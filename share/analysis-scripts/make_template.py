@@ -226,7 +226,7 @@ with open(sharedir / "analysis-scripts" / "template.mk") as f:
     if json_compilation_database:
       lines = insert_line_after(lines, "^FCFLAGS", f"  -json-compilation-database {json_compilation_database} \\\n")
     if relprefix != "..":
-        lines = replace_line(lines, "^  -add-symbolic-path=.:.. \\\\", f"  -add-symbolic-path=.:{relprefix} \\\n", all_occurrences=True)
+        lines = replace_line(lines, "^  -add-symbolic-path=..:. \\\\", f"  -add-symbolic-path={relprefix}:. \\\n", all_occurrences=True)
 
 gnumakefile.write_text("".join(lines))
 

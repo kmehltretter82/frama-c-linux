@@ -732,6 +732,7 @@ let process_call pdg state stmt lvaloption funcexp argl _loc =
     | [] ->
        let stmt_str = Format.asprintf "%a" Printer.pp_stmt stmt in
        Pdg_parameters.not_yet_implemented
+         ~source:(fst (Cil_datatype.Stmt.loc stmt))
          "pdg with an unknown function call: %s" stmt_str
     | st :: [] -> st
     | st :: other_states ->
@@ -1024,9 +1025,9 @@ let compute_pdg kf =
     | Pdg_state.Cannot_fold ->
         Pdg_parameters.warning "too imprecise value analysis : abort" ;
         degenerated true kf
-    | Log.FeatureRequest (who, what) ->
+    | Log.FeatureRequest (source, who, what) ->
 	(* [JS 2012/08/24] nobody should catch this exception *)
-        Pdg_parameters.warning "not implemented by %s yet: %s" who what ;
+        Pdg_parameters.warning ?source "not implemented by %s yet: %s" who what;
         degenerated true kf
 
 (*

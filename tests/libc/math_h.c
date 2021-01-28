@@ -1,5 +1,6 @@
 /* run.config
-   STDOPT: #"-warn-special-float none" #"-cpp-extra-args=\"-DNONFINITE\""
+   FILTER: sed -E -e '/atanf_/ s/([0-9][.][0-9]{6})[0-9]+/\1/g'
+   STDOPT: #"-warn-special-float none" #"-cpp-extra-args=\"-DNONFINITE\"" #"-eva-slevel 4"
 */
 #include <math.h>
 const double pi = 3.14159265358979323846264338327950288;
@@ -29,7 +30,6 @@ const double fp_ilogb0 = FP_ILOGB0;
 const double fp_ilogbnan = FP_ILOGBNAN;
 
 #define TEST_VAL(type,f,c) type f##_##c = f(c)
-
 #define TEST_FUN(type,f,prefix)                 \
   TEST_VAL(type,f,prefix##pi);                  \
   TEST_VAL(type,f,prefix##half_pi);             \
@@ -48,4 +48,20 @@ int main() {
   TEST_FUN(double,fabs,);
   TEST_FUN(float,fabsf,f_);
   TEST_FUN(long double,fabsl,ld_);
+
+#ifdef NONFINITE
+  int r;
+  r = isfinite(pi);
+  //@ assert r;
+  r = isfinite(large);
+  //@ assert r;
+  r = isfinite(0.0f);
+  //@ assert r;
+  r = isfinite(huge_val);
+  //@ assert !r;
+  r = isfinite(-INFINITY);
+  //@ assert !r;
+  r = isfinite(NAN);
+  //@ assert !r;
+#endif
 }

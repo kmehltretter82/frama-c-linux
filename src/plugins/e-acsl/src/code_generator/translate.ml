@@ -135,7 +135,11 @@ let add_cast ~loc ?name env kf ctx strnum t_opt e =
             None
             new_ty
             (fun v _ ->
-               [ Smart_stmt.lib_call ~loc ~result:(Cil.var v) fname [ e ] ])
+               [ Smart_stmt.rtl_call ~loc
+                   ~result:(Cil.var v)
+                   ~prefix:""
+                   fname
+                   [ e ] ])
         in
         e, env
       else if Gmp_types.Q.is_t ty || strnum = Str_R then
@@ -297,7 +301,7 @@ and context_insensitive_term_to_exp kf env t =
           kf
           ~name:vname
           (Some t)
-          (fun _ ev -> [ Smart_stmt.lib_call ~loc name [ ev; e ] ])
+          (fun _ ev -> [ Smart_stmt.rtl_call ~loc ~prefix:"" name [ ev; e ] ])
       in
       e, env, C_number, ""
     else if Gmp_types.Q.is_t ty then
@@ -326,7 +330,10 @@ and context_insensitive_term_to_exp kf env t =
     let e2, env = term_to_exp kf env t2 in
     if Gmp_types.Z.is_t ty then
       let name = name_of_mpz_arith_bop bop in
-      let mk_stmts _ e = [ Smart_stmt.lib_call ~loc name [ e; e1; e2 ] ] in
+      let mk_stmts _ e = [ Smart_stmt.rtl_call ~loc
+                             ~prefix:""
+                             name
+                             [ e; e1; e2 ] ] in
       let name = Misc.name_of_binop bop in
       let _, e, env =
         Env.new_var_and_mpz_init ~loc ~name env kf (Some t) mk_stmts
@@ -371,7 +378,7 @@ and context_insensitive_term_to_exp kf env t =
             p
         in
         Env.add_assert kf cond p;
-        let instr = Smart_stmt.lib_call ~loc name [ e; e1; e2 ] in
+        let instr = Smart_stmt.rtl_call ~loc ~prefix:"" name [ e; e1; e2 ] in
         [ cond; instr ]
       in
       let name = Misc.name_of_binop bop in
@@ -429,7 +436,7 @@ and context_insensitive_term_to_exp kf env t =
             (fun vi _e ->
                let result = Cil.var vi in
                let fname = "__gmpz_fits_ulong_p" in
-               [ Smart_stmt.lib_call ~loc ~result fname [ e2 ] ])
+               [ Smart_stmt.rtl_call ~loc ~result ~prefix:"" fname [ e2 ] ])
         in
         e, env
       in
@@ -459,7 +466,7 @@ and context_insensitive_term_to_exp kf env t =
         in
         let result = Cil.var vi in
         let name = "__gmpz_get_ui" in
-        let instr = Smart_stmt.lib_call ~loc ~result name [ e2 ] in
+        let instr = Smart_stmt.rtl_call ~loc ~result ~prefix:"" name [ e2 ] in
         [ coerce_guard_cond; instr ]
       in
       let name = e2_name ^ bop_name ^ "_coerced" in
@@ -478,7 +485,10 @@ and context_insensitive_term_to_exp kf env t =
       (* Create the shift instruction *)
       let mk_shift_instr result_e =
         let name = name_of_mpz_arith_bop bop in
-        Smart_stmt.lib_call ~loc name [ result_e; e1; e2_as_bitcnt_e ]
+        Smart_stmt.rtl_call ~loc
+          ~prefix:""
+          name
+          [ result_e; e1; e2_as_bitcnt_e ]
       in
 
       (* Put t in an option to use with comparison_to_exp and
@@ -537,21 +547,28 @@ and context_insensitive_term_to_exp kf env t =
     end
   | TBinOp(LOr, t1, t2) ->
     (* t1 || t2 <==> if t1 then true else t2 *)
-    let e1, env1 = term_to_exp kf (Env.rte env true) t1 in
-    let env' = Env.push env1 in
-    let res2 = term_to_exp kf (Env.push env') t2 in
     let e, env =
-      conditional_to_exp ~name:"or" loc kf (Some t) e1 (Cil.one loc, env') res2
+      Env.with_rte_and_result env true
+        ~f:(fun env ->
+            let e1, env1 = term_to_exp kf env t1 in
+            let env' = Env.push env1 in
+            let res2 = term_to_exp kf (Env.push env') t2 in
+            conditional_to_exp
+              ~name:"or" loc kf (Some t) e1 (Cil.one loc, env') res2
+          )
     in
     e, env, C_number, ""
   | TBinOp(LAnd, t1, t2) ->
     (* t1 && t2 <==> if t1 then t2 else false *)
-    let e1, env1 = term_to_exp kf (Env.rte env true) t1 in
-    let _, env2 as res2 = term_to_exp kf (Env.push env1) t2 in
-    let env3 = Env.push env2 in
     let e, env =
-      conditional_to_exp
-        ~name:"and" loc kf (Some t) e1 res2 (Cil.zero loc, env3)
+      Env.with_rte_and_result env true
+        ~f:(fun env ->
+            let e1, env1 = term_to_exp kf env t1 in
+            let _, env2 as res2 = term_to_exp kf (Env.push env1) t2 in
+            let env3 = Env.push env2 in
+            conditional_to_exp
+              ~name:"and" loc kf (Some t) e1 res2 (Cil.zero loc, env3)
+          )
     in
     e, env, C_number, ""
   | TBinOp((BOr | BXor | BAnd) as bop, t1, t2) ->
@@ -562,7 +579,7 @@ and context_insensitive_term_to_exp kf env t =
     if Gmp_types.Z.is_t ty then
       let mk_stmts _v e =
         let name = name_of_mpz_arith_bop bop in
-        let instr = Smart_stmt.lib_call ~loc name [ e; e1; e2 ] in
+        let instr = Smart_stmt.rtl_call ~loc ~prefix:"" name [ e; e1; e2 ] in
         [ instr ]
       in
       let name = Misc.name_of_binop bop in
@@ -639,9 +656,13 @@ and context_insensitive_term_to_exp kf env t =
           env
           kf
           (Some t)
-          (Misc.cty (Extlib.the li.l_type))
+          (Misc.cty (Option.get li.l_type))
           (fun vi _ ->
-             [ Smart_stmt.lib_call ~loc ~result:(Cil.var vi) fname args ])
+             [ Smart_stmt.rtl_call ~loc
+                 ~result:(Cil.var vi)
+                 ~prefix:""
+                 fname
+                 args ])
       else
         (* build the arguments and compute the integer_ty of the parameters *)
         let params_ty, args, env =
@@ -671,10 +692,15 @@ and context_insensitive_term_to_exp kf env t =
   | Tlambda _ -> Env.not_yet env "functional"
   | TDataCons _ -> Env.not_yet env "constructor"
   | Tif(t1, t2, t3) ->
-    let e1, env1 = term_to_exp kf (Env.rte env true) t1 in
-    let (_, env2 as res2) = term_to_exp kf (Env.push env1) t2 in
-    let res3 = term_to_exp kf (Env.push env2) t3 in
-    let e, env = conditional_to_exp loc kf (Some t) e1 res2 res3 in
+    let e, env =
+      Env.with_rte_and_result env true
+        ~f:(fun env ->
+            let e1, env1 = term_to_exp kf env t1 in
+            let (_, env2 as res2) = term_to_exp kf (Env.push env1) t2 in
+            let res3 = term_to_exp kf (Env.push env2) t3 in
+            conditional_to_exp loc kf (Some t) e1 res2 res3
+          )
+    in
     e, env, C_number, ""
   | Tat(t, BuiltinLabel Here) ->
     let e, env = term_to_exp kf env t in
@@ -731,21 +757,23 @@ and term_to_exp kf env t =
   let generate_rte = Env.generate_rte env in
   Options.feedback ~dkey ~level:4 "translating term %a (rte? %b)"
     Printer.pp_term t generate_rte;
-  let env = Env.rte env false in
-  let t = match t.term_node with TLogic_coerce(_, t) -> t | _ -> t in
-  let e, env, sty, name = context_insensitive_term_to_exp kf env t in
-  let env = if generate_rte then translate_rte kf env e else env in
-  let cast = Typing.get_cast t in
-  let name = if name = "" then None else Some name in
-  add_cast
-    ~loc:t.term_loc
-    ?name
-    env
-    kf
-    cast
-    sty
-    (Some t)
-    e
+  Env.with_rte_and_result env false
+    ~f:(fun env ->
+        let t = match t.term_node with TLogic_coerce(_, t) -> t | _ -> t in
+        let e, env, sty, name = context_insensitive_term_to_exp kf env t in
+        let env = if generate_rte then translate_rte kf env e else env in
+        let cast = Typing.get_cast t in
+        let name = if name = "" then None else Some name in
+        add_cast
+          ~loc:t.term_loc
+          ?name
+          env
+          kf
+          cast
+          sty
+          (Some t)
+          e
+      )
 
 (* generate the C code equivalent to [t1 bop t2]. *)
 and comparison_to_exp
@@ -760,8 +788,8 @@ and comparison_to_exp
   let ty1 = Cil.typeOf e1 in
   let e2, env = term_to_exp kf env t2 in
   let ty2 = Cil.typeOf e2 in
-  match Logic_array.is_array ty1, Logic_array.is_array ty2 with
-  | true, true ->
+  match Logic_aggr.get_t ty1, Logic_aggr.get_t ty2 with
+  | Logic_aggr.Array, Logic_aggr.Array ->
     Logic_array.comparison_to_exp
       ~loc
       kf
@@ -770,7 +798,9 @@ and comparison_to_exp
       bop
       e1
       e2
-  | false, false -> (
+  | Logic_aggr.StructOrUnion, Logic_aggr.StructOrUnion ->
+    Env.not_yet env "comparison between two structs or unions"
+  | Logic_aggr.NotAggregate, Logic_aggr.NotAggregate -> begin
       match ity with
       | Typing.C_integer _ | Typing.C_float _ | Typing.Nan ->
         Cil.mkBinOp ~loc bop e1 e2, env
@@ -783,8 +813,9 @@ and comparison_to_exp
             ~name
             Cil.intType
             (fun v _ ->
-               [ Smart_stmt.lib_call ~loc
+               [ Smart_stmt.rtl_call ~loc
                    ~result:(Cil.var v)
+                   ~prefix:""
                    "__gmpz_cmp"
                    [ e1; e2 ] ])
         in
@@ -793,10 +824,13 @@ and comparison_to_exp
         Rational.cmp ~loc bop e1 e2 env kf t_opt
       | Typing.Real ->
         Error.not_yet "comparison involving real numbers"
-    )
+    end
   | _, _ ->
-    Options.fatal ~current:true "Comparison involving an array with something \
-                                 else."
+    Options.fatal
+      ~current:true
+      "Comparison involving incompatible types: '%a' and '%a'"
+      Printer.pp_typ ty1
+      Printer.pp_typ ty2
 
 and at_to_exp_no_lscope env kf t_opt label e =
   let stmt = E_acsl_label.get_stmt kf label in
@@ -890,19 +924,25 @@ and predicate_content_to_exp ?name kf env p =
     comparison_to_exp ~loc kf env ity (relation_to_binop rel) t1 t2 None
   | Pand(p1, p2) ->
     (* p1 && p2 <==> if p1 then p2 else false *)
-    let e1, env1 = predicate_to_exp kf (Env.rte env true) p1 in
-    let _, env2 as res2 =
-      predicate_to_exp kf (Env.push env1) p2 in
-    let env3 = Env.push env2 in
-    let name = match name with None -> "and" | Some n -> n in
-    conditional_to_exp ~name loc kf None e1 res2 (Cil.zero loc, env3)
+    Env.with_rte_and_result env true
+      ~f:(fun env ->
+          let e1, env1 = predicate_to_exp kf env p1 in
+          let _, env2 as res2 =
+            predicate_to_exp kf (Env.push env1) p2 in
+          let env3 = Env.push env2 in
+          let name = match name with None -> "and" | Some n -> n in
+          conditional_to_exp ~name loc kf None e1 res2 (Cil.zero loc, env3)
+        )
   | Por(p1, p2) ->
     (* p1 || p2 <==> if p1 then true else p2 *)
-    let e1, env1 = predicate_to_exp kf (Env.rte env true) p1 in
-    let env' = Env.push env1 in
-    let res2 = predicate_to_exp kf (Env.push env') p2 in
-    let name = match name with None -> "or" | Some n -> n in
-    conditional_to_exp ~name loc kf None e1 (Cil.one loc, env') res2
+    Env.with_rte_and_result env true
+      ~f:(fun env ->
+          let e1, env1 = predicate_to_exp kf env p1 in
+          let env' = Env.push env1 in
+          let res2 = predicate_to_exp kf (Env.push env') p2 in
+          let name = match name with None -> "or" | Some n -> n in
+          conditional_to_exp ~name loc kf None e1 (Cil.one loc, env') res2
+        )
   | Pxor _ -> Env.not_yet env "xor"
   | Pimplies(p1, p2) ->
     (* (p1 ==> p2) <==> !p1 || p2 *)
@@ -924,11 +964,14 @@ and predicate_content_to_exp ?name kf env p =
     let e, env = predicate_to_exp kf env p in
     Cil.new_exp ~loc (UnOp(LNot, e, Cil.intType)), env
   | Pif(t, p2, p3) ->
-    let e1, env1 = term_to_exp kf (Env.rte env true) t in
-    let (_, env2 as res2) =
-      predicate_to_exp kf (Env.push env1) p2 in
-    let res3 = predicate_to_exp kf (Env.push env2) p3 in
-    conditional_to_exp loc kf None e1 res2 res3
+    Env.with_rte_and_result env true
+      ~f:(fun env ->
+          let e1, env1 = term_to_exp kf env t in
+          let (_, env2 as res2) =
+            predicate_to_exp kf (Env.push env1) p2 in
+          let res3 = predicate_to_exp kf (Env.push env2) p3 in
+          conditional_to_exp loc kf None e1 res2 res3
+        )
   | Plet(li, p) ->
     let lvs = Lscope.Lvs_let(li.l_var_info, Misc.term_of_li li) in
     let env = Env.Logic_scope.extend env lvs in
@@ -1035,19 +1078,21 @@ and predicate_content_to_exp ?name kf env p =
 
 and predicate_to_exp ?name kf ?rte env p =
   let rte = match rte with None -> Env.generate_rte env | Some b -> b in
-  let env = Env.rte env false in
-  let e, env = predicate_content_to_exp ?name kf env p in
-  let env = if rte then translate_rte kf env e else env in
-  let cast = Typing.get_cast_of_predicate p in
-  add_cast
-    ~loc:p.pred_loc
-    ?name
-    env
-    kf
-    cast
-    C_number
-    None
-    e
+  Env.with_rte_and_result env false
+    ~f:(fun env ->
+        let e, env = predicate_content_to_exp ?name kf env p in
+        let env = if rte then translate_rte kf env e else env in
+        let cast = Typing.get_cast_of_predicate p in
+        add_cast
+          ~loc:p.pred_loc
+          ?name
+          env
+          kf
+          cast
+          C_number
+          None
+          e
+      )
 
 and generalized_untyped_predicate_to_exp ?name kf ?rte ?must_clear_typing env p =
   (* If [rte] is true, it means we're translating the root predicate of an
@@ -1083,7 +1128,10 @@ and translate_rte_annots:
                 let p = p.tp_statement in
                 let lscope_reset_old = Env.Logic_scope.get_reset env in
                 let env = Env.Logic_scope.set_reset env false in
-                let env = translate_predicate kf (Env.rte env false) p in
+                let env =
+                  Env.with_rte env false
+                    ~f:(fun env -> translate_predicate kf env p)
+                in
                 let env = Env.Logic_scope.set_reset env lscope_reset_old in
                 env)
              env
@@ -1168,7 +1216,7 @@ let untyped_term_to_exp typ t =
       | TFloat(fk, _) -> Typing.fkind fk
       | _ -> Typing.nan
   in
-  let ctx = Extlib.opt_map ctx_of_typ typ in
+  let ctx = Option.map ctx_of_typ typ in
   Typing.type_term ~use_gmp_opt:true ?ctx t;
   let env = Env.push Env.empty in
   let env = Env.rte env false in

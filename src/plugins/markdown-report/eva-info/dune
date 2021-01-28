@@ -1,0 +1,21 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "markdown-report.eva-info:" %{lib-available:frama-c-markdown-report.eva-info} "\n")
+          (echo "  - markdown-report.core:" %{lib-available:markdown-report.core} "\n")
+          (echo "  - eva.core:" %{lib-available:eva.core} "\n")
+  )
+  )
+)
+
+( library
+  (name markdown_report_eva_info)
+  (public_name frama-c-markdown-report.eva-info)
+  (optional)
+  (flags -open Frama_c_kernel)
+  (libraries frama-c.kernel frama-c-eva.core frama-c-markdown-report.core)
+  (preprocess (pps ppx_deriving_yojson))
+)
+
+(plugin (optional) (name markdown-report-eva-info) (libraries frama-c-markdown-report.eva-info) (site (frama-c plugins)))

@@ -52,7 +52,7 @@ let valid_index ~remove_trivial ~on_alarm e size =
     let v_e = get_expr_val e in
     let v_size = get_expr_val size in
     let neg_ok =
-      Extlib.may_map ~dft:false (Integer.le Integer.zero) v_e
+      Option.fold ~none:false ~some:(Integer.le Integer.zero) v_e
       || Cil.isUnsignedInteger (Cil.typeOf e)
     in
     if not neg_ok then alarm Lower_bound;
@@ -111,15 +111,18 @@ let lval_initialized_assertion ~remove_trivial:_ ~on_alarm lv =
     | NoOffset ->
       begin
         match typ with
-        | TComp({cstruct = false; cfields} ,_,_) ->
+        | TComp({cstruct = false; cfields; cname} ,_,_) ->
           (match cfields with
-           | [] -> () (* empty union, supported by gcc with size 0.
-                         Trivially initialized. *)
-           | _ ->
+           | None ->
+             Options.fatal
+               "Access to an object of undefined union %a"
+               Printer.pp_varname cname
+           | Some [] -> () (* empty union, supported by gcc with size 0.
+                              Trivially initialized. *)
+           | Some l ->
              let llv =
                List.map
-                 (fun fi -> Cil.addOffsetLval (Field (fi, NoOffset)) lv)
-                 cfields
+                 (fun fi -> Cil.addOffsetLval (Field (fi, NoOffset)) lv) l
              in
              if default then
                on_alarm ~invalid:false (Alarms.Uninitialized_union llv))
@@ -451,18 +454,23 @@ let finite_float_assertion ~remove_trivial:_ ~on_alarm (fkind, exp) =
 let pointer_call ~remove_trivial:_ ~on_alarm (e, args) =
   on_alarm ~invalid:false (Alarms.Function_pointer (e, Some args))
 
+let rec is_safe_offset = function
+  | NoOffset -> true
+  | Field(fi,o) -> fi.fcomp.cstruct && not fi.faddrof && is_safe_offset o
+  | Index(_,o) -> is_safe_offset o
+
 let is_safe_pointer_value = function
   | Lval (Var vi, offset) ->
     (* Reading a pointer variable must emit an alarm if an invalid pointer value
        could have been written without previous alarm, through:
        - an union type, in which case [offset] is not NoOffset;
        - an untyped write, in which case the address of [vi] is taken. *)
-    not vi.vaddrof && offset = NoOffset
+    not vi.vaddrof && is_safe_offset offset
   | AddrOf (_, NoOffset) | StartOf (_, NoOffset) -> true
   | CastE (_typ, e) ->
     (* 0 can always be converted into a NULL pointer. *)
     let v = get_expr_val e in
-    Extlib.may_map ~dft:false Integer.(equal zero) v
+    Option.fold ~none:false ~some:Integer.(equal zero) v
   | _ -> false
 
 let pointer_value ~remove_trivial ~on_alarm expr =

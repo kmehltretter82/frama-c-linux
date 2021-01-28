@@ -59,7 +59,7 @@ let generate_requires ?loc alloc_type num size =
     else
       None
   in
-  [ valid_size ?loc alloc_type size ] @ (Extlib.list_of_opt only_one)
+  [ valid_size ?loc alloc_type size ] @ (Option.to_list only_one)
 
 let pinitialized_len ?loc alloc_type num size =
   let result = tresult ?loc (ptr_of alloc_type) in

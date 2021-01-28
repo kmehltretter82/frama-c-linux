@@ -284,7 +284,7 @@ struct
       let neg = Q.sign q < 0 in
       let int,frac,exp = (group 1 s), (group 2 s), (group 3 s) in
       let exp = if String.equal exp "" then None else Some exp in
-      let ty = Extlib.the (of_tau ~cnv tau) in
+      let ty = Option.get (of_tau ~cnv tau) in
       why3_real ty ~radix:16 ~neg ~int ~frac ?exp ()
     else raise Not_found
 
@@ -895,7 +895,7 @@ class visitor (ctx:context) c =
           let decl = Why3.Decl.create_data_decl [tys,[cstr,fields]] in
           ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
 
-    method private on_comp_gen kind c (fts:(Lang.field * Lang.tau) list) =
+    method private on_comp_gen kind c fts =
       begin
         let make_id = match kind with
           | Lang.KValue -> Lang.comp_id
@@ -905,7 +905,7 @@ class visitor (ctx:context) c =
           let cmp = Lang.Field.compare f g in
           if cmp = 0 then assert false (* by definition *) else cmp
         in
-        let fts = List.sort compare_field fts in
+        let fts = Option.map (List.sort compare_field) fts in
         (*TODO:NUPW: manage UNIONS *)
         let id = Why3.Ident.id_fresh (make_id c) in
         let ts = Why3.Ty.create_tysymbol id [] Why3.Ty.NoDef in
@@ -918,9 +918,15 @@ class visitor (ctx:context) c =
           let ls = Why3.Term.create_lsymbol id [ty] ty_ctr in
           (Some ls,Why3.Opt.get ty_ctr)
         in
-        let fields = List.map map fts in
-        let constr = Why3.Term.create_fsymbol ~constr:1 id (List.map snd fields) ty in
-        let decl = Why3.Decl.create_data_decl [ts,[constr,List.map fst fields]] in
+        let fields = Option.map (List.map map) fts in
+        let decl = match fields with
+          | None -> Why3.Decl.create_ty_decl ts
+          | Some fields ->
+              let constr =
+                Why3.Term.create_fsymbol ~constr:1 id (List.map snd fields) ty
+              in
+              Why3.Decl.create_data_decl [ts,[constr,List.map fst fields]]
+        in
         ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
       end
 

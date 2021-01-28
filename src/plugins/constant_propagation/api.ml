@@ -144,8 +144,8 @@ class propagate project fnames ~cast_intro = object(self)
         &&
         (* (2) [vi] is bound in this function *)
         (vi.vglob ||
-         Extlib.may_map
-           (Kernel_function.is_formal_or_local vi) ~dft:false
+         Option.fold
+           ~some:(Kernel_function.is_formal_or_local vi) ~none:false
            self#current_kf)
       in
       let change_to = match b with

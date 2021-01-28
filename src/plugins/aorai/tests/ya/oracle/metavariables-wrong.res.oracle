@@ -1,0 +1,5 @@
+[kernel] Parsing tests/ya/metavariables-wrong.i (no preprocessing)
+[aorai] Welcome to the Aorai plugin
+[aorai] User Error: The metavariables aorai_x may not be initialized before the transition from e to f_0:
+  { (Call(h)) and ((aorai_x) > (0)) }
+[kernel] Plug-in aorai aborted: invalid user input.

@@ -44,9 +44,10 @@ Assume {
 Prove: global(L_two_24) != one_0.
 
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'global_frame':
+[wp] tests/wp_bts/bts_1828.i:56: Warning: 
+  Memory model hypotheses for function 'global_frame':
   /*@
-     behavior typed_ref:
+     behavior wp_typed_ref:
        requires \separated(zero, one);
        requires \valid(one);
        requires \valid(zero);

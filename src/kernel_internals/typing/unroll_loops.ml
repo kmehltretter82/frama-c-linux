@@ -39,7 +39,7 @@ let empty_info =
 let update_info global_find_init emitter info spec =
   match spec with
     | {term_type=typ}  when Logic_typing.is_integral_type typ ->
-      if Extlib.has_some info.unroll_number && not info.ignore_unroll then begin
+      if Option.is_some info.unroll_number && not info.ignore_unroll then begin
 	Kernel.warning ~once:true ~current:true
 	  "ignoring unrolling directive (directive already defined)";
         info
@@ -65,7 +65,7 @@ let update_info global_find_init emitter info spec =
       end
     | {term_node=TConst (LStr "done") } -> { info with ignore_unroll = true }
     | {term_node=TConst (LStr "completely") } ->
-      if Extlib.has_some info.total_unroll then begin
+      if Option.is_some info.total_unroll then begin
         Kernel.warning ~once:true ~current:true
           "found two total unroll pragmas";
         info
@@ -187,7 +187,7 @@ let copy_annotations kf assoc labelled_stmt_tbl (break_continue_must_change, stm
             begin
               try
                 let vi'= snd (List.find (fun (x,_) -> x.vid = vi.vid) assoc) in
-                ChangeTo (Extlib.the vi'.vlogic_var_assoc)
+                ChangeTo (Option.get vi'.vlogic_var_assoc)
               with Not_found -> SkipChildren
                 | Invalid_argument _ ->
                     Kernel.abort
@@ -604,13 +604,13 @@ class do_it global_find_init ((force:bool),(times:int)) = object(self)
       ChangeDoChildrenPost (s, update)
   | Loop _ ->
     let infos = extract_from_pragmas global_find_init s in
-    let number = Extlib.opt_conv times infos.unroll_number in
+    let number = Option.value ~default:times infos.unroll_number in
     let total_unrolling = infos.total_unroll in
     let is_ignored_unrolling = not force && infos.ignore_unroll in
     let f sloop = 
       Kernel.debug ~dkey
         "Unrolling loop stmt %d (%d times) inside function %a@." 
-	sloop.sid number Kernel_function.pretty (Extlib.the self#current_kf);
+	sloop.sid number Kernel_function.pretty (Option.get self#current_kf);
       file_has_unrolled_loop <- true ;
       has_unrolled_loop <- true ;
       match sloop.skind with
@@ -644,14 +644,14 @@ class do_it global_find_init ((force:bool),(times:int)) = object(self)
         let switch_label_action = if i = number-1 then Move else Ignore in
         let new_block, new_switch_cases =
           copy_block
-	    (Extlib.the self#current_kf)
+	    (Option.get self#current_kf)
             switch_label_action
             ((Some break_lbl_stmt),(Some !current_continue))
             block
         in
         cases <- new_switch_cases @ cases;
         current_continue := mk_continue ();
-	update_loop_current (Extlib.the self#current_kf) !current_continue new_block;
+	update_loop_current (Option.get self#current_kf) !current_continue new_block;
         (match new_block.blocals with
           [] -> new_stmts:= new_block.bstmts @ !new_stmts;
         | _ -> (* keep the block in order to preserve locals decl *)
@@ -660,7 +660,7 @@ class do_it global_find_init ((force:bool),(times:int)) = object(self)
       let new_stmt = match !new_stmts with
       | [ s ] -> s
       | l ->
-	List.iter (update_loop_entry (Extlib.the self#current_kf) !current_continue) l;
+	List.iter (update_loop_entry (Option.get self#current_kf) !current_continue) l;
         let l = if is_referenced !current_continue l then !current_continue :: l else l in
         let new_stmts = l @ [break_lbl_stmt] in
         let new_block = mkBlock new_stmts in
@@ -687,7 +687,7 @@ class do_it global_find_init ((force:bool),(times:int)) = object(self)
               (AInvariant ([],true,Logic_const.(toplevel_predicate pfalse)))
           in
           Annotations.add_code_annot
-	    emitter ~kf:(Extlib.the self#current_kf) sloop annot;
+	    emitter ~kf:(Option.get self#current_kf) sloop annot;
           new_stmts
     in
     let h sloop new_stmts = (* To indicate that the unrolling has been done *)
@@ -699,7 +699,7 @@ class do_it global_find_init ((force:bool),(times:int)) = object(self)
         Logic_const.new_code_annotation (APragma (Loop_pragma specs))
       in
       Annotations.add_code_annot
-        Emitter.end_user ~kf:(Extlib.the self#current_kf) sloop annot;
+        Emitter.end_user ~kf:(Option.get self#current_kf) sloop annot;
       new_stmts
     in
     let fgh sloop = h sloop (g sloop (f sloop)) in

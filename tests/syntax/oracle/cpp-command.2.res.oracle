@@ -1,2 +1,10 @@
+<<<<<<< HEAD
 [kernel] Parsing cpp-command.c (with preprocessing)
 using \% has no effect : cpp-command.c'
+||||||| ac7807782d
+[kernel] Parsing tests/syntax/cpp-command.c (with preprocessing)
+using \% has no effect : cpp-command.c'
+=======
+[kernel] Parsing tests/syntax/cpp-command.c (with preprocessing)
+using \% has no effect : cpp-command.c'
+>>>>>>> origin/master

@@ -134,7 +134,7 @@ let cast_arg i paramtyp exp =
            The argument will be cast from %a to %a."
           (i + 1)
           pretty_typ argtyp pretty_typ paramtyp
-  end;
+    end;
   Cil.mkCast ~force:false ~e:exp ~newt:paramtyp
 
 
@@ -181,12 +181,12 @@ let find_null exp_list =
 let aggregator_call
     ~fundec ~ghost {a_target; a_pos; a_type; a_param} scope loc mk_call vf args =
   let name = vf.vf_decl.vorig_name
-  and tparams = Typ.params_types a_target.vtype 
+  and tparams = Typ.params_types a_target.vtype
   and pname, ptyp = a_param in
 
   (* Check argument count *)
   let argcount = List.length args
-  and paramcount = List.length tparams in 
+  and paramcount = List.length tparams in
   if argcount < paramcount then begin
     Self.warning ~current:true
       "Not enough arguments: expected %d, given %d."
@@ -195,14 +195,14 @@ let aggregator_call
   end;
 
   (* Compute the size of the aggregation *)
-  let size = match a_type with 
-  | EndedByNull ->
+  let size = match a_type with
+    | EndedByNull ->
       begin try
-        find_null (List.drop a_pos args) + 1
-      with Not_found ->
-        Self.warning ~current:true
-          "Failed to find a sentinel (NULL pointer) in the argument list.";
-        raise Translate_call_exn;
+          find_null (List.drop a_pos args) + 1
+        with Not_found ->
+          Self.warning ~current:true
+            "Failed to find a sentinel (NULL pointer) in the argument list.";
+          raise Translate_call_exn;
       end
   in
 
@@ -272,25 +272,28 @@ let overloaded_call ~fundec overload block loc mk_call vf args =
   let tparams, new_callee =
     match filter_matching_prototypes overload args with
     | [] -> (* No matching prototype *)
-        Self.warning ~current:true
-          "@[No matching prototype found for this call to %s.@.\
-           Expected candidates:@.\
-           @[<v>       %a@]@.\
-           Given arguments:@.\
-           @[<v>       %a@]"
-          name (pp_overload name) overload
-          (pp_prototype name) (List.map Cil.typeOf args);
-        raise Translate_call_exn;
+      Self.warning ~current:true
+        "@[No matching prototype found for this call to %s.@.\
+         Expected candidates:@.\
+         @[<v>       %a@]@.\
+         Given arguments:@.\
+         @[<v>       %a@]"
+        name (pp_overload name) overload
+        (pp_prototype name) (List.map Cil.typeOf args);
+      raise Translate_call_exn;
     | [(tparams,vi)] -> (* Exactly one matching prototype *)
-        tparams, vi
+      tparams, vi
     | l -> (* Several matching prototypes *)
-        Self.warning ~current:true
-          "Ambiguous call to %s. Matching candidates are: \
-           %a"
-          name
-          (pp_overload name) l;
-        raise Translate_call_exn;
+      Self.warning ~current:true
+        "Ambiguous call to %s. Matching candidates are: \
+         %a"
+        name
+        (pp_overload name) l;
+      raise Translate_call_exn;
   in
+
+  (* Store the translation *)
+  Replacements.add new_callee vf.vf_decl;
 
   (* Rebuild the call *)
   Self.result ~current:true ~level:2
@@ -328,7 +331,7 @@ let find_predicate name =
   | [] ->
     Self.warning ~once:true
       "Unable to locate ACSL predicate %s which should be in the Frama-C LibC. \
-      Correct specifications can't be generated."
+       Correct specifications can't be generated."
       name;
     None
 
@@ -393,17 +396,17 @@ let build_fun_spec env loc vf format_fun tvparams formals =
   let add_lval ~indirect (lval,dir) =
     (* Add the lval to the list of sources/dests *)
     begin match dir with
-    | (`ArgIn | `ArgInArray _) -> insert_source ~indirect lval
-    | (`ArgOut | `ArgOutArray) -> insert_dest lval
-    | `ArgInOut -> insert_source ~indirect lval; insert_dest lval
+      | (`ArgIn | `ArgInArray _) -> insert_source ~indirect lval
+      | (`ArgOut | `ArgOutArray) -> insert_dest lval
+      | `ArgInOut -> insert_source ~indirect lval; insert_dest lval
     end
   in
   let add_var ?pos (vi,dir) =
     (* Use the appropriate logical lval *)
     let lval = match dir with
-    | `ArgIn -> Build.lvar vi
-    | (`ArgInArray _ | `ArgOutArray) -> Build.trange_from_vi ~loc vi
-    | (`ArgOut | `ArgInOut) -> Build.tvarmem ~loc vi
+      | `ArgIn -> Build.lvar vi
+      | (`ArgInArray _ | `ArgOutArray) -> Build.trange_from_vi ~loc vi
+      | (`ArgOut | `ArgInOut) -> Build.tvarmem ~loc vi
     in
     (* Build requires/ensures *)
     let term = Build.tvar ~loc vi in
@@ -430,7 +433,7 @@ let build_fun_spec env loc vf format_fun tvparams formals =
             let labels = List.map (fun _ -> here) logic_info.l_labels in
             let nterm = match precision with
               | PStar ->
-                let n_vi = List.nth vformals (Extlib.the pos) in
+                let n_vi = List.nth vformals (Option.get pos) in
                 Logic_utils.numeric_coerce Linteger (Build.tvar ~loc n_vi)
               | PInt n -> Cil.lconstant ~loc (Integer.of_int n)
             in
@@ -474,17 +477,17 @@ let build_fun_spec env loc vf format_fun tvparams formals =
     (* assigns stream->__fc_FILE_data
          \from stream->__fc_FILE_data, __fc_FILE_id *)
     begin match find_field env "__fc_FILE" "__fc_FILE_data" with
-    | Some fieldinfo ->
+      | Some fieldinfo ->
         let varfield = Build.tvarfield ~loc vi fieldinfo in
         add_lval ~indirect:false (varfield, `ArgInOut)
-    | None ->
+      | None ->
         add_var ~indirect:false (vi, `ArgInOut)
     end;
     begin match find_field env "__fc_FILE" "__fc_FILE_id" with
-    | Some fieldinfo ->
+      | Some fieldinfo ->
         let varfield = Build.tvarfield ~loc vi fieldinfo in
         add_lval ~indirect:true (varfield, `ArgIn)
-    | None -> ()
+      | None -> ()
     end
   in
 
@@ -524,31 +527,31 @@ let build_fun_spec env loc vf format_fun tvparams formals =
   in
 
   begin match format_fun.f_buffer, format_fun.f_kind with
-  | StdIO, ScanfLike ->
+    | StdIO, ScanfLike ->
       begin match find_global env "__fc_stdin" with
-      | Some vi -> add_stream vi
-      | None -> ()
+        | Some vi -> add_stream vi
+        | None -> ()
       end
-  | StdIO, PrintfLike ->
+    | StdIO, PrintfLike ->
       begin match find_global env "__fc_stdout" with
-      | Some vi -> add_stream vi
-      | None -> ()
+        | Some vi -> add_stream vi
+        | None -> ()
       end
-  | Arg (i, _), ScanfLike ->
+    | Arg (i, _), ScanfLike ->
       add_var ~indirect:true (List.nth sformals i, `ArgInArray None)
-  | Arg (i, size_pos), PrintfLike ->
+    | Arg (i, size_pos), PrintfLike ->
       add_var ~indirect:true (List.nth sformals i, `ArgOutArray);
       begin match size_pos with
-      | Some n ->
-        add_buffer (List.nth sformals i) (List.nth sformals n)
-      | None -> ()
+        | Some n ->
+          add_buffer (List.nth sformals i) (List.nth sformals n)
+        | None -> ()
       end
-  | Stream i, _ ->
+    | Stream i, _ ->
       add_stream (List.nth sformals i)
-  | File i, _ ->
+    | File i, _ ->
       let file = List.nth sformals i in
       add_var ~indirect:true (file, `ArgIn);
-  | Syslog, _ -> ()
+    | Syslog, _ -> ()
   end;
 
   (* Build the assigns clause (without \result, for now; it will be added
@@ -568,7 +571,7 @@ let build_fun_spec env loc vf format_fun tvparams formals =
 
   (* Build the default behaviour *)
   let bhv = Cil.mk_behavior ~assigns
-    ~requires:!requires ~post_cond:!ensures () in
+      ~requires:!requires ~post_cond:!ensures () in
   { (Cil.empty_funspec ()) with spec_behavior = [bhv] }
 
 
@@ -579,7 +582,7 @@ let format_fun_call ~fundec env format_fun scope loc mk_call vf args =
   and params = Typ.params vf.vf_decl.vtype in
   (* Remove the va_param parameter added during the declaration visit *)
   let fixed_params_count = Typ.params_count vf.vf_original_type in
-  let sparams = List.take fixed_params_count params in 
+  let sparams = List.take fixed_params_count params in
 
   (* Extract the format if possible *)
   let format =
@@ -634,6 +637,9 @@ let format_fun_call ~fundec env format_fun scope loc mk_call vf args =
   in
   new_callee.vname <- new_name;
   new_globals := glob :: !new_globals;
+
+  (* Store the translation *)
+  Replacements.add new_callee vf.vf_decl;
 
   (* Translate the call *)
   Self.result ~current:true ~level:2

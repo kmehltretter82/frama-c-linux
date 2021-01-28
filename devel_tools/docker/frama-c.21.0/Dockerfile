@@ -1,4 +1,4 @@
-FROM debian:sid as base
+FROM debian:buster as base
 
 # Install non-OCaml dependencies + opam
 RUN apt-get update && apt-get install -y \

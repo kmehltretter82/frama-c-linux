@@ -10,7 +10,7 @@ Goal Post-condition (file reference_array.i, line 49) in 'add_1_5':
 Let a = shift_A5_sint32(ap_0, 0).
 Assume {
   (* Heap *)
-  Type: (region(ap_0.base) <= 0) /\ IsArray1_sint32(reg_load_0) /\
+  Type: (region(ap_0.base) <= 0) /\ IsArray_sint32(reg_load_0) /\
       linked(Malloc_0).
   (* Goal *)
   When: (0 <= i) /\ (i <= 4).
@@ -46,7 +46,7 @@ Prove: true.
 Goal Post-condition 'Pload' in 'calls_on_array_dim_1':
 Assume {
   (* Heap *)
-  Type: IsArray1_sint32(t).
+  Type: IsArray_sint32(t).
   (* Goal *)
   When: (0 <= i) /\ (i <= 4).
   (* Call 'load_5' *)
@@ -68,7 +68,7 @@ Prove: t[i] = reg_load_0[i].
 Goal Post-condition 'Preset' in 'calls_on_array_dim_1':
 Assume {
   (* Heap *)
-  Type: IsArray1_sint32(t_1).
+  Type: IsArray_sint32(t_1).
   (* Goal *)
   When: (0 <= i) /\ (i <= 4).
   (* Call 'load_5' *)
@@ -90,7 +90,7 @@ Prove: t[i] = 0.
 Goal Post-condition 'Padd' in 'calls_on_array_dim_1':
 Assume {
   (* Heap *)
-  Type: IsArray1_sint32(t).
+  Type: IsArray_sint32(t).
   (* Goal *)
   When: (0 <= i) /\ (i <= 4).
   (* Call 'load_5' *)
@@ -144,7 +144,7 @@ Goal Post-condition 'Pload' in 'calls_on_array_dim_2':
 Let m = tt_0[0].
 Assume {
   (* Heap *)
-  Type: IsArray2_sint32(tt_0).
+  Type: IsArray_d2_sint32(tt_0).
   (* Goal *)
   When: (0 <= i) /\ (i <= 4).
   (* Call 'load_1_5' *)
@@ -163,7 +163,7 @@ Prove: m[i] = reg_load_0[i].
 Goal Post-condition 'Preset' in 'calls_on_array_dim_2':
 Assume {
   (* Heap *)
-  Type: IsArray2_sint32(tt_0).
+  Type: IsArray_d2_sint32(tt_0).
   (* Goal *)
   When: (0 <= i) /\ (i <= 4).
   (* Call 'load_1_5' *)
@@ -183,7 +183,7 @@ Goal Post-condition 'Padd' in 'calls_on_array_dim_2':
 Let m = tt_0[0].
 Assume {
   (* Heap *)
-  Type: IsArray2_sint32(tt_0).
+  Type: IsArray_d2_sint32(tt_0).
   (* Goal *)
   When: (0 <= i) /\ (i <= 4).
   (* Call 'load_1_5' *)
@@ -235,7 +235,7 @@ Let m = tt_1[0].
 Let m_1 = tt_0[0].
 Assume {
   (* Heap *)
-  Type: IsArray2_sint32(tt_0).
+  Type: IsArray_d2_sint32(tt_0).
   (* Goal *)
   When: (0 <= i) /\ (i <= 4).
   (* Call 'load_5' *)
@@ -257,7 +257,7 @@ Goal Post-condition 'Preset' in 'calls_on_array_dim_2_to_1':
 Let m = tt_0[0].
 Assume {
   (* Heap *)
-  Type: IsArray2_sint32(tt_1).
+  Type: IsArray_d2_sint32(tt_1).
   (* Goal *)
   When: (0 <= i) /\ (i <= 4).
   (* Call 'load_5' *)
@@ -280,7 +280,7 @@ Let m = tt_1[0].
 Let m_1 = tt_0[0].
 Assume {
   (* Heap *)
-  Type: IsArray2_sint32(tt_0).
+  Type: IsArray_d2_sint32(tt_0).
   (* Goal *)
   When: (0 <= i) /\ (i <= 4).
   (* Call 'load_5' *)
@@ -401,15 +401,32 @@ Goal Instance of 'Pre-condition (file reference_array.i, line 9) in 'reset_5'' i
 Prove: true.
 
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'load_1_5':
+[wp] tests/wp_hoare/reference_array.i:24: Warning: 
+  Memory model hypotheses for function 'load_5':
   /*@
-     behavior typed_ref:
+     behavior wp_typed_ref:
+       requires \separated(hp + (..), (int *)reg_load + (..));
+     */
+  void load_5(int *hp);
+[wp] tests/wp_hoare/reference_array.i:31: Warning: 
+  Memory model hypotheses for function 'add_5':
+  /*@
+     behavior wp_typed_ref:
+       requires
+         \separated(gp + (..), (int *)reg_load + (..), (int *)reg_add + (..));
+     */
+  void add_5(int *gp);
+[wp] tests/wp_hoare/reference_array.i:45: Warning: 
+  Memory model hypotheses for function 'load_1_5':
+  /*@
+     behavior wp_typed_ref:
        requires \separated(lp + (..), (int *)reg_load + (..));
      */
   void load_1_5(int (*lp)[5]);
-[wp] Warning: Memory model hypotheses for function 'add_1_5':
+[wp] tests/wp_hoare/reference_array.i:52: Warning: 
+  Memory model hypotheses for function 'add_1_5':
   /*@
-     behavior typed_ref:
+     behavior wp_typed_ref:
        requires
          \separated(ap + (..), (int *)reg_load + (..), (int *)reg_add + (..));
      */

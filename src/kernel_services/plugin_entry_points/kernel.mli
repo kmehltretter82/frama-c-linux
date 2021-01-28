@@ -175,6 +175,8 @@ val wkey_no_proto: warn_category
 
 val wkey_missing_spec: warn_category
 
+val wkey_multi_from: warn_category
+
 val wkey_decimal_float: warn_category
 
 val wkey_acsl_extension: warn_category
@@ -240,7 +242,7 @@ module AutocompleteHelp: Parameter_sig.String_set
 
 module PrintConfigJson: Parameter_sig.Bool
 (** Behavior of option "-print-config-json"
-    @since Frama-C+dev *)
+    @since 22.0-Titanium *)
 
 (* ************************************************************************* *)
 (** {2 Output Messages} *)
@@ -304,8 +306,9 @@ module CodeOutput : sig
 end
 
 (** Behavior of option "-add-symbolic-path"
-    @since Neon-20140301 *)
-module SymbolicPath: Parameter_sig.String_set
+    @since Neon-20140301
+    @modify Frama-C+dev inversed argument order (now uses path:name) *)
+module SymbolicPath: Parameter_sig.Filepath_map with type value = string
 
 module FloatNormal: Parameter_sig.Bool
 (** Behavior of option "-float-normal" *)

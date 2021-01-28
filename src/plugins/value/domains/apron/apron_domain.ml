@@ -329,8 +329,8 @@ let truncate_interval typ interval =
 let interval_to_ival interval =
   let inf = scalar_to_int interval.Interval.inf
   and sup = scalar_to_int interval.Interval.sup in
-  let inf = Extlib.opt_map Integer.of_int inf
-  and sup = Extlib.opt_map Integer.of_int sup in
+  let inf = Option.map Integer.of_int inf
+  and sup = Option.map Integer.of_int sup in
   Some (Ival.inject_range inf sup)
 
 let int_to_scalar positive = function

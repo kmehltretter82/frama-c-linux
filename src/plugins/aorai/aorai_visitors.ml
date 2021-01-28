@@ -33,7 +33,7 @@ open Cil
 let dkey = Aorai_option.register_category "action"
 
 let get_acceptance_pred () =
-  let (st,_) = Data_for_aorai.getAutomata () in
+  let (st,_) = Data_for_aorai.getGraph () in
   List.fold_left
     (fun acc s ->
        match s.acceptation with
@@ -46,6 +46,7 @@ let get_call_name exp = match exp.enode with
   | Lval(Var(vi),NoOffset) -> vi.vname
   | _ ->
     Aorai_option.not_yet_implemented
+      ~source:(fst exp.eloc)
       "At this time, only explicit calls are allowed by the Aorai plugin."
 
 (****************************************************************************)
@@ -120,7 +121,7 @@ class visit_adding_code_for_synchronisation =
     method! vglob_aux g =
       match g with
       | GFun (fundec,loc) ->
-        let kf = Extlib.the self#current_kf in
+        let kf = Option.get self#current_kf in
         let vi = Kernel_function.get_vi kf in
         let vi_pre = Cil_const.copy_with_new_vid vi in
         vi_pre.vname <- Data_for_aorai.get_fresh (vi_pre.vname ^ "_pre_func");
@@ -207,7 +208,7 @@ class visit_adding_code_for_synchronisation =
     method! vstmt_aux stmt =
       match stmt.skind with
       | Return (res,loc)  ->
-        let kf = Extlib.the self#current_kf in
+        let kf = Option.get self#current_kf in
         let vi = Kernel_function.get_vi kf in
         let current_function = vi.vname in
         if not (Data_for_aorai.isIgnoredFunction current_function) then begin
@@ -371,24 +372,24 @@ let pred_reachable reachable_states =
       (nb, reachable,
        Logic_const.pand (unreachable, Aorai_utils.is_out_of_state_pred state))
   in
-  let (states,_) = Data_for_aorai.getAutomata () in
+  let (states,_) = Data_for_aorai.getGraph () in
   let (nb, reachable, unreachable) =
     List.fold_left treat_one_state (0,pfalse,ptrue) states
   in
   (nb > 1, reachable, unreachable)
 
 let possible_start kf (start,int) =
-  let auto = Data_for_aorai.getAutomata () in
+  let auto = Data_for_aorai.getGraph () in
   let trans = Path_analysis.get_edges start int auto in
   let treat_one_trans cond tr =
     Logic_const.por
-      (cond, Aorai_utils.crosscond_to_pred (fst tr.cross) kf Promelaast.Call)
+      (cond, Aorai_utils.crosscond_to_pred tr.cross kf Promelaast.Call)
   in
   let cond = List.fold_left treat_one_trans Logic_const.pfalse trans in
   Logic_const.pand (Aorai_utils.is_state_pred start, cond)
 
 let neg_trans kf trans =
-  let auto = Data_for_aorai.getAutomata () in
+  let auto = Data_for_aorai.getGraph () in
   let rec aux l acc =
     match l with
     | [] -> acc
@@ -409,7 +410,7 @@ let neg_trans kf trans =
              List.fold_left
                (fun cond tr ->
                   Logic_simplification.tand
-                    cond (Logic_simplification.tnot (fst tr.cross)))
+                    cond (Logic_simplification.tnot tr.cross))
                cond trans)
           TTrue same_start
       in
@@ -527,7 +528,7 @@ class visit_adding_pre_post_from_buch treatloops =
         predicate_to_invariant kf stmt pred
       end
     in
-    let (states,_) = Data_for_aorai.getAutomata () in
+    let (states,_) = Data_for_aorai.getGraph () in
     List.iter treat_one_state states;
     if has_multiple_choice then begin
       let add_possible_state state _ acc =
@@ -584,7 +585,7 @@ class visit_adding_pre_post_from_buch treatloops =
     Data_for_aorai.Aorai_state.Map.fold treat_one_state possible_states []
   in
   let partition_pre_state map =
-    let (states,_) = Data_for_aorai.getAutomata () in
+    let (states,_) = Data_for_aorai.getGraph () in
     let is_equiv st1 st2 =
       let check_one _ o1 o2 =
         match o1, o2 with
@@ -840,7 +841,7 @@ class visit_adding_pre_post_from_buch treatloops =
               in
               (i+1,bhv :: bhvs)
           in
-          let (states,_) = Data_for_aorai.getAutomata () in
+          let (states,_) = Data_for_aorai.getGraph () in
           List.rev (snd (List.fold_left aux (0,bhvs) states))
         end
     in
@@ -906,7 +907,7 @@ class visit_adding_pre_post_from_buch treatloops =
     method private leave_block () = !(Stack.pop has_call)
 
     method! vfunc f =
-      let my_kf = Extlib.the self#current_kf in
+      let my_kf = Option.get self#current_kf in
       let vi = Kernel_function.get_vi my_kf in
       let spec = Annotations.funspec my_kf in
       let loc = Kernel_function.get_location my_kf in
@@ -939,7 +940,7 @@ class visit_adding_pre_post_from_buch treatloops =
     method! vglob_aux g =
       match g with
       | GFun(f,_)  ->
-        let my_kf = Extlib.the self#current_kf in
+        let my_kf = Option.get self#current_kf in
         (* don't use get_spec, as we'd generate default assigns,
            while we'll fill the spec just below. *)
         let vi = Kernel_function.get_vi my_kf in
@@ -980,7 +981,7 @@ class visit_adding_pre_post_from_buch treatloops =
       | _ -> DoChildren;
 
     method! vstmt_aux stmt =
-      let kf = Extlib.the self#current_kf in
+      let kf = Option.get self#current_kf in
       let treat_loop body_ref stmt =
         let init_state = Data_for_aorai.get_loop_init_state stmt in
         let inv_state = Data_for_aorai.get_loop_invariant_state stmt in
@@ -1104,7 +1105,7 @@ class visit_adding_pre_post_from_buch treatloops =
           List.iter
             (update_assigns
                (Cil_datatype.Stmt.loc stmt)
-               (Extlib.the self#current_kf)
+               (Option.get self#current_kf)
                (Kstmt stmt))
             specs;
           s

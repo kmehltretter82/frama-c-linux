@@ -33,7 +33,7 @@ let apply_on_var ~loc funname e =
     else if Gmp_types.Q.is_t ty then "__gmpq_"
     else assert false
   in
-  Smart_stmt.lib_call ~loc (prefix ^ funname) [ e ]
+  Smart_stmt.rtl_call ~loc ~prefix funname [ e ]
 
 let init ~loc e = apply_on_var "init" ~loc e
 let clear ~loc e = apply_on_var "clear" ~loc e
@@ -90,7 +90,7 @@ let generic_affect ~loc fname lv ev e =
   let ty = Cil.typeOf ev in
   if Gmp_types.Z.is_t ty || Gmp_types.Q.is_t ty then begin
     let suf, args = get_set_suffix_and_arg ty e in
-    Smart_stmt.lib_call ~loc (fname ^ suf) (ev :: args)
+    Smart_stmt.rtl_call ~loc ~prefix:"" (fname ^ suf) (ev :: args)
   end else
     Smart_stmt.assigns ~loc:e.eloc ~result:lv e
 
@@ -111,7 +111,8 @@ let init_set ~loc lv ev e =
      | Lval elv ->
        assert (Gmp_types.Z.is_t (Cil.typeOf ev));
        let call =
-         Smart_stmt.lib_call ~loc
+         Smart_stmt.rtl_call ~loc
+           ~prefix:""
            "__gmpz_import"
            [ ev;
              Cil.one ~loc;

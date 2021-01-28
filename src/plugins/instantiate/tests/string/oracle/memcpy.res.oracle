@@ -45,15 +45,15 @@ int *memcpy_int(int *dest, int const *src, size_t len)
 
 void integer(int * /*[10]*/ src, int * /*[10]*/ dest)
 {
-  int *res = memcpy_int(dest,src,(unsigned int)10 * sizeof(int));
-  memcpy_int(src,res,(unsigned int)10 * sizeof(int));
+  int *res = memcpy_int(dest,src,(unsigned long)10 * sizeof(int));
+  memcpy_int(src,res,(unsigned long)10 * sizeof(int));
   return;
 }
 
 void with_named(named * /*[10]*/ src, named * /*[10]*/ dest)
 {
-  named *res = memcpy_int(dest,src,(unsigned int)10 * sizeof(named));
-  memcpy_int(src,res,(unsigned int)10 * sizeof(named));
+  named *res = memcpy_int(dest,src,(unsigned long)10 * sizeof(named));
+  memcpy_int(src,res,(unsigned long)10 * sizeof(named));
   return;
 }
 
@@ -85,28 +85,28 @@ struct X *memcpy_st_X(struct X *dest, struct X const *src, size_t len)
 
 void structure(struct X * /*[10]*/ src, struct X * /*[10]*/ dest)
 {
-  struct X *res = memcpy_st_X(dest,src,(unsigned int)10 * sizeof(struct X));
-  memcpy_st_X(src,res,(unsigned int)10 * sizeof(struct X));
+  struct X *res = memcpy_st_X(dest,src,(unsigned long)10 * sizeof(struct X));
+  memcpy_st_X(src,res,(unsigned long)10 * sizeof(struct X));
   return;
 }
 
 /*@ requires
       separation:
-        \let __fc_len = len / 4;
+        \let __fc_len = len / 8;
           \separated(dest + (0 .. __fc_len - 1), src + (0 .. __fc_len - 1));
-    requires aligned_end: len % 4 ≡ 0;
+    requires aligned_end: len % 8 ≡ 0;
     requires
-      valid_dest: \let __fc_len = len / 4; \valid(dest + (0 .. __fc_len - 1));
+      valid_dest: \let __fc_len = len / 8; \valid(dest + (0 .. __fc_len - 1));
     requires
       valid_read_src:
-        \let __fc_len = len / 4; \valid_read(src + (0 .. __fc_len - 1));
+        \let __fc_len = len / 8; \valid_read(src + (0 .. __fc_len - 1));
     ensures
       copied:
-        \let __fc_len = len / 4;
+        \let __fc_len = len / 8;
         ∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(dest + j0) ≡ *(src + j0);
     ensures result: \result ≡ dest;
-    assigns *(dest + (0 .. len / 4 - 1)), \result;
-    assigns *(dest + (0 .. len / 4 - 1)) \from *(src + (0 .. len / 4 - 1));
+    assigns *(dest + (0 .. len / 8 - 1)), \result;
+    assigns *(dest + (0 .. len / 8 - 1)) \from *(src + (0 .. len / 8 - 1));
     assigns \result \from dest;
  */
 int **memcpy_ptr_int(int **dest, int * const *src, size_t len)
@@ -118,8 +118,8 @@ int **memcpy_ptr_int(int **dest, int * const *src, size_t len)
 
 void pointers(int ** /*[10]*/ src, int ** /*[10]*/ dest)
 {
-  int **res = memcpy_ptr_int(dest,src,(unsigned int)10 * sizeof(int *));
-  memcpy_ptr_int(src,res,(unsigned int)10 * sizeof(int *));
+  int **res = memcpy_ptr_int(dest,src,(unsigned long)10 * sizeof(int *));
+  memcpy_ptr_int(src,res,(unsigned long)10 * sizeof(int *));
   return;
 }
 
@@ -157,32 +157,32 @@ int (*memcpy_arr10_int(int (*dest)[10], int const (*src)[10], size_t len))[10]
 void nested(int (*src)[10], int (*dest)[10], int n)
 {
   int (*res)[10] =
-    memcpy_arr10_int(dest,src,(unsigned int)n * sizeof(int [10]));
-  memcpy_arr10_int(src,res,(unsigned int)n * sizeof(int [10]));
+    memcpy_arr10_int(dest,src,(unsigned long)n * sizeof(int [10]));
+  memcpy_arr10_int(src,res,(unsigned long)n * sizeof(int [10]));
   return;
 }
 
 void with_void(void *src, void *dest, int n)
 {
-  void *res = memcpy(dest,(void const *)src,(unsigned int)n);
-  memcpy(src,(void const *)res,(unsigned int)n);
+  void *res = memcpy(dest,(void const *)src,(unsigned long)n);
+  memcpy(src,(void const *)res,(unsigned long)n);
   return;
 }
 
 void with_incomplete(struct incomplete *src, struct incomplete *dest, int n)
 {
   struct incomplete *res =
-    memcpy((void *)dest,(void const *)src,(unsigned int)n);
-  memcpy((void *)src,(void const *)res,(unsigned int)n);
+    memcpy((void *)dest,(void const *)src,(unsigned long)n);
+  memcpy((void *)src,(void const *)res,(unsigned long)n);
   return;
 }
 
 void with_null_or_int(int * /*[10]*/ p)
 {
-  memcpy((void *)0,(void const *)p,(unsigned int)10 * sizeof(int));
-  memcpy((void *)p,(void const *)0,(unsigned int)10 * sizeof(int));
-  memcpy((void *)((int *)42),(void const *)p,(unsigned int)10 * sizeof(int));
-  memcpy((void *)p,(void const *)((int *)42),(unsigned int)10 * sizeof(int));
+  memcpy((void *)0,(void const *)p,(unsigned long)10 * sizeof(int));
+  memcpy((void *)p,(void const *)0,(unsigned long)10 * sizeof(int));
+  memcpy((void *)((int *)42),(void const *)p,(unsigned long)10 * sizeof(int));
+  memcpy((void *)p,(void const *)((int *)42),(unsigned long)10 * sizeof(int));
   return;
 }
 
@@ -228,16 +228,16 @@ int *memcpy_int(int *dest, int const *src, size_t len)
 void integer(int *src, int *dest)
 {
   int *res =
-    memcpy_int(dest,(int const *)src,(unsigned int)10 * sizeof(int));
-  memcpy_int(src,(int const *)res,(unsigned int)10 * sizeof(int));
+    memcpy_int(dest,(int const *)src,(unsigned long)10 * sizeof(int));
+  memcpy_int(src,(int const *)res,(unsigned long)10 * sizeof(int));
   return;
 }
 
 void with_named(named *src, named *dest)
 {
   named *res =
-    memcpy_int(dest,(int const *)src,(unsigned int)10 * sizeof(named));
-  memcpy_int(src,(int const *)res,(unsigned int)10 * sizeof(named));
+    memcpy_int(dest,(int const *)src,(unsigned long)10 * sizeof(named));
+  memcpy_int(src,(int const *)res,(unsigned long)10 * sizeof(named));
   return;
 }
 
@@ -272,29 +272,29 @@ void structure(struct X *src, struct X *dest)
 {
   struct X *res =
     memcpy_st_X(dest,(struct X const *)src,
-                (unsigned int)10 * sizeof(struct X));
-  memcpy_st_X(src,(struct X const *)res,(unsigned int)10 * sizeof(struct X));
+                (unsigned long)10 * sizeof(struct X));
+  memcpy_st_X(src,(struct X const *)res,(unsigned long)10 * sizeof(struct X));
   return;
 }
 
 /*@ requires
       separation:
-        \let __fc_len = len / 4;
+        \let __fc_len = len / 8;
           \separated(dest + (0 .. __fc_len - 1), src + (0 .. __fc_len - 1));
-    requires aligned_end: len % 4 ≡ 0;
+    requires aligned_end: len % 8 ≡ 0;
     requires
-      valid_dest: \let __fc_len = len / 4; \valid(dest + (0 .. __fc_len - 1));
+      valid_dest: \let __fc_len = len / 8; \valid(dest + (0 .. __fc_len - 1));
     requires
       valid_read_src:
-        \let __fc_len = len / 4; \valid_read(src + (0 .. __fc_len - 1));
+        \let __fc_len = len / 8; \valid_read(src + (0 .. __fc_len - 1));
     ensures
       copied:
-        \let __fc_len = \old(len) / 4;
+        \let __fc_len = \old(len) / 8;
         ∀ ℤ j0;
           0 ≤ j0 < __fc_len ⇒ *(\old(dest) + j0) ≡ *(\old(src) + j0);
     ensures result: \result ≡ \old(dest);
-    assigns *(dest + (0 .. len / 4 - 1)), \result;
-    assigns *(dest + (0 .. len / 4 - 1)) \from *(src + (0 .. len / 4 - 1));
+    assigns *(dest + (0 .. len / 8 - 1)), \result;
+    assigns *(dest + (0 .. len / 8 - 1)) \from *(src + (0 .. len / 8 - 1));
     assigns \result \from dest;
  */
 int **memcpy_ptr_int(int **dest, int * const *src, size_t len)
@@ -307,8 +307,8 @@ int **memcpy_ptr_int(int **dest, int * const *src, size_t len)
 void pointers(int **src, int **dest)
 {
   int **res =
-    memcpy_ptr_int(dest,(int * const *)src,(unsigned int)10 * sizeof(int *));
-  memcpy_ptr_int(src,(int * const *)res,(unsigned int)10 * sizeof(int *));
+    memcpy_ptr_int(dest,(int * const *)src,(unsigned long)10 * sizeof(int *));
+  memcpy_ptr_int(src,(int * const *)res,(unsigned long)10 * sizeof(int *));
   return;
 }
 
@@ -348,33 +348,33 @@ void nested(int (*src)[10], int (*dest)[10], int n)
 {
   int (*res)[10] =
     memcpy_arr10_int(dest,(int const (*)[10])src,
-                     (unsigned int)n * sizeof(int [10]));
+                     (unsigned long)n * sizeof(int [10]));
   memcpy_arr10_int(src,(int const (*)[10])res,
-                   (unsigned int)n * sizeof(int [10]));
+                   (unsigned long)n * sizeof(int [10]));
   return;
 }
 
 void with_void(void *src, void *dest, int n)
 {
-  void *res = memcpy(dest,(void const *)src,(unsigned int)n);
-  memcpy(src,(void const *)res,(unsigned int)n);
+  void *res = memcpy(dest,(void const *)src,(unsigned long)n);
+  memcpy(src,(void const *)res,(unsigned long)n);
   return;
 }
 
 void with_incomplete(struct incomplete *src, struct incomplete *dest, int n)
 {
   struct incomplete *res =
-    memcpy((void *)dest,(void const *)src,(unsigned int)n);
-  memcpy((void *)src,(void const *)res,(unsigned int)n);
+    memcpy((void *)dest,(void const *)src,(unsigned long)n);
+  memcpy((void *)src,(void const *)res,(unsigned long)n);
   return;
 }
 
 void with_null_or_int(int *p)
 {
-  memcpy((void *)0,(void const *)p,(unsigned int)10 * sizeof(int));
-  memcpy((void *)p,(void const *)0,(unsigned int)10 * sizeof(int));
-  memcpy((void *)((int *)42),(void const *)p,(unsigned int)10 * sizeof(int));
-  memcpy((void *)p,(void const *)((int *)42),(unsigned int)10 * sizeof(int));
+  memcpy((void *)0,(void const *)p,(unsigned long)10 * sizeof(int));
+  memcpy((void *)p,(void const *)0,(unsigned long)10 * sizeof(int));
+  memcpy((void *)((int *)42),(void const *)p,(unsigned long)10 * sizeof(int));
+  memcpy((void *)p,(void const *)((int *)42),(unsigned long)10 * sizeof(int));
   return;
 }
 

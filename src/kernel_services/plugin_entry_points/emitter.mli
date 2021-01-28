@@ -71,7 +71,7 @@ val orphan: t
       emitter that is no longer available (in particular, annotations loaded
       from a state that was generated from a different set of plug-ins than
       in current session). Should not be used outside of the kernel.
-      @since Frama-C+dev
+      @since 22.0-Titanium
   *)
 
 (** Usable emitters are the ones which can really emit something. *)

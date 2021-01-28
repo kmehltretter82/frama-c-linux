@@ -9,7 +9,7 @@ axiomatic dynamic_allocation {
     reads __fc_heap_status;
   
   axiom never_allocable{L}:
-    ∀ ℤ i; i < 0 ∧ i > 4294967295 ⇒ ¬is_allocable(i);
+    ∀ ℤ i; i < 0 ∧ i > 18446744073709551615 ⇒ ¬is_allocable(i);
   
   }
 
@@ -117,7 +117,7 @@ int *malloc_int(size_t size)
 void foo(void)
 {
   int *p = malloc_int(sizeof(int));
-  int *q = calloc_int((unsigned int)2,sizeof(int));
+  int *q = calloc_int((unsigned long)2,sizeof(int));
   free_int(p);
   free_int(q);
   return;
@@ -135,7 +135,7 @@ axiomatic dynamic_allocation {
     reads __fc_heap_status;
   
   axiom never_allocable{L}:
-    ∀ ℤ i; i < 0 ∧ i > 4294967295 ⇒ ¬is_allocable(i);
+    ∀ ℤ i; i < 0 ∧ i > 18446744073709551615 ⇒ ¬is_allocable(i);
   
   }
 
@@ -244,7 +244,7 @@ int *malloc_int(size_t size)
 void foo(void)
 {
   int *p = malloc_int(sizeof(int));
-  int *q = calloc_int((unsigned int)2,sizeof(int));
+  int *q = calloc_int((unsigned long)2,sizeof(int));
   free_int(p);
   free_int(q);
   return;

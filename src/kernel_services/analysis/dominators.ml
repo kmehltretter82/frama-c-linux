@@ -172,7 +172,7 @@ let direction_dom kf =
 (* Fill the project table with the dominators of a given function. *)
 let store_dom domtree to_stmt =
   Array.iteri( fun ord idom ->
-    let idom = Extlib.opt_map to_stmt idom in
+    let idom = Option.map to_stmt idom in
     let stmt = to_stmt ord in
     Kernel.debug ~dkey:Kernel.dkey_dominators "storing dom for %d: %s"
       stmt.sid (match idom with None -> "self" | Some s ->string_of_int s.sid);
@@ -270,7 +270,7 @@ let nearest_common_ancestor l =
     );
     let to_ordered = Dominator.to_ordered in
     let to_stmt = Dominator.to_stmt in
-    let find i = Extlib.opt_map to_ordered (Dom_tree.find (to_stmt i)) in
+    let find i = Option.map to_ordered (Dom_tree.find (to_stmt i)) in
     let rec aux = function
       | [] -> assert false
       | [s] -> to_ordered s

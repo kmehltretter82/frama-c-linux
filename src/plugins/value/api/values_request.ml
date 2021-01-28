@@ -23,7 +23,17 @@
 open Server
 open Data
 open Cil_types
+
+module Kmap = Kernel_function.Hashtbl
+module Smap = Cil_datatype.Stmt.Hashtbl
+module CS = Value_types.Callstack
+module CSet = CS.Set
+module CSmap = CS.Hashtbl
+
 module Md = Markdown
+module Jkf = Kernel_ast.Kf
+module Jstmt = Kernel_ast.Stmt
+module Jmarker = Kernel_ast.Marker
 
 let package =
   Package.package
@@ -33,334 +43,467 @@ let package =
     ~readme:"eva.md"
     ()
 
-type value =
-  { value: string;
-    alarm: bool; }
+type probe =
+  | Pexpr of exp * stmt
+  | Plval of lval * stmt
+  | Pnone
 
-type evaluation =
-  | Unreachable
-  | Evaluation of value
+type callstack = Value_types.callstack
+type truth = Abstract_interp.truth
+type step = [ `Here | `After | `Then of exp | `Else of exp ]
 
-type after =
-  | Unchanged
-  | Reduced of evaluation
+type domain = {
+  values: ( step * string ) list ;
+  alarms: ( truth * string ) list ;
+}
 
-type before_after =
-  { before: evaluation;
-    after_instr: after option;
-    after_then: after option;
-    after_else: after option; }
+let signal = Request.signal ~package ~name:"changed"
+    ~descr:(Md.plain "Emitted when EVA results has changed")
 
-type values =
-  { values: before_after;
-    callstack: (Value_util.callstack * before_after) list option; }
+let () = Analysis.register_computed_hook (fun () -> Request.emit signal)
 
-let get_value = function
-  | Unreachable -> "Unreachable"
-  | Evaluation { value } -> value
+(* -------------------------------------------------------------------------- *)
+(* --- Marker Utilities                                                   --- *)
+(* -------------------------------------------------------------------------- *)
 
-let get_alarm = function
-  | Unreachable -> false
-  | Evaluation { alarm } -> alarm
+let next_steps s : step list =
+  match s.skind with
+  | If(cond,_,_,_) -> [ `Then cond ; `Else cond ]
+  | Instr (Set _ | Call _ | Local_init _ | Asm _ | Code_annot _)
+  | Switch _ | Loop _ | Block _ | UnspecifiedSequence _
+  | TryCatch _ | TryFinally _ | TryExcept _
+    -> [ `After ]
+  | Instr (Skip _) | Return _ | Break _ | Continue _ | Goto _ | Throw _ -> []
 
-let get_after_value =
-  Extlib.opt_map
-    (function Unchanged -> "unchanged" | Reduced eval -> get_value eval)
+let probe_stmt s =
+  match s.skind with
+  | Instr (Set(lv,_,_)) -> Plval(lv,s)
+  | Instr (Call(Some lr,_,_,_)) -> Plval(lr,s)
+  | Instr (Local_init(v,_,_)) -> Plval((Var v,NoOffset),s)
+  | Return (Some e,_) | If(e,_,_,_) | Switch(e,_,_,_) -> Pexpr(e,s)
+  | _ -> Pnone
 
-module CallStackId =
-  Data.Index
-    (Value_types.Callstack.Map)
-    (struct
-      let name = "eva-callstack-id"
-    end)
+let probe marker =
+  let open Printer_tag in
+  match marker with
+  | PLval(_,Kstmt s,l) -> Plval(l,s)
+  | PExp(_,Kstmt s,e) -> Pexpr(e,s)
+  | PStmt(_,s) | PStmtStart(_,s) -> probe_stmt s
+  | PVDecl(_,Kstmt s,v) -> Plval((Var v,NoOffset),s)
+  | _ -> Pnone
 
-(* This pretty-printer drops the toplevel kf, which is always the function
-   in which we are pretty-printing the expression/term *)
-let pretty_callstack fmt cs =
-  match cs with
-  | [_, Kglobal] -> ()
-  | (_kf_cur, Kstmt callsite) :: q -> begin
-      let rec aux callsite = function
-        | (kf, callsite') :: q -> begin
-            Format.fprintf fmt "%a (%a)"
-              Kernel_function.pretty kf
-              Cil_datatype.Location.pretty (Cil_datatype.Stmt.loc callsite);
-            match callsite' with
-            | Kglobal -> ()
-            | Kstmt callsite' ->
-              Format.fprintf fmt " ←@ ";
-              aux callsite' q
+(* -------------------------------------------------------------------------- *)
+(* --- Stmt Ranking                                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
+module Ranking :
+sig
+  val stmt : stmt -> int
+  val sort : callstack list -> callstack list
+end =
+struct
+
+  class ranker =
+    object(self)
+      inherit Visitor.frama_c_inplace
+      (* ranks really starts at 1 *)
+      (* rank < 0 means not computed yet *)
+      val mutable rank = (-1)
+      val rmap = Smap.create 0
+      val fmark = Kmap.create 0
+      val fqueue = Queue.create ()
+
+      method private call kf =
+        if not (Kmap.mem fmark kf) then
+          begin
+            Kmap.add fmark kf () ;
+            Queue.push kf fqueue ;
           end
-        | _ -> assert false
-      in
-      Format.fprintf fmt "@[<hv>%a" Value_types.Callstack.pretty_hash cs;
-      aux callsite q;
-      Format.fprintf fmt "@]"
+
+      method private newrank s =
+        let r = succ rank in
+        Smap.add rmap s r ;
+        rank <- r ; r
+
+      method! vlval lv =
+        begin
+          try match fst lv with
+            | Var vi -> self#call (Globals.Functions.get vi)
+            | _ -> ()
+          with Not_found -> ()
+        end ; Cil.DoChildren
+
+      method! vstmt_aux s =
+        ignore (self#newrank s) ;
+        Cil.DoChildren
+
+      method flush =
+        while not (Queue.is_empty fqueue) do
+          let kf = Queue.pop fqueue in
+          ignore (Visitor.(visitFramacKf (self :> frama_c_visitor) kf))
+        done
+
+      method compute =
+        match Globals.entry_point () with
+        | kf , _ -> self#call kf ; self#flush
+        | exception Globals.No_such_entry_point _ -> ()
+
+      method rank s =
+        if rank < 0 then (rank <- 0 ; self#compute) ;
+        try Smap.find rmap s
+        with Not_found ->
+          let kf = Kernel_function.find_englobing_kf s in
+          self#call kf ;
+          self#flush ;
+          try Smap.find rmap s
+          with Not_found -> self#newrank s
+
     end
-  | _ -> assert false
 
-(* This pretty-printer prints only the lists of the functions, not
-   the locations. *)
-let pretty_callstack_short fmt cs =
-  match cs with
-  | [_, Kglobal] -> ()
-  | (_kf_cur, Kstmt _callsite) :: q ->
-    Format.fprintf fmt "%a" Value_types.Callstack.pretty_hash cs;
-    Pretty_utils.pp_flowlist ~left:"@[" ~sep:" ←@ " ~right:"@]"
-      (fun fmt (kf, _) -> Kernel_function.pretty fmt kf) fmt q
-  | _ -> assert false
+  let stmt = let rk = new ranker in rk#rank
 
-module CallStack = struct
-  type record
+  let rec ranks (rks : int list) (cs : callstack) : int list =
+    match cs with
+    | [] -> rks
+    | (_,Kglobal)::wcs -> ranks rks wcs
+    | (_,Kstmt s)::wcs -> ranks (stmt s :: rks) wcs
 
-  let record: record Record.signature = Record.signature ()
+  let order : int list -> int list -> int = Stdlib.compare
 
-  let id = Record.field record ~name:"id"
-      ~descr:(Md.plain "Callstack id") (module Jint)
-  let short = Record.field record ~name:"short"
-      ~descr:(Md.plain "Short name for the callstack") (module Jstring)
-  let full = Record.field record ~name:"full"
-      ~descr:(Md.plain "Full name for the callstack") (module Jstring)
+  let sort (wcs : callstack list) : callstack list =
+    List.map fst @@
+    List.sort (fun (_,rp) (_,rq) -> order rp rq) @@
+    List.map (fun cs -> cs , ranks [] cs) wcs
 
-  module R =
-    (val
-      (Record.publish
-         ~package
-         ~name:"callstack"
-         ~descr:(Md.plain "CallStack")
-         record) : Record.S with type r = record)
+end
 
-  type t = Value_types.callstack option
+(* -------------------------------------------------------------------------- *)
+(* --- Domain Utilities                                                   --- *)
+(* -------------------------------------------------------------------------- *)
 
-  let jtype = R.jtype
+module Jcallstack : S with type t = callstack =
+struct
+  module I = Data.Index
+      (Value_types.Callstack.Map)
+      (struct let name = "eva-callstack-id" end)
+  let jtype = Data.declare ~package ~name:"callstack" I.jtype
+  type t = I.t
+  let to_json = I.to_json
+  let of_json = I.of_json
+end
 
-  let pp_callstack ~short = function
-    | None -> if short then "all" else ""
-    | Some callstack ->
-      let pp_text =
-        if short
-        then Pretty_utils.to_string ~margin:50 pretty_callstack_short
-        else Pretty_utils.to_string pretty_callstack
-      in
-      (pp_text callstack)
+module Jcalls : Request.Output with type t = callstack =
+struct
 
-  let id_callstack = function
-    | None -> -1
-    | Some callstack -> CallStackId.get callstack
+  type t = callstack
+  let jtype = Package.(Jlist (Jrecord [
+      "callee" , Jkf.jtype ;
+      "caller" , Joption Jkf.jtype ;
+      "stmt" , Joption Jstmt.jtype ;
+      "rank" , Joption Jnumber ;
+    ]))
 
-  let to_json callstack =
-    R.default |>
-    R.set id (id_callstack callstack) |>
-    R.set short (pp_callstack ~short:true callstack) |>
-    R.set full (pp_callstack ~short:false callstack) |>
-    R.to_json
+  let rec jcallstack jcallee ki cs : json list =
+    match ki , cs with
+    | Kglobal , _ | _ , [] -> [
+        `Assoc [ "callee", jcallee ]
+      ]
+    | Kstmt stmt , (called,ki) :: cs ->
+      let jcaller = Jkf.to_json called in
+      let callsite = `Assoc [
+          "callee", jcallee ;
+          "caller", jcaller ;
+          "stmt", Jstmt.to_json stmt ;
+          "rank", Jint.to_json (Ranking.stmt stmt) ;
+        ] in
+      callsite :: jcallstack jcaller ki cs
 
-  let key = function
-    | None -> "all"
-    | Some callstack -> string_of_int (CallStackId.get callstack)
+  let to_json = function
+    | [] -> `List []
+    | (callee,ki)::cs -> `List (jcallstack (Jkf.to_json callee) ki cs)
+
 end
 
 
-let consolidated = ref None
-let table = Hashtbl.create 100
 
-let iter f =
-  if Hashtbl.length table > 1
-  then Extlib.may (fun values -> f (None, values)) !consolidated;
-  Hashtbl.iter (fun key data -> f (Some key, data)) table
-
-let array =
-  let model = States.model () in
-  let () =
-    States.column
-      ~name:"callstack"
-      ~descr:(Md.plain "CallStack")
-      ~data:(module CallStack)
-      ~get:fst
-      model
-  in
-  let () =
-    States.column
-      ~name:"value_before"
-      ~descr:(Md.plain "Value inferred just before the selected point")
-      ~data:(module Jstring)
-      ~get:(fun (_, e) -> get_value e.before)
-      model
-  in
-  let () =
-    States.column
-      ~name:"alarm"
-      ~descr:(Md.plain "Did the evaluation led to an alarm?")
-      ~data:(module Jbool)
-      ~get:(fun (_, e) -> get_alarm e.before)
-      model
-  in
-  let () =
-    States.column
-      ~name:"value_after"
-      ~descr:(Md.plain "Value inferred just after the selected point")
-      ~data:(module Joption(Jstring))
-      ~get:(fun (_, e) -> get_after_value e.after_instr)
-      model
-  in
-  States.register_array
-    ~package
-    ~name:"values"
-    ~descr:(Md.plain "Abstract values inferred by the Eva analysis")
-    ~key:(fun (cs, _) -> CallStack.key cs)
-    ~iter
-    model
-
-let update_values values =
-  Hashtbl.clear table;
-  consolidated := Some values.values;
-  let () =
-    match values.callstack with
-    | None -> ()
-    | Some by_callstack ->
-      List.iter
-        (fun (callstack, before_after) ->
-           Hashtbl.add table callstack before_after)
-        by_callstack
-  in
-  States.reload array
-
-module type S = sig
-  val evaluate: kinstr -> exp -> values
-  val lvaluate: kinstr -> lval -> values
+module Jtruth : Data.S with type t = truth =
+struct
+  type t = truth
+  let jtype =
+    Package.(Junion [ Jtag "True" ; Jtag "False" ; Jtag "Unknown" ])
+  let to_json = function
+    | Abstract_interp.Unknown -> `String "Unknown"
+    | True -> `String "True"
+    | False -> `String "False"
+  let of_json = function
+    | `String "True" -> Abstract_interp.True
+    | `String "False" -> Abstract_interp.False
+    | _ -> Abstract_interp.Unknown
 end
 
-module Make (Eva: Analysis.S) : S = struct
+(* -------------------------------------------------------------------------- *)
+(* --- EVA Proxy                                                          --- *)
+(* -------------------------------------------------------------------------- *)
 
-  let make_before eval before =
-    let before =
-      match before with
-      | `Bottom -> Unreachable
-      | `Value state -> Evaluation (eval state)
-    in
-    { before; after_instr = None; after_then = None; after_else = None; }
+module type EvaProxy =
+sig
+  val callstacks : stmt -> callstack list
+  val domain : probe -> callstack option -> domain
+end
 
-  let make_callstack stmt eval =
-    let before = Eva.get_stmt_state_by_callstack ~after:false stmt in
-    match before with
-    | (`Bottom | `Top) -> []
-    | `Value before ->
-      let aux callstack before acc =
-        let before_after = make_before eval (`Value before) in
-        (callstack, before_after) :: acc
-      in
-      Value_types.Callstack.Hashtbl.fold aux before []
+module Proxy(A : Analysis.S) : EvaProxy =
+struct
 
-  let make_before_after eval ~before ~after =
-    match before with
-    | `Bottom ->
-      { before = Unreachable;
-        after_instr = None;
-        after_then = None;
-        after_else = None; }
-    | `Value before ->
-      let before = eval before in
-      let after_instr =
-        match after with
-        | `Bottom -> Some (Reduced Unreachable)
-        | `Value after ->
-          let after = eval after in
-          if String.equal before.value after.value
-          then Some Unchanged
-          else Some (Reduced (Evaluation after))
-      in
-      { before = Evaluation before;
-        after_instr; after_then = None; after_else = None; }
+  open Eval
+  type dstate = A.Dom.state or_top_or_bottom
 
-  let make_instr_callstack stmt eval =
-    let before = Eva.get_stmt_state_by_callstack ~after:false stmt in
-    let after = Eva.get_stmt_state_by_callstack ~after:true stmt in
-    match before, after with
-    | (`Bottom | `Top), _
-    | _, (`Bottom | `Top) -> []
-    | `Value before, `Value after ->
-      let aux callstack before acc =
-        let before = `Value before in
-        let after =
-          try `Value (Value_types.Callstack.Hashtbl.find after callstack)
+  let callstacks stmt =
+    match A.get_stmt_state_by_callstack ~after:false stmt with
+    | `Top | `Bottom -> []
+    | `Value states ->
+      CSmap.fold_sorted (fun cs _st wcs -> cs :: wcs) states []
+
+  let dstate ~after stmt callstack =
+    match callstack with
+    | None -> (A.get_stmt_state ~after stmt :> dstate)
+    | Some cs ->
+      begin match A.get_stmt_state_by_callstack ~after stmt with
+        | `Top -> `Top
+        | `Bottom -> `Bottom
+        | `Value cmap ->
+          try `Value (CSmap.find cmap cs)
           with Not_found -> `Bottom
-        in
-        let before_after = make_before_after eval ~before ~after in
-        (callstack, before_after) :: acc
-      in
-      Value_types.Callstack.Hashtbl.fold aux before []
+      end
 
-  let make eval kinstr =
-    let before = Eva.get_kinstr_state ~after:false kinstr in
-    let values, callstack =
-      match kinstr with
-      | Cil_types.Kglobal ->
-        make_before eval before, None
-      | Cil_types.Kstmt stmt ->
-        match stmt.skind with
-        | Instr _ ->
-          let after = Eva.get_kinstr_state ~after:true kinstr in
-          let values = make_before_after eval ~before ~after in
-          let callstack = make_instr_callstack stmt eval in
-          values, Some callstack
-        | _ ->
-          make_before eval before, Some (make_callstack stmt eval)
-    in
-    { values; callstack; }
+  let dnone = {
+    alarms = [] ;
+    values = [] ;
+  }
 
+  let dtop = {
+    alarms = [] ;
+    values = [`Here , "Not available."] ;
+  }
 
-  let evaluate kinstr expr =
-    let eval state =
-      let value, alarms = Eva.eval_expr state expr in
-      let alarm = not (Alarmset.is_empty alarms) in
-      let str = Format.asprintf "%a" (Bottom.pretty Eva.Val.pretty) value in
-      { value = str; alarm }
-    in
-    make eval kinstr
+  let dbottom = {
+    alarms = [] ;
+    values = [`Here , "Unreachable."] ;
+  }
 
-  let lvaluate kinstr lval =
-    let eval state =
-      let value, alarms = Eva.copy_lvalue state lval in
-      let alarm = not (Alarmset.is_empty alarms) in
-      let flagged_value = match value with
-        | `Bottom -> Eval.Flagged_Value.bottom
-        | `Value v -> v
-      in
-      let pretty = Eval.Flagged_Value.pretty Eva.Val.pretty in
-      let str = Format.asprintf "%a" pretty flagged_value in
-      { value = str; alarm }
-    in
-    make eval kinstr
+  let dalarms alarms =
+    let pool = ref [] in
+    Alarmset.iter
+      (fun alarm status ->
+         let descr = Format.asprintf "@[<hov 2>%a@]" Alarms.pretty alarm
+         in pool := (status , descr) :: !pool
+      ) alarms ;
+    List.rev !pool
+
+  let deval (eval : A.Dom.state -> string * Alarmset.t) stmt callstack =
+    match dstate ~after:false stmt callstack with
+    | `Bottom -> dbottom
+    | `Top -> dtop
+    | `Value state ->
+      let value, alarms = eval state in
+      let dnext (step : step) vs = function
+        | `Top | `Bottom -> vs
+        | `Value state ->
+          let values =
+            try fst @@ eval state
+            with exn -> Printf.sprintf "Error (%S)" (Printexc.to_string exn)
+          in (step , values) :: vs in
+      let others = List.fold_right
+          begin fun st vs ->
+            match st with
+            | `Here -> vs (* absurd *)
+            | `After -> dnext st vs @@ dstate ~after:true stmt callstack
+            | `Then cond -> dnext st vs @@ A.assume_cond stmt state cond true
+            | `Else cond -> dnext st vs @@ A.assume_cond stmt state cond false
+          end (next_steps stmt) []
+      in {
+        values = (`Here,value) :: others ;
+        alarms = dalarms alarms ;
+      }
+
+  let e_expr expr state =
+    let value, alarms = A.eval_expr state expr in
+    begin
+      Pretty_utils.to_string (Bottom.pretty A.Val.pretty) value,
+      alarms
+    end
+
+  let e_lval lval state =
+    let value, alarms = A.copy_lvalue state lval in
+    let flagged = match value with
+      | `Bottom -> Eval.Flagged_Value.bottom
+      | `Value v -> v in
+    begin
+      Pretty_utils.to_string (Eval.Flagged_Value.pretty A.Val.pretty) flagged,
+      alarms
+    end
+
+  let domain p wcs = match p with
+    | Plval(l,s) -> deval (e_lval l) s wcs
+    | Pexpr(e,s) -> deval (e_expr e) s wcs
+    | Pnone -> dnone
+
 end
 
+let proxy =
+  let make (a : (module Analysis.S)) = (module Proxy(val a) : EvaProxy) in
+  let current = ref (make @@ Analysis.current_analyzer ()) in
+  let () = Analysis.register_hook
+      begin fun a ->
+        current := make a ;
+        Request.emit signal ;
+      end
+  in current
 
-let ref_request =
-  let module Analyzer = (val Analysis.current_analyzer ()) in
-  ref (module Make (Analyzer) : S)
+(* -------------------------------------------------------------------------- *)
+(* --- Request getCallstacks                                              --- *)
+(* -------------------------------------------------------------------------- *)
 
-let hook (module Analyzer: Analysis.S) =
-  ref_request := (module Make (Analyzer) : S)
+let () = Request.register ~package
+    ~kind:`GET ~name:"getCallstacks"
+    ~descr:(Md.plain "Callstacks for markers")
+    ~input:(module Jlist(Jmarker))
+    ~output:(module Jlist(Jcallstack))
+    begin fun markers ->
+      let module A = (val !proxy) in
+      let cset = List.fold_left
+          (fun cset marker ->
+             match probe marker with
+             | Pexpr(_,stmt) | Plval(_,stmt) ->
+               List.fold_right CSet.add (A.callstacks stmt) cset
+             | Pnone -> cset
+          ) CSet.empty markers in
+      Ranking.sort (CSet.elements cset)
+    end
 
-let () = Analysis.register_hook hook
-
-
-let update tag =
-  let module Request = (val !ref_request) in
-  match tag with
-  | Printer_tag.PExp (_kf, kinstr, expr) ->
-    update_values (Request.evaluate kinstr expr)
-  | Printer_tag.PLval (_kf, kinstr, lval) ->
-    update_values (Request.lvaluate kinstr lval)
-  | PVDecl (_kf, kinstr, varinfo) ->
-    update_values (Request.lvaluate kinstr (Var varinfo, NoOffset))
-  | _ -> ()
+(* -------------------------------------------------------------------------- *)
+(* --- Request getCallstackInfo                                           --- *)
+(* -------------------------------------------------------------------------- *)
 
 let () =
-  Server.Request.register
-    ~package
-    ~kind:`GET
-    ~name:"getValues"
-    ~descr:(Md.plain "Get the abstract values computed for an expression or lvalue")
-    ~input:(module Kernel_ast.Marker)
-    ~output:(module Junit)
-    update
+  Request.register ~package
+    ~kind:`GET ~name:"getCallstackInfo"
+    ~descr:(Md.plain "Callstack Description")
+    ~input:(module Jcallstack)
+    ~output:(module Jcalls)
+    begin fun cs -> cs end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Request getStmtInfo                                                --- *)
+(* -------------------------------------------------------------------------- *)
+
+let () =
+  let getStmtInfo = Request.signature ~input:(module Jstmt) () in
+  let set_fct = Request.result getStmtInfo ~name:"fct"
+      ~descr:(Md.plain "Englobing function")
+      (module Jkf) in
+  let set_rank = Request.result getStmtInfo ~name:"rank"
+      ~descr:(Md.plain "Global stmt order")
+      (module Jint) in
+  Request.register_sig ~package getStmtInfo
+    ~kind:`GET ~name:"getStmtInfo"
+    ~descr:(Md.plain "Stmt Information")
+    begin fun rq s ->
+      set_fct rq (Kernel_function.find_englobing_kf s) ;
+      set_rank rq (Ranking.stmt s) ;
+    end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Request getProbeInfo                                               --- *)
+(* -------------------------------------------------------------------------- *)
+
+let () =
+  let getProbeInfo = Request.signature ~input:(module Jmarker) () in
+  let set_code = Request.result_opt getProbeInfo
+      ~name:"code" ~descr:(Md.plain "Probe source code")
+      (module Jstring) in
+  let set_stmt = Request.result_opt getProbeInfo
+      ~name:"stmt" ~descr:(Md.plain "Probe statement")
+      (module Jstmt) in
+  let set_rank = Request.result getProbeInfo
+      ~name:"rank" ~descr:(Md.plain "Probe statement rank")
+      ~default:0 (module Jint) in
+  let set_effects = Request.result getProbeInfo
+      ~name:"effects" ~descr:(Md.plain "Effectfull statement")
+      ~default:false (module Jbool) in
+  let set_condition = Request.result getProbeInfo
+      ~name:"condition" ~descr:(Md.plain "Conditional statement")
+      ~default:false (module Jbool) in
+  let set_probe rq pp p s =
+    begin
+      set_code rq (Some (Pretty_utils.to_string pp p)) ;
+      set_stmt rq (Some s) ;
+      set_rank rq (Ranking.stmt s) ;
+      List.iter
+        (function
+          | `Here -> ()
+          | `Then _ | `Else _ -> set_condition rq true
+          | `After -> set_effects rq true
+        )
+        (next_steps s)
+    end
+  in Request.register_sig ~package ~kind:`GET getProbeInfo
+    ~name:"getProbeInfo" ~descr:(Md.plain "Probe informations")
+    begin fun rq marker ->
+      match probe marker with
+      | Plval(l,s) ->
+        set_probe rq Printer.pp_lval l s ;
+      | Pexpr(e,s) ->
+        set_probe rq Printer.pp_exp e s ;
+      | Pnone -> ()
+    end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Request getValues                                                  --- *)
+(* -------------------------------------------------------------------------- *)
+
+let () =
+  let getValues = Request.signature () in
+  let get_tgt = Request.param getValues ~name:"target"
+      ~descr:(Md.plain "Works with all markers containing an expression")
+      (module Jmarker) in
+  let get_cs = Request.param_opt getValues ~name:"callstack"
+      ~descr:(Md.plain "Callstack to collect (defaults to none)")
+      (module Jcallstack) in
+  let set_alarms = Request.result getValues ~name:"alarms"
+      ~descr:(Md.plain "Alarms raised during evaluation")
+      (module Jlist(Jpair(Jtruth)(Jstring))) in
+  let set_domain = Request.result_opt getValues ~name:"values"
+      ~descr:(Md.plain "Domain values")
+      (module Jstring) in
+  let set_after = Request.result_opt getValues ~name:"v_after"
+      ~descr:(Md.plain "Domain values after execution")
+      (module Jstring) in
+  let set_then = Request.result_opt getValues ~name:"v_then"
+      ~descr:(Md.plain "Domain values for true condition")
+      (module Jstring) in
+  let set_else = Request.result_opt getValues ~name:"v_else"
+      ~descr:(Md.plain "Domain values for false condition")
+      (module Jstring) in
+  Request.register_sig ~package getValues
+    ~kind:`GET ~name:"getValues"
+    ~descr:(Md.plain "Abstract values for the given marker")
+    begin fun rq () ->
+      let marker = get_tgt rq in
+      let callstack = get_cs rq in
+      let domain =
+        let module A : EvaProxy = (val !proxy) in
+        A.domain (probe marker) callstack in
+      set_alarms rq domain.alarms ;
+      List.iter
+        (fun (step,values) ->
+           let domain = Some values in
+           match step with
+           | `Here -> set_domain rq domain
+           | `After -> set_after rq domain
+           | `Then _ -> set_then rq domain
+           | `Else _ -> set_else rq domain
+        ) domain.values ;
+    end
+
+
+(* -------------------------------------------------------------------------- *)

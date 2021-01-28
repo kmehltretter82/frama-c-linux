@@ -23,11 +23,27 @@ diff oracle/addition.res.oracle oracle_bitwise/addition.res.oracle
 <       (origin: Arithmetic {addition.i:52}) }}
 ---
 >   p10 ∈ {{ garbled mix of &{p1} }}
+<<<<<<< HEAD
 diff oracle/bitwise.res.oracle oracle_bitwise/bitwise.res.oracle
 79c79,82
 < [eva] bitwise.i:144: Frama_C_show_each_dead: {0}
+||||||| ac7807782d
+diff tests/value/oracle/bitwise.res.oracle tests/value/oracle_bitwise/bitwise.res.oracle
+79c79,82
+< [eva] tests/value/bitwise.i:144: Frama_C_show_each_dead: {0}
+=======
+diff tests/value/oracle/bitwise.res.oracle tests/value/oracle_bitwise/bitwise.res.oracle
+98c98,101
+< [eva] tests/value/bitwise.i:158: Frama_C_show_each_dead: {0}
+>>>>>>> origin/master
 ---
+<<<<<<< HEAD
 > [eva] bitwise.i:142: 
+||||||| ac7807782d
+> [eva] tests/value/bitwise.i:142: 
+=======
+> [eva] tests/value/bitwise.i:156: 
+>>>>>>> origin/master
 >   The evaluation of the expression x & 2
 >   led to bottom without alarms:
 >   at this point the product of states has no possible concretization.
@@ -50,4 +66,11 @@ diff oracle/logic_ptr_cast.res.oracle oracle_bitwise/logic_ptr_cast.res.oracle
 <   Assigning imprecise value to p.
 <   The imprecision originates from Arithmetic {logic_ptr_cast.i:8}
 ---
+<<<<<<< HEAD
 > [eva] logic_ptr_cast.i:8: Assigning imprecise value to p.
+||||||| ac7807782d
+> [eva] tests/value/logic_ptr_cast.i:8: Assigning imprecise value to p.
+=======
+> [eva] tests/value/logic_ptr_cast.i:8: Assigning imprecise value to p.
+Only in tests/value/oracle: unit_tests.res.oracle
+>>>>>>> origin/master

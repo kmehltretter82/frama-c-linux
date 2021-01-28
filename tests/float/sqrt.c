@@ -27,5 +27,5 @@ void main() {
 
   for (k=0; k<8; k++)
     c[k] = ((unsigned char*)&i)[k];
-   
+
 }

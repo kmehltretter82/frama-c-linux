@@ -68,14 +68,13 @@ let call_for_individual_froms (call_type, value_initial_state, call_stack) =
   if From_parameters.ForceCallDeps.get () then begin
     let current_function, call_site = List.hd call_stack in
     let register_from froms =
-      try
-        let { table_for_calls = table } = List.hd !call_froms_stack in
-        merge_call_froms table call_site froms;
-        record_callwise_dependencies_in_db call_site froms;
-      with Failure _ ->
-        From_parameters.fatal
-          "calldeps internal error 23 empty callfromsstack %a"
-          Kernel_function.pretty current_function
+      record_callwise_dependencies_in_db call_site froms;
+      match !call_froms_stack with
+      | { table_for_calls } :: _ ->
+        merge_call_froms table_for_calls call_site froms;
+      | [] ->
+        (* Empty call stack: this is the main entry point with no call site. *)
+        assert (call_site = Cil_types.Kglobal);
     in
     let compute_from_behaviors bhv =
       let assigns = Ast_info.merge_assigns bhv in

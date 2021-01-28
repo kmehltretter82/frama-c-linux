@@ -1,6 +1,7 @@
 COMMENT: for now, this directory mainly tests the annotations syntax.
 COMMENT: we continue on annotation errors, as this allows to put
 COMMENT: various variations of the same test in one file.
+<<<<<<< HEAD
 COMMENT: by default, no analysis is performed (since the PLUGIN directive
 COMMENT: is empty).
 COMMENT: to perform value analyses, the macro @EVA_PLUGINS@ (resp. @EVA_OPTIONS@)
@@ -8,3 +9,8 @@ COMMENT: can be used into PLUGIN (resp. OPT) directives of specific test files.
 
 PLUGIN:
 OPT: -pp-annot -print -kernel-warn-key=annot-error=active -machdep x86_32
+||||||| ac7807782d
+OPT: -pp-annot -print -journal-disable -kernel-warn-key=annot-error=active -check
+=======
+OPT: -pp-annot -print -journal-disable -kernel-warn-key=annot-error=active -check -machdep x86_32
+>>>>>>> origin/master

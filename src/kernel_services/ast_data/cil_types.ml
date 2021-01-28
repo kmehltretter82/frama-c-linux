@@ -347,7 +347,10 @@ and attrparam =
 (** The definition of a structure or union type. Use {!Cil.mkCompInfo} to make
     one and use {!Cil.copyCompInfo} to copy one (this ensures that a new key is
     assigned and that the fields have the right pointers to parents.).
-    @plugin development guide *)
+    @plugin development guide
+
+    @since Frama-C+dev [cfields] is an option, [None] is used for incomplete
+    types (in replacement of removed field [cdefined]) *)
 and compinfo = {
   mutable cstruct: bool;
   (** [true] if struct, [false] if union *)
@@ -365,20 +368,17 @@ and compinfo = {
       files might have different keys. Use {!Cil_const.copyCompInfo} to copy
       structures so that a new key is assigned. *)
 
-  mutable cfields: fieldinfo list;
+  mutable cfields: fieldinfo list option;
   (** Information about the fields. Notice that each fieldinfo has a pointer
       back to the host compinfo. This means that you should not share
-      fieldinfo's between two compinfo's *)
+      fieldinfo's between two compinfo's.
+
+      None value means that the type is incomplete. *)
 
   mutable cattr:   attributes;
   (** The attributes that are defined at the same time as the composite
       type. These attributes can be supplemented individually at each
       reference to this [compinfo] using the [TComp] type constructor. *)
-
-  mutable cdefined: bool;
-  (** This boolean flag can be used to distinguish between structures
-      that have not been defined and those that have been defined but have
-      no fields (such things are allowed in gcc). *)
 
   mutable creferenced: bool;
   (** [true] if used. Initially set to [false]. *)
@@ -399,6 +399,9 @@ and fieldinfo = {
   mutable fcomp: compinfo;
   (** The host structure that contains this field. There can be only one
       [compinfo] that contains the field. *)
+
+  mutable forder: int;
+  (** The position in the host structure. *)
 
   forig_name: string;
   (** original name as found in C file. *)
@@ -433,13 +436,14 @@ and fieldinfo = {
       expression. *)
 
   mutable fsize_in_bits: int option;
-  (** (Deprecated. Use {!Cil.bitsOffset} instead.) Similar to [fbitfield] for
-      all types of fields.
-      @deprecated only Jessie uses this *)
+  (** Similar to [fbitfield] for all types of fields.
+      Do not read this field directly. Use {!Cil.fieldBitsOffset} or
+      {!Cil.bitsOffset} instead. *)
 
   mutable foffset_in_bits: int option;
-  (** Offset at which the field starts in the structure. Do not read directly,
-      but use {!Cil.bitsOffset} instead. *)
+  (** Offset at which the field starts in the structure.
+      Do not read this field directly. Use {!Cil.fieldBitsOffset} or
+      {!Cil.bitsOffset} instead. *)
 
   mutable fpadding_in_bits: int option;
   (** (Deprecated.) Store the size of the padding that follows the field, if any.
@@ -1693,6 +1697,7 @@ and acsl_extension_kind =
   | Ext_terms of term list
   | Ext_preds of predicate list
   (** a list of predicates, the most common case of for extensions *)
+  | Ext_annot of string * acsl_extension list
 
 (** Where are we expected to find corresponding extension keyword.
     @plugin development guide

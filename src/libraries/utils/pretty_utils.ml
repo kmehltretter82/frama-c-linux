@@ -34,7 +34,7 @@ let sfprintf = Format.asprintf
 let to_string ?margin pp x =
   let b = Buffer.create 20 in
   let f = Format.formatter_of_buffer b in
-  Extlib.may (Format.pp_set_margin f) margin;
+  Option.iter (Format.pp_set_margin f) margin;
   pp f x ;
   Format.pp_print_flush f () ;
   Buffer.contents b

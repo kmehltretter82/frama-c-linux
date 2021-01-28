@@ -41,6 +41,7 @@ bin/migration_scripts/sodium2magnesium.sh: CEA_LGPL
 bin/migration_scripts/sulfur2chlorine.sh: CEA_LGPL
 bin/migration_scripts/chlorine2argon.sh: CEA_LGPL
 bin/migration_scripts/potassium2calcium.sh: CEA_LGPL
+bin/migration_scripts/titanium2vanadium.sh: CEA_LGPL
 bin/sed_get_binutils_version: .ignore
 bin/sed_get_make_major: .ignore
 bin/sed_get_make_minor: .ignore
@@ -135,6 +136,7 @@ share/analysis-scripts/results_display.py: .ignore
 share/analysis-scripts/summary.py: .ignore
 share/analysis-scripts/template.mk: .ignore
 share/compliance/c11_functions.json: .ignore
+share/compliance/c11_headers.json: .ignore
 share/compliance/glibc_functions.json: .ignore
 share/compliance/nonstandard_identifiers.json: .ignore
 share/compliance/posix_identifiers.json: .ignore
@@ -371,7 +373,6 @@ src/kernel_internals/runtime/dump_config.ml: CEA_LGPL
 src/kernel_internals/runtime/dump_config.mli: CEA_LGPL
 src/kernel_internals/runtime/fc_config.ml.in: CEA_LGPL
 src/kernel_internals/runtime/fc_config.mli: CEA_LGPL
-src/kernel_internals/runtime/frama_c_config.ml.in: CEA_LGPL
 src/kernel_internals/runtime/frama_c_init.ml: CEA_LGPL
 src/kernel_internals/runtime/frama_c_init.mli: CEA_LGPL
 src/kernel_internals/runtime/gui_init.ml: CEA_LGPL
@@ -542,6 +543,8 @@ src/kernel_services/ast_queries/ast_info.ml: CEA_LGPL
 src/kernel_services/ast_queries/ast_info.mli: CEA_LGPL
 src/kernel_services/ast_queries/cil.ml: CIL
 src/kernel_services/ast_queries/cil.mli: CIL
+src/kernel_services/ast_queries/cil_builtins.ml: CIL
+src/kernel_services/ast_queries/cil_builtins.mli: CIL
 src/kernel_services/ast_queries/cil_const.ml: CIL
 src/kernel_services/ast_queries/cil_const.mli: CIL
 src/kernel_services/ast_queries/cil_datatype.ml: CEA_LGPL
@@ -714,6 +717,10 @@ src/plugins/aorai/VERSIONS.txt: .ignore
 src/plugins/aorai/YA.README: .ignore
 src/plugins/aorai/aorai_dataflow.ml: AORAI_LGPL
 src/plugins/aorai/aorai_dataflow.mli: AORAI_LGPL
+src/plugins/aorai/aorai_graph.ml: AORAI_LGPL
+src/plugins/aorai/aorai_graph.mli: AORAI_LGPL
+src/plugins/aorai/aorai_metavariables.ml: AORAI_LGPL
+src/plugins/aorai/aorai_metavariables.mli: AORAI_LGPL
 src/plugins/aorai/aorai_option.ml: AORAI_LGPL
 src/plugins/aorai/aorai_option.mli: AORAI_LGPL
 src/plugins/aorai/aorai_register.ml: AORAI_LGPL
@@ -747,7 +754,7 @@ src/plugins/callgraph/Callgraph.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/callgraph_api.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/cg.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/cg.mli: CEA_LGPL_OR_PROPRIETARY
-src/plugins/callgraph/cg_viewer.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/callgraph/cg_viewer.yes.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/journalize.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/journalize.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/options.ml: CEA_LGPL_OR_PROPRIETARY
@@ -806,7 +813,7 @@ src/plugins/gui/analyses_manager.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/analyses_manager.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/book_manager.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/book_manager.mli: CEA_LGPL_OR_PROPRIETARY
-src/plugins/gui/debug_manager.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/gui/debug_manager.yes.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/debug_manager.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/design.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/design.mli: CEA_LGPL_OR_PROPRIETARY
@@ -908,9 +915,10 @@ src/plugins/loop_analysis/region_analysis_stmt.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/loop_analysis/register.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/loop_analysis/slevel_analysis.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/markdown-report/configure.ac: CEA_LGPL
-src/plugins/markdown-report/eva_coverage.ml: CEA_LGPL
-src/plugins/markdown-report/eva_coverage.mli: CEA_LGPL
+src/plugins/markdown-report/eva_info.ml: CEA_LGPL
+src/plugins/markdown-report/eva_info.mli: CEA_LGPL
 src/plugins/markdown-report/Makefile.in: CEA_LGPL
+src/plugins/markdown-report/META.in: .ignore
 src/plugins/markdown-report/md_gen.ml: CEA_LGPL
 src/plugins/markdown-report/md_gen.mli: CEA_LGPL
 src/plugins/markdown-report/mdr_params.ml: CEA_LGPL
@@ -1204,6 +1212,8 @@ src/plugins/studia/reads.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/studia/reads.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/studia/studia_gui.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/studia/studia_gui.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/studia/studia_request.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/studia/studia_request.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/studia/Studia.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/studia/writes.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/studia/writes.mli: CEA_LGPL_OR_PROPRIETARY
@@ -1450,12 +1460,16 @@ src/plugins/variadic/generic.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/options.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/options.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/register.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/variadic/replacements.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/variadic/replacements.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/standard.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/translate.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/va_build.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/va_types.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/wp/.gitignore: .ignore
 src/plugins/wp/.ocp-indent: .ignore
+src/plugins/wp/AssignsCompleteness.ml: CEA_WP
+src/plugins/wp/AssignsCompleteness.mli: CEA_WP
 src/plugins/wp/Auto.ml: CEA_WP
 src/plugins/wp/Auto.mli: CEA_WP
 src/plugins/wp/Cache.ml: CEA_WP
@@ -1607,6 +1621,8 @@ src/plugins/wp/TacBitwised.ml: CEA_WP
 src/plugins/wp/TacBitwised.mli: CEA_WP
 src/plugins/wp/TacBitrange.ml: CEA_WP
 src/plugins/wp/TacBitrange.mli: CEA_WP
+src/plugins/wp/TacBittest.ml: CEA_WP
+src/plugins/wp/TacBittest.mli: CEA_WP
 src/plugins/wp/TacChoice.ml: CEA_WP
 src/plugins/wp/TacChoice.mli: CEA_WP
 src/plugins/wp/TacCongruence.ml: CEA_WP
@@ -1619,6 +1635,8 @@ src/plugins/wp/TacFilter.ml: CEA_WP
 src/plugins/wp/TacFilter.mli: CEA_WP
 src/plugins/wp/TacHavoc.ml: CEA_WP
 src/plugins/wp/TacHavoc.mli: CEA_WP
+src/plugins/wp/TacInduction.ml: CEA_WP
+src/plugins/wp/TacInduction.mli: CEA_WP
 src/plugins/wp/TacInstance.ml: CEA_WP
 src/plugins/wp/TacInstance.mli: CEA_WP
 src/plugins/wp/TacLemma.ml: CEA_WP
@@ -1631,6 +1649,8 @@ src/plugins/wp/TacRange.ml: CEA_WP
 src/plugins/wp/TacRange.mli: CEA_WP
 src/plugins/wp/TacRewrite.ml: CEA_WP
 src/plugins/wp/TacRewrite.mli: CEA_WP
+src/plugins/wp/TacSequence.ml: CEA_WP
+src/plugins/wp/TacSequence.mli: CEA_WP
 src/plugins/wp/TacShift.ml: CEA_WP
 src/plugins/wp/TacShift.mli: CEA_WP
 src/plugins/wp/TacSplit.ml: CEA_WP
@@ -1675,7 +1695,6 @@ src/plugins/wp/doc/coqdoc/typed_generated.tex: .ignore
 src/plugins/wp/doc/coqdoc/wpcoq.tex: .ignore
 src/plugins/wp/doc/manual/.gitignore: .ignore
 src/plugins/wp/doc/manual/Makefile: .ignore
-src/plugins/wp/doc/manual/cealistlogo.jpg: .ignore
 src/plugins/wp/doc/manual/mem.pdf: .ignore
 src/plugins/wp/doc/manual/size_base.pdf: .ignore
 src/plugins/wp/doc/manual/size_compl.pdf: .ignore
@@ -1812,6 +1831,8 @@ src/plugins/wp/wpRTE.ml: CEA_WP
 src/plugins/wp/wpRTE.mli: CEA_WP
 src/plugins/wp/wpStrategy.ml: CEA_WP
 src/plugins/wp/wpStrategy.mli: CEA_WP
+src/plugins/wp/wpTarget.ml: CEA_WP
+src/plugins/wp/wpTarget.mli: CEA_WP
 src/plugins/wp/wp_error.ml: CEA_WP
 src/plugins/wp/wp_error.mli: CEA_WP
 src/plugins/wp/wp_parameters.ml: CEA_WP

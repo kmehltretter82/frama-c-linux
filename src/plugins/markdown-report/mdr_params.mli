@@ -45,3 +45,9 @@ module Date: Parameter_sig.String
 
 (** Value of [-mdr-stubs]. *)
 module Stubs: Parameter_sig.String_list
+
+(** Value of [-mdr-print-libc]. *)
+module PrintLibc: Parameter_sig.Bool
+
+(** Value of [-mdr-sarif-deterministic]. *)
+module SarifDeterministic: Parameter_sig.Bool

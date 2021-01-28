@@ -177,6 +177,7 @@
 (analysis-scripts/summary.py as analysis-scripts/summary.py)
 (analysis-scripts/template.mk as analysis-scripts/template.mk)
 (compliance/c11_functions.json as compliance/c11_functions.json)
+(compliance/c11_headers.json as compliance/c11_headers.json)
 (compliance/glibc_functions.json as compliance/glibc_functions.json)
 (compliance/nonstandard_identifiers.json as compliance/nonstandard_identifiers.json)
 (compliance/posix_identifiers.json as compliance/posix_identifiers.json)

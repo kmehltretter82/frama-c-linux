@@ -30,7 +30,7 @@ let unexpected = Options.fatal "Stdlib.Basic_alloc: unexpected: %s"
 let valid_size ?loc typ size =
   let p = match typ with
     | TComp (ci, _, _) when Cil.has_flexible_array_member typ ->
-      let elem = match (last ci.cfields).ftype with
+      let elem = match (last (Option.value ~default:[] ci.cfields)).ftype with
         | TArray(t, _ , _, _) -> tinteger ?loc (Cil.bytesSizeOf t)
         | _ -> unexpected "non array last field on flexible structure"
       in
@@ -73,11 +73,8 @@ let make_axiomatic_is_allocable loc () =
   let lv_i = Cil_const.make_logic_var_quant "i" Linteger in
   let t_i = tvar lv_i in
   let zero = tinteger 0 in
-  let max =
-    tinteger
-      (Integer.to_int
-         (Cil.max_unsigned_number (Cil.bitsSizeOf (size_t ()))))
-  in
+  let max_value = Cil.max_unsigned_number (Cil.bitsSizeOf (size_t ())) in
+  let max = term ~loc (TConst (Integer (max_value, None))) Linteger in
   let label = FormalLabel("L") in
   let cond = pand (prel (Rlt, t_i, zero), prel (Rgt, t_i, max)) in
   let app = pnot (papp (is_allocable,[label],[t_i])) in

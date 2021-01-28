@@ -32,7 +32,7 @@ let make_marker_attributes
   ?(icon_name:string option)
   () =
   let my_attributes = GSourceView3.source_mark_attributes () in
-  Extlib.may my_attributes#set_background background;
-  Extlib.may my_attributes#set_pixbuf pixbuf;
-  Extlib.may my_attributes#set_icon_name icon_name;
+  Option.iter my_attributes#set_background background;
+  Option.iter my_attributes#set_pixbuf pixbuf;
+  Option.iter my_attributes#set_icon_name icon_name;
   source#set_mark_attributes ~category my_attributes priority

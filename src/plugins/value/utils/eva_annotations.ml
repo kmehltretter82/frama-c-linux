@@ -290,7 +290,7 @@ module Allocation = struct
           (* Be kind and return By_stack by default. Someone is bound to write a
              visitor that will simplify our term into something unrecognizable. *)
           begin match term_node with
-            | TConst (LStr s) -> Extlib.opt_conv By_stack (of_string s)
+            | TConst (LStr s) -> Option.value ~default:By_stack (of_string s)
             | _ -> By_stack
           end
         | _ -> assert false
@@ -301,7 +301,7 @@ module Allocation = struct
 
   let get stmt =
     match get stmt with
-    | [] -> Extlib.the (of_string (Value_parameters.AllocBuiltin.get ()))
+    | [] -> Option.get (of_string (Value_parameters.AllocBuiltin.get ()))
     | [x] -> x
     | x :: _ ->
       Value_parameters.warning ~current:true ~once:true

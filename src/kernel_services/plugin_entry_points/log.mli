@@ -82,10 +82,13 @@ exception AbortFatal of string
     name of the plugin.
     @since Beryllium-20090601-beta1 *)
 
-exception FeatureRequest of string * string
+exception FeatureRequest of Filepath.position option * string * string
 (** Raised by [not_yet_implemented].
-    You may catch [FeatureRequest(p,r)] to support degenerated behavior.
-    The responsible plugin is 'p' and the feature request is 'r'. *)
+    You may catch [FeatureRequest(s,p,r)] to support degenerated behavior.
+    The (optional) source location is s, the responsible plugin is 'p'
+    and the feature request is 'r'.
+    @modified Frama-C+dev added source location.
+*)
 
 (* -------------------------------------------------------------------------- *)
 (** {2 Option_signature.Interface}
@@ -205,11 +208,14 @@ module type Messages = sig
       @since Beryllium-20090601-beta1
       @plugin development guide *)
 
-  val not_yet_implemented : ('a,formatter,unit,'b) format4 -> 'a
+  val not_yet_implemented : ?current:bool -> ?source:Filepath.position ->
+    ('a,formatter,unit,'b) format4 -> 'a
   (** raises [FeatureRequest] but {i does not} send any message.
       If the exception is not caught, Frama-C displays a feature-request
       message to the user.
-      @since Beryllium-20090901 *)
+      @since Beryllium-20090901
+      @modified Frama-C+dev added current and source arguments.
+  *)
 
   val deprecated: string -> now:string -> ('a -> 'b) -> ('a -> 'b)
   (** [deprecated s ~now f] indicates that the use of [f] of name [s] is now

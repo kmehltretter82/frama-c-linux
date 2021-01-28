@@ -11,5 +11,6 @@ yarn-error.log
 /bin
 /dist
 /doc/html
+/src/renderer/loader.ts
 
 # --------------------------------------------------------------------------

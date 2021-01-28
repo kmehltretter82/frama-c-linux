@@ -25,6 +25,21 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-* E-ACSL       [2021-01-12] Fix crash when comparing two structs, which is
+                currently unsupported (frama-c/e-acsl#139).
+-* Makefile     [2021-01-05] Fix dependencies in bytecode-only compilation.
+-  E-ACSL       [2020-12-09] Add RTL support for Windows.
+-  E-ACSL       [2020-11-17] Update e-acsl-gcc.sh so that the library dlmalloc
+                can be compiled and used from sources.
+
+#############################
+Plugin E-ACSL 22.0 (Titanium)
+#############################
+
+-* E-ACSL       [2020-11-16] Fix soundness bug when checking
+                initialization of a chunk of heap memory block.
+-  E-ACSL       [2020-10-14] Add Support for Variadic generated functions in
+                the AST (frama-c/e-acsl#128).
 -  E-ACSL       [2020-10-06] Add support for the `\separated` predicate.
                 (frama-c/e-acsl#31)
 -* E-ACSL       [2020-10-06] Fix a soundness bug when translating a range with a

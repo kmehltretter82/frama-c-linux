@@ -21,6 +21,7 @@ share/e-acsl/instrumentation_model/e_acsl_temporal_timestamp.h: CEA_LGPL_OR_PROP
 share/e-acsl/internals/e_acsl_alias.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/internals/e_acsl_bits.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/internals/e_acsl_bits.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+share/e-acsl/internals/e_acsl_config.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/internals/e_acsl_debug.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/internals/e_acsl_debug.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/internals/e_acsl_malloc.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
@@ -132,6 +133,8 @@ src/libraries/functions.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/functions.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/gmp_types.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/gmp_types.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/libraries/logic_aggr.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/libraries/logic_aggr.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/misc.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/misc.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/varname.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL

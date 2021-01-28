@@ -33,7 +33,27 @@ diff oracle/alias.6.res.oracle oracle_octagons/alias.6.res.oracle
 >   tz1 ∈ {1}
 >   tz2 ∈ {1}
 >   tz3 ∈ {1}
+<<<<<<< HEAD
 diff oracle/bitfield.res.oracle oracle_octagons/bitfield.res.oracle
+||||||| ac7807782d
+diff tests/value/oracle/bitfield.res.oracle tests/value/oracle_octagons/bitfield.res.oracle
+=======
+diff tests/value/oracle/auto_loop_unroll.0.res.oracle tests/value/oracle_octagons/auto_loop_unroll.0.res.oracle
+211,212d210
+< [eva:alarm] tests/value/auto_loop_unroll.c:203: Warning: 
+<   signed overflow. assert -2147483648 ≤ i_0 - 1;
+218,219d215
+< [eva:alarm] tests/value/auto_loop_unroll.c:208: Warning: 
+<   signed overflow. assert -2147483648 ≤ i_1 - 1;
+245,246d240
+< [eva:alarm] tests/value/auto_loop_unroll.c:240: Warning: 
+<   signed overflow. assert -2147483648 ≤ i - 1;
+306c300
+<   i ∈ [-2147483648..20]
+---
+>   i ∈ {-1}
+diff tests/value/oracle/bitfield.res.oracle tests/value/oracle_octagons/bitfield.res.oracle
+>>>>>>> origin/master
 138a139,141
 > [eva] bitfield.i:71: 
 >   Frama_C_show_each:
@@ -237,6 +257,7 @@ diff oracle/non_natural.res.oracle oracle_octagons/non_natural.res.oracle
 199a200,201
 > [kernel] non_natural.i:39: 
 >   more than 200(12500) elements to enumerate. Approximating.
+<<<<<<< HEAD
 diff oracle/nonlin.res.oracle oracle_octagons/nonlin.res.oracle
 107a108,109
 > [eva:nonlin] nonlin.c:65: non-linear 'x * x', lv 'x'
@@ -256,6 +277,47 @@ diff oracle/nonlin.res.oracle oracle_octagons/nonlin.res.oracle
 155a166
 > [eva:nonlin] nonlin.c:115: subdividing on x
 diff oracle/plevel.res.oracle oracle_octagons/plevel.res.oracle
+||||||| ac7807782d
+diff tests/value/oracle/nonlin.res.oracle tests/value/oracle_octagons/nonlin.res.oracle
+107a108,109
+> [eva:nonlin] tests/value/nonlin.c:65: non-linear 'x * x', lv 'x'
+> [eva:nonlin] tests/value/nonlin.c:65: subdividing on x
+110a113,115
+> [eva:nonlin] tests/value/nonlin.c:66: subdividing on x
+> [eva:nonlin] tests/value/nonlin.c:66: non-linear 'y * y', lv 'y'
+> [eva:nonlin] tests/value/nonlin.c:66: subdividing on y
+113a119,120
+> [eva:nonlin] tests/value/nonlin.c:68: non-linear 'z * x + x * y', lv 'x'
+> [eva:nonlin] tests/value/nonlin.c:68: subdividing on x
+151a159,160
+> [eva:nonlin] tests/value/nonlin.c:112: non-linear 'x * x', lv 'x'
+> [eva:nonlin] tests/value/nonlin.c:112: subdividing on x
+154a164
+> [eva:nonlin] tests/value/nonlin.c:113: subdividing on x
+155a166
+> [eva:nonlin] tests/value/nonlin.c:115: subdividing on x
+diff tests/value/oracle/plevel.res.oracle tests/value/oracle_octagons/plevel.res.oracle
+=======
+diff tests/value/oracle/nonlin.res.oracle tests/value/oracle_octagons/nonlin.res.oracle
+113a114,115
+> [eva:nonlin] tests/value/nonlin.c:71: non-linear 'x * x', lv 'x'
+> [eva:nonlin] tests/value/nonlin.c:71: subdividing on x
+116a119,121
+> [eva:nonlin] tests/value/nonlin.c:72: subdividing on x
+> [eva:nonlin] tests/value/nonlin.c:72: non-linear 'y * y', lv 'y'
+> [eva:nonlin] tests/value/nonlin.c:72: subdividing on y
+119a125,126
+> [eva:nonlin] tests/value/nonlin.c:74: non-linear 'z * x + x * y', lv 'x'
+> [eva:nonlin] tests/value/nonlin.c:74: subdividing on x
+157a165,166
+> [eva:nonlin] tests/value/nonlin.c:118: non-linear 'x * x', lv 'x'
+> [eva:nonlin] tests/value/nonlin.c:118: subdividing on x
+160a170
+> [eva:nonlin] tests/value/nonlin.c:119: subdividing on x
+161a172
+> [eva:nonlin] tests/value/nonlin.c:121: subdividing on x
+diff tests/value/oracle/plevel.res.oracle tests/value/oracle_octagons/plevel.res.oracle
+>>>>>>> origin/master
 12d11
 < [eva] Recording results for main
 14a14
@@ -386,7 +448,14 @@ diff oracle/test.0.res.oracle oracle_octagons/test.0.res.oracle
 <   j ∈ [-1073741822..1]
 ---
 >   j ∈ {-1; 0; 1}
+<<<<<<< HEAD
 diff oracle/unroll.res.oracle oracle_octagons/unroll.res.oracle
+||||||| ac7807782d
+diff tests/value/oracle/unroll.res.oracle tests/value/oracle_octagons/unroll.res.oracle
+=======
+Only in tests/value/oracle: unit_tests.res.oracle
+diff tests/value/oracle/unroll.res.oracle tests/value/oracle_octagons/unroll.res.oracle
+>>>>>>> origin/master
 22c22
 <   G ∈ [17739..2147483647]
 ---

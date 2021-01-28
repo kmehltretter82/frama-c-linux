@@ -85,11 +85,10 @@ module Clean: Parameter_sig.Bool
 module Filter: Parameter_sig.Bool
 module Parasite: Parameter_sig.Bool
 module Prenex: Parameter_sig.Bool
-module Bits: Parameter_sig.Bool
 module Ground: Parameter_sig.Bool
 module Reduce: Parameter_sig.Bool
 module ExtEqual : Parameter_sig.Bool
-module UnfoldAssigns : Parameter_sig.Bool
+module UnfoldAssigns : Parameter_sig.Int
 module Split: Parameter_sig.Bool
 module SplitMax: Parameter_sig.Int
 module SplitDepth: Parameter_sig.Int
@@ -150,13 +149,11 @@ module Report: Parameter_sig.String_list
 module ReportJson: Parameter_sig.String
 module ReportName: Parameter_sig.String
 module MemoryContext: Parameter_sig.Bool
-module CheckModelHypotheses: Parameter_sig.Bool
+module CheckMemoryContext: Parameter_sig.Bool
 module SmokeTests: Parameter_sig.Bool
 module SmokeDeadloop: Parameter_sig.Bool
 module SmokeDeadcode: Parameter_sig.Bool
 module SmokeDeadcall: Parameter_sig.Bool
-
-val wkey_imprecise_hypotheses_assigns: warn_category
 
 (** {2 Getters} *)
 
@@ -175,3 +172,5 @@ val print_generated: ?header:string -> string -> unit
 (** print the given file if the debugging category
     "print-generated" is set *)
 val cat_print_generated: category
+
+val protect : exn -> bool

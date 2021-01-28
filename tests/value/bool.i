@@ -16,7 +16,17 @@ int valid_bool () {
   Frama_C_show_each(x, y);
   x=x+1;
   Frama_C_show_each(x);
-  x=x+1;
+  ++x;
+  Frama_C_show_each(x);
+  x++;
+  Frama_C_show_each(x);
+  x--;
+  Frama_C_show_each(x);
+  x--;
+  Frama_C_show_each(x);
+  --x;
+  Frama_C_show_each(x);
+  --x;
   Frama_C_show_each(x);
   return y;
 }

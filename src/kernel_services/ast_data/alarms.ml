@@ -138,13 +138,13 @@ module D =
           if n = 0 then Lval.compare lv1 lv2 else n
         | Index_out_of_bound(e11, e12), Index_out_of_bound(e21, e22) ->
           let n = Exp.compare e11 e21 in
-          if n = 0 then Extlib.opt_compare Exp.compare e12 e22 else n
+          if n = 0 then Option.compare Exp.compare e12 e22 else n
         | Invalid_pointer e1, Invalid_pointer e2 -> Exp.compare e1 e2
         | Invalid_shift(e1, n1), Invalid_shift(e2, n2) ->
           let n = Exp.compare e1 e2 in
-          if n = 0 then Extlib.opt_compare Datatype.Int.compare n1 n2 else n
+          if n = 0 then Option.compare Datatype.Int.compare n1 n2 else n
         | Pointer_comparison(e11, e12), Pointer_comparison(e21, e22) ->
-          let n = Extlib.opt_compare Exp.compare e11 e21 in
+          let n = Option.compare Exp.compare e11 e21 in
           if n = 0 then Exp.compare e12 e22 else n
         | Overflow(s1, e1, n1, b1), Overflow(s2, e2, n2, b2) ->
           let n = Stdlib.compare s1 s2 in
@@ -188,7 +188,7 @@ module D =
         | Function_pointer (e1, l1), Function_pointer (e2, l2) ->
           let n = Exp.compare e1 e2 in
           if n <> 0 then n
-          else Extlib.opt_compare (Extlib.list_compare Exp.compare) l1 l2
+          else Option.compare (Extlib.list_compare Exp.compare) l1 l2
         | Invalid_bool lv1, Invalid_bool lv2 -> Lval.compare lv1 lv2
         | _, (Division_by_zero _ | Memory_access _ |
               Index_out_of_bound _ | Invalid_pointer _ |

@@ -185,7 +185,7 @@ module type S_no_parameter = sig
       If [visible] is set to false, the aliases do not appear in help messages.
       If [deprecated] is set to true, the use of the aliases emits a warning.
       @raise Invalid_argument if one of the strings is empty
-      @modify Frama-c+dev add [visible] and [deprecated] arguments. *)
+      @modify 22.0-Titanium add [visible] and [deprecated] arguments. *)
 
   (**/**)
   val is_set: unit -> bool

@@ -81,15 +81,16 @@ PLUGIN_CMO:= \
 	Sigma MemLoader \
 	MemEmpty MemZeroAlias MemVar \
 	MemMemory MemTyped MemRegion \
-	wpReached wpRTE wpAnnot \
+	wpReached wpRTE wpAnnot wpTarget \
 	CfgCompiler StmtSemantics \
 	VCS script proof wpo wpReport \
 	Footprint Tactical Strategy \
-	TacSplit TacChoice TacRange \
+	TacSplit TacChoice TacRange TacInduction \
 	TacArray TacCompound TacUnfold \
 	TacHavoc TacInstance TacLemma \
 	TacFilter TacCut WpTac TacNormalForm \
-	TacRewrite TacBitwised TacBitrange TacShift \
+	TacRewrite TacBitwised TacBitrange TacBittest TacShift \
+	TacSequence \
 	TacCongruence TacOverflow Auto \
 	ProofSession ProofScript ProofEngine \
 	ProverTask ProverErgo ProverCoq \
@@ -128,7 +129,7 @@ CEA_WP_GENEREATED= script.ml rformat.ml driver.ml
 # --------------------------------------------------------------------------
 
 PLUGIN_TESTS_DIRS:= \
-  wp wp_plugin wp_acsl wp_bts \
+  why3 wp wp_plugin wp_acsl wp_bts \
   wp_store wp_hoare wp_typed wp_usage \
   wp_gallery wp_manual wp_tip \
   wp_region

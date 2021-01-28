@@ -639,6 +639,9 @@ let inject_in_global (env, main) = function
     env, main
   | g when Rtl.Symbols.mem_global g ->
     env, main
+  (* generated function declaration: nothing to do *)
+  | GFunDecl(_, vi, _) when Misc.is_fc_stdlib_generated vi ->
+    env, main
 
   (* variable declarations *)
   | GVarDecl(vi, _) | GFunDecl(_, vi, _) ->
@@ -684,7 +687,7 @@ let inject_in_global (env, main) = function
 let surround_function_with kf fundec stmt_begin stmt_end =
   let body = fundec.sbody in
   (* Insert last statement *)
-  Extlib.may
+  Option.iter
     (fun stmt_end ->
        let last_stmts ?return_stmt () =
          match return_stmt with
@@ -825,7 +828,7 @@ let inject_mtracking_handler main =
       let clean = Smart_stmt.rtl_call loc "memory_clean" [] in
       surround_function_with main fundec init (Some clean)
     in
-    Extlib.may handle_main main
+    Option.iter handle_main main
   end
 
 let inject_in_file file =

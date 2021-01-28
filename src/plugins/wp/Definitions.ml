@@ -27,7 +27,6 @@
 open LogicUsage
 open Cil_types
 open Cil_datatype
-open Ctypes
 open Qed.Logic
 open Lang
 open Lang.F
@@ -255,11 +254,7 @@ let icompinfo c =
        in cluster.c_irecords <- [c] ; cluster)
     (Lang.comp_init_id c)
 
-let matrix = function
-  | C_array _ -> assert false
-  | C_comp c -> compinfo c
-  | C_int _ | C_float _ | C_pointer _ ->
-      cluster ~id:"Matrix" ~title:"Basic Arrays" ()
+let matrix () = cluster ~id:"Matrix" ~title:"Basic Arrays" ()
 
 let call_fun ~result lfun cc es =
   Symbol.compile (Lang.local cc) lfun ;
@@ -341,11 +336,13 @@ class virtual visitor main =
           let c = compinfo r in
           if self#do_local c then
             begin
-              let fts = List.map
-                  (fun f ->
-                     let t = Lang.tau_of_ctype f.ftype in
-                     self#vtau t ; Cfield (f, KValue) , t
-                  ) r.cfields
+              let fts = Option.map
+                  (List.map
+                     (fun f ->
+                        let t = Lang.tau_of_ctype f.ftype in
+                        self#vtau t ; Cfield (f, KValue) , t
+                     ))
+                  r.cfields
               in self#on_comp r fts ;
             end
         end
@@ -357,11 +354,13 @@ class virtual visitor main =
           let c = icompinfo r in
           if self#do_local c then
             begin
-              let fts = List.map
-                  (fun f ->
-                     let t = Lang.init_of_ctype f.ftype in
-                     self#vtau t ; Cfield (f, KInit) , t
-                  ) r.cfields
+              let fts = Option.map
+                  (List.map
+                     (fun f ->
+                        let t = Lang.init_of_ctype f.ftype in
+                        self#vtau t ; Cfield (f, KInit) , t
+                     ))
+                  r.cfields
               in self#on_icomp r fts ;
             end
         end
@@ -567,8 +566,8 @@ class virtual visitor main =
     method virtual on_library : string -> unit
     method virtual on_cluster : cluster -> unit
     method virtual on_type : logic_type_info -> typedef -> unit
-    method virtual on_comp : compinfo -> (field * tau) list -> unit
-    method virtual on_icomp : compinfo -> (field * tau) list -> unit
+    method virtual on_comp : compinfo -> (field * tau) list option -> unit
+    method virtual on_icomp : compinfo -> (field * tau) list option -> unit
     method virtual on_dlemma : dlemma -> unit
     method virtual on_dfun : dfun -> unit
 

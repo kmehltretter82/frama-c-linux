@@ -14,7 +14,7 @@ Let x_3 = ta1_0[3].
 Assume {
   Type: is_sint32(x_1) /\ is_sint32(x_2) /\ is_sint32(x_3) /\ is_sint32(x).
   (* Heap *)
-  Type: IsArray1_sint32(ta1_0).
+  Type: IsArray_sint32(ta1_0).
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 1) -> (ta1_0[i] = 0))).
   (* Initializer *)
@@ -34,7 +34,7 @@ Assume {
   Type: is_sint32(ta1_0[0]) /\ is_sint32(ta1_0[1]) /\ is_sint32(ta1_0[3]) /\
       is_sint32(x).
   (* Heap *)
-  Type: IsArray1_sint32(ta1_0).
+  Type: IsArray_sint32(ta1_0).
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 1) -> (ta1_0[i] = 0))).
   (* Initializer *)
@@ -55,7 +55,7 @@ Assume {
   Type: is_sint32(ta1_0[0]) /\ is_sint32(ta1_0[1]) /\ is_sint32(x_1) /\
       is_sint32(x).
   (* Heap *)
-  Type: IsArray1_sint32(ta1_0).
+  Type: IsArray_sint32(ta1_0).
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 1) -> (ta1_0[i] = 0))).
   (* Initializer *)
@@ -79,7 +79,7 @@ Let x_2 = ta2_0[4].
 Assume {
   Type: is_sint32(x) /\ is_sint32(x_1) /\ is_sint32(x_2).
   (* Heap *)
-  Type: IsArray1_sint32(ta2_0).
+  Type: IsArray_sint32(ta2_0).
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 1) -> (ta2_0[i] = 0))).
   (* Initializer *)
@@ -96,7 +96,7 @@ Let x = ta2_0[4].
 Assume {
   Type: is_sint32(ta2_0[0]) /\ is_sint32(ta2_0[1]) /\ is_sint32(x).
   (* Heap *)
-  Type: IsArray1_sint32(ta2_0).
+  Type: IsArray_sint32(ta2_0).
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 1) -> (ta2_0[i] = 0))).
   (* Initializer *)
@@ -113,7 +113,7 @@ Let x = ta2_0[1].
 Assume {
   Type: is_sint32(ta2_0[0]) /\ is_sint32(x) /\ is_sint32(ta2_0[4]).
   (* Heap *)
-  Type: IsArray1_sint32(ta2_0).
+  Type: IsArray_sint32(ta2_0).
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 1) -> (ta2_0[i] = 0))).
   (* Initializer *)
@@ -137,8 +137,8 @@ Assume {
   Type: is_sint32(x_1) /\ is_sint32(x) /\ is_sint32(ta2_0[4]) /\
       is_sint32(x_2) /\ is_sint32(x_3).
   (* Heap *)
-  Type: IsArray1_sint32(ta1_0) /\ IsArray1_sint32(ta2_0) /\
-      IsArray1_sint32(ta3_0).
+  Type: IsArray_sint32(ta1_0) /\ IsArray_sint32(ta2_0) /\
+      IsArray_sint32(ta3_0).
   (* Initializer *)
   Init: forall i : Z. ((i <= 0) -> ((0 <= i) -> (ta3_0[i] = 0))).
   (* Initializer *)
@@ -176,8 +176,8 @@ Assume {
   Type: is_sint32(x_1) /\ is_sint32(x) /\ is_sint32(ta2_0[4]) /\
       is_sint32(x_2) /\ is_sint32(ta3_0[2]).
   (* Heap *)
-  Type: IsArray1_sint32(ta1_0) /\ IsArray1_sint32(ta2_0) /\
-      IsArray1_sint32(ta3_0).
+  Type: IsArray_sint32(ta1_0) /\ IsArray_sint32(ta2_0) /\
+      IsArray_sint32(ta3_0).
   (* Initializer *)
   Init: forall i : Z. ((i <= 0) -> ((0 <= i) -> (ta3_0[i] = 0))).
   (* Initializer *)
@@ -215,8 +215,8 @@ Assume {
   Type: is_sint32(x_1) /\ is_sint32(x) /\ is_sint32(ta2_0[4]) /\
       is_sint32(ta3_0[0]) /\ is_sint32(x_2).
   (* Heap *)
-  Type: IsArray1_sint32(ta1_0) /\ IsArray1_sint32(ta2_0) /\
-      IsArray1_sint32(ta3_0).
+  Type: IsArray_sint32(ta1_0) /\ IsArray_sint32(ta2_0) /\
+      IsArray_sint32(ta3_0).
   (* Initializer *)
   Init: forall i : Z. ((i <= 0) -> ((0 <= i) -> (ta3_0[i] = 0))).
   (* Initializer *)
@@ -254,8 +254,8 @@ Assume {
   Type: is_sint32(x_1) /\ is_sint32(x) /\ is_sint32(x_2) /\
       is_sint32(ta3_0[0]) /\ is_sint32(ta3_0[2]).
   (* Heap *)
-  Type: IsArray1_sint32(ta1_0) /\ IsArray1_sint32(ta2_0) /\
-      IsArray1_sint32(ta3_0).
+  Type: IsArray_sint32(ta1_0) /\ IsArray_sint32(ta2_0) /\
+      IsArray_sint32(ta3_0).
   (* Initializer *)
   Init: forall i : Z. ((i <= 0) -> ((0 <= i) -> (ta3_0[i] = 0))).
   (* Initializer *)
@@ -300,7 +300,7 @@ Assume {
   Type: IsS5(a_1) /\ IsS5(a_2) /\ IsS5(a_3) /\ is_sint32(a_1.F5_a) /\
       is_sint32(x_2) /\ is_sint32(x_1) /\ is_sint32(x).
   (* Heap *)
-  Type: IsArray1S5(ts1_0).
+  Type: IsArray_S5(ts1_0).
   (* Initializer *)
   Init: forall i : Z. let a_4 = ts1_0[i] in ((0 <= i) -> ((i <= 1) ->
       (((a_4.F5_a) = 0) /\ ((a_4.F5_b) = 0) /\ ((a_4.F5_c) = 0)))).
@@ -329,7 +329,7 @@ Assume {
       is_sint32(a_1.F5_a) /\ is_sint32(x_2) /\ is_sint32(x_1) /\
       is_sint32(x).
   (* Heap *)
-  Type: IsArray1S5(ts1_0).
+  Type: IsArray_S5(ts1_0).
   (* Initializer *)
   Init: forall i : Z. let a_2 = ts1_0[i] in ((0 <= i) -> ((i <= 1) ->
       (((a_2.F5_a) = 0) /\ ((a_2.F5_b) = 0) /\ ((a_2.F5_c) = 0)))).
@@ -358,7 +358,7 @@ Assume {
   Type: IsS5(a_1) /\ IsS5(ts1_0[1]) /\ IsS5(ts1_0[3]) /\ is_sint32(x_3) /\
       is_sint32(x_2) /\ is_sint32(x_1) /\ is_sint32(x).
   (* Heap *)
-  Type: IsArray1S5(ts1_0).
+  Type: IsArray_S5(ts1_0).
   (* Initializer *)
   Init: forall i : Z. let a_2 = ts1_0[i] in ((0 <= i) -> ((i <= 1) ->
       (((a_2.F5_a) = 0) /\ ((a_2.F5_b) = 0) /\ ((a_2.F5_c) = 0)))).
@@ -402,10 +402,9 @@ Assume {
       is_sint32(a_6) /\ is_sint32(a_7[1]) /\ is_sint32(a_7[2]) /\
       is_sint32(a_1) /\ is_sint32(a[5]).
   (* Heap *)
-  Type: IsArray1_sint32(t) /\ IsArray1_sint32(t1_0) /\
-      IsArray1_uint8(tab_0) /\ IsS1_S(s) /\ IsS2_St(st_0) /\
-      IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\ IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\
-      IsS3_Sc(sq0_0) /\ IsU4_U(u).
+  Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
+      IsS1_S(s) /\ IsS2_St(st_0) /\ IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\
+      IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ IsS3_Sc(sq0_0) /\ IsU4_U(u).
   (* Initializer *)
   Init: x_5 = (-1).
   (* Initializer *)
@@ -512,10 +511,9 @@ Assume {
       is_sint32(a_6) /\ is_sint32(a_7[1]) /\ is_sint32(a_7[2]) /\
       is_sint32(a_1) /\ is_sint32(a[5]).
   (* Heap *)
-  Type: IsArray1_sint32(t) /\ IsArray1_sint32(t1_0) /\
-      IsArray1_uint8(tab_0) /\ IsS1_S(s) /\ IsS2_St(st_0) /\
-      IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\ IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\
-      IsS3_Sc(sq0_0) /\ IsU4_U(u).
+  Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
+      IsS1_S(s) /\ IsS2_St(st_0) /\ IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\
+      IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ IsS3_Sc(sq0_0) /\ IsU4_U(u).
   (* Initializer *)
   Init: x_5 = (-1).
   (* Initializer *)
@@ -622,10 +620,9 @@ Assume {
       is_sint32(a_6) /\ is_sint32(a_7[1]) /\ is_sint32(a_7[2]) /\
       is_sint32(a_1) /\ is_sint32(a[5]).
   (* Heap *)
-  Type: IsArray1_sint32(t) /\ IsArray1_sint32(t1_0) /\
-      IsArray1_uint8(tab_0) /\ IsS1_S(s) /\ IsS2_St(st_0) /\
-      IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\ IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\
-      IsS3_Sc(sq0_0) /\ IsU4_U(u).
+  Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
+      IsS1_S(s) /\ IsS2_St(st_0) /\ IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\
+      IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ IsS3_Sc(sq0_0) /\ IsU4_U(u).
   (* Initializer *)
   Init: x_5 = (-1).
   (* Initializer *)
@@ -733,10 +730,9 @@ Assume {
       is_sint32(a_6) /\ is_sint32(a_7[1]) /\ is_sint32(a_7[2]) /\
       is_sint32(a_1) /\ is_sint32(a[5]).
   (* Heap *)
-  Type: IsArray1_sint32(t) /\ IsArray1_sint32(t1_0) /\
-      IsArray1_uint8(tab_0) /\ IsS1_S(s) /\ IsS2_St(st_0) /\
-      IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\ IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\
-      IsS3_Sc(sq0_0) /\ IsU4_U(u).
+  Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
+      IsS1_S(s) /\ IsS2_St(st_0) /\ IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\
+      IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ IsS3_Sc(sq0_0) /\ IsU4_U(u).
   (* Initializer *)
   Init: x_5 = (-1).
   (* Initializer *)
@@ -844,10 +840,9 @@ Assume {
       is_sint32(a_6) /\ is_sint32(a_7[1]) /\ is_sint32(a_7[2]) /\
       is_sint32(a_1) /\ is_sint32(a_8).
   (* Heap *)
-  Type: IsArray1_sint32(t) /\ IsArray1_sint32(t1_0) /\
-      IsArray1_uint8(tab_0) /\ IsS1_S(s) /\ IsS2_St(st_0) /\
-      IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\ IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\
-      IsS3_Sc(sq0_0) /\ IsU4_U(u).
+  Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
+      IsS1_S(s) /\ IsS2_St(st_0) /\ IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\
+      IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ IsS3_Sc(sq0_0) /\ IsU4_U(u).
   (* Initializer *)
   Init: x_5 = (-1).
   (* Initializer *)
@@ -954,10 +949,9 @@ Assume {
       is_sint32(a_6) /\ is_sint32(a_7[1]) /\ is_sint32(a_7[2]) /\
       is_sint32(a_1) /\ is_sint32(a[5]).
   (* Heap *)
-  Type: IsArray1_sint32(t) /\ IsArray1_sint32(t1_0) /\
-      IsArray1_uint8(tab_0) /\ IsS1_S(s) /\ IsS2_St(st_0) /\
-      IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\ IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\
-      IsS3_Sc(sq0_0) /\ IsU4_U(u).
+  Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
+      IsS1_S(s) /\ IsS2_St(st_0) /\ IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\
+      IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ IsS3_Sc(sq0_0) /\ IsU4_U(u).
   (* Initializer *)
   Init: x_5 = (-1).
   (* Initializer *)
@@ -1064,10 +1058,9 @@ Assume {
       is_sint32(a_6) /\ is_sint32(a_7[1]) /\ is_sint32(a_7[2]) /\
       is_sint32(a_1) /\ is_sint32(a[5]).
   (* Heap *)
-  Type: IsArray1_sint32(t) /\ IsArray1_sint32(t1_0) /\
-      IsArray1_uint8(tab_0) /\ IsS1_S(s) /\ IsS2_St(st_0) /\
-      IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\ IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\
-      IsS3_Sc(sq0_0) /\ IsU4_U(u).
+  Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
+      IsS1_S(s) /\ IsS2_St(st_0) /\ IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\
+      IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ IsS3_Sc(sq0_0) /\ IsU4_U(u).
   (* Initializer *)
   Init: x_5 = (-1).
   (* Initializer *)
@@ -1175,10 +1168,9 @@ Assume {
       is_sint32(a_7[1]) /\ is_sint32(a_7[2]) /\ is_sint32(a_1) /\
       is_sint32(a[5]).
   (* Heap *)
-  Type: IsArray1_sint32(t) /\ IsArray1_sint32(t1_0) /\
-      IsArray1_uint8(tab_0) /\ IsS1_S(s) /\ IsS2_St(st_0) /\
-      IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\ IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\
-      IsS3_Sc(sq0_0) /\ IsU4_U(u).
+  Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
+      IsS1_S(s) /\ IsS2_St(st_0) /\ IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\
+      IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ IsS3_Sc(sq0_0) /\ IsU4_U(u).
   (* Initializer *)
   Init: x_5 = (-1).
   (* Initializer *)
@@ -1285,10 +1277,9 @@ Assume {
       is_sint32(a_6) /\ is_sint32(a_7[1]) /\ is_sint32(a_7[2]) /\
       is_sint32(a_1) /\ is_sint32(a[5]).
   (* Heap *)
-  Type: IsArray1_sint32(t) /\ IsArray1_sint32(t1_0) /\
-      IsArray1_uint8(tab_0) /\ IsS1_S(s) /\ IsS2_St(st_0) /\
-      IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\ IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\
-      IsS3_Sc(sq0_0) /\ IsU4_U(u).
+  Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
+      IsS1_S(s) /\ IsS2_St(st_0) /\ IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\
+      IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ IsS3_Sc(sq0_0) /\ IsU4_U(u).
   (* Initializer *)
   Init: x_5 = (-1).
   (* Initializer *)
@@ -1395,10 +1386,9 @@ Assume {
       is_sint32(a_6) /\ is_sint32(a_7[1]) /\ is_sint32(a_7[2]) /\
       is_sint32(a_1) /\ is_sint32(a[5]).
   (* Heap *)
-  Type: IsArray1_sint32(t) /\ IsArray1_sint32(t1_0) /\
-      IsArray1_uint8(tab_0) /\ IsS1_S(s) /\ IsS2_St(st_0) /\
-      IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\ IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\
-      IsS3_Sc(sq0_0) /\ IsU4_U(u).
+  Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
+      IsS1_S(s) /\ IsS2_St(st_0) /\ IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\
+      IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ IsS3_Sc(sq0_0) /\ IsU4_U(u).
   (* Initializer *)
   Init: x_5 = (-1).
   (* Initializer *)
@@ -1505,10 +1495,9 @@ Assume {
       is_sint32(a_6) /\ is_sint32(a_7[1]) /\ is_sint32(a_7[2]) /\
       is_sint32(a_1) /\ is_sint32(a[5]).
   (* Heap *)
-  Type: IsArray1_sint32(t) /\ IsArray1_sint32(t1_0) /\
-      IsArray1_uint8(tab_0) /\ IsS1_S(s) /\ IsS2_St(st_0) /\
-      IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\ IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\
-      IsS3_Sc(sq0_0) /\ IsU4_U(u).
+  Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
+      IsS1_S(s) /\ IsS2_St(st_0) /\ IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\
+      IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ IsS3_Sc(sq0_0) /\ IsU4_U(u).
   (* Initializer *)
   Init: x_5 = (-1).
   (* Initializer *)
@@ -1616,10 +1605,9 @@ Assume {
       is_sint32(a_6) /\ is_sint32(a_7[1]) /\ is_sint32(a_7[2]) /\
       is_sint32(a_1) /\ is_sint32(a[5]).
   (* Heap *)
-  Type: IsArray1_sint32(t) /\ IsArray1_sint32(t1_0) /\
-      IsArray1_uint8(tab_0) /\ IsS1_S(s) /\ IsS2_St(st_0) /\
-      IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\ IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\
-      IsS3_Sc(sq0_0) /\ IsU4_U(u).
+  Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
+      IsS1_S(s) /\ IsS2_St(st_0) /\ IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\
+      IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ IsS3_Sc(sq0_0) /\ IsU4_U(u).
   (* Initializer *)
   Init: x_5 = (-1).
   (* Initializer *)
@@ -1726,10 +1714,9 @@ Assume {
       is_sint32(a_6) /\ is_sint32(a_7[1]) /\ is_sint32(a_7[2]) /\
       is_sint32(a_1) /\ is_sint32(a[5]).
   (* Heap *)
-  Type: IsArray1_sint32(t) /\ IsArray1_sint32(t1_0) /\
-      IsArray1_uint8(tab_0) /\ IsS1_S(s) /\ IsS2_St(st_0) /\
-      IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\ IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\
-      IsS3_Sc(sq0_0) /\ IsU4_U(u).
+  Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
+      IsS1_S(s) /\ IsS2_St(st_0) /\ IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\
+      IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ IsS3_Sc(sq0_0) /\ IsU4_U(u).
   (* Goal *)
   When: (0 <= i) /\ (i <= 31) /\ is_sint32(i).
   (* Initializer *)
@@ -1839,10 +1826,9 @@ Assume {
       is_sint32(a_6) /\ is_sint32(a_8) /\ is_sint32(a_7[2]) /\
       is_sint32(a_1) /\ is_sint32(a[5]).
   (* Heap *)
-  Type: IsArray1_sint32(t) /\ IsArray1_sint32(t1_0) /\
-      IsArray1_uint8(tab_0) /\ IsS1_S(s) /\ IsS2_St(st_0) /\
-      IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\ IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\
-      IsS3_Sc(sq0_0) /\ IsU4_U(u).
+  Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
+      IsS1_S(s) /\ IsS2_St(st_0) /\ IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\
+      IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ IsS3_Sc(sq0_0) /\ IsU4_U(u).
   (* Initializer *)
   Init: x_5 = (-1).
   (* Initializer *)
@@ -1950,10 +1936,9 @@ Assume {
       is_sint32(a_6) /\ is_sint32(a_7[1]) /\ is_sint32(a_8) /\
       is_sint32(a_1) /\ is_sint32(a[5]).
   (* Heap *)
-  Type: IsArray1_sint32(t) /\ IsArray1_sint32(t1_0) /\
-      IsArray1_uint8(tab_0) /\ IsS1_S(s) /\ IsS2_St(st_0) /\
-      IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\ IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\
-      IsS3_Sc(sq0_0) /\ IsU4_U(u).
+  Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
+      IsS1_S(s) /\ IsS2_St(st_0) /\ IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\
+      IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ IsS3_Sc(sq0_0) /\ IsU4_U(u).
   (* Initializer *)
   Init: x_5 = (-1).
   (* Initializer *)
@@ -2060,10 +2045,9 @@ Assume {
       is_sint32(a_6) /\ is_sint32(a_7[1]) /\ is_sint32(a_7[2]) /\
       is_sint32(a_1) /\ is_sint32(a[5]).
   (* Heap *)
-  Type: IsArray1_sint32(t) /\ IsArray1_sint32(t1_0) /\
-      IsArray1_uint8(tab_0) /\ IsS1_S(s) /\ IsS2_St(st_0) /\
-      IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\ IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\
-      IsS3_Sc(sq0_0) /\ IsU4_U(u).
+  Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
+      IsS1_S(s) /\ IsS2_St(st_0) /\ IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\
+      IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ IsS3_Sc(sq0_0) /\ IsU4_U(u).
   (* Goal *)
   When: (0 <= i) /\ (i <= 3).
   (* Initializer *)
@@ -2173,10 +2157,9 @@ Assume {
       is_sint32(a_7[1]) /\ is_sint32(a_7[2]) /\ is_sint32(a_1) /\
       is_sint32(a[5]).
   (* Heap *)
-  Type: IsArray1_sint32(t) /\ IsArray1_sint32(t1_0) /\
-      IsArray1_uint8(tab_0) /\ IsS1_S(s) /\ IsS2_St(st_0) /\
-      IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\ IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\
-      IsS3_Sc(sq0_0) /\ IsU4_U(u).
+  Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
+      IsS1_S(s) /\ IsS2_St(st_0) /\ IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\
+      IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ IsS3_Sc(sq0_0) /\ IsU4_U(u).
   (* Initializer *)
   Init: x_5 = (-1).
   (* Initializer *)
@@ -2283,10 +2266,9 @@ Assume {
       is_sint32(a_6) /\ is_sint32(a_7[1]) /\ is_sint32(a_7[2]) /\
       is_sint32(a_1) /\ is_sint32(a[5]).
   (* Heap *)
-  Type: IsArray1_sint32(t) /\ IsArray1_sint32(t1_0) /\
-      IsArray1_uint8(tab_0) /\ IsS1_S(s) /\ IsS2_St(st_0) /\
-      IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\ IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\
-      IsS3_Sc(sq0_0) /\ IsU4_U(u).
+  Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
+      IsS1_S(s) /\ IsS2_St(st_0) /\ IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\
+      IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ IsS3_Sc(sq0_0) /\ IsU4_U(u).
   (* Goal *)
   When: (6 <= i) /\ (i <= 6).
   (* Initializer *)
@@ -2395,10 +2377,9 @@ Assume {
       is_sint32(a_6) /\ is_sint32(a_7[1]) /\ is_sint32(a_7[2]) /\
       is_sint32(a_1) /\ is_sint32(a[5]).
   (* Heap *)
-  Type: IsArray1_sint32(t) /\ IsArray1_sint32(t1_0) /\
-      IsArray1_uint8(tab_0) /\ IsS1_S(s) /\ IsS2_St(st_0) /\
-      IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\ IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\
-      IsS3_Sc(sq0_0) /\ IsU4_U(u).
+  Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
+      IsS1_S(s) /\ IsS2_St(st_0) /\ IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\
+      IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ IsS3_Sc(sq0_0) /\ IsU4_U(u).
   (* Goal *)
   When: (7 <= i) /\ (i <= 9).
   (* Initializer *)
@@ -2507,10 +2488,9 @@ Assume {
       is_sint32(a_6) /\ is_sint32(a_7[1]) /\ is_sint32(a_7[2]) /\
       is_sint32(a_1) /\ is_sint32(a[5]).
   (* Heap *)
-  Type: IsArray1_sint32(t) /\ IsArray1_sint32(t1_0) /\
-      IsArray1_uint8(tab_0) /\ IsS1_S(s) /\ IsS2_St(st_0) /\
-      IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\ IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\
-      IsS3_Sc(sq0_0) /\ IsU4_U(u).
+  Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
+      IsS1_S(s) /\ IsS2_St(st_0) /\ IsS3_Sc(sc0_0) /\ IsS3_Sc(sc1_0) /\
+      IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ IsS3_Sc(sq0_0) /\ IsU4_U(u).
   (* Initializer *)
   Init: x_5 = (-1).
   (* Initializer *)

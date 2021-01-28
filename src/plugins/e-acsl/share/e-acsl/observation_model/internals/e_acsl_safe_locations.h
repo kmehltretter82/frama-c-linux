@@ -34,11 +34,17 @@
 #include <stdint.h>
 #include <stddef.h>
 
-/* Simple representation of a safe location */
+/*! Simple representation of a safe location */
 struct memory_location {
-  uintptr_t address; /* Address */
-  uintptr_t length; /* Byte-length */
-  int is_initialized; /* Notion of initialization */
+  /*! Address */
+  uintptr_t address;
+  /*! Byte-length */
+  uintptr_t length;
+  /*! Notion of initialization */
+  int is_initialized;
+  /*! True if the address is on static memory, false if it is on dynamic
+      memory */
+  int is_on_static;
 };
 typedef struct memory_location memory_location;
 

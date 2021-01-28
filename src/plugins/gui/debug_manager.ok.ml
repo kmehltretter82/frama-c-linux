@@ -20,9 +20,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Require Dgraph included in Ocamlgraph, thus GnomeCanvas *)
+(* Require Dgraph included in OCamlgraph/Ocamlgraph_gtk, thus GnomeCanvas *)
 
-open Dgraph
+open DGRAPH_MODULE
 
 let graph_view ~packing mk_dot =
   let f =

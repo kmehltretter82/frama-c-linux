@@ -211,7 +211,7 @@ module Value = struct
       (fun l ->
          if
            not
-             (Extlib.opt_equal ListArgs.equal (Some l) (FunArgs.get_option ()))
+             (Option.equal ListArgs.equal (Some l) (FunArgs.get_option ()))
          then begin
            !initial_state_changed ();
            FunArgs.set l
@@ -241,7 +241,7 @@ module Value = struct
         Db.Value.globals_set_initial_state\" : _ -> unit)"
       (Datatype.func Cvalue.Model.ty Datatype.unit)
       (fun state ->
-         if not (Extlib.opt_equal Cvalue.Model.equal
+         if not (Option.equal Cvalue.Model.equal
                    (Some state)
                    (VGlobals.get_option ()))
          then begin

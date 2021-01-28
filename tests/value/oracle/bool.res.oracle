@@ -5,18 +5,48 @@
 [eva:initial-state] Values of globals at initialization
   rand ∈ [--..--]
 [eva] computing for function valid_bool <- main.
+<<<<<<< HEAD
   Called from bool.i:61.
 [eva] bool.i:12: Frama_C_show_each: {0}
 [eva] bool.i:14: Frama_C_show_each: {1}
 [eva] bool.i:16: Frama_C_show_each: {1}, {2}
 [eva] bool.i:18: Frama_C_show_each: {1}
 [eva] bool.i:20: Frama_C_show_each: {1}
+||||||| ac7807782d
+  Called from tests/value/bool.i:61.
+[eva] tests/value/bool.i:12: Frama_C_show_each: {0}
+[eva] tests/value/bool.i:14: Frama_C_show_each: {1}
+[eva] tests/value/bool.i:16: Frama_C_show_each: {1}, {2}
+[eva] tests/value/bool.i:18: Frama_C_show_each: {1}
+[eva] tests/value/bool.i:20: Frama_C_show_each: {1}
+=======
+  Called from tests/value/bool.i:71.
+[eva] tests/value/bool.i:12: Frama_C_show_each: {0}
+[eva] tests/value/bool.i:14: Frama_C_show_each: {1}
+[eva] tests/value/bool.i:16: Frama_C_show_each: {1}, {2}
+[eva] tests/value/bool.i:18: Frama_C_show_each: {1}
+[eva] tests/value/bool.i:20: Frama_C_show_each: {1}
+[eva] tests/value/bool.i:22: Frama_C_show_each: {1}
+[eva] tests/value/bool.i:24: Frama_C_show_each: {0}
+[eva] tests/value/bool.i:26: Frama_C_show_each: {1}
+[eva] tests/value/bool.i:28: Frama_C_show_each: {0}
+[eva] tests/value/bool.i:30: Frama_C_show_each: {1}
+>>>>>>> origin/master
 [eva] Recording results for valid_bool
 [eva] Done for function valid_bool
 [eva] computing for function invalid_bool <- main.
+<<<<<<< HEAD
   Called from bool.i:62.
 [eva:alarm] bool.i:33: Warning: 
+||||||| ac7807782d
+  Called from tests/value/bool.i:62.
+[eva:alarm] tests/value/bool.i:33: Warning: 
+=======
+  Called from tests/value/bool.i:72.
+[eva:alarm] tests/value/bool.i:43: Warning: 
+>>>>>>> origin/master
   trap representation of a _Bool lvalue. assert ub.b ≡ 0 ∨ ub.b ≡ 1;
+<<<<<<< HEAD
 [eva] bool.i:36: Frama_C_show_each_zero: {0}
 [eva] bool.i:39: Frama_C_show_each_one: {1}
 [eva:alarm] bool.i:42: Warning: 
@@ -26,17 +56,66 @@
 [eva] bool.i:46: Frama_C_show_each_zero_or_one: {0; 1}
 [eva] bool.i:49: Frama_C_show_each_one: {1}
 [eva:alarm] bool.i:52: Warning: 
+||||||| ac7807782d
+[eva] tests/value/bool.i:36: Frama_C_show_each_zero: {0}
+[eva] tests/value/bool.i:39: Frama_C_show_each_one: {1}
+[eva:alarm] tests/value/bool.i:42: Warning: 
+  trap representation of a _Bool lvalue. assert ub.b ≡ 0 ∨ ub.b ≡ 1;
+[eva:alarm] tests/value/bool.i:45: Warning: 
+  trap representation of a _Bool lvalue. assert ub.b ≡ 0 ∨ ub.b ≡ 1;
+[eva] tests/value/bool.i:46: Frama_C_show_each_zero_or_one: {0; 1}
+[eva] tests/value/bool.i:49: Frama_C_show_each_one: {1}
+[eva:alarm] tests/value/bool.i:52: Warning: 
+=======
+[eva] tests/value/bool.i:46: Frama_C_show_each_zero: {0}
+[eva] tests/value/bool.i:49: Frama_C_show_each_one: {1}
+[eva:alarm] tests/value/bool.i:52: Warning: 
+  trap representation of a _Bool lvalue. assert ub.b ≡ 0 ∨ ub.b ≡ 1;
+[eva:alarm] tests/value/bool.i:55: Warning: 
+  trap representation of a _Bool lvalue. assert ub.b ≡ 0 ∨ ub.b ≡ 1;
+[eva] tests/value/bool.i:56: Frama_C_show_each_zero_or_one: {0; 1}
+[eva] tests/value/bool.i:59: Frama_C_show_each_one: {1}
+[eva:alarm] tests/value/bool.i:62: Warning: 
+>>>>>>> origin/master
   trap representation of a _Bool lvalue. assert b ≡ 0 ∨ b ≡ 1;
+<<<<<<< HEAD
 [eva:alarm] bool.i:56: Warning: 
+||||||| ac7807782d
+[eva:alarm] tests/value/bool.i:56: Warning: 
+=======
+[eva:alarm] tests/value/bool.i:66: Warning: 
+>>>>>>> origin/master
   trap representation of a _Bool lvalue. assert *p ≡ 0 ∨ *p ≡ 1;
+<<<<<<< HEAD
 [eva] bool.i:57: Frama_C_show_each_zero_or_one: {0; 1}
+||||||| ac7807782d
+[eva] tests/value/bool.i:57: Frama_C_show_each_zero_or_one: {0; 1}
+=======
+[eva] tests/value/bool.i:67: Frama_C_show_each_zero_or_one: {0; 1}
+>>>>>>> origin/master
 [eva] Recording results for invalid_bool
 [eva] Done for function invalid_bool
 [eva] Recording results for main
 [eva] done for function main
+<<<<<<< HEAD
 [eva] bool.i:33: assertion 'Eva,bool_value' got final status invalid.
 [eva] bool.i:42: assertion 'Eva,bool_value' got final status invalid.
 [eva] bool.i:52: assertion 'Eva,bool_value' got final status invalid.
+||||||| ac7807782d
+[eva] tests/value/bool.i:33: 
+  assertion 'Eva,bool_value' got final status invalid.
+[eva] tests/value/bool.i:42: 
+  assertion 'Eva,bool_value' got final status invalid.
+[eva] tests/value/bool.i:52: 
+  assertion 'Eva,bool_value' got final status invalid.
+=======
+[eva] tests/value/bool.i:43: 
+  assertion 'Eva,bool_value' got final status invalid.
+[eva] tests/value/bool.i:52: 
+  assertion 'Eva,bool_value' got final status invalid.
+[eva] tests/value/bool.i:62: 
+  assertion 'Eva,bool_value' got final status invalid.
+>>>>>>> origin/master
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function invalid_bool:
   ub{.b; .c; .s[bits 0 to 7]} ∈ {0; 1}

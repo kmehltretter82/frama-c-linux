@@ -91,7 +91,7 @@ Let x_1 = inp_0[0].
 Assume {
   Type: is_sint32(b) /\ is_sint32(v) /\ is_sint32(x_1) /\ is_sint32(x).
   (* Heap *)
-  Type: IsArray1_sint32(inp_1) /\ IsArray1_sint32(out_0).
+  Type: IsArray_sint32(inp_1) /\ IsArray_sint32(out_0).
   If x != 33
   Then { Have: inp_1[0 <- v] = inp_0. }
   Else { (* Call Effects *) Have: inp_1[0 <- v][1 <- b] = inp_0. }
@@ -106,7 +106,7 @@ Prove: x_1 = b.
 Goal Post-condition for 'ko_1' 'qed_ko' in 'f':
 Assume {
   (* Heap *)
-  Type: IsArray1_sint32(out_0).
+  Type: IsArray_sint32(out_0).
   (* Pre-condition for 'ko_1' *)
   Have: out_0[0] = 33.
   (* Pre-condition for 'ko_1' *)
@@ -120,7 +120,7 @@ Goal Post-condition for 'ko_1' 'qed_ko' in 'f':
 Assume {
   Type: is_sint32(b) /\ is_sint32(v).
   (* Heap *)
-  Type: IsArray1_sint32(out_0).
+  Type: IsArray_sint32(out_0).
   (* Pre-condition for 'ko_1' *)
   Have: out_0[0] = 33.
   (* Pre-condition for 'ko_1' *)
@@ -133,7 +133,7 @@ Prove: v = b.
 Goal Post-condition for 'ko_1' 'qed_ko' in 'f':
 Assume {
   (* Heap *)
-  Type: IsArray1_sint32(out_0).
+  Type: IsArray_sint32(out_0).
   (* Pre-condition for 'ko_1' *)
   Have: out_0[0] = 33.
   (* Pre-condition for 'ko_1' *)

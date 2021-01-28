@@ -1,15 +1,15 @@
 /* run.config
-  OPT: -rte -warn-signed-overflow  -warn-signed-downcast -print
-  OPT: -rte -warn-signed-overflow  -warn-signed-downcast -no-collapse-call-cast -print
+  OPT: -machdep x86_32 -rte -warn-signed-overflow  -warn-signed-downcast -print
+  OPT: -machdep x86_32 -rte -warn-signed-overflow  -warn-signed-downcast -no-collapse-call-cast -print
 */
 
-/*@ 
+/*@
   ensures (\result == a) || (\result == b);
   assigns \result \from a,b;
  */
 int nondet(int a, int b);
 
-/*@ 
+/*@
   ensures (\result == a) || (\result == b);
   assigns \result \from a,b;
  */

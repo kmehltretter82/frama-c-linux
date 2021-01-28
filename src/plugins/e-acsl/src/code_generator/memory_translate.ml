@@ -115,7 +115,10 @@ let rec eliminate_ranges_from_index_of_toffset ~loc toffset quantifiers =
 let call ~loc kf name ctx env t =
   assert (name = "base_addr" || name = "block_length"
           || name = "offset" || name ="freeable");
-  let e, env = !term_to_exp_ref kf (Env.rte env true) t in
+  let e, env =
+    Env.with_rte_and_result env true
+      ~f:(fun env -> !term_to_exp_ref kf env t)
+  in
   Env.rtl_call_to_new_var
     ~loc
     ~name
@@ -156,8 +159,9 @@ let gmp_to_sizet ~loc kf env size p =
       sizet
       (fun vi _ ->
          [ Smart_stmt.runtime_check Smart_stmt.RTE kf guard p;
-           Smart_stmt.lib_call ~loc
+           Smart_stmt.rtl_call ~loc
              ~result:(Cil.var vi)
+             ~prefix:""
              "__gmpz_get_ui"
              [ size ] ])
   in
@@ -194,7 +198,10 @@ let range_to_ptr_and_size ~loc kf env ptr r p =
       (Ctype typ_charptr)
   in
   Typing.type_term ~use_gmp_opt:false ~ctx:Typing.nan ptr;
-  let ptr, env = !term_to_exp_ref kf (Env.rte env true) ptr in
+  let ptr, env =
+    Env.with_rte_and_result env true
+      ~f:(fun env -> !term_to_exp_ref kf env ptr)
+  in
   (* size *)
   let size_term =
     (* Since [s] and [n1] have been typed through [ptr],
@@ -252,7 +259,10 @@ let range_to_ptr_and_size ~loc kf env ptr r p =
    expression in bytes and [env] is the current environment.
    [p] is the predicate under test. *)
 let term_to_ptr_and_size ~loc kf env t =
-  let e, env = !term_to_exp_ref kf (Env.rte env true) t in
+  let e, env =
+    Env.with_rte_and_result env true
+      ~f:(fun env -> !term_to_exp_ref kf env t)
+  in
   let ty = Misc.cty t.term_type in
   let sizeof = Smart_exp.ptr_sizeof ~loc ty in
   e, sizeof, env

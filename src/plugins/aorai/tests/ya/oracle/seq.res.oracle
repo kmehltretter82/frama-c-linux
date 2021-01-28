@@ -253,6 +253,11 @@ void f(void)
          (0 ≡ aorai_intermediate_state_2 ∨ ¬(aorai_counter < 2)) ∧
          0 ≡ aorai_intermediate_state_0 ∧ 0 ≡ aorai_intermediate_state;
        ensures 0 ≡ aorai_intermediate_state_3;
+     
+     behavior aorai_counter_unchanged:
+       assumes 0 ≡ aorai_intermediate_state;
+       assumes 0 ≡ aorai_intermediate_state_0;
+       assumes 0 ≡ aorai_intermediate_state_2 ∨ ¬(aorai_counter < 2);
        ensures aorai_counter ≡ \old(aorai_counter);
    @/
   void g_pre_func(void)
@@ -273,16 +278,10 @@ void f(void)
     aorai_intermediate_state_1_tmp = aorai_intermediate_state_1;
     aorai_intermediate_state_2_tmp = aorai_intermediate_state_2;
     aorai_intermediate_state_3_tmp = aorai_intermediate_state_3;
-    if (aorai_intermediate_state == 1) aorai_intermediate_state_3_tmp = 1;
-    else 
-      if (aorai_intermediate_state_0 == 1) aorai_intermediate_state_3_tmp = 1;
-      else 
-        if (aorai_intermediate_state_2 == 1) 
-          if (aorai_counter < 2) aorai_intermediate_state_3_tmp = 1;
-          else aorai_intermediate_state_3_tmp = 0;
-        else aorai_intermediate_state_3_tmp = 0;
-    if (aorai_intermediate_state_2 == 1) 
-      if (aorai_counter < 2) aorai_counter ++;
+    if ((aorai_intermediate_state == 1 || aorai_intermediate_state_0 == 1) || 
+        aorai_intermediate_state_2 == 1 && aorai_counter < 2) aorai_intermediate_state_3_tmp = 1;
+    else aorai_intermediate_state_3_tmp = 0;
+    if (aorai_intermediate_state_2 == 1 && aorai_counter < 2) aorai_counter ++;
     if (aorai_intermediate_state_0 == 1) aorai_counter = 1;
     if (aorai_intermediate_state == 1) aorai_counter = 1;
     aorai_intermediate_state_2_tmp = 0;
@@ -563,8 +562,7 @@ void g(void)
     aorai_intermediate_state_1_tmp = 0;
     aorai_intermediate_state_0_tmp = 0;
     aorai_intermediate_state_tmp = 0;
-    if (aorai_intermediate_state_2 == 1) 
-      if (1 <= aorai_counter) Sf_tmp = 1; else Sf_tmp = 0;
+    if (aorai_intermediate_state_2 == 1 && 1 <= aorai_counter) Sf_tmp = 1;
     else Sf_tmp = 0;
     S0_tmp = 0;
     S0 = S0_tmp;

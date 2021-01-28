@@ -42,7 +42,7 @@ sig
   val name : string
 
   type loc
-  val sizeof : c_object -> int
+  val sizeof : c_object -> term
   val field : loc -> fieldinfo -> loc
   val shift : loc -> c_object -> term -> loc
 

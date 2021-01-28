@@ -2,69 +2,32 @@
 // --- Main React Component rendered by './index.js'
 // --------------------------------------------------------------------------
 
+// --- React & Dome
+
 import React from 'react';
 import * as Dome from 'dome';
-import * as States from 'frama-c/states';
 import { Vfill } from 'dome/layout/boxes';
-import { Splitter } from 'dome/layout/splitters';
+import { LSplit } from 'dome/layout/splitters';
 import * as Toolbar from 'dome/frame/toolbars';
 import * as Sidebar from 'dome/frame/sidebars';
-
-import './style.css';
-
-import { LabView, View, Group } from 'frama-c/LabViews';
-import Dive from 'frama-c/dive/Dive';
-import { GridHbox, GridItem } from 'dome/layout/grids';
 import * as Controller from './Controller';
-
-import ASTview from './ASTview';
-import ASTinfo from './ASTinfo';
-import Globals from './Globals';
-import Properties from './Properties';
-import Locations from './Locations';
-import Values from './Values';
-
-// --------------------------------------------------------------------------
-// --- Selection Controls
-// --------------------------------------------------------------------------
-
-const HistorySelectionControls = () => {
-  const [selection, updateSelection] = States.useSelection();
-
-  const doPrevSelect = () => { updateSelection('HISTORY_PREV'); };
-  const doNextSelect = () => { updateSelection('HISTORY_NEXT'); };
-
-  return (
-    <Toolbar.ButtonGroup>
-      <Toolbar.Button
-        icon="ANGLE.LEFT"
-        onClick={doPrevSelect}
-        disabled={!selection || selection.history.prevSelections.length === 0}
-        title="Previous location"
-      />
-      <Toolbar.Button
-        icon="ANGLE.RIGHT"
-        onClick={doNextSelect}
-        disabled={!selection || selection.history.nextSelections.length === 0}
-        title="Next location"
-      />
-    </Toolbar.ButtonGroup>
-  );
-};
+import * as Extensions from './Extensions';
+import * as Laboratory from './Laboratory';
+import './loader';
 
 // --------------------------------------------------------------------------
 // --- Main View
 // --------------------------------------------------------------------------
 
 export default (() => {
-  const [sidebar, flipSidebar] = Dome.useSwitch(
-    'frama-c.sidebar.unfold',
-    true,
-  );
-  const [viewbar, flipViewbar] = Dome.useSwitch(
-    'frama-c.viewbar.unfold',
-    true,
-  );
+  const [sidebar, flipSidebar] =
+    Dome.useFlipSettings('frama-c.sidebar.unfold', true);
+  const [viewbar, flipViewbar] =
+    Dome.useFlipSettings('frama-c.viewbar.unfold', true);
+  const hints = Extensions.useSearchHints();
+  const onSelectedHints = () => {
+    if (hints.length === 1) Extensions.onSearchHint(hints[0]);
+  };
 
   return (
     <Vfill>
@@ -76,8 +39,15 @@ export default (() => {
           onClick={flipSidebar}
         />
         <Controller.Control />
-        <HistorySelectionControls />
+        <Extensions.Toolbar />
         <Toolbar.Filler />
+        <Toolbar.SearchField
+          placeholder="Search…"
+          hints={hints}
+          onSearch={Extensions.searchHints}
+          onHint={Extensions.onSearchHint}
+          onSelect={onSelectedHints}
+        />
         <Toolbar.Button
           icon="ITEMS.GRID"
           title="Customize Main View"
@@ -85,49 +55,19 @@ export default (() => {
           onClick={flipViewbar}
         />
       </Toolbar.ToolBar>
-      <Splitter dir="LEFT" settings="frame-c.sidebar.position" unfold={sidebar}>
+      <LSplit settings="frama-c.sidebar.split" unfold={sidebar}>
         <Sidebar.SideBar>
           <div className="sidebar-ruler" />
-          <Globals key="globals" />
+          <Extensions.Sidebar />
         </Sidebar.SideBar>
-        <LabView
+        <Laboratory.LabView
           customize={viewbar}
           settings="frama-c.labview"
-        >
-          <View id="console" label="Console" defaultView>
-            <GridItem id="frama-c.console" />
-          </View>
-          <View id="values" label="Values">
-            <GridHbox>
-              <GridItem id="frama-c.astview" />
-              <GridItem id="frama-c.values" />
-            </GridHbox>
-            <GridItem id="frama-c.properties" />
-          </View>
-          <View id="dive" label="Dive">
-            <GridHbox>
-              <GridItem id="frama-c.astview" />
-              <GridItem id="dive.graph" />
-              <GridItem id="frama-c.locations" />
-            </GridHbox>
-            <GridHbox>
-              <GridItem id="frama-c.properties" />
-              <GridItem id="frama-c.console" />
-            </GridHbox>
-          </View>
-          <Group id="frama-c" label="Frama-C" title="Frama-C Kernel Components">
-            <Controller.Console />
-            <Properties />
-            <ASTview />
-            <ASTinfo />
-            <Locations />
-            <Dive />
-            <Values />
-          </Group>
-        </LabView>
-      </Splitter>
+        />
+      </LSplit>
       <Toolbar.ToolBar>
         <Controller.Status />
+        <Extensions.Statusbar />
         <Toolbar.Filler />
         <Controller.Stats />
       </Toolbar.ToolBar>

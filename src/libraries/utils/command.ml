@@ -111,21 +111,23 @@ let print_file file job =
 (* -------------------------------------------------------------------------- *)
 
 type timer = float ref
-type 'a result = Result of 'a | Error of exn
 let dt_max tm dt = match tm with Some r when dt > !r -> r := dt | _ -> ()
 let dt_add tm dt = match tm with Some r -> r := !r +. dt | _ -> ()
-let return = function Result x -> x | Error e -> raise e
-let catch f x = try Result(f x) with e -> Error e
 let time ?rmax ?radd job data =
-  begin
-    let t0 = Sys.time () in
-    let re = catch job data in
+  let t0 = Sys.time () in
+  try
+    let result = job data in
     let t1 = Sys.time () in
     let dt = t1 -. t0 in
     dt_max rmax dt ;
     dt_add radd dt ;
-    return re ;
-  end
+    result
+  with exn ->
+    let t1 = Sys.time () in
+    let dt = t1 -. t0 in
+    dt_max rmax dt ;
+    dt_add radd dt ;
+    raise exn
 
 (* -------------------------------------------------------------------------- *)
 (* --- Process                                                            --- *)

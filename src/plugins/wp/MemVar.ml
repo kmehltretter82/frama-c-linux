@@ -683,14 +683,18 @@ struct
     | Loc l -> M.block_length sigma.mem obj l
     | Ref x -> noref ~op:"block-length of" x
     | Val(m,x,_) ->
-        let obj = Ctypes.object_of (vtype m x) in
-        let size =
-          if Ctypes.sizeof_defined obj
-          then Ctypes.sizeof_object obj
-          else if Wp_parameters.ExternArrays.get ()
-          then max_int
-          else Warning.error ~source:"MemVar" "Unknown array-size"
-        in F.e_int size
+        begin match Ctypes.object_of (vtype m x) with
+          | C_comp ({ cfields = None } as c) ->
+              Cvalues.bytes_length_of_opaque_comp c
+          | obj ->
+              let size =
+                if Ctypes.sizeof_defined obj
+                then Ctypes.sizeof_object obj
+                else if Wp_parameters.ExternArrays.get ()
+                then max_int
+                else Warning.error ~source:"MemVar" "Unknown array-size"
+              in F.e_int size
+        end
 
   let cast obj l = Loc(M.cast obj (mloc_of_loc l))
   let loc_of_int e a = Loc(M.loc_of_int e a)
@@ -903,8 +907,8 @@ struct
     | OBJ , _ , [Shift(te,k)] -> Some(te,k,obj)
     | OBJ , C_comp c , (Field fd :: ofs) ->
         begin
-          match List.rev c.cfields with
-          | fd0::_ when Fieldinfo.equal fd fd0 ->
+          match Option.map List.rev c.cfields with
+          | Some (fd0::_) when Fieldinfo.equal fd fd0 ->
               last_field_shift acs (Ctypes.object_of fd.ftype) ofs
           | _ -> None
         end
@@ -1049,13 +1053,18 @@ struct
           | Some { arr_size } -> arr_size
         in
         initialized_range sigma obj x ofs (e_int 0)(e_int (size-1))
-    | C_comp ci ->
+    | C_comp { cfields = None } ->
+        Lang.F.p_equal
+          (access_init (get_init_term sigma x) ofs)
+          (Cvalues.initialized_obj obj)
+    | C_comp { cfields = Some fields } ->
         let mk_pred f =
           let obj = Ctypes.object_of f.ftype in
           let ofs = ofs @ [Field f] in
           initialized_loc sigma obj x ofs
         in
-        Lang.F.p_conj (List.map mk_pred ci.cfields)
+        Lang.F.p_conj (List.map mk_pred fields)
+
   and initialized_range sigma obj x ofs low up =
     match obj with
     | C_array { arr_element=t } ->
@@ -1085,11 +1094,11 @@ struct
           | Ref _ -> p_true
           | Loc l -> M.initialized sigma.mem (Rloc(obj,l))
           | Val(m,x,p) ->
-              if (x.vformal || x.vglob) then
+              if is_heap_allocated m then
+                M.initialized sigma.mem (Rloc(obj,mloc_of_loc l))
+              else if (x.vformal || x.vglob) then
                 try valid_offset RW (vobject m x) p
                 with ShiftMismatch -> shift_mismatch l
-              else if is_heap_allocated m then
-                M.initialized sigma.mem (Rloc(obj,mloc_of_loc l))
               else
                 initialized_loc sigma obj x p
         end
@@ -1099,17 +1108,26 @@ struct
           | Loc l -> M.initialized sigma.mem (Rrange(l,elt,Some a, Some b))
           | Val(m,x,p) ->
               try
-                let in_array = valid_range RW (vobject m x) p (elt, a, b) in
-                let initialized =
-                  if x.vformal || x.vglob then p_true
-                  else initialized_range sigma (vobject m x) x p a b
-                in
-                F.p_imply (F.p_leq a b) (p_and in_array initialized)
-              with ShiftMismatch ->
                 if is_heap_allocated m then
                   let l = mloc_of_loc l in
                   M.initialized sigma.mem (Rrange(l,elt,Some a, Some b))
-                else shift_mismatch l
+                else
+                  let rec normalize obj = function
+                    | [] -> [], a, b
+                    | [Shift(elt, i)] when Ctypes.equal obj elt ->
+                        [], F.e_add a i, F.e_add b i
+                    | f :: ofs ->
+                        let l, a, b = normalize obj ofs in f :: l, a, b
+                  in
+                  let p, a, b = normalize elt p in
+                  let in_array = valid_range RW (vobject m x) p (elt, a, b) in
+                  let initialized =
+                    if x.vformal || x.vglob then p_true
+                    else initialized_range sigma (vobject m x) x p a b
+                  in
+                  F.p_imply (F.p_leq a b) (p_and in_array initialized)
+              with ShiftMismatch ->
+                shift_mismatch l
         end
     | Rrange(l, _,a,b) ->
         Warning.error
@@ -1126,11 +1144,13 @@ struct
     | TInt _ | TFloat _ | TVoid _ | TEnum _ | TNamed _ | TBuiltin_va_list _
       -> F.p_true
     | TPtr _ | TFun _ -> phi v
-    | TComp({ cfields },_,_) ->
+    | TComp({ cfields = None },_,_) ->
+        F.p_true
+    | TComp({ cfields = Some fields },_,_) ->
         F.p_all
           (fun fd ->
              forall_pointers phi (e_getfield v (Cfield (fd, KValue))) fd.ftype)
-          cfields
+          fields
     | TArray(elt,_,_,_) ->
         let k = Lang.freshvar Qed.Logic.Int in
         F.p_forall [k] (forall_pointers phi (e_get v (e_var k)) elt)
@@ -1190,7 +1210,10 @@ struct
     match scope with
     | Leave -> []
     | Enter ->
-        let xs = List.filter (fun v -> not v.vformal && not v.vglob) xs in
+        let xs = List.filter
+            (fun v -> is_mvar_alloc v && not v.vformal &&
+                      not v.vglob && not v.vdefined) xs
+        in
         let uninitialized v =
           let value = Cvalues.uninitialized_obj (Ctypes.object_of v.vtype) in
           Lang.F.p_equal (access_init (get_init_term seq.post v) []) value
@@ -1237,7 +1260,9 @@ struct
                  let bg = e_getfield b cg in
                  let eqg = p_forall ys (p_equal ag bg) in
                  eqg :: hs
-            ) hs f.fcomp.cfields
+            ) hs
+            (* Note: we have field accesses, everything here is thus complete *)
+            (Option.get f.fcomp.cfields)
 
       | Shift(_,e) :: ofs ->
           let y = Lang.freshvar ~basename:"k" Qed.Logic.Int in
@@ -1308,13 +1333,17 @@ struct
           let hyp = Vset.in_range (e_var v) low up in
           let in_range = monotonic_initialized seq obj x ofs in
           Lang.F.p_forall [v] (p_imply hyp in_range)
-      | C_comp ci ->
+      | C_comp { cfields = None } ->
+          p_imply
+            (initialized_loc seq.pre obj x ofs)
+            (initialized_loc seq.post obj x ofs)
+      | C_comp { cfields = Some fields } ->
           let mk_pred f =
             let obj = Ctypes.object_of f.ftype in
             let ofs = ofs @ [Field f] in
             monotonic_initialized seq obj x ofs
           in
-          Lang.F.p_conj (List.map mk_pred ci.cfields)
+          Lang.F.p_conj (List.map mk_pred fields)
 
   let memvar_assigned seq obj loc v =
     match loc with

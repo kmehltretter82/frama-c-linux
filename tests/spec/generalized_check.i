@@ -1,8 +1,14 @@
 /* run.config
+<<<<<<< HEAD
 PLUGIN: @EVA_PLUGINS@
+||||||| ac7807782d
+OPT: -wp -wp-prover qed -wp-msg-key shell
+=======
+>>>>>>> origin/master
 OPT: -eva -eva-use-spec f
 OPT: -print
 */
+
 /*@ check lemma easy_proof: \false; */ // should not be put in any environment
 
 /*@ check requires f_valid_x: \valid(x);

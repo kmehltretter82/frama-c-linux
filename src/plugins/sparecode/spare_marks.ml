@@ -305,7 +305,7 @@ class annot_visitor ~filter pdg = object (self)
     let () =
       if filter annot then
       try
-        let stmt = Extlib.the self#current_stmt in
+        let stmt = Option.get self#current_stmt in
         debug 1 "selecting annotation : %a @."
           Printer.pp_code_annotation annot;
         let info = !Db.Pdg.find_code_annot_nodes pdg stmt annot in

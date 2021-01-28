@@ -3,7 +3,9 @@
                             { decreases-clause? } simple-clause*
                             named-behavior* completeness-clause*
   \
-  requires-clause ::= "requires" pred ";"
+  clause-kind ::= "check" | { "admit" }
+  \
+  requires-clause ::= clause-kind? "requires" pred ";"
   \
   { decreases-clause } ::= { "decreases" term ("for" id)? ";" }
   \
@@ -16,7 +18,7 @@
   \
   { location } ::= { tset }
   \
-  ensures-clause ::= "ensures" pred ";"
+  ensures-clause ::= clause-kind? "ensures" pred ";"
   \
   named-behavior ::= "behavior" id ":" behavior-body
   \

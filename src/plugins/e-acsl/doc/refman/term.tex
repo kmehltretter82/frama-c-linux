@@ -26,7 +26,7 @@
        | { "{" term "\with" "."id "=" term "}" } ; field functional modifier
        | term "->" id ;
        | [ "(" type-expr ")" term ] ; cast
-       | { id "(" term ("," term)* ")" } ; function application
+       | id "(" term ("," term)* ")" ; function application
        | "(" term ")" ; parentheses
        | [ term "?" term ":" term ] ; ternary condition
        | "\let" id "=" term ";" term ; local binding

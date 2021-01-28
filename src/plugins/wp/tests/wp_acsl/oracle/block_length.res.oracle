@@ -55,3 +55,64 @@ Goal Post-condition 'Pts1' in 'f':
 Prove: true.
 
 ------------------------------------------------------------
+------------------------------------------------------------
+  Function g
+------------------------------------------------------------
+
+Goal Post-condition 'Pt' in 'g':
+Assume { (* Heap *) Type: linked(Malloc_0). }
+Prove: (Malloc_0[G_t_20] / 20) = 1.
+
+------------------------------------------------------------
+
+Goal Post-condition 'Psiz1' in 'g':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Post-condition 'Pmat1' in 'g':
+Assume { (* Heap *) Type: linked(Malloc_0). }
+Prove: (Malloc_0[G_mat_21] / 5) = 10.
+
+------------------------------------------------------------
+
+Goal Post-condition 'Psiz2' in 'g':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Post-condition 'Pmat2' in 'g':
+Assume { (* Heap *) Type: linked(Malloc_0). }
+Prove: (Malloc_0[G_mat_21] / 50) = 1.
+
+------------------------------------------------------------
+
+Goal Post-condition 'Ps' in 'g':
+Assume { (* Heap *) Type: linked(Malloc_0). }
+Prove: (4 + Malloc_0[G_x_22]) = (5 * (Malloc_0[G_s_23] / 5)).
+
+------------------------------------------------------------
+
+Goal Post-condition 'Pts' in 'g':
+Assume { (* Heap *) Type: linked(Malloc_0). }
+Prove: (Malloc_0[G_ts_24] / 20) = (Malloc_0[G_s_23] / 5).
+
+------------------------------------------------------------
+
+Goal Post-condition 'Pt1' in 'g':
+Assume { (* Heap *) Type: linked(Malloc_0). }
+Prove: Malloc_0[G_t_20] = 20.
+
+------------------------------------------------------------
+
+Goal Post-condition 'Pmat12' in 'g':
+Assume { (* Heap *) Type: linked(Malloc_0). }
+Prove: Malloc_0[G_mat_21] = 50.
+
+------------------------------------------------------------
+
+Goal Post-condition 'Pts1' in 'g':
+Assume { (* Heap *) Type: linked(Malloc_0). }
+Prove: (Malloc_0[G_ts_24] / 5) = (4 * (Malloc_0[G_s_23] / 5)).
+
+------------------------------------------------------------

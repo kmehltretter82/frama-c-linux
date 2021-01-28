@@ -28,13 +28,16 @@ open Cil_datatype
 (* ************************************************************************** *)
 
 let is_fc_or_compiler_builtin vi =
-  Cil.is_builtin vi
+  Cil_builtins.is_builtin vi
   ||
   (let prefix_length = 10 (* number of characters in "__builtin_" *) in
    String.length vi.vname > prefix_length
    &&
    let prefix = String.sub vi.vname 0 prefix_length in
    Datatype.String.equal prefix "__builtin_")
+
+let is_fc_stdlib_generated vi =
+  Cil.hasAttribute "fc_stdlib_generated" vi.vattr
 
 (* ************************************************************************** *)
 (** {2 Handling \result} *)

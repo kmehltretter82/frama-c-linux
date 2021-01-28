@@ -17,7 +17,7 @@ object(self)
     let has_loop =
       try
         Some 
-          (Kernel_function.find_enclosing_loop (Extlib.the self#current_kf) s)
+          (Kernel_function.find_enclosing_loop (Option.get self#current_kf) s)
       with Not_found -> None
     in
     (match has_loop with

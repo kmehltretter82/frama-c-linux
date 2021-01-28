@@ -27,7 +27,7 @@ let pretty_with_indirect fmt v =
   Function_Froms.pretty_with_type_indirect (Kernel_function.get_type v) fmt deps
 
 let display fmtopt =
-  Extlib.may (fun fmt -> Format.fprintf fmt "@[<v>") fmtopt;
+  Option.iter (fun fmt -> Format.fprintf fmt "@[<v>") fmtopt;
   Callgraph.Uses.iter_in_rev_order
     (fun kf ->
       if !Db.Value.is_called kf then
@@ -45,7 +45,7 @@ let display fmtopt =
           | Some fmt ->
             Format.fprintf fmt "@[%t@]@ @[  %a]" header pretty kf
     );
-  Extlib.may (fun fmt -> Format.fprintf fmt "@]") fmtopt
+  Option.iter (fun fmt -> Format.fprintf fmt "@]") fmtopt
 
 module SortCalls = struct
   type t = stmt

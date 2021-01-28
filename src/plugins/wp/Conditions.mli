@@ -142,7 +142,7 @@ val map_sequence : (pred -> pred) -> sequence -> sequence
 (** Rewrite all root predicates in sequence *)
 
 val map_sequent : (pred -> pred) -> sequent -> sequent
-(** Rewrite all root predocates in hypotheses and goal *)
+(** Rewrite all root predicates in hypotheses and goal *)
 
 val insert : ?at:int -> step -> sequent -> sequent
 (** Insert a step in the sequent immediately [at] the specified position.

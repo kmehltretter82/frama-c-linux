@@ -40,7 +40,13 @@
 [pdg] Bottom for function spare_called_fct
 [pdg] computing for function stop
 [from] Computing for function stop
+<<<<<<< HEAD
 [kernel:annot:missing-spec] intra.i:110: Warning: 
+||||||| ac7807782d
+[kernel:annot:missing-spec] tests/sparecode/intra.i:110: Warning: 
+=======
+[kernel:annot:missing-spec] tests/sparecode/intra.i:93: Warning: 
+>>>>>>> origin/master
   Neither code nor specification for function stop, generating default assigns from the prototype
 [from] Done for function stop
 [pdg] done for function stop

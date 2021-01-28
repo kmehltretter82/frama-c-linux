@@ -72,11 +72,11 @@ enum aorai_OpStatusList {
        ensures 0 ≡ S1;
      
      behavior buch_state_S2_in:
-       assumes 1 ≡ S1 ∧ 1 ≢ 0;
+       assumes 1 ≡ S1;
        ensures 1 ≡ S2;
      
      behavior buch_state_S2_out:
-       assumes 0 ≡ S1 ∨ 1 ≡ 0;
+       assumes 0 ≡ S1;
        ensures 0 ≡ S2;
      
      behavior buch_state_main_0_out:
@@ -106,7 +106,6 @@ enum aorai_OpStatusList {
 /*@ requires 1 ≡ S1 ∧ 0 ≡ S2 ∧ 0 ≡ main_0;
     
     behavior Buchi_property_behavior:
-      ensures 1 ≡ S2 ⇒ 1 ≢ 0;
       ensures 1 ≡ S1 ∨ 0 ≡ S1;
       ensures 1 ≡ S2 ∨ 0 ≡ S2;
       ensures 0 ≡ main_0;
@@ -118,7 +117,7 @@ int decode_int(char *s)
   int __retres;
   char c;
   /*@ ghost decode_int_pre_func(s); */
-  int intmax = ~ (1 << (sizeof(int) * (unsigned int)8 - (unsigned int)1));
+  int intmax = ~ (1 << (sizeof(int) * (unsigned long)8 - (unsigned long)1));
   int cutlim = intmax % 10;
   int cutoff = intmax / 10;
   int value = 0;
@@ -186,7 +185,6 @@ int decode_int(char *s)
 
 /*@ ghost
   /@ requires (1 ≡ S1 ∨ 1 ≡ S2) ∧ 0 ≡ main_0;
-     requires 1 ≡ S1 ⇒ 1 ≢ 0;
      ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_factorial;
      assigns aorai_CurOpStatus, aorai_CurOperation, S1, S2, main_0;
@@ -195,11 +193,11 @@ int decode_int(char *s)
        ensures 0 ≡ S1;
      
      behavior buch_state_S2_in:
-       assumes 1 ≡ S2 ∨ (1 ≡ S1 ∧ 1 ≢ 0);
+       assumes 1 ≡ S2 ∨ 1 ≡ S1;
        ensures 1 ≡ S2;
      
      behavior buch_state_S2_out:
-       assumes 0 ≡ S2 ∧ (0 ≡ S1 ∨ 1 ≡ 0);
+       assumes 0 ≡ S2 ∧ 0 ≡ S1;
        ensures 0 ≡ S2;
      
      behavior buch_state_main_0_out:
@@ -216,9 +214,7 @@ int decode_int(char *s)
     S2_tmp = S2;
     main_0_tmp = main_0;
     main_0_tmp = 0;
-    if (S1 == 1) S2_tmp = 1;
-    else 
-      if (S2 == 1) S2_tmp = 1; else S2_tmp = 0;
+    if (S1 == 1 || S2 == 1) S2_tmp = 1; else S2_tmp = 0;
     S1_tmp = 0;
     S1 = S1_tmp;
     S2 = S2_tmp;
@@ -243,11 +239,11 @@ int decode_int(char *s)
        ensures 0 ≡ S1;
      
      behavior buch_state_S2_in:
-       assumes 1 ≡ S2 ∨ (1 ≡ S1 ∧ 1 ≢ 0);
+       assumes 1 ≡ S2 ∨ 1 ≡ S1;
        ensures 1 ≡ S2;
      
      behavior buch_state_S2_out:
-       assumes 0 ≡ S2 ∧ (0 ≡ S1 ∨ 1 ≡ 0);
+       assumes 0 ≡ S2 ∧ 0 ≡ S1;
        ensures 0 ≡ S2;
      
      behavior buch_state_main_0_out:
@@ -264,12 +260,8 @@ int decode_int(char *s)
     S2_tmp = S2;
     main_0_tmp = main_0;
     main_0_tmp = 0;
-    if (S1 == 1) S2_tmp = 1;
-    else 
-      if (S2 == 1) S2_tmp = 1; else S2_tmp = 0;
-    if (S1 == 1) S1_tmp = 1;
-    else 
-      if (S2 == 1) S1_tmp = 1; else S1_tmp = 0;
+    if (S1 == 1 || S2 == 1) S2_tmp = 1; else S2_tmp = 0;
+    if (S1 == 1 || S2 == 1) S1_tmp = 1; else S1_tmp = 0;
     S1 = S1_tmp;
     S2 = S2_tmp;
     main_0 = main_0_tmp;
@@ -279,7 +271,6 @@ int decode_int(char *s)
 */
 
 /*@ requires (1 ≡ S1 ∨ 1 ≡ S2) ∧ 0 ≡ main_0;
-    requires 1 ≡ S1 ⇒ 1 ≢ 0;
     requires 1 ≡ S2 ∨ 0 ≡ S2;
     requires 1 ≡ S1 ∨ 0 ≡ S1;
     requires 0 ≤ value ≤ 12;
@@ -362,11 +353,11 @@ int factorial(int value)
        ensures 0 ≡ S1;
      
      behavior buch_state_S2_in:
-       assumes 1 ≡ S1 ∧ 1 ≢ 0;
+       assumes 1 ≡ S1;
        ensures 1 ≡ S2;
      
      behavior buch_state_S2_out:
-       assumes 0 ≡ S1 ∨ 1 ≡ 0;
+       assumes 0 ≡ S1;
        ensures 0 ≡ S2;
      
      behavior buch_state_main_0_out:
@@ -398,7 +389,6 @@ int factorial(int value)
     ensures \result ≡ 0 ∨ \result ≡ 1;
     
     behavior Buchi_property_behavior:
-      ensures 1 ≡ S2 ⇒ 1 ≢ 0;
       ensures 1 ≡ S1 ∨ 0 ≡ S1;
       ensures 1 ≡ S2 ∨ 0 ≡ S2;
       ensures 0 ≡ main_0;

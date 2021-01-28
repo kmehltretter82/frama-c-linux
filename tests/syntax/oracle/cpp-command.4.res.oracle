@@ -1,2 +1,8 @@
 [kernel] Preprocessing command:
+<<<<<<< HEAD
   gcc -E -C -I LIBC -D__FRAMAC__ -D__FC_MACHDEP_X86_32 -dD -nostdinc -m32 './cpp-command.c' -o '/tmp/FILE.i'
+||||||| ac7807782d
+  gcc -E -C -I.  -I./share/libc -D__FRAMAC__ -D__FC_MACHDEP_X86_32 -dD -nostdinc -m32 'tests/syntax/cpp-command.c' -o '/tmp/FILE.i'
+=======
+  gcc -E -C -I.  -I./share/libc -D__FRAMAC__ -D__FC_MACHDEP_X86_32 -dD -nostdinc 'tests/syntax/cpp-command.c' -o 'TMPDIR/FILE.i'
+>>>>>>> origin/master

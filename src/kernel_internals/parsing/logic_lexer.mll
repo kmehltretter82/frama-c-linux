@@ -26,7 +26,6 @@
 
   open Logic_parser
   open Lexing
-  open Logic_ptree
 
   type state = Normal | Test
 
@@ -207,7 +206,12 @@
             match Logic_env.extension_category s with
             | exception Not_found -> None
             | Cil_types.Ext_contract -> Some (EXT_CONTRACT s)
-            | Cil_types.Ext_global -> Some (EXT_GLOBAL s)
+            | Cil_types.Ext_global ->
+              begin
+                match Logic_env.is_extension_block s with
+                | false -> Some (EXT_GLOBAL s)
+                | true -> Some (EXT_GLOBAL_BLOCK s)
+              end
             | Cil_types.Ext_code_annot _ -> Some (EXT_CODE_ANNOT s)
           end
           else None
@@ -362,17 +366,17 @@ rule token = parse
       end else curr_tok
     }
 
-  | '0'['x''X'] rH+ rIS?    { CONSTANT (IntConstant (lexeme lexbuf)) }
-  | '0'['b''B'] rB+ rIS?    { CONSTANT (IntConstant (lexeme lexbuf)) }
-  | '0' rD+ rIS?            { CONSTANT (IntConstant (lexeme lexbuf)) }
-  | rD+                     { CONSTANT10 (lexeme lexbuf) }
-  | rD+ rIS                 { CONSTANT (IntConstant (lexeme lexbuf)) }
+  | '0'['x''X'] rH+ rIS?    { INT_CONSTANT (lexeme lexbuf) }
+  | '0'['b''B'] rB+ rIS?    { INT_CONSTANT (lexeme lexbuf) }
+  | '0' rD+ rIS?            { INT_CONSTANT (lexeme lexbuf) }
+  | rD+                     { INT_CONSTANT (lexeme lexbuf) }
+  | rD+ rIS                 { INT_CONSTANT (lexeme lexbuf) }
   | ('L'? "'" as prelude) (([^ '\\' '\'' '\n']|("\\"[^ '\n']))+ as content) "'"
       {
         let b = Buffer.create 5 in
         Buffer.add_string b prelude;
         let lbf = Lexing.from_string content in
-        CONSTANT (IntConstant (chr b lbf ^ "'"))
+        INT_CONSTANT (chr b lbf ^ "'")
       }
 (* floating-point literals, both decimal and hexadecimal *)
   | rD+ rE rFS?
@@ -381,11 +385,11 @@ rule token = parse
   | '0'['x''X'] rH+ '.' rH* rP rFS?
   | '0'['x''X'] rH* '.' rH+ rP rFS?
   | '0'['x''X'] rH+ rP rFS?
-      { CONSTANT (FloatConstant (lexeme lexbuf)) }
+      { FLOAT_CONSTANT (lexeme lexbuf) }
 
  (* hack to lex 0..3 as 0 .. 3 and not as 0. .3 *)
   | (rD+ as n) ".."         { lexbuf.lex_curr_pos <- lexbuf.lex_curr_pos - 2;
-                              CONSTANT (IntConstant n) }
+                              INT_CONSTANT n }
 
   | 'L'? '"' as prelude (([^ '\\' '"' '\n']|("\\"[^ '\n']))* as content) '"'
       { STRING_LITERAL (prelude.[0] = 'L',content) }
@@ -565,8 +569,9 @@ and comment = parse
       | Logic_utils.Not_well_formed (loc, m) ->
         output ~source:(fst loc) "%s" m;
         None
-      | Log.FeatureRequest(_,msg) ->
-        output ~source:(Cil_datatype.Position.of_lexing_pos lb.lex_curr_p) "unimplemented ACSL feature: %s" msg; None
+      | Log.FeatureRequest(source,_,msg) ->
+        let source = Option.value ~default:(Cil_datatype.Position.of_lexing_pos lb.lex_curr_p) source in
+        output ~source "unimplemented ACSL feature: %s" msg; None
       | exn ->
         Kernel.fatal ~source:(Cil_datatype.Position.of_lexing_pos lb.lex_curr_p) "Unknown error (%s)"
           (Printexc.to_string exn)

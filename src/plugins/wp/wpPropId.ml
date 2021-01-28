@@ -121,12 +121,12 @@ let mk_var_pos_id    kf s ca = mk_prop PKVarPos  (mk_annot_id kf s ca)
 
 let mk_loop_from_id kf s ca from =
   let id = Property.ip_of_from kf (Kstmt s) (Property.Id_loop ca) from in
-  mk_prop PKPropLoop (Extlib.the id)
+  mk_prop PKPropLoop (Option.get id)
 
 let mk_bhv_from_id kf ki a bhv from =
   let a = Datatype.String.Set.of_list a in
   let id = Property.ip_of_from kf ki (Property.Id_contract (a,bhv)) from in
-  mk_prop PKProp (Extlib.the id)
+  mk_prop PKProp (Option.get id)
 
 let get_kind_for_tk kf tkind = match tkind with
   | Normal ->
@@ -138,7 +138,7 @@ let mk_fct_from_id kf bhv tkind from =
   let contract_info = Property.Id_contract(Datatype.String.Set.empty,bhv) in
   let id = Property.ip_of_from kf Kglobal contract_info from in
   let kind = get_kind_for_tk kf tkind in
-  mk_prop kind (Extlib.the id)
+  mk_prop kind (Option.get id)
 
 let mk_disj_bhv_id (kf,ki,active,disj)  =
   mk_prop PKProp (Property.ip_of_disjoint kf ki active disj)
@@ -153,18 +153,18 @@ let mk_stmt_assigns_id kf s active b a =
   let active = Datatype.String.Set.of_list active in
   let b = Property.Id_contract (active,b) in
   let p = Property.ip_of_assigns kf (Kstmt s) b (Writes a) in
-  Extlib.opt_map (mk_prop PKProp) p
+  Option.map (mk_prop PKProp) p
 
 let mk_loop_assigns_id kf s ca a =
   let ca = Property.Id_loop ca in
   let p = Property.ip_of_assigns kf (Kstmt s) ca (Writes a) in
-  Extlib.opt_map (mk_prop PKPropLoop) p
+  Option.map (mk_prop PKPropLoop) p
 
 let mk_fct_assigns_id kf b tkind a =
   let b = Property.Id_contract(Datatype.String.Set.empty,b) in
   let kind = get_kind_for_tk kf tkind in
   let p = Property.ip_of_assigns kf Kglobal b (Writes a) in
-  Extlib.opt_map (mk_prop kind) p
+  Option.map (mk_prop kind) p
 
 let mk_pre_id kf ki b p =
   mk_prop PKProp (Property.ip_of_requires kf ki b p)
@@ -418,7 +418,7 @@ struct
         (** remove name of callee kernel function given by get_ip *)
         let ip_string = get_ip pre in
         let ip_string =
-          Extlib.opt_conv ip_string
+          Option.value ~default:ip_string
             (Extlib.string_del_prefix
                ((Kernel_function.get_name callee_kf)^"_")
                ip_string)
@@ -520,6 +520,22 @@ let user_prop_names p =
   | IPTypeInvariant _
   | IPGlobalInvariant _
   | IPOther _ -> []
+
+let user_bhv_names p =
+  let open Property in
+  let fors = match p with
+    | Property.IPCodeAnnot { ica_ca } ->
+        let fors = match ica_ca.annot_content with
+          | Cil_types.AAssert (fors, _)
+          | Cil_types.AStmtSpec (fors, _)
+          | Cil_types.AInvariant (fors, _, _)
+          | Cil_types.AAssigns (fors, _)
+          | Cil_types.AAllocation (fors, _)
+          | Cil_types.AExtended (fors, _, _) -> fors
+          | _ -> []
+        in fors
+    | _ -> []
+  in Option.fold ~none:fors ~some:(fun b -> b.b_name :: fors) (get_behavior p)
 
 let string_of_termination_kind = function
     Normal -> "post"
@@ -772,8 +788,7 @@ let select_default pid =
   let names = user_prop_pid pid in
   not (List.mem "no_wp" names)
 
-let select_by_name asked_names pid =
-  let names = user_prop_pid pid in
+let are_selected_names asked names =
   if List.mem "no_wp" names then false
   else
     let is_minus s = try s.[0] = '-' with _ -> false in
@@ -791,9 +806,15 @@ let select_by_name asked_names pid =
                then a && (not (eval ()))
                else a || (eval ()))
     in
-    match List.fold_left eval None asked_names with
+    match List.fold_left eval None asked with
     | Some false -> false
     | _ -> true
+
+
+let select_by_name asked_names pid =
+  let names = user_prop_pid pid in
+  are_selected_names asked_names names
+
 
 let select_call_pre s_call asked_pre pid =
   match pid.p_kind with

@@ -35,8 +35,8 @@ char *memset_char(char *ptr, char value, size_t len)
 
 void chars(char * /*[10]*/ dest)
 {
-  char *res = memset_char(dest,(char)0,(unsigned int)10);
-  memset_char(res,(char)0,(unsigned int)10);
+  char *res = memset_char(dest,(char)0,(unsigned long)10);
+  memset_char(res,(char)0,(unsigned long)10);
   return;
 }
 
@@ -59,8 +59,8 @@ unsigned char *memset_uchar(unsigned char *ptr, unsigned char value,
 
 void uchars(unsigned char * /*[10]*/ dest)
 {
-  unsigned char *res = memset_uchar(dest,(unsigned char)0,(unsigned int)10);
-  memset_uchar(res,(unsigned char)0,(unsigned int)10);
+  unsigned char *res = memset_uchar(dest,(unsigned char)0,(unsigned long)10);
+  memset_uchar(res,(unsigned char)0,(unsigned long)10);
   return;
 }
 
@@ -87,8 +87,8 @@ char (*memset_arr10_char(char (*ptr)[10], char value, size_t len))[10]
 
 void nested_chars(char (* /*[10]*/ dest)[10])
 {
-  char (*res)[10] = memset_arr10_char(dest,(char)0,(unsigned int)100);
-  memset_arr10_char(res,(char)0,(unsigned int)100);
+  char (*res)[10] = memset_arr10_char(dest,(char)0,(unsigned long)100);
+  memset_arr10_char(res,(char)0,(unsigned long)100);
   return;
 }
 
@@ -113,8 +113,8 @@ int *memset_int_0(int *ptr, size_t len)
 
 void integer(int * /*[10]*/ dest)
 {
-  int *res = memset_int_0(dest,(unsigned int)10 * sizeof(int));
-  memset_int_0(res,(unsigned int)10 * sizeof(int));
+  int *res = memset_int_0(dest,(unsigned long)10 * sizeof(int));
+  memset_int_0(res,(unsigned long)10 * sizeof(int));
   return;
 }
 
@@ -139,8 +139,8 @@ enum E *memset_e_E_0(enum E *ptr, size_t len)
 
 void with_enum(enum E * /*[10]*/ dest)
 {
-  enum E *res = memset_e_E_0(dest,(unsigned int)10 * sizeof(enum E));
-  memset_e_E_0(res,(unsigned int)10 * sizeof(enum E));
+  enum E *res = memset_e_E_0(dest,(unsigned long)10 * sizeof(enum E));
+  memset_e_E_0(res,(unsigned long)10 * sizeof(enum E));
   return;
 }
 
@@ -165,15 +165,15 @@ float *memset_float_0(float *ptr, size_t len)
 
 void floats(float * /*[10]*/ dest)
 {
-  float *res = memset_float_0(dest,(unsigned int)10 * sizeof(float));
-  memset_float_0(res,(unsigned int)10 * sizeof(float));
+  float *res = memset_float_0(dest,(unsigned long)10 * sizeof(float));
+  memset_float_0(res,(unsigned long)10 * sizeof(float));
   return;
 }
 
 void with_named(named * /*[10]*/ dest)
 {
-  named *res = memset_int_0(dest,(unsigned int)10 * sizeof(named));
-  memset_int_0(res,(unsigned int)10 * sizeof(named));
+  named *res = memset_int_0(dest,(unsigned long)10 * sizeof(named));
+  memset_int_0(res,(unsigned long)10 * sizeof(named));
   return;
 }
 
@@ -199,21 +199,21 @@ struct X *memset_st_X_0(struct X *ptr, size_t len)
 
 void structure(struct X * /*[10]*/ dest)
 {
-  struct X *res = memset_st_X_0(dest,(unsigned int)10 * sizeof(struct X));
-  memset_st_X_0(res,(unsigned int)10 * sizeof(struct X));
+  struct X *res = memset_st_X_0(dest,(unsigned long)10 * sizeof(struct X));
+  memset_st_X_0(res,(unsigned long)10 * sizeof(struct X));
   return;
 }
 
-/*@ requires aligned_end: len % 4 ≡ 0;
+/*@ requires aligned_end: len % 8 ≡ 0;
     requires
-      valid_dest: \let __fc_len = len / 4; \valid(ptr + (0 .. __fc_len - 1));
+      valid_dest: \let __fc_len = len / 8; \valid(ptr + (0 .. __fc_len - 1));
     ensures
       set_content:
-        \let __fc_len = len / 4;
+        \let __fc_len = len / 8;
         ∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(ptr + j0) ≡ \null;
     ensures result: \result ≡ ptr;
-    assigns *(ptr + (0 .. len / 4 - 1)), \result;
-    assigns *(ptr + (0 .. len / 4 - 1)) \from \nothing;
+    assigns *(ptr + (0 .. len / 8 - 1)), \result;
+    assigns *(ptr + (0 .. len / 8 - 1)) \from \nothing;
     assigns \result \from ptr;
  */
 int **memset_ptr_int_0(int **ptr, size_t len)
@@ -225,8 +225,8 @@ int **memset_ptr_int_0(int **ptr, size_t len)
 
 void pointers(int ** /*[10]*/ dest)
 {
-  int **res = memset_ptr_int_0(dest,(unsigned int)10 * sizeof(int *));
-  memset_ptr_int_0(res,(unsigned int)10 * sizeof(int *));
+  int **res = memset_ptr_int_0(dest,(unsigned long)10 * sizeof(int *));
+  memset_ptr_int_0(res,(unsigned long)10 * sizeof(int *));
   return;
 }
 
@@ -254,22 +254,22 @@ int (*memset_arr10_int_0(int (*ptr)[10], size_t len))[10]
 void nested(int (*dest)[10], int n)
 {
   int (*res)[10] =
-    memset_arr10_int_0(dest,(unsigned int)n * sizeof(int [10]));
-  memset_arr10_int_0(res,(unsigned int)n * sizeof(int [10]));
+    memset_arr10_int_0(dest,(unsigned long)n * sizeof(int [10]));
+  memset_arr10_int_0(res,(unsigned long)n * sizeof(int [10]));
   return;
 }
 
 void with_void(void *dest)
 {
-  void *res = memset(dest,0,(unsigned int)10);
-  memset(res,0,(unsigned int)10);
+  void *res = memset(dest,0,(unsigned long)10);
+  memset(res,0,(unsigned long)10);
   return;
 }
 
 void with_null_or_int(void)
 {
-  memset((void *)0,0,(unsigned int)10);
-  memset((void *)((int *)42),0,(unsigned int)10);
+  memset((void *)0,0,(unsigned long)10);
+  memset((void *)((int *)42),0,(unsigned long)10);
   return;
 }
 
@@ -309,8 +309,8 @@ char *memset_char(char *ptr, char value, size_t len)
 
 void chars(char *dest)
 {
-  char *res = memset_char(dest,(char)0,(unsigned int)10);
-  memset_char(res,(char)0,(unsigned int)10);
+  char *res = memset_char(dest,(char)0,(unsigned long)10);
+  memset_char(res,(char)0,(unsigned long)10);
   return;
 }
 
@@ -335,8 +335,8 @@ unsigned char *memset_uchar(unsigned char *ptr, unsigned char value,
 
 void uchars(unsigned char *dest)
 {
-  unsigned char *res = memset_uchar(dest,(unsigned char)0,(unsigned int)10);
-  memset_uchar(res,(unsigned char)0,(unsigned int)10);
+  unsigned char *res = memset_uchar(dest,(unsigned char)0,(unsigned long)10);
+  memset_uchar(res,(unsigned char)0,(unsigned long)10);
   return;
 }
 
@@ -364,8 +364,8 @@ char (*memset_arr10_char(char (*ptr)[10], char value, size_t len))[10]
 
 void nested_chars(char (*dest)[10])
 {
-  char (*res)[10] = memset_arr10_char(dest,(char)0,(unsigned int)100);
-  memset_arr10_char(res,(char)0,(unsigned int)100);
+  char (*res)[10] = memset_arr10_char(dest,(char)0,(unsigned long)100);
+  memset_arr10_char(res,(char)0,(unsigned long)100);
   return;
 }
 
@@ -390,8 +390,8 @@ int *memset_int_0(int *ptr, size_t len)
 
 void integer(int *dest)
 {
-  int *res = memset_int_0(dest,(unsigned int)10 * sizeof(int));
-  memset_int_0(res,(unsigned int)10 * sizeof(int));
+  int *res = memset_int_0(dest,(unsigned long)10 * sizeof(int));
+  memset_int_0(res,(unsigned long)10 * sizeof(int));
   return;
 }
 
@@ -416,8 +416,8 @@ enum E *memset_e_E_0(enum E *ptr, size_t len)
 
 void with_enum(enum E *dest)
 {
-  enum E *res = memset_e_E_0(dest,(unsigned int)10 * sizeof(enum E));
-  memset_e_E_0(res,(unsigned int)10 * sizeof(enum E));
+  enum E *res = memset_e_E_0(dest,(unsigned long)10 * sizeof(enum E));
+  memset_e_E_0(res,(unsigned long)10 * sizeof(enum E));
   return;
 }
 
@@ -442,15 +442,15 @@ float *memset_float_0(float *ptr, size_t len)
 
 void floats(float *dest)
 {
-  float *res = memset_float_0(dest,(unsigned int)10 * sizeof(float));
-  memset_float_0(res,(unsigned int)10 * sizeof(float));
+  float *res = memset_float_0(dest,(unsigned long)10 * sizeof(float));
+  memset_float_0(res,(unsigned long)10 * sizeof(float));
   return;
 }
 
 void with_named(named *dest)
 {
-  named *res = memset_int_0(dest,(unsigned int)10 * sizeof(named));
-  memset_int_0(res,(unsigned int)10 * sizeof(named));
+  named *res = memset_int_0(dest,(unsigned long)10 * sizeof(named));
+  memset_int_0(res,(unsigned long)10 * sizeof(named));
   return;
 }
 
@@ -477,21 +477,21 @@ struct X *memset_st_X_0(struct X *ptr, size_t len)
 
 void structure(struct X *dest)
 {
-  struct X *res = memset_st_X_0(dest,(unsigned int)10 * sizeof(struct X));
-  memset_st_X_0(res,(unsigned int)10 * sizeof(struct X));
+  struct X *res = memset_st_X_0(dest,(unsigned long)10 * sizeof(struct X));
+  memset_st_X_0(res,(unsigned long)10 * sizeof(struct X));
   return;
 }
 
-/*@ requires aligned_end: len % 4 ≡ 0;
+/*@ requires aligned_end: len % 8 ≡ 0;
     requires
-      valid_dest: \let __fc_len = len / 4; \valid(ptr + (0 .. __fc_len - 1));
+      valid_dest: \let __fc_len = len / 8; \valid(ptr + (0 .. __fc_len - 1));
     ensures
       set_content:
-        \let __fc_len = \old(len) / 4;
+        \let __fc_len = \old(len) / 8;
         ∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(\old(ptr) + j0) ≡ \null;
     ensures result: \result ≡ \old(ptr);
-    assigns *(ptr + (0 .. len / 4 - 1)), \result;
-    assigns *(ptr + (0 .. len / 4 - 1)) \from \nothing;
+    assigns *(ptr + (0 .. len / 8 - 1)), \result;
+    assigns *(ptr + (0 .. len / 8 - 1)) \from \nothing;
     assigns \result \from ptr;
  */
 int **memset_ptr_int_0(int **ptr, size_t len)
@@ -503,8 +503,8 @@ int **memset_ptr_int_0(int **ptr, size_t len)
 
 void pointers(int **dest)
 {
-  int **res = memset_ptr_int_0(dest,(unsigned int)10 * sizeof(int *));
-  memset_ptr_int_0(res,(unsigned int)10 * sizeof(int *));
+  int **res = memset_ptr_int_0(dest,(unsigned long)10 * sizeof(int *));
+  memset_ptr_int_0(res,(unsigned long)10 * sizeof(int *));
   return;
 }
 
@@ -532,22 +532,22 @@ int (*memset_arr10_int_0(int (*ptr)[10], size_t len))[10]
 void nested(int (*dest)[10], int n)
 {
   int (*res)[10] =
-    memset_arr10_int_0(dest,(unsigned int)n * sizeof(int [10]));
-  memset_arr10_int_0(res,(unsigned int)n * sizeof(int [10]));
+    memset_arr10_int_0(dest,(unsigned long)n * sizeof(int [10]));
+  memset_arr10_int_0(res,(unsigned long)n * sizeof(int [10]));
   return;
 }
 
 void with_void(void *dest)
 {
-  void *res = memset(dest,0,(unsigned int)10);
-  memset(res,0,(unsigned int)10);
+  void *res = memset(dest,0,(unsigned long)10);
+  memset(res,0,(unsigned long)10);
   return;
 }
 
 void with_null_or_int(void)
 {
-  memset((void *)0,0,(unsigned int)10);
-  memset((void *)((int *)42),0,(unsigned int)10);
+  memset((void *)0,0,(unsigned long)10);
+  memset((void *)((int *)42),0,(unsigned long)10);
   return;
 }
 

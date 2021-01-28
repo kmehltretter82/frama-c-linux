@@ -108,7 +108,7 @@ let add_lemmas cc = function
 
 let compute_kf cc ?kf ?bhv ?prop () =
   begin
-    Extlib.may (add_kf cc ?bhv ?prop) kf ;
+    Option.iter (add_kf cc ?bhv ?prop) kf ;
     cc#compute
   end
 

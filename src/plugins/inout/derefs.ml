@@ -41,7 +41,7 @@ class virtual do_it_ = object(self)
       | Var _ -> ()
       | Mem e ->
           let state =
-            Db.Value.get_state (Kstmt (Extlib.the self#current_stmt))
+            Db.Value.get_state (Kstmt (Option.get self#current_stmt))
           in
           let r = !Db.Value.eval_expr state e in
           let loc = loc_bytes_to_loc_bits r in

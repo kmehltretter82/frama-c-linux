@@ -127,9 +127,9 @@ let reduce_to_valid_location out loc =
   if Locations.(Location_Bits.(equal top loc.loc)) then
     begin
       Value_parameters.error ~once:true ~current:true
-        "Cannot@ handle@ %a,@ location@ is@ too@ imprecise@ \
-         (%a).@ Assuming@ it@ is@ not@ assigned,@ but@ be@ aware@ this\
-         @ is@ incorrect." pp_assign_free_alloc out Locations.pretty loc;
+        "@[Cannot handle@ %a,@ location is too imprecise@ (%a).@ \
+         Assuming it is not assigned,@ but be aware@ this is incorrect.@]"
+        pp_assign_free_alloc out Locations.pretty loc;
       None
     end
   else
@@ -247,7 +247,7 @@ module Make
     then retres_loc
     else
       let ploc = precise_loc_of_assign env logic_assign in
-      Extlib.opt_map (fun ploc -> set_location ploc Location.top) ploc
+      Option.map (fun ploc -> set_location ploc Location.top) ploc
 
   (* From a list of assigns, allocates or frees clauses, builds a list
      associating each clause to the location it affects. Removes clauses that
@@ -291,7 +291,7 @@ module Make
           Value_parameters.warning ~current:true ~once:true
             ~wkey:Value_parameters.wkey_garbled_mix
             "The specification of function %a has generated a garbled mix \
-             for assigns clause %a."
+             for %a."
             Kernel_function.pretty kf pp_assign_free_alloc assign
         end
     in
@@ -310,7 +310,7 @@ module Make
     States.join states >>- fun pre_state ->
     Locations.Location_Bytes.do_track_garbled_mix false;
     let behavior = List.hd behaviors in
-    let retres_loc = Extlib.opt_map Location.eval_varinfo result in
+    let retres_loc = Option.map Location.eval_varinfo result in
     let assigns = get_assigns_for_behavior spec behavior in
     let allocs = get_allocation_for_behavior spec behavior in
     let compute = apply_assigns_and_allocations retres_loc (assigns @ allocs) in

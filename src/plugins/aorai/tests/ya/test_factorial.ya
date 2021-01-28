@@ -5,7 +5,7 @@ main : { !CALL(factorial) } -> S1
      |                      -> S2
      ;
 S1   : { !CALL(factorial) } -> S1
-     | { 1 }                -> S2
+     | { true }                -> S2
      ;
 S2   : {!CALL(factorial) && COR(factorial) } -> S1
      | { COR(factorial) }                    -> S2

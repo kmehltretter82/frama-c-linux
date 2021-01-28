@@ -21,7 +21,13 @@ CPPFLAGS    += \
 FCFLAGS     += \
   -json-compilation-database ./compile_commands.json \
   -main eva_main \
+<<<<<<< HEAD
   -add-symbolic-path=.:. \
+||||||| ac7807782d
+  -add-symbolic-path=.:.. \
+=======
+  -add-symbolic-path=..:. \
+>>>>>>> origin/master
   -kernel-warn-key annot:missing-spec=abort \
   -kernel-warn-key typing:implicit-function-declaration=abort \
 
@@ -31,7 +37,12 @@ EVAFLAGS    += \
 
 ## GUI-only flags
 FCGUIFLAGS += \
+<<<<<<< HEAD
   -add-symbolic-path=.:. \
+||||||| ac7807782d
+  -add-symbolic-path=.:.. \
+=======
+>>>>>>> origin/master
 
 ## Analysis targets (suffixed with .eva)
 TARGETS = fc_script_main.eva

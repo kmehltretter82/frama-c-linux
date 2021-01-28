@@ -10,7 +10,7 @@ class vis prj = object(self)
     let b = Cil.mkBlock [s1] in
     if create then begin
       let f = Visitor_behavior.Get.fundec
-          self#behavior (Extlib.the self#current_func) in
+          self#behavior (Option.get self#current_func) in
       let y = Cil.makeLocalVar f ~scope:b "y" (TInt(IInt,[])) in
       my_var <- Some y;
       let loc = Cil_datatype.Location.unknown in
@@ -33,8 +33,8 @@ class vis prj = object(self)
          Kernel.feedback "transient_block fatal error on %a as expected"
            Printer.pp_instr instr;
          let f = Visitor_behavior.Get.fundec
-             self#behavior (Extlib.the self#current_func) in
-         let y = Extlib.the my_var in
+             self#behavior (Option.get self#current_func) in
+         let y = Option.get my_var in
          f.slocals <-
            List.filter
              (fun v -> not (Cil_datatype.Varinfo.equal v y)) f.slocals;

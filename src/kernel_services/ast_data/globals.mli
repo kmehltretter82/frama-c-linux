@@ -107,15 +107,15 @@ module Functions: sig
 
   val mem_name: string -> bool
   (** @return [true] iff there is a function with such a name
-      @since Frama-C+dev *)
+      @since 22.0-Titanium *)
 
   val mem_def_name: string -> bool
   (** @return [true] iff there is a function definition with such a name
-      @since Frama-C+dev *)
+      @since 22.0-Titanium *)
 
   val mem_decl_name: string -> bool
   (** @return [true] iff there is a function declaration with such a name
-      @since Frama-C+dev *)
+      @since 22.0-Titanium *)
 
   (** {2 Searching} *)
 
@@ -236,7 +236,7 @@ module Types : sig
   val mem_enum_tag: string -> bool
   (** @return [true] iff there is an enum constant with the given name in the
       AST.
-      @since Frama-C+dev *)
+      @since 22.0-Titanium *)
 
   val find_enum_tag: string -> exp * typ
   (** Find an enum constant from its name in the AST.
@@ -245,7 +245,7 @@ module Types : sig
   val mem_type: Logic_typing.type_namespace -> string -> bool
   (** @return [true] iff there is a type with the given name in the given
       namespace in the AST.
-      @since Frama-C+dev *)
+      @since 22.0-Titanium *)
 
   val find_type: Logic_typing.type_namespace -> string -> typ
   (** Find a type from its name in the AST.

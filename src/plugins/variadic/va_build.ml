@@ -29,7 +29,7 @@ open Cil
 let function_declaration ?vattr ~loc name typ mk_spec =
   (* Build the varinfo *)
   let vi = makeGlobalVar ~referenced:true name typ in
-  Extlib.may (fun extra_vattr -> vi.vattr <- vi.vattr @ extra_vattr) vattr;
+  Option.iter (fun extra_vattr -> vi.vattr <- vi.vattr @ extra_vattr) vattr;
   vi.vdecl <- loc;
   (* Build the formals *)
   setFormalsDecl vi typ;
@@ -48,11 +48,11 @@ let array_init ~loc fundec ~ghost scope name elem_typ values =
   let vi = Cil.makeLocalVar fundec ~ghost ~scope name typ in
   let initl =
     match values with
-      | [] -> [ Index (Cil.zero ~loc, NoOffset), Cil.makeZeroInit ~loc elem_typ]
-      | _ ->
-        List.mapi
-          (fun i exp -> Index (Cil.integer ~loc i, NoOffset), SingleInit exp)
-          values
+    | [] -> [ Index (Cil.zero ~loc, NoOffset), Cil.makeZeroInit ~loc elem_typ]
+    | _ ->
+      List.mapi
+        (fun i exp -> Index (Cil.integer ~loc i, NoOffset), SingleInit exp)
+        values
   in
   vi.vdefined <- true;
   vi, Local_init(vi, AssignInit(CompoundInit(typ,initl)), loc)
@@ -106,7 +106,7 @@ exception NotAFunction
 
 let tapp ~loc logic_info labels args =
   let ltyp = match logic_info.l_type with
-  | None -> raise NotAFunction
-  | Some ltyp -> ltyp
+    | None -> raise NotAFunction
+    | Some ltyp -> ltyp
   in
   Logic_const.term ~loc (Tapp (logic_info, labels, args)) ltyp

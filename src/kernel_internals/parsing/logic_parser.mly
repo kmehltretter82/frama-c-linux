@@ -107,15 +107,25 @@
 
   let loc_decl d = { decl_node = d; decl_loc = loc () }
 
-  let concat_froms a1 a2 =
-    let compare_pair (b1,_) (b2,_) = is_same_lexpr b1 b2 in
+  let loc_ext d = { extended_node = d; extended_loc = loc () }
+
+  let filter_from l = function
+    | FromAny ->
+      l, FromAny
+    | From ds ->
+      let f ds d = if List.exists (is_same_lexpr d) ds then ds else d :: ds in
+      l, From(List.(rev (fold_left f [] ds)))
+
+  let concat_froms cura newa =
+    let compare_pair (curb,_) (newb,_) = is_same_lexpr curb newb in
     (* NB: the following has an horrible complexity, but the order of
        clauses in the input is preserved. *)
-    let concat_one acc (_,f2 as p)  =
+    let concat_one acc (newloc, newf)  =
+      let (newloc, newf) as p = filter_from newloc newf in
       try
-        let (_,f1) = List.find (compare_pair p) acc
+        let (curloc,curf) = List.find (compare_pair p) acc
         in
-        match (f1, f2) with
+        match (curf, newf) with
           | _,FromAny ->
             (* the new fundeps does not give more information than the one
                which is already present. Just ignore it.
@@ -128,12 +138,28 @@
                  that we get the exact same clause if we try to
                  link the original contract with its pretty-printed version. *)
               Extlib.replace compare_pair p acc
-          | From _, From _ ->
-            (* we keep the two functional dependencies,
-               as they have to be proved separately. *)
-            acc @ [p]
+          | From curl, From newl ->
+            let incl l lin =
+              List.(for_all (fun e -> exists (is_same_lexpr e) lin) l)
+            in
+            let drop d k =
+              Kernel.warning ~current:false ~wkey:Kernel.wkey_multi_from
+                "Drop '%a' \\from at %a for more precise one at %a"
+                Logic_print.print_lexpr curloc
+                Cil_datatype.Location.pretty d.lexpr_loc
+                Cil_datatype.Location.pretty k.lexpr_loc
+            in
+            if incl curl newl then begin
+              if not (incl newl curl) then drop newloc curloc;
+              acc
+            end
+            else if incl newl curl then begin
+              drop curloc newloc;
+              Extlib.replace compare_pair p acc
+            end
+            else acc @ [p]
       with Not_found -> acc @ [p]
-    in List.fold_left concat_one a1 a2
+    in List.fold_left concat_one cura newa
 
   let concat_allocation fa1 fa2 =
     match fa1,fa2 with
@@ -149,7 +175,7 @@
       | Writes [], _  | Writes _, [] ->
         raise (
           Not_well_formed (loc(),"Mixing \\nothing and a real location"))
-      | Writes a1, a2 -> Writes (concat_froms a2 a1)
+      | Writes a1, a2 -> Writes (concat_froms (concat_froms [] a2) a1)
 
   let concat_loop_assigns_allocation annots bhvs2 a2 fa2=
     (* NB: this is supposed to merge assigns related to named behaviors, in
@@ -238,8 +264,10 @@
 /* ACSL extension for external spec  file */
 %token <string> IDENTIFIER TYPENAME
 %token <bool*string> STRING_LITERAL
-%token <Logic_ptree.constant> CONSTANT
-%token <string> CONSTANT10
+%token <string> INT_CONSTANT
+%token <string> FLOAT_CONSTANT
+%token <string> STRING_CONSTANT
+%token <string> WSTRING_CONSTANT
 %token LPAR RPAR IF ELSE COLON COLON2 COLONCOLON DOT DOTDOT DOTDOTDOT
 %token INT INTEGER REAL BOOLEAN BOOL FLOAT LT GT LE GE EQ NE COMMA ARROW EQUAL
 %token FORALL EXISTS IFF IMPLIES AND OR NOT SEPARATED
@@ -253,7 +281,7 @@
 %token REQUIRES ENSURES ALLOCATES FREES ASSIGNS LOOP NOTHING SLICE IMPACT PRAGMA FROM
 %token CHECK_REQUIRES CHECK_LOOP CHECK_INVARIANT CHECK_LEMMA
 %token CHECK_ENSURES CHECK_EXITS CHECK_CONTINUES CHECK_BREAKS CHECK_RETURNS
-%token <string> EXT_CODE_ANNOT EXT_GLOBAL EXT_CONTRACT
+%token <string> EXT_CODE_ANNOT EXT_GLOBAL EXT_GLOBAL_BLOCK EXT_CONTRACT
 %token EXITS BREAKS CONTINUES RETURNS
 %token VOLATILE READS WRITES
 %token LOGIC PREDICATE INDUCTIVE AXIOMATIC AXIOM LEMMA LBRACE RBRACE
@@ -484,12 +512,23 @@ lexpr_inner:
 | ALLOCABLE opt_label_1 LPAR lexpr RPAR { info (PLallocable ($2,$4)) }
 | FREEABLE opt_label_1 LPAR lexpr RPAR { info (PLfreeable ($2,$4)) }
 | ALLOCATION opt_label_1 LPAR lexpr RPAR
-  { Kernel.not_yet_implemented "\\allocation" }
-| AUTOMATIC { Kernel.not_yet_implemented "\\automatic" }
-| DYNAMIC { Kernel.not_yet_implemented "\\dynamic" }
-| REGISTER { Kernel.not_yet_implemented "\\register" }
-| STATIC { Kernel.not_yet_implemented "\\static" }
-| UNALLOCATED { Kernel.not_yet_implemented "\\unallocated" }
+  { let source = fst(loc()) in
+    Kernel.not_yet_implemented ~source "\\allocation" }
+| AUTOMATIC {
+  let source = fst(loc()) in
+  Kernel.not_yet_implemented ~source "\\automatic" }
+| DYNAMIC {
+  let source = fst(loc()) in
+  Kernel.not_yet_implemented ~source "\\dynamic" }
+| REGISTER {
+  let source = fst(loc()) in
+  Kernel.not_yet_implemented ~source "\\register" }
+| STATIC {
+  let source = fst(loc()) in
+  Kernel.not_yet_implemented ~source "\\static" }
+| UNALLOCATED {
+  let source = fst(loc()) in
+  Kernel.not_yet_implemented ~source "\\unallocated" }
 | NULL { info PLnull }
 | constant { info (PLconstant $1) }
 | lexpr_inner PLUS lexpr_inner { info (PLbinop ($1, Badd, $3)) }
@@ -652,12 +691,14 @@ var_spec:
 ;
 
 constant:
-| CONSTANT   { $1 }
-| CONSTANT10 { IntConstant $1 }
+| INT_CONSTANT   { IntConstant $1 }
+| FLOAT_CONSTANT { FloatConstant $1 }
+| STRING_CONSTANT { StringConstant $1 }
+| WSTRING_CONSTANT { WStringConstant $1 }
 ;
 
 array_size:
-| CONSTANT10 { ASinteger $1 }
+| INT_CONSTANT { ASinteger $1 }
 | identifier { ASidentifier $1 }
 | /* empty */ { ASnone }
 ;
@@ -680,7 +721,8 @@ abs_param_type_list:
 | /* empty */    { [ ] }
 | abs_param_list { $1 }
 | abs_param_list COMMA DOTDOTDOT {
-    Kernel.not_yet_implemented "variadic C function types"
+  let source = fst(loc()) in
+  Kernel.not_yet_implemented ~source "variadic C function types"
   }
 ;
 
@@ -1014,7 +1056,7 @@ ext_contract_markup:
 
 stmt_markup:
 | any_identifier { $1 }
-| CONSTANT10 { $1 }
+| INT_CONSTANT { $1 }
 ;
 
 stmt_markup_attr:
@@ -1532,11 +1574,32 @@ decl:
 | type_annot {LDtype_annot $1}
 | model_annot {LDmodel_annot $1}
 | logic_def  { $1 }
-| EXT_GLOBAL grammar_extension SEMICOLON {
-    let processed = Logic_env.preprocess_extension $1 $2 in
-	  LDextended ($1, processed)
-  }
+| ext_decl { LDextended $1 }
 | deprecated_logic_decl { $1 }
+;
+
+ext_decl:
+| EXT_GLOBAL grammar_extension SEMICOLON {
+     let processed = Logic_env.preprocess_extension $1 $2 in
+     Ext_lexpr($1, processed)
+   }
+| EXT_GLOBAL_BLOCK any_identifier LBRACE ext_decls RBRACE {
+    let processed_id,processed_block =
+       Logic_env.preprocess_extension_block $1 ($2,$4)
+    in
+    Ext_extension($1,processed_id,processed_block)
+   }
+;
+
+ext_decls:
+| /* epsilon */
+    { [] }
+| ext_decl_loc ext_decls
+    { $1::$2 }
+;
+
+ext_decl_loc:
+| ext_decl { loc_ext $1 }
 ;
 
 volatile_opt:
@@ -1893,6 +1956,7 @@ is_acsl_spec:
 is_acsl_decl_or_code_annot:
 | EXT_CODE_ANNOT { $1 }
 | EXT_GLOBAL     { $1 }
+| EXT_GLOBAL_BLOCK     { $1 }
 | ASSUMES   { "assumes" }
 | ASSERT    { "assert" }
 | CHECK     { "check" }
@@ -1993,8 +2057,10 @@ wildcard:
 | COLON2 { () }
 | COLONCOLON { () }
 | COMMA { () }
-| CONSTANT { () }
-| CONSTANT10 { () }
+| INT_CONSTANT { () }
+| FLOAT_CONSTANT { () }
+| STRING_CONSTANT { () }
+| WSTRING_CONSTANT { () }
 | DOLLAR { () }
 | DOT { () }
 | DOTDOT { () }

@@ -380,8 +380,7 @@ struct termios {
    tcflag_t c_lflag ;
    cc_t c_cc[32] ;
 };
-int volatile Frama_C_entropy_source __attribute__((__unused__,
-                                                   __FRAMA_C_MODEL__));
+int volatile Frama_C_entropy_source __attribute__((__unused__));
 void Frama_C_make_unknown(char *p, size_t l);
 
 int Frama_C_nondet(int a, int b);
@@ -1129,8 +1128,7 @@ int feholdexcept(fenv_t *envp);
 
 int fesetenv(fenv_t const *envp);
 
-static int volatile fetestexcept___fc_random_fetestexcept __attribute__((
-  __FRAMA_C_MODEL__));
+static int volatile fetestexcept___fc_random_fetestexcept;
 int fetestexcept(int excepts)
 {
   int __retres;
@@ -1138,7 +1136,7 @@ int fetestexcept(int excepts)
   return __retres;
 }
 
-fenv_t volatile __fc_fenv_state __attribute__((__FRAMA_C_MODEL__));
+fenv_t volatile __fc_fenv_state;
 int feholdexcept(fenv_t *envp)
 {
   int __retres;
@@ -1913,7 +1911,7 @@ int glob(char const *pattern, int flags,
 
 void globfree(glob_t *pglob);
 
-/*@ ghost extern int __fc_heap_status __attribute__((__FRAMA_C_MODEL__)); */
+/*@ ghost extern int __fc_heap_status; */
 
 /*@
 axiomatic dynamic_allocation {
@@ -2179,9 +2177,7 @@ extern unsigned long strtoul(char const * __restrict nptr,
 extern unsigned long long strtoull(char const * __restrict nptr,
                                    char ** __restrict endptr, int base);
 
-/*@ ghost
-extern int __fc_random_counter __attribute__((__unused__, __FRAMA_C_MODEL__));
-*/
+/*@ ghost extern int __fc_random_counter __attribute__((__unused__)); */
 
 unsigned long const __fc_rand_max = (unsigned long)32767;
 /*@ ensures result_range: 0 ≤ \result ≤ __fc_rand_max;
@@ -2205,8 +2201,8 @@ extern long random(void);
     assigns __fc_random_counter \from seed; */
 extern void srandom(unsigned int seed);
 
-int __fc_random48_init __attribute__((__FRAMA_C_MODEL__));
-unsigned short __fc_random48_counter[3] __attribute__((__FRAMA_C_MODEL__));
+int __fc_random48_init;
+unsigned short __fc_random48_counter[3];
 unsigned short *__fc_p_random48_counter = __fc_random48_counter;
 /*@ ensures random48_initialized: __fc_random48_init ≡ 1;
     assigns __fc_random48_counter[0 .. 2], __fc_random48_init;
@@ -2398,7 +2394,7 @@ extern  __attribute__((__noreturn__)) void exit(int status);
     assigns \nothing; */
 extern  __attribute__((__noreturn__)) void _Exit(int status);
 
-char *__fc_env[4096] __attribute__((__FRAMA_C_MODEL__));
+char *__fc_env[4096];
 char *getenv(char const *name);
 
 int putenv(char *string);
@@ -2675,7 +2671,11 @@ imaxdiv_t imaxdiv(intmax_t numer, intmax_t denom);
 extern intmax_t strtoimax(char const * __restrict nptr,
                           char ** __restrict endptr, int base);
 
-/*@ requires abs_representable: (long long)(-c) ≢ c;
+/*@ requires abs_representable: c > -9223372036854775807LL - 1LL;
+    ensures positive_result: \result ≥ 0.;
+    ensures
+      equal_magnitude_result: \result ≡ \old(c) ∨ \result ≡ -\old(c);
+    ensures logical_abs_result: \result ≡ \abs(\old(c));
     assigns \result;
     assigns \result \from c;
  */
@@ -3394,6 +3394,20 @@ float fabsf(float x)
   return_label: return __retres;
 }
 
+/*@ assigns \result;
+    assigns \result \from f;
+    
+    behavior finite:
+      assumes isfinite_f: \is_finite(f);
+      ensures nonzero_result: \result > 0 ∨ \result < 0;
+    
+    behavior nonfinite:
+      assumes nonfinite_f: ¬\is_finite(f);
+      ensures zero_result: \result ≡ 0;
+    
+    complete behaviors nonfinite, finite;
+    disjoint behaviors nonfinite, finite;
+ */
 int __finitef(float f)
 {
   int __retres;
@@ -3406,6 +3420,20 @@ int __finitef(float f)
   return __retres;
 }
 
+/*@ assigns \result;
+    assigns \result \from d;
+    
+    behavior finite:
+      assumes isfinite_d: \is_finite(d);
+      ensures nonzero_result: \result > 0 ∨ \result < 0;
+    
+    behavior nonfinite:
+      assumes nonfinite_d: ¬\is_finite(d);
+      ensures zero_result: \result ≡ 0;
+    
+    complete behaviors nonfinite, finite;
+    disjoint behaviors nonfinite, finite;
+ */
 int __finite(double d)
 {
   int __retres;
@@ -3687,6 +3715,40 @@ extern int listen(int sockfd, int backlog);
 extern ssize_t recv(int sockfd, void *buf, size_t len, int flags);
 
 /*@ requires valid_sockfd: 0 ≤ sockfd < 1024;
+    requires valid_buffer_length: \valid((char *)buf + (0 .. len - 1));
+    requires
+      valid_addrbuf_or_null:
+        (\valid(addrbuf_len) ∧ \initialized(addrbuf_len) ∧
+         \valid((char *)addrbuf + (0 .. *addrbuf_len - 1))) ∨
+        (addrbuf ≡ \null ∧ addrbuf_len ≡ \null);
+    ensures
+      result_error_or_received_length:
+        \result ≡ -1 ∨ (0 ≤ \result ≤ \old(len));
+    ensures
+      initialization: buf:
+        \initialized((char *)\old(buf) + (0 .. \result - 1));
+    ensures
+      initialization: addrbuf:
+        \old(addrbuf) ≢ \null ⇒
+        \initialized((char *)\old(addrbuf) + (0 .. \old(*addrbuf_len) - 1));
+    assigns *((char *)buf + (0 .. len - 1)), __fc_sockfds[sockfd], \result,
+            *addrbuf_len, *((char *)addrbuf + (0 .. \old(*addrbuf_len) - 1));
+    assigns *((char *)buf + (0 .. len - 1))
+      \from sockfd, len, flags, __fc_sockfds[sockfd];
+    assigns __fc_sockfds[sockfd]
+      \from sockfd, len, flags, __fc_sockfds[sockfd];
+    assigns \result \from sockfd, len, flags, __fc_sockfds[sockfd];
+    assigns *addrbuf_len
+      \from (indirect: sockfd), (indirect: len), (indirect: flags),
+            __fc_sockfds[sockfd];
+    assigns *((char *)addrbuf + (0 .. \old(*addrbuf_len) - 1))
+      \from (indirect: sockfd), (indirect: len), (indirect: flags),
+            __fc_sockfds[sockfd];
+ */
+extern ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags,
+                        struct sockaddr *addrbuf, socklen_t *addrbuf_len);
+
+/*@ requires valid_sockfd: 0 ≤ sockfd < 1024;
     requires
       msg_control_has_room:
         \valid((char *)hdr->msg_control + (0 .. hdr->msg_controllen - 1));
@@ -3736,6 +3798,23 @@ extern ssize_t recvmsg(int sockfd, struct msghdr *hdr, int flags);
             (indirect: *((char *)buf + (0 .. len))), (indirect: flags);
  */
 extern ssize_t send(int sockfd, void const *buf, size_t len, int flags);
+
+/*@ requires available_sockfd: 0 ≤ sockfd < 1024;
+    requires buf_len_ok: \valid_read((char *)buf + (0 .. len - 1));
+    ensures
+      error_or_chars_sent: \result ≡ -1 ∨ (0 ≤ \result ≤ \old(len));
+    assigns __fc_errno, __fc_sockfds[sockfd], \result;
+    assigns __fc_errno
+      \from (indirect: sockfd), (indirect: __fc_sockfds[sockfd]),
+            (indirect: *((char *)buf + (0 .. len))), flags;
+    assigns __fc_sockfds[sockfd]
+      \from __fc_sockfds[sockfd], *((char *)buf + (0 .. len)), flags;
+    assigns \result
+      \from (indirect: sockfd), (indirect: __fc_sockfds[sockfd]),
+            (indirect: *((char *)buf + (0 .. len))), (indirect: flags);
+ */
+extern ssize_t sendto(int sockfd, void const *buf, size_t len, int flags,
+                      struct sockaddr const *address, socklen_t address_len);
 
 /*@ requires valid_sockfd: 0 ≤ sockfd < 1024;
     requires
@@ -3943,7 +4022,7 @@ extern size_t strcspn(char const *s, char const *reject);
 /*@ requires valid_string_s: valid_read_string(s);
     requires valid_string_accept: valid_read_string(accept);
     ensures result_bounded: 0 ≤ \result ≤ strlen(\old(s));
-    assigns \result, \result;
+    assigns \result;
     assigns \result \from *(s + (0 ..)), *(accept + (0 ..));
     assigns \result
       \from (indirect: *(s + (0 ..))), (indirect: *(accept + (0 ..)));
@@ -6241,8 +6320,7 @@ char *strsignal(int signum)
   return __retres;
 }
 
-/*@ ghost unsigned int volatile __fc_time __attribute__((__FRAMA_C_MODEL__));
-  */
+/*@ ghost unsigned int volatile __fc_time; */
 /*@ assigns \result;
     assigns \result \from __fc_time; */
 extern clock_t clock(void);
@@ -6380,8 +6458,7 @@ axiomatic nanosleep_predicates {
   }
 
 */
-/*@ ghost int volatile __fc_interrupted __attribute__((__FRAMA_C_MODEL__));
-  */
+/*@ ghost int volatile __fc_interrupted; */
 /*@ requires valid_request: \valid_read(rqtp);
     requires
       initialization: initialized_request:
@@ -6890,7 +6967,7 @@ wchar_t *wcsncat(wchar_t *dest, wchar_t const *src, size_t n)
   return dest;
 }
 
-/*@ ghost extern int __fc_stack_status __attribute__((__FRAMA_C_MODEL__)); */
+/*@ ghost extern int __fc_stack_status; */
 
 /*@ ensures allocation: \fresh{Old, Here}(\result,\old(size));
     assigns __fc_stack_status, \result;
@@ -7372,7 +7449,7 @@ extern int __va_openat_void(int dirfd, char const *filename, int flags);
 extern int __va_openat_mode_t(int dirfd, char const *filename, int flags,
                               mode_t mode);
 
-/*@ ghost extern int __fc_tz __attribute__((__FRAMA_C_MODEL__)); */
+/*@ ghost extern int __fc_tz; */
 
 /*@ requires valid_path: valid_read_string(path);
     requires
@@ -7456,15 +7533,9 @@ extern int gettimeofday(struct timeval * __restrict tv, void * __restrict tz);
  */
 extern int settimeofday(struct timeval const *tv, struct timezone const *tz);
 
-/*@ ghost
-  struct itimerval volatile __fc_itimer_real __attribute__((__FRAMA_C_MODEL__));
-  */
-/*@ ghost
-  struct itimerval volatile __fc_itimer_virtual __attribute__((__FRAMA_C_MODEL__));
-  */
-/*@ ghost
-  struct itimerval volatile __fc_itimer_prof __attribute__((__FRAMA_C_MODEL__));
-  */
+/*@ ghost struct itimerval volatile __fc_itimer_real; */
+/*@ ghost struct itimerval volatile __fc_itimer_virtual; */
+/*@ ghost struct itimerval volatile __fc_itimer_prof; */
 /*@ requires valid_curr_value: \valid(curr_value);
     ensures initialization: curr_value: \initialized(\old(curr_value));
     assigns \result, *curr_value;

@@ -1,3 +1,9 @@
 PLUGIN: server
 LOG: @PTEST_NAME@.out.json
+<<<<<<< HEAD
 OPT: -check -server-batch %{dep:@PTEST_NAME@.json} -server-batch-output-dir .
+||||||| ac7807782d
+OPT: -no-autoload-plugins -load-module server -check -server-batch @PTEST_DIR@/@PTEST_NAME@.json -server-batch-output-dir @PTEST_RESULT@
+=======
+OPT: -no-autoload-plugins -load-module server -check -server-batch @PTEST_DIR@/@PTEST_NAME@.json -server-batch-output-dir @PTEST_RESULT@ -server-msg-key use-relative-filepath
+>>>>>>> origin/master

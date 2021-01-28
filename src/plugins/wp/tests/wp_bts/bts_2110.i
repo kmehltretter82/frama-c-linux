@@ -1,5 +1,11 @@
 /* run.config
+<<<<<<< HEAD
    CMD: @frama-c@ -wp -wp-msg-key shell,cluster,print-generated -wp-prover why3 -wp-gen @OPTIONS@ -wp-warn-key "pedantic-assigns=inactive"
+||||||| ac7807782d
+   CMD: @frama-c@ -wp -wp-msg-key shell,cluster,print-generated -wp-prover why3 -wp-gen -wp-share ./share
+=======
+   CMD: @frama-c@ -wp -wp-msg-key shell,cluster,print-generated -wp-prover why3 -wp-gen -wp-share ./share -wp-warn-key "pedantic-assigns=inactive"
+>>>>>>> origin/master
    OPT:
 */
 

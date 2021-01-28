@@ -1,5 +1,13 @@
+<<<<<<< HEAD
 [kernel] Parsing math_h.c (with preprocessing)
 [kernel:parser:decimal-float] math_h.c:5: Warning: 
+||||||| ac7807782d
+[kernel] Parsing tests/libc/math_h.c (with preprocessing)
+[kernel:parser:decimal-float] tests/libc/math_h.c:5: Warning: 
+=======
+[kernel] Parsing tests/libc/math_h.c (with preprocessing)
+[kernel:parser:decimal-float] tests/libc/math_h.c:6: Warning: 
+>>>>>>> origin/master
   Floating-point constant 3.14159265358979323846264338327950288 is not represented exactly. Will use 0x1.921fb54442d18p1.
   (warn-once: no further messages from category 'parser:decimal-float' will be emitted)
 [eva] Analyzing a complete application starting at main
@@ -219,6 +227,41 @@
 [eva:alarm] math_h.c:50: Warning: 
   function fabsl: precondition 'finite_arg' got status unknown.
 [eva] Done for function fabsl
+[eva] computing for function __finite <- main.
+  Called from tests/libc/math_h.c:54.
+[eva] using specification for function __finite
+[eva] Done for function __finite
+[eva] tests/libc/math_h.c:55: assertion got status valid.
+[eva] computing for function __finite <- main.
+  Called from tests/libc/math_h.c:56.
+[eva] Done for function __finite
+[eva] computing for function __finite <- main.
+  Called from tests/libc/math_h.c:56.
+[eva] Done for function __finite
+[eva] tests/libc/math_h.c:57: assertion got status valid.
+[eva] computing for function __finitef <- main.
+  Called from tests/libc/math_h.c:58.
+[eva] using specification for function __finitef
+[eva] Done for function __finitef
+[eva] computing for function __finitef <- main.
+  Called from tests/libc/math_h.c:58.
+[eva] Done for function __finitef
+[eva] tests/libc/math_h.c:59: assertion got status valid.
+[eva] computing for function __finite <- main.
+  Called from tests/libc/math_h.c:60.
+[eva] Done for function __finite
+[eva] computing for function __finite <- main.
+  Called from tests/libc/math_h.c:60.
+[eva] Done for function __finite
+[eva] tests/libc/math_h.c:61: assertion got status valid.
+[eva] computing for function __finitef <- main.
+  Called from tests/libc/math_h.c:62.
+[eva] Done for function __finitef
+[eva] tests/libc/math_h.c:63: assertion got status valid.
+[eva] computing for function __finitef <- main.
+  Called from tests/libc/math_h.c:64.
+[eva] Done for function __finitef
+[eva] tests/libc/math_h.c:65: assertion got status valid.
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -232,15 +275,15 @@
   atan_minus_one ∈ {-0.785398163397}
   atan_large ∈ {1.57079632679}
   atan_top ∈ [-1.57079632679 .. 1.57079632679] ∪ {NaN}
-  atanf_f_pi ∈ {1.262627244}
-  atanf_f_half_pi ∈ {1.00388479233}
-  atanf_f_e ∈ {1.218282938}
+  atanf_f_pi ∈ {1.262627}
+  atanf_f_half_pi ∈ {1.003884}
+  atanf_f_e ∈ {1.218282}
   atanf_zero ∈ {0}
   atanf_minus_zero ∈ {-0.}
-  atanf_one ∈ {0.785398185253}
-  atanf_minus_one ∈ {-0.785398185253}
-  atanf_large ∈ {1.57079637051}
-  atanf_f_top ∈ [-1.57079637051 .. 1.57079637051] ∪ {NaN}
+  atanf_one ∈ {0.785398}
+  atanf_minus_one ∈ {-0.785398}
+  atanf_large ∈ {1.570796}
+  atanf_f_top ∈ [-1.570796 .. 1.570796] ∪ {NaN}
   atanl_ld_pi ∈ [-inf .. inf]
   atanl_ld_half_pi ∈ [-inf .. inf]
   atanl_ld_e ∈ [-inf .. inf]
@@ -277,4 +320,5 @@
   fabsl_minus_one ∈ [-inf .. inf]
   fabsl_large ∈ [-inf .. inf]
   fabsl_ld_top ∈ [-inf .. inf]
+  r ∈ {0}
   __retres ∈ {0}

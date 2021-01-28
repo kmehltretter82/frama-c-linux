@@ -109,7 +109,7 @@ let get_non_naturals kf =
     if Stmt.Hashtbl.mem visited s then begin
       (* pred always contains something except when entering the recursion,
          when visited is empty. *)
-      let pred = Extlib.the pred in
+      let pred = Option.get pred in
       if Stmt.Hashtbl.mem current s &&  not (is_back_edge kf pred s) then begin
         res := Stmt.Set.add s !res;
         Kernel.warning ~once:true ~source:(fst (Cil_datatype.Stmt.loc s))

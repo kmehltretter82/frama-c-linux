@@ -163,7 +163,7 @@ struct
 
   let t_status value name ?label descr =
     Enum.tag ~name
-      ?label:(Extlib.opt_map Md.plain label)
+      ?label:(Option.map Md.plain label)
       ~descr:(Md.plain descr) ~value status
 
   open Property_status.Feedback
@@ -281,7 +281,7 @@ let () = States.column model ~name:"status"
     ~data:(module PropStatus)
     ~get:(Property_status.Feedback.get)
 
-let () = States.column model ~name:"function"
+let () = States.column model ~name:"fct"
     ~descr:(Md.plain "Function")
     ~data:(module Joption(Kf)) ~get:Property.get_kf
 
@@ -297,24 +297,24 @@ let () = States.column model ~name:"source"
 let () = States.column model ~name:"alarm"
     ~descr:(Md.plain "Alarm name (if the property is an alarm)")
     ~data:(module Joption(Jstring))
-    ~get:(fun ip -> Extlib.opt_map Alarms.get_short_name (find_alarm ip))
+    ~get:(fun ip -> Option.map Alarms.get_short_name (find_alarm ip))
 
 let () = States.column model ~name:"alarm_descr"
     ~descr:(Md.plain "Alarm description (if the property is an alarm)")
     ~data:(module Joption(Jstring))
-    ~get:(fun ip -> Extlib.opt_map Alarms.get_description (find_alarm ip))
+    ~get:(fun ip -> Option.map Alarms.get_description (find_alarm ip))
 
 let () = States.column model ~name:"predicate"
     ~descr:(Md.plain "Predicate")
     ~data:(module Joption(Jstring))
-    ~get:(fun ip -> Extlib.opt_map snd (Description.property_kind_and_node ip))
+    ~get:(fun ip -> Option.map snd (Description.property_kind_and_node ip))
 
 let is_relevant ip =
   match Property.get_kf ip with
   | None -> true
   | Some kf ->
     not (Ast_info.is_frama_c_builtin (Kernel_function.get_name kf)
-         || Cil.is_unused_builtin (Kernel_function.get_vi kf))
+         || Cil_builtins.is_unused_builtin (Kernel_function.get_vi kf))
 
 let iter f = Property_status.iter (fun ip -> if is_relevant ip then f ip)
 let add_update_hook f =
@@ -330,6 +330,7 @@ let array =
     ~name:"status"
     ~descr:(Md.plain "Status of Registered Properties")
     ~key:(fun ip -> Kernel_ast.Marker.create (PIP ip))
+    ~keyType:Kernel_ast.Marker.jproperty
     ~iter
     ~add_update_hook
     ~add_remove_hook

@@ -25,11 +25,9 @@ digraph G {
   cp25 [label=<*(pt[x])>, shape=parallelogram, fillcolor="#AACCFF",
         color="#88AAFF", style="filled,dotted", ];
   
-  subgraph cluster_cs_1 { label=<many_writes>; cp2;
+  subgraph cluster_cs_1 { label=<many_writes>; cp22;cp20;cp18;cp16;cp14;cp12;cp10;cp8;cp6;cp4;cp2;
      };
   subgraph cluster_cs_2 { label=<many_values>; cp25;cp24;
-     };
-  subgraph cluster_file_1 { label=<tests/dive/manydeps.i>; cp22;cp20;cp18;cp16;cp14;cp12;cp10;cp8;cp6;cp4;
      };
   
   cp2 -> cp2 [style="bold", ];

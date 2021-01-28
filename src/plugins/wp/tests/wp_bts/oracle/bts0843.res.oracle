@@ -52,7 +52,8 @@ Goal Instance of 'Pre-condition (file bts0843.i, line 12) in 'f3'' in 'g3' at ca
 Prove: true.
 
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'f3':
-  /*@ behavior typed:
+[wp] tests/wp_bts/bts0843.i:13: Warning: 
+  Memory model hypotheses for function 'f3':
+  /*@ behavior wp_typed:
         requires \separated(&p, &p->a); */
   void f3(void);

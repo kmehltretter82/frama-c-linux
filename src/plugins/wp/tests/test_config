@@ -1,3 +1,9 @@
+<<<<<<< HEAD
 PLUGIN: rtegen,wp
 CMD: @frama-c@ -wp -wp-prover none -wp-print -wp-msg-key shell -wp-warn-key "pedantic-assigns=inactive" @OPTIONS@
+||||||| ac7807782d
+CMD: @frama-c@ -no-autoload-plugins -load-module wp -wp -wp-prover none -wp-print -wp-share ./share -wp-msg-key shell
+=======
+CMD: @frama-c@ -no-autoload-plugins -load-module wp -wp -wp-prover none -wp-print -wp-share ./share -wp-msg-key shell -wp-warn-key "pedantic-assigns=inactive"
+>>>>>>> origin/master
 OPT:

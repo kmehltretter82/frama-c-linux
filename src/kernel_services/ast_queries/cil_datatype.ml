@@ -467,9 +467,9 @@ and compare_array_sizes e1o e2o =
     match i1, i2 with
     | None, None -> (* inconclusive. do not return 0 *)
       !compare_exp_struct_eq e1 e2
-    | _ -> Extlib.opt_compare Integer.compare i1 i2
+    | _ -> Option.compare Integer.compare i1 i2
   in
-  Extlib.opt_compare compare_non_empty_size e1o e2o
+  Option.compare compare_non_empty_size e1o e2o
 
 and compare_type config t1 t2 =
   if t1 == t2 then 0
@@ -521,7 +521,7 @@ and compare_type config t1 t2 =
       index_typ a1 - index_typ a2
 
 and compare_arg_list  config l1 l2 =
-  Extlib.opt_compare
+  Option.compare
     (compare_list
        (fun (_n1, t1, l1) (_n2, t2, l2) ->
           (compare_chain (compare_type config) t1 t2
@@ -776,9 +776,8 @@ module Compinfo = struct
               corig_name = "";
               cname = "";
               ckey = -1;
-              cfields = [];
+              cfields = None;
               cattr = [];
-              cdefined = false;
               creferenced = false } ]
         let compare v1 v2 = Datatype.Int.compare v1.ckey v2.ckey
         let hash v = Hashtbl.hash v.ckey
@@ -804,6 +803,7 @@ module Fieldinfo = struct
                     List.fold_left
                       (fun acc loc ->
                          { fcomp = ci;
+                           forder = 0;
                            forig_name = "";
                            fname = "";
                            ftype = typ;
@@ -821,7 +821,7 @@ module Fieldinfo = struct
                  Typ.reprs)
             []
             Compinfo.reprs
-        let fid fi = fi.fcomp.ckey, fi.fname
+        let fid fi = fi.fcomp.ckey, fi.forder
         let compare f1 f2 = Extlib.compare_basic (fid f1) (fid f2)
         let hash f1 = Hashtbl.hash (fid f1)
         let equal f1 f2 = (fid f1) = (fid f2)
@@ -2304,23 +2304,26 @@ module Identified_predicate = struct
       end)
 end
 
-module Funbehavior =
-  Datatype.Make
-    (struct
-      include Datatype.Serializable_undefined
-      type t = funbehavior
-      let name = "Funbehavior"
-      let reprs =
-        [ {  b_name = "default!"; (* Cil.default_behavior_name *)
-             b_requires = Identified_predicate.reprs;
-             b_assumes = Identified_predicate.reprs;
-             b_post_cond =
-               List.map (fun x -> Normal, x) Identified_predicate.reprs;
-             b_assigns = WritesAny;
-             b_allocation = FreeAllocAny;
-             b_extended = []; } ]
-      let mem_project = Datatype.never_any_project
-    end)
+module Funbehavior = struct
+  let pretty_ref = ref (fun _ _ -> assert false)
+  include Datatype.Make
+      (struct
+        include Datatype.Serializable_undefined
+        type t = funbehavior
+        let name = "Funbehavior"
+        let reprs =
+          [ {  b_name = "default!"; (* Cil.default_behavior_name *)
+               b_requires = Identified_predicate.reprs;
+               b_assumes = Identified_predicate.reprs;
+               b_post_cond =
+                 List.map (fun x -> Normal, x) Identified_predicate.reprs;
+               b_assigns = WritesAny;
+               b_allocation = FreeAllocAny;
+               b_extended = []; } ]
+        let pretty fmt x = !pretty_ref fmt x
+        let mem_project = Datatype.never_any_project
+      end)
+end
 
 module Funspec = struct
   let pretty_ref = ref (fun _ _ -> assert false)

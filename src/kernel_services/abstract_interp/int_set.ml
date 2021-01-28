@@ -152,7 +152,7 @@ let for_all f (a : Integer.t array) =
   let rec c i = i = l || ((f a.(i)) && c (succ i)) in
   c 0
 
-let exists = Extlib.array_exists
+let exists = Array.exists
 
 let iter = Array.iter
 let fold ?(increasing=true) =

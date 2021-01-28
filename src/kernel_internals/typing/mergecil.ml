@@ -442,28 +442,35 @@ let hash_list f l =
     | _ -> acc
   in aux 47 3 l
 
-let hash_ext_kind = function
-  | Ext_id i -> Datatype.Int.hash i
-  | Ext_terms terms -> 29 * (hash_list Logic_utils.hash_term terms)
-  | Ext_preds preds -> 47 * (hash_list Logic_utils.hash_predicate preds)
-
-let compare_ext_kind k1 k2 =
-  match k1, k2 with
-  | Ext_id i1, Ext_id i2 -> Datatype.Int.compare i1 i2
-  | Ext_id _, _ -> 1 | _, Ext_id _ -> -1
-  | Ext_terms terms1, Ext_terms terms2 ->
-    Extlib.list_compare Logic_utils.compare_term terms1 terms2
-  | Ext_terms _, _ -> 1 | _, Ext_terms _ -> -1
-  | Ext_preds p1, Ext_preds p2 ->
-    Extlib.list_compare Logic_utils.compare_predicate p1 p2
 
 module ExtMerging =
   Merging
     (struct
       type t = acsl_extension
-      let hash (e : acsl_extension) =
+      let rec hash (e : acsl_extension) =
+        let hash_ext_kind = function
+          | Ext_id i -> Datatype.Int.hash i
+          | Ext_terms terms -> 29 * (hash_list Logic_utils.hash_term terms)
+          | Ext_preds preds -> 47 * (hash_list Logic_utils.hash_predicate preds)
+          | Ext_annot (id, annots) -> Datatype.String.hash id + 5 * (hash_list hash annots)
+        in
         Datatype.String.hash e.ext_name + 5 * hash_ext_kind e.ext_kind
-      let compare (e1 : acsl_extension) (e2 : acsl_extension) =
+      let rec compare (e1 : acsl_extension) (e2 : acsl_extension) =
+        let compare_ext_kind k1 k2 =
+          match k1, k2 with
+          | Ext_id i1, Ext_id i2 -> Datatype.Int.compare i1 i2
+          | Ext_id _, _ -> 1 | _, Ext_id _ -> -1
+          | Ext_terms terms1, Ext_terms terms2 ->
+            Extlib.list_compare Logic_utils.compare_term terms1 terms2
+          | Ext_terms _, _ -> 1 | _, Ext_terms _ -> -1
+          | Ext_preds p1, Ext_preds p2 ->
+            Extlib.list_compare Logic_utils.compare_predicate p1 p2
+          | Ext_preds _, _ -> 1 | _, Ext_preds _ -> -1
+          | Ext_annot (id1, a1) , Ext_annot (id2, a2)  ->
+            match String.compare id1 id2 with
+            | 0 -> Extlib.list_compare compare a1 a2
+            | n -> n
+        in
         let res = Datatype.String.compare e1.ext_name e2.ext_name in
         if res <> 0 then res
         else
@@ -838,7 +845,8 @@ let init ?(all=true) () =
   if all then Logic_env.prepare_tables ()
 
 (* Ignores some attributes that are irrelevant for mergecil, e.g. fc_stdlib *)
-let drop_attributes_for_merge attrs = Cil.dropAttributes ["fc_stdlib"] attrs
+let drop_attributes_for_merge attrs =
+  Cil.dropAttributes ["fc_stdlib"; "fc_stdlib_generated"] attrs
 
 let equal_attributes_for_merge attrs1 attrs2 =
   Cil_datatype.Attributes.equal (drop_attributes_for_merge attrs1)
@@ -884,12 +892,12 @@ let rec global_annot_pass1 g = match g with
            annotation at loc %a. Ignoring new binding."
           Cil_printer.pp_identified_term t
           pretty_volatile_kind k
-          Cil_printer.pp_location (fst (Extlib.the node.nloc))
+          Cil_printer.pp_location (fst (Option.get node.nloc))
     in
     List.iter
       (fun x ->
-         if Extlib.has_some rvi then process_term_kind (x,R);
-         if Extlib.has_some wvi then process_term_kind (x,W))
+         if Option.is_some rvi then process_term_kind (x,R);
+         if Option.is_some wvi then process_term_kind (x,W))
       hs
   | Daxiomatic(id,decls,_,l) ->
     CurrentLoc.set l;
@@ -1144,7 +1152,7 @@ and equalModuloPackedAlign attrs1 attrs2 =
    Raises [Failure] if the fields are not equivalent.
    If [mustCheckOffsets] is true, then there is already a difference in the
    composite type, so each field must be checked. *)
-and checkFieldsEqualModuloPackedAlign ~mustCheckOffsets typ_ci1 typ_ci2 f1 f2 =
+and checkFieldsEqualModuloPackedAlign ~mustCheckOffsets f1 f2 =
   if f1.fbitfield <> f2.fbitfield then
     raise (Failure "different bitfield info");
   if mustCheckOffsets || not (equal_attributes_for_merge f1.fattr f2.fattr) then
@@ -1153,11 +1161,8 @@ and checkFieldsEqualModuloPackedAlign ~mustCheckOffsets typ_ci1 typ_ci2 f1 f2 =
        in which case the difference may be safely ignored *)
     begin
       try
-        let offs1, width1 =
-          Cil.bitsOffset typ_ci1 (Field (f1, NoOffset))
-        in
-        let offs2, width2 =
-          Cil.bitsOffset typ_ci2 (Field (f2, NoOffset))
+        let offs1, width1 = Cil.fieldBitsOffset f1
+        and offs2, width2 = Cil.fieldBitsOffset f2
         in
         if not (equalModuloPackedAlign f1.fattr f2.fattr)
         || offs1 <> offs2 || width1 <> width2 then
@@ -1196,121 +1201,112 @@ and matchCompInfo (oldfidx: int) (oldci: compinfo)
     let ci = cinode.ndata in
     let fidx = cinode.nfidx in
 
-    let old_len = List.length oldci.cfields in
-    let len = List.length ci.cfields in
-    (* It is easy to catch here the case when the new structure is undefined
-     * and the old one was defined. We just reuse the old *)
-    (* More complicated is the case when the old one is not defined but the
-     * new one is. We still reuse the old one and we'll take care of defining
-     * it later with the new fields.
-     * GN: 7/10/04, I could not find when is "later", so I added it below *)
-    if len <> 0 && old_len <> 0 && old_len <> len then begin
-      let curLoc = CurrentLoc.get () in     (* d_global blows this away.. *)
-      CurrentLoc.set curLoc;
-      let aggregate_name = if cstruct then "struct" else "union" in
-      let msg = Printf.sprintf
-          "different number of fields in %s %s and %s %s: %d != %d."
-          aggregate_name oldci.cname aggregate_name ci.cname
-          old_len len
-      in
-      raise (Failure msg)
-    end;
-    (* We check that they are defined in the same way. While doing this there
-     * might be recursion and we have to watch for going into an infinite
-     * loop. So we add the assumption that they are equal *)
-    let newrep, undo = union oldcinode cinode in
-    (* We check the fields but watch for Failure. We only do the check when
-     * the lengths are the same. Due to the code above this the other
-     * possibility is that one of the length is 0, in which case we reuse the
-     * old compinfo. *)
-    (* But what if the old one is the empty one ? *)
-    if old_len = len then begin
-      try
-        (* must_check_offsets indicates that composite type attributes are
-           different, which may impact field offsets *)
-        let mustCheckOffsets =
-          if equal_attributes_for_merge ci.cattr oldci.cattr then false
-          else if equalModuloPackedAlign ci.cattr oldci.cattr then true
-          else raise
-              (Failure
-                 (let attrs = drop_attributes_for_merge ci.cattr in
-                  let oldattrs = drop_attributes_for_merge oldci.cattr in
-                  (* we do not use Cil_datatype.Attributes.pretty because it
-                     may not print some relevant attributes *)
-                  let pp_attrs =
-                    Pretty_utils.pp_list ~sep:", " Printer.pp_attribute
-                  in
-                  Format.asprintf
-                    "different/incompatible composite type attributes: \
-                     [%a] vs [%a]"
-                    pp_attrs attrs pp_attrs oldattrs))
-        in
-        let typ_ci = TComp(ci, {scache = Not_Computed}, []) in
-        let typ_oldci = TComp(oldci, {scache = Not_Computed}, []) in
-        List.iter2
-          (fun oldf f ->
-             checkFieldsEqualModuloPackedAlign ~mustCheckOffsets
-               typ_ci typ_oldci f oldf;
-             (* Make sure the types are compatible *)
-             (* Note: 6.2.7 §1 states that the names of the fields should be the
-                same. We do not force this for now, but could do it. *)
-             let newtype =
-               combineTypes CombineOther oldfidx oldf.ftype fidx f.ftype
-             in
-             (* Change the type in the representative *)
-             oldf.ftype <- newtype)
-          oldci.cfields ci.cfields
-      with Failure reason ->
-        (* Our assumption was wrong. Forget the isomorphism *)
-        undo ();
-        let fields_old =
-          Format.asprintf "%a"
-            Cil_printer.pp_global
-            (GCompTag(oldci, Cil_datatype.Location.unknown))
-        in
-        let fields =
-          Format.asprintf "%a"
-            Cil_printer.pp_global (GCompTag(ci, Cil_datatype.Location.unknown))
-        in
-        let fullname_old = compFullName oldci in
-        let fullname = compFullName ci in
-        let msg =
-          match fullname_old = fullname,
-                fields_old = fields (* Could also use a special comparison *)
-          with
-            true, true ->
-            Format.asprintf
-              "Definitions of %s are not isomorphic. Reason follows:@\n@?%s"
-              fullname_old reason
-          | false, true ->
-            Format.asprintf
-              "%s and %s are not isomorphic. Reason follows:@\n@?%s"
-              fullname_old fullname reason
-          | true, false ->
-            Format.asprintf
-              "Definitions of %s are not isomorphic. \
-               Reason follows:@\n@?%s@\n@?%s@?%s"
-              fullname_old reason
-              fields_old fields
-          | false, false ->
-            Format.asprintf
-              "%s and %s are not isomorphic. Reason follows:@\n@?%s@\n@?%s@?%s"
-              fullname_old fullname reason
-              fields_old fields
-
-
+    match oldci.cfields, ci.cfields with
+    | _, None -> () (* new struct is not defined, just keep using the old one *)
+    | None, Some fields ->
+      (* old struct is not defined, but new one is. Use its fields. *)
+      oldci.cfields <- Some fields
+    | Some oldfields, Some fields ->
+      let old_len = List.length oldfields in
+      let len = List.length fields in
+      if old_len <> len then begin
+        let curLoc = CurrentLoc.get () in (* d_global blows this away.. *)
+        CurrentLoc.set curLoc;
+        let aggregate_name = if cstruct then "struct" else "union" in
+        let msg = Printf.sprintf
+            "different number of fields in %s %s and %s %s: %d != %d."
+            aggregate_name oldci.cname aggregate_name ci.cname
+            old_len len
         in
         raise (Failure msg)
-    end else begin
-      (* We will reuse the old one. One of them is empty. If the old one is
-       * empty, copy over the fields from the new one. Won't this result in
-       * all sorts of undefined types??? *)
-      if old_len = 0 then oldci.cfields <- ci.cfields;
-    end;
-    (* We get here when we succeeded checking that they are equal, or one of
-     * them was empty *)
-    newrep.ndata.cattr <- addAttributes oldci.cattr ci.cattr;
-    ()
+      end;
+      (* We check that they are defined in the same way. While doing this there
+       * might be recursion and we have to watch for going into an infinite
+       * loop. So we add the assumption that they are equal *)
+      let newrep, undo = union oldcinode cinode in
+      (* We check the fields but watch for Failure. We only do the check when
+       * the lengths are the same. Due to the code above this the other
+       * possibility is that one of the length is 0, in which case we reuse the
+       * old compinfo. *)
+      begin
+        try
+          (* must_check_offsets indicates that composite type attributes are
+             different, which may impact field offsets *)
+          let mustCheckOffsets =
+            if equal_attributes_for_merge ci.cattr oldci.cattr then false
+            else if equalModuloPackedAlign ci.cattr oldci.cattr then true
+            else raise
+                (Failure
+                   (let attrs = drop_attributes_for_merge ci.cattr in
+                    let oldattrs = drop_attributes_for_merge oldci.cattr in
+                    (* we do not use Cil_datatype.Attributes.pretty because it
+                       may not print some relevant attributes *)
+                    let pp_attrs =
+                      Pretty_utils.pp_list ~sep:", " Printer.pp_attribute
+                    in
+                    Format.asprintf
+                      "different/incompatible composite type attributes: \
+                       [%a] vs [%a]"
+                      pp_attrs attrs pp_attrs oldattrs))
+          in
+          List.iter2
+            (fun oldf f ->
+               checkFieldsEqualModuloPackedAlign ~mustCheckOffsets f oldf;
+               (* Make sure the types are compatible *)
+               (* Note: 6.2.7 §1 states that the names of the fields
+                  should be the same.
+                  We do not force this for now, but could do it. *)
+               let newtype =
+                 combineTypes CombineOther oldfidx oldf.ftype fidx f.ftype
+               in
+               (* Change the type in the representative *)
+               oldf.ftype <- newtype)
+            oldfields fields
+        with Failure reason ->
+          (* Our assumption was wrong. Forget the isomorphism *)
+          undo ();
+          let fields_old =
+            Format.asprintf "%a"
+              Cil_printer.pp_global
+              (GCompTag(oldci, Cil_datatype.Location.unknown))
+          in
+          let fields =
+            Format.asprintf "%a"
+              Cil_printer.pp_global
+              (GCompTag(ci, Cil_datatype.Location.unknown))
+          in
+          let fullname_old = compFullName oldci in
+          let fullname = compFullName ci in
+          let msg =
+            match fullname_old = fullname,
+                  fields_old = fields (* Could also use a special comparison *)
+            with
+              true, true ->
+              Format.asprintf
+                "Definitions of %s are not isomorphic. Reason follows:@\n@?%s"
+                fullname_old reason
+            | false, true ->
+              Format.asprintf
+                "%s and %s are not isomorphic. Reason follows:@\n@?%s"
+                fullname_old fullname reason
+            | true, false ->
+              Format.asprintf
+                "Definitions of %s are not isomorphic. \
+                 Reason follows:@\n@?%s@\n@?%s@?%s"
+                fullname_old reason
+                fields_old fields
+            | false, false ->
+              Format.asprintf
+                "%s and %s are not isomorphic. \
+                 Reason follows:@\n@?%s@\n@?%s@?%s"
+                fullname_old fullname reason
+                fields_old fields
+          in
+          raise (Failure msg)
+      end;
+      (* We get here when we succeeded checking that they are equal, or one of
+       * them was empty *)
+      newrep.ndata.cattr <- addAttributes oldci.cattr ci.cattr
   end
 
 (* Match two enuminfos and throw a Failure if they do not match *)
@@ -1945,7 +1941,7 @@ class renameVisitorClass =
          if lv == lv' then DoChildren (* Replacement already done... *)
          else ChangeTo lv')
     | LVC ->
-      let vi = Extlib.the lv.lv_origin in
+      let vi = Option.get lv.lv_origin in
       if not vi.vglob then DoChildren
       else begin
         match PlainMerging.findReplacement true vEq !currentFidx vi.vname
@@ -2158,64 +2154,46 @@ class renameVisitorClass =
              })
       | _ -> DoChildren
 
+    method private update_field f =
+      (* See if the compinfo was changed *)
+      if f.fcomp.creferenced then None
+      else begin
+        match
+          PlainMerging.findReplacement true sEq !currentFidx f.fcomp.cname
+        with
+          None -> None (* We did not replace it *)
+        | Some (ci', _oldfidx) -> begin
+            (* First, find out the index of the original field *)
+            let rec indexOf (i: int) = function
+              | [] -> Kernel.fatal "Cannot find field %s in %s"
+                        f.fname (compFullName f.fcomp)
+              | f' :: _ when f' == f -> i
+              | _ :: rest -> indexOf (i + 1) rest
+            in
+            let idx = indexOf 0 (Option.value ~default:[] f.fcomp.cfields) in
+            let ci'_fields = Option.value ~default:[] ci'.cfields in
+            if List.length ci'_fields <= idx then
+              Kernel.fatal "Too few fields in replacement %s for %s"
+                (compFullName ci')
+                (compFullName f.fcomp);
+            Some (List.nth ci'_fields idx)
+          end
+      end
+
     (* The Field offset might need to be changed to use new compinfo *)
     method! voffs = function
         Field (f, o) -> begin
-          (* See if the compinfo was changed *)
-          if f.fcomp.creferenced then
-            DoChildren
-          else begin
-            match
-              PlainMerging.findReplacement true sEq !currentFidx f.fcomp.cname
-            with
-              None -> DoChildren (* We did not replace it *)
-            | Some (ci', _oldfidx) -> begin
-                (* First, find out the index of the original field *)
-                let rec indexOf (i: int) = function
-                    [] -> Kernel.fatal "Cannot find field %s in %s"
-                            f.fname (compFullName f.fcomp)
-                  | f' :: _ when f' == f -> i
-                  | _ :: rest -> indexOf (i + 1) rest
-                in
-                let index = indexOf 0 f.fcomp.cfields in
-                if List.length ci'.cfields <= index then
-                  Kernel.fatal "Too few fields in replacement %s for %s"
-                    (compFullName ci')
-                    (compFullName f.fcomp);
-                let f' = List.nth ci'.cfields index in
-                ChangeDoChildrenPost (Field (f', o), fun x -> x)
-              end
-          end
+          match self#update_field f with
+          | None -> DoChildren
+          | Some f' -> ChangeDoChildrenPost (Field (f', o), fun x -> x)
         end
       | _ -> DoChildren
 
     method! vterm_offset = function
         TField (f, o) -> begin
-          (* See if the compinfo was changed *)
-          if f.fcomp.creferenced then
-            DoChildren
-          else begin
-            match
-              PlainMerging.findReplacement true sEq !currentFidx f.fcomp.cname
-            with
-              None -> DoChildren (* We did not replace it *)
-            | Some (ci', _oldfidx) -> begin
-                (* First, find out the index of the original field *)
-                let rec indexOf (i: int) = function
-                    [] -> Kernel.fatal "Cannot find field %s in %s"
-                            f.fname (compFullName f.fcomp)
-                  | f' :: _ when f' == f -> i
-                  | _ :: rest -> indexOf (i + 1) rest
-                in
-                let index = indexOf 0 f.fcomp.cfields in
-                if List.length ci'.cfields <= index then
-                  Kernel.fatal "Too few fields in replacement %s for %s"
-                    (compFullName ci')
-                    (compFullName f.fcomp);
-                let f' = List.nth ci'.cfields index in
-                ChangeDoChildrenPost (TField (f', o), fun x -> x)
-              end
-          end
+          match self#update_field f with
+          | None -> DoChildren
+          | Some f' -> ChangeDoChildrenPost (TField (f', o), fun x -> x)
         end
       | TModel(f,o) ->
         (match
@@ -2408,9 +2386,8 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
     end
   | Dvolatile(vi,rd,wr,attr,loc) ->
     let is_representative id =
-      not
-        (Extlib.has_some
-           (VolatileMerging.findReplacement true lvEq !currentFidx id))
+      Option.is_none
+        (VolatileMerging.findReplacement true lvEq !currentFidx id)
     in
     let push_volatile l rd wr =
       match l with
@@ -2437,8 +2414,8 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
            annotation can be used as is (i.e. does not overlap with a
            preceding annotation.
       *)
-      let reads = not (Extlib.has_some rd) || is_representative (v,R) in
-      let writes = not (Extlib.has_some wr) || is_representative (v,W) in
+      let reads = Option.is_none rd || is_representative (v,R) in
+      let writes = Option.is_none wr || is_representative (v,W) in
       if reads then
         if writes then
           no_drop, v::full_representative, only_reads, only_writes
@@ -2455,8 +2432,8 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
     if no_drop then mergePushGlobals (visitCilGlobal renameVisitor g)
     else begin
       push_volatile full_representative rd wr;
-      if Extlib.has_some rd then push_volatile only_reads rd None;
-      if Extlib.has_some wr then push_volatile only_writes None wr
+      if Option.is_some rd then push_volatile only_reads rd None;
+      if Option.is_some wr then push_volatile only_writes None wr
     end
   | Daxiomatic(n,l,_,loc) ->
     begin
@@ -2986,7 +2963,7 @@ let oneFilePass2 (f: file) =
               (* Restore the formals from the old definition. We always have
                  Some l from getFormalsDecl
                  in case of a defined function. *)
-              Cil.setFormals fdec (Extlib.the defn_formals);
+              Cil.setFormals fdec (Option.get defn_formals);
               (* previous was found *)
               if (curSum = prevSum) then
                 Kernel.warning ~current:true
@@ -3285,7 +3262,7 @@ let find_decls g =
       method! vspec _ = SkipChildren
       method! vfunc f =
         ignore (self#vvdec f.svar);
-        Extlib.may (ignore $ self#vlogic_var_decl) f.svar.vlogic_var_assoc;
+        Option.iter (ignore $ self#vlogic_var_decl) f.svar.vlogic_var_assoc;
         SkipChildren
     end
   in

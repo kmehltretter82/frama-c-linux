@@ -29,6 +29,7 @@ val html_stag_functions : Format.formatter_stag_functions;;
     - level 1 headers are underlined by '='
     - level 2 headers by '-'
     - level 3 headers by '~'
+
     This function is supposed to follow reStructuredText's conventions.
 *)
 val mk_hdr : int -> Format.formatter -> string -> unit;;
@@ -52,7 +53,7 @@ module BasicMetrics : sig
                                  function, possibly more for a file.*)
     cptrs: int ;             (** Access to pointers *)
     cdecision_points: int ;  (** Decision points of the program: ifs,
-                              switch cases, exception handlers, ... *)
+                                 switch cases, exception handlers, ... *)
     cglob_vars: int;         (** Global variables *)
     ccyclo: int;             (** Cyclomatic complexity *)
   }
@@ -108,6 +109,10 @@ val pretty_set : Format.formatter -> int VInfoMap.t -> unit
 
 val pretty_extern_vars: Format.formatter -> VInfoSet.t -> unit
 
+(** Build a JSON list with the varinfos in [m], each as a JSON object with
+    the varinfo name as key and additional attributes as values. *)
+val json_of_varinfo_map : int VInfoMap.t -> Yojson.t
+
 (** Handling entry points informations *)
 val number_entry_points : int VInfoMap.t -> int
 ;;
@@ -115,6 +120,8 @@ val number_entry_points : int VInfoMap.t -> int
 val pretty_entry_points :
   Format.formatter -> int VInfoMap.t -> unit
 ;;
+
+val json_of_entry_points : int VInfoMap.t -> Yojson.t
 
 (** Get the filename where the definition of a varinfo occurs *)
 val file_of_vinfodef: Cil_types.varinfo -> Datatype.Filepath.t;;
@@ -133,6 +140,7 @@ val get_filename: Cabs.definition -> Datatype.Filepath.t;;
 type output_type =
   | Html
   | Text
+  | Json
 ;;
 
 (** get_file_type [extension] sets the output type according to [extension].
@@ -157,7 +165,7 @@ val consider_variable: libc:bool -> Cil_types.varinfo -> bool
 
 (** Convert float to string with the following convention:
     - if the float is an integer (ie, it has no digits after the decimal point),
-    print it as such;
+      print it as such;
     - otherwise, print the first two digits after the decimal point.
 *)
 val float_to_string : float -> string ;;

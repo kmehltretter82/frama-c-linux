@@ -62,7 +62,7 @@ struct
     | Is_nan (e,_) | Function_pointer (e,_) | Invalid_pointer e ->
       from_exp f e
     | Pointer_comparison (opt_e1,e2) ->
-      Extlib.may (from_exp f) opt_e1;
+      Option.iter (from_exp f) opt_e1;
       from_exp f e2
     | Differing_blocks (e1,e2) ->
       from_exp f e1; from_exp f e2
@@ -339,7 +339,7 @@ let build_node_writes context node =
     match Node_kind.get_base node.node_kind with
     (* TODO refine formal dependency computation for non-scalar formals *)
     | Some vi when vi.vformal ->
-      let kf = Extlib.the (Kernel_function.find_defining_kf vi) in
+      let kf = Option.get (Kernel_function.find_defining_kf vi) in
       let pos = Kernel_function.get_formal_position vi kf in
       let callsites =
         match Callstack.pop callstack with
@@ -367,6 +367,7 @@ let build_node_writes context node =
     | {skind = Return (Some {enode = Lval lval_res},_)} as return_stmt ->
       let callstack = Callstack.push (kf,stmt) callstack in
       build_lval_deps callstack return_stmt Data lval_res
+    | {skind = Return (None, _)} -> () (* return void *)
     | _ -> assert false (* Cil invariant *)
     | exception Kernel_function.No_Statement ->
       (* the function is only a prototype *)
@@ -613,7 +614,7 @@ let add_alarm context stmt alarm =
 
 let add_annotation context stmt annot =
   (* Only do something for alarms notations *)
-  Extlib.opt_map (add_alarm context stmt) (Alarms.find annot)
+  Option.map (add_alarm context stmt) (Alarms.find annot)
 
 let add_instr context stmt = function
   | Set (lval, _, _)

@@ -228,11 +228,13 @@ Goal Post-condition 'qed_ko,Eq_oracle_ko' in 'pointer':
 Prove: false.
 
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'compare':
-  /*@ behavior typed:
+[wp] tests/wp_acsl/pointer.i:63: Warning: 
+  Memory model hypotheses for function 'compare':
+  /*@ behavior wp_typed:
         requires \separated(q + (..), &p); */
   void compare(int *q);
-[wp] Warning: Memory model hypotheses for function 'absurd':
-  /*@ behavior typed:
+[wp] tests/wp_acsl/pointer.i:73: Warning: 
+  Memory model hypotheses for function 'absurd':
+  /*@ behavior wp_typed:
         requires \separated(q + (..), &p); */
   void absurd(int *q);

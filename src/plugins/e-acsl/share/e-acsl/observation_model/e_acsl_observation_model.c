@@ -39,7 +39,8 @@
  * otherwise.
  */
 int separated2(void * ptr1, size_t size1, void * ptr2, size_t size2) {
-  DASSERT(valid_read(ptr1, size1, base_addr(ptr1), NULL) && valid_read(ptr2, size2, base_addr(ptr2), NULL));
+  DASSERT(eacsl_valid_read(ptr1, size1, eacsl_base_addr(ptr1), NULL)
+          && eacsl_valid_read(ptr2, size2, eacsl_base_addr(ptr2), NULL));
 
   // Cast pointers to char* to be able to do pointer arithmetic without
   // triggering undefined behavior

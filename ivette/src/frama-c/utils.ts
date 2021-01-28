@@ -9,9 +9,9 @@
 
 import * as Dome from 'dome';
 import * as DomeBuffers from 'dome/text/buffers';
-import * as KernelData from 'api/kernel/data';
+import * as KernelData from 'frama-c/api/kernel/data';
 
-const PP = new Dome.PP('Utils');
+const D = new Dome.Debug('Utils');
 
 // --------------------------------------------------------------------------
 // --- Print Utilities
@@ -47,6 +47,6 @@ export function printTextWithTags(
   } else if (typeof contents === 'string') {
     buffer.append(contents);
   } else {
-    PP.error('Unexpected text', contents);
+    D.error('Unexpected text', contents);
   }
 }

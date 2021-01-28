@@ -65,6 +65,9 @@ val of_logic : Cil_types.logic_label -> c_label
     labels. Ambiguous labels are: Old, LoopEntry and LoopCurrent, since
     they points to different program points dependending on the context. *)
 
+val is_post : Cil_types.logic_label -> bool
+(** Checks whether the logic-label is [Post] or [to_logic post] *)
+
 val pretty : Format.formatter -> c_label -> unit
 
 open Cil_types

@@ -26,7 +26,7 @@ open Abstract_interp
 open Locations
 
 (** Estimation of the cardinal of the concretization of an abstract state
-  or value. *)
+    or value. *)
 module CardinalEstimate: sig
   type t
   val one: t
@@ -45,15 +45,15 @@ module V : sig
     (* Too many aliases, and OCaml module system is not able to keep track
        of all of them. Use some shortcuts *)
     with type M.t = Location_Bytes.M.t
-    and type t = Location_Bytes.t
-    and type numerical_widen_hint = Location_Bytes.numerical_widen_hint
-    and type size_widen_hint = Location_Bytes.size_widen_hint
+     and type t = Location_Bytes.t
+     and type numerical_widen_hint = Location_Bytes.numerical_widen_hint
+     and type size_widen_hint = Location_Bytes.size_widen_hint
 
   include Offsetmap_lattice_with_isotropy.S
-      with type t := t
-      and type numerical_widen_hint := numerical_widen_hint
-      and type size_widen_hint := size_widen_hint
-      and type widen_hint := widen_hint
+    with type t := t
+     and type numerical_widen_hint := numerical_widen_hint
+     and type size_widen_hint := size_widen_hint
+     and type widen_hint := widen_hint
 
   val pretty_typ: Cil_types.typ option -> t Pretty_utils.formatter
 
@@ -69,7 +69,7 @@ module V : sig
 
   val project_ival_bottom: t -> Ival.t
   (* Temporary API, will be merged with project_ival later *)
-    
+
   val is_imprecise : t -> bool
   val is_topint : t -> bool
   val is_bottom : t -> bool
@@ -95,12 +95,12 @@ module V : sig
   val inject_float : Fval.t -> t
   val interp_boolean : contains_zero:bool -> contains_non_zero:bool -> t
 
-(** [cast_int_to_int ~size ~signed v] applies to the abstract value [v] the
-    conversion to the integer type described by [size] and [signed].
-    Offsets of bases other than NULL are not clipped. If they were clipped,
-    they should be clipped at the validity of the base. The C standard does
-    not say that [p+(1ULL<<32+1)] is the same as [p+1], it says that
-    [p+(1ULL<<32+1)] is invalid. *)
+  (** [cast_int_to_int ~size ~signed v] applies to the abstract value [v] the
+      conversion to the integer type described by [size] and [signed].
+      Offsets of bases other than NULL are not clipped. If they were clipped,
+      they should be clipped at the validity of the base. The C standard does
+      not say that [p+(1ULL<<32+1)] is the same as [p+1], it says that
+      [p+(1ULL<<32+1)] is invalid. *)
   val cast_int_to_int: size:Int.t -> signed:bool -> t -> t
 
   val reinterpret_as_float: Cil_types.fkind -> t -> t
@@ -174,9 +174,9 @@ module V_Or_Uninitialized : sig
 
   include Offsetmap_lattice_with_isotropy.S
     with type t := t
-    and  type size_widen_hint = Location_Bytes.size_widen_hint
-    and  type numerical_widen_hint = Location_Bytes.numerical_widen_hint
-    and  type widen_hint = Locations.Location_Bytes.widen_hint
+     and  type size_widen_hint = Location_Bytes.size_widen_hint
+     and  type numerical_widen_hint = Location_Bytes.numerical_widen_hint
+     and  type widen_hint = Locations.Location_Bytes.widen_hint
   include Lattice_type.With_Under_Approximation with type t:= t
   include Lattice_type.With_Narrow with type t := t
   include Lattice_type.With_Top with type t := t
@@ -212,32 +212,32 @@ module V_Or_Uninitialized : sig
 
   val reduce_by_initializedness : bool -> t -> t
   (** [reduce_by_initializedness initialized v] reduces [v] so that its result
-     [r] verifies [\initialized(r)] if [initialized] is [true], and
-     [!\initialized(r)] otherwise. *)
+      [r] verifies [\initialized(r)] if [initialized] is [true], and
+      [!\initialized(r)] otherwise. *)
 
   val reduce_by_danglingness : bool -> t -> t
   (** [reduce_by_danglingness dangling v] reduces [v] so that its result [r]
-     verifies [\dangling(r)] if [dangling] is [true], and
-     [!\dangling(r)] otherwise. *)
+      verifies [\dangling(r)] if [dangling] is [true], and
+      [!\dangling(r)] otherwise. *)
 
   val remove_indeterminateness: t -> t
   (** Remove 'uninitialized' and 'escaping addresses' flags from the argument *)
 
-  val unspecify_escaping_locals : 
+  val unspecify_escaping_locals :
     exact:bool -> (V.M.key -> bool) -> t -> bool * t
 
   val map: (V.t -> V.t) -> t -> t
   val map2: (V.t -> V.t -> V.t) -> t -> t -> t
   (** initialized/escaping information is the join of the information
       on each argument. *)
- end
+end
 
 (** Memory slices. They are maps from intervals to values with
     flags. All sizes and intervals are in bits. *)
 module V_Offsetmap: sig
   include Offsetmap_sig.S
-  with type v = V_Or_Uninitialized.t
-  and type widen_hint = V_Or_Uninitialized.numerical_widen_hint
+    with type v = V_Or_Uninitialized.t
+     and type widen_hint = V_Or_Uninitialized.numerical_widen_hint
 
   val narrow: t -> t -> t Bottom.Type.or_bottom
   val narrow_reinterpret: t -> t -> t Bottom.Type.or_bottom
@@ -256,8 +256,8 @@ module Model: sig
   (** Functions inherited from [Lmap_sig] interface *)
   include Lmap_sig.S
     with type v = V_Or_Uninitialized.t
-    and type offsetmap = V_Offsetmap.t
-    and type widen_hint_base = V_Or_Uninitialized.numerical_widen_hint
+     and type offsetmap = V_Offsetmap.t
+     and type widen_hint_base = V_Or_Uninitialized.numerical_widen_hint
 
   include Lattice_type.With_Narrow with type t := t
 
@@ -279,6 +279,7 @@ module Model: sig
       - if [conflate_bottom] is [false] and at least one bit pointed to by
         [l..l+loc.size-1] is not [V.bottom], the value is an approximation
         of the join of all the bits at [l..l+loc.size-1].
+
       As a rule of thumb, you must set [conflate_bottom=true] when the
       operation you abstract really accesses [loc.size] bits, and when
       undeterminate values are an error. This is typically the case when

@@ -112,7 +112,7 @@ module Make
       (Right.reduce_further right expr value)
 
   let lift_record side record =
-    let origin = Extlib.opt_map side record.origin in
+    let origin = Option.map side record.origin in
     let reductness =
       match record.reductness, origin with
       | Unreduced, Some (reduced, _) -> reduced
@@ -120,7 +120,7 @@ module Make
       | Reduced, Some (Created, _) -> Created
       | _ as x, _ -> x
     in
-    let origin = Extlib.may_map snd ~dft:None origin in
+    let origin = Option.fold ~some:snd ~none:None origin in
     { record with origin; reductness }
 
   let lift_valuation side valuation =

@@ -70,7 +70,7 @@ struct
     match Cil.unrollType ty with
     | TArray(te,n,_,_) ->
         begin
-          match Extlib.opt_bind Ctypes.get_int n with
+          match Option.bind n Ctypes.get_int with
           | None -> failwith "Wp.Layout: unkown array size"
           | Some n -> Index(te,n)
         end
@@ -99,15 +99,12 @@ struct
       let typ = TComp(comp,Cil.empty_size_cache (),[]) in
       H.add cache comp typ ; typ
 
-  let field_offset cache fd =
-    let typ = typ_of_comp cache fd.fcomp in
-    let offset = Cil_types.(Field(fd,NoOffset)) in
-    Cil.bitsOffset typ offset
+  let field_offset _cache fd =
+    Cil.fieldBitsOffset fd
 
   let range_field cache fd =
     let typ = typ_of_comp cache fd.fcomp in
-    let offset = Cil_types.(Field(fd,NoOffset)) in
-    Cil.bitsOffset typ offset , Cil.bitsSizeOf typ
+    Cil.fieldBitsOffset fd, Cil.bitsSizeOf typ
 
   let range_index typ n =
     let len = Cil.bitsSizeOf typ * n in (0 , len) , len
@@ -385,7 +382,7 @@ struct
   let pretty ?title pp fmt rs =
     begin
       Format.fprintf fmt "@[<hv 0>" ;
-      Extlib.may (fun pp -> pp fmt) title ;
+      Option.iter (fun pp -> pp fmt) title ;
       Format.fprintf fmt "@[<hov 2>{" ;
       List.iter
         (fun rg ->

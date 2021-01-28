@@ -30,7 +30,7 @@ let stmt sk = Cil.mkStmt ~valid_sid:true sk
 let instr i = stmt (Instr i)
 let block_stmt blk = stmt (Block blk)
 let block_from_stmts stmts = block_stmt (Cil.mkBlock stmts)
-let call ~loc ?result e args = instr (Call(result, e, args, loc))
+let call_instr ~loc ?result e args = instr (Call(result, e, args, loc))
 
 let assigns ~loc ~result e = instr (Set(result, e, loc))
 
@@ -68,13 +68,7 @@ let block stmt b = match b.bstmts with
 (* E-ACSL specific code *)
 (* ********************************************************************** *)
 
-let lib_call ~loc ?result fname args =
-  let vi =
-    try Rtl.Symbols.find_vi fname
-    with Rtl.Symbols.Unregistered _ as exn ->
-    try Builtins.find fname
-    with Not_found -> raise exn
-  in
+let do_call ~loc ?result vi args =
   let f = Cil.evar ~loc vi in
   vi.vreferenced <- true;
   let make_args ~variadic args param_ty =
@@ -95,7 +89,7 @@ let lib_call ~loc ?result fname args =
         Options.fatal
           "Mismatch between the number of expressions given and the number \
            of arguments in the signature when calling function '%s'"
-          fname
+          vi.vname
     in
     List.rev (make_rev_args [] args param_ty)
   in
@@ -104,10 +98,27 @@ let lib_call ~loc ?result fname args =
     | TFun(_, None, _, _) -> []
     | _ -> assert false
   in
-  call ~loc ?result f args
+  call_instr ~loc ?result f args
 
-let rtl_call ~loc ?result fname args =
-  lib_call ~loc ?result (Functions.RTL.mk_api_name fname) args
+let call ~loc ?result fname args =
+  let kf =
+    try Globals.Functions.find_by_name fname
+    with Not_found ->
+      Options.fatal "Unable to find function '%s'" fname
+  in
+  let vi = Globals.Functions.get_vi kf in
+  do_call ~loc ?result vi args
+
+let rtl_call ~loc ?result ?(prefix=Functions.RTL.api_prefix) fname args =
+  let fname = prefix ^ fname in
+  let vi =
+    try Rtl.Symbols.find_vi fname
+    with Rtl.Symbols.Unregistered _ as exn ->
+    try Builtins.find fname
+    with Not_found ->
+      raise exn
+  in
+  do_call ~loc ?result vi args
 
 (* ************************************************************************** *)
 (** {2 Handling the E-ACSL's C-libraries, part II} *)

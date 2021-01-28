@@ -21,7 +21,4 @@
 #                                                                        #
 ##########################################################################
 
-
-. $(dirname $0)/local_export.sh
-
-exec $BINDIR/frama-c -no-autoload-plugins "$@"
+exec $(dirname $0)/frama-c -no-autoload-plugins "$@"

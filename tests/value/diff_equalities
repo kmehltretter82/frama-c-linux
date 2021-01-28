@@ -120,19 +120,49 @@ diff oracle/alias.6.res.oracle oracle_equalities/alias.6.res.oracle
 <   x ∈ {0; 4; 33}
 ---
 >   x ∈ {33}
+<<<<<<< HEAD
 diff oracle/auto_loop_unroll.0.res.oracle oracle_equalities/auto_loop_unroll.0.res.oracle
 82c82,85
 < [eva] auto_loop_unroll.c:103: Reusing old results for call to incr
+||||||| ac7807782d
+diff tests/value/oracle/auto_loop_unroll.0.res.oracle tests/value/oracle_equalities/auto_loop_unroll.0.res.oracle
+82c82,85
+< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+=======
+diff tests/value/oracle/auto_loop_unroll.0.res.oracle tests/value/oracle_equalities/auto_loop_unroll.0.res.oracle
+81c81,84
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
+>>>>>>> origin/master
 ---
 > [eva] computing for function incr <- various_loops <- main.
+<<<<<<< HEAD
 >   Called from auto_loop_unroll.c:103.
+||||||| ac7807782d
+>   Called from tests/value/auto_loop_unroll.c:103.
+=======
+>   Called from tests/value/auto_loop_unroll.c:101.
+>>>>>>> origin/master
 > [eva] Recording results for incr
 > [eva] Done for function incr
+<<<<<<< HEAD
 91c94,97
 < [eva] auto_loop_unroll.c:103: Reusing old results for call to incr
+||||||| ac7807782d
+91c94,97
+< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+=======
+90c93,96
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
+>>>>>>> origin/master
 ---
 > [eva] computing for function incr <- various_loops <- main.
+<<<<<<< HEAD
 >   Called from auto_loop_unroll.c:103.
+||||||| ac7807782d
+>   Called from tests/value/auto_loop_unroll.c:103.
+=======
+>   Called from tests/value/auto_loop_unroll.c:101.
+>>>>>>> origin/master
 > [eva] Recording results for incr
 > [eva] Done for function incr
 diff oracle/backward_add_ptr.res.oracle oracle_equalities/backward_add_ptr.res.oracle
@@ -687,8 +717,16 @@ diff oracle/non_natural.res.oracle oracle_equalities/non_natural.res.oracle
 199a200,201
 > [kernel] non_natural.i:39: 
 >   more than 200(12500) elements to enumerate. Approximating.
+<<<<<<< HEAD
 diff oracle/nonlin.res.oracle oracle_equalities/nonlin.res.oracle
 188c188
+||||||| ac7807782d
+diff tests/value/oracle/nonlin.res.oracle tests/value/oracle_equalities/nonlin.res.oracle
+188c188
+=======
+diff tests/value/oracle/nonlin.res.oracle tests/value/oracle_equalities/nonlin.res.oracle
+194c194
+>>>>>>> origin/master
 <   q ∈ {{ &x + [-400..400],0%4 }}
 ---
 >   q ∈ {{ &x }}
@@ -867,3 +905,4 @@ diff oracle/struct2.res.oracle oracle_equalities/struct2.res.oracle
 <            [9].a}; s1; s2; s5.e[0].b; s6.b; s8; tabl[0..1]; tab1[0..1];
 ---
 >            [9].a}; s1; s2; s5.e[0].b; s6.b; s8; tabl[0..1]; tab1[0];
+Only in tests/value/oracle: unit_tests.res.oracle

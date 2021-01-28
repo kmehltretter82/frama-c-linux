@@ -1,3 +1,0 @@
-<!-- Icon Gallery -->
-
-<!-- (Generated) -->

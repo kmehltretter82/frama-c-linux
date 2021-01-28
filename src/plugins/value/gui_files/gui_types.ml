@@ -148,10 +148,10 @@ module Make (V: Abstractions.Value) = struct
     | GR_Empty, GR_Empty -> true
     | GR_Offsm (o1, typ1), GR_Offsm (o2, typ2) ->
       equal_gui_offsetmap_res o1 o2 &&
-      Extlib.opt_equal Cil_datatype.Typ.equal typ1 typ2
+      Option.equal Cil_datatype.Typ.equal typ1 typ2
     | GR_Value (v1, typ1), GR_Value (v2, typ2) ->
       Eval.Flagged_Value.equal V.equal v1 v2 &&
-      Extlib.opt_equal Cil_datatype.Typ.equal typ1 typ2
+      Option.equal Cil_datatype.Typ.equal typ1 typ2
     | GR_Status s1, GR_Status s2 -> Extlib.compare_basic s1 s2 = 0
     | GR_Zone z1, GR_Zone z2 -> Locations.Zone.equal z1 z2
     | (GR_Empty | GR_Offsm _ | GR_Value _  | GR_Status _ | GR_Zone _), _ -> false

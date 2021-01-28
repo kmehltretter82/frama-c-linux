@@ -667,8 +667,8 @@ let backward_ge_int min v =
   | Float _ -> v
   | Int _ -> narrow v (inject_int (Int_val.inject_range min None))
 
-let backward_lt_int max v = backward_le_int (Extlib.opt_map Int.pred max) v
-let backward_gt_int min v = backward_ge_int (Extlib.opt_map Int.succ min) v
+let backward_lt_int max v = backward_le_int (Option.map Int.pred max) v
+let backward_gt_int min v = backward_ge_int (Option.map Int.succ min) v
 
 let diff_if_one value rem =
   match value, rem with
@@ -837,8 +837,8 @@ type overflow_float_to_int =
 
 let cast_float_to_int_non_nan ~signed ~size (min, max) =
   let all = create_all_values ~size ~signed in
-  let min_all = Extlib.the (min_int all) in
-  let max_all = Extlib.the (max_int all) in
+  let min_all = Option.get (min_int all) in
+  let max_all = Option.get (max_int all) in
   let conv f =
     try
       (* truncate_to_integer returns an integer that fits in a 64 bits

@@ -17,8 +17,39 @@
 Open Source Release <next-release>
 ##################################
 
+o!  Kernel    [2021-01-15] Make cfields list optional. None means undefined,
+              empty struct allowed only in specific machdeps.
+              removed cdefined field
+-*  RTE       [2021-01-13] remove spurious assert when comparing function
+              pointer to NULL (fixes #@940)
+-   Kernel    [2021-01-12] set default machdep to x86_64; allow setting machdep
+              via environment variable FRAMAC_MACHDEP.
+-   Kernel    [2021-01-08] allow -add-symbolic-path to survive saves/loads and
+              invert argument order (path:name).
+-   Libc      [2020-12-02] remove obsolete attribute FRAMA_C_MODEL in the libc.
+              Fixes #@877.
+-*  Logic     [2020-11-30] assigns clause can't mention const locations
+              anymore. Fixes #@855.
+o   Kernel    [2020-11-27] Extract builtin-related functions from module Cil
+              to module Cil_builtins. Code can be updated using
+              `bin/migration_scripts/titanium2vanadium.sh`.
+-   Metrics   [2020-10-27] Add json output in addition to text and html.
+
+###################################
+Open Source Release 22.0 (Titanium)
+###################################
+
+-   MdR       [2020-10-19] Update Sarif output to 2.1.0 + prettier URI
+-   Dev       [2020-10-20] Support for OCamlGraph 2.0.0
+-   ACSL      [2020-10-16] Allows for axiomatic blocks-like extensions
+-   Variadic  [2020-10-14] Don't print generated function name but print
+              original name and a comment with the generated name so that the
+              printed code is compilable.
+-   Aorai     [2020-10-13] Ya automata can set auxiliary variables during a
+              transition, and use such variables in subsequent guards.
 -   Kernel    [2020-10-09] Add option -print-config-json, to output Frama-C
               configuration data in JSON format.
+-   Logic     [2020-10-14] '\from' now accepts '&v' expressions
 -   Metrics   [2020-10-01] Distinguish between undefined but specified functions
               and functions with neither definition nor specification.
 -*  Eva       [2020-09-28] Improved string builtins on wide strings: crash fixed,
@@ -39,6 +70,7 @@ Open Source Release <next-release>
               option) on loops with several exit conditions, conditions using
               equality operators, temporary variables introduced by the Frama-C
               normalization or goto statements.
+-!  Kernel    [2020-07-21] OCaml version greater than or equal to 4.08.1 required.
 -   Eva       [2020-05-29] New builtins for trigonometric functions acos, asin
               and atan (and their single-precision version acosf, asinf, atanf).
 -   Kernel    [2020-05-28] Support for C11's _Thread_local storage specifier

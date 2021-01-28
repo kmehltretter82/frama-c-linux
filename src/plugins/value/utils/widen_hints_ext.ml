@@ -148,6 +148,7 @@ let printer _pp fmt ext =
   match ext with
   | Ext_id _ -> assert false
   | Ext_preds _ -> assert false
+  | Ext_annot _ -> assert false
   | Ext_terms terms ->
     match widen_hint_terms_of_terms terms with
     | Some (hint_lval, hint_terms) ->

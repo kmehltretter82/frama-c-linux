@@ -227,7 +227,8 @@ let hints_from_keys stmt h =
       float_hints_for_base b)
 
 let var_hints stmt prio_bases =
-  { empty with priority_bases = Stmt.Map.singleton stmt prio_bases }
+  let bases = Base.Set.filter (fun b -> not (Base.is_function b)) prio_bases in
+  { empty with priority_bases = Stmt.Map.singleton stmt bases }
 
 let num_hints stmto baseo hints =
   match stmto, baseo with

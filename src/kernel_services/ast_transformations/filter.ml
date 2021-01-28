@@ -354,7 +354,7 @@ end = struct
         in ok
       | _ -> false
 
-    method private get_finfo () = Extlib.the fi
+    method private get_finfo () = Option.get fi
 
     method private add_stmt_keep stmt =
       keep_stmts <- Stmt.Set.add stmt keep_stmts
@@ -432,10 +432,10 @@ end = struct
       new_locals
 
     method! vcode_annot v =
-      Extlib.may Cil.CurrentLoc.set (Cil_datatype.Code_annotation.loc v);
+      Option.iter Cil.CurrentLoc.set (Cil_datatype.Code_annotation.loc v);
       let stmt =
         Visitor_behavior.Get_orig.stmt
-          self#behavior (Extlib.the self#current_stmt)
+          self#behavior (Option.get self#current_stmt)
       in
       debug "[annotation] stmt %d : %a @."
         stmt.sid Printer.pp_code_annotation v;
@@ -712,7 +712,7 @@ end = struct
       Varinfo.Hashtbl.clear local_visible;
       Varinfo.Hashtbl.add spec_table f.svar
         (visitCilFunspec (self:>Cil.cilVisitor)
-           (Annotations.funspec ~populate:false (Extlib.the self#current_kf)));
+           (Annotations.funspec ~populate:false (Option.get self#current_kf)));
       SkipChildren
 
     method private visit_pred p =
@@ -776,7 +776,7 @@ end = struct
 
     method! vspec spec =
       debug "@[[vspec] for %a @\n@]@."
-        Kernel_function.pretty (Extlib.the self#current_kf);
+        Kernel_function.pretty (Option.get self#current_kf);
       let finfo = self#get_finfo () in
       let b = Cil.visitCilBehaviors (self:>Cil.cilVisitor) spec.spec_behavior in
       let b = List.filter (not $ Cil.is_empty_behavior) b in
@@ -808,7 +808,7 @@ end = struct
                    *)
 
     method private build_proto is_first finfo loc =
-      let kf = Extlib.the self#current_kf in
+      let kf = Option.get self#current_kf in
       fi <- Some finfo;
       let new_var = ff_var fun_vars kf finfo in
       (* we're building a prototype. *)
@@ -888,9 +888,9 @@ end = struct
       end
 
     method private compute_fct_prototypes (_fct_var,loc) =
-      let finfo_list = Info.fct_info pinfo (Extlib.the self#current_kf) in
+      let finfo_list = Info.fct_info pinfo (Option.get self#current_kf) in
       debug "@[[compute_fct_prototypes] for %a (x%d)@\n@]@."
-        Kernel_function.pretty (Extlib.the self#current_kf)
+        Kernel_function.pretty (Option.get self#current_kf)
         (List.length finfo_list);
       let build_cil_proto is_first finfo =
         self#build_proto is_first finfo loc
@@ -904,7 +904,7 @@ end = struct
 
     method private compute_fct_definitions f loc =
       let fvar = f.Cil_types.svar in
-      let kf = Extlib.the self#current_kf in
+      let kf = Option.get self#current_kf in
       let finfo_list = Info.fct_info pinfo kf in
       debug "@[[compute_fct_definitions] for %a (x%d)@\n@]@."
         Kernel_function.pretty kf (List.length finfo_list);
@@ -927,7 +927,7 @@ end = struct
           Varinfo.Hashtbl.add fi_table new_fct_var finfo;
           debug "@[[build_cil_fct] -> %s@\n@]@."
             (Info.fct_name
-               (Kernel_function.get_vi (Extlib.the self#current_kf)) finfo);
+               (Kernel_function.get_vi (Option.get self#current_kf)) finfo);
           let action () =
             Queue.add
               (fun () ->

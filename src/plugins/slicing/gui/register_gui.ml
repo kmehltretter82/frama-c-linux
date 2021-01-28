@@ -276,7 +276,7 @@ let slicing_selector (popup_factory:GMenu.menu GMenu.factory)
           let txt = get_lv lvopt
             "Input a lvalue to slice on its value before the current statement."
           in
-          Extlib.may do_with_txt txt
+          Option.iter do_with_txt txt
         in
         add_slicing_item "Slice lval" kf_ki_lv_opt ~callback);
 
@@ -302,7 +302,7 @@ let slicing_selector (popup_factory:GMenu.menu GMenu.factory)
            let txt = get_lv lvopt
              "Input a lvalue to slice on its read accesses."
            in
-           Extlib.may do_with_txt txt
+           Option.iter do_with_txt txt
          in
          add_slicing_item "Slice rd" kf_ki_lv_opt ~callback);
 
@@ -328,7 +328,7 @@ let slicing_selector (popup_factory:GMenu.menu GMenu.factory)
            let txt = get_lv lvopt
              "Input a lvalue to slice on its write accesses."
            in
-           Extlib.may do_with_txt txt
+           Option.iter do_with_txt txt
          in
         add_slicing_item "Slice wr" kf_ki_lv_opt ~callback);
 
@@ -575,7 +575,7 @@ let file_tree_decorate (file_tree:Filetree.t) =
       ~title:"Slicing"
       (fun globs ->
         SlicingState.may_map
-          ~dft:[`STOCK_ID ""]
+          ~none:[`STOCK_ID ""]
           (fun () ->
             if List.exists
               (fun glob -> match glob with

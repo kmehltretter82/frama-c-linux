@@ -3,7 +3,7 @@
 
 let mk_buildInputs = { opamPackages ? [], nixPackages ? [] } :
     [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl pkgs.file pkgs.which pkgs.dos2unix] ++ nixPackages ++ opam2nix.build {
-           specs = opam2nix.toSpecs ([ "ocamlfind" "zarith" "ocamlgraph" "yojson"
+           specs = opam2nix.toSpecs ([ "ocamlfind" "zarith" "ocamlgraph" "yojson" "zmq"
                 { name = "coq"; constraint = "=8.12.0";  }
                 { name = "alt-ergo" ; constraint = "=2.2.0"; }
                 { name = "why3" ; constraint = "=1.3.3"; }
@@ -295,6 +295,14 @@ rec {
                 autoPatchelf src/plugins/pathcrawler
                 make -j 4
                 ln -sr src/plugins/pathcrawler/share share/pc
+                # Setup Why3
+                mkdir home
+                HOME=$(pwd)/home
+                why3 config --detect
+                # Setup WP related
+                export CAVEAT_IMPORTER_NIX_MODE=yes
+                export FRAMAC_WP_CACHE=replay
+                export FRAMAC_WP_CACHEDIR=${plugins.wp-cache.src}
                 make tests -j4 PTESTS_OPTS="-error-code -j 4"
         '';
         installPhase = ''

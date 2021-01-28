@@ -290,7 +290,7 @@ let frama_c_memcpy state actuals =
       if Ival.is_zero size then
         raise (Memcpy_result (state, empty_cfrom, Zone.bottom));
       let (precise_state,precise_deps_table,sure_zone) = precise_copy state in
-      if Extlib.may_map ~dft:false (Int.equal min) max then
+      if Option.fold ~none:false ~some:(Int.equal min) max then
         (let open Function_Froms in
          let c_from = { deps_table = precise_deps_table; deps_return } in
          raise (Memcpy_result (precise_state, c_from, sure_zone)));
@@ -470,16 +470,15 @@ let memset_typ_offsm_int full_typ i =
           (* Do not produce NaN or infinites here (unless they are accepted
              by the engine). *)
           if Fval.is_finite f = True then update size v' else update size v
-        | TComp ({ cstruct = true ; cfields = l}, _, _) as tcomp -> (* struct *)
+        | TComp ({ cstruct = true ; cfields = l}, _, _) -> (* struct *)
           let aux_field offsm fi =
-            let field = Field (fi, NoOffset) in
-            let offset_fi = Int.of_int (fst (Cil.bitsOffset tcomp field)) in
+            let offset_fi = Int.of_int (fst (Cil.fieldBitsOffset fi)) in
             aux fi.ftype (Int.add offset offset_fi) offsm
           in
-          List.fold_left aux_field offsm l
+          List.fold_left aux_field offsm (Option.value ~default:[] l)
         | TComp ({ cstruct = false ; cfields = l}, _, _) -> (* union *)
           (* Use only the first field. This is somewhat arbitrary *)
-          aux (List.hd l).ftype offset offsm
+          aux (List.hd (Option.get l)).ftype offset offsm
         | TArray (typelt, nb, _, _) -> begin
             let nb = Cil.lenOfArray64 nb in (* always succeeds, we computed the
                                                size of the entire type earlier *)

@@ -29,11 +29,15 @@ open Cil_types
 (** {2 registered ACSL extensions } *)
 
 val is_extension: string -> bool
+val is_extension_block: string -> bool
 
 val extension_category: string -> ext_category
 
 val preprocess_extension:
   string -> Logic_ptree.lexpr list -> Logic_ptree.lexpr list
+
+val preprocess_extension_block:
+  string -> string * Logic_ptree.extended_decl list -> string * Logic_ptree.extended_decl list
 
 (** {2 Global Tables} *)
 module Logic_info: State_builder.Hashtbl
@@ -208,6 +212,10 @@ val set_extension_handler:
   category:(string -> ext_category) ->
   is_extension:(string -> bool) ->
   preprocess:(string -> Logic_ptree.lexpr list -> Logic_ptree.lexpr list) ->
+  is_extension_block:(string -> bool) ->
+  preprocess_block:
+    (string -> string * Logic_ptree.extended_decl list ->
+     string * Logic_ptree.extended_decl list) ->
   unit
 (** Used to setup references related to the handling of ACSL extensions.
     If your name is not [Acsl_extension], do not call this

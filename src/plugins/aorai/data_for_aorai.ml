@@ -57,19 +57,18 @@ module Aorai_typed_trans =
   Datatype.Make_with_collections(
     struct
       let name = "Aorai_typed_trans"
-      type t =
-          (Promelaast.typed_condition * Promelaast.action) Promelaast.trans
+      type t = Promelaast.typed_trans
       let structural_descr = Structural_descr.t_abstract
       let reprs = [ { numt = -1; start = List.hd (Aorai_state.reprs);
                       stop = List.hd (Aorai_state.reprs);
-                      cross = (TTrue,[]); } ]
+                      cross = TTrue; actions=[]; } ]
       let equal x y = Datatype.Int.equal x.numt y.numt
       let hash x = x.numt
       let rehash = Datatype.identity
       let compare x y = Datatype.Int.compare x.numt y.numt
       let copy = Datatype.identity
       let internal_pretty_code = Datatype.undefined
-      let pretty = Promelaoutput.print_transition
+      let pretty = Promelaoutput.Typed.print_transition
       let varname _ = assert false
       let mem_project = Datatype.never_any_project
     end)
@@ -133,8 +132,10 @@ let rec is_same_expression e1 e2 =
     | PVar _,_ | _,PVar _ -> false
     | PCst cst1, PCst cst2 -> Logic_utils.is_same_pconstant cst1 cst2
     | PCst _,_ | _,PCst _ -> false
-    | PPrm (f1,x1), PPrm(f2,x2) -> f1 = x1 && f2 = x2
+    | PPrm (f1,x1), PPrm(f2,x2) -> f1 = f2 && x1 = x2
     | PPrm _,_ | _,PPrm _ -> false
+    | PMetavar x, PMetavar y -> x = y
+    | PMetavar _,_ | _,PMetavar _ -> false
     | PBinop(b1,l1,r1), PBinop(b2,l2,r2) ->
       b1 = b2 && is_same_expression l1 l2 && is_same_expression r1 r2
     | PBinop _, _ | _, PBinop _ -> false
@@ -158,7 +159,7 @@ let get_logic name =
 
 let declared_predicates = Hashtbl.create 97
 
-let add_predicate name pred_info = 
+let add_predicate name pred_info =
   Hashtbl.replace declared_predicates name pred_info
 
 let get_predicate name =
@@ -205,7 +206,7 @@ let buch_sync   = "Aorai_Sync"                           (* Deprecated ? *)
 
 (* ************************************************************************* *)
 (* Buchi automata as stored after parsing *)
-let automata = ref ([],[])
+let automata = ref None
 
 (* Each transition with a parametrized cross condition (call param access or return value access) has its parametrized part stored in this array. *)
 let cond_of_parametrizedTransitions = ref (Array.make (1) [[]])
@@ -218,13 +219,24 @@ let functions_from_c = ref []
 let ignored_functions = ref []
 
 (** Return the buchi automata as stored after parsing *)
-let getAutomata () = !automata
+let getAutomata () =
+  match !automata with
+  | Some auto -> auto
+  | None ->
+    Aorai_option.fatal "The automaton has not been compiled yet"
+
+let getGraph () =
+  let auto = getAutomata () in
+  auto.states, auto.trans
 
 (** Return the number of transitions of the automata *)
-let getNumberOfTransitions () = List.length (snd !automata)
+let getNumberOfTransitions () =
+  List.length (getAutomata ()).trans
 
 (** Return the number of states of the automata *)
-let getNumberOfStates () = List.length (fst !automata)
+let getNumberOfStates () =
+  List.length (getAutomata ()).states
+
 
 let is_c_global name =
   try ignore (Globals.Vars.find_from_astinfo name VGlobal); true
@@ -294,7 +306,7 @@ let update_condition vi1 vi2 cond =
 let pebble_set_at li lab =
   assert (li.l_profile = []);
   let labels = List.map (fun _ -> lab) li.l_labels in
-  Logic_const.term (Tapp (li,labels,[])) (Extlib.the li.l_type)
+  Logic_const.term (Tapp (li,labels,[])) (Option.get li.l_type)
 
 let memo_multi_state st =
   match st.multi_state with
@@ -315,8 +327,8 @@ let memo_multi_state st =
     | Some multi_state -> multi_state
 
 let change_bound_var st1 st2 cond =
-  if Extlib.has_some st1.multi_state then begin
-    let (_,idx1) = Extlib.the st1.multi_state in
+  if Option.is_some st1.multi_state then begin
+    let (_,idx1) = Option.get st1.multi_state in
     let (_,idx2) = memo_multi_state st2 in
     update_condition idx1 idx2 cond
   end else cond
@@ -341,11 +353,11 @@ let new_state name =
 
 let new_intermediate_state () = new_state "aorai_intermediate_state"
 
-let new_trans start stop cond =
-  { start = start; stop = stop; cross = cond; numt = TransIndex.next () }
+let new_trans start stop cross actions =
+  { start; stop; cross; actions; numt = TransIndex.next () }
 
 let check_states s =
-  let states,trans = getAutomata() in
+  let {states;trans} = getAutomata() in
   let max = getNumberOfStates () in
   List.iter
     (fun x -> if x.nums >= max then
@@ -354,7 +366,7 @@ let check_states s =
     states;
   List.iter
     (fun x ->
-      try 
+      try
         let y = List.find (fun y -> x.nums = y.nums && not (x==y)) states in
         Aorai_option.fatal "%s: State %s and %s share same id %d"
           s x.name y.name x.nums
@@ -397,25 +409,23 @@ let is_single elt =
    the entire automaton is processed by adding direct transitions from the
    starting state to the children of the end state.
 *)
-type eps_trans =
-    Normal of typed_condition * action
-  | Epsilon of typed_condition * action
+type 'a eps = Normal of 'a | Epsilon of 'a
 
-let print_epsilon_trans fmt = function
-  | Normal (c,a) ->
-    Format.fprintf fmt "%a%a"
-      Promelaoutput.print_condition c
-      Promelaoutput.print_action a
-  | Epsilon (c,a) ->
-    Format.fprintf fmt "epsilon-trans:@\n%a%a"
-      Promelaoutput.print_condition c
-      Promelaoutput.print_action a
+let print_eps f fmt = function
+  | Normal x -> f fmt x
+  | Epsilon x -> Format.fprintf fmt "epsilon-trans:@\n%a" f x
+      
+let print_eps_trans fmt tr =
+  Format.fprintf fmt "%s -> %s:@[%a%a@]"
+    tr.start.name tr.stop.name
+    (print_eps Promelaoutput.Typed.print_condition) tr.cross
+    Promelaoutput.Typed.print_actionl tr.actions
 
 type current_event =
   | ECall of
       kernel_function
     * Cil_types.logic_var Cil_datatype.Varinfo.Hashtbl.t
-    * eps_trans Promelaast.trans
+    * (typed_condition eps,typed_action) Promelaast.trans
   | EReturn of kernel_function
   | ECOR of kernel_function
   | ENone (* None found yet *)
@@ -481,11 +491,11 @@ let add_current_event event env cond =
 let merge_current_event env1 env2 cond1 cond2 =
   assert (List.tl env1 == List.tl env2);
   let old_env = List.tl env2 in
-  match (List.hd env1, List.hd env2) with
+  match List.hd env1, List.hd env2 with
       | ENone, _ -> env2, tor cond1 cond2
       | _, ENone -> env1, tor cond1 cond2
       | ECall(kf1,_,_), ECall(kf2,_,_)
-        when Kernel_function.equal kf1 kf2 -> env2,  tor cond1 cond2
+        when Kernel_function.equal kf1 kf2 -> env2, tor cond1 cond2
       | ECall _, ECall _ -> EMulti::old_env, tor cond1 cond2
       | ECall _, EMulti -> env2, tor cond1 cond2
       | ECall (kf1,_,_), ECOR kf2 when Kernel_function.equal kf1 kf2 ->
@@ -540,11 +550,11 @@ let memo_aux_variable tr counter used_prms vi =
     let my_lvar = Cil.cvar_to_lvar my_var in
     Cil_datatype.Varinfo.Hashtbl.add used_prms vi my_lvar;
     (match tr.cross with
-      | Normal (cond,action) ->
-        let st = Extlib.opt_map (fun _ -> tr.stop) counter in
+      | Normal _ ->
+        let st = Option.map (fun _ -> tr.stop) counter in
         let loc = get_bindings st my_lvar in
         let copy = Copy_value (loc,Logic_const.tvar (Cil.cvar_to_lvar vi)) in
-        tr.cross <- Normal(cond,copy::action)
+        tr.actions <- copy :: tr.actions
       | Epsilon _ ->
         Aorai_option.fatal "Epsilon transition used as Call event"
     );
@@ -567,6 +577,13 @@ let check_one top info counter s =
           Kernel_function.pretty kf;
       Some (Logic_const.term (TLval (TResult rt,TNoOffset)) (Ctype rt))
     | ECOR _ | EReturn _ | EMulti | ENone -> None
+
+
+let find_metavar s metaenv =
+  try
+    Datatype.String.Map.find s metaenv
+  with Not_found ->
+    Aorai_option.abort "Metavariable %s not declared" s
 
 let find_in_env env counter s =
   let current, stack =
@@ -682,14 +699,17 @@ end
 
 module LTyping = Logic_typing.Make(C_logic_env)
 
-let type_expr env ?tr ?current e =
+let type_expr metaenv env ?tr ?current e =
   let loc = Cil_datatype.Location.unknown in
   let rec aux env cond e =
     match e with
-        PVar s ->
-          let var = find_in_env env current s in
-          env, var, cond
+      | PVar s ->
+        let var = find_in_env env current s in
+        env, var, cond
       | PPrm(f,x) -> find_prm_in_env env ?tr current f x
+      | PMetavar s ->
+        let var = Logic_const.tvar (Cil.cvar_to_lvar (find_metavar s metaenv)) in
+        env, var, cond
       | PCst (Logic_ptree.IntConstant s) ->
         let e = Cil.parseIntLogic ~loc s in
         env, e, cond
@@ -869,13 +889,13 @@ let type_expr env ?tr ?current e =
   in
   aux env TTrue e
 
-let type_cond needs_pebble env tr cond =
+let type_cond needs_pebble metaenv env tr cond =
   let current = if needs_pebble then Some tr.stop else None in
   let rec aux pos env =
     function
       | PRel(rel,e1,e2) ->
-        let env, e1, c1 = type_expr env ~tr ?current e1 in
-        let env, e2, c2 = type_expr env ~tr ?current e2 in
+        let env, e1, c1 = type_expr metaenv env ~tr ?current e1 in
+        let env, e2, c2 = type_expr metaenv env ~tr ?current e2 in
         let call_cond = if pos then tand c1 c2 else tor (tnot c1) (tnot c2) in
         let rel = TRel(Logic_typing.type_rel rel,e1,e2) in
         let cond = if pos then tand call_cond rel else tor call_cond rel in
@@ -885,20 +905,22 @@ let type_cond needs_pebble env tr cond =
       | POr(c1,c2) ->
         let env1, c1 = aux pos env c1 in
         let env2, c2 = aux pos env c2 in
-        merge_current_event env1 env2 c1 c2
+        let env, c = merge_current_event env1 env2 c1 c2 in
+        env, c
       | PAnd(c1,c2) ->
         let env, c1 = aux pos env c1 in
         let env, c2 = aux pos env c2 in
-        env, TAnd(c1,c2)
+        env, TAnd (c1,c2)
       | PNot c ->
-        let env, c = aux (not pos) env c in env, TNot c
+        let env, c = aux (not pos) env c in
+        env, TNot c
       | PCall (s,b) ->
         let kf =
           try Globals.Functions.find_by_name s
           with Not_found -> Aorai_option.abort "No such function: %s" s
         in
         let b =
-          Extlib.opt_map
+          Option.map
             (fun b ->
               let bhvs = Annotations.behaviors ~populate:false kf in
               try List.find (fun x -> x.b_name = b) bhvs
@@ -908,18 +930,24 @@ let type_cond needs_pebble env tr cond =
             b
         in
         if pos then
-          add_current_event
+          let env, c = add_current_event
             (ECall (kf, Cil_datatype.Varinfo.Hashtbl.create 3, tr)) env
             (TCall (kf,b))
-          else env, TCall (kf,b)
+          in
+          env, c
+        else
+          env, TCall (kf,b)
       | PReturn s ->
         let kf =
           try
             Globals.Functions.find_by_name s
           with Not_found -> Aorai_option.abort "No such function %s" s
         in
-        if pos then add_current_event (EReturn kf) env (TReturn kf)
-        else env, TReturn kf
+        if pos then
+          let env,c  = add_current_event (EReturn kf) env (TReturn kf) in
+          env, c
+        else
+          env, TReturn kf
   in
   aux true (ENone::env) cond
 
@@ -941,7 +969,7 @@ let add_if_needed states st =
   then st::states
   else states
 
-let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
+let rec type_seq default_state tr metaenv env needs_pebble curr_start curr_end seq =
   let loc = Cil_datatype.Location.unknown in
   match seq with
     | [] -> (* We identify start and end. *)
@@ -959,7 +987,7 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
       in
       let might_be_zero =
         is_opt ||
-          (match Extlib.the elt.min_rep with PCst _ -> false | _ -> true)
+          (match Option.get elt.min_rep with PCst _ -> false | _ -> true)
       in
       let at_most_one =
         is_opt &&
@@ -989,12 +1017,12 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
           | _ -> new_intermediate_state ()
       in
       Aorai_option.debug "Examining single elt:@\n%s -> %s:@[%a@]"
-        curr_start.name my_end.name Promelaoutput.print_seq_elt elt;
+        curr_start.name my_end.name Promelaoutput.Parsed.print_seq_elt elt;
       let guard_exit_loop env current counter =
         if is_opt then TTrue
         else
-          let e = Extlib.the elt.min_rep in
-          let _,e,_ = type_expr env ?current e in
+          let e = Option.get elt.min_rep in
+          let _,e,_ = type_expr metaenv env ?current e in
           (* If we have done at least the lower bound of cycles, we can exit
              the loop. *)
           TRel(Cil_types.Rle,e,counter)
@@ -1009,7 +1037,7 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
             let e = Logic_const.tint ~loc i in
             TRel(Cil_types.Rlt, counter, e)
           | Some e ->
-            let _,e,_ = type_expr env ?current e in
+            let _,e,_ = type_expr metaenv env ?current e in
             Max_value_counter.replace counter e;
             (* The counter is incremented after the test: it
                must be strictly less than the upper bound to enter
@@ -1023,16 +1051,18 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
             assert (elt.nested <> []);
             (* we don't have a completely empty condition. *)
             type_seq
-              default_state tr env needs_pebble curr_start my_end elt.nested
+              default_state tr metaenv env needs_pebble curr_start my_end elt.nested
           | Some cond ->
             let seq_start =
               match elt.nested with
                   [] -> my_end
                 | _ -> new_intermediate_state ()
             in
-            let trans_start = new_trans curr_start seq_start (Normal (TTrue,[]))
+            let trans_start = new_trans curr_start seq_start (Normal TTrue) []
             in
-            let inner_env, cond = type_cond needs_pebble env trans_start cond in
+            let inner_env, cond =
+              type_cond needs_pebble metaenv env trans_start cond
+            in
             let (env,states, seq_transitions, seq_end) =
               match elt.nested with
                 | [] -> inner_env, [], [], my_end
@@ -1040,15 +1070,15 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
                   let intermediate = new_intermediate_state () in
                   let (env, states, transitions, _, seq_end) =
                     type_seq
-                      default_state tr
+                      default_state tr metaenv
                       inner_env needs_pebble seq_start intermediate elt.nested
                   in env, states, transitions, seq_end
             in
             let states = add_if_needed states curr_start in
             let transitions = trans_start :: seq_transitions in
             (match trans_start.cross with
-                | Normal (conds,action) ->
-                  trans_start.cross <- Normal(tand cond conds,action)
+                | Normal conds ->
+                  trans_start.cross <- Normal (tand cond conds)
                 | Epsilon _ ->
                   Aorai_option.fatal
                     "Transition guard translated as epsilon transition");
@@ -1058,7 +1088,7 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
                 (env, states, transitions, curr_start, seq_end)
               | EReturn kf1 :: ECall (kf2,_,_) :: tl
                   when Kernel_function.equal kf1 kf2 ->
-                (tl, states, transitions, curr_start, seq_end)
+                  tl, states, transitions, curr_start, seq_end
               | (EReturn _ | ECOR _ ) :: _ ->
                     (* If there is as mismatch (e.g. Call f; Return g), it will
                        be caught later. There are legitimate situations for
@@ -1066,20 +1096,20 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
                        in a non-empty context in particular)
                      *)
                 (env, states, transitions, curr_start, seq_end)
-              | EMulti :: env ->
-                (env, states, transitions, curr_start, seq_end))
+              | EMulti :: env_tmp ->
+                env_tmp, states, transitions, curr_start, seq_end)
       in
       let loop_end = if has_loop then new_intermediate_state () else inner_end
       in
       let (_,oth_states,oth_trans,oth_start,_) =
-        type_seq default_state tr env needs_pebble loop_end curr_end seq
+        type_seq default_state tr metaenv env needs_pebble loop_end curr_end seq
       in
       let trans = inner_trans @ oth_trans in
       let states = List.fold_left add_if_needed oth_states inner_states in
       let auto = (inner_states,inner_trans) in
       if at_most_one then begin
         (* Just adds an epsilon transition from start to end *)
-        let opt = new_trans curr_start oth_start (Epsilon (TTrue,[])) in
+        let opt = new_trans curr_start oth_start (Epsilon TTrue) [] in
         env, states, opt::trans, curr_start, curr_end
       end
       else if has_loop then begin
@@ -1117,19 +1147,12 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
                 List.fold_left
                   (fun acc tr ->
                     let init_action = Counter_init (make_counter tr.stop) in
-                    let init_cross =
-                      match tr.cross with
-                        | Normal (cond, actions) ->
-                          Normal(cond, init_action :: actions)
-                        | Epsilon(cond, actions) ->
-                          Epsilon(cond, init_action :: actions)
-                    in
-                    Aorai_option.debug "New init trans %s -> %s: %a"
-                      st.name tr.stop.name
-                      print_epsilon_trans init_cross;
+                    let init_actions = init_action :: tr.actions in
                     let init_trans =
-                      new_trans st tr.stop init_cross
+                      new_trans st tr.stop tr.cross init_actions
                     in
+                    Aorai_option.debug "New init trans %a"
+                      print_eps_trans init_trans;
                     if at_most_one then init_trans :: acc
                     else begin
                       let st =
@@ -1141,24 +1164,22 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
                             (make_counter_term curr_start)
                         else TTrue
                       in
-                      let loop_action =
-                        if needs_counter then begin
+                      let loop_actions =
+                        if needs_counter then
                           let counter = make_counter curr_start in
-                          [ Counter_incr counter ]
-                        end else []
+                          Counter_incr counter :: tr.actions
+                        else tr.actions
                       in
                       let loop_cross =
                         match tr.cross with
-                          | Normal(cond, actions) ->
-                            Normal(tand loop_cond cond, loop_action @ actions)
-                          | Epsilon(cond, actions) ->
-                            Epsilon(tand loop_cond cond, loop_action @ actions)
+                        | Normal cond -> Normal (tand loop_cond cond)
+                        | Epsilon cond -> Epsilon (tand loop_cond cond)
                       in
-                      Aorai_option.debug "New loop trans %s -> %s: %a"
-                        inner_end.name tr.stop.name
-                      print_epsilon_trans loop_cross;
                       let loop_trans =
-                        new_trans inner_end tr.stop loop_cross in
+                        new_trans inner_end tr.stop loop_cross loop_actions
+                      in
+                      Aorai_option.debug "New loop trans %a"
+                        print_eps_trans loop_trans;
                       init_trans :: loop_trans :: acc
                     end)
                   oth_trans trans
@@ -1174,11 +1195,11 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
                       if needs_pebble then Some curr_start else None
                     in
                     let _,t,_ =
-                      type_expr env ?current (Extlib.the elt.min_rep)
+                      type_expr metaenv env ?current (Option.get elt.min_rep)
                     in
                     TRel (Cil_types.Req, t, Logic_const.tinteger ~loc 0)
                 in
-                let no_seq = new_trans st oth_start (Epsilon (zero_cond,[])) in
+                let no_seq = new_trans st oth_start (Epsilon zero_cond) [] in
                 no_seq :: loop_trans
               end else loop_trans
             in
@@ -1194,11 +1215,10 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
                 guard_exit_loop env st (make_counter_term curr_end)
               else TTrue
             in
-            let min_cond = Epsilon (min_cond,[]) in
-            Aorai_option.debug "New exit trans %s -> %s: %a"
-              inner_end.name oth_start.name
-              print_epsilon_trans min_cond;
-            let exit_trans = new_trans inner_end oth_start min_cond in
+            let min_cond = Epsilon min_cond in
+            let exit_trans = new_trans inner_end oth_start min_cond [] in
+            Aorai_option.debug "New exit trans %a"
+              print_eps_trans exit_trans;
             let trans = exit_trans :: trans @ oth_trans in
             states, trans
           end else begin
@@ -1214,7 +1234,7 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
                 List.fold_left
                   (fun acc tr ->
                     match tr.cross with
-                      | Normal (cond,_) | Epsilon (cond,_) ->
+                      | Normal cond | Epsilon cond ->
                         let cond = change_bound_var tr.stop st cond in
                         tor acc cond)
                   TFalse trans
@@ -1226,7 +1246,7 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
                 | _ ->
                   let reject = get_reject_state () in
                   let states = add_if_needed states reject in
-                  let trans = new_trans st reject (Normal(cond,[])) :: trans
+                  let trans = new_trans st reject (Normal cond) [] :: trans
                   in states, trans @ oth_trans
               )
             end
@@ -1241,6 +1261,13 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
         env, states, trans, curr_start, curr_end
       end else
         env, states, trans, curr_start, curr_end
+
+let type_action metaenv env = function
+| Metavar_assign (s, e) ->
+  let vi = find_metavar s metaenv in
+  let _, e, _ = type_expr metaenv env e in
+  (* TODO: check type assignability *)
+  Copy_value ((TVar (Cil.cvar_to_lvar vi), TNoOffset), e)
 
 let single_path (states,transitions as auto) tr =
   Aorai_option.Deterministic.get () ||
@@ -1258,7 +1285,7 @@ let find_otherwise_trans auto st =
   try let tr = List.find (fun x -> x.cross = Otherwise) trans in Some tr.stop
   with Not_found -> None
 
-let type_trans auto env tr =
+let type_trans auto metaenv env tr =
   let needs_pebble = not (single_path auto tr) in
   let has_siblings =
     match Path_analysis.get_transitions_of_state tr.start auto with
@@ -1269,15 +1296,26 @@ let type_trans auto env tr =
   in
   Aorai_option.debug
     "Analyzing transition %s -> %s: %a (needs pebble: %B)"
-    tr.start.name tr.stop.name Promelaoutput.print_parsed tr.cross needs_pebble;
+    tr.start.name tr.stop.name
+    Promelaoutput.Parsed.print_guard
+    tr.cross needs_pebble;
   match tr.cross with
     | Seq seq ->
       let default_state = find_otherwise_trans auto tr.start in
-      let has_default_state = Extlib.has_some default_state in
-      let _,states, transitions,_,_ =
-        type_seq has_default_state tr env needs_pebble tr.start tr.stop seq
+      let has_default_state = Option.is_some default_state in
+      let env,states, transitions,_,_ =
+        type_seq has_default_state tr metaenv env needs_pebble tr.start tr.stop seq
       in
-      let (states, transitions) =
+      (* Insert metavariable assignments for transitions to tr.stop *)
+      let meta_actions = List.map (type_action metaenv env) tr.actions in
+      let add_meta_actions t =
+        if Aorai_state.equal t.stop tr.stop then
+          { t with actions = t.actions @ meta_actions }
+        else
+          t
+      in
+      let transitions = List.map add_meta_actions transitions in    
+      let transitions =
         if List.exists (fun st -> st.multi_state <> None) states then begin
         (* We have introduced some multi-state somewhere, we have to introduce
            pebbles and propagate them from state to state. *)
@@ -1292,26 +1330,25 @@ let type_trans auto env tr =
               (fun trans ->
                 match trans.cross with
                   | Epsilon _ -> trans
-                  | Normal(cond,actions) ->
+                  | Normal _ ->
                     let (dest,d_aux) = memo_multi_state tr.stop in
                     let actions =
                       if tr.start.nums <> start.nums then begin
                         let src,s_aux = memo_multi_state tr.start in
-                        Pebble_move(dest,d_aux,src,s_aux) :: actions
+                        Pebble_move(dest,d_aux,src,s_aux) :: trans.actions
                       end else begin
                         let v = Cil.cvar_to_lvar count in
                         let incr = Counter_incr (TVar v, TNoOffset) in
                         let init = Pebble_init (dest, d_aux, v) in
-                        init::incr::actions
+                        init::incr::trans.actions
                       end
                     in
-                    { trans with
-                      cross = Normal(cond, actions) })
+                    { trans with actions })
               transitions
           in
-          states, transitions
+          transitions
         end else
-          states, transitions
+          transitions
       in
         (* For each intermediate state, add a transition
            to either the default state or a rejection state (in which we will
@@ -1326,8 +1363,8 @@ let type_trans auto env tr =
       in
       Aorai_option.debug "Resulting transitions:@\n%a"
           (Pretty_utils.pp_list ~sep:"@\n"
-             (fun fmt tr -> Format.fprintf fmt "%s -> %s:@[%a@]"
-               tr.start.name tr.stop.name print_epsilon_trans tr.cross))
+             (fun fmt tr -> Format.fprintf fmt "%a"
+               print_eps_trans tr))
           transitions;
         states, transitions, needs_default
     | Otherwise -> [],[], false (* treated directly by type_seq *)
@@ -1340,8 +1377,7 @@ let add_reject_trans auto intermediate_states =
     let cond =
       List.fold_left
         (fun acc tr ->
-          let cond,_ = tr.cross in
-          let cond = change_bound_var tr.stop st cond in
+          let cond = change_bound_var tr.stop st tr.cross in
           tor cond acc)
         TFalse my_trans
     in
@@ -1351,35 +1387,38 @@ let add_reject_trans auto intermediate_states =
       | _ ->
         Aorai_option.debug
           "Adding default transition %s -> %s: %a"
-          st.name reject_state.name Promelaoutput.print_condition cond;
-        states, new_trans st reject_state (cond,[]) :: trans
+          st.name reject_state.name Promelaoutput.Typed.print_condition cond;
+        states, new_trans st reject_state cond [] :: trans
   in
   List.fold_left treat_one_state auto intermediate_states
 
 let propagate_epsilon_transitions (states, _ as auto) =
-  let rec transitive_closure start (conds,actions) known_states curr =
+  let rec transitive_closure start conds actions known_states curr =
     let known_states = curr :: known_states in
     let trans = Path_analysis.get_transitions_of_state curr auto in
     List.fold_left
       (fun acc tr ->
         match tr.cross with
-          | Epsilon (cond,my_actions) ->
+          | Epsilon cond ->
             Aorai_option.debug "Treating epsilon trans %s -> %s"
               curr.name tr.stop.name;
             if List.exists (fun st -> st.nums = tr.stop.nums) known_states
             then acc
             else
               transitive_closure
-                start (tand cond conds, my_actions @ actions)
+                start (tand cond conds) (tr.actions @ actions)
                 known_states tr.stop @ acc
-          | Normal (cond, action) ->
+          | Normal cond ->
             Aorai_option.debug "Adding transition %s -> %s from epsilon trans"
               start.name tr.stop.name;
-            new_trans start tr.stop (tand cond conds,action @ actions) ::acc)
+            let tr =
+              new_trans start tr.stop (tand cond conds) (tr.actions @ actions)
+            in
+            tr :: acc)
       [] trans
   in
   let treat_one_state acc st =
-    acc @ transitive_closure st (TTrue,[]) [] st
+    acc @ transitive_closure st TTrue [] [] st
   in
   let trans = List.fold_left treat_one_state [] states in
   (states, trans)
@@ -1393,51 +1432,50 @@ let add_default_trans (states, transitions as auto) otherwise =
     let cond =
       List.fold_left
         (fun acc c ->
-          let (cond,_) = c.cross in
+          let cond = c.cross in
           Aorai_option.debug "considering trans %s -> %s: %a"
-            c.start.name c.stop.name Promelaoutput.print_condition cond;
+            c.start.name c.stop.name Promelaoutput.Typed.print_condition cond;
           let neg = tnot cond in
           Aorai_option.debug "negation: %a"
-            Promelaoutput.print_condition neg;
+            Promelaoutput.Typed.print_condition neg;
           Aorai_option.debug "acc: %a"
-            Promelaoutput.print_condition acc;
+            Promelaoutput.Typed.print_condition acc;
          let res = tand acc (tnot cond) in
           Aorai_option.debug "partial result: %a"
-            Promelaoutput.print_condition res;
+            Promelaoutput.Typed.print_condition res;
           res
         )
         TTrue
         my_trans
     in
     Aorai_option.debug "resulting transition: %a"
-      Promelaoutput.print_condition cond;
+      Promelaoutput.Typed.print_condition cond;
     let cond,_ = Logic_simplification.simplifyCond cond in
-    let new_trans = new_trans st tr.stop (cond,[]) in
+    let new_trans = new_trans st tr.stop cond [] in
     new_trans::acc
   in
   let transitions = List.fold_left add_one_trans transitions otherwise in
   states, transitions
 
-let type_cond_auto (st,tr as auto) =
-  let otherwise = List.filter (fun t -> t.cross = Otherwise) tr in
+let type_cond_auto auto =
+  let original_auto = auto in
+  let otherwise = List.filter (fun t -> t.cross = Otherwise) auto.trans in
   let add_if_needed acc st =
     if List.memq st acc then acc else st::acc
   in
   let type_trans (states,transitions,add_reject) tr =
-    let (intermediate_states, trans, needs_reject) = type_trans auto [] tr in
+    let (intermediate_states, trans, needs_reject) =
+      type_trans (auto.states,auto.trans) auto.metavariables [] tr
+    in
     Aorai_option.debug
       "Considering parsed transition %s -> %s" tr.start.name tr.stop.name;
     Aorai_option.debug
       "Resulting transitions:@\n%a@\nEnd of transitions"
-      (Pretty_utils.pp_list ~sep:"@\n"
-         (fun fmt tr ->
-           Format.fprintf fmt "%s -> %s: %a"
-             tr.start.name tr.stop.name print_epsilon_trans tr.cross))
-      trans;
+      (Pretty_utils.pp_list ~sep:"@\n" print_eps_trans) trans;
     let add_reject =
       if needs_reject then
-        (List.filter 
-           (fun x -> not (Aorai_state.equal tr.start x || 
+        (List.filter
+           (fun x -> not (Aorai_state.equal tr.start x ||
                             Aorai_state.equal tr.stop x))
            intermediate_states) @ add_reject
       else add_reject
@@ -1447,7 +1485,7 @@ let type_cond_auto (st,tr as auto) =
      add_reject)
   in
   let (states, trans, add_reject) =
-    List.fold_left type_trans (st,[],[]) tr
+    List.fold_left type_trans (auto.states,[],[]) auto.trans
   in
   let auto = propagate_epsilon_transitions (states, trans) in
   let auto = add_reject_trans auto add_reject in
@@ -1456,23 +1494,23 @@ let type_cond_auto (st,tr as auto) =
      must ensure that we use consecutive numbers starting from 0, or we'll
      have needlessly long arrays.
    *)
-  let (states, transitions as auto) =
+  let states, trans =
     match Reject_state.get_option () with
-      | Some state -> 
-          (states, (new_trans state state (TTrue,[])):: transitions)
+      | Some state ->
+          (states, new_trans state state TTrue [] :: transitions)
       | None -> auto
   in
+  let auto = { original_auto with states ; trans } in
   if Aorai_option.debug_atleast 1 then
-    Promelaoutput.output_dot_automata auto "aorai_debug_typed.dot";
+    Promelaoutput.Typed.output_dot_automata auto "aorai_debug_typed.dot";
   let (_,trans) =
     List.fold_left
       (fun (i,l as acc) t ->
-        let cond, action = t.cross in
-        let cond = fst (Logic_simplification.simplifyCond cond)
+        let cond = fst (Logic_simplification.simplifyCond t.cross)
         in match cond with
             TFalse -> acc
-          | _ -> (i+1,{ t with cross = (cond,action); numt = i } :: l))
-      (0,[]) transitions
+          | _ -> (i+1,{ t with cross = cond; numt = i } :: l))
+      (0,[]) trans
   in
   let _, states =
     List.fold_left
@@ -1487,29 +1525,52 @@ let type_cond_auto (st,tr as auto) =
         end else acc)
       (0,[]) states
   in
-   (List.rev states, List.rev trans)
+    { original_auto with states = List.rev states; trans = List.rev trans }
+
+
+(* Check Metavariable compatibility *)
+let checkMetavariableCompatibility auto =
+  let is_extended_trans trans =
+    match trans.cross with
+    | Otherwise -> false
+    | Seq [ elt ] ->
+      elt.nested <> [] || not (is_single elt)
+    | Seq _ -> true
+  in
+  let has_metavariables = not (Datatype.String.Map.is_empty auto.metavariables)
+  and deterministic = Aorai_option.Deterministic.get ()
+  and uses_extended_guards = List.exists is_extended_trans auto.trans in
+  if has_metavariables && (not deterministic || uses_extended_guards) then
+    Aorai_option.abort
+      "The use of metavariables is incompatible with non-deterministic \
+       automata, such as automa using extended transitions."
+
 
 (** Stores the buchi automaton and its variables and
     functions as it is returned by the parsing *)
 let setAutomata auto =
+  checkMetavariableCompatibility auto;
   let auto = type_cond_auto auto in
-  automata:=auto;
+  automata:=Some auto;
   check_states "typed automata";
   if Aorai_option.debug_atleast 1 then
-    Promelaoutput.output_dot_automata auto "aorai_debug_reduced.dot";
+    Promelaoutput.Typed.output_dot_automata auto "aorai_debug_reduced.dot";
   if (Array.length !cond_of_parametrizedTransitions) <
     (getNumberOfTransitions  ())
   then
     (* all transitions have a true parameterized guard, i.e. [[]] *)
     cond_of_parametrizedTransitions :=
-      Array.make (getNumberOfTransitions  ()) [[]]
+      Array.make (getNumberOfTransitions  ()) [[]] ;
+  Aorai_metavariables.checkInitialization auto ;
+  Aorai_metavariables.checkSingleAssignment auto
 
-let getState num = List.find (fun st -> st.nums = num) (fst !automata)
+let getState num =
+  List.find (fun st -> st.nums = num) (getAutomata ()).states
 
 let getStateName num = (getState num).name
 
 let getTransition num =
-  List.find (fun trans -> trans.numt = num) (snd !automata)
+  List.find (fun trans -> trans.numt = num) (getAutomata ()).trans
 
 (** Initializes some tables according to data from Cil AST. *)
 let setCData () =
@@ -1776,14 +1837,14 @@ let merge_bindings tbl1 tbl2 =
         | None, None -> None
         | Some tbl, None | None, Some tbl ->
             Some
-              (Cil_datatype.Term.Map.merge 
+              (Cil_datatype.Term.Map.merge
                  (merge_range loc) tbl (unchanged loc))
         | Some tbl1, Some tbl2 ->
           Some (Cil_datatype.Term.Map.merge (merge_range loc) tbl1 tbl2)
   in
   Cil_datatype.Term.Map.merge merge_vals tbl1 tbl2
 
-module End_state = 
+module End_state =
   Aorai_state.Map.Make(Datatype.Triple(Aorai_state.Set)(Aorai_state.Set)(Vals))
 
 type end_state = End_state.t
@@ -1805,7 +1866,7 @@ let pretty_end_state start fmt tbl =
         start.Promelaast.name stop.Promelaast.name;
       Aorai_state.Set.iter
         (fun state ->
-          Format.fprintf fmt "    %s -> %s@\n" 
+          Format.fprintf fmt "    %s -> %s@\n"
             start.Promelaast.name
             state.Promelaast.name)
         fst;
@@ -1850,7 +1911,7 @@ let included_state tbl1 tbl2 =
                 Cil_datatype.Term.Map.iter
                   (fun loc range1 ->
                     let range2 = Cil_datatype.Term.Map.find loc bindings2 in
-                    if not 
+                    if not
                       (included_range range1 range2) then raise Not_found)
                   bindings1)
               tbl1)
@@ -1860,7 +1921,7 @@ let included_state tbl1 tbl2 =
   with Not_found -> false
 
 let merge_end_state tbl1 tbl2 =
-  let merge_stop_state _ (fst1, last1, tbl1) (fst2, last2, tbl2) = 
+  let merge_stop_state _ (fst1, last1, tbl1) (fst2, last2, tbl2) =
     let fst = Aorai_state.Set.union fst1 fst2 in
     let last = Aorai_state.Set.union last1 last2 in
     let tbl = merge_bindings tbl1 tbl2 in
@@ -1872,12 +1933,12 @@ let merge_state tbl1 tbl2 =
   let merge_state _ = merge_end_state in
   Aorai_state.Map.merge (Extlib.merge_opt merge_state) tbl1 tbl2
 
-module Pre_state = 
+module Pre_state =
   Kernel_function.Make_Table
     (Case_state)
     (struct
         let name = "Data_for_aorai.Pre_state"
-        let dependencies = 
+        let dependencies =
           [ Ast.self; Aorai_option.Ya.self; Aorai_option.Ltl_File.self;
             Aorai_option.To_Buchi.self; Aorai_option.Deterministic.self ]
         let size = 17
@@ -1890,7 +1951,7 @@ let set_kf_init_state kf state =
 
 let dkey = Aorai_option.register_category "dataflow"
 
-let replace_kf_init_state kf state = 
+let replace_kf_init_state kf state =
   Aorai_option.debug ~dkey
     "Replacing pre-state of %a:@\n  @[%a@]"
     Kernel_function.pretty kf pretty_state state;
@@ -1901,12 +1962,12 @@ let get_kf_init_state kf =
     Pre_state.find kf
   with Not_found -> Aorai_state.Map.empty
 
-module Post_state = 
+module Post_state =
   Kernel_function.Make_Table
     (Case_state)
     (struct
         let name = "Data_for_aorai.Post_state"
-        let dependencies = 
+        let dependencies =
           [ Ast.self; Aorai_option.Ya.self; Aorai_option.Ltl_File.self;
             Aorai_option.To_Buchi.self; Aorai_option.Deterministic.self ]
         let size = 17
@@ -1973,26 +2034,26 @@ let get_loop_invariant_state stmt =
 
 let pretty_pre_state fmt =
   Pre_state.iter
-    (fun kf state -> 
+    (fun kf state ->
       Format.fprintf fmt "Function %a:@\n  @[%a@]@\n"
         Kernel_function.pretty kf pretty_state state)
 
 let pretty_post_state fmt =
   Post_state.iter
-    (fun kf state -> 
+    (fun kf state ->
       Format.fprintf fmt "Function %a:@\n  @[%a@]@\n"
         Kernel_function.pretty kf pretty_state state)
 
 let pretty_loop_init fmt =
   Loop_init_state.iter
-    (fun stmt state -> 
+    (fun stmt state ->
       let kf = Kernel_function.find_englobing_kf stmt in
       Format.fprintf fmt "Function %a, sid %d:@\n  @[%a@]@\n"
         Kernel_function.pretty kf stmt.sid pretty_state state)
 
 let pretty_loop_invariant fmt =
   Loop_invariant_state.iter
-    (fun stmt state -> 
+    (fun stmt state ->
       let kf = Kernel_function.find_englobing_kf stmt in
       Format.fprintf fmt "Function %a, sid %d:@\n  @[%a@]@\n"
         Kernel_function.pretty kf stmt.sid pretty_state state)
@@ -2006,18 +2067,19 @@ let debug_computed_state ?(dkey=dkey) () =
 (* ************************************************************************* *)
 
 let removeUnusedTransitionsAndStates () =
+  let auto = getAutomata () in
   (* Step 1 : computation of reached states and crossed transitions *)
   let treat_one_state state map set =
     Aorai_state.Map.fold
-      (fun state (fst, last, _) set -> 
-          Aorai_state.Set.add state 
+      (fun state (fst, last, _) set ->
+          Aorai_state.Set.add state
             (Aorai_state.Set.union last
                (Aorai_state.Set.union fst set)))
       map
       (Aorai_state.Set.add state set)
   in
   let reached _ state set = Aorai_state.Map.fold treat_one_state state set in
-  let init = Path_analysis.get_init_states (getAutomata ()) in
+  let init = Path_analysis.get_init_states (getGraph ()) in
   let reached_states = Pre_state.fold reached (Aorai_state.Set.of_list init) in
   let reached_states = Post_state.fold reached reached_states in
   let reached_states = Loop_init_state.fold reached reached_states in
@@ -2026,7 +2088,7 @@ let removeUnusedTransitionsAndStates () =
     raise Empty_automaton;
   (* Step 2 : computation of translation tables *)
   let state_list =
-    List.sort 
+    List.sort
       (fun x y -> Datatype.String.compare x.Promelaast.name y.Promelaast.name)
       (Aorai_state.Set.elements reached_states)
   in
@@ -2046,7 +2108,7 @@ let removeUnusedTransitionsAndStates () =
           (i+1,
            { trans with start = new_start; stop = new_stop; numt = i } :: list)
         with Not_found -> acc)
-      (0,[]) (snd (getAutomata()))
+      (0,[]) auto.trans
   in
   let state_list = List.map new_state state_list in
   Reject_state.may
@@ -2056,13 +2118,13 @@ let removeUnusedTransitionsAndStates () =
         Reject_state.set new_reject
       with Not_found -> Reject_state.clear ());
   (* Step 3 : rewriting stored information *)
-  automata:= (state_list,trans_list);
+  automata := Some { auto with states =state_list; trans = trans_list };
   check_states "reduced automata";
 
   let rewrite_state state =
     let rewrite_set set =
-      Aorai_state.Set.fold 
-        (fun s set -> Aorai_state.Set.add (new_state s) set) 
+      Aorai_state.Set.fold
+        (fun s set -> Aorai_state.Set.add (new_state s) set)
         set Aorai_state.Set.empty
     in
     let rewrite_bindings (fst_states, last_states, bindings) =
@@ -2084,7 +2146,7 @@ let removeUnusedTransitionsAndStates () =
   in
   Pre_state.iter (fun kf state -> Pre_state.replace kf (rewrite_state state));
   Post_state.iter (fun kf state -> Post_state.replace kf (rewrite_state state));
-  Loop_init_state.iter 
+  Loop_init_state.iter
     (fun s state -> Loop_init_state.replace s (rewrite_state state));
   Loop_invariant_state.iter
     (fun s state -> Loop_invariant_state.replace s (rewrite_state state))

@@ -36,3 +36,9 @@ void main() {
   float monef = minus_onef();
 }
 
+/*@ requires 0. == -f;
+    requires 0. == f + (-f);
+    requires 0. == -d;
+    requires 0. == d + (-d);
+*/
+void unop_coerce(float f, double d);

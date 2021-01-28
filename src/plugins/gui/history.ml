@@ -104,7 +104,7 @@ let set_display_elt_callback f = display_elt := f
 
 let show_current () =
   let h = CurrentHistory.get () in
-  Extlib.may !display_elt h.current;
+  Option.iter !display_elt h.current;
   CurrentHistory.set h
 
 let back () =
@@ -250,7 +250,7 @@ let translate_history_elt old_helt =
   in
   let open Pretty_source in
   let open Cil_datatype in
-  let global_Global g = Extlib.opt_map (fun x -> Global x) (global g) in
+  let global_Global g = Option.map (fun x -> Global x) (global g) in
   match old_helt with
   | Global old_g -> global_Global old_g
   | Localizable (PGlobal old_g) -> global_Global old_g

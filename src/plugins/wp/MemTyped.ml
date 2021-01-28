@@ -45,7 +45,7 @@ let datatype = "MemTyped"
 let hypotheses p = p
 let configure () =
   begin
-    let orig_pointer = Context.push Lang.pointer (fun _ -> t_addr) in
+    let orig_pointer = Context.push Lang.pointer t_addr in
     let orig_null    = Context.push Cvalues.null (p_equal a_null) in
     let rollback () =
       Context.pop Lang.pointer orig_pointer ;
@@ -200,23 +200,64 @@ let rec footprint = function
   | C_array a -> footprint (object_of a.arr_element)
   | C_comp c -> footprint_comp c
 
-and footprint_comp c =
-  List.fold_left
-    (fun ft f ->
-       Heap.Set.union ft (footprint (object_of f.ftype))
-    ) Heap.Set.empty c.cfields
+and footprint_comp { cfields } =
+  match cfields with
+  | None -> all_value_chunks ()
+  | Some fields ->
+      List.fold_left
+        (fun ft f ->
+           Heap.Set.union ft (footprint (object_of f.ftype))
+        ) Heap.Set.empty fields
+
+and all_value_chunks () =
+  let ints =
+    List.fold_left (fun l i -> M_int i :: l) []
+      [ Ctypes.CBool ;
+        SInt8 ; UInt8 ; SInt16 ; UInt16 ; SInt32 ; UInt32 ; SInt64 ; UInt64 ]
+  in
+  Heap.Set.of_list (M_pointer :: M_char :: M_f32 :: M_f64 :: ints)
 
 let init_footprint _ _ = Heap.Set.singleton T_init
 let value_footprint obj _l = footprint obj
 
+(* Note that it is the length in MemTyped and not the occupied bytes *)
+module OPAQUE_COMP_LENGTH = WpContext.Generator(Cil_datatype.Compinfo)
+    (struct
+      let name = "MemTyped.EmptyCompLength"
+      type key = compinfo
+      type data = lfun
+      let compile c =
+        if c.cfields <> None then
+          Wp_parameters.fatal
+            "Asking for opaque struct length on non opaque struct" ;
+        let result = Lang.t_int in
+        let size =
+          Lang.generated_f ~params:[] ~result "Length_of_%s" (Lang.comp_id c)
+        in
+        (* Registration *)
+        Definitions.define_symbol {
+          d_cluster = Definitions.compinfo c ;
+          d_lfun = size ; d_types = 0 ; d_params = [] ;
+          d_definition = Logic result ;
+        } ;
+        Definitions.define_lemma {
+          l_kind = `Axiom ;
+          l_name = "Positive_Length_of_" ^ Lang.comp_id c ;
+          l_types = 0 ; l_triggers = [] ; l_forall = [] ;
+          l_cluster = Definitions.compinfo c ;
+          l_lemma = Lang.F.(p_lt e_zero (e_fun size []))
+        } ;
+        size
+    end)
+
 let rec length_of_object = function
-  | C_int _ | C_float _ | C_pointer _ -> 1
+  | C_int _ | C_float _ | C_pointer _ -> e_one
   | C_comp c -> length_of_comp c
   | C_array { arr_flat = Some { arr_size = n } ; arr_element = elt } ->
-      n * (length_of_typ elt)
+      e_mul (e_int n) (length_of_typ elt)
   | C_array _ as a ->
       if Wp_parameters.ExternArrays.get () then
-        max_int
+        e_int max_int
       else
         Warning.error ~source:"Typed Model"
           "Undefined array-size (%a)" Ctypes.pretty a
@@ -224,18 +265,22 @@ let rec length_of_object = function
 and length_of_typ t = length_of_object (object_of t)
 and length_of_field f = length_of_typ f.ftype
 and length_of_comp c =
-  (* union field are considered as struct field *)
-  List.fold_left
-    (fun s f -> s + length_of_field f)
-    0 c.cfields
+  match c.cfields with
+  | None ->
+      Lang.F.e_fun (OPAQUE_COMP_LENGTH.get c) []
+  | Some fields ->
+      (* union field are considered as struct field *)
+      e_sum (List.map length_of_field fields)
 
 let position_of_field f =
   let rec fnext k f = function
     | [] -> assert false
     | g::gs ->
         if Fieldinfo.equal f g then k
-        else fnext (k + length_of_field g) f gs
-  in fnext 0 f f.fcomp.cfields
+        else fnext (e_add k (length_of_field g)) f gs
+        (* Just as we fail if the field does not exists, we fail
+           if we try to get a field position in an opaque struct. *)
+  in fnext e_zero f (Option.get f.fcomp.cfields)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Utilities on loc-as-term                                           --- *)
@@ -257,19 +302,19 @@ let cluster_globals () =
   Definitions.cluster ~id:"Globals" ~title:"Global Variables" ()
 
 type shift =
-  | RS_Field of fieldinfo * int (* offset of the field *)
-  | RS_Index of int  (* size of the shift *)
+  | RS_Field of fieldinfo * term (* offset of the field *)
+  | RS_Index of term  (* size of the shift *)
 
 let phi_base = function
   | p::_ -> a_base p
   | _ -> raise Not_found
 
 let phi_field offset = function
-  | [p] -> e_add (a_offset p) (F.e_int offset)
+  | [p] -> e_add (a_offset p) offset
   | _ -> raise Not_found
 
 let phi_index size = function
-  | [p;k] -> e_add (a_offset p) (F.e_fact size k)
+  | [p;k] -> e_add (a_offset p) (F.e_mul size k)
   | _ -> raise Not_found
 
 module RegisterShift = WpContext.Static
@@ -293,7 +338,7 @@ module ShiftFieldDef = WpContext.StaticGenerator(Cil_datatype.Fieldinfo)
         (* Since its a generated it is the unique name given *)
         let xloc = Lang.freshvar ~basename:"p" t_addr in
         let loc = e_var xloc in
-        let def = a_shift loc (F.e_int position) in
+        let def = a_shift loc position in
         let dfun = Definitions.Function( result , Def , def) in
         RegisterShift.define lfun (RS_Field(f,position)) ;
         MemMemory.register ~base:phi_base ~offset:(phi_field position) lfun ;
@@ -338,7 +383,7 @@ module ShiftGen = WpContext.StaticGenerator(Cobj)
         | C_int i -> pp_int fmt i
         | C_float f -> pp_float fmt f
         | C_pointer _ -> Format.fprintf fmt "PTR"
-        | C_comp c -> Format.pp_print_string fmt c.cname
+        | C_comp c -> Format.pp_print_string fmt (Lang.comp_id c)
         | C_array a ->
             let te = object_of a.arr_element in
             match a.arr_flat with
@@ -356,7 +401,7 @@ module ShiftGen = WpContext.StaticGenerator(Cobj)
         let loc = e_var xloc in
         let xk = Lang.freshvar ~basename:"k" Qed.Logic.Int in
         let k = e_var xk in
-        let def = a_shift loc (F.e_fact size k) in
+        let def = a_shift loc (F.e_mul size k) in
         let dfun = Definitions.Function( result , Def , def) in
         RegisterShift.define shift (RS_Index size) ;
         MemMemory.register ~base:phi_base ~offset:(phi_index size)
@@ -516,14 +561,14 @@ module BASE = WpContext.Generator(Varinfo)
 
       let linked prefix x base =
         let name = prefix ^ "_linked" in
-        let size = if x.vglob then sizeof x else Some 0 in
+        let size = if x.vglob then sizeof x else Some e_zero in
         match size with
         | None -> ()
         | Some size ->
             let a = Lang.freshvar ~basename:"alloc" t_malloc in
             let m = e_var a in
             let m_linked = p_call p_linked [m] in
-            let base_size = p_equal (F.e_get m base) (e_int size) in
+            let base_size = p_equal (F.e_get m base) size in
             Definitions.define_lemma {
               l_kind = `Axiom ;
               l_name = name ; l_types = 0 ;
@@ -538,10 +583,10 @@ module BASE = WpContext.Generator(Varinfo)
             let a = Lang.freshvar ~basename:"init" t_init in
             let m = e_var a in
             let init_access =
-              if size = 1 then
+              if size = e_one then
                 p_bool (F.e_get m (a_addr base e_zero))
               else
-                F.p_call p_is_init_r [ m ; a_addr base e_zero ; e_int size ]
+                F.p_call p_is_init_r [ m ; a_addr base e_zero ; size ]
             in
             let m_init = p_call p_cinits [m] in
             let init_prop = p_forall [a] (p_imply m_init init_access) in
@@ -600,7 +645,12 @@ let allocated sigma l = F.e_get (Sigma.value sigma T_alloc) (a_base l)
 let base_addr l = a_addr (a_base l) e_zero
 let base_offset l = a_base_offset (a_base l) (a_offset l)
 let block_length sigma obj l =
-  e_fact (Ctypes.sizeof_object obj) (allocated sigma l)
+  let n_cells = e_div (allocated sigma l) (length_of_object obj) in
+  match obj with
+  | C_comp ({ cfields = None } as c) ->
+      e_mul (Cvalues.bytes_length_of_opaque_comp c) n_cells
+  | _ ->
+      e_fact (Ctypes.sizeof_object obj) n_cells
 
 (* -------------------------------------------------------------------------- *)
 (* --- Cast                                                               --- *)
@@ -649,7 +699,7 @@ struct
     | C_int i -> A (I i)
     | C_float f -> A (F f)
     | C_pointer t -> A (P t)
-    | C_comp ( { cfields = [f] } as c ) ->
+    | C_comp ( { cfields = Some [f] } as c ) ->
         begin (* union having only one field is equivalent to a struct *)
           match Ctypes.object_of f.ftype with
           | C_array _ -> (if c.cstruct then S c else U c)
@@ -718,8 +768,12 @@ struct
   let layout (obj : c_object) : layout = rlayout [] obj
 
   let clayout (c: Cil_types.compinfo) : layout =
-    let flayout w f = rlayout w (Ctypes.object_of f.ftype) in
-    List.fold_left flayout [] (List.rev c.cfields)
+    match c.cfields with
+    | None ->
+        rlayout [] (C_comp c)
+    | Some fields ->
+        let flayout w f = rlayout w (Ctypes.object_of f.ftype) in
+        List.fold_left flayout [] (List.rev fields)
 
   type comparison = Srem of layout | Drem of layout | Equal | Mismatch
 
@@ -908,7 +962,7 @@ let int_of_loc _ l = F.e_fun f_int_of_addr [l]
 let frames obj addr = function
   | T_alloc -> []
   | m ->
-      let offset = F.e_int (length_of_object obj) in
+      let offset = length_of_object obj in
       let sizeof = F.e_one in
       let tau = Chunk.val_of_chunk m in
       let basename = Chunk.basename_of_chunk m in
@@ -985,21 +1039,21 @@ struct
 
   let last sigma obj l =
     let n = length_of_object obj in
-    e_sub (F.e_div (allocated sigma l) (F.e_int n)) e_one
+    e_sub (F.e_div (allocated sigma l) n) e_one
 
   let havoc obj loc ~length chunk ~fresh ~current =
     if chunk <> T_alloc then
-      let n = F.e_fact (length_of_object obj) length in
+      let n = F.e_mul (length_of_object obj) length in
       F.e_fun f_havoc [fresh;current;loc;n]
     else fresh
 
   let eqmem obj loc _chunk m1 m2 =
-    F.p_call p_eqmem [m1;m2;loc;e_int (length_of_object obj)]
+    F.p_call p_eqmem [m1;m2;loc;length_of_object obj]
 
   let eqmem_forall obj loc _chunk m1 m2 =
     let xp = Lang.freshvar ~basename:"p" t_addr in
     let p = F.e_var xp in
-    let n = F.e_int (length_of_object obj) in
+    let n = length_of_object obj in
     let separated = F.p_call p_separated [p;e_one;loc;n] in
     let equal = p_equal (e_get m1 p) (e_get m2 p) in
     [xp],separated,equal
@@ -1014,11 +1068,11 @@ struct
   let is_init_atom sigma l = F.e_get (Sigma.value sigma T_init) l
 
   let is_init_range sigma obj loc length =
-    let n = F.e_fact (length_of_object obj) length in
+    let n = F.e_mul (length_of_object obj) length in
     F.p_call p_is_init_r [ Sigma.value sigma T_init ; loc ; n ]
 
   let set_init obj loc ~length _chunk ~current =
-    let n = F.e_fact (length_of_object obj) length in
+    let n = F.e_mul (length_of_object obj) length in
     F.e_fun f_set_init [current;loc;n]
 
   let monotonic_init s1 s2 =
@@ -1053,7 +1107,7 @@ let loc_lt = loc_compare p_addr_lt p_lt
 let loc_leq = loc_compare p_addr_le p_leq
 let loc_diff obj p q =
   let delta = e_sub (a_offset p) (a_offset q) in
-  let size = e_int (length_of_object obj) in
+  let size = length_of_object obj in
   e_div delta size
 
 (* -------------------------------------------------------------------------- *)
@@ -1073,10 +1127,10 @@ let s_invalid sigma p n =
 
 let segment phi = function
   | Rloc(obj,l) ->
-      phi l (e_int (length_of_object obj))
+      phi l (length_of_object obj)
   | Rrange(l,obj,Some a,Some b) ->
       let l = shift l obj a in
-      let n = e_fact (length_of_object obj) (e_range a b) in
+      let n = e_mul (length_of_object obj) (e_range a b) in
       phi l n
   | Rrange(l,_,a,b) ->
       Wp_parameters.abort ~current:true
@@ -1106,9 +1160,9 @@ let scope seq scope xs =
       List.fold_left
         (fun m x ->
            let size = match scope with
-             | Sigs.Leave -> 0
+             | Sigs.Leave -> e_zero
              | Sigs.Enter -> length_of_typ x.vtype
-           in F.e_set m (BASE.get x) (e_int size))
+           in F.e_set m (BASE.get x) size)
         (Sigma.value seq.pre T_alloc) xs in
     [ p_equal (Sigma.value seq.post T_alloc) alloc ]
 

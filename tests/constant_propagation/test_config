@@ -1,2 +1,8 @@
+<<<<<<< HEAD
 PLUGIN: constant_propagation @PLUGIN@
 OPT: -journal-disable -scf @EVA_OPTIONS@ -machdep x86_32
+||||||| ac7807782d
+OPT: -journal-disable -scf @EVA_OPTIONS@
+=======
+OPT: -journal-disable -scf @EVA_OPTIONS@ -machdep x86_32
+>>>>>>> origin/master
