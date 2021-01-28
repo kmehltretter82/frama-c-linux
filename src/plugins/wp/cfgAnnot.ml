@@ -137,12 +137,30 @@ let get_precond_at kf stmt (id,p) =
   let id_at = WpPropId.mk_call_pre_id kf stmt pi pi_at in
   id_at , p
 
+let assigns_upper_bound behaviors =
+  let collect_assigns (def, assigns) bhv =
+    (* Default behavior prevails *)
+    if Cil.is_default_behavior bhv then Some bhv.b_assigns, None
+    else if Option.is_some def then def, None
+    else begin
+      (* Note that here, def is None *)
+      match assigns, bhv.b_assigns with
+      | None, a -> None, Some a
+      | Some WritesAny, _ | Some _, WritesAny -> None, Some WritesAny
+      | Some (Writes a), Writes b -> None, Some (Writes (a @ b))
+    end
+  in
+  match List.fold_left collect_assigns (None, None) behaviors with
+  | Some a, _ -> a (* default behavior first *)
+  | _, Some a -> a (* else combined behaviors *)
+  | _ -> WritesAny
+
 let get_call_contract kf =
   let cpre : WpPropId.pred_info list ref = ref [] in
   let cpost : WpPropId.pred_info list ref = ref [] in
   let cexit : WpPropId.pred_info list ref = ref [] in
-  let cwrites = ref [] in
   let add c f x = c := (f x) :: !c in
+  let behaviors = Annotations.behaviors kf in
   setup_preconditions kf ;
   List.iter
     begin fun bhv ->
@@ -153,20 +171,14 @@ let get_call_contract kf =
       List.iter (add cpre @@ mk_pre) bhv.b_requires ;
       List.iter
         (fun (tk,ip) ->
-           add (if tk = Returns then cpost else cexit) (mk_post tk) ip
+           add (if tk = Normal then cpost else cexit) (mk_post tk) ip
         ) bhv.b_post_cond ;
-      match bhv.b_assigns with
-      | WritesAny -> ()
-      | Writes froms ->
-          let assigns = normalize_froms kf Kglobal froms in
-          cwrites := List.rev_append assigns !cwrites ;
-    end (Annotations.behaviors kf) ;
+    end behaviors ;
   {
     call_pre = List.rev !cpre ;
     call_post = List.rev !cpost ;
     call_exit = List.rev !cexit ;
-    call_assigns =
-      match List.rev !cwrites with [] -> WritesAny | ws -> Writes ws ;
+    call_assigns = assigns_upper_bound behaviors
   }
 
 (* -------------------------------------------------------------------------- *)
