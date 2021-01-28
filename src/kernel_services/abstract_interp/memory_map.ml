@@ -20,11 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-[@@@warning "-60"] (* unused module ; to be removed once ocaml is patched *)
-[@@@warning "-37"] (* constructor never used to build values. *)
-[@@@warning "-32"] (* unused value *)
+(* Ocaml compiler incorrectly considers that module MemorySafe is unused and
+   emits a warning *)
+[@@@warning "-60"]
 
-exception Not_implemented
+open Abstract_offset
 
 type size = Integer.t
 
@@ -121,15 +121,9 @@ sig
 end
 
 
-type typed_offset =
-  | NoOffset of Cil_types.typ
-  | Index of Ival.t * Cil_types.typ * typed_offset
-  | Field of Cil_types.fieldinfo * typed_offset
-
-
-module MakeTyped (Config : Config) (Value : Value) =
+module Make (Config : Config) (Value : Value) =
 struct
-  type location = typed_offset
+  type location = Abstract_offset.typed_offset
   type value = Value.t
 
   type 'fieldmap memory' =
@@ -327,36 +321,7 @@ struct
 
   let is_top m =
     m = top
-(*
-  let std_compare =
 
-  let are_typ_compatible t1 2 =
-    match Cil.unrollType t1, Cil.unrollType t2 with
-    | TVoid _a1, TVoid _a2 -> true
-    | TInt (i1, _a1), TInt (i2, _a2) -> i1 = i2
-    | TFloat (f1, _a1), TFloat (f2, _a2) -> f1 = f2
-    | TPtr _, TPtr _ -> true
-    | TArray (t1, _size, _, _a1), TArray (t2, e2, _, _a2) ->
-      are_typ_compatible t1 t2
-    | TFun _, TFun _ -> true
-    | TComp (c1, _, _a1), TComp (c2, _, _a2) ->
-      c1.ckey = c2.ckey
-      in
-      if res <> 0 then res
-      else compare_attributes config _a1 _a2
-    | TEnum (e1, _a1), TEnum (e2, _a2) ->
-      compare_chain
-        (=?=) e1.ename e2.ename
-        (compare_attributes config) _a1 _a2
-    | TBuiltin_va_list _a1, TBuiltin_va_list _a2 ->
-      compare_attributes config _a1 _a2
-    | (TVoid _ | TInt _ | TFloat _ | TPtr _ | TArray _ | TFun _ | TNamed _ |
-       TComp _ | TEnum _ | TBuiltin_va_list _ as a1), a2 ->
-      index_typ a1 - index_typ a2
-
-  let match_array celltyp = function
-    |
-*)
   let typ_size t =
     Integer.of_int (Cil.bitsSizeOf t)
 
@@ -382,9 +347,6 @@ struct
 
   let typ_size t =
     Integer.of_int (Cil.bitsSizeOf t)
-
-  let type_range t =
-    Ival.inject_range (Some Integer.zero) (Some (typ_size t))
 
   let is_included =
     let rec is_included m1 m2 = match m1, m2 with

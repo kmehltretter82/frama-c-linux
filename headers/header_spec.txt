@@ -437,6 +437,8 @@ src/kernel_services/README.md: .ignore
 src/kernel_services/abstract_interp/README.md: .ignore
 src/kernel_services/abstract_interp/abstract_interp.ml: CEA_LGPL
 src/kernel_services/abstract_interp/abstract_interp.mli: CEA_LGPL
+src/kernel_services/abstract_interp/abstract_offset.ml: CEA_LGPL
+src/kernel_services/abstract_interp/abstract_offset.mli: CEA_LGPL
 src/kernel_services/abstract_interp/base.ml: CEA_LGPL
 src/kernel_services/abstract_interp/base.mli: CEA_LGPL
 src/kernel_services/abstract_interp/bottom.ml: CEA_LGPL

@@ -23,9 +23,6 @@
 open Cil_types
 open Eval
 
-[@@@warning "-60"] (* unused module *)
-[@@@warning "-32"] (* unused value *)
-
 let dkey = Value_parameters.register_category "d-multidim"
 
 let map_to_singleton map =
@@ -81,226 +78,20 @@ let find_builtin =
     with Not_found -> None
 
 
-module MultidimOffset =
-struct
-  include Multidim
-
-  let field fi x =
-    let field_offset, field_size = Cil.fieldBitsOffset fi in
-    add_int x field_offset, Integer.of_int field_size
-
-  let index elem_typ index x =
-    let elem_size = Integer.of_int (Cil.bitsSizeOf elem_typ) in
-    add x (mul_integer index elem_size), elem_size
-
-  let rec of_exp oracle = function
-    | { Cil_types.enode=BinOp (PlusA,e1,e2,_typ) } ->
-      add (of_exp oracle e1) (of_exp oracle e2)
-    | { enode=BinOp (Mult,e1,e2,_typ) } ->
-      mul (of_exp oracle e1) (of_exp oracle e2)
-    | { enode=BinOp (Shiftlt,e1,e2,_typ) } as expr ->
-      begin match oracle e2 with
-        | (i,[]) -> mul_integer (of_exp oracle e1) (Integer.two_power i)
-        | _ -> oracle expr (* default to oracle *)
-      end
-    | expr -> oracle expr (* default to oracle *)
-
-  let assert_valid_size idx _array_size =
-    idx
-
-  let of_offset oracle base_typ offset =
-    let rec aux base_typ base_size x = function
-      | Cil_types.NoOffset -> x, base_size
-      | Field (fi, sub) ->
-        let x', size = field fi x in
-        aux fi.ftype size x' sub
-      | Index (exp, sub) ->
-        match base_typ with
-        | TArray (elem_typ, array_size, _, _) ->
-          let idx = of_exp oracle exp in
-          let idx = assert_valid_size idx array_size in
-          let x', elem_size = index elem_typ idx x in
-          aux elem_typ elem_size x' sub
-        | _ -> assert false (* Index is only valid on arrays *)
-    in
-    let base_size = Integer.of_int (Cil.bitsSizeOf base_typ) in
-    aux base_typ base_size zero offset
-end
-
-(* Multidim adresses building from valuation *)
-
-module MultidimLocation =
-struct
-  module Map = Base.Base.Map
-
-  type size = Integer.t
-  type offset = MultidimOffset.t
-  type t = offset Map.t * size
-
-  let size ((_map,size) : t) : size =
-    size
-
-  let fold f ((map,size):t) x =
-    Map.fold (fun base offset -> f base (offset,size)) map x
-
-  (* Raises Abstract_domain.{Error_top,Error_bottom} *)
-  let of_lval oracle ((host,offset) : Cil_types.lval) =
-    let oracle' expr =
-      try MultidimOffset.of_ival (Value.project_ival (oracle expr))
-      with Value.Not_based_on_null -> raise Abstract_interp.Error_Top
-    in
-    let base_typ = Cil.typeOfLhost host in
-    let offset, size = MultidimOffset.of_offset oracle' base_typ offset in
-    let map = match host with
-      | Var vi ->
-        Map.singleton (Base.of_varinfo vi) offset
-      | Mem exp ->
-        let add b o map =
-          Map.add b MultidimOffset.(add (of_ival o) offset) map
-        in
-        Locations.Location_Bytes.fold_topset_ok add (oracle exp) Map.empty
-    in
-    map, size
-
-  let is_singleton (map,_) =
-    match map_to_singleton map with
-    | None -> false
-    | Some (b,o) -> not (Base.is_weak b) && MultidimOffset.is_singleton o
-end
-
-
-module Offset =
-struct
-  open Memory_map
-  type t = [ `Value of typed_offset | `Top ]
-
-  let append o1 o2 =
-    let rec aux o1 o2 =
-      match o1 with
-      | NoOffset _t -> o2
-      | Field (fi, s) -> Field (fi, aux s o2)
-      | Index (i, t, s) -> Index (i, t, aux s o2)
-    in
-    match o1, o2 with
-    | `Top, _ | _, `Top -> `Top
-    | `Value o1, `Value o2 -> `Value (aux o1 o2)
-
-  let join o1 o2 =
-    let rec aux o1 o2 =
-      match o1, o2 with
-      | NoOffset t, NoOffset t' when Cil_datatype.Typ.equal t t' ->
-        NoOffset t
-      | Field (fi, s1), Field (fi', s2) when Cil_datatype.Fieldinfo.equal fi fi' ->
-        Field (fi, aux s1 s2)
-      | Index (i1, t, s1), Index (i2, t', s2) when Cil_datatype.Typ.equal t t' ->
-        Index (Ival.join i1 i2, t, aux s1 s2)
-      | _ -> raise Abstract_interp.Error_Top
-    in
-    match o1, o2 with
-    | `Top, _ | _, `Top -> `Top
-    | `Value o1, `Value o2 ->
-      try `Value (aux o1 o2) with Abstract_interp.Error_Top -> `Top
-
-  let assert_valid_size idx _array_size =
-    idx
-
-  let of_offset oracle base_typ offset =
-    (* Temorary debug *)
-    let rec aux base_typ = function
-      | Cil_types.NoOffset -> NoOffset base_typ
-      | Field (fi, sub) -> Field (fi, aux fi.ftype sub)
-      | Index (exp, sub) ->
-        match Cil.unrollType base_typ with
-        | TArray (elem_typ, array_size, _, _) ->
-          let idx =
-            try Value.project_ival (oracle exp)
-            with Value.Not_based_on_null -> raise Abstract_interp.Error_Top
-          in
-          let idx = assert_valid_size idx array_size in
-          Index (idx, elem_typ, aux elem_typ sub)
-        | _ -> assert false
-    in
-    try `Value (aux base_typ offset) with Abstract_interp.Error_Top -> `Top
-
-  let of_bits_offset base_typ typ i =
-    try
-      let offset, _t = Bit_utils.(find_offset base_typ i (MatchType typ)) in
-      (* typ and _t may be different *)
-      of_offset no_oracle base_typ offset
-    with Bit_utils.NoMatchingOffset ->
-      `Top
-
-  let of_ival base_typ typ ival =
-    match Ival.cardinal ival with
-    | Some c when Integer.(lt c (of_int 100)) ->
-      let f i acc =
-        let offset = of_bits_offset base_typ typ i in
-        match acc with
-        | `Bottom -> offset
-        | #t as prev -> join prev offset
-      in
-      begin match Ival.fold_int f ival `Bottom with
-        | `Bottom -> assert false (* ival should not be bottom *)
-        | #t as o -> o
-      end
-
-    | _ ->
-      Value_parameters.feedback ~dkey ~current:true ~once:true
-        "too many values to convert cvalues to multidim offset";
-      `Top
-
-  let index_of_term t =
-    match t.term_node with
-    | Tempty_set -> Ival.bottom
-    | TConst (Integer (v, _)) -> Ival.inject_singleton v
-    | Trange (l,u) ->
-      let eval_bound = function
-        | { term_node=TConst (Integer (v, _)) } -> v
-        | _ -> raise Abstract_interp.Error_Top
-      in
-      let l' = Option.map eval_bound l
-      and u' = Option.map eval_bound u in
-      Ival.inject_range l' u'
-    | _ -> raise Abstract_interp.Error_Top
-
-  let of_term_offset base_typ offset =
-    let rec aux base_typ = function
-      | Cil_types.TNoOffset -> NoOffset base_typ
-      | TField (fi, sub) ->
-        Field (fi, aux fi.ftype sub)
-      | TIndex (index, sub) ->
-        begin match Cil.unrollType base_typ with
-          | TArray (elem_typ, array_size, _, _) ->
-            let idx = index_of_term index in
-            let idx = assert_valid_size idx array_size in
-            Index (idx, elem_typ, aux elem_typ sub)
-          | _ -> assert false
-        end
-      | _ -> raise Abstract_interp.Error_Top
-    in
-    try `Value (aux base_typ offset) with Abstract_interp.Error_Top -> `Top
-
-  let is_singleton =
-    let rec aux = function
-      | NoOffset _ -> true
-      | Field (_fi, sub) -> aux sub
-      | Index (ival, _elem_typ, sub) ->
-        Ival.is_singleton_int ival && aux sub
-    in function
-      | `Top -> false
-      | `Value o -> aux o
-end
-
 module Location =
 struct
+  open Abstract_offset
+
+  module Offset = TypedOffsetOrTop
   module Map = Base.Base.Map
 
   type offset = Offset.t
+  type base = Base.t
   type t = offset Map.t
 
   let empty = Map.empty
 
-  let fold = Map.fold
+  let fold : (base-> offset -> 'a -> 'a) -> t -> 'a -> 'a = Map.fold
 
   let is_singleton map =
     match map_to_singleton map with
@@ -310,8 +101,12 @@ struct
 
   (* Raises Abstract_domain.{Error_top,Error_bottom} *)
   let of_lval oracle ((host,offset) as lval : Cil_types.lval) : t =
+    let oracle' exp =
+      try Value.project_ival (oracle exp)
+      with Value.Not_based_on_null -> Ival.top
+    in
     let base_typ = Cil.typeOfLhost host in
-    let offset : Offset.t = Offset.of_offset oracle base_typ offset in
+    let offset = Offset.of_cil_offset oracle' base_typ offset in
     match host with
     | Var vi ->
       Map.singleton (Base.of_varinfo vi) offset
@@ -349,7 +144,7 @@ struct
     let add_base base map =
       (* Null base doesn't have a type ; use void instead *)
       let typ = Option.value ~default:Cil.voidType (Base.typeof base) in
-      Map.add base (`Value Memory_map.(NoOffset typ)) map
+      Map.add base (`Value (NoOffset typ)) map
     in
     Locations.Location_Bits.(fold_bases add_base loc'.loc empty)
 end
@@ -360,7 +155,7 @@ end
 module Base_Domain =
 struct
   module Config = struct let deps = [Ast.self] end
-  module Memory = Memory_map.MakeTyped (Config) (Value)
+  module Memory = Memory_map.Make (Config) (Value)
 
   module Prototype =
   (* Datatype *)
@@ -441,7 +236,7 @@ struct
 end
 
 
-module Prototype =
+module DomainPrototype =
 struct
   (* The domain is essentially a map from bases to individual memory abstractions *)
   module Initial_Values = struct let v = [] end
@@ -635,20 +430,21 @@ struct
     | `Value {value={v=`Bottom}} -> raise Abstract_interp.Error_Bottom
     | `Value {value={v=`Value value}} -> value
 
-  let assume_exp valuation expr record state =
+  let assume_exp _valuation _expr _record state = (*
     let oracle = make_oracle valuation in
     try
       match expr.enode, record.value.v with
       | Lval lv, `Value value ->
         let loc = Location.of_lval oracle lv in
+        let update value' = `Value (Value.narrow value value') in
         if Location.is_singleton loc
-        then store state loc value
+        then update_loc update loc state
         else state
       | _, `Bottom -> state (* Indeterminate value, ignore *)
       | _ -> state
     with
     (* Failed to evaluate the location *)
-      Abstract_interp.Error_Top | Abstract_interp.Error_Bottom -> state
+      Abstract_interp.Error_Top | Abstract_interp.Error_Bottom -> *) state
 
   let assume_valuation valuation state =
     valuation.Abstract_domain.fold (assume_exp valuation) state
@@ -799,4 +595,4 @@ struct
 end
 
 
-include Domain_builder.Complete (Prototype)
+include Domain_builder.Complete (DomainPrototype)

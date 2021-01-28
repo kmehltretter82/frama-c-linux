@@ -104,11 +104,6 @@ sig
   val pretty : Format.formatter -> t -> unit
 end
 
-type typed_offset =
-  | NoOffset of Cil_types.typ
-  | Index of Ival.t * Cil_types.typ * typed_offset
-  | Field of Cil_types.fieldinfo * typed_offset
-
-module MakeTyped (Config : Config) (Value : Value) : T
+module Make (Config : Config) (Value : Value) : T
   with type value = Value.t
-   and type location = typed_offset
+   and type location = Abstract_offset.typed_offset

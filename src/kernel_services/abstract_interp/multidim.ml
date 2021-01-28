@@ -29,26 +29,26 @@ module Term =
 struct
   type t = Integer.t * Integer.t
 
-  let pretty fmt (d,b) =
+  let pretty fmt (d,b : t) =
     Format.fprintf fmt "%a×[..%a]" pretty_int d pretty_int b
 
-  let order (d1,_b1) (d2,_b2) = (* descending order *)
+  let order (d1,_b1 : t) (d2,_b2 : t) = (* descending order *)
     Integer.compare d2 d1
 
   (* Keep the same interval but change the dimension (leading to
      over-approximation, hence coarcer abstraction). This might
      produce two terms instead of one *)
-  let coarsen (d,b) d' =
+  let coarsen (d,b : t) (d' : Integer.t) =
     (* d×[0,b] -> (d'q + r)×[0,b] -> d'×[0,qb] + r×[0,b] *)
     let q,r = Integer.e_div_rem d d' in
     if Integer.is_zero r
     then [ (d', Integer.mul q b) ]
     else [ (d', Integer.mul q b) ; (r,b) ]
 
-  let mul (d1,b1) (d2,b2) =
+  let mul (d1,b1 : t) (d2,b2 : t) =
     Integer.mul d1 d2, Integer.mul b1 b2
 
-  let mul_integer i (d,b) =
+  let mul_integer (i : Integer.t) (d,b : t) =
     Integer.mul d i, b
 end
 
@@ -201,3 +201,35 @@ let mod_integer (o,sum) i =
 
 let mod_int x i =
   mod_integer x (Integer.of_int i)
+
+(* Conversion from Cil *)
+
+let rec of_exp oracle = function
+  | { Cil_types.enode=BinOp (PlusA,e1,e2,_typ) } ->
+    add (of_exp oracle e1) (of_exp oracle e2)
+  | { enode=BinOp (Mult,e1,e2,_typ) } ->
+    mul (of_exp oracle e1) (of_exp oracle e2)
+  | { enode=BinOp (Shiftlt,e1,e2,_typ) } as expr ->
+    begin match oracle e2 with
+      | (i,[]) -> mul_integer (of_exp oracle e1) (Integer.two_power i)
+      | _ -> oracle expr (* default to oracle *)
+    end
+  | expr -> oracle expr (* default to oracle *)
+
+let of_offset oracle base_typ offset =
+  let rec aux base_typ base_size x = function
+    | Cil_types.NoOffset -> x, base_size
+    | Field (fi, sub) ->
+      let field_offset, field_size = Cil.fieldBitsOffset fi in
+      aux fi.ftype (Integer.of_int field_size) (add_int x field_offset) sub
+    | Index (exp, sub) ->
+      match base_typ with
+      | TArray (elem_typ, _array_size, _, _) ->
+        let idx = of_exp oracle exp in
+        let elem_size = Integer.of_int (Cil.bitsSizeOf elem_typ) in
+        let x' = add x (mul_integer idx elem_size) in
+        aux elem_typ elem_size x' sub
+      | _ -> assert false (* Index is only valid on arrays *)
+  in
+  let base_size = Integer.of_int (Cil.bitsSizeOf base_typ) in
+  fst (aux base_typ base_size zero offset)

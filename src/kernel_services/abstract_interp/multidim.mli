@@ -75,3 +75,8 @@ val mul_integer : t -> Integer.t -> t
 
 val mod_int : t -> int -> t
 val mod_integer : t -> Integer.t -> t
+
+(* Conversion from Cil *)
+
+val of_exp : (Cil_types.exp -> t) -> Cil_types.exp -> t (* improves over an oracle *)
+val of_offset : (Cil_types.exp -> t) -> Cil_types.typ -> Cil_types.offset -> t
