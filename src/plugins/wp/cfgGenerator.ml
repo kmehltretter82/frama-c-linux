@@ -65,7 +65,7 @@ let apply task ~kf ?bhvs ?prop () =
     List.iter (fun bhv ->
         task.modes <- { kf ; bhv } :: task.modes
       ) bhvs ;
-    Extlib.may (fun ip -> task.props <- `PropId ip) prop ;
+    Option.iter (fun ip -> task.props <- `PropId ip) prop ;
   end
 
 let notyet prop =

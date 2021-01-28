@@ -305,7 +305,7 @@ let build_automaton ~annotations kf =
   in
   let build_stmt_transition src dest stmt succ transition =
     ignore (build_stmt_next src dest stmt succ transition) in
-  
+
   let rec do_list do_one control labels = function
     | [] -> assert false
     | stmt :: [] -> do_one control labels stmt
