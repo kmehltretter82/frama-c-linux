@@ -257,7 +257,7 @@ and pall_fields_pred ?loc ?(flex_mem_len=None) depth t1 ci pred =
     | [ x ] -> [ eq flex_mem_len x ]
     | x :: l -> let x' = eq None x in x' :: (eqs_fields l)
   in
-  pands (eqs_fields ci.cfields)
+  pands (eqs_fields (Option.get ci.cfields))
 
 let punfold_flexible_struct_pred ?loc the_struct bytes_len pred =
   let struct_len = tinteger ?loc (sizeof the_struct.term_type) in
@@ -265,7 +265,7 @@ let punfold_flexible_struct_pred ?loc the_struct bytes_len pred =
     | Ctype(TComp(ci, _, _) as t) when Cil.has_flexible_array_member t -> ci
     | _ -> Options.fatal "Unfolding flexible on a non flexible structure"
   in
-  let flex_type = Ctype (Extlib.last ci.cfields).ftype in
+  let flex_type = Ctype (Extlib.last (Option.get ci.cfields)).ftype in
   let flex_len = tminus bytes_len struct_len in
   let pall_fields_pred len =
     pall_fields_pred ?loc ~flex_mem_len:(Some len) 0 the_struct ci pred

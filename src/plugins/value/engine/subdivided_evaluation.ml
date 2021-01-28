@@ -231,7 +231,9 @@ let compare_bound ival_compare_bound v1 v2 =
       let f1 = Cvalue.V.project_ival v1 in
       let f2 = Cvalue.V.project_ival v2 in
       ival_compare_bound f1 f2
-    with Cvalue.V.Not_based_on_null -> assert false
+    (* Cannot compare pointers. This case can however happens on subdivisions
+       of a pointer subexpression to reduce a bigger numeric expression. *)
+    with Cvalue.V.Not_based_on_null -> 0
 
 let has_greater_min_bound = compare_bound Ival.has_greater_min_bound
 let has_smaller_max_bound = compare_bound Ival.has_smaller_max_bound

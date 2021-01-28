@@ -198,6 +198,7 @@ class mkcomposer
           Wutil.on filter (fun f -> wvalid <- f) ;
           Wutil.on range (fun r -> ranged <- r) ;
           ignore vmin ; ignore vmax ;
+          self#updated
         end
   end
 

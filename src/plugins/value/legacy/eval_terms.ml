@@ -548,7 +548,7 @@ let constraint_trange idx size_arr =
     match idx.term_node with
     | Trange ((None as low), up) | Trange (low, (None as up)) -> begin
         let loc = idx.term_loc in
-        match Extlib.opt_bind Cil.constFoldToInt size_arr with
+        match Option.bind size_arr Cil.constFoldToInt with
         | None -> idx
         | Some size ->
           let low = match low with (* constrained l.h.s *)
@@ -576,7 +576,7 @@ let apply_logic_builtin builtin env args_list =
   match res with
   | None -> None
   | Some offsm ->
-    let v = Extlib.the (Cvalue.V_Offsetmap.single_interval_value offsm) in
+    let v = Option.get (Cvalue.V_Offsetmap.single_interval_value offsm) in
     let v = Cvalue.V_Or_Uninitialized.get_v v in
     Some (v, alarms)
 
@@ -654,11 +654,11 @@ let eval_is_allocable size =
 (* returns true iff the logic variable is defined by the
    Frama-C standard library *)
 let comes_from_fc_stdlib lvar =
-  Cil.hasAttribute "fc_stdlib" lvar.lv_attr ||
+  Cil.is_in_libc lvar.lv_attr ||
   match lvar.lv_origin with
   | None -> false
   | Some vi ->
-    Cil.hasAttribute "fc_stdlib" vi.vattr
+    Cil.is_in_libc vi.vattr
 
 (* As usual in this file, [dst_typ] may be misleading: the 'size' is
    meaningless, because [src_typ] may actually be a logic type. Thus,
@@ -1250,7 +1250,7 @@ and eval_toffset ~alarm_mode env typ toffset =
 
   | TField (fi, remaining) ->
     let size_current default =
-      try Ival.of_int (fst (Cil.bitsOffset typ (Field(fi, NoOffset))))
+      try Ival.of_int (fst (Cil.fieldBitsOffset fi))
       with Cil.SizeOfError _ -> default
     in
     let attrs = Cil.filter_qualifier_attributes (Cil.typeAttrs typ) in

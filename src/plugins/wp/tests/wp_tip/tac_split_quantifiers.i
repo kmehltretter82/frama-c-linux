@@ -17,7 +17,7 @@
    predicate R2(integer a1, integer a2) reads \nothing ;
    } */
 
-/*@ ensures Goal_Exist_Or: 
+/*@ ensures Goal_Exist_Or:
        (\exists integer a, b, c ;
         P1(a) || P2(b, c) || Q1(1) || \exists integer d ; Q2(a,d)) ;
 
@@ -29,7 +29,7 @@
        (\exists integer a, b, c, d ;
         P2(a, b) && R2(b, c) && Q1(1) && \exists integer e ; Q2(d,e)) ;
 
-  @ ensures Hyp_Forall_And: 
+  @ ensures Hyp_Forall_And:
        (\forall integer a, b, c ;
         P1(a) && P2(b, c) && Q1(1) && \forall integer d ; Q2(a,d)
        ) ==>

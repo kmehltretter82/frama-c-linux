@@ -181,6 +181,10 @@ ptests/ptests.exe: ptests/ptests.ml
 PTESTS=dune exec --root ptests -- ./ptests.exe
 PTESTS=dune exec --root ptests -- ./ptests.exe -v
 
+.PHONY: ptests-help
+ptests-help: ptests/ptests.exe
+	$(PTESTS) --help
+
 # Removes all dune files generated for testing
 .PHONY: purge-tests
 purge-tests:

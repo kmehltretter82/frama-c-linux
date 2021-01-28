@@ -695,9 +695,9 @@ Ignoring this function in the analysis (potentially incorrect results)."
     let set =
       M.fold
         (fun (n,_) _ acc ->
-           Extlib.may_map
-             ~dft:acc
-             (fun s -> Stmt.Set.add s acc)
+           Option.fold
+             ~none:acc
+             ~some:(fun s -> Stmt.Set.add s acc)
              (get_node_stmt n))
         res
         Stmt.Set.empty
@@ -715,9 +715,9 @@ Ignoring this function in the analysis (potentially incorrect results)."
       M.fold
         (fun (n,_) v acc ->
            if check v then
-             Extlib.may_map
-               ~dft:acc
-               (fun s -> Stmt.Set.add s acc)
+             Option.fold
+               ~none:acc
+               ~some:(fun s -> Stmt.Set.add s acc)
                (get_node_stmt n)
            else
              acc)
@@ -830,7 +830,7 @@ let compute, self =
            !use_ctrl_dependencies
            (fun (n, _ as elt) ->
               Nodes.add elt;
-              Extlib.may add_one (get_node_stmt n))
+              Option.iter add_one (get_node_stmt n))
            kf
            stmt
        in

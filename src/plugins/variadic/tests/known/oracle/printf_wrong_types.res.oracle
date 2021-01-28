@@ -326,23 +326,23 @@ int main(void)
   float f = 42.0f;
   long double ld = 42.0l;
   char *string = (char *)"42";
-  printf_va_1("%hhd",(int)c);
-  printf_va_2("%d",(int)ui);
-  printf_va_3("%x",(unsigned int)i);
-  printf_va_4("%ld",(long)i);
-  printf_va_5("%d",(int)li);
-  printf_va_6("%lu",(unsigned long)ui);
-  printf_va_7("%u",(unsigned int)uli);
-  printf_va_8("%p",(void *)ui);
-  printf_va_9("%f",(double)f);
-  printf_va_10("%f",(double)ld);
-  printf_va_11("%lf",(double)ld);
-  printf_va_12("%Lf",(long double)((double)f));
-  printf_va_13("%s",(char *)i);
-  printf_va_14("%d",(int)string);
+  printf("%hhd",(int)c); /* printf_va_1 */
+  printf("%d",(int)ui); /* printf_va_2 */
+  printf("%x",(unsigned int)i); /* printf_va_3 */
+  printf("%ld",(long)i); /* printf_va_4 */
+  printf("%d",(int)li); /* printf_va_5 */
+  printf("%lu",(unsigned long)ui); /* printf_va_6 */
+  printf("%u",(unsigned int)uli); /* printf_va_7 */
+  printf("%p",(void *)ui); /* printf_va_8 */
+  printf("%f",(double)f); /* printf_va_9 */
+  printf("%f",(double)ld); /* printf_va_10 */
+  printf("%lf",(double)ld); /* printf_va_11 */
+  printf("%Lf",(long double)((double)f)); /* printf_va_12 */
+  printf("%s",(char *)i); /* printf_va_13 */
+  printf("%d",(int)string); /* printf_va_14 */
   RC rc = OK;
-  printf_va_15("%u",rc);
-  printf_va_16("%d",(int)rc);
+  printf("%u",rc); /* printf_va_15 */
+  printf("%d",(int)rc); /* printf_va_16 */
   __retres = 0;
   return __retres;
 }
@@ -438,12 +438,20 @@ int main(void)
   Incorrect type for argument 2. The argument will be cast from int to unsigned int.
 [variadic] printf_wrong_types.c:21: 
   Translating call to printf to a call to the specialized version printf_va_4.
+[variadic] printf_wrong_types.c:21: Warning: 
+  Incorrect type for argument 2. The argument will be cast from int to long.
 [variadic] printf_wrong_types.c:22: 
   Translating call to printf to a call to the specialized version printf_va_5.
+[variadic] printf_wrong_types.c:22: Warning: 
+  Incorrect type for argument 2. The argument will be cast from long to int.
 [variadic] printf_wrong_types.c:23: 
   Translating call to printf to a call to the specialized version printf_va_6.
+[variadic] printf_wrong_types.c:23: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned int to unsigned long.
 [variadic] printf_wrong_types.c:24: 
   Translating call to printf to a call to the specialized version printf_va_7.
+[variadic] printf_wrong_types.c:24: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned long to unsigned int.
 [variadic] printf_wrong_types.c:25: 
   Translating call to printf to a call to the specialized version printf_va_8.
 [variadic] printf_wrong_types.c:25: Warning: 
@@ -728,23 +736,23 @@ int main(void)
   float f = 42.0f;
   long double ld = 42.0l;
   char *string = (char *)"42";
-  printf_va_1("%hhd",(int)c);
-  printf_va_2("%d",(int)ui);
-  printf_va_3("%x",(unsigned int)i);
-  printf_va_4("%ld",(long)i);
-  printf_va_5("%d",(int)li);
-  printf_va_6("%lu",(unsigned long)ui);
-  printf_va_7("%u",(unsigned int)uli);
-  printf_va_8("%p",(void *)ui);
-  printf_va_9("%f",(double)f);
-  printf_va_10("%f",(double)ld);
-  printf_va_11("%lf",(double)ld);
-  printf_va_12("%Lf",(long double)((double)f));
-  printf_va_13("%s",(char *)i);
-  printf_va_14("%d",(int)string);
+  printf("%hhd",(int)c); /* printf_va_1 */
+  printf("%d",(int)ui); /* printf_va_2 */
+  printf("%x",(unsigned int)i); /* printf_va_3 */
+  printf("%ld",(long)i); /* printf_va_4 */
+  printf("%d",(int)li); /* printf_va_5 */
+  printf("%lu",(unsigned long)ui); /* printf_va_6 */
+  printf("%u",(unsigned int)uli); /* printf_va_7 */
+  printf("%p",(void *)ui); /* printf_va_8 */
+  printf("%f",(double)f); /* printf_va_9 */
+  printf("%f",(double)ld); /* printf_va_10 */
+  printf("%lf",(double)ld); /* printf_va_11 */
+  printf("%Lf",(long double)((double)f)); /* printf_va_12 */
+  printf("%s",(char *)i); /* printf_va_13 */
+  printf("%d",(int)string); /* printf_va_14 */
   RC rc = OK;
-  printf_va_15("%u",rc);
-  printf_va_16("%d",(int)rc);
+  printf("%u",rc); /* printf_va_15 */
+  printf("%d",(int)rc); /* printf_va_16 */
   __retres = 0;
   return __retres;
 }

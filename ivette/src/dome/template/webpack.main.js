@@ -21,15 +21,24 @@ function domeDevtools() {
   case 'dev':
     return 'electron-devtools-installer';
   default:
-    return path.resolve( DOME , 'src/misc/devtools.js' );
+    return path.resolve( DOME , 'misc/devtools.js' );
   }
 }
 
+// --------------------------------------------------------------------------
+
 module.exports = {
+  module: {
+    rules: [
+      { test: /\.(ts|js)x?$/, use: [ 'babel-loader' ], exclude: /node_modules/ }
+    ],
+    strictExportPresence: true
+  },
   resolve: {
+    extensions: ['.ts', '.tsx', '.js', 'jsx', '.json'],
     alias: {
-      'dome$':         path.resolve( DOME , 'src/main/dome.js' ),
-      'dome/system$':  path.resolve( DOME , 'src/misc/system.js' ),
+      'dome$':         path.resolve( DOME , 'main/dome.ts' ),
+      'dome/system$':  path.resolve( DOME , 'misc/system.ts' ),
       'dome/devtools': domeDevtools()
     }
   }

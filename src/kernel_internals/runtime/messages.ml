@@ -23,51 +23,53 @@
 module DatatypeMessages =
   Datatype.Make_with_collections
     (struct
-       include Datatype.Serializable_undefined
-       open Log
-       type t = event
-       let name = "message"
-       let reprs =
-         [ { evt_kind = Failure;
-             evt_plugin = "";
-             evt_category = None;
-             evt_source = None;
-             evt_message = "" } ]
-       let mem_project = Datatype.never_any_project
-       let hash (e: event)= Hashtbl.hash e
-       let compare (e1: event) e2 = Extlib.compare_basic e1 e2
-       let equal = Datatype.from_compare
-     end)
+      include Datatype.Serializable_undefined
+      open Log
+      type t = event
+      let name = "message"
+      let reprs =
+        [ { evt_kind = Failure;
+            evt_plugin = "";
+            evt_category = None;
+            evt_source = None;
+            evt_message = "" } ]
+      let mem_project = Datatype.never_any_project
+      let hash (e: event)= Hashtbl.hash e
+      let compare (e1: event) e2 = Extlib.compare_basic e1 e2
+      let equal = Datatype.from_compare
+    end)
 
 module Messages =
   State_builder.List_ref
     (DatatypeMessages)
     (struct
-       let name = "Messages.message_table"
-       let dependencies = [ Ast.self ]
-     end)
+      let name = "Messages.message_table"
+      let dependencies = [ Ast.self ]
+    end)
 let () = Ast.add_monotonic_state Messages.self
 
+let hooks = ref []
 let add_message m =
-  Messages.set (m :: Messages.get ());;
+  begin
+    Messages.set (m :: Messages.get ()) ;
+    List.iter (fun fn -> fn()) !hooks ;
+  end
 
 let nb_errors () =
-  let n = ref 0 in
-  Messages.iter (fun e ->
-      match e.Log.evt_kind with
-      | Log.Error -> incr n
-      | _ -> ());
-  !n
+  Messages.fold_left
+    (fun n e ->
+       match e.Log.evt_kind with
+       | Log.Error -> succ n
+       | _ -> n) 0
 
 let nb_warnings () =
-  let n = ref 0 in
-  Messages.iter (fun e ->
-      match e.Log.evt_kind with
-      | Log.Warning -> incr n
-      | _ -> ());
-  !n
+  Messages.fold_left
+    (fun n e ->
+       match e.Log.evt_kind with
+       | Log.Warning -> succ n
+       | _ -> n) 0
 
-let nb_messages() = nb_errors() + nb_warnings();;
+let nb_messages() = List.length (Messages.get ())
 
 let self = Messages.self
 
@@ -75,10 +77,9 @@ let iter f = List.iter f (List.rev (Messages.get ()))
 let dump_messages () = iter Log.echo
 
 let () =
-  Log.add_listener ~kind:[ Log.Error; Log.Warning ] add_message;
-;;
+  Log.add_listener ~kind:[ Log.Error; Log.Warning ] add_message
 
-module OnceTable = 
+module OnceTable =
   State_builder.Hashtbl
     (DatatypeMessages.Hashtbl)
     (Datatype.Unit)
@@ -86,12 +87,12 @@ module OnceTable =
       let size = 37
       let dependencies = [ Ast.self ]
       let name = "Messages.OnceTable"
-     end)
+    end)
 
 let check_not_yet evt =
   if OnceTable.mem evt then false
   else begin
-    OnceTable.add evt (); 
+    OnceTable.add evt ();
     true
   end
 
@@ -99,6 +100,7 @@ let () = Log.check_not_yet := check_not_yet
 
 let reset_once_flag () = OnceTable.clear ()
 
+let add_global_hook fn = hooks := !hooks @ [fn]
 
 (*
 Local Variables:

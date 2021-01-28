@@ -1,4 +1,5 @@
 [kernel] Parsing empty_base.c (with preprocessing)
+[kernel] empty_base.c:13: User Error: empty structs only allowed for GCC/MSVC
 [kernel] empty_base.c:47: User Error: 
   zero-length arrays only allowed for GCC/MSVC
 [kernel] empty_base.c:49: User Error: 

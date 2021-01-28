@@ -122,7 +122,7 @@ class printer_with_annot () = object (self)
   method! private stmt_has_annot s = Annotations.has_code_annot s
 
   method! private has_annot =
-    Extlib.may_map self#stmt_has_annot ~dft:false self#current_stmt
+    Option.fold ~some:self#stmt_has_annot ~none:false self#current_stmt
 
   method! private inline_block ctxt blk =
     super#inline_block ctxt blk
@@ -143,7 +143,7 @@ class printer_with_annot () = object (self)
        then begin
          declared_globs <- Cil_datatype.Varinfo.Set.add vi declared_globs;
          (* pretty prints the spec, but not for built-ins*)
-         if not (Cil.Builtin_functions.mem vi.vname) then
+         if not (Cil_builtins.Builtin_functions.mem vi.vname) then
            self#pretty_funspec fmt kf
        end
      with Not_found ->
@@ -281,6 +281,7 @@ let () = Cil_datatype.Term_lval.pretty_ref := pp_term_lval
 let () = Cil_datatype.Term_offset.pretty_ref := pp_term_offset
 let () = Cil_datatype.Code_annotation.pretty_ref := pp_code_annotation
 let () = Cil_datatype.Funspec.pretty_ref := pp_funspec
+let () = Cil_datatype.Funbehavior.pretty_ref := pp_behavior
 
 let () = Cil_datatype.Label.pretty_ref := pp_label
 let () = Cil_datatype.Compinfo.pretty_ref := pp_compinfo

@@ -172,16 +172,17 @@ class visitor = object(self)
         | { enode = Lval ( (Var vi), NoOffset ) } -> Some vi
         | _ -> None
       in
+      let is_ghost vi = vi.vghost || Ast_info.is_frama_c_builtin vi.vname in
       let failed = match i with
         | Call(_, fexp, _, _) ->
           begin match call_varinfo fexp with
-            | Some fct when not fct.vghost ->
+            | Some fct when not (is_ghost fct) ->
               Error.non_ghost_function_call_in_ghost ~current:true () ; true
             | None ->
               Error.function_pointer_call ~current:true () ; true
             | _ -> false
           end
-        | Local_init(_, ConsInit(fct, _, _), _) when not fct.vghost ->
+        | Local_init(_, ConsInit(fct, _, _), _) when not (is_ghost fct) ->
           Error.non_ghost_function_call_in_ghost ~current:true () ; true
         | _ -> false
       in
@@ -225,7 +226,7 @@ class visitor = object(self)
         if not (ghost_term_type term.term_type) then
           Error.assigns_non_ghost_term ~current:true term
       in
-      let kf = Extlib.the (self#current_kf) in
+      let kf = Option.get (self#current_kf) in
       match assigns with
       | Writes froms -> List.iter check_assign froms
       | WritesAny when not (Kernel_function.has_definition kf) ->

@@ -354,8 +354,8 @@ and numeric_bound ltyp = function
 
 let is_zero_comparable t =
   match unroll_type t.term_type with
-  | Ctype (TInt _ | TFloat _ | TPtr _ | TArray _ | TFun _) -> true
-  | Ctype _ -> false
+  | Ctype (TInt _ | TFloat _ | TPtr _ | TArray _ | TFun _ | TEnum _) -> true
+  | Ctype (TVoid _ | TNamed _ | TComp _ | TBuiltin_va_list _) -> false
   | Linteger | Lreal -> true
   | Ltype ({lt_name},[]) -> lt_name = Utf8_logic.boolean
   | Ltype _ -> false
@@ -373,7 +373,7 @@ let scalar_term_conversion conversion t =
     let ctrue = Logic_env.Logic_ctor_info.find "\\true" in
     conversion ~loc true t (term ~loc (TDataCons(ctrue,[])) boolean_type) in
   match unroll_type t.term_type with
-  | Ctype (TInt _) -> int_conversion t
+  | Ctype (TInt _ | TEnum _) -> int_conversion t
   | Ctype (TFloat _) as ltyp -> real_conversion ~ltyp t
   | Ctype (TPtr _) -> ptr_conversion t
   | Ctype (TArray _) -> ptr_conversion t
@@ -385,7 +385,7 @@ let scalar_term_conversion conversion t =
   | Ltype ({lt_name = name},[]) when name = Utf8_logic.boolean ->
     bool_conversion t
   | Ltype _ | Lvar _ | Larrow _
-  | Ctype (TVoid _ | TNamed _ | TComp _ | TEnum _ | TBuiltin_va_list _)
+  | Ctype (TVoid _ | TNamed _ | TComp _ | TBuiltin_va_list _)
     -> Kernel.fatal
          "Cannot convert a term of type %a"
          Cil_printer.pp_logic_type t.term_type
@@ -417,7 +417,8 @@ let float_builtin prefix fkind =
   let name = match fkind with
     | FFloat -> Printf.sprintf "\\%s_float" prefix
     | FDouble -> Printf.sprintf "\\%s_double" prefix
-    | FLongDouble -> Kernel.not_yet_implemented "Builtins for long double type"
+    | FLongDouble ->
+      Kernel.not_yet_implemented ~current:true "Builtins for long double type"
   in match Logic_env.find_all_logic_functions name with
   | [ lf ] -> Some lf
   | _ -> Kernel.fatal "Missing or ambiguous builtin %S" name
@@ -1186,7 +1187,7 @@ let is_same_pragma p1 p2 =
   | Impact_pragma p1, Impact_pragma p2 -> is_same_impact_pragma p1 p2
   | (Loop_pragma _ | Slice_pragma _ | Impact_pragma _), _ -> false
 
-let is_same_extension x1 x2 =
+let rec is_same_extension x1 x2 =
   Datatype.String.equal x1.ext_name x2.ext_name &&
   (x1.ext_has_status = x2.ext_has_status) &&
   match x1.ext_kind, x2.ext_kind with
@@ -1195,7 +1196,9 @@ let is_same_extension x1 x2 =
     is_same_list is_same_term t1 t2
   | Ext_preds p1, Ext_preds p2 ->
     is_same_list is_same_predicate p1 p2
-  | (Ext_id _ | Ext_preds _ | Ext_terms _), _ -> false
+  | Ext_annot (id1, a1), Ext_annot (id2, a2) ->
+    is_same_string id1 id2 && is_same_list is_same_extension a1 a2
+  | (Ext_id _ | Ext_preds _ | Ext_terms _ | Ext_annot _ ), _ -> false
 
 let is_same_code_annotation (ca1:code_annotation) (ca2:code_annotation) =
   match ca1.annot_content, ca2.annot_content with
@@ -2575,8 +2578,8 @@ and bitsLogicOffset ltyp off : Integer.t * Integer.t =
         (* Force the computation of the fields fsize_in_bits and
            foffset_in_bits *)
         ignore (Cil.bitsOffset typ (Field (f, NoOffset)));
-        let size = Integer.of_int (Extlib.the f.fsize_in_bits) in
-        let offset_f = Integer.of_int (Extlib.the f.foffset_in_bits) in
+        let size = Integer.of_int (Option.get f.fsize_in_bits) in
+        let offset_f = Integer.of_int (Option.get f.foffset_in_bits) in
         loopOff f.ftype size (Integer.add start offset_f) off
       end
       else
@@ -2608,7 +2611,7 @@ let rec fold_itv f b e acc =
 let find_init_by_index init i =
   let same_offset (off, _) = match off with
     | Index (i', NoOffset) ->
-      Integer.equal i (Extlib.the (Cil.isInteger i'))
+      Integer.equal i (Option.get (Cil.isInteger i'))
     | _ -> false
   in
   snd (List.find same_offset init)

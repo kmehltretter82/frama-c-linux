@@ -65,7 +65,8 @@ Assume {
 Prove: global(L_two_24) != one_0.
 
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'global_frame':
-  /*@ behavior typed:
+[wp] bts_1828.i:56: Warning: 
+  Memory model hypotheses for function 'global_frame':
+  /*@ behavior wp_typed:
         requires \separated(one, &zero); */
   void global_frame(int *one, int arg);

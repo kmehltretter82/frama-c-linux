@@ -59,10 +59,7 @@ module F = struct
       are also considered, e.g. "if x < 0.0" is equivalent to "if x < -0.0",
       which is also equivalent to "F.compare x (-0.0) < 0".
       This 'compare' operator distinguishes -0. and 0. *)
-  (* replace "noalloc" with [@@noalloc] for OCaml version >= 4.03.0 *)
-  [@@@ warning "-3"]
-  external compare : float -> float -> int = "float_compare_total" "noalloc"
-  [@@@ warning "+3"]
+  external compare : float -> float -> int = "float_compare_total" [@@noalloc]
   let equal f1 f2 = compare f1 f2 = 0
 
   (* The Caml version of compare below is fine but the C version above is

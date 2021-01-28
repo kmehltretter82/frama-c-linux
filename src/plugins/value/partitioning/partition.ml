@@ -109,7 +109,7 @@ struct
     let compare_split (i1,_m1) (i2,_m2) =
       Integer.compare i1 i2
     in
-    Extlib.opt_compare IntPair.compare k1.ration_stamp k2.ration_stamp
+    Option.compare IntPair.compare k1.ration_stamp k2.ration_stamp
     <?> (LoopList.compare, k1.loops, k2.loops)
     <?> (ExpMap.compare compare_split, k1.static_split, k2.static_split)
     <?> (ExpMap.compare compare_split, k1.dynamic_split, k2.dynamic_split)

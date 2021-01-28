@@ -228,3 +228,15 @@ make_public:
   - nix
   only:
   - schedules
+
+make_public_meta:
+  stage: make_public
+  script:
+   - echo "$FRAMA_C_PUBLIC_SSH_PRIVATE_KEY" | nix run -f channel:nixos-19.03 coreutils --command base64 -d > nix/frama-c-public/id_ed25519
+   - nix run -f channel:nixos-19.03 coreutils --command chmod 400 nix/frama-c-public/id_ed25519
+   - GIT_SSH=$PWD/nix/frama-c-public/ssh.sh nix run -f channel:nixos-19.03 openssh --command git clone git@git.frama-c.com:frama-c/meta.git nix/frama-c-public/meta
+   - GIT_SSH=$PWD/nix/frama-c-public/ssh.sh nix run -f channel:nixos-19.03 openssh --command git -C nix/frama-c-public/meta push git@git.frama-c.com:pub/meta origin/master:refs/heads/master
+  tags:
+  - nix
+  only:
+  - schedules

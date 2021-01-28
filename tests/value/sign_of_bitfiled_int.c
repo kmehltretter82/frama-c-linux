@@ -1,6 +1,6 @@
 /* run.config*
-   OPT: -eva @EVA_OPTIONS@ -cpp-extra-args="-DPTEST" 
-   OPT: -machdep ppc_32 -eva @EVA_OPTIONS@ -cpp-extra-args="-DPTEST"
+   OPT: -eva @EVA_CONFIG@ -cpp-extra-args="-DPTEST" 
+   OPT: -machdep ppc_32 -eva @EVA_CONFIG@ -cpp-extra-args="-DPTEST"
 */
 
 

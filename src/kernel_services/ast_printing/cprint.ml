@@ -262,7 +262,7 @@ and print_fields fmt (flds : field_group list) =
 and print_enum_items fmt items =
   let print_item fmt (id,exp,_) =
     fprintf fmt "%s%a%a"
-      id (pp_cond (exp.expr_node=NOTHING)) "@ =@ " print_expression exp
+      id (pp_cond (exp.expr_node<>NOTHING)) "@ =@ " print_expression exp
   in
   pp_list ~sep:",@ " print_item fmt items
 

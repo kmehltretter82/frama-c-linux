@@ -84,17 +84,17 @@ int main(void)
   int __retres;
   char data[100];
   size_t tmp_0;
-  memset((void *)(data),'A',(unsigned int)99);
+  memset((void *)(data),'A',(unsigned long)99);
   data[99] = (char)0;
   char dest[50] = {(char)'\000'};
   if (nondet) {
     size_t tmp;
     tmp = strlen((char const *)(data));
-    snprintf_va_1(dest,tmp,"%s",data);
+    snprintf(dest,tmp,"%s",data); /* snprintf_va_1 */
     /*@ assert \false; */ ;
   }
   tmp_0 = strlen((char const *)(data));
-  snprintf_va_2(dest,tmp_0 / (size_t)2,"%s",data);
+  snprintf(dest,tmp_0 / (size_t)2,"%s",data); /* snprintf_va_2 */
   __retres = 0;
   return __retres;
 }

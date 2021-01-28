@@ -239,7 +239,7 @@ module ValueCoverageGUI = struct
     end;
     Metrics__Metrics_coverage.compute_coverage_by_fun ();
     !update_filetree `Contents;
-    Extlib.the !result
+    Option.get !result
 
   let decorate_filetree (main_ui: Design.main_window_extension_points) =
     let compute get = function

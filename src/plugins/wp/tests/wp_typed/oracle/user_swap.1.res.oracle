@@ -40,9 +40,10 @@ Goal Assigns 'E' in 'swap':
 Prove: true.
 
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'swap':
+[wp] user_swap.i:13: Warning: 
+  Memory model hypotheses for function 'swap':
   /*@
-     behavior typed_ref:
+     behavior wp_typed_ref:
        requires \separated(a, b);
        requires \valid(a);
        requires \valid(b);

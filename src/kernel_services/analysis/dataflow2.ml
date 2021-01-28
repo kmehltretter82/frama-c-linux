@@ -365,7 +365,7 @@ module Forwards(T : ForwardsTransfer) = struct
             | TryExcept _ | TryFinally _
             | Loop _ | Return _ | Block _ -> do_succs curr
             | Throw _ | TryCatch _ ->
-              Kernel.not_yet_implemented
+              Kernel.not_yet_implemented ~current:true
                 "[dataflow] exception handling"
 
 

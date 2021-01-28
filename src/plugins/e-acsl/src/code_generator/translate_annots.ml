@@ -70,10 +70,12 @@ let pre_funspec kf kinstr env funspec =
   let env = convert_unsupported_clauses env in
   let loc = Kernel_function.get_location kf in
   let contract = Contract.create ~loc funspec in
-  Contract.translate_preconditions kf kinstr env contract
+  Env.with_rte env true
+    ~f:(fun env -> Contract.translate_preconditions kf kinstr env contract)
 
 let post_funspec kf kinstr env =
-  Contract.translate_postconditions kf kinstr env
+  Env.with_rte env true
+    ~f:(fun env -> Contract.translate_postconditions kf kinstr env)
 
 let pre_code_annotation kf stmt env annot =
   let convert env = match annot.annot_content with
@@ -82,7 +84,8 @@ let pre_code_annotation kf stmt env annot =
         let env = Env.set_annotation_kind env Smart_stmt.Assertion in
         if l <> [] then
           Env.not_yet env "@[assertion applied only on some behaviors@]";
-        Translate.translate_predicate kf env p.tp_statement
+        Env.with_rte env true
+          ~f:(fun env -> Translate.translate_predicate kf env p.tp_statement)
       else
         env
     | AStmtSpec(l, spec) ->
@@ -90,13 +93,18 @@ let pre_code_annotation kf stmt env annot =
         Env.not_yet env "@[statement contract applied only on some behaviors@]";
       let loc = Stmt.loc stmt in
       let contract = Contract.create ~loc spec in
-      Contract.translate_preconditions kf (Kstmt stmt) env contract
+      Env.with_rte env true
+        ~f:(fun env ->
+            Contract.translate_preconditions kf (Kstmt stmt) env contract)
     | AInvariant(l, loop_invariant, p) ->
       if must_translate (Property.ip_of_code_annot_single kf stmt annot) then
         let env = Env.set_annotation_kind env Smart_stmt.Invariant in
         if l <> [] then
           Env.not_yet env "@[invariant applied only on some behaviors@]";
-        let env = Translate.translate_predicate kf env p.tp_statement in
+        let env =
+          Env.with_rte env true
+            ~f:(fun env -> Translate.translate_predicate kf env p.tp_statement)
+        in
         if loop_invariant then
           Env.add_loop_invariant env p.tp_statement
         else env
@@ -127,7 +135,9 @@ let pre_code_annotation kf stmt env annot =
 
 let post_code_annotation kf stmt env annot =
   let convert env = match annot.annot_content with
-    | AStmtSpec(_, _) -> Contract.translate_postconditions kf (Kstmt stmt) env
+    | AStmtSpec(_, _) ->
+      Env.with_rte env true
+        ~f:(fun env -> Contract.translate_postconditions kf (Kstmt stmt) env)
     | AAssert _
     | AInvariant _
     | AVariant _

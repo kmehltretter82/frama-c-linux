@@ -175,18 +175,10 @@ $ make dome-help
   make dome-plugins Package plugins for distribution
 
 [Dome] Development:
-  Dome framework  DOME = '…'
-  Local command   DOME_CLI  = '…'
-  Arguments (dev) DOME_ARGS = '…'
-  Export modules  DOME_EXPORTS = '…'
-  Plugin modules  DOME_PLUGINS = '…'
+  … (environment variables)
 
 [Dome] Documentation:
-  Application     APP          = '…'
-  Copyright       COPYRIGHT    = '…'
-  Dome framework  DOME_DOC     = '…'
-  Output dir      DOME_DOC     = '…'
-  Public API      DOME_API     = '…'
+  … (environment variables)
 
 ```
 

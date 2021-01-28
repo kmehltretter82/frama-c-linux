@@ -298,17 +298,17 @@ int *calloc_int(size_t num, size_t size)
 int main(void)
 {
   int __retres;
-  int *pi = calloc_int((unsigned int)10,sizeof(int));
-  enum E *pe = calloc_e_E((unsigned int)10,sizeof(enum E));
-  float *pf = calloc_float((unsigned int)10,sizeof(float));
-  struct X *px = calloc_st_X((unsigned int)10,sizeof(struct X));
-  char *pc = calloc_char((unsigned int)10,sizeof(char));
-  int (*pa)[10] = calloc_arr10_int((unsigned int)10,sizeof(int [10]));
+  int *pi = calloc_int((unsigned long)10,sizeof(int));
+  enum E *pe = calloc_e_E((unsigned long)10,sizeof(enum E));
+  float *pf = calloc_float((unsigned long)10,sizeof(float));
+  struct X *px = calloc_st_X((unsigned long)10,sizeof(struct X));
+  char *pc = calloc_char((unsigned long)10,sizeof(char));
+  int (*pa)[10] = calloc_arr10_int((unsigned long)10,sizeof(int [10]));
   struct Flex *f =
-    calloc_st_Flex((unsigned int)1,
-                   sizeof(struct Flex) + (unsigned int)3 * sizeof(int));
-  void *v = calloc((unsigned int)10,sizeof(char));
-  struct incomplete *inc = calloc((unsigned int)10,(unsigned int)10);
+    calloc_st_Flex((unsigned long)1,
+                   sizeof(struct Flex) + (unsigned long)3 * sizeof(int));
+  void *v = calloc((unsigned long)10,sizeof(char));
+  struct incomplete *inc = calloc((unsigned long)10,(unsigned long)10);
   __retres = 0;
   return __retres;
 }
@@ -617,17 +617,17 @@ int *calloc_int(size_t num, size_t size)
 int main(void)
 {
   int __retres;
-  int *pi = calloc_int((unsigned int)10,sizeof(int));
-  enum E *pe = calloc_e_E((unsigned int)10,sizeof(enum E));
-  float *pf = calloc_float((unsigned int)10,sizeof(float));
-  struct X *px = calloc_st_X((unsigned int)10,sizeof(struct X));
-  char *pc = calloc_char((unsigned int)10,sizeof(char));
-  int (*pa)[10] = calloc_arr10_int((unsigned int)10,sizeof(int [10]));
+  int *pi = calloc_int((unsigned long)10,sizeof(int));
+  enum E *pe = calloc_e_E((unsigned long)10,sizeof(enum E));
+  float *pf = calloc_float((unsigned long)10,sizeof(float));
+  struct X *px = calloc_st_X((unsigned long)10,sizeof(struct X));
+  char *pc = calloc_char((unsigned long)10,sizeof(char));
+  int (*pa)[10] = calloc_arr10_int((unsigned long)10,sizeof(int [10]));
   struct Flex *f =
-    calloc_st_Flex((unsigned int)1,
-                   sizeof(struct Flex) + (unsigned int)3 * sizeof(int));
-  void *v = calloc((unsigned int)10,sizeof(char));
-  struct incomplete *inc = calloc((unsigned int)10,(unsigned int)10);
+    calloc_st_Flex((unsigned long)1,
+                   sizeof(struct Flex) + (unsigned long)3 * sizeof(int));
+  void *v = calloc((unsigned long)10,sizeof(char));
+  struct incomplete *inc = calloc((unsigned long)10,(unsigned long)10);
   __retres = 0;
   return __retres;
 }

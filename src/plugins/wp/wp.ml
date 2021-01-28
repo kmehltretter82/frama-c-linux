@@ -81,3 +81,4 @@ module WpStrategy = WpStrategy
 module Why3Provers = Why3Provers
 module ProverWhy3 = ProverWhy3
 module Cache = Cache
+module WpTarget = WpTarget

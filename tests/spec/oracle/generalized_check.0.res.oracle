@@ -4,20 +4,20 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:alarm] generalized_check.i:23: Warning: 
+[eva:alarm] generalized_check.i:24: Warning: 
   accessing uninitialized left-value. assert \initialized(&c);
 [eva] using specification for function f
-[eva:alarm] generalized_check.i:24: Warning: 
-  function f: precondition 'f_valid_x' got status unknown.
-[eva] generalized_check.i:9: Warning: no \from part for clause 'assigns *x;'
 [eva:alarm] generalized_check.i:25: Warning: 
-  check 'main_valid_ko' got status unknown.
+  function f: precondition 'f_valid_x' got status unknown.
+[eva] generalized_check.i:10: Warning: no \from part for clause 'assigns *x;'
 [eva:alarm] generalized_check.i:26: Warning: 
+  check 'main_valid_ko' got status unknown.
+[eva:alarm] generalized_check.i:27: Warning: 
   check 'main_p_content_ko' got status unknown.
-[eva:alarm] generalized_check.i:32: Warning: 
+[eva:alarm] generalized_check.i:33: Warning: 
   loop invariant 'false_but_preserved' got status invalid.
-[eva] generalized_check.i:35: starting to merge loop iterations
-[eva:alarm] generalized_check.i:36: Warning: 
+[eva] generalized_check.i:36: starting to merge loop iterations
+[eva:alarm] generalized_check.i:37: Warning: 
   check 'implied_by_false_invariant' got status invalid.
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

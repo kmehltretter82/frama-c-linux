@@ -3352,6 +3352,58 @@
             by Frama-C kernel.
 
 --------------------------------------------------------------------------------
+--- Properties of Function '__finitef'
+--------------------------------------------------------------------------------
+
+[ Extern  ] Post-condition for 'finite' 'nonzero_result'
+            ensures nonzero_result: \result > 0 ∨ \result < 0
+            Unverifiable but considered Valid.
+[ Extern  ] Post-condition for 'nonfinite' 'zero_result'
+            ensures zero_result: \result ≡ 0
+            Unverifiable but considered Valid.
+[ Extern  ] Assigns nothing
+            assigns \nothing;
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/math.h, line 706)
+            assigns \result \from f;
+            Unverifiable but considered Valid.
+[  Valid  ] Default behavior
+            default behavior
+            by Frama-C kernel.
+[  Valid  ] Behavior 'finite'
+            behavior finite
+            by Frama-C kernel.
+[  Valid  ] Behavior 'nonfinite'
+            behavior nonfinite
+            by Frama-C kernel.
+
+--------------------------------------------------------------------------------
+--- Properties of Function '__finite'
+--------------------------------------------------------------------------------
+
+[ Extern  ] Post-condition for 'finite' 'nonzero_result'
+            ensures nonzero_result: \result > 0 ∨ \result < 0
+            Unverifiable but considered Valid.
+[ Extern  ] Post-condition for 'nonfinite' 'zero_result'
+            ensures zero_result: \result ≡ 0
+            Unverifiable but considered Valid.
+[ Extern  ] Assigns nothing
+            assigns \nothing;
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/math.h, line 719)
+            assigns \result \from d;
+            Unverifiable but considered Valid.
+[  Valid  ] Default behavior
+            default behavior
+            by Frama-C kernel.
+[  Valid  ] Behavior 'finite'
+            behavior finite
+            by Frama-C kernel.
+[  Valid  ] Behavior 'nonfinite'
+            behavior nonfinite
+            by Frama-C kernel.
+
+--------------------------------------------------------------------------------
 --- Properties of Function '__fc_infinity'
 --------------------------------------------------------------------------------
 
@@ -3361,7 +3413,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/math.h, line 724)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/math.h, line 746)
             assigns \result \from \nothing;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3378,7 +3430,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/math.h, line 730)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/math.h, line 752)
             assigns \result \from \nothing;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3740,9 +3792,9 @@
 --------------------------------------------------------------------------------
 --- Status Report Summary
 --------------------------------------------------------------------------------
-   169 Completely validated
+   175 Completely validated
     16 Locally validated
-   454 Considered valid
+   462 Considered valid
     56 To be validated
-   695 Total
+   709 Total
 --------------------------------------------------------------------------------

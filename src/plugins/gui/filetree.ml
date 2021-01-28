@@ -22,7 +22,6 @@
 
 open Cil_types
 open Cil_datatype
-open Extlib
 open Gtk_helper
 
 (* To debug performance related to height of lines *)
@@ -296,10 +295,6 @@ module MYTREE = struct
   let comes_from_share filename =
     Filepath.is_relative ~base_name:Fc_config.datadir filename
 
-  let is_stdlib_global g =
-    Cil.hasAttribute "fc_stdlib" (Cil_datatype.Global.attr g) ||
-    Cil.hasAttribute "fc_stdlib_generated" (Cil_datatype.Global.attr g)
-
   let is_function t = match t with
     | MFile _ -> false
     | MGlobal {globals = [| g |]} -> is_function_global g
@@ -457,7 +452,7 @@ module State = struct
       let is_unused = function
         | GFun ({svar = vi},_) | GFunDecl (_, vi, _)
         | GVar (vi, _, _) | GVarDecl (vi, _) ->
-          Cil.is_unused_builtin vi
+          Cil_builtins.is_unused_builtin vi
         | _ -> false
       in
       f, Extlib.filter_out is_unused all
@@ -530,7 +525,7 @@ let make (tree_view:GTree.view) =
     in
     hide_kind g
     || (MYTREE.is_builtin_global g && hide_builtins ())
-    || (MYTREE.is_stdlib_global g && hide_stdlib ())
+    || (Cil.global_is_in_libc g && hide_stdlib ())
     || (MYTREE.is_defined_global g && hide_defined ())
     || (MYTREE.is_undefined_global g && hide_undefined ())
   in
@@ -560,10 +555,10 @@ let make (tree_view:GTree.view) =
 
   let set_row model ?strikethrough ?text (path,raw_row) =
     let row = raw_row.MODEL.finfo in
-    may
+    Option.iter
       (fun b -> (MYTREE.get_storage row).MYTREE.strikethrough <- b)
       strikethrough;
-    may (fun b -> (MYTREE.get_storage row).MYTREE.name <- b) text;
+    Option.iter (fun b -> (MYTREE.get_storage row).MYTREE.name <- b) text;
     if false then model#custom_row_changed (GTree.Path.create (List.rev path)) raw_row
   in
 
@@ -835,7 +830,7 @@ let make (tree_view:GTree.view) =
         in
         try
           let {MODEL.finfo=t} =
-            Extlib.the (model_custom#custom_get_iter path) in
+            Option.get (model_custom#custom_get_iter path) in
           let selected_node = MYTREE.storage_type t in
           let was_activated = match current_node with
             | None -> false
@@ -887,7 +882,7 @@ let make (tree_view:GTree.view) =
       expand_to_path tree_view path;
       tree_view#selection#select_path path;
       (* set_cursor updates the keyboard cursor and scrolls to the element *)
-      tree_view#set_cursor path (Extlib.the name_column);
+      tree_view#set_cursor path (Option.get name_column);
       tree_view#misc#grab_focus ()
 
     (* TODO: keep the structure of the tree, ie. reexpand all the nodes that

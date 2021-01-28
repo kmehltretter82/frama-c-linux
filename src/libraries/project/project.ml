@@ -362,7 +362,7 @@ let set_current ?(on=false) ?(selection=State_selection.full) p =
   if not (equal p (current ())) then journalized_set_current on selection p
 
 let set_current_as_last_created () =
-  Extlib.may (fun p -> set_current p) !last_created_by_copy_ref
+  Option.iter (fun p -> set_current p) !last_created_by_copy_ref
 
 (** Indicates if we should keep [p] as the current project when calling {!on p}. *)
 let keep_current: bool ref = ref false
@@ -430,7 +430,7 @@ let unjournalized_remove project =
     Set_Current_Hook_User.apply c
   end;
   (* if we removed the last created_by_copy project, there is no last one *)
-  Extlib.may
+  Option.iter
     (fun p -> if equal project p then last_created_by_copy_ref := None)
     !last_created_by_copy_ref;
   (* clear all the states of other projects referring to the delete project *)

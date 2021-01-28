@@ -428,7 +428,7 @@ let datatype = "MemRegion"
 
 let configure () =
   begin
-    let orig_pointer = Context.push Lang.pointer (fun _ -> t_index) in
+    let orig_pointer = Context.push Lang.pointer t_index in
     let orig_null = Context.push Cvalues.null p_inull in
     let rollback () =
       Context.pop Lang.pointer orig_pointer ;
@@ -722,7 +722,7 @@ struct
   type nonrec loc = loc
   let field = field
   let shift = shift
-  let sizeof = Ctypes.bits_sizeof_object
+  let sizeof obj = Lang.F.e_int (Ctypes.bits_sizeof_object obj)
   let value_footprint = value_footprint
   let init_footprint = init_footprint
   let frames _ _ _ = []
@@ -852,7 +852,7 @@ let disjoint_region s1 s2 =
 
 
 let addrof = MODEL.to_addr
-let sizeof = Ctypes.bits_sizeof_object
+let sizeof = MODEL.sizeof
 
 let included s1 s2 =
   if disjoint_region s1 s2 then F.p_false else

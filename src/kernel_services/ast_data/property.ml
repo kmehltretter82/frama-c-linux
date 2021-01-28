@@ -536,7 +536,7 @@ include Datatype.Make_with_collections
             (11, Kf.hash kf, Kinstr.hash s,
              (b.b_name:string), (a:Datatype.String.Set.t))
         | IPReachable {ir_kf=kf; ir_kinstr=ki; ir_program_point=ba} ->
-          Hashtbl.hash(12, Extlib.may_map Kf.hash ~dft:0 kf,
+          Hashtbl.hash(12, Option.fold ~some:Kf.hash ~none:0 kf,
                        Kinstr.hash ki, Hashtbl.hash ba)
         | IPAllocation {ial_kf=f; ial_kinstr=ki; ial_bhv=b} ->
           Hashtbl.hash (13, Kf.hash f, Kinstr.hash ki, hash_bhv_loop b)
@@ -591,7 +591,7 @@ include Datatype.Make_with_collections
           Kf.equal f1 f2 && Kinstr.equal ki1 ki2
         | IPReachable {ir_kf=kf1; ir_kinstr=ki1; ir_program_point=ba1},
           IPReachable {ir_kf=kf2; ir_kinstr=ki2; ir_program_point=ba2} ->
-          Extlib.opt_equal Kf.equal kf1 kf2 && Kinstr.equal ki1 ki2 && ba1 = ba2
+          Option.equal Kf.equal kf1 kf2 && Kinstr.equal ki1 ki2 && ba1 = ba2
         | IPBehavior {ib_kf=f1; ib_kinstr=k1; ib_active=a1; ib_bhv=b1},
           IPBehavior {ib_kf=f2; ib_kinstr=k2; ib_active=a2; ib_bhv=b2} ->
           Kf.equal f1 f2
@@ -665,7 +665,7 @@ include Datatype.Make_with_collections
           if n = 0 then Kinstr.compare ki1 ki2 else n
         | IPReachable {ir_kf=kf1; ir_kinstr=ki1; ir_program_point=ba1},
           IPReachable {ir_kf=kf2; ir_kinstr=ki2; ir_program_point=ba2} ->
-          let n = Extlib.opt_compare Kf.compare kf1 kf2 in
+          let n = Option.compare Kf.compare kf1 kf2 in
           if n = 0 then
             let n = Kinstr.compare ki1 ki2 in
             if n = 0 then Stdlib.compare ba1 ba2 else n
@@ -1404,7 +1404,7 @@ let ip_from_of_behavior kf st ~active b =
       | From _ ->
         let a = Datatype.String.Set.of_list active in
         let ip =
-          Extlib.the (ip_of_from kf st (Id_contract (a,b)) (out, froms))
+          Option.get (ip_of_from kf st (Id_contract (a,b)) (out, froms))
         in
         ip :: acc
     in
@@ -1424,7 +1424,7 @@ let ip_from_of_code_annot kf st ca = match ca.annot_content with
     let treat_from acc (out, froms) = match froms with FromAny -> acc
                                                      | From _ ->
                                                        let ip =
-                                                         Extlib.the (ip_of_from kf st (Id_loop ca) (out, froms))
+                                                         Option.get (ip_of_from kf st (Id_loop ca) (out, froms))
                                                        in
                                                        ip::acc
     in
@@ -1433,9 +1433,9 @@ let ip_from_of_code_annot kf st ca = match ca.annot_content with
 
 let ip_post_cond_of_behavior kf st ~active b =
   ip_ensures_of_behavior kf st b
-  @ (Extlib.list_of_opt (ip_assigns_of_behavior kf st ~active b))
+  @ (Option.to_list (ip_assigns_of_behavior kf st ~active b))
   @ ip_from_of_behavior kf st active b
-  @ (Extlib.list_of_opt (ip_allocation_of_behavior kf st ~active b))
+  @ (Option.to_list (ip_allocation_of_behavior kf st ~active b))
 
 let ip_of_behavior ib_kf ib_kinstr ~active ib_bhv =
   let ib_active = Datatype.String.Set.of_list active in
@@ -1487,7 +1487,7 @@ let ip_of_decreases id_kf id_kinstr id_variant =
   IPDecrease {id_kf; id_kinstr; id_ca = None; id_variant}
 
 let ip_decreases_of_spec kf st s =
-  Extlib.opt_map (ip_of_decreases kf st) s.spec_variant
+  Option.map (ip_of_decreases kf st) s.spec_variant
 
 let ip_post_cond_of_spec kf st ~active s =
   List.concat
@@ -1497,8 +1497,8 @@ let ip_of_spec kf st ~active s =
   List.concat (List.map (ip_all_of_behavior kf st ~active) s.spec_behavior)
   @ ip_complete_of_spec kf st active s
   @ ip_disjoint_of_spec kf st active s
-  @ (Extlib.list_of_opt (ip_terminates_of_spec kf st s))
-  @ (Extlib.list_of_opt (ip_decreases_of_spec kf st s))
+  @ (Option.to_list (ip_terminates_of_spec kf st s))
+  @ (Option.to_list (ip_decreases_of_spec kf st s))
 
 let ip_axiom s = IPAxiom s
 let ip_lemma s = IPLemma s
@@ -1516,10 +1516,10 @@ let ip_of_code_annot kf stmt ca =
   | AVariant t ->
     [ IPDecrease {id_kf=kf;id_kinstr=ki;id_ca=Some ca; id_variant=t}]
   | AAllocation _ ->
-    Extlib.list_of_opt (ip_allocation_of_code_annot kf ki ca)
+    Option.to_list (ip_allocation_of_code_annot kf ki ca)
     @ ip_from_of_code_annot kf ki ca
   | AAssigns _ ->
-    Extlib.list_of_opt (ip_assigns_of_code_annot kf ki ca)
+    Option.to_list (ip_assigns_of_code_annot kf ki ca)
     @ ip_from_of_code_annot kf ki ca
   | APragma p when Logic_utils.is_property_pragma p ->
     [ IPCodeAnnot {ica_kf=kf; ica_stmt=stmt; ica_ca=ca} ]

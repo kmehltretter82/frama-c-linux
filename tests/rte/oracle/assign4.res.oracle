@@ -5,10 +5,8 @@
     assigns \result \from min, max; */
 int choose1(int min, int max);
 
-/*@ assigns \result, \result;
-    assigns \result \from min, max, min, max;
-    assigns \result \from min, max, min, max;
- */
+/*@ assigns \result;
+    assigns \result \from min, max; */
 int choose2(int min, int max);
 
 int main(void)

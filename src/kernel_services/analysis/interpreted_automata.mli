@@ -97,9 +97,9 @@ val pretty_edge: vertex edge Pretty_utils.formatter
 
 module G : Graph.Sig.I
   with type V.t = vertex
-  and  type E.t = vertex * vertex edge * vertex
-  and  type V.label = vertex
-  and  type E.label = vertex edge
+   and  type E.t = vertex * vertex edge * vertex
+   and  type V.label = vertex
+   and  type E.label = vertex edge
 
 type graph = G.t
 
@@ -145,7 +145,7 @@ val exit_strategy : graph -> vertex Wto.component -> wto
 val output_to_dot : out_channel -> ?number:[`Stmt|`Vertex] -> ?wto:wto -> automaton -> unit
 
 
-(** the position of a statement in a wto given as the list of 
+(** the position of a statement in a wto given as the list of
     component heads *)
 type wto_index = vertex list
 
@@ -277,4 +277,3 @@ module Dataflow (D : Domain) :
 sig
   val fixpoint : Cil_types.kernel_function -> D.t -> D.t Vertex.Hashtbl.t
 end
-

@@ -161,7 +161,7 @@ void encrypt_aesni(void)
      (unsigned char)0x8a,
      (unsigned char)0x53};
   memcpy((void *)(a),(void const *)(a_init),
-         (unsigned int)64 * sizeof(unsigned char));
+         (unsigned long)64 * sizeof(unsigned char));
   i = 0;
   while (i < 14 + 1) {
     j = 0;

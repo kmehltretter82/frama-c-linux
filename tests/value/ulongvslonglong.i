@@ -1,6 +1,6 @@
 /* run.config*
-   OPT: -eva @EVA_OPTIONS@ -machdep x86_64
-   OPT: -eva @EVA_OPTIONS@
+   OPT: -eva @EVA_CONFIG@ -machdep x86_64
+   OPT: -eva @EVA_CONFIG@
 */
 
 int x;

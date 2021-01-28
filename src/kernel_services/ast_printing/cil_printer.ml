@@ -120,7 +120,7 @@ let print_global g =
     not (Cil.hasAttribute "fc_stdlib" attrs) || Kernel.PrintLibc.get()
   in
   let print_var v =
-    not (Cil.is_unused_builtin v) ||
+    not (Cil_builtins.is_unused_builtin v) ||
     Kernel.is_debug_key_enabled Kernel.dkey_print_builtins
   in
   match g with
@@ -131,7 +131,10 @@ let print_global g =
 let print_std_includes fmt globs =
   if not (Kernel.PrintLibc.get ()) then begin
     let extract_file acc = function
-      | AStr s -> Datatype.String.Set.add s acc
+      | AStr s ->
+        (* These strings are filepaths, so we normalize and prettify them *)
+        let s = Filepath.Normalized.(to_pretty_string (of_string s)) in
+        Datatype.String.Set.add s acc
       | _ -> Kernel.warning "Unexpected attribute parameter for fc_stdlib"; acc
     in
     let add_file acc g =
@@ -1080,7 +1083,7 @@ class cil_printer () = object (self)
         match arg.enode with
         | CastE (_, { enode = AddrOf (host, offset) }) ->
           (* Print the destination *)
-          Extlib.may (fprintf fmt "%a = " self#lval) dest;
+          Option.iter (fprintf fmt "%a = " self#lval) dest;
           (* Now the call itself *)
           fprintf fmt "%a(%a, %a)%s"
             self#varname "offsetof"
@@ -1723,7 +1726,7 @@ class cil_printer () = object (self)
           self#attributes sto_mod
           self#varname n
           (Pretty_utils.pp_list ~sep:"@\n" self#fieldinfo)
-          comp.cfields
+          (Option.value ~default:[] comp.cfields)
           self#attributes rest_attr
 
       | GCompTagDecl (comp, l) -> (* This is a declaration of a tag *)
@@ -1755,7 +1758,8 @@ class cil_printer () = object (self)
       | GFunDecl (funspec, vi, l) ->
         self#in_current_function vi;
         self#opt_funspec fmt funspec;
-        if not state.print_cil_as_is && Cil.Builtin_functions.mem vi.vname
+        if not state.print_cil_as_is &&
+           Cil_builtins.Builtin_functions.mem vi.vname
         then begin
           (* Compiler builtins need no prototypes. Just print them in
              comments. *)
@@ -1833,10 +1837,11 @@ class cil_printer () = object (self)
       self#attributes fi.fattr;
     if Kernel.(is_debug_key_enabled dkey_print_field_offsets) then
       try
-        let (offset, size) = Cil.bitsOffset fi.ftype (Field (fi, NoOffset)) in
+        let (offset, size) = Cil.fieldBitsOffset fi in
         let first = offset in
-        let last = offset + size - 1 in
-        fprintf fmt " /* bits %d .. %d */" first last
+        let last = if size > 0 then Some (offset + size - 1) else None in
+        let pp_opt fmt = Pretty_utils.pp_opt ~none:"" Format.pp_print_int fmt in
+        fprintf fmt " /* bits %d .. %a */" first pp_opt last
       with Cil.SizeOfError _ -> ()
 
   method private opt_funspec fmt funspec =
@@ -2912,12 +2917,17 @@ class cil_printer () = object (self)
           (function (a,_) -> not (Logic_const.is_exit_status a.it_content))
           l
       in
+      let unique_assigned_locs =
+        let same t1 t2 = Cil_datatype.Term.equal t1.it_content t2.it_content in
+        let f l (a,_) = if List.exists (same a) l then l else a :: l in
+        List.rev (List.fold_left f [] without_result)
+      in
       fprintf fmt "@[<h>%t%a@]"
         (fun fmt -> if without_result <> [] then
             Format.fprintf fmt "%a " self#pp_acsl_keyword kw)
         (Pretty_utils.pp_list ~sep:",@ " ~suf:";@]"
-           (fun fmt (t, _) -> self#identified_term fmt t))
-        without_result
+           (fun fmt t -> self#identified_term fmt t))
+        unique_assigned_locs
 
   method private assigns_deps kw fmt = function
     | WritesAny -> ()

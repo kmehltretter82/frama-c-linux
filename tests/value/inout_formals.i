@@ -1,5 +1,5 @@
 /*run.config*
-  OPT: @EVA_OPTIONS@ -inout -input-with-formals  -inout-with-formals
+  OPT: @EVA_CONFIG@ -inout -input-with-formals  -inout-with-formals
 */
 int x, y;
 

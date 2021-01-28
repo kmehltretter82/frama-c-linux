@@ -47,10 +47,10 @@ module CurrentLoc =
   State_builder.Ref
     (Cil_datatype.Location)
     (struct
-       let dependencies = []
-       let name = "CurrentLoc"
-       let default () = Cil_datatype.Location.unknown
-     end)
+      let dependencies = []
+      let name = "CurrentLoc"
+      let default () = Cil_datatype.Location.unknown
+    end)
 
 let voidType = TVoid([])
 
@@ -66,27 +66,27 @@ let copy_with_new_vid v =
   let n = Vid.next () in
   let new_v = { v with vid = n } in
   (match v.vlogic_var_assoc with
-    | None -> ()
-    | Some lv ->
-      let new_lv = { lv with lv_id = n } in
-      new_v.vlogic_var_assoc <- Some new_lv;
-      new_lv.lv_origin <- Some new_v);
+   | None -> ()
+   | Some lv ->
+     let new_lv = { lv with lv_id = n } in
+     new_v.vlogic_var_assoc <- Some new_lv;
+     new_lv.lv_origin <- Some new_v);
   new_v
 
 let change_varinfo_name vi name =
   vi.vname <- name;
   match vi.vlogic_var_assoc with
-    | None -> ()
-    | Some lv -> lv.lv_name <- name
+  | None -> ()
+  | Some lv -> lv.lv_name <- name
 
 let new_raw_id = Vid.next
 
 (* The next compindo identifier to use. Counts up. *)
- let nextCompinfoKey =
-   let module M =
-         State_builder.SharedCounter(struct let name = "compinfokey" end)
-   in
-   M.next
+let nextCompinfoKey =
+  let module M =
+    State_builder.SharedCounter(struct let name = "compinfokey" end)
+  in
+  M.next
 
 (** Creates a (potentially recursive) composite type. Make sure you add a
   * GTag for it to the file! **)
@@ -99,7 +99,7 @@ let mkCompInfo
        * the fields. The function can ignore this argument if not
        * constructing a recursive type.  *)
     (mkfspec: compinfo -> (string * typ * int option * attribute list *
-			   location) list)
+                           location) list option)
     (a: attribute list) : compinfo =
 
   (* make a new name for anonymous structs *)
@@ -110,28 +110,28 @@ let mkCompInfo
       corig_name = norig;
       cname = n;
       ckey = nextCompinfoKey ();
-      cfields = []; (* fields will be added afterwards. *)
+      cfields = None; (* fields will be added afterwards. *)
       cattr = a;
       creferenced = false;
       (* Make this compinfo undefined by default *)
-      cdefined = false; }
+    }
   in
   let flds =
-    List.map (fun (fn, ft, fb, fa, fl) ->
-	{ fcomp = comp;
-	  ftype = ft;
-	  forig_name = fn;
-	  fname = fn;
-	  fbitfield = fb;
-	  fattr = fa;
-	  floc = fl;
-	  faddrof = false;
-	  fsize_in_bits = None;
-	  foffset_in_bits = None;
-	  fpadding_in_bits = None;
-	}) (mkfspec comp) in
+    Option.map (List.mapi (fun forder (fn, ft, fb, fa, fl) ->
+        { fcomp = comp;
+          forder;
+          ftype = ft;
+          forig_name = fn;
+          fname = fn;
+          fbitfield = fb;
+          fattr = fa;
+          floc = fl;
+          faddrof = false;
+          fsize_in_bits = None;
+          foffset_in_bits = None;
+          fpadding_in_bits = None;
+        })) (mkfspec comp) in
   comp.cfields <- flds;
-  if flds <> [] then comp.cdefined <- true;
   comp
 
 (** Make a copy of a compinfo, changing the name and the key *)
@@ -139,12 +139,13 @@ let copyCompInfo ?(fresh=true) ci cname =
   let ckey = if fresh then nextCompinfoKey () else ci.ckey in
   let ci' = { ci with cname; ckey } in
   (* Copy the fields and set the new pointers to parents *)
-  ci'.cfields <- List.map (fun f -> {f with fcomp = ci'}) ci'.cfields;
+  ci'.cfields <-
+    Option.map (List.map (fun f -> {f with fcomp = ci'})) ci'.cfields;
   ci'
 
 
 let make_logic_var_kind x kind typ =
-  {lv_name = x; lv_id = new_raw_id(); lv_type = typ; lv_kind = kind; 
+  {lv_name = x; lv_id = new_raw_id(); lv_type = typ; lv_kind = kind;
    lv_origin = None; lv_attr = [] }
 
 let make_logic_var_global x t = make_logic_var_kind x LVGlobal t
@@ -153,15 +154,15 @@ let make_logic_var_quant x t = make_logic_var_kind x LVQuant t
 let make_logic_var_local x t = make_logic_var_kind x LVLocal t
 
 let make_logic_var =
-  Kernel.deprecated "Cil_const.make_logic_var" 
+  Kernel.deprecated "Cil_const.make_logic_var"
     ~now:"Use one of Cil_const.make_logic_var_* to indicate \
           the origin of the variable"
     make_logic_var_quant
 
 let make_logic_info k x =
   { l_var_info = make_logic_var_kind x k (Ctype voidType);
-      (* we should put the right type when fields
-	 l_profile, l_type will be factorized *)
+    (* we should put the right type when fields
+       l_profile, l_type will be factorized *)
     l_type = None;
     l_tparams = [];
     l_labels = [];

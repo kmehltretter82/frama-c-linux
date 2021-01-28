@@ -1,7 +1,7 @@
 /*run.config*
   EXIT: 1
-  OPT: -lib-entry -main main -eva @EVA_OPTIONS@
-  OPT: -lib-entry -main main -eva @EVA_OPTIONS@ -eva-ignore-recursive-calls
+  OPT: -lib-entry -main main -eva @EVA_CONFIG@
+  OPT: -lib-entry -main main -eva @EVA_CONFIG@ -eva-ignore-recursive-calls
  */
 int G;
 int ff() {

@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -eva @EVA_OPTIONS@ -eva-context-width 3 -then -eva-slevel 3
+   OPT: -eva @EVA_CONFIG@ -eva-context-width 3 -then -eva-slevel 3
 */
 
 

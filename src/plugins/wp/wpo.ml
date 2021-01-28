@@ -190,7 +190,14 @@ struct
 
   let is_trivial g = Conditions.is_trivial g.sequent
 
-  let apply phi g = g.sequent <- phi g.sequent
+  let apply option phi g =
+    try g.sequent <- phi g.sequent
+    with exn when Wp_parameters.protect exn ->
+      Wp_parameters.warning ~current:false ~once:true
+        "Goal simplification aborted (%s):@\n\
+         Exception %S@\n\
+         Re-run with debug level 1+ for details."
+        option (Printexc.to_string exn)
 
   let default_simplifiers = [
     Wp_parameters.SimplifyIsCint.get, Cint.is_cint_simplifier ;
@@ -200,23 +207,23 @@ struct
   let preprocess g =
     if Wp_parameters.Let.get () then
       begin
-        apply Conditions.introduction_eq g ;
+        apply "introcution" Conditions.introduction_eq g ;
         let fold acc (get,solver) = if get () then solver::acc else acc in
         let solvers = List.fold_left fold [] default_simplifiers in
-        apply (Conditions.simplify ~solvers) g ;
+        apply "-wp-simplify-*" (Conditions.simplify ~solvers) g ;
         if Wp_parameters.FilterInit.get ()
-        then apply Conditions.init_filter g ;
+        then apply "-wp-filter-init" Conditions.init_filter g ;
         if Wp_parameters.Prune.get ()
-        then apply (Conditions.pruning ~solvers) g ;
+        then apply "-wp-pruning" (Conditions.pruning ~solvers) g ;
         if Wp_parameters.Filter.get ()
-        then apply Conditions.filter g ;
+        then apply "-wp-filter" Conditions.filter g ;
         if Wp_parameters.Parasite.get ()
-        then apply Conditions.parasite g ;
+        then apply "-wp-parasite" Conditions.parasite g ;
       end
     else
       begin
         if Wp_parameters.Clean.get ()
-        then apply Conditions.clean g ;
+        then apply "-wp-clean" Conditions.clean g ;
       end ;
     if Conditions.is_trivial g.sequent then
       g.sequent <- Conditions.trivial ;

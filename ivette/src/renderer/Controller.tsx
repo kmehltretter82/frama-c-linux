@@ -4,6 +4,8 @@
 
 import React from 'react';
 import * as Dome from 'dome';
+import * as Json from 'dome/data/json';
+import * as Settings from 'dome/data/settings';
 
 import { Button as ToolButton, ButtonGroup, Space } from 'dome/frame/toolbars';
 import { LED, LEDstatus, IconButton } from 'dome/controls/buttons';
@@ -11,8 +13,8 @@ import { Label, Code } from 'dome/controls/labels';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 
+import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
-import { Component, TitleBar } from 'frama-c/LabViews';
 
 import 'codemirror/theme/ambiance.css';
 
@@ -96,9 +98,11 @@ function insertConfig(hs: string[], cfg: Server.Configuration) {
 
 let reloadCommand: string | undefined;
 
-Dome.onReload(() => {
-  const hst = Dome.getWindowSetting('Controller.history');
-  reloadCommand = Array.isArray(hst) && hst[0];
+Dome.reload.on(() => {
+  const [lastCmd] = Settings.getLocalStorage(
+    'Controller.history', Json.jList(Json.jString), [],
+  );
+  reloadCommand = lastCmd;
 });
 
 Dome.onCommand((argv: string[], cwd: string) => {
@@ -169,14 +173,20 @@ const editor = new RichTextBuffer();
 const RenderConsole = () => {
   const scratch = React.useRef([] as string[]);
   const [cursor, setCursor] = React.useState(-1);
-  const [history, setHistory] = Dome.useState('Controller.history', []);
   const [isEmpty, setEmpty] = React.useState(true);
   const [noTrash, setNoTrash] = React.useState(true);
+  const [history, setHistory] = Settings.useLocalStorage(
+    'Controller.history', Json.jList(Json.jString), [],
+  );
 
-  Dome.useEmitter(editor, 'change', () => {
-    const cmd = editor.getValue().trim();
-    setEmpty(cmd === '');
-    setNoTrash(cursor === 0 && history.length === 1 && cmd === history[0]);
+  React.useEffect(() => {
+    const callback = () => {
+      const cmd = editor.getValue().trim();
+      setEmpty(cmd === '');
+      setNoTrash(noTrash && cmd === history[0]);
+    };
+    editor.on('change', callback);
+    return () => { editor.off('change', callback); };
   });
 
   const doReload = () => {
@@ -241,7 +251,7 @@ const RenderConsole = () => {
 
   return (
     <>
-      <TitleBar label={edited ? 'Command line' : 'Console'}>
+      <Ivette.TitleBar label={edited ? 'Command line' : 'Console'}>
         <IconButton
           icon="TRASH"
           display={edited}
@@ -290,7 +300,7 @@ const RenderConsole = () => {
           onClick={doSwitch}
           title="Toggle command line editing"
         />
-      </TitleBar>
+      </Ivette.TitleBar>
       <Text
         buffer={edited ? editor : Server.buffer}
         mode="text"
@@ -301,15 +311,22 @@ const RenderConsole = () => {
   );
 };
 
-export const Console = () => (
-  <Component
-    id="frama-c.console"
-    label="Console"
-    title="Frama-C Server Output & Command Line"
-  >
-    <RenderConsole />
-  </Component>
-);
+Ivette.registerComponent({
+  id: 'frama-c.console',
+  group: 'frama-c.kernel',
+  label: 'Console',
+  title: 'Frama-C Server Output & Command Line',
+  rank: -1,
+  children: <RenderConsole />,
+});
+
+Ivette.registerView({
+  id: 'console',
+  rank: -1,
+  label: 'Console',
+  defaultView: true,
+  layout: 'frama-c.console',
+});
 
 // --------------------------------------------------------------------------
 // --- Status

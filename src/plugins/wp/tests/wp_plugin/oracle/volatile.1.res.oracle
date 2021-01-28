@@ -62,7 +62,8 @@ volatile.i:35: warning from wp:
 Prove: true.
 
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'job_struct_assigns':
-  /*@ behavior typed:
+[wp] volatile.i:32: Warning: 
+  Memory model hypotheses for function 'job_struct_assigns':
+  /*@ behavior wp_typed:
         requires \separated(p, &sv); */
   void job_struct_assigns(struct st_v *p);

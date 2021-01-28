@@ -1,0 +1,186 @@
+# frama-c -wp [...]
+[kernel] Parsing opaque_struct.i (no preprocessing)
+[wp] Running WP plugin...
+[wp] Warning: Missing RTE guards
+------------------------------------------------------------
+  Axiomatic 'test'
+------------------------------------------------------------
+
+Lemma fail:
+Prove: (EqS1_S S1_0 S2_0)
+
+------------------------------------------------------------
+
+Lemma succeed_L1:
+Prove: true
+
+------------------------------------------------------------
+
+Lemma succeed_L2:
+Prove: 0<=BytesLength_of_S1_S
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function assigned_via_pointer
+------------------------------------------------------------
+
+Goal Check 'fail' (file opaque_struct.i, line 53):
+Assume {
+  (* Heap *)
+  Type: (region(p.base) <= 0) /\ framed(Mptr_0) /\ sconst(Mchar_0).
+}
+Prove: EqS1_S(Load_S1_S(p, havoc(Mchar_undef_0, Mchar_0, p, Length_of_S1_S),
+                havoc(Mint_undef_0, Mint_0, p, Length_of_S1_S),
+                havoc(Mint_undef_1, Mint_1, p, Length_of_S1_S),
+                havoc(Mint_undef_2, Mint_2, p, Length_of_S1_S),
+                havoc(Mint_undef_3, Mint_3, p, Length_of_S1_S),
+                havoc(Mint_undef_4, Mint_4, p, Length_of_S1_S),
+                havoc(Mint_undef_5, Mint_5, p, Length_of_S1_S),
+                havoc(Mint_undef_6, Mint_6, p, Length_of_S1_S),
+                havoc(Mint_undef_7, Mint_7, p, Length_of_S1_S),
+                havoc(Mint_undef_8, Mint_8, p, Length_of_S1_S),
+                havoc(Mf32_undef_0, Mf32_0, p, Length_of_S1_S),
+                havoc(Mf64_undef_0, Mf64_0, p, Length_of_S1_S),
+                havoc(Mptr_undef_0, Mptr_0, p, Length_of_S1_S)),
+         Load_S1_S(p, Mchar_0, Mint_0, Mint_1, Mint_2, Mint_3, Mint_4,
+           Mint_5, Mint_6, Mint_7, Mint_8, Mf32_0, Mf64_0, Mptr_0)).
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function assigns
+------------------------------------------------------------
+
+Goal Check 'fail' (file opaque_struct.i, line 17):
+Prove: EqS1_S(S1_0, S1_1).
+
+------------------------------------------------------------
+
+Goal Check 'succeed' (file opaque_struct.i, line 18):
+Prove: true.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function assigns_effect
+------------------------------------------------------------
+
+Goal Check 'fail' (file opaque_struct.i, line 62):
+Let x = Mint_0[p].
+Let a_1 = havoc(Mint_undef_0, Mint_0, a, Length_of_S1_S)[p].
+Assume {
+  Type: is_sint32(x) /\ is_sint32(a_1).
+  (* Heap *)
+  Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\
+      (region(p.base) <= 0).
+  (* Pre-condition *)
+  Have: separated(a, Length_of_S1_S, c, 1).
+}
+Prove: a_1 = x.
+
+------------------------------------------------------------
+
+Goal Check 'fail' (file opaque_struct.i, line 63):
+Assume {
+  (* Heap *)
+  Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\
+      (region(q.base) <= 0).
+  (* Pre-condition *)
+  Have: separated(a, Length_of_S1_S, c, 1).
+}
+Prove: of_f32(havoc(Mf32_undef_0, Mf32_0, a, Length_of_S1_S)[q])
+         = of_f32(Mf32_0[q]).
+
+------------------------------------------------------------
+
+Goal Check 'succeed' (file opaque_struct.i, line 64):
+Let x = Mchar_0[c].
+Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, Length_of_S1_S)[c].
+Assume {
+  Type: is_sint8(x) /\ is_sint8(a_1).
+  (* Heap *)
+  Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\ sconst(Mchar_0).
+  (* Pre-condition *)
+  Have: separated(a, Length_of_S1_S, c, 1).
+}
+Prove: a_1 = x.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function initialized_assigns
+------------------------------------------------------------
+
+Goal Check 'succeed' (file opaque_struct.i, line 31):
+Let a = havoc(Init_undef_0, Init_0, p, Length_of_S1_S).
+Assume {
+  (* Heap *)
+  Type: (region(p.base) <= 0) /\ linked(Malloc_0) /\ cinits(Init_0).
+  (* Pre-condition *)
+  Have: IsInit_S1_S(p, Init_0) /\ valid_rw(Malloc_0, p, Length_of_S1_S).
+  (* Call Effects *)
+  Have: monotonic_init(Init_0, a).
+}
+Prove: IsInit_S1_S(p, a).
+
+------------------------------------------------------------
+
+Goal Check 'succeed' (file opaque_struct.i, line 32):
+Let x = p.base.
+Assume {
+  (* Heap *)
+  Type: (region(x) <= 0) /\ linked(Malloc_0).
+  (* Pre-condition *)
+  Have: valid_rw(Malloc_0, p, Length_of_S1_S).
+}
+Prove: 0 <= (BytesLength_of_S1_S * (Malloc_0[x] / Length_of_S1_S)).
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function uninitialized_assigns
+------------------------------------------------------------
+
+Goal Check 'fail' (file opaque_struct.i, line 47):
+Let a = havoc(Init_undef_0, Init_0, p, Length_of_S1_S).
+Assume {
+  (* Heap *)
+  Type: (region(p.base) <= 0) /\ cinits(Init_0).
+  (* Pre-condition *)
+  Have: !IsInit_S1_S(p, Init_0).
+  (* Call Effects *)
+  Have: monotonic_init(Init_0, a).
+}
+Prove: !IsInit_S1_S(p, a).
+
+------------------------------------------------------------
+
+Goal Check 'fail' (file opaque_struct.i, line 48):
+Let a = havoc(Init_undef_0, Init_0, p, Length_of_S1_S).
+Assume {
+  (* Heap *)
+  Type: (region(p.base) <= 0) /\ cinits(Init_0).
+  (* Pre-condition *)
+  Have: !IsInit_S1_S(p, Init_0).
+  (* Call Effects *)
+  Have: monotonic_init(Init_0, a).
+}
+Prove: IsInit_S1_S(p, a).
+
+------------------------------------------------------------
+[wp] opaque_struct.i:24: Warning: 
+  Memory model hypotheses for function 'g':
+  /*@ behavior wp_typed:
+        requires \separated(p, &S1, &S2, &p); */
+  void g(void);
+[wp] opaque_struct.i:57: Warning: 
+  Memory model hypotheses for function 'assign':
+  /*@ behavior wp_typed:
+        requires \separated(a, &S1, &S2); */
+  void assign(struct S *a);
+[wp] opaque_struct.i:60: Warning: 
+  Memory model hypotheses for function 'assigns_effect':
+  /*@
+     behavior wp_typed:
+       requires \separated(a, &S1, &S2);
+       requires \separated(c, &S1, &S2);
+       requires \separated(p_0, &S1, &S2);
+       requires \separated(q, &S1, &S2);
+     */
+  void assigns_effect(int *p_0, float *q, char *c, struct S *a);

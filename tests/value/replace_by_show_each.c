@@ -1,5 +1,5 @@
 /* run.config*
- OPT: -eva @EVA_OPTIONS@ -inout -calldeps
+ OPT: -eva @EVA_CONFIG@ -inout -calldeps
 */
 
 #define show_each_1 Frama_C_show_each_1

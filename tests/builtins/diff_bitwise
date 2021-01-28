@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 diff oracle/Longinit_sequencer.res.oracle oracle_bitwise/Longinit_sequencer.res.oracle
 320c320
 <   result/Longinit_sequencer.sav
@@ -8,6 +9,20 @@ diff oracle/Longinit_sequencer.res.oracle oracle_bitwise/Longinit_sequencer.res.
 ---
 >   result_bitwise/Longinit_sequencer.sav
 diff oracle/allocated.0.res.oracle oracle_bitwise/allocated.0.res.oracle
+||||||| ac7807782d
+diff tests/builtins/oracle/Longinit_sequencer.res.oracle tests/builtins/oracle_bitwise/Longinit_sequencer.res.oracle
+320c320
+<   tests/builtins/result/Longinit_sequencer.sav
+---
+>   tests/builtins/result_bitwise/Longinit_sequencer.sav
+556c556
+<   tests/builtins/result/Longinit_sequencer.sav
+---
+>   tests/builtins/result_bitwise/Longinit_sequencer.sav
+diff tests/builtins/oracle/allocated.0.res.oracle tests/builtins/oracle_bitwise/allocated.0.res.oracle
+=======
+diff tests/builtins/oracle/allocated.0.res.oracle tests/builtins/oracle_bitwise/allocated.0.res.oracle
+>>>>>>> origin/master
 260a261,263
 > [eva] allocated.c:127: Call to builtin __fc_vla_alloc
 > [eva:malloc] allocated.c:127: 

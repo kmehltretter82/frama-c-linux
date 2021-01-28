@@ -571,10 +571,10 @@ class check_annot_visitor = object(self)
   method proven () = proven
 
   method! vcode_annot annot =
-    let kf = Extlib.the self#current_kf in
+    let kf = Option.get self#current_kf in
     let stmt =
       Visitor_behavior.Get_orig.stmt
-        self#behavior (Extlib.the self#current_stmt)
+        self#behavior (Option.get self#current_stmt)
     in
     begin match annot.annot_content with
       | AAssert _ ->
@@ -591,7 +591,7 @@ class check_annot_visitor = object(self)
 
   method! vglob_aux g = match g with
     | GFun (fdec, _loc) when
-        !Db.Value.is_called (Extlib.the self#current_kf) &&
+        !Db.Value.is_called (Option.get self#current_kf) &&
         not (!Db.Value.no_results fdec)
         ->
       Cil.DoChildren

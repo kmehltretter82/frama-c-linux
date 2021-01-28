@@ -397,15 +397,15 @@ module Option_ref(Data:Datatype.S)(Info: Info) = struct
   let memo ?change f =
     try
       let old = get () in
-      Extlib.may_map
-        ~dft:old (fun f -> let v = f old in set v; v) change
+      Option.fold
+        ~none:old ~some:(fun f -> let v = f old in set v; v) change
     with Not_found ->
       let data = f () in
       set data;
       data
 
-  let map f = Extlib.opt_map f !(!state)
-  let may f = Extlib.may f !(!state)
+  let map f = Option.map f !(!state)
+  let may f = Option.iter f !(!state)
 
 end
 
@@ -559,8 +559,8 @@ struct
   let memo ?change f key =
     try
       let old = find key in
-      Extlib.may_map
-        ~dft:old (fun f -> let v = f old in replace key v; v) change
+      Option.fold
+        ~none:old ~some:(fun f -> let v = f old in replace key v; v) change
     with Not_found ->
       let data = f key in
       replace key data;

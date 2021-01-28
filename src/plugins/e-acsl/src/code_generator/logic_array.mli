@@ -22,9 +22,6 @@
 
 open Cil_types
 
-val is_array: typ -> bool
-(** @return true iff the type is an array *)
-
 val comparison_to_exp: loc:location -> kernel_function -> Env.t ->
   name:string -> binop -> exp -> exp -> exp * Env.t
 (** [comparison_to_exp ~loc kf env ~name bop e1 e2] generate the C code

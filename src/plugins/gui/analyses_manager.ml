@@ -46,7 +46,7 @@ let run title filter_name extension loader
              !Db.Main.play ();
              host_window#reset ()
            in
-           Extlib.may run dialog#filename;
+           Option.iter run dialog#filename;
        | `DELETE_EVENT | `CANCEL ->
            ());
   dialog#destroy ()
@@ -72,7 +72,7 @@ let insert (main_ui: Design.main_window_extension_points) =
       ]
   in
   default_analyses_items.(0)#add_accelerator `CONTROL 'r';
-  let stop_button = Extlib.the default_analyses_items.(2)#tool_button in
+  let stop_button = Option.get default_analyses_items.(2)#tool_button in
 
   Gtk_helper.register_locking_machinery
     ~lock_last:true

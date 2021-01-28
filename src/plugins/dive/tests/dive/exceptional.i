@@ -1,5 +1,5 @@
 /* run.config
-STDOPT: +"-absolute-valid-range 0x10000000-0x1fffffff -dive-from-variables main::__retres -dive-depth-limit 5"
+STDOPT: #"-machdep x86_32" +"-absolute-valid-range 0x10000000-0x1fffffff -dive-from-variables main::__retres -dive-depth-limit 5"
 */
 
 int* gm(int *p) { return (int *) ((unsigned int) p * 2 / 2); }

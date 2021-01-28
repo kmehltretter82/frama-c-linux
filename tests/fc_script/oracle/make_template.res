@@ -10,7 +10,7 @@ warning: GNUmakefile already exists. Overwrite? [y/N] Main target name: Source f
 warning: 'main' seems to be defined multiple times.
 Is this ok? [Y/n] compile_commands.json exists, add option -json-compilation-database? [Y/n] Add stub for function main (only needed if it uses command-line arguments)? [y/N] Please define the architectural model (machdep) of the target machine.
 Known machdeps: x86_16 x86_32 x86_64 gcc_x86_16 gcc_x86_32 gcc_x86_64 ppc_32 msvc_x86_64
-Please enter the machdep [x86_32]: 'invalid_machdep' is not a standard machdep. Proceed anyway? [y/N]Please enter the machdep [x86_32]: warning: fc_stubs.c already exists. Overwrite? [y/N] Created stub for main function: fc_stubs.c
+Please enter the machdep [x86_64]: 'invalid_machdep' is not a standard machdep. Proceed anyway? [y/N]Please enter the machdep [x86_64]: warning: fc_stubs.c already exists. Overwrite? [y/N] Created stub for main function: fc_stubs.c
 Template created: GNUmakefile
 Path to Frama-C binaries written to: path.mk
 Running ptests: cleaning up after tests...

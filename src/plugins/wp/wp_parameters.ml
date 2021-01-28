@@ -415,9 +415,12 @@ module Split =
 
 let () = Parameter_customize.set_group wp_strategy
 module UnfoldAssigns =
-  False(struct
+  Int(struct
     let option_name = "-wp-unfold-assigns"
-    let help = "Unfold aggregates in assigns."
+    let default = 0
+    let arg_name = "n"
+    let help = "Unfold up to <n> levels of aggregates and arrays in assigns.\n\
+                Value -1 means unlimited depth (default 0)"
   end)
 
 let () = Parameter_customize.set_group wp_strategy
@@ -541,13 +544,6 @@ module Prenex =
   False(struct
     let option_name = "-wp-prenex"
     let help = "Normalize nested foralls into prenex-form"
-  end)
-
-let () = Parameter_customize.set_group wp_simplifier
-module Bits =
-  True(struct
-    let option_name = "-wp-bits"
-    let help = "Use bit-test simplifications."
   end)
 
 let () = Parameter_customize.set_group wp_simplifier
@@ -1065,24 +1061,16 @@ module MemoryContext =
       let help = "Warn Against Memory Model Hypotheses"
     end)
 
-let wkey_imprecise_hypotheses_assigns =
-  register_warn_category "hypotheses:assigns"
-let () = set_warn_status wkey_imprecise_hypotheses_assigns Log.Winactive
-
 let () = Parameter_customize.set_group wp_po
 let () = Parameter_customize.do_not_save ()
 
-module CheckModelHypotheses =
+module CheckMemoryContext =
   False
     (struct
-      let option_name = "-wp-check-model-hypotheses"
+      let option_name = "-wp-check-memory-model"
       let help = "Insert memory model hypotheses in function contracts and \
                   check them on call. (experimental)"
     end)
-
-let wkey_imprecise_hypotheses_assigns =
-  register_warn_category "hypotheses:assigns"
-let () = set_warn_status wkey_imprecise_hypotheses_assigns Log.Winactive
 
 let () = Parameter_customize.set_group wp_po
 module OutputDir =
@@ -1237,5 +1225,15 @@ let print_generated ?header file =
             Format.pp_print_string fmt s;
             Format.pp_print_newline fmt ())
     end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Debugging                                                          --- *)
+(* -------------------------------------------------------------------------- *)
+
+let protect e =
+  if debug_atleast 1 then false else
+    match e with
+    | Db.Cancel | Log.AbortError _ | Log.AbortFatal _ -> false
+    | _ -> true
 
 (* -------------------------------------------------------------------------- *)

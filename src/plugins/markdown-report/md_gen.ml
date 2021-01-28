@@ -23,6 +23,13 @@
 open Cil_types
 open Markdown
 
+module Eva_info = struct
+  let loaded = ref false
+  let coverage_md_gen: (unit -> elements) ref = Extlib.mk_fun "coverage_md_gen"
+  let domains_md_gen: (unit -> (text * text) list) ref=
+    Extlib.mk_fun "domains_md_gen"
+end
+
 type env =
   { is_draft: bool;
     remarks: Markdown.element list Datatype.String.Map.t; }
@@ -49,21 +56,15 @@ let plural l s =
   | [] | [ _ ] -> s
   | _::_::_ -> s ^ "s"
 
-let get_eva_domains () =
-  let eva_domains = Eva.Value_parameters.enabled_domains () in
-  let domains = List.filter (fun (name, _) -> name <> "cvalue") eva_domains in
-  let aux (name, descr) = (plain "domain" @ bold name), plain descr in
-  List.map aux domains
-
 let section_domains env =
   let anchor = "domains" in
-  let head = H3 (plain "EVA Domains", Some anchor) in
+  let head = H3 (plain "Eva Domains", Some anchor) in
   if env.is_draft then
     head
-    :: Comment "You can give more information about the choice of EVA domains"
+    :: Comment "You can give more information about the choice of Eva domains"
     :: insert_marks env anchor
   else begin
-    let l = get_eva_domains () in
+    let l = !Eva_info.domains_md_gen () in
     head
     :: Block
       (match l with
@@ -76,7 +77,7 @@ let section_domains env =
          [Text
             (plain
                "In addition to the base domain (`cvalue`), additional \
-                domains have been used by EVA");
+                domains have been used by Eva");
           DL l]
       )
     :: insert_remark env anchor
@@ -94,7 +95,6 @@ let section_stubs env =
   in
   let stubbed_kf = List.filter Kernel_function.is_definition stubbed_kf in
   let opt = Dynamic.Parameter.String.get "-eva-use-spec" () in
-  (* NB: requires OCaml >= 4.04 *)
   let l = String.split_on_char ',' opt in
   let use_spec =
     Extlib.filter_map
@@ -259,7 +259,7 @@ let gen_context env =
   H1 (plain "Context of the analysis", Some "context")
   :: gen_inputs env
   @ gen_config env
-  @ section_domains env
+  @ (if !Eva_info.loaded then section_domains env else [])
   @ H3 (plain "Stubbed Functions", Some "stubs")
     :: (
       if env.is_draft then
@@ -272,11 +272,11 @@ let gen_context env =
 let gen_coverage env =
   let anchor = "coverage" in
   let header = H1 (plain "Coverage", Some anchor) in
-  let content = Eva_coverage.md_gen () in
+  let content = !Eva_info.coverage_md_gen () in
   let content =
     if env.is_draft then
       content @
-      Comment "You can comment on the coverage obtained by EVA"
+      Comment "You can comment on the coverage obtained by Eva"
       :: insert_marks env anchor
     else
       content @ insert_remark env anchor
@@ -569,7 +569,7 @@ let gen_report ~draft:is_draft () =
   let remarks = mk_remarks is_draft in
   let env = { remarks; is_draft } in
   let context = gen_context env in
-  let coverage = gen_coverage env in
+  let coverage = if !Eva_info.loaded then gen_coverage env else [] in
   let alarms = gen_alarms env in
   let title = Mdr_params.Title.get () in
   let title =

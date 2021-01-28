@@ -14,19 +14,23 @@
 const path = require('path');
 const DOME = process.env.DOME || path.resolve( __dirname , 'dome' );
 
+// --------------------------------------------------------------------------
+
 module.exports = {
   module: {
     rules: [
-      { test: /\.css$/, use: [ 'css-loader' ] }
-    ]
+      { test: /\.css$/, use: [ 'css-loader' ] },
+      { test: /\.(ts|js)x?$/, use: [ 'babel-loader' ], exclude: /node_modules/ }
+    ],
+    strictExportPresence: true
   },
   resolve: {
+    extensions: ['.ts', '.tsx', '.js', 'jsx', '.json'],
     alias: {
-      '@plugins':     path.resolve( __dirname , 'src/plugins' ),
-      'dome/misc':    path.resolve( DOME , 'src/misc' ),
-      'dome/system':  path.resolve( DOME , 'src/misc/system.js' ),
-      'dome$':        path.resolve( DOME , 'src/renderer/dome.js' ),
-      'dome':         path.resolve( DOME , 'src/renderer' ),
+      'dome/misc':    path.resolve( DOME , 'misc' ),
+      'dome/system':  path.resolve( DOME , 'misc/system.ts' ),
+      'dome$':        path.resolve( DOME , 'renderer/dome.tsx' ),
+      'dome':         path.resolve( DOME , 'renderer' ),
       'react-dom':    '@hot-loader/react-dom'
     }
   }

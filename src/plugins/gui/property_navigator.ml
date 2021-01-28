@@ -675,7 +675,7 @@ let make_panel (main_ui:main_window_extension_points) =
     | Consolidation.Unknown_but_dead _ -> dead.get ()
     | Consolidation.Inconsistent _ -> inconsistent.get ()
   in
-  let visible_status = Extlib.may_map visible_status_aux ~dft:true in
+  let visible_status = Option.fold ~some:visible_status_aux ~none:true in
   let fill_model () =
     let add_ip ip =
       if visible ip then
@@ -688,7 +688,7 @@ let make_panel (main_ui:main_window_extension_points) =
 
     (* Will the results for this kf be ultimately displayed *)
     let display kf =
-      not (Cil.is_unused_builtin (Kernel_function.get_vi kf)) &&
+      not (Cil_builtins.is_unused_builtin (Kernel_function.get_vi kf)) &&
       not (onlyCurrent.get ()) ||
       (let kfvi = Kernel_function.get_vi kf in
        List.exists

@@ -1,6 +1,6 @@
 /* run.config*
    PLUGIN: from,inout,eva,report
-   OPT: -lib-entry -eva @EVA_OPTIONS@ -then -report -report-print-properties -then -report-no-specialized
+   OPT: -lib-entry -eva @EVA_CONFIG@ -then -report -report-print-properties -then -report-no-specialized
 */
 
 int x;

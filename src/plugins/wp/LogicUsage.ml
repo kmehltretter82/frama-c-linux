@@ -396,6 +396,8 @@ class visitor =
 
       (* --- LOGIC INFO --- *)
 
+      | Dtype_annot(l,_)
+      | Dinvariant(l,_)
       | Dfun_or_pred(l,_) ->
           begin
             register_logic database self#section l ;
@@ -427,8 +429,6 @@ class visitor =
       (* --- OTHERS --- *)
 
       | Dvolatile _
-      | Dinvariant _
-      | Dtype_annot _
       | Dmodel_annot _
       | Dcustom_annot _
       | Dextended _

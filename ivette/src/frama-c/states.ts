@@ -12,19 +12,24 @@ import React from 'react';
 import * as Dome from 'dome';
 import * as Json from 'dome/data/json';
 import { Order } from 'dome/data/compare';
-import * as GlobalStates from 'dome/data/states';
-import { useModel } from 'dome/table/models';
+import { GlobalState, useGlobalState } from 'dome/data/states';
+import { Client, useModel } from 'dome/table/models';
 import { CompactModel } from 'dome/table/arrays';
+import * as Ast from 'frama-c/api/kernel/ast';
 import * as Server from './server';
 
-const PROJECT = 'frama-c.project';
-const STATE_PREFIX = 'frama-c.state.';
+const PROJECT = new Dome.Event('frama-c.project');
+class STATE extends Dome.Event {
+  constructor(id: string) {
+    super(`frama-c.state.${id}`);
+  }
+}
 
 // --------------------------------------------------------------------------
 // --- Pretty Printing (Browser Console)
 // --------------------------------------------------------------------------
 
-const PP = new Dome.PP('States');
+const D = new Dome.Debug('States');
 
 // --------------------------------------------------------------------------
 // --- Synchronized Current Project
@@ -42,15 +47,15 @@ Server.onReady(async () => {
     };
     const current: { id?: string } = await Server.send(sr, null);
     currentProject = current.id;
-    Dome.emit(PROJECT);
+    PROJECT.emit();
   } catch (error) {
-    PP.error(`Fail to retrieve the current project. ${error.toString()}`);
+    D.error(`Fail to retrieve the current project. ${error.toString()}`);
   }
 });
 
 Server.onShutdown(() => {
   currentProject = '';
-  Dome.emit(PROJECT);
+  PROJECT.emit();
 });
 
 // --------------------------------------------------------------------------
@@ -85,9 +90,9 @@ export async function setProject(project: string) {
       };
       await Server.send(sr, project);
       currentProject = project;
-      Dome.emit(PROJECT);
+      PROJECT.emit();
     } catch (error) {
-      PP.error(`Fail to set the current project. ${error.toString()}`);
+      D.error(`Fail to set the current project. ${error.toString()}`);
     }
   }
 }
@@ -133,7 +138,7 @@ export function useRequest<In, Out>(
         const r = await Server.send(rq, params);
         update(r);
       } catch (error) {
-        PP.error(`Fail in useRequest '${rq.name}'. ${error.toString()}`);
+        D.error(`Fail in useRequest '${rq.name}'. ${error.toString()}`);
         update(options.onError);
       }
     } else {
@@ -221,20 +226,20 @@ interface Handler<A> {
 
 // shared for all projects
 class SyncState<A> {
-  UPDATE: string;
+  UPDATE: Dome.Event;
   handler: Handler<A>;
   upToDate: boolean;
   value?: A;
 
   constructor(h: Handler<A>) {
     this.handler = h;
-    this.UPDATE = STATE_PREFIX + h.name;
+    this.UPDATE = new STATE(h.name);
     this.upToDate = false;
     this.value = undefined;
     this.update = this.update.bind(this);
     this.getValue = this.getValue.bind(this);
     this.setValue = this.setValue.bind(this);
-    Dome.on(PROJECT, this.update);
+    PROJECT.on(this.update);
   }
 
   getValue() {
@@ -250,9 +255,9 @@ class SyncState<A> {
       this.value = v;
       const setter = this.handler.getter;
       if (setter) await Server.send(setter, v);
-      Dome.emit(this.UPDATE);
+      this.UPDATE.emit();
     } catch (error) {
-      PP.error(
+      D.error(
         `Fail to set value of SyncState '${this.handler.name}'.`,
         `${error.toString()}`,
       );
@@ -264,9 +269,9 @@ class SyncState<A> {
       this.upToDate = true;
       const v = await Server.send(this.handler.getter, null);
       this.value = v;
-      Dome.emit(this.UPDATE);
+      this.UPDATE.emit();
     } catch (error) {
-      PP.error(
+      D.error(
         `Fail to update SyncState '${this.handler.name}'.`,
         `${error.toString()}`,
       );
@@ -309,7 +314,7 @@ export function useSyncState<A>(
 /** Synchronization with a (projectified) server value. */
 export function useSyncValue<A>(va: Value<A>): A | undefined {
   const s = getSyncState(va);
-  Dome.useUpdate(s.update);
+  Dome.useUpdate(PROJECT, s.UPDATE);
   Server.useSignal(s.handler.signal, s.update);
   return s.getValue();
 }
@@ -359,7 +364,7 @@ class SyncArray<K, A> {
       } while (pending > 0);
       /* eslint-enable no-await-in-loop */
     } catch (error) {
-      PP.error(
+      D.error(
         `Fail to retrieve the value of syncArray '${this.handler.name}.`,
         `${error.toString()}`,
       );
@@ -378,7 +383,7 @@ class SyncArray<K, A> {
         this.fetch();
       }
     } catch (error) {
-      PP.error(
+      D.error(
         `Fail to set reload of syncArray '${this.handler.name}'.`,
         `${error.toString()}`,
       );
@@ -393,7 +398,7 @@ class SyncArray<K, A> {
 
 const syncArrays = new Map<string, SyncArray<any, any>>();
 
-function getSyncArray<K, A>(
+function lookupSyncArray<K, A>(
   array: Array<K, A>,
 ): SyncArray<K, A> {
   const id = `${currentProject}@${array.name}`;
@@ -413,7 +418,7 @@ Server.onShutdown(() => syncArrays.clear());
 
 /** Force a Synchronized Array to reload. */
 export function reloadArray<K, A>(arr: Array<K, A>) {
-  getSyncArray(arr).reload();
+  lookupSyncArray(arr).reload();
 }
 
 /**
@@ -430,33 +435,50 @@ export function useSyncArray<K, A>(
   sync = true,
 ): CompactModel<K, A> {
   Dome.useUpdate(PROJECT);
-  const st = getSyncArray(arr);
+  const st = lookupSyncArray(arr);
   React.useEffect(st.update);
   Server.useSignal(arr.signal, st.fetch);
   useModel(st.model, sync);
   return st.model;
 }
 
+/**
+   Return the associated array model.
+*/
+export function getSyncArray<K, A>(
+  arr: Array<K, A>,
+): CompactModel<K, A> {
+  const st = lookupSyncArray(arr);
+  return st.model;
+}
+
+/**
+   Link on the associated array model.
+   @param onReload callback on reload event and update event if not specified.
+   @param onUpdate callback on update event.
+ */
+export function onSyncArray<K, A>(
+  arr: Array<K, A>,
+  onReload?: () => void,
+  onUpdate?: () => void,
+): Client {
+  const st = lookupSyncArray(arr);
+  return st.model.link(onReload, onUpdate);
+}
+
 // --------------------------------------------------------------------------
 // --- Selection
 // --------------------------------------------------------------------------
-
-type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> =
-  Partial<T> & U[keyof U];
-
-export interface FullLocation {
-  /** Function name. */
-  readonly function: string;
-  /** Marker identifier. */
-  readonly marker: string;
-}
 
 /** An AST location.
  *
  *  Properties [[function]] and [[marker]] are optional,
  *  but at least one of the two must be set.
  */
-export type Location = AtLeastOne<FullLocation>;
+export type Location = {
+  fct?: string;
+  marker?: Ast.marker;
+};
 
 export interface HistorySelection {
   /** Previous locations with respect to the [[current]] one. */
@@ -475,7 +497,11 @@ export type HistorySelectActions = 'HISTORY_PREV' | 'HISTORY_NEXT';
 
 /** A selection of multiple locations. */
 export interface MultipleSelection {
-  /** The index of the current selected location in [[possibleSelections]]. */
+  /** Name of the multiple selection.  */
+  name: string;
+  /** Explanatory description of the multiple selection.  */
+  title: string;
+  /** The index of the current selected location in [[allSelections]]. */
   index: number;
   /** All locations forming a multiple selection. */
   allSelections: Location[];
@@ -483,6 +509,8 @@ export interface MultipleSelection {
 
 /** A select action on multiple locations. */
 export interface MultipleSelect {
+  readonly name: string;
+  readonly title: string;
   readonly index: number;
   readonly locations: Location[];
 }
@@ -544,7 +572,7 @@ function isNthSelect(a: SelectionActions): a is NthSelect {
 /** Update selection to the given location. */
 function selectLocation(s: Selection, location: Location): Selection {
   const [prevSelections, nextSelections] =
-    s.current && s.current.function !== location.function ?
+    s.current && s.current.fct !== location.fct ?
       [[s.current, ...s.history.prevSelections], []] :
       [s.history.prevSelections, s.history.nextSelections];
   return {
@@ -593,19 +621,18 @@ function fromHistory(s: Selection, action: HistorySelectActions): Selection {
  */
 function fromMultipleSelections(
   s: Selection,
-  action: 'MULTIPLE_PREV' | 'MULTIPLE_NEXT' | 'MULTIPLE_CYCLE'
-  | 'MULTIPLE_CLEAR',
+  a: 'MULTIPLE_PREV' | 'MULTIPLE_NEXT' | 'MULTIPLE_CYCLE' | 'MULTIPLE_CLEAR',
 ): Selection {
-  switch (action) {
+  switch (a) {
     case 'MULTIPLE_PREV':
     case 'MULTIPLE_NEXT':
     case 'MULTIPLE_CYCLE': {
       const idx =
-        action === 'MULTIPLE_PREV' ?
+        a === 'MULTIPLE_PREV' ?
           s.multiple.index - 1 :
           s.multiple.index + 1;
       const index =
-        action === 'MULTIPLE_CYCLE' && idx >= s.multiple.allSelections.length ?
+        a === 'MULTIPLE_CYCLE' && idx >= s.multiple.allSelections.length ?
           0 :
           idx;
       if (0 <= index && index < s.multiple.allSelections.length) {
@@ -621,6 +648,8 @@ function fromMultipleSelections(
       return {
         ...s,
         multiple: {
+          name: '',
+          title: '',
           index: 0,
           allSelections: [],
         },
@@ -636,13 +665,15 @@ function reducer(s: Selection, action: SelectionActions): Selection {
     return selectLocation(s, action.location);
   }
   if (isMultipleSelect(action)) {
-    if (action.locations.length === 0)
-      return s;
     const index = action.index > 0 ? action.index : 0;
-    const selection = selectLocation(s, action.locations[index]);
+    const selection =
+      action.locations.length === 0 ? s :
+        selectLocation(s, action.locations[index]);
     return {
       ...selection,
       multiple: {
+        name: action.name,
+        title: action.title,
         allSelections: action.locations,
         index,
       },
@@ -680,24 +711,27 @@ const emptySelection = {
     nextSelections: [],
   },
   multiple: {
+    name: '',
+    title: '',
     index: 0,
     allSelections: [],
   },
 };
 
-const GlobalSelection = new GlobalStates.State<Selection>(emptySelection);
+export const MetaSelection = new Dome.Event<Location>('frama-c-meta-selection');
+export const GlobalSelection = new GlobalState<Selection>(emptySelection);
 Server.onShutdown(() => GlobalSelection.setValue(emptySelection));
+
+export function setSelection(location: Location, meta = false) {
+  const s = GlobalSelection.getValue();
+  GlobalSelection.setValue(reducer(s, { location }));
+  if (meta) MetaSelection.emit(location);
+}
 
 /** Current selection. */
 export function useSelection(): [Selection, (a: SelectionActions) => void] {
-  const [selection, setSelection] = GlobalStates.useState(GlobalSelection);
-
-  function update(action: SelectionActions) {
-    const nextSelection = reducer(selection, action);
-    setSelection(nextSelection);
-  }
-
-  return [selection, update];
+  const [current, setCurrent] = useGlobalState(GlobalSelection);
+  return [current, (action) => setCurrent(reducer(current, action))];
 }
 
 // --------------------------------------------------------------------------

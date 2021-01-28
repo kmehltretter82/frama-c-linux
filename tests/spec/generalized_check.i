@@ -3,6 +3,7 @@ PLUGIN: @EVA_PLUGINS@
 OPT: -eva -eva-use-spec f
 OPT: -print
 */
+
 /*@ check lemma easy_proof: \false; */ // should not be put in any environment
 
 /*@ check requires f_valid_x: \valid(x);

@@ -7,7 +7,7 @@
         - [Installing Frama-C from opam repository](#installing-frama-c-from-opam-repository)
         - [Installing Custom Versions of Frama-C](#installing-custom-versions-of-frama-c)
         - [Installing Frama-C on Windows via WSL](#installing-frama-c-on-windows-via-wsl)
-        - [Installing Frama-C on macOS](#installing-frama-c-on-mac-os)
+        - [Installing Frama-C on macOS](#installing-frama-c-on-macos)
     - [Installing Frama-C via your Linux distribution (Debian/Ubuntu/Fedora)](#installing-frama-c-via-your-linux-distribution-debianubuntufedora)
     - [Compiling from source](#compiling-from-source)
         - [Quick Start](#quick-start)
@@ -92,7 +92,7 @@ why3 config --detect
 ### Reference configuration
 
 See file [reference-configuration.md](reference-configuration.md)
-for a set of packages that is known to work with Frama-C 21 (Scandium).
+for a set of packages that is known to work with Frama-C 22 (Titanium).
 
 ### Installing Custom Versions of Frama-C
 
@@ -129,7 +129,7 @@ following tools:
 #### Prerequisites: WSL + a Linux distribution
 
 For enabling WSL on Windows, you may follow these instructions
-(we tested with Ubuntu 18.04 LTS;
+(we tested with Ubuntu 20.04 LTS;
 other distributions/versions should also work,
 but the instructions below may require some modifications).
 
@@ -158,7 +158,7 @@ Move to your user directory, download the distribution and install it:
 
 ```
 cd C:\Users\<Your User Directory>
-Invoke-WebRequest -Uri https://aka.ms/wsl-ubuntu-1804 -OutFile Ubuntu.appx -UseBasicParsing
+Invoke-WebRequest -Uri https://aka.ms/wslubuntu2004 -OutFile Ubuntu.appx -UseBasicParsing
 Add-AppxPackage .\Ubuntu.appx
 ```
 
@@ -171,16 +171,15 @@ For installing opam, some packages are required. The following commands can be
 run to update the system and install those packages:
 
 ```
-sudo add-apt-repository -y ppa:avsm/ppa # unnecessary for Ubuntu 20.04
 sudo apt update
 sudo apt upgrade
-sudo apt install make m4 gcc opam
+sudo apt install make m4 gcc opam yaru-theme-gtk yaru-theme-icon
 ```
 
 Then opam can be set up using these commands:
 
 ```
-opam init --disable-sandboxing -c 4.05.0 --shell-setup
+opam init --disable-sandboxing --shell-setup
 eval $(opam env)
 opam install -y depext
 ```
@@ -415,7 +414,7 @@ available:
 
 - `frama-c`
 - `frama-c-gui`       if available
-- `frama-c-config`    displays Frama-C configuration paths
+- `frama-c-config`    lightweight wrapper used to display configuration paths
 - `frama-c.byte`      bytecode version of frama-c
 - `frama-c-gui.byte`  bytecode version of frama-c-gui, if available
 - `ptests.opt`        testing tool for Frama-c

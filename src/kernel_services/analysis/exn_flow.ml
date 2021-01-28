@@ -346,7 +346,7 @@ let generate_exn_union e exns =
   let loc = Cil_datatype.Location.unknown in
   let create_union_fields _ =
     let add_one_field t acc = (get_type_tag t, t, None, [], loc) :: acc in
-    Cil_datatype.Typ.Set.fold add_one_field exns []
+    Some (Cil_datatype.Typ.Set.fold add_one_field exns [])
   in
   let union_name = "__fc_exn_union" in
   let exn_kind_union =
@@ -360,7 +360,7 @@ let generate_exn_union e exns =
       (exn_obj_name,
        TComp(exn_kind_union, { scache = Not_Computed } , []), None, [], loc)
     in
-    [uncaught; kind; obj]
+    Some [uncaught; kind; obj]
   in
   let struct_name = "__fc_exn_struct" in
   let exn_struct =
@@ -444,7 +444,7 @@ class erase_exn =
         let s = get_type_tag t in
         Kernel.debug ~dkey:Kernel.dkey_exn_flow
           "Registering %a as possible exn type" Cil_datatype.Typ.pretty t;
-        let fi = List.find (fun fi -> fi.fname = s) union.cfields in
+        let fi = List.find (fun fi -> fi.fname = s) (Option.get union.cfields) in
         Cil_datatype.Typ.Hashtbl.add exn_union t fi
       in
       Cil_datatype.Typ.Set.iter update_one_binding exns
@@ -454,13 +454,13 @@ class erase_exn =
     method private is_thrown t = Cil_datatype.Typ.Hashtbl.mem exn_enum t
 
     method private exn_field_off name =
-      List.find (fun fi -> fi.fname = name) (Extlib.the exn_struct).cfields
+      List.find (fun fi -> fi.fname = name) (Option.(get (get exn_struct).cfields))
 
     method private exn_field name =
-      Var (Extlib.the exn_var), Field(self#exn_field_off name, NoOffset)
+      Var (Option.get exn_var), Field(self#exn_field_off name, NoOffset)
 
     method private exn_field_term name =
-      TVar(Cil.cvar_to_lvar (Extlib.the exn_var)),
+      TVar(Cil.cvar_to_lvar (Option.get exn_var)),
       TField(self#exn_field_off name, TNoOffset)
 
     method private exn_obj_field = self#exn_field exn_obj_name
@@ -516,7 +516,7 @@ class erase_exn =
       if Stack.is_empty catch_all_label then begin
         (* no catch-all clause in the function: just go up in the stack. *)
         fct_can_throw <- true;
-        let kf = Extlib.the self#current_kf in
+        let kf = Option.get self#current_kf in
         let ret = Kernel_function.find_return kf in
         let rtyp = Kernel_function.get_return_type kf in
         if ret.labels = [] then
@@ -594,7 +594,7 @@ class erase_exn =
         in
         b.bstmts <- s :: b.bstmts
       in
-      let f = Extlib.the self#current_func in
+      let f = Option.get self#current_func in
       let update_locals v b =
         if not (List.memq v b.blocals) then b.blocals <- v::b.blocals;
         if not (List.memq v f.slocals) then f.slocals <- v::f.slocals
@@ -638,7 +638,7 @@ class erase_exn =
 
     method private modify_current () =
       modified_funcs <-
-        Cil_datatype.Fundec.Set.add (Extlib.the self#current_func) modified_funcs;
+        Cil_datatype.Fundec.Set.add (Option.get self#current_func) modified_funcs;
 
     method private aux_handler_goto target (v,b) =
       let loc = v.vdecl in
@@ -696,7 +696,7 @@ class erase_exn =
     method private clean_catch_clause (bind,b as handler) acc =
       let remove_local v =
         let f =
-          Visitor_behavior.Get.fundec self#behavior (Extlib.the self#current_func)
+          Visitor_behavior.Get.fundec self#behavior (Option.get self#current_func)
         in
         let v = Visitor_behavior.Get.varinfo self#behavior v in
         f.slocals <- List.filter (fun v' -> v!=v') f.slocals;
@@ -776,7 +776,7 @@ class erase_exn =
       | Throw (None,loc) ->
         self#modify_current ();
         let s1 = self#set_uncaught_flag loc true in
-        let t = purify (Extlib.the exn_var).vtype in
+        let t = purify (Option.get exn_var).vtype in
         let rv = self#jumps_to_handler loc t in
         let b = mkBlock (s1 :: rv) in
         s.skind <- Block b;

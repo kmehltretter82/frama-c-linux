@@ -208,7 +208,7 @@ end = struct
       [ Ast.self;
         Ast.UntypedFiles.self;
         Cabshelper.Comments.self;
-        Cil.Frama_c_builtins.self ]
+        Cil_builtins.Frama_c_builtins.self ]
 
   let () =
     Ast.add_linked_state Cabshelper.Comments.self
@@ -537,7 +537,7 @@ let parse_cabs cpp_command_no_output = function
       Datatype.Filepath.pretty f;
     Frontc.parse f ()
   | NeedCPP (f, cmdl, is_gnu_like) ->
-    let cpp_command, ppf, supported_cpp_arch_args = Extlib.the cpp_command_no_output in
+    let cpp_command, ppf, supported_cpp_arch_args = Option.get cpp_command_no_output in
     Kernel.feedback "Parsing %a (with preprocessing)"
       Datatype.Filepath.pretty f;
     if Sys.command cpp_command <> 0 then begin
@@ -1188,7 +1188,7 @@ let prepare_cil_file ast =
 let fill_built_ins () =
   if Cil.selfMachine_is_computed () then begin
     Kernel.debug "Machine is computed, just fill the built-ins";
-    Cil.init_builtins ();
+    Cil_builtins.init_builtins ();
   end else begin
     Kernel.debug "Machine is not computed, initialize everything";
     Cil.initCIL (Logic_builtin.init()) (get_machdep ());
@@ -1203,7 +1203,7 @@ let init_project_from_cil_file prj file =
       State_selection.full
       (State_selection.list_union
          (List.map State_selection.with_dependencies
-            [Cil.Builtin_functions.self;
+            [Cil_builtins.Builtin_functions.self;
              Ast.self;
              Files.pre_register_state]))
   in
@@ -1631,7 +1631,7 @@ let prepare_from_c_files () =
 let init_project_from_visitor ?(reorder=false) prj
     (vis:Visitor.frama_c_visitor) =
   if not (Visitor_behavior.is_copy vis#behavior)
-  || not (Project.equal prj (Extlib.the vis#project))
+  || not (Project.equal prj (Option.get vis#project))
   then
     Kernel.fatal
       "Visitor does not copy or does not operate on correct project.";
@@ -1685,7 +1685,7 @@ let init_from_cmdline () =
     let selection =
       State_selection.list_union
         (List.map State_selection.with_dependencies
-           [ Cil.Builtin_functions.self;
+           [ Cil_builtins.Builtin_functions.self;
              Logic_env.Logic_info.self;
              Logic_env.Logic_type_info.self;
              Logic_env.Logic_ctor_info.self;

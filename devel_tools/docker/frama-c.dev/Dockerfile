@@ -2,7 +2,6 @@ FROM debian:sid as base
 
 # Install non-OCaml dependencies + opam
 RUN apt-get update && apt-get install -y \
-    cvc4 \
     opam \
     z3 \
     && rm -rf /var/lib/apt/lists/*
@@ -19,6 +18,8 @@ ENV PATH "/root/.opam/ocaml-base-compiler.4.08.1/bin:$PATH"
 RUN opam update -y && opam install depext -y
 
 # Install packages from reference configuration
+# Note: Python and time packages are only required for tests, but if so,
+# they need to be present before running './configure'
 RUN apt-get update && opam update -y && opam depext --install -y --verbose \
     alt-ergo.2.2.0 \
     apron.v0.9.12 \
@@ -31,7 +32,14 @@ RUN apt-get update && opam update -y && opam depext --install -y --verbose \
     yojson.1.7.0 \
     zarith.1.9.1 \
     zmq.5.1.3 \
+    conf-python-3.1.0.0 \
+    conf-time.1 \
     && rm -rf /var/lib/apt/lists/*
+
+# Note: Debian's CVC is too recent for Why3, so we do not install the Debian
+# package; instead, we download its binary and add it to a directory in PATH.
+RUN wget https://github.com/CVC4/CVC4/releases/download/1.7/cvc4-1.7-x86_64-linux-opt -O /usr/local/bin/cvc4
+RUN chmod a+x /usr/local/bin/cvc4
 
 RUN why3 config --detect
 
@@ -45,22 +53,15 @@ RUN cd /root && \
         make -j && \
         make install \
     ) && \
-    [ "${with_source}" != "no" ] || rm -rf frama-c
+    ([ "${with_source}" != "no" ] || rm -rf frama-c)
 
 # with_test: run Frama-C tests; requires "with_source=yes"
 ARG with_test=no
 
 # run general tests, then test that WP can see external provers
 RUN if [ "${with_test}" != "no" ]; then \
-       apt-get update && \
-       opam update -y && opam depext --install -y \
-           conf-python-3.1.0.0 \
-           conf-time.1 \
-           --verbose \
-        && \
-        rm -rf /var/lib/apt/lists/* && \
         cd /root/frama-c && \
-        make tests && \
+        make tests PTESTS_OPTS=-error-code && \
         (cd src/plugins/wp/tests/ && \
          frama-c -wp wp_gallery/binary-multiplication-without-overflow.c \
          -wp-prover alt-ergo,cvc4); \

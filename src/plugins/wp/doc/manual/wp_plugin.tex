@@ -251,240 +251,6 @@ c. Consolidating the Bench.
 
 This mode replays the automated proofs and the interactive ones, re-running Alt-Ergo on every \textsf{WP} goals and every proof tactic sub-goals. The user scripts are never modified — this is a replay mode only.
 
-\clearpage
-\subsection{Available Tactics}
-
-\newcommand{\TACTIC}[2]{#1\quad\quad\triangleright\quad\quad#2}
-
-\paragraph{Absurd} Contradict a Hypothesis\\
-The user can select a hypothesis $H$, and change the goal to $\neg H$:
-
-$$ \TACTIC{\Delta,H\models\,G}{\Delta\models\,\neg H} $$
-
-
-\paragraph{Array} Decompose array access-update patterns\\
-The use select an expression $e\equiv a[k_1\mapsto v][k_2]$. Then:
-
-$$ \TACTIC{\Delta\models\,G}{%
-\begin{array}[t]{ll}
-\Delta,\,k_1=k_2,\,e = v &\models G \\
-\Delta,\,k_1\neq k_2,\,e = a[k_2] &\models G
-\end{array}} $$
-
-\paragraph{Choice} Select a Goal Alternative\\
-When the goal is a disjunction, the user select one alternative and discard the others:
-$$ \TACTIC{\Delta\models\,\Gamma,G}{\Delta\models\,G} $$
-
-\paragraph{Compound} Decompose compound equalities\\
-When the user select an equality between two records, it is decomposed field by field.
-
-$$ \TACTIC{ a = b }{ \bigwedge a.f_i = b.f_i } $$
-
-
-\paragraph{Contrapose} Swap and Negate Hypothesis with Conclusion\\
-The user select a hypothesis (typically, a negation) and swap it with the goal.
-$$ \TACTIC{\Delta,H\models\,G}{\Delta,\neg G\models\,\neg H} $$
-
-\paragraph{Cut} Use Intermerdiate Hypothesis
-The user introduce a new clause $C$ with the composer to prove the goal. There two variants of the tactic, made available by a menu in the tactic panel.
-
-The \textsf{Modus-Ponens} variant where the clause $C$ is used as an intermediate proof step:
-
-$$\TACTIC{\Delta\models\,G}{%
-\begin{array}[t]{ll}
-\Delta &\models C \\
-\Delta,C &\models G
-\end{array}} $$
-
-And the \textsf{Case Analysis} variant where the clause $C$ is used with a split:
-$$\TACTIC{\Delta\models\,G}{%
-\begin{array}[t]{ll}
-\Delta,\phantom{\neg}C \models G \\
-\Delta,\neg C \models G
-\end{array}} $$
-
-\paragraph{Filter} Erase Hypotheses \\
-The tactic is always applicable. It removes hypotheses from the goal on a variable used basis. When variables are compounds (record and arrays) a finer heuristics is used to detect which parts of the variable is relevant. A transitive closure of dependencies is also used. However, it is always possible that too many hypotheses are removed.
-
-The tactic also have a variant where only hypotheses \emph{not relevant} to the goal are retained. This is useful to find absurd hypotheses that are completely disjoint from the goal.
-
-\paragraph{Havoc} Go Through Assigns \\
-This is a variant of the \texttt{Lemma} tactic dedicated to \texttt{Havoc} predicate generate by complex assigns clause. The user select an address, and if the address is not assigned by the \texttt{Havoc} clause, the memory at this address is unchanged.
-
-\paragraph{Instance} Instantiate properties\\
-The user selects a hypothesis with one or several $\forall$ quantifiers, or an $\exists$ quantified goal. Then, with the composer, the use choose to instantiate one or several of the quantified parameters. In case of $\forall$ quantifier over integer, a range of values can be instantiated instead.
-
-When instantiating hypothesis with an expression $e$:
-$$\TACTIC{\Delta,\,\forall x\, P(x)\models G}{\Delta,P(e)\models G}$$
-
-When instantiating with a range of values $n\ldots m$:
-$$\TACTIC{\Delta,\,\forall x\, P(x)\models G}{\Delta,P(n)\ldots P(m)\models G}$$
-
-When instantiating a goal with an expression $e$:
-$$\TACTIC{\Delta\models \exists x\,G(x)}{\Delta\models G(e)}$$
-
-\paragraph{Lemma} Search \& Instantiate Lemma\\
-The user start by selecting a term in the goal. Then, the search button in the tactic panel will display a list of lemma related to the term. Then, he can instantiate the parameters of the lemma, like with the Instance tactic.
-
-\paragraph{Intuition} Decompose with Conjunctive/Disjunctive Normal Form\\
-The user can select a hypothesis or a goal with nested conjunctions and disjunctions. The tactics then computes the conjunctive or disjunctive normal form of the selection and split the goal accordingly.
-
-\paragraph{Range} Enumerate a range of values for an integer term\\
-The user select any integer expression $e$ in the proof, and a range of numerical values $a\ldots b$. The proof goes by case for each $e=a\ldots e=b$, plus the side cases $e<a$ and $e>b$:
-$$\TACTIC{\Delta\models\,G}{%
-\begin{array}[t]{ll}
-\Delta,e<a &\models G \\
-\Delta,e=a &\models G \\
-&\vdots \\
-\Delta,e=b &\models G \\
-\Delta,e>b &\models G
-\end{array}} $$
-
-\paragraph{Rewrite} Replace Terms\\
-This tactic uses an equality in a hypothesis to replace each occurrence of term by another one.
-The tactic exists with two variants: the left-variant which rewrites $a$ into $b$ from equality $a=b$,
-and the right-variant which rewrites $b$ into $a$ from equality $a=b$.
-The original equality hypothesis is removed from the goal.
-
-$$\TACTIC{\Delta,a=b\models\,G}{\Delta[a\leftarrow b]\models\,G[a\leftarrow b]}$$
-
-\paragraph{Separated} Expand Separation Cases\\
-This tactic decompose a \texttt{separated}$(a,n,b,m)$ predicate into its four base cases: $a$ and $b$ have different bases, $a+n \leq b$, $b+m \leq a$, and $a[0..n-1]$ and $b[0..m-1]$ overlaps. The regions are separated in the first three cases, and not separated in the overlapping case. This is kind of normal disjunctive form of the separation clause.
-
-\paragraph{Split} Decompose Logical Connectives and Conditionals\\
-This is the most versatile available tactic. It decompose merely any logical operator following the sequent calculus rules. Typically:
-
-\[
-\begin{array}{c@{\quad\quad}c@{\quad\quad}c}
-  \Delta,(H_1\vee H_2)\models G & \triangleright &
-     \Delta,H_1 \models G \\
-  && \Delta,H_2 \models G \\
-  \Delta\models(G_1\wedge G_2) & \triangleright &
-     \Delta\models G_1 \\
-  && \Delta\models G_2 \\
-  \Delta,H?P:Q\models G & \triangleright &
-     \Delta,\phantom{\neg}H,P\models G \\
-  && \Delta,\neg H,Q\models G \\
-  \ldots
-\end{array}
-\]
-
-When the user selects a arbitrary boolean expression $e$, the tactic is similar to the Cut one:
-\[\TACTIC{\Delta\models\,G}{%
-\begin{array}[t]{l}
-\Delta,\phantom{\neg}e\models G \\
-\Delta,\neg e\models G
-\end{array}} \]
-
-Finally, when the user select a arithmetic comparison over $a$ and $b$, the tactics makes a split over $a=b$, $a<b$ and $a>b$:
-\[\TACTIC{\Delta\models\,G}{%
-\begin{array}[t]{ll}
-\Delta,a<b&\models G \\
-\Delta,a=b&\models G \\
-\Delta,a>b&\models G
-\end{array}} \]
-
-\paragraph{Definition} Unfold predicate and logic function definition\\
-The user simply select a term $f(e_1,\ldots,e_n)$ or a predicate $P(e_1,\ldots,e_n)$ which is replaced by its definition, when available.
-
-\paragraph{Bitwise} Decompose equalities over $N$-bits\\
-The use selects an integer equality and a number of bits.
-Providing the two members of the equality are in range $0..2^N-1$,
-the equality is decomposed into $N$ bit-tests equalities:
-\[\TACTIC{\Delta\models G}{%
-\begin{array}[t]{rcl}
-\Delta\phantom{)} &\models & 0 \leq a,b < 2^N \\
-\sigma(\Delta) & \models & \sigma(G)
-\end{array}
-}\]
-where $\sigma$ is the following subsitution:
-\[ \sigma \equiv
-\left[ a=b \quad \leftarrow
-\bigwedge_{k\in 0..N-1} \mathtt{bit\_test}(a,k) = \mathtt{bit\_test}(b,k)
-\right]
-\]
-
-The \lstinline{bit_test(a,b)} function is predefined in \textsf{WP} and is equivalent
-to the \textsf{ACSL} expression \lstinline{(a & (1 << k)) != 0}. The
-\textsf{Qed} engine has many simplification rules that applies to
-such patterns, and the a tactic is good way to reason over bits.
-
-\paragraph{Shift} Transform logical shifts into arithmetics\\
-For positive integers, logical shifts such as \lstinline{a << k}
-and \lstinline{a >> k} where \lstinline$k$ is a constant can be interpreted into a multiplication or a division by $2^k$.
-
-When selecting a logical-shift, the tactic performs:
-\[\TACTIC{\Delta\models G}{%
-\begin{array}[t]{rcl}
-\Delta\phantom{)} &\models& 0 \leq a \\
-\sigma(\Delta) &\models& \sigma(G)
-\end{array}
-}\]
-where:
-\begin{tabular}[t]{ll}
-$\sigma = [ \mathtt{lsl}(a,k) \leftarrow a * 2^k ]$ &
-for left-shift, \\
-$\sigma = [ \mathtt{lsr}(a,k) \leftarrow a / 2^k ]$ &
-for right-shifts.
-\end{tabular}
-
-\paragraph{BitRange} Range of logical bitwise operators \\
-This tactical applies the two following lemmas to the current goal.
-The first lemma is on logical-or, and only applies to positive integers:
-\[
-\begin{array}{c}
-  \bigwedge_i 0 \leq x_i < 2^p
-  \\\hline
-  0 \leq \mathtt{lor}(x_1,\ldots,x_n) \leq 2^p
-\end{array}
-\]
-
-The second lemma is on logical-and, and applies to at-least one positive integer:
-\[
-\begin{array}{c}
-  \bigvee_i 0 \leq x_i \quad\wedge\quad \bigwedge_i x_i \leq 2^p
-  \\\hline
-  0 \leq \mathtt{land}(x_1,\ldots,x_n) \leq 2^p
-\end{array}
-\]
-
-The tactical rewrites range goals on logical and/or into the corresponding range over its parameters, by finding a suitable $2^p$
-to apply the theorems. Such a strategy is \emph{not} complete in general.
-Typically, $\mathtt{land}(x,y) < 38$ is true whenever both $x$ and $y$ are in range $0\ldots 31$, but this is also true
-in other cases.
-
-\paragraph{Congruence} Simplify Divisions and Products \\
-This tactic rewrites integer comparisons involving products and divisions.
-The tactic applies one of the following theorems to the current goal.
-In the following lemmas, $k$, $k'$, and $n$ are integer constants, $a$ and $b$ any integer terms.
-The notation $k|n$ stands for $k$ divides $n$.
-The lemmas are extended to non-strict inequalities and non-positive constants in a natural way.
-\[
-\begin{array}{crcl}
-0<k, & a < n/k &\Longrightarrow& k.a < n \\
-k|n, & a = n/k &\Longleftrightarrow& k.a = n \\
-\neg(k|n), & k.a = n & \Longrightarrow & \mathtt{false} \\
-0<k, & a < k.(b+1) &\Longrightarrow& a/k < b \\
-0<k, 0<k', & k'.a < k.b &\Longrightarrow& a/k < b/k' \\
-n|k, n|k', & (k/n).a = (k'/n).b &\Longleftrightarrow& k.a = k'.b
-\end{array}
-\]
-
-\paragraph{Overflow} Integer Conversions \\
-This tactic rewrites machine integer conversions by identify,
-providing the converted value is in available range. The tactic applies on expression
-with pattern $\mathtt{to\_iota(e)}$ where \texttt{iota} is a a machine-integer name,
-\emph{eg.} \texttt{to\_uint32}.
-
-\[\TACTIC{\Delta\models G}{%
-\begin{array}[t]{rcl}
-\Delta\phantom{)} &\models & a \leq e \leq b \\
-\sigma(\Delta) & \models & \sigma(G)
-\end{array}
-}\]
-where $\sigma = [ \mathtt{to\_iota}(e) \mapsto e ]$ and $[a..b]$ is the range
-of the \texttt{iota} integer domain.
-
 \subsection{Strategies}
 
 Strategies are heuristics that generate a prioritized bunch of tactics to be tried on the current goal.
@@ -512,6 +278,329 @@ remains unproved by \textsf{Qed} or the selected provers. More precisely:
 \end{description}
 
 The name of registered strategies is printed on console by using \texttt{-wp-auto '?'}. Custom strategies can be loaded by plug-ins, see below.
+
+\newcommand{\TACTIC}[2]{#1\quad\quad\triangleright\quad\quad#2}
+
+\subsection{General Tactics}
+
+\paragraph{Absurd} Contradict a Hypothesis\\
+The user can select a hypothesis $H$, and change the goal to $\neg H$:
+
+$$ \TACTIC{\Delta,H\models\,G}{\Delta\models\,\neg H} $$
+
+\paragraph{Choice} Select a Goal Alternative\\
+When the goal is a disjunction, the user select one alternative and discard the others:
+$$ \TACTIC{\Delta\models\,\Gamma,G}{\Delta\models\,G} $$
+
+\paragraph{Compound} Decompose compound equalities\\
+When the user select an equality between two records, it is decomposed field by field.
+
+$$ \TACTIC{ a = b }{ \bigwedge a.f_i = b.f_i } $$
+
+\paragraph{Contrapose} Swap and Negate Hypothesis with Conclusion\\
+The user select a hypothesis (typically, a negation) and swap it with the goal.
+$$ \TACTIC{\Delta,H\models\,G}{\Delta,\neg G\models\,\neg H} $$
+
+\paragraph{Cut} Use Intermerdiate Hypothesis
+The user introduce a new clause $C$ with the composer to prove the goal. There two variants of the tactic, made available by a menu in the tactic panel.
+
+The \textsf{Modus-Ponens} variant where the clause $C$ is used as an intermediate proof step:
+
+$$\TACTIC{\Delta\models\,G}{%
+\begin{array}[t]{ll}
+\Delta &\models C \\
+\Delta,C &\models G
+\end{array}} $$
+
+And the \textsf{Case Analysis} variant where the clause $C$ is used with a split:
+$$\TACTIC{\Delta\models\,G}{%
+\begin{array}[t]{ll}
+\Delta,\phantom{\neg}C \models G \\
+\Delta,\neg C \models G
+\end{array}} $$
+
+\paragraph{Definition} Unfold predicate and logic function definition\\
+The user simply select a term $f(e_1,\ldots,e_n)$ or a predicate $P(e_1,\ldots,e_n)$ which is replaced by its definition, when available.
+
+\paragraph{Filter} Erase Hypotheses \\
+The tactic is always applicable. It removes hypotheses from the goal on a variable used basis. When variables are compounds (record and arrays) a finer heuristics is used to detect which parts of the variable is relevant. A transitive closure of dependencies is also used. However, it is always possible that too many hypotheses are removed.
+
+The tactic also have a variant where only hypotheses \emph{not relevant} to the goal are retained. This is useful to find absurd hypotheses that are completely disjoint from the goal.
+
+\paragraph{Instance} Instantiate properties\\
+The user selects a hypothesis with one or several $\forall$ quantifiers, or an $\exists$ quantified goal. Then, with the composer, the use choose to instantiate one or several of the quantified parameters. In case of $\forall$ quantifier over integer, a range of values can be instantiated instead.
+
+When instantiating hypothesis with an expression $e$:
+$$\TACTIC{\Delta,\,\forall x\, P(x)\models G}{\Delta,P(e)\models G}$$
+
+When instantiating with a range of values $n\ldots m$:
+$$\TACTIC{\Delta,\,\forall x\, P(x)\models G}{\Delta,P(n)\ldots P(m)\models G}$$
+
+When instantiating a goal with an expression $e$:
+$$\TACTIC{\Delta\models \exists x\,G(x)}{\Delta\models G(e)}$$
+
+\paragraph{Intuition} Decompose with Conjunctive/Disjunctive Normal Form\\
+The user can select a hypothesis or a goal with nested conjunctions and disjunctions. The tactics then computes the conjunctive or disjunctive normal form of the selection and split the goal accordingly.
+
+\paragraph{Lemma} Search \& Instantiate Lemma\\
+The user start by selecting a term in the goal. Then, the search button in the tactic panel will display a list of lemma related to the term. Then, he can instantiate the parameters of the lemma, like with the Instance tactic.
+
+\paragraph{Rewrite} Replace Terms\\
+This tactic uses an equality in a hypothesis to replace each occurrence of term by another one.
+The tactic exists with two variants: the left-variant which rewrites $a$ into $b$ from equality $a=b$,
+and the right-variant which rewrites $b$ into $a$ from equality $a=b$.
+The original equality hypothesis is removed from the goal.
+
+$$\TACTIC{\Delta,a=b\models\,G}{\Delta[a\leftarrow b]\models\,G[a\leftarrow b]}$$
+
+\paragraph{Split} Decompose Logical Connectives and Conditionals\\
+This is the most versatile available tactic. It decompose merely any logical operator following the sequent calculus rules. Typically:
+
+\[
+\begin{array}{c@{\quad\quad}c@{\quad\quad}c}
+  \Delta,(H_1\vee H_2)\models G & \triangleright &
+     \Delta,H_1 \models G \\
+  && \Delta,H_2 \models G \\
+  \Delta\models(G_1\wedge G_2) & \triangleright &
+     \Delta\models G_1 \\
+  && \Delta\models G_2 \\
+  \Delta,H?P:Q\models G & \triangleright &
+     \Delta,\phantom{\neg}H,P\models G \\
+  && \Delta,\neg H,Q\models G \\
+  \ldots
+\end{array}
+\]
+
+When the user selects a arbitrary boolean expression $e$, the tactic is similar to the Cut one:
+\[\TACTIC{\Delta\models\,G}{%
+\begin{array}[t]{l}
+\Delta,\phantom{\neg}e\models G \\
+\Delta,\neg e\models G
+\end{array}} \]
+
+Finally, when the user select a arithmetic comparison over $a$ and $b$,
+the tactics makes a split over $a=b$, $a<b$ and $a>b$:
+\[\TACTIC{\Delta\models\,G}{%
+\begin{array}[t]{ll}
+\Delta,a<b&\models G \\
+\Delta,a=b&\models G \\
+\Delta,a>b&\models G
+\end{array}} \]
+
+\subsection{Integers \& Bit-wised Tactics}
+
+\paragraph{BitRange} Range of logical bitwise operators \\
+This tactical applies the two following lemmas to the current goal.
+The first lemma is on logical-or, and only applies to positive integers:
+\[
+\begin{array}{c}
+  \bigwedge_i 0 \leq x_i < 2^p
+  \\\hline
+  0 \leq \mathtt{lor}(x_1,\ldots,x_n) \leq 2^p
+\end{array}
+\]
+
+The second lemma is on logical-and, and applies to at-least one positive integer:
+\[
+\begin{array}{c}
+  \bigvee_i 0 \leq x_i \quad\wedge\quad \bigwedge_i x_i \leq 2^p
+  \\\hline
+  0 \leq \mathtt{land}(x_1,\ldots,x_n) \leq 2^p
+\end{array}
+\]
+
+The tactical rewrites range goals on logical and/or into the corresponding range over its parameters, by finding a suitable $2^p$
+to apply the theorems. Such a strategy is \emph{not} complete in general.
+Typically, $\mathtt{land}(x,y) < 38$ is true whenever both $x$ and $y$ are in range $0\ldots 31$, but this is also true
+in other cases.
+
+\paragraph{Bit-Test Range} Tighten bounds with respect to bits \\
+The \lstinline{bit_test(a,b)} function is predefined in \textsf{WP} and is equivalent
+to the \textsf{ACSL} expression \lstinline{(a & (1 << k)) != 0}. The
+\textsf{Qed} engine has many simplification rules that applies to
+such patterns.
+
+The user selects an expression $\mathtt{bit\_test}(n,k)$ with $k$
+a \emph{constant} integer value greater or equal to 0 and lower than
+128. The tactic uses this test to thighten the bounds of $n$.
+
+$$\TACTIC{\Delta\models\,G}{%
+\begin{array}[t]{ll}
+\Delta,T &\models G \\
+\Delta,F &\models G
+\end{array}} $$
+
+with
+$$\begin{array}[t]{rlcll}
+  T \equiv & \mathtt{bit\_test}(n,k) & \wedge & (0 \leq n & \Rightarrow 2^{k} \leq n) \\
+  F \equiv & \neg \mathtt{bit\_test}(n,k) & \wedge & (0 \leq n < 2^{k+1} & \Rightarrow n < 2^{k})
+  \end{array}
+$$
+
+\paragraph{Bitwise} Decompose equalities over $N$-bits\\
+The use selects an integer equality and a number of bits.
+Providing the two members of the equality are in range $0..2^N-1$,
+the equality is decomposed into $N$ bit-tests equalities:
+\[\TACTIC{\Delta\models G}{%
+\begin{array}[t]{rcl}
+\Delta\phantom{)} &\models & 0 \leq a,b < 2^N \\
+\sigma(\Delta) & \models & \sigma(G)
+\end{array}
+}\]
+where $\sigma$ is the following subsitution:
+\[ \sigma \equiv
+\left[ a=b \quad \leftarrow
+\bigwedge_{k\in 0..N-1} \mathtt{bit\_test}(a,k) = \mathtt{bit\_test}(b,k)
+\right]
+\]
+
+\paragraph{Congruence} Simplify Divisions and Products \\
+This tactic rewrites integer comparisons involving products and divisions.
+The tactic applies one of the following theorems to the current goal.
+In the following lemmas, $k$, $k'$, and $n$ are integer constants, $a$ and $b$ any integer terms.
+The notation $k|n$ stands for $k$ divides $n$.
+The lemmas are extended to non-strict inequalities and non-positive constants in a natural way.
+\[
+\begin{array}{crcl}
+0<k, & a < n/k &\Longrightarrow& k.a < n \\
+k|n, & a = n/k &\Longleftrightarrow& k.a = n \\
+\neg(k|n), & k.a = n & \Longrightarrow & \mathtt{false} \\
+0<k, & a < k.(b+1) &\Longrightarrow& a/k < b \\
+0<k, 0<k', & k'.a < k.b &\Longrightarrow& a/k < b/k' \\
+n|k, n|k', & (k/n).a = (k'/n).b &\Longleftrightarrow& k.a = k'.b
+\end{array}
+\]
+
+\paragraph{Induction} Start a proof by integer induction \\
+The user select any integer expression $e$ in the proof and a base value $b$ (which defaults to
+0). The tactic generates a proof by induction on $e$, that is, the base case
+$e = b$ and then the cases $e < b$ and $b < e$. Formally, the initial goal
+$\Delta_0\models\,G_0$ is first generalized into $\Delta,P(e)\models\,Q(e)$. The tactic
+then proceed by (strong) induction over $n$ for
+$G(n) \equiv P(n)\Longrightarrow\,Q(n)$:
+
+\[\TACTIC{\Delta\models\,G(n)}{%
+\begin{array}[t]{lll}
+\Delta,\; \quad n = b & \models G(n) \\
+\Delta,\; \forall i,\, b \leq i < n \Longrightarrow G(i) \; & \models G(n) \\
+\Delta,\; \forall i,\, n < i \leq b \Longrightarrow G(i) \; & \models G(n)
+\end{array}} \]
+
+\paragraph{Overflow} Integer Conversions \\
+This tactic rewrites machine integer conversions by identity,
+providing the converted value is in available range. The tactic applies on expression
+with pattern $\mathtt{to\_iota(e)}$ where \texttt{iota} is a a machine-integer name,
+\emph{eg.} \texttt{to\_uint32}.
+
+\[\TACTIC{\Delta\models G}{%
+\begin{array}[t]{rcl}
+\Delta\phantom{)} &\models & a \leq e \leq b \\
+\sigma(\Delta) & \models & \sigma(G)
+\end{array}
+}\]
+where $\sigma = [ \mathtt{to\_iota}(e) \mapsto e ]$ and $[a..b]$ is the range
+of the \texttt{iota} integer domain.
+
+\paragraph{Range} Enumerate a range of values for an integer term\\
+The user select any integer expression $e$ in the proof, and a range of numerical values $a\ldots b$. The proof goes by case for each $e=a\ldots e=b$, plus the side cases $e<a$ and $e>b$:
+$$\TACTIC{\Delta\models\,G}{%
+\begin{array}[t]{ll}
+\Delta,e<a &\models G \\
+\Delta,e=a &\models G \\
+&\vdots \\
+\Delta,e=b &\models G \\
+\Delta,e>b &\models G
+\end{array}} $$
+
+\paragraph{Shift} Transform logical shifts into arithmetics\\
+For positive integers, logical shifts such as \lstinline{a << k}
+and \lstinline{a >> k} where \lstinline$k$ is a constant can be interpreted into a multiplication or a division by $2^k$.
+
+When selecting a logical-shift, the tactic performs:
+\[\TACTIC{\Delta\models G}{%
+\begin{array}[t]{rcl}
+\Delta\phantom{)} &\models& 0 \leq a \\
+\sigma(\Delta) &\models& \sigma(G)
+\end{array}
+}\]
+where:
+\begin{tabular}[t]{ll}
+$\sigma = [ \mathtt{lsl}(a,k) \leftarrow a * 2^k ]$ &
+for left-shift, \\
+$\sigma = [ \mathtt{lsr}(a,k) \leftarrow a / 2^k ]$ &
+for right-shifts.
+\end{tabular}
+
+\subsection{Domain Specific Tactics}
+
+\paragraph{Array} Decompose array access-update patterns\\
+The use select an expression $e\equiv a[k_1\mapsto v][k_2]$. Then:
+
+\[
+\TACTIC{\Delta\models\,G}{%
+\begin{array}[t]{ll}
+\Delta,\,k_1=k_2,\,e = v &\models G \\
+\Delta,\,k_1\neq k_2,\,e = a[k_2] &\models G
+\end{array}
+}\]
+
+\paragraph{Havoc} Go Through Assigns \\
+This is a variant of the \texttt{Lemma} tactic dedicated to \texttt{Havoc} predicate generate by complex assigns clause. The user select an address, and if the address is not assigned by the \texttt{Havoc} clause, the memory at this address is unchanged.
+
+\paragraph{Separated} Expand Separation Cases\\
+This tactic decompose a \texttt{separated}$(a,n,b,m)$ predicate into its four base cases: $a$ and $b$ have different bases, $a+n \leq b$, $b+m \leq a$, and $a[0..n-1]$ and $b[0..m-1]$ overlaps. The regions are separated in the first three cases, and not separated in the overlapping case. This is kind of normal disjunctive form of the separation clause.
+
+
+\paragraph{Sequence} Unroll repeat-sequence operator\\
+In this section, let us use $A^n$ for the ACSL notation \lstinline{A *^ n},
+the repeat list operation, and $A \oplus l$ for the list concatenation.
+
+This tactics is used to transform $A^n$ sequences. Threes behaviors
+can be selected:
+unroll left that rewrites the list  $A^n$ into $A \oplus A^{n-1}$,
+unroll right that rewrites the list $A^n$ into $A^{n-1} \oplus A$
+and unroll sum that rewrites the list $A ^{n_1 + ... + n_k}$
+into $A^{n_1} \oplus ... \oplus A^{n_k}$. For unroll left and right,
+a negative value leads to an empty list. For unroll sum, one must prove that all
+$nI$ are positive.
+
+Rule for unroll left:
+
+\[
+\TACTIC{\Delta\models\,G}{%
+\begin{array}[t]{lll}
+  \Delta[A^n\leftarrow A \oplus A^{n-1}],& n > 0 & \models G[A^n\leftarrow A \oplus A^{n-1}]\\
+  \Delta[A^n\leftarrow []],& n \leq 0 & \models G[A^n\leftarrow []]
+\end{array}
+}\]
+
+Rule for unroll right:
+
+\[
+\TACTIC{\Delta\models\,G}{%
+\begin{array}[t]{lll}
+  \Delta[A^n\leftarrow A^{n-1} \oplus A],& n > 0 & \models G[A^n\leftarrow A^{n-1} \oplus A]\\
+  \Delta[A^n\leftarrow []],& n \leq 0 & \models G[A^n\leftarrow []]
+\end{array}
+}\]
+
+Rule for unroll sum:
+
+\[
+\TACTIC{\Delta\models\,G}{%
+\begin{array}[t]{ll}
+  \Delta & \models\bigwedge_{i=1}^{k} 0 \leq n_i\\
+  &\\
+  \Delta[A^{\sum_{i=1}^{k}n_i}\leftarrow \bigoplus_{i=1}^{k} A^{n_i}] &
+  \models G[A^{\sum_{i=1}^{k}n_i}\leftarrow \bigoplus_{i=1}^{k} A^{n_i}]
+\end{array}
+}\]
+
+\paragraph{Validity} Unfold validity and range definitions\\
+The user selects a validity expression (\lstinline{valid_rd},
+\lstinline{valid_rw}, \lstinline{invalid} or \lstinline{included}).
+The expression is unfolded to a \textsf{Qed} term.
+
 
 \subsection{Custom Tactics and Strategies}
 \label{wp-custom-tactics}
@@ -823,10 +912,17 @@ The available \textsf{WP} command-line options related to model selection are:
   makes the \textsf{WP} emitting a warning on each volatile access.
 \item[\tt -wp-(no)-warn-memory-model] this option (de)activate the
   warnings about memory model hypotheses
-  for the generated proof obligations. For each model supporting this feature, and each concerned function,
+  for the generated proof obligations, as described in Section~\ref{wp-model-hypotheses}.
+  For each model supporting this feature, and each concerned function,
   an \textsf{ACSL} specification is printed on output.
   Currently, only the \texttt{Caveat}, \texttt{Typed} and \texttt{Ref} memory models support
-  this feature.
+  this feature. See also experimental option below.
+\item[\tt -wp-(no)-check-memory-model] this \emph{experimental} option generates
+  ACSL contracts for the selected memory model hypotheses, as described
+  in Section~\ref{wp-model-hypotheses} and listed by option
+  \texttt{-wp-warn-memory-model}.
+  Hence, the memory model hypothes are exposed to \textsf{WP} and other plugins.
+  Disabled by default.
 \end{description}
 
 \subsection{Computation Strategy}
@@ -860,20 +956,47 @@ weakest precondition calculus.
   a call (default is: \texttt{yes}).
 \item[\tt -wp-(no)-precond-weakening] discard pre-conditions of side behaviours (sound but
   incomplete optimisation, default is: \texttt{no}).
-\item[\tt -wp-(no)-unfold-assigns] prove assigns goal of \texttt{struct}
-  compound types field by field. This allows for proving that assigning
-  a complete structure is still included into an assignment field by field.
-  This option is not set by default, because it is generally not necessary
-  and it can generates a large number of verifications for structures
-  with many (nested) fields (defaults to \texttt{no}).
+\item[\tt -wp-unfold-assigns <{\it n}>] when proving assigns, unfold up to
+  \textit{n} levels of \texttt{struct} compounds types or access via ranges.
+  \texttt{struct} are unfolded field by field, ranges are unfolded cell by
+  cell (via a universal quantification over the index of the cell).
+  This allows for proving that assigning a complete structure is still included
+  into an assignment field by field, or that assigning a range is still included
+  in a union of subranges. This option is set to \texttt{0} by default, because
+  it is generally not necessary and it can generates a large number of
+  verifications for structures with many (nested) fields. \texttt{-1} enables
+  full unfolding.
 \item[\tt -wp-(no)-dynamic] handles calls \textit{via} function pointers
-  thanks to the dedicated \verb+@calls f1,...,fn+ code annotation.
-  For each call to a function pointer \texttt{fp}
-  in the instruction or block under the annotation,
-  \texttt{fp} is required to belongs to the set \texttt{f1,\ldots,fn} and
-  a case analysis is performed with the contract of each provided function
-  (default is: \texttt{yes}).
+  thanks to the dedicated \verb+@calls f1,...,fn+ code annotation (default is: \texttt{yes}).
 \end{description}
+
+\subsubsection{ACSL extension \texttt{@calls}}
+
+The handling of functions pointers is done via the ACSL code annotation
+extension \verb+@calls+. For each call to a function pointer \verb+fp+
+in the instruction or block under the annotation \verb+calls f1,\ldots,fn+,
+\verb+fp+ is required to belongs to the set \verb+f1,\ldots,fn+ and
+a case analysis is performed with the contract of each provided function.
+
+For example:
+
+\begin{lstlisting}[language=c, alsolanguage=acsl]
+/*@ ensures \result == x ; */
+int f1(int x);
+/*@ ensures \result == x+1 ; */
+int f2(int x);
+
+/*@ requires fp == &f1 || fp == &f2 ;
+    ensures POST: \result == 4 || \result == 5; */
+int caller(int (*fp)(int)){
+  //@ calls f1, f2 ;
+  return (*fp)(4);
+}
+\end{lstlisting}
+
+These annotations split post-conditions to the dynamic call into two sub-goals: one for call to \verb+f1+ and
+a second for the call to \verb+f2+. A last goal is generated at the call
+site: one must prove that \verb+fp+ is either \verb+f1+ or \verb+f2+.
 
 \subsection{Smoke Tests}
 

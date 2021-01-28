@@ -5,7 +5,7 @@
   Function f
 ------------------------------------------------------------
 
-Goal Post-condition (file save_load.i, line 16) in 'f':
+Goal Post-condition (file save_load.i, line 15) in 'f':
 Assume {
   Type: is_sint32(a) /\ is_sint32(b) /\ is_sint32(b_1) /\ is_sint32(c).
   If c != 0

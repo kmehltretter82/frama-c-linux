@@ -35,5 +35,5 @@ val compute: string -> (kernel_function -> partition) -> unit
 
 val add_behavior:
   kernel_function -> string -> (kernel_function -> partition) -> unit
-val get_behavior:
-  kernel_function -> string -> (kernel_function -> partition) -> behavior option
+val warn:
+  kernel_function -> string -> (kernel_function -> partition) -> unit

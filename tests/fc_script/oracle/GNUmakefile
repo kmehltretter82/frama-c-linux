@@ -31,7 +31,6 @@ EVAFLAGS    += \
 
 ## GUI-only flags
 FCGUIFLAGS += \
-  -add-symbolic-path=.:. \
 
 ## Analysis targets (suffixed with .eva)
 TARGETS = fc_script_main.eva

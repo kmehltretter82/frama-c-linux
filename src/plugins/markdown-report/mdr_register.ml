@@ -30,4 +30,5 @@ let main () =
     Mdr_params.fatal "Unexpected value for option %s: %s"
       Mdr_params.Generate.option_name s
 
-let () = Db.Main.extend main
+let () =
+  Db.Main.extend main

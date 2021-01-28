@@ -732,7 +732,7 @@ class error_manager ?reset (o_parent:GWindow.window_skel) : host =
       let w = GWindow.message_dialog
           ~message
           ~message_type:`ERROR
-          ~parent:(Extlib.opt_conv o_parent parent)
+          ~parent:(Option.value ~default:o_parent parent)
           ~buttons:GWindow.Buttons.ok
           ~title:"Error"
           ~position:`CENTER_ALWAYS
@@ -945,7 +945,7 @@ let source_files_chooser (main_ui: source_files_chooser_host) defaults f =
           (fun () -> f (get_all ()))
       | `DELETE_EVENT | `CANCEL ->
         ());
-    Extlib.may (fun f ->
+    Option.iter (fun f ->
         Configuration.set "last_opened_dir"
           (Configuration.ConfString f)) filechooser#current_folder;
     dialog#destroy ()

@@ -87,10 +87,15 @@ struct
 
   let to_json p =
     let path = Filepath.(Normalized.to_pretty_string p.pos_path) in
+    let file =
+      if Server_parameters.has_relative_filepath ()
+      then path
+      else (p.Filepath.pos_path :> string)
+    in
     `Assoc [
       "dir"  , `String (Filename.dirname path) ;
       "base" , `String (Filename.basename path) ;
-      "file" , `String (p.Filepath.pos_path :> string) ;
+      "file" , `String file ;
       "line" , `Int p.Filepath.pos_lnum ;
     ]
 

@@ -9,7 +9,7 @@ struct st {
 struct fam {
    int a ; /* bits 0 .. 31 */
    char b ; /* bits 32 .. 39 */
-   int fam[] ;
+   int fam[] ; /* bits 64 ..  */
 };
 int main(void)
 {

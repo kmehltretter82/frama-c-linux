@@ -192,7 +192,7 @@ module Make (Abstract: Abstractions.Eva) = struct
         Value_parameters.feedback ~once:true
           "@[using specification for function %a@]" Kernel_function.pretty kf;
         let vi = Kernel_function.get_vi kf in
-        if Cil.hasAttribute "fc_stdlib" vi.vattr then
+        if Cil.is_in_libc vi.vattr then
           Library_functions.warn_unsupported_spec vi.vorig_name;
         Spec.compute_using_specification ~warn:true call_kinstr call spec state,
         Value_types.Cacheable

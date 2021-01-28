@@ -14,7 +14,8 @@
  Functions                 WP     Alt-Ergo  Total   Success
   f                         1        -        2      50.0%
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'f':
-  /*@ behavior typed_ref:
+[wp] tests/wp_typed/unit_loopscope.i:9: Warning: 
+  Memory model hypotheses for function 'f':
+  /*@ behavior wp_typed_ref:
         requires \valid(written); */
   void f(unsigned int *written);

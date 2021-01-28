@@ -352,7 +352,7 @@ new way
 main_assigns_global sequent:
    Assume {
      Have: foo_1 = 42.
-     Have: (Init_r_0=false) /\ (ta_r_0=true) /\ (ta_r_1=false).
+     Have: (ta_r_0=true) /\ (ta_r_1=false).
      Have: foo_2 = 1.
      Have: x = result_0.
      Have: x = foo_0.
@@ -370,7 +370,7 @@ Prove: foo_0 = 1.
 main_assigns_global sequent:
    Assume {
      Have: foo_1 = 42.
-     Have: (Init_r_0=false) /\ (ta_r_0=true) /\ (ta_r_1=false).
+     Have: (ta_r_0=true) /\ (ta_r_1=false).
      Have: foo_2 = 1.
      Have: x = result_0.
      Have: x = foo_0.
@@ -387,7 +387,7 @@ Prove: true.
 main_assigns_global sequent:
    Assume {
      Have: foo_1 = 42.
-     Have: (Init_r_0=false) /\ (ta_r_0=true) /\ (ta_r_1=false).
+     Have: (ta_r_0=true) /\ (ta_r_1=false).
      Have: foo_2 = 1.
      Have: x = result_0.
      Have: x = foo_0.
@@ -405,12 +405,11 @@ zloop sequent:
    Assume {
      Have: foo_0 = 42.
      Have: 0 <= x.
-     Have: (Init_i_0=false) /\ (ta_i_0=true) /\ (ta_i_1=false).
-     Have: i_1 = 0.
+     Have: (ta_i_0=true) /\ (ta_i_1=false).
+     Have: (Init_i_0=true) /\ (i_1 = 0).
      Have: (Init_i_1=true) /\ ((1 + i_1) = i_2).
      Have: i_2 <= 10.
      Have: i <= 10.
-     Have: 10 <= i.
      Have: 10 <= i.
      Have: i = 10.
      Have: 0 <= x.
@@ -428,12 +427,11 @@ zloop sequent:
    Assume {
      Have: foo_0 = 42.
      Have: 0 <= x.
-     Have: (Init_i_0=false) /\ (ta_i_0=true) /\ (ta_i_1=false).
-     Have: i = 0.
+     Have: (ta_i_0=true) /\ (ta_i_1=false).
+     Have: (Init_i_0=true) /\ (i = 0).
      Have: (Init_i_1=true) /\ ((1 + i) = i_1).
      Have: i_1 <= 10.
      Have: i_2 <= 10.
-     Have: 10 <= i_2.
      Have: 10 <= i_2.
      Have: i_2 = 10.
    }
@@ -448,12 +446,11 @@ zloop sequent:
    Assume {
      Have: foo_0 = 42.
      Have: 0 <= x.
-     Have: (Init_i_0=false) /\ (ta_i_0=true) /\ (ta_i_1=false).
-     Have: i_1 = 0.
+     Have: (ta_i_0=true) /\ (ta_i_1=false).
+     Have: (Init_i_0=true) /\ (i_1 = 0).
      Have: (Init_i_1=true) /\ ((1 + i_1) = i_2).
      Have: i_2 <= 10.
      Have: i <= 10.
-     Have: 10 <= i.
      Have: 10 <= i.
    }
 Prove: i = 10.
@@ -467,26 +464,8 @@ zloop sequent:
    Assume {
      Have: foo_0 = 42.
      Have: 0 <= x.
-     Have: (Init_i_0=false) /\ (ta_i_0=true) /\ (ta_i_1=false).
-     Have: i_1 = 0.
-     Have: (Init_i_1=true) /\ ((1 + i_1) = i_2).
-     Have: i_2 <= 10.
-     Have: i <= 10.
-     Have: 10 <= i.
-   }
-Prove: 10 <= i.
-
-Goal Assertion (file stmtcompiler_test.i, line 84):
-Prove: true.
-[Qed] Valid
-
-------------------------------------------------------------
-zloop sequent:
-   Assume {
-     Have: foo_0 = 42.
-     Have: 0 <= x.
-     Have: (Init_i_0=false) /\ (ta_i_0=true) /\ (ta_i_1=false).
-     Have: i_1 = 0.
+     Have: (ta_i_0=true) /\ (ta_i_1=false).
+     Have: (Init_i_0=true) /\ (i_1 = 0).
      Have: (Init_i_1=true) /\ ((1 + i_1) = i).
    }
 Prove: i <= 10.
@@ -500,8 +479,8 @@ zloop sequent:
    Assume {
      Have: foo_0 = 42.
      Have: 0 <= x.
-     Have: (Init_i_0=false) /\ (ta_i_0=true) /\ (ta_i_1=false).
-     Have: i_1 = 0.
+     Have: (ta_i_0=true) /\ (ta_i_1=false).
+     Have: (Init_i_0=true) /\ (i_1 = 0).
      Have: (Init_i_1=true) /\ ((1 + i_1) = i_2).
      Have: i_2 <= 10.
      Have: i_3 <= 10.
@@ -520,12 +499,11 @@ zloop sequent:
    Assume {
      Have: foo_0 = 42.
      Have: 0 <= x.
-     Have: (Init_i_0=false) /\ (ta_i_0=true) /\ (ta_i_1=false).
-     Have: i = 0.
+     Have: (ta_i_0=true) /\ (ta_i_1=false).
+     Have: (Init_i_0=true) /\ (i = 0).
      Have: (Init_i_1=true) /\ ((1 + i) = i_1).
      Have: i_1 <= 10.
      Have: i_2 <= 10.
-     Have: 10 <= i_2.
      Have: 10 <= i_2.
      Have: i_2 = 10.
      Have: 0 <= x.

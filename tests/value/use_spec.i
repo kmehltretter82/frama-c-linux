@@ -1,7 +1,7 @@
 /* run.config*
  EXIT: 1
- OPT: -eva-use-spec f,h -eva @EVA_OPTIONS@ -inout -calldeps
- OPT: -eva-use-spec f,h -eva @EVA_OPTIONS@ -inout -calldeps -show-indirect-deps
+ OPT: -eva-use-spec f,h -eva @EVA_CONFIG@ -inout -calldeps
+ OPT: -eva-use-spec f,h -eva @EVA_CONFIG@ -inout -calldeps -show-indirect-deps
 */
 
 void f(int *x) {

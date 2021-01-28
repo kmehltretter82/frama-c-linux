@@ -702,8 +702,30 @@ extern double fma(double x, double y, double z);
 extern float fmaf(float x, float y, float z);
 extern long double fmal(long double x, long double y, long double z);
 
+/*@
+  assigns \result \from f;
+  behavior finite:
+    assumes isfinite_f: \is_finite(f);
+    ensures nonzero_result: \result > 0 || \result < 0;
+  behavior nonfinite:
+    assumes nonfinite_f: !\is_finite(f);
+    ensures zero_result: \result == 0;
+  complete behaviors;
+  disjoint behaviors;
+*/
 extern int __finitef(float f);
 
+/*@
+  assigns \result \from d;
+  behavior finite:
+    assumes isfinite_d: \is_finite(d);
+    ensures nonzero_result: \result > 0 || \result < 0;
+  behavior nonfinite:
+    assumes nonfinite_d: !\is_finite(d);
+    ensures zero_result: \result == 0;
+  complete behaviors;
+  disjoint behaviors;
+*/
 extern int __finite(double d);
 
 #  define isfinite(x) \

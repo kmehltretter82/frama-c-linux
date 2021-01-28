@@ -42,7 +42,7 @@ let mk_array_type (is_gcc, typ, types, kind) length =
     | Complete, Some _ -> Complete
   in
   let length =
-    Extlib.opt_map (Cil.kinteger ~loc Cil.(theMachine.kindOfSizeOf)) length
+    Option.map (Cil.kinteger ~loc Cil.(theMachine.kindOfSizeOf)) length
   in
   (is_gcc, TArray (typ, length, { scache = Not_Computed }, []), types, kind)
 
@@ -58,12 +58,12 @@ let mk_comp_type
   in
   let mk_fields compinfo =
     match nb_fields with
-    | 0 -> compinfo.cdefined <- false; []
-    | 1 -> compinfo.cdefined <- true; [ mk_field typ1 ]
-    | _ -> compinfo.cdefined <- true; [ mk_field typ1; mk_field typ2 ]
+    | 0 -> None
+    | 1 -> Some [ mk_field typ1 ]
+    | _ -> Some [ mk_field typ1; mk_field typ2 ]
   in
   let compinfo =
-    Cil.mkCompInfo cstruct (type_name()) mk_fields []
+    Cil_const.mkCompInfo cstruct (type_name()) mk_fields []
   in
   let kind =
    match cstruct, nb_fields, kind1, kind2 with

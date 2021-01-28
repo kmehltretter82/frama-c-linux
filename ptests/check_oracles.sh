@@ -58,7 +58,7 @@ do
 
      # only report oracles in tested directories (DEFAULT_SUITES)
      for dir in $(grep DEFAULT_SUITES "tests/ptests_config" | sed 's/DEFAULT_SUITES=//'); do
-         find "tests/$dir" -name "*.oracle" | sed "s|^|${plugin_test_dir%tests}|" >> $actual_oracles
+         find "tests/$dir" -name "*.oracle" | sed "s|^|${plugin_test_dir%tests}|" | sed 's|"|\\"|g' >> $actual_oracles
      done
     )
 done

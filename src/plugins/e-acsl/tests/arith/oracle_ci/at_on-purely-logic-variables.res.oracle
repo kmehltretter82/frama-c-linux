@@ -53,6 +53,10 @@
 [eva:alarm] tests/arith/at_on-purely-logic-variables.c:43: Warning: 
   assertion got status unknown.
 [eva:alarm] tests/arith/at_on-purely-logic-variables.c:7: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/arith/at_on-purely-logic-variables.c:7: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/arith/at_on-purely-logic-variables.c:7: Warning: 
   accessing uninitialized left-value.
   assert \initialized(__gen_e_acsl_at + (int)((int)(__gen_e_acsl_n - 1) - 1));
 [eva:alarm] tests/arith/at_on-purely-logic-variables.c:7: Warning: 

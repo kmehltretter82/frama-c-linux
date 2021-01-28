@@ -261,7 +261,7 @@ extern unsigned long long int strtoull(
      char ** restrict endptr,
      int base);
 
-//@ ghost extern int __fc_random_counter __attribute__((unused)) __attribute__((FRAMA_C_MODEL));
+//@ ghost extern int __fc_random_counter __attribute__((unused));
 const unsigned long __fc_rand_max = __FC_RAND_MAX;
 
 /* ISO C: 7.20.2 */
@@ -284,9 +284,9 @@ extern long int random(void);
 extern void srandom(unsigned int seed);
 
 // used to check if some *48() functions have called the seed initializer
-int __fc_random48_init __attribute__((FRAMA_C_MODEL));
+int __fc_random48_init;
 
-extern unsigned short __fc_random48_counter[3] __attribute__((FRAMA_C_MODEL));
+extern unsigned short __fc_random48_counter[3];
 unsigned short *__fc_p_random48_counter = __fc_random48_counter;
 
 /*@
@@ -480,7 +480,7 @@ extern void exit(int status) __attribute__ ((__noreturn__));
 */
 extern void _Exit(int status) __attribute__ ((__noreturn__));
 
-extern char *__fc_env[ARG_MAX] __attribute__((FRAMA_C_MODEL));
+extern char *__fc_env[ARG_MAX];
 
 /*@
   requires valid_name: valid_read_string(name);

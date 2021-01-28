@@ -40,7 +40,8 @@ int main(int argc, char const **argv)
   int t = 0;
   UP: ;
   if (t == 2) {
-    printf(__gen_e_acsl_literal_string_2,t,__gen_e_acsl_literal_string);
+    printf(__gen_e_acsl_literal_string_2,t,
+           (char *)__gen_e_acsl_literal_string); /* printf_va_1 */
     goto RET;
   }
   AGAIN:
@@ -58,7 +59,8 @@ int main(int argc, char const **argv)
     }
     /*@ assert \valid(&a); */ ;
     if (t == 2) {
-      printf(__gen_e_acsl_literal_string_2,t,__gen_e_acsl_literal_string_3);
+      printf(__gen_e_acsl_literal_string_2,t,
+             (char *)__gen_e_acsl_literal_string_3); /* printf_va_2 */
       __e_acsl_delete_block((void *)(& a));
       goto UP;
     }
@@ -74,7 +76,8 @@ int main(int argc, char const **argv)
                       "tests/memory/local_goto.c",36);
     }
     /*@ assert \valid(&b); */ ;
-    printf(__gen_e_acsl_literal_string_2,t,__gen_e_acsl_literal_string_4);
+    printf(__gen_e_acsl_literal_string_2,t,
+           (char *)__gen_e_acsl_literal_string_4); /* printf_va_3 */
     __e_acsl_delete_block((void *)(& a));
     __e_acsl_delete_block((void *)(& b));
     goto AGAIN;

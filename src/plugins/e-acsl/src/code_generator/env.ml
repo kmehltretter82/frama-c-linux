@@ -135,6 +135,20 @@ let generate_rte env =
   let local_env, _ = top env in
   local_env.rte
 
+let with_rte ~f env rte_value =
+  let old_rte_value = generate_rte env in
+  let env = rte env rte_value in
+  let env = f env in
+  let env = rte env old_rte_value in
+  env
+
+let with_rte_and_result ~f env rte_value =
+  let old_rte_value = generate_rte env in
+  let env = rte env rte_value in
+  let other, env = f env in
+  let env = rte env old_rte_value in
+  other, env
+
 (* ************************************************************************** *)
 
 (* eta-expansion required for typing generalisation *)
@@ -201,9 +215,9 @@ let do_new_var ~loc ?(scope=Varname.Block) ?(name="") env kf t ty mk_stmts =
         env_stack = local_env :: tl_env }
     | Varname.Block ->
       let local_env =
-        { block_info = new_block;
-          mp_tbl = extend_tbl local_env.mp_tbl;
-          rte = false (* must be already checked by mk_stmts *) }
+        { local_env with
+          block_info = new_block;
+          mp_tbl = extend_tbl local_env.mp_tbl }
       in
       { env with
         cpt = n;
@@ -213,8 +227,7 @@ let do_new_var ~loc ?(scope=Varname.Block) ?(name="") env kf t ty mk_stmts =
     let new_global_vars = (v, lscope) :: env.new_global_vars in
     let local_env =
       { local_env with
-        block_info = new_block;
-        rte = false (* must be already checked by mk_stmts *) }
+        block_info = new_block }
     in
     { env with
       new_global_vars = new_global_vars;
@@ -342,7 +355,7 @@ let add_assert kf stmt annot =
 
 let add_stmt ?(post=false) ?before env kf stmt =
   if not post then
-    Extlib.may (fun old -> E_acsl_label.move kf ~old stmt) before;
+    Option.iter (fun old -> E_acsl_label.move kf ~old stmt) before;
   let local_env, tl = top env in
   let block = local_env.block_info in
   let block =

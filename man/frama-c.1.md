@@ -81,6 +81,10 @@ This option has the same per-plugin (and kernel) specializations as
 Bounds are parsed as OCaml integer constants.
 By default, all numerical addresses are considered invalid.
 
+-add-symbolic-path *p1:n1[,p2:n2[...,pn:nn]]*
+: replaces each path *pi* with the name *ni* when displaying file locations
+in messages.
+
 [-no]-aggressive-merging
 : merges function definitions modulo renaming. Defaults to no.
 

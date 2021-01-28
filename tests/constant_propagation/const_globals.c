@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -constfold -print -journal-disable
+   OPT: -constfold -print -machdep x86_32
 */
 
 #include <stddef.h>

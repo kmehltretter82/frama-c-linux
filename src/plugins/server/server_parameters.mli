@@ -32,4 +32,6 @@ val wpage : warn_category (** Inconsistent page warning *)
 val wkind : warn_category (** Inconsistent category warning *)
 val wname : warn_category (** Invalid name warning *)
 
+val has_relative_filepath: unit -> bool
+
 (**************************************************************************)

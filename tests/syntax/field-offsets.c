@@ -13,7 +13,7 @@ struct st {
 struct fam {
   int a;
   char b;
-  int fam[]; // check that a SizeOfError exception does not crash the printer
+  int fam[]; // check that the printer handles flexible arrays members
 };
 
 int main() {

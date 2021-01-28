@@ -662,6 +662,28 @@ let pp_funinfo fmt vis =
     Metrics_base.pretty_entry_points vis#fundef_calls
 ;;
 
+let json_of_funinfo vis =
+  let fundef =
+    ("defined-functions", json_of_varinfo_map vis#fundef_calls)
+  in
+  let funspec =
+    ("specified-only-functions", json_of_varinfo_map vis#funspec_calls)
+  in
+  let fundecl =
+    ("undefined-functions", json_of_varinfo_map vis#fundecl_calls)
+  in
+  let extern_vars =
+    VInfoSet.fold (fun vi acc -> `String vi.vname :: acc)
+      vis#extern_global_vars []
+  in
+  let extern =
+    ("extern-global-vars", `List (List.rev extern_vars))
+  in
+  let entry_points =
+    ("entry-points", json_of_entry_points vis#fundef_calls)
+  in
+  `Assoc [fundef; funspec; fundecl; extern; entry_points]
+
 let pp_with_funinfo fmt cil_visitor =
   Format.fprintf fmt "@[<v 0>%a@ %a@]"
     pp_funinfo cil_visitor
@@ -721,6 +743,10 @@ let compute_on_cilast ~libc =
         (match Metrics_base.get_file_type out_fname with
          | Html -> dump_html fmt cil_visitor
          | Text -> pp_with_funinfo fmt cil_visitor
+         | Json ->
+           let json = json_of_funinfo cil_visitor in
+           Yojson.pretty_print fmt json;
+           Format.fprintf fmt "@." (* ensure the file ends with a newline *)
         );
         close_out oc;
       with Sys_error _ ->

@@ -248,7 +248,8 @@ and decl_node =
   | LDmodel_annot of model_annot    (** model field. *)
   | LDvolatile of lexpr list * (string option * string option)
       (** volatile clause read/write. *)
-  | LDextended of extension (** extended global annotation. *)
+  | LDextended of global_extension (** extended global annotation. *)
+
 
 (** dependencies of an assigned location. *)
 and deps =
@@ -272,6 +273,15 @@ and allocation =
 
 (** variant of a loop or a recursive function. *)
 and variant = lexpr * string option
+
+and global_extension =
+  | Ext_lexpr of string * lexpr list
+  | Ext_extension of string * string * extended_decl list
+
+and extended_decl = {
+  extended_node : global_extension;
+  extended_loc : location
+}
 
 (** Behavior in a specification. This type shares the name of its constructors
     with {!Cil_types.behavior}. *)

@@ -1,6 +1,6 @@
 /* run.config
-   OPT: -rte -warn-signed-overflow -print -then -rte-trivial-annotations
-   OPT: -rte -warn-signed-overflow -print -unsafe-arrays
+   OPT: -machdep x86_32 -rte -warn-signed-overflow -print -then -rte-trivial-annotations
+   OPT: -machdep x86_32 -rte -warn-signed-overflow -print -unsafe-arrays
 */
 
 int t[10];

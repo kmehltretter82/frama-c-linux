@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 diff oracle/Longinit_sequencer.res.oracle oracle_symblocs/Longinit_sequencer.res.oracle
 320c320
 <   result/Longinit_sequencer.sav
@@ -8,6 +9,20 @@ diff oracle/Longinit_sequencer.res.oracle oracle_symblocs/Longinit_sequencer.res
 ---
 >   result_symblocs/Longinit_sequencer.sav
 diff oracle/alloc_weak.res.oracle oracle_symblocs/alloc_weak.res.oracle
+||||||| ac7807782d
+diff tests/builtins/oracle/Longinit_sequencer.res.oracle tests/builtins/oracle_symblocs/Longinit_sequencer.res.oracle
+320c320
+<   tests/builtins/result/Longinit_sequencer.sav
+---
+>   tests/builtins/result_symblocs/Longinit_sequencer.sav
+556c556
+<   tests/builtins/result/Longinit_sequencer.sav
+---
+>   tests/builtins/result_symblocs/Longinit_sequencer.sav
+diff tests/builtins/oracle/alloc_weak.res.oracle tests/builtins/oracle_symblocs/alloc_weak.res.oracle
+=======
+diff tests/builtins/oracle/alloc_weak.res.oracle tests/builtins/oracle_symblocs/alloc_weak.res.oracle
+>>>>>>> origin/master
 36,37d35
 < [eva:alarm] alloc_weak.c:30: Warning: 
 <   accessing uninitialized left-value. assert \initialized(p);

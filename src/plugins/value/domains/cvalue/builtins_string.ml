@@ -52,7 +52,7 @@ type acc =
     from: Ival.t;  (* The offsets from which the current search has begun. *)
     stop: bool; }  (* True if the search is completely done. *)
 
-let the_max_int ival = Extlib.the (Ival.max_int ival)
+let the_max_int ival = Option.get (Ival.max_int ival)
 
 let pos_min_int ival =
   match Ival.min_int ival with
@@ -230,7 +230,7 @@ let search_offsm kind ~validity ~offset ~rem offsetmap =
     | Base.Valid_range (Some (_min, max)) -> max
   in
   (* Uses [kind.limit] to bound the read. *)
-  let limit_max = Extlib.opt_bind Ival.max_int kind.limit in
+  let limit_max = Option.bind kind.limit Ival.max_int in
   let max = match Ival.max_int offset, limit_max with
     | Some max_start, Some max_limit ->
       let max = Integer.(add max_start (pred max_limit)) in
@@ -323,12 +323,12 @@ let return_top ~length str =
    to the found characters otherwise. Handles the case of a limit 0. *)
 let search_char kind ~length state str =
   let basemap =
-    if Extlib.may_map Ival.is_zero ~dft:false kind.limit
+    if Option.fold ~some:Ival.is_zero ~none:false kind.limit
     then Base.Map.empty
     else search_by_base kind str state
   in
   let alarm = Base.Map.exists (fun _base t -> t.alarm) basemap in
-  let zero = Extlib.may_map Ival.contains_zero ~dft:false kind.limit in
+  let zero = Option.fold ~some:Ival.contains_zero ~none:false kind.limit in
   if length
   then return_length kind ~zero basemap, alarm
   else return_pointer ~zero basemap, alarm
@@ -391,7 +391,7 @@ let do_search ~search ~stop_at_0 ~typ ~length ?limit = fun state args ->
         let limit = Ival.scale size (Cvalue.V.project_ival cvalue) in
         Ival.(narrow positive_integers limit)
       in
-      let limit = Extlib.opt_map interpret_limit limit in
+      let limit = Option.map interpret_limit limit in
       let kind = { search; stop_at_0; size; signed; limit } in
       let result, alarm = search_char kind ~length state str in
       result, alarm || not valid

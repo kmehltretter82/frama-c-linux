@@ -67,19 +67,23 @@
   missing_context           4        -        5      80.0%
   no_call                   4        -        4       100%
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'guarded_call':
-  /*@ behavior typed:
+[wp] tests/wp_plugin/dynamic.i:41: Warning: 
+  Memory model hypotheses for function 'guarded_call':
+  /*@ behavior wp_typed:
         requires \separated(p, &X); */
   void guarded_call(struct S *p);
-[wp] Warning: Memory model hypotheses for function 'behavior':
-  /*@ behavior typed:
+[wp] tests/wp_plugin/dynamic.i:63: Warning: 
+  Memory model hypotheses for function 'behavior':
+  /*@ behavior wp_typed:
         requires \separated(p + (..), &X1); */
   int behavior(int (*p)(void));
-[wp] Warning: Memory model hypotheses for function 'some_behaviors':
-  /*@ behavior typed:
+[wp] tests/wp_plugin/dynamic.i:76: Warning: 
+  Memory model hypotheses for function 'some_behaviors':
+  /*@ behavior wp_typed:
         requires \separated(p + (..), &X1); */
   int some_behaviors(int (*p)(void));
-[wp] Warning: Memory model hypotheses for function 'missing_context':
-  /*@ behavior typed:
+[wp] tests/wp_plugin/dynamic.i:85: Warning: 
+  Memory model hypotheses for function 'missing_context':
+  /*@ behavior wp_typed:
         requires \separated(p, &X1); */
   int missing_context(int (*p)(void));

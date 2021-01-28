@@ -181,17 +181,22 @@ class visitor fmt c =
         engine#declare_type fmt (Lang.adt lt) (List.length lt.lt_params) def ;
       end
 
-    method on_comp c fts =
+    method private gen_on_comp kind c fts =
       begin
         self#lines ;
-        engine#declare_type fmt (Lang.comp c) 0 (Qed.Engine.Trec fts) ;
+        let adt = match kind with
+          | KValue -> Lang.comp c
+          | KInit -> Lang.comp_init c
+        in
+        let t = match fts with
+          | None -> Qed.Engine.Tabs
+          | Some fts -> Qed.Engine.Trec fts
+        in
+        engine#declare_type fmt adt 0 t ;
       end
 
-    method on_icomp c fts =
-      begin
-        self#lines ;
-        engine#declare_type fmt (Lang.comp_init c) 0 (Qed.Engine.Trec fts) ;
-      end
+    method on_comp = self#gen_on_comp KValue
+    method on_icomp = self#gen_on_comp KInit
 
     method on_dlemma l =
       begin

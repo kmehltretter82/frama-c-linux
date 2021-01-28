@@ -19,6 +19,7 @@ prefix=framacbook@,
 \DeclareVoidOption{web}{\PassOptionsToPackage{colorlinks,urlcolor=blue}{hyperref}}
 \DeclareVoidOption{paper}{\PassOptionsToPackage{pdfborder=0 0 0}{hyperref}}
 \DeclareStringOption[{version=4.0,modifier=by-sa}]{license}
+\DeclareStringOption[english]{lang}
 \DeclareDefaultOption{\PassOptionsToClass{\CurrentOption}{report}}
 \PassOptionsToClass{a4paper,11pt,twoside,openright}{report}
 
@@ -26,10 +27,13 @@ prefix=framacbook@,
 
 \LoadClass{report}
 
+\PassOptionsToPackage{\framacbook@lang}{babel}
+
 \ifthenelse{\equal{\framacbook@license}{no}}{\useccfalse}{}
 \ifusecc
   \PassOptionsToPackage{\framacbook@license}{doclicense}
 \fi
+\RequirePackage{babel}
 \RequirePackage{fullpage}
 \RequirePackage{lmodern}
 \RequirePackage[T1]{fontenc}

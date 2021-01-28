@@ -20,3 +20,8 @@
   g                         1        -        1       100%
   h                         -        1        1       100%
 ------------------------------------------------------------
+[wp] tests/wp_typed/unit_alloc.i:34: Warning: 
+  Memory model hypotheses for function 'h':
+  /*@ behavior wp_typed_ref:
+        ensures \separated(\result, &x); */
+  int *h(int x);

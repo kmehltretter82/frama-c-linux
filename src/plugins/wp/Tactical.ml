@@ -372,6 +372,9 @@ let rewrite ?at patterns sequent =
        descr , Conditions.insert ?at step sequent
     ) patterns
 
+let condition name guard process seq =
+  ( name , (fst seq , guard) ) :: process seq
+
 (* -------------------------------------------------------------------------- *)
 (* --- Tactical Engines                                                   --- *)
 (* -------------------------------------------------------------------------- *)

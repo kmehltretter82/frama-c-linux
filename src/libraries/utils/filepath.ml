@@ -173,6 +173,8 @@ let add_symbolic_dir name dir =
   Hashtbl.replace symbolic_dirs name dir;
   (insert cwd dir).symbolic_name <- Some name
 
+let reset_symbolic_dirs () = Hashtbl.clear symbolic_dirs
+
 let rec add_uri_path buffer path =
   let open Buffer in
   match path.symbolic_name with
@@ -267,23 +269,36 @@ module Normalized = struct
     if case_sensitive then String.compare s1 s2
     else Extlib.compare_ignore_case s1 s2
 
-  let pretty fmt p = Format.fprintf fmt "%s" (pretty p)
-  let pp_abs fmt p = Format.fprintf fmt "%s" p
   let unknown = normalize ""
   let is_unknown fp = equal fp unknown
+  let special_stdout = normalize "-"
+  let is_special_stdout fp = equal fp special_stdout
+
+  let pretty fmt p =
+    if is_special_stdout p then
+      Format.fprintf fmt "<stdout>"
+    else
+      Format.fprintf fmt "%s" (pretty p)
+  let pp_abs fmt p = Format.fprintf fmt "%s" p
   let is_file fp =
     try
       (Unix.stat (fp :> string)).Unix.st_kind = Unix.S_REG
     with _ -> false
 
   let to_base_uri name =
-    if is_relative name then None, skip_dot name
-    else begin
-      let p = insert cwd name in
-      let buf = Buffer.create 80 in
-      let res = add_uri_path buf p in
-      res, Buffer.contents buf
-    end
+    let p = insert cwd name in
+    let buf = Buffer.create 80 in
+    let res = add_uri_path buf p in
+    let uri =
+      Buffer.contents buf in
+    let uri =
+      try
+        if String.get uri 0 = '/' then
+          String.sub uri 1 (String.length uri - 1)
+        else uri
+      with Invalid_argument _ -> uri
+    in
+    res, uri
 end
 
 type position =

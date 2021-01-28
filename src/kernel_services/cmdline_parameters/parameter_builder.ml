@@ -878,7 +878,7 @@ struct
          since an element may be added, then removed later (e.g +h,-@all):
          that has to be accepted *)
       if check then begin
-        Extlib.may parse_error unparsable;
+        Option.iter parse_error unparsable;
         C.iter check_possible_value col
       end;
       col
@@ -1522,7 +1522,7 @@ struct
              let rec pp_custom_list = function
                | [] -> ()
                | v :: l ->
-                 Extlib.may
+                 Option.iter
                    (fun v -> Format.fprintf fmt ":%s" v)
                    (V.to_string ~key (Some v));
                  pp_custom_list l

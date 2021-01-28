@@ -142,6 +142,8 @@ val pp_int : Format.formatter -> c_int -> unit
 val pp_float : Format.formatter -> c_float -> unit
 val pp_object : Format.formatter -> c_object -> unit
 
+val i_name : c_int -> string
+val f_name : c_float -> string
 val basename : c_object -> string
 val compare : c_object -> c_object -> int
 val equal : c_object -> c_object -> bool

@@ -1,10 +1,10 @@
 /* run.config*
    
-   OPT: @EVA_OPTIONS@ -inout -deps -main inout_11_0
-   OPT: @EVA_OPTIONS@ -inout -deps -main inout_11_3
-   OPT: @EVA_OPTIONS@ -inout -deps -main never_terminate
-   OPT: @EVA_OPTIONS@ -inout -deps -main may_not_terminate
-   OPT: @EVA_OPTIONS@ -inout -deps -main call_may_not_terminate
+   OPT: @EVA_CONFIG@ -inout -deps -main inout_11_0
+   OPT: @EVA_CONFIG@ -inout -deps -main inout_11_3
+   OPT: @EVA_CONFIG@ -inout -deps -main never_terminate
+   OPT: @EVA_CONFIG@ -inout -deps -main may_not_terminate
+   OPT: @EVA_CONFIG@ -inout -deps -main call_may_not_terminate
 */
 
 int Xt, Xs, Xs_I, Ys, Ys_I, Z, I;

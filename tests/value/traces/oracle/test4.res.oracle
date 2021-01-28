@@ -255,9 +255,8 @@ c -> 1
     228 -> Assume: i < 100 false -> 229
     229 -> leave_loop -> 230
     230 -> LeaveScope: i -> 231
-    231 -> LeaveScope: i -> 232
-    232 -> EnterScope: \result<main> -> 233
-    233 -> Assign: \result<main> = tmp -> 234 ]} at 234
+    231 -> EnterScope: \result<main> -> 232
+    232 -> Assign: \result<main> = tmp -> 233 ]} at 233
 [from] Computing for function main
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======

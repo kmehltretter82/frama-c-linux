@@ -100,9 +100,9 @@ let save_project_as (main_ui: Design.main_window_extension_points) project =
     (fun () ->
        match dialog#run () with
        | `SAVE ->
-           Extlib.may
+           Option.iter
              (save_in main_ui (dialog :> GWindow.window_skel) project)
-             (Extlib.opt_map Filepath.Normalized.of_string dialog#filename)
+             (Option.map Filepath.Normalized.of_string dialog#filename)
        | `DELETE_EVENT | `CANCEL -> ());
   dialog#destroy ()
 

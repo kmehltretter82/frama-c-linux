@@ -11,8 +11,8 @@ Let x = Mint_0[shiftfield_F2_s_d(p)].
 Let a = shiftfield_F2_s_u(p).
 Assume {
   Type: is_sint32(x) /\ is_sint32(Mint_0[shiftfield_F2_s_e(p)]) /\
-      is_sint32(Mint_0[shiftfield_F1_t_c(shift_t(a, 0))]) /\
-      is_sint32(Mint_0[shiftfield_F1_t_c(shift_t(a, 1))]).
+      is_sint32(Mint_0[shiftfield_F1_t_c(shift_S1_t(a, 0))]) /\
+      is_sint32(Mint_0[shiftfield_F1_t_c(shift_S1_t(a, 1))]).
   (* Heap *)
   Type: region(p.base) <= 0.
   (* Pre-condition *)
@@ -26,8 +26,8 @@ Goal Assertion (file shift_lemma.i, line 22):
 Let a = shiftfield_F2_s_u(p).
 Assume {
   Type: is_sint32(Mint_0[shiftfield_F2_s_e(p)]) /\
-      is_sint32(Mint_0[shiftfield_F1_t_c(shift_t(a, 0))]) /\
-      is_sint32(Mint_0[shiftfield_F1_t_c(shift_t(a, 1))]).
+      is_sint32(Mint_0[shiftfield_F1_t_c(shift_S1_t(a, 0))]) /\
+      is_sint32(Mint_0[shiftfield_F1_t_c(shift_S1_t(a, 1))]).
   (* Heap *)
   Type: region(p.base) <= 0.
   (* Goal *)
@@ -37,7 +37,7 @@ Assume {
   (* Assertion *)
   Have: Mint_0[shiftfield_F2_s_d(p)] = 0.
 }
-Prove: Mint_0[shiftfield_F1_t_c(shift_t(a, i))] = 0.
+Prove: Mint_0[shiftfield_F1_t_c(shift_S1_t(a, i))] = 0.
 
 ------------------------------------------------------------
 
@@ -63,7 +63,7 @@ Assume {
   Have: Mint_0[shiftfield_F2_s_d(p)] = 0.
   (* Assertion *)
   Have: forall i : Z. ((0 <= i) -> ((i <= 9) ->
-      (Mint_0[shiftfield_F1_t_c(shift_t(shiftfield_F2_s_u(p), i))] = 0))).
+      (Mint_0[shiftfield_F1_t_c(shift_S1_t(shiftfield_F2_s_u(p), i))] = 0))).
 }
 Prove: x = 0.
 

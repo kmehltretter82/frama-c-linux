@@ -321,7 +321,7 @@ let type_letin li li_t =
 (* type the term [t] in a context [ctx] by taking --e-acsl-gmp-only into account
    iff [use_gmp_opt] is true. *)
 let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
-  let ctx = Extlib.opt_map (mk_ctx ~use_gmp_opt) ctx in
+  let ctx = Option.map (mk_ctx ~use_gmp_opt) ctx in
   let dup ty = ty, ty in
   let compute_ctx ?ctx i =
     (* in order to get a minimal amount of generated casts for operators, the
@@ -485,8 +485,8 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
         in
         List.iter2 typ_arg li.l_profile args;
         (* [li.l_type is [None] for predicate only: not possible here.
-           Thus using [Extlib.the] is fine *)
-        dup (ty_of_logic_ty (Extlib.the li.l_type))
+           Thus using [Option.get] is fine *)
+        dup (ty_of_logic_ty (Option.get li.l_type))
       else begin
         (* TODO: what if the type of the parameter is smaller than the infered
            type of the argument? For now, it is silently ignored (both
@@ -751,12 +751,12 @@ let get_op t =
 
 let get_cast t =
   let info = Memo.get t in
-  try Extlib.opt_map typ_of_number_ty info.cast
+  try Option.map typ_of_number_ty info.cast
   with Not_a_number -> None
 
 let get_cast_of_predicate p =
   let info = type_predicate p in
-  try Extlib.opt_map typ_of_number_ty info.cast
+  try Option.map typ_of_number_ty info.cast
   with Not_a_number -> assert false
 
 let clear = Memo.clear

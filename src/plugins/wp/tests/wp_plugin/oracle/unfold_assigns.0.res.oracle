@@ -6,8 +6,8 @@
   Function ASSIGN_NO_UNFOLD_KO
 ------------------------------------------------------------
 
-Goal Assigns (file unfold_assigns.i, line 62) in 'ASSIGN_NO_UNFOLD_KO':
-Effect at line 65
+Goal Assigns (file unfold_assigns.i, line 66) in 'ASSIGN_NO_UNFOLD_KO':
+Effect at line 69
 Assume {
   (* Heap *)
   Type: (region(s.base) <= 0) /\ linked(Malloc_0).
@@ -21,17 +21,77 @@ Prove: false.
   Function ASSIGN_NO_UNFOLD_OK
 ------------------------------------------------------------
 
-Goal Assigns (file unfold_assigns.i, line 56) in 'ASSIGN_NO_UNFOLD_OK':
-Effect at line 59
+Goal Assigns (file unfold_assigns.i, line 60) in 'ASSIGN_NO_UNFOLD_OK':
+Effect at line 63
 Prove: true.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function NESTED_ARRAY_STATIC
+------------------------------------------------------------
+
+Goal Assigns (file unfold_assigns.i, line 95) in 'NESTED_ARRAY_STATIC':
+Call Effect at line 97
+Assume {
+  (* Heap *)
+  Type: (region(s.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: !invalid(Malloc_0, s, 4).
+}
+Prove: false.
+
+------------------------------------------------------------
+
+Goal Assigns (file unfold_assigns.i, line 95) in 'NESTED_ARRAY_STATIC':
+Call Effect at line 97
+Assume {
+  (* Heap *)
+  Type: (region(s.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: !invalid(Malloc_0, s, 4).
+}
+Prove: false.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function NESTED_ARRAY_VARS
+------------------------------------------------------------
+
+Goal Assigns (file unfold_assigns.i, line 102) in 'NESTED_ARRAY_VARS':
+Call Effect at line 104
+Assume {
+  Type: is_uint32(n).
+  (* Heap *)
+  Type: (region(s.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: !invalid(Malloc_0, s, 4).
+  (* Pre-condition *)
+  Have: 3 <= n.
+}
+Prove: included(s, 4, shift_sint32(shiftfield_F2_With_array_t(s), 1), n).
+
+------------------------------------------------------------
+
+Goal Assigns (file unfold_assigns.i, line 102) in 'NESTED_ARRAY_VARS':
+Call Effect at line 104
+Assume {
+  Type: is_uint32(n).
+  (* Heap *)
+  Type: (region(s.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: !invalid(Malloc_0, s, 4).
+  (* Pre-condition *)
+  Have: 3 <= n.
+}
+Prove: included(s, 4, shift_sint32(shiftfield_F2_With_array_t(s), 1), n).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function NO_UNFOLD_KO
 ------------------------------------------------------------
 
-Goal Assigns (file unfold_assigns.i, line 33) in 'NO_UNFOLD_KO':
-Call Effect at line 35
+Goal Assigns (file unfold_assigns.i, line 37) in 'NO_UNFOLD_KO':
+Call Effect at line 39
 Assume {
   (* Heap *)
   Type: (region(s.base) <= 0) /\ linked(Malloc_0).
@@ -42,8 +102,8 @@ Prove: false.
 
 ------------------------------------------------------------
 
-Goal Assigns (file unfold_assigns.i, line 33) in 'NO_UNFOLD_KO':
-Call Effect at line 35
+Goal Assigns (file unfold_assigns.i, line 37) in 'NO_UNFOLD_KO':
+Call Effect at line 39
 Assume {
   (* Heap *)
   Type: (region(s.base) <= 0) /\ linked(Malloc_0).
@@ -57,14 +117,14 @@ Prove: false.
   Function NO_UNFOLD_OK_1
 ------------------------------------------------------------
 
-Goal Assigns (file unfold_assigns.i, line 18) in 'NO_UNFOLD_OK_1':
-Call Effect at line 20
+Goal Assigns (file unfold_assigns.i, line 22) in 'NO_UNFOLD_OK_1':
+Call Effect at line 24
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file unfold_assigns.i, line 18) in 'NO_UNFOLD_OK_1':
-Call Effect at line 20
+Goal Assigns (file unfold_assigns.i, line 22) in 'NO_UNFOLD_OK_1':
+Call Effect at line 24
 Prove: true.
 
 ------------------------------------------------------------
@@ -72,14 +132,14 @@ Prove: true.
   Function NO_UNFOLD_OK_2
 ------------------------------------------------------------
 
-Goal Assigns (file unfold_assigns.i, line 23) in 'NO_UNFOLD_OK_2':
-Call Effect at line 25
+Goal Assigns (file unfold_assigns.i, line 27) in 'NO_UNFOLD_OK_2':
+Call Effect at line 29
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file unfold_assigns.i, line 23) in 'NO_UNFOLD_OK_2':
-Call Effect at line 25
+Goal Assigns (file unfold_assigns.i, line 27) in 'NO_UNFOLD_OK_2':
+Call Effect at line 29
 Prove: true.
 
 ------------------------------------------------------------
@@ -87,22 +147,168 @@ Prove: true.
   Function NO_UNFOLD_OK_3
 ------------------------------------------------------------
 
-Goal Assigns (file unfold_assigns.i, line 28) in 'NO_UNFOLD_OK_3':
-Call Effect at line 30
+Goal Assigns (file unfold_assigns.i, line 32) in 'NO_UNFOLD_OK_3':
+Call Effect at line 34
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file unfold_assigns.i, line 28) in 'NO_UNFOLD_OK_3':
-Call Effect at line 30
+Goal Assigns (file unfold_assigns.i, line 32) in 'NO_UNFOLD_OK_3':
+Call Effect at line 34
 Prove: true.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function PARTIAL_ASSIGNS_STATIC
+------------------------------------------------------------
+
+Goal Assigns (file unfold_assigns.i, line 75) in 'PARTIAL_ASSIGNS_STATIC':
+Call Effect at line 77
+Assume {
+  (* Heap *)
+  Type: (region(p.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: !invalid(Malloc_0, shift_sint32(p, 0), 5).
+}
+Prove: false.
+
+------------------------------------------------------------
+
+Goal Assigns (file unfold_assigns.i, line 75) in 'PARTIAL_ASSIGNS_STATIC':
+Call Effect at line 77
+Assume {
+  (* Heap *)
+  Type: (region(p.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: !invalid(Malloc_0, shift_sint32(p, 0), 5).
+}
+Prove: false.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function PARTIAL_ASSIGNS_VARS
+------------------------------------------------------------
+
+Goal Assigns (file unfold_assigns.i, line 81) in 'PARTIAL_ASSIGNS_VARS':
+Call Effect at line 83
+Let a = shift_sint32(p, 0).
+Let x = 1 + n.
+Assume {
+  Have: 0 <= n.
+  Type: is_uint32(n).
+  (* Heap *)
+  Type: (region(p.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: !invalid(Malloc_0, a, x).
+  (* Pre-condition *)
+  Have: 5 <= n.
+}
+Prove: (n <= 0) \/ included(a, x, shift_sint32(p, 1), n - 1) \/
+    included(a, x, shift_sint32(p, n), 1).
+
+------------------------------------------------------------
+
+Goal Assigns (file unfold_assigns.i, line 81) in 'PARTIAL_ASSIGNS_VARS':
+Call Effect at line 83
+Let a = shift_sint32(p, 0).
+Let x = 1 + n.
+Assume {
+  Have: 0 <= n.
+  Type: is_uint32(n).
+  (* Heap *)
+  Type: (region(p.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: !invalid(Malloc_0, a, x).
+  (* Pre-condition *)
+  Have: 5 <= n.
+}
+Prove: (n <= 0) \/ included(a, x, shift_sint32(p, 1), n - 1) \/
+    included(a, x, shift_sint32(p, n), 1).
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function RANGE_NESTED_ARRAY_STATIC
+------------------------------------------------------------
+
+Goal Assigns (file unfold_assigns.i, line 111) in 'RANGE_NESTED_ARRAY_STATIC':
+Call Effect at line 116
+Assume {
+  (* Heap *)
+  Type: (region(s.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: !invalid(Malloc_0, shift_S2_With_array(s, 0), 12).
+}
+Prove: false.
+
+------------------------------------------------------------
+
+Goal Assigns (file unfold_assigns.i, line 111) in 'RANGE_NESTED_ARRAY_STATIC':
+Call Effect at line 116
+Assume {
+  (* Heap *)
+  Type: (region(s.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: !invalid(Malloc_0, shift_S2_With_array(s, 0), 12).
+}
+Prove: false.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function RANGE_NESTED_ARRAY_VARS
+------------------------------------------------------------
+
+Goal Assigns (file unfold_assigns.i, line 121) in 'RANGE_NESTED_ARRAY_VARS':
+Call Effect at line 126
+Let a = shift_S2_With_array(s, 0).
+Let x = 4 * n.
+Let x_1 = 4 + x.
+Let a_1 = shift_S2_With_array(s, 1).
+Let a_2 = shiftfield_F2_With_array_t(a).
+Assume {
+  Type: is_uint32(m) /\ is_uint32(n).
+  (* Heap *)
+  Type: (region(s.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: !invalid(Malloc_0, a, x_1).
+  (* Pre-condition *)
+  Have: (3 <= n) /\ (4 <= m).
+}
+Prove: (n < 0) \/ included(a, x_1, shift_S2_With_array(s, 2), x - 4) \/
+    included(a, x_1, shiftfield_F2_With_array_x(a_1), 1) \/
+    included(a, x_1, shift_sint32(a_2, 0), 1) \/
+    included(a, x_1, shift_sint32(a_2, 1), m) \/
+    included(a, x_1, shift_sint32(shiftfield_F2_With_array_t(a_1), 0), 1 + m).
+
+------------------------------------------------------------
+
+Goal Assigns (file unfold_assigns.i, line 121) in 'RANGE_NESTED_ARRAY_VARS':
+Call Effect at line 126
+Let a = shift_S2_With_array(s, 0).
+Let x = 4 * n.
+Let x_1 = 4 + x.
+Let a_1 = shift_S2_With_array(s, 1).
+Let a_2 = shiftfield_F2_With_array_t(a).
+Assume {
+  Type: is_uint32(m) /\ is_uint32(n).
+  (* Heap *)
+  Type: (region(s.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: !invalid(Malloc_0, a, x_1).
+  (* Pre-condition *)
+  Have: (3 <= n) /\ (4 <= m).
+}
+Prove: (n < 0) \/ included(a, x_1, shift_S2_With_array(s, 2), x - 4) \/
+    included(a, x_1, shiftfield_F2_With_array_x(a_1), 1) \/
+    included(a, x_1, shift_sint32(a_2, 0), 1) \/
+    included(a, x_1, shift_sint32(a_2, 1), m) \/
+    included(a, x_1, shift_sint32(shiftfield_F2_With_array_t(a_1), 0), 1 + m).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function USE_ASSIGN_UNFOLD_KO
 ------------------------------------------------------------
 
-Goal Post-condition (file unfold_assigns.i, line 48) in 'USE_ASSIGN_UNFOLD_KO':
+Goal Post-condition (file unfold_assigns.i, line 52) in 'USE_ASSIGN_UNFOLD_KO':
 Let a = Load_S1_S(q, Mint_0).
 Let a_1 = Load_S1_S(q, havoc(Mint_undef_0, Mint_0, p, 2)).
 Assume {
@@ -116,8 +322,8 @@ Prove: EqS1_S(a_1, a).
 
 ------------------------------------------------------------
 
-Goal Assigns (file unfold_assigns.i, line 49) in 'USE_ASSIGN_UNFOLD_KO':
-Call Effect at line 53
+Goal Assigns (file unfold_assigns.i, line 53) in 'USE_ASSIGN_UNFOLD_KO':
+Call Effect at line 57
 Assume {
   (* Heap *)
   Type: (region(p.base) <= 0) /\ linked(Malloc_0).
@@ -128,8 +334,8 @@ Prove: false.
 
 ------------------------------------------------------------
 
-Goal Assigns (file unfold_assigns.i, line 49) in 'USE_ASSIGN_UNFOLD_KO':
-Call Effect at line 53
+Goal Assigns (file unfold_assigns.i, line 53) in 'USE_ASSIGN_UNFOLD_KO':
+Call Effect at line 57
 Assume {
   (* Heap *)
   Type: (region(p.base) <= 0) /\ linked(Malloc_0).
@@ -143,7 +349,7 @@ Prove: false.
   Function USE_ASSIGN_UNFOLD_OK
 ------------------------------------------------------------
 
-Goal Post-condition (file unfold_assigns.i, line 39) in 'USE_ASSIGN_UNFOLD_OK':
+Goal Post-condition (file unfold_assigns.i, line 43) in 'USE_ASSIGN_UNFOLD_OK':
 Let a = Load_S1_S(q, Mint_0).
 Let a_1 = Load_S1_S(q, havoc(Mint_undef_0, Mint_0, p, 2)).
 Assume {
@@ -157,14 +363,14 @@ Prove: EqS1_S(a_1, a).
 
 ------------------------------------------------------------
 
-Goal Assigns (file unfold_assigns.i, line 40) in 'USE_ASSIGN_UNFOLD_OK':
-Call Effect at line 44
+Goal Assigns (file unfold_assigns.i, line 44) in 'USE_ASSIGN_UNFOLD_OK':
+Call Effect at line 48
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file unfold_assigns.i, line 40) in 'USE_ASSIGN_UNFOLD_OK':
-Call Effect at line 44
+Goal Assigns (file unfold_assigns.i, line 44) in 'USE_ASSIGN_UNFOLD_OK':
+Call Effect at line 48
 Prove: true.
 
 ------------------------------------------------------------

@@ -210,19 +210,23 @@ Goal Assigns (file dispatch_var2.i, line 13) in 'reset':
 Prove: true.
 
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'reset':
-  /*@ behavior typed_ref:
+[wp] dispatch_var2.i:16: Warning: 
+  Memory model hypotheses for function 'reset':
+  /*@ behavior wp_typed_ref:
         requires \valid(rp); */
   void reset(int *rp);
-[wp] Warning: Memory model hypotheses for function 'incr':
-  /*@ behavior typed_ref:
+[wp] dispatch_var2.i:23: Warning: 
+  Memory model hypotheses for function 'incr':
+  /*@ behavior wp_typed_ref:
         requires \valid(ip); */
   void incr(int *ip);
-[wp] Warning: Memory model hypotheses for function 'load':
-  /*@ behavior typed_ref:
+[wp] dispatch_var2.i:31: Warning: 
+  Memory model hypotheses for function 'load':
+  /*@ behavior wp_typed_ref:
         requires \valid(lp); */
   int load(int *lp);
-[wp] Warning: Memory model hypotheses for function 'call_param_ref':
-  /*@ behavior typed_ref:
+[wp] dispatch_var2.i:70: Warning: 
+  Memory model hypotheses for function 'call_param_ref':
+  /*@ behavior wp_typed_ref:
         requires \valid(q); */
   int call_param_ref(int *q);

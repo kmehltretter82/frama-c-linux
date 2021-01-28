@@ -1,4 +1,10 @@
+<<<<<<< HEAD
 PLUGIN: rtegen,wp
-MACRO: WP_OPTIONS -wp -wp-par 1 -wp-share ../../../share -wp-msg-key shell -wp-report  %{dep:../../qualif.report} -wp-session ../oracle@PTEST_CONFIG@/@PTEST_NAME@.@PTEST_NUMBER@.session -wp-cache-env -wp-cache replay -wp-coq-timeout 120
+MACRO: WP_OPTIONS -wp -wp-par 1 -wp-share ../../../share -wp-msg-key shell -wp-warn-key pedantic-assigns=inactive -wp-report  %{dep:../../qualif.report} -wp-session ../oracle@PTEST_CONFIG@/@PTEST_NAME@.@PTEST_NUMBER@.session -wp-cache-env -wp-cache replay -wp-coq-timeout 120
 CMD: @frama-c@ @WP_OPTIONS@ @OPTIONS@
+||||||| ac7807782d
+CMD: @frama-c@ -no-autoload-plugins -load-module wp -wp -wp-par 1 -wp-share ./share -wp-msg-key shell -wp-report tests/qualif.report -wp-session @PTEST_DIR@/oracle@PTEST_CONFIG@/@PTEST_NAME@.@PTEST_NUMBER@.session -wp-cache-env -wp-cache replay @PTEST_FILE@ -wp-coq-timeout 120
+=======
+CMD: @frama-c@ -no-autoload-plugins -load-module wp -wp -wp-par 1 -wp-share ./share -wp-msg-key shell -wp-warn-key pedantic-assigns=inactive -wp-report tests/qualif.report -wp-session @PTEST_DIR@/oracle@PTEST_CONFIG@/@PTEST_NAME@.@PTEST_NUMBER@.session -wp-cache-env -wp-cache replay @PTEST_FILE@ -wp-coq-timeout 120
+>>>>>>> origin/master
 OPT:

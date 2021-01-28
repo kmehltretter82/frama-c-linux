@@ -44,8 +44,8 @@ let may f = match P.get_option () with
   | None -> ()
   | Some _ -> f ()
 
-let may_map ~dft f = match P.get_option () with
-  | None -> dft
+let may_map ~none f = match P.get_option () with
+  | None -> none
   | Some _ -> f ()
 
 let reset_slicing () =

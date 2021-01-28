@@ -1,6 +1,6 @@
 /* run.config*
    
-   OPT: -eva @EVA_OPTIONS@ -lib-entry -main f -absolute-valid-range 0x200-0x199 -eva-msg-key initial-state
+   OPT: -eva @EVA_CONFIG@ -lib-entry -main f -absolute-valid-range 0x200-0x199 -eva-msg-key initial-state
 */
 
 

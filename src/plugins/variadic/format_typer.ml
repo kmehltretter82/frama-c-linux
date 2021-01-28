@@ -35,7 +35,7 @@ type typdef_finder = Logic_typing.type_namespace -> string -> Cil_types.typ
 
 
 let get_typedef ?(find_typedef = Globals.Types.find_type) s =
-  try 
+  try
     find_typedef Logic_typing.Typedef s
   with Not_found ->
     raise (Type_not_found s)
@@ -119,17 +119,17 @@ let type_f_format ?find_typedef format =
   let add_types spec =
     match spec with
     | Char _ -> ()
-    | Specification s -> 
-        if s.f_field_width = Some `FWStar then
-          r := (Cil.intType, `ArgIn) :: !r;
-        if s.f_precision = Some PStar then
-          r := (Cil.intType, `ArgIn) :: !r;
-        let dir = match s.f_conversion_specifier with
-          | `s -> `ArgInArray s.f_precision
-          | `n -> `ArgOut
-          | _ ->  `ArgIn
-         in
-        r := (type_f_specifier ?find_typedef s, dir) :: !r;
+    | Specification s ->
+      if s.f_field_width = Some `FWStar then
+        r := (Cil.intType, `ArgIn) :: !r;
+      if s.f_precision = Some PStar then
+        r := (Cil.intType, `ArgIn) :: !r;
+      let dir = match s.f_conversion_specifier with
+        | `s -> `ArgInArray s.f_precision
+        | `n -> `ArgOut
+        | _ ->  `ArgIn
+      in
+      r := (type_f_specifier ?find_typedef s, dir) :: !r;
   in
   List.iter add_types format;
   List.rev !r
@@ -139,13 +139,13 @@ let type_s_format ?find_typedef format =
   let add_types spec =
     match spec with
     | Char _ -> ()
-    | Specification s -> 
-        let dir = match s.s_conversion_specifier with
-          | `s -> `ArgOutArray
-          | _ -> `ArgOut
-        in
-        if not s.s_assignment_suppression then
-          r := (type_s_specifier ?find_typedef s, dir) :: !r;
+    | Specification s ->
+      let dir = match s.s_conversion_specifier with
+        | `s -> `ArgOutArray
+        | _ -> `ArgOut
+      in
+      if not s.s_assignment_suppression then
+        r := (type_s_specifier ?find_typedef s, dir) :: !r;
   in
   List.iter add_types format;
   List.rev !r
@@ -154,4 +154,3 @@ let type_s_format ?find_typedef format =
 let type_format ?find_typedef = function
   | FFormat f -> type_f_format ?find_typedef f
   | SFormat s -> type_s_format ?find_typedef s
-

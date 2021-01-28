@@ -315,12 +315,12 @@ val add_attribute_glob_annot:
 (** {2 Contracts } *)
 
 (** [true] if the behavior has only an assigns clause.
-    @since Frama-C+dev
+    @since 22.0-Titanium
 *)
 val behavior_has_only_assigns: behavior -> bool
 
 (** [true] if the only non-empty fields of the contract are assigns clauses
-    @since Frama-C+dev
+    @since 22.0-Titanium
 *)
 val funspec_has_only_assigns: funspec -> bool
 

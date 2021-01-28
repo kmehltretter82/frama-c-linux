@@ -300,7 +300,7 @@ let add_zeroes = add_v (V_Or_Uninitialized.initialized Cvalue.V.singleton_zero)
    possibility of failure, despite -eva-alloc-returns-null. *)
 let wrap_fallible_alloc ?returns_null ret orig_state state_after_alloc =
   let default_returns_null = Value_parameters.AllocReturnsNull.get () in
-  let returns_null = Extlib.opt_conv default_returns_null returns_null in
+  let returns_null = Option.value ~default:default_returns_null returns_null in
   let success = Eval_op.wrap_ptr ret, state_after_alloc in
   if returns_null
   then

@@ -59,7 +59,7 @@ let reparse (host_window: Design.main_window_extension_points) =
       host_window#reset ()
     | Some old_helt, Some () ->
       let new_helt = History.translate_history_elt old_helt in
-      Extlib.may History.push new_helt;
+      Option.iter History.push new_helt;
       host_window#reset ();
       (** The buffer is not ready yet, modification of its vadjustement
           is unreliable *)
@@ -92,9 +92,9 @@ let save_file_as (host_window: Design.main_window_extension_points) =
     (fun () ->
        match dialog#run () with
        | `SAVE ->
-         Extlib.may
+         Option.iter
            (save_in host_window (dialog :> GWindow.window_skel))
-           (Extlib.opt_map Filepath.Normalized.of_string dialog#filename)
+           (Option.map Filepath.Normalized.of_string dialog#filename)
        | `DELETE_EVENT | `CANCEL -> ());
   dialog#destroy ()
 

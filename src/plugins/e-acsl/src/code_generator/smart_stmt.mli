@@ -56,14 +56,21 @@ val break: loc:location -> stmt
 (* E-ACSL specific code: build calls to its RTL API *)
 (* ********************************************************************** *)
 
-val lib_call: loc:location -> ?result:lval -> string -> exp list -> stmt
+val call: loc:location -> ?result:lval -> string -> exp list -> stmt
+(** Construct a call to a function with the given name.
+    @raise Not_found if the given string does not represent a function in the
+    AST, for instance if the function does not exist. *)
+
+val rtl_call:
+  loc:location -> ?result:lval -> ?prefix:string -> string -> exp list -> stmt
 (** Construct a call to a library function with the given name.
+
+    [prefix] defaults to the E-ACSL RTL API prefix and can be explicitely
+    provided to call functions without this prefix.
+
     @raise Rtl.Symbols.Unregistered if the given string does not represent
     such a function or if library functions were never registered (only possible
     when using E-ACSL through its API). *)
-
-val rtl_call: loc:location -> ?result:lval -> string -> exp list -> stmt
-(** Special version of [lib_call] for E-ACSL's RTL functions. *)
 
 val store_stmt: ?str_size:exp -> varinfo -> stmt
 (** Construct a call to [__e_acsl_store_block] that observes the allocation of

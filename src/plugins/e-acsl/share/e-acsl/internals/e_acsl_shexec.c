@@ -25,6 +25,11 @@
  * \brief Implementation for running shell commands
 ***************************************************************************/
 
+#include "e_acsl_config.h"
+
+// Only available on linux
+#if E_ACSL_OS_IS_LINUX
+
 #include <errno.h>
 #include <stddef.h>
 #include <sys/types.h>
@@ -201,3 +206,5 @@ ipr_t* shexec (char **data, const char *sin) {
   /* Run the command returning a pointer to `ipr_t` */
   return __shexec(ipr);
 }
+
+#endif // E_ACSL_OS_IS_LINUX

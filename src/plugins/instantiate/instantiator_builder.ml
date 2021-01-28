@@ -50,7 +50,6 @@ module type Instantiator = sig
 end
 
 let build_body caller callee args_generator =
-  let open Extlib in
   let loc  = Cil_datatype.Location.unknown in
   let ret_var = match Cil.getReturnType caller.svar.vtype with
     | t when Cil.isVoidType t -> None
@@ -59,10 +58,10 @@ let build_body caller callee args_generator =
   let call =
     let args = List.map Cil.evar caller.sformals in
     let args = args_generator args in
-    Cil.mkStmt (Instr(call_function (opt_map Cil.var ret_var) callee args))
+    Cil.mkStmt (Instr(call_function (Option.map Cil.var ret_var) callee args))
   in
-  let ret = Cil.mkStmt (Return ( (opt_map Cil.evar ret_var), loc)) in
-  { (Cil.mkBlock [call ; ret]) with blocals = list_of_opt ret_var }
+  let ret = Cil.mkStmt (Return (Option.map Cil.evar ret_var, loc)) in
+  { (Cil.mkBlock [call ; ret]) with blocals = Option.to_list ret_var }
 
 module Make_instantiator (G: Generator_sig) = struct
   include G

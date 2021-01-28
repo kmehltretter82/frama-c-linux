@@ -49,38 +49,38 @@ let mk_aggregator env fun_name a_pos pname a_type =
   match find_function env fun_name with
   | None -> Misc
   | Some vi ->
-      try
-        (* Get the list of arguments *)
-        let params = Typ.params vi.vtype in
+    try
+      (* Get the list of arguments *)
+      let params = Typ.params vi.vtype in
 
-        (* Check that pos is a valid position in the list *)
-        assert (a_pos >= 0);
-        if a_pos >= List.length params then begin
-          Self.warning ~current:true
-            "The standard function %s should have at least %d parameters."
-            fun_name
-            (a_pos + 1);
-            raise Exit
-        end;
+      (* Check that pos is a valid position in the list *)
+      assert (a_pos >= 0);
+      if a_pos >= List.length params then begin
+        Self.warning ~current:true
+          "The standard function %s should have at least %d parameters."
+          fun_name
+          (a_pos + 1);
+        raise Exit
+      end;
 
-        (* Get the aggregate type of elements *)
-        let _,ptyp,_ = List.nth params a_pos in
-        let a_param = pname, match ptyp with
+      (* Get the aggregate type of elements *)
+      let _,ptyp,_ = List.nth params a_pos in
+      let a_param = pname, match ptyp with
         | TArray (typ,_,_,_)
         | TPtr (typ, _) -> typ
         | _ ->
-            Self.warning ~current:true
-              "The parameter %d of standard function %s should be \
-               of array type."
-              (a_pos + 1)
-              fun_name;
-            raise Exit
-        in
+          Self.warning ~current:true
+            "The parameter %d of standard function %s should be \
+             of array type."
+            (a_pos + 1)
+            fun_name;
+          raise Exit
+      in
 
-        Aggregator {a_target = vi; a_pos; a_type; a_param}
+      Aggregator {a_target = vi; a_pos; a_type; a_param}
 
-        (* In case of failure return Misc (apply generic translation) *)
-      with Exit -> Misc
+    (* In case of failure return Misc (apply generic translation) *)
+    with Exit -> Misc
 
 let mk_format_fun vi f_kind f_buffer ~format_pos =
   let buffer_arguments = match f_buffer with
@@ -92,16 +92,16 @@ let mk_format_fun vi f_kind f_buffer ~format_pos =
   let n_expected_args = (List.fold_left max (-1) expected_args) + 1
   and n_actual_args = List.length (Typ.params vi.vtype) in
   if n_actual_args < n_expected_args then
-  begin
-    Self.warning ~current:true
-      "The standard function %s was expected to have at least %d fixed \
-       parameters but only has %d.@ \
-       No variadic translation will be performed."
-      vi.vname
-      n_expected_args
-      n_actual_args;
-    Misc
-  end
+    begin
+      Self.warning ~current:true
+        "The standard function %s was expected to have at least %d fixed \
+         parameters but only has %d.@ \
+         No variadic translation will be performed."
+        vi.vname
+        n_expected_args
+        n_actual_args;
+      Misc
+    end
   else
     FormatFun { f_kind ; f_buffer ; f_format_pos = format_pos }
 
@@ -113,11 +113,11 @@ let mk_format_fun vi f_kind f_buffer ~format_pos =
 let classify_std env vi = match vi.vname with
   (* fcntl.h - Overloads of functions *)
   | "fcntl" -> mk_overload env
-      ["__va_fcntl_void" ; "__va_fcntl_int" ; "__va_fcntl_flock"]
+                 ["__va_fcntl_void" ; "__va_fcntl_int" ; "__va_fcntl_flock"]
   | "open" -> mk_overload env
-      ["__va_open_void" ; "__va_open_mode_t"]
+                ["__va_open_void" ; "__va_open_mode_t"]
   | "openat" -> mk_overload env
-      ["__va_openat_void" ; "__va_openat_mode_t"]
+                  ["__va_openat_void" ; "__va_openat_mode_t"]
 
   (* unistd.h *)
   | "execl"   -> mk_aggregator env "execv" 1 "argv" EndedByNull
@@ -165,4 +165,3 @@ let classify env vi =
     }
   end else
     None
-

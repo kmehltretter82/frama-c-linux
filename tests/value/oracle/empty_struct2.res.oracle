@@ -5,43 +5,43 @@
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
   pg ∈ {{ &global_empty }}
-[eva] empty_struct2.c:44: assertion got status valid.
-[eva] empty_struct2.c:46: Frama_C_show_each_global_empty: ∅
-[eva] empty_struct2.c:47: Frama_C_show_each_e1: ∅
-[eva] empty_struct2.c:48: Call to builtin memcpy
-[eva] empty_struct2.c:48: 
+[eva] empty_struct2.c:48: assertion got status valid.
+[eva] empty_struct2.c:50: Frama_C_show_each_global_empty: ∅
+[eva] empty_struct2.c:51: Frama_C_show_each_e1: ∅
+[eva] empty_struct2.c:52: Call to builtin memcpy
+[eva] empty_struct2.c:52: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] empty_struct2.c:48: 
+[eva] empty_struct2.c:52: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] empty_struct2.c:48: 
+[eva] empty_struct2.c:52: 
   function memcpy: precondition 'separation' got status valid.
 [eva] FRAMAC_SHARE/libc/string.h:98: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
-[eva] empty_struct2.c:53: Call to builtin memcpy
-[eva] empty_struct2.c:53: 
+[eva] empty_struct2.c:57: Call to builtin memcpy
+[eva] empty_struct2.c:57: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] empty_struct2.c:53: 
+[eva] empty_struct2.c:57: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] empty_struct2.c:53: 
+[eva] empty_struct2.c:57: 
   function memcpy: precondition 'separation' got status valid.
-[eva] empty_struct2.c:54: 
+[eva] empty_struct2.c:58: 
   Frama_C_show_each_c2: .a ∈ {42}
                         .b ∈ {77}
-[eva] empty_struct2.c:55: Frama_C_show_each_c2_e: ∅
+[eva] empty_struct2.c:59: Frama_C_show_each_c2_e: ∅
 [eva] computing for function f <- main.
-  Called from empty_struct2.c:56.
+  Called from empty_struct2.c:60.
 [eva] Recording results for f
 [eva] Done for function f
-[eva] empty_struct2.c:58: 
+[eva] empty_struct2.c:62: 
   Frama_C_show_each_res: .a ∈ {87}
                          .b ∈ {39}
-[eva] empty_struct2.c:62: assertion got status valid.
+[eva] empty_struct2.c:66: assertion got status valid.
 [eva] computing for function ret_empty <- main.
-  Called from empty_struct2.c:64.
+  Called from empty_struct2.c:68.
 [eva] using specification for function ret_empty
 [eva] Done for function ret_empty
 [eva] computing for function ret_ptr_empty <- main.
-  Called from empty_struct2.c:65.
+  Called from empty_struct2.c:69.
 [eva] using specification for function ret_ptr_empty
 [eva] Done for function ret_ptr_empty
 [eva] Recording results for main

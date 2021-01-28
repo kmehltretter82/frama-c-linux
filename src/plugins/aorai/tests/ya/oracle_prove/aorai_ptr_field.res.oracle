@@ -1,0 +1,4 @@
+[kernel] Parsing tests/ya/aorai_ptr_field.i (no preprocessing)
+[aorai] Welcome to the Aorai plugin
+[kernel] Parsing TMPDIR/aorai_aorai_ptr_field_0.i (no preprocessing)
+[wp] Warning: Missing RTE guards

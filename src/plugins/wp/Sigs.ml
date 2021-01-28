@@ -587,7 +587,7 @@ sig
      Express that all objects in a range of locations have a given value.
 
      More precisely, [is_exp_range sigma loc ty a b v] express that
-     value at [( ty* )loc + k] equals [v], forall [a <= k < b].
+     value at [( ty* )loc + k] equals [v], forall [a <= k <= b].
      Value [v=None] stands for zero.
   *)
   val is_exp_range :
@@ -598,17 +598,25 @@ sig
   val unchanged : M.sigma -> M.sigma -> varinfo -> pred
   (** Express that a given variable has the same value in two memory states. *)
 
-  type warned_hyp = Warning.Set.t * pred
+  type warned_hyp = Warning.Set.t * (pred * pred)
 
-  val init : sigma:M.sigma -> varinfo -> init option -> warned_hyp list
-  (** Express that some variable has some initial value at the
-      given memory state.
+  val init :
+    sigma:M.sigma -> varinfo -> init option -> warned_hyp list
+    (** Express that some variable has some initial value at the
+        given memory state. The first predicate states the value,
+        the second, the initialization status.
 
-      Remark: [None] initializer are interpreted as zeroes. This is consistent
-      with the [init option] associated with global variables in CIL,
-      for which the default initializer are zeroes. There is no
-      [init option] value associated with local initializers.
-  *)
+        Note: we DO NOT merge values and initialization status
+        hypotheses as the factorization performed by Qed can make
+        predicates too hard to simplify later.
+
+        Remark: [None] initializer are interpreted as zeroes. This is consistent
+        with the [init option] associated with global variables in CIL,
+        for which the default initializer are zeroes. This function is called
+        for global initializers and local initializers ([Cil.Local_init]).
+        It is not called for local variables without initializers as they do not
+        have a [Cil.init option].
+    *)
 
 end
 
@@ -765,22 +773,21 @@ sig
   val pred : polarity -> env -> Cil_types.predicate -> pred
 
   (** Compile a term representing a set of memory locations into an abstract
-      region. When [~unfold:true], compound memory locations are expanded
-      field-by-field. *)
-  val region : env -> unfold:bool -> Cil_types.term -> region
+      region.  *)
+  val region : env -> Cil_types.term -> region
 
   (** Computes the region assigned by a list of froms. *)
   val assigned_of_lval :
-    env -> unfold:bool -> Cil_types.lval -> region
+    env -> Cil_types.lval -> region
 
   (** Computes the region assigned by a list of froms. *)
   val assigned_of_froms :
-    env -> unfold:bool -> from list -> region
+    env -> from list -> region
 
   (** Computes the region assigned by an assigns clause.
       [None] means everyhting is assigned. *)
   val assigned_of_assigns :
-    env -> unfold:bool -> assigns -> region option
+    env -> assigns -> region option
 
   (** Same as [term] above but reject any set of locations. *)
   val val_of_term : env -> Cil_types.term -> term
@@ -802,9 +809,12 @@ sig
 
   (** Check assigns inclusion.
       Compute a formula that checks whether written locations are either
-      invalid (at the given memory location)
-      or included in some assignable region. *)
-  val check_assigns : sigma -> written:region -> assignable:region -> pred
+      invalid (at the given memory location) or included in some assignable
+      region. When [~unfold:n && n <> 0], compound memory locations are expanded
+      field-by-field and arrays, cell-by-cell (by quantification). Up to [n]
+      levels are unfolded, -1 means unlimited. *)
+  val check_assigns :
+    unfold:int -> sigma -> written:region -> assignable:region -> pred
 
 end
 

@@ -28,6 +28,11 @@
 #ifndef E_ACSL_SHEXEC_H
 #define E_ACSL_SHEXEC_H
 
+#include "e_acsl_config.h"
+
+// Only available on linux
+#if E_ACSL_OS_IS_LINUX
+
 #include <sys/types.h>
 
 /*! \class ipr_t
@@ -67,5 +72,7 @@ typedef struct {
  *  executed command. Deallocation of this struct must be performed via the
  *  `free_ipr` function. */
 ipr_t* shexec (char **data, const char *sin);
+
+#endif // E_ACSL_OS_IS_LINUX
 
 #endif // E_ACSL_SHEXEC_H

@@ -98,8 +98,7 @@ let create_hidden_base ~libc ~valid ~hidden_var_name ~name_desc pointed_typ =
 let reject_empty_struct b offset typ =
   match Cil.unrollType typ with
   | TComp (ci, _, _) ->
-    if ci.cfields = [] && ci.cdefined &&
-       not (Cil.gccMode () || Cil.msvcMode ()) then
+    if ci.cfields = Some [] && not (Cil.acceptEmptyCompinfo ()) then
       Value_parameters.abort ~current:true
         "@[empty %ss@ are unsupported@ (type '%a',@ location %a%a)@ \
          in C99 (only allowed as GCC/MSVC extension).@ Aborting.@]"
@@ -133,7 +132,7 @@ let initialize_var_using_type varinfo state =
     | TPtr (typ, _) as full_typ
       when depth <= Value_parameters.AutomaticContextMaxDepth.get () ->
       let attr = Cil.typeAttrs full_typ in
-      let libc = Cil.hasAttribute "fc_stdlib" varinfo.vattr in
+      let libc = Cil.is_in_libc varinfo.vattr in
       let context_max_width =
         Value_parameters.AutomaticContextMaxWidth.get ()
       in begin
@@ -252,7 +251,7 @@ let initialize_var_using_type varinfo state =
                  The periodicity of the contents may be smaller than the size
                  of a cell; take this into account. *)
               let v, modu, offset =
-                Extlib.the (Cvalue.V_Offsetmap.fold
+                Option.get (Cvalue.V_Offsetmap.fold
                               (fun _itv v _ -> Some v) offsm_joined None)
               in
               assert (Abstract_interp.Rel.(equal offset zero));
@@ -314,7 +313,8 @@ let initialize_var_using_type varinfo state =
       in
       begin
         try
-          List.fold_left treat_field state compinfo.cfields
+          List.fold_left treat_field state
+            (Option.value ~default:[] compinfo.cfields)
         with Cil.SizeOfError (s, t) ->
           warn_unknown_size varinfo (s, t);
           bind_entire_loc Cvalue.V.top_int;

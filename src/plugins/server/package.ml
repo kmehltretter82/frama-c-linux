@@ -208,7 +208,7 @@ type requestInfo = {
 
 type arrayInfo = {
   arr_key: string;
-  arr_kind: string;
+  arr_kind: jtype;
 }
 
 type declKindInfo =

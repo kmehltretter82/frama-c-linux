@@ -25,3 +25,19 @@ Assume {
 Prove: `x_2 = `x_1.
 
 ------------------------------------------------------------
+[wp] chunk_printing.i:19: Warning: 
+  Memory model hypotheses for function 'get_int':
+  /*@
+     behavior wp_typed:
+       requires \separated(v, &y);
+       ensures \separated(\result, &y);
+     */
+  int *get_int(struct V *v);
+[wp] chunk_printing.i:25: Warning: 
+  Memory model hypotheses for function 'get_uint':
+  /*@
+     behavior wp_typed:
+       requires \separated(v, &y);
+       ensures \separated(\result, &y);
+     */
+  unsigned int *get_uint(struct V *v);

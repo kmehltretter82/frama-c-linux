@@ -10,7 +10,7 @@
   t[0..19] ∈ {0}
   u[0..39] ∈ {0}
 [eva] computing for function main1 <- main.
-  Called from widen_non_constant.i:84.
+  Called from widen_non_constant.i:97.
 [eva] widen_non_constant.i:11: Frama_C_show_each_out: {0}
 [eva] widen_non_constant.i:13: Frama_C_show_each_in: {0}, {1}
 [eva] widen_non_constant.i:12: starting to merge loop iterations
@@ -27,7 +27,7 @@
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
-  Called from widen_non_constant.i:85.
+  Called from widen_non_constant.i:98.
 [eva] widen_non_constant.i:27: Frama_C_show_each_out: {0}
 [eva] widen_non_constant.i:29: Frama_C_show_each_in: {0}, {1}
 [eva] widen_non_constant.i:28: starting to merge loop iterations
@@ -44,7 +44,7 @@
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] computing for function main3 <- main.
-  Called from widen_non_constant.i:86.
+  Called from widen_non_constant.i:99.
 [eva] widen_non_constant.i:46: Frama_C_show_each_out: {0}
 [eva] widen_non_constant.i:48: Frama_C_show_each_in: {0}, {1}
 [eva] widen_non_constant.i:47: starting to merge loop iterations
@@ -61,7 +61,7 @@
 [eva] Recording results for main3
 [eva] Done for function main3
 [eva] computing for function main4 <- main.
-  Called from widen_non_constant.i:87.
+  Called from widen_non_constant.i:100.
 [eva] widen_non_constant.i:63: starting to merge loop iterations
 [eva] widen_non_constant.i:69: starting to merge loop iterations
 [eva] widen_non_constant.i:72: Frama_C_show_each: {43}
@@ -70,6 +70,11 @@
   Frama_C_show_each: {35; 36; 37; 38; 39; 40; 41; 42}
 [eva] Recording results for main4
 [eva] Done for function main4
+[eva] computing for function main5 <- main.
+  Called from widen_non_constant.i:101.
+[eva] widen_non_constant.i:90: starting to merge loop iterations
+[eva] Recording results for main5
+[eva] Done for function main5
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -91,6 +96,9 @@
   j ∈ {35; 36; 37; 38; 39; 40; 41; 42}
   maxi ∈ {19}
   maxj ∈ {35}
+[eva:final-states] Values at end of function main5:
+  i ∈ {32}
+  ptr ∈ {{ (void *)&sub }}
 [eva:final-states] Values at end of function main:
   t[0] ∈ {-1}
    [1..19] ∈ [0..18]
@@ -103,6 +111,8 @@
 [from] Done for function main3
 [from] Computing for function main4
 [from] Done for function main4
+[from] Computing for function main5
+[from] Done for function main5
 [from] Computing for function main
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
@@ -117,6 +127,8 @@
   t[0] FROM \nothing
    [1..19] FROM \nothing (and SELF)
   u[0..39] FROM \nothing (and SELF)
+[from] Function main5:
+  NO EFFECTS
 [from] Function main:
   t[0] FROM \nothing
    [1..19] FROM \nothing (and SELF)
@@ -137,6 +149,10 @@
 [inout] Out (internal) for function main4:
     t[0..19]; u[0..39]; i; j; maxi; maxj
 [inout] Inputs for function main4:
+    \nothing
+[inout] Out (internal) for function main5:
+    i; ptr
+[inout] Inputs for function main5:
     \nothing
 [inout] Out (internal) for function main:
     t[0..19]; u[0..39]

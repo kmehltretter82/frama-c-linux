@@ -73,7 +73,7 @@ module V_Offsetmap = struct
   include Cvalue.V_Offsetmap
 
   let pretty_generic ?typ ?pretty_v ?skip_v ?sep () fmt t =
-    let pretty_v = Extlib.opt_conv V_Or_Uninitialized.pretty_typ pretty_v in
+    let pretty_v = Option.value ~default:V_Or_Uninitialized.pretty_typ pretty_v in
     pretty_generic ?typ ~pretty_v ?skip_v ?sep () fmt t
 end
 

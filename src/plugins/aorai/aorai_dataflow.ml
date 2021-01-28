@@ -265,7 +265,7 @@ let actions_to_range l =
   in List.fold_left treat_one_action Cil_datatype.Term.Map.empty l
 
 let make_start_transition ?(is_main=false) kf init_states =
-  let auto = Data_for_aorai.getAutomata () in
+  let auto = Data_for_aorai.getGraph () in
   let is_crossable = 
     if is_main then 
       Aorai_utils.isCrossableAtInit 
@@ -276,8 +276,7 @@ let make_start_transition ?(is_main=false) kf init_states =
     let my_trans = Path_analysis.get_transitions_of_state state auto in
     let treat_one_trans acc trans =
         if is_crossable trans kf then begin
-          let (_,action) = trans.cross in
-          let bindings = actions_to_range action in
+          let bindings = actions_to_range trans.actions in
           let fst_set =
             Data_for_aorai.Aorai_state.Set.singleton trans.stop
           in
@@ -303,14 +302,13 @@ let make_start_transition ?(is_main=false) kf init_states =
 let make_return_transition kf state =
   let s = Kernel_function.find_return kf in
   set_return_state s state;
-  let auto = Data_for_aorai.getAutomata () in
+  let auto = Data_for_aorai.getGraph () in
   let treat_one_state state bindings acc =
     let my_trans = Path_analysis.get_transitions_of_state state auto in
     let last = Data_for_aorai.Aorai_state.Set.singleton state in
     let treat_one_trans acc trans =
       if Aorai_utils.isCrossable trans kf Promelaast.Return then begin
-        let (_,action) = trans.cross in
-        let my_bindings = actions_to_range action in
+        let my_bindings = actions_to_range trans.actions in
         let new_bindings = compose_actions bindings (last, last, my_bindings) in
         add_or_merge trans.stop new_bindings acc
       end else acc
@@ -473,6 +471,7 @@ module Computer(I: Init) = struct
         do_call s v args d
       | Call (_,e,_,_) ->
         Aorai_option.not_yet_implemented
+          ~source:(fst e.eloc)
           "Indirect call to %a is not handled yet" Printer.pp_exp e
       | Local_init (v, ConsInit(f,args,kind),_) ->
         let args =
@@ -624,7 +623,7 @@ let compute_forward () =
   if Data_for_aorai.isIgnoredFunction (Kernel_function.get_name kf) then
     Aorai_option.abort "Main function %a is ignored by Aorai"
       Kernel_function.pretty kf;
-  let (states,_) = Data_for_aorai.getAutomata () in
+  let (states,_) = Data_for_aorai.getGraph () in
   let start = 
     List.fold_left
       (fun acc s ->
@@ -798,6 +797,7 @@ struct
       | Call (_,{ enode = Lval(Var f,NoOffset) },_,_) -> do_call s f state
       | Call (_,e,_,_) ->
         Aorai_option.not_yet_implemented
+          ~source:(fst e.eloc)
           "Indirect call to %a is not handled yet" Printer.pp_exp e
       | Local_init (_,ConsInit(f,_,_),_) -> do_call s f state
       | Local_init (_,AssignInit _,_)
@@ -833,7 +833,7 @@ let filter_possible_states kf states =
 
 let filter_return_states kf states =
   let end_state = Return_state.find (Kernel_function.find_return kf) in
-  let auto = Data_for_aorai.getAutomata () in
+  let auto = Data_for_aorai.getGraph () in
   let is_possible_state start_state state _ =
     try
       let trans = Path_analysis.get_transitions_of_state state auto in

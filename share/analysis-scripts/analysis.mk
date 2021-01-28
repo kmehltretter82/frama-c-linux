@@ -84,7 +84,7 @@ else
   SED_UNBUFFERED:=sed --unbuffered
 ifneq (,$(wildcard /usr/bin/time))
 define time_with_output
-  /usr/bin/time --format='user_time=%U\nmemory=%M' --output="$(1)"
+  /usr/bin/time -f 'user_time=%U\nmemory=%M' -o "$(1)"
 endef
 else
 define time_with_output
@@ -96,9 +96,13 @@ endif
 # --- Utilities ---
 
 define display_command =
-  $(info )
-  $(info $(shell tput setaf 4)Command: $(1)$(shell tput sgr0))
-  $(info )
+  @{
+    echo '';
+    [ -t 1 ] && tput setaf 4;
+    echo "Command: $(strip $(1))";
+    [ -t 1 ] && tput sgr0;
+    echo '';
+  }
 endef
 
 empty :=
@@ -118,7 +122,7 @@ EVAFLAGS   ?= \
   -eva-print-callstacks -eva-warn-key alarm=inactive \
   -no-deps-print -no-calldeps-print \
   -eva-warn-key garbled-mix \
-  -calldeps -permissive -from-verbose 0 \
+  -calldeps -from-verbose 0 \
   $(if $(EVABUILTINS), -eva-builtin=$(call fc_list,$(EVABUILTINS)),) \
   $(if $(EVAUSESPECS), -eva-use-spec $(call fc_list,$(EVAUSESPECS)),)
 FCFLAGS    ?=
@@ -143,7 +147,7 @@ clean-backups:
 
 HR_TIMESTAMP := $(shell date +"%H:%M:%S %d/%m/%Y")# Human readable
 DIR          := $(dir $(lastword $(MAKEFILE_LIST)))
-SHELL        := /bin/bash
+SHELL        := $(shell which bash)
 .SHELLFLAGS  := -eu -o pipefail -c
 
 .ONESHELL:

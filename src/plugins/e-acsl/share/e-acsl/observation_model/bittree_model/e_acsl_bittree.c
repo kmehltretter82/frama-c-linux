@@ -25,11 +25,24 @@
  * \brief Patricia Trie API Implementation
 ***************************************************************************/
 
+#include "../../internals/e_acsl_config.h"
 #include "../../internals/e_acsl_malloc.h"
+#include "../../internals/e_acsl_private_assert.h"
 
 #include "e_acsl_bittree.h"
 
+#if E_ACSL_OS_IS_LINUX
 #define WORDBITS __WORDSIZE
+#elif E_ACSL_OS_IS_WINDOWS
+// On windows, __WORDSIZE is not available
+# ifdef _WIN64
+#   define WORDBITS 64
+# else
+#   define WORDBITS 32
+# endif
+#else
+# error "Unsupported OS"
+#endif
 
 static size_t mask(size_t, size_t);
 
@@ -160,7 +173,7 @@ static bt_node * bt_get_leaf_from_block (bt_block * ptr) {
 	    == (ptr->ptr & curr->left->mask))
       curr = curr->left;
     else
-      vassert(0, "Unreachable", NULL);
+      private_assert(0, "Unreachable", NULL);
   }
   DASSERT(curr->is_leaf);
   DASSERT(curr->leaf == ptr);

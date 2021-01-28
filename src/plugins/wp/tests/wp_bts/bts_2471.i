@@ -4,7 +4,6 @@
 
 /* run.config_qualif
    OPT: -wp-timeout 1
-   OPT: -wp-prover native:alt-ergo -wp-timeout 1
    OPT: -wp-prover native:coq
  */
 

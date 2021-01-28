@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -eva @EVA_OPTIONS@ -lib-entry -eva-context-width 4 -eva-initialization-padding-globals no
+   OPT: -eva @EVA_CONFIG@ -lib-entry -eva-context-width 4 -eva-initialization-padding-globals no
 */
 
 typedef struct {

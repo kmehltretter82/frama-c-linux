@@ -329,10 +329,7 @@ let get stmt_zones stmt =
 
 let pretty fmt stmt_zones =
   let pp s d = Format.fprintf fmt "Stmt:%d -> %a@." s.sid Data.pretty d in
-  (* Sort output so that it does not depend on the OCaml hash function.
-     Can be removed when OCaml 4.01 is mandatory *)
-  let sorted = Stmt.Hashtbl.fold Stmt.Map.add stmt_zones Stmt.Map.empty in
-  Stmt.Map.iter pp sorted
+  Stmt.Hashtbl.iter_sorted pp stmt_zones
 
        (*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)
 

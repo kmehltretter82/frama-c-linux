@@ -83,22 +83,22 @@ let dummy_edge = {
 }
 
 module Vertex = Datatype.Make_with_collections
-  (struct
-    include Datatype.Serializable_undefined
-    type t = vertex
-    let reprs = [dummy_vertex]
-    let name = "Interpreted_automata.Vertex"
-    let copy v =
-      { v with vertex_key = v.vertex_key }
-    let compare v1 v2 = v1.vertex_key - v2.vertex_key
-    let hash v = v.vertex_key
-    let equal v1 v2 = v1.vertex_key = v2.vertex_key
-    let pretty fmt v = Format.pp_print_int fmt v.vertex_key
-  end)
+    (struct
+      include Datatype.Serializable_undefined
+      type t = vertex
+      let reprs = [dummy_vertex]
+      let name = "Interpreted_automata.Vertex"
+      let copy v =
+        { v with vertex_key = v.vertex_key }
+      let compare v1 v2 = v1.vertex_key - v2.vertex_key
+      let hash v = v.vertex_key
+      let equal v1 v2 = v1.vertex_key = v2.vertex_key
+      let pretty fmt v = Format.pp_print_int fmt v.vertex_key
+    end)
 
-module Edge = 
-  struct 
-    include Datatype.Make_with_collections
+module Edge =
+struct
+  include Datatype.Make_with_collections
       (struct
         include Datatype.Serializable_undefined
         type t = vertex edge
@@ -110,8 +110,8 @@ module Edge =
         let equal e1 e2 = e1.edge_key = e2.edge_key
         let pretty fmt e = Format.pp_print_int fmt e.edge_key
       end)
-    let default = dummy_edge
-  end
+  let default = dummy_edge
+end
 
 
 module G = Graph.Imperative.Digraph.ConcreteBidirectionalLabeled (Vertex)
@@ -133,7 +133,7 @@ type automaton = {
   stmt_table : (vertex * vertex) StmtTable.t;
 }
 
-(** Each goto statement is referenced during the traversal of the AST so 
+(** Each goto statement is referenced during the traversal of the AST so
     that the jumps can be added to the graph afterward using a stmt_table.
     They are stored as a (vertex,stmt,stmt) tuple, where the vertex is the
     origin and the two statements are the origin and the destination of the
@@ -145,8 +145,6 @@ type goto_list = (vertex * stmt * stmt) list ref
 type control_points = {
   src: vertex;
   dest: vertex;
-  break: vertex option;
-  continue: vertex option;
 }
 
 
@@ -165,24 +163,24 @@ let unknown_loc =
 
 let first_loc block =
   let rec f = function
-  | [] ->
-    raise Not_found
-  | {skind = Block b} :: l ->
-    (try f b.bstmts with Not_found -> f l)
-  | stmt :: _ ->
-    stmt_loc stmt
+    | [] ->
+      raise Not_found
+    | {skind = Block b} :: l ->
+      (try f b.bstmts with Not_found -> f l)
+    | stmt :: _ ->
+      stmt_loc stmt
   in
   try f block.bstmts
   with Not_found -> unknown_loc
 
 let last_loc block =
   let rec f = function
-  | [] ->
-    raise Not_found
-  | {skind = Block b} :: l ->
-    (try f (List.rev b.bstmts) with Not_found -> f l)
-  | stmt :: _ ->
-    stmt_loc stmt
+    | [] ->
+      raise Not_found
+    | {skind = Block b} :: l ->
+      (try f (List.rev b.bstmts) with Not_found -> f l)
+    | stmt :: _ ->
+      stmt_loc stmt
   in
   try f (List.rev block.bstmts)
   with Not_found -> unknown_loc
@@ -262,16 +260,16 @@ let build_automaton ~annotations kf =
   let build_transitions src dest kinstr loc l =
     (* Add transitions to the graph *)
     let rec fold_transition v1 = function
-    | [] ->
-      assert false
-    | [t] -> 
-      add_edge v1 dest kinstr t loc
-    | Skip :: l ->
-      fold_transition v1 l
-    | t :: l -> 
-      let v2 = add_vertex () in
-      add_edge v1 v2 kinstr t loc;
-      fold_transition v2 l
+      | [] ->
+        assert false
+      | [t] ->
+        add_edge v1 dest kinstr t loc
+      | Skip :: l ->
+        fold_transition v1 l
+      | t :: l ->
+        let v2 = add_vertex () in
+        add_edge v1 v2 kinstr t loc;
+        fold_transition v2 l
     in
     fold_transition src l
   in
@@ -286,15 +284,7 @@ let build_automaton ~annotations kf =
       List.map (fun b -> Enter b) entered_blocks
     and kinstr = Kstmt stmt
     in
-    build_transitions src dest kinstr (stmt_loc stmt) l 
-  in
-  let add_jump src dest stmt =
-    (* We use Cil stmt successor informations *)
-    let succ = match stmt.succs with
-    | [succ] -> succ (* List must contain one element *)
-    | _ -> assert false
-    in
-    build_stmt_transition src dest stmt succ Skip
+    build_transitions src dest kinstr (stmt_loc stmt) l
   in
 
   let rec do_list do_one control labels = function
@@ -324,14 +314,14 @@ let build_automaton ~annotations kf =
       in
       add_edge control.src block_start kinstr (Enter block) loc_start;
       add_edge block_end control.dest kinstr (Leave block) loc_end;
-      let block_control = {control with src = block_start; dest = block_end} in
+      let block_control = {src = block_start; dest = block_end} in
       do_list do_stmt block_control labels block.bstmts
     end
 
   and do_stmt control (labels:vertex labels) stmt =
     let kinstr = Kstmt stmt
     and loc = stmt_loc stmt in
-
+    let source = fst loc in
     let do_annot control labels (annot: code_annotation) : unit =
       let labels = LabelMap.add_builtin Here control.src labels in
       let annotation = make_annotation kf stmt annot labels in
@@ -384,12 +374,10 @@ let build_automaton ~annotations kf =
         gotos := (control.src,stmt,!dest_stmt) :: !gotos;
         control.src
 
-      | Break _ ->
-        add_jump control.src (Extlib.the control.break) stmt;
-        control.src
-
-      | Continue _ ->
-        add_jump control.src (Extlib.the control.continue) stmt;
+      | Break _ | Continue _ ->
+        assert (List.length stmt.succs = 1);
+        let dest_stmt = List.hd stmt.succs in
+        gotos := (control.src,stmt,dest_stmt) :: !gotos;
         control.src
 
       | If (exp, then_block, else_block, _) ->
@@ -414,7 +402,6 @@ let build_automaton ~annotations kf =
         let block_control = {
           control with
           src = add_vertex ();
-          break = Some control.dest;
         } in
         do_block block_control kinstr labels block;
         (* Then link the cases *)
@@ -424,31 +411,31 @@ let build_automaton ~annotations kf =
             begin fun values case_stmt ->
               let dest,_ = StmtTable.find table case_stmt in
               (* For all cases for this statement *)
-            List.fold_left
-              begin fun values -> function
-              | Case (exp2,_) ->
-                  let guard = build_guard exp2 Then in
-                  build_stmt_transition control.src dest stmt case_stmt guard;
-                  exp2 :: values
-              | Default (_) ->
-                  default_case := Some (dest,case_stmt);
-                  values
-              | Label _ -> values
-              end values case_stmt.Cil_types.labels
-          end [] cases
+              List.fold_left
+                begin fun values -> function
+                  | Case (exp2,_) ->
+                    let guard = build_guard exp2 Then in
+                    build_stmt_transition control.src dest stmt case_stmt guard;
+                    exp2 :: values
+                  | Default (_) ->
+                    default_case := Some (dest,case_stmt);
+                    values
+                  | Label _ -> values
+                end values case_stmt.Cil_types.labels
+            end [] cases
         in
         (* Finally, link the default case *)
         let rec add_default_edge src = function
           | [] ->
-              add_last_edge src Skip
+            add_last_edge src Skip
           | exp2 :: [] ->
-              let guard = build_guard exp2 Else in
-              add_last_edge src guard
+            let guard = build_guard exp2 Else in
+            add_last_edge src guard
           | exp2 :: l ->
-              let point = add_vertex ()
-              and guard = build_guard exp2 Else in
-              add_edge src point kinstr guard loc;
-              add_default_edge point l
+            let point = add_vertex ()
+            and guard = build_guard exp2 Else in
+            add_edge src point kinstr guard loc;
+            add_default_edge point l
         and add_last_edge src transition =
           match !default_case with
           | None ->
@@ -465,9 +452,7 @@ let build_automaton ~annotations kf =
           if not annotations
           then
             { src = control.src;
-              dest = control.src;
-              break = Some control.dest;
-              continue = Some control.src; }
+              dest = control.src; }
           else
             (* We separate loop head from first statement of the loop, otherwise
                  we can't separate loop_entry from loop_current *)
@@ -476,7 +461,7 @@ let build_automaton ~annotations kf =
             loop_head_point.vertex_info <- LoopHead (!loop_level);
             let labels =
               LabelMap.(add_builtin LoopEntry control.src
-                           (add_builtin LoopCurrent loop_head_point labels))
+                          (add_builtin LoopCurrent loop_head_point labels))
             in
             (* for variant to have one point at the end of the loop *)
             let loop_end_point = add_vertex () in
@@ -493,26 +478,24 @@ let build_automaton ~annotations kf =
             in
             add_edge loop_back loop_head_point kinstr Skip loc;
             { src=loop_start_body;
-              break=Some control.dest;
-              dest=loop_end_point;
-              continue=Some loop_end_point; }
+              dest=loop_end_point; }
         in
         do_block loop_control kinstr labels block;
         decr loop_level;
         control.dest
 
-    | Block block ->
-      do_block control kinstr labels block;
-      control.dest
+      | Block block ->
+        do_block control kinstr labels block;
+        control.dest
 
-    | UnspecifiedSequence us ->
-      let block = Cil.block_from_unspecified_sequence us in
-      do_block control kinstr labels block;
-      control.dest
+      | UnspecifiedSequence us ->
+        let block = Cil.block_from_unspecified_sequence us in
+        do_block control kinstr labels block;
+        control.dest
 
-    | Throw _ | TryCatch _ | TryFinally _ | TryExcept _
-        -> Kernel.not_yet_implemented
-                  "[interpreted_automata] exception handling"
+      | Throw _ | TryCatch _ | TryFinally _ | TryExcept _
+        -> Kernel.not_yet_implemented ~source
+             "[interpreted_automata] exception handling"
     in
     (* Update statement table *)
     assert (control.src.vertex_start_of = None);
@@ -529,8 +512,6 @@ let build_automaton ~annotations kf =
   let control = {
     src = start_code;
     dest = end_code;
-    break = None;
-    continue = None;
   }
   in
 
@@ -543,7 +524,7 @@ let build_automaton ~annotations kf =
   List.iter
     begin fun (src,src_stmt,dest_stmt) ->
       let dest,_ = StmtTable.find table dest_stmt in
-      add_jump src dest src_stmt
+      build_stmt_transition src dest src_stmt dest_stmt Skip
     end !gotos;
 
   (* For annotation transitions, bind statement labels to their corresponding
@@ -559,9 +540,9 @@ let build_automaton ~annotations kf =
       let bind label map =
         try
           let vertex = match label with
-          | FormalLabel _ -> raise Not_found
-          | BuiltinLabel _ -> LabelMap.find label annot.labels
-          | StmtLabel stmt -> snd (StmtTable.find table !stmt)
+            | FormalLabel _ -> raise Not_found
+            | BuiltinLabel _ -> LabelMap.find label annot.labels
+            | StmtLabel stmt -> snd (StmtTable.find table !stmt)
           in
           LabelMap.add label vertex map
         with Not_found -> map
@@ -585,32 +566,32 @@ let build_automaton ~annotations kf =
 (* ---------------------------------------------------------------------- *)
 
 module Automaton = Datatype.Make
-  (struct
-    include Datatype.Serializable_undefined
-    type t = automaton
-    let reprs = [{
-      graph=G.create ();
-      entry_point=dummy_vertex;
-      return_point=dummy_vertex;
-      stmt_table=StmtTable.create 0;
-    }]
-    let name = "Interpreted_automata.Automaton"
-    let copy automaton =
-      {
-        automaton with
-        graph = G.copy automaton.graph;
-        stmt_table = StmtTable.copy automaton.stmt_table;
-      }
-    let pretty : t Pretty_utils.formatter = fun fmt g ->
-      Pretty_utils.pp_iter G.iter_vertex ~pre:"@[" ~suf:"@]" ~sep:";@ "
-        (fun fmt v ->
-           Format.fprintf fmt "@[<2>@[%a ->@]@ %a@]"
-             Vertex.pretty v
-             (Pretty_utils.pp_iter (fun f -> G.iter_succ f g.graph) ~sep:",@ " Vertex.pretty)
-             v
-        )
-        fmt g.graph
-   end)
+    (struct
+      include Datatype.Serializable_undefined
+      type t = automaton
+      let reprs = [{
+          graph=G.create ();
+          entry_point=dummy_vertex;
+          return_point=dummy_vertex;
+          stmt_table=StmtTable.create 0;
+        }]
+      let name = "Interpreted_automata.Automaton"
+      let copy automaton =
+        {
+          automaton with
+          graph = G.copy automaton.graph;
+          stmt_table = StmtTable.copy automaton.stmt_table;
+        }
+      let pretty : t Pretty_utils.formatter = fun fmt g ->
+        Pretty_utils.pp_iter G.iter_vertex ~pre:"@[" ~suf:"@]" ~sep:";@ "
+          (fun fmt v ->
+             Format.fprintf fmt "@[<2>@[%a ->@]@ %a@]"
+               Vertex.pretty v
+               (Pretty_utils.pp_iter (fun f -> G.iter_succ f g.graph) ~sep:",@ " Vertex.pretty)
+               v
+          )
+          fmt g.graph
+    end)
 
 (* ---------------------------------------------------------------------- *)
 (* --- Weak Topological Order                                         --- *)
@@ -629,14 +610,14 @@ let build_wto ~pref {graph; entry_point} =
 module WTO = struct
   include Scheduler
   include Datatype.Make
-    (struct
-      include Datatype.Serializable_undefined
-      type t = wto
-      let reprs = [List.map (fun s -> Wto.Node s) Vertex.reprs]
-      let pretty = Scheduler.pretty_partition
-      let name = "Interpreted_automata.WTO"
-      let copy w = w
-     end)
+      (struct
+        include Datatype.Serializable_undefined
+        type t = wto
+        let reprs = [List.map (fun s -> Wto.Node s) Vertex.reprs]
+        let pretty = Scheduler.pretty_partition
+        let name = "Interpreted_automata.WTO"
+        let copy w = w
+      end)
 end
 
 (* ---------------------------------------------------------------------- *)
@@ -645,10 +626,10 @@ end
 
 let exit_strategy graph component =
   let head, l = match component with
-  | Wto.Component (v, w) -> v, Wto.Node (v) :: w
-  | Wto.Node (v) -> v, [component]
+    | Wto.Component (v, w) -> v, Wto.Node (v) :: w
+    | Wto.Node (v) -> v, [component]
   in
-  (* Build a table of vertices that should not be passed through to get 
+  (* Build a table of vertices that should not be passed through to get
      a path to an exit. At the begining it only contains the component head. *)
   let table = Hashtbl.create (G.nb_vertex graph) in
   Hashtbl.add table head ();
@@ -656,19 +637,19 @@ let exit_strategy graph component =
   let rec f acc = function
     | [] -> acc
     | Wto.Node v :: l ->
-        if List.for_all (Hashtbl.mem table) (G.succ graph v) then
-          (Hashtbl.add table v (); f acc l)
-        else
-          f (Wto.Node v :: acc) l
+      if List.for_all (Hashtbl.mem table) (G.succ graph v) then
+        (Hashtbl.add table v (); f acc l)
+      else
+        f (Wto.Node v :: acc) l
     | Wto.Component (v, w) :: l ->
-        let vertices = v :: Wto.flatten w in (* All vertices of the sub wto *)
-        List.iter (fun v -> Hashtbl.add table v ()) vertices; (* Temporarilly add them *)
-        let succs = List.flatten (List.map (G.succ graph) vertices) in
-        if List.for_all (Hashtbl.mem table) succs then
-          f acc l
-        else (
-          List.iter (Hashtbl.remove table) vertices; (* Undo *)
-          f (Wto.Component (v, w) :: acc) l)
+      let vertices = v :: Wto.flatten w in (* All vertices of the sub wto *)
+      List.iter (fun v -> Hashtbl.add table v ()) vertices; (* Temporarilly add them *)
+      let succs = List.flatten (List.map (G.succ graph) vertices) in
+      if List.for_all (Hashtbl.mem table) succs then
+        f acc l
+      else (
+        List.iter (Hashtbl.remove table) vertices; (* Undo *)
+        f (Wto.Component (v, w) :: acc) l)
   in
   f [] (List.rev l)
 
@@ -689,17 +670,17 @@ let pretty_transition fmt t =
     Pretty_utils.pp_list ~sep:", " Printer.pp_varinfo fmt l
   in
   begin match t with
-  | Skip -> ()
-  | Return (None,_) -> fprintf fmt "return"
-  | Return (Some exp,_) -> fprintf fmt "return %a" Printer.pp_exp exp
-  | Guard (exp,Then,_) -> Printer.pp_exp fmt exp
-  | Guard (exp,Else,_) -> fprintf fmt "!(%a)" Printer.pp_exp exp
-  | Prop (a,_) ->
-    fprintf fmt "%a: %a"
-      pretty_kind a.kind Printer.pp_identified_predicate a.predicate
-  | Instr (instr,_) -> Printer.pp_instr fmt instr
-  | Enter (b) -> fprintf fmt "Enter %a" print_var_list b.blocals
-  | Leave (b)  -> fprintf fmt "Exit %a" print_var_list b.blocals
+    | Skip -> ()
+    | Return (None,_) -> fprintf fmt "return"
+    | Return (Some exp,_) -> fprintf fmt "return %a" Printer.pp_exp exp
+    | Guard (exp,Then,_) -> Printer.pp_exp fmt exp
+    | Guard (exp,Else,_) -> fprintf fmt "!(%a)" Printer.pp_exp exp
+    | Prop (a,_) ->
+      fprintf fmt "%a: %a"
+        pretty_kind a.kind Printer.pp_identified_predicate a.predicate
+    | Instr (instr,_) -> Printer.pp_instr fmt instr
+    | Enter (b) -> fprintf fmt "Enter %a" print_var_list b.blocals
+    | Leave (b)  -> fprintf fmt "Exit %a" print_var_list b.blocals
   end
 
 let pretty_edge fmt t = pretty_transition fmt t.edge_transition
@@ -741,7 +722,7 @@ module MakeDot
         | `Vertex -> htmllabel "%a" V.pretty v
       in
       let vertex_attributes =
-        if head && Extlib.has_some subgraph
+        if head && Option.is_some subgraph
         then [`Shape `Invtriangle ; label]
         else [label]
       in
@@ -753,7 +734,7 @@ module MakeDot
         incr component_count;
         let subgraph = Some {
             sg_name = string_of_int !component_count;
-            sg_parent = Extlib.opt_map (fun s -> s.sg_name) subgraph;
+            sg_parent = Option.map (fun s -> s.sg_name) subgraph;
             sg_attributes = []} in
         donode subgraph true v;
         traverse_component subgraph w
@@ -775,21 +756,23 @@ module MakeDot
           try let (x,_,_,_) = Table.find subgraphs v in x
           with Not_found ->
             let l = if wto = None then [] else [`Style `Dashed] in
-            (htmllabel "%a" V.pretty v)::l
+            let pretty fmt v =
+              V.pretty fmt v ;
+              match V.start_of v with
+              | None -> ()
+              | Some s -> Format.fprintf fmt "@s%d" s.sid
+            in (htmllabel "%a" pretty v)::l
         let get_subgraph v =
           try let (_,x,_,_) = Table.find subgraphs v in x
           with Not_found -> None
         let default_edge_attributes _g = []
         let edge_attributes (v1,e,v2) =
+          htmllabel "%a" pretty_edge e ::
           if Table.mem subgraphs v1 && Table.mem subgraphs v2 then
             let (_,_,c1,_) = Table.find subgraphs v1 in
             let (_,_,c2,head2) = Table.find subgraphs v2 in
-            let l = if head2 && c2 <= c1 then [`Constraint false] else [] in
-            (htmllabel "%a" pretty_edge e)::l
-          else if wto = None then
-            [`Style `Dashed]
-          else
-            []
+            if head2 && c2 <= c1 then [`Constraint false] else []
+          else if wto = None then [] else [`Style `Dashed]
         include G
       end)
     in
@@ -818,7 +801,7 @@ module WTOIndex =
       let pretty i =
         Pretty_utils.pp_list ~sep:"," Vertex.pretty i
       let copy i = i
-     end)
+    end)
 
 module Compute = struct
 
@@ -889,21 +872,21 @@ end
 
 
 module AutomatonState = Kernel_function.Make_Table (Automaton)
-  (struct
-    let size = 97
-    let name = "Interpreted_automata.AutomatonState"
-    let dependencies = [Ast.self]
-   end)
+    (struct
+      let size = 97
+      let name = "Interpreted_automata.AutomatonState"
+      let dependencies = [Ast.self]
+    end)
 
 let get_automaton = AutomatonState.memo (build_automaton ~annotations:false)
 
 
 module WTOState = Kernel_function.Make_Table (WTO)
-  (struct
-    let size = 97
-    let name = "Interpreted_automata.WTOState"
-    let dependencies = [Ast.self]
-   end)
+    (struct
+      let size = 97
+      let name = "Interpreted_automata.WTOState"
+      let dependencies = [Ast.self]
+    end)
 
 let get_wto =
   let build kf =
@@ -927,7 +910,7 @@ module WTOIndexState =
       let size = 97
       let name = "Interpreted_automata.WTOIndexState"
       let dependencies = [Ast.self]
-     end)
+    end)
 
 let build_wto_index_table kf = Compute.build_wto_index_table (get_wto kf)
 
@@ -1178,4 +1161,3 @@ struct
     iterate_list wto;
     results
 end
-
