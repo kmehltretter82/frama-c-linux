@@ -228,11 +228,19 @@ let reverse_loop_contract l = {
   loop_assigns = List.rev l.loop_assigns ;
 }
 
+let default_assigns stmt l = {
+  l with
+  loop_assigns =
+    if l.loop_assigns <> [] then l.loop_assigns
+    else [WpPropId.mk_loop_any_assigns_info stmt]
+}
+
 let get_loop_contract kf stmt : loop_contract =
   let labels = NormAtLabels.labels_loop stmt in
   let normalize_pred p = NormAtLabels.preproc_annot labels p in
   let normalize_annot (i,p) = i, normalize_pred p in
   let normalize_assigns w = NormAtLabels.preproc_assigns labels w in
+  default_assigns stmt @@
   reverse_loop_contract @@
   Annotations.fold_code_annot
     begin fun _emitter ca l ->

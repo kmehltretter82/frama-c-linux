@@ -143,7 +143,10 @@ struct
   let use_assigns env (a : assigns) w =
     match a with
     | NoAssignsInfo -> assert false
-    | AssignsAny ad -> W.use_assigns env.we None ad w
+    | AssignsAny ad ->
+        Wp_parameters.warning ~current:true ~once:true
+          "Missing assigns clause (assigns 'everything' instead)" ;
+        W.use_assigns env.we None ad w
     | AssignsLocations(ap,ad) -> W.use_assigns env.we (Some ap) ad w
 
   let prove_assigns env (a : assigns) w =
