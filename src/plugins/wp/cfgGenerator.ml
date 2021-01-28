@@ -31,7 +31,7 @@ module KFmap = Kernel_function.Map
 
 type task = {
   mutable lemmas: LogicUsage.logic_lemma list ;
-  mutable modes: CfgCalculus.mode KFmap.t ; (** TODO: when New CFG is validated, use list *)
+  mutable modes: CfgCalculus.mode list KFmap.t ; (** TODO: when New CFG is validated, use list *)
   mutable props: CfgCalculus.props ;
 }
 
@@ -81,9 +81,15 @@ let apply task ~kf ?bhvs ?prop () =
           match Annotations.behaviors kf with
           | [] -> [empty_default_behavior]
           | bhvs -> bhvs in
-    List.iter (fun bhv ->
-        task.modes <- KFmap.add kf { CfgCalculus.kf ; bhv } task.modes
-      ) bhvs ;
+    let add_mode kf m =
+      let modes =
+        match KFmap.find_opt kf task.modes with
+        | None -> []
+        | Some modes -> modes
+      in
+      task.modes <- KFmap.add kf (m :: modes) task.modes
+    in
+    List.iter (fun bhv -> add_mode kf { CfgCalculus.kf ; bhv }) bhvs ;
     Option.iter (fun ip -> task.props <- `PropId ip) prop ;
   end
 
@@ -183,20 +189,24 @@ struct
               ) task.lemmas ;
           end () ;
       KFmap.iter
-        (fun _ (mode : CfgCalculus.mode) ->
-           WpContext.on_context (model,WpContext.Kf mode.kf)
-             begin fun () ->
-               LogicUsage.iter_lemmas VCG.register_lemma ;
-               if WpRTE.missing_guards model mode.kf then
-                 warning ~current:false ~once:true "Missing RTE guards" ;
-               let bhv =
-                 if Cil.is_default_behavior mode.bhv then None
-                 else Some mode.bhv.b_name in
-               let index = Wpo.Function(mode.kf,bhv) in
-               let wp = snd @@ WP.compute ~mode ~props:task.props in
-               let wcs = VCG.compile_wp index wp in
-               collection := Bag.concat !collection wcs
-             end ()
+        (fun _ modes ->
+           List.iter
+             begin fun (mode: CfgCalculus.mode) ->
+               WpContext.on_context (model,WpContext.Kf mode.kf)
+                 begin fun () ->
+                   LogicUsage.iter_lemmas VCG.register_lemma ;
+                   if WpRTE.missing_guards model mode.kf then
+                     warning ~current:false ~once:true "Missing RTE guards" ;
+                   let bhv =
+                     if Cil.is_default_behavior mode.bhv then None
+                     else Some mode.bhv.b_name in
+                   let index = Wpo.Function(mode.kf,bhv) in
+                   let wp = snd @@ WP.compute ~mode ~props:task.props in
+                   let wcs = VCG.compile_wp index wp in
+                   collection := Bag.concat !collection wcs
+                 end ()
+             end
+             (List.rev modes)
         ) task.modes ;
       !collection
     end
@@ -248,17 +258,21 @@ let dump task =
   let module WP = CfgCalculus.Make(CfgDump) in
   let props = task.props in
   KFmap.iter
-    (fun _ (mode : CfgCalculus.mode) ->
-       let bhv =
-         if Cil.is_default_behavior mode.bhv
-         then None else Some mode.bhv.b_name in
-       try
-         CfgDump.fopen mode.kf bhv ;
-         ignore (WP.compute ~mode ~props) ;
-         CfgDump.flush () ;
-       with err ->
-         CfgDump.flush () ;
-         raise err
+    (fun _ modes ->
+       List.iter
+         begin fun (mode : CfgCalculus.mode) ->
+           let bhv =
+             if Cil.is_default_behavior mode.bhv
+             then None else Some mode.bhv.b_name in
+           try
+             CfgDump.fopen mode.kf bhv ;
+             ignore (WP.compute ~mode ~props) ;
+             CfgDump.flush () ;
+           with err ->
+             CfgDump.flush () ;
+             raise err
+         end
+         (List.rev modes)
     ) task.modes
 
 let dumper setup driver =
