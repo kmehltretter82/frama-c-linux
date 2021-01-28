@@ -103,13 +103,13 @@ let is_file_empty_or_nonexisting filename =
 let config_name ~env name =
   if env.config = "" then name else name ^ "_" ^ env.config
 
-let macro_default_options = "-journal-disable -check -no-autoload-plugins"
-let macro_frama_c_exe = "frama-c"
-let macro_frama_c_only = "@frama-c-exe@ @DEFAULT_OPTIONS@"
-let macro_frama_c_cmd = "@frama-c-exe@ @DEFAULT_OPTIONS@ @PLUGIN_OPTIONS@"
-let macro_frama_c = "@frama-c-exe@ @DEFAULT_OPTIONS@ @PLUGIN_OPTIONS@ @PTEST_FILE@"
+let macro_default_options = ref "-journal-disable -check -no-autoload-plugins"
+let macro_frama_c_exe = ref "frama-c"
+let macro_frama_c_only = ref "@frama-c-exe@ @DEFAULT_OPTIONS@"
+let macro_frama_c_cmd = ref "@frama-c-exe@ @DEFAULT_OPTIONS@ @PLUGIN_OPTIONS@"
+let macro_frama_c = ref "@frama-c-exe@ @DEFAULT_OPTIONS@ @PLUGIN_OPTIONS@ @PTEST_FILE@"
 
-let default_toplevel = "@frama-c@ @OPTIONS@"
+let default_toplevel = ref "@frama-c@ @OPTIONS@"
 
 (** the files in [suites] whose name matches
       the pattern [test_file_regexp] will be considered as test files *)
@@ -198,27 +198,38 @@ let example_msg =
      - 'dune build @<subdirectory>/<alias-name>'@  \
      @]@ \
      @]"
-    macro_default_options
-    macro_frama_c_exe
-    macro_frama_c_only
-    macro_frama_c
-    macro_frama_c_cmd
+    !macro_default_options
+    !macro_frama_c_exe
+    !macro_frama_c_only
+    !macro_frama_c
+    !macro_frama_c_cmd
     test_file_regexp
-    default_toplevel
+    !default_toplevel
 
 let umsg = "Usage: ptests [options] [names of test suites]"
 
 let default_dune_alias = ref "ptests"
 let rec argspec =
   [
-    "-v", Arg.Unit (fun () -> incr verbosity),
-    " Increase verbosity (up to  twice)" ;
-    "-make", Arg.String (fun s -> Format.eprintf "Deprecated option -make %s" s),
-    "<command> Use command instead of make (DEPRECATED)";
-    "-config", Arg.String (fun s -> Format.eprintf "Deprecated option -config %s" s),
-    " <name> Use special configuration and oracles (DEPRECATED)";
-    "-dune-alias", Arg.String (fun s -> default_dune_alias := s),
-    " <name> Use @<name> as dune alias to exectute tests (defaults to "^ !default_dune_alias ^")";
+    ("-v", Arg.Unit (fun () -> incr verbosity),
+     "Increase verbosity (up to  twice)") ;
+
+    ("-adds-default-options" , Arg.String (fun s -> macro_default_options := !macro_default_options ^ " " ^ s),
+     " <options> Appends the <options> to the default value of the @DEFAULT_OPTIONS@ macro");
+
+    ("-macro-default-options" , Arg.String (fun s -> macro_default_options := s),
+     " <value> Set the default value of the @DEFAULT_OPTIONS@ macro (defaults to "^ !macro_default_options ^")");
+    ("-macro-frama-c-exe", Arg.String (fun s -> macro_frama_c_exe := s),
+     " <value> Set the default value of the @frama-c-exe@ macro (defaults to "^ !macro_frama_c_exe ^")");
+    ("-macro-frama-c-only", Arg.String (fun s -> macro_frama_c_only := s),
+     " <value> Set the default value of the @frama-c-only@ macro (defaults to "^ !macro_frama_c_only ^")");
+    ("-macro-frama-c-cmd", Arg.String (fun s -> macro_frama_c_only := s),
+     " <value> Set the default value of the @frama-c-cmd@ macro (defaults to "^ !macro_frama_c_cmd ^")");
+    ("-macro-frama-c", Arg.String (fun s -> macro_frama_c_only := s),
+     " <value> Set the @frama-c@ macro (defaults to "^ !macro_frama_c ^")");
+
+    ("-dune-alias", Arg.String (fun s -> default_dune_alias := s),
+     " <name> Use @<name> as dune alias to exectute tests (defaults to "^ !default_dune_alias ^")");
   ]
 and help_msg () = Arg.usage (Arg.align argspec) umsg
 
@@ -424,11 +435,11 @@ module Macros = struct
 
   let default_macros = add_list
     [ "PLUGIN", "" ;
-      "DEFAULT_OPTIONS", macro_default_options;
-      "frama-c-exe", macro_frama_c_exe;
-      "frama-c-only", macro_frama_c_only;
-      "frama-c-cmd", macro_frama_c_cmd;
-      "frama-c",     macro_frama_c;
+      "DEFAULT_OPTIONS", !macro_default_options;
+      "frama-c-exe", !macro_frama_c_exe;
+      "frama-c-only", !macro_frama_c_only;
+      "frama-c-cmd", !macro_frama_c_cmd;
+      "frama-c",     !macro_frama_c;
     ] empty
 
 end
@@ -532,7 +543,7 @@ end = struct
       dc_load_module = [];
       dc_filter = None ;
       dc_exit_code = None;
-      dc_default_toplevel = default_toplevel;
+      dc_default_toplevel = !default_toplevel;
       dc_commands = [];
       dc_dont_run = false;
       dc_framac = true;
@@ -680,15 +691,24 @@ end = struct
       current
     end
 
-  (* the default toplevel for the current level of options. *)
-  let current_default_toplevel = ref default_toplevel
-  let current_default_log = ref []
-  let current_default_cmds = ref []
+  type parsing_env = {
+    current_default_toplevel: string;
+    current_default_log: string list;
+    current_default_cmds: cmd list;
+  }
 
-  let _reset_current () =
-    current_default_toplevel := default_toplevel;
-    current_default_log := [];
-    current_default_cmds := []
+  let default_parsing_env = ref {
+      current_default_toplevel = "" ;
+      current_default_log = [] ;
+      current_default_cmds = []
+    }
+
+  let set_default_parsing_env config =
+    default_parsing_env := {
+      current_default_toplevel = config.dc_default_toplevel;
+      current_default_log = config.dc_default_log;
+      current_default_cmds = List.rev config.dc_commands;
+    }
 
   let config_options =
     [ "CMD",
@@ -711,7 +731,7 @@ end = struct
              timeout = current.dc_timeout }
          in
          { current with
-           dc_default_log = !current_default_log;
+           dc_default_log = !default_parsing_env.current_default_log;
            dc_commands = t :: current.dc_commands });
 
       "STDOPT",
@@ -726,12 +746,12 @@ end = struct
                 { command with opts= make_custom_opts ~file ~dir command.opts s;
                                exit_code = current.dc_exit_code;
                                timeout= current.dc_timeout})
-             (if !current_default_cmds = [] then
+             (if !default_parsing_env.current_default_cmds = [] then
                default_commands current
-             else !current_default_cmds)
+             else !default_parsing_env.current_default_cmds)
          in
          { current with dc_commands = new_top @ current.dc_commands;
-                        dc_default_log = !current_default_log @
+                        dc_default_log = !default_parsing_env.current_default_log @
                                          current.dc_default_log });
       "FILEREG",
       (fun ~file:_ ~dir:_ s current ->
@@ -784,9 +804,7 @@ end = struct
     ]
 
   let scan_directives dir ~file scan_buffer default =
-    current_default_toplevel := default.dc_default_toplevel;
-    current_default_log := default.dc_default_log;
-    current_default_cmds := List.rev default.dc_commands;
+    set_default_parsing_env default;
     let r = ref { default with dc_commands = [] } in
     let treat_line s =
       try
