@@ -27,15 +27,17 @@ open Wp_parameters
 (* --- Task Manager                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
+module KFmap = Kernel_function.Map
+
 type task = {
   mutable lemmas: LogicUsage.logic_lemma list ;
-  mutable modes: CfgCalculus.mode list ;
+  mutable modes: CfgCalculus.mode KFmap.t ;
   mutable props: CfgCalculus.props ;
 }
 
 let empty () = {
   lemmas = [];
-  modes = [];
+  modes = KFmap.empty;
   props = `All ;
 }
 
@@ -80,7 +82,7 @@ let apply task ~kf ?bhvs ?prop () =
           | [] -> [empty_default_behavior]
           | bhvs -> bhvs in
     List.iter (fun bhv ->
-        task.modes <- { kf ; bhv } :: task.modes
+        task.modes <- KFmap.add kf { CfgCalculus.kf ; bhv } task.modes
       ) bhvs ;
     Option.iter (fun ip -> task.props <- `PropId ip) prop ;
   end
@@ -178,10 +180,10 @@ struct
                 if l.LogicUsage.lem_kind <> `Axiom then
                   let wpo = VCG.compile_lemma l in
                   collection := Bag.add wpo !collection
-              ) (List.rev task.lemmas) ;
+              ) task.lemmas ;
           end () ;
-      List.iter
-        (fun (mode : CfgCalculus.mode) ->
+      KFmap.iter
+        (fun _ (mode : CfgCalculus.mode) ->
            WpContext.on_context (model,WpContext.Kf mode.kf)
              begin fun () ->
                LogicUsage.iter_lemmas VCG.register_lemma ;
@@ -243,8 +245,8 @@ let generator setup driver =
 let dump task =
   let module WP = CfgCalculus.Make(CfgDump) in
   let props = task.props in
-  List.iter
-    (fun (mode : CfgCalculus.mode) ->
+  KFmap.iter
+    (fun _ (mode : CfgCalculus.mode) ->
        let bhv =
          if Cil.is_default_behavior mode.bhv
          then None else Some mode.bhv.b_name in
