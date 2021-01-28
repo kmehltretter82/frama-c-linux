@@ -240,12 +240,11 @@ let reverse_loop_contract l = {
   loop_assigns = List.rev l.loop_assigns ;
 }
 
-let default_assigns stmt l = {
-  l with
-  loop_assigns =
-    if l.loop_assigns <> [] then l.loop_assigns
-    else [WpPropId.mk_loop_any_assigns_info stmt]
-}
+let default_assigns stmt l =
+  { l with
+    loop_assigns =
+      if l.loop_assigns <> [] then l.loop_assigns
+      else [WpPropId.mk_loop_any_assigns_info stmt] }
 
 let get_loop_contract kf stmt : loop_contract =
   let labels = NormAtLabels.labels_loop stmt in

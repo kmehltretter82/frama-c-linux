@@ -41,7 +41,7 @@ type assigns = WpPropId.assigns_full_info
 
 type mode = {
   kf: kernel_function;
-  bhv : funbehavior ; (* Selected behavior (None is default) *)
+  bhv : funbehavior ;
 }
 
 type props = [ `All | `Names of string list | `PropId of Property.t ]

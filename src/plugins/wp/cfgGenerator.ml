@@ -43,25 +43,42 @@ let empty () = {
 (* --- Property Guided Selection                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
+let empty_default_behavior : funbehavior = {
+  b_name = Cil.default_behavior_name ;
+  b_requires = [] ;
+  b_assumes = [] ;
+  b_post_cond = [] ;
+  b_assigns = WritesAny ;
+  b_allocation = FreeAllocAny ;
+  b_extended = [] ;
+}
+
 let default kf =
-  List.filter
-    Cil.is_default_behavior
-    (Annotations.behaviors kf)
+  match Annotations.behaviors kf with
+  | [] -> [empty_default_behavior]
+  | bhvs -> List.filter Cil.is_default_behavior bhvs
 
 let select kf bnames =
-  let bhvs = Annotations.behaviors kf in
-  if bnames = [] then bhvs else
-    List.filter
-      (fun b -> List.mem b.b_name bnames)
-      bhvs
+  match Annotations.behaviors kf with
+  | [] -> if bnames = [] then [empty_default_behavior] else []
+  | bhvs -> if bnames = [] then bhvs else
+        List.filter
+          (fun b -> List.mem b.b_name bnames)
+          bhvs
 
-let lemma task l = task.lemmas <- l :: task.lemmas
+let lemma task ?(prop=[]) l =
+  if l.LogicUsage.lem_kind <> `Axiom &&
+     (prop=[] || WpPropId.select_by_name prop (WpPropId.mk_lemma_id l))
+  then task.lemmas <- l :: task.lemmas
 
 let apply task ~kf ?bhvs ?prop () =
   begin
     let bhvs = match bhvs with
-      | None -> Annotations.behaviors kf
-      | Some bhvs -> bhvs in
+      | Some bhvs -> bhvs
+      | None ->
+          match Annotations.behaviors kf with
+          | [] -> [empty_default_behavior]
+          | bhvs -> bhvs in
     List.iter (fun bhv ->
         task.modes <- { kf ; bhv } :: task.modes
       ) bhvs ;
@@ -126,24 +143,18 @@ let rec strategy_ip task prop =
   | IPPropertyInstance _ -> notyet prop (* ? *)
   | IPExtended _ | IPAxiom _ | IPOther _ -> ()
 
-let select_lemma_prop l = function
-  | None -> true
-  | Some ns -> WpPropId.select_by_name ns (WpPropId.mk_lemma_id l)
-
-let strategy_main task ?(fct=Fct_all) ?bhv ?prop () =
+let strategy_main task ?(fct=Fct_all) ?(bhv=[]) ?(prop=[]) () =
   begin
-    if fct = Fct_all && bhv = None then
-      LogicUsage.iter_lemmas (fun l ->
-          if l.lem_kind <> `Axiom && select_lemma_prop l prop
-          then lemma task l
-        ) ;
+    if fct = Fct_all && bhv = [] then
+      LogicUsage.iter_lemmas (lemma task ~prop) ;
     Wp_parameters.iter_fct
       (fun kf ->
-         match bhv with
-         | None | Some [] -> apply task ~kf ()
-         | Some bs -> apply task ~kf ~bhvs:(select kf bs) ()
+         if Kernel_function.has_definition kf then
+           if bhv=[]
+           then apply task ~kf ()
+           else apply task ~kf ~bhvs:(select kf bhv) ()
       ) fct ;
-    task.props <- (match prop with None -> `All | Some ps -> `Names ps) ;
+    task.props <- (if prop=[] then `All else `Names prop);
   end
 
 (* -------------------------------------------------------------------------- *)
