@@ -31,7 +31,7 @@ module KFmap = Kernel_function.Map
 
 type task = {
   mutable lemmas: LogicUsage.logic_lemma list ;
-  mutable modes: CfgCalculus.mode KFmap.t ;
+  mutable modes: CfgCalculus.mode KFmap.t ; (** TODO: when New CFG is validated, use list *)
   mutable props: CfgCalculus.props ;
 }
 
