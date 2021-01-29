@@ -146,6 +146,14 @@ module Lemmas =
       let size = 17
     end)
 
+module Axiomatics =
+  State_builder.Hashtbl(Datatype.String.Hashtbl)(Cil_datatype.Location)
+    (struct
+      let name = "Logic_env.Axiomatics"
+      let dependencies = []
+      let size = 17
+    end)
+
 module Model_info =
   State_builder.Hashtbl
     (Datatype.String.Hashtbl)
@@ -164,6 +172,7 @@ let init_dependencies from =
       Logic_type_info.self;
       Logic_ctor_info.self;
       Lemmas.self;
+      Axiomatics.self;
       Model_info.self;
     ]
 
@@ -330,6 +339,7 @@ let prepare_tables () =
   Logic_type_info.clear ();
   Logic_info.clear ();
   Lemmas.clear ();
+  Axiomatics.clear();
   Model_info.clear ();
   Logic_type_builtin.iter Logic_type_info.add;
   Logic_ctor_builtin.iter Logic_ctor_info.add;
