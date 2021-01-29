@@ -1,7 +1,8 @@
 /* run.config*
-   STDOPT: #"-load-module variadic -eva-no-builtins-auto"
-   STDOPT: #"-load-module variadic -eva-plevel 100 -big-ints-hex 257 -eva-no-builtins-auto"
-   STDOPT: #"-load-module variadic -eva-slevel 12 -big-ints-hex 257 -eva-no-builtins-auto"
+   PLUGIN: variadic
+   STDOPT: #"-eva-no-builtins-auto"
+   STDOPT: #"-eva-plevel 100 -big-ints-hex 257 -eva-no-builtins-auto"
+   STDOPT: #"-eva-slevel 12 -big-ints-hex 257 -eva-no-builtins-auto"
 */
 
 #include "__fc_define_size_t.h"

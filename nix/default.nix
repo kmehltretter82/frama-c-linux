@@ -4,6 +4,7 @@
 let mk_buildInputs = { opamPackages ? [], nixPackages ? [] } :
     [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl pkgs.file pkgs.which pkgs.dos2unix] ++ nixPackages ++ opam2nix.build {
            specs = opam2nix.toSpecs ([ "ocamlfind" "zarith" "ocamlgraph" "yojson" "zmq"
+                "ppx_deriving" "ppx_deriving_yojson"
                 { name = "coq"; constraint = "=8.12.0";  }
                 { name = "alt-ergo" ; constraint = "=2.2.0"; }
                 { name = "why3" ; constraint = "=1.3.3"; }
