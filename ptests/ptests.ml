@@ -1044,7 +1044,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
         let filter = Str.global_replace regexp foracle filter in
          Format.fprintf result_fmt
           "(rule ; FILTER %s #%d OF TEST FILE %S\n  \
-            (action (with-stdout-to %S (system %S)))\n\
+            (action (with-stdout-to %S (with-accepted-exit-codes (or 0 1 2 125) (system %S))))\n\
            )@."
           txt
           command.nth command.file

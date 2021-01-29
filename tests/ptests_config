@@ -16,7 +16,7 @@ IGNORE= DEFAULT_SUITES= make_run_script
 IGNORE= DEFAULT_SUITES= value/numerors
 
 IGNORE= apron_SUITES = value
-IGNORE= bitwise_SUITES = value
+bitwise_SUITES = value
 IGNORE= equalities_SUITES = value
 IGNORE= gauges_SUITES = value
 IGNORE= octagon_SUITES = value

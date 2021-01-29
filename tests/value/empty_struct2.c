@@ -1,4 +1,4 @@
-/* run.config
+/* run.config*
    STDOPT: +"-machdep gcc_x86_64"
 */
 
