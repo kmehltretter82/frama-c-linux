@@ -1,0 +1,130 @@
+11,13c11
+< [eva:alarm] auto_loop_unroll.c:25: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] auto_loop_unroll.c:27: Frama_C_show_each_auto: [0..2147483647]
+---
+> [eva] auto_loop_unroll.c:27: Frama_C_show_each_auto: {100}
+15,17c13
+< [eva:alarm] auto_loop_unroll.c:31: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] auto_loop_unroll.c:33: Frama_C_show_each_imprecise: [0..2147483647]
+---
+> [eva] auto_loop_unroll.c:33: Frama_C_show_each_imprecise: {1000}
+19,21c15
+< [eva:alarm] auto_loop_unroll.c:39: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] auto_loop_unroll.c:41: Frama_C_show_each_imprecise: [0..2147483647]
+---
+> [eva] auto_loop_unroll.c:41: Frama_C_show_each_imprecise: {100}
+29,31c23
+< [eva:alarm] auto_loop_unroll.c:58: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] auto_loop_unroll.c:59: Frama_C_show_each_64: [0..2147483647]
+---
+> [eva] auto_loop_unroll.c:59: Frama_C_show_each_64: {64}
+33,35c25
+< [eva:alarm] auto_loop_unroll.c:63: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] auto_loop_unroll.c:64: Frama_C_show_each_40: [0..2147483647]
+---
+> [eva] auto_loop_unroll.c:64: Frama_C_show_each_40: {40}
+37,39c27
+< [eva:alarm] auto_loop_unroll.c:69: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] auto_loop_unroll.c:72: Frama_C_show_each_80: [0..2147483647]
+---
+> [eva] auto_loop_unroll.c:72: Frama_C_show_each_80: {80}
+41,43c29
+< [eva:alarm] auto_loop_unroll.c:76: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] auto_loop_unroll.c:82: Frama_C_show_each_32_80: [0..2147483647]
+---
+> [eva] auto_loop_unroll.c:82: Frama_C_show_each_32_80: [32..83]
+51,53c37
+< [eva:alarm] auto_loop_unroll.c:88: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] auto_loop_unroll.c:89: Frama_C_show_each_40_50: [0..2147483647]
+---
+> [eva] auto_loop_unroll.c:89: Frama_C_show_each_40_50: [40..1073741861]
+128,130c112
+< [eva:alarm] auto_loop_unroll.c:120: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] auto_loop_unroll.c:122: Frama_C_show_each_32_64: [0..2147483647]
+---
+> [eva] auto_loop_unroll.c:122: Frama_C_show_each_32_64: [32..65]
+175,177c157
+< [eva:alarm] auto_loop_unroll.c:173: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] auto_loop_unroll.c:175: Frama_C_show_each_imprecise: [0..2147483647]
+---
+> [eva] auto_loop_unroll.c:175: Frama_C_show_each_imprecise: [1..9]
+179,180d158
+< [eva:alarm] auto_loop_unroll.c:181: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+183c161
+< [eva] auto_loop_unroll.c:183: Frama_C_show_each_imprecise: [0..2147483647]
+---
+> [eva] auto_loop_unroll.c:183: Frama_C_show_each_imprecise: [64..2147483647]
+189,191c167
+< [eva:alarm] auto_loop_unroll.c:193: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] auto_loop_unroll.c:195: Frama_C_show_each_11: [0..2147483647]
+---
+> [eva] auto_loop_unroll.c:195: Frama_C_show_each_11: {11}
+193,195c169
+< [eva:alarm] auto_loop_unroll.c:198: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] auto_loop_unroll.c:200: Frama_C_show_each_12: [0..2147483647]
+---
+> [eva] auto_loop_unroll.c:200: Frama_C_show_each_12: {12}
+197,198d170
+< [eva:alarm] auto_loop_unroll.c:204: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+200a173,174
+> [eva:alarm] auto_loop_unroll.c:204: Warning: 
+>   signed overflow. assert res + 1 ≤ 2147483647;
+203,204d176
+< [eva:alarm] auto_loop_unroll.c:209: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+206a179,180
+> [eva:alarm] auto_loop_unroll.c:209: Warning: 
+>   signed overflow. assert res + 1 ≤ 2147483647;
+209,210d182
+< [eva:alarm] auto_loop_unroll.c:217: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+213,215c185
+< [eva:alarm] auto_loop_unroll.c:222: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] auto_loop_unroll.c:226: Frama_C_show_each_11_111: [0..2147483647]
+---
+> [eva] auto_loop_unroll.c:226: Frama_C_show_each_11_111: [11..111]
+223,225c193
+< [eva:alarm] auto_loop_unroll.c:236: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] auto_loop_unroll.c:238: Frama_C_show_each_20: [0..2147483647]
+---
+> [eva] auto_loop_unroll.c:238: Frama_C_show_each_20: [20..2147483646]
+227,228d194
+< [eva:alarm] auto_loop_unroll.c:241: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+231c197,199
+< [eva] auto_loop_unroll.c:243: Frama_C_show_each_21: [0..2147483647]
+---
+> [eva:alarm] auto_loop_unroll.c:241: Warning: 
+>   signed overflow. assert res + 1 ≤ 2147483647;
+> [eva] auto_loop_unroll.c:243: Frama_C_show_each_21: {21}
+237,239c205,206
+< [eva:alarm] auto_loop_unroll.c:250: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] auto_loop_unroll.c:254: Frama_C_show_each_30: [0..2147483647]
+---
+> [eva] auto_loop_unroll.c:254: Frama_C_show_each_30: {30}
+> [eva] auto_loop_unroll.c:258: starting to merge loop iterations
+242d208
+< [eva] auto_loop_unroll.c:258: starting to merge loop iterations
+245,247c211
+< [eva:alarm] auto_loop_unroll.c:267: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] auto_loop_unroll.c:272: Frama_C_show_each_32: [0..2147483647]
+---
+> [eva] auto_loop_unroll.c:272: Frama_C_show_each_32: {32}

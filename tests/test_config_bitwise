@@ -1,6 +1,9 @@
 MACRO: EVA_PLUGINS from inout eva scope variadic
 MACRO: EVA_OPTIONS -eva-show-progress -eva-msg-key=-summary -eva-auto-loop-unroll 0 -eva-domains bitwise
 MACRO: EVA_CONFIG @EVA_OPTIONS@ -machdep x86_32
+
+# Compare the result with the oracle of the default config.
 FILTER: diff %{dep:../oracle/@PTEST_ORACLE@}
+
 PLUGIN: @EVA_PLUGINS@
 OPT: -eva @EVA_CONFIG@ -out -input -deps

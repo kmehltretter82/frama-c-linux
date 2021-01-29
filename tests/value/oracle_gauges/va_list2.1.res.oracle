@@ -1,0 +1,13 @@
+38a39,50
+> [eva] computing for function __builtin_va_arg <- main.
+>   Called from va_list2.c:15.
+> [eva] Done for function __builtin_va_arg
+> [eva] computing for function __builtin_va_arg <- main.
+>   Called from va_list2.c:20.
+> [eva] Done for function __builtin_va_arg
+> [eva] computing for function __builtin_va_arg <- main.
+>   Called from va_list2.c:15.
+> [eva] Done for function __builtin_va_arg
+> [eva] computing for function __builtin_va_arg <- main.
+>   Called from va_list2.c:20.
+> [eva] Done for function __builtin_va_arg

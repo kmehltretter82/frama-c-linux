@@ -18,7 +18,7 @@ IGNORE= DEFAULT_SUITES= value/numerors
 IGNORE= apron_SUITES = value
 bitwise_SUITES = value
 equalities_SUITES = value
-IGNORE= gauges_SUITES = value
+gauges_SUITES = value
 IGNORE= octagon_SUITES = value
 IGNORE= symbols_SUITES = value
 
