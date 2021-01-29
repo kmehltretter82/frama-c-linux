@@ -1,8 +1,8 @@
 /* run.config
-  
-  STDOPT: #"-load-module pdg -eva -out -input -deps -main g"
-  STDOPT: #"-load-module pdg -eva -out -input -deps -main h"
-  STDOPT: #"-load-module pdg -eva -out -input -deps -main f"
+
+  STDOPT: #"-eva -out -input -deps -main g"
+  STDOPT: #"-eva -out -input -deps -main h"
+  STDOPT: #"-eva -out -input -deps -main f"
 */
 struct Tstr;
 extern int X;
