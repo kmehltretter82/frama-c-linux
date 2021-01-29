@@ -1,4 +1,4 @@
-Bool A, B;
+_Bool A, B;
 
 /*@
   ensures GOAL: \result ≡ 255;
