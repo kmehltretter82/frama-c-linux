@@ -41,7 +41,7 @@ let find_function env s =
     None
 
 let mk_overload env names =
-  let vis = Extends.List.filter_map (find_function env) names in
+  let vis = List.filter_map (find_function env) names in
   let overload = List.map (fun vi -> Typ.params_types vi.vtype, vi) vis in
   Overload overload
 
