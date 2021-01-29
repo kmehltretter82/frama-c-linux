@@ -347,8 +347,8 @@ struct
     List.fold_right (use_property env) bhv.bhv_assumes @@
     List.fold_right (use_property env) bhv.bhv_requires @@
     List.fold_right (use_property env) (behaviors kf) @@
-    List.fold_right (use_property env) (complete mode kf) @@
-    List.fold_right (use_property env) (disjoint mode kf) @@
+    List.fold_right (prove_property env) (complete mode kf) @@
+    List.fold_right (prove_property env) (disjoint mode kf) @@
     (* frame-in *)
     W.scope env.we xs SC_Frame_in @@
     (* function body *)
