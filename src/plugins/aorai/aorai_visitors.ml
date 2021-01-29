@@ -119,7 +119,7 @@ class visit_adding_code_for_synchronisation =
     val aux_post_table = Kernel_function.Hashtbl.create 17
 
     method do_fundec fundec loc =
-      let kf = Extlib.the self#current_kf in
+      let kf = Option.get self#current_kf in
       let vi = Kernel_function.get_vi kf in
       let vi_pre = Cil_const.copy_with_new_vid vi in
       vi_pre.vname <- Data_for_aorai.get_fresh (vi_pre.vname ^ "_pre_func");
