@@ -94,8 +94,8 @@ let is_active_mode ~mode (p: Property.t) =
       end
   | IPDecrease { id_ca = None } -> is_default_bhv mode
   | IPDecrease { id_ca = Some ca } -> is_selected_ca mode ca
-  | IPComplete _ | IPDisjoint _ | IPFrom _
-  | IPGlobalInvariant _ | IPTypeInvariant _ ->
+  | IPComplete _ | IPDisjoint _ -> is_default_bhv mode
+  | IPFrom _ | IPGlobalInvariant _ | IPTypeInvariant _ ->
       (*TODO: is it in pass or not ? *) assert false
   | IPAxiomatic _ | IPAxiom _ | IPLemma _
   | IPOther _ | IPExtended _ | IPBehavior _
