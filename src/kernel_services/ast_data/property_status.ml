@@ -182,9 +182,10 @@ let fold_on_statuses f ip acc =
     Emitter_with_properties.Hashtbl.fold f h acc
   with Not_found -> acc
 
-
 let iter f = Status.iter (fun p _ -> f p)
 let fold f = Status.fold (fun p _ -> f p)
+let iter_sorted ~cmp f = Status.iter_sorted ~cmp (fun p _ -> f p)
+let fold_sorted ~cmp f = Status.fold_sorted ~cmp (fun p _ -> f p)
 
 (* ok to be computed once right now since there is no parameter dependency *)
 let usable_kernel_emitter = Emitter.get Emitter.kernel
