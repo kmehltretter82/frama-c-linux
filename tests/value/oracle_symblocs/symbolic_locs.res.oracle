@@ -1,0 +1,71 @@
+19a20,25
+>   # Symbolic locations domain:
+>   V: {[ t[i] -> {4} ]}
+>   Z: {[ t[i] -> t[0..8]; i ]}
+>   I: {[ t -> {t[i]}
+>         i -> {t[i]} ]}
+>   S: {[ i -> {t[i]} ]}
+30a37,41
+>   # Symbolic locations domain:
+>   V: {[  ]}
+>   Z: {[  ]}
+>   I: {[  ]}
+>   S: {[  ]}
+46a58,63
+>   # Symbolic locations domain:
+>   V: {[ t[i] -> {4} ]}
+>   Z: {[ t[i] -> t[0..8]; i ]}
+>   I: {[ t -> {t[i]}
+>         i -> {t[i]} ]}
+>   S: {[ i -> {t[i]} ]}
+57a75,79
+>   # Symbolic locations domain:
+>   V: {[  ]}
+>   Z: {[  ]}
+>   I: {[  ]}
+>   S: {[  ]}
+76a99,105
+>   # Symbolic locations domain:
+>   V: {[ t[i] -> {{ &x }} ]}
+>   Z: {[ t[i] -> t[0..8]; i ]}
+>   I: {[ t -> {t[i]}
+>         i -> {t[i]} ]}
+>   S: {[ i -> {t[i]}
+>         x -> {t[i]} ]}
+89a119,123
+>   # Symbolic locations domain:
+>   V: {[  ]}
+>   Z: {[  ]}
+>   I: {[  ]}
+>   S: {[  ]}
+104a139,144
+>   # Symbolic locations domain:
+>   V: {[ t[i] -> {1} ]}
+>   Z: {[ t[i] -> t[0..8]; i ]}
+>   I: {[ t -> {t[i]}
+>         i -> {t[i]} ]}
+>   S: {[ i -> {t[i]} ]}
+113a154,158
+>   # Symbolic locations domain:
+>   V: {[  ]}
+>   Z: {[  ]}
+>   I: {[  ]}
+>   S: {[  ]}
+128a174,178
+>   # Symbolic locations domain:
+>   V: {[  ]}
+>   Z: {[  ]}
+>   I: {[  ]}
+>   S: {[  ]}
+135,137c185
+< [eva:alarm] symbolic_locs.i:111: Warning: 
+<   signed overflow. assert *p + 1 ≤ 2147483647;
+< [eva] symbolic_locs.i:113: Frama_C_show_each: [0..2147483647]
+---
+> [eva] symbolic_locs.i:113: Frama_C_show_each: [10001..2147483647]
+146a195,199
+>   # Symbolic locations domain:
+>   V: {[  ]}
+>   Z: {[  ]}
+>   I: {[  ]}
+>   S: {[  ]}

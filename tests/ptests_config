@@ -20,11 +20,11 @@ bitwise_SUITES = value
 equalities_SUITES = value
 gauges_SUITES = value
 IGNORE= octagon_SUITES = value
-IGNORE= symbols_SUITES = value
+symblocs_SUITES = value
 
 IGNORE= apron_SUITES = value/numerors
 IGNORE= bitwise_SUITES = value/numerors
 IGNORE= equalities_SUITES = value/numerors
 IGNORE= gauges_SUITES = value/numerors
 IGNORE= octagon_SUITES = value/numerors
-IGNORE= symbols_SUITES = value/numerors
+IGNORE= symblocs_SUITES = value/numerors
