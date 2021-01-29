@@ -31,18 +31,6 @@ module Typ : sig
   val params_count : typ -> int
 end
 
-module Cil : sig 
-  include module type of Cil
-
-  val shortType : typ 
-  val ushortType : typ 
-
-  (** @return [true] if varinfo is a variadic function, [false] if it
-      is a non-variadic function or if it is not a function. *)
-  val is_variadic_function : varinfo -> bool
-end
-
-
 module List : sig
   include module type of List
 

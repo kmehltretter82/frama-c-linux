@@ -40,18 +40,6 @@ module Typ = struct
     List.length (params typ)
 end
 
-module Cil = struct
-  include Cil
-
-  let shortType = TInt(IShort, [])
-  let ushortType = TInt(IUShort, [])
-
-  let is_variadic_function vi =
-    match Cil.unrollType vi.vtype with
-    | TFun (_, _, b, _) -> b
-    |  _ -> false
-end
-
 module List = struct
   include List
 
