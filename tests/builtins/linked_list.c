@@ -1,5 +1,4 @@
 /* run.config*
-   PLUGIN: variadic
    STDOPT: #"-eva-no-builtins-auto"
    STDOPT: #"-eva-plevel 100 -big-ints-hex 257 -eva-no-builtins-auto"
    STDOPT: #"-eva-slevel 12 -big-ints-hex 257 -eva-no-builtins-auto"
