@@ -28,9 +28,12 @@ open Cil_types
 let dkey = Options.dkey_typing
 
 let compute_quantif_guards_ref
-  : (predicate -> logic_var list -> predicate ->
-     (term * relation * logic_var * relation * term) list) ref
-  = Extlib.mk_fun "compute_quantif_guards_ref"
+  : (is_forall:bool -> predicate ->logic_var list -> predicate ->
+     (term * relation * logic_var * relation * term) list * predicate) ref
+  = ref (fun ~is_forall:_ ->
+      raise
+        (Extlib.Unregistered_function
+           "Function 'compute_quantif_guards_ref' not registered yet"))
 
 (******************************************************************************)
 (** Datatype and constructor *)
@@ -627,9 +630,17 @@ let rec type_predicate p =
       ignore (type_term ~use_gmp_opt:true li_t);
       (type_predicate p).ty
 
-    | Pforall(bounded_vars, { pred_content = Pimplies(hyps, goal) })
-    | Pexists(bounded_vars, { pred_content = Pand(hyps, goal) }) ->
-      let guards = !compute_quantif_guards_ref p bounded_vars hyps in
+    | Pforall(bounded_vars, ({ pred_content = Pimplies(_, _) } as p'))
+    | Pexists(bounded_vars, ({ pred_content = Pand(_, _) } as p')) ->
+      let is_forall =
+        match p.pred_content with
+        | Pforall _ -> true
+        | Pexists _ -> false
+        | _ -> assert false
+      in
+      let guards, goal =
+        !compute_quantif_guards_ref ~is_forall p bounded_vars p'
+      in
       let iv_plus_one iv =
         Interval.Ival (Ival.add_singleton_int Integer.one iv)
       in
