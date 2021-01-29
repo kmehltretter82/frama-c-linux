@@ -4894,8 +4894,8 @@
                   "startLine": 39,
                   "startColumn": 4,
                   "endLine": 41,
-                  "endColumn": 50,
-                  "byteLength": 99
+                  "endColumn": 61,
+                  "byteLength": 110
                 }
               }
             }
@@ -8009,8 +8009,8 @@
                   "startLine": 39,
                   "startColumn": 4,
                   "endLine": 41,
-                  "endColumn": 50,
-                  "byteLength": 99
+                  "endColumn": 61,
+                  "byteLength": 110
                 }
               }
             }

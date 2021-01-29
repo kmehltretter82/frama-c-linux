@@ -699,14 +699,14 @@ Ok  = 16 of 16
 sequences. These options are detailed in Section~\ref{ptests:options}.
 
 \begin{example}
-If the code of plug-in \texttt{plug-in} has changed, a typical sequence of tests
+If the code of plug-in \texttt{plugin} has changed, a typical sequence of tests
 is the following one.
 \begin{shell}
-\$ ./bin/ptests.opt plug-in
-\$ ./bin/ptests.opt -update plug-in
+\$ ./bin/ptests.opt plugin
+\$ ./bin/ptests.opt -update plugin
 \$ make tests
 \end{shell}
-So we first run the tests suite corresponding to \texttt{plug-in} in order to
+So we first run the tests suite corresponding to \texttt{plugin} in order to
 display what tests have been modified by the changes. After checking the
 displayed differences, we validate the changes by updating the
 oracles\index{Oracle}. Finally we run all the test suites\index{Test!Suite} in
@@ -715,8 +715,8 @@ order to ensure that the changes do not break anything else in \framac.
 \begin{example}
 For adding a new test, the typical sequence of command is the following.
 \begin{shell}
-\$ ./bin/ptests.opt -show tests/plug-in/new_test.c
-\$ ./bin/ptests.opt -update tests/plug-in/new_test.c
+\$ ./bin/ptests.opt -show tests/plugin/new_test.c
+\$ ./bin/ptests.opt -update tests/plugin/new_test.c
 \$ make tests
 \end{shell}
 We first ask \ptests to print the output of the test on the command line, check
@@ -832,7 +832,7 @@ base. Common cases include:
 This is possible with option \texttt{-config} of \ptests, which takes as
 argument the name of a special test configuration, as in
 \begin{shell}
-\$ ./bin/ptests.opt -config <special_name> plug-in
+\$ ./bin/ptests.opt -config <special_name> plugin
 \end{shell}
 
 Then, the directives for this test can be found:
@@ -860,7 +860,7 @@ configuration: \lstinline+/* run.config* +.
 All operations for this test configuration should take option
 \texttt{-config} in argument, as in
 \begin{shell}
-\$ ./bin/ptests.opt -update -config <special_name> plug-in
+\$ ./bin/ptests.opt -update -config <special_name> plugin
 \end{shell}
 
 \begin{important}
