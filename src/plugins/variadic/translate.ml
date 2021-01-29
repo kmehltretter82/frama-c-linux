@@ -172,11 +172,7 @@ let translate_variadics (file : file) =
 
         | Call(lv, callee, args, loc) ->
           let is_variadic =
-            try
-              let args, _ = Typ.ghost_partitioned_params (Cil.typeOf callee) in
-              let last = Extends.List.last args in
-              last = Generic.vpar
-            with Extends.List.EmptyList -> false
+            List.mem Generic.vpar (Typ.params (Cil.typeOf callee))
           in
           if is_variadic then begin
             let mk_call f args = Call (lv, f, args, loc) in

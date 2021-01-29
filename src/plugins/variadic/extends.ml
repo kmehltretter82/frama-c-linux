@@ -43,16 +43,9 @@ end
 module List = struct
   include List
 
-  exception EmptyList
-
   let rec make n a =
     if n <= 0 then []
     else a :: make (n - 1) a
-
-  let rec last = function
-    | [] -> raise EmptyList
-    | [a] -> a
-    | _ :: l -> last l
 
   let rec take n l =
     if n <= 0 then []

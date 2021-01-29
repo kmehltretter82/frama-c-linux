@@ -34,9 +34,6 @@ end
 module List : sig
   include module type of List
 
-  exception EmptyList
-
-  val last : 'a list -> 'a (** @raise EmptyList when the list is empty. *)
   val make : int -> 'a -> 'a list
   val take : int -> 'a list -> 'a list
   val drop : int -> 'a list -> 'a list
