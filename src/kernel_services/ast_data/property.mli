@@ -214,6 +214,18 @@ and identified_property = private
 
 include Datatype.S_with_collections with type t = identified_property
 
+(** Datatype with alternative ordering, where properties are ordered according
+    the following criteria:
+    1. Kf name (global properties ranked first)
+    2. Kinstr
+    3. kind of property
+    4. id of the property
+
+    @since Frama-C+dev
+*)
+module Ordered_by_function:
+  Datatype.S_with_collections with type t = identified_property
+
 val short_pretty: Format.formatter -> t -> unit
 (** output a meaningful name for the property (e.g. the name of the
     corresponding identified predicate when available)
