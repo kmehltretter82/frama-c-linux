@@ -21,11 +21,15 @@
 ##########################################################################
 
 .PHONY: all
-all: ptests.exe
+all: ptests.exe wtests.exe
 
 .PHONY: ptests.exe
 ptests.exe:
 	dune build --root . ptests.exe
+
+.PHONY: wtests.exe
+wtests.exe:
+	dune build --root . wtests.exe
 
 .PHONY: clean
 clean: purge-tests
