@@ -62,24 +62,25 @@ let is_default_bhv (m: mode) = Cil.is_default_behavior m.bhv
 let is_selected_bhv (m: mode) (bhv: funbehavior) =
   m.bhv.b_name = bhv.b_name
 
-let is_selected_for (m: mode) (fors: string list) =
-  fors=[] || List.mem m.bhv.b_name fors
+let is_selected_for (m: mode) ~goal (fors: string list) =
+  (fors=[] && (not goal || is_default_bhv m)) ||
+  List.mem m.bhv.b_name fors
 
-let is_selected_ca (m: mode) (ca: code_annotation) =
+let is_selected_ca (m: mode) ~goal (ca: code_annotation) =
   match ca.annot_content with
   | AAssigns(forb,_)
   | AAllocation(forb,_)
   | AAssert(forb,_)
   | AInvariant(forb,_,_)
-    -> is_selected_for m forb
+    -> is_selected_for m ~goal forb
   | AVariant _ -> is_default_bhv m
   | AExtended _ | AStmtSpec _ | APragma _ ->
       assert false (* n/a *)
 
-let is_active_mode ~mode (p: Property.t) =
+let is_active_mode ~mode ~goal (p: Property.t) =
   let open Property in
   match p with
-  | IPCodeAnnot { ica_ca } -> is_selected_ca mode ica_ca
+  | IPCodeAnnot { ica_ca } -> is_selected_ca mode ~goal ica_ca
   | IPPredicate { ip_kind } ->
       begin match ip_kind with
         | PKRequires bhv | PKAssumes bhv ->
@@ -89,11 +90,11 @@ let is_active_mode ~mode (p: Property.t) =
       end
   | IPAllocation { ial_bhv = bhv } | IPAssigns { ias_bhv = bhv } ->
       begin match bhv with
-        | Id_loop ca -> is_selected_ca mode ca
+        | Id_loop ca -> is_selected_ca mode ~goal ca
         | Id_contract(_,bhv) -> is_selected_bhv mode bhv
       end
   | IPDecrease { id_ca = None } -> is_default_bhv mode
-  | IPDecrease { id_ca = Some ca } -> is_selected_ca mode ca
+  | IPDecrease { id_ca = Some ca } -> is_selected_ca mode ~goal ca
   | IPComplete _ | IPDisjoint _ -> is_default_bhv mode
   | IPFrom _ | IPGlobalInvariant _ | IPTypeInvariant _ ->
       (*TODO: is it in pass or not ? *) assert false
@@ -174,7 +175,7 @@ struct
 
   let is_selected ~goal { mode ; props } (pid,_) =
     let pi = WpPropId.property_of_id pid in
-    is_active_mode ~mode pi &&
+    is_active_mode ~mode ~goal pi &&
     ( not goal || is_selected_props props ~pi pid )
 
   let is_selected_callpre { props } (pid,_) =
