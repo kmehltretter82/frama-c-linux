@@ -347,13 +347,6 @@ struct
     if not (is_default_bhv mode) then []
     else CfgAnnot.get_disjoint_behaviors kf
 
-  let body env ~ensures ~exits w =
-    let rw = List.fold_right (prove_property env) ensures w in
-    let rk = List.fold_right (prove_property env) exits env.wk in
-    Vhash.add env.wp env.cfg.return_point (Some rw) ;
-    env.wk <- rk ;
-    wp env env.cfg.entry_point
-
   (* Putting everything together *)
   let compute ~mode ~props =
     let kf = mode.kf in
@@ -386,16 +379,22 @@ struct
     (* frame-in *)
     W.scope env.we xs SC_Frame_in @@
     (* function body *)
-    body env
-      ~ensures:bhv.bhv_ensures
-      ~exits:bhv.bhv_exits @@
+    begin fun w ->
+      Vhash.add env.wp env.cfg.return_point (Some w) ;
+      wp env env.cfg.entry_point
+    end @@
     (* frame-out *)
-    W.label env.we None Clabels.post @@
-    (fun t ->
-       if not has_exit then env.wk <- t
-       else env.wk <- prove_assigns env bhv.bhv_exit_assigns t ;
-       prove_assigns env bhv.bhv_post_assigns t) @@
     W.scope env.we xs SC_Frame_out @@
+    (* Post-conds*)
+    W.label env.we None Clabels.post @@
+    begin fun w ->
+      env.wk <-
+        List.fold_right (prove_property env) bhv.bhv_exits @@
+        if not has_exit then w else prove_assigns env bhv.bhv_exit_assigns w ;
+
+      List.fold_right (prove_property env) bhv.bhv_ensures @@
+      prove_assigns env bhv.bhv_post_assigns w
+    end @@
     (* wp-end *)
     W.empty
 
