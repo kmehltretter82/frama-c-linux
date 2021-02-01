@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 let main () =
-  if Options.Filename.get () <> "" then
+  if not (Filepath.Normalized.is_unknown (Options.Filename.get ())) then
     if Options.Services.get () then begin
       if not (Services.is_computed ()) then Services.dump ()
     end else

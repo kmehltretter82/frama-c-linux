@@ -32,10 +32,12 @@ include
     end)
 
 module Filename =
-  Empty_string
+  Filepath
     (struct
       let option_name = "-cg"
       let arg_name = "filename"
+      let file_kind = "DOT"
+      let existence = Fc_Filepath.Indifferent
       let help = "dump the callgraph to the file \
                   <filename> in dot format"
     end)
@@ -97,9 +99,10 @@ module Uncalled_leaf =
 
 let dump output g =
   let file = Filename.get () in
-  feedback ~level:2 "dumping the graph into file %s" file;
+  feedback ~level:2 "dumping the graph into file %a"
+    Fc_Filepath.Normalized.pretty file;
   try
-    let cout = open_out file in
+    let cout = open_out (file:>string) in
     output cout g;
     close_out cout
   with e ->
