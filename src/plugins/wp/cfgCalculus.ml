@@ -106,7 +106,7 @@ let is_active_mode ~mode ~goal (p: Property.t) =
 let is_selected_props (props : props) ?pi pid =
   WpPropId.filter_status pid &&
   match props with
-  | `All | `Names [] -> true
+  | `All | `Names [] -> WpPropId.select_default pid
   | `Names ps -> WpPropId.select_by_name ps pid
   | `PropId p ->
       Property.equal p @@ match pi with
