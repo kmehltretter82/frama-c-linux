@@ -78,9 +78,10 @@ let apply task ~kf ?bhvs ?prop () =
     let bhvs = match bhvs with
       | Some bhvs -> bhvs
       | None ->
-          match Annotations.behaviors kf with
-          | [] -> [empty_default_behavior]
-          | bhvs -> bhvs in
+          let bhvs = Annotations.behaviors kf in
+          if List.exists (Cil.is_default_behavior) bhvs then bhvs
+          else empty_default_behavior :: bhvs
+    in
     let add_mode kf m =
       let modes =
         match KFmap.find_opt kf task.modes with
