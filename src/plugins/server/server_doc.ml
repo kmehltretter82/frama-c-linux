@@ -307,16 +307,17 @@ let metadata page : json =
 (* -------------------------------------------------------------------------- *)
 
 let pp_one_page ~root ~page ~title body =
-  let full_path = Filepath.normalize (root ^ "/" ^ page) in
-  let dir = Filename.dirname full_path in
+  let full_path = Filepath.Normalized.concat root page in
+  let dir = Filename.dirname (full_path:>string) in
   if not (Sys.file_exists dir) then Extlib.mkdir ~parents:true dir 0o755;
   try
-    let chan = open_out full_path in
+    let chan = open_out (full_path:>string) in
     let fmt = Format.formatter_of_out_channel chan in
     let title = Md.plain title in
     Markdown.(pp_pandoc ~page fmt (pandoc ~title body))
   with Sys_error e ->
-    Senv.fatal "Could not open file %s for writing: %s" full_path e
+    Senv.fatal "Could not open file %a for writing: %s"
+      Filepath.Normalized.pretty full_path e
 
 (* Build section contents in reverse order *)
 let build d s = List.fold_left (fun d s -> s() :: d) d s
@@ -338,13 +339,13 @@ let dump ~root ?(meta=true) () =
          let body = Markdown.subsections page.descr (build [] page.sections) in
          pp_one_page ~root ~page:path ~title (intro @ body) ;
          if meta then
-           let path = Printf.sprintf "%s/%s.json" root path in
-           Yojson.Basic.to_file path (metadata page) ;
+           let path = Filepath.Normalized.concat root (path ^ ".json") in
+           Yojson.Basic.to_file (path:>string) (metadata page) ;
       ) !pages ;
     Senv.feedback "[doc] Page: 'readme.md'" ;
     if meta then
-      let path = Printf.sprintf "%s/readme.md.json" root in
-      Yojson.Basic.to_file path maindata ;
+      let path = Filepath.Normalized.concat root "readme.md.json" in
+      Yojson.Basic.to_file (path:>string) maindata ;
       let body =
         [ Md.H1 (Md.plain "Presentation", None);
           Md.Block (Md.text (Md.format "Version %s" Fc_config.version))]
@@ -363,15 +364,16 @@ let () =
   Db.Main.extend begin
     fun () ->
       let root = Senv.Doc.get () in
-      if root <> "" then
-        if Sys.file_exists root && Sys.is_directory root then
+      if not (Filepath.Normalized.is_unknown root) then
+        if Sys.is_directory (root:>string) then
           begin
-            Senv.feedback "[doc] Root: '%s'" root ;
+            Senv.feedback "[doc] Root: '%a'" Filepath.Normalized.pretty root ;
             Package.iter package ;
             dump ~root () ;
           end
         else
-          Senv.error "[doc] File '%s' is not a directory" root
+          Senv.error "[doc] File '%a' is not a directory"
+            Filepath.Normalized.pretty root
   end
 
 (* -------------------------------------------------------------------------- *)
