@@ -238,7 +238,7 @@ module HdefAnnotBhv = Cil2cfg.HE (struct type t = (stmt * int) end)
 type strategy_info = {
   kf : Kernel_function.t;
   cfg : Cil2cfg.t;
-  reached : WpReached.reached option ;
+  reachability : WpReached.reachability option ;
   cur_bhv : asked_bhv;
   asked_bhvs : asked_bhv list;
   asked_prop : asked_prop;
@@ -915,7 +915,7 @@ let get_loop_annots config vloop s =
 let add_stmt_deadcode_smoke config acc s =
   if cur_fct_default_bhv config
   then
-    match config.reached with
+    match config.reachability with
     | Some r when WpReached.smoking r s ->
         WpStrategy.add_prop_dead_code acc config.kf s
     | _ -> acc
@@ -1298,6 +1298,8 @@ let process_unreached_annots cfg =
   let do_annot s _ a acc =
     List.fold_left add_id acc (WpPropId.mk_code_annot_ids kf s a)
   in
+  let do_stmt s acc =
+    Annotations.fold_code_annot (do_annot s) s acc in
   let do_node acc n =
     debug
       "process annotations of unreachable node %a@."
@@ -1312,13 +1314,13 @@ let process_unreached_annots cfg =
         ignore Visitor.(visitFramacKf (visitor :> frama_c_visitor) kf) ;
         visitor#acc
     | Cil2cfg.Vcall (s, _, call, _) ->
-        Annotations.fold_code_annot (do_annot s) s acc @
+        do_stmt s acc @
         preconditions_at_call s call
     | Cil2cfg.Vstmt s
     | Cil2cfg.VblkIn (Cil2cfg.Bstmt s, _)
     | Cil2cfg.VblkOut (Cil2cfg.Bstmt s, _)
     | Cil2cfg.Vtest (true, s, _) | Cil2cfg.Vloop (_, s) | Cil2cfg.Vswitch (s,_)
-      -> Annotations.fold_code_annot (do_annot s) s acc
+      -> do_stmt s acc
     | Cil2cfg.Vtest (false, _, _) | Cil2cfg.Vloop2 _
     | Cil2cfg.VblkIn _ | Cil2cfg.VblkOut _ | Cil2cfg.Vend -> acc
   in
@@ -1329,11 +1331,6 @@ let process_unreached_annots cfg =
 (*----------------------------------------------------------------------------*)
 (* Everything must go through here.                                           *)
 (*----------------------------------------------------------------------------*)
-
-let get_cfg kf model =
-  if Wp_parameters.RTE.get () then WpRTE.generate model kf ;
-  let cfg = Cil2cfg.get kf in
-  let _ = process_unreached_annots cfg in cfg
 
 let build_configs assigns kf model behaviors ki property =
   debug "[get_strategies] for behaviors names: %a@."
@@ -1348,16 +1345,18 @@ let build_configs assigns kf model behaviors ki property =
         debug
           "[get_strategies] select stmt %d properties@." s.sid
   in
-  let cfg = get_cfg kf model in
-  let reached =
+  if Wp_parameters.RTE.get () then WpRTE.generate model kf ;
+  let cfg = Cil2cfg.get kf in
+  let reachability =
     if Wp_parameters.SmokeTests.get ()
     && Wp_parameters.SmokeDeadcode.get ()
-    then Some (WpReached.reached kf)
+    then Some (WpReached.reachability kf)
     else None in
+  process_unreached_annots cfg ;
   let def_annot_bhv, bhvs = find_behaviors kf cfg ki behaviors in
   if bhvs <> [] then debug "[get_strategies] %d behaviors" (List.length bhvs);
   let mk_bhv_config bhv = {
-    kf; reached; cfg;
+    kf; reachability; cfg;
     cur_bhv = bhv;
     asked_prop = property;
     asked_bhvs = bhvs;

@@ -41,13 +41,14 @@ type node = {
   mutable flow : flow ;
   mutable prev : node list ;
   mutable reached : bool option ;
+  mutable alive : bool option ;
 }
 
 let kid = ref 0
 
 let node () =
   incr kid ;
-  { id = !kid ; prev = [] ; reached = None ; flow = F_goto }
+  { id = !kid ; prev = [] ; alive = None ; reached = None ; flow = F_goto }
 
 (* -------------------------------------------------------------------------- *)
 (* --- Unrolled Loop                                                      --- *)
@@ -83,7 +84,7 @@ let rec is_predicate cond p =
 let is_dead_annot ca =
   match ca.annot_content with
   | APragma (Loop_pragma (Unroll_specs [ spec ; _ ])) ->
-      false && is_unrolled_completely spec
+      is_unrolled_completely spec
   | AAssert([],p)
   | AInvariant([],_,p) ->
       not p.tp_only_check && is_predicate false p.tp_statement
@@ -102,8 +103,8 @@ let is_dead_code stmt =
 (* --- Compute CFG                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-type reached = node Stmt.Map.t
-type cfg = reached ref
+type reachability = node Stmt.Map.t
+type cfg = reachability ref (* working cfg during compilation *)
 
 let of_stmt cfg s =
   try Stmt.Map.find s !cfg with Not_found ->
@@ -133,11 +134,8 @@ type env = {
 
 let rec stmt env s b =
   let a = of_stmt env.cfg s in
-  if is_dead_code s then
-    a.flow <- F_dead
-  else
-    a.flow <- skind env a b s.skind ;
-  a
+  let f = skind env a b s.skind in
+  a.flow <- if is_dead_code s then F_dead else f ; a
 
 and skind env a b = function
   | Instr i -> flow i (goto a b)
@@ -182,7 +180,12 @@ let rec reached node =
   | Some r -> r
   | None ->
       node.reached <- Some true ; (* cut loops *)
-      let r = List.for_all reached_after node.prev in
+      let r =
+        match node.flow with
+        | F_dead | F_entry -> true
+        | F_goto | F_effect | F_return | F_branch | F_call ->
+            List.for_all reached_after node.prev
+      in
       node.reached <- Some r ; r
 
 and reached_after node =
@@ -191,14 +194,26 @@ and reached_after node =
   | F_effect | F_entry | F_dead -> true
   | F_return | F_branch | F_call -> false
 
+let rec alive node =
+  match node.alive with
+  | Some a -> a
+  | None ->
+      match node.flow with
+      | F_dead -> false
+      | F_entry -> true
+      | _ ->
+          node.alive <- Some false ;
+          let a = List.exists alive node.prev in
+          node.alive <- Some a ; a
+
 let smoking_node n =
   match n.flow with
-  | F_effect | F_call | F_return -> not (reached n)
+  | F_effect | F_call | F_return -> alive n && not (reached n)
   | F_goto | F_branch | F_entry | F_dead -> false
 
 (* returns true if the stmt requires a reachability smoke test *)
-let smoking nodes stmt =
-  try Stmt.Map.find stmt nodes |> smoking_node
+let smoking reachability stmt =
+  try Stmt.Map.find stmt reachability |> smoking_node
   with Not_found -> false
 
 let compute kf =
@@ -262,7 +277,8 @@ let dump ~dir kf reached =
          | UnspecifiedSequence  _ -> Printf.sprintf "Seq. s%d" s.sid
          | Throw _ | TryExcept _ | TryCatch _ | TryFinally _ ->
              Printf.sprintf "Exn. s%d" s.sid
-       in G.node dot (N.get n) [`Box;`Label label])
+       in G.node dot (N.get n)
+         [`Box;`Label (Printf.sprintf "s%d n%d: %s" s.sid n.id label)])
     reached ;
   G.run dot ;
   G.close dot ;
@@ -276,7 +292,7 @@ let dump ~dir kf reached =
 module FRmap = Kernel_function.Make_Table
     (Datatype.Make
        (struct
-         type t = reached
+         type t = reachability
          include Datatype.Serializable_undefined
          let reprs = [Stmt.Map.empty]
          let name = "WpReachable.reached"
@@ -289,7 +305,7 @@ module FRmap = Kernel_function.Make_Table
 
 let dkey = Wp_parameters.register_category "reached"
 
-let reached = FRmap.memo
+let reachability = FRmap.memo
     begin fun kf ->
       let r = compute kf in
       (if Wp_parameters.has_dkey dkey then
