@@ -95,8 +95,9 @@ let print_csv =
 
 let print_csv_once () =
   let file = Report_parameters.CSVFile.get () in
-  Report_parameters.feedback "Dumping properties in '%s'" file;
-  print_csv file
+  Report_parameters.feedback "Dumping properties in '%a'"
+    Filepath.Normalized.pretty file;
+  print_csv (file:>string)
 
 let print_csv, _ =
   State_builder.apply_once
@@ -107,7 +108,9 @@ let print_csv, _ =
       Property_status.self ]
     print_csv_once
 
-let main () = if Report_parameters.CSVFile.get () <> "" then print_csv ()
+let main () =
+  if not (Filepath.Normalized.is_unknown (Report_parameters.CSVFile.get ()))
+  then print_csv ()
 
 let () = Db.Main.extend main
 
