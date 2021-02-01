@@ -39,33 +39,36 @@ module Generate = String(
        none (default), md, draft and sarif"
   end)
 
-module Output : Parameter_sig.String =
+module Output : Parameter_sig.Filepath =
 struct
-  include String(
+  include Filepath(
     struct
       let option_name = "-mdr-out"
       let arg_name = "f"
-      let default = "report"
+      let file_kind = "Report"
+      let existence = Fc_Filepath.Indifferent
       let help = "sets the name of the output file to <f>. \
                   If <f> has no extension, it is chosen automatically based on \
                   the report kind"
     end)
   let get () =
     let s = get () in
-    if Pervasives_string.contains (Filename.basename s) '.' then s
+    if Pervasives_string.contains (Filename.basename (s:>string)) '.' then s
     else
       let kind = Generate.get () in
       let ext = if kind = "sarif" then ".sarif" else ".md" in
-      s ^ ext
+      Fc_Filepath.Normalized.concat s ext
 end
 
 let () =
   Generate.set_possible_values [ "none"; "md"; "draft"; "sarif" ]
 
-module Remarks = Empty_string(
+module Remarks = Filepath(
   struct
     let option_name = "-mdr-remarks"
     let arg_name = "f"
+    let file_kind = "Remarks file"
+    let existence = Fc_Filepath.Must_exist
     let help =
       "reads file <f> to add additional remarks to various sections of the report. \
        Must be in a format compatible with the file produced by -mdr-gen-draft. \

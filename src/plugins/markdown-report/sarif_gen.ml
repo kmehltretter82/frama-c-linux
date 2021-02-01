@@ -39,7 +39,7 @@ let frama_c_sarif () =
 
 let get_remarks () =
   let f = Mdr_params.Remarks.get () in
-  if f <> "" then Parse_remarks.get_remarks f
+  if not (Filepath.Normalized.is_unknown f) then Parse_remarks.get_remarks f
   else Datatype.String.Map.empty
 
 let get_remark remarks label =
@@ -274,12 +274,13 @@ let generate () =
   let runs = [ gen_run remarks ] in
   let json = Schema.create ~runs () |> Schema.to_yojson in
   let file = Mdr_params.Output.get () in
-  if file = "" then
+  if Filepath.Normalized.is_unknown file then
     Log.print_on_output (fun fmt -> Yojson.Safe.pretty_print fmt json)
   else
     try
-      Command.write_file file
+      Command.write_file (file:>string)
         (fun out -> Yojson.Safe.pretty_to_channel ~std:true out json) ;
-      Mdr_params.result "Report %s generated" file
+      Mdr_params.result "Report %a generated" Filepath.Normalized.pretty file
     with Sys_error s ->
-      Mdr_params.abort "Unable to generate %s (%s)" file s
+      Mdr_params.abort "Unable to generate %a (%s)"
+        Filepath.Normalized.pretty file s
