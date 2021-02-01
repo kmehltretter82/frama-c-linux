@@ -47,7 +47,7 @@ let type_f_specifier ?find_typedef spec =
   match spec.f_conversion_specifier, spec.f_length_modifier with
   | #signed_specifier, None     -> Cil.intType
   | #signed_specifier, Some `hh -> Cil.scharType
-  | #signed_specifier, Some `h  -> Extends.Cil.shortType
+  | #signed_specifier, Some `h  -> Cil.shortType
   | #signed_specifier, Some `l  -> Cil.longType
   | #signed_specifier, Some `ll -> Cil.longLongType
   | #signed_specifier, Some `j  -> get_typedef ?find_typedef "intmax_t"
@@ -55,7 +55,7 @@ let type_f_specifier ?find_typedef spec =
   | #signed_specifier, Some `t  -> get_typedef ?find_typedef "ptrdiff_t"
   | #unsigned_specifier, None     -> Cil.uintType
   | #unsigned_specifier, Some `hh -> Cil.ucharType
-  | #unsigned_specifier, Some `h  -> Extends.Cil.ushortType
+  | #unsigned_specifier, Some `h  -> Cil.ushortType
   | #unsigned_specifier, Some `l  -> Cil.ulongType
   | #unsigned_specifier, Some `ll -> Cil.ulongLongType
   | #unsigned_specifier, Some `j  -> get_typedef ?find_typedef "uintmax_t"
@@ -71,7 +71,7 @@ let type_f_specifier ?find_typedef spec =
   | `p, None    -> Cil.voidPtrType
   | `n, None     -> ptr Cil.intType
   | `n, Some `hh -> ptr Cil.scharType
-  | `n, Some `h  -> ptr Extends.Cil.shortType
+  | `n, Some `h  -> ptr Cil.shortType
   | `n, Some `l  -> ptr Cil.longType
   | `n, Some `ll -> ptr Cil.longLongType
   | `n, Some `j  -> ptr (get_typedef ?find_typedef "intmax_t")
@@ -83,7 +83,7 @@ let type_s_specifier ?find_typedef spec =
   match spec.s_conversion_specifier, spec.s_length_modifier with
   | #signed_specifier, None     -> ptr Cil.intType
   | #signed_specifier, Some `hh -> ptr Cil.scharType
-  | #signed_specifier, Some `h  -> ptr Extends.Cil.shortType
+  | #signed_specifier, Some `h  -> ptr Cil.shortType
   | #signed_specifier, Some `l  -> ptr Cil.longType
   | #signed_specifier, Some `ll -> ptr Cil.longLongType
   | #signed_specifier, Some `j  -> ptr (get_typedef ?find_typedef "intmax_t")
@@ -91,7 +91,7 @@ let type_s_specifier ?find_typedef spec =
   | #signed_specifier, Some `t  -> ptr (get_typedef ?find_typedef "ptrdiff_t")
   | #unsigned_specifier, None     -> ptr Cil.uintType
   | #unsigned_specifier, Some `hh -> ptr Cil.ucharType
-  | #unsigned_specifier, Some `h  -> ptr Extends.Cil.ushortType
+  | #unsigned_specifier, Some `h  -> ptr Cil.ushortType
   | #unsigned_specifier, Some `l  -> ptr Cil.ulongType
   | #unsigned_specifier, Some `ll -> ptr Cil.ulongLongType
   | #unsigned_specifier, Some `j  -> ptr (get_typedef ?find_typedef "uintmax_t")
@@ -105,7 +105,7 @@ let type_s_specifier ?find_typedef spec =
   | `p, None    -> ptr (Cil.voidPtrType)
   | `n, None     -> ptr Cil.intType
   | `n, Some `hh -> ptr Cil.scharType
-  | `n, Some `h  -> ptr Extends.Cil.shortType
+  | `n, Some `h  -> ptr Cil.shortType
   | `n, Some `l  -> ptr Cil.longType
   | `n, Some `ll -> ptr Cil.longLongType
   | `n, Some `j  -> ptr (get_typedef ?find_typedef "intmax_t")

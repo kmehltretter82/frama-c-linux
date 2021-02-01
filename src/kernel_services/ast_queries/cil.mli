@@ -303,6 +303,12 @@ val intType: typ
 (** unsigned int *)
 val uintType: typ
 
+(** short *)
+val shortType : typ
+
+(** unsigned short *)
+val ushortType : typ
+
 (** long *)
 val longType: typ
 
