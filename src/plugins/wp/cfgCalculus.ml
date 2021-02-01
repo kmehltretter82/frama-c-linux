@@ -363,6 +363,11 @@ struct
     let req = default_requires mode kf in
     let bhv = CfgAnnot.get_behavior kf Kglobal has_exit ~active:[] mode.bhv in
 
+    let prove_if_main env ps =
+      if not @@ WpStrategy.is_main_init kf then Extlib.id
+      else List.fold_right (prove_property env) ps
+    in
+
     env.we ,
     (* global init *)
     W.close env.we @@
@@ -372,6 +377,7 @@ struct
     W.label env.we None Clabels.pre @@
     List.fold_right (use_property env) req @@
     List.fold_right (use_property env) bhv.bhv_assumes @@
+    prove_if_main env bhv.bhv_requires @@
     List.fold_right (use_property env) bhv.bhv_requires @@
     List.fold_right (use_property env) (behaviors kf) @@
     List.fold_right (prove_property env) (complete mode kf) @@
