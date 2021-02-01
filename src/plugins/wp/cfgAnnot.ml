@@ -31,7 +31,8 @@ type behavior = {
   bhv_requires: WpPropId.pred_info list ;
   bhv_ensures: WpPropId.pred_info list ;
   bhv_exits: WpPropId.pred_info list ;
-  bhv_assigns: WpPropId.assigns_full_info ;
+  bhv_post_assigns: WpPropId.assigns_full_info ;
+  bhv_exit_assigns: WpPropId.assigns_full_info ;
 }
 
 let normalize_assumes kf ki h =
@@ -73,35 +74,47 @@ let normalize_froms kf ki froms =
     | Kstmt s -> L.labels_stmt_assigns kf s in
   L.preproc_assigns labels froms
 
-let normalize_assigns kf ki bhv ~active = function
-  | WritesAny -> WpPropId.empty_assigns_info
+let normalize_assigns kf ki has_exit bhv ~active = function
+  | WritesAny ->
+      WpPropId.empty_assigns_info, WpPropId.empty_assigns_info
   | Writes froms ->
-      let aid = match ki with
-        | Kglobal -> WpPropId.mk_fct_assigns_id kf bhv Normal froms
-        | Kstmt s -> WpPropId.mk_stmt_assigns_id kf s active bhv froms in
-      match aid with
-      | None -> WpPropId.empty_assigns_info
-      | Some id ->
-          let assigns = normalize_froms kf ki froms in
-          let desc = match ki with
-            | Kglobal -> WpPropId.mk_kf_assigns_desc assigns
-            | Kstmt s -> WpPropId.mk_stmt_assigns_desc s assigns
-          in  WpPropId.mk_assigns_info id desc
+      let aid_post, aid_exit = match ki with
+        | Kglobal ->
+            WpPropId.mk_fct_assigns_id kf has_exit bhv Normal froms,
+            WpPropId.mk_fct_assigns_id kf has_exit bhv Exits froms
+        | Kstmt s ->
+            WpPropId.mk_stmt_assigns_id kf s active bhv froms,
+            WpPropId.mk_stmt_assigns_id kf s active bhv []
+      in
+      let make_assigns_info aid =
+        match aid with
+        | None -> WpPropId.empty_assigns_info
+        | Some id ->
+            let assigns = normalize_froms kf ki froms in
+            let desc = match ki with
+              | Kglobal -> WpPropId.mk_kf_assigns_desc assigns
+              | Kstmt s -> WpPropId.mk_stmt_assigns_desc s assigns
+            in  WpPropId.mk_assigns_info id desc
+      in
+      make_assigns_info aid_post, make_assigns_info aid_exit
 
 let get_requires kf ki bhv =
   List.map (normalize_pre kf ki bhv) bhv.b_requires
 
-let get_behavior kf ki ~active bhv =
+let get_behavior kf ki has_exit ~active bhv =
   let pre_cond = normalize_pre kf ki bhv in
   let post_cond tk (kind,ip) =
     if kind = tk then Some (normalize_post kf ki bhv tk ip) else None in
-  let assigns = normalize_assigns kf ki bhv ~active bhv.b_assigns in
+  let p_asgn, e_asgn =
+    normalize_assigns kf ki has_exit bhv ~active bhv.b_assigns
+  in
   {
     bhv_assumes = List.map pre_cond bhv.b_assumes;
     bhv_requires = List.map pre_cond bhv.b_requires;
     bhv_ensures = List.filter_map (post_cond Normal) bhv.b_post_cond ;
     bhv_exits = List.filter_map (post_cond Exits) bhv.b_post_cond ;
-    bhv_assigns = assigns ;
+    bhv_post_assigns = p_asgn ;
+    bhv_exit_assigns = e_asgn ;
   }
 
 (* -------------------------------------------------------------------------- *)

@@ -148,8 +148,10 @@ val mk_bhv_from_id :
   kernel_function -> kinstr -> string list -> funbehavior ->
   from -> prop_id
 
-(** \from property of function behavior assigns. Must not be [FromAny]. *)
-val mk_fct_from_id : kernel_function -> funbehavior ->
+(** \from property of function behavior assigns. Must not be [FromAny].
+    The boolean indicate whether the function has exit node or not.
+*)
+val mk_fct_from_id : kernel_function -> bool -> funbehavior ->
   termination_kind -> from -> prop_id
 
 (** disjoint behaviors property.
@@ -176,8 +178,10 @@ val mk_stmt_assigns_id :
 val mk_loop_assigns_id : kernel_function -> stmt -> code_annotation ->
   from list -> prop_id option
 
-(** function assigns *)
-val mk_fct_assigns_id : kernel_function -> funbehavior ->
+(** function assigns
+    The boolean indicate whether the function has exit node or not.
+*)
+val mk_fct_assigns_id : kernel_function -> bool -> funbehavior ->
   termination_kind -> from list -> prop_id option
 
 val mk_pre_id : kernel_function -> kinstr -> funbehavior ->

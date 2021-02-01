@@ -302,7 +302,8 @@ let add_stmt_assigns_goal config s active acc b l_post = match b.b_assigns with
 let add_fct_assigns_goal config acc tkind b = match b.b_assigns with
   | WritesAny -> acc
   | Writes assigns ->
-      let id = WpPropId.mk_fct_assigns_id config.kf b tkind assigns in
+      let has_exit = Cil2cfg.has_exit (Cil2cfg.get config.kf) in
+      let id = WpPropId.mk_fct_assigns_id config.kf has_exit b tkind assigns in
       match id with
       | None -> acc
       | Some id ->

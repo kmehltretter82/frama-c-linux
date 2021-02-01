@@ -464,7 +464,8 @@ let add_fct_bhv_assigns_hyp acc kf tkind b = match b.b_assigns with
       let id = WpPropId.mk_kf_any_assigns_info () in
       add_assigns_any acc Ahyp id
   | Writes assigns ->
-      let id = WpPropId.mk_fct_assigns_id kf b tkind assigns in
+      let has_exit = Cil2cfg.has_exit (Cil2cfg.get kf) in
+      let id = WpPropId.mk_fct_assigns_id kf has_exit   b tkind assigns in
       match id with
       | None ->
           let id = WpPropId.mk_kf_any_assigns_info () in

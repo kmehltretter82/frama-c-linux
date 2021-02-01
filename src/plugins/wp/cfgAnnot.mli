@@ -37,12 +37,14 @@ type behavior = {
   bhv_requires: pred_info list ;
   bhv_ensures: pred_info list ;
   bhv_exits: pred_info list ;
-  bhv_assigns: assigns_full_info ;
+  bhv_post_assigns: assigns_full_info ;
+  bhv_exit_assigns: assigns_full_info ;
 }
 
 val get_requires : kernel_function -> kinstr -> funbehavior -> pred_info list
-val get_behavior : kernel_function -> kinstr -> active:string list ->
-  funbehavior -> behavior
+val get_behavior :
+  kernel_function -> kinstr -> bool -> active:string list -> funbehavior ->
+  behavior
 
 val get_preconditions : kernel_function -> pred_info list
 val get_complete_behaviors : kernel_function -> pred_info list

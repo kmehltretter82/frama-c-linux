@@ -128,16 +128,16 @@ let mk_bhv_from_id kf ki a bhv from =
   let id = Property.ip_of_from kf ki (Property.Id_contract (a,bhv)) from in
   mk_prop PKProp (Option.get id)
 
-let get_kind_for_tk kf tkind = match tkind with
+let get_kind_for_tk tkind has_exit = match tkind with
   | Normal ->
-      if Cil2cfg.has_exit (Cil2cfg.get kf) then PKAFctOut else PKProp
+      if has_exit then PKAFctOut else PKProp
   | Exits -> PKAFctExit
   | _ -> assert false
 
-let mk_fct_from_id kf bhv tkind from =
+let mk_fct_from_id kf kf_has_exit bhv tkind from =
   let contract_info = Property.Id_contract(Datatype.String.Set.empty,bhv) in
   let id = Property.ip_of_from kf Kglobal contract_info from in
-  let kind = get_kind_for_tk kf tkind in
+  let kind = get_kind_for_tk tkind kf_has_exit in
   mk_prop kind (Option.get id)
 
 let mk_disj_bhv_id (kf,ki,active,disj)  =
@@ -160,9 +160,9 @@ let mk_loop_assigns_id kf s ca a =
   let p = Property.ip_of_assigns kf (Kstmt s) ca (Writes a) in
   Option.map (mk_prop PKPropLoop) p
 
-let mk_fct_assigns_id kf b tkind a =
+let mk_fct_assigns_id kf kf_has_exit b tkind a =
   let b = Property.Id_contract(Datatype.String.Set.empty,b) in
-  let kind = get_kind_for_tk kf tkind in
+  let kind = get_kind_for_tk tkind kf_has_exit in
   let p = Property.ip_of_assigns kf Kglobal b (Writes a) in
   Option.map (mk_prop kind) p
 

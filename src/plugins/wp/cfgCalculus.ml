@@ -121,6 +121,37 @@ struct
 
   module I = CfgInit.Make(W)
 
+  module Reachable_call : sig
+    val has_reachable_call: Cfg.automaton -> vertex -> bool
+  end
+  =
+  struct
+    exception Found_call
+
+    type reachability_env = {
+      table: unit Vhash.t ;
+      cfg: Cfg.automaton ;
+    }
+
+    let rec has_reachable_call cfg v =
+      let env = { table = Vhash.create 32 ; cfg } in
+      try reachable_call_by_cfg env v ; false
+      with Found_call -> true
+
+    and reachable_call_by_cfg env a =
+      try Vhash.find env.table a
+      with Not_found ->
+        Vhash.add env.table a () ;
+        List.iter (transition env) (G.succ_e env.cfg.graph a)
+
+    and transition env (_,edge,dst) =
+      reachable_call_by_cfg env dst ;
+      match edge.edge_transition with
+      | Instr ((Local_init(_,ConsInit _, _)| Call _), _) -> raise Found_call
+      | _ -> ()
+
+  end
+
   (* --- Traversal Environment --- *)
 
   type env = {
@@ -317,7 +348,7 @@ struct
 
   let body env ~ensures ~exits w =
     let rw = List.fold_right (prove_property env) ensures w in
-    let rk = List.fold_right (prove_property env) exits w in
+    let rk = List.fold_right (prove_property env) exits env.wk in
     Vhash.add env.wp env.cfg.return_point (Some rw) ;
     env.wk <- rk ;
     wp env env.cfg.entry_point
@@ -325,16 +356,18 @@ struct
   (* Putting everything together *)
   let compute ~mode ~props =
     let kf = mode.kf in
+    let cfg = Cfg.get_automaton kf in
+    let has_exit = Reachable_call.has_reachable_call cfg (cfg.entry_point) in
     let env = {
       mode ; props ;
-      cfg = Cfg.get_automaton kf ;
+      cfg ;
       we = W.new_env kf ;
       wp = Vhash.create 32 ;
       wk = W.empty ;
     } in
     let xs = Kernel_function.get_formals kf in
     let req = default_requires mode kf in
-    let bhv = CfgAnnot.get_behavior kf Kglobal ~active:[] mode.bhv in
+    let bhv = CfgAnnot.get_behavior kf Kglobal has_exit ~active:[] mode.bhv in
 
     env.we ,
     (* global init *)
@@ -357,8 +390,11 @@ struct
       ~exits:bhv.bhv_exits @@
     (* frame-out *)
     W.label env.we None Clabels.post @@
+    (fun t ->
+       if not has_exit then env.wk <- t
+       else env.wk <- prove_assigns env bhv.bhv_exit_assigns t ;
+       prove_assigns env bhv.bhv_post_assigns t) @@
     W.scope env.we xs SC_Frame_out @@
-    prove_assigns env bhv.bhv_assigns @@
     (* wp-end *)
     W.empty
 
