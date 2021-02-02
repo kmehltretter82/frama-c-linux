@@ -347,6 +347,40 @@ struct
     if not (is_default_bhv mode) then []
     else CfgAnnot.get_disjoint_behaviors kf
 
+  let do_preconditions env ~main ~behaviors ~requires ~def_requires ~assumes w =
+    let prove_if_main ps w =
+      if main then List.fold_right (prove_property env) ps w else w
+    in
+    List.fold_right (use_property env) def_requires @@
+    List.fold_right (use_property env) assumes @@
+    prove_if_main requires @@
+    List.fold_right (use_property env) requires @@
+    List.fold_right (use_property env) behaviors w
+
+  let do_complete_disjoint env ~complete ~disjoint w =
+    List.fold_right (prove_property env) complete @@
+    List.fold_right (prove_property env) disjoint w
+
+  let do_function_body env w =
+    Vhash.add env.wp env.cfg.return_point (Some w) ;
+    wp env env.cfg.entry_point
+
+  let do_post_exit env has_exit xs ~post ~post_assigns ~exit ~exit_assigns w =
+    let w_exit =
+      W.scope env.we xs SC_Frame_out @@
+      W.label env.we None Clabels.at_exit @@
+      List.fold_right (prove_property env) exit @@
+      if has_exit then prove_assigns env exit_assigns w else w
+    in
+    let w_post =
+      W.scope env.we xs SC_Frame_out @@
+      W.label env.we None Clabels.post @@
+      List.fold_right (prove_property env) post @@
+      prove_assigns env post_assigns w
+    in
+    env.wk <- w_exit ;
+    w_post
+
   (* Putting everything together *)
   let compute ~mode ~props =
     let kf = mode.kf in
@@ -360,44 +394,19 @@ struct
       wk = W.empty ;
     } in
     let xs = Kernel_function.get_formals kf in
-    let req = default_requires mode kf in
-    let bhv = CfgAnnot.get_behavior kf Kglobal has_exit ~active:[] mode.bhv in
+    let bhvs = CfgAnnot.get_behavior kf Kglobal has_exit ~active:[] mode.bhv in
 
-    let prove_if_main env ps =
-      if not @@ WpStrategy.is_main_init kf then Extlib.id
-      else List.fold_right (prove_property env) ps
-    in
-    let do_preconditions env w =
-      List.fold_right (use_property env) req @@
-      List.fold_right (use_property env) bhv.bhv_assumes @@
-      prove_if_main env bhv.bhv_requires @@
-      List.fold_right (use_property env) bhv.bhv_requires @@
-      List.fold_right (use_property env) (behaviors kf) w
-    in
-    let do_complete_disjoint env w =
-      List.fold_right (prove_property env) (complete mode kf) @@
-      List.fold_right (prove_property env) (disjoint mode kf) w
-    in
-    let do_function_body env w =
-      Vhash.add env.wp env.cfg.return_point (Some w) ;
-      wp env env.cfg.entry_point
-    in
-    let do_post_exit env w =
-      let w_exit =
-        W.scope env.we xs SC_Frame_out @@
-        W.label env.we None Clabels.at_exit @@
-        List.fold_right (prove_property env) bhv.bhv_exits @@
-        if not has_exit then w else prove_assigns env bhv.bhv_exit_assigns w
-      in
-      let w_post =
-        W.scope env.we xs SC_Frame_out @@
-        W.label env.we None Clabels.post @@
-        List.fold_right (prove_property env) bhv.bhv_ensures @@
-        prove_assigns env bhv.bhv_post_assigns w
-      in
-      env.wk <- w_exit ;
-      w_post
-    in
+    let def_requires = default_requires mode kf in
+    let requires = bhvs.bhv_requires in
+    let assumes = bhvs.bhv_assumes in
+    let post = bhvs.bhv_ensures in
+    let post_assigns = bhvs.bhv_post_assigns in
+    let exit = bhvs.bhv_exits in
+    let exit_assigns = bhvs.bhv_exit_assigns in
+    let main = WpStrategy.is_main_init kf in
+    let behaviors = behaviors kf in
+    let complete = complete mode kf in
+    let disjoint = disjoint mode kf in
 
     env.we ,
     (* global init *)
@@ -410,13 +419,13 @@ struct
     (* frame-in *)
     W.scope env.we xs SC_Frame_in @@
 
-    do_preconditions env @@
-    do_complete_disjoint env @@
+    do_preconditions env ~main ~behaviors ~requires ~def_requires ~assumes @@
+    do_complete_disjoint env ~complete ~disjoint @@
     do_function_body env @@
 
     (* NOTE: do_post_exit performs frame-out on both post and exit *)
     (* Post-conds*)
-    do_post_exit env @@
+    do_post_exit env has_exit xs ~post ~post_assigns ~exit ~exit_assigns @@
     (* wp-end *)
     W.empty
 
