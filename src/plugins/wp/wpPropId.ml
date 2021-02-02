@@ -817,6 +817,10 @@ let select_by_name asked_names pid =
   let names = user_prop_pid pid in
   are_selected_names asked_names names
 
+let select_for_behaviors bhvs pid =
+  let fors = Property.get_for_behaviors @@ property_of_id pid in
+  List.exists (fun b -> List.mem b fors) bhvs
+
 let select_call_pre s_call asked_pre pid =
   match pid.p_kind with
   | PKPre (_, p_stmt, p_prop) ->

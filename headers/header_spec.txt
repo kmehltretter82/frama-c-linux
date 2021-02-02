@@ -1676,6 +1676,8 @@ src/plugins/wp/calculus.ml: CEA_WP
 src/plugins/wp/calculus.mli: CEA_WP
 src/plugins/wp/cfgAnnot.ml: CEA_WP
 src/plugins/wp/cfgAnnot.mli: CEA_WP
+src/plugins/wp/cfgInfos.ml: CEA_WP
+src/plugins/wp/cfgInfos.mli: CEA_WP
 src/plugins/wp/cfgCalculus.ml: CEA_WP
 src/plugins/wp/cfgCalculus.mli: CEA_WP
 src/plugins/wp/cfgDump.ml: CEA_WP

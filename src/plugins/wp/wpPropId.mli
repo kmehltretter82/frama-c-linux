@@ -62,14 +62,13 @@ val is_smoke_test : prop_id -> bool
 (** test if the prop_id does not have a [no_wp:] in its name(s). *)
 val select_default : prop_id -> bool
 
-(** test if the prop_id has to be selected for the asked name.
-    Also returns a debug message to explain then answer. Includes
-    a test for [no_wp:]. *)
+(** test if the prop_id has to be selected for the asked names. *)
 val select_by_name : string list -> prop_id -> bool
 
-(** test if the prop_id has to be selected when we want to select the call
- * precondition the the [stmt] call (None means all the call preconditions).
- * Also returns a debug message to explain then answer. *)
+(** test if the prop_id has to be selected for the asked behavior names. *)
+val select_for_behaviors : string list -> prop_id -> bool
+
+(** test if the prop_id has to be selected when we want to select the call. *)
 val select_call_pre : stmt -> Property.t option -> prop_id -> bool
 
 (*----------------------------------------------------------------------------*)

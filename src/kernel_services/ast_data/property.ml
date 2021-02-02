@@ -378,6 +378,41 @@ let get_behavior = function
   | IPGlobalInvariant _
   | IPOther _ -> None
 
+let get_for_behaviors = function
+  | IPPredicate {ip_kind} ->
+    (match get_pk_behavior ip_kind with None -> [] | Some b -> [b.b_name])
+  | IPBehavior {ib_bhv=b}
+  | IPAllocation {ial_bhv=Id_contract (_, b)}
+  | IPAssigns {ias_bhv=Id_contract (_, b)}
+  | IPFrom {if_bhv=Id_contract (_, b)} -> [b.b_name]
+
+  | IPAllocation {ial_bhv=Id_loop ca}
+  | IPAssigns {ias_bhv=Id_loop ca}
+  | IPFrom {if_bhv=Id_loop ca}
+  | IPCodeAnnot { ica_ca = ca } ->
+    begin
+      match ca.annot_content with
+      | AAssert (bhvs,_)
+      | AInvariant (bhvs,_,_)
+      | AStmtSpec(bhvs,_)
+      | AAssigns(bhvs,_)
+      | AAllocation(bhvs,_) -> bhvs
+      | AVariant _ | APragma _ | AExtended _ -> []
+    end
+
+  | IPAxiom _
+  | IPAxiomatic _
+  | IPExtended _
+  | IPLemma _
+  | IPComplete _
+  | IPDisjoint _
+  | IPDecrease _
+  | IPReachable _
+  | IPPropertyInstance _
+  | IPTypeInvariant _
+  | IPGlobalInvariant _
+  | IPOther _ -> []
+
 (* -------------------------------------------------------------------------- *)
 (* --- Property Status                                                    --- *)
 (* -------------------------------------------------------------------------- *)
