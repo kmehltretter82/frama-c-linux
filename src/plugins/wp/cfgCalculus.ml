@@ -134,12 +134,7 @@ struct
       cfg: Cfg.automaton ;
     }
 
-    let rec has_reachable_call cfg v =
-      let env = { table = Vhash.create 32 ; cfg } in
-      try reachable_call_by_cfg env v ; false
-      with Found_call -> true
-
-    and reachable_call_by_cfg env a =
+    let rec reachable_call_by_cfg env a =
       try Vhash.find env.table a
       with Not_found ->
         Vhash.add env.table a () ;
@@ -150,6 +145,11 @@ struct
       match edge.edge_transition with
       | Instr ((Local_init(_,ConsInit _, _)| Call _), _) -> raise Found_call
       | _ -> ()
+
+    let has_reachable_call cfg v =
+      let env = { table = Vhash.create 32 ; cfg } in
+      try reachable_call_by_cfg env v ; false
+      with Found_call -> true
 
   end
 
@@ -185,7 +185,7 @@ struct
     match a with
     | NoAssignsInfo -> assert false
     | AssignsAny ad ->
-        Wp_parameters.warning ~current:true ~once:true
+        WpLog.warning ~current:true ~once:true
           "Missing assigns clause (assigns 'everything' instead)" ;
         W.use_assigns env.we None ad w
     | AssignsLocations(ap,ad) -> W.use_assigns env.we (Some ap) ad w
@@ -367,40 +367,56 @@ struct
       if not @@ WpStrategy.is_main_init kf then Extlib.id
       else List.fold_right (prove_property env) ps
     in
+    let do_preconditions env w =
+      List.fold_right (use_property env) req @@
+      List.fold_right (use_property env) bhv.bhv_assumes @@
+      prove_if_main env bhv.bhv_requires @@
+      List.fold_right (use_property env) bhv.bhv_requires @@
+      List.fold_right (use_property env) (behaviors kf) w
+    in
+    let do_complete_disjoint env w =
+      List.fold_right (prove_property env) (complete mode kf) @@
+      List.fold_right (prove_property env) (disjoint mode kf) w
+    in
+    let do_function_body env w =
+      Vhash.add env.wp env.cfg.return_point (Some w) ;
+      wp env env.cfg.entry_point
+    in
+    let do_post_exit env w =
+      let w_exit =
+        W.scope env.we xs SC_Frame_out @@
+        W.label env.we None Clabels.at_exit @@
+        List.fold_right (prove_property env) bhv.bhv_exits @@
+        if not has_exit then w else prove_assigns env bhv.bhv_exit_assigns w
+      in
+      let w_post =
+        W.scope env.we xs SC_Frame_out @@
+        W.label env.we None Clabels.post @@
+        List.fold_right (prove_property env) bhv.bhv_ensures @@
+        prove_assigns env bhv.bhv_post_assigns w
+      in
+      env.wk <- w_exit ;
+      w_post
+    in
 
     env.we ,
     (* global init *)
     W.close env.we @@
     I.process_global_init env.we kf @@
     W.scope env.we [] SC_Global @@
+
     (* pre-state *)
     W.label env.we None Clabels.pre @@
-    List.fold_right (use_property env) req @@
-    List.fold_right (use_property env) bhv.bhv_assumes @@
-    prove_if_main env bhv.bhv_requires @@
-    List.fold_right (use_property env) bhv.bhv_requires @@
-    List.fold_right (use_property env) (behaviors kf) @@
-    List.fold_right (prove_property env) (complete mode kf) @@
-    List.fold_right (prove_property env) (disjoint mode kf) @@
     (* frame-in *)
     W.scope env.we xs SC_Frame_in @@
-    (* function body *)
-    begin fun w ->
-      Vhash.add env.wp env.cfg.return_point (Some w) ;
-      wp env env.cfg.entry_point
-    end @@
-    (* frame-out *)
-    W.scope env.we xs SC_Frame_out @@
-    (* Post-conds*)
-    W.label env.we None Clabels.post @@
-    begin fun w ->
-      env.wk <-
-        List.fold_right (prove_property env) bhv.bhv_exits @@
-        if not has_exit then w else prove_assigns env bhv.bhv_exit_assigns w ;
 
-      List.fold_right (prove_property env) bhv.bhv_ensures @@
-      prove_assigns env bhv.bhv_post_assigns w
-    end @@
+    do_preconditions env @@
+    do_complete_disjoint env @@
+    do_function_body env @@
+
+    (* NOTE: do_post_exit performs frame-out on both post and exit *)
+    (* Post-conds*)
+    do_post_exit env @@
     (* wp-end *)
     W.empty
 
