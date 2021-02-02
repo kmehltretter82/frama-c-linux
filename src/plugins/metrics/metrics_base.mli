@@ -146,7 +146,7 @@ type output_type =
 (** get_file_type [extension] sets the output type according to [extension].
     Raises an error if [extension] is not among supported extensions or is empty.
 *)
-val get_file_type: string -> output_type;;
+val get_file_type: Filepath.Normalized.t -> output_type;;
 
 (** consider_function [vinfo] returns false if the varinfo is not a function we
     are interested in.

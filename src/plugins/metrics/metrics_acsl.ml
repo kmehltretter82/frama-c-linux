@@ -309,9 +309,9 @@ let dump_acsl_stats_html fmt =
 
 let dump () =
   let out = Metrics_parameters.OutputFile.get () in
-  if out <> "" then begin
+  if not (Filepath.Normalized.is_unknown out) then begin
     try
-      let chan = open_out out in
+      let chan = open_out (out:>string) in
       let fmt = Format.formatter_of_out_channel chan in
       (match Metrics_base.get_file_type out with
             | Metrics_base.Html -> dump_acsl_stats_html fmt
@@ -322,6 +322,7 @@ let dump () =
       );
       close_out chan
     with Sys_error s ->
-      Metrics_parameters.abort "Cannot open file %s (%s)" out s
+      Metrics_parameters.abort "Cannot open file %a (%s)"
+        Filepath.Normalized.pretty out s
   end else Metrics_parameters.result "%t" dump_acsl_stats
 

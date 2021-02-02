@@ -736,9 +736,9 @@ let compute_on_cilast ~libc =
   (* Print the result to file if required *)
   let out_fname = Metrics_parameters.OutputFile.get () in
   begin
-    if out_fname <> "" then
+    if not (Filepath.Normalized.is_unknown out_fname) then
       try
-        let oc = open_out_bin out_fname in
+        let oc = open_out_bin (out_fname:>string) in
         let fmt = Format.formatter_of_out_channel oc in
         (match Metrics_base.get_file_type out_fname with
          | Html -> dump_html fmt cil_visitor
@@ -750,7 +750,8 @@ let compute_on_cilast ~libc =
         );
         close_out oc;
       with Sys_error _ ->
-        Metrics_parameters.failure "Cannot open file %s.@." out_fname
+        Metrics_parameters.failure "Cannot open file %a.@."
+          Filepath.Normalized.pretty out_fname
     else Metrics_parameters.result "%a" pp_with_funinfo cil_visitor
   end
 
