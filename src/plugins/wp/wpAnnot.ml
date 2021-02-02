@@ -1294,7 +1294,7 @@ class vexit kf acc =
       Cil.DoChildren
   end
 
-let process_unreached_annots cfg =
+let process_unreached_annots cfg reachability =
   debug "collecting unreachable annotations@.";
   let unreached = Cil2cfg.unreachable_nodes cfg in
   let kf = Cil2cfg.cfg_kf cfg in
@@ -1311,7 +1311,15 @@ let process_unreached_annots cfg =
     List.fold_left add_id acc (WpPropId.mk_code_annot_ids kf s a)
   in
   let do_stmt s acc =
-    Annotations.fold_code_annot (do_annot s) s acc in
+    let acc =
+      match reachability with
+      | None -> acc
+      | Some r ->
+          if WpReached.smoking r s then
+            WpPropId.mk_smoke kf ~id:"unreachable" ~unreachable:s () :: acc
+          else acc
+    in Annotations.fold_code_annot (do_annot s) s acc
+  in
   let do_node acc n =
     debug
       "process annotations of unreachable node %a@."
@@ -1364,7 +1372,7 @@ let build_configs assigns kf model behaviors ki property =
     && Wp_parameters.SmokeDeadcode.get ()
     then Some (WpReached.reachability kf)
     else None in
-  process_unreached_annots cfg ;
+  process_unreached_annots cfg reachability ;
   let def_annot_bhv, bhvs = find_behaviors kf cfg ki behaviors in
   if bhvs <> [] then debug "[get_strategies] %d behaviors" (List.length bhvs);
   let mk_bhv_config bhv = {

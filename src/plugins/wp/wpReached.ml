@@ -40,15 +40,20 @@ type node = {
   id : int ;
   mutable flow : flow ;
   mutable prev : node list ;
-  mutable reached : bool option ;
-  mutable alive : bool option ;
+  mutable protected : bool option ;
+  (* whether the node is dominated by unreachable node or by a smoke test *)
+  mutable unreachable : bool option ;
+  (* whether the node is unreachable from the entry point *)
 }
 
 let kid = ref 0
 
 let node () =
   incr kid ;
-  { id = !kid ; prev = [] ; alive = None ; reached = None ; flow = F_goto }
+  { id = !kid ; prev = [] ;
+    protected = None ;
+    unreachable = None ;
+    flow = F_goto }
 
 (* -------------------------------------------------------------------------- *)
 (* --- Unrolled Loop                                                      --- *)
@@ -175,46 +180,46 @@ and sequence env seq b = match seq with
 (* --- Compute Reachability                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-let rec reached node =
-  match node.reached with
+let rec unreachable node =
+  match node.unreachable with
   | Some r -> r
   | None ->
-      node.reached <- Some true ; (* cut loops *)
+      node.unreachable <- Some true ; (* cut loops *)
+      let r =
+        match node.flow with
+        | F_dead -> true
+        | F_entry -> false
+        | F_goto | F_effect | F_return | F_branch | F_call ->
+            List.for_all unreachable node.prev
+      in node.unreachable <- Some r ; r
+
+let rec protected node =
+  match node.protected with
+  | Some r -> r
+  | None ->
+      node.protected <- Some false ; (* cut loops *)
       let r =
         match node.flow with
         | F_dead | F_entry -> true
         | F_goto | F_effect | F_return | F_branch | F_call ->
-            List.for_all reached_after node.prev
-      in
-      node.reached <- Some r ; r
+            node.prev <> [] && List.for_all protected_by node.prev
+      in node.protected <- Some r ; r
 
-and reached_after node =
-  match node.flow with
-  | F_goto -> reached node
-  | F_effect | F_entry | F_dead -> true
-  | F_return | F_branch | F_call -> false
-
-let rec alive node =
-  match node.alive with
-  | Some a -> a
-  | None ->
-      match node.flow with
-      | F_dead -> false
-      | F_entry -> true
-      | _ ->
-          node.alive <- Some false ;
-          let a = List.exists alive node.prev in
-          node.alive <- Some a ; a
+and protected_by prev =
+  match prev.flow with
+  | F_dead | F_entry | F_effect -> true
+  | F_goto -> protected prev
+  | F_call | F_branch | F_return -> unreachable prev
 
 let smoking_node n =
   match n.flow with
-  | F_effect | F_call | F_return -> alive n && not (reached n)
+  | F_effect | F_call | F_return -> not (protected n)
   | F_goto | F_branch | F_entry | F_dead -> false
 
 (* returns true if the stmt requires a reachability smoke test *)
 let smoking reachability stmt =
   try Stmt.Map.find stmt reachability |> smoking_node
-  with Not_found -> false
+  with Not_found -> true
 
 let compute kf =
   try
@@ -245,14 +250,10 @@ let dump ~dir kf reached =
   N.define dot
     (fun a na ->
        let attr =
-         if smoking_node a
-         then [`Filled;`Fillcolor "orange"]
-         else
-           match a.flow with
-           | F_entry | F_effect | F_return | F_call ->
-               [`Filled;`Fillcolor "green"]
-           | F_dead -> [`Filled;`Fillcolor "red"]
-           | F_branch | F_goto -> []
+         if smoking_node a then [`Filled;`Fillcolor "orange"]
+         else if protected a then [`Filled;`Fillcolor "green"]
+         else if unreachable a then [`Filled;`Fillcolor "red"]
+         else []
        in G.node dot na attr ;
        List.iter
          (fun b ->
