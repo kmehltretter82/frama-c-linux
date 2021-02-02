@@ -49,4 +49,6 @@ val smoking : reachability -> Cil_types.stmt -> bool
 
 val dump : dir:Datatype.Filepath.t -> Kernel_function.t -> reachability -> unit
 
+val set_doomed : Emitter.t -> WpPropId.prop_id -> unit
+
 (* -------------------------------------------------------------------------- *)

@@ -314,3 +314,28 @@ let reachability = FRmap.memo
     end
 
 (* -------------------------------------------------------------------------- *)
+(* --- Doome Status                                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
+let set_invalid emitter tgt =
+  Property_status.emit emitter ~hyps:[] tgt Property_status.False_if_reachable
+
+let set_doomed emitter pid =
+  List.iter (set_invalid emitter) (WpPropId.doomed_if_valid pid) ;
+  match WpPropId.unreachable_if_valid pid with
+  | Property.OLStmt(kf,stmt) ->
+      let ca =
+        match Annotations.code_annot ~emitter ~filter:is_dead_annot stmt with
+        | ca::_ -> ca
+        | [] ->
+            let pred_loc = Stmt.loc stmt in
+            let pred_name = [ "Wp" ; "SmokeTest" ] in
+            let pf = { Logic_const.pfalse with pred_loc ; pred_name } in
+            let pf = Logic_const.toplevel_predicate pf in
+            let ca = Logic_const.new_code_annotation (AAssert ([],pf)) in
+            Annotations.add_code_annot emitter ~kf stmt ca ; ca
+      in
+      List.iter (set_invalid emitter) (Property.ip_of_code_annot kf stmt ca)
+  | Property.OLGlob _ | Property.OLContract _ -> ()
+
+(* -------------------------------------------------------------------------- *)

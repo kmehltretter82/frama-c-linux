@@ -19,3 +19,4 @@
 [wp] CFG f -> f
 [wp] CFG f -> f_default_for_stmt_2
 [wp] Warning: No goal generated
+[wp] Proved goals:    9 / 9
