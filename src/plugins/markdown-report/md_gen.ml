@@ -554,9 +554,8 @@ let gen_alarms env =
   gen_section_postlude env
 
 let mk_remarks is_draft =
-  let f = Mdr_params.Remarks.get () in
-  if not (Filepath.Normalized.is_unknown f) then
-    Parse_remarks.get_remarks f
+  if Mdr_params.Remarks.is_known () then
+    Parse_remarks.get_remarks (Mdr_params.Remarks.get ())
   else if is_draft then begin
     let f = Mdr_params.Output.get() in
     if Sys.file_exists (f:>string) then begin

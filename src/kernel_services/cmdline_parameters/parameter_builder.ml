@@ -532,6 +532,7 @@ struct
       else
         p
 
+    let is_known () = not (Filepath.Normalized.is_unknown (get ()))
   end
 
   (* ************************************************************************ *)

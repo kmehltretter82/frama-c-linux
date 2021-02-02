@@ -363,8 +363,8 @@ let dump ~root ?(meta=true) () =
 let () =
   Db.Main.extend begin
     fun () ->
-      let root = Senv.Doc.get () in
-      if not (Filepath.Normalized.is_unknown root) then
+      if Senv.Doc.is_known () then
+        let root = Senv.Doc.get () in
         if Sys.is_directory (root:>string) then
           begin
             Senv.feedback "[doc] Root: '%a'" Filepath.Normalized.pretty root ;

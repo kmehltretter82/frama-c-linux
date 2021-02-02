@@ -270,7 +270,7 @@ let compute_flags_from_file () =
   Flags.mark_as_computed ()
 
 let get_flags f =
-  if not (Filepath.Normalized.is_unknown (Kernel.JsonCompilationDatabase.get ())) then begin
+  if Kernel.JsonCompilationDatabase.is_known () then begin
     if not (Flags.is_computed ()) then compute_flags_from_file ();
     try
       let flags = Flags.find f in

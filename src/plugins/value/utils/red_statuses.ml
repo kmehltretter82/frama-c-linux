@@ -190,5 +190,4 @@ let output file =
   Format.fprintf fmt "@]%!"
 
 let report () =
-  let file = Value_parameters.ReportRedStatuses.get () in
-  if not (Filepath.Normalized.is_unknown file) then output file
+  Value_parameters.ReportRedStatuses.(if is_known () then output (get ()))

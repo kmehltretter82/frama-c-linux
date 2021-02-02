@@ -540,8 +540,7 @@ let classify () =
        (not (R.Stderr.get ()) &&
         not (R.Output.is_set ()))
     then report_console () ;
-    let file = R.Output.get () in
-    if not (Filepath.Normalized.is_unknown file) then report_output file ;
+    if R.Output.is_known () then report_output (R.Output.get ());
     report_number "Reviews     : " !nb_reviews R.OutputReviews.get ;
     report_number "Errors      : " !nb_errors R.OutputErrors.get ;
     report_number "Unclassified: " !nb_unclassified R.OutputUnclassified.get ;

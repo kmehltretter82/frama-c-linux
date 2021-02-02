@@ -178,14 +178,14 @@ let init_file_names () =
     in
     Filepath.Normalized.of_string name
   in
-  if Filepath.Normalized.is_unknown (Aorai_option.Ya.get ()) then
-    if Filepath.Normalized.is_unknown (Aorai_option.Buchi.get ()) then begin
+  if not (Aorai_option.Ya.is_known ()) then
+    if not (Aorai_option.Buchi.is_known ()) then begin
       (* ltl_file name is given and has to point out a valid file. *)
       ltl_file := Aorai_option.Ltl_File.get ();
       if Aorai_option.Dot.get() then dot_file := freshname !ltl_file ".dot";
       (* The LTL file is always used. *)
       (* The promela file can be given or not. *)
-      if not (Filepath.Normalized.is_unknown (Aorai_option.To_Buchi.get ())) then begin
+      if Aorai_option.To_Buchi.is_known () then begin
         ltl_tmp_file:=
           freshname (Aorai_option.promela_file ()) ".ltl";
         promela_file:= Aorai_option.promela_file ();
@@ -203,8 +203,7 @@ let init_file_names () =
         Extlib.cleanup_at_exit (!promela_file :> string);
       end
     end else begin
-      if not (Filepath.Normalized.is_unknown (Aorai_option.To_Buchi.get ())) &&
-         not (Filepath.Normalized.is_unknown (Aorai_option.Ltl_File.get ()))
+      if Aorai_option.To_Buchi.is_known () && Aorai_option.Ltl_File.is_known ()
       then begin
         Aorai_option.abort
           "Error. '-buchi' option is incompatible with '-to-buchi' and '-ltl' \
@@ -217,12 +216,10 @@ let init_file_names () =
         dot_file := freshname !promela_file ".dot";
     end
   else begin
-    let ya_file = Aorai_option.Ya.get () in
-    if (Filepath.Normalized.is_unknown ya_file) then
-      Aorai_option.abort
-        "invalid Ya file name %a" Filepath.Normalized.pretty ya_file;
+    if not (Aorai_option.Ya.is_known ()) then
+      Aorai_option.abort "empty Ya file name";
     if Aorai_option.Dot.get() then
-      dot_file := freshname ya_file ".dot"
+      dot_file := freshname (Aorai_option.Ya.get ()) ".dot"
   end;
   display_status ()
 
@@ -243,8 +240,8 @@ let work () =
   let file = Ast.get () in
   Aorai_utils.initFile file;
   printverb "C file loading         : done\n";
-  if Filepath.Normalized.is_unknown (Aorai_option.Ya.get ()) then
-    if Filepath.Normalized.is_unknown (Aorai_option.Buchi.get ()) then begin
+  if not (Aorai_option.Ya.is_known ()) then
+    if not (Aorai_option.Buchi.is_known ()) then begin
       ltl_to_ltlLight !ltl_file !ltl_tmp_file;
       printverb "LTL loading            : done\n";
       let cmd = Format.asprintf "ltl2ba %s -F %a > %a"
@@ -255,16 +252,16 @@ let work () =
         Aorai_option.abort "failed to run: %s" cmd ;
       printverb "LTL ~> Promela (ltl2ba): done\n"
     end;
-  if not (Filepath.Normalized.is_unknown (Aorai_option.To_Buchi.get ())) then
+  if Aorai_option.To_Buchi.is_known () then
     printverb ("Finished.\nGenerated file: '"^(Filepath.Normalized.to_pretty_string !promela_file)^"'\n")
   else
     begin
       (* Step 3 : Loading promela_file and checking the consistency between informations from C code and LTL property *)
       (*          Such as functions name and global variables. *)
 
-      if not (Filepath.Normalized.is_unknown (Aorai_option.Buchi.get ())) then
+      if Aorai_option.Buchi.is_known () then
         load_promela_file_withexps !promela_file
-      else if not (Filepath.Normalized.is_unknown (Aorai_option.Ya.get ())) then
+      else if Aorai_option.Ya.is_known () then
         load_ya_file (Aorai_option.Ya.get ())
       else
         load_promela_file !promela_file;

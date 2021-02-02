@@ -308,8 +308,8 @@ let dump_acsl_stats_html fmt =
     
 
 let dump () =
-  let out = Metrics_parameters.OutputFile.get () in
-  if not (Filepath.Normalized.is_unknown out) then begin
+  if Metrics_parameters.OutputFile.is_known () then begin
+    let out = Metrics_parameters.OutputFile.get () in
     try
       let chan = open_out (out:>string) in
       let fmt = Format.formatter_of_out_channel chan in

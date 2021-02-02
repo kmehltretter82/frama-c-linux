@@ -395,8 +395,8 @@ let start_doing_flamegraph callstack =
   | [] -> assert false
   | [_] ->
     (* Analysis of main *)
-    let file = Value_parameters.ValPerfFlamegraphs.get () in
-    if not (Filepath.Normalized.is_unknown file) then begin
+    if Value_parameters.ValPerfFlamegraphs.is_known () then begin
+      let file = Value_parameters.ValPerfFlamegraphs.get () in
       try
         (* Flamegraphs must be computed. Set up the stack and the output file *)
         let oc = open_out (file:>string) in

@@ -109,8 +109,7 @@ let print_csv, _ =
     print_csv_once
 
 let main () =
-  if not (Filepath.Normalized.is_unknown (Report_parameters.CSVFile.get ()))
-  then print_csv ()
+  if Report_parameters.CSVFile.is_known () then print_csv ()
 
 let () = Db.Main.extend main
 

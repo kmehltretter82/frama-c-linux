@@ -734,26 +734,25 @@ let compute_on_cilast ~libc =
       "@[<v 0>Cil AST@ %t@]" cil_visitor#pp_detailed_text_metrics;
   (*  let r =  metrics_to_result cil_visitor in *)
   (* Print the result to file if required *)
-  let out_fname = Metrics_parameters.OutputFile.get () in
-  begin
-    if not (Filepath.Normalized.is_unknown out_fname) then
-      try
-        let oc = open_out_bin (out_fname:>string) in
-        let fmt = Format.formatter_of_out_channel oc in
-        (match Metrics_base.get_file_type out_fname with
-         | Html -> dump_html fmt cil_visitor
-         | Text -> pp_with_funinfo fmt cil_visitor
-         | Json ->
-           let json = json_of_funinfo cil_visitor in
-           Yojson.pretty_print fmt json;
-           Format.fprintf fmt "@." (* ensure the file ends with a newline *)
-        );
-        close_out oc;
-      with Sys_error _ ->
-        Metrics_parameters.failure "Cannot open file %a.@."
-          Filepath.Normalized.pretty out_fname
-    else Metrics_parameters.result "%a" pp_with_funinfo cil_visitor
+  if Metrics_parameters.OutputFile.is_known () then begin
+    let out_fname = Metrics_parameters.OutputFile.get () in
+    try
+      let oc = open_out_bin (out_fname:>string) in
+      let fmt = Format.formatter_of_out_channel oc in
+      (match Metrics_base.get_file_type out_fname with
+       | Html -> dump_html fmt cil_visitor
+       | Text -> pp_with_funinfo fmt cil_visitor
+       | Json ->
+         let json = json_of_funinfo cil_visitor in
+         Yojson.pretty_print fmt json;
+         Format.fprintf fmt "@." (* ensure the file ends with a newline *)
+      );
+      close_out oc;
+    with Sys_error _ ->
+      Metrics_parameters.failure "Cannot open file %a.@."
+        Filepath.Normalized.pretty out_fname
   end
+  else Metrics_parameters.result "%a" pp_with_funinfo cil_visitor
 
 (* Visitor for the recursive estimation of a stack size.
    Its arguments are the function currently being visited and the current
