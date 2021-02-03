@@ -244,28 +244,44 @@ let reverse_code_assertions a = {
   code_verified = List.rev a.code_verified ;
 }
 
-let get_code_assertions kf stmt : code_assertions =
-  let labels = NormAtLabels.labels_assert_before ~kf stmt in
-  let normalize_pred p = NormAtLabels.preproc_annot labels p in
-  reverse_code_assertions @@
-  Annotations.fold_code_annot
-    begin fun _emitter ca l ->
-      match ca.annot_content with
-      | AAssert(_,a) ->
-          let p =
-            WpPropId.mk_assert_id kf stmt ca ,
-            normalize_pred a.tp_statement
-          in if a.tp_only_check then {
-            l with code_verified = p :: l.code_verified ;
-          } else {
-            code_admitted = p :: l.code_admitted ;
-            code_verified = p :: l.code_verified ;
-          }
-      | _ -> l
-    end stmt {
-    code_admitted = [];
-    code_verified = [];
-  }
+module CodeAssertKey =
+struct
+  type t = kernel_function * stmt
+  let compare (a:t) (b:t) = Stdlib.compare (snd a).sid (snd b).sid
+  let pretty fmt (a:t) = Format.fprintf fmt "s%d" (snd a).sid
+end
+
+module CodeAssertions =
+  WpContext.StaticGenerator(CodeAssertKey)
+    (struct
+      type key = CodeAssertKey.t
+      type data = code_assertions
+      let name = "Wp.CfgAnnot.CodeAssertions"
+      let compile (kf,stmt) =
+        let labels = NormAtLabels.labels_assert_before ~kf stmt in
+        let normalize_pred p = NormAtLabels.preproc_annot labels p in
+        reverse_code_assertions @@
+        Annotations.fold_code_annot
+          begin fun _emitter ca l ->
+            match ca.annot_content with
+            | AAssert(_,a) ->
+                let p =
+                  WpPropId.mk_assert_id kf stmt ca ,
+                  normalize_pred a.tp_statement
+                in if a.tp_only_check then {
+                  l with code_verified = p :: l.code_verified ;
+                } else {
+                  code_admitted = p :: l.code_admitted ;
+                  code_verified = p :: l.code_verified ;
+                }
+            | _ -> l
+          end stmt {
+          code_admitted = [];
+          code_verified = [];
+        }
+    end)
+
+let get_code_assertions kf stmt = CodeAssertions.get (kf,stmt)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Loop Invariants                                                    --- *)
