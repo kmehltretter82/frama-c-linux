@@ -23,6 +23,17 @@
 open Cil_types
 
 (* -------------------------------------------------------------------------- *)
+(* --- Memoization                                                        --- *)
+(* -------------------------------------------------------------------------- *)
+
+module CodeKey =
+struct
+  type t = kernel_function * stmt
+  let compare (a:t) (b:t) = Stdlib.compare (snd a).sid (snd b).sid
+  let pretty fmt (a:t) = Format.fprintf fmt "s%d" (snd a).sid
+end
+
+(* -------------------------------------------------------------------------- *)
 (* --- Property Accessors : Behaviors                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -205,30 +216,38 @@ let assigns_upper_bound behaviors =
   | _, Some a -> a (* else combined behaviors *)
   | _ -> WritesAny
 
-let get_call_contract kf =
-  let cpre : WpPropId.pred_info list ref = ref [] in
-  let cpost : WpPropId.pred_info list ref = ref [] in
-  let cexit : WpPropId.pred_info list ref = ref [] in
-  let add c f x = c := (f x) :: !c in
-  let behaviors = Annotations.behaviors kf in
-  setup_preconditions kf ;
-  List.iter
-    begin fun bhv ->
-      let assumes = get_assumes kf bhv in
-      let mk_pre = normalize_pre kf Kglobal bhv ~assumes in
-      let mk_post = normalize_post kf Kglobal bhv ~assumes in
-      List.iter (add cpre @@ mk_pre) bhv.b_requires ;
-      List.iter
-        (fun (tk,ip) ->
-           add (if tk = Normal then cpost else cexit) (mk_post tk) ip
-        ) bhv.b_post_cond ;
-    end behaviors ;
-  {
-    call_pre = List.rev !cpre ;
-    call_post = List.rev !cpost ;
-    call_exit = List.rev !cexit ;
-    call_assigns = assigns_upper_bound behaviors
-  }
+module CallContract = WpContext.StaticGenerator(Kernel_function)
+    (struct
+      type key = kernel_function
+      type data = call_contract
+      let name = "Wp.CfgAnnot.CallContract"
+      let compile kf =
+        let cpre : WpPropId.pred_info list ref = ref [] in
+        let cpost : WpPropId.pred_info list ref = ref [] in
+        let cexit : WpPropId.pred_info list ref = ref [] in
+        let add c f x = c := (f x) :: !c in
+        let behaviors = Annotations.behaviors kf in
+        setup_preconditions kf ;
+        List.iter
+          begin fun bhv ->
+            let assumes = get_assumes kf bhv in
+            let mk_pre = normalize_pre kf Kglobal bhv ~assumes in
+            let mk_post = normalize_post kf Kglobal bhv ~assumes in
+            List.iter (add cpre @@ mk_pre) bhv.b_requires ;
+            List.iter
+              (fun (tk,ip) ->
+                 add (if tk = Normal then cpost else cexit) (mk_post tk) ip
+              ) bhv.b_post_cond ;
+          end behaviors ;
+        {
+          call_pre = List.rev !cpre ;
+          call_post = List.rev !cpost ;
+          call_exit = List.rev !cexit ;
+          call_assigns = assigns_upper_bound behaviors
+        }
+    end)
+
+let get_call_contract = CallContract.get
 
 (* -------------------------------------------------------------------------- *)
 (* --- Code Assertions                                                    --- *)
@@ -244,17 +263,9 @@ let reverse_code_assertions a = {
   code_verified = List.rev a.code_verified ;
 }
 
-module CodeAssertKey =
-struct
-  type t = kernel_function * stmt
-  let compare (a:t) (b:t) = Stdlib.compare (snd a).sid (snd b).sid
-  let pretty fmt (a:t) = Format.fprintf fmt "s%d" (snd a).sid
-end
-
-module CodeAssertions =
-  WpContext.StaticGenerator(CodeAssertKey)
+module CodeAssertions = WpContext.StaticGenerator(CodeKey)
     (struct
-      type key = CodeAssertKey.t
+      type key = CodeKey.t
       type data = code_assertions
       let name = "Wp.CfgAnnot.CodeAssertions"
       let compile (kf,stmt) =
@@ -311,54 +322,62 @@ let default_assigns stmt l =
       if l.loop_assigns <> [] then l.loop_assigns
       else [WpPropId.mk_loop_any_assigns_info stmt] }
 
-let get_loop_contract kf stmt : loop_contract =
-  let labels = NormAtLabels.labels_loop stmt in
-  let normalize_pred p = NormAtLabels.preproc_annot labels p in
-  let normalize_annot (i,p) = i, normalize_pred p in
-  let normalize_assigns w = NormAtLabels.preproc_assigns labels w in
-  default_assigns stmt @@
-  reverse_loop_contract @@
-  Annotations.fold_code_annot
-    begin fun _emitter ca l ->
-      match ca.annot_content with
-      | AInvariant(_,true,inv) ->
-          let p = normalize_pred inv.tp_statement in
-          let g_est = WpPropId.mk_loop_inv_id kf stmt ~established:true ca in
-          let g_ind = WpPropId.mk_loop_inv_id kf stmt ~established:false ca in
-          if inv.tp_only_check then
-            { l with
-              loop_established = (g_est,p) :: l.loop_established ;
-              loop_preserved   = (g_ind,p) :: l.loop_preserved }
-          else
-            let g_hyp = WpPropId.mk_inv_hyp_id kf stmt ca in
-            { l with
-              loop_established = (g_est,p) :: l.loop_established ;
-              loop_invariants  = (g_hyp,p) :: l.loop_invariants ;
-              loop_preserved   = (g_ind,p) :: l.loop_preserved }
-      | AVariant(term, None) ->
-          let vpos , vdec = WpStrategy.mk_variant_properties kf stmt ca term in
-          { l with loop_preserved =
-                     normalize_annot vdec ::
-                     normalize_annot vpos ::
-                     l.loop_preserved }
-      | AAssigns(_,WritesAny) ->
-          let asgn = WpPropId.mk_loop_any_assigns_info stmt in
-          { l with loop_assigns = asgn :: l.loop_assigns }
-      | AAssigns(_,Writes w) ->
-          begin match WpPropId.mk_loop_assigns_id kf stmt ca w with
-            | None -> l (* shall not occur *)
-            | Some id ->
-                let w = normalize_assigns w in
-                let a = WpPropId.mk_loop_assigns_desc stmt w in
-                let asgn = WpPropId.mk_assigns_info id a in
+module LoopContract = WpContext.StaticGenerator(CodeKey)
+    (struct
+      type key = CodeKey.t
+      type data = loop_contract
+      let name = "Wp.CfgAnnot.LoopContract"
+      let compile (kf,stmt) =
+        let labels = NormAtLabels.labels_loop stmt in
+        let normalize_pred p = NormAtLabels.preproc_annot labels p in
+        let normalize_annot (i,p) = i, normalize_pred p in
+        let normalize_assigns w = NormAtLabels.preproc_assigns labels w in
+        default_assigns stmt @@
+        reverse_loop_contract @@
+        Annotations.fold_code_annot
+          begin fun _emitter ca l ->
+            match ca.annot_content with
+            | AInvariant(_,true,inv) ->
+                let p = normalize_pred inv.tp_statement in
+                let g_est, g_ind = WpPropId.mk_loop_inv kf stmt ca in
+                if inv.tp_only_check then
+                  { l with
+                    loop_established = (g_est,p) :: l.loop_established ;
+                    loop_preserved   = (g_ind,p) :: l.loop_preserved }
+                else
+                  let g_hyp = WpPropId.mk_inv_hyp_id kf stmt ca in
+                  { l with
+                    loop_established = (g_est,p) :: l.loop_established ;
+                    loop_invariants  = (g_hyp,p) :: l.loop_invariants ;
+                    loop_preserved   = (g_ind,p) :: l.loop_preserved }
+            | AVariant(term, None) ->
+                let vpos , vdec =
+                  WpStrategy.mk_variant_properties kf stmt ca term in
+                { l with loop_preserved =
+                           normalize_annot vdec ::
+                           normalize_annot vpos ::
+                           l.loop_preserved }
+            | AAssigns(_,WritesAny) ->
+                let asgn = WpPropId.mk_loop_any_assigns_info stmt in
                 { l with loop_assigns = asgn :: l.loop_assigns }
-          end
-      | _ -> l
-    end stmt {
-    loop_established = [] ;
-    loop_invariants = [] ;
-    loop_preserved = [] ;
-    loop_assigns = [] ;
-  }
+            | AAssigns(_,Writes w) ->
+                begin match WpPropId.mk_loop_assigns_id kf stmt ca w with
+                  | None -> l (* shall not occur *)
+                  | Some id ->
+                      let w = normalize_assigns w in
+                      let a = WpPropId.mk_loop_assigns_desc stmt w in
+                      let asgn = WpPropId.mk_assigns_info id a in
+                      { l with loop_assigns = asgn :: l.loop_assigns }
+                end
+            | _ -> l
+          end stmt {
+          loop_established = [] ;
+          loop_invariants = [] ;
+          loop_preserved = [] ;
+          loop_assigns = [] ;
+        }
+    end)
+
+let get_loop_contract kf stmt = LoopContract.get (kf,stmt)
 
 (* -------------------------------------------------------------------------- *)

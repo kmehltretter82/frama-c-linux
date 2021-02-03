@@ -115,6 +115,11 @@ let mk_assert_id kf s ca = mk_prop PKProp  (mk_annot_id kf s ca)
 let mk_loop_inv_id kf s ~established ca =
   let kind = if established then PKEstablished else PKPreserved in
   mk_prop kind (mk_annot_id kf s ca)
+
+let mk_loop_inv kf s ca =
+  mk_loop_inv_id kf s ~established:true ca,
+  mk_loop_inv_id kf s ~established:false ca
+
 let mk_inv_hyp_id    kf s ca = mk_prop PKPropLoop  (mk_annot_id kf s ca)
 let mk_var_decr_id   kf s ca = mk_prop PKVarDecr (mk_annot_id kf s ca)
 let mk_var_pos_id    kf s ca = mk_prop PKVarPos  (mk_annot_id kf s ca)

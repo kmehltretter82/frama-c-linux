@@ -128,6 +128,9 @@ val mk_assert_id : kernel_function -> stmt -> code_annotation -> prop_id
 val mk_loop_inv_id : kernel_function -> stmt ->
   established:bool -> code_annotation -> prop_id
 
+(** Invariant establishment and preservation, in this order *)
+val mk_loop_inv : kernel_function -> stmt -> code_annotation -> prop_id * prop_id
+
 (** Invariant used as hypothesis *)
 val mk_inv_hyp_id : kernel_function -> stmt -> code_annotation -> prop_id
 
