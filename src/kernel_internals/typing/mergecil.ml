@@ -618,7 +618,7 @@ module EnumMerging =
            (e2.ename <-
               fst
                 (Alpha.newAlphaName
-                   aeAlpha e2.ename Cil_datatype.Location.unknown);
+                   aeAlpha None e2.ename Cil_datatype.Location.unknown);
             Kernel.debug ~dkey:Kernel.dkey_linker
               "new anonymous name %s" e2.ename;
             false))))
@@ -1403,7 +1403,7 @@ let update_compinfo ci =
   in
   Alpha.registerAlphaName sAlpha ci.cname loc;
   let orig_name = if ci.corig_name = "" then ci.cname else ci.corig_name in
-  let n, _ = Alpha.newAlphaName sAlpha orig_name loc in
+  let n, _ = Alpha.newAlphaName sAlpha None orig_name loc in
   let oldnode = PlainMerging.find true node in
   if oldnode == node then begin
     let node =
@@ -1440,7 +1440,7 @@ let rec update_type_repr t =
       | None -> Cil_datatype.Location.unknown
     in
     Alpha.registerAlphaName vtAlpha ti.tname loc;
-    let n,_ = Alpha.newAlphaName vtAlpha ti.torig_name loc in
+    let n,_ = Alpha.newAlphaName vtAlpha None ti.torig_name loc in
     let oldnode = PlainMerging.find true node in
     if oldnode == node then begin
       let node =
@@ -1851,7 +1851,7 @@ let oneFilePass1 (f:file) : unit =
         let orig_name =
           if ei.eorig_name = "" then ei.ename else ei.eorig_name
         in
-        ignore (Alpha.newAlphaName aeAlpha orig_name l);
+        ignore (Alpha.newAlphaName aeAlpha None orig_name l);
         ei.ereferenced <- false;
         ignore
           (EnumMerging.getNode eEq eSyn !currentFidx ei ei
@@ -2670,7 +2670,7 @@ let oneFilePass2 (f: file) =
         (* Maybe it is static. Rename it then *)
         if vi.vstorage = Static then begin
           let newName, _ =
-            Alpha.newAlphaName vtAlpha vi.vname (CurrentLoc.get ())
+            Alpha.newAlphaName vtAlpha None vi.vname (CurrentLoc.get ())
           in
           let formals_decl =
             try Some (Cil.getFormalsDecl vi)
@@ -3026,7 +3026,7 @@ let oneFilePass2 (f: file) =
               if ci.corig_name = "" then ci.cname else ci.corig_name
             in
             let newname, _ =
-              Alpha.newAlphaName sAlpha orig_name (CurrentLoc.get ())
+              Alpha.newAlphaName sAlpha None orig_name (CurrentLoc.get ())
             in
             ci.cname <- newname;
             ci.creferenced <- true;
@@ -3055,7 +3055,7 @@ let oneFilePass2 (f: file) =
               if ei.eorig_name = "" then ei.ename else ei.eorig_name
             in
             let newname, _ =
-              Alpha.newAlphaName eAlpha orig_name (CurrentLoc.get ())
+              Alpha.newAlphaName eAlpha None orig_name (CurrentLoc.get ())
             in
             ei.ename <- newname;
             ei.ereferenced <- true;
@@ -3064,7 +3064,7 @@ let oneFilePass2 (f: file) =
             List.iter
               (fun item ->
                  let newname,_ =
-                   Alpha.newAlphaName vtAlpha item.eiorig_name item.eiloc
+                   Alpha.newAlphaName vtAlpha None item.eiorig_name item.eiloc
                  in
                  item.einame <- newname)
               ei.eitems;
@@ -3108,7 +3108,7 @@ let oneFilePass2 (f: file) =
           with
             None -> (* We must rename it and keep it *)
             let newname, _ =
-              Alpha.newAlphaName vtAlpha ti.torig_name (CurrentLoc.get ())
+              Alpha.newAlphaName vtAlpha None ti.torig_name (CurrentLoc.get ())
             in
             ti.tname <- newname;
             ti.treferenced <- true;

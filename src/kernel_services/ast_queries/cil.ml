@@ -6219,7 +6219,8 @@ let uniqueVarNames (f: file) : unit =
             let data = CurrentLoc.get () in
             let newname, oldloc =
               Alpha.newAlphaName
-                ~alphaTable:gAlphaTable ~undolist ~lookupname ~data
+                ~alphaTable:gAlphaTable ~undolist:(Some undolist)
+                ~lookupname ~data
             in
             if false && newname <> v.vname then (* Disable this warning *)
               Kernel.warning
