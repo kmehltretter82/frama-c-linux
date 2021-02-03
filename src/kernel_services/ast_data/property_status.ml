@@ -339,12 +339,12 @@ let merge_distinct_emitted x y = match x, y with
     raise Unmergeable
 
 type property_kind =
-  | Hypothesis (* Admitted property with a [Considered_valid] status. *)
+  | Admitted (* Admitted property with a [Considered_valid] status. *)
   | Unverifiable (* Postconditions and assigns of functions without code. *)
   | Consequence of Property.identified_property list (* Logical consequence. *)
   | Tautology (* Always valid. *)
   | Ignored (* Property with no logical status. *)
-  | Other
+  | Verifiable
 
 let is_admitted_code_annot = function
   | Cil_types.AAssert (_, tp)
@@ -381,12 +381,12 @@ let property_kind = function
       | None, Kstmt _, _ ->
         Kernel.fatal "reachability of a stmt without function"
       | Some kf, Kglobal, Before when Kernel_function.is_main kf -> Tautology
-      | _ -> Other
+      | _ -> Verifiable
     end
   | p ->
     if Property.has_status p then
-      if is_admitted p then Hypothesis else
-      if is_verifiable p then Other else Unverifiable
+      if is_admitted p then Admitted else
+      if is_verifiable p then Verifiable else Unverifiable
     else Ignored
 
 module Register_hook = Hook.Build (struct type t = Property.t end)
@@ -411,7 +411,7 @@ and register_as_kernel_logical_consequence ppt =
   match property_kind ppt with
   | Consequence ips -> logical_consequence Emitter.kernel ppt ips
   | Tautology -> emit_valid ppt
-  | Hypothesis | Unverifiable | Ignored | Other -> ()
+  | Admitted | Unverifiable | Ignored | Verifiable -> ()
 
 and unsafe_emit_and_get e ~hyps ~auto ppt ?(distinct=false) s =
   Kernel.feedback ~dkey:Kernel.dkey_prop_status_emit
@@ -534,11 +534,11 @@ let () =
 
 let emit_and_get e ~hyps ppt ?distinct s =
   match property_kind ppt with
-  | Hypothesis | Consequence _ | Ignored ->
+  | Admitted | Consequence _ | Ignored ->
     Kernel.fatal
       "Only the kernel should set the status of property %a (%a, %a)"
       Property.pretty ppt Emitter.pretty e Emitted_status.pretty s
-  | Other | Tautology | Unverifiable ->
+  | Verifiable | Tautology | Unverifiable ->
     unsafe_emit_and_get e ~hyps ~auto:false ppt ?distinct s
 
 let emit e ~hyps ppt ?distinct s = ignore (emit_and_get e ~hyps ppt ?distinct s)
@@ -628,9 +628,9 @@ let conjunction s1 s2 = match s1, s2 with
 
 let is_not_verifiable_but_valid ppt status =
   match property_kind ppt with
-  | Hypothesis -> true
+  | Admitted -> true
   | Unverifiable -> status = Never_tried
-  | Other | Consequence _ | Tautology | Ignored -> false
+  | Verifiable | Consequence _ | Tautology | Ignored -> false
 
 let rec compute_automatic_status _e properties =
   let local_get p =
@@ -696,8 +696,8 @@ let get ppt = get_status ppt
 
 let automatically_computed ppt =
   match property_kind ppt with
-  | Hypothesis | Unverifiable | Ignored | Consequence _ | Tautology -> true
-  | Other -> false
+  | Admitted | Unverifiable | Ignored | Consequence _ | Tautology -> true
+  | Verifiable -> false
 
 (**************************************************************************)
 (** {3 Consolidated property status} *)
