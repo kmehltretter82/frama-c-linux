@@ -6975,6 +6975,23 @@ wchar_t *wcsncat(wchar_t *dest, wchar_t const *src, size_t n)
   return dest;
 }
 
+wchar_t *wcsdup(wchar_t const *ws)
+{
+  wchar_t *__retres;
+  size_t tmp;
+  tmp = wcslen(ws);
+  size_t l = tmp + (size_t)1;
+  wchar_t *p = malloc(sizeof(wchar_t) * l);
+  if (! p) {
+    __fc_errno = 12;
+    __retres = (wchar_t *)0;
+    goto return_label;
+  }
+  wmemcpy(p,ws,l);
+  __retres = p;
+  return_label: return __retres;
+}
+
 /*@ ghost extern int __fc_stack_status; */
 
 /*@ ensures allocation: \fresh{Old, Here}(\result,\old(size));
