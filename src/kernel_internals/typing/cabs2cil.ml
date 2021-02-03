@@ -1368,7 +1368,7 @@ let rec is_boolean_result e =
 (* Like Cil.mkCastT, but it calls typeForInsertedCast *)
 let makeCastT ~(e: exp) ~(oldt: typ) ~(newt: typ) =
   if need_cast oldt newt then
-    Cil.mkCastT e oldt (!typeForInsertedCast e oldt newt)
+    Cil.mkCastT oldt (!typeForInsertedCast e oldt newt) e
   else e
 
 let makeCast ~(e: exp) ~(newt: typ) =
@@ -2652,8 +2652,8 @@ let rec combineTypes (what: combineWhat) (oldt: typ) (t: typ) : typ =
            evaluate them. Check first machine independent comparison. *)
         let checkEqualSize (machdep: bool) =
           let size_t = Cil.theMachine.Cil.typeOfSizeOf in
-          let size_t_oldsz' = Cil.mkCast ~force:false ~e:oldsz' ~newt:size_t in
-          let size_t_sz' = Cil.mkCast ~force:false ~e:sz' ~newt:size_t in
+          let size_t_oldsz' = Cil.mkCast ~force:false ~newt:size_t oldsz' in
+          let size_t_sz' = Cil.mkCast ~force:false ~newt:size_t sz' in
           ExpStructEq.equal
             (constFold machdep size_t_oldsz')
             (constFold machdep size_t_sz')
@@ -2852,7 +2852,7 @@ let rec castTo ?context ?(fromsource=false)
   end else begin
     let nt' = if fromsource then nt' else !typeForInsertedCast e ot' nt' in
     let result = (nt', if theMachine.insertImplicitCasts || fromsource then
-                    Cil.mkCastT ~force:true ~e ~oldt:ot ~newt:nt' else e)
+                    Cil.mkCastT ~force:true ~oldt:ot ~newt:nt' e else e)
     in
     let error s =
       if fromsource then abort_context s else Kernel.fatal ~current:true s
@@ -2872,10 +2872,10 @@ let rec castTo ?context ?(fromsource=false)
       else
         nt,
         Cil.mkCastT
+          ot nt'
           (constFold true
              (new_exp  ~loc:e.eloc
                 (BinOp(Ne,e,Cil.integer ~loc:e.eloc 0,intType))))
-          ot nt'
     | TInt(_,_), TInt(_,_) ->
       (* We used to ignore attributes on integer-integer casts. Not anymore *)
       (* if ikindo = ikindn then (nt, e) else *)

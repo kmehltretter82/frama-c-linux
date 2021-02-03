@@ -253,7 +253,7 @@ let retype_args (_t, e) args =
       | Value_of t -> base_char_type t
       | _ -> unexpected "trying to retype arguments on an ill-typed call"
     in
-    let v = Cil.mkCast (Cil.stripCasts v) base_type in
+    let v = Cil.mkCast base_type (Cil.stripCasts v) in
     [ ptr ; v ; n ]
   | Some fv, [ ptr ; v ; n ] ->
     let ptr = Cil.stripCasts ptr in

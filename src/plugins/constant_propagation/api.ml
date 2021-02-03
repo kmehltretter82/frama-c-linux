@@ -93,7 +93,7 @@ class propagate project fnames ~cast_intro = object(self)
       else
         oldt, newt
     in
-    let exp = Cil.mkCastT e oldt newt in
+    let exp = Cil.mkCastT oldt newt e in
     if cast_intro then
       exp
     else match exp.enode with

@@ -978,11 +978,14 @@ val need_cast: ?force:bool -> typ -> typ -> bool
     type is the same as the old type, then no cast is added, unless [force]
     is [true] (default is [false])
     @modify Fluorine-20130401 add [force] argument
+    @modify Frama-C+dev change order or arguments
 *)
-val mkCastT: ?force:bool -> e:exp -> oldt:typ -> newt:typ -> exp
+val mkCastT: ?force:bool -> oldt:typ -> newt:typ -> exp -> exp
 
-(** Like {!Cil.mkCastT} but uses typeOf to get [oldt] *)
-val mkCast: ?force:bool -> e:exp -> newt:typ -> exp
+(** Like {!Cil.mkCastT} but uses typeOf to get [oldt]
+    @modify Frama-C+dev change order or arguments
+*)
+val mkCast: ?force:bool -> newt:typ -> exp -> exp
 
 (** Equivalent to [stripCasts] for terms. *)
 val stripTermCasts: term -> term

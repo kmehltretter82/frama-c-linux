@@ -5757,7 +5757,7 @@ let getCompField cinfo fieldName =
     (fun fi -> fi.fname = fieldName)
     (Option.value ~default:[] cinfo.cfields)
 
-let mkCastT ?(force=false) ~(e: exp) ~(oldt: typ) ~(newt: typ) =
+let mkCastT ?(force=false) ~(oldt: typ) ~(newt: typ) e =
   let loc = e.eloc in
   (* Issue #!1546
      let force = force ||
@@ -5794,8 +5794,8 @@ let mkCastT ?(force=false) ~(e: exp) ~(oldt: typ) ~(newt: typ) =
   end else
     e
 
-let mkCast ?force ~(e: exp) ~(newt: typ) =
-  mkCastT ?force ~e ~oldt:(typeOf e) ~newt
+let mkCast ?force ~(newt: typ) e =
+  mkCastT ?force ~oldt:(typeOf e) ~newt e
 
 (* TODO: unify this with doBinOp in Cabs2cil. *)
 let mkBinOp ~loc op e1 e2 =
@@ -5804,8 +5804,8 @@ let mkBinOp ~loc op e1 e2 =
   let machdep = false in
   let make_expr common_type res_type =
     constFoldBinOp ~loc machdep op
-      (mkCastT e1 t1 common_type)
-      (mkCastT e2 t2 common_type)
+      (mkCastT t1 common_type e1)
+      (mkCastT t2 common_type e2)
       res_type
   in
   let doArithmetic () =
@@ -5826,7 +5826,7 @@ let mkBinOp ~loc op e1 e2 =
   let compare_pointer op ?cast1 ?cast2 e1 e2 =
     let do_cast e = function
       | None -> e
-      | Some t' -> mkCastT ~force:false ~e ~oldt:(typeOf e) ~newt:t'
+      | Some t' -> mkCastT ~force:false ~oldt:(typeOf e) ~newt:t' e
     in
     let e1, e2 =
       if need_cast ~force:true (typeOf e1) (typeOf e2) then
@@ -5857,14 +5857,14 @@ let mkBinOp ~loc op e1 e2 =
       let t1' = integralPromotion t1 in
       let t2' = integralPromotion t2 in
       constFoldBinOp ~loc machdep op
-        (mkCastT e1 t1 t1') (mkCastT e2 t2 t2') t1'
+        (mkCastT t1 t1' e1) (mkCastT t2 t2' e2) t1'
   | (PlusA|MinusA)
     when isArithmeticType t1 && isArithmeticType t2 -> doArithmetic ()
   | (PlusPI|MinusPI|IndexPI) when isPointerType t1 && isIntegralType t2 ->
     constFoldBinOp ~loc machdep op e1 e2 t1
   | MinusPP when isPointerType t1 && isPointerType t2 ->
     (* NB: Same as cabs2cil. Check if this is really what the standard says*)
-    constFoldBinOp ~loc machdep op e1 (mkCastT e2 t2 t1) intType
+    constFoldBinOp ~loc machdep op e1 (mkCastT t2 t1 e2) intType
   | (Eq|Ne|Lt|Le|Ge|Gt)
     when isArithmeticType t1 && isArithmeticType t2 ->
     doArithmeticComp ()
@@ -5894,8 +5894,8 @@ let mkBinOp_safe_ptr_cmp ~loc op e1 e2 =
       if isPointerType t1 && isPointerType t2
          && not (isZero e1) && not (isZero e2)
       then begin
-        mkCast ~force:true ~e:e1 ~newt:theMachine.upointType,
-        mkCast ~force:true ~e:e2 ~newt:theMachine.upointType
+        mkCast ~force:true ~newt:theMachine.upointType e1,
+        mkCast ~force:true ~newt:theMachine.upointType e2
       end else e1, e2
     | _ -> e1, e2
   in
@@ -6013,7 +6013,7 @@ let rec makeZeroInit ~loc (t: typ) : init =
 
   | TPtr _ as t ->
     SingleInit(
-      if theMachine.insertImplicitCasts then mkCast (zero ~loc) t
+      if theMachine.insertImplicitCasts then mkCast t (zero ~loc)
       else zero ~loc)
   | x -> Kernel.fatal ~current:true "Cannot initialize type: %a" !pp_typ_ref x
 

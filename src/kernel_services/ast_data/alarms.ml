@@ -648,7 +648,7 @@ let create_predicate ?(loc=Location.unknown) alarm =
         | TPtr (TFun (ret, None, var, attrs), _), Some args ->
           let ltyps = List.map (fun arg -> "", Cil.typeOf arg, []) args in
           let typ = TFun (ret, Some ltyps, var, attrs) in
-          Cil.mkCast e (TPtr (typ, []))
+          Cil.mkCast (TPtr (typ, [])) e
         | t', _ ->
           Kernel.fatal
             "Trying to emit a Function_pointer alarm over expression %a \

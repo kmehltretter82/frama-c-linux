@@ -108,7 +108,7 @@ let add_cast ~loc ?name env kf ctx strnum t_opt e =
                only non integral value that can be seen as an integer, while the
                type system infers that it is C-representable (see
                tests/runtime/null.i) *)
-            Cil.mkCast e Cil.longType (* \null *)
+            Cil.mkCast Cil.longType e (* \null *)
           else
             e
         in
@@ -147,7 +147,7 @@ let add_cast ~loc ?name env kf ctx strnum t_opt e =
         Rational.add_cast ~loc ?name e env kf ctx
       else
         (* C type --> another C type *)
-        Cil.mkCastT ~force:false ~e ~oldt:ty ~newt:ctx, env
+        Cil.mkCastT ~force:false ~oldt:ty ~newt:ctx e, env
 
 let constant_to_exp ~loc t c =
   let mk_real s =
@@ -733,7 +733,7 @@ and context_insensitive_term_to_exp kf env t =
     e, env, C_number, name
   | Tblock_length _ -> Env.not_yet env "labeled \\block_length"
   | Tnull ->
-    Cil.mkCast (Cil.zero ~loc) (TPtr(TVoid [], [])), env, C_number, "null"
+    Cil.mkCast (TPtr(TVoid [], [])) (Cil.zero ~loc), env, C_number, "null"
   | TUpdate _ -> Env.not_yet env "functional update"
   | Ttypeof _ -> Env.not_yet env "typeof"
   | Ttype _ -> Env.not_yet env "C type"

@@ -45,7 +45,7 @@ let call_function lval vi args =
   let typs = Cil.argsToList typs in
   let gen_arg exp (_, typ, _) =
     if Cil_datatype.Typ.equal vi.vtype typ then exp
-    else Cil.mkCast exp typ
+    else Cil.mkCast typ exp
   in
   let args = List.map2 gen_arg args typs in
   Call(lval, (Cil.evar vi), args, loc)
