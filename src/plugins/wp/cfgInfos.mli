@@ -26,10 +26,10 @@ type t
 
 module Cfg = Interpreted_automata
 
-val collect : Kernel_function.t -> Cfg.automaton ->
-  ?bhv:string list ->
-  ?prop:string list ->
-  unit -> t
+(** Memoized *)
+val collect :
+  Kernel_function.t -> ?bhv:string list -> ?prop:string list -> unit -> t
+
 val annots : t -> bool
 val doomed : t -> WpPropId.prop_id Bag.t
 val calls : t -> Kernel_function.Set.t

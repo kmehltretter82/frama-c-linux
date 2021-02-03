@@ -100,10 +100,38 @@ let collect_calls ~bhv stmt =
   | _ -> Fset.empty
 
 (* -------------------------------------------------------------------------- *)
+(* --- Memoization Key                                                    --- *)
+(* -------------------------------------------------------------------------- *)
+
+module Key =
+struct
+  type t = { kf: Kernel_function.t ; bhv : string list ; prop : string list }
+  let compare a b =
+    let cmp = Kernel_function.compare a.kf b.kf in
+    if cmp <> 0 then cmp else
+      let cmp = Stdlib.compare a.bhv b.bhv in
+      if cmp <> 0 then cmp else
+        Stdlib.compare a.prop b.prop
+  let pp_filter kind fmt xs =
+    match xs with
+    | [] -> ()
+    | x::xs ->
+        Format.fprintf fmt "~%s:%s" kind x ;
+        List.iter (Format.fprintf fmt ",%s") xs
+  let pretty fmt k =
+    begin
+      Kernel_function.pretty fmt k.kf ;
+      pp_filter "bhv" fmt k.bhv ;
+      pp_filter "prop" fmt k.prop ;
+    end
+end
+
+(* -------------------------------------------------------------------------- *)
 (* --- Main Collection Pass                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-let collect kf cfg ?(bhv=[]) ?(prop=[]) () =
+let compile Key.{ kf ; bhv ; prop } =
+  let cfg = Cfg.get_automaton kf in
   let infos = {
     cfg ;
     annots = false ;
@@ -132,5 +160,20 @@ let collect kf cfg ?(bhv=[]) ?(prop=[]) () =
     ) cfg.stmt_table ;
   (* Collected Infos *)
   infos
+
+(* -------------------------------------------------------------------------- *)
+(* --- Memoization Data                                                   --- *)
+(* -------------------------------------------------------------------------- *)
+
+module Generator = WpContext.StaticGenerator(Key)
+    (struct
+      type key = Key.t
+      type data = t
+      let name = "Wp.CfgInfos.Generator"
+      let compile = compile
+    end)
+
+let collect kf ?(bhv=[]) ?(prop=[]) () =
+  Generator.get { kf ; bhv ; prop }
 
 (* -------------------------------------------------------------------------- *)
