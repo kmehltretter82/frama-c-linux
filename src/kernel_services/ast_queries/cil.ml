@@ -4161,7 +4161,7 @@ and process_aligned_attribute (pp:Format.formatter->unit) ~may_reduce attrs defa
 (* Computation of the offset of the field [fi], given the information [sofar]
    computed for the previous fields. [last] indicates that we are considering
    the last field of the struct. Set to [false] by default for unions. *)
-and offsetOfFieldAcc ?(last=false) ~(fi: fieldinfo) ~(sofar: offsetAcc) : offsetAcc =
+and offsetOfFieldAcc ~last ~(fi: fieldinfo) ~(sofar: offsetAcc) : offsetAcc =
   if msvcMode () then offsetOfFieldAcc_MSVC last fi sofar
   else offsetOfFieldAcc_GCC last fi sofar
 
@@ -4372,7 +4372,7 @@ and bitsSizeOf t =
              oaPrevBitPack = None;
            } in
          let fold acc fi =
-           let lastoff = offsetOfFieldAcc ?last:None ~fi ~sofar:startAcc in
+           let lastoff = offsetOfFieldAcc ~last:false ~fi ~sofar:startAcc in
            if lastoff.oaFirstFree > acc
            then lastoff.oaFirstFree
            else acc
