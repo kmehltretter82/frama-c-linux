@@ -715,28 +715,6 @@ let get_proof g =
     with Not_found -> `Unknown
   in status , target
 
-let set_invalid emitter tgt =
-  Property_status.emit emitter ~hyps:[] tgt Property_status.False_if_reachable
-
-let set_doomed emitter pid =
-  List.iter (set_invalid emitter) (WpPropId.doomed_if_valid pid) ;
-  match WpPropId.unreachable_if_valid pid with
-  | Property.OLStmt(kf,stmt) ->
-      let ca =
-        let filter = WpReached.is_dead_annot in
-        match Annotations.code_annot ~emitter ~filter stmt with
-        | ca::_ -> ca
-        | [] ->
-            let pred_loc = Stmt.loc stmt in
-            let pred_name = [ "Wp" ; "SmokeTest" ] in
-            let pf = { Logic_const.pfalse with pred_loc ; pred_name } in
-            let pf = Logic_const.toplevel_predicate pf in
-            let ca = Logic_const.new_code_annotation (AAssert ([],pf)) in
-            Annotations.add_code_annot emitter ~kf stmt ca ; ca
-      in
-      List.iter (set_invalid emitter) (Property.ip_of_code_annot kf stmt ca)
-  | Property.OLGlob _ | Property.OLContract _ -> ()
-
 let find_proof system g =
   let pi = proof g (WpPropId.property_of_id g.po_pid) in
   try Hproof.find system.proofs pi
@@ -789,7 +767,7 @@ let set_result g p r =
       in
       let hyps = if smoke then [] else WpAnnot.dependencies proof in
       Property_status.emit emitter ~hyps target status ;
-      if smoke && unproved && proved then set_doomed emitter g.po_pid ;
+      if smoke && unproved && proved then WpReached.set_doomed emitter g.po_pid ;
   end
 
 let has_verdict g p =

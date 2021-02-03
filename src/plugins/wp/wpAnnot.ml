@@ -68,6 +68,9 @@ let get_called_assigns kf =
 (* --- Status of Unreachable Annotations                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
+let unreachable_proved = ref 0
+let unreachable_failed = ref 0
+
 let wp_unreachable =
   Emitter.create
     "Unreachable Annotations"
@@ -76,27 +79,36 @@ let wp_unreachable =
     ~tuning:[] (* TBC *)
 
 let set_unreachable pid =
-  let open Property in
-  let emit = function
-    | IPPredicate {ip_kind = PKAssumes _} -> ()
-    | p ->
-        debug "unreachable annotation %a@." Property.pretty p;
-        Property_status.emit wp_unreachable ~hyps:[] p Property_status.True
-  in
-  let pids = match WpPropId.property_of_id pid with
-    | IPPredicate {ip_kind = PKAssumes _} -> []
-    | IPBehavior {ib_kf; ib_kinstr; ib_active; ib_bhv} ->
-        let active = Datatype.String.Set.elements ib_active in
-        (ip_post_cond_of_behavior ib_kf ib_kinstr active ib_bhv) @
-        (ip_requires_of_behavior ib_kf ib_kinstr ib_bhv)
-    | IPExtended _ -> []
-    (* Extended clauses might concern anything. Don't validate them
-       unless we know exactly what is going on. *)
-    | p ->
-        Wp_parameters.result "[CFG] Goal %a : Valid (Unreachable)"
-          WpPropId.pp_propid pid ; [p]
-  in
-  List.iter emit pids
+  if WpPropId.is_smoke_test pid then
+    begin
+      let source = WpPropId.source_of_id pid in
+      WpReached.set_doomed wp_unreachable pid ;
+      incr unreachable_failed ;
+      Wp_parameters.warning ~source "Failed smoke-test"
+    end
+  else
+    let open Property in
+    let emit = function
+      | IPPredicate {ip_kind = PKAssumes _} -> ()
+      | p ->
+          debug "unreachable annotation %a@." Property.pretty p;
+          Property_status.emit wp_unreachable ~hyps:[] p Property_status.True
+    in
+    let pids = match WpPropId.property_of_id pid with
+      | IPPredicate {ip_kind = PKAssumes _} -> []
+      | IPBehavior {ib_kf; ib_kinstr; ib_active; ib_bhv} ->
+          let active = Datatype.String.Set.elements ib_active in
+          (ip_post_cond_of_behavior ib_kf ib_kinstr active ib_bhv) @
+          (ip_requires_of_behavior ib_kf ib_kinstr ib_bhv)
+      | IPExtended _ -> []
+      (* Extended clauses might concern anything. Don't validate them
+         unless we know exactly what is going on. *)
+      | p ->
+          incr unreachable_proved ;
+          Wp_parameters.result "[CFG] Goal %a : Valid (Unreachable)"
+            WpPropId.pp_propid pid ; [p]
+    in
+    List.iter emit pids
 
 (*----------------------------------------------------------------------------*)
 (* Proofs                                                                     *)
@@ -238,7 +250,7 @@ module HdefAnnotBhv = Cil2cfg.HE (struct type t = (stmt * int) end)
 type strategy_info = {
   kf : Kernel_function.t;
   cfg : Cil2cfg.t;
-  reached : WpReached.reached option ;
+  reachability : WpReached.reachability option ;
   cur_bhv : asked_bhv;
   asked_bhvs : asked_bhv list;
   asked_prop : asked_prop;
@@ -915,7 +927,7 @@ let get_loop_annots config vloop s =
 let add_stmt_deadcode_smoke config acc s =
   if cur_fct_default_bhv config
   then
-    match config.reached with
+    match config.reachability with
     | Some r when WpReached.smoking r s ->
         WpStrategy.add_prop_dead_code acc config.kf s
     | _ -> acc
@@ -1282,7 +1294,7 @@ class vexit kf acc =
       Cil.DoChildren
   end
 
-let process_unreached_annots cfg =
+let process_unreached_annots cfg reachability =
   debug "collecting unreachable annotations@.";
   let unreached = Cil2cfg.unreachable_nodes cfg in
   let kf = Cil2cfg.cfg_kf cfg in
@@ -1298,6 +1310,16 @@ let process_unreached_annots cfg =
   let do_annot s _ a acc =
     List.fold_left add_id acc (WpPropId.mk_code_annot_ids kf s a)
   in
+  let do_stmt s acc =
+    let acc =
+      match reachability with
+      | None -> acc
+      | Some r ->
+          if WpReached.smoking r s then
+            WpPropId.mk_smoke kf ~id:"unreachable" ~unreachable:s () :: acc
+          else acc
+    in Annotations.fold_code_annot (do_annot s) s acc
+  in
   let do_node acc n =
     debug
       "process annotations of unreachable node %a@."
@@ -1312,13 +1334,13 @@ let process_unreached_annots cfg =
         ignore Visitor.(visitFramacKf (visitor :> frama_c_visitor) kf) ;
         visitor#acc
     | Cil2cfg.Vcall (s, _, call, _) ->
-        Annotations.fold_code_annot (do_annot s) s acc @
+        do_stmt s acc @
         preconditions_at_call s call
     | Cil2cfg.Vstmt s
     | Cil2cfg.VblkIn (Cil2cfg.Bstmt s, _)
     | Cil2cfg.VblkOut (Cil2cfg.Bstmt s, _)
     | Cil2cfg.Vtest (true, s, _) | Cil2cfg.Vloop (_, s) | Cil2cfg.Vswitch (s,_)
-      -> Annotations.fold_code_annot (do_annot s) s acc
+      -> do_stmt s acc
     | Cil2cfg.Vtest (false, _, _) | Cil2cfg.Vloop2 _
     | Cil2cfg.VblkIn _ | Cil2cfg.VblkOut _ | Cil2cfg.Vend -> acc
   in
@@ -1329,11 +1351,6 @@ let process_unreached_annots cfg =
 (*----------------------------------------------------------------------------*)
 (* Everything must go through here.                                           *)
 (*----------------------------------------------------------------------------*)
-
-let get_cfg kf model =
-  if Wp_parameters.RTE.get () then WpRTE.generate model kf ;
-  let cfg = Cil2cfg.get kf in
-  let _ = process_unreached_annots cfg in cfg
 
 let build_configs assigns kf model behaviors ki property =
   debug "[get_strategies] for behaviors names: %a@."
@@ -1348,16 +1365,18 @@ let build_configs assigns kf model behaviors ki property =
         debug
           "[get_strategies] select stmt %d properties@." s.sid
   in
-  let cfg = get_cfg kf model in
-  let reached =
+  if Wp_parameters.RTE.get () then WpRTE.generate model kf ;
+  let cfg = Cil2cfg.get kf in
+  let reachability =
     if Wp_parameters.SmokeTests.get ()
     && Wp_parameters.SmokeDeadcode.get ()
-    then Some (WpReached.reached kf)
+    then Some (WpReached.reachability kf)
     else None in
+  process_unreached_annots cfg reachability ;
   let def_annot_bhv, bhvs = find_behaviors kf cfg ki behaviors in
   if bhvs <> [] then debug "[get_strategies] %d behaviors" (List.length bhvs);
   let mk_bhv_config bhv = {
-    kf; reached; cfg;
+    kf; reachability; cfg;
     cur_bhv = bhv;
     asked_prop = property;
     asked_bhvs = bhvs;
