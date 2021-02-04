@@ -79,9 +79,9 @@ let make_axiomatic_is_allocable loc () =
   let cond = pand (prel (Rlt, t_i, zero), prel (Rgt, t_i, max)) in
   let app = pnot (papp (is_allocable,[label],[t_i])) in
   let prop = pforall ([lv_i], pimplies (cond, app)) in
-  let prop = Logic_const.toplevel_predicate prop in
+  let prop = Logic_const.toplevel_predicate ~kind:Admit prop in
   let gfun = Dfun_or_pred(is_allocable, loc) in
-  let axiom = Dlemma("never_allocable", true, [label],[],prop,[], loc) in
+  let axiom = Dlemma("never_allocable", [label],[],prop,[], loc) in
   ("dynamic_allocation", [gfun ; axiom]), [is_allocable]
 
 let get_is_allocable loc =

@@ -149,8 +149,7 @@ let ip_is_in_libc ip =
       match ip with
       | IPAxiomatic {iax_attrs=attrs}
       | IPLemma {il_attrs=attrs}
-      | IPAxiom {il_attrs=attrs} ->
-        Cil.is_in_libc attrs
+        -> Cil.is_in_libc attrs
       | _ ->
         false
     end

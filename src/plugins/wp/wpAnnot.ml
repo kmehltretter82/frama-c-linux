@@ -1145,7 +1145,7 @@ let add_global_annotations annots =
           "Global invariant not handled yet ('%s' ignored)"
           linfo.l_var_info.lv_name;
         ()
-    | Dlemma (name,_,_,_,p,_,_) ->
+    | Dlemma (name,_,_,p,_,_) ->
         if use_predicate p.tp_kind then
           WpStrategy.add_axiom annots (LogicUsage.logic_lemma name)
 

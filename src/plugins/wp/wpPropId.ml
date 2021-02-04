@@ -513,7 +513,6 @@ let user_prop_names p =
   | IPFrom _
   | IPAllocation _
   | IPAxiomatic _
-  | IPAxiom _
   | IPBehavior _
   | IPReachable _
   | IPPropertyInstance _
@@ -684,7 +683,6 @@ let annot_hints hs = function
 
 let property_hints hs =
   let open Property in function
-    | IPAxiom  {il_name; il_pred}
     | IPLemma  {il_name; il_pred} ->
         List.iter (add_required hs) (il_name::il_pred.tp_statement.pred_name)
     | IPBehavior _ -> ()
@@ -981,6 +979,10 @@ let merge_assign_info a1 a2 = match a1,a2 with
       Wp_parameters.fatal "Several assigns ?"
 
 
+(* -------------------------------------------------------------------------- *)
+(* --- Axioms                                                             --- *)
+(* -------------------------------------------------------------------------- *)
+
 type axiom_info = prop_id * LogicUsage.logic_lemma
 
 let mk_axiom_info lemma =
@@ -988,11 +990,7 @@ let mk_axiom_info lemma =
 
 let pp_axiom_info fmt (id,thm) =
   Format.fprintf fmt "(@[%a:@ %a@])" pp_propid id
-    Printer.pp_predicate thm.LogicUsage.lem_property
-
-(* -------------------------------------------------------------------------- *)
-(* --- Prop Splitter                                                      --- *)
-(* -------------------------------------------------------------------------- *)
+    Printer.pp_predicate thm.LogicUsage.lem_predicate.tp_statement
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prop Splitter                                                      --- *)

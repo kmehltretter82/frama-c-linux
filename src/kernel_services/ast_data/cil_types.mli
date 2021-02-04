@@ -1827,10 +1827,9 @@ and global_annotation =
   | Daxiomatic of string * global_annotation list * attributes * location
   | Dtype of logic_type_info * location (** declaration of a logic type. *)
   | Dlemma of
-      string * bool * logic_label list * string list *
+      string * logic_label list * string list *
       toplevel_predicate * attributes * location
-  (** definition of a lemma. The boolean flag is [true] if the property should
-      be taken as an axiom and [false] if it must be proved.  *)
+  (** definition of all kinds of lemmas (axioms are admit lemmas).  *)
   | Dinvariant of logic_info * location
   (** global invariant. The predicate does not have any argument. *)
   | Dtype_annot of logic_info * location

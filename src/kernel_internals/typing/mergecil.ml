@@ -867,8 +867,8 @@ let rec global_annot_without_irrelevant_attributes ga =
   | Daxiomatic(n,l,attr,loc) ->
     Daxiomatic(n,List.map global_annot_without_irrelevant_attributes l,
                drop_attributes_for_merge attr,loc)
-  | Dlemma (id,ax,labs,typs,st,attr,loc) ->
-    Dlemma (id,ax,labs,typs,st,drop_attributes_for_merge attr,loc)
+  | Dlemma (id,labs,typs,st,attr,loc) ->
+    Dlemma (id,labs,typs,st,drop_attributes_for_merge attr,loc)
   | Dtype (lti,loc) ->
     Dtype (logic_type_info_without_irrelevant_attributes lti, loc)
   | Dextended (ext, attr, loc) ->
@@ -941,10 +941,10 @@ let rec global_annot_pass1 g = match g with
     ignore (PlainMerging.getNode ltEq ltSyn !currentFidx info.lt_name info
               (Some (l, !currentDeclIdx)))
 
-  | Dlemma (n,is_ax,labs,typs,st,attr,l) ->
+  | Dlemma (n,labs,typs,st,attr,l) ->
     CurrentLoc.set l;
     ignore (PlainMerging.getNode
-              llEq llSyn !currentFidx n (n,(is_ax,labs,typs,st,attr,l))
+              llEq llSyn !currentFidx n (n,(labs,typs,st,attr,l))
               (Some (l, !currentDeclIdx)))
   | Dextended(ext,_,l) ->
     CurrentLoc.set l;
@@ -1569,15 +1569,15 @@ let matchLogicLemma oldfidx (oldid, _ as oldnode) fidx (id, _ as node) =
   let oldlnode = PlainMerging.getNode llEq llSyn oldfidx oldid oldnode None in
   let lnode = PlainMerging.getNode llEq llSyn fidx id node None in
   if oldlnode != lnode then begin
-    let (oldid,(oldax,oldlabs,oldtyps,oldst,oldattr,oldloc)) = oldlnode.ndata in
+    let (oldid,(oldlabs,oldtyps,oldst,oldattr,oldloc)) = oldlnode.ndata in
     let oldfidx = oldlnode.nfidx in
-    let (id,(ax,labs,typs,st,attr,loc)) = lnode.ndata in
+    let (id,(labs,typs,st,attr,loc)) = lnode.ndata in
     let fidx = lnode.nfidx in
     let oldattr = drop_attributes_for_merge oldattr in
     let attr = drop_attributes_for_merge attr in
     if Logic_utils.is_same_global_annotation
-        (Dlemma (oldid,oldax,oldlabs,oldtyps,oldst,oldattr,oldloc))
-        (Dlemma (id,ax,labs,typs,st,attr,loc))
+        (Dlemma (oldid,oldlabs,oldtyps,oldst,oldattr,oldloc))
+        (Dlemma (id,labs,typs,st,attr,loc))
     then begin
       if oldfidx < fidx then
         lnode.nrep <- oldlnode.nrep
@@ -2375,7 +2375,7 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
           mergePushGlobals g
       | Some _ -> ()
     end
-  | Dlemma (n,_,_,_,_,_,l) ->
+  | Dlemma (n,_,_,_,_,l) ->
     begin
       CurrentLoc.set l;
       match PlainMerging.findReplacement true llEq !currentFidx n with

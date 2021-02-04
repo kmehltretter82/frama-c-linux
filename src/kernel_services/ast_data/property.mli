@@ -162,8 +162,6 @@ and identified_lemma = {
   il_loc : location
 }
 
-and identified_axiom = identified_lemma
-
 (** Specialization of a property at a given point, identified by a statement
     and a function, along with the predicate transposed at this point (if it
     can be) and the original property. *)
@@ -195,7 +193,6 @@ and identified_other = {
 and identified_property = private
   | IPPredicate of identified_predicate
   | IPExtended of identified_extended
-  | IPAxiom of identified_axiom
   | IPAxiomatic of identified_axiomatic
   | IPLemma of identified_lemma
   | IPBehavior of identified_behavior
@@ -476,12 +473,6 @@ val ip_of_spec:
 val ip_property_instance:
   kernel_function -> stmt -> Cil_types.identified_predicate option ->
   identified_property -> identified_property
-
-(** Builds an IPAxiom.
-    @since Carbon-20110201
-    @modify Oxygen-20120901 takes an identified_axiom instead of a string
-*)
-val ip_axiom: identified_axiom -> identified_property
 
 (** Build an IPLemma.
     @since Nitrogen-20111001

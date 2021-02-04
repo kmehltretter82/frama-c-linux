@@ -2113,11 +2113,11 @@ and childrenAnnotation vis a =
            Logic_env.add_logic_type ti'.lt_name ti')
         vis#get_filling_actions;
     if ti' != ti then Dtype (ti',loc) else a
-  | Dlemma(s,is_axiom,labels,tvars,p,attr,loc) ->
+  | Dlemma(s,labels,tvars,p,attr,loc) ->
     let p' = visitCilToplevel_predicate vis p in
     let attr' = visitCilAttributes vis attr in
     if p' != p || attr != attr' then
-      Dlemma(s,is_axiom,labels,tvars,p',attr',loc)
+      Dlemma(s,labels,tvars,p',attr',loc)
     else a
   | Dinvariant (p,loc) ->
     let p' = visitCilLogicInfo vis p in
@@ -5373,7 +5373,7 @@ let global_annotation_attributes = function
   | Dvolatile (_,_,_,attrs,_) -> attrs
   | Daxiomatic (_,_,attrs,_) -> attrs
   | Dtype ({ lt_attr }, _) -> lt_attr
-  | Dlemma (_,_,_,_,_,attrs,_) -> attrs
+  | Dlemma (_,_,_,_,attrs,_) -> attrs
   | Dinvariant ({l_var_info = { lv_attr }}, _) -> lv_attr
   | Dtype_annot ({l_var_info = { lv_attr }}, _) -> lv_attr
   | Dmodel_annot ({ mi_attr }, _) -> mi_attr

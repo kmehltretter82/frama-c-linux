@@ -57,15 +57,12 @@ let trim name =
 (* --- Definition Blocks                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
-type lkind = [ `Axiom | `Check | `Lemma ]
-
 type logic_lemma = {
   lem_name : string ;
-  lem_kind : lkind ;
   lem_position : Filepath.position ;
   lem_types : string list ;
   lem_labels : logic_label list ;
-  lem_property : predicate ;
+  lem_predicate : toplevel_predicate ;
   lem_depends : logic_lemma list ;
   (* global lemmas declared before in AST order (in reverse order) *)
   lem_attrs : attributes ;
@@ -194,30 +191,21 @@ let pp_profile fmt l =
 (* -------------------------------------------------------------------------- *)
 
 let ip_lemma l =
-  let open Property in
-  let mk_prop, kind =
-    match l.lem_kind with
-    | `Axiom -> Property.ip_axiom, Admit
-    | `Lemma -> Property.ip_lemma, Assert
-    | `Check -> Property.ip_lemma, Check
-  in
-  mk_prop
-    {il_name = l.lem_name; il_labels = l.lem_labels;
-     il_args = l.lem_types; il_loc = (l.lem_position, l.lem_position);
-     il_attrs = l.lem_attrs;
-     il_pred = Logic_const.toplevel_predicate ~kind l.lem_property}
+  Property.ip_lemma {
+    il_name = l.lem_name; il_labels = l.lem_labels;
+    il_args = l.lem_types; il_loc = (l.lem_position, l.lem_position);
+    il_attrs = l.lem_attrs;
+    il_pred = l.lem_predicate;
+  }
 
 let lemma_of_global ~context = function
-  | Dlemma(name,axiom,labels,types,pred,attrs,loc) ->
-      let kind = if axiom then `Axiom else
-        if pred.tp_kind = Check then `Check else `Lemma in
+  | Dlemma(name,labels,types,pred,attrs,loc) ->
       {
         lem_name = name ;
         lem_position = fst loc ;
         lem_types = types ;
         lem_labels = labels ;
-        lem_kind = kind ;
-        lem_property = pred.tp_statement ;
+        lem_predicate = pred ;
         lem_depends = context ;
         lem_attrs = attrs ;
       }
@@ -418,7 +406,7 @@ class visitor =
       | Dlemma _ ->
           let lem = lemma_of_global database.proofcontext global in
           register_lemma database self#section lem ;
-          if lem.lem_kind <> `Check then
+          if Logic_utils.use_predicate lem.lem_predicate.tp_kind then
             database.proofcontext <- lem :: database.proofcontext ;
           SkipChildren
 
@@ -556,12 +544,12 @@ let pp_decl fmt d l =
   end
 
 let pp_kind fmt = function
-  | `Axiom -> Format.pp_print_string fmt "axiom"
-  | `Lemma -> Format.pp_print_string fmt "lemma"
-  | `Check -> Format.pp_print_string fmt "check lemma"
+  | Admit -> Format.pp_print_string fmt "axiom"
+  | Assert -> Format.pp_print_string fmt "lemma"
+  | Check -> Format.pp_print_string fmt "check lemma"
 
 let pp_lemma fmt l =
-  Format.fprintf fmt " * %a '%s'@\n" pp_kind l.lem_kind l.lem_name
+  Format.fprintf fmt " * %a '%s'@\n" pp_kind l.lem_predicate.tp_kind l.lem_name
 
 let get_name l = compute () ; compute_logicname l
 
@@ -596,7 +584,7 @@ let dump () =
       SMap.iter
         (fun l (lem,s) ->
            Format.fprintf fmt " * %a '%s' in %a@\n"
-             pp_kind lem.lem_kind
+             pp_kind lem.lem_predicate.tp_kind
              l pp_section s)
         d.lemmas ;
       Format.fprintf fmt "-------------------------------------------------@." ;

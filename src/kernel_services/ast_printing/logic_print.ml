@@ -364,13 +364,12 @@ let rec print_decl fmt d =
       (pp_list ~pre:"<@[" ~sep:",@ " ~suf:"@>}" pp_print_string) tvar
       (pp_list ~sep:",@ " print_typed_ident) prms
       (pp_list ~sep:"@\n" print_case) cases
-  | LDlemma(name,is_axiom,labels,tvar,body) ->
-    fprintf fmt "@[<2>%s%a@ %s%a%a:@ %a;@]"
+  | LDlemma(name,labels,tvar,body) ->
+    fprintf fmt "@[<2>%s@ %s%a%a:@ %a;@]"
       (match body.tp_kind with
-       | Assert -> ""
-       | Check ->  "check "
-       | Admit ->   "admit")
-      (pp_cond ~pr_false:"lemma" is_axiom) "axiom" name
+       | Admit ->   "axiom"
+       | Assert -> "lemma"
+       | Check ->  "check lemma") name
       (pp_list ~pre:"{@[" ~sep:",@ " ~suf:"@]}" pp_print_string) labels
       (pp_list ~pre:"<@[" ~sep:",@ " ~suf:"@>}" pp_print_string) tvar
       print_lexpr body.tp_statement

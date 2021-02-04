@@ -3217,12 +3217,15 @@ class cil_printer () = object (self)
         self#logic_var pred.l_var_info
         self#predicate (pred_body pred.l_body);
       current_label <- old_label
-    | Dlemma(name, is_axiom, labels, tvars, pred, _attr, _) ->
+    | Dlemma(name, labels, tvars, pred, _attr, _) ->
       (* attributes are meant to be purely internal for now. *)
       let old_lab = current_label in
-      fprintf fmt "@[<hv 2>@[<hov 1>%a%a %a%a%a:@]@ %t%a;@]@\n"
-        self#pp_predicate_kind pred
-        self#pp_acsl_keyword (if is_axiom then "axiom" else "lemma")
+      fprintf fmt "@[<hv 2>@[<hov 1>%a %a%a%a:@]@ %t%a;@]@\n"
+        self#pp_acsl_keyword
+        (match pred.tp_kind with
+         | Admit -> "axiom"
+         | Assert -> "lemma"
+         | Check -> "check lemma")
         self#varname name
         self#labels labels
         self#polyTypePrms tvars

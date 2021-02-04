@@ -499,14 +499,15 @@ let to_do_on_select
         "This is a complete behaviors clause.@.%a@."
         pretty_predicate_status ip;
       main_ui#view_original (location ip)
-    | PIP(IPAxiom _ as ip) ->
-      main_ui#pretty_information "This is an axiom.@.";
-      main_ui#view_original (location ip)
     | PIP(IPAxiomatic _ as ip) ->
       main_ui#pretty_information "This is an axiomatic.@.";
       main_ui#view_original (location ip)
-    | PIP(IPLemma _ as ip) ->
-      main_ui#pretty_information "This is a lemma.@.";
+    | PIP(IPLemma { il_pred } as ip) ->
+      let kind = match il_pred.tp_kind with
+        | Admit -> "axiom"
+        | Assert -> "lemma"
+        | Check -> "check lemma" in
+      main_ui#pretty_information "This is a %s.@." kind;
       main_ui#view_original (location ip)
     | PIP(IPTypeInvariant _ as ip) ->
       main_ui#pretty_information "This is a type invariant.@.";

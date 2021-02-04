@@ -155,7 +155,7 @@ struct
                     prefix name Chunk.pretty chunk i in
                 let l_lemma = F.p_hyps conditions (p_equal value1 value2) in
                 Definitions.define_lemma {
-                  l_kind = `Axiom ;
+                  l_kind = Admit ;
                   l_name ; l_types = 0 ;
                   l_triggers ;
                   l_forall = F.p_vars l_lemma ;
@@ -293,7 +293,7 @@ struct
             d_cluster = cluster ;
           } ;
           Definitions.define_lemma {
-            l_kind = `Axiom ;
+            l_kind = Admit ;
             l_name = name ; l_types = 0 ;
             l_forall = F.p_vars lemma ;
             l_triggers = [[Trigger.of_term va]] ;
@@ -390,7 +390,7 @@ struct
           let is_init_r = M.is_init_range sigma obj loc e_one in
           let lemma = p_equiv is_init_p is_init_r in
           Definitions.define_lemma {
-            l_kind = `Axiom ;
+            l_kind = Admit ;
             l_name = name ^ "_range" ; l_types = 0 ;
             l_forall = params ;
             l_triggers = [] ;
@@ -438,7 +438,7 @@ struct
             let is_init_r = M.is_init_range sigma obj loc len in
             let lemma = p_equiv is_init_p is_init_r in
             Definitions.define_lemma {
-              l_kind = `Axiom ;
+              l_kind = Admit ;
               l_name = name ^ "_range" ; l_types = 0 ;
               l_forall = params ;
               l_triggers = [] ;
