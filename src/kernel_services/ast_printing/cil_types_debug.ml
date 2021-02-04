@@ -882,9 +882,14 @@ and pp_identified_predicate fmt identified_predicate =
     identified_predicate.ip_id
     pp_toplevel_predicate identified_predicate.ip_content
 
+and pp_predicate_kind fmt = function
+  | Assert -> Format.fprintf fmt "Assert"
+  | Check -> Format.fprintf fmt "Check"
+  | Admit -> Format.fprintf fmt "Admit"
+
 and pp_toplevel_predicate fmt toplevel_predicate =
-  Format.fprintf fmt "{tp_only_check=%B;tp_statement=%a}"
-    toplevel_predicate.tp_only_check
+  Format.fprintf fmt "{tp_kind=%a;tp_statement=%a}"
+    pp_predicate_kind toplevel_predicate.tp_kind
     pp_predicate toplevel_predicate.tp_statement
 
 and pp_predicate fmt predicate = Format.fprintf fmt "{%a%apred_content=%a}"

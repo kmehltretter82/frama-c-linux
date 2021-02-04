@@ -111,6 +111,7 @@
          if flag then Hashtbl.add c_kw i t
       )
       [
+        "admit", (fun _ -> ADMIT), false;
         "allocates", (fun _ -> ALLOCATES), false;
         "assert", (fun _ -> ASSERT), false;
         "assigns", (fun _ -> ASSIGNS), false;
@@ -312,6 +313,15 @@
     | CHECK, LOOP -> true, CHECK_LOOP
     | CHECK, INVARIANT -> true, CHECK_INVARIANT
     | CHECK, LEMMA -> true, CHECK_LEMMA
+    | ADMIT, REQUIRES -> true, ADMIT_REQUIRES
+    | ADMIT, ENSURES -> true, ADMIT_ENSURES
+    | ADMIT, EXITS -> true, ADMIT_EXITS
+    | ADMIT, RETURNS -> true, ADMIT_RETURNS
+    | ADMIT, BREAKS -> true, ADMIT_BREAKS
+    | ADMIT, CONTINUES -> true, ADMIT_CONTINUES
+    | ADMIT, LOOP -> true, ADMIT_LOOP
+    | ADMIT, INVARIANT -> true, ADMIT_INVARIANT
+    | ADMIT, LEMMA -> true, ADMIT_LEMMA
     | _ -> false, current
 }
 
@@ -356,7 +366,7 @@ rule token = parse
       let cabsloc = Cil_datatype.Location.of_lexing_loc loc in
       let s = lexeme lexbuf in
       let curr_tok = identifier s cabsloc in
-      if curr_tok = CHECK then begin
+      if curr_tok = CHECK || curr_tok = ADMIT then begin
         let next_tok =
           token { lexbuf with refill_buff = lexbuf.refill_buff }
         in

@@ -113,6 +113,7 @@ module Refreshers: sig
   val from: check
   val user_assertions: check
   val user_checks: check
+  val user_admits: check
   val rte: check
   val invariant: check
   val variant: check
@@ -242,6 +243,8 @@ struct
     add ~name:"User assertions" ~hint:"Show user assertions" ()
   let user_checks =
     add ~name:"User checks" ~hint:"Show user checks" ()
+  let user_admits =
+    add ~name:"User admits" ~hint:"Show user hypotheses" ()
   (* Function called when RTEs are enabled or disabled. *)
   let set_rte = ref (fun _b -> ())
   let rte = add ~set:(fun b -> !set_rte b) ~name:"RTEs"
@@ -364,6 +367,7 @@ struct
     from.add hb;
     user_assertions.add hb;
     user_checks.add hb;
+    user_admits.add hb;
     rte.add hb;
     invariant.add hb;
     variant.add hb;
@@ -636,12 +640,15 @@ let make_panel (main_ui:main_window_extension_points) =
     | IPLemma _ -> lemmas.get ()
     | IPComplete _ -> complete_disjoint.get ()
     | IPDisjoint _ -> complete_disjoint.get ()
-    | IPCodeAnnot {ica_ca={annot_content=AAssert(_, {tp_only_check})} as ca} ->
+    | IPCodeAnnot {ica_ca={annot_content=AAssert(_, {tp_kind})} as ca} ->
       begin
         match Alarms.find ca with
         | Some a -> rte.get () && active_alarm a
         | None ->
-          if tp_only_check then user_checks.get() else  user_assertions.get ()
+          match tp_kind with
+          | Assert -> user_assertions.get ()
+          | Check -> user_checks.get ()
+          | Admit -> user_admits.get ()
       end
     | IPCodeAnnot {ica_ca={annot_content = AInvariant _}} ->
       invariant.get ()

@@ -1317,12 +1317,17 @@ let add_code_annot ?(keep_empty=true) emitter ?kf stmt ca =
     fill_tables ca (Property.ip_of_code_annot kf stmt ca)
 
 let add_assert e ?kf stmt a =
-  let a = Logic_const.toplevel_predicate ~only_check:false a in
+  let a = Logic_const.toplevel_predicate ~kind:Assert a in
   let a = Logic_const.new_code_annotation (AAssert ([],a)) in
   add_code_annot e ?kf stmt a
 
 let add_check e ?kf stmt a =
-  let a = Logic_const.toplevel_predicate ~only_check:true a in
+  let a = Logic_const.toplevel_predicate ~kind:Check a in
+  let a = Logic_const.new_code_annotation (AAssert ([],a)) in
+  add_code_annot e ?kf stmt a
+
+let add_admit e ?kf stmt a =
+  let a = Logic_const.toplevel_predicate ~kind:Admit a in
   let a = Logic_const.new_code_annotation (AAssert ([],a)) in
   add_code_annot e ?kf stmt a
 

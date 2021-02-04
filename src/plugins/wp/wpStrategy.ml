@@ -24,6 +24,7 @@ let dkey = Wp_parameters.register_category "strategy" (* debugging key *)
 let debug fmt = Wp_parameters.debug ~dkey fmt
 
 open Cil_types
+open Logic_utils
 open LogicUsage
 
 (* -------------------------------------------------------------------------- *)
@@ -171,7 +172,7 @@ let add_prop_fct_pre_bhv acc kind kf bhv =
     Logic_const.(pat (p,pre_label))
   in
   let requires =
-    List.filter (fun x -> not x.ip_content.tp_only_check) bhv.b_requires
+    List.filter (fun x -> use_predicate x.ip_content.tp_kind) bhv.b_requires
   in
   let requires = Logic_const.pands (List.map norm_pred requires) in
   let assumes = Logic_const.pands (List.map norm_pred bhv.b_assumes) in
@@ -183,21 +184,23 @@ let add_prop_fct_pre_bhv acc kind kf bhv =
   add_prop acc kind id p
 
 let add_prop_fct_pre acc kind kf bhv ~assumes pre =
-  if pre.ip_content.tp_only_check then acc else begin
+  if use_predicate pre.ip_content.tp_kind then begin
     let id = WpPropId.mk_pre_id kf Kglobal bhv pre in
     let labels = NormAtLabels.labels_fct_pre in
     let p = Logic_const.pred_of_id_pred pre in
     let p = Logic_const.(pat (p,pre_label)) in
     let p = normalize id ?assumes labels p in
     add_prop acc kind id p
-  end
+  end else acc
 
 let add_prop_fct_post acc kind kf  bhv tkind post =
-  let id = WpPropId.mk_fct_post_id kf bhv (tkind, post) in
-  let labels = NormAtLabels.labels_fct_post in
-  let p = Logic_const.pred_of_id_pred post in
-  let p = normalize id labels p in
-  add_prop acc kind id p
+  if verify_predicate post.ip_content.tp_kind then begin
+    let id = WpPropId.mk_fct_post_id kf bhv (tkind, post) in
+    let labels = NormAtLabels.labels_fct_post in
+    let p = Logic_const.pred_of_id_pred post in
+    let p = normalize id labels p in
+    add_prop acc kind id p
+  end else acc
 
 let add_prop_fct_bhv_pre acc kind kf bhv =
   let assumes = None in
@@ -206,11 +209,13 @@ let add_prop_fct_bhv_pre acc kind kf bhv =
   List.fold_left add acc bhv.b_assumes
 
 let add_prop_stmt_pre acc kind kf s bhv ~assumes pre =
-  let id = WpPropId.mk_pre_id kf (Kstmt s) bhv pre in
-  let labels = NormAtLabels.labels_stmt_pre ~kf s in
-  let p = Logic_const.pred_of_id_pred pre in
-  let p = normalize id labels ?assumes p in
-  add_prop acc kind id p
+  if use_predicate pre.ip_content.tp_kind then begin
+    let id = WpPropId.mk_pre_id kf (Kstmt s) bhv pre in
+    let labels = NormAtLabels.labels_stmt_pre ~kf s in
+    let p = Logic_const.pred_of_id_pred pre in
+    let p = normalize id labels ?assumes p in
+    add_prop acc kind id p
+  end else acc
 
 let add_prop_stmt_bhv_requires acc kind kf s bhv ~with_assumes =
   let assumes =
@@ -227,14 +232,16 @@ let add_prop_stmt_spec_pre acc kind kf s spec =
   in List.fold_left add_bhv_pre acc spec.spec_behavior
 
 let add_prop_stmt_post acc kind kf s bhv tkind l_post ~assumes post =
-  let id = WpPropId.mk_stmt_post_id kf s bhv (tkind, post) in
-  let labels = NormAtLabels.labels_stmt_post ~kf s l_post in
-  let p = Logic_const.pred_of_id_pred post in
-  let p = normalize id labels ?assumes p in
-  add_prop acc kind id p
+  if verify_predicate post.ip_content.tp_kind then begin
+    let id = WpPropId.mk_stmt_post_id kf s bhv (tkind, post) in
+    let labels = NormAtLabels.labels_stmt_post ~kf s l_post in
+    let p = Logic_const.pred_of_id_pred post in
+    let p = normalize id labels ?assumes p in
+    add_prop acc kind id p
+  end else acc
 
 let update_kind kind pre =
-  if pre.ip_content.tp_only_check then begin
+  if pre.ip_content.tp_kind = Check then begin
     match kind with
     | AcallPre(false,_) -> None
     | AcallPre(true, kf) -> Some (AcallCheck kf)

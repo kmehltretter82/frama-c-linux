@@ -29,8 +29,9 @@ let has_requires spec =
 
 let code_annotation_text ca =
   match ca.annot_content with
-  | AAssert (_, {tp_only_check=false}) ->  "assertion"
-  | AAssert (_, {tp_only_check=true}) -> "check"
+  | AAssert (_, {tp_kind=Assert}) ->  "assertion"
+  | AAssert (_, {tp_kind=Check}) -> "check"
+  | AAssert (_, {tp_kind=Admit}) -> "admit"
   | AInvariant _ ->  "loop invariant"
   | APragma _  | AVariant _ | AAssigns _ | AAllocation _ | AStmtSpec _
   | AExtended _  ->
@@ -46,7 +47,7 @@ let code_annotation_loc ca stmt =
 
 let mark_unreachable () =
   let mark ppt =
-    if not (Property_status.automatically_proven ppt) then begin
+    if not (Property_status.automatically_computed ppt) then begin
       Value_parameters.debug "Marking property %a as dead"
         Description.pp_property ppt;
       let emit =

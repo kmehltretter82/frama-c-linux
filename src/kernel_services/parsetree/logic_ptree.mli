@@ -161,7 +161,8 @@ and lexpr_node =
   | PLrepeat of lexpr * lexpr
       (** repeat a list of elements a number of times. *)
 
-type toplevel_predicate = { tp_only_check: bool; tp_statement: lexpr }
+type toplevel_predicate =
+  { tp_kind: Cil_types.predicate_kind; tp_statement: lexpr }
 
 type extension = string * lexpr list
 

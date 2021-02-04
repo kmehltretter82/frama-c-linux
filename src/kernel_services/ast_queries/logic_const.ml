@@ -43,11 +43,11 @@ let new_code_annotation annot =
 
 let fresh_code_annotation = AnnotId.next
 
-let toplevel_predicate ?(only_check=false) p =
-  { tp_only_check = only_check; tp_statement = p }
+let toplevel_predicate ?(kind=Assert) p =
+  { tp_kind = kind; tp_statement = p }
 
-let new_predicate ?only_check p =
-  { ip_id = PredicateId.next (); ip_content = toplevel_predicate ?only_check p }
+let new_predicate ?kind p =
+  { ip_id = PredicateId.next (); ip_content = toplevel_predicate ?kind p }
 
 let fresh_predicate_id = PredicateId.next
 
