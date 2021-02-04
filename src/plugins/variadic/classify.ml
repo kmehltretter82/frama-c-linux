@@ -41,7 +41,7 @@ let find_function env s =
     None
 
 let mk_overload env names =
-  let vis = Extends.List.filter_map (find_function env) names in
+  let vis = List.filter_map (find_function env) names in
   let overload = List.map (fun vi -> Typ.params_types vi.vtype, vi) vis in
   Overload overload
 
@@ -152,9 +152,13 @@ let classify_std env vi = match vi.vname with
   (* Anything else *)
   | _ -> Unknown
 
+let is_variadic_function vi =
+  match Cil.unrollType vi.vtype with
+  | TFun (_, _, b, _) -> b
+  |  _ -> false
 
 let classify env vi =
-  if Extends.Cil.is_variadic_function vi then begin
+  if is_variadic_function vi then begin
     Self.result ~level:2 ~current:true
       "Declaration of variadic function %s." vi.vname;
     Some {

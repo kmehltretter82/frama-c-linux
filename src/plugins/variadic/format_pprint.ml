@@ -119,12 +119,12 @@ let pp_s_specification ff (spec: s_conversion_specification) =
     (string_of_cs spec.s_conversion_specifier)
 
 let pp_f_format ff fl =
-  let fl = Extends.List.filter_map
-      (function | Specification s -> Some s | _ -> None) fl in
+  let fl = List.filter_map
+      (function Specification s -> Some s | _ -> None) fl in
   Pretty_utils.pp_list ~sep:"@." (fun ff s -> pp_f_specification ff s) ff fl
 
 let pp_s_format ff (fl: s_format) =
-  let fl = Extends.List.filter_map
+  let fl = List.filter_map
       (function | Specification s -> Some s | _ -> None) fl in
   Pretty_utils.pp_list ~sep:"@." (fun ff s -> pp_s_specification ff s) ff fl
 

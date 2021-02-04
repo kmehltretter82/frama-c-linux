@@ -23,7 +23,6 @@
 open Cil_types
 open Va_types
 open Options
-module Cil = Extends.Cil
 module List = Extends.List
 module Typ = Extends.Typ
 module Build = Va_build

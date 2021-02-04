@@ -100,7 +100,7 @@
 [wp] [Qed] Goal typed_init_t2_bis_v2_loop_variant_positive : Valid
 [wp] [Qed] Goal typed_init_t2_bis_v2_call_init_requires : Valid
 [wp] [Qed] Goal typed_init_t2_bis_v2_call_init_requires_2 : Valid
-[wp] Proved goals:   92 / 92
+[wp] Proved goals:   97 / 97
   Qed:            52 
   Alt-Ergo:       40
 ------------------------------------------------------------

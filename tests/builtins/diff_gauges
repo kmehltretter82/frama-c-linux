@@ -1,5 +1,5 @@
 diff tests/builtins/oracle/linked_list.0.res.oracle tests/builtins/oracle_gauges/linked_list.0.res.oracle
-1122a1123,1128
+2290a2291,2296
 > [eva] computing for function printf_va_1 <- main.
 >   Called from tests/builtins/linked_list.c:51.
 > [eva] Done for function printf_va_1
@@ -7,7 +7,7 @@ diff tests/builtins/oracle/linked_list.0.res.oracle tests/builtins/oracle_gauges
 >   Called from tests/builtins/linked_list.c:51.
 > [eva] Done for function printf_va_1
 diff tests/builtins/oracle/linked_list.1.res.oracle tests/builtins/oracle_gauges/linked_list.1.res.oracle
-626a627,632
+798a799,804
 > [eva] computing for function printf_va_1 <- main.
 >   Called from tests/builtins/linked_list.c:51.
 > [eva] Done for function printf_va_1

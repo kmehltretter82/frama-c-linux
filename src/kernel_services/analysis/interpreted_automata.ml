@@ -526,7 +526,7 @@ let build_automaton ~annotations kf =
         control.dest
 
       | Throw _ | TryCatch _ | TryFinally _ | TryExcept _
-        -> Kernel.not_yet_implemented
+        -> Kernel.not_yet_implemented ~source:(fst loc)
              "[interpreted_automata] exception handling"
     in
     (* Update statement table *)

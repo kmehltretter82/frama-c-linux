@@ -88,6 +88,26 @@
   Called from tests/slicing/bts1768.i:46.
 [eva] Recording results for fsm_transition
 [eva] Done for function fsm_transition
+[eva] tests/slicing/bts1768.i:45: Reusing old results for call to lecture
+[eva] computing for function fsm_transition <- main.
+  Called from tests/slicing/bts1768.i:46.
+[eva] Recording results for fsm_transition
+[eva] Done for function fsm_transition
+[eva] tests/slicing/bts1768.i:45: Reusing old results for call to lecture
+[eva] computing for function fsm_transition <- main.
+  Called from tests/slicing/bts1768.i:46.
+[eva] Recording results for fsm_transition
+[eva] Done for function fsm_transition
+[eva] tests/slicing/bts1768.i:45: Reusing old results for call to lecture
+[eva] computing for function fsm_transition <- main.
+  Called from tests/slicing/bts1768.i:46.
+[eva] Recording results for fsm_transition
+[eva] Done for function fsm_transition
+[eva] tests/slicing/bts1768.i:45: Reusing old results for call to lecture
+[eva] computing for function fsm_transition <- main.
+  Called from tests/slicing/bts1768.i:46.
+[eva] Recording results for fsm_transition
+[eva] Done for function fsm_transition
 [eva:alarm] tests/slicing/bts1768.i:51: Warning: 
   signed overflow. assert step + 1 ≤ 2147483647;
 [eva] tests/slicing/bts1768.i:45: Reusing old results for call to lecture

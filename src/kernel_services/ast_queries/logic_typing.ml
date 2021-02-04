@@ -4163,9 +4163,16 @@ struct
       if in_axiomatic then
         (* Not supported yet. See issue 43 on ACSL's github repository. *)
         C.error loc "Nested axiomatic. Ignoring body of %s" id
-      else
+      else begin
+        let change oldloc =
+          C.error loc
+            "Duplicated axiomatics %s (first occurrence at %a)"
+            id Cil_printer.pp_location oldloc
+        in
         let l = List.map (annot true) decls in
+        ignore (Logic_env.Axiomatics.memo ~change (fun _ -> loc) id);
         Daxiomatic(id,l,[],loc)
+      end
     | LDtype(s,l,def) ->
       let env = init_type_variables loc l in
       let my_info =

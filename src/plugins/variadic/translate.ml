@@ -172,11 +172,7 @@ let translate_variadics (file : file) =
 
         | Call(lv, callee, args, loc) ->
           let is_variadic =
-            try
-              let args, _ = Typ.ghost_partitioned_params (Cil.typeOf callee) in
-              let last = Extends.List.last args in
-              last = Generic.vpar
-            with Extends.List.EmptyList -> false
+            List.mem Generic.vpar (Typ.params (Cil.typeOf callee))
           in
           if is_variadic then begin
             let mk_call f args = Call (lv, f, args, loc) in
@@ -233,7 +229,7 @@ let translate_variadics (file : file) =
     method! vexpr exp =
       begin match exp.enode with
         | AddrOf (Var vi, NoOffset)
-          when Extends.Cil.is_variadic_function vi && is_framac_builtin vi ->
+          when Classify.is_variadic_function vi && is_framac_builtin vi ->
           Self.not_yet_implemented
             ~source:(fst exp.eloc)
             "The variadic plugin doesn't handle calls to a pointer to the \

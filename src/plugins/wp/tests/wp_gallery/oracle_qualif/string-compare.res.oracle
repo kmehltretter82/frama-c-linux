@@ -56,7 +56,7 @@
 [wp] [Qed] Goal typed_main_assigns_normal_part1 : Valid
 [wp] [Qed] Goal typed_main_assigns_normal_part2 : Valid
 [wp] [Alt-Ergo] Goal typed_main_call_stringCompare_requires_validStrings : Valid
-[wp] Proved goals:   51 / 51
+[wp] Proved goals:   53 / 53
   Qed:            33 
   Alt-Ergo:       18
 ------------------------------------------------------------

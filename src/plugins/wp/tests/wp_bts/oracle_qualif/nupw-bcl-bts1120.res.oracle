@@ -17,7 +17,7 @@
 [wp] [Qed] Goal typed_g_assigns_normal_part3 : Valid
 [wp] [Qed] Goal typed_unreachable_smt_with_contract_ensures_ok_2 : Valid
 [wp] [Qed] Goal typed_unreachable_smt_with_contract_call_f_with_precond_2_requires_ok : Valid
-[wp] Proved goals:    8 / 8
+[wp] Proved goals:   14 / 14
   Qed:             8
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

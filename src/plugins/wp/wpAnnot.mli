@@ -30,7 +30,10 @@ open Cil_types
 (* ###      WARNING:  DEPRECATED API                                      ### *)
 (* ########################################################################## *)
 
-(**/**)
+(*----------------------------------------------------------------------------*)
+
+val unreachable_proved : int ref
+val unreachable_failed : int ref
 
 type asked_assigns = NoAssigns | OnlyAssigns | WithAssigns
 
