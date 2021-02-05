@@ -29,15 +29,14 @@ open Cil_types
 type mode = {
   kf : kernel_function ; (* Selected function *)
   bhv : funbehavior ; (* Selected behavior *)
+  infos : CfgInfos.t ; (* Associated infos *)
 }
 
 type props = [ `All | `Names of string list | `PropId of Property.t ]
 
 module Make(W : Mcfg.S) :
 sig
-
-  val compute : mode:mode -> props:props -> W.t_env * W.t_prop
-
+  val compute : mode:mode -> props:props -> W.t_prop
 end
 
 (* -------------------------------------------------------------------------- *)

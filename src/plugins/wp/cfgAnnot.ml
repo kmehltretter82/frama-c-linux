@@ -110,12 +110,12 @@ let normalize_assigns kf ki has_exit bhv ~active = function
 let get_requires kf ki bhv =
   List.map (normalize_pre kf ki bhv) bhv.b_requires
 
-let get_behavior kf ki has_exit ~active bhv =
+let get_behavior kf ki ~exits ~active bhv =
   let pre_cond = normalize_pre kf ki bhv in
   let post_cond tk (kind,ip) =
     if kind = tk then Some (normalize_post kf ki bhv tk ip) else None in
   let p_asgn, e_asgn =
-    normalize_assigns kf ki has_exit bhv ~active bhv.b_assigns
+    normalize_assigns kf ki exits bhv ~active bhv.b_assigns
   in
   {
     bhv_assumes = List.map pre_cond bhv.b_assumes;

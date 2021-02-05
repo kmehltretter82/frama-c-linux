@@ -30,15 +30,15 @@ open Wp_parameters
 module KFmap = Kernel_function.Map
 
 type task = {
-  mutable lemmas: LogicUsage.logic_lemma list ;
-  mutable modes: CfgCalculus.mode list KFmap.t ; (** TODO: when New CFG is validated, use list *)
+  mutable modes: CfgCalculus.mode list KFmap.t ;
   mutable props: CfgCalculus.props ;
+  mutable lemmas: LogicUsage.logic_lemma list ;
 }
 
 let empty () = {
   lemmas = [];
   modes = KFmap.empty;
-  props = `All ;
+  props = `All;
 }
 
 (* -------------------------------------------------------------------------- *)
@@ -73,34 +73,31 @@ let lemma task ?(prop=[]) l =
      (prop=[] || WpPropId.select_by_name prop (WpPropId.mk_lemma_id l))
   then task.lemmas <- l :: task.lemmas
 
-let apply task ~kf ?bhvs ?prop () =
+let apply task ~kf ?infos ?bhvs ?target () =
+  let infos = match infos with
+    | Some infos -> infos
+    | None -> CfgInfos.get kf () in
+  let bhvs = match bhvs with
+    | Some bhvs -> bhvs
+    | None ->
+        let bhvs = Annotations.behaviors kf in
+        if List.exists (Cil.is_default_behavior) bhvs then bhvs
+        else empty_default_behavior :: bhvs in
+  let add_mode kf m =
+    let ms = try KFmap.find kf task.modes with Not_found -> [] in
+    task.modes <- KFmap.add kf (m :: ms) task.modes in
   begin
-    let bhvs = match bhvs with
-      | Some bhvs -> bhvs
-      | None ->
-          let bhvs = Annotations.behaviors kf in
-          if List.exists (Cil.is_default_behavior) bhvs then bhvs
-          else empty_default_behavior :: bhvs
-    in
-    let add_mode kf m =
-      let modes =
-        match KFmap.find_opt kf task.modes with
-        | None -> []
-        | Some modes -> modes
-      in
-      task.modes <- KFmap.add kf (m :: modes) task.modes
-    in
-    List.iter (fun bhv -> add_mode kf { CfgCalculus.kf ; bhv }) bhvs ;
-    Option.iter (fun ip -> task.props <- `PropId ip) prop ;
+    List.iter (fun bhv -> add_mode kf CfgCalculus.{ infos ; kf ; bhv }) bhvs ;
+    Option.iter (fun ip -> task.props <- `PropId ip) target ;
   end
 
 let notyet prop =
   Wp_parameters.warning ~once:true
     "Not yet implemented wp for '%a'" Property.pretty prop
 
-let rec strategy_ip task prop =
+let rec strategy_ip task target =
   let open Property in
-  match prop with
+  match target with
   | IPLemma { il_name } ->
       lemma task (LogicUsage.logic_lemma il_name)
   | IPAxiomatic { iax_props } ->
@@ -113,43 +110,43 @@ let rec strategy_ip task prop =
         | PKRequires bhv ->
             begin
               match ki with
-              | Kglobal -> (*TODO*) notyet prop
-              | Kstmt _ -> apply task ~kf ~bhvs:[bhv] ~prop ()
+              | Kglobal -> (*TODO*) notyet target
+              | Kstmt _ -> apply task ~kf ~bhvs:[bhv] ~target ()
             end
         | PKEnsures(bhv,_) ->
-            apply task ~kf ~bhvs:[bhv] ~prop ()
+            apply task ~kf ~bhvs:[bhv] ~target ()
         | PKTerminates ->
-            apply task ~kf ~bhvs:(default kf) ~prop ()
+            apply task ~kf ~bhvs:(default kf) ~target ()
       end
   | IPDecrease { id_kf = kf } ->
-      apply task ~kf ~bhvs:(default kf) ~prop ()
+      apply task ~kf ~bhvs:(default kf) ~target ()
   | IPAssigns { ias_kf=kf ; ias_bhv=Id_loop ca }
   | IPAllocation { ial_kf=kf ; ial_bhv=Id_loop ca } ->
       let bhvs = match ca.annot_content with
         | AAssigns(bhvs,_) | AAllocation(bhvs,_) -> bhvs
         | _ -> [] in
-      apply task ~kf ~bhvs:(select kf bhvs) ~prop ()
+      apply task ~kf ~bhvs:(select kf bhvs) ~target ()
   | IPAssigns { ias_kf=kf ; ias_bhv=Id_contract(_,bhv) }
   | IPAllocation { ial_kf=kf ; ial_bhv=Id_contract(_,bhv) }
-    -> apply task ~kf ~bhvs:[bhv] ~prop ()
+    -> apply task ~kf ~bhvs:[bhv] ~target ()
   | IPCodeAnnot { ica_kf = kf ; ica_ca = ca } ->
       begin match ca.annot_content with
         | AExtended _ | APragma _ -> ()
         | AStmtSpec(fors,_) ->
-            (*TODO*) notyet prop ;
+            (*TODO*) notyet target ;
             apply task ~kf ~bhvs:(select kf fors) ()
         | AVariant _ ->
-            apply task ~kf ~prop ()
+            apply task ~kf ~target ()
         | AAssert(fors, _)
         | AInvariant(fors, _, _)
         | AAssigns(fors, _)
         | AAllocation(fors, _) ->
-            apply task ~kf ~bhvs:(select kf fors) ~prop ()
+            apply task ~kf ~bhvs:(select kf fors) ~target ()
       end
-  | IPComplete _ -> (*TODO*) notyet prop
-  | IPDisjoint _ -> (*TODO*) notyet prop
+  | IPComplete _ -> (*TODO*) notyet target
+  | IPDisjoint _ -> (*TODO*) notyet target
   | IPFrom _ | IPReachable _ | IPTypeInvariant _ | IPGlobalInvariant _
-  | IPPropertyInstance _ -> notyet prop (* ? *)
+  | IPPropertyInstance _ -> notyet target (* ? *)
   | IPExtended _ | IPAxiom _ | IPOther _ -> ()
 
 let strategy_main task ?(fct=Fct_all) ?(bhv=[]) ?(prop=[]) () =
@@ -159,9 +156,11 @@ let strategy_main task ?(fct=Fct_all) ?(bhv=[]) ?(prop=[]) () =
     Wp_parameters.iter_fct
       (fun kf ->
          if Kernel_function.has_definition kf then
-           if bhv=[]
-           then apply task ~kf ()
-           else apply task ~kf ~bhvs:(select kf bhv) ()
+           let infos = CfgInfos.get kf ~bhv ~prop () in
+           if CfgInfos.annots infos then
+             if bhv=[]
+             then apply task ~infos ~kf ()
+             else apply task ~infos ~kf ~bhvs:(select kf bhv) ()
       ) fct ;
     task.props <- (if prop=[] then `All else `Names prop);
   end
@@ -202,7 +201,8 @@ struct
                      if Cil.is_default_behavior mode.bhv then None
                      else Some mode.bhv.b_name in
                    let index = Wpo.Function(mode.kf,bhv) in
-                   let wp = snd @@ WP.compute ~mode ~props:task.props in
+                   let props = task.props in
+                   let wp = WP.compute ~mode ~props in
                    let wcs = VCG.compile_wp index wp in
                    collection := Bag.concat !collection wcs
                  end ()

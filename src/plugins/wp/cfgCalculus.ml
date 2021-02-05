@@ -28,6 +28,7 @@ open Cil_datatype
 (* -------------------------------------------------------------------------- *)
 
 module WpLog = Wp_parameters
+module Kf = Kernel_function
 module Cfg = Interpreted_automata
 module G = Cfg.G
 module V = Cfg.Vertex
@@ -42,6 +43,7 @@ type assigns = WpPropId.assigns_full_info
 type mode = {
   kf: kernel_function;
   bhv : funbehavior ;
+  infos : CfgInfos.t ;
 }
 
 type props = [ `All | `Names of string list | `PropId of Property.t ]
@@ -121,37 +123,6 @@ module Make(W : Mcfg.S) =
 struct
 
   module I = CfgInit.Make(W)
-
-  module Reachable_call : sig
-    val has_reachable_call: Cfg.automaton -> vertex -> bool
-  end
-  =
-  struct
-    exception Found_call
-
-    type reachability_env = {
-      table: unit Vhash.t ;
-      cfg: Cfg.automaton ;
-    }
-
-    let rec reachable_call_by_cfg env a =
-      try Vhash.find env.table a
-      with Not_found ->
-        Vhash.add env.table a () ;
-        List.iter (transition env) (G.succ_e env.cfg.graph a)
-
-    and transition env (_,edge,dst) =
-      reachable_call_by_cfg env dst ;
-      match edge.edge_transition with
-      | Instr ((Local_init(_,ConsInit _, _)| Call _), _) -> raise Found_call
-      | _ -> ()
-
-    let has_reachable_call cfg v =
-      let env = { table = Vhash.create 32 ; cfg } in
-      try reachable_call_by_cfg env v ; false
-      with Found_call -> true
-
-  end
 
   (* --- Traversal Environment --- *)
 
@@ -291,7 +262,7 @@ struct
     | Local_init(x,ConsInit (vf, args, kind), loc) ->
         Cil.treat_constructor_as_func
           begin fun r fct args _loc ->
-            match Kernel_function.get_called fct with
+            match Kf.get_called fct with
             | Some kf -> call env s r kf args w
             | None ->
                 WpLog.warning ~once:true "No function for constructor '%s'"
@@ -301,7 +272,7 @@ struct
           end x vf args kind loc
     | Call(res,fct,args,_loc) ->
         begin
-          match Kernel_function.get_called fct with
+          match Kf.get_called fct with
           | Some kf -> call env s res kf args w
           | None ->
               match Dyncall.get ~bhv:env.mode.bhv.b_name s with
@@ -335,27 +306,28 @@ struct
       in W.call_goal_precond env.we s kf es ~pre w_call
     else w_call
 
-  let complete mode kf =
-    if not (is_default_bhv mode) then []
-    else CfgAnnot.get_complete_behaviors kf
-
-  let disjoint mode kf =
-    if not (is_default_bhv mode) then []
-    else CfgAnnot.get_disjoint_behaviors kf
+  let do_complete_disjoint env w =
+    if not (is_default_bhv env.mode) then w
+    else
+      let kf = env.mode.kf in
+      let complete = CfgAnnot.get_complete_behaviors kf in
+      let disjoint = CfgAnnot.get_disjoint_behaviors kf in
+      List.fold_right (prove_property env) complete @@
+      List.fold_right (prove_property env) disjoint w
 
   let do_global_init env w =
     I.process_global_init env.we env.mode.kf @@
     W.scope env.we [] SC_Global w
 
-  let do_preconditions env ~main ~formals bhvs w =
+  let do_preconditions env ~formals bhvs w =
     let kf = env.mode.kf in
-    let prove_if_main ps w =
-      if main then List.fold_right (prove_property env) ps w else w in
+    let init = WpStrategy.is_main_init kf in
     let behaviors =
-      if main || WpLog.PrecondWeakening.get () then []
+      if init || WpLog.PrecondWeakening.get () then []
       else CfgAnnot.get_preconditions ~goal:false kf in
     let defaults = default_requires env.mode kf in
     let requires = bhvs.CfgAnnot.bhv_requires in
+    let initreqs = if init then requires else [] in
     let assumes = bhvs.CfgAnnot.bhv_assumes in
     (* pre-state *)
     W.label env.we None Clabels.pre @@
@@ -364,13 +336,9 @@ struct
     (* pre-conditions *)
     List.fold_right (use_property env) defaults @@
     List.fold_right (use_property env) assumes @@
-    prove_if_main requires @@
+    List.fold_right (prove_property env) initreqs @@
     List.fold_right (use_property env) requires @@
     List.fold_right (use_property env) behaviors w
-
-  let do_complete_disjoint env ~complete ~disjoint w =
-    List.fold_right (prove_property env) complete @@
-    List.fold_right (prove_property env) disjoint w
 
   let do_post env ~formals (b : CfgAnnot.behavior) w =
     W.scope env.we formals SC_Frame_out @@
@@ -384,7 +352,7 @@ struct
     List.fold_right (prove_property env) b.bhv_exits @@
     prove_assigns env b.bhv_exit_assigns w
 
-  let do_body env ~formals (b : CfgAnnot.behavior) w =
+  let do_funbehavior env ~formals (b : CfgAnnot.behavior) w =
     let wpost = do_post env ~formals b w in
     let wexit = do_exit env ~formals b w in
     Vhash.add env.wp env.cfg.return_point (Some wpost) ;
@@ -394,27 +362,25 @@ struct
   (* Putting everything together *)
   let compute ~mode ~props =
     let kf = mode.kf in
-    let cfg = Cfg.get_automaton kf in
+    let infos = mode.infos in
+    let cfg = CfgInfos.cfg infos in
     let env = {
-      mode ; props ;
-      cfg ;
+      mode ; props ; cfg ;
       we = W.new_env kf ;
       wp = Vhash.create 32 ;
       wk = W.empty ;
     } in
-    let main = WpStrategy.is_main_init kf in
-    let formals = Kernel_function.get_formals kf in
-    let complete = complete mode kf in
-    let disjoint = disjoint mode kf in
-    let has_exit = Reachable_call.has_reachable_call cfg (cfg.entry_point) in
-    let bhv = CfgAnnot.get_behavior kf Kglobal has_exit ~active:[] mode.bhv in
-    env.we ,
-    W.close env.we @@
-    do_global_init env @@
-    do_preconditions env ~main ~formals bhv @@
-    do_complete_disjoint env ~complete ~disjoint @@
-    do_body env ~formals bhv @@
-    W.empty
+    let formals = Kf.get_formals kf in
+    let exits = not @@ Kf.Set.is_empty @@ CfgInfos.calls infos in
+    let bhv = CfgAnnot.get_behavior kf Kglobal ~exits ~active:[] mode.bhv in
+    begin
+      W.close env.we @@
+      do_global_init env @@
+      do_preconditions env ~formals bhv @@
+      do_complete_disjoint env @@
+      do_funbehavior env ~formals bhv @@
+      W.empty
+    end
 
 end
 

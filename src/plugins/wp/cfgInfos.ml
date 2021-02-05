@@ -41,6 +41,7 @@ type t = {
 (* --- Getters                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
+let cfg infos = infos.cfg
 let calls infos = infos.calls
 let annots infos = infos.annots
 let doomed infos = infos.doomed
@@ -173,7 +174,6 @@ module Generator = WpContext.StaticGenerator(Key)
       let compile = compile
     end)
 
-let collect kf ?(bhv=[]) ?(prop=[]) () =
-  Generator.get { kf ; bhv ; prop }
+let get kf ?(bhv=[]) ?(prop=[]) () = Generator.get { kf ; bhv ; prop }
 
 (* -------------------------------------------------------------------------- *)

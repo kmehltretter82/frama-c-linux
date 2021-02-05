@@ -43,8 +43,8 @@ type behavior = {
 
 val get_requires : kernel_function -> kinstr -> funbehavior -> pred_info list
 val get_behavior :
-  kernel_function -> kinstr -> bool -> active:string list -> funbehavior ->
-  behavior
+  kernel_function -> kinstr -> exits:bool -> active:string list ->
+  funbehavior -> behavior
 
 val get_preconditions : goal:bool ->kernel_function -> pred_info list
 val get_complete_behaviors : kernel_function -> pred_info list
