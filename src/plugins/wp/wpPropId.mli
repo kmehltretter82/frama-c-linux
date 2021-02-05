@@ -79,6 +79,7 @@ val get_propid : prop_id -> string (** Unique identifier of [prop_id] *)
 val get_legacy : prop_id -> string (** Unique legacy identifier of [prop_id] *)
 val pp_propid : Format.formatter -> prop_id -> unit (** Print unique id of [prop_id] *)
 
+val user_pred_names: toplevel_predicate -> string list
 val user_bhv_names: Property.identified_property -> string list
 val user_prop_names: Property.identified_property -> string list
 val are_selected_names: string list -> string list -> bool

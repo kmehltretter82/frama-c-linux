@@ -277,7 +277,10 @@ struct
           | None ->
               match Dyncall.get ~bhv:env.mode.bhv.b_name s with
               | None ->
-                  WpLog.warning ~once:true "Missing dynamic-call infos." ;
+                  WpLog.warning ~once:true "Missing 'calls' for %s"
+                    (if Cil.is_default_behavior env.mode.bhv
+                     then "default behavior"
+                     else env.mode.bhv.b_name) ;
                   let any = WpPropId.mk_stmt_assigns_any_desc s in
                   W.use_assigns env.we None any (W.merge env.we w env.wk)
               | Some(prop,kfs) ->

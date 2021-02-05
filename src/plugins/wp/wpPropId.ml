@@ -476,13 +476,13 @@ let ident_names names =
   List.filter (function "" -> true
                       | _ as n -> '\"' <> (String.get n 0) ) names
 
-let pred_names p =
+let user_pred_names p =
   let p_names = ident_names p.tp_statement.pred_name in
   if p.tp_kind = Check then "@check"::p_names else p_names
 
 let code_annot_names ca = match ca.annot_content with
-  | AAssert (_, pred)  -> "@assert" :: pred_names pred
-  | AInvariant (_,_,pred) -> "@invariant":: pred_names pred
+  | AAssert (_, pred)  -> "@assert" :: user_pred_names pred
+  | AInvariant (_,_,pred) -> "@invariant":: user_pred_names pred
   | AVariant (term, _) -> "@variant"::(ident_names term.term_name)
   | AExtended(_,_,{ext_name}) -> [Printf.sprintf "@%s" ext_name]
   | _ -> [] (* TODO : add some more names ? *)
@@ -493,7 +493,7 @@ let user_prop_names p =
   let open Property in match p with
   | IPPredicate {ip_kind; ip_pred} ->
       Format.asprintf  "@@%a" Property.pretty_predicate_kind ip_kind ::
-      pred_names ip_pred.ip_content
+      user_pred_names ip_pred.ip_content
   | IPExtended {ie_ext={ext_name}} -> [ Printf.sprintf "@%s" ext_name ]
   | IPCodeAnnot {ica_ca} -> code_annot_names ica_ca
   | IPComplete {ic_bhvs} ->
@@ -511,7 +511,7 @@ let user_prop_names p =
   | IPDecrease {id_ca=Some ca} -> "@decreases"::code_annot_names ca
   | IPDecrease _ -> [ "@decreases" ]
   | IPLemma {il_name = a; il_pred = l} ->
-      let names = "@lemma"::a::pred_names l in
+      let names = "@lemma"::a::user_pred_names l in
       begin
         match LogicUsage.section_of_lemma a with
         | LogicUsage.Toplevel _ -> names
@@ -546,7 +546,7 @@ let user_bhv_names p =
   in Option.fold ~none:fors ~some:(fun b -> b.b_name :: fors) (get_behavior p)
 
 let string_of_termination_kind = function
-    Normal -> "post"
+    Normal -> "ensures"
   | Exits -> "exits"
   | Breaks -> "breaks"
   | Continues -> "continues"

@@ -72,6 +72,51 @@ let selected ~bhv ~prop pid =
   (prop = [] || WpPropId.select_by_name prop pid) &&
   (bhv = [] || WpPropId.select_for_behaviors bhv pid)
 
+let selected_default ~bhv =
+  bhv=[] || List.mem Cil.default_behavior_name bhv
+
+let selected_name ~prop name =
+  prop=[] || WpPropId.are_selected_names prop [name]
+
+let selected_assigns ~prop = function
+  | Cil_types.WritesAny -> false
+  | _ -> selected_name ~prop "@assigns"
+
+let selected_allocates ~prop = function
+  | Cil_types.FreeAllocAny -> false
+  | _ -> (selected_name ~prop "@allocates" || selected_name ~prop "@frees")
+
+let selected_precond ~prop ip =
+  prop = [] ||
+  let tk_name = "@ensures" in
+  let tp_names = WpPropId.user_pred_names ip.Cil_types.ip_content in
+  WpPropId.are_selected_names prop (tk_name :: tp_names)
+
+let selected_postcond ~prop (tk,ip) =
+  prop = [] ||
+  let tk_name = "@" ^ WpPropId.string_of_termination_kind tk in
+  let tp_names = WpPropId.user_pred_names ip.Cil_types.ip_content in
+  WpPropId.are_selected_names prop (tk_name :: tp_names)
+
+let selected_requires ~prop (b : Cil_types.funbehavior) =
+  List.exists (selected_precond ~prop) b.b_requires
+
+let selected_call ~bhv ~prop kf =
+  bhv = [] && List.exists (selected_requires ~prop) (Annotations.behaviors kf)
+
+let selected_disjoint_complete ~bhv ~prop =
+  selected_default ~bhv &&
+  ( selected_name ~prop "@disjoint_behaviors" ||
+    selected_name ~prop "@disjoint_behaviors" )
+
+let selected_bhv ~bhv ~prop (b : Cil_types.funbehavior) =
+  (bhv = [] || List.mem b.b_name bhv) &&
+  begin
+    (selected_assigns ~prop b.b_assigns) ||
+    (selected_allocates ~prop b.b_allocation) ||
+    (List.exists (selected_postcond ~prop) b.b_post_cond)
+  end
+
 (* -------------------------------------------------------------------------- *)
 (* --- Calls                                                              --- *)
 (* -------------------------------------------------------------------------- *)
@@ -143,6 +188,10 @@ let compile Key.{ kf ; bhv ; prop } =
   (* Root Reachability *)
   let v0 = cfg.entry_point in
   Vhash.add infos.unreachable v0 false ;
+  (* Spec Iteration *)
+  if selected_disjoint_complete ~bhv ~prop ||
+     List.exists (selected_bhv ~bhv ~prop) (Annotations.behaviors kf)
+  then infos.annots <- true ;
   (* Stmt Iteration *)
   Shash.iter
     (fun stmt (src,_) ->
@@ -154,7 +203,9 @@ let compile Key.{ kf ; bhv ; prop } =
          infos.doomed <- Bag.concat infos.doomed (Bag.list pids)
        else
          begin
-           if List.exists (selected ~bhv ~prop) pids
+           if not infos.annots &&
+              ( List.exists (selected ~bhv ~prop) pids ||
+                Fset.exists (selected_call ~bhv ~prop) fs )
            then infos.annots <- true ;
            infos.calls <- Fset.union fs infos.calls ;
          end
