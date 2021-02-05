@@ -3394,9 +3394,9 @@ let evar ?(loc=Location.unknown) vi = new_exp ~loc (Lval (var vi))
 
 let mkString ~loc s = new_exp ~loc (Const(CStr s))
 
-let mkLoop ?(sattr = [Attr("while", [])]) ~(guard:exp) ~(body: stmt list) : stmt list =
+let mkLoop ?sattr ~(guard:exp) ~(body: stmt list) () : stmt list =
   (* Do it like this so that the pretty printer recognizes it *)
-  [ mkStmt ~valid_sid:true ~sattr
+  [ mkStmt ~valid_sid:true ?sattr
       (Loop ([],
              mkBlock
                (mkStmt ~valid_sid:true
@@ -3405,28 +3405,43 @@ let mkLoop ?(sattr = [Attr("while", [])]) ~(guard:exp) ~(body: stmt list) : stmt
                       mkBlock [ mkStmt ~valid_sid:true (Break guard.eloc)], guard.eloc)) ::
                 body), guard.eloc, None, None)) ]
 
-let mkFor ~(start: stmt list) ~(guard: exp) ~(next: stmt list)
-    ~(body: stmt list) : stmt list =
-  (start @
-   (mkLoop ~sattr:[Attr("For",[])] ~guard ~body:(body @ next)))
+let mkWhile ?sattr ~(guard:exp) ~(body: stmt list) () : stmt list =
+  let sattr = [Attr("while", [])] @ Option.value ~default:[] sattr in
+  mkLoop ~sattr ~guard ~body ()
 
-let mkForIncr ~(iter : varinfo) ~(first: exp) ~(stopat: exp) ~(incr: exp)
-    ~(body: stmt list) : stmt list =
+let mkDoWhile ?sattr ~(body: stmt list) ~(guard:exp) () : stmt list =
+  let sattr = [Attr("dowhile", [])] @ Option.value ~default:[] sattr in
+  let exit_stmt =
+    mkStmt ~valid_sid:true
+      (If(guard, mkBlock [mkStmt ~valid_sid:true (Break guard.eloc)],
+          mkBlock [], guard.eloc))
+  in
+  let true_exp = one ~loc:guard.eloc in
+  mkLoop ~sattr ~guard:true_exp ~body:(body @ [exit_stmt]) ()
+
+let mkFor ?sattr ~(start: stmt list) ~(guard: exp) ~(next: stmt list)
+    ~(body: stmt list) () : stmt list =
+  let sattr = [Attr("for", [])] @ Option.value ~default:[] sattr in
+  (start @
+   (mkLoop ~sattr ~guard ~body:(body @ next)) ())
+
+let mkForIncr ?sattr ~(iter : varinfo) ~(first: exp) ~(stopat: exp) ~(incr: exp)
+    ~(body: stmt list) () : stmt list =
   (* See what kind of operator we need *)
   let nextop = match unrollTypeSkel iter.vtype with
     | TPtr _ -> PlusPI
     | _ -> PlusA
   in
-  mkFor
-    [ mkStmtOneInstr ~valid_sid:true (Set (var iter, first, first.eloc)) ]
-    (new_exp ~loc:stopat.eloc (BinOp(Lt, evar iter, stopat, intType)))
-    [ mkStmtOneInstr ~valid_sid:true
-        (Set
-           (var iter,
-            (new_exp ~loc:incr.eloc
-               (BinOp(nextop, evar iter, incr, iter.vtype))),
-            incr.eloc))]
-    body
+  mkFor ?sattr
+    ~start:[ mkStmtOneInstr ~valid_sid:true (Set (var iter, first, first.eloc)) ]
+    ~guard:(new_exp ~loc:stopat.eloc (BinOp(Lt, evar iter, stopat, intType)))
+    ~next:[ mkStmtOneInstr ~valid_sid:true
+              (Set
+                 (var iter,
+                  (new_exp ~loc:incr.eloc
+                     (BinOp(nextop, evar iter, incr, iter.vtype))),
+                  incr.eloc))]
+    ~body ()
 
 let block_from_unspecified_sequence us =
   mkBlock (List.map (fun (x,_,_,_,_) ->x) us)
