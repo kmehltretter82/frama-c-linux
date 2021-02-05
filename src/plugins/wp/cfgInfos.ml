@@ -104,10 +104,13 @@ let selected_requires ~prop (b : Cil_types.funbehavior) =
 let selected_call ~bhv ~prop kf =
   bhv = [] && List.exists (selected_requires ~prop) (Annotations.behaviors kf)
 
-let selected_disjoint_complete ~bhv ~prop =
+let selected_clause ~prop name getter kf =
+  getter kf <> [] && selected_name ~prop name
+
+let selected_disjoint_complete kf ~bhv ~prop =
   selected_default ~bhv &&
-  ( selected_name ~prop "@disjoint_behaviors" ||
-    selected_name ~prop "@disjoint_behaviors" )
+  ( selected_clause ~prop "@complete_behaviors" Annotations.complete kf ||
+    selected_clause ~prop "@disjoint_behaviors" Annotations.disjoint kf )
 
 let selected_bhv ~bhv ~prop (b : Cil_types.funbehavior) =
   (bhv = [] || List.mem b.b_name bhv) &&
@@ -189,8 +192,10 @@ let compile Key.{ kf ; bhv ; prop } =
   let v0 = cfg.entry_point in
   Vhash.add infos.unreachable v0 false ;
   (* Spec Iteration *)
-  if selected_disjoint_complete ~bhv ~prop ||
-     List.exists (selected_bhv ~bhv ~prop) (Annotations.behaviors kf)
+  if selected_disjoint_complete kf ~bhv ~prop ||
+     List.exists
+       (selected_bhv ~bhv ~prop)
+       (Annotations.behaviors kf)
   then infos.annots <- true ;
   (* Stmt Iteration *)
   Shash.iter
