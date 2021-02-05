@@ -89,16 +89,11 @@ let normalize_assigns kf ki has_exit bhv ~active = function
   | WritesAny ->
       WpPropId.empty_assigns_info, WpPropId.empty_assigns_info
   | Writes froms ->
-      let aid_post, aid_exit = match ki with
-        | Kglobal ->
-            WpPropId.mk_fct_assigns_id kf has_exit bhv Normal froms,
-            WpPropId.mk_fct_assigns_id kf has_exit bhv Exits froms
-        | Kstmt s ->
-            WpPropId.mk_stmt_assigns_id kf s active bhv froms,
-            WpPropId.mk_stmt_assigns_id kf s active bhv []
-      in
-      let make_assigns_info aid =
-        match aid with
+      let make kf ki has_exit bhv tk froms =
+        let aid = match ki with
+          | Kglobal -> WpPropId.mk_fct_assigns_id kf has_exit bhv tk froms
+          | Kstmt s -> WpPropId.mk_stmt_assigns_id kf s active bhv froms
+        in match aid with
         | None -> WpPropId.empty_assigns_info
         | Some id ->
             let assigns = normalize_froms kf ki froms in
@@ -107,7 +102,10 @@ let normalize_assigns kf ki has_exit bhv ~active = function
               | Kstmt s -> WpPropId.mk_stmt_assigns_desc s assigns
             in  WpPropId.mk_assigns_info id desc
       in
-      make_assigns_info aid_post, make_assigns_info aid_exit
+      make kf ki has_exit bhv Normal froms,
+      if has_exit
+      then make kf ki has_exit bhv Exits froms
+      else WpPropId.empty_assigns_info
 
 let get_requires kf ki bhv =
   List.map (normalize_pre kf ki bhv) bhv.b_requires

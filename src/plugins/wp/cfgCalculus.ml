@@ -335,10 +335,6 @@ struct
       in W.call_goal_precond env.we s kf es ~pre w_call
     else w_call
 
-  let behaviors kf =
-    if WpStrategy.is_main_init kf || WpLog.PrecondWeakening.get () then []
-    else CfgAnnot.get_preconditions ~goal:false kf
-
   let complete mode kf =
     if not (is_default_bhv mode) then []
     else CfgAnnot.get_complete_behaviors kf
@@ -347,11 +343,26 @@ struct
     if not (is_default_bhv mode) then []
     else CfgAnnot.get_disjoint_behaviors kf
 
-  let do_preconditions env ~main ~behaviors ~requires ~def_requires ~assumes w =
+  let do_global_init env w =
+    I.process_global_init env.we env.mode.kf @@
+    W.scope env.we [] SC_Global w
+
+  let do_preconditions env ~main ~formals bhvs w =
+    let kf = env.mode.kf in
     let prove_if_main ps w =
-      if main then List.fold_right (prove_property env) ps w else w
-    in
-    List.fold_right (use_property env) def_requires @@
+      if main then List.fold_right (prove_property env) ps w else w in
+    let behaviors =
+      if main || WpLog.PrecondWeakening.get () then []
+      else CfgAnnot.get_preconditions ~goal:false kf in
+    let defaults = default_requires env.mode kf in
+    let requires = bhvs.CfgAnnot.bhv_requires in
+    let assumes = bhvs.CfgAnnot.bhv_assumes in
+    (* pre-state *)
+    W.label env.we None Clabels.pre @@
+    (* frame-in *)
+    W.scope env.we formals SC_Frame_in @@
+    (* pre-conditions *)
+    List.fold_right (use_property env) defaults @@
     List.fold_right (use_property env) assumes @@
     prove_if_main requires @@
     List.fold_right (use_property env) requires @@
@@ -361,31 +372,29 @@ struct
     List.fold_right (prove_property env) complete @@
     List.fold_right (prove_property env) disjoint w
 
-  let do_function_body env w =
-    Vhash.add env.wp env.cfg.return_point (Some w) ;
-    wp env env.cfg.entry_point
+  let do_post env ~formals (b : CfgAnnot.behavior) w =
+    W.scope env.we formals SC_Frame_out @@
+    W.label env.we None Clabels.post @@
+    List.fold_right (prove_property env) b.bhv_ensures @@
+    prove_assigns env b.bhv_post_assigns w
 
-  let do_post_exit env has_exit xs ~post ~post_assigns ~exit ~exit_assigns w =
-    let w_exit =
-      W.scope env.we xs SC_Frame_out @@
-      W.label env.we None Clabels.at_exit @@
-      List.fold_right (prove_property env) exit @@
-      if has_exit then prove_assigns env exit_assigns w else w
-    in
-    let w_post =
-      W.scope env.we xs SC_Frame_out @@
-      W.label env.we None Clabels.post @@
-      List.fold_right (prove_property env) post @@
-      prove_assigns env post_assigns w
-    in
-    env.wk <- w_exit ;
-    w_post
+  let do_exit env ~formals (b : CfgAnnot.behavior) w =
+    W.scope env.we formals SC_Frame_out @@
+    W.label env.we None Clabels.at_exit @@
+    List.fold_right (prove_property env) b.bhv_exits @@
+    prove_assigns env b.bhv_exit_assigns w
+
+  let do_body env ~formals (b : CfgAnnot.behavior) w =
+    let wpost = do_post env ~formals b w in
+    let wexit = do_exit env ~formals b w in
+    Vhash.add env.wp env.cfg.return_point (Some wpost) ;
+    env.wk <- wexit ;
+    wp env env.cfg.entry_point
 
   (* Putting everything together *)
   let compute ~mode ~props =
     let kf = mode.kf in
     let cfg = Cfg.get_automaton kf in
-    let has_exit = Reachable_call.has_reachable_call cfg (cfg.entry_point) in
     let env = {
       mode ; props ;
       cfg ;
@@ -393,40 +402,18 @@ struct
       wp = Vhash.create 32 ;
       wk = W.empty ;
     } in
-    let xs = Kernel_function.get_formals kf in
-    let bhvs = CfgAnnot.get_behavior kf Kglobal has_exit ~active:[] mode.bhv in
-
-    let def_requires = default_requires mode kf in
-    let requires = bhvs.bhv_requires in
-    let assumes = bhvs.bhv_assumes in
-    let post = bhvs.bhv_ensures in
-    let post_assigns = bhvs.bhv_post_assigns in
-    let exit = bhvs.bhv_exits in
-    let exit_assigns = bhvs.bhv_exit_assigns in
     let main = WpStrategy.is_main_init kf in
-    let behaviors = behaviors kf in
+    let formals = Kernel_function.get_formals kf in
     let complete = complete mode kf in
     let disjoint = disjoint mode kf in
-
+    let has_exit = Reachable_call.has_reachable_call cfg (cfg.entry_point) in
+    let bhv = CfgAnnot.get_behavior kf Kglobal has_exit ~active:[] mode.bhv in
     env.we ,
-    (* global init *)
     W.close env.we @@
-    I.process_global_init env.we kf @@
-    W.scope env.we [] SC_Global @@
-
-    (* pre-state *)
-    W.label env.we None Clabels.pre @@
-    (* frame-in *)
-    W.scope env.we xs SC_Frame_in @@
-
-    do_preconditions env ~main ~behaviors ~requires ~def_requires ~assumes @@
+    do_global_init env @@
+    do_preconditions env ~main ~formals bhv @@
     do_complete_disjoint env ~complete ~disjoint @@
-    do_function_body env @@
-
-    (* NOTE: do_post_exit performs frame-out on both post and exit *)
-    (* Post-conds*)
-    do_post_exit env has_exit xs ~post ~post_assigns ~exit ~exit_assigns @@
-    (* wp-end *)
+    do_body env ~formals bhv @@
     W.empty
 
 end
