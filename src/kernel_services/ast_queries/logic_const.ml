@@ -43,13 +43,15 @@ let new_code_annotation annot =
 
 let fresh_code_annotation = AnnotId.next
 
-let toplevel_predicate ?(only_check=false) p =
-  { tp_only_check = only_check; tp_statement = p }
+let toplevel_predicate ?(kind=Assert) p =
+  { tp_kind = kind; tp_statement = p }
 
-let new_predicate ?only_check p =
-  { ip_id = PredicateId.next (); ip_content = toplevel_predicate ?only_check p }
+let new_predicate ?kind p =
+  { ip_id = PredicateId.next (); ip_content = toplevel_predicate ?kind p }
 
 let fresh_predicate_id = PredicateId.next
+
+let pred_of_id_pred p = p.ip_content.tp_statement
 
 let refresh_predicate p = { p with ip_id = PredicateId.next () }
 
@@ -339,10 +341,6 @@ let unamed ?(loc=Cil_datatype.Location.unknown) p =
 
 let ptrue = unamed Ptrue
 let pfalse = unamed Pfalse
-
-let pred_of_id_pred ?(check=true) p =
-  let tp = p.ip_content in
-  if tp.tp_only_check && not check then ptrue else tp.tp_statement
 
 let pold ?(loc=Cil_datatype.Location.unknown) p = match p.pred_content with
   | Ptrue | Pfalse -> p

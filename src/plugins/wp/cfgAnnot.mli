@@ -46,7 +46,7 @@ val get_behavior :
   kernel_function -> kinstr -> bool -> active:string list -> funbehavior ->
   behavior
 
-val get_preconditions : kernel_function -> pred_info list
+val get_preconditions : goal:bool ->kernel_function -> pred_info list
 val get_complete_behaviors : kernel_function -> pred_info list
 val get_disjoint_behaviors : kernel_function -> pred_info list
 

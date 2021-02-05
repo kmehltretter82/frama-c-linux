@@ -3577,8 +3577,8 @@ struct
   let id_predicate env pred = Logic_const.new_predicate (predicate env pred)
 
   let id_predicate_top env pred =
-    let { tp_only_check = only_check; tp_statement = pred } = pred in
-    Logic_const.new_predicate ~only_check (predicate env pred)
+    let { tp_kind = kind; tp_statement = pred } = pred in
+    Logic_const.new_predicate ~kind (predicate env pred)
 
   let id_term_ptr env t =
     let loc = t.lexpr_loc in
@@ -3832,10 +3832,10 @@ struct
   let code_annot loc current_behaviors current_return_type ca =
     let source = fst loc in
     let annot = match ca with
-      | AAssert (behav,{tp_only_check=only_check; tp_statement = p}) ->
+      | AAssert (behav,{tp_kind = kind; tp_statement = p}) ->
         check_behavior_names loc current_behaviors behav;
         let p = predicate (code_annot_env()) p in
-        let p = Logic_const.toplevel_predicate ~only_check p in
+        let p = Logic_const.toplevel_predicate ~kind p in
         Cil_types.AAssert(behav,p)
       | APragma (Impact_pragma sp) ->
         Cil_types.APragma
@@ -3862,10 +3862,10 @@ struct
         Cil_types.AStmtSpec (behav,my_spec)
       | AVariant v ->
         Cil_types.AVariant (type_variant (loop_annot_env ()) v)
-      | AInvariant (behav,f,{ tp_only_check = only_check; tp_statement = i}) ->
+      | AInvariant (behav,f,{ tp_kind = kind; tp_statement = i}) ->
         let env = if f then loop_annot_env () else code_annot_env () in
         check_behavior_names loc current_behaviors behav;
-        let p = Logic_const.toplevel_predicate ~only_check (predicate env i) in
+        let p = Logic_const.toplevel_predicate ~kind (predicate env i) in
         Cil_types.AInvariant (behav,f,p)
       | AAllocation (behav,fa) ->
         check_behavior_names loc current_behaviors behav;
@@ -4188,8 +4188,7 @@ struct
         C.error loc "Definition of %s is cyclic" s;
       my_info.lt_def <- tdef;
       Dtype (my_info,loc)
-    | LDlemma (x,is_axiom, labels, poly,
-               { tp_only_check = only_check; tp_statement = e}) ->
+    | LDlemma (x,is_axiom, labels, poly, {tp_kind = kind; tp_statement = e}) ->
       if Logic_env.Lemmas.mem x then begin
         let old_def = Logic_env.Lemmas.find x in
         let old_loc = Cil_datatype.Global_annotation.loc old_def in
@@ -4205,7 +4204,7 @@ struct
           Cil_datatype.Location.pretty old_loc
       end;
       let labels,env = annot_env loc labels poly in
-      let p = Logic_const.toplevel_predicate ~only_check (predicate env e) in
+      let p = Logic_const.toplevel_predicate ~kind (predicate env e) in
       let labels = match !Lenv.default_label with
         | None -> labels
         | Some lab -> [lab]

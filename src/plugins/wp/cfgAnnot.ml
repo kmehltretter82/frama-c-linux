@@ -135,15 +135,10 @@ let get_behavior kf ki has_exit ~active bhv =
 let get_assumes kf bhv =
   normalize_assumes kf Kglobal (Ast_info.behavior_assumes bhv)
 
-let get_preconditions kf =
-  (*TODO use this code instead! *)
-  (*
-  let assumes = get_assumes kf bhv in
-  List.map (normalize_pre kf Kglobal ~assumes bhv) bhv.b_requires
-  *)
+let get_preconditions ~goal kf =
   List.map
     (fun bhv ->
-       let p = Ast_info.behavior_precondition ~check:false bhv in
+       let p = Ast_info.behavior_precondition ~goal bhv in
        normalize_pre kf Kglobal bhv (Logic_const.new_predicate p)
     ) (Annotations.behaviors kf)
 
@@ -278,12 +273,13 @@ module CodeAssertions = WpContext.StaticGenerator(CodeKey)
             | AAssert(_,a) ->
                 let p =
                   WpPropId.mk_assert_id kf stmt ca ,
-                  normalize_pred a.tp_statement
-                in if a.tp_only_check then {
-                  l with code_verified = p :: l.code_verified ;
-                } else {
-                  code_admitted = p :: l.code_admitted ;
-                  code_verified = p :: l.code_verified ;
+                  normalize_pred a.tp_statement in
+                let admit = Logic_utils.use_predicate a.tp_kind in
+                let verif = Logic_utils.verify_predicate a.tp_kind in
+                let use flag p ps = if flag then p::ps else ps in
+                {
+                  code_admitted = use admit p l.code_admitted ;
+                  code_verified = use verif p l.code_verified ;
                 }
             | _ -> l
           end stmt {
@@ -339,17 +335,16 @@ module LoopContract = WpContext.StaticGenerator(CodeKey)
             match ca.annot_content with
             | AInvariant(_,true,inv) ->
                 let p = normalize_pred inv.tp_statement in
+                let g_hyp = WpPropId.mk_inv_hyp_id kf stmt ca in
                 let g_est, g_ind = WpPropId.mk_loop_inv kf stmt ca in
-                if inv.tp_only_check then
-                  { l with
-                    loop_established = (g_est,p) :: l.loop_established ;
-                    loop_preserved   = (g_ind,p) :: l.loop_preserved }
-                else
-                  let g_hyp = WpPropId.mk_inv_hyp_id kf stmt ca in
-                  { l with
-                    loop_established = (g_est,p) :: l.loop_established ;
-                    loop_invariants  = (g_hyp,p) :: l.loop_invariants ;
-                    loop_preserved   = (g_ind,p) :: l.loop_preserved }
+                let admit = Logic_utils.use_predicate inv.tp_kind in
+                let verif = Logic_utils.verify_predicate inv.tp_kind in
+                let use flag id p ps = if flag then (id,p) :: ps else ps in
+                { l with
+                  loop_established = use verif g_est p l.loop_established ;
+                  loop_invariants  = use admit g_hyp p l.loop_invariants ;
+                  loop_preserved   = use verif g_ind p l.loop_preserved ;
+                }
             | AVariant(term, None) ->
                 let vpos , vdec =
                   WpStrategy.mk_variant_properties kf stmt ca term in

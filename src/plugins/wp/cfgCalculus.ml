@@ -337,7 +337,7 @@ struct
 
   let behaviors kf =
     if WpStrategy.is_main_init kf || WpLog.PrecondWeakening.get () then []
-    else CfgAnnot.get_preconditions kf
+    else CfgAnnot.get_preconditions ~goal:false kf
 
   let complete mode kf =
     if not (is_default_bhv mode) then []

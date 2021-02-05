@@ -224,8 +224,13 @@ let code_annot = Annotations.code_annot ~filter:supported_annotation
 let make_annotation kf stmt annot labels =
   let kind, pred =
     match annot.annot_content with
-    | AAssert ([], {tp_only_check = false; tp_statement = pred}) -> Assert, pred
-    | AAssert ([], {tp_only_check = true; tp_statement = pred}) -> Check, pred
+    | AAssert ([], {tp_kind; tp_statement = pred}) ->
+      begin
+        match tp_kind with
+        | Cil_types.Assert -> Assert, pred
+        | Cil_types.Check -> Check, pred
+        | Cil_types.Admit -> Assume, pred
+      end
     | AInvariant ([], _, pred) -> Invariant, pred.tp_statement
     | AVariant (v, None) -> Assert, variant_predicate stmt v
     | _ -> assert false

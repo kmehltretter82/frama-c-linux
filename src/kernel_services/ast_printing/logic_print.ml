@@ -366,7 +366,10 @@ let rec print_decl fmt d =
       (pp_list ~sep:"@\n" print_case) cases
   | LDlemma(name,is_axiom,labels,tvar,body) ->
     fprintf fmt "@[<2>%s%a@ %s%a%a:@ %a;@]"
-      (if body.tp_only_check then "check " else "")
+      (match body.tp_kind with
+       | Assert -> ""
+       | Check ->  "check "
+       | Admit ->   "admit")
       (pp_cond ~pr_false:"lemma" is_axiom) "axiom" name
       (pp_list ~pre:"{@[" ~sep:",@ " ~suf:"@]}" pp_print_string) labels
       (pp_list ~pre:"<@[" ~sep:",@ " ~suf:"@>}" pp_print_string) tvar
@@ -419,7 +422,12 @@ let print_allocation ~isloop fmt fa =
 let print_clause name fmt e = fprintf fmt "@\n%s@ %a;" name print_lexpr e
 
 let print_tp_clause name fmt e =
-  let name = if e.tp_only_check then "check " ^ name else name in
+  let name =
+    match e.tp_kind with
+    | Assert -> name
+    | Check -> "check " ^ name
+    | Admit -> "admit " ^ name
+  in
   print_clause name fmt e.tp_statement
 
 let print_post fmt (k,e) =
@@ -487,16 +495,20 @@ let print_code_annot fmt ca =
     AAssert(bhvs,e) ->
     fprintf fmt "%a%s@ %a;"
       print_behaviors bhvs
-      (if e.tp_only_check then "check" else "assert")
+      (match e.tp_kind with
+       | Assert -> ""
+       | Check ->  "check "
+       | Admit ->   "admit")
       print_lexpr e.tp_statement
   | AStmtSpec (bhvs,s) ->
     fprintf fmt "%a%a"
       print_behaviors bhvs
       print_spec s
   | AInvariant (bhvs,loop,e) ->
-    fprintf fmt "%a%a%ainvariant@ %a;"
+    fprintf fmt "%a%a%a%ainvariant@ %a;"
       print_behaviors bhvs
-      (pp_cond e.tp_only_check) "check @"
+      (pp_cond (e.tp_kind = Check)) "check @"
+      (pp_cond (e.tp_kind = Admit)) "admit @"
       (pp_cond loop) "loop@ "
       print_lexpr e.tp_statement
   | AVariant e -> fprintf fmt "loop@ variant@ %a;" print_variant e

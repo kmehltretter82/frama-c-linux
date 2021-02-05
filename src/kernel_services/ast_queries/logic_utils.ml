@@ -1092,7 +1092,7 @@ and is_same_predicate pred1 pred2 =
 
 
 and is_same_toplevel_predicate p1 p2 =
-  p1.tp_only_check = p2.tp_only_check &&
+  p1.tp_kind = p2.tp_kind &&
   is_same_predicate p1.tp_statement p2.tp_statement
 
 and is_same_identified_predicate p1 p2 =
@@ -2229,11 +2229,17 @@ let lhost_c_type thost =
      | _ -> assert false)
   | TResult ty -> ty
 
+let use_predicate = function Assert | Admit -> true | Check -> false
+let verify_predicate = function Assert | Check -> true | Admit -> false
+
 let is_assert ca =
-  match ca.annot_content with AAssert (_, p) -> not p.tp_only_check | _ -> false
+  match ca.annot_content with AAssert (_, p) -> p.tp_kind = Assert | _ -> false
 
 let is_check ca =
-  match ca.annot_content with AAssert (_, p) -> p.tp_only_check | _ -> false
+  match ca.annot_content with AAssert (_, p) -> p.tp_kind = Check | _ -> false
+
+let is_admit ca =
+  match ca.annot_content with AAssert (_, p) -> p.tp_kind = Admit | _ -> false
 
 let is_contract ca =
   match ca.annot_content with AStmtSpec _ -> true | _ -> false

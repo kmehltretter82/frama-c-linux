@@ -2279,7 +2279,7 @@ module Toplevel_predicate = struct
         type t = toplevel_predicate
         let name = "Toplevel_predicate"
         let reprs =
-          [ { tp_statement = List.hd Predicate.reprs; tp_only_check = false }]
+          [ { tp_statement = List.hd Predicate.reprs; tp_kind = Assert }]
         let internal_pretty_code = Datatype.undefined
         let pretty fmt x = !pretty_ref fmt x
         let varname _ = "p"

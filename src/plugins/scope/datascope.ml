@@ -488,7 +488,8 @@ let add_proven_annot (ca, stmt_ca) (ca_because, stmt_because) acc =
 let check_stmt_annots (ca, stmt_ca) stmt acc =
   let check _ annot acc =
     match ca.annot_content, annot.annot_content with
-    | AAssert (_, p'), AAssert (_, p) when not p'.tp_only_check ->
+    | AAssert (_, p'), AAssert (_, p)
+      when p'.tp_kind <> Check && p.tp_kind <> Admit ->
       let p = p.tp_statement.pred_content in
       let p' = p'.tp_statement.pred_content in
       if Logic_utils.is_same_predicate_node p p' then

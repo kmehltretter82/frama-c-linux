@@ -65,22 +65,25 @@ val term_lvals_of_term: term -> term_lval list
 (** @return the list of all the term lvals of a given term.
     Purely syntactic function. *)
 
-val precondition : ?check:bool -> funspec -> predicate
+val precondition : goal:bool -> funspec -> predicate
 (** Builds the precondition from [b_assumes] and [b_requires] clauses.
-    If [~check:false] is specified, check-only requires are skipped.
+    With [~goal:true], only returns assert and check predicates.
+    With [~goal:false], only returns assert and admit predicates.
     @since Carbon-20101201 *)
 
 val behavior_assumes : funbehavior -> predicate
 (** Builds the conjunction of the [b_assumes].
     @since Nitrogen-20111001 *)
 
-val behavior_precondition : ?check:bool -> funbehavior -> predicate
+val behavior_precondition : goal:bool -> funbehavior -> predicate
 (** Builds the precondition from [b_assumes] and [b_requires] clauses.
-    If [~check:false] is specified, check-only requires are skipped.
+    For flag [~goal] see [precondition] above.
     @since Carbon-20101201 *)
 
-val behavior_postcondition : funbehavior -> termination_kind -> predicate
+val behavior_postcondition :
+  goal:bool -> funbehavior -> termination_kind -> predicate
 (** Builds the postcondition from [b_assumes] and [b_post_cond] clauses.
+    For flag [~goal] see [precondition] above.
     @modify Boron-20100401 added termination kind as filtering argument. *)
 
 val disjoint_behaviors : funspec -> string list -> predicate

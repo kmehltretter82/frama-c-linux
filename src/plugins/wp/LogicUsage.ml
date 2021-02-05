@@ -195,22 +195,22 @@ let pp_profile fmt l =
 
 let ip_lemma l =
   let open Property in
-  let mk_prop, only_check =
+  let mk_prop, kind =
     match l.lem_kind with
-    | `Axiom -> Property.ip_axiom, false
-    | `Lemma -> Property.ip_lemma, false
-    | `Check -> Property.ip_lemma, true
+    | `Axiom -> Property.ip_axiom, Admit
+    | `Lemma -> Property.ip_lemma, Assert
+    | `Check -> Property.ip_lemma, Check
   in
   mk_prop
     {il_name = l.lem_name; il_labels = l.lem_labels;
      il_args = l.lem_types; il_loc = (l.lem_position, l.lem_position);
      il_attrs = l.lem_attrs;
-     il_pred = Logic_const.toplevel_predicate ~only_check l.lem_property}
+     il_pred = Logic_const.toplevel_predicate ~kind l.lem_property}
 
 let lemma_of_global ~context = function
   | Dlemma(name,axiom,labels,types,pred,attrs,loc) ->
       let kind = if axiom then `Axiom else
-        if pred.tp_only_check then `Check else `Lemma in
+        if pred.tp_kind = Check then `Check else `Lemma in
       {
         lem_name = name ;
         lem_position = fst loc ;
