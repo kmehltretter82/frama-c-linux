@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2019                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -39,7 +39,7 @@ let visit = object
         (fun acc bhv ->
            let exists = List.exists (function
                | (Normal,v) ->
-                 is_infinite_or_nan v.ip_content
+                 is_infinite_or_nan v.ip_content.tp_statement
                | _ -> false
              )
                bhv.b_post_cond
@@ -47,7 +47,9 @@ let visit = object
            if exists
            then
              let neg_assumes =
-               List.map (fun e -> (Logic_const.pnot (e.ip_content))) bhv.b_assumes
+               List.map
+                 (fun e -> (Logic_const.pnot (e.ip_content.tp_statement)))
+                 bhv.b_assumes
              in
              Logic_const.(new_predicate (pors neg_assumes))::acc
            , None
