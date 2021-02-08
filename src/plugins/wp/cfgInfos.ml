@@ -34,7 +34,7 @@ type t = {
   mutable annots : bool; (* has goals to prove *)
   mutable doomed : WpPropId.prop_id Bag.t;
   mutable calls : Kernel_function.Set.t;
-  unreachable : bool Vhash.t ;
+  unreachable : bool option Vhash.t ;
 }
 
 (* -------------------------------------------------------------------------- *)
@@ -50,19 +50,31 @@ let doomed infos = infos.doomed
 (* --- Reachability Analyses                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
-let fixpoint h d f =
+let fixpoint h f =
   let rec phi v =
     try Vhash.find h v
     with Not_found ->
-      Vhash.add h v d ;
+      Vhash.add h v None ;
       let r = f phi v in
-      Vhash.replace h v r ; r
+      if Option.is_none r
+      then Vhash.remove h v
+      else Vhash.replace h v r ;
+      r
   in phi
 
-let unreachable infos =
+let unreachable infos v =
   let pred = Cfg.G.pred (Option.get infos.cfg).graph in
-  fixpoint infos.unreachable true
-    begin fun phi v -> List.for_all phi (pred v) end
+  let do_fixpoint = fixpoint infos.unreachable
+      begin fun phi v ->
+        match List.map phi (pred v) with
+        | l when List.exists (fun x -> x = Some false) l -> Some false
+        | l when List.for_all (fun x -> x = Some true) l -> Some true
+        | _ -> None
+      end
+  in
+  match do_fixpoint v with
+  | Some x -> x
+  | None -> Vhash.add infos.unreachable v (Some false) ; false
 
 (* -------------------------------------------------------------------------- *)
 (* --- Selected Properties                                                --- *)
@@ -216,7 +228,7 @@ let compile Key.{ kf ; bhv ; prop } =
     let cfg = Option.get cfg in
     (* Root Reachability *)
     let v0 = cfg.entry_point in
-    Vhash.add infos.unreachable v0 false ;
+    Vhash.add infos.unreachable v0 (Some false) ;
     (* Spec Iteration *)
     if selected_disjoint_complete kf ~bhv ~prop ||
        (List.exists (selected_bhv ~bhv ~prop) behaviors)
