@@ -3923,7 +3923,7 @@ struct
   let anonCompFieldName = anonCompFieldName
   let conditionalConversion = logicConditionalConversion
   let find_macro _ = raise Not_found
-  let find_var ?label ~var =
+  let find_var ?label var =
     let find_from_curr_env test =
       (* logic has always access to the ghost variables. *)
       match Datatype.String.Hashtbl.find ghost_env var with

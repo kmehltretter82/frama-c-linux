@@ -488,7 +488,7 @@ type typing_context = {
   anonCompFieldName : string;
   conditionalConversion : typ -> typ -> typ;
   find_macro : string -> lexpr;
-  find_var : ?label:string -> var:string -> logic_var;
+  find_var : ?label:string -> string -> logic_var;
   find_enum_tag : string -> exp * typ;
   find_comp_field: compinfo -> string -> offset;
   find_type : type_namespace -> string -> typ;
@@ -670,7 +670,7 @@ module Make
        val anonCompFieldName : string
        val conditionalConversion : typ -> typ -> typ
        val find_macro : string -> lexpr
-       val find_var : ?label:string -> var:string -> logic_var
+       val find_var : ?label:string -> string -> logic_var
        val find_enum_tag : string -> exp * typ
        val find_comp_field: compinfo -> string -> offset
        val find_type : type_namespace -> string -> typ
@@ -2615,7 +2615,7 @@ struct
         with Not_found ->
         try
           let label = Lenv.string_of_current_label env in
-          let info = ctxt.find_var ?label ~var:x in
+          let info = ctxt.find_var ?label x in
           (match info.lv_origin with
            | Some lv ->
              check_current_label loc env;

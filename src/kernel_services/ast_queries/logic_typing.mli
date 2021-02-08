@@ -97,7 +97,7 @@ type typing_context = {
   anonCompFieldName : string;
   conditionalConversion : typ -> typ -> typ;
   find_macro : string -> Logic_ptree.lexpr;
-  find_var : ?label:string -> var:string -> logic_var;
+  find_var : ?label:string -> string -> logic_var;
   (** the label argument is a C label (obeying the restrictions
       of which label can be present in a \at). If present, the scope for
       searching local C variables is the one of the statement with
@@ -262,7 +262,7 @@ module Make
        val anonCompFieldName : string
        val conditionalConversion : typ -> typ -> typ
        val find_macro : string -> Logic_ptree.lexpr
-       val find_var : ?label:string -> var:string -> logic_var
+       val find_var : ?label:string -> string -> logic_var
        (** see corresponding field in {!Logic_typing.typing_context}. *)
        val find_enum_tag : string -> exp * typ
        val find_type : type_namespace -> string -> typ
