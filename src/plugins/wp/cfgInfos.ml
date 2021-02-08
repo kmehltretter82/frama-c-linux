@@ -179,6 +179,20 @@ end
 (* --- Main Collection Pass                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
+let loop_contract_pids kf stmt =
+  match stmt.Cil_types.skind with
+  | Loop _ ->
+      let invs = CfgAnnot.get_loop_contract kf stmt in
+      let add_assigns assigns l =
+        match assigns with
+        | WpPropId.NoAssignsInfo | AssignsAny _ -> l
+        | AssignsLocations (pid, _) -> pid :: l
+      in
+      List.fold_right (fun (pid,_) l -> pid :: l) invs.loop_established @@
+      List.fold_right (fun (pid,_) l -> pid :: l) invs.loop_preserved @@
+      List.fold_right add_assigns invs.loop_assigns []
+  | _ -> []
+
 let compile Key.{ kf ; bhv ; prop } =
   let cfg = Cfg.get_automaton kf in
   let infos = {
@@ -203,13 +217,16 @@ let compile Key.{ kf ; bhv ; prop } =
        let fs = collect_calls ~bhv stmt in
        let dead = unreachable infos src in
        let ca = CfgAnnot.get_code_assertions kf stmt in
-       let pids = List.map fst ca.code_verified in
-       if dead then
-         infos.doomed <- Bag.concat infos.doomed (Bag.list pids)
-       else
+       let ca_pids = List.map fst ca.code_verified in
+       let loop_pids = loop_contract_pids kf stmt in
+       if dead then begin
+         infos.doomed <- Bag.concat infos.doomed (Bag.list ca_pids) ;
+         infos.doomed <- Bag.concat infos.doomed (Bag.list loop_pids) ;
+       end else
          begin
            if not infos.annots &&
-              ( List.exists (selected ~bhv ~prop) pids ||
+              ( List.exists (selected ~bhv ~prop) ca_pids ||
+                List.exists (selected ~bhv ~prop) loop_pids ||
                 Fset.exists (selected_call ~bhv ~prop) fs )
            then infos.annots <- true ;
            infos.calls <- Fset.union fs infos.calls ;
