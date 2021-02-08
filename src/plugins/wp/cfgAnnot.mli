@@ -62,7 +62,9 @@ type code_assertions = {
   code_verified: pred_info list ;
 }
 
-val get_code_assertions : kernel_function -> stmt -> code_assertions
+val get_code_assertions :
+  ?smoking:WpReached.reachability ->
+  kernel_function -> stmt -> code_assertions
 
 (* -------------------------------------------------------------------------- *)
 (* --- Property Accessors : Loop Contracts                                --- *)

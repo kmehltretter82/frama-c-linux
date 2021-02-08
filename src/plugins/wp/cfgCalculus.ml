@@ -131,6 +131,7 @@ struct
     props: props;
     body: Cfg.automaton option;
     succ: Cfg.vertex -> Cfg.G.edge list;
+    dead: WpReached.reachability option;
     we: W.t_env;
     wp: W.t_prop option Vhash.t; (* None is used for non-dag detection *)
     mutable wk: W.t_prop; (* end point *)
@@ -197,7 +198,9 @@ struct
     let kl = Cil.CurrentLoc.get () in
     try
       Cil.CurrentLoc.set (Stmt.loc s) ;
-      let ca = CfgAnnot.get_code_assertions env.mode.kf s in
+      let smoking =
+        if is_default_bhv env.mode then env.dead else None in
+      let ca = CfgAnnot.get_code_assertions ?smoking env.mode.kf s in
       let pi =
         W.label env.we (Some s) (Clabels.stmt s) @@
         List.fold_right (prove_property env) ca.code_verified @@
@@ -370,8 +373,14 @@ struct
     let succ = match body with
       | None -> (fun _ -> [])
       | Some cfg -> Cfg.G.succ_e cfg.graph in
+    let dead =
+      if body <> None &&
+         is_default_bhv mode &&
+         WpLog.SmokeTests.get () &&
+         WpLog.SmokeDeadcall.get ()
+      then Some (WpReached.reachability kf) else None in
     let env = {
-      mode ; props ; body ; succ ;
+      mode ; props ; body ; succ ; dead ;
       we = W.new_env kf ;
       wp = Vhash.create 32 ;
       wk = W.empty ;

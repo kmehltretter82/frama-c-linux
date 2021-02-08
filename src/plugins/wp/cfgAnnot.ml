@@ -305,7 +305,15 @@ module CodeAssertions = WpContext.StaticGenerator(CodeKey)
         }
     end)
 
-let get_code_assertions kf stmt = CodeAssertions.get (kf,stmt)
+let get_code_assertions ?smoking kf stmt =
+  let ca = CodeAssertions.get (kf,stmt) in
+  match smoking with
+  | None -> ca
+  | Some r ->
+      if WpReached.smoking r stmt then
+        let s = smoke kf ~id:"deadcode" ~unreachable:stmt () in
+        { ca with code_verified = s :: ca.code_verified }
+      else ca
 
 (* -------------------------------------------------------------------------- *)
 (* --- Loop Invariants                                                    --- *)
