@@ -213,6 +213,8 @@ struct
              end
              (List.rev modes)
         ) task.modes ;
+      CfgAnnot.clear () ;
+      CfgInfos.clear () ;
       !collection
     end
 

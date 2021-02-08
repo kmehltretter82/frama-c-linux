@@ -374,3 +374,12 @@ module LoopContract = WpContext.StaticGenerator(CodeKey)
 let get_loop_contract kf stmt = LoopContract.get (kf,stmt)
 
 (* -------------------------------------------------------------------------- *)
+(* --- Clear Tablesnts                                                    --- *)
+(* -------------------------------------------------------------------------- *)
+
+let clear () =
+  CallContract.clear () ;
+  LoopContract.clear () ;
+  CodeAssertions.clear ()
+
+(* -------------------------------------------------------------------------- *)

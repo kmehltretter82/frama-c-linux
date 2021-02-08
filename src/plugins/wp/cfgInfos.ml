@@ -252,5 +252,6 @@ module Generator = WpContext.StaticGenerator(Key)
     end)
 
 let get kf ?(bhv=[]) ?(prop=[]) () = Generator.get { kf ; bhv ; prop }
+let clear () = Generator.clear ()
 
 (* -------------------------------------------------------------------------- *)

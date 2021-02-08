@@ -30,6 +30,8 @@ module Cfg = Interpreted_automata
 val get : Kernel_function.t -> ?bhv:string list -> ?prop:string list ->
   unit -> t
 
+val clear : unit -> unit
+
 val cfg : t -> Cfg.automaton option
 val annots : t -> bool
 val doomed : t -> WpPropId.prop_id Bag.t
