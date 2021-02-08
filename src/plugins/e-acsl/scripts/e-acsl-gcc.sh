@@ -23,6 +23,9 @@
 
 # Convenience wrapper for small runs of E-ACSL Frama-C plugin
 
+# Base dir of this script
+BASEDIR="$(realpath `dirname $0`)"
+
 # Print a message to STDERR and exit. If the second argument (exit code)
 # is provided and it is '0' then do nothing.
 error () {
@@ -37,6 +40,11 @@ warning () {
   echo "e-acsl-gcc: warning: $1" 1>&2
 }
 
+# True if the script is launched from the E-ACSL sources, false otherwise
+is_development_version() {
+  test -f "$BASEDIR/../E_ACSL.mli"
+}
+
 # Check if a given executable name can be found by in the PATH
 has_tool() {
   which "$@" >/dev/null 2>&1 && return 0 || return 1
@@ -46,6 +54,23 @@ has_tool() {
 # in the $PATH. Abort the execution if not.
 check_tool() {
    { has_tool "$1" || test -e "$1"; } || error "No executable $1 found";
+}
+
+# Check if a given Frama-C executable name is indeed an executable, can be found
+# in the $PATH, can be found in the same folder than the script, or can be found
+# in the binary folder of the development version. Abort the execution if not.
+retrieve_framac_path() {
+  if has_tool "$1"; then
+    echo $(which "$1")
+  elif [ -e "$1" ]; then
+    echo "$1"
+  elif [ -e "$BASEDIR/$1" ]; then
+    echo "$BASEDIR/$1"
+  elif is_development_version && [ -e "$BASEDIR/../../../../bin/$1" ]; then
+    echo "$BASEDIR/../../../../bin/$1"
+  else
+    error "No executable $1 or $BASEDIR/$1 found"
+  fi
 }
 
 # Check whether getopt utility supports long options
@@ -358,9 +383,6 @@ Notes:
   See man (1) e-acsl-gcc.sh for full up-to-date documentation.\n"
   exit 1
 }
-
-# Base dir of this script
-BASEDIR="$(realpath `dirname $0`)"
 
 # Run getopt
 ARGS=`getopt -n "$ERROR" -l "$LONGOPTIONS" -o "$SHORTOPTIONS" -- "$@"`
@@ -701,7 +723,7 @@ if [ -z "$1" -a "$OPTION_DLMALLOC_COMPILE_ONLY" != "1" ]; then
 fi
 
 # Check Frama-C and GCC executable names
-check_tool "$OPTION_FRAMAC"
+OPTION_FRAMAC="$(retrieve_framac_path "$OPTION_FRAMAC")"
 check_tool "$OPTION_CC"
 
 # Frama-C directories
@@ -710,7 +732,7 @@ FRAMAC="$OPTION_FRAMAC"
 : ${FRAMAC_PLUGIN:="`$FRAMAC -no-autoload-plugins -print-plugin-path`"}
 
 # Check if this is a development or an installed version
-if [ -f "$BASEDIR/../E_ACSL.mli" ]; then
+if is_development_version; then
   # Development version
   DEVELOPMENT="$(realpath "$BASEDIR/..")"
   # Check if the project has been built, as if this is a non-installed
