@@ -4,6 +4,7 @@
 #include "stdarg.h"
 #include "stddef.h"
 #include "stdio.h"
+/*@ ensures \result ≡ 0; */
 int main(void)
 {
   int __retres;
