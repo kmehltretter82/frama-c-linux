@@ -126,13 +126,12 @@ let get_behavior kf
   let p_asgn, e_asgn =
     normalize_assigns kf ki exits bhv ~active bhv.b_assigns in
   let smokes =
-    if smoking then
-      if bhv.b_assumes = [] && bhv.b_requires = [] then [] else
-        let bname =
-          if Cil.is_default_behavior bhv then "default" else bhv.b_name in
-        let id = bname ^ "_requires" in
-        let doomed = Property.ip_requires_of_behavior kf Kglobal bhv in
-        [smoke kf ~id ~doomed ()]
+    if smoking && bhv.b_requires <> [] then
+      let bname =
+        if Cil.is_default_behavior bhv then "default" else bhv.b_name in
+      let id = bname ^ "_requires" in
+      let doomed = Property.ip_requires_of_behavior kf Kglobal bhv in
+      [smoke kf ~id ~doomed ()]
     else []
   in
   {
@@ -320,7 +319,7 @@ let get_code_assertions ?smoking kf stmt =
   | None -> ca
   | Some r ->
       if WpReached.smoking r stmt then
-        let s = smoke kf ~id:"deadcode" ~unreachable:stmt () in
+        let s = smoke kf ~id:"dead_code" ~unreachable:stmt () in
         { ca with code_verified = s :: ca.code_verified }
       else ca
 
@@ -333,6 +332,8 @@ type loop_contract = {
   loop_established: WpPropId.pred_info list;
   (* to be assumed for loop current *)
   loop_invariants: WpPropId.pred_info list;
+  (* to be proved after loop invariants *)
+  loop_smoke: WpPropId.pred_info list;
   (* to be verified after loop body *)
   loop_preserved: WpPropId.pred_info list;
   (* assigned by loop body *)
@@ -344,6 +345,7 @@ let reverse_loop_contract l = {
   loop_invariants = List.rev l.loop_invariants ;
   loop_preserved = List.rev l.loop_preserved ;
   loop_assigns = List.rev l.loop_assigns ;
+  loop_smoke = List.rev l.loop_smoke ;
 }
 
 let default_assigns stmt l =
@@ -403,11 +405,17 @@ module LoopContract = WpContext.StaticGenerator(CodeKey)
           loop_established = [] ;
           loop_invariants = [] ;
           loop_preserved = [] ;
+          loop_smoke = [] ;
           loop_assigns = [] ;
         }
     end)
 
-let get_loop_contract kf stmt = LoopContract.get (kf,stmt)
+let get_loop_contract ?(smoking=false) kf stmt =
+  let lc = LoopContract.get (kf,stmt) in
+  if smoking && not (WpReached.is_dead_code stmt) then
+    let g = smoke kf ~id:"dead_loop" ~unreachable:stmt () in
+    { lc with loop_smoke = g :: lc.loop_smoke }
+  else lc
 
 (* -------------------------------------------------------------------------- *)
 (* --- Clear Tablesnts                                                    --- *)

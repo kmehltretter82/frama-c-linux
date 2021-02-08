@@ -72,16 +72,19 @@ val get_code_assertions :
 
 type loop_contract = {
   (** to be verified at loop entry *)
-  loop_established: pred_info list;
+  loop_established: WpPropId.pred_info list;
   (** to be assumed for loop current *)
-  loop_invariants: pred_info list;
+  loop_invariants: WpPropId.pred_info list;
+  (** to be proved after loop invariants *)
+  loop_smoke: WpPropId.pred_info list;
   (** to be verified after loop body *)
-  loop_preserved: pred_info list;
+  loop_preserved: WpPropId.pred_info list;
   (** assigned by loop body *)
-  loop_assigns: assigns_full_info list;
+  loop_assigns: WpPropId.assigns_full_info list;
 }
 
-val get_loop_contract : kernel_function -> stmt -> loop_contract
+val get_loop_contract : ?smoking:bool ->
+  kernel_function -> stmt -> loop_contract
 
 (* -------------------------------------------------------------------------- *)
 (* --- Property Accessors : Call Contracts                                --- *)

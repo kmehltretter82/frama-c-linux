@@ -98,10 +98,11 @@ let is_active_mode ~mode ~goal (p: Property.t) =
   | IPDecrease { id_ca = None } -> is_default_bhv mode
   | IPDecrease { id_ca = Some ca } -> is_selected_ca mode ~goal ca
   | IPComplete _ | IPDisjoint _ -> is_default_bhv mode
+  | IPOther _ -> true
   | IPFrom _ | IPGlobalInvariant _ | IPTypeInvariant _ ->
       (*TODO: is it in pass or not ? *) assert false
   | IPAxiomatic _ | IPAxiom _ | IPLemma _
-  | IPOther _ | IPExtended _ | IPBehavior _
+  | IPExtended _ | IPBehavior _
   | IPReachable _ | IPPropertyInstance _
     -> assert false (* n/a *)
 
@@ -220,7 +221,13 @@ struct
         W.switch env.we s value
           (List.map (fun (e,v) -> [e], wp env v) cases)
           (wp env default)
-    | Loop _ -> loop env a s (CfgAnnot.get_loop_contract env.mode.kf s)
+    | Loop _ ->
+        let m = env.mode in
+        let smoking =
+          is_default_bhv m &&
+          WpLog.SmokeTests.get () &&
+          WpLog.SmokeDeadloop.get () in
+        loop env a s (CfgAnnot.get_loop_contract ~smoking m.kf s)
     | Edges -> successors env a
 
   (* Compute loops *)
@@ -233,6 +240,7 @@ struct
       List.fold_right (use_assigns env) lc.loop_assigns @@
       W.label env.we None loop_current @@
       List.fold_right (use_property env) lc.loop_invariants @@
+      List.fold_right (prove_property env) lc.loop_smoke @@
       let q =
         List.fold_right (prove_property env) lc.loop_preserved @@
         List.fold_right (prove_assigns env) lc.loop_assigns @@
@@ -382,7 +390,7 @@ struct
       if body <> None &&
          is_default_bhv mode &&
          WpLog.SmokeTests.get () &&
-         WpLog.SmokeDeadcall.get ()
+         WpLog.SmokeDeadcode.get ()
       then Some (WpReached.reachability kf) else None in
     let env = {
       mode ; props ; body ; succ ; dead ;

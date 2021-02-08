@@ -113,11 +113,12 @@ let selected_bhv ~bhv ~prop (b : Cil_types.funbehavior) =
   begin
     (selected_assigns ~prop b.b_assigns) ||
     (selected_allocates ~prop b.b_allocation) ||
+    (Wp_parameters.SmokeTests.get () && b.b_requires <> []) ||
     (List.exists (selected_postcond ~prop) b.b_post_cond)
   end
 
 let selected_main_bhv ~bhv ~prop (b : Cil_types.funbehavior) =
-  (bhv = [] || List.mem b.b_name bhv) && (selected_requires ~prop) b
+  (bhv = [] || List.mem b.b_name bhv) && (selected_requires ~prop b)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Calls                                                              --- *)
@@ -225,10 +226,12 @@ let compile Key.{ kf ; bhv ; prop } =
            let ca = CfgAnnot.get_code_assertions kf stmt in
            let ca_pids = List.map fst ca.code_verified in
            let loop_pids = loop_contract_pids kf stmt in
-           if dead then begin
-             infos.doomed <- Bag.concat infos.doomed (Bag.list ca_pids) ;
-             infos.doomed <- Bag.concat infos.doomed (Bag.list loop_pids) ;
-           end else
+           if dead then
+             begin
+               infos.doomed <- Bag.concat infos.doomed (Bag.list ca_pids) ;
+               infos.doomed <- Bag.concat infos.doomed (Bag.list loop_pids) ;
+             end
+           else
              begin
                if not infos.annots &&
                   ( List.exists (selected ~bhv ~prop) ca_pids ||
@@ -239,6 +242,8 @@ let compile Key.{ kf ; bhv ; prop } =
              end
         ) cfg.stmt_table ;
     end body ;
+  (* Doomed *)
+  Bag.iter WpAnnot.set_unreachable infos.doomed ;
   (* Collected Infos *)
   infos
 
