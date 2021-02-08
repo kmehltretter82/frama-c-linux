@@ -597,7 +597,7 @@ struct
     let next = (a.return_point,Vertex.Set.empty) in
     let wto =
       WTO.partition
-        ?pref:None (* natural loop keep the heads *)
+        ~pref:(fun _ _ -> 0) (* natural loops keep their heads *)
         ~succs:(UnrollUnnatural.G.succ g)
         ~init:here in
 

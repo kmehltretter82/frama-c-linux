@@ -53,11 +53,12 @@ module Make(Node:sig
   end):sig
 
   type pref = Node.t -> Node.t -> int
-  (** partial order of preference for the choice of the head of a loop *)
+  (** Partial order of preference for the choice of the head of a loop.
+      Use "(fun _ _ -> 0)" for no specific preference. *)
 
   (** Implements Bourdoncle "Efficient chaotic iteration strategies with
   widenings" algorithm to compute a WTO. *)
-  val partition: ?pref:pref -> init:Node.t -> succs:(Node.t -> Node.t list) -> Node.t partition
+  val partition: pref:pref -> init:Node.t -> succs:(Node.t -> Node.t list) -> Node.t partition
 
   val pretty_partition: Format.formatter -> Node.t partition -> unit
   val pretty_component: Format.formatter -> Node.t component -> unit
