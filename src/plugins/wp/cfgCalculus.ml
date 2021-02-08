@@ -321,26 +321,24 @@ struct
     I.process_global_init env.we env.mode.kf @@
     W.scope env.we [] SC_Global w
 
-  let do_preconditions env ~formals bhvs w =
+  let do_preconditions env ~formals (b : CfgAnnot.behavior) w =
     let kf = env.mode.kf in
     let init = WpStrategy.is_main_init kf in
-    let behaviors =
+    let side_behaviors =
       if init || WpLog.PrecondWeakening.get () then []
       else CfgAnnot.get_preconditions ~goal:false kf in
-    let defaults = default_requires env.mode kf in
-    let requires = bhvs.CfgAnnot.bhv_requires in
-    let initreqs = if init then requires else [] in
-    let assumes = bhvs.CfgAnnot.bhv_assumes in
+    let requires_init = if init then b.bhv_requires else [] in
     (* pre-state *)
     W.label env.we None Clabels.pre @@
     (* frame-in *)
     W.scope env.we formals SC_Frame_in @@
     (* pre-conditions *)
-    List.fold_right (use_property env) defaults @@
-    List.fold_right (use_property env) assumes @@
-    List.fold_right (prove_property env) initreqs @@
-    List.fold_right (use_property env) requires @@
-    List.fold_right (use_property env) behaviors w
+    List.fold_right (use_property env) (default_requires env.mode kf) @@
+    List.fold_right (use_property env) b.bhv_assumes @@
+    List.fold_right (prove_property env) requires_init @@
+    List.fold_right (use_property env) b.bhv_requires @@
+    List.fold_right (prove_property env) b.bhv_smokes @@
+    List.fold_right (use_property env) side_behaviors w
 
   let do_post env ~formals (b : CfgAnnot.behavior) w =
     W.scope env.we formals SC_Frame_out @@
@@ -380,7 +378,8 @@ struct
     } in
     let formals = Kf.get_formals kf in
     let exits = not @@ Kf.Set.is_empty @@ CfgInfos.calls infos in
-    let bhv = CfgAnnot.get_behavior kf Kglobal ~exits ~active:[] mode.bhv in
+    let smoking = WpLog.SmokeTests.get () in
+    let bhv = CfgAnnot.get_behavior kf ~smoking ~exits mode.bhv in
     begin
       W.close env.we @@
       do_global_init env @@

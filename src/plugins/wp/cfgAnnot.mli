@@ -35,6 +35,7 @@ open WpPropId
 type behavior = {
   bhv_assumes: pred_info list ;
   bhv_requires: pred_info list ;
+  bhv_smokes: pred_info list ;
   bhv_ensures: pred_info list ;
   bhv_exits: pred_info list ;
   bhv_post_assigns: assigns_full_info ;
@@ -42,11 +43,13 @@ type behavior = {
 }
 
 val get_requires : kernel_function -> kinstr -> funbehavior -> pred_info list
+
 val get_behavior :
-  kernel_function -> kinstr -> exits:bool -> active:string list ->
+  kernel_function ->
+  ?ki:kinstr -> ?smoking:bool -> ?exits:bool -> ?active:string list ->
   funbehavior -> behavior
 
-val get_preconditions : goal:bool ->kernel_function -> pred_info list
+val get_preconditions : goal:bool -> kernel_function -> pred_info list
 val get_complete_behaviors : kernel_function -> pred_info list
 val get_disjoint_behaviors : kernel_function -> pred_info list
 

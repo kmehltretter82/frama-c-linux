@@ -23,6 +23,13 @@
 open Cil_types
 
 (* -------------------------------------------------------------------------- *)
+(* --- Smoke Tests                                                        --- *)
+(* -------------------------------------------------------------------------- *)
+
+let smoke kf ~id ?doomed ?unreachable () =
+  WpPropId.mk_smoke kf ~id ?doomed ?unreachable () , Logic_const.pfalse
+
+(* -------------------------------------------------------------------------- *)
 (* --- Memoization                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -40,6 +47,7 @@ end
 type behavior = {
   bhv_assumes: WpPropId.pred_info list ;
   bhv_requires: WpPropId.pred_info list ;
+  bhv_smokes: WpPropId.pred_info list ;
   bhv_ensures: WpPropId.pred_info list ;
   bhv_exits: WpPropId.pred_info list ;
   bhv_post_assigns: WpPropId.assigns_full_info ;
@@ -110,16 +118,27 @@ let normalize_assigns kf ki has_exit bhv ~active = function
 let get_requires kf ki bhv =
   List.map (normalize_pre kf ki bhv) bhv.b_requires
 
-let get_behavior kf ki ~exits ~active bhv =
+let get_behavior kf
+    ?(ki=Kglobal) ?(smoking=false) ?(exits=false) ?(active=[]) bhv =
   let pre_cond = normalize_pre kf ki bhv in
   let post_cond tk (kind,ip) =
     if kind = tk then Some (normalize_post kf ki bhv tk ip) else None in
   let p_asgn, e_asgn =
-    normalize_assigns kf ki exits bhv ~active bhv.b_assigns
+    normalize_assigns kf ki exits bhv ~active bhv.b_assigns in
+  let smokes =
+    if smoking then
+      if bhv.b_assumes = [] && bhv.b_requires = [] then [] else
+        let bname =
+          if Cil.is_default_behavior bhv then "default" else bhv.b_name in
+        let id = bname ^ "_requires" in
+        let doomed = Property.ip_requires_of_behavior kf Kglobal bhv in
+        [smoke kf ~id ~doomed ()]
+    else []
   in
   {
     bhv_assumes = List.map pre_cond bhv.b_assumes;
     bhv_requires = List.map pre_cond bhv.b_requires;
+    bhv_smokes = smokes;
     bhv_ensures = List.filter_map (post_cond Normal) bhv.b_post_cond ;
     bhv_exits = List.filter_map (post_cond Exits) bhv.b_post_cond ;
     bhv_post_assigns = p_asgn ;
