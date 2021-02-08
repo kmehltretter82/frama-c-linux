@@ -92,7 +92,13 @@ let selected_name ~prop name =
 
 let selected_assigns ~prop = function
   | Cil_types.WritesAny -> false
-  | _ -> selected_name ~prop "@assigns"
+  | Writes _ when prop = [] -> true
+  | Writes l ->
+    let collect_names l (t, _) =
+      WpPropId.ident_names t.Cil_types.it_content.term_name @ l
+    in
+    let names = List.fold_left collect_names ["@assigns"] l in
+    WpPropId.are_selected_names prop names
 
 let selected_allocates ~prop = function
   | Cil_types.FreeAllocAny -> false
@@ -100,7 +106,7 @@ let selected_allocates ~prop = function
 
 let selected_precond ~prop ip =
   prop = [] ||
-  let tk_name = "@ensures" in
+  let tk_name = "@requires" in
   let tp_names = WpPropId.user_pred_names ip.Cil_types.ip_content in
   WpPropId.are_selected_names prop (tk_name :: tp_names)
 

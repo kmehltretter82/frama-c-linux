@@ -71,6 +71,9 @@ val select_for_behaviors : string list -> prop_id -> bool
 (** test if the prop_id has to be selected when we want to select the call. *)
 val select_call_pre : stmt -> Property.t option -> prop_id -> bool
 
+(** From a list of names (of an identified terms), returns usable names. *)
+val ident_names : string list -> string list
+
 (*----------------------------------------------------------------------------*)
 
 val prop_id_keys : prop_id -> string list * string list (* required , hints *)
