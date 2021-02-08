@@ -45,6 +45,13 @@ let empty () = {
 (* --- Property Guided Selection                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
+let get_kf_infos model kf ?bhv ?prop () =
+  if WpRTE.missing_guards model kf then
+    Wp_parameters.warning ~current:false ~once:true "Missing RTE guards"
+  else if Wp_parameters.RTE.get () then
+    WpRTE.generate model kf ;
+  CfgInfos.get kf ?bhv ?prop ()
+
 let empty_default_behavior : funbehavior = {
   b_name = Cil.default_behavior_name ;
   b_requires = [] ;
@@ -73,10 +80,10 @@ let lemma task ?(prop=[]) l =
      (prop=[] || WpPropId.select_by_name prop (WpPropId.mk_lemma_id l))
   then task.lemmas <- l :: task.lemmas
 
-let apply task ~kf ?infos ?bhvs ?target () =
+let apply model task ~kf ?infos ?bhvs ?target () =
   let infos = match infos with
     | Some infos -> infos
-    | None -> CfgInfos.get kf () in
+    | None -> get_kf_infos model kf () in
   let bhvs = match bhvs with
     | Some bhvs -> bhvs
     | None ->
@@ -95,15 +102,15 @@ let notyet prop =
   Wp_parameters.warning ~once:true
     "Not yet implemented wp for '%a'" Property.pretty prop
 
-let rec strategy_ip task target =
+let rec strategy_ip model task target =
   let open Property in
   match target with
   | IPLemma { il_name } ->
       lemma task (LogicUsage.logic_lemma il_name)
   | IPAxiomatic { iax_props } ->
-      List.iter (strategy_ip task) iax_props
+      List.iter (strategy_ip model task) iax_props
   | IPBehavior { ib_kf = kf ; ib_bhv = bhv } ->
-      apply task ~kf ~bhvs:[bhv] ()
+      apply model task ~kf ~bhvs:[bhv] ()
   | IPPredicate { ip_kf = kf ; ip_kind ; ip_kinstr = ki } ->
       begin match ip_kind with
         | PKAssumes _ -> ()
@@ -111,37 +118,37 @@ let rec strategy_ip task target =
             begin
               match ki with
               | Kglobal -> (*TODO*) notyet target
-              | Kstmt _ -> apply task ~kf ~bhvs:[bhv] ~target ()
+              | Kstmt _ -> apply model task ~kf ~bhvs:[bhv] ~target ()
             end
         | PKEnsures(bhv,_) ->
-            apply task ~kf ~bhvs:[bhv] ~target ()
+            apply model task ~kf ~bhvs:[bhv] ~target ()
         | PKTerminates ->
-            apply task ~kf ~bhvs:(default kf) ~target ()
+            apply model task ~kf ~bhvs:(default kf) ~target ()
       end
   | IPDecrease { id_kf = kf } ->
-      apply task ~kf ~bhvs:(default kf) ~target ()
+      apply model task ~kf ~bhvs:(default kf) ~target ()
   | IPAssigns { ias_kf=kf ; ias_bhv=Id_loop ca }
   | IPAllocation { ial_kf=kf ; ial_bhv=Id_loop ca } ->
       let bhvs = match ca.annot_content with
         | AAssigns(bhvs,_) | AAllocation(bhvs,_) -> bhvs
         | _ -> [] in
-      apply task ~kf ~bhvs:(select kf bhvs) ~target ()
+      apply model task ~kf ~bhvs:(select kf bhvs) ~target ()
   | IPAssigns { ias_kf=kf ; ias_bhv=Id_contract(_,bhv) }
   | IPAllocation { ial_kf=kf ; ial_bhv=Id_contract(_,bhv) }
-    -> apply task ~kf ~bhvs:[bhv] ~target ()
+    -> apply model task ~kf ~bhvs:[bhv] ~target ()
   | IPCodeAnnot { ica_kf = kf ; ica_ca = ca } ->
       begin match ca.annot_content with
         | AExtended _ | APragma _ -> ()
         | AStmtSpec(fors,_) ->
             (*TODO*) notyet target ;
-            apply task ~kf ~bhvs:(select kf fors) ()
+            apply model task ~kf ~bhvs:(select kf fors) ()
         | AVariant _ ->
-            apply task ~kf ~target ()
+            apply model task ~kf ~target ()
         | AAssert(fors, _)
         | AInvariant(fors, _, _)
         | AAssigns(fors, _)
         | AAllocation(fors, _) ->
-            apply task ~kf ~bhvs:(select kf fors) ~target ()
+            apply model task ~kf ~bhvs:(select kf fors) ~target ()
       end
   | IPComplete _ -> (*TODO*) notyet target
   | IPDisjoint _ -> (*TODO*) notyet target
@@ -149,18 +156,18 @@ let rec strategy_ip task target =
   | IPPropertyInstance _ -> notyet target (* ? *)
   | IPExtended _ | IPAxiom _ | IPOther _ -> ()
 
-let strategy_main task ?(fct=Fct_all) ?(bhv=[]) ?(prop=[]) () =
+let strategy_main model task ?(fct=Fct_all) ?(bhv=[]) ?(prop=[]) () =
   begin
     if fct = Fct_all && bhv = [] then
       LogicUsage.iter_lemmas (lemma task ~prop) ;
     Wp_parameters.iter_fct
       (fun kf ->
          if Kernel_function.has_definition kf then
-           let infos = CfgInfos.get kf ~bhv ~prop () in
+           let infos = get_kf_infos model kf ~bhv ~prop () in
            if CfgInfos.annots infos then
              if bhv=[]
-             then apply task ~infos ~kf ()
-             else apply task ~infos ~kf ~bhvs:(select kf bhv) ()
+             then apply model task ~infos ~kf ()
+             else apply model task ~infos ~kf ~bhvs:(select kf bhv) ()
       ) fct ;
     task.props <- (if prop=[] then `All else `Names prop);
   end
@@ -195,8 +202,6 @@ struct
                WpContext.on_context (model,WpContext.Kf mode.kf)
                  begin fun () ->
                    LogicUsage.iter_lemmas VCG.register_lemma ;
-                   if WpRTE.missing_guards model mode.kf then
-                     warning ~current:false ~once:true "Missing RTE guards" ;
                    let bhv =
                      if Cil.is_default_behavior mode.bhv then None
                      else Some mode.bhv.b_name in
@@ -214,7 +219,7 @@ struct
 
   let compute_ip model ip =
     let task = empty () in
-    strategy_ip task ip ;
+    strategy_ip model task ip ;
     compute model task
 
   let compute_call _model _stmt =
@@ -224,7 +229,7 @@ struct
 
   let compute_main model ?fct ?bhv ?prop () =
     let task = empty () in
-    strategy_main task ?fct ?bhv ?prop () ;
+    strategy_main model task ?fct ?bhv ?prop () ;
     compute model task
 
 end
@@ -283,12 +288,12 @@ let dumper setup driver =
       method model = model
       method compute_ip ip =
         let task = empty () in
-        strategy_ip task ip ;
+        strategy_ip model task ip ;
         dump task ; Bag.empty
       method compute_call _ = Bag.empty
       method compute_main ?fct ?bhv ?prop () =
         let task = empty () in
-        strategy_main task ?fct ?bhv ?prop () ;
+        strategy_main model task ?fct ?bhv ?prop () ;
         dump task ; Bag.empty
     end
   in generator
