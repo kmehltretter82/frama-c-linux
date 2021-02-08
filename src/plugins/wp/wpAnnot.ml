@@ -657,7 +657,7 @@ let add_called_post called_kf termination_kind acc =
 let add_call_checks config s kf posts exits =
   if cur_fct_default_bhv config
   && Wp_parameters.SmokeTests.get ()
-  && Wp_parameters.SmokeDeadcode.get ()
+  && Wp_parameters.SmokeDeadcall.get ()
   then
     WpStrategy.add_prop_dead_call kf s posts exits
   else

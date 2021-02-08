@@ -259,7 +259,16 @@ module CallContract = WpContext.StaticGenerator(Kernel_function)
         }
     end)
 
-let get_call_contract = CallContract.get
+let get_call_contract ?smoking kf =
+  let cc = CallContract.get kf in
+  match smoking with
+  | None -> cc
+  | Some s ->
+      let g = smoke kf ~id:"dead_call" ~unreachable:s () in
+      { cc with
+        call_post = g :: cc.call_post ;
+        call_exit = g :: cc.call_exit ;
+      }
 
 (* -------------------------------------------------------------------------- *)
 (* --- Code Assertions                                                    --- *)

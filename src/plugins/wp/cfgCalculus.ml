@@ -294,7 +294,12 @@ struct
         W.use_assigns env.we None (WpPropId.mk_asm_assigns_desc s) w
 
   and call env s r kf es wr : W.t_prop =
-    let c = CfgAnnot.get_call_contract kf in
+    let smoking =
+      if is_default_bhv env.mode &&
+         WpLog.SmokeTests.get () &&
+         WpLog.SmokeDeadcall.get ()
+      then Some s else None in
+    let c = CfgAnnot.get_call_contract ?smoking kf in
     let w_call = W.call env.we s r kf es
         ~pre:c.call_pre
         ~post:c.call_post
