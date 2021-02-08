@@ -129,7 +129,7 @@ struct
   type env = {
     mode: mode;
     props: props;
-    cfg: Cfg.automaton;
+    cfg: Cfg.automaton option;
     we: W.t_env;
     wp: W.t_prop option Vhash.t; (* None is used for non-dag detection *)
     mutable wk: W.t_prop; (* end point *)
@@ -179,7 +179,7 @@ struct
 
   exception NonNaturalLoop
 
-  let succ env a = G.succ_e env.cfg.graph a
+  let succ env a = G.succ_e (Option.get env.cfg).graph a
 
   let rec wp (env:env) (a:vertex) : W.t_prop =
     match Vhash.find env.wp a with
@@ -356,11 +356,12 @@ struct
     prove_assigns env b.bhv_exit_assigns w
 
   let do_funbehavior env ~formals (b : CfgAnnot.behavior) w =
+    let cfg = Option.get env.cfg in
     let wpost = do_post env ~formals b w in
     let wexit = do_exit env ~formals b w in
-    Vhash.add env.wp env.cfg.return_point (Some wpost) ;
+    Vhash.add env.wp cfg.return_point (Some wpost) ;
     env.wk <- wexit ;
-    wp env env.cfg.entry_point
+    wp env cfg.entry_point
 
   (* Putting everything together *)
   let compute ~mode ~props =
@@ -381,7 +382,9 @@ struct
       do_global_init env @@
       do_preconditions env ~formals bhv @@
       do_complete_disjoint env @@
-      do_funbehavior env ~formals bhv @@
+      (if Kernel_function.has_definition kf
+       then do_funbehavior env ~formals bhv
+       else Extlib.id) @@
       W.empty
     end
 

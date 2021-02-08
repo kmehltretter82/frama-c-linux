@@ -30,7 +30,7 @@ module Shash = Cil_datatype.Stmt.Hashtbl
 (* -------------------------------------------------------------------------- *)
 
 type t = {
-  cfg : Cfg.automaton;
+  cfg : Cfg.automaton option;
   mutable annots : bool; (* has goals to prove *)
   mutable doomed : WpPropId.prop_id Bag.t;
   mutable calls : Kernel_function.Set.t;
@@ -60,7 +60,7 @@ let fixpoint h d f =
   in phi
 
 let unreachable infos =
-  let pred = Cfg.G.pred infos.cfg.graph in
+  let pred = Cfg.G.pred (Option.get infos.cfg).graph in
   fixpoint infos.unreachable true
     begin fun phi v -> List.for_all phi (pred v) end
 
@@ -119,6 +119,9 @@ let selected_bhv ~bhv ~prop (b : Cil_types.funbehavior) =
     (selected_allocates ~prop b.b_allocation) ||
     (List.exists (selected_postcond ~prop) b.b_post_cond)
   end
+
+let selected_main_bhv ~bhv ~prop (b : Cil_types.funbehavior) =
+  (bhv = [] || List.mem b.b_name bhv) && (selected_requires ~prop) b
 
 (* -------------------------------------------------------------------------- *)
 (* --- Calls                                                              --- *)
@@ -194,7 +197,10 @@ let loop_contract_pids kf stmt =
   | _ -> []
 
 let compile Key.{ kf ; bhv ; prop } =
-  let cfg = Cfg.get_automaton kf in
+  let cfg =
+    if Kernel_function.has_definition kf then Some (Cfg.get_automaton kf)
+    else None
+  in
   let infos = {
     cfg ;
     annots = false ;
@@ -202,36 +208,41 @@ let compile Key.{ kf ; bhv ; prop } =
     calls = Fset.empty ;
     unreachable = Vhash.create 32 ;
   } in
-  (* Root Reachability *)
-  let v0 = cfg.entry_point in
-  Vhash.add infos.unreachable v0 false ;
-  (* Spec Iteration *)
-  if selected_disjoint_complete kf ~bhv ~prop ||
-     List.exists
-       (selected_bhv ~bhv ~prop)
-       (Annotations.behaviors kf)
-  then infos.annots <- true ;
-  (* Stmt Iteration *)
-  Shash.iter
-    (fun stmt (src,_) ->
-       let fs = collect_calls ~bhv stmt in
-       let dead = unreachable infos src in
-       let ca = CfgAnnot.get_code_assertions kf stmt in
-       let ca_pids = List.map fst ca.code_verified in
-       let loop_pids = loop_contract_pids kf stmt in
-       if dead then begin
-         infos.doomed <- Bag.concat infos.doomed (Bag.list ca_pids) ;
-         infos.doomed <- Bag.concat infos.doomed (Bag.list loop_pids) ;
-       end else
-         begin
-           if not infos.annots &&
-              ( List.exists (selected ~bhv ~prop) ca_pids ||
-                List.exists (selected ~bhv ~prop) loop_pids ||
-                Fset.exists (selected_call ~bhv ~prop) fs )
-           then infos.annots <- true ;
-           infos.calls <- Fset.union fs infos.calls ;
-         end
-    ) cfg.stmt_table ;
+  let behaviors = Annotations.behaviors kf in
+  if WpStrategy.is_main_init kf then
+    infos.annots <- List.exists (selected_main_bhv ~bhv ~prop) behaviors ;
+
+  if Kernel_function.has_definition kf then begin
+    let cfg = Option.get cfg in
+    (* Root Reachability *)
+    let v0 = cfg.entry_point in
+    Vhash.add infos.unreachable v0 false ;
+    (* Spec Iteration *)
+    if selected_disjoint_complete kf ~bhv ~prop ||
+       (List.exists (selected_bhv ~bhv ~prop) behaviors)
+    then infos.annots <- true ;
+    (* Stmt Iteration *)
+    Shash.iter
+      (fun stmt (src,_) ->
+         let fs = collect_calls ~bhv stmt in
+         let dead = unreachable infos src in
+         let ca = CfgAnnot.get_code_assertions kf stmt in
+         let ca_pids = List.map fst ca.code_verified in
+         let loop_pids = loop_contract_pids kf stmt in
+         if dead then begin
+           infos.doomed <- Bag.concat infos.doomed (Bag.list ca_pids) ;
+           infos.doomed <- Bag.concat infos.doomed (Bag.list loop_pids) ;
+         end else
+           begin
+             if not infos.annots &&
+                ( List.exists (selected ~bhv ~prop) ca_pids ||
+                  List.exists (selected ~bhv ~prop) loop_pids ||
+                  Fset.exists (selected_call ~bhv ~prop) fs )
+             then infos.annots <- true ;
+             infos.calls <- Fset.union fs infos.calls ;
+           end
+      ) cfg.stmt_table ;
+  end ;
   (* Collected Infos *)
   infos
 

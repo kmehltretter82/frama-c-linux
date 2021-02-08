@@ -162,12 +162,11 @@ let strategy_main model task ?(fct=Fct_all) ?(bhv=[]) ?(prop=[]) () =
       LogicUsage.iter_lemmas (lemma task ~prop) ;
     Wp_parameters.iter_fct
       (fun kf ->
-         if Kernel_function.has_definition kf then
-           let infos = get_kf_infos model kf ~bhv ~prop () in
-           if CfgInfos.annots infos then
-             if bhv=[]
-             then apply model task ~infos ~kf ()
-             else apply model task ~infos ~kf ~bhvs:(select kf bhv) ()
+         let infos = get_kf_infos model kf ~bhv ~prop () in
+         if CfgInfos.annots infos then
+           if bhv=[]
+           then apply model task ~infos ~kf ()
+           else apply model task ~infos ~kf ~bhvs:(select kf bhv) ()
       ) fct ;
     task.props <- (if prop=[] then `All else `Names prop);
   end
