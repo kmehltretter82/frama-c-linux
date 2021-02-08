@@ -344,7 +344,6 @@ Options:
   -e         pass additional options to the prepreprocessor
   -E         pass additional arguments to the Frama-C preprocessor
   -F         pass additional options to the Frama-C command line
-  -p         output the generated code to STDOUT
   -o <file>  output the generated code to <file> [a.out.frama.c]
   -O <file>  output the generated executables to <file> [a.out, a.out.e-acsl]
   -M         maximize memory-related instrumentation
