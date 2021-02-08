@@ -897,6 +897,11 @@ fi
 FRAMAC_FLAGS="$FRAMAC_FLAGS \
   -remove-unused-specified-functions"
 
+if [ -n "$OPTION_VALIDATE_FORMAT_STRINGS" ]; then
+  FRAMAC_FLAGS="$FRAMAC_FLAGS \
+    -variadic-no-translation"
+fi
+
 # C, CPP and LD flags for compilation of E-ACSL-generated sources
 EACSL_CFLAGS="$OPTION_EXTERNAL_ASSERT"
 EACSL_CPPFLAGS="-I$EACSL_SHARE"
