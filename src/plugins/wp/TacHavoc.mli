@@ -29,7 +29,7 @@ module Havoc :
 sig
   val tactical : tactical
   val strategy :
-    ?priority:float -> havoc:selection -> strategy
+    ?priority:float -> selection -> strategy
 end
 
 module Separated :

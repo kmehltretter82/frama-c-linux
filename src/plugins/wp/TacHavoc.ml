@@ -196,7 +196,7 @@ class validity =
 module Havoc =
 struct
   let tactical = Tactical.export (new havoc)
-  let strategy ?(priority=1.0) ~havoc =
+  let strategy ?(priority=1.0) havoc =
     Strategy.{
       priority ;
       tactical ;
