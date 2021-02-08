@@ -863,6 +863,17 @@ or other auxiliary variables that must be updated, other
 \lstinline|ensures| clauses define their new value according to the transition
 that is activated.
 
+It is also possible to only activate the generation of the body of the
+transition functions, without their specification (e.g. to analyze the
+instrumented code with the Eva plug-in, which does not need the contracts and
+loop invariants). This is done through option
+\lstinline|-aorai-no-generate-annotations|. In that case, it might be the case
+that the automaton end up in a rejecting state (for a deterministic automaton)
+or without any active state (for a non-deterministic automaton). Option
+\lstinline|-aorai-smoke-tests| can thus be used to generate assertions at
+the end of all update functions, stating that the automaton is still in an
+appropriate state.
+
 \subsection{Functions behaviors}
 
 Each function \texttt{f} defined in the original C code gets its specification
@@ -1235,6 +1246,8 @@ The plug-in is composed of three parts:
 \section{Recent updates}
 \subsection{Frama-C+dev}
 \begin{itemize}
+\item Documentation for options \texttt{-aorai-no-generate-annotations}
+and \texttt{-aorai-smoke-tests}
 \item Documentation for option \texttt{-aorai-instrumentation-history}
 and built-in \texttt{Frama\_C\_show\_aorai\_state}
 \item Aoraï does not generate a C file by default anymore, relying on
