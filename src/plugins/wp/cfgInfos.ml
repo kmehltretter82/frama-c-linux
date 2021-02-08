@@ -22,19 +22,20 @@
 
 module Cfg = Interpreted_automata
 module Fset = Kernel_function.Set
-module Vhash = Cfg.Vertex.Hashtbl
 module Shash = Cil_datatype.Stmt.Hashtbl
 
 (* -------------------------------------------------------------------------- *)
 (* --- Compute Kernel-Function & CFG Infos for WP                         --- *)
 (* -------------------------------------------------------------------------- *)
 
+module Reachability = Graph.Path.Check(Cfg.G)
+
 type t = {
-  cfg : Cfg.automaton option;
+  cfg : Cfg.automaton option ;
+  reachability : Reachability.path_checker option ;
   mutable annots : bool; (* has goals to prove *)
   mutable doomed : WpPropId.prop_id Bag.t;
   mutable calls : Kernel_function.Set.t;
-  unreachable : bool option Vhash.t ;
 }
 
 (* -------------------------------------------------------------------------- *)
@@ -46,35 +47,10 @@ let calls infos = infos.calls
 let annots infos = infos.annots
 let doomed infos = infos.doomed
 
-(* -------------------------------------------------------------------------- *)
-(* --- Reachability Analyses                                              --- *)
-(* -------------------------------------------------------------------------- *)
-
-let fixpoint h f =
-  let rec phi v =
-    try Vhash.find h v
-    with Not_found ->
-      Vhash.add h v None ;
-      let r = f phi v in
-      if Option.is_none r
-      then Vhash.remove h v
-      else Vhash.replace h v r ;
-      r
-  in phi
-
 let unreachable infos v =
-  let pred = Cfg.G.pred (Option.get infos.cfg).graph in
-  let do_fixpoint = fixpoint infos.unreachable
-      begin fun phi v ->
-        match List.map phi (pred v) with
-        | l when List.exists (fun x -> x = Some false) l -> Some false
-        | l when List.for_all (fun x -> x = Some true) l -> Some true
-        | _ -> None
-      end
-  in
-  match do_fixpoint v with
-  | Some x -> x
-  | None -> Vhash.add infos.unreachable v (Some false) ; false
+  let reachability = Option.get infos.reachability in
+  let entry = (Option.get infos.cfg).entry_point in
+  not @@ Reachability.check_path reachability entry v
 
 (* -------------------------------------------------------------------------- *)
 (* --- Selected Properties                                                --- *)
@@ -94,11 +70,11 @@ let selected_assigns ~prop = function
   | Cil_types.WritesAny -> false
   | Writes _ when prop = [] -> true
   | Writes l ->
-    let collect_names l (t, _) =
-      WpPropId.ident_names t.Cil_types.it_content.term_name @ l
-    in
-    let names = List.fold_left collect_names ["@assigns"] l in
-    WpPropId.are_selected_names prop names
+      let collect_names l (t, _) =
+        WpPropId.ident_names t.Cil_types.it_content.term_name @ l
+      in
+      let names = List.fold_left collect_names ["@assigns"] l in
+      WpPropId.are_selected_names prop names
 
 let selected_allocates ~prop = function
   | Cil_types.FreeAllocAny -> false
@@ -215,16 +191,18 @@ let loop_contract_pids kf stmt =
   | _ -> []
 
 let compile Key.{ kf ; bhv ; prop } =
-  let cfg =
-    if Kernel_function.has_definition kf then Some (Cfg.get_automaton kf)
-    else None
+  let cfg, reachability =
+    if Kernel_function.has_definition kf then
+      let cfg = Cfg.get_automaton kf in
+      Some cfg, Some (Reachability.create cfg.graph)
+    else None, None
   in
   let infos = {
     cfg ;
     annots = false ;
     doomed = Bag.empty ;
     calls = Fset.empty ;
-    unreachable = Vhash.create 32 ;
+    reachability
   } in
   let behaviors = Annotations.behaviors kf in
   if WpStrategy.is_main_init kf then
@@ -232,9 +210,6 @@ let compile Key.{ kf ; bhv ; prop } =
 
   if Kernel_function.has_definition kf then begin
     let cfg = Option.get cfg in
-    (* Root Reachability *)
-    let v0 = cfg.entry_point in
-    Vhash.add infos.unreachable v0 (Some false) ;
     (* Spec Iteration *)
     if selected_disjoint_complete kf ~bhv ~prop ||
        (List.exists (selected_bhv ~bhv ~prop) behaviors)
