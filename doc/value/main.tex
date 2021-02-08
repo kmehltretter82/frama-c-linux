@@ -2033,6 +2033,50 @@ by the Report plugin.
 The summary display can be disabled by using option
 \lstinline|-eva-msg-key=-summary|.
 
+\subsection{Audit messages ({\em experimental})}
+
+Using options \lstinline|-audit-prepare| and \lstinline|-audit-check|, the
+user can produce and check some information relevant for auditing purposes.
+
+\lstinline|-audit-prepare <file>| outputs the following information:
+
+\begin{itemize}
+\item the list of all source files used during parsing: not only those
+  given in the command line, but also those in \lslinline|#include|
+  directives, recursively. This usually includes Frama-C's standard library.
+  For each file, its MD5 checksum is also printed;
+\item the list of {\em enabled} and {\em disabled} warning categories,
+  for the kernel as well as for \Eva{}. Warning categories are considered
+  disabled when set to one of the following actions: {\em inactive},
+  {\em feedback}, and {\em feedback-once}. All other actions are considered
+  as enabled;
+\item the list of Eva's {\em correctness parameters}, along with their values
+  at the moment when Eva is run.
+\end{itemize}
+
+The information is written to \lstinline|<file>|, in JSON format, unless it
+is the special value \lstinline|-| (given as \lstinline|-audit-prepare=-|),
+in which case the information is printed to the standard output in text format.
+
+The complementary option \lstinline|-audit-check file| takes a JSON file
+produced by \lstinline|-audit-prepare| and checks if all checksums, warning
+category statuses and correctness parameters match. Any discrepancies are
+reported and result in an error by default.
+
+The main intent of these options is to help users perform audit-related
+tasks concerning an analysis performed with Eva. It also helps fine-tuning
+analyses without affecting its correctness; for instance, since it omits
+information related to parameters which do not affect correctness, the user
+is free to adjust them to improve the speed and precision of the analysis.
+
+Note that these options are still in experimental stage, and should not be
+blindly relied upon for strict auditing purposes. For instance, they do
+not record information related to syntactic transformations performed by
+plugins such as \textsf{Variadic}, which can have an indirect impact on
+its correctness.
+
+Please contact the Frama-C development team if you intend to use these
+options in a production setting.
 
 \section{About these alarms the user is supposed to check\ldots}
 
