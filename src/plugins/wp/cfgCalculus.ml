@@ -129,7 +129,8 @@ struct
   type env = {
     mode: mode;
     props: props;
-    cfg: Cfg.automaton option;
+    body: Cfg.automaton option;
+    succ: Cfg.vertex -> Cfg.G.edge list;
     we: W.t_env;
     wp: W.t_prop option Vhash.t; (* None is used for non-dag detection *)
     mutable wk: W.t_prop; (* end point *)
@@ -178,8 +179,6 @@ struct
   (* --- Decomposition of WP Rules --- *)
 
   exception NonNaturalLoop
-
-  let succ env a = G.succ_e (Option.get env.cfg).graph a
 
   let rec wp (env:env) (a:vertex) : W.t_prop =
     match Vhash.find env.wp a with
@@ -240,7 +239,7 @@ struct
     W.merge env.we established presersed
 
   (* Merge transitions *)
-  and successors env (a : vertex) = transitions env (succ env a)
+  and successors env (a : vertex) = transitions env (env.succ a)
   and transitions env (es : G.edge list) = fmerge env (transition env) es
   and transition env (_,edge,dst) : W.t_prop =
     let p = wp env dst in
@@ -355,21 +354,26 @@ struct
     List.fold_right (prove_property env) b.bhv_exits @@
     prove_assigns env b.bhv_exit_assigns w
 
-  let do_funbehavior env ~formals (b : CfgAnnot.behavior) w =
-    let cfg = Option.get env.cfg in
-    let wpost = do_post env ~formals b w in
-    let wexit = do_exit env ~formals b w in
-    Vhash.add env.wp cfg.return_point (Some wpost) ;
-    env.wk <- wexit ;
-    wp env cfg.entry_point
+  let do_funbehavior env ~formals (b:CfgAnnot.behavior) w =
+    match env.body with
+    | None -> w
+    | Some cfg ->
+        let wpost = do_post env ~formals b w in
+        let wexit = do_exit env ~formals b w in
+        Vhash.add env.wp cfg.return_point (Some wpost) ;
+        env.wk <- wexit ;
+        wp env cfg.entry_point
 
   (* Putting everything together *)
   let compute ~mode ~props =
     let kf = mode.kf in
     let infos = mode.infos in
-    let cfg = CfgInfos.cfg infos in
+    let body = CfgInfos.body infos in
+    let succ = match body with
+      | None -> (fun _ -> [])
+      | Some cfg -> Cfg.G.succ_e cfg.graph in
     let env = {
-      mode ; props ; cfg ;
+      mode ; props ; body ; succ ;
       we = W.new_env kf ;
       wp = Vhash.create 32 ;
       wk = W.empty ;
@@ -382,9 +386,7 @@ struct
       do_global_init env @@
       do_preconditions env ~formals bhv @@
       do_complete_disjoint env @@
-      (if Kernel_function.has_definition kf
-       then do_funbehavior env ~formals bhv
-       else Extlib.id) @@
+      do_funbehavior env ~formals bhv @@
       W.empty
     end
 

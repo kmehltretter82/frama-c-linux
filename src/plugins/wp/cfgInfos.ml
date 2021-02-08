@@ -31,7 +31,7 @@ module Shash = Cil_datatype.Stmt.Hashtbl
 module Reachability = Graph.Path.Check(Cfg.G)
 
 type t = {
-  cfg : Cfg.automaton option ;
+  body : Cfg.automaton option ;
   reachability : Reachability.path_checker option ;
   mutable annots : bool; (* has goals to prove *)
   mutable doomed : WpPropId.prop_id Bag.t;
@@ -42,15 +42,17 @@ type t = {
 (* --- Getters                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-let cfg infos = infos.cfg
+let body infos = infos.body
 let calls infos = infos.calls
 let annots infos = infos.annots
 let doomed infos = infos.doomed
 
 let unreachable infos v =
-  let reachability = Option.get infos.reachability in
-  let entry = (Option.get infos.cfg).entry_point in
-  not @@ Reachability.check_path reachability entry v
+  match infos.body, infos.reachability with
+  | Some cfg , Some reach ->
+      let entry = cfg.entry_point in
+      not @@ Reachability.check_path reach entry v
+  | _ -> true
 
 (* -------------------------------------------------------------------------- *)
 (* --- Selected Properties                                                --- *)
@@ -191,51 +193,52 @@ let loop_contract_pids kf stmt =
   | _ -> []
 
 let compile Key.{ kf ; bhv ; prop } =
-  let cfg, reachability =
+  let body, reachability =
     if Kernel_function.has_definition kf then
       let cfg = Cfg.get_automaton kf in
       Some cfg, Some (Reachability.create cfg.graph)
     else None, None
   in
   let infos = {
-    cfg ;
+    body ;
     annots = false ;
     doomed = Bag.empty ;
     calls = Fset.empty ;
-    reachability
+    reachability ;
   } in
   let behaviors = Annotations.behaviors kf in
+  (* Inits *)
   if WpStrategy.is_main_init kf then
     infos.annots <- List.exists (selected_main_bhv ~bhv ~prop) behaviors ;
-
-  if Kernel_function.has_definition kf then begin
-    let cfg = Option.get cfg in
-    (* Spec Iteration *)
-    if selected_disjoint_complete kf ~bhv ~prop ||
-       (List.exists (selected_bhv ~bhv ~prop) behaviors)
-    then infos.annots <- true ;
-    (* Stmt Iteration *)
-    Shash.iter
-      (fun stmt (src,_) ->
-         let fs = collect_calls ~bhv stmt in
-         let dead = unreachable infos src in
-         let ca = CfgAnnot.get_code_assertions kf stmt in
-         let ca_pids = List.map fst ca.code_verified in
-         let loop_pids = loop_contract_pids kf stmt in
-         if dead then begin
-           infos.doomed <- Bag.concat infos.doomed (Bag.list ca_pids) ;
-           infos.doomed <- Bag.concat infos.doomed (Bag.list loop_pids) ;
-         end else
-           begin
-             if not infos.annots &&
-                ( List.exists (selected ~bhv ~prop) ca_pids ||
-                  List.exists (selected ~bhv ~prop) loop_pids ||
-                  Fset.exists (selected_call ~bhv ~prop) fs )
-             then infos.annots <- true ;
-             infos.calls <- Fset.union fs infos.calls ;
-           end
-      ) cfg.stmt_table ;
-  end ;
+  (* Function Body *)
+  Option.iter
+    begin fun (cfg : Cfg.automaton) ->
+      (* Spec Iteration *)
+      if selected_disjoint_complete kf ~bhv ~prop ||
+         (List.exists (selected_bhv ~bhv ~prop) behaviors)
+      then infos.annots <- true ;
+      (* Stmt Iteration *)
+      Shash.iter
+        (fun stmt (src,_) ->
+           let fs = collect_calls ~bhv stmt in
+           let dead = unreachable infos src in
+           let ca = CfgAnnot.get_code_assertions kf stmt in
+           let ca_pids = List.map fst ca.code_verified in
+           let loop_pids = loop_contract_pids kf stmt in
+           if dead then begin
+             infos.doomed <- Bag.concat infos.doomed (Bag.list ca_pids) ;
+             infos.doomed <- Bag.concat infos.doomed (Bag.list loop_pids) ;
+           end else
+             begin
+               if not infos.annots &&
+                  ( List.exists (selected ~bhv ~prop) ca_pids ||
+                    List.exists (selected ~bhv ~prop) loop_pids ||
+                    Fset.exists (selected_call ~bhv ~prop) fs )
+               then infos.annots <- true ;
+               infos.calls <- Fset.union fs infos.calls ;
+             end
+        ) cfg.stmt_table ;
+    end body ;
   (* Collected Infos *)
   infos
 
