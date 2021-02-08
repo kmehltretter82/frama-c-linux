@@ -526,7 +526,7 @@ let build_cpp_cmd = function
     in
     let cpp_command = replace_in_cpp_cmd cmdl supp_args (f:>string) (ppf:>string) in
     Kernel.feedback ~dkey:Kernel.dkey_pp
-      "@{<i>preprocessing@} with \"%s\""
+      "preprocessing with \"%s\""
       cpp_command;
     Some (cpp_command, ppf, supp_args)
 
