@@ -1706,20 +1706,18 @@ let check_source_hashes expected actual_table =
           fp hash (Option.value ~default:("<none> (not in list)") expected_hash)
     ) actual_table
 
+let print_and_exit cpp_commands =
+  let print_cpp_cmd (cpp_cmd, _ppf, _) =
+    Kernel.result "Preprocessing command:@.%s" cpp_cmd
+  in
+  List.iter (fun (_f, ocmd) -> Option.iter print_cpp_cmd ocmd) cpp_commands;
+  raise Cmdline.Exit
+
 let prepare_from_c_files () =
   init_cil ();
   let files = Files.get () in (* Allow pre-registration of prolog files *)
   let cpp_commands = List.map (fun f -> (f, build_cpp_cmd f)) files in
-  if Kernel.PrintCppCommands.get () then begin
-    List.iter (fun (_f, opt_cpp_cmd) ->
-        match opt_cpp_cmd with
-        | None -> ()
-        | Some (cpp_cmd, _ppf, _) ->
-          Kernel.result
-            "Preprocessing command:@.%s" cpp_cmd
-      ) cpp_commands;
-    raise Cmdline.Exit
-  end;
+  if Kernel.PrintCppCommands.get () then print_and_exit cpp_commands;
   let audit_check_path = Kernel.AuditCheck.get () in
   if not (Filepath.Normalized.is_unknown audit_check_path) then begin
     let all_sources_tbl = compute_sources_table cpp_commands in
