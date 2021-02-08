@@ -108,24 +108,33 @@ let term_lvals_of_term t =
 let behavior_assumes b =
   Logic_const.pands (List.map Logic_const.pred_of_id_pred b.b_assumes)
 
-let behavior_postcondition b k =
+let take_ip ~goal (ip : identified_predicate) =
+  let { tp_kind ; tp_statement } = ip.ip_content in
+  let take_it =
+    if goal
+    then Logic_utils.verify_predicate tp_kind
+    else Logic_utils.use_predicate tp_kind in
+  if take_it then tp_statement else Logic_const.ptrue
+
+let behavior_postcondition ~goal b k =
   let assumes = Logic_const.pold (behavior_assumes b) in
   let postcondition =
     Logic_const.pands
-      (Extlib.filter_map (fun (x,_) -> x = k)
-         (Extlib.($) Logic_const.pred_of_id_pred snd) b.b_post_cond)
-  in
-  Logic_const.pimplies (assumes,postcondition)
+      (List.map
+         (fun (tk,ip) ->
+            if tk = k then take_ip ~goal ip else Logic_const.ptrue)
+         b.b_post_cond)
+  in Logic_const.pimplies (assumes,postcondition)
 
-let behavior_precondition b =
+let behavior_precondition ~goal b =
   let assumes = behavior_assumes b in
-  let requires = Logic_const.pands
-      (List.rev_map Logic_const.pred_of_id_pred b.b_requires)
-  in
-  Logic_const.pimplies (assumes,requires)
+  let requires =
+    Logic_const.pands
+      (List.map (take_ip ~goal) b.b_requires)
+  in Logic_const.pimplies (assumes,requires)
 
-let precondition spec =
-  Logic_const.pands (List.map behavior_precondition spec.spec_behavior)
+let precondition ~goal spec =
+  Logic_const.pands (List.map (behavior_precondition ~goal) spec.spec_behavior)
 
 (** find the behavior named [name] in the list *)
 let get_named_bhv bhv_list name =

@@ -150,15 +150,15 @@ exception CannotMerge of string
    [merge_object path json_obj] recursively merges the object [json_obj] into the
    JSON file [path]. If [path] does not exist, it is created.
    Merge consists in combining values with the same key, e.g. if [path]
-   already contains an object {"kernel": {"options": ["a"]}}, and
-   [json_obj] is {"kernel": {"options": ["b"]}}, the result will be
-   {"kernel": {"options": ["a", "b"]}}. Cannot merge heterogeneous
+   already contains an object [{"kernel": {"options": ["a"]}}], and
+   [json_obj] is [{"kernel": {"options": ["b"]}}], the result will be
+   [{"kernel": {"options": ["a", "b"]}}]. Cannot merge heterogeneous
    objects, i.e. in the previous example, if "options" were associated
    with a string in [path], trying to merge an array into it would
-   raise [JsonCannotMerge].
+   raise [CannotMerge].
    The merged object is updated in the memory cache.
 
-   @raise [CannotMerge] if the objects have conflicting types for
+   @raise CannotMerge if the objects have conflicting types for
    the same keys, or if the root JSON element is not an object.
    @since Frama-C+dev
 *)
@@ -170,7 +170,7 @@ val merge_object : Filepath.Normalized.t -> Yojson.Basic.t -> unit
    Unlike objects, arrays are merged by simply concatenating their list
    of elements.
 
-   @raise [CannotMerge] if the root JSON element is not an array.
+   @raise CannotMerge if the root JSON element is not an array.
    @since Frama-C+dev
 *)
 val merge_array : Filepath.Normalized.t -> Yojson.Basic.t -> unit
