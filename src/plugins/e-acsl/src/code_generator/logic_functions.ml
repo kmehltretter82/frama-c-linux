@@ -320,7 +320,7 @@ let tapp_to_exp ~loc fname env kf t li params_ty args =
            the exact type of the parameter is only computed when the function is
            generated *)
         List.map2
-          (fun (_, newt, _) e -> Cil.mkCast ~force:false ~newt ~e)
+          (fun (_, newt, _) e -> Cil.mkCast ~force:false ~newt e)
           params
           args
       | _ -> assert false

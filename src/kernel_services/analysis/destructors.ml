@@ -32,7 +32,7 @@ let add_destructor (_, l as acc) var =
       let e =
         match Globals.Functions.get_params kf with
         | vi :: _ ->
-          if Cil.need_cast (Cil.typeOf e) vi.vtype then Cil.mkCast e vi.vtype
+          if Cil.need_cast (Cil.typeOf e) vi.vtype then Cil.mkCast vi.vtype e
           else e
         | [] ->
           Kernel.fatal

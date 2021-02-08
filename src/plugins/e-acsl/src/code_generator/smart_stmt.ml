@@ -81,7 +81,7 @@ let do_call ~loc ?result vi args =
           | TPtr _, TArray _, _ -> assert false
           | _, _, _ -> arg
         in
-        let e = Cil.mkCast ~force:false ~newt:ty ~e in
+        let e = Cil.mkCast ~force:false ~newt:ty e in
         make_rev_args (e :: res) args_tl param_ty_tl
       | arg :: args_tl, [] when variadic -> make_rev_args (arg :: res) args_tl []
       | [], [] -> res

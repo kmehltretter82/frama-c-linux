@@ -3394,9 +3394,9 @@ let evar ?(loc=Location.unknown) vi = new_exp ~loc (Lval (var vi))
 
 let mkString ~loc s = new_exp ~loc (Const(CStr s))
 
-let mkLoop ?(sattr = [Attr("while", [])]) ~(guard:exp) ~(body: stmt list) : stmt list =
+let mkLoop ?sattr ~(guard:exp) ~(body: stmt list) () : stmt list =
   (* Do it like this so that the pretty printer recognizes it *)
-  [ mkStmt ~valid_sid:true ~sattr
+  [ mkStmt ~valid_sid:true ?sattr
       (Loop ([],
              mkBlock
                (mkStmt ~valid_sid:true
@@ -3405,28 +3405,43 @@ let mkLoop ?(sattr = [Attr("while", [])]) ~(guard:exp) ~(body: stmt list) : stmt
                       mkBlock [ mkStmt ~valid_sid:true (Break guard.eloc)], guard.eloc)) ::
                 body), guard.eloc, None, None)) ]
 
-let mkFor ~(start: stmt list) ~(guard: exp) ~(next: stmt list)
-    ~(body: stmt list) : stmt list =
-  (start @
-   (mkLoop ~sattr:[Attr("For",[])] ~guard ~body:(body @ next)))
+let mkWhile ?sattr ~(guard:exp) ~(body: stmt list) () : stmt list =
+  let sattr = [Attr("while", [])] @ Option.value ~default:[] sattr in
+  mkLoop ~sattr ~guard ~body ()
 
-let mkForIncr ~(iter : varinfo) ~(first: exp) ~(stopat: exp) ~(incr: exp)
-    ~(body: stmt list) : stmt list =
+let mkDoWhile ?sattr ~(body: stmt list) ~(guard:exp) () : stmt list =
+  let sattr = [Attr("dowhile", [])] @ Option.value ~default:[] sattr in
+  let exit_stmt =
+    mkStmt ~valid_sid:true
+      (If(guard, mkBlock [mkStmt ~valid_sid:true (Break guard.eloc)],
+          mkBlock [], guard.eloc))
+  in
+  let true_exp = one ~loc:guard.eloc in
+  mkLoop ~sattr ~guard:true_exp ~body:(body @ [exit_stmt]) ()
+
+let mkFor ?sattr ~(start: stmt list) ~(guard: exp) ~(next: stmt list)
+    ~(body: stmt list) () : stmt list =
+  let sattr = [Attr("for", [])] @ Option.value ~default:[] sattr in
+  (start @
+   (mkLoop ~sattr ~guard ~body:(body @ next)) ())
+
+let mkForIncr ?sattr ~(iter : varinfo) ~(first: exp) ~(stopat: exp) ~(incr: exp)
+    ~(body: stmt list) () : stmt list =
   (* See what kind of operator we need *)
   let nextop = match unrollTypeSkel iter.vtype with
     | TPtr _ -> PlusPI
     | _ -> PlusA
   in
-  mkFor
-    [ mkStmtOneInstr ~valid_sid:true (Set (var iter, first, first.eloc)) ]
-    (new_exp ~loc:stopat.eloc (BinOp(Lt, evar iter, stopat, intType)))
-    [ mkStmtOneInstr ~valid_sid:true
-        (Set
-           (var iter,
-            (new_exp ~loc:incr.eloc
-               (BinOp(nextop, evar iter, incr, iter.vtype))),
-            incr.eloc))]
-    body
+  mkFor ?sattr
+    ~start:[ mkStmtOneInstr ~valid_sid:true (Set (var iter, first, first.eloc)) ]
+    ~guard:(new_exp ~loc:stopat.eloc (BinOp(Lt, evar iter, stopat, intType)))
+    ~next:[ mkStmtOneInstr ~valid_sid:true
+              (Set
+                 (var iter,
+                  (new_exp ~loc:incr.eloc
+                     (BinOp(nextop, evar iter, incr, iter.vtype))),
+                  incr.eloc))]
+    ~body ()
 
 let block_from_unspecified_sequence us =
   mkBlock (List.map (fun (x,_,_,_,_) ->x) us)
@@ -4161,7 +4176,7 @@ and process_aligned_attribute (pp:Format.formatter->unit) ~may_reduce attrs defa
 (* Computation of the offset of the field [fi], given the information [sofar]
    computed for the previous fields. [last] indicates that we are considering
    the last field of the struct. Set to [false] by default for unions. *)
-and offsetOfFieldAcc ?(last=false) ~(fi: fieldinfo) ~(sofar: offsetAcc) : offsetAcc =
+and offsetOfFieldAcc ~last ~(fi: fieldinfo) ~(sofar: offsetAcc) : offsetAcc =
   if msvcMode () then offsetOfFieldAcc_MSVC last fi sofar
   else offsetOfFieldAcc_GCC last fi sofar
 
@@ -4372,7 +4387,7 @@ and bitsSizeOf t =
              oaPrevBitPack = None;
            } in
          let fold acc fi =
-           let lastoff = offsetOfFieldAcc ?last:None ~fi ~sofar:startAcc in
+           let lastoff = offsetOfFieldAcc ~last:false ~fi ~sofar:startAcc in
            if lastoff.oaFirstFree > acc
            then lastoff.oaFirstFree
            else acc
@@ -5757,7 +5772,7 @@ let getCompField cinfo fieldName =
     (fun fi -> fi.fname = fieldName)
     (Option.value ~default:[] cinfo.cfields)
 
-let mkCastT ?(force=false) ~(e: exp) ~(oldt: typ) ~(newt: typ) =
+let mkCastT ?(force=false) ~(oldt: typ) ~(newt: typ) e =
   let loc = e.eloc in
   (* Issue #!1546
      let force = force ||
@@ -5794,8 +5809,8 @@ let mkCastT ?(force=false) ~(e: exp) ~(oldt: typ) ~(newt: typ) =
   end else
     e
 
-let mkCast ?force ~(e: exp) ~(newt: typ) =
-  mkCastT ?force ~e ~oldt:(typeOf e) ~newt
+let mkCast ?force ~(newt: typ) e =
+  mkCastT ?force ~oldt:(typeOf e) ~newt e
 
 (* TODO: unify this with doBinOp in Cabs2cil. *)
 let mkBinOp ~loc op e1 e2 =
@@ -5804,8 +5819,8 @@ let mkBinOp ~loc op e1 e2 =
   let machdep = false in
   let make_expr common_type res_type =
     constFoldBinOp ~loc machdep op
-      (mkCastT e1 t1 common_type)
-      (mkCastT e2 t2 common_type)
+      (mkCastT t1 common_type e1)
+      (mkCastT t2 common_type e2)
       res_type
   in
   let doArithmetic () =
@@ -5826,7 +5841,7 @@ let mkBinOp ~loc op e1 e2 =
   let compare_pointer op ?cast1 ?cast2 e1 e2 =
     let do_cast e = function
       | None -> e
-      | Some t' -> mkCastT ~force:false ~e ~oldt:(typeOf e) ~newt:t'
+      | Some t' -> mkCastT ~force:false ~oldt:(typeOf e) ~newt:t' e
     in
     let e1, e2 =
       if need_cast ~force:true (typeOf e1) (typeOf e2) then
@@ -5857,14 +5872,14 @@ let mkBinOp ~loc op e1 e2 =
       let t1' = integralPromotion t1 in
       let t2' = integralPromotion t2 in
       constFoldBinOp ~loc machdep op
-        (mkCastT e1 t1 t1') (mkCastT e2 t2 t2') t1'
+        (mkCastT t1 t1' e1) (mkCastT t2 t2' e2) t1'
   | (PlusA|MinusA)
     when isArithmeticType t1 && isArithmeticType t2 -> doArithmetic ()
   | (PlusPI|MinusPI|IndexPI) when isPointerType t1 && isIntegralType t2 ->
     constFoldBinOp ~loc machdep op e1 e2 t1
   | MinusPP when isPointerType t1 && isPointerType t2 ->
     (* NB: Same as cabs2cil. Check if this is really what the standard says*)
-    constFoldBinOp ~loc machdep op e1 (mkCastT e2 t2 t1) intType
+    constFoldBinOp ~loc machdep op e1 (mkCastT t2 t1 e2) intType
   | (Eq|Ne|Lt|Le|Ge|Gt)
     when isArithmeticType t1 && isArithmeticType t2 ->
     doArithmeticComp ()
@@ -5894,8 +5909,8 @@ let mkBinOp_safe_ptr_cmp ~loc op e1 e2 =
       if isPointerType t1 && isPointerType t2
          && not (isZero e1) && not (isZero e2)
       then begin
-        mkCast ~force:true ~e:e1 ~newt:theMachine.upointType,
-        mkCast ~force:true ~e:e2 ~newt:theMachine.upointType
+        mkCast ~force:true ~newt:theMachine.upointType e1,
+        mkCast ~force:true ~newt:theMachine.upointType e2
       end else e1, e2
     | _ -> e1, e2
   in
@@ -6013,7 +6028,7 @@ let rec makeZeroInit ~loc (t: typ) : init =
 
   | TPtr _ as t ->
     SingleInit(
-      if theMachine.insertImplicitCasts then mkCast (zero ~loc) t
+      if theMachine.insertImplicitCasts then mkCast t (zero ~loc)
       else zero ~loc)
   | x -> Kernel.fatal ~current:true "Cannot initialize type: %a" !pp_typ_ref x
 
@@ -6219,7 +6234,8 @@ let uniqueVarNames (f: file) : unit =
             let data = CurrentLoc.get () in
             let newname, oldloc =
               Alpha.newAlphaName
-                ~alphaTable:gAlphaTable ~undolist ~lookupname ~data
+                ~alphaTable:gAlphaTable ~undolist:(Some undolist)
+                ~lookupname ~data
             in
             if false && newname <> v.vname then (* Disable this warning *)
               Kernel.warning

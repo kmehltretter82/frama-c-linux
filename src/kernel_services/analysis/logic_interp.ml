@@ -312,7 +312,7 @@ and loc_to_exp ~result {term_node = lnode ; term_type = ltype; term_loc = loc} =
           Logic_utils.is_same_type
           (Logic_typing.type_of_set_elem set) t.term_type ->
     loc_to_exp ~result t
-  | Tnull -> [ Cil.mkCast (Cil.zero ~loc) (TPtr(TVoid [], [])) ]
+  | Tnull -> [ Cil.mkCast (TPtr(TVoid [], [])) (Cil.zero ~loc) ]
 
   (* additional constructs *)
   | Tapp _ | Tlambda _ | Trange _   | Tlet _
