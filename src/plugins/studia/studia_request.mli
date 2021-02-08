@@ -19,3 +19,5 @@
 (*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
 (*                                                                        *)
 (**************************************************************************)
+
+(* Studia API for Frama-C server. Nothing is exported. *)

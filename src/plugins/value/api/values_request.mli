@@ -19,3 +19,5 @@
 (*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
 (*                                                                        *)
 (**************************************************************************)
+
+(* Eva API to Frama-C server. Nothing is exported. *)

@@ -19,3 +19,5 @@
 (*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
 (*                                                                        *)
 (**************************************************************************)
+
+(* Dive API for the server. Nothing is exported. *)

@@ -19,3 +19,5 @@
 (*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
 (*                                                                        *)
 (**************************************************************************)
+
+(* This plugin does not export anything to the OCaml API. *)
