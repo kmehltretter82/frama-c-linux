@@ -113,7 +113,7 @@ end
 
 (** How to handle a Frama-C menu. 
     @since Boron-20100401 *)
-class menu_manager: ?packing:(GObj.widget -> unit) -> host:Gtk_helper.host ->
+class menu_manager: ?packing:(GObj.widget -> unit) -> Gtk_helper.host ->
   object
 
     (** {2 API for plug-ins} *)
