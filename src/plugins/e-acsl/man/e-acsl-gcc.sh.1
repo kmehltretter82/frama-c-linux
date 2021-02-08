@@ -269,12 +269,10 @@ instrumentation- or compile-time error
 
 instrument foo.c and output the instrumented code to \fIa.out.frama.c\fP.
 
-.B e-acsl-gcc.sh -P -c -ogen_foo.c -Ofoo foo.c
+.B e-acsl-gcc.sh -c -ogen_foo.c -Ofoo foo.c
 
 instrument \fIfoo.c\fP, output the instrumented code to \fIgen_foo.c\fP and
 compile \fIfoo.c\fP into \fIfoo\fP and \fIgen_foo.c\fP into \fIfoo.e-acsl\fP.
-The \fB-P\fP option specifies that the instrumentation should omit debug
-functionality.
 
 .B e-acsl-gcc.sh --memory-model=bittree -C gen_foo.c
 

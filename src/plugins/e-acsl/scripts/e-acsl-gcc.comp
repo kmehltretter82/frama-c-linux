@@ -29,7 +29,7 @@ _eacsl_gcc() {
   prev="${COMP_WORDS[COMP_CWORD-1]}"
 
   opts="
-    -i -C -d -o -O -v -V -f -E -L -M -l -e -g -q -s -F -P -N -D -I -G -X -a
+    -i -C -d -o -O -v -V -f -E -L -M -l -e -g -q -s -F -N -D -I -G -X -a
     -h -c -T -k
     --verbose= --debug= --debug-log= --logfile= --quiet --rt-debug --help
     --rt-verbose --check --then --keep-going --fail-with-code --external-assert=
