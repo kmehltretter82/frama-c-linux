@@ -85,10 +85,15 @@ module Location: sig
       starting position. Compares normalized filenames, lines and columns,
       but no absolute character offsets.
 
+      @since Frama-C+dev
+   *)
+  val compare_start_semantic : location -> location -> int
+
+  (** Equality using [compare_start_semantic].
+
       @since 22.0-Titanium
    *)
   val equal_start_semantic : location -> location -> bool
-
 end
 
 module Localisation: Datatype.S with type t = localisation

@@ -268,6 +268,7 @@ DISTRIB_FILES:=\
       share/analysis-scripts/function_finder.py                         \
       share/analysis-scripts/git_utils.py                               \
       share/analysis-scripts/list_files.py                              \
+      share/analysis-scripts/list_functions.ml                          \
       share/analysis-scripts/make_template.py                           \
       share/analysis-scripts/make_wrapper.py                            \
       share/analysis-scripts/normalize_jcdb.py                          \
@@ -1934,6 +1935,7 @@ install:: install-lib-$(OCAMLBEST)
 	  share/analysis-scripts/function_finder.py \
 	  share/analysis-scripts/git_utils.py \
 	  share/analysis-scripts/list_files.py \
+	  share/analysis-scripts/list_functions.ml \
 	  share/analysis-scripts/make_template.py \
 	  share/analysis-scripts/make_wrapper.py \
 	  share/analysis-scripts/normalize_jcdb.py \

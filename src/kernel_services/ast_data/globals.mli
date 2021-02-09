@@ -122,6 +122,16 @@ module Functions: sig
   val find_by_name : string -> kernel_function
   (** @raise Not_found if there is no function of this name. *)
 
+  val find_all_by_orig_name : ?cmp:(kernel_function -> kernel_function -> int) ->
+    string -> kernel_function list
+  (**
+     [find_all_by_orig_name ?cmp name] returns the list of functions whose original
+     name is [name], sorted according to [cmp]. If [cmp] is [None],
+     the resulting order is unspecified.
+
+     @since Frama-C+dev
+  *)
+
   val find_def_by_name : string -> kernel_function
   (** @raise Not_found if there is no function definition of this name. *)
 

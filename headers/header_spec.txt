@@ -126,6 +126,7 @@ share/analysis-scripts/flamegraph.pl: CDDL
 share/analysis-scripts/function_finder.py: .ignore
 share/analysis-scripts/git_utils.py: .ignore
 share/analysis-scripts/list_files.py: .ignore
+share/analysis-scripts/list_functions.ml: .ignore
 share/analysis-scripts/make_template.py: .ignore
 share/analysis-scripts/make_wrapper.py: .ignore
 share/analysis-scripts/normalize_jcdb.py: .ignore
