@@ -155,6 +155,7 @@ module Config : sig
   val octagon: flag
   val bitwise: flag
   val inout: flag
+  val taint: flag
   val sign: flag
   val traces: flag
   val printer: flag
