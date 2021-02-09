@@ -40,6 +40,10 @@ module Value_parameters: sig
       to interpret calls to function [kf].
       Raises [Not_found] if there is no builtin of name [name]. *)
   val use_builtin: Cil_types.kernel_function -> string -> unit
+
+  (** [use_global_value_partitioning vi] instructs the analysis to use
+      value partitioning on the global variable [vi]. *)
+  val use_global_value_partitioning: Cil_types.varinfo -> unit
 end
 
 module Eval_terms: sig

@@ -206,6 +206,7 @@ let gen_status ip =
   Sarif_result.create ~ruleId:user_annot_id ~level ~locations ~message ()
 
 let gen_statuses () =
+  let cmp = Property.Ordered_by_function.compare in
   let f ip content =
     let exclude =
       is_alarm ip ||
@@ -213,7 +214,7 @@ let gen_statuses () =
     in
     if exclude then content else (gen_status ip) :: content
   in
-  List.rev (Property_status.fold f [])
+  List.rev (Property_status.fold_sorted ~cmp f [])
 
 let gen_artifacts () =
   let add_src_file f =

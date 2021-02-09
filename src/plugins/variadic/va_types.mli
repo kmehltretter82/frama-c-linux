@@ -26,6 +26,8 @@ open Cil_types
 type variadic_class =
   | Unknown
   (** Function declared and not known by Frama-C *)
+  | Builtin
+  (** Function registered as a builtin function in Cil_builtins *)
   | Defined
   (** Function for which we have the definition in the project *)
   | Misc

@@ -60,11 +60,11 @@ keywordstyle=\bfseries,
 \aorai is a Frama-C plugin that provides a method to automatically annotate a 
 C program according to an automaton $F$ such that, if the annotations
 are verified, we ensure that the program respects $F$. A classical method to
-validate annotations then is to use the Jessie plugin and
+validate annotations then is to use the WP plugin and
 the Why tool or the WP plugin.
 
 This document requires basic knowledge about
-the Frama-C platform itself (See \url{http://frama-c.com} for more information),
+the Frama-C platform itself (See \url{https://frama-c.com} for more information),
 in particular the notions of {\it plug-ins} and {\it project}.
 
 \vspace*{20pt}
@@ -79,7 +79,7 @@ in particular the notions of {\it plug-ins} and {\it project}.
 \end{itemize}
 
 \vspace*{20pt}
-\noindent \textbf{Official web site:}
+\noindent \textbf{Official web site for the original version:}
 
 \begin{center}
   \url{http://amazones.gforge.inria.fr/aorai/index.html}
@@ -140,7 +140,7 @@ This document is divided into four parts:
 \item The second part defines the three \aorai input languages with which it is
 possible to describe a given property.
 \item The third part explains how to prove a program annotated with \aorai 
-using the Jessie plug-in.
+using the WP plug-in.
 \item Finally, the last part details \aorai 's underlying theory, and its
 internal architecture in order to help people who would like to contribute to
 the plug-in itself.
@@ -152,7 +152,7 @@ the plug-in itself.
 \chapter{Quick overview}
 
 In this chapter we will see how to use Frama-C and the couple
-Jessie-\aorai to prove that a C program has the same behavior than
+WP-\aorai to prove that a C program has the same behavior than
 an automaton.
 
 \section{First use}
@@ -163,9 +163,9 @@ an automaton.
   which will be described in the second part. In fact, we consider
   that we have already written the file which describes the automaton.
 
-  Jessie's verification\footnote{For more information about Jessie
+  WP verification\footnote{For more information about WP
     and code verification,please refer to
-    \url{http://frama-c.com/jessie.html}} can only be done on C
+    \url{http://frama-c.com/wp.html}} can only be done on C
   code augmented with ACSL annotations. Thus, 
   \aorai creates a new C file where the automaton is encoded into ACSL 
   annotations. Section~\ref{generated_annotated_file} will give more
@@ -179,37 +179,33 @@ an automaton.
 \end{itemize}
 
  With two files (automaton's description and C file), we can create an
-annotated file in order to process the validation with the Jessie plug-in. This
+annotated file. This
 is done by the following command:
-\begin{lstlisting}[language=sh]
-$ frama-c example.c -aorai-automata example.ya
+\begin{lstlisting}
+$ frama-c example.c -aorai-automata example.ya \
+          -then-last -ocode example_annot.c -print
 \end{lstlisting} %$
 
-This generates a new C file \texttt{example\_annot.c}\footnote{Or \texttt{example\_annot0.c} if \texttt{example\_annot.c} already exists}.
+This generates a new C file \texttt{example\_annot.c}.
 In order to decide if the original program is correct with respect to
 the automaton, it is sufficient to establish that the generated C code and
 its associated ACSL annotations are valid. For instance, the following command
-uses the Jessie plug-in to generate proof obligations and launches \texttt{gwhy}
+uses the WP plugin over the generated file:
 \begin{lstlisting}[language=sh]
-$ frama-c example_annot.c -jessie
+$ frama-c example_annot.c -wp -wp-rte
 \end{lstlisting} %$
 
-Of course, any option of Jessie itself can be used. For instance, one can use
-the Why3 interface instead of \texttt{gwhy}, and select a different algorithm
-for the generation of proof obligations:
-\begin{lstlisting}[language=sh]
-$ frama-c example_annot.c  -jessie \
-        -jessie-why-opt="-fast-wp" -jessie-atp why3ide
-\end{lstlisting} %$
-
-Finally, since Frama-C Nitrogen, it is possible to instruct Frama-C to do a
+Of course, any option of WP itself can be used, notably \texttt{-wp-rte} to
+check for the absence of runtime error.
+Finally, it is possible to instruct Frama-C to do a
 sequence of analyses over various projects, {\it via} the \texttt{-then-on}
-option. Thus, we do not need to use an intermediate file and to run Frama-C
-twice. Instead, we just instruct jessie to operate on the \texttt{aorai}
+options and \texttt{-then-last} options.
+Thus, we do not need to use an intermediate file and to run Frama-C
+twice. Instead, we just instruct WP to operate on the \texttt{aorai}
 project that contains the code annotated by \aorai:
-\begin{lstlisting}[language=sh]
+\begin{lstlisting}
 $ frama-c example.c -aorai-automata example.ya \
-        -then-on aorai -jessie -jessie-atp why3ide
+          -then-last -wp -wp-rte
 \end{lstlisting} %$
 
 \subsection{Automata and verification}
@@ -269,7 +265,7 @@ of states authorized just before (resp. after) the call.
 \aorai generates a new C program, including the automaton
 axiomatization, some coherence invariants, and annotations on
 operations, such that if this annotated program can be validated with
-the Jessie plugin, then we ensure that it respects the given
+the WP plugin, then we ensure that it respects the given
 properties.
 
 Sometimes, the automaton has not enough information to check the
@@ -294,10 +290,7 @@ information about that, please read section \ref{collaboration}.
    \item[-aorai-dot] generates a dot file of the automata.
      Dot is a graph format used by the
      GraphViz tools\footnote{\url{http://www.graphviz.org}}.
-   \item[-aorai-output-c-file <f>] outputs the annotated code in file
-     \texttt{<f>} (default is to suffix the name of the first input file
-     with \texttt{\_annot}, and a numerical suffix if that name is already
-     taken).
+     
  \end{itemize}
 
   Finally, here is a concrete example of a common call:
@@ -697,21 +690,19 @@ figure~\ref{LTL_first_use}
 % ===========================================================================
 % ===========================================================================
 \chapter{Advanced Features}
-\section{Generated Annotated File}
+\section{Generated Annotated Program}
 \label{generated_annotated_file}
 
-The default configuration is to generate a new C file
-(whose name is derived from first input file or can be set by the user; see
-section~\ref{sec:help-command} for more information). The generated file is
+The instrumented program is
 the original program (with its annotations\footnote{ ACSL language for
-  annotation is described at \url{http://frama-c.com/acsl.html}})
+  annotation is described at \url{https://github.com/acsl-language/acsl}})
 completed with the following:
 \begin{itemize}
 \item Some auxiliary C declarations representing the automaton itself
 and information needed to decide if a given transition should be taken or not;
 \item If the automaton has been marked as \texttt{deterministic}, a set of
 lemmas state that it is indeed the case;
-\item For each original C function, two functions are given with their
+\item For each original C function, two functions are defined with their
 specification. They take care of updating the automaton's state when entering
 and exiting the function respectively;
 \item Each original C function gets additional ACSL behaviors, expressing how
@@ -872,6 +863,17 @@ or other auxiliary variables that must be updated, other
 \lstinline|ensures| clauses define their new value according to the transition
 that is activated.
 
+It is also possible to only activate the generation of the body of the
+transition functions, without their specification (e.g. to analyze the
+instrumented code with the Eva plug-in, which does not need the contracts and
+loop invariants). This is done through option
+\lstinline|-aorai-no-generate-annotations|. In that case, it might be the case
+that the automaton end up in a rejecting state (for a deterministic automaton)
+or without any active state (for a non-deterministic automaton). Option
+\lstinline|-aorai-smoke-tests| can thus be used to generate assertions at
+the end of all update functions, stating that the automaton is still in an
+appropriate state.
+
 \subsection{Functions behaviors}
 
 Each function \texttt{f} defined in the original C code gets its specification
@@ -1006,18 +1008,29 @@ int main(int c) {
   \label{FigGeneratedLoopInvariants}
 \end{figure}
 
-\section{Interaction with Annotated Files}
+\section{Analyzing Annotated Files with Eva or WP}
 \label{collaboration}
 Once the annotated file has been generated, it remains to verify that all the
 annotations hold. This section describes briefly how this can be done and some
 common issues that may arise during verification.
 
-\aorai tries to generate ACSL annotations that stay in the fragment
-supported by Value Analysis, so that this plug-in might be used over the
-generated code, but there is no guarantee that it will be able to establish
-the validity of all annotations.
+In addition to annotations, \aorai generates an implementation for the transition
+functions, so that it is possible to use the Eva plug-in of Frama-C on the
+instrumented code. However, there's no guarantee that Eva will be able to
+perform an analysis that stays precise enough to verify that the automaton
+always ends in an accepting state. Aoraï will set up automatically a certain number
+of parameters in Eva to help make the analysis more precise, but,
+in the case of deterministic automata it is also possible
+to use option \texttt{-aorai-instrumentation-history n} to have the instrumentation
+retain the \texttt{n} previous states of the automaton (in addition to the
+current state), that will be used for splitting Eva's abstract states. Furthermore,
+each time Eva encounters a call to the 
+built-in function \texttt{Frama\_C\_show\_aorai\_state}, it will display the current
+state (together with the previous ones up to \texttt{-aorai\-instrumentation-history}).
+If the function is called with some arguments, their abstract value will also be
+displayed.
 
-Another possibility is to use deductive verification plug-ins WP or Jessie.
+Another possibility is to use the deductive verification plug-in WP.
 Note however that the generated annotations are not guaranteed to be complete,
 {\it i.e.} to it might be necessary to add further annotations in order to
 discharge all proof obligations. In particular, in presence of loops, \aorai 
@@ -1028,12 +1041,6 @@ invariants of figure~\ref{FigGeneratedLoopInvariants} that
 \lstinline{c+aorai_counter} remains constant throughout the loop (\lstinline|c|
 gets decremented at each step, while \lstinline|aorai_counter| gets
 incremented), but such a relation is well beyond the scope of \aorai itself.
-
-Finally, as a special warning, Jessie does not use the fact that globals are
-initialized to 0 when entering the \lstinline|main| function of a program
-(which is in fact treated like any other function). This fact must thus be
-sometimes added to the \lstinline|requires| of the function, especially for
-auxiliary variables.
 
 % ========================================================================
 % ========================================================================
@@ -1239,6 +1246,13 @@ The plug-in is composed of three parts:
 \section{Recent updates}
 \subsection{Frama-C+dev}
 \begin{itemize}
+\item Documentation for options \texttt{-aorai-no-generate-annotations}
+and \texttt{-aorai-smoke-tests}
+\item Documentation for option \texttt{-aorai-instrumentation-history}
+and built-in \texttt{Frama\_C\_show\_aorai\_state}
+\item Aoraï does not generate a C file by default anymore, relying on
+kernel options \texttt{-print} and \texttt{-ocode} for that, like all
+plug-ins. Remove corresponding ad'hoc options.
 \item update syntax for YA sequence to avoid ambiguities with
  \texttt{+} and \texttt{*} repetition operators
 \end{itemize}

@@ -800,6 +800,9 @@ module ValuePartitioning =
     end)
 let () = add_precision_dep ValuePartitioning.parameter
 
+let use_global_value_partitioning vi =
+  ValuePartitioning.add vi.Cil_types.vname
+
 let () = Parameter_customize.set_group precision_tuning
 module SplitLimit =
   Int

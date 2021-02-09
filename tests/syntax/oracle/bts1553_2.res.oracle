@@ -6,6 +6,8 @@
      int b ;
   };
   /* compiler builtin: 
+     void Frama_C_show_aorai_state(...);   */
+  /* compiler builtin: 
      __builtin_va_list __builtin_next_arg(void);   */
   /* compiler builtin: 
      unsigned int __builtin_offsetof(unsigned int);   */
@@ -40,6 +42,8 @@
   struct a {
      int b ;
   };
+  /* compiler builtin: 
+     void Frama_C_show_aorai_state(...);   */
   /* compiler builtin: 
      __builtin_va_list __builtin_next_arg(void);   */
   /* compiler builtin: 

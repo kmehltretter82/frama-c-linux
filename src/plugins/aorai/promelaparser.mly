@@ -77,7 +77,10 @@ promela
                 st::l
               ) observed_states []
             in
-            { states; trans = $3; metavariables = Datatype.String.Map.empty }
+            { states; trans = $3;
+              metavariables = Datatype.String.Map.empty;
+              observables = None;
+            }
         }
         | PROMELA_NEVER PROMELA_LBRACE states PROMELA_SEMICOLON 
             PROMELA_RBRACE EOF {
@@ -91,7 +94,11 @@ promela
                   st::l
                 ) observed_states []
               in
-              { states; trans = $3; metavariables = Datatype.String.Map.empty } }
+              { states; trans = $3;
+                metavariables = Datatype.String.Map.empty;
+                observables = None;
+              }
+          }
   ;
 
 states   

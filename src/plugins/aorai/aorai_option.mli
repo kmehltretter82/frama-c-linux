@@ -29,19 +29,27 @@ module Ltl_File: Parameter_sig.Filepath
 module To_Buchi: Parameter_sig.Filepath
 module Buchi: Parameter_sig.Filepath
 module Ya: Parameter_sig.Filepath
-module Output_Spec: Parameter_sig.Bool
-module Output_C_File: Parameter_sig.Filepath
 module Dot: Parameter_sig.Bool
 module DotSeparatedLabels: Parameter_sig.Bool
 module AbstractInterpretation: Parameter_sig.Bool
 module Axiomatization: Parameter_sig.Bool
+module GenerateAnnotations: Parameter_sig.Bool
+module GenerateDeterministicLemmas: Parameter_sig.Bool
 module ConsiderAcceptance: Parameter_sig.Bool
 module AutomataSimplification: Parameter_sig.Bool
-module Test: Parameter_sig.Int
 module AddingOperationNameAndStatusInSpecification: Parameter_sig.Bool
+
+(** if [true], adds assertion at the end of the generated function
+    to check that the automaton is not in the rejecting state (in
+    the deterministic case), or that at least one non-rejecting state
+    is active (in the non-deterministic state).
+*)
+module SmokeTests: Parameter_sig.Bool
 
 (** [true] if the user declares that its ya automaton is deterministic. *)
 module Deterministic: State_builder.Ref with type data = bool
+
+module InstrumentationHistory: Parameter_sig.Int
 
 val is_on : unit -> bool
 val promela_file: unit -> Filepath.Normalized.t

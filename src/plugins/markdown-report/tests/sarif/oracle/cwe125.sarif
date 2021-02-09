@@ -120,7 +120,9 @@
           "ruleId": "user-spec",
           "kind": "pass",
           "level": "none",
-          "message": { "text": "assigns clause in function printf." },
+          "message": {
+            "text": "reachability of stmt line 27 in getValueFromArray."
+          },
           "locations": [
             {
               "physicalLocation": {
@@ -131,8 +133,8 @@
                 "region": {
                   "startLine": 27,
                   "endLine": 27,
-                  "endColumn": 6,
-                  "byteLength": 6
+                  "endColumn": 38,
+                  "byteLength": 38
                 }
               }
             }
@@ -165,30 +167,6 @@
           "ruleId": "user-spec",
           "kind": "pass",
           "level": "none",
-          "message": {
-            "text": "from clause of term \\result in function printf."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "tests/sarif/cwe125.c",
-                  "uriBaseId": "PWD"
-                },
-                "region": {
-                  "startLine": 27,
-                  "endLine": 27,
-                  "endColumn": 6,
-                  "byteLength": 6
-                }
-              }
-            }
-          ]
-        },
-        {
-          "ruleId": "user-spec",
-          "kind": "pass",
-          "level": "none",
           "message": { "text": "behavior default! in function printf." },
           "locations": [
             {
@@ -211,8 +189,30 @@
           "ruleId": "user-spec",
           "kind": "pass",
           "level": "none",
+          "message": { "text": "assigns clause in function printf." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "tests/sarif/cwe125.c",
+                  "uriBaseId": "PWD"
+                },
+                "region": {
+                  "startLine": 27,
+                  "endLine": 27,
+                  "endColumn": 6,
+                  "byteLength": 6
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
           "message": {
-            "text": "reachability of stmt line 27 in getValueFromArray."
+            "text": "from clause of term \\result in function printf."
           },
           "locations": [
             {
@@ -224,8 +224,8 @@
                 "region": {
                   "startLine": 27,
                   "endLine": 27,
-                  "endColumn": 38,
-                  "byteLength": 38
+                  "endColumn": 6,
+                  "byteLength": 6
                 }
               }
             }

@@ -27,16 +27,7 @@ module Typ = Extends.Typ
 
 (* List of builtin function names to translate *)
 
-let va_builtins = [
-  "__builtin_va_start";
-  "__builtin_va_copy";
-  "__builtin_va_arg";
-  "__builtin_va_end"]
-
-let is_framac_builtin vi =
-  Ast_info.is_frama_c_builtin vi.vname ||
-  Extlib.string_prefix "__FRAMAC_" vi.vname (* Mthread prefixes *)
-
+let is_framac_builtin vi = Classify.is_frama_c_builtin vi.vname
 
 (* In place visitor for translation *)
 
@@ -53,8 +44,7 @@ let translate_variadics (file : file) =
 
     method! vglob glob =
       begin match glob with
-        | GFunDecl(_, vi, _) | GFun ({svar = vi}, _)
-          when not (is_framac_builtin vi) ->
+        | GFunDecl(_, vi, _) | GFun ({svar = vi}, _) ->
           if not (Table.mem classification vi) then begin
             let vf = Classify.classify env vi in
             Option.iter (Table.add classification vi) vf
@@ -87,15 +77,16 @@ let translate_variadics (file : file) =
     (* Translate types and signatures *)
     method! vglob glob =
       begin match glob with
-        | GFunDecl(_, vi, _) when is_framac_builtin vi ->
-          Self.result ~level:2 ~current:true
-            "Variadic builtin %s left untransformed." vi.vname;
-          Cil.SkipChildren
-
         | GFunDecl(_, vi, _) ->
-          if Table.mem classification vi then
-            Generic.add_vpar vi;
-          Cil.DoChildren
+          (match Table.find_opt classification vi with
+           | None -> Cil.DoChildren (* may transform the type *)
+           | Some { vf_class = Builtin } ->
+             Self.result ~level:2 ~current:true
+               "Variadic builtin %s left untransformed." vi.vname;
+             Cil.SkipChildren
+           | Some _ ->
+             Generic.add_vpar vi;
+             Cil.DoChildren)
 
         | GFun ({svar = vi} as fundec, _) ->
           if Table.mem classification vi then begin
@@ -147,6 +138,10 @@ let translate_variadics (file : file) =
             | Overload o -> Standard.overloaded_call ~fundec o
             | Aggregator a -> Standard.aggregator_call ~fundec ~ghost a
             | FormatFun f -> Standard.format_fun_call ~fundec env f
+            | Builtin ->
+              Self.result ~level:2 ~current:true
+                "Call to variadic builtin %s left untransformed." f.vname;
+              raise Not_found
             | _ -> raise Standard.Translate_call_exn
           in
           call_translator block loc mk_call vf args
@@ -156,7 +151,7 @@ let translate_variadics (file : file) =
       in
       begin match i with
         | Call(_, {enode = Lval(Var vi, _)}, _, _)
-          when List.mem vi.vname va_builtins ->
+          when Classify.is_va_builtin vi.vname ->
           File.must_recompute_cfg fundec;
           Cil.ChangeTo (Generic.translate_va_builtin fundec i)
         | Call(lv, {enode = Lval(Var vi, NoOffset)}, args, loc) ->
