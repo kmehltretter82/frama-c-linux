@@ -196,6 +196,20 @@ end
 (* --- Main Collection Pass                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
+let post_props_ids ~bhv ~prop tk (b: CfgAnnot.behavior) =
+  let assigns, posts =  match tk with
+    | Cil_types.Exits -> b.bhv_exit_assigns, b.bhv_exits
+    | _ -> b.bhv_post_assigns, b.bhv_ensures
+  in
+  let ps = List.filter (selected ~prop ~bhv) @@ List.map fst posts in
+  match assigns with
+  | WpPropId.AssignsLocations(id, _) -> Bag.list (id :: ps)
+  | _ -> Bag.list ps
+
+let dead_posts ~bhv ~prop tk behaviors =
+  let collect_dead b = Bag.concat (post_props_ids ~bhv ~prop tk b) in
+  List.fold_right collect_dead behaviors Bag.empty
+
 let loop_contract_pids kf stmt =
   match stmt.Cil_types.skind with
   | Loop _ ->
@@ -262,9 +276,21 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
                infos.calls <- Fset.union fs infos.calls ;
              end
         ) cfg.stmt_table ;
+
+      let exits = not @@ Fset.is_empty infos.calls in
+      let mapper fb = CfgAnnot.get_behavior kf ~exits ~active:bhv fb in
+      let behaviors = List.map mapper behaviors in
+      if not exits then
+        infos.doomed <-
+          Bag.concat infos.doomed (dead_posts ~bhv ~prop Exits behaviors) ;
+      if unreachable infos cfg.return_point then
+        infos.doomed <-
+          Bag.concat infos.doomed (dead_posts ~bhv ~prop Normal behaviors) ;
     end body ;
   (* Doomed *)
-  Bag.iter WpAnnot.set_unreachable infos.doomed ;
+  Bag.iter
+    (fun p -> if WpPropId.filter_status p then WpAnnot.set_unreachable p)
+    infos.doomed ;
   (* Collected Infos *)
   infos
 
