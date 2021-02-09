@@ -226,10 +226,15 @@ module Location = struct
   let to_lexing_loc (pos1, pos2) =
     Position.to_lexing_pos pos1, Position.to_lexing_pos pos2
 
-  let equal_start_semantic (pos1, _) (pos2, _) =
-    Filepath.(Datatype.Filepath.equal pos1.pos_path pos2.pos_path
-              && pos1.pos_lnum = pos2.pos_lnum
-              && pos1.pos_cnum - pos1.pos_bol = pos2.pos_cnum - pos2.pos_bol)
+  let compare_start_semantic (pos1, _) (pos2, _) =
+    let open Filepath in
+    let c = Datatype.Filepath.compare pos1.pos_path pos2.pos_path in
+    if c <> 0 then c else
+      let c = pos1.pos_lnum - pos2.pos_lnum in
+      if c <> 0 then c else
+        (pos1.pos_cnum - pos1.pos_bol) - (pos2.pos_cnum - pos2.pos_bol)
+
+  let equal_start_semantic l1 l2 = compare_start_semantic l1 l2 = 0
 
 end
 

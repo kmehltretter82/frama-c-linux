@@ -44,6 +44,11 @@ usage() {
    echo "      Also lists files defining a 'main' function"
    echo "      (heuristics-based; neither correct nor complete)."
    echo ""
+   echo "  - list-functions [files] [Frama-C options]"
+   echo "      Parses all sources in [files] and lists all function"
+   echo "      definitions, with source location and number of statements."
+   echo "      Accepts Frama-C options (e.g. -cpp-extra-args for parsing)."
+   echo ""
    echo "  - flamegraph flamegraph.txt [dir]"
    echo "      Generates flamegraph.svg and flamegraph.html in dir"
    echo "      [default: FRAMAC_SESSION]."
@@ -190,6 +195,13 @@ case "$command" in
     "list-files")
         shift;
         ${FRAMAC_SHARE}/analysis-scripts/list_files.py "$@";
+        ;;
+    "list-functions")
+        shift;
+        # to avoid a slow startup, we only load plugins which perform syntactic
+        # transformations. This may trigger annotation errors due to missing
+        # plugins, so we disable those
+        ${DIR}/frama-c "$@" -no-autoload-plugins -load-module variadic,instantiate,${FRAMAC_SHARE}/analysis-scripts/list_functions.ml -kernel-warn-key annot-error=inactive -kernel-verbose 0;
         ;;
     "find-fun")
         shift;
