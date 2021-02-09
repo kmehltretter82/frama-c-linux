@@ -29,6 +29,9 @@ open Cil_types
 let smoke kf ~id ?doomed ?unreachable () =
   WpPropId.mk_smoke kf ~id ?doomed ?unreachable () , Logic_const.pfalse
 
+let get_unreachable kf stmt =
+  WpPropId.mk_smoke kf ~id:"unreachabled" ~unreachable:stmt ()
+
 (* -------------------------------------------------------------------------- *)
 (* --- Memoization                                                        --- *)
 (* -------------------------------------------------------------------------- *)
@@ -313,15 +316,12 @@ module CodeAssertions = WpContext.StaticGenerator(CodeKey)
         }
     end)
 
-let get_code_assertions ?smoking kf stmt =
+let get_code_assertions ?(smoking=false) kf stmt =
   let ca = CodeAssertions.get (kf,stmt) in
-  match smoking with
-  | None -> ca
-  | Some r ->
-      if WpReached.smoking r stmt then
-        let s = smoke kf ~id:"dead_code" ~unreachable:stmt () in
-        { ca with code_verified = s :: ca.code_verified }
-      else ca
+  if smoking then
+    let s = smoke kf ~id:"dead_code" ~unreachable:stmt () in
+    { ca with code_verified = s :: ca.code_verified }
+  else ca
 
 (* -------------------------------------------------------------------------- *)
 (* --- Loop Invariants                                                    --- *)

@@ -63,8 +63,9 @@ type code_assertions = {
 }
 
 val get_code_assertions :
-  ?smoking:WpReached.reachability ->
-  kernel_function -> stmt -> code_assertions
+  ?smoking:bool -> kernel_function -> stmt -> code_assertions
+
+val get_unreachable : kernel_function -> stmt -> WpPropId.prop_id
 
 (* -------------------------------------------------------------------------- *)
 (* --- Property Accessors : Loop Contracts                                --- *)

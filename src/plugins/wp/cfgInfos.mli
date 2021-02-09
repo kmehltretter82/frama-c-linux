@@ -27,7 +27,8 @@ type t
 module Cfg = Interpreted_automata
 
 (** Memoized *)
-val get : Kernel_function.t -> ?bhv:string list -> ?prop:string list ->
+val get : Kernel_function.t ->
+  ?smoking:bool -> ?bhv:string list -> ?prop:string list ->
   unit -> t
 val clear : unit -> unit
 
@@ -35,6 +36,7 @@ val body : t -> Cfg.automaton option
 val annots : t -> bool
 val doomed : t -> WpPropId.prop_id Bag.t
 val calls : t -> Kernel_function.Set.t
+val smoking : t -> Cil_types.stmt -> bool
 val unreachable : t -> Cfg.vertex -> bool
 
 (**************************************************************************)

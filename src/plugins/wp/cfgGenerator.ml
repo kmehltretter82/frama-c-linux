@@ -50,7 +50,10 @@ let get_kf_infos model kf ?bhv ?prop () =
     Wp_parameters.warning ~current:false ~once:true "Missing RTE guards"
   else if Wp_parameters.RTE.get () then
     WpRTE.generate model kf ;
-  CfgInfos.get kf ?bhv ?prop ()
+  let smoking =
+    Wp_parameters.SmokeTests.get () &&
+    Wp_parameters.SmokeDeadcode.get () in
+  CfgInfos.get kf ~smoking ?bhv ?prop ()
 
 let empty_default_behavior : funbehavior = {
   b_name = Cil.default_behavior_name ;

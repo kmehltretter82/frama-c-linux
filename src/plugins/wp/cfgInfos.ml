@@ -28,11 +28,12 @@ module Shash = Cil_datatype.Stmt.Hashtbl
 (* --- Compute Kernel-Function & CFG Infos for WP                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Reachability = Graph.Path.Check(Cfg.G)
+module CheckPath = Graph.Path.Check(Cfg.G)
 
 type t = {
   body : Cfg.automaton option ;
-  reachability : Reachability.path_checker option ;
+  checkpath : CheckPath.path_checker option ;
+  reachability : WpReached.reachability option ;
   mutable annots : bool; (* has goals to prove *)
   mutable doomed : WpPropId.prop_id Bag.t;
   mutable calls : Kernel_function.Set.t;
@@ -47,11 +48,15 @@ let calls infos = infos.calls
 let annots infos = infos.annots
 let doomed infos = infos.doomed
 
+let wpreached s = function
+  | None -> false
+  | Some reachability -> WpReached.smoking reachability s
+let smoking infos s = wpreached s infos.reachability
+
 let unreachable infos v =
-  match infos.body, infos.reachability with
-  | Some cfg , Some reach ->
-      let entry = cfg.entry_point in
-      not @@ Reachability.check_path reach entry v
+  match infos.body, infos.checkpath with
+  | Some cfg , Some checkpath ->
+      not @@ CheckPath.check_path checkpath cfg.entry_point v
   | _ -> true
 
 (* -------------------------------------------------------------------------- *)
@@ -108,12 +113,12 @@ let selected_disjoint_complete kf ~bhv ~prop =
   ( selected_clause ~prop "@complete_behaviors" Annotations.complete kf ||
     selected_clause ~prop "@disjoint_behaviors" Annotations.disjoint kf )
 
-let selected_bhv ~bhv ~prop (b : Cil_types.funbehavior) =
+let selected_bhv ~smoking ~bhv ~prop (b : Cil_types.funbehavior) =
   (bhv = [] || List.mem b.b_name bhv) &&
   begin
     (selected_assigns ~prop b.b_assigns) ||
     (selected_allocates ~prop b.b_allocation) ||
-    (Wp_parameters.SmokeTests.get () && b.b_requires <> []) ||
+    (smoking && b.b_requires <> []) ||
     (List.exists (selected_postcond ~prop) b.b_post_cond)
   end
 
@@ -154,25 +159,37 @@ let collect_calls ~bhv stmt =
 
 module Key =
 struct
-  type t = { kf: Kernel_function.t ; bhv : string list ; prop : string list }
+  type t = {
+    kf: Kernel_function.t ;
+    smoking: bool ;
+    bhv : string list ;
+    prop : string list ;
+  }
+
   let compare a b =
     let cmp = Kernel_function.compare a.kf b.kf in
     if cmp <> 0 then cmp else
-      let cmp = Stdlib.compare a.bhv b.bhv in
+      let cmp = Stdlib.compare a.smoking b.smoking in
       if cmp <> 0 then cmp else
-        Stdlib.compare a.prop b.prop
+        let cmp = Stdlib.compare a.bhv b.bhv in
+        if cmp <> 0 then cmp else
+          Stdlib.compare a.prop b.prop
+
   let pp_filter kind fmt xs =
     match xs with
     | [] -> ()
     | x::xs ->
         Format.fprintf fmt "~%s:%s" kind x ;
         List.iter (Format.fprintf fmt ",%s") xs
+
   let pretty fmt k =
     begin
       Kernel_function.pretty fmt k.kf ;
+      pp_filter "smoking" fmt (if k.smoking then ["true"] else []) ;
       pp_filter "bhv" fmt k.bhv ;
       pp_filter "prop" fmt k.prop ;
     end
+
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -193,19 +210,20 @@ let loop_contract_pids kf stmt =
       List.fold_right add_assigns invs.loop_assigns []
   | _ -> []
 
-let compile Key.{ kf ; bhv ; prop } =
-  let body, reachability =
+let compile Key.{ kf ; smoking ; bhv ; prop } =
+  let body, checkpath, reachability =
     if Kernel_function.has_definition kf then
       let cfg = Cfg.get_automaton kf in
-      Some cfg, Some (Reachability.create cfg.graph)
-    else None, None
+      Some cfg,
+      Some (CheckPath.create cfg.graph),
+      if smoking then Some (WpReached.reachability kf) else None
+    else None, None, None
   in
   let infos = {
-    body ;
+    body ; checkpath ; reachability ;
     annots = false ;
     doomed = Bag.empty ;
     calls = Fset.empty ;
-    reachability ;
   } in
   let behaviors = Annotations.behaviors kf in
   (* Inits *)
@@ -216,7 +234,7 @@ let compile Key.{ kf ; bhv ; prop } =
     begin fun (cfg : Cfg.automaton) ->
       (* Spec Iteration *)
       if selected_disjoint_complete kf ~bhv ~prop ||
-         (List.exists (selected_bhv ~bhv ~prop) behaviors)
+         (List.exists (selected_bhv ~smoking ~bhv ~prop) behaviors)
       then infos.annots <- true ;
       (* Stmt Iteration *)
       Shash.iter
@@ -228,6 +246,9 @@ let compile Key.{ kf ; bhv ; prop } =
            let loop_pids = loop_contract_pids kf stmt in
            if dead then
              begin
+               if wpreached stmt reachability then
+                 (let p = CfgAnnot.get_unreachable kf stmt in
+                  infos.doomed <- Bag.append infos.doomed p) ;
                infos.doomed <- Bag.concat infos.doomed (Bag.list ca_pids) ;
                infos.doomed <- Bag.concat infos.doomed (Bag.list loop_pids) ;
              end
@@ -259,7 +280,9 @@ module Generator = WpContext.StaticGenerator(Key)
       let compile = compile
     end)
 
-let get kf ?(bhv=[]) ?(prop=[]) () = Generator.get { kf ; bhv ; prop }
+let get kf ?(smoking=false) ?(bhv=[]) ?(prop=[]) () =
+  Generator.get { kf ; smoking ; bhv ; prop }
+
 let clear () = Generator.clear ()
 
 (* -------------------------------------------------------------------------- *)
