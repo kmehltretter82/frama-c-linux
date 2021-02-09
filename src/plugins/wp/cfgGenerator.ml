@@ -46,14 +46,17 @@ let empty () = {
 (* -------------------------------------------------------------------------- *)
 
 let get_kf_infos model kf ?bhv ?prop () =
-  if WpRTE.missing_guards model kf then
-    Wp_parameters.warning ~current:false ~once:true "Missing RTE guards"
-  else if Wp_parameters.RTE.get () then
+  let missing = WpRTE.missing_guards model kf in
+  if missing && Wp_parameters.RTE.get () then
     WpRTE.generate model kf ;
   let smoking =
     Wp_parameters.SmokeTests.get () &&
     Wp_parameters.SmokeDeadcode.get () in
-  CfgInfos.get kf ~smoking ?bhv ?prop ()
+  let infos = CfgInfos.get kf ~smoking ?bhv ?prop () in
+  (*TODO: print warning first *)
+  if missing then
+    Wp_parameters.warning ~current:false ~once:true "Missing RTE guards" ;
+  infos
 
 let empty_default_behavior : funbehavior = {
   b_name = Cil.default_behavior_name ;
