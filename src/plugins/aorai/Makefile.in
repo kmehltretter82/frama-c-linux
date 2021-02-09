@@ -79,23 +79,22 @@ PLUGIN_DISTRIB_EXTERNAL:= \
 PLUGIN_HAS_EXT_DOC:=no # [JS 2010/07/28] was 'yes'
                        # but prevent 'make src-distrib to work
 PLUGIN_DEPENDENCIES:=
-	
-# Dynamic dependencies
 
-$(PLUGIN_DIR)/aorai_eva_analysis.ml:
-	$(PRINT_MAKING) $@
-	$(CP) $< $@
-	$(CHMOD_RO) $@
+# Dynamic dependencies
 
 ifneq "$(ENABLE_EVA)" "no"
 PLUGIN_DEPENDENCIES+= Eva
-$(PLUGIN_DIR)/aorai_eva_analysis.ml: $(PLUGIN_DIR)/aorai_eva_analysis.enabled.ml
+AORAI_EVA_ANALYSIS:= $(PLUGIN_DIR)/aorai_eva_analysis.enabled.ml
 else
-$(PLUGIN_DIR)/aorai_eva_analysis.ml: $(PLUGIN_DIR)/aorai_eva_analysis.disabled.ml
+AORAI_EVA_ANALYSIS:= $(PLUGIN_DIR)/aorai_eva_analysis.disabled.ml
 endif
 
-$(PLUGIN_DIR)/aorai_eva_analysis.ml: $(PLUGIN_DIR)/Makefile share/Makefile.config
+$(PLUGIN_DIR)/aorai_eva_analysis.ml: $(AORAI_EVA_ANALYSIS)
+	$(PRINT_MAKING) $@
+	$(CP) $(AORAI_EVA_ANALYSIS) $@
+	$(CHMOD_RO) $@
 
+$(PLUGIN_DIR)/aorai_eva_analysis.ml: $(PLUGIN_DIR)/Makefile share/Makefile.config
 
 # Tests
 
