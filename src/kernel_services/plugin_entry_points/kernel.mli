@@ -83,6 +83,8 @@ val dkey_parser: category
 
 val dkey_pp: category
 
+val dkey_pp_logic: category
+
 val dkey_print_attrs: category
 
 val dkey_print_bitfields: category

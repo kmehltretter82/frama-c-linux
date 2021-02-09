@@ -171,7 +171,10 @@
       Buffer.output_buffer ppfile preprocess_buffer;
       close_out ppfile;
       let cppname = Extlib.temp_file_cleanup_at_exit ~debug "cppannot" suffix in
-      let res = Sys.command (cpp ppname cppname) in
+      let pp_cmd = cpp ppname cppname in
+      Kernel.feedback ~dkey:Kernel.dkey_pp_logic
+        "logic preprocessing with \"%s\"" pp_cmd;
+      let res = Sys.command pp_cmd in
       let result_file =
         if res <> 0 then begin
           abort_preprocess "Preprocessor call exited with an error";

@@ -86,6 +86,7 @@ let dkey_rmtmps = register_category "parser:rmtmps"
 let dkey_referenced = register_category "parser:referenced"
 
 let dkey_pp = register_category "pp"
+let dkey_pp_logic = register_category "pp:logic"
 let dkey_compilation_db = register_category "pp:compilation-db"
 
 let dkey_print_bitfields = register_category "printer:bitfields"
