@@ -706,8 +706,8 @@ check_tool "$OPTION_CC"
 
 # Frama-C directories
 FRAMAC="$OPTION_FRAMAC"
-: ${FRAMAC_SHARE:="`$FRAMAC -print-share-path`"}
-: ${FRAMAC_PLUGIN:="`$FRAMAC -print-plugin-path`"}
+: ${FRAMAC_SHARE:="`$FRAMAC -no-autoload-plugins -print-share-path`"}
+: ${FRAMAC_PLUGIN:="`$FRAMAC -no-autoload-plugins -print-plugin-path`"}
 
 # Check if this is a development or an installed version
 if [ -f "$BASEDIR/../E_ACSL.mli" ]; then
