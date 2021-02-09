@@ -308,12 +308,14 @@ struct
          WpLog.SmokeDeadcall.get ()
       then Some s else None in
     let c = CfgAnnot.get_call_contract ?smoking kf in
+    let p_post = List.fold_right (prove_property env) c.call_smoke wr in
+    let p_exit = List.fold_right (prove_property env) c.call_smoke env.wk in
     let w_call = W.call env.we s r kf es
         ~pre:c.call_pre
         ~post:c.call_post
         ~pexit:c.call_exit
         ~assigns:c.call_assigns
-        ~p_post:wr ~p_exit:env.wk in
+        ~p_post ~p_exit in
     if is_default_bhv env.mode then
       let pre =
         List.filter_map (fun p ->

@@ -203,6 +203,7 @@ type call_contract = {
   call_pre : WpPropId.pred_info list ;
   call_post : WpPropId.pred_info list ;
   call_exit : WpPropId.pred_info list ;
+  call_smoke : WpPropId.pred_info list ;
   call_assigns : Cil_types.assigns ;
 }
 
@@ -257,6 +258,7 @@ module CallContract = WpContext.StaticGenerator(Kernel_function)
           call_pre = List.rev !cpre ;
           call_post = List.rev !cpost ;
           call_exit = List.rev !cexit ;
+          call_smoke = [] ;
           call_assigns = assigns_upper_bound behaviors
         }
     end)
@@ -268,8 +270,9 @@ let get_call_contract ?smoking kf =
   | Some s ->
       let g = smoke kf ~id:"dead_call" ~unreachable:s () in
       { cc with
-        call_post = g :: cc.call_post ;
-        call_exit = g :: cc.call_exit ;
+        call_smoke = [ g ] ;
+        call_post = cc.call_post ;
+        call_exit = cc.call_exit ;
       }
 
 (* -------------------------------------------------------------------------- *)

@@ -95,6 +95,7 @@ type call_contract = {
   call_pre : pred_info list ;
   call_post : pred_info list ;
   call_exit : pred_info list ;
+  call_smoke : pred_info list ;
   call_assigns : assigns ;
 }
 
