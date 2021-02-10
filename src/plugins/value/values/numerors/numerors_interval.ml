@@ -441,7 +441,7 @@ let finite_values ~prec = function
     let max = F.min (F.maximal_pos_float prec) y in
     if max < min then None else Some (min, max)
 
-let backward_op (op : operator) fnan ?(prec = Precisions.Real) value result =
+let backward_op (op : operator) fnan ?(prec = Precisions.Real) value result () =
   if contains_infinity result || (contains_nan value && contains_nan result)
   then `Value (top prec)
   else
@@ -471,7 +471,7 @@ let synthetize left right =
   | `Value left, `Value right -> `Value (left, right)
 [@@inline]
 
-let backward_add ?(prec = Precisions.Real) ~left ~right ~result =
+let backward_add ?(prec = Precisions.Real) ~left ~right ~result () =
   let reduce_for_nan value =
     match contains_pos_infinity value, contains_neg_infinity value with
     | true , true   -> I (F.neg_inf prec, F.pos_inf prec, true)
@@ -479,38 +479,38 @@ let backward_add ?(prec = Precisions.Real) ~left ~right ~result =
     | false, true   -> I (F.pos_inf prec, F.pos_inf prec, true)
     | false, false  -> NaN prec
   in
-  let right' = backward_op F.sub reduce_for_nan ~prec left  result in
-  let left'  = backward_op F.sub reduce_for_nan ~prec right result in
+  let right' = backward_op F.sub reduce_for_nan ~prec left  result () in
+  let left'  = backward_op F.sub reduce_for_nan ~prec right result () in
   synthetize left' right'
 
-let backward_sub ?(prec = Precisions.Real) ~left ~right ~result =
-  match backward_add ~prec ~left ~right:(neg right) ~result with
+let backward_sub ?(prec = Precisions.Real) ~left ~right ~result () =
+  match backward_add ~prec ~left ~right:(neg right) ~result () with
   | `Bottom -> `Bottom
   | `Value (left, right) -> `Value (left, neg right)
 
-let backward_mul ?(prec = Precisions.Real) ~left ~right ~result =
+let backward_mul ?(prec = Precisions.Real) ~left ~right ~result () =
   let reduce_for_nan value =
     match contains_infinity value, contains_a_zero value with
     | true, _ | _, true -> I (F.neg_inf prec, F.pos_inf prec, true)
     | false, false -> NaN prec
   in
-  let right' = backward_op F.div reduce_for_nan ~prec left  result in
-  let left'  = backward_op F.div reduce_for_nan ~prec right result in
+  let right' = backward_op F.div reduce_for_nan ~prec left  result () in
+  let left'  = backward_op F.div reduce_for_nan ~prec right result () in
   synthetize left' right'
 
-let backward_div ?(prec = Precisions.Real) ~left ~right ~result =
+let backward_div ?(prec = Precisions.Real) ~left ~right ~result () =
   let reduce_for_nan value =
     match contains_infinity value, contains_a_zero value with
     | true, _ | _, true -> I (F.neg_inf prec, F.pos_inf prec, true)
     | false, false -> NaN prec
   in
   let right' =
-    match backward_op F.div reduce_for_nan ~prec left  result with
+    match backward_op F.div reduce_for_nan ~prec left  result () with
     | `Value right' ->
       let one = F.of_int ~prec 1 in
       let one = I (one, one, false) in
       `Value (div ~prec one right')
     | `Bottom -> `Bottom
   in
-  let left'  = backward_op F.div reduce_for_nan ~prec right result in
+  let left'  = backward_op F.div reduce_for_nan ~prec right result () in
   synthetize left' right'
