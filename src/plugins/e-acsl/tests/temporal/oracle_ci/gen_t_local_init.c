@@ -110,6 +110,7 @@ void __e_acsl_globals_clean(void)
 {
   __e_acsl_delete_block((void *)(Str));
   __e_acsl_delete_block((void *)(Strings));
+  return;
 }
 
 int main(int argc, char const **argv)

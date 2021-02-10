@@ -2558,6 +2558,7 @@ void __e_acsl_globals_clean(void)
   __e_acsl_delete_block((void *)(& valid_specifiers));
   __e_acsl_delete_block((void *)(& __fc_p_time_tm));
   __e_acsl_delete_block((void *)(& __fc_time_tm));
+  return;
 }
 
 int main(int argc, char const **argv)

@@ -62,6 +62,7 @@ void __e_acsl_globals_clean(void)
 {
   __e_acsl_delete_block((void *)(Vertices2));
   __e_acsl_delete_block((void *)(Vertices));
+  return;
 }
 
 int main(int argc, char const **argv)

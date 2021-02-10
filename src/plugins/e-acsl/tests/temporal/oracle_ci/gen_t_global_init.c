@@ -118,6 +118,7 @@ void __e_acsl_globals_clean(void)
   __e_acsl_delete_block((void *)(& l_desc));
   __e_acsl_delete_block((void *)(extra_lbits));
   __e_acsl_delete_block((void *)(strings));
+  return;
 }
 
 int main(int argc, char const **argv)

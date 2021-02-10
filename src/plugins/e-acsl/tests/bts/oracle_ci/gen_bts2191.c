@@ -34,6 +34,7 @@ void __e_acsl_globals_init(void)
 void __e_acsl_globals_clean(void)
 {
   __e_acsl_delete_block((void *)(_G));
+  return;
 }
 
 int main(int argc, char **argv)
