@@ -70,7 +70,9 @@
     }
   },
   "sources": {
-    "tests/value/audit.c": "d91c35d6c3eb02ede2ca2bdf92fda63d",
-    "tests/value/audit_included.h": "6164442da331e54680e25ff2fe1ba74e"
+    "tests/value/audit.c": "08f73691217888d926a0ee15cbe18159",
+    "tests/value/audit_included.h": "c2cc488143a476f69cf2ed04c3439e6e",
+    "tests/value/audit_included_but_not_listed.h":
+      "c2cc488143a476f69cf2ed04c3439e6e"
   }
 }

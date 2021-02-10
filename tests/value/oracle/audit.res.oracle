@@ -1,8 +1,13 @@
 [kernel:audit] Warning: 
-  different hashes for tests/value/audit.c: got d91c35d6c3eb02ede2ca2bdf92fda63d, expected 4574f9d5090319c57dab0c9cb81fda32
+  different hashes for tests/value/audit.c: got 08f73691217888d926a0ee15cbe18159, expected 01010101010101010101010101010101
+[kernel:audit] Warning: 
+  different hashes for tests/value/audit_included_but_not_listed.h: got c2cc488143a476f69cf2ed04c3439e6e, expected <none> (not in list)
+[kernel:audit] Warning: 
+  missing hashes for files:
+  tests/value/non_existing_file.h
 [kernel] Audit: sources list written to: tests/value/result/audit-out.json
 [kernel] Parsing tests/value/audit.c (with preprocessing)
-[kernel:parser:decimal-float] tests/value/audit.c:9: Warning: 
+[kernel:parser:decimal-float] tests/value/audit.c:10: Warning: 
   Floating-point constant 2.1 is not represented exactly. Will use 0x1.0cccccccccccdp1.
   (warn-once: no further messages from category 'parser:decimal-float' will be emitted)
 [eva] Analyzing a complete application starting at main

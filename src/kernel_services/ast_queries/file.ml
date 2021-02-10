@@ -1697,14 +1697,40 @@ let source_hashes_of_json path =
       (Yojson.Basic.pretty_to_string v)
 
 let check_source_hashes expected actual_table =
-  Hashtbl.iter (fun fp hash ->
-      let fp = Filepath.Normalized.to_pretty_string fp in
-      let expected_hash = List.assoc_opt fp expected in
-      if Some hash <> expected_hash then
+  let checked, diffs =
+    Hashtbl.fold (fun fp hash (acc_checked, acc_diffs) ->
+        let fp = Filepath.Normalized.to_pretty_string fp in
+        let expected_hash = List.assoc_opt fp expected in
+        let checked = Datatype.String.Set.add fp acc_checked in
+        let diffs =
+          if Some hash = expected_hash then acc_diffs
+          else (fp, hash, expected_hash) :: acc_diffs
+        in
+        checked, diffs
+      ) actual_table (Datatype.String.Set.empty, [])
+  in
+  if diffs <> [] then begin
+    let diffs =
+      List.sort (fun (fp1, _, _) (fp2, _, _) ->
+          Extlib.compare_ignore_case fp1 fp2) diffs
+    in
+    List.iter (fun (fp, got, expected) ->
         Kernel.warning ~wkey:Kernel.wkey_audit
           "different hashes for %s: got %s, expected %s"
-          fp hash (Option.value ~default:("<none> (not in list)") expected_hash)
-    ) actual_table
+          fp got (Option.value ~default:("<none> (not in list)") expected)
+      ) diffs
+  end;
+  let expected_names = List.map fst expected in
+  let missing =
+    List.filter (fun fp -> not (Datatype.String.Set.mem fp checked))
+      expected_names
+  in
+  if missing <> [] then begin
+    let missing = List.sort Extlib.compare_ignore_case missing in
+    Kernel.warning ~wkey:Kernel.wkey_audit
+      "missing hashes for files:@\n%a"
+      (Pretty_utils.pp_list ~sep:"@\n" Format.pp_print_string) missing
+  end
 
 let print_and_exit cpp_commands =
   let print_cpp_cmd (cpp_cmd, _ppf, _) =
