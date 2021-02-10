@@ -181,13 +181,8 @@ let labels_stmt_assigns_l ~kf s l_post = function
 (* --- User Assertions in Functions Code                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
-let labels_assert_before ~kf s = function
+let labels_assert ~kf s = function
   | BuiltinLabel Here -> Clabels.stmt s
-  | l -> labels_fct ~kf ~at:s l
-
-let labels_assert_after ~kf s l_post = function
-  | BuiltinLabel Old -> Clabels.stmt s
-  | BuiltinLabel Here as l -> option l l_post
   | l -> labels_fct ~kf ~at:s l
 
 let labels_loop s = function

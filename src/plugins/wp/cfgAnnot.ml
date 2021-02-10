@@ -295,7 +295,7 @@ module CodeAssertions = WpContext.StaticGenerator(CodeKey)
       type data = code_assertions
       let name = "Wp.CfgAnnot.CodeAssertions"
       let compile (kf,stmt) =
-        let labels = NormAtLabels.labels_assert_before ~kf stmt in
+        let labels = NormAtLabels.labels_assert ~kf stmt in
         let normalize_pred p = NormAtLabels.preproc_annot labels p in
         reverse_code_assertions @@
         Annotations.fold_code_annot

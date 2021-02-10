@@ -268,7 +268,7 @@ let add_prop_call_post acc kind called_kf bhv tkind ~assumes post =
 
 let add_prop_assert acc kind kf s ca p =
   let id = WpPropId.mk_assert_id kf s ca in
-  let labels = NormAtLabels.labels_assert_before ~kf s in
+  let labels = NormAtLabels.labels_assert ~kf s in
   let p = normalize id labels p in
   add_prop acc kind id p
 
