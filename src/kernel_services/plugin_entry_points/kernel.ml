@@ -195,6 +195,7 @@ let wkey_acsl_extension = register_warn_category "acsl-extension"
 let wkey_cmdline = register_warn_category "cmdline"
 
 let wkey_audit = register_warn_category "audit"
+let () = set_warn_status wkey_audit Log.Werror
 
 (* ************************************************************************* *)
 (** {2 Specialised functors for building kernel parameters} *)
