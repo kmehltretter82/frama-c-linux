@@ -1071,7 +1071,7 @@ module AuditCheck =
       let existence = Filepath.Must_exist
       let file_kind = "json"
       let help = "reads an audit JSON file (produced by -audit-prepare) and \
-                  checks compliance w.r.t. to it; e.g., if the source files \
+                  checks compliance w.r.t. it; e.g., if the source files \
                   were declared and have the expected checksum. \
                   Raises a warning (with warning key 'audit') in case of \
                   failed checks. \

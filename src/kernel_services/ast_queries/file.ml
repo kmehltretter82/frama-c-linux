@@ -1754,8 +1754,9 @@ let prepare_from_c_files () =
   if not (Filepath.Normalized.is_unknown audit_path) then begin
     let all_sources_tbl = compute_sources_table cpp_commands in
     print_all_sources audit_path all_sources_tbl;
-    Kernel.feedback "Audit: sources list written to: %a@."
-      Filepath.Normalized.pretty audit_path;
+    if not (Filepath.Normalized.is_special_stdout audit_path) then
+      Kernel.feedback "Audit: sources list written to: %a@."
+        Filepath.Normalized.pretty audit_path;
   end;
   let cil, cabs_files = files_to_cabs_cil files cpp_commands in
   prepare_cil_file cil;
