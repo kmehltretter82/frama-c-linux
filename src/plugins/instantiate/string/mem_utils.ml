@@ -58,7 +58,7 @@ let mem2s_typing _ = function
     (Cil.isCompleteType dest)
   | _ -> false
 
-let mem2s_spec ~requires ~assigns ~ensures _t { svar = vi } loc =
+let mem2s_spec ~requires ~assigns ~ensures _t loc { svar = vi } =
   let (cdest, csrc, clen) = match Cil.getFormalsDecl vi with
     | [ dest ; src ; len ] -> dest, src, len
     | _ -> unexpected "ill-formed fundec in specification generation"

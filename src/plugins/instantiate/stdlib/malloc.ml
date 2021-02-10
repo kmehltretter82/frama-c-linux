@@ -48,7 +48,7 @@ let make_behavior_no_allocation loc ptr_type size =
   let alloc = allocates_nothing () in
   make_behavior ~name:"no_allocation" ~assumes ~assigns ~ensures ~alloc ()
 
-let generate_spec alloc_typ { svar = vi } loc =
+let generate_spec alloc_typ loc { svar = vi } =
   let (csize) = match Cil.getFormalsDecl vi with
     | [ size ] -> size
     | _ -> unexpected "ill-formed fundec in specification generation"
