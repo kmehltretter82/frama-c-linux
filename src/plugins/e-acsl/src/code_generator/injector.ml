@@ -710,8 +710,12 @@ let inject_global_handler file main =
     let vi_init, fundec_init = Global_observer.mk_init_function () in
     let cil_fct_init = GFun(fundec_init, Location.unknown) in
     (* Create [__e_acsl_globals_delete] function *)
-    let vi_clean, fundec_clean = Global_observer.mk_clean_function () in
-    let cil_fct_clean = GFun(fundec_clean, Location.unknown) in
+    let vi_and_fundec_clean_opt = Global_observer.mk_clean_function () in
+    let cil_fct_clean_opt =
+      Option.map
+        (fun (_, fundec_clean) -> GFun(fundec_clean, Location.unknown))
+        vi_and_fundec_clean_opt
+    in
     match main with
     | Some main ->
       let mk_fct_call vi =
@@ -730,14 +734,14 @@ let inject_global_handler file main =
       (* Create [__e_acsl_globals_init();] call *)
       let stmt_init = mk_fct_call vi_init in
       (* Create [__e_acsl_globals_delete();] call *)
-      let stmt_clean =
-        match fundec_clean.sbody.bstmts with
-        | [] -> None
-        | _ -> Some (mk_fct_call vi_clean)
+      let stmt_clean_opt =
+        Option.map
+          (fun (vi_clean, _) -> mk_fct_call vi_clean)
+          vi_and_fundec_clean_opt
       in
       (* Surround the content of main with the calls to
          [__e_acsl_globals_init();] and [__e_acsl_globals_delete();] *)
-      surround_function_with main main_fundec stmt_init stmt_clean;
+      surround_function_with main main_fundec stmt_init stmt_clean_opt;
       (* Retrieve all globals except main *)
       let main_vi = Globals.Functions.get_vi main in
       let new_globals =
@@ -758,9 +762,10 @@ let inject_global_handler file main =
         let globals_to_add = [ GFun(main_fundec, Location.unknown) ] in
         (* Prepend [__e_acsl_globals_clean] if not empty *)
         let globals_to_add =
-          match fundec_clean.sbody.bstmts with
-          | [] -> globals_to_add
-          | _ -> cil_fct_clean :: globals_to_add
+          Option.fold
+            ~none:globals_to_add
+            ~some:(fun cil_fct_clean -> cil_fct_clean :: globals_to_add)
+            cil_fct_clean_opt
         in
         (* Prepend [__e_acsl_globals_init] *)
         let globals_to_add = cil_fct_init :: globals_to_add in
@@ -782,9 +787,10 @@ let inject_global_handler file main =
         Global_observer.function_init_name
         Global_observer.function_clean_name;
       let globals_func =
-        match fundec_clean.sbody.bstmts with
-        | [] -> [ cil_fct_init ]
-        | _ -> [ cil_fct_init; cil_fct_clean ]
+        Option.fold
+          ~none:[ cil_fct_init ]
+          ~some:(fun cil_fct_clean -> [ cil_fct_init; cil_fct_clean ])
+          cil_fct_clean_opt
       in
       file.globals <- file.globals @ globals_func
 
