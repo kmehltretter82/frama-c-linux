@@ -54,6 +54,8 @@ module Make(Node:sig
 
   type pref = Node.t -> Node.t -> int
   (** Partial order of preference for the choice of the head of a loop.
+      [pref current_head new_candidate] must return < 0 if [new_candidate]
+      is preferred to [current_head].
       Use "(fun _ _ -> 0)" for no specific preference. *)
 
   (** Implements Bourdoncle "Efficient chaotic iteration strategies with
