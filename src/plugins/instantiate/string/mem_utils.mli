@@ -56,7 +56,7 @@ val mem2s_spec:
   requires: (identified_predicate list) spec_gen ->
   assigns: assigns spec_gen ->
   ensures: (termination_kind * identified_predicate) list spec_gen ->
-  typ -> fundec -> location -> funspec
+  typ -> location -> fundec -> funspec
 
 val mem2s_typing: typ option -> typ list -> bool
 

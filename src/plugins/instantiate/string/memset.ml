@@ -162,7 +162,7 @@ let generate_ensures e loc t ptr value len =
       { (presult_ptr ~loc t ptr) with pred_name = [ "result"] }
     ])
 
-let generate_spec (_t, e) { svar = vi } loc =
+let generate_spec (_t, e) loc { svar = vi } =
   let (cptr, cvalue, clen) = match Cil.getFormalsDecl vi with
     | [ ptr ; value ; len ] -> ptr, (Some value), len
     | [ ptr ; len ] -> ptr, None, len
