@@ -232,22 +232,16 @@ struct
 
   (* Compute loops *)
   and loop env a s (lc : CfgAnnot.loop_contract) : W.t_prop =
-    let loop_current = Clabels.loop_current s in
-    let established =
-      W.label env.we None loop_current @@
-      List.fold_right (prove_property env) lc.loop_established W.empty in
-    let presersed =
-      List.fold_right (use_assigns env) lc.loop_assigns @@
-      W.label env.we None loop_current @@
-      List.fold_right (use_property env) lc.loop_invariants @@
-      List.fold_right (prove_property env) lc.loop_smoke @@
-      let q =
-        List.fold_right (prove_property env) lc.loop_preserved @@
-        List.fold_right (prove_assigns env) lc.loop_assigns @@
-        W.empty in
-      ( Vhash.replace env.wp a (Some q) ; successors env a )
-    in
-    W.merge env.we established presersed
+    List.fold_right (prove_property env) lc.loop_established @@
+    List.fold_right (use_assigns env) lc.loop_assigns @@
+    W.label env.we None (Clabels.loop_current s) @@
+    List.fold_right (use_property env) lc.loop_invariants @@
+    List.fold_right (prove_property env) lc.loop_smoke @@
+    let q =
+      List.fold_right (prove_property env) lc.loop_preserved @@
+      List.fold_right (prove_assigns env) lc.loop_assigns @@
+      W.empty in
+    ( Vhash.replace env.wp a (Some q) ; successors env a )
 
   (* Merge transitions *)
   and successors env (a : vertex) = transitions env (env.succ a)

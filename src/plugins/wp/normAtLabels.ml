@@ -121,6 +121,8 @@ let labels_fct ?kf ?at l =
   | BuiltinLabel Pre -> Clabels.pre
   | StmtLabel at -> Clabels.stmt !at
   | BuiltinLabel LoopEntry -> Clabels.loop_entry (enclosing_loop ?kf ?at l)
+  (* Labels fct is not used to label invariant establishment/preservation,
+     thus, contrary to what is done in [labels_loop], Current is not Here. *)
   | BuiltinLabel LoopCurrent -> Clabels.loop_current (enclosing_loop ?kf ?at l)
   | _ -> raise (LabelError l)
 
@@ -189,6 +191,7 @@ let labels_assert_after ~kf s l_post = function
   | l -> labels_fct ~kf ~at:s l
 
 let labels_loop s = function
+  (* In invariant preservation/establishment, LoopCurrent is Here. *)
   | BuiltinLabel (Here | LoopCurrent) -> Clabels.here
   | BuiltinLabel LoopEntry -> Clabels.loop_entry s
   | FormalLabel wplabel -> Clabels.formal wplabel
