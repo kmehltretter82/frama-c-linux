@@ -216,11 +216,13 @@ struct
   and control env a s : W.t_prop =
     match a.vertex_control with
     | If { cond ; vthen ; velse } ->
-        W.test env.we s cond (wp env vthen) (wp env velse)
+        let wthen = wp env vthen in
+        let welse = wp env velse in
+        W.test env.we s cond wthen welse
     | Switch { value ; cases ; default } ->
-        W.switch env.we s value
-          (List.map (fun (e,v) -> [e], wp env v) cases)
-          (wp env default)
+        let wcases = List.map (fun (e,v) -> [e], wp env v) cases in
+        let wdefault = wp env default in
+        W.switch env.we s value wcases wdefault
     | Loop _ ->
         let m = env.mode in
         let smoking =
