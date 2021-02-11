@@ -284,22 +284,43 @@ extern double atan(double x);
 */
 extern long double atanl(long double x);
 
-// TODO
-
-/*@ requires finite_args: \is_finite(x) && \is_finite(y);
-    requires finite_result: \is_finite(atan2(x, y));
-    assigns \result \from x, y;
+/*@
+  assigns \result \from x, y;
+  behavior normal:
+    assumes number_args: !\is_NaN(x) && !\is_NaN(y);
     ensures finite_result: \is_finite(\result);
+  behavior nan:
+    assumes nan_arg: \is_NaN(x) || \is_NaN(y);
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern double atan2(double y, double x);
 
-/*@ requires finite_args: \is_finite(x) && \is_finite(y);
-    requires finite_logic_result: \is_finite(atan2f(x, y));
-    assigns \result \from x, y;
+/*@
+  assigns \result \from x, y;
+  behavior normal:
+    assumes number_args: !\is_NaN(x) && !\is_NaN(y);
     ensures finite_result: \is_finite(\result);
+  behavior nan:
+    assumes nan_arg: \is_NaN(x) || \is_NaN(y);
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern float atan2f(float y, float x);
 
+/*@
+  assigns \result \from x, y;
+  behavior normal:
+    assumes number_args: !\is_NaN(x) && !\is_NaN(y);
+    ensures finite_result: \is_finite(\result);
+  behavior nan:
+    assumes nan_arg: \is_NaN(x) || \is_NaN(y);
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
+*/
 extern long double atan2l(long double y, long double x);
 
 /*@

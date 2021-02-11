@@ -175,81 +175,55 @@
 [eva] tests/float/math_builtins.c:99: 
   Call to builtin Frama_C_atan2 for function atan2
 [eva] tests/float/math_builtins.c:99: 
-  function atan2: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:99: 
-  function atan2: precondition 'finite_result' got status valid.
+  function atan2: precondition 'number_args' got status valid.
 [eva] tests/float/math_builtins.c:100: 
   Call to builtin Frama_C_atan2 for function atan2
 [eva] tests/float/math_builtins.c:100: 
-  function atan2: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:100: 
-  function atan2: precondition 'finite_result' got status valid.
+  function atan2: precondition 'number_args' got status valid.
 [eva] tests/float/math_builtins.c:101: 
   Call to builtin Frama_C_atan2 for function atan2
 [eva] tests/float/math_builtins.c:101: 
-  function atan2: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:101: 
-  function atan2: precondition 'finite_result' got status valid.
+  function atan2: precondition 'number_args' got status valid.
 [eva] tests/float/math_builtins.c:102: 
   Call to builtin Frama_C_atan2 for function atan2
 [eva] tests/float/math_builtins.c:102: 
-  function atan2: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:102: 
-  function atan2: precondition 'finite_result' got status valid.
+  function atan2: precondition 'number_args' got status valid.
 [eva] tests/float/math_builtins.c:103: 
   Call to builtin Frama_C_atan2 for function atan2
 [eva] tests/float/math_builtins.c:103: 
-  function atan2: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:103: 
-  function atan2: precondition 'finite_result' got status valid.
+  function atan2: precondition 'number_args' got status valid.
 [eva] tests/float/math_builtins.c:104: 
   Call to builtin Frama_C_atan2 for function atan2
 [eva] tests/float/math_builtins.c:104: 
-  function atan2: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:104: 
-  function atan2: precondition 'finite_result' got status valid.
+  function atan2: precondition 'number_args' got status valid.
 [eva] tests/float/math_builtins.c:105: 
   Call to builtin Frama_C_atan2 for function atan2
 [eva] tests/float/math_builtins.c:105: 
-  function atan2: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:105: 
-  function atan2: precondition 'finite_result' got status valid.
+  function atan2: precondition 'number_args' got status valid.
 [eva] tests/float/math_builtins.c:106: 
   Call to builtin Frama_C_atan2 for function atan2
 [eva] tests/float/math_builtins.c:106: 
-  function atan2: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:106: 
-  function atan2: precondition 'finite_result' got status valid.
+  function atan2: precondition 'number_args' got status valid.
 [eva] tests/float/math_builtins.c:107: 
   Call to builtin Frama_C_atan2 for function atan2
 [eva] tests/float/math_builtins.c:107: 
-  function atan2: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:107: 
-  function atan2: precondition 'finite_result' got status valid.
+  function atan2: precondition 'number_args' got status valid.
 [eva] tests/float/math_builtins.c:108: 
   Call to builtin Frama_C_atan2 for function atan2
 [eva] tests/float/math_builtins.c:108: 
-  function atan2: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:108: 
-  function atan2: precondition 'finite_result' got status valid.
+  function atan2: precondition 'number_args' got status valid.
 [eva] tests/float/math_builtins.c:109: 
   Call to builtin Frama_C_atan2 for function atan2
 [eva] tests/float/math_builtins.c:109: 
-  function atan2: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:109: 
-  function atan2: precondition 'finite_result' got status valid.
+  function atan2: precondition 'number_args' got status valid.
 [eva] tests/float/math_builtins.c:110: 
   Call to builtin Frama_C_atan2 for function atan2
 [eva] tests/float/math_builtins.c:110: 
-  function atan2: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:110: 
-  function atan2: precondition 'finite_result' got status valid.
+  function atan2: precondition 'number_args' got status valid.
 [eva] tests/float/math_builtins.c:111: 
   Call to builtin Frama_C_atan2 for function atan2
 [eva] tests/float/math_builtins.c:111: 
-  function atan2: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:111: 
-  function atan2: precondition 'finite_result' got status valid.
+  function atan2: precondition 'number_args' got status valid.
 [eva] Recording results for test_atan2_det
 [eva] Done for function test_atan2_det
 [eva] computing for function test_atan2 <- main.
@@ -265,9 +239,7 @@
 [eva] tests/float/math_builtins.c:118: 
   Call to builtin Frama_C_atan2 for function atan2
 [eva] tests/float/math_builtins.c:118: 
-  function atan2: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:118: 
-  function atan2: precondition 'finite_result' got status valid.
+  function atan2: precondition 'number_args' got status valid.
 [eva] computing for function double_interval <- test_atan2 <- main.
   Called from tests/float/math_builtins.c:119.
 [eva] Recording results for double_interval
@@ -275,9 +247,7 @@
 [eva] tests/float/math_builtins.c:120: 
   Call to builtin Frama_C_atan2 for function atan2
 [eva] tests/float/math_builtins.c:120: 
-  function atan2: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:120: 
-  function atan2: precondition 'finite_result' got status valid.
+  function atan2: precondition 'number_args' got status valid.
 [eva] computing for function double_interval <- test_atan2 <- main.
   Called from tests/float/math_builtins.c:121.
 [eva] Recording results for double_interval
@@ -285,9 +255,7 @@
 [eva] tests/float/math_builtins.c:122: 
   Call to builtin Frama_C_atan2 for function atan2
 [eva] tests/float/math_builtins.c:122: 
-  function atan2: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:122: 
-  function atan2: precondition 'finite_result' got status valid.
+  function atan2: precondition 'number_args' got status valid.
 [eva] computing for function double_interval <- test_atan2 <- main.
   Called from tests/float/math_builtins.c:123.
 [eva] Recording results for double_interval
@@ -295,9 +263,7 @@
 [eva] tests/float/math_builtins.c:124: 
   Call to builtin Frama_C_atan2 for function atan2
 [eva] tests/float/math_builtins.c:124: 
-  function atan2: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:124: 
-  function atan2: precondition 'finite_result' got status valid.
+  function atan2: precondition 'number_args' got status valid.
 [eva] computing for function double_interval <- test_atan2 <- main.
   Called from tests/float/math_builtins.c:125.
 [eva] Recording results for double_interval
@@ -305,9 +271,7 @@
 [eva] tests/float/math_builtins.c:126: 
   Call to builtin Frama_C_atan2 for function atan2
 [eva] tests/float/math_builtins.c:126: 
-  function atan2: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:126: 
-  function atan2: precondition 'finite_result' got status valid.
+  function atan2: precondition 'number_args' got status valid.
 [eva] computing for function double_interval <- test_atan2 <- main.
   Called from tests/float/math_builtins.c:127.
 [eva] Recording results for double_interval
@@ -319,9 +283,7 @@
 [eva] tests/float/math_builtins.c:129: 
   Call to builtin Frama_C_atan2 for function atan2
 [eva] tests/float/math_builtins.c:129: 
-  function atan2: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:129: 
-  function atan2: precondition 'finite_result' got status valid.
+  function atan2: precondition 'number_args' got status valid.
 [eva] computing for function double_interval <- test_atan2 <- main.
   Called from tests/float/math_builtins.c:130.
 [eva] Recording results for double_interval
@@ -329,9 +291,7 @@
 [eva] tests/float/math_builtins.c:131: 
   Call to builtin Frama_C_atan2 for function atan2
 [eva] tests/float/math_builtins.c:131: 
-  function atan2: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:131: 
-  function atan2: precondition 'finite_result' got status valid.
+  function atan2: precondition 'number_args' got status valid.
 [eva] computing for function double_interval <- test_atan2 <- main.
   Called from tests/float/math_builtins.c:132.
 [eva] Recording results for double_interval
@@ -339,9 +299,7 @@
 [eva] tests/float/math_builtins.c:133: 
   Call to builtin Frama_C_atan2 for function atan2
 [eva] tests/float/math_builtins.c:133: 
-  function atan2: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:133: 
-  function atan2: precondition 'finite_result' got status valid.
+  function atan2: precondition 'number_args' got status valid.
 [eva] computing for function double_interval <- test_atan2 <- main.
   Called from tests/float/math_builtins.c:134.
 [eva] Recording results for double_interval
@@ -349,9 +307,7 @@
 [eva] tests/float/math_builtins.c:135: 
   Call to builtin Frama_C_atan2 for function atan2
 [eva] tests/float/math_builtins.c:135: 
-  function atan2: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:135: 
-  function atan2: precondition 'finite_result' got status valid.
+  function atan2: precondition 'number_args' got status valid.
 [eva] computing for function double_interval <- test_atan2 <- main.
   Called from tests/float/math_builtins.c:136.
 [eva] Recording results for double_interval
@@ -359,33 +315,23 @@
 [eva] tests/float/math_builtins.c:137: 
   Call to builtin Frama_C_atan2 for function atan2
 [eva] tests/float/math_builtins.c:137: 
-  function atan2: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:137: 
-  function atan2: precondition 'finite_result' got status valid.
+  function atan2: precondition 'number_args' got status valid.
 [eva] tests/float/math_builtins.c:138: 
   Call to builtin Frama_C_atan2 for function atan2
 [eva] tests/float/math_builtins.c:138: 
-  function atan2: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:138: 
-  function atan2: precondition 'finite_result' got status valid.
+  function atan2: precondition 'number_args' got status valid.
 [eva] tests/float/math_builtins.c:139: 
   Call to builtin Frama_C_atan2 for function atan2
 [eva] tests/float/math_builtins.c:139: 
-  function atan2: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:139: 
-  function atan2: precondition 'finite_result' got status valid.
+  function atan2: precondition 'number_args' got status valid.
 [eva] tests/float/math_builtins.c:140: 
   Call to builtin Frama_C_atan2 for function atan2
 [eva] tests/float/math_builtins.c:140: 
-  function atan2: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:140: 
-  function atan2: precondition 'finite_result' got status valid.
+  function atan2: precondition 'number_args' got status valid.
 [eva] tests/float/math_builtins.c:141: 
   Call to builtin Frama_C_atan2 for function atan2
 [eva] tests/float/math_builtins.c:141: 
-  function atan2: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:141: 
-  function atan2: precondition 'finite_result' got status valid.
+  function atan2: precondition 'number_args' got status valid.
 [eva] Recording results for test_atan2
 [eva] Done for function test_atan2
 [eva] computing for function test_pow_det <- main.
