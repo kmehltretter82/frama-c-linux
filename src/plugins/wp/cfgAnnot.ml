@@ -276,6 +276,18 @@ let get_call_contract ?smoking kf =
       { cc with contract_smoke = [ g ] }
 
 (* -------------------------------------------------------------------------- *)
+(* --- Code Contracts                                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
+let get_code_behaviors stmt =
+  Annotations.fold_code_annot
+    (fun _emitter ca cs ->
+       match ca.annot_content with
+       | AStmtSpec(fors,spec) -> (fors,spec) :: cs
+       | _ -> cs
+    ) stmt []
+
+(* -------------------------------------------------------------------------- *)
 (* --- Code Assertions                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 

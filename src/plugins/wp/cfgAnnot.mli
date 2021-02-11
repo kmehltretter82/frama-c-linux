@@ -54,6 +54,12 @@ val get_complete_behaviors : kernel_function -> pred_info list
 val get_disjoint_behaviors : kernel_function -> pred_info list
 
 (* -------------------------------------------------------------------------- *)
+(* --- Property Accessors : Code Behaviors                                --- *)
+(* -------------------------------------------------------------------------- *)
+
+val get_code_behaviors : stmt -> (string list * funspec) list
+
+(* -------------------------------------------------------------------------- *)
 (* --- Property Accessors : Assertions                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
