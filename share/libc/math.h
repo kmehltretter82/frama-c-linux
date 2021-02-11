@@ -637,7 +637,7 @@ extern long double ldexpl(long double x, int exp);
     ensures infinite_result: \is_plus_infinity(\result);
   behavior zero:
     assumes zero_arg: \is_finite(x) && x == 0.;
-    ensures infinite_result: \is_minus_infinity(\result);
+    ensures infinite_result: \is_minus_infinity(\result); // -HUGE_VAL
     ensures errno_set: errno == ERANGE;
   behavior negative:
     assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
@@ -665,7 +665,7 @@ extern double log(double x);
     ensures infinite_result: \is_plus_infinity(\result);
   behavior zero:
     assumes zero_arg: \is_finite(x) && x == 0.;
-    ensures infinite_result: \is_minus_infinity(\result);
+    ensures infinite_result: \is_minus_infinity(\result); // -HUGE_VALF
     ensures errno_set: errno == ERANGE;
   behavior negative:
     assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
@@ -693,7 +693,7 @@ extern float logf(float x);
     ensures infinite_result: \is_plus_infinity(\result);
   behavior zero:
     assumes zero_arg: \is_finite(x) && x == 0.;
-    ensures infinite_result: \is_minus_infinity(\result);
+    ensures infinite_result: \is_minus_infinity(\result); // -HUGE_VALL
     ensures errno_set: errno == ERANGE;
   behavior negative:
     assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
@@ -721,7 +721,7 @@ extern long double logl(long double x);
     ensures infinite_result: \is_plus_infinity(\result);
   behavior zero:
     assumes zero_arg: \is_finite(x) && x == 0.;
-    ensures infinite_result: \is_minus_infinity(\result);
+    ensures infinite_result: \is_minus_infinity(\result); // -HUGE_VAL
     ensures errno_set: errno == ERANGE;
   behavior negative:
     assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
@@ -749,7 +749,7 @@ extern double log10(double x);
     ensures infinite_result: \is_plus_infinity(\result);
   behavior zero:
     assumes zero_arg: \is_finite(x) && x == 0.;
-    ensures infinite_result: \is_minus_infinity(\result);
+    ensures infinite_result: \is_minus_infinity(\result); // -HUGE_VALF
     ensures errno_set: errno == ERANGE;
   behavior negative:
     assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
@@ -777,7 +777,7 @@ extern float log10f(float x);
     ensures infinite_result: \is_plus_infinity(\result);
   behavior zero:
     assumes zero_arg: \is_finite(x) && x == 0.;
-    ensures infinite_result: \is_minus_infinity(\result);
+    ensures infinite_result: \is_minus_infinity(\result); // -HUGE_VALL
     ensures errno_set: errno == ERANGE;
   behavior negative:
     assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
@@ -809,7 +809,7 @@ extern long double log1pl(long double x);
     ensures infinite_result: \is_plus_infinity(\result);
   behavior zero:
     assumes zero_arg: \is_finite(x) && x == 0.;
-    ensures infinite_result: \is_minus_infinity(\result);
+    ensures infinite_result: \is_minus_infinity(\result); // -HUGE_VAL
     ensures errno_set: errno == ERANGE;
   behavior negative:
     assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
@@ -837,7 +837,7 @@ extern double log2(double x);
     ensures infinite_result: \is_plus_infinity(\result);
   behavior zero:
     assumes zero_arg: \is_finite(x) && x == 0.;
-    ensures infinite_result: \is_minus_infinity(\result);
+    ensures infinite_result: \is_minus_infinity(\result); // -HUGE_VALF
     ensures errno_set: errno == ERANGE;
   behavior negative:
     assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
@@ -865,7 +865,7 @@ extern float log2f(float x);
     ensures infinite_result: \is_plus_infinity(\result);
   behavior zero:
     assumes zero_arg: \is_finite(x) && x == 0.;
-    ensures infinite_result: \is_minus_infinity(\result);
+    ensures infinite_result: \is_minus_infinity(\result); // -HUGE_VALL
     ensures errno_set: errno == ERANGE;
   behavior negative:
     assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
@@ -958,17 +958,33 @@ extern double hypot(double x, double y);
 extern float hypotf(float x, float y);
 extern long double hypotl(long double x, long double y);
 
-/*@ requires finite_args: \is_finite(x) && \is_finite(y);
-    requires finite_logic_res: \is_finite(pow(x, y));
-    assigns \result \from x, y;
+/*@
+  assigns errno, \result \from x, y;
+  behavior normal:
+    assumes finite_logic_res: \is_finite(pow(x, y));
     ensures finite_result: \is_finite(\result);
+    ensures errno: errno == ERANGE || errno == \old(errno);
+  behavior overflow:
+    assumes infinite_logic_res: !\is_finite(pow(x, y));
+    ensures infinite_result: !\is_finite(\result);
+    ensures errno: errno == ERANGE || errno == EDOM || errno == \old(errno);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern double pow(double x, double y);
 
-/*@ requires finite_args: \is_finite(x) && \is_finite(y);
-    requires finite_logic_res: \is_finite(powf(x, y));
-    assigns \result \from x, y;
+/*@
+  assigns errno, \result \from x, y;
+  behavior normal:
+    assumes finite_logic_res: \is_finite(pow(x, y));
     ensures finite_result: \is_finite(\result);
+    ensures errno: errno == ERANGE || errno == \old(errno);
+  behavior overflow:
+    assumes infinite_logic_res: !\is_finite(pow(x, y));
+    ensures infinite_result: !\is_finite(\result);
+    ensures errno: errno == ERANGE || errno == EDOM || errno == \old(errno);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern float powf(float x, float y);
 

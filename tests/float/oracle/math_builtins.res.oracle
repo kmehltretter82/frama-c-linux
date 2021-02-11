@@ -339,49 +339,33 @@
 [eva] tests/float/math_builtins.c:145: 
   Call to builtin Frama_C_pow for function pow
 [eva] tests/float/math_builtins.c:145: 
-  function pow: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:145: 
   function pow: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:146: 
   Call to builtin Frama_C_pow for function pow
 [eva] tests/float/math_builtins.c:146: 
-  function pow: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:146: 
   function pow: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:147: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:147: 
-  function pow: precondition 'finite_args' got status valid.
 [eva] tests/float/math_builtins.c:147: 
   function pow: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:148: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:148: 
-  function pow: precondition 'finite_args' got status valid.
 [eva] tests/float/math_builtins.c:148: 
   function pow: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:149: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:149: 
-  function pow: precondition 'finite_args' got status valid.
 [eva] tests/float/math_builtins.c:149: 
   function pow: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:150: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:150: 
-  function pow: precondition 'finite_args' got status valid.
 [eva] tests/float/math_builtins.c:150: 
   function pow: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:151: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:151: 
-  function pow: precondition 'finite_args' got status valid.
 [eva] tests/float/math_builtins.c:151: 
   function pow: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:152: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:152: 
-  function pow: precondition 'finite_args' got status valid.
 [eva] tests/float/math_builtins.c:152: 
   function pow: precondition 'finite_logic_res' got status valid.
 [eva] Recording results for test_pow_det
@@ -394,14 +378,10 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:170: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:170: 
-  function pow: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:170: Warning: 
   function pow: precondition 'finite_logic_res' got status invalid.
 [eva] tests/float/math_builtins.c:172: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:172: 
-  function pow: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:172: Warning: 
   function pow: precondition 'finite_logic_res' got status invalid.
 [eva] computing for function double_interval <- test_pow_singleton_exp <- main.
@@ -410,26 +390,18 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:176: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:176: 
-  function pow: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:176: Warning: 
   function pow: precondition 'finite_logic_res' got status unknown.
 [eva] tests/float/math_builtins.c:177: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:177: 
-  function pow: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:177: Warning: 
   function pow: precondition 'finite_logic_res' got status unknown.
 [eva] tests/float/math_builtins.c:180: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:180: 
-  function pow: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:180: Warning: 
   function pow: precondition 'finite_logic_res' got status unknown.
 [eva] tests/float/math_builtins.c:181: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:181: 
-  function pow: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:181: Warning: 
   function pow: precondition 'finite_logic_res' got status unknown.
 [eva] computing for function double_interval <- test_pow_singleton_exp <- main.
@@ -438,8 +410,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:185: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:185: 
-  function pow: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:185: Warning: 
   function pow: precondition 'finite_logic_res' got status unknown.
 [eva] computing for function double_interval <- test_pow_singleton_exp <- main.
@@ -448,8 +418,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:187: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:187: 
-  function pow: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:187: Warning: 
   function pow: precondition 'finite_logic_res' got status unknown.
 [eva] computing for function double_interval <- test_pow_singleton_exp <- main.
@@ -458,8 +426,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:191: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:191: 
-  function pow: precondition 'finite_args' got status valid.
 [eva] tests/float/math_builtins.c:191: 
   function pow: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:192: 
@@ -471,8 +437,6 @@
 [eva] tests/float/math_builtins.c:194: 
   Call to builtin Frama_C_pow for function pow
 [eva] tests/float/math_builtins.c:194: 
-  function pow: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:194: 
   function pow: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:195: 
   Frama_C_show_each_j:
@@ -480,13 +444,9 @@
 [eva] tests/float/math_builtins.c:199: 
   Call to builtin Frama_C_pow for function pow
 [eva] tests/float/math_builtins.c:199: 
-  function pow: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:199: 
   function pow: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:200: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:200: 
-  function pow: precondition 'finite_args' got status valid.
 [eva] tests/float/math_builtins.c:200: 
   function pow: precondition 'finite_logic_res' got status valid.
 [eva] computing for function double_interval <- test_pow_singleton_exp <- main.
@@ -496,31 +456,21 @@
 [eva] tests/float/math_builtins.c:203: 
   Call to builtin Frama_C_pow for function pow
 [eva] tests/float/math_builtins.c:203: 
-  function pow: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:203: 
   function pow: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:204: 
   Call to builtin Frama_C_pow for function pow
 [eva] tests/float/math_builtins.c:204: 
-  function pow: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:204: 
   function pow: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:205: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:205: 
-  function pow: precondition 'finite_args' got status valid.
 [eva] tests/float/math_builtins.c:205: 
   function pow: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:206: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:206: 
-  function pow: precondition 'finite_args' got status valid.
 [eva] tests/float/math_builtins.c:206: 
   function pow: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:207: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:207: 
-  function pow: precondition 'finite_args' got status valid.
 [eva] tests/float/math_builtins.c:207: 
   function pow: precondition 'finite_logic_res' got status valid.
 [eva] computing for function double_interval <- test_pow_singleton_exp <- main.
@@ -530,13 +480,9 @@
 [eva] tests/float/math_builtins.c:210: 
   Call to builtin Frama_C_pow for function pow
 [eva] tests/float/math_builtins.c:210: 
-  function pow: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:210: 
   function pow: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:211: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:211: 
-  function pow: precondition 'finite_args' got status valid.
 [eva] tests/float/math_builtins.c:211: 
   function pow: precondition 'finite_logic_res' got status valid.
 [eva] Recording results for test_pow_singleton_exp
@@ -550,8 +496,6 @@
 [eva] tests/float/math_builtins.c:218: 
   Call to builtin Frama_C_pow for function pow
 [eva] tests/float/math_builtins.c:218: 
-  function pow: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:218: 
   function pow: precondition 'finite_logic_res' got status valid.
 [eva] computing for function double_interval <- test_pow <- main.
   Called from tests/float/math_builtins.c:219.
@@ -560,8 +504,6 @@
 [eva] tests/float/math_builtins.c:220: 
   Call to builtin Frama_C_pow for function pow
 [eva] tests/float/math_builtins.c:220: 
-  function pow: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:220: 
   function pow: precondition 'finite_logic_res' got status valid.
 [eva] computing for function double_interval <- test_pow <- main.
   Called from tests/float/math_builtins.c:221.
@@ -569,8 +511,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:222: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:222: 
-  function pow: precondition 'finite_args' got status valid.
 [eva] tests/float/math_builtins.c:222: 
   function pow: precondition 'finite_logic_res' got status valid.
 [eva] computing for function double_interval <- test_pow <- main.
@@ -583,8 +523,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:230: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:230: 
-  function pow: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:230: Warning: 
   function pow: precondition 'finite_logic_res' got status unknown.
 [eva] computing for function double_interval <- test_pow <- main.
@@ -593,8 +531,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:232: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:232: 
-  function pow: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:232: Warning: 
   function pow: precondition 'finite_logic_res' got status unknown.
 [eva] computing for function double_interval <- test_pow <- main.
@@ -603,8 +539,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:234: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:234: 
-  function pow: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:234: Warning: 
   function pow: precondition 'finite_logic_res' got status unknown.
 [eva] computing for function double_interval <- test_pow <- main.
@@ -618,8 +552,6 @@
 [eva] tests/float/math_builtins.c:237: 
   Call to builtin Frama_C_pow for function pow
 [eva] tests/float/math_builtins.c:237: 
-  function pow: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:237: 
   function pow: precondition 'finite_logic_res' got status valid.
 [eva] computing for function double_interval <- test_pow <- main.
   Called from tests/float/math_builtins.c:240.
@@ -632,8 +564,6 @@
 [eva] tests/float/math_builtins.c:242: 
   Call to builtin Frama_C_pow for function pow
 [eva] tests/float/math_builtins.c:242: 
-  function pow: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:242: 
   function pow: precondition 'finite_logic_res' got status valid.
 [eva] computing for function double_interval <- test_pow <- main.
   Called from tests/float/math_builtins.c:245.
@@ -645,8 +575,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:247: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:247: 
-  function pow: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:247: Warning: 
   function pow: precondition 'finite_logic_res' got status unknown.
 [eva] computing for function double_interval <- test_pow <- main.
@@ -659,8 +587,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:250: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:250: 
-  function pow: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:250: Warning: 
   function pow: precondition 'finite_logic_res' got status unknown.
 [eva] computing for function double_interval <- test_pow <- main.
@@ -673,8 +599,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:256: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:256: 
-  function pow: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:256: Warning: 
   function pow: precondition 'finite_logic_res' got status unknown.
 [eva] computing for function double_interval <- test_pow <- main.
@@ -687,8 +611,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:261: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:261: 
-  function pow: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:261: Warning: 
   function pow: precondition 'finite_logic_res' got status unknown.
 [eva] computing for function double_interval <- test_pow <- main.
@@ -702,8 +624,6 @@
 [eva] tests/float/math_builtins.c:266: 
   Call to builtin Frama_C_pow for function pow
 [eva] tests/float/math_builtins.c:266: 
-  function pow: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:266: 
   function pow: precondition 'finite_logic_res' got status valid.
 [eva] computing for function double_interval <- test_pow <- main.
   Called from tests/float/math_builtins.c:269.
@@ -715,8 +635,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:271: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:271: 
-  function pow: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:271: Warning: 
   function pow: precondition 'finite_logic_res' got status unknown.
 [eva] computing for function double_interval <- test_pow <- main.
@@ -729,8 +647,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:276: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:276: 
-  function pow: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:276: Warning: 
   function pow: precondition 'finite_logic_res' got status invalid.
 [eva] computing for function double_interval <- test_pow <- main.
@@ -739,8 +655,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:278: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:278: 
-  function pow: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:278: Warning: 
   function pow: precondition 'finite_logic_res' got status unknown.
 [eva] computing for function double_interval <- test_pow <- main.
@@ -749,8 +663,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:280: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:280: 
-  function pow: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:280: Warning: 
   function pow: precondition 'finite_logic_res' got status unknown.
 [eva] computing for function double_interval <- test_pow <- main.
@@ -759,8 +671,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:282: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:282: 
-  function pow: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:282: Warning: 
   function pow: precondition 'finite_logic_res' got status unknown.
 [eva] computing for function double_interval <- test_pow <- main.
@@ -773,8 +683,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:287: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:287: 
-  function pow: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:287: Warning: 
   function pow: precondition 'finite_logic_res' got status invalid.
 [eva] computing for function double_interval <- test_pow <- main.
@@ -787,8 +695,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:292: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:292: 
-  function pow: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:292: Warning: 
   function pow: precondition 'finite_logic_res' got status unknown.
 [eva] tests/float/math_builtins.c:292: Frama_C_show_each_unreachable:
@@ -798,8 +704,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:295: 
   Call to builtin Frama_C_pow for function pow
-[eva] tests/float/math_builtins.c:295: 
-  function pow: precondition 'finite_args' got status valid.
 [eva] tests/float/math_builtins.c:295: 
   function pow: precondition 'finite_logic_res' got status valid.
 [eva] Recording results for test_pow
@@ -1298,49 +1202,33 @@
 [eva] tests/float/math_builtins.c:156: 
   Call to builtin Frama_C_powf for function powf
 [eva] tests/float/math_builtins.c:156: 
-  function powf: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:156: 
   function powf: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:157: 
   Call to builtin Frama_C_powf for function powf
 [eva] tests/float/math_builtins.c:157: 
-  function powf: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:157: 
   function powf: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:158: 
   Call to builtin Frama_C_powf for function powf
-[eva] tests/float/math_builtins.c:158: 
-  function powf: precondition 'finite_args' got status valid.
 [eva] tests/float/math_builtins.c:158: 
   function powf: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:159: 
   Call to builtin Frama_C_powf for function powf
-[eva] tests/float/math_builtins.c:159: 
-  function powf: precondition 'finite_args' got status valid.
 [eva] tests/float/math_builtins.c:159: 
   function powf: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:160: 
   Call to builtin Frama_C_powf for function powf
-[eva] tests/float/math_builtins.c:160: 
-  function powf: precondition 'finite_args' got status valid.
 [eva] tests/float/math_builtins.c:160: 
   function powf: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:161: 
   Call to builtin Frama_C_powf for function powf
-[eva] tests/float/math_builtins.c:161: 
-  function powf: precondition 'finite_args' got status valid.
 [eva] tests/float/math_builtins.c:161: 
   function powf: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:162: 
   Call to builtin Frama_C_powf for function powf
-[eva] tests/float/math_builtins.c:162: 
-  function powf: precondition 'finite_args' got status valid.
 [eva] tests/float/math_builtins.c:162: 
   function powf: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:163: 
   Call to builtin Frama_C_powf for function powf
-[eva] tests/float/math_builtins.c:163: 
-  function powf: precondition 'finite_args' got status valid.
 [eva] tests/float/math_builtins.c:163: 
   function powf: precondition 'finite_logic_res' got status valid.
 [eva] Recording results for test_powf_det
@@ -1353,14 +1241,10 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:303: 
   Call to builtin Frama_C_powf for function powf
-[eva] tests/float/math_builtins.c:303: 
-  function powf: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:303: Warning: 
   function powf: precondition 'finite_logic_res' got status invalid.
 [eva] tests/float/math_builtins.c:305: 
   Call to builtin Frama_C_powf for function powf
-[eva] tests/float/math_builtins.c:305: 
-  function powf: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:305: Warning: 
   function powf: precondition 'finite_logic_res' got status invalid.
 [eva] computing for function double_interval <- test_powf_singleton_exp <- main.
@@ -1369,26 +1253,18 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:309: 
   Call to builtin Frama_C_powf for function powf
-[eva] tests/float/math_builtins.c:309: 
-  function powf: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:309: Warning: 
   function powf: precondition 'finite_logic_res' got status unknown.
 [eva] tests/float/math_builtins.c:310: 
   Call to builtin Frama_C_powf for function powf
-[eva] tests/float/math_builtins.c:310: 
-  function powf: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:310: Warning: 
   function powf: precondition 'finite_logic_res' got status unknown.
 [eva] tests/float/math_builtins.c:313: 
   Call to builtin Frama_C_powf for function powf
-[eva] tests/float/math_builtins.c:313: 
-  function powf: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:313: Warning: 
   function powf: precondition 'finite_logic_res' got status unknown.
 [eva] tests/float/math_builtins.c:314: 
   Call to builtin Frama_C_powf for function powf
-[eva] tests/float/math_builtins.c:314: 
-  function powf: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:314: Warning: 
   function powf: precondition 'finite_logic_res' got status unknown.
 [eva] computing for function double_interval <- test_powf_singleton_exp <- main.
@@ -1398,8 +1274,6 @@
 [eva] tests/float/math_builtins.c:318: 
   Call to builtin Frama_C_powf for function powf
 [eva] tests/float/math_builtins.c:318: 
-  function powf: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:318: 
   function powf: precondition 'finite_logic_res' got status valid.
 [eva] computing for function double_interval <- test_powf_singleton_exp <- main.
   Called from tests/float/math_builtins.c:319.
@@ -1407,8 +1281,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:320: 
   Call to builtin Frama_C_powf for function powf
-[eva] tests/float/math_builtins.c:320: 
-  function powf: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:320: Warning: 
   function powf: precondition 'finite_logic_res' got status unknown.
 [eva] computing for function double_interval <- test_powf_singleton_exp <- main.
@@ -1417,8 +1289,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:324: 
   Call to builtin Frama_C_powf for function powf
-[eva] tests/float/math_builtins.c:324: 
-  function powf: precondition 'finite_args' got status valid.
 [eva] tests/float/math_builtins.c:324: 
   function powf: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:325: 
@@ -1430,20 +1300,14 @@
 [eva] tests/float/math_builtins.c:327: 
   Call to builtin Frama_C_powf for function powf
 [eva] tests/float/math_builtins.c:327: 
-  function powf: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:327: 
   function powf: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:328: Frama_C_show_each_j: {0}
 [eva] tests/float/math_builtins.c:332: 
   Call to builtin Frama_C_powf for function powf
 [eva] tests/float/math_builtins.c:332: 
-  function powf: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:332: 
   function powf: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:333: 
   Call to builtin Frama_C_powf for function powf
-[eva] tests/float/math_builtins.c:333: 
-  function powf: precondition 'finite_args' got status valid.
 [eva] tests/float/math_builtins.c:333: 
   function powf: precondition 'finite_logic_res' got status valid.
 [eva] computing for function double_interval <- test_powf_singleton_exp <- main.
@@ -1453,31 +1317,21 @@
 [eva] tests/float/math_builtins.c:336: 
   Call to builtin Frama_C_powf for function powf
 [eva] tests/float/math_builtins.c:336: 
-  function powf: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:336: 
   function powf: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:337: 
   Call to builtin Frama_C_powf for function powf
 [eva] tests/float/math_builtins.c:337: 
-  function powf: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:337: 
   function powf: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:338: 
   Call to builtin Frama_C_powf for function powf
-[eva] tests/float/math_builtins.c:338: 
-  function powf: precondition 'finite_args' got status valid.
 [eva] tests/float/math_builtins.c:338: 
   function powf: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:339: 
   Call to builtin Frama_C_powf for function powf
-[eva] tests/float/math_builtins.c:339: 
-  function powf: precondition 'finite_args' got status valid.
 [eva] tests/float/math_builtins.c:339: 
   function powf: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:340: 
   Call to builtin Frama_C_powf for function powf
-[eva] tests/float/math_builtins.c:340: 
-  function powf: precondition 'finite_args' got status valid.
 [eva] tests/float/math_builtins.c:340: 
   function powf: precondition 'finite_logic_res' got status valid.
 [eva] computing for function double_interval <- test_powf_singleton_exp <- main.
@@ -1487,13 +1341,9 @@
 [eva] tests/float/math_builtins.c:343: 
   Call to builtin Frama_C_powf for function powf
 [eva] tests/float/math_builtins.c:343: 
-  function powf: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:343: 
   function powf: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:344: 
   Call to builtin Frama_C_powf for function powf
-[eva] tests/float/math_builtins.c:344: 
-  function powf: precondition 'finite_args' got status valid.
 [eva] tests/float/math_builtins.c:344: 
   function powf: precondition 'finite_logic_res' got status valid.
 [eva] Recording results for test_powf_singleton_exp
@@ -1507,8 +1357,6 @@
 [eva] tests/float/math_builtins.c:351: 
   Call to builtin Frama_C_powf for function powf
 [eva] tests/float/math_builtins.c:351: 
-  function powf: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:351: 
   function powf: precondition 'finite_logic_res' got status valid.
 [eva] computing for function double_interval <- test_powf <- main.
   Called from tests/float/math_builtins.c:352.
@@ -1517,8 +1365,6 @@
 [eva] tests/float/math_builtins.c:353: 
   Call to builtin Frama_C_powf for function powf
 [eva] tests/float/math_builtins.c:353: 
-  function powf: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:353: 
   function powf: precondition 'finite_logic_res' got status valid.
 [eva] computing for function double_interval <- test_powf <- main.
   Called from tests/float/math_builtins.c:354.
@@ -1526,8 +1372,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:355: 
   Call to builtin Frama_C_powf for function powf
-[eva] tests/float/math_builtins.c:355: 
-  function powf: precondition 'finite_args' got status valid.
 [eva] tests/float/math_builtins.c:355: 
   function powf: precondition 'finite_logic_res' got status valid.
 [eva] computing for function double_interval <- test_powf <- main.
@@ -1540,8 +1384,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:363: 
   Call to builtin Frama_C_powf for function powf
-[eva] tests/float/math_builtins.c:363: 
-  function powf: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:363: Warning: 
   function powf: precondition 'finite_logic_res' got status unknown.
 [eva] computing for function double_interval <- test_powf <- main.
@@ -1550,8 +1392,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:365: 
   Call to builtin Frama_C_powf for function powf
-[eva] tests/float/math_builtins.c:365: 
-  function powf: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:365: Warning: 
   function powf: precondition 'finite_logic_res' got status unknown.
 [eva] computing for function double_interval <- test_powf <- main.
@@ -1560,8 +1400,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:367: 
   Call to builtin Frama_C_powf for function powf
-[eva] tests/float/math_builtins.c:367: 
-  function powf: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:367: Warning: 
   function powf: precondition 'finite_logic_res' got status unknown.
 [eva] computing for function double_interval <- test_powf <- main.
@@ -1575,8 +1413,6 @@
 [eva] tests/float/math_builtins.c:370: 
   Call to builtin Frama_C_powf for function powf
 [eva] tests/float/math_builtins.c:370: 
-  function powf: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:370: 
   function powf: precondition 'finite_logic_res' got status valid.
 [eva] computing for function double_interval <- test_powf <- main.
   Called from tests/float/math_builtins.c:373.
@@ -1589,8 +1425,6 @@
 [eva] tests/float/math_builtins.c:375: 
   Call to builtin Frama_C_powf for function powf
 [eva] tests/float/math_builtins.c:375: 
-  function powf: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:375: 
   function powf: precondition 'finite_logic_res' got status valid.
 [eva] computing for function double_interval <- test_powf <- main.
   Called from tests/float/math_builtins.c:378.
@@ -1602,8 +1436,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:380: 
   Call to builtin Frama_C_powf for function powf
-[eva] tests/float/math_builtins.c:380: 
-  function powf: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:380: Warning: 
   function powf: precondition 'finite_logic_res' got status unknown.
 [eva] computing for function double_interval <- test_powf <- main.
@@ -1616,8 +1448,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:385: 
   Call to builtin Frama_C_powf for function powf
-[eva] tests/float/math_builtins.c:385: 
-  function powf: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:385: Warning: 
   function powf: precondition 'finite_logic_res' got status unknown.
 [eva] computing for function double_interval <- test_powf <- main.
@@ -1630,8 +1460,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:391: 
   Call to builtin Frama_C_powf for function powf
-[eva] tests/float/math_builtins.c:391: 
-  function powf: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:391: Warning: 
   function powf: precondition 'finite_logic_res' got status unknown.
 [eva] computing for function double_interval <- test_powf <- main.
@@ -1644,8 +1472,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:396: 
   Call to builtin Frama_C_powf for function powf
-[eva] tests/float/math_builtins.c:396: 
-  function powf: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:396: Warning: 
   function powf: precondition 'finite_logic_res' got status unknown.
 [eva] computing for function double_interval <- test_powf <- main.
@@ -1658,8 +1484,6 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:401: 
   Call to builtin Frama_C_powf for function powf
-[eva] tests/float/math_builtins.c:401: 
-  function powf: precondition 'finite_args' got status valid.
 [eva] tests/float/math_builtins.c:401: 
   function powf: precondition 'finite_logic_res' got status valid.
 [eva] Recording results for test_powf
@@ -1876,13 +1700,9 @@
 [eva] tests/float/math_builtins.c:569: 
   Call to builtin Frama_C_pow for function pow
 [eva] tests/float/math_builtins.c:569: 
-  function pow: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:569: 
   function pow: precondition 'finite_logic_res' got status valid.
 [eva] tests/float/math_builtins.c:570: 
   Call to builtin Frama_C_powf for function powf
-[eva] tests/float/math_builtins.c:570: 
-  function powf: precondition 'finite_args' got status valid.
 [eva] tests/float/math_builtins.c:570: 
   function powf: precondition 'finite_logic_res' got status valid.
 [eva] Recording results for test_diff_pow_powf
@@ -2432,6 +2252,7 @@
   y ∈ {1.0000000000000000}
   z ∈ {1.0806046117362795*2^-1}
 [eva:final-states] Values at end of function test_diff_pow_powf:
+  __fc_errno ∈ [--..--]
   d ∈ {1.3824840787361052*2^-96}
   f32__f ∈ {1.382483*2^-96}
 [eva:final-states] Values at end of function test_exp_det:
@@ -2523,6 +2344,7 @@
   f32__a ∈ {3.740641}
   f32__b ∈ {-2.079441}
 [eva:final-states] Values at end of function test_pow:
+  __fc_errno ∈ [--..--]
   x ∈ [-1.4551915228366852*2^36 .. -1.1641532182693481*2^33]
   y ∈ [-1.0000000000000000*2^-1 .. 9.5000000000000000]
   a ∈ {1.0000000000000000}
@@ -2544,6 +2366,7 @@
   q ∈ [-1.9999999999999998*2^1023 .. 1.9999999999999998*2^1023]
   r ∈ [1.2649110640673517*2^-2 .. 1.4725502860585131*2^31]
 [eva:final-states] Values at end of function test_pow_det:
+  __fc_errno ∈ [--..--]
   a ∈ {1.0000000000000000}
   b ∈ {0}
   c ∈ {1.0000000000000000}
@@ -2553,6 +2376,7 @@
   g ∈ {1.6817928305074290*2^-21}
   h ∈ {1.0000000000000000}
 [eva:final-states] Values at end of function test_pow_singleton_exp:
+  __fc_errno ∈ [--..--]
   x ∈ [-3.5000000000000000 .. -1.0000000000000000*2^-3]
   c ∈ [0.0000000000000000 .. 4.5603590867386749]
   d ∈ [1.7542478229978975*2^-3 .. 1.9999999999999998*2^1023]
@@ -2572,6 +2396,7 @@
   r ∈ [1.3061224489795917*2^-4 .. 64.0000000000000000]
   s ∈ [-8.0000000000000000 .. -1.1428571428571428*2^-2]
 [eva:final-states] Values at end of function test_powf:
+  __fc_errno ∈ [--..--]
   f32__x ∈ [-0.000000 .. 10.000000]
   f32__y ∈ [-0.000000 .. 5.000000]
   f32__a ∈ {1.000000}
@@ -2588,6 +2413,7 @@
   f32__l ∈ [-1024.000000 .. 256.000000]
   f32__m ∈ [-0.000000 .. 1.525878*2^16]
 [eva:final-states] Values at end of function test_powf_det:
+  __fc_errno ∈ [--..--]
   f32__a ∈ {1.000000}
   f32__b ∈ {0}
   f32__c ∈ {1.000000}
@@ -2597,6 +2423,7 @@
   f32__g ∈ {1.681792*2^-21}
   f32__h ∈ {1.000000}
 [eva:final-states] Values at end of function test_powf_singleton_exp:
+  __fc_errno ∈ [--..--]
   f32__x ∈ [-3.500000 .. -1.000000*2^-3]
   f32__c ∈ [0.000000 .. 4.560359]
   f32__d ∈ [1.754247*2^-3 .. 1.999999*2^127]
@@ -2879,8 +2706,10 @@
 [from] Function logf:
   \result FROM x
 [from] Function pow:
+  __fc_errno FROM x; y
   \result FROM x; y
 [from] Function powf:
+  __fc_errno FROM x; y
   \result FROM x; y
 [from] Function round:
   \result FROM x
@@ -2913,7 +2742,7 @@
 [from] Function test_cos_det:
   NO EFFECTS
 [from] Function test_diff_pow_powf:
-  NO EFFECTS
+  __fc_errno FROM \nothing
 [from] Function test_exp_det:
   __fc_errno FROM \nothing
 [from] Function test_expf_det:
@@ -2939,17 +2768,17 @@
 [from] Function test_logf_det:
   NO EFFECTS
 [from] Function test_pow:
-  NO EFFECTS
+  __fc_errno FROM nondet
 [from] Function test_pow_det:
-  NO EFFECTS
+  __fc_errno FROM \nothing
 [from] Function test_pow_singleton_exp:
-  NO EFFECTS
+  __fc_errno FROM nondet
 [from] Function test_powf:
-  NO EFFECTS
+  __fc_errno FROM nondet
 [from] Function test_powf_det:
-  NO EFFECTS
+  __fc_errno FROM \nothing
 [from] Function test_powf_singleton_exp:
-  NO EFFECTS
+  __fc_errno FROM nondet
 [from] Function test_round:
   NO EFFECTS
 [from] Function test_round_det:
@@ -3032,7 +2861,7 @@
 [inout] Inputs for function test_cos_det:
     \nothing
 [inout] Out (internal) for function test_diff_pow_powf:
-    d; f32__f
+    __fc_errno; d; f32__f
 [inout] Inputs for function test_diff_pow_powf:
     \nothing
 [inout] Out (internal) for function test_exp_det:
@@ -3085,32 +2914,33 @@
 [inout] Inputs for function test_logf_det:
     nondet
 [inout] Out (internal) for function test_pow:
-    x; y; a; b; c; d; e; f; g; h; i; j; k; l; m; n; o; p; q; r
+    __fc_errno; x; y; a; b; c; d; e; f; g; h; i; j; k; l; m; n; o; p; q; r
 [inout] Inputs for function test_pow:
     nondet
 [inout] Out (internal) for function test_pow_det:
-    a; b; c; d; e; f; g; h
+    __fc_errno; a; b; c; d; e; f; g; h
 [inout] Inputs for function test_pow_det:
     \nothing
 [inout] Out (internal) for function test_pow_singleton_exp:
-    x; c; d; e; f; g; h; i; j; k; l; m; n; o; p; q; r; s
+    __fc_errno; x; c; d; e; f; g; h; i; j; k; l; m; n; o; p; q; r; s
 [inout] Inputs for function test_pow_singleton_exp:
     nondet
 [inout] Out (internal) for function test_powf:
-    f32__x; f32__y; tmp; f32__a; tmp_1; f32__b; tmp_3; f32__c; tmp_5; tmp_6;
-    f32__d; tmp_8; f32__e; tmp_10; f32__f; tmp_12; tmp_13; f32__g; tmp_15;
-    tmp_16; f32__h; tmp_18; tmp_19; f32__i; tmp_21; tmp_22; f32__j; tmp_24;
-    tmp_25; f32__k; tmp_27; tmp_28; f32__l; tmp_30; tmp_31; f32__m
+    __fc_errno; f32__x; f32__y; tmp; f32__a; tmp_1; f32__b; tmp_3; f32__c;
+    tmp_5; tmp_6; f32__d; tmp_8; f32__e; tmp_10; f32__f; tmp_12; tmp_13;
+    f32__g; tmp_15; tmp_16; f32__h; tmp_18; tmp_19; f32__i; tmp_21; tmp_22;
+    f32__j; tmp_24; tmp_25; f32__k; tmp_27; tmp_28; f32__l; tmp_30; tmp_31;
+    f32__m
 [inout] Inputs for function test_powf:
     nondet
 [inout] Out (internal) for function test_powf_det:
-    f32__a; f32__b; f32__c; f32__d; f32__e; f32__f; f32__g; f32__h
+    __fc_errno; f32__a; f32__b; f32__c; f32__d; f32__e; f32__f; f32__g; f32__h
 [inout] Inputs for function test_powf_det:
     \nothing
 [inout] Out (internal) for function test_powf_singleton_exp:
-    f32__x; tmp; tmp_0; f32__c; f32__d; f32__e; f32__f; tmp_5; f32__g; 
-    tmp_7; f32__h; tmp_9; f32__i; tmp_11; f32__j; f32__k; f32__l; tmp_15;
-    f32__m; f32__n; f32__o; f32__p; f32__q; tmp_21; f32__r; f32__s
+    __fc_errno; f32__x; tmp; tmp_0; f32__c; f32__d; f32__e; f32__f; tmp_5;
+    f32__g; tmp_7; f32__h; tmp_9; f32__i; tmp_11; f32__j; f32__k; f32__l;
+    tmp_15; f32__m; f32__n; f32__o; f32__p; f32__q; tmp_21; f32__r; f32__s
 [inout] Inputs for function test_powf_singleton_exp:
     nondet
 [inout] Out (internal) for function test_round:
