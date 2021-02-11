@@ -567,8 +567,8 @@ src/kernel_services/ast_queries/logic_typing.mli: CEA_INRIA_LGPL
 src/kernel_services/ast_queries/logic_utils.ml: CEA_INRIA_LGPL
 src/kernel_services/ast_queries/logic_utils.mli: CEA_INRIA_LGPL
 src/kernel_services/ast_transformations/README.md: .ignore
-src/kernel_services/ast_transformations/contract_finite_float.ml: CEA_LGPL
-src/kernel_services/ast_transformations/contract_finite_float.mli: CEA_LGPL
+src/kernel_services/ast_transformations/contract_special_float.ml: CEA_LGPL
+src/kernel_services/ast_transformations/contract_special_float.mli: CEA_LGPL
 src/kernel_services/ast_transformations/clone.ml: CEA_LGPL
 src/kernel_services/ast_transformations/clone.mli: CEA_LGPL
 src/kernel_services/ast_transformations/filter.ml: CEA_LGPL

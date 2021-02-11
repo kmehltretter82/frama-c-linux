@@ -126,14 +126,13 @@ let visitor = object
 end
 
 let run ast =
-  if Kernel.ContractFiniteFloat.get ()
-  && Kernel.SpecialFloat.get () <> "none" then
+  if Kernel.SpecialFloat.get () <> "none" then
     Cil.visitCilFileSameGlobals visitor ast
 
 let transform =
-  File.register_code_transformation_category "contract_finite_float"
+  File.register_code_transformation_category "contract_special_float"
 
 let () =
   File.add_code_transformation_before_cleanup
-    ~deps:[(module Kernel.ContractFiniteFloat); (module Kernel.SpecialFloat)]
+    ~deps:[(module Kernel.SpecialFloat)]
     transform run
