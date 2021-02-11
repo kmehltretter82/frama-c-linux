@@ -1213,39 +1213,58 @@
 [eva] tests/float/math_builtins.c:516: 
   Call to builtin Frama_C_exp for function exp
 [eva] tests/float/math_builtins.c:516: 
-  function exp: precondition 'finite_arg' got status valid.
+  function exp: precondition ¬(overflow_arg:
+                                  \is_finite(x) ∧ x > 0x1.62e42fefa39efp+9) got status valid.
 [eva] tests/float/math_builtins.c:516: 
-  function exp: precondition 'finite_domain' got status valid.
+  function exp: precondition ¬(plus_infinity_arg: \is_plus_infinity(x)) got status valid.
+[eva] tests/float/math_builtins.c:516: 
+  function exp: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
 [eva] tests/float/math_builtins.c:517: 
   Call to builtin Frama_C_exp for function exp
 [eva] tests/float/math_builtins.c:517: 
-  function exp: precondition 'finite_arg' got status valid.
+  function exp: precondition ¬(overflow_arg:
+                                  \is_finite(x) ∧ x > 0x1.62e42fefa39efp+9) got status valid.
 [eva] tests/float/math_builtins.c:517: 
-  function exp: precondition 'finite_domain' got status valid.
+  function exp: precondition ¬(plus_infinity_arg: \is_plus_infinity(x)) got status valid.
+[eva] tests/float/math_builtins.c:517: 
+  function exp: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
 [eva] tests/float/math_builtins.c:518: 
   Call to builtin Frama_C_exp for function exp
 [eva] tests/float/math_builtins.c:518: 
-  function exp: precondition 'finite_arg' got status valid.
+  function exp: precondition ¬(overflow_arg:
+                                  \is_finite(x) ∧ x > 0x1.62e42fefa39efp+9) got status valid.
 [eva] tests/float/math_builtins.c:518: 
-  function exp: precondition 'finite_domain' got status valid.
+  function exp: precondition ¬(plus_infinity_arg: \is_plus_infinity(x)) got status valid.
+[eva] tests/float/math_builtins.c:518: 
+  function exp: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
 [eva] tests/float/math_builtins.c:519: 
   Call to builtin Frama_C_exp for function exp
 [eva] tests/float/math_builtins.c:519: 
-  function exp: precondition 'finite_arg' got status valid.
+  function exp: precondition ¬(overflow_arg:
+                                  \is_finite(x) ∧ x > 0x1.62e42fefa39efp+9) got status valid.
 [eva] tests/float/math_builtins.c:519: 
-  function exp: precondition 'finite_domain' got status valid.
+  function exp: precondition ¬(plus_infinity_arg: \is_plus_infinity(x)) got status valid.
+[eva] tests/float/math_builtins.c:519: 
+  function exp: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
 [eva] tests/float/math_builtins.c:520: 
   Call to builtin Frama_C_exp for function exp
 [eva] tests/float/math_builtins.c:520: 
-  function exp: precondition 'finite_arg' got status valid.
+  function exp: precondition ¬(overflow_arg:
+                                  \is_finite(x) ∧ x > 0x1.62e42fefa39efp+9) got status valid.
 [eva] tests/float/math_builtins.c:520: 
-  function exp: precondition 'finite_domain' got status valid.
+  function exp: precondition ¬(plus_infinity_arg: \is_plus_infinity(x)) got status valid.
+[eva] tests/float/math_builtins.c:520: 
+  function exp: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
 [eva] tests/float/math_builtins.c:521: 
   Call to builtin Frama_C_exp for function exp
-[eva] tests/float/math_builtins.c:521: 
-  function exp: precondition 'finite_arg' got status valid.
 [eva:alarm] tests/float/math_builtins.c:521: Warning: 
-  function exp: precondition 'finite_domain' got status invalid.
+  function exp: precondition ¬(overflow_arg:
+                                  \is_finite(x) ∧ x > 0x1.62e42fefa39efp+9) got status invalid.
+[eva] tests/float/math_builtins.c:521: 
+  function exp: no state left, precondition ¬(plus_infinity_arg:
+                                                 \is_plus_infinity(x)) got status valid.
+[eva] tests/float/math_builtins.c:521: 
+  function exp: no state left, precondition ¬(nan_arg: \is_NaN(x)) got status valid.
 [eva] Recording results for test_exp_det
 [eva] Done for function test_exp_det
 [eva] computing for function test_log_det <- main.
@@ -1782,33 +1801,48 @@
 [eva] tests/float/math_builtins.c:525: 
   Call to builtin Frama_C_expf for function expf
 [eva] tests/float/math_builtins.c:525: 
-  function expf: precondition 'finite_arg' got status valid.
+  function expf: precondition ¬(overflow_arg:
+                                   \is_finite(x) ∧ x > 0x1.62e42ep+6) got status valid.
 [eva] tests/float/math_builtins.c:525: 
-  function expf: precondition 'res_finite' got status valid.
+  function expf: precondition ¬(plus_infinity_arg: \is_plus_infinity(x)) got status valid.
+[eva] tests/float/math_builtins.c:525: 
+  function expf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
 [eva] tests/float/math_builtins.c:526: 
   Call to builtin Frama_C_expf for function expf
 [eva] tests/float/math_builtins.c:526: 
-  function expf: precondition 'finite_arg' got status valid.
+  function expf: precondition ¬(overflow_arg:
+                                   \is_finite(x) ∧ x > 0x1.62e42ep+6) got status valid.
 [eva] tests/float/math_builtins.c:526: 
-  function expf: precondition 'res_finite' got status valid.
+  function expf: precondition ¬(plus_infinity_arg: \is_plus_infinity(x)) got status valid.
+[eva] tests/float/math_builtins.c:526: 
+  function expf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
 [eva] tests/float/math_builtins.c:527: 
   Call to builtin Frama_C_expf for function expf
 [eva] tests/float/math_builtins.c:527: 
-  function expf: precondition 'finite_arg' got status valid.
+  function expf: precondition ¬(overflow_arg:
+                                   \is_finite(x) ∧ x > 0x1.62e42ep+6) got status valid.
 [eva] tests/float/math_builtins.c:527: 
-  function expf: precondition 'res_finite' got status valid.
+  function expf: precondition ¬(plus_infinity_arg: \is_plus_infinity(x)) got status valid.
+[eva] tests/float/math_builtins.c:527: 
+  function expf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
 [eva] tests/float/math_builtins.c:528: 
   Call to builtin Frama_C_expf for function expf
 [eva] tests/float/math_builtins.c:528: 
-  function expf: precondition 'finite_arg' got status valid.
+  function expf: precondition ¬(overflow_arg:
+                                   \is_finite(x) ∧ x > 0x1.62e42ep+6) got status valid.
 [eva] tests/float/math_builtins.c:528: 
-  function expf: precondition 'res_finite' got status valid.
+  function expf: precondition ¬(plus_infinity_arg: \is_plus_infinity(x)) got status valid.
+[eva] tests/float/math_builtins.c:528: 
+  function expf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
 [eva] tests/float/math_builtins.c:529: 
   Call to builtin Frama_C_expf for function expf
 [eva] tests/float/math_builtins.c:529: 
-  function expf: precondition 'finite_arg' got status valid.
+  function expf: precondition ¬(overflow_arg:
+                                   \is_finite(x) ∧ x > 0x1.62e42ep+6) got status valid.
 [eva] tests/float/math_builtins.c:529: 
-  function expf: precondition 'res_finite' got status valid.
+  function expf: precondition ¬(plus_infinity_arg: \is_plus_infinity(x)) got status valid.
+[eva] tests/float/math_builtins.c:529: 
+  function expf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
 [eva] Recording results for test_expf_det
 [eva] Done for function test_expf_det
 [eva] computing for function test_logf_det <- main.
@@ -2455,12 +2489,14 @@
   d ∈ {1.3824840787361052*2^-96}
   f32__f ∈ {1.382483*2^-96}
 [eva:final-states] Values at end of function test_exp_det:
+  __fc_errno ∈ [--..--]
   a ∈ {1.7094457008275896*2^60}
   b ∈ {1.0826822658929016*2^-3}
   c ∈ {1.0000000000000000}
   d ∈ {1.0000000000000000}
   e ∈ {1.4715177646857693*2^-2}
 [eva:final-states] Values at end of function test_expf_det:
+  __fc_errno ∈ [--..--]
   f32__a ∈ {1.709445*2^60}
   f32__b ∈ {1.082682*2^-3}
   f32__c ∈ {1.000000}
@@ -2706,6 +2742,7 @@
   f32__e ∈ {-0.000000}
   f32__f ∈ {-1.000000}
 [eva:final-states] Values at end of function main:
+  __fc_errno ∈ [--..--]
   __retres ∈ {0}
 [from] Computing for function double_interval
 [from] Done for function double_interval
@@ -2876,8 +2913,10 @@
 [from] Function double_interval:
   \result FROM min; max; nondet
 [from] Function exp:
+  __fc_errno FROM x
   \result FROM x
 [from] Function expf:
+  __fc_errno FROM x
   \result FROM x
 [from] Function floor:
   \result FROM x
@@ -2930,9 +2969,9 @@
 [from] Function test_diff_pow_powf:
   NO EFFECTS
 [from] Function test_exp_det:
-  NO EFFECTS
+  __fc_errno FROM \nothing
 [from] Function test_expf_det:
-  NO EFFECTS
+  __fc_errno FROM \nothing
 [from] Function test_floor:
   NO EFFECTS
 [from] Function test_floor_det:
@@ -2996,6 +3035,7 @@
 [from] Function test_truncf_det:
   NO EFFECTS
 [from] Function main:
+  __fc_errno FROM \nothing
   \result FROM \nothing
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function double_interval:
@@ -3050,11 +3090,11 @@
 [inout] Inputs for function test_diff_pow_powf:
     \nothing
 [inout] Out (internal) for function test_exp_det:
-    a; b; c; d; e
+    __fc_errno; a; b; c; d; e
 [inout] Inputs for function test_exp_det:
     nondet
 [inout] Out (internal) for function test_expf_det:
-    f32__a; f32__b; f32__c; f32__d; f32__e
+    __fc_errno; f32__a; f32__b; f32__c; f32__d; f32__e
 [inout] Inputs for function test_expf_det:
     \nothing
 [inout] Out (internal) for function test_floor:
@@ -3180,10 +3220,11 @@
 [inout] Inputs for function test_truncf_det:
     \nothing
 [inout] Out (internal) for function main:
-    __retres
+    __fc_errno; __retres
 [inout] Inputs for function main:
     nondet; any_double; any_float
 /* Generated by Frama-C */
+#include "errno.h"
 #include "math.h"
 static int volatile nondet;
 static double volatile any_double;

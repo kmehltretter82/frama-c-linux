@@ -515,19 +515,69 @@ extern double tanh(double x);
 extern float tanhf(float x);
 extern long double tanhl(long double x);
 
-/*@ requires finite_arg: \is_finite(x);
-    requires finite_domain: x <= 0x1.62e42fefa39efp+9;
+/*@
+  assigns errno, \result \from x;
+  behavior normal:
+    assumes finite_arg: \is_finite(x);
+    assumes domain_arg: x >= -0x1.74910d52d3051p9 && x <= 0x1.62e42fefa39efp+9;
     assigns \result \from x;
     ensures res_finite: \is_finite(\result);
     ensures positive_result: \result > 0.;
+  behavior overflow:
+    assumes overflow_arg: \is_finite(x) && x > 0x1.62e42fefa39efp+9;
+    ensures infinite_res: \is_plus_infinity(\result);
+    ensures errno_set: errno == ERANGE;
+  behavior plus_infinity:
+    assumes plus_infinity_arg: \is_plus_infinity(x);
+    assigns \result \from x;
+    ensures infinity_result: \is_plus_infinity(\result);
+  behavior underflow:
+    assumes underflow_arg: \is_finite(x) && x < -0x1.74910d52d3051p9;
+    ensures zero_res: \result == 0.;
+    ensures errno_set: errno == ERANGE;
+  behavior minus_infinity:
+    assumes plus_infinity_arg: \is_minus_infinity(x);
+    assigns \result \from x;
+    ensures zero_result: \is_finite(\result) && \result == 0.;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern double exp(double x);
 
-/*@ requires finite_arg: \is_finite(x);
-    requires res_finite: x <= 0x1.62e42ep+6;
+/*@
+  assigns errno, \result \from x;
+  behavior normal:
+    assumes finite_arg: \is_finite(x);
+    assumes domain_arg: x >= -0x1.9fe368p6 && x <= 0x1.62e42ep+6;
     assigns \result \from x;
     ensures res_finite: \is_finite(\result);
     ensures positive_result: \result > 0.;
+  behavior overflow:
+    assumes overflow_arg: \is_finite(x) && x > 0x1.62e42ep+6;
+    ensures infinite_res: \is_plus_infinity(\result);
+    ensures errno_set: errno == ERANGE;
+  behavior plus_infinity:
+    assumes plus_infinity_arg: \is_plus_infinity(x);
+    assigns \result \from x;
+    ensures infinity_result: \is_plus_infinity(\result);
+  behavior underflow:
+    assumes underflow_arg: \is_finite(x) && x < -0x1.9fe368p6;
+    ensures zero_res: \result == 0.;
+    ensures errno_set: errno == ERANGE;
+  behavior minus_infinity:
+    assumes plus_infinity_arg: \is_minus_infinity(x);
+    assigns \result \from x;
+    ensures zero_result: \is_finite(\result) && \result == 0.;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern float expf(float x);
 
