@@ -603,45 +603,171 @@ extern double ldexp(double x, int exp);
 extern float ldexpf(float x, int exp);
 extern long double ldexpl(long double x, int exp);
 
-/*@ requires finite_arg: \is_finite(x);
-    requires arg_positive: x > 0;
+/*@
+  assigns errno, \result \from x;
+  behavior normal:
+    assumes finite_arg: \is_finite(x);
+    assumes arg_positive: x > 0;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
+  behavior infinite:
+    assumes infinite_arg: \is_plus_infinity(x);
+    assigns \result \from x;
+    ensures infinite_result: \is_plus_infinity(\result);
+  behavior zero:
+    assumes zero_arg: \is_finite(x) && x == 0.;
+    ensures infinite_result: \is_minus_infinity(\result);
+    ensures errno_set: errno == ERANGE;
+  behavior negative:
+    assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern double log(double x);
 
-/*@ requires finite_arg: \is_finite(x);
-    requires arg_positive: x > 0;
+/*@
+  assigns errno, \result \from x;
+  behavior normal:
+    assumes finite_arg: \is_finite(x);
+    assumes arg_positive: x > 0;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
+  behavior infinite:
+    assumes infinite_arg: \is_plus_infinity(x);
+    assigns \result \from x;
+    ensures infinite_result: \is_plus_infinity(\result);
+  behavior zero:
+    assumes zero_arg: \is_finite(x) && x == 0.;
+    ensures infinite_result: \is_minus_infinity(\result);
+    ensures errno_set: errno == ERANGE;
+  behavior negative:
+    assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern float logf(float x);
 
-/*@ requires finite_arg: \is_finite(x);
-    requires arg_pos: x > 0;
+/*@
+  assigns errno, \result \from x;
+  behavior normal:
+    assumes finite_arg: \is_finite(x);
+    assumes arg_positive: x > 0;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
+  behavior infinite:
+    assumes infinite_arg: \is_plus_infinity(x);
+    assigns \result \from x;
+    ensures infinite_result: \is_plus_infinity(\result);
+  behavior zero:
+    assumes zero_arg: \is_finite(x) && x == 0.;
+    ensures infinite_result: \is_minus_infinity(\result);
+    ensures errno_set: errno == ERANGE;
+  behavior negative:
+    assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern long double logl(long double x);
 
-/*@ requires finite_arg: \is_finite(x);
-    requires arg_positive: x > 0;
+/*@
+  assigns errno, \result \from x;
+  behavior normal:
+    assumes finite_arg: \is_finite(x);
+    assumes arg_positive: x > 0;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
+  behavior infinite:
+    assumes infinite_arg: \is_plus_infinity(x);
+    assigns \result \from x;
+    ensures infinite_result: \is_plus_infinity(\result);
+  behavior zero:
+    assumes zero_arg: \is_finite(x) && x == 0.;
+    ensures infinite_result: \is_minus_infinity(\result);
+    ensures errno_set: errno == ERANGE;
+  behavior negative:
+    assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern double log10(double x);
 
-/*@ requires finite_arg: \is_finite(x);
-    requires arg_positive: x > 0;
+/*@
+  assigns errno, \result \from x;
+  behavior normal:
+    assumes finite_arg: \is_finite(x);
+    assumes arg_positive: x > 0;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
+  behavior infinite:
+    assumes infinite_arg: \is_plus_infinity(x);
+    assigns \result \from x;
+    ensures infinite_result: \is_plus_infinity(\result);
+  behavior zero:
+    assumes zero_arg: \is_finite(x) && x == 0.;
+    ensures infinite_result: \is_minus_infinity(\result);
+    ensures errno_set: errno == ERANGE;
+  behavior negative:
+    assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern float log10f(float x);
 
-/*@ requires finite_arg: \is_finite(x);
-    requires arg_postive: x > 0;
+/*@
+  assigns errno, \result \from x;
+  behavior normal:
+    assumes finite_arg: \is_finite(x);
+    assumes arg_positive: x > 0;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
+  behavior infinite:
+    assumes infinite_arg: \is_plus_infinity(x);
+    assigns \result \from x;
+    ensures infinite_result: \is_plus_infinity(\result);
+  behavior zero:
+    assumes zero_arg: \is_finite(x) && x == 0.;
+    ensures infinite_result: \is_minus_infinity(\result);
+    ensures errno_set: errno == ERANGE;
+  behavior negative:
+    assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern long double log10l(long double x);
 
@@ -649,24 +775,87 @@ extern double log1p(double x);
 extern float log1pf(float x);
 extern long double log1pl(long double x);
 
-/*@ requires finite_arg: \is_finite(x);
-    requires arg_positive: x > 0;
+/*@
+  assigns errno, \result \from x;
+  behavior normal:
+    assumes finite_arg: \is_finite(x);
+    assumes arg_positive: x > 0;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
+  behavior infinite:
+    assumes infinite_arg: \is_plus_infinity(x);
+    assigns \result \from x;
+    ensures infinite_result: \is_plus_infinity(\result);
+  behavior zero:
+    assumes zero_arg: \is_finite(x) && x == 0.;
+    ensures infinite_result: \is_minus_infinity(\result);
+    ensures errno_set: errno == ERANGE;
+  behavior negative:
+    assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern double log2(double x);
 
-/*@ requires finite_arg: \is_finite(x);
-    requires arg_positive: x > 0;
+/*@
+  assigns errno, \result \from x;
+  behavior normal:
+    assumes finite_arg: \is_finite(x);
+    assumes arg_positive: x > 0;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
+  behavior infinite:
+    assumes infinite_arg: \is_plus_infinity(x);
+    assigns \result \from x;
+    ensures infinite_result: \is_plus_infinity(\result);
+  behavior zero:
+    assumes zero_arg: \is_finite(x) && x == 0.;
+    ensures infinite_result: \is_minus_infinity(\result);
+    ensures errno_set: errno == ERANGE;
+  behavior negative:
+    assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern float log2f(float x);
 
-/*@ requires finite_arg: \is_finite(x);
-    requires arg_positive: x > 0;
+/*@
+  assigns errno, \result \from x;
+  behavior normal:
+    assumes finite_arg: \is_finite(x);
+    assumes arg_positive: x > 0;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
+  behavior infinite:
+    assumes infinite_arg: \is_plus_infinity(x);
+    assigns \result \from x;
+    ensures infinite_result: \is_plus_infinity(\result);
+  behavior zero:
+    assumes zero_arg: \is_finite(x) && x == 0.;
+    ensures infinite_result: \is_minus_infinity(\result);
+    ensures errno_set: errno == ERANGE;
+  behavior negative:
+    assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern long double log2l(long double x);
 
