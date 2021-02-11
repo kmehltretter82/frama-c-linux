@@ -1035,17 +1035,41 @@ extern float truncf(float x);
 */
 extern long double truncl(long double x);
 
-/*@ requires finite_args: \is_finite(x) && \is_finite(y);
-    requires finite_logic_result: \is_finite(fmod(x, y));
+/*@
+  assigns errno, \result \from x, y;
+  behavior normal:
+    assumes in_domain: !\is_NaN(x) && !\is_NaN(y) && y != 0.;
     assigns \result \from x, y;
     ensures finite_result: \is_finite(\result);
+  behavior domain_error:
+    assumes out_of_domain: \is_infinite(x) || y == 0.;
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior nan:
+    assumes nan_args: \is_NaN(x) || \is_NaN(y);
+    assigns \result \from x, y;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern double fmod(double x, double y);
 
-/*@ requires finite_args: \is_finite(x) && \is_finite(y);
-    requires finite_logic_result: \is_finite(fmodf(x, y));
+/*@
+  assigns errno, \result \from x, y;
+  behavior normal:
+    assumes in_domain: !\is_NaN(x) && !\is_NaN(y) && y != 0.;
     assigns \result \from x, y;
     ensures finite_result: \is_finite(\result);
+  behavior domain_error:
+    assumes out_of_domain: \is_infinite(x) || y == 0.;
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior nan:
+    assumes nan_args: \is_NaN(x) || \is_NaN(y);
+    assigns \result \from x, y;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern float fmodf(float x, float y);
 

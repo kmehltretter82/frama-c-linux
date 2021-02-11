@@ -863,45 +863,31 @@
 [eva] tests/float/math_builtins.c:405: 
   Call to builtin Frama_C_fmod for function fmod
 [eva] tests/float/math_builtins.c:405: 
-  function fmod: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:405: 
-  function fmod: precondition 'finite_logic_result' got status valid.
+  function fmod: precondition 'in_domain' got status valid.
 [eva] tests/float/math_builtins.c:406: 
   Call to builtin Frama_C_fmod for function fmod
 [eva] tests/float/math_builtins.c:406: 
-  function fmod: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:406: 
-  function fmod: precondition 'finite_logic_result' got status valid.
+  function fmod: precondition 'in_domain' got status valid.
 [eva] tests/float/math_builtins.c:407: 
   Call to builtin Frama_C_fmod for function fmod
 [eva] tests/float/math_builtins.c:407: 
-  function fmod: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:407: 
-  function fmod: precondition 'finite_logic_result' got status valid.
+  function fmod: precondition 'in_domain' got status valid.
 [eva] tests/float/math_builtins.c:408: 
   Call to builtin Frama_C_fmod for function fmod
 [eva] tests/float/math_builtins.c:408: 
-  function fmod: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:408: 
-  function fmod: precondition 'finite_logic_result' got status valid.
+  function fmod: precondition 'in_domain' got status valid.
 [eva] tests/float/math_builtins.c:409: 
   Call to builtin Frama_C_fmod for function fmod
 [eva] tests/float/math_builtins.c:409: 
-  function fmod: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:409: 
-  function fmod: precondition 'finite_logic_result' got status valid.
+  function fmod: precondition 'in_domain' got status valid.
 [eva] tests/float/math_builtins.c:410: 
   Call to builtin Frama_C_fmod for function fmod
 [eva] tests/float/math_builtins.c:410: 
-  function fmod: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:410: 
-  function fmod: precondition 'finite_logic_result' got status valid.
+  function fmod: precondition 'in_domain' got status valid.
 [eva] tests/float/math_builtins.c:411: 
   Call to builtin Frama_C_fmod for function fmod
-[eva] tests/float/math_builtins.c:411: 
-  function fmod: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:411: Warning: 
-  function fmod: precondition 'finite_logic_result' got status invalid.
+  function fmod: precondition 'in_domain' got status invalid.
 [eva] Recording results for test_fmod_det
 [eva] Done for function test_fmod_det
 [eva] computing for function test_fmod <- main.
@@ -913,27 +899,19 @@
 [eva] tests/float/math_builtins.c:417: 
   Call to builtin Frama_C_fmod for function fmod
 [eva] tests/float/math_builtins.c:417: 
-  function fmod: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:417: 
-  function fmod: precondition 'finite_logic_result' got status valid.
+  function fmod: precondition 'in_domain' got status valid.
 [eva] tests/float/math_builtins.c:418: 
   Call to builtin Frama_C_fmod for function fmod
 [eva] tests/float/math_builtins.c:418: 
-  function fmod: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:418: 
-  function fmod: precondition 'finite_logic_result' got status valid.
+  function fmod: precondition 'in_domain' got status valid.
 [eva] tests/float/math_builtins.c:419: 
   Call to builtin Frama_C_fmod for function fmod
 [eva] tests/float/math_builtins.c:419: 
-  function fmod: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:419: 
-  function fmod: precondition 'finite_logic_result' got status valid.
+  function fmod: precondition 'in_domain' got status valid.
 [eva] tests/float/math_builtins.c:420: 
   Call to builtin Frama_C_fmod for function fmod
 [eva] tests/float/math_builtins.c:420: 
-  function fmod: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:420: 
-  function fmod: precondition 'finite_logic_result' got status valid.
+  function fmod: precondition 'in_domain' got status valid.
 [eva] computing for function double_interval <- test_fmod <- main.
   Called from tests/float/math_builtins.c:421.
 [eva] Recording results for double_interval
@@ -941,15 +919,11 @@
 [eva] tests/float/math_builtins.c:422: 
   Call to builtin Frama_C_fmod for function fmod
 [eva] tests/float/math_builtins.c:422: 
-  function fmod: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:422: 
-  function fmod: precondition 'finite_logic_result' got status valid.
+  function fmod: precondition 'in_domain' got status valid.
 [eva] tests/float/math_builtins.c:423: 
   Call to builtin Frama_C_fmod for function fmod
 [eva] tests/float/math_builtins.c:423: 
-  function fmod: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:423: 
-  function fmod: precondition 'finite_logic_result' got status valid.
+  function fmod: precondition 'in_domain' got status valid.
 [eva] computing for function double_interval <- test_fmod <- main.
   Called from tests/float/math_builtins.c:424.
 [eva] Recording results for double_interval
@@ -961,9 +935,7 @@
 [eva] tests/float/math_builtins.c:426: 
   Call to builtin Frama_C_fmod for function fmod
 [eva] tests/float/math_builtins.c:426: 
-  function fmod: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:426: 
-  function fmod: precondition 'finite_logic_result' got status valid.
+  function fmod: precondition 'in_domain' got status valid.
 [eva] computing for function double_interval <- test_fmod <- main.
   Called from tests/float/math_builtins.c:427.
 [eva] Recording results for double_interval
@@ -975,15 +947,11 @@
 [eva] tests/float/math_builtins.c:429: 
   Call to builtin Frama_C_fmod for function fmod
 [eva] tests/float/math_builtins.c:429: 
-  function fmod: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:429: 
-  function fmod: precondition 'finite_logic_result' got status valid.
+  function fmod: precondition 'in_domain' got status valid.
 [eva] tests/float/math_builtins.c:430: 
   Call to builtin Frama_C_fmod for function fmod
 [eva] tests/float/math_builtins.c:430: 
-  function fmod: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:430: 
-  function fmod: precondition 'finite_logic_result' got status valid.
+  function fmod: precondition 'in_domain' got status valid.
 [eva] computing for function double_interval <- test_fmod <- main.
   Called from tests/float/math_builtins.c:431.
 [eva] Recording results for double_interval
@@ -994,10 +962,8 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:433: 
   Call to builtin Frama_C_fmod for function fmod
-[eva] tests/float/math_builtins.c:433: 
-  function fmod: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:433: Warning: 
-  function fmod: precondition 'finite_logic_result' got status unknown.
+  function fmod: precondition 'in_domain' got status unknown.
 [eva] computing for function double_interval <- test_fmod <- main.
   Called from tests/float/math_builtins.c:434.
 [eva] Recording results for double_interval
@@ -1008,40 +974,32 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:436: 
   Call to builtin Frama_C_fmod for function fmod
-[eva] tests/float/math_builtins.c:436: 
-  function fmod: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:436: Warning: 
-  function fmod: precondition 'finite_logic_result' got status unknown.
+  function fmod: precondition 'in_domain' got status unknown.
 [eva] computing for function double_interval <- test_fmod <- main.
   Called from tests/float/math_builtins.c:437.
 [eva] Recording results for double_interval
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:438: 
   Call to builtin Frama_C_fmod for function fmod
-[eva] tests/float/math_builtins.c:438: 
-  function fmod: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:438: Warning: 
-  function fmod: precondition 'finite_logic_result' got status invalid.
+  function fmod: precondition 'in_domain' got status invalid.
 [eva] computing for function double_interval <- test_fmod <- main.
   Called from tests/float/math_builtins.c:439.
 [eva] Recording results for double_interval
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:440: 
   Call to builtin Frama_C_fmod for function fmod
-[eva] tests/float/math_builtins.c:440: 
-  function fmod: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:440: Warning: 
-  function fmod: precondition 'finite_logic_result' got status unknown.
+  function fmod: precondition 'in_domain' got status unknown.
 [eva] computing for function double_interval <- test_fmod <- main.
   Called from tests/float/math_builtins.c:441.
 [eva] Recording results for double_interval
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:442: 
   Call to builtin Frama_C_fmod for function fmod
-[eva] tests/float/math_builtins.c:442: 
-  function fmod: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:442: Warning: 
-  function fmod: precondition 'finite_logic_result' got status unknown.
+  function fmod: precondition 'in_domain' got status unknown.
 [eva] computing for function double_interval <- test_fmod <- main.
   Called from tests/float/math_builtins.c:443.
 [eva] Recording results for double_interval
@@ -1049,9 +1007,7 @@
 [eva] tests/float/math_builtins.c:444: 
   Call to builtin Frama_C_fmod for function fmod
 [eva] tests/float/math_builtins.c:444: 
-  function fmod: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:444: 
-  function fmod: precondition 'finite_logic_result' got status valid.
+  function fmod: precondition 'in_domain' got status valid.
 [eva] computing for function double_interval <- test_fmod <- main.
   Called from tests/float/math_builtins.c:445.
 [eva] Recording results for double_interval
@@ -1059,9 +1015,7 @@
 [eva] tests/float/math_builtins.c:446: 
   Call to builtin Frama_C_fmod for function fmod
 [eva] tests/float/math_builtins.c:446: 
-  function fmod: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:446: 
-  function fmod: precondition 'finite_logic_result' got status valid.
+  function fmod: precondition 'in_domain' got status valid.
 [eva] computing for function double_interval <- test_fmod <- main.
   Called from tests/float/math_builtins.c:447.
 [eva] Recording results for double_interval
@@ -1069,9 +1023,7 @@
 [eva] tests/float/math_builtins.c:448: 
   Call to builtin Frama_C_fmod for function fmod
 [eva] tests/float/math_builtins.c:448: 
-  function fmod: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:448: 
-  function fmod: precondition 'finite_logic_result' got status valid.
+  function fmod: precondition 'in_domain' got status valid.
 [eva] computing for function double_interval <- test_fmod <- main.
   Called from tests/float/math_builtins.c:449.
 [eva] Recording results for double_interval
@@ -1079,9 +1031,7 @@
 [eva] tests/float/math_builtins.c:450: 
   Call to builtin Frama_C_fmod for function fmod
 [eva] tests/float/math_builtins.c:450: 
-  function fmod: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:450: 
-  function fmod: precondition 'finite_logic_result' got status valid.
+  function fmod: precondition 'in_domain' got status valid.
 [eva] computing for function double_interval <- test_fmod <- main.
   Called from tests/float/math_builtins.c:451.
 [eva] Recording results for double_interval
@@ -1089,9 +1039,7 @@
 [eva] tests/float/math_builtins.c:452: 
   Call to builtin Frama_C_fmod for function fmod
 [eva] tests/float/math_builtins.c:452: 
-  function fmod: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:452: 
-  function fmod: precondition 'finite_logic_result' got status valid.
+  function fmod: precondition 'in_domain' got status valid.
 [eva] computing for function double_interval <- test_fmod <- main.
   Called from tests/float/math_builtins.c:453.
 [eva] Recording results for double_interval
@@ -1099,9 +1047,7 @@
 [eva] tests/float/math_builtins.c:454: 
   Call to builtin Frama_C_fmod for function fmod
 [eva] tests/float/math_builtins.c:454: 
-  function fmod: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:454: 
-  function fmod: precondition 'finite_logic_result' got status valid.
+  function fmod: precondition 'in_domain' got status valid.
 [eva] computing for function double_interval <- test_fmod <- main.
   Called from tests/float/math_builtins.c:455.
 [eva] Recording results for double_interval
@@ -1109,9 +1055,7 @@
 [eva] tests/float/math_builtins.c:456: 
   Call to builtin Frama_C_fmod for function fmod
 [eva] tests/float/math_builtins.c:456: 
-  function fmod: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:456: 
-  function fmod: precondition 'finite_logic_result' got status valid.
+  function fmod: precondition 'in_domain' got status valid.
 [eva] computing for function double_interval <- test_fmod <- main.
   Called from tests/float/math_builtins.c:457.
 [eva] Recording results for double_interval
@@ -1119,9 +1063,7 @@
 [eva] tests/float/math_builtins.c:458: 
   Call to builtin Frama_C_fmod for function fmod
 [eva] tests/float/math_builtins.c:458: 
-  function fmod: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:458: 
-  function fmod: precondition 'finite_logic_result' got status valid.
+  function fmod: precondition 'in_domain' got status valid.
 [eva] computing for function double_interval <- test_fmod <- main.
   Called from tests/float/math_builtins.c:459.
 [eva] Recording results for double_interval
@@ -1133,9 +1075,7 @@
 [eva] tests/float/math_builtins.c:461: 
   Call to builtin Frama_C_fmod for function fmod
 [eva] tests/float/math_builtins.c:461: 
-  function fmod: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:461: 
-  function fmod: precondition 'finite_logic_result' got status valid.
+  function fmod: precondition 'in_domain' got status valid.
 [eva] computing for function double_interval <- test_fmod <- main.
   Called from tests/float/math_builtins.c:462.
 [eva] Recording results for double_interval
@@ -1143,9 +1083,7 @@
 [eva] tests/float/math_builtins.c:463: 
   Call to builtin Frama_C_fmod for function fmod
 [eva] tests/float/math_builtins.c:463: 
-  function fmod: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:463: 
-  function fmod: precondition 'finite_logic_result' got status valid.
+  function fmod: precondition 'in_domain' got status valid.
 [eva] computing for function double_interval <- test_fmod <- main.
   Called from tests/float/math_builtins.c:464.
 [eva] Recording results for double_interval
@@ -1153,9 +1091,7 @@
 [eva] tests/float/math_builtins.c:465: 
   Call to builtin Frama_C_fmod for function fmod
 [eva] tests/float/math_builtins.c:465: 
-  function fmod: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:465: 
-  function fmod: precondition 'finite_logic_result' got status valid.
+  function fmod: precondition 'in_domain' got status valid.
 [eva] computing for function double_interval <- test_fmod <- main.
   Called from tests/float/math_builtins.c:466.
 [eva] Recording results for double_interval
@@ -1163,9 +1099,7 @@
 [eva] tests/float/math_builtins.c:467: 
   Call to builtin Frama_C_fmod for function fmod
 [eva] tests/float/math_builtins.c:467: 
-  function fmod: precondition 'finite_args' got status valid.
-[eva] tests/float/math_builtins.c:467: 
-  function fmod: precondition 'finite_logic_result' got status valid.
+  function fmod: precondition 'in_domain' got status valid.
 [eva] computing for function double_interval <- test_fmod <- main.
   Called from tests/float/math_builtins.c:468.
 [eva] Recording results for double_interval
@@ -1176,30 +1110,24 @@
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:470: 
   Call to builtin Frama_C_fmod for function fmod
-[eva] tests/float/math_builtins.c:470: 
-  function fmod: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:470: Warning: 
-  function fmod: precondition 'finite_logic_result' got status unknown.
+  function fmod: precondition 'in_domain' got status unknown.
 [eva] computing for function double_interval <- test_fmod <- main.
   Called from tests/float/math_builtins.c:471.
 [eva] Recording results for double_interval
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:472: 
   Call to builtin Frama_C_fmod for function fmod
-[eva] tests/float/math_builtins.c:472: 
-  function fmod: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:472: Warning: 
-  function fmod: precondition 'finite_logic_result' got status unknown.
+  function fmod: precondition 'in_domain' got status unknown.
 [eva] computing for function double_interval <- test_fmod <- main.
   Called from tests/float/math_builtins.c:473.
 [eva] Recording results for double_interval
 [eva] Done for function double_interval
 [eva] tests/float/math_builtins.c:474: 
   Call to builtin Frama_C_fmod for function fmod
-[eva] tests/float/math_builtins.c:474: 
-  function fmod: precondition 'finite_args' got status valid.
 [eva:alarm] tests/float/math_builtins.c:474: Warning: 
-  function fmod: precondition 'finite_logic_result' got status unknown.
+  function fmod: precondition 'in_domain' got status unknown.
 [eva] Recording results for test_fmod
 [eva] Done for function test_fmod
 [eva] computing for function test_sqrt_det <- main.
