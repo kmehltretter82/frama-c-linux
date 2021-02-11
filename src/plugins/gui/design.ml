@@ -1034,7 +1034,7 @@ class main_window () : main_window_extension_points =
         let m =
           new Menu_manager.menu_manager
             ~packing:(toplevel_vbox#pack ~expand:false ~fill:false ~from:`START)
-            ~host:(self :> Gtk_helper.host)
+            (self :> Gtk_helper.host)
         in
         menu_manager <- Some m;
         m

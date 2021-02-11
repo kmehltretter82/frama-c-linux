@@ -1088,7 +1088,7 @@ let prove_goal ~id ~title ~name ?axioms t =
   end;
   th, decl
 
-let prove_prop ?axioms ~pid ~prop =
+let prove_prop ?axioms ~pid prop =
   let id = WpPropId.get_propid pid in
   let title = Pretty_utils.to_string WpPropId.pretty pid in
   let name = "WP" in
@@ -1105,13 +1105,13 @@ let task_of_wpo wpo =
       let axioms = v.Wpo.VC_Annot.axioms in
       let prop = Wpo.GOAL.compute_proof v.Wpo.VC_Annot.goal in
       (* Format.printf "Goal: %a@." Lang.F.pp_pred prop; *)
-      prove_prop ~pid ~prop ?axioms
+      prove_prop ~pid prop ?axioms
   | Wpo.GoalLemma v ->
       let lemma = v.Wpo.VC_Lemma.lemma in
       let depends = v.Wpo.VC_Lemma.depends in
       let prop = Lang.F.p_forall lemma.l_forall lemma.l_lemma in
       let axioms = Some(lemma.l_cluster,depends) in
-      prove_prop ~pid ~prop ?axioms
+      prove_prop ~pid prop ?axioms
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prover Task                                                        --- *)

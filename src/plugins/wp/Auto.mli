@@ -35,7 +35,7 @@ val contrapose : ?priority:float -> selection -> strategy
 val compound : ?priority:float -> selection -> strategy
 val cut : ?priority:float -> ?modus:bool -> selection -> strategy
 val filter : ?priority:float -> ?anti:bool -> unit -> strategy
-val havoc : ?priority:float -> havoc:selection -> strategy
+val havoc : ?priority:float -> selection -> strategy
 val separated : ?priority:float -> selection -> strategy
 val instance : ?priority:float -> selection -> selection list -> strategy
 val lemma : ?priority:float -> ?at:selection -> string -> selection list -> strategy

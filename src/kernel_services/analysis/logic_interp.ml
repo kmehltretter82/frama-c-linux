@@ -27,7 +27,7 @@ open Cil_datatype
 exception Error of Cil_types.location * string
 exception Unbound of string
 
-let find_var kf kinstr ?label ~var =
+let find_var kf kinstr ?label var =
   let vi =
     try
       let vi = Globals.Vars.find_from_astinfo var (VLocal kf) in
@@ -89,7 +89,7 @@ end) =
 
       let find_macro _ = raise Not_found
 
-      let find_var ?label ~var = find_var X.kf X.kinstr ?label ~var
+      let find_var ?label var = find_var X.kf X.kinstr ?label var
 
       let find_enum_tag x =
         try

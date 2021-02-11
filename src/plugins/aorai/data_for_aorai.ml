@@ -697,7 +697,7 @@ struct
   let conditionalConversion = Cabs2cil.logicConditionalConversion
   let is_loop () = false
   let find_macro _ = raise Not_found
-  let find_var ?label:_ ~var:_ = raise Not_found
+  let find_var ?label:_ _ = raise Not_found
   let find_enum_tag _ = raise Not_found
   (*let find_comp_type ~kind:_ _ = raise Not_found*)
   let find_comp_field info s =

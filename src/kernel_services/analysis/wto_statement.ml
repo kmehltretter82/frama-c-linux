@@ -39,7 +39,7 @@ let build_wto kf =
   let init = Kernel_function.find_first_stmt kf
   and succs = fun stmt -> List.rev stmt.succs
   in
-  Scheduler.partition ?pref:None ~init ~succs
+  Scheduler.partition ~pref:(fun _ _ -> 0) ~init ~succs
 
 
 (* ********************************************************************** *)
