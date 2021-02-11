@@ -44,7 +44,7 @@
    wcscpy (0 call); wcsdup (0 call); wcslen (3 calls); wcsncat (0 call);
    wcsncpy (0 call); wmemcpy (1 call); wmemset (0 call); 
   
-  Specified-only functions (414)
+  Specified-only functions (415)
   ==============================
    FD_CLR (0 call); FD_ISSET (0 call); FD_SET (0 call); FD_ZERO (0 call);
    Frama_C_int_interval (0 call); Frama_C_long_interval (0 call);
@@ -78,10 +78,10 @@
    acoshf (0 call); acoshl (0 call); acosl (0 call); alloca (0 call);
    asctime (0 call); asin (0 call); asinf (0 call); asinl (0 call);
    at_quick_exit (0 call); atan (0 call); atan2 (0 call); atan2f (0 call);
-   atanf (0 call); atanl (0 call); atexit (0 call); atof (0 call);
-   atol (0 call); atoll (0 call); basename (0 call); bind (0 call);
-   bsearch (0 call); bzero (0 call); ceil (0 call); ceilf (0 call);
-   ceill (0 call); cfgetispeed (0 call); cfgetospeed (0 call);
+   atan2l (0 call); atanf (0 call); atanl (0 call); atexit (0 call);
+   atof (0 call); atol (0 call); atoll (0 call); basename (0 call);
+   bind (0 call); bsearch (0 call); bzero (0 call); ceil (0 call);
+   ceilf (0 call); ceill (0 call); cfgetispeed (0 call); cfgetospeed (0 call);
    cfsetispeed (0 call); cfsetospeed (0 call); chdir (0 call); chown (0 call);
    chroot (0 call); clearerr (0 call); clearerr_unlocked (0 call);
    clock (0 call); clock_gettime (0 call); clock_nanosleep (0 call);
@@ -196,7 +196,7 @@
   Goto = 98
   Assignment = 465
   Exit point = 84
-  Function = 499
+  Function = 500
   Function call = 96
   Pointer dereferencing = 159
   Cyclomatic complexity = 298
