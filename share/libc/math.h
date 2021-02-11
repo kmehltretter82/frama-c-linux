@@ -128,62 +128,163 @@ int __fc_fpclassify(double x);
   (sizeof(x) == sizeof(float) ? __fc_fpclassifyf(x) == FP_NORMAL : __fc_fpclassify(x) == FP_NORMAL)
 
 
-/*@ requires in_domain: \is_finite(x) && \abs(x) <= 1;
+/*@
+  assigns errno, \result \from x;
+  behavior normal:
+    assumes in_domain: \is_finite(x) && \abs(x) <= 1;
     assigns \result \from x;
     ensures positive_result: \is_finite(\result) && \result >= 0;
+  behavior domain_error:
+    assumes out_of_domain: \is_infinite(x) || (\is_finite(x) && \abs(x) > 1);
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern double acos(double x);
 
-/*@ requires in_domain: \is_finite(x) && \abs(x) <= 1;
+/*@
+  assigns errno, \result \from x;
+  behavior normal:
+    assumes in_domain: \is_finite(x) && \abs(x) <= 1;
     assigns \result \from x;
     ensures positive_result: \is_finite(\result) && \result >= 0;
+  behavior domain_error:
+    assumes out_of_domain: \is_infinite(x) || (\is_finite(x) && \abs(x) > 1);
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern float acosf(float x);
 
-/*@ requires in_domain: \is_finite(x) && \abs(x) <= 1;
+/*@
+  assigns errno, \result \from x;
+  behavior normal:
+    assumes in_domain: \is_finite(x) && \abs(x) <= 1;
     assigns \result \from x;
     ensures positive_result: \is_finite(\result) && \result >= 0;
+  behavior domain_error:
+    assumes out_of_domain: \is_infinite(x) || (\is_finite(x) && \abs(x) > 1);
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern long double acosl(long double x);
 
-/*@ requires in_domain: \is_finite(x) && \abs(x) <= 1;
+/*@
+  assigns errno, \result \from x;
+  behavior normal:
+    assumes in_domain: \is_finite(x) && \abs(x) <= 1;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
+  behavior domain_error:
+    assumes out_of_domain: \is_infinite(x) || (\is_finite(x) && \abs(x) > 1);
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern double asin(double x);
 
-/*@ requires in_domain: \is_finite(x) && \abs(x) <= 1;
+/*@
+  assigns errno, \result \from x;
+  behavior normal:
+    assumes in_domain: \is_finite(x) && \abs(x) <= 1;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
+  behavior domain_error:
+    assumes out_of_domain: \is_infinite(x) || (\is_finite(x) && \abs(x) > 1);
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern float asinf(float x);
 
-/*@ requires in_domain: \is_finite(x) && \abs(x) <= 1;
+/*@
+  assigns errno, \result \from x;
+  behavior normal:
+    assumes in_domain: \is_finite(x) && \abs(x) <= 1;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
+  behavior domain_error:
+    assumes out_of_domain: \is_infinite(x) || (\is_finite(x) && \abs(x) > 1);
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern long double asinl(long double x);
 
-/*@ requires finite_arg: \is_finite(x);
-    assigns \result \from x;
+/*@
+  assigns \result \from x;
+  behavior normal:
+    assumes finite_arg: !\is_NaN(x);
     ensures finite_result: \is_finite(\result);
     ensures result_domain: -1.571 <= \result <= 1.571;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern float atanf(float x);
 
-/*@ requires finite_arg: \is_finite(x);
-    assigns \result \from x;
+/*@
+  assigns \result \from x;
+  behavior normal:
+    assumes number_arg: !\is_NaN(x);
     ensures finite_result: \is_finite(\result);
     ensures result_domain: -1.571 <= \result <= 1.571;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern double atan(double x);
 
-/*@ requires finite_arg: \is_finite(x);
-    assigns \result \from x;
+/*@
+  assigns \result \from x;
+  behavior normal:
+    assumes number_arg: !\is_NaN(x);
     ensures finite_result: \is_finite(\result);
     ensures result_domain: -1.571 <= \result <= 1.571;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern long double atanl(long double x);
+
+// TODO
 
 /*@ requires finite_args: \is_finite(x) && \is_finite(y);
     requires finite_result: \is_finite(atan2(x, y));
@@ -201,45 +302,123 @@ extern float atan2f(float y, float x);
 
 extern long double atan2l(long double y, long double x);
 
-/*@ requires finite_arg: \is_finite(x);
+/*@
+  assigns errno, \result \from x;
+  behavior normal:
+    assumes finite_arg: \is_finite(x);
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
     ensures result_domain: -1. <= \result <= 1.;
+  behavior infinity:
+    assumes infinite_arg: \is_infinite(x);
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior nan:
+    assumes nan_arg: !\is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern double cos(double x);
 
-/*@ requires finite_arg: \is_finite(x);
+/*@
+  assigns errno, \result \from x;
+  behavior normal:
+    assumes finite_arg: \is_finite(x);
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
     ensures result_domain: -1. <= \result <= 1.;
+  behavior infinity:
+    assumes infinite_arg: \is_infinite(x);
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior nan:
+    assumes nan_arg: !\is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern float cosf(float x);
 
-/*@ requires finite_arg: \is_finite(x);
+/*@
+  assigns errno, \result \from x;
+  behavior normal:
+    assumes finite_arg: \is_finite(x);
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
     ensures result_domain: -1. <= \result <= 1.;
+  behavior infinity:
+    assumes infinite_arg: \is_infinite(x);
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior nan:
+    assumes nan_arg: !\is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern long double cosl(long double x);
 
-/*@ requires finite_arg: \is_finite(x);
+/*@
+  assigns errno, \result \from x;
+  behavior normal:
+    assumes finite_arg: \is_finite(x);
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
     ensures result_domain: -1. <= \result <= 1.;
+  behavior infinity:
+    assumes infinite_arg: \is_infinite(x);
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior nan:
+    assumes nan_arg: !\is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern double sin(double x);
 
-/*@ requires finite_arg: \is_finite(x);
+/*@
+  assigns errno, \result \from x;
+  behavior normal:
+    assumes finite_arg: \is_finite(x);
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
     ensures result_domain: -1. <= \result <= 1.;
+  behavior infinity:
+    assumes infinite_arg: \is_infinite(x);
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior nan:
+    assumes nan_arg: !\is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern float sinf(float x);
 
-/*@ requires finite_arg: \is_finite(x);
+/*@
+  assigns errno, \result \from x;
+  behavior normal:
+    assumes finite_arg: \is_finite(x);
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
     ensures result_domain: -1. <= \result <= 1.;
+  behavior infinity:
+    assumes infinite_arg: \is_infinite(x);
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior nan:
+    assumes nan_arg: !\is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern long double sinl(long double x);
 
@@ -248,7 +427,7 @@ extern float tanf(float x);
 extern long double tanl(long double x);
 
 /*@
-  assigns __fc_errno, \result \from x;
+  assigns errno, \result \from x;
   behavior normal:
     assumes in_domain: \is_finite(x) && x >= 1;
     assigns \result \from x;
@@ -259,14 +438,19 @@ extern long double tanl(long double x);
     ensures result_plus_infinity: \is_plus_infinity(\result);
   behavior domain_error:
     assumes out_of_domain: \is_minus_infinity(x) || (\is_finite(x) && x < 1);
-    assigns __fc_errno, \result \from x;
-    ensures errno_set: __fc_errno == 1;
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
   disjoint behaviors;
  */
 extern double acosh(double x);
 
 /*@
-  assigns __fc_errno, \result \from x;
+  assigns errno, \result \from x;
   behavior normal:
     assumes in_domain: \is_finite(x) && x >= 1;
     assigns \result \from x;
@@ -277,14 +461,19 @@ extern double acosh(double x);
     ensures result_plus_infinity: \is_plus_infinity(\result);
   behavior domain_error:
     assumes out_of_domain: \is_minus_infinity(x) || (\is_finite(x) && x < 1);
-    assigns __fc_errno, \result \from x;
-    ensures errno_set: __fc_errno == 1;
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
   disjoint behaviors;
  */
 extern float acoshf(float x);
 
 /*@
-  assigns __fc_errno, \result \from x;
+  assigns errno, \result \from x;
   behavior normal:
     assumes in_domain: \is_finite(x) && x >= 1;
     assigns \result \from x;
@@ -295,8 +484,13 @@ extern float acoshf(float x);
     ensures result_plus_infinity: \is_plus_infinity(\result);
   behavior domain_error:
     assumes out_of_domain: \is_minus_infinity(x) || (\is_finite(x) && x < 1);
-    assigns __fc_errno, \result \from x;
-    ensures errno_set: __fc_errno == 1;
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
   disjoint behaviors;
  */
 extern long double acoshl(long double x);
@@ -446,27 +640,57 @@ extern double cbrt(double x);
 extern float cbrtf(float x);
 extern long double cbrtl(long double x);
 
-/*@ requires finite_arg: \is_finite(x);
-    assigns \result \from x;
+/*@
+  assigns \result \from x;
+  behavior normal:
+    assumes finite_arg: \is_finite(x);
     ensures res_finite: \is_finite(\result);
     ensures positive_result: \result >= 0.;
     ensures equal_magnitude_result: \result == x || \result == -x;
+  behavior infinity:
+    assumes infinite_arg: \is_infinite(x);
+    ensures infinite_result: \is_plus_infinity(\result);
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern double fabs(double x);
 
-/*@ requires finite_arg: \is_finite(x);
-    assigns \result \from x;
+/*@
+  assigns \result \from x;
+  behavior normal:
+    assumes finite_arg: \is_finite(x);
     ensures res_finite: \is_finite(\result);
     ensures positive_result: \result >= 0.;
     ensures equal_magnitude_result: \result == x || \result == -x;
+  behavior infinity:
+    assumes infinite_arg: \is_infinite(x);
+    ensures infinite_result: \is_plus_infinity(\result);
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern float fabsf(float x);
 
-/*@ requires finite_arg: \is_finite(x);
-    assigns \result \from x;
+/*@
+  assigns \result \from x;
+  behavior normal:
+    assumes finite_arg: \is_finite(x);
     ensures res_finite: \is_finite(\result);
     ensures positive_result: \result >= 0.;
     ensures equal_magnitude_result: \result == x || \result == -x;
+  behavior infinity:
+    assumes infinite_arg: \is_infinite(x);
+    ensures infinite_result: \is_plus_infinity(\result);
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern long double fabsl(long double x);
 
@@ -490,29 +714,80 @@ extern float powf(float x, float y);
 
 extern long double powl(long double x, long double y);
 
-/*@ requires finite_arg: \is_finite(x);
-    requires arg_positive: x >= -0.;
+/*@
+  assigns errno, \result \from x;
+  behavior normal:
+    assumes finite_arg: \is_finite(x);
+    assumes arg_positive: x >= -0.;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
     ensures positive_result: \result >= -0.;
     ensures result_value: \result == sqrt(x);
+  behavior negative:
+    assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior infinity:
+    assumes infinite_arg: \is_plus_infinity(x);
+    assigns \result \from x;
+    ensures infinite_result: \is_plus_infinity(\result);
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern double sqrt(double x);
 
-/*@ requires finite_arg: \is_finite(x);
-    requires arg_positive: x >= -0.;
+/*@
+  assigns errno, \result \from x;
+  behavior normal:
+    assumes finite_arg: \is_finite(x);
+    assumes arg_positive: x >= -0.;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
     ensures positive_result: \result >= -0.;
-    ensures result_value: \result == sqrtf(x);
+    ensures result_value: \result == sqrt(x);
+  behavior negative:
+    assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior infinity:
+    assumes infinite_arg: \is_plus_infinity(x);
+    assigns \result \from x;
+    ensures infinite_result: \is_plus_infinity(\result);
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern float sqrtf(float x);
 
-/*@ requires finite_arg: \is_finite(x);
-    requires arg_positive: x >= -0.;
+/*@
+  assigns errno, \result \from x;
+  behavior normal:
+    assumes finite_arg: \is_finite(x);
+    assumes arg_positive: x >= -0.;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
     ensures positive_result: \result >= -0.;
+  behavior negative:
+    assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior infinity:
+    assumes infinite_arg: \is_plus_infinity(x);
+    assigns \result \from x;
+    ensures infinite_result: \is_plus_infinity(\result);
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern long double sqrtl(long double x);
 
@@ -532,40 +807,105 @@ extern double tgamma(double x);
 extern float tgammaf(float x);
 extern long double tgammal(long double x);
 
-/*@ requires finite_arg: \is_finite(x);
-    assigns \result \from x;
+/*@
+  assigns \result \from x;
+  behavior finite:
+    assumes finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
+  behavior infinite:
+    assumes infinite_arg: \is_infinite(x);
+    ensures infinite_result: \is_infinite(\result);
+    ensures equal_result: \result == x;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern double ceil(double x);
 
-/*@ requires finite_arg: \is_finite(x);
-    assigns \result \from x;
+/*@
+  assigns \result \from x;
+  behavior finite:
+    assumes finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
+  behavior infinite:
+    assumes infinite_arg: \is_infinite(x);
+    ensures infinite_result: \is_infinite(\result);
+    ensures equal_result: \result == x;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
-
 extern float ceilf(float x);
 
-/*@ requires finite_arg: \is_finite(x);
-    assigns \result \from x;
+/*@
+  assigns \result \from x;
+  behavior finite:
+    assumes finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
+  behavior infinite:
+    assumes infinite_arg: \is_infinite(x);
+    ensures infinite_result: \is_infinite(\result);
+    ensures equal_result: \result == x;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern long double ceill(long double x);
 
-/*@ requires finite_arg: \is_finite(x);
-    assigns \result \from x;
+/*@
+  assigns \result \from x;
+  behavior finite:
+    assumes finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
+  behavior infinite:
+    assumes infinite_arg: \is_infinite(x);
+    ensures infinite_result: \is_infinite(\result);
+    ensures equal_result: \result == x;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern double floor(double x);
 
-/*@ requires finite_arg: \is_finite(x);
-    assigns \result \from x;
+/*@
+  assigns \result \from x;
+  behavior finite:
+    assumes finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
+  behavior infinite:
+    assumes infinite_arg: \is_infinite(x);
+    ensures infinite_result: \is_infinite(\result);
+    ensures equal_result: \result == x;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern float floorf(float x);
 
-/*@ requires finite_arg: \is_finite(x);
-    assigns \result \from x;
+/*@
+  assigns \result \from x;
+  behavior finite:
+    assumes finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
+  behavior infinite:
+    assumes infinite_arg: \is_infinite(x);
+    ensures infinite_result: \is_infinite(\result);
+    ensures equal_result: \result == x;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern long double floorl(long double x);
 
@@ -585,21 +925,54 @@ extern long long int llrint(double x);
 extern long long int llrintf(float x);
 extern long long int llrintl(long double x);
 
-/*@ requires finite_arg: \is_finite(x);
-    assigns \result \from x;
+/*@
+  assigns \result \from x;
+  behavior finite:
+    assumes finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
+  behavior infinite:
+    assumes infinite_arg: \is_infinite(x);
+    ensures infinite_result: \is_infinite(\result);
+    ensures equal_result: \result == x;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern double round(double x);
 
-/*@ requires finite_arg: \is_finite(x);
-    assigns \result \from x;
+/*@
+  assigns \result \from x;
+  behavior finite:
+    assumes finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
+  behavior infinite:
+    assumes infinite_arg: \is_infinite(x);
+    ensures infinite_result: \is_infinite(\result);
+    ensures equal_result: \result == x;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern float roundf(float x);
 
-/*@ requires finite_arg: \is_finite(x);
-    assigns \result \from x;
+/*@
+  assigns \result \from x;
+  behavior finite:
+    assumes finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
+  behavior infinite:
+    assumes infinite_arg: \is_infinite(x);
+    ensures infinite_result: \is_infinite(\result);
+    ensures equal_result: \result == x;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern long double roundl(long double x);
 
@@ -611,21 +984,54 @@ extern long long int llround(double x);
 extern long long int llroundf(float x);
 extern long long int llroundl(long double x);
 
-/*@ requires finite_arg: \is_finite(x);
-    assigns \result \from x;
+/*@
+  assigns \result \from x;
+  behavior finite:
+    assumes finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
+  behavior infinite:
+    assumes infinite_arg: \is_infinite(x);
+    ensures infinite_result: \is_infinite(\result);
+    ensures equal_result: \result == x;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern double trunc(double x);
 
-/*@ requires finite_arg: \is_finite(x);
-    assigns \result \from x;
+/*@
+  assigns \result \from x;
+  behavior finite:
+    assumes finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
+  behavior infinite:
+    assumes infinite_arg: \is_infinite(x);
+    ensures infinite_result: \is_infinite(\result);
+    ensures equal_result: \result == x;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern float truncf(float x);
 
-/*@ requires finite_arg: \is_finite(x);
-    assigns \result \from x;
+/*@
+  assigns \result \from x;
+  behavior finite:
+    assumes finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
+  behavior infinite:
+    assumes infinite_arg: \is_infinite(x);
+    ensures infinite_result: \is_infinite(\result);
+    ensures equal_result: \result == x;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
 */
 extern long double truncl(long double x);
 
