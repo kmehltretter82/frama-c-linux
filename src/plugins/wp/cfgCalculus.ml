@@ -99,8 +99,7 @@ let is_active_mode ~mode ~goal (p: Property.t) =
   | IPDecrease { id_ca = Some ca } -> is_selected_ca mode ~goal ca
   | IPComplete _ | IPDisjoint _ -> is_default_bhv mode
   | IPOther _ -> true
-  | IPFrom _ | IPGlobalInvariant _ | IPTypeInvariant _ ->
-      (*TODO: is it in pass or not ? *) assert false
+  | IPFrom _ | IPGlobalInvariant _ | IPTypeInvariant _
   | IPAxiomatic _ | IPAxiom _ | IPLemma _
   | IPExtended _ | IPBehavior _
   | IPReachable _ | IPPropertyInstance _
@@ -304,13 +303,13 @@ struct
          WpLog.SmokeDeadcall.get ()
       then Some s else None in
     let c = CfgAnnot.get_call_contract ?smoking kf in
-    let p_post = List.fold_right (prove_property env) c.call_smoke wr in
-    let p_exit = List.fold_right (prove_property env) c.call_smoke env.wk in
+    let p_post = List.fold_right (prove_property env) c.contract_smoke wr in
+    let p_exit = List.fold_right (prove_property env) c.contract_smoke env.wk in
     let w_call = W.call env.we s r kf es
-        ~pre:c.call_pre
-        ~post:c.call_post
-        ~pexit:c.call_exit
-        ~assigns:c.call_assigns
+        ~pre:c.contract_pre
+        ~post:c.contract_post
+        ~pexit:c.contract_exit
+        ~assigns:c.contract_assigns
         ~p_post ~p_exit in
     if is_default_bhv env.mode then
       let pre =
@@ -318,7 +317,7 @@ struct
             if is_selected_callpre env p then
               Some (CfgAnnot.get_precond_at kf s p)
             else None
-          ) c.call_pre
+          ) c.contract_pre
       in W.call_goal_precond env.we s kf es ~pre w_call
     else w_call
 

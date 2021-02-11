@@ -180,38 +180,16 @@ let get_disjoint_behaviors kf =
     ) spec.spec_disjoint_behaviors
 
 (* -------------------------------------------------------------------------- *)
-(* --- Called Contract                                                    --- *)
+(* --- Contracts                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-(*TODO: put it in Status_by_call ? *)
-module AllPrecondStatus =
-  State_builder.Hashtbl(Kernel_function.Hashtbl)(Datatype.Unit)
-    (struct
-      let name = "Wp.CfgAnnot.AllPrecondStatus"
-      let dependencies = [Ast.self]
-      let size = 32
-    end)
-
-let setup_preconditions kf =
-  if not (AllPrecondStatus.mem kf) then
-    begin
-      AllPrecondStatus.add kf () ;
-      Statuses_by_call.setup_all_preconditions_proxies kf ;
-    end
-
-type call_contract = {
-  call_pre : WpPropId.pred_info list ;
-  call_post : WpPropId.pred_info list ;
-  call_exit : WpPropId.pred_info list ;
-  call_smoke : WpPropId.pred_info list ;
-  call_assigns : Cil_types.assigns ;
+type contract = {
+  contract_pre : WpPropId.pred_info list ;
+  contract_post : WpPropId.pred_info list ;
+  contract_exit : WpPropId.pred_info list ;
+  contract_smoke : WpPropId.pred_info list ;
+  contract_assigns : Cil_types.assigns ;
 }
-
-let get_precond_at kf stmt (id,p) =
-  let pi = WpPropId.property_of_id id in
-  let pi_at = Statuses_by_call.precondition_at_call kf pi stmt in
-  let id_at = WpPropId.mk_call_pre_id kf stmt pi pi_at in
-  id_at , p
 
 let assigns_upper_bound behaviors =
   let collect_assigns (def, assigns) bhv =
@@ -231,10 +209,36 @@ let assigns_upper_bound behaviors =
   | _, Some a -> a (* else combined behaviors *)
   | _ -> WritesAny
 
+(* -------------------------------------------------------------------------- *)
+(* --- Call Contracts                                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
+(*TODO: put it in Status_by_call ? *)
+module AllPrecondStatus =
+  State_builder.Hashtbl(Kernel_function.Hashtbl)(Datatype.Unit)
+    (struct
+      let name = "Wp.CfgAnnot.AllPrecondStatus"
+      let dependencies = [Ast.self]
+      let size = 32
+    end)
+
+let setup_preconditions kf =
+  if not (AllPrecondStatus.mem kf) then
+    begin
+      AllPrecondStatus.add kf () ;
+      Statuses_by_call.setup_all_preconditions_proxies kf ;
+    end
+
+let get_precond_at kf stmt (id,p) =
+  let pi = WpPropId.property_of_id id in
+  let pi_at = Statuses_by_call.precondition_at_call kf pi stmt in
+  let id_at = WpPropId.mk_call_pre_id kf stmt pi pi_at in
+  id_at , p
+
 module CallContract = WpContext.StaticGenerator(Kernel_function)
     (struct
       type key = kernel_function
-      type data = call_contract
+      type data = contract
       let name = "Wp.CfgAnnot.CallContract"
       let compile kf =
         let cpre : WpPropId.pred_info list ref = ref [] in
@@ -255,11 +259,11 @@ module CallContract = WpContext.StaticGenerator(Kernel_function)
               ) bhv.b_post_cond ;
           end behaviors ;
         {
-          call_pre = List.rev !cpre ;
-          call_post = List.rev !cpost ;
-          call_exit = List.rev !cexit ;
-          call_smoke = [] ;
-          call_assigns = assigns_upper_bound behaviors
+          contract_pre = List.rev !cpre ;
+          contract_post = List.rev !cpost ;
+          contract_exit = List.rev !cexit ;
+          contract_smoke = [] ;
+          contract_assigns = assigns_upper_bound behaviors
         }
     end)
 
@@ -269,11 +273,7 @@ let get_call_contract ?smoking kf =
   | None -> cc
   | Some s ->
       let g = smoke kf ~id:"dead_call" ~unreachable:s () in
-      { cc with
-        call_smoke = [ g ] ;
-        call_post = cc.call_post ;
-        call_exit = cc.call_exit ;
-      }
+      { cc with contract_smoke = [ g ] }
 
 (* -------------------------------------------------------------------------- *)
 (* --- Code Assertions                                                    --- *)

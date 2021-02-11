@@ -91,16 +91,16 @@ val get_loop_contract : ?smoking:bool ->
 (* --- Property Accessors : Call Contracts                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-type call_contract = {
-  call_pre : pred_info list ;
-  call_post : pred_info list ;
-  call_exit : pred_info list ;
-  call_smoke : pred_info list ;
-  call_assigns : assigns ;
+type contract = {
+  contract_pre : pred_info list ;
+  contract_post : pred_info list ;
+  contract_exit : pred_info list ;
+  contract_smoke : pred_info list ;
+  contract_assigns : assigns ;
 }
 
 val get_precond_at : kernel_function -> stmt -> pred_info -> pred_info
-val get_call_contract : ?smoking:stmt -> kernel_function -> call_contract
+val get_call_contract : ?smoking:stmt -> kernel_function -> contract
 
 (* -------------------------------------------------------------------------- *)
 (* --- Clear Tablesnts                                                    --- *)
