@@ -2969,19 +2969,14 @@ extern float sinf(float x);
  */
 extern long double sinl(long double x);
 
-/*@ assigns __fc_errno, \result;
+/*@ requires ¬(is_plus_infinity: \is_plus_infinity(x));
+    assigns __fc_errno, \result;
     assigns __fc_errno \from x;
     assigns \result \from x;
     
     behavior normal:
       assumes in_domain: \is_finite(x) ∧ x ≥ 1;
       ensures positive_result: \is_finite(\result) ∧ \result ≥ 0;
-      assigns \result;
-      assigns \result \from x;
-    
-    behavior infinite:
-      assumes is_plus_infinity: \is_plus_infinity(x);
-      ensures result_plus_infinity: \is_plus_infinity(\result);
       assigns \result;
       assigns \result \from x;
     
@@ -2993,23 +2988,18 @@ extern long double sinl(long double x);
       assigns __fc_errno \from x;
       assigns \result \from x;
     
-    disjoint behaviors domain_error, infinite, normal;
+    disjoint behaviors domain_error, normal;
  */
 extern double acosh(double x);
 
-/*@ assigns __fc_errno, \result;
+/*@ requires ¬(is_plus_infinity: \is_plus_infinity(x));
+    assigns __fc_errno, \result;
     assigns __fc_errno \from x;
     assigns \result \from x;
     
     behavior normal:
       assumes in_domain: \is_finite(x) ∧ x ≥ 1;
       ensures positive_result: \is_finite(\result) ∧ \result ≥ 0;
-      assigns \result;
-      assigns \result \from x;
-    
-    behavior infinite:
-      assumes is_plus_infinity: \is_plus_infinity(x);
-      ensures result_plus_infinity: \is_plus_infinity(\result);
       assigns \result;
       assigns \result \from x;
     
@@ -3021,23 +3011,18 @@ extern double acosh(double x);
       assigns __fc_errno \from x;
       assigns \result \from x;
     
-    disjoint behaviors domain_error, infinite, normal;
+    disjoint behaviors domain_error, normal;
  */
 extern float acoshf(float x);
 
-/*@ assigns __fc_errno, \result;
+/*@ requires ¬(is_plus_infinity: \is_plus_infinity(x));
+    assigns __fc_errno, \result;
     assigns __fc_errno \from x;
     assigns \result \from x;
     
     behavior normal:
       assumes in_domain: \is_finite(x) ∧ x ≥ 1;
       ensures positive_result: \is_finite(\result) ∧ \result ≥ 0;
-      assigns \result;
-      assigns \result \from x;
-    
-    behavior infinite:
-      assumes is_plus_infinity: \is_plus_infinity(x);
-      ensures result_plus_infinity: \is_plus_infinity(\result);
       assigns \result;
       assigns \result \from x;
     
@@ -3049,7 +3034,7 @@ extern float acoshf(float x);
       assigns __fc_errno \from x;
       assigns \result \from x;
     
-    disjoint behaviors domain_error, infinite, normal;
+    disjoint behaviors domain_error, normal;
  */
 extern long double acoshl(long double x);
 

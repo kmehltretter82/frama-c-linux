@@ -1,4 +1,5 @@
 [kernel] Parsing tests/libc/fc_libc.c (with preprocessing)
+[kernel] :0: Warning: unnamed requires
 [kernel] share/libc/sys/socket.h:451: Warning: 
   clause with '\initialized' must contain name 'initialization'
 [eva] Analyzing a complete application starting at main

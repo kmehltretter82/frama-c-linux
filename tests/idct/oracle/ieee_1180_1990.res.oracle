@@ -2737,9 +2737,6 @@
 [ Extern  ] Post-condition for 'normal' 'positive_result'
             ensures positive_result: \is_finite(\result) ∧ \result ≥ 0
             Unverifiable but considered Valid.
-[ Extern  ] Post-condition for 'infinite' 'result_plus_infinity'
-            ensures result_plus_infinity: \is_plus_infinity(\result)
-            Unverifiable but considered Valid.
 [ Extern  ] Post-condition for 'domain_error' 'errno_set'
             ensures errno_set: __fc_errno ≡ 1
             Unverifiable but considered Valid.
@@ -2748,9 +2745,6 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 262)
             assigns __fc_errno, \result;
-            Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'infinite' nothing
-            assigns \nothing;
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'normal' nothing
             assigns \nothing;
@@ -2767,9 +2761,6 @@
 [ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 262)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'infinite' (file share/libc/math.h, line 258)
-            assigns \result \from x;
-            Unverifiable but considered Valid.
 [ Extern  ] Froms for 'normal' (file share/libc/math.h, line 254)
             assigns \result \from x;
             Unverifiable but considered Valid.
@@ -2778,9 +2769,6 @@
             by Frama-C kernel.
 [  Valid  ] Behavior 'domain_error'
             behavior domain_error
-            by Frama-C kernel.
-[  Valid  ] Behavior 'infinite'
-            behavior infinite
             by Frama-C kernel.
 [  Valid  ] Behavior 'normal'
             behavior normal
@@ -2793,9 +2781,6 @@
 [ Extern  ] Post-condition for 'normal' 'positive_result'
             ensures positive_result: \is_finite(\result) ∧ \result ≥ 0
             Unverifiable but considered Valid.
-[ Extern  ] Post-condition for 'infinite' 'result_plus_infinity'
-            ensures result_plus_infinity: \is_plus_infinity(\result)
-            Unverifiable but considered Valid.
 [ Extern  ] Post-condition for 'domain_error' 'errno_set'
             ensures errno_set: __fc_errno ≡ 1
             Unverifiable but considered Valid.
@@ -2804,9 +2789,6 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 280)
             assigns __fc_errno, \result;
-            Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'infinite' nothing
-            assigns \nothing;
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'normal' nothing
             assigns \nothing;
@@ -2823,9 +2805,6 @@
 [ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 280)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'infinite' (file share/libc/math.h, line 276)
-            assigns \result \from x;
-            Unverifiable but considered Valid.
 [ Extern  ] Froms for 'normal' (file share/libc/math.h, line 272)
             assigns \result \from x;
             Unverifiable but considered Valid.
@@ -2834,9 +2813,6 @@
             by Frama-C kernel.
 [  Valid  ] Behavior 'domain_error'
             behavior domain_error
-            by Frama-C kernel.
-[  Valid  ] Behavior 'infinite'
-            behavior infinite
             by Frama-C kernel.
 [  Valid  ] Behavior 'normal'
             behavior normal
@@ -2849,9 +2825,6 @@
 [ Extern  ] Post-condition for 'normal' 'positive_result'
             ensures positive_result: \is_finite(\result) ∧ \result ≥ 0
             Unverifiable but considered Valid.
-[ Extern  ] Post-condition for 'infinite' 'result_plus_infinity'
-            ensures result_plus_infinity: \is_plus_infinity(\result)
-            Unverifiable but considered Valid.
 [ Extern  ] Post-condition for 'domain_error' 'errno_set'
             ensures errno_set: __fc_errno ≡ 1
             Unverifiable but considered Valid.
@@ -2860,9 +2833,6 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 298)
             assigns __fc_errno, \result;
-            Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'infinite' nothing
-            assigns \nothing;
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'normal' nothing
             assigns \nothing;
@@ -2879,9 +2849,6 @@
 [ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 298)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'infinite' (file share/libc/math.h, line 294)
-            assigns \result \from x;
-            Unverifiable but considered Valid.
 [ Extern  ] Froms for 'normal' (file share/libc/math.h, line 290)
             assigns \result \from x;
             Unverifiable but considered Valid.
@@ -2890,9 +2857,6 @@
             by Frama-C kernel.
 [  Valid  ] Behavior 'domain_error'
             behavior domain_error
-            by Frama-C kernel.
-[  Valid  ] Behavior 'infinite'
-            behavior infinite
             by Frama-C kernel.
 [  Valid  ] Behavior 'normal'
             behavior normal
@@ -4002,9 +3966,9 @@
 --------------------------------------------------------------------------------
 --- Status Report Summary
 --------------------------------------------------------------------------------
-   175 Completely validated
+   172 Completely validated
     16 Locally validated
-   462 Considered valid
+   453 Considered valid
     56 To be validated
-   709 Total
+   697 Total
 --------------------------------------------------------------------------------
