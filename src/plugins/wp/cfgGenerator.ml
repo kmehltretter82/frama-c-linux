@@ -29,7 +29,7 @@ open Wp_parameters
 
 module KFmap = Kernel_function.Map
 
-type task = {
+type pool = {
   mutable modes: CfgCalculus.mode list KFmap.t ;
   mutable props: CfgCalculus.props ;
   mutable lemmas: LogicUsage.logic_lemma list ;
@@ -40,10 +40,6 @@ let empty () = {
   modes = KFmap.empty;
   props = `All;
 }
-
-(* -------------------------------------------------------------------------- *)
-(* --- Property Guided Selection                                          --- *)
-(* -------------------------------------------------------------------------- *)
 
 let get_kf_infos model kf ?bhv ?prop () =
   let missing = WpRTE.missing_guards model kf in
@@ -57,6 +53,10 @@ let get_kf_infos model kf ?bhv ?prop () =
   if missing then
     Wp_parameters.warning ~current:false ~once:true "Missing RTE guards" ;
   infos
+
+(* -------------------------------------------------------------------------- *)
+(* --- Behavior Selection                                                 --- *)
+(* -------------------------------------------------------------------------- *)
 
 let empty_default_behavior : funbehavior = {
   b_name = Cil.default_behavior_name ;
@@ -81,12 +81,16 @@ let select kf bnames =
           (fun b -> List.mem b.b_name bnames)
           bhvs
 
-let lemma task ?(prop=[]) l =
+(* -------------------------------------------------------------------------- *)
+(* --- Elementary Tasks                                                   --- *)
+(* -------------------------------------------------------------------------- *)
+
+let add_lemma pool ?(prop=[]) l =
   if l.LogicUsage.lem_kind <> `Axiom &&
      (prop=[] || WpPropId.select_by_name prop (WpPropId.mk_lemma_id l))
-  then task.lemmas <- l :: task.lemmas
+  then pool.lemmas <- l :: pool.lemmas
 
-let apply model task ~kf ?infos ?bhvs ?target () =
+let add_funtask model pool ~kf ?infos ?bhvs ?target () =
   let infos = match infos with
     | Some infos -> infos
     | None -> get_kf_infos model kf () in
@@ -97,26 +101,30 @@ let apply model task ~kf ?infos ?bhvs ?target () =
         if List.exists (Cil.is_default_behavior) bhvs then bhvs
         else empty_default_behavior :: bhvs in
   let add_mode kf m =
-    let ms = try KFmap.find kf task.modes with Not_found -> [] in
-    task.modes <- KFmap.add kf (m :: ms) task.modes in
+    let ms = try KFmap.find kf pool.modes with Not_found -> [] in
+    pool.modes <- KFmap.add kf (m :: ms) pool.modes in
   begin
     List.iter (fun bhv -> add_mode kf CfgCalculus.{ infos ; kf ; bhv }) bhvs ;
-    Option.iter (fun ip -> task.props <- `PropId ip) target ;
+    Option.iter (fun ip -> pool.props <- `PropId ip) target ;
   end
 
 let notyet prop =
   Wp_parameters.warning ~once:true
     "Not yet implemented wp for '%a'" Property.pretty prop
 
-let rec strategy_ip model task target =
+(* -------------------------------------------------------------------------- *)
+(* --- Property Tasks                                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
+let rec strategy_ip model pool target =
   let open Property in
   match target with
   | IPLemma { il_name } ->
-      lemma task (LogicUsage.logic_lemma il_name)
+      add_lemma pool (LogicUsage.logic_lemma il_name)
   | IPAxiomatic { iax_props } ->
-      List.iter (strategy_ip model task) iax_props
+      List.iter (strategy_ip model pool) iax_props
   | IPBehavior { ib_kf = kf ; ib_bhv = bhv } ->
-      apply model task ~kf ~bhvs:[bhv] ()
+      add_funtask model pool ~kf ~bhvs:[bhv] ()
   | IPPredicate { ip_kf = kf ; ip_kind ; ip_kinstr = ki } ->
       begin match ip_kind with
         | PKAssumes _ -> ()
@@ -124,37 +132,37 @@ let rec strategy_ip model task target =
             begin
               match ki with
               | Kglobal -> (*TODO*) notyet target
-              | Kstmt _ -> apply model task ~kf ~bhvs:[bhv] ~target ()
+              | Kstmt _ -> add_funtask model pool ~kf ~bhvs:[bhv] ~target ()
             end
         | PKEnsures(bhv,_) ->
-            apply model task ~kf ~bhvs:[bhv] ~target ()
+            add_funtask model pool ~kf ~bhvs:[bhv] ~target ()
         | PKTerminates ->
-            apply model task ~kf ~bhvs:(default kf) ~target ()
+            add_funtask model pool ~kf ~bhvs:(default kf) ~target ()
       end
   | IPDecrease { id_kf = kf } ->
-      apply model task ~kf ~bhvs:(default kf) ~target ()
+      add_funtask model pool ~kf ~bhvs:(default kf) ~target ()
   | IPAssigns { ias_kf=kf ; ias_bhv=Id_loop ca }
   | IPAllocation { ial_kf=kf ; ial_bhv=Id_loop ca } ->
       let bhvs = match ca.annot_content with
         | AAssigns(bhvs,_) | AAllocation(bhvs,_) -> bhvs
         | _ -> [] in
-      apply model task ~kf ~bhvs:(select kf bhvs) ~target ()
+      add_funtask model pool ~kf ~bhvs:(select kf bhvs) ~target ()
   | IPAssigns { ias_kf=kf ; ias_bhv=Id_contract(_,bhv) }
   | IPAllocation { ial_kf=kf ; ial_bhv=Id_contract(_,bhv) }
-    -> apply model task ~kf ~bhvs:[bhv] ~target ()
+    -> add_funtask model pool ~kf ~bhvs:[bhv] ~target ()
   | IPCodeAnnot { ica_kf = kf ; ica_ca = ca } ->
       begin match ca.annot_content with
         | AExtended _ | APragma _ -> ()
         | AStmtSpec(fors,_) ->
             (*TODO*) notyet target ;
-            apply model task ~kf ~bhvs:(select kf fors) ()
+            add_funtask model pool ~kf ~bhvs:(select kf fors) ()
         | AVariant _ ->
-            apply model task ~kf ~target ()
+            add_funtask model pool ~kf ~target ()
         | AAssert(fors, _)
         | AInvariant(fors, _, _)
         | AAssigns(fors, _)
         | AAllocation(fors, _) ->
-            apply model task ~kf ~bhvs:(select kf fors) ~target ()
+            add_funtask model pool ~kf ~bhvs:(select kf fors) ~target ()
       end
   | IPComplete _ -> (*TODO*) notyet target
   | IPDisjoint _ -> (*TODO*) notyet target
@@ -162,19 +170,23 @@ let rec strategy_ip model task target =
   | IPPropertyInstance _ -> notyet target (* ? *)
   | IPExtended _ | IPAxiom _ | IPOther _ -> ()
 
-let strategy_main model task ?(fct=Fct_all) ?(bhv=[]) ?(prop=[]) () =
+(* -------------------------------------------------------------------------- *)
+(* --- Function Strategy Tasks                                            --- *)
+(* -------------------------------------------------------------------------- *)
+
+let strategy_main model pool ?(fct=Fct_all) ?(bhv=[]) ?(prop=[]) () =
   begin
     if fct = Fct_all && bhv = [] then
-      LogicUsage.iter_lemmas (lemma task ~prop) ;
+      LogicUsage.iter_lemmas (add_lemma pool ~prop) ;
     Wp_parameters.iter_fct
       (fun kf ->
          let infos = get_kf_infos model kf ~bhv ~prop () in
          if CfgInfos.annots infos then
            if bhv=[]
-           then apply model task ~infos ~kf ()
-           else apply model task ~infos ~kf ~bhvs:(select kf bhv) ()
+           then add_funtask model pool ~infos ~kf ()
+           else add_funtask model pool ~infos ~kf ~bhvs:(select kf bhv) ()
       ) fct ;
-    task.props <- (if prop=[] then `All else `Names prop);
+    pool.props <- (if prop=[] then `All else `Names prop);
   end
 
 (* -------------------------------------------------------------------------- *)
@@ -186,11 +198,11 @@ struct
 
   module WP = CfgCalculus.Make(VCG)
 
-  let compute model task =
+  let compute model pool =
     begin
       let collection = ref Bag.empty in
       Lang.F.release () ;
-      if task.lemmas <> [] then
+      if pool.lemmas <> [] then
         WpContext.on_context (model,WpContext.Global)
           begin fun () ->
             LogicUsage.iter_lemmas VCG.register_lemma ;
@@ -198,7 +210,7 @@ struct
                 if l.LogicUsage.lem_kind <> `Axiom then
                   let wpo = VCG.compile_lemma l in
                   collection := Bag.add wpo !collection
-              ) task.lemmas ;
+              ) pool.lemmas ;
           end () ;
       KFmap.iter
         (fun _ modes ->
@@ -211,23 +223,23 @@ struct
                      if Cil.is_default_behavior mode.bhv then None
                      else Some mode.bhv.b_name in
                    let index = Wpo.Function(mode.kf,bhv) in
-                   let props = task.props in
+                   let props = pool.props in
                    let wp = WP.compute ~mode ~props in
                    let wcs = VCG.compile_wp index wp in
                    collection := Bag.concat !collection wcs
                  end ()
              end
              (List.rev modes)
-        ) task.modes ;
+        ) pool.modes ;
       CfgAnnot.clear () ;
       CfgInfos.clear () ;
       !collection
     end
 
   let compute_ip model ip =
-    let task = empty () in
-    strategy_ip model task ip ;
-    compute model task
+    let pool = empty () in
+    strategy_ip model pool ip ;
+    compute model pool
 
   let compute_call _model _stmt =
     Wp_parameters.warning
@@ -235,9 +247,9 @@ struct
     Bag.empty
 
   let compute_main model ?fct ?bhv ?prop () =
-    let task = empty () in
-    strategy_main model task ?fct ?bhv ?prop () ;
-    compute model task
+    let pool = empty () in
+    strategy_main model pool ?fct ?bhv ?prop () ;
+    compute model pool
 
 end
 
@@ -267,9 +279,9 @@ let generator setup driver =
 (* --- Dumper                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-let dump task =
+let dump pool =
   let module WP = CfgCalculus.Make(CfgDump) in
-  let props = task.props in
+  let props = pool.props in
   KFmap.iter
     (fun _ modes ->
        List.iter
@@ -286,7 +298,7 @@ let dump task =
              raise err
          end
          (List.rev modes)
-    ) task.modes
+    ) pool.modes
 
 let dumper setup driver =
   let model = Factory.instance setup driver in
@@ -294,14 +306,14 @@ let dumper setup driver =
     object
       method model = model
       method compute_ip ip =
-        let task = empty () in
-        strategy_ip model task ip ;
-        dump task ; Bag.empty
+        let pool = empty () in
+        strategy_ip model pool ip ;
+        dump pool ; Bag.empty
       method compute_call _ = Bag.empty
       method compute_main ?fct ?bhv ?prop () =
-        let task = empty () in
-        strategy_main model task ?fct ?bhv ?prop () ;
-        dump task ; Bag.empty
+        let pool = empty () in
+        strategy_main model pool ?fct ?bhv ?prop () ;
+        dump pool ; Bag.empty
     end
   in generator
 
