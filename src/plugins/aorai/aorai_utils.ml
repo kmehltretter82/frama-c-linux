@@ -2004,20 +2004,16 @@ let normalize_condition loc cond block1 block2 =
     | UnOp(LNot,e,_) -> aux e b2 b1
     | BinOp(LAnd,e1,e2,_) ->
       let b2' = mk_goto loc b2 in
-      let b1'= aux e2 b1 b2' in
+      let b1'= Cil.mkBlock [aux e2 b1 b2'] in
       aux e1 b1' b2
     | BinOp(LOr,e1,e2,_) ->
       let b1' = mk_goto loc b1 in
-      let b2' = aux e2 b1' b2 in
+      let b2' = Cil.mkBlock [aux e2 b1' b2] in
       aux e1 b1 b2'
     | _ ->
-      Cil.mkBlock [ Cil.mkStmt ~ghost:true (If(cond,b1,b2,loc)) ]
+      Cil.mkStmt ~ghost:true (If(cond,b1,b2,loc))
   in
-  let b = aux cond block1 block2 in
-  match b.bstmts with
-  | [] -> Aorai_option.fatal "If normalization failed"
-  | [ s ] -> s
-  | _ -> Cil.mkStmt ~ghost:true (Block b)
+  aux cond block1 block2
 
 let mkIfStmt loc exp1 block1 block2 =
   if Kernel.LogicalOperators.get() then
