@@ -313,6 +313,12 @@ module CodeAssertions = WpContext.StaticGenerator(CodeKey)
         Annotations.fold_code_annot
           begin fun _emitter ca l ->
             match ca.annot_content with
+            | AStmtSpec _ ->
+                Wp_parameters.warning ~once:true ~current:false
+                  "Statement specifications not yet supported (skipped)." ; l
+            | AInvariant(_,false,_) ->
+                Wp_parameters.warning ~once:true ~current:false
+                  "Generalized invariant not yet supported (skipped)." ; l
             | AAssert(_,a) ->
                 let p =
                   WpPropId.mk_assert_id kf stmt ca ,

@@ -213,7 +213,7 @@ struct
               ) pool.lemmas ;
           end () ;
       KFmap.iter
-        (fun _ modes ->
+        (fun kf modes ->
            List.iter
              begin fun (mode: CfgCalculus.mode) ->
                WpContext.on_context (model,WpContext.Kf mode.kf)
@@ -224,9 +224,16 @@ struct
                      else Some mode.bhv.b_name in
                    let index = Wpo.Function(mode.kf,bhv) in
                    let props = pool.props in
-                   let wp = WP.compute ~mode ~props in
-                   let wcs = VCG.compile_wp index wp in
-                   collection := Bag.concat !collection wcs
+                   try
+                     let wp = WP.compute ~mode ~props in
+                     let wcs = VCG.compile_wp index wp in
+                     collection := Bag.concat !collection wcs
+                   with WP.NonNaturalLoop loc ->
+                     Wp_parameters.error
+                       ~source:(fst loc)
+                       "Non natural loop detected.@\n\
+                        WP for function '%a' aborted."
+                       Kernel_function.pretty kf
                  end ()
              end
              (List.rev modes)

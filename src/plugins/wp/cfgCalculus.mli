@@ -36,6 +36,7 @@ type props = [ `All | `Names of string list | `PropId of Property.t ]
 
 module Make(W : Mcfg.S) :
 sig
+  exception NonNaturalLoop of location
   val compute : mode:mode -> props:props -> W.t_prop
 end
 

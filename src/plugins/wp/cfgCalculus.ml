@@ -137,6 +137,8 @@ struct
     mutable wk: W.t_prop; (* end point *)
   }
 
+  exception NonNaturalLoop of location
+
   (* --- Annotation Helpers --- *)
 
   let fmerge env f = function
@@ -179,11 +181,9 @@ struct
 
   (* --- Decomposition of WP Rules --- *)
 
-  exception NonNaturalLoop
-
   let rec wp (env:env) (a:vertex) : W.t_prop =
     match Vhash.find env.wp a with
-    | None -> raise NonNaturalLoop
+    | None -> raise (NonNaturalLoop (Cil.CurrentLoc.get()));
     | Some pi -> pi
     | exception Not_found ->
         (* cut circularities *)
