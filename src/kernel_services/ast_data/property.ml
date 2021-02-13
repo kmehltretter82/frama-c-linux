@@ -758,11 +758,11 @@ module Ordered_by_function = Datatype.Make_with_collections(
         | IPAllocation _ -> 16
         | IPPredicate { ip_kind = PKTerminates } -> 17
         | IPDecrease _ -> 18
-        | IPReachable _ -> 18
-        | IPComplete _ -> 19
-        | IPDisjoint _ -> 20
-        | IPExtended _ -> 21
-        | IPOther _ -> 22
+        | IPReachable _ -> 19
+        | IPComplete _ -> 20
+        | IPDisjoint _ -> 21
+        | IPExtended _ -> 22
+        | IPOther _ -> 23
         | IPCodeAnnot ca ->
           Kernel.fatal "Unexpected code annot %a in identified property"
             Cil_printer.pp_code_annotation ca.ica_ca
@@ -820,9 +820,11 @@ module Ordered_by_function = Datatype.Make_with_collections(
         let res = other_loc_compare l1 l2 in
         if res <> 0 then res
         else String.compare n1 n2
-      | _ ->
+      | (p1,p2) ->
         Kernel.fatal
-          "Property.cmp_same_kind called with 2 arguments of different kind"
+          "Property.cmp_same_kind called with 2 arguments of different kind:\
+           @\n@[<2>Property 1 is: %a@]@\n@[<2>Property 2 is: %a@]"
+          pretty p1 pretty p2
 
     let compare p1 p2 =
       let kf1 = get_kf p1 and kf2 = get_kf p2 in
