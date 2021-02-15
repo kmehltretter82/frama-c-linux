@@ -852,6 +852,9 @@ let get ?kf ?(init=false) vi =
   in
   if init then Access.cup kf_access (E.get vi u_init) else kf_access
 
+let is_nullable vi =
+  vi.vformal && Cil.hasAttribute "nullable" vi.vattr
+
 let compute () = ignore (usage ())
 
 let print x m fmt = Access.pretty x fmt m

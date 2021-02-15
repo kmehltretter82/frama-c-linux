@@ -38,6 +38,10 @@ val get : ?kf:kernel_function -> ?init:bool -> varinfo -> access
 
 val iter: ?kf:kernel_function -> ?init:bool -> (varinfo -> access -> unit) -> unit
 
+val is_nullable : varinfo -> bool
+  (** [is_nullable vi] returns true
+      iff [vi] is a formal and has an attribute 'nullable' *)
+
 val print : varinfo -> access -> Format.formatter -> unit
 val dump : unit -> unit
 val compute : unit -> unit
