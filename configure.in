@@ -842,6 +842,7 @@ check_plugin(sparecode,src/plugins/sparecode,
              [support for sparecode plugin],yes)
 plugin_require(sparecode,pdg)
 plugin_require(sparecode,eva)
+plugin_require(sparecode,users)
 
 # users
 #######
