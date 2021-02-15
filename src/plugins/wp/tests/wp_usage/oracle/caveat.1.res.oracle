@@ -62,7 +62,7 @@ Let x_4 = x + x_1.
 Assume {
   Type: is_sint32(r) /\ is_sint32(x) /\ is_sint32(x_1) /\ is_sint32(x_2) /\
       is_sint32(x_3) /\ is_sint32(x_4).
-  (* Pre-condition *)
+  (* Pre-condition 'KO' *)
   Have: P_OBS(x, x_1, r).
 }
 Prove: P_OBS(x_2, x_3, x_4).
