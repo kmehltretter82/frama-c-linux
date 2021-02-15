@@ -832,6 +832,7 @@ plugin_require(slicing,from_analysis)
 plugin_require(slicing,pdg)
 plugin_require(slicing,eva)
 plugin_require(slicing,callgraph)
+plugin_require(slicing,sparecode)
 plugin_use(slicing,gui)
 
 # spare code
