@@ -85,8 +85,7 @@ let is_active_mode ~mode ~goal (p: Property.t) =
   | IPCodeAnnot { ica_ca } -> is_selected_ca mode ~goal ica_ca
   | IPPredicate { ip_kind } ->
       begin match ip_kind with
-        | PKRequires bhv | PKAssumes bhv ->
-            Cil.is_default_behavior bhv || is_selected_bhv mode bhv
+        | PKRequires _ | PKAssumes _ -> true
         | PKEnsures(bhv,_) -> is_selected_bhv mode bhv
         | PKTerminates -> is_default_bhv mode
       end
