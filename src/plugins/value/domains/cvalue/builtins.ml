@@ -24,6 +24,14 @@ open Cil_types
 open Cvalue
 
 exception Invalid_nb_of_args of int
+exception Outside_builtin_possibilities
+
+type builtin_type = unit -> typ * typ list
+
+type builtin =
+  Cvalue.Model.t ->
+  (Cil_types.exp * Cvalue.V.t * Cvalue.V_Offsetmap.t) list ->
+  Value_types.call_result
 
 (* 'Always' means the builtin will always be used to replace a function
    with its name. 'OnAuto' means that the function will be replaced only
@@ -45,24 +53,13 @@ end
 module BuiltinsOverride = State_builder.Set_ref (Kernel_function.Set) (Info)
 
 let register_builtin name ?replace ?typ f =
+  Value_parameters.register_builtin name;
   Hashtbl.replace table name (f, typ, None, Always);
   match replace with
   | None -> ()
   | Some fname -> Hashtbl.replace table fname (f, typ, Some name, OnAuto)
 
-let () = Db.Value.register_builtin := register_builtin
-
 (* The functions in _builtin must only return the 'Always' builtins *)
-
-let registered_builtins () =
-  let l =
-    Hashtbl.fold
-      (fun name (f, _, _, u) acc -> if u = Always then (name, f) :: acc else acc)
-      table []
-  in
-  List.sort (fun (name1, _) (name2, _) -> String.compare name1 name2) l
-
-let () = Db.Value.registered_builtins := registered_builtins
 
 let builtin_names_and_replacements () =
   let stand_alone, replacements =
@@ -103,14 +100,6 @@ let () =
                    Format.pp_print_string) stand_alone);
          raise Cmdline.Exit
        end)
-
-let mem_builtin name =
-  try
-    let _, _, _, u = Hashtbl.find table name in
-    u = Always
-  with Not_found -> false
-
-let () = Db.Value.mem_builtin := mem_builtin
 
 (* Returns the specification of a builtin, used to evaluate preconditions
    and to transfer the states of other domains. *)
@@ -229,7 +218,6 @@ let clobbered_set_from_ret state ret =
 
 type call = (Precise_locs.precise_location, Cvalue.V.t) Eval.call
 type result = Cvalue.Model.t * Locals_scoping.clobbered_set
-type builtin = Db.Value.builtin
 
 open Eval
 
@@ -257,7 +245,7 @@ let compute_builtin name builtin state actuals =
       "Invalid number of arguments for builtin %s: %d expected, %d found"
       name n (List.length actuals);
     raise Db.Value.Aborted
-  | Db.Value.Outside_builtin_possibilities ->
+  | Outside_builtin_possibilities ->
     Value_parameters.warning ~once:true ~current:true
       "Call to builtin %s failed, aborting." name;
     raise Db.Value.Aborted

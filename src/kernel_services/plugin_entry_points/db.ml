@@ -628,19 +628,6 @@ module Value = struct
   let access =  mk_fun "Value.access"
   let access_expr =  mk_fun "Value.access_expr"
 
-  (** Type for a Value builtin function *)
-
-  type builtin_type = unit -> typ * typ list
-  type builtin =
-      state ->
-      (Cil_types.exp * Cvalue.V.t * Cvalue.V_Offsetmap.t) list ->
-      Value_types.call_result
-
-  exception Outside_builtin_possibilities
-  let register_builtin = mk_fun "Value.register_builtin"
-  let registered_builtins = mk_fun "Value.registered_builtins"
-  let mem_builtin = mk_fun "Value.mem_builtin"
-
   let use_spec_instead_of_definition =
     mk_fun "Value.use_spec_instead_of_definition"
 

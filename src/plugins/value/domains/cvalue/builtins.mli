@@ -24,6 +24,14 @@
     equivalent in C *)
 
 exception Invalid_nb_of_args of int
+exception Outside_builtin_possibilities
+
+type builtin_type = unit -> Cil_types.typ * Cil_types.typ list
+
+type builtin =
+  Cvalue.Model.t ->
+  (Cil_types.exp * Cvalue.V.t * Cvalue.V_Offsetmap.t) list ->
+  Value_types.call_result
 
 (** [register_builtin name ?replace ?typ f] registers the ocaml function [f]
     as a builtin to be used instead of the C function of name [name].
@@ -33,7 +41,7 @@ exception Invalid_nb_of_args of int
     the C function is checked before using the builtin. *)
 val register_builtin:
   string -> ?replace:string ->
-  ?typ:Db.Value.builtin_type -> Db.Value.builtin -> unit
+  ?typ:builtin_type -> builtin -> unit
 
 (** Prepares the builtins to be used for an analysis. Must be called at the
     beginning of each Eva analysis. Warns about builtins of incompatible types,
@@ -46,7 +54,6 @@ val prepare_builtins: unit -> unit
     of [ret] whose contents may contain local variables. *)
 val clobbered_set_from_ret: Cvalue.Model.t -> Cvalue.V.t -> Base.SetLattice.t
 
-type builtin
 type call = (Precise_locs.precise_location, Cvalue.V.t) Eval.call
 type result = Cvalue.Model.t * Locals_scoping.clobbered_set
 

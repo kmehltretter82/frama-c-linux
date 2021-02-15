@@ -46,7 +46,7 @@ let frama_c_cardinal state actuals =
     Kernel.abort ~current:true "Incorrect argument for Frama_C_cardinal"
 
 let () =
-  !Db.Value.register_builtin "Frama_C_abstract_cardinal" frama_c_cardinal
+  Builtins.register_builtin "Frama_C_abstract_cardinal" frama_c_cardinal
 
 (** Minimum or maximum of an integer abstract value, Top_int otherwise.
     Also not monotonic. *)
@@ -70,8 +70,8 @@ let frama_c_min_max f state actuals =
     Kernel.abort ~current:true "Incorrect argument for Frama_C_min/max"
 
 let () =
-  !Db.Value.register_builtin "Frama_C_abstract_min" (frama_c_min_max fst);
-  !Db.Value.register_builtin "Frama_C_abstract_max" (frama_c_min_max snd);
+  Builtins.register_builtin "Frama_C_abstract_min" (frama_c_min_max fst);
+  Builtins.register_builtin "Frama_C_abstract_max" (frama_c_min_max snd);
 ;;
 
 (** Splitting values *)
@@ -222,8 +222,8 @@ let aux_split f state actuals =
     }
 
 let () =
-  !Db.Value.register_builtin "Frama_C_builtin_split" (aux_split split_v)
+  Builtins.register_builtin "Frama_C_builtin_split" (aux_split split_v)
 let () =
-  !Db.Value.register_builtin "Frama_C_builtin_split_pointer" (aux_split split_pointer)
+  Builtins.register_builtin "Frama_C_builtin_split_pointer" (aux_split split_pointer)
 let () =
-  !Db.Value.register_builtin "Frama_C_builtin_split_all" (aux_split split_all)
+  Builtins.register_builtin "Frama_C_builtin_split_all" (aux_split split_all)

@@ -55,14 +55,14 @@ let add_watch make_watch state actuals =
         let size = Cvalue.V.project_ival size in
         Int.mul Int.eight (Ival.project_int size)
       with V.Not_based_on_null | Ival.Not_Singleton_Int ->
-        raise Db.Value.Outside_builtin_possibilities
+        raise Builtins.Outside_builtin_possibilities
     in
     let number =
       try
         let number = Cvalue.V.project_ival number in
         Ival.project_int number
       with V.Not_based_on_null | Ival.Not_Singleton_Int ->
-        raise Db.Value.Outside_builtin_possibilities
+        raise Builtins.Outside_builtin_possibilities
     in
     let loc_bits = Locations.loc_bytes_to_loc_bits dst in
     let loc = Locations.make_loc loc_bits (Int_Base.inject size) in
@@ -90,7 +90,7 @@ let make_watch_cardinal target_value =
     Cardinal (Integer.to_int (Ival.project_int target_value))
   with V.Not_based_on_null | Ival.Not_Singleton_Int
      | Z.Overflow (* from Integer.to_int *) ->
-    raise Db.Value.Outside_builtin_possibilities
+    raise Builtins.Outside_builtin_possibilities
 
 let () =
   Builtins.register_builtin "Frama_C_watch_value" (add_watch make_watch_value)

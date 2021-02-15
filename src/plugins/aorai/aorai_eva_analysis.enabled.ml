@@ -41,7 +41,7 @@ let show_val fmt (expr, v, _) =
 
 let show_aorai_state = "Frama_C_show_aorai_state"
 
-let builtin_show_aorai_state state args =
+let _builtin_show_aorai_state state args =
   if not (Aorai_option.Deterministic.get()) then begin
     Aorai_option.warning
       ~current:true "%s can only display info for deterministic automata"
@@ -66,9 +66,6 @@ let builtin_show_aorai_state state args =
 let () =
   Cil_builtins.add_custom_builtin
     (fun () -> (show_aorai_state,Cil.voidType,[],true))
-
-let () =
-  !Db.Value.register_builtin show_aorai_state builtin_show_aorai_state
 
 let add_slevel_annotation vi kind =
   match kind with
