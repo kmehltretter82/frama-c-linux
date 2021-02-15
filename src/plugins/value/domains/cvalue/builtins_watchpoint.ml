@@ -49,7 +49,7 @@ let new_watchpoint name_lv loc v n =
 
 let add_watch make_watch state actuals =
   match actuals with
-  | [(dst_e, dst, _); (_, size, _); (_, target_value, _); (_, number, _)] ->
+  | [(dst_e, dst); (_, size); (_, target_value); (_, number)] ->
     let size =
       try
         let size = Cvalue.V.project_ival size in
@@ -76,10 +76,7 @@ let add_watch make_watch state actuals =
     then
       watch_table :=
         (new_watchpoint dst_e loc target_w number) :: current;
-    { Builtins.c_values = [None, state];
-      c_clobbered = Base.SetLattice.bottom;
-      c_from = None;
-      c_cacheable = Eval.Cacheable }
+    Builtins.States [state]
   | _ -> raise (Builtins.Invalid_nb_of_args 4)
 
 let make_watch_value target_value = Value target_value
@@ -93,10 +90,10 @@ let make_watch_cardinal target_value =
     raise Builtins.Outside_builtin_possibilities
 
 let () =
-  Builtins.register_builtin "Frama_C_watch_value" (add_watch make_watch_value)
+  Builtins.register_builtin "Frama_C_watch_value" Cacheable
+    (add_watch make_watch_value)
 let () =
-  Builtins.register_builtin
-    "Frama_C_watch_cardinal"
+  Builtins.register_builtin "Frama_C_watch_cardinal" Cacheable
     (add_watch make_watch_cardinal)
 
 let watch_hook (stmt, _callstack, states) =

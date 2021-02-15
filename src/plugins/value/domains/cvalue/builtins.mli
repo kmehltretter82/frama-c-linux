@@ -20,29 +20,30 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Value analysis builtin shipped with Frama-C, more efficient than their
-    equivalent in C *)
+(** Eva analysis builtins for the cvalue domain, more efficient than their
+    equivalent in C. *)
+
+open Cil_types
 
 exception Invalid_nb_of_args of int
 exception Outside_builtin_possibilities
 
-type builtin_type = unit -> Cil_types.typ * Cil_types.typ list
+(* Signature of a builtin: type of the result, and type of the arguments. *)
+type builtin_type = unit -> typ * typ list
 type cacheable = Eval.cacheable
 
-type call_result = {
-  c_values:
-    (Cvalue.V_Offsetmap.t option
-     * Cvalue.Model.t)
-    list;
+type full_result = {
+  c_values: (Cvalue.V.t option * Cvalue.Model.t) list;
   c_clobbered: Base.SetLattice.t;
-  c_cacheable: cacheable;
-  c_from: (Function_Froms.froms * Locations.Zone.t) option
+  c_from: (Function_Froms.froms * Locations.Zone.t) option;
 }
 
-type builtin =
-  Cvalue.Model.t ->
-  (Cil_types.exp * Cvalue.V.t * Cvalue.V_Offsetmap.t) list ->
-  call_result
+type call_result =
+  | States of Cvalue.Model.t list
+  | Result of Cvalue.V.t list
+  | Full of full_result
+
+type builtin = Cvalue.Model.t -> (exp * Cvalue.V.t) list -> call_result
 
 (** [register_builtin name ?replace ?typ f] registers the ocaml function [f]
     as a builtin to be used instead of the C function of name [name].
@@ -51,8 +52,7 @@ type builtin =
     If [typ] is provided, consistency between the expected [typ] and the type of
     the C function is checked before using the builtin. *)
 val register_builtin:
-  string -> ?replace:string ->
-  ?typ:builtin_type -> builtin -> unit
+  string -> ?replace:string -> ?typ:builtin_type -> cacheable -> builtin -> unit
 
 (** Prepares the builtins to be used for an analysis. Must be called at the
     beginning of each Eva analysis. Warns about builtins of incompatible types,
@@ -66,21 +66,21 @@ val prepare_builtins: unit -> unit
 val clobbered_set_from_ret: Cvalue.Model.t -> Cvalue.V.t -> Base.SetLattice.t
 
 type call = (Precise_locs.precise_location, Cvalue.V.t) Eval.call
-type result = Cvalue.Model.t * Locals_scoping.clobbered_set
+type result = Cvalue_domain.State.t
 
 (** Is a given function replaced by a builtin? *)
-val is_builtin_overridden: Cil_types.kernel_function -> bool
+val is_builtin_overridden: kernel_function -> bool
 
 (** Returns the cvalue builtin for a function, if any. Also returns the name of
     the builtin and the specification of the function; the preconditions must be
     evaluated along with the builtin.
     [prepare_builtins] should have been called before using this function. *)
 val find_builtin_override:
-  Cil_types.kernel_function -> (string * builtin * Cil_types.funspec) option
+  kernel_function -> (string * builtin * cacheable * funspec) option
 
 (* Applies a cvalue builtin for the given call, in the given cvalue state. *)
 val apply_builtin:
-  builtin -> call -> Cvalue.Model.t -> result list * cacheable
+  builtin -> call -> pre:Cvalue.Model.t -> post:Cvalue.Model.t -> result list
 
 
 (*

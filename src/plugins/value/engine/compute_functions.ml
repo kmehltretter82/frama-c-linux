@@ -275,7 +275,7 @@ module Make (Abstract: Abstractions.Eva) = struct
   let compute_call_or_builtin stmt call state =
     match Builtins.find_builtin_override call.kf with
     | None -> compute_and_cache_call stmt call state
-    | Some (name, builtin, spec) ->
+    | Some (name, builtin, cacheable, spec) ->
       Value_results.mark_kf_as_called call.kf;
       let kinstr = Kstmt stmt in
       let kf_name = Kernel_function.get_name call.kf in
@@ -300,8 +300,9 @@ module Make (Abstract: Abstractions.Eva) = struct
         Transfer.{states; cacheable; builtin=true}
       | `Value final_state ->
         let cvalue_call = get_cvalue_call call in
-        let cvalue_states, cacheable =
-          Builtins.apply_builtin builtin cvalue_call cvalue_state
+        let post = Abstract.Dom.get_cvalue_or_top final_state in
+        let cvalue_states =
+          Builtins.apply_builtin builtin cvalue_call ~pre:cvalue_state ~post
         in
         let insert cvalue_state =
           Abstract.Dom.set Cvalue_domain.State.key cvalue_state final_state

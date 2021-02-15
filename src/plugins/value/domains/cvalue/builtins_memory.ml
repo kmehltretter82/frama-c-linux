@@ -24,64 +24,38 @@ open Cil_types
 open Cvalue
 open Abstract_interp
 open Locations
-open Value_util
 
-let register_builtin = Builtins.register_builtin
+let register_builtin name ?replace builtin =
+  Builtins.register_builtin name ?replace Cacheable builtin
 
 let dkey = Value_parameters.register_category "imprecision"
 
-exception Found_misaligned_base
-
-let frama_C_is_base_aligned state actuals =
-  try begin
-    match actuals with
-    | [_,x,_; _,y,_] ->
-      let i = Cvalue.V.project_ival y in
-      begin match Ival.project_small_set i with
-        | Some si ->
-          Location_Bytes.fold_i
-            (fun b _o () ->
-               List.iter
-                 (fun int ->
-                    if not (Base.is_aligned_by b int)
-                    then raise Found_misaligned_base)
-                 si)
+let frama_C_is_base_aligned _state = function
+  | [_, x; _, y] ->
+    let result =
+      match Ival.project_small_set (Cvalue.V.project_ival y) with
+      | Some si ->
+        let aligned =
+          Location_Bytes.for_all
+            (fun b _o -> List.for_all (Base.is_aligned_by b) si)
             x
-            ();
-          { Builtins.c_values =
-              [ Eval_op.wrap_int Cvalue.V.singleton_one, state];
-            c_clobbered = Base.SetLattice.bottom;
-            c_from = None;
-            c_cacheable = Eval.Cacheable;
-          }
-        | None -> raise Found_misaligned_base
-      end
-    | _ -> raise (Builtins.Invalid_nb_of_args 2)
-  end
-  with
-  | Found_misaligned_base
-  | Not_found (* from project_ival *)
-  | Abstract_interp.Error_Top (* from fold_i *) ->
-    { Builtins.c_values = [Eval_op.wrap_int Cvalue.V.zero_or_one, state];
-      c_clobbered = Base.SetLattice.bottom;
-      c_from = None;
-      c_cacheable = Eval.Cacheable;
-    }
+        in
+        if aligned then Cvalue.V.singleton_one else Cvalue.V.zero_or_one
+      | None
+      | exception Cvalue.V.Not_based_on_null -> Cvalue.V.zero_or_one
+    in
+    Builtins.Result [result]
+  | _ -> raise (Builtins.Invalid_nb_of_args 2)
 
 let () = register_builtin "Frama_C_is_base_aligned" frama_C_is_base_aligned
 
 
-let frama_c_offset state actuals =
-  match actuals with
-  | [_,x,_] ->
-    let value =
+let frama_c_offset _state = function
+  | [_, x] ->
+    let result =
       try
-        let offsets =
-          Location_Bytes.fold_i
-            (fun _b o a -> Ival.join a o)
-            x
-            Ival.bottom
-        in
+        let acc = Ival.bottom in
+        let offsets = Location_Bytes.fold_i (fun _b -> Ival.join) x acc in
         Cvalue.V.inject_ival offsets
       with Abstract_interp.Error_Top ->
         Value_parameters.error ~current:true
@@ -89,11 +63,7 @@ let frama_c_offset state actuals =
            guaranteed to be an address";
         Cvalue.V.top_int
     in
-    { Builtins.c_values = [Eval_op.wrap_size_t value, state];
-      c_clobbered = Base.SetLattice.bottom;
-      c_from = None;
-      c_cacheable = Eval.Cacheable;
-    }
+    Builtins.Result [result]
   | _ -> raise (Builtins.Invalid_nb_of_args 1)
 
 let () = register_builtin "Frama_C_offset" frama_c_offset
@@ -130,7 +100,7 @@ let deps_nth_arg n =
 
 
 let frama_c_memcpy state actuals =
-  let compute (_exp_dst,dst_bytes,_) (_exp_src,src_bytes,_) (_exp_size,size,_) =
+  let compute (_exp_dst,dst_bytes) (_exp_src,src_bytes) (_exp_size,size) =
     let plevel = Value_parameters.ArrayPrecisionLevel.get() in
     let size =
       try Cvalue.V.project_ival size
@@ -300,15 +270,15 @@ let frama_c_memcpy state actuals =
       if Model.is_reachable new_state then
         (* Copy at least partially succeeded (with perhaps an
            alarm for some of the sizes *)
-        { Builtins.c_values = [Eval_op.wrap_ptr dst_bytes, new_state];
-          c_clobbered = Builtins.clobbered_set_from_ret new_state dst_bytes;
-          c_from = Some(c_from,  sure_zone);
-          c_cacheable = Eval.Cacheable }
+        Builtins.Full
+          { Builtins.c_values = [Some dst_bytes, new_state];
+            c_clobbered = Builtins.clobbered_set_from_ret new_state dst_bytes;
+            c_from = Some (c_from,  sure_zone); }
       else
-        { Builtins.c_values = [ None, Cvalue.Model.bottom];
-          c_clobbered = Base.SetLattice.bottom;
-          c_from = Some(c_from,  sure_zone);
-          c_cacheable = Eval.Cacheable }
+        Builtins.Full
+          { Builtins.c_values = [ None, Cvalue.Model.bottom];
+            c_clobbered = Base.SetLattice.bottom;
+            c_from = Some (c_from,  sure_zone); }
   in
   match actuals with
   | [dst; src; size] -> compute dst src size
@@ -385,11 +355,10 @@ let frama_c_memset_imprecise state dst v size =
     let deps_return = deps_nth_arg 0 in
     { deps_table; deps_return }
   in
-  { Builtins.c_values = [Eval_op.wrap_ptr dst, new_state'];
-    c_clobbered = Base.SetLattice.bottom;
-    c_from = Some(c_from,sure_zone);
-    c_cacheable = Eval.Cacheable;
-  }
+  Builtins.Full
+    { Builtins.c_values = [Some dst, new_state'];
+      c_clobbered = Base.SetLattice.bottom;
+      c_from = Some (c_from,sure_zone); }
 (* let () = register_builtin "Frama_C_memset" frama_c_memset_imprecise *)
 
 (* Type that describes why the 'precise memset' builtin may fail. *)
@@ -603,11 +572,10 @@ let frama_c_memset_precise state dst v (exp_size, size) =
       Cvalue.Model.paste_offsetmap
         ~from:offsm ~dst_loc ~size:size_bits ~exact:true state
     in
-    { Builtins.c_values = [Eval_op.wrap_ptr dst, state'];
-      c_clobbered = Base.SetLattice.bottom;
-      c_from = Some (c_from,dst_zone);
-      c_cacheable = Eval.Cacheable;
-    }
+    Builtins.Full
+      { Builtins.c_values = [Some dst, state'];
+        c_clobbered = Base.SetLattice.bottom;
+        c_from = Some (c_from,dst_zone); }
   with
   | Bit_utils.NoMatchingOffset -> raise (ImpreciseMemset SizeMismatch)
   | Base.Not_a_C_variable -> raise (ImpreciseMemset NoTypeForDest)
@@ -619,7 +587,7 @@ let frama_c_memset_precise state dst v (exp_size, size) =
 
 let frama_c_memset state actuals =
   match actuals with
-  | [(_exp_dst, dst, _); (_, v, _); (exp_size, size, _)] ->
+  | [(_exp_dst, dst); (_, v); (exp_size, size)] ->
     begin
       (* Remove read-only destinations *)
       let dst = V.filter_base (fun b -> not (Base.is_read_only b)) dst in
@@ -634,7 +602,7 @@ let frama_c_memset state actuals =
       with ImpreciseMemset reason ->
         Value_parameters.debug ~dkey ~current:true
           "Call to builtin precise_memset(%a) failed; %a%t"
-          pretty_actuals actuals pretty_imprecise_memset_reason reason
+          Value_util.pretty_actuals actuals pretty_imprecise_memset_reason reason
           Value_util.pp_callstack;
         frama_c_memset_imprecise state dst v size
     end
@@ -642,53 +610,40 @@ let frama_c_memset state actuals =
 
 let () = register_builtin ~replace:"memset" "Frama_C_memset" frama_c_memset
 
-let frama_c_interval_split state actuals =
-  try
-    begin match actuals with
-      | [_,lower,_; _,upper,_] ->
+let frama_c_interval_split _state actuals =
+  match actuals with
+  | [_,lower; _,upper] ->
+    begin
+      try
         let upper = Ival.project_int (Cvalue.V.project_ival upper) in
         let lower = Ival.project_int (Cvalue.V.project_ival lower) in
         let i = ref lower in
         let r = ref [] in
         while (Int.le !i upper) do
-          r := (Eval_op.wrap_int (Cvalue.V.inject_int !i), state) :: !r;
+          r := Cvalue.V.inject_int !i :: !r;
           i := Int.succ !i;
         done;
-        { Builtins.c_values = !r;
-          c_clobbered = Base.SetLattice.bottom;
-          c_from = None;
-          c_cacheable = Eval.Cacheable;
-        }
-      | _ -> raise (Builtins.Invalid_nb_of_args 2)
+        Builtins.Result !r
+      with
+      | Cvalue.V.Not_based_on_null
+      | Ival.Not_Singleton_Int ->
+        Value_parameters.error
+          "Invalid call to Frama_C_interval_split%a"
+          Value_util.pretty_actuals actuals;
+        raise Db.Value.Aborted
     end
-  with
-  | Cvalue.V.Not_based_on_null
-  | Ival.Not_Singleton_Int ->
-    Value_parameters.error
-      "Invalid call to Frama_C_interval_split%a" pretty_actuals actuals;
-    raise Db.Value.Aborted
+  | _ -> raise (Builtins.Invalid_nb_of_args 2)
 
 let () = register_builtin "Frama_C_interval_split" frama_c_interval_split
 
 (* Transforms a garbled mix into Top_int. Let other values unchanged.
    Remark: this currently returns an int. Maybe we need multiple versions? *)
-let frama_c_ungarble state actuals =
-  begin match actuals with
-    | [_,i,_] ->
-      let v =
-        try
-          ignore (V.project_ival i);
-          i
-        with V.Not_based_on_null ->
-          V.inject_ival Ival.top
-      in
-      { Builtins.c_values = [ Eval_op.wrap_int v, state ];
-        c_clobbered = Base.SetLattice.bottom;
-        c_from = None;
-        c_cacheable = Eval.Cacheable;
-      }
-    | _ -> raise (Builtins.Invalid_nb_of_args 1)
-  end
+let frama_c_ungarble _state = function
+  | [_, i] ->
+    if Cvalue.V.is_imprecise i
+    then Builtins.Result [Cvalue.V.top_int]
+    else Builtins.Result [i]
+  | _ -> raise (Builtins.Invalid_nb_of_args 1)
 
 let () = register_builtin "Frama_C_ungarble" frama_c_ungarble
 

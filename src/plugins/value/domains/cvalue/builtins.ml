@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Cvalue
 
 exception Invalid_nb_of_args of int
 exception Outside_builtin_possibilities
@@ -29,20 +28,18 @@ exception Outside_builtin_possibilities
 type builtin_type = unit -> typ * typ list
 type cacheable = Eval.cacheable
 
-type call_result = {
-  c_values:
-    (Cvalue.V_Offsetmap.t option
-     * Cvalue.Model.t)
-    list;
+type full_result = {
+  c_values: (Cvalue.V.t option * Cvalue.Model.t) list;
   c_clobbered: Base.SetLattice.t;
-  c_cacheable: cacheable;
-  c_from: (Function_Froms.froms * Locations.Zone.t) option
+  c_from: (Function_Froms.froms * Locations.Zone.t) option;
 }
 
-type builtin =
-  Cvalue.Model.t ->
-  (Cil_types.exp * Cvalue.V.t * Cvalue.V_Offsetmap.t) list ->
-  call_result
+type call_result =
+  | States of Cvalue.Model.t list
+  | Result of Cvalue.V.t list
+  | Full of full_result
+
+type builtin = Cvalue.Model.t -> (exp * Cvalue.V.t) list -> call_result
 
 (* Table of all registered builtins; filled by [register_builtin] calls.  *)
 let table = Hashtbl.create 17
@@ -58,22 +55,24 @@ end
 (** Set of functions overridden by a builtin. *)
 module BuiltinsOverride = State_builder.Set_ref (Kernel_function.Set) (Info)
 
-let register_builtin name ?replace ?typ f =
+let register_builtin name ?replace ?typ cacheable f =
   Value_parameters.register_builtin name;
-  Hashtbl.replace table name (f, typ, name);
+  let builtin = (name, f, cacheable, typ) in
+  Hashtbl.replace table name builtin;
   match replace with
   | None -> ()
-  | Some fname -> Hashtbl.replace table fname (f, typ, name)
+  | Some fname -> Hashtbl.replace table fname builtin
 
 (* The functions in _builtin must only return the 'Always' builtins *)
 
 let builtin_names_and_replacements () =
   let stand_alone, replacements =
-    Hashtbl.fold (fun name (_, _, builtin_name) (acc1, acc2) ->
-        if name = builtin_name
-        then name :: acc1, acc2
-        else acc1, (name, builtin_name) :: acc2
-      ) table ([], [])
+    Hashtbl.fold
+      (fun name (builtin_name, _, _, _) (acc1, acc2) ->
+         if name = builtin_name
+         then name :: acc1, acc2
+         else acc1, (name, builtin_name) :: acc2)
+      table ([], [])
   in
   List.sort String.compare stand_alone,
   List.sort (fun (name1, _) (name2, _) -> String.compare name1 name2) replacements
@@ -106,6 +105,10 @@ let () =
                    Format.pp_print_string) stand_alone);
          raise Cmdline.Exit
        end)
+
+(* -------------------------------------------------------------------------- *)
+(* --- Prepare builtins for an analysis                                   --- *)
+(* -------------------------------------------------------------------------- *)
 
 (* Returns the specification of a builtin, used to evaluate preconditions
    and to transfer the states of other domains. *)
@@ -150,7 +153,7 @@ let warn_builtin_override kf source bname =
       "function %s: definition will be overridden by %s"
       fname (if fname = bname then "its builtin" else "builtin " ^ bname)
 
-let prepare_builtin kf builtin_name builtin expected_typ =
+let prepare_builtin kf (name, builtin, cacheable, expected_typ) =
   let source = fst (Kernel_function.get_location kf) in
   if inconsistent_builtin_typ kf expected_typ
   then
@@ -158,7 +161,7 @@ let prepare_builtin kf builtin_name builtin expected_typ =
       ~wkey:Value_parameters.wkey_builtins_override
       "The builtin %s will not be used for function %a of incompatible type.@ \
        (got: %a)."
-      builtin_name Kernel_function.pretty kf
+      name Kernel_function.pretty kf
       Printer.pp_typ (Kernel_function.get_type kf)
   else
     match find_builtin_specification kf with
@@ -169,9 +172,9 @@ let prepare_builtin kf builtin_name builtin expected_typ =
          specification is not available."
         Kernel_function.pretty kf
     | Some spec ->
-      warn_builtin_override kf source builtin_name;
+      warn_builtin_override kf source name;
       BuiltinsOverride.add kf;
-      Hashtbl.replace builtins_table kf (builtin_name, builtin, spec)
+      Hashtbl.replace builtins_table kf (name, builtin, cacheable, spec)
 
 let prepare_builtins () =
   BuiltinsOverride.clear ();
@@ -179,35 +182,33 @@ let prepare_builtins () =
   let autobuiltins = Value_parameters.BuiltinsAuto.get () in
   (* Links kernel functions to the registered builtins. *)
   Hashtbl.iter
-    (fun name (f, typ, bname) ->
+    (fun name (bname, f, cacheable, typ) ->
        if autobuiltins || name = bname
        then
          try
            let kf = Globals.Functions.find_by_name name in
-           prepare_builtin kf name f typ
+           prepare_builtin kf (name, f, cacheable, typ)
          with Not_found -> ())
     table;
   (* Overrides builtins attribution according to the -eva-builtin option. *)
   Value_parameters.BuiltinsOverrides.iter
     (fun (kf, name) ->
-       let builtin_name = Option.get name in
-       let f, typ, _ = Hashtbl.find table builtin_name in
-       prepare_builtin kf builtin_name f typ)
+       prepare_builtin kf (Hashtbl.find table (Option.get name)))
 
 let find_builtin_override = Hashtbl.find_opt builtins_table
 
-let is_builtin_overridden =
+let is_builtin_overridden name =
   if not (BuiltinsOverride.is_computed ())
   then prepare_builtins ();
-  BuiltinsOverride.mem
+  BuiltinsOverride.mem name
 
 (* -------------------------------------------------------------------------- *)
-(* --- Returning a clobbered set                                          --- *)
+(* --- Applying a builtin                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
 let clobbered_set_from_ret state ret =
   let aux b _ acc =
-    match Model.find_base_or_default b state with
+    match Cvalue.Model.find_base_or_default b state with
     | `Top -> Base.SetLattice.top
     | `Bottom -> acc
     | `Value m ->
@@ -215,68 +216,70 @@ let clobbered_set_from_ret state ret =
         Base.SetLattice.(join (inject_singleton b) acc)
       else acc
   in
-  try V.fold_topset_ok aux ret Base.SetLattice.bottom
+  try Cvalue.V.fold_topset_ok aux ret Base.SetLattice.bottom
   with Abstract_interp.Error_Top -> Base.SetLattice.top
-
-(* -------------------------------------------------------------------------- *)
-(* --- Applying a builtin                                                 --- *)
-(* -------------------------------------------------------------------------- *)
 
 type call = (Precise_locs.precise_location, Cvalue.V.t) Eval.call
 type result = Cvalue.Model.t * Locals_scoping.clobbered_set
 
 open Eval
 
-let unbottomize = function
-  | `Bottom -> Cvalue.V.bottom
-  | `Value v -> v
-
-let offsetmap_of_formals state arguments rest =
-  let compute expr assigned =
-    let offsm = Cvalue_offsetmap.offsetmap_of_assignment state expr assigned in
-    let value = unbottomize (Eval.value_assigned assigned) in
-    expr, value, offsm
+let compute_arguments arguments rest =
+  let compute assigned =
+    match Eval.value_assigned assigned with
+    | `Bottom -> Cvalue.V.bottom
+    | `Value v -> v
   in
-  let treat_one_formal arg = compute arg.concrete arg.avalue in
-  let treat_one_rest (exp, v) = compute exp v in
-  let list = List.map treat_one_formal arguments in
-  let rest = List.map treat_one_rest rest in
+  let list = List.map (fun arg -> arg.concrete, compute arg.avalue) arguments in
+  let rest = List.map (fun (exp, v) -> exp, compute v) rest in
   list @ rest
 
-let compute_builtin name builtin state actuals =
-  try builtin state actuals
+let process_result call state call_result =
+  let clob = Locals_scoping.bottom () in
+  let bind_result state return =
+    match return, call.return with
+    | Some value, Some vi_ret ->
+      let b_ret = Base.of_varinfo vi_ret in
+      let offsm = Eval_op.offsetmap_of_v ~typ:vi_ret.vtype value in
+      Cvalue.Model.add_base b_ret offsm state, clob
+    | _, _ -> state, clob (* TODO: error? *)
+  in
+  match call_result with
+  | States states -> List.rev_map (fun s -> s, clob) states
+  | Result values -> List.rev_map (fun v -> bind_result state (Some v)) values
+  | Full result ->
+    Locals_scoping.remember_bases_with_locals clob result.c_clobbered;
+    let process_one_return acc (return, state) =
+      if Cvalue.Model.is_reachable state
+      then bind_result state return :: acc
+      else acc
+    in
+    List.fold_left process_one_return [] result.c_values
+
+let apply_builtin (builtin:builtin) call ~pre ~post =
+  let arguments = compute_arguments call.arguments call.rest in
+  try
+    let call_result = builtin pre arguments in
+    let call_stack = Value_util.call_stack () in
+    let froms =
+      match call_result with
+      | Full result -> `Builtin result.c_from
+      | States _ -> `Builtin None
+      | Result _ -> `Spec (Annotations.funspec call.kf)
+    in
+    Db.Value.Call_Type_Value_Callbacks.apply (froms, pre, call_stack);
+    process_result call post call_result
   with
   | Invalid_nb_of_args n ->
     Value_parameters.error ~current:true
-      "Invalid number of arguments for builtin %s: %d expected, %d found"
-      name n (List.length actuals);
+      "Invalid number of arguments for builtin %a: %d expected, %d found"
+      Kernel_function.pretty call.kf n (List.length arguments);
     raise Db.Value.Aborted
   | Outside_builtin_possibilities ->
     Value_parameters.warning ~once:true ~current:true
-      "Call to builtin %s failed, aborting." name;
+      "Call to builtin %a failed, aborting." Kernel_function.pretty call.kf;
     raise Db.Value.Aborted
 
-let apply_builtin builtin call state =
-  let name = Kernel_function.get_name call.kf in
-  let actuals = offsetmap_of_formals state call.arguments call.rest in
-  let res = compute_builtin name builtin state actuals in
-  let clob = Locals_scoping.bottom () in
-  Locals_scoping.remember_bases_with_locals clob res.c_clobbered;
-  let process_one_return acc (ret, post_state) =
-    if Cvalue.Model.is_reachable post_state then
-      let state =
-        match ret, call.return with
-        | Some offsm_ret, Some vi_ret ->
-          let b_ret = Base.of_varinfo vi_ret in
-          Cvalue.Model.add_base b_ret offsm_ret post_state
-        | _, _ -> post_state
-      in
-      (state, clob) :: acc
-    else
-      acc
-  in
-  let list = List.fold_left process_one_return [] res.c_values in
-  list, res.c_cacheable
 
 (*
 Local Variables:
