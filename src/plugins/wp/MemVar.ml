@@ -104,7 +104,7 @@ struct
       match V.param x with
       | ByRef ->
           "ra_" ^ LogicUsage.basename x
-      | NotUsed | ByValue | ByShift | ByAddr | InContext | InArray ->
+      | NotUsed | ByValue | ByShift | ByAddr | InContext _ | InArray _ ->
           "ta_" ^ LogicUsage.basename x
     let is_framed = is_framed_var
   end
@@ -600,7 +600,7 @@ struct
   let pp_var_model fmt = function
     | ByValue | ByShift | NotUsed -> Format.pp_print_string fmt "non-aliased" (* cf.  -wp-unalias-vars *)
     | ByRef -> Format.pp_print_string fmt "by reference" (* cf. -wp-ref-vars *)
-    | InContext | InArray -> Format.pp_print_string fmt "in an isolated context" (* cf. -wp-context-vars *)
+    | InContext _ | InArray _ -> Format.pp_print_string fmt "in an isolated context" (* cf. -wp-context-vars *)
     | ByAddr -> Format.pp_print_string fmt "aliased" (* cf. -wp-alias-vars *)
 
   let pretty fmt = function
@@ -631,7 +631,7 @@ struct
   let cvar x = match V.param x with
     | NotUsed | ByValue | ByShift -> Val(CVAL,x,[])
     | ByAddr -> Val(HEAP,x,[])
-    | InContext | InArray | ByRef -> Ref x
+    | InContext _ | InArray _ | ByRef -> Ref x
 
   (* -------------------------------------------------------------------------- *)
   (* ---  Lifting                                                           --- *)
@@ -730,9 +730,9 @@ struct
   let load sigma obj = function
     | Ref x ->
         begin match V.param x with
-          | ByRef     -> Sigs.Loc(Val(CREF,x,[]))
-          | InContext -> Sigs.Loc(Val(CTXT,x,[]))
-          | InArray   -> Sigs.Loc(Val(CARR,x,[]))
+          | ByRef       -> Sigs.Loc(Val(CREF,x,[]))
+          | InContext _ -> Sigs.Loc(Val(CTXT,x,[]))
+          | InArray _   -> Sigs.Loc(Val(CARR,x,[]))
           | NotUsed | ByAddr | ByValue | ByShift -> assert false
         end
     | Val((CREF|CVAL),x,ofs) ->
@@ -1180,7 +1180,7 @@ struct
 
   let is_mvar_alloc x =
     match V.param x with
-    | ByRef | InContext | InArray | NotUsed -> false
+    | ByRef | InContext _ | InArray _ | NotUsed -> false
     | ByValue | ByShift | ByAddr -> true
 
   let alloc sigma xs =

@@ -22,7 +22,9 @@
 
 open Cil_types
 
-type param = NotUsed | ByAddr | ByValue | ByShift | ByRef | InContext | InArray
+type validity = Valid | Nullable
+type param = NotUsed | ByAddr | ByValue | ByShift | ByRef
+           | InContext of validity | InArray of validity
 
 val pp_param: Format.formatter -> param -> unit
 

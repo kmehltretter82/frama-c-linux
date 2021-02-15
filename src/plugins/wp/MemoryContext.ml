@@ -24,16 +24,23 @@
 (* --- Variable Partitionning                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-type param = NotUsed | ByAddr | ByValue | ByShift | ByRef | InContext | InArray
+type validity = Valid | Nullable
+type param =
+  | NotUsed | ByAddr | ByValue | ByShift | ByRef
+  | InContext of validity | InArray of validity
+
+let nullable_string = function
+  | Valid -> ""
+  | Nullable -> "(nullable)"
 
 let pp_param fmt = function
   | NotUsed -> Format.pp_print_string fmt "not used"
   | ByAddr -> Format.pp_print_string fmt "in heap"
   | ByValue -> Format.pp_print_string fmt "by value"
   | ByShift -> Format.pp_print_string fmt "by value with shift"
-  | ByRef -> Format.pp_print_string fmt "by ref."
-  | InContext -> Format.pp_print_string fmt "in context"
-  | InArray -> Format.pp_print_string fmt "in array"
+  | ByRef -> Format.pp_print_string fmt "by ref"
+  | InContext n -> Format.pp_print_string fmt ("in context" ^ nullable_string n)
+  | InArray n -> Format.pp_print_string fmt ("in array" ^ nullable_string n)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Separation Hypotheses                                              --- *)
@@ -50,6 +57,7 @@ type partition = {
   globals : zone list ; (* [ &G , G[...], ... ] *)
   to_heap : zone list ; (* [ p, ... ] *)
   context : zone list ; (* [ p+(..), ... ] *)
+  nullable : zone list ; (* [ p+(..), ... ] but can be NULL *)
   by_addr : zone list ; (* [ &(x + ..), ... ] *)
 }
 
@@ -60,6 +68,7 @@ type partition = {
 let empty = {
   globals = [] ;
   context = [] ;
+  nullable = [] ;
   to_heap = [] ;
   by_addr = [] ;
 }
@@ -68,12 +77,21 @@ let set x p w =
   match p with
   | NotUsed -> w
   | ByAddr -> { w with by_addr = Var x :: w.by_addr }
-  | ByRef | InContext ->
+  | ByRef ->
       if Cil.isFunctionType x.vtype then w else
         { w with context = Ptr x :: w.context }
-  | InArray ->
+  | InContext v ->
       if Cil.isFunctionType x.vtype then w else
-        { w with context = Arr x :: w.context }
+        begin match v with
+          | Nullable -> { w with nullable = Ptr x :: w.nullable }
+          | Valid -> { w with context = Ptr x :: w.context }
+        end
+  | InArray v ->
+      if Cil.isFunctionType x.vtype then w else
+      begin match v with
+        | Nullable -> { w with nullable = Arr x :: w.nullable }
+        | Valid -> { w with context = Arr x :: w.context }
+      end
   | ByValue | ByShift ->
       if x.vghost then w else
       if Cil.isFunctionType x.vtype then w else
