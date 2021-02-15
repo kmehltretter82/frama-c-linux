@@ -39,6 +39,7 @@ check_plugin(studia,PLUGIN_RELATIVE_PATH(plugin_file),
              [support for studia plug-in],yes)
 
 plugin_require(studia,eva)
+plugin_require(studia,server)
 
 #######################
 # Generating Makefile #

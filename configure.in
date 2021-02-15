@@ -857,6 +857,7 @@ check_plugin(eva,src/plugins/value,
 plugin_use(eva,gui)
 plugin_use(eva,scope)
 plugin_use(eva,callgraph)
+plugin_require(eva,server)
 
 ####################
 # External plugins #

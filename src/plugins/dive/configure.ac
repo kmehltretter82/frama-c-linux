@@ -39,6 +39,7 @@ check_plugin(dive,PLUGIN_RELATIVE_PATH(plugin_file),
 
 plugin_require(dive,eva)
 plugin_require(dive,studia)
+plugin_require(dive,server)
 #plugin_use(dive,usable_plugin_but_not_mandatory)
 
 check_plugin_dependencies
