@@ -342,15 +342,16 @@ struct
     let requires_init = if init then b.bhv_requires else [] in
     (* pre-state *)
     W.label env.we None Clabels.pre @@
-    (* frame-in *)
-    W.scope env.we formals SC_Frame_in @@
     (* pre-conditions *)
     List.fold_right (use_property env) (default_requires env.mode kf) @@
     List.fold_right (use_property env) b.bhv_assumes @@
     List.fold_right (prove_property env) requires_init @@
     List.fold_right (use_property env) b.bhv_requires @@
     List.fold_right (prove_property env) b.bhv_smokes @@
-    List.fold_right (use_property env) side_behaviors w
+    List.fold_right (use_property env) side_behaviors @@
+    (* frame-in *)
+    W.scope env.we formals SC_Frame_in w
+
 
   let do_post env ~formals (b : CfgAnnot.behavior) w =
     W.scope env.we formals SC_Frame_out @@
