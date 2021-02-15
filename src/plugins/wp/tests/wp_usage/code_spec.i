@@ -53,34 +53,6 @@ void by_array_in_code(int *p, int *q, int **qq) {
   p1[p2[0]]=*(p3+p4[*(p5+1)]);
 }
 //-------------------------------------------------------
-void by_value_in_code_annotation(int v, int *p, int*q) {
-  //@ assert tab[v-1]==0 && \initialized (&x6);
-  /*@ requires (x1?x2:x3)== 0;
-    @ assigns x4;
-    @*/
-  /*@ loop invariant x5<0;
-    @ loop variant q-p;
-    @*/
-  while (1)
-    //@ assert 0 == \let term=1+\at(x7,Pre) ; 1+term;
-    //@ assert \let pred=(x8==0) ; pred && x9==0;
-    ;
-}
-
-//@ behavior no_exit: exits \false;
-void by_reference_in_code_annotation(int*p) {
-  //@ for no_exit: assert \valid (p);
-  //@ ensures \separated (p1,p2) && \freeable (p3) || \allocable (p5) <==> \initialized (p6);
-  ;
-  //@ loop invariant *p4<0;
-  while (1);
-}
-
-void by_addr_in_code_annotation(void) {
-  //@ requires (&x0 != &s0.c) && &tab[5];
-  return;
-}
-
 void by_array_in_code_annotation(int *p, int *q, int **qq) {
   //@ assert *(ptr+1)==0 && *(p+1)==q[0] && p1[p2[0]]==*(p3+p4[*(p5+1)]);
   ;
