@@ -409,10 +409,10 @@ let apply_builtin _name builtin = fun state args ->
     | None -> None, Cvalue.Model.bottom
     | Some _ -> result, state
   in
-  { Value_types.c_values = [ res_cvalue ];
+  { Builtins.c_values = [ res_cvalue ];
     c_clobbered = Base.SetLattice.bottom;
     c_from = None;
-    c_cacheable = Value_types.Cacheable; }
+    c_cacheable = Eval.Cacheable; }
 
 (* Builds, registers and exports a builtin for the C function [c_name]. *)
 let register_builtin c_name ~search ~stop_at_0 ~typ ~length ?limit =

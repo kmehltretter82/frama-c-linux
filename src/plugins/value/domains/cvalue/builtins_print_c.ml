@@ -325,10 +325,10 @@ let pretty_state_as_c_assignments fmt state =
 let frama_c_dump_assert state _actuals =
   Value_parameters.result ~current:true "Frama_C_dump_assert_each called:@\n(%a)@\nEnd of Frama_C_dump_assert_each output"
     pretty_state_as_c_assert state;
-  { Value_types.c_values = [None, state];
+  { Builtins.c_values = [None, state];
     c_clobbered = Base.SetLattice.bottom;
     c_from = None;
-    c_cacheable = Value_types.NoCache;
+    c_cacheable = Eval.NoCache;
   }
 
 let () = Builtins.register_builtin "Frama_C_dump_assert_each" frama_c_dump_assert
@@ -336,10 +336,10 @@ let () = Builtins.register_builtin "Frama_C_dump_assert_each" frama_c_dump_asser
 let frama_c_dump_assignments state _actuals =
   Value_parameters.result ~current:true "Frama_C_dump_assignment_each called:@\n%a@\nEnd of Frama_C_dump_assignment_each output"
     pretty_state_as_c_assignments state;
-  { Value_types.c_values = [None, state];
+  { Builtins.c_values = [None, state];
     c_clobbered = Base.SetLattice.bottom;
     c_from = None;
-    c_cacheable = Value_types.NoCache;
+    c_cacheable = Eval.NoCache;
   }
 
 let () =

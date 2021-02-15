@@ -466,7 +466,7 @@ module Value : sig
       @since Aluminium-20160501  *)
   module Call_Type_Value_Callbacks:
     Hook.Iter_hook with type param =
-    [`Builtin of Value_types.call_result | `Spec of funspec | `Def | `Memexec]
+    [`Builtin of Value_types.call_froms | `Spec of funspec | `Def | `Memexec]
     * state * callstack
 
 

@@ -48,11 +48,11 @@ let frama_C_is_base_aligned state actuals =
                  si)
             x
             ();
-          { Value_types.c_values =
+          { Builtins.c_values =
               [ Eval_op.wrap_int Cvalue.V.singleton_one, state];
             c_clobbered = Base.SetLattice.bottom;
             c_from = None;
-            c_cacheable = Value_types.Cacheable;
+            c_cacheable = Eval.Cacheable;
           }
         | None -> raise Found_misaligned_base
       end
@@ -62,10 +62,10 @@ let frama_C_is_base_aligned state actuals =
   | Found_misaligned_base
   | Not_found (* from project_ival *)
   | Abstract_interp.Error_Top (* from fold_i *) ->
-    { Value_types.c_values = [Eval_op.wrap_int Cvalue.V.zero_or_one, state];
+    { Builtins.c_values = [Eval_op.wrap_int Cvalue.V.zero_or_one, state];
       c_clobbered = Base.SetLattice.bottom;
       c_from = None;
-      c_cacheable = Value_types.Cacheable;
+      c_cacheable = Eval.Cacheable;
     }
 
 let () = register_builtin "Frama_C_is_base_aligned" frama_C_is_base_aligned
@@ -89,10 +89,10 @@ let frama_c_offset state actuals =
            guaranteed to be an address";
         Cvalue.V.top_int
     in
-    { Value_types.c_values = [Eval_op.wrap_size_t value, state];
+    { Builtins.c_values = [Eval_op.wrap_size_t value, state];
       c_clobbered = Base.SetLattice.bottom;
       c_from = None;
-      c_cacheable = Value_types.Cacheable;
+      c_cacheable = Eval.Cacheable;
     }
   | _ -> raise (Builtins.Invalid_nb_of_args 1)
 
@@ -300,15 +300,15 @@ let frama_c_memcpy state actuals =
       if Model.is_reachable new_state then
         (* Copy at least partially succeeded (with perhaps an
            alarm for some of the sizes *)
-        { Value_types.c_values = [Eval_op.wrap_ptr dst_bytes, new_state];
+        { Builtins.c_values = [Eval_op.wrap_ptr dst_bytes, new_state];
           c_clobbered = Builtins.clobbered_set_from_ret new_state dst_bytes;
           c_from = Some(c_from,  sure_zone);
-          c_cacheable = Value_types.Cacheable }
+          c_cacheable = Eval.Cacheable }
       else
-        { Value_types.c_values = [ None, Cvalue.Model.bottom];
+        { Builtins.c_values = [ None, Cvalue.Model.bottom];
           c_clobbered = Base.SetLattice.bottom;
           c_from = Some(c_from,  sure_zone);
-          c_cacheable = Value_types.Cacheable }
+          c_cacheable = Eval.Cacheable }
   in
   match actuals with
   | [dst; src; size] -> compute dst src size
@@ -385,10 +385,10 @@ let frama_c_memset_imprecise state dst v size =
     let deps_return = deps_nth_arg 0 in
     { deps_table; deps_return }
   in
-  { Value_types.c_values = [Eval_op.wrap_ptr dst, new_state'];
+  { Builtins.c_values = [Eval_op.wrap_ptr dst, new_state'];
     c_clobbered = Base.SetLattice.bottom;
     c_from = Some(c_from,sure_zone);
-    c_cacheable = Value_types.Cacheable;
+    c_cacheable = Eval.Cacheable;
   }
 (* let () = register_builtin "Frama_C_memset" frama_c_memset_imprecise *)
 
@@ -603,10 +603,10 @@ let frama_c_memset_precise state dst v (exp_size, size) =
       Cvalue.Model.paste_offsetmap
         ~from:offsm ~dst_loc ~size:size_bits ~exact:true state
     in
-    { Value_types.c_values = [Eval_op.wrap_ptr dst, state'];
+    { Builtins.c_values = [Eval_op.wrap_ptr dst, state'];
       c_clobbered = Base.SetLattice.bottom;
       c_from = Some (c_from,dst_zone);
-      c_cacheable = Value_types.Cacheable;
+      c_cacheable = Eval.Cacheable;
     }
   with
   | Bit_utils.NoMatchingOffset -> raise (ImpreciseMemset SizeMismatch)
@@ -654,10 +654,10 @@ let frama_c_interval_split state actuals =
           r := (Eval_op.wrap_int (Cvalue.V.inject_int !i), state) :: !r;
           i := Int.succ !i;
         done;
-        { Value_types.c_values = !r;
+        { Builtins.c_values = !r;
           c_clobbered = Base.SetLattice.bottom;
           c_from = None;
-          c_cacheable = Value_types.Cacheable;
+          c_cacheable = Eval.Cacheable;
         }
       | _ -> raise (Builtins.Invalid_nb_of_args 2)
     end
@@ -682,10 +682,10 @@ let frama_c_ungarble state actuals =
         with V.Not_based_on_null ->
           V.inject_ival Ival.top
       in
-      { Value_types.c_values = [ Eval_op.wrap_int v, state ];
+      { Builtins.c_values = [ Eval_op.wrap_int v, state ];
         c_clobbered = Base.SetLattice.bottom;
         c_from = None;
-        c_cacheable = Value_types.Cacheable;
+        c_cacheable = Eval.Cacheable;
       }
     | _ -> raise (Builtins.Invalid_nb_of_args 1)
   end

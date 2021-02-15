@@ -493,9 +493,9 @@ let register_malloc ?replace name ?returns_null prefix region =
     let new_state = add_uninitialized state new_base max_alloc in
     let ret = V.inject new_base Ival.zero in
     let c_values = wrap_fallible_alloc ?returns_null ret state new_state in
-    { Value_types.c_values = c_values ;
+    { Builtins.c_values = c_values ;
       c_clobbered = Base.SetLattice.bottom;
-      c_cacheable = Value_types.NoCacheCallers;
+      c_cacheable = Eval.NoCacheCallers;
       c_from = None; }
   in
   let name = "Frama_C_" ^ name in
@@ -547,9 +547,9 @@ let calloc_builtin state args =
       let ret = V.inject base Ival.zero in
       wrap_fallible_alloc ?returns_null ret state new_state
   in
-  { Value_types.c_values;
+  { Builtins.c_values;
     c_clobbered = Base.SetLattice.bottom;
-    c_cacheable = Value_types.NoCacheCallers;
+    c_cacheable = Eval.NoCacheCallers;
     c_from = None; }
 
 let () =
@@ -653,17 +653,17 @@ let frama_c_free state actuals =
   | [ _, arg, _ ] ->
     let bases_to_remove, card_to_remove, _null = resolve_bases_to_free arg in
     if card_to_remove = 0 then
-      { Value_types.c_values = [];
+      { Builtins.c_values = [];
         c_clobbered = Base.SetLattice.bottom;
         c_from = None;
-        c_cacheable = Value_types.Cacheable; }
+        c_cacheable = Eval.Cacheable; }
     else
       let strong = card_to_remove <= 1 in
       let state, changed = free_aux state ~strong bases_to_remove in
-      { Value_types.c_values = [None, state];
+      { Builtins.c_values = [None, state];
         c_clobbered = Base.SetLattice.bottom;
         c_from = Some changed;
-        c_cacheable = Value_types.Cacheable;
+        c_cacheable = Eval.Cacheable;
       }
   | _ -> raise (Builtins.Invalid_nb_of_args 1)
 
@@ -678,10 +678,10 @@ let frama_c_vla_free state actuals =
   | [ _, arg, _] ->
     let bases_to_remove, _card_to_remove, _null = resolve_bases_to_free arg in
     let state, changed = free_aux state ~strong:true bases_to_remove in
-    { Value_types.c_values = [None, state];
+    { Builtins.c_values = [None, state];
       c_clobbered = Base.SetLattice.bottom;
       c_from = Some changed;
-      c_cacheable = Value_types.Cacheable;
+      c_cacheable = Eval.Cacheable;
     }
   | _ -> raise (Builtins.Invalid_nb_of_args 1)
 
@@ -843,14 +843,14 @@ let realloc_builtin state args =
     (* free old bases. *)
     let new_state, changed = free_aux new_state ~strong bases in
     let c_values = wrap_fallible_alloc ret state new_state in
-    { Value_types.c_values;
+    { Builtins.c_values;
       c_clobbered = Builtins.clobbered_set_from_ret new_state ret;
-      c_cacheable = Value_types.NoCacheCallers;
+      c_cacheable = Eval.NoCacheCallers;
       c_from = Some changed; }
   else (* Invalid call. *)
-    { Value_types.c_values = [] ;
+    { Builtins.c_values = [] ;
       c_clobbered = Base.SetLattice.bottom;
-      c_cacheable = Value_types.NoCacheCallers;
+      c_cacheable = Eval.NoCacheCallers;
       c_from = None; }
 
 let () =
@@ -892,9 +892,9 @@ let check_leaked_malloced_bases state _ =
         Value_util.warning_once_current "memory leak detected for %a"
           Base.pretty base)
     alloced_bases;
-  { Value_types.c_values = [None,state] ;
+  { Builtins.c_values = [None,state] ;
     c_clobbered = Base.SetLattice.bottom;
-    c_cacheable = Value_types.NoCacheCallers;
+    c_cacheable = Eval.NoCacheCallers;
     c_from = None;
   }
 

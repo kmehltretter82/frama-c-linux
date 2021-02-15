@@ -606,7 +606,7 @@ module Callwise = struct
         merge_call_in_local_table call_site table inout
     in
     match call_type with
-    | `Builtin {Value_types.c_from = Some (froms,sure_out) } ->
+    | `Builtin (Some (froms,sure_out)) ->
       let in_, out_ = extract_inout_from_froms froms in
       let inout = {
         over_inputs_if_termination = in_;
@@ -624,7 +624,7 @@ module Callwise = struct
     | `Spec spec ->
       let inout =compute_using_given_spec_state state spec current_function in
       merge_inout inout
-    | `Builtin { Value_types.c_from = None } ->
+    | `Builtin None ->
       let inout = compute_using_prototype_state state current_function in
       merge_inout inout
 

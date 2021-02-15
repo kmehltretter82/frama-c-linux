@@ -27,11 +27,22 @@ exception Invalid_nb_of_args of int
 exception Outside_builtin_possibilities
 
 type builtin_type = unit -> typ * typ list
+type cacheable = Eval.cacheable
+
+type call_result = {
+  c_values:
+    (Cvalue.V_Offsetmap.t option
+     * Cvalue.Model.t)
+    list;
+  c_clobbered: Base.SetLattice.t;
+  c_cacheable: cacheable;
+  c_from: (Function_Froms.froms * Locations.Zone.t) option
+}
 
 type builtin =
   Cvalue.Model.t ->
   (Cil_types.exp * Cvalue.V.t * Cvalue.V_Offsetmap.t) list ->
-  Value_types.call_result
+  call_result
 
 (* 'Always' means the builtin will always be used to replace a function
    with its name. 'OnAuto' means that the function will be replaced only
@@ -254,10 +265,8 @@ let apply_builtin builtin call state =
   let name = Kernel_function.get_name call.kf in
   let actuals = offsetmap_of_formals state call.arguments call.rest in
   let res = compute_builtin name builtin state actuals in
-  let call_stack = Value_util.call_stack () in
-  Db.Value.Call_Type_Value_Callbacks.apply (`Builtin res, state, call_stack);
   let clob = Locals_scoping.bottom () in
-  Locals_scoping.remember_bases_with_locals clob res.Value_types.c_clobbered;
+  Locals_scoping.remember_bases_with_locals clob res.c_clobbered;
   let process_one_return acc (ret, post_state) =
     if Cvalue.Model.is_reachable post_state then
       let state =
@@ -271,8 +280,8 @@ let apply_builtin builtin call state =
     else
       acc
   in
-  let list = List.fold_left process_one_return [] res.Value_types.c_values in
-  list, res.Value_types.c_cacheable
+  let list = List.fold_left process_one_return [] res.c_values in
+  list, res.c_cacheable
 
 (*
 Local Variables:

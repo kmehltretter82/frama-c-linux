@@ -76,10 +76,10 @@ let add_watch make_watch state actuals =
     then
       watch_table :=
         (new_watchpoint dst_e loc target_w number) :: current;
-    { Value_types.c_values = [None, state];
+    { Builtins.c_values = [None, state];
       c_clobbered = Base.SetLattice.bottom;
       c_from = None;
-      c_cacheable = Value_types.Cacheable }
+      c_cacheable = Eval.Cacheable }
   | _ -> raise (Builtins.Invalid_nb_of_args 4)
 
 let make_watch_value target_value = Value target_value

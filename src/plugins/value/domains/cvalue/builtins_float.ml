@@ -59,12 +59,12 @@ let arity2 fk caml_fun state actuals =
         with Cvalue.V.Not_based_on_null ->
           Cvalue.V.topify_arith_origin (V.join arg1 arg2)
       in
-      { Value_types.c_values =
+      { Builtins.c_values =
           if V.is_bottom r then []
           else [wrap_fk r fk, state ];
         c_clobbered = Base.SetLattice.bottom;
         c_from = None;
-        c_cacheable = Value_types.Cacheable; }
+        c_cacheable = Eval.Cacheable; }
     end
   | _ -> raise (Builtins.Invalid_nb_of_args 2)
 
@@ -102,12 +102,12 @@ let arity1 name fk caml_fun state actuals =
             Cvalue.V.topify_arith_origin arg
           end
       in
-      { Value_types.c_values =
+      { Builtins.c_values =
           if V.is_bottom r then []
           else [wrap_fk r fk, state ];
         c_clobbered = Base.SetLattice.bottom;
         c_from = None;
-        c_cacheable = Value_types.Cacheable; }
+        c_cacheable = Eval.Cacheable; }
     end
   | _ -> raise (Builtins.Invalid_nb_of_args 1)
 

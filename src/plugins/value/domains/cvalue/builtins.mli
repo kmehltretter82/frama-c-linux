@@ -27,11 +27,22 @@ exception Invalid_nb_of_args of int
 exception Outside_builtin_possibilities
 
 type builtin_type = unit -> Cil_types.typ * Cil_types.typ list
+type cacheable = Eval.cacheable
+
+type call_result = {
+  c_values:
+    (Cvalue.V_Offsetmap.t option
+     * Cvalue.Model.t)
+    list;
+  c_clobbered: Base.SetLattice.t;
+  c_cacheable: cacheable;
+  c_from: (Function_Froms.froms * Locations.Zone.t) option
+}
 
 type builtin =
   Cvalue.Model.t ->
   (Cil_types.exp * Cvalue.V.t * Cvalue.V_Offsetmap.t) list ->
-  Value_types.call_result
+  call_result
 
 (** [register_builtin name ?replace ?typ f] registers the ocaml function [f]
     as a builtin to be used instead of the C function of name [name].
@@ -69,7 +80,7 @@ val find_builtin_override:
 
 (* Applies a cvalue builtin for the given call, in the given cvalue state. *)
 val apply_builtin:
-  builtin -> call -> Cvalue.Model.t -> result list * Value_types.cacheable
+  builtin -> call -> Cvalue.Model.t -> result list * cacheable
 
 
 (*

@@ -41,7 +41,8 @@ let show_val fmt (expr, v, _) =
 
 let show_aorai_state = "Frama_C_show_aorai_state"
 
-let _builtin_show_aorai_state state args =
+(*
+let builtin_show_aorai_state state args =
   if not (Aorai_option.Deterministic.get()) then begin
     Aorai_option.warning
       ~current:true "%s can only display info for deterministic automata"
@@ -62,6 +63,7 @@ let _builtin_show_aorai_state state args =
     c_from = None;
     c_cacheable = Value_types.Cacheable;
   }
+*)
 
 let () =
   Cil_builtins.add_custom_builtin

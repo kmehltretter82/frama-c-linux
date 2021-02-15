@@ -90,9 +90,9 @@ let call_for_individual_froms (call_type, value_initial_state, call_stack) =
       call_froms_stack :=
         { current_function; value_initial_state; table_for_calls } ::
         !call_froms_stack
-    | `Builtin { Value_types.c_from = Some (result,_) } ->
+    | `Builtin (Some (result,_)) ->
        register_from result
-    | `Builtin { Value_types.c_from = None } ->
+    | `Builtin None ->
         let behaviors =
           !Db.Value.valid_behaviors current_function value_initial_state
         in

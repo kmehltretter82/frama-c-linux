@@ -448,7 +448,7 @@ module Value = struct
 
   module Call_Type_Value_Callbacks =
     Hook.Build(struct
-      type t = [`Builtin of Value_types.call_result | `Spec of funspec
+      type t = [`Builtin of Value_types.call_froms | `Spec of funspec
                | `Def | `Memexec]
         * state * (kernel_function * kinstr) list end)
   ;;

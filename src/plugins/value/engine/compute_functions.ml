@@ -195,7 +195,7 @@ module Make (Abstract: Abstractions.Eva) = struct
         if Cil.is_in_libc vi.vattr then
           Library_functions.warn_unsupported_spec vi.vorig_name;
         Spec.compute_using_specification ~warn:true call_kinstr call spec state,
-        Value_types.Cacheable
+        Eval.Cacheable
       | `Def _fundec ->
         Db.Value.Call_Type_Value_Callbacks.apply (`Def, cvalue_state, call_stack);
         Computer.compute kf call_kinstr state
@@ -221,7 +221,7 @@ module Make (Abstract: Abstractions.Eva) = struct
         let call_result = default () in
         let () =
           if not (!Db.Value.use_spec_instead_of_definition call.kf)
-          && call_result.Transfer.cacheable = Value_types.Cacheable
+          && call_result.Transfer.cacheable = Eval.Cacheable
           then
             let final_states = call_result.Transfer.states in
             MemExec.store_computed_call call.kf init_state args final_states
@@ -251,7 +251,7 @@ module Make (Abstract: Abstractions.Eva) = struct
         Db.Value.Record_Value_Callbacks_New.apply
           (stack_with_call, Value_types.Reuse i);
         (* call can be cached since it was cached once *)
-        Transfer.{states; cacheable = Value_types.Cacheable; builtin=false}
+        Transfer.{states; cacheable = Cacheable; builtin=false}
     else
       default ()
 
@@ -296,7 +296,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       | `Bottom ->
         let cs = Value_util.call_stack () in
         Db.Value.Call_Type_Value_Callbacks.apply (`Spec spec, cvalue_state, cs);
-        let cacheable = Value_types.Cacheable in
+        let cacheable = Eval.Cacheable in
         Transfer.{states; cacheable; builtin=true}
       | `Value final_state ->
         let cvalue_call = get_cvalue_call call in

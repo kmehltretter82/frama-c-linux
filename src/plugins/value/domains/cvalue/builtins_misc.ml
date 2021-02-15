@@ -45,10 +45,10 @@ let frama_C_assert state actuals =
           state
         end
       in
-      { Value_types.c_values = [ None, state ] ;
+      { Builtins.c_values = [ None, state ] ;
         c_clobbered = Base.SetLattice.bottom;
         c_from = None;
-        c_cacheable = Value_types.NoCache;
+        c_cacheable = Eval.NoCache;
       }
     end
   | _ -> raise (Builtins.Invalid_nb_of_args 1)

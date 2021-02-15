@@ -36,9 +36,9 @@ let frama_c_cardinal state actuals =
         | None -> Cvalue.V.inject_int Integer.minus_one
         | Some i -> Cvalue.V.inject_int i
       in
-      { Value_types.c_values = [Eval_op.wrap_long_long nb, state];
+      { Builtins.c_values = [Eval_op.wrap_long_long nb, state];
         c_clobbered = Base.SetLattice.empty;
-        c_cacheable = Value_types.Cacheable;
+        c_cacheable = Eval.Cacheable;
         c_from = None;
       }
     end
@@ -60,9 +60,9 @@ let frama_c_min_max f state actuals =
           | Some i -> Cvalue.V.inject_int i
         with V.Not_based_on_null -> Cvalue.V.top_int
       in
-      { Value_types.c_values = [Eval_op.wrap_long_long nb, state];
+      { Builtins.c_values = [Eval_op.wrap_long_long nb, state];
         c_clobbered = Base.SetLattice.empty;
-        c_cacheable = Value_types.Cacheable;
+        c_cacheable = Eval.Cacheable;
         c_from = None;
       }
     end
@@ -198,26 +198,26 @@ let aux_split f state actuals =
         let states = f ~warn:true lv state max_card in
         (* Add empty return *)
         let states = List.map (fun state -> None, state) states in
-        { Value_types.c_values = states;
+        { Builtins.c_values = states;
           c_clobbered = Base.SetLattice.bottom;
-          c_cacheable = Value_types.Cacheable;
+          c_cacheable = Eval.Cacheable;
           c_from = None;
         }
       with V.Not_based_on_null | Ival.Not_Singleton_Int ->
         Value_parameters.warning ~current:true ~once:true
           "Cannot use non-constant split level %a" V.pretty card;
-        { Value_types.c_values = [(None, state)];
+        { Builtins.c_values = [(None, state)];
           c_clobbered = Base.SetLattice.bottom;
-          c_cacheable = Value_types.Cacheable;
+          c_cacheable = Eval.Cacheable;
           c_from = None;
         }
     end
   | _ ->
     Value_parameters.warning ~current:true ~once:true
       "Cannot interpret split directive. Ignoring";
-    { Value_types.c_values = [(None, state)];
+    { Builtins.c_values = [(None, state)];
       c_clobbered = Base.SetLattice.bottom;
-      c_cacheable = Value_types.Cacheable;
+      c_cacheable = Eval.Cacheable;
       c_from = None;
     }
 

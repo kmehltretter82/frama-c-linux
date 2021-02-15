@@ -243,6 +243,8 @@ type ('loc, 'value) call = {
   recursive: bool;
 }
 
+type cacheable = Cacheable | NoCache | NoCacheCallers
+
 (*
 Local Variables:
 compile-command: "make -C ../../.."
