@@ -44,11 +44,6 @@ type builtin =
   (Cil_types.exp * Cvalue.V.t * Cvalue.V_Offsetmap.t) list ->
   call_result
 
-(* 'Always' means the builtin will always be used to replace a function
-   with its name. 'OnAuto' means that the function will be replaced only
-   if -eva-builtins-auto is set. *)
-type use_builtin = Always | OnAuto
-
 (* Table of all registered builtins; filled by [register_builtin] calls.  *)
 let table = Hashtbl.create 17
 
@@ -65,19 +60,19 @@ module BuiltinsOverride = State_builder.Set_ref (Kernel_function.Set) (Info)
 
 let register_builtin name ?replace ?typ f =
   Value_parameters.register_builtin name;
-  Hashtbl.replace table name (f, typ, None, Always);
+  Hashtbl.replace table name (f, typ, name);
   match replace with
   | None -> ()
-  | Some fname -> Hashtbl.replace table fname (f, typ, Some name, OnAuto)
+  | Some fname -> Hashtbl.replace table fname (f, typ, name)
 
 (* The functions in _builtin must only return the 'Always' builtins *)
 
 let builtin_names_and_replacements () =
   let stand_alone, replacements =
-    Hashtbl.fold (fun name (_, _, replaced_by, _) (acc1, acc2) ->
-        match replaced_by with
-        | None -> name :: acc1, acc2
-        | Some rep_by -> acc1, (name, rep_by) :: acc2
+    Hashtbl.fold (fun name (_, _, builtin_name) (acc1, acc2) ->
+        if name = builtin_name
+        then name :: acc1, acc2
+        else acc1, (name, builtin_name) :: acc2
       ) table ([], [])
   in
   List.sort String.compare stand_alone,
@@ -184,8 +179,8 @@ let prepare_builtins () =
   let autobuiltins = Value_parameters.BuiltinsAuto.get () in
   (* Links kernel functions to the registered builtins. *)
   Hashtbl.iter
-    (fun name (f, typ, _bname, u) ->
-       if autobuiltins || u = Always
+    (fun name (f, typ, bname) ->
+       if autobuiltins || name = bname
        then
          try
            let kf = Globals.Functions.find_by_name name in
@@ -196,7 +191,7 @@ let prepare_builtins () =
   Value_parameters.BuiltinsOverrides.iter
     (fun (kf, name) ->
        let builtin_name = Option.get name in
-       let f, typ, _, _ = Hashtbl.find table builtin_name in
+       let f, typ, _ = Hashtbl.find table builtin_name in
        prepare_builtin kf builtin_name f typ)
 
 let find_builtin_override = Hashtbl.find_opt builtins_table
