@@ -1,10 +1,10 @@
 # frama-c -wp [...]
 [kernel] Parsing tests/wp_gallery/string-compare.c (with preprocessing)
 [wp] Running WP plugin...
+[wp] Warning: Missing RTE guards
 [wp] [CFG] Goal stringCompare_exits_never : Valid (Unreachable)
 [wp] [CFG] Goal stringLength_exits_never : Valid (Unreachable)
-[wp] Warning: Missing RTE guards
-[wp] 51 goals scheduled
+[wp] 52 goals scheduled
 [wp] [Qed] Goal typed_stringCompare_complete_SomeDifferent_allEqual : Valid
 [wp] [Qed] Goal typed_stringCompare_disjoint_SomeDifferent_allEqual : Valid
 [wp] [Alt-Ergo] Goal typed_stringCompare_loop_invariant_equal_preserved : Valid
@@ -21,6 +21,7 @@
 [wp] [Alt-Ergo] Goal typed_stringCompare_loop_invariant_strlen_s1_established : Valid
 [wp] [Alt-Ergo] Goal typed_stringCompare_loop_invariant_strlen_s2_preserved : Valid
 [wp] [Alt-Ergo] Goal typed_stringCompare_loop_invariant_strlen_s2_established : Valid
+[wp] [Alt-Ergo] Goal typed_stringCompare_assert_length : Valid
 [wp] [Alt-Ergo] Goal typed_stringCompare_assert_different : Valid
 [wp] [Qed] Goal typed_stringCompare_loop_assigns_part1 : Valid
 [wp] [Qed] Goal typed_stringCompare_loop_assigns_part2 : Valid
@@ -56,12 +57,12 @@
 [wp] [Qed] Goal typed_main_assigns_normal_part1 : Valid
 [wp] [Qed] Goal typed_main_assigns_normal_part2 : Valid
 [wp] [Alt-Ergo] Goal typed_main_call_stringCompare_requires_validStrings : Valid
-[wp] Proved goals:   53 / 53
+[wp] Proved goals:   54 / 54
   Qed:            33 
-  Alt-Ergo:       18
+  Alt-Ergo:       19
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  stringCompare            19       12       31       100%
+  stringCompare            19       13       32       100%
   stringLength              9        4       13       100%
   main                      5        2        7       100%
 ------------------------------------------------------------
@@ -83,7 +84,7 @@
   Alt-Ergo:        6
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  stringCompare            21       17       38       100%
+  stringCompare            21       18       39       100%
   stringLength              9        5       14       100%
   main                      5        2        7       100%
 ------------------------------------------------------------

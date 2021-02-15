@@ -38,8 +38,10 @@ int stringCompare(const char* s1, const char* s2) {
         loop assigns s1, s2; */
     while (*s1 == *(s2++))
     {
-       if (*(s1++) == '\0')
+      if (*(s1++) == '\0') {
+        //@ assert length: strlen(s1-1) == strlen(s2-1) == 0;
          return 0;
+      }
     }
 
     //@ assert different: \let k = \at(strlen(s1), Pre) - strlen(s1) ; \at(s1,Pre)[k] != \at(s2,Pre)[k];
