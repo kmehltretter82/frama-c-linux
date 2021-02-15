@@ -766,7 +766,7 @@ plugin_use_external(gui,dot)
 check_plugin(impact,src/plugins/impact,[support for impact plugin],yes)
 
 plugin_use(impact,gui)
-plugin_use(impact,slicing)
+plugin_require(impact,slicing)
 plugin_require(impact,pdg)
 plugin_require(impact,eva)
 plugin_require(impact,inout)
