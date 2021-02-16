@@ -157,8 +157,8 @@ val set_annotation_kind: t -> Smart_stmt.annotation_kind -> t
 (* ************************************************************************** *)
 
 val push_loop: t -> t
-val add_loop_invariant: t -> predicate -> t
-val pop_loop: t -> predicate list * t
+val add_loop_invariant: t -> toplevel_predicate -> t
+val pop_loop: t -> toplevel_predicate list * t
 
 (* ************************************************************************** *)
 (** {2 RTEs} *)

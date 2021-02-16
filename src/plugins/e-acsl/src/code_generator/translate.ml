@@ -1125,7 +1125,6 @@ and translate_rte_annots:
                 (* The logic scope MUST NOT be reset here since we still might
                    be in the middle of the translation of the original
                    predicate. *)
-                let p = p.tp_statement in
                 let lscope_reset_old = Env.Logic_scope.get_reset env in
                 let env = Env.Logic_scope.set_reset env false in
                 let env =
@@ -1154,16 +1153,16 @@ and translate_rte ?filter kf env e =
 
 and translate_predicate ?pred_to_print kf env p =
   Options.feedback ~dkey ~level:3 "translating predicate %a"
-    Printer.pp_predicate p;
+    Printer.pp_toplevel_predicate p;
   let pred_to_print =
     match pred_to_print with
     | Some pred ->
       Options.feedback ~dkey ~level:3 "(predicate to print %a)"
         Printer.pp_predicate pred;
       pred
-    | None -> p
+    | None -> p.tp_statement
   in
-  let e, env = generalized_untyped_predicate_to_exp kf env p in
+  let e, env = generalized_untyped_predicate_to_exp kf env p.tp_statement in
   Env.add_stmt
     env
     kf

@@ -67,7 +67,7 @@ type t = {
   (* Stack of contracts for active functions and statements *)
   var_mapping: Varinfo.t Stack.t Logic_var.Map.t;
   (* records of C bindings for logic vars *)
-  loop_invariants: predicate list list;
+  loop_invariants: toplevel_predicate list list;
   (* list of loop invariants for each currently visited loops *)
   cpt: int;
   (* counter used when generating variables *)

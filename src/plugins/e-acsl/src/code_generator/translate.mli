@@ -44,7 +44,11 @@ val generalized_untyped_predicate_to_exp:
 (** Convert an untyped ACSL predicate into a corresponding C expression. *)
 
 val translate_predicate:
-  ?pred_to_print:predicate -> kernel_function -> Env.t -> predicate -> Env.t
+  ?pred_to_print:predicate ->
+  kernel_function ->
+  Env.t ->
+  toplevel_predicate ->
+  Env.t
 (** Translate the given predicate to a runtime check in the given environment.
     If [pred_to_print] is set, then the runtime check will use this predicate as
     message. *)

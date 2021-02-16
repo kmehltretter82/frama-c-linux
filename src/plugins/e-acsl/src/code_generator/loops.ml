@@ -28,7 +28,7 @@ open Cil_types
 (**************************************************************************)
 
 let translate_predicate_ref
-  : (kernel_function -> Env.t -> predicate -> Env.t) ref
+  : (kernel_function -> Env.t -> toplevel_predicate -> Env.t) ref
   = Extlib.mk_fun "translate_predicate_ref"
 
 let predicate_to_exp_ref
