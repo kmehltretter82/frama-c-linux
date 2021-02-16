@@ -35,15 +35,17 @@
   NON TERMINATING FUNCTION
 [eva:final-states] Values at end of function main:
   NON TERMINATING FUNCTION
-[nonterm] tests/nonterm/n8.i:13: Warning: statement is syntactically unreachable
-[nonterm] tests/nonterm/n8.i:17: Warning: statement is syntactically unreachable
-[nonterm] tests/nonterm/n8.i:22: Warning: 
+[nonterm:dead-code] tests/nonterm/n8.i:13: Warning: 
+  statement is syntactically unreachable
+[nonterm:dead-code] tests/nonterm/n8.i:17: Warning: 
+  statement is syntactically unreachable
+[nonterm:dead-code] tests/nonterm/n8.i:22: Warning: 
   implicit return is syntactically unreachable
-[nonterm] tests/nonterm/n8.i:31: Warning: 
+[nonterm:dead-code] tests/nonterm/n8.i:31: Warning: 
   implicit return is syntactically unreachable
-[nonterm] tests/nonterm/n8.i:41: Warning: 
+[nonterm:stmt] tests/nonterm/n8.i:41: Warning: 
   non-terminating loop
   stack: main
-[nonterm] tests/nonterm/n8.i:41: Warning: 
+[nonterm:dead-code] tests/nonterm/n8.i:41: Warning: 
   implicit return is syntactically unreachable
 [nonterm] Analysis done.

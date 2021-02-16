@@ -25,7 +25,7 @@
   len1 ∈ {2} or UNINITIALIZED
   len2 ∈ UNINITIALIZED
   __retres ∈ {0}
-[nonterm] tests/nonterm/builtin_termination.c:16: Warning: 
+[nonterm:stmt] tests/nonterm/builtin_termination.c:16: Warning: 
   non-terminating function call
   stack: main
 [nonterm] Analysis done.
