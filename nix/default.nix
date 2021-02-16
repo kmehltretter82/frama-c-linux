@@ -76,6 +76,7 @@ rec {
         inherit src;
         buildInputs =
           (mk_buildInputs {
+            nixPackages = [ pkgs.bc ];
             opamPackages = [
               { name = "ocp-indent"; constraint = "=1.7.0"; }
               { name = "headache"; constraint = "=1.05"; }
