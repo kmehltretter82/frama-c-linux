@@ -39,7 +39,7 @@ prefix=framacbook@,
 \RequirePackage[T1]{fontenc}
 \RequirePackage[utf8]{inputenc}
 \RequirePackage{amssymb}
-\RequirePackage{xcolor}
+\RequirePackage[table]{xcolor}
 \RequirePackage[pdftex]{graphicx}
 \RequirePackage{ifthen}
 \RequirePackage{xspace}
