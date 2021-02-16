@@ -42,11 +42,11 @@ type behavior = {
   bhv_exit_assigns: assigns_full_info ;
 }
 
-val get_requires : kernel_function -> kinstr -> funbehavior -> pred_info list
+val get_requires : kernel_function -> funbehavior -> pred_info list
 
 val get_behavior :
   kernel_function ->
-  ?ki:kinstr -> ?smoking:bool -> ?exits:bool -> ?active:string list ->
+  ?smoking:bool -> ?exits:bool ->
   funbehavior -> behavior
 
 val get_preconditions : goal:bool -> kernel_function -> pred_info list

@@ -68,66 +68,47 @@ let normalize_assumes kf ki h =
 let implies ?assumes p =
   match assumes with None -> p | Some h -> Logic_const.pimplies (h,p)
 
-let normalize_pre kf ki bhv ?assumes ip =
+let normalize_pre kf bhv ?assumes ip =
   let module L = NormAtLabels in
-  let labels =
-    match ki with
-    | Kglobal -> L.labels_fct_pre
-    | Kstmt s -> L.labels_stmt_pre kf s in
-  let id = WpPropId.mk_pre_id kf ki bhv ip in
+  let labels = L.labels_fct_pre in
+  let id = WpPropId.mk_pre_id kf Kglobal bhv ip in
   let p = L.preproc_annot labels ip.ip_content.tp_statement in
   id, implies ?assumes p
 
-let normalize_post kf ki bhv tk ?assumes ip =
+let normalize_post kf bhv tk ?assumes ip =
   let module L = NormAtLabels in
-  let labels =
-    match ki with
-    | Kglobal -> L.labels_fct_post
-    | Kstmt s -> L.labels_stmt_post kf s in
-  let id = WpPropId.mk_post_id kf ki bhv (tk,ip) in
+  let labels = L.labels_fct_post in
+  let id = WpPropId.mk_post_id kf Kglobal bhv (tk,ip) in
   let p = L.preproc_annot labels ip.ip_content.tp_statement in
   id , implies ?assumes p
 
-let normalize_froms kf ki froms =
+let normalize_froms froms =
   let module L = NormAtLabels in
-  let labels =
-    match ki with
-    | Kglobal -> L.labels_fct_assigns
-    | Kstmt s -> L.labels_stmt_assigns kf s in
-  L.preproc_assigns labels froms
+  L.preproc_assigns L.labels_fct_assigns froms
 
-let normalize_assigns kf ki has_exit bhv ~active = function
+let normalize_assigns kf ~exits bhv = function
   | WritesAny ->
       WpPropId.empty_assigns_info, WpPropId.empty_assigns_info
   | Writes froms ->
-      let make kf ki has_exit bhv tk froms =
-        let aid = match ki with
-          | Kglobal -> WpPropId.mk_fct_assigns_id kf has_exit bhv tk froms
-          | Kstmt s -> WpPropId.mk_stmt_assigns_id kf s active bhv froms
-        in match aid with
+      let make tk =
+        match WpPropId.mk_fct_assigns_id kf exits bhv tk froms with
         | None -> WpPropId.empty_assigns_info
         | Some id ->
-            let assigns = normalize_froms kf ki froms in
-            let desc = match ki with
-              | Kglobal -> WpPropId.mk_kf_assigns_desc assigns
-              | Kstmt s -> WpPropId.mk_stmt_assigns_desc s assigns
-            in  WpPropId.mk_assigns_info id desc
+            let assigns = normalize_froms froms in
+            let desc = WpPropId.mk_kf_assigns_desc assigns in
+            WpPropId.mk_assigns_info id desc
       in
-      make kf ki has_exit bhv Normal froms,
-      if has_exit
-      then make kf ki has_exit bhv Exits froms
-      else WpPropId.empty_assigns_info
+      make Normal,
+      if exits then make Exits else WpPropId.empty_assigns_info
 
-let get_requires kf ki bhv =
-  List.map (normalize_pre kf ki bhv) bhv.b_requires
+let get_requires kf bhv =
+  List.map (normalize_pre kf bhv) bhv.b_requires
 
-let get_behavior kf
-    ?(ki=Kglobal) ?(smoking=false) ?(exits=false) ?(active=[]) bhv =
-  let pre_cond = normalize_pre kf ki bhv in
+let get_behavior kf ?(smoking=false) ?(exits=false) bhv =
+  let pre_cond = normalize_pre kf bhv in
   let post_cond tk (kind,ip) =
-    if kind = tk then Some (normalize_post kf ki bhv tk ip) else None in
-  let p_asgn, e_asgn =
-    normalize_assigns kf ki exits bhv ~active bhv.b_assigns in
+    if kind = tk then Some (normalize_post kf bhv tk ip) else None in
+  let p_asgn, e_asgn = normalize_assigns kf ~exits bhv bhv.b_assigns in
   let smokes =
     if smoking && bhv.b_requires <> [] then
       let bname =
@@ -158,7 +139,7 @@ let get_preconditions ~goal kf =
   List.map
     (fun bhv ->
        let p = Ast_info.behavior_precondition ~goal bhv in
-       normalize_pre kf Kglobal bhv (Logic_const.new_predicate p)
+       normalize_pre kf bhv (Logic_const.new_predicate p)
     ) (Annotations.behaviors kf)
 
 let get_complete_behaviors kf =
@@ -250,8 +231,8 @@ module CallContract = WpContext.StaticGenerator(Kernel_function)
         List.iter
           begin fun bhv ->
             let assumes = get_assumes kf bhv in
-            let mk_pre = normalize_pre kf Kglobal bhv ~assumes in
-            let mk_post = normalize_post kf Kglobal bhv ~assumes in
+            let mk_pre = normalize_pre kf bhv ~assumes in
+            let mk_post = normalize_post kf bhv ~assumes in
             List.iter (add cpre @@ mk_pre) bhv.b_requires ;
             List.iter
               (fun (tk,ip) ->

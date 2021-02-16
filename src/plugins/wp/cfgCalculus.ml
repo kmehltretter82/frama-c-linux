@@ -52,7 +52,7 @@ let default_requires mode kf =
   if Cil.is_default_behavior mode.bhv then [] else
     try
       let bhv = List.find Cil.is_default_behavior (Annotations.behaviors kf) in
-      CfgAnnot.get_requires kf Kglobal bhv
+      CfgAnnot.get_requires kf bhv
     with Not_found -> []
 
 (* -------------------------------------------------------------------------- *)
