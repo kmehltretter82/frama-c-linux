@@ -26,7 +26,7 @@ exception Invalid_nb_of_args of int
 exception Outside_builtin_possibilities
 
 type builtin_type = unit -> typ * typ list
-type cacheable = Eval.cacheable
+type cacheable = Eval.cacheable = Cacheable | NoCache | NoCacheCallers
 
 type full_result = {
   c_values: (Cvalue.V.t option * Cvalue.Model.t) list;
@@ -63,7 +63,11 @@ let register_builtin name ?replace ?typ cacheable f =
   | None -> ()
   | Some fname -> Hashtbl.replace table fname builtin
 
-(* The functions in _builtin must only return the 'Always' builtins *)
+let is_builtin name =
+  try
+    let bname, _, _, _ = Hashtbl.find table name in
+    name = bname
+  with Not_found -> false
 
 let builtin_names_and_replacements () =
   let stand_alone, replacements =
