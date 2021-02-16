@@ -54,11 +54,11 @@ type zone =
   | Arr of varinfo   (* p+(..) - the cell and its neighbors pointed by p *)
 
 type partition = {
-  globals : zone list ; (* [ &G , G[...], ... ] *)
-  to_heap : zone list ; (* [ p, ... ] *)
-  context : zone list ; (* [ p+(..), ... ] *)
+  globals : zone list ;  (* [ &G , G[...], ... ] *)
+  to_heap : zone list ;  (* [ p, ... ] *)
+  context : zone list ;  (* [ p+(..), ... ] *)
   nullable : zone list ; (* [ p+(..), ... ] but can be NULL *)
-  by_addr : zone list ; (* [ &(x + ..), ... ] *)
+  by_addr : zone list ;  (* [ &(x + ..), ... ] *)
 }
 
 (* -------------------------------------------------------------------------- *)
@@ -88,10 +88,10 @@ let set x p w =
         end
   | InArray v ->
       if Cil.isFunctionType x.vtype then w else
-      begin match v with
-        | Nullable -> { w with nullable = Arr x :: w.nullable }
-        | Valid -> { w with context = Arr x :: w.context }
-      end
+        begin match v with
+          | Nullable -> { w with nullable = Arr x :: w.nullable }
+          | Valid -> { w with context = Arr x :: w.context }
+        end
   | ByValue | ByShift ->
       if x.vghost then w else
       if Cil.isFunctionType x.vtype then w else
@@ -205,6 +205,11 @@ let valid_region loc r =
   let t = region_to_term loc r in
   pvalid ~loc (here_label, t)
 
+let valid_or_null_region loc r =
+  let t = region_to_term loc r in
+  let null = term ~loc Tnull t.term_type in
+  por (valid_region loc r, prel ~loc (Req, t, null))
+
 let simplify ps =
   List.sort_uniq Logic_utils.compare_predicate
     (List.filter (fun p -> not(Logic_utils.is_trivially_true p)) ps)
@@ -239,6 +244,9 @@ let global_zones partition =
 let context_zones partition =
   List.map (fun z -> [z]) partition.context
 
+let nullable_zones partition =
+  List.map (fun z -> [z]) partition.nullable
+
 let heaps partition = welltyped partition.to_heap
 let addr_of_vars partition = welltyped partition.by_addr
 
@@ -247,20 +255,39 @@ let addr_of_vars partition = welltyped partition.by_addr
 (* -------------------------------------------------------------------------- *)
 
 (* Memory regions shall be separated with each others *)
-let main_separation loc globals context heaps =
-  match heaps, context with
-  | [], [] ->
-      (* In this case, separation is completely trivial *)
-      [ ptrue ]
-  | [], context ->
-      let zones = globals @ context in
-      [ separated_list ~loc (List.map (region_to_term loc) zones) ]
-  | heaps, context ->
-      let for_typed_heap h =
-        let zones = h :: globals @ context in
-        separated_list ~loc (List.map (region_to_term loc) zones)
-      in
-      List.map for_typed_heap heaps
+let main_separation loc globals context nullable heaps =
+  if context = [] && nullable = [] && heaps = [] then []
+  else
+    let l_zones = match heaps with
+      | [] -> [globals @ context]
+      | heaps -> List.map (fun h -> h :: (globals @ context)) heaps
+    in
+    let regions_to_terms = List.map (region_to_term loc) in
+    let guard_nullable_sep tn sep =
+      pimplies ~loc (prel ~loc (Rneq, tn, term ~loc Tnull tn.term_type), sep)
+    in
+    let acc_with_nullable tn zones acc =
+      let s  = separated_list ~loc (tn :: regions_to_terms zones) in
+      guard_nullable_sep tn s :: acc
+    in
+    let no_nullable zones = separated_list ~loc @@ regions_to_terms zones in
+    let rec nullable_inter visited = function
+      (* trivial cases *)
+      | [] -> [] | [_] when visited = [] -> []
+      | n :: tl ->
+          let seps =
+            let f = List.fold_right (fun t l -> pseparated ~loc [n ; t] :: l) in
+            f visited (f tl [])
+          in
+          guard_nullable_sep n (pands seps) :: nullable_inter (n :: visited) tl
+    in
+    match nullable with
+    | [] -> List.map no_nullable l_zones
+    | nullable ->
+        let t_nullable = regions_to_terms nullable in
+        let sep_nullable = nullable_inter [] t_nullable in
+        let fold n = List.fold_right (acc_with_nullable n) l_zones in
+        List.fold_right fold t_nullable sep_nullable
 
 (* Filter assigns *)
 let assigned_locations kf filter =
@@ -319,10 +346,13 @@ let assigned_separation kf loc globals =
 (* Computes conditions from partition *)
 let clauses_of_partition kf loc p =
   let globals = global_zones p in
-  let main_sep = main_separation loc globals (context_zones p) (heaps p) in
+  let main_sep =
+    main_separation loc globals (context_zones p) (nullable_zones p) (heaps p)
+  in
   let assigns_sep_req, assigns_sep_ens = assigned_separation kf loc globals in
-  let context_validity = List.map (valid_region loc) (context_zones p) in
-  let reqs = main_sep @ assigns_sep_req @ context_validity in
+  let context_valid = List.map (valid_region loc) (context_zones p) in
+  let nullable_valid = List.map (valid_or_null_region loc) (nullable_zones p) in
+  let reqs = main_sep @ assigns_sep_req @ context_valid @ nullable_valid in
   let reqs = simplify reqs in
   let ens = simplify assigns_sep_ens in
   reqs, ens
