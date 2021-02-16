@@ -40,6 +40,17 @@ type info =
   | NoneInfo
   | LoopHead of int (* level *)
 
+(** Control flow informations for outgoing edges, if any. *)
+type 'a control =
+  | Edges (** control flow is only given by vertex edges. *)
+  | Loop of 'a (** start of a Loop stmt, with breaking vertex. *)
+  | If of { cond: exp; vthen: 'a; velse: 'a }
+  (** edges are guaranteed to be two guards `Then` else `Else`
+      with the given condition and successor vertices. *)
+  | Switch of { value: exp; cases: (exp * 'a) list; default: 'a }
+  (** edges are guaranteed to be issued from a `switch()` statement with
+      the given cases and default vertices. *)
+
 (** Vertices are control points. When a vertice is the *start* of a statement,
     this statement is kept in vertex_stmt. Currently, this statement is kept for
     two reasons: to know when callbacks should be called and when annotations
@@ -49,6 +60,7 @@ type vertex = private {
   vertex_key : int;
   mutable vertex_start_of : Cil_types.stmt option;
   mutable vertex_info : info;
+  mutable vertex_control : vertex control;
 }
 
 type assert_kind =
@@ -134,7 +146,7 @@ module WTO : sig
   include Datatype.S with type t = wto
 end
 
-(** Get the interpreted automaton for the given kernel_function without annotations *)
+(** Get the automaton for the given kernel_function without annotations *)
 val get_automaton : Cil_types.kernel_function -> automaton
 (** Get the wto for the automaton of the given kernel_function *)
 val get_wto : Cil_types.kernel_function -> wto
@@ -142,8 +154,8 @@ val get_wto : Cil_types.kernel_function -> wto
     vertices lead outside the wto without passing through the head. *)
 val exit_strategy : graph -> vertex Wto.component -> wto
 (** Output the automaton in dot format *)
-val output_to_dot : out_channel -> ?number:[`Stmt|`Vertex] -> ?wto:wto -> automaton -> unit
-
+val output_to_dot : out_channel -> ?number:[`Stmt|`Vertex] -> ?wto:wto ->
+  automaton -> unit
 
 (** the position of a statement in a wto given as the list of
     component heads *)
@@ -187,7 +199,8 @@ module Compute: sig
       vertices lead outside the wto without passing through the head. *)
   val exit_strategy : graph -> vertex Wto.component -> wto
   (** Output the automaton in dot format *)
-  val output_to_dot : out_channel -> ?number:[`Stmt|`Vertex] -> ?wto:wto -> automaton -> unit
+  val output_to_dot : out_channel -> ?number:[`Stmt|`Vertex] -> ?wto:wto ->
+    automaton -> unit
 
 
   type wto_index_table
@@ -219,9 +232,10 @@ end
 module UnrollUnnatural : sig
   (** Could enter a loop only by head nodes *)
 
-
-  module Vertex_Set : Datatype.S_with_collections with type t = Vertex.Set.t
-  module Version :Datatype.S_with_collections with type t = Vertex.t * Vertex.Set.t
+  module Vertex_Set:
+    Datatype.S_with_collections with type t = Vertex.Set.t
+  module Version:
+    Datatype.S_with_collections with type t = Vertex.t * Vertex.Set.t
 
   module G : sig
     include Graph.Sig.I
