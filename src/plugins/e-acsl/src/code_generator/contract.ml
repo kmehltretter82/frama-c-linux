@@ -354,25 +354,33 @@ let check_requires kf kinstr env contract =
              if !must_translate_ppt_ref
                  (Property.ip_of_requires kf kinstr b ip_requires) then
                let tp_requires = ip_requires.ip_content in
-               let requires = tp_requires.tp_statement in
-               let loc = requires.pred_loc in
-               Cil.CurrentLoc.set loc;
-               (* Prepend the name of the behavior *)
-               let requires =
-                 { requires with pred_name = b.b_name :: requires.pred_name }
-               in
-               (* Create runtime check *)
-               let requires_e, env =
-                 Translate.generalized_untyped_predicate_to_exp kf env requires
-               in
-               let stmt =
-                 Smart_stmt.runtime_check
-                   Smart_stmt.Precondition
-                   kf
-                   requires_e
-                   requires
-               in
-               env, stmt :: stmts
+               let pred_kind = tp_requires.tp_kind in
+               match pred_kind with
+               | Assert | Check ->
+                 let requires = tp_requires.tp_statement in
+                 let loc = requires.pred_loc in
+                 Cil.CurrentLoc.set loc;
+                 (* Prepend the name of the behavior *)
+                 let requires =
+                   { requires with pred_name = b.b_name :: requires.pred_name }
+                 in
+                 (* Create runtime check *)
+                 let requires_e, env =
+                   Translate.generalized_untyped_predicate_to_exp
+                     kf
+                     env
+                     requires
+                 in
+                 let stmt =
+                   Smart_stmt.runtime_check
+                     ~pred_kind
+                     Smart_stmt.Precondition
+                     kf
+                     requires_e
+                     requires
+                 in
+                 env, stmt :: stmts
+               | Admit -> env, stmts
              else
                env, stmts)
           (env, [])
@@ -501,6 +509,7 @@ let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf kinstr env co
         Smart_stmt.runtime_check_with_msg
           ~loc
           msg
+          ~pred_kind:Assert
           (Env.annotation_kind env)
           kf
           (Cil.mkBinOp ~loc bop active_bhvrs_e (Cil.one ~loc))
@@ -648,30 +657,41 @@ let check_post_conds kf kinstr env contract =
              if !must_translate_ppt_ref
                  (Property.ip_of_ensures kf kinstr b tp) then
                let tp_post_cond = ip_post_cond.ip_content in
-               let post_cond = tp_post_cond.tp_statement in
-               let loc = post_cond.pred_loc in
-               Cil.CurrentLoc.set loc;
-               match termination with
-               | Normal ->
-                 (* Prepend the name of the behavior *)
-                 let post_cond =
-                   { post_cond with pred_name = b.b_name :: post_cond.pred_name }
-                 in
-                 (* Create runtime check *)
-                 let post_cond_e, env =
-                   Translate.generalized_untyped_predicate_to_exp kf env post_cond
-                 in
-                 let stmt =
-                   Smart_stmt.runtime_check
-                     Smart_stmt.Postcondition
-                     kf
-                     post_cond_e
-                     post_cond
-                 in
-                 env, stmt :: stmts
-               | Exits | Breaks | Continues | Returns ->
-                 Error.process_error (Error.not_yet "abnormal termination case in behavior");
-                 env, stmts
+               let pred_kind = tp_post_cond.tp_kind in
+               match pred_kind with
+               | Assert | Check -> begin
+                   let post_cond = tp_post_cond.tp_statement in
+                   let loc = post_cond.pred_loc in
+                   Cil.CurrentLoc.set loc;
+                   match termination with
+                   | Normal ->
+                     (* Prepend the name of the behavior *)
+                     let post_cond =
+                       { post_cond with
+                         pred_name = b.b_name :: post_cond.pred_name }
+                     in
+                     (* Create runtime check *)
+                     let post_cond_e, env =
+                       Translate.generalized_untyped_predicate_to_exp
+                         kf
+                         env
+                         post_cond
+                     in
+                     let stmt =
+                       Smart_stmt.runtime_check
+                         ~pred_kind
+                         Smart_stmt.Postcondition
+                         kf
+                         post_cond_e
+                         post_cond
+                     in
+                     env, stmt :: stmts
+                   | Exits | Breaks | Continues | Returns ->
+                     Error.process_error
+                       (Error.not_yet "abnormal termination case in behavior");
+                     env, stmts
+                 end
+               | Admit -> env, stmts
              else
                env, stmts)
           (env, [])

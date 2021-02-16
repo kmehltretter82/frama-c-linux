@@ -251,7 +251,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       | Some p ->
         let e, env = !predicate_to_exp_ref kf (Env.push env) p in
         let stmt, env =
-          Smart_stmt.runtime_check Smart_stmt.RTE kf e p, env
+          Smart_stmt.runtime_check ~pred_kind:Assert Smart_stmt.RTE kf e p, env
         in
         let b, env = Env.pop_and_get env stmt ~global_clear:false Env.After in
         let guard_for_small_type = Smart_stmt.block_stmt b in

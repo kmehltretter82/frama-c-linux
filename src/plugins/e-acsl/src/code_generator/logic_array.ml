@@ -241,7 +241,7 @@ let comparison_to_exp ~loc kf env ~name bop array1 array2 =
       in
       let p = { p with pred_name = "array_coercion" :: p.pred_name } in
       let stmt =
-        Smart_stmt.runtime_check Smart_stmt.RTE kf e p
+        Smart_stmt.runtime_check ~pred_kind:Assert Smart_stmt.RTE kf e p
       in
       stmt :: stmts, env
   in
