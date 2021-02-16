@@ -50,7 +50,20 @@ let user_setup () : Factory.setup =
           cint = Cint.Natural ;
           cfloat = Cfloat.Real ;
         }
-    | spec -> Factory.parse spec
+    | spec ->
+        let setup = Factory.parse spec in
+        let mvar_special = match setup.mvar with
+          | Caveat -> "Caveat" | Ref -> "Ref" | _ -> ""
+        in
+        if mvar_special <> ""
+        && RefUsage.has_nullable ()
+        && not (Wp_parameters.RTE.is_set ())
+        then
+          Wp_parameters.warning ~current:false ~once:true
+            "In %s mode, with nullable variables,\
+             -wp-rte should be explicitly positioned"
+            mvar_special;
+        setup
   end
 
 (* -------------------------------------------------------------------------- *)

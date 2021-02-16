@@ -831,14 +831,6 @@ let is_computed () = S.is_computed ()
 (* --- Nullable variables                                             --- *)
 (* ---------------------------------------------------------------------- *)
 
-module NullableStatuses =
-  State_builder.Hashtbl(Varinfo.Hashtbl)(Datatype.Bool)
-    (struct
-      let size = 17
-      let name = "Wp.RefUsage.NullableStatuses"
-      let dependencies = [Ast.self]
-    end)
-
 module HasNullable =
   State_builder.Option_ref(Datatype.Bool)
     (struct
@@ -846,17 +838,13 @@ module HasNullable =
       let dependencies = [Ast.self]
     end)
 
-let is_nullable =
-  NullableStatuses.memo
-    (fun vi -> vi.vformal && Cil.hasAttribute "nullable" vi.vattr)
+let is_nullable vi = vi.vformal && Cil.hasAttribute "nullable" vi.vattr
 
 let compute_nullable () =
   let module F = Globals.Functions in
-  (* Avoid short-circuit optimization so that all variables are visited *)
-  let force_or a b = a || b in
-  F.fold
-    (fun f -> List.fold_right (fun v -> force_or @@ is_nullable v)
-        (F.get_params f)) false
+  F.fold (fun f b ->
+      b || List.fold_left (fun b v -> b || is_nullable v) b (F.get_params f)
+    ) false
 
 let has_nullable () = HasNullable.memo compute_nullable
 
@@ -886,6 +874,8 @@ let get ?kf ?(init=false) vi =
   if init then Access.cup kf_access (E.get vi u_init) else kf_access
 
 let compute () = ignore (usage ())
+
+
 
 let print x m fmt = Access.pretty x fmt m
 
