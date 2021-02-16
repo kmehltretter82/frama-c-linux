@@ -41,15 +41,23 @@ extern int eacsl_runtime_sound_verdict;
 
 /*! \brief Runtime assertion verifying a given predicate
  *  \param pred  integer code of a predicate
- *  \param kind  C string representing a kind an annotation (e.g., "Assertion")
+ *  \param blocking integer representing if the assertion is blocking or not
+ *  \param kind  C string representing a kind of annotation (e.g., "Assertion")
  *  \param fct
  *  \param pred_txt  stringified predicate
  *  \param file un-instrumented file of predicate placement
  *  \param line line of predicate placement in the un-instrumented file */
-/*@ requires pred != 0;
-  @ assigns \nothing; */
-void eacsl_runtime_assert(int pred, const char *kind, const char *fct,
-    const char *pred_txt, const char * file, int line)
+/*@ assigns \nothing;
+  @ behavior blocking:
+  @   assumes blocking != 0;
+  @   requires pred != 0;
+  @ behavior non_blocking:
+  @   assumes blocking == 0;
+  @   check requires pred != 0;
+  @ complete behaviors;
+  @ disjoint behaviors; */
+void eacsl_runtime_assert(int pred, int blocking, const char *kind,
+    const char *fct, const char *pred_txt, const char * file, int line)
   __attribute__((FC_BUILTIN));
 
 #endif // E_ACSL_ASSERT_H
