@@ -65,13 +65,42 @@ int x = 0;
     init_tmp = init;
     last_tmp = last;
     step1_tmp = step1;
-    if ((init == 1 && x == 3 || last == 1 && x == 3) || step1 == 1 && x != 4) 
-      step1_tmp = 1;
-    else step1_tmp = 0;
-    if (last == 1 && (x != 4 && x != 3) || step1 == 1 && x == 4) last_tmp = 1;
-    else last_tmp = 0;
-    if (init == 1 && x != 3 || last == 1 && x == 4) init_tmp = 1;
-    else init_tmp = 0;
+    if (init == 1) {
+      if (x == 3) step1_tmp = 1; else goto __aorai_label_2;
+    }
+    else {
+      __aorai_label_2: ;
+      if (last == 1) {
+        if (x == 3) step1_tmp = 1; else goto __aorai_label_1;
+      }
+      else {
+        __aorai_label_1: ;
+        if (step1 == 1) 
+          if (x != 4) step1_tmp = 1; else step1_tmp = 0;
+        else step1_tmp = 0;
+      }
+    }
+    if (last == 1) {
+      if (x != 4) {
+        if (x != 3) last_tmp = 1; else goto __aorai_label_0;
+      }
+      else goto __aorai_label_0;
+    }
+    else {
+      __aorai_label_0: ;
+      if (step1 == 1) 
+        if (x == 4) last_tmp = 1; else last_tmp = 0;
+      else last_tmp = 0;
+    }
+    if (init == 1) {
+      if (x != 3) init_tmp = 1; else goto __aorai_label;
+    }
+    else {
+      __aorai_label: ;
+      if (last == 1) 
+        if (x == 4) init_tmp = 1; else init_tmp = 0;
+      else init_tmp = 0;
+    }
     init = init_tmp;
     last = last_tmp;
     step1 = step1_tmp;
@@ -129,13 +158,42 @@ int x = 0;
     init_tmp = init;
     last_tmp = last;
     step1_tmp = step1;
-    if ((init == 1 && x == 3 || last == 1 && x == 3) || step1 == 1 && x != 4) 
-      step1_tmp = 1;
-    else step1_tmp = 0;
-    if (last == 1 && (x != 4 && x != 3) || step1 == 1 && x == 4) last_tmp = 1;
-    else last_tmp = 0;
-    if (init == 1 && x != 3 || last == 1 && x == 4) init_tmp = 1;
-    else init_tmp = 0;
+    if (init == 1) {
+      if (x == 3) step1_tmp = 1; else goto __aorai_label_6;
+    }
+    else {
+      __aorai_label_6: ;
+      if (last == 1) {
+        if (x == 3) step1_tmp = 1; else goto __aorai_label_5;
+      }
+      else {
+        __aorai_label_5: ;
+        if (step1 == 1) 
+          if (x != 4) step1_tmp = 1; else step1_tmp = 0;
+        else step1_tmp = 0;
+      }
+    }
+    if (last == 1) {
+      if (x != 4) {
+        if (x != 3) last_tmp = 1; else goto __aorai_label_4;
+      }
+      else goto __aorai_label_4;
+    }
+    else {
+      __aorai_label_4: ;
+      if (step1 == 1) 
+        if (x == 4) last_tmp = 1; else last_tmp = 0;
+      else last_tmp = 0;
+    }
+    if (init == 1) {
+      if (x != 3) init_tmp = 1; else goto __aorai_label_3;
+    }
+    else {
+      __aorai_label_3: ;
+      if (last == 1) 
+        if (x == 4) init_tmp = 1; else init_tmp = 0;
+      else init_tmp = 0;
+    }
     init = init_tmp;
     last = last_tmp;
     step1 = step1_tmp;
@@ -257,13 +315,42 @@ void f(void)
     init_tmp = init;
     last_tmp = last;
     step1_tmp = step1;
-    if ((init == 1 && x == 3 || last == 1 && x == 3) || step1 == 1 && x != 4) 
-      step1_tmp = 1;
-    else step1_tmp = 0;
-    if (last == 1 && (x != 4 && x != 3) || step1 == 1 && x == 4) last_tmp = 1;
-    else last_tmp = 0;
-    if (init == 1 && x != 3 || last == 1 && x == 4) init_tmp = 1;
-    else init_tmp = 0;
+    if (init == 1) {
+      if (x == 3) step1_tmp = 1; else goto __aorai_label_10;
+    }
+    else {
+      __aorai_label_10: ;
+      if (last == 1) {
+        if (x == 3) step1_tmp = 1; else goto __aorai_label_9;
+      }
+      else {
+        __aorai_label_9: ;
+        if (step1 == 1) 
+          if (x != 4) step1_tmp = 1; else step1_tmp = 0;
+        else step1_tmp = 0;
+      }
+    }
+    if (last == 1) {
+      if (x != 4) {
+        if (x != 3) last_tmp = 1; else goto __aorai_label_8;
+      }
+      else goto __aorai_label_8;
+    }
+    else {
+      __aorai_label_8: ;
+      if (step1 == 1) 
+        if (x == 4) last_tmp = 1; else last_tmp = 0;
+      else last_tmp = 0;
+    }
+    if (init == 1) {
+      if (x != 3) init_tmp = 1; else goto __aorai_label_7;
+    }
+    else {
+      __aorai_label_7: ;
+      if (last == 1) 
+        if (x == 4) init_tmp = 1; else init_tmp = 0;
+      else init_tmp = 0;
+    }
     init = init_tmp;
     last = last_tmp;
     step1 = step1_tmp;
@@ -321,13 +408,42 @@ void f(void)
     init_tmp = init;
     last_tmp = last;
     step1_tmp = step1;
-    if ((init == 1 && x == 3 || last == 1 && x == 3) || step1 == 1 && x != 4) 
-      step1_tmp = 1;
-    else step1_tmp = 0;
-    if (last == 1 && (x != 4 && x != 3) || step1 == 1 && x == 4) last_tmp = 1;
-    else last_tmp = 0;
-    if (init == 1 && x != 3 || last == 1 && x == 4) init_tmp = 1;
-    else init_tmp = 0;
+    if (init == 1) {
+      if (x == 3) step1_tmp = 1; else goto __aorai_label_14;
+    }
+    else {
+      __aorai_label_14: ;
+      if (last == 1) {
+        if (x == 3) step1_tmp = 1; else goto __aorai_label_13;
+      }
+      else {
+        __aorai_label_13: ;
+        if (step1 == 1) 
+          if (x != 4) step1_tmp = 1; else step1_tmp = 0;
+        else step1_tmp = 0;
+      }
+    }
+    if (last == 1) {
+      if (x != 4) {
+        if (x != 3) last_tmp = 1; else goto __aorai_label_12;
+      }
+      else goto __aorai_label_12;
+    }
+    else {
+      __aorai_label_12: ;
+      if (step1 == 1) 
+        if (x == 4) last_tmp = 1; else last_tmp = 0;
+      else last_tmp = 0;
+    }
+    if (init == 1) {
+      if (x != 3) init_tmp = 1; else goto __aorai_label_11;
+    }
+    else {
+      __aorai_label_11: ;
+      if (last == 1) 
+        if (x == 4) init_tmp = 1; else init_tmp = 0;
+      else init_tmp = 0;
+    }
     init = init_tmp;
     last = last_tmp;
     step1 = step1_tmp;
@@ -436,9 +552,13 @@ void g(void)
     init_tmp = init;
     last_tmp = last;
     step1_tmp = step1;
-    if (init == 1 && x == 3) step1_tmp = 1; else step1_tmp = 0;
+    if (init == 1) 
+      if (x == 3) step1_tmp = 1; else step1_tmp = 0;
+    else step1_tmp = 0;
     last_tmp = 0;
-    if (init == 1 && x != 3) init_tmp = 1; else init_tmp = 0;
+    if (init == 1) 
+      if (x != 3) init_tmp = 1; else init_tmp = 0;
+    else init_tmp = 0;
     init = init_tmp;
     last = last_tmp;
     step1 = step1_tmp;
@@ -496,13 +616,42 @@ void g(void)
     init_tmp = init;
     last_tmp = last;
     step1_tmp = step1;
-    if ((init == 1 && x == 3 || last == 1 && x == 3) || step1 == 1 && x != 4) 
-      step1_tmp = 1;
-    else step1_tmp = 0;
-    if (last == 1 && (x != 4 && x != 3) || step1 == 1 && x == 4) last_tmp = 1;
-    else last_tmp = 0;
-    if (init == 1 && x != 3 || last == 1 && x == 4) init_tmp = 1;
-    else init_tmp = 0;
+    if (init == 1) {
+      if (x == 3) step1_tmp = 1; else goto __aorai_label_18;
+    }
+    else {
+      __aorai_label_18: ;
+      if (last == 1) {
+        if (x == 3) step1_tmp = 1; else goto __aorai_label_17;
+      }
+      else {
+        __aorai_label_17: ;
+        if (step1 == 1) 
+          if (x != 4) step1_tmp = 1; else step1_tmp = 0;
+        else step1_tmp = 0;
+      }
+    }
+    if (last == 1) {
+      if (x != 4) {
+        if (x != 3) last_tmp = 1; else goto __aorai_label_16;
+      }
+      else goto __aorai_label_16;
+    }
+    else {
+      __aorai_label_16: ;
+      if (step1 == 1) 
+        if (x == 4) last_tmp = 1; else last_tmp = 0;
+      else last_tmp = 0;
+    }
+    if (init == 1) {
+      if (x != 3) init_tmp = 1; else goto __aorai_label_15;
+    }
+    else {
+      __aorai_label_15: ;
+      if (last == 1) 
+        if (x == 4) init_tmp = 1; else init_tmp = 0;
+      else init_tmp = 0;
+    }
     init = init_tmp;
     last = last_tmp;
     step1 = step1_tmp;

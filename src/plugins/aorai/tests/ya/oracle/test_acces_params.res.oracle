@@ -76,7 +76,9 @@ int rr = 1;
     SF_tmp = 0;
     S4_tmp = 0;
     S3_tmp = 0;
-    if (S1 == 1 && i >= 0) S2_tmp = 1; else S2_tmp = 0;
+    if (S1 == 1) 
+      if (i >= 0) S2_tmp = 1; else S2_tmp = 0;
+    else S2_tmp = 0;
     S1_tmp = 0;
     S1 = S1_tmp;
     S2 = S2_tmp;
@@ -294,7 +296,9 @@ void opa(int i, int j)
     SF_tmp = SF;
     mainst_tmp = mainst;
     mainst_tmp = 0;
-    if (S4 == 1 && res > 0) SF_tmp = 1; else SF_tmp = 0;
+    if (S4 == 1) 
+      if (res > 0) SF_tmp = 1; else SF_tmp = 0;
+    else SF_tmp = 0;
     S4_tmp = 0;
     S3_tmp = 0;
     S2_tmp = 0;

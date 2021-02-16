@@ -39,7 +39,9 @@ enum aorai_OpStatusList {
     aorai_CurOperation = op_f;
     S0_tmp = S0;
     Sf_tmp = Sf;
-    if (S0 == 1 && x >= 4) Sf_tmp = 1; else Sf_tmp = 0;
+    if (S0 == 1) 
+      if (x >= 4) Sf_tmp = 1; else Sf_tmp = 0;
+    else Sf_tmp = 0;
     S0_tmp = 0;
     S0 = S0_tmp;
     Sf = Sf_tmp;

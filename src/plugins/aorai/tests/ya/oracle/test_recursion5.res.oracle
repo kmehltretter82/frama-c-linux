@@ -124,10 +124,24 @@ enum aorai_OpStatusList {
     Idle_tmp = Idle;
     IgnoreFoo_tmp = IgnoreFoo;
     WillDoFoo_tmp = WillDoFoo;
-    if (Idle == 1 && res == -1 || WillDoFoo == 1 && res == -1) WillDoFoo_tmp = 1;
-    else WillDoFoo_tmp = 0;
-    if (Idle == 1 && res != -1 || IgnoreFoo == 1 && res != -1) IgnoreFoo_tmp = 1;
-    else IgnoreFoo_tmp = 0;
+    if (Idle == 1) {
+      if (res == -1) WillDoFoo_tmp = 1; else goto __aorai_label_0;
+    }
+    else {
+      __aorai_label_0: ;
+      if (WillDoFoo == 1) 
+        if (res == -1) WillDoFoo_tmp = 1; else WillDoFoo_tmp = 0;
+      else WillDoFoo_tmp = 0;
+    }
+    if (Idle == 1) {
+      if (res != -1) IgnoreFoo_tmp = 1; else goto __aorai_label;
+    }
+    else {
+      __aorai_label: ;
+      if (IgnoreFoo == 1) 
+        if (res != -1) IgnoreFoo_tmp = 1; else IgnoreFoo_tmp = 0;
+      else IgnoreFoo_tmp = 0;
+    }
     Idle_tmp = 0;
     End_tmp = 0;
     End = End_tmp;
@@ -281,11 +295,14 @@ int isPresentRec(int *t, int i, int max, int val)
     Idle_tmp = Idle;
     IgnoreFoo_tmp = IgnoreFoo;
     WillDoFoo_tmp = WillDoFoo;
-    if (WillDoFoo == 1 && res == -1) WillDoFoo_tmp = 1;
+    if (WillDoFoo == 1) 
+      if (res == -1) WillDoFoo_tmp = 1; else WillDoFoo_tmp = 0;
     else WillDoFoo_tmp = 0;
     IgnoreFoo_tmp = 0;
     Idle_tmp = 0;
-    if (IgnoreFoo == 1 && res != -1) End_tmp = 1; else End_tmp = 0;
+    if (IgnoreFoo == 1) 
+      if (res != -1) End_tmp = 1; else End_tmp = 0;
+    else End_tmp = 0;
     End = End_tmp;
     Idle = Idle_tmp;
     IgnoreFoo = IgnoreFoo_tmp;

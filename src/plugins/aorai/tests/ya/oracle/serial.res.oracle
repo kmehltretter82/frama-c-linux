@@ -276,7 +276,7 @@
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   11 functions analyzed (out of 11): 100% coverage.
-  In these functions, 206 statements reached (out of 261): 78% coverage.
+  In these functions, 273 statements reached (out of 339): 80% coverage.
   ----------------------------------------------------------------------------
   Some errors and warnings have been raised during the analysis:
     by the Eva analyzer:      0 errors    0 warnings
@@ -576,46 +576,123 @@ int n = 0;
     aorai_CurOperation = op_input_status;
     aorai_StatesHistory_2 = aorai_StatesHistory_1;
     aorai_StatesHistory_1 = aorai_CurStates;
-    if (18 == aorai_CurStates && ((res & 15) != 1 && (res & 1) != 0)) 
-      aorai_CurStates = StatusError;
-    else 
-      if (17 == aorai_CurStates && ((res & 15) != 1 && (res & 1) != 0)) 
-        aorai_CurStates = StatusError;
-      else 
-        if (16 == aorai_CurStates && ((res & 15) != 1 && (res & 1) != 0)) 
-          aorai_CurStates = StatusError;
-        else 
-          if (15 == aorai_CurStates && ((res & 15) != 1 && (res & 1) != 0)) 
-            aorai_CurStates = StatusError;
-          else 
-            if (14 == aorai_CurStates && ((res & 15) != 1 && (res & 1) != 0)) 
-              aorai_CurStates = StatusError;
-            else 
-              if (14 == aorai_CurStates && (res & 15) == 1) aorai_CurStates = StatusOk1;
-              else 
-                if (15 == aorai_CurStates && (res & 15) == 1) aorai_CurStates = StatusOk2;
-                else 
-                  if (16 == aorai_CurStates && (res & 15) == 1) aorai_CurStates = StatusOk3;
-                  else 
-                    if (17 == aorai_CurStates && (res & 15) == 1) aorai_CurStates = StatusOk4;
-                    else 
-                      if (18 == aorai_CurStates && (res & 15) == 1) aorai_CurStates = StatusOk5;
-                      else 
-                        if (14 == aorai_CurStates && (res & 1) == 0) 
-                          aorai_CurStates = Wait1;
-                        else 
-                          if (15 == aorai_CurStates && (res & 1) == 0) 
-                            aorai_CurStates = Wait2;
-                          else 
-                            if (16 == aorai_CurStates && (res & 1) == 0) 
-                              aorai_CurStates = Wait3;
-                            else 
-                              if (17 == aorai_CurStates && (res & 1) == 0) 
-                                aorai_CurStates = Wait4;
-                              else 
-                                if (18 == aorai_CurStates && (res & 1) == 0) 
-                                  aorai_CurStates = Wait5;
+    if (18 == aorai_CurStates) {
+      if ((res & 15) != 1) {
+        if ((res & 1) != 0) aorai_CurStates = StatusError;
+        else goto __aorai_label_12;
+      }
+      else goto __aorai_label_12;
+    }
+    else {
+      __aorai_label_12: ;
+      if (17 == aorai_CurStates) {
+        if ((res & 15) != 1) {
+          if ((res & 1) != 0) aorai_CurStates = StatusError;
+          else goto __aorai_label_11;
+        }
+        else goto __aorai_label_11;
+      }
+      else {
+        __aorai_label_11: ;
+        if (16 == aorai_CurStates) {
+          if ((res & 15) != 1) {
+            if ((res & 1) != 0) aorai_CurStates = StatusError;
+            else goto __aorai_label_10;
+          }
+          else goto __aorai_label_10;
+        }
+        else {
+          __aorai_label_10: ;
+          if (15 == aorai_CurStates) {
+            if ((res & 15) != 1) {
+              if ((res & 1) != 0) aorai_CurStates = StatusError;
+              else goto __aorai_label_9;
+            }
+            else goto __aorai_label_9;
+          }
+          else {
+            __aorai_label_9: ;
+            if (14 == aorai_CurStates) {
+              if ((res & 15) != 1) {
+                if ((res & 1) != 0) aorai_CurStates = StatusError;
+                else goto __aorai_label_8;
+              }
+              else goto __aorai_label_8;
+            }
+            else {
+              __aorai_label_8: ;
+              if (14 == aorai_CurStates) {
+                if ((res & 15) == 1) aorai_CurStates = StatusOk1;
+                else goto __aorai_label_7;
+              }
+              else {
+                __aorai_label_7: ;
+                if (15 == aorai_CurStates) {
+                  if ((res & 15) == 1) aorai_CurStates = StatusOk2;
+                  else goto __aorai_label_6;
+                }
+                else {
+                  __aorai_label_6: ;
+                  if (16 == aorai_CurStates) {
+                    if ((res & 15) == 1) aorai_CurStates = StatusOk3;
+                    else goto __aorai_label_5;
+                  }
+                  else {
+                    __aorai_label_5: ;
+                    if (17 == aorai_CurStates) {
+                      if ((res & 15) == 1) aorai_CurStates = StatusOk4;
+                      else goto __aorai_label_4;
+                    }
+                    else {
+                      __aorai_label_4: ;
+                      if (18 == aorai_CurStates) {
+                        if ((res & 15) == 1) aorai_CurStates = StatusOk5;
+                        else goto __aorai_label_3;
+                      }
+                      else {
+                        __aorai_label_3: ;
+                        if (14 == aorai_CurStates) {
+                          if ((res & 1) == 0) aorai_CurStates = Wait1;
+                          else goto __aorai_label_2;
+                        }
+                        else {
+                          __aorai_label_2: ;
+                          if (15 == aorai_CurStates) {
+                            if ((res & 1) == 0) aorai_CurStates = Wait2;
+                            else goto __aorai_label_1;
+                          }
+                          else {
+                            __aorai_label_1: ;
+                            if (16 == aorai_CurStates) {
+                              if ((res & 1) == 0) aorai_CurStates = Wait3;
+                              else goto __aorai_label_0;
+                            }
+                            else {
+                              __aorai_label_0: ;
+                              if (17 == aorai_CurStates) {
+                                if ((res & 1) == 0) aorai_CurStates = Wait4;
+                                else goto __aorai_label;
+                              }
+                              else {
+                                __aorai_label: ;
+                                if (18 == aorai_CurStates) 
+                                  if ((res & 1) == 0) aorai_CurStates = Wait5;
+                                  else aorai_CurStates = aorai_reject;
                                 else aorai_CurStates = aorai_reject;
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
     /@ assert Aorai: aorai_smoke_test: aorai_CurStates ≢ aorai_reject; @/
     ;
     return;
@@ -682,54 +759,121 @@ int input_status(void)
     aorai_CurOperation = op_input_data;
     aorai_StatesHistory_2 = aorai_StatesHistory_1;
     aorai_StatesHistory_1 = aorai_CurStates;
-    if (5 == aorai_CurStates && (res & 128) == 0) {
-      aorai_CurStates = Complete;
-      aorai_y2 = res;
+    if (5 == aorai_CurStates) {
+      if ((res & 128) == 0) {
+        aorai_CurStates = Complete;
+        aorai_y2 = res;
+      }
+      else goto __aorai_label_26;
     }
     else 
+      __aorai_label_26:
       if (6 == aorai_CurStates) aorai_CurStates = Wait1;
       else 
-        if (5 == aorai_CurStates && (res & 192) == 192) aorai_CurStates = Wait1;
-        else 
-          if (4 == aorai_CurStates && (res & 192) == 192) aorai_CurStates = Wait1;
-          else 
-            if (3 == aorai_CurStates && (res & 192) == 192) aorai_CurStates = Wait1;
-            else 
-              if (2 == aorai_CurStates && (res & 192) == 192) aorai_CurStates = Wait1;
-              else 
-                if (1 == aorai_CurStates && (res & 128) == 0) aorai_CurStates = Wait1;
-                else 
-                  if (1 == aorai_CurStates && (res & 192) == 192) aorai_CurStates = Wait1;
-                  else 
-                    if (5 == aorai_CurStates && (res & 192) == 128) aorai_CurStates = Wait2;
-                    else 
-                      if (4 == aorai_CurStates && (res & 192) == 128) 
-                        aorai_CurStates = Wait2;
-                      else 
-                        if (3 == aorai_CurStates && (res & 192) == 128) 
-                          aorai_CurStates = Wait2;
-                        else 
-                          if (2 == aorai_CurStates && (res & 192) == 128) 
-                            aorai_CurStates = Wait2;
-                          else 
-                            if (1 == aorai_CurStates && (res & 192) == 128) 
-                              aorai_CurStates = Wait2;
-                            else 
-                              if (2 == aorai_CurStates && (res & 128) == 0) {
-                                aorai_CurStates = Wait3;
-                                aorai_x1 = res;
-                              }
-                              else 
-                                if (3 == aorai_CurStates && (res & 128) == 0) {
-                                  aorai_CurStates = Wait4;
-                                  aorai_x2 = res;
+        if (5 == aorai_CurStates) {
+          if ((res & 192) == 192) aorai_CurStates = Wait1;
+          else goto __aorai_label_25;
+        }
+        else {
+          __aorai_label_25: ;
+          if (4 == aorai_CurStates) {
+            if ((res & 192) == 192) aorai_CurStates = Wait1;
+            else goto __aorai_label_24;
+          }
+          else {
+            __aorai_label_24: ;
+            if (3 == aorai_CurStates) {
+              if ((res & 192) == 192) aorai_CurStates = Wait1;
+              else goto __aorai_label_23;
+            }
+            else {
+              __aorai_label_23: ;
+              if (2 == aorai_CurStates) {
+                if ((res & 192) == 192) aorai_CurStates = Wait1;
+                else goto __aorai_label_22;
+              }
+              else {
+                __aorai_label_22: ;
+                if (1 == aorai_CurStates) {
+                  if ((res & 128) == 0) aorai_CurStates = Wait1;
+                  else goto __aorai_label_21;
+                }
+                else {
+                  __aorai_label_21: ;
+                  if (1 == aorai_CurStates) {
+                    if ((res & 192) == 192) aorai_CurStates = Wait1;
+                    else goto __aorai_label_20;
+                  }
+                  else {
+                    __aorai_label_20: ;
+                    if (5 == aorai_CurStates) {
+                      if ((res & 192) == 128) aorai_CurStates = Wait2;
+                      else goto __aorai_label_19;
+                    }
+                    else {
+                      __aorai_label_19: ;
+                      if (4 == aorai_CurStates) {
+                        if ((res & 192) == 128) aorai_CurStates = Wait2;
+                        else goto __aorai_label_18;
+                      }
+                      else {
+                        __aorai_label_18: ;
+                        if (3 == aorai_CurStates) {
+                          if ((res & 192) == 128) aorai_CurStates = Wait2;
+                          else goto __aorai_label_17;
+                        }
+                        else {
+                          __aorai_label_17: ;
+                          if (2 == aorai_CurStates) {
+                            if ((res & 192) == 128) aorai_CurStates = Wait2;
+                            else goto __aorai_label_16;
+                          }
+                          else {
+                            __aorai_label_16: ;
+                            if (1 == aorai_CurStates) {
+                              if ((res & 192) == 128) aorai_CurStates = Wait2;
+                              else goto __aorai_label_15;
+                            }
+                            else {
+                              __aorai_label_15: ;
+                              if (2 == aorai_CurStates) {
+                                if ((res & 128) == 0) {
+                                  aorai_CurStates = Wait3;
+                                  aorai_x1 = res;
                                 }
-                                else 
-                                  if (4 == aorai_CurStates && (res & 128) == 0) {
-                                    aorai_CurStates = Wait5;
-                                    aorai_y1 = res;
+                                else goto __aorai_label_14;
+                              }
+                              else {
+                                __aorai_label_14: ;
+                                if (3 == aorai_CurStates) {
+                                  if ((res & 128) == 0) {
+                                    aorai_CurStates = Wait4;
+                                    aorai_x2 = res;
                                   }
+                                  else goto __aorai_label_13;
+                                }
+                                else {
+                                  __aorai_label_13: ;
+                                  if (4 == aorai_CurStates) 
+                                    if ((res & 128) == 0) {
+                                      aorai_CurStates = Wait5;
+                                      aorai_y1 = res;
+                                    }
+                                    else aorai_CurStates = aorai_reject;
                                   else aorai_CurStates = aorai_reject;
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
     /@ assert Aorai: aorai_smoke_test: aorai_CurStates ≢ aorai_reject; @/
     ;
     return;
@@ -781,18 +925,21 @@ int input_data(void)
                       else 
                         if (8 == aorai_CurStates) aorai_CurStates = Error;
                         else 
-                          if (0 == aorai_CurStates && (y != aorai_y1 + 
-                                                            128 * aorai_y2 || 
-                                                       x != aorai_x1 + 
-                                                            128 * aorai_x2)) 
-                            aorai_CurStates = Error;
-                          else 
-                            if (0 == aorai_CurStates && (x == aorai_x1 + 
-                                                              128 * aorai_x2 && 
-                                                         y == aorai_y1 + 
-                                                              128 * aorai_y2)) 
-                              aorai_CurStates = Wait1;
+                          if (0 == aorai_CurStates) {
+                            if (y != aorai_y1 + 128 * aorai_y2) aorai_CurStates = Error;
+                            else 
+                              if (x != aorai_x1 + 128 * aorai_x2) aorai_CurStates = Error;
+                              else goto __aorai_label_27;
+                          }
+                          else {
+                            __aorai_label_27: ;
+                            if (0 == aorai_CurStates) 
+                              if (x == aorai_x1 + 128 * aorai_x2) 
+                                if (y == aorai_y1 + 128 * aorai_y2) aorai_CurStates = Wait1;
+                                else aorai_CurStates = aorai_reject;
+                              else aorai_CurStates = aorai_reject;
                             else aorai_CurStates = aorai_reject;
+                          }
     /@ assert Aorai: aorai_smoke_test: aorai_CurStates ≢ aorai_reject; @/
     ;
     return;

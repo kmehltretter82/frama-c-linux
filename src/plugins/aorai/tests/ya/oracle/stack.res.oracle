@@ -219,7 +219,9 @@ void push(void)
     /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_pop;
-    if (4 == aorai_CurStates && aorai_n > 0) aorai_CurStates = emptying_stack;
+    if (4 == aorai_CurStates) 
+      if (aorai_n > 0) aorai_CurStates = emptying_stack;
+      else aorai_CurStates = aorai_reject;
     else aorai_CurStates = aorai_reject;
     return;
   }
@@ -277,16 +279,23 @@ void push(void)
     /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_pop;
-    if (3 == aorai_CurStates && aorai_n == 1) {
-      aorai_CurStates = empty_stack;
-      aorai_n --;
-    }
-    else 
-      if (3 == aorai_CurStates && aorai_n > 1) {
-        aorai_CurStates = filled_stack;
+    if (3 == aorai_CurStates) {
+      if (aorai_n == 1) {
+        aorai_CurStates = empty_stack;
         aorai_n --;
       }
+      else goto __aorai_label;
+    }
+    else {
+      __aorai_label: ;
+      if (3 == aorai_CurStates) 
+        if (aorai_n > 1) {
+          aorai_CurStates = filled_stack;
+          aorai_n --;
+        }
+        else aorai_CurStates = aorai_reject;
       else aorai_CurStates = aorai_reject;
+    }
     return;
   }
 

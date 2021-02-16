@@ -363,7 +363,9 @@ void g(void)
     /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_h;
-    if (5 == aorai_CurStates && aorai_x > 0) aorai_CurStates = f_0;
+    if (5 == aorai_CurStates) 
+      if (aorai_x > 0) aorai_CurStates = f_0;
+      else aorai_CurStates = aorai_reject;
     else aorai_CurStates = aorai_reject;
     return;
   }
