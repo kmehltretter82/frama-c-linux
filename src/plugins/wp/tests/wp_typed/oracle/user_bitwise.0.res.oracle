@@ -33,7 +33,7 @@ Assume {
   Type: is_uint32(x) /\ is_sint32(n) /\ is_uint32(x_2).
   (* Goal *)
   When: (0 <= i) /\ (i < n) /\ is_sint32(i).
-  (* Pre-condition *)
+  (* Pre-condition 'r' *)
   Have: (0 < n) /\ (n <= 31).
 }
 Prove: (land(lor(to_uint32(lsl(x, n)), x_2), lsl(1, i)) != 0) <->
@@ -48,7 +48,7 @@ Assume {
   Type: is_uint32(x) /\ is_sint32(n) /\ is_uint32(x_2).
   (* Goal *)
   When: (0 <= i) /\ (x_1 <= 31) /\ is_sint32(i).
-  (* Pre-condition *)
+  (* Pre-condition 'r' *)
   Have: (0 < n) /\ (n <= 31).
 }
 Prove: (land(lor(to_uint32(lsl(x, n)), x_2), lsl(1, x_1)) != 0) <->
@@ -66,7 +66,7 @@ Assume {
   Type: is_sint32(n) /\ is_uint64(x) /\ is_uint64(x_2).
   (* Goal *)
   When: (0 <= i) /\ (i < n) /\ is_sint32(i).
-  (* Pre-condition *)
+  (* Pre-condition 'r' *)
   Have: (0 < n) /\ (n <= 63).
 }
 Prove: (land(lor(to_uint64(lsl(x, n)), x_2), lsl(1, i)) != 0) <->
@@ -81,7 +81,7 @@ Assume {
   Type: is_sint32(n) /\ is_uint64(x) /\ is_uint64(x_2).
   (* Goal *)
   When: (0 <= i) /\ (x_1 <= 63) /\ is_sint32(i).
-  (* Pre-condition *)
+  (* Pre-condition 'r' *)
   Have: (0 < n) /\ (n <= 63).
 }
 Prove: (land(lor(to_uint64(lsl(x, n)), x_2), lsl(1, x_1)) != 0) <->
@@ -120,7 +120,7 @@ Assume {
   Type: is_uint32(x) /\ is_sint32(n) /\ is_uint32(x_1).
   (* Goal *)
   When: (0 <= i) /\ (i < n) /\ is_sint32(i).
-  (* Pre-condition *)
+  (* Pre-condition 'r' *)
   Have: (0 < n) /\ (n <= 31).
 }
 Prove: (land(lor(x_1, to_uint32(lsl(x, 32 - n))), lsl(1, 32 + i - n)) != 0) <->
@@ -135,7 +135,7 @@ Assume {
   Type: is_uint32(x) /\ is_sint32(n) /\ is_uint32(x_2).
   (* Goal *)
   When: (0 <= i) /\ (x_1 <= 31) /\ is_sint32(i).
-  (* Pre-condition *)
+  (* Pre-condition 'r' *)
   Have: (0 < n) /\ (n <= 31).
 }
 Prove: (land(lor(x_2, to_uint32(lsl(x, 32 - n))), lsl(1, i)) != 0) <->
@@ -153,7 +153,7 @@ Assume {
   Type: is_sint32(n) /\ is_uint64(x) /\ is_uint64(x_1).
   (* Goal *)
   When: (0 <= i) /\ (i < n) /\ is_sint32(i).
-  (* Pre-condition *)
+  (* Pre-condition 'r' *)
   Have: (0 < n) /\ (n <= 63).
 }
 Prove: (land(lor(x_1, to_uint64(lsl(x, 64 - n))), lsl(1, 64 + i - n)) != 0) <->
@@ -168,7 +168,7 @@ Assume {
   Type: is_sint32(n) /\ is_uint64(x) /\ is_uint64(x_2).
   (* Goal *)
   When: (0 <= i) /\ (x_1 <= 63) /\ is_sint32(i).
-  (* Pre-condition *)
+  (* Pre-condition 'r' *)
   Have: (0 < n) /\ (n <= 63).
 }
 Prove: (land(lor(x_2, to_uint64(lsl(x, 64 - n))), lsl(1, i)) != 0) <->
