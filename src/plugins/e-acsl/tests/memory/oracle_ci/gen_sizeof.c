@@ -6,7 +6,7 @@ int main(void)
   int __retres;
   int x = 0;
   x ++;
-  __e_acsl_assert(1,"Assertion","main","sizeof(int) == sizeof(x)",
+  __e_acsl_assert(1,1,"Assertion","main","sizeof(int) == sizeof(x)",
                   "tests/memory/sizeof.i",8);
   /*@ assert sizeof(int) ≡ sizeof(x); */ ;
   __retres = 0;

@@ -22,7 +22,7 @@ int main(void)
       __gen_e_acsl_and = __gen_e_acsl_valid;
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(! __gen_e_acsl_and,"Assertion","main","!\\valid(p)",
+    __e_acsl_assert(! __gen_e_acsl_and,1,"Assertion","main","!\\valid(p)",
                     "tests/temporal/t_malloc.c",11);
   }
   /*@ assert ¬\valid(p); */ ;
@@ -38,7 +38,7 @@ int main(void)
       __gen_e_acsl_and_2 = __gen_e_acsl_valid_2;
     }
     else __gen_e_acsl_and_2 = 0;
-    __e_acsl_assert(! __gen_e_acsl_and_2,"Assertion","main","!\\valid(q)",
+    __e_acsl_assert(! __gen_e_acsl_and_2,1,"Assertion","main","!\\valid(q)",
                     "tests/temporal/t_malloc.c",12);
   }
   /*@ assert ¬\valid(q); */ ;
@@ -62,7 +62,7 @@ int main(void)
       __gen_e_acsl_and_3 = __gen_e_acsl_valid_3;
     }
     else __gen_e_acsl_and_3 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_3,"Assertion","main","\\valid(p)",
+    __e_acsl_assert(__gen_e_acsl_and_3,1,"Assertion","main","\\valid(p)",
                     "tests/temporal/t_malloc.c",17);
   }
   /*@ assert \valid(p); */ ;
@@ -78,7 +78,7 @@ int main(void)
       __gen_e_acsl_and_4 = __gen_e_acsl_valid_4;
     }
     else __gen_e_acsl_and_4 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_4,"Assertion","main","\\valid(q)",
+    __e_acsl_assert(__gen_e_acsl_and_4,1,"Assertion","main","\\valid(q)",
                     "tests/temporal/t_malloc.c",18);
   }
   /*@ assert \valid(q); */ ;
@@ -99,7 +99,7 @@ int main(void)
       __gen_e_acsl_and_5 = __gen_e_acsl_valid_5;
     }
     else __gen_e_acsl_and_5 = 0;
-    __e_acsl_assert(! __gen_e_acsl_and_5,"Assertion","main","!\\valid(p)",
+    __e_acsl_assert(! __gen_e_acsl_and_5,1,"Assertion","main","!\\valid(p)",
                     "tests/temporal/t_malloc.c",22);
   }
   /*@ assert ¬\valid(p); */ ;
@@ -115,7 +115,7 @@ int main(void)
       __gen_e_acsl_and_6 = __gen_e_acsl_valid_6;
     }
     else __gen_e_acsl_and_6 = 0;
-    __e_acsl_assert(! __gen_e_acsl_and_6,"Assertion","main","!\\valid(q)",
+    __e_acsl_assert(! __gen_e_acsl_and_6,1,"Assertion","main","!\\valid(q)",
                     "tests/temporal/t_malloc.c",23);
   }
   /*@ assert ¬\valid(q); */ ;
@@ -136,7 +136,7 @@ int main(void)
       __gen_e_acsl_and_7 = __gen_e_acsl_valid_7;
     }
     else __gen_e_acsl_and_7 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_7,"Assertion","main","\\valid(p)",
+    __e_acsl_assert(__gen_e_acsl_and_7,1,"Assertion","main","\\valid(p)",
                     "tests/temporal/t_malloc.c",28);
   }
   /*@ assert \valid(p); */ ;
@@ -152,7 +152,7 @@ int main(void)
       __gen_e_acsl_and_8 = __gen_e_acsl_valid_8;
     }
     else __gen_e_acsl_and_8 = 0;
-    __e_acsl_assert(! __gen_e_acsl_and_8,"Assertion","main","!\\valid(q)",
+    __e_acsl_assert(! __gen_e_acsl_and_8,1,"Assertion","main","!\\valid(q)",
                     "tests/temporal/t_malloc.c",29);
   }
   /*@ assert ¬\valid(q); */ ;
@@ -177,7 +177,7 @@ int main(void)
       __gen_e_acsl_and_9 = __gen_e_acsl_valid_9;
     }
     else __gen_e_acsl_and_9 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_9,"Assertion","main","\\valid(q)",
+    __e_acsl_assert(__gen_e_acsl_and_9,1,"Assertion","main","\\valid(q)",
                     "tests/temporal/t_malloc.c",35);
   }
   /*@ assert \valid(q); */ ;
@@ -199,7 +199,7 @@ int main(void)
       __gen_e_acsl_and_10 = __gen_e_acsl_valid_10;
     }
     else __gen_e_acsl_and_10 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_10,"Assertion","main","\\valid(q)",
+    __e_acsl_assert(__gen_e_acsl_and_10,1,"Assertion","main","\\valid(q)",
                     "tests/temporal/t_malloc.c",39);
   }
   /*@ assert \valid(q); */ ;

@@ -54,13 +54,13 @@ int main(void)
                                         (__e_acsl_mpz_struct const *)(__gen_e_acsl__3));
     __gmpz_init(__gen_e_acsl_mod);
     /*@ assert E_ACSL: 2 ≢ 0; */
-    __e_acsl_assert(__gen_e_acsl_mod_guard != 0,"Assertion","main","2 != 0",
-                    "tests/arith/longlong.i",17);
+    __e_acsl_assert(__gen_e_acsl_mod_guard != 0,1,"Assertion","main",
+                    "2 != 0","tests/arith/longlong.i",17);
     __gmpz_tdiv_r(__gen_e_acsl_mod,
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_add),
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
     __gen_e_acsl__4 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_mod));
-    __e_acsl_assert(__gen_e_acsl__4 == 1L,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl__4 == 1L,1,"Assertion","main",
                     "(2 * x + 1) % 2 == 1","tests/arith/longlong.i",17);
     __gmpz_clear(__gen_e_acsl_);
     __gmpz_clear(__gen_e_acsl_x);

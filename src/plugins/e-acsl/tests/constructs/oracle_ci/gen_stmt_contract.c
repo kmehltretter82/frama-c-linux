@@ -12,7 +12,7 @@ int main(void)
   int y = 2;
   /*@ ensures x ≡ 1; */
   x = 1;
-  __e_acsl_assert(x == 1,"Postcondition","main","x == 1",
+  __e_acsl_assert(x == 1,1,"Postcondition","main","x == 1",
                   "tests/constructs/stmt_contract.i",8);
   {
     int __gen_e_acsl_and;
@@ -20,21 +20,21 @@ int main(void)
         ensures y ≡ 2;
         ensures x ≡ 2 ∧ y ≡ 2; */
     x = 2;
-    __e_acsl_assert(x == 2,"Postcondition","main","x == 2",
+    __e_acsl_assert(x == 2,1,"Postcondition","main","x == 2",
                     "tests/constructs/stmt_contract.i",11);
-    __e_acsl_assert(y == 2,"Postcondition","main","y == 2",
+    __e_acsl_assert(y == 2,1,"Postcondition","main","y == 2",
                     "tests/constructs/stmt_contract.i",12);
     if (x == 2) __gen_e_acsl_and = y == 2; else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,"Postcondition","main",
+    __e_acsl_assert(__gen_e_acsl_and,1,"Postcondition","main",
                     "x == 2 && y == 2","tests/constructs/stmt_contract.i",13);
   }
-  __e_acsl_assert(x == 2,"Precondition","main","x == 2",
+  __e_acsl_assert(x == 2,1,"Precondition","main","x == 2",
                   "tests/constructs/stmt_contract.i",17);
   /*@ requires x ≡ 2; */
   x ++;
-  __e_acsl_assert(x == 3,"Precondition","main","x == 3",
+  __e_acsl_assert(x == 3,1,"Precondition","main","x == 3",
                   "tests/constructs/stmt_contract.i",20);
-  __e_acsl_assert(y == 2,"Precondition","main","y == 2",
+  __e_acsl_assert(y == 2,1,"Precondition","main","y == 2",
                   "tests/constructs/stmt_contract.i",21);
   /*@ requires x ≡ 3;
       requires y ≡ 2; */
@@ -50,16 +50,17 @@ int main(void)
                                              1);
       __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
       ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)0);
-      if (__gen_e_acsl_assumes_value) __e_acsl_assert(x == 5,"Precondition",
-                                                      "main","b1: x == 5",
+      if (__gen_e_acsl_assumes_value) __e_acsl_assert(x == 5,1,
+                                                      "Precondition","main",
+                                                      "b1: x == 5",
                                                       "tests/constructs/stmt_contract.i",
                                                       25);
       __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
       ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)1);
       if (__gen_e_acsl_assumes_value) {
-        __e_acsl_assert(y == 2,"Precondition","main","b2: y == 2",
+        __e_acsl_assert(y == 2,1,"Precondition","main","b2: y == 2",
                         "tests/constructs/stmt_contract.i",29);
-        __e_acsl_assert((long)x == 3L + y,"Precondition","main",
+        __e_acsl_assert((long)x == 3L + y,1,"Precondition","main",
                         "b2: x == 3 + y","tests/constructs/stmt_contract.i",
                         28);
       }
@@ -76,13 +77,14 @@ int main(void)
     x = 3;
     __gen_e_acsl_assumes_value_2 = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)0);
-    if (__gen_e_acsl_assumes_value_2) __e_acsl_assert(x == 3,"Postcondition",
-                                                      "main","b1: x == 3",
+    if (__gen_e_acsl_assumes_value_2) __e_acsl_assert(x == 3,1,
+                                                      "Postcondition","main",
+                                                      "b1: x == 3",
                                                       "tests/constructs/stmt_contract.i",
                                                       26);
     __gen_e_acsl_assumes_value_2 = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)1);
-    if (__gen_e_acsl_assumes_value_2) __e_acsl_assert((long)x == y + 1L,
+    if (__gen_e_acsl_assumes_value_2) __e_acsl_assert((long)x == y + 1L,1,
                                                       "Postcondition","main",
                                                       "b2: x == y + 1",
                                                       "tests/constructs/stmt_contract.i",
@@ -100,16 +102,17 @@ int main(void)
                                            __gen_e_acsl_and_2);
     __gen_e_acsl_assumes_value_3 = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract_2,(size_t)0);
-    if (__gen_e_acsl_assumes_value_3) __e_acsl_assert(x == 0,"Precondition",
-                                                      "main","b1: x == 0",
+    if (__gen_e_acsl_assumes_value_3) __e_acsl_assert(x == 0,1,
+                                                      "Precondition","main",
+                                                      "b1: x == 0",
                                                       "tests/constructs/stmt_contract.i",
                                                       35);
     __gen_e_acsl_assumes_value_3 = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract_2,(size_t)1);
     if (__gen_e_acsl_assumes_value_3) {
-      __e_acsl_assert(x + (long)y == 5L,"Precondition","main",
+      __e_acsl_assert(x + (long)y == 5L,1,"Precondition","main",
                       "b2: x + y == 5","tests/constructs/stmt_contract.i",40);
-      __e_acsl_assert(x == 3,"Precondition","main","b2: x == 3",
+      __e_acsl_assert(x == 3,1,"Precondition","main","b2: x == 3",
                       "tests/constructs/stmt_contract.i",39);
     }
   }
@@ -125,11 +128,11 @@ int main(void)
   */
   x += y;
   __e_acsl_contract_clean(__gen_e_acsl_contract_2);
-  __e_acsl_assert(x == 5,"Precondition","main","x == 5",
+  __e_acsl_assert(x == 5,1,"Precondition","main","x == 5",
                   "tests/constructs/stmt_contract.i",43);
   /*@ requires x ≡ 5; */
   {
-    __e_acsl_assert(y == 2,"Precondition","main","y == 2",
+    __e_acsl_assert(y == 2,1,"Precondition","main","y == 2",
                     "tests/constructs/stmt_contract.i",44);
     /*@ requires y ≡ 2; */
     x += y;
@@ -143,16 +146,16 @@ int main(void)
                                              (size_t)0,x >= 0);
       __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract_3,
                                              (size_t)1,x < 0);
-      __e_acsl_assert(x > -1000,"Precondition","main","x > -1000",
+      __e_acsl_assert(x > -1000,1,"Precondition","main","x > -1000",
                       "tests/constructs/stmt_contract.i",49);
       __gen_e_acsl_active_bhvrs = __e_acsl_contract_partial_count_all_behaviors
       ((__e_acsl_contract_t const *)__gen_e_acsl_contract_3);
       if (__gen_e_acsl_active_bhvrs != 1) {
-        __e_acsl_assert(__gen_e_acsl_active_bhvrs >= 1,"Precondition","main",
-                        "all behaviors complete",
+        __e_acsl_assert(__gen_e_acsl_active_bhvrs >= 1,1,"Precondition",
+                        "main","all behaviors complete",
                         "tests/constructs/stmt_contract.i",64);
-        __e_acsl_assert(__gen_e_acsl_active_bhvrs <= 1,"Precondition","main",
-                        "all behaviors disjoint",
+        __e_acsl_assert(__gen_e_acsl_active_bhvrs <= 1,1,"Precondition",
+                        "main","all behaviors disjoint",
                         "tests/constructs/stmt_contract.i",64);
       }
     }
@@ -172,24 +175,25 @@ int main(void)
         disjoint behaviors neg, pos;
     */
     if (x < 0) z = - x; else z = x;
-    __e_acsl_assert(z >= 0,"Postcondition","main","z >= 0",
+    __e_acsl_assert(z >= 0,1,"Postcondition","main","z >= 0",
                     "tests/constructs/stmt_contract.i",51);
     __gen_e_acsl_assumes_value_4 = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract_3,(size_t)0);
-    if (__gen_e_acsl_assumes_value_4) __e_acsl_assert(z == x,"Postcondition",
-                                                      "main","pos: z == x",
+    if (__gen_e_acsl_assumes_value_4) __e_acsl_assert(z == x,1,
+                                                      "Postcondition","main",
+                                                      "pos: z == x",
                                                       "tests/constructs/stmt_contract.i",
                                                       55);
     __gen_e_acsl_assumes_value_4 = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract_3,(size_t)1);
     if (__gen_e_acsl_assumes_value_4) __e_acsl_assert((long)z == - ((long)x),
-                                                      "Postcondition","main",
-                                                      "neg: z == -x",
+                                                      1,"Postcondition",
+                                                      "main","neg: z == -x",
                                                       "tests/constructs/stmt_contract.i",
                                                       59);
     __e_acsl_contract_clean(__gen_e_acsl_contract_3);
   }
-  __e_acsl_assert(x == 7,"Precondition","main","x == 7",
+  __e_acsl_assert(x == 7,1,"Precondition","main","x == 7",
                   "tests/constructs/stmt_contract.i",70);
   /*@ requires x ≡ 7;
       ensures x ≡ 7; */
@@ -197,7 +201,7 @@ int main(void)
     __retres = 0;
     goto return_label;
   }
-  __e_acsl_assert(x == 7,"Postcondition","main","x == 7",
+  __e_acsl_assert(x == 7,1,"Postcondition","main","x == 7",
                   "tests/constructs/stmt_contract.i",71);
   return_label: return __retres;
 }

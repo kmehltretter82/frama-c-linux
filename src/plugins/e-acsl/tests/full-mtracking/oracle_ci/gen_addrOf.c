@@ -18,7 +18,7 @@ void f(void)
   {
     int __gen_e_acsl_initialized;
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)p,sizeof(int));
-    __e_acsl_assert(__gen_e_acsl_initialized,"Assertion","f",
+    __e_acsl_assert(__gen_e_acsl_initialized,1,"Assertion","f",
                     "\\initialized(p)","tests/full-mtracking/addrOf.i",10);
   }
   /*@ assert \initialized(p); */ ;
@@ -55,7 +55,7 @@ int main(void)
   __e_acsl_store_block((void *)(& x),(size_t)4);
   __e_acsl_full_init((void *)(& x));
   f();
-  __e_acsl_assert(& x == & x,"Assertion","main","&x == &x",
+  __e_acsl_assert(& x == & x,1,"Assertion","main","&x == &x",
                   "tests/full-mtracking/addrOf.i",16);
   /*@ assert &x ≡ &x; */ ;
   __e_acsl_full_init((void *)(& __retres));

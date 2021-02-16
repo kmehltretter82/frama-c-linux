@@ -45,7 +45,7 @@ int main(int argc, char const **argv)
       __gen_e_acsl_and = __gen_e_acsl_valid;
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,"Assertion","main","\\valid(d)",
+    __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","main","\\valid(d)",
                     "tests/memory/ctype_macros.c",39);
   }
   /*@ assert \valid(d); */ ;
@@ -103,13 +103,14 @@ int __gen_e_acsl_isupper(int c)
     if (0 <= c) __gen_e_acsl_and_4 = c <= 255; else __gen_e_acsl_and_4 = 0;
     if (__gen_e_acsl_and_4) __gen_e_acsl_or_3 = 1;
     else __gen_e_acsl_or_3 = c == -1;
-    __e_acsl_assert(__gen_e_acsl_or_3,"Precondition","isupper",
-                    "(0 <= c <= 255) || c == -1","FRAMAC_SHARE/libc/ctype.h",
-                    174);
+    __e_acsl_assert(__gen_e_acsl_or_3,1,"Precondition","isupper",
+                    "c_uchar_or_eof: (0 <= c <= 255) || c == -1",
+                    "FRAMAC_SHARE/libc/ctype.h",174);
     __gen_e_acsl_active_bhvrs = __e_acsl_contract_partial_count_all_behaviors
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract);
-    __e_acsl_assert(__gen_e_acsl_active_bhvrs <= 1,"Precondition","isupper",
-                    "all behaviors disjoint","FRAMAC_SHARE/libc/ctype.h",173);
+    __e_acsl_assert(__gen_e_acsl_active_bhvrs <= 1,1,"Precondition",
+                    "isupper","all behaviors disjoint",
+                    "FRAMAC_SHARE/libc/ctype.h",173);
   }
   __retres = isupper(c);
   {
@@ -120,16 +121,16 @@ int __gen_e_acsl_isupper(int c)
       int __gen_e_acsl_or_4;
       if (__retres < 0) __gen_e_acsl_or_4 = 1;
       else __gen_e_acsl_or_4 = __retres > 0;
-      __e_acsl_assert(__gen_e_acsl_or_4,"Postcondition","isupper",
-                      "definitely_match: \\result < 0 || \\result > 0",
+      __e_acsl_assert(__gen_e_acsl_or_4,1,"Postcondition","isupper",
+                      "definitely_match: nonzero_result: \\result < 0 || \\result > 0",
                       "FRAMAC_SHARE/libc/ctype.h",178);
     }
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)1);
-    if (__gen_e_acsl_assumes_value) __e_acsl_assert(__retres == 0,
+    if (__gen_e_acsl_assumes_value) __e_acsl_assert(__retres == 0,1,
                                                     "Postcondition",
                                                     "isupper",
-                                                    "definitely_not_match: \\result == 0",
+                                                    "definitely_not_match: zero_result: \\result == 0",
                                                     "FRAMAC_SHARE/libc/ctype.h",
                                                     181);
     __e_acsl_contract_clean(__gen_e_acsl_contract);

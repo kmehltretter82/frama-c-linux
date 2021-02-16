@@ -74,7 +74,7 @@ int main(void)
       __gen_e_acsl_and = __gen_e_acsl_valid;
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,"Assertion","main","\\valid(src[0])",
+    __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","main","\\valid(src[0])",
                     "tests/temporal/t_memcpy.c",22);
   }
   /*@ assert \valid(src[0]); */ ;
@@ -91,8 +91,8 @@ int main(void)
       __gen_e_acsl_and_2 = __gen_e_acsl_valid_2;
     }
     else __gen_e_acsl_and_2 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_2,"Assertion","main","\\valid(src[1])",
-                    "tests/temporal/t_memcpy.c",23);
+    __e_acsl_assert(__gen_e_acsl_and_2,1,"Assertion","main",
+                    "\\valid(src[1])","tests/temporal/t_memcpy.c",23);
   }
   /*@ assert \valid(src[1]); */ ;
   __e_acsl_temporal_reset_parameters();
@@ -113,8 +113,8 @@ int main(void)
       __gen_e_acsl_and_3 = __gen_e_acsl_valid_3;
     }
     else __gen_e_acsl_and_3 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_3,"Assertion","main","\\valid(dest[0])",
-                    "tests/temporal/t_memcpy.c",27);
+    __e_acsl_assert(__gen_e_acsl_and_3,1,"Assertion","main",
+                    "\\valid(dest[0])","tests/temporal/t_memcpy.c",27);
   }
   /*@ assert \valid(dest[0]); */ ;
   {
@@ -130,8 +130,8 @@ int main(void)
       __gen_e_acsl_and_4 = __gen_e_acsl_valid_4;
     }
     else __gen_e_acsl_and_4 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_4,"Assertion","main","\\valid(dest[1])",
-                    "tests/temporal/t_memcpy.c",28);
+    __e_acsl_assert(__gen_e_acsl_and_4,1,"Assertion","main",
+                    "\\valid(dest[1])","tests/temporal/t_memcpy.c",28);
   }
   /*@ assert \valid(dest[1]); */ ;
   __e_acsl_temporal_reset_parameters();
@@ -150,7 +150,7 @@ int main(void)
       __gen_e_acsl_and_5 = __gen_e_acsl_valid_5;
     }
     else __gen_e_acsl_and_5 = 0;
-    __e_acsl_assert(! __gen_e_acsl_and_5,"Assertion","main",
+    __e_acsl_assert(! __gen_e_acsl_and_5,1,"Assertion","main",
                     "!\\valid(dest[0])","tests/temporal/t_memcpy.c",32);
   }
   /*@ assert ¬\valid(dest[0]); */ ;
@@ -167,7 +167,7 @@ int main(void)
       __gen_e_acsl_and_6 = __gen_e_acsl_valid_6;
     }
     else __gen_e_acsl_and_6 = 0;
-    __e_acsl_assert(! __gen_e_acsl_and_6,"Assertion","main",
+    __e_acsl_assert(! __gen_e_acsl_and_6,1,"Assertion","main",
                     "!\\valid(dest[1])","tests/temporal/t_memcpy.c",33);
   }
   /*@ assert ¬\valid(dest[1]); */ ;
@@ -209,7 +209,7 @@ int main(void)
         __gen_e_acsl_and_7 = __gen_e_acsl_valid_read;
       }
       else __gen_e_acsl_and_7 = 0;
-      __e_acsl_assert(__gen_e_acsl_and_7,"RTE","main",
+      __e_acsl_assert(__gen_e_acsl_and_7,1,"RTE","main",
                       "mem_access: \\valid_read(p)",
                       "tests/temporal/t_memcpy.c",42);
       __gen_e_acsl_valid_7 = __e_acsl_valid((void *)*p,sizeof(int),
@@ -217,7 +217,7 @@ int main(void)
       __gen_e_acsl_and_8 = __gen_e_acsl_valid_7;
     }
     else __gen_e_acsl_and_8 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_8,"Assertion","main","\\valid(*p)",
+    __e_acsl_assert(__gen_e_acsl_and_8,1,"Assertion","main","\\valid(*p)",
                     "tests/temporal/t_memcpy.c",42);
   }
   /*@ assert \valid(*p); */ ;
@@ -233,7 +233,7 @@ int main(void)
                                                       sizeof(int *),
                                                       (void *)p,
                                                       (void *)(& p));
-      __e_acsl_assert(__gen_e_acsl_valid_read_2,"RTE","main",
+      __e_acsl_assert(__gen_e_acsl_valid_read_2,1,"RTE","main",
                       "mem_access: \\valid_read(p + 1)",
                       "tests/temporal/t_memcpy.c",43);
       __gen_e_acsl_valid_8 = __e_acsl_valid((void *)*(p + 1),sizeof(int),
@@ -242,7 +242,7 @@ int main(void)
       __gen_e_acsl_and_9 = __gen_e_acsl_valid_8;
     }
     else __gen_e_acsl_and_9 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_9,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_and_9,1,"Assertion","main",
                     "\\valid(*(p + 1))","tests/temporal/t_memcpy.c",43);
   }
   /*@ assert \valid(*(p + 1)); */ ;
@@ -266,7 +266,7 @@ int main(void)
         __gen_e_acsl_and_10 = __gen_e_acsl_valid_read_3;
       }
       else __gen_e_acsl_and_10 = 0;
-      __e_acsl_assert(__gen_e_acsl_and_10,"RTE","main",
+      __e_acsl_assert(__gen_e_acsl_and_10,1,"RTE","main",
                       "mem_access: \\valid_read(q)",
                       "tests/temporal/t_memcpy.c",44);
       __gen_e_acsl_valid_9 = __e_acsl_valid((void *)*q,sizeof(int),
@@ -274,8 +274,8 @@ int main(void)
       __gen_e_acsl_and_11 = __gen_e_acsl_valid_9;
     }
     else __gen_e_acsl_and_11 = 0;
-    __e_acsl_assert(! __gen_e_acsl_and_11,"Assertion","main","!\\valid(*q)",
-                    "tests/temporal/t_memcpy.c",44);
+    __e_acsl_assert(! __gen_e_acsl_and_11,1,"Assertion","main",
+                    "!\\valid(*q)","tests/temporal/t_memcpy.c",44);
   }
   /*@ assert ¬\valid(*q); */ ;
   {
@@ -290,7 +290,7 @@ int main(void)
                                                       sizeof(int *),
                                                       (void *)q,
                                                       (void *)(& q));
-      __e_acsl_assert(__gen_e_acsl_valid_read_4,"RTE","main",
+      __e_acsl_assert(__gen_e_acsl_valid_read_4,1,"RTE","main",
                       "mem_access: \\valid_read(q + 1)",
                       "tests/temporal/t_memcpy.c",45);
       __gen_e_acsl_valid_10 = __e_acsl_valid((void *)*(q + 1),sizeof(int),
@@ -299,7 +299,7 @@ int main(void)
       __gen_e_acsl_and_12 = __gen_e_acsl_valid_10;
     }
     else __gen_e_acsl_and_12 = 0;
-    __e_acsl_assert(! __gen_e_acsl_and_12,"Assertion","main",
+    __e_acsl_assert(! __gen_e_acsl_and_12,1,"Assertion","main",
                     "!\\valid(*(q + 1))","tests/temporal/t_memcpy.c",45);
   }
   /*@ assert ¬\valid(*(q + 1)); */ ;
@@ -337,7 +337,7 @@ int main(void)
         __gen_e_acsl_and_13 = __gen_e_acsl_valid_read_5;
       }
       else __gen_e_acsl_and_13 = 0;
-      __e_acsl_assert(__gen_e_acsl_and_13,"RTE","main",
+      __e_acsl_assert(__gen_e_acsl_and_13,1,"RTE","main",
                       "mem_access: \\valid_read(q)",
                       "tests/temporal/t_memcpy.c",50);
       __gen_e_acsl_valid_11 = __e_acsl_valid((void *)*q,sizeof(int),
@@ -345,7 +345,7 @@ int main(void)
       __gen_e_acsl_and_14 = __gen_e_acsl_valid_11;
     }
     else __gen_e_acsl_and_14 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_14,"Assertion","main","\\valid(*q)",
+    __e_acsl_assert(__gen_e_acsl_and_14,1,"Assertion","main","\\valid(*q)",
                     "tests/temporal/t_memcpy.c",50);
   }
   /*@ assert \valid(*q); */ ;
@@ -361,7 +361,7 @@ int main(void)
                                                       sizeof(int *),
                                                       (void *)q,
                                                       (void *)(& q));
-      __e_acsl_assert(__gen_e_acsl_valid_read_6,"RTE","main",
+      __e_acsl_assert(__gen_e_acsl_valid_read_6,1,"RTE","main",
                       "mem_access: \\valid_read(q + 1)",
                       "tests/temporal/t_memcpy.c",51);
       __gen_e_acsl_valid_12 = __e_acsl_valid((void *)*(q + 1),sizeof(int),
@@ -370,7 +370,7 @@ int main(void)
       __gen_e_acsl_and_15 = __gen_e_acsl_valid_12;
     }
     else __gen_e_acsl_and_15 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_15,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_and_15,1,"Assertion","main",
                     "\\valid(*(q + 1))","tests/temporal/t_memcpy.c",51);
   }
   /*@ assert \valid(*(q + 1)); */ ;
@@ -406,8 +406,9 @@ void *__gen_e_acsl_memset(void *s, int c, size_t n)
   __e_acsl_temporal_memset(s,c,n);
   __gen_e_acsl_at = s;
   __retres = memset(s,c,n);
-  __e_acsl_assert(__retres == __gen_e_acsl_at,"Postcondition","memset",
-                  "\\result == \\old(s)","FRAMAC_SHARE/libc/string.h",119);
+  __e_acsl_assert(__retres == __gen_e_acsl_at,1,"Postcondition","memset",
+                  "result_ptr: \\result == \\old(s)",
+                  "FRAMAC_SHARE/libc/string.h",119);
   __e_acsl_delete_block((void *)(& s));
   return __retres;
 }
@@ -484,7 +485,7 @@ void *__gen_e_acsl_memcpy(void * __restrict dest,
     /*@ assert
         E_ACSL: separated_guard: \valid_read((char *)dest + (0 .. n - 1));
     */
-    __e_acsl_assert(__gen_e_acsl_valid_read,"RTE","memcpy",
+    __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","memcpy",
                     "separated_guard: \\valid_read((char *)dest + (0 .. n - 1))",
                     "FRAMAC_SHARE/libc/string.h",95);
     __gen_e_acsl__4 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_add));
@@ -499,7 +500,7 @@ void *__gen_e_acsl_memcpy(void * __restrict dest,
     /*@ assert
         E_ACSL: separated_guard: \valid_read((char *)src + (0 .. n - 1));
     */
-    __e_acsl_assert(__gen_e_acsl_valid_read_2,"RTE","memcpy",
+    __e_acsl_assert(__gen_e_acsl_valid_read_2,1,"RTE","memcpy",
                     "separated_guard: \\valid_read((char *)src + (0 .. n - 1))",
                     "FRAMAC_SHARE/libc/string.h",95);
     __gen_e_acsl__5 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_add));
@@ -515,8 +516,8 @@ void *__gen_e_acsl_memcpy(void * __restrict dest,
                                                 __gen_e_acsl_if_3,
                                                 (char *)src + 1 * 0,
                                                 __gen_e_acsl_if_4);
-    __e_acsl_assert(__gen_e_acsl_separated,"Precondition","memcpy",
-                    "\\separated((char *)dest + (0 .. n - 1), (char *)src + (0 .. n - 1))",
+    __e_acsl_assert(__gen_e_acsl_separated,1,"Precondition","memcpy",
+                    "separation:\n  \\separated((char *)dest + (0 .. n - 1), (char *)src + (0 .. n - 1))",
                     "FRAMAC_SHARE/libc/string.h",95);
     __e_acsl_temporal_reset_parameters();
     __e_acsl_temporal_reset_return();
@@ -532,8 +533,9 @@ void *__gen_e_acsl_memcpy(void * __restrict dest,
   }
   __gen_e_acsl_at = dest;
   __retres = memcpy(dest,src,n);
-  __e_acsl_assert(__retres == __gen_e_acsl_at,"Postcondition","memcpy",
-                  "\\result == \\old(dest)","FRAMAC_SHARE/libc/string.h",99);
+  __e_acsl_assert(__retres == __gen_e_acsl_at,1,"Postcondition","memcpy",
+                  "result_ptr: \\result == \\old(dest)",
+                  "FRAMAC_SHARE/libc/string.h",99);
   __e_acsl_delete_block((void *)(& src));
   __e_acsl_delete_block((void *)(& dest));
   return __retres;

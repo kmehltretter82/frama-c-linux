@@ -1,11 +1,11 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] tests/arith/functions_rec.c:22: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] tests/arith/functions_rec.c:22: Warning: 
   assertion got status unknown.
 [eva:alarm] tests/arith/functions_rec.c:23: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] tests/arith/functions_rec.c:23: Warning: 
   assertion got status unknown.
 [eva] tests/arith/functions_rec.c:7: Warning: 
@@ -15,7 +15,7 @@
                                              main).
   Assuming the call has no effect. The analysis will be unsound.
 [eva:alarm] tests/arith/functions_rec.c:24: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] tests/arith/functions_rec.c:24: Warning: 
   assertion got status unknown.
 [eva] tests/arith/functions_rec.c:10: Warning: 
@@ -37,7 +37,7 @@
                                              main).
   Assuming the call has no effect. The analysis will be unsound.
 [eva:alarm] tests/arith/functions_rec.c:10: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] tests/arith/functions_rec.c:10: Warning: 
   division by zero. assert __gen_e_acsl_f2_8 ≢ 0;
 [eva:alarm] tests/arith/functions_rec.c:10: Warning: 
@@ -64,7 +64,7 @@
   (int)(__gen_e_acsl_f2_9 * __gen_e_acsl_f2_11) / __gen_e_acsl_f2_13 ≤
   2147483647;
 [eva:alarm] tests/arith/functions_rec.c:26: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] tests/arith/functions_rec.c:26: Warning: 
   assertion got status unknown.
 [eva] tests/arith/functions_rec.c:14: Warning: 
@@ -82,6 +82,6 @@
                                              main).
   Assuming the call has no effect. The analysis will be unsound.
 [eva:alarm] tests/arith/functions_rec.c:30: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] tests/arith/functions_rec.c:30: Warning: 
   assertion got status unknown.

@@ -13,4 +13,4 @@
   signed overflow. assert n * tmp ≤ 2147483647;
                    (tmp from fact(n - 1))
 [eva:alarm] tests/bts/bts1395.i:14: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.

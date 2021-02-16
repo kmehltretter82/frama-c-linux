@@ -18,7 +18,7 @@ int f(void)
     int __gen_e_acsl_valid_read;
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)S,sizeof(char),
                                                   (void *)S,(void *)(& S));
-    __e_acsl_assert(__gen_e_acsl_valid_read,"Assertion","f",
+    __e_acsl_assert(__gen_e_acsl_valid_read,1,"Assertion","f",
                     "\\valid_read(S)","tests/bts/bts1837.i",10);
   }
   /*@ assert \valid_read(S); */ ;
@@ -36,7 +36,7 @@ int f(void)
       __gen_e_acsl_and = __gen_e_acsl_valid_read_2;
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,"Assertion","f","\\valid_read(s1)",
+    __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","f","\\valid_read(s1)",
                     "tests/bts/bts1837.i",11);
   }
   /*@ assert \valid_read(s1); */ ;
@@ -54,7 +54,7 @@ int f(void)
       __gen_e_acsl_and_2 = __gen_e_acsl_valid_read_3;
     }
     else __gen_e_acsl_and_2 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_2,"Assertion","f","\\valid_read(s2)",
+    __e_acsl_assert(__gen_e_acsl_and_2,1,"Assertion","f","\\valid_read(s2)",
                     "tests/bts/bts1837.i",12);
   }
   /*@ assert \valid_read(s2); */ ;
@@ -125,7 +125,7 @@ int main(void)
           __gen_e_acsl_and = __gen_e_acsl_valid_read;
         }
         else __gen_e_acsl_and = 0;
-        __e_acsl_assert(__gen_e_acsl_and,"Assertion","main",
+        __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","main",
                         "\\valid_read(s)","tests/bts/bts1837.i",20);
       }
       /*@ assert \valid_read(s); */ ;
@@ -141,7 +141,7 @@ int main(void)
           __gen_e_acsl_and_2 = __gen_e_acsl_valid;
         }
         else __gen_e_acsl_and_2 = 0;
-        __e_acsl_assert(! __gen_e_acsl_and_2,"Assertion","main",
+        __e_acsl_assert(! __gen_e_acsl_and_2,1,"Assertion","main",
                         "!\\valid(s)","tests/bts/bts1837.i",21);
       }
       /*@ assert ¬\valid(s); */ ;

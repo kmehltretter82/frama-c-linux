@@ -30,7 +30,7 @@ int main(void)
     int __gen_e_acsl_valid;
     __gen_e_acsl_valid = __e_acsl_valid((void *)(& a[4]),sizeof(int),
                                         (void *)(a),(void *)0);
-    __e_acsl_assert(! __gen_e_acsl_valid,"Assertion","main",
+    __e_acsl_assert(! __gen_e_acsl_valid,1,"Assertion","main",
                     "!\\valid(&a[4])","tests/memory/array_overflow.c",31);
   }
   /*@ assert ¬\valid(&a[4]); */ ;
@@ -44,7 +44,7 @@ int main(void)
                                           sizeof(int),
                                           (void *)(*((int (*)[])ap)),
                                           (void *)0);
-    __e_acsl_assert(! __gen_e_acsl_valid_2,"Assertion","main",
+    __e_acsl_assert(! __gen_e_acsl_valid_2,1,"Assertion","main",
                     "!\\valid(&(*((int (*)[])ap))[4])",
                     "tests/memory/array_overflow.c",36);
   }
@@ -62,7 +62,7 @@ int main(void)
     int __gen_e_acsl_valid_3;
     __gen_e_acsl_valid_3 = __e_acsl_valid((void *)(& d.arr[4]),sizeof(int),
                                           (void *)(& d.arr[0]),(void *)0);
-    __e_acsl_assert(! __gen_e_acsl_valid_3,"Assertion","main",
+    __e_acsl_assert(! __gen_e_acsl_valid_3,1,"Assertion","main",
                     "!\\valid(&d.arr[4])","tests/memory/array_overflow.c",42);
   }
   /*@ assert ¬\valid(&d.arr[4]); */ ;
@@ -72,7 +72,7 @@ int main(void)
                                           sizeof(int),
                                           (void *)(& (d2.p[1])->arr[0]),
                                           (void *)0);
-    __e_acsl_assert(__gen_e_acsl_valid_4,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_valid_4,1,"Assertion","main",
                     "\\valid(&(d2.p[1])->arr[2])",
                     "tests/memory/array_overflow.c",43);
   }

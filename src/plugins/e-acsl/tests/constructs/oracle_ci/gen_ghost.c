@@ -38,13 +38,13 @@ int main(void)
     __e_acsl_initialize((void *)P,sizeof(int));
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)P,sizeof(int),
                                                   (void *)P,(void *)(& P));
-    __e_acsl_assert(__gen_e_acsl_valid_read,"RTE","main",
+    __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","main",
                     "mem_access: \\valid_read(P)","tests/constructs/ghost.i",
                     13);
     __gen_e_acsl_valid = __e_acsl_valid((void *)P,sizeof(int),(void *)P,
                                         (void *)(& P));
-    __e_acsl_assert(__gen_e_acsl_valid,"RTE","main","mem_access: \\valid(P)",
-                    "tests/constructs/ghost.i",13);
+    __e_acsl_assert(__gen_e_acsl_valid,1,"RTE","main",
+                    "mem_access: \\valid(P)","tests/constructs/ghost.i",13);
   }
   (*P) ++;
   {
@@ -60,10 +60,10 @@ int main(void)
       __gen_e_acsl_and = __gen_e_acsl_valid_read_2;
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,"RTE","main",
+    __e_acsl_assert(__gen_e_acsl_and,1,"RTE","main",
                     "mem_access: \\valid_read(q)","tests/constructs/ghost.i",
                     14);
-    __e_acsl_assert(*q == G,"Assertion","main","*q == G",
+    __e_acsl_assert(*q == G,1,"Assertion","main","*q == G",
                     "tests/constructs/ghost.i",14);
   }
   /*@ assert *q ≡ G; */ ;

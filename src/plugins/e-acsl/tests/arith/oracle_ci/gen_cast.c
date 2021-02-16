@@ -6,23 +6,23 @@ int main(void)
   int __retres;
   long x = (long)0;
   int y = 0;
-  __e_acsl_assert((int)x == y,"Assertion","main","(int)x == y",
+  __e_acsl_assert((int)x == y,1,"Assertion","main","(int)x == y",
                   "tests/arith/cast.i",9);
   /*@ assert (int)x ≡ y; */ ;
-  __e_acsl_assert(x == (long)y,"Assertion","main","x == (long)y",
+  __e_acsl_assert(x == (long)y,1,"Assertion","main","x == (long)y",
                   "tests/arith/cast.i",10);
   /*@ assert x ≡ (long)y; */ ;
-  __e_acsl_assert(y == 0,"Assertion","main","y == (int)0",
+  __e_acsl_assert(y == 0,1,"Assertion","main","y == (int)0",
                   "tests/arith/cast.i",12);
   /*@ assert y ≡ (int)0; */ ;
-  __e_acsl_assert((unsigned int)y == 0U,"Assertion","main",
+  __e_acsl_assert((unsigned int)y == 0U,1,"Assertion","main",
                   "(unsigned int)y == (unsigned int)0","tests/arith/cast.i",
                   13);
   /*@ assert (unsigned int)y ≡ (unsigned int)0; */ ;
-  __e_acsl_assert(y != -1,"Assertion","main","y != (int)0xfffffffffffffff",
+  __e_acsl_assert(y != -1,1,"Assertion","main","y != (int)0xfffffffffffffff",
                   "tests/arith/cast.i",16);
   /*@ assert y ≢ (int)0xfffffffffffffff; */ ;
-  __e_acsl_assert((unsigned int)y != 4294967295U,"Assertion","main",
+  __e_acsl_assert((unsigned int)y != 4294967295U,1,"Assertion","main",
                   "(unsigned int)y != (unsigned int)0xfffffffffffffff",
                   "tests/arith/cast.i",17);
   /*@ assert (unsigned int)y ≢ (unsigned int)0xfffffffffffffff; */ ;

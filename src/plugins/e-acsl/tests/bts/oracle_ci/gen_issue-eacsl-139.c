@@ -42,7 +42,7 @@ void __gen_e_acsl_f(struct X *item)
                                                   sizeof(struct X),
                                                   (void *)item,
                                                   (void *)(& item));
-    __e_acsl_assert(__gen_e_acsl_valid_read,"RTE","f",
+    __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","f",
                     "mem_access: \\valid_read(item)",
                     "tests/bts/issue-eacsl-139.c",9);
     __gen_e_acsl_at_2 = *item;

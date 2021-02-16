@@ -19,7 +19,7 @@ int main(void)
       int __gen_e_acsl_initialized;
       __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& static_pair.a),
                                                       sizeof(int32_t));
-      __e_acsl_assert(! __gen_e_acsl_initialized,"Assertion","main",
+      __e_acsl_assert(! __gen_e_acsl_initialized,1,"Assertion","main",
                       "!\\initialized(&static_pair.a)",
                       "tests/memory/struct_initialized.c",13);
     }
@@ -28,7 +28,7 @@ int main(void)
       int __gen_e_acsl_initialized_2;
       __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& static_pair.b),
                                                         sizeof(int32_t));
-      __e_acsl_assert(! __gen_e_acsl_initialized_2,"Assertion","main",
+      __e_acsl_assert(! __gen_e_acsl_initialized_2,1,"Assertion","main",
                       "!\\initialized(&static_pair.b)",
                       "tests/memory/struct_initialized.c",14);
     }
@@ -39,7 +39,7 @@ int main(void)
       int __gen_e_acsl_initialized_3;
       __gen_e_acsl_initialized_3 = __e_acsl_initialized((void *)(& static_pair.a),
                                                         sizeof(int32_t));
-      __e_acsl_assert(__gen_e_acsl_initialized_3,"Assertion","main",
+      __e_acsl_assert(__gen_e_acsl_initialized_3,1,"Assertion","main",
                       "\\initialized(&static_pair.a)",
                       "tests/memory/struct_initialized.c",16);
     }
@@ -48,7 +48,7 @@ int main(void)
       int __gen_e_acsl_initialized_4;
       __gen_e_acsl_initialized_4 = __e_acsl_initialized((void *)(& static_pair.b),
                                                         sizeof(int32_t));
-      __e_acsl_assert(! __gen_e_acsl_initialized_4,"Assertion","main",
+      __e_acsl_assert(! __gen_e_acsl_initialized_4,1,"Assertion","main",
                       "!\\initialized(&static_pair.b)",
                       "tests/memory/struct_initialized.c",17);
     }
@@ -59,7 +59,7 @@ int main(void)
       int __gen_e_acsl_initialized_5;
       __gen_e_acsl_initialized_5 = __e_acsl_initialized((void *)(& static_pair.a),
                                                         sizeof(int32_t));
-      __e_acsl_assert(__gen_e_acsl_initialized_5,"Assertion","main",
+      __e_acsl_assert(__gen_e_acsl_initialized_5,1,"Assertion","main",
                       "\\initialized(&static_pair.a)",
                       "tests/memory/struct_initialized.c",19);
     }
@@ -68,7 +68,7 @@ int main(void)
       int __gen_e_acsl_initialized_6;
       __gen_e_acsl_initialized_6 = __e_acsl_initialized((void *)(& static_pair.b),
                                                         sizeof(int32_t));
-      __e_acsl_assert(__gen_e_acsl_initialized_6,"Assertion","main",
+      __e_acsl_assert(__gen_e_acsl_initialized_6,1,"Assertion","main",
                       "\\initialized(&static_pair.b)",
                       "tests/memory/struct_initialized.c",20);
     }
@@ -83,7 +83,7 @@ int main(void)
       int __gen_e_acsl_initialized_7;
       __gen_e_acsl_initialized_7 = __e_acsl_initialized((void *)(& heap_pair->a),
                                                         sizeof(int32_t));
-      __e_acsl_assert(! __gen_e_acsl_initialized_7,"Assertion","main",
+      __e_acsl_assert(! __gen_e_acsl_initialized_7,1,"Assertion","main",
                       "!\\initialized(&heap_pair->a)",
                       "tests/memory/struct_initialized.c",26);
     }
@@ -92,7 +92,7 @@ int main(void)
       int __gen_e_acsl_initialized_8;
       __gen_e_acsl_initialized_8 = __e_acsl_initialized((void *)(& heap_pair->b),
                                                         sizeof(int32_t));
-      __e_acsl_assert(! __gen_e_acsl_initialized_8,"Assertion","main",
+      __e_acsl_assert(! __gen_e_acsl_initialized_8,1,"Assertion","main",
                       "!\\initialized(&heap_pair->b)",
                       "tests/memory/struct_initialized.c",27);
     }
@@ -103,7 +103,7 @@ int main(void)
       int __gen_e_acsl_initialized_9;
       __gen_e_acsl_initialized_9 = __e_acsl_initialized((void *)(& heap_pair->a),
                                                         sizeof(int32_t));
-      __e_acsl_assert(__gen_e_acsl_initialized_9,"Assertion","main",
+      __e_acsl_assert(__gen_e_acsl_initialized_9,1,"Assertion","main",
                       "\\initialized(&heap_pair->a)",
                       "tests/memory/struct_initialized.c",29);
     }
@@ -112,7 +112,7 @@ int main(void)
       int __gen_e_acsl_initialized_10;
       __gen_e_acsl_initialized_10 = __e_acsl_initialized((void *)(& heap_pair->b),
                                                          sizeof(int32_t));
-      __e_acsl_assert(! __gen_e_acsl_initialized_10,"Assertion","main",
+      __e_acsl_assert(! __gen_e_acsl_initialized_10,1,"Assertion","main",
                       "!\\initialized(&heap_pair->b)",
                       "tests/memory/struct_initialized.c",30);
     }
@@ -123,7 +123,7 @@ int main(void)
       int __gen_e_acsl_initialized_11;
       __gen_e_acsl_initialized_11 = __e_acsl_initialized((void *)(& heap_pair->a),
                                                          sizeof(int32_t));
-      __e_acsl_assert(__gen_e_acsl_initialized_11,"Assertion","main",
+      __e_acsl_assert(__gen_e_acsl_initialized_11,1,"Assertion","main",
                       "\\initialized(&heap_pair->a)",
                       "tests/memory/struct_initialized.c",32);
     }
@@ -132,7 +132,7 @@ int main(void)
       int __gen_e_acsl_initialized_12;
       __gen_e_acsl_initialized_12 = __e_acsl_initialized((void *)(& heap_pair->b),
                                                          sizeof(int32_t));
-      __e_acsl_assert(__gen_e_acsl_initialized_12,"Assertion","main",
+      __e_acsl_assert(__gen_e_acsl_initialized_12,1,"Assertion","main",
                       "\\initialized(&heap_pair->b)",
                       "tests/memory/struct_initialized.c",33);
     }

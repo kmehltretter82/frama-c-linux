@@ -6,42 +6,42 @@ int main(void)
   int __retres;
   int x = 0;
   int y = 1;
-  __e_acsl_assert(x < y,"Assertion","main","x < y",
+  __e_acsl_assert(x < y,1,"Assertion","main","x < y",
                   "tests/constructs/nested_code_annot.i",7);
   /*@ assert x < y; */ ;
-  __e_acsl_assert(x == 0,"Precondition","main","x == 0",
+  __e_acsl_assert(x == 0,1,"Precondition","main","x == 0",
                   "tests/constructs/nested_code_annot.i",8);
   /*@ requires x ≡ 0;
       ensures x ≥ 1; */
   if (x) {
-    __e_acsl_assert(0,"Assertion","main","\\false",
+    __e_acsl_assert(0,1,"Assertion","main","\\false",
                     "tests/constructs/nested_code_annot.i",11);
     /*@ assert \false; */ ;
   }
   else {
-    __e_acsl_assert(x == 0,"Precondition","main","x == 0",
+    __e_acsl_assert(x == 0,1,"Precondition","main","x == 0",
                     "tests/constructs/nested_code_annot.i",13);
     /*@ requires x ≡ 0;
         ensures x ≡ 1; */
     x ++;
-    __e_acsl_assert(x == 1,"Postcondition","main","x == 1",
+    __e_acsl_assert(x == 1,1,"Postcondition","main","x == 1",
                     "tests/constructs/nested_code_annot.i",14);
     if (x) {
-      __e_acsl_assert(x == 1,"Precondition","main","x == 1",
+      __e_acsl_assert(x == 1,1,"Precondition","main","x == 1",
                       "tests/constructs/nested_code_annot.i",17);
       /*@ requires x ≡ 1;
           ensures x ≡ 2; */
       x ++;
-      __e_acsl_assert(x == 2,"Postcondition","main","x == 2",
+      __e_acsl_assert(x == 2,1,"Postcondition","main","x == 2",
                       "tests/constructs/nested_code_annot.i",18);
     }
     else {
-      __e_acsl_assert(0,"Assertion","main","\\false",
+      __e_acsl_assert(0,1,"Assertion","main","\\false",
                       "tests/constructs/nested_code_annot.i",21);
       /*@ assert \false; */ ;
     }
   }
-  __e_acsl_assert(x >= 1,"Postcondition","main","x >= 1",
+  __e_acsl_assert(x >= 1,1,"Postcondition","main","x >= 1",
                   "tests/constructs/nested_code_annot.i",9);
   __retres = 0;
   return __retres;

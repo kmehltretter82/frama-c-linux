@@ -8,10 +8,10 @@ enum bool {
 int main(void)
 {
   int __retres;
-  __e_acsl_assert(1,"Assertion","main","\'c\' == \'c\'",
+  __e_acsl_assert(1,1,"Assertion","main","\'c\' == \'c\'",
                   "tests/memory/other_constants.i",10);
   /*@ assert 'c' ≡ 'c'; */ ;
-  __e_acsl_assert(1,"Assertion","main","false != true",
+  __e_acsl_assert(1,1,"Assertion","main","false != true",
                   "tests/memory/other_constants.i",11);
   /*@ assert false ≢ true; */ ;
   __retres = 0;

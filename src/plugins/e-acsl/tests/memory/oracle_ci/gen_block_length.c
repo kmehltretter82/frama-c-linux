@@ -41,7 +41,7 @@ int main(void)
   {
     unsigned long __gen_e_acsl_block_length;
     __gen_e_acsl_block_length = __e_acsl_block_length((void *)(& ZERO));
-    __e_acsl_assert(__gen_e_acsl_block_length == 0UL,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_block_length == 0UL,1,"Assertion","main",
                     "\\block_length(&ZERO) == 0",
                     "tests/memory/block_length.c",15);
   }
@@ -49,7 +49,7 @@ int main(void)
   {
     unsigned long __gen_e_acsl_block_length_2;
     __gen_e_acsl_block_length_2 = __e_acsl_block_length((void *)(& zero));
-    __e_acsl_assert(__gen_e_acsl_block_length_2 == 0UL,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_block_length_2 == 0UL,1,"Assertion","main",
                     "\\block_length(&zero) == 0",
                     "tests/memory/block_length.c",16);
   }
@@ -58,7 +58,7 @@ int main(void)
   {
     unsigned long __gen_e_acsl_block_length_3;
     __gen_e_acsl_block_length_3 = __e_acsl_block_length((void *)(A));
-    __e_acsl_assert(__gen_e_acsl_block_length_3 == 16UL,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_block_length_3 == 16UL,1,"Assertion","main",
                     "\\block_length((int *)A) == sizeof(A)",
                     "tests/memory/block_length.c",20);
   }
@@ -66,7 +66,7 @@ int main(void)
   {
     unsigned long __gen_e_acsl_block_length_4;
     __gen_e_acsl_block_length_4 = __e_acsl_block_length((void *)(& A[3]));
-    __e_acsl_assert(__gen_e_acsl_block_length_4 == 16UL,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_block_length_4 == 16UL,1,"Assertion","main",
                     "\\block_length(&A[3]) == sizeof(A)",
                     "tests/memory/block_length.c",21);
   }
@@ -74,7 +74,7 @@ int main(void)
   {
     unsigned long __gen_e_acsl_block_length_5;
     __gen_e_acsl_block_length_5 = __e_acsl_block_length((void *)PA);
-    __e_acsl_assert(__gen_e_acsl_block_length_5 == 16UL,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_block_length_5 == 16UL,1,"Assertion","main",
                     "\\block_length(PA) == sizeof(A)",
                     "tests/memory/block_length.c",22);
   }
@@ -86,7 +86,7 @@ int main(void)
     __gen_e_acsl_block_length_6 = __e_acsl_block_length((void *)(PA + 1));
     __gen_e_acsl_block_length_7 = __e_acsl_block_length((void *)(& A[1]));
     __e_acsl_assert(__gen_e_acsl_block_length_6 == __gen_e_acsl_block_length_7,
-                    "Assertion","main",
+                    1,"Assertion","main",
                     "\\block_length(PA + 1) == \\block_length(&A[1])",
                     "tests/memory/block_length.c",24);
   }
@@ -100,7 +100,7 @@ int main(void)
   {
     unsigned long __gen_e_acsl_block_length_8;
     __gen_e_acsl_block_length_8 = __e_acsl_block_length((void *)(a));
-    __e_acsl_assert(__gen_e_acsl_block_length_8 == 16UL,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_block_length_8 == 16UL,1,"Assertion","main",
                     "\\block_length((int *)a) == sizeof(a)",
                     "tests/memory/block_length.c",29);
   }
@@ -108,7 +108,7 @@ int main(void)
   {
     unsigned long __gen_e_acsl_block_length_9;
     __gen_e_acsl_block_length_9 = __e_acsl_block_length((void *)(& a[3]));
-    __e_acsl_assert(__gen_e_acsl_block_length_9 == 16UL,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_block_length_9 == 16UL,1,"Assertion","main",
                     "\\block_length(&a[3]) == sizeof(a)",
                     "tests/memory/block_length.c",30);
   }
@@ -116,8 +116,8 @@ int main(void)
   {
     unsigned long __gen_e_acsl_block_length_10;
     __gen_e_acsl_block_length_10 = __e_acsl_block_length((void *)pa);
-    __e_acsl_assert(__gen_e_acsl_block_length_10 == 16UL,"Assertion","main",
-                    "\\block_length(pa) == sizeof(a)",
+    __e_acsl_assert(__gen_e_acsl_block_length_10 == 16UL,1,"Assertion",
+                    "main","\\block_length(pa) == sizeof(a)",
                     "tests/memory/block_length.c",31);
   }
   /*@ assert \block_length(pa) ≡ sizeof(a); */ ;
@@ -129,7 +129,7 @@ int main(void)
     __gen_e_acsl_block_length_11 = __e_acsl_block_length((void *)(pa + 1));
     __gen_e_acsl_block_length_12 = __e_acsl_block_length((void *)(& a[1]));
     __e_acsl_assert(__gen_e_acsl_block_length_11 == __gen_e_acsl_block_length_12,
-                    "Assertion","main",
+                    1,"Assertion","main",
                     "\\block_length(pa + 1) == \\block_length(&a[1])",
                     "tests/memory/block_length.c",33);
   }
@@ -143,7 +143,7 @@ int main(void)
   {
     unsigned long __gen_e_acsl_block_length_13;
     __gen_e_acsl_block_length_13 = __e_acsl_block_length((void *)(& l));
-    __e_acsl_assert(__gen_e_acsl_block_length_13 == 8UL,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_block_length_13 == 8UL,1,"Assertion","main",
                     "\\block_length(&l) == sizeof(long)",
                     "tests/memory/block_length.c",39);
   }
@@ -151,7 +151,7 @@ int main(void)
   {
     unsigned long __gen_e_acsl_block_length_14;
     __gen_e_acsl_block_length_14 = __e_acsl_block_length((void *)pl);
-    __e_acsl_assert(__gen_e_acsl_block_length_14 == 8UL,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_block_length_14 == 8UL,1,"Assertion","main",
                     "\\block_length(pl) == sizeof(long)",
                     "tests/memory/block_length.c",40);
   }
@@ -159,7 +159,7 @@ int main(void)
   {
     unsigned long __gen_e_acsl_block_length_15;
     __gen_e_acsl_block_length_15 = __e_acsl_block_length((void *)(pl + 7));
-    __e_acsl_assert(__gen_e_acsl_block_length_15 == 8UL,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_block_length_15 == 8UL,1,"Assertion","main",
                     "\\block_length(pl + 7) == sizeof(long)",
                     "tests/memory/block_length.c",41);
   }
@@ -173,7 +173,7 @@ int main(void)
     __gen_e_acsl_block_length_16 = __e_acsl_block_length((void *)pi);
     __gen_e_acsl_block_length_17 = __e_acsl_block_length((void *)(& l));
     __e_acsl_assert(__gen_e_acsl_block_length_16 == __gen_e_acsl_block_length_17,
-                    "Assertion","main",
+                    1,"Assertion","main",
                     "\\block_length(pi) == \\block_length(&l)",
                     "tests/memory/block_length.c",43);
   }
@@ -186,7 +186,7 @@ int main(void)
     __gen_e_acsl_block_length_18 = __e_acsl_block_length((void *)pi);
     __gen_e_acsl_block_length_19 = __e_acsl_block_length((void *)(& l));
     __e_acsl_assert(__gen_e_acsl_block_length_18 == __gen_e_acsl_block_length_19,
-                    "Assertion","main",
+                    1,"Assertion","main",
                     "\\block_length(pi) == \\block_length(&l)",
                     "tests/memory/block_length.c",45);
   }
@@ -198,16 +198,16 @@ int main(void)
   {
     unsigned long __gen_e_acsl_block_length_20;
     __gen_e_acsl_block_length_20 = __e_acsl_block_length((void *)p);
-    __e_acsl_assert(__gen_e_acsl_block_length_20 == size,"Assertion","main",
-                    "\\block_length(p) == size",
+    __e_acsl_assert(__gen_e_acsl_block_length_20 == size,1,"Assertion",
+                    "main","\\block_length(p) == size",
                     "tests/memory/block_length.c",50);
   }
   /*@ assert \block_length(p) ≡ size; */ ;
   {
     unsigned long __gen_e_acsl_block_length_21;
     __gen_e_acsl_block_length_21 = __e_acsl_block_length((void *)(p + 11));
-    __e_acsl_assert(__gen_e_acsl_block_length_21 == size,"Assertion","main",
-                    "\\block_length(p + 11) == size",
+    __e_acsl_assert(__gen_e_acsl_block_length_21 == size,1,"Assertion",
+                    "main","\\block_length(p + 11) == size",
                     "tests/memory/block_length.c",51);
   }
   /*@ assert \block_length(p + 11) ≡ size; */ ;
@@ -219,7 +219,7 @@ int main(void)
     __gen_e_acsl_block_length_22 = __e_acsl_block_length((void *)(p + 5));
     __gen_e_acsl_block_length_23 = __e_acsl_block_length((void *)(p - 5));
     __e_acsl_assert(__gen_e_acsl_block_length_22 == __gen_e_acsl_block_length_23,
-                    "Assertion","main",
+                    1,"Assertion","main",
                     "\\block_length(p + 5) == \\block_length(p - 5)",
                     "tests/memory/block_length.c",53);
   }
@@ -231,8 +231,8 @@ int main(void)
   {
     unsigned long __gen_e_acsl_block_length_24;
     __gen_e_acsl_block_length_24 = __e_acsl_block_length((void *)q);
-    __e_acsl_assert(__gen_e_acsl_block_length_24 == size,"Assertion","main",
-                    "\\block_length(q) == size",
+    __e_acsl_assert(__gen_e_acsl_block_length_24 == size,1,"Assertion",
+                    "main","\\block_length(q) == size",
                     "tests/memory/block_length.c",59);
   }
   /*@ assert \block_length(q) ≡ size; */ ;
@@ -241,8 +241,8 @@ int main(void)
   {
     unsigned long __gen_e_acsl_block_length_25;
     __gen_e_acsl_block_length_25 = __e_acsl_block_length((void *)q);
-    __e_acsl_assert(__gen_e_acsl_block_length_25 == size,"Assertion","main",
-                    "\\block_length(q) == size",
+    __e_acsl_assert(__gen_e_acsl_block_length_25 == size,1,"Assertion",
+                    "main","\\block_length(q) == size",
                     "tests/memory/block_length.c",61);
   }
   /*@ assert \block_length(q) ≡ size; */ ;

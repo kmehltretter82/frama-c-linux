@@ -12,16 +12,16 @@
 [eva:alarm] FRAMAC_SHARE/libc/stdlib.h:488: Warning: 
   pointer comparison. assert \pointer_comparable((void *)__retres, (void *)0);
 [eva:alarm] FRAMAC_SHARE/libc/stdlib.h:488: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/stdlib.h:488: Warning: 
   function __gen_e_acsl_getenv: postcondition 'null_or_valid_result' got status unknown.
 [eva:alarm] tests/temporal/t_getenv.c:14: Warning: 
   pointer comparison. assert \pointer_comparable((void *)g1, (void *)0);
 [eva:alarm] tests/temporal/t_getenv.c:14: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] tests/temporal/t_getenv.c:14: Warning: assertion got status unknown.
 [eva:alarm] tests/temporal/t_getenv.c:15: Warning: 
   pointer comparison. assert \pointer_comparable((void *)g2, (void *)0);
 [eva:alarm] tests/temporal/t_getenv.c:15: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] tests/temporal/t_getenv.c:15: Warning: assertion got status unknown.
