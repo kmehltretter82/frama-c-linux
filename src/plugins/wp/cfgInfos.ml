@@ -196,19 +196,16 @@ end
 (* --- Main Collection Pass                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-let post_props_ids ~bhv ~prop tk (b: CfgAnnot.behavior) =
-  let assigns, posts =  match tk with
-    | Cil_types.Exits -> b.bhv_exit_assigns, b.bhv_exits
-    | _ -> b.bhv_post_assigns, b.bhv_ensures
-  in
-  let ps = List.filter (selected ~prop ~bhv) @@ List.map fst posts in
-  match assigns with
-  | WpPropId.AssignsLocations(id, _) -> Bag.list (id :: ps)
-  | _ -> Bag.list ps
-
-let dead_posts ~bhv ~prop tk behaviors =
-  let collect_dead b = Bag.concat (post_props_ids ~bhv ~prop tk b) in
-  List.fold_right collect_dead behaviors Bag.empty
+let dead_posts ~bhv ~prop tk (bhvs : CfgAnnot.behavior list) =
+  let post ~bhv ~prop tk (b: CfgAnnot.behavior) =
+    let assigns, ps =  match tk with
+      | Cil_types.Exits -> b.bhv_exit_assigns, b.bhv_exits
+      | _ -> b.bhv_post_assigns, b.bhv_ensures in
+    let ps = List.filter (selected ~prop ~bhv) @@ List.map fst ps in
+    match assigns with
+    | WpPropId.AssignsLocations(id, _) -> Bag.list (id :: ps)
+    | _ -> Bag.list ps
+  in Bag.umap_list (post ~bhv ~prop tk) bhvs
 
 let loop_contract_pids kf stmt =
   match stmt.Cil_types.skind with
@@ -276,16 +273,20 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
                infos.calls <- Fset.union fs infos.calls ;
              end
         ) cfg.stmt_table ;
-
-      let exits = not @@ Fset.is_empty infos.calls in
-      let mapper fb = CfgAnnot.get_behavior kf ~exits ~active:bhv fb in
-      let behaviors = List.map mapper behaviors in
-      if not exits then
+      (* Dead Post Conditions *)
+      let dead_exit = Fset.is_empty infos.calls in
+      let dead_post = unreachable infos cfg.return_point in
+      let bhvs =
+        if dead_exit || dead_post then
+          let exits = not dead_exit in
+          List.map (CfgAnnot.get_behavior kf ~exits ~active:bhv) behaviors
+        else [] in
+      if dead_exit then
         infos.doomed <-
-          Bag.concat infos.doomed (dead_posts ~bhv ~prop Exits behaviors) ;
-      if unreachable infos cfg.return_point then
+          Bag.concat infos.doomed (dead_posts ~bhv ~prop Exits bhvs) ;
+      if dead_post then
         infos.doomed <-
-          Bag.concat infos.doomed (dead_posts ~bhv ~prop Normal behaviors) ;
+          Bag.concat infos.doomed (dead_posts ~bhv ~prop Normal bhvs) ;
     end body ;
   (* Doomed *)
   Bag.iter
