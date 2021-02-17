@@ -17,7 +17,9 @@ Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
-  Have: (b != a) /\ valid_rd(Malloc_0, b, 1) /\ valid_rw(Malloc_0, a, 1).
+  Have: valid_rd(Malloc_0, b, 1) /\ valid_rw(Malloc_0, a, 1).
+  (* Pre-condition *)
+  Have: b != a.
 }
 Prove: valid_rd(Malloc_0, a, 1).
 
@@ -62,7 +64,9 @@ Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
-  Have: (b != a) /\ valid_rd(Malloc_0, a, 1) /\ valid_rd(Malloc_0, b, 1).
+  Have: valid_rd(Malloc_0, a, 1) /\ valid_rd(Malloc_0, b, 1).
+  (* Pre-condition *)
+  Have: b != a.
 }
 Prove: valid_rw(Malloc_0, a, 1).
 
