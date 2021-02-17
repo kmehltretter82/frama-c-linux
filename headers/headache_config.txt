@@ -136,6 +136,13 @@
 ##############
 | ".*\.el" -> frame open: ";" line: ";" close:";"
 
+##########
+# Python #
+##########
+
+| ".*\.py" -> frame open: "#" line: "#" close:"#"
+| ".*\.py" -> skip multiline_match: "#!.*" multiline_match: "#-\*-.*"
+
 ##############
 # Misc files #
 ##############

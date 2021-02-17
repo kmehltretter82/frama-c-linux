@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2020                                               #
+#  Copyright (C) 2007-2021                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -785,12 +785,11 @@ PLUGIN_DIR:=src/plugins/callgraph
 PLUGIN_CMO:= options journalize subgraph cg services uses register
 ifeq ($(HAS_DGRAPH),yes)
 PLUGIN_GUI_CMO:=cg_viewer
-PLUGIN_DISTRIB_EXTERNAL:=cg_viewer.yes.ml
 PLUGIN_GENERATED:=$(PLUGIN_DIR)/cg_viewer.ml
 else
 PLUGIN_GUI_CMO:=
-PLUGIN_DISTRIB_EXTERNAL:=cg_viewer.ml
 endif
+PLUGIN_DISTRIB_EXTERNAL:=cg_viewer.yes.ml
 PLUGIN_CMI:= callgraph_api
 PLUGIN_INTERNAL_TEST:=yes
 PLUGIN_TESTS_DIRS:=callgraph
@@ -1634,10 +1633,10 @@ dots: $(ALL_CMO)
 	$(QUIET_MAKE) doc/call_graph.ps
 
 # pandoc is required to regenerate the manpage
-man/frama-c.1: man/frama-c.1.header man/frama-c.1.md
+man/frama-c.1: man/frama-c.1.md Makefile
 	$(PRINT) 'generating $@'
 	$(RM) $@
-	pandoc -s -t man -H $^ | tail -n +5 > man/frama-c.1
+	pandoc -s -t man $< > $@
 	$(CHMOD_RO) $@
 
 # Checking consistency with the current implementation

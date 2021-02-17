@@ -74,8 +74,13 @@ rec {
   lint = mk_deriv {
         name = "frama-c-lint";
         inherit src;
-        buildInputs = (mk_buildInputs { opamPackages = [ { name = "ocp-indent"; constraint = "=1.7.0"; } ];} )
-                      ++ [ pkgs.bc plugins.headache.installed ];
+        buildInputs =
+          (mk_buildInputs {
+            nixPackages = [ pkgs.bc ];
+            opamPackages = [
+              { name = "ocp-indent"; constraint = "=1.7.0"; }
+              { name = "headache"; constraint = "=1.05"; }
+            ];} );
         outputs = [ "out" ];
         postPatch = ''
                patchShebangs .
@@ -120,7 +125,11 @@ rec {
   build-distrib-tarball = mk_deriv {
         name = "frama-c-build-distrib-tarball";
         inherit src;
-        buildInputs = buildInputs ++ [ plugins.headache.installed ];
+        buildInputs =
+          (mk_buildInputs {
+            opamPackages = [
+              { name = "headache"; constraint = "=1.05"; }
+            ];} );
         outputs = [ "out" ];
         postPatch = ''
                patchShebangs .
