@@ -1634,10 +1634,10 @@ dots: $(ALL_CMO)
 	$(QUIET_MAKE) doc/call_graph.ps
 
 # pandoc is required to regenerate the manpage
-man/frama-c.1: man/frama-c.1.header man/frama-c.1.md
+man/frama-c.1: man/frama-c.1.md Makefile
 	$(PRINT) 'generating $@'
 	$(RM) $@
-	pandoc -s -t man -H $^ | tail -n +5 > man/frama-c.1
+	pandoc -s -t man $< > $@
 	$(CHMOD_RO) $@
 
 # Checking consistency with the current implementation
