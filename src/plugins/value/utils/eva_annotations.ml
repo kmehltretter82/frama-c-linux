@@ -211,6 +211,14 @@ module Merge = Register (struct
     let is_loop_annot = false
   end)
 
+module Taint = Register (struct
+    include SimpleTermAnnotation
+    let name = "taint"
+    let is_loop_annot = false
+  end)
+
+let get_taint_annot = Taint.get
+let add_taint_annot = Taint.add
 
 let get_slevel_annot stmt =
   try Some (List.hd (Slevel.get stmt))
