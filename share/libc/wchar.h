@@ -260,6 +260,13 @@ extern wchar_t *fgetws(wchar_t * restrict ws, int n, FILE * restrict stream);
   }
 */
 
+/*@
+  requires valid_wstring_ws1: valid_read_wstring(ws1);
+  requires valid_wstring_ws2: valid_read_wstring(ws2);
+  assigns \result \from indirect:ws1[0..], indirect:ws2[0..];
+*/
+extern int wcscasecmp(const wchar_t *ws1, const wchar_t *ws2);
+
 /* It is unclear whether these are more often in wchar.h or stdio.h */
 
 extern int fwprintf(FILE * stream, const wchar_t * format, ...);

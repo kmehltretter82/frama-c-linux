@@ -69,6 +69,13 @@ int main() {
   wchar_t *wmr1 = wmemchr(wc, L'C', 2); // not found
   wchar_t *wmr2 = wmemchr(p, L'C', 2); // found
 
+#ifdef TEST_IMPLEMENTATION
+  wchar_t *dupbuf = wcsdup(wc);
+  if (!dupbuf) goto exit;
+  dupbuf = wcsdup(dupbuf); // memory leak
+  free(dupbuf);
+#endif
+
 exit:
   return 0;
 }
