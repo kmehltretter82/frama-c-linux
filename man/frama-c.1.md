@@ -547,8 +547,8 @@ is installed.
 
 # SEE ALSO
 
-Frama-C user manual: http://frama-c.com/download/frama-c-user-manual.pdf
+Frama-C user manual: https://frama-c.com/download/frama-c-user-manual.pdf
 
-Frama-C homepage: http://frama-c.com
+Frama-C homepage: https://frama-c.com
 
-Frama-C BTS: http://bts.frama-c.com
+Frama-C BTS: https://git.frama-c.com/pub/frama-c/issues
