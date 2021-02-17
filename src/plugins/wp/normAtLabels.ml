@@ -135,16 +135,16 @@ let labels_fct_pre = function
   | BuiltinLabel (Pre|Here) -> Clabels.pre
   | l -> raise (LabelError l)
 
-let labels_fct_post = function
+let labels_fct_post ~exit = function
   | BuiltinLabel Init -> Clabels.init
   | BuiltinLabel (Pre | Old)  -> Clabels.pre
-  | BuiltinLabel (Post | Here) -> Clabels.post
+  | BuiltinLabel (Post | Here) -> if exit then Clabels.exit else Clabels.post
   | l -> raise (LabelError l)
 
-let labels_fct_assigns = function
+let labels_fct_assigns ~exit = function
   | BuiltinLabel Init -> Clabels.init
   | BuiltinLabel (Here | Pre | Old) -> Clabels.pre
-  | BuiltinLabel Post -> Clabels.post
+  | BuiltinLabel Post -> if exit then Clabels.exit else Clabels.post
   | l -> raise (LabelError l)
 
 (* -------------------------------------------------------------------------- *)

@@ -40,11 +40,10 @@ let here = "wp:here"
 let next = "wp:next"
 let pre = "wp:pre"
 let post = "wp:post"
-let old = "wp:old"
+let exit = "wp:exit"
 let break = "wp:break"
 let continue = "wp:continue"
 let default = "wp:default"
-let at_exit = "wp:exit"
 
 let loopcurrent = "wp:loopcurrent"
 let loopentry = "wp:loopentry"
@@ -70,14 +69,14 @@ let of_logic = function
   | BuiltinLabel Pre -> pre
   | BuiltinLabel Post -> post
   | FormalLabel name -> name
-  | BuiltinLabel Old -> old
+  | BuiltinLabel Old -> "wp:old"
   | BuiltinLabel LoopCurrent -> loopcurrent
   | BuiltinLabel LoopEntry -> loopentry
   | StmtLabel s -> stmt !s
 
 let is_post = function
   | BuiltinLabel Post -> true
-  | FormalLabel a -> a = post
+  | FormalLabel a -> a = post || a = exit
   | _ -> false
 
 let name = function FormalLabel a -> a | _ -> ""

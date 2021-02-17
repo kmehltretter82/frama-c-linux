@@ -354,25 +354,24 @@ struct
 
 
   let do_post env ~formals (b : CfgAnnot.behavior) w =
-    W.scope env.we formals SC_Frame_out @@
     W.label env.we None Clabels.post @@
+    W.scope env.we formals SC_Frame_out @@
     List.fold_right (prove_property env) b.bhv_ensures @@
     prove_assigns env b.bhv_post_assigns w
 
   let do_exit env ~formals (b : CfgAnnot.behavior) w =
+    W.label env.we None Clabels.exit @@
     W.scope env.we formals SC_Frame_out @@
-    W.label env.we None Clabels.at_exit @@
     List.fold_right (prove_property env) b.bhv_exits @@
     prove_assigns env b.bhv_exit_assigns w
 
-  let do_funbehavior env ~formals (b:CfgAnnot.behavior) w =
+  let do_funbehavior env ~formals ~exits (b:CfgAnnot.behavior) w =
     match env.body with
     | None -> w
     | Some cfg ->
         let wpost = do_post env ~formals b w in
-        let wexit = do_exit env ~formals b w in
         Vhash.add env.wp cfg.return_point (Some wpost) ;
-        env.wk <- wexit ;
+        env.wk <- if exits then do_exit env ~formals b w else w ;
         wp env cfg.entry_point
 
   (* Putting everything together *)
@@ -405,7 +404,7 @@ struct
       do_global_init env @@
       do_preconditions env ~formals bhv @@
       do_complete_disjoint env @@
-      do_funbehavior env ~formals bhv @@
+      do_funbehavior env ~formals ~exits bhv @@
       W.empty
     end
 

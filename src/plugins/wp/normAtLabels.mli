@@ -30,8 +30,8 @@ type label_mapping
 
 val labels_empty : label_mapping
 val labels_fct_pre : label_mapping
-val labels_fct_post : label_mapping
-val labels_fct_assigns : label_mapping
+val labels_fct_post : exit:bool -> label_mapping
+val labels_fct_assigns : exit:bool -> label_mapping
 val labels_assert : kf:kernel_function -> stmt -> label_mapping
 val labels_loop : stmt -> label_mapping
 val labels_stmt_pre : kf:kernel_function -> stmt -> label_mapping

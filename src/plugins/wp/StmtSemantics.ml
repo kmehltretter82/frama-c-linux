@@ -98,7 +98,7 @@ struct
                subst_formals = Varinfo.Map.empty} in
     env @* [
       Clabels.init, Cfg.node ();
-      Clabels.at_exit, Cfg.node();
+      Clabels.exit, Cfg.node();
     ]
 
   (* -------------------------------------------------------------------------- *)
@@ -380,7 +380,7 @@ struct
         @* [Clabels.init, env @: Clabels.init;
             Clabels.pre, pre_node; Clabels.here, pre_node;
             Clabels.next, post_node; Clabels.post, post_node;
-            Clabels.at_exit, env @: Clabels.at_exit]
+            Clabels.exit, env @: Clabels.exit]
       in
 
       (* TODO: Call inlining. *)
@@ -391,7 +391,7 @@ struct
       @^ result (env_call @* [(Clabels.here, return_node);
                               (Clabels.next, next_node)])
       @^ exit_status (env_call @* [(Clabels.here, exit_stop);
-                                   (Clabels.next, env @: Clabels.at_exit)])
+                                   (Clabels.next, env @: Clabels.exit)])
 
   and call
     : env -> lval option -> exp -> exp list -> paths
@@ -469,7 +469,7 @@ struct
         (fun acc post -> acc @^ post_cond Exits post_at_exit_env post)
         nop b.b_post_cond
       @^ goto post_normal_behavior  (env @: Clabels.post)
-      @^ goto post_at_exit_behavior (env @: Clabels.at_exit)
+      @^ goto post_at_exit_behavior (env @: Clabels.exit)
     in
     let env = env @* [Clabels.here, env @: Clabels.pre; Clabels.next, env @: Clabels.post] in
     parallel behavior env spec.spec_behavior

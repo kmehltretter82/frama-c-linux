@@ -321,7 +321,7 @@ let add_fct_assigns_goal config acc tkind b = match b.b_assigns with
       | None -> acc
       | Some id ->
           if goal_to_select config id then
-            let labels = NormAtLabels.labels_fct_assigns in
+            let labels = NormAtLabels.labels_fct_assigns ~exit:false in
             let assigns' = NormAtLabels.preproc_assigns labels assigns in
             let a_desc = WpPropId.mk_kf_assigns_desc assigns' in
             WpStrategy.add_assigns acc WpStrategy.Agoal id a_desc

@@ -196,7 +196,7 @@ let add_prop_fct_pre acc kind kf bhv ~assumes pre =
 let add_prop_fct_post acc kind kf  bhv tkind post =
   if verify_predicate post.ip_content.tp_kind then begin
     let id = WpPropId.mk_fct_post_id kf bhv (tkind, post) in
-    let labels = NormAtLabels.labels_fct_post in
+    let labels = NormAtLabels.labels_fct_post ~exit:false in
     let p = Logic_const.pred_of_id_pred post in
     let p = normalize id labels p in
     add_prop acc kind id p
@@ -261,7 +261,7 @@ let add_prop_call_pre acc kind id ~assumes pre =
 
 let add_prop_call_post acc kind called_kf bhv tkind ~assumes post =
   let id = WpPropId.mk_fct_post_id called_kf bhv (tkind, post) in
-  let labels = NormAtLabels.labels_fct_post in
+  let labels = NormAtLabels.labels_fct_post ~exit:false in
   let p = Logic_const.pred_of_id_pred post in
   let p = normalize id labels ~assumes p in
   add_prop acc kind id p
@@ -478,7 +478,7 @@ let add_fct_bhv_assigns_hyp acc kf tkind b = match b.b_assigns with
           let id = WpPropId.mk_kf_any_assigns_info () in
           add_assigns_any acc Ahyp id
       | Some id ->
-          let labels = NormAtLabels.labels_fct_assigns in
+          let labels = NormAtLabels.labels_fct_assigns ~exit:false in
           let assigns' = NormAtLabels.preproc_assigns labels assigns in
           let a_desc = WpPropId.mk_kf_assigns_desc assigns' in
           add_assigns acc Ahyp id a_desc

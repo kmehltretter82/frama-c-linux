@@ -44,13 +44,12 @@ val here : c_label
 val next : c_label
 val init : c_label
 val post : c_label
+val exit : c_label
 val break : c_label
 val continue : c_label
 val default : c_label
-val at_exit : c_label
 val loopentry : c_label
 val loopcurrent : c_label
-val old : c_label
 
 val formal : string -> c_label
 

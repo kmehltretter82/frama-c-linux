@@ -77,14 +77,15 @@ let normalize_pre kf bhv ?assumes ip =
 
 let normalize_post kf bhv tk ?assumes ip =
   let module L = NormAtLabels in
-  let labels = L.labels_fct_post in
+  let labels = L.labels_fct_post ~exit:(tk=Exits) in
   let id = WpPropId.mk_post_id kf Kglobal bhv (tk,ip) in
   let p = L.preproc_annot labels ip.ip_content.tp_statement in
   id , implies ?assumes p
 
-let normalize_froms froms =
+let normalize_froms tk froms =
   let module L = NormAtLabels in
-  L.preproc_assigns L.labels_fct_assigns froms
+  let labels = L.labels_fct_post ~exit:(tk=Exits) in
+  L.preproc_assigns labels froms
 
 let normalize_assigns kf ~exits bhv = function
   | WritesAny ->
@@ -94,7 +95,7 @@ let normalize_assigns kf ~exits bhv = function
         match WpPropId.mk_fct_assigns_id kf exits bhv tk froms with
         | None -> WpPropId.empty_assigns_info
         | Some id ->
-            let assigns = normalize_froms froms in
+            let assigns = normalize_froms tk froms in
             let desc = WpPropId.mk_kf_assigns_desc assigns in
             WpPropId.mk_assigns_info id desc
       in
