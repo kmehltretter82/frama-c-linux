@@ -29,9 +29,7 @@ let has_requires spec =
 
 let code_annotation_text ca =
   match ca.annot_content with
-  | AAssert (_, {tp_kind=Assert}) ->  "assertion"
-  | AAssert (_, {tp_kind=Check}) -> "check"
-  | AAssert (_, {tp_kind=Admit}) -> "admit"
+  | AAssert (_, {tp_kind}) -> Cil_printer.name_of_assert tp_kind
   | AInvariant _ ->  "loop invariant"
   | APragma _  | AVariant _ | AAssigns _ | AAllocation _ | AStmtSpec _
   | AExtended _  ->

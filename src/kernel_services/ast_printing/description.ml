@@ -120,13 +120,8 @@ let pp_top fmt tp = pp_named fmt tp.tp_statement
 let pp_code_annot fmt ca =
   match ca.annot_content with
   | AAssert(bs,tp) ->
-    let kind =
-      match tp.tp_kind with
-      | Assert -> "assertion"
-      | Check -> "check"
-      | Admit -> "admit"
-    in
-    Format.fprintf fmt "%s%a%a" kind pp_for bs pp_top tp
+    Format.fprintf fmt "%a%a%a"
+      Cil_printer.pp_assert_kind tp.tp_kind pp_for bs pp_top tp
   | AInvariant(bs,_,tp) ->
     Format.fprintf fmt "invariant%a%a" pp_for bs pp_top tp
   | AAssigns(bs,_) -> Format.fprintf fmt "assigns%a" pp_for bs

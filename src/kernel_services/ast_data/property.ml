@@ -420,10 +420,8 @@ let rec pretty_ip fmt = function
   | IPExtended {ie_ext} -> Cil_printer.pp_extended fmt ie_ext
   | IPAxiomatic {iax_name} -> Format.fprintf fmt "axiomatic@ %s" iax_name
   | IPLemma {il_name; il_pred} ->
-    (match il_pred.tp_kind with
-     | Admit -> Format.fprintf fmt "axiom@ %s" il_name
-     | Assert -> Format.fprintf fmt "lemma@ %s" il_name
-     | Check -> Format.fprintf fmt "check lemma@ %s" il_name)
+    Format.fprintf fmt "%a@ %s"
+      Cil_printer.pp_lemma_kind il_pred.tp_kind il_name
   | IPTypeInvariant {iti_name; iti_type} ->
     Format.fprintf fmt "invariant@ %s for type %a" iti_name
       Cil_printer.pp_typ iti_type
@@ -1135,11 +1133,10 @@ struct
       Format.asprintf  "%sextended%a" (extended_loc_prefix le) pp_names [ext_name]
     | IPCodeAnnot {ica_kf=kf; ica_ca=ca} ->
       let name = match ca.annot_content with
-        | AAssert (_, {tp_kind = Assert }) -> "assert"
-        | AAssert (_, {tp_kind = Check }) -> "check"
-        | AAssert (_, {tp_kind = Admit }) -> "admit"
-        | AInvariant (_,true,_) -> "loop_inv"
-        | AInvariant _ -> "inv"
+        | AAssert (_, {tp_kind}) -> Cil_printer.string_of_assert tp_kind
+        | AInvariant (_,loop,{tp_kind}) ->
+          let kw = if loop then "invariant" else "loop_invariant" in
+          Cil_printer.ident_of_predicate ~kw tp_kind
         | APragma _ -> "pragma"
         | AStmtSpec _ -> "contract"
         | AAssigns _ -> "assigns"
@@ -1161,7 +1158,9 @@ struct
       (kf_prefix kf) ^ "loop_term" ^ (variant_suffix variant)
     | IPAxiomatic {iax_name} -> "axiomatic_" ^ iax_name
     | IPLemma {il_name=name; il_pred} ->
-      Format.asprintf "lemma_%s%a" name pp_names il_pred.tp_statement.pred_name
+      Format.asprintf "%s_%s%a"
+        (Cil_printer.ident_of_lemma il_pred.tp_kind)
+        name pp_names il_pred.tp_statement.pred_name
     | IPTypeInvariant {iti_name; iti_pred} ->
       Format.asprintf "type_invariant_%s%a"
         iti_name pp_names iti_pred.pred_name
@@ -1169,10 +1168,10 @@ struct
       Format.asprintf "global_invariant_%s%a"
         igi_name pp_names igi_pred.pred_name
     | IPAllocation {ial_kf=kf; ial_kinstr=ki; ial_bhv=Id_contract (a,b)} ->
-      Format.asprintf "%s%s%a%salloc"
+      Format.asprintf "%s%s%a%sallocates"
         (kf_prefix kf) (ki_prefix ki) active_prefix a (behavior_prefix b)
     | IPAllocation {ial_kf=kf; ial_kinstr=Kstmt _; ial_bhv=Id_loop ca} ->
-      Format.asprintf "%sloop_alloc%a"
+      Format.asprintf "%sloop_allocates%a"
         (kf_prefix kf) pp_code_annot_names ca
     | IPAllocation _ -> assert false
     | IPAssigns {ias_kf=kf; ias_kinstr=ki; ias_bhv=Id_contract (a,b)} ->
@@ -1271,10 +1270,7 @@ struct
       add_part buffer p ; add_sep buffer ; add_parts buffer ps
 
   let prefix_with_kind tp name =
-    match tp.tp_kind with
-    | Assert -> name
-    | Check -> "check_" ^ name
-    | Admit -> "admit_" ^ name
+    Cil_printer.ident_of_predicate ~kw:name tp.tp_kind
 
   let rec parts_of_property ip : part list =
     match ip with
@@ -1334,11 +1330,7 @@ struct
                    ica_ca={annot_content=AExtended (_, _, {ext_name})}} ->
       [ K kf ; A ext_name ; S stmt ]
     | IPCodeAnnot {ica_kf=kf; ica_ca={annot_content=AAssert (_,p)}} ->
-      let a = match p.tp_kind with
-        | Assert -> "assert"
-        | Check -> "check"
-        | Admit -> "admit"
-      in
+      let a = Cil_printer.string_of_assert p.tp_kind in
       [K kf ; A a ; P p.tp_statement ]
     | IPCodeAnnot {ica_kf=kf; ica_ca={annot_content=AInvariant (_, true, p)}} ->
       let a = prefix_with_kind p "loop_invariant" in
@@ -1372,7 +1364,7 @@ struct
 
     | IPAxiomatic _ -> []
     | IPLemma {il_name=name; il_pred=p} ->
-      let a = prefix_with_kind p "lemma" in
+      let a = Cil_printer.ident_of_lemma p.tp_kind in
       [ A a ; A name ; P p.tp_statement ]
 
     | IPTypeInvariant {iti_name=name}

@@ -503,11 +503,8 @@ let to_do_on_select
       main_ui#pretty_information "This is an axiomatic.@.";
       main_ui#view_original (location ip)
     | PIP(IPLemma { il_pred } as ip) ->
-      let kind = match il_pred.tp_kind with
-        | Admit -> "axiom"
-        | Assert -> "lemma"
-        | Check -> "check lemma" in
-      main_ui#pretty_information "This is a %s.@." kind;
+      main_ui#pretty_information "This is a %a.@."
+        Cil_printer.pp_lemma_kind il_pred.tp_kind;
       main_ui#view_original (location ip)
     | PIP(IPTypeInvariant _ as ip) ->
       main_ui#pretty_information "This is a type invariant.@.";

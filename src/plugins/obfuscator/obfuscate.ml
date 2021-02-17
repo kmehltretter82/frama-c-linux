@@ -170,10 +170,7 @@ class visitor = object
       warn "axiomatic" str;
       Cil.DoChildren
     | Dlemma(str, _, _, { tp_kind }, _, _) ->
-      warn (match tp_kind with
-          | Admit -> "axiom"
-          | Assert -> "lemma"
-          | Check -> "check lemma") str;
+      warn (Cil_printer.string_of_lemma tp_kind) str;
       Cil.DoChildren
     | _ ->
       Cil.DoChildren

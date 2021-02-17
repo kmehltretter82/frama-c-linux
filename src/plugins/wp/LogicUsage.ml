@@ -543,13 +543,9 @@ let pp_decl fmt d l =
       pp_sig fmt kind l ;
   end
 
-let pp_kind fmt = function
-  | Admit -> Format.pp_print_string fmt "axiom"
-  | Assert -> Format.pp_print_string fmt "lemma"
-  | Check -> Format.pp_print_string fmt "check lemma"
-
 let pp_lemma fmt l =
-  Format.fprintf fmt " * %a '%s'@\n" pp_kind l.lem_predicate.tp_kind l.lem_name
+  Format.fprintf fmt " * %a '%s'@\n"
+    Cil_printer.pp_lemma_kind l.lem_predicate.tp_kind l.lem_name
 
 let get_name l = compute () ; compute_logicname l
 
@@ -584,7 +580,7 @@ let dump () =
       SMap.iter
         (fun l (lem,s) ->
            Format.fprintf fmt " * %a '%s' in %a@\n"
-             pp_kind lem.lem_predicate.tp_kind
+             Cil_printer.pp_lemma_kind lem.lem_predicate.tp_kind
              l pp_section s)
         d.lemmas ;
       Format.fprintf fmt "-------------------------------------------------@." ;
