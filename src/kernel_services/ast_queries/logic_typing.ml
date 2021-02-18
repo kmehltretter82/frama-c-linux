@@ -4191,9 +4191,14 @@ struct
     | LDlemma (x,labels, poly, {tp_kind = kind; tp_statement = e}) ->
       if Logic_env.Lemmas.mem x then begin
         let old_def = Logic_env.Lemmas.find x in
+        let old_kind = match old_def with
+          | Dlemma(_,_,_,{tp_kind },_,_) -> tp_kind
+          | _ -> Assert in
         let old_loc = Cil_datatype.Global_annotation.loc old_def in
-        C.error loc "lemma %s is already registered (%a)"
-          x Cil_datatype.Location.pretty old_loc
+        C.error loc "%a %s is already registered as %a (%a)"
+          Cil_printer.pp_lemma_kind kind x
+          Cil_printer.pp_lemma_kind old_kind
+          Cil_datatype.Location.pretty old_loc
       end;
       let labels,env = annot_env loc labels poly in
       let p = Logic_const.toplevel_predicate ~kind (predicate env e) in
