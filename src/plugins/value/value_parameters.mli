@@ -20,8 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Fc_filepath = Filepath
-
 include Plugin.General_services
 
 module ForceValues: Parameter_sig.With_output

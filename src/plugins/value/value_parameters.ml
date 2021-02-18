@@ -61,17 +61,13 @@ let add_precision_dep p =
 
 let () = List.iter add_correctness_dep kernel_parameters_correctness
 
-module Fc_filepath = Filepath
-
-module Eva =
-  Plugin.Register
+include Plugin.Register
     (struct
       let name = "Eva"
       let shortname = "eva"
       let help =
         "automatically computes variation domains for the variables of the program"
     end)
-include Eva
 
 let () = Help.add_aliases ~visible:false [ "-value-h"; "-val-h" ]
 let () = add_plugin_output_aliases ~visible:false ~deprecated:true [ "value" ]
@@ -1427,6 +1423,8 @@ let parameters_correctness =
   Typed_parameter.Set.elements !parameters_correctness
 let parameters_tuning =
   Typed_parameter.Set.elements !parameters_tuning
+
+
 
 (*
 Local Variables:
