@@ -17,8 +17,11 @@ Assume {
   (* Goal *)
   When: !invalid(Malloc_0, shiftfield_F1_size(shift_S1(a, x)), 1).
   (* Pre-condition *)
-  Have: (0 <= d) /\ (d <= 16) /\ valid_rw(Malloc_0, tbl_0, 35) /\
-      valid_rw(Malloc_0, shift_S1(a, 0), 34).
+  Have: valid_rw(Malloc_0, tbl_0, 35).
+  (* Pre-condition *)
+  Have: valid_rw(Malloc_0, shift_S1(a, 0), 34).
+  (* Pre-condition *)
+  Have: (0 <= d) /\ (d <= 16).
 }
 Prove: (x <= d) /\ (d <= x).
 
