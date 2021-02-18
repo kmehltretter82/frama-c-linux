@@ -163,14 +163,25 @@ let return _env _stmt r k =
 
 let test _env _stmt e k1 k2 =
   let u = node () in
-  Format.fprintf !out "  %a [ color=cyan , label=\"If %a\" ] ;@." pretty u Printer.pp_exp e ;
+  Format.fprintf !out "  %a [ color=cyan , label=\"If %a\" ] ;@."
+    pretty u Printer.pp_exp e ;
   link u k1 ; link u k2 ; u
 
 let switch _env _stmt e cases def =
   let u = node () in
-  Format.fprintf !out "  %a [ color=cyan , label=\"Switch %a\" ] ;@." pretty u Printer.pp_exp e ;
-  List.iter (fun (_,k) -> link u k) cases ;
-  link u def ; u
+  Format.fprintf !out "  %a [ color=cyan , label=\"Switch %a\" ] ;@."
+    pretty u Printer.pp_exp e ;
+  List.iter (fun (es,k) ->
+      let c = node () in
+      Format.fprintf !out "  %a [ color=orange , label=\"Case %a\" ] ;@."
+        pretty c (Pretty_utils.pp_list ~sep:"," Printer.pp_exp) es ;
+      link u c ;
+      link c k ;
+    ) cases ;
+  let d = node () in
+  Format.fprintf !out "  %a [ color=orange , label=\"Default\" ] ;@." pretty d ;
+  link u d ;
+  link d def ; u
 
 let const _ x k =
   let u = node () in

@@ -114,6 +114,14 @@ let is_selected_props (props : props) ?pi pid =
       | Some q -> q
       | None -> WpPropId.property_of_id pid
 
+let rec factorize ~wdefault = function
+  | (_,w)::wcs when w==wdefault -> factorize ~wdefault wcs
+  | (e,w)::wcs -> collect ~wdefault [e] w wcs
+  | [] -> []
+and collect ~wdefault rs wr = function
+  | (e,w)::wcs when w==wr -> collect ~wdefault (e::rs) wr wcs
+  | wcs -> (List.rev rs,wr) :: factorize ~wdefault wcs
+
 (* -------------------------------------------------------------------------- *)
 (* --- WP Calculus Driver from Interpreted Automata                       --- *)
 (* -------------------------------------------------------------------------- *)
@@ -218,9 +226,9 @@ struct
         let welse = wp env velse in
         W.test env.we s cond wthen welse
     | Switch { value ; cases ; default } ->
-        let wcases = List.map (fun (e,v) -> [e], wp env v) cases in
+        let wcases = List.map (fun (e,v) -> e,wp env v) cases in
         let wdefault = wp env default in
-        W.switch env.we s value wcases wdefault
+        W.switch env.we s value (factorize ~wdefault wcases) wdefault
     | Loop _ ->
         let m = env.mode in
         let smoking =
