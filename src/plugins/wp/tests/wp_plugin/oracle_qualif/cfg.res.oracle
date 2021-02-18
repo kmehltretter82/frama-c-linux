@@ -3,19 +3,18 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 5 goals scheduled
-[wp] [Qed] Goal typed_f1_ensures_BUG_WP : Valid
-[wp] [Qed] Goal typed_f1_simpler_ensures_BUG_WP : Valid
-[wp] [Qed] Goal typed_f1_variant_ensures_BUG_WP : Valid
+[wp] [Alt-Ergo] Goal typed_f1_ensures_BUG_LEGACY_WP : Unsuccess
+[wp] [Alt-Ergo] Goal typed_f1_simpler_ensures_BUG_LEGACY_WP : Unsuccess
+[wp] [Alt-Ergo] Goal typed_f1_variant_ensures_BUG_LEGACY_WP : Unsuccess
 [wp] [Alt-Ergo] Goal typed_f1_variant_invert_ensures_FAILS_AS_EXPECTED : Unsuccess
-[wp] [Qed] Goal typed_f2_ensures_BUG_WP : Valid
-[wp] Proved goals:    4 / 5
-  Qed:             4 
-  Alt-Ergo:        0  (unsuccess: 1)
+[wp] [Alt-Ergo] Goal typed_f2_ensures_BUG_LEGACY_WP : Unsuccess
+[wp] Proved goals:    0 / 5
+  Alt-Ergo:        0  (unsuccess: 5)
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  f1                        1        -        1       100%
-  f1_simpler                1        -        1       100%
-  f1_variant                1        -        1       100%
+  f1                        -        -        1       0.0%
+  f1_simpler                -        -        1       0.0%
+  f1_variant                -        -        1       0.0%
   f1_variant_invert         -        -        1       0.0%
-  f2                        1        -        1       100%
+  f2                        -        -        1       0.0%
 ------------------------------------------------------------

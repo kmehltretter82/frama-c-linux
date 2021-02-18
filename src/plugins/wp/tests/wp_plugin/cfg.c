@@ -1,7 +1,7 @@
 //@ assigns \nothing;
 void foo(void);
 
-/*@ ensures BUG_WP: \false; */
+/*@ ensures BUG_LEGACY_WP: \false; */
 void f1(void)
 {
   if (0 == 1)
@@ -14,7 +14,7 @@ void f1(void)
   return_label: return;
 }
 
-/*@ ensures BUG_WP: \false; */
+/*@ ensures BUG_LEGACY_WP: \false; */
 void f1_simpler(void)
 {
   if (0 == 1)
@@ -26,7 +26,7 @@ void f1_simpler(void)
   return_label: return;
 }
 
-/*@ ensures BUG_WP: \false; */
+/*@ ensures BUG_LEGACY_WP: \false; */
 void f1_variant(void)
 {
   if (0 == 1) L: ;
@@ -50,7 +50,7 @@ void f1_variant_invert(void)
   return_label: return;
 }
 
-/*@ ensures BUG_WP: \false; */
+/*@ ensures BUG_LEGACY_WP: \false; */
 void f2(void)
 {
   if (0 == 1)

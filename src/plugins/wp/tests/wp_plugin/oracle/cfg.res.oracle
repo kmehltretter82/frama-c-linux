@@ -6,24 +6,24 @@
   Function f1
 ------------------------------------------------------------
 
-Goal Post-condition 'BUG_WP' in 'f1':
-Prove: true.
+Goal Post-condition 'BUG_LEGACY_WP' in 'f1':
+Prove: false.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function f1_simpler
 ------------------------------------------------------------
 
-Goal Post-condition 'BUG_WP' in 'f1_simpler':
-Prove: true.
+Goal Post-condition 'BUG_LEGACY_WP' in 'f1_simpler':
+Prove: false.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function f1_variant
 ------------------------------------------------------------
 
-Goal Post-condition 'BUG_WP' in 'f1_variant':
-Prove: true.
+Goal Post-condition 'BUG_LEGACY_WP' in 'f1_variant':
+Prove: false.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -38,7 +38,7 @@ Prove: false.
   Function f2
 ------------------------------------------------------------
 
-Goal Post-condition 'BUG_WP' in 'f2':
-Prove: true.
+Goal Post-condition 'BUG_LEGACY_WP' in 'f2':
+Prove: false.
 
 ------------------------------------------------------------
