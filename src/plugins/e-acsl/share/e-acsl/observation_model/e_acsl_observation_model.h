@@ -36,6 +36,19 @@
 #include "../internals/e_acsl_alias.h"
 #include "e_acsl_heap.h"
 
+/*@ ghost extern int __fc_heap_status; */
+
+/*@ axiomatic dynamic_allocation {
+  @   predicate is_allocable{L}(integer n) // Can a block of n bytes be allocated?
+  @     reads __fc_heap_status;
+  @   // The logic label L is not used, but it must be present because the
+  @   // predicate depends on the memory state
+  @   axiom never_allocable{L}:
+  @     \forall integer i;
+  @        i < 0 || i > __FC_SIZE_MAX ==> !is_allocable(i);
+  @ }
+*/
+
 /************************************************************************/
 /*** API Prefixes {{{ ***/
 /************************************************************************/
@@ -83,8 +96,16 @@
  *    behaviour is as if the size were some non-zero value, except that the
  *    returned pointer shall not be used to access an object." */
 /*@
-  assigns __e_acsl_heap_allocation_size \from size, __e_acsl_heap_allocation_size;
-  assigns __e_acsl_heap_allocated_blocks \from size, __e_acsl_heap_allocated_blocks;
+  assigns __e_acsl_heap_allocation_size \from indirect:size, __e_acsl_heap_allocation_size;
+  assigns __e_acsl_heap_allocated_blocks \from indirect:size, __e_acsl_heap_allocated_blocks;
+  behavior allocation:
+    assumes can_allocate: is_allocable(size);
+    assigns __e_acsl_heap_allocation_size \from indirect:size, __e_acsl_heap_allocation_size;
+    assigns __e_acsl_heap_allocated_blocks \from indirect:size, __e_acsl_heap_allocated_blocks;
+  behavior no_allocation:
+    assumes cannot_allocate: !is_allocable(size);
+    assigns __e_acsl_heap_allocation_size \from indirect:size, __e_acsl_heap_allocation_size;
+    assigns __e_acsl_heap_allocated_blocks \from size, __e_acsl_heap_allocated_blocks;
  */
 void * malloc(size_t size)
   __attribute__((FC_BUILTIN));
@@ -94,6 +115,14 @@ void * malloc(size_t size)
 /*@
   assigns __e_acsl_heap_allocation_size \from indirect:nbr_elt, indirect:size_elt, __e_acsl_heap_allocation_size;
   assigns __e_acsl_heap_allocated_blocks \from indirect:nbr_elt, indirect:size_elt, __e_acsl_heap_allocated_blocks;
+  behavior allocation:
+    assumes can_allocate: is_allocable(nbr_elt * size_elt);
+    assigns __e_acsl_heap_allocation_size \from indirect:nbr_elt, indirect:size_elt, __e_acsl_heap_allocation_size;
+    assigns __e_acsl_heap_allocated_blocks \from indirect:nbr_elt, indirect:size_elt, __e_acsl_heap_allocated_blocks;
+  behavior no_allocation:
+    assumes cannot_allocate: !is_allocable(nbr_elt * size_elt);
+    assigns __e_acsl_heap_allocation_size \from indirect:nbr_elt, indirect:size_elt, __e_acsl_heap_allocation_size;
+    assigns __e_acsl_heap_allocated_blocks \from indirect:nbr_elt, indirect:size_elt, __e_acsl_heap_allocated_blocks;
  */
 void * calloc(size_t nbr_elt, size_t size_elt)
   __attribute__((FC_BUILTIN));
@@ -103,6 +132,19 @@ void * calloc(size_t nbr_elt, size_t size_elt)
 /*@
   assigns __e_acsl_heap_allocation_size \from __e_acsl_heap_allocation_size;
   assigns __e_acsl_heap_allocated_blocks \from __e_acsl_heap_allocated_blocks;
+  behavior allocation:
+    assumes   can_allocate: is_allocable(size);
+    assigns __e_acsl_heap_allocation_size \from __e_acsl_heap_allocation_size;
+    assigns __e_acsl_heap_allocated_blocks \from __e_acsl_heap_allocated_blocks;
+  behavior deallocation:
+    assumes   nonnull_ptr: ptr != \null;
+    assumes   can_allocate: is_allocable(size);
+    assigns __e_acsl_heap_allocation_size \from __e_acsl_heap_allocation_size;
+    assigns __e_acsl_heap_allocated_blocks \from __e_acsl_heap_allocated_blocks;
+  behavior fail:
+    assumes cannot_allocate: !is_allocable(size);
+    assigns __e_acsl_heap_allocation_size \from __e_acsl_heap_allocation_size;
+    assigns __e_acsl_heap_allocated_blocks \from __e_acsl_heap_allocated_blocks;
  */
 void * realloc(void * ptr, size_t size)
   __attribute__((FC_BUILTIN));
@@ -112,6 +154,14 @@ void * realloc(void * ptr, size_t size)
 /*@
   assigns __e_acsl_heap_allocation_size \from __e_acsl_heap_allocation_size;
   assigns __e_acsl_heap_allocated_blocks \from __e_acsl_heap_allocated_blocks;
+  behavior deallocation:
+    assumes  nonnull_p: ptr != \null;
+    assigns __e_acsl_heap_allocation_size \from __e_acsl_heap_allocation_size;
+    assigns __e_acsl_heap_allocated_blocks \from __e_acsl_heap_allocated_blocks;
+  behavior no_deallocation:
+    assumes  null_p: ptr == \null;
+    assigns __e_acsl_heap_allocation_size \from __e_acsl_heap_allocation_size;
+    assigns __e_acsl_heap_allocated_blocks \from __e_acsl_heap_allocated_blocks;
  */
 void free(void * ptr)
   __attribute__((FC_BUILTIN));
@@ -137,6 +187,14 @@ void *aligned_alloc(size_t alignment, size_t size)
 /*@
   assigns __e_acsl_heap_allocation_size \from indirect:alignment, size, __e_acsl_heap_allocation_size;
   assigns __e_acsl_heap_allocated_blocks \from indirect:alignment, size, __e_acsl_heap_allocated_blocks;
+  behavior allocation:
+    assumes can_allocate: is_allocable(size);
+    assigns __e_acsl_heap_allocation_size \from indirect:alignment, size, __e_acsl_heap_allocation_size;
+    assigns __e_acsl_heap_allocated_blocks \from indirect:alignment, size, __e_acsl_heap_allocated_blocks;
+  behavior no_allocation:
+    assumes cannot_allocate: !is_allocable(size);
+    assigns __e_acsl_heap_allocation_size \from indirect:alignment, size, __e_acsl_heap_allocation_size;
+    assigns __e_acsl_heap_allocated_blocks \from indirect:alignment, size, __e_acsl_heap_allocated_blocks;
  */
 int posix_memalign(void **memptr, size_t alignment, size_t size)
   __attribute__((FC_BUILTIN));
