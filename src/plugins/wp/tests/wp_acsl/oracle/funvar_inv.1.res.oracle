@@ -16,8 +16,10 @@ Assume {
   (* Initializer *)
   Init: Mint_0[global(L_i_27)] = 0.
   If v <= 3
-  Then { (* Else *) Have: Mint_0[f] = 0. Have: shift_sint32(a, v) = f. }
-  Else { Have: global(L_i_27) = f. }
+  Then { (* Else *) Have: Mint_0[shift_sint32(a, v)] = 0. }
+  If 4 <= v
+  Then { Have: global(L_i_27) = f. }
+  Else { Have: shift_sint32(a, v) = f. }
 }
 Prove: a_1 = f.
 
@@ -34,8 +36,10 @@ Assume {
   (* Initializer *)
   Init: Mint_0[global(L_i_27)] = 0.
   If v <= 3
-  Then { (* Else *) Have: Mint_0[f] = 0. Have: shift_sint32(a, v) = f. }
-  Else { Have: global(L_i_27) = f. }
+  Then { (* Else *) Have: Mint_0[shift_sint32(a, v)] = 0. }
+  If 4 <= v
+  Then { Have: global(L_i_27) = f. }
+  Else { Have: shift_sint32(a, v) = f. }
 }
 Prove: a_1 = f.
 
@@ -59,9 +63,10 @@ Assume {
   (* Initializer *)
   Init: Mint_0[global(L_i_32)] = 0.
   If v <= 3
-  Then { (* Else *) Have: Mint_0[f2_0] = 0. Have: shift_sint32(a, v) = f2_0.
-  }
-  Else { Have: global(L_i_32) = f2_0. }
+  Then { (* Else *) Have: Mint_0[shift_sint32(a, v)] = 0. }
+  If 4 <= v
+  Then { Have: global(L_i_32) = f2_0. }
+  Else { Have: shift_sint32(a, v) = f2_0. }
 }
 Prove: a_1 = f2_0.
 
@@ -78,9 +83,10 @@ Assume {
   (* Initializer *)
   Init: Mint_0[global(L_i_32)] = 0.
   If v <= 3
-  Then { (* Else *) Have: Mint_0[f2_0] = 0. Have: shift_sint32(a, v) = f2_0.
-  }
-  Else { Have: global(L_i_32) = f2_0. }
+  Then { (* Else *) Have: Mint_0[shift_sint32(a, v)] = 0. }
+  If 4 <= v
+  Then { Have: global(L_i_32) = f2_0. }
+  Else { Have: shift_sint32(a, v) = f2_0. }
 }
 Prove: a_1 = f2_0.
 
@@ -104,8 +110,10 @@ Assume {
   (* Initializer *)
   Init: Mint_0[global(L_i_37)] = 0.
   If v <= 3
-  Then { (* Else *) Have: Mint_0[g] = 0. Have: shift_sint32(a, v) = g. }
-  Else { Have: global(L_i_37) = g. }
+  Then { (* Else *) Have: Mint_0[shift_sint32(a, v)] = 0. }
+  If 4 <= v
+  Then { Have: global(L_i_37) = g. }
+  Else { Have: shift_sint32(a, v) = g. }
 }
 Prove: a_1 = g.
 
@@ -122,8 +130,10 @@ Assume {
   (* Initializer *)
   Init: Mint_0[global(L_i_37)] = 0.
   If v <= 3
-  Then { (* Else *) Have: Mint_0[g] = 0. Have: shift_sint32(a, v) = g. }
-  Else { Have: global(L_i_37) = g. }
+  Then { (* Else *) Have: Mint_0[shift_sint32(a, v)] = 0. }
+  If 4 <= v
+  Then { Have: global(L_i_37) = g. }
+  Else { Have: shift_sint32(a, v) = g. }
 }
 Prove: a_1 = g.
 
