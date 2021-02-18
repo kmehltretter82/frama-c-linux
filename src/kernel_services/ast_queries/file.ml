@@ -1728,7 +1728,7 @@ let check_source_hashes expected actual_table =
   if missing <> [] then begin
     let missing = List.sort Extlib.compare_ignore_case missing in
     Kernel.warning ~wkey:Kernel.wkey_audit
-      "missing hashes for files:@\n%a"
+      "missing files:@\n%a"
       (Pretty_utils.pp_list ~sep:"@\n" Format.pp_print_string) missing
   end
 
