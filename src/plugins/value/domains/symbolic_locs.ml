@@ -576,12 +576,12 @@ module Internal : Domain_builder.InputDomain
      this point. Hence, the alarms have already been emitted, and we can
      return [Alarmset.none]. *)
 
-  let extract_expr ~oracle:_ ~root:_ state expr =
+  let extract_expr ~oracle:_ _context state expr =
     match Memory.find_expr expr state with
     | None -> top_query
     | Some v -> `Value (v, None), Alarmset.none
 
-  let extract_lval ~oracle:_ ~root:_ state lv _typ _locs =
+  let extract_lval ~oracle:_ _context state lv _typ _locs =
     match Memory.find_lval lv state with
     | None -> top_query
     | Some v -> `Value (v, None), Alarmset.none

@@ -834,12 +834,13 @@ module Make
     match expr.enode with
     | Lval lval -> eval_lval context lval
     | BinOp _ | UnOp _ | CastE _ -> begin
-        let { state; root } = context in
+        let { state; root; subdivision } = context in
         let context = { context with root = false } in
         let oracle = make_oracle context in
         let intern_value, alarms = internal_forward_eval context expr in
+        let eval_context = Abstract_domain.{ root; subdivision } in
         let domain_value, alarms' =
-          Domain.extract_expr ~oracle ~root state expr
+          Domain.extract_expr ~oracle eval_context state expr
         in
         (* Intersection of alarms, as each sets of alarms are correct
            and "complete" for the evaluation of [expr]. *)
@@ -1067,7 +1068,7 @@ module Make
       off, typ_res, volatile
 
   and eval_lval ?(indeterminate=false) context lval =
-    let { state; root } = context in
+    let { state; root; subdivision } = context in
     let context = { context with root = false } in
     let oracle = make_oracle context in
     (* Computes the location of [lval]. *)
@@ -1081,7 +1082,8 @@ module Make
     *)
     let volatile = volatile_expr || Cil.typeHasQualifier "volatile" typ_lv in
     (* Find the value of the location, if not bottom. *)
-    let v, alarms = Domain.extract_lval ~oracle ~root state lval typ_lv loc in
+    let context = Abstract_domain.{ root; subdivision } in
+    let v, alarms = Domain.extract_lval ~oracle context state lval typ_lv loc in
     let alarms = close_dereference_alarms lval alarms in
     if indeterminate
     then

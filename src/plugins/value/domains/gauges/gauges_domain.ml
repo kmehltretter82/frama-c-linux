@@ -1259,10 +1259,10 @@ module D_Impl : Abstract_domain.S
 
   (* TODO: it would be interesting to return something here, but we
      currently need a valuation to perform the translation. *)
-  let extract_expr ~oracle:_ ~root:_ _state _exp =
+  let extract_expr ~oracle:_ _context _state _exp =
     `Value (Cvalue.V.top, None), Alarmset.all
 
-  let extract_lval ~oracle:_ ~root:_ state _lv typ loc =
+  let extract_lval ~oracle:_ _context state _lv typ loc =
     let v =
       try
         let b = loc_to_base (Precise_locs.imprecise_location loc) typ in

@@ -239,12 +239,12 @@ module Make
       v, Alarmset.none
     | None -> `Value (Value.top, None), Alarmset.all
 
-  let extract_expr ~oracle ~root:_ (equalities, _, _) expr =
+  let extract_expr ~oracle _context (equalities, _, _) expr =
     let expr = Cil.constFold true expr in
     let atom_e = HCE.of_exp expr in
     coop_eval oracle equalities atom_e
 
-  let extract_lval ~oracle ~root:_ (equalities, _, _) lval _typ _location =
+  let extract_lval ~oracle _context (equalities, _, _) lval _typ _location =
     let atom_lv = HCE.of_lval lval in
     coop_eval oracle equalities atom_lv
 

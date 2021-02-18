@@ -201,9 +201,9 @@ module State = struct
 
   type origin = Model.origin
 
-  let extract_expr ~oracle:_ ~root:_ (s, _) expr =
+  let extract_expr ~oracle:_ _context (s, _) expr =
     Model.extract_expr s expr
-  let extract_lval ~oracle:_ ~root:_ (s, _) lval typ loc =
+  let extract_lval ~oracle:_ _context (s, _) lval typ loc =
     Model.extract_lval s lval typ loc
   let backward_location (state, _) lval typ precise_loc value =
     Model.backward_location state lval typ precise_loc value

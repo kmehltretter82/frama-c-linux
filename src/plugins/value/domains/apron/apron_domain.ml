@@ -487,10 +487,10 @@ module Make (Man : Input) = struct
          apron state, whose environment raises the Failure exception. *)
       | Z.Overflow | Failure _ -> top
 
-  let extract_expr ~oracle:_ ~root:_ state expr =
+  let extract_expr ~oracle:_ _context state expr =
     compute state expr (Cil.typeOf expr)
 
-  let extract_lval ~oracle:_ ~root:_ state lval typ _loc =
+  let extract_lval ~oracle:_ _context state lval typ _loc =
     let expr = Value_util.lval_to_exp lval in
     compute state expr typ
 

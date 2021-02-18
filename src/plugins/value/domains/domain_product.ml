@@ -89,15 +89,15 @@ module Make
       in
       value, alarms
 
-  let extract_expr ~oracle ~root (left, right) expr =
+  let extract_expr ~oracle context (left, right) expr =
     merge
-      (Left.extract_expr ~oracle ~root left expr)
-      (Right.extract_expr ~oracle ~root right expr)
+      (Left.extract_expr ~oracle context left expr)
+      (Right.extract_expr ~oracle context right expr)
 
-  let extract_lval ~oracle ~root (left, right) lval typ location =
+  let extract_lval ~oracle context (left, right) lval typ location =
     merge
-      (Left.extract_lval ~oracle ~root left lval typ location)
-      (Right.extract_lval ~oracle ~root right lval typ location)
+      (Left.extract_lval ~oracle context left lval typ location)
+      (Right.extract_lval ~oracle context right lval typ location)
 
   let backward_location (left, right) lval typ loc value =
     (* TODO: Loc.narrow *)

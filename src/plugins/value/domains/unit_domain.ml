@@ -55,8 +55,8 @@ module Make
   type origin
 
   let eval_top = `Value (Value.top, None), Alarmset.all
-  let extract_expr ~oracle:_ ~root:_ _ _ = eval_top
-  let extract_lval ~oracle:_ ~root:_ _ _ _ _ = eval_top
+  let extract_expr ~oracle:_ _ _ _ = eval_top
+  let extract_lval ~oracle:_ _ _ _ _ _ = eval_top
   let backward_location _ _ _ loc value = `Value (loc, value)
   let reduce_further _ _ _  = []
 
