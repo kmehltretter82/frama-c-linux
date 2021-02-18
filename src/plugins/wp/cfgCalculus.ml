@@ -52,7 +52,7 @@ let default_requires mode kf =
   if Cil.is_default_behavior mode.bhv then [] else
     try
       let bhv = List.find Cil.is_default_behavior (Annotations.behaviors kf) in
-      CfgAnnot.get_requires kf bhv
+      CfgAnnot.get_requires ~goal:false kf bhv
     with Not_found -> []
 
 (* -------------------------------------------------------------------------- *)
@@ -301,23 +301,18 @@ struct
          WpLog.SmokeTests.get () &&
          WpLog.SmokeDeadcall.get ()
       then Some s else None in
-    let c = CfgAnnot.get_call_contract ?smoking kf in
+    let c = CfgAnnot.get_call_contract ?smoking kf s in
     let p_post = List.fold_right (prove_property env) c.contract_smoke wr in
     let p_exit = List.fold_right (prove_property env) c.contract_smoke env.wk in
     let w_call = W.call env.we s r kf es
-        ~pre:c.contract_pre
+        ~pre:c.contract_hpre
         ~post:c.contract_post
         ~pexit:c.contract_exit
         ~assigns:c.contract_assigns
         ~p_post ~p_exit in
     if is_default_bhv env.mode then
-      let pre =
-        List.filter_map (fun p ->
-            if is_selected_callpre env p then
-              Some (CfgAnnot.get_precond_at kf s p)
-            else None
-          ) c.contract_pre
-      in W.call_goal_precond env.we s kf es ~pre w_call
+      let pre = List.filter (is_selected_callpre env) c.contract_cond in
+      W.call_goal_precond env.we s kf es ~pre w_call
     else w_call
 
   let do_complete_disjoint env w =
@@ -398,7 +393,7 @@ struct
     let formals = Kf.get_formals kf in
     let exits = not @@ Kf.Set.is_empty @@ CfgInfos.calls infos in
     let smoking = WpLog.SmokeTests.get () in
-    let bhv = CfgAnnot.get_behavior kf ~smoking ~exits mode.bhv in
+    let bhv = CfgAnnot.get_behavior_goals kf ~smoking ~exits mode.bhv in
     begin
       W.close env.we @@
       do_global_init env @@

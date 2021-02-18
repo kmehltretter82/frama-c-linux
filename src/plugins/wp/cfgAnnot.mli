@@ -42,14 +42,17 @@ type behavior = {
   bhv_exit_assigns: assigns_full_info ;
 }
 
-val get_requires : kernel_function -> funbehavior -> pred_info list
+val get_requires :
+  goal:bool -> kernel_function -> funbehavior -> pred_info list
 
-val get_behavior :
+val get_preconditions :
+  goal:bool -> kernel_function -> pred_info list
+
+val get_behavior_goals :
   kernel_function ->
   ?smoking:bool -> ?exits:bool ->
   funbehavior -> behavior
 
-val get_preconditions : goal:bool -> kernel_function -> pred_info list
 val get_complete_behaviors : kernel_function -> pred_info list
 val get_disjoint_behaviors : kernel_function -> pred_info list
 
@@ -98,15 +101,15 @@ val get_loop_contract : ?smoking:bool ->
 (* -------------------------------------------------------------------------- *)
 
 type contract = {
-  contract_pre : pred_info list ;
+  contract_cond : pred_info list ;
+  contract_hpre : pred_info list ;
   contract_post : pred_info list ;
   contract_exit : pred_info list ;
   contract_smoke : pred_info list ;
   contract_assigns : assigns ;
 }
 
-val get_precond_at : kernel_function -> stmt -> pred_info -> pred_info
-val get_call_contract : ?smoking:stmt -> kernel_function -> contract
+val get_call_contract : ?smoking:stmt -> kernel_function -> stmt -> contract
 
 (* -------------------------------------------------------------------------- *)
 (* --- Clear Tablesnts                                                    --- *)

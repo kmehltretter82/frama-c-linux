@@ -57,30 +57,36 @@ type behavior = {
   bhv_exit_assigns: WpPropId.assigns_full_info ;
 }
 
-let normalize_assumes kf ki h =
+let normalize_assumes h =
   let module L = NormAtLabels in
-  let labels =
-    match ki with
-    | Kglobal -> L.labels_fct_pre
-    | Kstmt s -> L.labels_stmt_pre kf s in
+  let labels = L.labels_fct_pre in
   L.preproc_annot labels h
 
 let implies ?assumes p =
   match assumes with None -> p | Some h -> Logic_const.pimplies (h,p)
 
-let normalize_pre kf bhv ?assumes ip =
-  let module L = NormAtLabels in
-  let labels = L.labels_fct_pre in
-  let id = WpPropId.mk_pre_id kf Kglobal bhv ip in
-  let p = L.preproc_annot labels ip.ip_content.tp_statement in
-  id, implies ?assumes p
+let filter ~goal ip =
+  if goal
+  then Logic_utils.verify_predicate ip.ip_content.tp_kind
+  else Logic_utils.use_predicate ip.ip_content.tp_kind
 
-let normalize_post kf bhv tk ?assumes ip =
-  let module L = NormAtLabels in
-  let labels = L.labels_fct_post ~exit:(tk=Exits) in
-  let id = WpPropId.mk_post_id kf Kglobal bhv (tk,ip) in
-  let p = L.preproc_annot labels ip.ip_content.tp_statement in
-  id , implies ?assumes p
+let normalize_pre ~goal kf bhv ?assumes ip =
+  if filter ~goal ip then
+    let module L = NormAtLabels in
+    let labels = L.labels_fct_pre in
+    let id = WpPropId.mk_pre_id kf Kglobal bhv ip in
+    let p = L.preproc_annot labels ip.ip_content.tp_statement in
+    Some (id, implies ?assumes p)
+  else None
+
+let normalize_post ~goal kf bhv tk ?assumes (itk,ip) =
+  if tk = itk && filter ~goal ip then
+    let module L = NormAtLabels in
+    let labels = L.labels_fct_post ~exit:(tk=Exits) in
+    let id = WpPropId.mk_post_id kf Kglobal bhv (tk,ip) in
+    let p = L.preproc_annot labels ip.ip_content.tp_statement in
+    Some (id , implies ?assumes p)
+  else None
 
 let normalize_froms tk froms =
   let module L = NormAtLabels in
@@ -102,13 +108,9 @@ let normalize_assigns kf ~exits bhv = function
       make Normal,
       if exits then make Exits else WpPropId.empty_assigns_info
 
-let get_requires kf bhv =
-  List.map (normalize_pre kf bhv) bhv.b_requires
-
-let get_behavior kf ?(smoking=false) ?(exits=false) bhv =
-  let pre_cond = normalize_pre kf bhv in
-  let post_cond tk (kind,ip) =
-    if kind = tk then Some (normalize_post kf bhv tk ip) else None in
+let get_behavior_goals kf ?(smoking=false) ?(exits=false) bhv =
+  let pre_cond = normalize_pre ~goal:false kf bhv in
+  let post_cond = normalize_post ~goal:true kf bhv in
   let p_asgn, e_asgn = normalize_assigns kf ~exits bhv bhv.b_assigns in
   let smokes =
     if smoking && bhv.b_requires <> [] then
@@ -120,27 +122,30 @@ let get_behavior kf ?(smoking=false) ?(exits=false) bhv =
     else []
   in
   {
-    bhv_assumes = List.map pre_cond bhv.b_assumes;
-    bhv_requires = List.map pre_cond bhv.b_requires;
-    bhv_smokes = smokes;
+    bhv_assumes = List.filter_map pre_cond bhv.b_assumes;
+    bhv_requires = List.filter_map pre_cond bhv.b_requires;
     bhv_ensures = List.filter_map (post_cond Normal) bhv.b_post_cond ;
     bhv_exits = List.filter_map (post_cond Exits) bhv.b_post_cond ;
     bhv_post_assigns = p_asgn ;
     bhv_exit_assigns = e_asgn ;
+    bhv_smokes = smokes;
   }
 
 (* -------------------------------------------------------------------------- *)
 (* --- Side Behavior Requires                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-let get_assumes kf bhv =
-  normalize_assumes kf Kglobal (Ast_info.behavior_assumes bhv)
+let get_requires ~goal kf bhv =
+  List.filter_map (normalize_pre ~goal kf bhv) bhv.b_requires
 
 let get_preconditions ~goal kf =
+  let module L = NormAtLabels in
+  let mk_pre = L.preproc_annot L.labels_fct_pre in
   List.map
     (fun bhv ->
        let p = Ast_info.behavior_precondition ~goal bhv in
-       normalize_pre kf bhv (Logic_const.new_predicate p)
+       let ip = Logic_const.new_predicate p in
+       WpPropId.mk_pre_id kf Kglobal bhv ip,  mk_pre p
     ) (Annotations.behaviors kf)
 
 let get_complete_behaviors kf =
@@ -166,7 +171,8 @@ let get_disjoint_behaviors kf =
 (* -------------------------------------------------------------------------- *)
 
 type contract = {
-  contract_pre : WpPropId.pred_info list ;
+  contract_cond : WpPropId.pred_info list ;
+  contract_hpre : WpPropId.pred_info list ;
   contract_post : WpPropId.pred_info list ;
   contract_exit : WpPropId.pred_info list ;
   contract_smoke : WpPropId.pred_info list ;
@@ -223,39 +229,43 @@ module CallContract = WpContext.StaticGenerator(Kernel_function)
       type data = contract
       let name = "Wp.CfgAnnot.CallContract"
       let compile kf =
-        let cpre : WpPropId.pred_info list ref = ref [] in
-        let cpost : WpPropId.pred_info list ref = ref [] in
-        let cexit : WpPropId.pred_info list ref = ref [] in
-        let add c f x = c := (f x) :: !c in
+        let wcond : WpPropId.pred_info list ref = ref [] in
+        let whpre : WpPropId.pred_info list ref = ref [] in
+        let wpost : WpPropId.pred_info list ref = ref [] in
+        let wexit : WpPropId.pred_info list ref = ref [] in
+        let add w f x = match f x with Some y -> w := y :: !w | None -> () in
         let behaviors = Annotations.behaviors kf in
         setup_preconditions kf ;
         List.iter
           begin fun bhv ->
-            let assumes = get_assumes kf bhv in
-            let mk_pre = normalize_pre kf bhv ~assumes in
-            let mk_post = normalize_post kf bhv ~assumes in
-            List.iter (add cpre @@ mk_pre) bhv.b_requires ;
-            List.iter
-              (fun (tk,ip) ->
-                 add (if tk = Normal then cpost else cexit) (mk_post tk) ip
-              ) bhv.b_post_cond ;
+            let assumes = normalize_assumes (Ast_info.behavior_assumes bhv) in
+            let mk_cond = normalize_pre ~goal:true kf bhv ~assumes in
+            let mk_hpre = normalize_pre ~goal:false kf bhv ~assumes in
+            let mk_post = normalize_post ~goal:false kf bhv ~assumes in
+            List.iter (add wcond @@ mk_cond) bhv.b_requires ;
+            List.iter (add whpre @@ mk_hpre) bhv.b_requires ;
+            List.iter (add wpost @@ mk_post Normal) bhv.b_post_cond ;
+            List.iter (add wexit @@ mk_post Exits) bhv.b_post_cond ;
           end behaviors ;
         {
-          contract_pre = List.rev !cpre ;
-          contract_post = List.rev !cpost ;
-          contract_exit = List.rev !cexit ;
+          contract_cond = List.rev !wcond ;
+          contract_hpre = List.rev !whpre ;
+          contract_post = List.rev !wpost ;
+          contract_exit = List.rev !wexit ;
           contract_smoke = [] ;
           contract_assigns = assigns_upper_bound behaviors
         }
     end)
 
-let get_call_contract ?smoking kf =
+let get_call_contract ?smoking kf stmt =
   let cc = CallContract.get kf in
+  let preconds = List.map (get_precond_at kf stmt) cc.contract_cond in
   match smoking with
-  | None -> cc
+  | None ->
+      { cc with contract_cond = preconds }
   | Some s ->
       let g = smoke kf ~id:"dead_call" ~unreachable:s () in
-      { cc with contract_smoke = [ g ] }
+      { cc with contract_cond = preconds ; contract_smoke = [ g ] }
 
 (* -------------------------------------------------------------------------- *)
 (* --- Code Contracts                                                     --- *)

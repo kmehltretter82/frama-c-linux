@@ -279,7 +279,7 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
       let bhvs =
         if dead_exit || dead_post then
           let exits = not dead_exit in
-          List.map (CfgAnnot.get_behavior kf ~exits) behaviors
+          List.map (CfgAnnot.get_behavior_goals kf ~exits) behaviors
         else [] in
       if dead_exit then
         infos.doomed <-
