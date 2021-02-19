@@ -268,16 +268,39 @@ let get_call_contract ?smoking kf stmt =
       { cc with contract_cond = preconds ; contract_smoke = [ g ] }
 
 (* -------------------------------------------------------------------------- *)
-(* --- Code Contracts                                                     --- *)
+(* --- Assembly Code                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
-let get_code_behaviors stmt =
-  Annotations.fold_code_annot
-    (fun _emitter ca cs ->
-       match ca.annot_content with
-       | AStmtSpec(fors,spec) -> (fors,spec) :: cs
-       | _ -> cs
-    ) stmt []
+let is_assembly stmt =
+  match stmt.skind with
+  | Instr (Asm _) -> true
+  | _ -> false
+
+let get_stmt_assigns kf stmt =
+  let asgn =
+    Annotations.fold_code_annot
+      begin fun _emitter ca l ->
+        match ca.annot_content with
+        | AStmtSpec(fors,s) ->
+            List.fold_left
+              (fun l bhv ->
+                 match bhv.b_assigns with
+                 | WritesAny -> l
+                 | Writes froms ->
+                     let module L = NormAtLabels in
+                     let labels = L.labels_stmt_assigns ~kf stmt in
+                     match
+                       WpPropId.mk_stmt_assigns_id kf stmt fors bhv froms
+                     with
+                     | None -> l
+                     | Some id ->
+                         let froms = L.preproc_assigns labels froms in
+                         let desc = WpPropId.mk_stmt_assigns_desc stmt froms in
+                         WpPropId.mk_assigns_info id desc :: l
+              ) l s.spec_behavior
+        | _ -> l
+      end stmt []
+  in if asgn = [] then [WpPropId.empty_assigns_info] else asgn
 
 (* -------------------------------------------------------------------------- *)
 (* --- Code Assertions                                                    --- *)
@@ -305,11 +328,13 @@ module CodeAssertions = WpContext.StaticGenerator(CodeKey)
         Annotations.fold_code_annot
           begin fun _emitter ca l ->
             match ca.annot_content with
-            | AStmtSpec _ ->
-                Wp_parameters.warning ~once:true ~current:false
+            | AStmtSpec _ when not @@ is_assembly stmt ->
+                let source = fst (Cil_datatype.Stmt.loc stmt) in
+                Wp_parameters.warning ~once:true ~source
                   "Statement specifications not yet supported (skipped)." ; l
             | AInvariant(_,false,_) ->
-                Wp_parameters.warning ~once:true ~current:false
+                let source = fst (Cil_datatype.Stmt.loc stmt) in
+                Wp_parameters.warning ~once:true ~source
                   "Generalized invariant not yet supported (skipped)." ; l
             | AAssert(_,a) ->
                 let p =

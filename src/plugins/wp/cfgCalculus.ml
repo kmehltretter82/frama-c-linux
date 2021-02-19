@@ -301,7 +301,8 @@ struct
                   List.map (fun kf -> kf, call env s res kf args w) kfs
         end
     | Asm _ ->
-        W.use_assigns env.we None (WpPropId.mk_asm_assigns_desc s) w
+        let assigns = CfgAnnot.get_stmt_assigns env.mode.kf s in
+        List.fold_right (use_assigns env) assigns w
 
   and call env s r kf es wr : W.t_prop =
     let smoking =
