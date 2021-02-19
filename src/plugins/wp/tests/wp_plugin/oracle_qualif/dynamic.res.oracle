@@ -13,6 +13,7 @@
 [wp] [Qed] Goal typed_guarded_call_ensures_part2 : Valid
 [wp] [Qed] Goal typed_guarded_call_ensures_2_part1 : Valid
 [wp] [Qed] Goal typed_guarded_call_ensures_2_part2 : Valid
+[wp] [Alt-Ergo] Goal typed_behavior_call_point_h1_h2_s15 : Unsuccess
 [wp] [Qed] Goal typed_behavior_call_point_h1_h2_s15 : Valid
 [wp] [Qed] Goal typed_behavior_bhv1_ensures_part1 : Valid
 [wp] [Qed] Goal typed_behavior_bhv1_ensures_part2 : Valid

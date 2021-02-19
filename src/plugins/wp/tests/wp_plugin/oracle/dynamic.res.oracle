@@ -10,8 +10,17 @@
 [wp] tests/wp_plugin/dynamic.i:87: Calls h1
 [wp] tests/wp_plugin/dynamic.i:100: Calls unreachable_g
 [wp:calls] Dynamic call(s): 6.
-[wp] tests/wp_plugin/dynamic.i:78: Warning: Missing 'calls' for default behavior
 [wp] Warning: Missing RTE guards
+[wp] tests/wp_plugin/dynamic.i:78: Warning: Missing 'calls' for default behavior
+------------------------------------------------------------
+  Function behavior
+------------------------------------------------------------
+
+Goal Call point h1 h2 in 'behavior' at instruction (file tests/wp_plugin/dynamic.i, line 65):
+Assume { (* Heap *) Type: region(p.base) <= 0. }
+Prove: (global(G_h1_61) = p) \/ (global(G_h2_67) = p).
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function behavior with behavior bhv1
 ------------------------------------------------------------

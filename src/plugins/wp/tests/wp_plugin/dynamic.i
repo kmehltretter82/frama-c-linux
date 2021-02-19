@@ -61,7 +61,7 @@ int h0(void);
   @   assigns X1;
   @   ensures X1==1; */
 int behavior (int (*p)(void)) {
-  //@ calls h1, h2; // Shall not be proved in default behavior (known bug)
+  //@ calls h1, h2; // Shall not be proved in default behavior
   return (*p)();
 }
 
