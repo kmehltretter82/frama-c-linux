@@ -49,12 +49,11 @@ val term_addr_of: loc:location -> term_lval -> typ -> term
 val cty: logic_type -> typ
 (** Assume that the logic type is indeed a C type. Just return it. *)
 
-val ptr_index: ?loc:location -> ?index:exp -> exp
-  -> Cil_types.exp * Cil_types.exp
-(** Split pointer-arithmetic expression of the type [p + i] into its
-    pointer and integer parts. *)
+val ptr_base: loc:location -> exp -> exp
+(** Takes an expression [e] and return [base] where [base] is the address [p]
+    if [e] is of the form [p + i] and [e] otherwise. *)
 
-val ptr_base: loc:location -> exp -> exp * exp
+val ptr_base_and_base_addr: loc:location -> exp -> exp * exp
 (* Takes an expression [e] and return a tuple [(base, base_addr)] where [base]
    is the address [p] if [e] is of the form [p + i] and [e] otherwise, and
    [base_addr] is the address [&p] if [e] is of the form [p + i] and 0
