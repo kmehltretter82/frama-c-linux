@@ -20,10 +20,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cil_types
 open Locations
 
 type taint = Zone.t
-
 
 module LatticeTaint = struct
 
@@ -74,10 +74,56 @@ end
 
 module TransferTaint = struct
 
+  let state_of_taint_annot stmt =
+    match Eva_annotations.get_taint_annot stmt with
+    | [] ->
+      LatticeTaint.empty
+    | [ t ] ->
+      begin match t.term_node with
+        | TLval (TVar { lv_origin = Some vi }, TNoOffset) ->
+          Locations.zone_of_varinfo vi
+        | _ ->
+          LatticeTaint.empty
+      end
+    | _ ->
+      (* No more than one annotation at time. *)
+      assert false
+
+  let loc_of_lval valuation lv =
+    match valuation.Abstract_domain.find_loc lv with
+    | `Value loc -> loc.Eval.loc
+    | `Top -> Precise_locs.loc_top
+
   (* No update about taint wrt information provided by the other domains. *)
   let update _valuation state = `Value state
 
-  let assign _ki _lv _exp _v _valuation state = `Value state
+  let assign ki lv exp _v valuation state =
+    match ki with
+    | Kglobal ->
+      `Value state
+    | Kstmt stmt ->
+      Format.printf "stmt: %a@." Cil_printer.pp_stmt stmt;
+      Format.printf "pre: %a@." LatticeTaint.pretty state;
+      let state = LatticeTaint.join state (state_of_taint_annot stmt) in
+      let state =
+        let to_loc = loc_of_lval valuation in
+        let exp_zone = Value_util.zone_of_expr to_loc exp in
+        let lv_indirect_zone =
+          Value_util.indirect_zone_of_lval to_loc lv.Eval.lval
+        in
+        let lv_state =
+          Value_util.(zone_of_expr to_loc (lval_to_exp lv.Eval.lval))
+        in
+        let intersect_state =
+          Zone.intersects exp_zone state ||
+          Zone.intersects lv_indirect_zone state
+        in
+        if intersect_state
+        then LatticeTaint.join lv_state state
+        else Zone.diff state lv_state
+      in
+      Format.printf "post: %a@." LatticeTaint.pretty state;
+      `Value state
 
   let assume _stmt _exp _b _valuation state = `Value state
 
