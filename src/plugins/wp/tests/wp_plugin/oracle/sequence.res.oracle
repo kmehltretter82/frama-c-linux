@@ -278,7 +278,7 @@ Goal Post-condition 'ok,m2' in 'no_calls':
 Assume {
   (* Heap *)
   Type: is_sint32(call_seq_0).
-  (* Pre-condition *)
+  (* Pre-condition 'init' *)
   Have: L_call_obs(call_seq_0) = nil.
 }
 Prove: length(L_call_nil) = 0.
@@ -294,7 +294,7 @@ Goal Post-condition 'ok,n2' in 'no_calls':
 Assume {
   (* Heap *)
   Type: is_sint32(call_seq_0).
-  (* Pre-condition *)
+  (* Pre-condition 'init' *)
   Have: L_call_obs(call_seq_0) = nil.
 }
 Prove: L_call_nil = nil.
@@ -305,7 +305,7 @@ Goal Post-condition 'ok,n3' in 'no_calls':
 Assume {
   (* Heap *)
   Type: is_sint32(call_seq_0).
-  (* Pre-condition *)
+  (* Pre-condition 'init' *)
   Have: L_call_obs(call_seq_0) = nil.
 }
 Prove: L_call_nil = nil.
@@ -319,7 +319,7 @@ Assume {
   Type: is_sint32(call_seq_0).
   (* Goal *)
   When: 0 <= a.
-  (* Pre-condition *)
+  (* Pre-condition 'init' *)
   Have: L_call_obs(call_seq_0) = nil.
 }
 Prove: (L_call_nil = nil) \/ (a <= 0).
@@ -336,7 +336,7 @@ Assume {
   Type: is_sint32(a).
   (* Heap *)
   Type: is_sint32(call_seq_0).
-  (* Pre-condition *)
+  (* Pre-condition 'init' *)
   Have: L_call_obs(call_seq_0) = nil.
 }
 Prove: (L_call_nil = nil) \/ (a <= 0).

@@ -11,10 +11,12 @@ Assume {
   (* Heap *)
   Type: (region(dest_0.base) <= 0) /\ (region(src_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
-  (* Pre-condition *)
-  Have: P_valid_or_empty(Malloc_0, dest_0, n) /\
-      P_valid_read_or_empty(Malloc_0, src_0, n) /\
-      separated(a, n, shift_sint8(src_0, 0), n).
+  (* Pre-condition 'valid_dest' *)
+  Have: P_valid_or_empty(Malloc_0, dest_0, n).
+  (* Pre-condition 'valid_src' *)
+  Have: P_valid_read_or_empty(Malloc_0, src_0, n).
+  (* Pre-condition 'separation' *)
+  Have: separated(a, n, shift_sint8(src_0, 0), n).
   (* Invariant 'no_eva' *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
       (a_1[shift_sint8(src_0, i_1)] = a_1[shift_sint8(dest_0, i_1)]))).
@@ -41,10 +43,12 @@ Assume {
   (* Heap *)
   Type: (region(dest_0.base) <= 0) /\ (region(src_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
-  (* Pre-condition *)
-  Have: P_valid_or_empty(Malloc_0, dest_0, n) /\
-      P_valid_read_or_empty(Malloc_0, src_0, n) /\
-      separated(a, n, shift_sint8(src_0, 0), n).
+  (* Pre-condition 'valid_dest' *)
+  Have: P_valid_or_empty(Malloc_0, dest_0, n).
+  (* Pre-condition 'valid_src' *)
+  Have: P_valid_read_or_empty(Malloc_0, src_0, n).
+  (* Pre-condition 'separation' *)
+  Have: separated(a, n, shift_sint8(src_0, 0), n).
   (* Invariant 'no_eva' *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
       (a_1[shift_sint8(src_0, i_1)] = a_1[shift_sint8(dest_0, i_1)]))).
@@ -63,10 +67,12 @@ Assume {
   (* Heap *)
   Type: (region(dest_0.base) <= 0) /\ (region(src_0.base) <= 0) /\
       linked(Malloc_0).
-  (* Pre-condition *)
-  Have: P_valid_or_empty(Malloc_0, dest_0, n) /\
-      P_valid_read_or_empty(Malloc_0, src_0, n) /\
-      separated(shift_sint8(dest_0, 0), n, shift_sint8(src_0, 0), n).
+  (* Pre-condition 'valid_dest' *)
+  Have: P_valid_or_empty(Malloc_0, dest_0, n).
+  (* Pre-condition 'valid_src' *)
+  Have: P_valid_read_or_empty(Malloc_0, src_0, n).
+  (* Pre-condition 'separation' *)
+  Have: separated(shift_sint8(dest_0, 0), n, shift_sint8(src_0, 0), n).
 }
 Prove: 0 <= n.
 
@@ -83,10 +89,12 @@ Assume {
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Goal *)
   When: (0 <= i_1) /\ (i_1 < to_uint64(1 + i)).
-  (* Pre-condition *)
-  Have: P_valid_or_empty(Malloc_0, dest_0, n) /\
-      P_valid_read_or_empty(Malloc_0, src_0, n) /\
-      separated(a, n, shift_sint8(src_0, 0), n).
+  (* Pre-condition 'valid_dest' *)
+  Have: P_valid_or_empty(Malloc_0, dest_0, n).
+  (* Pre-condition 'valid_src' *)
+  Have: P_valid_read_or_empty(Malloc_0, src_0, n).
+  (* Pre-condition 'separation' *)
+  Have: separated(a, n, shift_sint8(src_0, 0), n).
   (* Invariant 'no_eva' *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
       (a_1[shift_sint8(src_0, i_2)] = a_1[shift_sint8(dest_0, i_2)]))).
@@ -127,10 +135,12 @@ Assume {
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Goal *)
   When: !invalid(Malloc_0, a_2, 1).
-  (* Pre-condition *)
-  Have: P_valid_or_empty(Malloc_0, dest_0, n) /\
-      P_valid_read_or_empty(Malloc_0, src_0, n) /\
-      separated(a, n, shift_sint8(src_0, 0), n).
+  (* Pre-condition 'valid_dest' *)
+  Have: P_valid_or_empty(Malloc_0, dest_0, n).
+  (* Pre-condition 'valid_src' *)
+  Have: P_valid_read_or_empty(Malloc_0, src_0, n).
+  (* Pre-condition 'separation' *)
+  Have: separated(a, n, shift_sint8(src_0, 0), n).
   (* Invariant 'no_eva' *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
       (a_1[shift_sint8(src_0, i_1)] = a_1[shift_sint8(dest_0, i_1)]))).
@@ -157,10 +167,12 @@ Assume {
   (* Heap *)
   Type: (region(dest_0.base) <= 0) /\ (region(src_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
-  (* Pre-condition *)
-  Have: P_valid_or_empty(Malloc_0, dest_0, n) /\
-      P_valid_read_or_empty(Malloc_0, src_0, n) /\
-      separated(a, n, shift_sint8(src_0, 0), n).
+  (* Pre-condition 'valid_dest' *)
+  Have: P_valid_or_empty(Malloc_0, dest_0, n).
+  (* Pre-condition 'valid_src' *)
+  Have: P_valid_read_or_empty(Malloc_0, src_0, n).
+  (* Pre-condition 'separation' *)
+  Have: separated(a, n, shift_sint8(src_0, 0), n).
   (* Invariant 'no_eva' *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
       (a_1[shift_sint8(src_0, i_1)] = a_1[shift_sint8(dest_0, i_1)]))).
@@ -185,9 +197,10 @@ Assume {
   (* Heap *)
   Type: (region(dest_0.base) <= 0) /\ (region(src_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
-  (* Pre-condition *)
-  Have: P_valid_or_empty(Malloc_0, dest_0, n) /\
-      P_valid_read_or_empty(Malloc_0, src_0, n).
+  (* Pre-condition 'valid_dest' *)
+  Have: P_valid_or_empty(Malloc_0, dest_0, n).
+  (* Pre-condition 'valid_src' *)
+  Have: P_valid_read_or_empty(Malloc_0, src_0, n).
   If n = 0
   Then { Have: Mchar_1 = Mchar_0. }
   Else {
@@ -256,9 +269,10 @@ Assume {
   (* Heap *)
   Type: (region(dest_0.base) <= 0) /\ (region(src_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
-  (* Pre-condition *)
-  Have: P_valid_or_empty(Malloc_0, dest_0, n) /\
-      P_valid_read_or_empty(Malloc_0, src_0, n).
+  (* Pre-condition 'valid_dest' *)
+  Have: P_valid_or_empty(Malloc_0, dest_0, n).
+  (* Pre-condition 'valid_src' *)
+  Have: P_valid_read_or_empty(Malloc_0, src_0, n).
   (* Else *)
   Have: n != 0.
   (* Call 'memoverlap' *)
@@ -291,9 +305,10 @@ Assume {
   Type: is_sint32(memoverlap_0) /\ is_uint64(n).
   (* Heap *)
   Type: (region(d.base) <= 0) /\ (region(s.base) <= 0) /\ linked(Malloc_0).
-  (* Pre-condition *)
-  Have: P_valid_or_empty(Malloc_0, d, n) /\
-      P_valid_read_or_empty(Malloc_0, s, n).
+  (* Pre-condition 'valid_dest' *)
+  Have: P_valid_or_empty(Malloc_0, d, n).
+  (* Pre-condition 'valid_src' *)
+  Have: P_valid_read_or_empty(Malloc_0, s, n).
   (* Else *)
   Have: n != 0.
   (* Call 'memoverlap' *)
@@ -320,9 +335,10 @@ Assume {
       sconst(Mchar_0).
   (* Goal *)
   When: (0 <= i_1) /\ (i_1 < to_uint64(1 + i)).
-  (* Pre-condition *)
-  Have: P_valid_or_empty(Malloc_0, d, n) /\
-      P_valid_read_or_empty(Malloc_0, s, n).
+  (* Pre-condition 'valid_dest' *)
+  Have: P_valid_or_empty(Malloc_0, d, n).
+  (* Pre-condition 'valid_src' *)
+  Have: P_valid_read_or_empty(Malloc_0, s, n).
   (* Else *)
   Have: n != 0.
   (* Call 'memoverlap' *)
@@ -366,9 +382,10 @@ Assume {
       sconst(Mchar_0).
   (* Goal *)
   When: (i_1 < n) /\ (to_uint64(1 + i) <= i_1).
-  (* Pre-condition *)
-  Have: P_valid_or_empty(Malloc_0, d, n) /\
-      P_valid_read_or_empty(Malloc_0, s, n).
+  (* Pre-condition 'valid_dest' *)
+  Have: P_valid_or_empty(Malloc_0, d, n).
+  (* Pre-condition 'valid_src' *)
+  Have: P_valid_read_or_empty(Malloc_0, s, n).
   (* Else *)
   Have: n != 0.
   (* Call 'memoverlap' *)
@@ -408,9 +425,10 @@ Assume {
   (* Heap *)
   Type: (region(dest_0.base) <= 0) /\ (region(src_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
-  (* Pre-condition *)
-  Have: P_valid_or_empty(Malloc_0, dest_0, n) /\
-      P_valid_read_or_empty(Malloc_0, src_0, n).
+  (* Pre-condition 'valid_dest' *)
+  Have: P_valid_or_empty(Malloc_0, dest_0, n).
+  (* Pre-condition 'valid_src' *)
+  Have: P_valid_read_or_empty(Malloc_0, src_0, n).
   (* Else *)
   Have: n != 0.
   (* Call 'memoverlap' *)
@@ -443,9 +461,10 @@ Assume {
   Type: is_sint32(memoverlap_0) /\ is_uint64(n).
   (* Heap *)
   Type: (region(d.base) <= 0) /\ (region(s.base) <= 0) /\ linked(Malloc_0).
-  (* Pre-condition *)
-  Have: P_valid_or_empty(Malloc_0, d, n) /\
-      P_valid_read_or_empty(Malloc_0, s, n).
+  (* Pre-condition 'valid_dest' *)
+  Have: P_valid_or_empty(Malloc_0, d, n).
+  (* Pre-condition 'valid_src' *)
+  Have: P_valid_read_or_empty(Malloc_0, s, n).
   (* Else *)
   Have: n != 0.
   (* Call 'memoverlap' *)
@@ -472,9 +491,10 @@ Assume {
       sconst(Mchar_0).
   (* Goal *)
   When: (i_1 < n) /\ (to_uint64(i - 1) < i_1).
-  (* Pre-condition *)
-  Have: P_valid_or_empty(Malloc_0, d, n) /\
-      P_valid_read_or_empty(Malloc_0, s, n).
+  (* Pre-condition 'valid_dest' *)
+  Have: P_valid_or_empty(Malloc_0, d, n).
+  (* Pre-condition 'valid_src' *)
+  Have: P_valid_read_or_empty(Malloc_0, s, n).
   (* Else *)
   Have: n != 0.
   (* Call 'memoverlap' *)
@@ -511,9 +531,10 @@ Assume {
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Goal *)
   When: (i < n) /\ (to_uint64(n - 1) < i).
-  (* Pre-condition *)
-  Have: P_valid_or_empty(Malloc_0, dest_0, n) /\
-      P_valid_read_or_empty(Malloc_0, src_0, n).
+  (* Pre-condition 'valid_dest' *)
+  Have: P_valid_or_empty(Malloc_0, dest_0, n).
+  (* Pre-condition 'valid_src' *)
+  Have: P_valid_read_or_empty(Malloc_0, src_0, n).
   (* Else *)
   Have: n != 0.
   (* Call 'memoverlap' *)
@@ -541,9 +562,10 @@ Assume {
       sconst(Mchar_0).
   (* Goal *)
   When: (0 <= i_1) /\ (i_1 <= to_uint64(i - 1)).
-  (* Pre-condition *)
-  Have: P_valid_or_empty(Malloc_0, d, n) /\
-      P_valid_read_or_empty(Malloc_0, s, n).
+  (* Pre-condition 'valid_dest' *)
+  Have: P_valid_or_empty(Malloc_0, d, n).
+  (* Pre-condition 'valid_src' *)
+  Have: P_valid_read_or_empty(Malloc_0, s, n).
   (* Else *)
   Have: n != 0.
   (* Call 'memoverlap' *)
@@ -598,9 +620,10 @@ Assume {
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Goal *)
   When: !invalid(Malloc_0, a_3, 1).
-  (* Pre-condition *)
-  Have: P_valid_or_empty(Malloc_0, d, n) /\
-      P_valid_read_or_empty(Malloc_0, src_0, n).
+  (* Pre-condition 'valid_dest' *)
+  Have: P_valid_or_empty(Malloc_0, d, n).
+  (* Pre-condition 'valid_src' *)
+  Have: P_valid_read_or_empty(Malloc_0, src_0, n).
   (* Else *)
   Have: n != 0.
   (* Call 'memoverlap' *)
@@ -650,9 +673,10 @@ Assume {
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Goal *)
   When: !invalid(Malloc_0, a_3, 1).
-  (* Pre-condition *)
-  Have: P_valid_or_empty(Malloc_0, d, n) /\
-      P_valid_read_or_empty(Malloc_0, src_0, n).
+  (* Pre-condition 'valid_dest' *)
+  Have: P_valid_or_empty(Malloc_0, d, n).
+  (* Pre-condition 'valid_src' *)
+  Have: P_valid_read_or_empty(Malloc_0, src_0, n).
   (* Else *)
   Have: n != 0.
   (* Call 'memoverlap' *)
@@ -724,9 +748,10 @@ Assume {
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Goal *)
   When: !invalid(Malloc_0, a, 1).
-  (* Pre-condition *)
-  Have: P_valid_or_empty(Malloc_0, d, n) /\
-      P_valid_read_or_empty(Malloc_0, src_0, n).
+  (* Pre-condition 'valid_dest' *)
+  Have: P_valid_or_empty(Malloc_0, d, n).
+  (* Pre-condition 'valid_src' *)
+  Have: P_valid_read_or_empty(Malloc_0, src_0, n).
   (* Else *)
   Have: n != 0.
   (* Call 'memoverlap' *)
@@ -767,9 +792,10 @@ Assume {
   (* Heap *)
   Type: (region(dest_0.base) <= 0) /\ (region(src_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
-  (* Pre-condition *)
-  Have: P_valid_or_empty(Malloc_0, dest_0, n) /\
-      P_valid_read_or_empty(Malloc_0, src_0, n).
+  (* Pre-condition 'valid_dest' *)
+  Have: P_valid_or_empty(Malloc_0, dest_0, n).
+  (* Pre-condition 'valid_src' *)
+  Have: P_valid_read_or_empty(Malloc_0, src_0, n).
   (* Else *)
   Have: n != 0.
   (* Call 'memoverlap' *)
@@ -809,9 +835,10 @@ Assume {
   (* Heap *)
   Type: (region(dest_0.base) <= 0) /\ (region(src_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
-  (* Pre-condition *)
-  Have: P_valid_or_empty(Malloc_0, dest_0, n) /\
-      P_valid_read_or_empty(Malloc_0, src_0, n).
+  (* Pre-condition 'valid_dest' *)
+  Have: P_valid_or_empty(Malloc_0, dest_0, n).
+  (* Pre-condition 'valid_src' *)
+  Have: P_valid_read_or_empty(Malloc_0, src_0, n).
   (* Else *)
   Have: n != 0.
   (* Call 'memoverlap' *)
