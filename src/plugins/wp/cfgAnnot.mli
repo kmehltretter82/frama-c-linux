@@ -57,12 +57,6 @@ val get_complete_behaviors : kernel_function -> pred_info list
 val get_disjoint_behaviors : kernel_function -> pred_info list
 
 (* -------------------------------------------------------------------------- *)
-(* --- Property Accessors : Code Behaviors                                --- *)
-(* -------------------------------------------------------------------------- *)
-
-val get_code_behaviors : stmt -> (string list * funspec) list
-
-(* -------------------------------------------------------------------------- *)
 (* --- Property Accessors : Assertions                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -74,7 +68,8 @@ type code_assertions = {
 val get_code_assertions :
   ?smoking:bool -> kernel_function -> stmt -> code_assertions
 
-val get_unreachable : kernel_function -> stmt -> WpPropId.prop_id
+val get_unreachable : kernel_function -> stmt -> prop_id
+val get_stmt_assigns : kernel_function -> stmt -> assigns_full_info list
 
 (* -------------------------------------------------------------------------- *)
 (* --- Property Accessors : Loop Contracts                                --- *)
@@ -82,15 +77,15 @@ val get_unreachable : kernel_function -> stmt -> WpPropId.prop_id
 
 type loop_contract = {
   (** to be verified at loop entry *)
-  loop_established: WpPropId.pred_info list;
+  loop_established: pred_info list;
   (** to be assumed for loop current *)
-  loop_invariants: WpPropId.pred_info list;
+  loop_invariants: pred_info list;
   (** to be proved after loop invariants *)
-  loop_smoke: WpPropId.pred_info list;
+  loop_smoke: pred_info list;
   (** to be verified after loop body *)
-  loop_preserved: WpPropId.pred_info list;
+  loop_preserved: pred_info list;
   (** assigned by loop body *)
-  loop_assigns: WpPropId.assigns_full_info list;
+  loop_assigns: assigns_full_info list;
 }
 
 val get_loop_contract : ?smoking:bool ->

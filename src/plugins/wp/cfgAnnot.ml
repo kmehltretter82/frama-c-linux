@@ -90,10 +90,10 @@ let normalize_post ~goal kf bhv tk ?assumes (itk,ip) =
 
 let normalize_froms tk froms =
   let module L = NormAtLabels in
-  let labels = L.labels_fct_post ~exit:(tk=Exits) in
+  let labels = L.labels_fct_assigns ~exit:(tk=Exits) in
   L.preproc_assigns labels froms
 
-let normalize_assigns kf ~exits bhv = function
+let normalize_fct_assigns kf ~exits bhv = function
   | WritesAny ->
       WpPropId.empty_assigns_info, WpPropId.empty_assigns_info
   | Writes froms ->
@@ -111,7 +111,7 @@ let normalize_assigns kf ~exits bhv = function
 let get_behavior_goals kf ?(smoking=false) ?(exits=false) bhv =
   let pre_cond = normalize_pre ~goal:false kf bhv in
   let post_cond = normalize_post ~goal:true kf bhv in
-  let p_asgn, e_asgn = normalize_assigns kf ~exits bhv bhv.b_assigns in
+  let p_asgn, e_asgn = normalize_fct_assigns kf ~exits bhv bhv.b_assigns in
   let smokes =
     if smoking && bhv.b_requires <> [] then
       let bname =
