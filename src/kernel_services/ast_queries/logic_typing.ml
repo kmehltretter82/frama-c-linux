@@ -4188,19 +4188,16 @@ struct
         C.error loc "Definition of %s is cyclic" s;
       my_info.lt_def <- tdef;
       Dtype (my_info,loc)
-    | LDlemma (x,is_axiom, labels, poly, {tp_kind = kind; tp_statement = e}) ->
+    | LDlemma (x,labels, poly, {tp_kind = kind; tp_statement = e}) ->
       if Logic_env.Lemmas.mem x then begin
         let old_def = Logic_env.Lemmas.find x in
+        let old_kind = match old_def with
+          | Dlemma(_,_,_,{tp_kind },_,_) -> tp_kind
+          | _ -> Assert in
         let old_loc = Cil_datatype.Global_annotation.loc old_def in
-        let is_axiom =
-          match old_def with
-          | Dlemma(_, is_axiom, _, _, _, _, _) -> is_axiom
-          | _ ->
-            Kernel.fatal ~current:true
-              "Logic_env.get_lemma must return Dlemma"
-        in
-        C.error loc "%s is already registered as %s (%a)"
-          x (if is_axiom then "axiom" else "lemma")
+        C.error loc "%a %s is already registered as %a (%a)"
+          Cil_printer.pp_lemma_kind kind x
+          Cil_printer.pp_lemma_kind old_kind
           Cil_datatype.Location.pretty old_loc
       end;
       let labels,env = annot_env loc labels poly in
@@ -4209,7 +4206,7 @@ struct
         | None -> labels
         | Some lab -> [lab]
       in
-      let def = Dlemma (x,is_axiom, labels, poly,  p, [], loc) in
+      let def = Dlemma (x,labels, poly,  p, [], loc) in
       Logic_env.Lemmas.add x def;
       def
     | LDinvariant (s, e) ->

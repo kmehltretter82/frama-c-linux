@@ -169,8 +169,8 @@ class visitor = object
     | Daxiomatic(str, _, _, _) ->
       warn "axiomatic" str;
       Cil.DoChildren
-    | Dlemma(str, axiom, _, _, _, _, _) ->
-      warn (if axiom then "axiom" else "lemma") str;
+    | Dlemma(str, _, _, { tp_kind }, _, _) ->
+      warn (Cil_printer.string_of_lemma tp_kind) str;
       Cil.DoChildren
     | _ ->
       Cil.DoChildren

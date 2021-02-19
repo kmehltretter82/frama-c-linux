@@ -27,6 +27,53 @@ open Cil_datatype
 open Printer_api
 open Format
 
+let string_of_assert = function
+  | Assert -> "assert"
+  | Check -> "check"
+  | Admit -> "admit"
+
+let name_of_assert = function
+  | Assert -> "assertion"
+  | Check -> "check"
+  | Admit -> "admit"
+
+let string_of_lemma = function
+  | Assert -> "lemma"
+  | Check -> "check lemma"
+  | Admit -> "axiom"
+
+let ident_of_lemma = function
+  | Assert -> "lemma"
+  | Check -> "check_lemma"
+  | Admit -> "axiom"
+
+let string_of_predicate ~kw = function
+  | Assert -> kw
+  | Check -> "check " ^ kw
+  | Admit -> "admit " ^ kw
+
+let ident_of_predicate ~kw = function
+  | Assert -> kw
+  | Check -> "check_" ^ kw
+  | Admit -> "admit_" ^ kw
+
+let pp_assert_kind fmt kd = Format.pp_print_string fmt (string_of_assert kd)
+let pp_lemma_kind fmt kd = Format.pp_print_string fmt (string_of_lemma kd)
+let pp_predicate_kind ~kw fmt kd =
+  match kd with
+  | Assert -> Format.pp_print_string fmt kw
+  | Check ->
+    begin
+      Format.pp_print_string fmt "check " ;
+      Format.pp_print_string fmt kw ;
+    end
+  | Admit ->
+    begin
+      Format.pp_print_string fmt "admit " ;
+      Format.pp_print_string fmt kw ;
+    end
+
+
 module Extensions = struct
   let initialized = ref false
   let ref_print = ref (fun _ _ _ _ -> assert false)
@@ -2847,11 +2894,20 @@ class cil_printer () = object (self)
   method decreases fmt v = self#decrement "decreases" fmt v
   method variant fmt v = self#decrement "loop variant" fmt v
 
-  method private pp_predicate_kind fmt p =
-    match p.tp_kind with
+  method private pp_predicate_kind fmt = function
     | Assert -> ()
-    | Check -> fprintf fmt "%a " self#pp_acsl_keyword "check"
-    | Admit -> fprintf fmt "%a " self#pp_acsl_keyword "admit"
+    | Check -> self#pp_acsl_keyword fmt "check" ; pp_print_char fmt ' '
+    | Admit -> self#pp_acsl_keyword fmt "admit" ; pp_print_char fmt ' '
+
+  method private pp_lemma_kind fmt = function
+    | Assert -> self#pp_acsl_keyword fmt "lemma"
+    | Admit -> self#pp_acsl_keyword fmt "axiom"
+    | Check ->
+      begin
+        self#pp_acsl_keyword fmt "check" ;
+        pp_print_char fmt ' ' ;
+        self#pp_acsl_keyword fmt "lemma" ;
+      end
 
   method assumes fmt p =
     fprintf fmt "@[<hov 2>%a@ %a;@]"
@@ -2860,7 +2916,7 @@ class cil_printer () = object (self)
 
   method requires fmt p =
     fprintf fmt "@[<hov 2>%a%a@ %a;@]"
-      self#pp_predicate_kind p.ip_content
+      self#pp_predicate_kind p.ip_content.tp_kind
       self#pp_acsl_keyword "requires"
       self#identified_predicate p
 
@@ -2873,7 +2929,7 @@ class cil_printer () = object (self)
   method post_cond fmt (k,p) =
     let kw = get_termination_kind_name k in
     fprintf fmt "@[<hov 2>%a%a@ %a;@]"
-      self#pp_predicate_kind p.ip_content
+      self#pp_predicate_kind p.ip_content.tp_kind
       self#pp_acsl_keyword kw
       self#identified_predicate p
 
@@ -3086,14 +3142,9 @@ class cil_printer () = object (self)
     in
     match ca.annot_content with
     | AAssert (behav,p) ->
-      let kw = match p.tp_kind with
-        | Assert -> "assert"
-        | Check ->  "check"
-        | Admit ->  "admit"
-      in
       fprintf fmt "@[%a%a@ %a;@]"
         pp_for_behavs behav
-        self#pp_acsl_keyword kw
+        self#pp_acsl_keyword (string_of_assert p.tp_kind)
         self#predicate p.tp_statement
     | APragma (Slice_pragma sp) ->
       fprintf fmt "@[%a@ %a;@]"
@@ -3122,13 +3173,13 @@ class cil_printer () = object (self)
     | AInvariant(behav,true, i) ->
       fprintf fmt "@[<2>%a%a%a@ %a;@]"
         pp_for_behavs behav
-        self#pp_predicate_kind i
+        self#pp_predicate_kind i.tp_kind
         self#pp_acsl_keyword "loop invariant"
         self#predicate i.tp_statement
     | AInvariant(behav,false,i) ->
       fprintf fmt "@[<2>%a%a%a@ %a;@]"
         pp_for_behavs behav
-        self#pp_predicate_kind i
+        self#pp_predicate_kind i.tp_kind
         self#pp_acsl_keyword "invariant"
         self#predicate i.tp_statement
     | AVariant v ->
@@ -3217,12 +3268,11 @@ class cil_printer () = object (self)
         self#logic_var pred.l_var_info
         self#predicate (pred_body pred.l_body);
       current_label <- old_label
-    | Dlemma(name, is_axiom, labels, tvars, pred, _attr, _) ->
+    | Dlemma(name, labels, tvars, pred, _attr, _) ->
       (* attributes are meant to be purely internal for now. *)
       let old_lab = current_label in
-      fprintf fmt "@[<hv 2>@[<hov 1>%a%a %a%a%a:@]@ %t%a;@]@\n"
-        self#pp_predicate_kind pred
-        self#pp_acsl_keyword (if is_axiom then "axiom" else "lemma")
+      fprintf fmt "@[<hv 2>@[<hov 1>%a %a%a%a:@]@ %t%a;@]@\n"
+        self#pp_lemma_kind pred.tp_kind
         self#varname name
         self#labels labels
         self#polyTypePrms tvars

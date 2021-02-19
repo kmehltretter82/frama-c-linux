@@ -322,7 +322,7 @@ class slocVisitor ~libc : sloc_visitor = object(self)
         | Dvolatile (_, _, _, _, _) -> " (Volatile) "
         | Daxiomatic (s, _, _, _) -> s
         | Dtype (lti, _) ->  lti.lt_name
-        | Dlemma (ln, _, _, _, _, _, _) ->  ln
+        | Dlemma (ln, _, _, _, _, _) ->  ln
         | Dinvariant (toto, _) -> toto.l_var_info.lv_name
         | Dtype_annot (ta, _) -> ta.l_var_info.lv_name
         | Dmodel_annot (mi, _) -> mi.mi_name

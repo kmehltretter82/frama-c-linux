@@ -233,13 +233,12 @@ and decl_node =
         (** [LDinductive_def(name,labels,type_params, parameters, indcases)]
             represents an inductive definition of a new predicate.
          *)
-  | LDlemma of string * bool * string list * string list * toplevel_predicate
-      (** LDlemma(name,is_axiom,labels,type_params,property) represents
-          a lemma or an axiom [name].
-          [is_axiom] is true for an axiom and false for a lemma. [labels]
-          is the list of label arguments and
-          [type_params] the list of type parameters. Last, [property] is the
-          statement of the lemma.
+  | LDlemma of string * string list * string list * toplevel_predicate
+      (** LDlemma(name,labels,type_params,property) represents axioms and
+          lemmas. Axioms and admit lemmas are fusionned.
+          [labels] is the list of label arguments and
+          [type_params] the list of type parameters.
+          Last, [property] is the statement of the lemma.
        *)
   | LDaxiomatic of string * decl list
         (** [LDaxiomatic(id,decls)]

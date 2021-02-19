@@ -224,8 +224,8 @@ let translate_history_elt old_helt =
          GAnnot(Dtype(               {lt_name = new_name},_)  ,        new_loc))
       | (GAnnot(Daxiomatic(          old_name,_,_,_),                  old_loc),
          GAnnot(Daxiomatic(          new_name,_,_,_),                  new_loc))
-      | (GAnnot(Dlemma(              old_name,_,_,_,_,_,_),            old_loc),
-         GAnnot(Dlemma(              new_name,_,_,_,_,_,_),            new_loc))
+      | (GAnnot(Dlemma(              old_name,_,_,_,_,_),              old_loc),
+         GAnnot(Dlemma(              new_name,_,_,_,_,_),              new_loc))
       | (GAnnot(Dfun_or_pred({l_var_info= {lv_name=old_name}},_),      old_loc),
          GAnnot(Dfun_or_pred({l_var_info= {lv_name=new_name}},_),      new_loc))
 

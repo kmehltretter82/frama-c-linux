@@ -675,7 +675,7 @@ let add_all_axioms tbl =
   let rec do_g g =
     match g with
     | Daxiomatic (_ax_name, globs,_,_) -> do_globs globs
-    | Dlemma (name,_,_,_,_,_,_) ->
+    | Dlemma (name,_,_,_,_,_) ->
         let lem = LogicUsage.logic_lemma name in
         add_axiom tbl lem
     | _ -> ()

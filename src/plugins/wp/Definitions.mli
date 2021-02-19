@@ -48,7 +48,7 @@ type typedef = (tau,field,lfun) Qed.Engine.ftypedef
 type dlemma = {
   l_name  : string ;
   l_cluster : cluster ;
-  l_kind : lkind ;
+  l_kind : predicate_kind ;
   l_types : int ;
   l_forall : var list ;
   l_triggers : trigger list list ; (** OR of AND-triggers *)

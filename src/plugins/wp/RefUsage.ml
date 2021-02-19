@@ -735,7 +735,7 @@ let compute_usage () =
   (* Usage in lemmas *)
   let u_lemmas =
     LogicUsage.fold_lemmas
-      (fun l -> E.cup (pred (mk_ctx()) l.lem_property)) E.bot
+      (fun l -> E.cup (pred (mk_ctx()) l.lem_predicate.tp_statement)) E.bot
   in
   (* initial state by kf *)
   let usage = Globals.Functions.fold (fun kf env ->

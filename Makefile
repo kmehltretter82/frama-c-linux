@@ -526,8 +526,8 @@ KERNEL_CMO=\
 	src/kernel_services/ast_printing/cil_descriptive_printer.cmo    \
 	src/kernel_services/parsetree/cabs.cmo                               \
 	src/kernel_services/parsetree/cabshelper.cmo                         \
-	src/kernel_services/ast_printing/logic_print.cmo                \
 	src/kernel_services/ast_queries/logic_utils.cmo              \
+	src/kernel_services/ast_printing/logic_print.cmo                \
 	src/kernel_internals/parsing/logic_parser.cmo                  \
 	src/kernel_internals/parsing/logic_lexer.cmo                   \
 	src/kernel_services/ast_queries/logic_typing.cmo             \

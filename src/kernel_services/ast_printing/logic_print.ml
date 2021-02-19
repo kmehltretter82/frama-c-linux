@@ -364,13 +364,9 @@ let rec print_decl fmt d =
       (pp_list ~pre:"<@[" ~sep:",@ " ~suf:"@>}" pp_print_string) tvar
       (pp_list ~sep:",@ " print_typed_ident) prms
       (pp_list ~sep:"@\n" print_case) cases
-  | LDlemma(name,is_axiom,labels,tvar,body) ->
-    fprintf fmt "@[<2>%s%a@ %s%a%a:@ %a;@]"
-      (match body.tp_kind with
-       | Assert -> ""
-       | Check ->  "check "
-       | Admit ->   "admit")
-      (pp_cond ~pr_false:"lemma" is_axiom) "axiom" name
+  | LDlemma(name,labels,tvar,body) ->
+    fprintf fmt "@[<2>%a@ %s%a%a:@ %a;@]"
+      Cil_printer.pp_lemma_kind body.tp_kind name
       (pp_list ~pre:"{@[" ~sep:",@ " ~suf:"@]}" pp_print_string) labels
       (pp_list ~pre:"<@[" ~sep:",@ " ~suf:"@>}" pp_print_string) tvar
       print_lexpr body.tp_statement
@@ -422,12 +418,7 @@ let print_allocation ~isloop fmt fa =
 let print_clause name fmt e = fprintf fmt "@\n%s@ %a;" name print_lexpr e
 
 let print_tp_clause name fmt e =
-  let name =
-    match e.tp_kind with
-    | Assert -> name
-    | Check -> "check " ^ name
-    | Admit -> "admit " ^ name
-  in
+  let name = Cil_printer.string_of_predicate ~kw:name e.tp_kind in
   print_clause name fmt e.tp_statement
 
 let print_post fmt (k,e) =
@@ -493,23 +484,19 @@ let print_code_annot fmt ca =
   in
   match ca with
     AAssert(bhvs,e) ->
-    fprintf fmt "%a%s@ %a;"
+    fprintf fmt "%a%a@ %a;"
       print_behaviors bhvs
-      (match e.tp_kind with
-       | Assert -> ""
-       | Check ->  "check "
-       | Admit ->   "admit")
+      Cil_printer.pp_assert_kind e.tp_kind
       print_lexpr e.tp_statement
   | AStmtSpec (bhvs,s) ->
     fprintf fmt "%a%a"
       print_behaviors bhvs
       print_spec s
   | AInvariant (bhvs,loop,e) ->
-    fprintf fmt "%a%a%a%ainvariant@ %a;"
+    let kw = if loop then "loop invariant" else "invariant" in
+    fprintf fmt "%a%a@ %a;"
       print_behaviors bhvs
-      (pp_cond (e.tp_kind = Check)) "check @"
-      (pp_cond (e.tp_kind = Admit)) "admit @"
-      (pp_cond loop) "loop@ "
+      (Cil_printer.pp_predicate_kind ~kw) e.tp_kind
       print_lexpr e.tp_statement
   | AVariant e -> fprintf fmt "loop@ variant@ %a;" print_variant e
   | AAssigns (bhvs,a) ->

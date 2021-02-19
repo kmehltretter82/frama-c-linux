@@ -945,11 +945,12 @@ class visitor (ctx:context) c =
       id, t
 
     method on_dlemma l =
-      let kind = Why3.Decl.(if l.l_kind = `Axiom then Paxiom else Plemma) in
-      let cnv = empty_cnv ctx in
-      let id, t = self#make_lemma cnv l in
-      let decl = Why3.Decl.create_prop_decl kind id t in
-      ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl
+      if l.l_kind <> Check then
+        let kind = Why3.Decl.(if l.l_kind = Admit then Paxiom else Plemma) in
+        let cnv = empty_cnv ctx in
+        let id, t = self#make_lemma cnv l in
+        let decl = Why3.Decl.create_prop_decl kind id t in
+        ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl
 
     method on_dfun d =
       Wp_parameters.debug ~dkey:dkey_api "Define %a@." Lang.Fun.pretty d.d_lfun ;

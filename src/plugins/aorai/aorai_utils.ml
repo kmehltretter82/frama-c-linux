@@ -1080,7 +1080,7 @@ let mk_deterministic_lemma () =
     let prop = Logic_const.toplevel_predicate ~kind:Check prop in
     let name = state.Promelaast.name ^ "_deterministic_trans" in
     let lemma =
-      Dlemma (name, false, [label],[],prop,[],Cil_datatype.Location.unknown)
+      Dlemma (name, [label],[],prop,[],Cil_datatype.Location.unknown)
     in
     Annotations.add_global Aorai_option.emitter lemma
   in

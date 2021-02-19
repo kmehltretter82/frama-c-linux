@@ -71,7 +71,6 @@ let compute_ip cc ip =
       cc#compute
 
   | IPFrom _
-  | IPAxiom _
   | IPReachable _
   | IPPropertyInstance _
   | IPOther _

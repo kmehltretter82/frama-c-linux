@@ -120,13 +120,8 @@ let pp_top fmt tp = pp_named fmt tp.tp_statement
 let pp_code_annot fmt ca =
   match ca.annot_content with
   | AAssert(bs,tp) ->
-    let kind =
-      match tp.tp_kind with
-      | Assert -> "assertion"
-      | Check -> "check"
-      | Admit -> "admit"
-    in
-    Format.fprintf fmt "%s%a%a" kind pp_for bs pp_top tp
+    Format.fprintf fmt "%a%a%a"
+      Cil_printer.pp_assert_kind tp.tp_kind pp_for bs pp_top tp
   | AInvariant(bs,_,tp) ->
     Format.fprintf fmt "invariant%a%a" pp_for bs pp_top tp
   | AAssigns(bs,_) -> Format.fprintf fmt "assigns%a" pp_for bs
@@ -226,8 +221,11 @@ let pp_capitalize fmt s =
 let pp_acsl_extension fmt {ext_name} = pp_capitalize fmt ext_name
 
 let rec pp_prop kfopt kiopt kloc fmt = function
-  | IPAxiom {il_name=s} -> Format.fprintf fmt "Axiom '%s'" s
-  | IPLemma {il_name=s} -> Format.fprintf fmt "Lemma '%s'" s
+  | IPLemma {il_name=s; il_pred=p} ->
+    (match p.tp_kind with
+     | Admit -> Format.fprintf fmt "Axiom '%s'" s
+     | Assert -> Format.fprintf fmt "Lemma '%s'" s
+     | Check ->  Format.fprintf fmt "Check Lemma '%s'" s)
   | IPTypeInvariant {iti_name=s} -> Format.fprintf fmt "Type invariant '%s'" s
   | IPGlobalInvariant {igi_name=s} -> Format.fprintf fmt "Global invariant '%s'" s
   | IPAxiomatic {iax_name=s} -> Format.fprintf fmt "Axiomatic '%s'" s
@@ -500,7 +498,7 @@ let loop_order = function
 
 let rec ip_order = function
   | IPAxiomatic {iax_name=a} -> [I 0;S a]
-  | IPAxiom {il_name=a} | IPLemma {il_name=a} -> [I 1;S a]
+  | IPLemma {il_name=a} -> [I 1;S a]
   | IPOther {io_name=s;io_loc=OLContract kf} -> [I 3;F kf;S s]
   | IPOther {io_name=s;io_loc=OLStmt (kf, stmt)} -> [I 4;F kf;K (Kstmt stmt);S s]
   | IPOther {io_name=s;io_loc=OLGlob _} -> [I 5; S s]
