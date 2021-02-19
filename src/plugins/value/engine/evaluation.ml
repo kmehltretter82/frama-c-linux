@@ -770,6 +770,8 @@ module Make
       (* Maximum number of subdivisions. See {!Subdivided_evaluation} for
          more details. *)
       subdivision: int;
+      (* Is the current evaluation subdivided? *)
+      subdivided: bool;
       (* The remaining fuel: maximum number of nested oracle uses, decremented
          at each call to the oracle. *)
       remaining_fuel: int;
@@ -778,8 +780,12 @@ module Make
       oracle: context -> exp -> Value.t evaluated;
     }
 
-  (* Builds the oracle from the context. *)
-  let make_oracle context = context.oracle context
+  (* Builds the query to the domain from the context. *)
+  let make_domain_query query context =
+    let { state; oracle; root; subdivision; subdivided; } = context in
+    let oracle = oracle context in
+    let domain_context = Abstract_domain.{ root; subdivision; subdivided; } in
+    query ~oracle domain_context state
 
   (* Returns the cached value and alarms for the evaluation if it exists;
      call [coop_forward_eval] and caches its result otherwise.
@@ -834,14 +840,10 @@ module Make
     match expr.enode with
     | Lval lval -> eval_lval context lval
     | BinOp _ | UnOp _ | CastE _ -> begin
-        let { state; root; subdivision } = context in
+        let domain_query = make_domain_query Domain.extract_expr context in
         let context = { context with root = false } in
-        let oracle = make_oracle context in
         let intern_value, alarms = internal_forward_eval context expr in
-        let eval_context = Abstract_domain.{ root; subdivision } in
-        let domain_value, alarms' =
-          Domain.extract_expr ~oracle eval_context state expr
-        in
+        let domain_value, alarms' = domain_query expr in
         (* Intersection of alarms, as each sets of alarms are correct
            and "complete" for the evaluation of [expr]. *)
         match Alarmset.inter alarms alarms' with
@@ -1068,9 +1070,8 @@ module Make
       off, typ_res, volatile
 
   and eval_lval ?(indeterminate=false) context lval =
-    let { state; root; subdivision } = context in
+    let domain_query = make_domain_query Domain.extract_lval context in
     let context = { context with root = false } in
-    let oracle = make_oracle context in
     (* Computes the location of [lval]. *)
     lval_to_loc context ~for_writing:false ~reduction:true lval
     >>= fun (loc, typ_lv, volatile_expr) ->
@@ -1082,8 +1083,7 @@ module Make
     *)
     let volatile = volatile_expr || Cil.typeHasQualifier "volatile" typ_lv in
     (* Find the value of the location, if not bottom. *)
-    let context = Abstract_domain.{ root; subdivision } in
-    let v, alarms = Domain.extract_lval ~oracle context state lval typ_lv loc in
+    let v, alarms = domain_query lval typ_lv loc in
     let alarms = close_dereference_alarms lval alarms in
     if indeterminate
     then
@@ -1108,8 +1108,13 @@ module Make
      the reference for the oracle given to the domains. *)
   module Forward_Evaluation = struct
     type nonrec context = context
-    let evaluate context valuation expr =
+    let evaluate ~subdivided context valuation expr =
       cache := valuation;
+      let context =
+        if subdivided
+        then { context with root = false; subdivided }
+        else context
+      in
       root_forward_eval context expr >>=: fun (value, _) ->
       !cache, value
   end
@@ -1143,7 +1148,8 @@ module Make
       | None -> Value_parameters.LinearLevel.get ()
       | Some n -> n
     in
-    { state; root = true; subdivision; remaining_fuel; oracle }
+    let subdivided = false in
+    { state; root = true; subdivision; subdivided; remaining_fuel; oracle }
 
   (* Context for a fast forward evaluation with minimal precision:
      no subdivisions, no calls to the oracle, and the expression is not
@@ -1151,7 +1157,8 @@ module Make
   let fast_eval_context state =
     let remaining_fuel = no_fuel in
     let subdivision = 0 in
-    { state; root = false; subdivision; remaining_fuel; oracle }
+    let subdivided = false in
+    { state; root = false; subdivision; subdivided; remaining_fuel; oracle }
 
   let subdivided_forward_eval valuation ?subdivnb state expr =
     let context = root_context ?subdivnb state in

@@ -360,7 +360,8 @@ module type Forward_Evaluation = sig
   type value
   type valuation
   type context
-  val evaluate: context -> valuation -> exp -> (valuation * value) evaluated
+  val evaluate: subdivided:bool -> context -> valuation ->
+    exp -> (valuation * value) evaluated
 end
 
 module Make
@@ -663,7 +664,7 @@ module Make
       (* Updates [variables] with their new [subvalues]. *)
       let valuation = update_variables cleared_valuation variables subvalues in
       (* Evaluates [expr] with this new valuation. *)
-      let eval, alarms = Eva.evaluate context valuation expr in
+      let eval, alarms = Eva.evaluate ~subdivided:true context valuation expr in
       let result = eval >>-: snd in
       (* Optimization if [subexpr] = [expr]. *)
       if eq_equal_subexpr
@@ -711,7 +712,8 @@ module Make
     (* Reevaluates the lvalue in the initial state, as its value could have
        been reduced in the evaluation of the complete expression, and we cannot
        omit the alarms for the removed values. *)
-    fst (Eva.evaluate context valuation lv_expr) >>- fun (valuation, _) ->
+    fst (Eva.evaluate ~subdivided:true context valuation lv_expr)
+    >>- fun (valuation, _) ->
     let lv_record = find_val valuation lv_expr in
     lv_record.value.v >>-: fun lv_value ->
     { lval; lv_expr; lv_record; lv_value }
@@ -736,7 +738,8 @@ module Make
   (* Subdivided evaluation of [expr] in state [state]. *)
   let subdivide_evaluation context initial_valuation subdivnb expr =
     (* Evaluation of [expr] without subdivision. *)
-    let default = Eva.evaluate context initial_valuation expr in
+    let subdivided = false in
+    let default = Eva.evaluate ~subdivided context initial_valuation expr in
     default >>> fun valuation result alarms ->
     (* Do not try to subdivide if the result is singleton or contains some
        pointers: the better_bound heuristic only works on numerical values. *)
@@ -792,14 +795,14 @@ module Make
               let valuation =
                 Clear.clear_englobing_exprs valuation ~expr ~subexpr
               in
-              Eva.evaluate context valuation expr >>>
+              Eva.evaluate ~subdivided:true context valuation expr >>>
               subdivide_subexpr tail
       in
       subdivide_subexpr vars_info valuation result alarms
 
   let evaluate context valuation ~subdivnb expr =
     if subdivnb = 0 || not activated
-    then Eva.evaluate context valuation expr
+    then Eva.evaluate ~subdivided:false context valuation expr
     else subdivide_evaluation context valuation subdivnb expr
 
 
@@ -895,7 +898,7 @@ module Make
     let condition_may_still_be_true valuation expr record value =
       let value = { record.value with v = `Value value } in
       let valuation = Valuation.add valuation expr { record with value } in
-      let eval, _alarms = Eva.evaluate context valuation cond in
+      let eval = fst (Eva.evaluate ~subdivided:true context valuation cond) in
       match eval with
       | `Bottom -> false
       | `Value (_valuation, value) ->

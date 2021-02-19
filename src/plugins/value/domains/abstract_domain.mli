@@ -120,6 +120,8 @@ type evaluation_context = {
   subdivision: int;
   (** Maximum number of subdivisions for the current evaluation.
       See {!Subdivided_evaluation} for more details. *)
+  subdivided: bool;
+  (** Is the current evaluation a subdivision of the complete evaluation? *)
 }
 
 (** Extraction of information: queries for values or locations inferred by a

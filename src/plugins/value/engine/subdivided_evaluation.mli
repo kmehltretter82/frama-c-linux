@@ -31,7 +31,8 @@ module type Forward_Evaluation = sig
   type value
   type valuation
   type context
-  val evaluate: context -> valuation -> exp -> (valuation * value) evaluated
+  val evaluate: subdivided:bool -> context -> valuation ->
+    exp -> (valuation * value) evaluated
 end
 
 module Make
