@@ -75,7 +75,7 @@ int main(void)
   {
     int __gen_e_acsl_valid;
     __gen_e_acsl_valid = __e_acsl_valid((void *)(& v1[2]),sizeof(int),
-                                        (void *)(& v1[2]),(void *)0);
+                                        (void *)(v1),(void *)0);
     __e_acsl_assert(__gen_e_acsl_valid,"Assertion","main","\\valid(&v1[2])",
                     "tests/memory/vector.c",21);
   }

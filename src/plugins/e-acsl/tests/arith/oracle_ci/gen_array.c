@@ -104,7 +104,7 @@ void arrays(void)
           int __gen_e_acsl_valid_read;
           __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(& (*((int (*)[3])g))[__gen_e_acsl_iter_4]),
                                                         sizeof(int),
-                                                        (void *)(& (*((int (*)[3])g))[__gen_e_acsl_iter_4]),
+                                                        (void *)(*((int (*)[3])g)),
                                                         (void *)0);
           __e_acsl_assert(__gen_e_acsl_valid_read,"RTE","arrays",
                           "mem_access: \\valid_read(&(*((int (*)[3])g))[__gen_e_acsl_iter_4])",
@@ -132,7 +132,7 @@ void arrays(void)
     __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(*((int (*)[])g)),
                                                     sizeof(int),
                                                     (void *)(*((int (*)[])g)),
-                                                    (void *)(*((int (*)[])g)));
+                                                    (void *)0);
     __e_acsl_assert(__gen_e_acsl_valid_read_2,"RTE","arrays",
                     "mem_access: \\valid_read((int *)*((int (*)[])g))",
                     "tests/arith/array.i",41);
@@ -147,7 +147,7 @@ void arrays(void)
           int __gen_e_acsl_valid_read_3;
           __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)(& (*((int (*)[])g))[__gen_e_acsl_iter_5]),
                                                           sizeof(int),
-                                                          (void *)(& (*((int (*)[])g))[__gen_e_acsl_iter_5]),
+                                                          (void *)(*((int (*)[])g)),
                                                           (void *)0);
           __e_acsl_assert(__gen_e_acsl_valid_read_3,"RTE","arrays",
                           "mem_access: \\valid_read(&(*((int (*)[])g))[__gen_e_acsl_iter_5])",
@@ -176,7 +176,7 @@ void arrays(void)
           int __gen_e_acsl_valid_read_4;
           __gen_e_acsl_valid_read_4 = __e_acsl_valid_read((void *)(& (*((int (*)[3])f))[__gen_e_acsl_iter_6]),
                                                           sizeof(int),
-                                                          (void *)(& (*((int (*)[3])f))[__gen_e_acsl_iter_6]),
+                                                          (void *)(*((int (*)[3])f)),
                                                           (void *)0);
           __e_acsl_assert(__gen_e_acsl_valid_read_4,"RTE","arrays",
                           "mem_access: \\valid_read(&(*((int (*)[3])f))[__gen_e_acsl_iter_6])",
@@ -204,7 +204,7 @@ void arrays(void)
     __gen_e_acsl_valid_read_5 = __e_acsl_valid_read((void *)(*((int (*)[])f)),
                                                     sizeof(int),
                                                     (void *)(*((int (*)[])f)),
-                                                    (void *)(*((int (*)[])f)));
+                                                    (void *)0);
     __e_acsl_assert(__gen_e_acsl_valid_read_5,"RTE","arrays",
                     "mem_access: \\valid_read((int *)*((int (*)[])f))",
                     "tests/arith/array.i",43);
@@ -219,7 +219,7 @@ void arrays(void)
           int __gen_e_acsl_valid_read_6;
           __gen_e_acsl_valid_read_6 = __e_acsl_valid_read((void *)(& (*((int (*)[])f))[__gen_e_acsl_iter_7]),
                                                           sizeof(int),
-                                                          (void *)(& (*((int (*)[])f))[__gen_e_acsl_iter_7]),
+                                                          (void *)(*((int (*)[])f)),
                                                           (void *)0);
           __e_acsl_assert(__gen_e_acsl_valid_read_6,"RTE","arrays",
                           "mem_access: \\valid_read(&(*((int (*)[])f))[__gen_e_acsl_iter_7])",
@@ -324,14 +324,14 @@ void arrays(void)
           int __gen_e_acsl_valid_read_8;
           __gen_e_acsl_valid_read_7 = __e_acsl_valid_read((void *)(& (*((int (*)[3])l))[__gen_e_acsl_iter_11]),
                                                           sizeof(int),
-                                                          (void *)(& (*((int (*)[3])l))[__gen_e_acsl_iter_11]),
+                                                          (void *)(*((int (*)[3])l)),
                                                           (void *)0);
           __e_acsl_assert(__gen_e_acsl_valid_read_7,"RTE","arrays",
                           "mem_access: \\valid_read(&(*((int (*)[3])l))[__gen_e_acsl_iter_11])",
                           "tests/arith/array.i",55);
           __gen_e_acsl_valid_read_8 = __e_acsl_valid_read((void *)(& (*((int (*)[3])m))[__gen_e_acsl_iter_11]),
                                                           sizeof(int),
-                                                          (void *)(& (*((int (*)[3])m))[__gen_e_acsl_iter_11]),
+                                                          (void *)(*((int (*)[3])m)),
                                                           (void *)0);
           __e_acsl_assert(__gen_e_acsl_valid_read_8,"RTE","arrays",
                           "mem_access: \\valid_read(&(*((int (*)[3])m))[__gen_e_acsl_iter_11])",
@@ -362,14 +362,14 @@ void arrays(void)
           int __gen_e_acsl_valid_read_10;
           __gen_e_acsl_valid_read_9 = __e_acsl_valid_read((void *)(& (*((int (*)[3])l))[__gen_e_acsl_iter_12]),
                                                           sizeof(int),
-                                                          (void *)(& (*((int (*)[3])l))[__gen_e_acsl_iter_12]),
+                                                          (void *)(*((int (*)[3])l)),
                                                           (void *)0);
           __e_acsl_assert(__gen_e_acsl_valid_read_9,"RTE","arrays",
                           "mem_access: \\valid_read(&(*((int (*)[3])l))[__gen_e_acsl_iter_12])",
                           "tests/arith/array.i",56);
           __gen_e_acsl_valid_read_10 = __e_acsl_valid_read((void *)(& (*((int (*)[3])n))[__gen_e_acsl_iter_12]),
                                                            sizeof(int),
-                                                           (void *)(& (*((int (*)[3])n))[__gen_e_acsl_iter_12]),
+                                                           (void *)(*((int (*)[3])n)),
                                                            (void *)0);
           __e_acsl_assert(__gen_e_acsl_valid_read_10,"RTE","arrays",
                           "mem_access: \\valid_read(&(*((int (*)[3])n))[__gen_e_acsl_iter_12])",
@@ -446,14 +446,14 @@ void arrays(void)
           int __gen_e_acsl_valid_read_12;
           __gen_e_acsl_valid_read_11 = __e_acsl_valid_read((void *)(& (*((int (*)[2])l))[__gen_e_acsl_iter_15]),
                                                            sizeof(int),
-                                                           (void *)(& (*((int (*)[2])l))[__gen_e_acsl_iter_15]),
+                                                           (void *)(*((int (*)[2])l)),
                                                            (void *)0);
           __e_acsl_assert(__gen_e_acsl_valid_read_11,"RTE","arrays",
                           "mem_access: \\valid_read(&(*((int (*)[2])l))[__gen_e_acsl_iter_15])",
                           "tests/arith/array.i",61);
           __gen_e_acsl_valid_read_12 = __e_acsl_valid_read((void *)(& (*((int (*)[2])m))[__gen_e_acsl_iter_15]),
                                                            sizeof(int),
-                                                           (void *)(& (*((int (*)[2])m))[__gen_e_acsl_iter_15]),
+                                                           (void *)(*((int (*)[2])m)),
                                                            (void *)0);
           __e_acsl_assert(__gen_e_acsl_valid_read_12,"RTE","arrays",
                           "mem_access: \\valid_read(&(*((int (*)[2])m))[__gen_e_acsl_iter_15])",
@@ -484,14 +484,14 @@ void arrays(void)
           int __gen_e_acsl_valid_read_14;
           __gen_e_acsl_valid_read_13 = __e_acsl_valid_read((void *)(& (*((int (*)[2])l))[__gen_e_acsl_iter_16]),
                                                            sizeof(int),
-                                                           (void *)(& (*((int (*)[2])l))[__gen_e_acsl_iter_16]),
+                                                           (void *)(*((int (*)[2])l)),
                                                            (void *)0);
           __e_acsl_assert(__gen_e_acsl_valid_read_13,"RTE","arrays",
                           "mem_access: \\valid_read(&(*((int (*)[2])l))[__gen_e_acsl_iter_16])",
                           "tests/arith/array.i",62);
           __gen_e_acsl_valid_read_14 = __e_acsl_valid_read((void *)(& (*((int (*)[2])n))[__gen_e_acsl_iter_16]),
                                                            sizeof(int),
-                                                           (void *)(& (*((int (*)[2])n))[__gen_e_acsl_iter_16]),
+                                                           (void *)(*((int (*)[2])n)),
                                                            (void *)0);
           __e_acsl_assert(__gen_e_acsl_valid_read_14,"RTE","arrays",
                           "mem_access: \\valid_read(&(*((int (*)[2])n))[__gen_e_acsl_iter_16])",

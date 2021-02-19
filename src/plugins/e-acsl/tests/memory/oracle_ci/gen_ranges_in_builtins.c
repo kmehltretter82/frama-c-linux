@@ -264,7 +264,7 @@ int main(void)
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)((char *)(& t3[6][1][0]) + 
                                                            4 * 2),
                                                   (size_t)__gen_e_acsl_if_11,
-                                                  (void *)(& t3[6][1][0]),
+                                                  (void *)(& t3[0][0][0]),
                                                   (void *)0);
     __e_acsl_assert(! __gen_e_acsl_valid_read,"Assertion","main",
                     "!\\valid_read(&t3[6][1][0] + (2 .. 10))",
@@ -282,7 +282,7 @@ int main(void)
         int __gen_e_acsl_valid_read_2;
         __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(& t3[__gen_e_acsl_range_3][1]),
                                                         sizeof(float [4]),
-                                                        (void *)(& t3[__gen_e_acsl_range_3][1]),
+                                                        (void *)(& t3[0][0]),
                                                         (void *)0);
         if (__gen_e_acsl_valid_read_2) ;
         else {
@@ -311,7 +311,7 @@ int main(void)
         int __gen_e_acsl_valid_8;
         __gen_e_acsl_valid_8 = __e_acsl_valid((void *)(& t4[4][__gen_e_acsl_range_4][2]),
                                               sizeof(int),
-                                              (void *)(& t4[4][__gen_e_acsl_range_4][2]),
+                                              (void *)(& t4[0][0][0]),
                                               (void *)0);
         if (__gen_e_acsl_valid_8) ;
         else {
