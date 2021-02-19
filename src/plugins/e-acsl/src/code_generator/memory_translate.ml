@@ -507,12 +507,12 @@ let call_valid ~loc kf name ctx env t p =
   assert (name = "valid" || name = "valid_read");
   let arg_from_term ~loc kf env rev_args t _p =
     let ptr, size, env = term_to_ptr_and_size ~loc kf env t in
-    let base, base_addr = Misc.ptr_base ~loc ptr in
+    let base, base_addr = Misc.ptr_base_and_base_addr ~loc ptr in
     base_addr :: base :: size :: ptr :: rev_args, env
   in
   let arg_from_range ~loc kf env rev_args ptr r p =
     let ptr, size, env = range_to_ptr_and_size ~loc kf env ptr r p in
-    let base, base_addr = Misc.ptr_base ~loc ptr in
+    let base, base_addr = Misc.ptr_base_and_base_addr ~loc ptr in
     base_addr :: base :: size :: ptr :: rev_args, env
   in
   let prepend_n_args = false in
