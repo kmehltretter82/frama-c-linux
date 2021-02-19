@@ -668,6 +668,8 @@
   function strchr, behavior found: postcondition 'result_in_length' got status valid.
 [eva] share/libc/string.h:164: 
   function strchr, behavior found: postcondition 'result_valid_string' got status valid.
+[eva] share/libc/string.h:165: 
+  cannot evaluate ACSL term, unsupported logic var p
 [eva:alarm] share/libc/string.h:165: Warning: 
   function strchr, behavior found: postcondition 'result_first_occur' got status unknown.
 [eva] share/libc/string.h:171: 
