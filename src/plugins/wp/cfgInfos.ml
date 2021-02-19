@@ -129,7 +129,7 @@ let selected_main_bhv ~bhv ~prop (b : Cil_types.funbehavior) =
 (* --- Calls                                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
-let collect_calls ~bhv stmt =
+let collect_calls ~bhv kf stmt =
   let open Cil_types in
   match stmt.skind with
   | Instr(Call(_,fct,_,_)) ->
@@ -137,7 +137,10 @@ let collect_calls ~bhv stmt =
         match Kernel_function.get_called fct with
         | Some kf -> Fset.singleton kf
         | None ->
-            let bhvs = if bhv = [] then [Cil.default_behavior_name] else bhv in
+            let bhvs =
+              if bhv = []
+              then List.map (fun b -> b.b_name) (Annotations.behaviors kf)
+              else bhv in
             List.fold_left
               (fun fs bhv -> match Dyncall.get ~bhv stmt with
                  | None -> fs
@@ -250,7 +253,7 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
       (* Stmt Iteration *)
       Shash.iter
         (fun stmt (src,_) ->
-           let fs = collect_calls ~bhv stmt in
+           let fs = collect_calls ~bhv kf stmt in
            let dead = unreachable infos src in
            let ca = CfgAnnot.get_code_assertions kf stmt in
            let ca_pids = List.map fst ca.code_verified in
