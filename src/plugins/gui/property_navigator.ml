@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -633,7 +633,6 @@ let make_panel (main_ui:main_window_extension_points) =
     | IPPredicate {ip_kind=PKEnsures _;ip_kinstr=Kstmt _} ->
       ensures.get() && stmtSpec.get()
     | IPPredicate {ip_kind = PKTerminates} -> terminates.get ()
-    | IPAxiom _ -> false
     | IPTypeInvariant _ -> typeInvariants.get()
     | IPGlobalInvariant _ -> globalInvariants.get()
     | IPAxiomatic _ -> axiomatic.get () && not (onlyCurrent.get ())

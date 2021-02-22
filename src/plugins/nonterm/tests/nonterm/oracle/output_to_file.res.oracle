@@ -15,8 +15,9 @@
   NON TERMINATING FUNCTION
 [eva:final-states] Values at end of function main:
   NON TERMINATING FUNCTION
-[nonterm] tests/nonterm/output_to_file.i:7: Warning: 
+[nonterm:stmt] tests/nonterm/output_to_file.i:7: Warning: 
   non-terminating loop
   stack: loop :: tests/nonterm/output_to_file.i:11 <- main
-[nonterm] tests/nonterm/output_to_file.i:12: Warning: unreachable return
+[nonterm:unreachable] tests/nonterm/output_to_file.i:12: Warning: 
+  unreachable return
 [nonterm] Analysis done.

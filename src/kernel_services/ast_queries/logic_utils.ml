@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -723,8 +723,8 @@ let rec add_attribute_glob_annot a g =
     Daxiomatic(n,List.map (add_attribute_glob_annot a) l,
                Cil.addAttribute a al,loc)
   | Dtype(ti,_) -> ti.lt_attr <- Cil.addAttribute a ti.lt_attr; g
-  | Dlemma(n,ax,labs,t,p,al,l) ->
-    Dlemma(n,ax,labs,t,p,Cil.addAttribute a al,l)
+  | Dlemma(n,labs,t,p,al,l) ->
+    Dlemma(n,labs,t,p,Cil.addAttribute a al,l)
   | Dmodel_annot (mi,_) -> mi.mi_attr <- Cil.addAttribute a mi.mi_attr; g
   | Dcustom_annot(c,n,al,l) -> Dcustom_annot(c,n,Cil.addAttribute a al, l)
   | Dextended (e,al,l) -> Dextended(e,Cil.addAttribute a al,l)
@@ -1233,9 +1233,9 @@ let rec is_same_global_annotation ga1 ga2 =
     id1 = id2 && is_same_list is_same_global_annotation ga1 ga2
     && is_same_attributes attr1 attr2
   | Dtype (t1,_), Dtype (t2,_) -> is_same_logic_type_info t1 t2
-  | Dlemma(n1,ax1,labs1,typs1,st1,attr1,_),
-    Dlemma(n2,ax2,labs2,typs2,st2,attr2,_) ->
-    is_same_string n1 n2 && ax1 = ax2 &&
+  | Dlemma(n1,labs1,typs1,st1,attr1,_),
+    Dlemma(n2,labs2,typs2,st2,attr2,_) ->
+    is_same_string n1 n2 &&
     is_same_list is_same_logic_label labs1 labs2 &&
     is_same_list (=) typs1 typs2 && is_same_toplevel_predicate st1 st2 &&
     is_same_attributes attr1 attr2

@@ -1,5 +1,4 @@
 [kernel] Parsing tests/ltl/goto.c (with preprocessing)
-[aorai] Welcome to the Aorai plugin
 [aorai] tests/ltl/goto.c:28: Warning: 
   Call to opc does not follow automaton's specification. This path is assumed to be dead
 [kernel] Parsing TMPDIR/aorai_goto_0.i (no preprocessing)
@@ -18,8 +17,8 @@ int status = 0;
 int rr = 1;
 /*@ global invariant inv: 0 ≤ rr ≤ 5000;
  */
-/*@ ghost enum aorai_ListOper aorai_CurOperation = op_main; */
-/*@ ghost enum aorai_OpStatusList aorai_CurOpStatus = aorai_Called; */
+/*@ ghost enum aorai_ListOper aorai_CurOperation; */
+/*@ ghost enum aorai_OpStatusList aorai_CurOpStatus; */
 /*@ ghost int accept_S2 = 0; */
 /*@ ghost int accept_S3 = 0; */
 /*@ ghost int accept_S4 = 0; */
@@ -72,6 +71,7 @@ int rr = 1;
     int accept_S6_tmp;
     int accept_all_tmp;
     int accept_init_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_opa;
     accept_S2_tmp = accept_S2;
@@ -145,6 +145,7 @@ int rr = 1;
     int accept_S6_tmp;
     int accept_all_tmp;
     int accept_init_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_opa;
     accept_S2_tmp = accept_S2;
@@ -241,6 +242,7 @@ void opa(void)
     int accept_S6_tmp;
     int accept_all_tmp;
     int accept_init_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_opb;
     accept_S2_tmp = accept_S2;
@@ -314,6 +316,7 @@ void opa(void)
     int accept_S6_tmp;
     int accept_all_tmp;
     int accept_init_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_opb;
     accept_S2_tmp = accept_S2;
@@ -398,6 +401,7 @@ void opb(void)
     int accept_S6_tmp;
     int accept_all_tmp;
     int accept_init_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_opc;
     accept_S2_tmp = accept_S2;
@@ -463,6 +467,7 @@ void opb(void)
     int accept_S6_tmp;
     int accept_all_tmp;
     int accept_init_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_opc;
     accept_S2_tmp = accept_S2;
@@ -567,6 +572,7 @@ void opc(void)
     int accept_S6_tmp;
     int accept_all_tmp;
     int accept_init_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
     accept_S2_tmp = accept_S2;
@@ -640,6 +646,7 @@ void opc(void)
     int accept_S6_tmp;
     int accept_all_tmp;
     int accept_init_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;
     accept_S2_tmp = accept_S2;

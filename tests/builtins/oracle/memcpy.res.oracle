@@ -996,6 +996,32 @@
 --- Global Properties
 --------------------------------------------------------------------------------
 
+[  Valid  ] Axiomatic 'MemChr'
+            by Frama-C kernel.
+[  Valid  ] Axiomatic 'MemCmp'
+            by Frama-C kernel.
+[  Valid  ] Axiomatic 'MemSet'
+            by Frama-C kernel.
+[  Valid  ] Axiomatic 'StrChr'
+            by Frama-C kernel.
+[  Valid  ] Axiomatic 'StrCmp'
+            by Frama-C kernel.
+[  Valid  ] Axiomatic 'StrLen'
+            by Frama-C kernel.
+[  Valid  ] Axiomatic 'StrNCmp'
+            by Frama-C kernel.
+[  Valid  ] Axiomatic 'WMemChr'
+            by Frama-C kernel.
+[  Valid  ] Axiomatic 'WcsChr'
+            by Frama-C kernel.
+[  Valid  ] Axiomatic 'WcsCmp'
+            by Frama-C kernel.
+[  Valid  ] Axiomatic 'WcsLen'
+            by Frama-C kernel.
+[  Valid  ] Axiomatic 'WcsNCmp'
+            by Frama-C kernel.
+[  Valid  ] Axiomatic 'dynamic_allocation'
+            by Frama-C kernel.
 [ Extern  ] Axiom 'memchr_def'
             Unverifiable but considered Valid.
 [ Extern  ] Axiom 'memcmp_strlen_left'
@@ -1066,32 +1092,6 @@
             Unverifiable but considered Valid.
 [ Extern  ] Axiom 'wmemchr_def'
             Unverifiable but considered Valid.
-[  Valid  ] Axiomatic 'MemChr'
-            by Frama-C kernel.
-[  Valid  ] Axiomatic 'MemCmp'
-            by Frama-C kernel.
-[  Valid  ] Axiomatic 'MemSet'
-            by Frama-C kernel.
-[  Valid  ] Axiomatic 'StrChr'
-            by Frama-C kernel.
-[  Valid  ] Axiomatic 'StrCmp'
-            by Frama-C kernel.
-[  Valid  ] Axiomatic 'StrLen'
-            by Frama-C kernel.
-[  Valid  ] Axiomatic 'StrNCmp'
-            by Frama-C kernel.
-[  Valid  ] Axiomatic 'WMemChr'
-            by Frama-C kernel.
-[  Valid  ] Axiomatic 'WcsChr'
-            by Frama-C kernel.
-[  Valid  ] Axiomatic 'WcsCmp'
-            by Frama-C kernel.
-[  Valid  ] Axiomatic 'WcsLen'
-            by Frama-C kernel.
-[  Valid  ] Axiomatic 'WcsNCmp'
-            by Frama-C kernel.
-[  Valid  ] Axiomatic 'dynamic_allocation'
-            by Frama-C kernel.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'memcmp'

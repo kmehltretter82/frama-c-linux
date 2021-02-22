@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -124,6 +124,9 @@ val get: Property.t -> status
     Consider using {!Property_status.Consolidation.get} if you want to know the
     consolidated status of the property. *)
 
+(** Iteration on all the individual statuses emitted for the given property.
+    @since Aluminium-20160501 *)
+
 val iter_on_statuses:
   (emitter_with_properties -> emitted_status -> unit) -> Property.t -> unit
 
@@ -131,8 +134,6 @@ val fold_on_statuses:
   (emitter_with_properties -> emitted_status -> 'a -> 'a) ->
   Property.t ->
   'a -> 'a
-(** Iteration on all the individual statuses emitted for the given property.
-    @since Aluminium-20160501 *)
 
 (* ************************************************************************ *)
 (** {2 Consolidated status} *)
@@ -232,11 +233,19 @@ module Consolidation_graph: sig
 end
   
 (* ************************************************************************* *)
-(** {2 Access to the registered properties} *)
+(** {2 Iteration over the registered properties} *)
 (* ************************************************************************* *)
 
 val iter: (Property.t -> unit) -> unit
 val fold: (Property.t -> 'a -> 'a) -> 'a -> 'a
+
+(** @since Frama-C+dev *)
+val iter_sorted:
+  cmp:(Property.t -> Property.t -> int) -> (Property.t -> unit) -> unit
+
+val fold_sorted:
+  cmp:(Property.t -> Property.t -> int) ->
+  (Property.t -> 'a -> 'a) -> 'a -> 'a
 
 (* ************************************************************************* *)
 (** {2 API not for casual users} *)

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -112,7 +112,7 @@ let add_submenu container ~pos label =
 external set_menu :  Obj.t -> unit = "ige_mac_menu_set_menu_bar"
 *)
 
-class menu_manager ?packing ~host:(_:Gtk_helper.host) =
+class menu_manager ?packing (_:Gtk_helper.host) =
   let menubar = GMenu.menu_bar ?packing () in
   (*  let () = set_menu (Obj.field (Obj.repr ((menubar)#as_widget)) 1) in *)
   let factory = new GMenu.factory menubar in

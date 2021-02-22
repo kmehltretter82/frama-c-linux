@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -86,6 +86,7 @@ let dkey_rmtmps = register_category "parser:rmtmps"
 let dkey_referenced = register_category "parser:referenced"
 
 let dkey_pp = register_category "pp"
+let dkey_pp_logic = register_category "pp:logic"
 let dkey_compilation_db = register_category "pp:compilation-db"
 
 let dkey_print_bitfields = register_category "printer:bitfields"
@@ -192,6 +193,9 @@ let () = set_warn_status wkey_decimal_float Log.Wonce
 let wkey_acsl_extension = register_warn_category "acsl-extension"
 
 let wkey_cmdline = register_warn_category "cmdline"
+
+let wkey_audit = register_warn_category "audit"
+let () = set_warn_status wkey_audit Log.Werror
 
 (* ************************************************************************* *)
 (** {2 Specialised functors for building kernel parameters} *)
@@ -1037,6 +1041,41 @@ module PrintCppCommands =
       let option_name = "-print-cpp-commands"
       let help = "prints the preprocessing command(s) used by Frama-C \
                   and exits."
+    end)
+
+let () = Parameter_customize.set_group parsing
+let () = Parameter_customize.do_not_reset_on_copy ()
+module AuditPrepare =
+  P.Filepath
+    (struct
+      let option_name = "-audit-prepare"
+      let arg_name = "path"
+      let existence = Filepath.Indifferent
+      let file_kind = "json"
+      let help = "produces audit-related information, such as the list of all \
+                  source files used during parsing (including those in include \
+                  directives) with checksums. Some plug-ins may produce \
+                  additional audit-related information. \
+                  Prints the information as JSON to the specified file, or \
+                  if the file is '-', prints as text to the standard output. \
+                  Requires -cpp-frama-c-compliant."
+    end)
+
+let () = Parameter_customize.set_group parsing
+let () = Parameter_customize.do_not_reset_on_copy ()
+module AuditCheck =
+  P.Filepath
+    (struct
+      let option_name = "-audit-check"
+      let arg_name = "path"
+      let existence = Filepath.Must_exist
+      let file_kind = "json"
+      let help = "reads an audit JSON file (produced by -audit-prepare) and \
+                  checks compliance w.r.t. it; e.g., if the source files \
+                  were declared and have the expected checksum. \
+                  Raises a warning (with warning key 'audit') in case of \
+                  failed checks. \
+                  Requires -cpp-frama-c-compliant."
     end)
 
 let () = Parameter_customize.set_group parsing

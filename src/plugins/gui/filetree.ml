@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -316,7 +316,7 @@ module MYTREE = struct
     | Dvolatile _ -> Some "volatile clause"
     | Daxiomatic (s, _, _,_) -> Some (global_name s)
     | Dtype (lti, _) -> Some (global_name lti.lt_name)
-    | Dlemma (s, _, _, _, _, _,_) -> Some (global_name s)
+    | Dlemma (s, _, _, _, _,_) -> Some (global_name s)
     | Dinvariant (li, _) -> Some (global_name li.l_var_info.lv_name)
     | Dtype_annot (li, _) -> Some (global_name li.l_var_info.lv_name)
     | Dmodel_annot (mf, _) -> Some (global_name mf.mi_name)

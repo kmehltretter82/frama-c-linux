@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -499,14 +499,12 @@ let to_do_on_select
         "This is a complete behaviors clause.@.%a@."
         pretty_predicate_status ip;
       main_ui#view_original (location ip)
-    | PIP(IPAxiom _ as ip) ->
-      main_ui#pretty_information "This is an axiom.@.";
-      main_ui#view_original (location ip)
     | PIP(IPAxiomatic _ as ip) ->
       main_ui#pretty_information "This is an axiomatic.@.";
       main_ui#view_original (location ip)
-    | PIP(IPLemma _ as ip) ->
-      main_ui#pretty_information "This is a lemma.@.";
+    | PIP(IPLemma { il_pred } as ip) ->
+      main_ui#pretty_information "This is a %a.@."
+        Cil_printer.pp_lemma_kind il_pred.tp_kind;
       main_ui#view_original (location ip)
     | PIP(IPTypeInvariant _ as ip) ->
       main_ui#pretty_information "This is a type invariant.@.";
@@ -1034,7 +1032,7 @@ class main_window () : main_window_extension_points =
         let m =
           new Menu_manager.menu_manager
             ~packing:(toplevel_vbox#pack ~expand:false ~fill:false ~from:`START)
-            ~host:(self :> Gtk_helper.host)
+            (self :> Gtk_helper.host)
         in
         menu_manager <- Some m;
         m

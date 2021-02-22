@@ -1124,6 +1124,51 @@
 --- Global Properties
 --------------------------------------------------------------------------------
 
+[  Valid  ] Axiomatic 'GetsLength'
+            axiomatic GetsLength
+            by Frama-C kernel.
+[  Valid  ] Axiomatic 'MemChr'
+            axiomatic MemChr
+            by Frama-C kernel.
+[  Valid  ] Axiomatic 'MemCmp'
+            axiomatic MemCmp
+            by Frama-C kernel.
+[  Valid  ] Axiomatic 'MemSet'
+            axiomatic MemSet
+            by Frama-C kernel.
+[  Valid  ] Axiomatic 'StrChr'
+            axiomatic StrChr
+            by Frama-C kernel.
+[  Valid  ] Axiomatic 'StrCmp'
+            axiomatic StrCmp
+            by Frama-C kernel.
+[  Valid  ] Axiomatic 'StrLen'
+            axiomatic StrLen
+            by Frama-C kernel.
+[  Valid  ] Axiomatic 'StrNCmp'
+            axiomatic StrNCmp
+            by Frama-C kernel.
+[  Valid  ] Axiomatic 'WMemChr'
+            axiomatic WMemChr
+            by Frama-C kernel.
+[  Valid  ] Axiomatic 'WcsChr'
+            axiomatic WcsChr
+            by Frama-C kernel.
+[  Valid  ] Axiomatic 'WcsCmp'
+            axiomatic WcsCmp
+            by Frama-C kernel.
+[  Valid  ] Axiomatic 'WcsLen'
+            axiomatic WcsLen
+            by Frama-C kernel.
+[  Valid  ] Axiomatic 'WcsNCmp'
+            axiomatic WcsNCmp
+            by Frama-C kernel.
+[  Valid  ] Axiomatic 'format_length'
+            axiomatic format_length
+            by Frama-C kernel.
+[  Valid  ] Axiomatic 'pipe_streams'
+            axiomatic pipe_streams
+            by Frama-C kernel.
 [ Extern  ] Axiom 'memchr_def'
             axiom memchr_def
             Unverifiable but considered Valid.
@@ -1226,51 +1271,6 @@
 [ Extern  ] Axiom 'wmemchr_def'
             axiom wmemchr_def
             Unverifiable but considered Valid.
-[  Valid  ] Axiomatic 'GetsLength'
-            axiomatic GetsLength
-            by Frama-C kernel.
-[  Valid  ] Axiomatic 'MemChr'
-            axiomatic MemChr
-            by Frama-C kernel.
-[  Valid  ] Axiomatic 'MemCmp'
-            axiomatic MemCmp
-            by Frama-C kernel.
-[  Valid  ] Axiomatic 'MemSet'
-            axiomatic MemSet
-            by Frama-C kernel.
-[  Valid  ] Axiomatic 'StrChr'
-            axiomatic StrChr
-            by Frama-C kernel.
-[  Valid  ] Axiomatic 'StrCmp'
-            axiomatic StrCmp
-            by Frama-C kernel.
-[  Valid  ] Axiomatic 'StrLen'
-            axiomatic StrLen
-            by Frama-C kernel.
-[  Valid  ] Axiomatic 'StrNCmp'
-            axiomatic StrNCmp
-            by Frama-C kernel.
-[  Valid  ] Axiomatic 'WMemChr'
-            axiomatic WMemChr
-            by Frama-C kernel.
-[  Valid  ] Axiomatic 'WcsChr'
-            axiomatic WcsChr
-            by Frama-C kernel.
-[  Valid  ] Axiomatic 'WcsCmp'
-            axiomatic WcsCmp
-            by Frama-C kernel.
-[  Valid  ] Axiomatic 'WcsLen'
-            axiomatic WcsLen
-            by Frama-C kernel.
-[  Valid  ] Axiomatic 'WcsNCmp'
-            axiomatic WcsNCmp
-            by Frama-C kernel.
-[  Valid  ] Axiomatic 'format_length'
-            axiomatic format_length
-            by Frama-C kernel.
-[  Valid  ] Axiomatic 'pipe_streams'
-            axiomatic pipe_streams
-            by Frama-C kernel.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'remove'

@@ -214,6 +214,7 @@ let comparison_to_exp ~loc kf env ~name bop array1 array2 =
              ~stopat:len1_exp
              ~incr:(Cil.one ~loc)
              ~body:[ Smart_stmt.block_stmt body_blk ]
+             ()
           )
        )
     )

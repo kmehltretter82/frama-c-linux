@@ -1528,7 +1528,7 @@ attribute:
 |   VOLATILE              { ("volatile",[]), $1 }
 |   GHOST                 { ("ghost",[]), $1 }
 |   ATTRIBUTE_ANNOT       { let annot, loc = $1 in
-			    ("$annot:" ^ annot, []), loc }
+			    (Cil.mkAttrAnnot annot, []), loc }
 ;
 
 /* (* sm: I need something that just includes __attribute__ and nothing more,

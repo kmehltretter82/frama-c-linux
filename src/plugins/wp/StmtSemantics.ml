@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -597,7 +597,7 @@ struct
     let next = (a.return_point,Vertex.Set.empty) in
     let wto =
       WTO.partition
-        ?pref:None (* natural loop keep the heads *)
+        ~pref:(fun _ _ -> 0) (* natural loops keep their heads *)
         ~succs:(UnrollUnnatural.G.succ g)
         ~init:here in
 

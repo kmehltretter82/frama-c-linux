@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA   (Commissariat à l'énergie atomique et aux énergies            */
 /*           alternatives)                                                */
 /*    INRIA (Institut National de Recherche en Informatique et en         */
@@ -1699,15 +1699,15 @@ logic_def:
 | LEMMA poly_id COLON full_lexpr SEMICOLON
     { let (id,labels,tvars) = $2 in
       exit_type_variables_scope ();
-      LDlemma (id, false, labels, tvars, toplevel_pred Assert $4) }
+      LDlemma (id, labels, tvars, toplevel_pred Assert $4) }
 | CHECK_LEMMA poly_id COLON full_lexpr SEMICOLON
     { let (id,labels,tvars) = $2 in
       exit_type_variables_scope ();
-      LDlemma (id, false, labels, tvars, toplevel_pred Check $4) }
+      LDlemma (id, labels, tvars, toplevel_pred Check $4) }
 | ADMIT_LEMMA poly_id COLON full_lexpr SEMICOLON
     { let (id,labels,tvars) = $2 in
       exit_type_variables_scope ();
-      LDlemma (id, false, labels, tvars, toplevel_pred Admit $4) }
+      LDlemma (id, labels, tvars, toplevel_pred Admit $4) }
 | AXIOMATIC any_identifier LBRACE logic_decls RBRACE
     { LDaxiomatic($2,$4) }
 | TYPE poly_id_type_add_typename EQUAL typedef SEMICOLON
@@ -1780,7 +1780,7 @@ logic_decl:
 | AXIOM poly_id COLON full_lexpr SEMICOLON
     { let (id,labels,tvars) = $2 in
       exit_type_variables_scope ();
-      LDlemma (id, true, labels, tvars, toplevel_pred Assert $4) }
+      LDlemma (id, labels, tvars, toplevel_pred Admit $4) }
 ;
 
 logic_decl_loc:

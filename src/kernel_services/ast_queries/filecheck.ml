@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -1083,7 +1083,7 @@ module Base_checker = struct
                "field %s of type %a is not present in environment"
                mi.mi_name Printer.pp_typ mi.mi_base_type);
           Cil.DoChildren
-        | Dlemma(_,_,labels,_,_,_,_) ->
+        | Dlemma(_,labels,_,_,_,_) ->
           let old_labels = logic_labels in
           logic_labels <- labels @ logic_labels;
           Cil.DoChildrenPost (fun g -> logic_labels <- old_labels; g)

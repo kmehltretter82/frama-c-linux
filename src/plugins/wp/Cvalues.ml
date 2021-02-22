@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -157,7 +157,7 @@ module OPAQUE_COMP_BYTES_LENGTH = WpContext.Generator(Cil_datatype.Compinfo)
         } ;
         let min_size = if Cil.acceptEmptyCompinfo () then e_zero else e_one in
         Definitions.define_lemma {
-          l_kind = `Axiom ; l_name ;
+          l_kind = Admit ; l_name ;
           l_types = 0 ; l_triggers = [] ; l_forall = [] ;
           l_cluster = Definitions.compinfo c ;
           l_lemma = Lang.F.(p_leq min_size (e_fun size []))

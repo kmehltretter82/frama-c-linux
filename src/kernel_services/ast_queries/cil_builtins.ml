@@ -685,6 +685,13 @@ let init_common_builtins () =
     [ Cil.theMachine.typeOfSizeOf ]
     false
 
+let custom_builtins = Queue.create ()
+
+let add_custom_builtin f = Queue.add f custom_builtins
+
+let register_custom_builtin (name, rt, prms, isva) =
+  Builtin_functions.add name (rt,prms,isva)
+
 let init_builtins () =
   if not (Cil.selfMachine_is_computed ()) then
     Kernel.fatal ~current:true "You must call initCIL before init_builtins" ;
@@ -696,7 +703,8 @@ let init_builtins () =
   else begin
     initVABuiltins ();
     if Cil.gccMode () then initGccBuiltins ();
-  end
+  end;
+  Queue.iter (fun f -> register_custom_builtin (f())) custom_builtins
 
 (** This is used as the location of the prototypes of builtin functions. *)
 let builtinLoc: location = Location.unknown

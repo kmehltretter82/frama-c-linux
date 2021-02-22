@@ -131,7 +131,9 @@ struct
 
       method model = model
 
-      method add_lemma lemma = lemmas <- Bag.append lemmas lemma
+      method add_lemma lemma =
+        if Logic_utils.verify_predicate lemma.lem_predicate.tp_kind then
+          lemmas <- Bag.append lemmas lemma
 
       method add_strategy strategy =
         let kf = WpStrategy.get_kf strategy in
@@ -144,17 +146,21 @@ struct
           Lang.F.release () ;
           WpContext.on_context (model,WpContext.Global)
             begin fun () ->
-              LogicUsage.iter_lemmas VCG.register_lemma ;
-              Bag.iter (fun l ->
-                  if l.lem_kind <> `Axiom then
-                    let vc = VCG.compile_lemma l in
-                    collection := Bag.append !collection vc
+              Bag.iter
+                (fun (l : LogicUsage.logic_lemma) ->
+                   if Logic_utils.verify_predicate l.lem_predicate.tp_kind then
+                     let vc = VCG.compile_lemma l in
+                     collection := Bag.append !collection vc
                 ) lemmas ;
             end () ;
           KFmap.iter
             (fun kf strategies ->
                WpContext.on_context (model,WpContext.Kf kf)
                  begin fun () ->
+                   LogicUsage.iter_lemmas
+                     (fun (l : LogicUsage.logic_lemma) ->
+                        if Logic_utils.use_predicate l.lem_predicate.tp_kind
+                        then VCG.register_lemma l) ;
                    LogicUsage.iter_lemmas VCG.register_lemma ;
                    Bag.iter (prove_strategy collection model kf) strategies ;
                  end ()

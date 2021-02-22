@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -134,7 +134,7 @@ let cast_arg i paramtyp exp =
           (i + 1)
           pretty_typ argtyp pretty_typ paramtyp
     end;
-  Cil.mkCast ~force:false ~e:exp ~newt:paramtyp
+  Cil.mkCast ~force:false ~newt:paramtyp exp
 
 
 (* cast a list of args to the tparams list of types and remove unused args *)

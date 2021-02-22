@@ -118,6 +118,11 @@ autom4te.cache
 /doc/code/qed
 /doc/code/wp
 
+/doc/developer/tutorial/viewcfg/src/META.frama-c-viewcfg
+/doc/developer/tutorial/viewcfg/src/Makefile
+/doc/developer/tutorial/viewcfg/src/gui/
+/doc/developer/tutorial/viewcfg/src/top/
+
 /doc/doxygen
 
 /doc/pdg/call-f.eps

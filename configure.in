@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2020                                               #
+#  Copyright (C) 2007-2021                                               #
 #    CEA   (Commissariat à l'énergie atomique et aux énergies            #
 #           alternatives)                                                #
 #    INRIA (Institut National de Recherche en Informatique et en         #
@@ -766,7 +766,7 @@ plugin_use_external(gui,dot)
 check_plugin(impact,src/plugins/impact,[support for impact plugin],yes)
 
 plugin_use(impact,gui)
-plugin_use(impact,slicing)
+plugin_require(impact,slicing)
 plugin_require(impact,pdg)
 plugin_require(impact,eva)
 plugin_require(impact,inout)
@@ -832,6 +832,7 @@ plugin_require(slicing,from_analysis)
 plugin_require(slicing,pdg)
 plugin_require(slicing,eva)
 plugin_require(slicing,callgraph)
+plugin_require(slicing,sparecode)
 plugin_use(slicing,gui)
 
 # spare code
@@ -841,6 +842,7 @@ check_plugin(sparecode,src/plugins/sparecode,
              [support for sparecode plugin],yes)
 plugin_require(sparecode,pdg)
 plugin_require(sparecode,eva)
+plugin_require(sparecode,users)
 
 # users
 #######
@@ -856,7 +858,8 @@ check_plugin(eva,src/plugins/value,
              [support for value analysis],yes)
 plugin_use(eva,gui)
 plugin_use(eva,scope)
-plugin_use(eva,callgraph)
+plugin_require(eva,callgraph)
+plugin_require(eva,server)
 
 ####################
 # External plugins #

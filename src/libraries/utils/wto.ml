@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -187,10 +187,9 @@ module Make(N:sig
           let element = Stack.pop state.stack in
           DFN.remove state.dfn element;
           if not (N.equal element vertex) then begin
-            let best_head = match pref with
-              (** the strict is important because we are conservative *)
-              | Some cmp when cmp best_head element < 0 -> element
-              | _ -> best_head
+            (** the strict is important because we are conservative *)
+            let best_head =
+              if pref best_head element < 0 then element else best_head
             in
             reset_SCC best_head
           end
@@ -223,7 +222,7 @@ module Make(N:sig
 
   type pref = N.t -> N.t -> int
 
-  let partition ?pref ~init ~succs =
+  let partition ~pref ~init ~succs =
     let state = {dfn = DFN.create 17; num = 0; succs;
                  stack = Stack.create () } in
     let loop,component = visit ~pref state init [] in

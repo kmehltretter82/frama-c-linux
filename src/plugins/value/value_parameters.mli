@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -227,6 +227,10 @@ val enabled_domains: unit -> (string * string) list
 (** [use_builtin kf b] adds a builtin override for function `kf` to
     builtin `b`. *)
 val use_builtin: Cil_types.kernel_function -> string -> unit
+
+(** [use_global_value_partitioning vi] enable value partitioning on the global
+    variable `vi`. *)
+val use_global_value_partitioning: Cil_types.varinfo -> unit
 
 (*
 Local Variables:

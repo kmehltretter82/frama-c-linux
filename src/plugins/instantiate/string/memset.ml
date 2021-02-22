@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -162,7 +162,7 @@ let generate_ensures e loc t ptr value len =
       { (presult_ptr ~loc t ptr) with pred_name = [ "result"] }
     ])
 
-let generate_spec (_t, e) { svar = vi } loc =
+let generate_spec (_t, e) loc { svar = vi } =
   let (cptr, cvalue, clen) = match Cil.getFormalsDecl vi with
     | [ ptr ; value ; len ] -> ptr, (Some value), len
     | [ ptr ; len ] -> ptr, None, len
@@ -253,7 +253,7 @@ let retype_args (_t, e) args =
       | Value_of t -> base_char_type t
       | _ -> unexpected "trying to retype arguments on an ill-typed call"
     in
-    let v = Cil.mkCast (Cil.stripCasts v) base_type in
+    let v = Cil.mkCast base_type (Cil.stripCasts v) in
     [ ptr ; v ; n ]
   | Some fv, [ ptr ; v ; n ] ->
     let ptr = Cil.stripCasts ptr in

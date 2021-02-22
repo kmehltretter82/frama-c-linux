@@ -1,4 +1,5 @@
 /tests/ptests_config
+/aorai_eva_analysis.ml
 /Makefile
 /ltllexer.ml
 /ltlparser.ml

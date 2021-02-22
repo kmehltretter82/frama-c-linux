@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -82,6 +82,7 @@ struct
   let t_axiomatic = t_kind "axiomatic" "Axiomatic definitions"
   let t_axiom = t_kind "axiom" "Logical axiom"
   let t_lemma = t_kind "lemma" "Logical lemma"
+  let t_check_lemma = t_kind "check_lemma" "Logical check lemma"
 
   let p_ext = Enum.prefix kinds ~name:"ext" ~var:"<clause>"
       ~descr:(Md.plain "ACSL extension `<clause>`")
@@ -108,8 +109,9 @@ struct
       end
     | IPExtended { ie_ext={ ext_name } } -> Enum.instance p_ext ext_name
     | IPAxiomatic _ -> t_axiomatic
-    | IPAxiom _ -> t_axiom
-    | IPLemma _ -> t_lemma
+    | IPLemma { il_pred = { tp_kind = Admit } } -> t_axiom
+    | IPLemma { il_pred = { tp_kind = Assert } } -> t_lemma
+    | IPLemma { il_pred = { tp_kind = Check } } -> t_check_lemma
     | IPBehavior _ -> t_behavior
     | IPComplete _ -> t_complete
     | IPDisjoint _ -> t_disjoint

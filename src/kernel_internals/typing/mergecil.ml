@@ -618,7 +618,7 @@ module EnumMerging =
            (e2.ename <-
               fst
                 (Alpha.newAlphaName
-                   aeAlpha e2.ename Cil_datatype.Location.unknown);
+                   aeAlpha None e2.ename Cil_datatype.Location.unknown);
             Kernel.debug ~dkey:Kernel.dkey_linker
               "new anonymous name %s" e2.ename;
             false))))
@@ -867,8 +867,8 @@ let rec global_annot_without_irrelevant_attributes ga =
   | Daxiomatic(n,l,attr,loc) ->
     Daxiomatic(n,List.map global_annot_without_irrelevant_attributes l,
                drop_attributes_for_merge attr,loc)
-  | Dlemma (id,ax,labs,typs,st,attr,loc) ->
-    Dlemma (id,ax,labs,typs,st,drop_attributes_for_merge attr,loc)
+  | Dlemma (id,labs,typs,st,attr,loc) ->
+    Dlemma (id,labs,typs,st,drop_attributes_for_merge attr,loc)
   | Dtype (lti,loc) ->
     Dtype (logic_type_info_without_irrelevant_attributes lti, loc)
   | Dextended (ext, attr, loc) ->
@@ -941,10 +941,10 @@ let rec global_annot_pass1 g = match g with
     ignore (PlainMerging.getNode ltEq ltSyn !currentFidx info.lt_name info
               (Some (l, !currentDeclIdx)))
 
-  | Dlemma (n,is_ax,labs,typs,st,attr,l) ->
+  | Dlemma (n,labs,typs,st,attr,l) ->
     CurrentLoc.set l;
     ignore (PlainMerging.getNode
-              llEq llSyn !currentFidx n (n,(is_ax,labs,typs,st,attr,l))
+              llEq llSyn !currentFidx n (n,(labs,typs,st,attr,l))
               (Some (l, !currentDeclIdx)))
   | Dextended(ext,_,l) ->
     CurrentLoc.set l;
@@ -1403,7 +1403,7 @@ let update_compinfo ci =
   in
   Alpha.registerAlphaName sAlpha ci.cname loc;
   let orig_name = if ci.corig_name = "" then ci.cname else ci.corig_name in
-  let n, _ = Alpha.newAlphaName sAlpha orig_name loc in
+  let n, _ = Alpha.newAlphaName sAlpha None orig_name loc in
   let oldnode = PlainMerging.find true node in
   if oldnode == node then begin
     let node =
@@ -1440,7 +1440,7 @@ let rec update_type_repr t =
       | None -> Cil_datatype.Location.unknown
     in
     Alpha.registerAlphaName vtAlpha ti.tname loc;
-    let n,_ = Alpha.newAlphaName vtAlpha ti.torig_name loc in
+    let n,_ = Alpha.newAlphaName vtAlpha None ti.torig_name loc in
     let oldnode = PlainMerging.find true node in
     if oldnode == node then begin
       let node =
@@ -1569,15 +1569,15 @@ let matchLogicLemma oldfidx (oldid, _ as oldnode) fidx (id, _ as node) =
   let oldlnode = PlainMerging.getNode llEq llSyn oldfidx oldid oldnode None in
   let lnode = PlainMerging.getNode llEq llSyn fidx id node None in
   if oldlnode != lnode then begin
-    let (oldid,(oldax,oldlabs,oldtyps,oldst,oldattr,oldloc)) = oldlnode.ndata in
+    let (oldid,(oldlabs,oldtyps,oldst,oldattr,oldloc)) = oldlnode.ndata in
     let oldfidx = oldlnode.nfidx in
-    let (id,(ax,labs,typs,st,attr,loc)) = lnode.ndata in
+    let (id,(labs,typs,st,attr,loc)) = lnode.ndata in
     let fidx = lnode.nfidx in
     let oldattr = drop_attributes_for_merge oldattr in
     let attr = drop_attributes_for_merge attr in
     if Logic_utils.is_same_global_annotation
-        (Dlemma (oldid,oldax,oldlabs,oldtyps,oldst,oldattr,oldloc))
-        (Dlemma (id,ax,labs,typs,st,attr,loc))
+        (Dlemma (oldid,oldlabs,oldtyps,oldst,oldattr,oldloc))
+        (Dlemma (id,labs,typs,st,attr,loc))
     then begin
       if oldfidx < fidx then
         lnode.nrep <- oldlnode.nrep
@@ -1851,7 +1851,7 @@ let oneFilePass1 (f:file) : unit =
         let orig_name =
           if ei.eorig_name = "" then ei.ename else ei.eorig_name
         in
-        ignore (Alpha.newAlphaName aeAlpha orig_name l);
+        ignore (Alpha.newAlphaName aeAlpha None orig_name l);
         ei.ereferenced <- false;
         ignore
           (EnumMerging.getNode eEq eSyn !currentFidx ei ei
@@ -2375,7 +2375,7 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
           mergePushGlobals g
       | Some _ -> ()
     end
-  | Dlemma (n,_,_,_,_,_,l) ->
+  | Dlemma (n,_,_,_,_,l) ->
     begin
       CurrentLoc.set l;
       match PlainMerging.findReplacement true llEq !currentFidx n with
@@ -2670,7 +2670,7 @@ let oneFilePass2 (f: file) =
         (* Maybe it is static. Rename it then *)
         if vi.vstorage = Static then begin
           let newName, _ =
-            Alpha.newAlphaName vtAlpha vi.vname (CurrentLoc.get ())
+            Alpha.newAlphaName vtAlpha None vi.vname (CurrentLoc.get ())
           in
           let formals_decl =
             try Some (Cil.getFormalsDecl vi)
@@ -3026,7 +3026,7 @@ let oneFilePass2 (f: file) =
               if ci.corig_name = "" then ci.cname else ci.corig_name
             in
             let newname, _ =
-              Alpha.newAlphaName sAlpha orig_name (CurrentLoc.get ())
+              Alpha.newAlphaName sAlpha None orig_name (CurrentLoc.get ())
             in
             ci.cname <- newname;
             ci.creferenced <- true;
@@ -3055,7 +3055,7 @@ let oneFilePass2 (f: file) =
               if ei.eorig_name = "" then ei.ename else ei.eorig_name
             in
             let newname, _ =
-              Alpha.newAlphaName eAlpha orig_name (CurrentLoc.get ())
+              Alpha.newAlphaName eAlpha None orig_name (CurrentLoc.get ())
             in
             ei.ename <- newname;
             ei.ereferenced <- true;
@@ -3064,7 +3064,7 @@ let oneFilePass2 (f: file) =
             List.iter
               (fun item ->
                  let newname,_ =
-                   Alpha.newAlphaName vtAlpha item.eiorig_name item.eiloc
+                   Alpha.newAlphaName vtAlpha None item.eiorig_name item.eiloc
                  in
                  item.einame <- newname)
               ei.eitems;
@@ -3108,7 +3108,7 @@ let oneFilePass2 (f: file) =
           with
             None -> (* We must rename it and keep it *)
             let newname, _ =
-              Alpha.newAlphaName vtAlpha ti.torig_name (CurrentLoc.get ())
+              Alpha.newAlphaName vtAlpha None ti.torig_name (CurrentLoc.get ())
             in
             ti.tname <- newname;
             ti.treferenced <- true;

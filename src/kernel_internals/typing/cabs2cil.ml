@@ -967,7 +967,7 @@ let alphaTable : location Alpha.alphaTable = H.create 307
  * foo" or "union bar" *)
 
 let fresh_global lookupname =
-  fst (Alpha.newAlphaName alphaTable lookupname (CurrentLoc.get ()))
+  fst (Alpha.newAlphaName alphaTable None lookupname (CurrentLoc.get ()))
 
 (* To keep different name scopes different, we add prefixes to names
  * specifying the kind of name: the kind can be one of "" for variables or
@@ -1026,7 +1026,7 @@ let newAlphaName
   in
   let data = CurrentLoc.get () in
   let newname, oldloc =
-    Alpha.newAlphaName ~alphaTable ?undolist ~lookupname ~data
+    Alpha.newAlphaName ~alphaTable ~undolist ~lookupname ~data
   in
   (match undo_scope, undolist with
    | None, None -> ()
@@ -1199,7 +1199,7 @@ let get_temp_name ghost () =
   let data = CurrentLoc.get() in
   let name = if ghost then "g_tmp" else "tmp" in
   let name, _ =
-    Alpha.newAlphaName ~alphaTable ~undolist ~lookupname:name ~data
+    Alpha.newAlphaName ~alphaTable ~undolist:(Some undolist) ~lookupname:name ~data
   in
   let undolist = !undolist in
   Alpha.undoAlphaChanges ~alphaTable ~undolist;
@@ -1368,7 +1368,7 @@ let rec is_boolean_result e =
 (* Like Cil.mkCastT, but it calls typeForInsertedCast *)
 let makeCastT ~(e: exp) ~(oldt: typ) ~(newt: typ) =
   if need_cast oldt newt then
-    Cil.mkCastT e oldt (!typeForInsertedCast e oldt newt)
+    Cil.mkCastT oldt (!typeForInsertedCast e oldt newt) e
   else e
 
 let makeCast ~(e: exp) ~(newt: typ) =
@@ -2652,8 +2652,8 @@ let rec combineTypes (what: combineWhat) (oldt: typ) (t: typ) : typ =
            evaluate them. Check first machine independent comparison. *)
         let checkEqualSize (machdep: bool) =
           let size_t = Cil.theMachine.Cil.typeOfSizeOf in
-          let size_t_oldsz' = Cil.mkCast ~force:false ~e:oldsz' ~newt:size_t in
-          let size_t_sz' = Cil.mkCast ~force:false ~e:sz' ~newt:size_t in
+          let size_t_oldsz' = Cil.mkCast ~force:false ~newt:size_t oldsz' in
+          let size_t_sz' = Cil.mkCast ~force:false ~newt:size_t sz' in
           ExpStructEq.equal
             (constFold machdep size_t_oldsz')
             (constFold machdep size_t_sz')
@@ -2852,7 +2852,7 @@ let rec castTo ?context ?(fromsource=false)
   end else begin
     let nt' = if fromsource then nt' else !typeForInsertedCast e ot' nt' in
     let result = (nt', if theMachine.insertImplicitCasts || fromsource then
-                    Cil.mkCastT ~force:true ~e ~oldt:ot ~newt:nt' else e)
+                    Cil.mkCastT ~force:true ~oldt:ot ~newt:nt' e else e)
     in
     let error s =
       if fromsource then abort_context s else Kernel.fatal ~current:true s
@@ -2872,10 +2872,10 @@ let rec castTo ?context ?(fromsource=false)
       else
         nt,
         Cil.mkCastT
+          ot nt'
           (constFold true
              (new_exp  ~loc:e.eloc
                 (BinOp(Ne,e,Cil.integer ~loc:e.eloc 0,intType))))
-          ot nt'
     | TInt(_,_), TInt(_,_) ->
       (* We used to ignore attributes on integer-integer casts. Not anymore *)
       (* if ikindo = ikindn then (nt, e) else *)
@@ -3923,7 +3923,7 @@ struct
   let anonCompFieldName = anonCompFieldName
   let conditionalConversion = logicConditionalConversion
   let find_macro _ = raise Not_found
-  let find_var ?label ~var =
+  let find_var ?label var =
     let find_from_curr_env test =
       (* logic has always access to the ghost variables. *)
       match Datatype.String.Hashtbl.find ghost_env var with

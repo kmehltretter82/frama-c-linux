@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -432,7 +432,7 @@ let rec monitored_property ip =
   | IPDisjoint _ -> true
   | IPReachable {ir_kf=None} -> false
   | IPReachable {ir_kf=Some _} -> true
-  | IPAxiomatic _ | IPAxiom _ -> false
+  | IPAxiomatic _ -> false
   | IPLemma _ -> true
   | IPTypeInvariant _ | IPGlobalInvariant _ -> true
   | IPOther _ -> true

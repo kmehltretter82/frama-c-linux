@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -735,7 +735,7 @@ let compute_usage () =
   (* Usage in lemmas *)
   let u_lemmas =
     LogicUsage.fold_lemmas
-      (fun l -> E.cup (pred (mk_ctx()) l.lem_property)) E.bot
+      (fun l -> E.cup (pred (mk_ctx()) l.lem_predicate.tp_statement)) E.bot
   in
   (* initial state by kf *)
   let usage = Globals.Functions.fold (fun kf env ->

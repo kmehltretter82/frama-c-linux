@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -1128,7 +1128,7 @@ let rec stmts_of_cfg cfg current var_map locals return_exp acc =
           let exp = subst_in_exp var_map exp in
           let exp = if bloop then exp else Cil.new_exp ~loc:dummy_loc (UnOp(LNot,exp,Cil.intType)) in
           let body = stmts_of_cfg g nloop var_map locals None [] in
-          let acc = (List.rev (Cil.mkLoop ?sattr:None ~guard:exp ~body)) @ acc in
+          let acc = (List.rev (Cil.mkLoop ~guard:exp ~body ())) @ acc in
           stmts_of_cfg cfg n2 var_map locals return_exp acc
     end
   | l ->

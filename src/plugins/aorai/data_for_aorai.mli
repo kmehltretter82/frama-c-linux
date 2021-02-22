@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Aorai plug-in of Frama-C.                        *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -130,8 +130,9 @@ val curOpStatus  : string
 (** Name of curState C generated variable (Table of states that can be synchronized with the program) *)
 val curState     : string
 
-(** Name of curStateOld C generated variable (Last value of curState) *)
-val curStateOld  : string
+(** Name of the history variables (History of previous states) *)
+val history  : int -> string
+val whole_history  : unit -> string list
 
 (** Name of curTrans C generated variable (Last transitions that can be crossed) *)
 val curTrans     : string
@@ -218,20 +219,19 @@ val getNumberOfTransitions : unit -> int
 (** return the number of states of the automata *)
 val getNumberOfStates : unit -> int
 
-(** Return the list of all function name observed in the C file. *)
-val getFunctions_from_c : unit -> string list
+(** Return the list of all function name observed in the C file, except ignored functions. *)
+val getObservablesFunctions : unit -> Cil_types.kernel_function list
 
-(** Return the list of all variables name observed in the C file. *)
-val getVariables_from_c : unit -> string list
-
-(** Return the list of names of all ignored functions. A function is ignored if it is used in C file and if its declaration is unavailable. *)
-val getIgnoredFunctions : unit -> string list
-
-(** Return the list of names of all ignored functions. A function is ignored if it is used in C file and if its declaration is unavailable. *)
-val addIgnoredFunction : string -> unit
+(** Return the list of names of observable but ignored functions.
+    A function is ignored if it is used in C file and if its declaration
+    is unavailable. *)
+val getIgnoredFunctions : unit -> Cil_types.kernel_function list
 
 (** Return true if and only if the given string fname denotes an ignored function. *)
-val isIgnoredFunction : string -> bool
+val isIgnoredFunction : Cil_types.kernel_function -> bool
+
+(** Return true if and only if the given function can be observed *)
+val isObservableFunction : Cil_types.kernel_function -> bool
 
 (** returns the state of given index.
     @since Nitrogen-20111001
@@ -243,6 +243,12 @@ val getStateName : int -> string
 (** [true] iff the given state is the rejection state for automaton with
     sequences. *)
 val is_reject_state: state -> bool
+
+(** [true] iff a rejecting state already exists. *)
+val has_reject_state: unit -> bool
+
+(** return the rejecting state of the graph, creating it if needed. *)
+val get_reject_state: unit -> state
 
 (** returns the transition having the corresponding id.
     @raise Not_found if this is not the case.
@@ -301,6 +307,7 @@ type range =
     (** range bounded by a logic term (depending on program parameter). *)
   | Unbounded of int (** only the lower bound is known,
                          there is no upper bound *)
+  | Unknown (** completely unknown relation. *)
 
 module Range: Datatype.S_with_collections with type t = range
 

@@ -170,7 +170,7 @@ let add_cast ~loc ?name e env kf ty =
     let e, env = get_double e env in
     Options.warning
       ~once:true "R to float: double rounding might cause unsoundness";
-    Cil.mkCastT ~force:false ~e ~oldt:Cil.doubleType ~newt:ty, env
+    Cil.mkCastT ~force:false ~oldt:Cil.doubleType ~newt:ty e, env
   | TInt(IULongLong, _) ->
     (* The biggest C integer type we can extract from GMP is ulong *)
     Error.not_yet "R to unsigned long long"

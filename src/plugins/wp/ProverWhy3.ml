@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -945,11 +945,12 @@ class visitor (ctx:context) c =
       id, t
 
     method on_dlemma l =
-      let kind = Why3.Decl.(if l.l_kind = `Axiom then Paxiom else Plemma) in
-      let cnv = empty_cnv ctx in
-      let id, t = self#make_lemma cnv l in
-      let decl = Why3.Decl.create_prop_decl kind id t in
-      ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl
+      if l.l_kind <> Check then
+        let kind = Why3.Decl.(if l.l_kind = Admit then Paxiom else Plemma) in
+        let cnv = empty_cnv ctx in
+        let id, t = self#make_lemma cnv l in
+        let decl = Why3.Decl.create_prop_decl kind id t in
+        ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl
 
     method on_dfun d =
       Wp_parameters.debug ~dkey:dkey_api "Define %a@." Lang.Fun.pretty d.d_lfun ;
@@ -1088,7 +1089,7 @@ let prove_goal ~id ~title ~name ?axioms t =
   end;
   th, decl
 
-let prove_prop ?axioms ~pid ~prop =
+let prove_prop ?axioms ~pid prop =
   let id = WpPropId.get_propid pid in
   let title = Pretty_utils.to_string WpPropId.pretty pid in
   let name = "WP" in
@@ -1105,13 +1106,13 @@ let task_of_wpo wpo =
       let axioms = v.Wpo.VC_Annot.axioms in
       let prop = Wpo.GOAL.compute_proof v.Wpo.VC_Annot.goal in
       (* Format.printf "Goal: %a@." Lang.F.pp_pred prop; *)
-      prove_prop ~pid ~prop ?axioms
+      prove_prop ~pid prop ?axioms
   | Wpo.GoalLemma v ->
       let lemma = v.Wpo.VC_Lemma.lemma in
       let depends = v.Wpo.VC_Lemma.depends in
       let prop = Lang.F.p_forall lemma.l_forall lemma.l_lemma in
       let axioms = Some(lemma.l_cluster,depends) in
-      prove_prop ~pid ~prop ?axioms
+      prove_prop ~pid prop ?axioms
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prover Task                                                        --- *)

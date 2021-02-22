@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -1000,6 +1000,19 @@ let add_disjoint e kf ?stmt ?active l =
     let active = match active with None -> [] | Some l -> l in
     Property_status.register (Property.ip_of_disjoint kf (kinstr stmt) active l)
   end
+
+let add_spec ?register_children e kf ?stmt ?active spec =
+  add_behaviors ?register_children e kf ?stmt ?active spec.spec_behavior;
+  Option.iter (fun variant -> add_decreases e kf variant) spec.spec_variant;
+  Option.iter
+    (fun terminates -> add_terminates e kf ?stmt ?active terminates)
+    spec.spec_terminates;
+  List.iter
+    (fun complete -> add_complete e kf ?stmt ?active complete)
+    spec.spec_complete_behaviors;
+  List.iter
+    (fun disjoint -> add_disjoint e kf ?stmt ?active disjoint)
+    spec.spec_disjoint_behaviors
 
 let extend_behavior
     e kf ?stmt ?active ?(behavior=Cil.default_behavior_name) set_bhv =

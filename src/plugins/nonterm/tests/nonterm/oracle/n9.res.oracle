@@ -28,13 +28,13 @@
 [eva:final-states] Values at end of function main:
   res ∈ {0}
   __retres ∈ {0}
-[nonterm] tests/nonterm/n9.i:7: Warning: 
+[nonterm:stmt] tests/nonterm/n9.i:7: Warning: 
   non-terminating loop
   stack: f :: tests/nonterm/n9.i:41 <- main
-[nonterm] tests/nonterm/n9.i:19: Warning: 
+[nonterm:stmt] tests/nonterm/n9.i:19: Warning: 
   non-terminating loop
   stack: g :: tests/nonterm/n9.i:42 <- main
-[nonterm] tests/nonterm/n9.i:29: Warning: 
+[nonterm:stmt] tests/nonterm/n9.i:29: Warning: 
   non-terminating loop
   stack: f_explicit_break :: tests/nonterm/n9.i:43 <- main
 [nonterm] Analysis done.

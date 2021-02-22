@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Aorai plug-in of Frama-C.                        *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -72,6 +72,21 @@ module Aorai_typed_trans =
       let varname _ = assert false
       let mem_project = Datatype.never_any_project
     end)
+
+module Aorai_automaton =
+  Datatype.Make(
+      struct
+        include Datatype.Serializable_undefined
+        let name = "Aorai_automaton"
+        type t = Promelaast.typed_automaton
+        let structural_descr = Structural_descr.t_abstract
+        let reprs = [ { states = Aorai_state.reprs;
+                        trans = Aorai_typed_trans.reprs;
+                        metavariables = Datatype.String.Map.empty;
+                        observables = Some Datatype.String.Set.empty;
+                      }]
+      end
+    )
 
 module State_var =
   State_builder.Hashtbl
@@ -177,7 +192,13 @@ let loopInit    = "aorai_Loop_Init"                      (* OK *)
 
 (* C variables *)
 let curState    = "aorai_CurStates"                      (* OK *)
-let curStateOld = "aorai_CurStates_old"                  (* OK *)
+let history n   = "aorai_StatesHistory_" ^ string_of_int n (* OK *)
+let whole_history () =
+  let rec aux acc n =
+    if n > 0 then aux (history n :: acc) (n - 1) else acc
+  in
+  aux [] (Aorai_option.InstrumentationHistory.get ())
+
 let curTrans    = "aorai_CurTrans"                       (* OK *)
 (*let curTransTmp = "aorai_CurTrans_tmp"                   (* OK *)*)
 let curOp       = "aorai_CurOperation"                   (* OK *)
@@ -206,21 +227,28 @@ let buch_sync   = "Aorai_Sync"                           (* Deprecated ? *)
 
 (* ************************************************************************* *)
 (* Buchi automata as stored after parsing *)
-let automata = ref None
+module Automaton =
+  State_builder.Ref
+    (Datatype.Option(Aorai_automaton))
+    (struct
+      let name = "Data_for_aorai.Automaton"
+      let dependencies =
+        [ Aorai_option.Ltl_File.self; Aorai_option.Buchi.self;
+          Aorai_option.Ya.self ]
+      let default () = None
+    end)
 
 (* Each transition with a parametrized cross condition (call param access or return value access) has its parametrized part stored in this array. *)
 let cond_of_parametrizedTransitions = ref (Array.make (1) [[]])
 
-(* List of variables name observed in the C file *)
-let variables_from_c = ref []
-(* List of functions name observed in the C file *)
-let functions_from_c = ref []
-(* List of functions call observed in the C file without declaration *)
+(* List of functions defined in the C file *)
+let defined_functions = ref []
+(* List of functions without declaration *)
 let ignored_functions = ref []
 
-(** Return the buchi automata as stored after parsing *)
+(** Return the buchi automaton as stored after parsing *)
 let getAutomata () =
-  match !automata with
+  match Automaton.get() with
   | Some auto -> auto
   | None ->
     Aorai_option.fatal "The automaton has not been compiled yet"
@@ -229,11 +257,11 @@ let getGraph () =
   let auto = getAutomata () in
   auto.states, auto.trans
 
-(** Return the number of transitions of the automata *)
+(** Return the number of transitions of the automaton *)
 let getNumberOfTransitions () =
   List.length (getAutomata ()).trans
 
-(** Return the number of states of the automata *)
+(** Return the number of states of the automaton *)
 let getNumberOfStates () =
   List.length (getAutomata ()).states
 
@@ -669,7 +697,7 @@ struct
   let conditionalConversion = Cabs2cil.logicConditionalConversion
   let is_loop () = false
   let find_macro _ = raise Not_found
-  let find_var ?label:_ ~var:_ = raise Not_found
+  let find_var ?label:_ _ = raise Not_found
   let find_enum_tag _ = raise Not_found
   (*let find_comp_type ~kind:_ _ = raise Not_found*)
   let find_comp_field info s =
@@ -956,13 +984,21 @@ module Reject_state =
     (struct
         let name = "Data_for_aorai.Reject_state"
         let dependencies =
-          [ Ast.self; Aorai_option.Ltl_File.self; Aorai_option.Buchi.self;
+          [ Aorai_option.Ltl_File.self; Aorai_option.Buchi.self;
             Aorai_option.Ya.self]
      end)
 
 let get_reject_state () =
   let create () = new_state "aorai_reject" in
   Reject_state.memo create
+
+let is_reject_state state =
+  match Reject_state.get_option () with
+      None -> false
+    | Some state' -> Aorai_state.equal state state'
+
+let has_reject_state () =
+  match Reject_state.get_option () with None -> false | Some _ -> true
 
 let add_if_needed states st =
   if List.for_all (fun x -> not (Aorai_state.equal x st)) states
@@ -1512,10 +1548,16 @@ let type_cond_auto auto =
           | _ -> (i+1,{ t with cross = cond; numt = i } :: l))
       (0,[]) trans
   in
+  let states =
+    if Aorai_option.Deterministic.get () then
+      add_if_needed states (get_reject_state())
+    else states
+  in
   let _, states =
     List.fold_left
       (fun (i,l as acc) s ->
         if
+          is_reject_state s ||
           List.exists
             (fun t -> t.start.nums = s.nums || t.stop.nums = s.nums)
             trans
@@ -1543,16 +1585,43 @@ let checkMetavariableCompatibility auto =
   if has_metavariables && (not deterministic || uses_extended_guards) then
     Aorai_option.abort
       "The use of metavariables is incompatible with non-deterministic \
-       automata, such as automa using extended transitions."
+       automata, such as automata using extended transitions."
 
+let check_observables auto =
+ match auto.observables with
+ | None -> () (* No observable list set, everything is observable *)
+ | Some set ->
+   let is_relevant name =
+     try
+       let kf = Globals.Functions.find_by_name name in
+       if not (Kernel_function.is_definition kf) then
+         Aorai_option.warning
+           "Function %a is observable by the automaton but is not defined \
+            in the C code. It will be ignored in the instrumentation"
+           Printer.pp_varname (Kernel_function.get_name kf)
+     with Not_found ->
+       Aorai_option.abort "Observable %s doesn't match any function" name
+   in
+   let rec check = function
+     | TAnd (c1,c2) | TOr (c1,c2) -> check c1; check c2
+     | TNot (c) -> check c
+     | TRel _ | TTrue | TFalse -> ()
+     | TCall (kf,_) | TReturn kf ->
+       let name = Kernel_function.get_name kf in
+       if not (Datatype.String.Set.mem name set) then
+         Aorai_option.abort "Function %s is not observable" name
+   in
+   Datatype.String.Set.iter is_relevant set;
+   List.iter (fun tr -> check tr.cross) auto.trans
 
 (** Stores the buchi automaton and its variables and
     functions as it is returned by the parsing *)
 let setAutomata auto =
   checkMetavariableCompatibility auto;
   let auto = type_cond_auto auto in
-  automata:=Some auto;
-  check_states "typed automata";
+  Automaton.set (Some auto);
+  check_states "typed automaton";
+  check_observables auto;
   if Aorai_option.debug_atleast 1 then
     Promelaoutput.Typed.output_dot_automata auto "aorai_debug_reduced.dot";
   if (Array.length !cond_of_parametrizedTransitions) <
@@ -1577,62 +1646,76 @@ let setCData () =
   let (f_decl,f_def) =
     Globals.Functions.fold
       (fun f (lf_decl,lf_def) ->
-         let name = (Kernel_function.get_name f) in
          match f.fundec with
-           | Definition _ -> (lf_decl,name::lf_def)
-           | Declaration _ -> (name::lf_decl,lf_def))
+           | Definition _  -> (lf_decl, f :: lf_def)
+           | Declaration _ -> (f :: lf_decl, lf_def))
       ([],[])
   in
-  functions_from_c:=f_def;
-  ignored_functions:=f_decl;
-  variables_from_c:=
-    Globals.Vars.fold
-    (fun v _ lv ->
-      Format.asprintf "%a" Cil_datatype.Varinfo.pretty v :: lv)
-    []
-
-(** Return the list of all function name observed in the C file, except ignored functions. *)
-let getFunctions_from_c () =
-  (!functions_from_c)
-
-(** Return the list of all variables name observed in the C file. *)
-let getVariables_from_c () =
-  (!variables_from_c)
-
-(** Return the list of names of all ignored functions. A function is ignored if it is used in C file and if its declaration is unavailable. *)
-let getIgnoredFunctions () =
-  (!ignored_functions)
-
-(** Return the list of names of all ignored functions. A function is ignored if it is used in C file and if its declaration is unavailable. *)
-let addIgnoredFunction fname =
-  ignored_functions:=fname::(!ignored_functions)
+  defined_functions := f_def;
+  ignored_functions := f_decl
 
 (** Return true if and only if the given string fname denotes an ignored function. *)
-let isIgnoredFunction fname =
-  List.exists
-    (fun s -> (String.compare fname s)=0)
-    (!ignored_functions)
+let isIgnoredFunction kf =
+  List.exists (Kernel_function.equal kf) !ignored_functions
 
-let is_reject_state state =
-  match Reject_state.get_option () with
-      None -> false
-    | Some state' -> Aorai_state.equal state state'
+let isDeclaredObservable kf =
+  let auto = getAutomata () in
+  let fname = Kernel_function.get_name kf in
+  match auto.observables with
+  | None -> true
+  | Some set ->
+    Datatype.String.Set.mem fname set
+
+let isObservableFunction kf =
+  not (isIgnoredFunction kf) && isDeclaredObservable kf
+
+(** Return the list of all function name observed in the C file, except ignored functions. *)
+let getObservablesFunctions () =
+  List.filter isDeclaredObservable !defined_functions
+
+(** Return the list of names of observable but ignored functions. A function is ignored if it is used in C file and if its declaration is unavailable. *)
+let getIgnoredFunctions () =
+  List.filter isDeclaredObservable !ignored_functions
 
 (* ************************************************************************* *)
 (* Table giving the varinfo structure associated to a given variable name *)
 (* In practice it contains all variables (from promela and globals from C file) and only variables *)
-let varinfos = Hashtbl.create 97
-let paraminfos = Hashtbl.create 97
+
+module Aux_varinfos =
+  State_builder.Hashtbl(Datatype.String.Hashtbl)(Cil_datatype.Varinfo)
+  (struct
+    let name = "Data_for_aorai.Aux_varinfos"
+    let dependencies =
+      [ Ast.self; Aorai_option.Ya.self; Aorai_option.Ltl_File.self;
+        Aorai_option.To_Buchi.self; Aorai_option.Deterministic.self ]
+    let size = 13
+  end)
+
+let () = Ast.add_linked_state Aux_varinfos.self
+
+module StringPair =
+  Datatype.Pair_with_collections
+    (Datatype.String)(Datatype.String)
+    (struct let module_name = "Data_for_aorai.StringPair" end)
+
+module Paraminfos =
+  State_builder.Hashtbl(StringPair.Hashtbl)(Cil_datatype.Varinfo)
+  (struct
+    let name = "Data_for_aorai.Paraminfos"
+    let dependencies =
+      [ Ast.self; Aorai_option.Ya.self; Aorai_option.Ltl_File.self;
+        Aorai_option.To_Buchi.self; Aorai_option.Deterministic.self ]
+    let size = 13
+  end)
 
 (* Add a new variable into the association table name -> varinfo *)
-let set_varinfo name vi =
-  Hashtbl.add varinfos name vi
+let set_varinfo = Aux_varinfos.add
 
 (* Given a variable name, it returns its associated varinfo.
     If the variable is not found then an error message is print and an assert false is raised. *)
 let get_varinfo name =
   try
-    Hashtbl.find varinfos name
+    Aux_varinfos.find name
   with Not_found -> raise_error ("Variable not declared ("^name^")")
 
 let get_logic_var name =
@@ -1642,20 +1725,20 @@ let get_logic_var name =
    Hence, if the variable is not found then None is return. *)
 let get_varinfo_option name =
   try
-    Some(Hashtbl.find varinfos name)
+    Some(Aux_varinfos.find name)
   with
     | Not_found -> None
 
 (* Add a new param into the association table (funcname,paramname) -> varinfo *)
 let set_paraminfo funcname paramname vi =
   (* Aorai_option.log "Adding %s(...,%s,...) " funcname paramname; *)
-  Hashtbl.add paraminfos (funcname,paramname)  vi
+  Paraminfos.add (funcname,paramname)  vi
 
 (* Given a function name and a param name, it returns the varinfo associated to the given param.
     If the variable is not found then an error message is print and an assert false is raised. *)
 let get_paraminfo funcname paramname =
   try
-    Hashtbl.find paraminfos (funcname,paramname)
+    Paraminfos.find (funcname,paramname)
   with Not_found ->
     raise_error
       ("Parameter '"^paramname^"' not declared for function '"^funcname^"'.")
@@ -1663,13 +1746,13 @@ let get_paraminfo funcname paramname =
 (* Add a new param into the association table funcname -> varinfo *)
 let set_returninfo funcname vi =
   (* Aorai_option.log "Adding return %s(...) " funcname ; *)
-  Hashtbl.add paraminfos (funcname,"\\return")  vi
+  Paraminfos.add (funcname,"\\return")  vi
 
 (* Given a function name, it returns the varinfo associated to the given param.
     If the variable is not found then an error message is print and an assert false is raised. *)
 let get_returninfo funcname =
   try
-    Hashtbl.find paraminfos (funcname,"\\return")
+    Paraminfos.find (funcname,"\\return")
   with Not_found ->
     raise_error ("Return varinfo not declared for function '"^funcname^"'.")
 
@@ -1681,6 +1764,7 @@ type range =
                            *)
   | Unbounded of int (** only the lower bound is known,
                          there is no upper bound *)
+  | Unknown (** completely unknown value. *)
 
 module Range = Datatype.Make_with_collections
   (struct
@@ -1708,11 +1792,15 @@ module Range = Datatype.Make_with_collections
             | Bounded _, _ -> 1
             | _, Bounded _ -> -1
             | Unbounded c1, Unbounded c2 -> Datatype.Int.compare c1 c2
+            | Unbounded _, _ -> 1
+            | _, Unbounded _ -> -1
+            | Unknown, Unknown -> 0
       let hash = function
         | Fixed c1 -> 2 * c1
         | Interval(c1,c2) -> 3 * (c1 + c2)
         | Bounded (c1,c2) -> 5 * (c1 + Cil_datatype.Term.hash c2)
         | Unbounded c1 -> 7 * c1
+        | Unknown -> 11
       let copy = function
         | Fixed c1 ->
           Fixed (Datatype.Int.copy c1)
@@ -1721,6 +1809,7 @@ module Range = Datatype.Make_with_collections
         | Bounded(c1,c2) ->
           Bounded(Datatype.Int.copy c1, Cil_datatype.Term.copy c2)
         | Unbounded c1 -> Unbounded (Datatype.Int.copy c1)
+        | Unknown -> Unknown
       let internal_pretty_code _ = Datatype.from_pretty_code
       let pretty fmt = function
         | Fixed c1 -> Format.fprintf fmt "%d" c1
@@ -1730,6 +1819,7 @@ module Range = Datatype.Make_with_collections
           Format.fprintf fmt "@[<2>[%d..@;%a]@]" c1
             Cil_datatype.Term.pretty c2
         | Unbounded c1 -> Format.fprintf fmt "[%d..]" c1
+        | Unknown -> Format.fprintf fmt "[..]"
       let varname _ = "r"
       let mem_project = Datatype.never_any_project
    end)
@@ -1805,6 +1895,7 @@ let merge_range loc base r1 r2 =
       let min =
         if Datatype.Int.compare min2 min1 < 0 then min2 else min1
       in Unbounded min
+    | Unknown, _ | _, Unknown -> Unknown
 
 let tlval lv = Logic_const.term (TLval lv) (Cil.typeOfTermLval lv)
 
@@ -1826,6 +1917,8 @@ let included_range range1 range2 =
     | Bounded(l1,_), Unbounded l2 -> Datatype.Int.compare l1 l2 <= 0
     | Unbounded l1, Unbounded l2 -> Datatype.Int.compare l1 l2 <= 0
     | Unbounded _, (Fixed _ | Interval _ | Bounded _) -> false
+    | _, Unknown -> true
+    | Unknown, _ -> false
 
 let unchanged loc =
   Cil_datatype.Term.Map.add loc (Fixed 0) Cil_datatype.Term.Map.empty
@@ -2086,6 +2179,12 @@ let removeUnusedTransitionsAndStates () =
   let reached_states = Loop_invariant_state.fold reached reached_states in
   if Aorai_state.Set.is_empty reached_states then
     raise Empty_automaton;
+  let reached_states =
+    if Aorai_option.Deterministic.get() then
+      (* keep the rejecting state anyways. *)
+      Aorai_state.Set.add (get_reject_state()) reached_states
+    else reached_states
+  in
   (* Step 2 : computation of translation tables *)
   let state_list =
     List.sort
@@ -2118,8 +2217,8 @@ let removeUnusedTransitionsAndStates () =
         Reject_state.set new_reject
       with Not_found -> Reject_state.clear ());
   (* Step 3 : rewriting stored information *)
-  automata := Some { auto with states =state_list; trans = trans_list };
-  check_states "reduced automata";
+  Automaton.set (Some { auto with states =state_list; trans = trans_list });
+  check_states "reduced automaton";
 
   let rewrite_state state =
     let rewrite_set set =

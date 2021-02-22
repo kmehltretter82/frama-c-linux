@@ -73,14 +73,13 @@ type 'a alphaTable =
  * previous occurrence. This function knows about the location implicitly
  * from the [(Cil.CurrentLoc.get ())]. *)
 val newAlphaName: alphaTable: 'a alphaTable ->
-  ?undolist: 'a undoAlphaElement list ref ->
+  undolist: 'a undoAlphaElement list ref option ->
   lookupname:string -> data:'a -> string * 'a
 
 
 (** Register a name with an alpha conversion table to ensure that when later
   * we call newAlphaName we do not end up generating this one *)
 val registerAlphaName: alphaTable: 'a alphaTable ->
-  ?undolist: 'a undoAlphaElement list ref ->
   lookupname:string -> data:'a -> unit
 
 (** Split the name in preparation for newAlphaName. Returns a pair

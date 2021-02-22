@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -33,7 +33,7 @@ module type Generator_sig = sig
   val retype_args: override_key -> exp list -> exp list
   val args_for_original: override_key -> exp list -> exp list
   val generate_prototype: override_key -> (string * typ)
-  val generate_spec: override_key -> fundec -> location -> funspec
+  val generate_spec: override_key -> location -> fundec -> funspec
 end
 
 module type Instantiator = sig
@@ -90,7 +90,7 @@ module Make_instantiator (G: Generator_sig) = struct
     let spec = Cil.empty_funspec () in
     Globals.Functions.replace_by_definition spec fd loc ;
     let kf = Globals.Functions.get fd.svar in
-    let spec = generate_spec key fd loc in
+    let spec = generate_spec key loc fd in
     Annotations.add_behaviors Options.emitter kf spec.spec_behavior ;
     List.iter
       (Annotations.add_complete Options.emitter kf)

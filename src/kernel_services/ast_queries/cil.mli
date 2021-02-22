@@ -978,11 +978,14 @@ val need_cast: ?force:bool -> typ -> typ -> bool
     type is the same as the old type, then no cast is added, unless [force]
     is [true] (default is [false])
     @modify Fluorine-20130401 add [force] argument
+    @modify Frama-C+dev change order or arguments
 *)
-val mkCastT: ?force:bool -> e:exp -> oldt:typ -> newt:typ -> exp
+val mkCastT: ?force:bool -> oldt:typ -> newt:typ -> exp -> exp
 
-(** Like {!Cil.mkCastT} but uses typeOf to get [oldt] *)
-val mkCast: ?force:bool -> e:exp -> newt:typ -> exp
+(** Like {!Cil.mkCastT} but uses typeOf to get [oldt]
+    @modify Frama-C+dev change order or arguments
+*)
+val mkCast: ?force:bool -> newt:typ -> exp -> exp
 
 (** Equivalent to [stripCasts] for terms. *)
 val stripTermCasts: term -> term
@@ -1116,21 +1119,41 @@ val mkPureExpr:
   ?loc:location -> exp -> stmt
 
 (** Make a loop. Can contain Break or Continue.
-    The kind of loop (While, For, DoWhile) is given by [sattr];
-    it is a While loop if unspecified. *)
-val mkLoop: ?sattr:attributes -> guard:exp -> body:stmt list -> stmt list
+    The kind of loop (while, for, dowhile) is given by [sattr]
+    (none by default). Use {!Cil.mkWhile} for a While loop.
+    @modify Frama-C+dev add unit argument. Default type is no longer While,
+            use {!Cil.mkWhile} instead.
+*)
+val mkLoop: ?sattr:attributes -> guard:exp -> body:stmt list -> unit ->
+  stmt list
 
 (** Make a for loop for(i=start; i<past; i += incr) \{ ... \}. The body
     can contain Break but not Continue. Can be used with i a pointer
     or an integer. Start and done must have the same type but incr
-    must be an integer *)
-val mkForIncr:  iter:varinfo -> first:exp -> stopat:exp -> incr:exp
-  -> body:stmt list -> stmt list
+    must be an integer
+    @modify Frama-C+dev add unit argument
+*)
+val mkForIncr: ?sattr:attributes -> iter:varinfo -> first:exp -> stopat:exp ->
+  incr:exp -> body:stmt list -> unit -> stmt list
 
 (** Make a for loop for(start; guard; next) \{ ... \}. The body can
-    contain Break but not Continue !!! *)
-val mkFor: start:stmt list -> guard:exp -> next: stmt list ->
-  body: stmt list -> stmt list
+    contain Break but not Continue !!!
+    @modify Frama-C+dev add unit argument
+*)
+val mkFor: ?sattr:attributes -> start:stmt list -> guard:exp -> next: stmt list ->
+  body: stmt list -> unit -> stmt list
+
+(** Make a while loop.
+    @since Frama-C+dev
+*)
+val mkWhile: ?sattr:attributes -> guard:exp -> body:stmt list -> unit ->
+  stmt list
+
+(** Make a do ... while loop.
+    @since Frama-C+dev
+*)
+val mkDoWhile: ?sattr:attributes -> body:stmt list -> guard:exp -> unit ->
+  stmt list
 
 (** creates a block with empty attributes from an unspecified sequence. *)
 val block_from_unspecified_sequence:

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -30,15 +30,12 @@ open Clabels
 
 val basename : varinfo -> string (** Trims the original name *)
 
-type lkind = [ `Axiom | `Check | `Lemma ]
-
 type logic_lemma = {
   lem_name : string ;
-  lem_kind : lkind ;
   lem_position : Filepath.position ;
   lem_types : string list ;
   lem_labels : logic_label list ;
-  lem_property : predicate ;
+  lem_predicate : toplevel_predicate ;
   lem_depends : logic_lemma list ; (** in reverse order *)
   lem_attrs : attributes ;
 }

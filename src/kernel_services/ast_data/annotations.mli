@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -332,6 +332,14 @@ type 'a behavior_component_addition =
     Default for [behavior] is {!Cil.default_behavior_name}. 
 
     @since Aluminium-20160501
+*)
+
+val add_spec: ?register_children:bool -> spec contract_component_addition
+(** Add new spec into the given contract.
+
+    [register_children] is directly given to the function [add_behaviors].
+
+    @since Frama-C+dev
 *)
 
 val add_behaviors:

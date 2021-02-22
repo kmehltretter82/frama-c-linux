@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -1017,8 +1017,8 @@ and pp_global_annotation fmt = function
       pp_attributes attributes  pp_location location
   | Dtype(logic_type_info,location) ->
     Format.fprintf fmt "Dtype(%a,%a)"  pp_logic_type_info logic_type_info  pp_location location
-  | Dlemma(string,bool,logic_label_list,string_list,predicate,attributes,location) ->
-    Format.fprintf fmt "Dlemma(%a,%a,%a,%a,%a,%a,%a)"  pp_string string  pp_bool bool
+  | Dlemma(string,logic_label_list,string_list,predicate,attributes,location) ->
+    Format.fprintf fmt "Dlemma(%a,%a,%a,%a,%a,%a)"  pp_string string
       (pp_list pp_logic_label) logic_label_list (pp_list pp_string) string_list
       pp_toplevel_predicate predicate
       pp_attributes attributes  pp_location location

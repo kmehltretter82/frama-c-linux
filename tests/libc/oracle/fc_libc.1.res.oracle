@@ -6789,6 +6789,14 @@ extern wchar_t *fgetws(wchar_t * __restrict ws, int n,
       }
 
 */
+/*@ requires valid_wstring_ws1: valid_read_wstring(ws1);
+    requires valid_wstring_ws2: valid_read_wstring(ws2);
+    assigns \result;
+    assigns \result
+      \from (indirect: *(ws1 + (0 ..))), (indirect: *(ws2 + (0 ..)));
+ */
+extern int wcscasecmp(wchar_t const *ws1, wchar_t const *ws2);
+
 /*@ requires
       valid_dest:
         valid_or_empty((void *)dest, (unsigned int)(sizeof(wchar_t) * n));
@@ -6965,6 +6973,23 @@ wchar_t *wcsncat(wchar_t *dest, wchar_t const *src, size_t n)
   }
   *(dest + (dest_len + i)) = 0;
   return dest;
+}
+
+wchar_t *wcsdup(wchar_t const *ws)
+{
+  wchar_t *__retres;
+  size_t tmp;
+  tmp = wcslen(ws);
+  size_t l = tmp + (size_t)1;
+  wchar_t *p = malloc(sizeof(wchar_t) * l);
+  if (! p) {
+    __fc_errno = 12;
+    __retres = (wchar_t *)0;
+    goto return_label;
+  }
+  wmemcpy(p,ws,l);
+  __retres = p;
+  return_label: return __retres;
 }
 
 /*@ ghost extern int __fc_stack_status; */

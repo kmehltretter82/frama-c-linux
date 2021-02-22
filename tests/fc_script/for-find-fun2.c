@@ -24,3 +24,8 @@ void h() {
 
  void false_positive(); // this is a "voluntary" false negative (space before):
                         // it allows us to avoid false positives more easily
+
+static int static_fun() {
+  static int init = 0;
+  return init;
+}

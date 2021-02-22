@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -342,6 +342,17 @@ module Functions = struct
   let find_by_name fct_name =
     let vi = Datatype.String.Map.find fct_name (Iterator.State.get ()) in
     State.find vi
+
+  let find_all_by_orig_name ?cmp fct_name =
+    let l =
+      Datatype.String.Map.fold (fun _ vi acc ->
+          if vi.vorig_name = fct_name then (State.find vi) :: acc
+          else acc
+        ) (Iterator.State.get ()) []
+    in
+    match cmp with
+    | None -> l
+    | Some cmp -> List.sort cmp l
 
   let find_def_by_name fct_name =
     let vi = Datatype.String.Map.find fct_name (Iterator.State.get ()) in

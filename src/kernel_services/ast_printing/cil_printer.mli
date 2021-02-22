@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -29,6 +29,34 @@
     @since Fluorine-20130401 *)
 
 include Printer_api.S
+
+(** ["assert"], ["check"] or ["admit"]. *)
+val string_of_assert : Cil_types.predicate_kind -> string
+
+(** ["assertion"], ["check"] or ["admit"]. *)
+val name_of_assert : Cil_types.predicate_kind -> string
+
+(** ["lemma"], ["check lemma"] or ["axiom"]. *)
+val string_of_lemma : Cil_types.predicate_kind -> string
+
+(** clause, prefixed by ["check"] or ["admit"]. *)
+val string_of_predicate : kw:string -> Cil_types.predicate_kind -> string
+
+(** same as [string_of_lemma] with ["_"] for separator. *)
+val ident_of_lemma : Cil_types.predicate_kind -> string
+
+(** same as [string_of_predicate] with ["_"] for separator. *)
+val ident_of_predicate : kw:string -> Cil_types.predicate_kind -> string
+
+(** pretty prints [string_of_assert]. *)
+val pp_assert_kind : Format.formatter -> Cil_types.predicate_kind -> unit
+
+(** pretty prints [string_of_lemma]. *)
+val pp_lemma_kind : Format.formatter -> Cil_types.predicate_kind -> unit
+
+(** pretty prints [string_of_predicate]. *)
+val pp_predicate_kind :
+  kw:string -> Format.formatter -> Cil_types.predicate_kind -> unit
 
 val get_termination_kind_name: Cil_types.termination_kind -> string
 

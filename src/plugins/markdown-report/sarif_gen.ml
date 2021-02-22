@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -149,8 +149,7 @@ let ip_is_in_libc ip =
       match ip with
       | IPAxiomatic {iax_attrs=attrs}
       | IPLemma {il_attrs=attrs}
-      | IPAxiom {il_attrs=attrs} ->
-        Cil.is_in_libc attrs
+        -> Cil.is_in_libc attrs
       | _ ->
         false
     end
@@ -206,6 +205,7 @@ let gen_status ip =
   Sarif_result.create ~ruleId:user_annot_id ~level ~locations ~message ()
 
 let gen_statuses () =
+  let cmp = Property.Ordered_by_function.compare in
   let f ip content =
     let exclude =
       is_alarm ip ||
@@ -213,7 +213,7 @@ let gen_statuses () =
     in
     if exclude then content else (gen_status ip) :: content
   in
-  List.rev (Property_status.fold f [])
+  List.rev (Property_status.fold_sorted ~cmp f [])
 
 let gen_artifacts () =
   let add_src_file f =

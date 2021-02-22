@@ -100,7 +100,7 @@ let is_active_mode ~mode ~goal (p: Property.t) =
   | IPComplete _ | IPDisjoint _ -> is_default_bhv mode
   | IPOther _ -> true
   | IPFrom _ | IPGlobalInvariant _ | IPTypeInvariant _
-  | IPAxiomatic _ | IPAxiom _ | IPLemma _
+  | IPAxiomatic _ | IPLemma _
   | IPExtended _ | IPBehavior _
   | IPReachable _ | IPPropertyInstance _
     -> assert false (* n/a *)

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -676,7 +676,7 @@ let add_all_axioms tbl =
   let rec do_g g =
     match g with
     | Daxiomatic (_ax_name, globs,_,_) -> do_globs globs
-    | Dlemma (name,_,_,_,_,_,_) ->
+    | Dlemma (name,_,_,_,_,_) ->
         let lem = LogicUsage.logic_lemma name in
         add_axiom tbl lem
     | _ -> ()

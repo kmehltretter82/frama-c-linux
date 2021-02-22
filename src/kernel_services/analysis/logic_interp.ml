@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -27,7 +27,7 @@ open Cil_datatype
 exception Error of Cil_types.location * string
 exception Unbound of string
 
-let find_var kf kinstr ?label ~var =
+let find_var kf kinstr ?label var =
   let vi =
     try
       let vi = Globals.Vars.find_from_astinfo var (VLocal kf) in
@@ -89,7 +89,7 @@ end) =
 
       let find_macro _ = raise Not_found
 
-      let find_var ?label ~var = find_var X.kf X.kinstr ?label ~var
+      let find_var ?label var = find_var X.kf X.kinstr ?label var
 
       let find_enum_tag x =
         try
@@ -312,7 +312,7 @@ and loc_to_exp ~result {term_node = lnode ; term_type = ltype; term_loc = loc} =
           Logic_utils.is_same_type
           (Logic_typing.type_of_set_elem set) t.term_type ->
     loc_to_exp ~result t
-  | Tnull -> [ Cil.mkCast (Cil.zero ~loc) (TPtr(TVoid [], [])) ]
+  | Tnull -> [ Cil.mkCast (TPtr(TVoid [], [])) (Cil.zero ~loc) ]
 
   (* additional constructs *)
   | Tapp _ | Tlambda _ | Trange _   | Tlet _

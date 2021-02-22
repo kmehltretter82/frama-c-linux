@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -226,10 +226,15 @@ module Location = struct
   let to_lexing_loc (pos1, pos2) =
     Position.to_lexing_pos pos1, Position.to_lexing_pos pos2
 
-  let equal_start_semantic (pos1, _) (pos2, _) =
-    Filepath.(Datatype.Filepath.equal pos1.pos_path pos2.pos_path
-              && pos1.pos_lnum = pos2.pos_lnum
-              && pos1.pos_cnum - pos1.pos_bol = pos2.pos_cnum - pos2.pos_bol)
+  let compare_start_semantic (pos1, _) (pos2, _) =
+    let open Filepath in
+    let c = Datatype.Filepath.compare pos1.pos_path pos2.pos_path in
+    if c <> 0 then c else
+      let c = pos1.pos_lnum - pos2.pos_lnum in
+      if c <> 0 then c else
+        (pos1.pos_cnum - pos1.pos_bol) - (pos2.pos_cnum - pos2.pos_bol)
+
+  let equal_start_semantic l1 l2 = compare_start_semantic l1 l2 = 0
 
 end
 
@@ -1982,7 +1987,7 @@ module Global_annotation = struct
           | Dtype(t1,_), Dtype(t2,_) -> Logic_type_info.compare t1 t2
           | Dtype _, _ -> -1
           | _, Dtype _ -> 1
-          | Dlemma (l1,_,_,_,_,attr1,_), Dlemma(l2,_,_,_,_,attr2,_) ->
+          | Dlemma (l1,_,_,_,attr1,_), Dlemma(l2,_,_,_,attr2,_) ->
             let res = Datatype.String.compare l1 l2 in
             if res = 0 then Attributes.compare attr1 attr2 else res
           | Dlemma _, _ -> -1
@@ -2017,7 +2022,7 @@ module Global_annotation = struct
           (* Empty axiomatic is weird but authorized. *)
           | Daxiomatic (_,g::_,_,_) -> 5 * hash g
           | Dtype (t,_) -> 7 * Logic_type_info.hash t
-          | Dlemma(n,_,_,_,_,_,_) -> 11 * Datatype.String.hash n
+          | Dlemma(n,_,_,_,_,_) -> 11 * Datatype.String.hash n
           | Dinvariant(l,_) -> 13 * Logic_info.hash l
           | Dtype_annot(l,_) -> 17 * Logic_info.hash l
           | Dmodel_annot(l,_) -> 19 * Model_info.hash l
@@ -2031,7 +2036,7 @@ module Global_annotation = struct
     | Dfun_or_pred(_, loc)
     | Daxiomatic(_, _, _, loc)
     | Dtype (_, loc)
-    | Dlemma(_, _, _, _, _, _, loc)
+    | Dlemma(_, _, _, _, _, loc)
     | Dinvariant(_, loc)
     | Dtype_annot(_, loc) -> loc
     | Dmodel_annot(_, loc) -> loc
@@ -2043,7 +2048,7 @@ module Global_annotation = struct
     | Dfun_or_pred({ l_var_info = { lv_attr }}, _) -> lv_attr
     | Daxiomatic(_, _, attr, _) -> attr
     | Dtype ({lt_attr}, _) -> lt_attr
-    | Dlemma(_, _, _, _, _, attr, _) -> attr
+    | Dlemma(_, _, _, _, attr, _) -> attr
     | Dinvariant({ l_var_info = { lv_attr }}, _) -> lv_attr
     | Dtype_annot({ l_var_info = { lv_attr}}, _) -> lv_attr
     | Dmodel_annot({ mi_attr }, _) -> mi_attr

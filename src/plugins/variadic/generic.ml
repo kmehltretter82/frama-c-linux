@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -120,7 +120,7 @@ let translate_va_builtin caller inst =
     (* Build the replacing instruction *)
     let mk_lval_exp lval = Cil.new_exp ~loc (Lval lval)  in
     let mk_mem exp = mk_lval_exp (Cil.mkMem ~addr:exp ~off:NoOffset) in
-    let mk_cast exp typ = Cil.mkCast ~force:false ~e:exp ~newt:typ in
+    let mk_cast exp typ = Cil.mkCast ~force:false ~newt:typ exp in
     let src = mk_mem (mk_cast (mk_mem (mk_lval_exp va_list)) (TPtr (typ,[])))
     in
     [ Set (lval, src, loc);
@@ -173,7 +173,7 @@ let translate_call ~fundec ~ghost block loc mk_call callee pars =
 
   (* Translate the call *)
   let exp_vargs = Cil.mkAddrOrStartOf ~loc (Cil.var vargs) in
-  let new_arg = Cil.mkCast ~force:false ~e:exp_vargs ~newt:(vpar_typ []) in
+  let new_arg = Cil.mkCast ~force:false ~newt:(vpar_typ []) exp_vargs in
   let new_args = s_exps @ [new_arg] @ g_exps in
   let call = mk_call callee new_args in
   instrs @ [call]

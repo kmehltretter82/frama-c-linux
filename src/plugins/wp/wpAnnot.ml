@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -1030,7 +1030,7 @@ let add_global_annotations annots =
           "Global invariant not handled yet ('%s' ignored)"
           linfo.l_var_info.lv_name;
         ()
-    | Dlemma (name,_,_,_,p,_,_) ->
+    | Dlemma (name,_,_,p,_,_) ->
         if use_predicate p.tp_kind then
           WpStrategy.add_axiom annots (LogicUsage.logic_lemma name)
 
@@ -1396,7 +1396,6 @@ let get_property_strategies ~model ip =
   | IPAxiomatic _
   | IPLemma _
   | IPFrom _
-  | IPAxiom _
   | IPReachable _
   | IPPropertyInstance _
   | IPOther _

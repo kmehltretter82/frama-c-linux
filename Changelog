@@ -17,6 +17,10 @@
 Open Source Release <next-release>
 ##################################
 
+-   Aorai     [2021-02-09] New option for tracking last N states of the
+              automaton. Easier analysis of instrumented code with Eva
+o!  Kernel    [2021-02-08] Avoid triggering warning 16 (unerasable optional
+              argument). Implies changing some labeled functions' signatures.
 o!  Kernel    [2021-01-15] Make cfields list optional. None means undefined,
               empty struct allowed only in specific machdeps.
               removed cdefined field

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -82,6 +82,8 @@ val dkey_loops: category
 val dkey_parser: category
 
 val dkey_pp: category
+
+val dkey_pp_logic: category
 
 val dkey_print_attrs: category
 
@@ -183,6 +185,9 @@ val wkey_acsl_extension: warn_category
 
 val wkey_cmdline: warn_category
 (** Command-line related warning, e.g. for invalid options given by the user *)
+
+val wkey_audit: warn_category
+(** Warning related to options '-audit-*'. *)
 
 (* ************************************************************************* *)
 (** {2 Functors for late option registration}                                *)
@@ -411,6 +416,12 @@ module CppGnuLike: Parameter_sig.Bool
 
 module PrintCppCommands: Parameter_sig.Bool
 (** Behavior of option "-print-cpp-commands" *)
+
+module AuditPrepare: Parameter_sig.Filepath
+(** Behavior of option "-audit-prepare" *)
+
+module AuditCheck: Parameter_sig.Filepath
+(** Behavior of option "-audit-check" *)
 
 module FramaCStdLib: Parameter_sig.Bool
 (** Behavior of option "-frama-c-stdlib" *)

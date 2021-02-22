@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -186,7 +186,7 @@ let zero e =
   | TPtr _ ->
     let ik = Cil.(theMachine.upointKind) in
     let zero = Cil.new_exp ~loc (Const (CInt64 (Integer.zero, ik, None))) in
-    Cil.mkCast ~force:true ~e:zero ~newt:typ
+    Cil.mkCast ~force:true ~newt:typ zero
   | typ -> Value_parameters.fatal ~current:true "non-scalar type %a"
              Printer.pp_typ typ
 

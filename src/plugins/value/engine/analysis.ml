@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -173,6 +173,10 @@ let reset_analyzer () =
 let force_compute () =
   Ast.compute ();
   Value_parameters.configure_precision ();
+  if not (Filepath.Normalized.is_unknown (Kernel.AuditCheck.get ()))
+  then Eva_audit.check_configuration (Kernel.AuditCheck.get ());
+  if not (Filepath.Normalized.is_unknown (Kernel.AuditPrepare.get ()))
+  then Eva_audit.print_configuration (Kernel.AuditPrepare.get ());
   let kf, lib_entry = Globals.entry_point () in
   reset_analyzer ();
   let module Analyzer = (val snd !ref_analyzer) in

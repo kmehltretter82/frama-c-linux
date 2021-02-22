@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -182,9 +182,10 @@ let fold_on_statuses f ip acc =
     Emitter_with_properties.Hashtbl.fold f h acc
   with Not_found -> acc
 
-
 let iter f = Status.iter (fun p _ -> f p)
 let fold f = Status.fold (fun p _ -> f p)
+let iter_sorted ~cmp f = Status.iter_sorted ~cmp (fun p _ -> f p)
+let fold_sorted ~cmp f = Status.fold_sorted ~cmp (fun p _ -> f p)
 
 (* ok to be computed once right now since there is no parameter dependency *)
 let usable_kernel_emitter = Emitter.get Emitter.kernel
@@ -352,7 +353,6 @@ let is_admitted_code_annot = function
   | _ -> false
 
 let rec is_admitted = function
-  | Property.IPAxiom _  -> true
   | Property.IPPredicate ip -> ip.ip_pred.ip_content.tp_kind = Admit
   | IPLemma lemma -> lemma.il_pred.tp_kind = Admit
   | IPCodeAnnot ca -> is_admitted_code_annot ca.ica_ca.annot_content
@@ -518,8 +518,9 @@ and unsafe_emit_and_get e ~hyps ~auto ppt ?(distinct=false) s =
   | Property.IPPredicate _ | Property.IPCodeAnnot _ | Property.IPComplete _
   | Property.IPDisjoint _ | Property.IPAssigns _ | Property.IPFrom _
   | Property.IPAllocation _ | Property.IPDecrease _ | Property.IPBehavior _
-  | Property.IPAxiom _ | Property.IPAxiomatic _ | Property.IPLemma _
-  | Property.IPTypeInvariant _ | Property.IPGlobalInvariant _ | Property.IPExtended _ ->
+  | Property.IPAxiomatic _ | Property.IPLemma _
+  | Property.IPTypeInvariant _ | Property.IPGlobalInvariant _
+  | Property.IPExtended _ ->
     Kernel.fatal "unregistered property %a" Property.pretty ppt
 
 and logical_consequence e ppt hyps =
@@ -685,7 +686,7 @@ and get_status ?(must_register=true) ppt =
   | Property.IPPredicate _ | Property.IPCodeAnnot _ | Property.IPComplete _
   | Property.IPDisjoint _ | Property.IPAssigns _ | Property.IPFrom _
   | Property.IPDecrease _ | Property.IPAllocation _
-  | Property.IPAxiom _ | Property.IPAxiomatic _ | Property.IPLemma _
+  | Property.IPAxiomatic _ | Property.IPLemma _
   | Property.IPTypeInvariant _ | Property.IPGlobalInvariant _ ->
     Kernel.fatal "trying to get status of unregistered property `%a'.\n\
                   That is forbidden (kernel invariant broken)."

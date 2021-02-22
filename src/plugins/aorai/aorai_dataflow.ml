@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Aorai plug-in of Frama-C.                        *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -70,6 +70,7 @@ let compose_range loc b r1 r2 =
       ->
       if Cil.isLogicZero b then Data_for_aorai.absolute_range loc (min1 + min2)
       else Unbounded (min1 + min2)
+    | Unknown, _ | _, Unknown -> Unknown
 
 let fail_on_both k elt1 elt2 =
   match elt1, elt2 with
@@ -85,8 +86,7 @@ let compose_bindings map1 loc vals map =
   let vals = Cil_datatype.Term.Map.fold 
     (fun base intv vals ->
       let vals' =
-        if Cil.isLogicZero base then
-          Cil_datatype.Term.Map.add base intv Cil_datatype.Term.Map.empty
+        if Cil.isLogicZero base then Cil_datatype.Term.Map.singleton base intv
         else
           try
             let orig_base = Cil_datatype.Term.Map.find base map1 in
@@ -96,8 +96,7 @@ let compose_bindings map1 loc vals map =
                 Cil_datatype.Term.Map.add base intv' map
               )
               orig_base Cil_datatype.Term.Map.empty
-          with Not_found ->
-            Cil_datatype.Term.Map.add base intv Cil_datatype.Term.Map.empty
+          with Not_found -> Cil_datatype.Term.Map.singleton base intv
       in
       Cil_datatype.Term.Map.merge
         (Extlib.merge_opt (Data_for_aorai.merge_range loc)) vals' vals
@@ -273,8 +272,9 @@ let make_start_transition ?(is_main=false) kf init_states =
       (fun trans kf -> Aorai_utils.isCrossable trans kf Promelaast.Call)
   in
   let treat_one_state state acc =
-    let my_trans = Path_analysis.get_transitions_of_state state auto in
-    let treat_one_trans acc trans =
+    if Data_for_aorai.isObservableFunction kf then begin
+      let my_trans = Path_analysis.get_transitions_of_state state auto in
+      let treat_one_trans acc trans =
         if is_crossable trans kf then begin
           let bindings = actions_to_range trans.actions in
           let fst_set =
@@ -286,13 +286,23 @@ let make_start_transition ?(is_main=false) kf init_states =
           add_or_merge trans.stop (fst_set, last_set, bindings) acc
         end
         else acc
-    in
-    let possible_states =
-      List.fold_left 
-        treat_one_trans Data_for_aorai.Aorai_state.Map.empty my_trans
-    in
-    if Data_for_aorai.Aorai_state.Map.is_empty possible_states then acc
-    else Data_for_aorai.Aorai_state.Map.add state possible_states acc
+      in
+      let possible_states =
+        List.fold_left 
+          treat_one_trans Data_for_aorai.Aorai_state.Map.empty my_trans
+      in
+      if Data_for_aorai.Aorai_state.Map.is_empty possible_states then acc
+      else Data_for_aorai.Aorai_state.Map.add state possible_states acc
+    end else begin
+      (* function is not observed by automaton: this is as if there
+         were a single transition letting the state unchanged. *)
+      Data_for_aorai.Aorai_state.(
+        Map.add state
+          (Map.singleton state
+           (Set.singleton state, Set.singleton state,
+            Cil_datatype.Term.Map.empty))
+          acc)
+    end
   in
   let res =
     Data_for_aorai.Aorai_state.Set.fold 
@@ -304,16 +314,28 @@ let make_return_transition kf state =
   set_return_state s state;
   let auto = Data_for_aorai.getGraph () in
   let treat_one_state state bindings acc =
-    let my_trans = Path_analysis.get_transitions_of_state state auto in
-    let last = Data_for_aorai.Aorai_state.Set.singleton state in
-    let treat_one_trans acc trans =
-      if Aorai_utils.isCrossable trans kf Promelaast.Return then begin
-        let my_bindings = actions_to_range trans.actions in
-        let new_bindings = compose_actions bindings (last, last, my_bindings) in
-        add_or_merge trans.stop new_bindings acc
-      end else acc
-    in
-    List.fold_left treat_one_trans acc my_trans
+    if Data_for_aorai.isObservableFunction kf then begin
+      let my_trans = Path_analysis.get_transitions_of_state state auto in
+      let last = Data_for_aorai.Aorai_state.Set.singleton state in
+      let treat_one_trans acc trans =
+        if Aorai_utils.isCrossable trans kf Promelaast.Return then begin
+          let my_bindings = actions_to_range trans.actions in
+          let new_bindings =
+            compose_actions bindings (last, last, my_bindings)
+          in
+          add_or_merge trans.stop new_bindings acc
+        end else acc
+      in
+      List.fold_left treat_one_trans acc my_trans
+    end else begin
+      (* non-observable function: its return does not change the state
+         of the automaton. *)
+      let last = Data_for_aorai.Aorai_state.Set.singleton state in
+      let new_bindings =
+        compose_actions bindings (last,last,Cil_datatype.Term.Map.empty)
+      in
+      add_or_merge state new_bindings acc
+    end
   in
   let treat_one_path start_state curr_state acc =
     let res =
@@ -430,7 +452,7 @@ module Computer(I: Init) = struct
 
   let do_call s f args (state,loops as d) =
     let kf = Globals.Functions.get f in
-    if Data_for_aorai.isIgnoredFunction (Kernel_function.get_name kf)
+    if Data_for_aorai.isIgnoredFunction kf
     then d (* we simply skip ignored functions. *)
     else begin
       set_call_state s state;
@@ -455,7 +477,13 @@ module Computer(I: Init) = struct
           let acc = Cil_datatype.Term.Map.add lv value acc in
           bind acc prms args
       in
-      let args = bind Cil_datatype.Term.Map.empty prms args in
+      let res = Logic_const.tresult (Kernel_function.get_return_type kf) in
+      let z = Logic_const.tinteger 0 in
+      (* invalidate bindings to \result of the callee.
+         TODO: generate global variable to store the result if needed?
+      *)
+      let map = Cil_datatype.Term.Map.(singleton res (singleton z Unknown)) in
+      let args = bind map prms args in
       let init_states = extract_current_states state in
       let init_trans = make_start_transition kf init_states in
       let end_state = !compute_func I.stack (Kstmt s) kf init_trans in
@@ -532,7 +560,7 @@ module Computer(I: Init) = struct
 end
 
 let compute_func_aux stack call_site kf init_state =
-  if Data_for_aorai.isIgnoredFunction (Kernel_function.get_name kf) then
+  if Data_for_aorai.isIgnoredFunction kf then
     Aorai_option.fatal "compute_func on function %a which is ignored by Aorai"
       Kernel_function.pretty kf
   else if List.mem_assq kf stack then begin
@@ -620,7 +648,7 @@ let () = compute_func := compute_func_aux
 
 let compute_forward () =
   let kf = Globals.Functions.find_by_name (Kernel.MainFunction.get()) in
-  if Data_for_aorai.isIgnoredFunction (Kernel_function.get_name kf) then
+  if Data_for_aorai.isIgnoredFunction kf then
     Aorai_option.abort "Main function %a is ignored by Aorai"
       Kernel_function.pretty kf;
   let (states,_) = Data_for_aorai.getGraph () in
@@ -757,7 +785,7 @@ struct
 
   let do_call s f state =
     let kf = Globals.Functions.get f in
-    if Data_for_aorai.isIgnoredFunction (Kernel_function.get_name kf)
+    if Data_for_aorai.isIgnoredFunction kf
     then Dataflow2.Default (* we simply skip ignored functions. *)
     else begin
       try
@@ -912,7 +940,7 @@ let filter_init_state restrict initial map acc =
   with Not_found -> acc
 
 let backward_analysis_aux stack kf ret_state =
-  if (Data_for_aorai.isIgnoredFunction (Kernel_function.get_name kf)) then
+  if Data_for_aorai.isIgnoredFunction kf then
     Aorai_option.fatal 
       "Call backward analysis on ignored function %a" Kernel_function.pretty kf
   else if List.memq kf stack then begin
@@ -1002,7 +1030,7 @@ let () = backward_analysis := backward_analysis_aux
 
 let compute_backward () =
   let kf = Globals.Functions.find_by_name (Kernel.MainFunction.get()) in
-  if Data_for_aorai.isIgnoredFunction (Kernel_function.get_name kf) then
+  if Data_for_aorai.isIgnoredFunction kf then
     Aorai_option.abort "Main function %a is ignored by Aorai"
       Kernel_function.pretty kf;
   let final_state = Data_for_aorai.get_kf_return_state kf in

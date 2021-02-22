@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2020                                               #
+#  Copyright (C) 2007-2021                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -268,6 +268,7 @@ DISTRIB_FILES:=\
       share/analysis-scripts/function_finder.py                         \
       share/analysis-scripts/git_utils.py                               \
       share/analysis-scripts/list_files.py                              \
+      share/analysis-scripts/list_functions.ml                          \
       share/analysis-scripts/make_template.py                           \
       share/analysis-scripts/make_wrapper.py                            \
       share/analysis-scripts/normalize_jcdb.py                          \
@@ -525,8 +526,8 @@ KERNEL_CMO=\
 	src/kernel_services/ast_printing/cil_descriptive_printer.cmo    \
 	src/kernel_services/parsetree/cabs.cmo                               \
 	src/kernel_services/parsetree/cabshelper.cmo                         \
-	src/kernel_services/ast_printing/logic_print.cmo                \
 	src/kernel_services/ast_queries/logic_utils.cmo              \
+	src/kernel_services/ast_printing/logic_print.cmo                \
 	src/kernel_internals/parsing/logic_parser.cmo                  \
 	src/kernel_internals/parsing/logic_lexer.cmo                   \
 	src/kernel_services/ast_queries/logic_typing.cmo             \
@@ -784,12 +785,11 @@ PLUGIN_DIR:=src/plugins/callgraph
 PLUGIN_CMO:= options journalize subgraph cg services uses register
 ifeq ($(HAS_DGRAPH),yes)
 PLUGIN_GUI_CMO:=cg_viewer
-PLUGIN_DISTRIB_EXTERNAL:=cg_viewer.yes.ml
 PLUGIN_GENERATED:=$(PLUGIN_DIR)/cg_viewer.ml
 else
 PLUGIN_GUI_CMO:=
-PLUGIN_DISTRIB_EXTERNAL:=cg_viewer.ml
 endif
+PLUGIN_DISTRIB_EXTERNAL:=cg_viewer.yes.ml
 PLUGIN_CMI:= callgraph_api
 PLUGIN_INTERNAL_TEST:=yes
 PLUGIN_TESTS_DIRS:=callgraph
@@ -839,7 +839,7 @@ endif
 # General rules for ordering files within PLUGIN_CMO:
 # - try to keep the legacy Value before Eva
 PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode value_parameters \
-	utils/value_perf utils/eva_annotations \
+	utils/eva_audit utils/value_perf utils/eva_annotations \
 	utils/value_util utils/red_statuses \
 	utils/mark_noresults \
 	utils/widen_hints_ext utils/widen \
@@ -1633,10 +1633,10 @@ dots: $(ALL_CMO)
 	$(QUIET_MAKE) doc/call_graph.ps
 
 # pandoc is required to regenerate the manpage
-man/frama-c.1: man/frama-c.1.header man/frama-c.1.md
+man/frama-c.1: man/frama-c.1.md Makefile
 	$(PRINT) 'generating $@'
 	$(RM) $@
-	pandoc -s -t man -H $^ | tail -n +5 > man/frama-c.1
+	pandoc -s -t man $< > $@
 	$(CHMOD_RO) $@
 
 # Checking consistency with the current implementation
@@ -1934,6 +1934,7 @@ install:: install-lib-$(OCAMLBEST)
 	  share/analysis-scripts/function_finder.py \
 	  share/analysis-scripts/git_utils.py \
 	  share/analysis-scripts/list_files.py \
+	  share/analysis-scripts/list_functions.ml \
 	  share/analysis-scripts/make_template.py \
 	  share/analysis-scripts/make_wrapper.py \
 	  share/analysis-scripts/normalize_jcdb.py \
