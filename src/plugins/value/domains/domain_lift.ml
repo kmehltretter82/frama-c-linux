@@ -53,15 +53,16 @@ module Make
   type location = Convert.extended_location
   type origin = Domain.origin
 
-  let extract_expr oracle state exp =
+  let extract_expr ~oracle context state exp =
     let oracle exp = oracle exp >>=: Convert.restrict_val in
-    Domain.extract_expr oracle state exp >>=: fun (value, origin) ->
+    Domain.extract_expr ~oracle context state exp >>=: fun (value, origin) ->
     Convert.extend_val value, origin
 
-  let extract_lval oracle state lval typ loc =
+  let extract_lval ~oracle context state lval typ loc =
     let oracle exp = oracle exp >>=: Convert.restrict_val in
     let loc = Convert.restrict_loc loc in
-    Domain.extract_lval oracle state lval typ loc >>=: fun (value, origin) ->
+    Domain.extract_lval ~oracle context state lval typ loc
+    >>=: fun (value, origin) ->
     Convert.extend_val value, origin
 
   let backward_location state lval typ loc value =

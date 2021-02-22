@@ -163,7 +163,7 @@ module Internal  : Domain_builder.InputDomain
 
   let show_expr _valuation _state _fmt _expr = ()
 
-  let extract_expr _oracle _state _exp =
+  let extract_expr ~oracle:_ _context _state _exp =
     `Value (Offsm_value.Offsm.top, None), Alarmset.all
 
   (* Basic 'find' on a location *)
@@ -176,7 +176,7 @@ module Internal  : Domain_builder.InputDomain
     then Offsm_value.Offsm.top
     else O o
 
-  let extract_lval _oracle state _lv typ locs =
+  let extract_lval ~oracle:_ _context state _lv typ locs =
     let o =
       if Cil.typeHasQualifier "volatile" typ ||
          not (Cil.isArithmeticOrPointerType typ)

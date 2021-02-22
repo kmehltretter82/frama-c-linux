@@ -112,6 +112,17 @@ module type Lattice = sig
       without impeding the analysis: [meet x y = `Value x] is always sound. *)
 end
 
+(** Context from the engine evaluation about a domain query. *)
+type evaluation_context = {
+  root: bool;
+  (** Is the queried expression the "root" expression being evaluated, or is it
+      a sub-expression? *)
+  subdivision: int;
+  (** Maximum number of subdivisions for the current evaluation.
+      See {!Subdivided_evaluation} for more details. *)
+  subdivided: bool;
+  (** Is the current evaluation a subdivision of the complete evaluation? *)
+}
 
 (** Extraction of information: queries for values or locations inferred by a
     domain about expressions and lvalues.
@@ -137,20 +148,29 @@ module type Queries = sig
            value of the expression [exp], and [o] is the origin of the value,
            which can be None. *)
 
+  (** When evaluating an expression, the evaluation engine asks the domains
+      for abstract values and alarms at each lvalue (via [extract_lval]) and
+      each sub-expressions (via [extract_expr]).
+      In these queries:
+      - [oracle] is an evaluation function and can be used to find the answer
+        by evaluating some others expressions, especially by relational domain.
+        No recursive evaluation should be done by this function.
+      - [context] record gives some information about
+        the current evaluation. *)
+
   (** Query function for compound expressions:
-      [eval oracle t exp] returns the known value of [exp] by the state [t].
-      [oracle] is an evaluation function and can be used to find the answer
-      by evaluating some others expressions, especially by relational domain.
-      No recursive evaluation should be done by this function. *)
+      [extract_expr ~oracle context t exp] returns the known value of [exp]
+      by the state [t]. See above for more details on queries. *)
   val extract_expr :
-    (exp -> value evaluated) ->
+    oracle:(exp -> value evaluated) -> evaluation_context ->
     state -> exp -> (value * origin option) evaluated
 
   (** Query function for lvalues:
-      [find oracle t lval typ loc] returns the known value stored at
-      the location [loc] of the left value [lval] of type [typ]. *)
+      [extract_lval ~oracle context t lval typ loc] returns the known value
+      stored at the location [loc] of the left value [lval] of type [typ].
+      See above for more details on queries. *)
   val extract_lval :
-    (exp -> value evaluated) ->
+    oracle:(exp -> value evaluated) -> evaluation_context ->
     state -> lval -> typ -> location -> (value * origin option) evaluated
 
   (** [backward_location state lval typ loc v] reduces the location [loc] of the

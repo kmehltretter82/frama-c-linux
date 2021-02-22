@@ -271,8 +271,8 @@ module Internal
 
   let top_query = `Value (Cvalue.V.top, None), Alarmset.all
 
-  let extract_expr _oracle _state _expr = top_query
-  let extract_lval _oracle _state _lv _typ _locs = top_query
+  let extract_expr ~oracle:_ _context _state _expr = top_query
+  let extract_lval ~oracle:_ _context _state _lv _typ _locs = top_query
 
   let backward_location _state _lval _typ loc value =
     `Value (loc, value)
