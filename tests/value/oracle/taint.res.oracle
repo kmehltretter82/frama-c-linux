@@ -6,7 +6,7 @@
 [eva:initial-state] Values of globals at initialization
   undet ∈ [--..--]
 [eva] computing for function taint_1 <- main.
-  Called from tests/value/taint.c:27.
+  Called from tests/value/taint.c:26.
 [eva] tests/value/taint.c:19: 
   Frama_C_dump_each:
   # taint:
@@ -14,7 +14,7 @@
   ==END OF DUMP==
 [eva] Recording results for taint_1
 [eva] Done for function taint_1
-[eva] tests/value/taint.c:28: 
+[eva] tests/value/taint.c:27: 
   Frama_C_domain_show_each:
   w : # taint: true
 [eva] Recording results for main

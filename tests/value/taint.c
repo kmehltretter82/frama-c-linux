@@ -23,7 +23,6 @@ int main(void) {
    int w;
    w = 0;
    //@ taint w;
-   w = w;
    taint_1(w);
    Frama_C_domain_show_each(w);
    return 0;
