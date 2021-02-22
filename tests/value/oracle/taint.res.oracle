@@ -1,0 +1,51 @@
+[kernel] Parsing tests/value/taint.c (with preprocessing)
+[eva:experimental] Warning: The taint domain is experimental.
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  undet ∈ [--..--]
+[eva] computing for function taint_1 <- main.
+  Called from tests/value/taint.c:27.
+[eva] tests/value/taint.c:19: 
+  Frama_C_dump_each:
+  # taint:
+  x; y; buf[1..2]; w
+  ==END OF DUMP==
+[eva] Recording results for taint_1
+[eva] Done for function taint_1
+[eva] tests/value/taint.c:28: 
+  Frama_C_domain_show_each:
+  w : # taint: true
+[eva] Recording results for main
+[eva] done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function taint_1:
+  t ∈ {1}
+  x ∈ {1}
+  y ∈ {1; 2}
+  buf[0] ∈ {0}
+     [1..2] ∈ {0; 1}
+     [3..4] ∈ {0}
+[eva:final-states] Values at end of function main:
+  w ∈ {0}
+  __retres ∈ {0}
+[from] Computing for function taint_1
+[from] Done for function taint_1
+[from] Computing for function main
+[from] Done for function main
+[from] ====== DEPENDENCIES COMPUTED ======
+  These dependencies hold at termination for the executions that terminate:
+[from] Function taint_1:
+  NO EFFECTS
+[from] Function main:
+  \result FROM \nothing
+[from] ====== END OF DEPENDENCIES ======
+[inout] Out (internal) for function taint_1:
+    t; x; y; buf[0..4]
+[inout] Inputs for function taint_1:
+    undet
+[inout] Out (internal) for function main:
+    w; __retres
+[inout] Inputs for function main:
+    undet
