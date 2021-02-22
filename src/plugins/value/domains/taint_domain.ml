@@ -231,7 +231,16 @@ module InternalTaint = struct
   (* Scoping and Initialization. *)
 
   let enter_scope _kind _vars state = state
-  let leave_scope _kf _vars state = state
+
+  let leave_scope _kf vars state =
+    let bases =
+      List.fold_left
+        (fun acc v -> Base.Set.add (Base.of_varinfo v) acc)
+        Base.Set.empty
+        vars
+    in
+    Zone.filter_base (fun b -> not (Base.Set.mem b bases)) state
+
 
   (* Initial state: initializers are singletons, so we store nothing. *)
   let empty () = LatticeTaint.empty
