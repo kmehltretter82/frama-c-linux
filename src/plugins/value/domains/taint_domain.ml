@@ -60,6 +60,9 @@ module LatticeTaint = struct
   (* Join: keep to over-approximate. *)
   let join = Zone.join
 
+  (* Remove from state. *)
+  let diff = Zone.diff
+
   (* The memory locations are finite, so the ascending chain property is
      already verified. We simply use a join. *)
   let widen _ _ c1 c2 = join c1 c2
@@ -68,6 +71,9 @@ module LatticeTaint = struct
 
   (* Inclusion testing: pointwise. *)
   let is_included = Zone.is_included
+
+  (* Intersection testing: pointwise. *)
+  let intersects = Zone.intersects
 
 end
 
@@ -102,8 +108,6 @@ module TransferTaint = struct
     | Kglobal ->
       `Value state
     | Kstmt stmt ->
-      Format.printf "stmt: %a@." Cil_printer.pp_stmt stmt;
-      Format.printf "pre: %a@." LatticeTaint.pretty state;
       let state = LatticeTaint.join state (state_of_taint_annot stmt) in
       let state =
         let to_loc = loc_of_lval valuation in
@@ -115,23 +119,50 @@ module TransferTaint = struct
           Value_util.(zone_of_expr to_loc (lval_to_exp lv.Eval.lval))
         in
         let intersect_state =
-          Zone.intersects exp_zone state ||
-          Zone.intersects lv_indirect_zone state
+          LatticeTaint.intersects exp_zone state ||
+          LatticeTaint.intersects lv_indirect_zone state
         in
         if intersect_state
         then LatticeTaint.join lv_state state
-        else Zone.diff state lv_state
+        else LatticeTaint.diff state lv_state
       in
-      Format.printf "post: %a@." LatticeTaint.pretty state;
       `Value state
 
   let assume _stmt _exp _b _valuation state = `Value state
 
-  let start_call _stmt _call _valutaion state = `Value state
+  let start_call stmt call valuation state =
+    let state = LatticeTaint.join state (state_of_taint_annot stmt) in
+    let state =
+      let to_loc = loc_of_lval valuation in
+      List.fold_left
+        (fun s { Eval.concrete; formal; _ } ->
+           let concrete_zone = Value_util.zone_of_expr to_loc concrete in
+           let formal_zone = Locations.zone_of_varinfo formal in
+           if LatticeTaint.intersects concrete_zone state
+           then LatticeTaint.join s formal_zone
+           else s)
+        state
+        call.Eval.arguments
+    in
+    `Value state
 
-  let finalize_call _stmt _call ~pre:_ ~post = `Value post
+  let finalize_call _stmt call ~pre ~post =
+    let state =
+      match call.Eval.return with
+      | None ->
+        pre
+      | Some vi ->
+        let result_zone = Locations.zone_of_varinfo vi in
+        if LatticeTaint.intersects post result_zone
+        then LatticeTaint.join pre result_zone
+        else pre
+    in
+    `Value state
 
-  let show_expr _valuation _state _fmt _exp = ()
+  let show_expr valuation state fmt exp =
+    let to_loc = loc_of_lval valuation in
+    let exp_zone = Value_util.zone_of_expr to_loc exp in
+    Format.fprintf fmt "%B" (LatticeTaint.intersects exp_zone state)
 
 end
 
