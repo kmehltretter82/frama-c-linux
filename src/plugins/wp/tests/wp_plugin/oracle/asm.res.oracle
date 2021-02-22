@@ -16,12 +16,3 @@ Assume { Type: is_sint32(dst_0). }
 Prove: dst_0 = 2.
 
 ------------------------------------------------------------
-------------------------------------------------------------
-  Function main with behavior default_for_stmt_3
-------------------------------------------------------------
-
-Goal Assigns (file tests/wp_plugin/asm.i, line 5) at assembly (file tests/wp_plugin/asm.i, line 5):
-Effect at line 5
-Prove: false.
-
-------------------------------------------------------------
