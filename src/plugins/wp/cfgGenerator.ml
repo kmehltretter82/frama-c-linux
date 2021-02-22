@@ -207,9 +207,9 @@ struct
           begin fun () ->
             List.iter
               (fun (l : LogicUsage.logic_lemma) ->
-                if Logic_utils.verify_predicate l.lem_predicate.tp_kind then
-                  let wpo = VCG.compile_lemma l in
-                  collection := Bag.add wpo !collection
+                 if Logic_utils.verify_predicate l.lem_predicate.tp_kind then
+                   let wpo = VCG.compile_lemma l in
+                   collection := Bag.add wpo !collection
               ) pool.lemmas ;
           end () ;
       KFmap.iter
