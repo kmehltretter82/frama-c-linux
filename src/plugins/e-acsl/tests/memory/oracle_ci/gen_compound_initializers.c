@@ -74,6 +74,7 @@ void __e_acsl_globals_clean(void)
   __e_acsl_delete_block((void *)(& _B));
   __e_acsl_delete_block((void *)(_A));
   __e_acsl_delete_block((void *)(& _F));
+  return;
 }
 
 int main(int argc, char **argv)

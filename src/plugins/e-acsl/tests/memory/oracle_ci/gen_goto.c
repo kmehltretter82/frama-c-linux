@@ -16,6 +16,7 @@ void __e_acsl_globals_init(void)
 void __e_acsl_globals_clean(void)
 {
   __e_acsl_delete_block((void *)(& a));
+  return;
 }
 
 int main(void)

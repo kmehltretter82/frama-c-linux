@@ -57,6 +57,7 @@ void __e_acsl_globals_clean(void)
 {
   __e_acsl_delete_block((void *)(& global_i_ptr));
   __e_acsl_delete_block((void *)(& global_i));
+  return;
 }
 
 int main(void)
