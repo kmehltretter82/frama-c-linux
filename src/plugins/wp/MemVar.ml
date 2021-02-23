@@ -516,8 +516,8 @@ struct
   type mem =
     | CVAL (* By-Value variable *)
     | CREF (* By-Ref variable *)
-    | CTXT (* In-context pointer *)
-    | CARR (* In-context array *)
+    | CTXT of MemoryContext.validity (* In-context pointer *)
+    | CARR of MemoryContext.validity (* In-context array *)
     | HEAP (* In-heap variable *)
 
   type loc =
@@ -562,8 +562,8 @@ struct
   let vtype m x =
     match m with
     | CVAL | HEAP -> x.vtype
-    | CTXT | CREF -> Cil.typeOf_pointed x.vtype
-    | CARR -> Ast_info.array_type (Cil.typeOf_pointed x.vtype)
+    | CTXT _ | CREF -> Cil.typeOf_pointed x.vtype
+    | CARR _ -> Ast_info.array_type (Cil.typeOf_pointed x.vtype)
 
   let vobject m x = Ctypes.object_of (vtype m x)
 
@@ -592,8 +592,8 @@ struct
   let pp_mem fmt = function
     | CVAL -> Format.pp_print_string fmt "var"
     | CREF -> Format.pp_print_string fmt "ref"
-    | CTXT -> Format.pp_print_string fmt "ptr"
-    | CARR -> Format.pp_print_string fmt "arr"
+    | CTXT _ -> Format.pp_print_string fmt "ptr"
+    | CARR _ -> Format.pp_print_string fmt "arr"
     | HEAP -> Format.pp_print_string fmt "mem"
 
   (* re-uses strings that are used into the description of -wp-xxx-vars *)
@@ -634,6 +634,35 @@ struct
     | InContext _ | InArray _ | ByRef -> Ref x
 
   (* -------------------------------------------------------------------------- *)
+  (* ---  Nullable locations                                                --- *)
+  (* -------------------------------------------------------------------------- *)
+
+  module Nullable = WpContext.Generator(Varinfo)
+      (struct
+        let name = "MemVar.Nullable"
+        type key = varinfo
+        type data = lfun
+
+        let compile v =
+          let result = t_addr () in
+          let lfun = Lang.generated_f ~result "pointer_%s" v.vname in
+          let cluster =
+            Definitions.cluster ~id:"Globals" ~title:"Context pointers" ()
+          in
+          Definitions.define_symbol {
+            d_lfun = lfun ;
+            d_types = 0 ;
+            d_params = [] ;
+            d_definition = Definitions.Logic result ;
+            d_cluster = cluster
+          } ;
+          lfun
+      end)
+
+  let nullable_address v =
+    Lang.F.e_fun (Nullable.get v) []
+
+  (* -------------------------------------------------------------------------- *)
   (* ---  Lifting                                                           --- *)
   (* -------------------------------------------------------------------------- *)
 
@@ -644,7 +673,11 @@ struct
   let mseq_of_seq seq = { pre = seq.pre.mem ; post = seq.post.mem }
 
   let mloc_of_path m x ofs =
-    List.fold_left moffset (M.cvar (vbase m x)) ofs
+    let l = match m with
+      | CTXT Nullable | CARR Nullable -> M.pointer_loc @@ nullable_address x
+      | _ -> M.cvar (vbase m x)
+    in
+    List.fold_left moffset l ofs
 
   let mloc_of_loc = function
     | Loc l -> l
@@ -731,8 +764,8 @@ struct
     | Ref x ->
         begin match V.param x with
           | ByRef       -> Sigs.Loc(Val(CREF,x,[]))
-          | InContext _ -> Sigs.Loc(Val(CTXT,x,[]))
-          | InArray _   -> Sigs.Loc(Val(CARR,x,[]))
+          | InContext n -> Sigs.Loc(Val(CTXT n,x,[]))
+          | InArray n   -> Sigs.Loc(Val(CARR n,x,[]))
           | NotUsed | ByAddr | ByValue | ByShift -> assert false
         end
     | Val((CREF|CVAL),x,ofs) ->
@@ -741,7 +774,7 @@ struct
         Cvalues.map_value
           (fun l -> Loc l)
           (M.load sigma.mem obj l)
-    | Val((CTXT|CARR|HEAP) as m,x,ofs) ->
+    | Val((CTXT _|CARR _|HEAP) as m,x,ofs) ->
         Cvalues.map_value
           (fun l -> Loc l)
           (M.load sigma.mem obj (mloc_of_path m x ofs))
@@ -772,7 +805,7 @@ struct
     | Val((CREF|CVAL),x,ofs) ->
         let init = Cvalues.initialized_obj obj in
         (memvar_stored seq obj l v) :: (memvar_set_init seq x ofs init)
-    | Val((CTXT|CARR|HEAP) as m,x,ofs) ->
+    | Val((CTXT _|CARR _|HEAP) as m,x,ofs) ->
         M.stored (mseq_of_seq seq) obj (mloc_of_path m x ofs) v
     | Loc l ->
         M.stored (mseq_of_seq seq) obj l v
@@ -789,6 +822,8 @@ struct
 
   let is_null = function
     | Loc l -> M.is_null l
+    | Val ((CTXT Nullable|CARR Nullable)as m,x,ofs) ->
+        M.is_null (mloc_of_path m x ofs)
     | Ref _ | Val _ -> F.p_false
 
   let rec offset = function
@@ -830,7 +865,7 @@ struct
   exception ShiftMismatch
 
   let is_heap_allocated = function
-    | CREF | CVAL -> false | HEAP | CTXT | CARR -> true
+    | CREF | CVAL -> false | HEAP | CTXT _ | CARR _ -> true
 
   let shift_mismatch l =
     Wp_parameters.fatal "Invalid shift : %a" pretty l
@@ -938,7 +973,9 @@ struct
     else
       match mem with
       | CVAL | HEAP -> p_bool (ALLOC.value sigma.alloc x)
-      | CREF | CTXT | CARR -> p_true
+      | CREF | CTXT Valid | CARR Valid -> p_true
+      | CTXT Nullable | CARR Nullable ->
+          p_not @@ M.is_null (mloc_of_path mem x [])
 
   (* segment *)
 
@@ -1220,6 +1257,20 @@ struct
         in
         List.map uninitialized xs
 
+  let scope_nullable xs =
+    let predicate_is_nullable v =
+      Option.map
+        (fun m ->
+           let addr = nullable_address v in
+           p_or
+             (M.is_null @@ M.pointer_loc addr)
+             (p_equal (M.pointer_val @@ M.cvar (vbase m v)) addr))
+        (match V.param v with
+         | InContext Nullable -> Some (CTXT Nullable)
+         | InArray Nullable -> Some (CARR Nullable)
+         | _ -> None)
+    in
+    List.filter_map predicate_is_nullable xs
 
   let scope seq scope xs =
     let xm = List.filter is_mem xs in
@@ -1227,7 +1278,8 @@ struct
     let hmem = M.scope smem scope xm in
     let hvars = scope_vars seq scope xs in
     let hinit = scope_init seq scope xs in
-    hvars @ hinit @ hmem
+    let hcontext = scope_nullable xs in
+    hvars @ hinit @ hmem @ hcontext
 
   let global sigma p = M.global sigma.mem p
 
@@ -1362,7 +1414,7 @@ struct
     | Val((CVAL|CREF),_,_) as vloc ->
         let v = Lang.freshvar ~basename:"v" (Lang.tau_of_object obj) in
         memvar_assigned seq obj vloc (e_var v)
-    | Val((HEAP|CTXT|CARR) as m,x,ofs) ->
+    | Val((HEAP|CTXT _|CARR _) as m,x,ofs) ->
         M.assigned (mseq_of_seq seq) obj (Sloc (mloc_of_path m x ofs))
     | Loc l ->
         M.assigned (mseq_of_seq seq) obj (Sloc l)
@@ -1384,7 +1436,7 @@ struct
         in
         let obj = get_obj (Ctypes.object_of x.vtype) ofs in
         memvar_assigned seq obj vloc (e_var v)
-    | Val((HEAP|CTXT|CARR) as m,x,ofs) ->
+    | Val((HEAP|CTXT _|CARR _) as m,x,ofs) ->
         let l = mloc_of_path m x ofs in
         M.assigned (mseq_of_seq seq) obj (Sarray(l,elt,n))
     | Loc l ->
@@ -1395,7 +1447,7 @@ struct
     | Ref x -> noref ~op:"assigns to" x
     | Loc l ->
         M.assigned (mseq_of_seq seq) obj (Srange(l,elt,a,b))
-    | Val((HEAP|CTXT|CARR) as m,x,ofs) ->
+    | Val((HEAP|CTXT _|CARR _) as m,x,ofs) ->
         M.assigned (mseq_of_seq seq) obj (Srange(mloc_of_path m x ofs,elt,a,b))
     | Val((CVAL|CREF) as m,x,ofs) ->
         let k = Lang.freshvar ~basename:"k" Qed.Logic.Int in
@@ -1409,7 +1461,7 @@ struct
     | Ref x -> noref ~op:"assigns to" x
     | Loc l ->
         M.assigned (mseq_of_seq seq) obj (Sdescr(xs,l,p))
-    | Val((HEAP|CTXT|CARR) as m,x,ofs) ->
+    | Val((HEAP|CTXT _|CARR _) as m,x,ofs) ->
         M.assigned (mseq_of_seq seq) obj (Sdescr(xs,mloc_of_path m x ofs,p))
     | Val((CVAL|CREF) as m,x,ofs) ->
         (monotonic_initialized_genset seq xs m x ofs p) @
@@ -1479,9 +1531,15 @@ struct
         Fseg(x,range ofs obj a b)
 
     (* in M: *)
-    | Rloc(obj,Val((CTXT|CARR|HEAP) as m,x,ofs)) ->
+    (* First intercept nullable context *)
+    | Rloc(obj,Val((CTXT Nullable|CARR Nullable) as m,x,ofs)) ->
+        Lseg(Rloc(obj, mloc_of_path m x ofs))
+    | Rrange(Val((CTXT Nullable|CARR Nullable) as m,x,ofs),obj,a,b) ->
+        Lseg(Rrange(mloc_of_path m x ofs, obj, a, b))
+
+    | Rloc(obj,Val((CTXT _|CARR _|HEAP) as m,x,ofs)) ->
         Mseg(Rloc(obj,mloc_of_path m x ofs),x,delta obj x ofs)
-    | Rrange(Val((CTXT|CARR|HEAP) as m,x,ofs),obj,a,b) ->
+    | Rrange(Val((CTXT _|CARR _|HEAP) as m,x,ofs),obj,a,b) ->
         Mseg(Rrange(mloc_of_path m x ofs,obj,a,b),x,range ofs obj a b)
 
   (* -------------------------------------------------------------------------- *)
@@ -1556,7 +1614,7 @@ struct
           else []
         in
         Heap.Set.of_list ((Var x) :: init)
-    | Loc _ | Val((CTXT|CARR|HEAP),_,_) ->
+    | Loc _ | Val((CTXT _|CARR _|HEAP),_,_) ->
         M.Heap.Set.fold
           (fun m s -> Heap.Set.add (Mem m) s)
           (M.domain obj (mloc_of_loc l)) Heap.Set.empty

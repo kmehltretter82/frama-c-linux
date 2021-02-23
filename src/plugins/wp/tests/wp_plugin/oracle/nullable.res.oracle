@@ -8,7 +8,7 @@
 ------------------------------------------------------------
 
 Goal Check 'must_fail' (file tests/wp_plugin/nullable.i, line 14):
-Assume { (* Then *) Have: G_p_24 = 0. }
+Assume { (* Then *) Have: null = pointer_p. }
 Prove: false.
 
 ------------------------------------------------------------
