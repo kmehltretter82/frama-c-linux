@@ -46,7 +46,7 @@ Prove: true.
        requires p ≢ \null ⇒ \separated(g, p, &x);
        requires \valid(p) ∨ p ≡ \null;
      */
-  void nullable_coherence(int *p /*@ nullable */);
+  void nullable_coherence(int *p /*@ wp_nullable */);
 [wp] tests/wp_plugin/nullable.i:24: Warning: 
   Memory model hypotheses for function 'nullable_in_context':
   /*@
@@ -63,5 +63,6 @@ Prove: true.
        requires \valid(q) ∨ q ≡ \null;
        requires \valid(r) ∨ r ≡ \null;
      */
-  void nullable_in_context(int *p /*@ nullable */, int *q /*@ nullable */,
-                           int *r /*@ nullable */, int *s, int *t);
+  void nullable_in_context(int *p /*@ wp_nullable */,
+                           int *q /*@ wp_nullable */,
+                           int *r /*@ wp_nullable */, int *s, int *t);

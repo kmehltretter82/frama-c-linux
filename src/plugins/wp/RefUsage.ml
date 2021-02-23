@@ -838,7 +838,7 @@ module HasNullable =
       let dependencies = [Ast.self]
     end)
 
-let is_nullable vi = vi.vformal && Cil.hasAttribute "nullable" vi.vattr
+let is_nullable vi = vi.vformal && Cil.hasAttribute "wp_nullable" vi.vattr
 
 let compute_nullable () =
   let module F = Globals.Functions in
