@@ -29,9 +29,9 @@ type param =
   | NotUsed | ByAddr | ByValue | ByShift | ByRef
   | InContext of validity | InArray of validity
 
-let nullable_string = function
-  | Valid -> ""
-  | Nullable -> "(nullable)"
+let pp_nullable fmt = function
+  | Valid -> ()
+  | Nullable -> Format.pp_print_string fmt " (nullable)"
 
 let pp_param fmt = function
   | NotUsed -> Format.pp_print_string fmt "not used"
@@ -39,8 +39,8 @@ let pp_param fmt = function
   | ByValue -> Format.pp_print_string fmt "by value"
   | ByShift -> Format.pp_print_string fmt "by value with shift"
   | ByRef -> Format.pp_print_string fmt "by ref"
-  | InContext n -> Format.pp_print_string fmt ("in context" ^ nullable_string n)
-  | InArray n -> Format.pp_print_string fmt ("in array" ^ nullable_string n)
+  | InContext n -> Format.fprintf fmt "in context%a" pp_nullable n
+  | InArray n -> Format.fprintf fmt "in array%a" pp_nullable n
 
 (* -------------------------------------------------------------------------- *)
 (* --- Separation Hypotheses                                              --- *)
