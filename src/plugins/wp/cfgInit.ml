@@ -20,35 +20,53 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* -------------------------------------------------------------------------- *)
-(* --- Model Factory                                                      --- *)
-(* -------------------------------------------------------------------------- *)
+(* Compute Init WP *)
 
-type mheap = Hoare | ZeroAlias | Region | Typed of MemTyped.pointer
-type mvar = Raw | Var | Ref | Caveat
+module Make(W : Mcfg.S) =
+struct
 
-type setup = {
-  mvar : mvar ;
-  mheap : mheap ;
-  cint : Cint.model ;
-  cfloat : Cfloat.model ;
-}
+  let compute_global_init wenv filter obj =
+    Globals.Vars.fold_in_file_order
+      (fun var initinfo obj ->
+         if var.vstorage = Extern then obj else
+           let do_init = match filter with
+             | `All -> true
+             | `InitConst -> WpStrategy.isGlobalInitConst var
+           in if not do_init then obj
+           else
+             let old_loc = Cil.CurrentLoc.get () in
+             Cil.CurrentLoc.set var.vdecl ;
+             let obj = W.init wenv var initinfo.init obj in
+             Cil.CurrentLoc.set old_loc ; obj
+      ) obj
 
-type driver = LogicBuiltins.driver
+  let process_global_const wenv obj =
+    Globals.Vars.fold_in_file_order
+      (fun var _initinfo obj ->
+         if WpStrategy.isGlobalInitConst var
+         then W.const wenv var obj
+         else obj
+      ) obj
 
-val ident : setup -> string
-val descr : setup -> string
-val compiler : mheap -> mvar -> (module Sigs.Compiler)
-val configure_driver : setup -> driver -> unit -> WpContext.rollback
-val instance : setup -> driver -> WpContext.model
-val default : setup (** ["Var,Typed,Nat,Real"] memory model. *)
-val parse :
-  ?default:setup ->
-  ?warning:(string -> unit) ->
-  string list -> setup
-(**
-   Apply specifications to default setup.
-   Default setup is [Factory.default].
-   Default warning is [Wp_parameters.abort]. *)
+  (* WP of global initializations. *)
+  let process_global_init wenv kf obj =
+    if WpStrategy.is_main_init kf then
+      begin
+        let obj = W.label wenv None Clabels.init obj in
+        compute_global_init wenv `All obj
+      end
+    else if W.has_init wenv then
+      begin
+        let obj =
+          if WpStrategy.isInitConst ()
+          then process_global_const wenv obj else obj in
+        let obj = W.use_assigns wenv None WpPropId.mk_init_assigns obj in
+        let obj = W.label wenv None Clabels.init obj in
+        compute_global_init wenv `All obj
+      end
+    else
+    if WpStrategy.isInitConst ()
+    then compute_global_init wenv `InitConst obj
+    else obj
 
-(* -------------------------------------------------------------------------- *)
+end

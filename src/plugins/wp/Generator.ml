@@ -21,106 +21,67 @@
 (**************************************************************************)
 
 (* -------------------------------------------------------------------------- *)
+(* --- Model Setup                                                        --- *)
+(* -------------------------------------------------------------------------- *)
+
+let user_setup () : Factory.setup =
+  begin
+    match Wp_parameters.Model.get () with
+    | ["Runtime"] ->
+        Wp_parameters.abort
+          "Model 'Runtime' is no more available.@\nIt will be reintroduced \
+           in a future release."
+    | ["Logic"] ->
+        Wp_parameters.warning ~once:true
+          "Deprecated 'Logic' model.@\nUse 'Typed' with option '-wp-ref' \
+           instead." ;
+        {
+          mheap = Factory.Typed MemTyped.Fits ;
+          mvar = Factory.Ref ;
+          cint = Cint.Natural ;
+          cfloat = Cfloat.Real ;
+        }
+    | ["Store"] ->
+        Wp_parameters.warning ~once:true
+          "Deprecated 'Store' model.@\nUse 'Typed' instead." ;
+        {
+          mheap = Factory.Typed MemTyped.Fits ;
+          mvar = Factory.Var ;
+          cint = Cint.Natural ;
+          cfloat = Cfloat.Real ;
+        }
+    | spec -> Factory.parse spec
+  end
+
+(* -------------------------------------------------------------------------- *)
 (* --- WP Computer (main entry points)                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-class type computer =
-  object
-    method lemma : bool
-    method model : WpContext.model
-    method add_strategy : WpStrategy.strategy -> unit
-    method add_lemma : LogicUsage.logic_lemma -> unit
-    method compute : Wpo.t Bag.t
-  end
-
-(* -------------------------------------------------------------------------- *)
-(* --- Property Entry Point                                               --- *)
-(* -------------------------------------------------------------------------- *)
-
-let compute_ip cc ip =
-  let open Property in match ip with
-  | IPLemma _
-  | IPAxiomatic _
-    ->
-      let rec iter cc = function
-        | IPLemma {il_name} -> cc#add_lemma (LogicUsage.logic_lemma il_name)
-        | IPAxiomatic {iax_props} -> List.iter (iter cc) iax_props
-        | _ -> ()
-      in iter cc ip ;
-      cc#compute
-
-  | IPBehavior {ib_kf; ib_bhv} ->
-      let model = cc#model in
-      let bhv = [ib_bhv.Cil_types.b_name] in
-      let assigns = WpAnnot.WithAssigns in
-      List.iter cc#add_strategy
-        (WpAnnot.get_function_strategies ~model ~assigns ~bhv ib_kf) ;
-      cc#compute
-  | IPComplete _
-  | IPDisjoint _
-  | IPCodeAnnot _
-  | IPAllocation _
-  | IPAssigns _
-  | IPDecrease _
-  | IPPredicate _
-    ->
-      let model = cc#model in
-      let assigns = WpAnnot.WithAssigns in
-      List.iter cc#add_strategy
-        (WpAnnot.get_id_prop_strategies ~model ~assigns ip) ;
-      cc#compute
-
-  | IPFrom _
-  | IPReachable _
-  | IPPropertyInstance _
-  | IPOther _
-  | IPTypeInvariant _
-  | IPGlobalInvariant _
-  | IPExtended _
-    ->
-      Wp_parameters.result "Nothing to compute for '%a'" pretty ip ;
-      Bag.empty
-
-(* -------------------------------------------------------------------------- *)
-(* --- Annotations Entry Point                                            --- *)
-(* -------------------------------------------------------------------------- *)
-
-let add_kf cc ?bhv ?prop kf =
-  let model = cc#model in
-  let assigns = WpAnnot.WithAssigns in
-  List.iter cc#add_strategy
-    (WpAnnot.get_function_strategies ~model ~assigns ?bhv ?prop kf)
-
-let add_lemmas cc = function
-  | None | Some[] ->
-      LogicUsage.iter_lemmas
-        (fun lem ->
-           let idp = WpPropId.mk_lemma_id lem in
-           if WpAnnot.filter_status idp then cc#add_lemma lem)
-  | Some ps ->
-      if List.mem "-@lemmas" ps then ()
-      else LogicUsage.iter_lemmas
-          (fun lem ->
-             let idp = WpPropId.mk_lemma_id lem in
-             if WpAnnot.filter_status idp && WpPropId.select_by_name ps idp
-             then cc#add_lemma lem)
-
-let compute_kf cc ?kf ?bhv ?prop () =
-  begin
-    Option.iter (add_kf cc ?bhv ?prop) kf ;
-    cc#compute
-  end
-
-let compute_selection cc ?(fct=Wp_parameters.Fct_all) ?bhv ?prop () =
-  begin
-    add_lemmas cc prop ;
-    Wp_parameters.iter_fct (add_kf cc ?bhv ?prop) fct ;
-    cc#compute
-  end
-
-let compute_call cc stmt =
-  let model = cc#model in
-  List.iter cc#add_strategy (WpAnnot.get_call_pre_strategies ~model stmt) ;
-  cc#compute
+let create
+    ?dump ?legacy
+    ?(setup: Factory.setup option)
+    ?(driver: Factory.driver option)
+    () : Wpo.generator =
+  let default f = function Some v -> v | None -> f () in
+  let dump = default Wp_parameters.Dump.get dump in
+  let legacy = default Wp_parameters.Legacy.get legacy in
+  let driver = default Driver.load_driver driver in
+  let setup = default user_setup setup in
+  if legacy then
+    let cc =
+      if dump
+      then WpGenerator.dumper ()
+      else WpGenerator.computer setup driver in
+    let the_model = cc#model in
+    object
+      method model = the_model
+      method compute_ip = WpGenerator.compute_ip cc
+      method compute_call = WpGenerator.compute_call cc
+      method compute_main = WpGenerator.compute_selection cc
+    end
+  else
+  if dump
+  then CfgGenerator.dumper setup driver
+  else CfgGenerator.generator setup driver
 
 (* -------------------------------------------------------------------------- *)

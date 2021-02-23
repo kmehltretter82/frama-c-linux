@@ -115,6 +115,11 @@ let mk_assert_id kf s ca = mk_prop PKProp  (mk_annot_id kf s ca)
 let mk_loop_inv_id kf s ~established ca =
   let kind = if established then PKEstablished else PKPreserved in
   mk_prop kind (mk_annot_id kf s ca)
+
+let mk_loop_inv kf s ca =
+  mk_loop_inv_id kf s ~established:true ca,
+  mk_loop_inv_id kf s ~established:false ca
+
 let mk_inv_hyp_id    kf s ca = mk_prop PKPropLoop  (mk_annot_id kf s ca)
 let mk_var_decr_id   kf s ca = mk_prop PKVarDecr (mk_annot_id kf s ca)
 let mk_var_pos_id    kf s ca = mk_prop PKVarPos  (mk_annot_id kf s ca)
@@ -128,16 +133,16 @@ let mk_bhv_from_id kf ki a bhv from =
   let id = Property.ip_of_from kf ki (Property.Id_contract (a,bhv)) from in
   mk_prop PKProp (Option.get id)
 
-let get_kind_for_tk kf tkind = match tkind with
+let get_kind_for_tk tkind has_exit = match tkind with
   | Normal ->
-      if Cil2cfg.has_exit (Cil2cfg.get kf) then PKAFctOut else PKProp
+      if has_exit then PKAFctOut else PKProp
   | Exits -> PKAFctExit
   | _ -> assert false
 
-let mk_fct_from_id kf bhv tkind from =
+let mk_fct_from_id kf kf_has_exit bhv tkind from =
   let contract_info = Property.Id_contract(Datatype.String.Set.empty,bhv) in
   let id = Property.ip_of_from kf Kglobal contract_info from in
-  let kind = get_kind_for_tk kf tkind in
+  let kind = get_kind_for_tk tkind kf_has_exit in
   mk_prop kind (Option.get id)
 
 let mk_disj_bhv_id (kf,ki,active,disj)  =
@@ -160,14 +165,17 @@ let mk_loop_assigns_id kf s ca a =
   let p = Property.ip_of_assigns kf (Kstmt s) ca (Writes a) in
   Option.map (mk_prop PKPropLoop) p
 
-let mk_fct_assigns_id kf b tkind a =
+let mk_fct_assigns_id kf kf_has_exit b tkind a =
   let b = Property.Id_contract(Datatype.String.Set.empty,b) in
-  let kind = get_kind_for_tk kf tkind in
+  let kind = get_kind_for_tk tkind kf_has_exit in
   let p = Property.ip_of_assigns kf Kglobal b (Writes a) in
   Option.map (mk_prop kind) p
 
 let mk_pre_id kf ki b p =
   mk_prop PKProp (Property.ip_of_requires kf ki b p)
+
+let mk_post_id kf ki b p =
+  mk_prop PKProp (Property.ip_of_ensures kf ki b p)
 
 let mk_stmt_post_id kf s b p =
   mk_prop PKProp (Property.ip_of_ensures kf (Kstmt s) b p)
@@ -468,13 +476,13 @@ let ident_names names =
   List.filter (function "" -> true
                       | _ as n -> '\"' <> (String.get n 0) ) names
 
-let pred_names p =
+let user_pred_names p =
   let p_names = ident_names p.tp_statement.pred_name in
   if p.tp_kind = Check then "@check"::p_names else p_names
 
 let code_annot_names ca = match ca.annot_content with
-  | AAssert (_, pred)  -> "@assert" :: pred_names pred
-  | AInvariant (_,_,pred) -> "@invariant":: pred_names pred
+  | AAssert (_, pred)  -> "@assert" :: user_pred_names pred
+  | AInvariant (_,_,pred) -> "@invariant":: user_pred_names pred
   | AVariant (term, _) -> "@variant"::(ident_names term.term_name)
   | AExtended(_,_,{ext_name}) -> [Printf.sprintf "@%s" ext_name]
   | _ -> [] (* TODO : add some more names ? *)
@@ -485,7 +493,7 @@ let user_prop_names p =
   let open Property in match p with
   | IPPredicate {ip_kind; ip_pred} ->
       Format.asprintf  "@@%a" Property.pretty_predicate_kind ip_kind ::
-      pred_names ip_pred.ip_content
+      user_pred_names ip_pred.ip_content
   | IPExtended {ie_ext={ext_name}} -> [ Printf.sprintf "@%s" ext_name ]
   | IPCodeAnnot {ica_ca} -> code_annot_names ica_ca
   | IPComplete {ic_bhvs} ->
@@ -503,7 +511,7 @@ let user_prop_names p =
   | IPDecrease {id_ca=Some ca} -> "@decreases"::code_annot_names ca
   | IPDecrease _ -> [ "@decreases" ]
   | IPLemma {il_name = a; il_pred = l} ->
-      let names = "@lemma"::a::pred_names l in
+      let names = "@lemma"::a::user_pred_names l in
       begin
         match LogicUsage.section_of_lemma a with
         | LogicUsage.Toplevel _ -> names
@@ -537,7 +545,7 @@ let user_bhv_names p =
   in Option.fold ~none:fors ~some:(fun b -> b.b_name :: fors) (get_behavior p)
 
 let string_of_termination_kind = function
-    Normal -> "post"
+    Normal -> "ensures"
   | Exits -> "exits"
   | Breaks -> "breaks"
   | Continues -> "continues"
@@ -808,11 +816,13 @@ let are_selected_names asked names =
     | Some false -> false
     | _ -> true
 
-
 let select_by_name asked_names pid =
   let names = user_prop_pid pid in
   are_selected_names asked_names names
 
+let select_for_behaviors bhvs pid =
+  let fors = Property.get_for_behaviors @@ property_of_id pid in
+  List.exists (fun b -> List.mem b fors) bhvs
 
 let select_call_pre s_call asked_pre pid =
   match pid.p_kind with
@@ -857,6 +867,13 @@ let mk_stmt_assigns_desc s assigns = {
   a_stmt = Some s ;
   a_kind = StmtAssigns ;
   a_assigns = Writes assigns ;
+}
+
+let mk_stmt_assigns_any_desc s = {
+  a_label = Clabels.stmt s ;
+  a_stmt = Some s ;
+  a_kind = StmtAssigns ;
+  a_assigns = WritesAny ;
 }
 
 let mk_init_assigns = {
@@ -1100,3 +1117,87 @@ let get_induction p =
   | PKEstablished|PKVarDecr|PKVarPos|PKPreserved ->
       (match get_stmt (property_of_id p) with
        | None -> None | Some (_, s) -> Some s)
+
+(* -------------------------------------------------------------------------- *)
+(* --- Filter according to status                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+let filter_status pid =
+  Wp_parameters.StatusAll.get () ||
+  begin
+    let module C = Property_status.Consolidation in
+    match C.get (property_of_id pid) with
+    | C.Never_tried -> true
+    | C.Considered_valid | C.Inconsistent _ -> false
+    | C.Valid _ | C.Valid_under_hyp _
+    | C.Invalid_but_dead _ | C.Valid_but_dead _ | C.Unknown_but_dead _ ->
+        Wp_parameters.StatusTrue.get ()
+    | C.Unknown _ -> Wp_parameters.StatusMaybe.get ()
+    | C.Invalid _ | C.Invalid_under_hyp _ -> Wp_parameters.StatusFalse.get ()
+  end
+
+(*----------------------------------------------------------------------------*)
+(* Proofs Management                                                          *)
+(*----------------------------------------------------------------------------*)
+
+type proof = {
+  target : Property.t ;
+  proved : proofpart array ;
+  mutable invalid : bool ;
+  mutable dependencies : Property.Set.t ;
+} and proofpart =
+    | Noproof
+    | Complete
+    | Parts of Bitvector.t
+
+let target p = p.target
+let dependencies p =
+  Property.Set.elements (Property.Set.remove p.target p.dependencies)
+
+let create_proof ip =
+  let n = subproofs ip in
+  {
+    target = property_of_id ip ;
+    proved = Array.make n Noproof ;
+    dependencies = Property.Set.empty ;
+    invalid = false ;
+  }
+
+let add_proof pf ip hs =
+  begin
+    if not (Property.equal (property_of_id ip) pf.target)
+    then Wp_parameters.fatal "Partial proof inconsistency" ;
+    List.iter
+      (fun iph ->
+         if not (is_requires iph) then
+           pf.dependencies <- Property.Set.add iph pf.dependencies
+      ) hs ;
+    let k = subproof_idx ip in
+    match parts_of_id ip with
+    | None -> pf.proved.(k) <- Complete
+    | Some(p,n) ->
+        match pf.proved.(k) with
+        | Complete -> ()
+        | Noproof ->
+            let bv = Bitvector.create n in
+            Bitvector.set_range bv 0 (p-1) ;
+            Bitvector.set_range bv (p+1) (n-1) ;
+            pf.proved.(k) <- Parts bv
+        | Parts bv ->
+            Bitvector.clear bv p ;
+            if Bitvector.is_empty bv
+            then pf.proved.(k) <- Complete
+  end
+
+let add_invalid_proof pf = pf.invalid <- true
+
+let is_composed pf =
+  Array.length pf.proved > 1
+
+let is_proved pf =
+  Array.for_all (function Complete -> true | _ -> false) pf.proved
+
+let is_invalid pf =
+  pf.invalid && not (is_proved pf)
+
+(* -------------------------------------------------------------------------- *)

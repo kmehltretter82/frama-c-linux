@@ -76,12 +76,12 @@ module Cfg (W : Mcfg.S) = struct
   let add_assigns_hyp wenv obj h_assigns = match h_assigns with
     | WpPropId.AssignsLocations (h_id, a) ->
         let hid = Some h_id in
-        let obj = W.use_assigns wenv a.WpPropId.a_stmt hid a obj in
+        let obj = W.use_assigns wenv hid a obj in
         Some a.WpPropId.a_label, obj
     | WpPropId.AssignsAny a ->
         Wp_parameters.warning ~current:true ~once:true
           "Missing assigns clause (assigns 'everything' instead)" ;
-        let obj = W.use_assigns wenv a.WpPropId.a_stmt None a obj in
+        let obj = W.use_assigns wenv None a obj in
         Some a.WpPropId.a_label, obj
     | WpPropId.NoAssignsInfo -> None, obj
 
@@ -476,7 +476,7 @@ module Cfg (W : Mcfg.S) = struct
           | (Set (lv, e, _)) -> W.assign wenv s lv e obj
           | (Asm _) ->
               let asm = WpPropId.mk_asm_assigns_desc s in
-              W.use_assigns wenv asm.WpPropId.a_stmt None asm obj
+              W.use_assigns wenv None asm obj
           | (Call _) -> assert false
           | Skip _ | Code_annot _ -> obj
         end
@@ -617,49 +617,7 @@ module Cfg (W : Mcfg.S) = struct
     Cil.CurrentLoc.set old_loc;
     res
 
-  let compute_global_init wenv filter obj =
-    Globals.Vars.fold_in_file_order
-      (fun var initinfo obj ->
-         if var.vstorage = Extern then obj else
-           let do_init = match filter with
-             | `All -> true
-             | `InitConst -> WpStrategy.isGlobalInitConst var
-           in if not do_init then obj
-           else
-             let old_loc = Cil.CurrentLoc.get () in
-             Cil.CurrentLoc.set var.vdecl ;
-             let obj = W.init wenv var initinfo.init obj in
-             Cil.CurrentLoc.set old_loc ; obj
-      ) obj
-
-  let process_global_const wenv obj =
-    Globals.Vars.fold_in_file_order
-      (fun var _initinfo obj ->
-         if WpStrategy.isGlobalInitConst var
-         then W.const wenv var obj
-         else obj
-      ) obj
-
-  (* WP of global initializations. *)
-  let process_global_init wenv kf obj =
-    if WpStrategy.is_main_init kf then
-      begin
-        let obj = W.label wenv None Clabels.init obj in
-        compute_global_init wenv `All obj
-      end
-    else if W.has_init wenv then
-      begin
-        let obj =
-          if WpStrategy.isInitConst ()
-          then process_global_const wenv obj else obj in
-        let obj = W.use_assigns wenv None None WpPropId.mk_init_assigns obj in
-        let obj = W.label wenv None Clabels.init obj in
-        compute_global_init wenv `All obj
-      end
-    else
-    if WpStrategy.isInitConst ()
-    then compute_global_init wenv `InitConst obj
-    else obj
+  module Init = CfgInit.Make(W)
 
   let get_weakest_precondition cfg ((kf, _g, strategy, res, wenv) as env) =
     debug "[wp-cfg] start Pass1";
@@ -670,7 +628,7 @@ module Cfg (W : Mcfg.S) = struct
      * but if not, it will only fetch Pass1 result. *)
     let e_start = Cil2cfg.start_edge cfg in
     let obj = get_wp_edge env e_start in
-    let obj = process_global_init wenv kf obj in
+    let obj = Init.process_global_init wenv kf obj in
     let obj = match WpStrategy.strategy_kind strategy with
       | WpStrategy.SKannots -> obj
       | WpStrategy.SKfroms info ->

@@ -1388,3 +1388,66 @@ module KfCfg =
 let get kf = KfCfg.memo create kf
 
 (* ------------------------------------------------------------------------ *)
+(** {2 CFG dump} *)
+
+module Dump =
+struct
+  type dot = {
+    name: string;
+    chan: out_channel;
+    fmt : Stdlib__format.formatter;
+  }
+
+  let create kf =
+    let name = Kernel_function.get_name kf in
+    let name =
+      Filename.concat (Wp_parameters.get_output () :> string) ("Cil2CFG_" ^ name)
+    in
+    let chan = open_out (name ^ ".dot") in
+    let fmt  = Format.formatter_of_out_channel chan in
+    let out = { name ; chan ; fmt } in
+    Format.fprintf fmt "digraph %a {@\n" Kernel_function.pretty kf ;
+    Format.fprintf fmt "  rankdir = TB ;@\n" ;
+    Format.fprintf fmt "  node [ style = filled, shape = box ] ;@\n" ;
+    out
+
+  let finalize out =
+    Format.fprintf out.fmt "}@." ;
+    close_out out.chan ;
+    let name = out.name in
+    ignore (Sys.command (Printf.sprintf "dot -Tpdf %s.dot > %s.pdf" name name))
+
+  let pp_id fmt (id, sid) =
+    Format.fprintf fmt "N%03d%03d" sid id
+
+  let pp_content fmt = function
+    | None ->
+        Format.fprintf fmt "label=\"No statement\""
+    | Some s ->
+        Format.fprintf fmt "label=\"wp:sid%d@\n%a\""
+          s.sid Cil_printer.pp_stmt s
+
+  let pp_node fmt n =
+    Format.fprintf fmt "  %a [ %a ];@\n"
+      pp_id (node_id n) pp_content (node_stmt_opt n)
+
+  let pp_edge fmt e =
+    Format.fprintf fmt
+      "  %a -> %a [ label=\"%a\"];@\n"
+      pp_id (node_id (edge_src e))
+      pp_id (node_id (edge_dst e))
+      EL.pretty (edge_type e)
+
+  let process_kf kf =
+    let cfg = (get kf).graph in
+    let dot = create kf in
+    CFG.iter_vertex (Format.fprintf dot.fmt "%a" pp_node) cfg ;
+    CFG.iter_edges_e (Format.fprintf dot.fmt "%a" pp_edge) cfg ;
+    finalize dot
+
+  let process () =
+    Globals.Functions.iter process_kf
+
+end
+
+(* ------------------------------------------------------------------------ *)

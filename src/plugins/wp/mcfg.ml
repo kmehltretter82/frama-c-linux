@@ -73,8 +73,8 @@ module type S = sig
   (** [use_assigns env hid kind assgn goal] performs the havoc on the goal.
    * [hid] should be [None] iff [assgn] is [WritesAny],
    * and tied to the corresponding identified_property otherwise.*)
-  val use_assigns : t_env -> stmt option -> WpPropId.prop_id option ->
-    WpPropId.assigns_desc -> t_prop -> t_prop
+  val use_assigns : t_env ->
+    WpPropId.prop_id option -> WpPropId.assigns_desc -> t_prop -> t_prop
 
   val label  : t_env -> stmt option -> Clabels.c_label -> t_prop -> t_prop
   val init : t_env -> varinfo -> init option -> t_prop -> t_prop

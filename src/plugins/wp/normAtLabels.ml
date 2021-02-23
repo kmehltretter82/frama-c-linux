@@ -121,6 +121,8 @@ let labels_fct ?kf ?at l =
   | BuiltinLabel Pre -> Clabels.pre
   | StmtLabel at -> Clabels.stmt !at
   | BuiltinLabel LoopEntry -> Clabels.loop_entry (enclosing_loop ?kf ?at l)
+  (* Labels fct is not used to label invariant establishment/preservation,
+     thus, contrary to what is done in [labels_loop], Current is not Here. *)
   | BuiltinLabel LoopCurrent -> Clabels.loop_current (enclosing_loop ?kf ?at l)
   | _ -> raise (LabelError l)
 
@@ -133,16 +135,16 @@ let labels_fct_pre = function
   | BuiltinLabel (Pre|Here) -> Clabels.pre
   | l -> raise (LabelError l)
 
-let labels_fct_post = function
+let labels_fct_post ~exit = function
   | BuiltinLabel Init -> Clabels.init
   | BuiltinLabel (Pre | Old)  -> Clabels.pre
-  | BuiltinLabel (Post | Here) -> Clabels.post
+  | BuiltinLabel (Post | Here) -> if exit then Clabels.exit else Clabels.post
   | l -> raise (LabelError l)
 
-let labels_fct_assigns = function
+let labels_fct_assigns ~exit = function
   | BuiltinLabel Init -> Clabels.init
   | BuiltinLabel (Here | Pre | Old) -> Clabels.pre
-  | BuiltinLabel Post -> Clabels.post
+  | BuiltinLabel Post -> if exit then Clabels.exit else Clabels.post
   | l -> raise (LabelError l)
 
 (* -------------------------------------------------------------------------- *)
@@ -153,12 +155,24 @@ let labels_stmt_pre ~kf s = function
   | BuiltinLabel Here -> Clabels.stmt s
   | l -> labels_fct ~kf ~at:s l
 
-let labels_stmt_post ~kf s l_post = function
+let labels_stmt_post ~kf s = function
+  | BuiltinLabel Old -> Clabels.stmt s
+  | BuiltinLabel (Here | Post) -> Clabels.stmt_post s
+  | l -> labels_fct ~kf ~at:s l
+
+let labels_stmt_assigns ~kf s = function
+  | BuiltinLabel (Here | Old) -> Clabels.stmt s
+  | BuiltinLabel Post -> Clabels.stmt_post s
+  | l -> labels_fct ~kf ~at:s l
+
+(* LEGACY *)
+let labels_stmt_post_l ~kf s l_post = function
   | BuiltinLabel Old -> Clabels.stmt s
   | BuiltinLabel (Here | Post) as l -> option l l_post
   | l -> labels_fct ~kf ~at:s l
 
-let labels_stmt_assigns ~kf s l_post = function
+(* LEGACY *)
+let labels_stmt_assigns_l ~kf s l_post = function
   | BuiltinLabel (Here | Old) -> Clabels.stmt s
   | BuiltinLabel Post as l -> option l l_post
   | l -> labels_fct ~kf ~at:s l
@@ -167,16 +181,12 @@ let labels_stmt_assigns ~kf s l_post = function
 (* --- User Assertions in Functions Code                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
-let labels_assert_before ~kf s = function
+let labels_assert ~kf s = function
   | BuiltinLabel Here -> Clabels.stmt s
   | l -> labels_fct ~kf ~at:s l
 
-let labels_assert_after ~kf s l_post = function
-  | BuiltinLabel Old -> Clabels.stmt s
-  | BuiltinLabel Here as l -> option l l_post
-  | l -> labels_fct ~kf ~at:s l
-
 let labels_loop s = function
+  (* In invariant preservation/establishment, LoopCurrent is Here. *)
   | BuiltinLabel (Here | LoopCurrent) -> Clabels.here
   | BuiltinLabel LoopEntry -> Clabels.loop_entry s
   | FormalLabel wplabel -> Clabels.formal wplabel

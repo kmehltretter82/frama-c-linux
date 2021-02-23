@@ -20,52 +20,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Factory
-
 let dkey_main = Wp_parameters.register_category "main"
 let dkey_raised = Wp_parameters.register_category "raised"
 let wkey_smoke = Wp_parameters.register_warn_category "smoke"
-
-(* --------- Command Line ------------------- *)
-
-let cmdline () : setup =
-  begin
-    match Wp_parameters.Model.get () with
-    | ["Runtime"] ->
-        Wp_parameters.abort
-          "Model 'Runtime' is no more available.@\nIt will be reintroduced \
-           in a future release."
-    | ["Logic"] ->
-        Wp_parameters.warning ~once:true
-          "Deprecated 'Logic' model.@\nUse 'Typed' with option '-wp-ref' \
-           instead." ;
-        {
-          mheap = Factory.Typed MemTyped.Fits ;
-          mvar = Factory.Ref ;
-          cint = Cint.Natural ;
-          cfloat = Cfloat.Real ;
-        }
-    | ["Store"] ->
-        Wp_parameters.warning ~once:true
-          "Deprecated 'Store' model.@\nUse 'Typed' instead." ;
-        {
-          mheap = Factory.Typed MemTyped.Fits ;
-          mvar = Factory.Var ;
-          cint = Cint.Natural ;
-          cfloat = Cfloat.Real ;
-        }
-    | spec -> Factory.parse spec
-  end
-
-let set_model (s:setup) =
-  Wp_parameters.Model.set [Factory.ident s]
-
-(* --------- WP Computer -------------------- *)
-
-let computer () =
-  if Wp_parameters.Model.get () = ["Dump"]
-  then CfgDump.create ()
-  else CfgWP.computer (cmdline ()) (Driver.load_driver ())
 
 (* ------------------------------------------------------------------------ *)
 (* --- Memory Model Hypotheses                                          --- *)
@@ -751,11 +708,12 @@ let cmdline_run () =
     if fct <> Wp_parameters.Fct_none then
       begin
         Wp_parameters.feedback ~ontty:`Feedback "Running WP plugin...";
-        let computer = computer () in
+        let generator = Generator.create () in
+        let model = generator#model in
         Ast.compute ();
         Dyncall.compute ();
         if Wp_parameters.RTE.get () then
-          WpRTE.generate_all computer#model ;
+          WpRTE.generate_all model ;
         if Wp_parameters.has_dkey dkey_logicusage then
           begin
             LogicUsage.compute ();
@@ -771,14 +729,14 @@ let cmdline_run () =
         (** TODO entry point *)
         if Wp_parameters.has_dkey dkey_builtins then
           begin
-            WpContext.on_context (computer#model,WpContext.Global)
+            WpContext.on_context (model,WpContext.Global)
               LogicBuiltins.dump ();
           end ;
-        WpTarget.compute computer#model ;
-        wp_compute_memory_context computer#model ;
+        WpTarget.compute model ;
+        wp_compute_memory_context model ;
         if Wp_parameters.CheckMemoryContext.get () then
-          wp_insert_memory_context computer#model ;
-        let goals = Generator.compute_selection computer ~fct ~bhv ~prop () in
+          wp_insert_memory_context model ;
+        let goals = generator#compute_main ~fct ~bhv ~prop () in
         do_wp_proofs goals ;
         begin
           if fct <> Wp_parameters.Fct_all then
@@ -786,7 +744,7 @@ let cmdline_run () =
           else
             do_wp_print () ;
         end ;
-        do_wp_report computer#model ;
+        do_wp_report model ;
       end
   end
 
@@ -815,10 +773,7 @@ let pp_wp_parameters fmt =
     if Wp_parameters.RTE.get () then Format.pp_print_string fmt " -wp-rte" ;
     let spec = Wp_parameters.Model.get () in
     if spec <> [] && spec <> ["Typed"] then
-      ( let descr =
-          if spec = ["Dump"] then "Dump"
-          else Factory.descr (Factory.parse spec)
-        in
+      ( let descr = Factory.descr (Factory.parse spec) in
         Format.fprintf fmt " -wp-model '%s'" descr ) ;
     if not (Wp_parameters.Let.get ()) then Format.pp_print_string fmt
         " -wp-no-let" ;

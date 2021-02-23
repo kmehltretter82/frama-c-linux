@@ -20,35 +20,24 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cil_types
+
 (* -------------------------------------------------------------------------- *)
-(* --- Model Factory                                                      --- *)
+(* --- WP Calculus Driver from Interpreted Automata                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-type mheap = Hoare | ZeroAlias | Region | Typed of MemTyped.pointer
-type mvar = Raw | Var | Ref | Caveat
-
-type setup = {
-  mvar : mvar ;
-  mheap : mheap ;
-  cint : Cint.model ;
-  cfloat : Cfloat.model ;
+type mode = {
+  kf : kernel_function ; (* Selected function *)
+  bhv : funbehavior ; (* Selected behavior *)
+  infos : CfgInfos.t ; (* Associated infos *)
 }
 
-type driver = LogicBuiltins.driver
+type props = [ `All | `Names of string list | `PropId of Property.t ]
 
-val ident : setup -> string
-val descr : setup -> string
-val compiler : mheap -> mvar -> (module Sigs.Compiler)
-val configure_driver : setup -> driver -> unit -> WpContext.rollback
-val instance : setup -> driver -> WpContext.model
-val default : setup (** ["Var,Typed,Nat,Real"] memory model. *)
-val parse :
-  ?default:setup ->
-  ?warning:(string -> unit) ->
-  string list -> setup
-(**
-   Apply specifications to default setup.
-   Default setup is [Factory.default].
-   Default warning is [Wp_parameters.abort]. *)
+module Make(W : Mcfg.S) :
+sig
+  exception NonNaturalLoop of location
+  val compute : mode:mode -> props:props -> W.t_prop
+end
 
 (* -------------------------------------------------------------------------- *)

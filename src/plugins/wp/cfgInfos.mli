@@ -20,35 +20,23 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* -------------------------------------------------------------------------- *)
-(* --- Model Factory                                                      --- *)
-(* -------------------------------------------------------------------------- *)
+(* Compute Kernel-Function & CFG Infos for WP *)
 
-type mheap = Hoare | ZeroAlias | Region | Typed of MemTyped.pointer
-type mvar = Raw | Var | Ref | Caveat
+type t
 
-type setup = {
-  mvar : mvar ;
-  mheap : mheap ;
-  cint : Cint.model ;
-  cfloat : Cfloat.model ;
-}
+module Cfg = Interpreted_automata
 
-type driver = LogicBuiltins.driver
+(** Memoized *)
+val get : Kernel_function.t ->
+  ?smoking:bool -> ?bhv:string list -> ?prop:string list ->
+  unit -> t
+val clear : unit -> unit
 
-val ident : setup -> string
-val descr : setup -> string
-val compiler : mheap -> mvar -> (module Sigs.Compiler)
-val configure_driver : setup -> driver -> unit -> WpContext.rollback
-val instance : setup -> driver -> WpContext.model
-val default : setup (** ["Var,Typed,Nat,Real"] memory model. *)
-val parse :
-  ?default:setup ->
-  ?warning:(string -> unit) ->
-  string list -> setup
-(**
-   Apply specifications to default setup.
-   Default setup is [Factory.default].
-   Default warning is [Wp_parameters.abort]. *)
+val body : t -> Cfg.automaton option
+val annots : t -> bool
+val doomed : t -> WpPropId.prop_id Bag.t
+val calls : t -> Kernel_function.Set.t
+val smoking : t -> Cil_types.stmt -> bool
+val unreachable : t -> Cfg.vertex -> bool
 
-(* -------------------------------------------------------------------------- *)
+(**************************************************************************)

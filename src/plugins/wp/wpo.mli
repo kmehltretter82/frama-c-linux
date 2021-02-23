@@ -210,3 +210,29 @@ val pp_goal_flow : Format.formatter -> t -> unit
 
 (** Dynamically exported. *)
 val prover_of_name : string -> prover option
+
+(* -------------------------------------------------------------------------- *)
+(* --- Generators                                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+(** VC Generator interface. *)
+
+class type generator =
+  object
+    method model : WpContext.model
+    (** Generate VCs for the given Property. *)
+    method compute_ip : Property.t -> t Bag.t
+    (** Generate VCs for call preconditions at the given statement. *)
+    method compute_call : stmt -> t Bag.t
+    (** Generate VCs for all functions
+        matching provided behaviors and property names.
+        For `~bhv` and `~prop` optional arguments,
+        default and empty list means {i all} properties. *)
+    method compute_main :
+      ?fct:Wp_parameters.functions ->
+      ?bhv:string list ->
+      ?prop:string list ->
+      unit -> t Bag.t
+  end
+
+(* -------------------------------------------------------------------------- *)

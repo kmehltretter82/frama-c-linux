@@ -808,6 +808,11 @@ interface of the programmatic API.
   for which the current status is already 'invalid' (default is: \texttt{no}).
 \item [\tt -wp-(no)-status-maybe] includes in the goal selection those properties with
   an undetermined status (default is: \texttt{yes}).
+\item [\tt -wp-(no)-legacy] use the legacy WP generator, if set to \texttt{no},
+  WP uses a recently developed generator (default is: \texttt{no}).
+\item [\tt -wp-dump] does not prove selected properties, but dumps the control
+  flow graph computed by WP, including code annotations, both DOT files and PDF
+  files into the directory specified by \texttt{-wp-out}.
 \end{description}
 
 \textbf{Remark:} options \texttt{-wp-status-xxx} are not taken into account

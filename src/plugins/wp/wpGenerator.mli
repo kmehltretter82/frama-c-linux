@@ -21,34 +21,33 @@
 (**************************************************************************)
 
 (* -------------------------------------------------------------------------- *)
-(* --- Model Factory                                                      --- *)
+(* --- WP Computer (main entry points)                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-type mheap = Hoare | ZeroAlias | Region | Typed of MemTyped.pointer
-type mvar = Raw | Var | Ref | Caveat
+class type computer =
+  object
+    method model : WpContext.model
+    method add_strategy : WpStrategy.strategy -> unit
+    method add_lemma : LogicUsage.logic_lemma -> unit
+    method compute : Wpo.t Bag.t
+  end
 
-type setup = {
-  mvar : mvar ;
-  mheap : mheap ;
-  cint : Cint.model ;
-  cfloat : Cfloat.model ;
-}
+open Wp_parameters
 
-type driver = LogicBuiltins.driver
+val compute_ip : computer -> Property.t -> Wpo.t Bag.t
+val compute_call : computer -> Cil_types.stmt -> Wpo.t Bag.t
 
-val ident : setup -> string
-val descr : setup -> string
-val compiler : mheap -> mvar -> (module Sigs.Compiler)
-val configure_driver : setup -> driver -> unit -> WpContext.rollback
-val instance : setup -> driver -> WpContext.model
-val default : setup (** ["Var,Typed,Nat,Real"] memory model. *)
-val parse :
-  ?default:setup ->
-  ?warning:(string -> unit) ->
-  string list -> setup
-(**
-   Apply specifications to default setup.
-   Default setup is [Factory.default].
-   Default warning is [Wp_parameters.abort]. *)
+val compute_kf : computer ->
+  ?kf:Kernel_function.t ->
+  ?bhv:string list ->
+  ?prop:string list ->
+  unit -> Wpo.t Bag.t
 
-(* -------------------------------------------------------------------------- *)
+val compute_selection : computer ->
+  ?fct:functions ->
+  ?bhv:string list ->
+  ?prop:string list ->
+  unit -> Wpo.t Bag.t
+
+val dumper : unit -> computer
+val computer : Factory.setup -> Factory.driver -> computer

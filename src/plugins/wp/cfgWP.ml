@@ -35,7 +35,15 @@ open Lang.F
 open Sigs
 open Wpo
 
-module VC( C : Sigs.Compiler ) =
+module type VCgen =
+sig
+  include Mcfg.S
+  val register_lemma : logic_lemma -> unit
+  val compile_lemma : logic_lemma -> Wpo.t
+  val compile_wp : Wpo.index -> t_prop -> Wpo.t Bag.t
+end
+
+module VC( C : Sigs.Compiler ) : VCgen =
 struct
 
   open C
@@ -598,8 +606,9 @@ struct
     let sequence = { pre=s0 ; post=s1 } in
     sequence , assigned
 
-  let use_assigns wenv stmt hpid ainfo wp = in_wenv wenv wp
+  let use_assigns wenv hpid ainfo wp = in_wenv wenv wp
       begin fun env wp ->
+        let stmt = ainfo.a_stmt in
         match ainfo.a_assigns with
 
         | WritesAny ->
@@ -1344,8 +1353,9 @@ struct
     else
       group.verifs <- Bag.concat group.verifs (make_vcqs target tags vc)
 
-  let compile collection index (wp : t_prop) =
+  let compile_wp index (wp : t_prop) =
     let groups = ref PMAP.empty in
+    let collection = ref Bag.empty in
     Gmap.iter_sorted
       (fun target -> Splitter.iter (group_vc groups target))
       wp.vcs ;
@@ -1383,121 +1393,56 @@ struct
           end
           pid group
 
-      end !groups
+      end !groups ;
+    !collection
 
-  let lemma = L.lemma
+  let register_lemma l = ignore (L.lemma l)
 
-end
-
-(* -------------------------------------------------------------------------- *)
-(* --- WPO Computer                                                       --- *)
-(* -------------------------------------------------------------------------- *)
-
-module KFmap = Kernel_function.Map
-
-module Computer(M : Sigs.Compiler) =
-struct
-
-  module VCG = VC(M)
-  module WP = Calculus.Cfg(VCG)
-
-  let compile_lemma l = ignore (VCG.lemma l)
-
-  let prove_lemma collection l =
-    if Logic_utils.verify_predicate l.lem_predicate.tp_kind then
-      begin
-        let id = WpPropId.mk_lemma_id l in
-        let def = VCG.lemma l in
-        let model = WpContext.get_model () in
-        let vca = {
-          Wpo.VC_Lemma.depends = l.lem_depends ;
-          Wpo.VC_Lemma.lemma = def ;
-          Wpo.VC_Lemma.sequent = None ;
-        } in
-        let index = match LogicUsage.section_of_lemma l.lem_name with
-          | LogicUsage.Toplevel _ -> Wpo.Axiomatic None
-          | LogicUsage.Axiomatic a -> Wpo.Axiomatic (Some a.ax_name) in
-        let mid = WpContext.MODEL.id model in
-        let sid = WpPropId.get_propid id in
-        let leg = WpPropId.get_legacy id in
-        let wpo = {
-          Wpo.po_model = model ;
-          Wpo.po_gid = Printf.sprintf "%s_%s" mid sid ;
-          Wpo.po_leg = Printf.sprintf "%s_%s" mid leg ;
-          Wpo.po_sid = sid ;
-          Wpo.po_name = Printf.sprintf "Lemma '%s'" l.lem_name ;
-          Wpo.po_idx = index ;
-          Wpo.po_pid = id ;
-          Wpo.po_formula = Wpo.GoalLemma vca ;
-        } in
-        Wpo.add wpo ;
-        collection := Bag.append !collection wpo ;
-      end
-
-  let prove_strategy collection model kf strategy =
-    let cfg = WpStrategy.cfg_of_strategy strategy in
-    let bhv = WpStrategy.get_bhv strategy in
-    let index = Wpo.Function( kf , bhv ) in
-    if WpRTE.missing_guards model kf then
-      Wp_parameters.warning ~current:false ~once:true
-        "Missing RTE guards" ;
-    try
-      let (results,_) = WP.compute cfg strategy in
-      List.iter (VCG.compile collection index) results
-    with Warning.Error(source,reason) ->
-      Wp_parameters.failure
-        ~current:false "From %s: %s" source reason
-
-  class wp (model:WpContext.model) =
-    object
-      val mutable lemmas : LogicUsage.logic_lemma Bag.t = Bag.empty
-      val mutable annots : WpStrategy.strategy Bag.t KFmap.t = KFmap.empty
-      method lemma = true
-      method model = model
-
-      method add_lemma lemma = lemmas <- Bag.append lemmas lemma
-
-      method add_strategy strategy =
-        let kf = WpStrategy.get_kf strategy in
-        let sf = try KFmap.find kf annots with Not_found -> Bag.empty in
-        annots <- KFmap.add kf (Bag.append sf strategy) annots
-
-      method compute : Wpo.t Bag.t =
-        begin
-          let collection = ref Bag.empty in
-          Lang.F.release () ;
-          WpContext.on_context (model,WpContext.Global)
-            begin fun () ->
-              LogicUsage.iter_lemmas compile_lemma ;
-              Bag.iter (prove_lemma collection) lemmas ;
-            end () ;
-          KFmap.iter
-            (fun kf strategies ->
-               WpContext.on_context (model,WpContext.Kf kf)
-                 begin fun () ->
-                   LogicUsage.iter_lemmas compile_lemma ;
-                   Bag.iter (prove_strategy collection model kf) strategies ;
-                 end ()
-            ) annots ;
-          lemmas <- Bag.empty ;
-          annots <- KFmap.empty ;
-          Lang.F.release () ;
-          !collection
-        end
+  let compile_lemma l =
+    begin
+      let id = WpPropId.mk_lemma_id l in
+      let def = L.lemma l in
+      let model = WpContext.get_model () in
+      let vca = {
+        Wpo.VC_Lemma.depends = l.lem_depends ;
+        Wpo.VC_Lemma.lemma = def ;
+        Wpo.VC_Lemma.sequent = None ;
+      } in
+      let index = match LogicUsage.section_of_lemma l.lem_name with
+        | LogicUsage.Toplevel _ -> Wpo.Axiomatic None
+        | LogicUsage.Axiomatic a -> Wpo.Axiomatic (Some a.ax_name) in
+      let mid = WpContext.MODEL.id model in
+      let sid = WpPropId.get_propid id in
+      let leg = WpPropId.get_legacy id in
+      let wpo = {
+        Wpo.po_model = model ;
+        Wpo.po_gid = Printf.sprintf "%s_%s" mid sid ;
+        Wpo.po_leg = Printf.sprintf "%s_%s" mid leg ;
+        Wpo.po_sid = sid ;
+        Wpo.po_name = Printf.sprintf "Lemma '%s'" l.lem_name ;
+        Wpo.po_idx = index ;
+        Wpo.po_pid = id ;
+        Wpo.po_formula = Wpo.GoalLemma vca ;
+      } in
+      Wpo.add wpo ; wpo
     end
 
 end
 
-(* Cache because computer functors can not be instantiated twice *)
-module COMPUTERS = Hashtbl.Make(WpContext.MODEL)
-let computers = COMPUTERS.create 1
+(* -------------------------------------------------------------------------- *)
+(* --- VCgen Cache                                                        --- *)
+(* -------------------------------------------------------------------------- *)
 
-let computer setup driver =
+(* Cache by Model Context *)
+let vcgenerators = WpContext.MINDEX.create 1
+
+let vcgen setup driver : (module VCgen) =
   let model = Factory.instance setup driver in
-  try COMPUTERS.find computers model
+  try WpContext.MINDEX.find vcgenerators model
   with Not_found ->
     let module M = (val Factory.(compiler setup.mheap setup.mvar)) in
-    let module VC = Computer(M) in
-    let generator = (new VC.wp model :> Generator.computer) in
-    COMPUTERS.add computers model generator ;
-    generator
+    let vcgen = (module VC(M) : VCgen) in
+    WpContext.MINDEX.add vcgenerators model vcgen ;
+    vcgen
+
+(* -------------------------------------------------------------------------- *)

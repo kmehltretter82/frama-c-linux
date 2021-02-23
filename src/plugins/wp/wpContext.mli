@@ -78,6 +78,8 @@ sig
   val compare : t -> t -> int
 end
 
+module MINDEX : Hashtbl.S with type key = model
+
 val is_defined : unit -> bool
 val on_context : context -> ('a -> 'b) -> 'a -> 'b
 val get_model : unit -> model

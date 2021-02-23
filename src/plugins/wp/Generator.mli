@@ -24,28 +24,14 @@
 (* --- WP Computer (main entry points)                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-class type computer =
-  object
-    method lemma : bool
-    method model : WpContext.model
-    method add_strategy : WpStrategy.strategy -> unit
-    method add_lemma : LogicUsage.logic_lemma -> unit
-    method compute : Wpo.t Bag.t
-  end
+(** Compute model setup from command line options. *)
+val user_setup : unit -> Factory.setup
 
-open Wp_parameters
+val create :
+  ?dump:bool ->
+  ?legacy:bool ->
+  ?setup:Factory.setup ->
+  ?driver:Factory.driver ->
+  unit -> Wpo.generator
 
-val compute_ip : computer -> Property.t -> Wpo.t Bag.t
-val compute_call : computer -> Cil_types.stmt -> Wpo.t Bag.t
-
-val compute_kf : computer ->
-  ?kf:Kernel_function.t ->
-  ?bhv:string list ->
-  ?prop:string list ->
-  unit -> Wpo.t Bag.t
-
-val compute_selection : computer ->
-  ?fct:functions ->
-  ?bhv:string list ->
-  ?prop:string list ->
-  unit -> Wpo.t Bag.t
+(* -------------------------------------------------------------------------- *)

@@ -20,6 +20,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Produce a CfgProof.computer that dumps a graph of generated PO *)
+(* Dump calls to Mcfg into DOT graphs *)
 
-val create : unit -> Generator.computer
+open Cil_types
+
+include Mcfg.S
+
+val fopen : kernel_function -> string option -> unit
+val flush : unit -> unit
+
+(**************************************************************************)

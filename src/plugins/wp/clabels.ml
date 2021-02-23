@@ -40,11 +40,10 @@ let here = "wp:here"
 let next = "wp:next"
 let pre = "wp:pre"
 let post = "wp:post"
-let old = "wp:old"
+let exit = "wp:exit"
 let break = "wp:break"
 let continue = "wp:continue"
 let default = "wp:default"
-let at_exit = "wp:exit"
 
 let loopcurrent = "wp:loopcurrent"
 let loopentry = "wp:loopentry"
@@ -59,6 +58,7 @@ let mem l lbl = List.mem l lbl
 
 let case n = "wp:case" ^ Int64.to_string n
 let stmt s = "wp:sid"  ^ string_of_int s.sid
+let stmt_post s = "wp:sid:post:" ^ string_of_int s.sid
 let loop_entry s = stmt s (* same point *)
 let loop_current s = "wp:head" ^ string_of_int s.sid
 
@@ -69,14 +69,14 @@ let of_logic = function
   | BuiltinLabel Pre -> pre
   | BuiltinLabel Post -> post
   | FormalLabel name -> name
-  | BuiltinLabel Old -> old
+  | BuiltinLabel Old -> "wp:old"
   | BuiltinLabel LoopCurrent -> loopcurrent
   | BuiltinLabel LoopEntry -> loopentry
   | StmtLabel s -> stmt !s
 
 let is_post = function
   | BuiltinLabel Post -> true
-  | FormalLabel a -> a = post
+  | FormalLabel a -> a = post || a = exit
   | _ -> false
 
 let name = function FormalLabel a -> a | _ -> ""
