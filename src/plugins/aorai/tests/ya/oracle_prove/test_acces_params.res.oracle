@@ -1,5 +1,3 @@
 [kernel] Parsing tests/ya/test_acces_params.c (with preprocessing)
 [kernel] Parsing TMPDIR/aorai_test_acces_params_0.i (no preprocessing)
-[wp] TMPDIR/aorai_test_acces_params_0.i:4: Warning: 
-  Global invariant not handled yet ('inv' ignored)
 [wp] Warning: Missing RTE guards
