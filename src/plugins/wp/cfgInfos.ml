@@ -108,6 +108,14 @@ let selected_call ~bhv ~prop kf =
 let selected_clause ~prop name getter kf =
   getter kf <> [] && selected_name ~prop name
 
+let selected_terminates kf =
+  match Annotations.terminates kf with
+  | None -> ()
+  | Some ip ->
+      let loc = ip.ip_content.tp_statement.pred_loc in
+      Wp_parameters.warning ~source:(fst loc)
+        "Terminates not implemented yet (skipped)."
+
 let selected_disjoint_complete kf ~bhv ~prop =
   selected_default ~bhv &&
   ( selected_clause ~prop "@complete_behaviors" Annotations.complete kf ||
@@ -247,6 +255,7 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
   Option.iter
     begin fun (cfg : Cfg.automaton) ->
       (* Spec Iteration *)
+      selected_terminates kf ;
       if selected_disjoint_complete kf ~bhv ~prop ||
          (List.exists (selected_bhv ~smoking ~bhv ~prop) behaviors)
       then infos.annots <- true ;
