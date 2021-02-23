@@ -344,7 +344,6 @@ Options:
   -e         pass additional options to the prepreprocessor
   -E         pass additional arguments to the Frama-C preprocessor
   -F         pass additional options to the Frama-C command line
-  -p         output the generated code to STDOUT
   -o <file>  output the generated code to <file> [a.out.frama.c]
   -O <file>  output the generated executables to <file> [a.out, a.out.e-acsl]
   -M         maximize memory-related instrumentation
@@ -707,8 +706,8 @@ check_tool "$OPTION_CC"
 
 # Frama-C directories
 FRAMAC="$OPTION_FRAMAC"
-: ${FRAMAC_SHARE:="`$FRAMAC -print-share-path`"}
-: ${FRAMAC_PLUGIN:="`$FRAMAC -print-plugin-path`"}
+: ${FRAMAC_SHARE:="`$FRAMAC -no-autoload-plugins -print-share-path`"}
+: ${FRAMAC_PLUGIN:="`$FRAMAC -no-autoload-plugins -print-plugin-path`"}
 
 # Check if this is a development or an installed version
 if [ -f "$BASEDIR/../E_ACSL.mli" ]; then
@@ -897,6 +896,11 @@ fi
 # Extra Frama-C Flags E-ACSL needs
 FRAMAC_FLAGS="$FRAMAC_FLAGS \
   -remove-unused-specified-functions"
+
+if [ -n "$OPTION_VALIDATE_FORMAT_STRINGS" ]; then
+  FRAMAC_FLAGS="$FRAMAC_FLAGS \
+    -variadic-no-translation"
+fi
 
 # C, CPP and LD flags for compilation of E-ACSL-generated sources
 EACSL_CFLAGS="$OPTION_EXTERNAL_ASSERT"
