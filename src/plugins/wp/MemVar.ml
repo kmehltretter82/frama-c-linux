@@ -205,6 +205,7 @@ struct
       alloc = ALLOC.create () ;
       mem = M.Sigma.create () ;
     }
+
     let copy s = {
       vars = SIGMA.copy s.vars ;
       init = INIT.copy s.init ;
@@ -1293,6 +1294,7 @@ struct
     let conds = assigned_path KValue [p_sloc] xs [] a b ofs in
     List.map (fun p -> Assert p) conds
 
+  (*
   let monotonic_initialized_genset s xs mem x ofs p =
     if x.vformal || x.vglob then [Assert p_true]
     else
@@ -1307,6 +1309,7 @@ struct
       in
       let conds = assigned_path KInit [not_p; exact_p] xs [] a b ofs in
       List.map (fun p -> Assert p) conds
+  *)
 
   (* -------------------------------------------------------------------------- *)
   (* ---  Assigned                                                          --- *)
@@ -1401,7 +1404,7 @@ struct
         let k = Lang.freshvar ~basename:"k" Qed.Logic.Int in
         let p = Vset.in_range (e_var k) a b in
         let ofs = ofs_shift elt (e_var k) ofs in
-        (monotonic_initialized_genset seq [k] m x ofs p) @
+        (* (monotonic_initialized_genset seq [k] m x ofs p) @*)
         (assigned_genset seq [k] m x ofs p)
 
   let assigned_descr seq obj xs l p =
@@ -1412,7 +1415,7 @@ struct
     | Val((HEAP|CTXT|CARR) as m,x,ofs) ->
         M.assigned (mseq_of_seq seq) obj (Sdescr(xs,mloc_of_path m x ofs,p))
     | Val((CVAL|CREF) as m,x,ofs) ->
-        (monotonic_initialized_genset seq xs m x ofs p) @
+        (* (monotonic_initialized_genset seq xs m x ofs p) @ *)
         (assigned_genset seq xs m x ofs p)
 
   let assigned seq obj = function
