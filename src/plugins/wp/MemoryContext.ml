@@ -263,29 +263,32 @@ let main_separation loc globals context nullable heaps =
       | heaps -> List.map (fun h -> h :: (globals @ context)) heaps
     in
     let regions_to_terms = List.map (region_to_term loc) in
-    let guard_nullable_sep tn sep =
+    let guard_nullable tn sep =
       pimplies ~loc (prel ~loc (Rneq, tn, term ~loc Tnull tn.term_type), sep)
     in
-    let acc_with_nullable tn zones acc =
-      let s  = separated_list ~loc (tn :: regions_to_terms zones) in
-      guard_nullable_sep tn s :: acc
+    let acc_with_nullable tn zones =
+      List.cons @@
+      guard_nullable tn (separated_list ~loc (tn :: regions_to_terms zones))
     in
     let no_nullable zones = separated_list ~loc @@ regions_to_terms zones in
-    let rec nullable_inter visited = function
-      (* trivial cases *)
-      | [] -> [] | [_] when visited = [] -> []
-      | n :: tl ->
-          let seps =
-            let f = List.fold_right (fun t l -> pseparated ~loc [n ; t] :: l) in
-            f visited (f tl [])
-          in
-          guard_nullable_sep n (pands seps) :: nullable_inter (n :: visited) tl
+    let nullable_inter nullable =
+      let separated_nullable (p, q) =
+        guard_nullable p @@ guard_nullable q @@ pseparated ~loc [ p ; q ]
+      in
+      let rec collect_pairs = function
+        (* trivial cases *)
+        | [] -> [] | [_] -> []
+        | p :: l ->
+            let acc_sep q = List.cons @@ separated_nullable (p, q) in
+            List.fold_right acc_sep l @@ collect_pairs l
+      in
+      collect_pairs nullable
     in
     match nullable with
     | [] -> List.map no_nullable l_zones
     | nullable ->
         let t_nullable = regions_to_terms nullable in
-        let sep_nullable = nullable_inter [] t_nullable in
+        let sep_nullable = nullable_inter t_nullable in
         let fold n = List.fold_right (acc_with_nullable n) l_zones in
         List.fold_right fold t_nullable sep_nullable
 

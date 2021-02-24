@@ -54,11 +54,11 @@ Prove: true.
        requires \valid(s);
        requires \valid(t);
        requires p ≢ \null ⇒ \separated(p, s, t);
-       requires p ≢ \null ⇒ \separated(p, q) ∧ \separated(p, r);
        requires q ≢ \null ⇒ \separated(q, s, t);
-       requires q ≢ \null ⇒ \separated(q, r) ∧ \separated(q, p);
+       requires q ≢ \null ⇒ p ≢ \null ⇒ \separated(q, p);
        requires r ≢ \null ⇒ \separated(r, s, t);
-       requires r ≢ \null ⇒ \separated(r, q) ∧ \separated(r, p);
+       requires r ≢ \null ⇒ p ≢ \null ⇒ \separated(r, p);
+       requires r ≢ \null ⇒ q ≢ \null ⇒ \separated(r, q);
        requires \valid(p) ∨ p ≡ \null;
        requires \valid(q) ∨ q ≡ \null;
        requires \valid(r) ∨ r ≡ \null;
