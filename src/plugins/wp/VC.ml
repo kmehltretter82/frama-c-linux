@@ -46,7 +46,8 @@ let get_formula po =
   match po.po_formula with
   | GoalLemma l -> l.VC_Lemma.lemma.Definitions.l_lemma
   | GoalAnnot { VC_Annot.goal = g } ->
-      WpContext.on_context (get_context po) Wpo.GOAL.compute_proof g
+      WpContext.on_context
+        (get_context po) (Wpo.GOAL.compute_proof ~pid:po.po_pid) g
 
 let clear = Wpo.clear
 let proof = Wpo.goals_of_property

@@ -655,7 +655,7 @@ let prove_annot wpo vcq ~mode =
     begin fun () ->
       let prop =
         WpContext.on_context (Wpo.get_context wpo)
-          GOAL.compute_proof vcq.VC_Annot.goal in
+          (GOAL.compute_proof ~pid:wpo.po_pid) vcq.VC_Annot.goal in
       prove_prop wpo ~mode ~axioms:None ~prop
     end
 
