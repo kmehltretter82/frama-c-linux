@@ -9,7 +9,7 @@ int x ;
 int *g ;
 
 /*@ assigns *g, *p, x ;
-    wp_nullable_pointers p ;
+    wp_nullable_args p ;
 */
 void nullable_coherence(int* p){
   if(p == (void*)0){
@@ -23,7 +23,7 @@ void nullable_coherence(int* p){
 }
 
 /*@ assigns *p, *q, *r, *s, *t ;
-    wp_nullable_pointers p, q, r ;
+    wp_nullable_args p, q, r ;
 */
 void nullable_in_context(int* p, int* q, int* r, int* s, int* t){
   *p = 42;

@@ -848,7 +848,7 @@ struct
       | Logic_ptree.PLvar s ->
           let lv = typing_context.Logic_typing.find_var s in
           begin match lv.lv_origin with
-            | Some vi when Cil.isPointerType vi.vtype ->
+            | Some vi when Cil.isPointerType vi.vtype && vi.vformal ->
                 make_nullable vi ;
                 Logic_const.tvar ~loc lv
             | _ ->
@@ -864,7 +864,7 @@ struct
 
   let () =
     Acsl_extension.register_behavior
-      "wp_nullable_pointers" Nullable_extension.typer false
+      "wp_nullable_args" Nullable_extension.typer false
 
   module HasNullable =
     State_builder.Option_ref(Datatype.Bool)
