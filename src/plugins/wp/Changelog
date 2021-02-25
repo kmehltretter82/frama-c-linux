@@ -24,9 +24,15 @@
 Plugin WP <next-release>
 #########################
 
-
+- WP          [2020-02-25] Section « Limitation & Roadmap » added to the WP manual.
+- WP          [2020-02-25] New internal WP engine, fixing many issues related to
+                           control flow graph and local variable scoping.
+                           Support for stmt contracts has been removed.
+                           Support for looping gotos has been removed.
+                           Altough unsound, the legacy engine is still
+                           accessible via -wp-legacy option.
 - WP          [2020-01-25] Improved -wp-unfold-assigns <depth>
-			   Now recursively applies to all compounds
+                           Now recursively applies to all compounds
 -* WP         [2020-01-20] Fixes opaque structures handling
 - TIP         [2020-11-06] New tactic: Sequence unrolling
 - TIP         [2020-11-05] New tactic: Induction
