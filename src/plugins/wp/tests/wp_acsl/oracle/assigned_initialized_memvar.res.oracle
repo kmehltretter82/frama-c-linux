@@ -71,29 +71,24 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Check 'CHECK' (file tests/wp_acsl/assigned_initialized_memvar.i, line 105):
-Let a = Init_s_0.Init_F1_S_a.
 Assume {
-  Have: 0 <= i.
-  Have: i <= 9.
-  Type: is_sint32(i_1) /\ is_sint32(i_2).
+  Type: is_sint32(i) /\ is_sint32(i_1).
   (* Invariant *)
-  Have: (0 <= i_1) /\ (i_1 <= 10) /\
-      (((0 < i_1) ->
-       (forall i_3 : Z. ((0 <= i_3) -> ((i_3 < i_1) -> (v[i_3]=true)))))).
+  Have: (0 <= i) /\ (i <= 10) /\
+      (((0 < i) ->
+       (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) -> (v[i_2]=true)))))).
+  (* Else *)
+  Have: 10 <= i.
+  (* Loop assigns 'CHECK' *)
+  Have: ((s.F1_S_i) = 0) /\
+      (forall i_2 : Z. ((i_2 != 0) -> ((i_2 != 2) -> ((i_2 != 4) ->
+       ((0 <= i_2) -> ((i_2 <= 9) -> ((s.F1_S_a)[i_2] = v_1[i_2]))))))).
   (* Else *)
   Have: 10 <= i_1.
-  (* Loop assigns 'CHECK' *)
-  Have: ((s.F1_S_i) = 0) /\ ((Init_s_0.Init_F1_S_i)=true) /\
-      (forall i_3 : Z. ((i_3 != 0) -> ((i_3 != 2) -> ((i_3 != 4) ->
-       ((0 <= i_3) -> ((i_3 <= 9) -> ((a[i_3]=true) <-> (v[i_3]=true)))))))) /\
-      (forall i_3 : Z. ((i_3 != 0) -> ((i_3 != 2) -> ((i_3 != 4) ->
-       ((0 <= i_3) -> ((i_3 <= 9) -> ((s.F1_S_a)[i_3] = v_1[i_3]))))))) /\
-      (forall i_3 : Z. ((0 <= i_3) -> ((i_3 <= 9) -> ((v[i_3]=true) ->
-       (((i_3 = 0) \/ (i_3 = 2) \/ (i_3 = 4)) -> (a[i_3]=true)))))).
-  (* Else *)
-  Have: 10 <= i_2.
 }
-Prove: (a[i]=true).
+Prove: ((Init_s_0.Init_F1_S_i)=true) /\
+    (forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) ->
+     ((Init_s_0.Init_F1_S_a)[i_2]=true)))).
 
 ------------------------------------------------------------
 
@@ -255,29 +250,24 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Check 'CHECK' (file tests/wp_acsl/assigned_initialized_memvar.i, line 38):
-Let a = Init_s_0.Init_F1_S_a.
 Assume {
-  Have: 0 <= i.
-  Have: i <= 9.
-  Type: is_sint32(i_1) /\ is_sint32(i_2).
+  Type: is_sint32(i) /\ is_sint32(i_1).
   (* Invariant *)
-  Have: (0 <= i_1) /\ (i_1 <= 10) /\
-      (((0 < i_1) ->
-       (forall i_3 : Z. ((0 <= i_3) -> ((i_3 < i_1) -> (v[i_3]=true)))))).
+  Have: (0 <= i) /\ (i <= 10) /\
+      (((0 < i) ->
+       (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) -> (v[i_2]=true)))))).
+  (* Else *)
+  Have: 10 <= i.
+  (* Loop assigns 'CHECK' *)
+  Have: ((s.F1_S_i) = 0) /\
+      (forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) ->
+       (((i_2 <= 0) \/ (5 <= i_2)) -> ((s.F1_S_a)[i_2] = v_1[i_2]))))).
   (* Else *)
   Have: 10 <= i_1.
-  (* Loop assigns 'CHECK' *)
-  Have: ((s.F1_S_i) = 0) /\ ((Init_s_0.Init_F1_S_i)=true) /\
-      (forall i_3 : Z. ((0 <= i_3) -> ((i_3 <= 9) ->
-       (((i_3 <= 0) \/ (5 <= i_3)) -> ((a[i_3]=true) <-> (v[i_3]=true)))))) /\
-      (forall i_3 : Z. ((0 <= i_3) -> ((i_3 <= 9) ->
-       (((i_3 <= 0) \/ (5 <= i_3)) -> ((s.F1_S_a)[i_3] = v_1[i_3]))))) /\
-      (forall i_3 : Z. ((0 < i_3) -> ((0 <= i_3) -> ((i_3 <= 4) ->
-       ((i_3 <= 9) -> ((v[i_3]=true) -> (a[i_3]=true))))))).
-  (* Else *)
-  Have: 10 <= i_2.
 }
-Prove: (a[i]=true).
+Prove: ((Init_s_0.Init_F1_S_i)=true) /\
+    (forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) ->
+     ((Init_s_0.Init_F1_S_a)[i_2]=true)))).
 
 ------------------------------------------------------------
 
