@@ -37,6 +37,8 @@ Plugin E-ACSL <next-release>
                 (frama-c/e-acsl#104).
 -  e-acsl-gcc   [2021-02-24] Do not load Frama-C plugins when retrieving share
                 and plugins paths (frama-c/e-acsl#104).
+-* runtime      [2021-02-18] Fix integration of contracts from the runtime
+                library into Frama-C (#@999).
 -* E-ACSL       [2021-01-12] Fix crash when comparing two structs, which is
                 currently unsupported (frama-c/e-acsl#139).
 -* Makefile     [2021-01-05] Fix dependencies in bytecode-only compilation.
