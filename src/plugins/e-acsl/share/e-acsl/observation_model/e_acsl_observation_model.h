@@ -36,6 +36,9 @@
 #include "../internals/e_acsl_alias.h"
 #include "e_acsl_heap.h"
 
+#ifdef __FC_STDLIB
+#include <__fc_alloc_axiomatic.h>
+#else
 /*@ ghost extern int __fc_heap_status; */
 
 /*@ axiomatic dynamic_allocation {
@@ -45,9 +48,10 @@
   @   // predicate depends on the memory state
   @   axiom never_allocable{L}:
   @     \forall integer i;
-  @        i < 0 || i > __FC_SIZE_MAX ==> !is_allocable(i);
+  @        i < 0 || i > SIZE_MAX ==> !is_allocable(i);
   @ }
 */
+#endif
 
 /************************************************************************/
 /*** API Prefixes {{{ ***/

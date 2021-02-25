@@ -35,7 +35,7 @@
 #ifdef __FC_STDLIB
 #include <__fc_alloc_axiomatic.h>
 #else
-/*@ ghost extern int __fc_heap_status __attribute__((FRAMA_C_MODEL)); */
+/*@ ghost extern int __fc_heap_status; */
 #endif
 
 #define contract_t                            export_alias(contract_t)
