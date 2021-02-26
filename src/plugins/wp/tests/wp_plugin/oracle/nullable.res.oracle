@@ -1,7 +1,7 @@
 # frama-c -wp -wp-model 'Typed (Caveat)' [...]
 [kernel] Parsing tests/wp_plugin/nullable.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] Warning: In Caveat mode, with nullable variables,-wp-rte should be explicitly positioned
+[wp] Warning: In caveat model with nullable arguments, -wp-(no)-rte shall be explicitly positioned.
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function nullable_coherence

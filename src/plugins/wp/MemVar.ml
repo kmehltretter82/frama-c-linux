@@ -1257,20 +1257,17 @@ struct
         in
         List.map uninitialized xs
 
-  let scope_nullable xs =
-    let predicate_is_nullable v =
-      Option.map
-        (fun m ->
-           let addr = nullable_address v in
-           p_or
-             (M.is_null @@ M.pointer_loc addr)
-             (p_equal (M.pointer_val @@ M.cvar (vbase m v)) addr))
-        (match V.param v with
-         | InContext Nullable -> Some (CTXT Nullable)
-         | InArray Nullable -> Some (CARR Nullable)
-         | _ -> None)
-    in
-    List.filter_map predicate_is_nullable xs
+  let is_nullable m v =
+    let addr = nullable_address v in
+    p_or
+      (M.is_null @@ M.pointer_loc addr)
+      (p_equal (M.pointer_val @@ M.cvar (vbase m v)) addr)
+
+  let nullable_scope v =
+    match V.param v with
+    | InContext Nullable -> Some (is_nullable (CTXT Nullable) v)
+    | InArray Nullable -> Some (is_nullable (CARR Nullable) v)
+    | _ -> None
 
   let scope seq scope xs =
     let xm = List.filter is_mem xs in
@@ -1278,7 +1275,7 @@ struct
     let hmem = M.scope smem scope xm in
     let hvars = scope_vars seq scope xs in
     let hinit = scope_init seq scope xs in
-    let hcontext = scope_nullable xs in
+    let hcontext = List.filter_map nullable_scope xs in
     hvars @ hinit @ hmem @ hcontext
 
   let global sigma p = M.global sigma.mem p
@@ -1530,16 +1527,16 @@ struct
     | Rrange(Val((CVAL|CREF),x,ofs),obj,a,b) ->
         Fseg(x,range ofs obj a b)
 
-    (* in M: *)
-    (* First intercept nullable context *)
+    (* Nullable: force M without symbolic access *)
     | Rloc(obj,Val((CTXT Nullable|CARR Nullable) as m,x,ofs)) ->
         Lseg(Rloc(obj, mloc_of_path m x ofs))
     | Rrange(Val((CTXT Nullable|CARR Nullable) as m,x,ofs),obj,a,b) ->
         Lseg(Rrange(mloc_of_path m x ofs, obj, a, b))
 
-    | Rloc(obj,Val((CTXT _|CARR _|HEAP) as m,x,ofs)) ->
+    (* Otherwise: use M with symbolic access *)
+    | Rloc(obj,Val((CTXT Valid|CARR Valid|HEAP) as m,x,ofs)) ->
         Mseg(Rloc(obj,mloc_of_path m x ofs),x,delta obj x ofs)
-    | Rrange(Val((CTXT _|CARR _|HEAP) as m,x,ofs),obj,a,b) ->
+    | Rrange(Val((CTXT Valid|CARR Valid|HEAP) as m,x,ofs),obj,a,b) ->
         Mseg(Rrange(mloc_of_path m x ofs,obj,a,b),x,range ofs obj a b)
 
   (* -------------------------------------------------------------------------- *)
