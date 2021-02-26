@@ -142,13 +142,13 @@ Prove: true.
 
 Goal Instance of 'Pre-condition for 'wp_typed_ref' (file tests/wp_hoare/memory_hypotheses_checking.i, line 58) in 'assigns_ptr'' in 'call_assigns_ptr_bad' at call 'assigns_ptr' (file tests/wp_hoare/memory_hypotheses_checking.i, line 70)
 :
-Prove: false.
+Prove: true.
 
 ------------------------------------------------------------
 
 Goal Instance of 'Pre-condition for 'wp_typed_ref' (file tests/wp_hoare/memory_hypotheses_checking.i, line 58) in 'assigns_ptr'' in 'call_assigns_ptr_bad' at call 'assigns_ptr' (file tests/wp_hoare/memory_hypotheses_checking.i, line 70)
 :
-Prove: true.
+Prove: false.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -194,14 +194,14 @@ Prove: true.
 
 Goal Instance of 'Pre-condition for 'wp_typed_ref' (file tests/wp_hoare/memory_hypotheses_checking.i, line 39) in 'gptr_sep'' in 'call_gptr_sep_bad' at call 'gptr_sep' (file tests/wp_hoare/memory_hypotheses_checking.i, line 53)
 :
-Prove: false.
+Assume { (* Heap *) Type: linked(Malloc_0). }
+Prove: valid_rw(Malloc_0, global(G_g_20), 1).
 
 ------------------------------------------------------------
 
 Goal Instance of 'Pre-condition for 'wp_typed_ref' (file tests/wp_hoare/memory_hypotheses_checking.i, line 39) in 'gptr_sep'' in 'call_gptr_sep_bad' at call 'gptr_sep' (file tests/wp_hoare/memory_hypotheses_checking.i, line 53)
 :
-Assume { (* Heap *) Type: linked(Malloc_0). }
-Prove: valid_rw(Malloc_0, global(G_g_20), 1).
+Prove: false.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -220,14 +220,14 @@ Prove: true.
 
 Goal Instance of 'Pre-condition for 'wp_typed_ref' (file tests/wp_hoare/memory_hypotheses_checking.i, line 39) in 'gptr_sep'' in 'call_gptr_sep_ok' at call 'gptr_sep' (file tests/wp_hoare/memory_hypotheses_checking.i, line 47)
 :
-Prove: true.
+Assume { (* Heap *) Type: linked(Malloc_0). }
+Prove: valid_rw(Malloc_0[L_l_46 <- 1], global(L_l_46), 1).
 
 ------------------------------------------------------------
 
 Goal Instance of 'Pre-condition for 'wp_typed_ref' (file tests/wp_hoare/memory_hypotheses_checking.i, line 39) in 'gptr_sep'' in 'call_gptr_sep_ok' at call 'gptr_sep' (file tests/wp_hoare/memory_hypotheses_checking.i, line 47)
 :
-Assume { (* Heap *) Type: linked(Malloc_0). }
-Prove: valid_rw(Malloc_0[L_l_46 <- 1], global(L_l_46), 1).
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -246,13 +246,13 @@ Prove: true.
 
 Goal Instance of 'Pre-condition for 'wp_typed_ref' (file tests/wp_hoare/memory_hypotheses_checking.i, line 12) in 'sep'' in 'call_sep_bad_sep' at call 'sep' (file tests/wp_hoare/memory_hypotheses_checking.i, line 24)
 :
-Prove: false.
+Prove: true.
 
 ------------------------------------------------------------
 
 Goal Instance of 'Pre-condition for 'wp_typed_ref' (file tests/wp_hoare/memory_hypotheses_checking.i, line 12) in 'sep'' in 'call_sep_bad_sep' at call 'sep' (file tests/wp_hoare/memory_hypotheses_checking.i, line 24)
 :
-Prove: true.
+Prove: false.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -283,14 +283,14 @@ Prove: true.
 
 Goal Instance of 'Pre-condition for 'wp_typed_ref' (file tests/wp_hoare/memory_hypotheses_checking.i, line 12) in 'sep'' in 'call_sep_bad_valid' at call 'sep' (file tests/wp_hoare/memory_hypotheses_checking.i, line 34)
 :
-Prove: true.
+Assume { (* Heap *) Type: linked(Malloc_0). }
+Prove: valid_rw(Malloc_0[L_l_37 <- 0], global(L_l_37), 1).
 
 ------------------------------------------------------------
 
 Goal Instance of 'Pre-condition for 'wp_typed_ref' (file tests/wp_hoare/memory_hypotheses_checking.i, line 12) in 'sep'' in 'call_sep_bad_valid' at call 'sep' (file tests/wp_hoare/memory_hypotheses_checking.i, line 34)
 :
-Assume { (* Heap *) Type: linked(Malloc_0). }
-Prove: valid_rw(Malloc_0[L_l_37 <- 0], global(L_l_37), 1).
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -341,8 +341,8 @@ int g;
 /*@ assigns \nothing;
     
     behavior wp_typed_ref:
-      requires \separated(p_0, &g);
       requires \valid(p_0);
+      requires \separated(p_0, &g);
  */
 int sep(int *p_0)
 {
@@ -382,8 +382,8 @@ int *p;
 /*@ assigns \nothing;
     
     behavior wp_typed_ref:
-      requires \separated(p, &g);
       requires \valid(p);
+      requires \separated(p, &g);
  */
 int gptr_sep(void)
 {
@@ -414,8 +414,8 @@ void call_gptr_sep_bad(void)
 /*@ assigns *p_0;
     
     behavior wp_typed_ref:
-      requires \separated(p_0, &g);
       requires \valid(p_0);
+      requires \separated(p_0, &g);
  */
 void assigns_ptr(int *p_0)
 {

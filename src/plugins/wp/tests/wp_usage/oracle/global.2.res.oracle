@@ -23,7 +23,7 @@ Prove: true.
   Memory model hypotheses for function 'foo':
   /*@
      behavior wp_typed_ref:
-       requires \separated(a, &GLOBAL);
        requires \valid(a);
+       requires \separated(a, &GLOBAL);
      */
   void foo(int *a);

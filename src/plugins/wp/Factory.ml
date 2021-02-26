@@ -104,6 +104,9 @@ let describe s =
 (* --- Variable Proxy                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
+let validity x =
+  if RefUsage.is_nullable x then MemoryContext.Nullable else Valid
+
 module type Proxy = sig
   val datatype : string
   val param : Cil_types.varinfo -> MemoryContext.param
@@ -124,7 +127,7 @@ struct
     let module S = Datatype.String.Set in
     let open MemoryContext in
     if S.mem x.vname (get_addr ()) then ByAddr else
-    if S.mem x.vname (get_ctxt ()) then InContext else
+    if S.mem x.vname (get_ctxt ()) then InContext (validity x) else
     if S.mem x.vname (get_refs ()) then ByRef else
     if S.mem x.vname (get_vars ()) then ByValue else
       V.param x
@@ -182,16 +185,19 @@ let refusage_param ~byref ~context x =
   | RefUsage.NoAccess -> MemoryContext.NotUsed
   | RefUsage.ByAddr -> MemoryContext.ByAddr
   | RefUsage.ByValue ->
-      if context && is_formal_ptr x then MemoryContext.InContext
+      if context && is_formal_ptr x then MemoryContext.InContext (validity x)
       else if is_ptr x && not (is_fun_ptr x) then MemoryContext.ByShift
       else MemoryContext.ByValue
   | RefUsage.ByRef ->
       if byref
-      then MemoryContext.ByRef
+      then
+        if RefUsage.is_nullable x
+        then MemoryContext.InContext Nullable
+        else MemoryContext.ByRef
       else MemoryContext.ByValue
   | RefUsage.ByArray ->
       if context && is_formal_ptr x
-      then MemoryContext.InArray
+      then MemoryContext.InArray (validity x)
       else MemoryContext.ByShift
 
 let refusage_iter ?kf ~init f = RefUsage.iter ?kf ~init (fun x _usage -> f x)

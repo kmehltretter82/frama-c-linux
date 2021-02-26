@@ -1223,7 +1223,7 @@ val partitionAttributes:  default:attributeClass ->
                 attribute list   (* AttrType *)
 
 (** Add an attribute. Maintains the attributes in sorted order of the second
-    argument *)
+    argument. The attribute is not added if it is already there. *)
 val addAttribute: attribute -> attributes -> attributes
 
 (** Add a list of attributes. Maintains the attributes in sorted order. The

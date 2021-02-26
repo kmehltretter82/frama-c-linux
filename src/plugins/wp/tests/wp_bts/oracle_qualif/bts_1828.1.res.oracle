@@ -21,8 +21,8 @@
   Memory model hypotheses for function 'global_frame':
   /*@
      behavior wp_typed_ref:
-       requires \separated(zero, one);
        requires \valid(one);
        requires \valid(zero);
+       requires \separated(zero, one);
      */
   void global_frame(int *one, int arg);

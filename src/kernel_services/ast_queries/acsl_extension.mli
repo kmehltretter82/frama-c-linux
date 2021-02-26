@@ -80,7 +80,7 @@ type extension_printer =
     Here is a basic example:
     [
     let count = ref 0
-    let foo_typer ~typing_context ~loc = function
+    let foo_typer typing_context loc = function
       | p :: [] ->
         Ext_preds
         [ (typing_context.type_predicate

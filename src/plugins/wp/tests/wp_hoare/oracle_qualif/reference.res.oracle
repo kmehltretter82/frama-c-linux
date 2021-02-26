@@ -45,9 +45,9 @@
   Memory model hypotheses for function 'f2':
   /*@
      behavior wp_typed_ref:
-       requires \separated(p2, q);
        requires \valid(p2);
        requires \valid(q);
+       requires \separated(p2, q);
      */
   int f2(int *p2, int *q);
 [wp] tests/wp_hoare/reference.i:37: Warning: 

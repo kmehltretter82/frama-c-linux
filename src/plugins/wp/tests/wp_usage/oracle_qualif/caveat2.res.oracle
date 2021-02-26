@@ -24,8 +24,8 @@
   Memory model hypotheses for function 'job':
   /*@
      behavior wp_typed_caveat:
-       requires \separated(p, b + (..));
        requires \valid(b + (..));
        requires \valid(p);
+       requires \separated(p, b + (..));
      */
   void job(struct S *p, int n, int *b);
