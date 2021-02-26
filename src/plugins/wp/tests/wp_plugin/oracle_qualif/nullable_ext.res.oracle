@@ -21,11 +21,11 @@
   Memory model hypotheses for function 'nullable_coherence':
   /*@
      behavior wp_typed_caveat:
+       requires \valid(g);
+       requires \valid(p) ∨ p ≡ \null;
        requires \separated(g, &x);
        requires \separated(p, &x);
-       requires \valid(g);
        requires p ≢ \null ⇒ \separated(g, p, &x);
-       requires \valid(p) ∨ p ≡ \null;
      */
   void nullable_coherence(int *p /*@ wp_nullable */);
 [wp] tests/wp_plugin/nullable_ext.i:28: Warning: 
@@ -34,15 +34,15 @@
      behavior wp_typed_caveat:
        requires \valid(s);
        requires \valid(t);
+       requires \valid(p) ∨ p ≡ \null;
+       requires \valid(q) ∨ q ≡ \null;
+       requires \valid(r) ∨ r ≡ \null;
        requires p ≢ \null ⇒ \separated(p, s, t);
        requires q ≢ \null ⇒ \separated(q, s, t);
        requires q ≢ \null ⇒ p ≢ \null ⇒ \separated(q, p);
        requires r ≢ \null ⇒ \separated(r, s, t);
        requires r ≢ \null ⇒ p ≢ \null ⇒ \separated(r, p);
        requires r ≢ \null ⇒ q ≢ \null ⇒ \separated(r, q);
-       requires \valid(p) ∨ p ≡ \null;
-       requires \valid(q) ∨ q ≡ \null;
-       requires \valid(r) ∨ r ≡ \null;
      */
   void nullable_in_context(int *p /*@ wp_nullable */,
                            int *q /*@ wp_nullable */,

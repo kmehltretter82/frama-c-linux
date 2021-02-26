@@ -24,8 +24,8 @@
   Memory model hypotheses for function 'memcpy_context_vars':
   /*@
      behavior wp_typed:
-       requires \separated(src, dst);
        requires \valid(dst);
        requires \valid(src);
+       requires \separated(src, dst);
      */
   void memcpy_context_vars(unsigned char *src, unsigned char *dst, int len);

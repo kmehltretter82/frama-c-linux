@@ -210,9 +210,20 @@ let valid_or_null_region loc r =
   let null = term ~loc Tnull t.term_type in
   por (valid_region loc r, prel ~loc (Req, t, null))
 
-let simplify ps =
-  List.sort_uniq Logic_utils.compare_predicate
-    (List.filter (fun p -> not(Logic_utils.is_trivially_true p)) ps)
+let rec rank p = match p.pred_content with
+  | Pvalid _ -> 1
+  | Pseparated _ -> 2
+  | Pimplies(_,p) -> rank p
+  | Por(p,q) | Pand(p,q) -> max (rank p) (rank q)
+  | _ -> 0
+
+let compare p q =
+  let r = rank p - rank q in
+  if r <> 0 then r else Logic_utils.compare_predicate p q
+
+let normalize ps =
+  List.sort_uniq compare @@
+  List.filter (fun p -> not(Logic_utils.is_trivially_true p)) ps
 
 let ptrset { term_type = t } =
   let open Logic_typing in
@@ -356,8 +367,8 @@ let clauses_of_partition kf loc p =
   let context_valid = List.map (valid_region loc) (context_zones p) in
   let nullable_valid = List.map (valid_or_null_region loc) (nullable_zones p) in
   let reqs = main_sep @ assigns_sep_req @ context_valid @ nullable_valid in
-  let reqs = simplify reqs in
-  let ens = simplify assigns_sep_ens in
+  let reqs = normalize reqs in
+  let ens = normalize assigns_sep_ens in
   reqs, ens
 
 (* Computes conditions from return *)
@@ -386,7 +397,7 @@ let out_pointers_separation kf loc p =
     let globals = global_zones p in
     List.map (fun t -> term_separated_from_regions loc t globals) asgnd_ptrs
   in
-  simplify (formals_separation @ globals_separation)
+  normalize (formals_separation @ globals_separation)
 
 (* Computes all conditions from behavior *)
 let compute_behavior kf name hypotheses_computer =

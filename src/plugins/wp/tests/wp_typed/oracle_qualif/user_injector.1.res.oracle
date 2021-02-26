@@ -29,11 +29,11 @@
   Memory model hypotheses for function 'job':
   /*@
      behavior wp_typed_ref:
+       requires \valid(error);
        requires
          \separated(
            error, (int *)service_id + (..), (int *)service_result + (..), &seq,
            &service_cpt
            );
-       requires \valid(error);
      */
   int job(int a, int b, int *error);

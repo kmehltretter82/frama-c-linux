@@ -515,10 +515,10 @@ Prove: true.
   Memory model hypotheses for function 'ref_ctr_nr':
   /*@
      behavior wp_typed_ref:
-       requires \separated(ref, ref1, ref2);
        requires \valid(ref);
        requires \valid(ref1);
        requires \valid(ref2);
+       requires \separated(ref, ref1, ref2);
      */
   int ref_ctr_nr(int *ref, int *ref1, int *ref2);
 [wp] tests/wp_hoare/dispatch_var.i:158: Warning: 
