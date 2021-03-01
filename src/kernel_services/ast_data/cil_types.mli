@@ -1675,13 +1675,8 @@ and spec = {
     Each extension is associated with a keyword, and can be either a global
     annotation, the clause of a function contract, a code annotation,
     or a loop annotation.
-    An extension can be registered through the following functions:
-    - [Logic_typing.register_xxx_extension] for parsing and type-checking
-    - [Cil_printer.register_xxx_extension] for pretty-printing an
-      extended clause
-    - [Cil.register_xxx_extension] for visiting an extended clause
-      where xxx can be either [global], [behavior], [code_annot] or
-      [loop annot] depending on the level at which the extension should be seen.
+    An extension can be registered through the function
+    [Acsl_extension.register_xxx].
 
     It is _not_ possible to register the same keyword for annotations at two
     different levels (e.g. [global] and [behavior]), as this would make the
