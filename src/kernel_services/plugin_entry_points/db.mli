@@ -175,40 +175,6 @@ module Value : sig
 
   (** {3 Parameterization} *)
 
-  exception Outside_builtin_possibilities
-
-  (* Type of a C function interpreted by a builtin:
-     return type and list of argument types. *)
-  type builtin_type = unit -> typ * typ list
-
-  (** Type for an Eva builtin function *)
-  type builtin =
-    (** Memory state at the beginning of the function *)
-    state ->
-    (** Args for the function: the expressions corresponding to the formals
-        of the functions at the call site, the actual value of those formals,
-        and a more precise view of those formals using offsetmaps (for eg.
-        structs)  *)
-    (Cil_types.exp * Cvalue.V.t * Cvalue.V_Offsetmap.t) list ->
-    Value_types.call_result
-
-  val register_builtin:
-    (string -> ?replace:string -> ?typ:builtin_type -> builtin -> unit) ref
-  (** [!register_builtin name ?replace ?typ f] registers an abstract function
-      [f] to use everytime a C function named [name] of type [typ] is called in
-      the program.  If [replace] is supplied and option [-eva-builtins-auto] is
-      active, calls to [replace] will also be substituted by the builtin.  See
-      also option [-eva-builtin] *)
-
-  val registered_builtins: (unit -> (string * builtin) list) ref
-  (** Returns a list of the pairs (name, builtin) registered via
-      [register_builtin].
-      @since Aluminium-20160501 *)
-
-  val mem_builtin: (string -> bool) ref
-  (** returns whether there is an abstract function registered by
-      {!register_builtin} with the given name. *)
-
   val use_spec_instead_of_definition: (kernel_function -> bool) ref
   (** To be called by derived analyses to determine if they must use
       the body of the function (if available), or only its spec. Used for
@@ -500,7 +466,7 @@ module Value : sig
       @since Aluminium-20160501  *)
   module Call_Type_Value_Callbacks:
     Hook.Iter_hook with type param =
-    [`Builtin of Value_types.call_result | `Spec of funspec | `Def | `Memexec]
+    [`Builtin of Value_types.call_froms | `Spec of funspec | `Def | `Memexec]
     * state * callstack
 
 

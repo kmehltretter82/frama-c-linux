@@ -885,6 +885,10 @@ let () = add_precision_dep ILevel.parameter
 let () = ILevel.add_update_hook (fun _ i -> Int_set.set_small_cardinal i)
 let () = ILevel.set_range 4 256
 
+let builtins = ref Datatype.String.Set.empty
+let register_builtin name = builtins := Datatype.String.Set.add name !builtins
+let mem_builtin name = Datatype.String.Set.mem name !builtins
+
 let () = Parameter_customize.set_group precision_tuning
 let () = Parameter_customize.argument_may_be_fundecl ()
 module BuiltinsOverrides =
@@ -895,12 +899,12 @@ module BuiltinsOverrides =
       let of_string ~key:kf ~prev:_ nameopt =
         begin match nameopt with
           | Some name ->
-            if not (!Db.Value.mem_builtin name) then
+            if not (mem_builtin name) then
               abort "option '-eva-builtin %a:%s': undeclared builtin '%s'@.\
                      declared builtins: @[%a@]"
                 Kernel_function.pretty kf name name
                 (Pretty_utils.pp_list ~sep:",@ " Format.pp_print_string)
-                (List.map fst (!Db.Value.registered_builtins ()))
+                (Datatype.String.Set.elements !builtins)
           | _ -> abort
                    "option '-eva-builtin':@ \
                     no builtin associated to function '%a',@ use '%a:<builtin>'"
@@ -921,7 +925,7 @@ let () = add_correctness_dep BuiltinsOverrides.parameter
 
 (* Exported in Eva.mli. *)
 let use_builtin key name =
-  if !Db.Value.mem_builtin name
+  if mem_builtin name
   then BuiltinsOverrides.add (key, Some name)
   else raise Not_found
 

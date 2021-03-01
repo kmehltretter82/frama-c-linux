@@ -33,14 +33,6 @@ val offsetmap_of_v: typ:Cil_types.typ -> V.t -> V_Offsetmap.t
 val offsetmap_of_loc:
   Precise_locs.precise_location -> Model.t -> V_Offsetmap.t Eval.or_bottom
 
-(** Specialization of the function above for standard types *)
-val wrap_size_t: V.t -> V_Offsetmap.t option
-val wrap_int: V.t -> V_Offsetmap.t option
-val wrap_ptr: V.t -> V_Offsetmap.t option
-val wrap_double: V.t -> V_Offsetmap.t option
-val wrap_float: V.t -> V_Offsetmap.t option
-val wrap_long_long: V.t -> V_Offsetmap.t option
-
 val backward_comp_left_from_type:
   logic_type ->
   (bool -> Abstract_interp.Comp.t -> Cvalue.V.t -> Cvalue.V.t -> Cvalue.V.t)

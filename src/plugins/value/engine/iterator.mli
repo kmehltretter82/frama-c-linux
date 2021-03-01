@@ -46,7 +46,7 @@ module Computer
 
     val compute:
       kernel_function -> kinstr -> Abstract.Dom.t ->
-      Abstract.Dom.t list or_bottom * Value_types.cacheable
+      Abstract.Dom.t list or_bottom * Eval.cacheable
 
   end
 

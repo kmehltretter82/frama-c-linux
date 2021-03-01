@@ -34,7 +34,7 @@ let show_aorai_variable state fmt var_name =
        Z.Overflow | Not_found ->
     Format.fprintf fmt "?"
 
-let show_val fmt (expr, v, _) =
+let show_val fmt (expr, v) =
   Format.fprintf fmt "%a in %a"
     Printer.pp_exp expr
     (Cvalue.V.pretty_typ (Some (Cil.typeOf expr))) v
@@ -56,19 +56,14 @@ let builtin_show_aorai_state state args =
     end;
   end;
   (* Return value : returns nothing, changes nothing *)
-  {
-    Value_types.c_values = [None, state];
-    c_clobbered = Base.SetLattice.bottom;
-    c_from = None;
-    c_cacheable = Value_types.Cacheable;
-  }
+  Eva.Builtins.States [state]
 
 let () =
   Cil_builtins.add_custom_builtin
     (fun () -> (show_aorai_state,Cil.voidType,[],true))
 
 let () =
-  !Db.Value.register_builtin show_aorai_state builtin_show_aorai_state
+  Eva.Builtins.register_builtin show_aorai_state Cacheable builtin_show_aorai_state
 
 let add_slevel_annotation vi kind =
   match kind with

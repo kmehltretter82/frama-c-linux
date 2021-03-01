@@ -88,7 +88,7 @@ let get_subdivision stmt =
     x
 
 let pretty_actuals fmt actuals =
-  let pp fmt (e,x,_) = Cvalue.V.pretty_typ (Some (Cil.typeOf e)) fmt x in
+  let pp fmt (e,x) = Cvalue.V.pretty_typ (Some (Cil.typeOf e)) fmt x in
   Pretty_utils.pp_flowlist pp fmt actuals
 
 let pretty_current_cfunction_name fmt =

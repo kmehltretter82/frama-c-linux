@@ -21,10 +21,10 @@
 (**************************************************************************)
 
 (** A builtin takes the state and a list of values for the arguments, and
-    returns the offsetmap of the return value (None if bottom), and a boolean
-    indicating the possibility of alarms.  *)
+    returns the return value (which can be bottom), and a boolean indicating the
+    possibility of alarms.  *)
 type str_builtin_sig =
-  Cvalue.Model.t -> Cvalue.V.t list -> Cvalue.V_Offsetmap.t option * bool
+  Cvalue.Model.t -> Cvalue.V.t list -> Cvalue.V.t * bool
 
 val frama_c_strlen_wrapper: str_builtin_sig
 val frama_c_wcslen_wrapper: str_builtin_sig

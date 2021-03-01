@@ -25,54 +25,41 @@ open Cil_types
 open Abstract_interp
 open Cvalue
 
+let register_builtin name builtin =
+  Builtins.register_builtin name Cacheable builtin
+
 (** Enumeration *)
 
 (** Cardinal of an abstract value (-1 if not enumerable). Beware this builtin
     is not monotonic *)
-let frama_c_cardinal state actuals =
-  match actuals with
-  | [_, v, _] -> begin
-      let nb = match Cvalue.V.cardinal v with
-        | None -> Cvalue.V.inject_int Integer.minus_one
-        | Some i -> Cvalue.V.inject_int i
-      in
-      { Value_types.c_values = [Eval_op.wrap_long_long nb, state];
-        c_clobbered = Base.SetLattice.empty;
-        c_cacheable = Value_types.Cacheable;
-        c_from = None;
-      }
-    end
-  | _ ->
-    Kernel.abort ~current:true "Incorrect argument for Frama_C_cardinal"
+let frama_c_cardinal _state = function
+  | [_, v] ->
+    let nb = match Cvalue.V.cardinal v with
+      | None -> Cvalue.V.inject_int Integer.minus_one
+      | Some i -> Cvalue.V.inject_int i
+    in
+    Builtins.Result [nb]
+  | _ -> Kernel.abort ~current:true "Incorrect argument for Frama_C_cardinal"
 
-let () =
-  !Db.Value.register_builtin "Frama_C_abstract_cardinal" frama_c_cardinal
+let () = register_builtin "Frama_C_abstract_cardinal" frama_c_cardinal
 
 (** Minimum or maximum of an integer abstract value, Top_int otherwise.
     Also not monotonic. *)
-let frama_c_min_max f state actuals =
-  match actuals with
-  | [_, v, _] -> begin
-      let nb =
-        try
-          match f (Ival.min_and_max (V.project_ival v)) with
-          | None -> Cvalue.V.top_int
-          | Some i -> Cvalue.V.inject_int i
-        with V.Not_based_on_null -> Cvalue.V.top_int
-      in
-      { Value_types.c_values = [Eval_op.wrap_long_long nb, state];
-        c_clobbered = Base.SetLattice.empty;
-        c_cacheable = Value_types.Cacheable;
-        c_from = None;
-      }
-    end
-  | _ ->
-    Kernel.abort ~current:true "Incorrect argument for Frama_C_min/max"
+let frama_c_min_max f _state = function
+  | [_, v] ->
+    let nb =
+      try
+        match f (Ival.min_and_max (V.project_ival v)) with
+        | None -> Cvalue.V.top_int
+        | Some i -> Cvalue.V.inject_int i
+      with V.Not_based_on_null -> Cvalue.V.top_int
+    in
+    Builtins.Result [nb]
+  | _ -> Kernel.abort ~current:true "Incorrect argument for Frama_C_min/max"
 
 let () =
-  !Db.Value.register_builtin "Frama_C_abstract_min" (frama_c_min_max fst);
-  !Db.Value.register_builtin "Frama_C_abstract_max" (frama_c_min_max snd);
-;;
+  register_builtin "Frama_C_abstract_min" (frama_c_min_max fst);
+  register_builtin "Frama_C_abstract_max" (frama_c_min_max snd)
 
 (** Splitting values *)
 
@@ -186,44 +173,26 @@ let split_all ~warn lv state max_card =
 
 (* Auxiliary function, used to register a 'Frama_C_split' variant. Only the
    parsing and the error handling is shared; all the hard work is done by [f] *)
-let aux_split f state actuals =
-  match actuals with
-  | [({ enode = (Lval lv | CastE (_, {enode = Lval lv}))}, _, _);
-     (_, card, _)] ->
-    begin
+let aux_split f state = function
+  | [({ enode = (Lval lv | CastE (_, {enode = Lval lv}))}, _); (_, card)] ->
+    let states =
       try
         let max_card =
           Integer.to_int (Ival.project_int (V.project_ival_bottom card))
         in
-        let states = f ~warn:true lv state max_card in
-        (* Add empty return *)
-        let states = List.map (fun state -> None, state) states in
-        { Value_types.c_values = states;
-          c_clobbered = Base.SetLattice.bottom;
-          c_cacheable = Value_types.Cacheable;
-          c_from = None;
-        }
+        f ~warn:true lv state max_card
       with V.Not_based_on_null | Ival.Not_Singleton_Int ->
         Value_parameters.warning ~current:true ~once:true
           "Cannot use non-constant split level %a" V.pretty card;
-        { Value_types.c_values = [(None, state)];
-          c_clobbered = Base.SetLattice.bottom;
-          c_cacheable = Value_types.Cacheable;
-          c_from = None;
-        }
-    end
+        [state]
+    in
+    Builtins.States states
   | _ ->
     Value_parameters.warning ~current:true ~once:true
       "Cannot interpret split directive. Ignoring";
-    { Value_types.c_values = [(None, state)];
-      c_clobbered = Base.SetLattice.bottom;
-      c_cacheable = Value_types.Cacheable;
-      c_from = None;
-    }
+    Builtins.States [state]
 
 let () =
-  !Db.Value.register_builtin "Frama_C_builtin_split" (aux_split split_v)
-let () =
-  !Db.Value.register_builtin "Frama_C_builtin_split_pointer" (aux_split split_pointer)
-let () =
-  !Db.Value.register_builtin "Frama_C_builtin_split_all" (aux_split split_all)
+  register_builtin "Frama_C_builtin_split" (aux_split split_v);
+  register_builtin "Frama_C_builtin_split_pointer" (aux_split split_pointer);
+  register_builtin "Frama_C_builtin_split_all" (aux_split split_all)

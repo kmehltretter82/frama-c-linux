@@ -63,37 +63,10 @@ type 'a callback_result =
   | NormalStore of 'a * int
   | Reuse of int
 
-type cacheable =
-  | Cacheable (** Functions whose result can be safely cached *)
-  | NoCache (** Functions whose result should not be cached, but for
-                which the caller can still be cached. Typically, functions
-                printing something during the analysis. *)
-  | NoCacheCallers (** Functions for which neither the call, neither the
-                       callers, can be cached *)
-
-
-(** Results of a a call to a function *)
-type call_result = {
-  c_values: (** Memory states after the call *)
-    (Cvalue.V_Offsetmap.t option
-       (** the value returned (ie. what is after the 'return' C keyword). *)
-     * Cvalue.Model.t
-       (** the memory state after the function has been executed *))
-    list;
-
-  c_clobbered: Base.SetLattice.t
-    (** An over-approximation of the bases in which addresses of local
-        variables might have been written *);
-
-  c_cacheable: cacheable
-    (** Is it possible to cache the result of this call? *);
-
-  c_from: (Function_Froms.froms * Locations.Zone.t) option
-    (** If not None, the froms of the function, and its sure outputs;
-        i.e. the dependencies of the result, and the dependencies
-        of each zone written to. *)
-}
-
+type call_froms = (Function_Froms.froms * Locations.Zone.t) option
+(** If not None, the froms of the function, and its sure outputs;
+    i.e. the dependencies of the result, and the dependencies
+    of each zone written to. *)
 
 (** Dependencies for the evaluation of a term or a predicate: for each
     program point involved, sets of zones that must be read *)

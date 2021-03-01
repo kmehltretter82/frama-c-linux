@@ -568,28 +568,20 @@ let constraint_trange idx size_arr =
 
 (* Applies a cvalue [builtin] to the list of arguments [args_list] in the
    current state of [env]. Returns [v, alarms], where [v] is the resulting
-   cvalue, or [None] if the builtin leads to [bottom]. *)
+   cvalue, which can be bottom. *)
 let apply_logic_builtin builtin env args_list =
   (* the call below could in theory return Builtins.Invalid_nb_of_args,
      but logic typing constraints prevent that. *)
-  let res, alarms = builtin (env_current_state env) args_list in
-  match res with
-  | None -> None
-  | Some offsm ->
-    let v = Option.get (Cvalue.V_Offsetmap.single_interval_value offsm) in
-    let v = Cvalue.V_Or_Uninitialized.get_v v in
-    Some (v, alarms)
+  builtin (env_current_state env) args_list
 
 (* Never raises exceptions; instead, returns [-1,+oo] in case of alarms
    (most imprecise result possible for the logic strlen/wcslen predicates). *)
 let eval_logic_charlen wrapper env v ldeps =
   let eover =
-    match apply_logic_builtin wrapper env [v] with
-    | None -> Cvalue.V.bottom
-    | Some (v, alarms) ->
-      if alarms
-      then Cvalue.V.inject_ival (Ival.inject_range (Some Int.minus_one) None)
-      else v
+    let v, alarms = apply_logic_builtin wrapper env [v] in
+    if alarms && not (Cvalue.V.is_bottom v)
+    then Cvalue.V.inject_ival (Ival.inject_range (Some Int.minus_one) None)
+    else v
   in
   let eunder = under_from_over eover in
   (* the C strlen function has type size_t, but the logic strlen function has
@@ -600,19 +592,16 @@ let eval_logic_charlen wrapper env v ldeps =
 (* Evaluates the logical predicates strchr/wcschr. *)
 let eval_logic_charchr builtin env s c ldeps_s ldeps_c =
   let eover =
-    match apply_logic_builtin builtin env [s; c] with
-    | None -> Cvalue.V.bottom
-    | Some (r, alarms) ->
-      if alarms
-      then Cvalue.V.zero_or_one
-      else
-        let ctrue = Cvalue.V.contains_non_zero r
-        and cfalse = Cvalue.V.contains_zero r in
-        match ctrue, cfalse with
-        | true, true -> Cvalue.V.zero_or_one
-        | true, false -> Cvalue.V.singleton_one
-        | false, true -> Cvalue.V.singleton_zero
-        | false, false -> assert false (* a logic alarm would have been raised*)
+    let v, alarms = apply_logic_builtin builtin env [s; c] in
+    if Cvalue.V.is_bottom v then v else
+    if alarms then Cvalue.V.zero_or_one else
+      let ctrue = Cvalue.V.contains_non_zero v
+      and cfalse = Cvalue.V.contains_zero v in
+      match ctrue, cfalse with
+      | true, true -> Cvalue.V.zero_or_one
+      | true, false -> Cvalue.V.singleton_one
+      | false, true -> Cvalue.V.singleton_zero
+      | false, false -> assert false (* a logic alarm would have been raised*)
   in
   let eunder = under_from_over eover in
   (* the C strchr function has type char*, but the logic strchr predicate has
@@ -629,11 +618,12 @@ let eval_logic_memchr_off builtin env s c n =
   let n_pos = Cvalue.V.narrow positive pred_n in
   let eover =
     if Cvalue.V.is_bottom n_pos then minus_one else
-      match apply_logic_builtin builtin env [s.eover; c.eover; n_pos] with
-      | None -> pred_n
-      | Some (v, alarms) ->
-        if alarms then Cvalue.V.join pred_n v else
-        if Cvalue.V.equal n_pos pred_n then v else Cvalue.V.join minus_one v
+      let args = [s.eover; c.eover; n_pos] in
+      let v, alarms = apply_logic_builtin builtin env args in
+      if Cvalue.V.is_bottom v then pred_n else
+      if alarms then Cvalue.V.join pred_n v else
+      if Cvalue.V.equal n_pos pred_n then v else
+        Cvalue.V.join minus_one v
   in
   let ldeps = join_logic_deps s.ldeps (join_logic_deps c.ldeps n.ldeps) in
   { (einteger eover) with ldeps }
@@ -1681,12 +1671,12 @@ let eval_valid_read_str ~wide env v =
     if wide then Builtins_string.frama_c_wcslen_wrapper
     else Builtins_string.frama_c_strlen_wrapper
   in
-  match apply_logic_builtin wrapper env [v] with
-  | None -> (* bottom state => string always invalid *) False
-  | Some (_res, alarms) ->
-    if alarms
-    then (* alarm => string possibly invalid *) Unknown
-    else (* no alarm => string always valid for reading *) True
+  let v, alarms = apply_logic_builtin wrapper env [v] in
+  if Cvalue.V.is_bottom v
+  then False (* bottom state => string always invalid *)
+  else if alarms
+  then Unknown (* alarm => string possibly invalid *)
+  else True (* no alarm => string always valid for reading *)
 
 (* Evaluates a [valid_string] or [valid_wstring] predicate.
    First, we check the constness of the arguments.

@@ -37,7 +37,7 @@ module type S = sig
 
   val call:
     stmt -> lval option -> exp -> exp list -> state ->
-    state list or_bottom * Value_types.cacheable
+    state list or_bottom * Eval.cacheable
 
   val check_unspecified_sequence:
     Cil_types.stmt ->
@@ -50,7 +50,7 @@ module type S = sig
 
   type call_result = {
     states: state list or_bottom;
-    cacheable: Value_types.cacheable;
+    cacheable: Eval.cacheable;
     builtin: bool;
   }
 

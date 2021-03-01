@@ -218,6 +218,9 @@ val dkey_callbacks : category
 (** Debug category used to print the usage of widenings. *)
 val dkey_widening : category
 
+(** Registers available cvalue builtins for the -eva-builtin option. *)
+val register_builtin: string -> unit
+
 (** Registers available domain names for the -eva-domains option. *)
 val register_domain: name:string -> descr:string -> unit
 

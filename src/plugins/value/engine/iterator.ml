@@ -66,7 +66,7 @@ module Make_Dataflow
 
   let kf = AnalysisParam.kf
   let fundec = Kernel_function.get_definition kf
-  let cacheable = ref Value_types.Cacheable
+  let cacheable = ref Eval.Cacheable
 
 
   (* --- Plugin parameters --- *)
@@ -273,9 +273,9 @@ module Make_Dataflow
     let result, call_cacheable =
       Transfer.call stmt dest callee args state
     in
-    if call_cacheable = Value_types.NoCacheCallers then
+    if call_cacheable = Eval.NoCacheCallers then
       (* Propagate info that the current call cannot be cached either *)
-      cacheable := Value_types.NoCacheCallers;
+      cacheable := Eval.NoCacheCallers;
     Bottom.list_of_bot result
 
   let transfer_instr (stmt : stmt) (instr : instr) : transfer_function =

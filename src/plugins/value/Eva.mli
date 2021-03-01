@@ -101,3 +101,34 @@ module Eva_annotations: sig
   val add_subdivision_annot : emitter:Emitter.t -> loc:Cil_types.location ->
     Cil_types.stmt -> int -> unit
 end
+
+(** Analysis builtins for the cvalue domain, more efficient than the analysis
+    of the C functions. See {builtins.mli} for more details. *)
+module Builtins: sig
+  open Cil_types
+
+  exception Invalid_nb_of_args of int
+  exception Outside_builtin_possibilities
+
+  type builtin_type = unit -> typ * typ list
+  type cacheable = Cacheable | NoCache | NoCacheCallers
+
+  type full_result = {
+    c_values: (Cvalue.V.t option * Cvalue.Model.t) list;
+    c_clobbered: Base.SetLattice.t;
+    c_from: (Function_Froms.froms * Locations.Zone.t) option;
+  }
+
+  type call_result =
+    | States of Cvalue.Model.t list
+    | Result of Cvalue.V.t list
+    | Full of full_result
+
+  type builtin = Cvalue.Model.t -> (exp * Cvalue.V.t) list -> call_result
+
+  val register_builtin:
+    string -> ?replace:string -> ?typ:builtin_type -> cacheable ->
+    builtin -> unit
+
+  val is_builtin: string -> bool
+end

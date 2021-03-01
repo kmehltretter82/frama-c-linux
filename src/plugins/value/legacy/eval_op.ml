@@ -39,14 +39,6 @@ let offsetmap_of_loc location state =
   in
   Precise_locs.fold aux location `Bottom
 
-let wrap_int i = Some (offsetmap_of_v ~typ:Cil.intType i)
-let wrap_ptr p = Some (offsetmap_of_v ~typ:Cil.intPtrType p)
-let wrap_double d = Some (offsetmap_of_v ~typ:Cil.doubleType d)
-let wrap_float d = Some (offsetmap_of_v ~typ:Cil.floatType d)
-let wrap_size_t i =
-  Some (offsetmap_of_v ~typ:(Cil.theMachine.Cil.typeOfSizeOf) i)
-let wrap_long_long i = Some (offsetmap_of_v ~typ:Cil.longLongType i)
-
 let v_uninit_of_offsetmap ~typ offsm =
   let size = Eval_typ.sizeof_lval_typ typ in
   match size with

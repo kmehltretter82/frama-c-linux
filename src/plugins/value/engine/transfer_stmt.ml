@@ -32,7 +32,7 @@ module type S = sig
   val assume: state -> stmt -> exp -> bool -> state or_bottom
   val call:
     stmt -> lval option -> exp -> exp list -> state ->
-    state list or_bottom * Value_types.cacheable
+    state list or_bottom * Eval.cacheable
   val check_unspecified_sequence:
     stmt ->
     state -> (stmt * lval list * lval list * lval list * stmt ref list) list ->
@@ -40,7 +40,7 @@ module type S = sig
   val enter_scope: kernel_function -> varinfo list -> state -> state
   type call_result = {
     states: state list or_bottom;
-    cacheable: Value_types.cacheable;
+    cacheable: Eval.cacheable;
     builtin: bool;
   }
   val compute_call_ref:
@@ -290,7 +290,7 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   type call_result = {
     states: state list or_bottom;
-    cacheable: Value_types.cacheable;
+    cacheable: cacheable;
     builtin: bool;
   }
 
@@ -317,7 +317,7 @@ module Make (Abstract: Abstractions.Eva) = struct
           Domain.Store.register_initial_state (Value_util.call_stack ()) state;
           !compute_call_ref stmt call state
         | `Bottom ->
-          { states = `Bottom; cacheable = Value_types.Cacheable; builtin=false }
+          { states = `Bottom; cacheable = Cacheable; builtin=false }
       in
       cleanup ();
       res
@@ -716,15 +716,8 @@ module Make (Abstract: Abstractions.Eva) = struct
     let cvalue_state = Domain.get_cvalue_or_top state in
     Db.Value.Call_Value_Callbacks.apply (cvalue_state, stack_with_call);
     Db.Value.merge_initial_state (Value_util.call_stack ()) cvalue_state;
-    let result =
-      { Value_types.c_values = [ None, cvalue_state] ;
-        c_clobbered = Base.SetLattice.bottom;
-        c_from = None;
-        c_cacheable = Value_types.Cacheable;
-      }
-    in
     Db.Value.Call_Type_Value_Callbacks.apply
-      (`Builtin result, cvalue_state, stack_with_call)
+      (`Builtin None, cvalue_state, stack_with_call)
 
 
   (* --------------------- Process the call statement ---------------------- *)
@@ -737,7 +730,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       Eval.eval_function_exp ~subdivnb funcexp ~args state
     in
     Alarmset.emit ki_call alarms;
-    let cacheable = ref Value_types.Cacheable in
+    let cacheable = ref Cacheable in
     let eval =
       functions >>- fun functions ->
       let current_kf = Value_util.current_kf () in
@@ -757,8 +750,8 @@ module Make (Abstract: Abstractions.Eva) = struct
           (* Do the call. *)
           let c, states = do_one_call valuation stmt lval_option call state in
           (* If needed, propagate that callers cannot be cached. *)
-          if c = Value_types.NoCacheCallers then
-            cacheable := Value_types.NoCacheCallers;
+          if c = NoCacheCallers then
+            cacheable := NoCacheCallers;
           states
       in
       (* Process each possible function apart, and append the result list. *)

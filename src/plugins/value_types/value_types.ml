@@ -114,18 +114,7 @@ type 'a callback_result =
   | NormalStore of 'a * int
   | Reuse of int
 
-type cacheable =
-  | Cacheable
-  | NoCache
-  | NoCacheCallers
-
-
-type call_result = {
-  c_values: (Cvalue.V_Offsetmap.t option * Cvalue.Model.t) list;
-  c_clobbered: Base.SetLattice.t;
-  c_cacheable: cacheable;
-  c_from: (Function_Froms.froms * Locations.Zone.t) option
-}
+type call_froms = (Function_Froms.froms * Locations.Zone.t) option
 
 type logic_dependencies = Locations.Zone.t Cil_datatype.Logic_label.Map.t
 
