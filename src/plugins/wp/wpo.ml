@@ -190,8 +190,13 @@ struct
 
   let is_trivial g = Conditions.is_trivial g.sequent
 
+  let dkey = Wp_parameters.register_category "qed"
+
   let apply option phi g =
-    try g.sequent <- phi g.sequent
+    try
+      Db.yield () ;
+      Wp_parameters.debug ~dkey "Appy %s" option ;
+      g.sequent <- phi g.sequent ;
     with exn when Wp_parameters.protect exn ->
       Wp_parameters.warning ~current:false ~once:true
         "Goal simplification aborted (%s):@\n\
@@ -207,7 +212,7 @@ struct
   let preprocess g =
     if Wp_parameters.Let.get () then
       begin
-        apply "introcution" Conditions.introduction_eq g ;
+        apply "introduction" Conditions.introduction_eq g ;
         let fold acc (get,solver) = if get () then solver::acc else acc in
         let solvers = List.fold_left fold [] default_simplifiers in
         apply "-wp-simplify-*" (Conditions.simplify ~solvers) g ;
@@ -229,26 +234,24 @@ struct
       g.sequent <- Conditions.trivial ;
     g.obligation <- Conditions.close g.sequent
 
-  let dkey = Wp_parameters.register_category "prover"
-
-  let safecompute g =
+  let safecompute ~pid g =
     begin
       g.simplified <- true ;
       let timer = ref 0.0 in
-      Wp_parameters.debug ~dkey "Simplify goal" ;
+      Wp_parameters.debug ~dkey "Simplify %a" WpPropId.pretty pid ;
       Command.time ~rmax:timer preprocess g ;
       Wp_parameters.debug ~dkey "Simplification time: %a"
         Rformat.pp_time !timer ;
       g.time <- !timer ;
     end
 
-  let compute g =
+  let compute ~pid g =
     if not g.simplified then
       Lang.local ~vars:(Conditions.vars_seq g.sequent)
-        safecompute g
+        (safecompute ~pid) g
 
-  let compute_proof g = compute g ; g.obligation
-  let compute_descr g = compute g ; g.sequent
+  let compute_proof ~pid g = compute ~pid g ; g.obligation
+  let compute_descr ~pid g = compute ~pid g ; g.sequent
   let get_descr g = g.sequent
   let qed_time g = g.time
 
@@ -324,7 +327,7 @@ struct
     effect = None ;
   }
 
-  let resolve vcq = GOAL.compute_proof vcq.goal == Lang.F.p_true
+  let resolve ~pid vcq = GOAL.compute_proof ~pid vcq.goal == Lang.F.p_true
   let is_trivial vcq = GOAL.is_trivial vcq.goal
 
   let pp_effect fmt = function
@@ -350,7 +353,7 @@ struct
           Format.fprintf fmt "@].@\n" ;
         end ;
       pp_warnings fmt vc.warn ;
-      Pcond.pretty fmt (GOAL.compute_descr vc.goal) ;
+      Pcond.pretty fmt (GOAL.compute_descr ~pid vc.goal) ;
       List.iter
         (fun (prover,result) ->
            if result.verdict <> NoResult then
@@ -792,8 +795,11 @@ let is_trivial g =
 
 let reduce g =
   match g.po_formula with
-  | GoalLemma vc -> WpContext.on_context (get_context g) VC_Lemma.is_trivial vc
-  | GoalAnnot vc -> WpContext.on_context (get_context g) VC_Annot.resolve vc
+  | GoalLemma vc ->
+      WpContext.on_context (get_context g) VC_Lemma.is_trivial vc
+  | GoalAnnot vc ->
+      let pid = g.po_pid in
+      WpContext.on_context (get_context g) (VC_Annot.resolve ~pid) vc
 
 let resolve g =
   let valid = reduce g in
@@ -806,7 +812,8 @@ let compute g =
   let ctxt = get_context g in
   match g.po_formula with
   | GoalAnnot { VC_Annot.axioms ; VC_Annot.goal = goal } ->
-      axioms , WpContext.on_context ctxt GOAL.compute_descr goal
+      let pid = g.po_pid in
+      axioms , WpContext.on_context ctxt (GOAL.compute_descr ~pid) goal
   | GoalLemma ({ VC_Lemma.depends = depends ; VC_Lemma.lemma = lemma } as w) ->
       let open Definitions in
       Some( lemma.l_cluster , depends ) ,

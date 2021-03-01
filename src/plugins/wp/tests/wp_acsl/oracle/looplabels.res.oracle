@@ -14,8 +14,13 @@ Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
-  Have: (0 < n) /\ valid_rw(Malloc_0, a_2, n) /\
-      valid_rw(Malloc_0, a_1, n) /\ separated(a_2, n, a_1, n).
+  Have: 0 < n.
+  (* Pre-condition *)
+  Have: valid_rw(Malloc_0, a_2, n).
+  (* Pre-condition *)
+  Have: valid_rw(Malloc_0, a_1, n).
+  (* Pre-condition *)
+  Have: separated(a_2, n, a_1, n).
   (* Invariant *)
   Have: P_IsEqual(havoc(Mint_undef_0, Mint_0, a_1, n), a, b, i).
   (* Invariant *)
@@ -35,8 +40,13 @@ Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
-  Have: (0 < n) /\ valid_rw(Malloc_0, a_2, n) /\
-      valid_rw(Malloc_0, a_1, n) /\ separated(a_2, n, a_1, n).
+  Have: 0 < n.
+  (* Pre-condition *)
+  Have: valid_rw(Malloc_0, a_2, n).
+  (* Pre-condition *)
+  Have: valid_rw(Malloc_0, a_1, n).
+  (* Pre-condition *)
+  Have: separated(a_2, n, a_1, n).
   (* Invariant *)
   Have: P_IsEqual(havoc(Mint_undef_0, Mint_0, a_1, n), a, b, i).
   (* Invariant *)
@@ -63,8 +73,13 @@ Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
-  Have: (0 < n) /\ valid_rw(Malloc_0, a_3, n) /\
-      valid_rw(Malloc_0, a_1, n) /\ separated(a_3, n, a_1, n).
+  Have: 0 < n.
+  (* Pre-condition *)
+  Have: valid_rw(Malloc_0, a_3, n).
+  (* Pre-condition *)
+  Have: valid_rw(Malloc_0, a_1, n).
+  (* Pre-condition *)
+  Have: separated(a_3, n, a_1, n).
   (* Invariant *)
   Have: P_IsEqual(a_2, a, b, i).
   (* Invariant *)
@@ -84,8 +99,13 @@ Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
-  Have: (0 < n) /\ valid_rw(Malloc_0, a_1, n) /\
-      valid_rw(Malloc_0, a_2, n) /\ separated(a_1, n, a_2, n).
+  Have: 0 < n.
+  (* Pre-condition *)
+  Have: valid_rw(Malloc_0, a_1, n).
+  (* Pre-condition *)
+  Have: valid_rw(Malloc_0, a_2, n).
+  (* Pre-condition *)
+  Have: separated(a_1, n, a_2, n).
 }
 Prove: P_IsEqual(Mint_0, a, b, 0).
 
@@ -108,8 +128,13 @@ Assume {
   (* Goal *)
   When: !invalid(Malloc_0, a_3, 1).
   (* Pre-condition *)
-  Have: (0 < n) /\ valid_rw(Malloc_0, a_2, n) /\
-      valid_rw(Malloc_0, a_1, n) /\ separated(a_2, n, a_1, n).
+  Have: 0 < n.
+  (* Pre-condition *)
+  Have: valid_rw(Malloc_0, a_2, n).
+  (* Pre-condition *)
+  Have: valid_rw(Malloc_0, a_1, n).
+  (* Pre-condition *)
+  Have: separated(a_2, n, a_1, n).
   (* Invariant *)
   Have: P_IsEqual(havoc(Mint_undef_0, Mint_0, a_1, n), a, b, i).
   (* Invariant *)

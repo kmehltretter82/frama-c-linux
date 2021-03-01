@@ -8,11 +8,10 @@
 
 Goal Post-condition for 'false' (file tests/wp_plugin/bool.i, line 28) in 'band_bool':
 Assume {
-  Type: is_bool(a) /\ is_bool(a_1) /\ is_bool(b) /\ is_bool(b_1) /\
-      is_bool(band_bool_0) /\ is_bool(retres_0).
-  Have: (a_1 = a) /\ (b_1 = b).
+  Type: is_bool(a) /\ is_bool(b) /\ is_bool(band_bool_0) /\
+      is_bool(retres_0).
   (* Pre-condition for 'false' *)
-  Have: (a_1 != 1) \/ (b_1 != 1).
+  Have: (a != 1) \/ (b != 1).
   Have: (if (land(a, b) = 0) then 0 else 1) = retres_0.
   (* Return *)
   Have: retres_0 = band_bool_0.
@@ -26,11 +25,10 @@ Prove: band_bool_0 = 0.
 
 Goal Post-condition for 'true' (file tests/wp_plugin/bool.i, line 25) in 'band_bool':
 Assume {
-  Type: is_bool(a) /\ is_bool(a_1) /\ is_bool(b) /\ is_bool(b_1) /\
-      is_bool(band_bool_0) /\ is_bool(retres_0).
-  Have: (a_1 = a) /\ (b_1 = b).
+  Type: is_bool(a) /\ is_bool(b) /\ is_bool(band_bool_0) /\
+      is_bool(retres_0).
   (* Pre-condition for 'true' *)
-  Have: (a_1 = 1) /\ (b_1 = 1).
+  Have: (a = 1) /\ (b = 1).
   Have: (if (land(a, b) = 0) then 0 else 1) = retres_0.
   (* Return *)
   Have: retres_0 = band_bool_0.
@@ -44,11 +42,9 @@ Prove: band_bool_0 = 1.
 
 Goal Post-condition for 'false' (file tests/wp_plugin/bool.i, line 18) in 'bor_bool':
 Assume {
-  Type: is_bool(a) /\ is_bool(a_1) /\ is_bool(b) /\ is_bool(b_1) /\
-      is_bool(bor_bool_0) /\ is_bool(retres_0).
-  Have: (a_1 = a) /\ (b_1 = b).
+  Type: is_bool(a) /\ is_bool(b) /\ is_bool(bor_bool_0) /\ is_bool(retres_0).
   (* Pre-condition for 'false' *)
-  Have: (a_1 != 1) /\ (b_1 != 1).
+  Have: (a != 1) /\ (b != 1).
   Have: (if ((a = 0) & (b = 0)) then 0 else 1) = retres_0.
   (* Return *)
   Have: retres_0 = bor_bool_0.
@@ -62,11 +58,9 @@ Prove: bor_bool_0 = 0.
 
 Goal Post-condition for 'true' (file tests/wp_plugin/bool.i, line 15) in 'bor_bool':
 Assume {
-  Type: is_bool(a) /\ is_bool(a_1) /\ is_bool(b) /\ is_bool(b_1) /\
-      is_bool(bor_bool_0) /\ is_bool(retres_0).
-  Have: (a_1 = a) /\ (b_1 = b).
+  Type: is_bool(a) /\ is_bool(b) /\ is_bool(bor_bool_0) /\ is_bool(retres_0).
   (* Pre-condition for 'true' *)
-  Have: (a_1 = 1) \/ (b_1 = 1).
+  Have: (a = 1) \/ (b = 1).
   Have: (if ((a = 0) & (b = 0)) then 0 else 1) = retres_0.
   (* Return *)
   Have: retres_0 = bor_bool_0.
@@ -80,11 +74,10 @@ Prove: bor_bool_0 = 1.
 
 Goal Post-condition for 'false' (file tests/wp_plugin/bool.i, line 37) in 'bxor_bool':
 Assume {
-  Type: is_bool(a) /\ is_bool(a_1) /\ is_bool(b) /\ is_bool(b_1) /\
-      is_bool(bxor_bool_0) /\ is_bool(retres_0).
-  Have: (a_1 = a) /\ (b_1 = b).
+  Type: is_bool(a) /\ is_bool(b) /\ is_bool(bxor_bool_0) /\
+      is_bool(retres_0).
   (* Pre-condition for 'false' *)
-  Have: ((a_1 != 0) \/ (b_1 != 1)) /\ ((a_1 != 1) \/ (b_1 != 0)).
+  Have: ((a != 0) \/ (b != 1)) /\ ((a != 1) \/ (b != 0)).
   Have: (if (b = a) then 0 else 1) = retres_0.
   (* Return *)
   Have: retres_0 = bxor_bool_0.
@@ -98,11 +91,10 @@ Prove: bxor_bool_0 = 0.
 
 Goal Post-condition for 'true' (file tests/wp_plugin/bool.i, line 34) in 'bxor_bool':
 Assume {
-  Type: is_bool(a) /\ is_bool(a_1) /\ is_bool(b) /\ is_bool(b_1) /\
-      is_bool(bxor_bool_0) /\ is_bool(retres_0).
-  Have: (a_1 = a) /\ (b_1 = b).
+  Type: is_bool(a) /\ is_bool(b) /\ is_bool(bxor_bool_0) /\
+      is_bool(retres_0).
   (* Pre-condition for 'true' *)
-  Have: ((a_1 = 0) /\ (b_1 = 1)) \/ ((a_1 = 1) /\ (b_1 = 0)).
+  Have: ((a = 0) /\ (b = 1)) \/ ((a = 1) /\ (b = 0)).
   Have: (if (b = a) then 0 else 1) = retres_0.
   (* Return *)
   Have: retres_0 = bxor_bool_0.

@@ -2,11 +2,11 @@
 [kernel] Parsing tests/wp_typed/user_init.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] [CFG] Goal init_exits : Valid (Unreachable)
+[wp] Warning: Missing RTE guards
 [wp] [CFG] Goal init_t1_exits : Valid (Unreachable)
 [wp] [CFG] Goal init_t2_v1_exits : Valid (Unreachable)
 [wp] [CFG] Goal init_t2_v2_exits : Valid (Unreachable)
 [wp] [CFG] Goal init_t2_v3_exits : Valid (Unreachable)
-[wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function init
 ------------------------------------------------------------
@@ -20,7 +20,9 @@ Assume {
   (* Goal *)
   When: (0 <= i_1) /\ (i_1 < n) /\ is_sint32(i_1).
   (* Pre-condition *)
-  Have: (0 <= n) /\ valid_rw(Malloc_0, a_1, n).
+  Have: valid_rw(Malloc_0, a_1, n).
+  (* Pre-condition *)
+  Have: 0 <= n.
   (* Invariant 'Partial' *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
       (havoc(Mint_undef_0, Mint_0, a_1, n)[shift_sint32(a, i_2)] = v))).
@@ -43,7 +45,9 @@ Assume {
   (* Goal *)
   When: (0 <= i_1) /\ (i_1 <= i) /\ is_sint32(i_1).
   (* Pre-condition *)
-  Have: (0 <= n) /\ valid_rw(Malloc_0, a_1, n).
+  Have: valid_rw(Malloc_0, a_1, n).
+  (* Pre-condition *)
+  Have: 0 <= n.
   (* Invariant 'Partial' *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
       (a_2[shift_sint32(a, i_2)] = v))).
@@ -68,7 +72,9 @@ Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
-  Have: (0 <= n) /\ valid_rw(Malloc_0, a_1, n).
+  Have: valid_rw(Malloc_0, a_1, n).
+  (* Pre-condition *)
+  Have: 0 <= n.
   (* Invariant 'Partial' *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
       (havoc(Mint_undef_0, Mint_0, a_1, n)[shift_sint32(a, i_1)] = v))).
@@ -108,7 +114,9 @@ Assume {
   (* Goal *)
   When: !invalid(Malloc_0, a_2, 1).
   (* Pre-condition *)
-  Have: (0 <= n) /\ valid_rw(Malloc_0, a_1, n).
+  Have: valid_rw(Malloc_0, a_1, n).
+  (* Pre-condition *)
+  Have: 0 <= n.
   (* Invariant 'Partial' *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
       (havoc(Mint_undef_0, Mint_0, a_1, n)[shift_sint32(a, i_1)] = v))).
@@ -835,10 +843,10 @@ Assume {
   Have: forall i_4,i_3 : Z. ((0 <= i_4) -> ((0 <= i_3) -> ((i_4 <= 9) ->
       ((i_3 <= 19) ->
       (((i_4 < 0) \/ (i_3 < 0) \/ (10 <= i_4) \/ (20 <= i_3)) ->
-      (t2_0[i_4][i_3] = t2_2[i_4][i_3])))))).
+      (t2_2[i_4][i_3] = t2_0[i_4][i_3])))))).
   (* Invariant 'Previous_i' *)
   Have: forall i_4,i_3 : Z. ((0 <= i_4) -> ((i_4 < i) -> ((0 <= i_3) ->
-      ((i_3 <= 19) -> (t2_0[i_4][i_3] = t2_2[i_4][i_3]))))).
+      ((i_3 <= 19) -> (t2_2[i_4][i_3] = t2_0[i_4][i_3]))))).
   (* Invariant 'Partial_j' *)
   Have: forall i_3 : Z. ((0 <= i_3) -> ((i_3 <= 19) -> (m[i_3] = v))).
 }
@@ -1331,7 +1339,7 @@ Assume {
   Have: i <= 9.
   (* Invariant 'Previous_i' *)
   Have: forall i_4,i_3 : Z. ((0 <= i_4) -> ((i_4 < i) -> ((0 <= i_3) ->
-      ((i_3 <= 19) -> (t2_0[i_4][i_3] = t2_1[i_4][i_3]))))).
+      ((i_3 <= 19) -> (t2_1[i_4][i_3] = t2_0[i_4][i_3]))))).
   (* Invariant 'Partial_j' *)
   Have: forall i_3 : Z. ((0 <= i_3) -> ((i_3 <= 19) -> (m[i_3] = v))).
 }

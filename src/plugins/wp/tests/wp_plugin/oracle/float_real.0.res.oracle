@@ -15,10 +15,10 @@ Assume {
   If x < ((1.0/100000) + y)
   Then {
     If y < ((1.0/100000) + x)
-    Then { (* Return *) Have: dequal_0 = 1. }
-    Else { (* Return *) Have: dequal_0 = 0. }
+    Then { Have: dequal_0 = 1. }
+    Else { Have: dequal_0 = 0. }
   }
-  Else { (* Return *) Have: dequal_0 = 0. }
+  Else { Have: dequal_0 = 0. }
 }
 Prove: (abs_real(x - y) < (1.0/100000)) <-> (dequal_0 != 0).
 

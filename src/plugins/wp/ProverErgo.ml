@@ -491,7 +491,7 @@ let prove_annot context pid vcq ~config ~mode =
   Task.todo
     begin fun () ->
       let axioms = vcq.VC_Annot.axioms in
-      let prop = GOAL.compute_proof vcq.VC_Annot.goal in
+      let prop = GOAL.compute_proof ~pid vcq.VC_Annot.goal in
       prove_prop ~pid ~config ~mode ~context ~axioms ~prop
     end
 

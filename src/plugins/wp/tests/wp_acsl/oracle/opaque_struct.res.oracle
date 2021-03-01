@@ -114,7 +114,9 @@ Assume {
   (* Heap *)
   Type: (region(p.base) <= 0) /\ linked(Malloc_0) /\ cinits(Init_0).
   (* Pre-condition *)
-  Have: IsInit_S1_S(p, Init_0) /\ valid_rw(Malloc_0, p, Length_of_S1_S).
+  Have: IsInit_S1_S(p, Init_0).
+  (* Pre-condition *)
+  Have: valid_rw(Malloc_0, p, Length_of_S1_S).
   (* Call Effects *)
   Have: monotonic_init(Init_0, a).
 }

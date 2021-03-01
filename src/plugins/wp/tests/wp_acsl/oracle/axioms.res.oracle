@@ -15,7 +15,9 @@ Assume {
   (* Heap *)
   Type: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
-  Have: (a <= b) /\ valid_rw(Malloc_0, a_1, 1 + b - a).
+  Have: valid_rw(Malloc_0, a_1, 1 + b - a).
+  (* Pre-condition *)
+  Have: a <= b.
   (* Invariant 'Positive' *)
   Have: forall i_1 : Z. ((a <= i_1) -> ((i_1 < i) ->
       (0 < a_2[shift_sint32(t, i_1)]))).
@@ -37,7 +39,9 @@ Assume {
   (* Heap *)
   Type: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
-  Have: (a <= b) /\ valid_rw(Malloc_0, a_1, 1 + b - a).
+  Have: valid_rw(Malloc_0, a_1, 1 + b - a).
+  (* Pre-condition *)
+  Have: a <= b.
   (* Invariant 'Positive' *)
   Have: forall i_1 : Z. ((a <= i_1) -> ((i_1 < i) ->
       (0 < a_2[shift_sint32(t, i_1)]))).
@@ -59,7 +63,9 @@ Assume {
   (* Heap *)
   Type: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
-  Have: (a <= b) /\ valid_rw(Malloc_0, a_1, 1 + b - a).
+  Have: valid_rw(Malloc_0, a_1, 1 + b - a).
+  (* Pre-condition *)
+  Have: a <= b.
   (* Invariant 'Positive' *)
   Have: forall i_1 : Z. ((a <= i_1) -> ((i_1 < i) ->
       (0 < havoc(Mint_undef_0, Mint_0, a_1, i - a)[shift_sint32(t, i_1)]))).
@@ -78,7 +84,9 @@ Assume {
   (* Heap *)
   Type: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
-  Have: (a <= b) /\ valid_rw(Malloc_0, shift_sint32(t, a), 1 + b - a).
+  Have: valid_rw(Malloc_0, shift_sint32(t, a), 1 + b - a).
+  (* Pre-condition *)
+  Have: a <= b.
 }
 Prove: a <= (1 + b).
 
@@ -95,7 +103,9 @@ Assume {
   (* Goal *)
   When: (a <= i_1) /\ (i_1 <= i) /\ is_sint32(i_1).
   (* Pre-condition *)
-  Have: (a <= b) /\ valid_rw(Malloc_0, a_1, 1 + b - a).
+  Have: valid_rw(Malloc_0, a_1, 1 + b - a).
+  (* Pre-condition *)
+  Have: a <= b.
   (* Invariant 'Positive' *)
   Have: forall i_2 : Z. ((a <= i_2) -> ((i_2 < i) ->
       (0 < a_2[shift_sint32(t, i_2)]))).
@@ -136,7 +146,9 @@ Assume {
   (* Goal *)
   When: !invalid(Malloc_0, a_2, 1).
   (* Pre-condition *)
-  Have: (a <= b) /\ valid_rw(Malloc_0, a_1, 1 + b - a).
+  Have: valid_rw(Malloc_0, a_1, 1 + b - a).
+  (* Pre-condition *)
+  Have: a <= b.
   (* Invariant 'Positive' *)
   Have: forall i_1 : Z. ((a <= i_1) -> ((i_1 < i) ->
       (0 < havoc(Mint_undef_0, Mint_0, a_1, i - a)[shift_sint32(t, i_1)]))).
@@ -160,7 +172,9 @@ Assume {
   (* Heap *)
   Type: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
-  Have: (a <= b) /\ valid_rw(Malloc_0, a_1, 1 + b - a).
+  Have: valid_rw(Malloc_0, a_1, 1 + b - a).
+  (* Pre-condition *)
+  Have: a <= b.
 }
 Prove: i <= (1 + b).
 

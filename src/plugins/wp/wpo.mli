@@ -54,10 +54,10 @@ sig
   val trivial : t
   val is_trivial : t -> bool
   val make : Conditions.sequent -> t
-  val compute_proof : t -> F.pred
-  val compute_descr : t -> Conditions.sequent
+  val compute : pid:WpPropId.prop_id -> t -> unit
+  val compute_proof : pid:WpPropId.prop_id -> t -> F.pred
+  val compute_descr : pid:WpPropId.prop_id -> t -> Conditions.sequent
   val get_descr : t -> Conditions.sequent
-  val compute : t -> unit
   val qed_time : t -> float
 end
 
@@ -88,8 +88,8 @@ sig
     effect : (stmt * effect_source) option ;
   }
 
-  val resolve : t -> bool
   val is_trivial : t -> bool
+  val resolve : pid:prop_id -> t -> bool
   val cache_descr : pid:prop_id -> t -> (prover * result) list -> string
 
 end

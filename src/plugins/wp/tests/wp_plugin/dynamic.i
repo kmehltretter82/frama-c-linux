@@ -1,9 +1,11 @@
 /* run.config
-   OPT: -wp-dynamic -wp-msg-key "calls"
+   OPT: -wp-dynamic -wp-msg-key "calls" -wp-skip-fct="guarded_call"
+   OPT: -wp-dynamic -wp-msg-key "calls" -wp-fct="guarded_call" -wp-no-let
 */
 
 /* run.config_qualif
-   OPT: -wp-dynamic -wp
+   OPT: -wp-dynamic -wp -wp-skip-fct="guarded_call"
+   OPT: -wp-dynamic -wp -wp-fct="guarded_call" -wp-no-let
 */
 //-----------------------------------------------------------------------------
 /*@
@@ -61,7 +63,7 @@ int h0(void);
   @   assigns X1;
   @   ensures X1==1; */
 int behavior (int (*p)(void)) {
-  //@ calls h1, h2; // Shall not be proved in default behavior (known bug)
+  //@ calls h1, h2; // Shall not be proved in default behavior
   return (*p)();
 }
 

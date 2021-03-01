@@ -1104,7 +1104,7 @@ let task_of_wpo wpo =
   | Wpo.GoalAnnot v ->
       let pid = wpo.Wpo.po_pid in
       let axioms = v.Wpo.VC_Annot.axioms in
-      let prop = Wpo.GOAL.compute_proof v.Wpo.VC_Annot.goal in
+      let prop = Wpo.GOAL.compute_proof ~pid v.Wpo.VC_Annot.goal in
       (* Format.printf "Goal: %a@." Lang.F.pp_pred prop; *)
       prove_prop ~pid prop ?axioms
   | Wpo.GoalLemma v ->

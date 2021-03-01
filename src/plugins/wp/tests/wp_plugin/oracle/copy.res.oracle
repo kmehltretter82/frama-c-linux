@@ -17,7 +17,9 @@ Assume {
   (* Goal *)
   When: (0 <= i_1) /\ (i_1 < n).
   (* Pre-condition *)
-  Have: (0 <= n) /\ separated(a_1, n, shift_sint32(b, 0), n).
+  Have: 0 <= n.
+  (* Pre-condition *)
+  Have: separated(a_1, n, shift_sint32(b, 0), n).
   (* Invariant 'Copy' *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
       (a_2[shift_sint32(b, i_2)] = a_2[shift_sint32(a, i_2)]))).
@@ -41,7 +43,9 @@ Assume {
   (* Goal *)
   When: (0 <= i_1) /\ (i_1 <= i).
   (* Pre-condition *)
-  Have: (0 <= n) /\ separated(a_1, n, shift_sint32(b, 0), n).
+  Have: 0 <= n.
+  (* Pre-condition *)
+  Have: separated(a_1, n, shift_sint32(b, 0), n).
   (* Invariant 'Copy' *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
       (a_2[shift_sint32(b, i_2)] = a_2[shift_sint32(a, i_2)]))).
@@ -74,7 +78,9 @@ Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(b.base) <= 0).
   (* Pre-condition *)
-  Have: (0 <= n) /\ separated(a_1, n, shift_sint32(b, 0), n).
+  Have: 0 <= n.
+  (* Pre-condition *)
+  Have: separated(a_1, n, shift_sint32(b, 0), n).
   (* Invariant 'Copy' *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
       (a_2[shift_sint32(b, i_1)] = a_2[shift_sint32(a, i_1)]))).
@@ -109,7 +115,9 @@ Assume {
   (* Goal *)
   When: (0 <= i_1) /\ (i_1 < i).
   (* Pre-condition *)
-  Have: (0 <= n) /\ separated(a_1, n, shift_sint32(b, 0), n).
+  Have: 0 <= n.
+  (* Pre-condition *)
+  Have: separated(a_1, n, shift_sint32(b, 0), n).
   (* Invariant 'Copy' *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
       (a_2[shift_sint32(b, i_2)] = a_2[shift_sint32(a, i_2)]))).
@@ -134,7 +142,9 @@ Assume {
   (* Goal *)
   When: (0 <= i_1) /\ (i_1 < i).
   (* Pre-condition *)
-  Have: (0 <= n) /\ separated(a_1, n, shift_sint32(b, 0), n).
+  Have: 0 <= n.
+  (* Pre-condition *)
+  Have: separated(a_1, n, shift_sint32(b, 0), n).
   (* Invariant 'Copy' *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
       (a_2[shift_sint32(b, i_2)] = a_2[shift_sint32(a, i_2)]))).
@@ -174,7 +184,9 @@ Assume {
   (* Goal *)
   When: !invalid(Malloc_0, a_3, 1).
   (* Pre-condition *)
-  Have: (0 <= n) /\ separated(a_1, n, shift_sint32(b, 0), n).
+  Have: 0 <= n.
+  (* Pre-condition *)
+  Have: separated(a_1, n, shift_sint32(b, 0), n).
   (* Invariant 'Copy' *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
       (a_2[shift_sint32(b, i_1)] = a_2[shift_sint32(a, i_1)]))).
