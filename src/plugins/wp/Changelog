@@ -24,8 +24,8 @@
 Plugin WP <next-release>
 #########################
 
-- WP          [2020-02-25] Section « Limitation & Roadmap » added to the WP manual.
-- WP          [2020-02-25] New internal WP engine, fixing many issues related to
+- WP          [2020-03-01] Section « Limitation & Roadmap » added to the WP manual.
+- WP          [2020-03-01] New internal WP engine, fixing many issues related to
                            control flow graph and local variable scoping.
                            Support for stmt contracts has been removed.
                            Support for looping gotos has been removed.
