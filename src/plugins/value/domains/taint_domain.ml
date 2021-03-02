@@ -81,16 +81,22 @@ end
 module TransferTaint = struct
 
   let state_of_taint_annot stmt =
+    let zone_of_term t =
+      match t.term_node with
+      | TLval (TVar { lv_origin = Some vi }, TNoOffset) ->
+        Locations.zone_of_varinfo vi
+      | _ ->
+        (* TODO: Better stop with an error message? *)
+        Zone.bottom
+    in
     match Eva_annotations.get_taint_annot stmt with
     | [] ->
       LatticeTaint.empty
-    | [ t ] ->
-      begin match t.term_node with
-        | TLval (TVar { lv_origin = Some vi }, TNoOffset) ->
-          Locations.zone_of_varinfo vi
-        | _ ->
-          LatticeTaint.empty
-      end
+    | [ tt ] ->
+      List.fold_left
+        (fun state t -> LatticeTaint.join state (zone_of_term t))
+        LatticeTaint.empty
+        tt
     | _ ->
       (* No more than one annotation at time. *)
       assert false

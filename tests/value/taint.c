@@ -19,26 +19,27 @@ void taint_1(int t) {
   Frama_C_dump_each();
 }
 
-void taint_2(int t) {
+void taint_2(int t, int u) {
   int x = 0;
   int buf[5] = { 0 };
   while (t > 0) {
       x = x + t;
       t--;
   }
+  buf[u] = 0;
   buf[x] = buf[0] + 1;
   Frama_C_dump_each();
 }
 
 int main(void) {
-   int w;
-   w = 0;
+   int w, z;
+   w = z = 0;
    //@ taint w;
    taint_1(w);
    Frama_C_domain_show_each(w);
    w = 2;
-   //@ taint w;
-   taint_2(w);
-   Frama_C_domain_show_each(w);
+   //@ taint w, z;
+   taint_2(w, z);
+   Frama_C_domain_show_each(w, z);
    return 0;
 }
