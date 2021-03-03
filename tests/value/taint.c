@@ -23,8 +23,8 @@ void taint_2(int t, int u) {
   int x = 0;
   int buf[5] = { 0 };
   while (t > 0) {
-      x = x + t;
-      t--;
+    x = x + t;
+    t--;
   }
   buf[u] = 0;
   buf[x] = buf[0] + 1;
@@ -32,14 +32,14 @@ void taint_2(int t, int u) {
 }
 
 int main(void) {
-   int w, z;
-   w = z = 0;
-   //@ taint w;
-   taint_1(w);
-   Frama_C_domain_show_each(w);
-   w = 2;
-   //@ taint w, z;
-   taint_2(w, z);
-   Frama_C_domain_show_each(w, z);
-   return 0;
+  int w, z;
+  w = z = 0;
+  //@ taint w;
+  taint_1(w);
+  Frama_C_domain_show_each(w);
+  w = 2;
+  //@ taint w, z;
+  taint_2(w, z);
+  Frama_C_domain_show_each(w, z);
+  return 0;
 }

@@ -57,11 +57,7 @@ module LatticeTaint = struct
       let equal = Datatype.from_compare
 
       let pretty fmt t =
-        Format.fprintf fmt
-          "@[<v 2>Zones:@ @[<hov>%a@]@]@.\
-           @[<v 2>Control stmt:@ @[<hov>%a@]@]"
-          Zone.pretty t.zone
-          (Pretty_utils.pp_opt Printer.pp_stmt) t.control_stmt
+        Format.fprintf fmt "@[<hov>%a@]" Zone.pretty t.zone
 
       let hash t =
         Hashtbl.hash
