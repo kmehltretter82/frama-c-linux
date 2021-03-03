@@ -10,7 +10,10 @@
 [eva] tests/value/taint.c:19: 
   Frama_C_dump_each:
   # taint:
-  x; y; buf[1..2]; w
+  Zones:
+    x; y; buf[1..2]; w
+  Control stmt:
+    
   ==END OF DUMP==
 [eva] Recording results for taint_1
 [eva] Done for function taint_1
@@ -23,7 +26,10 @@
 [eva] tests/value/taint.c:31: 
   Frama_C_dump_each:
   # taint:
-  t; u; x; buf{[0]; [3]}; w; z
+  Zones:
+    t; u; x; buf{[0]; [3]}; w; z
+  Control stmt:
+    
   ==END OF DUMP==
 [eva] Recording results for taint_2
 [eva] Done for function taint_2
