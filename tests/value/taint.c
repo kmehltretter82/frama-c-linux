@@ -5,6 +5,7 @@
 #include <__fc_builtin.h>
 
 volatile int undet;
+int global;
 
 void taint_1(int t) {
   int x, y;
@@ -31,6 +32,16 @@ void taint_2(int t, int u) {
   Frama_C_dump_each();
 }
 
+void taint_3(int t) {
+  int x, z;
+  if (t > 0) {
+    x = 1;
+  }
+  global = x + 1;
+  z = 2;
+  Frama_C_dump_each();
+}
+
 int main(void) {
   int w, z;
   w = z = 0;
@@ -41,5 +52,9 @@ int main(void) {
   //@ taint w, z;
   taint_2(w, z);
   Frama_C_domain_show_each(w, z);
+  z = 1;
+  //@ taint w;
+  taint_3(w);
+  Frama_C_domain_show_each(w, global);
   return 0;
 }

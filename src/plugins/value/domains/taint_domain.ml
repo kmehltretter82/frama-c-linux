@@ -83,21 +83,20 @@ module LatticeTaint = struct
   (* Join: keep pointwise over-approximation. *)
   let join t1 t2 =
     let join_control_stmt cs1 cs2 =
-      let error () =
-        Value_parameters.fatal
-          "@[<hv>@[Different control statements:@]@ %a@ %a.@]"
-          (Pretty_utils.pp_opt Printer.pp_stmt) cs1
-          (Pretty_utils.pp_opt Printer.pp_stmt) cs2
-      in
       match cs1, cs2 with
       | None, None ->
-        cs1
+        None
+      | (Some _ as cs), None
+      | None, (Some _ as cs) ->
+        cs
       | Some s1, Some s2 ->
         if Cil_datatype.Stmt.equal s1 s2
         then cs1
-        else error ()
-      | _ ->
-        error ()
+        else
+          Value_parameters.fatal
+            "@[<hv>@[Different control statements:@]@ %a@ vs.@ %a.@]"
+            (Pretty_utils.pp_opt ~none:"<None>" Cil_printer.pp_stmt) cs1
+            (Pretty_utils.pp_opt ~none:"<None>" Cil_printer.pp_stmt) cs2
     in
     { zone = Zone.join t1.zone t2.zone;
       control_stmt = join_control_stmt t1.control_stmt t2.control_stmt; }
@@ -160,35 +159,62 @@ module TransferTaint = struct
     | `Value loc -> loc.Eval.loc
     | `Top -> Precise_locs.loc_top
 
+  let is_under_taint_condition state stmt =
+    let kf = Kernel_function.find_englobing_kf stmt in
+    Option.fold
+      ~none:false
+      ~some:(fun cs ->
+          let always_reachable =
+            List.fold_left
+              (fun acc s -> Stmts_graph.stmt_can_reach kf s stmt && acc)
+              true
+              cs.succs
+          in
+          not always_reachable)
+      state.control_stmt
+
   (* No update about taint wrt information provided by the other domains. *)
   let update _valuation state = `Value state
 
   let assign ki lv exp _v valuation state =
-    match ki with
-    | Kglobal ->
-      `Value state
-    | Kstmt stmt ->
-      let state = LatticeTaint.add state (zone_of_taint_annot stmt) in
-      let state =
+    let state =
+      match ki with
+      | Kglobal ->
+        state
+      | Kstmt stmt ->
+        let state = LatticeTaint.add state (zone_of_taint_annot stmt) in
         let to_loc = loc_of_lval valuation in
-        let exp_zone = Value_util.zone_of_expr to_loc exp in
-        let lv_indirect_zone =
-          Value_util.indirect_zone_of_lval to_loc lv.Eval.lval
-        in
-        let lv_state =
+        let lv_zone =
           Value_util.(zone_of_expr to_loc (lval_to_exp lv.Eval.lval))
         in
-        let intersect_state =
-          LatticeTaint.intersects state exp_zone ||
-          LatticeTaint.intersects state lv_indirect_zone
-        in
-        if intersect_state
-        then LatticeTaint.add state lv_state
-        else LatticeTaint.remove state lv_state
-      in
-      `Value state
+        if is_under_taint_condition state stmt
+        then LatticeTaint.add state lv_zone
+        else
+          let state = { state with control_stmt = None; } in
+          let exp_zone = Value_util.zone_of_expr to_loc exp in
+          let lv_indirect_zone =
+            Value_util.indirect_zone_of_lval to_loc lv.Eval.lval
+          in
+          let intersect_state =
+            LatticeTaint.intersects state exp_zone ||
+            LatticeTaint.intersects state lv_indirect_zone
+          in
+          if intersect_state
+          then LatticeTaint.add state lv_zone
+          else LatticeTaint.remove state lv_zone
+    in
+    `Value state
 
-  let assume _stmt _exp _b _valuation state = `Value state
+  let assume stmt exp _b valuation state =
+    let state = LatticeTaint.add state (zone_of_taint_annot stmt) in
+    let to_loc = loc_of_lval valuation in
+    let exp_zone = Value_util.zone_of_expr to_loc exp in
+    let state =
+      if LatticeTaint.intersects state exp_zone && state.control_stmt = None
+      then { state with control_stmt = Some stmt; }
+      else state
+    in
+    `Value state
 
   let start_call stmt call valuation state =
     let state = LatticeTaint.add state (zone_of_taint_annot stmt) in
