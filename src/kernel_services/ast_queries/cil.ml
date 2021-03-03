@@ -837,19 +837,8 @@ module Extensions = struct
 
   let visit name = !ref_visit name
 
-  let ref_deprecated_handler = ref (fun _ _ _ -> assert false)
-  let set_deprecated_handler ~handler =
-    ref_deprecated_handler := handler
-
-  let register_behavior name ext =
-    !ref_deprecated_handler name Ext_contract ext
 end
 let set_extension_handler = Extensions.set_handler
-
-(* Deprecated *)
-let set_deprecated_extension_handler = Extensions.set_deprecated_handler
-let register_behavior_extension = Extensions.register_behavior
-
 
 (* sm/gn: cil visitor interface for traversing Cil trees. *)
 (* Use visitCilStmt and/or visitCilFile to use this. *)

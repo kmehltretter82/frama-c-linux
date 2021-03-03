@@ -92,12 +92,6 @@ module Extensions = struct
   let pp_short (printer) fmt {ext_name; ext_kind} =
     !ref_short_print ext_name printer fmt ext_kind
 
-  let ref_deprecated_handler = ref (fun _ _ _ -> assert false)
-  let set_deprecated_handler ~handler =
-    ref_deprecated_handler := handler
-
-  let deprecated_register name =
-    !ref_deprecated_handler name
 end
 let set_extension_handler = Extensions.set_handler
 
@@ -114,21 +108,6 @@ let () =
       "__fc_sig_ign", "SIG_IGN";
       "__fc_sig_err", "SIG_ERR";
     ]
-
-(* Deprecated functions *)
-let set_deprecated_extension_handler = Extensions.set_deprecated_handler
-
-let register_behavior_extension name =
-  Extensions.deprecated_register name Ext_contract
-
-let register_code_annot_extension name =
-  Extensions.deprecated_register name (Ext_code_annot Ext_here)
-
-let register_loop_annot_extension name =
-  Extensions.deprecated_register name (Ext_code_annot Ext_next_loop)
-
-let register_global_extension name =
-  Extensions.deprecated_register name Ext_global
 
 (* Internal attributes. Won't be pretty-printed *)
 let reserved_attributes = ref []

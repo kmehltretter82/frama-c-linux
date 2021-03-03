@@ -63,46 +63,6 @@ val get_termination_kind_name: Cil_types.termination_kind -> string
 val register_shallow_attribute: string -> unit
 (** Register an attribute that will never be pretty printed. *)
 
-val register_behavior_extension:
-  string ->
-  (Printer_api.extensible_printer_type -> Format.formatter ->
-   Cil_types.acsl_extension_kind -> unit) -> unit
-(** Register a pretty-printer used for behavior extension.
-    @plugin development guide
-    @deprecated 21.0-Scandium
-*)
-[@@ deprecated "Use Acsl_extension.register_behavior (arg: ~printer) instead"]
-
-val register_global_extension:
-  string ->
-  (Printer_api.extensible_printer_type -> Format.formatter ->
-   Cil_types.acsl_extension_kind -> unit) -> unit
-(** Register a pretty-printer used for global extension.
-    @plugin development guide
-    @deprecated 21.0-Scandium
-*)
-[@@ deprecated "Use Acsl_extension.register_global (arg: ~printer) instead"]
-
-val register_code_annot_extension:
-  string ->
-  (Printer_api.extensible_printer_type -> Format.formatter ->
-   Cil_types.acsl_extension_kind -> unit) -> unit
-(** Register a pretty-printer used for code annotation extension.
-    @plugin development guide
-    @deprecated 21.0-Scandium
-*)
-[@@ deprecated "Use Acsl_extension.register_code_annot_<kind> (arg: ~printer) instead"]
-
-val register_loop_annot_extension:
-  string ->
-  (Printer_api.extensible_printer_type -> Format.formatter ->
-   Cil_types.acsl_extension_kind -> unit) -> unit
-(** Register a pretty-printer used for loop annotation extension.
-    @plugin development guide
-    @deprecated 21.0-Scandium
-*)
-[@@ deprecated "Use Acsl_extension.register_loop_annot (arg: ~printer) instead"]
-
 val state: Printer_api.state
 
 val print_global: Cil_types.global -> bool
@@ -121,12 +81,6 @@ val set_extension_handler:
     If your name is not [Acsl_extension], do not call this.
     @since 21.0-Scandium
 *)
-
-val set_deprecated_extension_handler:
-  handler:(string -> Cil_types.ext_category ->
-           (Printer_api.extensible_printer_type -> Format.formatter ->
-            Cil_types.acsl_extension_kind -> unit) ->
-           unit) -> unit
 
 (*
 Local Variables:

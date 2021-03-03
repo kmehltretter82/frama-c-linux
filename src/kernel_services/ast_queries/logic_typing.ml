@@ -544,41 +544,10 @@ module Extensions = struct
   let typer_block name ~typing_context:typing_context ~loc =
     !ref_typer_block name typing_context loc
 
-  (* For deprecated functions *)
-  let ref_deprecated_handler = ref (fun _ _ _ _  -> assert false)
-
-  let set_deprecated_handler ~handler =
-    ref_deprecated_handler := handler
-
-  let deprecated_register name category status typer =
-    let typer typing_context loc = typer ~typing_context ~loc in
-    !ref_deprecated_handler name category status typer
 end
 let set_extension_handler = Extensions.set_handler
 let get_typer = Extensions.typer
 let get_typer_block = Extensions.typer_block
-
-(* Deprecated ACSL extensions functions *)
-let set_deprecated_extension_handler =
-  Extensions.set_deprecated_handler
-
-let register_behavior_extension name f =
-  Extensions.deprecated_register name Ext_contract f
-
-let register_global_extension name f =
-  Extensions.deprecated_register name Ext_global f
-
-let register_code_annot_extension name f =
-  Extensions.deprecated_register name (Ext_code_annot Ext_here) f
-
-let register_code_annot_next_stmt_extension name f =
-  Extensions.deprecated_register name (Ext_code_annot Ext_next_stmt) f
-
-let register_code_annot_next_loop_extension name f =
-  Extensions.deprecated_register name (Ext_code_annot Ext_next_loop) f
-
-let register_code_annot_next_both_extension name f =
-  Extensions.deprecated_register name (Ext_code_annot Ext_next_both) f
 
 let rec arithmetic_conversion ty1 ty2 =
   match unroll_type ty1, unroll_type ty2 with

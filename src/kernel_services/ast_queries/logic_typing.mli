@@ -151,108 +151,6 @@ type typing_context = {
   on_error: 'a 'b. ('a -> 'b) -> (unit -> unit) -> 'a -> 'b
 }
 
-(** [register_behavior_extension name status f] registers a
-    typing function [f] to
-    be used to type function contract clause with name [name].
-    The boolean flags specifies if the extension can be assigned
-    a property status or not.
-
-    Here is a basic example:
-
-    let count = ref 0 in
-    let foo_typer ~typing_context ~loc ps =
-    match ps with p::[] ->
-       Ext_preds
-       [
-             (typing_context.type_predicate
-                typing_context
-                (typing_context.post_state [Normal])
-                p)])
-      | [] -> let id = !count in incr count; Ext_id id
-      | _ -> typing_context.error loc "expecting a predicate after keyword FOO"
-    let () = register_behavior_extension "FOO" false foo_typer
-
-    @plugin development guide
-
-    @since Carbon-20101201
-    @modify Silicon-20161101 change type of the function
-    @modify 19.0-Potassium add [status] argument
-    @deprecated 21.0-Scandium
-*)
-val register_behavior_extension:
-  string -> bool ->
-  (typing_context:typing_context -> loc:location ->
-   Logic_ptree.lexpr list -> acsl_extension_kind) -> unit
-[@@ deprecated "Use Acsl_extension.register_behavior instead"]
-
-(** register an extension for global annotation.
-
-    @plugin development guide
-
-    @since 18.0-Argon
-    @deprecated 21.0-Scandium
-*)
-val register_global_extension:
-  string -> bool ->
-  (typing_context:typing_context -> loc: location ->
-   Logic_ptree.lexpr list -> acsl_extension_kind) -> unit
-[@@ deprecated "Use Acsl_extension.register_global instead"]
-
-(** register an extension for code annotation to be evaluated at _current_
-    program point.
-
-    @plugin development guide
-
-    @since 18.0-Argon
-    @deprecated 21.0-Scandium
-*)
-val register_code_annot_extension:
-  string -> bool ->
-  (typing_context: typing_context -> loc: location ->
-   Logic_ptree.lexpr list -> acsl_extension_kind) -> unit
-[@@ deprecated "Use Acsl_extension.register_code_annot instead"]
-
-(** register an extension for code annotation to be evaluated for the _next_
-    statement.
-
-    @plugin development guide
-
-    @since 18.0-Argon
-    @deprecated 21.0-Scandium
-*)
-val register_code_annot_next_stmt_extension:
-  string -> bool ->
-  (typing_context: typing_context -> loc: location ->
-   Logic_ptree.lexpr list -> acsl_extension_kind) -> unit
-[@@ deprecated "Use Acsl_extension.register_code_annot_next_stmt instead"]
-
-(** register an extension for loop annotation.
-
-    @plugin development guide
-
-    @since 18.0-Argon
-    @deprecated 21.0-Scandium
-*)
-val register_code_annot_next_loop_extension:
-  string -> bool ->
-  (typing_context: typing_context -> loc: location ->
-   Logic_ptree.lexpr list -> acsl_extension_kind) -> unit
-[@@ deprecated "Use Acsl_extension.register_code_annot_next_loop instead"]
-
-
-(** register an extension both for code and loop annotations.
-
-    @plugin development guide
-
-    @since 18.0-Argon
-    @deprecated 21.0-Scandium
-*)
-val register_code_annot_next_both_extension:
-  string -> bool ->
-  (typing_context: typing_context -> loc: location ->
-   Logic_ptree.lexpr list -> acsl_extension_kind) -> unit
-[@@ deprecated "Use Acsl_extension.register_code_annot_next_both instead"]
-
 module Make
     (C :
      sig
@@ -411,14 +309,6 @@ val get_typer_block:
   loc:Logic_ptree.location ->
   string * Logic_ptree.extended_decl list ->
   bool * Cil_types.acsl_extension_kind
-
-(**/**)
-val set_deprecated_extension_handler:
-  handler:(string -> ext_category -> bool ->
-           (typing_context -> location -> Logic_ptree.lexpr list ->
-            acsl_extension_kind) ->
-           unit) ->
-  unit
 
 (*
 Local Variables:

@@ -53,15 +53,6 @@ type extension_common = {
   printer: extension_printer ;
   short_printer: extension_printer ;
 }
-type extension = {
-  preprocessor: extension_preprocessor ;
-  typer: extension_typer ;
-  status: bool ;
-  category: ext_category ;
-  visitor: extension_visitor ;
-  printer: extension_printer ;
-  short_printer: extension_printer ;
-}
 
 let default_printer printer fmt = function
   | Ext_id i -> Format.fprintf fmt "%d" i
@@ -238,72 +229,3 @@ let () =
   Cil_printer.set_extension_handler
     ~print: Extensions.print
     ~short_print:Extensions.short_print
-
-(* For Deprecation: *)
-
-let deprecated_replace name ext =
-  let info1:extension_single = {
-    preprocessor = ext.preprocessor ;
-    typer = ext.typer ;
-    status = ext.status ;
-  }
-  in
-  let info2:extension_common  = {
-    category = ext.category ;
-    visitor = ext.visitor ;
-    printer = ext.printer ;
-    short_printer = ext.printer ;
-  }
-  in
-  Hashtbl.add Extensions.ext_single_tbl name info1;
-  Hashtbl.add Extensions.ext_tbl name info2
-
-let strong_cat = Hashtbl.create 5
-
-let default_typer _typing_context _loc _l = assert false
-
-let merge ((info1:extension_single),(info2:extension_common)) :extension =
-  {preprocessor = info1.preprocessor ;
-   typer = info1.typer ;
-   status = info1.status ;
-   category = info2.category ;
-   visitor = info2.visitor ;
-   printer = info2.printer ;
-   short_printer = info2.printer}
-
-let deprecated_find ?(strong=true) name cat op_name =
-  match Hashtbl.find_opt Extensions.ext_single_tbl name with
-  | None ->
-    if strong then Hashtbl.add strong_cat name cat ;
-    merge (make name cat default_typer false)
-  | Some ext1 ->
-    let ext2 = Extensions.find_common name in
-    if strong && Hashtbl.mem strong_cat name then begin
-      if ext2.category = cat then merge (ext1,ext2)
-      else
-        Kernel.fatal
-          "Registring %s for %s: this extension already exists for another \
-           category"
-          op_name name
-    end else if strong then begin
-      Hashtbl.add strong_cat name cat ;
-      let ext2 = { ext2 with category = cat } in
-      merge (ext1,ext2)
-    end else merge (ext1,ext2)
-
-let deprecated_register_typing name cat status typer =
-  deprecated_replace name
-    { (deprecated_find name cat "typing") with status ; typer }
-
-let deprecated_register_printing name cat printer =
-  deprecated_replace name
-    { (deprecated_find ~strong:false name cat "printing") with printer }
-
-let deprecated_register_visit name cat visitor =
-  deprecated_replace name
-    { (deprecated_find name cat "visit") with visitor }
-
-let () =
-  Logic_typing.set_deprecated_extension_handler deprecated_register_typing ;
-  Cil.set_deprecated_extension_handler deprecated_register_visit ;
-  Cil_printer.set_deprecated_extension_handler deprecated_register_printing
