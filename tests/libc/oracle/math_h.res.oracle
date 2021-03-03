@@ -30,299 +30,721 @@
   fp_ilogb0 ∈ {-2147483648.}
   fp_ilogbnan ∈ {-2147483648.}
   int_top ∈ [--..--]
-[eva] tests/libc/math_h.c:47: Call to builtin atan
-[eva] tests/libc/math_h.c:47: Call to builtin atan
-[eva] tests/libc/math_h.c:47: Call to builtin atan
-[eva] tests/libc/math_h.c:47: Call to builtin atan
-[eva] tests/libc/math_h.c:47: Call to builtin atan
-[eva] tests/libc/math_h.c:47: Call to builtin atan
-[eva] tests/libc/math_h.c:47: Call to builtin atan
-[eva] tests/libc/math_h.c:47: Call to builtin atan
-[eva] tests/libc/math_h.c:47: Call to builtin atan
-[eva] tests/libc/math_h.c:48: Call to builtin atanf
-[eva] tests/libc/math_h.c:48: Call to builtin atanf
-[eva] tests/libc/math_h.c:48: Call to builtin atanf
-[eva] tests/libc/math_h.c:48: Call to builtin atanf
-[eva] tests/libc/math_h.c:48: Call to builtin atanf
-[eva] tests/libc/math_h.c:48: Call to builtin atanf
-[eva] tests/libc/math_h.c:48: Call to builtin atanf
-[eva] tests/libc/math_h.c:48: Call to builtin atanf
-[eva] tests/libc/math_h.c:48: Call to builtin atanf
+[eva] tests/libc/math_h.c:61: Call to builtin atan
+[eva] tests/libc/math_h.c:61: Call to builtin atan
+[eva] tests/libc/math_h.c:61: Call to builtin atan
+[eva] tests/libc/math_h.c:61: Call to builtin atan
+[eva] tests/libc/math_h.c:61: Call to builtin atan
+[eva] tests/libc/math_h.c:61: Call to builtin atan
+[eva] tests/libc/math_h.c:61: Call to builtin atan
+[eva] tests/libc/math_h.c:61: Call to builtin atan
+[eva] tests/libc/math_h.c:61: Call to builtin atan
+[eva] tests/libc/math_h.c:62: Call to builtin atanf
+[eva] tests/libc/math_h.c:62: Call to builtin atanf
+[eva] tests/libc/math_h.c:62: Call to builtin atanf
+[eva] tests/libc/math_h.c:62: Call to builtin atanf
+[eva] tests/libc/math_h.c:62: Call to builtin atanf
+[eva] tests/libc/math_h.c:62: Call to builtin atanf
+[eva] tests/libc/math_h.c:62: Call to builtin atanf
+[eva] tests/libc/math_h.c:62: Call to builtin atanf
+[eva] tests/libc/math_h.c:62: Call to builtin atanf
 [eva] computing for function atanl <- main.
-  Called from tests/libc/math_h.c:49.
+  Called from tests/libc/math_h.c:63.
 [eva] using specification for function atanl
 [eva] Done for function atanl
 [eva] computing for function atanl <- main.
-  Called from tests/libc/math_h.c:49.
+  Called from tests/libc/math_h.c:63.
 [eva] Done for function atanl
 [eva] computing for function atanl <- main.
-  Called from tests/libc/math_h.c:49.
+  Called from tests/libc/math_h.c:63.
 [eva] Done for function atanl
 [eva] computing for function atanl <- main.
-  Called from tests/libc/math_h.c:49.
+  Called from tests/libc/math_h.c:63.
 [eva] Done for function atanl
 [eva] computing for function atanl <- main.
-  Called from tests/libc/math_h.c:49.
+  Called from tests/libc/math_h.c:63.
 [eva] Done for function atanl
 [eva] computing for function atanl <- main.
-  Called from tests/libc/math_h.c:49.
+  Called from tests/libc/math_h.c:63.
 [eva] Done for function atanl
 [eva] computing for function atanl <- main.
-  Called from tests/libc/math_h.c:49.
+  Called from tests/libc/math_h.c:63.
 [eva] Done for function atanl
 [eva] computing for function atanl <- main.
-  Called from tests/libc/math_h.c:49.
+  Called from tests/libc/math_h.c:63.
 [eva] Done for function atanl
 [eva] computing for function atanl <- main.
-  Called from tests/libc/math_h.c:49.
+  Called from tests/libc/math_h.c:63.
 [eva] Done for function atanl
 [eva] computing for function fabs <- main.
-  Called from tests/libc/math_h.c:50.
+  Called from tests/libc/math_h.c:64.
 [eva] using specification for function fabs
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
-  Called from tests/libc/math_h.c:50.
+  Called from tests/libc/math_h.c:64.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
-  Called from tests/libc/math_h.c:50.
+  Called from tests/libc/math_h.c:64.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
-  Called from tests/libc/math_h.c:50.
+  Called from tests/libc/math_h.c:64.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
-  Called from tests/libc/math_h.c:50.
+  Called from tests/libc/math_h.c:64.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
-  Called from tests/libc/math_h.c:50.
+  Called from tests/libc/math_h.c:64.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
-  Called from tests/libc/math_h.c:50.
+  Called from tests/libc/math_h.c:64.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
-  Called from tests/libc/math_h.c:50.
+  Called from tests/libc/math_h.c:64.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
-  Called from tests/libc/math_h.c:50.
+  Called from tests/libc/math_h.c:64.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
-  Called from tests/libc/math_h.c:50.
+  Called from tests/libc/math_h.c:64.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
-  Called from tests/libc/math_h.c:50.
+  Called from tests/libc/math_h.c:64.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
-  Called from tests/libc/math_h.c:50.
+  Called from tests/libc/math_h.c:64.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
-  Called from tests/libc/math_h.c:50.
+  Called from tests/libc/math_h.c:64.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
-  Called from tests/libc/math_h.c:50.
+  Called from tests/libc/math_h.c:64.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
-  Called from tests/libc/math_h.c:50.
+  Called from tests/libc/math_h.c:64.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
-  Called from tests/libc/math_h.c:50.
+  Called from tests/libc/math_h.c:64.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
-  Called from tests/libc/math_h.c:50.
+  Called from tests/libc/math_h.c:64.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
-  Called from tests/libc/math_h.c:50.
+  Called from tests/libc/math_h.c:64.
 [eva] Done for function fabs
 [eva] computing for function fabsf <- main.
-  Called from tests/libc/math_h.c:51.
+  Called from tests/libc/math_h.c:65.
 [eva] using specification for function fabsf
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
-  Called from tests/libc/math_h.c:51.
+  Called from tests/libc/math_h.c:65.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
-  Called from tests/libc/math_h.c:51.
+  Called from tests/libc/math_h.c:65.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
-  Called from tests/libc/math_h.c:51.
+  Called from tests/libc/math_h.c:65.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
-  Called from tests/libc/math_h.c:51.
+  Called from tests/libc/math_h.c:65.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
-  Called from tests/libc/math_h.c:51.
+  Called from tests/libc/math_h.c:65.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
-  Called from tests/libc/math_h.c:51.
+  Called from tests/libc/math_h.c:65.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
-  Called from tests/libc/math_h.c:51.
+  Called from tests/libc/math_h.c:65.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
-  Called from tests/libc/math_h.c:51.
+  Called from tests/libc/math_h.c:65.
 [eva] Done for function fabsf
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:52.
+  Called from tests/libc/math_h.c:66.
 [eva] using specification for function fabsl
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:52.
+  Called from tests/libc/math_h.c:66.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:52.
+  Called from tests/libc/math_h.c:66.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:52.
+  Called from tests/libc/math_h.c:66.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:52.
+  Called from tests/libc/math_h.c:66.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:52.
+  Called from tests/libc/math_h.c:66.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:52.
+  Called from tests/libc/math_h.c:66.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:52.
+  Called from tests/libc/math_h.c:66.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:52.
+  Called from tests/libc/math_h.c:66.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:52.
+  Called from tests/libc/math_h.c:66.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:52.
+  Called from tests/libc/math_h.c:66.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:52.
+  Called from tests/libc/math_h.c:66.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:52.
+  Called from tests/libc/math_h.c:66.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:52.
+  Called from tests/libc/math_h.c:66.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:52.
+  Called from tests/libc/math_h.c:66.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:52.
+  Called from tests/libc/math_h.c:66.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:52.
+  Called from tests/libc/math_h.c:66.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:52.
+  Called from tests/libc/math_h.c:66.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:52.
+  Called from tests/libc/math_h.c:66.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:52.
+  Called from tests/libc/math_h.c:66.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:52.
+  Called from tests/libc/math_h.c:66.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:52.
+  Called from tests/libc/math_h.c:66.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:52.
+  Called from tests/libc/math_h.c:66.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:52.
+  Called from tests/libc/math_h.c:66.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:52.
+  Called from tests/libc/math_h.c:66.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:52.
+  Called from tests/libc/math_h.c:66.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:52.
+  Called from tests/libc/math_h.c:66.
 [eva] Done for function fabsl
+[eva] computing for function frexp <- main.
+  Called from tests/libc/math_h.c:68.
+[eva] using specification for function frexp
+[eva] tests/libc/math_h.c:68: 
+  function frexp: precondition 'valid_exp' got status valid.
+[eva] Done for function frexp
+[eva] computing for function frexp <- main.
+  Called from tests/libc/math_h.c:68.
+[eva] tests/libc/math_h.c:68: 
+  function frexp: precondition 'valid_exp' got status valid.
+[eva] Done for function frexp
+[eva] computing for function frexp <- main.
+  Called from tests/libc/math_h.c:68.
+[eva] tests/libc/math_h.c:68: 
+  function frexp: precondition 'valid_exp' got status valid.
+[eva] Done for function frexp
+[eva] computing for function frexp <- main.
+  Called from tests/libc/math_h.c:68.
+[eva] tests/libc/math_h.c:68: 
+  function frexp: precondition 'valid_exp' got status valid.
+[eva] Done for function frexp
+[eva] computing for function frexp <- main.
+  Called from tests/libc/math_h.c:68.
+[eva] tests/libc/math_h.c:68: 
+  function frexp: precondition 'valid_exp' got status valid.
+[eva] Done for function frexp
+[eva] computing for function frexp <- main.
+  Called from tests/libc/math_h.c:68.
+[eva] tests/libc/math_h.c:68: 
+  function frexp: precondition 'valid_exp' got status valid.
+[eva] Done for function frexp
+[eva] computing for function frexp <- main.
+  Called from tests/libc/math_h.c:68.
+[eva] tests/libc/math_h.c:68: 
+  function frexp: precondition 'valid_exp' got status valid.
+[eva] Done for function frexp
+[eva] computing for function frexp <- main.
+  Called from tests/libc/math_h.c:68.
+[eva] tests/libc/math_h.c:68: 
+  function frexp: precondition 'valid_exp' got status valid.
+[eva] Done for function frexp
+[eva] computing for function frexp <- main.
+  Called from tests/libc/math_h.c:68.
+[eva] tests/libc/math_h.c:68: 
+  function frexp: precondition 'valid_exp' got status valid.
+[eva] Done for function frexp
+[eva] computing for function frexpf <- main.
+  Called from tests/libc/math_h.c:69.
+[eva] using specification for function frexpf
+[eva] tests/libc/math_h.c:69: 
+  function frexpf: precondition 'valid_exp' got status valid.
+[eva] Done for function frexpf
+[eva] computing for function frexpf <- main.
+  Called from tests/libc/math_h.c:69.
+[eva] tests/libc/math_h.c:69: 
+  function frexpf: precondition 'valid_exp' got status valid.
+[eva] Done for function frexpf
+[eva] computing for function frexpf <- main.
+  Called from tests/libc/math_h.c:69.
+[eva] tests/libc/math_h.c:69: 
+  function frexpf: precondition 'valid_exp' got status valid.
+[eva] Done for function frexpf
+[eva] computing for function frexpf <- main.
+  Called from tests/libc/math_h.c:69.
+[eva] tests/libc/math_h.c:69: 
+  function frexpf: precondition 'valid_exp' got status valid.
+[eva] Done for function frexpf
+[eva] computing for function frexpf <- main.
+  Called from tests/libc/math_h.c:69.
+[eva] tests/libc/math_h.c:69: 
+  function frexpf: precondition 'valid_exp' got status valid.
+[eva] Done for function frexpf
+[eva] computing for function frexpf <- main.
+  Called from tests/libc/math_h.c:69.
+[eva] tests/libc/math_h.c:69: 
+  function frexpf: precondition 'valid_exp' got status valid.
+[eva] Done for function frexpf
+[eva] computing for function frexpf <- main.
+  Called from tests/libc/math_h.c:69.
+[eva] tests/libc/math_h.c:69: 
+  function frexpf: precondition 'valid_exp' got status valid.
+[eva] Done for function frexpf
+[eva] computing for function frexpf <- main.
+  Called from tests/libc/math_h.c:69.
+[eva] tests/libc/math_h.c:69: 
+  function frexpf: precondition 'valid_exp' got status valid.
+[eva] Done for function frexpf
+[eva] computing for function frexpf <- main.
+  Called from tests/libc/math_h.c:69.
+[eva] tests/libc/math_h.c:69: 
+  function frexpf: precondition 'valid_exp' got status valid.
+[eva] Done for function frexpf
+[eva] computing for function frexpl <- main.
+  Called from tests/libc/math_h.c:70.
+[eva] using specification for function frexpl
+[eva] tests/libc/math_h.c:70: 
+  function frexpl: precondition 'valid_exp' got status valid.
+[eva] Done for function frexpl
+[eva] computing for function frexpl <- main.
+  Called from tests/libc/math_h.c:70.
+[eva] tests/libc/math_h.c:70: 
+  function frexpl: precondition 'valid_exp' got status valid.
+[eva] Done for function frexpl
+[eva] computing for function frexpl <- main.
+  Called from tests/libc/math_h.c:70.
+[eva] tests/libc/math_h.c:70: 
+  function frexpl: precondition 'valid_exp' got status valid.
+[eva] Done for function frexpl
+[eva] computing for function frexpl <- main.
+  Called from tests/libc/math_h.c:70.
+[eva] tests/libc/math_h.c:70: 
+  function frexpl: precondition 'valid_exp' got status valid.
+[eva] Done for function frexpl
+[eva] computing for function frexpl <- main.
+  Called from tests/libc/math_h.c:70.
+[eva] tests/libc/math_h.c:70: 
+  function frexpl: precondition 'valid_exp' got status valid.
+[eva] Done for function frexpl
+[eva] computing for function frexpl <- main.
+  Called from tests/libc/math_h.c:70.
+[eva] tests/libc/math_h.c:70: 
+  function frexpl: precondition 'valid_exp' got status valid.
+[eva] Done for function frexpl
+[eva] computing for function frexpl <- main.
+  Called from tests/libc/math_h.c:70.
+[eva] tests/libc/math_h.c:70: 
+  function frexpl: precondition 'valid_exp' got status valid.
+[eva] Done for function frexpl
+[eva] computing for function frexpl <- main.
+  Called from tests/libc/math_h.c:70.
+[eva] tests/libc/math_h.c:70: 
+  function frexpl: precondition 'valid_exp' got status valid.
+[eva] Done for function frexpl
+[eva] computing for function frexpl <- main.
+  Called from tests/libc/math_h.c:70.
+[eva] tests/libc/math_h.c:70: 
+  function frexpl: precondition 'valid_exp' got status valid.
+[eva] Done for function frexpl
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:71.
+[eva] using specification for function ldexp
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:71.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:71.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:71.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:71.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:71.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:71.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:71.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:71.
+[eva] Done for function ldexp
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:72.
+[eva] using specification for function ldexpf
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:72.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:72.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:72.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:72.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:72.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:72.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:72.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:72.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:72.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:72.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:72.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:72.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:72.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:72.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:72.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:72.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:72.
+[eva] Done for function ldexpf
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:74.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:74.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:74.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:74.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:74.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:74.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:74.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:74.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:74.
+[eva] Done for function ldexp
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:75.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:75.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:75.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:75.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:75.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:75.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:75.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:75.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:75.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:75.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:75.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:75.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:75.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:75.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:75.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:75.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:75.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:75.
+[eva] Done for function ldexpf
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:77.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:77.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:77.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:77.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:77.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:77.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:77.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:77.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:77.
+[eva] Done for function ldexp
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:78.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:78.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:78.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:78.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:78.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:78.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:78.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:78.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:78.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:78.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:78.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:78.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:78.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:78.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:78.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:78.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:78.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:78.
+[eva] Done for function ldexpf
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:80.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:80.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:80.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:80.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:80.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:80.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:80.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:80.
+[eva] Done for function ldexp
+[eva] computing for function ldexp <- main.
+  Called from tests/libc/math_h.c:80.
+[eva] Done for function ldexp
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:81.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:81.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:81.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:81.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:81.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:81.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:81.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:81.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:81.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:81.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:81.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:81.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:81.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:81.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:81.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:81.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:81.
+[eva] Done for function ldexpf
+[eva] computing for function ldexpf <- main.
+  Called from tests/libc/math_h.c:81.
+[eva] Done for function ldexpf
 [eva] computing for function __finite <- main.
-  Called from tests/libc/math_h.c:56.
+  Called from tests/libc/math_h.c:86.
 [eva] using specification for function __finite
 [eva] Done for function __finite
-[eva] tests/libc/math_h.c:57: assertion got status valid.
+[eva] tests/libc/math_h.c:87: assertion got status valid.
 [eva] computing for function __finite <- main.
-  Called from tests/libc/math_h.c:58.
+  Called from tests/libc/math_h.c:88.
 [eva] Done for function __finite
 [eva] computing for function __finite <- main.
-  Called from tests/libc/math_h.c:58.
+  Called from tests/libc/math_h.c:88.
 [eva] Done for function __finite
-[eva] tests/libc/math_h.c:59: assertion got status valid.
+[eva] tests/libc/math_h.c:89: assertion got status valid.
 [eva] computing for function __finitef <- main.
-  Called from tests/libc/math_h.c:60.
+  Called from tests/libc/math_h.c:90.
 [eva] using specification for function __finitef
 [eva] Done for function __finitef
 [eva] computing for function __finitef <- main.
-  Called from tests/libc/math_h.c:60.
+  Called from tests/libc/math_h.c:90.
 [eva] Done for function __finitef
-[eva] tests/libc/math_h.c:61: assertion got status valid.
+[eva] tests/libc/math_h.c:91: assertion got status valid.
 [eva] computing for function __finite <- main.
-  Called from tests/libc/math_h.c:62.
+  Called from tests/libc/math_h.c:92.
 [eva] Done for function __finite
 [eva] computing for function __finite <- main.
-  Called from tests/libc/math_h.c:62.
+  Called from tests/libc/math_h.c:92.
 [eva] Done for function __finite
-[eva] tests/libc/math_h.c:63: assertion got status valid.
+[eva] tests/libc/math_h.c:93: assertion got status valid.
 [eva] computing for function __finitef <- main.
-  Called from tests/libc/math_h.c:64.
+  Called from tests/libc/math_h.c:94.
 [eva] Done for function __finitef
-[eva] tests/libc/math_h.c:65: assertion got status valid.
+[eva] tests/libc/math_h.c:95: assertion got status valid.
 [eva] computing for function __finitef <- main.
-  Called from tests/libc/math_h.c:66.
+  Called from tests/libc/math_h.c:96.
 [eva] Done for function __finitef
-[eva] tests/libc/math_h.c:67: assertion got status valid.
-[eva] computing for function test_simple_specs <- main.
-  Called from tests/libc/math_h.c:70.
-[eva] computing for function frexp <- test_simple_specs <- main.
-  Called from tests/libc/math_h.c:82.
-[eva] using specification for function frexp
-[eva] tests/libc/math_h.c:82: 
-  function frexp: precondition 'valid_exp' got status valid.
-[eva] Done for function frexp
-[eva] computing for function frexpf <- test_simple_specs <- main.
-  Called from tests/libc/math_h.c:82.
-[eva] using specification for function frexpf
-[eva] tests/libc/math_h.c:82: 
-  function frexpf: precondition 'valid_exp' got status valid.
-[eva] Done for function frexpf
-[eva] computing for function frexpl <- test_simple_specs <- main.
-  Called from tests/libc/math_h.c:82.
-[eva] using specification for function frexpl
-[eva] tests/libc/math_h.c:82: 
-  function frexpl: precondition 'valid_exp' got status valid.
-[eva] Done for function frexpl
-[eva] computing for function ldexp <- test_simple_specs <- main.
-  Called from tests/libc/math_h.c:83.
-[eva] using specification for function ldexp
-[eva] Done for function ldexp
-[eva] computing for function ldexpf <- test_simple_specs <- main.
-  Called from tests/libc/math_h.c:83.
-[eva] using specification for function ldexpf
-[eva] Done for function ldexpf
-[eva] computing for function ldexpl <- test_simple_specs <- main.
-  Called from tests/libc/math_h.c:83.
-[eva] using specification for function ldexpl
-[eva] Done for function ldexpl
-[eva] tests/libc/math_h.c:84: assertion got status valid.
-[eva] Recording results for test_simple_specs
-[eva] Done for function test_simple_specs
+[eva] tests/libc/math_h.c:97: assertion got status valid.
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
-[eva:final-states] Values at end of function test_simple_specs:
-  exponent ∈ [--..--]
-  res_frexp ∈ [-inf .. inf] ∪ {NaN}
-  res_frexpf ∈ [-inf .. inf] ∪ {NaN}
-  res_frexpl ∈ [-inf .. inf] ∪ {NaN}
-  res_ldexp ∈ [-inf .. inf] ∪ {NaN}
-  res_ldexpf ∈ [-inf .. inf] ∪ {NaN}
-  res_ldexpl ∈ [-inf .. inf] ∪ {NaN}
 [eva:final-states] Values at end of function main:
+  __fc_errno ∈ [--..--]
   atan_pi ∈ {1.26262725568}
   atan_half_pi ∈ {1.00388482185}
   atan_e ∈ {1.21828290502}
@@ -377,5 +799,105 @@
   fabsl_minus_one ∈ [-inf .. inf]
   fabsl_large ∈ [-inf .. inf]
   fabsl_ld_top ∈ [-inf .. inf] ∪ {NaN}
+  exponent ∈ [--..--]
+  frexp_pi ∈ [0.5 .. 1.]
+  frexp_half_pi ∈ [0.5 .. 1.]
+  frexp_e ∈ [0.5 .. 1.]
+  frexp_zero ∈ [-0. .. 0.]
+  frexp_minus_zero ∈ [-0. .. 0.]
+  frexp_one ∈ [0.5 .. 1.]
+  frexp_minus_one ∈ [0.5 .. 1.]
+  frexp_large ∈ [0.5 .. 1.]
+  frexp_top ∈ [-inf .. inf] ∪ {NaN}
+  frexpf_f_pi ∈ [0.5 .. 0.999999940395]
+  frexpf_f_half_pi ∈ [0.5 .. 0.999999940395]
+  frexpf_f_e ∈ [0.5 .. 0.999999940395]
+  frexpf_zero ∈ [-0. .. 0.]
+  frexpf_minus_zero ∈ [-0. .. 0.]
+  frexpf_one ∈ [0.5 .. 0.999999940395]
+  frexpf_minus_one ∈ [0.5 .. 0.999999940395]
+  frexpf_large ∈ [0.5 .. 0.999999940395]
+  frexpf_f_top ∈ [-inf .. inf] ∪ {NaN}
+  frexpl_ld_pi ∈ [-inf .. inf]
+  frexpl_ld_half_pi ∈ [-inf .. inf]
+  frexpl_ld_e ∈ [-inf .. inf]
+  frexpl_zero ∈ [-inf .. inf]
+  frexpl_minus_zero ∈ [-inf .. inf]
+  frexpl_one ∈ [-inf .. inf]
+  frexpl_minus_one ∈ [-inf .. inf]
+  frexpl_large ∈ [-inf .. inf]
+  frexpl_ld_top ∈ [-inf .. inf] ∪ {NaN}
+  ldexp_pi ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  ldexp_half_pi ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  ldexp_e ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  ldexp_zero ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  ldexp_minus_zero ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  ldexp_one ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  ldexp_minus_one ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  ldexp_large ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  ldexp_top ∈ [-inf .. inf] ∪ {NaN}
+  ldexpf_f_pi ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
+  ldexpf_f_half_pi ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
+  ldexpf_f_e ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
+  ldexpf_zero ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
+  ldexpf_minus_zero ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
+  ldexpf_one ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
+  ldexpf_minus_one ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
+  ldexpf_large ∈ [-inf .. inf]
+  ldexpf_f_top ∈ [-inf .. inf] ∪ {NaN}
+  ldexp_pi_zero ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  ldexp_half_pi_zero ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  ldexp_e_zero ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  ldexp_zero_zero ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  ldexp_minus_zero_zero ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  ldexp_one_zero ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  ldexp_minus_one_zero ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  ldexp_large_zero ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  ldexp_top_zero ∈ [-inf .. inf] ∪ {NaN}
+  ldexpf_f_pi_zero ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
+  ldexpf_f_half_pi_zero ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
+  ldexpf_f_e_zero ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
+  ldexpf_zero_zero ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
+  ldexpf_minus_zero_zero ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
+  ldexpf_one_zero ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
+  ldexpf_minus_one_zero ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
+  ldexpf_large_zero ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
+  ldexpf_f_top_zero ∈ [-inf .. inf] ∪ {NaN}
+  ldexp_pi_minus5 ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  ldexp_half_pi_minus5 ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  ldexp_e_minus5 ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  ldexp_zero_minus5 ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  ldexp_minus_zero_minus5 ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  ldexp_one_minus5 ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  ldexp_minus_one_minus5 ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  ldexp_large_minus5 ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  ldexp_top_minus5 ∈ [-inf .. inf] ∪ {NaN}
+  ldexpf_f_pi_minus5 ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
+  ldexpf_f_half_pi_minus5 ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
+  ldexpf_f_e_minus5 ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
+  ldexpf_zero_minus5 ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
+  ldexpf_minus_zero_minus5 ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
+  ldexpf_one_minus5 ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
+  ldexpf_minus_one_minus5 ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
+  ldexpf_large_minus5 ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
+  ldexpf_f_top_minus5 ∈ [-inf .. inf] ∪ {NaN}
+  ldexp_pi_huge ∈ [-inf .. inf]
+  ldexp_half_pi_huge ∈ [-inf .. inf]
+  ldexp_e_huge ∈ [-inf .. inf]
+  ldexp_zero_huge ∈ [-inf .. inf]
+  ldexp_minus_zero_huge ∈ [-inf .. inf]
+  ldexp_one_huge ∈ [-inf .. inf]
+  ldexp_minus_one_huge ∈ [-inf .. inf]
+  ldexp_large_huge ∈ [-inf .. inf]
+  ldexp_top_huge ∈ [-inf .. inf] ∪ {NaN}
+  ldexpf_f_pi_huge ∈ [-inf .. inf]
+  ldexpf_f_half_pi_huge ∈ [-inf .. inf]
+  ldexpf_f_e_huge ∈ [-inf .. inf]
+  ldexpf_zero_huge ∈ [-inf .. inf]
+  ldexpf_minus_zero_huge ∈ [-inf .. inf]
+  ldexpf_one_huge ∈ [-inf .. inf]
+  ldexpf_minus_one_huge ∈ [-inf .. inf]
+  ldexpf_large_huge ∈ [-inf .. inf]
+  ldexpf_f_top_huge ∈ [-inf .. inf] ∪ {NaN}
   r ∈ {0}
   __retres ∈ {0}

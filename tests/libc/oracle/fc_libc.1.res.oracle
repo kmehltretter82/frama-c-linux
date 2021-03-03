@@ -3082,40 +3082,110 @@ extern double exp(double x);
 extern float expf(float x);
 
 /*@ requires valid_exp: \valid(exp);
-    ensures initialization: exp: \initialized(\old(exp));
+    requires
+      ¬(infinite_arg: \is_plus_infinity(x) ∨ \is_minus_infinity(x));
+    requires ¬(nan_arg: \is_NaN(x));
     assigns \result, *exp;
-    assigns \result \from value;
-    assigns *exp \from value;
+    assigns \result \from x;
+    assigns *exp \from x;
+    
+    behavior normal:
+      assumes finite_arg: \is_finite(x);
+      assumes arg_nonzero: x ≢ 0.0;
+      ensures finite_result: \is_finite(\result);
+      ensures bounded_result: 0.5 ≤ \result < 1.0;
+      ensures initialization: exp: \initialized(\old(exp));
+    
+    behavior zero:
+      assumes zero_arg: \is_finite(x) ∧ x ≡ 0.;
+      ensures finite_result: \is_finite(\result);
+      ensures zero_result: \result ≡ 0.0;
+      ensures initialization: exp: \initialized(\old(exp));
+      ensures zero_exp: *\old(exp) ≡ 0;
+    
+    complete behaviors zero, normal;
+    disjoint behaviors zero, normal;
  */
-extern double frexp(double value, int *exp);
+extern double frexp(double x, int *exp);
 
 /*@ requires valid_exp: \valid(exp);
-    ensures initialization: exp: \initialized(\old(exp));
+    requires
+      ¬(infinite_arg: \is_plus_infinity(x) ∨ \is_minus_infinity(x));
+    requires ¬(nan_arg: \is_NaN(x));
     assigns \result, *exp;
-    assigns \result \from value;
-    assigns *exp \from value;
+    assigns \result \from x;
+    assigns *exp \from x;
+    
+    behavior normal:
+      assumes finite_arg: \is_finite(x);
+      assumes arg_nonzero: x ≢ 0.0;
+      ensures finite_result: \is_finite(\result);
+      ensures bounded_result: 0.5 ≤ \result < 1.0;
+      ensures initialization: exp: \initialized(\old(exp));
+    
+    behavior zero:
+      assumes zero_arg: \is_finite(x) ∧ x ≡ 0.;
+      ensures finite_result: \is_finite(\result);
+      ensures zero_result: \result ≡ \old(x);
+      ensures initialization: exp: \initialized(\old(exp));
+      ensures zero_exp: *\old(exp) ≡ 0;
+    
+    complete behaviors zero, normal;
+    disjoint behaviors zero, normal;
  */
-extern float frexpf(float value, int *exp);
+extern float frexpf(float x, int *exp);
 
 /*@ requires valid_exp: \valid(exp);
-    ensures initialization: exp: \initialized(\old(exp));
+    requires
+      ¬(infinite_arg: \is_plus_infinity(x) ∨ \is_minus_infinity(x));
+    requires ¬(nan_arg: \is_NaN(x));
     assigns \result, *exp;
-    assigns \result \from value;
-    assigns *exp \from value;
+    assigns \result \from x;
+    assigns *exp \from x;
+    
+    behavior normal:
+      assumes finite_arg: \is_finite(x);
+      assumes arg_nonzero: x ≢ 0.0;
+      ensures finite_result: \is_finite(\result);
+      ensures bounded_result: 0.5 ≤ \result < 1.0;
+      ensures initialization: exp: \initialized(\old(exp));
+    
+    behavior zero:
+      assumes zero_arg: \is_finite(x) ∧ x ≡ 0.;
+      ensures finite_result: \is_finite(\result);
+      ensures zero_result: \result ≡ \old(x);
+      ensures initialization: exp: \initialized(\old(exp));
+      ensures zero_exp: *\old(exp) ≡ 0;
+    
+    complete behaviors zero, normal;
+    disjoint behaviors zero, normal;
  */
-extern long double frexpl(long double value, int *exp);
+extern long double frexpl(long double x, int *exp);
 
-/*@ assigns \result;
-    assigns \result \from x, exp; */
+/*@ requires
+      finite_logic_res:
+        \is_finite((double)(x * pow((double)2.0d, (double)exp)));
+    ensures finite_result: \is_finite(\result);
+    ensures
+      __fc_errno: __fc_errno ≡ 34 ∨ __fc_errno ≡ \old(__fc_errno);
+    assigns __fc_errno, \result;
+    assigns __fc_errno \from x, exp;
+    assigns \result \from x, exp;
+ */
 extern double ldexp(double x, int exp);
 
-/*@ assigns \result;
-    assigns \result \from x, exp; */
+/*@ requires
+      finite_logic_res:
+        \is_finite((float)(x *
+                           pow((double)((float)2.0f), (double)((float)exp))));
+    ensures finite_result: \is_finite(\result);
+    ensures
+      __fc_errno: __fc_errno ≡ 34 ∨ __fc_errno ≡ \old(__fc_errno);
+    assigns __fc_errno, \result;
+    assigns __fc_errno \from x, exp;
+    assigns \result \from x, exp;
+ */
 extern float ldexpf(float x, int exp);
-
-/*@ assigns \result;
-    assigns \result \from x, exp; */
-extern long double ldexpl(long double x, int exp);
 
 /*@ requires finite_arg: \is_finite(x);
     requires arg_positive: x > 0;
