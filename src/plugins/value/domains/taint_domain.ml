@@ -234,6 +234,7 @@ module TransferTaint = struct
 
   let finalize_call stmt call ~pre ~post =
     let state = LatticeTaint.add pre (zone_of_taint_annot stmt) in
+    let state = LatticeTaint.join state post in
     let state =
       match call.Eval.return with
       | None ->
@@ -241,8 +242,8 @@ module TransferTaint = struct
       | Some vi ->
         let result_zone = Locations.zone_of_varinfo vi in
         if LatticeTaint.intersects post result_zone
-        then LatticeTaint.add state result_zone
-        else state
+        then state
+        else LatticeTaint.remove state result_zone
     in
     `Value state
 

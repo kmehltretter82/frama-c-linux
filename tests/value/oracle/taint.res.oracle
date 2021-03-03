@@ -44,7 +44,7 @@
 [eva] tests/value/taint.c:58: 
   Frama_C_domain_show_each:
   w : # taint: true
-  global : # taint: false
+  global : # taint: true
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
