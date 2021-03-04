@@ -7,7 +7,7 @@
   undet ∈ [--..--]
   global ∈ {0}
 [eva] computing for function taint_1 <- main.
-  Called from tests/value/taint.c:49.
+  Called from tests/value/taint.c:59.
 [eva] tests/value/taint.c:20: 
   Frama_C_dump_each:
   # taint:
@@ -15,11 +15,11 @@
   ==END OF DUMP==
 [eva] Recording results for taint_1
 [eva] Done for function taint_1
-[eva] tests/value/taint.c:50: 
+[eva] tests/value/taint.c:60: 
   Frama_C_domain_show_each:
   w : # taint: true
 [eva] computing for function taint_2 <- main.
-  Called from tests/value/taint.c:53.
+  Called from tests/value/taint.c:63.
 [eva:loop-unroll] tests/value/taint.c:26: Automatic loop unrolling.
 [eva] tests/value/taint.c:32: 
   Frama_C_dump_each:
@@ -28,20 +28,45 @@
   ==END OF DUMP==
 [eva] Recording results for taint_2
 [eva] Done for function taint_2
-[eva] tests/value/taint.c:54: 
+[eva] tests/value/taint.c:64: 
   Frama_C_domain_show_each:
   w : # taint: true
   z : # taint: true
 [eva] computing for function taint_3 <- main.
-  Called from tests/value/taint.c:57.
-[eva] tests/value/taint.c:42: 
+  Called from tests/value/taint.c:67.
+[eva:loop-unroll] tests/value/taint.c:42: Automatic loop unrolling.
+[eva] tests/value/taint.c:43: 
+  Frama_C_domain_show_each:
+  z : # taint: false
+  y : # taint: false
+[eva] tests/value/taint.c:46: 
+  Frama_C_domain_show_each:
+  z : # taint: false
+  y : # taint: false
+[eva] tests/value/taint.c:43: 
+  Frama_C_domain_show_each:
+  z : # taint: true
+  y : # taint: false
+[eva] tests/value/taint.c:46: 
+  Frama_C_domain_show_each:
+  z : # taint: true
+  y : # taint: true
+[eva] tests/value/taint.c:43: 
+  Frama_C_domain_show_each:
+  z : # taint: true
+  y : # taint: true
+[eva] tests/value/taint.c:46: 
+  Frama_C_domain_show_each:
+  z : # taint: true
+  y : # taint: true
+[eva] tests/value/taint.c:52: 
   Frama_C_dump_each:
   # taint:
-  global; t; x; w
+  global; t; x; y; z; w
   ==END OF DUMP==
 [eva] Recording results for taint_3
 [eva] Done for function taint_3
-[eva] tests/value/taint.c:58: 
+[eva] tests/value/taint.c:68: 
   Frama_C_domain_show_each:
   w : # taint: true
   global : # taint: true
@@ -64,7 +89,9 @@
 [eva:final-states] Values at end of function taint_3:
   global ∈ {2}
   x ∈ {1}
-  z ∈ {2}
+  y ∈ {6}
+  z ∈ {3}
+  u ∈ {1}
 [eva:final-states] Values at end of function main:
   global ∈ {2}
   w ∈ {2}
@@ -99,7 +126,7 @@
 [inout] Inputs for function taint_2:
     \nothing
 [inout] Out (internal) for function taint_3:
-    global; x; z
+    global; x; y; z; u
 [inout] Inputs for function taint_3:
     \nothing
 [inout] Out (internal) for function main:

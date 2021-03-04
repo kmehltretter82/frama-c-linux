@@ -33,12 +33,22 @@ void taint_2(int t, int u) {
 }
 
 void taint_3(int t) {
-  int x, z;
+  int x, y, z, u;
   if (t > 0) {
     x = 1;
   }
   global = x + 1;
-  z = 2;
+  y = z = 0;
+  while (z < 3) {
+    Frama_C_domain_show_each(z, y);
+    if (y % 2 == 0) {
+      y += 2;
+      Frama_C_domain_show_each(z, y);
+    }
+    //@ taint z;
+    z++;
+  }
+  u = 1;
   Frama_C_dump_each();
 }
 
