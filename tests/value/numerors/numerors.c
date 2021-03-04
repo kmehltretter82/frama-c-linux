@@ -1,7 +1,7 @@
 /* run.config
    OPT: -eva -eva-domains numerors -eva-msg-key=d-numerors
+   COMMENT: requires opam package mlgmpidl and system libraries for MPFR
 */
-
 /* Tests for the numerors domain, that computes absolute and relative errors
    of floating-point computations. */
 
