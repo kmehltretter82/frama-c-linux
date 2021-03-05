@@ -25,9 +25,14 @@
 open Cil_types
 open Eval
 
-val recursive_spec: kinstr -> kernel_function -> funspec
+(* Returns the specification for a recursive call to the given function. Fails
+   if the function has no specification. Marks the preconditions of the call
+   as unknowns. *)
+val get_spec: kinstr -> kernel_function -> funspec
 
-(** TODO *)
-val get_recursion: ('v, 'loc) call -> recursion option
+(** Creates the information about a recursive call. *)
+val make: ('v, 'loc) call -> recursion option
 
-val revert_recursion: recursion -> recursion
+(** Changes the information about a recursive call to be used at the end
+    of the call. *)
+val revert: recursion -> recursion

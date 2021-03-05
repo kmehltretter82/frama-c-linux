@@ -251,11 +251,13 @@ module type Transfer = sig
     stmt -> exp -> bool ->
     (value, location, origin) valuation -> state -> state or_bottom
 
-  (** [start_call stmt call valuation state] returns an initial state
+  (** [start_call stmt call recursion valuation state] returns an initial state
       for the analysis of a called function. In particular, this function
       should introduce the formal parameters in the state, if necessary.
       - [stmt] is the statement of the call site;
       - [call] represents the call: the called function and the arguments;
+      - [recursion] is the information needed to interpret a recursive call.
+        It is None if the call is not recursive.
       - [state] is the abstract state at the call site, before the call;
       - [valuation] is a cache for all values and locations computed during
         the evaluation of the function and its arguments. *)
@@ -268,6 +270,8 @@ module type Transfer = sig
       end of the called function.
       - [stmt] is the statement of the call site;
       - [call] represents the function call and its arguments.
+      - [recursion] is the information needed to interpret a recursive call.
+        It is None if the call is not recursive.
       - [pre] and [post] are the states before and at the end of the call
         respectively. *)
   val finalize_call:

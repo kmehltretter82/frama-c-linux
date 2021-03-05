@@ -44,7 +44,7 @@ let mark_unknown_requires kinstr kf funspec =
   in
   List.iter emit_behavior funspec.spec_behavior
 
-let recursive_spec kinstr kf =
+let get_spec kinstr kf =
   let funspec = Annotations.funspec ~populate:false kf in
   if Cil.is_empty_funspec funspec then
     Value_parameters.abort ~current:true
@@ -174,7 +174,7 @@ let make_recursion call depth =
   let base_withdrawal = Base.Hptset.of_list list_withdrawal in
   { depth; substitution; base_substitution; withdrawal; base_withdrawal; }
 
-let get_recursion call =
+let make call =
   let call_stack = Value_util.call_stack () in
   let previous_calls = List.filter (fun (f, _) -> f == call.kf) call_stack in
   let depth = List.length previous_calls in
@@ -182,7 +182,7 @@ let get_recursion call =
   then Some (make_recursion call depth)
   else None
 
-let revert_recursion recursion =
+let revert recursion =
   let revert (v1, v2) = v2, v1 in
   let substitution = List.map revert recursion.substitution in
   let base_of_varinfo (v1, v2) = Base.of_varinfo v1, Base.of_varinfo v2 in

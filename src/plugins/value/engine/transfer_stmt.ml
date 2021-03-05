@@ -113,7 +113,7 @@ let substitution_visitor table = object
   method! vvrbl varinfo =
     match VarHashtbl.find_opt table varinfo with
     | None -> Cil.JustCopy
-    | Some lval -> Cil.ChangeTo lval
+    | Some vi -> Cil.ChangeTo vi
 end
 
 module Make (Abstract: Abstractions.Eva) = struct
@@ -483,7 +483,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       >>- fun reductions ->
       (* The formals (and the locals) of the called function leave scope. *)
       let post = Domain.leave_scope kf_callee leaving_vars state in
-      let recursion = Option.map Recursion.revert_recursion recursion in
+      let recursion = Option.map Recursion.revert recursion in
       (* Computes the state after the call, from the post state at the end of
          the called function, and the pre state at the call site. *)
       Domain.finalize_call stmt call recursion ~pre ~post >>- fun state ->
@@ -582,7 +582,7 @@ module Make (Abstract: Abstractions.Eva) = struct
     compute_actuals ~subdivnb ~determinate valuation state arguments
     >>=: fun (args, valuation) ->
     let call = create_call kf args in
-    let recursion = Recursion.get_recursion call in
+    let recursion = Recursion.make call in
     let call = Extlib.opt_fold replace_recursive_call recursion call in
     call, recursion, valuation
 

@@ -53,7 +53,7 @@ module Make_Memory (Value: Value) = struct
   module Deps = struct let l = [Ast.self] end
 
   include Hptmap.Make
-      (Base.Base) (Value)(Hptmap.Comp_unused) (Initial_Values) (Deps)
+      (Base.Base) (Value) (Hptmap.Comp_unused) (Initial_Values) (Deps)
 
   let cache_name s =
     Hptmap_sig.PersistentCache ("Value." ^ Value.name ^ "." ^ s)

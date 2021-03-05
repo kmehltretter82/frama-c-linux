@@ -89,6 +89,9 @@ module type S = sig
     (** Build a set from another [elt]-indexed map or set. *)
 
     val partition_with_shape: 'a shape -> t -> t * t
+    (** [partition_with_shape shape set] returns two sets [inter, diff] that are
+        respectively the intersection and the difference between [set] and
+        [shape]. *)
 
     val fold2_join_heterogeneous:
       cache:Hptmap_sig.cache_type ->
@@ -101,6 +104,9 @@ module type S = sig
       'b
 
     val replace: elt shape -> t -> bool * t
+    (** [replace shape set] replaces the elements of [set] according to [shape].
+        The returned boolean indicates whether the set has been modified; it is
+        false when the intersection between [shape] and [set] is empty. *)
 
     (** Clear all the caches used internally by the functions of this module.
         Those caches are not project-aware, so this function must be called

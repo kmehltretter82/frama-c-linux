@@ -236,13 +236,25 @@ type ('loc, 'value) call = {
 (** Information needed to interpret a recursive call.
     The local variables and formal parameters of different recursive calls
     should not be mixed up. Those of the current call must be temporary withdraw
-    or replaced from the domain states before starting the new recursive call. *)
+    or replaced from the domain states before starting the new recursive call,
+    and the inverse transformation must be made at the end of the call. *)
 type recursion = {
   depth: int;
+  (** Depth of the recursive call, i.e. the number of previous call to the
+      called function in the current callstack. *)
   substitution: (varinfo * varinfo) list;
+  (** List of variables substitutions to be performed by the domains: for each
+      pair, the first variable must be replaced by the second one in the domain
+      state. *)
   base_substitution: Base.substitution;
+  (** Same substitution as the previous field, for bases. *)
   withdrawal: varinfo list;
+  (** List of variables to be temporary removed from the state at the start of a
+      new recursive call (by the function [start_call] of the abstract domains),
+      or to be put back in the state at the end of a recursive call (by the
+      function [finalize_call] of the abstract domains).  *)
   base_withdrawal: Base.Hptset.t;
+  (** Same withdrawal as the previous field, for bases. *)
 }
 
 (** Can the results of a function call be cached with memexec? *)
