@@ -217,8 +217,6 @@
 [eva] tests/value/recursion.c:287: 
   detected recursive call of function escaping_formal.
 [eva] tests/value/recursion.c:287: Warning: 
-  function 'escaping_formal' (involved in a recursive call) has a formal parameter whose address is taken. Analysis may be unsound.
-[eva] tests/value/recursion.c:287: Warning: 
   Using specification of function escaping_formal for recursive calls.
   Analysis of function escaping_formal is thus incomplete and its soundness
   relies on the written specification.

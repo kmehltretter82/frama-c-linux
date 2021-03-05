@@ -99,8 +99,6 @@
   all target addresses were invalid. This path is assumed to be dead.
 [eva] tests/value/recursion.c:287: 
   detected recursive call of function escaping_formal.
-[eva] tests/value/recursion.c:287: Warning: 
-  function 'escaping_formal' (involved in a recursive call) has a formal parameter whose address is taken. Analysis may be unsound.
 [eva] tests/value/recursion.c:290: Frama_C_show_each_16: {1}
 [eva:locals-escaping] tests/value/recursion.c:287: Warning: 
   locals {x} escaping the scope of escaping_formal through p

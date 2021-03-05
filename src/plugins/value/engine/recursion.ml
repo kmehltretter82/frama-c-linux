@@ -25,27 +25,6 @@ open Eval
 
 module Varinfo = Cil_datatype.Varinfo
 
-(** Recursion *)
-
-(* Our current treatment for recursion -- use the specification for
-   the function that begins the recursive cycle -- is incorrect for
-   function with formals whose address is taken. Indeed, we do not know
-   which "instance" of the formal is updated by the specification. In
-   this case, warn the user. *)
-let check_formals_non_referenced kf =
-  let formals = Kernel_function.get_formals kf in
-  if List.exists (fun vi -> vi.vaddrof) formals then
-    Value_parameters.warning ~current:true ~once:true
-      "function '%a' (involved in a recursive call) has a formal parameter \
-       whose address is taken. Analysis may be unsound."
-      Kernel_function.pretty kf
-
-let warn_recursive_call kf =
-  Value_parameters.feedback ~once:true ~current:true
-    "@[detected recursive call@ of function %a.@]"
-    Kernel_function.pretty kf;
-  check_formals_non_referenced kf
-
 let mark_unknown_requires kinstr kf funspec =
   let stmt =
     match kinstr with
@@ -174,7 +153,9 @@ let make_stack (kf, depth) =
 let get_stack kf depth = VarStack.memo make_stack (kf, depth)
 
 let make_recursion call depth =
-  warn_recursive_call call.kf;
+  Value_parameters.feedback ~once:true ~current:true
+    "@[detected recursive call@ of function %a.@]"
+    Kernel_function.pretty call.kf;
   let substitution = get_stack call.kf depth in
   let add_if_copy acc argument =
     match argument.avalue with
