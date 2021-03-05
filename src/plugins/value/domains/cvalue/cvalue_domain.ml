@@ -230,21 +230,19 @@ module State = struct
     Cvalue_transfer.assume stmt expr positive valuation s >>-: fun s ->
     s, clob
 
+  let is_direct_recursion stmt call =
+    try
+      let kf = Kernel_function.find_englobing_kf stmt in
+      Kernel_function.equal kf call.kf
+    with Not_found -> false (* Should not happen *)
+
   let start_recursive_call stmt call recursion (state, clob) =
-    let direct =
-      try
-        let kf = Kernel_function.find_englobing_kf stmt in
-        Kernel_function.equal kf call.kf
-      with Not_found -> false (* Should not happen *)
-    in
+    let direct = is_direct_recursion stmt call in
     let state = Model.remove_variables recursion.withdrawal state in
-    let state = Model.replace_base recursion.base_substitution state in
+    let substitution = recursion.base_substitution in
     let clob = if direct then clob else Locals_scoping.top () in
-    let state, set =
-      Locals_scoping.substitute recursion.base_substitution clob state
-    in
-    Locals_scoping.remember_bases_with_locals clob (Base.SetLattice.inject set);
-    state
+    let state = Locals_scoping.substitute substitution clob state in
+    Model.replace_base substitution state
 
   let start_call stmt call recursion valuation (state, clob) =
     let state =
@@ -256,31 +254,26 @@ module State = struct
     >>-: fun state -> state, Locals_scoping.bottom ()
 
   let finalize_recursive_call stmt call ~pre recursion state =
-    let direct =
-      try
-        let kf = Kernel_function.find_englobing_kf stmt in
-        Kernel_function.equal kf call.kf
-      with Not_found -> false (* Should not happen *)
-    in
+    let direct = is_direct_recursion stmt call in
     let pre, clob = pre in
+    let substitution = recursion.base_substitution in
+    let state = Model.replace_base substitution state in
+    let clob = if direct then clob else Locals_scoping.top () in
+    let state = Locals_scoping.substitute substitution clob state in
     let shape = Base.Hptset.shape recursion.base_withdrawal in
     let inter = Cvalue.Model.filter_by_shape shape pre in
-    let state = Cvalue.Model.merge ~into:state inter in
-    let state = Model.replace_base recursion.base_substitution state in
-    let clob = if direct then clob else Locals_scoping.top () in
-    let state, _set =
-      Locals_scoping.substitute recursion.base_substitution clob state
-    in
-    state
+    Cvalue.Model.merge ~into:state inter
 
   let finalize_call stmt call recursion ~pre ~post =
-    let (post, post_clob) = post in
-    let post =
-      Extlib.opt_fold (finalize_recursive_call stmt call ~pre) recursion post
-    in
     let (pre, clob) = pre in
+    let (post, post_clob) = post in
     Locals_scoping.(remember_bases_with_locals clob post_clob.clob);
-    Cvalue_transfer.finalize_call stmt call recursion  ~pre ~post
+    let post =
+      Extlib.opt_fold
+        (finalize_recursive_call stmt call ~pre:(pre, clob))
+        recursion post
+    in
+    Cvalue_transfer.finalize_call stmt call recursion ~pre ~post
     >>-: fun state ->
     state, clob
 

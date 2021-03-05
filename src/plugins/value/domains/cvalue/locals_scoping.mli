@@ -71,8 +71,9 @@ val make_escaping_fundec:
     function, in which case a different warning is emitted. *)
 
 val substitute:
-  Base.substitution -> clobbered_set -> Cvalue.Model.t ->
-  Cvalue.Model.t * Base.Hptset.t
+  Base.substitution -> clobbered_set -> Cvalue.Model.t -> Cvalue.Model.t
+(** [substitute substitution clob state] applies [substitution] to all pointer
+    values in the offsetmaps bound to variables in [clob] in [state]. *)
 
 (*
 Local Variables:

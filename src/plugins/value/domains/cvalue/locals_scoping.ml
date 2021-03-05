@@ -130,12 +130,12 @@ let make_escaping_fundec fundec clob vars state =
 let substitute substitution clob state =
   (* Apply the [substitution] to [offsm]. If it is modified, bind the new
      offsetmap to [base] in [state], and add the [base] to [set]. *)
-  let replace_offsm base offsm (state, set) =
+  let replace_offsm base offsm state =
     let f v = snd (Cvalue.V_Or_Uninitialized.replace_base substitution v) in
     let offsm' = Cvalue.V_Offsetmap.map_on_values f offsm in
     if Cvalue.V_Offsetmap.equal offsm' offsm
-    then state, set
-    else Cvalue.Model.add_base base offsm' state, Base.Hptset.add base set
+    then state
+    else Cvalue.Model.add_base base offsm' state
   in
   (* Apply the substitution to the offsetmap bound to [base] in [state] *)
   let replace_base base acc =
@@ -144,15 +144,14 @@ let substitute substitution clob state =
     | `Top | `Bottom -> acc
     | exception Not_found -> acc
   in
-  let acc = state, Base.Hptset.empty in
   (* Iterate on all the bases that might contain a variable to substitute *)
-  try Base.SetLattice.fold replace_base clob.clob (replace_base Base.null acc)
+  try Base.SetLattice.fold replace_base clob.clob (replace_base Base.null state)
   with Abstract_interp.Error_Top ->
   (* [clob] is too imprecise. Iterate on the entire memory state instead,
      which is much slower. *)
   match state with
-  | Cvalue.Model.Top | Cvalue.Model.Bottom -> acc
-  | Cvalue.Model.Map map -> Cvalue.Model.fold replace_offsm map acc
+  | Cvalue.Model.Top | Cvalue.Model.Bottom -> state
+  | Cvalue.Model.Map map -> Cvalue.Model.fold replace_offsm map state
 
 (*
 Local Variables:
