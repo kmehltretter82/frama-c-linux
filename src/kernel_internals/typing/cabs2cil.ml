@@ -9447,7 +9447,7 @@ and doDecl local_env (isglobal: bool) : A.definition -> chunk = function
             if !currentFunctionFDEC.svar.vname = "main" then
               [],res
             else begin
-              Kernel.warning ~current:true
+              Kernel.warning ~current:true ~wkey:Kernel.wkey_cert_msc_37
                 "Body of function %s falls-through. \
                  Adding a return statement"
                 !currentFunctionFDEC.svar.vname;
@@ -9459,7 +9459,7 @@ and doDecl local_env (isglobal: bool) : A.definition -> chunk = function
                to get there anyway. *)
             let null_ptr = makeCastT (zero ~loc) intType (TPtr(rt,[])) in
             let res = Some (new_exp ~loc (Lval (mkMem null_ptr NoOffset))) in
-            Kernel.warning ~current:true
+            Kernel.warning ~current:true ~wkey:Kernel.wkey_cert_msc_37
               "Body of function %s falls-through. \
                Adding a return statement"
               !currentFunctionFDEC.svar.vname;

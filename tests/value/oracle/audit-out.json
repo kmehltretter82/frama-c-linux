@@ -51,11 +51,11 @@
   "kernel": {
     "warning-categories": {
       "enabled": [
-        "*", "CERT", "CERT:EXP", "CERT:EXP:46", "CERT:MSC", "CERT:MSC:38",
-        "acsl-extension", "annot", "annot:missing-spec", "annot:multi-from",
-        "annot-error", "audit", "check", "check:volatile", "cmdline",
-        "ghost", "ghost:bad-use", "inline", "linker",
-        "linker:drop-conflicting-unused", "parser",
+        "*", "CERT", "CERT:EXP", "CERT:EXP:46", "CERT:MSC", "CERT:MSC:37",
+        "CERT:MSC:38", "acsl-extension", "annot", "annot:missing-spec",
+        "annot:multi-from", "annot-error", "audit", "check",
+        "check:volatile", "cmdline", "ghost", "ghost:bad-use", "inline",
+        "linker", "linker:drop-conflicting-unused", "parser",
         "parser:conditional-feature", "pp", "pp:compilation-db", "typing",
         "typing:implicit-conv-void-ptr",
         "typing:implicit-function-declaration",

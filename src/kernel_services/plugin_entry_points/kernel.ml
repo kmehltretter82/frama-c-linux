@@ -167,6 +167,8 @@ let wkey_int_conversion =
 
 let wkey_cert_exp_46 = register_warn_category "CERT:EXP:46"
 
+let wkey_cert_msc_37 = register_warn_category "CERT:MSC:37"
+
 let wkey_cert_msc_38 = register_warn_category "CERT:MSC:38"
 let () = set_warn_status wkey_cert_msc_38 Log.Werror
 

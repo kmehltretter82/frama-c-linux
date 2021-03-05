@@ -1,5 +1,5 @@
 [kernel] Parsing tests/slicing/use_spec.i (no preprocessing)
-[kernel] tests/slicing/use_spec.i:18: Warning: 
+[kernel:CERT:MSC:37] tests/slicing/use_spec.i:18: Warning: 
   Body of function f falls-through. Adding a return statement
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at main
