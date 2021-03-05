@@ -72,6 +72,101 @@ cases, we simply refer to the related section in the ISO C standard.
 % disable the hyphenation ugly hack
 \texttt{\hyphenchar\font=-1}
 
+\section{RTE categories and C Undefined Behaviors}
+
+This section presents the correspondence between runtime execution (RTE) alarms
+emitted by the Eva plugin and C undefined behaviors.
+
+\begin{longtable}{>{\raggedright}m{0.26\textwidth} >{\raggedright\arraybackslash}m{0.28\textwidth} >{\raggedright\arraybackslash}m{0.4\textwidth}}
+  \caption{%
+    Correspondence between \FramaC's runtime error categories and C's undefined behaviors.
+  }\\
+  \cellcolor{white}\textbf{{\em RTE Category}} & \cellcolor{white}\textbf{{\em Related UBs}} & \cellcolor{white}\textbf{{\em Notes}} \\
+  \hline
+  \endhead
+  \endfoot
+  \label{tab:rte}%
+  bool\_value & {\em CC.12} & All values other than $\{0, 1\}$ are trap representations for the \texttt{\_Bool} type. \\
+  dangling\_pointer & {\em CC.9}, {\em CC.10}, {\em CC.177} & \\
+  differing\_blocks & {\em CC.48}, {\em CC.53} & \\
+  division\_by\_zero & {\em CC.45} & \\
+  float\_to\_int & {\em CC.17} & \\
+  function\_pointer & {\em CC.26}, {\em CC.41} & \\
+  freeable & {\em CC.179} & This is not an RTE category, but an alarm related to an ACSL precondition \\
+  index\_bound & {\em CC.49}, {\em CC.176} (among others) & \\
+  initialization & {\em CC.11}, {\em CC.180} & \\
+  initialization\_of\_union & {\em CC.11}, {\em CC.180} & \\
+  mem\_access & {\em CC.33}, {\em CC.62}, {\em CC.64} & \\
+  overflow & {\em CC.36} & \\
+  overlap & {\em CC.54} & {\em CC.100} is handled by \FramaC's libc ACSL specifications. \\
+  pointer\_value & {\em CC.46}, {\em CC.47}, {\em CC.62} & \\
+  ptr\_comparison & {\em CC.53} & \\
+  separation & {\em CC.35} & \\
+  shift & {\em CC.51}, {\em CC.52} & \\
+  special\_float & & Non-finite floating-point values are not UB, but can be optionally considered as undesirable. \\
+\end{longtable}
+
+Note that some undefined behaviors,
+such as {\em CC.100}, {\em CC.191}, {\em CC.192} and others,
+are not handled by specific categories of RTEs, but instead by ACSL
+specifications in \FramaC's libc. These specifications are used by some
+analyzers and result in warnings and errors when violated.
+
+%50 - The result of subtracting two pointers is not representable in an object of type ptrdiff_t (6.5.6).
+
+\section{C Undefined Behaviors {\em not} handled by \FramaC}
+
+This section lists some of the C undefined behaviors which are currently
+{\em not} directly covered by the open-source version of \FramaC.
+
+The list includes UBs which are delegated to other tools, such as the
+preprocessor or the compiler.
+\FramaC does not preprocess the sources, relying on external
+preprocessors such as GCC's or Clang; therefore, related UBs are out of the
+scope of \FramaC and listed below, even though in practice they are verified
+by the underlying preprocessor in all but the most exotic architectures.
+
+For a few UBs of syntactic nature, which are always detected during compilation,
+\FramaC delegates the task to the compiler. This implies that, when running
+\FramaC directly on the code, it may not complain about them; but the code
+will generate an error during compilation anyway, {\em without} requiring
+specific compilation flags.
+
+This list is not exhaustive; some UBs not listed here are partially handled
+by \FramaC. Others require further analysis to determine whether some \FramaC
+analyzer handles them. Please contact the \FramaC team if you would like more
+information about whether a specific set of UBs is handled by the platform.
+
+\begin{longtable}{>{\raggedright}m{0.1\textwidth} m{0.9\textwidth} >{\raggedright\arraybackslash}m{0.3\textwidth}}
+  \caption{%
+    C undefined behaviors {\em not} handled by \FramaC.
+  }\\
+  \cellcolor{white}\textbf{{\em UB}} & \cellcolor{white}\textbf{{\em Notes}} \\
+  \hline
+  \endhead
+  \endfoot
+  \label{tab:ubs-not-handled}%
+  CC.2 & Syntactic; out of the scope of \FramaC's analyzers.\\
+  CC.3 & Out of scope (lexing/preprocessing-related).\\
+  CC.5 & Requires concurrency analysis; the Mthread plugin can provide some guarantees.\\
+  CC.14 & Only applies to implementations not following IEEE-754. \FramaC's machdeps assume they do.\\
+  CC.18 & Only applies to implementations not following IEEE-754. \FramaC's machdeps assume they do.\\
+  CC.27 & Out of scope (lexing/preprocessing-related).\\
+  CC.28 & Out of scope (lexing/preprocessing-related).\\
+  CC.30 & Out of scope (lexing/preprocessing-related).\\
+  CC.31 & Out of scope (lexing/preprocessing-related).\\
+  CC.34 & Out of scope (lexing/preprocessing-related).\\
+  CC.58 & Syntactic; delegated to the compiler.\\
+  CC.59 & Syntactic; delegated to the compiler.\\
+  CC.90 & Out of scope (lexing/preprocessing-related).\\
+  CC.91 & Out of scope (lexing/preprocessing-related).\\
+  CC.92 & Out of scope (lexing/preprocessing-related).\\
+  CC.93 & Out of scope (lexing/preprocessing-related).\\
+  CC.94 & Out of scope (lexing/preprocessing-related).\\
+  CC.95 & Out of scope (lexing/preprocessing-related).\\
+  CC.96 & Out of scope (lexing/preprocessing-related).\\
+\end{longtable}
+
 \section{Common Weakness Enumerations (CWEs) Reported and not Reported by Frama-C}
 
 This section lists some CWEs which \FramaC is known to handle, as well as some
@@ -105,7 +200,7 @@ soundness.
 In Table~\ref{tab:cwe}, the {\em Status} column summarizes the current
 handling of the CWE by \FramaC, as one of the following:
 
-\begin{itemize}
+\begin{description}
 \item[Handled] means \FramaC already handles the CWE; in some cases, its
   detection may be controlled by command-line options;
 \item[Partially Handled] means the CWE is handled only in some specific cases;
@@ -124,7 +219,7 @@ handling of the CWE by \FramaC, as one of the following:
   concern of the platform developers.
 \item[Too Vague] means the CWE is either too vague or too broad to be formally
   matched to a given set of properties that \FramaC can verify.
-\end{itemize}
+\end{description}
 
 {\small
 \begin{longtable}{>{\raggedright}m{0.42\textwidth} m{0.13\textwidth} >{\raggedright\arraybackslash}m{0.45\textwidth}}
@@ -250,6 +345,7 @@ handling of the CWE by \FramaC, as one of the following:
   CWE-832: Unlock of Resource That is Not Locked & Annotations & Requires annotating resources and operations on them\\
   CWE-835: Infinite Loop & Partially Handled & Loops which, semantically, are {\em always} infinite are reported by the Nonterm plugin\\
   CWE-843: Access of Resource Using Incompatible Type ('Type Confusion') & Not Handled & -\\
+  CWE-912: Hidden Functionality & Too Vague & \FramaC's sound analysis can show the absence of backdoors, but only if they can be semantically specified (e.g. via annotations)\\
 \end{longtable}
 }
 
