@@ -1372,18 +1372,6 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config =
            wtest.cmd
        end;
        Format.fprintf result_fmt
-         "(rule ; REPRODUCE EXECNOW #%d OF TEST FILE %S\n  \
-          (alias %s)\n  \
-          (deps %a (package frama-c)%a (universe))\n  \
-          (action (system %S))\n\
-          )@."
-         nth file
-         (mk_alias cmd "execnow")
-         print_list config.dc_deps
-         Fmt.(list (package_as_deps (quote plugin_as_package))) config.dc_plugins
-         wtest.cmd
-       ;
-       Format.fprintf result_fmt
          "(rule ; SHOW EXECNOW COMMAND #%d OF TEST FILE %S\n  \
           (alias %s)\n  \
           (deps %a (package frama-c)%a (universe))\n  \
@@ -1427,7 +1415,7 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config =
       let print_list_alias fmt l = List.iter (Format.fprintf fmt "(alias %S)") l in
       Format.fprintf result_fmt
           "; TEST FILE %S\n\
-           (alias (deps %a%a) (name %S)) ; to performs all sub-tests related to a file\n \
+           (alias (deps %a%a) (name %S)) ; to performs all sub-tests related to a file\n\
            (alias (deps %a%a) (name %S)) ; to reproduce and visualize the all sub-test outputs related to a file@."
           file
           (* alias #1 *)
@@ -1436,7 +1424,7 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config =
           (Format.sprintf "%s.wtests" test_name)
           (* alias #2 *)
           print_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.exec" test_name i) config.dc_commands)
-          print_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.execnow" test_name i) config.dc_execnow)
+          print_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.execnow.wtests" test_name i) config.dc_execnow)
           file;
     end ;
     List.iter make_cmd config.dc_commands;
