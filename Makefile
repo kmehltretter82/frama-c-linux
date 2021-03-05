@@ -1254,8 +1254,8 @@ MODULES_TODOC+= $(filter-out src/plugins/gui/book_manager.mli,\
 GUICMI = $(GUICMO:.cmo=.cmi)
 GUICMX = $(SINGLE_GUI_CMX) $(PLUGIN_GUI_CMX_LIST)
 
-$(GUICMI) $(GUICMO) bin/viewer.byte$(EXE): BFLAGS+= $(GUI_INCLUDES)
-$(GUICMX) bin/viewer.opt$(EXE): OFLAGS+= $(GUI_INCLUDES)
+$(GUICMI) $(GUICMO) bin/viewer.byte$(EXE): BFLAGS+= $(GUI_INCLUDES) $(THREAD)
+$(GUICMX) bin/viewer.opt$(EXE): OFLAGS+= $(GUI_INCLUDES) $(THREAD)
 
 $(PLUGIN_DYN_DEP_GUI_CMO_LIST): BFLAGS+= $(GUI_INCLUDES)
 $(PLUGIN_DYN_DEP_GUI_CMX_LIST): OFLAGS+= $(GUI_INCLUDES)
