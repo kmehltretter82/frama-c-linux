@@ -7,7 +7,7 @@
   undet ∈ [--..--]
   global ∈ {0}
 [eva] computing for function taint_1 <- main.
-  Called from tests/value/taint.c:59.
+  Called from tests/value/taint.c:62.
 [eva] tests/value/taint.c:20: 
   Frama_C_dump_each:
   # taint:
@@ -15,11 +15,11 @@
   ==END OF DUMP==
 [eva] Recording results for taint_1
 [eva] Done for function taint_1
-[eva] tests/value/taint.c:60: 
+[eva] tests/value/taint.c:63: 
   Frama_C_domain_show_each:
   w : # taint: true
 [eva] computing for function taint_2 <- main.
-  Called from tests/value/taint.c:63.
+  Called from tests/value/taint.c:66.
 [eva:loop-unroll] tests/value/taint.c:26: Automatic loop unrolling.
 [eva] tests/value/taint.c:32: 
   Frama_C_dump_each:
@@ -28,12 +28,12 @@
   ==END OF DUMP==
 [eva] Recording results for taint_2
 [eva] Done for function taint_2
-[eva] tests/value/taint.c:64: 
+[eva] tests/value/taint.c:67: 
   Frama_C_domain_show_each:
   w : # taint: true
   z : # taint: true
 [eva] computing for function taint_3 <- main.
-  Called from tests/value/taint.c:67.
+  Called from tests/value/taint.c:70.
 [eva:loop-unroll] tests/value/taint.c:42: Automatic loop unrolling.
 [eva] tests/value/taint.c:43: 
   Frama_C_domain_show_each:
@@ -59,14 +59,14 @@
   Frama_C_domain_show_each:
   z : # taint: true
   y : # taint: true
-[eva] tests/value/taint.c:52: 
+[eva] tests/value/taint.c:55: 
   Frama_C_dump_each:
   # taint:
   global; t; x; y; z; w
   ==END OF DUMP==
 [eva] Recording results for taint_3
 [eva] Done for function taint_3
-[eva] tests/value/taint.c:68: 
+[eva] tests/value/taint.c:71: 
   Frama_C_domain_show_each:
   w : # taint: true
   global : # taint: true

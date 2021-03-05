@@ -38,7 +38,7 @@ void taint_3(int t) {
     x = 1;
   }
   global = x + 1;
-  y = z = 0;
+  y = z = u = 0;
   while (z < 3) {
     Frama_C_domain_show_each(z, y);
     if (y % 2 == 0) {
@@ -48,7 +48,10 @@ void taint_3(int t) {
     //@ taint z;
     z++;
   }
-  u = 1;
+  if (!u)
+    u = 1;
+  else
+    u = 2;
   Frama_C_dump_each();
 }
 

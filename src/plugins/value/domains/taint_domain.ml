@@ -210,7 +210,8 @@ module TransferTaint = struct
     let to_loc = loc_of_lval valuation in
     let exp_zone = Value_util.zone_of_expr to_loc exp in
     let state =
-      if LatticeTaint.intersects state exp_zone && state.control_stmt = None
+      if LatticeTaint.intersects state exp_zone &&
+         (state.control_stmt = None || not (is_under_taint_condition state stmt))
       then { state with control_stmt = Some stmt; }
       else state
     in
