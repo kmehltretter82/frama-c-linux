@@ -23,7 +23,7 @@ frama_c_journal.ml
 /headers/hdrck
 
 #build
-
+/_opam/
 configure
 autom4te.cache
 .log.autoconf
