@@ -1053,6 +1053,17 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       filter_rule "RES" cmdreslog reslog (log_prefix ^ ".res.oracle") ;
       filter_rule "ERR" cmderrlog errlog (log_prefix ^ ".err.oracle")
   end ;
+  List.iteri (fun n log ->
+      Format.fprintf result_fmt
+        "(rule ; COMPARE TARGET #%d OF TEST #%d FOR TEST FILE %S\n  \
+         (alias %s)\n  \
+         (action (diff %S %S))\n\
+         )@."
+        n command.nth command.file
+        (ptests_alias ~env)
+        (SubDir.make_file (SubDir.oracle_subdir ~env SubDir.upper_dir) log)
+        log
+    ) command.log_files;
   Format.fprintf result_fmt
     "(rule ; REPRODUCE TEST #%d OF TEST FILE %S\n  \
      (alias %S)\n  \
