@@ -9,10 +9,11 @@
           "signature": "int g(int y);",
           "defined": true,
           "sloc": {
-            "dir": "tests/batch",
+            "dir": ".",
             "base": "ast_services.i",
-            "file": "tests/batch/ast_services.i",
-            "line": 2
+            "file":
+              "/home/pb122476/export-local/frama-c/dune-frama-c/trunk/_build/default/src/plugins/server/tests/batch/result/ast_services.i",
+            "line": 8
           }
         },
         {
@@ -21,10 +22,11 @@
           "signature": "int f(int x);",
           "defined": true,
           "sloc": {
-            "dir": "tests/batch",
+            "dir": ".",
             "base": "ast_services.i",
-            "file": "tests/batch/ast_services.i",
-            "line": 1
+            "file":
+              "/home/pb122476/export-local/frama-c/dune-frama-c/trunk/_build/default/src/plugins/server/tests/batch/result/ast_services.i",
+            "line": 7
           }
         }
       ],
