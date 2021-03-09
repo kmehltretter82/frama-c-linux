@@ -1,8 +1,8 @@
 /* run.config
 CMD: @frama-c-cmd@ @OPTIONS@
-OPT: %{read:../framac_share_path}/libc/string.h @PTEST_FILE@ @PTEST_FILE@ -print
-OPT: @PTEST_FILE@ %{read:../framac_share_path}/libc/string.h @PTEST_FILE@ -print
-OPT: @PTEST_FILE@ @PTEST_FILE@ %{read:../framac_share_path}/libc/string.h -print
+OPT: ../../../../install/default/share/frama-c/share/libc/string.h @PTEST_FILE@ @PTEST_FILE@ -print
+OPT: @PTEST_FILE@ ../../../../install/default/share/frama-c/share/libc/string.h @PTEST_FILE@ -print
+OPT: @PTEST_FILE@ @PTEST_FILE@ ../../../../install/default/share/frama-c/share/libc/string.h -print
 */
 
 #include "string.h"
