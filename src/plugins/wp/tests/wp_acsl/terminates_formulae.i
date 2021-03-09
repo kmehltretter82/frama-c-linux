@@ -59,6 +59,15 @@ void variant(void){
   for(unsigned i = 3; i > 0; --i);
 }
 
+/*@ predicate Rel (integer old, integer new) = old > new && 0 <= old; */
+
+//@ terminates Q ;
+void general_variant(unsigned x) {
+  /*@ loop assigns x ;
+      loop variant x for Rel; */
+  while (x > 0) x --;
+}
+
 //@ terminates Q ;
 void no_variant(void){
   //@ loop assigns i ;

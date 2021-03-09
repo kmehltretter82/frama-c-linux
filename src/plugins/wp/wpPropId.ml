@@ -42,6 +42,7 @@ type prop_kind =
   | PKPropLoop    (** loop property used as hypothesis inside a loop. *)
   | PKVarDecr     (** computation related to the decreasing of a variant in a loop *)
   | PKVarPos      (** computation related to a loop variant being positive *)
+  | PKVarRel      (** computation related to a generalized loop variant *)
   | PKAFctOut     (** computation related to the function assigns on normal termination *)
   | PKAFctExit    (** computation related to the function assigns on exit termination *)
   | PKTerminates  (** computation related to the termination *)
@@ -124,6 +125,7 @@ let mk_loop_inv kf s ca =
 let mk_inv_hyp_id    kf s ca = mk_prop PKPropLoop  (mk_annot_id kf s ca)
 let mk_var_decr_id   kf s ca = mk_prop PKVarDecr (mk_annot_id kf s ca)
 let mk_var_pos_id    kf s ca = mk_prop PKVarPos  (mk_annot_id kf s ca)
+let mk_var_id kf s ca = mk_prop PKVarRel (mk_annot_id kf s ca)
 
 let mk_loop_from_id kf s ca from =
   let id = Property.ip_of_from kf (Kstmt s) (Property.Id_loop ca) from in
@@ -212,13 +214,14 @@ let kind_order = function
   | PKPreserved -> 3
   | PKVarPos -> 4
   | PKVarDecr -> 5
-  | PKPropLoop -> 6
-  | PKAFctOut -> 7
-  | PKAFctExit -> 8
-  | PKCheck -> 9
-  | PKTactic -> 10
-  | PKSmoke -> 11
-  | PKTerminates -> 12
+  | PKVarRel -> 6
+  | PKPropLoop -> 7
+  | PKAFctOut -> 8
+  | PKAFctExit -> 9
+  | PKCheck -> 10
+  | PKTactic -> 11
+  | PKSmoke -> 12
+  | PKTerminates -> 13
 
 let compare_kind k1 k2 = match k1, k2 with
     PKPre (kf1, ki1, p1), PKPre (kf2, ki2, p2) ->
@@ -339,6 +342,7 @@ end = struct
     | PKPreserved , p -> base_id_prop_txt p ^ "_preserved"
     | PKVarDecr , p -> base_id_prop_txt p ^ "_decrease"
     | PKVarPos , p -> base_id_prop_txt p ^ "_positive"
+    | PKVarRel , p -> base_id_prop_txt p ^ "_relation"
     | PKAFctOut , p -> base_id_prop_txt p ^ "_normal"
     | PKAFctExit , p -> base_id_prop_txt p ^ "_exit"
     | PKPre(_kf,stmt,pre) , _ ->
@@ -422,6 +426,7 @@ struct
     | PKPreserved , p -> get_ip p ^ "_preserved"
     | PKVarDecr , p -> get_ip p ^ "_decrease"
     | PKVarPos , p -> get_ip p ^ "_positive"
+    | PKVarRel , p -> get_ip p ^ "_relation"
     | PKAFctOut , p -> get_ip p ^ "_normal"
     | PKAFctExit , p -> get_ip p ^ "_exit"
     | PKPre(callee_kf,stmt,pre) , _ ->
@@ -567,6 +572,7 @@ let label_of_kind = function
   | PKPreserved -> "Preservation"
   | PKVarDecr -> "Decreasing"
   | PKVarPos -> "Positive"
+  | PKVarRel -> "Relation"
   | PKAFctOut -> "Function assigns"
   | PKAFctExit -> "Exit assigns"
   | PKTerminates -> "Terminates"
@@ -591,6 +597,7 @@ struct
     | PKPreserved -> pp_print_string fmt " (preserved)"
     | PKVarDecr -> pp_print_string fmt " (decrease)"
     | PKVarPos -> pp_print_string fmt " (positive)"
+    | PKVarRel -> pp_print_string fmt " (relation)"
     | PKAFctOut -> pp_print_string fmt " (return)"
     | PKAFctExit -> pp_print_string fmt " (exit)"
     | PKPre(kf,_,_) -> fprintf fmt " (call '%s')" (Kernel_function.get_name kf)
@@ -662,6 +669,7 @@ let propid_hints hs p =
   | PKPreserved , _ -> add_required hs "preserved"
   | PKVarDecr , _ -> add_required hs "decrease"
   | PKVarPos , _ -> add_required hs "positive"
+  | PKVarRel , _ -> add_required hs "relation"
   | PKAFctOut , _ -> add_required hs "return"
   | PKAFctExit , _ -> add_required hs "exit"
   | PKTerminates , _ -> add_required hs "terminates"
@@ -745,6 +753,7 @@ let pp_goal_kind fmt = function
   | PKPreserved -> Format.pp_print_string fmt "Preservation of "
   | PKVarDecr -> Format.pp_print_string fmt "Decreasing of "
   | PKVarPos -> Format.pp_print_string fmt "Positivity of "
+  | PKVarRel -> Format.pp_print_string fmt "Follows relation "
 
 let pp_goal_part fmt = function
   | None -> ()
@@ -1049,7 +1058,8 @@ let split_map f pid gs =
 
 let subproofs id = match id.p_kind with
   | PKCheck -> 0
-  | PKProp | PKSmoke | PKTactic | PKPre _ | PKPropLoop | PKTerminates -> 1
+  | PKProp | PKSmoke | PKTactic | PKPre _ | PKPropLoop
+  | PKTerminates | PKVarRel -> 1
   | PKEstablished | PKPreserved
   | PKVarDecr | PKVarPos
   | PKAFctExit | PKAFctOut -> 2
@@ -1057,7 +1067,7 @@ let subproofs id = match id.p_kind with
 let subproof_idx id = match id.p_kind with
   | PKCheck -> (-1) (* 0/0 *)
   | PKProp | PKTactic | PKPre _ | PKSmoke | PKPropLoop
-  | PKTerminates -> 0 (* 1/1 *)
+  | PKTerminates | PKVarRel -> 0 (* 1/1 *)
   | PKPreserved  -> 0 (* 1/2 *)
   | PKEstablished-> 1 (* 2/2 *)
   | PKVarDecr    -> 0 (* 1/2 *)
@@ -1125,7 +1135,7 @@ let get_induction p =
             (* loop assigns *) Some stmt
         | _ -> None (* assert false ??? *)
       in loop_stmt_opt
-  | PKEstablished|PKVarDecr|PKVarPos|PKPreserved ->
+  | PKEstablished|PKVarDecr|PKVarPos|PKVarRel|PKPreserved ->
       (match get_stmt (property_of_id p) with
        | None -> None | Some (_, s) -> Some s)
 

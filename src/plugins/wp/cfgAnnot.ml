@@ -468,6 +468,14 @@ let mk_variant_properties kf s ca v =
   let vdecr = Logic_const.prel ~loc (Rlt, v, vcurr) in
   (vpos_id, vpos), (vdecr_id, vdecr)
 
+let mk_variant_relation_property kf s ca v li =
+  let vid = WpPropId.mk_var_id kf s ca in
+  let loc = v.term_loc in
+  let lcurr = Clabels.to_logic (Clabels.loop_current s) in
+  let vcurr = Logic_const.tat ~loc (v, lcurr) in
+  let variant = Logic_const.papp ~loc (li,[],[vcurr ; v]) in
+  (vid, variant)
+
 type loop_hypothesis =
   | NoHyp
   | Check of WpPropId.prop_id
@@ -505,6 +513,23 @@ module LoopContract = WpContext.StaticGenerator(CodeKey)
         let normalize_pred p = NormAtLabels.preproc_annot labels p in
         let normalize_annot (i,p) = i, normalize_pred p in
         let normalize_assigns w = NormAtLabels.preproc_assigns labels w in
+        let intro_terminates_variant ~loc (pid, v) =
+          pid,
+          let t = snd @@ get_terminates_hyp kf in
+          if Wp_parameters.TerminatesVariantHyp.get () then begin
+            if Logic_utils.is_same_predicate t Logic_const.pfalse then
+              Wp_parameters.warning
+                ~source:(fst loc) ~once:true
+                "Loop variant is always trivially verified \
+                 (terminates \\false)" ;
+            Logic_const.pimplies (t, v)
+          end else v
+        in
+        let variant_as_inv ~loc (i, p) =
+          let i, p = intro_terminates_variant ~loc @@ normalize_annot (i, p) in
+          { loop_pred = p ;
+            loop_hyp = NoHyp ; loop_est = None ; loop_ind = Some i }
+        in
         default_assigns stmt @@
         Annotations.fold_code_annot
           begin fun _emitter ca l ->
@@ -525,28 +550,15 @@ module LoopContract = WpContext.StaticGenerator(CodeKey)
                 { l with
                   loop_invariants  = inv :: l.loop_invariants ; }
             | AVariant(term, None) ->
-                let vpos , vdec =
-                  mk_variant_properties kf stmt ca term in
-                let intro_terminates (pid, v) =
-                  pid,
-                  let t = snd @@ get_terminates_hyp kf in
-                  if Wp_parameters.TerminatesVariantHyp.get () then begin
-                    if Logic_utils.is_same_predicate t Logic_const.pfalse then
-                      Wp_parameters.warning
-                        ~source:(fst term.term_loc) ~once:true
-                        "Loop variant is always trivially verified \
-                         (terminates \\false)" ;
-                    Logic_const.pimplies (t, v)
-                  end else v
-                in
-                let mk_inv (i, p) =
-                  let i, p = intro_terminates @@ normalize_annot (i, p) in
-                  { loop_pred = p ;
-                    loop_hyp = NoHyp ; loop_est = None ; loop_ind = Some i }
-                in
+                let vpos , vdec = mk_variant_properties kf stmt ca term in
+                let vpos = variant_as_inv ~loc:term.term_loc vpos in
+                let vdec = variant_as_inv ~loc:term.term_loc vdec in
                 { l with loop_terminates = None ;
-                         loop_invariants =
-                           mk_inv vdec :: mk_inv vpos :: l.loop_invariants }
+                         loop_invariants = vdec :: vpos :: l.loop_invariants }
+            | AVariant(term, Some rel) ->
+                let vrel = mk_variant_relation_property kf stmt ca term rel in
+                let vrel = variant_as_inv ~loc:term.term_loc vrel in
+                { l with loop_invariants = vrel :: l.loop_invariants }
             | AAssigns(_,WritesAny) ->
                 let asgn = WpPropId.mk_loop_any_assigns_info stmt in
                 { l with loop_assigns = asgn :: l.loop_assigns }

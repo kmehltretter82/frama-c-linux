@@ -98,6 +98,7 @@ type prop_kind =
   | PKPropLoop    (** loop property used as hypothesis inside a loop. *)
   | PKVarDecr     (** computation related to the decreasing of a variant in a loop *)
   | PKVarPos      (** computation related to a loop variant being positive *)
+  | PKVarRel      (** computation related to a generalized loop variant *)
   | PKAFctOut     (** computation related to the function assigns on normal termination *)
   | PKAFctExit    (** computation related to the function assigns on exit termination *)
   | PKTerminates  (** computation related to the termination *)
@@ -144,6 +145,9 @@ val mk_var_decr_id : kernel_function -> stmt -> code_annotation -> prop_id
 
 (** Variant positive *)
 val mk_var_pos_id : kernel_function -> stmt -> code_annotation -> prop_id
+
+(** Variant for *)
+val mk_var_id : kernel_function -> stmt -> code_annotation -> prop_id
 
 (** \from property of loop assigns. Must not be [FromAny] *)
 val mk_loop_from_id : kernel_function -> stmt -> code_annotation ->
