@@ -111,9 +111,9 @@ let pre_code_annotation kf stmt env annot =
         else env
       else
         env
-    | AVariant _ ->
+    | AVariant (t, measure) ->
       if must_translate (Property.ip_of_code_annot_single kf stmt annot)
-      then Env.not_yet env "variant"
+      then Env.set_loop_variant env ?measure t
       else env
     | AAssigns _ ->
       (* TODO: it is not a precondition --> should not be handled here,
