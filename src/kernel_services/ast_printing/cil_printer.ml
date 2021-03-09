@@ -2862,13 +2862,12 @@ class cil_printer () = object (self)
 
   method private decrement kw fmt (t, rel) = match rel with
     | None -> fprintf fmt "@[<2>%a@ %a;@]" self#pp_acsl_keyword kw self#term t
-    | Some str ->
-      (*TODO: replace this string with an interpreted variable*)
-      fprintf fmt "@[<2>%a@ %a@ %a@ %s;@]"
+    | Some li ->
+      fprintf fmt "@[<2>%a@ %a@ %a@ %a;@]"
         self#pp_acsl_keyword kw
         self#term t
         self#pp_acsl_keyword "for"
-        str
+        self#logic_info li
 
   method decreases fmt v = self#decrement "decreases" fmt v
   method variant fmt v = self#decrement "loop variant" fmt v

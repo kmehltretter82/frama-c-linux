@@ -1620,7 +1620,7 @@ and predicate = {
 }
 
 (** variant of a loop or a recursive function. *)
-and variant = term * string option
+and variant = term * logic_info option
 
 (** allocates and frees.
     @since Oxygen-20120901  *)

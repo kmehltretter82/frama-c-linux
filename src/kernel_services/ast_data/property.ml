@@ -1121,7 +1121,7 @@ struct
     else b.b_name ^ "_"
 
   let variant_suffix = function
-    | (_,Some s) -> s
+    | (_,Some s) -> s.l_var_info.lv_name
     | _ -> ""
 
   let string_of_termination_kind = function
