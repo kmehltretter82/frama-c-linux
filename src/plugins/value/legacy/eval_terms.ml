@@ -300,14 +300,6 @@ let env_only_here state = {
                    contracts *);
 }
 
-(* Return the base and the type corresponding to the logic var if it is within
-   the scope of the supported ones. Fail otherwise. *)
-let c_logic_var lvi =
-  match Logic_utils.unroll_type lvi.lv_type with
-  | Ctype ty when Cil.isIntegralType ty ->
-    (Base.of_c_logic_var lvi), ty
-  | _ -> unsupported_lvar lvi
-
 let top_float =
   let neg_infinity = Fval.F.of_float neg_infinity
   and pos_infinity = Fval.F.of_float infinity in
@@ -322,14 +314,13 @@ let bind_logic_vars env lvs =
     match Logic_utils.unroll_type lv.lv_type with
     | Linteger -> bind_logic_var Ival.top
     | Lreal -> bind_logic_var top_float
-    | _ ->
-      try
-        let b, cty = c_logic_var lv in
-        let size = Int.of_int (Cil.bitsSizeOf cty) in
-        let v = Cvalue.V_Or_Uninitialized.initialized V.top_int in
-        let state = Model.add_base_value b ~size v ~size_v:Int.one state in
-        state, logic_vars
-      with Cil.SizeOfError _ -> unsupported_lvar lv
+    | Ctype ctyp when Cil.isIntegralType ctyp ->
+      let base = Base.of_c_logic_var lv in
+      let size = Int.of_int (Cil.bitsSizeOf ctyp) in
+      let v = Cvalue.V_Or_Uninitialized.initialized V.top_int in
+      let state = Model.add_base_value base ~size v ~size_v:Int.one state in
+      state, logic_vars
+    | _ -> unsupported_lvar lv
   in
   let state = env_current_state env in
   let state, logic_vars = List.fold_left bind_one (state, env.logic_vars) lvs in
@@ -342,15 +333,16 @@ let copy_logic_vars ~src ~dst lvars =
       let value = LogicVarEnv.find lvar src.logic_vars in
       let logic_vars = LogicVarEnv.add lvar value env.logic_vars in
       { env with logic_vars }
-    | _ ->
-      try
-        let base, _ = c_logic_var lvar in
+    | Ctype _ ->
+      begin
+        let base = Base.of_c_logic_var lvar in
         match Model.find_base base (env_current_state src) with
         | `Bottom | `Top -> env
         | `Value offsm ->
           let state = Model.add_base base offsm (env_current_state env) in
           overwrite_current_state env state
-      with Cil.SizeOfError _ -> unsupported_lvar lvar
+      end
+    | _ -> unsupported_lvar lvar
   in
   List.fold_left copy_one dst lvars
 
@@ -358,9 +350,10 @@ let unbind_logic_vars env lvs =
   let unbind_one (state, logic_vars) lv =
     match Logic_utils.unroll_type lv.lv_type with
     | Linteger | Lreal -> state, LogicVarEnv.remove lv logic_vars
-    | _ ->
-      let b, _ = c_logic_var lv in
-      Model.remove_base b state, logic_vars
+    | Ctype _ ->
+      let base = Base.of_c_logic_var lv in
+      Model.remove_base base state, logic_vars
+    | _ -> unsupported_lvar lv
   in
   let state = env_current_state env in
   let state, logic_vars = List.fold_left unbind_one (state, env.logic_vars) lvs in
@@ -1177,9 +1170,15 @@ and eval_binop ~alarm_mode env op t1 t2 =
 
 and eval_tlhost ~alarm_mode env lv =
   match lv with
-  | TVar { lv_origin = Some v } ->
-    let loc = Location_Bits.inject (Base.of_varinfo v) Ival.zero in
-    { etype = v.vtype;
+  | TVar lvar ->
+    let base, typ =
+      match lvar.lv_origin, Logic_utils.unroll_type lvar.lv_type with
+      | Some v, _ -> Base.of_varinfo v, v.vtype
+      | None, Ctype typ -> Base.of_c_logic_var lvar, typ
+      | _ -> unsupported_lvar lvar
+    in
+    let loc = Location_Bits.inject base Ival.zero in
+    { etype = typ;
       ldeps = empty_logic_deps;
       eover = loc;
       eunder = under_loc_from_over loc;
@@ -1193,14 +1192,6 @@ and eval_tlhost ~alarm_mode env lv =
          eunder = loc; eover = loc;
          empty = false; }
      | None -> no_result ())
-  | TVar ({ lv_origin = None } as tlv) ->
-    let b, ty = c_logic_var tlv in
-    let loc = Location_Bits.inject b Ival.zero in
-    { etype = ty;
-      ldeps = empty_logic_deps;
-      eover = loc;
-      eunder = under_loc_from_over loc;
-      empty = false; }
   | TMem t ->
     let r = eval_term ~alarm_mode env t in
     let tres = match Cil.unrollType r.etype with
