@@ -44,6 +44,7 @@ type annotation_kind =
   | Precondition
   | Postcondition
   | Invariant
+  | Variant
   | RTE
 
 let kind_to_string loc k =
@@ -54,6 +55,7 @@ let kind_to_string loc k =
      | Precondition -> "Precondition"
      | Postcondition -> "Postcondition"
      | Invariant -> "Invariant"
+     | Variant -> "Variant"
      | RTE -> "RTE")
 
 let block stmt b = match b.bstmts with
