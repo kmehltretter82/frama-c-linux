@@ -26,6 +26,7 @@ void __gen_e_acsl_f(int *x, int *y);
 
 void f(int *x, int *y)
 {
+  long __gen_e_acsl_old_variant;
   {
     int __gen_e_acsl_valid_read;
     __e_acsl_store_block((void *)(& y),(size_t)8);
@@ -51,10 +52,18 @@ void f(int *x, int *y)
     int i = 0;
     /*@ loop invariant 0 ≤ i ≤ 1;
         loop variant 2 - i; */
-    while (i < 1) {
+    while (1) {
+      __gen_e_acsl_old_variant = 2L - i;
+      if (! (i < 1)) break;
       /*@ assert 1 ≡ 1; */ ;
       /*@ assert \valid(y); */ ;
       i ++;
+      __e_acsl_assert(__gen_e_acsl_old_variant >= 0L,1,"Variant","f",
+                      "(old 2 - i) \342\211\245 0",
+                      "tests/special/e-acsl-valid.c",31);
+      __e_acsl_assert(__gen_e_acsl_old_variant > 2L - i,1,"Variant","f",
+                      "(old 2 - i) > 2 - i","tests/special/e-acsl-valid.c",
+                      31);
     }
   }
   __e_acsl_delete_block((void *)(& y));
