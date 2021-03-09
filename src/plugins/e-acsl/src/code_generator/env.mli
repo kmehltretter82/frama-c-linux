@@ -153,12 +153,15 @@ val annotation_kind: t -> Smart_stmt.annotation_kind
 val set_annotation_kind: t -> Smart_stmt.annotation_kind -> t
 
 (* ************************************************************************** *)
-(** {2 Loop invariants} *)
+(** {2 Loop annotations} *)
 (* ************************************************************************** *)
 
 val push_loop: t -> t
+val set_loop_variant: ?measure:logic_info -> t -> term -> t
 val add_loop_invariant: t -> toplevel_predicate -> t
-val pop_loop: t -> toplevel_predicate list * t
+val top_loop_variant: t -> (term * logic_info option) option
+val top_loop_invariants: t -> toplevel_predicate list
+val pop_loop: t -> t
 
 (* ************************************************************************** *)
 (** {2 RTEs} *)

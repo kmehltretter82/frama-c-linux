@@ -54,6 +54,11 @@ type local_env = {
   rte: bool
 }
 
+type loop_env = {
+  variant: (term * logic_info option) option;
+  invariants: toplevel_predicate list;
+}
+
 type t = {
   lscope: Lscope.t;
   lscope_reset: bool;
@@ -67,8 +72,8 @@ type t = {
   (* Stack of contracts for active functions and statements *)
   var_mapping: Varinfo.t Stack.t Logic_var.Map.t;
   (* records of C bindings for logic vars *)
-  loop_invariants: toplevel_predicate list list;
-  (* list of loop invariants for each currently visited loops *)
+  loop_envs: loop_env list;
+  (* list of loop environment for each currently visited loops *)
   cpt: int;
   (* counter used when generating variables *)
 }
@@ -88,6 +93,9 @@ let empty_local_env =
     mp_tbl = empty_mp_tbl;
     rte = true }
 
+let empty_loop_env =
+  { variant = None;
+    invariants = [] }
 let empty =
   { lscope = Lscope.empty;
     lscope_reset = true;
@@ -97,7 +105,7 @@ let empty =
     env_stack = [];
     contract_stack = [];
     var_mapping = Logic_var.Map.empty;
-    loop_invariants = [];
+    loop_envs = [];
     cpt = 0 }
 
 let top env = match env.env_stack with
@@ -113,15 +121,36 @@ let has_no_new_stmt env =
 (* ************************************************************************** *)
 
 let push_loop env =
-  { env with loop_invariants = [] :: env.loop_invariants }
+  { env with loop_envs = empty_loop_env :: env.loop_envs }
 
-let add_loop_invariant env inv = match env.loop_invariants with
+let top_loop_env env =
+  match env.loop_envs with
   | [] -> assert false
-  | invs :: tl -> { env with loop_invariants = (inv :: invs) :: tl }
+  | loop_env :: tl -> loop_env, tl
 
-let pop_loop env = match env.loop_invariants with
+let set_loop_variant ?measure env t =
+  let loop_env, tl = top_loop_env env in
+  let loop_env = { loop_env with variant = Some (t, measure) } in
+  { env with loop_envs = loop_env :: tl }
+
+let add_loop_invariant env inv =
+  match env.loop_envs with
   | [] -> assert false
-  | invs :: tl -> invs, { env with loop_invariants = tl }
+  | loop_env :: tl ->
+    let loop_env = { loop_env with invariants = inv :: loop_env.invariants} in
+    { env with loop_envs = loop_env :: tl }
+
+let top_loop_variant env =
+  let loop_env, _ = top_loop_env env in
+  loop_env.variant
+
+let top_loop_invariants env =
+  let loop_env, _ = top_loop_env env in
+  loop_env.invariants
+
+let pop_loop env =
+  let _, tl = top_loop_env env in
+  { env with loop_envs = tl }
 
 (* ************************************************************************** *)
 (** {2 RTEs} *)
