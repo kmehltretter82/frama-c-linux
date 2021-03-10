@@ -11,8 +11,7 @@
           "sloc": {
             "dir": ".",
             "base": "ast_services.i",
-            "file":
-              "/home/pb122476/export-local/frama-c/dune-frama-c/trunk/_build/default/src/plugins/server/tests/batch/result/ast_services.i",
+            "file": "ast_services.i",
             "line": 8
           }
         },
@@ -24,8 +23,7 @@
           "sloc": {
             "dir": ".",
             "base": "ast_services.i",
-            "file":
-              "/home/pb122476/export-local/frama-c/dune-frama-c/trunk/_build/default/src/plugins/server/tests/batch/result/ast_services.i",
+            "file": "ast_services.i",
             "line": 7
           }
         }
