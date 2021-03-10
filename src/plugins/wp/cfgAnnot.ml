@@ -247,13 +247,17 @@ module CallContract = WpContext.StaticGenerator(Kernel_function)
             List.iter (add wpost @@ mk_post Normal) bhv.b_post_cond ;
             List.iter (add wexit @@ mk_post Exits) bhv.b_post_cond ;
           end behaviors ;
+        let assigns = match assigns_upper_bound behaviors with
+          | WritesAny -> WritesAny
+          | Writes froms -> Writes (normalize_froms Normal froms)
+        in
         {
           contract_cond = List.rev !wcond ;
           contract_hpre = List.rev !whpre ;
           contract_post = List.rev !wpost ;
           contract_exit = List.rev !wexit ;
           contract_smoke = [] ;
-          contract_assigns = assigns_upper_bound behaviors
+          contract_assigns = assigns
         }
     end)
 
