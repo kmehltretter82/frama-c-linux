@@ -233,9 +233,8 @@ module TransferTaint = struct
     in
     `Value state
 
-  let finalize_call stmt call ~pre ~post =
-    let state = LatticeTaint.add pre (zone_of_taint_annot stmt) in
-    let state = LatticeTaint.join state post in
+  let finalize_call _stmt call ~pre ~post =
+    let state = { post with control_stmt = pre.control_stmt } in
     let state =
       match call.Eval.return with
       | None ->
