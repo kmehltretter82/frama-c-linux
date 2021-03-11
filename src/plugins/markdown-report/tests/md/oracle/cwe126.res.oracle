@@ -1,46 +1,18 @@
-<<<<<<< HEAD:src/plugins/markdown-report/tests/eva/oracle/cwe126.res.oracle
 [kernel] Parsing cwe126.c (with preprocessing)
-||||||| ac7807782d:src/plugins/markdown-report/tests/eva/oracle/cwe126.res.oracle
-[kernel] Parsing tests/eva/cwe126.c (with preprocessing)
-=======
-[kernel] Parsing tests/md/cwe126.c (with preprocessing)
->>>>>>> origin/master:src/plugins/markdown-report/tests/md/oracle/cwe126.res.oracle
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-<<<<<<< HEAD:src/plugins/markdown-report/tests/eva/oracle/cwe126.res.oracle
 [eva] cwe126.c:76: allocating variable __malloc_goodG2B_l76
-||||||| ac7807782d:src/plugins/markdown-report/tests/eva/oracle/cwe126.res.oracle
-[eva] tests/eva/cwe126.c:76: allocating variable __malloc_goodG2B_l76
-=======
-[eva] tests/md/cwe126.c:76: allocating variable __malloc_goodG2B_l76
->>>>>>> origin/master:src/plugins/markdown-report/tests/md/oracle/cwe126.res.oracle
 [eva] using specification for function exit
 [eva] FRAMAC_SHARE/libc/string.h:118: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
-<<<<<<< HEAD:src/plugins/markdown-report/tests/eva/oracle/cwe126.res.oracle
 [eva] cwe126.c:62: starting to merge loop iterations
 [eva] cwe126.c:40: 
-||||||| ac7807782d:src/plugins/markdown-report/tests/eva/oracle/cwe126.res.oracle
-[eva] tests/eva/cwe126.c:62: starting to merge loop iterations
-[eva] tests/eva/cwe126.c:40: 
-=======
-[eva] tests/md/cwe126.c:62: starting to merge loop iterations
-[eva] tests/md/cwe126.c:40: 
->>>>>>> origin/master:src/plugins/markdown-report/tests/md/oracle/cwe126.res.oracle
   allocating variable __malloc_CWE126_Buffer_Overread__malloc_char_loop_64_bad_l40
-<<<<<<< HEAD:src/plugins/markdown-report/tests/eva/oracle/cwe126.res.oracle
 [eva] cwe126.c:26: starting to merge loop iterations
 [eva:alarm] cwe126.c:28: Warning: 
-||||||| ac7807782d:src/plugins/markdown-report/tests/eva/oracle/cwe126.res.oracle
-[eva] tests/eva/cwe126.c:26: starting to merge loop iterations
-[eva:alarm] tests/eva/cwe126.c:28: Warning: 
-=======
-[eva] tests/md/cwe126.c:26: starting to merge loop iterations
-[eva:alarm] tests/md/cwe126.c:28: Warning: 
->>>>>>> origin/master:src/plugins/markdown-report/tests/md/oracle/cwe126.res.oracle
   out of bounds read. assert \valid_read(data + i);
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -82,10 +54,4 @@
     Preconditions     8 valid     0 unknown     0 invalid      8 total
   100% of the logical properties reached have been proven.
   ----------------------------------------------------------------------------
-<<<<<<< HEAD:src/plugins/markdown-report/tests/eva/oracle/cwe126.res.oracle
 [mdr] Report cwe126.0.md generated
-||||||| ac7807782d:src/plugins/markdown-report/tests/eva/oracle/cwe126.res.oracle
-[mdr] Report tests/eva/result/cwe126.0.md generated
-=======
-[mdr] Report tests/md/result/cwe126.0.md generated
->>>>>>> origin/master:src/plugins/markdown-report/tests/md/oracle/cwe126.res.oracle

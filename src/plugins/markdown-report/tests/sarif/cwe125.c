@@ -1,8 +1,8 @@
-/* run.config
-NOFRAMAC: use execnow for proper sequencing of executions
-EXECNOW: LOG @PTEST_NAME@.parse.log @frama-c@ @PTEST_FILE@ -save @PTEST_DIR@/result/@PTEST_NAME@_parse.sav > @PTEST_DIR@/result/@PTEST_NAME@.parse.log
-EXECNOW: LOG @PTEST_NAME@.eva.log @frama-c@ -load @PTEST_DIR@/result/@PTEST_NAME@_parse.sav -eva -save @PTEST_DIR@/result/@PTEST_NAME@_eva.sav > @PTEST_DIR@/result/@PTEST_NAME@.eva.log
-EXECNOW: LOG @PTEST_NAME@.sarif @frama-c@ -load @PTEST_DIR@/result/@PTEST_NAME@_eva.sav -then -mdr-out @PTEST_DIR@/result/@PTEST_NAME@.sarif -mdr-gen sarif -mdr-no-print-libc -mdr-sarif-deterministic
+/* run.config  NOFRAMAC: use execnow for proper sequencing of executions
+PLUGIN: markdown-report eva inout
+EXECNOW: LOG @PTEST_NAME@.parse.log LOG @PTEST_NAME@.parse.err LOG @PTEST_NAME@_parse.sav @frama-c@ -save @PTEST_NAME@_parse.sav > @PTEST_NAME@.parse.log 2> @PTEST_NAME@.parse.err
+EXECNOW: LOG @PTEST_NAME@.eva.log   LOG @PTEST_NAME@.eva.err   LOG @PTEST_NAME@_eva.sav   @frama-c-cmd@ -load %{dep:@PTEST_NAME@_parse.sav} -eva -save @PTEST_NAME@_eva.sav > @PTEST_NAME@.eva.log 2> @PTEST_NAME@.eva.err
+EXECNOW: LOG @PTEST_NAME@.sarif.log LOG @PTEST_NAME@.sarif.err LOG @PTEST_NAME@.sarif     @frama-c-cmd@ -load %{dep:@PTEST_NAME@_eva.sav} -then -mdr-out @PTEST_NAME@.sarif -mdr-gen sarif -mdr-no-print-libc -mdr-sarif-deterministic > @PTEST_NAME@.sarif.log 2> @PTEST_NAME@.sarif.err
 */
 #include "__fc_builtin.h"
 

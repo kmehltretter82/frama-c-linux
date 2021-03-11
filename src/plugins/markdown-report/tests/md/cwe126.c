@@ -1,11 +1,5 @@
 /* run.config
-<<<<<<< HEAD:src/plugins/markdown-report/tests/eva/cwe126.c
    STDOPT: +"-mdr-remarks %{dep:@PTEST_NAME@.remarks.md}"
-||||||| ac7807782d:src/plugins/markdown-report/tests/eva/cwe126.c
-   OPT: -mdr-remarks tests/eva/cwe126.remarks.md
-=======
-   OPT: -mdr-remarks @PTEST_DIR@/cwe126.remarks.md
->>>>>>> origin/master:src/plugins/markdown-report/tests/md/cwe126.c
  */
 
 /* extracted from Juliet test suite v1.3 for C

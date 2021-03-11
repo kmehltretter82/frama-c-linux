@@ -1,4 +1,4 @@
-[kernel] Parsing tests/sarif/libc.c (with preprocessing)
+[kernel] Parsing libc.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -20,4 +20,4 @@
     Preconditions     1 valid     0 unknown     0 invalid      1 total
   100% of the logical properties reached have been proven.
   ----------------------------------------------------------------------------
-[mdr] Report tests/sarif/result/without-libc.sarif generated
+[mdr] Report without-libc.sarif generated

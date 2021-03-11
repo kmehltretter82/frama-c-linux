@@ -16,13 +16,12 @@
       "invocations": [
         {
           "commandLine":
-            "frama-c -check tests/sarif/libc.c -no-autoload-plugins -load-module eva,from,scope,markdown_report -eva -eva-no-results -mdr-gen sarif -mdr-sarif-deterministic -mdr-out tests/sarif/result/with-libc.sarif",
+            "frama-c -journal-disable -check -no-autoload-plugins -load-plugin=eva,from,scope,markdown-report libc.c -eva -eva-no-results -mdr-gen sarif -mdr-sarif-deterministic -mdr-out with-libc.sarif",
           "arguments": [
-            "-check", "tests/sarif/libc.c", "-no-autoload-plugins",
-            "-load-module", "eva,from,scope,markdown_report", "-eva",
+            "-journal-disable", "-check", "-no-autoload-plugins",
+            "-load-plugin=eva,from,scope,markdown-report", "libc.c", "-eva",
             "-eva-no-results", "-mdr-gen", "sarif",
-            "-mdr-sarif-deterministic", "-mdr-out",
-            "tests/sarif/result/with-libc.sarif"
+            "-mdr-sarif-deterministic", "-mdr-out", "with-libc.sarif"
           ],
           "exitCode": 0,
           "executionSuccessful": true
@@ -32,7 +31,6 @@
         "FRAMAC_SHARE": {
           "uri": "file:///omitted-for-deterministic-output/"
         },
-        "FRAMAC_LIB": { "uri": "file:///omitted-for-deterministic-output/" },
         "FRAMAC_PLUGIN": {
           "uri": "file:///omitted-for-deterministic-output/"
         },
@@ -40,7 +38,7 @@
       },
       "artifacts": [
         {
-          "location": { "uri": "tests/sarif/libc.c", "uriBaseId": "PWD" },
+          "location": { "uri": "libc.c", "uriBaseId": "PWD" },
           "roles": [ "analysisTarget" ],
           "mimeType": "text/x-csrc"
         }
@@ -8683,10 +8681,7 @@
           "locations": [
             {
               "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "tests/sarif/libc.c",
-                  "uriBaseId": "PWD"
-                },
+                "artifactLocation": { "uri": "libc.c", "uriBaseId": "PWD" },
                 "region": {
                   "startLine": 13,
                   "startColumn": 10,
