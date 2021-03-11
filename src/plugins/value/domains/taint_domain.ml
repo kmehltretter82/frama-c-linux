@@ -21,11 +21,12 @@
 (**************************************************************************)
 
 open Cil_types
+open Cil_datatype
 open Locations
 
 type taint = {
-  zone: Zone.t;
-  control_stmt: stmt option;
+  locs: Zone.t;
+  assume_stmts: Stmt.Set.t;
 }
 
 module LatticeTaint = struct
@@ -39,30 +40,27 @@ module LatticeTaint = struct
       let name = "Value.Taint.t"
 
       let reprs =
-        [ { zone = List.hd Zone.reprs;
-            control_stmt = None; } ]
+        [ { locs = List.hd Zone.reprs;
+            assume_stmts = Stmt.Set.empty; } ]
 
       let structural_descr =
         Structural_descr.t_abstract (* TODO *)
 
       let compare t1 t2 =
-        let c = Zone.compare t1.zone t2.zone in
+        let c = Zone.compare t1.locs t2.locs in
         if c <> 0
         then c
-        else
-          Option.compare
-            Cil_datatype.Stmt.compare
-            t1.control_stmt t2.control_stmt
+        else Stmt.Set.compare t1.assume_stmts t2.assume_stmts
 
       let equal = Datatype.from_compare
 
       let pretty fmt t =
-        Format.fprintf fmt "@[<hov>%a@]" Zone.pretty t.zone
+        Format.fprintf fmt "@[<hov>%a@]" Zone.pretty t.locs
 
       let hash t =
         Hashtbl.hash
-          (Zone.hash t.zone,
-           Hashtbl.hash t.control_stmt)
+          (Zone.hash t.locs,
+           Stmt.Set.hash t.assume_stmts)
 
       let copy c = c
 
@@ -70,44 +68,28 @@ module LatticeTaint = struct
 
   (* Initial state at the start of the computation: nothing is tainted yet. *)
   let empty = {
-    zone = Zone.bottom;
-    control_stmt = None;
+    locs = Zone.bottom;
+    assume_stmts = Stmt.Set.empty;
   }
 
   (* Top state: everything is tainted. *)
   let top = {
-    zone = Zone.top;
-    control_stmt = None;
+    locs = Zone.top;
+    assume_stmts = Stmt.Set.empty;
   }
 
   (* Join: keep pointwise over-approximation. *)
   let join t1 t2 =
-    let join_control_stmt cs1 cs2 =
-      match cs1, cs2 with
-      | None, None ->
-        None
-      | (Some _ as cs), None
-      | None, (Some _ as cs) ->
-        cs
-      | Some s1, Some s2 ->
-        if Cil_datatype.Stmt.equal s1 s2
-        then cs1
-        else
-          Value_parameters.fatal
-            "@[<hv>@[Different control statements:@]@ %a@ vs.@ %a.@]"
-            (Pretty_utils.pp_opt ~none:"<None>" Cil_printer.pp_stmt) cs1
-            (Pretty_utils.pp_opt ~none:"<None>" Cil_printer.pp_stmt) cs2
-    in
-    { zone = Zone.join t1.zone t2.zone;
-      control_stmt = join_control_stmt t1.control_stmt t2.control_stmt; }
+    { locs = Zone.join t1.locs t2.locs;
+      assume_stmts = Stmt.Set.union t1.assume_stmts t2.assume_stmts; }
 
   (* Add zone to state. *)
   let add t e =
-    { t with zone = Zone.join t.zone e; }
+    { t with locs = Zone.join t.locs e; }
 
   (* Remove zone from state. *)
   let remove t e =
-    { t with zone = Zone.diff t.zone e; }
+    { t with locs = Zone.diff t.locs e; }
 
   (* The memory locations are finite, so the ascending chain property is
      already verified. We simply use a join. *)
@@ -115,17 +97,17 @@ module LatticeTaint = struct
 
   let narrow t1 t2 =
     `Value {
-      zone = Zone.narrow t1.zone t2.zone;
-      control_stmt = None;      (* TODO *)
+      locs = Zone.narrow t1.locs t2.locs;
+      assume_stmts = Stmt.Set.inter t1.assume_stmts t2.assume_stmts;
     }
 
   (* Inclusion testing: pointwise. *)
   let is_included t1 t2 =
-    Zone.is_included t1.zone t2.zone
+    Zone.is_included t1.locs t2.locs
 
   (* Intersection testing: pointwise. *)
   let intersects t e =
-    Zone.intersects t.zone e
+    Zone.intersects t.locs e
 
 end
 
@@ -159,19 +141,15 @@ module TransferTaint = struct
     | `Value loc -> loc.Eval.loc
     | `Top -> Precise_locs.loc_top
 
-  let is_under_taint_condition state stmt =
+  let is_under_tainted_assume state stmt =
     let kf = Kernel_function.find_englobing_kf stmt in
-    Option.fold
-      ~none:false
-      ~some:(fun cs ->
-          let always_reachable =
-            List.fold_left
-              (fun acc s -> Stmts_graph.stmt_can_reach kf s stmt && acc)
-              true
-              cs.succs
-          in
-          not always_reachable)
-      state.control_stmt
+    Stmt.Set.exists
+      (fun assume_stmt ->
+         List.exists
+           (fun assume_stmt_succ ->
+              not (Stmts_graph.stmt_can_reach kf assume_stmt_succ stmt))
+           assume_stmt.succs)
+      state.assume_stmts
 
   (* No update about taint wrt information provided by the other domains. *)
   let update _valuation state = `Value state
@@ -187,10 +165,10 @@ module TransferTaint = struct
         let lv_zone =
           Value_util.(zone_of_expr to_loc (lval_to_exp lv.Eval.lval))
         in
-        if is_under_taint_condition state stmt
+        if is_under_tainted_assume state stmt
         then LatticeTaint.add state lv_zone
         else
-          let state = { state with control_stmt = None; } in
+          let state = { state with assume_stmts = Stmt.Set.empty; } in
           let exp_zone = Value_util.zone_of_expr to_loc exp in
           let lv_indirect_zone =
             Value_util.indirect_zone_of_lval to_loc lv.Eval.lval
@@ -210,9 +188,8 @@ module TransferTaint = struct
     let to_loc = loc_of_lval valuation in
     let exp_zone = Value_util.zone_of_expr to_loc exp in
     let state =
-      if LatticeTaint.intersects state exp_zone &&
-         (state.control_stmt = None || not (is_under_taint_condition state stmt))
-      then { state with control_stmt = Some stmt; }
+      if LatticeTaint.intersects state exp_zone
+      then { state with assume_stmts = Stmt.Set.add stmt state.assume_stmts; }
       else state
     in
     `Value state
@@ -234,7 +211,7 @@ module TransferTaint = struct
     `Value state
 
   let finalize_call _stmt call ~pre ~post =
-    let state = { post with control_stmt = pre.control_stmt } in
+    let state = { post with assume_stmts = pre.assume_stmts } in
     let state =
       match call.Eval.return with
       | None ->
@@ -329,7 +306,7 @@ module InternalTaint = struct
       in
       Zone.filter_base (fun b -> not (Base.Set.mem b bases))
     in
-    { state with zone = remove_unscoped_bases state.zone; }
+    { state with locs = remove_unscoped_bases state.locs; }
 
 
   (* Initial state: initializers are singletons, so we store nothing. *)
