@@ -83,11 +83,12 @@ SRC_CODE_GENERATOR:= \
 	label \
 	env \
 	rational \
+	typed_number \
+	logic_functions \
 	loops \
 	quantif \
 	at_with_lscope \
 	memory_translate \
-	logic_functions \
 	logic_array \
 	translate \
 	contract \
