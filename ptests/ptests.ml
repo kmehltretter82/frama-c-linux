@@ -1051,6 +1051,10 @@ let print_json_wrapper ~file wtest =
   Format.fprintf wrapper_fmt "%a@" (pp_wtest ~compacted:false) wtest;
   close_out wrapper_cout
 
+let oracle_target oracle_fmt s =
+  Format.fprintf oracle_fmt
+      "(rule (target %S) (mode fallback) (action (write-file %S \"\")))\n" s s
+
 let command_string ~env ~result_fmt ~oracle_fmt command =
   let log_prefix = log_prefix ~env command in
   let reslog = log_prefix ^ ".res.log" in
@@ -1141,7 +1145,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     print_json_wrapper wtest
       ~file:(SubDir.make_file (SubDir.result_subdir ~env command.directory) wrapper_basename);
   end
-  else
+  else begin
     Format.fprintf result_fmt
       "(rule ; %s\n  \
        (alias %S)\n  \
@@ -1166,7 +1170,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       cmdreslog
       accepted_exit_code
       command_string
-  ;
+  end;
   let filter_rule txt fin fout cmd =
     if cmd <> "" then
       Format.fprintf result_fmt
@@ -1247,14 +1251,9 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     (ptests_alias ~env)
     Fmt.(list (var_libavailable plugin_as_package )) command.plugins
   ;
-  Format.fprintf oracle_fmt
-    "(rule (target %S) (mode fallback) (action (write-file %S \"\")))\n"
-    (Filename.basename (oracle_prefix ^ ".err.oracle"))
-    (Filename.basename (oracle_prefix ^ ".err.oracle"));
-  Format.fprintf oracle_fmt
-    "(rule (target %S) (mode fallback) (action (write-file %S \"\")))\n"
-    (Filename.basename (oracle_prefix ^ ".res.oracle"))
-    (Filename.basename (oracle_prefix ^ ".res.oracle"));
+  oracle_target oracle_fmt (Filename.basename (oracle_prefix ^ ".err.oracle"));
+  oracle_target oracle_fmt (Filename.basename (oracle_prefix ^ ".res.oracle"));
+  List.iter (oracle_target oracle_fmt) command.log_files ;
   ()
 
 (** process a test file *)
@@ -1323,7 +1322,7 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config =
          Format.fprintf result_fmt
            "(rule ; %s\n  \
             (alias %s)\n  \
-            (deps %a (package frama-c)%a)\n  \
+            (deps %a %a %a (package frama-c)%a)\n  \
             (targets %a %a)\n  \
             (action (run %s %%{dep:%s} %S))\n\
             )@."
@@ -1332,6 +1331,8 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config =
            (* alias *)
            wrapper_basename
            (* deps: *)
+           print_list (List.map (Filename.concat wtest.oracle_dir) wtest.log)
+           print_list (List.map (Filename.concat wtest.oracle_dir) wtest.bin)
            print_list config.dc_deps
            Fmt.(list (package_as_deps (quote plugin_as_package))) config.dc_plugins
            (* targets: *)
@@ -1371,6 +1372,8 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config =
            (* action: *)
            wtest.cmd
        end;
+       List.iter (oracle_target oracle_fmt) wtest.log ;
+       List.iter (oracle_target oracle_fmt) wtest.bin ;
        Format.fprintf result_fmt
          "(rule ; SHOW EXECNOW COMMAND #%d OF TEST FILE %S\n  \
           (alias %s)\n  \
