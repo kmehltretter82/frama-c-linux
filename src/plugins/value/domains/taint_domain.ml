@@ -227,18 +227,8 @@ module TransferTaint = struct
     in
     `Value state
 
-  let finalize_call _stmt call ~pre ~post =
+  let finalize_call _stmt _call ~pre ~post =
     let state = { post with assume_stmts = pre.assume_stmts } in
-    let state =
-      match call.Eval.return with
-      | None ->
-        state
-      | Some vi ->
-        let result_zone = Locations.zone_of_varinfo vi in
-        if LatticeTaint.intersects post result_zone
-        then state
-        else LatticeTaint.remove state result_zone
-    in
     `Value state
 
   let show_expr valuation state fmt exp =
