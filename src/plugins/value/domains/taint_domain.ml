@@ -29,7 +29,22 @@ type taint = {
   assume_stmts: Stmt.Set.t;
 }
 
+(* Set to true for pretty-printing also [assume_stmts] on
+   Frama_C_domain_show_each directive. *)
+let debug = false
+
+
 module LatticeTaint = struct
+
+  let pp_locs_only fmt t =
+    Format.fprintf fmt "@[<hov>%a@]" Zone.pretty t.locs
+
+  let pp_state fmt t =
+    Format.fprintf fmt
+      "@[<v 2>Locations:@ @[<hov>%a@]@]@.\
+       @[<v 2>Assume statements:@ @[<hov>%a@]@]"
+      Zone.pretty t.locs
+      Stmt.Set.pretty t.assume_stmts
 
   (* Frama-C "datatype" for type [taint]. *)
   include Datatype.Make_with_collections(struct
@@ -55,7 +70,9 @@ module LatticeTaint = struct
       let equal = Datatype.from_compare
 
       let pretty fmt t =
-        Format.fprintf fmt "@[<hov>%a@]" Zone.pretty t.locs
+        if debug
+        then pp_state fmt t
+        else pp_locs_only fmt t
 
       let hash t =
         Hashtbl.hash
