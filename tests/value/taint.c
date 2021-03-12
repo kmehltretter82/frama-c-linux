@@ -55,6 +55,17 @@ void taint_3(int t) {
   Frama_C_dump_each();
 }
 
+void taint_4() {
+  int z = 1;
+  if (global) {
+    /* Although 'z' is not tainted, all left-values in 'taint_1' must be tainted
+       as 'taint_1' is called depending on the value of 'global', which is
+       tainted. */
+    taint_1(z);
+    Frama_C_domain_show_each(z); // 'z' must remain untainted here.
+  }
+}
+
 int main(void) {
   int w, z;
   w = z = 0;
@@ -69,5 +80,6 @@ int main(void) {
   //@ taint w;
   taint_3(w);
   Frama_C_domain_show_each(w, global);
+  taint_4();
   return 0;
 }

@@ -7,7 +7,7 @@
   undet ∈ [--..--]
   global ∈ {0}
 [eva] computing for function taint_1 <- main.
-  Called from tests/value/taint.c:62.
+  Called from tests/value/taint.c:73.
 [eva] tests/value/taint.c:20: 
   Frama_C_dump_each:
   # taint:
@@ -15,11 +15,11 @@
   ==END OF DUMP==
 [eva] Recording results for taint_1
 [eva] Done for function taint_1
-[eva] tests/value/taint.c:63: 
+[eva] tests/value/taint.c:74: 
   Frama_C_domain_show_each:
   w : # taint: true
 [eva] computing for function taint_2 <- main.
-  Called from tests/value/taint.c:66.
+  Called from tests/value/taint.c:77.
 [eva:loop-unroll] tests/value/taint.c:26: Automatic loop unrolling.
 [eva] tests/value/taint.c:32: 
   Frama_C_dump_each:
@@ -28,12 +28,12 @@
   ==END OF DUMP==
 [eva] Recording results for taint_2
 [eva] Done for function taint_2
-[eva] tests/value/taint.c:67: 
+[eva] tests/value/taint.c:78: 
   Frama_C_domain_show_each:
   w : # taint: true
   z : # taint: true
 [eva] computing for function taint_3 <- main.
-  Called from tests/value/taint.c:70.
+  Called from tests/value/taint.c:81.
 [eva:loop-unroll] tests/value/taint.c:42: Automatic loop unrolling.
 [eva] tests/value/taint.c:43: 
   Frama_C_domain_show_each:
@@ -66,16 +66,32 @@
   ==END OF DUMP==
 [eva] Recording results for taint_3
 [eva] Done for function taint_3
-[eva] tests/value/taint.c:71: 
+[eva] tests/value/taint.c:82: 
   Frama_C_domain_show_each:
   w : # taint: true
   global : # taint: true
+[eva] computing for function taint_4 <- main.
+  Called from tests/value/taint.c:83.
+[eva] computing for function taint_1 <- taint_4 <- main.
+  Called from tests/value/taint.c:64.
+[eva] tests/value/taint.c:20: 
+  Frama_C_dump_each:
+  # taint:
+  global; t; x; y; buf{[0]; [2]}; w
+  ==END OF DUMP==
+[eva] Recording results for taint_1
+[eva] Done for function taint_1
+[eva] tests/value/taint.c:65: 
+  Frama_C_domain_show_each:
+  z : # taint: false
+[eva] Recording results for taint_4
+[eva] Done for function taint_4
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function taint_1:
   t ∈ {1}
-  x ∈ {1}
+  x ∈ {1; 2}
   y ∈ {1; 2}
   buf[0] ∈ {0}
      [1..2] ∈ {0; 1}
@@ -92,6 +108,8 @@
   y ∈ {6}
   z ∈ {3}
   u ∈ {1}
+[eva:final-states] Values at end of function taint_4:
+  z ∈ {1}
 [eva:final-states] Values at end of function main:
   global ∈ {2}
   w ∈ {2}
@@ -103,6 +121,8 @@
 [from] Done for function taint_2
 [from] Computing for function taint_3
 [from] Done for function taint_3
+[from] Computing for function taint_4
+[from] Done for function taint_4
 [from] Computing for function main
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
@@ -113,6 +133,8 @@
   NO EFFECTS
 [from] Function taint_3:
   global FROM t
+[from] Function taint_4:
+  NO EFFECTS
 [from] Function main:
   global FROM \nothing
   \result FROM \nothing
@@ -129,6 +151,10 @@
     global; x; y; z; u
 [inout] Inputs for function taint_3:
     \nothing
+[inout] Out (internal) for function taint_4:
+    z
+[inout] Inputs for function taint_4:
+    undet; global
 [inout] Out (internal) for function main:
     global; w; z; __retres
 [inout] Inputs for function main:
