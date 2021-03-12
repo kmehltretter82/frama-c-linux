@@ -25,7 +25,12 @@ open Cil_datatype
 open Locations
 
 type taint = {
+  (* Over-approximation of the memory locations that are tainted. *)
   locs: Zone.t;
+  (* Set of assume statements over a tainted expression. This set is needed to
+     implement control-dependency: all left-values appearing in statements whose
+     evaluation depends on at least one of the assume expressions is to be
+     tainted. *)
   assume_stmts: Stmt.Set.t;
 }
 
@@ -118,11 +123,11 @@ module LatticeTaint = struct
       assume_stmts = Stmt.Set.inter t1.assume_stmts t2.assume_stmts;
     }
 
-  (* Inclusion testing: pointwise. *)
+  (* Inclusion testing: pointwise, on locs only. *)
   let is_included t1 t2 =
     Zone.is_included t1.locs t2.locs
 
-  (* Intersection testing: pointwise. *)
+  (* Intersection testing: pointwise, on locs only. *)
   let intersects t e =
     Zone.intersects t.locs e
 
@@ -158,6 +163,11 @@ module TransferTaint = struct
     | `Value loc -> loc.Eval.loc
     | `Top -> Precise_locs.loc_top
 
+  (* Compute whether [stmt] is control-dependent of a tainted assume statement
+     in [state]: according to the control-flow graph, if there exists an assume
+     statement for which among its successors there exists one that cannot reach
+     [stmt], then the evaluation of [stmt] depends on the tainted assumption
+     expression. *)
   let is_under_tainted_assume state stmt =
     let kf = Kernel_function.find_englobing_kf stmt in
     Stmt.Set.exists
@@ -183,9 +193,17 @@ module TransferTaint = struct
           Value_util.(zone_of_expr to_loc (lval_to_exp lv.Eval.lval))
         in
         if is_under_tainted_assume state stmt
-        then LatticeTaint.add state lv_zone
+        then
+          (* Taint [lv] as it appears in [stmt], which is control-dependent of a
+             tainted assume statement in [state]. *)
+          LatticeTaint.add state lv_zone
         else
+          (* [stmt] has no control-dependency with [state]: reset [state]'s
+             assume statements as no longer valid. *)
           let state = { state with assume_stmts = Stmt.Set.empty; } in
+          (* Compute data-dependency with [state]: whenever [exp] (or its
+             sub-expressions) is tainted, or [lv] is indexed by a tainted memory
+             location. *)
           let exp_zone = Value_util.zone_of_expr to_loc exp in
           let lv_indirect_zone =
             Value_util.indirect_zone_of_lval to_loc lv.Eval.lval
@@ -202,6 +220,7 @@ module TransferTaint = struct
 
   let assume stmt exp _b valuation state =
     let state = LatticeTaint.add state (zone_of_taint_annot stmt) in
+    (* Add [stmt] as assume statement in [state] as soon as [exp] is tainted. *)
     let to_loc = loc_of_lval valuation in
     let exp_zone = Value_util.zone_of_expr to_loc exp in
     let state =
@@ -214,6 +233,7 @@ module TransferTaint = struct
   let start_call stmt call valuation state =
     let state = LatticeTaint.add state (zone_of_taint_annot stmt) in
     let state =
+      (* Add tainted actual parameters in [state]. *)
       let to_loc = loc_of_lval valuation in
       List.fold_left
         (fun s { Eval.concrete; formal; _ } ->
@@ -228,6 +248,8 @@ module TransferTaint = struct
     `Value state
 
   let finalize_call _stmt _call ~pre ~post =
+    (* Recover assume statements from the [pre] abstract state: we assume the
+       control-dependency does not extended beyond the function scope. *)
     let state = { post with assume_stmts = pre.assume_stmts } in
     `Value state
 
