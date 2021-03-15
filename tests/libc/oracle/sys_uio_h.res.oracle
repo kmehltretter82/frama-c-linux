@@ -1,0 +1,85 @@
+[kernel] Parsing tests/libc/sys_uio_h.c (with preprocessing)
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  
+[eva] computing for function __va_open_mode_t <- main.
+  Called from tests/libc/sys_uio_h.c:17.
+[eva] using specification for function __va_open_mode_t
+[eva] tests/libc/sys_uio_h.c:17: 
+  function __va_open_mode_t: precondition 'valid_filename' got status valid.
+[eva] Done for function __va_open_mode_t
+[eva] computing for function writev <- main.
+  Called from tests/libc/sys_uio_h.c:19.
+[eva] using specification for function writev
+[eva] tests/libc/sys_uio_h.c:19: 
+  function writev: precondition 'valid_fd' got status valid.
+[eva] tests/libc/sys_uio_h.c:19: 
+  function writev: precondition 'initialization,initialized_inputs' got status valid.
+[eva] tests/libc/sys_uio_h.c:19: 
+  function writev: precondition 'valid_read_iov' got status valid.
+[eva] tests/libc/sys_uio_h.c:19: 
+  function writev: precondition 'bounded_iovcnt' got status valid.
+[eva] share/libc/sys/uio.h:64: 
+  cannot evaluate ACSL term, unsupported ACSL construct: logic function \sum
+[eva:alarm] tests/libc/sys_uio_h.c:19: Warning: 
+  function writev: precondition 'bounded_lengths' got status unknown.
+[eva] share/libc/sys/uio.h:69: 
+  cannot evaluate ACSL term, unsupported ACSL construct: logic function \sum
+[eva] Done for function writev
+[eva] computing for function close <- main.
+  Called from tests/libc/sys_uio_h.c:20.
+[eva] using specification for function close
+[eva] tests/libc/sys_uio_h.c:20: 
+  function close: precondition 'valid_fd' got status valid.
+[eva] Done for function close
+[eva] computing for function __va_open_void <- main.
+  Called from tests/libc/sys_uio_h.c:21.
+[eva] using specification for function __va_open_void
+[eva] tests/libc/sys_uio_h.c:21: 
+  function __va_open_void: precondition 'valid_filename' got status valid.
+[eva] tests/libc/sys_uio_h.c:21: 
+  function __va_open_void: precondition 'flag_not_CREAT' got status valid.
+[eva] Done for function __va_open_void
+[eva] computing for function readv <- main.
+  Called from tests/libc/sys_uio_h.c:22.
+[eva] using specification for function readv
+[eva:alarm] tests/libc/sys_uio_h.c:22: Warning: 
+  function readv: precondition 'valid_fd' got status unknown.
+[eva] tests/libc/sys_uio_h.c:22: 
+  function readv: precondition 'initialization,initialized_inputs' got status valid.
+[eva:alarm] tests/libc/sys_uio_h.c:22: Warning: 
+  function readv: precondition 'valid_iov' got status unknown.
+[eva] tests/libc/sys_uio_h.c:22: 
+  function readv: precondition 'bounded_iovcnt' got status valid.
+[eva] share/libc/sys/uio.h:52: 
+  cannot evaluate ACSL term, unsupported ACSL construct: logic function \sum
+[eva] Done for function readv
+[eva] computing for function close <- main.
+  Called from tests/libc/sys_uio_h.c:23.
+[eva] tests/libc/sys_uio_h.c:23: 
+  function close: precondition 'valid_fd' got status valid.
+[eva] Done for function close
+[eva:alarm] tests/libc/sys_uio_h.c:24: Warning: 
+  signed overflow. assert w + r ≤ 2147483647;
+[eva] Recording results for main
+[eva] done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function main:
+  __fc_fds[0..1023] ∈ [--..--]
+  str ∈ {{ "A small string" }}
+  empty_buf ∈ {0}
+  buf[0..9] ∈ [--..--]
+  buf2[0..13] ∈ [--..--] or UNINITIALIZED
+  v[0].iov_base ∈ {{ "A small string" }}
+   [0].iov_len ∈ {15}
+   [1] ∈ {0}
+   [2].iov_base ∈ {{ (void *)&buf }}
+   [2].iov_len ∈ {10}
+   [3].iov_base ∈ {{ (void *)&buf2 }}
+   [3].iov_len ∈ {14}
+  fd ∈ [-1..1023]
+  w ∈ [-1..2147483647]
+  r ∈ [-1..2147483647]
+  __retres ∈ [-2..2147483647]

@@ -570,9 +570,8 @@
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
+  __fc_fds[0..1023] ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
-  __fc_fds[0] ∈ {0}
-          [1..1023] ∈ [--..--]
   r ∈ {-1; 0}
   hostname[0..255] ∈ [--..--] or UNINITIALIZED
   fd ∈ [-1..1023]

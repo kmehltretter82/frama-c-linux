@@ -68,24 +68,20 @@
 [eva] Done for function test_read
 [eva] computing for function test_readv <- main.
   Called from tests/libc/socket.c:127.
-[eva] computing for function init_reception <- test_readv <- main.
-  Called from tests/libc/socket.c:68.
-[eva] computing for function bzero <- init_reception <- test_readv <- main.
-  Called from tests/libc/socket.c:43.
-[eva] Done for function bzero
-[eva] computing for function write <- init_reception <- test_readv <- main.
-  Called from tests/libc/socket.c:44.
-[eva] Done for function write
-[eva] Recording results for init_reception
-[eva] Done for function init_reception
+[eva] tests/libc/socket.c:68: Reusing old results for call to init_reception
 [eva] computing for function readv <- test_readv <- main.
   Called from tests/libc/socket.c:69.
 [eva] using specification for function readv
 [eva] tests/libc/socket.c:69: 
-  function readv: precondition 'valid_read_iov' got status valid.
-[eva] share/libc/sys/uio.h:37: Warning: 
-  no \from part
-  for clause 'assigns *((char *)(iov + (0 .. iovcnt - 1))->iov_base + (0 ..));'
+  function readv: precondition 'valid_fd' got status valid.
+[eva] tests/libc/socket.c:69: 
+  function readv: precondition 'initialization,initialized_inputs' got status valid.
+[eva] tests/libc/socket.c:69: 
+  function readv: precondition 'valid_iov' got status valid.
+[eva] tests/libc/socket.c:69: 
+  function readv: precondition 'bounded_iovcnt' got status valid.
+[eva] share/libc/sys/uio.h:52: 
+  cannot evaluate ACSL term, unsupported ACSL construct: logic function \sum
 [eva] Done for function readv
 [eva:alarm] tests/libc/socket.c:72: Warning: 
   accessing uninitialized left-value.
@@ -240,8 +236,8 @@
                             [2].iov_len ∈ {3}
   S___fc_stdout[0..1] ∈ [--..--]
 [eva:final-states] Values at end of function test_recvmsg:
-  __fc_sockfds[0..1023] ∈ [--..--]
   __fc_fds[0..1023] ∈ [--..--]
+  __fc_sockfds[0..1023] ∈ [--..--]
   rcv_buffer[0..9] ∈ {0}
   rcv_buffer_scattered1[0] ∈ [--..--]
                        [1] ∈ [--..--] or UNINITIALIZED
@@ -265,9 +261,9 @@
      .msg_flags ∈ [--..--] or UNINITIALIZED
   S___fc_stdout[0..1] ∈ [--..--]
 [eva:final-states] Values at end of function test_server_echo:
+  __fc_fds[0..1023] ∈ [--..--]
   __fc_sockfds[0..1023] ∈ [--..--]
   __fc_socket_counter ∈ [--..--]
-  __fc_fds[0..1023] ∈ [--..--]
   fd ∈ [-1..1023]
   addr ∈ [--..--] or UNINITIALIZED
   addrlen ∈ {8}
@@ -276,9 +272,9 @@
   r ∈ [-1..64]
   __retres ∈ {0; 1; 5; 20; 100; 200; 300; 400}
 [eva:final-states] Values at end of function main:
+  __fc_fds[0..1023] ∈ [--..--]
   __fc_sockfds[0..1023] ∈ [--..--]
   __fc_socket_counter ∈ [--..--]
-  __fc_fds[0..1023] ∈ [--..--]
   rcv_buffer[0..9] ∈ {0}
   socket_fd[0..1] ∈ [0..1023]
   r ∈ {0; 1; 5; 20; 100; 200; 300; 400}

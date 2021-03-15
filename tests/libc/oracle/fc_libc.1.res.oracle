@@ -270,6 +270,10 @@ typedef struct __fc_FILE FILE;
 typedef unsigned int id_t;
 typedef int suseconds_t;
 typedef int clockid_t;
+struct timespec {
+   long tv_sec ;
+   long tv_nsec ;
+};
 typedef unsigned int clock_t;
 struct tm {
    int tm_sec ;
@@ -281,10 +285,6 @@ struct tm {
    int tm_wday ;
    int tm_yday ;
    int tm_isdst ;
-};
-struct timespec {
-   long tv_sec ;
-   long tv_nsec ;
 };
 struct dirent {
    ino_t d_ino ;
@@ -304,24 +304,16 @@ struct __fc_fd_set {
    long __fc_fd_set[(unsigned int)1024 / ((unsigned int)8 * sizeof(long))] ;
 };
 typedef struct __fc_fd_set fd_set;
+struct timeval {
+   time_t tv_sec ;
+   suseconds_t tv_usec ;
+};
 struct flock {
    short l_type ;
    short l_whence ;
    off_t l_start ;
    off_t l_len ;
    pid_t l_pid ;
-};
-struct timeval {
-   time_t tv_sec ;
-   suseconds_t tv_usec ;
-};
-struct timezone {
-   int tz_minuteswest ;
-   int tz_dsttime ;
-};
-struct itimerval {
-   struct timeval it_interval ;
-   struct timeval it_value ;
 };
 typedef void * iconv_t;
 struct pollfd {
@@ -350,6 +342,14 @@ struct __fc_code {
    int c_val ;
 };
 typedef struct __fc_code CODE;
+struct timezone {
+   int tz_minuteswest ;
+   int tz_dsttime ;
+};
+struct itimerval {
+   struct timeval it_interval ;
+   struct timeval it_value ;
+};
 typedef unsigned long rlim_t;
 struct rlimit {
    rlim_t rlim_cur ;
@@ -2875,7 +2875,8 @@ int fesetenv(fenv_t const *envp)
   return __retres;
 }
 
-/*@ ghost int __fc_fds[1024]; */
+extern int volatile __fc_fds[1024];
+
 /*@ requires valid_string_path: valid_read_string(path);
     requires valid_amode: (amode & ~((4 | 2) | 1)) ≡ 0 ∨ amode ≡ 0;
     ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
@@ -4518,10 +4519,59 @@ extern int kill(pid_t pid, int sig);
  */
 extern int killpg(pid_t pgrp, int sig);
 
-/*@ requires valid_read_iov: \valid_read(iov + (0 .. iovcnt - 1));
-    assigns *((char *)(iov + (0 .. iovcnt - 1))->iov_base + (0 ..));
+/*@ requires valid_fd: 0 ≤ fd < 1024;
+    requires
+      initialization: initialized_inputs:
+        ∀ ℤ i;
+          0 ≤ i < iovcnt ⇒
+          \initialized(&(iov + i)->iov_base) ∧
+          \initialized(&(iov + i)->iov_len);
+    requires
+      valid_iov:
+        ∀ ℤ i;
+          0 ≤ i < iovcnt ⇒
+          \valid((char *)(&(iov + i)->iov_base) +
+                 (0 .. (iov + i)->iov_len - 1));
+    requires bounded_iovcnt: 0 ≤ iovcnt ≤ 1024;
+    ensures
+      result_error_or_read_bytes:
+        \result ≡ -1 ∨
+        (0 ≤ \result ≤
+         \sum(0, \old(iovcnt) - 1, \lambda ℤ k; (\old(iov) + k)->iov_len));
+    assigns *((char *)(iov + (0 .. iovcnt - 1))->iov_base + (0 ..)), \result;
+    assigns *((char *)(iov + (0 .. iovcnt - 1))->iov_base + (0 ..))
+      \from (indirect: fd), (indirect: iovcnt), (indirect: __fc_fds[fd]);
+    assigns \result
+      \from (indirect: fd), (indirect: __fc_fds[fd]),
+            (indirect: *(iov + (0 ..))), (indirect: iovcnt);
  */
 extern ssize_t readv(int fd, struct iovec const *iov, int iovcnt);
+
+/*@ requires valid_fd: 0 ≤ fd < 1024;
+    requires
+      initialization: initialized_inputs:
+        ∀ ℤ i;
+          0 ≤ i < iovcnt ⇒
+          \initialized(&(iov + i)->iov_base) ∧
+          \initialized(&(iov + i)->iov_len);
+    requires valid_read_iov: \valid_read(iov + (0 .. iovcnt - 1));
+    requires bounded_iovcnt: 0 ≤ iovcnt ≤ 1024;
+    requires
+      bounded_lengths:
+        \sum(0, iovcnt - 1, \lambda ℤ k; (iov + k)->iov_len) ≤ 2147483647;
+    ensures
+      result_error_or_written_bytes:
+        \result ≡ -1 ∨
+        (0 ≤ \result ≤
+         \sum(0, \old(iovcnt) - 1, \lambda ℤ k; (\old(iov) + k)->iov_len));
+    assigns \result, __fc_fds[fd];
+    assigns \result
+      \from (indirect: fd), (indirect: __fc_fds[fd]),
+            (indirect: *(iov + (0 ..))), (indirect: iovcnt);
+    assigns __fc_fds[fd]
+      \from (indirect: *(iov + (0 ..))), (indirect: iovcnt);
+ */
+extern ssize_t writev(int fd, struct iovec const *iov, int iovcnt);
 
 /*@ ghost struct __fc_sockfds_type __fc_sockfds[1024]; */
 /*@ ghost extern int __fc_socket_counter; */
@@ -7777,34 +7827,6 @@ extern DIR *opendir(char const *path);
  */
 extern struct dirent *readdir(DIR *dirp);
 
-/*@ requires valid_fdset: \valid(fdset);
-    requires initialization: \initialized(fdset);
-    assigns *fdset;
-    assigns *fdset \from *fdset, (indirect: fd);
- */
-extern void FD_CLR(int fd, fd_set *fdset);
-
-/*@ requires valid_fdset: \valid_read(fdset);
-    requires initialization: \initialized(fdset);
-    assigns \result;
-    assigns \result \from (indirect: *fdset), (indirect: fd);
- */
-extern int FD_ISSET(int fd, fd_set const *fdset);
-
-/*@ requires valid_fdset: \valid(fdset);
-    requires initialization: \initialized(fdset);
-    assigns *fdset;
-    assigns *fdset \from *fdset, (indirect: fd);
- */
-extern void FD_SET(int fd, fd_set *fdset);
-
-/*@ requires valid_fdset: \valid(fdset);
-    ensures initialization: \initialized(\old(fdset));
-    assigns *fdset;
-    assigns *fdset \from \nothing;
- */
-extern void FD_ZERO(fd_set *fdset);
-
 /*@ requires valid_res: \valid(res);
     ensures initialization: res: \initialized(\old(res));
     ensures res_wrapped: *\old(res) ≡ (int)(\old(a) + \old(b));
@@ -8219,192 +8241,6 @@ extern int __va_openat_void(int dirfd, char const *filename, int flags);
  */
 extern int __va_openat_mode_t(int dirfd, char const *filename, int flags,
                               mode_t mode);
-
-/*@ ghost extern int __fc_tz; */
-
-/*@ requires valid_path: valid_read_string(path);
-    requires
-      valid_times_or_null: \valid_read(times + (0 .. 1)) ∨ times ≡ \null;
-    assigns \result;
-    assigns \result
-      \from (indirect: *(path + (0 .. strlen{Old}(path)))),
-            (indirect: times), (indirect: *(times + (0 .. 1)));
- */
-extern int utimes(char const *path, struct timeval const times[2]);
-
-/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
-    assigns tv->tv_sec, tv->tv_usec, *((struct timezone *)tz), \result;
-    assigns tv->tv_sec \from __fc_time;
-    assigns tv->tv_usec \from __fc_time;
-    assigns *((struct timezone *)tz) \from __fc_tz;
-    assigns \result
-      \from (indirect: tv), (indirect: tz), *tv, *((struct timezone *)tz),
-            __fc_tz;
-    
-    behavior tv_and_tz_null:
-      assumes null_tv_tz: tv ≡ \null ∧ tz ≡ \null;
-      assigns \result;
-      assigns \result \from (indirect: __fc_tz);
-    
-    behavior tv_not_null:
-      assumes non_null_tv_null_tz: tv ≢ \null ∧ tz ≡ \null;
-      ensures
-        initialization: tv_sec: tv_usec:
-          \initialized(&\old(tv)->tv_sec) ∧
-          \initialized(&\old(tv)->tv_usec);
-      ensures tv_usec_bounded: 0 ≤ \old(tv)->tv_usec ≤ 999999;
-      assigns tv->tv_sec, tv->tv_usec, \result;
-      assigns tv->tv_sec \from (indirect: __fc_time);
-      assigns tv->tv_usec \from (indirect: __fc_time);
-      assigns \result \from (indirect: *tv), (indirect: __fc_tz);
-    
-    behavior tz_not_null:
-      assumes null_tv_non_null_tz: tv ≡ \null ∧ tz ≢ \null;
-      ensures initialization: tz: \initialized((struct timezone *)\old(tz));
-      assigns *((struct timezone *)tz), \result;
-      assigns *((struct timezone *)tz) \from __fc_tz;
-      assigns \result
-        \from (indirect: *((struct timezone *)tz)), (indirect: __fc_tz);
-    
-    behavior tv_and_tz_not_null:
-      assumes non_null_tv_tz: tv ≢ \null ∧ tz ≢ \null;
-      ensures
-        initialization: tv_sec: tv_usec:
-          \initialized(&\old(tv)->tv_sec) ∧
-          \initialized(&\old(tv)->tv_usec);
-      ensures initialization: tz: \initialized((struct timezone *)\old(tz));
-      assigns tv->tv_sec, tv->tv_usec, *((struct timezone *)tz), \result;
-      assigns tv->tv_sec \from (indirect: __fc_time);
-      assigns tv->tv_usec \from (indirect: __fc_time);
-      assigns *((struct timezone *)tz) \from __fc_tz;
-      assigns \result
-        \from (indirect: *tv), (indirect: *((struct timezone *)tz)),
-              (indirect: __fc_tz);
-    
-    complete behaviors tv_and_tz_not_null,
-                       tz_not_null,
-                       tv_not_null,
-                       tv_and_tz_null;
-    disjoint behaviors tv_and_tz_not_null,
-                       tz_not_null,
-                       tv_not_null,
-                       tv_and_tz_null;
- */
-extern int gettimeofday(struct timeval * restrict tv, void * restrict tz);
-
-/*@ requires valid_tv_or_null: \valid_read(tv) ∨ tv ≡ \null;
-    requires valid_tz_or_null: \valid_read(tz) ∨ tz ≡ \null;
-    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
-    assigns __fc_time, __fc_tz, \result;
-    assigns __fc_time
-      \from tv->tv_sec, tv->tv_usec, tz->tz_dsttime, tz->tz_minuteswest;
-    assigns __fc_tz
-      \from tv->tv_sec, tv->tv_usec, tz->tz_dsttime, tz->tz_minuteswest;
-    assigns \result \from (indirect: *tv), (indirect: *tz);
- */
-extern int settimeofday(struct timeval const *tv, struct timezone const *tz);
-
-/*@ ghost struct itimerval volatile __fc_itimer_real; */
-/*@ ghost struct itimerval volatile __fc_itimer_virtual; */
-/*@ ghost struct itimerval volatile __fc_itimer_prof; */
-/*@ requires valid_curr_value: \valid(curr_value);
-    ensures initialization: curr_value: \initialized(\old(curr_value));
-    assigns \result, *curr_value;
-    assigns \result \from (indirect: which);
-    assigns *curr_value
-      \from __fc_itimer_real, __fc_itimer_virtual, __fc_itimer_prof;
-    
-    behavior real:
-      assumes itimer_real: which ≡ 0;
-      ensures result_ok: \result ≡ 0;
-      assigns \result, *curr_value;
-      assigns \result \from \nothing;
-      assigns *curr_value \from __fc_itimer_real;
-    
-    behavior virtual:
-      assumes itimer_virtual: which ≡ 1;
-      ensures result_ok: \result ≡ 0;
-      assigns \result, *curr_value;
-      assigns \result \from \nothing;
-      assigns *curr_value \from __fc_itimer_virtual;
-    
-    behavior prof:
-      assumes itimer_prof: which ≡ 2;
-      ensures result_ok: \result ≡ 0;
-      assigns \result, *curr_value;
-      assigns \result \from \nothing;
-      assigns *curr_value \from __fc_itimer_prof;
-    
-    behavior invalid:
-      assumes invalid_which: which ≢ 0 ∧ which ≢ 1 ∧ which ≢ 2;
-      ensures result_error: \result ≡ -1;
-      assigns \result;
-      assigns \result \from \nothing;
-    
-    complete behaviors invalid, prof, virtual, real;
-    disjoint behaviors invalid, prof, virtual, real;
- */
-extern int getitimer(int which, struct itimerval *curr_value);
-
-/*@ requires valid_new_value: \valid_read(new_value);
-    requires
-      old_value_null_or_valid: old_value ≡ \null ∨ \valid(old_value);
-    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
-    assigns *old_value, \result;
-    assigns *old_value
-      \from (indirect: which), (indirect: old_value), (indirect: new_value),
-            __fc_itimer_real, __fc_itimer_virtual, __fc_itimer_prof;
-    assigns \result
-      \from (indirect: which), (indirect: new_value), (indirect: *new_value);
-    
-    behavior real:
-      assumes
-        itimer_real_and_valid:
-          which ≡ 0 ≤ new_value->it_value.tv_usec ≤ 999999 ∧
-          0 ≤ new_value->it_interval.tv_usec ≤ 999999;
-      ensures result_ok: \result ≡ 0;
-      ensures initialization: old_value: \initialized(\old(old_value));
-      assigns \result, *old_value, __fc_itimer_real;
-      assigns \result \from \nothing;
-      assigns *old_value \from __fc_itimer_real;
-      assigns __fc_itimer_real \from *new_value;
-    
-    behavior virtual:
-      assumes
-        itimer_virtual_and_valid:
-          which ≡ 1 ∧ 0 ≤ new_value->it_value.tv_usec ≤ 999999 ∧
-          0 ≤ new_value->it_interval.tv_usec ≤ 999999;
-      ensures result_ok: \result ≡ 0;
-      ensures initialization: old_value: \initialized(\old(old_value));
-      assigns \result, *old_value;
-      assigns \result \from \nothing;
-      assigns *old_value \from __fc_itimer_virtual;
-    
-    behavior prof:
-      assumes
-        itimer_prof_and_valid:
-          which ≡ 2 ∧ 0 ≤ new_value->it_value.tv_usec ≤ 999999 ∧
-          0 ≤ new_value->it_interval.tv_usec ≤ 999999;
-      ensures result_ok: \result ≡ 0;
-      ensures initialization: old_value: \initialized(\old(old_value));
-      assigns \result, *old_value;
-      assigns \result \from \nothing;
-      assigns *old_value \from __fc_itimer_prof;
-    
-    behavior invalid:
-      assumes
-        invalid_itimer_or_new_value:
-          (which ≢ 0 ∧ which ≢ 1 ∧ which ≢ 2) ∨
-          ¬(0 ≤ new_value->it_value.tv_usec ≤ 999999 ∧
-             0 ≤ new_value->it_interval.tv_usec ≤ 999999);
-      ensures result_error: \result ≡ -1;
-      assigns \result;
-      assigns \result \from \nothing;
-    
-    disjoint behaviors invalid, prof, virtual, real;
- */
-extern int setitimer(int which, struct itimerval const * restrict new_value,
-                     struct itimerval * restrict old_value);
 
 /*@ ghost int volatile __fc_fds_state; */
 /*@ requires nfds: nfds ≥ 0;
@@ -8860,6 +8696,220 @@ extern void syslog(int __x0, char const *__x1, void * const *__va_params);
 
 /*@ assigns \nothing; */
 extern void vsyslog(int __x0, char const *__x1, va_list __x2);
+
+/*@ ghost extern int __fc_tz; */
+
+/*@ requires valid_path: valid_read_string(path);
+    requires
+      valid_times_or_null: \valid_read(times + (0 .. 1)) ∨ times ≡ \null;
+    assigns \result;
+    assigns \result
+      \from (indirect: *(path + (0 .. strlen{Old}(path)))),
+            (indirect: times), (indirect: *(times + (0 .. 1)));
+ */
+extern int utimes(char const *path, struct timeval const times[2]);
+
+/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns tv->tv_sec, tv->tv_usec, *((struct timezone *)tz), \result;
+    assigns tv->tv_sec \from __fc_time;
+    assigns tv->tv_usec \from __fc_time;
+    assigns *((struct timezone *)tz) \from __fc_tz;
+    assigns \result
+      \from (indirect: tv), (indirect: tz), *tv, *((struct timezone *)tz),
+            __fc_tz;
+    
+    behavior tv_and_tz_null:
+      assumes null_tv_tz: tv ≡ \null ∧ tz ≡ \null;
+      assigns \result;
+      assigns \result \from (indirect: __fc_tz);
+    
+    behavior tv_not_null:
+      assumes non_null_tv_null_tz: tv ≢ \null ∧ tz ≡ \null;
+      ensures
+        initialization: tv_sec: tv_usec:
+          \initialized(&\old(tv)->tv_sec) ∧
+          \initialized(&\old(tv)->tv_usec);
+      ensures tv_usec_bounded: 0 ≤ \old(tv)->tv_usec ≤ 999999;
+      assigns tv->tv_sec, tv->tv_usec, \result;
+      assigns tv->tv_sec \from (indirect: __fc_time);
+      assigns tv->tv_usec \from (indirect: __fc_time);
+      assigns \result \from (indirect: *tv), (indirect: __fc_tz);
+    
+    behavior tz_not_null:
+      assumes null_tv_non_null_tz: tv ≡ \null ∧ tz ≢ \null;
+      ensures initialization: tz: \initialized((struct timezone *)\old(tz));
+      assigns *((struct timezone *)tz), \result;
+      assigns *((struct timezone *)tz) \from __fc_tz;
+      assigns \result
+        \from (indirect: *((struct timezone *)tz)), (indirect: __fc_tz);
+    
+    behavior tv_and_tz_not_null:
+      assumes non_null_tv_tz: tv ≢ \null ∧ tz ≢ \null;
+      ensures
+        initialization: tv_sec: tv_usec:
+          \initialized(&\old(tv)->tv_sec) ∧
+          \initialized(&\old(tv)->tv_usec);
+      ensures initialization: tz: \initialized((struct timezone *)\old(tz));
+      assigns tv->tv_sec, tv->tv_usec, *((struct timezone *)tz), \result;
+      assigns tv->tv_sec \from (indirect: __fc_time);
+      assigns tv->tv_usec \from (indirect: __fc_time);
+      assigns *((struct timezone *)tz) \from __fc_tz;
+      assigns \result
+        \from (indirect: *tv), (indirect: *((struct timezone *)tz)),
+              (indirect: __fc_tz);
+    
+    complete behaviors tv_and_tz_not_null,
+                       tz_not_null,
+                       tv_not_null,
+                       tv_and_tz_null;
+    disjoint behaviors tv_and_tz_not_null,
+                       tz_not_null,
+                       tv_not_null,
+                       tv_and_tz_null;
+ */
+extern int gettimeofday(struct timeval * restrict tv, void * restrict tz);
+
+/*@ requires valid_tv_or_null: \valid_read(tv) ∨ tv ≡ \null;
+    requires valid_tz_or_null: \valid_read(tz) ∨ tz ≡ \null;
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns __fc_time, __fc_tz, \result;
+    assigns __fc_time
+      \from tv->tv_sec, tv->tv_usec, tz->tz_dsttime, tz->tz_minuteswest;
+    assigns __fc_tz
+      \from tv->tv_sec, tv->tv_usec, tz->tz_dsttime, tz->tz_minuteswest;
+    assigns \result \from (indirect: *tv), (indirect: *tz);
+ */
+extern int settimeofday(struct timeval const *tv, struct timezone const *tz);
+
+/*@ ghost struct itimerval volatile __fc_itimer_real; */
+/*@ ghost struct itimerval volatile __fc_itimer_virtual; */
+/*@ ghost struct itimerval volatile __fc_itimer_prof; */
+/*@ requires valid_curr_value: \valid(curr_value);
+    ensures initialization: curr_value: \initialized(\old(curr_value));
+    assigns \result, *curr_value;
+    assigns \result \from (indirect: which);
+    assigns *curr_value
+      \from __fc_itimer_real, __fc_itimer_virtual, __fc_itimer_prof;
+    
+    behavior real:
+      assumes itimer_real: which ≡ 0;
+      ensures result_ok: \result ≡ 0;
+      assigns \result, *curr_value;
+      assigns \result \from \nothing;
+      assigns *curr_value \from __fc_itimer_real;
+    
+    behavior virtual:
+      assumes itimer_virtual: which ≡ 1;
+      ensures result_ok: \result ≡ 0;
+      assigns \result, *curr_value;
+      assigns \result \from \nothing;
+      assigns *curr_value \from __fc_itimer_virtual;
+    
+    behavior prof:
+      assumes itimer_prof: which ≡ 2;
+      ensures result_ok: \result ≡ 0;
+      assigns \result, *curr_value;
+      assigns \result \from \nothing;
+      assigns *curr_value \from __fc_itimer_prof;
+    
+    behavior invalid:
+      assumes invalid_which: which ≢ 0 ∧ which ≢ 1 ∧ which ≢ 2;
+      ensures result_error: \result ≡ -1;
+      assigns \result;
+      assigns \result \from \nothing;
+    
+    complete behaviors invalid, prof, virtual, real;
+    disjoint behaviors invalid, prof, virtual, real;
+ */
+extern int getitimer(int which, struct itimerval *curr_value);
+
+/*@ requires valid_new_value: \valid_read(new_value);
+    requires
+      old_value_null_or_valid: old_value ≡ \null ∨ \valid(old_value);
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns *old_value, \result;
+    assigns *old_value
+      \from (indirect: which), (indirect: old_value), (indirect: new_value),
+            __fc_itimer_real, __fc_itimer_virtual, __fc_itimer_prof;
+    assigns \result
+      \from (indirect: which), (indirect: new_value), (indirect: *new_value);
+    
+    behavior real:
+      assumes
+        itimer_real_and_valid:
+          which ≡ 0 ≤ new_value->it_value.tv_usec ≤ 999999 ∧
+          0 ≤ new_value->it_interval.tv_usec ≤ 999999;
+      ensures result_ok: \result ≡ 0;
+      ensures initialization: old_value: \initialized(\old(old_value));
+      assigns \result, *old_value, __fc_itimer_real;
+      assigns \result \from \nothing;
+      assigns *old_value \from __fc_itimer_real;
+      assigns __fc_itimer_real \from *new_value;
+    
+    behavior virtual:
+      assumes
+        itimer_virtual_and_valid:
+          which ≡ 1 ∧ 0 ≤ new_value->it_value.tv_usec ≤ 999999 ∧
+          0 ≤ new_value->it_interval.tv_usec ≤ 999999;
+      ensures result_ok: \result ≡ 0;
+      ensures initialization: old_value: \initialized(\old(old_value));
+      assigns \result, *old_value;
+      assigns \result \from \nothing;
+      assigns *old_value \from __fc_itimer_virtual;
+    
+    behavior prof:
+      assumes
+        itimer_prof_and_valid:
+          which ≡ 2 ∧ 0 ≤ new_value->it_value.tv_usec ≤ 999999 ∧
+          0 ≤ new_value->it_interval.tv_usec ≤ 999999;
+      ensures result_ok: \result ≡ 0;
+      ensures initialization: old_value: \initialized(\old(old_value));
+      assigns \result, *old_value;
+      assigns \result \from \nothing;
+      assigns *old_value \from __fc_itimer_prof;
+    
+    behavior invalid:
+      assumes
+        invalid_itimer_or_new_value:
+          (which ≢ 0 ∧ which ≢ 1 ∧ which ≢ 2) ∨
+          ¬(0 ≤ new_value->it_value.tv_usec ≤ 999999 ∧
+             0 ≤ new_value->it_interval.tv_usec ≤ 999999);
+      ensures result_error: \result ≡ -1;
+      assigns \result;
+      assigns \result \from \nothing;
+    
+    disjoint behaviors invalid, prof, virtual, real;
+ */
+extern int setitimer(int which, struct itimerval const * restrict new_value,
+                     struct itimerval * restrict old_value);
+
+/*@ requires valid_fdset: \valid(fdset);
+    requires initialization: \initialized(fdset);
+    assigns *fdset;
+    assigns *fdset \from *fdset, (indirect: fd);
+ */
+extern void FD_CLR(int fd, fd_set *fdset);
+
+/*@ requires valid_fdset: \valid_read(fdset);
+    requires initialization: \initialized(fdset);
+    assigns \result;
+    assigns \result \from (indirect: *fdset), (indirect: fd);
+ */
+extern int FD_ISSET(int fd, fd_set const *fdset);
+
+/*@ requires valid_fdset: \valid(fdset);
+    requires initialization: \initialized(fdset);
+    assigns *fdset;
+    assigns *fdset \from *fdset, (indirect: fd);
+ */
+extern void FD_SET(int fd, fd_set *fdset);
+
+/*@ requires valid_fdset: \valid(fdset);
+    ensures initialization: \initialized(\old(fdset));
+    assigns *fdset;
+    assigns *fdset \from \nothing;
+ */
+extern void FD_ZERO(fd_set *fdset);
 
 /*@ assigns \result;
     assigns \result \from which, who; */
