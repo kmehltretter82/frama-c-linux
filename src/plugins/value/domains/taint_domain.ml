@@ -187,19 +187,23 @@ module TransferTaint = struct
       | Kglobal ->
         state
       | Kstmt stmt ->
-        let state = LatticeTaint.add state (zone_of_taint_annot stmt) in
+        let annot_zone = zone_of_taint_annot stmt in
+        let state = LatticeTaint.add state annot_zone in
         let to_loc = loc_of_lval valuation in
         let lv_zone =
           Value_util.(zone_of_expr to_loc (lval_to_exp lv.Eval.lval))
         in
-        if is_under_tainted_assume state stmt
+        let is_taint_annotated = Zone.is_included lv_zone annot_zone in
+        if is_taint_annotated || is_under_tainted_assume state stmt
         then
-          (* Taint [lv] as it appears in [stmt], which is control-dependent of a
-             tainted assume statement in [state]. *)
+          (* Taint [lv] as either it appears in [stmt] taint annotation or
+             [stmt] is control-dependent of a tainted assume statement in
+             [state]. *)
           LatticeTaint.add state lv_zone
         else
-          (* [stmt] has no control-dependency with [state]: reset [state]'s
-             assume statements as no longer valid. *)
+          (* No taint annotation concerning [lv] nor [stmt] has a
+             control-dependency with [state]. *)
+          (* Reset [state]'s assume statements as no longer valid. *)
           let state = { state with assume_stmts = Stmt.Set.empty; } in
           (* Compute data-dependency with [state]: whenever [exp] (or its
              sub-expressions) is tainted, or [lv] is indexed by a tainted memory

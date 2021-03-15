@@ -68,10 +68,11 @@ void taint_4() {
 
 int main(void) {
   int w, z;
-  w = z = 0;
   //@ taint w;
+  w = 0;
   taint_1(w);
   Frama_C_domain_show_each(w);
+  z = 0;
   w = 2;
   //@ taint w, z;
   taint_2(w, z);
