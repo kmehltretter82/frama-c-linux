@@ -38,6 +38,9 @@ __BEGIN_DECLS
 // assigns { ((char *) iov[i].iov_base)[0..iov[i].iov_len - 1] | integer i; 0 <= i < iovcnt };
 /*@
   requires valid_fd: 0 <= fd < __FC_MAX_OPEN_FILES;
+  requires initialization:initialized_inputs:
+     \forall integer i; 0 <= i < iovcnt ==>
+    \initialized(&iov[i].iov_base) && \initialized(&iov[i].iov_len);
   requires valid_iov: \forall integer i; 0 <= i < iovcnt ==>
     \valid( ((char*)&iov[i].iov_base)+(0..iov[i].iov_len-1));
   requires bounded_iovcnt: 0 <= iovcnt <= IOV_MAX;
@@ -52,6 +55,9 @@ extern ssize_t readv(int fd, const struct iovec *iov, int iovcnt);
 
 /*@
   requires valid_fd: 0 <= fd < __FC_MAX_OPEN_FILES;
+  requires initialization:initialized_inputs:
+    \forall integer i; 0 <= i < iovcnt ==>
+    \initialized(&iov[i].iov_base) && \initialized(&iov[i].iov_len);
   requires valid_read_iov: \valid_read(&iov[0..iovcnt-1]);
   requires bounded_iovcnt: 0 <= iovcnt <= IOV_MAX;
   requires bounded_lengths:
