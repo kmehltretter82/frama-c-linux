@@ -9,6 +9,8 @@
 [eva] share/libc/stdlib.c:114: Call to builtin strchr
 [eva] share/libc/stdlib.c:114: 
   function strchr: precondition 'valid_string_s' got status valid.
+[eva] share/libc/string.h:165: 
+  cannot evaluate ACSL term, unsupported logic var p
 [eva] share/libc/stdlib.c:115: 
   assertion 'string_contains_separator' got status valid.
 [eva] share/libc/stdlib.c:116: assertion 'name_is_not_empty' got status valid.

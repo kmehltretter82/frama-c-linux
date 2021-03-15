@@ -3,7 +3,6 @@
 [eva:alarm] tests/arith/quantif.i:15: Warning: 
   function __e_acsl_assert: precondition got status unknown.
 [eva:alarm] tests/arith/quantif.i:15: Warning: assertion got status unknown.
-[eva:alarm] tests/arith/quantif.i:20: Warning: assertion got status unknown.
 [eva:alarm] tests/arith/quantif.i:24: Warning: 
   function __e_acsl_assert: precondition got status unknown.
 [eva:alarm] tests/arith/quantif.i:24: Warning: assertion got status unknown.

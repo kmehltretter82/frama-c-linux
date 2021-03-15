@@ -23,6 +23,8 @@
 [eva] tests/builtins/strchr.c:88: Call to builtin strchr
 [eva] tests/builtins/strchr.c:88: 
   function strchr: precondition 'valid_string_s' got status valid.
+[eva] share/libc/string.h:165: 
+  cannot evaluate ACSL term, unsupported logic var p
 [eva] tests/builtins/strchr.c:88: Frama_C_show_each_mystrchr: {3}
 [eva] tests/builtins/strchr.c:89: assertion got status valid.
 [eva] tests/builtins/strchr.c:92: Call to builtin strchr

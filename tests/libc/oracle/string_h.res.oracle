@@ -143,12 +143,8 @@
 [eva] tests/libc/string_h.c:75: 
   function strtok: precondition 'valid_string_delim' got status valid.
 [eva:alarm] tests/libc/string_h.c:75: Warning: 
-  function strtok, behavior new_str: precondition 'valid_string_s_or_delim_not_found' got status unknown.
-[eva:invalid-assigns] tests/libc/string_h.c:75: 
-  Completely invalid destination for assigns clause *(s + (0 ..)). Ignoring.
+  function strtok, behavior new_str: precondition 'valid_string_s_or_delim_not_found' got status invalid.
 [eva] Done for function strtok
-[eva:alarm] tests/libc/string_h.c:76: Warning: 
-  assertion 'unreachable_if_precise' got status invalid (stopping propagation).
 [eva] Recording results for test_strtok
 [eva] Done for function test_strtok
 [eva] computing for function test_strtok_r <- main.
@@ -232,12 +228,8 @@
 [eva] tests/libc/string_h.c:105: 
   function strtok_r: precondition 'valid_saveptr' got status valid.
 [eva:alarm] tests/libc/string_h.c:105: Warning: 
-  function strtok_r, behavior new_str: precondition 'valid_string_s_or_delim_not_found' got status unknown.
-[eva:invalid-assigns] tests/libc/string_h.c:105: 
-  Completely invalid destination for assigns clause *(s + (0 ..)). Ignoring.
+  function strtok_r, behavior new_str: precondition 'valid_string_s_or_delim_not_found' got status invalid.
 [eva] Done for function strtok_r
-[eva:alarm] tests/libc/string_h.c:106: Warning: 
-  assertion 'unreachable_if_precise' got status invalid (stopping propagation).
 [eva] Recording results for test_strtok_r
 [eva] Done for function test_strtok_r
 [eva] computing for function strdup <- main.
@@ -333,6 +325,8 @@
 [eva] tests/libc/string_h.c:154: Call to builtin strchr
 [eva] tests/libc/string_h.c:154: 
   function strchr: precondition 'valid_string_s' got status valid.
+[eva] share/libc/string.h:165: 
+  cannot evaluate ACSL term, unsupported logic var p
 [eva] computing for function strchrnul <- main.
   Called from tests/libc/string_h.c:155.
 [eva] using specification for function strchrnul
