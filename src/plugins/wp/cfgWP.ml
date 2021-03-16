@@ -152,8 +152,15 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let pp_vc fmt vc =
-    Format.fprintf fmt "%a"
-      (Pcond.dump_bundle ~clause:"Context" ~goal:vc.goal) vc.hyps
+    if Wp_parameters.debug_atleast 2 then
+      begin
+        List.iter
+          (Format.fprintf fmt "Have @[<hov 2>%a@]@." F.pp_pred)
+          (Conditions.extract vc.hyps) ;
+        Format.fprintf fmt "Goal @[<hov 2>%a@]@]@." F.pp_pred vc.goal ;
+      end
+    else
+      Pcond.dump_bundle ~clause:"Context" ~goal:vc.goal fmt vc.hyps
 
   let pp_vcs fmt vcs =
     let k = ref 0 in
@@ -1099,11 +1106,14 @@ struct
         }
     | Writes froms ->
         let env = L.move_at env0 cenv.sigma_pre in
-        let assigned = L.in_frame cenv.frame_pre
-            (L.assigned_of_froms env) froms in
-        let vcs_post = do_assigns ~descr:"Call Effects" ~source:FromCall
+        let cc_region = L.assigned_of_froms env in
+        let vcs_post =
+          let assigned = L.in_frame cenv.frame_post cc_region froms in
+          do_assigns ~descr:"Call Effects" ~source:FromCall
             ~stmt cenv.seq_post ~assigned wpost.effects wpost.vcs in
-        let vcs_exit = do_assigns ~descr:"Exit Effects" ~source:FromCall
+        let vcs_exit =
+          let assigned = L.in_frame cenv.frame_exit cc_region froms in
+          do_assigns ~descr:"Exit Effects" ~source:FromCall
             ~stmt cenv.seq_exit ~assigned wexit.effects wexit.vcs in
         let vcs_result =
           match cenv.loc_result with

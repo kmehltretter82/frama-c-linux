@@ -220,6 +220,7 @@ struct
           Clabels.init , init ;
           Clabels.pre , seq.pre ;
           Clabels.post , seq.post ;
+          Clabels.exit , seq.post ;
         ] ;
     }
 
