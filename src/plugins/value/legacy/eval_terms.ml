@@ -21,15 +21,12 @@
 (**************************************************************************)
 
 open Cil_types
-open Cil_datatype
 open Locations
-open Abstract_interp
 open Cvalue
-open Bit_utils
 
 (* Truth values for a predicate analyzed by the value analysis *)
 
-type predicate_status = Comp.result = True | False | Unknown
+type predicate_status = Abstract_interp.Comp.result = True | False | Unknown
 
 let string_of_predicate_status = function
   | Unknown -> "unknown"
@@ -172,6 +169,7 @@ let contains_invalid_loc access loc =
    to force its re-evaluation.
 *)
 
+module Logic_label = Cil_datatype.Logic_label
 type labels_states = Cvalue.Model.t Logic_label.Map.t
 
 let join_label_states m1 m2 =
@@ -319,9 +317,9 @@ let bind_logic_vars env lvs =
     | Lreal -> bind_logic_var top_float
     | Ctype ctyp when Cil.isIntegralType ctyp ->
       let base = Base.of_c_logic_var lv in
-      let size = Int.of_int (Cil.bitsSizeOf ctyp) in
+      let size = Integer.of_int (Cil.bitsSizeOf ctyp) in
       let v = Cvalue.V_Or_Uninitialized.initialized V.top_int in
-      let state = Model.add_base_value base ~size v ~size_v:Int.one state in
+      let state = Model.add_base_value base ~size v ~size_v:Integer.one state in
       state, logic_vars
     | _ -> unsupported_lvar lv
   in
@@ -581,17 +579,17 @@ let pass_logic_cast exn typ trm =
   match Logic_utils.unroll_type typ, Logic_utils.unroll_type trm.term_type with
   | Linteger, Ctype (TInt _ | TEnum _) -> () (* Always inclusion *)
   | Ctype (TInt _ | TEnum _ as typ), Ctype (TInt _ | TEnum _ as typeoftrm) ->
-    let sztyp = sizeof typ in
-    let szexpr = sizeof typeoftrm in
+    let sztyp = Bit_utils.sizeof typ in
+    let szexpr = Bit_utils.sizeof typeoftrm in
     let styp, sexpr =
       match sztyp, szexpr with
       | Int_Base.Value styp, Int_Base.Value sexpr -> styp, sexpr
       | _ -> raise exn
     in
-    let sityp = is_signed_int_enum_pointer typ in
-    let sisexpr = is_signed_int_enum_pointer typeoftrm in
-    if (Int.ge styp sexpr && sityp = sisexpr) (* larger, same signedness *)
-    || (Int.gt styp sexpr && sityp) (* strictly larger and signed *)
+    let sityp = Bit_utils.is_signed_int_enum_pointer typ in
+    let sisexpr = Bit_utils.is_signed_int_enum_pointer typeoftrm in
+    if (Integer.ge styp sexpr && sityp = sisexpr) (* larger, same signedness *)
+    || (Integer.gt styp sexpr && sityp) (* strictly larger and signed *)
     then ()
     else raise exn
 
@@ -626,7 +624,7 @@ let constraint_trange idx size_arr =
           in
           let up = match up with (* constrained r.h.s *)
             | Some _ -> up
-            | None -> Some (Logic_const.tint ~loc (Int.pred size))
+            | None -> Some (Logic_const.tint ~loc (Integer.pred size))
           in
           Logic_const.trange ~loc (low, up)
       end
@@ -721,8 +719,8 @@ let inline logic_info =
    and the \Positive and \Negative constructors (handled in eval_term). They can
    only be compared through equality and disequality; no other operation exists
    on this type, so our interpretation remains correct. *)
-let positive_cvalue = Cvalue.V.inject_int Int.one
-let negative_cvalue = Cvalue.V.inject_int Int.minus_one
+let positive_cvalue = Cvalue.V.inject_int Integer.one
+let negative_cvalue = Cvalue.V.inject_int Integer.minus_one
 
 let is_true = function
   | `True | `TrueReduced _ -> true
@@ -799,7 +797,7 @@ let eval_logic_charlen wrapper env v ldeps =
   let eover =
     let v, alarms = apply_logic_builtin wrapper env [v] in
     if alarms && not (Cvalue.V.is_bottom v)
-    then Cvalue.V.inject_ival (Ival.inject_range (Some Int.minus_one) None)
+    then Cvalue.V.inject_ival (Ival.inject_range (Some Integer.minus_one) None)
     else v
   in
   let eunder = under_from_over eover in
@@ -1253,11 +1251,11 @@ let rec eval_term ~alarm_mode env t =
            frontiers are always 0 or 8*k-1 (because validity is in bits and
            starts on zero), so we add 1 everywhere, then divide by eight. *)
         let convert start_bits end_bits =
-          let congr_succ i = Int.(equal zero (e_rem (succ i) eight)) in
-          let congr_or_zero i = Int.(equal zero i || congr_succ i) in
+          let congr_succ i = Integer.(equal zero (e_rem (succ i) eight)) in
+          let congr_or_zero i = Integer.(equal zero i || congr_succ i) in
           assert (congr_or_zero start_bits || congr_or_zero end_bits);
-          let start_bytes = Int.(e_div (Int.succ start_bits) eight) in
-          let end_bytes =   Int.(e_div (Int.succ end_bits)   eight) in
+          let start_bytes = Integer.(e_div (Integer.succ start_bits) eight) in
+          let end_bytes =   Integer.(e_div (Integer.succ end_bits)   eight) in
           Ival.inject_range (Some start_bytes) (Some end_bytes)
         in
         match Base.validity b with
@@ -1445,7 +1443,8 @@ and eval_known_logic_function ~alarm_mode env li labels args =
 
   | ("\\min" | "\\max"), Some typ, _, t1 :: t2 :: tail_args ->
     begin
-      let comp = if lvi.lv_name = "\\min" then Comp.Le else Comp.Ge in
+      let min = lvi.lv_name = "\\min" in
+      let comp = Abstract_interp.Comp.(if min then Le else Ge) in
       let backward =
         match typ with
         | Linteger -> Cvalue.V.backward_comp_int_left comp
@@ -1919,7 +1918,7 @@ and reduce_by_valid env positive access (tset: term) =
          in
          let li = if op = PlusPI then li else Ival.neg_int li in
          let typ_p = Cil.typeOf_pointed rtlv.etype in
-         let sbits = Int.of_int (Cil.bitsSizeOf typ_p) in
+         let sbits = Integer.of_int (Cil.bitsSizeOf typ_p) in
          (* Compute the offsets expected by [aux], which are [i *
             8 * sizeof( *tlv)] *)
          let li = Ival.scale sbits li in
@@ -2550,6 +2549,7 @@ and eval_predicate env pred =
   (* Logic predicates. Update the list known_predicates above if you
      add something here. *)
   and eval_known_papp env li _labels args =
+    let open Abstract_interp in
     let unary_float unary_fun arg =
       try
         let eval_result = eval_term ~alarm_mode env arg in
@@ -2692,12 +2692,12 @@ let predicate_deps env pred =
             empty_logic_deps args
         else
           match Inline.inline_predicate ~inline ~current:env.e_cur p with
-          | None -> unsupported (Format.asprintf "%a" Predicate.pretty p)
+          | None -> unsupported (Format.asprintf "%a" Printer.pp_predicate p)
           | Some p' -> do_eval env p'
       end
 
     | Pfresh _ | Pallocable _ | Pfreeable _
-      -> unsupported (Format.asprintf "%a" Predicate.pretty p)
+      -> unsupported (Format.asprintf "%a" Printer.pp_predicate p)
   in
   try Some (do_eval env pred)
   with LogicEvalError _ -> None
