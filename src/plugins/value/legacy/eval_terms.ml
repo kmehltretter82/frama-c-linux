@@ -27,7 +27,6 @@ open Abstract_interp
 open Cvalue
 open Bit_utils
 
-
 (* Truth values for a predicate analyzed by the value analysis *)
 
 type predicate_status = Comp.result = True | False | Unknown
@@ -46,9 +45,8 @@ let join_predicate_status x y = match x, y with
   | True, False | False, True
   | Unknown, _ | _, Unknown -> Unknown
 
-exception Stop
-
 let _join_list_predicate_status l =
+  let exception Stop in
   try
     let r =
       List.fold_left
@@ -139,7 +137,12 @@ let contains_invalid_loc access loc =
   let valid_loc = Locations.valid_part access loc in
   not (Locations.Location.equal loc valid_loc)
 
-(* Evaluation environments. Used to evaluate predicate on \at nodes *)
+(* -------------------------------------------------------------------------- *)
+(* --- Evaluation environments.                                           --- *)
+(* -------------------------------------------------------------------------- *)
+
+(* Evaluation environments are used to evaluate predicate on \at nodes,
+   the varinfo \result and logic variables introduced by quantifiers. *)
 
 (* Labels:
    pre: pre-state of the function. Equivalent to \old in the postcondition
@@ -359,6 +362,122 @@ let unbind_logic_vars env lvs =
   let state, logic_vars = List.fold_left unbind_one (state, env.logic_vars) lvs in
   overwrite_current_state { env with logic_vars } state
 
+(* -------------------------------------------------------------------------- *)
+(* --- Evaluation results.                                                --- *)
+(* -------------------------------------------------------------------------- *)
+
+(* Result of the evaluation of a term as an exact location (to reduce its value
+   in the current state). *)
+type exact_location =
+  | Location of typ * Locations.location
+  (* A location represented in the cvalue state. *)
+  | Logic_var of logic_var
+  (* A logic variable, introduced by a quantifier, and stored in an environment
+     besides the states. *)
+
+(* Raised when a term cannot be evaluated as an exact location.*)
+exception Not_an_exact_loc
+
+type logic_deps = Zone.t Logic_label.Map.t
+
+let deps_at lbl (ld:logic_deps) =
+  try Logic_label.Map.find lbl ld
+  with Not_found -> Zone.bottom
+
+let add_deps lbl ldeps deps =
+  let prev_deps = deps_at lbl ldeps in
+  let deps = Zone.join prev_deps deps in
+  let ldeps : logic_deps = Logic_label.Map.add lbl deps ldeps in
+  ldeps
+
+let join_logic_deps (ld1:logic_deps) (ld2: logic_deps) : logic_deps =
+  let aux _ d1 d2 = match d1, d2 with
+    | None as d, None | (Some _ as d), None | None, (Some _ as d) -> d
+    | Some d1, Some d2 -> Some (Zone.join d1 d2)
+  in
+  Logic_label.Map.merge aux ld1 ld2
+
+let empty_logic_deps =
+  Logic_label.Map.add lbl_here Zone.bottom Logic_label.Map.empty
+
+(* Type holding the result of an evaluation. Currently, 'a is either
+   [Cvalue.V.t] for [eval_term], and [Location_Bits.t] for [eval_tlval_as_loc],
+   and [Ival.t] for [eval_toffset].
+
+   [eover] is an over-approximation of the evaluation. [eunder] is an
+   under-approximation, under the hypothesis that the state in which we
+   evaluate is not Bottom. (Otherwise, all under-approximations would be
+   Bottom themselves).
+   The following two invariants should hold:
+   (1) eunder \subset eover.
+   (2) when evaluating something that is not a Tset, either eunder = Bottom,
+      or eunder = eover, and cardinal(eover) <= 1. This is due to the fact
+      that under-approximations are not propagated as an abstract domain, but
+      only created from Trange or inferred from exact over-approximations.
+
+   This type can be used for the evaluation of logical sets, in which case
+   an eval_result [r] represents all *non-empty* sets [S] such that:
+   [r.eunder ⊆ S ⊆ r.eover]. The value {V.bottom} does *not* represents empty
+   sets, as for most predicates, P(∅) ≠ P(⊥) (if the latter has a meaning).
+   The boolean [empty] indicates whether an eval_result also represents a
+   possible empty set. *)
+type 'a eval_result = {
+  etype: Cil_types.typ;
+  eunder: 'a;
+  eover: 'a;
+  empty: bool;
+  ldeps: logic_deps;
+}
+
+let join_eval_result r1 r2 =
+  let eover = Cvalue.V.join r2.eover r1.eover in
+  let eunder = Cvalue.V.meet r1.eunder r2.eunder in
+  let ldeps = join_logic_deps r1.ldeps r2.ldeps in
+  { eover; eunder; ldeps; etype = r1.etype; empty = r1.empty || r2.empty; }
+
+(* When computing an under-approximation, we make the hypothesis that the state
+   is not Bottom. Hence, over-approximations of cardinal <= 1 are actually of
+   cardinal 1, and are thus exact. *)
+let under_from_over eover =
+  if Cvalue.V.cardinal_zero_or_one eover
+  then eover
+  else Cvalue.V.bottom
+
+let under_loc_from_over eover =
+  if Locations.Location_Bits.cardinal_zero_or_one eover
+  then eover
+  else Locations.Location_Bits.bottom
+
+(* Injects [cvalue] as an eval_result of type [typ] with no dependencies. *)
+let inject_no_deps typ cvalue =
+  { etype = typ;
+    eunder = under_from_over cvalue;
+    eover = cvalue;
+    empty = false;
+    ldeps = empty_logic_deps }
+
+(* Integer result with no memory dependencies: constants, sizeof & alignof,
+   and values of logic variables.*)
+let einteger = inject_no_deps Cil.intType
+
+(* Note: some reals cannot be exactly represented as floats; in which
+   case we do not know their under-approximation. *)
+let ereal fval = inject_no_deps Cil.doubleType (Cvalue.V.inject_float fval)
+let efloat fval = inject_no_deps Cil.floatType (Cvalue.V.inject_float fval)
+
+(* -------------------------------------------------------------------------- *)
+(* --- Utilitary functions on the Cil AST                                 --- *)
+(* -------------------------------------------------------------------------- *)
+
+let is_rel_binop = function
+  | Lt
+  | Gt
+  | Le
+  | Ge
+  | Eq
+  | Ne -> true
+  | _ -> false
+
 let lop_to_cop op =
   match op with
   | Req -> Eq
@@ -367,6 +486,15 @@ let lop_to_cop op =
   | Rge -> Ge
   | Rlt -> Lt
   | Rgt -> Gt
+
+let rel_of_binop = function
+  | Lt -> Rlt
+  | Gt -> Rgt
+  | Le -> Rle
+  | Ge -> Rge
+  | Eq -> Req
+  | Ne -> Rneq
+  | _ -> assert false
 
 (* Types currently understood in the evaluation of the logic: no arrays,
    structs, logic arrays or subtle ACSL types. Sets of sets seem to
@@ -421,79 +549,14 @@ let infer_binop_res_type op targ =
 (* Computes [*tsets], assuming that [tsets] has a pointer type. *)
 let deref_tsets tsets = Cil.mkTermMem ~addr:tsets ~off:TNoOffset
 
-
-type logic_deps = Zone.t Logic_label.Map.t
-
-let deps_at lbl (ld:logic_deps) =
-  try Logic_label.Map.find lbl ld
-  with Not_found -> Zone.bottom
-
-let add_deps lbl ldeps deps =
-  let prev_deps = deps_at lbl ldeps in
-  let deps = Zone.join prev_deps deps in
-  let ldeps : logic_deps = Logic_label.Map.add lbl deps ldeps in
-  ldeps
-
-let join_logic_deps (ld1:logic_deps) (ld2: logic_deps) : logic_deps =
-  let aux _ d1 d2 = match d1, d2 with
-    | None as d, None | (Some _ as d), None | None, (Some _ as d) -> d
-    | Some d1, Some d2 -> Some (Zone.join d1 d2)
-  in
-  Logic_label.Map.merge aux ld1 ld2
-
-let empty_logic_deps =
-  Logic_label.Map.add lbl_here Zone.bottom Logic_label.Map.empty
-
-
-(* Type holding the result of an evaluation. Currently, 'a is either
-   [Cvalue.V.t] for [eval_term], and [Location_Bits.t] for [eval_tlval_as_loc],
-   and [Ival.t] for [eval_toffset].
-
-   [eover] is an over-approximation of the evaluation. [eunder] is an
-   under-approximation, under the hypothesis that the state in which we
-   evaluate is not Bottom. (Otherwise, all under-approximations would be
-   Bottom themselves).
-   The following two invariants should hold:
-   (1) eunder \subset eover.
-   (2) when evaluating something that is not a Tset, either eunder = Bottom,
-      or eunder = eover, and cardinal(eover) <= 1. This is due to the fact
-      that under-approximations are not propagated as an abstract domain, but
-      only created from Trange or inferred from exact over-approximations.
-
-   This type can be used for the evaluation of logical sets, in which case
-   an eval_result [r] represents all *non-empty* sets [S] such that:
-   [r.eunder ⊆ S ⊆ r.eover]. The value {V.bottom} does *not* represents empty
-   sets, as for most predicates, P(∅) ≠ P(⊥) (if the latter has a meaning).
-   The boolean [empty] indicates whether an eval_result also represents a
-   possible empty set. *)
-type 'a eval_result = {
-  etype: Cil_types.typ;
-  eunder: 'a;
-  eover: 'a;
-  empty: bool;
-  ldeps: logic_deps;
-}
-
-let join_eval_result r1 r2 =
-  let eover = Cvalue.V.join r2.eover r1.eover in
-  let eunder = Cvalue.V.meet r1.eunder r2.eunder in
-  let ldeps = join_logic_deps r1.ldeps r2.ldeps in
-  { eover; eunder; ldeps; etype = r1.etype; empty = r1.empty || r2.empty; }
-
-(* When computing an under-approximation, we make the hypothesis that the state
-   is not Bottom. Hence, over-approximations of cardinal <= 1 are actually of
-   cardinal 1, and are thus exact. *)
-let under_from_over eover =
-  if Cvalue.V.cardinal_zero_or_one eover
-  then eover
-  else Cvalue.V.bottom
-;;
-
-let under_loc_from_over eover =
-  if Locations.Location_Bits.cardinal_zero_or_one eover
-  then eover
-  else Locations.Location_Bits.bottom
-;;
+(* returns true iff the logic variable is defined by the
+   Frama-C standard library *)
+let comes_from_fc_stdlib lvar =
+  Cil.is_in_libc lvar.lv_attr ||
+  match lvar.lv_origin with
+  | None -> false
+  | Some vi ->
+    Cil.is_in_libc vi.vattr
 
 let is_noop_cast ~src_typ ~dst_typ =
   let src_typ = Logic_const.plain_or_set
@@ -512,45 +575,39 @@ let is_noop_cast ~src_typ ~dst_typ =
   | Some (TSPtr _), Some (TSPtr _) -> true
   | _ -> false
 
-(* Injects [cvalue] as an eval_result of type [typ] with no dependencies. *)
-let inject_no_deps typ cvalue =
-  { etype = typ;
-    eunder = under_from_over cvalue;
-    eover = cvalue;
-    empty = false;
-    ldeps = empty_logic_deps }
+(* If casting [trm] to [typ] has no effect in terms of the values contained
+   in [trm], do nothing. Otherwise, raise [exn]. Adapted from [pass_cast] *)
+let pass_logic_cast exn typ trm =
+  match Logic_utils.unroll_type typ, Logic_utils.unroll_type trm.term_type with
+  | Linteger, Ctype (TInt _ | TEnum _) -> () (* Always inclusion *)
+  | Ctype (TInt _ | TEnum _ as typ), Ctype (TInt _ | TEnum _ as typeoftrm) ->
+    let sztyp = sizeof typ in
+    let szexpr = sizeof typeoftrm in
+    let styp, sexpr =
+      match sztyp, szexpr with
+      | Int_Base.Value styp, Int_Base.Value sexpr -> styp, sexpr
+      | _ -> raise exn
+    in
+    let sityp = is_signed_int_enum_pointer typ in
+    let sisexpr = is_signed_int_enum_pointer typeoftrm in
+    if (Int.ge styp sexpr && sityp = sisexpr) (* larger, same signedness *)
+    || (Int.gt styp sexpr && sityp) (* strictly larger and signed *)
+    then ()
+    else raise exn
 
-(* Integer result with no memory dependencies: constants, sizeof & alignof,
-   and values of logic variables.*)
-let einteger = inject_no_deps Cil.intType
+  | Lreal,  Ctype (TFloat _) -> () (* Always inclusion *)
+  | Ctype (TFloat (f1,_)), Ctype (TFloat (f2, _)) ->
+    if Cil.frank f1 < Cil.frank f2
+    then raise exn
 
-(* Note: some reals cannot be exactly represented as floats; in which
-   case we do not know their under-approximation. *)
-let ereal fval = inject_no_deps Cil.doubleType (Cvalue.V.inject_float fval)
-let efloat fval = inject_no_deps Cil.floatType (Cvalue.V.inject_float fval)
+  | _ -> raise exn (* Not a scalar type *)
 
-let is_true = function
-  | `True | `TrueReduced _ -> true
-  | `Unknown _ | `False | `Unreachable -> false
-
-(* Check "logic alarms" when evaluating [v1 op v2]. All operators shifts are
-   defined unambiguously in ACSL. *)
-let check_logic_alarms ~alarm_mode typ (_v1: V.t eval_result) op v2 =
-  match op with
-  | Div | Mod when Cil.isIntegralOrPointerType typ ->
-    let truth = Cvalue_forward.assume_non_zero v2.eover in
-    let division_by_zero = not (is_true truth) in
-    track_alarms division_by_zero alarm_mode
-  | Shiftlt | Shiftrt -> begin
-      (* Check that [e2] is positive. [e1] can be arbitrary, we use
-         the arithmetic vision of shifts *)
-      try
-        let i2 = Cvalue.V.project_ival_bottom v2.eover in
-        let valid = Ival.is_included i2 Ival.positive_integers in
-        track_alarms (not valid) alarm_mode
-      with Cvalue.V.Not_based_on_null -> track_alarms true alarm_mode
-    end
-  | _ -> ()
+let is_same_term_coerce t1 t2 =
+  match t1.term_node, t2.term_node with
+  | TLogic_coerce _, TLogic_coerce _ -> Logic_utils.is_same_term t1 t2
+  | TLogic_coerce (_,t1), _ -> Logic_utils.is_same_term t1 t2
+  | _, TLogic_coerce(_,t2) -> Logic_utils.is_same_term t1 t2
+  | _ -> Logic_utils.is_same_term t1 t2
 
 (* Constrain the ACSL range [idx] when it is used to access an array of
    [size_arr] cells, and it is a Trange in which one size is not
@@ -575,128 +632,6 @@ let constraint_trange idx size_arr =
       end
     | _ -> idx
   else idx
-
-(* Note: "charlen" stands for either strlen or wcslen *)
-
-(* Applies a cvalue [builtin] to the list of arguments [args_list] in the
-   current state of [env]. Returns [v, alarms], where [v] is the resulting
-   cvalue, which can be bottom. *)
-let apply_logic_builtin builtin env args_list =
-  (* the call below could in theory return Builtins.Invalid_nb_of_args,
-     but logic typing constraints prevent that. *)
-  builtin (env_current_state env) args_list
-
-(* Never raises exceptions; instead, returns [-1,+oo] in case of alarms
-   (most imprecise result possible for the logic strlen/wcslen predicates). *)
-let eval_logic_charlen wrapper env v ldeps =
-  let eover =
-    let v, alarms = apply_logic_builtin wrapper env [v] in
-    if alarms && not (Cvalue.V.is_bottom v)
-    then Cvalue.V.inject_ival (Ival.inject_range (Some Int.minus_one) None)
-    else v
-  in
-  let eunder = under_from_over eover in
-  (* the C strlen function has type size_t, but the logic strlen function has
-     type ℤ (signed) *)
-  let etype = Cil.intType in
-  { etype; ldeps; eover; empty = false; eunder }
-
-(* Evaluates the logical predicates strchr/wcschr. *)
-let eval_logic_charchr builtin env s c ldeps_s ldeps_c =
-  let eover =
-    let v, alarms = apply_logic_builtin builtin env [s; c] in
-    if Cvalue.V.is_bottom v then v else
-    if alarms then Cvalue.V.zero_or_one else
-      let ctrue = Cvalue.V.contains_non_zero v
-      and cfalse = Cvalue.V.contains_zero v in
-      match ctrue, cfalse with
-      | true, true -> Cvalue.V.zero_or_one
-      | true, false -> Cvalue.V.singleton_one
-      | false, true -> Cvalue.V.singleton_zero
-      | false, false -> assert false (* a logic alarm would have been raised*)
-  in
-  let eunder = under_from_over eover in
-  (* the C strchr function has type char*, but the logic strchr predicate has
-     type 𝔹 *)
-  let etype = TInt (IBool, []) in
-  let ldeps = join_logic_deps ldeps_s ldeps_c in
-  { etype; ldeps; eover; empty = false; eunder }
-
-(* Evaluates the logical functions memchr_off/wmemchr_off. *)
-let eval_logic_memchr_off builtin env s c n =
-  let minus_one = Cvalue.V.inject_int Integer.minus_one in
-  let positive = Cvalue.V.inject_ival Ival.positive_integers in
-  let pred_n = Cvalue.V.add_untyped Int_Base.one n.eover minus_one in
-  let n_pos = Cvalue.V.narrow positive pred_n in
-  let eover =
-    if Cvalue.V.is_bottom n_pos then minus_one else
-      let args = [s.eover; c.eover; n_pos] in
-      let v, alarms = apply_logic_builtin builtin env args in
-      if Cvalue.V.is_bottom v then pred_n else
-      if alarms then Cvalue.V.join pred_n v else
-      if Cvalue.V.equal n_pos pred_n then v else
-        Cvalue.V.join minus_one v
-  in
-  let ldeps = join_logic_deps s.ldeps (join_logic_deps c.ldeps n.ldeps) in
-  { (einteger eover) with ldeps }
-
-(* Evaluates the logical predicate is_allocable, according to the following
-   logic:
-   - if the size to allocate is always too large (> SIZE_MAX), allocation fails;
-   - otherwise, if AllocReturnsNull is true or if the size may exceed SIZE_MAX,
-     returns Unknown (to simulate non-determinism);
-   - otherwise, allocation always succeeds. *)
-let eval_is_allocable size =
-  let size_ok = Builtins_malloc.alloc_size_ok size in
-  match size_ok, Value_parameters.AllocReturnsNull.get () with
-  | Alarmset.False, _ -> False
-  | Alarmset.Unknown, _ | _, true -> Unknown
-  | Alarmset.True, false -> True
-
-(* returns true iff the logic variable is defined by the
-   Frama-C standard library *)
-let comes_from_fc_stdlib lvar =
-  Cil.is_in_libc lvar.lv_attr ||
-  match lvar.lv_origin with
-  | None -> false
-  | Some vi ->
-    Cil.is_in_libc vi.vattr
-
-(* As usual in this file, [dst_typ] may be misleading: the 'size' is
-   meaningless, because [src_typ] may actually be a logic type. Thus,
-   this size must not be used below. *)
-let cast ~src_typ ~dst_typ v =
-  let open Eval_typ in
-  match classify_as_scalar dst_typ, classify_as_scalar src_typ with
-  | None, _ | _, None  -> v (* unclear whether this happens. *)
-  | Some dst, Some src ->
-    match dst, src with
-    | TSFloat fkind, (TSInt _ | TSPtr _) ->
-      Cvalue.V.cast_int_to_float (Fval.kind fkind) v
-
-    | (TSInt dst | TSPtr dst), TSFloat fkind ->
-      (* This operation is not fully defined in ACSL. We raise an alarm
-         in case of overflow. *)
-      if is_true (Cvalue_forward.assume_not_nan ~assume_finite:true fkind v)
-      then Cvalue_forward.cast_float_to_int dst v
-      else c_alarm ()
-
-    | (TSInt dst | TSPtr dst), (TSInt _ | TSPtr _) ->
-      let size = Integer.of_int dst.i_bits in
-      let signed = dst.i_signed in
-      V.cast_int_to_int ~signed ~size v
-
-    | TSFloat fkind, TSFloat _ ->
-      Cvalue.V.cast_float_to_float (Fval.kind fkind) v
-
-(* V.cast_int_to_int is unsound when the destination type is _Bool.
-   Use this function instead. *)
-let cast_to_bool r =
-  let contains_zero = V.contains_zero r.eover
-  and contains_non_zero = V.contains_non_zero r.eover in
-  let eover = V.interp_boolean ~contains_zero ~contains_non_zero in
-  { eover; eunder = under_from_over eover; empty = r.empty;
-    ldeps = r.ldeps; etype = TInt (IBool, []) }
 
 (* -------------------------------------------------------------------------- *)
 (* --- Inlining of defined logic functions and predicates                 --- *)
@@ -777,6 +712,10 @@ let inline logic_info =
   let logic_var = logic_info.l_var_info in
   not (is_known_logic_fun logic_var || is_known_predicate logic_var)
 
+(* -------------------------------------------------------------------------- *)
+(* --- Auxiliary evaluation functions                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
 (* We evaluate the ACSL sign type as integers 1 or -1. Sign values can only be
    constructed through the \sign function (handled in eval_known_logic_function)
    and the \Positive and \Negative constructors (handled in eval_term). They can
@@ -785,9 +724,253 @@ let inline logic_info =
 let positive_cvalue = Cvalue.V.inject_int Int.one
 let negative_cvalue = Cvalue.V.inject_int Int.minus_one
 
+let is_true = function
+  | `True | `TrueReduced _ -> true
+  | `Unknown _ | `False | `Unreachable -> false
+
+(* Check "logic alarms" when evaluating [v1 op v2]. All operators shifts are
+   defined unambiguously in ACSL. *)
+let check_logic_alarms ~alarm_mode typ (_v1: V.t eval_result) op v2 =
+  match op with
+  | Div | Mod when Cil.isIntegralOrPointerType typ ->
+    let truth = Cvalue_forward.assume_non_zero v2.eover in
+    let division_by_zero = not (is_true truth) in
+    track_alarms division_by_zero alarm_mode
+  | Shiftlt | Shiftrt -> begin
+      (* Check that [e2] is positive. [e1] can be arbitrary, we use
+         the arithmetic vision of shifts *)
+      try
+        let i2 = Cvalue.V.project_ival_bottom v2.eover in
+        let valid = Ival.is_included i2 Ival.positive_integers in
+        track_alarms (not valid) alarm_mode
+      with Cvalue.V.Not_based_on_null -> track_alarms true alarm_mode
+    end
+  | _ -> ()
+
+(* As usual in this file, [dst_typ] may be misleading: the 'size' is
+   meaningless, because [src_typ] may actually be a logic type. Thus,
+   this size must not be used below. *)
+let cast ~src_typ ~dst_typ v =
+  let open Eval_typ in
+  match classify_as_scalar dst_typ, classify_as_scalar src_typ with
+  | None, _ | _, None  -> v (* unclear whether this happens. *)
+  | Some dst, Some src ->
+    match dst, src with
+    | TSFloat fkind, (TSInt _ | TSPtr _) ->
+      Cvalue.V.cast_int_to_float (Fval.kind fkind) v
+
+    | (TSInt dst | TSPtr dst), TSFloat fkind ->
+      (* This operation is not fully defined in ACSL. We raise an alarm
+         in case of overflow. *)
+      if is_true (Cvalue_forward.assume_not_nan ~assume_finite:true fkind v)
+      then Cvalue_forward.cast_float_to_int dst v
+      else c_alarm ()
+
+    | (TSInt dst | TSPtr dst), (TSInt _ | TSPtr _) ->
+      let size = Integer.of_int dst.i_bits in
+      let signed = dst.i_signed in
+      V.cast_int_to_int ~signed ~size v
+
+    | TSFloat fkind, TSFloat _ ->
+      Cvalue.V.cast_float_to_float (Fval.kind fkind) v
+
+(* V.cast_int_to_int is unsound when the destination type is _Bool.
+   Use this function instead. *)
+let cast_to_bool r =
+  let contains_zero = V.contains_zero r.eover
+  and contains_non_zero = V.contains_non_zero r.eover in
+  let eover = V.interp_boolean ~contains_zero ~contains_non_zero in
+  { eover; eunder = under_from_over eover; empty = r.empty;
+    ldeps = r.ldeps; etype = TInt (IBool, []) }
+
+(* Note: "charlen" stands for either strlen or wcslen *)
+
+(* Applies a cvalue [builtin] to the list of arguments [args_list] in the
+   current state of [env]. Returns [v, alarms], where [v] is the resulting
+   cvalue, which can be bottom. *)
+let apply_logic_builtin builtin env args_list =
+  (* the call below could in theory return Builtins.Invalid_nb_of_args,
+     but logic typing constraints prevent that. *)
+  builtin (env_current_state env) args_list
+
+(* Never raises exceptions; instead, returns [-1,+oo] in case of alarms
+   (most imprecise result possible for the logic strlen/wcslen predicates). *)
+let eval_logic_charlen wrapper env v ldeps =
+  let eover =
+    let v, alarms = apply_logic_builtin wrapper env [v] in
+    if alarms && not (Cvalue.V.is_bottom v)
+    then Cvalue.V.inject_ival (Ival.inject_range (Some Int.minus_one) None)
+    else v
+  in
+  let eunder = under_from_over eover in
+  (* the C strlen function has type size_t, but the logic strlen function has
+     type ℤ (signed) *)
+  let etype = Cil.intType in
+  { etype; ldeps; eover; empty = false; eunder }
+
+(* Evaluates the logical predicates strchr/wcschr. *)
+let eval_logic_charchr builtin env s c ldeps_s ldeps_c =
+  let eover =
+    let v, alarms = apply_logic_builtin builtin env [s; c] in
+    if Cvalue.V.is_bottom v then v else
+    if alarms then Cvalue.V.zero_or_one else
+      let ctrue = Cvalue.V.contains_non_zero v
+      and cfalse = Cvalue.V.contains_zero v in
+      match ctrue, cfalse with
+      | true, true -> Cvalue.V.zero_or_one
+      | true, false -> Cvalue.V.singleton_one
+      | false, true -> Cvalue.V.singleton_zero
+      | false, false -> assert false (* a logic alarm would have been raised*)
+  in
+  let eunder = under_from_over eover in
+  (* the C strchr function has type char*, but the logic strchr predicate has
+     type 𝔹 *)
+  let etype = TInt (IBool, []) in
+  let ldeps = join_logic_deps ldeps_s ldeps_c in
+  { etype; ldeps; eover; empty = false; eunder }
+
+(* Evaluates the logical functions memchr_off/wmemchr_off. *)
+let eval_logic_memchr_off builtin env s c n =
+  let minus_one = Cvalue.V.inject_int Integer.minus_one in
+  let positive = Cvalue.V.inject_ival Ival.positive_integers in
+  let pred_n = Cvalue.V.add_untyped Int_Base.one n.eover minus_one in
+  let n_pos = Cvalue.V.narrow positive pred_n in
+  let eover =
+    if Cvalue.V.is_bottom n_pos then minus_one else
+      let args = [s.eover; c.eover; n_pos] in
+      let v, alarms = apply_logic_builtin builtin env args in
+      if Cvalue.V.is_bottom v then pred_n else
+      if alarms then Cvalue.V.join pred_n v else
+      if Cvalue.V.equal n_pos pred_n then v else
+        Cvalue.V.join minus_one v
+  in
+  let ldeps = join_logic_deps s.ldeps (join_logic_deps c.ldeps n.ldeps) in
+  { (einteger eover) with ldeps }
+
+(* Evaluates the logical predicate is_allocable, according to the following
+   logic:
+   - if the size to allocate is always too large (> SIZE_MAX), allocation fails;
+   - otherwise, if AllocReturnsNull is true or if the size may exceed SIZE_MAX,
+     returns Unknown (to simulate non-determinism);
+   - otherwise, allocation always succeeds. *)
+let eval_is_allocable size =
+  let size_ok = Builtins_malloc.alloc_size_ok size in
+  match size_ok, Value_parameters.AllocReturnsNull.get () with
+  | Alarmset.False, _ -> False
+  | Alarmset.Unknown, _ | _, true -> Unknown
+  | Alarmset.True, false -> True
+
+(* Evaluates a [valid_read_string] or [valid_read_wstring] predicate
+   using str* builtins.
+   - if [bottom] is obtained, return False;
+   - otherwise, if no alarms are emitted, return True;
+   - otherwise, return [Unknown]. *)
+let eval_valid_read_str ~wide env v =
+  let wrapper =
+    if wide then Builtins_string.frama_c_wcslen_wrapper
+    else Builtins_string.frama_c_strlen_wrapper
+  in
+  let v, alarms = apply_logic_builtin wrapper env [v] in
+  if Cvalue.V.is_bottom v
+  then False (* bottom state => string always invalid *)
+  else if alarms
+  then Unknown (* alarm => string possibly invalid *)
+  else True (* no alarm => string always valid for reading *)
+
+(* Evaluates a [valid_string] or [valid_wstring] predicate.
+   First, we check the constness of the arguments.
+   Then, we evaluate [valid_read_string/valid_read_wstring] on non-const ones. *)
+let eval_valid_str ~wide env v =
+  assert (not (Cvalue.V.is_bottom v));
+  (* filter const bases *)
+  let v' = Cvalue.V.filter_base (fun b -> not (Base.is_read_only b)) v in
+  if Cvalue.V.is_bottom v' then False (* all bases were const *)
+  else
+  if Cvalue.V.equal v v' then
+    eval_valid_read_str ~wide env v (* all bases non-const *)
+  else (* at least one base was const *)
+    match eval_valid_read_str ~wide env v with
+    | True -> Unknown (* weaken result *)
+    | False | Unknown as r -> r
+
+(* Do all the possible values of a location in [state] satisfy [test]?  [loc] is
+   an over-approximation of the location, so the answer cannot be [False] even
+   if some parts of [loc] do not satisfy [test]. Thus, this function does not
+   fold the location, but instead applies [test] to the join of all values
+   stored in [loc] in [state].  *)
+let forall_in_over_location state loc test =
+  let v = Model.find_indeterminate state loc in
+  test v
+
+(* Do all the possible values of a location in [state] satisfy [test]?  [loc] is
+   an under-approximation of the location, so the answer cannot be [True], as
+   the values of some other parts of the location may not satisfy [test].
+   However, it is [False] as soon as some part of [loc] contradicts [test]. *)
+let forall_in_under_location state loc test =
+  let exception EFalse in
+  let inspect_value (_, _) (value, _, _) acc =
+    match test value with
+    | True | Unknown -> acc
+    | False -> raise EFalse
+  in
+  let inspect_itv base itv acc =
+    match Cvalue.Model.find_base_or_default base state with
+    | `Top | `Bottom -> Unknown
+    | `Value offsm ->
+      Cvalue.V_Offsetmap.fold_between ~entire:true itv inspect_value offsm acc
+  in
+  let inspect_base base intervals acc =
+    Int_Intervals.fold (inspect_itv base) intervals acc
+  in
+  let zone = Locations.enumerate_bits loc in
+  try Zone.fold_i inspect_base zone Unknown
+  with EFalse -> False
+     | Abstract_interp.Error_Top -> Unknown
+
+(* Evaluates an universal predicate about the values of a location evaluated to
+   [r] in [state]. The predicates holds whenever all the possible values at the
+   location satisfy [test]. *)
+let eval_forall_predicate state r test =
+  let size_bits = Eval_typ.sizeof_lval_typ r.etype in
+  let make_loc loc = make_loc loc size_bits in
+  let over_loc = make_loc r.eover in
+  if not Locations.(is_valid Read over_loc) then c_alarm ();
+  match forall_in_over_location state over_loc test with
+  | Unknown ->
+    let under_loc = make_loc r.eunder in
+    forall_in_under_location state under_loc test
+  | True -> True
+  | False -> if r.empty then Unknown else False
+
+(* Evaluation of an \initialized predicate on a location evaluated to [r]
+   in the state [state]. *)
+let eval_initialized state r =
+  let test = function
+    | V_Or_Uninitialized.C_init_esc _
+    | V_Or_Uninitialized.C_init_noesc _ -> True
+    | V_Or_Uninitialized.C_uninit_esc _ -> Unknown
+    | V_Or_Uninitialized.C_uninit_noesc v ->
+      if Location_Bytes.is_bottom v then False else Unknown
+  in
+  eval_forall_predicate state r test
+
+(* Evaluation of a \dangling predicate on a location evaluated to [r]
+   in the state [state]. *)
+let eval_dangling state r =
+  let test = function
+    | V_Or_Uninitialized.C_init_esc v ->
+      if Location_Bytes.is_bottom v then True else Unknown
+    | V_Or_Uninitialized.C_uninit_esc _ -> Unknown
+    | V_Or_Uninitialized.C_init_noesc _
+    | V_Or_Uninitialized.C_uninit_noesc _ -> False
+  in
+  eval_forall_predicate state r test
+
 (* -------------------------------------------------------------------------- *)
 (* --- Evaluation of terms                                                --- *)
 (* -------------------------------------------------------------------------- *)
+
+exception Reduce_to_bottom
 
 let int_or_float_op typ int_op float_op =
   match typ with
@@ -1170,149 +1353,6 @@ and eval_binop ~alarm_mode env op t1 t2 =
       ldeps = join_logic_deps r1.ldeps r2.ldeps;
       eunder; eover; empty = r1.empty || r2.empty; }
 
-and eval_tlhost ~alarm_mode env lv =
-  match lv with
-  | TVar lvar ->
-    let base, typ =
-      match lvar.lv_origin, Logic_utils.unroll_type lvar.lv_type with
-      | Some v, _ -> Base.of_varinfo v, v.vtype
-      | None, Ctype typ -> Base.of_c_logic_var lvar, typ
-      | _ -> unsupported_lvar lvar
-    in
-    let loc = Location_Bits.inject base Ival.zero in
-    { etype = typ;
-      ldeps = empty_logic_deps;
-      eover = loc;
-      eunder = under_loc_from_over loc;
-      empty = false; }
-  | TResult typ ->
-    (match env.result with
-     | Some v ->
-       let loc = Location_Bits.inject (Base.of_varinfo v) Ival.zero in
-       { etype = typ;
-         ldeps = empty_logic_deps;
-         eunder = loc; eover = loc;
-         empty = false; }
-     | None -> no_result ())
-  | TMem t ->
-    let r = eval_term ~alarm_mode env t in
-    let tres = match Cil.unrollType r.etype with
-      | TPtr (t, _) -> t
-      | _ -> ast_error "*p where p is not a pointer"
-    in
-    { etype = tres;
-      ldeps = r.ldeps;
-      eunder = loc_bytes_to_loc_bits r.eunder;
-      eover = loc_bytes_to_loc_bits r.eover;
-      empty = r.empty; }
-
-and eval_toffset ~alarm_mode env typ toffset =
-  match toffset with
-  | TNoOffset ->
-    { etype = typ;
-      ldeps = empty_logic_deps;
-      eunder = Ival.zero;
-      eover = Ival.zero;
-      empty = false; }
-  | TIndex (idx, remaining) ->
-    let typ_e, size = match Cil.unrollType typ with
-      | TArray (t, size, _, _) -> t, size
-      | _ -> ast_error "index on a non-array"
-    in
-    let idx = constraint_trange idx size in
-    let idxs = eval_term ~alarm_mode env idx in
-    let offsrem = eval_toffset ~alarm_mode env typ_e remaining in
-    let size_e = Bit_utils.sizeof typ_e in
-    let eover =
-      let offset =
-        try Cvalue.V.project_ival_bottom idxs.eover
-        with Cvalue.V.Not_based_on_null -> Ival.top
-      in
-      let offset = Ival.scale_int_base size_e offset in
-      Ival.add_int offset offsrem.eover
-    in
-    let eunder =
-      let offset =
-        try Cvalue.V.project_ival idxs.eunder
-        with Cvalue.V.Not_based_on_null -> Ival.bottom
-      in
-      let offset = match size_e with
-        | Int_Base.Top -> Ival.bottom
-        (* Note: scale_int_base would overapproximate when given a
-           Float.  Should never happen. *)
-        | Int_Base.Value f ->
-          assert (Ival.is_int offset);
-          Ival.scale f offset
-      in
-      Ival.add_int_under offset offsrem.eunder
-    in
-    { etype = offsrem.etype;
-      ldeps = join_logic_deps idxs.ldeps offsrem.ldeps;
-      eunder; eover; empty = idxs.empty || offsrem.empty; }
-
-  | TField (fi, remaining) ->
-    let size_current default =
-      try Ival.of_int (fst (Cil.fieldBitsOffset fi))
-      with Cil.SizeOfError _ -> default
-    in
-    let attrs = Cil.filter_qualifier_attributes (Cil.typeAttrs typ) in
-    let typ_fi = Cil.typeAddAttributes attrs fi.ftype in
-    let offsrem = eval_toffset ~alarm_mode env typ_fi remaining in
-    { etype = offsrem.etype;
-      ldeps = offsrem.ldeps;
-      eover = Ival.add_int (size_current Ival.top) offsrem.eover;
-      eunder = Ival.add_int_under (size_current Ival.bottom) offsrem.eunder;
-      empty = offsrem.empty; }
-
-  | TModel _ -> unsupported "model fields"
-
-and eval_tlval ~alarm_mode env (thost, toffs) =
-  let rhost = eval_tlhost ~alarm_mode env thost in
-  let roffset = eval_toffset ~alarm_mode env rhost.etype toffs in
-  { etype = roffset.etype;
-    ldeps = join_logic_deps rhost.ldeps roffset.ldeps;
-    eunder = Location_Bits.shift_under roffset.eunder rhost.eunder;
-    eover = Location_Bits.shift roffset.eover rhost.eover;
-    empty = rhost.empty || roffset.empty;
-  }
-
-and eval_term_as_lval ~alarm_mode env t =
-  match t.term_node with
-  | TLval tlval ->
-    eval_tlval ~alarm_mode env tlval
-  | Tunion l ->
-    let eunder, eover, deps, empty = List.fold_left
-        (fun (accunder, accover, accdeps, accempty) t ->
-           let r = eval_term_as_lval ~alarm_mode env t in
-           Location_Bits.link accunder r.eunder,
-           Location_Bits.join accover r.eover,
-           join_logic_deps accdeps r.ldeps,
-           accempty || r.empty
-        ) (Location_Bits.top, Location_Bits.bottom, empty_logic_deps, false) l
-    in
-    { etype = infer_type t.term_type;
-      ldeps = deps;
-      eover; eunder; empty }
-  | Tempty_set ->
-    { etype = infer_type t.term_type;
-      ldeps = empty_logic_deps;
-      eunder = Location_Bits.bottom;
-      eover = Location_Bits.bottom;
-      empty = true }
-  | Tat (t, lab) ->
-    ignore (env_state env lab);
-    eval_term_as_lval ~alarm_mode { env with e_cur = lab } t
-  | TLogic_coerce (_lt, t) ->
-    (* Logic coerce on locations (that are pointers) can only introduce
-       sets, that do not change the abstract value. *)
-    eval_term_as_lval ~alarm_mode env t
-  | Tif (tcond, ttrue, tfalse) ->
-    eval_tif eval_term_as_lval Location_Bits.join Location_Bits.meet ~alarm_mode env
-      tcond ttrue tfalse
-  | Tinter _ -> unsupported "intersection of locations"
-  | Tcomprehension _ -> unsupported "set comprehension"
-  | _ -> ast_error (Format.asprintf "non-lval term %a" Printer.pp_term t)
-
 and eval_tif : 'a. (alarm_mode:_ -> _ -> _ -> 'a eval_result) -> ('a -> 'a -> 'a) -> ('a -> 'a -> 'a) -> alarm_mode:_ -> _ -> _ -> _ -> _ -> 'a eval_result =
   fun eval join meet ~alarm_mode env tcond ttrue tfalse ->
   let r = eval_term ~alarm_mode env tcond in
@@ -1560,62 +1600,156 @@ and eval_quantifier_extremum backward_left ~min ~max eval_term =
     let r = eval_term (Cvalue.V.join min.eover max.eover) in
     return { r with eover = Cvalue.V.top; eunder = Cvalue.V.bottom }
 
-let eval_tlval_as_location ~alarm_mode env t =
-  let r = eval_term_as_lval ~alarm_mode env t in
-  let s = Eval_typ.sizeof_lval_typ r.etype in
-  make_loc r.eover s
+(* -------------------------------------------------------------------------- *)
+(* --- Evaluation of term lval and of terms as location                   --- *)
+(* -------------------------------------------------------------------------- *)
 
-(* Return a pair of (under-approximating, over-approximating) zones. *)
-let eval_tlval_as_zone_under_over ~alarm_mode access env t =
-  let r = eval_term_as_lval ~alarm_mode env t in
-  let s = Eval_typ.sizeof_lval_typ r.etype in
-  let under = enumerate_valid_bits_under access (make_loc r.eunder s) in
-  let over = enumerate_valid_bits access (make_loc r.eover s) in
-  (under, over)
-
-let eval_tlval_as_zone ~alarm_mode access env t =
-  let _under, over =
-    eval_tlval_as_zone_under_over ~alarm_mode access env t
-  in
-  over
-
-(* If casting [trm] to [typ] has no effect in terms of the values contained
-   in [trm], do nothing. Otherwise, raise [exn]. Adapted from [pass_cast] *)
-let pass_logic_cast exn typ trm =
-  match Logic_utils.unroll_type typ, Logic_utils.unroll_type trm.term_type with
-  | Linteger, Ctype (TInt _ | TEnum _) -> () (* Always inclusion *)
-  | Ctype (TInt _ | TEnum _ as typ), Ctype (TInt _ | TEnum _ as typeoftrm) ->
-    let sztyp = sizeof typ in
-    let szexpr = sizeof typeoftrm in
-    let styp, sexpr =
-      match sztyp, szexpr with
-      | Int_Base.Value styp, Int_Base.Value sexpr -> styp, sexpr
-      | _ -> raise exn
+and eval_tlhost ~alarm_mode env lv =
+  match lv with
+  | TVar lvar ->
+    let base, typ =
+      match lvar.lv_origin, Logic_utils.unroll_type lvar.lv_type with
+      | Some v, _ -> Base.of_varinfo v, v.vtype
+      | None, Ctype typ -> Base.of_c_logic_var lvar, typ
+      | _ -> unsupported_lvar lvar
     in
-    let sityp = is_signed_int_enum_pointer typ in
-    let sisexpr = is_signed_int_enum_pointer typeoftrm in
-    if (Int.ge styp sexpr && sityp = sisexpr) (* larger, same signedness *)
-    || (Int.gt styp sexpr && sityp) (* strictly larger and signed *)
-    then ()
-    else raise exn
+    let loc = Location_Bits.inject base Ival.zero in
+    { etype = typ;
+      ldeps = empty_logic_deps;
+      eover = loc;
+      eunder = under_loc_from_over loc;
+      empty = false; }
+  | TResult typ ->
+    (match env.result with
+     | Some v ->
+       let loc = Location_Bits.inject (Base.of_varinfo v) Ival.zero in
+       { etype = typ;
+         ldeps = empty_logic_deps;
+         eunder = loc; eover = loc;
+         empty = false; }
+     | None -> no_result ())
+  | TMem t ->
+    let r = eval_term ~alarm_mode env t in
+    let tres = match Cil.unrollType r.etype with
+      | TPtr (t, _) -> t
+      | _ -> ast_error "*p where p is not a pointer"
+    in
+    { etype = tres;
+      ldeps = r.ldeps;
+      eunder = loc_bytes_to_loc_bits r.eunder;
+      eover = loc_bytes_to_loc_bits r.eover;
+      empty = r.empty; }
 
-  | Lreal,  Ctype (TFloat _) -> () (* Always inclusion *)
-  | Ctype (TFloat (f1,_)), Ctype (TFloat (f2, _)) ->
-    if Cil.frank f1 < Cil.frank f2
-    then raise exn
+and eval_toffset ~alarm_mode env typ toffset =
+  match toffset with
+  | TNoOffset ->
+    { etype = typ;
+      ldeps = empty_logic_deps;
+      eunder = Ival.zero;
+      eover = Ival.zero;
+      empty = false; }
+  | TIndex (idx, remaining) ->
+    let typ_e, size = match Cil.unrollType typ with
+      | TArray (t, size, _, _) -> t, size
+      | _ -> ast_error "index on a non-array"
+    in
+    let idx = constraint_trange idx size in
+    let idxs = eval_term ~alarm_mode env idx in
+    let offsrem = eval_toffset ~alarm_mode env typ_e remaining in
+    let size_e = Bit_utils.sizeof typ_e in
+    let eover =
+      let offset =
+        try Cvalue.V.project_ival_bottom idxs.eover
+        with Cvalue.V.Not_based_on_null -> Ival.top
+      in
+      let offset = Ival.scale_int_base size_e offset in
+      Ival.add_int offset offsrem.eover
+    in
+    let eunder =
+      let offset =
+        try Cvalue.V.project_ival idxs.eunder
+        with Cvalue.V.Not_based_on_null -> Ival.bottom
+      in
+      let offset = match size_e with
+        | Int_Base.Top -> Ival.bottom
+        (* Note: scale_int_base would overapproximate when given a
+           Float.  Should never happen. *)
+        | Int_Base.Value f ->
+          assert (Ival.is_int offset);
+          Ival.scale f offset
+      in
+      Ival.add_int_under offset offsrem.eunder
+    in
+    { etype = offsrem.etype;
+      ldeps = join_logic_deps idxs.ldeps offsrem.ldeps;
+      eunder; eover; empty = idxs.empty || offsrem.empty; }
 
-  | _ -> raise exn (* Not a scalar type *)
+  | TField (fi, remaining) ->
+    let size_current default =
+      try Ival.of_int (fst (Cil.fieldBitsOffset fi))
+      with Cil.SizeOfError _ -> default
+    in
+    let attrs = Cil.filter_qualifier_attributes (Cil.typeAttrs typ) in
+    let typ_fi = Cil.typeAddAttributes attrs fi.ftype in
+    let offsrem = eval_toffset ~alarm_mode env typ_fi remaining in
+    { etype = offsrem.etype;
+      ldeps = offsrem.ldeps;
+      eover = Ival.add_int (size_current Ival.top) offsrem.eover;
+      eunder = Ival.add_int_under (size_current Ival.bottom) offsrem.eunder;
+      empty = offsrem.empty; }
 
+  | TModel _ -> unsupported "model fields"
 
-exception Not_an_exact_loc
+and eval_tlval ~alarm_mode env (thost, toffs) =
+  let rhost = eval_tlhost ~alarm_mode env thost in
+  let roffset = eval_toffset ~alarm_mode env rhost.etype toffs in
+  { etype = roffset.etype;
+    ldeps = join_logic_deps rhost.ldeps roffset.ldeps;
+    eunder = Location_Bits.shift_under roffset.eunder rhost.eunder;
+    eover = Location_Bits.shift roffset.eover rhost.eover;
+    empty = rhost.empty || roffset.empty;
+  }
 
-type exact_location =
-  | Location of typ * Locations.location
-  | Logic_var of logic_var
+and eval_term_as_lval ~alarm_mode env t =
+  match t.term_node with
+  | TLval tlval ->
+    eval_tlval ~alarm_mode env tlval
+  | Tunion l ->
+    let eunder, eover, deps, empty = List.fold_left
+        (fun (accunder, accover, accdeps, accempty) t ->
+           let r = eval_term_as_lval ~alarm_mode env t in
+           Location_Bits.link accunder r.eunder,
+           Location_Bits.join accover r.eover,
+           join_logic_deps accdeps r.ldeps,
+           accempty || r.empty
+        ) (Location_Bits.top, Location_Bits.bottom, empty_logic_deps, false) l
+    in
+    { etype = infer_type t.term_type;
+      ldeps = deps;
+      eover; eunder; empty }
+  | Tempty_set ->
+    { etype = infer_type t.term_type;
+      ldeps = empty_logic_deps;
+      eunder = Location_Bits.bottom;
+      eover = Location_Bits.bottom;
+      empty = true }
+  | Tat (t, lab) ->
+    ignore (env_state env lab);
+    eval_term_as_lval ~alarm_mode { env with e_cur = lab } t
+  | TLogic_coerce (_lt, t) ->
+    (* Logic coerce on locations (that are pointers) can only introduce
+       sets, that do not change the abstract value. *)
+    eval_term_as_lval ~alarm_mode env t
+  | Tif (tcond, ttrue, tfalse) ->
+    eval_tif eval_term_as_lval Location_Bits.join Location_Bits.meet ~alarm_mode env
+      tcond ttrue tfalse
+  | Tinter _ -> unsupported "intersection of locations"
+  | Tcomprehension _ -> unsupported "set comprehension"
+  | _ -> ast_error (Format.asprintf "non-lval term %a" Printer.pp_term t)
 
 (* Evaluate a term as a non-empty under-approximated location, or raise
    [Not_an_exact_loc]. *)
-let rec eval_term_as_exact_locs ~alarm_mode env t =
+and eval_term_as_exact_locs ~alarm_mode env t =
   match t.term_node with
   | TLval (TVar ({ lv_type = Linteger | Lreal } as logic_var), TNoOffset) ->
     Logic_var logic_var
@@ -1669,151 +1803,12 @@ let rec eval_term_as_exact_locs ~alarm_mode env t =
 
   | _ -> raise Not_an_exact_loc
 
-
 (* -------------------------------------------------------------------------- *)
-(* --- Evaluation and reduction by predicates                             --- *)
+(* --- Reduction by predicates                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-(** Auxiliary functions *)
-
-let is_same_term_coerce t1 t2 =
-  match t1.term_node, t2.term_node with
-  | TLogic_coerce _, TLogic_coerce _ -> Logic_utils.is_same_term t1 t2
-  | TLogic_coerce (_,t1), _ -> Logic_utils.is_same_term t1 t2
-  | _, TLogic_coerce(_,t2) -> Logic_utils.is_same_term t1 t2
-  | _ -> Logic_utils.is_same_term t1 t2
-
-
-(* Evaluates a [valid_read_string] or [valid_read_wstring] predicate
-   using str* builtins.
-   - if [bottom] is obtained, return False;
-   - otherwise, if no alarms are emitted, return True;
-   - otherwise, return [Unknown]. *)
-let eval_valid_read_str ~wide env v =
-  let wrapper =
-    if wide then Builtins_string.frama_c_wcslen_wrapper
-    else Builtins_string.frama_c_strlen_wrapper
-  in
-  let v, alarms = apply_logic_builtin wrapper env [v] in
-  if Cvalue.V.is_bottom v
-  then False (* bottom state => string always invalid *)
-  else if alarms
-  then Unknown (* alarm => string possibly invalid *)
-  else True (* no alarm => string always valid for reading *)
-
-(* Evaluates a [valid_string] or [valid_wstring] predicate.
-   First, we check the constness of the arguments.
-   Then, we evaluate [valid_read_string/valid_read_wstring] on non-const ones. *)
-let eval_valid_str ~wide env v =
-  assert (not (Cvalue.V.is_bottom v));
-  (* filter const bases *)
-  let v' = Cvalue.V.filter_base (fun b -> not (Base.is_read_only b)) v in
-  if Cvalue.V.is_bottom v' then False (* all bases were const *)
-  else
-  if Cvalue.V.equal v v' then
-    eval_valid_read_str ~wide env v (* all bases non-const *)
-  else (* at least one base was const *)
-    match eval_valid_read_str ~wide env v with
-    | True -> Unknown (* weaken result *)
-    | False | Unknown as r -> r
-
-
-(* Do all the possible values of a location in [state] satisfy [test]?  [loc] is
-   an over-approximation of the location, so the answer cannot be [False] even
-   if some parts of [loc] do not satisfy [test]. Thus, this function does not
-   fold the location, but instead applies [test] to the join of all values
-   stored in [loc] in [state].  *)
-let forall_in_over_location state loc test =
-  let v = Model.find_indeterminate state loc in
-  test v
-
-exception EFalse
-
-(* Do all the possible values of a location in [state] satisfy [test]?  [loc] is
-   an under-approximation of the location, so the answer cannot be [True], as
-   the values of some other parts of the location may not satisfy [test].
-   However, it is [False] as soon as some part of [loc] contradicts [test]. *)
-let forall_in_under_location state loc test =
-  let inspect_value (_, _) (value, _, _) acc =
-    match test value with
-    | True | Unknown -> acc
-    | False -> raise EFalse
-  in
-  let inspect_itv base itv acc =
-    match Cvalue.Model.find_base_or_default base state with
-    | `Top | `Bottom -> Unknown
-    | `Value offsm ->
-      Cvalue.V_Offsetmap.fold_between ~entire:true itv inspect_value offsm acc
-  in
-  let inspect_base base intervals acc =
-    Int_Intervals.fold (inspect_itv base) intervals acc
-  in
-  let zone = Locations.enumerate_bits loc in
-  try Zone.fold_i inspect_base zone Unknown
-  with EFalse -> False
-     | Abstract_interp.Error_Top -> Unknown
-
-(* Evaluates an universal predicate about the values of a location evaluated to
-   [r] in [state]. The predicates holds whenever all the possible values at the
-   location satisfy [test]. *)
-let eval_forall_predicate state r test =
-  let size_bits = Eval_typ.sizeof_lval_typ r.etype in
-  let make_loc loc = make_loc loc size_bits in
-  let over_loc = make_loc r.eover in
-  if not Locations.(is_valid Read over_loc) then c_alarm ();
-  match forall_in_over_location state over_loc test with
-  | Unknown ->
-    let under_loc = make_loc r.eunder in
-    forall_in_under_location state under_loc test
-  | True -> True
-  | False -> if r.empty then Unknown else False
-
-(* Evaluation of an \initialized predicate on a location evaluated to [r]
-   in the state [state]. *)
-let eval_initialized state r =
-  let test = function
-    | V_Or_Uninitialized.C_init_esc _
-    | V_Or_Uninitialized.C_init_noesc _ -> True
-    | V_Or_Uninitialized.C_uninit_esc _ -> Unknown
-    | V_Or_Uninitialized.C_uninit_noesc v ->
-      if Location_Bytes.is_bottom v then False else Unknown
-  in
-  eval_forall_predicate state r test
-
-(* Evaluation of a \dangling predicate on a location evaluated to [r]
-   in the state [state]. *)
-let eval_dangling state r =
-  let test = function
-    | V_Or_Uninitialized.C_init_esc v ->
-      if Location_Bytes.is_bottom v then True else Unknown
-    | V_Or_Uninitialized.C_uninit_esc _ -> Unknown
-    | V_Or_Uninitialized.C_init_noesc _
-    | V_Or_Uninitialized.C_uninit_noesc _ -> False
-  in
-  eval_forall_predicate state r test
-
-let is_rel_binop = function
-  | Lt
-  | Gt
-  | Le
-  | Ge
-  | Eq
-  | Ne -> true
-  | _ -> false
-
-let rel_of_binop = function
-  | Lt -> Rlt
-  | Gt -> Rgt
-  | Le -> Rle
-  | Ge -> Rge
-  | Eq -> Req
-  | Ne -> Rneq
-  | _ -> assert false
-
-exception DoNotReduce
-exception Reduce_to_bottom
-
-let reduce_by_valid env positive access (tset: term) =
+and reduce_by_valid env positive access (tset: term) =
+  let exception DoNotReduce in
   (* Auxiliary function that reduces \valid(lv+offs), where lv is atomic
      (no more tsets), and offs is a bits-expressed constant offset.
      [offs_typ] is supposed to be the type of the pointed location after [offs]
@@ -1939,7 +1934,7 @@ let reduce_by_valid env positive access (tset: term) =
   do_one env tset
 
 (* reduce [tl] so that [rl rel tr] holds *)
-let reduce_by_left_relation ~alarm_mode env positive tl rel tr =
+and reduce_by_left_relation ~alarm_mode env positive tl rel tr =
   try
     let debug = false in
     if debug then Format.printf "#Left term %a@." Printer.pp_term tl;
@@ -1982,7 +1977,7 @@ let reduce_by_left_relation ~alarm_mode env positive tl rel tr =
       Eval_op.apply_on_all_locs aux locs env
   with Not_an_exact_loc | LogicEvalError _ -> env
 
-let rec reduce_by_relation ~alarm_mode env positive t1 rel t2 =
+and reduce_by_relation ~alarm_mode env positive t1 rel t2 =
   (* special case: t1 is a term of the form "a rel' b",
      and is compared to "== 0" or "!= 0" => evaluate t1 directly;
      note: such terms may be created by other evaluation/reduction functions
@@ -2004,7 +1999,7 @@ let rec reduce_by_relation ~alarm_mode env positive t1 rel t2 =
    (and of course [eval_known_papp] below).
    May raise LogicEvalError or Not_an_exact_loc, when no reduction can be done,
    and Reduce_to_bottom, in which case the reduction leads to bottom. *)
-let reduce_by_known_papp ~alarm_mode env positive li _labels args =
+and reduce_by_known_papp ~alarm_mode env positive li _labels args =
   (* If the term [arg] is a floating-point lvalue with an exact location,
      reduces its value in [env] by using the backward propagator on fval
      [fval_reduce]. *)
@@ -2098,7 +2093,7 @@ let reduce_by_known_papp ~alarm_mode env positive li _labels args =
 
 (** Big recursive functions for predicates *)
 
-let rec reduce_by_predicate ~alarm_mode env positive p =
+and reduce_by_predicate ~alarm_mode env positive p =
   let loc = p.pred_loc in
   let rec reduce_by_predicate_content env positive p_content =
     match positive,p_content with
@@ -2178,7 +2173,7 @@ let rec reduce_by_predicate ~alarm_mode env positive p =
           | False -> overwrite_current_state env Cvalue.Model.bottom
           | Unknown -> reduce_by_relation ~alarm_mode env positive t1 op t2
         with
-        | DoNotReduce | LogicEvalError _ -> env
+        | LogicEvalError _ -> env
         | Reduce_to_bottom ->
           overwrite_current_state env Cvalue.Model.bottom
           (* if the exception was obtained without an alarm emitted,
@@ -2283,6 +2278,10 @@ let rec reduce_by_predicate ~alarm_mode env positive p =
       -> env
   in
   reduce_by_predicate_content env positive p.pred_content
+
+(* -------------------------------------------------------------------------- *)
+(* --- Evaluation of predicates                                           --- *)
+(* -------------------------------------------------------------------------- *)
 
 and eval_predicate env pred =
   let alarm_mode = Fail in
@@ -2629,7 +2628,6 @@ and eval_predicate env pred =
   in
   do_eval env pred
 
-
 (* -------------------------------------------------------------------------- *)
 (* --- Dependencies of predicates                                         --- *)
 (* -------------------------------------------------------------------------- *)
@@ -2713,6 +2711,25 @@ let predicate_deps env pred =
 let reduce_by_predicate env positive p =
   let alarm_mode = alarm_reduce_mode () in
   reduce_by_predicate ~alarm_mode env positive p
+
+let eval_tlval_as_location ~alarm_mode env t =
+  let r = eval_term_as_lval ~alarm_mode env t in
+  let s = Eval_typ.sizeof_lval_typ r.etype in
+  make_loc r.eover s
+
+(* Return a pair of (under-approximating, over-approximating) zones. *)
+let eval_tlval_as_zone_under_over ~alarm_mode access env t =
+  let r = eval_term_as_lval ~alarm_mode env t in
+  let s = Eval_typ.sizeof_lval_typ r.etype in
+  let under = enumerate_valid_bits_under access (make_loc r.eunder s) in
+  let over = enumerate_valid_bits access (make_loc r.eover s) in
+  (under, over)
+
+let eval_tlval_as_zone ~alarm_mode access env t =
+  let _under, over =
+    eval_tlval_as_zone_under_over ~alarm_mode access env t
+  in
+  over
 
 let () =
   (* TODO: deprecate loc_to_loc, move loc_to_locs into Value *)
