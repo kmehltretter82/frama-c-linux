@@ -1301,11 +1301,19 @@ let rec eval_term ~alarm_mode env t =
       | _ -> unsupported "logic inductive types"
     end
 
+  | Tcomprehension (term, quantifiers, predicate) ->
+    let env = bind_comprehension_quantifiers env quantifiers predicate in
+    let r = eval_term ~alarm_mode env term in
+    let pred_deps = Option.bind predicate (predicate_deps env) in
+    let ldeps =
+      Option.fold ~none:r.ldeps ~some:(join_logic_deps r.ldeps) pred_deps
+    in
+    { r with empty = true; ldeps }
+
   | Tlambda _ -> unsupported "logic functions or predicates"
   | TUpdate _ -> unsupported "functional updates"
   | Ttype _ -> unsupported "\\type operator"
   | Ttypeof _ -> unsupported "\\typeof operator"
-  | Tcomprehension _ -> unsupported "sets defined by comprehension"
   | Tinter _ -> unsupported "set intersection"
   | Tlet _ -> unsupported "\\let bindings"
   | TConst (LStr _) -> unsupported "constant strings"
@@ -1599,6 +1607,21 @@ and eval_quantifier_extremum backward_left ~min ~max eval_term =
     let r = eval_term (Cvalue.V.join min.eover max.eover) in
     return { r with eover = Cvalue.V.top; eunder = Cvalue.V.bottom }
 
+(* Introduces the logic variables [quantifiers] in [env], and reduces their
+   value according to [predicate]. *)
+and bind_comprehension_quantifiers env quantifiers predicate =
+  let env = bind_logic_vars env quantifiers in
+  match predicate with
+  | None -> env
+  | Some pred ->
+    try
+      let alarm_mode = Fail in
+      let reduced_env = reduce_by_predicate ~alarm_mode env true pred in
+      copy_logic_vars ~src:reduced_env ~dst:env quantifiers
+    with LogicEvalError error ->
+      display_evaluation_error ~loc:pred.pred_loc error;
+      env
+
 (* -------------------------------------------------------------------------- *)
 (* --- Evaluation of term lval and of terms as location                   --- *)
 (* -------------------------------------------------------------------------- *)
@@ -1742,8 +1765,15 @@ and eval_term_as_lval ~alarm_mode env t =
   | Tif (tcond, ttrue, tfalse) ->
     eval_tif eval_term_as_lval Location_Bits.join Location_Bits.meet ~alarm_mode env
       tcond ttrue tfalse
+  | Tcomprehension (term, quantifiers, predicate) ->
+    let env = bind_comprehension_quantifiers env quantifiers predicate in
+    let r = eval_term_as_lval ~alarm_mode env term in
+    let pred_deps = Option.bind predicate (predicate_deps env) in
+    let ldeps =
+      Option.fold ~none:r.ldeps ~some:(join_logic_deps r.ldeps) pred_deps
+    in
+    { r with empty = true; ldeps }
   | Tinter _ -> unsupported "intersection of locations"
-  | Tcomprehension _ -> unsupported "set comprehension"
   | _ -> ast_error (Format.asprintf "non-lval term %a" Printer.pp_term t)
 
 (* Evaluate a term as a non-empty under-approximated location, or raise
@@ -1799,6 +1829,10 @@ and eval_term_as_exact_locs ~alarm_mode env t =
 
   | Tunion [t] ->
     eval_term_as_exact_locs ~alarm_mode env t
+
+  | Tcomprehension (term, quantifiers, predicate) ->
+    let env = bind_comprehension_quantifiers env quantifiers predicate in
+    eval_term_as_exact_locs ~alarm_mode env term
 
   | _ -> raise Not_an_exact_loc
 
@@ -2632,7 +2666,7 @@ and eval_predicate env pred =
 (* --- Dependencies of predicates                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-let eval_tsets_deps ~alarm_mode env lbl tsets =
+and eval_tsets_deps ~alarm_mode env lbl tsets =
   let star_tsets = deref_tsets tsets in
   let r = eval_tlval ~alarm_mode env star_tsets in
   let size_bits = Eval_typ.sizeof_lval_typ r.etype in
@@ -2640,7 +2674,7 @@ let eval_tsets_deps ~alarm_mode env lbl tsets =
   let zone = enumerate_valid_bits Locations.Read loc in
   Logic_label.Map.add lbl zone r.ldeps
 
-let predicate_deps env pred =
+and predicate_deps env pred =
   let alarm_mode = Ignore in
   let rec do_eval env p =
     let term_deps term = (eval_term ~alarm_mode env term).ldeps in
