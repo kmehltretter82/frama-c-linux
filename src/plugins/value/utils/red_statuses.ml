@@ -190,4 +190,4 @@ let output file =
   Format.fprintf fmt "@]%!"
 
 let report () =
-  Value_parameters.ReportRedStatuses.(if is_known () then output (get ()))
+  Value_parameters.ReportRedStatuses.(if not (is_empty ()) then output (get ()))

@@ -269,8 +269,10 @@ module Normalized = struct
     if case_sensitive then String.compare s1 s2
     else Extlib.compare_ignore_case s1 s2
 
-  let unknown = normalize ""
-  let is_unknown fp = equal fp unknown
+  let empty = normalize ""
+  let unknown = empty
+  let is_empty fp = equal fp empty
+  let is_unknown = is_empty
   let special_stdout = normalize "-"
   let is_special_stdout fp = equal fp special_stdout
 

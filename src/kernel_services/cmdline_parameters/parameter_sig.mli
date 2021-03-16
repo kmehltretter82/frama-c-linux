@@ -297,11 +297,11 @@ module type Filepath = sig
   include S with type t = Filepath.Normalized.t
 
   (**
-     Whether the Filepath is known, e.g. not empty.
+     Whether the Filepath is empty.
 
      @since Frama-C+dev
   *)
-  val is_known: unit -> bool
+  val is_empty: unit -> bool
 end
 
 (** signature for searching files in a specific directory. *)

@@ -734,7 +734,7 @@ let compute_on_cilast ~libc =
       "@[<v 0>Cil AST@ %t@]" cil_visitor#pp_detailed_text_metrics;
   (*  let r =  metrics_to_result cil_visitor in *)
   (* Print the result to file if required *)
-  if Metrics_parameters.OutputFile.is_known () then begin
+  if not (Metrics_parameters.OutputFile.is_empty ()) then begin
     let out_fname = Metrics_parameters.OutputFile.get () in
     try
       let oc = open_out_bin (out_fname:>string) in

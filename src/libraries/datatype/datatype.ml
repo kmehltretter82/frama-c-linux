@@ -1946,7 +1946,7 @@ module Filepath = struct
         let pretty = Filepath.Normalized.pretty
         let varname _ = "p"
       end)
-  let dummy = Filepath.Normalized.unknown
+  let dummy = Filepath.Normalized.empty
   let of_string ?existence ?base_name s =
     Filepath.Normalized.of_string ?existence ?base_name s
   let concat ?existence t s = Filepath.Normalized.concat ?existence t s

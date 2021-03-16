@@ -53,9 +53,9 @@ module D =
       type t = file
       let name = "File"
       let reprs =
-        [ NeedCPP(Filepath.Normalized.unknown, "", [], Unknown);
-          NoCPP Filepath.Normalized.unknown;
-          External(Filepath.Normalized.unknown, "")
+        [ NeedCPP(Filepath.Normalized.empty, "", [], Unknown);
+          NoCPP Filepath.Normalized.empty;
+          External(Filepath.Normalized.empty, "")
         ]
       let structural_descr = Structural_descr.t_abstract
       let mem_project = Datatype.never_any_project
@@ -1744,17 +1744,17 @@ let prepare_from_c_files () =
   let files = Files.get () in (* Allow pre-registration of prolog files *)
   let cpp_commands = List.map (fun f -> (f, build_cpp_cmd f)) files in
   if Kernel.PrintCppCommands.get () then print_and_exit cpp_commands;
-  let audit_check_path = Kernel.AuditCheck.get () in
-  if not (Filepath.Normalized.is_unknown audit_check_path) then begin
+  if not (Kernel.AuditCheck.is_empty ()) then begin
     let all_sources_tbl = compute_sources_table cpp_commands in
-    let expected_hashes = source_hashes_of_json audit_check_path in
+    let expected_hashes = source_hashes_of_json (Kernel.AuditCheck.get ()) in
     check_source_hashes expected_hashes all_sources_tbl
   end;
-  let audit_path = Kernel.AuditPrepare.get () in
-  if not (Filepath.Normalized.is_unknown audit_path) then begin
+  if not (Kernel.AuditPrepare.is_empty ()) then begin
     let all_sources_tbl = compute_sources_table cpp_commands in
+    let audit_path = Kernel.AuditPrepare.get () in
     print_all_sources audit_path all_sources_tbl;
-    if not (Filepath.Normalized.is_special_stdout audit_path) then
+    if not (Filepath.Normalized.is_special_stdout audit_path)
+    then
       Kernel.feedback "Audit: sources list written to: %a@."
         Filepath.Normalized.pretty audit_path;
   end;

@@ -57,9 +57,9 @@ let main () =
     if not (Self.FromFunctionAlarms.is_empty ()) then
       Alarms.iter add_alarm;
     (* Output it *)
-    if Self.OutputDot.is_known () then
+    if not (Self.OutputDot.is_empty ()) then
       output Dot context (Self.OutputDot.get ());
-    if Self.OutputJson.is_known () then
+    if not (Self.OutputJson.is_empty ()) then
       output Json context (Self.OutputJson.get ());
   end
 

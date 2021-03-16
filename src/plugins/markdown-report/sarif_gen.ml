@@ -38,7 +38,7 @@ let frama_c_sarif () =
        ~informationUri ())
 
 let get_remarks () =
-  if Mdr_params.Remarks.is_known () then
+  if not (Mdr_params.Remarks.is_empty ()) then
     Parse_remarks.get_remarks (Mdr_params.Remarks.get ())
   else Datatype.String.Map.empty
 
@@ -273,7 +273,7 @@ let generate () =
   let remarks = get_remarks () in
   let runs = [ gen_run remarks ] in
   let json = Schema.create ~runs () |> Schema.to_yojson in
-  if Mdr_params.Output.is_known () then
+  if not (Mdr_params.Output.is_empty ()) then
     let file = Mdr_params.Output.get () in
     try
       Command.write_file (file:>string)

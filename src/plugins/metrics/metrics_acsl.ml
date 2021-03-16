@@ -308,7 +308,7 @@ let dump_acsl_stats_html fmt =
     
 
 let dump () =
-  if Metrics_parameters.OutputFile.is_known () then begin
+  if not (Metrics_parameters.OutputFile.is_empty ()) then begin
     let out = Metrics_parameters.OutputFile.get () in
     try
       let chan = open_out (out:>string) in

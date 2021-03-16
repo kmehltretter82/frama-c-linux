@@ -554,7 +554,7 @@ let gen_alarms env =
   gen_section_postlude env
 
 let mk_remarks is_draft =
-  if Mdr_params.Remarks.is_known () then
+  if not (Mdr_params.Remarks.is_empty ()) then
     Parse_remarks.get_remarks (Mdr_params.Remarks.get ())
   else if is_draft then begin
     let f = Mdr_params.Output.get() in

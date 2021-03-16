@@ -829,7 +829,7 @@ let create_by_copy
 module Undo = struct
 
   let short_filename = "frama_c_undo_restore"
-  let filename = ref Filepath.Normalized.unknown
+  let filename = ref Filepath.Normalized.empty
 
   let clear_breakpoint () = Extlib.safe_remove (!filename:>string)
 

@@ -526,7 +526,7 @@ let report_output file =
 let report_number name nb opt =
   if nb > 0 then R.feedback "%s%4d" name nb ;
   let file = opt () in
-  if not (Filepath.Normalized.is_unknown file) then
+  if not (Filepath.Normalized.is_empty file) then
     let out = open_out (file:>string) in
     output_string out (string_of_int nb) ;
     flush out ; close_out out
@@ -540,7 +540,7 @@ let classify () =
        (not (R.Stderr.get ()) &&
         not (R.Output.is_set ()))
     then report_console () ;
-    if R.Output.is_known () then report_output (R.Output.get ());
+    if not (R.Output.is_empty ()) then report_output (R.Output.get ());
     report_number "Reviews     : " !nb_reviews R.OutputReviews.get ;
     report_number "Errors      : " !nb_errors R.OutputErrors.get ;
     report_number "Unclassified: " !nb_unclassified R.OutputUnclassified.get ;

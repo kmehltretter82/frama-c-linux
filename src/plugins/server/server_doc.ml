@@ -363,7 +363,7 @@ let dump ~root ?(meta=true) () =
 let () =
   Db.Main.extend begin
     fun () ->
-      if Senv.Doc.is_known () then
+      if not (Senv.Doc.is_empty ()) then
         let root = Senv.Doc.get () in
         if Sys.is_directory (root:>string) then
           begin

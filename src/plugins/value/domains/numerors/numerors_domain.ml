@@ -86,7 +86,7 @@ module Domain = struct
   include Simple_memory.Make_Domain (Name) (Numerors_Value)
 
   let post_analysis f =
-    if Value_parameters.NumerorsLogFile.is_known () then
+    if not (Value_parameters.NumerorsLogFile.is_empty ()) then
       match f with
       | `Value _ ->
         let log = open_out (Value_parameters.NumerorsLogFile.get ():>string) in

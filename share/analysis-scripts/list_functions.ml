@@ -282,7 +282,7 @@ let run () =
       (fun fi1 fi2 -> Extlib.compare_ignore_case fi1.name fi2.name) funinfos
   in
   let outfp = Output.get () in
-  if Filepath.Normalized.is_unknown outfp then
+  if Filepath.Normalized.is_empty outfp then
     print_text funinfos
   else
     let funinfos_json = `List (List.map (fun fi ->

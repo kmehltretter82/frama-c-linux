@@ -109,7 +109,7 @@ let print_csv, _ =
     print_csv_once
 
 let main () =
-  if Report_parameters.CSVFile.is_known () then print_csv ()
+  if not (Report_parameters.CSVFile.is_empty ()) then print_csv ()
 
 let () = Db.Main.extend main
 

@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 let main () =
-  if Options.Filename.is_known () then
+  if not (Options.Filename.is_empty ()) then
     if Options.Services.get () then begin
       if not (Services.is_computed ()) then Services.dump ()
     end else

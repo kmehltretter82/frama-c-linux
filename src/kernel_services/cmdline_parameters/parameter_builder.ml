@@ -480,7 +480,7 @@ struct
         (struct
           include Datatype.Filepath
           include X
-          let default () = Filepath.Normalized.unknown
+          let default () = Filepath.Normalized.empty
           let functor_name = "Filepath"
         end)
 
@@ -532,7 +532,7 @@ struct
       else
         p
 
-    let is_known () = not (Filepath.Normalized.is_unknown (get ()))
+    let is_empty () = Filepath.Normalized.is_empty (get ())
   end
 
   (* ************************************************************************ *)
