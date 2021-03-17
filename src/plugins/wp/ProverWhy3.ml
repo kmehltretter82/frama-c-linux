@@ -1122,7 +1122,7 @@ let prover_task env prover task =
   let config = Why3Provers.config () in
   let prover_config = Why3.Whyconf.get_prover_config config prover in
   let drv = Why3.Whyconf.load_driver (Why3.Whyconf.get_main config)
-      env prover_config.driver prover_config.extra_drivers in
+      env prover_config in
   let remove_for_prover =
     if prover.prover_name = "Alt-Ergo"
     then Filter_axioms.remove_for_altergo
@@ -1204,7 +1204,7 @@ let ping_prover_call p =
       Wp_parameters.debug ~dkey
         "@[@[Why3 result for %a:@] @[%a@] and @[%a@]@."
         Why3.Whyconf.print_prover p.prover
-        (Why3.Call_provers.print_prover_result ~json_model:false) pr
+        (Why3.Call_provers.print_prover_result ~json:false) pr
         VCS.pp_result r;
       Task.Return (Task.Result r)
 

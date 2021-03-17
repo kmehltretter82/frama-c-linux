@@ -26,10 +26,7 @@
 
 let cfg = lazy
   begin
-    try
-      let config = Why3.Whyconf.read_config None in
-      let config = Why3.Whyconf.load_default_config_if_needed config in
-      config
+    try Why3.Whyconf.init_config None
     with exn ->
       Wp_parameters.abort "%a" Why3.Exn_printer.exn_printer exn
   end
@@ -46,10 +43,10 @@ let configure =
       begin
         let args = Array.of_list ("why3"::Wp_parameters.Why3Flags.get ()) in
         begin try
-            Arg.parse_argv ~current:(ref 0) args
+            Why3.Getopt.parse_all
               (Why3.Debug.Args.[desc_debug;desc_debug_all;desc_debug_list])
               (fun opt -> raise (Arg.Bad ("unknown option: " ^ opt)))
-              "Why3 options"
+              args
           with Arg.Bad s | Arg.Help s -> Wp_parameters.abort "%s" s
         end;
         ignore (Why3.Debug.Args.option_list ());
