@@ -52,7 +52,7 @@ usage() {
    echo "      Also opens it in a browser, unless variable NOGUI is set."
    echo ""
    echo "  - help"
-   echo "      Display this help message and exit."
+   echo "      Displays this help message and exits."
    echo ""
    echo "  - heuristic-detect-recursion file..."
    echo "      Uses a heuristic, syntactic-based, callgraph to detect recursive"

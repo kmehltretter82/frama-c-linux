@@ -178,7 +178,7 @@ def find_definitions_and_declarations(want_defs, want_decls, filename, newlines)
     return res
 
 # list of identifiers which are never function calls
-calls_blacklist = ["if", "while", "for", "return"]
+calls_blacklist = ["if", "while", "for", "return", "sizeof", "switch", "_Alignas"]
 
 # Returns a list of tuples (fname, line, offset) for each function call.
 #
