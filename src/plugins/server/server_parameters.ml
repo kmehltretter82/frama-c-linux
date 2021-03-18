@@ -60,11 +60,12 @@ let server_doc = add_group "Server Doc Generation"
 let () = Parameter_customize.set_group server_doc
 let () = Parameter_customize.do_not_save ()
 
-module Doc = P.String
+module Doc = P.Filepath
     (struct
       let option_name = "-server-doc"
       let arg_name = "dir"
-      let default = ""
+      let file_kind = "Directory"
+      let existence = Fc_Filepath.Must_exist
       let help = "Output a markdown documentation of the server in <dir>"
     end)
 

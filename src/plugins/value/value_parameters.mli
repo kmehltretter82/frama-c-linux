@@ -42,7 +42,7 @@ module OctagonCall: Parameter_sig.Bool
 
 module TracesUnrollLoop: Parameter_sig.Bool
 module TracesUnifyLoop: Parameter_sig.Bool
-module TracesDot: Parameter_sig.String
+module TracesDot: Parameter_sig.Filepath
 module TracesProject: Parameter_sig.Bool
 
 module EqualityStorage: Parameter_sig.Bool
@@ -122,11 +122,11 @@ module SplitGlobalStrategy: State_builder.Ref with type data = Split_strategy.t
 
 module ValShowProgress: Parameter_sig.Bool
 module ValShowPerf: Parameter_sig.Bool
-module ValPerfFlamegraphs: Parameter_sig.String
+module ValPerfFlamegraphs: Parameter_sig.Filepath
 module ShowSlevel: Parameter_sig.Int
 module PrintCallstacks: Parameter_sig.Bool
-module ReportRedStatuses: Parameter_sig.String
-module NumerorsLogFile: Parameter_sig.String
+module ReportRedStatuses: Parameter_sig.Filepath
+module NumerorsLogFile: Parameter_sig.Filepath
 
 module MemExecAll: Parameter_sig.Bool
 

@@ -23,7 +23,7 @@
 (** Callgraph plugin. *)
 
 module Options: sig
-  module Filename: Parameter_sig.String
+  module Filename: Parameter_sig.Filepath
   module Service_roots: Parameter_sig.Kernel_function_set
   module Uncalled: Parameter_sig.Bool
   module Uncalled_leaf: Parameter_sig.Bool

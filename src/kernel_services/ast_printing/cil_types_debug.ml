@@ -606,7 +606,7 @@ and pp_location fmt (pos_start,pos_end) =
 
 and pp_if_loc_known prefix suffix fmt loc =
   if print_locations &&
-     not (Filepath.Normalized.is_unknown (fst loc).Filepath.pos_path)
+     not (Filepath.Normalized.is_empty (fst loc).Filepath.pos_path)
   then Format.fprintf fmt "%s%a%s" prefix pp_location loc suffix
   else ()
 

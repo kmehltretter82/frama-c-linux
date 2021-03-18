@@ -112,13 +112,15 @@ let parse_remarks env chan =
     env
 
 let get_remarks f =
-  Mdr_params.debug ~dkey "Using remarks file %s" f;
+  Mdr_params.debug ~dkey "Using remarks file %a"
+    Filepath.Normalized.pretty f;
   try
-    let chan = open_in f in
+    let chan = open_in (f:>string) in
     let { remarks } = parse_remarks (empty_env ()) chan in
     remarks
   with Sys_error err ->
     Mdr_params.error
-      "Unable to open remarks file %s (%s). \
-       No additional remarks will be included in the report." f err;
+      "Unable to open remarks file %a (%s). \
+       No additional remarks will be included in the report."
+      Filepath.Normalized.pretty f err;
     Datatype.String.Map.empty

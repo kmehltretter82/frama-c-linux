@@ -460,7 +460,7 @@ let gen_file =
       f.svar.vdefined <- true;
       f.sbody <- body;
       (env,
-       { fileName = Filepath.Normalized.unknown;
+       { fileName = Filepath.Normalized.empty;
          globals = [
              GVarDecl (x,Cil_datatype.Location.unknown);
              GVarDecl (y,Cil_datatype.Location.unknown);

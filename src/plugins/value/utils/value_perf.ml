@@ -395,11 +395,11 @@ let start_doing_flamegraph callstack =
   | [] -> assert false
   | [_] ->
     (* Analysis of main *)
-    let file = Value_parameters.ValPerfFlamegraphs.get () in
-    if file <> "" then begin
+    if not (Value_parameters.ValPerfFlamegraphs.is_empty ()) then begin
+      let file = Value_parameters.ValPerfFlamegraphs.get () in
       try
         (* Flamegraphs must be computed. Set up the stack and the output file *)
-        let oc = open_out file in
+        let oc = open_out (file:>string) in
         oc_flamegraph := Some oc;
         stack_flamegraph := [ (Sys.time (), 0.) ]
       with e ->

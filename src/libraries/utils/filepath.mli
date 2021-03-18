@@ -154,11 +154,25 @@ module Normalized: sig
   (** Pretty-prints the normalized (absolute) path. *)
   val pp_abs: Format.formatter -> t -> unit
 
-  (** Unknown filepath, used as 'dummy' for [Datatype.Filepath]. *)
+  (** Unknown filepath, used as 'dummy' for [Datatype.Filepath].
+      @deprecated Frama-C+dev use 'empty' instead
+  *)
   val unknown: t
+  [@@alert deprecated "Use Filepath.Normalized.empty instead"]
 
-  (** @since 20.0-Calcium *)
+  (** @since 20.0-Calcium
+      @deprecated Frama-C+dev use 'is_empty' instead
+  *)
   val is_unknown: t -> bool
+  [@@alert deprecated "Use Filepath.Normalized.is_empty instead"]
+
+  (** Empty filepath, used as 'dummy' for [Datatype.Filepath].
+      @since Frama-C+dev.
+  *)
+  val empty: t
+
+  (** @since Frama-C+dev *)
+  val is_empty: t -> bool
 
   (** [is_special_stdout f] returns [true] iff [f] is '-' (a single dash),
       which is a special notation for 'stdout'.

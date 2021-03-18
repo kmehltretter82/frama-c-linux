@@ -22,13 +22,13 @@
 
 type format = Dot | Json
 
-let output format context basename =
-  let filename, output_function = match format with
-    | Dot -> basename ^ ".dot", Dive_graph.ouptput_to_dot
-    | Json -> basename ^ ".json", Dive_graph.ouptput_to_json
+let output format context filename =
+  let output_function = match format with
+    | Dot -> Dive_graph.ouptput_to_dot
+    | Json -> Dive_graph.ouptput_to_json
   in
-  Self.result "output to %s" filename;
-  let out_channel = open_out filename in
+  Self.result "output to %a" Filepath.Normalized.pretty filename;
+  let out_channel = open_out (filename:>string) in
   output_function out_channel (Context.get_graph context);
   close_out out_channel
 
@@ -57,9 +57,9 @@ let main () =
     if not (Self.FromFunctionAlarms.is_empty ()) then
       Alarms.iter add_alarm;
     (* Output it *)
-    if Self.OutputDot.get () <> "" then
+    if not (Self.OutputDot.is_empty ()) then
       output Dot context (Self.OutputDot.get ());
-    if Self.OutputJson.get () <> "" then
+    if not (Self.OutputJson.is_empty ()) then
       output Json context (Self.OutputJson.get ());
   end
 

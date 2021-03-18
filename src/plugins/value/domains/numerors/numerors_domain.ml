@@ -86,14 +86,14 @@ module Domain = struct
   include Simple_memory.Make_Domain (Name) (Numerors_Value)
 
   let post_analysis f =
-    match f, Value_parameters.NumerorsLogFile.get () with
-    | _, s when s = "" -> ()
-    | `Value _, s ->
-      let log = open_out s in
-      let fmt = Format.formatter_of_out_channel log in
-      List.iter (fun f -> f fmt ()) !Numerors_Value.dprint_callstack ;
-      close_out log
-    | _, _ -> ()
+    if not (Value_parameters.NumerorsLogFile.is_empty ()) then
+      match f with
+      | `Value _ ->
+        let log = open_out (Value_parameters.NumerorsLogFile.get ():>string) in
+        let fmt = Format.formatter_of_out_channel log in
+        List.iter (fun f -> f fmt ()) !Numerors_Value.dprint_callstack ;
+        close_out log
+      | _ -> ()
 end
 
 (* Reduced product between the cvalue values and the numerors values. *)

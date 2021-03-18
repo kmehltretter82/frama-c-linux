@@ -87,8 +87,8 @@ let () =
 
 (* Load Frama-c from disk if required *)
 let load_binary () =
-  let filepath = Kernel.LoadState.get () in
-  if filepath <> Filepath.Normalized.unknown then begin
+  if not (Kernel.LoadState.is_empty ()) then begin
+    let filepath = Kernel.LoadState.get () in
     try
       Project.load_all filepath
     with Project.IOError s ->
@@ -133,8 +133,8 @@ let () = Extlib.safe_at_exit time
 
 (* Save Frama-c on disk if required *)
 let save_binary error_extension =
-  let filename = Kernel.SaveState.get () in
-  if not (Filepath.Normalized.is_unknown filename) then begin
+  if not (Kernel.SaveState.is_empty ()) then begin
+    let filename = Kernel.SaveState.get () in
     Kernel.SaveState.clear ();
     let realname =
       match error_extension with

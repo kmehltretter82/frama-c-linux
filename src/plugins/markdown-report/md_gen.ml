@@ -554,13 +554,14 @@ let gen_alarms env =
   gen_section_postlude env
 
 let mk_remarks is_draft =
-  let f = Mdr_params.Remarks.get () in
-  if f <> "" then Parse_remarks.get_remarks f
+  if not (Mdr_params.Remarks.is_empty ()) then
+    Parse_remarks.get_remarks (Mdr_params.Remarks.get ())
   else if is_draft then begin
     let f = Mdr_params.Output.get() in
-    if Sys.file_exists f then begin
+    if Sys.file_exists (f:>string) then begin
       Mdr_params.feedback
-        "Re-using pre-existing remarks in draft file %s" f;
+        "Re-using pre-existing remarks in draft file %a"
+        Filepath.Normalized.pretty f;
       Parse_remarks.get_remarks f
     end else Datatype.String.Map.empty
   end else  Datatype.String.Map.empty
@@ -609,8 +610,9 @@ let gen_report ~draft:is_draft () =
   let doc = Markdown.pandoc ~title ~authors ?date elements in
   let file = Mdr_params.Output.get() in
   try
-    Command.print_file file (fun fmt -> Markdown.pp_pandoc fmt doc) ;
-    Mdr_params.result "Report %s generated" file
+    Command.print_file (file:>string) (fun fmt -> Markdown.pp_pandoc fmt doc) ;
+    Mdr_params.result "Report %a generated" Filepath.Normalized.pretty file
   with Sys_error s ->
     Mdr_params.warning
-      "Unable to open %s for writing (%s). No report generated" file s
+      "Unable to open %a for writing (%s). No report generated"
+      Filepath.Normalized.pretty file s

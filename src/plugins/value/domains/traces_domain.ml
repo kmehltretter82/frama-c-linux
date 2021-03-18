@@ -1278,7 +1278,7 @@ module D = struct
         Value_parameters.failure "The trace is TOP can't generate code"
       | `Value state ->
         if not (Value_parameters.TracesDot.is_default ())
-        then output_dot (Value_parameters.TracesDot.get ()) state;
+        then output_dot (Value_parameters.TracesDot.get ():>string) state;
         if Value_parameters.TracesProject.get ()
         then project_of_cfg return_exp state
 end

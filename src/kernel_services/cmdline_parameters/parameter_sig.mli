@@ -293,7 +293,16 @@ module type With_output = sig
 end
 
 (** signature for normalized pathnames. *)
-module type Filepath = S with type t = Filepath.Normalized.t
+module type Filepath = sig
+  include S with type t = Filepath.Normalized.t
+
+  (**
+     Whether the Filepath is empty.
+
+     @since Frama-C+dev
+  *)
+  val is_empty: unit -> bool
+end
 
 (** signature for searching files in a specific directory. *)
 module type Specific_dir = sig

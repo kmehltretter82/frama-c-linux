@@ -29,18 +29,22 @@ include Plugin.Register
       let help = "An interactive imprecision graph generator for Eva."
     end)
 
-module OutputDot = Empty_string
+module OutputDot = Filepath
     (struct
       let option_name = "-dive-output-dot"
-      let help = "Outputs the built graph into a dot file with this basename."
-      let arg_name = "basename"
+      let arg_name = "output.dot"
+      let file_kind = "DOT"
+      let existence = Fc_Filepath.Indifferent
+      let help = "Outputs the built graph in DOT format to the specified file."
     end)
 
-module OutputJson = Empty_string
+module OutputJson = Filepath
     (struct
       let option_name = "-dive-output-json"
-      let help = "Outputs the built graph into a json file with this basename."
-      let arg_name = "basename"
+      let arg_name = "output.json"
+      let file_kind = "JSON"
+      let existence = Fc_Filepath.Indifferent
+      let help = "Outputs the built graph in JSON format to the specified."
     end)
 
 module DepthLimit = Int

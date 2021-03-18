@@ -351,11 +351,13 @@ module TracesUnifyLoop =
 let () = add_precision_dep TracesUnifyLoop.parameter
 
 let () = Parameter_customize.set_group domains
-module TracesDot = Empty_string
+module TracesDot = Filepath
     (struct
       let option_name = "-eva-traces-dot"
-      let help = "Output to the given filename the Cfg in dot format."
       let arg_name = "FILENAME"
+      let file_kind = "DOT"
+      let existence = Fc_Filepath.Indifferent
+      let help = "Output to the given filename the Cfg in dot format."
     end)
 
 let () = Parameter_customize.set_group domains
@@ -1070,14 +1072,15 @@ module ValShowPerf =
 
 let () = Parameter_customize.set_group messages
 module ValPerfFlamegraphs =
-  String
+  Filepath
     (struct
       let option_name = "-eva-flamegraph"
+      let arg_name = "file"
+      let file_kind = "Text for flamegraph"
+      let existence = Fc_Filepath.Indifferent
       let help = "Dump a summary of the time spent analyzing function calls \
                   in a format suitable for the Flamegraph tool \
                   (http://www.brendangregg.com/flamegraphs.html)"
-      let arg_name = "file"
-      let default = ""
     end)
 
 
@@ -1103,11 +1106,12 @@ module PrintCallstacks =
 
 let () = Parameter_customize.set_group messages
 module ReportRedStatuses =
-  String
+  Filepath
     (struct
       let option_name = "-eva-report-red-statuses"
       let arg_name = "filename"
-      let default = ""
+      let file_kind = "CSV"
+      let existence = Fc_Filepath.Indifferent
       let help = "Output the list of \"red properties\" in a csv file of the \
                   given name. These are the properties which were invalid for \
                   some states. Their consolidated status may not be invalid, \
@@ -1116,13 +1120,14 @@ module ReportRedStatuses =
 
 let () = Parameter_customize.set_group messages
 module NumerorsLogFile =
-  String
+  Filepath
     (struct
       let option_name = "-eva-numerors-log-file"
+      let arg_name = "file"
+      let file_kind = "Text"
+      let existence = Fc_Filepath.Indifferent
       let help = "The Numerors domain will save each call to the DPRINT \
                   function in the given file"
-      let arg_name = "file"
-      let default = ""
     end)
 
 (* ------------------------------------------------------------------------- *)

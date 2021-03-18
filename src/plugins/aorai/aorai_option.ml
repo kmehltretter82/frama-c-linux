@@ -173,7 +173,7 @@ let is_on () =
        Buchi.is_default ()    && Ya.is_default () )
 
 let promela_file () =
-  if Fc_Filepath.Normalized.is_unknown (Buchi.get ()) then To_Buchi.get () else Buchi.get ()
+  if not (Buchi.is_empty ()) then Buchi.get () else To_Buchi.get ()
 
 let advance_abstract_interpretation () =
   not (AbstractInterpretationOff.get ()) && not (AbstractInterpretation.get ())
