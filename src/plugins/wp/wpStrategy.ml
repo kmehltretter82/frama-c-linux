@@ -438,8 +438,9 @@ let add_call_assigns_hyp acc kf_caller s ~called_kf l_post spec_opt =
               let asgn = WpPropId.mk_stmt_any_assigns_info s in
               add_assigns_any acc (AcallHyp called_kf) asgn
           | Some pid ->
-              let kf = kf_caller in
-              let labels = NormAtLabels.labels_stmt_assigns_l ~kf s l_post in
+              ignore l_post ;
+              (* let kf = kf_caller in *)
+              let labels = NormAtLabels.labels_fct_assigns ~exit:false (* ~kf s l_post *) in
               let assigns = NormAtLabels.preproc_assigns labels assigns in
               let a_desc = WpPropId.mk_stmt_assigns_desc s assigns in
               add_assigns acc (AcallHyp called_kf) pid a_desc

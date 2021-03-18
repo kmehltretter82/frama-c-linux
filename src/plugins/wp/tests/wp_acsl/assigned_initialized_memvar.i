@@ -31,7 +31,10 @@ void range(void){
   */
   for(int i = 0; i < 10; ++i) s.a[i] = 0;
 
-  /*@ loop assigns CHECK: i, s.a[1 .. 4]; */
+  /*@
+    loop invariant CHECK: \initialized(&s);
+    loop assigns CHECK: i, s.a[1 .. 4];
+  */
   for(int i = 0; i < 10; ++i){
     if(1 <= i && i <= 4) s.a[i] = 1 ;
   }
@@ -98,7 +101,10 @@ void descr(void){
   */
   for(int i = 0; i < 10; ++i) s.a[i] = 0;
 
-  /*@ loop assigns CHECK: i, { s.a[i] | integer i ; i \in { 0, 2, 4 } }; */
+  /*@
+    loop invariant CHECK: \initialized(&s);
+    loop assigns CHECK: i, { s.a[i] | integer i ; i \in { 0, 2, 4 } };
+  */
   for(int i = 0; i < 10; ++i){
     if(i == 0 || i == 2 || i == 4) s.a[i] = 1 ;
   }
