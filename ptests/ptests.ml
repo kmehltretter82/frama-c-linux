@@ -364,8 +364,6 @@ let () =
            ) argspec)
      ) @ ["", Arg.Unit (fun () -> ()), example_msg;])
     make_test_suite umsg
-;;
-
 
 let fail s =
   Format.printf "Error: %s@." s;
@@ -598,6 +596,8 @@ end
 
 
 (** configuration of a directory/test. *)
+type cmd = { toplevel:string; opts:string; macros: Macros.t ; logs:string list ; timeout:string }
+
 type config =
   {
     dc_test_regexp: string; (** regexp of test files. *)
@@ -609,7 +609,7 @@ type config =
     (** full path of the default toplevel. *)
     dc_filter     : string option; (** optional filter to apply to
                                        standard output *)
-    dc_toplevels    : (string * string * string list * Macros.t * string) list;
+    dc_commands    : cmd list;
     (** toplevel full path, options to launch the toplevel on, and list
         of output files to monitor beyond stdout and stderr. *)
     dc_dont_run   : bool;
@@ -631,7 +631,7 @@ let default_config () =
     dc_execnow = [];
     dc_filter = None ;
     dc_default_toplevel = !toplevel_path;
-    dc_toplevels = [ !toplevel_path, default_options, [], Macros.empty, "" ];
+    dc_commands = [ { toplevel= !toplevel_path; opts=default_options; macros=Macros.empty; logs= []; timeout= ""} ];
     dc_dont_run = false;
     dc_framac = true;
     dc_default_log = [];
@@ -694,11 +694,24 @@ let scan_execnow ~once dir ex_timeout (s:string) =
       ex_timeout;
     }
 
-(* the default toplevel for the current level of options. *)
-let current_default_toplevel = ref !toplevel_path
-let current_default_log = ref []
-let current_default_cmds =
-  ref [!toplevel_path,default_options,[], Macros.empty, ""]
+type parsing_env = {
+  current_default_toplevel: string;
+  current_default_log: string list;
+  current_default_cmds: cmd list;
+}
+
+let default_parsing_env = ref {
+    current_default_toplevel = "" ;
+    current_default_log = [] ;
+    current_default_cmds = []
+  }
+
+let set_default_parsing_env config =
+  default_parsing_env := {
+    current_default_toplevel = config.dc_default_toplevel;
+    current_default_log = config.dc_default_log;
+    current_default_cmds = List.rev config.dc_commands;
+  }
 
 let make_custom_opts =
   let space = Str.regexp " " in
@@ -769,28 +782,28 @@ let config_options =
     "OPT",
     (fun _ s current ->
        let t =
-         current.dc_default_toplevel,
-         s,
-         current.dc_default_log,
-         current.dc_macros,
-         current.dc_timeout
+         {toplevel= current.dc_default_toplevel;
+          opts= s;
+          logs= current.dc_default_log;
+          macros= current.dc_macros;
+          timeout= current.dc_timeout}
        in
        { current with
          (*           dc_default_toplevel = !current_default_toplevel;*)
-         dc_default_log = !current_default_log;
-         dc_toplevels = t :: current.dc_toplevels });
+         dc_default_log = !default_parsing_env.current_default_log;
+         dc_commands = t :: current.dc_commands });
 
     "STDOPT",
     (fun _ s current ->
        let new_top =
          List.map
-           (fun (cmd,opts, log, macros,_) ->
-              cmd, make_custom_opts opts s, log @ current.dc_default_log,
-              current.dc_macros, current.dc_timeout)
-           !current_default_cmds
+           (fun {toplevel; opts; logs; macros; timeout=_} ->
+              { toplevel ; opts = make_custom_opts opts s; logs=logs @ current.dc_default_log;
+                macros=current.dc_macros;timeout= current.dc_timeout})
+           !default_parsing_env.current_default_cmds
        in
-       { current with dc_toplevels = new_top @ current.dc_toplevels;
-                      dc_default_log = !current_default_log });
+       { current with dc_commands = new_top @ current.dc_commands;
+                      dc_default_log = !default_parsing_env.current_default_log });
 
     "FILEREG",
     (fun _ s current -> { current with dc_test_regexp = s });
@@ -817,16 +830,12 @@ let config_options =
     "TIMEOUT",
     (fun _ s current -> { current with dc_timeout = s });
     "NOFRAMAC",
-    (fun _ _ current -> { current with dc_toplevels = []; dc_framac = false; });
+    (fun _ _ current -> { current with dc_commands = []; dc_framac = false; });
   ]
 
-let scan_options dir scan_buffer default =
-  let r =
-    ref { default with dc_toplevels = [] }
-  in
-  current_default_toplevel := default.dc_default_toplevel;
-  current_default_log := default.dc_default_log;
-  current_default_cmds := List.rev default.dc_toplevels;
+let scan_directives dir scan_buffer default =
+  set_default_parsing_env default;
+  let r = ref { default with dc_commands = [] } in
   let treat_line s =
     try
       Scanf.sscanf s "%[ *]%[A-Za-z0-9]: %s@\n"
@@ -850,9 +859,9 @@ let scan_options dir scan_buffer default =
     assert false
   with
     End_of_file ->
-    (match !r.dc_toplevels with
-     | [] when !r.dc_framac -> { !r with dc_toplevels = default.dc_toplevels }
-     | l -> { !r with dc_toplevels = List.rev l })
+    (match !r.dc_commands with
+     | [] when !r.dc_framac -> { !r with dc_commands = default.dc_commands }
+     | l -> { !r with dc_commands = List.rev l })
 
 let split_config = Str.regexp ",[ ]*"
 
@@ -882,14 +891,14 @@ let scan_test_file default dir f =
            let configs = Str.split split_config (String.trim names) in
            if List.exists is_current_config configs then
              (* Found options for current config! *)
-             scan_options dir scan_buffer default
+             scan_directives dir scan_buffer default
            else (* config name does not match: eat config and continue.
                    But only if the comment is still opened by the end of
                    the line and we are indeed reading a config
                 *)
              (if List.exists is_config configs &&
                  not (str_string_match end_comment names 0) then
-                ignore (scan_options dir scan_buffer default);
+                ignore (scan_directives dir scan_buffer default);
               scan_config ()))
     in
     try
@@ -1626,7 +1635,7 @@ let default_config () =
   if Sys.file_exists general_config_file
   then begin
     let scan_buffer = Scanf.Scanning.from_file general_config_file in
-    scan_options
+    scan_directives
       (SubDir.create ~with_subdir:false Filename.current_dir_name)
       scan_buffer
       (default_config ())
@@ -1690,7 +1699,7 @@ let () =
          if Sys.file_exists config
          then begin
            let scan_buffer = Scanf.Scanning.from_file config in
-           scan_options directory scan_buffer default
+           scan_directives directory scan_buffer default
          end
          else default
        in
@@ -1728,8 +1737,8 @@ let dispatcher () =
         scan_test_file config directory file in
       let i = ref 0 in
       let e = ref 0 in
-      let nb_files = List.length config.dc_toplevels in
-      let make_toplevel_cmd (toplevel, options, log_files, macros, timeout) =
+      let nb_files = List.length config.dc_commands in
+      let make_toplevel_cmd {toplevel; opts=options; logs=log_files; macros; timeout} =
         let n = !i in
         {file; options; toplevel; nb_files; directory; n; log_files;
          filter = config.dc_filter; macros;
@@ -1779,7 +1788,7 @@ let dispatcher () =
         (match config.dc_execnow with
          | hd :: tl ->
            let subworkqueue = Queue.create () in
-           List.iter (treat_option subworkqueue) config.dc_toplevels;
+           List.iter (treat_option subworkqueue) config.dc_commands;
            let target =
              List.fold_left
                (fun current_target execnow ->
@@ -1792,7 +1801,7 @@ let dispatcher () =
          | [] ->
            List.iter
              (treat_option shared.commands)
-             config.dc_toplevels);
+             config.dc_commands);
         Condition.broadcast shared.work_available;
       end;
       unlock () ;
