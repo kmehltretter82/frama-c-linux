@@ -1,6 +1,6 @@
 /* run.config
-   DEPS: ../../../share/libc/string.c
-   STDOPT: #"-cpp-extra-args=-include../../share/libc/string.c -eva-slevel-function strstr:30 -eva-no-skip-stdlib-specs"
+   COMMENT: dependency to FRAMA-C share directory is implicit
+   STDOPT: #"-cpp-extra-args=-include../../../../install/default/share/frama-c/share/libc/string.c -eva-slevel-function strstr:30 -eva-no-skip-stdlib-specs"
  */
 /* This file has been adapted from libc-test, which is licensed under the
    following standard MIT license:
