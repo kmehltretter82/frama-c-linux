@@ -1,2 +1,8 @@
 (lang dune 2.7)
-(package (name frama-c-ptests))
+(allow_approximate_merlin)
+(package
+  (name frama-c-ptests)
+  (depends
+    (ppx_deriving_yojson (>= 3.5.1))
+  )
+)

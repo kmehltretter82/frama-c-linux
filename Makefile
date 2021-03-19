@@ -173,17 +173,26 @@ TEST_DIRS=tests $(wildcard src/plugins/*/tests)
 tests.info:
 	echo "TEST_DIRS=$(TEST_DIRS)"
 
-# Note: the plublic name of ptest.exe is frama-c-ptest
+# Note: the public name of ptest.exe is frama-c-ptests
 ptests/ptests.exe: ptests/ptests.ml
 	dune build --root ptests ptests.exe
 
-# Command for executing ptest (in order to generate dune test files)
-PTESTS=dune exec --root ptests -- ./ptests.exe
-PTESTS=dune exec --root ptests -- ./ptests.exe -v
+# Note: the public name of wtest.exe is frama-c-wtests
+ptests/wtests.exe: ptests/wtests.ml
+	dune build --root ptests wtests.exe
 
+# Command for executing ptest (in order to generate dune test files)
+PTESTS=dune exec --root ptests -- frama-c-ptests
+#PTESTS=dune exec --root ptests -- frama-c-ptests -v
+
+WTESTS=dune exec --root ptests -- frama-c-wtests
 .PHONY: ptests-help
-ptests-help: ptests/ptests.exe
+ptests-help:
 	$(PTESTS) --help
+
+.PHONY: wtests-help
+wtests-help:
+	$(WTESTS) --help
 
 # Removes all dune files generated for testing
 .PHONY: purge-tests
@@ -197,7 +206,7 @@ clean-tests: purge-tests
 
 # Generates all dune files used for testing
 .PHONY: run-ptests
-run-ptests: config.sed purge-tests ptests/ptests.exe
+run-ptests: config.sed purge-tests
 	$(PTESTS) $(TEST_DIRS)
 
 # run tests of for all configurations (requires all dune files)

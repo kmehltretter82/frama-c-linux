@@ -27,6 +27,9 @@ let nb_dune_files = ref 0
 let nb_ignores = ref 0
 let ignored_suites = ref []
 
+(* Set to an empty string to use no wrapper *)
+let wrapper_cmd = ref "frama-c-wtests -brief"
+
 type env_t = {
   config: string
 ; dir: string
@@ -187,6 +190,9 @@ let example_msg =
      @@<alias-name>                         # Tests all configurations related to the <alias-name>@  \
      @@<alias-name>_config                  # Tests only the default configuration.@  \
      @@<alias-name>_config_<configuration>  # Tests only the specified <configuration>.@  \
+     @@<PTEST_NAME>.wtests                  # Tests the specified file.@  \
+     @@<PTEST_NAME>.<PTEST_NUMBER>.exec.wtests     # Tests the specified sub-test comand.@  \
+     @@<PTEST_NAME>.<PTEST_NUMBER>.execnow.wtests  # Tests the specified execnow command.@  \
      @@<PTEST_FILE>                         # Force to reproduce the corresponding test and prints the outputs.@  \
      @@<PTEST_NAME>.<PTEST_NUMBER>.exec.show     # Prints the related sub-test command.@  \
      @@<PTEST_NAME>.<PTEST_NUMBER>.execnow.show  # Prints the related execnow command.@  \
@@ -206,13 +212,16 @@ let example_msg =
     test_file_regexp
     !default_toplevel
 
-let umsg = "Usage: ptests [options] [names of test suites]"
+let umsg = "Usage: frama-c-ptests [options] [names of test suites]"
 
 let default_dune_alias = ref "ptests"
 let rec argspec =
   [
     ("-v", Arg.Unit (fun () -> incr verbosity),
      "Increase verbosity (up to  twice)") ;
+
+    ("-wrapper" , Arg.String (fun s -> wrapper_cmd := s),
+     " <command> Uses a wrapper to executes tests (defaults to "^ !wrapper_cmd ^")");
 
     ("-adds-default-options" , Arg.String (fun s -> macro_default_options := !macro_default_options ^ " " ^ s),
      " <options> Appends the <options> to the default value of the @DEFAULT_OPTIONS@ macro");
@@ -289,7 +298,7 @@ end = struct
                   exit 2)
             | "IGNORE" -> incr nb_ignores;
               ignored_suites := (ptests_config ^ ":" ^ value)::!ignored_suites;
-              Format.eprintf "%s: %s=%s@." ptests_config key value
+              if !verbosity >=2 then Format.eprintf "%s: %s=%s@." ptests_config key value
             | _ ->  Format.eprintf "%s: setenv (DEPRECATED): %s=%s@." ptests_config key value;
       in
       if Sys.file_exists ptests_config then begin
@@ -451,10 +460,6 @@ type execnow =
     ex_dir: SubDir.t;    (** directory of test suite *)
     ex_timeout: string;
 
-    (* DEPRECATED FEATURE *)
-    ex_once: bool;       (** true iff the command has to be executed only once
-                             per config file (otherwise it is executed for
-                             every file of the test suite) *)
   }
 
 
@@ -553,8 +558,8 @@ end = struct
 
   let scan_execnow ~file ~once dir ex_timeout (s:string) =
     if once=false then
-      Format.eprintf "%a: using EXEC directive (DEPRECATED): %s@."
-        (SubDir.pp_file ~dir) file s;
+      Format.eprintf "%s: using EXEC directive (DEPRECATED): %s@."
+        file s;
     let rec aux (s:execnow) =
       try
         Scanf.sscanf s.ex_cmd "%_[ ]LOG%_[ ]%[-A-Za-z0-9_',+=:.\\@@]%_[ ]%s@\n"
@@ -570,8 +575,8 @@ end = struct
         Scanf.sscanf s.ex_cmd "%_[ ]make%_[ ]%s@\n"
           (fun cmd ->
              (* It should be better to use a specific macro into the command (such as @MAKE@) for that. *)
-             Format.eprintf "%a: EXEC%s directive with a make command (DEPRECATED): %s@."
-               (SubDir.pp_file ~dir) file (if once then "NOW" else "") cmd;
+             Format.eprintf "%s: EXEC%s directive with a make command (DEPRECATED): %s@."
+               file (if once then "NOW" else "") cmd;
              let s = aux ({ s with ex_cmd = cmd; }) in
              { s with ex_cmd = "make "^cmd; } )
       with Scanf.Scan_failure _ ->
@@ -582,13 +587,12 @@ end = struct
           ex_log = [];
           ex_bin = [];
           ex_dir = dir;
-          ex_once = once;
           ex_timeout;
         }
     in
     if execnow.ex_log = [] && execnow.ex_bin = [] then
-      Format.eprintf "%a: EXEC%s without LOG nor BIN target (DEPRECATED): %s@."
-        (SubDir.pp_file ~dir) file (if once then "NOW" else "") s;
+      Format.eprintf "%s: EXEC%s without LOG nor BIN target (DEPRECATED): %s@."
+        file (if once then "NOW" else "") s;
     execnow
 
   let make_custom_opts =
@@ -994,18 +998,63 @@ end
 let show_cmd =
   let regexp = Str.regexp "%{[a-z]+:\\([^}]+\\)}" in
   let subst = Str.global_replace regexp "\\1" in
-  fun ?reslog ?errlog cmd ->
+  subst
+
+let redirection ?reslog ?errlog cmd =
     match reslog, errlog with
-    | None, None         -> Format.sprintf "echo '%s'" (subst cmd)
-    | None, Some err     -> Format.sprintf "echo '%s 2> %s'" (subst cmd) err
-    | Some res, None     -> Format.sprintf "echo '%s > %s'" (subst cmd) res
-    | Some res, Some err -> Format.sprintf "echo '%s > %s 2> %s'" (subst cmd) res err
+    | None, None         -> cmd
+    | None, Some err     -> Format.sprintf "%s 2> %s" cmd err
+    | Some res, None     -> Format.sprintf "%s > %s" cmd res
+    | Some res, Some err -> Format.sprintf "%s > %s 2> %s" cmd res err
 
 let ptests_alias ~env = config_name ~env (env.dune_alias ^ "_config")
 
 let filter_log_regexp = Str.regexp "@PTEST_LOG@"
 
 let mk_alias cmd suffix = Format.sprintf "%s.%d.%s" cmd.test_name cmd.nth suffix
+
+type wtest = {
+  dir: (string [@default ""]); (* information on the test directory *)
+  info: (string [@default ""]); (* information *)
+  cmd: (string [@default "echo unknown command"]);
+  ret_code: (int [@default 0]);
+  out: (string [@default "" (* bin target built by the command *) ]); (* sdtout target *)
+  err: (string [@default "" (* bin target built by the command *) ]); (* stderr target *)
+  tmpout: (string [@default ""]); (* temporary file to filter stdout result *)
+  tmperr: (string [@default ""]); (* temporary file to filter stderr result *)
+  sedout: (string [@default ""]); (* filter command for the stdout result *)
+  sederr: (string [@default ""]); (* filter command for the stderr result *)
+  bin: (string list [@default []]); (* binary targets (without oracles) *)
+  log: (string list [@default []]); (* log targets (compared to log oracles *)
+  oracle_dir: (string [@default "../oracle"]); (* directory containing the oracle of the log files *)
+  oracle_out: (string [@default "" ]); (* oracle of the stdout target *)
+  oracle_err: (string [@default "" ]); (* oracle of the stderr target *)
+}
+[@@deriving yojson]
+
+let std = false
+let pp_wtest ?(compacted=false) fmt wtest =
+  let writer = (if compacted
+        then (fun json -> Format.fprintf fmt "%s" (Yojson.Safe.to_string ~std json))
+        else (fun json -> Format.fprintf fmt "%a" (Yojson.Safe.pretty_print ~std) json))
+  in writer (wtest_to_yojson wtest)
+
+let default_wtest = match wtest_of_yojson (Yojson.Safe.from_string "{}") with
+  | Ok r -> r
+  | _ -> assert false
+
+let print_json_wrapper ~file wtest =
+  (* Prints the JSON file for the wrapper *)
+  if !verbosity >= 2 then Format.printf "%% Generates %S wrapper file...@." file;
+  let wrapper_cout = open_out file in
+  let wrapper_fmt = Format.formatter_of_out_channel wrapper_cout  in
+  Format.fprintf wrapper_fmt "%a@" (pp_wtest ~compacted:false) wtest;
+  close_out wrapper_cout
+
+let oracle_target oracle_fmt s =
+  Format.fprintf oracle_fmt
+      "(rule (target %S) (mode fallback) (action (write-file %S \"\")))\n" s s
+
 let command_string ~env ~result_fmt ~oracle_fmt command =
   let log_prefix = log_prefix ~env command in
   let reslog = log_prefix ^ ".res.log" in
@@ -1017,42 +1066,128 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
   let deps = command.deps in
   let accepted_exit_code = Format.sprintf "with-accepted-exit-codes %d" command.exit_code in
   let command_string = basic_command_string command in
-  Format.fprintf result_fmt
-    "(rule ; TEST #%d OF TEST FILE %S\n  \
-     (targets %S %S %a)\n  \
-     (deps   %a %S (package frama-c)%a)\n  \
-     (action (with-stderr-to %S (with-stdout-to %S (%s (system %S)))))\n\
-     )@."
-    command.nth command.file
-    cmderrlog
-    cmdreslog
-    print_list command.log_files
-    print_list deps
-    command.file
-    Fmt.(list (package_as_deps (quote plugin_as_package))) command.plugins
-    cmderrlog
-    cmdreslog
-    accepted_exit_code
-    command_string
-  ;
-  begin
+  let filter_res,filter_err,wtest =
     match command.filter with
-    | None -> ()
+    | None -> "","",default_wtest
     | Some filter ->
       let regexp = Str.regexp "@PTEST_ORACLE@" in
-      let filter_rule txt fin fout foracle =
+      let filter_cmd fin foracle =
         let filter = Str.global_replace regexp foracle filter in
-         Format.fprintf result_fmt
-          "(rule ; FILTER %s #%d OF TEST FILE %S\n  \
-            (action (with-stdout-to %S (with-accepted-exit-codes (or 0 1 2 125) (system %S))))\n\
-           )@."
-          txt
-          command.nth command.file
-          fout (Format.sprintf "%s %%{dep:%s}" filter fin)
+        Format.sprintf "%s %s" filter fin
       in
-      filter_rule "RES" cmdreslog reslog (log_prefix ^ ".res.oracle") ;
-      filter_rule "ERR" cmderrlog errlog (log_prefix ^ ".err.oracle")
-  end ;
+      let filter_res = filter_cmd cmdreslog (log_prefix ^ ".res.oracle") in
+      let filter_err = filter_cmd cmderrlog (log_prefix ^ ".err.oracle") in
+      filter_res,filter_err, { default_wtest with
+                               sedout = redirection ~reslog filter_res ;
+                               sederr = redirection ~reslog:errlog filter_err ;
+                               tmpout = cmdreslog ;
+                               tmperr = cmderrlog ;
+                             }
+  in
+  let oracle_prefix = oracle_prefix ~env command in
+  let wtest =
+    { wtest with
+      dir = SubDir.get (SubDir.result_subdir ~env command.directory) ;
+      info = Format.sprintf "TEST #%d OF TEST FILE %s/%s"
+          command.nth (SubDir.get command.directory) command.file;
+      cmd = redirection ~reslog:cmdreslog ~errlog:cmderrlog command_string ;
+      out = reslog;
+      err = errlog;
+      ret_code = command.exit_code;
+      log = command.log_files;
+      oracle_out = Filename.concat ".." (oracle_prefix ^ ".res.oracle");
+      oracle_err = Filename.concat ".." (oracle_prefix ^ ".err.oracle");
+    }
+  in
+  let wtest = if wtest.log = [] then wtest else
+    { wtest with
+      oracle_dir = SubDir.get (SubDir.oracle_subdir ~env SubDir.upper_dir)
+    }
+  in
+  let wrapper_basename =  mk_alias command "exec.wtests" in
+  if !wrapper_cmd <> "" then begin
+    Format.fprintf result_fmt
+      "(rule ; %s\n  \
+       (alias %S)\n  \
+       (targets %S %S %a)\n  \
+       (deps %S %S %a %a %S (package frama-c)%a)\n  \
+       (action (run %s %%{dep:%s} %S %a))\n\
+       )@."
+      (* rules: *)
+      wtest.info
+      (* alias *)
+      wrapper_basename
+      (* targets: *)
+      cmderrlog
+      cmdreslog
+      print_list command.log_files
+      (* deps: *)
+      wtest.oracle_out
+      wtest.oracle_err
+      print_list (List.map (Filename.concat wtest.oracle_dir) command.log_files)
+      print_list deps
+      command.file
+      Fmt.(list (package_as_deps (quote plugin_as_package))) command.plugins
+      (* action: *)
+      !wrapper_cmd
+      wrapper_basename
+      wtest.cmd
+      print_list (if command.filter = None then [] else [wtest.sedout ; wtest.sederr]);
+
+    let wtest =
+      { wtest with
+        cmd = show_cmd wtest.cmd ;
+        sedout = show_cmd wtest.sedout ;
+        sederr = show_cmd wtest.sederr
+      }
+    in
+    (* Prints the JSON file for the wrapper *)
+    print_json_wrapper wtest
+      ~file:(SubDir.make_file (SubDir.result_subdir ~env command.directory) wrapper_basename);
+  end
+  else begin
+    Format.fprintf result_fmt
+      "(rule ; %s\n  \
+       (alias %S)\n  \
+       (targets %S %S %a)\n  \
+       (deps   %a %S (package frama-c)%a)\n  \
+       (action (with-stderr-to %S (with-stdout-to %S (%s (system %S)))))\n\
+       )@."
+      (* rules: *)
+      wtest.info
+      (* alias *)
+      wrapper_basename
+      (* targets: *)
+      cmderrlog
+      cmdreslog
+      print_list command.log_files
+      (* deps: *)
+      print_list deps
+      command.file
+      Fmt.(list (package_as_deps (quote plugin_as_package))) command.plugins
+      (* action: *)
+      cmderrlog
+      cmdreslog
+      accepted_exit_code
+      command_string
+  end;
+  let filter_rule txt fin fout cmd =
+    if cmd <> "" then
+      Format.fprintf result_fmt
+        "(rule ; FILTER %s #%d OF TEST FILE %S\n  \
+         (deps %S)
+         (action (with-stdout-to %S (with-accepted-exit-codes (or 0 1 2 125) (system %S))))\n\
+         )@."
+        txt
+        command.nth
+        command.file
+        (* deps *)
+        fin
+        (*action *)
+        fout cmd
+  in
+  filter_rule "RES" cmdreslog reslog filter_res ;
+  filter_rule "ERR" cmderrlog errlog filter_err ;
   List.iteri (fun n log ->
       Format.fprintf result_fmt
         "(rule ; COMPARE TARGET #%d OF TEST #%d FOR TEST FILE %S\n  \
@@ -1089,9 +1224,8 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     print_list deps
     command.file
     Fmt.(list (package_as_deps (quote plugin_as_package))) command.plugins
-    (show_cmd ~reslog ~errlog command_string);
+    ("echo '" ^ show_cmd wtest.cmd ^"'");
 
-  let oracle_prefix = oracle_prefix ~env command in
   let diff_alias = log_prefix ^ ".diff" in
   (* diff with oracles *)
   Format.fprintf result_fmt
@@ -1100,7 +1234,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
      (action (diff %S %S))\n\
      )@."
     diff_alias
-    (Filename.concat ".." (oracle_prefix ^ ".res.oracle"))
+    wtest.oracle_out
     reslog;
   Format.fprintf result_fmt
     "(rule\n  \
@@ -1108,7 +1242,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
      (action (diff %S %S))\n\
      )@."
     diff_alias
-    (Filename.concat ".." (oracle_prefix ^ ".err.oracle"))
+    wtest.oracle_err
     errlog;
   Format.fprintf result_fmt
     "(alias (deps (alias %S)) (name %S); (enabled_if (and true %a))\n\
@@ -1117,14 +1251,9 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     (ptests_alias ~env)
     Fmt.(list (var_libavailable plugin_as_package )) command.plugins
   ;
-  Format.fprintf oracle_fmt
-    "(rule (target %S) (mode fallback) (action (write-file %S \"\")))\n"
-    (Filename.basename (oracle_prefix ^ ".err.oracle"))
-    (Filename.basename (oracle_prefix ^ ".err.oracle"));
-  Format.fprintf oracle_fmt
-    "(rule (target %S) (mode fallback) (action (write-file %S \"\")))\n"
-    (Filename.basename (oracle_prefix ^ ".res.oracle"))
-    (Filename.basename (oracle_prefix ^ ".res.oracle"));
+  oracle_target oracle_fmt (Filename.basename (oracle_prefix ^ ".err.oracle"));
+  oracle_target oracle_fmt (Filename.basename (oracle_prefix ^ ".res.oracle"));
+  List.iter (oracle_target oracle_fmt) command.log_files ;
   ()
 
 (** process a test file *)
@@ -1178,40 +1307,73 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config =
            load_module = config.dc_libs @ config.dc_load_module;
          }
        in
-       let res =
-         { execnow with
-           ex_cmd = basic_command_string cmd;
-           ex_log = List.map (Macros.expand cmd.macros) execnow.ex_log;
-           ex_bin = List.map (Macros.expand cmd.macros) execnow.ex_bin;
-         }
+       let wtest = {
+         default_wtest with
+         dir = SubDir.get (SubDir.result_subdir ~env cmd.directory) ;
+         info = Format.sprintf "EXECNOW #%d OF TEST FILE %s/%s"
+             nth (SubDir.get directory) file;
+         cmd = basic_command_string cmd;
+         log = List.map (Macros.expand cmd.macros) execnow.ex_log;
+         bin = List.map (Macros.expand cmd.macros) execnow.ex_bin;
+       }
        in
-       Format.fprintf result_fmt
-         "(rule ; EXECNOW #%d OF TEST FILE %S\n  \
-          (alias %s)\n  \
-          (deps %a (package frama-c)%a)\n  \
-          (targets %a %a)\n  \
-          (action (system %S))\n\
-          )@."
-         nth file
-         (ptests_alias ~env)
-         print_list config.dc_deps
-         Fmt.(list (package_as_deps (quote plugin_as_package))) config.dc_plugins
-         print_list res.ex_log
-         print_list res.ex_bin
-         res.ex_cmd
-       ;
-       Format.fprintf result_fmt
-         "(rule ; REPRODUCE EXECNOW #%d OF TEST FILE %S\n  \
-          (alias %s)\n  \
-          (deps %a (package frama-c)%a (universe))\n  \
-          (action (system %S))\n\
-          )@."
-         nth file
-         (mk_alias cmd "execnow")
-         print_list config.dc_deps
-         Fmt.(list (package_as_deps (quote plugin_as_package))) config.dc_plugins
-         res.ex_cmd
-       ;
+       let wrapper_basename =  mk_alias cmd "execnow.wtests" in
+       if !wrapper_cmd <> "" then begin
+         Format.fprintf result_fmt
+           "(rule ; %s\n  \
+            (alias %s)\n  \
+            (deps %a %a %a (package frama-c)%a)\n  \
+            (targets %a %a)\n  \
+            (action (run %s %%{dep:%s} %S))\n\
+            )@."
+           (* rules: *)
+           wtest.info
+           (* alias *)
+           wrapper_basename
+           (* deps: *)
+           print_list (List.map (Filename.concat wtest.oracle_dir) wtest.log)
+           print_list (List.map (Filename.concat wtest.oracle_dir) wtest.bin)
+           print_list config.dc_deps
+           Fmt.(list (package_as_deps (quote plugin_as_package))) config.dc_plugins
+           (* targets: *)
+           print_list wtest.log
+           print_list wtest.bin
+           (* action: *)
+           !wrapper_cmd
+           wrapper_basename
+           wtest.cmd;
+         let wtest =
+           { wtest with
+             cmd = show_cmd wtest.cmd ;
+           }
+         in
+         (* Prints the JSON file for the wrapper *)
+         print_json_wrapper wtest
+           ~file:(SubDir.make_file (SubDir.result_subdir ~env cmd.directory) wrapper_basename);
+       end
+       else begin
+         Format.fprintf result_fmt
+           "(rule ; %s\n  \
+            (alias %s)\n  \
+            (deps %a (package frama-c)%a)\n  \
+            (targets %a %a)\n  \
+            (action (system %S))\n\
+            )@."
+           (* rules: *)
+           wtest.info
+           (* alias *)
+           wrapper_basename
+           (* deps: *)
+           print_list config.dc_deps
+           Fmt.(list (package_as_deps (quote plugin_as_package))) config.dc_plugins
+           (* targets: *)
+           print_list wtest.log
+           print_list wtest.bin
+           (* action: *)
+           wtest.cmd
+       end;
+       List.iter (oracle_target oracle_fmt) wtest.log ;
+       List.iter (oracle_target oracle_fmt) wtest.bin ;
        Format.fprintf result_fmt
          "(rule ; SHOW EXECNOW COMMAND #%d OF TEST FILE %S\n  \
           (alias %s)\n  \
@@ -1222,7 +1384,7 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config =
          (mk_alias cmd "execnow.show")
          print_list config.dc_deps
          Fmt.(list (package_as_deps (quote plugin_as_package))) config.dc_plugins
-         (show_cmd res.ex_cmd)
+         ("echo '" ^ show_cmd wtest.cmd ^"'");
        ;
        List.iteri (fun n log ->
            Format.fprintf result_fmt
@@ -1234,7 +1396,7 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config =
              (ptests_alias ~env)
              (SubDir.make_file (SubDir.oracle_subdir ~env SubDir.upper_dir) log)
              log
-         ) res.ex_log
+         ) wtest.log
     in
     List.iteri (fun n cmxs ->
         let libraries = String.concat " " config.dc_libs in
@@ -1255,10 +1417,18 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config =
     if config.dc_commands <> [] || config.dc_execnow <> [] then begin
       let print_list_alias fmt l = List.iter (Format.fprintf fmt "(alias %S)") l in
       Format.fprintf result_fmt
-          "(alias (deps%a%a) (name %S))@."
-          print_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.exec" test_name i) config.dc_commands)
-          print_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.execnow" test_name i) config.dc_execnow)
+          "; TEST FILE %S\n\
+           (alias (deps %a%a) (name %S)) ; to performs all sub-tests related to a file\n\
+           (alias (deps %a%a) (name %S)) ; to reproduce and visualize the all sub-test outputs related to a file@."
           file
+          (* alias #1 *)
+          print_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.exec.wtests" test_name i) config.dc_commands)
+          print_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.execnow.wtests" test_name i) config.dc_execnow)
+          (Format.sprintf "%s.wtests" test_name)
+          (* alias #2 *)
+          print_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.exec" test_name i) config.dc_commands)
+          print_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.execnow.wtests" test_name i) config.dc_execnow)
+          file;
     end ;
     List.iter make_cmd config.dc_commands;
     List.iter make_execnow_cmd config.dc_execnow;

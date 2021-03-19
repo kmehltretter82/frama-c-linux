@@ -3,4 +3,13 @@
  (name ptests)
  (modules ptests)
  (libraries unix str)
+ (preprocess (pps ppx_deriving_yojson))
+)
+
+(executable
+ (public_name frama-c-wtests)
+ (name wtests)
+ (modules wtests)
+ (libraries unix str)
+ (preprocess (pps ppx_deriving_yojson))
 )
