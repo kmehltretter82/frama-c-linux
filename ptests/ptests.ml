@@ -596,7 +596,14 @@ end
 
 
 (** configuration of a directory/test. *)
-type cmd = { toplevel:string; opts:string; macros: Macros.t ; logs:string list ; timeout:string }
+type cmd = {
+  toplevel: string;
+  opts: string;
+  macros: Macros.t;
+  exit_code: string option;
+  logs:string list;
+  timeout:string
+}
 
 type config =
   {
@@ -609,7 +616,8 @@ type config =
     (** full path of the default toplevel. *)
     dc_filter     : string option; (** optional filter to apply to
                                        standard output *)
-    dc_commands    : cmd list;
+    dc_exit_code  : string option; (** required exit code *)
+    dc_commands   : cmd list;
     (** toplevel full path, options to launch the toplevel on, and list
         of output files to monitor beyond stdout and stderr. *)
     dc_dont_run   : bool;
@@ -630,8 +638,9 @@ let default_config () =
     dc_macros = default_macros ();
     dc_execnow = [];
     dc_filter = None ;
+    dc_exit_code = None;
     dc_default_toplevel = !toplevel_path;
-    dc_commands = [ { toplevel= !toplevel_path; opts=default_options; macros=Macros.empty; logs= []; timeout= ""} ];
+    dc_commands = [ { toplevel= !toplevel_path; opts=default_options; macros=Macros.empty; exit_code=None; logs= []; timeout= ""} ];
     dc_dont_run = false;
     dc_framac = true;
     dc_default_log = [];
@@ -785,11 +794,11 @@ let config_options =
          {toplevel= current.dc_default_toplevel;
           opts= s;
           logs= current.dc_default_log;
+          exit_code= current.dc_exit_code;
           macros= current.dc_macros;
           timeout= current.dc_timeout}
        in
        { current with
-         (*           dc_default_toplevel = !current_default_toplevel;*)
          dc_default_log = !default_parsing_env.current_default_log;
          dc_commands = t :: current.dc_commands });
 
@@ -801,6 +810,7 @@ let config_options =
               { command with opts= make_custom_opts command.opts s;
                              logs= command.logs @ current.dc_default_log;
                              macros = current.dc_macros;
+                             exit_code = current.dc_exit_code;
                              timeout= current.dc_timeout
               })
            !default_parsing_env.current_default_cmds
@@ -813,6 +823,9 @@ let config_options =
 
     "FILTER",
     (fun _ s current -> { current with dc_filter = Some s });
+
+    "EXIT",
+    (fun _ s current -> { current with dc_exit_code = Some s });
 
     "GCC",
     (fun _ _ acc -> acc);
@@ -923,6 +936,7 @@ type toplevel_command =
     options : string ;
     toplevel: string ;
     filter : string option ;
+    exit_code : int ;
     directory : SubDir.t ;
     n : int;
     execnow:bool;
@@ -941,7 +955,7 @@ type diff =
   | Log_error of SubDir.t (** directory *) * string (** file *)
 
 type cmps =
-  | Cmp_Toplevel of toplevel_command
+  | Cmp_Toplevel of toplevel_command * bool (** returns with the required exit_code *)
   | Cmp_Log of SubDir.t (** directory *) * string (** file *)
 
 type shared =
@@ -959,6 +973,7 @@ type shared =
     mutable commands_finished : bool ;
     mutable cmp_finished : bool ;
     mutable summary_time : float ;
+    mutable summary_ret : int ; (* number of run with the required exit code *)
     mutable summary_run : int ;
     mutable summary_ok : int ;
     mutable summary_log : int;
@@ -978,6 +993,7 @@ let shared =
     cmp_finished = false ;
     summary_time = (Unix.times()).Unix.tms_cutime ;
     summary_run = 0 ;
+    summary_ret = 0 ;
     summary_ok = 0 ;
     summary_log = 0 }
 
@@ -1167,7 +1183,7 @@ let command_string command =
   let command_string = match filter with
     | None -> command_string
     | Some filter ->
-      Printf.sprintf "%s && %s < %s >%s && rm -f %s"
+      Printf.sprintf "%s && %s < %s >%s && rm -f %s" (* exit code ? *)
         command_string
         filter
         (Filename.sanitize stderr)
@@ -1243,34 +1259,38 @@ end
 module Report_run=Make_Report(struct type t=int*float
 (* At some point will contain the running time*)
   end)
+let report_run cmd r = Report_run.record cmd r
 
-let report_run cmp r = Report_run.record cmp r
-module Report_cmp=Make_Report(struct type t=int*int end)
+type cmp = { res : int; err:int ; ret:bool }
+module Report_cmp=Make_Report(struct type t=cmp end)
 let report_cmp = Report_cmp.record
+
 let pretty_report fmt =
   Report_run.iter
-    (fun test (_run_result,time_result) ->
+    (fun test (run_result,time_result) ->
        Format.fprintf fmt
          "<testcase classname=%S name=%S time=\"%f\">%s</testcase>@."
          (Filename.basename (SubDir.get test.directory)) test.file time_result
-         (let res,err = Report_cmp.find test in
+         (let {res;err;ret} = Report_cmp.find test in
           Report_cmp.remove test;
-          (if res=0 && err=0 then "" else
+          (if res=0 && err=0 && ret then "" else
              Format.sprintf "<failure type=\"Regression\">%s</failure>"
-               (if res=1 then "Stdout oracle difference"
+               (if not ret then Format.sprintf "Unexpected return code (returns %d instead of %d)" run_result test.exit_code
+                else if res=1 then "Stdout oracle difference"
                 else if res=2 then "Stdout System Error (missing oracle?)"
                 else if err=1 then "Stderr oracle difference"
                 else if err=2 then "Stderr System Error (missing oracle?)"
                 else "Unexpected errror"))));
   (* Test that were compared but not runned *)
   Report_cmp.iter
-    (fun test (res,err) ->
+    (fun test {res;err;ret} ->
        Format.fprintf fmt
          "<testcase classname=%S name=%S>%s</testcase>@."
          (Filename.basename (SubDir.get test.directory)) test.file
-         (if res=0 && err=0 then "" else
+         (if res=0 && err=0 && ret  then "" else
             Format.sprintf "<failure type=\"Regression\">%s</failure>"
-              (if res=1 then "Stdout oracle difference"
+              (if not ret then "Unexpected return code"
+               else if res=1 then "Stdout oracle difference"
                else if res=2 then "Stdout System Error (missing oracle?)"
                else if err=1 then "Stderr oracle difference"
                else if err=2 then "Stderr System Error (missing oracle?)"
@@ -1281,8 +1301,9 @@ let xunit_report () =
     let fmt = Format.formatter_of_out_channel out in
     Format.fprintf fmt
       "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\
-       @\n<testsuite errors=\"0\" failures=\"%d\" name=\"%s\" tests=\"%d\" time=\"%f\" timestamp=\"%f\">\
+       @\n<testsuite errors=\"%d\" failures=\"%d\" name=\"%s\" tests=\"%d\" time=\"%f\" timestamp=\"%f\">\
        @\n%t</testsuite>@."
+      (shared.summary_run-shared.summary_ret)
       (shared.summary_log-shared.summary_ok)
       "Frama-C"
       shared.summary_log
@@ -1315,18 +1336,29 @@ let do_command command =
         (* command string also replaces macros in logfiles names, which
            is useful for Examine as well. *)
         let command_string = command_string command in
-        if !behavior <> Examine
-        then begin
-          if !verbosity >= 1
-          then lock_printf "%% launch %s@." command_string ;
-          let launch_result = launch command_string in
-          let time = 0. (* Individual time is difficult to compute correctly
-                           for now, and currently unused *) in
-          report_run command (launch_result, time)
-        end;
+        let summary_ret =
+          if !behavior <> Examine
+          then begin
+            if !verbosity >= 1
+            then lock_printf "%% launch %s@." command_string ;
+            let launch_result = launch command_string in
+            let time = 0. (* Individual time is difficult to compute correctly
+                             for now, and currently unused *) in
+            report_run command (launch_result, time) ;
+            let summary_ret = (launch_result = command.exit_code)
+                              || (command.filter <> None) (* cannot checks exit code *)
+            in
+            if not summary_ret then
+              lock_printf "%% Unexpected code (returns %d instead of %d) for command: %s@." launch_result command.exit_code command_string ;
+            summary_ret
+          end
+          else false
+        in
         lock ();
+        if summary_ret then
+          shared.summary_ret <- succ shared.summary_ret;
         shared.summary_run <- succ shared.summary_run ;
-        Queue.push (Cmp_Toplevel command) shared.cmps;
+        Queue.push (Cmp_Toplevel (command,summary_ret)) shared.cmps;
         List.iter
           (fun f -> Queue.push (Cmp_Log (command.directory, f)) shared.cmps)
           command.log_files;
@@ -1354,11 +1386,13 @@ let do_command command =
       else begin
         let rec treat_cmd = function
             Toplevel cmd ->
-            shared.summary_run <- shared.summary_run + 1;
+            shared.summary_run <- succ shared.summary_run;
+            shared.summary_ret <- succ shared.summary_ret;
             let log_prefix = log_prefix cmd in
             unlink (log_prefix ^ ".res.log ")
           | Target (execnow,cmds) ->
             shared.summary_run <- succ shared.summary_run;
+            shared.summary_ret <- succ shared.summary_ret;
             remove_execnow_results execnow;
             Queue.iter treat_cmd cmds
         in
@@ -1391,6 +1425,7 @@ let do_command command =
             lock_printf "%% launch %s@." cmd;
           end;
           shared.summary_run <- succ shared.summary_run;
+          shared.summary_ret <- succ shared.summary_ret;
           let r = launch cmd in
           (* mark as already executed. For EXECNOW in test_config files,
              other instances (for example another test of the same
@@ -1490,12 +1525,15 @@ let compare_one_log_file dir file =
               ~cmp_string ~log_file ~oracle_file)
 
 let do_cmp = function
-  | Cmp_Toplevel cmp ->
-    let log_prefix = log_prefix cmp in
-    let oracle_prefix = oracle_prefix cmp in
-    let res = compare_one_file cmp log_prefix oracle_prefix Res in
-    let err = compare_one_file cmp log_prefix oracle_prefix Err in
-    report_cmp cmp (res,err)
+  | Cmp_Toplevel (cmd,ret) ->
+    let log_prefix = log_prefix cmd in
+    let oracle_prefix = oracle_prefix cmd in
+    let cmp = { res = compare_one_file cmd log_prefix oracle_prefix Res;
+                err = compare_one_file cmd log_prefix oracle_prefix Err;
+                ret
+              }
+    in
+    report_cmp cmd cmp
   | Cmp_Log(dir, f) ->
     ignore (compare_one_log_file dir f)
 
@@ -1741,10 +1779,17 @@ let dispatcher () =
       let i = ref 0 in
       let e = ref 0 in
       let nb_files = List.length config.dc_commands in
-      let make_toplevel_cmd {toplevel; opts=options; logs=log_files; macros; timeout} =
+      let make_toplevel_cmd {toplevel; opts=options; logs=log_files; macros; exit_code; timeout} =
         let n = !i in
         {file; options; toplevel; nb_files; directory; n; log_files;
          filter = config.dc_filter; macros;
+         exit_code = begin
+           match exit_code with
+           | None -> 0
+           | Some exit_code ->
+             try int_of_string exit_code with
+             | _ -> Format.eprintf "@[%s: integer required for directive EXIT: %s (defaults to 0)@]@." file exit_code ; 0
+         end;
          execnow=false; timeout;
         }
       in
@@ -1755,6 +1800,7 @@ let dispatcher () =
           log_files = [];
           options = "";
           toplevel = s;
+          exit_code = 0;
           n = !e;
           directory = directory;
           filter = config.dc_filter;
@@ -1848,12 +1894,12 @@ let () =
   Thread.join diff_id;
   if !behavior = Run
   then
-    lock_printf "%% Diffs finished. Summary:@\nRun = %d@\nOk   = %d of %d@\nTime = %f s.@."
-      shared.summary_run shared.summary_ok shared.summary_log
+    lock_printf "%% Diffs finished. Summary:@\nRun  = %d of %d@\nOk   = %d of %d@\nTime = %f s.@."
+      shared.summary_ret shared.summary_run shared.summary_ok shared.summary_log
       ((Unix.times()).Unix.tms_cutime -. shared.summary_time);
   xunit_report ();
   let error_code =
-    if !do_error_code && shared.summary_log <> shared.summary_ok
+    if !do_error_code && ((shared.summary_log <> shared.summary_ok) || (shared.summary_ret <> shared.summary_run))
     then 1
     else 0
   in
