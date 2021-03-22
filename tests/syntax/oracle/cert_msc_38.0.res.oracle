@@ -1,7 +1,7 @@
 [kernel] Parsing tests/syntax/cert_msc_38.c (with preprocessing)
-[kernel:CERT:MSC:38] tests/syntax/cert_msc_38.c:25: Warning: 
+[kernel:CERT:MSC:38] tests/syntax/cert_msc_38.c:26: Warning: 
   assert is a standard macro. Its definition cannot be suppressed, see CERT C coding rules MSC38-C
-[kernel] tests/syntax/cert_msc_38.c:25: User Error: 
+[kernel] tests/syntax/cert_msc_38.c:26: User Error: 
   Cannot resolve variable assert
 [kernel] User Error: stopping on file "tests/syntax/cert_msc_38.c" that has errors. Add
   '-kernel-msg-key pp' for preprocessing command.

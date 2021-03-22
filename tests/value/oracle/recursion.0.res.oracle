@@ -10,9 +10,9 @@
   pg ∈ {{ NULL ; &S_pg[0] }}
   S_pg[0..1] ∈ [--..--]
 [eva] computing for function ff <- main.
-  Called from tests/value/recursion.i:67.
-[eva] tests/value/recursion.i:8: User Error: 
-  detected recursive call (ff <- ff :: tests/value/recursion.i:67 <- main)
+  Called from tests/value/recursion.i:68.
+[eva] tests/value/recursion.i:9: User Error: 
+  detected recursive call (ff <- ff :: tests/value/recursion.i:68 <- main)
   Use -eva-ignore-recursive-calls to ignore (beware this will make the analysis
   unsound)
 [eva] User Error: Degeneration occurred:

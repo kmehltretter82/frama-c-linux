@@ -12,7 +12,7 @@
             "dir": "tests/batch",
             "base": "ast_services.i",
             "file": "tests/batch/ast_services.i",
-            "line": 2
+            "line": 8
           }
         },
         {
@@ -24,7 +24,7 @@
             "dir": "tests/batch",
             "base": "ast_services.i",
             "file": "tests/batch/ast_services.i",
-            "line": 1
+            "line": 7
           }
         }
       ],
