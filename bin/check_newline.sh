@@ -19,19 +19,18 @@ is_likely_text_file() {
 errors=0
 
 IFS=''
-file -f "$1" --mime | grep '\btext' | cut -d: -f1 |
 while read file
 do
     if [ -n "$(is_likely_text_file "$file")" ]; then
         x=$(tail -c 1 "$file")
-        if [ "$x" != "" -a "$file" != "VERSION" -a "$file" != "VERSION_CODENAME" ]; then
+        if [ "$x" != "" ] && [ "$file" != "VERSION" ] && [ "$file" != "VERSION_CODENAME" ]; then
             echo "error: no newline at end of file: $file"
             errors=$((errors+1))
         fi
     fi
-done
+done < <(file -f "$1" --mime | grep '\btext' | cut -d: -f1)
 
 if [ $errors -gt 0 ]; then
-    echo "Found $error(s) files with errors."
+    echo "Found $errors file(s) with errors."
     exit 0
 fi
