@@ -38,9 +38,11 @@ type taint = {
   assume_stmts: Stmt.Set.t;
 }
 
-(* Set to true for pretty-printing also [assume_stmts] on
+let dkey = Value_parameters.register_category "d-taint"
+
+(* Debug key to also include [assume_stmts] in the output of the
    Frama_C_domain_show_each directive. *)
-let debug = false
+let dkey_debug = Value_parameters.register_category "d-taint-debug"
 
 
 module LatticeTaint = struct
@@ -90,7 +92,7 @@ module LatticeTaint = struct
       let equal = Datatype.from_compare
 
       let pretty fmt t =
-        if debug
+        if Value_parameters.is_debug_key_enabled dkey_debug
         then pp_state fmt t
         else pp_locs_only fmt t
 
@@ -340,7 +342,7 @@ module InternalTaint = struct
   include (ReuseTaint: Abstract_domain.Reuse with type t := state)
 
   let name = "taint"
-  let log_category = Value_parameters.register_category "d-taint"
+  let log_category = dkey
 
 
   (* Logic. *)
