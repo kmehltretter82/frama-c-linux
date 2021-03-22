@@ -347,7 +347,30 @@ module InternalTaint = struct
 
   (* Logic. *)
 
-  let logic_assign _assign _location _state = top
+  let logic_assign assign location state =
+    let exists_tainted_from state deps =
+      let single_from_contents dep =
+        match dep.Eval.location with
+        | None ->
+          false
+        | Some location ->
+          let loc_zone = Precise_locs.enumerate_valid_bits Read location in
+          LatticeTaint.intersects state loc_zone
+      in
+      List.exists single_from_contents deps
+    in
+    match assign with
+    | None
+    | Some ((Eval.Frees _ | Allocates _), _) ->
+      state
+    | Some (Assigns (_, deps), pre_state) ->
+      if exists_tainted_from pre_state deps
+      then
+        let loc_zone = Precise_locs.enumerate_valid_bits Write location in
+        { state with locs_data = Zone.join state.locs_data loc_zone }
+      else
+        state
+
   let evaluate_predicate _ _ _ = Alarmset.Unknown
   let reduce_by_predicate _ state _ _ = `Value state
 

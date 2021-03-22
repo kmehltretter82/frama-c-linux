@@ -66,6 +66,9 @@ void taint_4() {
   }
 }
 
+/*@ assigns *t \from u; */
+void taint_5(int* t, int u);
+
 int main(void) {
   int w, z;
   //@ taint w;
@@ -82,5 +85,8 @@ int main(void) {
   taint_3(w);
   Frama_C_domain_show_each(w, global);
   taint_4();
+  //@ taint w;
+  taint_5(&z, w);
+  Frama_C_domain_show_each(z, w);
   return 0;
 }
