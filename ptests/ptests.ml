@@ -797,9 +797,12 @@ let config_options =
     (fun _ s current ->
        let new_top =
          List.map
-           (fun {toplevel; opts; logs; macros; timeout=_} ->
-              { toplevel ; opts = make_custom_opts opts s; logs=logs @ current.dc_default_log;
-                macros=current.dc_macros;timeout= current.dc_timeout})
+           (fun command ->
+              { command with opts= make_custom_opts command.opts s;
+                             logs= command.logs @ current.dc_default_log;
+                             macros = current.dc_macros;
+                             timeout= current.dc_timeout
+              })
            !default_parsing_env.current_default_cmds
        in
        { current with dc_commands = new_top @ current.dc_commands;
