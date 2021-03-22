@@ -255,7 +255,7 @@ fi
 "$SED" -i "s|@FCFLAGS@|$(echo $@ | tr "'" "\\'")|g" "$script_for_creduce"
 chmod u+x "$script_for_creduce"
 
-trap "{ echo \"Creduce interrupted!\"; echo \"\"; echo \"(partially) reduced file: $dir_for_reduction/$base\"; exit 0; }" SIGINT
+trap '{ echo "Creduce interrupted!"; echo ""; echo "(partially) reduced file: $dir_for_reduction/$base"; exit 0; }' SIGINT
 
 echo ""
 echo "File being reduced: $dir_for_reduction/$base (press Ctrl+C to stop at any time)"
