@@ -25,8 +25,12 @@ open Cil_datatype
 open Locations
 
 type taint = {
-  (* Over-approximation of the memory locations that are tainted. *)
-  locs: Zone.t;
+  (* Over-approximation of the memory locations that are tainted due to a data
+     dependency. *)
+  locs_data: Zone.t;
+  (* Over-approximation of the memory locations that are tainted due to a
+     control dependency. *)
+  locs_control: Zone.t;
   (* Set of assume statements over a tainted expression. This set is needed to
      implement control-dependency: all left-values appearing in statements whose
      evaluation depends on at least one of the assume expressions is to be
@@ -42,13 +46,19 @@ let debug = false
 module LatticeTaint = struct
 
   let pp_locs_only fmt t =
-    Format.fprintf fmt "@[<hov>%a@]" Zone.pretty t.locs
+    Format.fprintf fmt
+      "@[<v 2>Locations (data):@ @[<hov>%a@]@]@.\
+       @[<v 2>Locations (control):@ @[<hov>%a@]@]"
+      Zone.pretty t.locs_data
+      Zone.pretty t.locs_control
 
   let pp_state fmt t =
     Format.fprintf fmt
-      "@[<v 2>Locations:@ @[<hov>%a@]@]@.\
+      "@[<v 2>Locations (data):@ @[<hov>%a@]@]@.\
+       @[<v 2>Locations (control):@ @[<hov>%a@]@]@.\
        @[<v 2>Assume statements:@ @[<hov>%a@]@]"
-      Zone.pretty t.locs
+      Zone.pretty t.locs_data
+      Zone.pretty t.locs_control
       Stmt.Set.pretty t.assume_stmts
 
   (* Frama-C "datatype" for type [taint]. *)
@@ -60,17 +70,22 @@ module LatticeTaint = struct
       let name = "Value.Taint.t"
 
       let reprs =
-        [ { locs = List.hd Zone.reprs;
+        [ { locs_data = List.hd Zone.reprs;
+            locs_control = List.hd Zone.reprs;
             assume_stmts = Stmt.Set.empty; } ]
 
       let structural_descr =
         Structural_descr.t_abstract (* TODO *)
 
       let compare t1 t2 =
-        let c = Zone.compare t1.locs t2.locs in
+        let c = Zone.compare t1.locs_data t2.locs_data in
         if c <> 0
         then c
-        else Stmt.Set.compare t1.assume_stmts t2.assume_stmts
+        else
+          let c = Zone.compare t1.locs_data t2.locs_data in
+          if c <> 0
+          then c
+          else Stmt.Set.compare t1.assume_stmts t2.assume_stmts
 
       let equal = Datatype.from_compare
 
@@ -81,7 +96,8 @@ module LatticeTaint = struct
 
       let hash t =
         Hashtbl.hash
-          (Zone.hash t.locs,
+          (Zone.hash t.locs_data,
+           Zone.hash t.locs_control,
            Stmt.Set.hash t.assume_stmts)
 
       let copy c = c
@@ -90,28 +106,23 @@ module LatticeTaint = struct
 
   (* Initial state at the start of the computation: nothing is tainted yet. *)
   let empty = {
-    locs = Zone.bottom;
+    locs_data = Zone.bottom;
+    locs_control = Zone.bottom;
     assume_stmts = Stmt.Set.empty;
   }
 
   (* Top state: everything is tainted. *)
   let top = {
-    locs = Zone.top;
+    locs_data = Zone.top;
+    locs_control = Zone.top;
     assume_stmts = Stmt.Set.empty;
   }
 
   (* Join: keep pointwise over-approximation. *)
   let join t1 t2 =
-    { locs = Zone.join t1.locs t2.locs;
+    { locs_data = Zone.join t1.locs_data t2.locs_data;
+      locs_control = Zone.join t1.locs_control t2.locs_control;
       assume_stmts = Stmt.Set.union t1.assume_stmts t2.assume_stmts; }
-
-  (* Add zone to state. *)
-  let add t e =
-    { t with locs = Zone.join t.locs e; }
-
-  (* Remove zone from state. *)
-  let remove t e =
-    { t with locs = Zone.diff t.locs e; }
 
   (* The memory locations are finite, so the ascending chain property is
      already verified. We simply use a join. *)
@@ -119,17 +130,20 @@ module LatticeTaint = struct
 
   let narrow t1 t2 =
     `Value {
-      locs = Zone.narrow t1.locs t2.locs;
+      locs_data = Zone.narrow t1.locs_data t2.locs_data;
+      locs_control = Zone.narrow t1.locs_control t2.locs_control;
       assume_stmts = Stmt.Set.inter t1.assume_stmts t2.assume_stmts;
     }
 
   (* Inclusion testing: pointwise, on locs only. *)
   let is_included t1 t2 =
-    Zone.is_included t1.locs t2.locs
+    Zone.is_included t1.locs_data t2.locs_data &&
+    Zone.is_included t1.locs_control t2.locs_control
 
   (* Intersection testing: pointwise, on locs only. *)
   let intersects t e =
-    Zone.intersects t.locs e
+    Zone.intersects t.locs_data e ||
+    Zone.intersects t.locs_control e
 
 end
 
@@ -188,18 +202,23 @@ module TransferTaint = struct
         state
       | Kstmt stmt ->
         let annot_zone = zone_of_taint_annot stmt in
-        let state = LatticeTaint.add state annot_zone in
+        let state =
+          { state with locs_data = Zone.join state.locs_data annot_zone }
+        in
         let to_loc = loc_of_lval valuation in
         let lv_zone =
           Value_util.(zone_of_expr to_loc (lval_to_exp lv.Eval.lval))
         in
         let is_taint_annotated = Zone.is_included lv_zone annot_zone in
-        if is_taint_annotated || is_under_tainted_assume state stmt
+        if is_taint_annotated
         then
-          (* Taint [lv] as either it appears in [stmt] taint annotation or
-             [stmt] is control-dependent of a tainted assume statement in
-             [state]. *)
-          LatticeTaint.add state lv_zone
+          (* Taint [lv] as it appears in [stmt] taint annotation. *)
+          { state with locs_data = Zone.join state.locs_data lv_zone }
+        else if is_under_tainted_assume state stmt
+        then
+          (* Taint [lv] as [stmt] is control-dependent of a tainted assume
+             statement in [state]. *)
+          { state with locs_control = Zone.join state.locs_control lv_zone }
         else
           (* No taint annotation concerning [lv] nor [stmt] has a
              control-dependency with [state]. *)
@@ -217,13 +236,16 @@ module TransferTaint = struct
             LatticeTaint.intersects state lv_indirect_zone
           in
           if intersect_state
-          then LatticeTaint.add state lv_zone
-          else LatticeTaint.remove state lv_zone
+          then { state with locs_data = Zone.join state.locs_data lv_zone }
+          else { state with locs_data = Zone.diff state.locs_data lv_zone }
     in
     `Value state
 
   let assume stmt exp _b valuation state =
-    let state = LatticeTaint.add state (zone_of_taint_annot stmt) in
+    let state =
+      let annot_zone = zone_of_taint_annot stmt in
+      { state with locs_control = Zone.join state.locs_control annot_zone }
+    in
     (* Add [stmt] as assume statement in [state] as soon as [exp] is tainted. *)
     let to_loc = loc_of_lval valuation in
     let exp_zone = Value_util.zone_of_expr to_loc exp in
@@ -235,7 +257,10 @@ module TransferTaint = struct
     `Value state
 
   let start_call stmt call valuation state =
-    let state = LatticeTaint.add state (zone_of_taint_annot stmt) in
+    let state =
+      let annot_zone = zone_of_taint_annot stmt in
+      { state with locs_data = Zone.join state.locs_data annot_zone }
+    in
     let state =
       (* Add tainted actual parameters in [state]. *)
       let to_loc = loc_of_lval valuation in
@@ -244,7 +269,7 @@ module TransferTaint = struct
            let concrete_zone = Value_util.zone_of_expr to_loc concrete in
            let formal_zone = Locations.zone_of_varinfo formal in
            if LatticeTaint.intersects state concrete_zone
-           then LatticeTaint.add s formal_zone
+           then { s with locs_data = Zone.join s.locs_data formal_zone }
            else s)
         state
         call.Eval.arguments
@@ -339,7 +364,9 @@ module InternalTaint = struct
       in
       Zone.filter_base (fun b -> not (Base.Set.mem b bases))
     in
-    { state with locs = remove_unscoped_bases state.locs; }
+    { state with
+      locs_data = remove_unscoped_bases state.locs_data;
+      locs_control = remove_unscoped_bases state.locs_control; }
 
 
   (* Initial state: initializers are singletons, so we store nothing. *)
