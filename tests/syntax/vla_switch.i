@@ -1,3 +1,8 @@
+/* run.config*
+ EXIT: 1
+   STDOPT:
+*/
+
 int case3(int arg) {
   switch(arg) {
     // Illegal according to 6.8.4.2§2

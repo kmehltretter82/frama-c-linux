@@ -1,4 +1,5 @@
 /* run.config*
+ EXIT: 1
    STDOPT: +"-machdep gcc_x86_32"
    STDOPT:
  */

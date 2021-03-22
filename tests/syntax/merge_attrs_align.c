@@ -1,8 +1,11 @@
 /*run.config
+ EXIT: 1
   STDOPT: +"-machdep x86_64" +"tests/syntax/merge_attrs_align1.c" +"tests/syntax/merge_attrs_align2.c"
   STDOPT: +"-machdep x86_64" +"tests/syntax/merge_attrs_align1.c" +"tests/syntax/merge_attrs_align3.c"
+ EXIT: 0
   STDOPT: +"-machdep x86_64" +"tests/syntax/merge_attrs_align1.c" +"tests/syntax/merge_attrs_align4.c"
   STDOPT: +"-machdep x86_64" +"tests/syntax/merge_attrs_align2.c" +"tests/syntax/merge_attrs_align3.c"
+ EXIT: 1
   STDOPT: +"-machdep x86_64" +"tests/syntax/merge_attrs_align2.c" +"tests/syntax/merge_attrs_align4.c"
   STDOPT: +"-machdep x86_64" +"tests/syntax/merge_attrs_align3.c" +"tests/syntax/merge_attrs_align4.c"
  */

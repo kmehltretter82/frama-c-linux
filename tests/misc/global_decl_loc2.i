@@ -1,4 +1,6 @@
-/* run.config
+/* run.config*
+ EXIT: 0
+
    OPT: @PTEST_DIR@/global_decl_loc.i -load-module @PTEST_DIR@/global_decl_loc.cmxs
 */
 

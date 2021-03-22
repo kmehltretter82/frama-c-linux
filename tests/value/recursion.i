@@ -1,4 +1,5 @@
-/*run.config*
+/* run.config*
+ EXIT: 1
   OPT: -no-autoload-plugins -load-module from,inout,eva -lib-entry -main main -eva @EVA_CONFIG@ -journal-disable
   OPT: -no-autoload-plugins -load-module from,inout,eva -lib-entry -main main -eva @EVA_CONFIG@ -eva-ignore-recursive-calls -journal-disable
  */

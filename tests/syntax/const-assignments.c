@@ -1,21 +1,21 @@
 /* run.config
    STDOPT:
+ EXIT:1
    STDOPT: +" -cpp-extra-args=-DT0"
    STDOPT: +" -cpp-extra-args=-DT1"
    STDOPT: +" -cpp-extra-args=-DT2"
    STDOPT: +" -cpp-extra-args=-DT3"
    STDOPT: +" -cpp-extra-args=-DT4"
    STDOPT: +" -cpp-extra-args=-DT5"
+ EXIT:0
    STDOPT: +" -cpp-extra-args=-DT6"
    STDOPT: +" -cpp-extra-args=-DT7"
+ EXIT:1
    STDOPT: +" -cpp-extra-args=-DT8"
 */
-
 /* The first run is correct. The others should fail, as they include invalid
    assignments to const lvalues. */
 const int x = 1;
-
-
 #ifdef T0
 void f() {
   x = 42;

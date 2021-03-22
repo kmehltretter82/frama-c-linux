@@ -1,3 +1,7 @@
+/* run.config*
+ EXIT: 1
+   STDOPT:
+*/
 // In this file, each write raises an error: writing non-ghost memory location
 // from ghost code, except if a comment says the opposite.
 

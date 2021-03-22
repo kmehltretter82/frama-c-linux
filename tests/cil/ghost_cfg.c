@@ -1,4 +1,5 @@
 /* run.config
+ EXIT: 1
    OPT:-no-autoload-plugins -cpp-extra-args="-DCAN_CHECK"
    OPT:-no-autoload-plugins -cpp-extra-args="-DCANT_CHECK"
 */

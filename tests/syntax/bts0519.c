@@ -1,5 +1,6 @@
 /* run.config
    STDOPT: +"-cpp-command='gcc -C -E -I.'" +"-cpp-frama-c-compliant"
+ EXIT: 1
    STDOPT: +"-cpp-command='gcc -C -E -I. -DERR'" +"-cpp-frama-c-compliant"
  */
 
