@@ -191,8 +191,23 @@ type ('loc, 'value) assigned =
 (* Extract the assigned value from a [value assigned]. *)
 val value_assigned : ('loc, 'value) assigned -> 'value or_bottom
 
-type logic_assign =
-  | Assigns of from
+(** The logic dependency of an ACSL assigns clause. *)
+type 'location logic_dependency =
+  { term: identified_term;
+    (** The ACSL term of the dependency, expressed in a \from clause. *)
+    direct: bool;
+    (** Whether the dependency is direct (default case), or has been declared
+        as "indirect", meaning that its value is only used in a conditional or
+        to compute an address. *)
+    location: 'location option;
+    (** The location of the dependency. [None] if the location could not be
+        evaluated, in which case a warning has been emitted. *)
+  }
+
+type 'location logic_assign =
+  | Assigns of identified_term * 'location logic_dependency list
+  (** assigns clause, with the dependencies of the \from clause.
+      An empty list means \nothing. *)
   | Allocates of identified_term
   | Frees of identified_term
 

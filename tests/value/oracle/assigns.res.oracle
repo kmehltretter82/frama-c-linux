@@ -78,14 +78,14 @@
   no \from part
   for clause 'assigns Tpost[\at(\old(i),Post)], Tpost[\at(k,Post)];'
 [eva] tests/value/assigns.i:56: Warning: 
+  cannot interpret \from clause \at(x,Post)
+  (no environment to evaluate \at(_,Post)); effects will be ignored
+[eva] tests/value/assigns.i:56: Warning: 
   cannot interpret assigns clause Tpost[\at(\old(i),Post)]
   (no environment to evaluate \at(_,Post)); effects will be ignored
 [eva] tests/value/assigns.i:56: Warning: 
   cannot interpret assigns clause Tpost[\at(k,Post)]
   (no environment to evaluate \at(_,Post)); effects will be ignored
-[eva] tests/value/assigns.i:56: Warning: 
-  cannot interpret 'from' clause 'assigns x \from \at(x,Post);'
-  (no environment to evaluate \at(_,Post))
 [eva] Done for function assigns_post
 [eva] Recording results for main1
 [eva] Done for function main1

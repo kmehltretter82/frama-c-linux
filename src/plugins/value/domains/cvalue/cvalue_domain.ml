@@ -280,34 +280,21 @@ module State = struct
     then `Value (state, clob)
     else `Bottom
 
-  let pp_eval_error fmt e =
-    if e <> Eval_terms.CAlarm then
-      Format.fprintf fmt "@ (%a)" Eval_terms.pretty_logic_evaluation_error e
-
-  let evaluate_from_clause env (_, ins as assign) =
-    let open Cil_types in
-    match ins with
-    | FromAny -> Cvalue.V.top_int
-    | From l ->
-      try
-        (* Evaluates the contents of one element of the from clause, topify them,
-           and add them to the current state of the evaluation in acc. *)
-        let one_from_contents acc { it_content = t } =
-          let loc =
-            Eval_terms.(eval_tlval_as_location ~alarm_mode:Ignore env t)
-          in
-          let state = Eval_terms.env_current_state env in
-          let v = Cvalue.Model.find ~conflate_bottom:false state loc in
+  let evaluate_from_clause state deps =
+    (* Evaluates the contents of one element of the from clause, topify them,
+       and add them to the current state of the evaluation in acc. *)
+    let one_from_contents acc dep =
+      if dep.direct
+      then
+        match dep.location with
+        | None -> Cvalue.V.top
+        | Some location ->
+          let location = Precise_locs.imprecise_location location in
+          let v = Cvalue.Model.find ~conflate_bottom:false state location in
           Cvalue.V.join acc (Cvalue.V.topify_leaf_origin v)
-        in
-        let filter x = not (List.mem "indirect" x.it_content.term_name) in
-        let direct = List.filter filter l in
-        List.fold_left one_from_contents Cvalue.V.top_int direct
-      with Eval_terms.LogicEvalError e ->
-        Value_util.warning_once_current
-          "@[<hov 0>cannot interpret 'from'@ @[<hov 2>clause '%a'@]%a"
-          Printer.pp_from assign pp_eval_error e;
-        Cvalue.V.top
+      else acc
+    in
+    List.fold_left one_from_contents Cvalue.V.top_int deps
 
   let logic_assign logic_assign location (state, sclob) =
     match logic_assign with
@@ -315,10 +302,9 @@ module State = struct
       let location = Precise_locs.imprecise_location location
       and value = Cvalue.V.top in
       Cvalue.Model.add_binding ~exact:false state location value, sclob
-    | Some (Assigns assign, (pre_state, _)) ->
+    | Some (Assigns (_assign, deps), (pre_state, _)) ->
       let location = Precise_locs.imprecise_location location in
-      let env = Eval_terms.env_assigns pre_state in
-      let value = evaluate_from_clause env assign in
+      let value = evaluate_from_clause pre_state deps in
       Locals_scoping.remember_if_locals_in_value sclob location value;
       Cvalue.Model.add_binding ~exact:false state location value, sclob
     | Some ((Frees _ | Allocates _), _) -> state, sclob
