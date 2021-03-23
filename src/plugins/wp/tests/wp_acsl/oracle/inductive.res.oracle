@@ -22,9 +22,9 @@ theory Compound
   
   (* use frama_c_wp.memory.Memory *)
   
-  function shiftfield_F1__list_next (p:addr) : addr = shift p 1
-  
   function shift_sint32 (p:addr) (k:int) : addr = shift p k
+  
+  function shiftfield_F1__list_next (p:addr) : addr = shift p 1
 end
 [wp:print-generated] 
   theory WP

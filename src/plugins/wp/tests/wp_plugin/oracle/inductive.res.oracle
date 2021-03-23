@@ -28,9 +28,9 @@
   Require Import Qed.
   Require Import Memory.
   
-  Definition shiftfield_F1__list_next (p : addr) : addr := (shift p 1%Z).
-  
   Definition shift_sint32 (p : addr) (k : Z) : addr := (shift p k%Z).
+  
+  Definition shiftfield_F1__list_next (p : addr) : addr := (shift p 1%Z).
 [wp:print-generated] 
   "WPOUT/typed/lemma_test_Coq.v"
   (* ---------------------------------------------------------- *)
