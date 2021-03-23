@@ -1,5 +1,5 @@
 /* run.config
-   EXIT: 1
+ EXIT: 1
    DEPS: multiple_include.h
    OPT: -kernel-warn-key=annot-error=active -print %{dep:multiple_include_1.c}
 */

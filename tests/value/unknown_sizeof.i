@@ -1,5 +1,5 @@
 /* run.config*
-   EXIT: 1
+ EXIT: 1
    OPT: -eva @EVA_CONFIG@ -main main1
    OPT: -eva @EVA_CONFIG@ -main main2
 */

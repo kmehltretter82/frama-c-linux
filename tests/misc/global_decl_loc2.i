@@ -1,5 +1,5 @@
-/* run.config
-   EXIT: 1
+/* run.config*
+ EXIT: 1
    LIBS: global_decl_loc
    OPT: @PTEST_DIR@/global_decl_loc.i
 */

@@ -1,4 +1,4 @@
-/* run.config
+/* run.config*
    STDOPT:
  EXIT: 1
    STDOPT: +"-cpp-extra-args='-DHIDING_TYPEDEF'"

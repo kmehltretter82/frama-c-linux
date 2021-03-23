@@ -1,4 +1,4 @@
-/* run.config
+/* run.config*
  EXIT: 1
    OPT: %{dep:bts0990_link_1.i}
 */

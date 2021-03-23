@@ -1,5 +1,5 @@
 /* run.config*
-   EXIT: 1
+ EXIT: 1
    STDOPT:
 */
 void f(...) // f must have at least one argument
@@ -11,4 +11,3 @@ int main()
 {
   f(0);
 }
-

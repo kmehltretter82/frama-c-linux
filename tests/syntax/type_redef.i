@@ -1,5 +1,5 @@
 /* run.config
-   EXIT: 1
+ EXIT: 1
    STDOPT:
    STDOPT: #"-c11"
 */ // Note: redefinition of local typedefs is currently unsupported

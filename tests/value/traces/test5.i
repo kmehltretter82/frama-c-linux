@@ -1,5 +1,5 @@
 /* run.config
-   EXIT: 1
+ EXIT: 1
    STDOPT: #"-eva-domains traces -eva-msg-key d-traces -eva-slevel 10" +"-then-last -eva -eva-slevel 10 -print -no-eva-traces-domain"
 */
 

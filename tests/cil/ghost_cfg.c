@@ -1,5 +1,5 @@
 /* run.config
-   EXIT: 1
+ EXIT: 1
    OPT: -cpp-extra-args="-DCAN_CHECK"
    OPT: -cpp-extra-args="-DCANT_CHECK"
 */

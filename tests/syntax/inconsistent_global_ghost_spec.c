@@ -1,9 +1,9 @@
 /* run.config
 EXIT: 1
-OPT: -cpp-extra-args="-DNON_GHOST_DECL_GHOST_DEF"
-OPT: -cpp-extra-args="-DGHOST_DECL_NON_GHOST_DEF"
-OPT: -cpp-extra-args="-DGHOST_DEF_NON_GHOST_DECL"
-OPT: -cpp-extra-args="-DNON_GHOST_DEF_GHOST_DECL"
+  OPT: -cpp-extra-args="-DNON_GHOST_DECL_GHOST_DEF"
+  OPT: -cpp-extra-args="-DGHOST_DECL_NON_GHOST_DEF"
+  OPT: -cpp-extra-args="-DGHOST_DEF_NON_GHOST_DECL"
+  OPT: -cpp-extra-args="-DNON_GHOST_DEF_GHOST_DECL"
 */
 #ifdef NON_GHOST_DECL_GHOST_DEF
 

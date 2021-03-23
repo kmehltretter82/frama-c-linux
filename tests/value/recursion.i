@@ -1,5 +1,5 @@
-/*run.config*
-  EXIT: 1
+/* run.config*
+ EXIT: 1
   OPT: -lib-entry -main main -eva @EVA_CONFIG@
   OPT: -lib-entry -main main -eva @EVA_CONFIG@ -eva-ignore-recursive-calls
  */

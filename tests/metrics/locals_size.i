@@ -1,5 +1,5 @@
 /* run.config
-  EXIT: 1
+ EXIT: 1
   OPT: -metrics-locals-size f,g,level3,level2,level1,main
   OPT: -metrics-locals-size recurse2
  */

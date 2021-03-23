@@ -1,7 +1,7 @@
 /* run.config
 EXIT: 1
-STDOPT: +"-cpp-extra-args='-DHAS_PROTO'"
-STDOPT: +"-cpp-extra-args='-DNO_PROTO'"
+  STDOPT: +"-cpp-extra-args='-DHAS_PROTO'"
+  STDOPT: +"-cpp-extra-args='-DNO_PROTO'"
 */
 #ifdef HAS_PROTO
 int f();

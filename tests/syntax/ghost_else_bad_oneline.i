@@ -1,5 +1,5 @@
 /* run.config
-   EXIT: 1
+ EXIT: 1
    OPT: -print
 */
 void if_ghost_else_one_line_bad(int x, int y) {
