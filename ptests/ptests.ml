@@ -464,7 +464,15 @@ type execnow =
 
 
 (** configuration of a directory/test. *)
-type cmd = { toplevel:string; opts:string; macros: Macros.t ; exit_code: string option; logs:string list ; timeout:string }
+type cmd = {
+  toplevel: string;
+  opts: string;
+  macros: Macros.t;
+  exit_code: string option;
+  logs: string list;
+  timeout: string
+}
+
 type config =
   {
     dc_subdir: SubDir.t ;
@@ -535,7 +543,15 @@ end = struct
   (** the name of the directory-wide configuration file*)
   let filename = "test_config"
 
-  let default_commands config = [ { toplevel=config.dc_default_toplevel; opts=""; exit_code=None; macros=config.dc_macros; logs=[]; timeout=""} ]
+  let default_commands config =
+    [ { toplevel=config.dc_default_toplevel;
+        opts="";
+        exit_code=None;
+        macros=config.dc_macros;
+        logs=[];
+        timeout=""
+      } ]
+
   let default_config dir =
     { dc_subdir = dir;
       dc_test_regexp = test_file_regexp;
@@ -749,6 +765,7 @@ end = struct
              (fun command ->
                 { command with opts= make_custom_opts ~file ~dir command.opts s;
                                exit_code = current.dc_exit_code;
+                               logs= command.logs @ current.dc_default_log;
                                timeout= current.dc_timeout})
              (if !default_parsing_env.current_default_cmds = [] then
                default_commands current

@@ -147,16 +147,16 @@ let filter (cmd,_stdfile) =
   let ret_code = launch cmd in
   if !verbosity > 0 && ret_code <> 0 then Format.printf "%% note: the filter command returned an error code (%d)@." ret_code
 
-let compare_files ~json ~error ~result oracle =
+let compare_files ~json ~error~result oracle =
   let not_generated = not (Sys.file_exists result) in
   if not_generated then
     Format.printf "%a: missing target %S@." pp_json json result;
-  let diff_cmd =  if !verbosity > 0  then diff_cmd else cmp_cmd in
   let cmd = Format.sprintf "%s %s %s" (if !verbosity > 0  then diff_cmd else cmp_cmd) oracle result in
   if !verbosity > 0  then Format.printf "%% Run compare command: %s@." cmd;
   let ret_code = launch cmd in
   let is_ko = ret_code <> 0 in
-  if is_ko then Format.printf "%a: diff failure on diff: (cd _build/default && %s %S %S)@." pp_json json diff_cmd result oracle ;
+  if is_ko then Format.printf "%a: diff failure on diff:@. (cd _build/default/%s && %s %S %S)@."
+      pp_json json (Filename.dirname json) diff_cmd result oracle ;
   error || is_ko
 
 let compare_std ~json error = function
