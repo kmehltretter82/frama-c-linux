@@ -20,22 +20,24 @@ Open Source Release <next-release>
 -*  Kernel    [2021-03-26] Raise an error if trying to merge a tentative
               definition with a proper definition during linking
 o   Ptests    [2021-03-24] Add new EXIT directive
+o   Ptests    [2021-03-25] Modify MODULE directive.
+o   Ptests    [2021-03-24] Add new EXIT directive.
 -   Aorai     [2021-02-09] New option for tracking last N states of the
-              automaton. Easier analysis of instrumented code with Eva
+              automaton. Easier analysis of instrumented code with Eva.
 o!  Kernel    [2021-02-08] Avoid triggering warning 16 (unerasable optional
               argument). Implies changing some labeled functions' signatures.
 o!  Kernel    [2021-01-15] Make cfields list optional. None means undefined,
               empty struct allowed only in specific machdeps.
               removed cdefined field
--*  RTE       [2021-01-13] remove spurious assert when comparing function
+-*  RTE       [2021-01-13] Remove spurious assert when comparing function
               pointer to NULL (fixes #@940)
--   Kernel    [2021-01-12] set default machdep to x86_64; allow setting machdep
+-   Kernel    [2021-01-12] Set default machdep to x86_64; allow setting machdep
               via environment variable FRAMAC_MACHDEP.
--   Kernel    [2021-01-08] allow -add-symbolic-path to survive saves/loads and
+-   Kernel    [2021-01-08] Allow -add-symbolic-path to survive saves/loads and
               invert argument order (path:name).
--   Libc      [2020-12-02] remove obsolete attribute FRAMA_C_MODEL in the libc.
+-   Libc      [2020-12-02] Remove obsolete attribute FRAMA_C_MODEL in the libc.
               Fixes #@877.
--*  Logic     [2020-11-30] assigns clause can't mention const locations
+-*  Logic     [2020-11-30] The assigns clause can't mention const locations
               anymore. Fixes #@855.
 o   Kernel    [2020-11-27] Extract builtin-related functions from module Cil
               to module Cil_builtins. Code can be updated using

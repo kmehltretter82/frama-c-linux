@@ -98,6 +98,27 @@ let str_split regex s =
   let res = Str.split regex s in
   Mutex.unlock str_mutex; res
 
+let str_split_list = (* considers blanks (not preceded by '\'), tabs and commas as separators *)
+  let nonsep_regexp = Str.regexp "[\\] " in (* removed for beeing reintroduced *)
+  let sep_regexp = Str.regexp "[\t ,]+" in
+  fun s -> (* splits on '\ ' first then on ' ' or ',' *)
+    Mutex.lock str_mutex;
+    let r = List.fold_left (fun acc -> function
+        | Str.Text s -> List.rev_append (Str.full_split sep_regexp s) acc
+        | (Str.Delim _ as delim) -> delim::acc)
+        []
+        (Str.full_split nonsep_regexp s)
+    in
+    Mutex.unlock str_mutex;
+    let add s (glue,prev,curr) = if glue then false,(s^prev),curr else false,s,(if prev = "" then curr else prev::curr) in
+    let acc = List.fold_left (fun ((_,prev,curr) as acc) -> function
+        | Str.Delim ("\\ " as nonsep) -> true,(nonsep^prev),curr (* restore '\ ' *)
+        | Str.Delim _ -> add "" acc (* separator *)
+        | Str.Text s -> add s acc) (false,"",[]) r
+    in
+    let _,_,res = (add "" acc) in
+    res
+
 let default_env = ref []
 
 let add_default_env x y = default_env:=(x,y)::!default_env
@@ -272,12 +293,12 @@ let example_msg =
      DONTRUN:            @[<v 0># Ignores the file.@]@  \
      EXECNOW: ([LOG|BIN] <file>)+ <command>  @[<v 0># Defines the command to execute to build a 'LOG' (textual) 'BIN' (binary) targets.@ \
      # Note: the textual targets are compared to oracles.@]@  \
+     MODULE: <module>... @[<v 0># Compile the module and adds the corresponding '-load-module' option to all sub-test commands.@]@  \
      LOG: <file>...      @[<v 0># Defines dune targets built by the next sub-test command.@]@  \
      CMD: <command>      @[<v 0># Defines the command to execute for all tests in order to get results to be compared to oracles.@]@  \
      OPT: <options>      @[<v 0># Defines a sub-test using the 'CMD' definition: <command> <options>@]@  \
      STDOPT: +<extra>    @[<v 0># Defines a sub-test and append the extra to the current option.@]@  \
      STDOPT: #<extra>    @[<v 0># Defines a sub-test and prepend the extra to the current option.@]@  \
-     MODULE: <module>... @[<v 0># Compile the module and adds the corresponding '-load-module' option.@]@  \
      EXIT: <number>      @[<v 0># Defines the exit code required for the next sub-test commands.@]@  \
      FILTER: <cmd>       @[<v 0># Performs a transformation on the test result files before the comparison from the oracles.@ \
      # The oracle will be compared from the standard output of the command: <cmd> <test-output-file>.@ \
@@ -630,6 +651,8 @@ type config =
     dc_execnow    : execnow list; (** command to be launched before
                                        the toplevel(s)
                                   *)
+    dc_load_module: string; (** load module options. *)
+    dc_deps_module: string list; (** modules to compile. *)
     dc_macros: Macros.t; (** existing macros. *)
     dc_default_toplevel   : string;
     (** full path of the default toplevel. *)
@@ -680,7 +703,8 @@ end = struct
   let default_macros () =
     let l = [
       "frama-c", !toplevel_path;
-      "PTEST_MAKE_MODULE", "make -s"
+      "PTEST_MAKE_MODULE", "make -s";
+      "PTEST_LOAD_MODULES", ""
     ]
     in
     Macros.add_list l Macros.empty
@@ -694,6 +718,8 @@ end = struct
       dc_default_toplevel = !toplevel_path;
       dc_commands = [ { toplevel= !toplevel_path; opts=default_options; macros=Macros.empty; exit_code=None; logs= []; timeout= ""} ];
       dc_dont_run = false;
+      dc_load_module = "";
+      dc_deps_module = [];
       dc_framac = true;
       dc_default_log = [];
       dc_timeout = "";
@@ -802,12 +828,34 @@ end = struct
       current
     end
 
+  let set_load_modules deps macros =
+    let name = "PTEST_LOAD_MODULES" in
+    let def = List.fold_left (fun acc s ->
+        match acc with
+        | "" -> s
+        | acc -> s ^ "," ^ acc)
+        ""
+        deps
+    in
+    if !verbosity >= 3 then
+      lock_printf "%%   - Macro %s for -load-module with definition %s@." name def;
+    Macros.add_list [name, def] macros
+
+  let add_make_modules ~file dir deps current =
+    List.fold_left (fun acc s ->
+        let make_cmd = Macros.expand current.dc_macros "@PTEST_MAKE_MODULE@" in
+        let acc = config_exec ~once:true ~file dir (make_cmd ^ " " ^ s) acc in
+        { acc with dc_deps_module = s :: acc.dc_deps_module })
+      current deps
+
   let config_module ~file dir s current =
-    let make_cmd = "@PTEST_MAKE_MODULE@ " ^ s in
-    let make_cmd = Macros.expand current.dc_macros make_cmd in
-    let current = config_exec ~once:true ~file dir make_cmd current in
-    let k = "PTEST_LOAD_MODULES" and v = " -load-module " ^ s in
-    { current with dc_macros = Macros.append_expand k v current.dc_macros }
+    let s = Macros.expand current.dc_macros s in
+    let deps = List.map (fun s -> "@PTEST_DIR@/" ^ (Filename.remove_extension s) ^ ".cmxs")
+        (str_split_list s)
+    in
+    let current = add_make_modules ~file dir deps current in
+    { current with dc_deps_module = deps @ current.dc_deps_module;
+                   dc_macros = set_load_modules deps current.dc_macros }
 
   let config_options =
     [ "CMD",
@@ -843,7 +891,7 @@ end = struct
              (fun command ->
                 { command with opts= make_custom_opts command.opts s;
                                logs= command.logs @ current.dc_default_log;
-                               macros = current.dc_macros;
+                               macros= current.dc_macros;
                                exit_code = current.dc_exit_code;
                                timeout= current.dc_timeout
                 })
@@ -874,7 +922,9 @@ end = struct
 
       "EXECNOW", config_exec ~once:true;
       "EXEC", config_exec ~once:false;
+
       "MACRO", config_macro;
+
       "MODULE", config_module;
 
       "LOG",
@@ -1127,11 +1177,14 @@ let basic_command_string =
   let options =
     if contains_frama_c_binary
     then begin
-      let opt_modules = Macros.expand macros
-          (Macros.get "PTEST_LOAD_MODULES" macros) in
+      let opt_modules = match Macros.expand macros
+                                (Macros.get "PTEST_LOAD_MODULES" macros) with
+      | "" -> ""
+      | s -> "-load-module=" ^ s ^ ""
+      in
       let opt_pre = Macros.expand macros !additional_options_pre in
       let opt_post = Macros.expand macros !additional_options in
-      opt_modules ^ " " ^ opt_pre ^ " " ^ options ^ " " ^ opt_post
+      opt_modules ^ opt_pre ^ " " ^ options ^ " " ^ opt_post
     end else options
   in
   let options = if !use_byte then opt_to_byte_options options else options in
@@ -1844,7 +1897,8 @@ let dispatcher () =
                 try int_of_string exit_code with
                 | _ -> lock_eprintf "@[%s: integer required for directive EXIT: %s (defaults to 0)@]@." file exit_code ; 0
             end;
-            execnow=false; timeout;
+            execnow=false;
+            timeout;
           }
       in
       let nb_files_execnow = List.length config.dc_execnow in
