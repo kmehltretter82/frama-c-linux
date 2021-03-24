@@ -94,6 +94,17 @@ val extract_uncoerced_lval: exp -> exp option
     If at some point the expression is neither a [CastE] nor an [Lval], then
     return [None]. *)
 
+val strip_casts: exp -> exp * typ list
+(** [strip casts e] strips the casts from the expression [e] and returns the
+    uncasted expression and the list of casts that were removed in order of
+    application. For example calling [strip_casts ((A)((B)((C)e)))] will return
+    the expression [e] and the list [[C; B; A]]. *)
+
+val add_casts: typ list -> exp -> exp
+(** [add_casts typs e] successively adds the casts in [typs] to the expression
+    [e]. For example calling [add_casts [C; B; A] e] will return the expression
+    [(A)((B)((C)e))]. *)
+
 (*
 Local Variables:
 compile-command: "make -C ../../../../.."

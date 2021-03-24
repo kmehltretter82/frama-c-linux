@@ -60,6 +60,21 @@ let result_vi kf = match result_lhost kf with
 (** {2 Other stuff} *)
 (* ************************************************************************** *)
 
+let strip_casts e =
+  let rec aux casts e =
+    match e.enode with
+    | CastE(ty, e') -> aux (ty :: casts) e'
+    | _ -> e, casts
+  in
+  aux [] e
+
+let rec add_casts tys e =
+  match tys with
+  | [] -> e
+  | newt :: tl ->
+    let e = Cil.mkCast ~newt e in
+    add_casts tl e
+
 let term_addr_of ~loc tlv ty =
   Logic_const.taddrof ~loc tlv (Ctype (TPtr(ty, [])))
 
