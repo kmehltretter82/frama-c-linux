@@ -139,7 +139,12 @@ class annot_visitor kf flags on_alarm = object (self)
       Cil.ChangeDoChildrenPost (s', fun _ -> s)
     | _ -> Cil.DoChildren
 
-  method private treat_call ret_opt =
+  method private treat_call ret_opt args =
+    let check_arg = function
+      | { enode = Lval lv } when Cil.isStructOrUnionType (Cil.typeOfLval lv) ->
+        self#mark_to_skip_initialized lv
+      | _ -> ()
+    in List.iter check_arg args ;
     match ret_opt, self#do_mem_access () with
     | None, _ | Some _, false -> ()
     | Some ret, true ->
@@ -149,7 +154,7 @@ class annot_visitor kf flags on_alarm = object (self)
         (Rte.lval_assertion ~read_only:Alarms.For_writing) ret
 
 
-  method private check_uchar_assign dest src =
+  method private check_assigned dest =
     if self#do_mem_access () then begin
       Options.debug "lval %a: validity of potential mem access checked\n"
         Printer.pp_lval dest;
@@ -157,20 +162,11 @@ class annot_visitor kf flags on_alarm = object (self)
         (Rte.lval_assertion ~read_only:Alarms.For_writing)
         dest
     end;
-    begin match src.enode with
-      | Lval src_lv ->
-        let typ1 = Cil.typeOfLval src_lv in
-        let typ2 = Cil.typeOfLval dest in
-        let isUChar t = Cil.isUnsignedInteger t && Cil.isAnyCharType t in
-        if isUChar typ1 && isUChar typ2 then
-          self#mark_to_skip_initialized src_lv
-      | _ -> ()
-    end ;
     Cil.DoChildren
 
   (* assigned left values are checked for valid access *)
   method! vinst = function
-    | Set (lval,exp,_) -> self#check_uchar_assign lval exp
+    | Set (lval,_,_) -> self#check_assigned lval
     | Call (ret_opt,funcexp,argl,_) ->
       (* Do not emit alarms on Eva builtins such as Frama_C_show_each, that should
          have no effect on analyses. *)
@@ -192,7 +188,7 @@ class annot_visitor kf flags on_alarm = object (self)
       if is_builtin
       then Cil.SkipChildren
       else begin
-        self#treat_call ret_opt;
+        self#treat_call ret_opt argl;
         (* Alarm if the call is through a pointer. Done in DoChildrenPost to get a
            more pleasant ordering of annotations. *)
         let do_ptr () =
@@ -204,11 +200,11 @@ class annot_visitor kf flags on_alarm = object (self)
         Cil.DoChildrenPost (fun res -> do_ptr (); res)
       end
     | Local_init (v,ConsInit(f,args,kind),loc) ->
-      let do_call lv _e _args _loc = self#treat_call lv in
+      let do_call lv _e args _loc = self#treat_call lv args in
       Cil.treat_constructor_as_func do_call v f args kind loc;
       Cil.DoChildren
-    | Local_init (v,AssignInit (SingleInit exp),_) ->
-      self#check_uchar_assign (Cil.var v) exp
+    | Local_init (v,AssignInit (SingleInit _),_) ->
+      self#check_assigned (Cil.var v)
     | Local_init (_,AssignInit _,_)
     | Asm _ | Skip _ | Code_annot _ -> Cil.DoChildren
 

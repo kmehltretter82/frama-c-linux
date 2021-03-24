@@ -492,7 +492,9 @@ int main(void)
   /*@ assert rte: index_bound: i1 < 11; */
   /*@ assert rte: initialization: \initialized(&p.tq[i0][i1].v); */
   v = p.tq[i0][i1].v;
+  /*@ assert rte: initialization: \initialized(&c2); */
   c1 = c2;
+  /*@ assert rte: initialization: \initialized(&c2); */
   unsigned char c3 = c2;
   return v;
 }
