@@ -1817,22 +1817,24 @@ let dispatcher () =
       if !verbosity >= 2 then lock_printf "%% - Process test file %s ...@." file;
       let config =
         scan_test_file config directory file in
-      let i = ref 0 in
       let e = ref 0 in
       let nb_files = List.length config.dc_commands in
-      let make_toplevel_cmd {toplevel; opts=options; logs=log_files; macros; exit_code; timeout} =
-        let n = !i in
-        {file; options; toplevel; nb_files; directory; n; log_files;
-         filter = config.dc_filter; macros;
-         exit_code = begin
-           match exit_code with
-           | None -> 0
-           | Some exit_code ->
-             try int_of_string exit_code with
-             | _ -> lock_eprintf "@[%s: integer required for directive EXIT: %s (defaults to 0)@]@." file exit_code ; 0
-         end;
-         execnow=false; timeout;
-        }
+      let make_toplevel_cmd =
+        let i = ref 0 in
+        fun {toplevel; opts=options; logs=log_files; macros; exit_code; timeout} ->
+          let n = !i in
+          incr i;
+          { file; options; toplevel; nb_files; directory; n; log_files;
+            filter = config.dc_filter; macros;
+            exit_code = begin
+              match exit_code with
+              | None -> 0
+              | Some exit_code ->
+                try int_of_string exit_code with
+                | _ -> lock_eprintf "@[%s: integer required for directive EXIT: %s (defaults to 0)@]@." file exit_code ; 0
+            end;
+            execnow=false; timeout;
+          }
       in
       let mk_cmd (s, timeout) =
         {
@@ -1871,7 +1873,6 @@ let dispatcher () =
         Queue.push
           (Toplevel (make_toplevel_cmd option))
           q;
-        incr i
       in
       if not config.dc_dont_run
       then begin
