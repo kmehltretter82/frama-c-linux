@@ -1,5 +1,5 @@
 /* run.config*
-   GCC:
+   
    STDOPT: #"-main test_unroll -eva-default-loop-unroll 10"
    STDOPT: #"-main test_split"
    STDOPT: +"-main test_split -eva-partition-value k"

@@ -1,5 +1,5 @@
 /* run.config
-   GCC:
+   
    STDOPT: +"-eva -out -input -calldeps -pdg"
 */
 

@@ -1,5 +1,5 @@
 /* run.config*
-   GCC:
+   
    OPT: -no-autoload-plugins -load-module from,inout,eva @EVA_CONFIG@ -eva -eva-warn-copy-indeterminate=-origin_misalign_2,-main -main main -journal-disable -then -out -deps
    OPT: -no-autoload-plugins -load-module from,inout,eva @EVA_CONFIG@ -eva -eva-warn-copy-indeterminate=-origin_misalign_2,-origin -main origin -journal-disable -then -out -deps
 

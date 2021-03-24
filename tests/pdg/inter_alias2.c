@@ -1,5 +1,5 @@
 /* run.config
- *    GCC:
+ *    
  *    STDOPT: +"-eva"
  *    STDOPT: +"-calldeps -fct-pdg incr_ptr"
  *    STDOPT: +"-calldeps -fct-pdg f1"

@@ -1,5 +1,5 @@
 /* run.config*
-  GCC:
+  
   STDOPT: #"-lib-entry -main sort4_1"
   STDOPT: #"-lib-entry -main sort4_4"
   STDOPT: #"-lib-entry -main sort4_3"

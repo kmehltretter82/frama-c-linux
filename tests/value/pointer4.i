@@ -1,5 +1,5 @@
 /* run.config*
-   GCC:
+   
    STDOPT: #"-absolute-valid-range 0-0x7"
 */
 unsigned short d,e[10]={0},c = 0;

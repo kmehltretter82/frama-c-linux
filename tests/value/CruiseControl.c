@@ -1,5 +1,5 @@
 /* run.config*
-   GCC:
+   
    STDOPT: #"-float-normal tests/value/CruiseControl_const.c -lib-entry -main CruiseControl -eva-context-depth 10 -eva-context-valid-pointers"
 
 */

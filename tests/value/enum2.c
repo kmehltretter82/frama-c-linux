@@ -1,5 +1,5 @@
 /* run.config*
-  GCC:
+  
   STDOPT: #"-cpp-frama-c-compliant -cpp-command \"gcc -C -E -I. %1 -o %2\""
 */
 

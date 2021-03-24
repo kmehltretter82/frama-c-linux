@@ -1,5 +1,5 @@
 /* run.config*
-  GCC:
+  
   STDOPT: #"-main main2"
 */
 /* Commentaire avant G comment*/ /* Commentaire avant G2 comment*/

@@ -1,5 +1,5 @@
 /* run.config
-   GCC:
+   
    STDOPT: +"-impact-pragma loop" +"-lib-entry" +"-main loop"
    */
 

@@ -1,5 +1,5 @@
 /* run.config*
-   GCC:
+   
    STDOPT: #""
    STDOPT: #"-eva-warn-copy-indeterminate=-f,-g"
 */

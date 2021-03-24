@@ -1,5 +1,5 @@
 /* run.config*
-   GCC:
+   
    STDOPT: #"-eva-alloc-builtin fresh"
    STDOPT: #"-eva-alloc-builtin fresh -absolute-valid-range 0x100-0x200 -main main_abs"
 */
