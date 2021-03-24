@@ -1,3 +1,7 @@
+/* run.config*
+ EXIT: 1
+   STDOPT:
+*/
 /* variation around issue #2091 */
 
 struct S;

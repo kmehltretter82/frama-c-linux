@@ -1,6 +1,8 @@
-/*run.config
-  STDOPT:
-  STDOPT: #"-cpp-extra-args='-DNOERROR'"
+/* run.config
+ EXIT: 1
+   STDOPT:
+ EXIT: 0
+   STDOPT: #"-cpp-extra-args='-DNOERROR'"
  */
 // Note: some of the declarations below are accepted by GCC 7.1.1 with -std=c11
 // (but not -std=c99), mainly due to this warning (use -Wextra to see it):

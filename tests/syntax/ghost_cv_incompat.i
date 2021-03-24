@@ -1,3 +1,8 @@
+/* run.config*
+ EXIT: 1
+   STDOPT:
+*/
+
 typedef int int_array [10] ;
 struct Type { int field ; } ;
 

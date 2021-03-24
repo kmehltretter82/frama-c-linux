@@ -1,3 +1,8 @@
+/* run.config*
+ EXIT: 1
+   STDOPT:
+*/
+
 struct s1 { int a; };
 struct s2 { int a; };
 

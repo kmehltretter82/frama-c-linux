@@ -963,10 +963,14 @@ the configuration header of a test (or a test suite).
 & Add and remove options from the default set
 & \textit{None}
 \\
+& \texttt{EXIT}\nscodeidxdef{Test!Directive}{EXIT}
+& Indicate expected exit status if not 0.
+& \textit{None}
+\\
 & \texttt{LOG}\nscodeidxdef{Test!Directive}{LOG}
 & Add an additional file to compare against an oracle
 & \textit{None}
-\\ 
+\\
 & \texttt{EXECNOW}\nscodeidxdef{Test!Directive}{EXECNOW}
 & Run a command before the following commands. When specified in a configuration
 file, run it only once.
@@ -1078,6 +1082,15 @@ the sequence above is read in order and defines a configuration level
   configuration).
   After an \texttt{OPT} or \texttt{STDOPT} directive is encountered,
   the set of additional \texttt{LOG} files is reset to its default.
+\item By default, \framac is expected to return successfully (i.e., with
+  an exit status of 0). If a test is supposed to lead to an error, an
+  \texttt{EXIT} directive must be used. It takes as argument an integer
+  (typically 1 to denote a user error) representing the expected exit status
+  for the subsequent tests. All tests triggered by \texttt{OPT} or
+  \texttt{STDOPT} directives encountered after the \texttt{EXIT} directive
+  will be expected to exit with the corresponding status, until a new
+  \texttt{EXIT} directive is encountered. (\texttt{EXIT: 0} will thus
+  indicate that subsequent tests are expected to exit normally).
 \item If there are several directives \texttt{OPT} in the same
   configuration level, they correspond to different test cases. The
   \texttt{OPT} directive(s) of a given configuration level replace(s)

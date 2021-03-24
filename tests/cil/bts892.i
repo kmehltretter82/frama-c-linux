@@ -1,3 +1,9 @@
+/* run.config*
+ EXIT: 1
+   STDOPT:
+*/
+
+
 int tab[16];
 
 void* main(void)

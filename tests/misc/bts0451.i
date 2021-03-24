@@ -1,5 +1,6 @@
 /* run.config
    COMMENT: running this test fails on purpose
+ EXIT: 1
    OPT: -simplify-cfg -typecheck
  */
 

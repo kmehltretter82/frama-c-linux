@@ -10,79 +10,79 @@
   pg ∈ {{ NULL ; &S_pg[0] }}
   S_pg[0..1] ∈ [--..--]
 [eva] computing for function ff <- main.
-  Called from tests/value/recursion.i:67.
-[eva] tests/value/recursion.i:8: Warning: 
+  Called from tests/value/recursion.i:68.
+[eva] tests/value/recursion.i:9: Warning: 
   recursive call during value analysis
-  of ff (ff <- ff :: tests/value/recursion.i:67 <- main). Assuming the call has
+  of ff (ff <- ff :: tests/value/recursion.i:68 <- main). Assuming the call has
   no effect. The analysis will be unsound.
 [eva] computing for function ff <- ff <- main.
-  Called from tests/value/recursion.i:8.
+  Called from tests/value/recursion.i:9.
 [eva] using specification for function ff
 [eva] Done for function ff
 [eva] Recording results for ff
 [eva] Done for function ff
 [eva] computing for function g <- main.
-  Called from tests/value/recursion.i:68.
-[eva] tests/value/recursion.i:39: Warning: 
+  Called from tests/value/recursion.i:69.
+[eva] tests/value/recursion.i:40: Warning: 
   recursive call during value analysis
-  of g (g <- g :: tests/value/recursion.i:68 <- main). Assuming the call has
+  of g (g <- g :: tests/value/recursion.i:69 <- main). Assuming the call has
   no effect. The analysis will be unsound.
 [eva] computing for function g <- g <- main.
-  Called from tests/value/recursion.i:39.
+  Called from tests/value/recursion.i:40.
 [eva] using specification for function g
 [eva] Done for function g
 [eva] Recording results for g
 [eva] Done for function g
 [eva] computing for function h <- main.
-  Called from tests/value/recursion.i:70.
-[eva] tests/value/recursion.i:44: Warning: 
+  Called from tests/value/recursion.i:71.
+[eva] tests/value/recursion.i:45: Warning: 
   recursive call during value analysis
-  of h (h <- h :: tests/value/recursion.i:70 <- main). Assuming the call has
+  of h (h <- h :: tests/value/recursion.i:71 <- main). Assuming the call has
   no effect. The analysis will be unsound.
 [eva] computing for function h <- h <- main.
-  Called from tests/value/recursion.i:44.
+  Called from tests/value/recursion.i:45.
 [eva] using specification for function h
 [eva] Done for function h
 [eva] Recording results for h
 [eva] Done for function h
-[eva] tests/value/recursion.i:71: Frama_C_show_each: Bottom, Bottom
+[eva] tests/value/recursion.i:72: Frama_C_show_each: Bottom, Bottom
 [eva] computing for function escaping_formal <- main.
-  Called from tests/value/recursion.i:72.
-[eva] tests/value/recursion.i:72: 
+  Called from tests/value/recursion.i:73.
+[eva] tests/value/recursion.i:73: 
   function escaping_formal: precondition got status valid.
-[eva] tests/value/recursion.i:58: Frama_C_show_each: {{ &i }}, {10}, {0}, {10}
-[eva] tests/value/recursion.i:59: Warning: 
+[eva] tests/value/recursion.i:59: Frama_C_show_each: {{ &i }}, {10}, {0}, {10}
+[eva] tests/value/recursion.i:60: Warning: 
   recursive call during value analysis
-  of escaping_formal (escaping_formal <- escaping_formal :: tests/value/recursion.i:72 <-
+  of escaping_formal (escaping_formal <- escaping_formal :: tests/value/recursion.i:73 <-
                                          main).
   Assuming the call has no effect. The analysis will be unsound.
-[eva] tests/value/recursion.i:59: User Error: 
+[eva] tests/value/recursion.i:60: User Error: 
   function 'escaping_formal' (involved in a recursive call) has a formal parameter whose address is taken. Analysis may be unsound.
 [eva] computing for function escaping_formal <- escaping_formal <- main.
-  Called from tests/value/recursion.i:59.
+  Called from tests/value/recursion.i:60.
 [eva] using specification for function escaping_formal
 [eva] Done for function escaping_formal
-[eva] tests/value/recursion.i:62: Frama_C_show_each: {{ &i }}, {10}, {0}, {10}
-[eva] tests/value/recursion.i:54: 
+[eva] tests/value/recursion.i:63: Frama_C_show_each: {{ &i }}, {10}, {0}, {10}
+[eva] tests/value/recursion.i:55: 
   function escaping_formal: postcondition got status valid.
 [eva] Recording results for escaping_formal
 [eva] Done for function escaping_formal
 [eva] computing for function f <- main.
-  Called from tests/value/recursion.i:73.
-[eva] tests/value/recursion.i:28: Frama_C_show_each: {2}, {0}
-[eva] tests/value/recursion.i:30: Warning: 
+  Called from tests/value/recursion.i:74.
+[eva] tests/value/recursion.i:29: Frama_C_show_each: {2}, {0}
+[eva] tests/value/recursion.i:31: Warning: 
   recursive call during value analysis
-  of f (f <- f :: tests/value/recursion.i:73 <- main). Assuming the call has
+  of f (f <- f :: tests/value/recursion.i:74 <- main). Assuming the call has
   no effect. The analysis will be unsound.
 [eva] computing for function f <- f <- main.
-  Called from tests/value/recursion.i:30.
+  Called from tests/value/recursion.i:31.
 [eva] using specification for function f
 [eva] Done for function f
-[eva] tests/value/recursion.i:31: Frama_C_show_each: {2}, {0}
+[eva] tests/value/recursion.i:32: Frama_C_show_each: {2}, {0}
 [eva] Recording results for f
 [eva] Done for function f
-[eva] tests/value/recursion.i:74: Frama_C_show_each: {2}
-[eva:alarm] tests/value/recursion.i:75: Warning: 
+[eva] tests/value/recursion.i:75: Frama_C_show_each: {2}
+[eva:alarm] tests/value/recursion.i:76: Warning: 
   signed overflow. assert r.f1 + 1 ≤ 2147483647;
 [eva] Recording results for main
 [eva] done for function main

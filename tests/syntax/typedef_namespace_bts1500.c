@@ -1,7 +1,8 @@
-/* run.config
-STDOPT:
-STDOPT: +"-cpp-extra-args='-DHIDING_TYPEDEF'"
-STDOPT: +"-cpp-extra-args='-DREDEFINITION'"
+/* run.config*
+   STDOPT:
+ EXIT: 1
+   STDOPT: +"-cpp-extra-args='-DHIDING_TYPEDEF'"
+   STDOPT: +"-cpp-extra-args='-DREDEFINITION'"
 */
 typedef int digit;
 

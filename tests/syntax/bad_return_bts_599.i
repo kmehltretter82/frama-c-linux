@@ -1,4 +1,7 @@
-
+/* run.config*
+ EXIT: 1
+   STDOPT:
+*/
 int BadReturn1(int* p) {
   *p++;
   return;

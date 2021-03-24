@@ -1,6 +1,9 @@
 /* run.config
+ EXIT: 1
+
    OPT: -kernel-warn-key=annot-error=active -print tests/spec/multiple_include_1.c -journal-disable
 */
+
 #include "multiple_include.h"
 
 /*@ requires p(x); */

@@ -1,3 +1,9 @@
+/* run.config*
+ EXIT: 1
+   STDOPT:
+*/
+
+
 // Tests related to flexible array members
 
 // FAM declaration OK

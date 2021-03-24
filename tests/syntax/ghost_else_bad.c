@@ -1,12 +1,12 @@
 /* run.config
+ EXIT: 1
    OPT: -no-autoload-plugins -cpp-extra-args="-DERROR_LOC_WITH_COMMENTS"
+ EXIT: 0
    OPT: -no-autoload-plugins -cpp-extra-args="-DALREADY_HAS_ELSE" -print -kernel-warn-key ghost:bad-use=feedback
+ EXIT: 1
    OPT: -no-autoload-plugins -cpp-extra-args="-DBAD_ANNOT_POSITION"
 */
-
-
 #ifdef ERROR_LOC_WITH_COMMENTS // Must check that the line indicated for undeclared "z" is correct
-
 void if_ghost_else_block_comments_then_error(int x, int y) {
   if (x) {
     x++;

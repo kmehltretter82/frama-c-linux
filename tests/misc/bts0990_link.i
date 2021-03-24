@@ -1,7 +1,7 @@
-/* run.config
+/* run.config*
+ EXIT: 1
    OPT: tests/misc/bts0990_link_1.i
 */
-
 // NB: This test is meant to return an error, as s is declared as an array in
 // tests/misc/bts0990_link_1.i
 

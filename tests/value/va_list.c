@@ -1,6 +1,7 @@
-/*run.config*
-  STDOPT:
-  STDOPT: #"-variadic-no-translation"
+/* run.config*
+   STDOPT:
+ EXIT: 1
+   STDOPT: #"-variadic-no-translation"
 */
 typedef void *va_list;
 

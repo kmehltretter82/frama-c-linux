@@ -5,11 +5,11 @@
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function __builtin_next_arg <- main.
-  Called from tests/value/va_list.c:13.
-[kernel:annot:missing-spec] tests/value/va_list.c:13: Warning: 
+  Called from tests/value/va_list.c:14.
+[kernel:annot:missing-spec] tests/value/va_list.c:14: Warning: 
   Neither code nor specification for function __builtin_next_arg, generating default assigns from the prototype
 [eva] using specification for function __builtin_next_arg
-[eva] tests/value/va_list.c:13: User Error: 
+[eva] tests/value/va_list.c:14: User Error: 
   functions returning variadic arguments must be stubbed
 [eva] Done for function __builtin_next_arg
 [eva] Recording results for main

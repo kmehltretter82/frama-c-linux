@@ -1,9 +1,10 @@
 /* run.config*
-EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@/@PTEST_NAME@.cmxs
-OPT: -cpp-extra-args="-I@PTEST_DIR@/@PTEST_NAME@ -D__FC_MACHDEP_CUSTOM" -load-module @PTEST_DIR@/@PTEST_NAME@/@PTEST_NAME@ -machdep custom -print -then -print
-COMMENT: we need a -then to test double registering of a machdep
-*/
+ EXIT: 1
 
+  EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@/@PTEST_NAME@.cmxs
+  OPT: -cpp-extra-args="-I@PTEST_DIR@/@PTEST_NAME@ -D__FC_MACHDEP_CUSTOM" -load-module @PTEST_DIR@/@PTEST_NAME@/@PTEST_NAME@ -machdep custom -print -then -print
+  COMMENT: we need a -then to test double registering of a machdep
+*/
 #include "__fc_machdep_custom.h"
 // most of the following includes are not directly used, but they test if
 // the custom machdep has defined the necessary constants

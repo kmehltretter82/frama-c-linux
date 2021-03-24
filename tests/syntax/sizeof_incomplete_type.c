@@ -1,3 +1,8 @@
+/* run.config*
+ EXIT: 1
+   STDOPT:
+*/
+
 #include <stdlib.h>
 
 typedef char *sds;

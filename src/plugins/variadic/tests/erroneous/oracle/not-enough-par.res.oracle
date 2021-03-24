@@ -1,4 +1,4 @@
-[kernel] tests/erroneous/not-enough-par.i:4: User Error: 
+[kernel] tests/erroneous/not-enough-par.i:8: User Error: 
   Too few arguments in call to f.
 [kernel] User Error: stopping on file "tests/erroneous/not-enough-par.i" that has errors.
 [kernel] Frama-C aborted: invalid user input.
