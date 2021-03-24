@@ -19,6 +19,7 @@ Open Source Release <next-release>
 
 -*  Kernel    [2021-03-26] Raise an error if trying to merge a tentative
               definition with a proper definition during linking
+o   Ptests    [2021-03-24] Add new EXIT directive
 -   Aorai     [2021-02-09] New option for tracking last N states of the
               automaton. Easier analysis of instrumented code with Eva
 o!  Kernel    [2021-02-08] Avoid triggering warning 16 (unerasable optional
