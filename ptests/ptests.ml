@@ -271,7 +271,7 @@ let example_msg =
      FILEREG: <regexp>   @[<v 0># Ignores the files in suites whose name doesn't matche the pattern.@]@  \
      DONTRUN:            @[<v 0># Ignores the file.@]@  \
      EXECNOW: ([LOG|BIN] <file>)+ <command>  @[<v 0># Defines the command to execute to build a 'LOG' (textual) 'BIN' (binary) targets.@ \
-                                                    # Note: the textual targets are compared to oracles.@]@  \
+     # Note: the textual targets are compared to oracles.@]@  \
      LOG: <file>...      @[<v 0># Defines dune targets built by the next sub-test command.@]@  \
      CMD: <command>      @[<v 0># Defines the command to execute for all tests in order to get results to be compared to oracles.@]@  \
      OPT: <options>      @[<v 0># Defines a sub-test using the 'CMD' definition: <command> <options>@]@  \
@@ -280,7 +280,7 @@ let example_msg =
      MODULE: <module>... @[<v 0># Compile the module and adds the corresponding '-load-module' option.@]@  \
      EXIT: <number>      @[<v 0># Defines the exit code required for the next sub-test commands.@]@  \
      FILTER: <cmd>       @[<v 0># Performs a transformation on the test result files before the comparison from the oracles.@ \
-                                # The oracle will be compared from the standard output of the command: <cmd> <test-output-file>.@ \
+     # The oracle will be compared from the standard output of the command: <cmd> <test-output-file>.@ \
      TIMEOUT: <delay>    @[<v 0># Set a timeout for all sub-test.@]@  \
      NOFRAMAC:           @[<v 0># Drops previous sub-test definitions and considers that there is no defined default sub-test.@]@  \
      GCC:                @[<v 0># Deprecated.@]@  \
@@ -1817,7 +1817,6 @@ let dispatcher () =
       if !verbosity >= 2 then lock_printf "%% - Process test file %s ...@." file;
       let config =
         scan_test_file config directory file in
-      let e = ref 0 in
       let nb_files = List.length config.dc_commands in
       let make_toplevel_cmd =
         let i = ref 0 in
@@ -1836,29 +1835,29 @@ let dispatcher () =
             execnow=false; timeout;
           }
       in
-      let mk_cmd (s, timeout) =
-        {
-          file = file;
-          nb_files = nb_files;
-          log_files = [];
-          options = "";
-          toplevel = s;
-          exit_code = 0;
-          n = !e;
-          directory = directory;
-          filter = config.dc_filter;
-          macros = config.dc_macros;
-          execnow = true;
-          timeout;
-        }
-      in
-      let process_macros_cmd s = basic_command_string (mk_cmd s) in
-      let macros = get_macros (mk_cmd ("/bin/true","")) in
-      let process_macros s = Macros.expand macros s in
-      let make_execnow_cmd execnow =
-        let res =
-          {
-            ex_cmd = process_macros_cmd (execnow.ex_cmd, execnow.ex_timeout);
+      let nb_files_execnow = List.length config.dc_execnow in
+      let make_execnow_cmd =
+        let e = ref 0 in
+        fun execnow ->
+          let n = !e in
+          incr e;
+          let cmd =  {
+            file ;
+            nb_files = nb_files_execnow;
+            log_files = [];
+            options = "";
+            toplevel = execnow.ex_cmd;
+            exit_code = 0;
+            n;
+            directory;
+            filter = config.dc_filter;
+            macros = config.dc_macros;
+            execnow = true;
+            timeout = execnow.ex_timeout;
+          } in
+          let macros = get_macros cmd in
+          let process_macros s = Macros.expand macros s in
+          { ex_cmd = basic_command_string cmd;
             ex_log = List.map process_macros execnow.ex_log;
             ex_bin = List.map process_macros execnow.ex_bin;
             ex_dir = execnow.ex_dir;
@@ -1866,8 +1865,6 @@ let dispatcher () =
             ex_done = execnow.ex_done;
             ex_timeout = execnow.ex_timeout;
           }
-        in
-        incr e; res
       in
       let treat_option q option =
         Queue.push
