@@ -97,7 +97,7 @@ emitted by the Eva plugin and C undefined behaviors.
   initialization & {\em CC.11}, {\em CC.180} & \\
   initialization\_of\_union & {\em CC.11}, {\em CC.180} & \\
   mem\_access & {\em CC.33}, {\em CC.62}, {\em CC.64} & \\
-  overflow & {\em CC.36} & \\
+  overflow & {\em CC.36}, {\em CC.50} & For {\em CC.50}, see {\em Note about \texttt{ptrdiff\_t}}. \\
   overlap & {\em CC.54} & {\em CC.100} is handled by \FramaC's libc ACSL specifications. \\
   pointer\_value & {\em CC.46}, {\em CC.47}, {\em CC.62} & \\
   ptr\_comparison & {\em CC.53} & \\
@@ -112,7 +112,15 @@ are not handled by specific categories of RTEs, but instead by ACSL
 specifications in \FramaC's libc. These specifications are used by some
 analyzers and result in warnings and errors when violated.
 
-%50 - The result of subtracting two pointers is not representable in an object of type ptrdiff_t (6.5.6).
+\paragraph{Note about \texttt{ptrdiff\_t}}
+          {\em CC.50} deals with pointer subtractions, related to type \texttt{ptrdiff\_t}.
+          \FramaC does not perform specific handling for this type,
+          but in all standard machdeps defined in \FramaC, its definition
+          is such that pointer subtraction will lead to a signed overflow
+          if the difference cannot be represented in \texttt{ptrdiff\_t},
+          thus preventing the undefined behavior. However, if option
+          \texttt{-no-warn-signed-overflow} is used, or in a custom machdep,
+          this may not hold.
 
 \section{C Undefined Behaviors {\em not} handled by \FramaC}
 
