@@ -266,6 +266,26 @@ let example_msg =
     "@.@[<v 0>\
      A test suite can be the name of a directory in ./tests or \
      the path to a file.@ @ \
+     Directives of \"test_config[_<mode>]\" files:@  \
+     COMMENT: <comment>  @[<v 0># Just a comment line.@]@  \
+     FILEREG: <regexp>   @[<v 0># Ignores the files in suites whose name doesn't matche the pattern.@]@  \
+     DONTRUN:            @[<v 0># Ignores the file.@]@  \
+     EXECNOW: ([LOG|BIN] <file>)+ <command>  @[<v 0># Defines the command to execute to build a 'LOG' (textual) 'BIN' (binary) targets.@ \
+                                                    # Note: the textual targets are compared to oracles.@]@  \
+     LOG: <file>...      @[<v 0># Defines dune targets built by the next sub-test command.@]@  \
+     CMD: <command>      @[<v 0># Defines the command to execute for all tests in order to get results to be compared to oracles.@]@  \
+     OPT: <options>      @[<v 0># Defines a sub-test using the 'CMD' definition: <command> <options>@]@  \
+     STDOPT: +<extra>    @[<v 0># Defines a sub-test and append the extra to the current option.@]@  \
+     STDOPT: #<extra>    @[<v 0># Defines a sub-test and prepend the extra to the current option.@]@  \
+     MODULE: <module>... @[<v 0># Compile the module and adds the corresponding '-load-module' option.@]@  \
+     EXIT: <number>      @[<v 0># Defines the exit code required for the next sub-test commands.@]@  \
+     FILTER: <cmd>       @[<v 0># Performs a transformation on the test result files before the comparison from the oracles.@ \
+                                # The oracle will be compared from the standard output of the command: <cmd> <test-output-file>.@ \
+     TIMEOUT: <delay>    @[<v 0># Set a timeout for all sub-test.@]@  \
+     NOFRAMAC:           @[<v 0># Drops previous sub-test definitions and considers that there is no defined default sub-test.@]@  \
+     GCC:                @[<v 0># Deprecated.@]@  \
+     MACRO: <name> <def> @[<v 0># set a definition to the variable @@<name>@@.@]@  \
+     @]@ \
      @[<v 1>\
      Some variables can be used in test command:@ \
      @@PTEST_CONFIG@@    \
@@ -535,13 +555,13 @@ struct
 
   let macro_regex = Str.regexp "\\([^@]*\\)@\\([^@]*\\)@\\(.*\\)"
 
+  let print_macros macros =
+    lock_printf "%% Macros (%d):@."  (StringMap.cardinal macros);
+    StringMap.iter (fun key data -> lock_printf "%% - %s -> %s@." key data) macros;
+    lock_printf "%% End macros@."
+
   let does_expand macros s =
-    if !verbosity >=2 then begin
-      lock_printf "looking for macros in string %s\n%!" s;
-      lock_printf "Existing macros:\n%!";
-      iter (fun s1 s2 -> lock_printf "%s => %s\n%!" s1 s2) macros;
-      lock_printf "End macros\n%!";
-    end;
+    if !verbosity >=4 then print_macros macros;
     let rec aux n (ptest_file_matched,s as acc) =
       if Str.string_match macro_regex s n then begin
         let macro = Str.matched_group 2 s in
@@ -554,17 +574,17 @@ struct
             new_n + 1, String.sub s 0 new_n ^ "@" ^ rest
           end else begin
             try
-              if !verbosity >= 2 then lock_printf "macro is %s\n%!" macro;
+              if !verbosity >= 4 then lock_printf "%%     - macro is %s\n%!" macro;
               let replacement =  find macro macros in
-              if !verbosity >= 1 then
-                lock_printf "replacement for %s is %s\n%!" macro replacement;
+              if !verbosity >= 3 then
+                lock_printf "%%     - replacement for %s is %s\n%!" macro replacement;
               new_n,
               String.sub s 0 n ^ start ^ replacement ^ rest
             with
             | Not_found -> Str.group_end 2 + 1, s
           end
         in
-        if !verbosity >= 2 then lock_printf "new string is %s\n%!" new_s;
+        if !verbosity >= 4 then lock_printf "%%    - New string is %s\n%!" new_s;
         let new_acc = ptest_file_matched, new_s in
         if n <= String.length new_s then aux n new_acc else new_acc
       end else acc
@@ -753,12 +773,12 @@ let make_custom_opts =
 
 
 (* how to process options *)
-let config_exec ~once dir s current =
+let config_exec ~once ~file:_ dir s current =
   { current with
     dc_execnow =
       scan_execnow ~once dir current.dc_timeout s :: current.dc_execnow }
 
-let config_macro _dir s current =
+let config_macro ~file _dir s current =
   let regex = Str.regexp "[ \t]*\\([^ \t@]+\\)\\([ \t]+\\(.*\\)\\|$\\)" in
   Mutex.lock str_mutex;
   if Str.string_match regex s 0 then begin
@@ -767,29 +787,33 @@ let config_macro _dir s current =
       try Str.matched_group 3 s with Not_found -> (* empty text *) ""
     in
     Mutex.unlock str_mutex;
-    if !verbosity >= 1 then
-      lock_printf "new macro %s with definition %s\n%!" name def;
+    if !verbosity >= 3 then
+      lock_printf "%%   - New macro %s with definition %s\n%!" name def;
     { current with dc_macros = Macros.add_expand name def current.dc_macros }
   end else begin
     Mutex.unlock str_mutex;
-    lock_eprintf "cannot understand MACRO definition: %s\n%!" s;
+    lock_eprintf "%s: cannot understand MACRO definition: %s\n%!" file s;
     current
   end
 
-let config_module dir s current =
+let config_module ~file dir s current =
   let make_cmd = "@PTEST_MAKE_MODULE@ " ^ s in
   let make_cmd = Macros.expand current.dc_macros make_cmd in
-  let current = config_exec ~once:true dir make_cmd current in
+  let current = config_exec ~once:true ~file dir make_cmd current in
   let k = "PTEST_LOAD_MODULES" and v = " -load-module " ^ s in
   { current with dc_macros = Macros.append_expand k v current.dc_macros }
 
 let config_options =
   [ "CMD",
-    (fun _ s current ->
+    (fun ~file:_ _ s current ->
        { current with dc_default_toplevel = s});
 
     "OPT",
-    (fun _ s current ->
+    (fun ~file _ s current ->
+       if not current.dc_framac then
+         lock_eprintf
+           "%s: a NOFRAMAC directive has been defined before a sub-test defined by a 'OPT' directive (That NOFRAMAC directive could be misleading.).@."
+           file;
        let t =
          {toplevel= current.dc_default_toplevel;
           opts= s;
@@ -803,7 +827,11 @@ let config_options =
          dc_commands = t :: current.dc_commands });
 
     "STDOPT",
-    (fun _ s current ->
+    (fun ~file _ s current ->
+       if not current.dc_framac then
+         lock_eprintf
+           "%s: a NOFRAMAC directive has been defined before a sub-test defined by a 'STDOPT' directive (That NOFRAMAC directive could be misleading.).@."
+           file;
        let new_top =
          List.map
            (fun command ->
@@ -819,37 +847,44 @@ let config_options =
                       dc_default_log = !default_parsing_env.current_default_log });
 
     "FILEREG",
-    (fun _ s current -> { current with dc_test_regexp = s });
+    (fun ~file:_ _ s current -> { current with dc_test_regexp = s });
 
     "FILTER",
-    (fun _ s current -> { current with dc_filter = Some s });
+    (fun ~file:_ _ s current -> { current with dc_filter = Some s });
 
     "EXIT",
-    (fun _ s current -> { current with dc_exit_code = Some s });
+    (fun ~file:_ _ s current -> { current with dc_exit_code = Some s });
 
     "GCC",
-    (fun _ _ acc -> acc);
+    (fun ~file _ _ acc ->
+       lock_eprintf "%s: GCC directive (DEPRECATED)@." file;
+       acc);
 
     "COMMENT",
-    (fun _ _ acc -> acc);
+    (fun ~file:_ _ _ acc -> acc);
 
     "DONTRUN",
-    (fun _ s current -> { current with dc_dont_run = true });
+    (fun ~file:_ _ s current -> { current with dc_dont_run = true });
 
     "EXECNOW", config_exec ~once:true;
     "EXEC", config_exec ~once:false;
     "MACRO", config_macro;
     "MODULE", config_module;
     "LOG",
-    (fun _ s current ->
+    (fun ~file:_ _ s current ->
        { current with dc_default_log = s :: current.dc_default_log });
     "TIMEOUT",
-    (fun _ s current -> { current with dc_timeout = s });
+    (fun ~file:_ _ s current -> { current with dc_timeout = s });
     "NOFRAMAC",
-    (fun _ _ current -> { current with dc_commands = []; dc_framac = false; });
+    (fun ~file _ _ current ->
+       if current.dc_commands <> [] && current.dc_framac then
+         lock_eprintf
+           "%s: a NOFRAMAC directive has the effect of ignoring previous defined sub-tests (by some 'OPT' or 'STDOPT' directives that seems misleading). @."
+           file;
+       { current with dc_commands = []; dc_framac = false; });
   ]
 
-let scan_directives dir scan_buffer default =
+let scan_directives dir ~file scan_buffer default =
   set_default_parsing_env default;
   let r = ref { default with dc_commands = [] } in
   let treat_line s =
@@ -857,9 +892,9 @@ let scan_directives dir scan_buffer default =
       Scanf.sscanf s "%[ *]%[A-Za-z0-9]: %s@\n"
         (fun _ name opt ->
            try
-             r := (List.assoc name config_options) dir opt !r
+             r := (List.assoc name config_options) ~file dir opt !r
            with Not_found ->
-             lock_eprintf "@[unknown configuration option: %s@\n%!@]" name)
+             lock_eprintf "@[%s: unknown configuration option: %s@\n%!@]" file name)
     with
     | Scanf.Scan_failure _ ->
       if str_string_match end_comment s 0
@@ -907,14 +942,14 @@ let scan_test_file default dir f =
            let configs = Str.split split_config (String.trim names) in
            if List.exists is_current_config configs then
              (* Found options for current config! *)
-             scan_directives dir scan_buffer default
+             scan_directives dir ~file:f scan_buffer default
            else (* config name does not match: eat config and continue.
                    But only if the comment is still opened by the end of
                    the line and we are indeed reading a config
                 *)
              (if List.exists is_config configs &&
                  not (str_string_match end_comment names 0) then
-                ignore (scan_directives dir scan_buffer default);
+                ignore (scan_directives dir ~file:f scan_buffer default);
               scan_config ()))
     in
     try
@@ -1678,6 +1713,7 @@ let default_config () =
     let scan_buffer = Scanf.Scanning.from_file general_config_file in
     scan_directives
       (SubDir.create ~with_subdir:false Filename.current_dir_name)
+      ~file:general_config_file
       scan_buffer
       (default_config ())
   end
@@ -1740,7 +1776,7 @@ let () =
          if Sys.file_exists config
          then begin
            let scan_buffer = Scanf.Scanning.from_file config in
-           scan_directives directory scan_buffer default
+           scan_directives directory ~file:config scan_buffer default
          end
          else default
        in
@@ -1752,12 +1788,16 @@ let () =
        else begin
          if not (List.mem suite exclude_suite) then begin
            let dir_files = Sys.readdir (SubDir.get directory) in
+           if !verbosity >= 1 then
+             lock_printf "%% - Look at %d entries of the directory...@."
+               (Array.length dir_files);
            for i = 0 to pred (Array.length dir_files) do
              let file = dir_files.(i) in
              assert (Filename.is_relative file);
              if test_pattern dir_config file &&
                 (not (List.mem (SubDir.make_file directory file) exclude_file))
-             then Queue.push (file, directory, dir_config) files;
+             then
+               Queue.push (file, directory, dir_config) files;
            done
          end
        end)
@@ -1774,6 +1814,7 @@ let dispatcher () =
       done;
       (* we have the lock *)
       let file, directory, config = Queue.pop files in
+      if !verbosity >= 2 then lock_printf "%% - Process test file %s ...@." file;
       let config =
         scan_test_file config directory file in
       let i = ref 0 in
@@ -1788,7 +1829,7 @@ let dispatcher () =
            | None -> 0
            | Some exit_code ->
              try int_of_string exit_code with
-             | _ -> Format.eprintf "@[%s: integer required for directive EXIT: %s (defaults to 0)@]@." file exit_code ; 0
+             | _ -> lock_eprintf "@[%s: integer required for directive EXIT: %s (defaults to 0)@]@." file exit_code ; 0
          end;
          execnow=false; timeout;
         }
