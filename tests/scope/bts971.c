@@ -1,6 +1,6 @@
 /* run.config
-   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-   OPT: -journal-disable -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs -then -main main2
+   MODULE: @PTEST_NAME@
+   OPT: -journal-disable -then -main main2
 */
 /* bug 971: */
 volatile foo;

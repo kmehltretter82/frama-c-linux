@@ -1,6 +1,6 @@
 /* run.config
-   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-   OPT: -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs -kernel-warn-key transient-block=active
+ MODULE: @PTEST_NAME@
+   OPT: -kernel-warn-key transient-block=active
 */
 
 void f(void) { }

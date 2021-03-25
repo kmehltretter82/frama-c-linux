@@ -1,8 +1,8 @@
 /* run.config
-EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@_bis.cmxs
-OPT: -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs
-OPT: -load-module @PTEST_DIR@/@PTEST_NAME@_bis -test -then-on filtered -print
+ MODULE: @PTEST_NAME@
+   OPT:
+ MODULE: @PTEST_NAME@_bis
+   OPT: -test -then-on filtered -print
 */
 
 #include "stdio.h"

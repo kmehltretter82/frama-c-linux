@@ -1,6 +1,6 @@
 /* run.config
-   EXECNOW: make -s tests/spec/Type_of_term.cmxs
-   OPT: -load-module tests/spec/Type_of_term.cmxs -print
+ MODULE: Type_of_term
+   STDOPT:
 */
 
 int t [42];
