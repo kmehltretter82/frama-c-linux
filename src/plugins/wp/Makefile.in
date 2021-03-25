@@ -61,9 +61,10 @@ PLUGIN_NAME:=Wp
 PLUGIN_CMO:= \
 	rformat wprop \
 	wp_parameters wp_error \
-	dyncall ctypes clabels \
 	Why3Provers \
-	Context Warning AssignsCompleteness MemoryContext wpContext \
+	Context Warning \
+	dyncall ctypes clabels \
+	AssignsCompleteness MemoryContext wpContext \
 	LogicUsage RefUsage \
 	Layout Region \
 	RegionAnnot RegionAccess RegionDump RegionAnalysis \

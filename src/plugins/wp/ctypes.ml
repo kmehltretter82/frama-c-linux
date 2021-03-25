@@ -237,8 +237,13 @@ let char c = Integer.to_int64 (Cil.charConstToInt c)
 
 let constant e =
   match (Cil.constFold true e).enode with
-  | Const(CInt64(k,_,_)) -> Integer.to_int64 k
-  | _ -> WpLog.fatal "Non-constant expression (%a)" Printer.pp_exp e
+  | Const(CInt64(k,_,_)) ->
+      begin
+        try Integer.to_int64 k
+        with Z.Overflow ->
+          Warning.error "Array size too large (%a)" (Integer.pretty ~hexa:true) k
+      end
+  | _ -> Warning.error "Non-constant expression (%a)" Printer.pp_exp e
 
 let get_int e =
   match (Cil.constFold true e).enode with
