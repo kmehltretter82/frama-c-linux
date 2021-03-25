@@ -25,6 +25,8 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-  E-ACSL       [2021-03-25] Add support for `check` and `admit` annotations
+                (frama-c/e-acsl#142).
 -* E-ACSL       [2021-03-25] Fix wrong computation of the base pointer when
                 calling \valid predicate leading to undetected array overflows.
 -* E-ACSL       [2021-02-24] Fix crash when running another analysis after
