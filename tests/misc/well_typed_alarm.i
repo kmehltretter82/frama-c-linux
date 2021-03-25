@@ -1,6 +1,6 @@
 /* run.config*
-EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-OPT: -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs
+ MODULE: @PTEST_NAME@
+   OPT:
 */
 int main(int c) {
   int x = 0;
