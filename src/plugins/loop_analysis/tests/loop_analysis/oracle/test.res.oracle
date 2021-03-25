@@ -1,0 +1,8 @@
+[kernel] Parsing tests/loop_analysis/test.i (no preprocessing)
+[loop] Maximum number of iterations by loop:
+  tests/loop_analysis/test.i:8: 10
+  tests/loop_analysis/test.i:39: 9
+  tests/loop_analysis/test.i:44: 9
+  tests/loop_analysis/test.i:49: 20
+  tests/loop_analysis/test.i:55: 10
+  tests/loop_analysis/test.i:61: 10
