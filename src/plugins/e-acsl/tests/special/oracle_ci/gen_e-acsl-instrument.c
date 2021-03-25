@@ -98,7 +98,7 @@ int main(void)
     int __gen_e_acsl_initialized;
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& x),
                                                     sizeof(int));
-    __e_acsl_assert(__gen_e_acsl_initialized,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_initialized,1,"Assertion","main",
                     "\\initialized(&x)","tests/special/e-acsl-instrument.c",
                     56);
   }
@@ -107,7 +107,7 @@ int main(void)
     int __gen_e_acsl_initialized_2;
     __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& y),
                                                       sizeof(int));
-    __e_acsl_assert(__gen_e_acsl_initialized_2,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_initialized_2,1,"Assertion","main",
                     "\\initialized(&y)","tests/special/e-acsl-instrument.c",
                     57);
   }
@@ -138,7 +138,7 @@ int __gen_e_acsl_instrument2(int *p)
     __e_acsl_store_block((void *)(& p),(size_t)8);
     __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int),(void *)p,
                                         (void *)(& p));
-    __e_acsl_assert(__gen_e_acsl_valid,"Precondition","instrument2",
+    __e_acsl_assert(__gen_e_acsl_valid,1,"Precondition","instrument2",
                     "\\valid(p)","tests/special/e-acsl-instrument.c",29);
   }
   __retres = instrument2(p);
@@ -154,7 +154,7 @@ int __gen_e_acsl_uninstrument2(int *p)
     int __gen_e_acsl_valid;
     __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int),(void *)p,
                                         (void *)(& p));
-    __e_acsl_assert(__gen_e_acsl_valid,"Precondition","uninstrument2",
+    __e_acsl_assert(__gen_e_acsl_valid,1,"Precondition","uninstrument2",
                     "\\valid(p)","tests/special/e-acsl-instrument.c",14);
   }
   __e_acsl_sound_verdict = 0;

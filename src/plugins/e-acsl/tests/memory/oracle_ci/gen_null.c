@@ -4,7 +4,7 @@
 int main(void)
 {
   int __retres;
-  __e_acsl_assert((void *)0 == (void *)0,"Assertion","main",
+  __e_acsl_assert((void *)0 == (void *)0,1,"Assertion","main",
                   "\\null == (void *)0","tests/memory/null.i",6);
   /*@ assert \null ≡ (void *)0; */ ;
   __retres = 0;

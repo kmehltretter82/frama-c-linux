@@ -26,14 +26,14 @@ void __gen_e_acsl_loop(void)
 {
   {
     int __gen_e_acsl_valid;
-    __e_acsl_assert(global_i == 0,"Precondition","loop","global_i == 0",
+    __e_acsl_assert(global_i == 0,1,"Precondition","loop","global_i == 0",
                     "tests/bts/bts1478.c",9);
     __gen_e_acsl_valid = __e_acsl_valid((void *)global_i_ptr,sizeof(int),
                                         (void *)global_i_ptr,
                                         (void *)(& global_i_ptr));
-    __e_acsl_assert(__gen_e_acsl_valid,"Precondition","loop",
+    __e_acsl_assert(__gen_e_acsl_valid,1,"Precondition","loop",
                     "\\valid(global_i_ptr)","tests/bts/bts1478.c",10);
-    __e_acsl_assert(global_i_ptr == & global_i,"Precondition","loop",
+    __e_acsl_assert(global_i_ptr == & global_i,1,"Precondition","loop",
                     "global_i_ptr == &global_i","tests/bts/bts1478.c",11);
   }
   loop();

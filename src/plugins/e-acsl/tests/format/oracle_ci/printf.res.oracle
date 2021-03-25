@@ -75,7 +75,8 @@
 [e-acsl] FRAMAC_SHARE/libc/string.h:165: Warning: 
   invalid E-ACSL construct
   `non integer variable p in quantification
-  found: ∀ char *p; \old(s) ≤ p < \result ⇒ *p ≢ (char)\old(c)'.
+  found: result_first_occur:
+    ∀ char *p; \old(s) ≤ p < \result ⇒ *p ≢ (char)\old(c)'.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:125: Warning: 
   E-ACSL construct `logic functions with labels' is not yet supported.
@@ -103,7 +104,7 @@
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] FRAMAC_SHARE/libc/unistd.h:857: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/unistd.h:857: Warning: 
   function __gen_e_acsl_fork: postcondition 'result_ok_child_or_error' got status unknown.
 [kernel:annot:missing-spec] tests/format/printf.c:180: Warning: 

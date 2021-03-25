@@ -34,20 +34,20 @@ int main(void)
   int *q = & b;
   __e_acsl_store_block((void *)(& q),(size_t)8);
   __e_acsl_full_init((void *)(& q));
-  __e_acsl_assert(1,"Assertion","main","\\initialized(&b)",
+  __e_acsl_assert(1,1,"Assertion","main","\\initialized(&b)",
                   "tests/memory/init.c",9);
   /*@ assert \initialized(&b); */ ;
   {
     int __gen_e_acsl_initialized;
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)q,sizeof(int));
-    __e_acsl_assert(__gen_e_acsl_initialized,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_initialized,1,"Assertion","main",
                     "\\initialized(q)","tests/memory/init.c",10);
   }
   /*@ assert \initialized(q); */ ;
   {
     int __gen_e_acsl_initialized_2;
     __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)p,sizeof(int));
-    __e_acsl_assert(__gen_e_acsl_initialized_2,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_initialized_2,1,"Assertion","main",
                     "\\initialized(p)","tests/memory/init.c",11);
   }
   /*@ assert \initialized(p); */ ;

@@ -16,7 +16,7 @@ int main(void)
     int __gen_e_acsl_valid;
     __gen_e_acsl_valid = __e_acsl_valid((void *)(& s),sizeof(struct toto),
                                         (void *)(& s),(void *)0);
-    __e_acsl_assert(__gen_e_acsl_valid,"Assertion","main","\\valid(&s)",
+    __e_acsl_assert(__gen_e_acsl_valid,1,"Assertion","main","\\valid(&s)",
                     "tests/bts/bts1700.i",9);
   }
   /*@ assert \valid(&s); */ ;
@@ -34,7 +34,7 @@ int main(void)
       __gen_e_acsl_and = __gen_e_acsl_valid_2;
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,"Assertion","main","\\valid(p)",
+    __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","main","\\valid(p)",
                     "tests/bts/bts1700.i",12);
   }
   /*@ assert \valid(p); */ ;

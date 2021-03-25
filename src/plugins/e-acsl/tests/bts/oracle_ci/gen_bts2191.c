@@ -56,7 +56,7 @@ int main(int argc, char **argv)
       __gen_e_acsl_and = __gen_e_acsl_valid_read;
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","main",
                     "\\valid_read(_G[0].str)","tests/bts/bts2191.c",22);
   }
   /*@ assert \valid_read(_G[0].str); */ ;

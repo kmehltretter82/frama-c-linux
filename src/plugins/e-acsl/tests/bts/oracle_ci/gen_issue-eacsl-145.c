@@ -28,7 +28,7 @@ int main(void)
     int __gen_e_acsl_valid;
     __gen_e_acsl_valid = __e_acsl_valid((void *)(& G),sizeof(int),
                                         (void *)(& G),(void *)0);
-    __e_acsl_assert(__gen_e_acsl_valid,"Assertion","main","\\valid(&G)",
+    __e_acsl_assert(__gen_e_acsl_valid,1,"Assertion","main","\\valid(&G)",
                     "tests/bts/issue-eacsl-145.c",9);
   }
   /*@ assert \valid(&G); */ ;

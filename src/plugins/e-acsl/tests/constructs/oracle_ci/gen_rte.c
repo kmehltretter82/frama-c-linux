@@ -55,13 +55,13 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
   {
     int __gen_e_acsl_assumes_value;
     __gen_e_acsl_contract = __e_acsl_contract_init((size_t)1);
-    __e_acsl_assert(c != 0,"RTE","test","division_by_zero: c != 0",
+    __e_acsl_assert(c != 0,1,"RTE","test","division_by_zero: c != 0",
                     "tests/constructs/rte.i",11);
     __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
                                            1 % c == 1);
-    __e_acsl_assert(a != 0,"RTE","test","division_by_zero: a != 0",
+    __e_acsl_assert(a != 0,1,"RTE","test","division_by_zero: a != 0",
                     "tests/constructs/rte.i",7);
-    __e_acsl_assert(1 % a == 1,"Precondition","test","1 % a == 1",
+    __e_acsl_assert(1 % a == 1,1,"Precondition","test","1 % a == 1",
                     "tests/constructs/rte.i",7);
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)0);
@@ -73,32 +73,32 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
       int __gen_e_acsl_var_2;
       int __gen_e_acsl_exists;
       int __gen_e_acsl_var_3;
-      __e_acsl_assert(d != 0,"RTE","test","division_by_zero: d != 0",
+      __e_acsl_assert(d != 0,1,"RTE","test","division_by_zero: d != 0",
                       "tests/constructs/rte.i",12);
-      __e_acsl_assert(f != 0,"RTE","test","division_by_zero: f != 0",
+      __e_acsl_assert(f != 0,1,"RTE","test","division_by_zero: f != 0",
                       "tests/constructs/rte.i",13);
       if (1 % f == 1) __gen_e_acsl_or = 1;
       else {
-        __e_acsl_assert(g != 0,"RTE","test","division_by_zero: g != 0",
+        __e_acsl_assert(g != 0,1,"RTE","test","division_by_zero: g != 0",
                         "tests/constructs/rte.i",13);
         __gen_e_acsl_or = 1 % g == 1;
       }
-      __e_acsl_assert(h != 0,"RTE","test","division_by_zero: h != 0",
+      __e_acsl_assert(h != 0,1,"RTE","test","division_by_zero: h != 0",
                       "tests/constructs/rte.i",14);
       if (1 % h == 1) {
-        __e_acsl_assert(i != 0,"RTE","test","division_by_zero: i != 0",
+        __e_acsl_assert(i != 0,1,"RTE","test","division_by_zero: i != 0",
                         "tests/constructs/rte.i",14);
         __gen_e_acsl_and = 1 % i == 1;
       }
       else __gen_e_acsl_and = 0;
       __gen_e_acsl_var = 1;
-      __e_acsl_assert(j != 0,"RTE","test","division_by_zero: j != 0",
+      __e_acsl_assert(j != 0,1,"RTE","test","division_by_zero: j != 0",
                       "tests/constructs/rte.i",15);
       __gen_e_acsl_forall = 1;
       __gen_e_acsl_var_2 = 0;
       while (1) {
         if (__gen_e_acsl_var_2 < k) ; else break;
-        __e_acsl_assert(k != 0,"RTE","test","division_by_zero: k != 0",
+        __e_acsl_assert(k != 0,1,"RTE","test","division_by_zero: k != 0",
                         "tests/constructs/rte.i",16);
         if (__gen_e_acsl_var_2 % k == __gen_e_acsl_var_2) ;
         else {
@@ -112,7 +112,7 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
       __gen_e_acsl_var_3 = 0;
       while (1) {
         if (__gen_e_acsl_var_3 < l) ; else break;
-        __e_acsl_assert(l != 0,"RTE","test","division_by_zero: l != 0",
+        __e_acsl_assert(l != 0,1,"RTE","test","division_by_zero: l != 0",
                         "tests/constructs/rte.i",17);
         if (! (__gen_e_acsl_var_3 % l == __gen_e_acsl_var_3)) ;
         else {
@@ -122,22 +122,22 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
         __gen_e_acsl_var_3 ++;
       }
       e_acsl_end_loop2: ;
-      __e_acsl_assert(__gen_e_acsl_exists,"Precondition","test",
+      __e_acsl_assert(__gen_e_acsl_exists,1,"Precondition","test",
                       "bhvr: \\exists integer var; 0 <= var < l && var % l == var",
                       "tests/constructs/rte.i",17);
-      __e_acsl_assert(__gen_e_acsl_forall,"Precondition","test",
+      __e_acsl_assert(__gen_e_acsl_forall,1,"Precondition","test",
                       "bhvr: \\forall integer var; 0 <= var < k ==> var % k == var",
                       "tests/constructs/rte.i",16);
-      __e_acsl_assert(__gen_e_acsl_var % j == 1,"Precondition","test",
+      __e_acsl_assert(__gen_e_acsl_var % j == 1,1,"Precondition","test",
                       "bhvr: \\let var = 1; var % j == 1",
                       "tests/constructs/rte.i",15);
-      __e_acsl_assert(__gen_e_acsl_and,"Precondition","test",
+      __e_acsl_assert(__gen_e_acsl_and,1,"Precondition","test",
                       "bhvr: 1 % h == 1 && 1 % i == 1",
                       "tests/constructs/rte.i",14);
-      __e_acsl_assert(__gen_e_acsl_or,"Precondition","test",
+      __e_acsl_assert(__gen_e_acsl_or,1,"Precondition","test",
                       "bhvr: 1 % f == 1 || 1 % g == 1",
                       "tests/constructs/rte.i",13);
-      __e_acsl_assert(1 % d == 1,"Precondition","test","bhvr: 1 % d == 1",
+      __e_acsl_assert(1 % d == 1,1,"Precondition","test","bhvr: 1 % d == 1",
                       "tests/constructs/rte.i",12);
     }
   }
@@ -146,18 +146,18 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
   test(a,b,c,d,e,f,g,h,i,j,k,l);
   {
     int __gen_e_acsl_assumes_value_2;
-    __e_acsl_assert(__gen_e_acsl_at != 0,"RTE","test",
+    __e_acsl_assert(__gen_e_acsl_at != 0,1,"RTE","test",
                     "division_by_zero: __gen_e_acsl_at != 0",
                     "tests/constructs/rte.i",8);
-    __e_acsl_assert(1 % __gen_e_acsl_at == 1,"Postcondition","test",
+    __e_acsl_assert(1 % __gen_e_acsl_at == 1,1,"Postcondition","test",
                     "1 % \\old(b) == 1","tests/constructs/rte.i",8);
     __gen_e_acsl_assumes_value_2 = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)0);
     if (__gen_e_acsl_assumes_value_2) {
-      __e_acsl_assert(__gen_e_acsl_at_2 != 0,"RTE","test",
+      __e_acsl_assert(__gen_e_acsl_at_2 != 0,1,"RTE","test",
                       "division_by_zero: __gen_e_acsl_at_2 != 0",
                       "tests/constructs/rte.i",18);
-      __e_acsl_assert(1 % __gen_e_acsl_at_2 == 1,"Postcondition","test",
+      __e_acsl_assert(1 % __gen_e_acsl_at_2 == 1,1,"Postcondition","test",
                       "bhvr: 1 % \\old(e) == 1","tests/constructs/rte.i",18);
     }
     __e_acsl_contract_clean(__gen_e_acsl_contract);

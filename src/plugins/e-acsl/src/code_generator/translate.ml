@@ -372,6 +372,7 @@ and context_insensitive_term_to_exp kf env t =
         assert (Gmp_types.Z.is_t ty);
         let cond =
           Smart_stmt.runtime_check
+            ~pred_kind:Assert
             (Env.annotation_kind env)
             kf
             guard
@@ -456,6 +457,7 @@ and context_insensitive_term_to_exp kf env t =
           let pname = bop_name ^ "_rhs_fits_in_mp_bitcnt_t" in
           let pred = { pred with pred_name = pname :: pred.pred_name } in
           let cond = Smart_stmt.runtime_check
+              ~pred_kind:Assert
               Smart_stmt.RTE
               kf
               coerce_guard
@@ -520,6 +522,7 @@ and context_insensitive_term_to_exp kf env t =
           let e1_guard_cond =
             let pred = Logic_const.prel ~loc (Rge, t1, zero) in
             let cond = Smart_stmt.runtime_check
+                ~pred_kind:Assert
                 Smart_stmt.RTE
                 kf
                 e1_guard
@@ -1040,6 +1043,7 @@ and predicate_content_to_exp ?name kf env p =
            in
            let stmt =
              Smart_stmt.runtime_check
+               ~pred_kind:Assert
                Smart_stmt.RTE
                kf
                e
@@ -1125,7 +1129,6 @@ and translate_rte_annots:
                 (* The logic scope MUST NOT be reset here since we still might
                    be in the middle of the translation of the original
                    predicate. *)
-                let p = p.tp_statement in
                 let lscope_reset_old = Env.Logic_scope.get_reset env in
                 let env = Env.Logic_scope.set_reset env false in
                 let env =
@@ -1153,25 +1156,29 @@ and translate_rte ?filter kf env e =
   translate_rte_annots Printer.pp_exp e kf env l
 
 and translate_predicate ?pred_to_print kf env p =
-  Options.feedback ~dkey ~level:3 "translating predicate %a"
-    Printer.pp_predicate p;
-  let pred_to_print =
-    match pred_to_print with
-    | Some pred ->
-      Options.feedback ~dkey ~level:3 "(predicate to print %a)"
-        Printer.pp_predicate pred;
-      pred
-    | None -> p
-  in
-  let e, env = generalized_untyped_predicate_to_exp kf env p in
-  Env.add_stmt
-    env
-    kf
-    (Smart_stmt.runtime_check
-       (Env.annotation_kind env)
-       kf
-       e
-       pred_to_print)
+  match p.tp_kind with
+  | Assert | Check ->
+    Options.feedback ~dkey ~level:3 "translating predicate %a"
+      Printer.pp_toplevel_predicate p;
+    let pred_to_print =
+      match pred_to_print with
+      | Some pred ->
+        Options.feedback ~dkey ~level:3 "(predicate to print %a)"
+          Printer.pp_predicate pred;
+        pred
+      | None -> p.tp_statement
+    in
+    let e, env = generalized_untyped_predicate_to_exp kf env p.tp_statement in
+    Env.add_stmt
+      env
+      kf
+      (Smart_stmt.runtime_check
+         ~pred_kind:p.tp_kind
+         (Env.annotation_kind env)
+         kf
+         e
+         pred_to_print)
+  | Admit -> env
 
 let predicate_to_exp_without_rte ?name kf env p =
   predicate_to_exp ?name kf env p (* forget optional argument ?rte *)

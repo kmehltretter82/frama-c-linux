@@ -6,7 +6,7 @@ int main(void)
   int __retres;
   int x = 0;
   if (x) {
-    __e_acsl_assert(0,"Assertion","main","\\false",
+    __e_acsl_assert(0,1,"Assertion","main","\\false",
                     "tests/constructs/false.i",6);
     /*@ assert \false; */ ;
   }

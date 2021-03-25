@@ -9,7 +9,7 @@ void simple_loop(void)
     {
       int __gen_e_acsl_and;
       if (0 <= i) __gen_e_acsl_and = i <= 10; else __gen_e_acsl_and = 0;
-      __e_acsl_assert(__gen_e_acsl_and,"Invariant","simple_loop",
+      __e_acsl_assert(__gen_e_acsl_and,1,"Invariant","simple_loop",
                       "0 <= i <= 10","tests/constructs/loop.i",8);
     }
     /*@ loop invariant 0 ≤ i ≤ 10; */
@@ -20,7 +20,7 @@ void simple_loop(void)
         i ++;
         if (0 <= i) __gen_e_acsl_and_2 = i <= 10;
         else __gen_e_acsl_and_2 = 0;
-        __e_acsl_assert(__gen_e_acsl_and_2,"Invariant","simple_loop",
+        __e_acsl_assert(__gen_e_acsl_and_2,1,"Invariant","simple_loop",
                         "0 <= i <= 10","tests/constructs/loop.i",8);
       }
     }
@@ -35,7 +35,7 @@ void nested_loops(void)
   {
     int __gen_e_acsl_and;
     if (0 <= i) __gen_e_acsl_and = i <= 10; else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,"Invariant","nested_loops",
+    __e_acsl_assert(__gen_e_acsl_and,1,"Invariant","nested_loops",
                     "0 <= i <= 10","tests/constructs/loop.i",15);
   }
   /*@ loop invariant 0 ≤ i ≤ 10; */
@@ -54,16 +54,16 @@ void nested_loops(void)
           __gen_e_acsl_l = 0;
           while (1) {
             if (__gen_e_acsl_l < j) ; else break;
-            __e_acsl_assert(__gen_e_acsl_l < 15,"RTE","nested_loops",
+            __e_acsl_assert(__gen_e_acsl_l < 15,1,"RTE","nested_loops",
                             "index_bound: __gen_e_acsl_l < 15",
                             "tests/constructs/loop.i",19);
-            __e_acsl_assert(0 <= __gen_e_acsl_l,"RTE","nested_loops",
+            __e_acsl_assert(0 <= __gen_e_acsl_l,1,"RTE","nested_loops",
                             "index_bound: 0 <= __gen_e_acsl_l",
                             "tests/constructs/loop.i",19);
-            __e_acsl_assert(__gen_e_acsl_k < 10,"RTE","nested_loops",
+            __e_acsl_assert(__gen_e_acsl_k < 10,1,"RTE","nested_loops",
                             "index_bound: __gen_e_acsl_k < 10",
                             "tests/constructs/loop.i",19);
-            __e_acsl_assert(0 <= __gen_e_acsl_k,"RTE","nested_loops",
+            __e_acsl_assert(0 <= __gen_e_acsl_k,1,"RTE","nested_loops",
                             "index_bound: 0 <= __gen_e_acsl_k",
                             "tests/constructs/loop.i",19);
             if ((long)t[__gen_e_acsl_k][__gen_e_acsl_l] == __gen_e_acsl_k * (long)__gen_e_acsl_l) 
@@ -77,12 +77,12 @@ void nested_loops(void)
           __gen_e_acsl_k ++;
         }
         e_acsl_end_loop1: ;
-        __e_acsl_assert(__gen_e_acsl_forall,"Invariant","nested_loops",
+        __e_acsl_assert(__gen_e_acsl_forall,1,"Invariant","nested_loops",
                         "\\forall integer k, integer l; 0 <= k < i && 0 <= l < j ==> t[k][l] == k * l",
                         "tests/constructs/loop.i",19);
         if (0 <= j) __gen_e_acsl_and_2 = j <= 15;
         else __gen_e_acsl_and_2 = 0;
-        __e_acsl_assert(__gen_e_acsl_and_2,"Invariant","nested_loops",
+        __e_acsl_assert(__gen_e_acsl_and_2,1,"Invariant","nested_loops",
                         "0 <= j <= 15","tests/constructs/loop.i",17);
       }
       /*@ loop invariant 0 ≤ j ≤ 15;
@@ -100,7 +100,7 @@ void nested_loops(void)
           j ++;
           if (0 <= j) __gen_e_acsl_and_3 = j <= 15;
           else __gen_e_acsl_and_3 = 0;
-          __e_acsl_assert(__gen_e_acsl_and_3,"Invariant","nested_loops",
+          __e_acsl_assert(__gen_e_acsl_and_3,1,"Invariant","nested_loops",
                           "0 <= j <= 15","tests/constructs/loop.i",17);
           __gen_e_acsl_forall_2 = 1;
           __gen_e_acsl_k_2 = 0;
@@ -109,16 +109,16 @@ void nested_loops(void)
             __gen_e_acsl_l_2 = 0;
             while (1) {
               if (__gen_e_acsl_l_2 < j) ; else break;
-              __e_acsl_assert(__gen_e_acsl_l_2 < 15,"RTE","nested_loops",
+              __e_acsl_assert(__gen_e_acsl_l_2 < 15,1,"RTE","nested_loops",
                               "index_bound: __gen_e_acsl_l_2 < 15",
                               "tests/constructs/loop.i",19);
-              __e_acsl_assert(0 <= __gen_e_acsl_l_2,"RTE","nested_loops",
+              __e_acsl_assert(0 <= __gen_e_acsl_l_2,1,"RTE","nested_loops",
                               "index_bound: 0 <= __gen_e_acsl_l_2",
                               "tests/constructs/loop.i",19);
-              __e_acsl_assert(__gen_e_acsl_k_2 < 10,"RTE","nested_loops",
+              __e_acsl_assert(__gen_e_acsl_k_2 < 10,1,"RTE","nested_loops",
                               "index_bound: __gen_e_acsl_k_2 < 10",
                               "tests/constructs/loop.i",19);
-              __e_acsl_assert(0 <= __gen_e_acsl_k_2,"RTE","nested_loops",
+              __e_acsl_assert(0 <= __gen_e_acsl_k_2,1,"RTE","nested_loops",
                               "index_bound: 0 <= __gen_e_acsl_k_2",
                               "tests/constructs/loop.i",19);
               /*@ assert
@@ -136,7 +136,7 @@ void nested_loops(void)
             __gen_e_acsl_k_2 ++;
           }
           e_acsl_end_loop2: ;
-          __e_acsl_assert(__gen_e_acsl_forall_2,"Invariant","nested_loops",
+          __e_acsl_assert(__gen_e_acsl_forall_2,1,"Invariant","nested_loops",
                           "\\forall integer k, integer l; 0 <= k < i && 0 <= l < j ==> t[k][l] == k * l",
                           "tests/constructs/loop.i",19);
         }
@@ -146,7 +146,7 @@ void nested_loops(void)
       int __gen_e_acsl_and_4;
       i ++;
       if (0 <= i) __gen_e_acsl_and_4 = i <= 10; else __gen_e_acsl_and_4 = 0;
-      __e_acsl_assert(__gen_e_acsl_and_4,"Invariant","nested_loops",
+      __e_acsl_assert(__gen_e_acsl_and_4,1,"Invariant","nested_loops",
                       "0 <= i <= 10","tests/constructs/loop.i",15);
     }
   }
@@ -161,7 +161,7 @@ void unnatural_loop(void)
     {
       int __gen_e_acsl_and;
       if (0 <= i) __gen_e_acsl_and = i <= 6; else __gen_e_acsl_and = 0;
-      __e_acsl_assert(__gen_e_acsl_and,"Invariant","unnatural_loop",
+      __e_acsl_assert(__gen_e_acsl_and,1,"Invariant","unnatural_loop",
                       "0 <= i <= 6","tests/constructs/loop.i",26);
     }
     /*@ loop invariant 0 ≤ i ≤ 6; */
@@ -172,7 +172,7 @@ void unnatural_loop(void)
         int __gen_e_acsl_and_2;
         i ++;
         if (0 <= i) __gen_e_acsl_and_2 = i <= 6; else __gen_e_acsl_and_2 = 0;
-        __e_acsl_assert(__gen_e_acsl_and_2,"Invariant","unnatural_loop",
+        __e_acsl_assert(__gen_e_acsl_and_2,1,"Invariant","unnatural_loop",
                         "0 <= i <= 6","tests/constructs/loop.i",26);
       }
     }

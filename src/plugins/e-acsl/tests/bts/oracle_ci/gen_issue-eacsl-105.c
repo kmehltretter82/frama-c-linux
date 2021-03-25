@@ -14,7 +14,7 @@ int f(void)
     int __gen_e_acsl_valid;
     __gen_e_acsl_valid = __e_acsl_valid((void *)(& a),sizeof(int),
                                         (void *)(& a),(void *)0);
-    __e_acsl_assert(__gen_e_acsl_valid,"Assertion","f","\\valid(&a)",
+    __e_acsl_assert(__gen_e_acsl_valid,1,"Assertion","f","\\valid(&a)",
                     "tests/bts/issue-eacsl-105.c",11);
   }
   __retres = 0;

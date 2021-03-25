@@ -54,7 +54,7 @@ int main(int argc, char const **argv)
       int __gen_e_acsl_valid;
       __gen_e_acsl_valid = __e_acsl_valid((void *)(& a),sizeof(int),
                                           (void *)(& a),(void *)0);
-      __e_acsl_assert(__gen_e_acsl_valid,"Assertion","main","\\valid(&a)",
+      __e_acsl_assert(__gen_e_acsl_valid,1,"Assertion","main","\\valid(&a)",
                       "tests/memory/local_goto.c",25);
     }
     /*@ assert \valid(&a); */ ;
@@ -72,8 +72,8 @@ int main(int argc, char const **argv)
       int __gen_e_acsl_valid_2;
       __gen_e_acsl_valid_2 = __e_acsl_valid((void *)(& b),sizeof(int),
                                             (void *)(& b),(void *)0);
-      __e_acsl_assert(__gen_e_acsl_valid_2,"Assertion","main","\\valid(&b)",
-                      "tests/memory/local_goto.c",36);
+      __e_acsl_assert(__gen_e_acsl_valid_2,1,"Assertion","main",
+                      "\\valid(&b)","tests/memory/local_goto.c",36);
     }
     /*@ assert \valid(&b); */ ;
     printf(__gen_e_acsl_literal_string_2,t,

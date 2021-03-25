@@ -9,14 +9,14 @@
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] tests/arith/rationals.c:12: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] tests/arith/rationals.c:13: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] tests/arith/rationals.c:13: Warning: assertion got status unknown.
 [eva:alarm] tests/arith/rationals.c:15: Warning: 
   non-finite double value. assert \is_finite(__gen_e_acsl__6);
 [eva:alarm] tests/arith/rationals.c:15: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] tests/arith/rationals.c:15: Warning: assertion got status unknown.
 [eva:alarm] tests/arith/rationals.c:16: Warning: 
   non-finite double value. assert \is_finite(__gen_e_acsl__9);
@@ -25,23 +25,23 @@
 [eva:alarm] tests/arith/rationals.c:16: Warning: 
   non-finite float value. assert \is_finite((float)__gen_e_acsl__9);
 [eva:alarm] tests/arith/rationals.c:16: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] tests/arith/rationals.c:17: Warning: 
   non-finite double value. assert \is_finite(__gen_e_acsl__12);
 [eva:alarm] tests/arith/rationals.c:17: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] tests/arith/rationals.c:17: Warning: assertion got status unknown.
 [eva:alarm] tests/arith/rationals.c:18: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] tests/arith/rationals.c:18: Warning: assertion got status unknown.
 [eva:alarm] tests/arith/rationals.c:22: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] tests/arith/rationals.c:4: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] tests/arith/rationals.c:4: Warning: 
   function __gen_e_acsl_avg: postcondition got status unknown.
 [eva:alarm] tests/arith/rationals.c:29: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] tests/arith/rationals.c:29: Warning: assertion got status unknown.
 [eva:alarm] tests/arith/rationals.c:32: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.

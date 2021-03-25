@@ -7,24 +7,24 @@ int main(void)
   int x = -3;
   int y = 2;
   long z = 2L;
-  __e_acsl_assert(-3 == x,"Assertion","main","-3 == x","tests/arith/arith.i",
-                  10);
+  __e_acsl_assert(-3 == x,1,"Assertion","main","-3 == x",
+                  "tests/arith/arith.i",10);
   /*@ assert -3 ≡ x; */ ;
-  __e_acsl_assert(x == -3,"Assertion","main","x == -3","tests/arith/arith.i",
-                  11);
+  __e_acsl_assert(x == -3,1,"Assertion","main","x == -3",
+                  "tests/arith/arith.i",11);
   /*@ assert x ≡ -3; */ ;
-  __e_acsl_assert(1,"Assertion","main","0 != ~0","tests/arith/arith.i",12);
+  __e_acsl_assert(1,1,"Assertion","main","0 != ~0","tests/arith/arith.i",12);
   /*@ assert 0 ≢ ~0; */ ;
-  __e_acsl_assert(x + 1L == -2L,"Assertion","main","x + 1 == -2",
+  __e_acsl_assert(x + 1L == -2L,1,"Assertion","main","x + 1 == -2",
                   "tests/arith/arith.i",14);
   /*@ assert x + 1 ≡ -2; */ ;
-  __e_acsl_assert(x - 1L == -4L,"Assertion","main","x - 1 == -4",
+  __e_acsl_assert(x - 1L == -4L,1,"Assertion","main","x - 1 == -4",
                   "tests/arith/arith.i",15);
   /*@ assert x - 1 ≡ -4; */ ;
-  __e_acsl_assert(x * 3L == -9L,"Assertion","main","x * 3 == -9",
+  __e_acsl_assert(x * 3L == -9L,1,"Assertion","main","x * 3 == -9",
                   "tests/arith/arith.i",16);
   /*@ assert x * 3 ≡ -9; */ ;
-  __e_acsl_assert(x / 3 == -1,"Assertion","main","x / 3 == -1",
+  __e_acsl_assert(x / 3 == -1,1,"Assertion","main","x / 3 == -1",
                   "tests/arith/arith.i",17);
   /*@ assert x / 3 ≡ -1; */ ;
   {
@@ -39,13 +39,13 @@ int main(void)
                                         (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
     __gmpz_init(__gen_e_acsl_div);
     /*@ assert E_ACSL: 0xffffffffffffffffffffff ≢ 0; */
-    __e_acsl_assert(__gen_e_acsl_div_guard != 0,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_div_guard != 0,1,"Assertion","main",
                     "0xffffffffffffffffffffff != 0","tests/arith/arith.i",18);
     __gmpz_tdiv_q(__gen_e_acsl_div,
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_),
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
     __gen_e_acsl__3 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_div));
-    __e_acsl_assert(__gen_e_acsl__3 == 1L,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl__3 == 1L,1,"Assertion","main",
                     "0xffffffffffffffffffffff / 0xffffffffffffffffffffff == 1",
                     "tests/arith/arith.i",18);
     __gmpz_clear(__gen_e_acsl_);
@@ -53,38 +53,38 @@ int main(void)
     __gmpz_clear(__gen_e_acsl_div);
   }
   /*@ assert 0xffffffffffffffffffffff / 0xffffffffffffffffffffff ≡ 1; */ ;
-  __e_acsl_assert(x % 2 == -1,"Assertion","main","x % 2 == -1",
+  __e_acsl_assert(x % 2 == -1,1,"Assertion","main","x % 2 == -1",
                   "tests/arith/arith.i",19);
   /*@ assert x % 2 ≡ -1; */ ;
-  __e_acsl_assert(1,"Assertion","main","-3 % -2 == -1","tests/arith/arith.i",
-                  20);
+  __e_acsl_assert(1,1,"Assertion","main","-3 % -2 == -1",
+                  "tests/arith/arith.i",20);
   /*@ assert -3 % -2 ≡ -1; */ ;
-  __e_acsl_assert(1,"Assertion","main","3 % -2 == 1","tests/arith/arith.i",
+  __e_acsl_assert(1,1,"Assertion","main","3 % -2 == 1","tests/arith/arith.i",
                   21);
   /*@ assert 3 % -2 ≡ 1; */ ;
-  __e_acsl_assert(((x * 2L + (3L + y)) - 4L) + (x - (long)y) == -10L,
+  __e_acsl_assert(((x * 2L + (3L + y)) - 4L) + (x - (long)y) == -10L,1,
                   "Assertion","main",
                   "((x * 2 + (3 + y)) - 4) + (x - y) == -10",
                   "tests/arith/arith.i",23);
   /*@ assert ((x * 2 + (3 + y)) - 4) + (x - y) ≡ -10; */ ;
-  __e_acsl_assert(1,"Assertion","main","(0 == 1) == !(0 == 0)",
+  __e_acsl_assert(1,1,"Assertion","main","(0 == 1) == !(0 == 0)",
                   "tests/arith/arith.i",25);
   /*@ assert (0 ≡ 1) ≡ !(0 ≡ 0); */ ;
-  __e_acsl_assert(1,"Assertion","main","(0 <= -1) == (0 > 0)",
+  __e_acsl_assert(1,1,"Assertion","main","(0 <= -1) == (0 > 0)",
                   "tests/arith/arith.i",26);
   /*@ assert (0 ≤ -1) ≡ (0 > 0); */ ;
-  __e_acsl_assert(1,"Assertion","main","(0 >= -1) == (0 <= 0)",
+  __e_acsl_assert(1,1,"Assertion","main","(0 >= -1) == (0 <= 0)",
                   "tests/arith/arith.i",27);
   /*@ assert (0 ≥ -1) ≡ (0 ≤ 0); */ ;
-  __e_acsl_assert(1,"Assertion","main","(0 != 1) == !(0 != 0)",
+  __e_acsl_assert(1,1,"Assertion","main","(0 != 1) == !(0 != 0)",
                   "tests/arith/arith.i",28);
   /*@ assert (0 ≢ 1) ≡ !(0 ≢ 0); */ ;
-  __e_acsl_assert(1,"Assertion","main","(0 != 0) == !(1 != 0)",
+  __e_acsl_assert(1,1,"Assertion","main","(0 != 0) == !(1 != 0)",
                   "tests/arith/arith.i",30);
   /*@ assert (0 ≢ 0) ≡ !(1 ≢ 0); */ ;
-  __e_acsl_assert(y != 0,"RTE","main","division_by_zero: y != 0",
+  __e_acsl_assert(y != 0,1,"RTE","main","division_by_zero: y != 0",
                   "tests/arith/arith.i",31);
-  __e_acsl_assert(4 / y == 2,"Assertion","main","4 / y == 2",
+  __e_acsl_assert(4 / y == 2,1,"Assertion","main","4 / y == 2",
                   "tests/arith/arith.i",31);
   /*@ assert 4 / y ≡ 2; */ ;
   {
@@ -108,7 +108,7 @@ int main(void)
                                           (__e_acsl_mpz_struct const *)(__gen_e_acsl__6));
     __gmpz_init(__gen_e_acsl_div_2);
     /*@ assert E_ACSL: y - 123456789123456789 ≢ 0; */
-    __e_acsl_assert(__gen_e_acsl_div_guard_2 != 0,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_div_guard_2 != 0,1,"Assertion","main",
                     "y - 123456789123456789 != 0","tests/arith/arith.i",34);
     __gmpz_tdiv_q(__gen_e_acsl_div_2,
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_add),
@@ -116,7 +116,7 @@ int main(void)
     __gen_e_acsl__7 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_div_2));
     /*@ assert Eva: signed_overflow: -2147483648 ≤ 1 + __gen_e_acsl__7; */
     /*@ assert Eva: signed_overflow: 1 + __gen_e_acsl__7 ≤ 2147483647; */
-    __e_acsl_assert(1 + __gen_e_acsl__7 == 1,"Assertion","main",
+    __e_acsl_assert(1 + __gen_e_acsl__7 == 1,1,"Assertion","main",
                     "1 + (z + 1) / (y - 123456789123456789) == 1",
                     "tests/arith/arith.i",34);
     __gmpz_clear(__gen_e_acsl_z);
@@ -127,7 +127,7 @@ int main(void)
     __gmpz_clear(__gen_e_acsl_div_2);
   }
   /*@ assert 1 + (z + 1) / (y - 123456789123456789) ≡ 1; */ ;
-  __e_acsl_assert(1L - x == - ((long)x) + 1L,"Assertion","main",
+  __e_acsl_assert(1L - x == - ((long)x) + 1L,1,"Assertion","main",
                   "1 - x == -x + 1","tests/arith/arith.i",36);
   /*@ assert 1 - x ≡ -x + 1; */ ;
   __retres = 0;
