@@ -77,14 +77,14 @@ void __gen_e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(*__gen_e_acsl_at_6),
                                                   sizeof(int),
                                                   (void *)(*__gen_e_acsl_at_6),
-                                                  (void *)(*__gen_e_acsl_at_6));
+                                                  (void *)0);
     __e_acsl_assert(__gen_e_acsl_valid_read,"RTE",
                     "atp_NORMAL_computeAverageAccel",
                     "mem_access: \\valid_read((int *)*__gen_e_acsl_at_6)",
                     "tests/bts/bts1326.i",8);
     __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(& (*__gen_e_acsl_at_5)[1]),
                                                     sizeof(int),
-                                                    (void *)(& (*__gen_e_acsl_at_5)[1]),
+                                                    (void *)(*__gen_e_acsl_at_5),
                                                     (void *)0);
     __e_acsl_assert(__gen_e_acsl_valid_read_2,"RTE",
                     "atp_NORMAL_computeAverageAccel",
@@ -92,7 +92,7 @@ void __gen_e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
                     "tests/bts/bts1326.i",8);
     __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)(& (*__gen_e_acsl_at_4)[2]),
                                                     sizeof(int),
-                                                    (void *)(& (*__gen_e_acsl_at_4)[2]),
+                                                    (void *)(*__gen_e_acsl_at_4),
                                                     (void *)0);
     __e_acsl_assert(__gen_e_acsl_valid_read_3,"RTE",
                     "atp_NORMAL_computeAverageAccel",
@@ -100,7 +100,7 @@ void __gen_e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
                     "tests/bts/bts1326.i",8);
     __gen_e_acsl_valid_read_4 = __e_acsl_valid_read((void *)(& (*__gen_e_acsl_at_3)[3]),
                                                     sizeof(int),
-                                                    (void *)(& (*__gen_e_acsl_at_3)[3]),
+                                                    (void *)(*__gen_e_acsl_at_3),
                                                     (void *)0);
     __e_acsl_assert(__gen_e_acsl_valid_read_4,"RTE",
                     "atp_NORMAL_computeAverageAccel",
@@ -108,7 +108,7 @@ void __gen_e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
                     "tests/bts/bts1326.i",8);
     __gen_e_acsl_valid_read_5 = __e_acsl_valid_read((void *)(& (*__gen_e_acsl_at_2)[4]),
                                                     sizeof(int),
-                                                    (void *)(& (*__gen_e_acsl_at_2)[4]),
+                                                    (void *)(*__gen_e_acsl_at_2),
                                                     (void *)0);
     __e_acsl_assert(__gen_e_acsl_valid_read_5,"RTE",
                     "atp_NORMAL_computeAverageAccel",

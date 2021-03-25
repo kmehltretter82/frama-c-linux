@@ -49,12 +49,11 @@ val term_addr_of: loc:location -> term_lval -> typ -> term
 val cty: logic_type -> typ
 (** Assume that the logic type is indeed a C type. Just return it. *)
 
-val ptr_index: ?loc:location -> ?index:exp -> exp
-  -> Cil_types.exp * Cil_types.exp
-(** Split pointer-arithmetic expression of the type [p + i] into its
-    pointer and integer parts. *)
+val ptr_base: loc:location -> exp -> exp
+(** Takes an expression [e] and return [base] where [base] is the address [p]
+    if [e] is of the form [p + i] and [e] otherwise. *)
 
-val ptr_base: loc:location -> exp -> exp * exp
+val ptr_base_and_base_addr: loc:location -> exp -> exp * exp
 (* Takes an expression [e] and return a tuple [(base, base_addr)] where [base]
    is the address [p] if [e] is of the form [p + i] and [e] otherwise, and
    [base_addr] is the address [&p] if [e] is of the form [p + i] and 0
@@ -93,6 +92,17 @@ val extract_uncoerced_lval: exp -> exp option
 
     If at some point the expression is neither a [CastE] nor an [Lval], then
     return [None]. *)
+
+val strip_casts: exp -> exp * typ list
+(** [strip casts e] strips the casts from the expression [e] and returns the
+    uncasted expression and the list of casts that were removed in order of
+    application. For example calling [strip_casts ((A)((B)((C)e)))] will return
+    the expression [e] and the list [[C; B; A]]. *)
+
+val add_casts: typ list -> exp -> exp
+(** [add_casts typs e] successively adds the casts in [typs] to the expression
+    [e]. For example calling [add_casts [C; B; A] e] will return the expression
+    [(A)((B)((C)e))]. *)
 
 (*
 Local Variables:

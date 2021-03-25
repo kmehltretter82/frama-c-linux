@@ -146,9 +146,9 @@ let assign ?(ltype) lhs rhs loc =
   in
   match Cil.unrollType ltype with
   | TPtr _ ->
-    let base, _ = Misc.ptr_index rhs in
+    let base = Misc.ptr_base ~loc:rhs.eloc rhs in
     let rhs, flow =
-      (match base.enode with
+      (match (Cil.stripCasts base).enode with
        | AddrOf _
        | StartOf _ -> rhs, Direct
        (* Unary operator describes !, ~ or -: treat it same as Const since

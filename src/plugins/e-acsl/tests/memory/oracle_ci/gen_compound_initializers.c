@@ -85,7 +85,7 @@ int main(int argc, char **argv)
   {
     int __gen_e_acsl_valid;
     __gen_e_acsl_valid = __e_acsl_valid((void *)(_A),sizeof(char *),
-                                        (void *)(_A),(void *)(_A));
+                                        (void *)(_A),(void *)0);
     __e_acsl_assert(__gen_e_acsl_valid,"Assertion","main",
                     "\\valid((char **)_A)",
                     "tests/memory/compound_initializers.c",33);
@@ -150,7 +150,7 @@ int main(int argc, char **argv)
   {
     int __gen_e_acsl_valid_3;
     __gen_e_acsl_valid_3 = __e_acsl_valid((void *)(_D),sizeof(int),
-                                          (void *)(_D),(void *)(_D));
+                                          (void *)(_D),(void *)0);
     __e_acsl_assert(__gen_e_acsl_valid_3,"Assertion","main",
                     "\\valid((int *)_D)",
                     "tests/memory/compound_initializers.c",38);
