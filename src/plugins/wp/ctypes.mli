@@ -48,7 +48,7 @@ type arrayflat = {
   arr_size     : int ; (** number of elements in the array *)
   arr_dim      : int ; (** number of dimensions in the array *)
   arr_cell     : typ ; (** type of elementary cells of the flatten array. Never an array. *)
-  arr_cell_nbr : int ; (** number of elementary cells in the flatten array *)
+  arr_cell_nbr : int64 ; (** number of elementary cells in the flatten array *)
 }
 
 type arrayinfo = {
@@ -131,7 +131,7 @@ val array_size : arrayinfo -> int option
 val array_dimensions : arrayinfo -> c_object * int option list
 (** Returns the list of dimensions the array consists of.
     None-dimension means undefined one. *)
-val dimension_of_object : c_object -> (int * int) option
+val dimension_of_object : c_object -> (int * int64) option
 (** Returns None for 1-dimension objects, and Some(d,N) for d-matrix with N cells *)
 
 val i_convert : c_int -> c_int -> c_int

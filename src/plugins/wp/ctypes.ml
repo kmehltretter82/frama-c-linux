@@ -138,7 +138,7 @@ type arrayflat = {
   arr_size     : int ;  (* number of elements in the array *)
   arr_dim      : int ;  (* number of dimensions in the array *)
   arr_cell     : typ ;  (* type of elementary cells of the flatten array *)
-  arr_cell_nbr : int ;  (* number of elementary cells in the flatten array *)
+  arr_cell_nbr : int64 ; (* number of elementary cells in the flatten array *)
 }
 
 type arrayinfo = {
@@ -290,7 +290,7 @@ let rec object_of typ =
                   arr_size = Int64.to_int (constant e) ;
                   arr_dim = dim ;
                   arr_cell = ty_cell ;
-                  arr_cell_nbr = Int64.to_int (ncells) ;
+                  arr_cell_nbr = ncells ;
                 }
             }
       end
@@ -464,7 +464,8 @@ let bits_sizeof_comp cinfo = Cil.bitsSizeOf (typ_comp cinfo)
 let bits_sizeof_array ainfo =
   match ainfo.arr_flat with
   | Some a ->
-      let csize = Cil.integer ~loc:Cil_builtins.builtinLoc a.arr_cell_nbr in
+      let csize = Cil.kinteger64
+          ~loc:Cil_builtins.builtinLoc (Z.of_int64 a.arr_cell_nbr) in
       let ctype = TArray(a.arr_cell,Some csize,Cil.empty_size_cache(),[]) in
       Cil.bitsSizeOf ctype
   | None ->
