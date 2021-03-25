@@ -464,19 +464,14 @@ module G = struct
     let widen _stmt ~widen_nb i1 i2 =
       let nb =
         if widen_nb then
-          let threshold =
-            None (* LoopAnalysis.Loop_analysis.get_bounds _stmt *)
-          in
-          (* TODO: since we cannot easily use LoopAnalysis here, we
-             should instead:
+          (* TODO:
              - collect the conditionals that exit the loop, as done
                for syntactic hints, if possible in a structured way
                (i.e. base + interval for which we exit the loop)
              - invert this interval using the gauges domain, to
                deduce the number of iterations from which we exit
              - use the max of those values as threshold. *)
-          let threshold = Option.map Integer.of_int threshold in
-          let (min, max as w) = Bounds.widen ?threshold i1.nb i2.nb in
+          let (min, max as w) = Bounds.widen i1.nb i2.nb in
           (* Limit min bound to 0 *)
           if min = None then (Some Integer.zero, max) else w
         else
