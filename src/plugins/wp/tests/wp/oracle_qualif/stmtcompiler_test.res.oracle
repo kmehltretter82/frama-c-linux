@@ -1,6 +1,6 @@
 # frama-c -wp [...]
 [kernel] Parsing tests/wp/stmtcompiler_test.i (no preprocessing)
-[kernel] tests/wp/stmtcompiler_test.i:136: Warning: 
+[kernel:CERT:MSC:37] tests/wp/stmtcompiler_test.i:136: Warning: 
   Body of function if_assert falls-through. Adding a return statement
 [wp] Running WP plugin...
 [kernel] tests/wp/stmtcompiler_test.i:145: Warning: 
