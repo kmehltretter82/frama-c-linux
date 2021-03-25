@@ -1,8 +1,9 @@
 /* run.config
-   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-   CMD: @frama-c@ -load-module tests/slicing/libSelect.cmxs -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs
+ CMD: @frama-c@ -load-module tests/slicing/libSelect.cmxs
+ MODULE: @PTEST_NAME@
    OPT: @EVA_OPTIONS@ -deps -lib-entry -main main -journal-disable
-   CMD: bin/toplevel.opt
+ MODULE:
+ CMD: bin/toplevel.opt
    OPT: @EVA_OPTIONS@ -check -deps -lib-entry -main main -slice-pragma main -journal-disable -then-on 'Slicing export' -set-project-as-default -print -check -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check -no-deps
    OPT: @EVA_OPTIONS@ -check -deps -lib-entry -main main -slice-assert main -journal-disable -then-on 'Slicing export' -set-project-as-default -print -check -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check -no-deps
    OPT: @EVA_OPTIONS@ -check -deps -lib-entry -main main -slice-pragma modifS -no-slice-callers -journal-disable -then-on 'Slicing export' -set-project-as-default -print -check -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check -no-deps
@@ -17,7 +18,6 @@
    OPT: @EVA_OPTIONS@ -check -deps -lib-entry -main main -slice-pragma f8 -no-slice-callers -journal-disable -then-on 'Slicing export' -set-project-as-default -print -check -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check -no-deps
    OPT: @EVA_OPTIONS@ -check -deps -lib-entry -main main -slice-assert f8 -no-slice-callers -journal-disable -then-on 'Slicing export' -set-project-as-default -print -check -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check -no-deps
    OPT: @EVA_OPTIONS@ -check -deps -lib-entry -main main -slice-pragma f9 -no-slice-callers -journal-disable -then-on 'Slicing export' -set-project-as-default -print -check -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check -no-deps
-
 
 */
 struct Tstr { int a; int b; } S;

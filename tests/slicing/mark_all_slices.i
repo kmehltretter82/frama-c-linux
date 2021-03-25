@@ -1,6 +1,6 @@
 /* run.config
-   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-   CMD: @frama-c@ -load-module tests/slicing/libSelect.cmxs -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs
+ MODULE: @PTEST_NAME@
+ CMD: @frama-c@ -load-module tests/slicing/libSelect.cmxs
    OPT: @EVA_OPTIONS@ -deps -slicing-level 3 -no-slice-callers -journal-disable
 */
 int A, B, C, D;
