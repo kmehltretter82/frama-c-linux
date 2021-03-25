@@ -205,6 +205,10 @@ struct
       if pool.lemmas <> [] then
         WpContext.on_context (model,WpContext.Global)
           begin fun () ->
+            LogicUsage.iter_lemmas
+              (fun (l : LogicUsage.logic_lemma) ->
+                 if Logic_utils.use_predicate l.lem_predicate.tp_kind
+                 then VCG.register_lemma l) ;
             List.iter
               (fun (l : LogicUsage.logic_lemma) ->
                  if Logic_utils.verify_predicate l.lem_predicate.tp_kind then
