@@ -134,7 +134,7 @@ module Graph = struct
       G.fold_pred_e (transfer_edge ~inner_loop) loop.graph vertex None
     in
     let process_vertex ~inner_loop vertex =
-      Extlib.may (Results.add results vertex) (compute_vertex ~inner_loop vertex)
+      Option.iter (Results.add results vertex) (compute_vertex ~inner_loop vertex)
     in
     let rec iterate ~inner_loop = function
       | Wto.Node v -> process_vertex ~inner_loop v
@@ -160,7 +160,7 @@ module Graph = struct
       | _ -> conds
     in
     let set = compute loop transfer Condition.Set.inter Condition.Set.empty in
-    Extlib.may_map ~dft:[] Condition.Set.elements set
+    Option.fold ~none:[] ~some:Condition.Set.elements set
 end
 
 (* Effects of a loop:
