@@ -694,7 +694,7 @@ let launch command_string =
       exit 1
 
 module Test_config: sig
-  val scan_directives:
+  val scan_directives: drop:bool ->
     SubDir.t -> file:string -> Scanf.Scanning.in_channel -> config -> config
   val current_config: unit -> config
   val scan_test_file: config -> SubDir.t -> string -> config
@@ -805,12 +805,12 @@ end = struct
 
 
   (* how to process options *)
-  let config_exec ~once ~file:_ dir s current =
+  let config_exec ~once ~drop:_ ~file:_ dir s current =
     { current with
       dc_execnow =
         scan_execnow ~once dir current.dc_timeout s :: current.dc_execnow }
 
-  let config_macro ~file _dir s current =
+  let config_macro ~drop:_ ~file _dir s current =
     let regex = Str.regexp "[ \t]*\\([^ \t@]+\\)\\([ \t]+\\(.*\\)\\|$\\)" in
     Mutex.lock str_mutex;
     if Str.string_match regex s 0 then begin
@@ -841,30 +841,29 @@ end = struct
       lock_printf "%%   - Macro %s for -load-module with definition %s@." name def;
     Macros.add_list [name, def] macros
 
-  let add_make_modules ~file dir deps current =
+  let add_make_modules ~drop ~file dir deps current =
     List.fold_left (fun acc s ->
         let make_cmd = Macros.expand current.dc_macros "@PTEST_MAKE_MODULE@" in
-        let acc = config_exec ~once:true ~file dir (make_cmd ^ " " ^ s) acc in
+        let acc = config_exec ~once:true ~drop ~file dir (make_cmd ^ " " ^ s) acc in
         { acc with dc_deps_module = s :: acc.dc_deps_module })
       current deps
 
-  let config_module ~file dir s current =
+  let config_module ~drop ~file dir s current =
     let s = Macros.expand current.dc_macros s in
     let deps = List.map (fun s -> "@PTEST_DIR@/" ^ (Filename.remove_extension s) ^ ".cmxs")
         (str_split_list s)
     in
-    let current = add_make_modules ~file dir deps current in
+    let current = add_make_modules ~drop ~file dir deps current in
     { current with dc_deps_module = deps @ current.dc_deps_module;
                    dc_macros = set_load_modules deps current.dc_macros }
 
   let config_options =
     [ "CMD",
-      (fun ~file:_ _ s current ->
-         { current with dc_default_toplevel = s});
+      (fun ~drop:_ ~file:_ _ s current -> { current with dc_default_toplevel = s});
 
       "OPT",
-      (fun ~file _ s current ->
-         if not current.dc_framac then
+      (fun ~drop ~file _ s current ->
+         if not (drop || current.dc_framac) then
            lock_eprintf
              "%s: a NOFRAMAC directive has been defined before a sub-test defined by a 'OPT' directive (That NOFRAMAC directive could be misleading.).@."
              file;
@@ -881,8 +880,8 @@ end = struct
            dc_commands = t :: current.dc_commands });
 
       "STDOPT",
-      (fun ~file _ s current ->
-         if not current.dc_framac then
+      (fun ~drop ~file _ s current ->
+         if not (drop || current.dc_framac) then
            lock_eprintf
              "%s: a NOFRAMAC directive has been defined before a sub-test defined by a 'STDOPT' directive (That NOFRAMAC directive could be misleading.).@."
              file;
@@ -901,24 +900,24 @@ end = struct
                         dc_default_log = !default_parsing_env.current_default_log });
 
       "FILEREG",
-      (fun ~file:_ _ s current -> { current with dc_test_regexp = s });
+      (fun ~drop:_ ~file:_ _ s current -> { current with dc_test_regexp = s });
 
       "FILTER",
-      (fun ~file:_ _ s current -> { current with dc_filter = Some s });
+      (fun ~drop:_ ~file:_ _ s current -> { current with dc_filter = Some s });
 
       "EXIT",
-      (fun ~file:_ _ s current -> { current with dc_exit_code = Some s });
+      (fun ~drop:_ ~file:_ _ s current -> { current with dc_exit_code = Some s });
 
       "GCC",
-      (fun ~file _ _ acc ->
-         lock_eprintf "%s: GCC directive (DEPRECATED)@." file;
+      (fun ~drop ~file _ _ acc ->
+         if not drop then lock_eprintf "%s: GCC directive (DEPRECATED)@." file;
          acc);
 
       "COMMENT",
-      (fun ~file:_ _ _ acc -> acc);
+      (fun ~drop:_ ~file:_ _ _ acc -> acc);
 
       "DONTRUN",
-      (fun ~file:_ _ s current -> { current with dc_dont_run = true });
+      (fun ~drop:_ ~file:_ _ s current -> { current with dc_dont_run = true });
 
       "EXECNOW", config_exec ~once:true;
       "EXEC", config_exec ~once:false;
@@ -928,22 +927,21 @@ end = struct
       "MODULE", config_module;
 
       "LOG",
-      (fun ~file:_ _ s current ->
-         { current with dc_default_log = s :: current.dc_default_log });
+      (fun ~drop:_ ~file:_ _ s current -> { current with dc_default_log = s :: current.dc_default_log });
 
       "TIMEOUT",
-      (fun ~file:_ _ s current -> { current with dc_timeout = s });
+      (fun ~drop:_ ~file:_ _ s current -> { current with dc_timeout = s });
 
       "NOFRAMAC",
-      (fun ~file _ _ current ->
-         if current.dc_commands <> [] && current.dc_framac then
+      (fun ~drop ~file _ _ current ->
+         if not drop && current.dc_commands <> [] && current.dc_framac then
            lock_eprintf
              "%s: a NOFRAMAC directive has the effect of ignoring previous defined sub-tests (by some 'OPT' or 'STDOPT' directives that seems misleading). @."
              file;
          { current with dc_commands = []; dc_framac = false; });
     ]
 
-  let scan_directives dir ~file scan_buffer default =
+  let scan_directives ~drop dir ~file scan_buffer default =
     set_default_parsing_env default;
     let r = ref { default with dc_commands = [] } in
     let treat_line s =
@@ -951,7 +949,7 @@ end = struct
         Scanf.sscanf s "%[ *]%[A-Za-z0-9]: %s@\n"
           (fun _ name opt ->
              try
-               r := (List.assoc name config_options) ~file dir opt !r
+               r := (List.assoc name config_options) ~drop ~file dir opt !r
              with Not_found ->
                lock_eprintf "@[%s: unknown configuration option: %s@\n%!@]" file name)
       with
@@ -1001,14 +999,14 @@ end = struct
              let configs = Str.split split_config (String.trim names) in
              if List.exists is_current_config configs then
                (* Found options for current config! *)
-               scan_directives dir ~file:f scan_buffer default
+               scan_directives ~drop:false dir ~file:f scan_buffer default
              else (* config name does not match: eat config and continue.
                      But only if the comment is still opened by the end of
                      the line and we are indeed reading a config
                   *)
                (if List.exists is_config configs &&
                    not (str_string_match end_comment names 0) then
-                  ignore (scan_directives dir ~file:f scan_buffer default);
+                  ignore (scan_directives ~drop:true dir ~file:f scan_buffer default);
                 scan_config ()))
       in
       try
@@ -1028,7 +1026,7 @@ end = struct
     if Sys.file_exists general_config_file
     then begin
       let scan_buffer = Scanf.Scanning.from_file general_config_file in
-      scan_directives
+      scan_directives ~drop:false
         (SubDir.create ~with_subdir:false Filename.current_dir_name)
         ~file:general_config_file
         scan_buffer
@@ -1840,7 +1838,7 @@ let () =
          if Sys.file_exists file
          then begin
            let scan_buffer = Scanf.Scanning.from_file file in
-           Test_config.scan_directives directory
+           Test_config.scan_directives ~drop:false directory
              ~file scan_buffer dir_config
          end
          else dir_config
