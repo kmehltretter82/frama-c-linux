@@ -5,7 +5,7 @@
 
 int h(void);
 
-int glob;
+extern int glob;
 
 void indirect(void);
 

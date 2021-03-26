@@ -2759,20 +2759,13 @@ let oneFilePass2 (f: file) =
               (H.find emittedVarDefn vi'.vname) in
             (* previously defined; same initializer? *)
             if (equalInitOpts prevInitOpt init.init)
-            || (init.init = None) then (
+            then (
               false  (* do not emit *)
             )
-            else if prevInitOpt = None then (
-              (* The previous occurrence was only a tentative defn. Now,
-                 we have a real one. Set the correct value in the table,
-                 and tell that we need to change the previous into GVarDecl
-              *)
-              H.replace emittedVarDefn vi'.vname(vi',init.init,l);
-              replaceTentativeDefn:=true;
-              true
-            )
             else (
-              (* Both GVars have initializers. *)
+              (* Both GVars have initializers. Note that None in this
+                 context means a tentative definition turned into
+                 a default 0-initialization. *)
               Kernel.error ~current:true
                 "global var %s at %a has different initializer than %a"
                 vi'.vname
