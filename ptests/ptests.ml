@@ -98,7 +98,8 @@ let str_split regex s =
   let res = Str.split regex s in
   Mutex.unlock str_mutex; res
 
-let str_split_list = (* considers blanks (not preceded by '\'), tabs and commas as separators *)
+let str_split_list =
+  (* considers blanks (not preceded by '\'), tabs and commas as separators *)
   let nonsep_regexp = Str.regexp "[\\] " in (* removed for beeing reintroduced *)
   let sep_regexp = Str.regexp "[\t ,]+" in
   fun s -> (* splits on '\ ' first then on ' ' or ',' *)
@@ -108,11 +109,15 @@ let str_split_list = (* considers blanks (not preceded by '\'), tabs and commas 
         | (Str.Delim _ as delim) -> delim::acc)
         []
         (Str.full_split nonsep_regexp s)
-    in
+    in (* [r] is in the reverse order and the next [fold] restores the order *)
     Mutex.unlock str_mutex;
-    let add s (glue,prev,curr) = if glue then false,(s^prev),curr else false,s,(if prev = "" then curr else prev::curr) in
+    let add s (glue,prev,curr) =
+      if glue then false,(s^prev),curr
+      else false,s,(if prev = "" then curr else prev::curr)
+    in
     let acc = List.fold_left (fun ((_,prev,curr) as acc) -> function
-        | Str.Delim ("\\ " as nonsep) -> true,(nonsep^prev),curr (* restore '\ ' *)
+        | Str.Delim ("\\ " as nonsep) ->
+          true,(nonsep^prev),curr (* restore '\ ' *)
         | Str.Delim _ -> add "" acc (* separator *)
         | Str.Text s -> add s acc) (false,"",[]) r
     in
@@ -844,13 +849,17 @@ end = struct
     Macros.add_list [name, def] macros
 
   let add_make_modules ~drop ~file dir deps current =
-    List.fold_left (fun acc s ->
-        if StringSet.mem s acc.dc_cmxs_module then acc
+    let deps,current = List.fold_left (fun ((deps,curr) as acc) s ->
+        if StringSet.mem s curr.dc_cmxs_module then acc
         else
-          let make_cmd = Macros.expand current.dc_macros "@PTEST_MAKE_MODULE@" in
-          let acc = config_exec ~once:true ~drop ~file dir (make_cmd ^ " " ^ s) acc in
-          { acc with dc_cmxs_module = StringSet.add s acc.dc_cmxs_module })
-      current deps
+          (s ^ " " ^ deps),
+          { curr with dc_cmxs_module = StringSet.add s curr.dc_cmxs_module })
+        ("",current) deps
+    in
+    if String.(deps = "") then current
+    else
+      let make_cmd = Macros.expand current.dc_macros "@PTEST_MAKE_MODULE@" in
+      config_exec ~once:true ~drop ~file dir (make_cmd ^ " " ^ deps) current
 
   let config_module ~drop ~file dir s current =
     let s = Macros.expand current.dc_macros s in
