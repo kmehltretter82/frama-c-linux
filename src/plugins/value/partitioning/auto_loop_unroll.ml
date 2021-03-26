@@ -69,7 +69,7 @@ module Graph = struct
   type loop =
     { graph: G.t;   (* The complete graph of the englobing function. *)
       head: vertex; (* The head of the loop. *)
-      wto: wto;     (* The wto for the loop body. *)
+      wto: wto;     (* The wto for the loop body (without the loop head). *)
     }
 
   (* Builds the loop type for the englobing loop of statement [stmt]
@@ -334,7 +334,10 @@ module Make (Abstract: Abstractions.Eva) = struct
   let (>>) v f = match v with `Value v -> f v | _ -> None
   let (>>=) v f = match v with Some v -> f v | None -> None
 
-  (* Over-approximation of the change of a value in one iteration of a loop. *)
+  (* Over-approximation of the change of an lvalue in one iteration of a loop,
+     as a disjunction of:
+     - the values directly assigned to the lvalue within the loop;
+     - the increment/decrement of the lvalue in one iteration. *)
   type increment =
     { value: Val.t or_bottom; (* Possible values at the end of an iteration. *)
       delta: Val.t or_bottom; (* Possible increments in one iteration. *)
