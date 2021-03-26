@@ -348,7 +348,7 @@ end
 type evaluation = (module Evaluation)
 type lvaluation
 
-let eval_lval, eval_exp =
+let build_eval_lval_and_exp () =
   let module M = Make () in
   let open Response in
   let build = function
@@ -371,8 +371,12 @@ let eval_lval, eval_exp =
   let eval_exp exp req = build @@ M.eval_exp exp req in
   eval_lval, eval_exp
 
+let eval_lval lval req = (fst @@ build_eval_lval_and_exp ()) lval req
+
 let eval_var vi req =
   eval_lval (Cil.var vi) req
+
+let eval_exp exp req = (snd @@ build_eval_lval_and_exp ()) exp req
 
 let eval_address _lval _req =
   raise Not_implemented
