@@ -337,8 +337,9 @@ let as_cvalue_model req =
 
 module type Evaluation =
 sig
-  type 'callstack evaluation
-  val v : unrestricted_response evaluation
+  type 'a evaluation
+  type restriction
+  val v : restriction evaluation
   val as_cvalue : 'callstack evaluation -> Main_values.CVal.t result
   val as_functions : 'callstack evaluation ->
       Cil_types.kernel_function list result
@@ -347,20 +348,31 @@ end
 type evaluation = (module Evaluation)
 type lvaluation
 
-let eval_lval lval req =
-  (module struct
-    include Make ()
-    let v = eval_lval lval req
-  end : Evaluation)
+let eval_lval, eval_exp =
+  let module M = Make () in
+  let open Response in
+  let build = function
+    | `LValue (_, Consolidated _)
+    | `Value (Consolidated _) as eval ->
+      (module struct
+        include M
+        type restriction = unrestricted_response
+        let v = eval
+      end : Evaluation)
+    | `LValue (_, (ByCallstack _ | Top | Bottom))
+    | `Value (ByCallstack _ | Top | Bottom) as eval ->
+      (module struct
+        include M
+        type restriction = restricted_to_callstack
+        let v = eval
+      end : Evaluation)
+  in
+  let eval_lval lval req = build @@ M.eval_lval lval req in
+  let eval_exp exp req = build @@ M.eval_exp exp req in
+  eval_lval, eval_exp
 
 let eval_var vi req =
   eval_lval (Cil.var vi) req
-
-let eval_exp exp req =
-  (module struct
-    include Make ()
-    let v = eval_exp exp req
-  end : Evaluation)
 
 let eval_address _lval _req =
   raise Not_implemented
