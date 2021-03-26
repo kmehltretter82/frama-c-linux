@@ -6,7 +6,7 @@
   undet ∈ [--..--]
   g ∈ {0}
 [eva] computing for function simple_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:366.
+  Called from tests/value/auto_loop_unroll.c:388.
 [eva] tests/value/auto_loop_unroll.c:24: starting to merge loop iterations
 [eva:alarm] tests/value/auto_loop_unroll.c:25: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
@@ -27,7 +27,7 @@
 [eva] Recording results for simple_loops
 [eva] Done for function simple_loops
 [eva] computing for function various_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:367.
+  Called from tests/value/auto_loop_unroll.c:389.
 [eva] tests/value/auto_loop_unroll.c:57: starting to merge loop iterations
 [eva:alarm] tests/value/auto_loop_unroll.c:58: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
@@ -146,7 +146,7 @@
 [eva] Recording results for various_loops
 [eva] Done for function various_loops
 [eva] computing for function complex_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:368.
+  Called from tests/value/auto_loop_unroll.c:390.
 [eva] tests/value/auto_loop_unroll.c:152: starting to merge loop iterations
 [eva:alarm] tests/value/auto_loop_unroll.c:154: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
@@ -205,7 +205,7 @@
 [eva] Recording results for complex_loops
 [eva] Done for function complex_loops
 [eva] computing for function various_conditions <- main.
-  Called from tests/value/auto_loop_unroll.c:369.
+  Called from tests/value/auto_loop_unroll.c:391.
 [eva] tests/value/auto_loop_unroll.c:211: starting to merge loop iterations
 [eva:alarm] tests/value/auto_loop_unroll.c:212: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
@@ -245,7 +245,7 @@
 [eva] Recording results for various_conditions
 [eva] Done for function various_conditions
 [eva] computing for function temporary_variables <- main.
-  Called from tests/value/auto_loop_unroll.c:370.
+  Called from tests/value/auto_loop_unroll.c:392.
 [eva] tests/value/auto_loop_unroll.c:262: starting to merge loop iterations
 [eva:alarm] tests/value/auto_loop_unroll.c:262: Warning: 
   signed overflow. assert i + 1 ≤ 2147483647;
@@ -258,60 +258,78 @@
 [eva:alarm] tests/value/auto_loop_unroll.c:267: Warning: 
   signed overflow. assert -2147483648 ≤ i - 1;
 [eva] tests/value/auto_loop_unroll.c:270: Frama_C_show_each_21: [0..2147483647]
+[eva] tests/value/auto_loop_unroll.c:272: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:274: Warning: 
+  signed overflow. assert res + 1 ≤ 2147483647;
+[eva:alarm] tests/value/auto_loop_unroll.c:272: Warning: 
+  signed overflow. assert i + 1 ≤ 2147483647;
+[eva] tests/value/auto_loop_unroll.c:276: Frama_C_show_each_22: [0..2147483647]
+[eva] tests/value/auto_loop_unroll.c:279: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:282: Warning: 
+  signed overflow. assert res + 1 ≤ 2147483647;
+[eva:alarm] tests/value/auto_loop_unroll.c:279: Warning: 
+  signed overflow. assert i + 1 ≤ 2147483647;
+[eva] tests/value/auto_loop_unroll.c:284: Frama_C_show_each_23: [0..2147483647]
+[eva] tests/value/auto_loop_unroll.c:287: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:290: Warning: 
+  signed overflow. assert res + 1 ≤ 2147483647;
+[eva:alarm] tests/value/auto_loop_unroll.c:287: Warning: 
+  signed overflow. assert i + 1 ≤ 2147483647;
+[eva] tests/value/auto_loop_unroll.c:292: Frama_C_show_each_top: [0..2147483647]
 [eva] Recording results for temporary_variables
 [eva] Done for function temporary_variables
 [eva] computing for function loops_with_goto <- main.
-  Called from tests/value/auto_loop_unroll.c:371.
-[eva] tests/value/auto_loop_unroll.c:276: starting to merge loop iterations
-[eva:alarm] tests/value/auto_loop_unroll.c:277: Warning: 
+  Called from tests/value/auto_loop_unroll.c:393.
+[eva] tests/value/auto_loop_unroll.c:298: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:299: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:281: Frama_C_show_each_30: [0..2147483647]
-[eva:alarm] tests/value/auto_loop_unroll.c:286: Warning: 
+[eva] tests/value/auto_loop_unroll.c:303: Frama_C_show_each_30: [0..2147483647]
+[eva:alarm] tests/value/auto_loop_unroll.c:308: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:285: starting to merge loop iterations
-[eva] tests/value/auto_loop_unroll.c:290: Frama_C_show_each_top: [0..2147483647]
-[eva] tests/value/auto_loop_unroll.c:293: starting to merge loop iterations
-[eva:alarm] tests/value/auto_loop_unroll.c:294: Warning: 
+[eva] tests/value/auto_loop_unroll.c:307: starting to merge loop iterations
+[eva] tests/value/auto_loop_unroll.c:312: Frama_C_show_each_top: [0..2147483647]
+[eva] tests/value/auto_loop_unroll.c:315: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:316: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:299: Frama_C_show_each_32: [0..2147483647]
-[eva:alarm] tests/value/auto_loop_unroll.c:303: Warning: 
+[eva] tests/value/auto_loop_unroll.c:321: Frama_C_show_each_32: [0..2147483647]
+[eva:alarm] tests/value/auto_loop_unroll.c:325: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:302: starting to merge loop iterations
-[eva] tests/value/auto_loop_unroll.c:307: 
+[eva] tests/value/auto_loop_unroll.c:324: starting to merge loop iterations
+[eva] tests/value/auto_loop_unroll.c:329: 
   Frama_C_show_each_33_inf: [0..2147483647]
-[eva:alarm] tests/value/auto_loop_unroll.c:311: Warning: 
+[eva:alarm] tests/value/auto_loop_unroll.c:333: Warning: 
   signed overflow. assert i + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:310: starting to merge loop iterations
-[eva:alarm] tests/value/auto_loop_unroll.c:310: Warning: 
+[eva] tests/value/auto_loop_unroll.c:332: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:332: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:315: Frama_C_show_each_top: [0..2147483647]
-[eva] tests/value/auto_loop_unroll.c:318: starting to merge loop iterations
-[eva:alarm] tests/value/auto_loop_unroll.c:321: Warning: 
+[eva] tests/value/auto_loop_unroll.c:337: Frama_C_show_each_top: [0..2147483647]
+[eva] tests/value/auto_loop_unroll.c:340: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:343: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:323: 
+[eva] tests/value/auto_loop_unroll.c:345: 
   Frama_C_show_each_0_35: [0..2147483647]
-[eva] tests/value/auto_loop_unroll.c:326: starting to merge loop iterations
-[eva:alarm] tests/value/auto_loop_unroll.c:326: Warning: 
+[eva] tests/value/auto_loop_unroll.c:348: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:348: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
-[eva:alarm] tests/value/auto_loop_unroll.c:326: Warning: 
+[eva:alarm] tests/value/auto_loop_unroll.c:348: Warning: 
   signed overflow. assert -2147483648 ≤ i - 1;
-[eva] tests/value/auto_loop_unroll.c:330: Frama_C_show_each_36: [0..2147483647]
-[eva] tests/value/auto_loop_unroll.c:333: starting to merge loop iterations
-[eva:alarm] tests/value/auto_loop_unroll.c:336: Warning: 
+[eva] tests/value/auto_loop_unroll.c:352: Frama_C_show_each_36: [0..2147483647]
+[eva] tests/value/auto_loop_unroll.c:355: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:358: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:338: Frama_C_show_each_27: [0..2147483647]
+[eva] tests/value/auto_loop_unroll.c:360: Frama_C_show_each_27: [0..2147483647]
 [eva] Recording results for loops_with_goto
 [eva] Done for function loops_with_goto
 [eva] computing for function non_natural_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:372.
-[eva:alarm] tests/value/auto_loop_unroll.c:349: Warning: 
+  Called from tests/value/auto_loop_unroll.c:394.
+[eva:alarm] tests/value/auto_loop_unroll.c:371: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:353: Frama_C_show_each_50: [1..2147483647]
-[eva:alarm] tests/value/auto_loop_unroll.c:357: Warning: 
+[eva] tests/value/auto_loop_unroll.c:375: Frama_C_show_each_50: [1..2147483647]
+[eva:alarm] tests/value/auto_loop_unroll.c:379: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
-[eva:alarm] tests/value/auto_loop_unroll.c:358: Warning: 
+[eva:alarm] tests/value/auto_loop_unroll.c:380: Warning: 
   signed overflow. assert -2147483648 ≤ i - 1;
-[eva] tests/value/auto_loop_unroll.c:361: 
+[eva] tests/value/auto_loop_unroll.c:383: 
   Frama_C_show_each_1_51: [1..2147483647]
 [eva] Recording results for non_natural_loops
 [eva] Done for function non_natural_loops
@@ -347,7 +365,9 @@
 [eva:final-states] Values at end of function simple_loops:
   res ∈ {100}
 [eva:final-states] Values at end of function temporary_variables:
-  i ∈ [-2147483648..20]
+  i ∈ [0..2147483647]
+  j ∈ [23..2147483647]
+  k ∈ [22..2147483647]
   res ∈ [0..2147483647]
 [eva:final-states] Values at end of function various_conditions:
   i ∈ {12}
@@ -438,9 +458,9 @@
 [inout] Inputs for function simple_loops:
     \nothing
 [inout] Out (internal) for function temporary_variables:
-    i; res; tmp; tmp_0
+    i; j; k; res; tmp; tmp_0
 [inout] Inputs for function temporary_variables:
-    \nothing
+    undet
 [inout] Out (internal) for function various_conditions:
     i; res; i_0; tmp; i_1; tmp_0; i_2; i_3; x; p; i_4
 [inout] Inputs for function various_conditions:

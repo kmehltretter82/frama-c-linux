@@ -258,7 +258,7 @@ void various_conditions () {
    All loops could be automatically unrolled on the second run, but should
    not be unrolled on the first run. */
 void temporary_variables () {
-  int i, res = 0;
+  int i, j = 0, k = 0, res = 0;
   for (i = 0; i++ < 20;) {
     res++;
   }
@@ -268,6 +268,28 @@ void temporary_variables () {
     res++;
   }
   Frama_C_show_each_21(res);
+  res = 0;
+  for (i = 0; j < 21; i++) {
+    j = i;
+    res++;
+  }
+  Frama_C_show_each_22(res);
+  res = 0;
+  j = 0;
+  for (i = 0; k < 22; i++) {
+    j = i;
+    k = j;
+    res++;
+  }
+  Frama_C_show_each_23(res);
+  res = 0;
+  j = 0;
+  for (i = 0; j < 23; i++) {
+    if (undet)
+      j = i;
+    res++;
+  }
+  Frama_C_show_each_top(res);
 }
 
 /* Examples of natural loops with goto or continue statements. */
