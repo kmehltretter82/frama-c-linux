@@ -1,5 +1,7 @@
 /* run.config
+   EXIT: 0
    OPT: -cpp-extra-args="-DFIT"
+   EXIT: 1
    OPT: -cpp-extra-args="-DLARGE"
  */
 
