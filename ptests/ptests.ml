@@ -646,13 +646,15 @@ type cmd = {
   timeout:string
 }
 
+module StringSet = Set.Make (String)
+
 type config =
   { dc_test_regexp: string; (** regexp of test files. *)
     dc_execnow    : execnow list; (** command to be launched before
                                        the toplevel(s)
                                   *)
     dc_load_module: string; (** load module options. *)
-    dc_deps_module: string list; (** modules to compile. *)
+    dc_cmxs_module: StringSet.t; (** compiled modules. *)
     dc_macros: Macros.t; (** existing macros. *)
     dc_default_toplevel   : string;
     (** full path of the default toplevel. *)
@@ -719,7 +721,7 @@ end = struct
       dc_commands = [ { toplevel= !toplevel_path; opts=default_options; macros=Macros.empty; exit_code=None; logs= []; timeout= ""} ];
       dc_dont_run = false;
       dc_load_module = "";
-      dc_deps_module = [];
+      dc_cmxs_module = StringSet.empty;
       dc_framac = true;
       dc_default_log = [];
       dc_timeout = "";
@@ -843,9 +845,11 @@ end = struct
 
   let add_make_modules ~drop ~file dir deps current =
     List.fold_left (fun acc s ->
-        let make_cmd = Macros.expand current.dc_macros "@PTEST_MAKE_MODULE@" in
-        let acc = config_exec ~once:true ~drop ~file dir (make_cmd ^ " " ^ s) acc in
-        { acc with dc_deps_module = s :: acc.dc_deps_module })
+        if StringSet.mem s acc.dc_cmxs_module then acc
+        else
+          let make_cmd = Macros.expand current.dc_macros "@PTEST_MAKE_MODULE@" in
+          let acc = config_exec ~once:true ~drop ~file dir (make_cmd ^ " " ^ s) acc in
+          { acc with dc_cmxs_module = StringSet.add s acc.dc_cmxs_module })
       current deps
 
   let config_module ~drop ~file dir s current =
@@ -854,8 +858,7 @@ end = struct
         (str_split_list s)
     in
     let current = add_make_modules ~drop ~file dir deps current in
-    { current with dc_deps_module = deps @ current.dc_deps_module;
-                   dc_macros = set_load_modules deps current.dc_macros }
+    { current with dc_macros = set_load_modules deps current.dc_macros }
 
   let config_options =
     [ "CMD",
