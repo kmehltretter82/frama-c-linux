@@ -48,7 +48,7 @@ implementation choice.  Also note that annotations are dependent of the {\it
   machine dependency} used on Frama-C command-line, especially the size of
 integer types.
 
-The C language ISO standard \cite{standardc99} will be referred to as \cnn{} 
+The C language ISO standard \cite{standardc99} will be referred to as \cnn{}
 (of which specific paragraphs are cited, such as \mbox{6.2.5.9}).
 
 %%\section{Generated Annotations}
@@ -96,14 +96,14 @@ and thus has domain \lstinline|[-2147483648,2147483647]|, and that \lstinline|x|
 is an \lstinline|int|, the expression \lstinline|x+1| performs a signed integer
 overflow, and therefore has an undefined behavior, if and only if \lstinline|x|
 equals \lstinline|2147483647|.  This is independent of the fact that for most
-(if not all) C compilers and 32-bits architectures, one will get 
+(if not all) C compilers and 32-bits architectures, one will get
 \lstinline|x+1 = -2147483648| and no runtime error will happen.  But by strictly
-conforming to 
+conforming to
 the C standard, one cannot assert that the C compiler will not in fact generate
 code provoking a runtime error in this case, since it is allowed to do so.
-%% In fact, for an expression such as \lstinline|x/y| (for \lstinline|int x,y|), 
-%% the execution will most likely result in a floating point exception 
-%% when \lstinline|x = -2147483648, y = -1| (the result is \lstinline|2147483648|, which overflows). 
+%% In fact, for an expression such as \lstinline|x/y| (for \lstinline|int x,y|),
+%% the execution will most likely result in a floating point exception
+%% when \lstinline|x = -2147483648, y = -1| (the result is \lstinline|2147483648|, which overflows).
 Also note that from a security analysis point of view, an undefined behavior
 leading to a runtime error classifies as a denial of service (since the program
 terminates), while a signed integer overflow may very well lead to buffer
@@ -122,7 +122,7 @@ by making such wide-ranging and easily checkable assumptions.  {\bf Therefore
   representation.}
 %% value analysis makes the same assumption; also see value analyse manual 4.4.1
 
-%% Frama-C is not intended to work on non ISO conforming inputs (?), 
+%% Frama-C is not intended to work on non ISO conforming inputs (?),
 %% but conforming programs may still produce undefined behaviors. Well ...
 
 \section{Other annotations generated}
@@ -277,7 +277,7 @@ int main(void) {
 \end{listing-nonumber}
 
 \smallskip
-is in fact equivalent to: 
+is in fact equivalent to:
 
 \smallskip
 \begin{listing-nonumber}
@@ -312,7 +312,7 @@ whenever the result falls outside the range \lstinline|[-128,127]|.  Thus, with
 a single annotation, the \rte{} plug-in prevents both an undefined behavior
 (signed overflow) and an implementation defined behavior (signed downcasting).
 Note that the annotation for signed downcasting always entails the annotation
-for signed overflow. 
+for signed overflow.
 
 \subsection{Unary minus}
 
@@ -430,7 +430,7 @@ z = x >> y;
 
 \section{Left-values access}
 
-Dereferencing a pointer is an undefined behavior if: 
+Dereferencing a pointer is an undefined behavior if:
 \begin{itemize}
 
 \item the pointer has an invalid value: null pointer, misaligned address for the
@@ -511,7 +511,7 @@ int main(void) {
 }
 \end{listing-nonumber}
 
-% Note that in the call \lstinline|f(tab)|, the implicit conversion from array \lstinline|tab| to a pointer to the beginning of the array 
+% Note that in the call \lstinline|f(tab)|, the implicit conversion from array \lstinline|tab| to a pointer to the beginning of the array
 % \lstinline|&tab[0]| introduces a pointer dereferencing and thus the annotation \lstinline|\valid((int*) tab)|, which is equivalent to
 % \lstinline|\valid(&tab[0])|.
 
@@ -576,7 +576,7 @@ offers a way to generate assertions preventing unsigned arithmetic operations to
 overflow ({\it i.e.} involving computation of a modulo).
 
 Operations which are considered by \rte{} regarding unsigned overflows are
-addition, subtraction, multiplication. Negation (unary minus), left shift. 
+addition, subtraction, multiplication. Negation (unary minus), left shift.
 and right shift are not considered. The generated assertion requires the result
 of the operation (in non-modular arithmetic) to be less than the maximal
 representable value of its type, and nonnegative (for subtraction).
@@ -594,7 +594,7 @@ unsigned int f(unsigned int a, unsigned int b) {
 }
 \end{listing-nonumber}
 
-To generate assertions w.r.t. unsigned overflows, options 
+To generate assertions w.r.t. unsigned overflows, options
 \lstinline|-warn-unsigned-overflow| must be used. Here is the resulting
 file on a 32 bits target architecture (\lstinline|-machdep x86_32|):
 \begin{listing-nonumber}
@@ -710,7 +710,7 @@ preprocessing:
 
 \begin{listing-nonumber}
 typedef unsigned long size_t;
-/* compiler builtin: 
+/* compiler builtin:
    void *__builtin_alloca(unsigned int);   */
 size_t fsize3(int n)
 {
@@ -755,7 +755,7 @@ considered:
   aligned (\cnn{} 6.3.2.3)
 \item Use of a variable with automatic storage duration before its
   initialization (\cnn{} 6.7.8.10): such a variable has an indeterminate value
-%% technically, not an undefined behavior (does not appear in the list of undefined behavior in 
+%% technically, not an undefined behavior (does not appear in the list of undefined behavior in
 %% the relevant ANSI C ISO annex), but can as well be considered as one ;
 %% not treated by plug-in because too many annotations would be generated
 %% unless some dataflow analysis is performed
@@ -765,10 +765,10 @@ considered:
 %% ISO 6.3.1.3 / 6.3.1.4 / 6.3.1.5
 %% convert an integer type to another signed integer type that cannot represent its value: implementation defined.
 %% convert a real floating type to an integer: if the value of the integral part cannot be represented by the integer type, undefined.
-%% convert an integer to a real floating type : 
-%% if the value being converted is outside the range of values that can be represented, 
-%% undefined (does not happen with IEEE floating types, event if real floating = float and integer type = unsigned long long). 
-%% If in range but not exact, round to nearest higher or nearest lower representable value (implementation defined). 
+%% convert an integer to a real floating type :
+%% if the value being converted is outside the range of values that can be represented,
+%% undefined (does not happen with IEEE floating types, event if real floating = float and integer type = unsigned long long).
+%% If in range but not exact, round to nearest higher or nearest lower representable value (implementation defined).
 %% Value analysis rounds to nearest lower silently (?).
 %% demote a real floating type to another and procuce a value outside the range = undefined
 
@@ -800,7 +800,7 @@ unsigned overflows\\
 unsigned integer downcast\\
 \hline
 \lstinline|-warn-signed-overflow| & boolean (true) & Generate annotations for
-signed overflows \\ 
+signed overflows \\
 \hline
 \lstinline|-warn-signed-downcast| & boolean (false) & Generate annotations for
 signed integer downcast \\
@@ -836,23 +836,31 @@ invalid pointer arithmetic \\
 \hline
 \lstinline|-rte| & boolean (false) & Enable \rte{} plug-in \\
 \hline
-\lstinline|-rte-div| & boolean (false) & Generate annotations for division by
+\lstinline|-rte-div| & boolean (true) & Generate annotations for division by
 zero \\
-\hline
-\lstinline|-rte-shift| & boolean (false) & Generate annotations for left and right shift value out of bounds \\
-\hline
-\lstinline |-rte-mem| & boolean (false) & Generate annotations for validity of
-left-values access \\
 \hline
 \lstinline |-rte-float-to-int| & boolean (true) & Generate annotations for
 casts from floating-point to integer \\
 \hline
-\lstinline |-rte-trivial-annotations| & boolean (true) & Generate all annotations even when they trivially hold \\
+\lstinline |-rte-initialized| & boolean (false) & Generate annotations for
+initialization \\
 \hline
-\lstinline |-rte-warn| & boolean (true) & Emit warning on broken annotations \\
+\lstinline |-rte-mem| & boolean (true) & Generate annotations for validity of
+left-values access \\
+\hline
+\lstinline |-rte-pointer-call| & boolean (true) & Generate annotations for
+validity of calls via function pointers \\
+\hline
+\lstinline|-rte-shift| & boolean (true) & Generate annotations for left and
+right shift value out of bounds \\
 \hline
 \lstinline |-rte-select| & set of function (all) & Run plug-in on a subset of C
 functions \\
+\hline
+\lstinline |-rte-trivial-annotations| & boolean (false) & Generate all
+annotations even when they trivially hold \\
+\hline
+\lstinline |-rte-warn| & boolean (true) & Emit warning on broken annotations \\
 \hline
 \end{tabular}
 \caption{\rte{} options} \label{options}
