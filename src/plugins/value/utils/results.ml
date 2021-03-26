@@ -97,19 +97,19 @@ let filter_callstack f req = {
 
 (* Manipulating request results *)
 
-type usable_in_callstack
-type not_usable_in_callstack
+type restricted_to_callstack
+type unrestricted_response
 
 module Response =
 struct
 
   type ('a, 'callstack) t =
-    | Consolidated : 'a -> ('a, not_usable_in_callstack) t
+    | Consolidated : 'a -> ('a, unrestricted_response) t
     | ByCallstack  : 'a by_callstack -> ('a, 'callstack) t
     | Top : ('a, 'callstack) t
     | Bottom : ('a, 'callstack) t
 
-  let coercion : ('a, usable_in_callstack) t -> ('a, 'c) t = function
+  let coercion : ('a, restricted_to_callstack) t -> ('a, 'c) t = function
     | ByCallstack c -> ByCallstack c
     | Top -> Top
     | Bottom -> Bottom
@@ -128,7 +128,7 @@ struct
 
   let by_callstack : request ->
     [< `Bottom | `Top | `Value of 'a Value_types.Callstack.Hashtbl.t ] ->
-    ('a, usable_in_callstack) t =
+    ('a, restricted_to_callstack) t =
     fun req table ->
       match table with
       | `Top -> Top
@@ -160,7 +160,7 @@ struct
 
   (* Accessors *)
 
-  let callstacks : ('a, usable_in_callstack) t -> callstack list = function
+  let callstacks : ('a, restricted_to_callstack) t -> callstack list = function
     | ByCallstack l -> List.map fst l
     | Top | Bottom -> [] (* What else to do when Top is given ? *)
 
@@ -220,7 +220,7 @@ struct
   | `Value of ((valuation * value) Eval.evaluated, 'callstack) Response.t
   ]
 
-  let get_by_callstack : request -> (_, usable_in_callstack) Response.t =
+  let get_by_callstack : request -> (_, restricted_to_callstack) Response.t =
     fun req ->
       let open Response in
       match req.control_point with
@@ -235,7 +235,7 @@ struct
       | Final | End _ ->
         raise Not_implemented
 
-  let get : request -> (_, 'callstack) Response.t = fun req ->
+  let get : request -> (_, unrestricted_response) Response.t = fun req ->
     if Option.is_some req.filter || Option.is_some req.selector then
       Response.coercion @@ get_by_callstack req
     else
@@ -338,7 +338,7 @@ let as_cvalue_model req =
 module type Evaluation =
 sig
   type 'callstack evaluation
-  val v : not_usable_in_callstack evaluation
+  val v : unrestricted_response evaluation
   val as_cvalue : 'callstack evaluation -> Main_values.CVal.t result
   val as_functions : 'callstack evaluation ->
       Cil_types.kernel_function list result
