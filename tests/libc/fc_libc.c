@@ -1,19 +1,19 @@
 /* run.config*
-   EXECNOW: make -s @PTEST_DIR@/check_libc_naming_conventions.cmxs
-   EXECNOW: make -s @PTEST_DIR@/check_const.cmxs
-   EXECNOW: make -s @PTEST_DIR@/check_parsing_individual_headers.cmxs
-   EXECNOW: make -s @PTEST_DIR@/check_libc_anonymous_tags.cmxs
-   EXECNOW: make -s @PTEST_DIR@/check_compliance.cmxs
-   OPT: -load-module @PTEST_DIR@/check_libc_naming_conventions -print -cpp-extra-args='-nostdinc -Ishare/libc' -metrics -metrics-libc -load-module @PTEST_DIR@/check_const -load-module metrics -eva @EVA_CONFIG@ -then -lib-entry -no-print -metrics-no-libc
+ MODULE: check_libc_naming_conventions, check_const
+   OPT: -print -cpp-extra-args='-nostdinc -Ishare/libc' -metrics -metrics-libc -load-module metrics -eva @EVA_CONFIG@ -then -lib-entry -no-print -metrics-no-libc
+ MODULE:
    OPT: -print -print-libc -machdep x86_32
-   OPT: -load-module @PTEST_DIR@/check_parsing_individual_headers
-   OPT: -load-module @PTEST_DIR@/check_libc_anonymous_tags
-   OPT: -load-module @PTEST_DIR@/check_compliance -kernel-msg-key printer:attrs
-   CMD: ./tests/libc/check_full_libc.sh
+ MODULE: check_parsing_individual_headers
+   OPT:
+ MODULE: check_libc_anonymous_tags
+   OPT:
+ MODULE: check_compliance
+   OPT: -kernel-msg-key printer:attrs
+ MODULE:
+ CMD: ./tests/libc/check_full_libc.sh
    OPT:
 **/
 #define __FC_REG_TEST
-
 // Some functions such as usleep() are only defined for older of POSIX headers,
 // while others may be defined only by newer ones, so it is not possible to
 // test all of them. We nevertheless define some headers to test additional

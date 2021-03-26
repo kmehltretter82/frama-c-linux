@@ -1,6 +1,6 @@
 /* run.config
-  EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-  OPT: -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs
+ MODULE: @PTEST_NAME@
+   OPT: -no-autoload-plugins
 */
 
 void declaration_void(void) /*@ ghost (int x, int y) */ ;

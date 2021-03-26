@@ -775,10 +775,13 @@ Section~\ref{ptests:directives}.
   \texttt{STDOPT} directives:
 
   \begin{listing-nonumber}
-    MODULE: @PTEST_DIR@/@PTEST_NAME@.cmxs
+    MODULE: script.cmx
     STDOPT: +"-opt1" ...
     STDOPT: #"-opt2" ...
   \end{listing-nonumber}
+  The {\tt .cmx} extension is optional and the prefix {\tt @PTEST\_DIR@/}
+  is automatically added to the module names (the directive accepts a list
+  of modules that can be separed by blank or comma).
 
   In addition, if the same script {\tt tests/suite/script.ml}
   is shared by several test files in {\tt tests/suite},

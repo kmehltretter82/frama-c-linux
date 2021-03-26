@@ -1,8 +1,8 @@
 /* run.config
-EXECNOW: make -s tests/syntax/Enum_repr.cmxs
-OPT: -machdep x86_32 -load-module tests/syntax/Enum_repr.cmxs -enums int -print
-OPT: -machdep x86_32 -load-module tests/syntax/Enum_repr.cmxs -enums gcc-short-enums -print
-OPT: -machdep x86_32 -load-module tests/syntax/Enum_repr.cmxs -enums gcc-enums -print
+ MODULE: Enum_repr
+   OPT: -machdep x86_32 -enums int -print
+   OPT: -machdep x86_32 -enums gcc-short-enums -print
+   OPT: -machdep x86_32 -enums gcc-enums -print
 */
 
 // is represented by | int | gcc-enums          | gcc-short-enums

@@ -937,10 +937,10 @@ PLUGIN_DISTRIBUTED:=yes
 PLUGIN_INTERNAL_TEST:=yes
 PLUGIN_TESTS_DIRS:=rte rte_manual
 PLUGIN_TESTS_LIB:=\
-  tests/rte/my_annotation/my_annotation.ml \
-  tests/rte/rte_api/rte_get_annot.ml \
-  tests/rte/compute_annot/compute_annot.ml \
-  tests/rte/my_annot_proxy/my_annot_proxy.ml
+  tests/rte/my_annotation.ml \
+  tests/rte/rte_get_annot.ml \
+  tests/rte/compute_annot.ml \
+  tests/rte/my_annot_proxy.ml
 $(eval $(call include_generic_plugin_Makefile,$(PLUGIN_NAME)))
 
 #################

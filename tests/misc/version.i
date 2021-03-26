@@ -1,4 +1,4 @@
 /* run.config
-   MODULE: @PTEST_DIR@/@PTEST_NAME@.cmxs
+   MODULE: @PTEST_NAME@
    OPT: -no-autoload-plugins
 */

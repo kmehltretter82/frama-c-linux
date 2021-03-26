@@ -1,7 +1,7 @@
 /* run.config*
    OPT: -aorai-automata @PTEST_DIR@/@PTEST_NAME@.ya -load-module tests/Aorai_test.cmxs -aorai-test-number @PTEST_NUMBER@ @PROVE_OPTIONS@
    OPT: -aorai-automata @PTEST_DIR@/assigns_det.ya -load-module tests/Aorai_test.cmxs -aorai-test-number @PTEST_NUMBER@ @PROVE_OPTIONS@
-   MODULE: @PTEST_DIR@/name_projects.cmxs
+ MODULE: name_projects
    OPT: -aorai-automata @PTEST_DIR@/@PTEST_NAME@.ya -then -print
 */
 
