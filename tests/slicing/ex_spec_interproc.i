@@ -1,9 +1,9 @@
 /* run.config
-   LIBS: libSelect
-   CMXS: @PTEST_NAME@
-   CMD: @frama-c@ -load-module %{dep:@PTEST_NAME@.cmxs} @OPTIONS@
+ LIBS: libSelect
+ MODULE: @PTEST_NAME@
    OPT: @EVA_OPTIONS@ -deps -journal-disable
 */
+
 int X, Y;
 
 int g (int u, int v, int w) {

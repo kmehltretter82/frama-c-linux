@@ -1,8 +1,8 @@
 /* run.config
-CMXS: @PTEST_NAME@
-CMXS: @PTEST_NAME@_bis
-OPT: -load-module %{dep:@PTEST_NAME@.cmxs}
-OPT: -load-module %{dep:@PTEST_NAME@_bis.cmxs} -test -then-on filtered -print
+ MODULE: @PTEST_NAME@
+   OPT:
+ MODULE: @PTEST_NAME@_bis
+   OPT: -test -then-on filtered -print
 */
 
 #include "stdio.h"

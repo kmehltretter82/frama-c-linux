@@ -1,6 +1,6 @@
 /* run.config
-   CMXS: @PTEST_NAME@
-   OPT: -load-module %{dep:@PTEST_NAME@.cmxs} -keep-comments
+ MODULE: @PTEST_NAME@
+   OPT: -keep-comments
 */
 
 int f() {

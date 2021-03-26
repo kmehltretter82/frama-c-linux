@@ -1,7 +1,7 @@
 /* run.config
-   PLUGIN: pdg
-   CMXS: @PTEST_NAME@
-   OPT: -journal-disable -load-module %{dep:@PTEST_NAME@.cmxs} -then -main main2
+ PLUGIN: pdg
+ MODULE: @PTEST_NAME@
+   OPT: -then -main main2
 */
 /* bug 971: */
 volatile foo;

@@ -1,6 +1,6 @@
 /* run.config
-   CMXS: @PTEST_NAME@
-   OPT: -load-module %{dep:@PTEST_NAME@.cmxs} -eva @EVA_OPTIONS@ -deps -journal-disable
+ MODULE: @PTEST_NAME@
+   OPT: -eva @EVA_OPTIONS@ -deps
 */
 
 int x,y,z;

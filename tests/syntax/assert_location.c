@@ -1,6 +1,6 @@
 /* run.config
-DEPS: assert_location.h
-
+ DEPS: assert_location.h
+   STDOPT:
 */
 
 #include "assert_location.h"

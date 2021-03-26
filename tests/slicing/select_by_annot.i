@@ -1,9 +1,8 @@
 /* run.config
-   LIBS: libSelect
-   CMXS: @PTEST_NAME@
-   CMD: @frama-c@ -load-module %{dep:@PTEST_NAME@.cmxs} @OPTIONS@
-   OPT: @EVA_OPTIONS@ -deps -lib-entry -main main 
-   CMD: @frama-c@ @OPTIONS@
+ LIBS: libSelect
+ MODULE: @PTEST_NAME@
+   OPT: @EVA_OPTIONS@ -deps -lib-entry -main main
+ MODULE:
    OPT: @EVA_OPTIONS@ -deps -lib-entry -main main -slice-pragma main -journal-disable -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -no-deps
    OPT: @EVA_OPTIONS@ -deps -lib-entry -main main -slice-assert main -journal-disable -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -no-deps
    OPT: @EVA_OPTIONS@ -deps -lib-entry -main main -slice-pragma modifS -no-slice-callers -journal-disable -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -no-deps
@@ -20,6 +19,7 @@
    OPT: @EVA_OPTIONS@ -deps -lib-entry -main main -slice-pragma f9 -no-slice-callers -journal-disable -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -no-deps
 
 */
+
 struct Tstr { int a; int b; } S;
 int Sa ;
 

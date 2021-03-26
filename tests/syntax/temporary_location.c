@@ -1,7 +1,7 @@
 /* run.config
-   MODULE: @PTEST_NAME@
+ MODULE: @PTEST_NAME@
+   STDOPT:
 */
-
 
 int f(void) {
     return 1;

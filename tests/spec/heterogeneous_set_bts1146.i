@@ -1,6 +1,7 @@
 /* run.config
-   DONTRUN: bugfix in progress
-   OPT: -load-module %{dep:Type_of_term.cmxs} -print
+ DONTRUN: bugfix in progress
+ MODULE: Type_of_term
+   OPT: -print
 */
 
 /*@ lemma foo: \union(1) == \union(1.0); */

@@ -1,6 +1,6 @@
 /* run.config
-CMXS: my_annotation
-OPT: -load-module %{dep:my_annotation.cmxs}
+ MODULE: my_annotation
+   OPT:
 */
 
 

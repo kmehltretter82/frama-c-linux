@@ -1,9 +1,9 @@
 /* run.config
-   PLUGIN: sparecode @EVA_PLUGINS@
-   CMXS: @PTEST_NAME@ intra_journal
-   EXECNOW: BIN intra_journal.ml @frama-c@ -eva-show-progress -load-module %{dep:@PTEST_NAME@.cmxs} -journal-enable -journal-name intra_journal.ml > /dev/null 2> /dev/null
-   CMD: @frama-c@ -load-module %{dep:@PTEST_NAME@.cmxs} @OPTIONS@
-   OPT: -load-module %{dep:intra_journal.cmxs} -journal-disable
+ PLUGIN: sparecode @EVA_PLUGINS@
+ MODULE: @PTEST_NAME@
+   EXECNOW: BIN intra_journal.ml @frama-c@ -eva-show-progress -journal-enable -journal-name intra_journal.ml > /dev/null 2> /dev/null
+ MODULE: @PTEST_NAME@ intra_journal
+   OPT:
 */
 
 /* Waiting for results such as:

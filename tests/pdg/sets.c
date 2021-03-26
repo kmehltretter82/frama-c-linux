@@ -1,6 +1,6 @@
 /* run.config
-   CMXS: @PTEST_NAME@
-   STDOPT: +"-load-module %{dep:@PTEST_NAME@.cmxs} -lib-entry -main f -pdg -inout "
+ MODULE: @PTEST_NAME@
+   STDOPT: +"-lib-entry -main f -pdg -inout "
 */
 
 

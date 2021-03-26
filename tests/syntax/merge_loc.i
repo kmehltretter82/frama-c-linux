@@ -1,7 +1,7 @@
 /* run.config
-   MODULE: pp_lines
+ MODULE: pp_lines
+    STDOPT:
 */
-
 
 // Test locations when cabs2cil merges declarations and tentative definitions
 // together. We should always favor the tentative definition.

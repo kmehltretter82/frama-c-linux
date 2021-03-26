@@ -1,11 +1,11 @@
 /* run.config*
-   PLUGIN: report @EVA_PLUGINS@ 
-   CMXS: big_local_array_script
+ PLUGIN: report @EVA_PLUGINS@
    OPT: @EVA_OPTIONS@ -print -journal-disable -eva -report
-   OPT: @EVA_OPTIONS@ -load-module %{dep:big_local_array_script.cmxs} -then-on prj -print -report
+ MODULE: big_local_array_script
+   OPT: @EVA_OPTIONS@ -then-on prj -print -report
+ MODULE:
    OPT: @EVA_OPTIONS@ -print -journal-disable -no-initialized-padding-locals -eva
 */
-
 struct S {
   int a[50];
   int b[32];

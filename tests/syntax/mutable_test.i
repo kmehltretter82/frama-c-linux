@@ -1,7 +1,7 @@
 /* run.config
-MODULE: @PTEST_NAME@
+ MODULE: @PTEST_NAME@
+   STDOPT:
 */
-
 
 struct R_1 {
    int r ;
@@ -27,6 +27,3 @@ void f()
 {
   x.w.v.u.t.s.r = y;
 }
-
-
-

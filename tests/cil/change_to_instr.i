@@ -1,7 +1,7 @@
 /* run.config
-MODULE: @PTEST_NAME@
+  MODULE: @PTEST_NAME@
+    STDOPT:
 */
-
 
 int main(){
   int i = 0 ;

@@ -453,13 +453,19 @@ module Macros = struct
 
 end
 
+module StringSet = Set.Make(String)
+type deps =  {
+  load_module: string list;
+  deps_cmd: string list;
+}
+
 type execnow =
   { ex_cmd: string;      (** command to launch *)
     ex_log: string list; (** log files *)
     ex_bin: string list; (** bin files *)
     ex_dir: SubDir.t;    (** directory of test suite *)
     ex_timeout: string;
-
+    ex_deps: deps
   }
 
 
@@ -470,6 +476,7 @@ type cmd = {
   macros: Macros.t;
   exit_code: string option;
   logs: string list;
+  deps: deps;
   timeout: string
 }
 
@@ -507,7 +514,8 @@ module Test_config: sig
   val filename: string
   val current_config: env:env_t -> SubDir.t -> config
 
-  val scan_directives: SubDir.t -> file:string -> Scanf.Scanning.in_channel -> config -> config
+  val scan_directives:  drop:bool ->
+    SubDir.t -> file:string -> Scanf.Scanning.in_channel -> config -> config
   val scan_test_file: env:env_t -> SubDir.t -> file:string -> config -> config
 
   (* updates the configuration directives that do not depend of the test number and
@@ -549,6 +557,9 @@ end = struct
         exit_code=None;
         macros=config.dc_macros;
         logs=[];
+        deps={ load_module=[];
+               deps_cmd=[];
+             };
         timeout=""
       } ]
 
@@ -572,7 +583,7 @@ end = struct
       dc_timeout = "";
     }
 
-  let scan_execnow ~file ~once dir ex_timeout (s:string) =
+  let scan_execnow ~file ~once dir ex_timeout ex_deps (s:string) =
     if once=false then
       Format.eprintf "%s: using EXEC directive (DEPRECATED): %s@."
         file s;
@@ -603,6 +614,7 @@ end = struct
           ex_log = [];
           ex_bin = [];
           ex_dir = dir;
+          ex_deps;
           ex_timeout;
         }
     in
@@ -639,14 +651,19 @@ end = struct
       (* preserve options ordering *)
       List.fold_right (fun x s -> s ^ " " ^ x) opts ""
 
+  let deps_of_config ?(deps={load_module=[];deps_cmd=[]}) config =
+    { load_module = deps.load_module @ config.dc_load_module;
+      deps_cmd = deps.deps_cmd @ config.dc_deps
+    }
 
-  let config_exec ~once ~file ~dir s current =
+  let config_exec ~once ~drop:_ ~file ~dir s current =
     let s = Macros.expand current.dc_macros s in
     { current with
       dc_execnow =
-        scan_execnow ~file ~once dir current.dc_timeout s :: current.dc_execnow }
+        scan_execnow ~file ~once dir current.dc_timeout (deps_of_config current) s :: current.dc_execnow }
 
-  let split_list = (* considers blanks (not preceded by '\'), tabs and commas as separators *)
+  let split_list =
+    (* considers blanks (not preceded by '\'), tabs and commas as separators *)
     let nonsep_regexp = Str.regexp "[\\] " in (* removed for beeing reintroduced *)
     let sep_regexp = Str.regexp "[\t ,]+" in
     fun s -> (* splits on '\ ' first then on ' ' or ',' *)
@@ -655,8 +672,11 @@ end = struct
           | (Str.Delim _ as delim) -> delim::acc)
           []
           (Str.full_split nonsep_regexp s)
+      in (* [r] is in the reverse order and the next [fold] restores the order *)
+      let add s (glue,prev,curr) =
+        if glue then false,(s^prev),curr
+        else false,s,(if prev = "" then curr else prev::curr)
       in
-      let add s (glue,prev,curr) = if glue then false,(s^prev),curr else false,s,(if prev = "" then curr else prev::curr) in
       let acc = List.fold_left (fun ((_,prev,curr) as acc) -> function
           | Str.Delim ("\\ " as nonsep) -> true,(nonsep^prev),curr (* restore '\ ' *)
           | Str.Delim _ -> add "" acc (* separator *)
@@ -665,37 +685,35 @@ end = struct
       let _,_,res = (add "" acc) in
       res
 
-  let config_deps ~file:_ ~dir:_ s current =
+  let config_deps ~drop:_ ~file:_ ~dir:_ s current =
     let s = Macros.expand current.dc_macros s in
     { current with dc_deps = (split_list s) @ current.dc_deps }
 
-  let config_cmxs ~file:_ ~dir:_ s current =
+  let config_cmxs ~drop:_ ~file:_ ~dir:_ s current =
     let s = Macros.expand current.dc_macros s in
     let l = List.map (fun s -> Filename.remove_extension s) (split_list s) in
     { current with dc_cmxs = l @ current.dc_cmxs }
 
-  let config_libs ~file:_ ~dir:_ s current =
+  let config_libs ~drop:_ ~file:_ ~dir:_ s current =
     let s = Macros.expand current.dc_macros s in
     let l = List.map (fun s -> Filename.remove_extension s) (split_list s) in
-    { current with dc_libs = l @ current.dc_libs ;
-                   dc_deps = (List.map (fun s -> s^".cmxs") l) @ current.dc_deps }
+    { current with dc_libs = l @ current.dc_libs }
 
-  let config_plugin ~file:_ ~dir:_ s current =
+  let config_plugin ~drop:_ ~file:_ ~dir:_ s current =
     let s = Macros.expand current.dc_macros s in
     { current with dc_plugins = split_list s ;
                    dc_macros = Macros.add_list ["PLUGIN", s] current.dc_macros }
 
-  let config_module ~file:_ ~dir:_ s current =
+  let config_module ~drop:_ ~file:_ ~dir:_ s current =
     let s = Macros.expand current.dc_macros s in
     let l = List.map (fun s -> Filename.remove_extension s) (split_list s) in
     let deps = List.map (fun s -> s ^ ".cmxs") l in
     { current with
       dc_cmxs = l @ current.dc_cmxs;
-      dc_deps = deps @ current.dc_deps;
-      dc_load_module = deps @ current.dc_load_module;
+      dc_load_module = deps;
     }
 
-  let config_macro ~file ~dir s current =
+  let config_macro ~drop:_ ~file ~dir s current =
     (* note: the expansion is donly done into the definition *)
     let regex = Str.regexp "[ \t]*\\([^ \t@]+\\)\\([ \t]+\\(.*\\)\\|$\\)" in
     if Str.string_match regex s 0 then begin
@@ -732,13 +750,13 @@ end = struct
 
   let config_options =
     [ "CMD",
-      (fun ~file:_ ~dir:_ s current ->
+      (fun ~drop:_ ~file:_ ~dir:_ s current ->
          let s = Macros.expand current.dc_macros s in
          { current with dc_default_toplevel = s});
 
       "OPT",
-      (fun ~file ~dir:_ s current ->
-         if not current.dc_framac then
+      (fun ~drop ~file ~dir:_ s current ->
+         if not (drop || current.dc_framac) then
            Format.eprintf "%s: a NOFRAMAC directive has been defined before a sub-test defined by an 'OPT' directive (That NOFRAMAC directive could be misleading.).@."
              file;
          let s = Macros.expand current.dc_macros s in
@@ -748,15 +766,17 @@ end = struct
              macros = current.dc_macros ;
              exit_code = current.dc_exit_code ;
              logs = current.dc_default_log;
-             timeout = current.dc_timeout }
+             timeout = current.dc_timeout;
+             deps = deps_of_config current
+           }
          in
          { current with
            dc_default_log = !default_parsing_env.current_default_log;
            dc_commands = t :: current.dc_commands });
 
       "STDOPT",
-      (fun ~file ~dir s current ->
-         if not current.dc_framac then
+      (fun ~drop ~file ~dir s current ->
+         if not (drop || current.dc_framac) then
            Format.eprintf "%s: a NOFRAMAC directive has been defined before a sub-test defined by a 'STDOPT' directive (That NOFRAMAC directive could be misleading.).@."
              file;
          let s = Macros.expand current.dc_macros s in
@@ -766,7 +786,9 @@ end = struct
                 { command with opts= make_custom_opts ~file ~dir command.opts s;
                                exit_code = current.dc_exit_code;
                                logs= command.logs @ current.dc_default_log;
-                               timeout= current.dc_timeout})
+                               timeout= current.dc_timeout;
+                               deps = deps_of_config ~deps:command.deps current
+                })
              (if !default_parsing_env.current_default_cmds = [] then
                default_commands current
              else !default_parsing_env.current_default_cmds)
@@ -775,56 +797,61 @@ end = struct
                         dc_default_log = !default_parsing_env.current_default_log @
                                          current.dc_default_log });
       "FILEREG",
-      (fun ~file:_ ~dir:_ s current ->
+      (fun ~drop:_ ~file:_ ~dir:_ s current ->
          let s = Macros.expand current.dc_macros s in
          { current with dc_test_regexp = s });
 
       "FILTER",
-      (fun ~file:_ ~dir:_ s current ->
+      (fun ~drop:_ ~file:_ ~dir:_ s current ->
          let s = Macros.expand current.dc_macros s in
          { current with dc_filter = Some s });
 
       "EXIT",
-      (fun ~file:_ ~dir:_ s current ->
+      (fun ~drop:_ ~file:_ ~dir:_ s current ->
          let s = Macros.expand current.dc_macros s in
          { current with dc_exit_code = Some s });
 
       "GCC",
-      (fun ~file ~dir:_ _ acc ->
+      (fun ~drop:_ ~file ~dir:_ _ acc ->
          Format.eprintf "%s: GCC directive (DEPRECATED)@." file;
          acc);
 
       "COMMENT",
-      (fun ~file:_ ~dir:_ _ acc -> acc);
+      (fun ~drop:_ ~file:_ ~dir:_ _ acc -> acc);
 
       "DONTRUN",
-      (fun ~file:_ ~dir:_ _ current -> { current with dc_dont_run = true });
+      (fun ~drop:_ ~file:_ ~dir:_ _ current ->
+         { current with dc_dont_run = true });
 
       "EXECNOW", config_exec ~once:true;
       "EXEC", config_exec ~once:false;
+
+      "MACRO", config_macro;
       "CMXS", config_cmxs;
       "LIBS", config_libs;
       "DEPS", config_deps;
-      "MACRO", config_macro;
       "MODULE", config_module;
       "PLUGIN", config_plugin;
+
       "LOG",
-      (fun ~file:_ ~dir:_ s current ->
+      (fun ~drop:_ ~file:_ ~dir:_ s current ->
          let s = Macros.expand current.dc_macros s in
          { current with dc_default_log = s :: current.dc_default_log });
+
       "TIMEOUT",
-      (fun ~file:_ ~dir:_ s current ->
+      (fun ~drop:_ ~file:_ ~dir:_ s current ->
          let s = Macros.expand current.dc_macros s in
          { current with dc_timeout = s });
+
       "NOFRAMAC",
-      (fun ~file ~dir:_ _ current ->
-         if current.dc_commands <> [] && current.dc_framac then
+      (fun ~drop ~file ~dir:_ _ current ->
+         if not drop && current.dc_commands <> [] && current.dc_framac then
            Format.eprintf "%s: a NOFRAMAC directive has the effect of ignoring previous defined sub-tests (by some 'OPT' or 'STDOPT' directives that seems misleading). @."
              file;
          { current with dc_commands = []; dc_framac = false; });
     ]
 
-  let scan_directives dir ~file scan_buffer default =
+  let scan_directives ~drop dir ~file scan_buffer default =
     set_default_parsing_env default;
     let r = ref { default with dc_commands = [] } in
     let treat_line s =
@@ -832,7 +859,7 @@ end = struct
         Scanf.sscanf s "%[ *]%[A-Za-z0-9]: %s@\n"
           (fun _ name opt ->
              try
-               r := (List.assoc name config_options ~file ~dir) opt !r
+               r := (List.assoc name config_options) ~drop ~file ~dir opt !r
              with Not_found ->
                Format.eprintf "@[%s: unknown configuration option: %s@.@]" file name)
       with
@@ -862,7 +889,7 @@ end = struct
     then begin
       if !verbosity >=2 then Format.printf "%% Parsing global config file=%s@." general_config_file;
       let scan_buffer = Scanf.Scanning.from_file general_config_file in
-      scan_directives
+      scan_directives ~drop:false
         (SubDir.create ~env ~with_subdir:false Filename.current_dir_name)
         ~file:general_config_file
         scan_buffer
@@ -901,14 +928,14 @@ end = struct
              let configs = split_config (String.trim names) in
              if List.exists is_current_config configs then
                (* Found options for current config! *)
-               scan_directives dir ~file:f scan_buffer default
+               scan_directives ~drop:false dir ~file:f scan_buffer default
              else (* config name does not match: eat config and continue.
                      But only if the comment is still opened by the end of
                      the line and we are indeed reading a config
                   *)
                (if List.exists is_config configs &&
                    not (Str.string_match end_comment names 0) then
-                  ignore (scan_directives dir ~file:f scan_buffer default);
+                  ignore (scan_directives ~drop:true dir ~file:f scan_buffer default);
                 scan_config ()))
       in
       let config =
@@ -943,9 +970,8 @@ type toplevel_command =
     nth : int;
     execnow:bool;
     timeout: string;
-    deps: string list;
+    deps: deps;
     plugins: string list;
-    load_module: string list;
   }
 
 type command =
@@ -990,8 +1016,8 @@ let basic_command_string command =
   let plugins_options =
     let opt_plugin = if command.plugins = [] then ""
       else Printf.sprintf "-load-plugin=%s" (String.concat "," command.plugins) in
-    let opt_modules = if command.load_module = [] then ""
-      else Printf.sprintf "-load-module=%s" (String.concat "," command.load_module) in
+    let opt_modules = if command.deps.load_module = [] then ""
+      else Printf.sprintf "-load-module=%s" (String.concat "," command.deps.load_module) in
     String.concat " " [opt_plugin;opt_modules]
   in
   let macros = (* set expanded macros that can be used into CMD directives *)
@@ -1142,7 +1168,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       wtest.oracle_out
       wtest.oracle_err
       print_list (List.map (Filename.concat wtest.oracle_dir) command.log_files)
-      print_list deps
+      print_list deps.deps_cmd
       command.file
       Fmt.(list (package_as_deps (quote plugin_as_package))) command.plugins
       (* action: *)
@@ -1179,7 +1205,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       cmdreslog
       print_list command.log_files
       (* deps: *)
-      print_list deps
+      print_list deps.deps_cmd
       command.file
       Fmt.(list (package_as_deps (quote plugin_as_package))) command.plugins
       (* action: *)
@@ -1224,7 +1250,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
      )@."
     command.nth command.file
     (mk_alias command "exec")
-    print_list deps
+    print_list deps.deps_cmd
     command.file
     Fmt.(list (package_as_deps (quote plugin_as_package))) command.plugins
     accepted_exit_code
@@ -1238,7 +1264,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
      )@."
     command.nth command.file
     (mk_alias command "exec.show")
-    print_list deps
+    print_list deps.deps_cmd
     command.file
     Fmt.(list (package_as_deps (quote plugin_as_package))) command.plugins
     ("echo '" ^ show_cmd wtest.cmd ^"'");
@@ -1278,10 +1304,17 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config =
   let config = Test_config.scan_test_file ~env directory ~file config in
   if not config.dc_dont_run then
     let test_name,config,ptest_vars = Test_config.ptest_vars ~env directory ~file config  in
+    let dc_libs = List.map (fun s -> s^".cmxs") config.dc_libs in
+    let deps_command macros deps =
+      let subst = Macros.expand macros in
+      { load_module = List.map subst (dc_libs @ deps.load_module);
+        deps_cmd = List.map subst (dc_libs @ deps.load_module @ deps.deps_cmd);
+      };
+    in
     let nb_files = List.length config.dc_commands in
     let make_cmd =
       let i = ref 0 in
-      fun { toplevel; opts=options; macros; exit_code; logs; timeout } ->
+      fun { toplevel; opts=options; macros; exit_code; logs; timeout; deps } ->
         let nth = !i in
         incr i ;
         let macros = ptest_vars ~nth macros in
@@ -1298,9 +1331,8 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config =
                 | _ -> Format.eprintf "@[%s: integer required for directive EXIT: %s (defaults to 0)@]@." file exit_code ; 0
             end;
             execnow=false;
-            deps = config.dc_deps;
+            deps = deps_command macros deps;
             plugins = config.dc_plugins;
-            load_module = config.dc_libs @ config.dc_load_module ;
           }
     in
     let nb_files_execnow = List.length config.dc_execnow in
@@ -1309,6 +1341,7 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config =
       fun execnow->
        let nth = !e in
        incr e ;
+       let macros = ptest_vars ~nth Macros.empty in
        let cmd =
          { test_name; file; nb_files = nb_files_execnow; directory; nth;
            log_files = [];
@@ -1316,12 +1349,11 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config =
            toplevel = execnow.ex_cmd;
            exit_code = 0;
            timeout=execnow.ex_timeout;
-           macros = ptest_vars ~nth Macros.empty;
+           macros;
            filter = config.dc_filter;
            execnow = true;
-           deps = config.dc_deps;
-           plugins = config.dc_plugins;
-           load_module = config.dc_libs @ config.dc_load_module;
+           deps = deps_command macros execnow.ex_deps;
+           plugins = config.dc_plugins
          }
        in
        let wtest = {
@@ -1350,7 +1382,7 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config =
            (* deps: *)
            print_list (List.map (Filename.concat wtest.oracle_dir) wtest.log)
            print_list (List.map (Filename.concat wtest.oracle_dir) wtest.bin)
-           print_list config.dc_deps
+           print_list cmd.deps.deps_cmd
            Fmt.(list (package_as_deps (quote plugin_as_package))) config.dc_plugins
            (* targets: *)
            print_list wtest.log
@@ -1430,7 +1462,7 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config =
           cmxs
           print_list (List.map (Format.sprintf "frama-c-%s.core") config.dc_plugins)
           libraries
-      ) config.dc_cmxs;
+      ) (StringSet.elements (StringSet.of_list config.dc_cmxs));
     if config.dc_commands <> [] || config.dc_execnow <> [] then begin
       let print_list_alias fmt l = List.iter (Format.fprintf fmt "(alias %S)") l in
       Format.fprintf result_fmt
@@ -1478,7 +1510,8 @@ let process ~env default_config (suites:Ptests_config.alias StringMap.t) =
          if Sys.file_exists config
          then begin
             let scan_buffer = Scanf.Scanning.from_file config in
-           Test_config.scan_directives directory ~file:config scan_buffer default_config
+            Test_config.scan_directives ~drop:false directory ~file:config
+              scan_buffer default_config
          end
          else default_config
        in

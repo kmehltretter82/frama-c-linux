@@ -1,7 +1,7 @@
 /* run.config
-   MODULE: @PTEST_NAME@
+ MODULE: @PTEST_NAME@
+   STDOPT:
 */
-
 struct list { struct list *next; };
 
 /*@ axiomatic Ax { predicate P(struct list * root) ; } */

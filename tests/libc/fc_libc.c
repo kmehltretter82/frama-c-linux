@@ -1,19 +1,23 @@
 /* run.config*
-   CMXS: check_libc_naming_conventions
-   CMXS: check_const
-   CMXS: check_parsing_individual_headers
-   CMXS: check_libc_anonymous_tags
-   CMXS: check_compliance
-   PLUGIN: metrics @EVA_PLUGINS@
-   OPT: -load-module %{dep:check_libc_naming_conventions.cmxs} -print -cpp-extra-args='-nostdinc' -metrics -metrics-libc -load-module %{dep:check_const.cmxs} -eva @EVA_OPTIONS@ -then -lib-entry -no-print -metrics-no-libc
+ PLUGIN: metrics @EVA_PLUGINS@
+ MODULE: check_libc_naming_conventions check_const
+   OPT: -print -cpp-extra-args='-nostdinc' -metrics -metrics-libc -eva @EVA_OPTIONS@ -then -lib-entry -no-print -metrics-no-libc
+ MODULE:
    OPT: -print -print-libc -machdep x86_32
-   OPT: -load-module %{dep:check_parsing_individual_headers.cmxs}
-   OPT: -load-module %{dep:check_libc_anonymous_tags.cmxs}
-   OPT: -load-module %{dep:check_compliance.cmxs} -kernel-msg-key printer:attrs
-   DEPS: ./check_full_libc.sh
-   CMD: ./check_full_libc.sh
+ MODULE: check_parsing_individual_headers
+   OPT:
+ MODULE: check_libc_anonymous_tags
+   OPT:
+ MODULE: check_compliance
+   OPT: -kernel-msg-key printer:attrs
+ DEPS: ./check_full_libc.sh
+ CMD: ./check_full_libc.sh
+ MODULE:
    OPT:
 **/
+
+
+
 #define __FC_REG_TEST
 
 // Some functions such as usleep() are only defined for older of POSIX headers,

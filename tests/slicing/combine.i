@@ -1,10 +1,10 @@
 /* run.config
-   PLUGIN: constant_propagation @PLUGIN@
-   LIBS: libSelect
-   CMXS: @PTEST_NAME@
-   CMD: @frama-c@ -load-module %{dep:@PTEST_NAME@.cmxs} @OPTIONS@
+ PLUGIN: constant_propagation @PLUGIN@
+ LIBS: libSelect
+ MODULE: @PTEST_NAME@
    OPT: @EVA_OPTIONS@ -deps -journal-disable
 */
+
 //@ assigns \result \from x;
 int g (int x);
 int f (int c, int x) {

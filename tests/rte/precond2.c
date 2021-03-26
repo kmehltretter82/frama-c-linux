@@ -1,6 +1,6 @@
 /* run.config
-   CMXS: compute_annot
-   OPT: -warn-special-float none -load-module %{dep:compute_annot.cmxs} -journal-disable
+ MODULE: compute_annot
+   OPT: -warn-special-float none -journal-disable
 */
 
 int global = 15;

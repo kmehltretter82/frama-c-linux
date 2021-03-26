@@ -1,6 +1,6 @@
 /* run.config
-   CMXS: @PTEST_NAME@
-   OPT: -journal-disable -print -load-module %{dep:@PTEST_NAME@.cmxs} -variadic-no-translation
+ MODULE: @PTEST_NAME@
+   OPT: -journal-disable -print -variadic-no-translation
 */
 #include <stdio.h>
 

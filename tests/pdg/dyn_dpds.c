@@ -1,6 +1,6 @@
 /* run.config
-   CMXS: @PTEST_NAME@
-   STDOPT: +"-load-module %{dep:@PTEST_NAME@.cmxs} -deps"
+ MODULE: @PTEST_NAME@
+   STDOPT: +"-deps"
 */
 
 

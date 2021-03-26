@@ -1,6 +1,6 @@
 /* run.config
-CMXS: my_annot_proxy
-OPT: -load-module %{dep:my_annot_proxy.cmxs}
+ MODULE: my_annot_proxy
+   OPT:
 */
 
 

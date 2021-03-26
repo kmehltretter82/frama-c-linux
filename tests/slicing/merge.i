@@ -1,9 +1,9 @@
 /* run.config
-   LIBS: libSelect libAnim
-   CMXS: @PTEST_NAME@
-   CMD: @frama-c@ -load-module %{dep:@PTEST_NAME@.cmxs} @OPTIONS@
+ LIBS: libSelect libAnim
+ MODULE: @PTEST_NAME@
    OPT: @EVA_OPTIONS@ -deps -slicing-level 3 -journal-disable
 */
+
 int G1, G2, G3;
 void init (int a1, int a2, int a3);
 void add (int a1, int a2, int a3);
