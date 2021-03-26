@@ -90,22 +90,15 @@ module Graph = struct
       in
       find (get_wto kf)
 
-  (* Applies [f acc instr] to all instructions [instr] in the [loop].
-     If [backward] is set to true, instructions are browsed in backward order.
-     If [inner_loop] is set to false, inner loops are ignored. *)
-  let fold_instr ?(backward=false) ?(inner_loop=true) f loop acc =
+  (* Applies [f acc instr] to all instructions [instr] in the [loop]. *)
+  let fold_instr f loop acc =
     let transfer (_v1, edge, _v2) acc =
       match edge.edge_transition with
       | Instr (instr, _stmt) -> f acc instr
       | _ -> acc
     in
     let compute_vertex = G.fold_pred_e transfer loop.graph in
-    let wto =
-      if inner_loop
-      then Wto.flatten loop.wto
-      else List.filter_map (function Wto.Node v -> Some v | _ -> None) loop.wto
-    in
-    let wto = if backward then List.rev wto else wto in
+    let wto = Wto.flatten loop.wto in
     List.fold_left (fun acc vertex -> compute_vertex vertex acc) acc wto
 
   (* Results for the simple dataflow analysis performed by [compute] below. *)
@@ -115,14 +108,16 @@ module Graph = struct
      Starts with the value [init_value] at the head of the loop [loop.head],
      applies [transfer] to compute values through transitions in the loop body,
      and use [join] to merge values coming from different paths.
+     If [backward] is set to [true], transitions are browsed in backward order.
      [transfer] has an argument [~inner_loop], which is true in inner loops.
      Returns the value computed for the loop head after one iteration of the
      loop. Paths outside the loop body are ignored. *)
-  let compute loop transfer join init_value =
+  let compute ?(backward=false) loop transfer join init_value =
     let results = Results.create (G.nb_vertex loop.graph) in
     Results.add results loop.head init_value;
-    let transfer_edge ~inner_loop (v1, edge, _v2) acc =
-      match Results.find_opt results v1 with
+    let transfer_edge ~inner_loop (v1, edge, v2) acc =
+      let v = if backward then v2 else v1 in
+      match Results.find_opt results v with
       | None -> acc
       | Some value ->
         let value = transfer ~inner_loop value edge.edge_transition in
@@ -130,19 +125,21 @@ module Graph = struct
         | None -> Some value
         | Some acc -> Some (join acc value)
     in
-    let compute_vertex ~inner_loop vertex =
-      G.fold_pred_e (transfer_edge ~inner_loop) loop.graph vertex None
+    let compute_vertex =
+      let fold = if backward then G.fold_succ_e else G.fold_pred_e in
+      fun ~inner_loop vertex ->
+        fold (transfer_edge ~inner_loop) loop.graph vertex None
     in
     let process_vertex ~inner_loop vertex =
       Option.iter (Results.add results vertex) (compute_vertex ~inner_loop vertex)
     in
+    let sort = if backward then List.rev else fun x -> x in
     let rec iterate ~inner_loop = function
       | Wto.Node v -> process_vertex ~inner_loop v
       | Wto.Component (v, w) ->
-        process_vertex ~inner_loop v;
-        List.iter (iterate ~inner_loop:true) w;
+        List.iter (iterate ~inner_loop:true) (sort (Wto.Node v :: w));
     in
-    List.iter (iterate ~inner_loop:false) loop.wto;
+    List.iter (iterate ~inner_loop:false) (sort loop.wto);
     compute_vertex ~inner_loop:false loop.head
 
   (* A loop exit condition is an expression and a boolean expression whether the
@@ -285,29 +282,47 @@ let find_lonely_candidate eval_ptr loop_effect expr =
   in
   aux None lvalues
 
-(* If in the [loop], [lval] is assigned once to the value of another
+(* Builds a transfer function suitable for [Graph.compute] that does nothing,
+   except on assignemnts of [lval]:
+   - to the value of an expression [expr], it applies [f expr acc];
+   - to a function call, or if [inner_loop] is true, it raises [exn]. *)
+let transfer_assign lval exn f ~inner_loop acc instr =
+  let is_lval = Cil_datatype.LvalStructEq.equal lval in
+  let transfer_instr ~inner_loop acc = function
+    | Set (lv, expr, _loc) when is_lval lv ->
+      if inner_loop then raise exn else f expr acc
+    | Local_init (vi, AssignInit (SingleInit expr), _loc)
+      when is_lval (Cil.var vi) && not inner_loop ->
+      f expr acc
+    | Local_init (vi, _, _) when is_lval (Cil.var vi) -> raise exn
+    | Call (Some lv, _, _, _) when is_lval lv -> raise exn
+    | _ -> acc
+  in
+  match instr with
+  | Interpreted_automata.Instr (instr, _stmt) ->
+    transfer_instr ~inner_loop acc instr
+  | _ -> acc
+
+(* If in the [loop], [lval] is always assigned to the value of another
    lvalue, returns this new lvalue. Otherwise, returns [lval]. *)
 let cross_equality loop lval =
   (* If no such single equality can be found, return [lval] unchanged. *)
   let exception No_equality in
-  let rec find_lval expr =
+  let rec find_lval expr x =
     match expr.enode with
     | Lval lval -> lval
-    | Info (e, _) -> find_lval e
+    | Info (e, _) -> find_lval e x
     | _ -> raise No_equality
   in
-  let cross_instr lval = function
-    | Set (lv, expr, _loc) when Cil_datatype.LvalStructEq.equal lv lval ->
-      find_lval expr
-    | Local_init (varinfo, AssignInit (SingleInit expr), _loc)
-      when Cil_datatype.LvalStructEq.equal (Cil.var varinfo) lval ->
-      find_lval expr
-    | Call (Some lv, _, _, _) when Cil_datatype.LvalStructEq.equal lval lv ->
-      raise No_equality
-    | _ -> lval
+  let transfer ~inner_loop lval instr =
+    transfer_assign lval No_equality find_lval ~inner_loop lval instr
   in
-  try Graph.fold_instr ~backward:true ~inner_loop:false cross_instr loop lval
-  with No_equality -> lval
+  let join lv1 lv2 =
+    if Cil_datatype.LvalStructEq.equal lv1 lv2 then lv1 else raise No_equality
+  in
+  match Graph.compute ~backward:true loop transfer join lval with
+  | Some lval -> lval
+  | None | exception No_equality -> lval
 
 module Make (Abstract: Abstractions.Eva) = struct
 
@@ -344,7 +359,7 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   (* Adds to [acc] the increment from the assignement of [lval] to the value
      of [expr]. Raises NoIncrement if this is not an increment of [lval]. *)
-  let rec delta_assign lval acc expr =
+  let rec delta_assign lval expr acc =
     (* Is the expression [e] equal to the lvalue [lval] (modulo cast)? *)
     let rec is_lval e = match e.enode with
       | Lval lv -> Cil_datatype.LvalStructEq.equal lval lv
@@ -364,21 +379,9 @@ module Make (Abstract: Abstractions.Eva) = struct
         else if is_lval e2 && binop = PlusA
         then add_to_delta binop acc e1
         else raise NoIncrement
-      | CastE (typ, e) when Cil.isIntegralType typ -> delta_assign lval acc e
-      | Info (e, _) -> delta_assign lval acc e
+      | CastE (typ, e) when Cil.isIntegralType typ -> delta_assign lval e acc
+      | Info (e, _) -> delta_assign lval e acc
       | _ -> raise NoIncrement
-
-  let delta_instruction ~inner_loop lval acc = function
-    | Set (lv, expr, _loc) ->
-      if Cil_datatype.LvalStructEq.equal lval lv
-      then if inner_loop then raise NoIncrement else delta_assign lval acc expr
-      else acc
-    | Call (Some lv, _, _, _) ->
-      if Cil_datatype.LvalStructEq.equal lval lv
-      then raise NoIncrement (* No increment can be computed for a call. *)
-      else acc
-    | Call (None, _, _, _) | Local_init _ | Skip _ | Code_annot _ -> acc
-    | Asm _ -> raise NoIncrement
 
   (* Computes an over-approximation of the increment of [lval] in the [loop].
      Only syntactic assignments of [lval] are considered, so [lval]
@@ -386,11 +389,7 @@ module Make (Abstract: Abstractions.Eva) = struct
      and which should not be global if the loop contains function calls.
      Returns None if no increment can be computed. *)
   let compute_delta lval loop =
-    let transfer ~inner_loop value = function
-      | Interpreted_automata.Instr (instr, _stmt) ->
-        delta_instruction ~inner_loop lval value instr
-      | _ -> value
-    in
+    let transfer = transfer_assign lval NoIncrement (delta_assign lval) in
     let join t1 t2 =
       { value = Bottom.join Val.join t1.value t2.value;
         delta = Bottom.join Val.join t1.delta t2.delta; }
