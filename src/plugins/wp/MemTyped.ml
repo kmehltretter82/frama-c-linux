@@ -709,25 +709,25 @@ struct
     | C_array _ -> assert false
 
   type block =
-    | Str of slot * int
-    | Arr of c_object * int (* delayed layout of a C type *)
+    | Str of slot * int64
+    | Arr of c_object * int64 (* delayed layout of a C type *)
     | Garbled
 
   let pp_block fmt = function
-    | Str(a,n) when n=1 -> pp_slot fmt a
-    | Str(a,n) -> Format.fprintf fmt "%a[%d]" pp_slot a n
-    | Arr(o,n) -> Format.fprintf fmt "{ctype %a}[%d]" Ctypes.pretty o n
+    | Str(a,n) when n=1L -> pp_slot fmt a
+    | Str(a,n) -> Format.fprintf fmt "%a[%Ld]" pp_slot a n
+    | Arr(o,n) -> Format.fprintf fmt "{ctype %a}[%Ld]" Ctypes.pretty o n
     | Garbled -> Format.fprintf fmt "..."
 
   let add_slot a n w =
-    assert (n >= 1) ;
+    assert (n >= 1L) ;
     match w with
-    | Str(b,m) :: w when eq_slot a b -> Str(b,m+n)::w
+    | Str(b,m) :: w when eq_slot a b -> Str(b,Int64.add m n)::w
     | _ -> Str(a,n) :: w
 
   let add_block p w =
     match p , w with
-    | Str(a,n) , Str(b,m)::w when eq_slot a b -> Str(b,n+m)::w
+    | Str(a,n) , Str(b,m)::w when eq_slot a b -> Str(b,Int64.add n m)::w
     | Garbled , Garbled::_ -> w
     | _ -> p :: w
 
@@ -744,26 +744,27 @@ struct
 
   (* requires n > 1 *)
   let rec add_many cobj n w = (* returns [layout obj]*n @ [w] *)
-    assert (n > 1) ;
+    assert (n > 1L) ;
     match cobj, w with
-    | C_array { arr_flat = Some a }, _ when a.arr_cell_nbr = 1 ->
+    | C_array { arr_flat = Some a }, _ when a.arr_cell_nbr = 1L ->
         add_many (Ctypes.object_of a.arr_cell) n w
-    | C_array _, Arr(o, m)::w when 0 = compare_ptr_conflated o cobj -> Arr(o, m+n)::w
+    | C_array _, Arr(o, m)::w when 0 = compare_ptr_conflated o cobj ->
+        Arr(o, Int64.add m n)::w
     | C_array _, _ -> Arr(cobj, n)::w
     | _  -> add_slot (get_slot cobj) n w
 
   let rec rlayout w = function (* returns [layout obj] @ [w] *)
     | C_array { arr_flat = Some a } ->
         let cobj = Ctypes.object_of a.arr_cell in
-        if a.arr_cell_nbr = 1
+        if a.arr_cell_nbr = 1L
         then rlayout w cobj
         else add_many cobj a.arr_cell_nbr w
     | C_array { arr_element = e } ->
         if Wp_parameters.ExternArrays.get () then
-          add_many (Ctypes.object_of e) max_int w
+          add_many (Ctypes.object_of e) Int64.max_int w
         else
           add_block Garbled w
-    | cobj -> add_slot (get_slot cobj) 1 w
+    | cobj -> add_slot (get_slot cobj) 1L w
 
   let layout (obj : c_object) : layout = rlayout [] obj
 
@@ -778,12 +779,12 @@ struct
   type comparison = Srem of layout | Drem of layout | Equal | Mismatch
 
   let add_array o n w =
-    assert (n > 0) ;
-    if n=1 then rlayout w o else Arr(o, n)::w
+    assert (n > 0L) ;
+    if n=1L then rlayout w o else Arr(o, n)::w
 
   let decr_slot a n w =
-    assert (n >= 1);
-    if n=1 then w else Str(a, n-1)::w
+    assert (n >= 1L);
+    if n=1L then w else Str(a, Int64.pred n)::w
 
   let rec equal u v =
     match compare ~dst:u ~src:v with
@@ -793,8 +794,8 @@ struct
     match dst, src with
     | A a1, A a2 -> if eq_atom a1 a2 then Equal else Mismatch
     | S c1, S c2 | U c1, U c2 when Compinfo.equal c1 c2 -> Equal
-    | S c1, _    -> compare ~dst:(clayout c1) ~src:[Str(src,1)]
-    |    _, S c2 -> compare ~dst:[Str(dst,1)] ~src:(clayout c2)
+    | S c1, _    -> compare ~dst:(clayout c1) ~src:[Str(src,1L)]
+    |    _, S c2 -> compare ~dst:[Str(dst,1L)] ~src:(clayout c2)
     | U c1, U c2 ->  (* for union, the layouts must be equal *)
         if equal (clayout c1) (clayout c2) then Equal else Mismatch
     | U _, A _ -> Mismatch
@@ -821,10 +822,10 @@ struct
                   compare w1 w2
               | Equal ->
                   if n < m then
-                    let w2 = Str(a,m-n)::w2 in
+                    let w2 = Str(a,Int64.sub m n)::w2 in
                     compare w1 w2
                   else if n > m then
-                    let w1 = Str(a,n-m)::w1 in
+                    let w1 = Str(a,Int64.sub n m)::w1 in
                     compare w1 w2
                   else
                     (* n = m *)
@@ -835,28 +836,28 @@ struct
               match compare ~dst:(layout u) ~src:(layout v) with
               | Mismatch -> Mismatch
               | Drem u' ->
-                  let w1 = u' @ add_array u (n-1) w1 in
-                  let w2 =      add_array v (m-1) w2 in
+                  let w1 = u' @ add_array u (Int64.pred n) w1 in
+                  let w2 =      add_array v (Int64.pred m) w2 in
                   compare w1 w2
               | Srem v' ->
-                  let w1 =      add_array u (n-1) w1 in
-                  let w2 = v' @ add_array v (m-1) w2 in
+                  let w1 =      add_array u (Int64.pred n) w1 in
+                  let w2 = v' @ add_array v (Int64.pred m) w2 in
                   compare w1 w2
               | Equal ->
                   if n < m then
-                    let w2 = add_array v (m-n) w2 in
+                    let w2 = add_array v (Int64.sub m n) w2 in
                     compare w1 w2
                   else if n > m then
-                    let w1 = add_array u (n-m) w1 in
+                    let w1 = add_array u (Int64.sub n m) w1 in
                     compare w1 w2
                   else
                     (* n = m *)
                     compare w1 w2
             end
         | Arr(u,n) , Str _ ->
-            compare ~dst:((layout u) @ add_array u (n-1) w1) ~src
+            compare ~dst:((layout u) @ add_array u (Int64.pred n) w1) ~src
         | Str _ , Arr(v,n) ->
-            compare ~dst ~src:((layout v) @ add_array v (n-1) w2)
+            compare ~dst ~src:((layout v) @ add_array v (Int64.pred n) w2)
 
   let rec repeated ~dst ~src =
     match dst , src with
@@ -878,21 +879,21 @@ struct
               | Srem _ ->
                   false
               | Equal -> (* dst =?= repeated(src,n/m) *)
-                  n >= m && (n mod m = 0)
+                  n >= m && (Int64.rem n m = 0L)
             end
         | Arr(u,n) , Arr(v,m) ->
             begin
               match compare ~dst:(layout u) ~src:(layout v) with
               | Mismatch -> false
               | Drem u' ->
-                  let w1 = u' @ add_array u (n-1) [] in
-                  let w2 = add_array v (m-1) [] in
+                  let w1 = u' @ add_array u (Int64.pred  n) [] in
+                  let w2 = add_array v (Int64.pred m) [] in
                   let cmp = compare ~dst:w1 ~src:w2 in
                   repeated_result ~src cmp
               | Srem _ ->
                   false
               | Equal -> (* dst =?= repeated(src,n/m) *)
-                  n >= m && (n mod m = 0)
+                  n >= m && (Int64.rem n m = 0L)
             end
         | _ , _ -> repeated_compare ~dst ~src
       end
