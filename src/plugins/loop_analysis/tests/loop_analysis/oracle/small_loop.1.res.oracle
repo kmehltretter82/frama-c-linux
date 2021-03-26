@@ -1,4 +1,0 @@
-[kernel] Parsing tests/loop_analysis/small_loop.i (no preprocessing)
-[loop] Add this to your command line:
-  -val-slevel-merge-after-loop main \
-  -slevel-function main:20

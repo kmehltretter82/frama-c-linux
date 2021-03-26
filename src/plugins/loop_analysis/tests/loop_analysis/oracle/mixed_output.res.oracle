@@ -1,73 +1,62 @@
 [kernel] Parsing tests/loop_analysis/mixed_output.i (no preprocessing)
-[loop] Functions with loops whose bounds we could not find:
-  loop_inf
-  loop_inf2
-[loop] Functions with loops whose estimated bounds were larger than -loop-max-slevel
-  (we recommend setting their slevel to 0 to avoid wasting time):
-  loop_large (estimated bounds: 4000000000000000000)
-[loop] Add this to your command line:
-  -val-slevel-merge-after-loop loop108 \
-  -val-slevel-merge-after-loop loop_inf \
-  -val-slevel-merge-after-loop loop_inf2 \
-  -val-slevel-merge-after-loop loop_large \
-  -slevel-function loop_inf:0 \
-  -slevel-function loop_inf2:0 \
-  -slevel-function loop_large:0 \
-  -slevel-function loop0:1 \
-  -slevel-function loop1:1 \
-  -slevel-function loop10:10 \
-  -slevel-function loop108:400 \
-  -slevel-function loop10init:7 \
-  -slevel-function loop10initneg:13 \
-  -slevel-function loop10initnegle:14 \
-  -slevel-function m01:7 \
-  -slevel-function m02:8 \
-  -slevel-function m03:7 \
-  -slevel-function m04:7 \
-  -slevel-function m05:7 \
-  -slevel-function m06:7 \
-  -slevel-function m07:7 \
-  -slevel-function m08:8 \
-  -slevel-function m09:7 \
-  -slevel-function m10:8 \
-  -slevel-function m11:7 \
-  -slevel-function m12:7 \
-  -slevel-function m13:7 \
-  -slevel-function m14:7 \
-  -slevel-function m15:7 \
-  -slevel-function m16:8 \
-  -slevel-function m17:1 \
-  -slevel-function m18:1 \
-  -slevel-function m19:1 \
-  -slevel-function m20:1 \
-  -slevel-function m21:1 \
-  -slevel-function m22:1 \
-  -slevel-function m23:1 \
-  -slevel-function m24:1 \
-  -slevel-function m_01:7 \
-  -slevel-function m_02:8 \
-  -slevel-function m_03:7 \
-  -slevel-function m_04:7 \
-  -slevel-function m_05:7 \
-  -slevel-function m_06:7 \
-  -slevel-function m_07:7 \
-  -slevel-function m_08:8 \
-  -slevel-function m_09:7 \
-  -slevel-function m_10:8 \
-  -slevel-function m_11:7 \
-  -slevel-function m_12:7 \
-  -slevel-function m_13:7 \
-  -slevel-function m_14:7 \
-  -slevel-function m_15:7 \
-  -slevel-function m_16:8 \
-  -slevel-function m_17:1 \
-  -slevel-function m_18:1 \
-  -slevel-function m_19:1 \
-  -slevel-function m_20:1 \
-  -slevel-function m_21:1 \
-  -slevel-function m_22:1 \
-  -slevel-function m_23:1 \
-  -slevel-function m_24:1 \
-  -slevel-function main:1 \
-  -slevel-function straight_line:1 \
-  -slevel-function with_if:2
+[loop] Maximum number of iterations by loop:
+  tests/loop_analysis/mixed_output.i:19: 0
+  tests/loop_analysis/mixed_output.i:24: 1
+  tests/loop_analysis/mixed_output.i:29: 10
+  tests/loop_analysis/mixed_output.i:34: 7
+  tests/loop_analysis/mixed_output.i:39: 13
+  tests/loop_analysis/mixed_output.i:45: 14
+  tests/loop_analysis/mixed_output.i:64: 10
+  tests/loop_analysis/mixed_output.i:68: 10
+  tests/loop_analysis/mixed_output.i:80: 1000000
+  tests/loop_analysis/mixed_output.i:84: 1000000
+  tests/loop_analysis/mixed_output.i:88: 1000000
+  tests/loop_analysis/mixed_output.i:92: 1000000
+  tests/loop_analysis/mixed_output.i:103: 7
+  tests/loop_analysis/mixed_output.i:107: 8
+  tests/loop_analysis/mixed_output.i:111: 7
+  tests/loop_analysis/mixed_output.i:115: 7
+  tests/loop_analysis/mixed_output.i:119: 7
+  tests/loop_analysis/mixed_output.i:123: 7
+  tests/loop_analysis/mixed_output.i:127: 7
+  tests/loop_analysis/mixed_output.i:131: 8
+  tests/loop_analysis/mixed_output.i:135: 7
+  tests/loop_analysis/mixed_output.i:139: 8
+  tests/loop_analysis/mixed_output.i:143: 7
+  tests/loop_analysis/mixed_output.i:147: 7
+  tests/loop_analysis/mixed_output.i:151: 7
+  tests/loop_analysis/mixed_output.i:155: 7
+  tests/loop_analysis/mixed_output.i:159: 7
+  tests/loop_analysis/mixed_output.i:163: 8
+  tests/loop_analysis/mixed_output.i:167: 1
+  tests/loop_analysis/mixed_output.i:171: 1
+  tests/loop_analysis/mixed_output.i:175: 1
+  tests/loop_analysis/mixed_output.i:179: 1
+  tests/loop_analysis/mixed_output.i:183: 1
+  tests/loop_analysis/mixed_output.i:187: 1
+  tests/loop_analysis/mixed_output.i:191: 1
+  tests/loop_analysis/mixed_output.i:195: 1
+  tests/loop_analysis/mixed_output.i:199: 7
+  tests/loop_analysis/mixed_output.i:203: 8
+  tests/loop_analysis/mixed_output.i:207: 7
+  tests/loop_analysis/mixed_output.i:211: 7
+  tests/loop_analysis/mixed_output.i:215: 7
+  tests/loop_analysis/mixed_output.i:219: 7
+  tests/loop_analysis/mixed_output.i:223: 7
+  tests/loop_analysis/mixed_output.i:227: 8
+  tests/loop_analysis/mixed_output.i:231: 7
+  tests/loop_analysis/mixed_output.i:235: 8
+  tests/loop_analysis/mixed_output.i:239: 7
+  tests/loop_analysis/mixed_output.i:243: 7
+  tests/loop_analysis/mixed_output.i:247: 7
+  tests/loop_analysis/mixed_output.i:251: 7
+  tests/loop_analysis/mixed_output.i:255: 7
+  tests/loop_analysis/mixed_output.i:259: 8
+  tests/loop_analysis/mixed_output.i:263: 1
+  tests/loop_analysis/mixed_output.i:267: 1
+  tests/loop_analysis/mixed_output.i:271: 1
+  tests/loop_analysis/mixed_output.i:275: 1
+  tests/loop_analysis/mixed_output.i:279: 1
+  tests/loop_analysis/mixed_output.i:283: 1
+  tests/loop_analysis/mixed_output.i:287: 1
+  tests/loop_analysis/mixed_output.i:291: 1

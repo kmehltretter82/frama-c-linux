@@ -917,7 +917,6 @@ src/plugins/loop_analysis/region_analysis_sig.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/loop_analysis/region_analysis_stmt.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/loop_analysis/region_analysis_stmt.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/loop_analysis/register.ml: CEA_LGPL_OR_PROPRIETARY
-src/plugins/loop_analysis/slevel_analysis.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/markdown-report/configure.ac: CEA_LGPL
 src/plugins/markdown-report/eva_info.ml: CEA_LGPL
 src/plugins/markdown-report/eva_info.mli: CEA_LGPL

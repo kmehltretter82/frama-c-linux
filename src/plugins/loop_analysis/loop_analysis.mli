@@ -30,3 +30,5 @@ val analyze: Kernel_function.t -> unit
 val get_bounds: stmt -> int option
 
 val fold_bounds: (stmt -> int -> 'a -> 'a) -> 'a -> 'a
+
+val display_results: unit -> unit
