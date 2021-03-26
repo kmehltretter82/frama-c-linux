@@ -3,9 +3,9 @@
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
-  
+  n ∈ [--..--]
 [eva] computing for function main1 <- main.
-  Called from tests/value/loopinv.c:63.
+  Called from tests/value/loopinv.c:80.
 [eva] computing for function init <- main1 <- main.
   Called from tests/value/loopinv.c:22.
 [eva] tests/value/loopinv.c:22: 
@@ -27,7 +27,7 @@
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
-  Called from tests/value/loopinv.c:64.
+  Called from tests/value/loopinv.c:81.
 [eva] tests/value/loopinv.c:32: loop invariant got status valid.
 [eva] tests/value/loopinv.c:33: loop invariant got status valid.
 [eva:alarm] tests/value/loopinv.c:32: Warning: 
@@ -36,7 +36,7 @@
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] computing for function main3 <- main.
-  Called from tests/value/loopinv.c:65.
+  Called from tests/value/loopinv.c:82.
 [eva] tests/value/loopinv.c:42: loop invariant got status valid.
 [eva] tests/value/loopinv.c:46: Frama_C_show_each: {0}, {0}
 [eva] tests/value/loopinv.c:43: starting to merge loop iterations
@@ -54,13 +54,32 @@
 [eva] Recording results for main3
 [eva] Done for function main3
 [eva] computing for function main4 <- main.
-  Called from tests/value/loopinv.c:66.
+  Called from tests/value/loopinv.c:83.
 [eva] tests/value/loopinv.c:58: loop invariant got status valid.
 [eva] tests/value/loopinv.c:59: starting to merge loop iterations
 [eva:alarm] tests/value/loopinv.c:58: Warning: 
   loop invariant got status unknown.
 [eva] Recording results for main4
 [eva] Done for function main4
+[eva] computing for function main5 <- main.
+  Called from tests/value/loopinv.c:84.
+[eva] tests/value/loopinv.c:69: loop invariant got status valid.
+[eva] tests/value/loopinv.c:71: Frama_C_show_each: {0}, {1}
+[eva] tests/value/loopinv.c:70: starting to merge loop iterations
+[eva] tests/value/loopinv.c:71: Frama_C_show_each: {0; 2}, {1; 2}
+[eva] tests/value/loopinv.c:71: Frama_C_show_each: {0; 2; 4}, {1; 2; 3}
+[eva] tests/value/loopinv.c:71: Frama_C_show_each: {0; 2; 4; 6}, [1..106]
+[eva:alarm] tests/value/loopinv.c:69: Warning: 
+  loop invariant got status unknown.
+[eva] tests/value/loopinv.c:71: Frama_C_show_each: {0; 2; 4; 6; 8}, [1..107]
+[eva] tests/value/loopinv.c:71: 
+  Frama_C_show_each: [0..2147483646],0%2, [1..2147483647]
+[eva:alarm] tests/value/loopinv.c:72: Warning: 
+  signed overflow. assert sn + 2 ≤ 2147483647;
+[eva:alarm] tests/value/loopinv.c:73: Warning: 
+  signed overflow. assert i + 1 ≤ 2147483647;
+[eva] Recording results for main5
+[eva] Done for function main5
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -82,6 +101,10 @@
 [eva:final-states] Values at end of function main4:
   a ∈ {9}
   x ∈ {9}
+[eva:final-states] Values at end of function main5:
+  i ∈ [1..2147483647]
+  sn ∈ [0..2147483646],0%2
+  __retres ∈ {0}
 [eva:final-states] Values at end of function main:
   
 [report] Computing properties status...
@@ -142,9 +165,20 @@
             tried with Eva.
 
 --------------------------------------------------------------------------------
+--- Properties of Function 'main5'
+--------------------------------------------------------------------------------
+
+[    -    ] Invariant (file tests/value/loopinv.c, line 69)
+            tried with Eva.
+[    -    ] Assertion 'Eva,signed_overflow' (file tests/value/loopinv.c, line 72)
+            tried with Eva.
+[    -    ] Assertion 'Eva,signed_overflow' (file tests/value/loopinv.c, line 73)
+            tried with Eva.
+
+--------------------------------------------------------------------------------
 --- Status Report Summary
 --------------------------------------------------------------------------------
      9 Completely validated
-     4 To be validated
-    13 Total
+     7 To be validated
+    16 Total
 --------------------------------------------------------------------------------
