@@ -1,4 +1,6 @@
+/anr-logo.png
 /developer.pdf
+/eu-flag.jpg
 /frama-c-book.cls
 /frama-c-cover.pdf
 /frama-c-left.pdf
@@ -8,12 +10,6 @@
 /tutorial/viewcfg/generated/
 /tutorial/hello/generated/
 /examples/generated/
-developer.pdf
-frama-c-book.cls
-frama-c-cover.pdf
-frama-c-left.pdf
-frama-c-right.pdf
-hello_world/
 *.idx
 *.out
 developer.fdb_latexmk

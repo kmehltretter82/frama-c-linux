@@ -128,6 +128,40 @@ prefix=framacbook@,
 \medskip
 \ifusecc\doclicenseThis\else\fi
 }
+
+% \acknowledge{<flag image file>}{<text inside box>}
+\newcommand{\acknowledge}[2]{
+  \fbox{
+    \begin{minipage}{0.97\textwidth}
+      \begin{minipage}{1.2cm}
+        \includegraphics[width=\linewidth]{#1}
+      \end{minipage}
+      \begin{minipage}{0.90\textwidth}
+        This project has received funding from #2.
+      \end{minipage}
+    \end{minipage}
+  }
+}
+
+\newcommand{\acknowledgeANR}{
+  \acknowledge{anr-logo.png}{the French ANR projects
+    CAT~(ANR-05-RNTL-00301) and U3CAT~(08-SEGI-021-01)
+  }
+}
+
+\newcommand{\acknowledgeEU}{
+  \acknowledge{eu-flag.jpg}{the
+    European Union's Seventh Framework Programme (FP7/2007-2013)
+    under grant agreement N$^\circ$\,317753 (\mbox{STANCE}).\\
+    It has also received funding from the Horizon 2020 research
+    and innovation programme, under grant agreements
+    N$^\circ$\,731453~(\mbox{VESSEDIA}),
+    N$^\circ$\,824231~(\mbox{DECODER}),
+    N$^\circ$\,830892~(\mbox{SPARTA}),
+    and N$^\circ$\,883242~(\mbox{ENSURESEC})
+  }
+}
+
 % --------------------------------------------------------------------------
 % ---  Sectionning                                                       ---
 % --------------------------------------------------------------------------
