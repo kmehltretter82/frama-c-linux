@@ -46,7 +46,10 @@
     "__STDC_LIB_EXT1__"; "__STD_NO_ATOMICS__"; "__STD_NO_COMPLEX__";
     "__STDC_NO_THREADS__"; "__STDC_NO_VLA__";
     (* expanding assert, an ACSL keyword, is not a good idea. *)
-    "assert"]
+    "assert";
+    (* __nonnull is predefined by Clang on macOS. *)
+    "__nonnull";
+  ]
   let is_newline = ref CHAR
   let curr_file = ref ""
   let curr_line = ref 1
