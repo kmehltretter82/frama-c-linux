@@ -59,9 +59,27 @@ void main4 () {
   while(x < a) x++;
 }
 
+extern int n;
+
+/* The reduction by the loop invariant after the widening must not jeopardize
+   the convergence of the analysis. */
+int main5(void) {
+  int i = 1;
+  int sn = 0;
+  /*@ loop invariant i <= sn+100; */
+  while (i <= n) {
+    Frama_C_show_each(sn, i);
+    sn += 2;
+    i ++;
+  }
+  return 0;
+}
+
+
 void main(int c) {
   main1(c);
   if (c) main2();
   main3();
   main4();
+  main5();
 }
