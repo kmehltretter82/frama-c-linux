@@ -721,12 +721,13 @@ class cil_printer () = object (self)
     let fundecl = if Cil.isFunctionType v.vtype then Some v else None in
     let v = { v with vtype = self#no_ghost_at_first_level v.vtype } in
     let v =
-      if state.print_cil_as_is then v else begin
+      if v.vformal && not state.print_cil_as_is then begin
         match v.vtype with
         | TPtr(t,a) when Cil.hasAttribute "arraylen" a ->
           { v with vtype = TArray(t, None, { scache = Not_Computed }, a)}
         | _ -> v
       end
+      else v
     in
     (* First the storage modifiers *)
     fprintf fmt "%s%a%a%s%a%a"
