@@ -57,7 +57,7 @@ let dump_to_json () =
     "ocaml_wflags", `String Fc_config.ocaml_wflags ;
     "datadir", `String Fc_config.datadir ;
     "datadirs", list string Fc_config.datadirs ;
-    "framac_libc", `String Fc_config.framac_libc ;
+    "framac_libc", `String (Fc_config.framac_libc:>string) ;
     "libdir", `String Fc_config.libdir ;
     "plugin_dir", list string Fc_config.plugin_dir ;
     "plugin_path", `String Fc_config.plugin_path ;

@@ -53,7 +53,7 @@ let add_symbolic_dir_list name = function
 
 
 let datadir = try Sys.getenv "FRAMAC_SHARE" with Not_found -> "@FRAMAC_DATADIR@"
-let framac_libc = datadir ^ "/libc"
+let framac_libc = Filepath.Normalized.of_string (datadir ^ "/libc")
 let extra_datadir = try getenv_list "FRAMAC_EXTRA_SHARE" with Not_found -> []
 let () = add_symbolic_dir_list "FRAMAC_EXTRA_SHARE" extra_datadir
 (** After so that it has the priority for pretty printing *)

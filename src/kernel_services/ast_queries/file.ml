@@ -471,7 +471,7 @@ let build_cpp_cmd = function
     (* Hypothesis: the preprocessor is POSIX compliant,
        hence understands -I and -D. *)
     let include_args =
-      if Kernel.FramaCStdLib.get () then [Fc_config.framac_libc]
+      if Kernel.FramaCStdLib.get () then [(Fc_config.framac_libc:>string)]
       else []
     in
     let define_args =

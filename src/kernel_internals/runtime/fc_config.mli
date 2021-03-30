@@ -71,7 +71,7 @@ val datadirs: string list
     priority.
     @since 19.0-Potassium *)
 
-val framac_libc: string
+val framac_libc: Filepath.Normalized.t
 (** Directory where Frama-C libc headers are.
     @since 19.0-Potassium *)
 
