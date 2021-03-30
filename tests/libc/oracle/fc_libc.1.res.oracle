@@ -1675,7 +1675,7 @@ extern long pathconf(char const *path, int name);
     assigns *(pipefd + (0 .. 1)) \from (indirect: __fc_fds[0 ..]);
     assigns \result \from (indirect: __fc_fds[0 ..]);
  */
-extern int pipe(int * /*[2]*/ pipefd);
+extern int pipe(int pipefd[2]);
 
 /*@ requires valid_fd: 0 ≤ fd < 1024;
     requires buf_has_room: \valid((char *)buf + (0 .. count - 1));
@@ -2221,14 +2221,14 @@ extern void srand48(long seed);
     assigns __fc_random48_init \from \nothing;
     assigns \result \from __fc_p_random48_counter;
  */
-extern unsigned short *seed48(unsigned short * /*[3]*/ seed16v);
+extern unsigned short *seed48(unsigned short seed16v[3]);
 
 /*@ ensures random48_initialized: __fc_random48_init ≡ 1;
     assigns __fc_random48_counter[0 .. 2], __fc_random48_init;
     assigns __fc_random48_counter[0 .. 2] \from *(param + (0 .. 5));
     assigns __fc_random48_init \from \nothing;
  */
-extern void lcong48(unsigned short * /*[7]*/ param);
+extern void lcong48(unsigned short param[7]);
 
 /*@ requires random48_initialized: __fc_random48_init ≡ 1;
     ensures result_range: \is_finite(\result) ∧ 0.0 ≤ \result < 1.0;
@@ -2247,7 +2247,7 @@ extern double drand48(void);
       \from __fc_random48_counter[0 .. 2];
     assigns \result \from __fc_random48_counter[0 .. 2];
  */
-extern double erand48(unsigned short * /*[3]*/ xsubi);
+extern double erand48(unsigned short xsubi[3]);
 
 /*@ requires random48_initialized: __fc_random48_init ≡ 1;
     ensures result_range: 0 ≤ \result < 2147483648;
@@ -2266,7 +2266,7 @@ extern long lrand48(void);
       \from __fc_random48_counter[0 .. 2];
     assigns \result \from __fc_random48_counter[0 .. 2];
  */
-extern long nrand48(unsigned short * /*[3]*/ xsubi);
+extern long nrand48(unsigned short xsubi[3]);
 
 /*@ requires random48_initialized: __fc_random48_init ≡ 1;
     ensures result_range: -2147483648 ≤ \result < 2147483648;
@@ -2285,7 +2285,7 @@ extern long mrand48(void);
       \from __fc_random48_counter[0 .. 2];
     assigns \result \from __fc_random48_counter[0 .. 2];
  */
-extern long jrand48(unsigned short * /*[3]*/ xsubi);
+extern long jrand48(unsigned short xsubi[3]);
 
 void *calloc(size_t nmemb, size_t size);
 
@@ -3885,7 +3885,7 @@ extern int socket(int domain, int type, int protocol);
     assigns __fc_socket_counter \from __fc_socket_counter;
     assigns *(sv + (0 .. 1)) \from __fc_socket_counter;
  */
-extern int socketpair(int domain, int type, int protocol, int * /*[2]*/ sv);
+extern int socketpair(int domain, int type, int protocol, int sv[2]);
 
 struct in6_addr const in6addr_any = {.s6_addr = {(unsigned char)0}};
 struct in6_addr const in6addr_loopback =
@@ -7506,7 +7506,7 @@ extern int __va_openat_mode_t(int dirfd, char const *filename, int flags,
       \from (indirect: *(path + (0 .. strlen{Old}(path)))),
             (indirect: times), (indirect: *(times + (0 .. 1)));
  */
-extern int utimes(char const *path, struct timeval const * /*[2]*/ times);
+extern int utimes(char const *path, struct timeval const times[2]);
 
 /*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
     assigns tv->tv_sec, tv->tv_usec, *((struct timezone *)tz), \result;
@@ -8031,11 +8031,11 @@ extern struct passwd *getpwnam(char const *name);
 extern struct passwd *getpwuid(uid_t uid);
 
 /*@ assigns *(env + (0 .. 4)); */
-extern int setjmp(int * /*[5]*/ env);
+extern int setjmp(int env[5]);
 
 /*@ ensures never_terminates: \false;
     assigns \nothing; */
-extern void longjmp(int * /*[5]*/ env, int val);
+extern void longjmp(int env[5], int val);
 
 /*@ ensures never_terminates: \false;
     assigns \nothing; */

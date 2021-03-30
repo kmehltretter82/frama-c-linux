@@ -13,6 +13,6 @@ int f(struct foo *x);
 
 /*@ assigns *(x + (0 .. 3));
     assigns *(x + (0 .. 3)) \from y->bli[0 .. 3]; */
-int g(char * /*[4]*/ x, struct bli *y);
+int g(char x[4], struct bli *y);
 
 

@@ -17,7 +17,7 @@ foo X = {0, 1, 2, 3};
 /*@ lemma vaddrof2{L}: \valid((int *)X);
  */
 /*@ requires p1(x); */
-int f1(int * /*[4]*/ x)
+int f1(int x[4])
 {
   int __retres;
   __retres = *(x + 3);
