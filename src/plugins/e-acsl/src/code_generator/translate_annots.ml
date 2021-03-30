@@ -67,8 +67,9 @@ let pre_funspec kf kinstr env funspec =
       funspec;
     env
   in
-  let env = convert_unsupported_clauses env in
   let loc = Kernel_function.get_location kf in
+  Cil.CurrentLoc.set loc;
+  let env = convert_unsupported_clauses env in
   let contract = Contract.create ~loc funspec in
   Env.with_rte env true
     ~f:(fun env -> Contract.translate_preconditions kf kinstr env contract)
