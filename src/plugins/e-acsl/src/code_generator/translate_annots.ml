@@ -57,7 +57,7 @@ let pre_funspec kf kinstr env funspec =
     unsupported
       (fun spec ->
          let ppt = Property.ip_decreases_of_spec kf kinstr spec in
-         if must_translate_opt ppt then Env.not_yet env "variant clause")
+         if must_translate_opt ppt then Env.not_yet env "decreases clause")
       funspec;
     (* TODO: spec.spec_terminates is not part of the E-ACSL subset *)
     unsupported
