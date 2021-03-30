@@ -720,6 +720,12 @@ class cil_printer () = object (self)
     let stom, rest = Cil.separateStorageModifiers v.vattr in
     let fundecl = if Cil.isFunctionType v.vtype then Some v else None in
     let v = { v with vtype = self#no_ghost_at_first_level v.vtype } in
+    let v =
+      match v.vtype with
+      | TPtr(t,a) when Cil.hasAttribute "arraylen" a ->
+        { v with vtype = TArray(t, None, { scache = Not_Computed }, a)}
+      | _ -> v
+    in
     (* First the storage modifiers *)
     fprintf fmt "%s%a%a%s%a%a"
       (if v.vinline then "__inline " else "")
@@ -2000,6 +2006,19 @@ class cil_printer () = object (self)
         Kernel.failure ~current:true
           "Found some incorrect attributes for array (%a). Please report."
           self#attributes atts_elem;
+      let size_info,a =
+        List.partition
+          (fun a -> List.mem (Cil.attributeName a) ["arraylen"; "static"]) a
+      in
+      let print_size_info fmt =
+        match size_info with
+        | [] -> ()
+        | [Attr("arraylen",[s])]-> self#attrparam fmt s
+        | [Attr("static",[]); Attr("arraylen",[s])]
+        | [Attr("arraylen", [s]); Attr("static", [])] ->
+          Format.fprintf fmt "static@ %a" self#attrparam s
+        | _ -> ()
+      in
       let name' fmt =
         if a = [] then pname fmt false
         else if nameOpt = None then
@@ -2013,7 +2032,7 @@ class cil_printer () = object (self)
                name'
                (fun fmt ->
                   match lo with
-                  | None -> ()
+                  | None -> print_size_info fmt
                   | Some e -> self#exp fmt e)
            ))
         fmt
