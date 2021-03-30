@@ -25,6 +25,8 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-* runtime      [2021-03-30] Fix the end address of the memory segments in the
+                RTL layouts.
 -  E-ACSL       [2021-03-25] Add support for `check` and `admit` annotations
                 (frama-c/e-acsl#142).
 -* E-ACSL       [2021-03-25] Fix wrong computation of the base pointer when
