@@ -1,0 +1,6 @@
+[
+    { "directory": ".",
+      "command": "g++ -Isubdir2",
+      "file": "subdir.c"
+    }
+]
