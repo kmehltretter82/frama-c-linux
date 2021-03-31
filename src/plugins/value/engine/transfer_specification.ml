@@ -274,16 +274,15 @@ module Make
      clauses that cannot be interpreted. *)
   let evaluate_free_alloc state retres_loc (frees, allocates) =
     let env = make_env state in
-    let evaluate ~free term =
-      let kind = if free then Free else Allocate in
+    let evaluate kind term =
       match evaluate_location env retres_loc kind term with
       | None -> None (* Warnings have been emitted by [evaluate_location]. *)
       | Some loc ->
-        let clause = if free then Eval.Frees term else Eval.Allocates term in
+        let clause = if kind = Free then Frees term else Allocates term in
         Some (clause, loc)
     in
-    List.filter_map (evaluate ~free:true) frees @
-    List.filter_map (evaluate ~free:false) allocates
+    List.filter_map (evaluate Free) frees @
+    List.filter_map (evaluate Allocate) allocates
 
   (* Applies the [assigns] list of assigns, allocates and frees clauses to
      the state [state]. *)
