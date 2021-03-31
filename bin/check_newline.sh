@@ -32,5 +32,5 @@ done < <(file -f "$1" --mime | grep '\btext' | cut -d: -f1)
 
 if [ $errors -gt 0 ]; then
     echo "Found $errors file(s) with errors."
-    exit 0
+    exit 1
 fi
