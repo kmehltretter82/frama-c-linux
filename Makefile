@@ -612,6 +612,7 @@ KERNEL_CMO=\
 	src/kernel_services/ast_transformations/filter.cmo                          \
 	src/kernel_services/ast_transformations/inline.cmo              \
 	src/kernel_internals/runtime/dump_config.cmo                    \
+	src/kernel_services/ast_transformations/contract_special_float.cmo   \
 	src/kernel_internals/runtime/special_hooks.cmo                  \
 	src/kernel_internals/runtime/messages.cmo
 

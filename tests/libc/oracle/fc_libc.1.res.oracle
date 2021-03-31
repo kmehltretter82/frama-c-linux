@@ -2841,6 +2841,7 @@ int __fc_fpclassify(double x);
 
 /*@ requires in_domain: \is_finite(x) ∧ \abs(x) ≤ 1;
     ensures positive_result: \is_finite(\result) ∧ \result ≥ 0;
+    ensures no_error: __fc_errno ≡ \old(__fc_errno);
     assigns \result;
     assigns \result \from x;
  */
@@ -2848,6 +2849,7 @@ extern double acos(double x);
 
 /*@ requires in_domain: \is_finite(x) ∧ \abs(x) ≤ 1;
     ensures positive_result: \is_finite(\result) ∧ \result ≥ 0;
+    ensures no_error: __fc_errno ≡ \old(__fc_errno);
     assigns \result;
     assigns \result \from x;
  */
@@ -2855,6 +2857,7 @@ extern float acosf(float x);
 
 /*@ requires in_domain: \is_finite(x) ∧ \abs(x) ≤ 1;
     ensures positive_result: \is_finite(\result) ∧ \result ≥ 0;
+    ensures no_error: __fc_errno ≡ \old(__fc_errno);
     assigns \result;
     assigns \result \from x;
  */
@@ -2862,6 +2865,7 @@ extern long double acosl(long double x);
 
 /*@ requires in_domain: \is_finite(x) ∧ \abs(x) ≤ 1;
     ensures finite_result: \is_finite(\result);
+    ensures no_error: __fc_errno ≡ \old(__fc_errno);
     assigns \result;
     assigns \result \from x;
  */
@@ -2869,6 +2873,7 @@ extern double asin(double x);
 
 /*@ requires in_domain: \is_finite(x) ∧ \abs(x) ≤ 1;
     ensures finite_result: \is_finite(\result);
+    ensures no_error: __fc_errno ≡ \old(__fc_errno);
     assigns \result;
     assigns \result \from x;
  */
@@ -2876,12 +2881,13 @@ extern float asinf(float x);
 
 /*@ requires in_domain: \is_finite(x) ∧ \abs(x) ≤ 1;
     ensures finite_result: \is_finite(\result);
+    ensures no_error: __fc_errno ≡ \old(__fc_errno);
     assigns \result;
     assigns \result \from x;
  */
 extern long double asinl(long double x);
 
-/*@ requires finite_arg: \is_finite(x);
+/*@ requires finite_arg: ¬\is_NaN(x);
     ensures finite_result: \is_finite(\result);
     ensures result_domain: -1.571 ≤ \result ≤ 1.571;
     assigns \result;
@@ -2889,7 +2895,7 @@ extern long double asinl(long double x);
  */
 extern float atanf(float x);
 
-/*@ requires finite_arg: \is_finite(x);
+/*@ requires number_arg: ¬\is_NaN(x);
     ensures finite_result: \is_finite(\result);
     ensures result_domain: -1.571 ≤ \result ≤ 1.571;
     assigns \result;
@@ -2897,7 +2903,7 @@ extern float atanf(float x);
  */
 extern double atan(double x);
 
-/*@ requires finite_arg: \is_finite(x);
+/*@ requires number_arg: ¬\is_NaN(x);
     ensures finite_result: \is_finite(\result);
     ensures result_domain: -1.571 ≤ \result ≤ 1.571;
     assigns \result;
@@ -2905,25 +2911,31 @@ extern double atan(double x);
  */
 extern long double atanl(long double x);
 
-/*@ requires finite_args: \is_finite(x) ∧ \is_finite(y);
-    requires finite_result: \is_finite(atan2(x, y));
+/*@ requires number_args: ¬\is_NaN(x) ∧ ¬\is_NaN(y);
     ensures finite_result: \is_finite(\result);
     assigns \result;
     assigns \result \from x, y;
  */
 extern double atan2(double y, double x);
 
-/*@ requires finite_args: \is_finite(x) ∧ \is_finite(y);
-    requires finite_logic_result: \is_finite(atan2f(x, y));
+/*@ requires number_args: ¬\is_NaN(x) ∧ ¬\is_NaN(y);
     ensures finite_result: \is_finite(\result);
     assigns \result;
     assigns \result \from x, y;
  */
 extern float atan2f(float y, float x);
 
+/*@ requires number_args: ¬\is_NaN(x) ∧ ¬\is_NaN(y);
+    ensures finite_result: \is_finite(\result);
+    assigns \result;
+    assigns \result \from x, y;
+ */
+extern long double atan2l(long double y, long double x);
+
 /*@ requires finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
     ensures result_domain: -1. ≤ \result ≤ 1.;
+    ensures no_error: __fc_errno ≡ \old(__fc_errno);
     assigns \result;
     assigns \result \from x;
  */
@@ -2932,6 +2944,7 @@ extern double cos(double x);
 /*@ requires finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
     ensures result_domain: -1. ≤ \result ≤ 1.;
+    ensures no_error: __fc_errno ≡ \old(__fc_errno);
     assigns \result;
     assigns \result \from x;
  */
@@ -2940,6 +2953,7 @@ extern float cosf(float x);
 /*@ requires finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
     ensures result_domain: -1. ≤ \result ≤ 1.;
+    ensures no_error: __fc_errno ≡ \old(__fc_errno);
     assigns \result;
     assigns \result \from x;
  */
@@ -2948,6 +2962,7 @@ extern long double cosl(long double x);
 /*@ requires finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
     ensures result_domain: -1. ≤ \result ≤ 1.;
+    ensures no_error: __fc_errno ≡ \old(__fc_errno);
     assigns \result;
     assigns \result \from x;
  */
@@ -2956,6 +2971,7 @@ extern double sin(double x);
 /*@ requires finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
     ensures result_domain: -1. ≤ \result ≤ 1.;
+    ensures no_error: __fc_errno ≡ \old(__fc_errno);
     assigns \result;
     assigns \result \from x;
  */
@@ -2964,116 +2980,107 @@ extern float sinf(float x);
 /*@ requires finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
     ensures result_domain: -1. ≤ \result ≤ 1.;
+    ensures no_error: __fc_errno ≡ \old(__fc_errno);
     assigns \result;
     assigns \result \from x;
  */
 extern long double sinl(long double x);
 
-/*@ assigns __fc_errno, \result;
-    assigns __fc_errno \from x;
+/*@ requires in_domain: \is_finite(x) ∧ x ≥ 1;
+    ensures positive_result: \is_finite(\result) ∧ \result ≥ 0;
+    ensures no_error: __fc_errno ≡ \old(__fc_errno);
+    assigns \result;
     assigns \result \from x;
-    
-    behavior normal:
-      assumes in_domain: \is_finite(x) ∧ x ≥ 1;
-      ensures positive_result: \is_finite(\result) ∧ \result ≥ 0;
-      assigns \result;
-      assigns \result \from x;
-    
-    behavior infinite:
-      assumes is_plus_infinity: \is_plus_infinity(x);
-      ensures result_plus_infinity: \is_plus_infinity(\result);
-      assigns \result;
-      assigns \result \from x;
-    
-    behavior domain_error:
-      assumes
-        out_of_domain: \is_minus_infinity(x) ∨ (\is_finite(x) ∧ x < 1);
-      ensures errno_set: __fc_errno ≡ 1;
-      assigns __fc_errno, \result;
-      assigns __fc_errno \from x;
-      assigns \result \from x;
-    
-    disjoint behaviors domain_error, infinite, normal;
  */
 extern double acosh(double x);
 
-/*@ assigns __fc_errno, \result;
-    assigns __fc_errno \from x;
+/*@ requires in_domain: \is_finite(x) ∧ x ≥ 1;
+    ensures positive_result: \is_finite(\result) ∧ \result ≥ 0;
+    ensures no_error: __fc_errno ≡ \old(__fc_errno);
+    assigns \result;
     assigns \result \from x;
-    
-    behavior normal:
-      assumes in_domain: \is_finite(x) ∧ x ≥ 1;
-      ensures positive_result: \is_finite(\result) ∧ \result ≥ 0;
-      assigns \result;
-      assigns \result \from x;
-    
-    behavior infinite:
-      assumes is_plus_infinity: \is_plus_infinity(x);
-      ensures result_plus_infinity: \is_plus_infinity(\result);
-      assigns \result;
-      assigns \result \from x;
-    
-    behavior domain_error:
-      assumes
-        out_of_domain: \is_minus_infinity(x) ∨ (\is_finite(x) ∧ x < 1);
-      ensures errno_set: __fc_errno ≡ 1;
-      assigns __fc_errno, \result;
-      assigns __fc_errno \from x;
-      assigns \result \from x;
-    
-    disjoint behaviors domain_error, infinite, normal;
  */
 extern float acoshf(float x);
 
-/*@ assigns __fc_errno, \result;
+/*@ requires in_domain: \is_finite(x) ∧ x ≥ 1;
+    ensures positive_result: \is_finite(\result) ∧ \result ≥ 0;
+    ensures no_error: __fc_errno ≡ \old(__fc_errno);
+    assigns \result;
+    assigns \result \from x;
+ */
+extern long double acoshl(long double x);
+
+/*@ requires ¬(overflow_arg: \is_finite(x) ∧ x > 0x1.62e42fefa39efp+9);
+    requires ¬(plus_infinity_arg: \is_plus_infinity(x));
+    requires ¬(nan_arg: \is_NaN(x));
+    assigns __fc_errno, \result;
     assigns __fc_errno \from x;
     assigns \result \from x;
     
     behavior normal:
-      assumes in_domain: \is_finite(x) ∧ x ≥ 1;
-      ensures positive_result: \is_finite(\result) ∧ \result ≥ 0;
-      assigns \result;
-      assigns \result \from x;
-    
-    behavior infinite:
-      assumes is_plus_infinity: \is_plus_infinity(x);
-      ensures result_plus_infinity: \is_plus_infinity(\result);
-      assigns \result;
-      assigns \result \from x;
-    
-    behavior domain_error:
+      assumes finite_arg: \is_finite(x);
       assumes
-        out_of_domain: \is_minus_infinity(x) ∨ (\is_finite(x) ∧ x < 1);
-      ensures errno_set: __fc_errno ≡ 1;
-      assigns __fc_errno, \result;
-      assigns __fc_errno \from x;
+        domain_arg: x ≥ -0x1.74910d52d3051p9 ∧ x ≤ 0x1.62e42fefa39efp+9;
+      ensures res_finite: \is_finite(\result);
+      ensures positive_result: \result > 0.;
+      ensures no_error: __fc_errno ≡ \old(__fc_errno);
+      assigns \result;
       assigns \result \from x;
     
-    disjoint behaviors domain_error, infinite, normal;
- */
-extern long double acoshl(long double x);
-
-/*@ requires finite_arg: \is_finite(x);
-    requires finite_domain: x ≤ 0x1.62e42fefa39efp+9;
-    ensures res_finite: \is_finite(\result);
-    ensures positive_result: \result > 0.;
-    assigns \result;
-    assigns \result \from x;
+    behavior underflow:
+      assumes underflow_arg: \is_finite(x) ∧ x < -0x1.74910d52d3051p9;
+      ensures zero_res: \result ≡ 0.;
+      ensures errno_set: __fc_errno ≡ 34;
+    
+    behavior minus_infinity:
+      assumes plus_infinity_arg: \is_minus_infinity(x);
+      ensures zero_result: \is_finite(\result) ∧ \result ≡ 0.;
+      ensures no_error: __fc_errno ≡ \old(__fc_errno);
+      assigns \result;
+      assigns \result \from x;
+    
+    complete behaviors minus_infinity, underflow, normal;
+    disjoint behaviors minus_infinity, underflow, normal;
  */
 extern double exp(double x);
 
-/*@ requires finite_arg: \is_finite(x);
-    requires res_finite: x ≤ 0x1.62e42ep+6;
-    ensures res_finite: \is_finite(\result);
-    ensures positive_result: \result > 0.;
-    assigns \result;
+/*@ requires ¬(overflow_arg: \is_finite(x) ∧ x > 0x1.62e42ep+6);
+    requires ¬(plus_infinity_arg: \is_plus_infinity(x));
+    requires ¬(nan_arg: \is_NaN(x));
+    assigns __fc_errno, \result;
+    assigns __fc_errno \from x;
     assigns \result \from x;
+    
+    behavior normal:
+      assumes finite_arg: \is_finite(x);
+      assumes domain_arg: x ≥ -0x1.9fe368p6 ∧ x ≤ 0x1.62e42ep+6;
+      ensures res_finite: \is_finite(\result);
+      ensures positive_result: \result > 0.;
+      ensures no_error: __fc_errno ≡ \old(__fc_errno);
+      assigns \result;
+      assigns \result \from x;
+    
+    behavior underflow:
+      assumes underflow_arg: \is_finite(x) ∧ x < -0x1.9fe368p6;
+      ensures zero_res: \result ≡ 0.;
+      ensures errno_set: __fc_errno ≡ 34;
+    
+    behavior minus_infinity:
+      assumes plus_infinity_arg: \is_minus_infinity(x);
+      ensures zero_result: \is_finite(\result) ∧ \result ≡ 0.;
+      ensures no_error: __fc_errno ≡ \old(__fc_errno);
+      assigns \result;
+      assigns \result \from x;
+    
+    complete behaviors minus_infinity, underflow, normal;
+    disjoint behaviors minus_infinity, underflow, normal;
  */
 extern float expf(float x);
 
 /*@ requires finite_arg: \is_finite(x);
     requires arg_positive: x > 0;
     ensures finite_result: \is_finite(\result);
+    ensures no_error: __fc_errno ≡ \old(__fc_errno);
     assigns \result;
     assigns \result \from x;
  */
@@ -3082,14 +3089,16 @@ extern double log(double x);
 /*@ requires finite_arg: \is_finite(x);
     requires arg_positive: x > 0;
     ensures finite_result: \is_finite(\result);
+    ensures no_error: __fc_errno ≡ \old(__fc_errno);
     assigns \result;
     assigns \result \from x;
  */
 extern float logf(float x);
 
 /*@ requires finite_arg: \is_finite(x);
-    requires arg_pos: x > 0;
+    requires arg_positive: x > 0;
     ensures finite_result: \is_finite(\result);
+    ensures no_error: __fc_errno ≡ \old(__fc_errno);
     assigns \result;
     assigns \result \from x;
  */
@@ -3098,6 +3107,7 @@ extern long double logl(long double x);
 /*@ requires finite_arg: \is_finite(x);
     requires arg_positive: x > 0;
     ensures finite_result: \is_finite(\result);
+    ensures no_error: __fc_errno ≡ \old(__fc_errno);
     assigns \result;
     assigns \result \from x;
  */
@@ -3106,14 +3116,16 @@ extern double log10(double x);
 /*@ requires finite_arg: \is_finite(x);
     requires arg_positive: x > 0;
     ensures finite_result: \is_finite(\result);
+    ensures no_error: __fc_errno ≡ \old(__fc_errno);
     assigns \result;
     assigns \result \from x;
  */
 extern float log10f(float x);
 
 /*@ requires finite_arg: \is_finite(x);
-    requires arg_postive: x > 0;
+    requires arg_positive: x > 0;
     ensures finite_result: \is_finite(\result);
+    ensures no_error: __fc_errno ≡ \old(__fc_errno);
     assigns \result;
     assigns \result \from x;
  */
@@ -3122,6 +3134,7 @@ extern long double log10l(long double x);
 /*@ requires finite_arg: \is_finite(x);
     requires arg_positive: x > 0;
     ensures finite_result: \is_finite(\result);
+    ensures no_error: __fc_errno ≡ \old(__fc_errno);
     assigns \result;
     assigns \result \from x;
  */
@@ -3130,6 +3143,7 @@ extern double log2(double x);
 /*@ requires finite_arg: \is_finite(x);
     requires arg_positive: x > 0;
     ensures finite_result: \is_finite(\result);
+    ensures no_error: __fc_errno ≡ \old(__fc_errno);
     assigns \result;
     assigns \result \from x;
  */
@@ -3138,6 +3152,7 @@ extern float log2f(float x);
 /*@ requires finite_arg: \is_finite(x);
     requires arg_positive: x > 0;
     ensures finite_result: \is_finite(\result);
+    ensures no_error: __fc_errno ≡ \old(__fc_errno);
     assigns \result;
     assigns \result \from x;
  */
@@ -3157,18 +3172,22 @@ float fabsf(float x);
  */
 extern long double fabsl(long double x);
 
-/*@ requires finite_args: \is_finite(x) ∧ \is_finite(y);
-    requires finite_logic_res: \is_finite(pow(x, y));
+/*@ requires finite_logic_res: \is_finite(pow(x, y));
     ensures finite_result: \is_finite(\result);
-    assigns \result;
+    ensures
+      __fc_errno: __fc_errno ≡ 34 ∨ __fc_errno ≡ \old(__fc_errno);
+    assigns __fc_errno, \result;
+    assigns __fc_errno \from x, y;
     assigns \result \from x, y;
  */
 extern double pow(double x, double y);
 
-/*@ requires finite_args: \is_finite(x) ∧ \is_finite(y);
-    requires finite_logic_res: \is_finite(powf(x, y));
+/*@ requires finite_logic_res: \is_finite(pow((double)x, (double)y));
     ensures finite_result: \is_finite(\result);
-    assigns \result;
+    ensures
+      __fc_errno: __fc_errno ≡ 34 ∨ __fc_errno ≡ \old(__fc_errno);
+    assigns __fc_errno, \result;
+    assigns __fc_errno \from x, y;
     assigns \result \from x, y;
  */
 extern float powf(float x, float y);
@@ -3178,6 +3197,7 @@ extern float powf(float x, float y);
     ensures finite_result: \is_finite(\result);
     ensures positive_result: \result ≥ -0.;
     ensures result_value: \result ≡ sqrt(\old(x));
+    ensures no_error: __fc_errno ≡ \old(__fc_errno);
     assigns \result;
     assigns \result \from x;
  */
@@ -3187,7 +3207,8 @@ extern double sqrt(double x);
     requires arg_positive: x ≥ -0.;
     ensures finite_result: \is_finite(\result);
     ensures positive_result: \result ≥ -0.;
-    ensures result_value: \result ≡ sqrtf(\old(x));
+    ensures result_value: \result ≡ sqrt((double)\old(x));
+    ensures no_error: __fc_errno ≡ \old(__fc_errno);
     assigns \result;
     assigns \result \from x;
  */
@@ -3197,6 +3218,7 @@ extern float sqrtf(float x);
     requires arg_positive: x ≥ -0.;
     ensures finite_result: \is_finite(\result);
     ensures positive_result: \result ≥ -0.;
+    ensures no_error: __fc_errno ≡ \old(__fc_errno);
     assigns \result;
     assigns \result \from x;
  */
@@ -3286,17 +3308,17 @@ extern float truncf(float x);
  */
 extern long double truncl(long double x);
 
-/*@ requires finite_args: \is_finite(x) ∧ \is_finite(y);
-    requires finite_logic_result: \is_finite(fmod(x, y));
+/*@ requires in_domain: ¬\is_NaN(x) ∧ ¬\is_NaN(y) ∧ y ≢ 0.;
     ensures finite_result: \is_finite(\result);
+    ensures no_error: __fc_errno ≡ \old(__fc_errno);
     assigns \result;
     assigns \result \from x, y;
  */
 extern double fmod(double x, double y);
 
-/*@ requires finite_args: \is_finite(x) ∧ \is_finite(y);
-    requires finite_logic_result: \is_finite(fmodf(x, y));
+/*@ requires in_domain: ¬\is_NaN(x) ∧ ¬\is_NaN(y) ∧ y ≢ 0.;
     ensures finite_result: \is_finite(\result);
+    ensures no_error: __fc_errno ≡ \old(__fc_errno);
     assigns \result;
     assigns \result \from x, y;
  */
