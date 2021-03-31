@@ -55,9 +55,15 @@ let warn_empty_from list =
       "@[no \\from part@ for clause '%a'@]"
       Printer.pp_assigns (Writes no_from)
 
-let treat_assigns = function
+let get_assigns = function
   | WritesAny -> warn_empty_assigns (); []
-  | Writes list -> warn_empty_from list; List.map (fun a -> Assigns a) list
+  | Writes list ->
+    warn_empty_from list;
+    let get_froms = function
+      | From list -> list
+      | FromAny -> [] (* Warning emitted by [warn_empty_from]. *)
+    in
+    List.map (fun (t, from) -> t, get_froms from) list
 
 (* Returns the assigns clause to be used during per-behavior processing.
    The specification states that, if a behavior has no assigns clause,
@@ -68,7 +74,7 @@ let get_assigns_for_behavior spec b =
     | WritesAny -> (find_default_behavior spec).b_assigns
     | assigns -> assigns
   in
-  treat_assigns assigns
+  get_assigns assigns
 
 (* Returns the allocation clause for the behavior [b]. *)
 let get_allocation_for_behavior spec b =
@@ -78,21 +84,24 @@ let get_allocation_for_behavior spec b =
     | allocation -> allocation
   in
   match allocations with
-  | FreeAllocAny -> [] (* TODO: warning. *)
-  | FreeAlloc (free, alloc) ->
-    List.map (fun f -> Frees f) free @ List.map (fun a -> Allocates a) alloc
+  | FreeAllocAny -> [], [] (* TODO: warning. *)
+  | FreeAlloc (free, alloc) -> free, alloc
 
 let pp_eval_error fmt e =
   if e <> Eval_terms.CAlarm then
     Format.fprintf fmt "@ (%a)" Eval_terms.pretty_logic_evaluation_error e
 
-let pp_assign_free_alloc fmt = function
-  | Assigns (term, _) ->
-    Format.fprintf fmt "assigns clause %a" Printer.pp_term term.it_content
-  | Frees term ->
-    Format.fprintf fmt "frees clause %a" Printer.pp_term term.it_content
-  | Allocates term ->
-    Format.fprintf fmt "allocates clause %a" Printer.pp_term term.it_content
+type clause_kind = Assign | Free | Allocate | From
+
+let pp_assign_clause fmt (kind, term) =
+  let clause =
+    match kind with
+    | Assign -> "assigns"
+    | Free -> "frees"
+    | Allocate -> "allocates"
+    | From -> "\\from"
+  in
+  Format.fprintf fmt "%s clause %a" clause Printer.pp_term term.it_content
 
 (* Warns in case the 'assigns \result' clause is missing in a behavior
    (only if the return is used at the call site). *)
@@ -119,49 +128,45 @@ let warn_on_missing_result_assigns kinstr kf spec =
       "@[no 'assigns \\result@ \\from ...'@ clause@ specified for@ function %a@]"
       Kernel_function.pretty kf
 
-let is_assigns = function
-  | Assigns _ -> true
-  | Frees _ | Allocates _ -> false
-
-let reduce_to_valid_location out loc =
+let reduce_to_valid_location kind term loc =
   if Locations.(Location_Bits.(equal top loc.loc)) then
     begin
       Value_parameters.error ~once:true ~current:true
         "@[Cannot handle@ %a,@ location is too imprecise@ (%a).@ \
          Assuming it is not assigned,@ but be aware@ this is incorrect.@]"
-        pp_assign_free_alloc out Locations.pretty loc;
+        pp_assign_clause (kind, term) Locations.pretty loc;
       None
     end
   else
     let valid = Locations.(valid_part Write loc) in
     if Locations.is_bottom_loc valid then
       begin
-        if is_assigns out && not (Locations.is_bottom_loc loc) then
+        if kind = Assign && not (Locations.is_bottom_loc loc) then
           Value_parameters.warning ~current:true ~once:true
             ~wkey:Value_parameters.wkey_invalid_assigns
             "@[Completely invalid destination@ for %a.@ \
-             Ignoring.@]" pp_assign_free_alloc out;
+             Ignoring.@]" pp_assign_clause (kind, term);
         None
       end
     else Some loc
 
-let precise_loc_of_assign env assign_or_allocation =
+let precise_loc_of_assign env kind term =
   try
     (* TODO: warn about errors during evaluation. *)
     let alarm_mode = Eval_terms.Ignore in
-    let loc = match assign_or_allocation with
-      | Assigns (term, _) ->
+    let loc = match kind with
+      | Assign | From ->
         Eval_terms.eval_tlval_as_location ~alarm_mode env term.it_content
-      | Frees term | Allocates term ->
+      | Free | Allocate ->
         let result = Eval_terms.eval_term ~alarm_mode env term.it_content in
         let loc_bits = Locations.loc_bytes_to_loc_bits result.Eval_terms.eover in
         Locations.make_loc loc_bits Int_Base.top
     in
-    reduce_to_valid_location assign_or_allocation loc
+    if kind <> From then reduce_to_valid_location kind term loc else Some loc
   with Eval_terms.LogicEvalError e ->
     Value_util.warning_once_current
       "@[<hov 0>@[<hov 2>cannot interpret %a@]%a;@ effects will be ignored@]"
-      pp_assign_free_alloc assign_or_allocation pp_eval_error e;
+      pp_assign_clause (kind, term) pp_eval_error e;
     None
 
 
@@ -235,65 +240,85 @@ module Make
 
   let make_env state = Eval_terms.env_assigns (Domain.get_cvalue_or_top state)
 
-  let is_result = function
-    | Assigns (term, _)
-    | Allocates term -> Logic_utils.is_result term.it_content
-    | Frees _ -> false
-
-  (* Evaluates the location affected by an assigns, allocates or frees clause.
-     Returns None if the clause cannot be interpreted. *)
-  let evaluate_location env retres_loc logic_assign =
-    if is_result logic_assign
+  (* Evaluates the location affected by an assigns, allocates, frees or \from
+     clause. Returns None if the clause cannot be interpreted. *)
+  let evaluate_location env retres_loc kind term =
+    if (kind = Assign || kind = Allocate)
+    && Logic_utils.is_result term.it_content
     then retres_loc
     else
-      let ploc = precise_loc_of_assign env logic_assign in
+      let ploc = precise_loc_of_assign env kind term in
       Option.map (fun ploc -> set_location ploc Location.top) ploc
 
-  (* From a list of assigns, allocates or frees clauses, builds a list
-     associating each clause to the location it affects. Removes clauses that
-     cannot be interpreted. *)
-  let evaluate_locations env retres_loc list =
-    let process acc logic_assign =
-      match evaluate_location env retres_loc logic_assign with
-      | None -> acc
-      | Some location -> (logic_assign, location) :: acc
+  (* Evaluates the locations of a list of \assigns clauses: builds the list of
+     [Eval.logic_assign] (with the location of \from clauses), and associates
+     each assigns clause to the location it affects. Removes clauses that cannot
+     be interpreted. *)
+  let evaluate_assigns state retres_loc assigns =
+    let env = make_env state in
+    let evaluate (term, deps) =
+      match evaluate_location env retres_loc Assign term with
+      | None -> None (* Warnings have been emitted by [evaluate_location]. *)
+      | Some loc ->
+        let evaluate_from term =
+          let direct = not (List.mem "indirect" term.it_content.term_name) in
+          let location = evaluate_location env retres_loc From term in
+          { term; direct; location }
+        in
+        let deps = List.map evaluate_from deps in
+        Some (Eval.Assigns (term, deps), loc)
     in
-    List.rev (List.fold_left process [] list)
+    List.filter_map evaluate assigns
+
+  (* Evaluates the locations of a list of frees and allocates clauses. Removes
+     clauses that cannot be interpreted. *)
+  let evaluate_free_alloc state retres_loc (frees, allocates) =
+    let env = make_env state in
+    let evaluate kind term =
+      match evaluate_location env retres_loc kind term with
+      | None -> None (* Warnings have been emitted by [evaluate_location]. *)
+      | Some loc ->
+        let clause = if kind = Free then Frees term else Allocates term in
+        Some (clause, loc)
+    in
+    List.filter_map (evaluate Free) frees @
+    List.filter_map (evaluate Allocate) allocates
 
   (* Applies the [assigns] list of assigns, allocates and frees clauses to
      the state [state]. *)
-  let apply_assigns_and_allocations retres_loc assigns state =
+  let apply_assigns_and_allocations evaluated_clauses state =
     let pre = state in
-    let env = make_env state in
-    let assigns_with_locations = evaluate_locations env retres_loc assigns in
-    let transfer state (logic_assign, location) =
-      Domain.logic_assign (Some (logic_assign, pre)) location state
+    let transfer state (clause, location) =
+      Domain.logic_assign (Some (clause, pre)) location state
     in
-    List.fold_left transfer state assigns_with_locations
+    List.fold_left transfer state evaluated_clauses
 
   let treat_statement_assigns assigns state =
-    let assigns = treat_assigns assigns in
-    apply_assigns_and_allocations None assigns state
+    let assigns = get_assigns assigns in
+    let evaluated_assigns = evaluate_assigns state None assigns in
+    apply_assigns_and_allocations evaluated_assigns state
 
   (* After reduction by the postconditions, checks that the locations assigned
      by assigns clauses are not garbled mixes — and warn otherwise. *)
   let check_post_assigns kf retres_loc spec behavior ~pre states =
     let env = make_env pre in
     let assigns = get_assigns_for_behavior spec behavior in
-    let assigns = evaluate_locations env retres_loc assigns in
-    let check_one_assign cvalue_state (assign, location) =
-      let loc = Precise_locs.imprecise_location (get_ploc location) in
-      let cvalue = Cvalue.Model.find cvalue_state loc in
-      if Cvalue.V.is_imprecise cvalue
-      then
-        begin
-          ignore (Locations.Location_Bytes.track_garbled_mix cvalue);
-          Value_parameters.warning ~current:true ~once:true
-            ~wkey:Value_parameters.wkey_garbled_mix
-            "The specification of function %a has generated a garbled mix \
-             for %a."
-            Kernel_function.pretty kf pp_assign_free_alloc assign
-        end
+    let check_one_assign cvalue_state (assign, _) =
+      match evaluate_location env retres_loc Assign assign with
+      | None -> ()
+      | Some location ->
+        let loc = Precise_locs.imprecise_location (get_ploc location) in
+        let cvalue = Cvalue.Model.find cvalue_state loc in
+        if Cvalue.V.is_imprecise cvalue
+        then
+          begin
+            ignore (Locations.Location_Bytes.track_garbled_mix cvalue);
+            Value_parameters.warning ~current:true ~once:true
+              ~wkey:Value_parameters.wkey_garbled_mix
+              "The specification of function %a has generated a garbled mix \
+               for %a."
+              Kernel_function.pretty kf pp_assign_clause (Assign, assign)
+          end
     in
     let check_one_state state =
       let cvalue_state = Domain.get_cvalue_or_top state in
@@ -313,7 +338,11 @@ module Make
     let retres_loc = Option.map Location.eval_varinfo result in
     let assigns = get_assigns_for_behavior spec behavior in
     let allocs = get_allocation_for_behavior spec behavior in
-    let compute = apply_assigns_and_allocations retres_loc (assigns @ allocs) in
+    let compute state =
+      let assigns = evaluate_assigns state retres_loc assigns
+      and allocs = evaluate_free_alloc state retres_loc allocs in
+      apply_assigns_and_allocations (assigns @ allocs) state
+    in
     let states = States.map compute states in
     let states =
       Logic.check_fct_postconditions_for_behaviors kf behaviors status

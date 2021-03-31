@@ -124,7 +124,16 @@ module Make
 
   let show_expr valuation = Domain.show_expr (lift_valuation valuation)
 
+  let lift_logic_dep dep =
+    let location = Option.map Convert.restrict_loc dep.location in
+    { dep with location }
+
+  let lift_logic_assigns = function
+    | Assigns (term, dep) -> Assigns (term, List.map lift_logic_dep dep)
+    | (Allocates _ | Frees _) as x -> x
+
   let logic_assign assigns location state =
+    let assigns = Option.map (fun (a, s) -> lift_logic_assigns a, s) assigns in
     Domain.logic_assign assigns (Convert.restrict_loc location) state
 
   let evaluate_predicate = Domain.evaluate_predicate

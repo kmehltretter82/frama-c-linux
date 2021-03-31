@@ -220,8 +220,13 @@ let value_assigned = function
   | Assign v -> `Value v
   | Copy (_, copied) -> copied.v
 
-type logic_assign =
-  | Assigns of from
+type 'location logic_dependency =
+  { term: identified_term;
+    direct: bool;
+    location: 'location option; }
+
+type 'location logic_assign =
+  | Assigns of identified_term * 'location logic_dependency list
   | Allocates of identified_term
   | Frees of identified_term
 

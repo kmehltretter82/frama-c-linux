@@ -384,7 +384,8 @@ module type S = sig
       interpreted and the pre-state in which the terms of the clause are
       evaluated. The clause can be an assigns, allocates or frees clause.
       [loc] is then the memory location concerned by the clause. *)
-  val logic_assign: (logic_assign * state) option -> location -> state -> state
+  val logic_assign:
+    (location logic_assign * state) option -> location -> state -> state
 
   (** Evaluates a [predicate] to a logical status in the current [state].
       The [logic_environment] contains the states at some labels and the
