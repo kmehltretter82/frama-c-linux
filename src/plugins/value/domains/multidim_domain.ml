@@ -476,14 +476,18 @@ struct
   let assume _stmt _expr _pos valuation state =
     `Value (assume_valuation valuation state)
 
-  let start_call _stmt call valuation state =
+  let start_call _stmt call recursion valuation state =
+    if recursion <> None
+    then
+      Value_parameters.abort ~current:true
+        "The multidim domain does not support recursive calls yet";
     let oracle = make_oracle valuation in
     let bind state arg =
       state >>- assign_lval (Cil.var arg.formal) arg.avalue oracle
     in
     List.fold_left bind (`Value state) call.arguments
 
-  let finalize_call _stmt call ~pre:_ ~post =
+  let finalize_call _stmt call _recursion ~pre:_ ~post =
     match find_builtin call.kf, call.return with
     | None, _ | _, None   -> `Value post
     | Some f, Some return ->
