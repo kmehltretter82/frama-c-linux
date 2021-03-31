@@ -11,7 +11,7 @@
   \
   loop-annot ::= loop-clause* ;
   { loop-behavior* } ;
-  { loop-variant? }
+  loop-variant?
   \
   loop-clause ::= loop-invariant ;
                 | { loop-assigns }
@@ -23,6 +23,6 @@
   { loop-behavior } ::= { "for" id ("," id)* ":" } ;
   { loop-clause* } ; \hspace{-35mm} annotation for behavior $id$
   \
-  { loop-variant } ::= { "loop" "variant" term ";" } ;
-  | { "loop" "variant" term "for" id ";" } ;  \hspace{-35mm} variant for relation $id$
+  loop-variant ::= "loop" "variant" term ";" ;
+  | "loop" "variant" term "for" id ";" ;  \hspace{-35mm} variant for relation $id$
 \end{syntax}
