@@ -93,6 +93,11 @@ let str_string_match_and_replace regex1 regex2 ~suffix s =
   Mutex.unlock str_mutex;
   (replaced_str, matched)
 
+let str_bounded_full_split regex s n =
+  Mutex.lock str_mutex;
+  let res = Str.bounded_full_split regex s n in
+  Mutex.unlock str_mutex; res
+
 let str_split regex s =
   Mutex.lock str_mutex;
   let res = Str.split regex s in
@@ -158,27 +163,33 @@ let end_comment = Str.regexp ".*\\*/"
 
 let regex_cmxs = Str.regexp ("\\([^/]+\\)[.]cmxs\\($\\|[ \t]\\)")
 
-let opt_to_byte toplevel =
-  match string_del_suffix "frama-c" toplevel with
-  | Some path -> path ^ "frama-c.byte"
-  | None ->
-    match string_del_suffix "toplevel.opt" toplevel with
-    | Some path -> path ^ "toplevel.byte"
-    | None ->
-      match string_del_suffix "frama-c-gui" toplevel with
-      | Some path -> path ^ "frama-c-gui.byte"
-      | None ->
-        match string_del_suffix "viewer.opt" toplevel with
-        | Some path -> path ^ "viewer.byte"
-        | None -> toplevel
-
 let opt_to_byte_options options =
   str_global_replace regex_cmxs "\\1.cmo\\2" options
 
-let execnow_opt_to_byte cmd =
-  let cmd = opt_to_byte cmd in
-  opt_to_byte_options cmd
-
+let opt_to_byte =
+  let regexp_unescaped_blank = Str.regexp "[^\\ ] " in
+  let _regexp_blank_at_first =  Str.regexp "^ +" in
+  let opt_to_byte toplevel =
+    match string_del_suffix "frama-c" toplevel with
+    | Some path -> path ^ "frama-c.byte"
+    | None ->
+      match string_del_suffix "toplevel.opt" toplevel with
+      | Some path -> path ^ "toplevel.byte"
+      | None ->
+        match string_del_suffix "frama-c-gui" toplevel with
+        | Some path -> path ^ "frama-c-gui.byte"
+        | None ->
+          match string_del_suffix "viewer.opt" toplevel with
+          | Some path -> path ^ "viewer.byte"
+          | None -> toplevel
+  in
+  fun cmd ->
+    match str_bounded_full_split regexp_unescaped_blank cmd 2 with
+    | [ Str.Text toplevel ] -> opt_to_byte toplevel
+    | [ Str.Text toplevel ; Str.Delim delim ] -> opt_to_byte (toplevel ^ (String.make 1 (String.get delim 0)))
+    | [ Str.Text toplevel ; Str.Delim delim; Str.Text options ] ->
+      (opt_to_byte (toplevel ^ (String.make 1 (String.get delim 0)))) ^ " " ^ (opt_to_byte_options options)
+    | _ -> cmd
 
 let output_unix_error (exn : exn) =
   match exn with
@@ -1540,7 +1551,7 @@ let do_command command =
           remove_execnow_results execnow;
           let cmd =
             if !use_byte then
-              execnow_opt_to_byte execnow.ex_cmd
+              opt_to_byte execnow.ex_cmd
             else
               execnow.ex_cmd
           in
@@ -1862,10 +1873,11 @@ let () =
        end
        else begin
          if not (List.mem suite exclude_suite) then begin
-           let dir_files = Sys.readdir (SubDir.get directory) in
-           if !verbosity >= 1 then
-             lock_printf "%% - Look at %d entries of the directory...@."
-               (Array.length dir_files);
+           let dirname = SubDir.get directory in
+           let dir_files = Sys.readdir dirname in
+           if !verbosity >= 2 then
+             lock_printf "%% - Look at %d entries of the directory %S ...@."
+               (Array.length dir_files) dirname;
            for i = 0 to pred (Array.length dir_files) do
              let file = dir_files.(i) in
              assert (Filename.is_relative file);
