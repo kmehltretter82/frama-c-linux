@@ -174,6 +174,7 @@ share/libc/__fc_define_eof.h: CEA_LGPL
 share/libc/__fc_define_fd_set_t.h: CEA_LGPL
 share/libc/__fc_define_file.h: CEA_LGPL
 share/libc/__fc_define_fpos_t.h: CEA_LGPL
+share/libc/__fc_define_fs_cnt.h: CEA_LGPL
 share/libc/__fc_define_id_t.h: CEA_LGPL
 share/libc/__fc_define_ino_t.h: CEA_LGPL
 share/libc/__fc_define_intptr_t.h: CEA_LGPL
@@ -289,6 +290,7 @@ share/libc/sys/shm.h: CEA_LGPL
 share/libc/sys/signal.h: CEA_LGPL
 share/libc/sys/socket.h: CEA_LGPL
 share/libc/sys/stat.h: CEA_LGPL
+share/libc/sys/statvfs.h: CEA_LGPL
 share/libc/sys/time.h: CEA_LGPL
 share/libc/sys/times.h: CEA_LGPL
 share/libc/sys/timex.h: CEA_LGPL
@@ -296,6 +298,7 @@ share/libc/sys/types.h: CEA_LGPL
 share/libc/sys/uio.h: CEA_LGPL
 share/libc/sys/un.h: CEA_LGPL
 share/libc/sys/utsname.h: CEA_LGPL
+share/libc/sys/vfs.h: CEA_LGPL
 share/libc/sys/wait.h: CEA_LGPL
 share/libc/syslog.h: CEA_LGPL
 share/libc/termios.h: CEA_LGPL
