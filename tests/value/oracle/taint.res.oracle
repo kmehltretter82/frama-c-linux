@@ -28,7 +28,7 @@
   Frama_C_dump_each:
   # taint:
   Locations (data):
-    t; u; buf{[0]; [3..4]}; w; z
+    t; u; x; buf{[0]; [3..4]}; w; z
   Locations (control):
     t; x
   ==END OF DUMP==
@@ -69,9 +69,9 @@
   Frama_C_dump_each:
   # taint:
   Locations (data):
-    global; t; z; w
+    global; t; y; z; w
   Locations (control):
-    x; y
+    x; y; z
   ==END OF DUMP==
 [eva] Recording results for taint_3
 [eva] Done for function taint_3
@@ -87,7 +87,7 @@
   Frama_C_dump_each:
   # taint:
   Locations (data):
-    global; w
+    global; y; buf[2]; w
   Locations (control):
     t; x; y; buf{[0]; [2]}
   ==END OF DUMP==

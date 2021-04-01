@@ -213,21 +213,25 @@ module TransferTaint = struct
           let loc = Precise_locs.imprecise_location ploc in
           Locations.enumerate_valid_bits Write loc
         in
+        (* Control-dependency: taint the left-value of an assign statement whose
+           execution depends on the value of a tainted assume statement. *)
+        let state =
+          if is_under_tainted_assume state stmt
+          then
+            { state with locs_control = Zone.join state.locs_control lv_zone }
+          else
+            (* Reset [state]'s assume statements as no longer valid. *)
+            { state with assume_stmts = Stmt.Set.empty; }
+        in
+        (* Data-dependecy: taint the left-value of an assign statement if
+           tainted locations are involved in either the offset part of the
+           left-value or the assigned expression. As a special case, a
+           left-value is tainted as soon as it appears in a taint annotation. *)
         let is_taint_annotated = Zone.is_included lv_zone annot_zone in
         if is_taint_annotated
         then
-          (* Taint [lv] as it appears in [stmt] taint annotation. *)
           { state with locs_data = Zone.join state.locs_data lv_zone }
-        else if is_under_tainted_assume state stmt
-        then
-          (* Taint [lv] as [stmt] is control-dependent of a tainted assume
-             statement in [state]. *)
-          { state with locs_control = Zone.join state.locs_control lv_zone }
         else
-          (* No taint annotation concerning [lv] nor [stmt] has a
-             control-dependency with [state]. *)
-          (* Reset [state]'s assume statements as no longer valid. *)
-          let state = { state with assume_stmts = Stmt.Set.empty; } in
           (* Compute data-dependency with [state]: whenever [exp] (or its
              sub-expressions) is tainted, or [lv] is indexed by a tainted memory
              location. *)
