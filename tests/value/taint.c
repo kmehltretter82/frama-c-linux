@@ -22,6 +22,7 @@ void taint_1(int t) {
 
 void taint_2(int t, int u) {
   int x = 0;
+  int y = 4;
   int buf[5] = { 0 };
   while (t > 0) {
     x = x + t;
@@ -29,6 +30,11 @@ void taint_2(int t, int u) {
   }
   buf[u] = 0;
   buf[x] = buf[0] + 1;
+  buf[y] = buf[0];
+  /* 'y' must not be tainted here. */
+  if (y > 0) {
+    buf[1] = 2; // Hence neither 'buf[1]' must not.
+  }
   Frama_C_dump_each();
 }
 

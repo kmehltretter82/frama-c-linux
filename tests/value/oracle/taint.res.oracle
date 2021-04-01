@@ -7,7 +7,7 @@
   undet ∈ [--..--]
   global ∈ {0}
 [eva] computing for function taint_1 <- main.
-  Called from tests/value/taint.c:76.
+  Called from tests/value/taint.c:82.
 [eva] tests/value/taint.c:20: 
   Frama_C_dump_each:
   # taint:
@@ -18,54 +18,54 @@
   ==END OF DUMP==
 [eva] Recording results for taint_1
 [eva] Done for function taint_1
-[eva] tests/value/taint.c:77: 
+[eva] tests/value/taint.c:83: 
   Frama_C_domain_show_each:
   w : # taint: true
 [eva] computing for function taint_2 <- main.
-  Called from tests/value/taint.c:81.
-[eva:loop-unroll] tests/value/taint.c:26: Automatic loop unrolling.
-[eva] tests/value/taint.c:32: 
+  Called from tests/value/taint.c:87.
+[eva:loop-unroll] tests/value/taint.c:27: Automatic loop unrolling.
+[eva] tests/value/taint.c:38: 
   Frama_C_dump_each:
   # taint:
   Locations (data):
-    t; u; x; buf{[0]; [3]}; w; z
+    t; u; buf{[0]; [3..4]}; w; z
   Locations (control):
     t; x
   ==END OF DUMP==
 [eva] Recording results for taint_2
 [eva] Done for function taint_2
-[eva] tests/value/taint.c:82: 
+[eva] tests/value/taint.c:88: 
   Frama_C_domain_show_each:
   w : # taint: true
   z : # taint: true
 [eva] computing for function taint_3 <- main.
-  Called from tests/value/taint.c:85.
-[eva:loop-unroll] tests/value/taint.c:42: Automatic loop unrolling.
-[eva] tests/value/taint.c:43: 
+  Called from tests/value/taint.c:91.
+[eva:loop-unroll] tests/value/taint.c:48: Automatic loop unrolling.
+[eva] tests/value/taint.c:49: 
   Frama_C_domain_show_each:
   z : # taint: false
   y : # taint: false
-[eva] tests/value/taint.c:46: 
+[eva] tests/value/taint.c:52: 
   Frama_C_domain_show_each:
   z : # taint: false
   y : # taint: false
-[eva] tests/value/taint.c:43: 
+[eva] tests/value/taint.c:49: 
   Frama_C_domain_show_each:
   z : # taint: true
   y : # taint: false
-[eva] tests/value/taint.c:46: 
+[eva] tests/value/taint.c:52: 
   Frama_C_domain_show_each:
   z : # taint: true
   y : # taint: true
-[eva] tests/value/taint.c:43: 
+[eva] tests/value/taint.c:49: 
   Frama_C_domain_show_each:
   z : # taint: true
   y : # taint: true
-[eva] tests/value/taint.c:46: 
+[eva] tests/value/taint.c:52: 
   Frama_C_domain_show_each:
   z : # taint: true
   y : # taint: true
-[eva] tests/value/taint.c:55: 
+[eva] tests/value/taint.c:61: 
   Frama_C_dump_each:
   # taint:
   Locations (data):
@@ -75,14 +75,14 @@
   ==END OF DUMP==
 [eva] Recording results for taint_3
 [eva] Done for function taint_3
-[eva] tests/value/taint.c:86: 
+[eva] tests/value/taint.c:92: 
   Frama_C_domain_show_each:
   w : # taint: true
   global : # taint: true
 [eva] computing for function taint_4 <- main.
-  Called from tests/value/taint.c:87.
+  Called from tests/value/taint.c:93.
 [eva] computing for function taint_1 <- taint_4 <- main.
-  Called from tests/value/taint.c:64.
+  Called from tests/value/taint.c:70.
 [eva] tests/value/taint.c:20: 
   Frama_C_dump_each:
   # taint:
@@ -93,16 +93,16 @@
   ==END OF DUMP==
 [eva] Recording results for taint_1
 [eva] Done for function taint_1
-[eva] tests/value/taint.c:65: 
+[eva] tests/value/taint.c:71: 
   Frama_C_domain_show_each:
   z : # taint: false
 [eva] Recording results for taint_4
 [eva] Done for function taint_4
 [eva] computing for function taint_5 <- main.
-  Called from tests/value/taint.c:89.
+  Called from tests/value/taint.c:95.
 [eva] using specification for function taint_5
 [eva] Done for function taint_5
-[eva] tests/value/taint.c:90: 
+[eva] tests/value/taint.c:96: 
   Frama_C_domain_show_each:
   z : # taint: true
   w : # taint: true
@@ -119,7 +119,10 @@
 [eva:final-states] Values at end of function taint_2:
   t ∈ {0}
   x ∈ {3}
-  buf[0..2] ∈ {0}
+  y ∈ {4}
+  buf[0] ∈ {0}
+     [1] ∈ {2}
+     [2] ∈ {0}
      [3] ∈ {1}
      [4] ∈ {0}
 [eva:final-states] Values at end of function taint_3:
@@ -168,7 +171,7 @@
 [inout] Inputs for function taint_1:
     undet
 [inout] Out (internal) for function taint_2:
-    t; x; buf[0..4]
+    t; x; y; buf[0..4]
 [inout] Inputs for function taint_2:
     \nothing
 [inout] Out (internal) for function taint_3:

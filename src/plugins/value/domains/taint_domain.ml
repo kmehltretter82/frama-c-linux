@@ -209,7 +209,9 @@ module TransferTaint = struct
         in
         let to_loc = loc_of_lval valuation in
         let lv_zone =
-          Value_util.(zone_of_expr to_loc (lval_to_exp lv.Eval.lval))
+          let ploc = to_loc lv.Eval.lval in
+          let loc = Precise_locs.imprecise_location ploc in
+          Locations.enumerate_valid_bits Write loc
         in
         let is_taint_annotated = Zone.is_included lv_zone annot_zone in
         if is_taint_annotated
