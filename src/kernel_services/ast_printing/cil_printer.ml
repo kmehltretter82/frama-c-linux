@@ -2001,25 +2001,28 @@ class cil_printer () = object (self)
       self#typ (Some name'') fmt bt'
 
     | TArray (elemt, lo, _, a) ->
-      (* qualifiers attributes are not supposed to be on the TArray,
-         but on the base type. (Besides, GCC and Clang do not parse the
-         result if the qualifier is misplaced. *)
       let atts_elem, a = Cil.splitArrayAttributes a in
-      if atts_elem != [] then
-        Kernel.failure ~current:true
-          "Found some incorrect attributes for array (%a). Please report."
-          self#attributes atts_elem;
       let size_info,a =
         List.partition
           (fun a -> List.mem (Cil.attributeName a) ["arraylen"; "static"]) a
       in
+      (* qualifiers attributes are not supposed to be on the TArray,
+         but on the base type, except in the case of a formal declaration. *)
+      if atts_elem <> [] && size_info = [] then
+        Kernel.failure ~current:true
+          "Found some incorrect attributes for array (%a). Please report."
+          self#attributes atts_elem;
+      let sep fmt = if atts_elem <> [] then Format.pp_print_space fmt () in
       let print_size_info fmt =
         match size_info with
-        | [] -> ()
-        | [Attr("arraylen",[s])]-> self#attrparam fmt s
+        | [] -> printAttributes fmt a
+        | [Attr("arraylen",[s])]->
+          Format.fprintf fmt "%a%t%a"
+            printAttributes atts_elem sep self#attrparam s
         | [Attr("static",[]); Attr("arraylen",[s])]
         | [Attr("arraylen", [s]); Attr("static", [])] ->
-          Format.fprintf fmt "static@ %a" self#attrparam s
+          Format.fprintf fmt "static@ %a%t%a"
+            printAttributes atts_elem sep self#attrparam s
         | _ -> ()
       in
       let name' fmt =

@@ -14,4 +14,11 @@ int g(int a[static 2])
   return __retres;
 }
 
+int h(int a[static  const restrict 2])
+{
+  int __retres;
+  __retres = *(a + 1);
+  return __retres;
+}
+
 
