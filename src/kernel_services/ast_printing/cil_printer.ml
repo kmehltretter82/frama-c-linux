@@ -2026,7 +2026,7 @@ class cil_printer () = object (self)
         | _ -> ()
       in
       let name' fmt =
-        if a = [] then pname fmt false
+        if filter_printing_attributes a = [] then pname fmt false
         else if nameOpt = None then
           printAttributes fmt a
         else
