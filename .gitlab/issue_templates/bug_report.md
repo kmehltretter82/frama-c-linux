@@ -13,15 +13,21 @@ by the plug-in name: [Eva], [WP], [E-ACSL]…
 
 ### Steps to reproduce the issue
 
-*Please indicate here steps to follow to get a [minimal, complete, and verifiable example](https://stackoverflow.com/help/mcve) which reproduces the issue.*
+<!--
+Please indicate here steps to follow to get a [minimal, complete, and verifiable example](https://stackoverflow.com/help/mcve) which reproduces the issue.
+-->
 
 ### Expected behaviour
 
-*Please explain here what is the expected behaviour.*
+<!--
+Please explain here what is the expected behaviour.
+-->
 
 ### Actual behaviour
 
-*Please explain here what is the actual (faulty) behaviour.*
+<!--
+Please explain here what is the actual (faulty) behaviour.
+-->
 
 ### Contextual information
 
@@ -33,5 +39,7 @@ by the plug-in name: [Eva], [WP], [E-ACSL]…
 
 ### Additional information (optional)
 
-*You may add here any information deemed relevant with regard to this issue,
-and tell us if you already tried some workarounds or have some ideas to solve this issue.*
+<!--
+You may add here any information deemed relevant with regard to this issue,
+and tell us if you already tried some workarounds or have some ideas to solve this issue.
+-->
