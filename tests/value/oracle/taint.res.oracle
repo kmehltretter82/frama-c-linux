@@ -112,9 +112,9 @@
   Frama_C_dump_each:
   # taint:
   Locations (data):
-    global; i; w; z
+    global; i; u; w; z
   Locations (control):
-    \nothing
+    i; u
   ==END OF DUMP==
 [eva] Recording results for taint_6
 [eva] Done for function taint_6

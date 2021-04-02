@@ -179,20 +179,21 @@ module TransferTaint = struct
     | `Value loc -> loc.Eval.loc
     | `Top -> Precise_locs.loc_top
 
-  (* Compute whether [stmt] is control-dependent of a tainted assume statement
-     in [state]: according to the control-flow graph, if there exists an assume
-     statement for which among its successors there exists one that cannot reach
-     [stmt], then the evaluation of [stmt] depends on the tainted assumption
-     expression. *)
-  let is_under_tainted_assume state stmt =
+  (* Removes from the [state] the tainted assume statements on which the
+     execution of statement [stmt] does not depend. *)
+  let filter_tainted_assume stmt state =
     let kf = Kernel_function.find_englobing_kf stmt in
-    Stmt.Set.exists
-      (fun assume_stmt ->
-         List.exists
-           (fun assume_stmt_succ ->
-              not (Stmts_graph.stmt_can_reach kf assume_stmt_succ stmt))
-           assume_stmt.succs)
-      state.assume_stmts
+    let return = Kernel_function.find_return kf in
+    let filter s = s.sid <> stmt.sid in
+    let assume_stmts =
+      Stmt.Set.filter
+        (fun assume_stmt ->
+           let kf' = Kernel_function.find_englobing_kf assume_stmt in
+           not (Kernel_function.equal kf kf') ||
+           Stmts_graph.stmt_can_reach_filtered filter assume_stmt return)
+        state.assume_stmts
+    in
+    { state with assume_stmts }
 
   (* No update about taint wrt information provided by the other domains. *)
   let update _valuation state = `Value state
@@ -213,15 +214,14 @@ module TransferTaint = struct
           let loc = Precise_locs.imprecise_location ploc in
           Locations.enumerate_valid_bits Write loc
         in
+        let state = filter_tainted_assume stmt state in
         (* Control-dependency: taint the left-value of an assign statement whose
            execution depends on the value of a tainted assume statement. *)
         let state =
-          if is_under_tainted_assume state stmt
-          then
-            { state with locs_control = Zone.join state.locs_control lv_zone }
+          if Stmt.Set.is_empty state.assume_stmts
+          then state
           else
-            (* Reset [state]'s assume statements as no longer valid. *)
-            { state with assume_stmts = Stmt.Set.empty; }
+            { state with locs_control = Zone.join state.locs_control lv_zone }
         in
         (* Data-dependecy: taint the left-value of an assign statement if
            tainted locations are involved in either the offset part of the
@@ -250,6 +250,7 @@ module TransferTaint = struct
     `Value state
 
   let assume stmt exp _b valuation state =
+    let state = filter_tainted_assume stmt state in
     let state =
       let annot_zone = zone_of_taint_annot stmt in
       { state with locs_control = Zone.join state.locs_control annot_zone }
@@ -265,6 +266,7 @@ module TransferTaint = struct
     `Value state
 
   let start_call stmt call valuation state =
+    let state = filter_tainted_assume stmt state in
     let state =
       let annot_zone = zone_of_taint_annot stmt in
       { state with locs_data = Zone.join state.locs_data annot_zone }
@@ -287,8 +289,7 @@ module TransferTaint = struct
   let finalize_call _stmt _call ~pre ~post =
     (* Recover assume statements from the [pre] abstract state: we assume the
        control-dependency does not extended beyond the function scope. *)
-    let state = { post with assume_stmts = pre.assume_stmts } in
-    `Value state
+    `Value { post with assume_stmts = pre.assume_stmts; }
 
   let show_expr valuation state fmt exp =
     let to_loc = loc_of_lval valuation in
