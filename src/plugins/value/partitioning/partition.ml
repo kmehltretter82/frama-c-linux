@@ -412,7 +412,8 @@ struct
               match AutoLoopUnroll.compute ~max_unroll x stmt with
               | None -> min_unroll
               | Some i ->
-                Value_parameters.warning ~once:true ~current:true
+                let source = fst (Cil_datatype.Stmt.loc stmt) in
+                Value_parameters.warning ~once:true ~current:true ~source
                   ~wkey:Value_parameters.wkey_loop_unroll
                   "Automatic loop unrolling.";
                 i

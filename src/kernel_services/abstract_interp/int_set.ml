@@ -575,10 +575,10 @@ let complement_under ~min ~max set =
     end
   done;
   let b, e = Int.succ (get (!index-1)), Int.pred (get !index) in
-  let card = Int.(to_int (succ (sub e b))) in
-  if card <= 0 then `Bottom
-  else if card <= !small_cardinal
-  then `Set (Array.init card (fun i -> Int.add b (Int.of_int i)))
+  let card = Int.succ (Int.sub e b) in
+  if Int.(le card zero) then `Bottom
+  else if Int.le card (Int.of_int !small_cardinal)
+  then `Set (Array.init (Int.to_int card) (fun i -> Int.add b (Int.of_int i)))
   else `Top (b, e, Int.one)
 
 (* ------------------------------ Arithmetics ------------------------------- *)
