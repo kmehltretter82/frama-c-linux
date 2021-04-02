@@ -61,12 +61,6 @@ val normalize: ?existence:existence -> ?base_name:string -> string -> string
     @since Aluminium-20160501 *)
 val relativize: ?base_name:string -> string -> string
 
-(** returns true if the file is relative to [base]
-    (that is, it is prefixed by [base_name]), or to the current
-    working directory if no base is specified.
-    @since Aluminium-20160501 *)
-val is_relative: ?base_name:string -> string -> bool
-
 (** DEPRECATED: use [Normalized.to_pretty_string] instead.
     Pretty-print a path according to these rules:
     - relative filenames are kept, except for leading './', which are stripped;
@@ -82,23 +76,6 @@ val is_relative: ?base_name:string -> string -> bool
 *)
 val pretty: string -> string
 [@@deprecated "Use Filepath.Normalized.to_pretty_string instead."]
-
-(** [add_symbolic_dir name dir] indicates that the (absolute) path [dir] must
-    be replaced by [name] when pretty-printing paths.
-    This alias ensures that system-dependent paths such as FRAMAC_SHARE are
-    printed identically in different machines. *)
-val add_symbolic_dir: string -> string -> unit
-
-(** Remove all symbolic dirs that have been added earlier.
-    @since Frama-C+dev *)
-val reset_symbolic_dirs: unit -> unit
-
-(** Returns the list of symbolic dirs added via [add_symbolic_dir], plus
-    preexisting ones (e.g. FRAMAC_SHARE), as pairs (name, dir).
-
-    @since 22.0-Titanium
-*)
-val all_symbolic_dirs: unit -> (string * string) list
 
 (** The [Normalized] module is simply a wrapper that ensures that paths are
     always normalized. Used by [Datatype.Filepath].
@@ -128,6 +105,12 @@ module Normalized: sig
       is not a path.
       See [pretty] for details about usage. *)
   val to_pretty_string: t -> string
+
+  (** [to_string_list l] returns [l] as a list of strings containing the
+      absolute paths to the elements of [l].
+      @since Frama-C+dev
+  *)
+  val to_string_list: t list -> string list
 
   val equal: t -> t -> bool
 
@@ -198,6 +181,31 @@ module Normalized: sig
   *)
   val to_base_uri: t -> string option * string
 end
+
+(** returns true if the file is relative to [base]
+    (that is, it is prefixed by [base_name]), or to the current
+    working directory if no base is specified.
+    @since Aluminium-20160501
+    @modify Frama-C+dev argument types changed from string to Normalized.t
+*)
+val is_relative: ?base_name:Normalized.t -> Normalized.t -> bool
+
+(** [add_symbolic_dir name dir] indicates that the (absolute) path [dir] must
+    be replaced by [name] when pretty-printing paths.
+    This alias ensures that system-dependent paths such as FRAMAC_SHARE are
+    printed identically in different machines. *)
+val add_symbolic_dir: string -> Normalized.t -> unit
+
+(** Remove all symbolic dirs that have been added earlier.
+    @since Frama-C+dev *)
+val reset_symbolic_dirs: unit -> unit
+
+(** Returns the list of symbolic dirs added via [add_symbolic_dir], plus
+    preexisting ones (e.g. FRAMAC_SHARE), as pairs (name, dir).
+
+    @since 22.0-Titanium
+*)
+val all_symbolic_dirs: unit -> (string * Normalized.t) list
 
 (** Describes a position in a source file.
     @since 18.0-Argon

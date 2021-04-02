@@ -62,11 +62,11 @@ val ocaml_wflags: string
 (** Warning flags used when compiling Frama-C.
     @since Chlorine-20180501 *)
 
-val datadir: string
+val datadir: Filepath.Normalized.t
 (** Directory where architecture independent files are.
     Main directory, use {!datadirs} for the others *)
 
-val datadirs: string list
+val datadirs: Filepath.Normalized.t list
 (** Directories where architecture independent files are in order of
     priority.
     @since 19.0-Potassium *)
@@ -75,16 +75,16 @@ val framac_libc: Filepath.Normalized.t
 (** Directory where Frama-C libc headers are.
     @since 19.0-Potassium *)
 
-val libdir: string
+val libdir: Filepath.Normalized.t
 (** Directory where the Frama-C kernel library is.
     @since Beryllium-20090601-beta1 *)
 
-val plugin_dir: string list
+val plugin_dir: Filepath.Normalized.t list
 (** Directory where the Frama-C dynamic plug-ins are.
     @modify Magnesium-20151001 *)
 
 val plugin_path: string
-(** The coma-separated concatenation of [plugin_dir].
+(** The colon-separated concatenation of [plugin_dir].
     @since Magnesium-20151001 *)
 
 val compilation_unit_names: string list

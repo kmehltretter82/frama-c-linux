@@ -171,7 +171,7 @@ let symbolic_dirs = Hashtbl.create 3
 
 let add_symbolic_dir name dir =
   Hashtbl.replace symbolic_dirs name dir;
-  (insert cwd dir).symbolic_name <- Some name
+  (insert cwd (dir:>string)).symbolic_name <- Some name
 
 let reset_symbolic_dirs () = Hashtbl.clear symbolic_dirs
 
@@ -260,6 +260,7 @@ module Normalized = struct
   let of_string ?existence ?base_name s = normalize ?existence ?base_name s
   let concat ?existence t s = normalize ?existence (t ^ "/" ^ s)
   let to_pretty_string s = pretty s
+  let to_string_list l = l
   let equal : t -> t -> bool = (=)
   let compare = String.compare
 

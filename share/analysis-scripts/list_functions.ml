@@ -115,8 +115,7 @@ class stmt_count_visitor =
    location-based approach. *)
 let located_within_framac_libc loc =
   let pos = fst loc in
-  let file = (pos.Filepath.pos_path :> string) in
-  Filepath.is_relative ~base_name:Fc_config.framac_libc file
+  Filepath.is_relative ~base_name:Fc_config.framac_libc pos.Filepath.pos_path
 
 class fun_cabs_visitor print_libc = object(self)
   inherit Cabsvisit.nopCabsVisitor

@@ -1177,7 +1177,7 @@ let base_output () =
               | dir ->
                   make_output_dir dir ; dir in
       base_output := Some output;
-      Fc_Filepath.add_symbolic_dir "WPOUT" output ;
+      Fc_Filepath.(add_symbolic_dir "WPOUT" (Normalized.of_string output)) ;
       Datatype.Filepath.of_string output
   | Some output -> Datatype.Filepath.of_string output
 

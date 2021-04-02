@@ -622,8 +622,7 @@ let () =
        (* keep module [Filepath] synchronized with [SymbolicPath] *)
        Filepath.reset_symbolic_dirs ();
        Datatype.Filepath.Map.iter
-         (fun n p -> Filepath.add_symbolic_dir p (n :> string))
-         map)
+         (fun n p -> Filepath.add_symbolic_dir p n) map)
 
 (* [SymbolicPath] is better to be not projectified,
    but must be saved: use a fake state for saving it without projectifying it *)
@@ -911,10 +910,12 @@ let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
 let () = Parameter_customize.set_group saveload
 let () = Parameter_customize.do_not_projectify ()
 module Session_dir =
-  P.Empty_string
+  P.Filepath
     (struct
       let option_name = "-session"
-      let arg_name = ""
+      let arg_name = "path"
+      let existence = Filepath.Indifferent
+      let file_kind = "directory"
       let help = "directory in which session files are searched"
     end)
 let () = Plugin.session_is_set_ref := Session_dir.is_set
@@ -924,10 +925,12 @@ let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
 let () = Parameter_customize.set_group saveload
 let () = Parameter_customize.do_not_projectify ()
 module Config_dir =
-  P.Empty_string
+  P.Filepath
     (struct
       let option_name = "-config"
-      let arg_name = ""
+      let arg_name = "path"
+      let existence = Filepath.Indifferent
+      let file_kind = "directory"
       let help = "directory in which configuration files are searched"
     end)
 let () = Plugin.config_is_set_ref := Config_dir.is_set

@@ -300,7 +300,7 @@ struct
   module Make_specific_dir
       (O: Parameter_sig.Input_with_arg)
       (D: sig
-         val dirs: unit -> string list
+         val dirs: unit -> Fc_Filepath.Normalized.t list
          val visible_ref: bool
        end)
   =
@@ -351,11 +351,10 @@ struct
         let dirs = D.dirs () in
         assert (dirs <> []);
         if is_kernel
-        then
-          List.map Datatype.Filepath.of_string dirs
+        then dirs
         else
           List.map
-            (fun x -> Datatype.Filepath.of_string (x ^ "/" ^ plugin_subpath))
+            (fun x -> Datatype.Filepath.concat x plugin_subpath)
             dirs
       end
 
@@ -456,8 +455,10 @@ struct
         let dirs () = [
           if !session_is_set_ref () then !session_ref ()
           else
-            try Sys.getenv "FRAMAC_SESSION"
-            with Not_found -> "./.frama-c"]
+            Fc_Filepath.Normalized.of_string
+              (try Sys.getenv "FRAMAC_SESSION"
+               with Not_found -> "./.frama-c")
+        ]
         let visible_ref = !session_visible_ref
       end)
   let () =
@@ -476,20 +477,24 @@ struct
       end)
       (struct
         let dirs () = [
+          let to_path = Fc_Filepath.Normalized.of_string in
           let d, vis =
             if !config_is_set_ref () then !config_ref (), false
             else
-              try Sys.getenv "FRAMAC_CONFIG", false
+              try to_path (Sys.getenv "FRAMAC_CONFIG"), false
               with Not_found ->
-              try Sys.getenv "USERPROFILE", false (* Win32 *)
+              try to_path (Sys.getenv "USERPROFILE"), false (* Win32 *)
               with Not_found ->
               (* Unix like *)
-              try Sys.getenv "XDG_CONFIG_HOME", true
+              try to_path (Sys.getenv "XDG_CONFIG_HOME"), true
               with Not_found ->
-              try Sys.getenv "HOME" ^ "/.config", true
-              with Not_found -> ".", false
+              try
+                Fc_Filepath.Normalized.concat
+                  (to_path (Sys.getenv "HOME")) ".config", true
+              with Not_found -> to_path ".", false
           in
-          d ^ if vis then "/frama-c" else "/.frama-c"
+          Fc_Filepath.Normalized.concat
+            d (if vis then "frama-c" else ".frama-c")
         ]
         let visible_ref = !config_visible_ref
       end)

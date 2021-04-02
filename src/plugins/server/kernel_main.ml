@@ -53,9 +53,12 @@ let () =
     signature
     begin fun rq () ->
       set_version rq Fc_config.version ;
-      set_datadir rq Fc_config.datadir ;
-      set_libdir rq Fc_config.libdir ;
-      set_pluginpath rq Fc_config.plugin_dir ;
+      set_datadir rq (Fc_config.datadir :> string) ;
+      set_libdir rq (Fc_config.libdir :> string) ;
+      let pluginpath =
+        Filepath.Normalized.to_string_list Fc_config.plugin_dir
+      in
+      set_pluginpath rq pluginpath ;
     end
 
 (* -------------------------------------------------------------------------- *)
