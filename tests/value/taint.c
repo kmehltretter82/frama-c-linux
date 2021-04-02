@@ -75,6 +75,22 @@ void taint_4() {
 /*@ assigns *t \from u; */
 void taint_5(int* t, int u);
 
+void taint_6() {
+  int i, u = 0;
+  /* Since 'i' becomes taint at some point, it will make 'u' tainted via a
+     control-dependency. At the end, both are tainted because of data- and
+     control- dependencies. */
+  for (i = 0; i < 8 || u <= 9; i++) {
+    //@ split i;
+    if (i == 5) {
+      //@ taint i;
+      i++;
+    }
+    u++;
+  }
+  Frama_C_dump_each();
+}
+
 int main(void) {
   int w, z;
   //@ taint w;
@@ -94,5 +110,6 @@ int main(void) {
   //@ taint w;
   taint_5(&z, w);
   Frama_C_domain_show_each(z, w);
+  taint_6();
   return 0;
 }
