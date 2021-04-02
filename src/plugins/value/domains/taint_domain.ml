@@ -49,15 +49,15 @@ module LatticeTaint = struct
 
   let pp_locs_only fmt t =
     Format.fprintf fmt
-      "@[<v 2>Locations (data):@ @[<hov>%a@]@]@.\
+      "@[<v 2>Locations (data):@ @[<hov>%a@]@]@\n\
        @[<v 2>Locations (control):@ @[<hov>%a@]@]"
       Zone.pretty t.locs_data
       Zone.pretty t.locs_control
 
   let pp_state fmt t =
     Format.fprintf fmt
-      "@[<v 2>Locations (data):@ @[<hov>%a@]@]@.\
-       @[<v 2>Locations (control):@ @[<hov>%a@]@]@.\
+      "@[<v 2>Locations (data):@ @[<hov>%a@]@]@\n\
+       @[<v 2>Locations (control):@ @[<hov>%a@]@]@\n\
        @[<v 2>Assume statements:@ @[<hov>%a@]@]"
       Zone.pretty t.locs_data
       Zone.pretty t.locs_control
