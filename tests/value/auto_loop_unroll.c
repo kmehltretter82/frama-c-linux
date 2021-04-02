@@ -384,6 +384,34 @@ void non_natural_loops () {
   res = 0;
 }
 
+/* Tests the automatic loop unrolling on loops that follow directly each other. */
+void following_loops () {
+  int i = 0, j = 0;
+  while (i < 15) {
+    i++;
+    j++;
+  }
+  while (i < 30) {
+    i++;
+    j++;
+  }
+  Frama_C_show_each_30(j);
+  i = 0;
+  j = 0;
+  while (i < 15 && undet) {
+    i++;
+    j++;
+  }
+  while (i < 30) {
+    i++;
+    j++;
+  }
+  /* The equality relation between [i] and [j] is lost between the two loops,
+     where all states exiting the first loop are joined. However, the unrolling
+     prevents the value of [j] to be completely imprecise. */
+  Frama_C_show_each_30(j);
+}
+
 void main () {
   simple_loops ();
   various_loops ();
@@ -392,4 +420,5 @@ void main () {
   temporary_variables ();
   loops_with_goto ();
   non_natural_loops ();
+  following_loops ();
 }
