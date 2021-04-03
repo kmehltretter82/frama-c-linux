@@ -91,6 +91,20 @@ void taint_6() {
   Frama_C_dump_each();
 }
 
+void taint_7(int t) {
+  int x, y;
+  if (t > 0) {
+    x = 1;
+    goto L;
+  }
+  else {
+    /* Since this assign is always executed,
+       'y' should not be tainted. */
+    L: y = 0;
+  }
+  Frama_C_dump_each();
+}
+
 int main(void) {
   int w, z;
   //@ taint w;
@@ -111,5 +125,8 @@ int main(void) {
   taint_5(&z, w);
   Frama_C_domain_show_each(z, w);
   taint_6();
+  w = 1;
+  //@ taint undet;
+  taint_7(undet);
   return 0;
 }
