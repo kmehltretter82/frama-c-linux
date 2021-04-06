@@ -99,7 +99,7 @@ struct
 
   let add ~emitter ~loc stmt annot =
     let param = M.export annot in
-    let extension = Logic_const.new_acsl_extension "slevel" loc false param in
+    let extension = Logic_const.new_acsl_extension name loc false param in
     let annot_node = Cil_types.AExtended ([], false, extension) in
     let code_annotation = Logic_const.new_code_annotation annot_node in
     Annotations.add_code_annot emitter stmt code_annotation
