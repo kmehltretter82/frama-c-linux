@@ -1427,9 +1427,7 @@ let do_command command =
             let time = 0. (* Individual time is difficult to compute correctly
                              for now, and currently unused *) in
             report_run command (launch_result, time) ;
-            let summary_ret = (launch_result = command.exit_code)
-                              || (command.filter <> None) (* cannot checks exit code *)
-            in
+            let summary_ret = launch_result = command.exit_code in
             if not summary_ret then
               lock_printf "%% Unexpected code (returns %d instead of %d) for command: %s@." launch_result command.exit_code command_string ;
             summary_ret
@@ -1946,7 +1944,7 @@ let dispatcher () =
           | None -> cmd
           | Some filter ->
             { cmd with filter = Some (Macros.expand macros filter) }
-       in
+      in
       let nb_files_execnow = List.length config.dc_execnow in
       let make_execnow_cmd =
         let e = ref 0 in
