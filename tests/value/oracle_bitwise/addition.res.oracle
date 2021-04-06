@@ -1,0 +1,24 @@
+121,123c121
+< [eva] tests/value/addition.i:52: 
+<   Assigning imprecise value to p10.
+<   The imprecision originates from Arithmetic {tests/value/addition.i:52}
+---
+> [eva] tests/value/addition.i:52: Assigning imprecise value to p10.
+163a162
+>   {{ garbled mix of &{p1} (origin: Misaligned {tests/value/addition.i:52}) }}
+165a165
+>   {{ garbled mix of &{p2} (origin: Misaligned {tests/value/addition.i:56}) }}
+201,203c201
+<   p10 ∈
+<      {{ garbled mix of &{p1}
+<       (origin: Arithmetic {tests/value/addition.i:52}) }}
+---
+>   p10 ∈ {{ garbled mix of &{p1} }}
+428a427
+>   {{ garbled mix of &{p1} (origin: Misaligned {tests/value/addition.i:52}) }}
+467,469c466
+<   p10 ∈
+<      {{ garbled mix of &{p1}
+<       (origin: Arithmetic {tests/value/addition.i:52}) }}
+---
+>   p10 ∈ {{ garbled mix of &{p1} }}
