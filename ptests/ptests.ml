@@ -158,17 +158,30 @@ let dir_config_file = "test_config"
     the pattern [test_file_regexp] will be considered as test files *)
 let test_file_regexp = ".*\\.\\(c\\|i\\)$"
 
-(** the pattern that ends the parsing of options in a test file *)
-let end_comment = Str.regexp ".*\\*/"
-
-let regex_cmxs = Str.regexp ("\\([^/]+\\)[.]cmxs\\($\\|[ \t]\\)")
-
-let opt_to_byte_options options =
-  str_global_replace regex_cmxs "\\1.cmo\\2" options
-
-let opt_to_byte =
+(* Splits the command string to extract the command name to the parameters
+   [let cmd_name,param=command_partition cmd in assert cmd=cmd_name^param]
+*)
+let command_partition =
   let regexp_unescaped_blank = Str.regexp "[^\\ ] " in
-  let _regexp_blank_at_first =  Str.regexp "^ +" in
+  fun cmd ->
+    match str_bounded_full_split regexp_unescaped_blank cmd 2 with
+    | [ Str.Text cmd ] ->
+      cmd, ""
+    | [ Str.Text cmd ; Str.Delim delim ] ->
+      cmd ^ (String.make 1 (String.get delim 0)), (String.make 1 (String.get delim 1))
+    | [ Str.Text cmd ; Str.Delim delim; Str.Text options ] ->
+      cmd ^ (String.make 1 (String.get delim 0)), (String.make 1 (String.get delim 1)) ^ options
+    | [ Str.Delim delim ] ->
+      (String.make 1 (String.get delim 0)), (String.make 1 (String.get delim 1))
+    | [ Str.Delim delim; Str.Text options ] ->
+      (String.make 1 (String.get delim 0)), (String.make 1 (String.get delim 1)) ^ options
+    | _ -> assert false
+
+let opt_to_byte_options =
+  let regex_cmxs = Str.regexp ("\\([^/]+\\)[.]cmxs\\($\\|[ \t]\\)") in
+  fun options -> str_global_replace regex_cmxs "\\1.cmo\\2" options
+
+let opt_to_byte cmd =
   let opt_to_byte toplevel =
     match string_del_suffix "frama-c" toplevel with
     | Some path -> path ^ "frama-c.byte"
@@ -183,13 +196,8 @@ let opt_to_byte =
           | Some path -> path ^ "viewer.byte"
           | None -> toplevel
   in
-  fun cmd ->
-    match str_bounded_full_split regexp_unescaped_blank cmd 2 with
-    | [ Str.Text toplevel ] -> opt_to_byte toplevel
-    | [ Str.Text toplevel ; Str.Delim delim ] -> opt_to_byte (toplevel ^ (String.make 1 (String.get delim 0)))
-    | [ Str.Text toplevel ; Str.Delim delim; Str.Text options ] ->
-      (opt_to_byte (toplevel ^ (String.make 1 (String.get delim 0)))) ^ " " ^ (opt_to_byte_options options)
-    | _ -> cmd
+  let cmdname, options = command_partition cmd in
+  (opt_to_byte cmdname) ^ (opt_to_byte_options options)
 
 let output_unix_error (exn : exn) =
   match exn with
@@ -964,6 +972,9 @@ end = struct
          { current with dc_commands = []; dc_framac = false; });
     ]
 
+  (** the pattern that ends the parsing of options in a test file *)
+  let end_comment = Str.regexp ".*\\*/"
+
   let scan_directives ~drop dir ~file scan_buffer default =
     set_default_parsing_env default;
     let r = ref { default with dc_commands = [] } in
@@ -1289,18 +1300,7 @@ end = struct
     let filter = match command.filter with
       | None -> None
       | Some filter ->
-        let len = String.length filter in
-        let rec split_filter i =
-          if i < len && filter.[i] = ' ' then split_filter (i+1)
-          else
-            try
-              let idx = String.index_from filter i ' ' in
-              String.sub filter i idx,
-              String.sub filter idx (len - idx)
-            with Not_found ->
-              String.sub filter i (len - i), ""
-        in
-        let exec_name, params = split_filter 0 in
+        let exec_name, params = command_partition filter in
         let exec_name =
           if Sys.file_exists exec_name || not (Filename.is_relative exec_name)
           then exec_name
