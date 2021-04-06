@@ -1277,25 +1277,23 @@ end = struct
   let update_toplevel_command command =
     let log_prefix = log_prefix command in
     let oracle_prefix = oracle_prefix command in
-    (* Update oracle *)
-    mv (log_prefix ^ ".res.log") (oracle_prefix ^ ".res.oracle");
-    (* Is there an error log ? *)
-    begin try
-        let log = log_prefix ^ ".err.log"
-        and oracle = oracle_prefix ^ ".err.oracle"
-        in
+    let update_oracle log oracle =
+      try
         if is_file_empty_or_nonexisting log then
-          (* No, remove the error oracle *)
+          (* No, remove the oracle *)
           unlink ~silent:false oracle
         else
-          (* Yes, update the error oracle*)
+          (* Yes, update the oracle*)
           mv log oracle
       with (* Possible error in [is_file_empty] *)
         Unix.Unix_error _ -> ()
-    end;
-    let macros = get_macros command in
-    let log_files = List.map (Macros.expand macros) command.log_files
     in
+    (* Update res.oracle and err.oracle *)
+    update_oracle (log_prefix ^ ".res.log") (oracle_prefix ^ ".res.oracle");
+    update_oracle (log_prefix ^ ".err.log") (oracle_prefix ^ ".err.oracle");
+    (* Update files related to LOG directives *)
+    let macros = get_macros command in
+    let log_files = List.map (Macros.expand macros) command.log_files in
     List.iter (update_log_files command.directory) log_files
 
 end
@@ -1643,7 +1641,7 @@ let compare_one_file cmp log_prefix oracle_prefix log_kind =
     let log_file = Filename.sanitize (log_prefix ^ ext ^ ".log") in
     let oracle_file = Filename.sanitize (oracle_prefix ^ ext ^ ".oracle") in
     do_filter cmp log_kind;
-    if log_kind = Err && not (Sys.file_exists oracle_file) then
+    if not (Sys.file_exists oracle_file) then
       check_file_is_empty_or_nonexisting (Command_error (cmp,log_kind)) ~log_file
     else begin
       let cmp_string =
