@@ -1250,104 +1250,29 @@ end = struct
     if command.timeout = "" then raw_command
     else "ulimit -t " ^ command.timeout ^ " && " ^ raw_command
 
-  (* Searches for executable [s] in the directories contained in the PATH
-     environment variable. Returns [None] if not found, or
-     [Some <fullpath>] otherwise. *)
-  let find_in_path s =
-    let trim_right s =
-      let n = ref (String.length s - 1) in
-      let last_char_to_keep =
-        try
-          while !n > 0 do
-            if String.get s !n <> ' ' then raise Exit;
-            n := !n - 1
-          done;
-          0
-        with Exit -> !n
-      in
-      String.sub s 0 (last_char_to_keep+1)
+  let command_string command =
+    let log_prefix = log_prefix command in
+    let reslog,errlog = match command.filter with
+      | None -> log_prefix ^ ".res.log", log_prefix ^ ".err.log"
+      | Some _ ->log_prefix ^ ".res.unfiltered-log", log_prefix ^ ".err.unfiltered-log"
     in
-    let s = trim_right s in
-    let path_separator = if Sys.os_type = "Win32" then ";" else ":" in
-    let re_path_sep = Str.regexp path_separator in
-    let path_dirs = Str.split re_path_sep (Sys.getenv "PATH") in
-    let found = ref "" in
-    try
-      List.iter (fun dir ->
-          let fullname = dir ^ Filename.dir_sep ^ s in
-          if Sys.file_exists fullname then begin
-            found := fullname;
-            raise Exit
-          end
-        ) path_dirs;
-      None
-    with Exit ->
-      Some !found
-
-  let command_string =
-    let regexp_ptest_oracle = Str.regexp "@PTEST_ORACLE@" in
-    fun command ->
-      let log_prefix = log_prefix command in
-      let errlog = log_prefix ^ ".err.log" in
-      let stderr = match command.filter with
-          None -> errlog
-        | Some _ ->
-          let stderr =
-            Filename.temp_file (Filename.basename log_prefix) ".err.log"
-          in
-          at_exit (fun () ->  unlink stderr);
-          stderr
-      in
-      let filter = match command.filter with
-        | None -> None
-        | Some filter ->
-          let foracle = (Filename.basename log_prefix) ^ ".res.oracle" in
-          let filter = Str.global_replace regexp_ptest_oracle foracle filter in
-          let exec_name, params = command_partition filter in
-          let exec_name =
-            if Sys.file_exists exec_name || not (Filename.is_relative exec_name)
-            then exec_name
-            else
-              match find_in_path exec_name with
-              | Some full_exec_name -> full_exec_name
-              | None ->
-                Filename.concat
-                  (Filename.dirname (Filename.dirname log_prefix))
-                  (Filename.basename exec_name)
-          in
-          Some (exec_name ^ params)
-      in
-      let command_str = basic_command_string command in
-      let command_str =
-        command_str ^ " 2>" ^ (Filename.sanitize stderr)
-      in
-      let command_str = match filter with
-        | None -> command_str
-        | Some filter -> command_str ^ " | " ^ filter
-      in
-      let res = Filename.sanitize (log_prefix ^ ".res.log") in
-      let command_str = command_str ^ " >" ^ res in
-      let command_str =
-        match command.timeout with
-        | "" -> command_str
-        | s ->
-          Printf.sprintf
-            "%s; if test $? -gt 127; then \
-             echo 'TIMEOUT (%s); ABORTING EXECUTION' > %s; \
-             fi"
-            command_str s (Filename.sanitize stderr)
-      in
-      let command_str = match filter with
-        | None -> command_str
-        | Some filter ->
-          Printf.sprintf "%s && %s < %s >%s && rm -f %s" (* exit code ? *)
-            command_str
-            filter
-            (Filename.sanitize stderr)
-            (Filename.sanitize errlog)
-            (Filename.sanitize stderr)
-      in
-      command_str
+    let reslog = Filename.sanitize reslog in
+    let errlog = Filename.sanitize errlog in
+    let command_str = basic_command_string command in
+    let command_str =
+      command_str ^ " >" ^ reslog ^ " 2>" ^ errlog
+    in
+    let command_str =
+      match command.timeout with
+      | "" -> command_str
+      | s ->
+        Printf.sprintf
+          "%s; if test $? -gt 127; then \
+           echo 'TIMEOUT (%s); ABORTING EXECUTION' > %s; \
+           fi"
+          command_str s errlog
+    in
+    command_str
 
   let update_toplevel_command command =
     let log_prefix = log_prefix command in
@@ -1640,6 +1565,73 @@ let check_file_is_empty_or_nonexisting diff ~log_file =
     1
   end
 
+(* Searches for executable [s] in the directories contained in the PATH
+     environment variable. Returns [None] if not found, or
+     [Some <fullpath>] otherwise. *)
+let find_in_path s =
+  let trim_right s =
+    let n = ref (String.length s - 1) in
+    let last_char_to_keep =
+      try
+        while !n > 0 do
+          if String.get s !n <> ' ' then raise Exit;
+          n := !n - 1
+        done;
+        0
+      with Exit -> !n
+    in
+    String.sub s 0 (last_char_to_keep+1)
+  in
+  let s = trim_right s in
+  let path_separator = if Sys.os_type = "Win32" then ";" else ":" in
+  let re_path_sep = Str.regexp path_separator in
+  let path_dirs = Str.split re_path_sep (Sys.getenv "PATH") in
+  let found = ref "" in
+  try
+    List.iter (fun dir ->
+        let fullname = dir ^ Filename.dir_sep ^ s in
+        if Sys.file_exists fullname then begin
+          found := fullname;
+          raise Exit
+        end
+      ) path_dirs;
+    None
+  with Exit ->
+    Some !found
+
+let do_filter =
+  let regexp_ptest_oracle = Str.regexp "@PTEST_ORACLE@" in
+  fun cmd kind ->
+    match cmd.filter with
+    | None -> ()
+    | Some filter ->
+      let log_prefix = Cmd.log_prefix cmd in
+      let log_ext = log_ext kind in
+      let log_file = Filename.sanitize (log_prefix ^ log_ext ^ ".log") in
+      let foracle = (Filename.basename log_prefix) ^ log_ext ^ ".oracle" in
+      let filter = Str.global_replace regexp_ptest_oracle foracle filter in
+      let exec_name, params = command_partition filter in
+      let exec_name =
+        if Sys.file_exists exec_name || not (Filename.is_relative exec_name)
+        then exec_name
+        else
+          match find_in_path exec_name with
+          | Some full_exec_name -> full_exec_name
+          | None ->
+            Filename.concat
+              (Filename.dirname (Filename.dirname log_prefix))
+              (Filename.basename exec_name)
+      in
+      let unfiltered_file = Filename.sanitize (log_prefix ^ log_ext ^ ".unfiltered-log") in
+      let filter_cmd = Format.sprintf "%s | %s%s > %s 2> /dev/null"
+          (* the filter command can be a diff from a [@PTEST_ORACLE@] *)
+          (if Sys.file_exists unfiltered_file then "cat " ^ unfiltered_file else "echo \"\"")
+          exec_name params log_file
+      in
+      if !verbosity >= 1
+      then lock_printf "%tFilter command:@\n%s@." print_default_env filter_cmd;
+      ignore (launch filter_cmd)
+
 let compare_one_file cmp log_prefix oracle_prefix log_kind =
   if !behavior = Show
   then begin
@@ -1652,6 +1644,7 @@ let compare_one_file cmp log_prefix oracle_prefix log_kind =
     let ext = log_ext log_kind in
     let log_file = Filename.sanitize (log_prefix ^ ext ^ ".log") in
     let oracle_file = Filename.sanitize (oracle_prefix ^ ext ^ ".oracle") in
+    do_filter cmp log_kind;
     if log_kind = Err && not (Sys.file_exists oracle_file) then
       check_file_is_empty_or_nonexisting (Command_error (cmp,log_kind)) ~log_file
     else begin
@@ -1765,6 +1758,7 @@ let do_diff = function
     let log_prefix = Cmd.log_prefix diff in
     let log_ext = log_ext kind in
     let log_file = Filename.sanitize (log_prefix ^ log_ext ^ ".log") in
+    do_filter diff kind ;
     let command_string = Cmd.command_string diff in
     lock_printf "%tCommand:@\n%s@." print_default_env command_string;
     if !behavior = Show
@@ -1933,19 +1927,26 @@ let dispatcher () =
         fun {toplevel; opts=options; logs=log_files; macros; exit_code; timeout} ->
           let n = !i in
           incr i;
-          { file; options; toplevel; nb_files; directory; n; log_files;
-            filter = config.dc_filter; macros;
-            exit_code = begin
-              match exit_code with
-              | None -> 0
-              | Some exit_code ->
-                try int_of_string exit_code with
-                | _ -> lock_eprintf "@[%s: integer required for directive EXIT: %s (defaults to 0)@]@." file exit_code ; 0
-            end;
-            execnow=false;
-            timeout;
-          }
-      in
+          let cmd =
+            { file; options; toplevel; nb_files; directory; n; log_files;
+              filter = config.dc_filter; macros;
+              exit_code = begin
+                match exit_code with
+                | None -> 0
+                | Some exit_code ->
+                  try int_of_string exit_code with
+                  | _ -> lock_eprintf "@[%s: integer required for directive EXIT: %s (defaults to 0)@]@." file exit_code ; 0
+              end;
+              execnow=false;
+              timeout;
+            }
+          in
+          let macros = Cmd.get_macros cmd in
+          match cmd.filter with
+          | None -> cmd
+          | Some filter ->
+            { cmd with filter = Some (Macros.expand macros filter) }
+       in
       let nb_files_execnow = List.length config.dc_execnow in
       let make_execnow_cmd =
         let e = ref 0 in
@@ -1977,9 +1978,9 @@ let dispatcher () =
             ex_timeout = execnow.ex_timeout;
           }
       in
-      let treat_option q option =
+      let treat_option q cmd =
         Queue.push
-          (Toplevel (make_toplevel_cmd option))
+          (Toplevel (make_toplevel_cmd cmd))
           q;
       in
       if not config.dc_dont_run
