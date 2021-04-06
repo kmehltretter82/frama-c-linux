@@ -1132,230 +1132,248 @@ let unlock () = Mutex.unlock shared.lock
 
 let lock () = Mutex.lock shared.lock
 
-let catenate_number nb_files prefix n =
-  if nb_files > 1
-  then prefix ^ "." ^ (string_of_int n)
-  else prefix
-
-let name_without_extension command =
-  try
-    (Filename.chop_extension command.file)
-  with
-    Invalid_argument _ ->
-    fail ("this test file does not have any extension: " ^
-          command.file)
-
-let gen_prefix gen_file cmd =
-  let prefix = gen_file cmd.directory (name_without_extension cmd) in
-  catenate_number cmd.nb_files prefix cmd.n
-
-let log_prefix = gen_prefix SubDir.make_result_file
-let oracle_prefix = gen_prefix SubDir.make_oracle_file
-
-let get_ptest_file cmd = SubDir.make_file cmd.directory cmd.file
-
-let get_macros cmd =
-  let ptest_config =
-    if !special_config = "" then "" else "_" ^ !special_config
-  in
-  let ptest_file = get_ptest_file cmd in
-  let ptest_name =
-    try Filename.chop_extension cmd.file
-    with Invalid_argument _ -> cmd.file
-  in
-  let macros =
-    [ "PTEST_CONFIG", ptest_config;
-      "PTEST_DIR", SubDir.get cmd.directory;
-      "PTEST_RESULT",
-      SubDir.get cmd.directory ^ "/" ^ redefine_name "result";
-      "PTEST_FILE", Filename.sanitize ptest_file;
-      "PTEST_NAME", ptest_name;
-      "PTEST_NUMBER", string_of_int cmd.n;
-    ]
-  in
-  Macros.add_list macros cmd.macros
-
-let contains_frama_c_binary_name =
-  Str.regexp "[^( ]*\\(toplevel\\|viewer\\|frama-c-gui\\|frama-c[^-]\\).*"
-
-let frama_c_binary_name =
-  Str.regexp "\\([^ ]*\\(toplevel\\|viewer\\|frama-c-gui\\|frama-c\\)\\(\\.opt\\|\\.byte\\|\\.exe\\)?\\)"
-
-let basic_command_string =
-  fun command ->
-  let macros = get_macros command in
-  let logfiles = List.map (Macros.expand macros) command.log_files in
-  command.log_files <- logfiles;
-  let has_ptest_file_t, toplevel =
-    Macros.does_expand macros command.toplevel
-  in
-  let has_ptest_file_o, options = Macros.does_expand macros command.options in
-  let toplevel = if !use_byte then opt_to_byte toplevel else toplevel in
-  let toplevel, contains_frama_c_binary =
-    str_string_match_and_replace contains_frama_c_binary_name
-      frama_c_binary_name ~suffix:" -check" toplevel
-  in
-  let options =
-    if contains_frama_c_binary
-    then begin
-      let opt_modules = match Macros.expand macros
-                                (Macros.get "PTEST_LOAD_MODULES" macros) with
-      | "" -> ""
-      | s -> "-load-module=" ^ s ^ ""
-      in
-      let opt_pre = Macros.expand macros !additional_options_pre in
-      let opt_post = Macros.expand macros !additional_options in
-      opt_modules ^ opt_pre ^ " " ^ options ^ " " ^ opt_post
-    end else options
-  in
-  let options = if !use_byte then opt_to_byte_options options else options in
-  let raw_command =
-    if has_ptest_file_t || has_ptest_file_o || command.execnow then
-      toplevel ^ " " ^ options
-    else begin
-      let file = Filename.sanitize @@ get_ptest_file command in
-      toplevel ^ " " ^ file ^ " " ^ options
-    end
-  in
-  if command.timeout = "" then raw_command
-  else "ulimit -t " ^ command.timeout ^ " && " ^ raw_command
-
-(* Searches for executable [s] in the directories contained in the PATH
-   environment variable. Returns [None] if not found, or
-   [Some <fullpath>] otherwise. *)
-let find_in_path s =
-  let trim_right s =
-    let n = ref (String.length s - 1) in
-    let last_char_to_keep =
-      try
-        while !n > 0 do
-          if String.get s !n <> ' ' then raise Exit;
-          n := !n - 1
-        done;
-        0
-      with Exit -> !n
-    in
-    String.sub s 0 (last_char_to_keep+1)
-  in
-  let s = trim_right s in
-  let path_separator = if Sys.os_type = "Win32" then ";" else ":" in
-  let re_path_sep = Str.regexp path_separator in
-  let path_dirs = Str.split re_path_sep (Sys.getenv "PATH") in
-  let found = ref "" in
-  try
-    List.iter (fun dir ->
-        let fullname = dir ^ Filename.dir_sep ^ s in
-        if Sys.file_exists fullname then begin
-          found := fullname;
-          raise Exit
-        end
-      ) path_dirs;
-    None
-  with Exit ->
-    Some !found
-
-let command_string command =
-  let log_prefix = log_prefix command in
-  let errlog = log_prefix ^ ".err.log" in
-  let stderr = match command.filter with
-      None -> errlog
-    | Some _ ->
-      let stderr =
-        Filename.temp_file (Filename.basename log_prefix) ".err.log"
-      in
-      at_exit (fun () ->  unlink stderr);
-      stderr
-  in
-  let filter = match command.filter with
-    | None -> None
-    | Some filter ->
-      let len = String.length filter in
-      let rec split_filter i =
-        if i < len && filter.[i] = ' ' then split_filter (i+1)
-        else
-          try
-            let idx = String.index_from filter i ' ' in
-            String.sub filter i idx,
-            String.sub filter idx (len - idx)
-          with Not_found ->
-            String.sub filter i (len - i), ""
-      in
-      let exec_name, params = split_filter 0 in
-      let exec_name =
-        if Sys.file_exists exec_name || not (Filename.is_relative exec_name)
-        then exec_name
-        else
-          match find_in_path exec_name with
-          | Some full_exec_name -> full_exec_name
-          | None ->
-            Filename.concat
-              (Filename.dirname (Filename.dirname log_prefix))
-              (Filename.basename exec_name)
-      in
-      Some (exec_name ^ params)
-  in
-  let command_string = basic_command_string command in
-  let command_string =
-    command_string ^ " 2>" ^ (Filename.sanitize stderr)
-  in
-  let command_string = match filter with
-    | None -> command_string
-    | Some filter -> command_string ^ " | " ^ filter
-  in
-  let res = Filename.sanitize (log_prefix ^ ".res.log") in
-  let command_string = command_string ^ " >" ^ res in
-  let command_string =
-    match command.timeout with
-    | "" -> command_string
-    | s ->
-      Printf.sprintf
-        "%s; if test $? -gt 127; then \
-         echo 'TIMEOUT (%s); ABORTING EXECUTION' > %s; \
-         fi"
-        command_string s (Filename.sanitize stderr)
-  in
-  let command_string = match filter with
-    | None -> command_string
-    | Some filter ->
-      Printf.sprintf "%s && %s < %s >%s && rm -f %s" (* exit code ? *)
-        command_string
-        filter
-        (Filename.sanitize stderr)
-        (Filename.sanitize errlog)
-        (Filename.sanitize stderr)
-  in
-  command_string
-
 let update_log_files dir file =
   mv (SubDir.make_result_file dir file) (SubDir.make_oracle_file dir file)
 
-let update_toplevel_command command =
+module Cmd : sig
 
-  let log_prefix = log_prefix command in
-  let oracle_prefix = oracle_prefix command in
-  (* Update oracle *)
-  mv (log_prefix ^ ".res.log") (oracle_prefix ^ ".res.oracle");
-  (* Is there an error log ? *)
-  begin try
-      let log = log_prefix ^ ".err.log"
-      and oracle = oracle_prefix ^ ".err.oracle"
+  val log_prefix : toplevel_command -> string
+  val oracle_prefix : toplevel_command -> string
+
+  val get_macros : toplevel_command -> string Macros.StringMap.t
+
+  (* [basic_command_string cmd] does not redirect the outputs, and does
+     not overwrite the result files *)
+  val basic_command_string : toplevel_command -> string
+
+  val command_string : toplevel_command -> string
+
+  val update_toplevel_command : toplevel_command -> unit
+
+end = struct
+
+  let catenate_number nb_files prefix n =
+    if nb_files > 1
+    then prefix ^ "." ^ (string_of_int n)
+    else prefix
+
+  let name_without_extension command =
+    try
+      (Filename.chop_extension command.file)
+    with
+      Invalid_argument _ ->
+      fail ("this test file does not have any extension: " ^
+            command.file)
+
+  let gen_prefix gen_file cmd =
+    let prefix = gen_file cmd.directory (name_without_extension cmd) in
+    catenate_number cmd.nb_files prefix cmd.n
+
+  let log_prefix = gen_prefix SubDir.make_result_file
+  let oracle_prefix = gen_prefix SubDir.make_oracle_file
+
+  let get_ptest_file cmd = SubDir.make_file cmd.directory cmd.file
+
+  let get_macros cmd =
+    let ptest_config =
+      if !special_config = "" then "" else "_" ^ !special_config
+    in
+    let ptest_file = get_ptest_file cmd in
+    let ptest_name =
+      try Filename.chop_extension cmd.file
+      with Invalid_argument _ -> cmd.file
+    in
+    let macros =
+      [ "PTEST_CONFIG", ptest_config;
+        "PTEST_DIR", SubDir.get cmd.directory;
+        "PTEST_RESULT",
+        SubDir.get cmd.directory ^ "/" ^ redefine_name "result";
+        "PTEST_FILE", Filename.sanitize ptest_file;
+        "PTEST_NAME", ptest_name;
+        "PTEST_NUMBER", string_of_int cmd.n;
+      ]
+    in
+    Macros.add_list macros cmd.macros
+
+  let contains_frama_c_binary_name =
+    Str.regexp "[^( ]*\\(toplevel\\|viewer\\|frama-c-gui\\|frama-c[^-]\\).*"
+
+  let frama_c_binary_name =
+    Str.regexp "\\([^ ]*\\(toplevel\\|viewer\\|frama-c-gui\\|frama-c\\)\\(\\.opt\\|\\.byte\\|\\.exe\\)?\\)"
+
+  let basic_command_string =
+    fun command ->
+    let macros = get_macros command in
+    let logfiles = List.map (Macros.expand macros) command.log_files in
+    command.log_files <- logfiles;
+    let has_ptest_file_t, toplevel =
+      Macros.does_expand macros command.toplevel
+    in
+    let has_ptest_file_o, options = Macros.does_expand macros command.options in
+    let toplevel = if !use_byte then opt_to_byte toplevel else toplevel in
+    let toplevel, contains_frama_c_binary =
+      str_string_match_and_replace contains_frama_c_binary_name
+        frama_c_binary_name ~suffix:" -check" toplevel
+    in
+    let options =
+      if contains_frama_c_binary
+      then begin
+        let opt_modules = match Macros.expand macros
+                                  (Macros.get "PTEST_LOAD_MODULES" macros) with
+        | "" -> ""
+        | s -> "-load-module=" ^ s ^ ""
+        in
+        let opt_pre = Macros.expand macros !additional_options_pre in
+        let opt_post = Macros.expand macros !additional_options in
+        opt_modules ^ opt_pre ^ " " ^ options ^ " " ^ opt_post
+      end else options
+    in
+    let options = if !use_byte then opt_to_byte_options options else options in
+    let raw_command =
+      if has_ptest_file_t || has_ptest_file_o || command.execnow then
+        toplevel ^ " " ^ options
+      else begin
+        let file = Filename.sanitize @@ get_ptest_file command in
+        toplevel ^ " " ^ file ^ " " ^ options
+      end
+    in
+    if command.timeout = "" then raw_command
+    else "ulimit -t " ^ command.timeout ^ " && " ^ raw_command
+
+  (* Searches for executable [s] in the directories contained in the PATH
+     environment variable. Returns [None] if not found, or
+     [Some <fullpath>] otherwise. *)
+  let find_in_path s =
+    let trim_right s =
+      let n = ref (String.length s - 1) in
+      let last_char_to_keep =
+        try
+          while !n > 0 do
+            if String.get s !n <> ' ' then raise Exit;
+            n := !n - 1
+          done;
+          0
+        with Exit -> !n
       in
-      if is_file_empty_or_nonexisting log then
-        (* No, remove the error oracle *)
-        unlink ~silent:false oracle
-      else
-        (* Yes, update the error oracle*)
-        mv log oracle
-    with (* Possible error in [is_file_empty] *)
-      Unix.Unix_error _ -> ()
-  end;
-  let macros = get_macros command in
-  let log_files = List.map (Macros.expand macros) command.log_files
-  in
-  List.iter (update_log_files command.directory) log_files
+      String.sub s 0 (last_char_to_keep+1)
+    in
+    let s = trim_right s in
+    let path_separator = if Sys.os_type = "Win32" then ";" else ":" in
+    let re_path_sep = Str.regexp path_separator in
+    let path_dirs = Str.split re_path_sep (Sys.getenv "PATH") in
+    let found = ref "" in
+    try
+      List.iter (fun dir ->
+          let fullname = dir ^ Filename.dir_sep ^ s in
+          if Sys.file_exists fullname then begin
+            found := fullname;
+            raise Exit
+          end
+        ) path_dirs;
+      None
+    with Exit ->
+      Some !found
+
+  let command_string command =
+    let log_prefix = log_prefix command in
+    let errlog = log_prefix ^ ".err.log" in
+    let stderr = match command.filter with
+        None -> errlog
+      | Some _ ->
+        let stderr =
+          Filename.temp_file (Filename.basename log_prefix) ".err.log"
+        in
+        at_exit (fun () ->  unlink stderr);
+        stderr
+    in
+    let filter = match command.filter with
+      | None -> None
+      | Some filter ->
+        let len = String.length filter in
+        let rec split_filter i =
+          if i < len && filter.[i] = ' ' then split_filter (i+1)
+          else
+            try
+              let idx = String.index_from filter i ' ' in
+              String.sub filter i idx,
+              String.sub filter idx (len - idx)
+            with Not_found ->
+              String.sub filter i (len - i), ""
+        in
+        let exec_name, params = split_filter 0 in
+        let exec_name =
+          if Sys.file_exists exec_name || not (Filename.is_relative exec_name)
+          then exec_name
+          else
+            match find_in_path exec_name with
+            | Some full_exec_name -> full_exec_name
+            | None ->
+              Filename.concat
+                (Filename.dirname (Filename.dirname log_prefix))
+                (Filename.basename exec_name)
+        in
+        Some (exec_name ^ params)
+    in
+    let command_str = basic_command_string command in
+    let command_str =
+      command_str ^ " 2>" ^ (Filename.sanitize stderr)
+    in
+    let command_str = match filter with
+      | None -> command_str
+      | Some filter -> command_str ^ " | " ^ filter
+    in
+    let res = Filename.sanitize (log_prefix ^ ".res.log") in
+    let command_str = command_str ^ " >" ^ res in
+    let command_str =
+      match command.timeout with
+      | "" -> command_str
+      | s ->
+        Printf.sprintf
+          "%s; if test $? -gt 127; then \
+           echo 'TIMEOUT (%s); ABORTING EXECUTION' > %s; \
+           fi"
+          command_str s (Filename.sanitize stderr)
+    in
+    let command_str = match filter with
+      | None -> command_str
+      | Some filter ->
+        Printf.sprintf "%s && %s < %s >%s && rm -f %s" (* exit code ? *)
+          command_str
+          filter
+          (Filename.sanitize stderr)
+          (Filename.sanitize errlog)
+          (Filename.sanitize stderr)
+    in
+    command_str
+
+  let update_toplevel_command command =
+    let log_prefix = log_prefix command in
+    let oracle_prefix = oracle_prefix command in
+    (* Update oracle *)
+    mv (log_prefix ^ ".res.log") (oracle_prefix ^ ".res.oracle");
+    (* Is there an error log ? *)
+    begin try
+        let log = log_prefix ^ ".err.log"
+        and oracle = oracle_prefix ^ ".err.oracle"
+        in
+        if is_file_empty_or_nonexisting log then
+          (* No, remove the error oracle *)
+          unlink ~silent:false oracle
+        else
+          (* Yes, update the error oracle*)
+          mv log oracle
+      with (* Possible error in [is_file_empty] *)
+        Unix.Unix_error _ -> ()
+    end;
+    let macros = get_macros command in
+    let log_files = List.map (Macros.expand macros) command.log_files
+    in
+    List.iter (update_log_files command.directory) log_files
+
+end
 
 let rec update_command = function
-    Toplevel cmd -> update_toplevel_command cmd
+  | Toplevel cmd -> Cmd.update_toplevel_command cmd
   | Target (execnow,cmds) ->
     List.iter (update_log_files execnow.ex_dir) execnow.ex_log;
     Queue.iter update_command cmds
@@ -1390,6 +1408,7 @@ module Make_Report(M:sig type t end)=struct
   let remove k = H.remove tbl k
 
 end
+
 module Report_run=Make_Report(struct type t=int*float
 (* At some point will contain the running time*)
   end)
@@ -1429,6 +1448,7 @@ let pretty_report fmt =
                else if err=1 then "Stderr oracle difference"
                else if err=2 then "Stderr System Error (missing oracle?)"
                else "Unexpected errror")))
+
 let xunit_report () =
   if !xunit then begin
     let out = open_out_bin "xunit.xml" in
@@ -1456,20 +1476,20 @@ let do_command command =
        Gui: launch the command in the gui
        Examine : just enqueue the cmp *)
     if !behavior = Update
-    then update_toplevel_command command
+    then Cmd.update_toplevel_command command
     else begin
       (* Run, Show, Gui or Examine *)
       if !behavior = Gui then begin
         (* basic_command_string does not redirect the outputs, and does
            not overwrite the result files *)
-        let basic_command_string = basic_command_string command in
+        let basic_command_string = Cmd.basic_command_string command in
         lock_printf "%% launch %s@." basic_command_string ;
         ignore (launch basic_command_string)
       end
       else begin
         (* command string also replaces macros in logfiles names, which
            is useful for Examine as well. *)
-        let command_string = command_string command in
+        let command_string = Cmd.command_string command in
         let summary_ret =
           if !behavior <> Examine
           then begin
@@ -1522,7 +1542,7 @@ let do_command command =
             Toplevel cmd ->
             shared.summary_run <- succ shared.summary_run;
             shared.summary_ret <- succ shared.summary_ret;
-            let log_prefix = log_prefix cmd in
+            let log_prefix = Cmd.log_prefix cmd in
             unlink (log_prefix ^ ".res.log ")
           | Target (execnow,cmds) ->
             shared.summary_run <- succ shared.summary_run;
@@ -1660,8 +1680,8 @@ let compare_one_log_file dir file =
 
 let do_cmp = function
   | Cmp_Toplevel (cmd,ret) ->
-    let log_prefix = log_prefix cmd in
-    let oracle_prefix = oracle_prefix cmd in
+    let log_prefix = Cmd.log_prefix cmd in
+    let oracle_prefix = Cmd.oracle_prefix cmd in
     let cmp = { res = compare_one_file cmd log_prefix oracle_prefix Res;
                 err = compare_one_file cmd log_prefix oracle_prefix Err;
                 ret
@@ -1739,15 +1759,15 @@ let diff_check_exist old_file new_file =
 
 let do_diff = function
   | Command_error (diff, kind) ->
-    let log_prefix = log_prefix diff in
+    let log_prefix = Cmd.log_prefix diff in
     let log_ext = log_ext kind in
     let log_file = Filename.sanitize (log_prefix ^ log_ext ^ ".log") in
-    let command_string = command_string diff in
+    let command_string = Cmd.command_string diff in
     lock_printf "%tCommand:@\n%s@." print_default_env command_string;
     if !behavior = Show
     then ignore (launch ("cat " ^ log_file))
     else
-      let oracle_prefix = oracle_prefix diff in
+      let oracle_prefix = Cmd.oracle_prefix diff in
       let oracle_file =
         Filename.sanitize (oracle_prefix ^ log_ext ^ ".oracle")
       in
@@ -1943,9 +1963,9 @@ let dispatcher () =
             execnow = true;
             timeout = execnow.ex_timeout;
           } in
-          let macros = get_macros cmd in
+          let macros = Cmd.get_macros cmd in
           let process_macros s = Macros.expand macros s in
-          { ex_cmd = basic_command_string cmd;
+          { ex_cmd = Cmd.basic_command_string cmd;
             ex_log = List.map process_macros execnow.ex_log;
             ex_bin = List.map process_macros execnow.ex_bin;
             ex_dir = execnow.ex_dir;
