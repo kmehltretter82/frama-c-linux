@@ -326,6 +326,9 @@ let example_msg =
      EXIT: <number>      @[<v 0># Defines the exit code required for the next sub-test commands.@]@  \
      FILTER: <cmd>       @[<v 0># Performs a transformation on the test result files before the comparison from the oracles.@ \
      # The oracle will be compared from the standard output of the command: <cmd> <test-output-file>.@ \
+     # Note: in such a command, the @@PTEST_ORACLE@@ variable is set to the basename of the oracle.@ \
+     # That allows to perform a 'diff' command with the oracle of another test configuration:@ \
+     #    FILTER: diff ./oracle_configuration/@@PTEST_ORACLE@@ @]@  \
      TIMEOUT: <delay>    @[<v 0># Set a timeout for all sub-test.@]@  \
      NOFRAMAC:           @[<v 0># Drops previous sub-test definitions and considers that there is no defined default sub-test.@]@  \
      GCC:                @[<v 0># Deprecated.@]@  \
@@ -333,16 +336,12 @@ let example_msg =
      @]@ \
      @[<v 1>\
      Some variables can be used in test command:@ \
-     @@PTEST_CONFIG@@    \
-     # test configuration suffix@ \
-     @@PTEST_FILE@@   \
-     # substituted by the test filename@ \
-     @@PTEST_DIR@@    \
-     # dirname of the test file@ \
-     @@PTEST_NAME@@   \
-     # basename of the test file@ \
-     @@PTEST_NUMBER@@ \
-     # test command number@] @ \
+     @@PTEST_CONFIG@@    # Test configuration suffix.@  \
+     @@PTEST_FILE@@      # Substituted by the test filename.@  \
+     @@PTEST_DIR@@       # Dirname of the test file.@  \
+     @@PTEST_NAME@@      # Basename of the test file.@  \
+     @@PTEST_NUMBER@@    # Test command number.@  \
+     @@PTEST_ORACLE@@    # Basename of the current oracle file (variable only usable in FILTER directives).@  \
      @[<v 1>\
      Examples:@ \
      ptests@ \
@@ -1285,66 +1284,70 @@ end = struct
     with Exit ->
       Some !found
 
-  let command_string command =
-    let log_prefix = log_prefix command in
-    let errlog = log_prefix ^ ".err.log" in
-    let stderr = match command.filter with
-        None -> errlog
-      | Some _ ->
-        let stderr =
-          Filename.temp_file (Filename.basename log_prefix) ".err.log"
-        in
-        at_exit (fun () ->  unlink stderr);
-        stderr
-    in
-    let filter = match command.filter with
-      | None -> None
-      | Some filter ->
-        let exec_name, params = command_partition filter in
-        let exec_name =
-          if Sys.file_exists exec_name || not (Filename.is_relative exec_name)
-          then exec_name
-          else
-            match find_in_path exec_name with
-            | Some full_exec_name -> full_exec_name
-            | None ->
-              Filename.concat
-                (Filename.dirname (Filename.dirname log_prefix))
-                (Filename.basename exec_name)
-        in
-        Some (exec_name ^ params)
-    in
-    let command_str = basic_command_string command in
-    let command_str =
-      command_str ^ " 2>" ^ (Filename.sanitize stderr)
-    in
-    let command_str = match filter with
-      | None -> command_str
-      | Some filter -> command_str ^ " | " ^ filter
-    in
-    let res = Filename.sanitize (log_prefix ^ ".res.log") in
-    let command_str = command_str ^ " >" ^ res in
-    let command_str =
-      match command.timeout with
-      | "" -> command_str
-      | s ->
-        Printf.sprintf
-          "%s; if test $? -gt 127; then \
-           echo 'TIMEOUT (%s); ABORTING EXECUTION' > %s; \
-           fi"
-          command_str s (Filename.sanitize stderr)
-    in
-    let command_str = match filter with
-      | None -> command_str
-      | Some filter ->
-        Printf.sprintf "%s && %s < %s >%s && rm -f %s" (* exit code ? *)
-          command_str
-          filter
-          (Filename.sanitize stderr)
-          (Filename.sanitize errlog)
-          (Filename.sanitize stderr)
-    in
-    command_str
+  let command_string =
+    let regexp_ptest_oracle = Str.regexp "@PTEST_ORACLE@" in
+    fun command ->
+      let log_prefix = log_prefix command in
+      let errlog = log_prefix ^ ".err.log" in
+      let stderr = match command.filter with
+          None -> errlog
+        | Some _ ->
+          let stderr =
+            Filename.temp_file (Filename.basename log_prefix) ".err.log"
+          in
+          at_exit (fun () ->  unlink stderr);
+          stderr
+      in
+      let filter = match command.filter with
+        | None -> None
+        | Some filter ->
+          let foracle = (Filename.basename log_prefix) ^ ".res.oracle" in
+          let filter = Str.global_replace regexp_ptest_oracle foracle filter in
+          let exec_name, params = command_partition filter in
+          let exec_name =
+            if Sys.file_exists exec_name || not (Filename.is_relative exec_name)
+            then exec_name
+            else
+              match find_in_path exec_name with
+              | Some full_exec_name -> full_exec_name
+              | None ->
+                Filename.concat
+                  (Filename.dirname (Filename.dirname log_prefix))
+                  (Filename.basename exec_name)
+          in
+          Some (exec_name ^ params)
+      in
+      let command_str = basic_command_string command in
+      let command_str =
+        command_str ^ " 2>" ^ (Filename.sanitize stderr)
+      in
+      let command_str = match filter with
+        | None -> command_str
+        | Some filter -> command_str ^ " | " ^ filter
+      in
+      let res = Filename.sanitize (log_prefix ^ ".res.log") in
+      let command_str = command_str ^ " >" ^ res in
+      let command_str =
+        match command.timeout with
+        | "" -> command_str
+        | s ->
+          Printf.sprintf
+            "%s; if test $? -gt 127; then \
+             echo 'TIMEOUT (%s); ABORTING EXECUTION' > %s; \
+             fi"
+            command_str s (Filename.sanitize stderr)
+      in
+      let command_str = match filter with
+        | None -> command_str
+        | Some filter ->
+          Printf.sprintf "%s && %s < %s >%s && rm -f %s" (* exit code ? *)
+            command_str
+            filter
+            (Filename.sanitize stderr)
+            (Filename.sanitize errlog)
+            (Filename.sanitize stderr)
+      in
+      command_str
 
   let update_toplevel_command command =
     let log_prefix = log_prefix command in
