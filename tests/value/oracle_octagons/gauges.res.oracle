@@ -1,0 +1,24 @@
+209,210d208
+< [eva:alarm] tests/value/gauges.c:156: Warning: 
+<   signed overflow. assert -2147483648 ≤ toCopy - 1;
+276,277d273
+< [eva:alarm] tests/value/gauges.c:201: Warning: 
+<   signed overflow. assert -2147483648 ≤ numNonZero - 1;
+300,304d295
+< [eva] tests/value/gauges.c:218: Frama_C_show_each:
+< [eva] tests/value/gauges.c:218: Frama_C_show_each:
+< [eva] tests/value/gauges.c:218: Frama_C_show_each:
+< [eva:alarm] tests/value/gauges.c:220: Warning: 
+<   signed overflow. assert -2147483648 ≤ n - 1;
+791c782
+<   numNonZero ∈ [-2147483648..8]
+---
+>   numNonZero ∈ {-1}
+802c793
+<   n ∈ [-2147483648..99]
+---
+>   n ∈ {-1}
+863c854
+<   toCopy ∈ [-2147483648..99]
+---
+>   toCopy ∈ {-1}
