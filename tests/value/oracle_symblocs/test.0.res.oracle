@@ -1,0 +1,4 @@
+31c31
+<   tmp ∈ [--..--] or UNINITIALIZED
+---
+>   tmp ∈ [-2147483647..2147483647] or UNINITIALIZED
