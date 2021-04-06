@@ -1,0 +1,178 @@
+60,63c60
+<   Frama_C_show_each: {{ &p2 + [0..400000],0%32 }}
+< [eva:alarm] tests/value/non_natural.i:23: Warning: 
+<   out of bounds write. assert \valid(tmp);
+<                        (tmp from to++)
+---
+>   Frama_C_show_each: {{ &p2 + [0..399968],0%32 }}
+66,68d62
+< [eva:alarm] tests/value/non_natural.i:24: Warning: 
+<   out of bounds write. assert \valid(tmp_1);
+<                        (tmp_1 from to++)
+71,76d64
+< [eva:alarm] tests/value/non_natural.i:25: Warning: 
+<   out of bounds write. assert \valid(tmp_3);
+<                        (tmp_3 from to++)
+< [eva:alarm] tests/value/non_natural.i:25: Warning: 
+<   out of bounds read. assert \valid_read(tmp_4);
+<                       (tmp_4 from from++)
+79,84d66
+< [eva:alarm] tests/value/non_natural.i:26: Warning: 
+<   out of bounds write. assert \valid(tmp_5);
+<                        (tmp_5 from to++)
+< [eva:alarm] tests/value/non_natural.i:26: Warning: 
+<   out of bounds read. assert \valid_read(tmp_6);
+<                       (tmp_6 from from++)
+87,92d68
+< [eva:alarm] tests/value/non_natural.i:27: Warning: 
+<   out of bounds write. assert \valid(tmp_7);
+<                        (tmp_7 from to++)
+< [eva:alarm] tests/value/non_natural.i:27: Warning: 
+<   out of bounds read. assert \valid_read(tmp_8);
+<                       (tmp_8 from from++)
+95,100d70
+< [eva:alarm] tests/value/non_natural.i:28: Warning: 
+<   out of bounds write. assert \valid(tmp_9);
+<                        (tmp_9 from to++)
+< [eva:alarm] tests/value/non_natural.i:28: Warning: 
+<   out of bounds read. assert \valid_read(tmp_10);
+<                       (tmp_10 from from++)
+103,108d72
+< [eva:alarm] tests/value/non_natural.i:29: Warning: 
+<   out of bounds write. assert \valid(tmp_11);
+<                        (tmp_11 from to++)
+< [eva:alarm] tests/value/non_natural.i:29: Warning: 
+<   out of bounds read. assert \valid_read(tmp_12);
+<                       (tmp_12 from from++)
+111,125d74
+< [eva:alarm] tests/value/non_natural.i:30: Warning: 
+<   out of bounds write. assert \valid(tmp_13);
+<                        (tmp_13 from to++)
+< [eva:alarm] tests/value/non_natural.i:30: Warning: 
+<   out of bounds read. assert \valid_read(tmp_14);
+<                       (tmp_14 from from++)
+< [eva] tests/value/non_natural.i:22: 
+<   Frama_C_show_each: {{ &p2 + [0..400032],0%32 }}
+< [eva:alarm] tests/value/non_natural.i:23: Warning: 
+<   out of bounds read. assert \valid_read(tmp_0);
+<                       (tmp_0 from from++)
+< [eva:alarm] tests/value/non_natural.i:24: Warning: 
+<   out of bounds read. assert \valid_read(tmp_2);
+<                       (tmp_2 from from++)
+< [eva] tests/value/non_natural.i:22: Frama_C_show_each: {{ &p2 + [0..--],0%32 }}
+128,129d76
+<   more than 200(12501) elements to enumerate. Approximating.
+< [kernel] tests/value/non_natural.i:23: 
+132,133d78
+<   more than 200(12501) elements to enumerate. Approximating.
+< [kernel] tests/value/non_natural.i:24: 
+194,197c139
+<   Frama_C_show_each: {{ &p2 + [0..400000],0%32 }}
+< [eva:alarm] tests/value/non_natural.i:39: Warning: 
+<   out of bounds write. assert \valid(tmp);
+<                        (tmp from to++)
+---
+>   Frama_C_show_each: {{ &p2 + [0..399968],0%32 }}
+200,202d141
+< [eva:alarm] tests/value/non_natural.i:40: Warning: 
+<   out of bounds write. assert \valid(tmp_1);
+<                        (tmp_1 from to++)
+205,210d143
+< [eva:alarm] tests/value/non_natural.i:41: Warning: 
+<   out of bounds write. assert \valid(tmp_3);
+<                        (tmp_3 from to++)
+< [eva:alarm] tests/value/non_natural.i:41: Warning: 
+<   out of bounds read. assert \valid_read(tmp_4);
+<                       (tmp_4 from from++)
+213,218d145
+< [eva:alarm] tests/value/non_natural.i:42: Warning: 
+<   out of bounds write. assert \valid(tmp_5);
+<                        (tmp_5 from to++)
+< [eva:alarm] tests/value/non_natural.i:42: Warning: 
+<   out of bounds read. assert \valid_read(tmp_6);
+<                       (tmp_6 from from++)
+221,226d147
+< [eva:alarm] tests/value/non_natural.i:43: Warning: 
+<   out of bounds write. assert \valid(tmp_7);
+<                        (tmp_7 from to++)
+< [eva:alarm] tests/value/non_natural.i:43: Warning: 
+<   out of bounds read. assert \valid_read(tmp_8);
+<                       (tmp_8 from from++)
+229,234d149
+< [eva:alarm] tests/value/non_natural.i:44: Warning: 
+<   out of bounds write. assert \valid(tmp_9);
+<                        (tmp_9 from to++)
+< [eva:alarm] tests/value/non_natural.i:44: Warning: 
+<   out of bounds read. assert \valid_read(tmp_10);
+<                       (tmp_10 from from++)
+237,242d151
+< [eva:alarm] tests/value/non_natural.i:45: Warning: 
+<   out of bounds write. assert \valid(tmp_11);
+<                        (tmp_11 from to++)
+< [eva:alarm] tests/value/non_natural.i:45: Warning: 
+<   out of bounds read. assert \valid_read(tmp_12);
+<                       (tmp_12 from from++)
+245,259d153
+< [eva:alarm] tests/value/non_natural.i:46: Warning: 
+<   out of bounds write. assert \valid(tmp_13);
+<                        (tmp_13 from to++)
+< [eva:alarm] tests/value/non_natural.i:46: Warning: 
+<   out of bounds read. assert \valid_read(tmp_14);
+<                       (tmp_14 from from++)
+< [eva] tests/value/non_natural.i:38: 
+<   Frama_C_show_each: {{ &p2 + [0..400032],0%32 }}
+< [eva:alarm] tests/value/non_natural.i:39: Warning: 
+<   out of bounds read. assert \valid_read(tmp_0);
+<                       (tmp_0 from from++)
+< [eva:alarm] tests/value/non_natural.i:40: Warning: 
+<   out of bounds read. assert \valid_read(tmp_2);
+<                       (tmp_2 from from++)
+< [eva] tests/value/non_natural.i:38: Frama_C_show_each: {{ &p2 + [0..--],0%32 }}
+268,269c162,163
+<   to ∈ {{ &p2 + [32..--],0%32 }}
+<   from ∈ {{ &p1 + [32..--],0%32 }}
+---
+>   to ∈ {{ &p2 + [32..400000],0%32 }}
+>   from ∈ {{ &p1 + [32..400000],0%32 }}
+273,274c167,168
+<   to ∈ {{ &p2 + [32..--],0%32 }}
+<   from ∈ {{ &p1 + [32..--],0%32 }}
+---
+>   to ∈ {{ &p2 + [32..400000],0%32 }}
+>   from ∈ {{ &p1 + [32..400000],0%32 }}
+330,332c224,232
+<   p2[0] FROM to; from; count; p1[0..100000] (and SELF)
+<     [1..99992] FROM to; from; count; p1[0..100001] (and SELF)
+<     [99993] FROM to; from; count; p1[1..100001] (and SELF)
+---
+>   p2[0] FROM to; from; count; p1[0..99992] (and SELF)
+>     [1] FROM to; from; count; p1[0..99993] (and SELF)
+>     [2] FROM to; from; count; p1[0..99994] (and SELF)
+>     [3] FROM to; from; count; p1[0..99995] (and SELF)
+>     [4] FROM to; from; count; p1[0..99996] (and SELF)
+>     [5] FROM to; from; count; p1[0..99997] (and SELF)
+>     [6] FROM to; from; count; p1[0..99998] (and SELF)
+>     [7..99992] FROM to; from; count; p1[0..99999] (and SELF)
+>     [99993] FROM to; from; count; p1[1..99999] (and SELF)
+340,342c240,248
+<   p2[0] FROM to; from; count; p1[0..100000] (and SELF)
+<     [1..99992] FROM to; from; count; p1[0..100001] (and SELF)
+<     [99993] FROM to; from; count; p1[1..100001] (and SELF)
+---
+>   p2[0] FROM to; from; count; p1[0..99992] (and SELF)
+>     [1] FROM to; from; count; p1[0..99993] (and SELF)
+>     [2] FROM to; from; count; p1[0..99994] (and SELF)
+>     [3] FROM to; from; count; p1[0..99995] (and SELF)
+>     [4] FROM to; from; count; p1[0..99996] (and SELF)
+>     [5] FROM to; from; count; p1[0..99997] (and SELF)
+>     [6] FROM to; from; count; p1[0..99998] (and SELF)
+>     [7..99992] FROM to; from; count; p1[0..99999] (and SELF)
+>     [99993] FROM to; from; count; p1[1..99999] (and SELF)
+360c266
+<     p1[0..100001]
+---
+>     p1[0..99999]
+365c271
+<     p1[0..100001]
+---
+>     p1[0..99999]

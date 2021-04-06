@@ -1,0 +1,31 @@
+15,18c15
+< [eva:alarm] tests/value/auto_loop_unroll.c:31: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] tests/value/auto_loop_unroll.c:33: 
+<   Frama_C_show_each_imprecise: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:33: Frama_C_show_each_imprecise: {1000}
+20,23c17
+< [eva:alarm] tests/value/auto_loop_unroll.c:39: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] tests/value/auto_loop_unroll.c:41: 
+<   Frama_C_show_each_imprecise: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:41: Frama_C_show_each_imprecise: {100}
+335,338c329
+< [eva:alarm] tests/value/auto_loop_unroll.c:192: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] tests/value/auto_loop_unroll.c:194: 
+<   Frama_C_show_each_imprecise: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:194: Frama_C_show_each_imprecise: [1..9]
+340,341d330
+< [eva:alarm] tests/value/auto_loop_unroll.c:200: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+345c334
+<   Frama_C_show_each_imprecise: [0..2147483647]
+---
+>   Frama_C_show_each_imprecise: [64..2147483647]
+381,382d369
+< [eva:alarm] tests/value/auto_loop_unroll.c:287: Warning: 
+<   signed overflow. assert i + 1 ≤ 2147483647;
