@@ -1,0 +1,5 @@
+30a31,34
+> [kernel] tests/value/pointer_comp.c:43: 
+>   imprecise size for variable g (Undefined sizeof on a function.)
+> [kernel] tests/value/pointer_comp.c:43: 
+>   imprecise size for variable f (Undefined sizeof on a function.)
