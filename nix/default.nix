@@ -25,13 +25,15 @@ let mk_buildInputs = { opamPackages ? [], nixPackages ? [] } :
         } // args);
 in
 
-rec {
+pkgs.lib.makeExtensible
+(self: {
   inherit src mk_buildInputs;
   buildInputs = mk_buildInputs {};
-  installed = main.out;
+  installed = self.main.out;
   main = mk_deriv {
         name = "frama-c";
-        inherit src buildInputs;
+        src = self.src;
+        buildInputs =self.buildInputs;
         outputs = [ "out" "build_dir" ];
         postPatch = ''
                patchShebangs .
@@ -73,9 +75,9 @@ rec {
 
   lint = mk_deriv {
         name = "frama-c-lint";
-        inherit src;
+        src = self.src;
         buildInputs =
-          (mk_buildInputs {
+          (self.mk_buildInputs {
             nixPackages = [ pkgs.bc ];
             opamPackages = [
               { name = "ocp-indent"; constraint = "=1.7.0"; }
@@ -102,9 +104,9 @@ rec {
 
   tests = mk_deriv {
         name = "frama-c-test";
-        inherit buildInputs;
-        build_dir = main.build_dir;
-        src = main.build_dir + "/dir.tar";
+        buildInputs = self.buildInputs;
+        build_dir = self.main.build_dir;
+        src = self.main.build_dir + "/dir.tar";
         sourceRoot = ".";
         postUnpack = ''
                find . \( -name "Makefile*" -or -name ".depend" -o -name "ptests_config" -o -name "config.status" \) -exec bash -c "t=\$(stat -c %y \"\$0\"); sed -i -e \"s&$(cat $build_dir/old_pwd)&$(pwd)&g\" \"\$0\"; touch -d \"\$t\" \"\$0\"" {} \;
@@ -124,9 +126,9 @@ rec {
 
   build-distrib-tarball = mk_deriv {
         name = "frama-c-build-distrib-tarball";
-        inherit src;
+        src = self.src;
         buildInputs =
-          (mk_buildInputs {
+          (self.mk_buildInputs {
             opamPackages = [
               { name = "headache"; constraint = "=1.05"; }
             ];} );
@@ -151,8 +153,8 @@ rec {
 
   build-from-distrib-tarball = mk_deriv {
         name = "frama-c-build-from-distrib-tarball";
-        inherit buildInputs;
-        src = build-distrib-tarball.out ;
+        buildInputs = self.buildInputs;
+        src = self.build-distrib-tarball.out ;
         outputs = [ "out" ];
         configurePhase = ''
                unset CC
@@ -169,9 +171,9 @@ rec {
 
   wp-qualif = mk_deriv {
         name = "frama-c-wp-qualif";
-        buildInputs = mk_buildInputs { };
-        build_dir = main.build_dir;
-        src = main.build_dir + "/dir.tar";
+        buildInputs = self.mk_buildInputs { };
+        build_dir = self.main.build_dir;
+        src = self.main.build_dir + "/dir.tar";
         sourceRoot = ".";
         postUnpack = ''
                find . \( -name "Makefile*" -or -name ".depend" -o -name "ptests_config" -o -name "config.status" \) -exec bash -c "t=\$(stat -c %y \"\$0\"); sed -i -e \"s&$(cat $build_dir/old_pwd)&$(pwd)&g\" \"\$0\"; touch -d \"\$t\" \"\$0\"" {} \;
@@ -197,9 +199,9 @@ rec {
 
   aorai-prove = mk_deriv {
         name = "frama-c-aorai-prove";
-        buildInputs = mk_buildInputs { };
-        build_dir = main.build_dir;
-        src = main.build_dir + "/dir.tar";
+        buildInputs = self.mk_buildInputs { };
+        build_dir = self.main.build_dir;
+        src = self.main.build_dir + "/dir.tar";
         sourceRoot = ".";
         postUnpack = ''
                find . \( -name "Makefile*" -or -name ".depend" -o -name "ptests_config" -o -name "test_config*" -o -name "config.status" \) -exec bash -c "t=\$(stat -c %y \"\$0\"); sed -i -e \"s&$(cat $build_dir/old_pwd)&$(pwd)&g\" \"\$0\"; touch -d \"\$t\" \"\$0\"" {} \;
@@ -225,9 +227,9 @@ rec {
 
   e-acsl-tests-dev = mk_deriv {
         name = "frama-c-e-acsl-tests-dev";
-        buildInputs = mk_buildInputs { nixPackages = [ pkgs.gmp pkgs.getopt ]; };
-        build_dir = main.build_dir;
-        src = main.build_dir + "/dir.tar";
+        buildInputs = self.mk_buildInputs { nixPackages = [ pkgs.gmp pkgs.getopt ]; };
+        build_dir = self.main.build_dir;
+        src = self.main.build_dir + "/dir.tar";
         sourceRoot = ".";
         postUnpack = ''
                find . \( -name "Makefile*" -or -name ".depend" -o -name "ptests_config" -o -name "config.status" \) -exec bash -c "t=\$(stat -c %y \"\$0\"); sed -i -e \"s&$(cat $build_dir/old_pwd)&$(pwd)&g\" \"\$0\"; touch -d \"\$t\" \"\$0\"" {} \;
@@ -247,8 +249,8 @@ rec {
 
   internal = mk_deriv {
         name = "frama-c-internal";
-        inherit src;
-        buildInputs = (mk_buildInputs { opamPackages = [ "xml-light" ]; } ) ++
+        src = self.src;
+        buildInputs = (self.mk_buildInputs { opamPackages = [ "xml-light" ]; } ) ++
                     [ pkgs.getopt
                       pkgs.libxslt pkgs.libxml2 pkgs.autoPatchelfHook
                       pkgs.swiProlog
@@ -320,4 +322,4 @@ rec {
         '';
   };
 
-}
+})
