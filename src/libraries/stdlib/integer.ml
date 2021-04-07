@@ -101,6 +101,11 @@ let to_int = Z.to_int
 let to_int64 = Z.to_int64
 let to_int32 = Z.to_int32
 
+let wrap to_int i = try Some (to_int i) with Z.Overflow -> None
+let to_int_opt = wrap Z.to_int
+let to_int64_opt = wrap Z.to_int64
+let to_int32_opt = wrap Z.to_int32
+
 let of_string = Z.of_string
 let to_string = Z.to_string
 

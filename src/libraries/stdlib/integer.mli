@@ -122,9 +122,45 @@ val of_int : int -> t
 val of_int64 : Int64.t -> t
 val of_int32 : Int32.t -> t
 
-val to_int : t -> int (** @raise Z.Overflow if too big *)
-val to_int64 : t -> int64 (** @raise Z.Overflow if too big *)
-val to_int32 : t -> int32 (** @raise Z.Overflow if too big *)
+(**
+   @raise Z.Overflow if too big
+   @deprecated Frama-C+dev use [to_int_opt] instead
+*)
+val to_int : t -> int
+
+(**
+   @raise Z.Overflow if too big
+   @deprecated Frama-C+dev use [to_int64_opt] instead
+*)
+val to_int64 : t -> int64
+
+(**
+   @raise Z.Overflow if too big
+   @deprecated Frama-C+dev use [to_int32_opt] instead
+*)
+val to_int32 : t -> int32
+
+(**
+   Returns [Some i] if the number can be converted to an [int],
+   or [None] otherwise.
+   @since Frama-C+dev
+*)
+val to_int_opt : t -> int option
+
+(**
+   Returns [Some i] if the number can be converted to an [int64],
+   or [None] otherwise.
+   @since Frama-C+dev
+*)
+val to_int64_opt : t -> int64 option
+
+(**
+   Returns [Some i] if the number can be converted to an [int32],
+   or [None] otherwise.
+   @since Frama-C+dev
+*)
+val to_int32_opt : t -> int32 option
+
 
 val to_float : t -> float
 val of_float : float -> t
