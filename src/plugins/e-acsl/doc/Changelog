@@ -25,6 +25,8 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-  E-ACSL       [2021-04-07] Add support for multiple binders in guarded
+                quantifications (frama-c/e-acsl#127).
 -* runtime      [2021-03-30] Fix the end address of the memory segments in the
                 RTL layouts.
 -  E-ACSL       [2021-03-25] Add support for `check` and `admit` annotations

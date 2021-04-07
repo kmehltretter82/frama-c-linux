@@ -321,8 +321,15 @@ module Logic_binding = struct
     try
       let varinfos = Logic_var.Map.find logic_v env.var_mapping in
       Stack.top varinfos
-    with Not_found | Stack.Empty ->
-      assert false
+    with
+    | Not_found ->
+      Options.fatal
+        "Unable to find logic var '%a' in environment mappings"
+        Printer.pp_logic_var logic_v
+    | Stack.Empty ->
+      Options.fatal
+        "Empty mapping stack for logic var '%a' in environment"
+        Printer.pp_logic_var logic_v
 
   let remove env logic_v =
     try
