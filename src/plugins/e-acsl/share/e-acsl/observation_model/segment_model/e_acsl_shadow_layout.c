@@ -97,16 +97,22 @@ static uintptr_t get_stack_start(int *argc_ref,  char *** argv_ref) {
 
   // Check that the assumption that argc and argv are stored below environ in
   // the stack holds
-  DVASSERT(stack_start <= (uintptr_t)argc_ref
-           && (uintptr_t)argc_ref <= stack_end,
-           "Assumption that argc is stored below environ is not verified.\n\
-           \tStack: [%a - %a]\n\t&argc: %a",
-           stack_start, stack_end, argc_ref);
-  DVASSERT(stack_start <= (uintptr_t)argv_ref
-           && (uintptr_t)argv_ref <= stack_end,
-           "Assumption that argv is stored below environ is not verified.\n\
-           \tStack: [%a - %a]\n\t&argc: %a",
-           stack_start, stack_end, argc_ref);
+  if (argc_ref) {
+    DVASSERT(stack_start <= (uintptr_t)argc_ref
+            && (uintptr_t)argc_ref <= stack_end,
+            "Assumption that argc is stored below environ is not verified.\n"
+            "\tStack: [%a - %a]\n"
+            "\t&argc: %a\n",
+            stack_start, stack_end, argc_ref);
+  }
+  if (argv_ref) {
+    DVASSERT(stack_start <= (uintptr_t)argv_ref
+            && (uintptr_t)argv_ref <= stack_end,
+            "Assumption that argv is stored below environ is not verified.\n"
+            "\tStack: [%a - %a]\n"
+            "\t&argv: %a\n",
+            stack_start, stack_end, argv_ref);
+  }
 
   return stack_start;
 }
