@@ -988,7 +988,7 @@ file, run it only once.
 & \textit{None}
 \\
 & \texttt{FILTER}\nscodeidxdef{Test!Directive}{FILTER}
-& Command used to filter results
+& Command reading the standard input used to filter results. In such a command, the variable \texttt{@PTEST\_ORACLE@} is set to the basename of the oracle.
 & \textit{None}
 \\
 & \texttt{MODULE}\nscodeidxdef{Test!Directive}{MODULE}
@@ -1168,6 +1168,18 @@ or
   the suite. This directive is only
   usable in a \texttt{test\_config}\codeidx{test\_config}
   configuration file.
+\item The \texttt{FILTER}\nscodeidx{Test!Directive}{FILTER} command performs
+  a transformation on the test result files before the comparison from the
+  oracles.
+  The filter command read the result from the standard input and the oracle
+  will be compared from the standard output of that command.
+  In such a command, the  \texttt{@PTEST\_ORACLE@} variable is set to the
+  basename of the oracle.
+  That allows to perform a \texttt{diff} command with the oracle of another
+  test configuration:
+  \begin{code}
+    FILTER: diff --new-file @PTEST_DIR@/oracle_configuration/@PTEST_ORACLE@
+  \end{code}
 \end{itemize}
 
 \begin{important}
