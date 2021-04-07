@@ -85,9 +85,10 @@ int f(struct P ***pppp_0, struct P **ppp_0, struct P *pp_0, struct P p_0,
   /*@ assert rte: index_bound: i3_0 < 5; */
   /*@ assert rte: initialization: \initialized(&p_0.id[i3_0]); */
   p_0.id[i1_0] = p_0.id[i3_0];
+  /*@ assert rte: initialization: \initialized(&p_0.next); */
   /*@ assert rte: mem_access: \valid_read(p_0.next); */
-  /*@ assert rte: initialization: \initialized(p_0.next); */
   struct P np = *(p_0.next);
+  /*@ assert rte: initialization: \initialized(&p_0.next); */
   struct P *npp = p_0.next;
   /*@ assert rte: initialization: \initialized(&npp); */
   p_0.next = npp;
@@ -189,6 +190,7 @@ int f(struct P ***pppp_0, struct P **ppp_0, struct P *pp_0, struct P p_0,
         \initialized(&((p_0.nexts[i1_0][i2_0])->nexts[i3_0][*i_0])->id[i4_0]);
   */
   v_0 = ((p_0.nexts[i1_0][i2_0])->nexts[i3_0][*i_0])->id[i4_0];
+  /*@ assert rte: initialization: \initialized(&p_0.q.v); */
   v_0 = p_0.q.v;
   /*@ assert rte: index_bound: 0 ≤ i4_0; */
   /*@ assert rte: index_bound: i4_0 < 12; */
@@ -225,6 +227,7 @@ int f(struct P ***pppp_0, struct P **ppp_0, struct P *pp_0, struct P p_0,
   /*@ assert rte: mem_access: \valid_read(&pp_0->tq[i3_0][i1_0].v); */
   /*@ assert rte: initialization: \initialized(&pp_0->tq[i3_0][i1_0].v); */
   v_0 = pp_0->tq[i3_0][i1_0].v;
+  /*@ assert rte: initialization: \initialized(&p_0.znexts); */
   /*@ assert rte: mem_access: \valid_read(p_0.znexts + i0_0); */
   /*@ assert rte: initialization: \initialized(p_0.znexts + i0_0); */
   /*@ assert rte: mem_access: \valid_read(*(p_0.znexts + i0_0) + i1_0); */
@@ -243,7 +246,6 @@ int f(struct P ***pppp_0, struct P **ppp_0, struct P *pp_0, struct P p_0,
   /*@ assert rte: index_bound: i0_0 < 10; */
   /*@ assert rte: index_bound: 0 ≤ i1_0; */
   /*@ assert rte: index_bound: i1_0 < 11; */
-  /*@ assert rte: initialization: \initialized(&p_0.tq[i0_0][i1_0]); */
   q_0 = p_0.tq[i0_0][i1_0];
   /*@ assert rte: index_bound: 0 ≤ i0_0; */
   /*@ assert rte: index_bound: i0_0 < 10; */
@@ -258,6 +260,7 @@ int f(struct P ***pppp_0, struct P **ppp_0, struct P *pp_0, struct P p_0,
   /*@ assert rte: mem_access: \valid_read(&pp_0->val); */
   /*@ assert rte: initialization: \initialized(&pp_0->val); */
   v_0 = pp_0->val;
+  /*@ assert rte: initialization: \initialized(&p_0.val); */
   v_0 = p_0.val;
   /*@ assert rte: index_bound: 0 ≤ i0_0; */
   /*@ assert rte: index_bound: i0_0 < 10; */
@@ -329,9 +332,10 @@ int main(void)
   /*@ assert rte: index_bound: i3 < 5; */
   /*@ assert rte: initialization: \initialized(&p.id[i3]); */
   p.id[i1] = p.id[i3];
+  /*@ assert rte: initialization: \initialized(&p.next); */
   /*@ assert rte: mem_access: \valid_read(p.next); */
-  /*@ assert rte: initialization: \initialized(p.next); */
   struct P np = *(p.next);
+  /*@ assert rte: initialization: \initialized(&p.next); */
   struct P *npp = p.next;
   /*@ assert rte: initialization: \initialized(&p.id[3]); */
   v = p.id[3];
@@ -422,6 +426,7 @@ int main(void)
         \initialized(&((p.nexts[i1][i2])->nexts[i3][*i])->id[i4]);
   */
   v = ((p.nexts[i1][i2])->nexts[i3][*i])->id[i4];
+  /*@ assert rte: initialization: \initialized(&p.q.v); */
   v = p.q.v;
   /*@ assert rte: index_bound: 0 ≤ i4; */
   /*@ assert rte: index_bound: i4 < 12; */
@@ -456,6 +461,7 @@ int main(void)
   /*@ assert rte: mem_access: \valid_read(&pp->tq[i3][i1].v); */
   /*@ assert rte: initialization: \initialized(&pp->tq[i3][i1].v); */
   v = pp->tq[i3][i1].v;
+  /*@ assert rte: initialization: \initialized(&p.znexts); */
   /*@ assert rte: mem_access: \valid_read(p.znexts + i0); */
   /*@ assert rte: initialization: \initialized(p.znexts + i0); */
   /*@ assert rte: mem_access: \valid_read(*(p.znexts + i0) + i1); */
@@ -472,7 +478,6 @@ int main(void)
   /*@ assert rte: index_bound: i0 < 10; */
   /*@ assert rte: index_bound: 0 ≤ i1; */
   /*@ assert rte: index_bound: i1 < 11; */
-  /*@ assert rte: initialization: \initialized(&p.tq[i0][i1]); */
   q = p.tq[i0][i1];
   /*@ assert rte: index_bound: 0 ≤ i0; */
   /*@ assert rte: index_bound: i0 < 10; */
@@ -485,6 +490,7 @@ int main(void)
   /*@ assert rte: mem_access: \valid_read(&pp->val); */
   /*@ assert rte: initialization: \initialized(&pp->val); */
   v = pp->val;
+  /*@ assert rte: initialization: \initialized(&p.val); */
   v = p.val;
   /*@ assert rte: index_bound: 0 ≤ i0; */
   /*@ assert rte: index_bound: i0 < 10; */

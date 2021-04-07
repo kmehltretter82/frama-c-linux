@@ -139,12 +139,7 @@ class annot_visitor kf flags on_alarm = object (self)
       Cil.ChangeDoChildrenPost (s', fun _ -> s)
     | _ -> Cil.DoChildren
 
-  method private treat_call ret_opt args =
-    let check_arg = function
-      | { enode = Lval lv } when Cil.isStructOrUnionType (Cil.typeOfLval lv) ->
-        self#mark_to_skip_initialized lv
-      | _ -> ()
-    in List.iter check_arg args ;
+  method private treat_call ret_opt =
     match ret_opt, self#do_mem_access () with
     | None, _ | Some _, false -> ()
     | Some ret, true ->
@@ -188,7 +183,7 @@ class annot_visitor kf flags on_alarm = object (self)
       if is_builtin
       then Cil.SkipChildren
       else begin
-        self#treat_call ret_opt argl;
+        self#treat_call ret_opt;
         (* Alarm if the call is through a pointer. Done in DoChildrenPost to get a
            more pleasant ordering of annotations. *)
         let do_ptr () =
@@ -200,7 +195,7 @@ class annot_visitor kf flags on_alarm = object (self)
         Cil.DoChildrenPost (fun res -> do_ptr (); res)
       end
     | Local_init (v,ConsInit(f,args,kind),loc) ->
-      let do_call lv _e args _loc = self#treat_call lv args in
+      let do_call lv _e _args _loc = self#treat_call lv in
       Cil.treat_constructor_as_func do_call v f args kind loc;
       Cil.DoChildren
     | Local_init (v,AssignInit (SingleInit _),_) ->

@@ -163,7 +163,7 @@ int main() {
   v = p.val;
   v = p.tq[i0][i1].v;
 
-  /** Note: Frama-C is stricter than ISO C : potentiel indeterminate values are
+  /** Note: Frama-C is stricter than ISO C : potential indeterminate values are
    *  considered as alarms even for types without trap representation.
    */
   c1 = c2;
