@@ -1,3 +1,5 @@
+[eva] Warning: Option -eva-all-rounding-modes-constants is now deprecated.
+  Please contact us if you need it.
 [kernel] Parsing tests/float/dr.i (no preprocessing)
 [kernel:parser:decimal-float] tests/float/dr.i:7: Warning: 
   Floating-point constant 100e30f is not represented exactly. Will use 0x1.3b8b5c0000000p106.

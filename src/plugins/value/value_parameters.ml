@@ -460,17 +460,6 @@ let () = add_precision_dep BitwiseOffsmStorage.parameter
 (* ------------------------------------------------------------------------- *)
 
 let () = Parameter_customize.set_group alarms
-module AllRoundingModesConstants =
-  False
-    (struct
-      let option_name = "-eva-all-rounding-modes-constants"
-      let help = "Take into account the possibility of constants not being \
-                  converted to the nearest representable value, \
-                  or being converted to higher precision"
-    end)
-let () = add_correctness_dep AllRoundingModesConstants.parameter
-
-let () = Parameter_customize.set_group alarms
 module UndefinedPointerComparisonPropagateAll =
   False
     (struct
@@ -1283,8 +1272,25 @@ let () = MallocLevel.set_range 0 max_int
 let () = add_precision_dep MallocLevel.parameter
 
 (* -------------------------------------------------------------------------- *)
-(* --- Deprecated aliases                                                 --- *)
+(* --- Deprecated options and aliases                                     --- *)
 (* -------------------------------------------------------------------------- *)
+
+let () = Parameter_customize.set_group alarms
+let () = Parameter_customize.is_invisible ()
+module AllRoundingModesConstants =
+  False
+    (struct
+      let option_name = "-eva-all-rounding-modes-constants"
+      let help = "Deprecated. Take into account the possibility of constants \
+                  not being converted to the nearest representable value, \
+                  or being converted to higher precision"
+    end)
+let () = add_correctness_dep AllRoundingModesConstants.parameter
+let () =
+  AllRoundingModesConstants.add_set_hook
+    (fun _old _new ->
+       warning "Option -eva-all-rounding-modes-constants is now deprecated.@ \
+                Please contact us if you need it.")
 
 let deprecated_aliases : ((module Parameter_sig.S) * string) list =
   [ (module SemanticUnrollingLevel), "-slevel"
