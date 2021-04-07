@@ -53,8 +53,6 @@ let value_of_integral_expr e =
   | None -> assert false
   | Some i -> i
 
-let constant_expr ~loc i = new_exp ~loc (Const(CInt64(i,IInt,None)))
-
 let rec is_null_expr e = match (stripInfo e).enode with
   | Const c when is_integral_const c ->
     Integer.equal (value_of_integral_const c) Integer.zero

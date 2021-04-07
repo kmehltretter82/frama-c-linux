@@ -33,7 +33,6 @@ val possible_value_of_integral_const: constant -> Integer.t option
 val possible_value_of_integral_expr: exp -> Integer.t option
 val value_of_integral_const: constant -> Integer.t
 val value_of_integral_expr: exp -> Integer.t
-val constant_expr: loc:location -> Integer.t -> exp
 val is_null_expr: exp -> bool
 val is_non_null_expr: exp -> bool
 
