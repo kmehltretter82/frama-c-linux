@@ -51,7 +51,9 @@ class annot_visitor kf flags on_alarm = object (self)
     r
 
   method private do_initialized () =
-    flags.Flags.initialized && not (Generator.Initialized.is_computed kf)
+    flags.Flags.initialized
+    && not (Generator.Initialized.is_computed kf)
+    && not (Options.IgnoreInitialized.mem kf)
 
   method private do_mem_access () =
     flags.Flags.mem_access && not (Generator.Mem_access.is_computed kf)
@@ -300,7 +302,8 @@ class annot_visitor kf flags on_alarm = object (self)
             self#generate_assertion
               (Rte.lval_assertion ~read_only:Alarms.For_reading) lval
           end;
-          if self#do_initialized () && not (self#must_skip_initialized lval) then begin
+          if self#do_initialized ()
+          && not (self#must_skip_initialized lval) then begin
             Options.debug
               "exp %a is an lval: initialization of potential mem access checked"
               Printer.pp_exp exp;

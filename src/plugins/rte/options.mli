@@ -31,6 +31,8 @@ module DoInitialized : Parameter_sig.Bool
 module DoMemAccess : Parameter_sig.Bool
 module DoPointerCall : Parameter_sig.Bool
 
+module IgnoreInitialized : Parameter_sig.Kernel_function_set
+
 module Trivial : Parameter_sig.Bool
 module Warn : Parameter_sig.Bool
 module FunctionSelection: Parameter_sig.Kernel_function_set

@@ -68,7 +68,17 @@ module DoInitialized =
     (struct
       let option_name = "-rte-initialized"
       let help = "when on, annotates local variables and pointers \
-                  reads with initialization tests"
+                  reads of non struct types with initialization tests \
+                  see documentation for more details."
+    end)
+
+module IgnoreInitialized =
+  Kernel_function_set
+    (struct
+      let option_name = "-rte-initialized-ignore"
+      let arg_name = "fct"
+      let help = "list of functions where initialization alarms should not be \
+                  emitted"
     end)
 
 (* annotates invalid memory access (undefined behavior) *)
