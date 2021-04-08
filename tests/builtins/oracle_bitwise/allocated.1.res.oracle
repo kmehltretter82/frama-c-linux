@@ -1,9 +1,3 @@
-diff tests/builtins/oracle/allocated.0.res.oracle tests/builtins/oracle_bitwise/allocated.0.res.oracle
-260a261,263
-> [eva] tests/builtins/allocated.c:127: Call to builtin __fc_vla_alloc
-> [eva:malloc] tests/builtins/allocated.c:127: 
->   resizing variable `__malloc_main_l127' (0..31/319) to fit 0..63/319
-diff tests/builtins/oracle/allocated.1.res.oracle tests/builtins/oracle_bitwise/allocated.1.res.oracle
 171a172,173
 > [eva] tests/builtins/allocated.c:82: Call to builtin malloc
 > [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_7
@@ -282,8 +276,3 @@ diff tests/builtins/oracle/allocated.1.res.oracle tests/builtins/oracle_bitwise/
 >     __malloc_main_l82_36[0..2]; __malloc_main_l82_37[0..2];
 >     __malloc_main_l97[0]; __malloc_main_l114[0..3]; __malloc_main_l127;
 >     __malloc_main_l127_0[0..1]; __malloc_main_l127_1[0..2];
-diff tests/builtins/oracle/malloc-optimistic.res.oracle tests/builtins/oracle_bitwise/malloc-optimistic.res.oracle
-1945a1946,1948
-> [eva] tests/builtins/malloc-optimistic.c:90: Call to builtin malloc
-> [eva:malloc] tests/builtins/malloc-optimistic.c:90: 
->   resizing variable `__malloc_main7_l90' (0..31/3231) to fit 0..511/3231
