@@ -17,9 +17,10 @@
 Open Source Release <next-release>
 ##################################
 
+o   Ptests    [2021-04-08] FILTER directive reads the standard input and can be
+              chained.
 -*  Kernel    [2021-03-26] Raise an error if trying to merge a tentative
               definition with a proper definition during linking
-o   Ptests    [2021-03-24] Add new EXIT directive
 o   Ptests    [2021-03-25] Modify MODULE directive.
 o   Ptests    [2021-03-24] Add new EXIT directive.
 -   Aorai     [2021-02-09] New option for tracking last N states of the
