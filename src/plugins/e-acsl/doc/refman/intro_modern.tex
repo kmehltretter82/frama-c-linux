@@ -46,27 +46,53 @@ currently implemented into the \framac's \eacsl plug-in.
       & mathematical reals \\
       \hline
       terms
-      & \lstinline|\\true| and \lstinline|\\false| \\
+      & truth values \lstinline|\\true| and \lstinline|\\false| \\
+      & functional updates \\
+      & irrational numbers \\
+      & built-in function \lstinline|\\length| over arrays \\
+      & conversions of structure to structure \\
       & t-sets \\
+      & higher-order logic constructs \\
+      & hybrid functions \\
+      & labeled memory-related built-in functions \\
+      & finite sets \\
+      & finite lists \\
+      & \lstinline|\\exit_status|
+      \\
       \hline
       predicates
-      & exclusive or operator \\  %     \lstinline|^^|
-      & let bindings \\
-      & quantifications over non-integer types \\
-      & \lstinline|\\specified|
+      & let bindings of predicates \\
+      & unguarded quantifications over small types \\
+      & quantifications over pointers and enums \\
+      & iterators \\
+      & comparisons of unions and structures \\
+      & t-sets \\
+      & hybrid predicates \\
+      & labeled memory-related built-in predicates \\
+      & dangling pointers \lstinline|\\dangling|
+      \\
+      \hline
+      clauses
+      & decreases clauses \\
+      & assigns clauses \\
+      & allocation and deallocation clauses \\
+      & abrupt clauses \\
+      & reads clauses
       \\
       \hline
       annotations
-      & behavior-specific annotations \\
+      & behavior-specific annotations (introduced by \lstinline|for|) \\
       & loop assigns \\
-      & global annotations
-      \\
-      \hline
-      behavior clauses
-      & assigns \\
-      & allocates \\
-      & decreases \\
-      & abrupt termination
+      & loop allocations \\
+      & lemmas \\
+      & inductive predicates \\
+      & axiomatic definitions \\
+      & polymorphic logic types \\
+      & concrete logic types \\
+      & specification modules \\
+      & data invariants \\
+      & model variables and model fields \\
+      & volatile variables
       \\
       \hline
     \end{tabular}
