@@ -955,7 +955,7 @@ end = struct
          match current.dc_filter with
          | None when s="" -> { current with dc_filter = None }
          | None           -> { current with dc_filter = Some s }
-         | Some filter    -> { current with dc_filter = Some (filter ^ " | " ^ s) });
+         | Some filter    -> { current with dc_filter = Some (s ^ " | " ^ filter) });
 
       "EXIT",
       (fun ~drop:_ ~file:_ _ s current -> { current with dc_exit_code = Some s });
