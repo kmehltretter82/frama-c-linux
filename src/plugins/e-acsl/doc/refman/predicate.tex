@@ -10,7 +10,7 @@
        | [ pred "==>" pred ] ;               \hspace{-10mm} implication
        | pred "<==>" pred ;                  \hspace{-10mm} equivalence
        | "!" pred ;                          \hspace{-10mm} negation
-       | [ { pred "^^" pred } ] ;            \hspace{-10mm} exclusive or
+       | pred "^^" pred ;                    \hspace{-10mm} exclusive or
        | [ term "?" pred ":" pred ] ;        \hspace{-10mm} ternary condition
        | [ pred "?" pred ":" pred ];
        | "\let" id "=" term ";" pred ;       \hspace{-10mm} local binding

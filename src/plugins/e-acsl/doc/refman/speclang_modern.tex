@@ -17,13 +17,13 @@
 \section{Logic expressions}
 \label{sec:expressions}
 
-\except{guarded quantification}
+\except{the quantifications must be guarded}
 
-More precisely, grammars of terms and binders presented respectively
+More precisely, the grammars of terms and binders presented respectively
 Figures~\ref{fig:gram:term} and~\ref{fig:gram:binders} are the same than the one
-of \acsl, while Figure~\ref{fig:gram:pred} presents grammar of predicates. The
-only difference between \eacsl and \acsl predicates are quantifications and
-iterators.
+of \acsl, while Figure~\ref{fig:gram:pred} presents the grammar of
+predicates. The only differences introduced by \eacsl with respect to \acsl are
+the quantifications that must be guarded and the introduction of iterators.
 
 \begin{figure}[htbp]
   \begin{cadre}
@@ -51,20 +51,20 @@ iterators.
 
 {\highlightnotimplemented The general form of quantifications (called
     generalized quantification below), as described in Fig.~\ref{fig:gram:pred},
-    are restricted to a few \emph{finite enumerable types}: the types of bounded
+    are restricted to a few \emph{finite enumerable types}: the types of bound
     variables must be \C integer types, enum types, pointer types, or their
     aliases.
 
 \unefficient{Generalized quantification over large types (for instance, types
   containing $2^{32}$ elements).}}
 
-In addition to generalized quantification, a restricted form of guarded
-quantifications described in Fig.~\ref{fig:gram:guarded} are also recognized
+In addition to generalized quantifications, a restricted form of guarded
+quantifications described in Fig.~\ref{fig:gram:guarded} is also recognized
 \emph{for (possibly infinite) enumerable types} (typically,
-\lstinline|integer|). In guarded quantifications, each bounded variable must be
+\lstinline|integer|). In guarded quantifications, each bound variable must be
 guarded exactly once and, if its bounds depend on other bounded variables, these
 variables must be guarded earlier or guarded by the same guard. Additionnally,
-guards are limited to bounded variables, meaning that the only allowed
+guards are limited to bound variables, meaning that the only allowed
 identifiers $id$ are variable identifiers enclosed in the binder list.
 
 \begin{figure}[htbp]
@@ -91,8 +91,8 @@ identifiers $id$ are variable identifiers enclosed in the binder list.
 \end{example}
 
 \subsection*{{\highlightnotimplemented{Iterator quantification}}} For
-iterating over other datastructures, \eacsl introduces a notion of $iterators$
-over types that are introduced by a specific construct which attachs two sets
+iterating over other data structures, \eacsl introduces a notion of $iterators$
+over types that are introduced by a specific construct which attaches two sets
 --- namely \texttt{nexts} and the \texttt{guards} --- to a binary predicate over
 a type $\tau$. Both sets must have the same cardinal. This construct is
 described by the grammar of Figure~\ref{fig:gram:iterator}.
@@ -103,17 +103,19 @@ described by the grammar of Figure~\ref{fig:gram:iterator}.
     \caption{Grammar of iterator declarations}
     \label{fig:gram:iterator}
   \end{figure}
-  For a type $\tau$, \texttt{nexts} is a set of terms which take an argument of
-  type $\tau$ and return a value of type $\tau$ which computes the next element
-  in this type, while \texttt{guards} is a set of predicates which take an
-  argument of type $\tau$ and are valid (resp. invalid) to continue (resp. stop)
-  the iteration.
+  For a type $\tau$, \texttt{nexts} is a set of terms, and \texttt{guards} a set
+  of predicates of the same cardinal. Each term in \texttt{nexts} is a function
+  taking an argument of type $\tau$ and returning a value of type $\tau$ which
+  is a successor of its argument. Each predicate in the set gards takes an
+  element of type $\tau$, and is valid (resp. invalid) to indicate that the
+  iteration should continue on the corresponding successor (resp.  stop at the
+  given argument).
 
   Furthermore, the guard of a quantification using an iterator must be the
   predicate given in the definition of the iterator. This abstract binary
   predicate takes two arguments of the same type. One of them must be unnamed by
   using a wildcard (character underscore \texttt{'\_'}). The unnamed argument
-  must be binded to the guantifier, while the other corresponds to the term from
+  must be bound to the quantifier, while the other corresponds to the term from
   which the iteration begins.
   \begin{example}
     The following example introduces binary trees and a predicate which is valid
@@ -190,8 +192,8 @@ The semantics of all the below predicates are undefined:
 \end{itemize}
 \end{example}
 
-Furthermore, \C-like operators \lstinline|&&|, \lstinline+||+, \lstinline|^^|
-and \lstinline|_ ? _ : _| are lazy like in \C: their right members are evaluated
+Furthermore, \C-like operators \lstinline|&&|, \lstinline+||+, and
+\lstinline|_ ? _ : _| are lazy like in \C: their right members are evaluated 
 only if required. Thus the amount of undefinedness is limited. Consequently,
 predicate \lstinline|p ==> q| is also lazy since it is equivalent
 to \lstinline+!p || q+. It is also the case for guarded quantifications since
@@ -199,13 +201,13 @@ guards are conjunctions and for ternary condition since it is equivalent to a
 disjunction of implications.
 
 \begin{example}\label{ex:semantics}
-Below, the first, second and fourth predicates are invalid while the third
-one is valid:
+  All the predicates below are well defined. The first, second and fourth
+  predicates are invalid, whereas the third one is valid:
 \begin{itemize}
 \item \lstinline|\false && 1/0 == 1/0|
 \item \lstinline|\forall integer x, -1 <= x <= 1 ==> 1/x > 0|
 \item \lstinline|\forall integer x, 0 <= x <= 0 ==> \false ==> -1 <= 1/x <= 1|
-\item \lstinline|\exists integer x, 1 <= x <= 0 && -1 <= 1/x <= 1|
+\item \lstinline|\exists integer x, 1 <= x <= 0 && -1 <= 1/0 <= 1|
 \end{itemize}
 In particular, the second one is invalid since the quantification is in fact an
 enumeration over a finite number of elements, it amounts to
@@ -236,8 +238,8 @@ Below, the first term is well-defined, while the second one is undefined.
 \paragraph{Handling undefinedness in tools}
 
 It is the responsibility of each tool which interprets \eacsl to ensure that an
-undefined term is never evaluated. For instance, they may exit with a proper
-error message or, if they generate \C code, they may guard each generated
+undefined term is never evaluated. For instance, it may exit with a proper
+error message or, if it generates \C code, it may guard each generated
 undefined \C expression in order to be sure that they are always safely used.
 
 \ifthenelse{\boolean{PrintImplementationRq}}{%
@@ -254,8 +256,8 @@ predicate corresponding to a valid (resp. invalid) \acsl predicate is valid
 \framac's \Eva~\cite{eva} or \Wp~\cite{wp} in order to interpret \eacsl, and
 it is also possible to perform runtime assertion checking of \eacsl predicates
 in the same way than \jml predicates. Reader interested by the implications
-(especially issues) of such a choice may read articles of Patrice
-Chalin~\cite{chalin05,chalin07}.
+(especially issues) of such a choice may read the articles of Patrice
+Chalin on that topic~\cite{chalin05,chalin07}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -279,14 +281,14 @@ More precisely, most real numbers are not representable at runtime with an
 infinite precisions. Consequently, most operations over them (e.g., equality)
 cannot be computed at runtime with an arbitrary precision. In such cases, it is
 the responsibility of each tool which interprets \eacsl to specify their
-level of precision (e.g., $1e^{-6}$) up to they are sound, and/or to emit
+level of precision (e.g., $1e^{-6}$) up to which it is sound, and/or to emit
 undefinitive verdicts (e.g., ``unknown'').
 
 \ifthenelse{\boolean{PrintImplementationRq}}{%
   \begin{notimplementedenv}
-    Only floating point numbers, rationals numbers (in $\mathbb{Q}$) and
-    operations over them are supported by the \eacsl plug-in. Real numbers that
-    are not rational numbers are not supported.
+    Only floating point numbers (e.g., \texttt{0.1f}), rationals numbers (in
+    $\mathbb{Q}$) and operations over them are supported by the \eacsl
+    plug-in. Real numbers that are irrational numbers are not supported.
   \end{notimplementedenv}
 }
 
@@ -326,10 +328,10 @@ undefinitive verdicts (e.g., ``unknown'').
 \label{sec:fn-behavior}
 \index{function contract}\index{contract}
 
-\except{no \lstinline|terminates|}
+\except{no clause \lstinline|terminates|}
 
-Figure~\ref{fig:gram:contracts} shows grammar of function contracts. This is a
-simplified version of \acsl one without \lstinline|terminates|
+Figure~\ref{fig:gram:contracts} shows the grammar of function contracts. This is
+a simplified version of \acsl one without \lstinline|terminates|
 clauses. Section~\ref{sec:termination} explains why \eacsl has no
 \lstinline|terminates| clause.
 
@@ -350,8 +352,8 @@ clauses. Section~\ref{sec:termination} explains why \eacsl has no
 
 \nodiff
 
-Figure~\ref{fig:gram:oldandresult} summarizes grammar extension of terms with
-\lstinline|\old| and \lstinline|\result|.
+Figure~\ref{fig:gram:oldandresult} summarizes the grammar extension of terms
+with \lstinline|\old| and \lstinline|\result|.
 \begin{figure}[htbp]
   \begin{cadre}
       \input{oldandresult_modern.bnf}
@@ -414,14 +416,14 @@ set of even integers between 0 and 10.
   \begin{notimplementedenv}
     Ranges are currently only supported in memory built-ins described in
     Section~\ref{subsec:memory},~\ref{sec:initialized} and~\ref{sec:dangling}.
-
-    \begin{example}
-      The predicate \lstinline|\\valid(&t[0 .. 9])| is supported and denotes
-      that the ten first cells of the array \lstinline|t| are valid. Writing the
-      term \lstinline|&t[0 .. 9]| alone, outside any memory built-in, is not yet
-      supported.
-    \end{example}
   \end{notimplementedenv}
+
+  \begin{example}
+    The predicate \lstinline|\\valid(&t[0 .. 9])| is supported and denotes
+    that the ten first cells of the array \lstinline|t| are valid. Writing the
+    term \lstinline|&t[0 .. 9]| alone, outside any memory built-in, is not yet
+    supported.
+  \end{example}
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -469,7 +471,7 @@ syntactic difference with \acsl.
   \label{fig:gram:loops}
 \end{figure}
 
-\difficultwhy{\notimplemented{\lstinline|loop allocation|} and
+\difficultswhy{\notimplemented{\lstinline|loop allocation|} and
   \notimplemented{\lstinline|loop assigns|}}{the implementation of a memory
   model}
 
@@ -477,27 +479,28 @@ syntactic difference with \acsl.
 
 \index{invariant} The semantics of loop invariants is the same than the one
 defined in \acsl, except that they are not inductive. More precisely, if one
-does not take care of side effects (semantics of specifications about side
+does not take care of side effects (the semantics of specifications about side
 effects in loop is the same in \eacsl than the one in \acsl), a loop invariant
 $I$ is valid in \acsl if and only if:
 \begin{itemize}
 \item $I$ holds before entering the loop; and
 \item if $I$ is assumed true in some state where the loop condition $c$ is also
-  true, and if execution of the loop body in that state ends normally at the end
-  of the body or with a "continue" statement, $I$ is true in the resulting
+  true, and if the execution of the loop body in that state ends normally at the
+  end of the body or with a "continue" statement, $I$ is true in the resulting
   state.
 \end{itemize}
 
 In \eacsl, the same loop invariant $I$ is valid if and only if:
 \begin{itemize}
 \item $I$ holds before entering the loop; and
-\item if execution of the loop body in that state ends normally at the end of
-  the body or with a "continue" statement, $I$ is true in the resulting state.
+\item if the execution of the loop body in that state ends normally at the end
+  of the body or with a "continue" statement, $I$ is true in the resulting
+  state.
 \end{itemize}
 
 Thus the only difference with \acsl is that \eacsl does not assume that the
 invariant previously holds when one checks that it holds at the end of the loop
-body. In other words a loop invariant \lstinline|I| is equivalent to put an
+body. In other words a loop invariant \lstinline|I| is equivalent to putting an
 assertion \lstinline|I| just before entering the loop and at the very end of the
 loop body.
 
@@ -517,8 +520,10 @@ loop invariants are not inductive.
 \subsubsection{General inductive invariant}
 \label{sec:generalized-invariants}
 
-Syntax of these kinds of invariant is shown Figure~\ref{fig:advancedinvariants}
-\begin{figure}[t]
+The syntax of this kind of invariant is shown
+Figure~\ref{fig:advancedinvariants}.
+
+\begin{figure}[htbp]
   \begin{cadre}
     \input{generalinvariants_modern.bnf}
   \end{cadre}
@@ -526,8 +531,8 @@ Syntax of these kinds of invariant is shown Figure~\ref{fig:advancedinvariants}
   \label{fig:advancedinvariants}
 \end{figure}
 
-In \eacsl, these kinds of invariants put everywhere in a loop body is exactly
-equivalent to an assertion.
+In \eacsl, a general inductive invariant may be written everywhere in a loop
+body, and is exactly equivalent to writing an assertion.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -543,11 +548,15 @@ scoping rule must be respected in addition to the standard \acsl scoping rule:
 \begin{itemize}
 \item when evaluating \verb|\at(t,id)| at a propram point $p$, the program point
   $p'$ denoted by \verb|id| must be reached before $p$ in the program execution
-  flow;
+  flow; and
 \item when evaluating \verb|\at(t,id)|, for each \C left-value $x$ that
   contributes to the definition of a (non-ghost) logic variable involved in $t$,
-  the equality \verb|\at(x,id) == \at(x,Here)| must hold.
+  the equality \verb|\at(x,id) == \at(x,Here)| must hold, i.e. the value of $x$
+  must not be modified between the program points \verb|id| and \verb|Here|.
 \end{itemize}
+
+Below, the first example illustrates the first constraint, whereas the second
+example illustrates the second constraint.
 
 \begin{example}
   In the following example, both assertions are accepted and valid in \acsl, but
@@ -588,7 +597,7 @@ scoping rule must be respected in addition to the standard \acsl scoping rule:
 
 \nodiff
 
-Figure~\ref{fig:gram:stcontracts} shows grammar of statement contracts.
+Figure~\ref{fig:gram:stcontracts} shows the grammar of statement contracts.
 
 \begin{figure}[htbp]
   \begin{cadre}
@@ -661,7 +670,7 @@ Figure~\ref{fig:gram:logic} presents grammar of logic definitions.
 \subsection{\notimplemented{Lemmas}}
 \nodiff
 
-Lemmas are verified before running function \lstinline|main| but after
+Lemmas are verified before running the function \lstinline|main| but after
 initializing global variables.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -673,7 +682,7 @@ initializing global variables.
 
 \nodiff
 
-Figure~\ref{fig:gram:inductive} presents grammar of inductive predicates.
+Figure~\ref{fig:gram:inductive} presents the grammar of inductive predicates.
 
 \begin{figure}[htbp]
   \fbox{\begin{minipage}{0.97\linewidth}\vfill \input{inductive_modern.bnf}
@@ -683,7 +692,7 @@ Figure~\ref{fig:gram:inductive} presents grammar of inductive predicates.
 \end{figure}
 
 Inductive predicates in all their generality are not monitorable. Therefore,
-future version of this document will restrict them syntactically (e.g., to
+future versions of this document will restrict them syntactically (e.g., to
 definite Horn clauses (\url{http://en.wikipedia.org/wiki/Horn_clause}) and/or
 through semantic criteria.
 
@@ -705,7 +714,7 @@ Figure~\ref{fig:gram:logicdecl} presents grammar of inductive predicates.
 \end{figure}
 
 Axiomatic declarations in all their generality are not monitorable. Therefore,
-future version of this document will restrict them syntactically and/or
+future versions of this document will restrict them syntactically and/or
 through semantic criteria.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -751,7 +760,7 @@ higher-order logic.
 
 \nodiff
 
-Figure~\ref{fig:gram:higherorder} introduces new constructs for defining logic
+Figure~\ref{fig:gram:logictype} introduces new constructs for defining logic
 types and the associated new terms.
 
 \begin{figure}[htp]
@@ -782,7 +791,7 @@ types and the associated new terms.
 
 \nodiff
 
-Figure~\ref{fig:gram:logicreads} introduces \lstinline|reads| clause.
+Figure~\ref{fig:gram:logicreads} introduces \lstinline|reads| clauses.
 
 \begin{figure}[htp]
   \begin{cadre}
@@ -888,7 +897,7 @@ Figure~\ref{fig:gram:list} shows the notations for built-in lists.
 
 \nodiff
 
-Figure~\ref{fig:gram:abrupt} shows grammar of abrupt termination.
+Figure~\ref{fig:gram:abrupt} shows the grammar of abrupt terminations.
 
 \begin{figure}[htbp]
   \begin{cadre}
@@ -908,7 +917,7 @@ Figure~\ref{fig:gram:abrupt} shows grammar of abrupt termination.
 
 \nodiff
 
-Figure~\ref{fig:gram:dep} shows grammar for dependencies information.
+Figure~\ref{fig:gram:dep} shows the grammar for dependencies information.
 
 \begin{figure}[htp]
   \begin{cadre}
@@ -939,7 +948,7 @@ invariants.
 \label{fig:gram:datainvariants}
 \end{figure}
 
-\unefficient{strong invariant}
+\unefficient{strong invariants}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -954,7 +963,7 @@ invariants.
 
 \nodiff
 
-Figure~\ref{fig:gram:model} summarizes grammar for declarations of model
+Figure~\ref{fig:gram:model} summarizes the grammar for declarations of model
 variables and fields.
 \begin{figure}[htbp]
   \fbox{\begin{minipage}{0.97\linewidth}
@@ -974,8 +983,8 @@ variables and fields.
 
 \nodiff
 
-Figure~\ref{fig:gram:ghost} summarizes grammar for ghost statements which is the
-same than the one of \acsl.
+Figure~\ref{fig:gram:ghost} summarizes the grammar for ghost statements which is
+the same than the one of \acsl.
 \begin{figure}[htbp]
   \fbox{\begin{minipage}{0.98\linewidth}
       \input{ghost_modern.bnf}
@@ -990,7 +999,7 @@ same than the one of \acsl.
 \label{sec:volatile-variables}
 \indextt{volatile}
 
-Figure~\ref{fig:gram:model} summarizes grammar for volatile constructs.
+Figure~\ref{fig:gram:volatile} summarizes the grammar for volatile constructs.
 \begin{figure}[htp]
   \begin{cadre}
       \input{volatile-gram_modern.bnf}
@@ -1011,7 +1020,7 @@ Figure~\ref{fig:gram:model} summarizes grammar for volatile constructs.
 
 \ifthenelse{\boolean{PrintImplementationRq}}{%
   \begin{notimplementedenv}
-    Plug-in \eacsl does not support labels as arguments of
+    The \framac plug-in \eacsl does not support labels as arguments of
     \lstinline|\\initialized|.
   \end{notimplementedenv}
 }
