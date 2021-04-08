@@ -1,4 +1,3 @@
-diff tests/idct/oracle/ieee_1180_1990.res.oracle tests/idct/oracle_octagons/ieee_1180_1990.res.oracle
 424a425,432
 > [eva] tests/idct/ieee_1180_1990.c:85: 
 >   Reusing old results for call to IEEE_1180_1990_rand

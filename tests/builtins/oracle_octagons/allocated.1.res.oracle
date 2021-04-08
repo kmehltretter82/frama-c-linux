@@ -1,9 +1,3 @@
-diff tests/builtins/oracle/allocated.0.res.oracle tests/builtins/oracle_octagons/allocated.0.res.oracle
-273c273
-<   j ∈ [1..2147483647]
----
->   j ∈ {10}
-diff tests/builtins/oracle/allocated.1.res.oracle tests/builtins/oracle_octagons/allocated.1.res.oracle
 171a172,173
 > [eva] tests/builtins/allocated.c:82: Call to builtin malloc
 > [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_7
@@ -282,42 +276,3 @@ diff tests/builtins/oracle/allocated.1.res.oracle tests/builtins/oracle_octagons
 >     __malloc_main_l82_36[0..2]; __malloc_main_l82_37[0..2];
 >     __malloc_main_l97[0]; __malloc_main_l114[0..3]; __malloc_main_l127;
 >     __malloc_main_l127_0[0..1]; __malloc_main_l127_1[0..2];
-diff tests/builtins/oracle/imprecise.res.oracle tests/builtins/oracle_octagons/imprecise.res.oracle
-229a230,231
-> [kernel] tests/builtins/imprecise.c:111: 
->   more than 200(300) elements to enumerate. Approximating.
-238a241,242
-> [kernel] tests/builtins/imprecise.c:114: 
->   more than 200(300) elements to enumerate. Approximating.
-242,245d245
-< [kernel] tests/builtins/imprecise.c:111: 
-<   more than 200(300) elements to enumerate. Approximating.
-< [kernel] tests/builtins/imprecise.c:114: 
-<   more than 200(300) elements to enumerate. Approximating.
-diff tests/builtins/oracle/linked_list.1.res.oracle tests/builtins/oracle_octagons/linked_list.1.res.oracle
-530a531,532
-> [kernel] tests/builtins/linked_list.c:43: 
->   more than 100(127) elements to enumerate. Approximating.
-532a535,536
-> [kernel] tests/builtins/linked_list.c:44: 
->   more than 100(127) elements to enumerate. Approximating.
-702a707,708
-> [kernel] tests/builtins/linked_list.c:43: 
->   more than 100(128) elements to enumerate. Approximating.
-704a711,712
-> [kernel] tests/builtins/linked_list.c:44: 
->   more than 100(128) elements to enumerate. Approximating.
-800,803d807
-< [kernel] tests/builtins/linked_list.c:43: 
-<   more than 100(128) elements to enumerate. Approximating.
-< [kernel] tests/builtins/linked_list.c:44: 
-<   more than 100(128) elements to enumerate. Approximating.
-diff tests/builtins/oracle/malloc-optimistic.res.oracle tests/builtins/oracle_octagons/malloc-optimistic.res.oracle
-3520c3520
-<   i ∈ [14..100]
----
->   i ∈ {98; 99; 100}
-3524c3524
-<   i ∈ [14..100]
----
->   i ∈ {98; 99; 100}
