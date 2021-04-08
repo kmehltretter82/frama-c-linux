@@ -340,6 +340,8 @@ let example_msg =
      EXIT: <number>      @[<v 0># Defines the exit code required for the next sub-test commands.@]@  \
      FILTER: <cmd>       @[<v 0># Performs a transformation on the test result files before the comparison from the oracles.@ \
      # The oracle will be compared from the standard output of the command: cat <test-output-file> | <cmd> .@ \
+     # Chaining multiple filter commands is possible in defining several FILTER directives.@ \
+     # An empty command drops the previous FILTER directives.@ \
      # Note: in such a command, the @@PTEST_ORACLE@@ variable is set to the basename of the oracle.@ \
      # That allows to perform a 'diff' command with the oracle of another test configuration:@ \
      #    FILTER: diff --new-file @@PTEST_DIR@@/oracle_configuration/@@PTEST_ORACLE@@ @]@  \

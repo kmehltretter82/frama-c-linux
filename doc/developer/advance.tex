@@ -1168,18 +1168,20 @@ or
   the suite. This directive is only
   usable in a \texttt{test\_config}\codeidx{test\_config}
   configuration file.
-\item The \texttt{FILTER}\nscodeidx{Test!Directive}{FILTER} command performs
-  a transformation on the test result files before the comparison from the
+\item The \texttt{FILTER}\nscodeidx{Test!Directive}{FILTER} directive specifies
+  a transformation on the test result files before the comparison to the the
   oracles.
-  The filter command read the result from the standard input and the oracle
-  will be compared from the standard output of that command.
-  In such a command, the  \texttt{@PTEST\_ORACLE@} variable is set to the
+  The filtering command read the result from the standard input and the oracle
+  will be compared with the standard output of that command.
+  In such a directive, the \texttt{@PTEST\_ORACLE@} variable is set to the
   basename of the oracle.
   That allows to perform a \texttt{diff} command with the oracle of another
   test configuration:
   \begin{code}
     FILTER: diff --new-file @PTEST_DIR@/oracle_configuration/@PTEST_ORACLE@
   \end{code}
+  Chaining multiple filter commands is possible in defining several \texttt{FILTER} directives,
+  and an empty command drops the previous \texttt{FILTER} directives.
 \end{itemize}
 
 \begin{important}
