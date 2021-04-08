@@ -25,6 +25,10 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-* runtime      [2021-04-08] Fix backtrace output on failed assertion
+                (frama-c/e-acsl#151).
+-* runtime      [2021-04-08] Fix incorrect check on program arguments when the
+                main function takes no arguments (frama-c/e-acsl#151).
 -* runtime      [2021-03-30] Fix the end address of the memory segments in the
                 RTL layouts.
 -  E-ACSL       [2021-03-25] Add support for `check` and `admit` annotations
