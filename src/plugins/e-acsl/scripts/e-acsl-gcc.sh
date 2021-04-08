@@ -803,8 +803,10 @@ fi
 # compilation
 if [ -n "$OPTION_RT_DEBUG" ]; then
   OPT_CFLAGS="-g3 -O0 -fno-omit-frame-pointer"
+  OPT_LDFLAGS="-no-pie"
 else
   OPT_CFLAGS="-g -O2"
+  OPT_LDFLAGS=""
 fi
 
 # Gcc and related flags
@@ -837,7 +839,8 @@ if [ "`basename $CC`" = 'clang' ]; then
 fi
 
 CPPFLAGS="$OPTION_CPPFLAGS"
-LDFLAGS="$OPTION_LDFLAGS"
+LDFLAGS="$OPTION_LDFLAGS
+  $OPT_LDFLAGS"
 
 # Dlmalloc
 if [ -n "$OPTION_WITH_DLMALLOC" ]; then
