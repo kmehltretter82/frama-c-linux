@@ -129,6 +129,20 @@ let str_split_list =
     let _,_,res = (add "" acc) in
     res
 
+(* removes first blanks *)
+let trim_right s =
+  let n = ref (String.length s - 1) in
+  let last_char_to_keep =
+    try
+      while !n > 0 do
+        if String.get s !n <> ' ' then raise Exit;
+        n := !n - 1
+      done;
+      0
+    with Exit -> !n
+  in
+  String.sub s 0 (last_char_to_keep+1)
+
 let default_env = ref []
 
 let add_default_env x y = default_env:=(x,y)::!default_env
@@ -934,7 +948,12 @@ end = struct
       (fun ~drop:_ ~file:_ _ s current -> { current with dc_test_regexp = s });
 
       "FILTER",
-      (fun ~drop:_ ~file:_ _ s current -> { current with dc_filter = Some s });
+      (fun ~drop:_ ~file:_ _ s current ->
+         let s = trim_right s in
+         match current.dc_filter with
+         | None when s="" -> { current with dc_filter = None }
+         | None           -> { current with dc_filter = Some s }
+         | Some filter    -> { current with dc_filter = Some (filter ^ " | " ^ s) });
 
       "EXIT",
       (fun ~drop:_ ~file:_ _ s current -> { current with dc_exit_code = Some s });
@@ -1566,19 +1585,6 @@ let check_file_is_empty_or_nonexisting diff ~log_file =
      environment variable. Returns [None] if not found, or
      [Some <fullpath>] otherwise. *)
 let find_in_path s =
-  let trim_right s =
-    let n = ref (String.length s - 1) in
-    let last_char_to_keep =
-      try
-        while !n > 0 do
-          if String.get s !n <> ' ' then raise Exit;
-          n := !n - 1
-        done;
-        0
-      with Exit -> !n
-    in
-    String.sub s 0 (last_char_to_keep+1)
-  in
   let s = trim_right s in
   let path_separator = if Sys.os_type = "Win32" then ";" else ":" in
   let re_path_sep = Str.regexp path_separator in
