@@ -1133,16 +1133,17 @@ struct
 
   (* Intersection and difference between a map and a shape. *)
   let partition_with_shape =
-    let extract_leaf key map =
-      try wrap_Leaf key (find key map)
-      with Not_found -> Empty
-    in
     let rec merge shape map =
       match shape, map with
       | Empty, _ -> Empty, map
       | _, Empty -> Empty, Empty
       | _, Leaf (key, _, _) -> if mem key shape then map, Empty else Empty, map
-      | Leaf (key, _, _), _ -> extract_leaf key map, remove key map
+      | Leaf (key, _, _), _ -> begin
+          try
+            let v = find key map in
+            wrap_Leaf key v, remove key map
+          with Not_found -> Empty, map
+        end
       | Branch (p, m, s0, s1, _), Branch (q, n, t0, t1, _) ->
         let rewrap p m u0 u1 =
           if t0 == u0 && t1 == u1 then map
