@@ -1037,7 +1037,7 @@ and pp_global_annotation fmt = function
 
 and pp_custom_tree fmt _custom_tree = Format.fprintf fmt "CustomDummy"
 
-and pp_variant fmt = pp_pair pp_term (pp_option pp_string) fmt
+and pp_variant fmt = pp_pair pp_term (pp_option pp_logic_info) fmt
 
 let pp_kinstr fmt = function
   | Kstmt(stmt) -> Format.fprintf fmt "Kstmt(%a)"  pp_stmt stmt

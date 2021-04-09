@@ -3541,7 +3541,11 @@ struct
 
   let type_variant env = function
     | (t, None) -> (type_int_term (base_ctxt env) env t, None)
-    | (t, r) -> (term env t, r)
+    | (t, Some r) ->
+      let loc = t.lexpr_loc in
+      let t = term env t in
+      let li, _, _, _ = type_logic_app env loc r [] [t; t] in
+      (t, Some li)
 
   let id_predicate env pred = Logic_const.new_predicate (predicate env pred)
 

@@ -20,43 +20,30 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Manipulate the type of numbers. *)
+
 open Cil_types
 
-(** Generate C implementations of user-defined logic functions.
-    A logic function can have multiple C implementations depending on
-    the types computed for its arguments.
-    Eg: Consider the following definition: [integer g(integer x) = x]
-      with the following calls: [g(5)] and [g(10*INT_MAX)]
-      They will respectively generate the C prototypes [int g_1(int)]
-      and [long g_2(long)] *)
+(** Type of a string that represents a number.
+    Used when a string is required to encode a constant number because it is not
+    representable in any C type  *)
+type strnum =
+  | Str_Z         (* integers *)
+  | Str_R         (* reals *)
+  | C_number      (* integers and floats included *)
 
-(**************************************************************************)
-(************** Logic functions without labels ****************************)
-(**************************************************************************)
-
-val reset: unit -> unit
-
-val tapp_to_exp:
-  kernel_function -> Env.t -> ?eargs:exp list -> term -> exp * Env.t
-(** Translate a Tapp term to an expression. If the optional argument [eargs] is
-    provided, then these expressions are used as arguments of the fonction. *)
-
-val add_generated_functions: global list -> global list
-(* @return the input list of globals in which the generated functions have been
-   inserted at the right places (both their declaration and their definition) *)
-
-(**************************************************************************)
-(********************** Forward references ********************************)
-(**************************************************************************)
-
-val predicate_to_exp_ref:
-  (kernel_function -> Env.t -> predicate -> exp * Env.t) ref
-
-val term_to_exp_ref:
-  (kernel_function -> Env.t -> term -> exp * Env.t) ref
-
-(*
-Local Variables:
-compile-command: "make -C ../.."
-End:
-*)
+(** [add_cast ~loc ?name env kf ctx sty t_opt e] convert number expression [e]
+    in a way that it is compatible with the given typing context [ctx].
+    [sty] indicates if the expression is a string representing a number (integer
+    or real) or directly a C number type.
+    [t_opt] is the term that is represented by the expression [e]. *)
+val add_cast:
+  loc:location ->
+  ?name:string ->
+  Env.t ->
+  kernel_function ->
+  typ option ->
+  strnum ->
+  term option ->
+  exp ->
+  exp * Env.t

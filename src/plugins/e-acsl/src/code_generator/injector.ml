@@ -224,8 +224,8 @@ let add_new_block_in_stmt env kf stmt =
         end else
           env
       in
-      (* handle loop invariants *)
-      let new_stmt, env = Loops.preserve_invariant env kf stmt in
+      (* handle loop annotations *)
+      let new_stmt, env = Loops.handle_annotations env kf stmt in
       new_stmt, env
     else
       stmt, env

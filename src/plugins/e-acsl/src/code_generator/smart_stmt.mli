@@ -104,6 +104,7 @@ type annotation_kind =
   | Precondition
   | Postcondition
   | Invariant
+  | Variant
   | RTE
 
 val runtime_check:

@@ -57,7 +57,7 @@ let pre_funspec kf kinstr env funspec =
     unsupported
       (fun spec ->
          let ppt = Property.ip_decreases_of_spec kf kinstr spec in
-         if must_translate_opt ppt then Env.not_yet env "variant clause")
+         if must_translate_opt ppt then Env.not_yet env "decreases clause")
       funspec;
     (* TODO: spec.spec_terminates is not part of the E-ACSL subset *)
     unsupported
@@ -67,8 +67,9 @@ let pre_funspec kf kinstr env funspec =
       funspec;
     env
   in
-  let env = convert_unsupported_clauses env in
   let loc = Kernel_function.get_location kf in
+  Cil.CurrentLoc.set loc;
+  let env = convert_unsupported_clauses env in
   let contract = Contract.create ~loc funspec in
   Env.with_rte env true
     ~f:(fun env -> Contract.translate_preconditions kf kinstr env contract)
@@ -110,9 +111,9 @@ let pre_code_annotation kf stmt env annot =
         else env
       else
         env
-    | AVariant _ ->
+    | AVariant (t, measure) ->
       if must_translate (Property.ip_of_code_annot_single kf stmt annot)
-      then Env.not_yet env "variant"
+      then Env.set_loop_variant env ?measure t
       else env
     | AAssigns _ ->
       (* TODO: it is not a precondition --> should not be handled here,
