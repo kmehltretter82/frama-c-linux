@@ -25,6 +25,7 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-  E-ACSL       [2021-04-09] Add support for loop variant.
 -  E-ACSL       [2021-04-07] Add support for multiple binders in guarded
                 quantifications (frama-c/e-acsl#127).
 -* runtime      [2021-04-08] Fix backtrace output on failed assertion
