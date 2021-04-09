@@ -5,6 +5,7 @@
 \chapter{Compliance}
 \label{user-compliance}
 
+\newcommand{\CWE}[1]{\href{https://cwe.mitre.org/data/definitions/#1.html}{CWE-#1}}
 
 % Macros used by the tables in this chapter
 \definecolor{lightgray}{gray}{0.9}
@@ -246,125 +247,126 @@ handling of the CWE by \FramaC, as one of the following:
   \endhead
   \endfoot
   \label{tab:cwe}%
-  CWE-15: External Control of System or Configuration Setting & Annotations & Requires annotating configuration settings and untrusted sources\\
-  CWE-23: Relative Path Traversal & Annotations & Requires annotating path-related functions and untrusted sources\\
-  CWE-36: Absolute Path Traversal & Annotations & Requires annotating path-related functions and untrusted sources\\
-  CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection') & Annotations & Requires annotating which functions may inject OS commands\\
-  CWE-90: Improper Neutralization of Special Elements used in an LDAP Query ('LDAP Injection') & Annotations & Requires annotating which functions are LDAP-related\\
-  CWE-114: Process Control & Annotations & Requires annotating sensitive functions and untrusted sources\\
-  CWE-121: Stack-based Buffer Overflow & Handled & -\\
-  CWE-122: Heap-based Buffer Overflow & Handled & -\\
-  CWE-123: Write-what-where Condition & Handled & -\\
-  CWE-124: Buffer Underwrite & Handled & -\\
-  CWE-126: Buffer Overread & Handled & -\\
-  CWE-126: Buffer Underread & Handled & -\\
-  CWE-134: Use of Externally-Controlled Format String & Annotations & Requires annotating which format strings come from external sources\\
-  CWE-176: Improper Handling of Unicode Encoding & Annotations & Requires annotating Unicode-related functions and variables\\
-  CWE-188: Reliance on Data Memory Layout & Partially Handled & \FramaC memory model handles some kinds of invalid accesses\\
-  CWE-190: Integer Overflow or Wraparound & Handled & See remarks about {\em CC.17} in Table~\ref{tab:undefined-unspecified-behaviors}\\
-  CWE-191: Integer Underflow & Handled & See remarks about {\em CC.17} in Table~\ref{tab:undefined-unspecified-behaviors}\\
-  CWE-194: Unexpected Sign Extension & Handled & See note about {\em Numerical Conversions}\\
-  CWE-195: Signed to Unsigned Conversion Error & Handled & See note about {\em Numerical Conversions}\\
-  CWE-196: Unsigned to Signed Conversion Error & Handled & See note about {\em Numerical Conversions}\\
-  CWE-197: Numeric Truncation Error & Handled & See note about {\em Numerical Conversions}\\
-  CWE-222: Truncation of Security Relevant Information & Not Handled & -\\
-  CWE-223: Omission of Security Relevant Information & Not Handled & -\\
-  CWE-226: Sensitive Information in Resource Not Removed Before Reuse & Annotations & Requires annotating shared resources and external entities\\
-  CWE-242: Use of Inherently Dangerous Function & Annotations & Requires annotating which functions are ``inherently dangerous''\\
-  CWE-244: Improper Clearing of Heap Memory Before Release ('Heap Inspection') & Not Handled & Semantic property unavailable at the C memory model; syntactic heuristics can be devised\\
-  CWE-252: Unchecked Return Value & Syntactic & -\\
-  CWE-253: Incorrect Check of Function Return Value & Syntactic + Annotations & Similar to CWE-252, but also requires annotations definining what ``correct check'' means\\
-  CWE-256: Unprotected Storage of Credentials & Annotations & Requires annotating credential-related functions and variables\\
-  CWE-259: Use of Hard-coded Password & Annotations & Requires annotating password-related functions and variables\\
-  CWE-272: Least Privilege Violation & Annotations & Requires annotating sensitive functions\\
-  CWE-273: Improper Check for Dropped Privileges & Annotations & Requires annotating sensitive functions and forbidden control paths\\
-  CWE-284: Improper Access Control & Annotations & Requires annotating privileges, permissions, control paths, etc.\\
-  CWE-319: Cleartext Transmission of Sensitive Information & Annotations & Requires annotating sensitive data and transmission-related functions\\
-  CWE-321: Hard Coded Cryptographic Key & Annotations & Requires annotating which data correspond to cryptographic keys\\
-  CWE-325: Missing Cryptographic Step & Annotations & Requires annotating sequences of valid cryptographic function calls\\
-  CWE-327: Use of a Broken or Risky Cryptographic Algorithm & Annotations & Requires annotating which algorithms are ``broken or risky''\\
-  CWE-328: Reversible One-Way Hash & Annotations & Requires annotating hash-related functions and variables\\
-  CWE-338: Use of Cryptographically Weak Pseudo-Random Number Generator (PRNG) & Annotations & Requires annotating PRNG-related functions and variables\\
-  CWE-364: Signal Handler Race Condition & Not Handled & Some situations can be handled by the Mthread plugin\\
-  CWE-366: Race Condition Within Thread & Not Handled & Some situations can be handled by the Mthread plugin\\
-  CWE-367: TOC TOU & Not Handled & -\\
-  CWE-369: Divide by Zero & Handled & -\\
-  CWE-377: Insecure Temporary File & Annotations & Requires annotating functions and data flows related to temporary files\\
-  CWE-390: Error Without Action & Not Handled & -\\
-  CWE-391: Unchecked Error Condition & Not Handled & -\\
-  CWE-400: Uncontrolled Resource Consumption & Annotations & Requires annotating resource-related functions and variables\\
-  CWE-401: Missing Release of Memory after Effective Lifetime & Partially Handled & The Eva plugin contains a builtin to check for {\em some} cases of memory leaks; must be explicitly invoked\\
-  CWE-404: Improper Resource Shutdown or Release & Annotations & Requires annotating resources and functions manipulating them\\
-  CWE-415: Double Free & Handled & -\\
-  CWE-416: Use After Free & Handled & -\\
-  CWE-426: Untrusted Search Path & Not Handled & Not UB-related; requires annotations\\
-  CWE-427: Uncontrolled Search Path Element & Annotations & Requires annotating path-related functions and untrusted sources\\
-  CWE-440: Expected Behavior Violation & Too Vague & -\\
-  CWE-457: Use of Uninitialized Variable & Handled & See remarks about {\em DD.10}\\
-  CWE-459: Incomplete Cleanup & Annotations & Requires annotating resources and cleanup functions\\
-  CWE-464: Addition of Data Structure Sentinel & Not Handled & -\\
-  CWE-467: Use of sizeof on a Pointer Type & Syntactic & -\\
-  CWE-468: Incorrect Pointer Scaling & Syntactic & -\\
-  CWE-469: Use of Pointer Subtraction to Determine Size & Handled & -\\
-  CWE-475: Undefined Behavior for Input to API & Too Vague & \FramaC already handles some cases related to the C standard library, but in general, may require annotations\\
-  CWE-476: NULL Pointer Dereference & Handled & -\\
-  CWE-478: Missing Default Case in Switch & Syntactic & -\\
-  CWE-479: Signal Handler Use of Non Reentrant Function & Not Handled & -\\
-  CWE-480: Use of Incorrect Operator & Too Vague & -\\
-  CWE-481: Assigning Instead of Comparing & Syntactic & -\\
-  CWE-482: Comparing Instead of Assigning & Syntactic & -\\
-  CWE-483: Incorrect Block Delimitation & Syntactic & -\\
-  CWE-484: Omitted Break Statement in Switch & Syntactic & -\\
-  CWE-506: Embedded Malicious Code & Too Vague & Defining ``malicious code'' automatically is hard; manual annotations defeat the purpose\\
-  CWE-510: Trapdoor & Too Vague & Sound analyses such as those proposed by \FramaC are able to exhaustively identify some kinds of trapdoors\\
-  CWE-511: Logic/Time Bomb & Not Handled & -\\
-  CWE-526: Exposure of Sensitive Information Through Environmental Variables & Annotations & Requires annotating sensitive information and environment-related functions and variables\\
-  CWE-546: Suspicious Comment & Syntactic & -\\
-  CWE-561: Dead Code & Partially Handled & Metrics and Eva provide information about syntactic and semantic coverage\\
-  CWE-562: Return of Stack Variable Address & Handled & Related to Eva's warning category \texttt{locals-escaping}\\
-  CWE-563: Unused Variable & Syntactic & Mostly syntactic in nature; compilers often warn about it\\
-  CWE-570: Expression Always False & Syntactic & Mostly syntactic in nature; compilers often warn about it\\
-  CWE-571: Expression Always True & Syntactic & Mostly syntactic in nature; compilers often warn about it\\
-  CWE-587: Assignment of Fixed Address to Pointer & Handled Indirectly & Detected at the point of usage; option \texttt{-absolute-valid-range} changes its behavior\\
-  CWE-588: Attempt to Access Child of a Non-structure Pointer & Partially Handled & \FramaC emits warnings for certain types of incompatible casts\\
-  CWE-590: Free Memory Not on Heap & Handled & -\\
-  CWE-591: Sensitive Data Storage in Improperly Locked Memory & Not Handled & -\\
-  CWE-605: Multiple Binds to the Same Port & Annotations & Requires annotating socket-related functions and variables\\
-  CWE-606: Unchecked Loop Condition & Annotations & Requires annotating which data is user-supplied\\
-  CWE-615: Inclusion of Sensitive Information in Source Code Comments & Not Handled & -\\
-  CWE-617: Reachable Assertion & Handled & \FramaC's libc \texttt{assert} specification contains an ACSL assertion\\
-  CWE-620: Unverified Password Change & Not Handled & -\\
-  CWE-665: Improper Initialization & Handled & -\\
-  CWE-666: Operation on Resource in Wrong Phase of Lifetime & Annotations & Requires annotating resources and their lifecycles\\
-  CWE-667: Improper Locking & Annotations & Requires annotating locks and functions manipulating them\\
-  CWE-672: Operation on Resource After Expiration or Release & Annotations & Requires annotating resources and their lifecycles\\
-  CWE-674: Uncontrolled Recursion & Too Vague & The identification of an ``uncontrolled'' recursion is complex\\
-  CWE-675: Duplicate Operations on Resource & Annotations & Requires annotating resources and operations on them\\
-  CWE-676: Use of Potentially Dangerous Function & Annotations & Requires annotating which functions are ``potentially dangerous''\\
-  CWE-680: Integer Overflow to Buffer Overflow & Handled & -\\
-  CWE-681: Incorrect Conversion Between Numeric Types & Partially Handled & See note about {\em Numerical Conversions}\\
-  CWE-685: Function Call With Incorrect Number of Arguments & Partially Handled & The Variadic plugin handles most cases related to variadic function calls\\
-  CWE-688: Function Call With Incorrect Variable or Reference as Argument\\
-  CWE-690: Unchecked Return Value to NULL Pointer Dereference & Handled & For functions related to dynamically allocated memory, toggled via option \texttt{-eva-alloc-returns-null}\\
-  CWE-758: Undefined Behavior & Too Vague; Partially Handled & The C language has too many undefined behaviors, but Frama-C does handle several of them\\
-  CWE-761: Free Pointer Not at Start of Buffer & Handled & -\\
-  CWE-762: Mismatched Memory Management Routines & Annotations & Requires annotating memory management functions and objects\\
-  CWE-773: Missing Reference to Active File Descriptor or Handle & Annotations & Requires annotating resources and operations on them\\
-  CWE-775: Missing Release of File Descriptor or Handle & Annotations & Requires annotating resources and their lifecycles\\
-  CWE-780: Use of RSA Algorithm Without OAEP & Not Handled & -\\
-  CWE-785: Path Manipulation Function Without Max Sized Buffer & Annotations & Requires all relevant filepath-related functions to have correct annotations\\
-  CWE-789: Memory Allocation with Excessive Size Value & Annotations & Requires annotating memory limits\\
-  CWE-832: Unlock of Resource That is Not Locked & Annotations & Requires annotating resources and operations on them\\
-  CWE-835: Infinite Loop & Partially Handled & Loops which, semantically, are {\em always} infinite are reported by the Nonterm plugin\\
-  CWE-843: Access of Resource Using Incompatible Type ('Type Confusion') & Not Handled & -\\
-  CWE-912: Hidden Functionality & Too Vague & \FramaC's sound analysis can show the absence of backdoors, but only if they can be semantically specified (e.g. via annotations)\\
+  \CWE{15}: External Control of System or Configuration Setting & Annotations & Requires annotating configuration settings and untrusted sources\\
+  \CWE{23}: Relative Path Traversal & Annotations & Requires annotating path-related functions and untrusted sources\\
+  \CWE{36}: Absolute Path Traversal & Annotations & Requires annotating path-related functions and untrusted sources\\
+  \CWE{78}: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection') & Annotations & Requires annotating which functions may inject OS commands\\
+  \CWE{90}: Improper Neutralization of Special Elements used in an LDAP Query ('LDAP Injection') & Annotations & Requires annotating which functions are LDAP-related\\
+  \CWE{114}: Process Control & Annotations & Requires annotating sensitive functions and untrusted sources\\
+  \CWE{121}: Stack-based Buffer Overflow & Handled & -\\
+  \CWE{122}: Heap-based Buffer Overflow & Handled & -\\
+  \CWE{123}: Write-what-where Condition & Handled & -\\
+  \CWE{124}: Buffer Underwrite & Handled & -\\
+  \CWE{126}: Buffer Overread & Handled & -\\
+  \CWE{126}: Buffer Underread & Handled & -\\
+  \CWE{134}: Use of Externally-Controlled Format String & Annotations & Requires annotating which format strings come from external sources\\
+  \CWE{176}: Improper Handling of Unicode Encoding & Annotations & Requires annotating Unicode-related functions and variables\\
+  \CWE{188}: Reliance on Data Memory Layout & Partially Handled & \FramaC memory model handles some kinds of invalid accesses\\
+  \CWE{190}: Integer Overflow or Wraparound & Handled & See remarks about {\em CC.17} in Table~\ref{tab:undefined-unspecified-behaviors}\\
+  \CWE{191}: Integer Underflow & Handled & See remarks about {\em CC.17} in Table~\ref{tab:undefined-unspecified-behaviors}\\
+  \CWE{194}: Unexpected Sign Extension & Handled & See note about {\em Numerical Conversions}\\
+  \CWE{195}: Signed to Unsigned Conversion Error & Handled & See note about {\em Numerical Conversions}\\
+  \CWE{196}: Unsigned to Signed Conversion Error & Handled & See note about {\em Numerical Conversions}\\
+  \CWE{197}: Numeric Truncation Error & Handled & See note about {\em Numerical Conversions}\\
+  \CWE{222}: Truncation of Security Relevant Information & Not Handled & -\\
+  \CWE{223}: Omission of Security Relevant Information & Not Handled & -\\
+  \CWE{226}: Sensitive Information in Resource Not Removed Before Reuse & Annotations & Requires annotating shared resources and external entities\\
+  \CWE{242}: Use of Inherently Dangerous Function & Annotations & Requires annotating which functions are ``inherently dangerous''\\
+  \CWE{244}: Improper Clearing of Heap Memory Before Release ('Heap Inspection') & Not Handled & Semantic property unavailable at the C memory model; syntactic heuristics can be devised\\
+  \CWE{252}: Unchecked Return Value & Syntactic & -\\
+  \CWE{253}: Incorrect Check of Function Return Value & Syntactic + Annotations & Similar to \CWE{252}, but also requires annotations definining what ``correct check'' means\\
+  \CWE{256}: Unprotected Storage of Credentials & Annotations & Requires annotating credential-related functions and variables\\
+  \CWE{259}: Use of Hard-coded Password & Annotations & Requires annotating password-related functions and variables\\
+  \CWE{272}: Least Privilege Violation & Annotations & Requires annotating sensitive functions\\
+  \CWE{273}: Improper Check for Dropped Privileges & Annotations & Requires annotating sensitive functions and forbidden control paths\\
+  \CWE{284}: Improper Access Control & Annotations & Requires annotating privileges, permissions, control paths, etc.\\
+  \CWE{319}: Cleartext Transmission of Sensitive Information & Annotations & Requires annotating sensitive data and transmission-related functions\\
+  \CWE{321}: Hard Coded Cryptographic Key & Annotations & Requires annotating which data correspond to cryptographic keys\\
+  \CWE{325}: Missing Cryptographic Step & Annotations & Requires annotating sequences of valid cryptographic function calls\\
+  \CWE{327}: Use of a Broken or Risky Cryptographic Algorithm & Annotations & Requires annotating which algorithms are ``broken or risky''\\
+  \CWE{328}: Reversible One-Way Hash & Annotations & Requires annotating hash-related functions and variables\\
+  \CWE{338}: Use of Cryptographically Weak Pseudo-Random Number Generator (PRNG) & Annotations & Requires annotating PRNG-related functions and variables\\
+  \CWE{364}: Signal Handler Race Condition & Not Handled & Some situations can be handled by the Mthread plugin\\
+  \CWE{366}: Race Condition Within Thread & Not Handled & Some situations can be handled by the Mthread plugin\\
+  \CWE{367}: TOC TOU & Not Handled & -\\
+  \CWE{369}: Divide by Zero & Handled & -\\
+  \CWE{377}: Insecure Temporary File & Annotations & Requires annotating functions and data flows related to temporary files\\
+  \CWE{390}: Error Without Action & Not Handled & -\\
+  \CWE{391}: Unchecked Error Condition & Not Handled & -\\
+  \CWE{400}: Uncontrolled Resource Consumption & Annotations & Requires annotating resource-related functions and variables\\
+  \CWE{401}: Missing Release of Memory after Effective Lifetime & Partially Handled & The Eva plugin contains a builtin to check for {\em some} cases of memory leaks; must be explicitly invoked\\
+  \CWE{404}: Improper Resource Shutdown or Release & Annotations & Requires annotating resources and functions manipulating them\\
+  \CWE{415}: Double Free & Handled & -\\
+  \CWE{416}: Use After Free & Handled & -\\
+  \CWE{426}: Untrusted Search Path & Not Handled & Not UB-related; requires annotations\\
+  \CWE{427}: Uncontrolled Search Path Element & Annotations & Requires annotating path-related functions and untrusted sources\\
+  \CWE{440}: Expected Behavior Violation & Too Vague & -\\
+  \CWE{457}: Use of Uninitialized Variable & Handled & See remarks about {\em DD.10}\\
+  \CWE{459}: Incomplete Cleanup & Annotations & Requires annotating resources and cleanup functions\\
+  \CWE{464}: Addition of Data Structure Sentinel & Not Handled & -\\
+  \CWE{467}: Use of sizeof on a Pointer Type & Syntactic & -\\
+  \CWE{468}: Incorrect Pointer Scaling & Syntactic & -\\
+  \CWE{469}: Use of Pointer Subtraction to Determine Size & Handled & -\\
+  \CWE{475}: Undefined Behavior for Input to API & Too Vague & \FramaC already handles some cases related to the C standard library, but in general, may require annotations\\
+  \CWE{476}: NULL Pointer Dereference & Handled & -\\
+  \CWE{478}: Missing Default Case in Switch & Syntactic & -\\
+  \CWE{479}: Signal Handler Use of Non Reentrant Function & Not Handled & -\\
+  \CWE{480}: Use of Incorrect Operator & Too Vague & -\\
+  \CWE{481}: Assigning Instead of Comparing & Syntactic & -\\
+  \CWE{482}: Comparing Instead of Assigning & Syntactic & -\\
+  \CWE{483}: Incorrect Block Delimitation & Syntactic & -\\
+  \CWE{484}: Omitted Break Statement in Switch & Syntactic & -\\
+  \CWE{506}: Embedded Malicious Code & Too Vague & Defining ``malicious code'' automatically is hard; manual annotations defeat the purpose\\
+  \CWE{510}: Trapdoor & Too Vague & Sound analyses such as those proposed by \FramaC are able to exhaustively identify some kinds of trapdoors\\
+  \CWE{511}: Logic/Time Bomb & Not Handled & -\\
+  \CWE{526}: Exposure of Sensitive Information Through Environmental Variables & Annotations & Requires annotating sensitive information and environment-related functions and variables\\
+  \CWE{546}: Suspicious Comment & Syntactic & -\\
+  \CWE{561}: Dead Code & Partially Handled & Metrics and Eva provide information about syntactic and semantic coverage\\
+  \CWE{562}: Return of Stack Variable Address & Handled & Related to Eva's warning category \texttt{locals-escaping}\\
+  \CWE{563}: Unused Variable & Syntactic & Mostly syntactic in nature; compilers often warn about it\\
+  \CWE{570}: Expression Always False & Syntactic & Mostly syntactic in nature; compilers often warn about it\\
+  \CWE{571}: Expression Always True & Syntactic & Mostly syntactic in nature; compilers often warn about it\\
+  \CWE{587}: Assignment of Fixed Address to Pointer & Handled Indirectly & Detected at the point of usage; option \texttt{-absolute-valid-range} changes its behavior\\
+  \CWE{588}: Attempt to Access Child of a Non-structure Pointer & Partially Handled & \FramaC emits warnings for certain types of incompatible casts\\
+  \CWE{590}: Free Memory Not on Heap & Handled & -\\
+  \CWE{591}: Sensitive Data Storage in Improperly Locked Memory & Not Handled & -\\
+  \CWE{605}: Multiple Binds to the Same Port & Annotations & Requires annotating socket-related functions and variables\\
+  \CWE{606}: Unchecked Loop Condition & Annotations & Requires annotating which data is user-supplied\\
+  \CWE{615}: Inclusion of Sensitive Information in Source Code Comments & Not Handled & -\\
+  \CWE{617}: Reachable Assertion & Handled & \FramaC's libc \texttt{assert} specification contains an ACSL assertion\\
+  \CWE{620}: Unverified Password Change & Not Handled & -\\
+  \CWE{665}: Improper Initialization & Handled & -\\
+  \CWE{666}: Operation on Resource in Wrong Phase of Lifetime & Annotations & Requires annotating resources and their lifecycles\\
+  \CWE{667}: Improper Locking & Annotations & Requires annotating locks and functions manipulating them\\
+  \CWE{672}: Operation on Resource After Expiration or Release & Annotations & Requires annotating resources and their lifecycles\\
+  \CWE{674}: Uncontrolled Recursion & Too Vague & The identification of an ``uncontrolled'' recursion is complex\\
+  \CWE{675}: Duplicate Operations on Resource & Annotations & Requires annotating resources and operations on them\\
+  \CWE{676}: Use of Potentially Dangerous Function & Annotations & Requires annotating which functions are ``potentially dangerous''\\
+  \CWE{680}: Integer Overflow to Buffer Overflow & Handled & -\\
+  \CWE{681}: Incorrect Conversion Between Numeric Types & Partially Handled & See note about {\em Numerical Conversions}\\
+  \CWE{685}: Function Call With Incorrect Number of Arguments & Partially Handled & The Variadic plugin handles most cases related to variadic function calls\\
+  \CWE{688}: Function Call With Incorrect Variable or Reference as Argument\\
+  \CWE{690}: Unchecked Return Value to NULL Pointer Dereference & Handled & For functions related to dynamically allocated memory, toggled via option \texttt{-eva-alloc-returns-null}\\
+  \CWE{758}: Undefined Behavior & Too Vague; Partially Handled & The C language has too many undefined behaviors, but Frama-C does handle several of them\\
+  \CWE{761}: Free Pointer Not at Start of Buffer & Handled & -\\
+  \CWE{762}: Mismatched Memory Management Routines & Annotations & Requires annotating memory management functions and objects\\
+  \CWE{773}: Missing Reference to Active File Descriptor or Handle & Annotations & Requires annotating resources and operations on them\\
+  \CWE{775}: Missing Release of File Descriptor or Handle & Annotations & Requires annotating resources and their lifecycles\\
+  \CWE{780}: Use of RSA Algorithm Without OAEP & Not Handled & -\\
+  \CWE{785}: Path Manipulation Function Without Max Sized Buffer & Annotations & Requires all relevant filepath-related functions to have correct annotations\\
+  \CWE{789}: Memory Allocation with Excessive Size Value & Annotations & Requires annotating memory limits\\
+  \CWE{832}: Unlock of Resource That is Not Locked & Annotations & Requires annotating resources and operations on them\\
+  \CWE{835}: Infinite Loop & Partially Handled & Loops which, semantically, are {\em always} infinite are reported by the Nonterm plugin\\
+  \CWE{843}: Access of Resource Using Incompatible Type ('Type Confusion') & Not Handled & -\\
+  \CWE{912}: Hidden Functionality & Too Vague & \FramaC's sound analysis can show the absence of backdoors, but only if they can be semantically specified (e.g. via annotations)\\
 \end{longtable}
 }
 
 \paragraph{Note about {\em Numerical Conversions}}
 
-Some CWEs (CWE-194, CWE-195, CWE-196 and CWE-197) are related to numerical
-conversion issues which do not map directly to undefined behaviors;
+A few CWEs (\CWE{194}, \CWE{195}, \CWE{196} and \CWE{197}) related to numerical
+conversion issues do not map directly to undefined behaviors
+(except, in some cases, to {\em CC.36});
 some of them are related to unspecified and implementation-defined behaviors.
 \FramaC has a set of command-line options to enable warnings related to these
 conversions, when they can overflow or generate unexpected values:
@@ -372,7 +374,7 @@ conversions, when they can overflow or generate unexpected values:
 \texttt{-warn-signed-downcast}, and \texttt{-warn-unsigned-downcast}.
 
 See Section~\ref{sec:customizing-analyzers} for more details and some examples
-related to the these options.
+related to these options.
 
 Also note that conversion from a floating-point value to an integer may
 overflow; in this case, an alarm \texttt{float\_to\_int} is generated,
