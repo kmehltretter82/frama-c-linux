@@ -61,22 +61,6 @@ val normalize: ?existence:existence -> ?base_name:string -> string -> string
     @since Aluminium-20160501 *)
 val relativize: ?base_name:string -> string -> string
 
-(** DEPRECATED: use [Normalized.to_pretty_string] instead.
-    Pretty-print a path according to these rules:
-    - relative filenames are kept, except for leading './', which are stripped;
-    - absolute filenames are relativized if their prefix is included in the
-      current working directory; also, symbolic names are resolved,
-      i.e. the result may be prefixed by known aliases (e.g. FRAMAC_SHARE).
-      See {!add_symbolic_dir} for more details.
-      Therefore, the result of this function may not designate a valid name
-      in the filesystem.
-
-    @since Neon-20140301
-    @deprecated since 18.0-Argon
-*)
-val pretty: string -> string
-[@@deprecated "Use Filepath.Normalized.to_pretty_string instead."]
-
 (** The [Normalized] module is simply a wrapper that ensures that paths are
     always normalized. Used by [Datatype.Filepath].
     @since 18.0-Argon *)
