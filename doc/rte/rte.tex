@@ -738,6 +738,56 @@ int main(void)
 
 \end{example}
 
+\section{Initialization}
+
+Reading an uninitialized value can be an undefined behavior. Mostly two general
+cases apply:
+
+\begin{itemize}
+\item \mbox{ISO C11 6.3.2.1}\footnote{here we use C11 as it is clearer than C99}
+      a variable whose address is never taken is read before being initialized,
+\item a memory location that has never been initialized is read and it happens
+      that it was a trap representation for the type used for the access.
+\end{itemize}
+
+The second item is the consequence of the fact that an uninitialized location
+has indeterminate value (\mbox{6.7.9.10}), thus either an unspecified value or
+a trap representation, and that reading a trap representation is an undefined
+behavior (\mbox{6.2.6.1.5}).
+
+However for (most) types that do not have trap representation, reading an
+unspecified value is generally not a desirable behavior. Thus, \rte{} is
+stricter than the ISO C on many aspects and delegates one case of undefined
+behavior to the use of compiler warnings. We now detail the chosen tradeoff.
+
+If a value of a fundamental type (integers, floating point types, pointers, or
+a typedef of those) is read, it must be initialized except if it is a formal
+parameter or a global variable. We exclude formal parameters as its
+initialization status must be checked at the call point (\rte{} generates an
+annotation for this). We exclude global variables as they are initialized by
+default and any value stored in this variable must be initialized (and \rte{}
+generates an annotation for this).
+
+As structures and unions never have trap representation, they can (and they are
+regularly) be manipulated while being partially initialized. Consequently,
+\rte{} does not requires initialization for reads of a full union or structure
+(while read field with fundamental types are covered by the previous paragraph).
+As a consequence, the case of a structure or union \textit{whose address is never
+ taken is read before being initialized} is \textbf{not} covered by \rte{}. But
+this particular case is efficiently detected by a compiler warning (see
+\lstinline{-Wuninitialized} on GCC and Clang for example) as it only requires
+local reasoning that is easy for compilers (but not that simple to express in
+ACSL).
+
+If you really need \rte{} to cover the previous case, please contact the
+Frama-C team.
+
+Finally, there are some cases when reading uninitialized values via a type that
+cannot have trap representation (for example \lstinline{unsigned char}) should
+be allowed, for example writing a \lstinline{memcpy} function. In this case, one
+can exclude this function from the range of function annotated with
+initialization properties using \lstinline{-rte-initialized-ignore}.
+
 \section{Undefined behaviors not covered by \rte{}}
 
 One should be aware that \rte{} only covers a small subset of all possible
@@ -753,12 +803,6 @@ considered:
   producing a value outside of the representable range (\cnn{} 6.3.1.5)
 \item Conversion between two pointer types produces a result that is incorrectly
   aligned (\cnn{} 6.3.2.3)
-\item Use of a variable with automatic storage duration before its
-  initialization (\cnn{} 6.7.8.10): such a variable has an indeterminate value
-%% technically, not an undefined behavior (does not appear in the list of undefined behavior in
-%% the relevant ANSI C ISO annex), but can as well be considered as one ;
-%% not treated by plug-in because too many annotations would be generated
-%% unless some dataflow analysis is performed
 \end{itemize}
 
 %% \Section{Others}
@@ -844,6 +888,9 @@ casts from floating-point to integer \\
 \hline
 \lstinline |-rte-initialized| & boolean (false) & Generate annotations for
 initialization \\
+\hline
+\lstinline |-rte-initialized-ignore| & set of function (none) & Functions to
+exclude for initialization annotations \\
 \hline
 \lstinline |-rte-mem| & boolean (true) & Generate annotations for validity of
 left-values access \\
