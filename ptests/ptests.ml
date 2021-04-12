@@ -172,7 +172,7 @@ let dir_config_file = "test_config"
     the pattern [test_file_regexp] will be considered as test files *)
 let test_file_regexp = ".*\\.\\(c\\|i\\)$"
 
-(* Splits the command string to extract the command name to the parameters
+(* Splits the command string to separate the command name from the parameters
    [let cmd_name,param=command_partition cmd in assert cmd=cmd_name^param]
 *)
 let command_partition =
@@ -332,7 +332,7 @@ let example_msg =
      EXECNOW: ([LOG|BIN] <file>)+ <command>  @[<v 0># Defines the command to execute to build a 'LOG' (textual) 'BIN' (binary) targets.@ \
      # Note: the textual targets are compared to oracles.@]@  \
      MODULE: <module>... @[<v 0># Compile the module and adds the corresponding '-load-module' option to all sub-test commands.@]@  \
-     LOG: <file>...      @[<v 0># Defines dune targets built by the next sub-test command.@]@  \
+     LOG: <file>...      @[<v 0># Defines targets built by the next sub-test command.@]@  \
      CMD: <command>      @[<v 0># Defines the command to execute for all tests in order to get results to be compared to oracles.@]@  \
      OPT: <options>      @[<v 0># Defines a sub-test using the 'CMD' definition: <command> <options>@]@  \
      STDOPT: +<extra>    @[<v 0># Defines a sub-test and append the extra to the current option.@]@  \
@@ -340,25 +340,25 @@ let example_msg =
      EXIT: <number>      @[<v 0># Defines the exit code required for the next sub-test commands.@]@  \
      FILTER: <cmd>       @[<v 0># Performs a transformation on the test result files before the comparison from the oracles.@ \
      # The oracle will be compared from the standard output of the command: cat <test-output-file> | <cmd> .@ \
-     # Chaining multiple filter commands is possible in defining several FILTER directives.@ \
+     # Chaining multiple filter commands is possible by defining several FILTER directives.@ \
      # An empty command drops the previous FILTER directives.@ \
-     # Note: in such a command, the @@PTEST_ORACLE@@ variable is set to the basename of the oracle.@ \
-     # That allows to perform a 'diff' command with the oracle of another test configuration:@ \
+     # Note: in such a command, the @@PTEST_ORACLE@@ macro is set to the basename of the oracle.@ \
+     # This allows running a 'diff' command with the oracle of another test configuration:@ \
      #    FILTER: diff --new-file @@PTEST_DIR@@/oracle_configuration/@@PTEST_ORACLE@@ @]@  \
      TIMEOUT: <delay>    @[<v 0># Set a timeout for all sub-test.@]@  \
      NOFRAMAC:           @[<v 0># Drops previous sub-test definitions and considers that there is no defined default sub-test.@]@  \
      GCC:                @[<v 0># Deprecated.@]@  \
-     MACRO: <name> <def> @[<v 0># set a definition to the variable @@<name>@@.@]@  \
+     MACRO: <name> <def> @[<v 0># Set a definition to the macro @@<name>@@.@]@  \
      @]@ \
      @[<v 1>\
-     Some variables can be used in test command:@  \
+     Some predefined macros can be used in test commands:@  \
      @@PTEST_DIR@@       # Dirname of the test file.@  \
      @@PTEST_FILE@@      # Substituted by the test filename.@  \
      @@PTEST_NAME@@      # Basename of the test file.@  \
      @@PTEST_NUMBER@@    # Test command number.@  \
      @@PTEST_CONFIG@@    # Test configuration suffix.@  \
      @@PTEST_RESULT@@    # Shorthand alias to @@PTEST_DIR@@/result@@PTEST_CONFIG@@ (the result directory dedicated to the tested configuration).@  \
-     @@PTEST_ORACLE@@    # Basename of the current oracle file (variable only usable in FILTER directives).@  \
+     @@PTEST_ORACLE@@    # Basename of the current oracle file (macro only usable in FILTER directives).@  \
      @[<v 1>\
      Examples:@ \
      ptests@ \
