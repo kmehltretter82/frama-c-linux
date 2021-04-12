@@ -151,7 +151,8 @@ val filter_by_shape: 'a Hptmap.Shape(Base.Base).t -> t -> t
 val remove_base : Base.t -> t -> t
 
 (** [replace_bases substitition map] replaces some bases in [map]
-    according to [substitution]. *)
+    according to [substitution]. If [substitution] conflates different bases,
+    the offsetmaps bound to these bases are joined. *)
 val replace_base: Base.substitution -> t -> t
 
 

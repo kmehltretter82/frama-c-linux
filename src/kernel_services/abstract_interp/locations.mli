@@ -80,7 +80,8 @@ module Location_Bytes : sig
 
   val replace_base: Base.substitution -> t -> bool * t
   (** [replace_base subst loc] changes the location [loc] by substituting the
-      pointed bases according to [subst]. *)
+      pointed bases according to [subst]. If [substitution] conflates different
+      bases, the offsets bound to these bases are joined. *)
 
   val diff : t -> t -> t
     (** Over-approximation of difference. [arg2] needs to be exact or an
