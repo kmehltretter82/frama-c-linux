@@ -61,6 +61,20 @@ module Filename = struct
   let sanitize f = String.escaped f
 end
 
+(* removes first blanks *)
+let trim_right s =
+  let n = ref (String.length s - 1) in
+  let last_char_to_keep =
+    try
+      while !n > 0 do
+        if String.get s !n <> ' ' then raise Exit;
+        n := !n - 1
+      done;
+      0
+    with Exit -> !n
+  in
+  String.sub s 0 (last_char_to_keep+1)
+
 (** the pattern that ends the parsing of options in a test file *)
 let end_comment = Str.regexp ".*\\*/"
 
@@ -144,34 +158,37 @@ let example_msg =
      OPT: <options>      @[<v 0># Defines a sub-test using the 'CMD' definition: <command> <options>@]@  \
      STDOPT: +<extra>    @[<v 0># Defines a sub-test and append the extra to the current option.@]@  \
      STDOPT: #<extra>    @[<v 0># Defines a sub-test and prepend the extra to the current option.@]@  \
-     PLUGIN: <plugin>... @[<v 0># Adds a dependency and set the @@PLUGIN@@ variable used to define the '-load-plugins' option into the @@PLUGIN_OPTIONS@@ variable.@]@  \
+     PLUGIN: <plugin>... @[<v 0># Adds a dependency and set the macro @@PLUGIN@@ defining the '-load-plugins' option used in the macro @@PLUGIN_OPTIONS@@.@]@  \
      CMXS: <module>...   @[<v 0># Defines dune targets without dependency to tests so use '-load-module %%{dep:<module>.cmxs}' into the test options.@]@  \
-     MODULE: <module>... @[<v 0># Adds a dependency and adds the corresponding '-load-module' option into the @@PLUGIN_OPTIONS@@ variable.@]@  \
+     MODULE: <module>... @[<v 0># Adds a dependency and adds the corresponding '-load-module' option into the macro @@PLUGIN_OPTIONS@@.@]@  \
      LIBS: <module>...   @[<v 0># Like 'MODULE' directive but for modules that can be shared between several test files.@]@  \
      EXIT: <number>      @[<v 0># Defines the exit code required for the next sub-test commands.@]@  \
      FILTER: <cmd>       @[<v 0># Performs a transformation on the test result files before the comparison from the oracles.@ \
-                                # The oracle will be compared from the standard output of the command: <cmd> <test-output-file>.@ \
-                                # Note: in such a command, the @@PTEST_LOG@@ variable is set to the basename of the oracle.@ \
-                                # That allows to perform a 'diff' command with the oracle of another test configuration:@ \
-                                #    FILTER: diff ../oracle_configuration/@@PTEST_LOG@@ @]@  \
+     # The oracle will be compared from the standard output of the command: cat <test-output-file> | <cmd> .@ \
+     # Chaining multiple filter commands is possible in defining several FILTER directives.@ \
+     # An empty command drops the previous FILTER directives.@ \
+     # Note: in such a command, the macro @@PTEST_ORACLE@@ is set to the basename of the oracle.@ \
+     # This allows running a 'diff' command with the oracle of another test configuration:@ \
+     #    FILTER: diff --new-file @@PTEST_DIR@@/oracle_configuration/@@PTEST_ORACLE@@ @]@  \
      TIMEOUT: <delay>    @[<v 0># Set a timeout for all sub-test.@]@  \
      NOFRAMAC:           @[<v 0># Drops previous sub-test definitions and considers that there is no defined default sub-test.@]@  \
      GCC:                @[<v 0># Deprecated.@]@  \
-     MACRO: <name> <def> @[<v 0># set a definition to the variable @@<name>@@.@]@  \
+     MACRO: <name> <def> @[<v 0># Set a definition to the macro @@<name>@@.@]@  \
      @]@ \
      @[<v 1>\
-     Some predefined variables can be used in test directives:@  \
-     @@PTEST_CONFIG@@    # Test configuration suffix.@  \
-     @@PTEST_FILE@@      # Substituted by the test filename.@  \
+     Some predefined macros can be used in test directives:@  \
      @@PTEST_DIR@@       # Dirname of the test file.@  \
+     @@PTEST_FILE@@      # Substituted by the test filename.@  \
      @@PTEST_NAME@@      # Basename of the test file.@  \
      @@PTEST_NUMBER@@    # Test command number.@  \
-     @@PTEST_LOG@@       # Basename of the current oracle file (variable only usable in FILTER directives).@  \
+     @@PTEST_CONFIG@@    # Test configuration suffix.@  \
+     @@PTEST_RESULT@@    # Shorthand alias to @@PTEST_DIR@@/result@@PTEST_CONFIG@@ (the result directory dedicated to the tested configuration).@  \
+     @@PTEST_ORACLE@@    # Basename of the current oracle file (macro only usable in FILTER directives).@  \
      @@DEFAULT_OPTIONS@@ # The default option list: %s@  \
      @@PLUGIN@@          # The current list of plugins set by the PLUGIN directive.@  \
      @]@ \
      @[<v 1>\
-     Other variables can only be used in test commands (CMD and EXECNOW directives):@  \
+     Other macros can only be used in test commands (CMD and EXECNOW directives):@  \
      @@PLUGIN_OPTIONS@@ # The current list of options related to PLUGIN, MODULE and LIBS to load.@  \
      @@OPTIONS@@        # The current list of options related to OPT and STDOPT directives (for CMD directives).@  \
      @@frama-c-exe@@    # Shortcut defined as follow: %s@  \
@@ -804,7 +821,11 @@ end = struct
       "FILTER",
       (fun ~drop:_ ~file:_ ~dir:_ s current ->
          let s = Macros.expand current.dc_macros s in
-         { current with dc_filter = Some s });
+         let s = trim_right s in
+         match current.dc_filter with
+         | None when s="" -> { current with dc_filter = None }
+         | None           -> { current with dc_filter = Some s }
+         | Some filter    -> { current with dc_filter = Some (s ^ " | " ^ filter) });
 
       "EXIT",
       (fun ~drop:_ ~file:_ ~dir:_ s current ->
@@ -1052,8 +1073,6 @@ let redirection ?reslog ?errlog cmd =
 
 let ptests_alias ~env = config_name ~env (env.dune_alias ^ "_config")
 
-let filter_log_regexp = Str.regexp "@PTEST_LOG@"
-
 let mk_alias cmd suffix = Format.sprintf "%s.%d.%s" cmd.test_name cmd.nth suffix
 
 type wtest = {
@@ -1114,9 +1133,9 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     | None -> "","",default_wtest
     | Some filter ->
       let regexp = Str.regexp "@PTEST_ORACLE@" in
-      let filter_cmd fin foracle =
+      let filter_cmd funfiltred foracle =
         let filter = Str.global_replace regexp foracle filter in
-        Format.sprintf "%s %s" filter fin
+        Format.sprintf "cat %s | %s" funfiltred filter
       in
       let filter_res = filter_cmd cmdreslog (log_prefix ^ ".res.oracle") in
       let filter_err = filter_cmd cmderrlog (log_prefix ^ ".err.oracle") in
