@@ -23,6 +23,9 @@
 (** Command-line flags *)
 
 let verbosity = ref 0
+let check_oracles = ref false
+let create_missing_oracles = ref false
+let remove_empty_oracles = ref false
 let nb_dune_files = ref 0
 let nb_ignores = ref 0
 let ignored_suites = ref []
@@ -236,6 +239,15 @@ let rec argspec =
   [
     ("-v", Arg.Unit (fun () -> incr verbosity),
      "Increase verbosity (up to  twice)") ;
+
+    ("-check-oracles", Arg.Set check_oracles,
+     " warn on missing or empty oracles") ;
+
+    ("-create-missing-oracles", Arg.Set create_missing_oracles,
+     " creates missing oracles to allow the use of dune promote") ;
+
+    ("-remove-empty-oracles", Arg.Set remove_empty_oracles,
+     " remove empty oracles") ;
 
     ("-wrapper" , Arg.String (fun s -> wrapper_cmd := s),
      " <command> Uses a wrapper to executes tests (defaults to "^ !wrapper_cmd ^")");
@@ -1113,9 +1125,29 @@ let print_json_wrapper ~file wtest =
   Format.fprintf wrapper_fmt "%a@" (pp_wtest ~compacted:false) wtest;
   close_out wrapper_cout
 
-let oracle_target oracle_fmt s =
+let oracle_target oracle_fmt dir fname =
+  let oracle = SubDir.make_file dir fname in
+  if not (Sys.file_exists oracle) then begin
+    if !create_missing_oracles then begin
+      let code = Sys.command ("touch " ^ oracle) in
+      if code <> 0 then
+        Format.printf "  - cannot create missing oracle: %s@." oracle
+      else
+        Format.printf "  - creates missing oracle: %s@." oracle;
+    end
+    else if !check_oracles then
+      Format.printf "  - missing oracle: %s@." oracle;
+  end
+  else if is_file_empty_or_nonexisting oracle then begin
+    if !remove_empty_oracles then begin
+      Format.printf "  - removes empty oracle: %s@." oracle;
+      unlink ~silent:false oracle
+    end
+    else if !check_oracles then
+      Format.printf "  - empty oracle: %s@." oracle;
+  end;
   Format.fprintf oracle_fmt
-      "(rule (target %S) (mode fallback) (action (write-file %S \"\")))\n" s s
+    "(rule (target %S) (mode fallback) (action (write-file %S \"\")))\n" fname fname
 
 let command_string ~env ~result_fmt ~oracle_fmt command =
   let log_prefix = log_prefix ~env command in
@@ -1313,9 +1345,10 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     (ptests_alias ~env)
     Fmt.(list (var_libavailable plugin_as_package )) command.plugins
   ;
-  oracle_target oracle_fmt (Filename.basename (oracle_prefix ^ ".err.oracle"));
-  oracle_target oracle_fmt (Filename.basename (oracle_prefix ^ ".res.oracle"));
-  List.iter (oracle_target oracle_fmt) command.log_files ;
+  let oracle_subdir = SubDir.oracle_subdir ~env command.directory in
+  oracle_target oracle_fmt oracle_subdir (Filename.basename (oracle_prefix ^ ".err.oracle"));
+  oracle_target oracle_fmt oracle_subdir (Filename.basename (oracle_prefix ^ ".res.oracle"));
+  List.iter (oracle_target oracle_fmt oracle_subdir) command.log_files ;
   ()
 
 (** process a test file *)
@@ -1440,8 +1473,9 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config =
            (* action: *)
            wtest.cmd
        end;
-       List.iter (oracle_target oracle_fmt) wtest.log ;
-       List.iter (oracle_target oracle_fmt) wtest.bin ;
+       let oracle_subdir = SubDir.oracle_subdir ~env cmd.directory in
+       List.iter (oracle_target oracle_fmt oracle_subdir) wtest.log ;
+       List.iter (oracle_target oracle_fmt oracle_subdir) wtest.bin ;
        Format.fprintf result_fmt
          "(rule ; SHOW EXECNOW COMMAND #%d OF TEST FILE %S\n  \
           (alias %s)\n  \
