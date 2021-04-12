@@ -1,0 +1,8 @@
+25c25
+< [eva] dr.i:26: Frama_C_show_each: {0; 1}, {0; 1}
+---
+> [eva] dr.i:26: Frama_C_show_each: {1}, {0; 1}
+30c30
+<   e1 ∈ {0; 1}
+---
+>   e1 ∈ {1}
