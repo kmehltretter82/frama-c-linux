@@ -1,0 +1,61 @@
+19,20c19
+< [eva] tests/value/domains_function.c:92: 
+<   Frama_C_show_each_top: [-2147483648..2147483647]
+---
+> [eva] tests/value/domains_function.c:92: Frama_C_show_each_top: {3}
+28,29c27
+< [eva] tests/value/domains_function.c:77: 
+<   Frama_C_show_each_top: [-2147483648..2147483647]
+---
+> [eva] tests/value/domains_function.c:77: Frama_C_show_each_top: {1}
+32,33c30
+< [eva] tests/value/domains_function.c:96: 
+<   Frama_C_show_each_top: [-2147483648..2147483647]
+---
+> [eva] tests/value/domains_function.c:96: Frama_C_show_each_top: {1}
+36,37c33
+< [eva] tests/value/domains_function.c:84: 
+<   Frama_C_show_each_top: [-2147483648..2147483647]
+---
+> [eva] tests/value/domains_function.c:84: Frama_C_show_each_top: {2}
+40,41c36
+< [eva] tests/value/domains_function.c:98: 
+<   Frama_C_show_each_top: [-2147483648..2147483647]
+---
+> [eva] tests/value/domains_function.c:98: Frama_C_show_each_top: {2}
+60,61c55
+< [eva] tests/value/domains_function.c:84: 
+<   Frama_C_show_each_top: [-2147483648..2147483647]
+---
+> [eva] tests/value/domains_function.c:84: Frama_C_show_each_top: {2}
+64,65c58
+< [eva] tests/value/domains_function.c:113: 
+<   Frama_C_show_each_top: [-2147483648..2147483647]
+---
+> [eva] tests/value/domains_function.c:113: Frama_C_show_each_top: {2}
+78,79c71
+< [eva] tests/value/domains_function.c:55: 
+<   Frama_C_show_each_top: [-2147483648..2147483647]
+---
+> [eva] tests/value/domains_function.c:55: Frama_C_show_each_top: {42}
+108,109c100
+< [eva] tests/value/domains_function.c:64: 
+<   Frama_C_show_each_top: [-2147483648..2147483647]
+---
+> [eva] tests/value/domains_function.c:64: Frama_C_show_each_top: {42}
+116c107
+<   result ∈ [--..--]
+---
+>   result ∈ {2}
+130c121
+<   result ∈ [--..--]
+---
+>   result ∈ {1}
+135c126
+<   result ∈ [--..--]
+---
+>   result ∈ {2}
+138c129
+<   result ∈ [--..--]
+---
+>   result ∈ {2}

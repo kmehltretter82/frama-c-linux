@@ -1,0 +1,11 @@
+229a230,231
+> [kernel] tests/builtins/imprecise.c:111: 
+>   more than 200(300) elements to enumerate. Approximating.
+238a241,242
+> [kernel] tests/builtins/imprecise.c:114: 
+>   more than 200(300) elements to enumerate. Approximating.
+242,245d245
+< [kernel] tests/builtins/imprecise.c:111: 
+<   more than 200(300) elements to enumerate. Approximating.
+< [kernel] tests/builtins/imprecise.c:114: 
+<   more than 200(300) elements to enumerate. Approximating.

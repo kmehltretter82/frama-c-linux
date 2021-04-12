@@ -1,0 +1,5 @@
+263a264,265
+> [eva:nonlin] tests/float/nonlin.c:113: non-linear 'f + f', lv 'f'
+> [eva:nonlin] tests/float/nonlin.c:113: subdividing on f
+267d268
+< [eva:nonlin] tests/float/nonlin.c:113: subdividing on f

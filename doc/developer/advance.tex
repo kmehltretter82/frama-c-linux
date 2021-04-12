@@ -988,7 +988,7 @@ file, run it only once.
 & \textit{None}
 \\
 & \texttt{FILTER}\nscodeidxdef{Test!Directive}{FILTER}
-& Command used to filter results
+& Command reading the standard input used to filter results. In such a command, the predefined macro \texttt{@PTEST\_ORACLE@} is set to the basename of the oracle.
 & \textit{None}
 \\
 & \texttt{MODULE}\nscodeidxdef{Test!Directive}{MODULE}
@@ -1154,7 +1154,7 @@ or
   \texttt{@macro-name@} in a \texttt{CMD}, \texttt{LOG}, \texttt{OPT},
   \texttt{STDOPT} or \texttt{EXECNOW} directive at this configuration level
   or in any level below it will be replaced by \texttt{content}. Existing
-  pre-defined macros are listed in section~\ref{sec:ptests-macros}.
+  predefined macros are listed in section~\ref{sec:ptests-macros}.
 \item \texttt{MODULE}\nscodeidx{Test!Directive}{MODULE}
  directive takes as argument the name of a \texttt{.cmxs}
   module. It will then add a directive to compile this file with the
@@ -1168,6 +1168,19 @@ or
   the suite. This directive is only
   usable in a \texttt{test\_config}\codeidx{test\_config}
   configuration file.
+\item The \texttt{FILTER}\nscodeidx{Test!Directive}{FILTER} directive specifies
+  a transformation on the test result files before the comparison to the oracles.
+  The filtering command read the result from the standard input and the oracle
+  will be compared with the standard output of that command.
+  In such a directive, the predefined macro \texttt{@PTEST\_ORACLE@} is set to the
+  basename of the oracle.
+  That allows running a \texttt{diff} command with the oracle of another
+  test configuration:
+  \begin{code}
+    FILTER: diff --new-file @PTEST_DIR@/oracle_configuration/@PTEST_ORACLE@ -
+  \end{code}
+  Chaining multiple filter commands is possible by defining several \texttt{FILTER} directives (they are applied in the reverse order),
+  and an empty command drops the previous \texttt{FILTER} directives.
 \end{itemize}
 
 \begin{important}

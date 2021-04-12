@@ -1,0 +1,5 @@
+176a177,178
+> [eva] tests/builtins/memcpy.c:96: Call to builtin memcpy
+> [eva] tests/builtins/memcpy.c:96: Call to builtin memcpy
+457a460
+> [eva] tests/builtins/memcpy.c:230: starting to merge loop iterations

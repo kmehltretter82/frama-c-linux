@@ -1,0 +1,3 @@
+22a23,24
+> [eva] tests/float/parse.i:37: Warning: 
+>   cannot parse floating-point constant, returning imprecise result

@@ -1,0 +1,8 @@
+9a10,12
+> [eva] tests/value/loopfun.i:23: starting to merge loop iterations
+> [eva:loop-unroll] tests/value/loopfun.i:25: loop not completely unrolled
+> [eva] tests/value/loopfun.i:25: starting to merge loop iterations
+11a15
+> [eva] tests/value/loopfun.i:26: starting to merge loop iterations
+13a18
+> [eva] tests/value/loopfun.i:27: starting to merge loop iterations

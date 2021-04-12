@@ -1,0 +1,7 @@
+17,18d16
+< [eva:alarm] tests/value/test.i:11: Warning: 
+<   signed overflow. assert j + ecart ≤ 2147483647;
+29c27
+<   j ∈ [-1073741822..1]
+---
+>   j ∈ {-1; 0; 1}

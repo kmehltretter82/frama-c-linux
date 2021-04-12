@@ -1,0 +1,45 @@
+58a59,60
+> [kernel] tests/value/non_natural.i:30: 
+>   more than 200(12500) elements to enumerate. Approximating.
+65a68,69
+> [kernel] tests/value/non_natural.i:23: 
+>   more than 200(12500) elements to enumerate. Approximating.
+70a75,76
+> [kernel] tests/value/non_natural.i:24: 
+>   more than 200(12500) elements to enumerate. Approximating.
+78a85,86
+> [kernel] tests/value/non_natural.i:25: 
+>   more than 200(12500) elements to enumerate. Approximating.
+86a95,96
+> [kernel] tests/value/non_natural.i:26: 
+>   more than 200(12500) elements to enumerate. Approximating.
+94a105,106
+> [kernel] tests/value/non_natural.i:27: 
+>   more than 200(12500) elements to enumerate. Approximating.
+102a115,116
+> [kernel] tests/value/non_natural.i:28: 
+>   more than 200(12500) elements to enumerate. Approximating.
+110a125,126
+> [kernel] tests/value/non_natural.i:29: 
+>   more than 200(12500) elements to enumerate. Approximating.
+129,130d144
+< [kernel] tests/value/non_natural.i:23: 
+<   more than 200(12500) elements to enumerate. Approximating.
+133,146d146
+< [kernel] tests/value/non_natural.i:24: 
+<   more than 200(12500) elements to enumerate. Approximating.
+< [kernel] tests/value/non_natural.i:25: 
+<   more than 200(12500) elements to enumerate. Approximating.
+< [kernel] tests/value/non_natural.i:26: 
+<   more than 200(12500) elements to enumerate. Approximating.
+< [kernel] tests/value/non_natural.i:27: 
+<   more than 200(12500) elements to enumerate. Approximating.
+< [kernel] tests/value/non_natural.i:28: 
+<   more than 200(12500) elements to enumerate. Approximating.
+< [kernel] tests/value/non_natural.i:29: 
+<   more than 200(12500) elements to enumerate. Approximating.
+< [kernel] tests/value/non_natural.i:30: 
+<   more than 200(12500) elements to enumerate. Approximating.
+199a200,201
+> [kernel] tests/value/non_natural.i:39: 
+>   more than 200(12500) elements to enumerate. Approximating.

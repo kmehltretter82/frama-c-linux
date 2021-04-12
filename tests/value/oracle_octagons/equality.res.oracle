@@ -1,0 +1,6 @@
+29,30c29,30
+<   y ∈ [0..42] or UNINITIALIZED
+<   w ∈ [0..42] or UNINITIALIZED
+---
+>   y ∈ [0..42]
+>   w ∈ [0..42]

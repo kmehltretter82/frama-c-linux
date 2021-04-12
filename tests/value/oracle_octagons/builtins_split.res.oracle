@@ -1,0 +1,30 @@
+70a71,84
+> [eva] tests/value/builtins_split.c:104: 
+>   Call to builtin Frama_C_builtin_split_all
+> [eva] tests/value/builtins_split.c:104: 
+>   Call to builtin Frama_C_builtin_split_all
+> [eva] tests/value/builtins_split.c:104: 
+>   Call to builtin Frama_C_builtin_split_all
+> [eva] tests/value/builtins_split.c:104: 
+>   Call to builtin Frama_C_builtin_split_all
+> [eva] tests/value/builtins_split.c:104: 
+>   Call to builtin Frama_C_builtin_split_all
+> [eva] tests/value/builtins_split.c:104: 
+>   Call to builtin Frama_C_builtin_split_all
+> [eva] tests/value/builtins_split.c:104: 
+>   Call to builtin Frama_C_builtin_split_all
+81a96,109
+> [eva] tests/value/builtins_split.c:112: 
+>   Call to builtin Frama_C_builtin_split_all
+> [eva] tests/value/builtins_split.c:112: 
+>   Call to builtin Frama_C_builtin_split_all
+> [eva] tests/value/builtins_split.c:112: 
+>   Call to builtin Frama_C_builtin_split_all
+> [eva] tests/value/builtins_split.c:112: 
+>   Call to builtin Frama_C_builtin_split_all
+> [eva] tests/value/builtins_split.c:112: 
+>   Call to builtin Frama_C_builtin_split_all
+> [eva] tests/value/builtins_split.c:112: 
+>   Call to builtin Frama_C_builtin_split_all
+> [eva] tests/value/builtins_split.c:112: 
+>   Call to builtin Frama_C_builtin_split_all

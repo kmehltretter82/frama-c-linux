@@ -1,0 +1,14 @@
+104a105,106
+> [kernel] tests/builtins/imprecise.c:51: 
+>   imprecise size for variable v3 (abstract type 'struct u')
+229a232,233
+> [kernel] tests/builtins/imprecise.c:111: 
+>   more than 200(300) elements to enumerate. Approximating.
+238a243,244
+> [kernel] tests/builtins/imprecise.c:114: 
+>   more than 200(300) elements to enumerate. Approximating.
+242,245d247
+< [kernel] tests/builtins/imprecise.c:111: 
+<   more than 200(300) elements to enumerate. Approximating.
+< [kernel] tests/builtins/imprecise.c:114: 
+<   more than 200(300) elements to enumerate. Approximating.

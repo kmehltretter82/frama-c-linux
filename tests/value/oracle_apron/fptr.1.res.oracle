@@ -1,0 +1,34 @@
+42c42,45
+< [eva] tests/value/fptr.i:9: Reusing old results for call to h
+---
+> [eva] computing for function h <- f <- main_uninit.
+>   Called from tests/value/fptr.i:9.
+> [eva] Recording results for h
+> [eva] Done for function h
+51,52c54,61
+< [eva] tests/value/fptr.i:9: Reusing old results for call to hh
+< [eva] tests/value/fptr.i:9: Reusing old results for call to h
+---
+> [eva] computing for function hh <- f <- main_uninit.
+>   Called from tests/value/fptr.i:9.
+> [eva] Recording results for hh
+> [eva] Done for function hh
+> [eva] computing for function h <- f <- main_uninit.
+>   Called from tests/value/fptr.i:9.
+> [eva] Recording results for h
+> [eva] Done for function h
+57c66,77
+< [eva] tests/value/fptr.i:68: Reusing old results for call to f
+---
+> [eva] computing for function f <- main_uninit.
+>   Called from tests/value/fptr.i:68.
+> [eva] computing for function hh <- f <- main_uninit.
+>   Called from tests/value/fptr.i:9.
+> [eva] Recording results for hh
+> [eva] Done for function hh
+> [eva] computing for function h <- f <- main_uninit.
+>   Called from tests/value/fptr.i:9.
+> [eva] Recording results for h
+> [eva] Done for function h
+> [eva] Recording results for f
+> [eva] Done for function f

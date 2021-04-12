@@ -1,0 +1,26 @@
+10,13d9
+< [eva:alarm] tests/value/redundant_alarms.c:11: Warning: 
+<   accessing uninitialized left-value. assert \initialized(p);
+< [eva:alarm] tests/value/redundant_alarms.c:12: Warning: 
+<   accessing uninitialized left-value. assert \initialized(p);
+24,25d19
+< [eva:alarm] tests/value/redundant_alarms.c:21: Warning: 
+<   accessing uninitialized left-value. assert \initialized(&t[i]);
+63,65c57
+< [scope:rm_asserts] removing 3 assertion(s)
+< [scope:rm_asserts] tests/value/redundant_alarms.c:12: 
+<   removing redundant assert Eva: initialization: \initialized(p);
+---
+> [scope:rm_asserts] removing 2 assertion(s)
+108d99
+<   /*@ assert Eva: initialization: \initialized(p); */
+110d100
+<   /*@ assert Eva: initialization: \initialized(p); */
+127d116
+<   /*@ assert Eva: initialization: \initialized(&t[i]); */
+196a186
+>   int z;
+199,201d188
+<   *p = 1;
+<   int z = *p + 1;
+<   int w = *p + 2;
