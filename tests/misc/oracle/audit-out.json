@@ -1,30 +1,4 @@
 {
-  "sources": {
-    "tests/value/audit.c": "01010101010101010101010101010101",
-    "tests/value/audit_included.h": "c2cc488143a476f69cf2ed04c3439e6e",
-    "tests/value/non_existing_file.h": "1234567890abcdef1234567890abcdef"
-  },
-  "kernel": {
-    "warning-categories": {
-      "enabled": [
-        "*", "CERT", "CERT:EXP", "CERT:EXP:46", "CERT:MSC", "CERT:MSC:38",
-        "acsl-extension", "annot", "annot:missing-spec", "annot-error",
-        "audit", "check", "check:volatile", "cmdline", "ghost",
-        "ghost:bad-use", "inline", "linker",
-        "linker:drop-conflicting-unused", "parser",
-        "parser:conditional-feature", "pp", "pp:compilation-db", "typing",
-        "typing:implicit-conv-void-ptr",
-        "typing:implicit-function-declaration",
-        "typing:incompatible-pointer-types",
-        "typing:incompatible-types-call", "typing:inconsistent-specifier",
-        "typing:int-conversion", "typing:no-proto"
-      ],
-      "disabled": [
-        "CERT:EXP:10", "acsl-float-compare", "ghost:already-ghost",
-        "parser:decimal-float", "transient-block"
-      ]
-    }
-  },
   "eva": {
     "correctness-parameters": {
       "-absolute-valid-range": "",
@@ -73,5 +47,32 @@
         "missing-loop-unroll", "missing-loop-unroll:for"
       ]
     }
+  },
+  "kernel": {
+    "warning-categories": {
+      "enabled": [
+        "*", "CERT", "CERT:EXP", "CERT:EXP:46", "CERT:MSC", "CERT:MSC:37",
+        "CERT:MSC:38", "acsl-extension", "annot", "annot:missing-spec",
+        "annot:multi-from", "annot-error", "audit", "check",
+        "check:volatile", "cmdline", "ghost", "ghost:bad-use", "inline",
+        "linker", "linker:drop-conflicting-unused", "parser",
+        "parser:conditional-feature", "pp", "pp:compilation-db", "typing",
+        "typing:implicit-conv-void-ptr",
+        "typing:implicit-function-declaration",
+        "typing:incompatible-pointer-types",
+        "typing:incompatible-types-call", "typing:inconsistent-specifier",
+        "typing:int-conversion", "typing:no-proto"
+      ],
+      "disabled": [
+        "CERT:EXP:10", "acsl-float-compare", "ghost:already-ghost",
+        "parser:decimal-float", "transient-block"
+      ]
+    }
+  },
+  "sources": {
+    "tests/misc/audit.c": "aec49f030fcf92bc135bd75e7088194f",
+    "tests/misc/audit_included.h": "c2cc488143a476f69cf2ed04c3439e6e",
+    "tests/misc/audit_included_but_not_listed.h":
+      "c2cc488143a476f69cf2ed04c3439e6e"
   }
 }
