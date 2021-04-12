@@ -15,12 +15,12 @@ IGNORE= DEFAULT_SUITES= fc_script
 IGNORE= DEFAULT_SUITES= make_run_script
 IGNORE= DEFAULT_SUITES= value/numerors
 
-IGNORE= apron_SUITES = value
-bitwise_SUITES = value
-equalities_SUITES = value
-gauges_SUITES = value
-IGNORE= octagon_SUITES = value
-symblocs_SUITES = value
+IGNORE= apron_SUITES = value builtins float idct
+bitwise_SUITES = value builtins float idct
+equalities_SUITES = value builtins float idct
+gauges_SUITES = value builtins float idct
+IGNORE= octagon_SUITES = value builtins float idct
+symblocs_SUITES = value builtins float idct
 
 IGNORE= apron_SUITES = value/numerors
 IGNORE= bitwise_SUITES = value/numerors
