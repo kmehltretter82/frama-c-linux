@@ -142,5 +142,5 @@ messages: [
 ]
 
 post-messages: [
-  "Why3 provers setup: rm -f ~/.why3.conf ; why3 config --detect"
+  "Why3 provers setup: rm -f ~/.why3.conf ; why3 config detect"
 ]

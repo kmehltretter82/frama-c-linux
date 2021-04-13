@@ -59,6 +59,14 @@ order to fulfill proof obligations. An easy choice is to install the
 \textsc{inria} and now by \textsc{OcamlPro}\footnote{\textsf{Alt-Ergo}:
   \url{https://alt-ergo.ocamlpro.com/}}. When using the \textsf{Opam} package
   manager, these tools are automatically installed with \textsf{Frama-C}.
+
+When updating or installing \textsf{Why-3}, the following command should be
+run to detect available provers:
+
+\begin{lstlisting}[basicstyle=\ttfamily]
+rm -f ~/.why3.conf ; why3 config detect
+\end{lstlisting}
+
 See the documentation of \textsf{Why-3} to install other provers.
 
 
@@ -170,10 +178,10 @@ weakest precondition $W$; we can then conclude that $P$ precondition
 of $f$ always entails its postcondition $Q$. This proof can be summarized by
 the following diagram:
 
-$$ 
+$$
 \frac%
 {\quad(P \Longrightarrow W) \quad\quad \{W\}\,f\,\{Q\} \quad}%
-{\{P\}\,f\,\{Q\}} 
+{\{P\}\,f\,\{Q\}}
 $$
 
 This is the main idea of how to prove a property by weakest
@@ -247,7 +255,7 @@ plug-in, which makes \textsf{WP} complementary to \textsf{Jessie}.
 \item[\texttt{Hoare} model.]  A very efficient model that generates
   concise proof obligations. It simply maps each \textsf{C} variable to one
   pure logical variable.\par
-  
+
   However, the heap cannot be represented in this model, and
   expressions such as \texttt{*p} cannot be translated at all. You
   can still represent pointer values, but you cannot read or write
@@ -262,7 +270,7 @@ plug-in, which makes \textsf{WP} complementary to \textsf{Jessie}.
   In order to generate reasonable proof obligations, the values stored
   in the global array are not the machine ones, but the logical
   ones. Hence, all \textsf{C} integer types are represented by
-  mathematical integers and each pointer type to a given type is represented 
+  mathematical integers and each pointer type to a given type is represented
   by a specific logical abstract datatype.\par
 
   A consequence of having separated arrays is that heterogeneous casts
@@ -271,7 +279,7 @@ plug-in, which makes \textsf{WP} complementary to \textsf{Jessie}.
   pointer to \texttt{char}, and then access the internal
   representation of the original \texttt{int} value into memory.
 
-  However, variants of the \texttt{Typed} model enable limited forms of casts. 
+  However, variants of the \texttt{Typed} model enable limited forms of casts.
   See chapter~\ref{wp-models} for details.
 
 \item[\texttt{Bytes} model. (Not Implemented Yet).] This is a
