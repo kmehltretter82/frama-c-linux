@@ -7,10 +7,8 @@ let mk_buildInputs = { opamPackages ? [], nixPackages ? [] } :
                 "ppx_deriving" "ppx_deriving_yojson"
                 { name = "coq"; constraint = "=8.12.0";  }
                 { name = "alt-ergo" ; constraint = "=2.2.0"; }
-                { name = "why3" ; constraint = "=1.3.3"; }
-                { name = "why3-coq" ; constraint = "=1.3.3"; }
-                { name = "menhir"; constraint = "=20200624"; }
-                { name = "dune"; constraint = "=2.7.1"; }
+                { name = "why3" ; constraint = "=1.4.0"; }
+                { name = "why3-coq" ; constraint = "=1.4.0"; }
                 ] ++ opamPackages
               );
            ocamlAttr = ocaml_version;
@@ -186,7 +184,7 @@ pkgs.lib.makeExtensible
                make create_share_link
                mkdir home
                HOME=$(pwd)/home
-               why3 config --detect
+               why3 config detect
                make src/plugins/wp/tests/test_config_qualif
                export FRAMAC_WP_CACHE=replay
                export FRAMAC_WP_CACHEDIR=${plugins.wp-cache.src}
@@ -215,7 +213,7 @@ pkgs.lib.makeExtensible
           make create_share_link
           mkdir home
           HOME=$(pwd)/home
-          why3 config --detect
+          why3 config detect
           make src/plugins/aorai/tests/ptests_config
           make PTESTS_OPTS="-config prove -error-code" Aorai_TESTS
         '';
@@ -310,7 +308,7 @@ pkgs.lib.makeExtensible
                 # Setup Why3
                 mkdir home
                 HOME=$(pwd)/home
-                why3 config --detect
+                why3 config detect
                 # Setup WP related
                 export CAVEAT_IMPORTER_NIX_MODE=yes
                 export FRAMAC_WP_CACHE=replay
