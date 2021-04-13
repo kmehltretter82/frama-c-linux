@@ -63,15 +63,15 @@ case $WHY3VERSION in
         AC_MSG_RESULT([not found!])
         plugin_disable(wp,[why3 not found])
         ;;
-      0.* | 1.[[012]].* | 1.3.0 | 1.3.1 | 1.3.2)
-        AC_MSG_RESULT([found $WHY3VERSION: requires 1.3.3+])
+      0.* | 1.[[0123]].*)
+        AC_MSG_RESULT([found $WHY3VERSION: requires 1.4.0+])
         plugin_disable(wp,[non-supported why3 $WHY3VERSION])
         ;;
-      1.3.*)
+      1.4.*)
         AC_MSG_RESULT([found $WHY3VERSION: ok])
         ;;
       *)
-        AC_MSG_RESULT([found $WHY3VERSION: might work (should be 1.3.3+)])
+        AC_MSG_RESULT([found $WHY3VERSION: might work (should be 1.4.0+)])
         ;;
 esac
 fi
