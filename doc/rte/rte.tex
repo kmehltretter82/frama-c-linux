@@ -7,6 +7,9 @@
 \newcommand{\optnodowncast}{\mbox{\lstinline|-rte-no-downcast|}}
 \newcommand{\rte}{\textsf{RTE}\xspace}
 \newcommand{\framac}{\textsf{Frama-C}\xspace}
+\newcommand{\acsl}{\textsf{ACSL}\xspace}
+\newcommand{\gcc}{\textsf{Gcc}\xspace}
+\newcommand{\clang}{\textsf{Clang}\xspace}
 
 \tableofcontents
 
@@ -443,7 +446,7 @@ Dereferencing a pointer is an undefined behavior if:
 \end{itemize}
 
 The \rte{} plug-in generates annotations to prevent this type of undefined
-behavior in a systematic way. It does so by deferring the check to the ACSL
+behavior in a systematic way. It does so by deferring the check to the \acsl{}
 built-in predicate \lstinline|valid(p)|: \lstinline|valid(s)| (where
 \lstinline|s| is a set of terms) holds if and only if dereferencing any
 $\lstinline|p| \in \lstinline|s|$ is safe (i.e. points to a safely allocated
@@ -681,7 +684,7 @@ int f(float v) {
 \section{Expressions not considered by \rte{}}
 
 An expression which is the operand of a \lstinline|sizeof| (or
-\lstinline|__alignof|, a GCC operator parsed by Cil) is ignored by \rte{}, as
+\lstinline|__alignof|, a \gcc{} operator parsed by Cil) is ignored by \rte{}, as
 are all its sub-expressions.  This is an approximation, since the operand of
 \lstinline|sizeof| may sometimes be evaluated at runtime, for instance on
 variable sized arrays: see the example in \cnn{} paragraph \mbox{6.5.3.4.7}.
@@ -740,8 +743,8 @@ int main(void)
 
 \section{Initialization}
 
-Reading an uninitialized value can be an undefined behavior. Mostly two general
-cases apply:
+Reading an uninitialized value can be an undefined behavior in the two following
+cases:
 
 \begin{itemize}
 \item \mbox{ISO C11 6.3.2.1}\footnote{here we use C11 as it is clearer than C99}
@@ -750,10 +753,10 @@ cases apply:
       that it was a trap representation for the type used for the access.
 \end{itemize}
 
-The second item is the consequence of the fact that an uninitialized location
-has indeterminate value (\mbox{6.7.9.10}), thus either an unspecified value or
-a trap representation, and that reading a trap representation is an undefined
-behavior (\mbox{6.2.6.1.5}).
+More generally, reading an uninitialized location always results in an
+indeterminate value (\mbox{6.7.9.10}). Such a value is either an unspecified
+value or a trap representation. Only reading a trap representation is an
+undefined behavior (\mbox{6.2.6.1.5}). It corresponds to the second case above.
 
 However for (most) types that do not have trap representation, reading an
 unspecified value is generally not a desirable behavior. Thus, \rte{} is
@@ -765,19 +768,20 @@ a typedef of those) is read, it must be initialized except if it is a formal
 parameter or a global variable. We exclude formal parameters as its
 initialization status must be checked at the call point (\rte{} generates an
 annotation for this). We exclude global variables as they are initialized by
-default and any value stored in this variable must be initialized (and \rte{}
+default and any value stored in this variable must be initialized (\rte{}
 generates an annotation for this).
 
 As structures and unions never have trap representation, they can (and they are
 regularly) be manipulated while being partially initialized. Consequently,
-\rte{} does not requires initialization for reads of a full union or structure
-(while read field with fundamental types are covered by the previous paragraph).
-As a consequence, the case of a structure or union \textit{whose address is never
- taken is read before being initialized} is \textbf{not} covered by \rte{}. But
+\rte{} does not require initialization for reads of a full union or structure
+(while reading fields with fundamental types is covered by the previous paragraph).
+As a consequence, the case of structures and unions \textit{whose address is
+ never taken, and being read before being initialized} is \textbf{not} covered
+by \rte{}. It is worth noting that
 this particular case is efficiently detected by a compiler warning (see
-\lstinline{-Wuninitialized} on GCC and Clang for example) as it only requires
-local reasoning that is easy for compilers (but not that simple to express in
-ACSL).
+\lstinline{-Wuninitialized} on \gcc{} and \clang{} for example) as it only
+requires local reasoning that is easy for compilers (but not that simple to
+express in \acsl{}).
 
 If you really need \rte{} to cover the previous case, please contact the
 Frama-C team.
@@ -787,6 +791,8 @@ cannot have trap representation (for example \lstinline{unsigned char}) should
 be allowed, for example writing a \lstinline{memcpy} function. In this case, one
 can exclude this function from the range of function annotated with
 initialization properties using \lstinline{-rte-initialized-ignore}.
+Note that the excluded functions must preserve the initialization of globals, as
+no assertions are generated for them.
 
 \section{Undefined behaviors not covered by \rte{}}
 

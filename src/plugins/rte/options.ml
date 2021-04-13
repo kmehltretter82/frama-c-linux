@@ -68,7 +68,7 @@ module DoInitialized =
     (struct
       let option_name = "-rte-initialized"
       let help = "when on, annotates local variables and pointers \
-                  reads of non struct types with initialization tests \
+                  reads of non struct or union types with initialization tests \
                   see documentation for more details."
     end)
 
