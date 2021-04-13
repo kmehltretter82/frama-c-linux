@@ -1318,6 +1318,8 @@ src/plugins/value/domains/simple_memory.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/simple_memory.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/symbolic_locs.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/symbolic_locs.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/domains/taint_domain.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/domains/taint_domain.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/unit_domain.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/unit_domain.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/engine/abstractions.ml: CEA_LGPL_OR_PROPRIETARY
