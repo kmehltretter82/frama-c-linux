@@ -293,7 +293,8 @@ module MYTREE = struct
     Cil.hasAttribute "FC_BUILTIN" (Cil_datatype.Global.attr g)
 
   let comes_from_share filename =
-    Filepath.is_relative ~base_name:Fc_config.datadir filename
+    let path = Filepath.Normalized.of_string filename in
+    Filepath.is_relative ~base_name:Fc_config.datadir path
 
   let is_function t = match t with
     | MFile _ -> false

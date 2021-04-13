@@ -99,8 +99,9 @@ let warn_unsupported_spec name =
     Value_parameters.warning ~once:true ~current:true
       ~wkey:Value_parameters.wkey_libc_unsupported_spec
       "@[The specification of function '%s' is currently not supported by Eva.@ \
-       Consider adding %s@ to the analyzed source files.@]"
-      name (Fc_config.datadir ^ "/libc/" ^ header)
+       Consider adding '%a'@ to the analyzed source files.@]"
+      name Filepath.Normalized.pretty
+      (Filepath.Normalized.concat Fc_config.framac_libc header)
   with Not_found -> ()
 
 

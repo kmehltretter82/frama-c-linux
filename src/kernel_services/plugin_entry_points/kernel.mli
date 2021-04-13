@@ -356,13 +356,17 @@ module Journal: sig
 
 end
 
-module Session_dir: Parameter_sig.String
+module Session_dir: Parameter_sig.Filepath
 (** Directory in which session files are searched.
-    @since Neon-20140301 *)
+    @since Neon-20140301
+    @modify Frama-C+dev parameter type is now Filepath instead of string
+*)
 
-module Config_dir: Parameter_sig.String
+module Config_dir: Parameter_sig.Filepath
 (** Directory in which config files are searched.
-    @since Neon-20140301 *)
+    @since Neon-20140301
+    @modify Frama-C+dev parameter type is now Filepath instead of string
+*)
 
 (* this stop special comment does not work as expected (and as explained in the
    OCamldoc manual, Section 15.2.2. It just skips all the rest of the file

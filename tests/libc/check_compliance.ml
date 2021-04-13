@@ -88,7 +88,7 @@ let () =
         let vis = new stdlib_visitor in
         ignore (Visitor.visitFramacFile (vis :> Visitor.frama_c_visitor) (Ast.get ()));
         let fc_stdlib_idents = vis#get_idents in
-        let dir = Filename.concat Fc_config.datadir "compliance" in
+        let dir = Filename.concat (Fc_config.datadir:>string) "compliance" in
         let c11_idents = Json.(to_table HeadersOnly (parse dir "c11_functions.json"))
         and c11_headers = Json.(to_set (parse dir "c11_headers.json"))
         and glibc_idents = Json.(to_set (parse dir "glibc_functions.json"))

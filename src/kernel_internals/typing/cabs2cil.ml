@@ -323,7 +323,7 @@ let process_stdlib_pragma name args =
     match args with
     | [ ACons ("pop",_) ] -> pop_stdheader (); None
     | [ ACons ("push",_); AStr s ] ->
-      let base_name = Fc_config.framac_libc in
+      let base_name = (Fc_config.framac_libc:>string) in
       let relative_name = Filepath.relativize ~base_name s in
       push_stdheader relative_name;
       None

@@ -34,7 +34,8 @@ let print_config () =
            FRAMAC_LIB    = %S@\n  \
            FRAMAC_PLUGIN = %S%t@."
           Fc_config.version_and_codename
-          Fc_config.datadir Fc_config.libdir Fc_config.plugin_path
+          (Fc_config.datadir:>string) (Fc_config.libdir:>string)
+          Fc_config.plugin_path
           (fun fmt ->
              if Fc_config.preprocessor = "" then
                Format.fprintf fmt "@\nWarning: no default pre-processor"
@@ -58,10 +59,12 @@ let print_version =
   print_config Kernel.PrintVersion.get Fc_config.version_and_codename
 let () = Cmdline.run_after_early_stage print_version
 
-let print_sharepath = print_config Kernel.PrintShare.get Fc_config.datadir
+let print_sharepath =
+  print_config Kernel.PrintShare.get (Fc_config.datadir:>string)
 let () = Cmdline.run_after_early_stage print_sharepath
 
-let print_libpath = print_config Kernel.PrintLib.get Fc_config.libdir
+let print_libpath =
+  print_config Kernel.PrintLib.get (Fc_config.libdir:>string)
 let () = Cmdline.run_after_early_stage print_libpath
 
 let print_pluginpath =

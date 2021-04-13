@@ -95,7 +95,7 @@ let publish ~page ?name ?(index=[]) ~title
   page.sections <- section :: page.sections ; href
 
 let protocole ~title ~readme:filename =
-  let readme = Printf.sprintf "%s/server/%s" Fc_config.datadir filename in
+  let readme = Printf.sprintf "%s/server/%s" (Fc_config.datadir :> string) filename in
   ignore (page `Protocol ~title ~readme ~filename ())
 
 let () = protocole ~title:"Architecture" ~readme:"server.md"

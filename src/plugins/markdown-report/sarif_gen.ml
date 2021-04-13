@@ -250,7 +250,12 @@ let gen_run remarks =
   let taxonomies = [ToolComponent.create ~name ~rules ()] in
   let results = results @ user_annot_results in
   let artifacts = gen_artifacts () in
-  let uriBases = ("PWD", Sys.getcwd ()) :: Filepath.all_symbolic_dirs () in
+  let symbolicDirs =
+    List.map (fun (key, (dir : Filepath.Normalized.t)) ->
+        (key, (dir :> string))
+      ) (Filepath.all_symbolic_dirs ())
+  in
+  let uriBases = ("PWD", Sys.getcwd ()) :: symbolicDirs in
   let uriBasesJson =
     List.fold_left (fun acc (name, dir) ->
         let baseUri =
