@@ -38,9 +38,10 @@ type file =
       Filepath.Normalized.t (* Filename of the [.c] to preprocess. *)
       * string (* Preprocessing command, as given by -cpp-command, or
                   the default value, but without extra arguments. *)
-      * string list (* Extra arguments (already included in the command)
-                       which must also be given to the logic preprocessor
-                       (since Frama-C may preprocess twice each source). *)
+      * string list (* Extra arguments, specific to this file (that is,
+                       obtained via a JCDB, or -cpp-extra-args-per-file,
+                       but _not_ those via -cpp-extra-args), to be given
+                       to the C preprocessor. *)
       * cpp_opt_kind (* Whether the preprocessor is known to be compatible with
                         GCC-style options (mostly, -D and -I). *)
   | NoCPP of Filepath.Normalized.t (** filename of a preprocessed [.c] *)
@@ -126,7 +127,7 @@ let from_filename ?cpp f =
     else if cpp = None then get_preprocessor_command ()
     else Option.get cpp
   in
-  let extra =
+  let extra_for_this_file =
     let extra_by_file =
       try Kernel.CppExtraArgsPerFile.find f
       with Not_found -> ""
@@ -156,7 +157,7 @@ let from_filename ?cpp f =
         Kernel.warning ~once:true
           "Default pre-processor does not keep comments. Any ACSL annotation \
            on non-pre-processed file will be discarded.";
-      NeedCPP (f, cpp, extra, is_cpp_gnu_like ())
+      NeedCPP (f, cpp, extra_for_this_file, is_cpp_gnu_like ())
     end else
       Kernel.abort "No working pre-processor found. You can only analyze \
                     pre-processed .i files."
@@ -467,7 +468,7 @@ let adjust_pwd fp cpp_command =
 
 let build_cpp_cmd = function
   | NoCPP _ | External _ -> None
-  | NeedCPP (f, cmdl, extra, is_gnu_like) ->
+  | NeedCPP (f, cmdl, extra_for_this_file, is_gnu_like) ->
     if not (Sys.file_exists (f :> string)) then
       Kernel.abort "source file %a does not exist"
         Filepath.Normalized.pretty f;
@@ -490,16 +491,16 @@ let build_cpp_cmd = function
     let ppf = create_temp_file ~debug (Filename.basename (f :> string)) ".i" in
     (* Hypothesis: the preprocessor is POSIX compliant,
        hence understands -I and -D. *)
-    let include_args =
+    let fc_include_args =
       if Kernel.FramaCStdLib.get () then [(Fc_config.framac_libc:>string)]
       else []
     in
-    let define_args =
+    let fc_define_args =
       if not (existing_machdep_macro ())
       then [machdep_macro (Kernel.Machdep.get ())]
       else []
     in
-    let define_args = "__FRAMAC__" :: define_args in
+    let fc_define_args = "__FRAMAC__" :: fc_define_args in
     (* Hypothesis: the preprocessor does support the arch-related
        options tested when 'configure' was run. *)
     let required_cpp_arch_args = (get_machdep ()).cpp_arch_flags in
@@ -539,10 +540,13 @@ let build_cpp_cmd = function
     in
     let supp_args =
       string_of_supp_args
-        (Kernel.CppExtraArgs.get () @ gnu_implicit_args @ supported_cpp_arch_args @ extra)
-        include_args define_args
+        (gnu_implicit_args @ supported_cpp_arch_args @
+         extra_for_this_file @ (Kernel.CppExtraArgs.get ()))
+        fc_include_args fc_define_args
     in
-    let cpp_command = replace_in_cpp_cmd cmdl supp_args (f:>string) (ppf:>string) in
+    let cpp_command =
+      replace_in_cpp_cmd cmdl supp_args (f:>string) (ppf:>string)
+    in
     let workdir, cpp_command_with_chdir = adjust_pwd f cpp_command in
     if workdir <> None then
       Parse_env.set_workdir ppf (Option.get workdir);
@@ -550,6 +554,33 @@ let build_cpp_cmd = function
       "preprocessing with \"%s\""
       cpp_command_with_chdir;
     Some (cpp_command_with_chdir, ppf, supported_cpp_arch_args)
+
+let abort_with_detailed_pp_message f cpp_command =
+  let possible_cause =
+    if Kernel.JsonCompilationDatabase.is_set () then
+      if not (Json_compilation_database.has_entry f) then
+        Format.asprintf "note: %s is set but \
+                         contains no entries for '%a'.@ "
+          Kernel.JsonCompilationDatabase.option_name
+          Datatype.Filepath.pretty f
+      else ""
+    else
+    if not (Kernel.CppExtraArgs.is_set ()) &&
+       not (Kernel.CppExtraArgsPerFile.is_set ()) &&
+       not (Kernel.CppCommand.is_set ()) then
+      Format.asprintf
+        "this is possibly due to missing preprocessor flags;@ \
+         consider options %s, %s or %s.@ "
+        Kernel.CppExtraArgs.option_name
+        Kernel.JsonCompilationDatabase.option_name
+        Kernel.CppCommand.option_name
+    else ""
+  in
+  Kernel.abort
+    "failed to run: %s@\n\
+     %sSee chapter \"Preparing the Sources\" in the Frama-C user manual \
+     for more details."
+    cpp_command possible_cause
 
 let parse_cabs cpp_command = function
   | NoCPP f ->
@@ -559,37 +590,13 @@ let parse_cabs cpp_command = function
     Kernel.feedback "Parsing %a (no preprocessing)"
       Datatype.Filepath.pretty f;
     Frontc.parse f ()
-  | NeedCPP (f, cmdl, _extra, is_gnu_like) ->
+  | NeedCPP (f, cmdl, _extra_for_this_file, is_gnu_like) ->
     let cpp_command, ppf, logic_pp_args = Option.get cpp_command in
     Kernel.feedback "Parsing %a (with preprocessing)"
       Datatype.Filepath.pretty f;
     if Sys.command cpp_command <> 0 then begin
       safe_remove_file ppf;
-      let possible_cause =
-        if Kernel.JsonCompilationDatabase.is_set () then
-          if not (Json_compilation_database.has_entry f) then
-            Format.asprintf "note: %s is set but \
-                             contains no entries for '%a'.@ "
-              Kernel.JsonCompilationDatabase.option_name
-              Datatype.Filepath.pretty f
-          else ""
-        else
-        if not (Kernel.CppExtraArgs.is_set ()) &&
-           not (Kernel.CppExtraArgsPerFile.is_set ()) &&
-           not (Kernel.CppCommand.is_set ()) then
-          Format.asprintf
-            "this is possibly due to missing preprocessor flags;@ \
-             consider options %s, %s or %s.@ "
-            Kernel.CppExtraArgs.option_name
-            Kernel.JsonCompilationDatabase.option_name
-            Kernel.CppCommand.option_name
-        else ""
-      in
-      Kernel.abort
-        "failed to run: %s@\n\
-         %sSee chapter \"Preparing the Sources\" in the Frama-C user manual \
-         for more details."
-        cpp_command possible_cause
+      abort_with_detailed_pp_message f cpp_command
     end;
     let ppf =
       if Kernel.ReadAnnot.get() &&
