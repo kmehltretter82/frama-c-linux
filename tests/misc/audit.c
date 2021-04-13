@@ -1,6 +1,6 @@
 /* run.config
    LOG: audit-out.json
-   STDOPT: #"-audit-check @PTEST_DIR@/audit-in.json -audit-prepare @PTEST_DIR@/result/audit-out.json -kernel-warn-key audit=active"
+   STDOPT: #"-audit-check @PTEST_DIR@/audit-in.json -audit-prepare @PTEST_RESULT@/audit-out.json -kernel-warn-key audit=active"
 */
 
 #include "audit_included.h"

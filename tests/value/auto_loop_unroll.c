@@ -159,7 +159,19 @@ void complex_loops () {
   i = 0;
   while (i < 64) {
     for (int j = 0; j < i; j++) {
-      i++;
+      if (undet && i < 64)
+        i++; // The outer loop could be unrolled, as this speeds up convergence.
+    }
+    res++;
+    i++;
+  }
+  Frama_C_show_each_imprecise(res);
+  res = 0;
+  i = 0;
+  while (i < 64) {
+    for (int j = 0; j < i; j++) {
+      if (undet && i > 0)
+        i--; // The outer loop cannot be unrolled.
     }
     res++;
     i++;
