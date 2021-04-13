@@ -268,10 +268,10 @@ exception Cannot_parse of string * string
 let raise_error name because = raise (Cannot_parse(name, because))
 
 let error name msg =
-  let bin_name = Sys.argv.(0) in
+  let bin_name = Filepath.Normalized.of_string Sys.argv.(0) in
   Kernel_log.abort
-    "option `%s' %s.@\nuse `%s -help' for more information."
-    name msg bin_name
+    "option `%s' %s.@\nuse `%a -help' for more information."
+    name msg Filepath.Normalized.pretty bin_name
 
 let warning name msg =
   Kernel_log.warning

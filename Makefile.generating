@@ -31,13 +31,13 @@ tests/ptests_config: Makefile.generating share/Makefile.config
 	$(RM) $@
 	$(TOUCH) $@
 	$(ECHO) "DEFAULT_SUITES=$(PLUGIN_TESTS_LIST)" >> $@
-	$(ECHO) "TOPLEVEL_PATH=bin/toplevel.$(OCAMLBEST)$(EXE)" >> $@
+	$(ECHO) "TOPLEVEL_PATH=$(FRAMAC_ROOT_SRCDIR)/bin/toplevel.$(OCAMLBEST)$(EXE)" >> $@
 	$(ECHO) "OCAMLRUNPARAM=" >> $@
-	$(ECHO) "FRAMAC_SESSION=." >> $@
-	$(ECHO) "FRAMAC_SHARE=./share" >> $@
-	$(ECHO) "FRAMAC_PLUGIN=./lib/plugins" >> $@
-	$(ECHO) "FRAMAC_PLUGIN_GUI=./lib/plugins/gui" >> $@
-	$(ECHO) "FRAMAC_LIB=./lib/fc" >> $@
+	$(ECHO) "FRAMAC_SESSION=$(FRAMAC_ROOT_SRCDIR)" >> $@
+	$(ECHO) "FRAMAC_SHARE=$(FRAMAC_ROOT_SRCDIR)/share" >> $@
+	$(ECHO) "FRAMAC_PLUGIN=$(FRAMAC_ROOT_SRCDIR)/lib/plugins" >> $@
+	$(ECHO) "FRAMAC_PLUGIN_GUI=$(FRAMAC_ROOT_SRCDIR)/lib/plugins/gui" >> $@
+	$(ECHO) "FRAMAC_LIB=$(FRAMAC_ROOT_SRCDIR)/lib/fc" >> $@
 	$(CHMOD_RO) $@
 
 ALL_LIBRARY_NAMES=$(shell ocamlfind query -r -p-format $(LIBRARY_NAMES) $(LIBRARY_NAMES_GUI))
