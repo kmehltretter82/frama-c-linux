@@ -17,6 +17,10 @@
 Open Source Release <next-release>
 ##################################
 
+o!  Kernel    [2021-04-13] Removed deprecated function Filepath.pretty
+o!  Kernel    [2021-04-13] Filepath directories functions now return
+              Filepath.Normalized.t, Frama-C configuration and plugin
+              configuration getters updated accordingly
 o!  Kernel    [2021-04-09] Change the type of the measure from string to
               logic_info in the variant AST node.
 o   Ptests    [2021-04-08] FILTER directive reads the standard input and can be
