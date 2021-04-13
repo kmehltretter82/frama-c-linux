@@ -25,14 +25,33 @@ o!  Kernel    [2021-04-09] Change the type of the measure from string to
               logic_info in the variant AST node.
 o   Ptests    [2021-04-08] FILTER directive reads the standard input and can be
               chained.
+-   Eva       [2021-04-02] Improved automatic loop unroll (-eva-auto-loop-unroll
+              option) of loops with goto or continue statements, or assigning
+              constant values to loop variants.
+-   Libc      [2021-03-31] In math.h specifications, new behaviors for cases
+              creating NaN or infinite values. These behaviors are allowed or
+              forbidden according to the -warn-special-float option.
 -*  Kernel    [2021-03-26] Raise an error if trying to merge a tentative
               definition with a proper definition during linking
 o   Ptests    [2021-03-25] Modify MODULE directive.
 o   Ptests    [2021-03-24] Add new EXIT directive.
+-   Eva       [2021-03-15] Slightly more precise evaluation of ACSL quantifiers.
+o!  Eva       [2021-03-01] New signature for builtins, that are now registered
+              via Eva.mli instead of Db.Value.
+-   Eva       [2021-02-18] New "audit mode" to track file checksums, correctness
+              options and enabled warnings, via options -audit-prepare and
+              -audit-check.
 -   Aorai     [2021-02-09] New option for tracking last N states of the
               automaton. Easier analysis of instrumented code with Eva.
 o!  Kernel    [2021-02-08] Avoid triggering warning 16 (unerasable optional
               argument). Implies changing some labeled functions' signatures.
+-   ACSL      [2021-02-04] New admit annotations to express hypotheses to be
+              admitted but not verified by Frama-C.
+-   Eva       [2021-01-28] Improved automatic widening thresholds (widen hints):
+              use constant modulo as threshold, and infer thresholds globally
+              for global variables.
+-   Eva       [2021-01-21] Better interpretation of logical operators && and ||
+              (useful when option -keep-logical-operators is enabled).
 o!  Kernel    [2021-01-15] Make cfields list optional. None means undefined,
               empty struct allowed only in specific machdeps.
               removed cdefined field
@@ -42,6 +61,8 @@ o!  Kernel    [2021-01-15] Make cfields list optional. None means undefined,
               via environment variable FRAMAC_MACHDEP.
 -   Kernel    [2021-01-08] Allow -add-symbolic-path to survive saves/loads and
               invert argument order (path:name).
+-*  Eva       [2020-12-05] Fixes a crash when subdividing the evaluation of
+              pointer expressions (via option -eva-subdivide-non-linear).
 -   Libc      [2020-12-02] Remove obsolete attribute FRAMA_C_MODEL in the libc.
               Fixes #@877.
 -*  Logic     [2020-11-30] The assigns clause can't mention const locations
@@ -49,6 +70,8 @@ o!  Kernel    [2021-01-15] Make cfields list optional. None means undefined,
 o   Kernel    [2020-11-27] Extract builtin-related functions from module Cil
               to module Cil_builtins. Code can be updated using
               `bin/migration_scripts/titanium2vanadium.sh`.
+-   Eva       [2020-11-26] Allow using Eva directives Frama_C_show_each and
+              Frama_C_dump_each in ghost code.
 -   Metrics   [2020-10-27] Add json output in addition to text and html.
 
 ###################################
