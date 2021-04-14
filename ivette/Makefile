@@ -97,7 +97,11 @@ api:
 	@echo "[Ivette] Generating TypeScript API"
 	@rm -fr src/frama-c/api/generated
 	../bin/frama-c.byte -load-module src/frama-c/api/generator.ml -server-tsc
-	@find src/frama-c/api/generated -name "*.ts" -exec chmod a-w {} \;
+	@find src/frama-c/api/generated -name "*.ts" \
+		-exec headache \
+			-h ../headers/open-source/CEA_LGPL \
+			-c ../headers/headache_config.txt {} \;\
+		-exec chmod a-w {} \;
 
 # --------------------------------------------------------------------------
 # --- Ivette Documentation
