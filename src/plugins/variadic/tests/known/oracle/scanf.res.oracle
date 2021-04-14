@@ -57,7 +57,7 @@
       \from (indirect: __fc_stdin->__fc_FILE_id), __fc_stdin->__fc_FILE_data,
             (indirect: *(format + (0 ..)));
  */
-int scanf_va_1(char const * __restrict format, char *param0, char *param1,
+int scanf_va_1(char const * restrict format, char *param0, char *param1,
                int *param2);
 
 int main(void)

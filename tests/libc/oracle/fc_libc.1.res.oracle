@@ -38,8 +38,8 @@ struct __fc_glob_t {
    void (*gl_closedir)(void *) ;
    void *(*gl_readdir)(void *) ;
    void *(*gl_opendir)(char const *) ;
-   int (*gl_lstat)(char const * __restrict , void * __restrict ) ;
-   int (*gl_stat)(char const * __restrict , void * __restrict ) ;
+   int (*gl_lstat)(char const * restrict , void * restrict ) ;
+   int (*gl_stat)(char const * restrict , void * restrict ) ;
 };
 typedef struct __fc_glob_t glob_t;
 struct __fc_div_t {
@@ -337,7 +337,7 @@ struct passwd {
    char *pw_dir ;
    char *pw_shell ;
 };
-typedef int ( jmp_buf)[5];
+typedef int jmp_buf[5];
 struct __fc_sigjmp_buf {
    jmp_buf buf ;
    sigset_t sigs ;
@@ -1970,7 +1970,7 @@ extern long long atoll(char const *nptr);
     complete behaviors store_position, no_storage;
     disjoint behaviors store_position, no_storage;
  */
-extern double strtod(char const * __restrict nptr, char ** __restrict endptr);
+extern double strtod(char const * restrict nptr, char ** restrict endptr);
 
 /*@ requires valid_nptr: \valid_read(nptr);
     requires separation: \separated(nptr, endptr);
@@ -1998,7 +1998,7 @@ extern double strtod(char const * __restrict nptr, char ** __restrict endptr);
     complete behaviors store_position, no_storage;
     disjoint behaviors store_position, no_storage;
  */
-extern float strtof(char const * __restrict nptr, char ** __restrict endptr);
+extern float strtof(char const * restrict nptr, char ** restrict endptr);
 
 /*@ requires valid_nptr: \valid_read(nptr);
     requires separation: \separated(nptr, endptr);
@@ -2026,8 +2026,8 @@ extern float strtof(char const * __restrict nptr, char ** __restrict endptr);
     complete behaviors store_position, no_storage;
     disjoint behaviors store_position, no_storage;
  */
-extern long double strtold(char const * __restrict nptr,
-                           char ** __restrict endptr);
+extern long double strtold(char const * restrict nptr,
+                           char ** restrict endptr);
 
 /*@ requires valid_nptr: \valid_read(nptr);
     requires separation: \separated(nptr, endptr);
@@ -2063,7 +2063,7 @@ extern long double strtold(char const * __restrict nptr,
     complete behaviors store_position, no_storage;
     disjoint behaviors store_position, no_storage;
  */
-extern long strtol(char const * __restrict nptr, char ** __restrict endptr,
+extern long strtol(char const * restrict nptr, char ** restrict endptr,
                    int base);
 
 /*@ requires valid_nptr: \valid_read(nptr);
@@ -2100,8 +2100,8 @@ extern long strtol(char const * __restrict nptr, char ** __restrict endptr,
     complete behaviors store_position, no_storage;
     disjoint behaviors store_position, no_storage;
  */
-extern long long strtoll(char const * __restrict nptr,
-                         char ** __restrict endptr, int base);
+extern long long strtoll(char const * restrict nptr, char ** restrict endptr,
+                         int base);
 
 /*@ requires valid_nptr: \valid_read(nptr);
     requires separation: \separated(nptr, endptr);
@@ -2137,8 +2137,8 @@ extern long long strtoll(char const * __restrict nptr,
     complete behaviors store_position, no_storage;
     disjoint behaviors store_position, no_storage;
  */
-extern unsigned long strtoul(char const * __restrict nptr,
-                             char ** __restrict endptr, int base);
+extern unsigned long strtoul(char const * restrict nptr,
+                             char ** restrict endptr, int base);
 
 /*@ requires valid_nptr: \valid_read(nptr);
     requires separation: \separated(nptr, endptr);
@@ -2174,8 +2174,8 @@ extern unsigned long strtoul(char const * __restrict nptr,
     complete behaviors store_position, no_storage;
     disjoint behaviors store_position, no_storage;
  */
-extern unsigned long long strtoull(char const * __restrict nptr,
-                                   char ** __restrict endptr, int base);
+extern unsigned long long strtoull(char const * restrict nptr,
+                                   char ** restrict endptr, int base);
 
 /*@ ghost extern int __fc_random_counter __attribute__((__unused__)); */
 
@@ -2516,8 +2516,7 @@ extern int mblen(char const *s, size_t n);
       \from (indirect: s), *(s + (0 .. n - 1)), (indirect: n),
             __fc_mbtowc_state;
  */
-extern int mbtowc(wchar_t * __restrict pwc, char const * __restrict s,
-                  size_t n);
+extern int mbtowc(wchar_t * restrict pwc, char const * restrict s, size_t n);
 
 /*@ ghost extern int __fc_wctomb_state; */
 
@@ -2535,7 +2534,7 @@ extern int wctomb(char *s, wchar_t wc);
     assigns *(pwcs + (0 .. n - 1))
       \from (indirect: s), *(s + (0 .. n - 1)), (indirect: n);
  */
-extern size_t mbstowcs(wchar_t * __restrict pwcs, char const * __restrict s,
+extern size_t mbstowcs(wchar_t * restrict pwcs, char const * restrict s,
                        size_t n);
 
 /*@ requires separation: \separated(s, pwcs);
@@ -2546,7 +2545,7 @@ extern size_t mbstowcs(wchar_t * __restrict pwcs, char const * __restrict s,
     assigns *(s + (0 .. n - 1))
       \from (indirect: pwcs), *(pwcs + (0 .. n - 1)), (indirect: n);
  */
-extern size_t wcstombs(char * __restrict s, wchar_t const * __restrict pwcs,
+extern size_t wcstombs(char * restrict s, wchar_t const * restrict pwcs,
                        size_t n);
 
 int posix_memalign(void **memptr, size_t alignment, size_t size);
@@ -2560,8 +2559,7 @@ int posix_memalign(void **memptr, size_t alignment, size_t size);
  */
 extern int mkstemp(char *templat);
 
-char *realpath(char const * __restrict file_name,
-               char * __restrict resolved_name);
+char *realpath(char const * restrict file_name, char * restrict resolved_name);
 
 int glob(char const *pattern, int flags,
          int (*errfunc)(char const *epath, int eerrno), glob_t *pglob)
@@ -2668,8 +2666,8 @@ imaxdiv_t imaxdiv(intmax_t numer, intmax_t denom);
     assigns *(endptr + (..)) \from *(nptr + (..)), base;
     assigns __fc_errno \from *(nptr + (..)), base;
  */
-extern intmax_t strtoimax(char const * __restrict nptr,
-                          char ** __restrict endptr, int base);
+extern intmax_t strtoimax(char const * restrict nptr,
+                          char ** restrict endptr, int base);
 
 /*@ requires abs_representable: c > -9223372036854775807LL - 1LL;
     ensures positive_result: \result ≥ 0.;
@@ -3543,8 +3541,8 @@ struct sigaction *__fc_p_sigaction = __fc_sigaction;
       \from (indirect: signum), (indirect: act), (indirect: *act),
             (indirect: oldact), (indirect: *oldact);
  */
-extern int sigaction(int signum, struct sigaction const * __restrict act,
-                     struct sigaction * __restrict oldact);
+extern int sigaction(int signum, struct sigaction const * restrict act,
+                     struct sigaction * restrict oldact);
 
 /*@ requires valid_set_or_null: set ≡ \null ∨ \valid_read(set);
     requires valid_how: set ≢ \null ⇒ how ∈ {0, 2, 1};
@@ -3561,8 +3559,8 @@ extern int sigaction(int signum, struct sigaction const * __restrict act,
       \from (indirect: how), (indirect: set), (indirect: oldset);
     assigns *oldset \from (indirect: how), (indirect: oldset);
  */
-extern int sigprocmask(int how, sigset_t const * __restrict set,
-                       sigset_t * __restrict oldset);
+extern int sigprocmask(int how, sigset_t const * restrict set,
+                       sigset_t * restrict oldset);
 
 /*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
     assigns \result;
@@ -3656,8 +3654,8 @@ extern int connect(int sockfd, struct sockaddr const *addr, socklen_t addrlen);
     assigns *((char *)address + (0 .. *address_len - 1))
       \from (indirect: __fc_sockfds[socket]), (indirect: socket);
  */
-extern int getsockname(int socket, struct sockaddr * __restrict address,
-                       socklen_t * __restrict address_len);
+extern int getsockname(int socket, struct sockaddr * restrict address,
+                       socklen_t * restrict address_len);
 
 /*@ requires valid_sockfd: 0 ≤ sockfd < 1024;
     requires valid_optlen: \valid(optlen);
@@ -3967,10 +3965,10 @@ char *__fc_gai_strerror = (char *)"<error message reported by gai_strerror>";
  */
 extern char const *gai_strerror(int errcode);
 
-int getaddrinfo(char const * __restrict nodename,
-                char const * __restrict servname,
-                struct addrinfo const * __restrict hints,
-                struct addrinfo ** __restrict res);
+int getaddrinfo(char const * restrict nodename,
+                char const * restrict servname,
+                struct addrinfo const * restrict hints,
+                struct addrinfo ** restrict res);
 
 struct hostent *gethostbyname(char const *name);
 
@@ -3997,7 +3995,7 @@ int memcmp(void const *s1, void const *s2, size_t n);
 
 void *memchr(void const *s, int c, size_t n);
 
-void *memcpy(void * __restrict dest, void const * __restrict src, size_t n);
+void *memcpy(void * restrict dest, void const * restrict src, size_t n);
 
 void *memmove(void *dest, void const *src, size_t n);
 
@@ -4139,7 +4137,7 @@ char *__fc_strtok_ptr;
     complete behaviors resume_str, new_str;
     disjoint behaviors resume_str, new_str;
  */
-extern char *strtok(char * __restrict s, char const * __restrict delim);
+extern char *strtok(char * restrict s, char const * restrict delim);
 
 /*@ requires valid_string_delim: valid_read_string(delim);
     requires valid_saveptr: \valid(saveptr);
@@ -4202,8 +4200,8 @@ extern char *strtok(char * __restrict s, char const * __restrict delim);
     complete behaviors resume_str, new_str;
     disjoint behaviors resume_str, new_str;
  */
-extern char *strtok_r(char * __restrict s, char const * __restrict delim,
-                      char ** __restrict saveptr);
+extern char *strtok_r(char * restrict s, char const * restrict delim,
+                      char ** restrict saveptr);
 
 /*@ requires
       valid_string_stringp: \valid(stringp) ∧ valid_string(*stringp);
@@ -4238,7 +4236,7 @@ char *strncpy(char *dest, char const *src, size_t n);
     assigns \result
       \from (indirect: src), (indirect: *(src + (0 .. n - 1))), (indirect: n);
  */
-size_t strlcpy(char * __restrict dest, char const * __restrict src, size_t n);
+size_t strlcpy(char * restrict dest, char const * restrict src, size_t n);
 
 /*@ requires valid_string_src: valid_read_string(src);
     requires room_string: \valid(dest + (0 .. strlen(src)));
@@ -4252,7 +4250,7 @@ size_t strlcpy(char * __restrict dest, char const * __restrict src, size_t n);
       \from *(src + (0 .. strlen{Old}(src)));
     assigns \result \from dest;
  */
-extern char *stpcpy(char * __restrict dest, char const * __restrict src);
+extern char *stpcpy(char * restrict dest, char const * restrict src);
 
 char *strcat(char *dest, char const *src);
 
@@ -4269,7 +4267,7 @@ char *strncat(char *dest, char const *src, size_t n);
     assigns \result
       \from (indirect: src), (indirect: *(src + (0 .. n - 1))), (indirect: n);
  */
-extern size_t strlcat(char * __restrict dest, char const * __restrict src,
+extern size_t strlcat(char * restrict dest, char const * restrict src,
                       size_t n);
 
 /*@ requires valid_dest: \valid(dest + (0 .. n - 1));
@@ -4279,7 +4277,7 @@ extern size_t strlcat(char * __restrict dest, char const * __restrict src,
       \from (indirect: *(src + (0 ..))), (indirect: n);
     assigns \result \from dest;
  */
-extern size_t strxfrm(char * __restrict dest, char const * __restrict src,
+extern size_t strxfrm(char * restrict dest, char const * restrict src,
                       size_t n);
 
 char *strdup(char const *s);
@@ -4348,10 +4346,10 @@ static unsigned int volatile getaddrinfo_net_state;
     complete behaviors normal_request, empty_request;
     disjoint behaviors normal_request, empty_request;
  */
-int getaddrinfo(char const * __restrict nodename,
-                char const * __restrict servname,
-                struct addrinfo const * __restrict hints,
-                struct addrinfo ** __restrict res)
+int getaddrinfo(char const * restrict nodename,
+                char const * restrict servname,
+                struct addrinfo const * restrict hints,
+                struct addrinfo ** restrict res)
 {
   int __retres;
   if (nodename == (char const *)0) 
@@ -4606,8 +4604,7 @@ extern int fflush(FILE *stream);
       \from (indirect: *(filename + (0 .. strlen{Old}(filename)))),
             (indirect: *(mode + (0 .. strlen{Old}(mode)))), __fc_p_fopen;
  */
-extern FILE *fopen(char const * __restrict filename,
-                   char const * __restrict mode);
+extern FILE *fopen(char const * restrict filename, char const * restrict mode);
 
 /*@ requires valid_mode: valid_read_string(mode);
     ensures
@@ -4638,16 +4635,16 @@ extern FILE *fdopen(int fd, char const *mode);
       \from (indirect: *(filename + (..))), (indirect: *(mode + (..))),
             __fc_p_fopen, (indirect: stream);
  */
-extern FILE *freopen(char const * __restrict filename,
-                     char const * __restrict mode, FILE * __restrict stream);
+extern FILE *freopen(char const * restrict filename,
+                     char const * restrict mode, FILE * restrict stream);
 
 /*@ assigns *stream;
     assigns *stream \from buf; */
-extern void setbuf(FILE * __restrict stream, char * __restrict buf);
+extern void setbuf(FILE * restrict stream, char * restrict buf);
 
 /*@ assigns *stream;
     assigns *stream \from buf, mode, size; */
-extern int setvbuf(FILE * __restrict stream, char * __restrict buf, int mode,
+extern int setvbuf(FILE * restrict stream, char * restrict buf, int mode,
                    size_t size);
 
 /*@ axiomatic format_length {
@@ -4658,32 +4655,32 @@ extern int setvbuf(FILE * __restrict stream, char * __restrict buf, int mode,
 */
 /*@ assigns *stream;
     assigns *stream \from *(format + (..)), arg; */
-extern int vfprintf(FILE * __restrict stream, char const * __restrict format,
+extern int vfprintf(FILE * restrict stream, char const * restrict format,
                     va_list arg);
 
 /*@ assigns *stream;
     assigns *stream \from *(format + (..)), *stream; */
-extern int vfscanf(FILE * __restrict stream, char const * __restrict format,
+extern int vfscanf(FILE * restrict stream, char const * restrict format,
                    va_list arg);
 
 /*@ assigns *__fc_stdout;
     assigns *__fc_stdout \from arg; */
-extern int vprintf(char const * __restrict format, va_list arg);
+extern int vprintf(char const * restrict format, va_list arg);
 
 /*@ assigns *__fc_stdin;
     assigns *__fc_stdin \from *(format + (..)); */
-extern int vscanf(char const * __restrict format, va_list arg);
+extern int vscanf(char const * restrict format, va_list arg);
 
 /*@ assigns *(s + (0 .. n - 1));
     assigns *(s + (0 .. n - 1)) \from *(format + (..)), arg;
  */
-extern int vsnprintf(char * __restrict s, size_t n,
-                     char const * __restrict format, va_list arg);
+extern int vsnprintf(char * restrict s, size_t n,
+                     char const * restrict format, va_list arg);
 
 /*@ assigns *(s + (0 ..));
     assigns *(s + (0 ..)) \from *(format + (..)), arg;
  */
-extern int vsprintf(char * __restrict s, char const * __restrict format,
+extern int vsprintf(char * restrict s, char const * restrict format,
                     va_list arg);
 
 /*@ requires valid_stream: \valid(stream);
@@ -4708,7 +4705,7 @@ extern int fgetc(FILE *stream);
       \from (indirect: size), (indirect: *stream);
     assigns \result \from s, (indirect: size), (indirect: *stream);
  */
-extern char *fgets(char * __restrict s, int size, FILE * __restrict stream);
+extern char *fgets(char * restrict s, int size, FILE * restrict stream);
 
 /*@ requires valid_stream: \valid(stream);
     assigns *stream, \result;
@@ -4723,7 +4720,7 @@ extern int fputc(int c, FILE *stream);
     assigns \result
       \from (indirect: *(s + (0 .. strlen{Old}(s)))), (indirect: *stream);
  */
-extern int fputs(char const * __restrict s, FILE * __restrict stream);
+extern int fputs(char const * restrict s, FILE * restrict stream);
 
 /*@ requires valid_stream: \valid(stream);
     assigns \result, *stream;
@@ -4797,8 +4794,8 @@ extern int ungetc(int c, FILE *stream);
       \from (indirect: size), (indirect: nmemb), (indirect: *stream);
     assigns \result \from size, (indirect: *stream);
  */
-extern size_t fread(void * __restrict ptr, size_t size, size_t nmemb,
-                    FILE * __restrict stream);
+extern size_t fread(void * restrict ptr, size_t size, size_t nmemb,
+                    FILE * restrict stream);
 
 /*@ requires
       valid_ptr_block: \valid_read((char *)ptr + (0 .. nmemb * size - 1));
@@ -4810,8 +4807,8 @@ extern size_t fread(void * __restrict ptr, size_t size, size_t nmemb,
     assigns \result
       \from (indirect: *((char *)ptr + (0 .. nmemb * size - 1)));
  */
-extern size_t fwrite(void const * __restrict ptr, size_t size, size_t nmemb,
-                     FILE * __restrict stream);
+extern size_t fwrite(void const * restrict ptr, size_t size, size_t nmemb,
+                     FILE * restrict stream);
 
 /*@ requires valid_stream: \valid(stream);
     requires valid_pos: \valid(pos);
@@ -4820,7 +4817,7 @@ extern size_t fwrite(void const * __restrict ptr, size_t size, size_t nmemb,
     assigns \result \from (indirect: *stream);
     assigns *pos \from (indirect: *stream);
  */
-extern int fgetpos(FILE * __restrict stream, fpos_t * __restrict pos);
+extern int fgetpos(FILE * restrict stream, fpos_t * restrict pos);
 
 /*@ requires valid_stream: \valid(stream);
     requires whence_enum: whence ≡ 0 ∨ whence ≡ 1 ∨ whence ≡ 2;
@@ -5455,8 +5452,7 @@ int posix_memalign(void **memptr, size_t alignment, size_t size)
   return_label: return __retres;
 }
 
-char *realpath(char const * __restrict file_name,
-               char * __restrict resolved_name)
+char *realpath(char const * restrict file_name, char * restrict resolved_name)
 {
   char *__retres;
   int tmp;
@@ -5517,7 +5513,7 @@ char *realpath(char const * __restrict file_name,
       \from *((char *)src + (0 .. n - 1));
     assigns \result \from dest;
  */
-void *memcpy(void * __restrict dest, void const * __restrict src, size_t n)
+void *memcpy(void * restrict dest, void const * restrict src, size_t n)
 {
   {
     size_t i = (unsigned int)0;
@@ -6438,9 +6434,9 @@ extern struct tm *localtime(time_t const *timer);
     assigns \result
       \from (indirect: max), (indirect: *(format + (0 ..))), (indirect: *tm);
  */
-extern size_t strftime(char * __restrict s, size_t max,
-                       char const * __restrict format,
-                       struct tm const * __restrict tm);
+extern size_t strftime(char * restrict s, size_t max,
+                       char const * restrict format,
+                       struct tm const * restrict tm);
 
 /*@ requires tp: \valid(tp);
     assigns \result, *tp, __fc_time;
@@ -6573,8 +6569,8 @@ extern int clock_nanosleep(clockid_t clock_id, int flags,
     assigns \result \from (indirect: *timer), result;
     assigns *result \from (indirect: *timer);
  */
-extern struct tm *gmtime_r(time_t const * __restrict timer,
-                           struct tm * __restrict result);
+extern struct tm *gmtime_r(time_t const * restrict timer,
+                           struct tm * restrict result);
 
 /*@ requires valid_request: \valid_read(rqtp);
     requires
@@ -6718,8 +6714,8 @@ extern size_t wcscspn(wchar_t const *wcs, wchar_t const *accept);
       \from (indirect: *(dest + (0 ..))), (indirect: *(src + (0 .. n - 1))),
             (indirect: n);
  */
-extern size_t wcslcat(wchar_t * __restrict dest,
-                      wchar_t const * __restrict src, size_t n);
+extern size_t wcslcat(wchar_t * restrict dest, wchar_t const * restrict src,
+                      size_t n);
 
 /*@ requires valid_wstring_src: valid_read_wstring(src);
     requires room_nwstring: \valid(dest + (0 .. n));
@@ -6802,8 +6798,7 @@ extern wchar_t *wcsstr(wchar_t const *haystack, wchar_t const *needle);
     assigns *(ws + (0 .. n - 1)) \from (indirect: n), (indirect: *stream);
     assigns \result \from ws, (indirect: n), (indirect: *stream);
  */
-extern wchar_t *fgetws(wchar_t * __restrict ws, int n,
-                       FILE * __restrict stream);
+extern wchar_t *fgetws(wchar_t * restrict ws, int n, FILE * restrict stream);
 
 /*@ axiomatic wformat_length {
       logic ℤ wformat_length{L}(wchar_t *format) ;
@@ -7566,7 +7561,7 @@ extern int utimes(char const *path, struct timeval const times[2]);
                        tv_not_null,
                        tv_and_tz_null;
  */
-extern int gettimeofday(struct timeval * __restrict tv, void * __restrict tz);
+extern int gettimeofday(struct timeval * restrict tv, void * restrict tz);
 
 /*@ requires valid_tv_or_null: \valid_read(tv) ∨ tv ≡ \null;
     requires valid_tz_or_null: \valid_read(tz) ∨ tz ≡ \null;
@@ -7679,9 +7674,8 @@ extern int getitimer(int which, struct itimerval *curr_value);
     
     disjoint behaviors invalid, prof, virtual, real;
  */
-extern int setitimer(int which,
-                     struct itimerval const * __restrict new_value,
-                     struct itimerval * __restrict old_value);
+extern int setitimer(int which, struct itimerval const * restrict new_value,
+                     struct itimerval * restrict old_value);
 
 /*@ ghost int volatile __fc_fds_state; */
 /*@ requires nfds: nfds ≥ 0;
@@ -7795,10 +7789,9 @@ extern mode_t umask(mode_t cmask);
     assigns *(*(outbuf + (0 .. *outbytesleft - 1)))
       \from *(*(inbuf + (0 .. *inbytesleft - 1)));
  */
-extern size_t iconv(iconv_t cd, char ** __restrict inbuf,
-                    size_t * __restrict inbytesleft,
-                    char ** __restrict outbuf,
-                    size_t * __restrict outbytesleft);
+extern size_t iconv(iconv_t cd, char ** restrict inbuf,
+                    size_t * restrict inbytesleft, char ** restrict outbuf,
+                    size_t * restrict outbytesleft);
 
 /*@ ensures result_zero_or_neg: \result ≡ 0 ∨ \result ≡ -1;
     assigns __fc_errno;
@@ -7881,8 +7874,8 @@ extern int pthread_cond_destroy(pthread_cond_t *cond);
     assigns *cond \from *attr;
     assigns \result \from \nothing;
  */
-extern int pthread_cond_init(pthread_cond_t * __restrict cond,
-                             pthread_condattr_t const * __restrict attr);
+extern int pthread_cond_init(pthread_cond_t * restrict cond,
+                             pthread_condattr_t const * restrict attr);
 
 /*@ requires valid_cond: \valid(cond);
     requires valid_mutex: \valid(mutex);
@@ -7890,8 +7883,8 @@ extern int pthread_cond_init(pthread_cond_t * __restrict cond,
     assigns \result;
     assigns \result \from \nothing;
  */
-extern int pthread_cond_wait(pthread_cond_t * __restrict cond,
-                             pthread_mutex_t * __restrict mutex);
+extern int pthread_cond_wait(pthread_cond_t * restrict cond,
+                             pthread_mutex_t * restrict mutex);
 
 /*@ requires valid_thread: \valid(thread);
     requires valid_null_attr: attr ≡ \null ∨ \valid_read(attr);
@@ -7904,10 +7897,9 @@ extern int pthread_cond_wait(pthread_cond_t * __restrict cond,
     assigns *thread \from *attr;
     assigns \result \from (indirect: *attr);
  */
-extern int pthread_create(pthread_t * __restrict thread,
-                          pthread_attr_t const * __restrict attr,
-                          void *(*start_routine)(void *),
-                          void * __restrict arg);
+extern int pthread_create(pthread_t * restrict thread,
+                          pthread_attr_t const * restrict attr,
+                          void *(*start_routine)(void *), void * restrict arg);
 
 /*@ requires valid_or_null_retval: retval ≡ \null ∨ \valid(retval);
     ensures
@@ -7948,8 +7940,8 @@ extern int pthread_mutex_destroy(pthread_mutex_t *mutex);
     assigns *mutex \from *mutex, *attrs;
     assigns \result \from (indirect: *mutex), (indirect: *attrs);
  */
-extern int pthread_mutex_init(pthread_mutex_t * __restrict mutex,
-                              pthread_mutexattr_t const * __restrict attrs);
+extern int pthread_mutex_init(pthread_mutex_t * restrict mutex,
+                              pthread_mutexattr_t const * restrict attrs);
 
 /*@ requires mutex_valid: \valid(mutex);
     ensures

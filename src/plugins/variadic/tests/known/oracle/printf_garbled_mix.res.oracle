@@ -61,7 +61,7 @@ extern int ( /* missing proto */ Frama_C_show_each_nb_printed)();
             __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
             param0;
  */
-int printf_va_1(char const * __restrict format, int param0);
+int printf_va_1(char const * restrict format, int param0);
 
 void main(void)
 {

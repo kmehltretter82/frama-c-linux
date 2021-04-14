@@ -20,8 +20,8 @@ extern int __e_acsl_sound_verdict;
       \from *((char *)src + (0 .. n - 1));
     assigns \result \from dest;
  */
-void *__gen_e_acsl_memcpy(void * __restrict dest,
-                          void const * __restrict src, size_t n);
+void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
+                          size_t n);
 
 /*@ requires valid_s: valid_or_empty(s, n);
     ensures
@@ -428,8 +428,8 @@ void *__gen_e_acsl_memset(void *s, int c, size_t n)
       \from *((char *)src + (0 .. n - 1));
     assigns \result \from dest;
  */
-void *__gen_e_acsl_memcpy(void * __restrict dest,
-                          void const * __restrict src, size_t n)
+void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
+                          size_t n)
 {
   void *__gen_e_acsl_at;
   void *__retres;

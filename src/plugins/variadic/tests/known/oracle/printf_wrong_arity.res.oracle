@@ -56,7 +56,7 @@
             __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
             param0;
  */
-int printf_va_1(char const * __restrict format, int param0);
+int printf_va_1(char const * restrict format, int param0);
 
 /*@ requires valid_read_string(format);
     assigns \result, __fc_stdout->__fc_FILE_data;
@@ -70,7 +70,7 @@ int printf_va_1(char const * __restrict format, int param0);
             __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
             param1, param0;
  */
-int printf_va_2(char const * __restrict format, int param0, int param1);
+int printf_va_2(char const * restrict format, int param0, int param1);
 
 int main(void)
 {
