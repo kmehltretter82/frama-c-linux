@@ -2887,7 +2887,7 @@ extern float asinf(float x);
  */
 extern long double asinl(long double x);
 
-/*@ requires finite_arg: ¬\is_NaN(x);
+/*@ requires number_arg: ¬\is_NaN(x);
     ensures finite_result: \is_finite(\result);
     ensures result_domain: -1.571 ≤ \result ≤ 1.571;
     assigns \result;

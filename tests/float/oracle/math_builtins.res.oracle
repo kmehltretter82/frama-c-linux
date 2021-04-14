@@ -164,10 +164,10 @@
   function atan: precondition 'number_arg' got status valid.
 [eva] tests/float/math_builtins.c:94: Call to builtin atanf
 [eva] tests/float/math_builtins.c:94: 
-  function atanf: precondition 'finite_arg' got status valid.
+  function atanf: precondition 'number_arg' got status valid.
 [eva] tests/float/math_builtins.c:95: Call to builtin atanf
 [eva:alarm] tests/float/math_builtins.c:95: Warning: 
-  function atanf: precondition 'finite_arg' got status unknown.
+  function atanf: precondition 'number_arg' got status unknown.
 [eva] Recording results for test_atan
 [eva] Done for function test_atan
 [eva] computing for function test_atan2_det <- main.

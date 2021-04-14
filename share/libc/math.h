@@ -257,7 +257,7 @@ extern long double asinl(long double x);
 /*@
   assigns \result \from x;
   behavior normal:
-    assumes finite_arg: !\is_NaN(x);
+    assumes number_arg: !\is_NaN(x);
     ensures finite_result: \is_finite(\result);
     ensures result_domain: -1.571 <= \result <= 1.571;
   behavior nan:
@@ -348,7 +348,7 @@ extern long double atan2l(long double y, long double x);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
   behavior nan:
-    assumes nan_arg: !\is_NaN(x);
+    assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
     ensures no_error: errno == \old(errno);
@@ -370,7 +370,7 @@ extern double cos(double x);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
   behavior nan:
-    assumes nan_arg: !\is_NaN(x);
+    assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
     ensures no_error: errno == \old(errno);
@@ -392,7 +392,7 @@ extern float cosf(float x);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
   behavior nan:
-    assumes nan_arg: !\is_NaN(x);
+    assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
     ensures no_error: errno == \old(errno);
@@ -414,7 +414,7 @@ extern long double cosl(long double x);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
   behavior nan:
-    assumes nan_arg: !\is_NaN(x);
+    assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
     ensures no_error: errno == \old(errno);
@@ -436,7 +436,7 @@ extern double sin(double x);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
   behavior nan:
-    assumes nan_arg: !\is_NaN(x);
+    assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
     ensures no_error: errno == \old(errno);
@@ -458,7 +458,7 @@ extern float sinf(float x);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
   behavior nan:
-    assumes nan_arg: !\is_NaN(x);
+    assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
     ensures no_error: errno == \old(errno);
