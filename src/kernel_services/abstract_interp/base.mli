@@ -84,7 +84,7 @@ include Datatype.S_with_collections with type t = base
 
 module Hptset: Hptset.S
   with type elt = t
-   and type 'a shape = 'a Hptmap.Shape(Base).t
+   and type 'a map = 'a Hptmap.Shape(Base).t
 
 module SetLattice: Lattice_type.Lattice_Set with module O = Hptset
 

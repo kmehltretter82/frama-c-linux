@@ -65,7 +65,7 @@ end
 
 (** Hashconsed sets of symbolic expressions. *)
 module HCESet: Hptset.S with type elt = HCE.t
-                         and type 'a shape = 'a Hptmap.Shape(HCE).t
+                         and type 'a map = 'a Hptmap.Shape(HCE).t
 
 (* Sets of lvalues that appear in an expression. The [addr] field gathers the
    lvalues [lv] appearing as addresses &lv, while the [read] field gathers the

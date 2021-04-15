@@ -1094,16 +1094,6 @@ struct
     | Branch (p, m, t1, t2, _) ->
       wrap_Branch p m (from_shape f t1) (from_shape f t2)
 
-  let rec from_shape_id = function
-    | Empty -> Empty
-    | Leaf (key, value, _) -> wrap_Leaf key value
-    | Branch (p, m, t1, t2, _) as t ->
-      let t1' = from_shape_id t1 in
-      let t2' = from_shape_id t2 in
-      if (t1' == t1) && (t2' == t2)
-      then t
-      else wrap_Branch p m t1' t2'
-
 
   module Cacheable = struct
     type t = hptmap
@@ -1470,8 +1460,6 @@ struct
             result
       in
       traverse m
-
-  let shape x = ((x : t) :> V.t Shape(Key).map)
 
   let clear_caches () = List.iter (fun f -> f ()) !clear_caches
 

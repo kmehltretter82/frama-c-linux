@@ -216,7 +216,7 @@ module Stmt: sig
   include S_with_collections_pretty with type t = stmt
   module Hptset: sig
     include Hptset.S with type elt = stmt
-                      and type 'a shape = 'a Hptmap.Shape(Stmt_Id).t
+                      and type 'a map = 'a Hptmap.Shape(Stmt_Id).t
     val self: State.t
   end
   val loc: t -> location
@@ -256,7 +256,7 @@ module Varinfo: sig
   include S_with_collections_pretty with type t = varinfo
   module Hptset: sig
     include Hptset.S with type elt = varinfo
-                      and type 'a shape = 'a Hptmap.Shape(Varinfo_Id).t
+                      and type 'a map = 'a Hptmap.Shape(Varinfo_Id).t
     val self: State.t
   end
   val dummy: t

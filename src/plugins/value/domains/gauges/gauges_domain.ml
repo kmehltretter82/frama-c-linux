@@ -392,7 +392,7 @@ module G = struct
       MV.fold2_join_heterogeneous
         ~cache ~empty_left ~empty_right ~both ~join ~empty
     in
-    fun mv1 mv2 -> f mv1 (MV.shape mv2)
+    fun mv1 mv2 -> f mv1 mv2
 
   (* compute pointwise [mv - mc] *)
   let mv_minus_mc =
@@ -415,7 +415,7 @@ module G = struct
       MV.fold2_join_heterogeneous
         ~cache ~empty_left ~empty_right ~both ~join ~empty
     in
-    fun mv mc -> f mv (MC.shape mc)
+    fun mv mc -> f mv mc
 
   (* Implementation of the 'forget' operation. [nb] loop iterations have
      elapsed, and during one iteration, variables are incremented by [coeffs].
@@ -435,7 +435,7 @@ module G = struct
     in
     let join = MV.merge_disjoint in
     MV.fold2_join_heterogeneous
-      ~cache ~empty_left ~empty_right ~both ~join ~empty mv (MC.shape mc)
+      ~cache ~empty_left ~empty_right ~both ~join ~empty mv mc
 
   type multiple_iterations = { nb: Bounds.t; coeffs: MC. t}
 
@@ -481,7 +481,7 @@ module G = struct
 
     (* Keep only the variables of [mi.coeffs] already present in [mv]. *)
     let restrict mv mi =
-      { mi with coeffs = MC.inter_with_shape (MV.shape mv) mi.coeffs }
+      { mi with coeffs = MC.inter_with_shape mv mi.coeffs }
 
   end
 

@@ -326,13 +326,6 @@ module type S = sig
       More efficient than just performing successive {!add} the elements
       of the other map *)
 
-  val from_shape_id: v map -> t
-  (** Same as [from_shape (fun _ v -> v)]. *)
-
-  val shape: t -> v map
-  (** Export the map as a value suitable for functions {!inter_with_shape}
-      and {!from_shape} *)
-
   val replace_key: decide:(key -> v -> v -> v) -> key map -> t -> bool * t
   (** [replace_key ~decide shape map] substitute keys in [map] according to
       [shape]: it returns the [map] in which all bindings from [key] to [v] such

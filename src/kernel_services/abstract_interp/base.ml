@@ -561,8 +561,7 @@ type substitution = base Hptmap.Shape(Base).t
 
 let substitution_from_list list =
   let add map (key, elt) = BMap.add key elt map in
-  let bmap = List.fold_left add BMap.empty list in
-  BMap.shape bmap
+  List.fold_left add BMap.empty list
 
 (*
 Local Variables:

@@ -352,7 +352,7 @@ module Set = struct
     (* Naive pointwise union of maps. *)
     let r = naive_union a b in
     (* Computes the equalities that are missing in [r]. *)
-    let missing_equalities = transitive_closure a (shape b) in
+    let missing_equalities = transitive_closure a b in
     (* Binds the equalities of [missing_equalities] in [r]. [processed] is
        the set of the terms that have been already updated. *)
     let update key (equality, _, _) (map, processed) =
@@ -418,6 +418,6 @@ module Set = struct
     let f = fold2_join_heterogeneous
         ~cache ~empty_left ~empty_right ~both ~join ~empty
     in
-    fun eqs1 eqs2 -> f eqs1 (shape eqs2)
+    fun eqs1 eqs2 -> f eqs1 eqs2
 
 end

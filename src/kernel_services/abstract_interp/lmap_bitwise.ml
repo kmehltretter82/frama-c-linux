@@ -408,10 +408,10 @@ struct
       Zone.fold2_join_heterogeneous
         ~cache ~empty_left ~empty_right ~both ~join ~empty
     in
-    fun z m -> fmap z (LBase.shape m)
+    fun z m -> fmap z m
 
 
-  let shape = LBase.shape
+  let shape x = x
 
 end
 
