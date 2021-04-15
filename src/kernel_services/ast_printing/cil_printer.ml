@@ -2021,8 +2021,8 @@ class cil_printer () = object (self)
             printAttributes atts_elem sep self#attrparam s
         | [Attr("static",[]); Attr("arraylen",[s])]
         | [Attr("arraylen", [s]); Attr("static", [])] ->
-          Format.fprintf fmt "static@ %a%t%a"
-            printAttributes atts_elem sep self#attrparam s
+          Format.fprintf fmt "static%a@ %a"
+            printAttributes atts_elem self#attrparam s
         | _ -> ()
       in
       let name' fmt =
