@@ -2126,7 +2126,12 @@ class cil_printer () = object (self)
        | "thread", [] when not (Cil.msvcMode ()) -> fprintf fmt "__thread"; false
        | "volatile", [] -> self#pp_keyword fmt "volatile"; false
        | "ghost", [] -> self#pp_keyword fmt "\\ghost"; false
-       | "restrict", [] -> fprintf fmt "restrict"; false
+       | "restrict", [] ->
+         if Cil.msvcMode () then
+           fprintf fmt "__restrict"
+         else
+           self#pp_keyword fmt "restrict";
+         false
        | "missingproto", [] ->
          if self#display_comment () then fprintf fmt "/* missing proto */";
          false
