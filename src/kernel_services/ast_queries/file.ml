@@ -523,10 +523,23 @@ let build_cpp_cmd = function
         include_args define_args
     in
     let cpp_command = replace_in_cpp_cmd cmdl supp_args (f:>string) (ppf:>string) in
+    let cpp_command_with_chdir =
+      if Kernel.JsonCompilationDatabase.is_set () then
+        let jcdb_path = (Kernel.JsonCompilationDatabase.get () :> string) in
+        let dir =
+          if Sys.is_directory jcdb_path then jcdb_path
+          else Filename.dirname jcdb_path
+        in
+        let cwd = Unix.getcwd () in
+        if cwd <> dir then
+          "cd " ^ dir ^ " && " ^ cpp_command
+        else cpp_command
+      else cpp_command
+    in
     Kernel.feedback ~dkey:Kernel.dkey_pp
       "preprocessing with \"%s\""
-      cpp_command;
-    Some (cpp_command, ppf, supp_args)
+      cpp_command_with_chdir;
+    Some (cpp_command_with_chdir, ppf, supp_args)
 
 let parse_cabs cpp_command = function
   | NoCPP f ->
@@ -1744,17 +1757,17 @@ let prepare_from_c_files () =
   let files = Files.get () in (* Allow pre-registration of prolog files *)
   let cpp_commands = List.map (fun f -> (f, build_cpp_cmd f)) files in
   if Kernel.PrintCppCommands.get () then print_and_exit cpp_commands;
-  if not (Kernel.AuditCheck.is_empty ()) then begin
+  let audit_check_path = Kernel.AuditCheck.get () in
+  if not (Filepath.Normalized.is_empty audit_check_path) then begin
     let all_sources_tbl = compute_sources_table cpp_commands in
-    let expected_hashes = source_hashes_of_json (Kernel.AuditCheck.get ()) in
+    let expected_hashes = source_hashes_of_json audit_check_path in
     check_source_hashes expected_hashes all_sources_tbl
   end;
-  if not (Kernel.AuditPrepare.is_empty ()) then begin
+  let audit_path = Kernel.AuditPrepare.get () in
+  if not (Filepath.Normalized.is_empty audit_path) then begin
     let all_sources_tbl = compute_sources_table cpp_commands in
-    let audit_path = Kernel.AuditPrepare.get () in
     print_all_sources audit_path all_sources_tbl;
-    if not (Filepath.Normalized.is_special_stdout audit_path)
-    then
+    if not (Filepath.Normalized.is_special_stdout audit_path) then
       Kernel.feedback "Audit: sources list written to: %a@."
         Filepath.Normalized.pretty audit_path;
   end;
