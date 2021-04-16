@@ -17,6 +17,12 @@
 Open Source Release <next-release>
 ##################################
 
+-!  RTE       [2021-04-16] -rte-initialized takes a set of functions as
+                           parameter (defaults to none)
+-   RTE       [2021-04-16] No more initialization warnings for full structures
+                           and unions reads. Initialization warnings for other
+                           types *without* trap representation. Refer to the
+                           documentation for more details.
 -*  Kernel    [2021-04-16] Pretty prints array formals in their original form.
               Fixes pub/frama-c#392
 o!  Kernel    [2021-04-13] Removed deprecated function Filepath.pretty
