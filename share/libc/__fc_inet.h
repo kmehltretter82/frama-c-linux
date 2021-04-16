@@ -76,8 +76,8 @@ struct sockaddr_in6 {
 // Non-POSIX
 #define INADDR_NONE ((in_addr_t) 0xffffffff)
 
-#define IN6ADDR_ANY 0
-#define IN6ADDR_BROADCAST 0XFFFFFFFFFFFFFFFFULL
+#define IN6ADDR_ANY_INIT {{0}}
+#define IN6ADDR_LOOPBACK_INIT {{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 }}
 #define INET6_ADDRSTRLEN 46
 
 // Not required by POSIX

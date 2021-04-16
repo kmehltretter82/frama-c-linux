@@ -31,7 +31,7 @@ struct lconv __C_locale = {(char*)".",(char*)"",(char*)"",(char*)"",(char*)"",
 
 struct lconv *__frama_c_locale=&__C_locale;
 
-char*__frama_c_locale_names[512]={(char*)"C"};
+const char *__frama_c_locale_names[512] = {"C"};
 char *setlocale(int category, const char *locale) {
   if (*locale == 'C') 
     { __frama_c_locale = &__C_locale;

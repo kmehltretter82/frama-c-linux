@@ -3942,7 +3942,7 @@ int h_errno;
  */
 extern void freeaddrinfo(struct addrinfo *addrinfo);
 
-char *__fc_gai_strerror = (char *)"<error message reported by gai_strerror>";
+char const *__fc_gai_strerror = "<error message reported by gai_strerror>";
 /*@ ensures result_string: \result ≡ __fc_gai_strerror;
     ensures result_valid_string: valid_read_string(\result);
     assigns \result;
@@ -4501,22 +4501,22 @@ struct hostent *gethostbyname(char const *name)
 
 struct in6_addr const in6addr_any = {.s6_addr = {(unsigned char)0}};
 struct in6_addr const in6addr_loopback =
-  {.s6_addr = {(unsigned char)0xFF,
-               (unsigned char)0xFF,
-               (unsigned char)0xFF,
-               (unsigned char)0xFF,
-               (unsigned char)0xFF,
-               (unsigned char)0xFF,
-               (unsigned char)0xFF,
-               (unsigned char)0xFF,
-               (unsigned char)0xFF,
-               (unsigned char)0xFF,
-               (unsigned char)0xFF,
-               (unsigned char)0xFF,
-               (unsigned char)0xFF,
-               (unsigned char)0xFF,
-               (unsigned char)0xFF,
-               (unsigned char)0xFF}};
+  {.s6_addr = {(unsigned char)0,
+               (unsigned char)0,
+               (unsigned char)0,
+               (unsigned char)0,
+               (unsigned char)0,
+               (unsigned char)0,
+               (unsigned char)0,
+               (unsigned char)0,
+               (unsigned char)0,
+               (unsigned char)0,
+               (unsigned char)0,
+               (unsigned char)0,
+               (unsigned char)0,
+               (unsigned char)0,
+               (unsigned char)0,
+               (unsigned char)1}};
 FILE *__fc_stderr;
 
 FILE *__fc_stdin;

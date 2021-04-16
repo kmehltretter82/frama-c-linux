@@ -121,7 +121,7 @@ extern void endservent(void);
 */
 extern void freeaddrinfo(struct addrinfo * addrinfo);
 
-char *__fc_gai_strerror = (char*)"<error message reported by gai_strerror>";
+const char *__fc_gai_strerror = "<error message reported by gai_strerror>";
 
 /*@
   assigns \result \from indirect:errcode, __fc_gai_strerror;
