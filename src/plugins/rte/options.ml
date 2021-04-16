@@ -68,9 +68,9 @@ module DoInitialized =
     (struct
       let option_name = "-rte-initialized"
       let arg_name = "fct"
-      let help = "annotates local variables and pointers reads of non struct \
-                  or union types with initialization tests for functions in \
-                  'fct', see documentation for more details."
+      let help = "for each function in 'fct', annotates reads of non struct or \
+                  union values from local variables and pointers with \
+                  initialization tests, see documentation for more details"
     end)
 
 (* annotates invalid memory access (undefined behavior) *)
