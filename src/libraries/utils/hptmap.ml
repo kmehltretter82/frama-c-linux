@@ -336,36 +336,55 @@ module Shape(Key: Id_Datatype) = struct
 
   (* This reference will contain a list of functions that will clear
      all the transient caches used in this module *)
-  let clear_caches = ref []
+  let clear_caches_ref = ref []
+  let register_clear_cache f = clear_caches_ref := f :: !clear_caches_ref
+  let clear_caches () = List.iter (fun f -> f ()) !clear_caches_ref
 
-  let fold2_join_heterogeneous (type arg1) (type arg2) (type result) ~cache ~empty_left ~empty_right ~both ~join ~empty =
-    let cache_merge = match cache with
-      | Hptmap_sig.NoCache -> (fun f x y -> f x y)
-      | Hptmap_sig.PersistentCache _name | Hptmap_sig.TemporaryCache _name ->
-        if debug_cache then Format.eprintf "CACHE fold2_join_heterogeneous %s@." _name;
-        let module Arg1 = struct
-          type t = (Key.t, arg1) tree
-          let hash : t -> int = hash_generic
-          let sentinel : t = Empty
-          let equal : t -> t -> bool = (==)
-        end in
-        let module Arg2 = struct
-          type t = (Key.t, arg2) tree
-          let hash : t -> int = hash_generic
-          let sentinel : t = Empty
-          let equal : t -> t -> bool = (==)
-        end in
-        let module Result = struct
-          type t = result
-          let sentinel : t = empty
-        end in
-        let module Cache = Binary_cache.Arity_Two (Arg1) (Arg2) (Result) in
-        (match cache with
-         | Hptmap_sig.PersistentCache _ ->
-           clear_caches := Cache.clear :: !clear_caches
-         | _ -> ());
-        Cache.merge
-    in
+  module Cacheable (X: sig type v end) = struct
+    type t = (key, X.v) tree
+    let hash : t -> int = hash_generic
+    let sentinel : t = Empty
+    let equal : t -> t -> bool = (==)
+  end
+
+  type (_,_) equality = Eq : ('a,'a) equality
+  type ('a, 'b) eq = ('a, 'b) equality option
+
+  let make_binary_cache (type v1 v2 result)
+      ?(symmetric:(v1, v2) eq) ?(predicate:(result, bool) eq) empty name cache =
+    match cache with
+    | Hptmap_sig.NoCache -> (fun f x y -> f x y)
+    | Hptmap_sig.TemporaryCache cache_name
+    | Hptmap_sig.PersistentCache cache_name ->
+      if debug_cache
+      then Format.eprintf "Hptmap CACHE %s: %s@." name cache_name;
+      let module Arg1 = Cacheable (struct type v = v1 end) in
+      let module Arg2 = Cacheable (struct type v = v2 end) in
+      let module R = struct
+        type t = result
+        let sentinel : t = empty
+      end in
+      let clear_cache, merge_cache =
+        match predicate, symmetric with
+        | None, None ->
+          let module Cache = Binary_cache.Arity_Two (Arg1) (Arg2) (R) in
+          Cache.clear, Cache.merge
+        | None, Some Eq ->
+          let module Cache = Binary_cache.Symmetric_Binary (Arg1) (R) in
+          Cache.clear, Cache.merge
+        | Some Eq, None ->
+          let module Cache = Binary_cache.Binary_Predicate (Arg1) (Arg2) in
+          Cache.clear, Cache.merge
+        | Some Eq, Some Eq ->
+          let module Cache = Binary_cache.Symmetric_Binary_Predicate (Arg1) in
+          Cache.clear, Cache.merge
+      in
+      if cache = Hptmap_sig.PersistentCache cache_name
+      then register_clear_cache clear_cache;
+      merge_cache
+
+  let fold2_join_heterogeneous ~cache ~empty_left ~empty_right ~both ~join ~empty =
+    let cache_merge = make_binary_cache empty "fold2" cache in
     let rec compute s t = cache_merge aux s t
     and aux s t =
       match s, t with
@@ -503,54 +522,17 @@ module Shape(Key: Id_Datatype) = struct
     aux'
 
 
-  let binary_predicate (type arg1) (type arg2) ct pt ~decide_fast ~decide_fst ~decide_snd ~decide_both =
-    let cache_merge = match ct with
-      | Hptmap_sig.NoCache -> (fun f x y -> f x y)
-      | Hptmap_sig.PersistentCache _name | Hptmap_sig.TemporaryCache _name ->
-        if debug_cache then Format.eprintf "CACHE binary_predicate %s@." _name;
-        let module Arg1 = struct
-          type t = (Key.t, arg1) tree
-          let hash : t -> int = hash_generic
-          let sentinel : t = Empty
-          let equal : t -> t -> bool = (==)
-        end in
-        let module Arg2 = struct
-          type t = (Key.t, arg2) tree
-          let hash : t -> int = hash_generic
-          let sentinel : t = Empty
-          let equal : t -> t -> bool = (==)
-        end in
-        let module Cache =
-          Binary_cache.Binary_Predicate(Arg1)(Arg2)
-        in
-        (match ct with
-         | Hptmap_sig.PersistentCache _ ->
-           clear_caches := Cache.clear :: !clear_caches
-         | _ -> ());
-        Cache.merge
+  let binary_predicate ct pt ~decide_fast ~decide_fst ~decide_snd ~decide_both =
+    let cache_merge =
+      make_binary_cache ~predicate:Eq true "binary_predicate" ct
     in
     make_binary_predicate cache_merge pt
       ~decide_fast ~decide_fst ~decide_snd ~decide_both
 
-  let symmetric_binary_predicate (type arg) ct pt ~decide_fast ~decide_one ~decide_both =
-    let cache_merge = match ct with
-      | Hptmap_sig.NoCache -> (fun f x y -> f x y)
-      | Hptmap_sig.PersistentCache _name | Hptmap_sig.TemporaryCache _name ->
-        if debug_cache then Format.eprintf "CACHE symmetric_binary_predicate %s@." _name;
-        let module Arg = struct
-          type t = (Key.t, arg) tree
-          let hash : t -> int = hash_generic
-          let sentinel : t = Empty
-          let equal : t -> t -> bool = (==)
-        end in
-        let module Cache =
-          Binary_cache.Binary_Predicate (Arg) (Arg)
-        in
-        (match ct with
-         | Hptmap_sig.PersistentCache _ ->
-           clear_caches := Cache.clear :: !clear_caches
-         | _ -> ());
-        Cache.merge
+  let symmetric_binary_predicate ct pt ~decide_fast ~decide_one ~decide_both =
+    let cache_merge =
+      make_binary_cache ~symmetric:Eq ~predicate:Eq true
+        "symmetric_binary_predicate" ct
     in
     make_binary_predicate cache_merge pt
       ~decide_fast ~decide_fst:decide_one ~decide_snd:decide_one ~decide_both
@@ -562,7 +544,7 @@ module Shape(Key: Id_Datatype) = struct
     let cache = Array.make cache_size (Empty, empty) in
     let hash t = abs (hash t mod cache_size) in
     let reset () = Array.fill cache 0 cache_size (Empty, empty) in
-    if not temporary then clear_caches := reset :: !clear_caches;
+    if not temporary then register_clear_cache reset;
     fun m ->
       let rec traverse t =
         let mem result =
@@ -1094,25 +1076,6 @@ struct
     | Branch (p, m, t1, t2, _) ->
       wrap_Branch p m (from_shape f t1) (from_shape f t2)
 
-
-  module Cacheable = struct
-    type t = hptmap
-    let hash = hash
-    let sentinel = Empty
-    let equal = (==)
-  end
-
-  module R = struct
-    type t = hptmap
-    let sentinel = Empty
-  end
-
-  module type I = sig
-    val clear : unit -> unit
-    val merge : (Cacheable.t -> Cacheable.t -> R.t)
-      -> Cacheable.t -> Cacheable.t -> Cacheable.t
-  end
-
   (* A (too ?) generic merge. *)
   let generic_merge
       ~(cache:        Hptmap_sig.cache_type)
@@ -1124,20 +1087,8 @@ struct
       ~(decide_right: t -> t)
     =
     (* Cache of the merges, depending on [cache] and [symmetric].*)
-    let cache_merge = match cache with
-      | Hptmap_sig.NoCache -> (fun f x y -> f x y)
-      | Hptmap_sig.PersistentCache _name | Hptmap_sig.TemporaryCache _name ->
-        if debug_cache then Format.eprintf "CACHE generic_merge %s@." _name;
-        let module Cache =
-          (val if symmetric
-            then (module Binary_cache.Symmetric_Binary (Cacheable) (R) : I)
-            else (module Binary_cache.Arity_Two (Cacheable) (Cacheable) (R) : I)
-            : I)
-        in
-        if cache = Hptmap_sig.PersistentCache _name
-        then clear_caches := Cache.clear :: !clear_caches;
-        Cache.merge
-    in
+    let sym = if symmetric then Some Eq else None in
+    let cache_merge = make_binary_cache ?symmetric:sym Empty "merge" cache in
     (* Rewrap of branches.
        The initials branches and tree are provided in order to avoid the wrapping
        if the two branches have not been modified.
@@ -1431,7 +1382,7 @@ struct
     let _name, cache = cache in
     let table = Hashtbl.create cache in
     if not temporary then
-      clear_caches := (fun () -> Hashtbl.clear table) :: !clear_caches;
+      register_clear_cache (fun () -> Hashtbl.clear table);
     let counter = ref 0 in
     fun m ->
       let rec traverse t =
@@ -1460,8 +1411,6 @@ struct
             result
       in
       traverse m
-
-  let clear_caches () = List.iter (fun f -> f ()) !clear_caches
 
 end
 

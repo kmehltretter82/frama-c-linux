@@ -182,6 +182,11 @@ module type Shape = sig
         ['b] returned by the auxiliary functions are merged using [join], which is
         called in an unspecified order. The results of the function may be cached,
         depending on [cache]. *)
+
+  val clear_caches: unit -> unit
+  (** Clear all the persistent caches used internally by the functions of this
+      module. Those caches are not project-aware, so this function must be
+      called at least each time a project switch occurs. *)
 end
 
 
@@ -315,11 +320,6 @@ module type S = sig
   val compositional_bool: t -> bool
   (** Value of the compositional boolean associated to the tree, as computed
       by the {!Compositional_bool} argument of the functor. *)
-
-  val clear_caches: unit -> unit
-  (** Clear all the persistent caches used internally by the functions of this
-      module. Those caches are not project-aware, so this function must be
-      called at least each time a project switch occurs. *)
 
   val from_shape: (key -> 'a -> v) -> 'a map -> t
   (** Build an entire map from another map indexed by the same keys.
