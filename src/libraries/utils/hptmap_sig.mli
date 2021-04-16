@@ -195,38 +195,6 @@ module type S = sig
 
   (** {2 Binary predicates} *)
 
-  type decide_fast = Done | Unknown
-  (** Shortcut for functions that decide whether a predicate holds on a tree.
-      [Done] means that the function returns its default value, which is
-      usually [unit]. [Unknown] means that the evaluation must continue in the
-      subtrees. *)
-
-  val generic_predicate :
-    exn ->
-    cache:(string * 'a) ->
-    decide_fast:(t -> t -> decide_fast) ->
-    decide_fst:(key -> v  -> unit) ->
-    decide_snd:(key -> v  -> unit) ->
-    decide_both:(v -> v -> unit) ->
-    t -> t -> unit
-  (** [generic_is_included e (cache_name, cache_size) ~decide_fast
-          ~decide_fst ~decide_snd ~decide_both t1 t2] decides whether some
-      relation holds between [t1] and [t2]. All [decide] functions must raise
-      [e] when the relation does not hold, and do nothing otherwise.
-
-      [decide_fst] (resp. [decide_snd]) is called when one key is present only
-      in [t1] (resp. [t2]).
-
-      [decide_both] is called when a key is present in both trees.
-
-      [decide_fast] is called on entire keys. As its name implies, it must be
-      fast; in doubt, returning [Unknown] is always correct. Raising [e] means
-      that the relation does not hold. Returning [Done] means that the relation
-      holds.
-
-      The computation of this relation cached. [cache_name] is used to identify
-      the cache when debugging. [cache_size] is currently unused. *)
-
   (** Existential ([||]) or universal ([&&]) predicates. *)
   type predicate_type = ExistentialPredicate | UniversalPredicate
 
@@ -242,18 +210,24 @@ module type S = sig
     decide_snd:(key -> v  -> bool) ->
     decide_both:(key -> v -> v -> bool) ->
     t -> t -> bool
-  (** Same functionality as [generic_predicate] but with a different signature.
-      All decision functions return a boolean that are combined differently
-      depending on whether the predicate is existential or universal. *)
+  (** [binary_predicate] decides whether some relation holds between two maps,
+      according to the functions:
+      - [decide_fst] and [decide_snd], called on keys present only
+        in the first or second map respectively;
+      - [decide_both], called on keys present in both trees;
+      - [decide_fast], called on entire maps as an optimization. As its name
+        implies, it must be fast. If can prevent the analysis of some maps by
+        directly returning [PTrue] or [PFalse] when possible. Otherwise, it
+        returns [PUnknown] and the maps are analyzed by calling the functions
+        above on each binding.
 
-  val generic_symmetric_predicate :
-    exn ->
-    decide_fast:(t -> t -> decide_fast) ->
-    decide_one:(key -> v  -> unit) ->
-    decide_both:(v -> v -> unit) ->
-    t -> t -> unit
-  (** Same as [generic_predicate], but for a symmetric relation. [decide_fst]
-      and [decide_snd] are thus merged into [decide_one]. *)
+      If the predicate is existential, then the function returns [true] as soon
+      as one of the call to the functions above returns [true]. If the predicate
+      is universal, the function returns [true] if all calls to the functions
+      above return [true].
+
+      The computation of this relation can be cached, according to [cache_type].
+  *)
 
   val symmetric_binary_predicate:
     cache_type ->

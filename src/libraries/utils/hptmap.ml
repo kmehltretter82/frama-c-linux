@@ -1250,100 +1250,6 @@ struct
     in
     fun s t -> compute s t
 
-
-  type decide_fast = Done | Unknown
-
-  let make_predicate cache_merge exn ~decide_fast ~decide_fst ~decide_snd ~decide_both =
-    let rec aux s t =
-      if decide_fast s t = Unknown then
-        match s, t with
-        | Empty, _ ->
-          iter decide_snd t
-        | (Leaf _ | Branch _), Empty ->
-          iter decide_fst s
-        | Leaf(k1, v1, _), Leaf(k2, v2, _) ->
-          if Key.id k1 = Key.id k2
-          then decide_both v1 v2
-          else begin
-            decide_fst k1 v1;
-            decide_snd k2 v2;
-          end
-        | Leaf(key, _value, _), Branch(p,m,l,r,_) ->
-          let i = Key.id key in
-          if i < p+m
-          then begin
-            aux s l;
-            aux Empty r;
-          end
-          else begin
-            aux Empty l;
-            aux s r;
-          end
-        | Branch (p,m,l,r,_) , Leaf(key, _value, _) ->
-          let i = Key.id key in
-          if i < p+m
-          then begin
-            aux l t;
-            aux r Empty;
-          end
-          else begin
-            aux l Empty;
-            aux r t;
-          end
-        | Branch _, Branch _ ->
-          (* Beware that [cache_merge compute] may swap the order of its
-             arguments compared to [aux]. Do not use the result of the match
-             in [aux] directly inside [compute]. *)
-          let compute s t = match s, t with
-            | Branch(p, m, s0, s1, _), Branch(q, n, t0, t1, _) -> begin
-                try
-                  if (p = q) && (m = n) then
-                    begin
-                      (*The trees have the same prefix. Compare their sub-trees.*)
-                      aux s0 t0;
-                      aux s1 t1
-                    end
-                  else if (Big_Endian.shorter m n) && (match_prefix q p m) then
-                    (* [q] contains [p]. Compare [t] with a sub-tree of [s]. *)
-                    if (q land m) = 0 then
-                      begin
-                        aux s0 t;
-                        aux s1 Empty;
-                      end
-                    else
-                      begin
-                        aux s0 Empty;
-                        aux s1 t
-                      end
-                  else if (Big_Endian.shorter n m) && (match_prefix p q n) then
-                    (* [p] contains [q]. Compare [s] with a sub-tree of [t]. *)
-                    if (p land n) = 0 then
-                      begin
-                        aux s t0;
-                        aux Empty t1
-                      end
-                    else
-                      begin
-                        aux s t1;
-                        aux Empty t0
-                      end
-                  else
-                    begin
-                      (* The prefixes disagree. *)
-                      aux s Empty;
-                      aux Empty t;
-                    end;
-                  true
-                with e when e = exn -> false
-                   | _ -> assert false
-              end
-            | _ -> assert false (* Branch/Branch comparison *)
-          in
-          let result = cache_merge compute s t in
-          if not result then raise exn
-    in
-    aux
-
   let replace_key ~decide shape map =
     let cache = Hptmap_sig.NoCache in
     let inter, diff = partition_with_shape shape map in
@@ -1361,25 +1267,6 @@ struct
           ~both ~join inter shape
       in
       true, join new_inter diff
-
-  let generic_predicate exn ~cache ~decide_fast ~decide_fst ~decide_snd ~decide_both =
-    if debug_cache then Format.eprintf "CACHE generic_predicate %s@." (fst cache);
-    let module Cache =
-      Binary_cache.Binary_Predicate(Cacheable)(Cacheable)
-    in
-    clear_caches := Cache.clear :: !clear_caches;
-    make_predicate Cache.merge exn
-      ~decide_fast ~decide_fst ~decide_snd ~decide_both
-
-  let generic_symmetric_predicate exn ~decide_fast ~decide_one ~decide_both =
-    if debug_cache then Format.eprintf "CACHE generic_symmetric_predicate@.";
-    let module Cache =
-      Binary_cache.Symmetric_Binary_Predicate(Cacheable)
-    in
-    clear_caches := Cache.clear :: !clear_caches;
-    make_predicate Cache.merge exn
-      ~decide_fast ~decide_fst:decide_one ~decide_snd:decide_one ~decide_both
-
 
   type predicate_type = ExistentialPredicate | UniversalPredicate
   type predicate_result = PTrue | PFalse | PUnknown
