@@ -5171,7 +5171,9 @@ and doType (ghost:bool) isFuncArg
                  Cil_printer.pp_exp cst
              else
                Kernel.error ~once:true ~current:true
-                 "Array length %a is not a compile-time constant."
+                 "Array length %a is not a compile-time constant,@ \
+                  and currently VLAs may only have their first dimension \
+                  as variable."
                  Cil_printer.pp_exp cst
            | _ -> ());
           if Cil.isZero len' && not allowZeroSizeArrays &&
