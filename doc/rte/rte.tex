@@ -790,9 +790,10 @@ Finally, there are some cases when reading uninitialized values via a type that
 cannot have trap representation (for example \lstinline{unsigned char}) should
 be allowed, for example writing a \lstinline{memcpy} function. In this case, one
 can exclude this function from the range of function annotated with
-initialization properties using \lstinline{-rte-initialized-ignore}.
-Note that the excluded functions must preserve the initialization of globals, as
-no assertions are generated for them.
+initialization properties by removing them from the set of functions to annotate
+(e.g. \lstinline{-rte-initialized="@all,-f"}). Note that the excluded functions
+must preserve the initialization of globals, as no assertions are generated for
+them.
 
 \section{Undefined behaviors not covered by \rte{}}
 
@@ -892,11 +893,8 @@ zero \\
 \lstinline |-rte-float-to-int| & boolean (true) & Generate annotations for
 casts from floating-point to integer \\
 \hline
-\lstinline |-rte-initialized| & boolean (false) & Generate annotations for
-initialization \\
-\hline
-\lstinline |-rte-initialized-ignore| & set of function (none) & Functions to
-exclude for initialization annotations \\
+\lstinline |-rte-initialized| & set of function (none) & Generate annotations
+for initialization for the given set of functions \\
 \hline
 \lstinline |-rte-mem| & boolean (true) & Generate annotations for validity of
 left-values access \\
