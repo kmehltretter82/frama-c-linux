@@ -21,7 +21,7 @@
 /*  (enclosed in the file GPL).                                           */
 /*                                                                        */
 /**************************************************************************/
-#include "share/libc/stdlib.h"
+#include "stdlib.h"
 typedef struct purse {
   int balance;
 } purse;

@@ -1,7 +1,7 @@
 /* run.config*
    STDOPT: #"tests/value/abstract_struct_2.c -lib-entry -eva-msg-key initial-state"
 */
-#include "share/libc/stdlib.h"
+#include "stdlib.h"
 
 struct abstracttype;
 struct something {

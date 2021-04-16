@@ -1,4 +1,4 @@
-#include "share/libc/assert.h"
+#include "assert.h"
 
 int test = 1;
 
