@@ -22,6 +22,7 @@
     implemented on top of Patricia trees. A tree is big-endian if it
     expects the key's most significant bits to be tested first. *)
 
+
 (** Undocumented. Needed for advanced users only *)
 type prefix
 
@@ -42,12 +43,8 @@ end
     Those shapes can be used by various functions to efficiently build
     new maps whose shape are already known. *)
 module Shape (Key : Id_Datatype): sig
-  type 'value t
-  val compare: ('value -> 'value -> int) -> 'value t -> 'value t -> int
-  val equal : 'value t -> 'value t -> bool
-  val pretty: 'value Pretty_utils.formatter -> 'value t Pretty_utils.formatter
-  val hash: 'value t -> int
-  val iter: (Key.t -> 'value -> unit) -> 'value t -> unit
+  include Hptmap_sig.Shape with type key = Key.t
+  type 'a t = 'a map
 end
 
 module Make
@@ -78,7 +75,7 @@ module Make
      end)
   : Hptmap_sig.S with type key = Key.t
                   and type v = V.t
-                  and type 'a shape = 'a Shape(Key).t
+                  and type 'v map = 'v Shape(Key).map
                   and type prefix = prefix
 
 (** Default implementation for the [Compositional_bool] argument of the functor

@@ -56,6 +56,22 @@ module Big_Endian = struct
 
 end
 
+(* The auxiliary function [match_prefix] tells whether a given key has a
+   given prefix. More specifically, [match_prefix k p m] returns [true] if
+   and only if the key [k] has prefix [p] up to bit [m].
+
+   Throughout our implementation of Patricia trees, prefixes are assumed to
+   be in normal form, i.e. their irrelevant bits are set to some
+   predictable value. Formally, we assume
+   [Big_Endian.mask p m] equals [p] whenever
+   [p] is a prefix with [m] relevant bits. This allows implementing
+   [match_prefix] using only one call to [Big_Endian.mask].
+   On the other hand, this
+   requires normalizing prefixes, as done e.g. in [join] below, where
+   [Big_Endian.mask p0 m] has to be used instead of [p0]. *)
+let match_prefix k p m =
+  Big_Endian.mask k m = p
+
 (*i ------------------------------------------------------------------------ i*)
 (*s \mysection{Patricia-tree-based maps} *)
 
@@ -111,7 +127,11 @@ module type V = sig
 end
 
 module Shape(Key: Id_Datatype) = struct
-  type 'b t = (Key.t, 'b) tree
+  type key = Key.t
+  type 'b map = (Key.t, 'b) tree
+  type 'a t = 'a map
+
+  let id = hash_generic
 
   let compare_v cmp t1 t2 =
     match t1, t2 with
@@ -166,6 +186,411 @@ module Shape(Key: Id_Datatype) = struct
 
   let equal = ( == )
 
+
+
+  let rec min_binding t =
+    match t with
+    | Empty -> raise Not_found
+    | Branch (_,_,left,_,_) -> min_binding left
+    | Leaf (key, data, _) -> key, data
+
+  let rec max_binding t =
+    match t with
+    | Empty -> raise Not_found
+    | Branch (_,_,_,right,_) -> max_binding right
+    | Leaf (key, data, _) -> key, data
+
+  (* [find k m] looks up the value associated to the key [k] in the map [m],
+     and raises [Not_found] if no value is bound to [k].
+
+     This implementation takes branches \emph{without} checking whether the
+     key matches the prefix found at the current node. This means that a
+     query for a non-existent key shall be detected only when finally
+     reaching a leaf, rather than higher up in the tree. This strategy is
+     better when (most) queries are expected to be successful. *)
+  let find key htr =
+    let id = Key.id key in
+    let rec find htr =
+      match htr with
+      | Empty ->
+        raise Not_found
+      | Leaf (key', data, _) ->
+        if Key.equal key key' then
+          data
+        else
+          raise Not_found
+      | Branch (_, mask, tree0, tree1, _) ->
+        find (if (id land mask) = 0 then tree0 else tree1)
+    in
+    find htr
+
+  (* Similar to [find], but checks the prefix found at the current node *)
+  let find_check_missing key htr =
+    let id = Key.id key in
+    let rec find htr =
+      match htr with
+      | Empty ->
+        raise Not_found
+      | Leaf (key', data, _) ->
+        if Key.equal key key' then
+          data
+        else
+          raise Not_found
+      | Branch (prefix, mask, tree0, tree1, _) ->
+        if match_prefix id prefix mask then
+          find (if (id land mask) = 0 then tree0 else tree1)
+        else raise Not_found
+    in
+    find htr
+
+  let find_key key htr =
+    let id = Key.id key in
+    let rec find htr =
+      match htr with
+      | Empty ->
+        raise Not_found
+      | Leaf (key', _, _) ->
+        if Key.equal key key' then
+          key'
+        else
+          raise Not_found
+      | Branch (prefix, mask, tree0, tree1, _) ->
+        if match_prefix id prefix mask then
+          find (if (id land mask) = 0 then tree0 else tree1)
+        else raise Not_found
+    in
+    find htr
+
+  let mem key htr =
+    let id = Key.id key in
+    let rec find htr =
+      match htr with
+      | Empty ->
+        false
+      | Leaf (key', _, _) ->
+        Key.equal key key'
+      | Branch (prefix, mask, tree0, tree1, _) ->
+        if match_prefix id prefix mask then
+          find (if (id land mask) = 0 then tree0 else tree1)
+        else false
+    in
+    find htr
+
+  let is_singleton htr = match htr with
+    | Leaf (k, d, _) ->
+      Some (k, d)
+    | Empty
+    | Branch _ ->
+      None
+
+  let on_singleton f htr = match htr with
+    | Leaf (k, d, _) -> f k d
+    | Empty | Branch _ -> false
+
+  let is_empty htr = match htr with
+    | Empty ->
+      true
+    | Leaf _
+    | Branch _ ->
+      false
+
+  let rec cardinal htr = match htr with
+    | Empty ->
+      0
+    | Leaf _ ->
+      1
+    | Branch (_, _, t0, t1,  _) ->
+      cardinal t0 + cardinal t1
+
+
+  let rec fold f m accu =
+    match m with
+    | Empty ->
+      accu
+    | Leaf (key, data, _) ->
+      f key data accu
+    | Branch (_, _, tree0, tree1, _) ->
+      fold f tree1 (fold f tree0 accu)
+
+  let rec fold_rev f m accu =
+    match m with
+    | Empty ->
+      accu
+    | Leaf (key, data, _) ->
+      f key data accu
+    | Branch (_, _, tree0, tree1, _) ->
+      fold_rev f tree0 (fold_rev f tree1 accu)
+
+
+  let rec for_all f m =
+    match m with
+    | Empty -> true
+    | Leaf (key, data, _) -> f key data
+    | Branch (_, _, tree0, tree1, _) -> for_all f tree0 && for_all f tree1
+
+  let rec exists f m =
+    match m with
+    | Empty -> false
+    | Leaf (key, data, _) -> f key data
+    | Branch (_, _, tree0, tree1, _) -> exists f tree0 || exists f tree1
+
+  (* This reference will contain a list of functions that will clear
+     all the transient caches used in this module *)
+  let clear_caches = ref []
+
+  let fold2_join_heterogeneous (type arg1) (type arg2) (type result) ~cache ~empty_left ~empty_right ~both ~join ~empty =
+    let cache_merge = match cache with
+      | Hptmap_sig.NoCache -> (fun f x y -> f x y)
+      | Hptmap_sig.PersistentCache _name | Hptmap_sig.TemporaryCache _name ->
+        if debug_cache then Format.eprintf "CACHE fold2_join_heterogeneous %s@." _name;
+        let module Arg1 = struct
+          type t = (Key.t, arg1) tree
+          let hash : t -> int = hash_generic
+          let sentinel : t = Empty
+          let equal : t -> t -> bool = (==)
+        end in
+        let module Arg2 = struct
+          type t = (Key.t, arg2) tree
+          let hash : t -> int = hash_generic
+          let sentinel : t = Empty
+          let equal : t -> t -> bool = (==)
+        end in
+        let module Result = struct
+          type t = result
+          let sentinel : t = empty
+        end in
+        let module Cache = Binary_cache.Arity_Two (Arg1) (Arg2) (Result) in
+        (match cache with
+         | Hptmap_sig.PersistentCache _ ->
+           clear_caches := Cache.clear :: !clear_caches
+         | _ -> ());
+        Cache.merge
+    in
+    let rec compute s t = cache_merge aux s t
+    and aux s t =
+      match s, t with
+      | Empty, Empty -> empty
+      | Empty, t -> empty_left t
+      | s, Empty -> empty_right s
+
+      | Leaf (ks, vs, _), Leaf (kt, vt, _) ->
+        if Key.equal ks kt then
+          both ks vs vt
+        else
+          join (empty_left t) (empty_right s)
+
+      | Branch (p, m, s0, s1, _), Leaf(kt, _, _) ->
+        let k_id = Key.id kt in
+        if match_prefix k_id p m then
+          if (k_id land m) = 0 then
+            join (compute s0 t) (empty_right s1)
+          else
+            join (compute s1 t) (empty_right s0)
+        else
+          join (empty_right s) (empty_left t)
+
+      | Leaf (ks, _, _), Branch(q, n, t0, t1, _) ->
+        let k_id = Key.id ks in
+        if match_prefix k_id q n then
+          if (k_id land n) = 0 then
+            join (compute s t0) (empty_left t1)
+          else
+            join (compute s t1) (empty_left t0)
+        else
+          join (empty_right s) (empty_left t)
+
+      | Branch(p, m, s0, s1, _), Branch(q, n, t0, t1, _) ->
+        if (p = q) && (m = n) then
+          (* The trees have the same prefix. recurse on the sub-trees *)
+          join (compute s0 t0) (compute s1 t1)
+        else if (Big_Endian.shorter m n) && (match_prefix q p m) then
+          (* [q] contains [p]. Merge [t] with a sub-tree of [s]. *)
+          if (q land m) = 0 then
+            join (compute s0 t) (empty_right s1)
+          else
+            join (compute s1 t) (empty_right s0)
+        else if (Big_Endian.shorter n m) && (match_prefix p q n) then
+          (* [p] contains [q]. Merge [s] with a sub-tree of [t]. *)
+          if (p land n) = 0 then
+            join (compute s t0) (empty_left t1)
+          else
+            join (compute s t1) (empty_left t0)
+        else
+          (* The prefixes disagree. *)
+          join (empty_right s) (empty_left t)
+    in
+    fun s t -> compute s t
+
+  type predicate_type = ExistentialPredicate | UniversalPredicate
+  type predicate_result = PTrue | PFalse | PUnknown
+
+  let decide_fast_intersection s t =
+    match s, t with
+    | Empty, _ | _, Empty -> PFalse
+    | _ -> if s == t  then PTrue else PUnknown
+
+  let decide_fast_inclusion s t =
+    if s == t || s == Empty then PTrue else PUnknown
+
+  let make_binary_predicate cache_merge pt ~decide_fast ~decide_fst ~decide_snd ~decide_both =
+    (** We cannot use [&&] and [||] under another name, as functions are not
+        lazy in OCaml. Instead, we defer the evaluation of the right part by
+        calling a function. Due to typing issues, we must actually define
+        two functions... *)
+    let comb1, comb2 =
+      match pt with
+      | UniversalPredicate ->   let f b f v1 v2 = b && f v1 v2 in f, f
+      | ExistentialPredicate -> let f b f v1 v2 = b || f v1 v2 in f, f
+    in
+    let rec aux s t =
+      match s, t with
+      | Empty, Empty ->
+        (match pt with
+         | ExistentialPredicate -> false
+         | UniversalPredicate -> true)
+
+      | Leaf (key, data, _), Empty ->
+        decide_fst key data
+
+      | Empty, Leaf (key, data, _) ->
+        decide_snd key data
+
+      | Empty, Branch (_, _, tl, tr, _) ->
+        comb1 (aux' Empty tl) aux' Empty tr
+
+      | Branch (_, _, tl, tr, _), Empty ->
+        comb1 (aux' tl Empty) aux' tr Empty
+
+      | Leaf(k1, v1, _), Leaf(k2, v2, _) ->
+        if Key.id k1 = Key.id k2
+        then decide_both k1 v1 v2
+        else comb2 (decide_fst k1 v1) decide_snd k2 v2
+
+      | Leaf(key, _value, _), Branch(p,m,l,r,_) ->
+        let i = Key.id key in
+        if i < p+m
+        then comb1 (aux' Empty r) aux' s l
+        else comb1 (aux' Empty l) aux' s r
+
+      | Branch (p,m,l,r,_) , Leaf(key, _value, _) ->
+        let i = Key.id key in
+        if i < p+m
+        then comb1 (aux' r Empty) aux' l t
+        else comb1 (aux' l Empty) aux' r t
+
+      | Branch(p, m, s0, s1, _), Branch(q, n, t0, t1, _) ->
+        if (p = q) && (m = n) then
+          (*The trees have the same prefix. Compare their sub-trees.*)
+          comb1 (aux' s0 t0) aux' s1 t1
+        else if (Big_Endian.shorter m n) && (match_prefix q p m) then
+          (* [q] contains [p]. Compare [t] with a sub-tree of [s]. *)
+          if (q land m) = 0
+          then comb1 (aux' s1 Empty) aux' s0 t
+          else comb1 (aux' s0 Empty) aux' s1 t
+        else if (Big_Endian.shorter n m) && (match_prefix p q n) then
+          (* [p] contains [q]. Compare [s] with a sub-tree of [t]. *)
+          if (p land n) = 0
+          then comb1 (aux' s t0) aux' Empty t1
+          else comb1 (aux' s t1) aux' Empty t0
+        else (* The prefixes disagree. *)
+          comb1 (aux' s Empty) aux' Empty t
+    and aux' s t =
+      match decide_fast s t with
+      | PFalse -> false
+      | PTrue -> true
+      | PUnknown -> cache_merge aux s t
+    in
+    aux'
+
+
+  let binary_predicate (type arg1) (type arg2) ct pt ~decide_fast ~decide_fst ~decide_snd ~decide_both =
+    let cache_merge = match ct with
+      | Hptmap_sig.NoCache -> (fun f x y -> f x y)
+      | Hptmap_sig.PersistentCache _name | Hptmap_sig.TemporaryCache _name ->
+        if debug_cache then Format.eprintf "CACHE binary_predicate %s@." _name;
+        let module Arg1 = struct
+          type t = (Key.t, arg1) tree
+          let hash : t -> int = hash_generic
+          let sentinel : t = Empty
+          let equal : t -> t -> bool = (==)
+        end in
+        let module Arg2 = struct
+          type t = (Key.t, arg2) tree
+          let hash : t -> int = hash_generic
+          let sentinel : t = Empty
+          let equal : t -> t -> bool = (==)
+        end in
+        let module Cache =
+          Binary_cache.Binary_Predicate(Arg1)(Arg2)
+        in
+        (match ct with
+         | Hptmap_sig.PersistentCache _ ->
+           clear_caches := Cache.clear :: !clear_caches
+         | _ -> ());
+        Cache.merge
+    in
+    make_binary_predicate cache_merge pt
+      ~decide_fast ~decide_fst ~decide_snd ~decide_both
+
+  let symmetric_binary_predicate (type arg) ct pt ~decide_fast ~decide_one ~decide_both =
+    let cache_merge = match ct with
+      | Hptmap_sig.NoCache -> (fun f x y -> f x y)
+      | Hptmap_sig.PersistentCache _name | Hptmap_sig.TemporaryCache _name ->
+        if debug_cache then Format.eprintf "CACHE symmetric_binary_predicate %s@." _name;
+        let module Arg = struct
+          type t = (Key.t, arg) tree
+          let hash : t -> int = hash_generic
+          let sentinel : t = Empty
+          let equal : t -> t -> bool = (==)
+        end in
+        let module Cache =
+          Binary_cache.Binary_Predicate (Arg) (Arg)
+        in
+        (match ct with
+         | Hptmap_sig.PersistentCache _ ->
+           clear_caches := Cache.clear :: !clear_caches
+         | _ -> ());
+        Cache.merge
+    in
+    make_binary_predicate cache_merge pt
+      ~decide_fast ~decide_fst:decide_one ~decide_snd:decide_one ~decide_both
+
+
+  let cached_fold ~cache_name ~temporary ~f ~joiner ~empty =
+    if debug_cache then Format.eprintf "CACHE cached_fold %s@." cache_name;
+    let cache_size = Binary_cache.cache_size in
+    let cache = Array.make cache_size (Empty, empty) in
+    let hash t = abs (hash t mod cache_size) in
+    let reset () = Array.fill cache 0 cache_size (Empty, empty) in
+    if not temporary then clear_caches := reset :: !clear_caches;
+    fun m ->
+      let rec traverse t =
+        let mem result =
+          cache.(hash t) <- (t, result);
+          result
+        in
+        let find () =
+          let t', r = cache.(hash t) in
+          if equal t t' then r
+          else raise Not_found
+        in
+        match t with
+        | Empty -> empty
+        | Leaf(key, value, _) ->
+          (try
+             find ()
+           with Not_found ->
+             mem (f key value)
+          )
+        | Branch(_p, _m, s0, s1, _) ->
+          try
+            find ()
+          with Not_found ->
+            let result0 = traverse s0 in
+            let result1 = traverse s1 in
+            mem (joiner result0 result1)
+      in
+      traverse m
 end
 
 module Make
@@ -181,10 +606,8 @@ module Make
 =
 struct
 
-  type key = Key.t
+  include Shape (Key)
   type v = V.t
-  module Shape = Shape(Key)
-  type 'a shape = 'a Shape.t
   type prefix = int * int
 
   (* A tree is either empty, or a leaf node, containing both
@@ -220,29 +643,15 @@ struct
         (Type.name Key.ty) (Type.name V.ty);
       Datatype.undefined
     end
-    else Shape.compare V.compare
+    else compare V.compare
+
+  let pretty = pretty V.pretty
 
   let compositional_bool t =
     match t with
-      Empty -> Compositional_bool.e
+    | Empty -> Compositional_bool.e
     | Leaf (_,_,tc)
     | Branch (_,_,_,_,tc) -> Tag_comp.get_comp tc
-
-  let rec min_binding t =
-    match t with
-      Empty -> raise Not_found
-    | Branch (_,_,left,_,_) -> min_binding left
-    | Leaf (key, data, _) -> key, data
-
-  let rec max_binding t =
-    match t with
-      Empty -> raise Not_found
-    | Branch (_,_,_,right,_) -> max_binding right
-    | Leaf (key, data, _) -> key, data
-
-  let iter = Shape.iter
-
-  let pretty = Shape.pretty V.pretty
 
   let empty = Empty
 
@@ -338,8 +747,6 @@ struct
 
   let self = PatriciaHashconsTbl.self
 
-  let id = hash_generic
-
   let wrap_Leaf k v =
     (* The test k < p+m and the implementation of [highest_bit] do not work
        with negative keys. *)
@@ -362,107 +769,6 @@ struct
     if result == new_tr
     then current_tag := (succ tag) land max_int ;
     result
-
-
-  (* This reference will contain a list of functions that will clear
-     all the transient caches used in this module *)
-  let clear_caches = ref []
-
-
-  (* The auxiliary function [match_prefix] tells whether a given key has a
-     given prefix. More specifically, [match_prefix k p m] returns [true] if
-     and only if the key [k] has prefix [p] up to bit [m].
-
-     Throughout our implementation of Patricia trees, prefixes are assumed to
-     be in normal form, i.e. their irrelevant bits are set to some
-     predictable value. Formally, we assume
-     [Big_Endian.mask p m] equals [p] whenever
-     [p] is a prefix with [m] relevant bits. This allows implementing
-     [match_prefix] using only one call to [Big_Endian.mask].
-     On the other hand, this
-     requires normalizing prefixes, as done e.g. in [join] below, where
-     [Big_Endian.mask p0 m] has to be used instead of [p0]. *)
-  let match_prefix k p m =
-    Big_Endian.mask k m = p
-
-
-  (* [find k m] looks up the value associated to the key [k] in the map [m],
-     and raises [Not_found] if no value is bound to [k].
-
-     This implementation takes branches \emph{without} checking whether the
-     key matches the prefix found at the current node. This means that a
-     query for a non-existent key shall be detected only when finally
-     reaching a leaf, rather than higher up in the tree. This strategy is
-     better when (most) queries are expected to be successful. *)
-  let find key htr =
-    let id = Key.id key in
-    let rec find htr =
-      match htr with
-      | Empty ->
-        raise Not_found
-      | Leaf (key', data, _) ->
-        if Key.equal key key' then
-          data
-        else
-          raise Not_found
-      | Branch (_, mask, tree0, tree1, _) ->
-        find (if (id land mask) = 0 then tree0 else tree1)
-    in
-    find htr
-
-  (* Similar to [find], but checks the prefix found at the current node *)
-  let find_check_missing key htr =
-    let id = Key.id key in
-    let rec find htr =
-      match htr with
-      | Empty ->
-        raise Not_found
-      | Leaf (key', data, _) ->
-        if Key.equal key key' then
-          data
-        else
-          raise Not_found
-      | Branch (prefix, mask, tree0, tree1, _) ->
-        if match_prefix id prefix mask then
-          find (if (id land mask) = 0 then tree0 else tree1)
-        else raise Not_found
-    in
-    find htr
-
-
-  let find_key key htr =
-    let id = Key.id key in
-    let rec find htr =
-      match htr with
-      | Empty ->
-        raise Not_found
-      | Leaf (key', _, _) ->
-        if Key.equal key key' then
-          key'
-        else
-          raise Not_found
-      | Branch (prefix, mask, tree0, tree1, _) ->
-        if match_prefix id prefix mask then
-          find (if (id land mask) = 0 then tree0 else tree1)
-        else raise Not_found
-    in
-    find htr
-
-  let mem key htr =
-    let id = Key.id key in
-    let rec find htr =
-      match htr with
-      | Empty ->
-        false
-      | Leaf (key', _, _) ->
-        Key.equal key key'
-      | Branch (prefix, mask, tree0, tree1, _) ->
-        if match_prefix id prefix mask then
-          find (if (id land mask) = 0 then tree0 else tree1)
-        else false
-    in
-    find htr
-
 
   (* The auxiliary function [join] merges two trees in the simple case where
      their prefixes disagree.
@@ -631,32 +937,6 @@ struct
   let singleton k d =
     wrap_Leaf k d
 
-  let is_singleton htr = match htr with
-    | Leaf (k, d, _) ->
-      Some (k, d)
-    | Empty
-    | Branch _ ->
-      None
-
-  let on_singleton f htr = match htr with
-    | Leaf (k, d, _) -> f k d
-    | Empty | Branch _ -> false
-
-  let is_empty htr = match htr with
-    | Empty ->
-      true
-    | Leaf _
-    | Branch _ ->
-      false
-
-  let rec cardinal htr = match htr with
-    | Empty ->
-      0
-    | Leaf _ ->
-      1
-    | Branch (_, _, t0, t1,  _) ->
-      cardinal t0 + cardinal t1
-
   let remove key m =
     let id = Key.id key in
     let rec remove htr  = match htr with
@@ -729,25 +1009,6 @@ struct
       in
       find_and_remove htr
       *)
-
-  let rec fold f m accu =
-    match m with
-    | Empty ->
-      accu
-    | Leaf (key, data, _) ->
-      f key data accu
-    | Branch (_, _, tree0, tree1, _) ->
-      fold f tree1 (fold f tree0 accu)
-
-  let rec fold_rev f m accu =
-    match m with
-    | Empty ->
-      accu
-    | Leaf (key, data, _) ->
-      f key data accu
-    | Branch (_, _, tree0, tree1, _) ->
-      fold_rev f tree0 (fold_rev f tree1 accu)
-
   let rehash_node = function
     | Empty -> Empty
     | Leaf (k, v, _) -> wrap_Leaf k v
@@ -762,20 +1023,6 @@ struct
         fold add l r
 
   let () = rehash_ref := rehash_node
-
-
-  let rec for_all f m =
-    match m with
-    | Empty -> true
-    | Leaf (key, data, _) -> f key data
-    | Branch (_, _, tree0, tree1, _) -> for_all f tree0 && for_all f tree1
-
-  let rec exists f m =
-    match m with
-    | Empty -> false
-    | Leaf (key, data, _) -> f key data
-    | Branch (_, _, tree0, tree1, _) -> exists f tree0 || exists f tree1
-
 
   let rec map f htr = match htr with
     | Empty ->
@@ -1172,83 +1419,6 @@ struct
     in
     merge
 
-  let fold2_join_heterogeneous (type arg) (type result) ~cache ~empty_left ~empty_right ~both ~join ~empty =
-    let cache_merge = match cache with
-      | Hptmap_sig.NoCache -> (fun f x y -> f x y)
-      | Hptmap_sig.PersistentCache _name | Hptmap_sig.TemporaryCache _name ->
-        if debug_cache then Format.eprintf "CACHE fold2_join_heterogeneous %s@." _name;
-        let module Arg = struct
-          type t = (Key.t, arg) tree
-          let hash : t -> int = hash_generic
-          let sentinel : t = Empty
-          let equal : t -> t -> bool = (==)
-        end in
-        let module Result = struct
-          type t = result
-          let sentinel : t = empty
-        end in
-        let module Cache = Binary_cache.Arity_Two(Cacheable)(Arg)(Result) in
-        (match cache with
-         | Hptmap_sig.PersistentCache _ ->
-           clear_caches := Cache.clear :: !clear_caches
-         | _ -> ());
-        Cache.merge
-    in
-    let rec compute s t = cache_merge aux s t
-    and aux s t =
-      match s, t with
-      | Empty, Empty -> empty
-      | Empty, t -> empty_left t
-      | s, Empty -> empty_right s
-
-      | Leaf (ks, vs, _), Leaf (kt, vt, _) ->
-        if Key.equal ks kt then
-          both ks vs vt
-        else
-          join (empty_left t) (empty_right s)
-
-      | Branch (p, m, s0, s1, _), Leaf(kt, _, _) ->
-        let k_id = Key.id kt in
-        if match_prefix k_id p m then
-          if (k_id land m) = 0 then
-            join (compute s0 t) (empty_right s1)
-          else
-            join (compute s1 t) (empty_right s0)
-        else
-          join (empty_right s) (empty_left t)
-
-      | Leaf (ks, _, _), Branch(q, n, t0, t1, _) ->
-        let k_id = Key.id ks in
-        if match_prefix k_id q n then
-          if (k_id land n) = 0 then
-            join (compute s t0) (empty_left t1)
-          else
-            join (compute s t1) (empty_left t0)
-        else
-          join (empty_right s) (empty_left t)
-
-      | Branch(p, m, s0, s1, _), Branch(q, n, t0, t1, _) ->
-        if (p = q) && (m = n) then
-          (* The trees have the same prefix. recurse on the sub-trees *)
-          join (compute s0 t0) (compute s1 t1)
-        else if (Big_Endian.shorter m n) && (match_prefix q p m) then
-          (* [q] contains [p]. Merge [t] with a sub-tree of [s]. *)
-          if (q land m) = 0 then
-            join (compute s0 t) (empty_right s1)
-          else
-            join (compute s1 t) (empty_right s0)
-        else if (Big_Endian.shorter n m) && (match_prefix p q n) then
-          (* [p] contains [q]. Merge [s] with a sub-tree of [t]. *)
-          if (p land n) = 0 then
-            join (compute s t0) (empty_left t1)
-          else
-            join (compute s t1) (empty_left t0)
-        else
-          (* The prefixes disagree. *)
-          join (empty_right s) (empty_left t)
-    in
-    fun s t -> compute s t
-
   let replace_key ~decide shape map =
     let cache = Hptmap_sig.NoCache in
     let inter, diff = partition_with_shape shape map in
@@ -1266,157 +1436,6 @@ struct
           ~both ~join inter shape
       in
       true, join new_inter diff
-
-  type predicate_type = ExistentialPredicate | UniversalPredicate
-  type predicate_result = PTrue | PFalse | PUnknown
-
-  let decide_fast_intersection s t =
-    match s, t with
-    | Empty, _ | _, Empty -> PFalse
-    | _ -> if s == t  then PTrue else PUnknown
-
-  let decide_fast_inclusion s t =
-    if s == t || s == Empty then PTrue else PUnknown
-
-  let make_binary_predicate cache_merge pt ~decide_fast ~decide_fst ~decide_snd ~decide_both =
-    (** We cannot use [&&] and [||] under another name, as functions are not
-        lazy in OCaml. Instead, we defer the evaluation of the right part by
-        calling a function. Due to typing issues, we must actually define
-        two functions... *)
-    let comb1, comb2 =
-      match pt with
-      | UniversalPredicate ->   let f b f v1 v2 = b && f v1 v2 in f, f
-      | ExistentialPredicate -> let f b f v1 v2 = b || f v1 v2 in f, f
-    in
-    let rec aux s t =
-      match s, t with
-      | Empty, Empty ->
-        (match pt with
-         | ExistentialPredicate -> false
-         | UniversalPredicate -> true)
-
-      | Leaf (key, data, _), Empty ->
-        decide_fst key data
-
-      | Empty, Leaf (key, data, _) ->
-        decide_snd key data
-
-      | Empty, Branch (_, _, tl, tr, _) ->
-        comb1 (aux' Empty tl) aux' Empty tr
-
-      | Branch (_, _, tl, tr, _), Empty ->
-        comb1 (aux' tl Empty) aux' tr Empty
-
-      | Leaf(k1, v1, _), Leaf(k2, v2, _) ->
-        if Key.id k1 = Key.id k2
-        then decide_both k1 v1 v2
-        else comb2 (decide_fst k1 v1) decide_snd k2 v2
-
-      | Leaf(key, _value, _), Branch(p,m,l,r,_) ->
-        let i = Key.id key in
-        if i < p+m
-        then comb1 (aux' Empty r) aux' s l
-        else comb1 (aux' Empty l) aux' s r
-
-      | Branch (p,m,l,r,_) , Leaf(key, _value, _) ->
-        let i = Key.id key in
-        if i < p+m
-        then comb1 (aux' r Empty) aux' l t
-        else comb1 (aux' l Empty) aux' r t
-
-      | Branch(p, m, s0, s1, _), Branch(q, n, t0, t1, _) ->
-        if (p = q) && (m = n) then
-          (*The trees have the same prefix. Compare their sub-trees.*)
-          comb1 (aux' s0 t0) aux' s1 t1
-        else if (Big_Endian.shorter m n) && (match_prefix q p m) then
-          (* [q] contains [p]. Compare [t] with a sub-tree of [s]. *)
-          if (q land m) = 0
-          then comb1 (aux' s1 Empty) aux' s0 t
-          else comb1 (aux' s0 Empty) aux' s1 t
-        else if (Big_Endian.shorter n m) && (match_prefix p q n) then
-          (* [p] contains [q]. Compare [s] with a sub-tree of [t]. *)
-          if (p land n) = 0
-          then comb1 (aux' s t0) aux' Empty t1
-          else comb1 (aux' s t1) aux' Empty t0
-        else (* The prefixes disagree. *)
-          comb1 (aux' s Empty) aux' Empty t
-    and aux' s t =
-      match decide_fast s t with
-      | PFalse -> false
-      | PTrue -> true
-      | PUnknown -> cache_merge aux s t
-    in
-    aux'
-
-
-  let binary_predicate ct pt ~decide_fast ~decide_fst ~decide_snd ~decide_both =
-    let cache_merge = match ct with
-      | Hptmap_sig.NoCache -> (fun f x y -> f x y)
-      | Hptmap_sig.PersistentCache _name | Hptmap_sig.TemporaryCache _name ->
-        if debug_cache then Format.eprintf "CACHE binary_predicate %s@." _name;
-        let module Cache =
-          Binary_cache.Binary_Predicate(Cacheable)(Cacheable)
-        in
-        (match ct with
-         | Hptmap_sig.PersistentCache _ ->
-           clear_caches := Cache.clear :: !clear_caches
-         | _ -> ());
-        Cache.merge
-    in
-    make_binary_predicate cache_merge pt
-      ~decide_fast ~decide_fst ~decide_snd ~decide_both
-
-  let symmetric_binary_predicate ct pt ~decide_fast ~decide_one ~decide_both =
-    let cache_merge = match ct with
-      | Hptmap_sig.NoCache -> (fun f x y -> f x y)
-      | Hptmap_sig.PersistentCache _name | Hptmap_sig.TemporaryCache _name ->
-        if debug_cache then Format.eprintf "CACHE symmetric_binary_predicate %s@." _name;
-        let module Cache = Binary_cache.Symmetric_Binary_Predicate(Cacheable) in
-        (match ct with
-         | Hptmap_sig.PersistentCache _ ->
-           clear_caches := Cache.clear :: !clear_caches
-         | _ -> ());
-        Cache.merge
-    in
-    make_binary_predicate cache_merge pt
-      ~decide_fast ~decide_fst:decide_one ~decide_snd:decide_one ~decide_both
-
-
-  let cached_fold ~cache_name ~temporary ~f ~joiner ~empty =
-    if debug_cache then Format.eprintf "CACHE cached_fold %s@." cache_name;
-    let cache_size = Binary_cache.cache_size in
-    let cache = Array.make cache_size (Empty, empty) in
-    let hash t = abs (hash t mod cache_size) in
-    let reset () = Array.fill cache 0 cache_size (Empty, empty) in
-    if not temporary then clear_caches := reset :: !clear_caches;
-    fun m ->
-      let rec traverse t =
-        let mem result =
-          cache.(hash t) <- (t, result);
-          result
-        in
-        let find () =
-          let t', r = cache.(hash t) in
-          if equal t t' then r
-          else raise Not_found
-        in
-        match t with
-        | Empty -> empty
-        | Leaf(key, value, _) ->
-          (try
-             find ()
-           with Not_found ->
-             mem (f key value)
-          )
-        | Branch(_p, _m, s0, s1, _) ->
-          try
-            find ()
-          with Not_found ->
-            let result0 = traverse s0 in
-            let result1 = traverse s1 in
-            mem (joiner result0 result1)
-      in
-      traverse m
 
   let cached_map ~cache ~temporary ~f =
     let _name, cache = cache in
@@ -1452,7 +1471,7 @@ struct
       in
       traverse m
 
-  let shape x = ((x : t) :> V.t shape)
+  let shape x = ((x : t) :> V.t Shape(Key).map)
 
   let clear_caches () = List.iter (fun f -> f ()) !clear_caches
 

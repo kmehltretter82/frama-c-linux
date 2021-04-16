@@ -30,26 +30,174 @@ type cache_type =
       is a local function which is garbage-collectable. *)
 
 
+module type Shape = sig
+  type key    (** Type of the keys. *)
+  type 'v map (** Type of the maps from type [key] to type ['v]. *)
+
+  (** Bijective function. The ids are positive. *)
+  val id: 'v map -> int
+
+  val compare: ('value -> 'value -> int) -> 'value map -> 'value map -> int
+  val equal : 'value map -> 'value map -> bool
+  val pretty: 'value Pretty_utils.formatter -> 'value map Pretty_utils.formatter
+  val hash: 'value map -> int
+
+  val is_empty : 'v map -> bool
+  (** [is_empty m] returns [true] if and only if the map [m] defines no
+      bindings at all. *)
+
+  val find : key -> 'v map -> 'v
+  val find_check_missing: key -> 'v map -> 'v
+  (** Both [find key m] and [find_check_missing key m] return the value
+      bound to [key] in [m], or raise [Not_found] is [key] is unbound.
+      [find] is optimised for the case where [key] is bound in [m], whereas
+      [find_check_missing] is more efficient for the cases where [m]
+      is big and [key] is missing. *)
+
+  val find_key : key -> 'v map -> key
+  (** This function is useful where there are multiple distinct keys that
+      are equal for [Key.equal]. *)
+
+  val mem :  key -> 'v map -> bool
+  (** [mem k m] returns true if [k] is bound in [m], and false otherwise. *)
+
+  val iter : (key -> 'v -> unit) -> 'v map -> unit
+  (** [iter f m] applies [f] to all bindings of the map [m]. *)
+
+  val fold : (key -> 'v -> 'b -> 'b) -> 'v map -> 'b -> 'b
+  (** [fold f m seed] invokes [f k d accu], in turn, for each binding from
+      key [k] to datum [d] in the map [m]. Keys are presented to [f] in
+      increasing order according to the map's ordering. The initial value of
+      [accu] is [seed]; then, at each new call, its value is the value
+      returned by the previous invocation of [f]. The value returned by
+      [fold] is the final value of [accu]. *)
+
+  val fold_rev : (key -> 'v -> 'b -> 'b) -> 'v map -> 'b -> 'b
+  (** [fold_rev] performs exactly the same job as [fold], but presents keys
+      to [f] in the opposite order. *)
+
+  val for_all: (key -> 'v -> bool) -> 'v map -> bool
+  (** [for_all p m] returns true if all the bindings of the map [m] satisfy
+      the predicate [p]. *)
+
+  val exists: (key -> 'v -> bool) -> 'v map -> bool
+  (** [for_all p m] returns true if at least one binding of the map [m] satisfies
+      the predicate [p]. *)
+
+  (** {2 Binary predicates} *)
+
+  (** Existential ([||]) or universal ([&&]) predicates. *)
+  type predicate_type = ExistentialPredicate | UniversalPredicate
+
+  (** Does the given predicate hold or not. [PUnknown] indicates that the result
+      is uncertain, and that the more aggressive analysis should be used. *)
+  type predicate_result = PTrue | PFalse | PUnknown
+
+  val binary_predicate:
+    cache_type ->
+    predicate_type ->
+    decide_fast:('v map -> 'v map -> predicate_result) ->
+    decide_fst:(key -> 'v -> bool) ->
+    decide_snd:(key -> 'v -> bool) ->
+    decide_both:(key -> 'v -> 'v -> bool) ->
+    'v map -> 'v map -> bool
+  (** [binary_predicate] decides whether some relation holds between two maps,
+      according to the functions:
+      - [decide_fst] and [decide_snd], called on keys present only
+        in the first or second map respectively;
+      - [decide_both], called on keys present in both trees;
+      - [decide_fast], called on entire maps as an optimization. As its name
+        implies, it must be fast. If can prevent the analysis of some maps by
+        directly returning [PTrue] or [PFalse] when possible. Otherwise, it
+        returns [PUnknown] and the maps are analyzed by calling the functions
+        above on each binding.
+
+      If the predicate is existential, then the function returns [true] as soon
+      as one of the call to the functions above returns [true]. If the predicate
+      is universal, the function returns [true] if all calls to the functions
+      above return [true].
+
+      The computation of this relation can be cached, according to [cache_type].
+  *)
+
+  val symmetric_binary_predicate:
+    cache_type ->
+    predicate_type ->
+    decide_fast:('v map -> 'v map -> predicate_result) ->
+    decide_one:(key -> 'v -> bool) ->
+    decide_both:(key -> 'v -> 'v -> bool) ->
+    'v map -> 'v map -> bool
+  (** Same as [binary_predicate], but for a symmetric relation. [decide_fst]
+      and [decide_snd] are thus merged into [decide_one]. *)
+
+  val decide_fast_inclusion: 'v map -> 'v map -> predicate_result
+  (** Function suitable for the [decide_fast] argument of [binary_predicate],
+      when testing for inclusion of the first map into the second. If the two
+      arguments are equal, or the first one is empty, the relation holds. *)
+
+  val decide_fast_intersection: 'v map -> 'v map -> predicate_result
+  (** Function suitable for the [decide_fast] argument of
+      [symmetric_binary_predicate] when testing for a non-empty intersection
+      between two maps. If one map is empty, the intersection is empty.
+      Otherwise, if the two maps are equal, the intersection is non-empty. *)
+
+  val cached_fold :
+    cache_name:string ->
+    temporary:bool ->
+    f:(key -> 'v -> 'b) ->
+    joiner:('b -> 'b -> 'b) ->
+    empty:'b ->
+    'v map -> 'b
+
+  val is_singleton: 'v map -> (key * 'v) option
+  (** [is_singleton m] returns [Some (k, d)] if [m] is a singleton map
+      that maps [k] to [d]. Otherwise, it returns [None]. *)
+
+  val on_singleton: (key -> 'v -> bool) -> 'v map -> bool
+  (** [on_singleton f m] returns [f k d] if [m] is a singleton map
+      that maps [k] to [d]. Otherwise, it returns false. *)
+
+  val cardinal: 'v map -> int
+  (** [cardinal m] returns [m]'s cardinal, that is, the number of keys it
+      binds, or, in other words, its domain's cardinal. *)
+
+  val min_binding: 'v map -> key * 'v
+  val max_binding: 'v map -> key * 'v
+
+  val fold2_join_heterogeneous:
+    cache:cache_type ->
+    empty_left:('b map -> 'c) ->
+    empty_right:('a map -> 'c) ->
+    both:(key -> 'a -> 'b -> 'c) ->
+    join:('c -> 'c -> 'c) ->
+    empty:'c ->
+    'a map -> 'b map ->
+    'c
+    (** [fold2_join_heterogeneous ~cache ~empty_left ~empty_right ~both
+          ~join ~empty m1 m2] iterates simultaneously on [m1] and [m2]. If a subtree
+        [t] is present in [m1] but not in [m2] (resp. in [m2] but not in [m1]),
+        [empty_right t] (resp. [empty_left t]) is called. If a key [k] is present
+        in both trees, and bound to [v1] and [v2] respectively, [both k v1 v2] is
+        called. If both trees are empty, [empty] is returned. The values of type
+        ['b] returned by the auxiliary functions are merged using [join], which is
+        called in an unspecified order. The results of the function may be cached,
+        depending on [cache]. *)
+end
+
+
 (** Signature for hptmaps from hash-consed trees to values *)
 module type S = sig
   type key (** type of the keys *)
-  type v (** type of the values *)
-  type 'a shape
+  type v   (** type of the values *)
   type prefix
 
-  include Datatype.S_with_collections
-
-  (** Bijective function. The ids are positive. *)
-  val id: t -> int
+  include Shape with type key := key
+  include Datatype.S_with_collections with type t = v map
 
   val self : State.t
 
   val empty : t
   (** the empty map *)
-
-  val is_empty : t -> bool
-  (** [is_empty m] returns [true] if and only if the map [m] defines no
-      bindings at all. *)
 
   val add : key -> v -> t -> t
   (** [add k d m] returns a map whose bindings are all bindings in [m], plus
@@ -64,27 +212,9 @@ module type S = sig
         where [o] is (Some v) if [k] is bound to [v] in [m], or None if [k]
         is not bound in [m]. *)
 
-  val find : key -> t -> v
-  val find_check_missing: key -> t -> v
-  (** Both [find key m] and [find_check_missing key m] return the value
-      bound to [key] in [m], or raise [Not_found] is [key] is unbound.
-      [find] is optimised for the case where [key] is bound in [m], whereas
-      [find_check_missing] is more efficient for the cases where [m]
-      is big and [key] is missing. *)
-
-  val find_key : key -> t -> key
-  (** This function is useful where there are multiple distinct keys that
-      are equal for [Key.equal]. *)
-
   val remove : key -> t -> t
   (** [remove k m] returns the map [m] deprived from any binding involving
       [k]. *)
-
-  val mem :  key -> t -> bool
-  (** [mem k m] returns true if [k] is bound in [m], and false otherwise. *)
-
-  val iter : (key -> v -> unit) -> t -> unit
-  (** [iter f m] applies [f] to all bindings of the map [m]. *)
 
   val map : (v -> v) -> t -> t
   (** [map f m] returns the map obtained by composing the map [m] with the
@@ -96,26 +226,6 @@ module type S = sig
 
   val filter: (key -> bool) -> t -> t
   (** [filter f t] keep only the bindings of [m] whose key verify [f].  *)
-
-  val fold : (key -> v -> 'b -> 'b) -> t -> 'b -> 'b
-  (** [fold f m seed] invokes [f k d accu], in turn, for each binding from
-      key [k] to datum [d] in the map [m]. Keys are presented to [f] in
-      increasing order according to the map's ordering. The initial value of
-      [accu] is [seed]; then, at each new call, its value is the value
-      returned by the previous invocation of [f]. The value returned by
-      [fold] is the final value of [accu]. *)
-
-  val fold_rev : (key -> v -> 'b -> 'b) -> t -> 'b -> 'b
-  (** [fold_rev] performs exactly the same job as [fold], but presents keys
-      to [f] in the opposite order. *)
-
-  val for_all: (key -> v -> bool) -> t -> bool
-  (** [for_all p m] returns true if all the bindings of the map [m] satisfy
-      the predicate [p]. *)
-
-  val exists: (key -> v -> bool) -> t -> bool
-  (** [for_all p m] returns true if at least one binding of the map [m] satisfies
-      the predicate [p]. *)
 
   type empty_action = Neutral | Absorbing | Traversing of (key -> v -> v option)
 
@@ -176,87 +286,22 @@ module type S = sig
       map. Keys present in only one map are similarly unmapped in the result.
   *)
 
-  val inter_with_shape: 'a shape -> t -> t
+  val inter_with_shape: 'a map -> t -> t
   (** [inter_with_shape s m] keeps only the elements of [m] that are also
       bound in the  map [s]. No caching is used, but this function is more
       efficient than successive calls to {!remove} or {!add} to build the
       resulting map. *)
 
-  val diff_with_shape: 'a shape -> t -> t
+  val diff_with_shape: 'a map -> t -> t
   (** [diff_with_shape s m] keeps only the elements of [m] that are not
       bound in the map [s]. No caching is used, but this function is more
       efficient than successive calls to {!remove} or {!add} to build the
       resulting map. *)
 
-  val partition_with_shape: 'a shape -> t -> t * t
+  val partition_with_shape: 'a map -> t -> t * t
   (** [partition_with_shape s m] returns two maps [inter, diff] such that:
       - [inter] contains the elements of [m] bound in the shape [s];
       - [diff] contains the elements of [m] not bound in the shape [s]. *)
-
-  (** {2 Binary predicates} *)
-
-  (** Existential ([||]) or universal ([&&]) predicates. *)
-  type predicate_type = ExistentialPredicate | UniversalPredicate
-
-  (** Does the given predicate hold or not. [PUnknown] indicates that the result
-      is uncertain, and that the more aggressive analysis should be used. *)
-  type predicate_result = PTrue | PFalse | PUnknown
-
-  val binary_predicate:
-    cache_type ->
-    predicate_type ->
-    decide_fast:(t -> t -> predicate_result) ->
-    decide_fst:(key -> v  -> bool) ->
-    decide_snd:(key -> v  -> bool) ->
-    decide_both:(key -> v -> v -> bool) ->
-    t -> t -> bool
-  (** [binary_predicate] decides whether some relation holds between two maps,
-      according to the functions:
-      - [decide_fst] and [decide_snd], called on keys present only
-        in the first or second map respectively;
-      - [decide_both], called on keys present in both trees;
-      - [decide_fast], called on entire maps as an optimization. As its name
-        implies, it must be fast. If can prevent the analysis of some maps by
-        directly returning [PTrue] or [PFalse] when possible. Otherwise, it
-        returns [PUnknown] and the maps are analyzed by calling the functions
-        above on each binding.
-
-      If the predicate is existential, then the function returns [true] as soon
-      as one of the call to the functions above returns [true]. If the predicate
-      is universal, the function returns [true] if all calls to the functions
-      above return [true].
-
-      The computation of this relation can be cached, according to [cache_type].
-  *)
-
-  val symmetric_binary_predicate:
-    cache_type ->
-    predicate_type ->
-    decide_fast:(t -> t -> predicate_result) ->
-    decide_one:(key -> v  -> bool) ->
-    decide_both:(key -> v -> v -> bool) ->
-    t -> t -> bool
-  (** Same as [binary_predicate], but for a symmetric relation. [decide_fst]
-      and [decide_snd] are thus merged into [decide_one]. *)
-
-  val decide_fast_inclusion: t -> t -> predicate_result
-  (** Function suitable for the [decide_fast] argument of [binary_predicate],
-      when testing for inclusion of the first map into the second. If the two
-      arguments are equal, or the first one is empty, the relation holds. *)
-
-  val decide_fast_intersection: t -> t -> predicate_result
-  (** Function suitable for the [decide_fast] argument of
-      [symmetric_binary_predicate] when testing for a non-empty intersection
-      between two maps. If one map is empty, the intersection is empty.
-      Otherwise, if the two maps are equal, the intersection is non-empty. *)
-
-  val cached_fold :
-    cache_name:string ->
-    temporary:bool ->
-    f:(key -> v -> 'b) ->
-    joiner:('b -> 'b -> 'b) ->
-    empty:'b ->
-    t -> 'b
 
   val cached_map :
     cache:string * int ->
@@ -267,21 +312,6 @@ module type S = sig
   val singleton: key -> v -> t
   (** [singleton k d] returns a map whose only binding is from [k] to [d]. *)
 
-  val is_singleton: t -> (key * v) option
-  (** [is_singleton m] returns [Some (k, d)] if [m] is a singleton map
-      that maps [k] to [d]. Otherwise, it returns [None]. *)
-
-  val on_singleton: (key -> v -> bool) -> t -> bool
-  (** [on_singleton f m] returns [f k d] if [m] is a singleton map
-      that maps [k] to [d]. Otherwise, it returns false. *)
-
-  val cardinal: t -> int
-  (** [cardinal m] returns [m]'s cardinal, that is, the number of keys it
-      binds, or, in other words, its domain's cardinal. *)
-
-  val min_binding: t -> key * v
-  val max_binding: t -> key * v
-
   val compositional_bool: t -> bool
   (** Value of the compositional boolean associated to the tree, as computed
       by the {!Compositional_bool} argument of the functor. *)
@@ -291,38 +321,19 @@ module type S = sig
       module. Those caches are not project-aware, so this function must be
       called at least each time a project switch occurs. *)
 
-  val from_shape: (key -> 'a -> v) -> 'a shape -> t
+  val from_shape: (key -> 'a -> v) -> 'a map -> t
   (** Build an entire map from another map indexed by the same keys.
       More efficient than just performing successive {!add} the elements
       of the other map *)
 
-  val from_shape_id: v shape -> t
+  val from_shape_id: v map -> t
   (** Same as [from_shape (fun _ v -> v)]. *)
 
-  val shape: t -> v shape
+  val shape: t -> v map
   (** Export the map as a value suitable for functions {!inter_with_shape}
       and {!from_shape} *)
 
-  val fold2_join_heterogeneous:
-    cache:cache_type ->
-    empty_left:('a shape -> 'b) ->
-    empty_right:(t -> 'b) ->
-    both:(key -> v -> 'a -> 'b) ->
-    join:('b -> 'b -> 'b) ->
-    empty:'b ->
-    t -> 'a shape ->
-    'b
-  (** [fold2_join_heterogeneous ~cache ~empty_left ~empty_right ~both
-        ~join ~empty m1 m2] iterates simultaneously on [m1] and [m2]. If a subtree
-      [t] is present in [m1] but not in [m2] (resp. in [m2] but not in [m1]),
-      [empty_right t] (resp. [empty_left t]) is called. If a key [k] is present
-      in both trees, and bound to [v1] and [v2] respectively, [both k v1 v2] is
-      called. If both trees are empty, [empty] is returned. The values of type
-      ['b] returned by the auxiliary functions are merged using [join], which is
-      called in an unspecified order. The results of the function may be cached,
-      depending on [cache]. *)
-
-  val replace_key: decide:(key -> v -> v -> v) -> key shape -> t -> bool * t
+  val replace_key: decide:(key -> v -> v -> v) -> key map -> t -> bool * t
   (** [replace_key ~decide shape map] substitute keys in [map] according to
       [shape]: it returns the [map] in which all bindings from [key] to [v] such
       that [key] is bound to [key'] in [shape] are replaced by a binding from

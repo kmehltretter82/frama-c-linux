@@ -163,7 +163,7 @@ module Make_Map_Lattice
                            and type v = Value.t)
   : sig
 
-    include Map_Lattice with type t = KVMap.t
+    include Map_Lattice with type 'a map = 'a KVMap.map
                          and type key = Key.t
                          and type v = Value.t
 
