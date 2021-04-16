@@ -2,7 +2,7 @@
    OPT: -rte -warn-signed-overflow -warn-signed-downcast -print -machdep x86_32 -journal-disable
 */
 
-#include "share/libc/limits.h"
+#include "limits.h"
 
 typedef int tint;
 typedef unsigned int tuint;

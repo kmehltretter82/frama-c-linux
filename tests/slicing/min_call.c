@@ -7,4 +7,4 @@
 /* dummy source file in order to test minimal calls feature
  * on select_return.i  */
 
-#include "tests/slicing/select_return.i"
+#include "select_return.i"

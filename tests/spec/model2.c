@@ -2,7 +2,7 @@
 DONTRUN: main test is in tests/spec/model1.c
 */
 
-#include "tests/spec/model1.h"
+#include "model1.h"
 
 struct S { int bar; };
 
