@@ -2386,7 +2386,7 @@ DISTRIB_FILES += $(wildcard $(PLUGIN_DISTRIBUTED_LIST)                   \
 DISTRIB_FILES:=$(filter-out $(GENERATED) $(PLUGIN_GENERATED_LIST),\
                   $(DISTRIB_FILES))
 
-include ivette/Makefile.distrib
+sinclude ivette/Makefile.distrib
 
 DISTRIB_TESTS += $(wildcard $(PLUGIN_DIST_TESTS_LIST))
 
