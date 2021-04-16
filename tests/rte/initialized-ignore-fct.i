@@ -1,6 +1,6 @@
 /* run.config
-   OPT: -rte -rte-initialized -print
-   OPT: -rte -rte-initialized -rte-initialized-ignore f1 -print
+   OPT: -rte -rte-initialized="@all" -print
+   OPT: -rte -rte-initialized="@all,-f1" -print
 */
 
 int f1(void){

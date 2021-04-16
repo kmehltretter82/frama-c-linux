@@ -27,11 +27,9 @@ module Enabled: Parameter_sig.Bool
 module DoShift : Parameter_sig.Bool
 module DoDivMod : Parameter_sig.Bool
 module DoFloatToInt : Parameter_sig.Bool
-module DoInitialized : Parameter_sig.Bool
+module DoInitialized : Parameter_sig.Kernel_function_set
 module DoMemAccess : Parameter_sig.Bool
 module DoPointerCall : Parameter_sig.Bool
-
-module IgnoreInitialized : Parameter_sig.Kernel_function_set
 
 module Trivial : Parameter_sig.Bool
 module Warn : Parameter_sig.Bool

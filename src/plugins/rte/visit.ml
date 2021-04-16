@@ -51,9 +51,8 @@ class annot_visitor kf flags on_alarm = object (self)
     r
 
   method private do_initialized () =
-    flags.Flags.initialized
+    Kernel_function.Set.mem kf flags.Flags.initialized
     && not (Generator.Initialized.is_computed kf)
-    && not (Options.IgnoreInitialized.mem kf)
 
   method private do_mem_access () =
     flags.Flags.mem_access && not (Generator.Mem_access.is_computed kf)
@@ -454,7 +453,8 @@ let annotate ?flags kf =
     let (|||) a b = a || b in
     let open Generator in
     let open Flags in
-    if comp Initialized.accessor flags.initialized |||
+    if comp Initialized.accessor
+        (not @@ Kernel_function.Set.is_empty flags.initialized) |||
        comp Mem_access.accessor flags.mem_access |||
        comp Pointer_value.accessor flags.pointer_value |||
        comp Pointer_call.accessor flags.pointer_call |||

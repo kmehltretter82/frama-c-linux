@@ -28,7 +28,7 @@
    function *)
 let do_all_rte kf =
   let flags =
-    { Flags.all with
+    { (Flags.all ()) with
       Flags.signed_downcast = false;
       unsigned_downcast = false; }
   in
@@ -38,7 +38,7 @@ let do_all_rte kf =
    function *)
 let do_rte kf =
   let flags =
-    { Flags.all with
+    { (Flags.all ()) with
       Flags.unsigned_overflow = false;
       signed_downcast = false;
       unsigned_downcast = false; }

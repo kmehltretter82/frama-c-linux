@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -rte -rte-initialized -warn-signed-overflow -print
+   OPT: -rte -rte-initialized="@all" -warn-signed-overflow -print
 */
 
 struct R {

@@ -64,21 +64,13 @@ module DoFloatToInt =
 
 (* annotates local variables and pointers read (aside from globals) initialization *)
 module DoInitialized =
-  False
-    (struct
-      let option_name = "-rte-initialized"
-      let help = "when on, annotates local variables and pointers \
-                  reads of non struct or union types with initialization tests \
-                  see documentation for more details."
-    end)
-
-module IgnoreInitialized =
   Kernel_function_set
     (struct
-      let option_name = "-rte-initialized-ignore"
+      let option_name = "-rte-initialized"
       let arg_name = "fct"
-      let help = "list of functions where initialization alarms should not be \
-                  emitted"
+      let help = "annotates local variables and pointers reads of non struct \
+                  or union types with initialization tests for functions in \
+                  'fct', see documentation for more details."
     end)
 
 (* annotates invalid memory access (undefined behavior) *)

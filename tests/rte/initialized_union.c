@@ -1,6 +1,6 @@
 /* run.config
-   OPT: -rte -rte-initialized -warn-signed-overflow -print
-   OPT: -cpp-extra-args="-DEMPTY" -machdep gcc_x86_64 -rte -rte-initialized -warn-signed-overflow -print
+   OPT: -rte -rte-initialized="@all" -warn-signed-overflow -print
+   OPT: -cpp-extra-args="-DEMPTY" -machdep gcc_x86_64 -rte -rte-initialized="@all" -warn-signed-overflow -print
 */
 
 union U {

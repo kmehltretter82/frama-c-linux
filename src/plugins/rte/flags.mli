@@ -28,7 +28,7 @@
     a category of alarms will be visited or not. *)
 type t = {
   remove_trivial: bool;
-  initialized: bool;
+  initialized: Kernel_function.Set.t ;
   mem_access: bool;
   div_mod: bool;
   shift: bool;
@@ -49,7 +49,7 @@ type t = {
 (** Defaults flags are taken from the Kernel and RTE plug-in options. *)
 val default :
   ?remove_trivial:bool ->
-  ?initialized:bool ->
+  ?initialized:Kernel_function.Set.t ->
   ?mem_access:bool ->
   ?div_mod:bool ->
   ?shift:bool ->
@@ -67,10 +67,10 @@ val default :
   ?bool_value:bool ->
   unit -> t
 
-(** All flags set to [true]. *)
-val all : t
+(** All flags set to [true], [@all] for [initialized] *)
+val all : unit -> t
 
-(** All flags set to [false]. *)
+(** All flags set to [false], [empty] for [initialized] *)
 val none : t
 
 (* -------------------------------------------------------------------------- *)
