@@ -22,14 +22,8 @@
     implemented on top of Patricia trees. A tree is big-endian if it
     expects the key's most significant bits to be tested first. *)
 
-
-(**/**) (* Undocumented. Needed for advanced users only *)
+(** Undocumented. Needed for advanced users only *)
 type prefix
-val sentinel_prefix : prefix
-
-(**/**)
-
-type tag
 
 (** Type of the keys of the map. *)
 module type Id_Datatype = sig

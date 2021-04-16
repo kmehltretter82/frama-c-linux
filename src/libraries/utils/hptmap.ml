@@ -18,7 +18,6 @@
 let debug_cache = false
 
 type prefix = int * int
-let sentinel_prefix = (-1) , (-1)
 
 module Big_Endian = struct
 
