@@ -37,7 +37,7 @@ char *memset_char(char *ptr, char value, size_t len)
   return __retres;
 }
 
-void chars(char * /*[10]*/ dest)
+void chars(char dest[10])
 {
   char *res = memset_char(dest,(char)0,(unsigned long)10);
   memset_char(res,(char)0,(unsigned long)10);
@@ -61,7 +61,7 @@ unsigned char *memset_uchar(unsigned char *ptr, unsigned char value,
   return __retres;
 }
 
-void uchars(unsigned char * /*[10]*/ dest)
+void uchars(unsigned char dest[10])
 {
   unsigned char *res = memset_uchar(dest,(unsigned char)0,(unsigned long)10);
   memset_uchar(res,(unsigned char)0,(unsigned long)10);
@@ -89,7 +89,7 @@ char (*memset_arr10_char(char (*ptr)[10], char value, size_t len))[10]
   return __retres;
 }
 
-void nested_chars(char (* /*[10]*/ dest)[10])
+void nested_chars(char dest[10][10])
 {
   char (*res)[10] = memset_arr10_char(dest,(char)0,(unsigned long)100);
   memset_arr10_char(res,(char)0,(unsigned long)100);
@@ -115,7 +115,7 @@ int *memset_int_0(int *ptr, size_t len)
   return __retres;
 }
 
-void integer(int * /*[10]*/ dest)
+void integer(int dest[10])
 {
   int *res = memset_int_0(dest,(unsigned long)10 * sizeof(int));
   memset_int_0(res,(unsigned long)10 * sizeof(int));
@@ -141,7 +141,7 @@ enum E *memset_e_E_0(enum E *ptr, size_t len)
   return __retres;
 }
 
-void with_enum(enum E * /*[10]*/ dest)
+void with_enum(enum E dest[10])
 {
   enum E *res = memset_e_E_0(dest,(unsigned long)10 * sizeof(enum E));
   memset_e_E_0(res,(unsigned long)10 * sizeof(enum E));
@@ -167,14 +167,14 @@ float *memset_float_0(float *ptr, size_t len)
   return __retres;
 }
 
-void floats(float * /*[10]*/ dest)
+void floats(float dest[10])
 {
   float *res = memset_float_0(dest,(unsigned long)10 * sizeof(float));
   memset_float_0(res,(unsigned long)10 * sizeof(float));
   return;
 }
 
-void with_named(named * /*[10]*/ dest)
+void with_named(named dest[10])
 {
   named *res = memset_int_0(dest,(unsigned long)10 * sizeof(named));
   memset_int_0(res,(unsigned long)10 * sizeof(named));
@@ -201,7 +201,7 @@ struct X *memset_st_X_0(struct X *ptr, size_t len)
   return __retres;
 }
 
-void structure(struct X * /*[10]*/ dest)
+void structure(struct X dest[10])
 {
   struct X *res = memset_st_X_0(dest,(unsigned long)10 * sizeof(struct X));
   memset_st_X_0(res,(unsigned long)10 * sizeof(struct X));
@@ -227,7 +227,7 @@ int **memset_ptr_int_0(int **ptr, size_t len)
   return __retres;
 }
 
-void pointers(int ** /*[10]*/ dest)
+void pointers(int *dest[10])
 {
   int **res = memset_ptr_int_0(dest,(unsigned long)10 * sizeof(int *));
   memset_ptr_int_0(res,(unsigned long)10 * sizeof(int *));
@@ -311,7 +311,7 @@ char *memset_char(char *ptr, char value, size_t len)
   return __retres;
 }
 
-void chars(char *dest)
+void chars(char dest[10])
 {
   char *res = memset_char(dest,(char)0,(unsigned long)10);
   memset_char(res,(char)0,(unsigned long)10);
@@ -337,7 +337,7 @@ unsigned char *memset_uchar(unsigned char *ptr, unsigned char value,
   return __retres;
 }
 
-void uchars(unsigned char *dest)
+void uchars(unsigned char dest[10])
 {
   unsigned char *res = memset_uchar(dest,(unsigned char)0,(unsigned long)10);
   memset_uchar(res,(unsigned char)0,(unsigned long)10);
@@ -366,7 +366,7 @@ char (*memset_arr10_char(char (*ptr)[10], char value, size_t len))[10]
   return __retres;
 }
 
-void nested_chars(char (*dest)[10])
+void nested_chars(char dest[10][10])
 {
   char (*res)[10] = memset_arr10_char(dest,(char)0,(unsigned long)100);
   memset_arr10_char(res,(char)0,(unsigned long)100);
@@ -392,7 +392,7 @@ int *memset_int_0(int *ptr, size_t len)
   return __retres;
 }
 
-void integer(int *dest)
+void integer(int dest[10])
 {
   int *res = memset_int_0(dest,(unsigned long)10 * sizeof(int));
   memset_int_0(res,(unsigned long)10 * sizeof(int));
@@ -418,7 +418,7 @@ enum E *memset_e_E_0(enum E *ptr, size_t len)
   return __retres;
 }
 
-void with_enum(enum E *dest)
+void with_enum(enum E dest[10])
 {
   enum E *res = memset_e_E_0(dest,(unsigned long)10 * sizeof(enum E));
   memset_e_E_0(res,(unsigned long)10 * sizeof(enum E));
@@ -444,14 +444,14 @@ float *memset_float_0(float *ptr, size_t len)
   return __retres;
 }
 
-void floats(float *dest)
+void floats(float dest[10])
 {
   float *res = memset_float_0(dest,(unsigned long)10 * sizeof(float));
   memset_float_0(res,(unsigned long)10 * sizeof(float));
   return;
 }
 
-void with_named(named *dest)
+void with_named(named dest[10])
 {
   named *res = memset_int_0(dest,(unsigned long)10 * sizeof(named));
   memset_int_0(res,(unsigned long)10 * sizeof(named));
@@ -479,7 +479,7 @@ struct X *memset_st_X_0(struct X *ptr, size_t len)
   return __retres;
 }
 
-void structure(struct X *dest)
+void structure(struct X dest[10])
 {
   struct X *res = memset_st_X_0(dest,(unsigned long)10 * sizeof(struct X));
   memset_st_X_0(res,(unsigned long)10 * sizeof(struct X));
@@ -505,7 +505,7 @@ int **memset_ptr_int_0(int **ptr, size_t len)
   return __retres;
 }
 
-void pointers(int **dest)
+void pointers(int *dest[10])
 {
   int **res = memset_ptr_int_0(dest,(unsigned long)10 * sizeof(int *));
   memset_ptr_int_0(res,(unsigned long)10 * sizeof(int *));

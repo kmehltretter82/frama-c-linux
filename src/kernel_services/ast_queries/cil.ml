@@ -3722,7 +3722,7 @@ let rec typeOf (e: exp) : typ =
   | AddrOf (lv) -> TPtr(typeOfLval lv, [])
   | StartOf (lv) ->
     match unrollType (typeOfLval lv) with
-    | TArray (t,_,_, _) -> TPtr(t, [])
+    | TArray (t,_,_,attrs) -> TPtr(t, attrs)
     | _ ->  Kernel.fatal ~current:true "typeOf: StartOf on a non-array"
 
 and typeOfInit (i: init) : typ =

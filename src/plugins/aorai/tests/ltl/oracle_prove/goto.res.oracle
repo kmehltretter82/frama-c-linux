@@ -2,6 +2,4 @@
 [aorai] tests/ltl/goto.c:28: Warning: 
   Call to opc does not follow automaton's specification. This path is assumed to be dead
 [kernel] Parsing TMPDIR/aorai_goto_0.i (no preprocessing)
-[wp] TMPDIR/aorai_goto_0.i:4: Warning: 
-  Global invariant not handled yet ('inv' ignored)
 [wp] Warning: Missing RTE guards

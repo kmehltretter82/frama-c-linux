@@ -25,8 +25,8 @@ extern int __e_acsl_sound_verdict;
         equal_prefix:
           memcmp{Post, Post}(\old(dest), \old(src), \old(n)) ≡ 0;
  */
-char *__gen_e_acsl_strncpy(char * __restrict dest,
-                           char const * __restrict src, size_t n);
+char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
+                           size_t n);
 
 /*@ requires valid_nstring_src: valid_read_nstring(src, n);
     requires room_nstring: \valid(dest + (0 .. n - 1));
@@ -47,8 +47,8 @@ char *__gen_e_acsl_strncpy(char * __restrict dest,
         equal_prefix:
           memcmp{Post, Post}(\old(dest), \old(src), \old(n)) ≡ 0;
  */
-char *__gen_e_acsl_strncpy(char * __restrict dest,
-                           char const * __restrict src, size_t n)
+char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
+                           size_t n)
 {
   __e_acsl_mpz_t __gen_e_acsl_at_3;
   char *__gen_e_acsl_at_2;

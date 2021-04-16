@@ -6,7 +6,7 @@
  */
 /*@ requires strlen(c) < n;
     ensures strlen(\old(a)) ≤ \old(n); */
-void f(char const *c, char * __restrict a, int n)
+void f(char const *c, char * restrict a, int n)
 {
   return;
 }

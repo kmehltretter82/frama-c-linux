@@ -24,9 +24,9 @@ char g(char const * const *a)
   return __retres;
 }
 
-void foo(int *x, int * __restrict y);
+void foo(int *x, int * restrict y);
 
-void foo(int *x, int * __restrict y)
+void foo(int *x, int * restrict y)
 {
   int *tmp;
   int *tmp_0;

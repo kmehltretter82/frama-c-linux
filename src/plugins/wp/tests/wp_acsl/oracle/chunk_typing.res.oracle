@@ -1889,7 +1889,6 @@ Prove: true.
        requires \separated(u64 + (..), (char const *)x + (..));
        requires \separated(u8 + (..), (char const *)x + (..));
      */
-  void function(signed char * /*[10]*/ i8, unsigned char * /*[10]*/ u8,
-                short * /*[10]*/ i16, unsigned short * /*[10]*/ u16,
-                int * /*[10]*/ i32, unsigned int * /*[10]*/ u32,
-                long long * /*[10]*/ i64, unsigned long long * /*[10]*/ u64);
+  void function(signed char i8[10], unsigned char u8[10], short i16[10],
+                unsigned short u16[10], int i32[10], unsigned int u32[10],
+                long long i64[10], unsigned long long u64[10]);

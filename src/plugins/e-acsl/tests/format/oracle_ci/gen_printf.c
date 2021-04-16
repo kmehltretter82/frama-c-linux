@@ -411,7 +411,7 @@ char *__gen_e_acsl_strchr(char const *s, int c);
       \from *(src + (0 .. strlen{Old}(src)));
     assigns \result \from dest;
  */
-char *__gen_e_acsl_strcpy(char * __restrict dest, char const * __restrict src);
+char *__gen_e_acsl_strcpy(char * restrict dest, char const * restrict src);
 
 /*@ ensures
       result_ok_child_or_error:
@@ -699,7 +699,7 @@ pid_t __gen_e_acsl_fork(void)
       \from *(src + (0 .. strlen{Old}(src)));
     assigns \result \from dest;
  */
-char *__gen_e_acsl_strcpy(char * __restrict dest, char const * __restrict src)
+char *__gen_e_acsl_strcpy(char * restrict dest, char const * restrict src)
 {
   char *__gen_e_acsl_at;
   char *__retres;

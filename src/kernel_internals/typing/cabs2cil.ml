@@ -5258,7 +5258,7 @@ and doType (ghost:bool) isFuncArg
        * our life a lot, and is what the standard requires. *)
       let turnArrayIntoPointer (bt: typ)
           (lo: exp option) (a: attributes) : typ =
-        let _real_a = dropAttribute "static" a in
+        let main_attrs = dropAttribute "static" a in
         let a' : attributes =
           match lo with
           | None -> []
@@ -5280,7 +5280,8 @@ and doType (ghost:bool) isFuncArg
                 end
             end
         in
-        TPtr(bt, a')
+        let attrs = Cil.addAttributes a' main_attrs in
+        TPtr(bt, attrs)
       in
       let rec fixupArgumentTypes (argidx: int) (args: varinfo list) : unit =
         match args with

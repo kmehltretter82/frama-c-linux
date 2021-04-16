@@ -720,6 +720,15 @@ class cil_printer () = object (self)
     let stom, rest = Cil.separateStorageModifiers v.vattr in
     let fundecl = if Cil.isFunctionType v.vtype then Some v else None in
     let v = { v with vtype = self#no_ghost_at_first_level v.vtype } in
+    let v =
+      if v.vformal && not state.print_cil_as_is then begin
+        match v.vtype with
+        | TPtr(t,a) when Cil.hasAttribute "arraylen" a ->
+          { v with vtype = TArray(t, None, { scache = Not_Computed }, a)}
+        | _ -> v
+      end
+      else v
+    in
     (* First the storage modifiers *)
     fprintf fmt "%s%a%a%s%a%a"
       (if v.vinline then "__inline " else "")
@@ -1992,16 +2001,32 @@ class cil_printer () = object (self)
       self#typ (Some name'') fmt bt'
 
     | TArray (elemt, lo, _, a) ->
-      (* qualifiers attributes are not supposed to be on the TArray,
-         but on the base type. (Besides, GCC and Clang do not parse the
-         result if the qualifier is misplaced. *)
       let atts_elem, a = Cil.splitArrayAttributes a in
-      if atts_elem != [] then
+      let size_info,a =
+        List.partition
+          (fun a -> List.mem (Cil.attributeName a) ["arraylen"; "static"]) a
+      in
+      (* qualifiers attributes are not supposed to be on the TArray,
+         but on the base type, except in the case of a formal declaration. *)
+      if atts_elem <> [] && size_info = [] then
         Kernel.failure ~current:true
           "Found some incorrect attributes for array (%a). Please report."
           self#attributes atts_elem;
+      let sep fmt = if atts_elem <> [] then Format.pp_print_space fmt () in
+      let print_size_info fmt =
+        match size_info with
+        | [] -> printAttributes fmt a
+        | [Attr("arraylen",[s])]->
+          Format.fprintf fmt "%a%t%a"
+            printAttributes atts_elem sep self#attrparam s
+        | [Attr("static",[]); Attr("arraylen",[s])]
+        | [Attr("arraylen", [s]); Attr("static", [])] ->
+          Format.fprintf fmt "static%a@ %a"
+            printAttributes atts_elem self#attrparam s
+        | _ -> ()
+      in
       let name' fmt =
-        if a = [] then pname fmt false
+        if filter_printing_attributes a = [] then pname fmt false
         else if nameOpt = None then
           printAttributes fmt a
         else
@@ -2013,7 +2038,7 @@ class cil_printer () = object (self)
                name'
                (fun fmt ->
                   match lo with
-                  | None -> ()
+                  | None -> print_size_info fmt
                   | Some e -> self#exp fmt e)
            ))
         fmt
@@ -2101,7 +2126,12 @@ class cil_printer () = object (self)
        | "thread", [] when not (Cil.msvcMode ()) -> fprintf fmt "__thread"; false
        | "volatile", [] -> self#pp_keyword fmt "volatile"; false
        | "ghost", [] -> self#pp_keyword fmt "\\ghost"; false
-       | "restrict", [] -> fprintf fmt "__restrict"; false
+       | "restrict", [] ->
+         if Cil.msvcMode () then
+           fprintf fmt "__restrict"
+         else
+           self#pp_keyword fmt "restrict";
+         false
        | "missingproto", [] ->
          if self#display_comment () then fprintf fmt "/* missing proto */";
          false
