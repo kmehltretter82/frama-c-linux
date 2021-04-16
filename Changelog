@@ -17,6 +17,8 @@
 Open Source Release <next-release>
 ##################################
 
+-*  Kernel    [2021-04-16] Pretty prints array formals in their original form.
+              Fixes pub/frama-c#392
 o!  Kernel    [2021-04-13] Removed deprecated function Filepath.pretty
 o!  Kernel    [2021-04-13] Filepath directories functions now return
               Filepath.Normalized.t, Frama-C configuration and plugin
