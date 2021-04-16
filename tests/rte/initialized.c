@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -rte -rte-initialized -warn-signed-overflow -print
+   OPT: -rte -rte-initialized="@all" -warn-signed-overflow -print
 */
 
 struct R {
@@ -32,9 +32,9 @@ int g()
 }
 
 /* Formals */
-int f (struct P*** pppp, struct P** ppp, struct P* pp, struct P p, struct P p2, 
+int f (struct P*** pppp, struct P** ppp, struct P* pp, struct P p, struct P p2,
        int v, struct Q q, int *i, int *j, int i0, int i1, int i2, int i3, int i4, double f_0)
-{  
+{
   i0 = 0;
   i1 = 1;
   i2 = 2;
@@ -62,7 +62,7 @@ int f (struct P*** pppp, struct P** ppp, struct P* pp, struct P p, struct P p2,
 
   v = p.id[3];
   v = pp->id[3];
-  
+
   v = *i;
   v = pp->val;
   v = pp->id[3];
@@ -134,7 +134,7 @@ int main() {
   v = p.id[3];
   v = pp->id[3];
 
-  
+
   v = *i;
   v = pp->val;
   v = pp->id[3];
@@ -163,6 +163,9 @@ int main() {
   v = p.val;
   v = p.tq[i0][i1].v;
 
+  /** Note: Frama-C is stricter than ISO C : potential indeterminate values are
+   *  considered as alarms even for types without trap representation.
+   */
   c1 = c2;
   unsigned char c3 = c2;
   return v;

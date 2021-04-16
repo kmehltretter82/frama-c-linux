@@ -51,7 +51,8 @@ class annot_visitor kf flags on_alarm = object (self)
     r
 
   method private do_initialized () =
-    flags.Flags.initialized && not (Generator.Initialized.is_computed kf)
+    Kernel_function.Set.mem kf flags.Flags.initialized
+    && not (Generator.Initialized.is_computed kf)
 
   method private do_mem_access () =
     flags.Flags.mem_access && not (Generator.Mem_access.is_computed kf)
@@ -149,7 +150,7 @@ class annot_visitor kf flags on_alarm = object (self)
         (Rte.lval_assertion ~read_only:Alarms.For_writing) ret
 
 
-  method private check_uchar_assign dest src =
+  method private check_assigned dest =
     if self#do_mem_access () then begin
       Options.debug "lval %a: validity of potential mem access checked\n"
         Printer.pp_lval dest;
@@ -157,20 +158,11 @@ class annot_visitor kf flags on_alarm = object (self)
         (Rte.lval_assertion ~read_only:Alarms.For_writing)
         dest
     end;
-    begin match src.enode with
-      | Lval src_lv ->
-        let typ1 = Cil.typeOfLval src_lv in
-        let typ2 = Cil.typeOfLval dest in
-        let isUChar t = Cil.isUnsignedInteger t && Cil.isAnyCharType t in
-        if isUChar typ1 && isUChar typ2 then
-          self#mark_to_skip_initialized src_lv
-      | _ -> ()
-    end ;
     Cil.DoChildren
 
   (* assigned left values are checked for valid access *)
   method! vinst = function
-    | Set (lval,exp,_) -> self#check_uchar_assign lval exp
+    | Set (lval,_,_) -> self#check_assigned lval
     | Call (ret_opt,funcexp,argl,_) ->
       (* Do not emit alarms on Eva builtins such as Frama_C_show_each, that should
          have no effect on analyses. *)
@@ -207,8 +199,8 @@ class annot_visitor kf flags on_alarm = object (self)
       let do_call lv _e _args _loc = self#treat_call lv in
       Cil.treat_constructor_as_func do_call v f args kind loc;
       Cil.DoChildren
-    | Local_init (v,AssignInit (SingleInit exp),_) ->
-      self#check_uchar_assign (Cil.var v) exp
+    | Local_init (v,AssignInit (SingleInit _),_) ->
+      self#check_assigned (Cil.var v)
     | Local_init (_,AssignInit _,_)
     | Asm _ | Skip _ | Code_annot _ -> Cil.DoChildren
 
@@ -309,7 +301,8 @@ class annot_visitor kf flags on_alarm = object (self)
             self#generate_assertion
               (Rte.lval_assertion ~read_only:Alarms.For_reading) lval
           end;
-          if self#do_initialized () && not (self#must_skip_initialized lval) then begin
+          if self#do_initialized ()
+          && not (self#must_skip_initialized lval) then begin
             Options.debug
               "exp %a is an lval: initialization of potential mem access checked"
               Printer.pp_exp exp;
@@ -460,7 +453,8 @@ let annotate ?flags kf =
     let (|||) a b = a || b in
     let open Generator in
     let open Flags in
-    if comp Initialized.accessor flags.initialized |||
+    if comp Initialized.accessor
+        (not @@ Kernel_function.Set.is_empty flags.initialized) |||
        comp Mem_access.accessor flags.mem_access |||
        comp Pointer_value.accessor flags.pointer_value |||
        comp Pointer_call.accessor flags.pointer_call |||

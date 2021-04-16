@@ -106,50 +106,22 @@ let lval_assertion ~read_only ~remove_trivial ~on_alarm lv =
 
 (* assertion for lvalue initialization *)
 let lval_initialized_assertion ~remove_trivial:_ ~on_alarm lv =
-  let rec check_array_initialized default off typ in_struct l =
-    match off with
-    | NoOffset ->
-      begin
-        match typ with
-        | TComp({cstruct = false; cfields; cname} ,_,_) ->
-          (match cfields with
-           | None ->
-             Options.fatal
-               "Access to an object of undefined union %a"
-               Printer.pp_varname cname
-           | Some [] -> () (* empty union, supported by gcc with size 0.
-                              Trivially initialized. *)
-           | Some l ->
-             let llv =
-               List.map
-                 (fun fi -> Cil.addOffsetLval (Field (fi, NoOffset)) lv) l
-             in
-             if default then
-               on_alarm ~invalid:false (Alarms.Uninitialized_union llv))
-        | _ ->
-          if default then
-            on_alarm ~invalid:false (Alarms.Uninitialized lv)
-      end
-    | Field (fi, off) ->
-      (* Mark that we went through a struct field, then recurse *)
-      check_array_initialized default off fi.ftype true l
-    | Index (_e, off) ->
-      match Cil.unrollType typ with
-      | TArray (bt, Some _size, _, _) ->
-        check_array_initialized true off bt in_struct l
-      | TArray (bt, None, _, _) -> check_array_initialized true off bt in_struct l
-      | _ -> assert false
-  in
-
+  let typ = Cil.typeOfLval lv in
   match lv with
-  | Var vi , off ->
-    let loc = fst vi.vdecl in
-    let ignored_cases = vi.vglob || vi.vformal || vi.vtemp in
-    check_array_initialized (not ignored_cases) off vi.vtype false loc
-  | (Mem e as lh), off ->
-    let loc = fst e.eloc in
-    if not (Cil.isFunctionType (Cil.typeOfLval lv)) then
-      check_array_initialized true off (Cil.typeOfLhost lh) false loc
+  | Var vi, NoOffset ->
+    (** Note: here [lv] has structure/union type or fundamental type.
+        We exclude structures and unions. And for fundamental types:
+        - globals (initialized and then only written with initialized values)
+        - formals (checked at function call)
+        - temporary variables (initialized during AST normalization)
+    *)
+    if not (vi.vglob || vi.vformal || vi.vtemp)
+    && not (Cil.isStructOrUnionType typ)
+    then
+      on_alarm ~invalid:false (Alarms.Uninitialized lv)
+  | _ ->
+    if not (Cil.isFunctionType typ || Cil.isStructOrUnionType typ) then
+      on_alarm ~invalid:false (Alarms.Uninitialized lv)
 
 (* assertion for unary minus signed overflow *)
 let uminus_assertion ~remove_trivial ~on_alarm exp =
