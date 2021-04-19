@@ -260,7 +260,16 @@ module type Transfer = sig
         It is None if the call is not recursive.
       - [state] is the abstract state at the call site, before the call;
       - [valuation] is a cache for all values and locations computed during
-        the evaluation of the function and its arguments. *)
+        the evaluation of the function and its arguments.
+
+      On recursive calls, [recursion] contains some substitution of variables
+      to be applied on the domain state to prevent mixing up local variables
+      and formal parameters of different recursive calls.
+      See {!Eval.recursion} for more details.
+      This substitution has been applied on values and expressions in [call],
+      but not in the [valuation] given as argument. If the domain uses some
+      information from the [valuation] on a recursive call, it must apply the
+      substitution on it. *)
   val start_call:
     stmt -> (location, value) call -> recursion option ->
     (value, location, origin) valuation -> state -> state or_bottom

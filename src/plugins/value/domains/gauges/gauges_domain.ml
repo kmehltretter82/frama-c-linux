@@ -1225,8 +1225,8 @@ module D_Impl : Abstract_domain.S
     let state =
       match function_calls_handling with
       | FullInterprocedural ->
-        let state = Extlib.opt_fold start_recursive_call recursion state in
-        update valuation state
+        update valuation state >>-: fun state ->
+        Extlib.opt_fold start_recursive_call recursion state
       | IntraproceduralAll
       | IntraproceduralNonReferenced -> `Value G.empty
     in

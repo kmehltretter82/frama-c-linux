@@ -245,6 +245,9 @@ module State = struct
     Model.replace_base substitution state
 
   let start_call stmt call recursion valuation (state, clob) =
+    (* Uses the [valuation] to update the [state] before the substitution
+       for recursive calls. *)
+    Cvalue_transfer.update valuation state >>- fun state ->
     let state =
       match recursion with
       | None -> state

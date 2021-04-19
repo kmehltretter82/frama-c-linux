@@ -164,8 +164,8 @@ module Internal  : Domain_builder.InputDomain
     Memory.remove_variables vars state
 
   let start_call _stmt _call recursion valuation state =
-    let state = Extlib.opt_fold start_recursive_call recursion state in
-    update valuation state
+    update valuation state >>-: fun state ->
+    Extlib.opt_fold start_recursive_call recursion state
 
   let show_expr _valuation _state _fmt _expr = ()
 

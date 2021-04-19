@@ -1224,12 +1224,19 @@ module Domain = struct
     if intraprocedural ()
     then `Value (empty ())
     else
-      let state = Extlib.opt_fold start_recursive_call recursion state in
       let state = { state with modified = Locations.Zone.bottom } in
-      let assign_formal state { formal; concrete; avalue } =
-        state >>- assign_variable formal concrete avalue valuation
-      in
-      List.fold_left assign_formal (`Value state) call.arguments
+      match recursion with
+      | Some recursion ->
+        (* No relation inferred from the assignment of formal parameters
+           for recursive calls, because the valuation cannot be used safely
+           as the substitution of local and formals variables has not been
+           applied to it. *)
+        `Value (start_recursive_call recursion state)
+      | None ->
+        let assign_formal state { formal; concrete; avalue } =
+          state >>- assign_variable formal concrete avalue valuation
+        in
+        List.fold_left assign_formal (`Value state) call.arguments
 
   let finalize_call _stmt _call _recursion ~pre ~post =
     if intraprocedural ()
