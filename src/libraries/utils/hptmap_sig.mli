@@ -16,6 +16,12 @@
 
 (** Signature for the {!Hptmap} module *)
 
+(** Functions on hptmaps are divided into two module types:
+    - [Shape] contains only functions that do not create or modify a map:
+      comparisons, tests, finding an element or a key, iterators.
+    - [S] includes [Shape], plus functions that create and modify maps:
+      adding or removing elements, filter and maps, merge of two maps. *)
+
 (** Some functions of this module may optionally use internal caches. It is
     the responsibility of the use to choose whether or not to use a cache,
     and whether this cache will be garbage-collectable by OCaml. *)
@@ -29,6 +35,9 @@ type cache_type =
   (** The results of the function will be cached, but the function itself
       is a local function which is garbage-collectable. *)
 
+(** This module type contains only functions that do not create or modify maps.
+    These functions can be applied to any maps from a given type [key],
+    regardless of the type of values bound. *)
 module type Shape = sig
   type key    (** Type of the keys. *)
   type 'v map (** Type of the maps from type [key] to type ['v]. *)
@@ -36,10 +45,10 @@ module type Shape = sig
   (** Bijective function. The ids are positive. *)
   val id: 'v map -> int
 
-  val hash: 'value map -> int
-  val equal : 'value map -> 'value map -> bool
-  val compare: ('value -> 'value -> int) -> 'value map -> 'value map -> int
-  val pretty: 'value Pretty_utils.formatter -> 'value map Pretty_utils.formatter
+  val hash: 'v map -> int
+  val equal : 'v map -> 'v map -> bool
+  val compare: ('v -> 'v -> int) -> 'v map -> 'v map -> int
+  val pretty: 'v Pretty_utils.formatter -> 'v map Pretty_utils.formatter
 
   val is_empty : 'v map -> bool
   (** [is_empty m] returns [true] if and only if the map [m] defines no
@@ -74,6 +83,8 @@ module type Shape = sig
 
   val min_binding: 'v map -> key * 'v
   val max_binding: 'v map -> key * 'v
+
+  (** {2 Iterators} *)
 
   val iter : (key -> 'v -> unit) -> 'v map -> unit
   (** [iter f m] applies [f] to all bindings of the map [m]. *)
@@ -182,6 +193,8 @@ module type Shape = sig
       between two maps. If one map is empty, the intersection is empty.
       Otherwise, if the two maps are equal, the intersection is non-empty. *)
 
+  (** {2 Misc} *)
+
   val clear_caches: unit -> unit
   (** Clear all the persistent caches used internally by the functions of this
       module. Those caches are not project-aware, so this function must be
@@ -189,7 +202,7 @@ module type Shape = sig
 end
 
 
-(** Signature for hptmaps from hash-consed trees to values *)
+(** Signature for hptmaps from hash-consed trees to values. *)
 module type S = sig
   type key (** type of the keys *)
   type v   (** type of the values *)
@@ -223,6 +236,8 @@ module type S = sig
         where [o] is (Some v) if [k] is bound to [v] in [m], or None if [k]
         is not bound in [m]. *)
 
+  (** {2 Filters and maps} *)
+
   val filter: (key -> bool) -> t -> t
   (** [filter f t] keep only the bindings of [m] whose key verify [f].  *)
 
@@ -249,6 +264,8 @@ module type S = sig
       to compute the final value bound to [key'].
       The returned boolean indicates whether the map has been modified: it is
       false if the intersection between [shape] and [map] is empty. *)
+
+  (** {2 Merge of two maps} *)
 
   type empty_action = Neutral | Absorbing | Traversing of (key -> v -> v option)
 
@@ -326,6 +343,8 @@ module type S = sig
       - [inter] contains the elements of [m] bound in the shape [s];
       - [diff] contains the elements of [m] not bound in the shape [s]. *)
 
+  (** {2 Misc} *)
+
   val from_shape: (key -> 'a -> v) -> 'a map -> t
   (** Build an entire map from another map indexed by the same keys.
       More efficient than just performing successive {!add} the elements
@@ -335,15 +354,15 @@ module type S = sig
   (** Value of the compositional boolean associated to the tree, as computed
       by the {!Compositional_bool} argument of the functor. *)
 
-  (**/**) (* Undocumented. *)
   val pretty_debug: Format.formatter -> t -> unit
+  (** Verbose pretty printer for debug purposes. *)
 
-  (* Prefixes. *)
-  val comp_prefixes : t -> t -> unit
-  val pretty_prefix : prefix -> Format.formatter -> t -> unit
+  (** {2 Prefixes and subtree; Undocumented} *)
 
   type subtree
   exception Found_prefix of prefix * subtree * subtree
+  val comp_prefixes : t -> t -> unit
+  val pretty_prefix : prefix -> Format.formatter -> t -> unit
   val find_prefix : t -> prefix -> subtree option
   val hash_subtree : subtree -> int
   val equal_subtree : subtree -> subtree -> bool

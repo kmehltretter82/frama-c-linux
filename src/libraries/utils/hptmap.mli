@@ -22,7 +22,6 @@
     implemented on top of Patricia trees. A tree is big-endian if it
     expects the key's most significant bits to be tested first. *)
 
-
 (** Undocumented. Needed for advanced users only *)
 type prefix
 
@@ -39,14 +38,15 @@ module type V = sig
   val pretty_debug: t Pretty_utils.formatter
 end
 
-(** This functor exports the {i shape} of the maps indexed by keys [Key].
-    Those shapes can be used by various functions to efficiently build
-    new maps whose shape are already known. *)
+(** This functor builds {!Hptmap_sig.Shape} for maps indexed by keys [Key],
+    which contains all functions on hptmap that do not create or modify maps. *)
 module Shape (Key : Id_Datatype): sig
   include Hptmap_sig.Shape with type key = Key.t
   type 'a t = 'a map
 end
 
+(** This functor builds the complete module of maps indexed by keys [Key]
+    to values [V]. *)
 module Make
     (Key : Id_Datatype)
     (V : V)
