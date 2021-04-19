@@ -96,11 +96,11 @@ module type Shape = sig
   val binary_predicate:
     cache_type ->
     predicate_type ->
-    decide_fast:('v map -> 'v map -> predicate_result) ->
-    decide_fst:(key -> 'v -> bool) ->
-    decide_snd:(key -> 'v -> bool) ->
-    decide_both:(key -> 'v -> 'v -> bool) ->
-    'v map -> 'v map -> bool
+    decide_fast:('a map -> 'b map -> predicate_result) ->
+    decide_fst:(key -> 'a -> bool) ->
+    decide_snd:(key -> 'b -> bool) ->
+    decide_both:(key -> 'a -> 'b -> bool) ->
+    'a map -> 'b map -> bool
   (** [binary_predicate] decides whether some relation holds between two maps,
       according to the functions:
       - [decide_fst] and [decide_snd], called on keys present only
