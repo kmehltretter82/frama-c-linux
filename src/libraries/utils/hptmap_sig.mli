@@ -29,7 +29,6 @@ type cache_type =
   (** The results of the function will be cached, but the function itself
       is a local function which is garbage-collectable. *)
 
-
 module type Shape = sig
   type key    (** Type of the keys. *)
   type 'v map (** Type of the maps from type [key] to type ['v]. *)
@@ -37,14 +36,26 @@ module type Shape = sig
   (** Bijective function. The ids are positive. *)
   val id: 'v map -> int
 
-  val compare: ('value -> 'value -> int) -> 'value map -> 'value map -> int
-  val equal : 'value map -> 'value map -> bool
-  val pretty: 'value Pretty_utils.formatter -> 'value map Pretty_utils.formatter
   val hash: 'value map -> int
+  val equal : 'value map -> 'value map -> bool
+  val compare: ('value -> 'value -> int) -> 'value map -> 'value map -> int
+  val pretty: 'value Pretty_utils.formatter -> 'value map Pretty_utils.formatter
 
   val is_empty : 'v map -> bool
   (** [is_empty m] returns [true] if and only if the map [m] defines no
       bindings at all. *)
+
+  val is_singleton: 'v map -> (key * 'v) option
+  (** [is_singleton m] returns [Some (k, d)] if [m] is a singleton map
+      that maps [k] to [d]. Otherwise, it returns [None]. *)
+
+  val on_singleton: (key -> 'v -> bool) -> 'v map -> bool
+  (** [on_singleton f m] returns [f k d] if [m] is a singleton map
+      that maps [k] to [d]. Otherwise, it returns false. *)
+
+  val cardinal: 'v map -> int
+  (** [cardinal m] returns [m]'s cardinal, that is, the number of keys it
+      binds, or, in other words, its domain's cardinal. *)
 
   val find : key -> 'v map -> 'v
   val find_check_missing: key -> 'v map -> 'v
@@ -61,8 +72,19 @@ module type Shape = sig
   val mem :  key -> 'v map -> bool
   (** [mem k m] returns true if [k] is bound in [m], and false otherwise. *)
 
+  val min_binding: 'v map -> key * 'v
+  val max_binding: 'v map -> key * 'v
+
   val iter : (key -> 'v -> unit) -> 'v map -> unit
   (** [iter f m] applies [f] to all bindings of the map [m]. *)
+
+  val for_all: (key -> 'v -> bool) -> 'v map -> bool
+  (** [for_all p m] returns true if all the bindings of the map [m] satisfy
+      the predicate [p]. *)
+
+  val exists: (key -> 'v -> bool) -> 'v map -> bool
+  (** [for_all p m] returns true if at least one binding of the map [m] satisfies
+      the predicate [p]. *)
 
   val fold : (key -> 'v -> 'b -> 'b) -> 'v map -> 'b -> 'b
   (** [fold f m seed] invokes [f k d accu], in turn, for each binding from
@@ -76,13 +98,32 @@ module type Shape = sig
   (** [fold_rev] performs exactly the same job as [fold], but presents keys
       to [f] in the opposite order. *)
 
-  val for_all: (key -> 'v -> bool) -> 'v map -> bool
-  (** [for_all p m] returns true if all the bindings of the map [m] satisfy
-      the predicate [p]. *)
+  val cached_fold :
+    cache_name:string ->
+    temporary:bool ->
+    f:(key -> 'v -> 'b) ->
+    joiner:('b -> 'b -> 'b) ->
+    empty:'b ->
+    'v map -> 'b
 
-  val exists: (key -> 'v -> bool) -> 'v map -> bool
-  (** [for_all p m] returns true if at least one binding of the map [m] satisfies
-      the predicate [p]. *)
+  val fold2_join_heterogeneous:
+    cache:cache_type ->
+    empty_left:('b map -> 'c) ->
+    empty_right:('a map -> 'c) ->
+    both:(key -> 'a -> 'b -> 'c) ->
+    join:('c -> 'c -> 'c) ->
+    empty:'c ->
+    'a map -> 'b map ->
+    'c
+  (** [fold2_join_heterogeneous ~cache ~empty_left ~empty_right ~both
+        ~join ~empty m1 m2] iterates simultaneously on [m1] and [m2]. If a subtree
+      [t] is present in [m1] but not in [m2] (resp. in [m2] but not in [m1]),
+      [empty_right t] (resp. [empty_left t]) is called. If a key [k] is present
+      in both trees, and bound to [v1] and [v2] respectively, [both k v1 v2] is
+      called. If both trees are empty, [empty] is returned. The values of type
+      ['b] returned by the auxiliary functions are merged using [join], which is
+      called in an unspecified order. The results of the function may be cached,
+      depending on [cache]. *)
 
   (** {2 Binary predicates} *)
 
@@ -141,48 +182,6 @@ module type Shape = sig
       between two maps. If one map is empty, the intersection is empty.
       Otherwise, if the two maps are equal, the intersection is non-empty. *)
 
-  val cached_fold :
-    cache_name:string ->
-    temporary:bool ->
-    f:(key -> 'v -> 'b) ->
-    joiner:('b -> 'b -> 'b) ->
-    empty:'b ->
-    'v map -> 'b
-
-  val is_singleton: 'v map -> (key * 'v) option
-  (** [is_singleton m] returns [Some (k, d)] if [m] is a singleton map
-      that maps [k] to [d]. Otherwise, it returns [None]. *)
-
-  val on_singleton: (key -> 'v -> bool) -> 'v map -> bool
-  (** [on_singleton f m] returns [f k d] if [m] is a singleton map
-      that maps [k] to [d]. Otherwise, it returns false. *)
-
-  val cardinal: 'v map -> int
-  (** [cardinal m] returns [m]'s cardinal, that is, the number of keys it
-      binds, or, in other words, its domain's cardinal. *)
-
-  val min_binding: 'v map -> key * 'v
-  val max_binding: 'v map -> key * 'v
-
-  val fold2_join_heterogeneous:
-    cache:cache_type ->
-    empty_left:('b map -> 'c) ->
-    empty_right:('a map -> 'c) ->
-    both:(key -> 'a -> 'b -> 'c) ->
-    join:('c -> 'c -> 'c) ->
-    empty:'c ->
-    'a map -> 'b map ->
-    'c
-    (** [fold2_join_heterogeneous ~cache ~empty_left ~empty_right ~both
-          ~join ~empty m1 m2] iterates simultaneously on [m1] and [m2]. If a subtree
-        [t] is present in [m1] but not in [m2] (resp. in [m2] but not in [m1]),
-        [empty_right t] (resp. [empty_left t]) is called. If a key [k] is present
-        in both trees, and bound to [v1] and [v2] respectively, [both k v1 v2] is
-        called. If both trees are empty, [empty] is returned. The values of type
-        ['b] returned by the auxiliary functions are merged using [join], which is
-        called in an unspecified order. The results of the function may be cached,
-        depending on [cache]. *)
-
   val clear_caches: unit -> unit
   (** Clear all the persistent caches used internally by the functions of this
       module. Those caches are not project-aware, so this function must be
@@ -204,10 +203,17 @@ module type S = sig
   val empty : t
   (** the empty map *)
 
+  val singleton: key -> v -> t
+  (** [singleton k d] returns a map whose only binding is from [k] to [d]. *)
+
   val add : key -> v -> t -> t
   (** [add k d m] returns a map whose bindings are all bindings in [m], plus
       a binding of the key [k] to the datum [d]. If a binding already exists
       for [k], it is overridden. *)
+
+  val remove : key -> t -> t
+  (** [remove k m] returns the map [m] deprived from any binding involving
+      [k]. *)
 
   val replace : (v option -> v option) -> key -> t -> t
   (** [replace f k m] returns a map whose bindings are all bindings in [m],
@@ -217,9 +223,8 @@ module type S = sig
         where [o] is (Some v) if [k] is bound to [v] in [m], or None if [k]
         is not bound in [m]. *)
 
-  val remove : key -> t -> t
-  (** [remove k m] returns the map [m] deprived from any binding involving
-      [k]. *)
+  val filter: (key -> bool) -> t -> t
+  (** [filter f t] keep only the bindings of [m] whose key verify [f].  *)
 
   val map : (v -> v) -> t -> t
   (** [map f m] returns the map obtained by composing the map [m] with the
@@ -229,8 +234,21 @@ module type S = sig
   (** Same as [map], except if [f k v] returns [None]. In this case, [k] is not
       bound in the resulting map. *)
 
-  val filter: (key -> bool) -> t -> t
-  (** [filter f t] keep only the bindings of [m] whose key verify [f].  *)
+  val cached_map :
+    cache:string * int ->
+    temporary:bool ->
+    f:(key -> v -> v) ->
+    t -> t
+
+  val replace_key: decide:(key -> v -> v -> v) -> key map -> t -> bool * t
+  (** [replace_key ~decide shape map] substitute keys in [map] according to
+      [shape]: it returns the [map] in which all bindings from [key] to [v] such
+      that [key] is bound to [key'] in [shape] are replaced by a binding from
+      [key'] to [v]. If the new key [key'] was already bound in the map, or if
+      two keys are replaced by a same key [key'], the [decide] function is used
+      to compute the final value bound to [key'].
+      The returned boolean indicates whether the map has been modified: it is
+      false if the intersection between [shape] and [map] is empty. *)
 
   type empty_action = Neutral | Absorbing | Traversing of (key -> v -> v option)
 
@@ -308,33 +326,14 @@ module type S = sig
       - [inter] contains the elements of [m] bound in the shape [s];
       - [diff] contains the elements of [m] not bound in the shape [s]. *)
 
-  val cached_map :
-    cache:string * int ->
-    temporary:bool ->
-    f:(key -> v -> v) ->
-    t -> t
-
-  val singleton: key -> v -> t
-  (** [singleton k d] returns a map whose only binding is from [k] to [d]. *)
-
-  val compositional_bool: t -> bool
-  (** Value of the compositional boolean associated to the tree, as computed
-      by the {!Compositional_bool} argument of the functor. *)
-
   val from_shape: (key -> 'a -> v) -> 'a map -> t
   (** Build an entire map from another map indexed by the same keys.
       More efficient than just performing successive {!add} the elements
       of the other map *)
 
-  val replace_key: decide:(key -> v -> v -> v) -> key map -> t -> bool * t
-  (** [replace_key ~decide shape map] substitute keys in [map] according to
-      [shape]: it returns the [map] in which all bindings from [key] to [v] such
-      that [key] is bound to [key'] in [shape] are replaced by a binding from
-      [key'] to [v]. If the new key [key'] was already bound in the map, or if
-      two keys are replaced by a same key [key'], the [decide] function is used
-      to compute the final value bound to [key'].
-      The returned boolean indicates whether the map has been modified: it is
-      false if the intersection between [shape] and [map] is empty. *)
+  val compositional_bool: t -> bool
+  (** Value of the compositional boolean associated to the tree, as computed
+      by the {!Compositional_bool} argument of the functor. *)
 
   (**/**) (* Undocumented. *)
   val pretty_debug: Format.formatter -> t -> unit

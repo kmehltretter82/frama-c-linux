@@ -100,6 +100,13 @@ struct
   let compose _ _ = false
 end
 
+(* A tree is either empty, or a leaf node, containing both
+   the integer key and a piece of data, or a binary node.
+   Each binary node carries two integers. The first one is
+   the longest common prefix of all keys in this
+   sub-tree. The second integer is the branching bit.
+   It is an integer with a single one bit (i.e. a power of 2),
+   which describes the bit being tested at this node. *)
 type ('key, 'value) tree =
   | Empty
   | Leaf of 'key * 'value * tag
@@ -115,6 +122,15 @@ let id tr = match tr with
   | Branch (_, _, _, _, tag) -> Tag_comp.get_tag tag
 
 let hash_generic = id
+
+let rec iter f htr =
+  match htr with
+  | Empty -> ()
+  | Leaf (key, data, _) ->
+    f key data
+  | Branch (_, _, tree0, tree1, _tl) ->
+    iter f tree0;
+    iter f tree1
 
 module type Id_Datatype = sig
   include Datatype.S
@@ -132,6 +148,9 @@ module Shape(Key: Id_Datatype) = struct
   type 'a t = 'a map
 
   let id = hash_generic
+  let hash = hash_generic
+
+  let equal = ( == )
 
   let compare_v cmp t1 t2 =
     match t1, t2 with
@@ -167,38 +186,37 @@ module Shape(Key: Id_Datatype) = struct
     end
     else compare_v
 
-  let rec iter f htr =
-    match htr with
-    | Empty -> ()
-    | Leaf (key, data, _) ->
-      f key data
-    | Branch (_, _, tree0, tree1, _tl) ->
-      iter f tree0;
-      iter f tree1
-
   let pretty pretty_value fmt tree =
     Pretty_utils.pp_iter2
       ~pre:"@[<v 3>{[ " ~suf:" ]}@]" ~sep:"@ " ~between:" -> "
       iter Key.pretty (fun fmt v -> Format.fprintf fmt "@[%a@]" pretty_value v)
       fmt tree
 
-  let hash = hash_generic
+  let is_empty htr = match htr with
+    | Empty ->
+      true
+    | Leaf _
+    | Branch _ ->
+      false
 
-  let equal = ( == )
+  let is_singleton htr = match htr with
+    | Leaf (k, d, _) ->
+      Some (k, d)
+    | Empty
+    | Branch _ ->
+      None
 
+  let on_singleton f htr = match htr with
+    | Leaf (k, d, _) -> f k d
+    | Empty | Branch _ -> false
 
-
-  let rec min_binding t =
-    match t with
-    | Empty -> raise Not_found
-    | Branch (_,_,left,_,_) -> min_binding left
-    | Leaf (key, data, _) -> key, data
-
-  let rec max_binding t =
-    match t with
-    | Empty -> raise Not_found
-    | Branch (_,_,_,right,_) -> max_binding right
-    | Leaf (key, data, _) -> key, data
+  let rec cardinal htr = match htr with
+    | Empty ->
+      0
+    | Leaf _ ->
+      1
+    | Branch (_, _, t0, t1,  _) ->
+      cardinal t0 + cardinal t1
 
   (* [find k m] looks up the value associated to the key [k] in the map [m],
      and raises [Not_found] if no value is bound to [k].
@@ -276,32 +294,31 @@ module Shape(Key: Id_Datatype) = struct
     in
     find htr
 
-  let is_singleton htr = match htr with
-    | Leaf (k, d, _) ->
-      Some (k, d)
-    | Empty
-    | Branch _ ->
-      None
+  let rec min_binding t =
+    match t with
+    | Empty -> raise Not_found
+    | Branch (_,_,left,_,_) -> min_binding left
+    | Leaf (key, data, _) -> key, data
 
-  let on_singleton f htr = match htr with
-    | Leaf (k, d, _) -> f k d
-    | Empty | Branch _ -> false
+  let rec max_binding t =
+    match t with
+    | Empty -> raise Not_found
+    | Branch (_,_,_,right,_) -> max_binding right
+    | Leaf (key, data, _) -> key, data
 
-  let is_empty htr = match htr with
-    | Empty ->
-      true
-    | Leaf _
-    | Branch _ ->
-      false
+  let iter = iter
 
-  let rec cardinal htr = match htr with
-    | Empty ->
-      0
-    | Leaf _ ->
-      1
-    | Branch (_, _, t0, t1,  _) ->
-      cardinal t0 + cardinal t1
+  let rec for_all f m =
+    match m with
+    | Empty -> true
+    | Leaf (key, data, _) -> f key data
+    | Branch (_, _, tree0, tree1, _) -> for_all f tree0 && for_all f tree1
 
+  let rec exists f m =
+    match m with
+    | Empty -> false
+    | Leaf (key, data, _) -> f key data
+    | Branch (_, _, tree0, tree1, _) -> exists f tree0 || exists f tree1
 
   let rec fold f m accu =
     match m with
@@ -321,24 +338,47 @@ module Shape(Key: Id_Datatype) = struct
     | Branch (_, _, tree0, tree1, _) ->
       fold_rev f tree0 (fold_rev f tree1 accu)
 
-
-  let rec for_all f m =
-    match m with
-    | Empty -> true
-    | Leaf (key, data, _) -> f key data
-    | Branch (_, _, tree0, tree1, _) -> for_all f tree0 && for_all f tree1
-
-  let rec exists f m =
-    match m with
-    | Empty -> false
-    | Leaf (key, data, _) -> f key data
-    | Branch (_, _, tree0, tree1, _) -> exists f tree0 || exists f tree1
-
   (* This reference will contain a list of functions that will clear
      all the transient caches used in this module *)
   let clear_caches_ref = ref []
   let register_clear_cache f = clear_caches_ref := f :: !clear_caches_ref
   let clear_caches () = List.iter (fun f -> f ()) !clear_caches_ref
+
+  let cached_fold ~cache_name ~temporary ~f ~joiner ~empty =
+    if debug_cache then Format.eprintf "CACHE cached_fold %s@." cache_name;
+    let cache_size = Binary_cache.cache_size in
+    let cache = Array.make cache_size (Empty, empty) in
+    let hash t = abs (hash t mod cache_size) in
+    let reset () = Array.fill cache 0 cache_size (Empty, empty) in
+    if not temporary then register_clear_cache reset;
+    fun m ->
+      let rec traverse t =
+        let mem result =
+          cache.(hash t) <- (t, result);
+          result
+        in
+        let find () =
+          let t', r = cache.(hash t) in
+          if equal t t' then r
+          else raise Not_found
+        in
+        match t with
+        | Empty -> empty
+        | Leaf(key, value, _) ->
+          (try
+             find ()
+           with Not_found ->
+             mem (f key value)
+          )
+        | Branch(_p, _m, s0, s1, _) ->
+          try
+            find ()
+          with Not_found ->
+            let result0 = traverse s0 in
+            let result1 = traverse s1 in
+            mem (joiner result0 result1)
+      in
+      traverse m
 
   module Cacheable (X: sig type v end) = struct
     type t = (key, X.v) tree
@@ -521,7 +561,6 @@ module Shape(Key: Id_Datatype) = struct
     in
     aux'
 
-
   let binary_predicate ct pt ~decide_fast ~decide_fst ~decide_snd ~decide_both =
     let cache_merge =
       make_binary_cache ~predicate:Eq true "binary_predicate" ct
@@ -536,43 +575,6 @@ module Shape(Key: Id_Datatype) = struct
     in
     make_binary_predicate cache_merge pt
       ~decide_fast ~decide_fst:decide_one ~decide_snd:decide_one ~decide_both
-
-
-  let cached_fold ~cache_name ~temporary ~f ~joiner ~empty =
-    if debug_cache then Format.eprintf "CACHE cached_fold %s@." cache_name;
-    let cache_size = Binary_cache.cache_size in
-    let cache = Array.make cache_size (Empty, empty) in
-    let hash t = abs (hash t mod cache_size) in
-    let reset () = Array.fill cache 0 cache_size (Empty, empty) in
-    if not temporary then register_clear_cache reset;
-    fun m ->
-      let rec traverse t =
-        let mem result =
-          cache.(hash t) <- (t, result);
-          result
-        in
-        let find () =
-          let t', r = cache.(hash t) in
-          if equal t t' then r
-          else raise Not_found
-        in
-        match t with
-        | Empty -> empty
-        | Leaf(key, value, _) ->
-          (try
-             find ()
-           with Not_found ->
-             mem (f key value)
-          )
-        | Branch(_p, _m, s0, s1, _) ->
-          try
-            find ()
-          with Not_found ->
-            let result0 = traverse s0 in
-            let result1 = traverse s1 in
-            mem (joiner result0 result1)
-      in
-      traverse m
 end
 
 module Make
@@ -591,14 +593,6 @@ struct
   include Shape (Key)
   type v = V.t
   type prefix = int * int
-
-  (* A tree is either empty, or a leaf node, containing both
-     the integer key and a piece of data, or a binary node.
-     Each binary node carries two integers. The first one is
-     the longest common prefix of all keys in this
-     sub-tree. The second integer is the branching bit.
-     It is an integer with a single one bit (i.e. a power of 2),
-     which describes the bit being tested at this node. *)
 
   type t = (Key.t, V.t) tree
   type hptmap = t (* Alias needed later *)
@@ -634,8 +628,6 @@ struct
     | Empty -> Compositional_bool.e
     | Leaf (_,_,tc)
     | Branch (_,_,_,_,tc) -> Tag_comp.get_comp tc
-
-  let empty = Empty
 
   (* Tags must be > 0, as we use 0 for the id of Empty. *)
   let current_tag_before_initial_values = 1
@@ -769,94 +761,10 @@ struct
     else
       wrap_Branch p m t1 t0
 
-  let pretty_prefix (p,m) fmt tree =
-    let prettykv fmt k v =
-      Format.fprintf fmt "[@[%a@] -> @[%a@]@]@ " Key.pretty k V.pretty v
-    in
-    let rec pretty_prefix_aux tree =
-      match tree with
-        Empty -> ()
-      | Leaf (k,v,_) ->
-        if match_prefix (Key.id k) p m then prettykv fmt k v
-      | Branch(p1,m1,l,r,_) ->
-        if m1 <= m
-        then begin
-          if match_prefix p1 p m then iter (prettykv fmt) tree;
-        end
-        else if p land m1 = 0
-        then pretty_prefix_aux l
-        else pretty_prefix_aux r
-    in
-    Format.fprintf fmt "@[<v 2>[[";
-    pretty_prefix_aux tree;
-    Format.fprintf fmt "]]@]"
+  let empty = Empty
 
-  type subtree = t
-  exception Found_prefix of prefix * subtree * subtree
-
-  let rec comp_prefixes t1 t2 =
-    assert (t1 != t2);
-    let all_comp = compositional_bool t1 && compositional_bool t2 in
-    match t1, t2 with
-      Leaf (k1, _v1, _), Leaf (k2, _v2, _) ->
-      if Key.equal k1 k2 && all_comp
-      then begin
-        (*        Format.printf "PREF leaves:@.";
-                  prettykv Format.std_formatter k1 _v1;
-                  prettykv Format.std_formatter k1 _v2;  *)
-        raise (Found_prefix((Key.id k1, -1), t1, t2))
-      end
-    | Branch (p1, m1, l1, r1, _), Branch (p2, m2, l2, r2, _) ->
-      if (p1 = p2) && (m1 = m2)
-      then begin
-        if all_comp then begin
-          (*      Format.printf "PREF subtree:@.";
-                  pretty Format.std_formatter t1;
-                  pretty Format.std_formatter t2;  *)
-          raise (Found_prefix((p1 ,m1), t1, t2));
-        end;
-        let go_left = l1 != l2 in
-        if go_left
-        then begin
-          let go_right = r1 != r2 in
-          if go_right then comp_prefixes r1 r2;
-          comp_prefixes l1 l2;
-        end
-        else begin
-          assert (r1 != r2);
-          comp_prefixes r1 r2;
-        end
-      end
-      else if (Big_Endian.shorter m1 m2) && (match_prefix p2 p1 m1)
-      then
-        let sub1 = if (p2 land m1) = 0 then l1 else r1 in
-        if sub1 != t2 then comp_prefixes sub1 t2
-        else if (Big_Endian.shorter m2 m1) && (match_prefix p1 p2 m2)
-        then
-          let sub2 = if (p1 land m2) = 0 then l2 else r2 in
-          if sub2 != t1 then
-            comp_prefixes t1 sub2
-    | _, _ -> ()
-
-  let rec find_prefix t (p, m as prefix) =
-    match t with
-      Empty -> None
-    | Leaf (k, _, c) ->
-      if Key.id k = p && m = -1 && (Tag_comp.get_comp c)
-      then Some t
-      else None
-    | Branch (p1, m1, l, r, tc) ->
-      if p1 = p && m1 = m
-      then (if Tag_comp.get_comp tc then Some t else None)
-      else if Big_Endian.shorter m m1
-      then None
-      else if match_prefix p p1 m1
-      then find_prefix (if p land m1 = 0 then l else r) prefix
-      else None
-
-  let hash_subtree = hash
-
-  let equal_subtree = equal
+  let singleton k d =
+    wrap_Leaf k d
 
   exception Unchanged
 
@@ -884,40 +792,20 @@ struct
     try add m
     with Unchanged -> m
 
-  let replace f k m =
-    let id = Key.id k in
-    let replace_empty () = match f None with
-      | None -> raise Unchanged
-      | Some d -> wrap_Leaf k d
-    in
-    let rec add t =
-      match t with
-      | Empty -> replace_empty ()
-      | Leaf (k0, d0, _) ->
-        if Key.equal k k0 then
-          match f (Some d0) with
-          | None -> Empty
-          | Some d ->
-            if d == d0 then
-              raise Unchanged
-            else
-              wrap_Leaf k d
-        else
-          let new_leaf = replace_empty () in
-          join id new_leaf (Key.id k0) t
-      | Branch (p, m, t0, t1, _) ->
-        if match_prefix id p m then
-          if (id land m) = 0 then wrap_Branch p m (add t0) t1
-          else wrap_Branch p m t0 (add t1)
-        else
-          let new_leaf = replace_empty () in
-          join id new_leaf p t
-    in
-    try add m
-    with Unchanged -> m
+  let rehash_node = function
+    | Empty -> Empty
+    | Leaf (k, v, _) -> wrap_Leaf k v
+    | Branch (p,m,l,r,_) ->
+      if Descr.is_abstract Key.descr then
+        (* The keys id have not been modified during de-marshalling.
+           The shapes of [l] and [r] are compatible, just merge them. *)
+        wrap_Branch p m l r
+      else
+        (* The ids may have been modified, the trees can overlap. Rebuild
+           everything from scratch. *)
+        fold add l r
 
-  let singleton k d =
-    wrap_Leaf k d
+  let () = rehash_ref := rehash_node
 
   let remove key m =
     let id = Key.id key in
@@ -959,6 +847,38 @@ struct
     with Not_found ->
       m
 
+  let replace f k m =
+    let id = Key.id k in
+    let replace_empty () = match f None with
+      | None -> raise Unchanged
+      | Some d -> wrap_Leaf k d
+    in
+    let rec add t =
+      match t with
+      | Empty -> replace_empty ()
+      | Leaf (k0, d0, _) ->
+        if Key.equal k k0 then
+          match f (Some d0) with
+          | None -> Empty
+          | Some d ->
+            if d == d0 then
+              raise Unchanged
+            else
+              wrap_Leaf k d
+        else
+          let new_leaf = replace_empty () in
+          join id new_leaf (Key.id k0) t
+      | Branch (p, m, t0, t1, _) ->
+        if match_prefix id p m then
+          if (id land m) = 0 then wrap_Branch p m (add t0) t1
+          else wrap_Branch p m t0 (add t1)
+        else
+          let new_leaf = replace_empty () in
+          join id new_leaf p t
+    in
+    try add m
+    with Unchanged -> m
+
 (*
     (** [find_and_remove k m] looks up the value [v] associated to the key [k]
   in the map [m], and raises [Not_found] if no value is bound to [k]. The
@@ -991,20 +911,18 @@ struct
       in
       find_and_remove htr
       *)
-  let rehash_node = function
-    | Empty -> Empty
-    | Leaf (k, v, _) -> wrap_Leaf k v
-    | Branch (p,m,l,r,_) ->
-      if Descr.is_abstract Key.descr then
-        (* The keys id have not been modified during de-marshalling.
-           The shapes of [l] and [r] are compatible, just merge them. *)
-        wrap_Branch p m l r
-      else
-        (* The ids may have been modified, the trees can overlap. Rebuild
-           everything from scratch. *)
-        fold add l r
 
-  let () = rehash_ref := rehash_node
+  let rec filter f htr = match htr with
+    | Empty -> Empty
+    | Leaf (key, _data, _) ->
+      if f key then htr else Empty
+    | Branch (p, m, tree0, tree1, _) ->
+      let tree0' = filter f tree0 and tree1' = filter f tree1 in
+      if tree0' == tree0 && tree1' == tree1
+      then htr
+      else if tree0' == Empty then tree1'
+      else if tree1' == Empty then tree0'
+      else wrap_Branch p m tree0' tree1'
 
   let rec map f htr = match htr with
     | Empty ->
@@ -1037,18 +955,6 @@ struct
       else if tree1' == Empty then tree0'
       else wrap_Branch p m tree0' tree1'
 
-  let rec filter f htr = match htr with
-    | Empty -> Empty
-    | Leaf (key, _data, _) ->
-      if f key then htr else Empty
-    | Branch (p, m, tree0, tree1, _) ->
-      let tree0' = filter f tree0 and tree1' = filter f tree1 in
-      if tree0' == tree0 && tree1' == tree1
-      then htr
-      else if tree0' == Empty then tree1'
-      else if tree1' == Empty then tree0'
-      else wrap_Branch p m tree0' tree1'
-
   (** [endo_map] is similar to [map], but attempts to physically share its
       result with its input. This saves memory when [f] is the identity
       function. *)
@@ -1069,6 +975,40 @@ struct
         tree
       else
         wrap_Branch p m tree0' tree1'
+
+  let cached_map ~cache ~temporary ~f =
+    let _name, cache = cache in
+    let table = Hashtbl.create cache in
+    if not temporary then
+      register_clear_cache (fun () -> Hashtbl.clear table);
+    let counter = ref 0 in
+    fun m ->
+      let rec traverse t =
+        match t with
+          Empty -> empty
+        | Leaf(key, value, _) ->
+          wrap_Leaf key (f key value)
+        | Branch(p, m, s0, s1, _) ->
+          try
+            let result = Hashtbl.find table t in
+            (*		Format.printf "find %s %d@." name !counter; *)
+            result
+          with Not_found ->
+            let result0 = traverse s0 in
+            let result1 = traverse s1 in
+            let result = wrap_Branch p m result0 result1 in
+            incr counter;
+            if !counter >= cache
+            then begin
+              (*	    Format.printf "Clearing %s fold table@." name;*)
+              Hashtbl.clear table;
+              counter := 0;
+            end;
+            (*		Format.printf "add  %s %d@." name !counter; *)
+            Hashtbl.add table t result;
+            result
+      in
+      traverse m
 
   let rec from_shape f = function
     | Empty -> Empty
@@ -1378,42 +1318,96 @@ struct
       in
       true, join new_inter diff
 
-  let cached_map ~cache ~temporary ~f =
-    let _name, cache = cache in
-    let table = Hashtbl.create cache in
-    if not temporary then
-      register_clear_cache (fun () -> Hashtbl.clear table);
-    let counter = ref 0 in
-    fun m ->
-      let rec traverse t =
-        match t with
-          Empty -> empty
-        | Leaf(key, value, _) ->
-          wrap_Leaf key (f key value)
-        | Branch(p, m, s0, s1, _) ->
-          try
-            let result = Hashtbl.find table t in
-            (*    Format.printf "find %s %d@." name !counter; *)
-            result
-          with Not_found ->
-            let result0 = traverse s0 in
-            let result1 = traverse s1 in
-            let result = wrap_Branch p m result0 result1 in
-            incr counter;
-            if !counter >= cache
-            then begin
-              (*      Format.printf "Clearing %s fold table@." name;*)
-              Hashtbl.clear table;
-              counter := 0;
-            end;
-            (*    Format.printf "add  %s %d@." name !counter; *)
-            Hashtbl.add table t result;
-            result
-      in
-      traverse m
 
+  let pretty_prefix (p,m) fmt tree =
+    let prettykv fmt k v =
+      Format.fprintf fmt "[@[%a@] -> @[%a@]@]@ " Key.pretty k V.pretty v
+    in
+    let rec pretty_prefix_aux tree =
+      match tree with
+        Empty -> ()
+      | Leaf (k,v,_) ->
+        if match_prefix (Key.id k) p m then prettykv fmt k v
+      | Branch(p1,m1,l,r,_) ->
+        if m1 <= m
+        then begin
+          if match_prefix p1 p m then iter (prettykv fmt) tree;
+        end
+        else if p land m1 = 0
+        then pretty_prefix_aux l
+        else pretty_prefix_aux r
+    in
+    Format.fprintf fmt "@[<v 2>[[";
+    pretty_prefix_aux tree;
+    Format.fprintf fmt "]]@]"
+
+  type subtree = t
+  exception Found_prefix of prefix * subtree * subtree
+
+  let rec comp_prefixes t1 t2 =
+    assert (t1 != t2);
+    let all_comp = compositional_bool t1 && compositional_bool t2 in
+    match t1, t2 with
+      Leaf (k1, _v1, _), Leaf (k2, _v2, _) ->
+      if Key.equal k1 k2 && all_comp
+      then begin
+        (* Format.printf "PREF leaves:@.";
+           prettykv Format.std_formatter k1 _v1;
+           prettykv Format.std_formatter k1 _v2;  *)
+        raise (Found_prefix((Key.id k1, -1), t1, t2))
+      end
+    | Branch (p1, m1, l1, r1, _), Branch (p2, m2, l2, r2, _) ->
+      if (p1 = p2) && (m1 = m2)
+      then begin
+        if all_comp then begin
+          (* Format.printf "PREF subtree:@.";
+             pretty Format.std_formatter t1;
+             pretty Format.std_formatter t2;  *)
+          raise (Found_prefix((p1 ,m1), t1, t2));
+        end;
+        let go_left = l1 != l2 in
+        if go_left
+        then begin
+          let go_right = r1 != r2 in
+          if go_right then comp_prefixes r1 r2;
+          comp_prefixes l1 l2;
+        end
+        else begin
+          assert (r1 != r2);
+          comp_prefixes r1 r2;
+        end
+      end
+      else if (Big_Endian.shorter m1 m2) && (match_prefix p2 p1 m1)
+      then
+        let sub1 = if (p2 land m1) = 0 then l1 else r1 in
+        if sub1 != t2 then comp_prefixes sub1 t2
+        else if (Big_Endian.shorter m2 m1) && (match_prefix p1 p2 m2)
+        then
+          let sub2 = if (p1 land m2) = 0 then l2 else r2 in
+          if sub2 != t1 then
+            comp_prefixes t1 sub2
+    | _, _ -> ()
+
+  let rec find_prefix t (p, m as prefix) =
+    match t with
+      Empty -> None
+    | Leaf (k, _, c) ->
+      if Key.id k = p && m = -1 && (Tag_comp.get_comp c)
+      then Some t
+      else None
+    | Branch (p1, m1, l, r, tc) ->
+      if p1 = p && m1 = m
+      then (if Tag_comp.get_comp tc then Some t else None)
+      else if Big_Endian.shorter m m1
+      then None
+      else if match_prefix p p1 m1
+      then find_prefix (if p land m1 = 0 then l else r) prefix
+      else None
+
+  let hash_subtree = hash
+
+  let equal_subtree = equal
 end
-
 
 
 (*
