@@ -75,7 +75,7 @@ $(LOADER): $(PACKAGES) ./configure.js ./Makefile
 SRC_DISTRIB=Makefile.distrib
 SRC_HEADERS=headers/header_spec.txt
 
-src-distrib:
+update-distrib-files:
 	@echo "Generating $(SRC_DISTRIB)"
 	@rm -f $(SRC_DISTRIB)
 	@rm -f $(SRC_HEADERS)
