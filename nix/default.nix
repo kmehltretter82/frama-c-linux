@@ -33,7 +33,7 @@ in
 
 pkgs.lib.makeExtensible
 (self: {
-  inherit src mk_buildInputs opam_packages;
+  inherit src mk_buildInputs opam_packages mk_deriv;
   gen-opam-selection = mk_opam_derivations self.opam_packages;
   buildInputs = mk_buildInputs {};
   installed = self.main.out;
