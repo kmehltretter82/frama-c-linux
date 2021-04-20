@@ -5,7 +5,8 @@
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
   p ∈ {0}
-[eva] tests/value/recursion.c:18: detected recursive call of function five.
+[eva:recursion] tests/value/recursion.c:18: 
+  detected recursive call of function five.
 [eva] tests/value/recursion.c:18: Warning: 
   Using specification of function five for recursive calls.
   Analysis of function five is thus incomplete and its soundness
@@ -14,7 +15,8 @@
 [eva:alarm] tests/value/recursion.c:15: Warning: 
   function five: postcondition got status unknown.
 [eva] tests/value/recursion.c:342: Frama_C_show_each_5: {5}
-[eva] tests/value/recursion.c:28: detected recursive call of function sum.
+[eva:recursion] tests/value/recursion.c:28: 
+  detected recursive call of function sum.
 [eva] tests/value/recursion.c:28: Warning: 
   Using specification of function sum for recursive calls.
   Analysis of function sum is thus incomplete and its soundness
@@ -23,33 +25,38 @@
 [eva:alarm] tests/value/recursion.c:24: Warning: 
   function sum: postcondition got status unknown.
 [eva] tests/value/recursion.c:344: Frama_C_show_each_91: {91}
-[eva] tests/value/recursion.c:37: detected recursive call of function factorial.
+[eva:recursion] tests/value/recursion.c:37: 
+  detected recursive call of function factorial.
 [eva] tests/value/recursion.c:37: Warning: 
   Using specification of function factorial for recursive calls.
   Analysis of function factorial is thus incomplete and its soundness
   relies on the written specification.
 [eva] using specification for function factorial
 [eva] tests/value/recursion.c:346: Frama_C_show_each_120: [0..4294967295]
-[eva] tests/value/recursion.c:46: detected recursive call of function syracuse.
+[eva:recursion] tests/value/recursion.c:46: 
+  detected recursive call of function syracuse.
 [eva] tests/value/recursion.c:46: Warning: 
   Using specification of function syracuse for recursive calls.
   Analysis of function syracuse is thus incomplete and its soundness
   relies on the written specification.
 [eva] using specification for function syracuse
 [eva] tests/value/recursion.c:348: Frama_C_show_each_1: [0..4294967294]
-[eva] tests/value/recursion.c:59: detected recursive call of function fibonacci.
+[eva:recursion] tests/value/recursion.c:59: 
+  detected recursive call of function fibonacci.
 [eva] tests/value/recursion.c:59: Warning: 
   Using specification of function fibonacci for recursive calls.
   Analysis of function fibonacci is thus incomplete and its soundness
   relies on the written specification.
 [eva] using specification for function fibonacci
-[eva] tests/value/recursion.c:60: detected recursive call of function fibonacci.
+[eva:recursion] tests/value/recursion.c:60: 
+  detected recursive call of function fibonacci.
 [eva] tests/value/recursion.c:60: Warning: 
   Using specification of function fibonacci for recursive calls.
   Analysis of function fibonacci is thus incomplete and its soundness
   relies on the written specification.
 [eva] tests/value/recursion.c:350: Frama_C_show_each_89: [0..4294967295]
-[eva] tests/value/recursion.c:76: detected recursive call of function sum_ptr.
+[eva:recursion] tests/value/recursion.c:76: 
+  detected recursive call of function sum_ptr.
 [eva] tests/value/recursion.c:76: Warning: 
   Using specification of function sum_ptr for recursive calls.
   Analysis of function sum_ptr is thus incomplete and its soundness
@@ -60,7 +67,7 @@
 [eva:alarm] tests/value/recursion.c:69: Warning: 
   function sum_ptr: postcondition got status unknown.
 [eva] tests/value/recursion.c:355: Frama_C_show_each_91: {91}
-[eva] tests/value/recursion.c:89: 
+[eva:recursion] tests/value/recursion.c:89: 
   detected recursive call of function factorial_ptr.
 [eva] tests/value/recursion.c:89: Warning: 
   Using specification of function factorial_ptr for recursive calls.
@@ -70,7 +77,7 @@
 [eva:alarm] tests/value/recursion.c:90: Warning: 
   accessing uninitialized left-value. assert \initialized(&res);
 [eva] tests/value/recursion.c:358: Frama_C_show_each_120: [0..4294967295]
-[eva] tests/value/recursion.c:101: 
+[eva:recursion] tests/value/recursion.c:101: 
   detected recursive call of function syracuse_ptr.
 [eva] tests/value/recursion.c:101: Warning: 
   Using specification of function syracuse_ptr for recursive calls.
@@ -80,14 +87,14 @@
 [eva:alarm] tests/value/recursion.c:102: Warning: 
   accessing uninitialized left-value. assert \initialized(&prev_res);
 [eva] tests/value/recursion.c:361: Frama_C_show_each_1: [0..4294967294]
-[eva] tests/value/recursion.c:117: 
+[eva:recursion] tests/value/recursion.c:117: 
   detected recursive call of function fibonacci_ptr.
 [eva] tests/value/recursion.c:117: Warning: 
   Using specification of function fibonacci_ptr for recursive calls.
   Analysis of function fibonacci_ptr is thus incomplete and its soundness
   relies on the written specification.
 [eva] using specification for function fibonacci_ptr
-[eva] tests/value/recursion.c:119: 
+[eva:recursion] tests/value/recursion.c:119: 
   detected recursive call of function fibonacci_ptr.
 [eva] tests/value/recursion.c:119: Warning: 
   Using specification of function fibonacci_ptr for recursive calls.
@@ -98,7 +105,7 @@
 [eva:alarm] tests/value/recursion.c:120: Warning: 
   accessing uninitialized left-value. assert \initialized(&y);
 [eva] tests/value/recursion.c:364: Frama_C_show_each_89: [0..4294967295]
-[eva] tests/value/recursion.c:137: 
+[eva:recursion] tests/value/recursion.c:137: 
   detected recursive call of function sum_and_fact.
 [eva] tests/value/recursion.c:137: Warning: 
   Using specification of function sum_and_fact for recursive calls.
@@ -111,7 +118,8 @@
   function sum_and_fact: postcondition got status unknown.
 [eva] tests/value/recursion.c:368: 
   Frama_C_show_each_36_40320: {36}, [0..4294967288],0%8
-[eva] tests/value/recursion.c:161: detected recursive call of function odd.
+[eva:recursion] tests/value/recursion.c:161: 
+  detected recursive call of function odd.
 [eva] tests/value/recursion.c:161: Warning: 
   Using specification of function odd for recursive calls.
   Analysis of function odd is thus incomplete and its soundness
@@ -121,7 +129,8 @@
   function odd: postcondition got status unknown.
 [eva] tests/value/recursion.c:373: Frama_C_show_each_1: {1}, {1}
 [eva] tests/value/recursion.c:376: Frama_C_show_each_0: {0}, {0}
-[eva] tests/value/recursion.c:183: detected recursive call of function odd_ptr.
+[eva:recursion] tests/value/recursion.c:183: 
+  detected recursive call of function odd_ptr.
 [eva] tests/value/recursion.c:183: Warning: 
   Using specification of function odd_ptr for recursive calls.
   Analysis of function odd_ptr is thus incomplete and its soundness
@@ -133,7 +142,8 @@
   accessing uninitialized left-value. assert \initialized(&y);
 [eva:alarm] tests/value/recursion.c:179: Warning: 
   function even_ptr: postcondition got status unknown.
-[eva] tests/value/recursion.c:171: detected recursive call of function even_ptr.
+[eva:recursion] tests/value/recursion.c:171: 
+  detected recursive call of function even_ptr.
 [eva] tests/value/recursion.c:379: Frama_C_show_each_1: {1}, {1}
 [eva] tests/value/recursion.c:382: Frama_C_show_each_0: {0}, {0}
 [eva] using specification for function Frama_C_interval
@@ -145,7 +155,7 @@
   function fill_array: precondition got status invalid.
 [eva:alarm] tests/value/recursion.c:226: Warning: 
   function fill_array: precondition got status unknown.
-[eva] tests/value/recursion.c:200: 
+[eva:recursion] tests/value/recursion.c:200: 
   detected recursive call of function fill_array.
 [eva] tests/value/recursion.c:200: Warning: 
   Using specification of function fill_array for recursive calls.
@@ -158,14 +168,14 @@
   function fill_array: postcondition got status unknown.
 [eva:alarm] tests/value/recursion.c:228: Warning: 
   function binary_search: precondition \initialized(data + (start .. end)) got status unknown.
-[eva] tests/value/recursion.c:214: 
+[eva:recursion] tests/value/recursion.c:214: 
   detected recursive call of function binary_search.
 [eva] tests/value/recursion.c:214: Warning: 
   Using specification of function binary_search for recursive calls.
   Analysis of function binary_search is thus incomplete and its soundness
   relies on the written specification.
 [eva] using specification for function binary_search
-[eva] tests/value/recursion.c:216: 
+[eva:recursion] tests/value/recursion.c:216: 
   detected recursive call of function binary_search.
 [eva] tests/value/recursion.c:216: Warning: 
   Using specification of function binary_search for recursive calls.
@@ -181,7 +191,8 @@
   Frama_C_show_each_7_11: [-2147483648..2147483647]
 [eva] tests/value/recursion.c:241: 
   Frama_C_show_each_minus_1_15: [-2147483648..2147483647]
-[eva] tests/value/recursion.c:252: detected recursive call of function alarm.
+[eva:recursion] tests/value/recursion.c:252: 
+  detected recursive call of function alarm.
 [eva] tests/value/recursion.c:252: Warning: 
   Using specification of function alarm for recursive calls.
   Analysis of function alarm is thus incomplete and its soundness
@@ -194,7 +205,8 @@
                    (tmp from alarm(i - 1))
 [eva] tests/value/recursion.c:406: 
   Frama_C_show_each_unreachable: [20..2147483640],0%20
-[eva] tests/value/recursion.c:261: detected recursive call of function precond.
+[eva:recursion] tests/value/recursion.c:261: 
+  detected recursive call of function precond.
 [eva] tests/value/recursion.c:261: Warning: 
   Using specification of function precond for recursive calls.
   Analysis of function precond is thus incomplete and its soundness
@@ -204,7 +216,7 @@
 [eva] using specification for function precond
 [eva] tests/value/recursion.c:261: Warning: 
   Cannot handle empty assigns clause. Assuming assigns \nothing: be aware this is probably incorrect.
-[eva] tests/value/recursion.c:276: 
+[eva:recursion] tests/value/recursion.c:276: 
   detected recursive call of function escaping_local.
 [eva] tests/value/recursion.c:276: Warning: 
   Using specification of function escaping_local for recursive calls.
@@ -216,7 +228,7 @@
 [eva] tests/value/recursion.c:279: Frama_C_show_each_1: {5}
 [eva:locals-escaping] tests/value/recursion.c:277: Warning: 
   locals {x} escaping the scope of a block of escaping_local through p
-[eva] tests/value/recursion.c:291: 
+[eva:recursion] tests/value/recursion.c:291: 
   detected recursive call of function escaping_formal.
 [eva] tests/value/recursion.c:291: Warning: 
   Using specification of function escaping_formal for recursive calls.
@@ -228,7 +240,7 @@
 [eva] tests/value/recursion.c:294: Frama_C_show_each_1: {5}
 [eva:locals-escaping] tests/value/recursion.c:411: Warning: 
   locals {x} escaping the scope of escaping_formal through p
-[eva] tests/value/recursion.c:307: 
+[eva:recursion] tests/value/recursion.c:307: 
   detected recursive call of function escaping_stack.
 [eva] tests/value/recursion.c:307: Warning: 
   Using specification of function escaping_stack for recursive calls.
@@ -240,7 +252,8 @@
 [eva] tests/value/recursion.c:310: Frama_C_show_each_1_2: {5}
 [eva:locals-escaping] tests/value/recursion.c:308: Warning: 
   locals {x} escaping the scope of a block of escaping_stack through p
-[eva] tests/value/recursion.c:323: detected recursive call of function decr.
+[eva:recursion] tests/value/recursion.c:323: 
+  detected recursive call of function decr.
 [eva] tests/value/recursion.c:323: Warning: 
   Using specification of function decr for recursive calls.
   Analysis of function decr is thus incomplete and its soundness

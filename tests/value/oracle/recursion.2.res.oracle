@@ -5,7 +5,7 @@
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
   p ∈ {0}
-[eva] tests/value/recursion.c:422: 
+[eva:recursion] tests/value/recursion.c:422: 
   detected recursive call of function sum_nospec.
 [eva] tests/value/recursion.c:429: Frama_C_show_each_10: {10}
 [eva] tests/value/recursion.c:434: Frama_C_show_each_36: {36}

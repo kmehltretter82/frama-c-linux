@@ -82,11 +82,13 @@ let dkey_incompatible_states = register_category "incompatible-states"
 let dkey_iterator = register_category "iterator"
 let dkey_callbacks = register_category "callbacks"
 let dkey_widening = register_category "widening"
+let dkey_recursion = register_category "recursion"
 
 let () =
   let activate dkey = add_debug_keys dkey in
   List.iter activate
-    [dkey_initial_state; dkey_final_states; dkey_summary; dkey_cvalue_domain]
+    [dkey_initial_state; dkey_final_states; dkey_summary; dkey_cvalue_domain;
+     dkey_recursion; ]
 
 (* Warning categories. *)
 let wkey_alarm = register_warn_category "alarm"

@@ -144,7 +144,8 @@ let make_stack (kf, depth) =
 let get_stack kf depth = VarStack.memo make_stack (kf, depth)
 
 let make_recursion call depth =
-  Value_parameters.feedback ~once:true ~current:true
+  let dkey = Value_parameters.dkey_recursion in
+  Value_parameters.feedback ~dkey ~once:true ~current:true
     "@[detected recursive call@ of function %a.@]"
     Kernel_function.pretty call.kf;
   let substitution = get_stack call.kf depth in

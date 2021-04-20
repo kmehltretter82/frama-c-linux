@@ -218,6 +218,9 @@ val dkey_callbacks : category
 (** Debug category used to print the usage of widenings. *)
 val dkey_widening : category
 
+(** Debug category used to print messages about recursive calls. *)
+val dkey_recursion : category
+
 (** Registers available cvalue builtins for the -eva-builtin option. *)
 val register_builtin: string -> unit
 
