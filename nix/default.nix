@@ -6,7 +6,7 @@ let opam-selection = {
       selection = ./opam-selection.nix;
     };
     mk_opam_derivations = packages: opam2nix.resolve opam-selection packages;
-    opam_packages =
+    opamPackages =
       [ "ocamlfind" "zarith" "ocamlgraph" "yojson" "zmq"
         "ppx_deriving" "ppx_deriving_yojson"
         "coq=8.12.0" "alt-ergo=2.2.0" "why3=1.4.0" "why3-coq=1.4.0" ];
@@ -17,9 +17,9 @@ let opam-selection = {
     # frama-c derivations
     mk_deriv = args:
       let my_opam_packages =
-            if args?opam_packages then
-              opam_packages ++ args.opam_packages
-            else opam_packages
+            if args?opamPackages then
+              opamPackages ++ args.opamPackages
+            else opamPackages
           ;
       in
         stdenv.mkDerivation ({
@@ -33,8 +33,8 @@ in
 
 pkgs.lib.makeExtensible
 (self: {
-  inherit src mk_buildInputs opam_packages mk_deriv;
-  gen-opam-selection = mk_opam_derivations self.opam_packages;
+  inherit src mk_buildInputs opamPackages mk_deriv;
+  gen-opam-selection = mk_opam_derivations self.opamPackages;
   buildInputs = mk_buildInputs {};
   installed = self.main.out;
   main = mk_deriv {
@@ -83,7 +83,7 @@ pkgs.lib.makeExtensible
   lint = mk_deriv {
         name = "frama-c-lint";
         src = self.src;
-        opam_packages = [ "ocp-indent=1.7.0" "headache=1.05"];
+        opamPackages = [ "ocp-indent=1.7.0" "headache=1.05"];
         buildInputs =
           self.mk_buildInputs { nixPackages = [ pkgs.bc ]; };
         outputs = [ "out" ];
@@ -131,7 +131,7 @@ pkgs.lib.makeExtensible
         name = "frama-c-build-distrib-tarball";
         src = self.src;
         buildInputs = self.buildInputs;
-        opam_packages = [ "headache=1.05" ];
+        opamPackages = [ "headache=1.05" ];
         outputs = [ "out" ];
         postPatch = ''
                patchShebangs .
@@ -154,7 +154,7 @@ pkgs.lib.makeExtensible
   build-from-distrib-tarball = mk_deriv {
         name = "frama-c-build-from-distrib-tarball";
         buildInputs = self.buildInputs;
-        opam_packages = self.build-distrib-tarball.opam_packages;
+        opamPackages = self.build-distrib-tarball.opamPackages;
         src = self.build-distrib-tarball.out ;
         outputs = [ "out" ];
         configurePhase = ''
@@ -251,7 +251,7 @@ pkgs.lib.makeExtensible
   internal = mk_deriv {
         name = "frama-c-internal";
         src = self.src;
-        opam_packages = [ "xml-light" ];
+        opamPackages = [ "xml-light" ];
         buildInputs =
           self.mk_buildInputs
             { nixPackages =
