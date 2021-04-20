@@ -331,7 +331,9 @@ module Make (Abstract: Abstractions.Eva) = struct
     try
       Value_util.push_call_stack kf Kglobal;
       store_initial_state kf init_state;
-      let call = { kf; arguments = []; rest = []; return = None; } in
+      let call =
+        { kf; callstack = []; arguments = []; rest = []; return = None; }
+      in
       let final_result =
         compute_using_spec_or_body Kglobal call None init_state
       in

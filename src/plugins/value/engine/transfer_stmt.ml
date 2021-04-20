@@ -538,6 +538,7 @@ module Make (Abstract: Abstractions.Eva) = struct
   (* Create an Eval.call *)
   let create_call kf args =
     let return = Library_functions.get_retres_vi kf in
+    let callstack = Value_util.call_stack () in
     let arguments, rest =
       let formals = Kernel_function.get_formals kf in
       let rec format_arguments acc args formals = match args, formals with
@@ -551,7 +552,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       let arguments = List.rev arguments in
       arguments, rest
     in
-    {kf; arguments; rest; return; }
+    {kf; callstack; arguments; rest; return; }
 
   let replace_value visitor substitution = function
     | Assign value -> Assign (Value.replace_base substitution value)

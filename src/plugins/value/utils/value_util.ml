@@ -24,11 +24,7 @@ open Cil_types
 
 (* Callstacks related types and functions *)
 
-(* Function called, and calling instruction. *)
-type call_site = (kernel_function * kinstr)
-type callstack =  call_site list
-
-let call_stack : callstack ref = ref []
+let call_stack : Value_types.callstack ref = ref []
 (* let call_stack_for_callbacks : (kernel_function * kinstr) list ref = ref [] *)
 
 let clear_call_stack () =
