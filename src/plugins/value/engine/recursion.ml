@@ -126,18 +126,9 @@ module VarStack =
       let size = 9
     end)
 
-let copy_variable depth varinfo =
-  let name = Format.asprintf "\\copy<%s>[%i]" varinfo.vname depth
-  and typ = varinfo.vtype
-  and source = true
-  and temp = varinfo.vtemp
-  and referenced = varinfo.vreferenced
-  and ghost = varinfo.vghost
-  and loc = varinfo.vdecl in
-  Cil.makeVarinfo ~source ~temp ~referenced ~ghost ~loc false false name typ
-
-let copy_fresh_variable fundec depth varinfo =
-  let v = copy_variable depth varinfo in
+let copy_variable fundec depth varinfo =
+  let name = Format.asprintf "\\copy<%s>[%i]" varinfo.vname depth in
+  let v = Cil.copyVarinfo varinfo name in
   Cil.refresh_local_name fundec v;
   v
 
@@ -147,7 +138,7 @@ let make_stack (kf, depth) =
     with Kernel_function.No_Definition -> assert false
   in
   let vars = Kernel_function.(get_formals kf @ get_locals kf) in
-  let copy v = v, copy_fresh_variable fundec depth v in
+  let copy v = v, copy_variable fundec depth v in
   List.map copy vars
 
 let get_stack kf depth = VarStack.memo make_stack (kf, depth)
