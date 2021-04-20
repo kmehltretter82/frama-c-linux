@@ -422,6 +422,10 @@ sig
   (** Return the value of the object of the given type at the given location in
       the given memory state. *)
 
+  val load_init : sigma -> c_object -> loc -> term
+  (** Return the initialization status at the given location in the given
+      memory state. *)
+
   val copied : sigma sequence -> c_object -> loc -> loc -> equation list
   (**
      Return a set of equations that express a copy between two memory state.
@@ -431,14 +435,34 @@ sig
      [sigma.post] at [loc2].
   *)
 
+  val copied_init : sigma sequence -> c_object -> loc -> loc -> equation list
+  (**
+     Return a set of equations that express a copy of an initialized state
+     between two memory state.
+
+     [copied sigma ty loc1 loc2] returns a set of formula expressing that the
+     initialization status for an object [ty] is the same in [sigma.pre] at
+     [loc1] and in [sigma.post] at [loc2].
+  *)
+
   val stored : sigma sequence -> c_object -> loc -> term -> equation list
   (**
      Return a set of formula that express a modification between two memory
      state.
 
-     [copied sigma ty loc t] returns a set of formula expressing that
+     [stored sigma ty loc t] returns a set of formula expressing that
      [sigma.pre] and [sigma.post] are identical except for an object [ty] at
      location [loc] which is represented by [t] in [sigma.post].
+  *)
+
+  val stored_init : sigma sequence -> c_object -> loc -> term -> equation list
+  (**
+     Return a set of formula that express a modification of the initialization
+     status between two memory state.
+
+     [stored_init sigma ty loc t] returns a set of formula expressing that
+     [sigma.pre] and [sigma.post] are identical except for an object [ty] at
+     location [loc] which has a new init represented by [t] in [sigma.post].
   *)
 
   val assigned : sigma sequence -> c_object -> loc sloc -> equation list

@@ -451,7 +451,17 @@ struct
                  p_equal (val_of_exp sigma e) (cval v)
              | None -> is_zero sigma obj l
            in
-           value_hyp, (M.initialized sigma (Rloc(obj, l)))
+           let init_hyp = match init with
+             | Some { enode = Lval lv }
+               when Cil.(isStructOrUnionType @@ typeOfLval lv) ->
+                 let l_initializer = lval sigma lv in
+                 p_equal
+                   (M.load_init sigma obj l)
+                   (M.load_init sigma obj l_initializer)
+             | _ ->
+                 M.initialized sigma (Rloc(obj, l))
+           in
+           value_hyp, init_hyp
         ) () in
     match outcome with
     | Warning.Failed warn -> warn , (F.p_true, F.p_true)

@@ -700,12 +700,18 @@ struct
     if Cil.isVolatileLval lv &&
        Cvalues.volatile ~warn:"unsafe write-access to volatile l-value" ()
     then None
-    else Some
-        begin
-          match expr.enode with
-          | Lval lv -> M.copied seq obj loc (C.lval seq.pre lv)
-          | _ -> M.stored seq obj loc (C.val_of_exp seq.pre expr)
-        end
+    else
+      let value = match expr.enode with
+        | Lval lv -> M.copied seq obj loc (C.lval seq.pre lv)
+        | _ -> M.stored seq obj loc (C.val_of_exp seq.pre expr)
+      in
+      let init = match expr.enode with
+        | Lval lv when Cil.(isStructOrUnionType @@ typeOfLval lv) ->
+            M.copied_init seq obj loc (C.lval seq.pre lv)
+        | _ ->
+            M.stored_init seq obj loc (Cvalues.initialized_obj obj)
+      in
+      Some (value @ init)
 
   let assign wenv stmt lv expr wp = in_wenv wenv wp
       begin fun env wp ->
