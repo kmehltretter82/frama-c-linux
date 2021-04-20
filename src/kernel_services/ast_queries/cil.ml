@@ -4545,7 +4545,10 @@ and constFold (machdep: bool) (e: exp) : exp =
   | SizeOfStr s when machdep ->
     kinteger ~loc theMachine.kindOfSizeOf (1 + String.length s)
   | AlignOf t when machdep ->
-    kinteger ~loc theMachine.kindOfSizeOf (bytesAlignOf t)
+    begin
+      try kinteger ~loc theMachine.kindOfSizeOf (bytesAlignOf t)
+      with SizeOfError _ -> e
+    end
   | AlignOfE e when machdep -> begin
       (* The alignment of an expression is not always the alignment of its
        * type. I know that for strings this is not true *)
@@ -5223,7 +5226,11 @@ let rec constFoldTermNodeAtTop = function
     (try integer_lconstant (bytesSizeOf typ)
      with SizeOfError _ -> t)
   | TSizeOfStr str -> integer_lconstant (String.length str + 1)
-  | TAlignOf typ -> integer_lconstant (bytesAlignOf typ)
+  | TAlignOf typ as t ->
+    begin
+      try integer_lconstant (bytesAlignOf typ)
+      with SizeOfError _ -> t
+    end
   | TSizeOfE { term_type= Ctype typ } -> constFoldTermNodeAtTop (TSizeOf typ)
   | TAlignOfE { term_type= Ctype typ }
     -> 	constFoldTermNodeAtTop (TAlignOf typ)
