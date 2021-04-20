@@ -227,6 +227,8 @@ void test_array () {
   Frama_C_show_each_3(i);
   i = binary_search(array, 12, 0, 15);
   Frama_C_show_each_12(i);
+  i = binary_search(array, 20, 0, 15);
+  Frama_C_show_each_minus1(i);
 
   fill_array(array, 10, 15);
   j = Frama_C_interval(7, 11);

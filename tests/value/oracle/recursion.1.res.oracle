@@ -13,49 +13,49 @@
 [eva] using specification for function five
 [eva:alarm] tests/value/recursion.c:13: Warning: 
   function five: postcondition got status unknown.
-[eva] tests/value/recursion.c:339: Frama_C_show_each_5: {5}
+[eva] tests/value/recursion.c:341: Frama_C_show_each_5: {5}
 [eva] tests/value/recursion.c:26: detected recursive call of function sum.
-[eva] tests/value/recursion.c:341: Frama_C_show_each_91: {91}
+[eva] tests/value/recursion.c:343: Frama_C_show_each_91: {91}
 [eva] tests/value/recursion.c:35: detected recursive call of function factorial.
-[eva] tests/value/recursion.c:343: Frama_C_show_each_120: {120}
+[eva] tests/value/recursion.c:345: Frama_C_show_each_120: {120}
 [eva] tests/value/recursion.c:44: detected recursive call of function syracuse.
-[eva] tests/value/recursion.c:345: Frama_C_show_each_1: {1}
+[eva] tests/value/recursion.c:347: Frama_C_show_each_1: {1}
 [eva] tests/value/recursion.c:57: detected recursive call of function fibonacci.
 [eva] tests/value/recursion.c:58: detected recursive call of function fibonacci.
-[eva] tests/value/recursion.c:347: Frama_C_show_each_89: {89}
+[eva] tests/value/recursion.c:349: Frama_C_show_each_89: {89}
 [eva] tests/value/recursion.c:74: detected recursive call of function sum_ptr.
-[eva] tests/value/recursion.c:352: Frama_C_show_each_91: {91}
+[eva] tests/value/recursion.c:354: Frama_C_show_each_91: {91}
 [eva] tests/value/recursion.c:87: 
   detected recursive call of function factorial_ptr.
-[eva] tests/value/recursion.c:355: Frama_C_show_each_120: {120}
+[eva] tests/value/recursion.c:357: Frama_C_show_each_120: {120}
 [eva] tests/value/recursion.c:99: 
   detected recursive call of function syracuse_ptr.
-[eva] tests/value/recursion.c:358: Frama_C_show_each_1: {1}
+[eva] tests/value/recursion.c:360: Frama_C_show_each_1: {1}
 [eva] tests/value/recursion.c:115: 
   detected recursive call of function fibonacci_ptr.
 [eva] tests/value/recursion.c:117: 
   detected recursive call of function fibonacci_ptr.
-[eva] tests/value/recursion.c:361: Frama_C_show_each_89: {89}
+[eva] tests/value/recursion.c:363: Frama_C_show_each_89: {89}
 [eva] tests/value/recursion.c:135: 
   detected recursive call of function sum_and_fact.
-[eva] tests/value/recursion.c:365: Frama_C_show_each_36_40320: {36}, {40320}
+[eva] tests/value/recursion.c:367: Frama_C_show_each_36_40320: {36}, {40320}
 [eva] tests/value/recursion.c:159: detected recursive call of function odd.
 [eva] tests/value/recursion.c:150: detected recursive call of function even.
-[eva] tests/value/recursion.c:370: Frama_C_show_each_1: {1}, {1}
-[eva] tests/value/recursion.c:373: Frama_C_show_each_0: {0}, {0}
+[eva] tests/value/recursion.c:372: Frama_C_show_each_1: {1}, {1}
+[eva] tests/value/recursion.c:375: Frama_C_show_each_0: {0}, {0}
 [eva] tests/value/recursion.c:181: detected recursive call of function odd_ptr.
 [eva] tests/value/recursion.c:169: detected recursive call of function even_ptr.
-[eva] tests/value/recursion.c:376: Frama_C_show_each_1: {1}, {1}
-[eva] tests/value/recursion.c:379: Frama_C_show_each_0: {0}, {0}
+[eva] tests/value/recursion.c:378: Frama_C_show_each_1: {1}, {1}
+[eva] tests/value/recursion.c:381: Frama_C_show_each_0: {0}, {0}
 [eva] using specification for function Frama_C_interval
 [eva:alarm] tests/value/recursion.c:22: Warning: 
   function sum: postcondition got status unknown.
-[eva] tests/value/recursion.c:385: Frama_C_show_each_6_66: [6..66]
+[eva] tests/value/recursion.c:387: Frama_C_show_each_6_66: [6..66]
 [eva:alarm] tests/value/recursion.c:67: Warning: 
   function sum_ptr: postcondition got status unknown.
-[eva] tests/value/recursion.c:388: Frama_C_show_each_6_66: [6..66]
-[eva] tests/value/recursion.c:391: Frama_C_show_each_2_89: [2..89]
-[eva] tests/value/recursion.c:394: Frama_C_show_each_2_89: [2..89]
+[eva] tests/value/recursion.c:390: Frama_C_show_each_6_66: [6..66]
+[eva] tests/value/recursion.c:393: Frama_C_show_each_2_89: [2..89]
+[eva] tests/value/recursion.c:396: Frama_C_show_each_2_89: [2..89]
 [eva:alarm] tests/value/recursion.c:220: Warning: 
   function fill_array: precondition got status invalid.
 [eva:alarm] tests/value/recursion.c:224: Warning: 
@@ -78,48 +78,49 @@
 [eva] tests/value/recursion.c:214: 
   detected recursive call of function binary_search.
 [eva] tests/value/recursion.c:229: Frama_C_show_each_12: {12}
-[eva] tests/value/recursion.c:234: Frama_C_show_each_7_11: {7; 8; 9; 10; 11}
-[eva] tests/value/recursion.c:237: Frama_C_show_each_minus_1_15: [-1..15]
-[eva] tests/value/recursion.c:248: detected recursive call of function alarm.
-[eva:alarm] tests/value/recursion.c:248: Warning: 
+[eva] tests/value/recursion.c:231: Frama_C_show_each_minus1: {-1}
+[eva] tests/value/recursion.c:236: Frama_C_show_each_7_11: {7; 8; 9; 10; 11}
+[eva] tests/value/recursion.c:239: Frama_C_show_each_minus_1_15: [-1..15]
+[eva] tests/value/recursion.c:250: detected recursive call of function alarm.
+[eva:alarm] tests/value/recursion.c:250: Warning: 
   signed overflow. assert i * tmp ≤ 2147483647;
                    (tmp from alarm(i - 1))
-[eva] tests/value/recursion.c:257: detected recursive call of function precond.
-[eva:alarm] tests/value/recursion.c:257: Warning: 
+[eva] tests/value/recursion.c:259: detected recursive call of function precond.
+[eva:alarm] tests/value/recursion.c:259: Warning: 
   function precond: precondition got status invalid.
-[eva] tests/value/recursion.c:272: 
+[eva] tests/value/recursion.c:274: 
   detected recursive call of function escaping_local.
-[eva] tests/value/recursion.c:275: Frama_C_show_each_1: {1}
-[eva:locals-escaping] tests/value/recursion.c:273: Warning: 
+[eva] tests/value/recursion.c:277: Frama_C_show_each_1: {1}
+[eva:locals-escaping] tests/value/recursion.c:275: Warning: 
   locals {x} escaping the scope of a block of escaping_local through p
-[eva:alarm] tests/value/recursion.c:274: Warning: 
+[eva:alarm] tests/value/recursion.c:276: Warning: 
   accessing left-value that contains escaping addresses.
   assert ¬\dangling(&p);
-[kernel] tests/value/recursion.c:274: Warning: 
+[kernel] tests/value/recursion.c:276: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
-[eva] tests/value/recursion.c:287: 
+[eva] tests/value/recursion.c:289: 
   detected recursive call of function escaping_formal.
-[eva] tests/value/recursion.c:290: Frama_C_show_each_1: {1}
-[eva:locals-escaping] tests/value/recursion.c:287: Warning: 
+[eva] tests/value/recursion.c:292: Frama_C_show_each_1: {1}
+[eva:locals-escaping] tests/value/recursion.c:289: Warning: 
   locals {x} escaping the scope of escaping_formal through p
-[eva:alarm] tests/value/recursion.c:289: Warning: 
+[eva:alarm] tests/value/recursion.c:291: Warning: 
   accessing left-value that contains escaping addresses.
   assert ¬\dangling(&p);
-[kernel] tests/value/recursion.c:289: Warning: 
+[kernel] tests/value/recursion.c:291: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
-[eva] tests/value/recursion.c:303: 
+[eva] tests/value/recursion.c:305: 
   detected recursive call of function escaping_stack.
-[eva] tests/value/recursion.c:306: Frama_C_show_each_1_2: {1}
-[eva] tests/value/recursion.c:306: Frama_C_show_each_1_2: {2}
-[eva:locals-escaping] tests/value/recursion.c:304: Warning: 
+[eva] tests/value/recursion.c:308: Frama_C_show_each_1_2: {1}
+[eva] tests/value/recursion.c:308: Frama_C_show_each_1_2: {2}
+[eva:locals-escaping] tests/value/recursion.c:306: Warning: 
   locals {x} escaping the scope of a block of escaping_stack through p
-[eva:alarm] tests/value/recursion.c:305: Warning: 
+[eva:alarm] tests/value/recursion.c:307: Warning: 
   accessing left-value that contains escaping addresses.
   assert ¬\dangling(&p);
-[kernel] tests/value/recursion.c:305: Warning: 
+[kernel] tests/value/recursion.c:307: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
-[eva] tests/value/recursion.c:319: detected recursive call of function decr.
-[eva] tests/value/recursion.c:319: Warning: 
+[eva] tests/value/recursion.c:321: detected recursive call of function decr.
+[eva] tests/value/recursion.c:321: Warning: 
   Using specification of function decr for recursive calls of depth 20.
   Analysis of function decr is thus incomplete and its soundness
   relies on the written specification.
