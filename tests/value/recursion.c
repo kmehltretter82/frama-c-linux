@@ -1,6 +1,8 @@
 /* run.config*
   STDOPT: +"-eva-no-show-progress -eva-unroll-recursive-calls 0"
   STDOPT: +"-eva-no-show-progress -eva-unroll-recursive-calls 20"
+  EXIT: 1
+  STDOPT: +"-eva-no-show-progress -eva-unroll-recursive-calls 5 -main main_fail"
 */
 
 #include <__fc_builtin.h>
@@ -332,7 +334,6 @@ void bug_memexec () {
 
 /* ----- Main. -------------------------------------------------------------- */
 
-
 void main () {
   int a, b;
   unsigned int x, y;
@@ -411,4 +412,28 @@ void main () {
   escaping_stack(5, &a);
 
   bug_memexec();
+}
+
+/* ----- Recursive function without specification. -------------------------- */
+
+unsigned int sum_nospec (unsigned int i) {
+  if (i < 2)
+    return i;
+  unsigned int res = i + sum_nospec(i - 1);
+  return res;
+}
+
+void main_fail () {
+  int x, y;
+  y = sum_nospec(4);
+  Frama_C_show_each_10(y);
+  /* This call don't fail, as only 4 unrolling of [sum_nospec] are needed before
+     using the results from the first call stored in the memexec cache. However,
+     this call would fail without the first call to [sum_no_spec]. */
+  y = sum_nospec(8);
+  Frama_C_show_each_36(y);
+  x = Frama_C_interval(4, 16);
+  /* This call cannot be interpreted without a specification for [sum_nospec]. */
+  y = sum_nospec(x);
+  Frama_C_show_each_unreachable(y);
 }
