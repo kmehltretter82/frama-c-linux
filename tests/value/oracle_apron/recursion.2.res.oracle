@@ -1,0 +1,10 @@
+10,12d9
+< [eva] tests/value/recursion.c:429: Frama_C_show_each_10: {10}
+< [eva] tests/value/recursion.c:434: Frama_C_show_each_36: {36}
+< [eva] using specification for function Frama_C_interval
+14,16c11
+<   Recursive call to sum_nospec without a specification. Try to increase
+<   the -eva-unroll-recursive-calls parameter or write a specification
+<   for function sum_nospec.
+---
+>   The binding to APRON domains does not support recursive calls.
