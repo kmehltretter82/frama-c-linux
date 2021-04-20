@@ -1,31 +1,40 @@
 # paramaterised derivation with dependencies injected (callPackage style)
-{ pkgs, stdenv, src ? ../., opam2nix, ocaml_version ? "ocaml-ng.ocamlPackages_4_08.ocaml", plugins ? { } }:
+{ pkgs, stdenv, src ? ../., opam2nix, ocaml ? "ocaml-ng.ocamlPackages_4_08.ocaml", plugins ? { } }:
 
-let mk_buildInputs = { opamPackages ? [], nixPackages ? [] } :
-    [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl pkgs.file pkgs.which pkgs.dos2unix] ++ nixPackages ++ opam2nix.build {
-           specs = opam2nix.toSpecs ([ "ocamlfind" "zarith" "ocamlgraph" "yojson" "zmq"
-                "ppx_deriving" "ppx_deriving_yojson"
-                { name = "coq"; constraint = "=8.12.0";  }
-                { name = "alt-ergo" ; constraint = "=2.2.0"; }
-                { name = "why3" ; constraint = "=1.4.0"; }
-                { name = "why3-coq" ; constraint = "=1.4.0"; }
-                ] ++ opamPackages
-              );
-           ocamlAttr = ocaml_version;
-        };
+let opam-selection = {
+      inherit ocaml;
+      selection = ./opam-selection.nix;
+    };
+    mk_opam_derivations = packages: opam2nix.resolve opam-selection packages;
+    opam_packages =
+      [ "ocamlfind" "zarith" "ocamlgraph" "yojson" "zmq"
+        "ppx_deriving" "ppx_deriving_yojson"
+        "coq=8.12.0" "alt-ergo=2.2.0" "why3=1.4.0" "why3-coq=1.4.0" ];
 
+    mk_buildInputs = { nixPackages ? [] } :
+    [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl pkgs.file pkgs.which pkgs.dos2unix] ++ nixPackages ++ opam2nix.buildInputs opam-selection;
     # Extends the call to stdenv.mkDerivation with parameters common for all
     # frama-c derivations
     mk_deriv = args:
+      let my_opam_packages =
+            if args?opam_packages then
+              opam_packages ++ args.opam_packages
+            else opam_packages
+          ;
+      in
         stdenv.mkDerivation ({
             # Disable Nix's GCC hardening
             hardeningDisable = [ "all" ];
-        } // args);
+        } // args)
+        //
+        { gen-opam-selection = mk_opam_derivations my_opam_packages; }
+    ;
 in
 
 pkgs.lib.makeExtensible
 (self: {
-  inherit src mk_buildInputs;
+  inherit src mk_buildInputs opam_packages;
+  gen-opam-selection = mk_opam_derivations self.opam_packages;
   buildInputs = mk_buildInputs {};
   installed = self.main.out;
   main = mk_deriv {
@@ -74,13 +83,9 @@ pkgs.lib.makeExtensible
   lint = mk_deriv {
         name = "frama-c-lint";
         src = self.src;
+        opam_packages = [ "ocp-indent=1.7.0" "headache=1.05"];
         buildInputs =
-          (self.mk_buildInputs {
-            nixPackages = [ pkgs.bc ];
-            opamPackages = [
-              { name = "ocp-indent"; constraint = "=1.7.0"; }
-              { name = "headache"; constraint = "=1.05"; }
-            ];} );
+          self.mk_buildInputs { nixPackages = [ pkgs.bc ]; };
         outputs = [ "out" ];
         postPatch = ''
                patchShebangs .
@@ -125,11 +130,8 @@ pkgs.lib.makeExtensible
   build-distrib-tarball = mk_deriv {
         name = "frama-c-build-distrib-tarball";
         src = self.src;
-        buildInputs =
-          (self.mk_buildInputs {
-            opamPackages = [
-              { name = "headache"; constraint = "=1.05"; }
-            ];} );
+        buildInputs = self.buildInputs;
+        opam_packages = [ "headache=1.05" ];
         outputs = [ "out" ];
         postPatch = ''
                patchShebangs .
@@ -152,6 +154,7 @@ pkgs.lib.makeExtensible
   build-from-distrib-tarball = mk_deriv {
         name = "frama-c-build-from-distrib-tarball";
         buildInputs = self.buildInputs;
+        opam_packages = self.build-distrib-tarball.opam_packages;
         src = self.build-distrib-tarball.out ;
         outputs = [ "out" ];
         configurePhase = ''
@@ -248,12 +251,13 @@ pkgs.lib.makeExtensible
   internal = mk_deriv {
         name = "frama-c-internal";
         src = self.src;
-        buildInputs = (self.mk_buildInputs { opamPackages = [ "xml-light" ]; } ) ++
-                    [ pkgs.getopt
-                      pkgs.libxslt pkgs.libxml2 pkgs.autoPatchelfHook
-                      pkgs.swiProlog
-                      stdenv.cc.cc.lib
-        ];
+        opam_packages = [ "xml-light" ];
+        buildInputs =
+          self.mk_buildInputs
+            { nixPackages =
+                [ pkgs.getopt pkgs.libxslt pkgs.libxml2 pkgs.autoPatchelfHook
+                  pkgs.swiProlog stdenv.cc.cc.lib ];
+            };
         counter_examples_src = plugins.counter-examples.src;
         genassigns_src = plugins.genassigns.src;
         frama_clang_src = plugins.frama-clang.src;
