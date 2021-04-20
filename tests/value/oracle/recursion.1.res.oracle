@@ -77,7 +77,7 @@
 [eva] tests/value/recursion.c:227: Frama_C_show_each_3: {3}
 [eva] tests/value/recursion.c:214: 
   detected recursive call of function binary_search.
-[eva] tests/value/recursion.c:229: Frama_C_show_each_7: {12}
+[eva] tests/value/recursion.c:229: Frama_C_show_each_12: {12}
 [eva] tests/value/recursion.c:234: Frama_C_show_each_7_11: {7; 8; 9; 10; 11}
 [eva] tests/value/recursion.c:237: Frama_C_show_each_minus_1_15: [-1..15]
 [eva] tests/value/recursion.c:248: detected recursive call of function alarm.
@@ -99,7 +99,7 @@
   all target addresses were invalid. This path is assumed to be dead.
 [eva] tests/value/recursion.c:287: 
   detected recursive call of function escaping_formal.
-[eva] tests/value/recursion.c:290: Frama_C_show_each_16: {1}
+[eva] tests/value/recursion.c:290: Frama_C_show_each_1: {1}
 [eva:locals-escaping] tests/value/recursion.c:287: Warning: 
   locals {x} escaping the scope of escaping_formal through p
 [eva:alarm] tests/value/recursion.c:289: Warning: 

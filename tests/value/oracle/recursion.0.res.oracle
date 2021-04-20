@@ -174,7 +174,7 @@
 [eva] tests/value/recursion.c:227: 
   Frama_C_show_each_3: [-2147483648..2147483647]
 [eva] tests/value/recursion.c:229: 
-  Frama_C_show_each_7: [-2147483648..2147483647]
+  Frama_C_show_each_12: [-2147483648..2147483647]
 [eva] tests/value/recursion.c:234: 
   Frama_C_show_each_7_11: [-2147483648..2147483647]
 [eva] tests/value/recursion.c:237: 
@@ -223,7 +223,7 @@
 [eva] using specification for function escaping_formal
 [eva:alarm] tests/value/recursion.c:289: Warning: 
   out of bounds write. assert \valid(p);
-[eva] tests/value/recursion.c:290: Frama_C_show_each_16: {5}
+[eva] tests/value/recursion.c:290: Frama_C_show_each_1: {5}
 [eva:locals-escaping] tests/value/recursion.c:408: Warning: 
   locals {x} escaping the scope of escaping_formal through p
 [eva] tests/value/recursion.c:303: 
