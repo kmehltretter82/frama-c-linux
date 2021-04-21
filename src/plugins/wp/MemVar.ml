@@ -738,9 +738,6 @@ struct
   (* ---  Memory Load                                                       --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let always_init vi =
-    (vi.vglob || vi.vformal) && not @@ Cil.isStructOrUnionType vi.vtype
-
   let rec access_gen kind a = function
     | [] -> a
     | Field f :: ofs -> access_gen kind (e_getfield a (Cfield (f, kind))) ofs
@@ -786,7 +783,7 @@ struct
   let load_init sigma obj = function
     | Ref _ ->
         e_true
-    | Val((CREF|CVAL),x,_) when always_init x ->
+    | Val((CREF|CVAL),x,_) when Cvalues.always_initialized x ->
         Cvalues.initialized_obj obj
     | Val((CREF|CVAL),x,ofs) ->
         access_init (get_init_term sigma x) ofs
@@ -1148,7 +1145,7 @@ struct
           | Val(m,x,p) ->
               if is_heap_allocated m then
                 M.initialized sigma.mem (Rloc(obj,mloc_of_loc l))
-              else if always_init x then
+              else if Cvalues.always_initialized x then
                 try valid_offset RW (vobject m x) p
                 with ShiftMismatch -> shift_mismatch l
               else
@@ -1174,7 +1171,7 @@ struct
                   let p, a, b = normalize elt p in
                   let in_array = valid_range RW (vobject m x) p (elt, a, b) in
                   let initialized =
-                    if always_init x then p_true
+                    if Cvalues.always_initialized x then p_true
                     else initialized_range sigma (vobject m x) x p a b
                   in
                   F.p_imply (F.p_leq a b) (p_and in_array initialized)
@@ -1263,7 +1260,8 @@ struct
     | Leave -> []
     | Enter ->
         let init_status v =
-          if v.vdefined || always_init v || not @@ is_mvar_alloc v then None
+          if v.vdefined || Cvalues.always_initialized v || not@@ is_mvar_alloc v
+          then None
           else
             let i = Cvalues.uninitialized_obj (Ctypes.object_of v.vtype) in
             Some (Lang.F.p_equal (access_init (get_init_term seq.post v) []) i)
@@ -1377,7 +1375,7 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let rec monotonic_initialized seq obj x ofs =
-    if always_init x then p_true
+    if Cvalues.always_initialized x then p_true
     else
       match obj with
       (* Structure initialization is not monotonic *)
@@ -1611,7 +1609,9 @@ struct
   let domain obj l =
     match l with
     | Ref x | Val((CVAL|CREF),x,_) ->
-        let init = if not @@ always_init x then [ Init x ] else [] in
+        let init =
+          if not @@ Cvalues.always_initialized x then [ Init x ] else []
+        in
         Heap.Set.of_list ((Var x) :: init)
     | Loc _ | Val((CTXT _|CARR _|HEAP),_,_) ->
         M.Heap.Set.fold

@@ -579,8 +579,7 @@ module BASE = WpContext.Generator(Varinfo)
 
       let initialization prefix x base =
         match sizeof x with
-        | Some size
-          when (x.vformal || x.vglob) && not(Cil.isStructOrUnionType x.vtype) ->
+        | Some size when Cvalues.always_initialized x ->
             let a = Lang.freshvar ~basename:"init" t_init in
             let m = e_var a in
             let init_access =

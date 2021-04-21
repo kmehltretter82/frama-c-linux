@@ -133,6 +133,9 @@ and init_comp_value value ci =
 let initialized_obj = init_value e_true
 let uninitialized_obj = init_value e_false
 
+let always_initialized x =
+  (x.vformal || x.vglob) && not @@ Cil.isStructOrUnionType x.vtype
+
 (* -------------------------------------------------------------------------- *)
 (* --- Length of empty compinfos                                          --- *)
 (* -------------------------------------------------------------------------- *)

@@ -99,6 +99,7 @@ val logic_constant : logic_constant -> term
 val constant_exp : exp -> term
 val constant_term : Cil_types.term -> term
 
+val always_initialized: varinfo -> bool
 val initialized_obj: c_object -> term
 val uninitialized_obj: c_object -> term
 
