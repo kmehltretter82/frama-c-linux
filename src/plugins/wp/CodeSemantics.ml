@@ -452,9 +452,9 @@ struct
              | None -> is_zero sigma obj l
            in
            let init_hyp = match init with
-             | Some { enode = Lval lv }
-               when Cil.(isStructOrUnionType @@ typeOfLval lv) ->
-                 let l_initializer = lval sigma lv in
+             | Some { enode = Lval lv_init }
+               when Cil.(isStructOrUnionType @@ typeOfLval lv_init) ->
+                 let l_initializer = lval sigma lv_init in
                  p_equal
                    (M.load_init sigma obj l)
                    (M.load_init sigma obj l_initializer)
