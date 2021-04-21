@@ -1,6 +1,6 @@
 /* run.config_ci
    COMMENT: recursive function
-   STDOPT: +"-eva-ignore-recursive-calls"
+   STDOPT: +"-eva-unroll-recursive-calls 5"
 */
 
 /*@ requires n > 0; */

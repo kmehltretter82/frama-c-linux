@@ -452,6 +452,7 @@ module Base = struct
         let varname = Datatype.undefined
       end)
   let id = id
+  let pretty_debug = pretty
 end
 
 include Base
@@ -549,6 +550,17 @@ let of_string_exp e =
 
 module SetLattice = Make_Hashconsed_Lattice_Set(Base)(Hptset)
 
+module BMap =
+  Hptmap.Make (Base) (Base) (Hptmap.Comp_unused)
+    (struct let v = [ [] ] end)
+    (struct let l = [ Ast.self ] end)
+
+type substitution = base Hptmap.Shape(Base).t
+
+let substitution_from_list list =
+  let add map (key, elt) = BMap.add key elt map in
+  let bmap = List.fold_left add BMap.empty list in
+  BMap.shape bmap
 
 (*
 Local Variables:

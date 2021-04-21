@@ -82,11 +82,13 @@ let dkey_incompatible_states = register_category "incompatible-states"
 let dkey_iterator = register_category "iterator"
 let dkey_callbacks = register_category "callbacks"
 let dkey_widening = register_category "widening"
+let dkey_recursion = register_category "recursion"
 
 let () =
   let activate dkey = add_debug_keys dkey in
   List.iter activate
-    [dkey_initial_state; dkey_final_states; dkey_summary; dkey_cvalue_domain]
+    [dkey_initial_state; dkey_final_states; dkey_summary; dkey_cvalue_domain;
+     dkey_recursion; ]
 
 (* Warning categories. *)
 let wkey_alarm = register_warn_category "alarm"
@@ -509,15 +511,20 @@ module WarnPointerSubstraction =
 let () = add_correctness_dep WarnPointerSubstraction.parameter
 
 let () = Parameter_customize.set_group alarms
+let () = Parameter_customize.is_invisible ()
 module IgnoreRecursiveCalls =
   False
     (struct
       let option_name = "-eva-ignore-recursive-calls"
-      let help =
-        "Pretend function calls that would be recursive do not happen. \
-         Causes unsoundness"
+      let help = "Deprecated."
     end)
-let () = add_correctness_dep IgnoreRecursiveCalls.parameter
+let () =
+  IgnoreRecursiveCalls.add_set_hook
+    (fun _old _new ->
+       warning
+         "@[Option -eva-ignore-recursive-calls has no effect.@ Recursive calls \
+          can be unrolled@ through option -eva-unroll-recursive-calls,@ or their \
+          specification is used@ to interpret them.@]")
 
 let () = Parameter_customize.set_group alarms
 
@@ -670,6 +677,19 @@ module WideningPeriod =
     end)
 let () = WideningPeriod.set_range ~min:1 ~max:max_int
 let () = add_precision_dep WideningPeriod.parameter
+
+let () = Parameter_customize.set_group precision_tuning
+module RecursiveUnroll =
+  Int
+    (struct
+      let default = 0
+      let option_name = "-eva-unroll-recursive-calls"
+      let arg_name = "n"
+      let help = "Unroll <n> recursive calls before using the specification of \
+                  the recursive function to interpret the calls."
+    end)
+let () = RecursiveUnroll.set_range ~min:0 ~max:max_int
+let () = add_precision_dep RecursiveUnroll.parameter
 
 (* --- Partitioning --- *)
 

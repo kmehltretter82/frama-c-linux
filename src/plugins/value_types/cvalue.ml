@@ -909,6 +909,10 @@ module V_Or_Uninitialized = struct
     in
     removed, t'
 
+  let replace_base substitution t =
+    let modified, v = V.replace_base substitution (get_v t) in
+    modified, if modified then create (get_flags t) v else t
+
   let reduce_by_initializedness pos v =
     if pos then
       meet v (C_init_esc V.top)

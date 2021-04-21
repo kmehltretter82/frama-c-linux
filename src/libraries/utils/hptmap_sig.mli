@@ -188,6 +188,11 @@ module type S = sig
       efficient than successive calls to {!remove} or {!add} to build the
       resulting map. *)
 
+  val partition_with_shape: 'a shape -> t -> t * t
+  (** [partition_with_shape s m] returns two maps [inter, diff] such that:
+      - [inter] contains the elements of [m] bound in the shape [s];
+      - [diff] contains the elements of [m] not bound in the shape [s]. *)
+
   (** {2 Binary predicates} *)
 
   type decide_fast = Done | Unknown
@@ -343,6 +348,15 @@ module type S = sig
       called in an unspecified order. The results of the function may be cached,
       depending on [cache]. *)
 
+  val replace_key: decide:(key -> v -> v -> v) -> key shape -> t -> bool * t
+  (** [replace_key ~decide shape map] substitute keys in [map] according to
+      [shape]: it returns the [map] in which all bindings from [key] to [v] such
+      that [key] is bound to [key'] in [shape] are replaced by a binding from
+      [key'] to [v]. If the new key [key'] was already bound in the map, or if
+      two keys are replaced by a same key [key'], the [decide] function is used
+      to compute the final value bound to [key'].
+      The returned boolean indicates whether the map has been modified: it is
+      false if the intersection between [shape] and [map] is empty. *)
 
   (**/**) (* Undocumented. *)
   val pretty_debug: Format.formatter -> t -> unit

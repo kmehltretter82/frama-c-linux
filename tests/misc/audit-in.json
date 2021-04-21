@@ -35,7 +35,6 @@
       "-eva-context-depth": "2",
       "-eva-context-valid-pointers": "false",
       "-eva-context-width": "2",
-      "-eva-ignore-recursive-calls": "false",
       "-eva-initialization-padding-globals": "yes",
       "-eva-initialized-locals": "false",
       "-eva-new-initial-state": "0",

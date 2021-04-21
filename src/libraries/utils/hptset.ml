@@ -76,6 +76,8 @@ module type S = sig
     val shape: t -> unit shape
     val from_shape: 'a shape -> t
 
+    val partition_with_shape: 'a shape -> t -> t * t
+
     val fold2_join_heterogeneous:
       cache:Hptmap_sig.cache_type ->
       empty_left:('a shape -> 'b) ->
@@ -85,6 +87,8 @@ module type S = sig
       empty:'b ->
       t -> 'a shape ->
       'b
+
+    val replace: elt shape -> t -> bool * t
 
     val clear_caches: unit -> unit
 
@@ -220,6 +224,10 @@ module Make(X: Hptmap.Id_Datatype)
   let fold2_join_heterogeneous ~cache ~empty_left ~empty_right ~both ~join ~empty =
     let both k () v = both k v in
     fold2_join_heterogeneous ~cache ~empty_left ~empty_right ~both ~join ~empty
+
+  let replace =
+    let decide _k () () = () in
+    replace_key ~decide
 
 end
 

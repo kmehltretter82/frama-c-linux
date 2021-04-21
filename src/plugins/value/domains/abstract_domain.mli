@@ -251,16 +251,27 @@ module type Transfer = sig
     stmt -> exp -> bool ->
     (value, location, origin) valuation -> state -> state or_bottom
 
-  (** [start_call stmt call valuation state] returns an initial state
+  (** [start_call stmt call recursion valuation state] returns an initial state
       for the analysis of a called function. In particular, this function
       should introduce the formal parameters in the state, if necessary.
       - [stmt] is the statement of the call site;
       - [call] represents the call: the called function and the arguments;
+      - [recursion] is the information needed to interpret a recursive call.
+        It is None if the call is not recursive.
       - [state] is the abstract state at the call site, before the call;
       - [valuation] is a cache for all values and locations computed during
-        the evaluation of the function and its arguments. *)
+        the evaluation of the function and its arguments.
+
+      On recursive calls, [recursion] contains some substitution of variables
+      to be applied on the domain state to prevent mixing up local variables
+      and formal parameters of different recursive calls.
+      See {!Eval.recursion} for more details.
+      This substitution has been applied on values and expressions in [call],
+      but not in the [valuation] given as argument. If the domain uses some
+      information from the [valuation] on a recursive call, it must apply the
+      substitution on it. *)
   val start_call:
-    stmt -> (location, value) call ->
+    stmt -> (location, value) call -> recursion option ->
     (value, location, origin) valuation -> state -> state or_bottom
 
   (** [finalize_call stmt call ~pre ~post] computes the state after a function
@@ -268,10 +279,13 @@ module type Transfer = sig
       end of the called function.
       - [stmt] is the statement of the call site;
       - [call] represents the function call and its arguments.
+      - [recursion] is the information needed to interpret a recursive call.
+        It is None if the call is not recursive.
       - [pre] and [post] are the states before and at the end of the call
         respectively. *)
   val finalize_call:
-    stmt -> (location, value) call -> pre:state -> post:state -> state or_bottom
+    stmt -> (location, value) call -> recursion option ->
+    pre:state -> post:state -> state or_bottom
 
   (** Called on the Frama_C_show_each directives. Prints the internal properties
       inferred by the domain in the [state] about the expression [exp]. Can use

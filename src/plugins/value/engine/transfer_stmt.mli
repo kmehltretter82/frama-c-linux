@@ -29,7 +29,7 @@ module type S = sig
 
   type state
   type value
-  type location
+  type loc
 
   val assign: state -> kinstr -> lval -> exp -> state or_bottom
 
@@ -55,13 +55,13 @@ module type S = sig
   }
 
   val compute_call_ref:
-    (stmt -> (location, value) call -> state -> call_result) ref
+    (stmt -> (loc, value) call -> recursion option -> state -> call_result) ref
 end
 
 module Make (Abstract: Abstractions.Eva)
   : S with type state = Abstract.Dom.t
        and type value = Abstract.Val.t
-       and type location = Abstract.Loc.location
+       and type loc = Abstract.Loc.location
 
 (*
 Local Variables:

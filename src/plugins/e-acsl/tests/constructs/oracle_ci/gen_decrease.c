@@ -87,8 +87,6 @@ int fib(int n)
   }
   tmp = __gen_e_acsl_fib(n - 1);
   tmp_0 = __gen_e_acsl_fib(n - 2);
-  /*@ assert Eva: signed_overflow: -2147483648 ≤ tmp + tmp_0; */
-  /*@ assert Eva: signed_overflow: tmp + tmp_0 ≤ 2147483647; */
   __retres = tmp + tmp_0;
   return_label: return __retres;
 }

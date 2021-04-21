@@ -155,18 +155,20 @@ module Make
     Right.assume stmt expr positive (right_val valuation) right >>-: fun right ->
     left, right
 
-  let finalize_call stmt call ~pre ~post =
+  let finalize_call stmt call recursion ~pre ~post =
     let pre_left, pre_right = pre
     and left_state, right_state = post in
-    Left.finalize_call stmt call ~pre:pre_left ~post:left_state
+    Left.finalize_call stmt call recursion ~pre:pre_left ~post:left_state
     >>- fun left ->
-    Right.finalize_call stmt call ~pre:pre_right ~post:right_state
+    Right.finalize_call stmt call recursion ~pre:pre_right ~post:right_state
     >>-: fun right ->
     left, right
 
-  let start_call stmt call valuation (left, right) =
-    Left.start_call stmt call (left_val valuation) left >>- fun left ->
-    Right.start_call stmt call (right_val valuation) right >>-: fun right ->
+  let start_call stmt call recursion valuation (left, right) =
+    Left.start_call stmt call recursion (left_val valuation) left
+    >>- fun left ->
+    Right.start_call stmt call recursion (right_val valuation) right
+    >>-: fun right ->
     left, right
 
   let show_expr =

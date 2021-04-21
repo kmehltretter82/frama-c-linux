@@ -23,12 +23,16 @@
 (** Handling of recursion cycles in the callgraph *)
 
 open Cil_types
+open Eval
 
-val is_recursive_call: kernel_function -> bool
-(** Given  the current state of the call stack, detect whether the
-    given given function would start a recursive cycle. *)
+(* Returns the specification for a recursive call to the given function. Fails
+   if the function has no specification. Marks the preconditions of the call
+   as unknowns. *)
+val get_spec: kinstr -> kernel_function -> funspec
 
-val empty_spec_for_recursive_call: kernel_function -> spec
-(** Generate an empty spec [assigns \nothing] or
-    [assigns \result \from \nothing], to be used to "approximate" the
-    results of a recursive call. *)
+(** Creates the information about a recursive call. *)
+val make: ('v, 'loc) call -> recursion option
+
+(** Changes the information about a recursive call to be used at the end
+    of the call. *)
+val revert: recursion -> recursion

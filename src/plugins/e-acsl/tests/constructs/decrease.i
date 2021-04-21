@@ -1,5 +1,5 @@
 /* run.config_ci, run.config_dev
-   STDOPT: +"-eva-ignore-recursive-calls -eva-slevel 7"
+   STDOPT: +"-eva-unroll-recursive-calls 10 -eva-slevel 7"
  */
 
 // Test that the last iteration of the variant can be negative

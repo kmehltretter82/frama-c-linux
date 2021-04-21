@@ -24,11 +24,6 @@ open Cil_types
 
 (** {2 Callstacks related types and functions} *)
 
-(** A call_stack is a list, telling which function was called at which
-    site. The head of the list tells about the latest call. *)
-type call_site = (kernel_function * kinstr)
-type callstack = call_site list
-
 (** Functions dealing with call stacks. *)
 val clear_call_stack : unit -> unit
 val pop_call_stack : unit -> unit
@@ -36,7 +31,7 @@ val push_call_stack : kernel_function -> kinstr -> unit
 
 (** The current function is the one on top of the call stack. *)
 val current_kf : unit -> kernel_function
-val call_stack : unit -> callstack
+val call_stack : unit -> Value_types.callstack
 
 (** Prints the current callstack. *)
 val pp_callstack : Format.formatter -> unit

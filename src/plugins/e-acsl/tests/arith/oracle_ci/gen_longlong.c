@@ -12,8 +12,6 @@ unsigned long long my_pow(unsigned int x, unsigned int n)
   }
   tmp_0 = my_pow(x,n / (unsigned int)2);
   tmp = (int)tmp_0;
-  /*@ assert Eva: signed_overflow: -2147483648 ≤ tmp * tmp; */
-  /*@ assert Eva: signed_overflow: tmp * tmp ≤ 2147483647; */
   tmp *= tmp;
   if (n % (unsigned int)2 == (unsigned int)0) {
     __retres = (unsigned long long)tmp;

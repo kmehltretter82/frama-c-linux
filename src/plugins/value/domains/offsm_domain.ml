@@ -157,9 +157,15 @@ module Internal  : Domain_builder.InputDomain
 
   let assume _ _ _ _ state = `Value state
 
-  let finalize_call _stmt _call ~pre:_ ~post = `Value post
+  let finalize_call _stmt _call _recursion ~pre:_ ~post = `Value post
 
-  let start_call _stmt _call valuation state = update valuation state
+  let start_recursive_call recursion state =
+    let vars = List.map fst recursion.substitution @ recursion.withdrawal in
+    Memory.remove_variables vars state
+
+  let start_call _stmt _call recursion valuation state =
+    update valuation state >>-: fun state ->
+    Extlib.opt_fold start_recursive_call recursion state
 
   let show_expr _valuation _state _fmt _expr = ()
 

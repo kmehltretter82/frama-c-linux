@@ -116,11 +116,12 @@ module Make
   let assume stmt expr positive valuation state =
     Domain.assume stmt expr positive (lift_valuation valuation) state
 
-  let start_call stmt call valuation state =
-    Domain.start_call stmt (lift_call call) (lift_valuation valuation) state
+  let start_call stmt call recursion valuation state =
+    Domain.start_call
+      stmt (lift_call call) recursion (lift_valuation valuation) state
 
-  let finalize_call stmt call ~pre ~post =
-    Domain.finalize_call stmt (lift_call call) ~pre ~post
+  let finalize_call stmt call recursion ~pre ~post =
+    Domain.finalize_call stmt (lift_call call) recursion ~pre ~post
 
   let show_expr valuation = Domain.show_expr (lift_valuation valuation)
 

@@ -225,6 +225,17 @@ val register_memory_var : Cil_types.varinfo -> validity -> t
     They are created only to fill the contents of another variable.
     Their field [vsource] is set to false. *)
 
+
+(** {2 Substituting bases}
+    This is used to efficiently replace some bases by others in locations or
+    in memory states, for instance in {!Locations} or {!Lmap_sig}. *)
+
+type substitution = base Hptmap.Shape(Base).t
+(** Type used for the substitution between bases. *)
+
+val substitution_from_list: (base * base) list -> substitution
+(** Creates a substitution from an association list. *)
+
 (*
 Local Variables:
 compile-command: "make -C ../../.."

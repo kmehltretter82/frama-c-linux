@@ -226,6 +226,8 @@ module V_Or_Uninitialized : sig
   val unspecify_escaping_locals :
     exact:bool -> (V.M.key -> bool) -> t -> bool * t
 
+  val replace_base: Base.substitution -> t -> bool * t
+
   val map: (V.t -> V.t) -> t -> t
   val map2: (V.t -> V.t -> V.t) -> t -> t -> t
   (** initialized/escaping information is the join of the information

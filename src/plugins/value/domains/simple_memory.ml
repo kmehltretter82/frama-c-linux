@@ -52,10 +52,16 @@ module Make_Memory (Value: Value) = struct
   module Initial_Values = struct let v = [] end
   module Deps = struct let l = [Ast.self] end
 
-  include Hptmap.Make (Base) (Value)(Hptmap.Comp_unused) (Initial_Values) (Deps)
+  include Hptmap.Make
+      (Base.Base) (Value) (Hptmap.Comp_unused) (Initial_Values) (Deps)
 
   let cache_name s =
     Hptmap_sig.PersistentCache ("Value." ^ Value.name ^ "." ^ s)
+
+  let disjoint_union =
+    let cache = cache_name "union" in
+    let decide _key _v1 _v2 = assert false in
+    join ~cache ~symmetric:true ~idempotent:true ~decide
 
   let narrow =
     let module E = struct exception Bottom end in
@@ -259,7 +265,14 @@ module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
      abstraction of the domain itself. *)
   let assume _stmt _expr _pos = update
 
-  let start_call _stmt call _valuation state =
+  let start_recusive_call recursion state =
+    let state = remove_variables recursion.withdrawal state in
+    (* No collision should occur in the substitution. *)
+    let decide _key _v1 _v2 = assert false in
+    snd (replace_key ~decide recursion.base_substitution state)
+
+  let start_call _stmt call recursion _valuation state =
+    let state = Extlib.opt_fold start_recusive_call recursion state in
     let bind_argument state argument =
       let typ = argument.formal.vtype in
       let loc = Main_locations.PLoc.eval_varinfo argument.formal in
@@ -269,8 +282,17 @@ module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
     let state = List.fold_left bind_argument state call.arguments in
     `Value state
 
-  let finalize_call _stmt call ~pre:_ ~post =
+  let finalize_recursive_call ~pre recursion state =
+    let shape = Base.Hptset.shape recursion.base_withdrawal in
+    let inter = inter_with_shape shape pre in
+    let state = disjoint_union state inter in
+    (* No collision should occur in the substitution. *)
+    let decide _key _v1 _v2 = assert false in
+    snd (replace_key ~decide recursion.base_substitution state)
+
+  let finalize_call _stmt call recursion ~pre ~post =
     let kf_name = Kernel_function.get_name call.kf in
+    let post = Extlib.opt_fold (finalize_recursive_call ~pre) recursion post in
     match find_builtin kf_name, call.return with
     | None, _ | _, None   -> `Value post
     | Some f, Some return ->

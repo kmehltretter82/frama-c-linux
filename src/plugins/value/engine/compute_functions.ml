@@ -160,7 +160,7 @@ module Make (Abstract: Abstractions.Eva) = struct
      is the instruction at which the call takes place, and is used to update
      the statuses of the preconditions of [kf]. If [show_progress] is true,
      the callstack and additional information are printed. *)
-  let compute_using_spec_or_body call_kinstr call state =
+  let compute_using_spec_or_body call_kinstr call recursion state =
     let kf = call.kf in
     Value_results.mark_kf_as_called kf;
     let global = match call_kinstr with Kglobal -> true | _ -> false in
@@ -172,9 +172,10 @@ module Make (Abstract: Abstractions.Eva) = struct
         Value_types.Callstack.pretty_short call_stack
         Cil_datatype.Location.pretty (Cil_datatype.Kinstr.loc call_kinstr);
     let use_spec =
-      if call.recursive then
-        `Spec (Recursion.empty_spec_for_recursive_call kf)
-      else
+      match recursion with
+      | Some { depth } when depth >= Value_parameters.RecursiveUnroll.get () ->
+        `Spec (Recursion.get_spec call_kinstr kf)
+      | _ ->
         match kf.fundec with
         | Declaration (_,_,_,_) -> `Spec (Annotations.funspec kf)
         | Definition (def, _) ->
@@ -210,8 +211,10 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   module MemExec = Mem_exec.Make (Abstract.Val) (Abstract.Dom)
 
-  let compute_and_cache_call stmt call init_state =
-    let default () = compute_using_spec_or_body (Kstmt stmt) call init_state in
+  let compute_and_cache_call stmt call recursion init_state =
+    let default () =
+      compute_using_spec_or_body (Kstmt stmt) call recursion init_state
+    in
     if Value_parameters.MemExecAll.get () then
       let args =
         List.map (fun {avalue} -> Eval.value_assigned avalue) call.arguments
@@ -272,9 +275,9 @@ module Make (Abstract: Abstractions.Eva) = struct
     | [state] -> `Value state
     | s :: l  -> `Value (List.fold_left Abstract.Dom.join s l)
 
-  let compute_call_or_builtin stmt call state =
+  let compute_call_or_builtin stmt call recursion state =
     match Builtins.find_builtin_override call.kf with
-    | None -> compute_and_cache_call stmt call state
+    | None -> compute_and_cache_call stmt call recursion state
     | Some (name, builtin, cacheable, spec) ->
       Value_results.mark_kf_as_called call.kf;
       let kinstr = Kstmt stmt in
@@ -329,9 +332,11 @@ module Make (Abstract: Abstractions.Eva) = struct
       Value_util.push_call_stack kf Kglobal;
       store_initial_state kf init_state;
       let call =
-        {kf; arguments = []; rest = []; return = None; recursive = false}
+        { kf; callstack = []; arguments = []; rest = []; return = None; }
       in
-      let final_result = compute_using_spec_or_body Kglobal call init_state in
+      let final_result =
+        compute_using_spec_or_body Kglobal call None init_state
+      in
       let final_states = final_result.Transfer.states in
       let final_state = PowersetDomain.(final_states >>-: of_list >>- join) in
       Value_util.pop_call_stack ();

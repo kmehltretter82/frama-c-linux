@@ -1,6 +1,6 @@
 /* run.config_ci
    COMMENT: recursive logic functions
-   STDOPT: +"-eva-ignore-recursive-calls"
+   STDOPT: +"-eva-unroll-recursive-calls 100"
 */
 
 /*@ logic integer f1(integer n) =

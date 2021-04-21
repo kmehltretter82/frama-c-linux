@@ -241,9 +241,10 @@ module Internal
     let effects = Transfer.effects_assume to_z e in
     `Value (Transfer.catenate state effects)
 
-  let start_call _stmt _call _valuation _state = `Value LatticeInout.empty
+  let start_call _stmt _call _recursion _valuation _state =
+    `Value LatticeInout.empty
 
-  let finalize_call _stmt _call ~pre ~post =
+  let finalize_call _stmt _call _recursion ~pre ~post =
     `Value (Transfer.catenate pre post)
 
   let update _valuation state = `Value state

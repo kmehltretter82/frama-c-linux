@@ -865,7 +865,7 @@ module Internal = struct
     let trans = Assume (stmt, e, pos) in
     `Value (Traces.add_trans state trans)
 
-  let start_call stmt call _valuation state =
+  let start_call stmt call _recursion _valuation state =
     let kf = call.Eval.kf in
     if Kernel_function.is_definition kf then
       let msg = Format.asprintf "start_call: %s (%b)" (Kernel_function.get_name call.Eval.kf)
@@ -890,7 +890,7 @@ module Internal = struct
           (CallDeclared (call.Eval.kf, exps, Option.map Cil.var var))
       in `Value {state with call_declared_function = true}
 
-  let finalize_call _stmt call ~pre:_ ~post =
+  let finalize_call _stmt call _recursion ~pre:_ ~post =
     if post.call_declared_function
     then `Value {post with call_declared_function = false}
     else

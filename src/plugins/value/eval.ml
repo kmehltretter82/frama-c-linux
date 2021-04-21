@@ -240,12 +240,24 @@ type ('loc, 'value) argument = {
   avalue: ('loc, 'value) assigned;
 }
 
+
+type call_site = kernel_function * kinstr
+type callstack = call_site list
+
 type ('loc, 'value) call = {
   kf: kernel_function;
+  callstack: callstack;
   arguments: ('loc, 'value) argument list;
   rest: (exp * ('loc, 'value) assigned) list;
   return: varinfo option;
-  recursive: bool;
+}
+
+type recursion = {
+  depth: int;
+  substitution: (varinfo * varinfo) list;
+  base_substitution: Base.substitution;
+  withdrawal: varinfo list;
+  base_withdrawal: Base.Hptset.t;
 }
 
 type cacheable = Cacheable | NoCache | NoCacheCallers

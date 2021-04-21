@@ -434,6 +434,11 @@ module Offsm : Abstract_value.Leaf with type t = offsm_or_top = struct
     else Top
 
   let resolve_functions _ = `Top, true (* TODO: extract value *)
+  let replace_base substitution = function
+    | Top -> Top
+    | O offsm ->
+      let f v = snd (Cvalue.V_Or_Uninitialized.replace_base substitution v) in
+      O (Cvalue.V_Offsetmap.map_on_values f offsm)
 
   let forward_unop _typ op o =
     let o' = match o, op with

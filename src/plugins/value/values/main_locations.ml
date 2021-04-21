@@ -62,6 +62,8 @@ module PLoc = struct
       else `Unknown (l1, l2)
     else `True
 
+  let replace_base = Precise_locs.replace_base
+
   (* ------------------------------------------------------------------------ *)
   (*                              Offsets                                     *)
   (* ------------------------------------------------------------------------ *)

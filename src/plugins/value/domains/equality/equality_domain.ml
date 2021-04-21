@@ -473,16 +473,28 @@ module Make
       end
     | _ -> `Value state
 
-  let start_call _stmt call valuation state =
+  let start_recursive_call recursion state =
+    let vars = List.map fst recursion.substitution @ recursion.withdrawal in
+    unscope state vars
+
+  let start_call _stmt call recursion valuation state =
     let state =
-      match call_init_state call.kf with
-      | ISCaller  -> assign_formals valuation call state
-      | ISFormals -> assign_formals valuation call empty
-      | ISEmpty   -> empty
+      match recursion with
+      | Some recursion ->
+        (* No relation inferred from the assignment of formal parameters
+           for recursive calls, because the valuation cannot be used safely
+           as the substitution of local and formals variables has not been
+           applied to it. *)
+        start_recursive_call recursion state
+      | None ->
+        match call_init_state call.kf with
+        | ISCaller  -> assign_formals valuation call state
+        | ISFormals -> assign_formals valuation call empty
+        | ISEmpty   -> empty
     in
     `Value state
 
-  let finalize_call _stmt call ~pre ~post =
+  let finalize_call _stmt call _recursion ~pre ~post =
     if call_init_state call.kf = ISCaller then
       `Value post (* [pre] was the state inferred in the caller, and it
                      has been updated during the analysis of [kf] into
