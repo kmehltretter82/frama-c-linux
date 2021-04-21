@@ -4051,7 +4051,11 @@ let rec bytesAlignOf t =
     | TFun _ when not (msvcMode ()) ->
       theMachine.theMachine.alignof_fun
     | TFun _ as t -> raise (SizeOfError ("Undefined sizeof on a function.", t))
-    | TVoid _ as t -> raise (SizeOfError ("Undefined sizeof(void).", t))
+    | TVoid _ as t ->
+      if theMachine.theMachine.sizeof_void > 0 then
+        theMachine.theMachine.sizeof_void
+      else
+        raise (SizeOfError ("Undefined sizeof(void).", t))
   in
   process_aligned_attribute ~may_reduce:false
     (fun fmt -> !pp_typ_ref fmt t)
