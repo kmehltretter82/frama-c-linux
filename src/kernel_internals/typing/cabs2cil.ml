@@ -1336,6 +1336,15 @@ let canDropStatement (s: stmt) : bool =
   ignore (visitCilStmt vis s);
   !pRes
 
+let fail_if_incompatible_sizeof ~ensure_complete op typ =
+  if Cil.isFunctionType typ && Cil.theMachine.theMachine.sizeof_fun < 0 then
+    Kernel.error ~current:true "%s called on function" op;
+  let is_void = Cil.isVoidType typ in
+  if is_void && Cil.theMachine.theMachine.sizeof_void < 0 then
+    Kernel.error ~current:true "%s on void type" op;
+  if ensure_complete && not (Cil.isCompleteType typ) && not is_void then
+    Kernel.error ~current:true
+      "%s on incomplete type '%a'" op Cil_printer.pp_typ typ
 
 (******** CASTS *********)
 
@@ -6007,14 +6016,8 @@ and doExp local_env
 
     | A.TYPE_SIZEOF (bt, dt) ->
       let typ = doOnlyType local_env.is_ghost bt dt in
-      let res =
-        if Cil.isCompleteType typ then new_exp ~loc (SizeOf typ)
-        else begin
-          Kernel.error ~once:true ~current:true
-            "sizeof on incomplete type '%a'" Cil_printer.pp_typ typ;
-          new_exp ~loc (Const (CStr ("booo sizeof(incomplete)")))
-        end
-      in
+      fail_if_incompatible_sizeof ~ensure_complete:true "sizeof" typ;
+      let res = new_exp ~loc (SizeOf typ) in
       finishExp [] (unspecified_chunk empty) res theMachine.typeOfSizeOf
 
     | A.EXPR_SIZEOF e ->
@@ -6023,9 +6026,7 @@ and doExp local_env
       let (_, se, e', lvt) =
         doExp (no_paren_local_env local_env) CNoConst e AExpLeaveArrayFun
       in
-      if Cil.isFunctionType lvt && Cil.theMachine.theMachine.sizeof_fun < 0 then
-        Kernel.abort ~current:true
-          "sizeof() called on function";
+      fail_if_incompatible_sizeof ~ensure_complete:false "sizeof()" lvt;
       let scope_chunk = drop_chunk "sizeof" se e e' in
       let size =
         match e'.enode with
@@ -6042,23 +6043,15 @@ and doExp local_env
 
     | A.TYPE_ALIGNOF (bt, dt) ->
       let typ = doOnlyType local_env.is_ghost bt dt in
-      let res =
-        if Cil.isCompleteType typ then new_exp ~loc (AlignOf typ)
-        else begin
-          Kernel.error ~once:true ~current:true
-            "sizeof on incomplete type '%a'" Cil_printer.pp_typ typ;
-          new_exp ~loc (Const (CStr ("booo alignof(incomplete)")))
-        end
-      in
+      fail_if_incompatible_sizeof ~ensure_complete:true "alignof" typ;
+      let res = new_exp ~loc (AlignOf typ) in
       finishExp [] (unspecified_chunk empty) res theMachine.typeOfSizeOf
 
     | A.EXPR_ALIGNOF e ->
       let (_, se, e', lvt) =
         doExp (no_paren_local_env local_env) CNoConst e AExpLeaveArrayFun
       in
-      if Cil.isFunctionType lvt && Cil.theMachine.theMachine.alignof_fun < 0
-      then
-        Kernel.abort ~current:true "alignof() called on a function.";
+      fail_if_incompatible_sizeof ~ensure_complete:false "alignof()" lvt;
       let scope_chunk = drop_chunk "alignof" se e e' in
       let e'' =
         match e'.enode with (* If we are taking the alignof an
