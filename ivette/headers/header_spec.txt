@@ -7,6 +7,7 @@
 CONTRIBUTING.md: .ignore
 INSTALL.md: .ignore
 Makefile: CEA_LGPL
+Makefile.distrib: .ignore
 README.md: .ignore
 configure.js: .ignore
 doc/pandoc/href.lua: .ignore
