@@ -6,7 +6,7 @@
   Function array
 ------------------------------------------------------------
 
-Goal Check 'CHECK' (file tests/wp_acsl/assigned_initialized_memvar.i, line 76):
+Goal Check 'FAILS' (file tests/wp_acsl/assigned_initialized_memvar.i, line 76):
 Assume {
   Have: 0 <= i.
   Have: i <= 9.
@@ -17,9 +17,6 @@ Assume {
        (forall i_3 : Z. ((0 <= i_3) -> ((i_3 < i_1) -> (v_1[i_3]=true)))))).
   (* Else *)
   Have: 10 <= i_1.
-  (* Loop assigns 'CHECK' *)
-  Have: forall i_3 : Z. ((0 <= i_3) -> ((i_3 <= 9) -> ((v_1[i_3]=true) ->
-      (v[i_3]=true)))).
   (* Invariant *)
   Have: (0 <= i_2) /\ (i_2 <= 10).
   (* Else *)
@@ -37,28 +34,23 @@ Prove: true.
   Function comp
 ------------------------------------------------------------
 
-Goal Check 'CHECK' (file tests/wp_acsl/assigned_initialized_memvar.i, line 131):
-Let a = Init_s_0.Init_F1_S_a.
+Goal Check 'FAILS' (file tests/wp_acsl/assigned_initialized_memvar.i, line 131):
 Assume {
-  Have: 0 <= i.
-  Have: i <= 9.
-  Type: is_sint32(i_1) /\ is_sint32(i_2).
+  Type: is_sint32(i) /\ is_sint32(i_1).
   (* Invariant *)
-  Have: (0 <= i_1) /\ (i_1 <= 10) /\
-      (((0 < i_1) ->
-       (forall i_3 : Z. ((0 <= i_3) -> ((i_3 < i_1) -> (v[i_3]=true)))))).
+  Have: (0 <= i) /\ (i <= 10) /\
+      (((0 < i) ->
+       (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) -> (v[i_2]=true)))))).
+  (* Else *)
+  Have: 10 <= i.
+  (* Invariant *)
+  Have: (0 <= i_1) /\ (i_1 <= 10).
   (* Else *)
   Have: 10 <= i_1.
-  (* Loop assigns 'CHECK' *)
-  Have: ((Init_s_0.Init_F1_S_i)=true) /\
-      (forall i_3 : Z. ((0 <= i_3) -> ((i_3 <= 9) -> ((v[i_3]=true) ->
-       (a[i_3]=true))))).
-  (* Invariant *)
-  Have: (0 <= i_2) /\ (i_2 <= 10).
-  (* Else *)
-  Have: 10 <= i_2.
 }
-Prove: (a[i]=true).
+Prove: ((Init_s_0.Init_F1_S_i)=true) /\
+    (forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) ->
+     ((Init_s_0.Init_F1_S_a)[i_2]=true)))).
 
 ------------------------------------------------------------
 
@@ -195,21 +187,21 @@ Prove: true.
   Function field
 ------------------------------------------------------------
 
-Goal Check 'CHECK' (file tests/wp_acsl/assigned_initialized_memvar.i, line 57):
+Goal Check 'FAILS' (file tests/wp_acsl/assigned_initialized_memvar.i, line 57):
 Assume {
-  Have: 0 <= i.
-  Have: i <= 9.
-  Type: is_sint32(i_1) /\ is_sint32(i_2).
+  Type: is_sint32(i) /\ is_sint32(i_1).
   (* Invariant *)
-  Have: (0 <= i_1) /\ (i_1 <= 10) /\
-      (((0 < i_1) ->
-       (forall i_3 : Z. ((0 <= i_3) -> ((i_3 < i_1) -> (v[i_3]=true)))))).
+  Have: (0 <= i) /\ (i <= 10) /\
+      (((0 < i) ->
+       (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) -> (v[i_2]=true)))))).
+  (* Else *)
+  Have: 10 <= i.
   (* Else *)
   Have: 10 <= i_1.
-  (* Else *)
-  Have: 10 <= i_2.
 }
-Prove: (v[i]=true).
+Prove: ((Init_s_0.Init_F1_S_i)=true) /\
+    (forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) ->
+     ((Init_s_0.Init_F1_S_a)[i_2]=true)))).
 
 ------------------------------------------------------------
 
@@ -221,23 +213,21 @@ Prove: true.
   Function index
 ------------------------------------------------------------
 
-Goal Check 'CHECK' (file tests/wp_acsl/assigned_initialized_memvar.i, line 92):
+Goal Check 'FAILS' (file tests/wp_acsl/assigned_initialized_memvar.i, line 92):
 Assume {
-  Have: 0 <= i.
-  Have: i <= 9.
-  Type: is_sint32(i_1) /\ is_sint32(i_2).
+  Type: is_sint32(i) /\ is_sint32(i_1).
   (* Invariant *)
-  Have: (0 <= i_1) /\ (i_1 <= 10) /\
-      (((0 < i_1) ->
-       (forall i_3 : Z. ((0 <= i_3) -> ((i_3 < i_1) -> (v[i_3]=true)))))).
+  Have: (0 <= i) /\ (i <= 10) /\
+      (((0 < i) ->
+       (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) -> (v[i_2]=true)))))).
+  (* Else *)
+  Have: 10 <= i.
   (* Else *)
   Have: 10 <= i_1.
-  (* Loop assigns 'CHECK' *)
-  Have: ((v[4]=true) -> (v_1=true)).
-  (* Else *)
-  Have: 10 <= i_2.
 }
-Prove: (v[4 <- v_1][i]=true).
+Prove: ((Init_s_0.Init_F1_S_i)=true) /\
+    (forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) ->
+     ((Init_s_0.Init_F1_S_a)[i_2]=true)))).
 
 ------------------------------------------------------------
 

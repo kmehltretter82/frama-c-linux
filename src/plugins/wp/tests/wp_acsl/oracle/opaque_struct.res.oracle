@@ -108,7 +108,7 @@ Prove: a_1 = x.
   Function initialized_assigns
 ------------------------------------------------------------
 
-Goal Check 'succeed' (file tests/wp_acsl/opaque_struct.i, line 31):
+Goal Check 'fails' (file tests/wp_acsl/opaque_struct.i, line 31):
 Let a = havoc(Init_undef_0, Init_0, p, Length_of_S1_S).
 Assume {
   (* Heap *)
@@ -118,7 +118,7 @@ Assume {
   (* Pre-condition *)
   Have: valid_rw(Malloc_0, p, Length_of_S1_S).
   (* Call Effects *)
-  Have: monotonic_init(Init_0, a).
+  Have: cinits(a).
 }
 Prove: IsInit_S1_S(p, a).
 
@@ -147,7 +147,7 @@ Assume {
   (* Pre-condition *)
   Have: !IsInit_S1_S(p, Init_0).
   (* Call Effects *)
-  Have: monotonic_init(Init_0, a).
+  Have: cinits(a).
 }
 Prove: !IsInit_S1_S(p, a).
 
@@ -161,7 +161,7 @@ Assume {
   (* Pre-condition *)
   Have: !IsInit_S1_S(p, Init_0).
   (* Call Effects *)
-  Have: monotonic_init(Init_0, a).
+  Have: cinits(a).
 }
 Prove: IsInit_S1_S(p, a).
 
