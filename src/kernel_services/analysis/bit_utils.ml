@@ -219,8 +219,11 @@ let rec pretty_bits_internal env bfinfo typ ~align ~start ~stop =
     | TVoid _ | TBuiltin_va_list _ | TNamed _ | TFun (_, _, _, _) as typ ->
         let size =
           match bfinfo with
-            | Other -> Integer.of_int (bitsSizeOf typ)
-            | Bitfield i -> Integer.of_int64 i
+          | Other -> begin
+            try Integer.of_int (bitsSizeOf typ)
+            with Cil.SizeOfError _ -> Integer.zero
+          end
+          | Bitfield i -> Integer.of_int64 i
         in
         (if Integer.is_zero start
            && Integer.equal size req_size then

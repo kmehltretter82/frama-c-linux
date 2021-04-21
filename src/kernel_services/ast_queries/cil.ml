@@ -4409,7 +4409,11 @@ and bitsSizeOf t =
              sz' (*WAS: addTrailing sz' (8 * bytesAlignOf t)*)
            | _ -> raise (SizeOfError ("Array with non-constant length.", t))
          end)
-  | TVoid _ -> 8 * theMachine.theMachine.sizeof_void
+  | TVoid _ ->
+    if theMachine.theMachine.sizeof_void >= 0 then
+      8 * theMachine.theMachine.sizeof_void
+    else
+      raise (SizeOfError ("Undefined sizeof(void).", t))
   | TFun _ ->
     if theMachine.theMachine.sizeof_fun >= 0 then
       8 * theMachine.theMachine.sizeof_fun
