@@ -6042,8 +6042,15 @@ and doExp local_env
 
     | A.TYPE_ALIGNOF (bt, dt) ->
       let typ = doOnlyType local_env.is_ghost bt dt in
-      finishExp [] (unspecified_chunk empty) (new_exp ~loc (AlignOf(typ)))
-        theMachine.typeOfSizeOf
+      let res =
+        if Cil.isCompleteType typ then new_exp ~loc (AlignOf typ)
+        else begin
+          Kernel.error ~once:true ~current:true
+            "sizeof on incomplete type '%a'" Cil_printer.pp_typ typ;
+          new_exp ~loc (Const (CStr ("booo alignof(incomplete)")))
+        end
+      in
+      finishExp [] (unspecified_chunk empty) res theMachine.typeOfSizeOf
 
     | A.EXPR_ALIGNOF e ->
       let (_, se, e', lvt) =
