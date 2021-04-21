@@ -269,7 +269,7 @@ module TransferTaint = struct
     in
     `Value state
 
-  let start_call stmt call valuation state =
+  let start_call stmt call _recursion valuation state =
     let state = filter_active_tainted_assumes stmt state in
     let state =
       let annot_zone = zone_of_taint_annot stmt in
@@ -290,7 +290,7 @@ module TransferTaint = struct
     in
     `Value state
 
-  let finalize_call _stmt _call ~pre ~post =
+  let finalize_call _stmt _call _recursion ~pre ~post =
     (* Recover assume statements from the [pre] abstract state: we assume the
        control-dependency does not extended beyond the function scope. *)
     `Value { post with assume_stmts = pre.assume_stmts; }
