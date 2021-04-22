@@ -579,7 +579,7 @@ module BASE = WpContext.Generator(Varinfo)
 
       let initialization prefix x base =
         match sizeof x with
-        | Some size when x.vformal || x.vglob ->
+        | Some size when Cvalues.always_initialized x ->
             let a = Lang.freshvar ~basename:"init" t_init in
             let m = e_var a in
             let init_access =
@@ -1075,22 +1075,29 @@ struct
   let set_init obj loc ~length _chunk ~current =
     let n = F.e_mul (length_of_object obj) length in
     F.e_fun f_set_init [current;loc;n]
-
+(*
   let monotonic_init s1 s2 =
     let m1 = Sigma.value s1 T_init in
     let m2 = Sigma.value s2 T_init in
     F.p_call p_monotonic [m1; m2]
-
+*)
 end
 
 module LOADER = MemLoader.Make(MODEL)
 
 let load = LOADER.load
+let load_init = LOADER.load_init
 let stored = LOADER.stored
+let stored_init = LOADER.stored_init
 let copied = LOADER.copied
-let assigned = LOADER.assigned
+let copied_init = LOADER.copied_init
 let initialized = LOADER.initialized
 let domain = LOADER.domain
+
+let assigned seq obj loc =
+  (* Maintain always initialized values initialized *)
+  Assert (p_call p_cinits [Sigma.value seq.post T_init]) ::
+  LOADER.assigned seq obj loc
 
 (* -------------------------------------------------------------------------- *)
 (* --- Loc Comparison                                                     --- *)

@@ -240,7 +240,7 @@ one_assign sequent:
    Assume {
      Have: foo_0 = 42.
      Have: (Init_d_0=false) /\ (ta_d_0=true) /\ (ta_d_1=false).
-     Have: (Init_d_1=true) /\ (d = c).
+     Have: d = c.
    }
 Prove: d = c.
 
@@ -268,17 +268,11 @@ some_seq sequent:
    Assume {
      Have: foo_0 = 42.
      Have: (Init_d_0=false) /\ (ta_d_0=true) /\ (ta_d_1=false).
-     Have: (Init_d_1=true) /\ (d_1 = 0).
+     Have: d_1 = 0.
      If c != 0
-     Then {
-       Have: ((Init_d_1=true) <-> (Init_d_2=true)) /\ (d_1 = d_2).
-       Have: (Init_d_3=true) /\ (d = 1).
-     }
+     Then { Have: d_1 = d_2. Have: d = 1. }
      If c = 0
-     Then {
-       Have: ((Init_d_1=true) <-> (Init_d_4=true)) /\ (d_1 = d_3).
-       Have: (Init_d_5=true) /\ (d = 2).
-     }
+     Then { Have: d_1 = d_3. Have: d = 2. }
      Have: ((c != 0) -> (d = 1)).
    }
 Prove: ((c = 0) -> (d = 2)).
@@ -292,17 +286,11 @@ some_seq sequent:
    Assume {
      Have: foo_0 = 42.
      Have: (Init_d_0=false) /\ (ta_d_0=true) /\ (ta_d_1=false).
-     Have: (Init_d_1=true) /\ (d_1 = 0).
+     Have: d_1 = 0.
      If c != 0
-     Then {
-       Have: ((Init_d_1=true) <-> (Init_d_2=true)) /\ (d_1 = d_2).
-       Have: (Init_d_3=true) /\ (d = 1).
-     }
+     Then { Have: d_1 = d_2. Have: d = 1. }
      If c = 0
-     Then {
-       Have: ((Init_d_1=true) <-> (Init_d_4=true)) /\ (d_1 = d_3).
-       Have: (Init_d_5=true) /\ (d = 2).
-     }
+     Then { Have: d_1 = d_3. Have: d = 2. }
    }
 Prove: ((c != 0) -> (d = 1)).
 
@@ -407,7 +395,7 @@ zloop sequent:
      Have: 0 <= x.
      Have: (ta_i_0=true) /\ (ta_i_1=false).
      Have: (Init_i_0=true) /\ (i_1 = 0).
-     Have: (Init_i_1=true) /\ ((1 + i_1) = i_2).
+     Have: (1 + i_1) = i_2.
      Have: i_2 <= 10.
      Have: i <= 10.
      Have: 10 <= i.
@@ -429,7 +417,7 @@ zloop sequent:
      Have: 0 <= x.
      Have: (ta_i_0=true) /\ (ta_i_1=false).
      Have: (Init_i_0=true) /\ (i = 0).
-     Have: (Init_i_1=true) /\ ((1 + i) = i_1).
+     Have: (1 + i) = i_1.
      Have: i_1 <= 10.
      Have: i_2 <= 10.
      Have: 10 <= i_2.
@@ -448,7 +436,7 @@ zloop sequent:
      Have: 0 <= x.
      Have: (ta_i_0=true) /\ (ta_i_1=false).
      Have: (Init_i_0=true) /\ (i_1 = 0).
-     Have: (Init_i_1=true) /\ ((1 + i_1) = i_2).
+     Have: (1 + i_1) = i_2.
      Have: i_2 <= 10.
      Have: i <= 10.
      Have: 10 <= i.
@@ -466,7 +454,7 @@ zloop sequent:
      Have: 0 <= x.
      Have: (ta_i_0=true) /\ (ta_i_1=false).
      Have: (Init_i_0=true) /\ (i_1 = 0).
-     Have: (Init_i_1=true) /\ ((1 + i_1) = i).
+     Have: (1 + i_1) = i.
    }
 Prove: i <= 10.
 
@@ -481,12 +469,12 @@ zloop sequent:
      Have: 0 <= x.
      Have: (ta_i_0=true) /\ (ta_i_1=false).
      Have: (Init_i_0=true) /\ (i_1 = 0).
-     Have: (Init_i_1=true) /\ ((1 + i_1) = i_2).
+     Have: (1 + i_1) = i_2.
      Have: i_2 <= 10.
      Have: i_3 <= 10.
      Have: i_3 <= 9.
-     Have: (Init_i_2=true) /\ ((1 + i_3) = i_4).
-     Have: (Init_i_3=true) /\ ((1 + i_4) = i).
+     Have: (1 + i_3) = i_4.
+     Have: (1 + i_4) = i.
    }
 Prove: i <= 10.
 
@@ -501,7 +489,7 @@ zloop sequent:
      Have: 0 <= x.
      Have: (ta_i_0=true) /\ (ta_i_1=false).
      Have: (Init_i_0=true) /\ (i = 0).
-     Have: (Init_i_1=true) /\ ((1 + i) = i_1).
+     Have: (1 + i) = i_1.
      Have: i_1 <= 10.
      Have: i_2 <= 10.
      Have: 10 <= i_2.
@@ -685,49 +673,33 @@ compare sequent:
          ((b = a) /\ (a <= b) /\ (d <= c) /\
           ((b != a) \/ ((b = a) /\ (d <= c))))
      If b < a
-     Then {
-       Have: ((Init_r_0=true) <-> (Init_r_1=true)) /\ (r_1 = r_2).
-       Have: (Init_r_2=true) /\ (r = (-1)).
-     }
+     Then { Have: r_1 = r_2. Have: r = (-1). }
      If a <= b
      Then {
-       Have: ((Init_r_0=true) <-> (Init_r_3=true)) /\ (r_1 = r_3).
+       Have: r_1 = r_3.
        If (b != a) \/ ((b = a) /\ (d <= c))
        Then {
          If b = a
          Then {
-           Have: ((Init_r_4=true) <-> (Init_r_5=true)) /\ (r_4 = r_5).
+           Have: r_4 = r_5.
            If d <= c
-           Then {
-             Have: ((Init_r_5=true) <-> (Init_r_6=true)) /\ (r_5 = r_6).
-             Have: (Init_r_7=true) /\ (r = 0).
-           }
+           Then { Have: r_5 = r_6. Have: r = 0. }
            If c < d
-           Then {
-             Have: ((Init_r_5=true) <-> (Init_r_8=true)) /\ (r_5 = r_7).
-             Have: (Init_r_9=true) /\ (r = 1).
-           }
+           Then { Have: r_5 = r_7. Have: r = 1. }
          }
          If b != a
-         Then {
-           Have: ((Init_r_4=true) <-> (Init_r_10=true)) /\ (r_4 = r_8).
-           Have: (Init_r_11=true) /\ (r = 1).
-         }
+         Then { Have: r_4 = r_8. Have: r = 1. }
        }
        If b = a
        Then {
-         Have: ((Init_r_3=true) <-> (Init_r_12=true)) /\ (r_3 = r_9).
+         Have: r_3 = r_9.
          If c < d
-         Then {
-           Have: ((Init_r_12=true) <-> (Init_r_13=true)) /\ (r_9 = r_10).
-           Have: (Init_r_14=true) /\ (r = (-1)).
-         }
+         Then { Have: r_9 = r_10. Have: r = (-1). }
          If d <= c
-         Then { Have: ((Init_r_12=true) <-> (Init_r_4=true)) /\ (r_9 = r_4).
-         }
+         Then { Have: r_9 = r_4. }
        }
        If b != a
-       Then { Have: ((Init_r_3=true) <-> (Init_r_4=true)) /\ (r_3 = r_4). }
+       Then { Have: r_3 = r_4. }
      }
    }
 Prove: ((a < b) -> (r = 1)).

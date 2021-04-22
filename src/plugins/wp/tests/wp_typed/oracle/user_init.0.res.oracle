@@ -434,11 +434,12 @@ Assume {
   Have: i <= 9.
   Have: i_1 <= 19.
   (* Loop assigns 'lack,Zone' *)
-  Have: forall a : addr.
-      ((forall i_5,i_4 : Z. ((0 <= i_5) -> ((0 <= i_4) -> ((i_5 <= 9) ->
-        ((i_4 <= 19) ->
-        (shift_sint32(shift_A20_sint32(global(G_t2_52), i_5), i_4) != a)))))) ->
-      (Mint_0[a] = Mint_1[a])).
+  Have: cinits(Init_0) /\
+      (forall a : addr.
+       ((forall i_5,i_4 : Z. ((0 <= i_5) -> ((0 <= i_4) -> ((i_5 <= 9) ->
+         ((i_4 <= 19) ->
+         (shift_sint32(shift_A20_sint32(global(G_t2_52), i_5), i_4) != a)))))) ->
+       (Mint_0[a] = Mint_1[a]))).
 }
 Prove: exists i_5,i_4 : Z. (i_5 <= i) /\ (i_4 <= i_1) /\ (0 <= i_5) /\
     (i <= i_5) /\ (0 <= i_4) /\ (i_1 <= i_4) /\ (i_5 <= 9) /\ (i_4 <= 19).
@@ -469,11 +470,12 @@ Assume {
   Have: i <= 9.
   Have: i_1 <= 19.
   (* Loop assigns 'lack,Zone' *)
-  Have: forall a : addr.
-      ((forall i_5,i_4 : Z. ((0 <= i_5) -> ((0 <= i_4) -> ((i_5 <= 9) ->
-        ((i_4 <= 19) ->
-        (shift_sint32(shift_A20_sint32(global(G_t2_52), i_5), i_4) != a)))))) ->
-      (Mint_0[a] = Mint_1[a])).
+  Have: cinits(Init_0) /\
+      (forall a : addr.
+       ((forall i_5,i_4 : Z. ((0 <= i_5) -> ((0 <= i_4) -> ((i_5 <= 9) ->
+         ((i_4 <= 19) ->
+         (shift_sint32(shift_A20_sint32(global(G_t2_52), i_5), i_4) != a)))))) ->
+       (Mint_0[a] = Mint_1[a]))).
 }
 Prove: exists i_5,i_4 : Z. (i_5 <= i) /\ (i_4 <= i_1) /\ (0 <= i_5) /\
     (i <= i_5) /\ (0 <= i_4) /\ (i_1 <= i_4) /\ (i_5 <= 9) /\ (i_4 <= 19).
@@ -711,10 +713,11 @@ Assume {
   Have: 0 <= i.
   Have: i <= 9.
   (* Loop assigns 'tactic,Zone' *)
-  Have: forall a : addr.
-      ((forall i_5,i_4 : Z. ((0 <= i_5) -> ((i_5 <= 9) ->
-        (shift_sint32(shift_A20_sint32(global(G_t2_52), i_5), i_4) != a)))) ->
-      (Mint_0[a] = Mint_1[a])).
+  Have: cinits(Init_0) /\
+      (forall a : addr.
+       ((forall i_5,i_4 : Z. ((0 <= i_5) -> ((i_5 <= 9) ->
+         (shift_sint32(shift_A20_sint32(global(G_t2_52), i_5), i_4) != a)))) ->
+       (Mint_0[a] = Mint_1[a]))).
 }
 Prove: exists i_5,i_4 : Z. (i_5 <= i) /\ (i_4 <= i_1) /\ (0 <= i_5) /\
     (i <= i_5) /\ (i_1 <= i_4) /\ (i_5 <= 9).
@@ -743,10 +746,11 @@ Assume {
   Have: 0 <= i.
   Have: i <= 9.
   (* Loop assigns 'tactic,Zone' *)
-  Have: forall a : addr.
-      ((forall i_5,i_4 : Z. ((0 <= i_5) -> ((i_5 <= 9) ->
-        (shift_sint32(shift_A20_sint32(global(G_t2_52), i_5), i_4) != a)))) ->
-      (Mint_0[a] = Mint_1[a])).
+  Have: cinits(Init_0) /\
+      (forall a : addr.
+       ((forall i_5,i_4 : Z. ((0 <= i_5) -> ((i_5 <= 9) ->
+         (shift_sint32(shift_A20_sint32(global(G_t2_52), i_5), i_4) != a)))) ->
+       (Mint_0[a] = Mint_1[a]))).
 }
 Prove: exists i_5,i_4 : Z. (i_5 <= i) /\ (i_4 <= i_1) /\ (0 <= i_5) /\
     (i <= i_5) /\ (i_1 <= i_4) /\ (i_5 <= 9).

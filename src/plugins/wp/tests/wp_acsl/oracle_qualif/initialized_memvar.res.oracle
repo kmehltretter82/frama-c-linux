@@ -12,28 +12,28 @@
 [wp] [Qed] Goal typed_globals_check_qed_ok_5 : Valid
 [wp] [Qed] Goal typed_globals_check_qed_ok_6 : Valid
 [wp] [Qed] Goal typed_globals_check_qed_ok_7 : Valid
+[wp] [Alt-Ergo] Goal typed_globals_check_provable : Valid
+[wp] [Alt-Ergo] Goal typed_globals_check_provable_2 : Valid
+[wp] [Alt-Ergo] Goal typed_globals_check_not_provable : Unsuccess
+[wp] [Alt-Ergo] Goal typed_globals_check_provable_3 : Valid
+[wp] [Alt-Ergo] Goal typed_globals_check_qed_ko_3 : Unsuccess
 [wp] [Qed] Goal typed_globals_check_qed_ok_8 : Valid
 [wp] [Qed] Goal typed_globals_check_qed_ok_9 : Valid
-[wp] [Alt-Ergo] Goal typed_globals_check_qed_ko_3 : Unsuccess
 [wp] [Qed] Goal typed_globals_check_qed_ok_10 : Valid
-[wp] [Alt-Ergo] Goal typed_globals_check_qed_ko_4 : Unsuccess
 [wp] [Qed] Goal typed_globals_check_qed_ok_11 : Valid
 [wp] [Qed] Goal typed_globals_check_qed_ok_12 : Valid
 [wp] [Qed] Goal typed_globals_check_qed_ok_13 : Valid
-[wp] [Qed] Goal typed_globals_check_qed_ok_14 : Valid
-[wp] [Qed] Goal typed_globals_check_qed_ok_15 : Valid
-[wp] [Qed] Goal typed_globals_check_qed_ok_16 : Valid
-[wp] [Alt-Ergo] Goal typed_globals_check_provable : Valid
-[wp] [Alt-Ergo] Goal typed_globals_check_provable_2 : Valid
-[wp] [Alt-Ergo] Goal typed_globals_check_provable_3 : Valid
 [wp] [Alt-Ergo] Goal typed_globals_check_provable_4 : Valid
+[wp] [Alt-Ergo] Goal typed_globals_check_provable_5 : Valid
+[wp] [Alt-Ergo] Goal typed_globals_check_provable_6 : Valid
+[wp] [Alt-Ergo] Goal typed_globals_check_provable_7 : Valid
+[wp] [Alt-Ergo] Goal typed_globals_check_qed_ko_4 : Unsuccess
 [wp] [Alt-Ergo] Goal typed_globals_check_qed_ko_5 : Unsuccess
 [wp] [Alt-Ergo] Goal typed_globals_check_qed_ko_6 : Unsuccess
 [wp] [Alt-Ergo] Goal typed_globals_check_qed_ko_7 : Unsuccess
-[wp] [Alt-Ergo] Goal typed_globals_check_qed_ko_8 : Unsuccess
-[wp] [Alt-Ergo] Goal typed_globals_check_not_provable : Unsuccess
 [wp] [Alt-Ergo] Goal typed_globals_check_not_provable_2 : Unsuccess
 [wp] [Alt-Ergo] Goal typed_globals_check_not_provable_3 : Unsuccess
+[wp] [Alt-Ergo] Goal typed_globals_check_not_provable_4 : Unsuccess
 [wp] [Qed] Goal typed_locals_check_qed_ok : Valid
 [wp] [Qed] Goal typed_locals_check_qed_ok_2 : Valid
 [wp] [Qed] Goal typed_locals_check_qed_ok_3 : Valid
@@ -58,10 +58,10 @@
 [wp] [Qed] Goal typed_locals_check_qed_ok_20 : Valid
 [wp] [Qed] Goal typed_locals_check_qed_ok_21 : Valid
 [wp] Proved goals:   43 / 54
-  Qed:            37 
-  Alt-Ergo:        6  (unsuccess: 11)
+  Qed:            34 
+  Alt-Ergo:        9  (unsuccess: 11)
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  globals                  16        4       31      64.5%
+  globals                  13        7       31      64.5%
   locals                   21        2       23       100%
 ------------------------------------------------------------

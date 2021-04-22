@@ -827,10 +827,13 @@ end
 module LOADER = MemLoader.Make(MODEL)
 
 let load = LOADER.load
-let loadvalue = LOADER.loadvalue
+let load_init = LOADER.load_init
+let load_value = LOADER.load_value
 
 let stored = LOADER.stored
+let stored_init = LOADER.stored_init
 let copied = LOADER.copied
+let copied_init = LOADER.copied_init
 let assigned = LOADER.assigned
 let initialized = LOADER.initialized
 

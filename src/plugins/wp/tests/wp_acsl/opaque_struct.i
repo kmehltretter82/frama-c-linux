@@ -23,14 +23,14 @@ struct S* p ;
 //@ assigns *p ;
 void g(void);
 
-/*@ requires \initialized(p); 
+/*@ requires \initialized(p);
     requires \valid(p);
 */
 void initialized_assigns(void){
   g();
-  //@ check succeed: \initialized(p);
+  //@ check fails: \initialized(p); // struct initialization not monotonic
   //@ check succeed: \block_length(p) >= 0;
-  
+
   // while it can be proved in Coq, this is currently
   // too indirect for solvers.
   // @ check succeed: \block_length(p) >= \block_length(&S1);

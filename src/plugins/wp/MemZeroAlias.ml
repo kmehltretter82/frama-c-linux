@@ -200,13 +200,19 @@ let set s m ks v = if ks = [] then v else update (e_var (Sigma.get s m)) ks v
 let load sigma obj l =
   if Ctypes.is_pointer obj then Loc (Star l) else Val(value sigma l)
 
+let load_init _sigma _obj _l = Warning.error ~source "Mem0Alias: No initialized"
+
 let stored seq _obj l e =
   let m,ks = access l in
   let x = F.e_var (Sigma.get seq.post m) in
   [Set( x , set seq.pre m ks e )]
 
+let stored_init _seq _obj _l _e = Warning.error ~source "Mem0Alias: No initialized"
+
 let copied seq obj a b =
   stored seq obj a (value seq.pre b)
+
+let copied_init _seq _obj _a _b = Warning.error ~source "Mem0Alias: No initialized"
 
 let assigned _s _obj _sloc = []
 

@@ -780,42 +780,53 @@ struct
           (fun l -> Loc l)
           (M.load sigma.mem obj (mloc_of_path m x ofs))
 
+  let load_init sigma obj = function
+    | Ref _ ->
+        e_true
+    | Val((CREF|CVAL),x,_) when Cvalues.always_initialized x ->
+        Cvalues.initialized_obj obj
+    | Val((CREF|CVAL),x,ofs) ->
+        access_init (get_init_term sigma x) ofs
+    | Loc l ->
+        M.load_init sigma.mem obj l
+    | Val((CTXT _|CARR _|HEAP) as m,x,ofs) ->
+        M.load_init sigma.mem obj (mloc_of_path m x ofs)
+
   (* -------------------------------------------------------------------------- *)
   (* ---  Memory Store                                                      --- *)
   (* -------------------------------------------------------------------------- *)
 
-  (* Note that this function purposely does not update init state *)
-  let memvar_stored seq _obj l v =
+  let memvar_stored kind seq x ofs v =
+    let get_term, update = match kind with
+      | KValue -> get_term, update
+      | KInit -> get_init_term, update_init
+    in
+    let v1 = get_term seq.pre x in
+    let v2 = get_term seq.post x in
+    Set( v2 , update v1 ofs v )
+
+  let gen_stored kind seq obj l v =
+    let mstored = match kind with KValue -> M.stored | KInit -> M.stored_init in
     match l with
     | Ref x -> noref ~op:"write to" x
     | Val((CREF|CVAL),x,ofs) ->
-        let v1 = get_term seq.pre x in
-        let v2 = get_term seq.post x in
-        Set( v2 , update v1 ofs v )
-    | _ -> failwith "MemVar stored on a non MemVar location"
-
-  let memvar_set_init seq x ofs v =
-    if x.vformal || x.vglob then []
-    else
-      let v1 = get_init_term seq.pre x in
-      let v2 = get_init_term seq.post x in
-      [ Set( v2 , update_init v1 ofs v ) ]
-
-  let stored seq obj l v = match l with
-    | Ref x -> noref ~op:"write to" x
-    | Val((CREF|CVAL),x,ofs) ->
-        let init = Cvalues.initialized_obj obj in
-        (memvar_stored seq obj l v) :: (memvar_set_init seq x ofs init)
+        [memvar_stored kind seq x ofs v]
     | Val((CTXT _|CARR _|HEAP) as m,x,ofs) ->
-        M.stored (mseq_of_seq seq) obj (mloc_of_path m x ofs) v
+        mstored (mseq_of_seq seq) obj (mloc_of_path m x ofs) v
     | Loc l ->
-        M.stored (mseq_of_seq seq) obj l v
+        mstored (mseq_of_seq seq) obj l v
+
+  let stored = gen_stored KValue
+  let stored_init = gen_stored KInit
 
   let copied seq obj l1 l2 =
     let v = match load seq.pre obj l2 with
       | Sigs.Val r -> r
       | Sigs.Loc l -> pointer_val l
     in stored seq obj l1 v
+
+  let copied_init seq obj l1 l2 =
+    stored_init seq obj l1 (load_init seq.pre obj l2)
 
   (* -------------------------------------------------------------------------- *)
   (* ---  Pointer Comparison                                                --- *)
@@ -1134,7 +1145,7 @@ struct
           | Val(m,x,p) ->
               if is_heap_allocated m then
                 M.initialized sigma.mem (Rloc(obj,mloc_of_loc l))
-              else if (x.vformal || x.vglob) then
+              else if Cvalues.always_initialized x then
                 try valid_offset RW (vobject m x) p
                 with ShiftMismatch -> shift_mismatch l
               else
@@ -1160,7 +1171,7 @@ struct
                   let p, a, b = normalize elt p in
                   let in_array = valid_range RW (vobject m x) p (elt, a, b) in
                   let initialized =
-                    if x.vformal || x.vglob then p_true
+                    if Cvalues.always_initialized x then p_true
                     else initialized_range sigma (vobject m x) x p a b
                   in
                   F.p_imply (F.p_leq a b) (p_and in_array initialized)
@@ -1248,15 +1259,14 @@ struct
     match scope with
     | Leave -> []
     | Enter ->
-        let xs = List.filter
-            (fun v -> is_mvar_alloc v && not v.vformal &&
-                      not v.vglob && not v.vdefined) xs
+        let init_status v =
+          if v.vdefined || Cvalues.always_initialized v || not@@ is_mvar_alloc v
+          then None
+          else
+            let i = Cvalues.uninitialized_obj (Ctypes.object_of v.vtype) in
+            Some (Lang.F.p_equal (access_init (get_init_term seq.post v) []) i)
         in
-        let uninitialized v =
-          let value = Cvalues.uninitialized_obj (Ctypes.object_of v.vtype) in
-          Lang.F.p_equal (access_init (get_init_term seq.post v) []) value
-        in
-        List.map uninitialized xs
+        List.filter_map init_status xs
 
   let is_nullable m v =
     let addr = nullable_address v in
@@ -1345,7 +1355,7 @@ struct
 
   (*
   let monotonic_initialized_genset s xs mem x ofs p =
-    if x.vformal || x.vglob then [Assert p_true]
+    if always_init x then [Assert p_true]
     else
       let valid = valid_offset_path s.post Sigs.RW mem x ofs in
       let a = get_init_term s.pre x in
@@ -1365,13 +1375,19 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let rec monotonic_initialized seq obj x ofs =
-    if x.vformal || x.vglob then p_true
+    if Cvalues.always_initialized x then p_true
     else
       match obj with
+      (* Structure initialization is not monotonic *)
+      | C_comp _ -> p_true
+      (* Neither is initialization of arrays of structures *)
+      | C_array { arr_element=t } when Cil.isStructOrUnionType t -> p_true
+
       | C_int _ | C_float _ | C_pointer _ ->
           p_imply
             (p_bool (access_init (get_init_term seq.pre x) ofs))
             (p_bool (access_init (get_init_term seq.post x) ofs))
+
       | C_array { arr_flat=flat ; arr_element=t } ->
           let size = match flat with
             | None -> unsized_array ()
@@ -1385,35 +1401,20 @@ struct
           let hyp = Vset.in_range (e_var v) low up in
           let in_range = monotonic_initialized seq obj x ofs in
           Lang.F.p_forall [v] (p_imply hyp in_range)
-      | C_comp { cfields = None } ->
-          p_imply
-            (initialized_loc seq.pre obj x ofs)
-            (initialized_loc seq.post obj x ofs)
-      | C_comp { cfields = Some fields } ->
-          let mk_pred f =
-            let obj = Ctypes.object_of f.ftype in
-            let ofs = ofs @ [Field f] in
-            monotonic_initialized seq obj x ofs
-          in
-          Lang.F.p_conj (List.map mk_pred fields)
-
-  let memvar_assigned seq obj loc v =
-    match loc with
-    | Ref x -> noref ~op:"write to" x
-    | Val((CREF|CVAL),x,ofs) ->
-        let init = e_var (Lang.freshvar ~basename:"v" (init_of_object obj)) in
-        (memvar_stored seq obj loc v) ::
-        Assert(monotonic_initialized seq obj x ofs) ::
-        (memvar_set_init seq x ofs init)
-    | _ -> failwith "MemVar assigned on a non MemVar location"
 
   let assigned_loc seq obj = function
     | Ref x -> noref ~op:"assigns to" x
     | Val((CVAL|CREF),x,[]) ->
         [ Assert (monotonic_initialized seq obj x []) ]
-    | Val((CVAL|CREF),_,_) as vloc ->
-        let v = Lang.freshvar ~basename:"v" (Lang.tau_of_object obj) in
-        memvar_assigned seq obj vloc (e_var v)
+    | Val((CVAL|CREF),x,ofs) ->
+        let value = Lang.freshvar ~basename:"v" (tau_of_object obj) in
+        memvar_stored KValue seq x ofs (e_var value) ::
+        if Cil.isStructOrUnionType x.vtype then []
+        else begin
+          let init = Lang.freshvar ~basename:"v" (init_of_object obj) in
+          Assert(monotonic_initialized seq obj x ofs) ::
+          [ memvar_stored KInit seq x ofs (e_var init) ]
+        end
     | Val((HEAP|CTXT _|CARR _) as m,x,ofs) ->
         M.assigned (mseq_of_seq seq) obj (Sloc (mloc_of_path m x ofs))
     | Loc l ->
@@ -1423,19 +1424,18 @@ struct
     match l with
     | Ref x -> noref ~op:"assigns to" x
     | Val((CVAL|CREF),x,[]) ->
-        (* Note that 'obj' above corresponds to the elements *)
-        let obj = Ctypes.object_of x.vtype in
-        [ Assert (monotonic_initialized seq obj x []) ]
-    | Val((CVAL|CREF),x,ofs) as vloc ->
-        let te = Lang.tau_of_object elt in
-        let v = Lang.freshvar ~basename:"v" Qed.Logic.(Array(Int,te)) in
-        let rec get_obj obj = function
-          | [] -> obj
-          | Field(fi) :: l -> get_obj (Ctypes.object_of fi.ftype) l
-          | Shift(obj, _) :: l -> get_obj obj l
-        in
-        let obj = get_obj (Ctypes.object_of x.vtype) ofs in
-        memvar_assigned seq obj vloc (e_var v)
+        if Ctypes.is_compound elt then []
+        else
+          (* Note that 'obj' above corresponds to the elements *)
+          let obj = Ctypes.object_of x.vtype in
+          [ Assert (monotonic_initialized seq obj x []) ]
+
+    | Val((CVAL|CREF),x,ofs) ->
+        let f_array t =
+          e_var (Lang.freshvar ~basename:"v" Qed.Logic.(Array(Int, t))) in
+        [ memvar_stored KValue seq x ofs (f_array @@ Lang.tau_of_object elt) ;
+          memvar_stored KInit  seq x ofs (f_array @@ Lang.init_of_object elt) ]
+
     | Val((HEAP|CTXT _|CARR _) as m,x,ofs) ->
         let l = mloc_of_path m x ofs in
         M.assigned (mseq_of_seq seq) obj (Sarray(l,elt,n))
@@ -1610,8 +1610,7 @@ struct
     match l with
     | Ref x | Val((CVAL|CREF),x,_) ->
         let init =
-          if not (x.vformal || x.vglob) then [ Init x ]
-          else []
+          if not @@ Cvalues.always_initialized x then [ Init x ] else []
         in
         Heap.Set.of_list ((Var x) :: init)
     | Loc _ | Val((CTXT _|CARR _|HEAP),_,_) ->

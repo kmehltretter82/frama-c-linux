@@ -1,8 +1,8 @@
 /* run.config
-  OPT: -wp-prop=CHECK
+  OPT: -wp-prop=CHECK,FAILS
 */
 /* run.config_qualif
-  OPT: -wp-prop=CHECK -wp-timeout 20
+  OPT: -wp-prop=CHECK,FAILS -wp-timeout 20
 */
 
 struct S {
@@ -54,7 +54,7 @@ void field(void){
   for(int i = 0; i < 10; ++i){
     s.i++;
   }
-  //@ check CHECK: \initialized(&s);
+  //@ check FAILS: \initialized(&s); // initialization not monotonic
 }
 
 void array(void){
@@ -73,7 +73,7 @@ void array(void){
   for(int i = 0; i < 10; ++i){
     s.a[i] = 1 ;
   }
-  //@ check CHECK: \initialized(&s);
+  //@ check FAILS: \initialized(&s); // initialization not monotonic
 }
 
 void index(void){
@@ -89,7 +89,7 @@ void index(void){
   for(int i = 0; i < 10; ++i){
     if(i == 4) s.a[i] = 1 ;
   }
-  //@ check CHECK: \initialized(&s);
+  //@ check FAILS: \initialized(&s); // initialization not monotonic
 }
 
 void descr(void){
@@ -128,5 +128,5 @@ void comp(void){
     s.a[i] = 1 ;
     s.i++;
   }
-  //@ check CHECK: \initialized(&s);
+  //@ check FAILS: \initialized(&s); // initialization not monotonic
 }

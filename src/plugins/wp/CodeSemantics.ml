@@ -94,7 +94,7 @@ struct
     | C_float _ -> is_zero_float (M.load sigma obj l)
     | C_pointer _ -> is_zero_ptr (M.load sigma obj l)
     | C_comp { cfields = None } ->
-        Wp_parameters.fatal "0-initialization of an opaque structure"
+        p_true (* cannot say anything interesting here *)
     | C_comp { cfields = Some fields } ->
         p_all
           (fun f -> is_zero sigma (Ctypes.object_of f.ftype) (M.field l f))
@@ -451,7 +451,17 @@ struct
                  p_equal (val_of_exp sigma e) (cval v)
              | None -> is_zero sigma obj l
            in
-           value_hyp, (M.initialized sigma (Rloc(obj, l)))
+           let init_hyp = match init with
+             | Some { enode = Lval lv_init }
+               when Cil.(isStructOrUnionType @@ typeOfLval lv_init) ->
+                 let l_initializer = lval sigma lv_init in
+                 p_equal
+                   (M.load_init sigma obj l)
+                   (M.load_init sigma obj l_initializer)
+             | _ ->
+                 M.initialized sigma (Rloc(obj, l))
+           in
+           value_hyp, init_hyp
         ) () in
     match outcome with
     | Warning.Failed warn -> warn , (F.p_true, F.p_true)

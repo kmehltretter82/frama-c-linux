@@ -13,7 +13,7 @@ int a[10] ;
 
 struct C c ;
 struct C ac [10];
-
+//@ requires \initialized(&c) && \initialized(&ac);
 void globals(void){
   // Simple type
   //@ check qed_ok: \initialized(&x) ;
@@ -32,10 +32,10 @@ void globals(void){
   //@ check qed_ok: \initialized(&c.s) ;
   //@ check qed_ok: \initialized(&c.s.y) ;
 
-  //@ check qed_ok: \initialized(&c.a) ;
-  //@ check qed_ok: \initialized(&c.a[4]) ;
-  //@ check qed_ko: \initialized(&c.a[10]) ;
-  //@ check qed_ok: \initialized(&c.a[0 .. 9]) ;
+  //@ check provable: \initialized(&c.a) ;
+  //@ check provable: \initialized(&c.a[4]) ;
+  //@ check not_provable: \initialized(&c.a[10]) ;
+  //@ check provable: \initialized(&c.a[0 .. 9]) ;
   //@ check qed_ko: \initialized(&c.a[0 .. 10]) ;
 
   // Complex accesses

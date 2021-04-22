@@ -51,23 +51,59 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'qed_ok' (file tests/wp_acsl/initialized_memvar.i, line 35):
-Prove: true.
+Goal Check 'provable' (file tests/wp_acsl/initialized_memvar.i, line 35):
+Let a = Init_c_0.Init_F2_C_s.
+Let a_1 = Init_c_0.Init_F2_C_a.
+Assume {
+  (* Goal *)
+  When: (0 <= i) /\ (i <= 9).
+  (* Pre-condition *)
+  Have: ((Init_c_0.Init_F2_C_x)=true) /\ ((a.Init_F1_S_x)=true) /\
+      ((a.Init_F1_S_y)=true) /\
+      (forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 9) -> (a_1[i_1]=true)))).
+}
+Prove: (a_1[i]=true).
 
 ------------------------------------------------------------
 
-Goal Check 'qed_ok' (file tests/wp_acsl/initialized_memvar.i, line 36):
-Prove: true.
+Goal Check 'provable' (file tests/wp_acsl/initialized_memvar.i, line 36):
+Let a = Init_c_0.Init_F2_C_s.
+Let a_1 = Init_c_0.Init_F2_C_a.
+Assume {
+  (* Pre-condition *)
+  Have: ((Init_c_0.Init_F2_C_x)=true) /\ ((a.Init_F1_S_x)=true) /\
+      ((a.Init_F1_S_y)=true) /\
+      (forall i : Z. ((0 <= i) -> ((i <= 9) -> (a_1[i]=true)))).
+}
+Prove: (a_1[4]=true).
 
 ------------------------------------------------------------
 
-Goal Check 'qed_ko' (file tests/wp_acsl/initialized_memvar.i, line 37):
-Prove: false.
+Goal Check 'not_provable' (file tests/wp_acsl/initialized_memvar.i, line 37):
+Let a = Init_c_0.Init_F2_C_s.
+Let a_1 = Init_c_0.Init_F2_C_a.
+Assume {
+  (* Pre-condition *)
+  Have: ((Init_c_0.Init_F2_C_x)=true) /\ ((a.Init_F1_S_x)=true) /\
+      ((a.Init_F1_S_y)=true) /\
+      (forall i : Z. ((0 <= i) -> ((i <= 9) -> (a_1[i]=true)))).
+}
+Prove: (a_1[10]=true).
 
 ------------------------------------------------------------
 
-Goal Check 'qed_ok' (file tests/wp_acsl/initialized_memvar.i, line 38):
-Prove: true.
+Goal Check 'provable' (file tests/wp_acsl/initialized_memvar.i, line 38):
+Let a = Init_c_0.Init_F2_C_s.
+Let a_1 = Init_c_0.Init_F2_C_a.
+Assume {
+  (* Goal *)
+  When: (0 <= i) /\ (i <= 9).
+  (* Pre-condition *)
+  Have: ((Init_c_0.Init_F2_C_x)=true) /\ ((a.Init_F1_S_x)=true) /\
+      ((a.Init_F1_S_y)=true) /\
+      (forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 9) -> (a_1[i_1]=true)))).
+}
+Prove: (a_1[i]=true).
 
 ------------------------------------------------------------
 

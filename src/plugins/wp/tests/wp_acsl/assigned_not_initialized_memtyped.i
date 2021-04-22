@@ -47,7 +47,7 @@ void assigned_glob_comp(void){
   /*@ loop assigns i, *pg_comp, *cg_comp; */
   for(int i = 0; i < 10; ++i){}
   //@ check FAIL: \initialized(pg_comp);
-  //@ check OK: \initialized(cg_comp);
+  //@ check FAIL: \initialized(cg_comp); // struct not initialized by default
 }
 
 int glob_array[10] ;
