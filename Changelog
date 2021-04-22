@@ -17,6 +17,11 @@
 Open Source Release <next-release>
 ##################################
 
+-   Eva       [2021-04-21] Partial support for recursion:
+              new option -eva-unroll-recursive-calls to precisely analyze the n
+              first recursive calls, before using the function specification
+              to interpret the remaining calls.
+              The unsound option -eva-ignore-recursive-calls has been removed.
 -!  RTE       [2021-04-16] -rte-initialized takes a set of functions as
                            parameter (defaults to none)
 -   RTE       [2021-04-16] No more initialization warnings for full structures
