@@ -94,7 +94,7 @@ struct
     | C_float _ -> is_zero_float (M.load sigma obj l)
     | C_pointer _ -> is_zero_ptr (M.load sigma obj l)
     | C_comp { cfields = None } ->
-        Wp_parameters.fatal "0-initialization of an opaque structure"
+        p_true (* cannot say anything interesting here *)
     | C_comp { cfields = Some fields } ->
         p_all
           (fun f -> is_zero sigma (Ctypes.object_of f.ftype) (M.field l f))
