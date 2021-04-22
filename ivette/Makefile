@@ -1,3 +1,25 @@
+##########################################################################
+#                                                                        #
+#  This file is part of Frama-C.                                         #
+#                                                                        #
+#  Copyright (C) 2007-2021                                               #
+#    CEA (Commissariat à l'énergie atomique et aux énergies              #
+#         alternatives)                                                  #
+#                                                                        #
+#  you can redistribute it and/or modify it under the terms of the GNU   #
+#  Lesser General Public License as published by the Free Software       #
+#  Foundation, version 2.1.                                              #
+#                                                                        #
+#  It is distributed in the hope that it will be useful,                 #
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of        #
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         #
+#  GNU Lesser General Public License for more details.                   #
+#                                                                        #
+#  See the GNU Lesser General Public License version 2.1                 #
+#  for more details (enclosed in the file licenses/LGPLv2.1).            #
+#                                                                        #
+##########################################################################
+
 # --------------------------------------------------------------------------
 APP=Ivette
 DOME=./src/dome
@@ -47,6 +69,25 @@ $(LOADER): $(PACKAGES) ./configure.js ./Makefile
 	@chmod -f a-w $(LOADER)
 
 # --------------------------------------------------------------------------
+# --- Frama-C Source Distrib
+# --------------------------------------------------------------------------
+
+SRC_DISTRIB=Makefile.distrib
+SRC_HEADERS=headers/header_spec.txt
+
+update-distrib-files:
+	@echo "Generating $(SRC_DISTRIB)"
+	@rm -f $(SRC_DISTRIB)
+	@rm -f $(SRC_HEADERS)
+	@for f in `git ls-files .` ;\
+	 do \
+		echo "DISTRIB_FILES += \"ivette/$$f\"" >> $(SRC_DISTRIB) ;\
+		headers/register.sh "$$f" >> $(SRC_HEADERS) ; \
+	 done
+	@chmod a-w $(SRC_DISTRIB)
+	@chmod a-w $(SRC_HEADERS)
+
+# --------------------------------------------------------------------------
 # --- Frama-C API
 # --------------------------------------------------------------------------
 
@@ -56,7 +97,11 @@ api:
 	@echo "[Ivette] Generating TypeScript API"
 	@rm -fr src/frama-c/api/generated
 	../bin/frama-c.byte -load-module src/frama-c/api/generator.ml -server-tsc
-	@find src/frama-c/api/generated -name "*.ts" -exec chmod a-w {} \;
+	@find src/frama-c/api/generated -name "*.ts" \
+		-exec headache \
+			-h ../headers/open-source/CEA_LGPL \
+			-c ../headers/headache_config.txt {} \;\
+		-exec chmod a-w {} \;
 
 # --------------------------------------------------------------------------
 # --- Ivette Documentation
