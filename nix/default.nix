@@ -1,9 +1,10 @@
 # paramaterised derivation with dependencies injected (callPackage style)
 { pkgs, stdenv, src ? ../., opam2nix, ocaml ? "ocaml-ng.ocamlPackages_4_08.ocaml", plugins ? { } }:
 
-let opam-selection = {
+let mydir = builtins.getEnv("PWD");
+    opam-selection = {
       inherit ocaml;
-      selection = ./opam-selection.nix;
+      selection = "${mydir}/opam-selection.nix";
     };
     mk_opam_derivations = packages: opam2nix.resolve opam-selection packages;
     opamPackages =
