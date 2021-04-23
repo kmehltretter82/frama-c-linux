@@ -2,18 +2,18 @@
 { pkgs, stdenv, src ? ../., opam2nix, ocaml ? "ocaml-ng.ocamlPackages_4_08.ocaml", plugins ? { } }:
 
 let mydir = builtins.getEnv("PWD");
-    opam-selection = {
+    mk-opam-selection = name: {
       inherit ocaml;
-      selection = "${mydir}/opam-selection.nix";
+      selection = "${mydir}/${name}-${ocaml.version}-opam-selection.nix";
     };
-    mk_opam_derivations = packages: opam2nix.resolve opam-selection packages;
     opamPackages =
       [ "ocamlfind" "zarith" "ocamlgraph" "yojson" "zmq"
         "ppx_deriving" "ppx_deriving_yojson"
         "coq=8.12.0" "alt-ergo=2.2.0" "why3=1.4.0" "why3-coq=1.4.0" ];
 
+    # only pure nix packages. See mk_deriv below for adding opam2nix packages
     mk_buildInputs = { nixPackages ? [] } :
-    [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl pkgs.file pkgs.which pkgs.dos2unix] ++ nixPackages ++ opam2nix.buildInputs opam-selection;
+    [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl pkgs.file pkgs.which pkgs.dos2unix] ++ nixPackages;
     # Extends the call to stdenv.mkDerivation with parameters common for all
     # frama-c derivations
     mk_deriv = args:
@@ -22,20 +22,25 @@ let mydir = builtins.getEnv("PWD");
               opamPackages ++ args.opamPackages
             else opamPackages
           ;
+          opam-selection = mk-opam-selection args.name;
+          buildInputs = args.buildInputs ++ opam2nix.buildInputs opam-selection;
       in
-        stdenv.mkDerivation ({
+        stdenv.mkDerivation (
+          args //
+          {
             # Disable Nix's GCC hardening
             hardeningDisable = [ "all" ];
-        } // args)
+            inherit buildInputs;
+          })
         //
-        { gen-opam-selection = mk_opam_derivations my_opam_packages; }
+        { gen-opam-selection =
+            opam2nix.resolve opam-selection my_opam_packages; }
     ;
 in
 
 pkgs.lib.makeExtensible
 (self: {
-  inherit src mk_buildInputs mk_opam_derivations opamPackages mk_deriv;
-  gen-opam-selection = self.mk_opam_derivations self.opamPackages;
+  inherit src mk_buildInputs opamPackages mk_deriv;
   buildInputs = mk_buildInputs {};
   installed = self.main.out;
   main = mk_deriv {
