@@ -1093,7 +1093,7 @@ end
 
 type toplevel_command =
   { macros: Macros.t;
-    mutable log_files: string list;
+    log_files: string list;
     file : string ;
     nb_files : int ;
     options : string ;
@@ -1172,7 +1172,7 @@ module Cmd : sig
   val log_prefix : toplevel_command -> string
   val oracle_prefix : toplevel_command -> string
 
-  val get_macros : toplevel_command -> string Macros.StringMap.t
+  val expand_macros : toplevel_command -> toplevel_command
 
   (* [basic_command_string cmd] does not redirect the outputs, and does
      not overwrite the result files *)
@@ -1206,7 +1206,7 @@ end = struct
 
   let get_ptest_file cmd = SubDir.make_file cmd.directory cmd.file
 
-  let get_macros cmd =
+  let expand_macros cmd =
     let ptest_config =
       if !special_config = "" then "" else "_" ^ !special_config
     in
@@ -1225,7 +1225,16 @@ end = struct
         "PTEST_NUMBER", string_of_int cmd.n;
       ]
     in
-    Macros.add_list macros cmd.macros
+    let macros = Macros.add_list macros cmd.macros in
+    let process_macros s = Macros.expand macros s in
+    { cmd with
+      macros;
+      log_files = List.map process_macros cmd.log_files;
+      filter =
+        match cmd.filter with
+        | None -> None
+        | Some filter -> Some (process_macros filter)
+    }
 
   let contains_frama_c_binary_name =
     Str.regexp "[^( ]*\\(toplevel\\|viewer\\|frama-c-gui\\|frama-c[^-]\\).*"
@@ -1235,9 +1244,7 @@ end = struct
 
   let basic_command_string =
     fun command ->
-    let macros = get_macros command in
-    let logfiles = List.map (Macros.expand macros) command.log_files in
-    command.log_files <- logfiles;
+    let macros = command.macros in
     let has_ptest_file_t, toplevel =
       Macros.does_expand macros command.toplevel
     in
@@ -1314,9 +1321,7 @@ end = struct
     update_oracle (log_prefix ^ ".res.log") (oracle_prefix ^ ".res.oracle");
     update_oracle (log_prefix ^ ".err.log") (oracle_prefix ^ ".err.oracle");
     (* Update files related to LOG directives *)
-    let macros = get_macros command in
-    let log_files = List.map (Macros.expand macros) command.log_files in
-    List.iter (update_log_files command.directory) log_files
+    List.iter (update_log_files command.directory) command.log_files
 
 end
 
@@ -1435,8 +1440,6 @@ let do_command command =
         ignore (launch basic_command_string)
       end
       else begin
-        (* command string also replaces macros in logfiles names, which
-           is useful for Examine as well. *)
         let command_string = Cmd.command_string command in
         let summary_ret =
           if !behavior <> Examine
@@ -1932,7 +1935,7 @@ let dispatcher () =
         fun {toplevel; opts=options; logs=log_files; macros; exit_code; timeout} ->
           let n = !i in
           incr i;
-          let cmd =
+          Cmd.expand_macros
             { file; options; toplevel; nb_files; directory; n; log_files;
               filter = config.dc_filter; macros;
               exit_code = begin
@@ -1945,12 +1948,6 @@ let dispatcher () =
               execnow=false;
               timeout;
             }
-          in
-          let macros = Cmd.get_macros cmd in
-          match cmd.filter with
-          | None -> cmd
-          | Some filter ->
-            { cmd with filter = Some (Macros.expand macros filter) }
       in
       let nb_files_execnow = List.length config.dc_execnow in
       let make_execnow_cmd =
@@ -1958,29 +1955,29 @@ let dispatcher () =
         fun execnow ->
           let n = !e in
           incr e;
-          let cmd =  {
-            file ;
-            nb_files = nb_files_execnow;
-            log_files = [];
-            options = "";
-            toplevel = execnow.ex_cmd;
-            exit_code = 0;
-            n;
-            directory;
-            filter = None; (* No filter for execnow command *)
-            macros = config.dc_macros;
-            execnow = true;
-            timeout = execnow.ex_timeout;
-          } in
-          let macros = Cmd.get_macros cmd in
-          let process_macros s = Macros.expand macros s in
+          let cmd = Cmd.expand_macros
+              {file ;
+               nb_files = nb_files_execnow;
+               log_files = execnow.ex_log;
+               options = "";
+               toplevel = execnow.ex_cmd;
+               exit_code = 0;
+               n;
+               directory;
+               filter = None; (* No filter for execnow command *)
+               macros = config.dc_macros;
+               execnow = true;
+               timeout = execnow.ex_timeout;
+              }
+          in
+          let process_macros s = Macros.expand cmd.macros s in
           { ex_cmd = Cmd.basic_command_string cmd;
-            ex_log = List.map process_macros execnow.ex_log;
+            ex_log = cmd.log_files;
             ex_bin = List.map process_macros execnow.ex_bin;
             ex_dir = execnow.ex_dir;
             ex_once = execnow.ex_once;
             ex_done = execnow.ex_done;
-            ex_timeout = execnow.ex_timeout;
+            ex_timeout = cmd.timeout;
           }
       in
       let treat_option q cmd =
