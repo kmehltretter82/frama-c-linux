@@ -30,7 +30,7 @@ git-update:
 frama-c:
   stage: build
   script:
-   - nix/frama-ci.sh build -A frama-c.installed
+   - nix/frama-ci.sh build -A frama-c.main
   tags:
    - nix
 
