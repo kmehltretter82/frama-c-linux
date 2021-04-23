@@ -1096,45 +1096,31 @@ struct
     match obj with
     | C_int _ | C_float _ | C_pointer _ ->
         p_bool (access_init (get_init_term sigma x) ofs)
-    | C_array { arr_flat=flat } ->
+    | C_array { arr_flat=flat ; arr_element = te } ->
         let size = match flat with
           | None -> unsized_array ()
-          | Some { arr_size } -> arr_size
-        in
-        initialized_range sigma obj x ofs (e_int 0)(e_int (size-1))
+          | Some { arr_size } -> arr_size in
+        let elt = Ctypes.object_of te in
+        initialized_range sigma elt x ofs (e_int 0) (e_int (size-1))
     | C_comp { cfields = None } ->
         Lang.F.p_equal
           (access_init (get_init_term sigma x) ofs)
           (Cvalues.initialized_obj obj)
     | C_comp { cfields = Some fields } ->
-        let mk_pred f =
-          let obj = Ctypes.object_of f.ftype in
-          let ofs = ofs @ [Field f] in
-          initialized_loc sigma obj x ofs
+        let init_field fd =
+          let obj_fd = Ctypes.object_of fd.ftype in
+          let ofs_fd = ofs @ [Field fd] in
+          initialized_loc sigma obj_fd x ofs_fd
         in
-        Lang.F.p_conj (List.map mk_pred fields)
+        Lang.F.p_conj (List.map init_field fields)
 
-  and initialized_range sigma obj x ofs low up =
-    match obj with
-    | C_array { arr_element=t } ->
-        let v = Lang.freshvar ~basename:"i" Lang.t_int in
-        let hyp = p_and (p_leq low (e_var v)) (p_leq (e_var v) up) in
-        let obj = Ctypes.object_of t in
-        let ofs = ofs @ [ Shift(obj, e_var v) ] in
-        let sub = initialized_loc sigma obj x ofs in
-        Lang.F.p_forall [v] (p_imply hyp sub)
-    | C_comp _ ->
-        let hd = match ofs with
-          | Field f :: _ -> Ctypes.object_of f.ftype
-          | Shift(obj, _) :: _ -> obj
-          | [] -> assert false
-        in
-        begin match hd with
-          | C_array _ -> initialized_range sigma hd x ofs low up
-          | _ -> raise ShiftMismatch
-        end
-    | _ ->
-        raise ShiftMismatch
+  and initialized_range sigma elt x ofs lo up =
+    let i = Lang.freshvar ~basename:"i" Lang.t_int in
+    let vi = e_var i in
+    let ofs = ofs @ [ Shift(elt, vi) ] in
+    let range_i = p_and (p_leq lo vi) (p_leq vi up) in
+    let init_i = initialized_loc sigma elt x ofs in
+    Lang.F.p_forall [i] (p_imply range_i init_i)
 
   let initialized sigma l =
     match l with
@@ -1146,7 +1132,7 @@ struct
               if is_heap_allocated m then
                 M.initialized sigma.mem (Rloc(obj,mloc_of_loc l))
               else if Cvalues.always_initialized x then
-                try valid_offset RW (vobject m x) p
+                try valid_offset RD (vobject m x) p
                 with ShiftMismatch -> shift_mismatch l
               else
                 initialized_loc sigma obj x p
@@ -1169,10 +1155,10 @@ struct
                         let l, a, b = normalize obj ofs in f :: l, a, b
                   in
                   let p, a, b = normalize elt p in
-                  let in_array = valid_range RW (vobject m x) p (elt, a, b) in
+                  let in_array = valid_range RD (vobject m x) p (elt, a, b) in
                   let initialized =
                     if Cvalues.always_initialized x then p_true
-                    else initialized_range sigma (vobject m x) x p a b
+                    else initialized_range sigma elt x p a b
                   in
                   F.p_imply (F.p_leq a b) (p_and in_array initialized)
               with ShiftMismatch ->

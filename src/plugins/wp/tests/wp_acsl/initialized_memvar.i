@@ -1,3 +1,7 @@
+/* run.config_qualif
+   OPT: -wp-auto wp:split
+*/
+
 struct S {
   int x ;
   int y ;
@@ -106,4 +110,38 @@ void locals(void){
 
   c.a[9] = 1 ;
   //@ check qed_ok: \initialized(&c);
+}
+
+struct L {
+  int x ;
+  int f[10] ;
+};
+
+struct H {
+  int x ;
+  struct L l ;
+  struct L al[5];
+};
+
+void complex_struct(void){
+  struct H a;
+  //@ check qed_ok: ! \initialized(&a);
+  //@ check qed_ok: ! \initialized(&a);
+  //@ check qed_ok: ! \initialized(&a.x);
+  //@ check qed_ok: ! \initialized(&a.l);
+  //@ check qed_ok: ! \initialized(&a.l.x);
+  //@ check qed_ok: ! \initialized(&a.l.f);
+  //@ check qed_ok: ! \initialized(&a.l.f[3]);
+  //@ check qed_ok: ! \initialized(&a.l.f[1..6]);
+  //@ check qed_ok: ! \initialized(&a.al);
+  //@ check qed_ok: ! \initialized(&a.al[0]);
+  //@ check qed_ok: ! \initialized(&a.al[0].x);
+  //@ check qed_ok: ! \initialized(&a.al[0].f);
+  //@ check qed_ok: ! \initialized(&a.al[0].f[7]);
+  //@ check qed_ok: ! \initialized(&a.al[0].f[7 .. 9]);
+  //@ check qed_ok: ! \initialized(&a.al[1..3]);
+  //@ check qed_ok: ! \initialized(&a.al[1..3].x);
+  //@ check qed_ok: ! \initialized(&a.al[1..3].f);
+  //@ check qed_ok: ! \initialized(&a.al[1..3].f[7]);
+  //@ check provable: ! \initialized(&a.al[1..3].f[7 .. 9]);
 }
