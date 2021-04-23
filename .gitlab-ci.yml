@@ -31,6 +31,12 @@ frama-c:
   stage: build
   script:
    - nix/frama-ci.sh build -A frama-c.main
+  artifacts:
+    when: on_failure
+    paths:
+      - commits.nix
+      - results.log
+    expire_in: 1 day
   tags:
    - nix
 

@@ -9,4 +9,11 @@ export FRAMA_CI=$(nix-instantiate --eval -E "((import <nixos-20.03> {}).callPack
 FRAMA_CI=${FRAMA_CI#\"}
 FRAMA_CI=${FRAMA_CI%\"}
 
-$FRAMA_CI/compile.sh $@
+PIPE=$(mktemp)
+rm $PIPE
+mkfifo $PIPE
+tee results.log < $PIPE &
+$FRAMA_CI/compile.sh $@ > $PIPE 2>&1
+STATUS=$?
+rm $PIPE
+exit $STATUS
