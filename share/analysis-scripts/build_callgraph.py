@@ -88,8 +88,7 @@ def compute(files):
         for call in calls:
             caller = function_finder.find_caller(defs, call)
             if caller:
-                called = call[0]
-                line = call[1]
+                called, line, _ = call
                 loc = (f, line)
                 if debug:
                     print(f"build_callgraph: {f}:{line}: {caller} -> {called}")

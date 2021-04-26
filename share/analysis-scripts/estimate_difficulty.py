@@ -78,33 +78,37 @@ def get_framac_libc_function_statuses(framac, framac_share):
     spec_only = extract_keys(metrics_json["specified-only-functions"])
     return (defined, spec_only)
 
-include_exp_for_grep = r'\s*#\s*include\s*\("\|<\)\([^">]\+\)\("\|>\)'
-include_exp_for_py = r'\s*#\s*include\s*("|<)([^">]+)("|>)'
-re_include = re.compile(r'^(.*):(.*):' + include_exp_for_py)
+re_include = re.compile(r'\s*#\s*include\s*("|<)([^">]+)("|>)')
+def grep_includes_in_file(file):
+    res = []
+    i = 0
+    with open(file, "r", encoding="utf-8", errors='ignore') as f:
+        for line in f.readlines():
+            i += 1
+            m = re_include.match(line)
+            if m:
+                kind = m.group(1)
+                header = m.group(2)
+                res.append((i,kind,header))
+    return res
+
 def get_includes(files):
     quote_includes = {}
     chevron_includes = {}
-    # adding /dev/null to the list of files ensures 'grep' will display the
-    # file name for each match, even when a single file is given
-    out = subprocess.Popen(["grep", "-n", "^" + include_exp_for_grep] + files + ["/dev/null"],
-                           stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    lines = out.communicate()[0].decode('utf-8').splitlines()
-    for line in lines:
-        m = re_include.match(line)
-        assert m, f"grep found include but not Python: {line}"
-        filename = m.group(1)
-        line = m.group(2)
-        kind = m.group(3)
-        header = m.group(4)
-        if kind == '<':
-            includes = chevron_includes[header] if header in chevron_includes else []
-        else:
-            includes = quote_includes[header] if header in quote_includes else []
-        includes.append((filename, line))
-        if kind == '<':
-            chevron_includes[header] = includes
-        else:
-            chevron_includes[header] = includes
+    for filename in files:
+        for res in grep_includes_in_file(filename):
+            line = res[0]
+            kind = res[1]
+            header = res[2]
+            if kind == '<':
+                includes = chevron_includes[header] if header in chevron_includes else []
+            else:
+                includes = quote_includes[header] if header in quote_includes else []
+            includes.append((filename, line))
+            if kind == '<':
+                chevron_includes[header] = includes
+            else:
+                quote_includes[header] = includes
     return chevron_includes, quote_includes
 
 debug = os.getenv("DEBUG")
@@ -158,48 +162,47 @@ callees = set(callees)
 used_headers = set()
 print(f"Estimating difficulty for {len(callees)} function calls...")
 warnings = 0
+
 for callee in sorted(callees):
+    def callee_status(status, standard, reason):
+        if verbose or debug or status == "warning":
+            print(f"- {status}: {callee} ({standard}) {reason}")
     #print(f"callee: {callee}")
     if callee in posix_identifiers:
         used_headers.add(posix_identifiers[callee]["header"])
     if callee in c11_functions:
-        # check that the callee is not a macro or type (e.g. va_arg)
-        if callee not in posix_identifiers:
-            # a few functions, such as strcpy_s, are in C11 but not in POSIX
+        standard = "C11"
+        # check that the callee is not a macro or type (e.g. va_arg);
+        # a few functions, such as strcpy_s, are in C11 but not in POSIX,
+        # so we must test membership before checking the POSIX type
+        if callee in posix_identifiers and posix_identifiers[callee]["id_type"] != "function":
             continue
-        else:
-            if posix_identifiers[callee]["id_type"] != "function":
-                continue
         #print(f"C11 function: {callee}")
         if callee in libc_specified_functions:
-            if verbose or debug:
-                print(f"- good: {callee} (C11) is specified in Frama-C's libc")
+            callee_status("good", standard, "is specified in Frama-C's libc")
         elif callee in libc_defined_functions:
-            if verbose or debug:
-                print(f"- ok: {callee} (C11) is defined in Frama-C's libc")
+            callee_status("ok", standard, "is defined in Frama-C's libc")
         else:
             # Some functions without specification are actually variadic
             # (and possibly handled by the Variadic plug-in)
-            if "notes" in posix_identifiers[callee] and "variadic-plugin" in posix_identifiers[callee]["notes"]:
-                if verbose or debug:
-                    print(f"- ok: {callee} (C11) is handled by the Variadic plug-in")
+            if callee in posix_identifiers and "notes" in posix_identifiers[callee] and "variadic-plugin" in posix_identifiers[callee]["notes"]:
+                callee_status("ok", standard, "is handled by the Variadic plug-in")
             else:
                 warnings += 1
-                print(f"- warning: {callee} (C11) has neither code nor spec in Frama-C's libc")
+                callee_status("warning", standard, "has neither code nor spec in Frama-C's libc")
     elif callee in posix_identifiers:
+        standard = "POSIX"
         # check that the callee is not a macro or type (e.g. va_arg)
         if posix_identifiers[callee]["id_type"] != "function":
             continue
         #print(f"Non-C11, POSIX function: {callee}")
         if callee in libc_specified_functions:
-            if verbose or debug:
-                print(f"- good: {callee} (POSIX) specified in Frama-C's libc")
+            callee_status("good", standard, "specified in Frama-C's libc")
         elif callee in libc_defined_functions:
-            if verbose or debug:
-                print(f"- ok: {callee} (POSIX) defined in Frama-C's libc")
+            callee_status("ok", standard, "defined in Frama-C's libc")
         else:
             warnings += 1
-            print(f"- warning: {callee} (POSIX) has neither code nor spec in Frama-C's libc")
+            callee_status("warning", standard, "has neither code nor spec in Frama-C's libc")
 print(f"Function-related warnings: {warnings}")
 
 if (verbose or debug) and used_headers:
@@ -218,7 +221,7 @@ def is_local_header(header_dirs, header):
 
 print(f"Estimating difficulty for {len(chevron_includes)} '#include <header>' directives...")
 non_posix_headers = []
-for header in chevron_includes:
+for header in sorted(chevron_includes, key=str.casefold):
     if header in posix_headers:
         fc_support = posix_headers[header]["fc-support"]
         if fc_support == "unsupported":
