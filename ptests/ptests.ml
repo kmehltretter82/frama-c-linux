@@ -847,12 +847,12 @@ end = struct
 
 
   (* how to process options *)
-  let config_exec ~once ~drop:_ ~file:_ dir s current =
+  let config_exec ~once ~file:_ dir s current =
     { current with
       dc_execnow =
         scan_execnow ~once dir current.dc_timeout s :: current.dc_execnow }
 
-  let config_macro ~drop:_ ~file _dir s current =
+  let config_macro ~file _dir s current =
     let regex = Str.regexp "[ \t]*\\([^ \t@]+\\)\\([ \t]+\\(.*\\)\\|$\\)" in
     Mutex.lock str_mutex;
     if Str.string_match regex s 0 then begin
@@ -883,7 +883,7 @@ end = struct
       lock_printf "%%   - Macro %s for -load-module with definition %s@." name def;
     Macros.add_list [name, def] macros
 
-  let add_make_modules ~drop ~file dir deps current =
+  let add_make_modules ~file dir deps current =
     let deps,current = List.fold_left (fun ((deps,curr) as acc) s ->
         if StringSet.mem s curr.dc_cmxs_module then acc
         else
@@ -894,23 +894,23 @@ end = struct
     if String.(deps = "") then current
     else
       let make_cmd = Macros.expand current.dc_macros "@PTEST_MAKE_MODULE@" in
-      config_exec ~once:true ~drop ~file dir (make_cmd ^ " " ^ deps) current
+      config_exec ~once:true ~file dir (make_cmd ^ " " ^ deps) current
 
-  let config_module ~drop ~file dir s current =
+  let config_module ~file dir s current =
     let s = Macros.expand current.dc_macros s in
     let deps = List.map (fun s -> "@PTEST_DIR@/" ^ (Filename.remove_extension s) ^ ".cmxs")
         (str_split_list s)
     in
-    let current = add_make_modules ~drop ~file dir deps current in
+    let current = add_make_modules ~file dir deps current in
     { current with dc_macros = set_load_modules deps current.dc_macros }
 
   let config_options =
     [ "CMD",
-      (fun ~drop:_ ~file:_ _ s current -> { current with dc_default_toplevel = s});
+      (fun ~file:_ _ s current -> { current with dc_default_toplevel = s});
 
       "OPT",
-      (fun ~drop ~file _ s current ->
-         if not (drop || current.dc_framac) then
+      (fun ~file _ s current ->
+         if not (current.dc_framac) then
            lock_eprintf
              "%s: a NOFRAMAC directive has been defined before a sub-test defined by a 'OPT' directive (That NOFRAMAC directive could be misleading.).@."
              file;
@@ -927,8 +927,8 @@ end = struct
            dc_commands = t :: current.dc_commands });
 
       "STDOPT",
-      (fun ~drop ~file _ s current ->
-         if not (drop || current.dc_framac) then
+      (fun ~file _ s current ->
+         if not current.dc_framac then
            lock_eprintf
              "%s: a NOFRAMAC directive has been defined before a sub-test defined by a 'STDOPT' directive (That NOFRAMAC directive could be misleading.).@."
              file;
@@ -947,10 +947,10 @@ end = struct
                         dc_default_log = !default_parsing_env.current_default_log });
 
       "FILEREG",
-      (fun ~drop:_ ~file:_ _ s current -> { current with dc_test_regexp = s });
+      (fun ~file:_ _ s current -> { current with dc_test_regexp = s });
 
       "FILTER",
-      (fun ~drop:_ ~file:_ _ s current ->
+      (fun ~file:_ _ s current ->
          let s = trim_right s in
          match current.dc_filter with
          | None when s="" -> { current with dc_filter = None }
@@ -958,18 +958,18 @@ end = struct
          | Some filter    -> { current with dc_filter = Some (s ^ " | " ^ filter) });
 
       "EXIT",
-      (fun ~drop:_ ~file:_ _ s current -> { current with dc_exit_code = Some s });
+      (fun ~file:_ _ s current -> { current with dc_exit_code = Some s });
 
       "GCC",
-      (fun ~drop ~file _ _ acc ->
-         if not drop then lock_eprintf "%s: GCC directive (DEPRECATED)@." file;
+      (fun ~file _ _ acc ->
+         lock_eprintf "%s: GCC directive (DEPRECATED)@." file;
          acc);
 
       "COMMENT",
-      (fun ~drop:_ ~file:_ _ _ acc -> acc);
+      (fun ~file:_ _ _ acc -> acc);
 
       "DONTRUN",
-      (fun ~drop:_ ~file:_ _ s current -> { current with dc_dont_run = true });
+      (fun ~file:_ _ s current -> { current with dc_dont_run = true });
 
       "EXECNOW", config_exec ~once:true;
       "EXEC", config_exec ~once:false;
@@ -979,14 +979,14 @@ end = struct
       "MODULE", config_module;
 
       "LOG",
-      (fun ~drop:_ ~file:_ _ s current -> { current with dc_default_log = s :: current.dc_default_log });
+      (fun ~file:_ _ s current -> { current with dc_default_log = s :: current.dc_default_log });
 
       "TIMEOUT",
-      (fun ~drop:_ ~file:_ _ s current -> { current with dc_timeout = s });
+      (fun ~file:_ _ s current -> { current with dc_timeout = s });
 
       "NOFRAMAC",
-      (fun ~drop ~file _ _ current ->
-         if not drop && current.dc_commands <> [] && current.dc_framac then
+      (fun ~file _ _ current ->
+         if current.dc_commands <> [] && current.dc_framac then
            lock_eprintf
              "%s: a NOFRAMAC directive has the effect of ignoring previous defined sub-tests (by some 'OPT' or 'STDOPT' directives that seems misleading). @."
              file;
@@ -1004,7 +1004,9 @@ end = struct
         Scanf.sscanf s "%[ *]%[A-Za-z0-9]: %s@\n"
           (fun _ name opt ->
              try
-               r := (List.assoc name config_options) ~drop ~file dir opt !r
+               let directive = List.assoc name config_options in
+               if not drop then
+                 r := directive ~file dir opt !r;
              with Not_found ->
                lock_eprintf "@[%s: unknown configuration option: %s@\n%!@]" file name)
       with
