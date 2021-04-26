@@ -17,7 +17,7 @@
   function memcpy: precondition 'valid_src' got status valid.
 [eva] tests/builtins/memcpy2.c:10: 
   function memcpy: precondition 'separation' got status valid.
-[eva] share/libc/string.h:98: 
+[eva] share/libc/string.h:101: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva] tests/builtins/memcpy2.c:12: 
   Frama_C_dump_each:

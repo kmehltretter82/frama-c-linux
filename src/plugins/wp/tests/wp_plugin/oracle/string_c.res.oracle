@@ -153,7 +153,7 @@ Prove: included(a_2, 1, a, n).
 
 ------------------------------------------------------------
 
-Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 96) in 'memcpy':
+Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 99) in 'memcpy':
 Effect at line 38
 Prove: true.
 
@@ -702,41 +702,41 @@ Prove: included(a_3, 1, a, n).
 
 ------------------------------------------------------------
 
-Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 106) in 'memmove':
+Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 109) in 'memmove':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 106) in 'memmove' (1/7):
+Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 109) in 'memmove' (1/7):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 106) in 'memmove' (2/7):
+Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 109) in 'memmove' (2/7):
 Effect at line 74
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 106) in 'memmove' (3/7):
+Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 109) in 'memmove' (3/7):
 Call Result at line 77
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 106) in 'memmove' (4/7):
+Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 109) in 'memmove' (4/7):
 Effect at line 85
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 106) in 'memmove' (5/7):
+Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 109) in 'memmove' (5/7):
 Effect at line 97
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 106) in 'memmove' (6/7):
+Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 109) in 'memmove' (6/7):
 Effect at line 99
 Let a = shift_sint8(d, 0).
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
@@ -777,7 +777,7 @@ Prove: 0 < n.
 
 ------------------------------------------------------------
 
-Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 106) in 'memmove' (7/7):
+Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 109) in 'memmove' (7/7):
 Effect at line 101
 Prove: true.
 

@@ -20,28 +20,7 @@
 /*                                                                        */
 /**************************************************************************/
 
-#include "locale.h"
-#include "limits.h"
-__PUSH_FC_STDLIB
-struct lconv __C_locale = {(char*)".",(char*)"",(char*)"",(char*)"",(char*)"",
-                           (char*)"",(char*)"",(char*)"",(char*)"",(char*)"",
-                           CHAR_MAX,CHAR_MAX,CHAR_MAX,CHAR_MAX,CHAR_MAX,
-                           CHAR_MAX,CHAR_MAX,CHAR_MAX,CHAR_MAX,CHAR_MAX,
-                           CHAR_MAX,CHAR_MAX,CHAR_MAX,CHAR_MAX};
+#include "in.h"
 
-struct lconv *__frama_c_locale=&__C_locale;
-
-const char *__frama_c_locale_names[512] = {"C"};
-char *setlocale(int category, const char *locale) {
-  if (*locale == 'C') 
-    { __frama_c_locale = &__C_locale;
-      return (char*)__frama_c_locale_names[0];
-    };
-  return NULL;
-}
-
-struct lconv *localeconv(void) {
-  return __frama_c_locale;
-}
-
-__POP_FC_STDLIB
+const struct in6_addr in6addr_any=IN6ADDR_ANY_INIT;
+const struct in6_addr in6addr_loopback=IN6ADDR_LOOPBACK_INIT;

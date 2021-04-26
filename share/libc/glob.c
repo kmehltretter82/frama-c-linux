@@ -71,7 +71,7 @@ int glob(const char *pattern, int flags,
   for (size_t i = 0; i < reserve_offs; i++) pglob->gl_pathv[i] = 0;
 
   for (size_t i = 0; i < pglob->gl_pathc; i++) {
-    pglob->gl_pathv[reserve_offs + prev_len + i] = "glob result";
+    pglob->gl_pathv[reserve_offs + prev_len + i] = (char*)"glob result";
   }
   pglob->gl_pathv[prev_len + reserve_offs + pglob->gl_pathc] = 0; // terminator
   if (Frama_C_nondet(0, 1)) { // simulate "no error"

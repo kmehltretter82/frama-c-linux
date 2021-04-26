@@ -31,6 +31,7 @@
 #include "locale.c"
 #include "math.c"
 #include "netdb.c"
+#include "netinet/in.c"
 #include "signal.c"
 #include "stdio.c"
 #include "stdlib.c"

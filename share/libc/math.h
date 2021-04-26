@@ -1532,13 +1532,13 @@ extern int __finite(double d);
   ensures result_is_infinity: \is_plus_infinity(\result);
   assigns \result \from \nothing;
   @*/
-extern const float __fc_infinity(int x);
+extern float __fc_infinity(int x);
 
 /*@
   ensures result_is_nan: \is_NaN(\result);
   assigns \result \from \nothing;
   @*/
-extern const float __fc_nan(int x);
+extern float __fc_nan(int x);
 
 
 #define INFINITY __fc_infinity(0)

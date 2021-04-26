@@ -152,7 +152,7 @@
 [eva] tests/builtins/memchr.c:193: Call to builtin memset
 [eva] tests/builtins/memchr.c:193: 
   function memset: precondition 'valid_s' got status valid.
-[eva] share/libc/string.h:118: 
+[eva] share/libc/string.h:121: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] Recording results for init_array_nondet
 [eva] Done for function init_array_nondet

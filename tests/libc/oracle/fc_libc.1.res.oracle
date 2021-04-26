@@ -2740,7 +2740,7 @@ struct lconv __C_locale =
    .int_p_sign_posn = (char)127,
    .int_n_sign_posn = (char)127};
 struct lconv *__frama_c_locale = & __C_locale;
-char *__frama_c_locale_names[512] = {(char *)"C"};
+char const *__frama_c_locale_names[512] = {"C"};
 /*@ requires
       locale_null_or_valid_string:
         locale ≡ \null ∨ valid_read_string(locale);
@@ -2757,7 +2757,7 @@ char *setlocale(int category, char const *locale)
   char *__retres;
   if ((int)*locale == 'C') {
     __frama_c_locale = & __C_locale;
-    __retres = __frama_c_locale_names[0];
+    __retres = (char *)__frama_c_locale_names[0];
     goto return_label;
   }
   __retres = (char *)0;
@@ -3580,8 +3580,7 @@ extern int killpg(pid_t pgrp, int sig);
 extern ssize_t readv(int fd, struct iovec const *iov, int iovcnt);
 
 /*@ ghost struct __fc_sockfds_type __fc_sockfds[1024]; */
-/*@ ghost extern int __fc_socket_counter __attribute__((__FRAMA_C_MODEL__));
-*/
+/*@ ghost extern int __fc_socket_counter; */
 
 /*@ ghost int volatile __fc_open_sock_fds; */
 /*@ requires valid_sockfd: 0 ≤ sockfd < 1024;
@@ -3885,24 +3884,10 @@ extern int socket(int domain, int type, int protocol);
  */
 extern int socketpair(int domain, int type, int protocol, int sv[2]);
 
-struct in6_addr const in6addr_any = {.s6_addr = {(unsigned char)0}};
-struct in6_addr const in6addr_loopback =
-  {.s6_addr = {(unsigned char)0xFF,
-               (unsigned char)0xFF,
-               (unsigned char)0xFF,
-               (unsigned char)0xFF,
-               (unsigned char)0xFF,
-               (unsigned char)0xFF,
-               (unsigned char)0xFF,
-               (unsigned char)0xFF,
-               (unsigned char)0xFF,
-               (unsigned char)0xFF,
-               (unsigned char)0xFF,
-               (unsigned char)0xFF,
-               (unsigned char)0xFF,
-               (unsigned char)0xFF,
-               (unsigned char)0xFF,
-               (unsigned char)0xFF}};
+struct in6_addr const in6addr_any;
+
+struct in6_addr const in6addr_loopback;
+
 /*@ assigns \result;
     assigns \result \from arg; */
 extern uint32_t htonl(uint32_t arg);
@@ -3957,7 +3942,7 @@ int h_errno;
  */
 extern void freeaddrinfo(struct addrinfo *addrinfo);
 
-char *__fc_gai_strerror = (char *)"<error message reported by gai_strerror>";
+char const *__fc_gai_strerror = "<error message reported by gai_strerror>";
 /*@ ensures result_string: \result ≡ __fc_gai_strerror;
     ensures result_valid_string: valid_read_string(\result);
     assigns \result;
@@ -3994,6 +3979,8 @@ predicate valid_read_or_empty{L}(void *s, size_t n) =
 int memcmp(void const *s1, void const *s2, size_t n);
 
 void *memchr(void const *s, int c, size_t n);
+
+void *memrchr(void const *s, int c, size_t n);
 
 void *memcpy(void * restrict dest, void const * restrict src, size_t n);
 
@@ -4412,7 +4399,12 @@ int getaddrinfo(char const * restrict nodename,
       ai->ai_protocol = Frama_C_interval(0,IPPROTO_MAX);
       ai->ai_addrlen = sizeof(*sa);
       ai->ai_addr = sa;
-      ai->ai_canonname = (char *)"dummy";
+      ai->ai_canonname = (char *)malloc((unsigned int)6);
+      if (! ai->ai_canonname) {
+        __retres = -10;
+        goto return_label;
+      }
+      strcpy(ai->ai_canonname,"dummy");
       ai->ai_next = (struct addrinfo *)0;
       *res = ai;
       __retres = 0;
@@ -4423,8 +4415,8 @@ int getaddrinfo(char const * restrict nodename,
 }
 
 struct __fc_gethostbyname __fc_ghbn;
-int res_search(char const *dname, int class, int type, char *answer,
-               int anslen)
+static int res_search(char const *dname, int rec_class, int type,
+                      char *answer, int anslen)
 {
   int tmp;
   {
@@ -4475,8 +4467,10 @@ struct hostent *gethostbyname(char const *name)
           __retres = & __fc_ghbn.host;
           goto return_label;
         }
-        if ((int)*cp < '0') 
-          if ((int)*cp > '9') 
+        if ((int)*cp < '0') break;
+        else 
+          if ((int)*cp > '9') break;
+          else 
             if ((int)*cp != '.') break;
         cp ++;
       }
@@ -4510,6 +4504,24 @@ struct hostent *gethostbyname(char const *name)
   return_label: return __retres;
 }
 
+struct in6_addr const in6addr_any = {.s6_addr = {(unsigned char)0}};
+struct in6_addr const in6addr_loopback =
+  {.s6_addr = {(unsigned char)0,
+               (unsigned char)0,
+               (unsigned char)0,
+               (unsigned char)0,
+               (unsigned char)0,
+               (unsigned char)0,
+               (unsigned char)0,
+               (unsigned char)0,
+               (unsigned char)0,
+               (unsigned char)0,
+               (unsigned char)0,
+               (unsigned char)0,
+               (unsigned char)0,
+               (unsigned char)0,
+               (unsigned char)0,
+               (unsigned char)1}};
 FILE *__fc_stderr;
 
 FILE *__fc_stdin;
@@ -5294,7 +5306,8 @@ int putenv(char *string)
 {
   int __retres;
   int tmp_3;
-  char *separator = strchr((char const *)string,'=');
+  char *separator __attribute__((__unused__)) =
+    strchr((char const *)string,'=');
   /*@ assert string_contains_separator: separator ≢ \null; */ ;
   /*@ assert name_is_not_empty: separator ≢ string; */ ;
   __fc_initenv();
@@ -6205,7 +6218,7 @@ char *strstr(char const *haystack, char const *needle)
   return_label: return __retres;
 }
 
-static int __fc_strerror_init;
+static int strerror___fc_strerror_init;
 /*@ ensures result_internal_str: \result ≡ __fc_p_strerror;
     ensures result_nul_terminated: *(\result + 63) ≡ 0;
     ensures result_valid_string: valid_read_string(\result);
@@ -6215,10 +6228,10 @@ static int __fc_strerror_init;
 char *strerror(int errnum)
 {
   char *__retres;
-  if (! __fc_strerror_init) {
+  if (! strerror___fc_strerror_init) {
     Frama_C_make_unknown(__fc_strerror,(unsigned int)63);
     __fc_strerror[63] = (char)0;
-    __fc_strerror_init = 1;
+    strerror___fc_strerror_init = 1;
   }
   __retres = __fc_strerror;
   return __retres;
@@ -6319,7 +6332,7 @@ char *strndup(char const *s, size_t n)
   return_label: return __retres;
 }
 
-static int __fc_strsignal_init;
+static int strsignal___fc_strsignal_init;
 /*@ ensures result_internal_str: \result ≡ __fc_p_strsignal;
     ensures result_nul_terminated: *(\result + 63) ≡ 0;
     ensures result_valid_string: valid_read_string(\result);
@@ -6329,10 +6342,10 @@ static int __fc_strsignal_init;
 char *strsignal(int signum)
 {
   char *__retres;
-  if (! __fc_strsignal_init) {
+  if (! strsignal___fc_strsignal_init) {
     Frama_C_make_unknown(__fc_strsignal,(unsigned int)63);
     __fc_strsignal[63] = (char)0;
-    __fc_strsignal_init = 1;
+    strsignal___fc_strsignal_init = 1;
   }
   __retres = __fc_strsignal;
   return __retres;

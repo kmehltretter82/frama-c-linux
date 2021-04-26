@@ -408,7 +408,7 @@ void *__gen_e_acsl_memset(void *s, int c, size_t n)
   __retres = memset(s,c,n);
   __e_acsl_assert(__retres == __gen_e_acsl_at,1,"Postcondition","memset",
                   "result_ptr: \\result == \\old(s)",
-                  "FRAMAC_SHARE/libc/string.h",119);
+                  "FRAMAC_SHARE/libc/string.h",122);
   __e_acsl_delete_block((void *)(& s));
   return __retres;
 }
@@ -487,7 +487,7 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
     */
     __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","memcpy",
                     "separated_guard: \\valid_read((char *)dest + (0 .. n - 1))",
-                    "FRAMAC_SHARE/libc/string.h",95);
+                    "FRAMAC_SHARE/libc/string.h",98);
     __gen_e_acsl__4 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_add));
     __gen_e_acsl_size_2 = 1UL * __gen_e_acsl__4;
     if (__gen_e_acsl_size_2 <= 0UL) __gen_e_acsl_if_2 = 0UL;
@@ -502,7 +502,7 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
     */
     __e_acsl_assert(__gen_e_acsl_valid_read_2,1,"RTE","memcpy",
                     "separated_guard: \\valid_read((char *)src + (0 .. n - 1))",
-                    "FRAMAC_SHARE/libc/string.h",95);
+                    "FRAMAC_SHARE/libc/string.h",98);
     __gen_e_acsl__5 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_add));
     __gen_e_acsl_size_3 = 1UL * __gen_e_acsl__5;
     if (__gen_e_acsl_size_3 <= 0UL) __gen_e_acsl_if_3 = 0UL;
@@ -518,7 +518,7 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
                                                 __gen_e_acsl_if_4);
     __e_acsl_assert(__gen_e_acsl_separated,1,"Precondition","memcpy",
                     "separation:\n  \\separated((char *)dest + (0 .. n - 1), (char *)src + (0 .. n - 1))",
-                    "FRAMAC_SHARE/libc/string.h",95);
+                    "FRAMAC_SHARE/libc/string.h",98);
     __e_acsl_temporal_reset_parameters();
     __e_acsl_temporal_reset_return();
     __e_acsl_temporal_save_nreferent_parameter((void *)(& dest),0U);
@@ -535,7 +535,7 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
   __retres = memcpy(dest,src,n);
   __e_acsl_assert(__retres == __gen_e_acsl_at,1,"Postcondition","memcpy",
                   "result_ptr: \\result == \\old(dest)",
-                  "FRAMAC_SHARE/libc/string.h",99);
+                  "FRAMAC_SHARE/libc/string.h",102);
   __e_acsl_delete_block((void *)(& src));
   __e_acsl_delete_block((void *)(& dest));
   return __retres;

@@ -87,6 +87,9 @@ extern int memcmp (const void *s1, const void *s2, size_t n);
   @*/
 extern void *memchr(const void *s, int c, size_t n);
 
+// Non-POSIX; GNU extension
+extern void *memrchr(const void *s, int c, size_t n);
+
 // Copy memory
 
 /*@ requires valid_dest: valid_or_empty(dest, n);

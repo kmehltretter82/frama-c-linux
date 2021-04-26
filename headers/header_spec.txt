@@ -252,6 +252,7 @@ share/libc/n1362.pdf: .ignore
 share/libc/net/if.h: CEA_LGPL
 share/libc/netdb.c: CEA_LGPL
 share/libc/netdb.h: CEA_LGPL
+share/libc/netinet/in.c: CEA_LGPL
 share/libc/netinet/in.h: CEA_LGPL
 share/libc/netinet/ip.h: CEA_LGPL
 share/libc/netinet/tcp.h: CEA_LGPL
