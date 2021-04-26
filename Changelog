@@ -17,6 +17,8 @@
 Open Source Release <next-release>
 ##################################
 
+-*  Kernel    [2021-04-26] Do not crash on _Alignof(void): accept or properly
+              reject, depending on machdep. Fixes pub/frama-c#2551
 -   Eva       [2021-04-21] Partial support for recursion:
               new option -eva-unroll-recursive-calls to precisely analyze the n
               first recursive calls, before using the function specification
