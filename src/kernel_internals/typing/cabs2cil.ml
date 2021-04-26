@@ -1338,10 +1338,10 @@ let canDropStatement (s: stmt) : bool =
 
 let fail_if_incompatible_sizeof ~ensure_complete op typ =
   if Cil.isFunctionType typ && Cil.theMachine.theMachine.sizeof_fun < 0 then
-    Kernel.error ~current:true "%s called on function" op;
+    Kernel.error ~current:true "%s called on function only allowed for GCC" op;
   let is_void = Cil.isVoidType typ in
   if is_void && Cil.theMachine.theMachine.sizeof_void < 0 then
-    Kernel.error ~current:true "%s on void type" op;
+    Kernel.error ~current:true "%s on void type only allowed for GCC/MSVC" op;
   if ensure_complete && not (Cil.isCompleteType typ) && not is_void then
     Kernel.error ~current:true
       "%s on incomplete type '%a'" op Cil_printer.pp_typ typ
