@@ -35,7 +35,7 @@ const char *__frama_c_locale_names[512] = {"C"};
 char *setlocale(int category, const char *locale) {
   if (*locale == 'C') 
     { __frama_c_locale = &__C_locale;
-      return __frama_c_locale_names[0];
+      return (char*)__frama_c_locale_names[0];
     };
   return NULL;
 }

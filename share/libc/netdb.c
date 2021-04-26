@@ -69,7 +69,9 @@ int getaddrinfo(
       ai -> ai_protocol = Frama_C_interval(0,IPPROTO_MAX);
       ai -> ai_addrlen = sizeof(*sa) ;
       ai -> ai_addr = sa ;
-      ai -> ai_canonname = (char*)"dummy" ;
+      ai -> ai_canonname = malloc(6);
+      if (!ai -> ai_canonname) return EAI_MEMORY;
+      strcpy(ai -> ai_canonname, "dummy");
       ai -> ai_next = NULL;
       *res = ai;
       return 0;

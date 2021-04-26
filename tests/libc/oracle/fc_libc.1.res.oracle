@@ -2740,7 +2740,7 @@ struct lconv __C_locale =
    .int_p_sign_posn = (char)127,
    .int_n_sign_posn = (char)127};
 struct lconv *__frama_c_locale = & __C_locale;
-char *__frama_c_locale_names[512] = {(char *)"C"};
+char const *__frama_c_locale_names[512] = {"C"};
 /*@ requires
       locale_null_or_valid_string:
         locale ≡ \null ∨ valid_read_string(locale);
@@ -2757,7 +2757,7 @@ char *setlocale(int category, char const *locale)
   char *__retres;
   if ((int)*locale == 'C') {
     __frama_c_locale = & __C_locale;
-    __retres = __frama_c_locale_names[0];
+    __retres = (char *)__frama_c_locale_names[0];
     goto return_label;
   }
   __retres = (char *)0;
@@ -4399,7 +4399,12 @@ int getaddrinfo(char const * restrict nodename,
       ai->ai_protocol = Frama_C_interval(0,IPPROTO_MAX);
       ai->ai_addrlen = sizeof(*sa);
       ai->ai_addr = sa;
-      ai->ai_canonname = (char *)"dummy";
+      ai->ai_canonname = (char *)malloc((unsigned int)6);
+      if (! ai->ai_canonname) {
+        __retres = -10;
+        goto return_label;
+      }
+      strcpy(ai->ai_canonname,"dummy");
       ai->ai_next = (struct addrinfo *)0;
       *res = ai;
       __retres = 0;
