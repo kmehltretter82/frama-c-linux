@@ -121,6 +121,14 @@ CFP:
   tags:
    - nix
 
+eva-tests:
+  stage: tests
+  script:
+   - nix/frama-ci.sh build -A frama-c.eva-tests
+  tags:
+   - nix
+  allow_failure: true
+
 build-distrib-tarball:
   stage: build
   script:

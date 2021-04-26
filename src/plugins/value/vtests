@@ -1,9 +1,12 @@
 #!/bin/bash -eu
 
-DEFAULT_TESTS=(float value idct builtins)
-CONFIGS=(apron equality bitwise symblocs gauges octagon)
-
-ARGS=("${@-}")
+if [ -z ${TARGETS+x} ]; then
+    TARGETS="float value idct builtins"
+fi
+if [ -z ${CONFIGS+x} ]; then
+    CONFIGS="apron equality bitwise symblocs gauges octagon"
+fi
+ARGS="${@-}"
 
 # has_target returns 0 if at least one of the arguments is a target
 # (i.e. not an option such as "-j 8"). If so, do not run tests
@@ -15,7 +18,7 @@ function has_target() {
     for f in $@; do
         __re="\\b$f\\b" # match argument as whole word
         if [[ "$f" =~ \.[ci]$ || \
-            ( "$f" =~ ^[A-Za-z] && "${DEFAULT_TESTS[@]}" =~ $__re ) ]]; then
+            ( "$f" =~ ^[A-Za-z] && "${TARGETS[@]}" =~ $__re ) ]]; then
             __has_target=0
         fi
     done
@@ -24,15 +27,15 @@ function has_target() {
 
 
 if has_target ${ARGS[@]}; then
-    TESTS=("${ARGS[@]}")
+    TARGETS="${ARGS[@]}"
 else
-    TESTS="${DEFAULT_TESTS[@]} ${ARGS[@]}"
+    TARGETS="${TARGETS[@]} ${ARGS[@]}"
 fi
 
-echo Testing ${TESTS[@]}
-
-for A in ${CONFIGS[@]}
+echo "CONFIGS: ${CONFIGS[@]}"
+echo "Testing: ${TARGETS[@]}"
+for config in ${CONFIGS[@]}
 do
-    echo $A
-    ./bin/ptests.opt -config $A ${TESTS[@]}
+    echo $config
+    ./bin/ptests.opt -error-code -config $config ${TARGETS[@]}
 done
