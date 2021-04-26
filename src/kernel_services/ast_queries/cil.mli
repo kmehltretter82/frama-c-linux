@@ -2183,7 +2183,8 @@ val sizeOf: loc:location -> typ -> exp
 
 (** The minimum alignment (in bytes) for a type. This function is
  * architecture dependent, so you should only call this after you call
- * {!Cil.initCIL}. *)
+ * {!Cil.initCIL}.
+ * Raises {!SizeOfError} when it cannot compute the alignment. *)
 val bytesAlignOf: typ -> int
 
 (** [intOfAttrparam a] tries to const-fold [a] into a numeric value.

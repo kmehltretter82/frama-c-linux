@@ -4051,7 +4051,11 @@ let rec bytesAlignOf t =
     | TFun _ when not (msvcMode ()) ->
       theMachine.theMachine.alignof_fun
     | TFun _ as t -> raise (SizeOfError ("Undefined sizeof on a function.", t))
-    | TVoid _ as t -> raise (SizeOfError ("Undefined sizeof(void).", t))
+    | TVoid _ as t ->
+      if theMachine.theMachine.sizeof_void > 0 then
+        theMachine.theMachine.sizeof_void
+      else
+        raise (SizeOfError ("Undefined sizeof(void).", t))
   in
   process_aligned_attribute ~may_reduce:false
     (fun fmt -> !pp_typ_ref fmt t)
@@ -4409,7 +4413,11 @@ and bitsSizeOf t =
              sz' (*WAS: addTrailing sz' (8 * bytesAlignOf t)*)
            | _ -> raise (SizeOfError ("Array with non-constant length.", t))
          end)
-  | TVoid _ -> 8 * theMachine.theMachine.sizeof_void
+  | TVoid _ ->
+    if theMachine.theMachine.sizeof_void >= 0 then
+      8 * theMachine.theMachine.sizeof_void
+    else
+      raise (SizeOfError ("Undefined sizeof(void).", t))
   | TFun _ ->
     if theMachine.theMachine.sizeof_fun >= 0 then
       8 * theMachine.theMachine.sizeof_fun
@@ -4545,7 +4553,10 @@ and constFold (machdep: bool) (e: exp) : exp =
   | SizeOfStr s when machdep ->
     kinteger ~loc theMachine.kindOfSizeOf (1 + String.length s)
   | AlignOf t when machdep ->
-    kinteger ~loc theMachine.kindOfSizeOf (bytesAlignOf t)
+    begin
+      try kinteger ~loc theMachine.kindOfSizeOf (bytesAlignOf t)
+      with SizeOfError _ -> e
+    end
   | AlignOfE e when machdep -> begin
       (* The alignment of an expression is not always the alignment of its
        * type. I know that for strings this is not true *)
@@ -5223,7 +5234,11 @@ let rec constFoldTermNodeAtTop = function
     (try integer_lconstant (bytesSizeOf typ)
      with SizeOfError _ -> t)
   | TSizeOfStr str -> integer_lconstant (String.length str + 1)
-  | TAlignOf typ -> integer_lconstant (bytesAlignOf typ)
+  | TAlignOf typ as t ->
+    begin
+      try integer_lconstant (bytesAlignOf typ)
+      with SizeOfError _ -> t
+    end
   | TSizeOfE { term_type= Ctype typ } -> constFoldTermNodeAtTop (TSizeOf typ)
   | TAlignOfE { term_type= Ctype typ }
     -> 	constFoldTermNodeAtTop (TAlignOf typ)

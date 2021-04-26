@@ -272,7 +272,7 @@ let print_machdep fmt (m : Cil_types.mach) =
         "double", m.sizeof_double, m.alignof_double ;
         "long double", m.sizeof_longdouble, m.alignof_longdouble ;
         "pointer", m.sizeof_ptr, m.alignof_ptr ;
-        "void", m.sizeof_void, 1 ;
+        "void", m.sizeof_void, m.sizeof_void ;
         "function", m.sizeof_fun, m.alignof_fun ;
       ] ;
     List.iter

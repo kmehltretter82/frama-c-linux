@@ -7,7 +7,7 @@ Machine: gcc 4.0.3 AMD64
    sizeof      double =  8 (64 bits, aligned on 64 bits)
    sizeof long double = 16 (128 bits, aligned on 128 bits)
    sizeof     pointer =  8 (64 bits, aligned on 64 bits)
-   sizeof        void =  1 (8 bits, aligned on 8 bits)
+   sizeof        void = error (alignof error)
    sizeof    function = error (alignof error)
    typeof   sizeof(T) = unsigned long
    typeof     wchar_t = int

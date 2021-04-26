@@ -349,13 +349,15 @@ let is_aligned_by b alignment =
   if Int.is_zero alignment
   then false
   else
-    match b with
-    | Var (v,_) | Allocated(v,_,_) ->
-      Int.is_zero (Int.e_rem (Int.of_int (Cil.bytesAlignOf v.vtype)) alignment)
-    | CLogic_Var (_, ty, _) ->
-      Int.is_zero (Int.e_rem (Int.of_int (Cil.bytesAlignOf ty)) alignment)
-    | Null -> true
-    | String _ -> Int.is_one alignment
+    try
+      match b with
+      | Var (v,_) | Allocated(v,_,_) ->
+        Int.is_zero (Int.e_rem (Int.of_int (Cil.bytesAlignOf v.vtype)) alignment)
+      | CLogic_Var (_, ty, _) ->
+        Int.is_zero (Int.e_rem (Int.of_int (Cil.bytesAlignOf ty)) alignment)
+      | Null -> true
+      | String _ -> Int.is_one alignment
+    with Cil.SizeOfError _ -> false
 
 let is_any_formal_or_local v =
   match v with
