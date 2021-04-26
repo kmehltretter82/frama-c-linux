@@ -5459,9 +5459,24 @@ and makeCompType ghost (isstruct: bool)
                  "Base type for bitfield is not an integer type");
             match isIntegerConstant ghost w with
             | None ->
-              Kernel.fatal ~current:true
-                "bitfield width is not an integer constant"
+              Kernel.error ~current:true
+                "bitfield width is not an integer constant";
+              (* error  does not immediately stop execution.
+                 Hence, we return a placeholder here.
+              *)
+              Some 0, ftype
             | Some s as w ->
+              begin
+                try
+                  if s > Cil.bitsSizeOf ftype then
+                    Kernel.error ~current:true
+                      "bitfield width (%d) exceeds its type (%a, %d bits)"
+                      s Cil_printer.pp_typ ftype (Cil.bitsSizeOf ftype)
+                with
+                  SizeOfError _ ->
+                  Kernel.fatal ~current:true
+                    "Unable to compute size of %a" Cil_printer.pp_typ ftype
+              end;
               let ftype =
                 typeAddAttributes
                   [Attr (bitfield_attribute_name, [AInt (Integer.of_int s)])]
