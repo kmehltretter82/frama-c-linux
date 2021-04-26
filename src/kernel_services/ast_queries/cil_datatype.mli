@@ -319,6 +319,8 @@ module Toplevel_predicate: S_with_pretty with type t = toplevel_predicate
 module Identified_predicate:
   S_with_collections_pretty with type t = identified_predicate
 (** @since Neon-20140301 *)
+module PredicateStructEq: S_with_collections_pretty with type t = predicate
+(** @since Frama-C+dev *)
 
 (**************************************************************************)
 (** {3 Logic_ptree}
