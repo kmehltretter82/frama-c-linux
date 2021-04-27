@@ -251,12 +251,15 @@ function fill_wiki {
 function add_install_page {
     INSTALL_WEBPAGE=html/installations/$FRAMAC_VERSION_CODENAME_LOWER.md
     INSTALL_WEBPAGE_PATH=$WEBSITE_DIR/$INSTALL_WEBPAGE
+    EXT="$FRAMAC_VERSION_CODENAME (released on $(date +%Y-%m-%d))"
     echo "---" > $INSTALL_WEBPAGE_PATH
-    echo "layout: doc_page" >> $INSTALL_WEBPAGE_PATH
+    echo "layout: installation_page" >> $INSTALL_WEBPAGE_PATH
+    echo "version: $FRAMAC_VERSION_CODENAME_LOWER" >> $INSTALL_WEBPAGE_PATH
     echo "title: Installation instructions for $FRAMAC_VERSION_CODENAME" >> $INSTALL_WEBPAGE_PATH
     echo "---" >> $INSTALL_WEBPAGE_PATH
     echo >> $INSTALL_WEBPAGE_PATH
-    cat ./INSTALL.md >> $INSTALL_WEBPAGE_PATH
+    cat ./INSTALL.md |\
+    sed -e "s/^\(# Installing Frama-C\)$/\1 $EXT/" >> $INSTALL_WEBPAGE_PATH
 
     run "git -C $WEBSITE_DIR add $INSTALL_WEBPAGE"
 }
