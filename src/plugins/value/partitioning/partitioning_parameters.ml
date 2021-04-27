@@ -27,7 +27,8 @@ open Cil_types
 let is_return s = match s.skind with Return _ -> true | _ -> false
 let is_loop s =   match s.skind with Loop _ -> true | _ -> false
 
-let warn ?(current = true) = Kernel.warning ~once:true ~current
+let warn ?(current = true) =
+  Kernel.warning ~wkey:Kernel.wkey_annot_error ~once:true ~current
 
 module Make (Kf : sig val kf: kernel_function end) =
 struct
@@ -98,11 +99,12 @@ struct
           try
             Partition.ExpLimit (term_to_exp t)
           with Db.Properties.Interp.No_conversion ->
-            warn "loop unrolling parameters must be valid expressions";
+            warn "loop unrolling parameters must be valid expressions; \
+                  ignoring";
             default
       end
     | _ ->
-      warn "ignoring invalid unroll annotation";
+      warn "invalid unroll annotation; ignoring";
       default
 
   let history_size = HistoryPartitioning.get ()
@@ -117,7 +119,7 @@ struct
         Partition.Split (Cil.evar vi, Partition.Dynamic, monitor) :: l
       with Not_found ->
         warn ~current:false "cannot find the global variable %s for value \
-                             partitioning" name;
+                             partitioning; ignoring" name;
         l
     in
     ValuePartitioning.fold add []
@@ -135,7 +137,7 @@ struct
         action :: acc
       with
         Db.Properties.Interp.No_conversion ->
-        warn "split/merge expressions must be valid expressions";
+        warn "split/merge expressions must be valid expressions; ignoring";
         acc (* Impossible to convert term to lval *)
     in
     List.fold_left map_annot [] (get_flow_annot stmt)
