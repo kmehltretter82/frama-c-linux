@@ -258,7 +258,7 @@ handling of the CWE by \FramaC, as one of the following:
   \CWE{123}: Write-what-where Condition & Handled & -\\
   \CWE{124}: Buffer Underwrite & Handled & -\\
   \CWE{126}: Buffer Overread & Handled & -\\
-  \CWE{126}: Buffer Underread & Handled & -\\
+  \CWE{127}: Buffer Underread & Handled & -\\
   \CWE{134}: Use of Externally-Controlled Format String & Annotations & Requires annotating which format strings come from external sources\\
   \CWE{176}: Improper Handling of Unicode Encoding & Annotations & Requires annotating Unicode-related functions and variables\\
   \CWE{188}: Reliance on Data Memory Layout & Partially Handled & \FramaC memory model handles some kinds of invalid accesses\\
@@ -286,7 +286,7 @@ handling of the CWE by \FramaC, as one of the following:
   \CWE{327}: Use of a Broken or Risky Cryptographic Algorithm & Annotations & Requires annotating which algorithms are ``broken or risky''\\
   \CWE{328}: Reversible One-Way Hash & Annotations & Requires annotating hash-related functions and variables\\
   \CWE{338}: Use of Cryptographically Weak Pseudo-Random Number Generator (PRNG) & Annotations & Requires annotating PRNG-related functions and variables\\
-  \CWE{364}: Signal Handler Race Condition & Not Handled & Some situations can be handled by the Mthread plugin\\
+  \CWE{364}: Signal Handler Race Condition & Not Handled & -\\
   \CWE{366}: Race Condition Within Thread & Not Handled & Some situations can be handled by the Mthread plugin\\
   \CWE{367}: TOC TOU & Not Handled & -\\
   \CWE{369}: Divide by Zero & Handled & -\\
@@ -326,7 +326,7 @@ handling of the CWE by \FramaC, as one of the following:
   \CWE{563}: Unused Variable & Syntactic & Mostly syntactic in nature; compilers often warn about it\\
   \CWE{570}: Expression Always False & Syntactic & Mostly syntactic in nature; compilers often warn about it\\
   \CWE{571}: Expression Always True & Syntactic & Mostly syntactic in nature; compilers often warn about it\\
-  \CWE{587}: Assignment of Fixed Address to Pointer & Handled Indirectly & Detected at the point of usage; option \texttt{-absolute-valid-range} changes its behavior\\
+  \CWE{587}: Assignment of Fixed Address to Pointer & Handled Indirectly & Detected via \texttt{-warn-invalid-pointer} at the assignment, otherwise indirectly at the point of usage; option \texttt{-absolute-valid-range} changes its behavior\\
   \CWE{588}: Attempt to Access Child of a Non-structure Pointer & Partially Handled & \FramaC emits warnings for certain types of incompatible casts\\
   \CWE{590}: Free Memory Not on Heap & Handled & -\\
   \CWE{591}: Sensitive Data Storage in Improperly Locked Memory & Not Handled & -\\
@@ -345,9 +345,9 @@ handling of the CWE by \FramaC, as one of the following:
   \CWE{680}: Integer Overflow to Buffer Overflow & Handled & -\\
   \CWE{681}: Incorrect Conversion Between Numeric Types & Partially Handled & See note about {\em Numerical Conversions}\\
   \CWE{685}: Function Call With Incorrect Number of Arguments & Partially Handled & The Variadic plugin handles most cases related to variadic function calls\\
-  \CWE{688}: Function Call With Incorrect Variable or Reference as Argument\\
+  \CWE{688}: Function Call With Incorrect Variable or Reference as Argument & Partially Handled & Some cases are related to variadic functions (e.g. \texttt{printf}) and detected by the Variadic plugin\\
   \CWE{690}: Unchecked Return Value to NULL Pointer Dereference & Handled & For functions related to dynamically allocated memory, toggled via option \texttt{-eva-alloc-returns-null}\\
-  \CWE{758}: Undefined Behavior & Too Vague; Partially Handled & The C language has too many undefined behaviors, but Frama-C does handle several of them\\
+  \CWE{758}: Undefined Behavior & Partially Handled & The C language has too many undefined behaviors, but Frama-C does handle several of them\\
   \CWE{761}: Free Pointer Not at Start of Buffer & Handled & -\\
   \CWE{762}: Mismatched Memory Management Routines & Annotations & Requires annotating memory management functions and objects\\
   \CWE{773}: Missing Reference to Active File Descriptor or Handle & Annotations & Requires annotating resources and operations on them\\
