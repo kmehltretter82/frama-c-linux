@@ -3918,7 +3918,7 @@ let optConstFoldBinOp loc machdep bop e1 e2 t =
 let integral_cast ty t =
   raise
     (Failure
-       (Format.asprintf "term %a has type %a, but %a is expected."
+       (Format.asprintf "term %a has type %a, but %a is expected"
           Cil_printer.pp_term t Cil_printer.pp_logic_type Linteger Cil_printer.pp_typ ty))
 
 (* Exception raised by the instance of Logic_typing local to this module.
