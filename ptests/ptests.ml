@@ -614,50 +614,47 @@ struct
 
   let empty = StringMap.empty
 
-  let macro_regex = Str.regexp "\\([^@]*\\)@\\([^@]*\\)@\\(.*\\)"
-
   let print_macros macros =
     lock_printf "%% Macros (%d):@."  (StringMap.cardinal macros);
     StringMap.iter (fun key data -> lock_printf "%% - %s -> %s@." key data) macros;
     lock_printf "%% End macros@."
 
-  let does_expand macros s =
-    if !verbosity >=4 then print_macros macros;
-    let rec aux n (ptest_file_matched,s as acc) =
-      if Str.string_match macro_regex s n then begin
-        let macro = Str.matched_group 2 s in
-        let ptest_file_matched = ptest_file_matched || macro = "PTEST_FILE" in
-        let start = Str.matched_group 1 s in
-        let rest = Str.matched_group 3 s in
-        let new_n = Str.group_end 1 in
-        let n, new_s =
-          if macro = "" then begin
-            new_n + 1, String.sub s 0 new_n ^ "@" ^ rest
-          end else begin
-            try
-              if !verbosity >= 4 then lock_printf "%%     - macro is %s\n%!" macro;
-              let replacement =  find macro macros in
-              if !verbosity >= 3 then
-                lock_printf "%%     - replacement for %s is %s\n%!" macro replacement;
-              new_n,
-              String.sub s 0 n ^ start ^ replacement ^ rest
-            with
-            | Not_found -> Str.group_end 2 + 1, s
-          end
+  let does_expand =
+    let macro_regex = Str.regexp "@\\([-A-Za-z_0-9]+\\)@" in
+    fun macros s ->
+      let has_ptest_file = ref false in
+      if !verbosity >= 3 then lock_printf "%% Expand: %s@." s;
+      if !verbosity >= 4 then print_macros macros;
+      let rec aux s =
+        let expand_macro = function
+          | Str.Text s -> s
+          | Str.Delim s ->
+            if Str.string_match macro_regex s 0 then begin
+              let macro = Str.matched_group 1 s in
+              try
+                if !verbosity >= 4 then lock_printf "%%     - macro is %s\n%!" macro;
+                let replacement = find macro macros in
+                if String.(macro = "PTEST_FILE") then has_ptest_file := true;
+                if !verbosity >= 3 then
+                  lock_printf "%%     - replacement for %s is %s\n%!" macro replacement;
+                aux replacement
+              with
+              | Not_found -> s
+            end
+            else s
         in
-        if !verbosity >= 4 then lock_printf "%%    - New string is %s\n%!" new_s;
-        let new_acc = ptest_file_matched, new_s in
-        if n <= String.length new_s then aux n new_acc else new_acc
-      end else acc
-    in
-    Mutex.lock str_mutex;
-    try
-      let res = aux 0 (false,s) in
-      Mutex.unlock str_mutex; res
-    with e ->
-      lock_eprintf "Uncaught exception %s\n%!" (Printexc.to_string e);
-      Mutex.unlock str_mutex;
-      raise e
+        String.concat "" (List.map expand_macro (Str.full_split macro_regex s))
+      in
+      try
+        Mutex.lock str_mutex;
+        let r = aux s in
+        Mutex.unlock str_mutex;
+        if !verbosity >= 3 then lock_printf "%% Expansion result: %s@." r;
+        !has_ptest_file, r
+      with e ->
+        lock_eprintf "Uncaught exception %s\n%!" (Printexc.to_string e);
+        Mutex.unlock str_mutex;
+        raise e
 
   let expand macros s =
     snd (does_expand macros s)
