@@ -1043,6 +1043,11 @@ val parseInt: string -> Integer.t
 val parseIntExp: loc:location -> string -> exp
 val parseIntLogic: loc:location -> string -> term
 
+(** Like [parseIntExp], but returns [None] in case of failure.
+    @since Frama-C+dev
+*)
+val parseIntExp_opt: loc:location -> string -> exp option
+
 (** Convert a string representing a C integer literal to an expression.
     Handles the prefixes 0x and 0 and the suffixes L, U, UL, LL, ULL *)
 

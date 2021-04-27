@@ -3198,6 +3198,9 @@ let isLogicNull t =
       | _ -> false
    in aux t)
 
+exception ParseIntError of string
+
+(* Raises [ParseIntError] if cannot parse. *)
 let parseIntAux (str:string) =
   let hasSuffix str =
     let l = String.length str in
@@ -3257,7 +3260,8 @@ let parseIntAux (str:string) =
       else if  ch >= 'A' && ch <= 'F'  then
         doAcc (Integer.of_int (10 + Char.code ch - Char.code 'A'))
       else
-        Kernel.fatal ~current:true "Invalid integer constant: %s" str
+        raise (ParseIntError
+                 (Format.asprintf "Invalid integer constant: %s" str))
   in
   let i =
     if octalhexbin && l >= 2 then
@@ -3273,24 +3277,47 @@ let parseIntAux (str:string) =
   in
   i,kinds
 
-let parseInt s = fst (parseIntAux s)
+let parseInt s =
+  try
+    fst (parseIntAux s)
+  with ParseIntError msg ->
+    Kernel.fatal ~current:true "%s" msg
 
 let parseIntLogic ~loc str =
-  let i,_= parseIntAux str in
-  { term_node = TConst (Integer (i,Some str)) ; term_loc = loc;
-    term_name = []; term_type = Linteger;}
+  try
+    let i,_= parseIntAux str in
+    { term_node = TConst (Integer (i,Some str)) ; term_loc = loc;
+      term_name = []; term_type = Linteger;}
+  with ParseIntError msg ->
+    Kernel.fatal ~current:true "%s" msg
 
 let parseIntExp ~loc repr =
-  let i,kinds = parseIntAux repr in
-  let rec loop = function
-    | k::rest ->
-      if fitsInInt k i then (* i fits in the current type. *)
-        kinteger64 ~loc ~repr ~kind:k i
-      else loop rest
-    | [] ->
-      Kernel.fatal ~source:(fst loc) "Cannot represent the integer %s" repr
-  in
-  loop kinds
+  try
+    let i,kinds = parseIntAux repr in
+    let rec loop = function
+      | k::rest ->
+        if fitsInInt k i then (* i fits in the current type. *)
+          kinteger64 ~loc ~repr ~kind:k i
+        else loop rest
+      | [] ->
+        Kernel.fatal ~source:(fst loc) "Cannot represent the integer %s" repr
+    in
+    loop kinds
+  with ParseIntError msg ->
+    Kernel.fatal ~current:true "%s" msg
+
+let parseIntExp_opt ~loc repr =
+  try
+    let i,kinds = parseIntAux repr in
+    let rec loop = function
+      | k::rest ->
+        if fitsInInt k i then (* i fits in the current type. *)
+          Some (kinteger64 ~loc ~repr ~kind:k i)
+        else loop rest
+      | [] -> None
+    in
+    loop kinds
+  with ParseIntError _ -> None
 
 let mkStmtCfg ~before ~(new_stmtkind:stmtkind) ~(ref_stmt:stmt) : stmt =
   let new_ = { skind = new_stmtkind;
