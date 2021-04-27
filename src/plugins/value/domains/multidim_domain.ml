@@ -521,20 +521,13 @@ struct
     match assign with
     | None -> remove state location
     | Some ((Frees _ | Allocates _), _) -> state
-    | Some (Assigns (_it, from), pre_state) ->
-      match from with
-      | FromAny | From (_ :: _) -> remove state location
-      | From [] ->
-        let _env = {
-          Abstract_domain.states = begin function
-            | Cil_types.(BuiltinLabel (Pre | Here)) -> pre_state
-            | _ -> assert false
-          end;
-          Abstract_domain.result = None
-        } in
-        (* let _dst,_typ = Location.of_term env it.it_content in *)
+    | Some (Assigns (_dest, sources), _pre_state) ->
+      match sources with
+      | [] ->
         let dst = Location.of_precise_loc location in
         initialize dst Memory_map.Numerical state
+      | _ ->
+        remove state location
 
   let evaluate_predicate _ _ _ = Alarmset.Unknown
 
