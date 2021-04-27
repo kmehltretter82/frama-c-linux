@@ -932,11 +932,12 @@ end = struct
          let new_top =
            List.map
              (fun command ->
-                { command with opts= make_custom_opts command.opts s;
-                               logs= command.logs @ current.dc_default_log;
-                               macros= current.dc_macros;
-                               exit_code = current.dc_exit_code;
-                               timeout= current.dc_timeout
+                { toplevel = current.dc_default_toplevel;
+                  opts= make_custom_opts command.opts s;
+                  logs= command.logs @ current.dc_default_log;
+                  macros= current.dc_macros;
+                  exit_code = current.dc_exit_code;
+                  timeout= current.dc_timeout
                 })
              !default_parsing_env.current_default_cmds
          in
