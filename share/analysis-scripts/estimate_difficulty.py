@@ -80,26 +80,21 @@ def get_framac_libc_function_statuses(framac, framac_share):
 
 re_include = re.compile(r'\s*#\s*include\s*("|<)([^">]+)("|>)')
 def grep_includes_in_file(file):
-    res = []
-    i = 0
     with open(file, "r", encoding="utf-8", errors='ignore') as f:
+        i = 0
         for line in f.readlines():
             i += 1
             m = re_include.match(line)
             if m:
                 kind = m.group(1)
                 header = m.group(2)
-                res.append((i,kind,header))
-    return res
+                yield((i,kind,header))
 
 def get_includes(files):
     quote_includes = {}
     chevron_includes = {}
     for filename in files:
-        for res in grep_includes_in_file(filename):
-            line = res[0]
-            kind = res[1]
-            header = res[2]
+        for line, kind, header in grep_includes_in_file(filename):
             if kind == '<':
                 includes = chevron_includes[header] if header in chevron_includes else []
             else:
@@ -165,6 +160,9 @@ warnings = 0
 
 for callee in sorted(callees):
     def callee_status(status, standard, reason):
+        global warnings
+        if status == "warning":
+            warnings += 1
         if verbose or debug or status == "warning":
             print(f"- {status}: {callee} ({standard}) {reason}")
     #print(f"callee: {callee}")
@@ -188,7 +186,6 @@ for callee in sorted(callees):
             if callee in posix_identifiers and "notes" in posix_identifiers[callee] and "variadic-plugin" in posix_identifiers[callee]["notes"]:
                 callee_status("ok", standard, "is handled by the Variadic plug-in")
             else:
-                warnings += 1
                 callee_status("warning", standard, "has neither code nor spec in Frama-C's libc")
     elif callee in posix_identifiers:
         standard = "POSIX"
@@ -201,7 +198,6 @@ for callee in sorted(callees):
         elif callee in libc_defined_functions:
             callee_status("ok", standard, "defined in Frama-C's libc")
         else:
-            warnings += 1
             callee_status("warning", standard, "has neither code nor spec in Frama-C's libc")
 print(f"Function-related warnings: {warnings}")
 
