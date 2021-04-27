@@ -490,7 +490,7 @@ function create_website_branch {
             run "git -C $WEBSITE_DIR checkout master"
             exit 1
     esac
-    run "git -C $WEBSITE_DIR commit -m \"Prepare pages for the release of Frama-C $FRAMAC_VERSION\""
+    run "git -C $WEBSITE_DIR commit -m \"$FRAMAC_VERSION_AND_CODENAME release\""
 }
 
 function commit_wiki {
@@ -505,7 +505,7 @@ function commit_wiki {
             echo "Abort wiki update."
             exit 1
     esac
-    run "git -C $WIKI_DIR commit -m \"Prepare pages for the release of Frama-C $FRAMAC_VERSION\""
+    run "git -C $WIKI_DIR commit -m \"$FRAMAC_VERSION_AND_CODENAME release\""
 }
 
 
@@ -523,10 +523,10 @@ function last_step_validation {
     This step will:
 
       - ask for a validation of the changes to website
-      - create a NEW branch on for the website
+      - create a NEW local branch for the website
 
       - ask for a validation of the changes to wiki
-      - commit changes to the wiki MASTER branch
+      - commit changes to the wiki MASTER local branch
 
     If you want to perform some additional checks it is probably time to stop.
 
@@ -799,7 +799,6 @@ case "${STEP}" in
         echo "Bad entry: ${STEP}"
         echo "Exiting without doing anything.";
         exit 31
-        ;;
 esac
 
 exit 0
