@@ -315,7 +315,8 @@ let fold_left_handle_error_with_args f (env, acc) l =
 
 (** Insert requires check for the default behavior of the given contract in the
     environment. *)
-let check_default_requires kf kinstr env contract =
+let check_default_requires kf env contract =
+  let kinstr = Env.get_kinstr env in
   let default_behavior =
     Cil.find_default_behavior contract.spec
   in
@@ -337,10 +338,11 @@ let check_default_requires kf kinstr env contract =
 
 (** Insert requires check for the behaviors other than the default behavior of
     the given contract in the environment *)
-let check_other_requires kf kinstr env contract =
+let check_other_requires kf env contract =
   let get_or_create_assumes_var =
     mk_get_or_create_var kf Cil.intType "assumes_value"
   in
+  let kinstr = Env.get_kinstr env in
   let do_behavior env b =
     if Cil.is_default_behavior b then
       env
@@ -440,7 +442,8 @@ type translate_ppt =
 (** For each set of behavior names in [clauses], [check_active_behaviors] counts
     the number of active behaviors and creates assertions for the
     [ppt_to_translate]. *)
-let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf kinstr env contract clauses =
+let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf env contract clauses =
+  let kinstr = Env.get_kinstr env in
   let loc = contract.location in
   Cil.CurrentLoc.set loc;
   let do_clause env bhvrs =
@@ -563,7 +566,7 @@ let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf kinstr env co
 
 (** Insert complete and disjoint behaviors check for the given contract in the
     environement *)
-let check_complete_and_disjoint kf kinstr env contract =
+let check_complete_and_disjoint kf env contract =
   (* Only translate the complete and disjoint clauses if all the assumes clauses
      could be translated *)
   if contract.all_assumes_translated then
@@ -611,7 +614,6 @@ let check_complete_and_disjoint kf kinstr env contract =
         ~ppt_to_translate
         ~get_or_create_var
         kf
-        kinstr
         env
         contract
         bhvrs
@@ -630,10 +632,11 @@ let check_complete_and_disjoint kf kinstr env contract =
   end
 
 (** Insert ensures check for the given contract in the environement *)
-let check_post_conds kf kinstr env contract =
+let check_post_conds kf env contract =
   let get_or_create_assumes_var =
     mk_get_or_create_var kf Cil.intType "assumes_value"
   in
+  let kinstr = Env.get_kinstr env in
   let do_behavior env b =
     let env =
       Env.handle_error
@@ -763,14 +766,14 @@ let check_post_conds kf kinstr env contract =
     env
     contract.spec.spec_behavior
 
-let translate_preconditions kf kinstr env contract =
+let translate_preconditions kf env contract =
   let env = Env.set_annotation_kind env Smart_stmt.Precondition in
   let env = Env.push_contract env contract in
   let env = init kf env contract in
   (* Start with translating the requires predicate of the default behavior. *)
   let env =
     Env.handle_error
-      (fun env -> check_default_requires kf kinstr env contract)
+      (fun env -> check_default_requires kf env contract)
       env
   in
   (* Then setup the assumes clauses of the contract. *)
@@ -778,17 +781,17 @@ let translate_preconditions kf kinstr env contract =
   (* And finally translate the requires predicates of the rest of the behaviors,
      skipping over the default behavior. *)
   let do_it env =
-    let env = check_other_requires kf kinstr env contract in
-    let env = check_complete_and_disjoint kf kinstr env contract in
+    let env = check_other_requires kf env contract in
+    let env = check_complete_and_disjoint kf env contract in
     env
   in
   Env.handle_error do_it env
 
-let translate_postconditions kf kinstr env =
+let translate_postconditions kf env =
   let env = Env.set_annotation_kind env Smart_stmt.Postcondition in
   let contract, env = Env.pop_and_get_contract env in
   let do_it env =
-    let env = check_post_conds kf kinstr env contract in
+    let env = check_post_conds kf env contract in
     env
   in
   let env = Env.handle_error do_it env in

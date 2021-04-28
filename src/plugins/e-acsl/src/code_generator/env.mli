@@ -175,22 +175,6 @@ val set_rte: t -> bool -> t
 val generate_rte: t -> bool
 (** Returns the current value of RTE generation for the given environment *)
 
-val with_rte: f:(t -> t) -> t -> bool -> t
-(** [with_rte ~f env x] executes the given closure with RTE generation set to x,
-    and reset RTE generation to its original value afterwards.
-    This function does not handle exceptions at all. The user must handle them
-    either directly in the [f] closure or around the call to the function. *)
-
-val with_rte_and_result: f:(t -> 'a * t) -> t -> bool -> 'a * t
-(** [with_rte_and_result ~f env x] executes the given closure with RTE
-    generation set to x, and reset RTE generation to its original value
-    afterwards. [f] is a closure that takes an environment an returns a pair
-    where the first member is an arbitrary value and the second member is the
-    environment. The function will return the first member of the returned pair
-    of the closure along with the updated environment.
-    This function does not handle exceptions at all. The user must handle them
-    either directly in the [f] closure or around the call to the function. *)
-
 module Local_vars: sig
   val push_new: t -> t
   val add: t -> Typing.number_ty -> t
@@ -242,6 +226,31 @@ val pop_and_get_contract: t -> contract * t
 (** Pop and return the top contract of the environment's stack *)
 val pop_contract: t -> t
 (** Pop the top contract of the environment's stack *)
+
+(* ************************************************************************** *)
+(** {2 Utilities} *)
+(* ************************************************************************** *)
+
+val with_params: ?rte:bool -> ?kinstr:kinstr -> f:(t -> t) -> t -> t
+(** [with_params ~rte ~kinstr ~f env] executes the given closure with the given
+    environment after having set RTE generation to [rte] and current kinstr to
+    [kinstr].
+    [f] is a closure that takes an environment and returns an environment.
+    The environment returned by the closure is updated to restore the RTE
+    generation and kinstr attributes to the values of the original environment,
+    then is returned. *)
+
+val with_params_and_result:
+  ?rte:bool -> ?kinstr:kinstr -> f:(t -> 'a * t) -> t -> 'a * t
+(** [with_params_and_result ~rte ~kinstr ~f env] executes the given closure with
+    the given environment after having set RTE generation to [rte] and current
+    kinstr to [kinstr].
+    [f] is a closure that takes an environment and returns a pair where the
+    first member is an arbitrary value and the second member is the environment.
+    The environment returned by the closure is updated to restore the RTE
+    generation and kinstr attributes to the values of the original environment,
+    then the function returns the arbitrary value returned by the closure along
+    with the updated environment. *)
 
 val pretty: Format.formatter -> t -> unit
 

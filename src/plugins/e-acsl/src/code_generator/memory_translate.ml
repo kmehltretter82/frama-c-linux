@@ -144,10 +144,12 @@ let call ~adata ~loc kf name ctx env t =
   assert (name = "base_addr" || name = "block_length"
           || name = "offset" || name ="freeable");
   let (e, adata), env =
-    Env.with_rte_and_result env true
+    Env.with_params_and_result
+      ~rte:true
       ~f:(fun env ->
           let e, adata, env = !term_to_exp_ref ~adata kf env t in
           (e, adata), env)
+      env
   in
   let e, env =
     Env.rtl_call_to_new_var
@@ -219,10 +221,12 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
     ~lenv:(Env.Local_vars.get env)
     ptr;
   let (ptr, adata), env =
-    Env.with_rte_and_result env true
+    Env.with_params_and_result
+      ~rte:true
       ~f:(fun env ->
           let e, adata, env = !term_to_exp_ref ~adata kf env ptr in
           (e, adata), env)
+      env
   in
   (* size *)
   let size_term =
@@ -296,10 +300,12 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
    [p] is the predicate under test. *)
 let term_to_ptr_and_size ~adata ~loc kf env t =
   let (e, adata), env =
-    Env.with_rte_and_result env true
+    Env.with_params_and_result
+      ~rte:true
       ~f:(fun env ->
           let e, adata, env = !term_to_exp_ref ~adata kf env t in
           (e, adata), env)
+      env
   in
   let ty = Misc.cty t.term_type in
   let sizeof = Smart_exp.ptr_sizeof ~loc ty in

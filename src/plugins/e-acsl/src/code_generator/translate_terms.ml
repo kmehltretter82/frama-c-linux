@@ -641,7 +641,8 @@ and context_insensitive_term_to_exp ~adata kf env t =
     (* t1 || t2 <==> if t1 then true else t2 *)
     let e, adata, env =
       Extlib.flatten
-        (Env.with_rte_and_result env true
+        (Env.with_params_and_result
+           ~rte:true
            ~f:(fun env ->
                let e1, adata, env1 = to_exp ~adata kf env t1 in
                let env' = Env.push env1 in
@@ -653,14 +654,16 @@ and context_insensitive_term_to_exp ~adata kf env t =
                  adata
                  (Translate_utils.conditional_to_exp
                     ~name:"or" ~loc kf (Some t) e1 (Cil.one loc, env') res2)
-             ))
+             )
+           env)
     in
     e, adata, env, Typed_number.C_number, ""
   | TBinOp(LAnd, t1, t2) ->
     (* t1 && t2 <==> if t1 then t2 else false *)
     let e, adata, env =
       Extlib.flatten
-        (Env.with_rte_and_result env true
+        (Env.with_params_and_result
+           ~rte:true
            ~f:(fun env ->
                let e1, adata, env1 = to_exp ~adata kf env t1 in
                let e2, adata, env2 =
@@ -672,7 +675,8 @@ and context_insensitive_term_to_exp ~adata kf env t =
                  adata
                  (Translate_utils.conditional_to_exp
                     ~name:"and" ~loc kf (Some t) e1 res2 (Cil.zero loc, env3))
-             ))
+             )
+           env)
     in
     e, adata, env, Typed_number.C_number, ""
   | TBinOp((BOr | BXor | BAnd) as bop, t1, t2) ->
@@ -770,7 +774,8 @@ and context_insensitive_term_to_exp ~adata kf env t =
   | Tif(t1, t2, t3) ->
     let e, adata, env =
       Extlib.flatten
-        (Env.with_rte_and_result env true
+        (Env.with_params_and_result
+           ~rte:true
            ~f:(fun env ->
                let e1, adata, env1 = to_exp ~adata kf env t1 in
                let e2, adata, env2 =
@@ -790,7 +795,8 @@ and context_insensitive_term_to_exp ~adata kf env t =
                     e1
                     res2
                     res3)
-             ))
+             )
+           env)
     in
     e, adata, env, Typed_number.C_number, ""
   | Tat(t, BuiltinLabel Here) ->
@@ -873,7 +879,8 @@ and to_exp ~adata kf env t =
     (Env.Local_vars.get env);
   let t = Logic_normalizer.get_term t in
   Extlib.flatten
-    (Env.with_rte_and_result env false
+    (Env.with_params_and_result
+       ~rte:false
        ~f:(fun env ->
            let e, adata, env, sty, name =
              context_insensitive_term_to_exp ~adata kf env t
@@ -894,7 +901,8 @@ and to_exp ~adata kf env t =
                 sty
                 (Some t)
                 e)
-         ))
+         )
+       env)
 
 let () =
   Translate_utils.term_to_exp_ref := to_exp;

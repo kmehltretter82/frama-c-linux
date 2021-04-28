@@ -32,8 +32,8 @@ val create: loc:location -> spec -> t
 (** Create a contract from a [spec] object (either function spec or statement
     spec) *)
 
-val translate_preconditions: kernel_function -> kinstr -> Env.t -> t -> Env.t
+val translate_preconditions: kernel_function -> Env.t -> t -> Env.t
 (** Translate the preconditions of the given contract into the environement *)
 
-val translate_postconditions: kernel_function -> kinstr -> Env.t -> Env.t
+val translate_postconditions: kernel_function -> Env.t -> Env.t
 (** Translate the postconditions of the given contract into the environment *)

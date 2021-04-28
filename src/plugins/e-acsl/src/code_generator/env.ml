@@ -171,20 +171,6 @@ let generate_rte env =
   let local_env, _ = top env in
   local_env.rte
 
-let with_rte ~f env rte_value =
-  let old_rte_value = generate_rte env in
-  let env = set_rte env rte_value in
-  let env = f env in
-  let env = set_rte env old_rte_value in
-  env
-
-let with_rte_and_result ~f env rte_value =
-  let old_rte_value = generate_rte env in
-  let env = set_rte env rte_value in
-  let other, env = f env in
-  let env = set_rte env old_rte_value in
-  other, env
-
 (* ************************************************************************** *)
 (** {2 Kinstr} *)
 (* ************************************************************************** *)
@@ -605,6 +591,41 @@ let pop_contract env =
   let _, env = pop_and_get_contract env in
   env
 
+(* ************************************************************************** *)
+(** {2 Utilities} *)
+(* ************************************************************************** *)
+
+let with_params_and_result ?rte ?kinstr ~f env =
+  let old_rte, env =
+    match rte with
+    | Some rte ->
+      Some (generate_rte env), set_rte env rte
+    | None -> None, env
+  in
+  let old_kinstr, env =
+    match kinstr with
+    | Some kinstr ->
+      Some (get_kinstr env), set_kinstr env kinstr
+    | None -> None, env
+  in
+  let other, env = f env in
+  let env =
+    match old_kinstr with
+    | Some kinstr -> set_kinstr env kinstr
+    | None -> env
+  in
+  let env =
+    match old_rte with
+    | Some rte -> set_rte env rte
+    | None -> env
+  in
+  other, env
+
+let with_params ?rte ?kinstr ~f env =
+  let (), env =
+    with_params_and_result ?rte ?kinstr ~f:(fun env -> (), f env) env
+  in
+  env
 
 (* debugging purpose *)
 let pretty fmt env =

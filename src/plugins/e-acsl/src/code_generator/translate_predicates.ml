@@ -100,7 +100,8 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
   | Pand(p1, p2) ->
     (* p1 && p2 <==> if p1 then p2 else false *)
     Extlib.flatten
-      (Env.with_rte_and_result env true
+      (Env.with_params_and_result
+         ~rte:true
          ~f:(fun env ->
              let e1, adata, env1 = to_exp ~adata kf env p1 in
              let e2, adata, env2 =
@@ -118,11 +119,13 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
                   e1
                   res2
                   (Cil.zero loc, env3))
-           ))
+           )
+         env)
   | Por(p1, p2) ->
     (* p1 || p2 <==> if p1 then true else p2 *)
     Extlib.flatten
-      (Env.with_rte_and_result env true
+      (Env.with_params_and_result
+         ~rte:true
          ~f:(fun env ->
              let e1, adata, env1 = to_exp ~adata kf env p1 in
              let env' = Env.push env1 in
@@ -141,7 +144,8 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
                   e1
                   (Cil.one loc, env')
                   res2)
-           ))
+           )
+         env)
   | Pxor _ -> Env.not_yet env "xor"
   | Pimplies(p1, p2) ->
     (* (p1 ==> p2) <==> !p1 || p2 *)
@@ -166,7 +170,8 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
     Smart_exp.lnot ~loc e, adata, env
   | Pif(t, p2, p3) ->
     Extlib.flatten
-      (Env.with_rte_and_result env true
+      (Env.with_params_and_result
+         ~rte:true
          ~f:(fun env ->
              let e1, adata, env1 = Translate_terms.to_exp ~adata kf env t in
              let e2, adata, env2 =
@@ -179,7 +184,8 @@ let rec predicate_content_to_exp ~adata ?name kf env p =
              Extlib.nest
                adata
                (Translate_utils.conditional_to_exp ~loc kf None e1 res2 res3)
-           ))
+           )
+         env)
   | Plet(li, p) ->
     let lvs = Lvs_let(li.l_var_info, Misc.term_of_li li) in
     let env = Env.Logic_scope.extend env lvs in
@@ -304,7 +310,8 @@ and to_exp ~adata ?name kf ?rte env p =
   | PoT_pred p ->
     let rte = match rte with None -> Env.generate_rte env | Some b -> b in
     Extlib.flatten
-      (Env.with_rte_and_result env false
+      (Env.with_params_and_result
+         ~rte:false
          ~f:(fun env ->
              let e, adata, env =
                predicate_content_to_exp ~adata ?name kf env p
@@ -326,7 +333,8 @@ and to_exp ~adata ?name kf ?rte env p =
                   Typed_number.C_number
                   None
                   e)
-           ))
+           )
+         env)
 
 let generalized_untyped_to_exp ~adata ?name kf ?rte env p =
   (* If [rte] is true, it means we're translating the root predicate of an

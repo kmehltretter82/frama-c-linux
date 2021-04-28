@@ -268,7 +268,7 @@ let add_new_block_in_stmt env kf stmt =
           let env = mk_post_env env stmt in
           (* also handle the postcondition of the function and clear the
              env *)
-          Translate_annots.post_funspec kf Kglobal env
+          Translate_annots.post_funspec kf env
         else
           env
       in
@@ -451,6 +451,7 @@ and inject_in_stmt env kf stmt =
     | Loop _ -> Env.push_loop env
     | _ -> env
   in
+  let env = Env.set_kinstr env (Kstmt stmt) in
   (* initial environment *)
   let env =
     if Kernel_function.is_first_stmt kf stmt then
@@ -466,7 +467,7 @@ and inject_in_stmt env kf stmt =
       (* translate the precondition of the function *)
       if Functions.check kf then
         let funspec = Annotations.funspec kf in
-        Translate_annots.pre_funspec kf Kglobal env funspec
+        Translate_annots.pre_funspec kf env funspec
       else env
     else
       env
