@@ -1,42 +1,44 @@
-# Installation
+# Dependencies
 
 Required package to be installed:
-- `yarn` for node and node pakage management;
+- `yarn` for node pakage management;
 - `pandoc` for generating the documentation;
 
-# Emacs Configuration
+# Installation
 
-Emacs mode configuration can be setup with Typescript, Web-mode and Tide packages.
-You can install them with `M-x package-install`:
-
-```
-M-x package-refresh-contents ;; updates your index
-M-x package-install web-mode
-M-x package-install typescript-mode
-M-x package-install tidse
-```
-
-For configuring your `.emacs` accordingly,
-please look at the `share/typescript-config.el` file.
-It setup the Tide package to work with
-`typescript-mode` for `*.ts` files (see also `tsfmt.json` config file)
-and `web-mode` for `*.tsx` files.
-
-Usefull commands:
+From the `Frama-C` main directory, simply type:
 
 ```
-M-. goto definition
-M-, back to previous point
-M-x tide-documentation-at-point
-M-x tide-error-at-point
+$ make -C ivette dist
 ```
 
-# VS Code
+If this is the first time you compile `ivette`, this might take some time to download
+all the necessary packages and Electron binaries from the web.
 
-VS Code has native support for Typescript (and JavaScript, of course), in terms
-of code navigation, syntax highlighting and formatting, compiler errors and
-warnings. The same holds for React development.
+Once finished, the Ivette application is available in `ivette/dist/<platform>` directory.
 
-Useful extensions:
-- `ESlint` provides support for lint errors and warnings;
-- `ES7 React/Redux/GraphQL/React-Native snippets` provides boilerplate snippets;
+# Developer Install
+
+Ivette can be compiled and used with different modes:
+- `make dev` builds and start the development version with live-code-editing enabled. It uses
+  local binaries of Electron framework. This is _not_ a full packaged
+  application.
+- `make app` pre-builds the production application. It is not _yet_ packaged and still
+  uses the local Electron binaries.
+- `make dist` packages the pre-built application into a new application for the host
+  operating system.
+
+The development and production applications can be launched from the command line
+with `Frama-C/ivette/bin/frama-c-gui` binary.
+The generated `frama-c-gui` script will use the local `Frama-C/bin/frama-c` binary by default,
+although you can change the default settings by using the following options:
+
+```
+frama-c-gui [ivette options] [frama-c command line]
+  --cwd <dir> change the working directory used by ivette & frama-c
+  --command <bin> set the frama-c server to be launched
+  --socket <socket> set the IPC socket name to be used for the frama-c server
+```
+
+See also the [CONTRIBUTING] guide for editor configuration if you want to hack in Ivette
+source code.

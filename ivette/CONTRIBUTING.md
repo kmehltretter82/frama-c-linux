@@ -1,37 +1,36 @@
-## Coding Guidelines
+# Emacs Configuration
 
-- use `make app` (checked by GitLab-CI)
-- per-directory `style.css` for CSS;
-- caml-cased file names for typescript modules;
-- indentation based on 2 spaces, no tabs;
-- caml-case identifiers for exported members;
-- no `export default` for libs, individual exports only;
-- prefer use of `import * as AbcDef from '<path>/AbcDef'`;
-
-## Makefile Targets
-
-From the `./ivette` sub-directory of Frama-C main directory:
+Emacs mode configuration can be setup with Typescript, Web-mode and Tide packages.
+You can install them with `M-x package-install`:
 
 ```
-$ make app  // Builds desktop app
-$ make dev  // Launch development version with live code editing
-$ make doc  // Generate development documentation (static)
-$ make serve // Serve the documentation (makes it searchable)
+M-x package-refresh-contents ;; updates your index
+M-x package-install web-mode
+M-x package-install typescript-mode
+M-x package-install tidse
 ```
 
-Once build, the application can be launched from the command line
-with `./bin/frama-c-gui`.
+For configuring your `.emacs` accordingly,
+please look at the `share/typescript-config.el` file.
+It setup the Tide package to work with
+`typescript-mode` for `*.ts` files (see also `tsfmt.json` config file)
+and `web-mode` for `*.tsx` files.
 
-The static documentation is available offline at `doc/html/index.html`.
-However, searching the documentation does not work
-with `file://` protocole, use `make serve` to use it.
+Usefull commands:
 
-## Mirroring to Dome/Electron
+```
+M-. goto definition
+M-, back to previous point
+M-x tide-documentation-at-point
+M-x tide-error-at-point
+```
 
-**Warning:** not recommanded until all codebase has been moved to TypeScript.
+# VS Code
 
-The content of ./src/dome shall be kept in sync with
-the public repository for Dome. An experimental support
-for automated synchronisation is available with:
-- `make dome-pull` for pulling Dome updates into Ivette
-- `make dome-push` for pushing local updates into Dome
+VS Code has native support for Typescript (and JavaScript, of course), in terms
+of code navigation, syntax highlighting and formatting, compiler errors and
+warnings. The same holds for React development.
+
+Useful extensions:
+- `ESlint` provides support for lint errors and warnings;
+- `ES7 React/Redux/GraphQL/React-Native snippets` provides boilerplate snippets;
