@@ -77,8 +77,10 @@ type t = {
   (* list of loop environment for each currently visited loops *)
   cpt: int;
   (* counter used when generating variables *)
-  local_vars: Typing.Function_params_ty.t list
+  local_vars: Typing.Function_params_ty.t list;
   (* type of variables used in calls to logic functions and predicates *)
+  kinstr: kinstr;
+  (* Current kinstr of the environment *)
 }
 
 let empty_block =
@@ -110,7 +112,8 @@ let empty =
     var_mapping = Logic_var.Map.empty;
     loop_envs = [];
     cpt = 0;
-    local_vars = [] }
+    local_vars = [];
+    kinstr = Kglobal }
 
 let top env = match env.env_stack with
   | [] -> Options.fatal "Empty environment. That is unexpected."
@@ -181,6 +184,16 @@ let with_rte_and_result ~f env rte_value =
   let other, env = f env in
   let env = rte env old_rte_value in
   other, env
+
+(* ************************************************************************** *)
+(** {2 Kinstr} *)
+(* ************************************************************************** *)
+
+let set_kinstr env kinstr =
+  { env with kinstr = kinstr }
+
+let get_kinstr env =
+  env.kinstr
 
 (* ************************************************************************** *)
 
