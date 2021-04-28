@@ -1,3 +1,22 @@
+# Makefile Targets
+
+The most useful developmenent targets are:
+
+```
+$ make tsc   # run linter
+$ make dev   # run development version
+$ make app   # build production version
+$ make dist  # package the application
+$ make doc   # generate the documentation
+$ make api   # update the frama-c server API
+```
+
+Additional makefile targets and environment variables are listed by:
+
+```
+$ make dome-help
+```
+
 # Emacs Configuration
 
 Emacs mode configuration can be setup with Typescript, Web-mode and Tide packages.
