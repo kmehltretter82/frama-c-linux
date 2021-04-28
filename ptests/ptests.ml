@@ -588,29 +588,18 @@ end = struct
 
 end
 
-type execnow =
-  {
-    ex_cmd: string;      (** command to launch *)
-    ex_log: string list; (** log files *)
-    ex_bin: string list; (** bin files *)
-    ex_dir: SubDir.t;    (** directory of test suite *)
-    ex_once: bool;       (** true iff the command has to be executed only once
-                             per config file (otherwise it is executed for
-                             every file of the test suite) *)
-    ex_done: bool ref;   (** has the command been already fully executed.
-                             Shared between all copies of this EXECNOW. Do
-                             NOT use a mutable field here, as execnows
-                             are duplicated using OCaml 'with' syntax. *)
-    ex_timeout: string;
-  }
-
-
 module Macros =
 struct
   module StringMap = Map.Make (String)
   open StringMap
 
   type t = string StringMap.t
+
+  let add_defaults ~defaults macros =
+    StringMap.merge (fun _k default cur ->
+        match cur with
+        | Some _ -> cur
+        | _ -> default) defaults macros
 
   let empty = StringMap.empty
 
@@ -671,6 +660,24 @@ struct
   let append_expand name def macros =
     add name (get name macros ^ expand macros def) macros
 end
+
+
+type execnow =
+  {
+    ex_cmd: string;      (** command to launch *)
+    ex_macros: Macros.t; (** current macros *)
+    ex_log: string list; (** log files *)
+    ex_bin: string list; (** bin files *)
+    ex_dir: SubDir.t;    (** directory of test suite *)
+    ex_once: bool;       (** true iff the command has to be executed only once
+                             per config file (otherwise it is executed for
+                             every file of the test suite) *)
+    ex_done: bool ref;   (** has the command been already fully executed.
+                             Shared between all copies of this EXECNOW. Do
+                             NOT use a mutable field here, as execnows
+                             are duplicated using OCaml 'with' syntax. *)
+    ex_timeout: string;
+  }
 
 
 (** configuration of a directory/test. *)
@@ -764,7 +771,7 @@ end = struct
       dc_timeout = "";
     }
 
-  let scan_execnow ~once dir ex_timeout (s:string) =
+  let scan_execnow ~once dir ex_macros ex_timeout (s:string) =
     let rec aux (s:execnow) =
       try
         Scanf.sscanf s.ex_cmd "%_[ ]LOG%_[ ]%[-A-Za-z0-9_',+=:.\\@@]%_[ ]%s@\n"
@@ -786,6 +793,7 @@ end = struct
     in
     aux
       { ex_cmd = s;
+        ex_macros;
         ex_log = [];
         ex_bin = [];
         ex_dir = dir;
@@ -847,7 +855,7 @@ end = struct
   let config_exec ~once ~file:_ dir s current =
     { current with
       dc_execnow =
-        scan_execnow ~once dir current.dc_timeout s :: current.dc_execnow }
+        scan_execnow ~once dir current.dc_macros current.dc_timeout s :: current.dc_execnow }
 
   let config_macro ~file _dir s current =
     let regex = Str.regexp "[ \t]*\\([^ \t@]+\\)\\([ \t]+\\(.*\\)\\|$\\)" in
@@ -869,13 +877,7 @@ end = struct
 
   let set_load_modules deps macros =
     let name = "PTEST_LOAD_MODULES" in
-    let def = List.fold_left (fun acc s ->
-        match acc with
-        | "" -> s
-        | acc -> s ^ "," ^ acc)
-        ""
-        deps
-    in
+    let def = String.concat "," deps in
     if !verbosity >= 3 then
       lock_printf "%%   - Macro %s for -load-module with definition %s@." name def;
     Macros.add_list [name, def] macros
@@ -1172,7 +1174,7 @@ module Cmd : sig
   val log_prefix : toplevel_command -> string
   val oracle_prefix : toplevel_command -> string
 
-  val expand_macros : toplevel_command -> toplevel_command
+  val expand_macros : defaults:Macros.t -> toplevel_command -> toplevel_command
 
   (* [basic_command_string cmd] does not redirect the outputs, and does
      not overwrite the result files *)
@@ -1206,7 +1208,7 @@ end = struct
 
   let get_ptest_file cmd = SubDir.make_file cmd.directory cmd.file
 
-  let expand_macros cmd =
+  let expand_macros ~defaults cmd =
     let ptest_config =
       if !special_config = "" then "" else "_" ^ !special_config
     in
@@ -1226,6 +1228,7 @@ end = struct
       ]
     in
     let macros = Macros.add_list macros cmd.macros in
+    let macros = Macros.add_defaults ~defaults macros in
     let process_macros s = Macros.expand macros s in
     { cmd with
       macros;
@@ -1935,7 +1938,7 @@ let dispatcher () =
         fun {toplevel; opts=options; logs=log_files; macros; exit_code; timeout} ->
           let n = !i in
           incr i;
-          Cmd.expand_macros
+          Cmd.expand_macros ~defaults:config.dc_macros
             { file; options; toplevel; nb_files; directory; n; log_files;
               filter = config.dc_filter; macros;
               exit_code = begin
@@ -1955,7 +1958,7 @@ let dispatcher () =
         fun execnow ->
           let n = !e in
           incr e;
-          let cmd = Cmd.expand_macros
+          let cmd = Cmd.expand_macros ~defaults:config.dc_macros
               {file ;
                nb_files = nb_files_execnow;
                log_files = execnow.ex_log;
@@ -1965,13 +1968,14 @@ let dispatcher () =
                n;
                directory;
                filter = None; (* No filter for execnow command *)
-               macros = config.dc_macros;
+               macros = execnow.ex_macros;
                execnow = true;
                timeout = execnow.ex_timeout;
               }
           in
           let process_macros s = Macros.expand cmd.macros s in
           { ex_cmd = Cmd.basic_command_string cmd;
+            ex_macros = cmd.macros;
             ex_log = cmd.log_files;
             ex_bin = List.map process_macros execnow.ex_bin;
             ex_dir = execnow.ex_dir;
