@@ -473,6 +473,7 @@ function create_website_branch {
         echo "### Warning: branch $BRANCH_NAME already exists in $WEBSITE_DIR"
         echo "The script will ERASE this branch"
         proceed_anyway "Rename or erase the branch, then run the script again."
+        run "git -C $WEBSITE_DIR checkout master"
         run "git -C $WEBSITE_DIR branch -D $BRANCH_NAME"
     fi
 
