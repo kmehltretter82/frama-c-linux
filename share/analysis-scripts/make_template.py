@@ -98,11 +98,11 @@ main = input("Main target name: ")
 if not re.match("^[a-zA-Z_0-9-]+$", main):
     sys.exit("error: invalid main target name (can only contain letters, digits, dash or underscore)")
 
-main_fun_finder_re = function_finder.prepare("main")
+main_fun_finder_re = function_finder.prepare_re_specific_name("main")
 
 # returns 0 if none, 1 if declaration, 2 if definition
 def defines_or_declares_main(f):
-    return function_finder.find(main_fun_finder_re, f)
+    return function_finder.find_specific_name(main_fun_finder_re, f)
 
 def expand_and_normalize_sources(expression, relprefix):
     subexps = shlex.split(expression)
