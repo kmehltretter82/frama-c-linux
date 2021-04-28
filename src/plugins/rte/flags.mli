@@ -67,10 +67,10 @@ val default :
   ?bool_value:bool ->
   unit -> t
 
-(** All flags set to [true], [@all] for [initialized] *)
+(** All flags set to [true], "@all" for initialized *)
 val all : unit -> t
 
-(** All flags set to [false], [empty] for [initialized] *)
+(** All flags set to [false], empty for initialized *)
 val none : t
 
 (* -------------------------------------------------------------------------- *)

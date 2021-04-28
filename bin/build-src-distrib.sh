@@ -23,9 +23,9 @@ if ! command -v git-lfs >/dev/null 2>/dev/null; then
     exit 99
 fi
 
-# rgrep needs to be installed
-if ! command -v rgrep --version >/dev/null 2>/dev/null; then
-    echo "rgrep is required"
+# grep needs to be installed
+if ! command -v grep --version >/dev/null 2>/dev/null; then
+    echo "grep is required"
     exit 99
 fi
 
@@ -100,7 +100,7 @@ function look_for_uncommited_changes {
 }
 
 function look_for_frama_c_dev {
-    rgrep -i "frama-c+dev" src &> /dev/null
+    grep -Iir "frama-c+dev" src &> /dev/null
     if [ "$?" == "0" ]; then
         echo "### WARNING: Remaining frama-c+dev occurrences in 'src'"
         proceed_anyway "Update API, then run the script again"
@@ -251,12 +251,15 @@ function fill_wiki {
 function add_install_page {
     INSTALL_WEBPAGE=html/installations/$FRAMAC_VERSION_CODENAME_LOWER.md
     INSTALL_WEBPAGE_PATH=$WEBSITE_DIR/$INSTALL_WEBPAGE
+    EXT="$FRAMAC_VERSION_CODENAME (released on $(date +%Y-%m-%d))"
     echo "---" > $INSTALL_WEBPAGE_PATH
-    echo "layout: doc_page" >> $INSTALL_WEBPAGE_PATH
+    echo "layout: installation_page" >> $INSTALL_WEBPAGE_PATH
+    echo "version: $FRAMAC_VERSION_CODENAME_LOWER" >> $INSTALL_WEBPAGE_PATH
     echo "title: Installation instructions for $FRAMAC_VERSION_CODENAME" >> $INSTALL_WEBPAGE_PATH
     echo "---" >> $INSTALL_WEBPAGE_PATH
     echo >> $INSTALL_WEBPAGE_PATH
-    cat ./INSTALL.md >> $INSTALL_WEBPAGE_PATH
+    cat ./INSTALL.md |\
+    sed -e "s/^\(# Installing Frama-C\)$/\1 $EXT/" >> $INSTALL_WEBPAGE_PATH
 
     run "git -C $WEBSITE_DIR add $INSTALL_WEBPAGE"
 }
@@ -470,6 +473,7 @@ function create_website_branch {
         echo "### Warning: branch $BRANCH_NAME already exists in $WEBSITE_DIR"
         echo "The script will ERASE this branch"
         proceed_anyway "Rename or erase the branch, then run the script again."
+        run "git -C $WEBSITE_DIR checkout master"
         run "git -C $WEBSITE_DIR branch -D $BRANCH_NAME"
     fi
 
@@ -487,7 +491,7 @@ function create_website_branch {
             run "git -C $WEBSITE_DIR checkout master"
             exit 1
     esac
-    run "git -C $WEBSITE_DIR commit -m \"Prepare pages for the release of Frama-C $FRAMAC_VERSION\""
+    run "git -C $WEBSITE_DIR commit -m \"$FRAMAC_VERSION_AND_CODENAME release\""
 }
 
 function commit_wiki {
@@ -502,7 +506,7 @@ function commit_wiki {
             echo "Abort wiki update."
             exit 1
     esac
-    run "git -C $WIKI_DIR commit -m \"Prepare pages for the release of Frama-C $FRAMAC_VERSION\""
+    run "git -C $WIKI_DIR commit -m \"$FRAMAC_VERSION_AND_CODENAME release\""
 }
 
 
@@ -520,10 +524,10 @@ function last_step_validation {
     This step will:
 
       - ask for a validation of the changes to website
-      - create a NEW branch on for the website
+      - create a NEW local branch for the website
 
       - ask for a validation of the changes to wiki
-      - commit changes to the wiki MASTER branch
+      - commit changes to the wiki MASTER local branch
 
     If you want to perform some additional checks it is probably time to stop.
 
@@ -796,7 +800,6 @@ case "${STEP}" in
         echo "Bad entry: ${STEP}"
         echo "Exiting without doing anything.";
         exit 31
-        ;;
 esac
 
 exit 0

@@ -329,7 +329,7 @@ Please check that the distribution (sources and API) is OK:
   \item \verb+./configure --prefix="$PWD/build"+
   \item \verb+make+;
   \item \verb+make install+;
-  \item \verb+rm -f ~/.why3.conf; why3 config --detect+;
+  \item \verb+rm -f ~/.why3.conf; why3 config detect+;
   \item \verb+build/bin/frama-c tests/idct/*.c -eva -wp -wp-rte+
   \item If you have a GUI, replace \verb+frama-c+ above with \verb+frama-c-gui+
     and click around, see if things work (e.g. no segmentation faults).
