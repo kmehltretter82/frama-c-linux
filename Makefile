@@ -256,23 +256,28 @@ DISTRIB_FILES:=\
       $(LIBC_FILES)							\
       share/analysis-scripts/analysis.mk                                \
       share/analysis-scripts/benchmark_database.py                      \
+      share/analysis-scripts/build_callgraph.py                         \
       share/analysis-scripts/cmd-dep.sh                                 \
       share/analysis-scripts/concat-csv.sh                              \
       share/analysis-scripts/clone.sh                                   \
       share/analysis-scripts/creduce.sh                                 \
+      share/analysis-scripts/detect_recursion.py                        \
       share/analysis-scripts/epilogue.mk                                \
+      share/analysis-scripts/estimate_difficulty.py                     \
       share/analysis-scripts/fc_stubs.c                                 \
       share/analysis-scripts/find_fun.py                                \
       share/analysis-scripts/flamegraph.pl                              \
       share/analysis-scripts/frama_c_results.py                         \
       share/analysis-scripts/function_finder.py                         \
       share/analysis-scripts/git_utils.py                               \
+      share/analysis-scripts/heuristic_list_functions.py                \
       share/analysis-scripts/list_files.py                              \
       share/analysis-scripts/list_functions.ml                          \
       share/analysis-scripts/make_template.py                           \
       share/analysis-scripts/make_wrapper.py                            \
       share/analysis-scripts/normalize_jcdb.py                          \
       share/analysis-scripts/parse-coverage.sh                          \
+      share/analysis-scripts/print_callgraph.py                         \
       share/analysis-scripts/prologue.mk                                \
       share/analysis-scripts/README.md                                  \
       share/analysis-scripts/results_display.py                         \

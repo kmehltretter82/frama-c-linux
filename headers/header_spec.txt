@@ -114,9 +114,12 @@ ptests/ptests.ml: CEA_LGPL
 share/_frama-c: CEA_LGPL
 share/analysis-scripts/analysis.mk: CEA_LGPL
 share/analysis-scripts/benchmark_database.py: CEA_LGPL
+share/analysis-scripts/build_callgraph.py: CEA_LGPL
 share/analysis-scripts/clone.sh: .ignore
 share/analysis-scripts/creduce.sh: CEA_LGPL
+share/analysis-scripts/detect_recursion.py: CEA_LGPL
 share/analysis-scripts/epilogue.mk: CEA_LGPL
+share/analysis-scripts/estimate_difficulty.py: CEA_LGPL
 share/analysis-scripts/fc_stubs.c: .ignore
 share/analysis-scripts/frama_c_results.py: CEA_LGPL
 share/analysis-scripts/cmd-dep.sh: .ignore
@@ -125,12 +128,14 @@ share/analysis-scripts/find_fun.py: CEA_LGPL
 share/analysis-scripts/flamegraph.pl: CDDL
 share/analysis-scripts/function_finder.py: .ignore
 share/analysis-scripts/git_utils.py: CEA_LGPL
+share/analysis-scripts/heuristic_list_functions.py: CEA_LGPL
 share/analysis-scripts/list_files.py: CEA_LGPL
 share/analysis-scripts/list_functions.ml: CEA_LGPL
 share/analysis-scripts/make_template.py: CEA_LGPL
 share/analysis-scripts/make_wrapper.py: CEA_LGPL
 share/analysis-scripts/normalize_jcdb.py: CEA_LGPL
 share/analysis-scripts/parse-coverage.sh: .ignore
+share/analysis-scripts/print_callgraph.py: CEA_LGPL
 share/analysis-scripts/prologue.mk: CEA_LGPL
 share/analysis-scripts/README.md: .ignore
 share/analysis-scripts/results_display.py: CEA_LGPL
