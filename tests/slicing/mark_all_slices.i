@@ -1,7 +1,7 @@
 /* run.config
- MODULE: @PTEST_NAME@
- CMD: @frama-c@ -load-module tests/slicing/libSelect.cmxs
-   OPT: @EVA_OPTIONS@ -deps -slicing-level 3 -no-slice-callers -journal-disable
+ MODULE: libSelect @PTEST_NAME@
+
+   OPT: @EVA_OPTIONS@ -deps -slicing-level 3 -no-slice-callers
 */
 int A, B, C, D;
 int A2, B2, C2, D2;

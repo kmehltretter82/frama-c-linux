@@ -1,7 +1,7 @@
 /* run.config
- MODULE: @PTEST_NAME@
- CMD: @frama-c@ -load-module tests/slicing/libSelect.cmxs
-   OPT: @EVA_OPTIONS@ -deps -no-slice-callers -journal-disable
+ MODULE: libSelect @PTEST_NAME@
+
+   OPT: @EVA_OPTIONS@ -deps -no-slice-callers
 */
 int Unknown;
 int G;

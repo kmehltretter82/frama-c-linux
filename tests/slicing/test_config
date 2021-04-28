@@ -1,2 +1,3 @@
-EXECNOW: make -s tests/slicing/libSelect.cmxs tests/slicing/libAnim.cmxs
+MODULE: libSelect libAnim
+MODULE:
 OPT: @EVA_OPTIONS@ -machdep x86_32

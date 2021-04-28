@@ -1,7 +1,7 @@
 /*  run.config
- MODULE: @PTEST_NAME@
- CMD: @frama-c@ -load-module tests/slicing/libSelect.cmxs
-   OPT: @EVA_OPTIONS@ -deps -journal-disable
+ MODULE: libSelect @PTEST_NAME@
+
+   OPT: @EVA_OPTIONS@ -deps
 */
 int main (char choix) {
   int x = 0, y = 0, z = 0;

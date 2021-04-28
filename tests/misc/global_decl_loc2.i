@@ -1,7 +1,6 @@
 /* run.config*
- EXIT: 0
-
-   OPT: @PTEST_DIR@/global_decl_loc.i -load-module @PTEST_DIR@/global_decl_loc.cmxs
+ MODULE: global_decl_loc
+   OPT: @PTEST_DIR@/global_decl_loc.i
 */
 
 extern int g;
