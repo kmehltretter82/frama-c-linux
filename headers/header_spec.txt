@@ -134,6 +134,8 @@ share/analysis-scripts/parse-coverage.sh: .ignore
 share/analysis-scripts/prologue.mk: CEA_LGPL
 share/analysis-scripts/README.md: .ignore
 share/analysis-scripts/results_display.py: CEA_LGPL
+share/analysis-scripts/script_for_creduce_fatal.sh: .ignore
+share/analysis-scripts/script_for_creduce_non_fatal.sh: .ignore
 share/analysis-scripts/summary.py: CEA_LGPL
 share/analysis-scripts/template.mk: .ignore
 share/compliance/c11_functions.json: .ignore
