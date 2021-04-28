@@ -28,8 +28,10 @@ set +o pipefail
 
 ##########
 
+set -o pipefail
 "@FRAMAC@" "@BASE@" @FCFLAGS@ 2>&1 | tee $fc_out
 fc_retcode=$(echo ${PIPESTATUS[0]})
+set +o pipefail
 
 ### Examples of conditions to be maintained by C-Reduce; copy and adapt
 #

@@ -43,7 +43,7 @@ This script creates a temporary directory named 'creducing'. It copies <file>
 inside it, then runs creduce with 'frama-c <command line options>'
 on the copied file, modifying it to make it smaller while still crashing.
 
-When done, you need to copy the reduced file and erase directoy 'creducing'.
+When done, you need to copy the reduced file and erase directory 'creducing'.
 
 # Script options
 
@@ -286,3 +286,4 @@ set -e
 "$CREDUCE" script_for_creduce.sh "$base"
 
 echo "Finished reducing file: $dir_for_reduction/$base"
+echo "Remember to remove 'script_for_creduce.sh' after you are done."
