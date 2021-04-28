@@ -401,7 +401,7 @@ export interface Configuration {
   command?: string;
   /** Additional server arguments (default: empty). */
   params: string[];
-  /** Server socket (default: `ipc:///.frama-c.<pid>.io`). */
+  /** Server socket (default: `ipc:///tmp/frama-c.<pid>.io`). */
   sockaddr?: string;
   /** Shutdown timeout before server is hard killed, in milliseconds
    *  (default: 300ms). */
@@ -465,12 +465,14 @@ async function _launch() {
   }
   buffer.append('\n');
 
-  if (!cwd) cwd = System.getWorkingDir();
   if (!sockaddr) {
-    const socketfile = System.join(cwd, `.frama-c.${System.getPID()}.io`);
+    const tmp = System.getTempDir();
+    const pid = System.getPID();
+    const socketfile = System.join(tmp, `ivette.frama-c.${pid}.io`);
     System.atExit(() => System.remove(socketfile));
     sockaddr = `ipc://${socketfile}`;
   }
+  if (!cwd) cwd = System.getWorkingDir();
   logout = logout && System.join(cwd, logout);
   logerr = logerr && System.join(cwd, logerr);
   params = ['-server-zmq', sockaddr, '-then'].concat(params);
