@@ -23,9 +23,9 @@ if ! command -v git-lfs >/dev/null 2>/dev/null; then
     exit 99
 fi
 
-# rgrep needs to be installed
-if ! command -v rgrep --version >/dev/null 2>/dev/null; then
-    echo "rgrep is required"
+# grep needs to be installed
+if ! command -v grep --version >/dev/null 2>/dev/null; then
+    echo "grep is required"
     exit 99
 fi
 
@@ -100,7 +100,7 @@ function look_for_uncommited_changes {
 }
 
 function look_for_frama_c_dev {
-    rgrep -i "frama-c+dev" src &> /dev/null
+    grep -Iir "frama-c+dev" src &> /dev/null
     if [ "$?" == "0" ]; then
         echo "### WARNING: Remaining frama-c+dev occurrences in 'src'"
         proceed_anyway "Update API, then run the script again"
