@@ -20,31 +20,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** This module is dedicated to some preprocessing on the predicates:
-    - It guards all the [Pvalid] and [Pvalid_read] clauses with
-      an adequate [Pinitialized] clause;
-    - It replaces all the applications [Papp] by a corresponding
-      term obtained as an application [Tapp]
-      The predicates that have undergone these changed are
-      called the preprocessed predicates.
-*)
+(** Types used by E-ACSL analyses *)
 
 open Cil_types
-open Analyses_types
 
-val preprocess : file -> unit
-(** Preprocess all the predicates of the ast and store the results *)
+type lscope_var =
+  | Lvs_let of logic_var * term (* the expression to which the lv is binded *)
+  | Lvs_quantif of term * relation * logic_var * relation * term
+  | Lvs_formal of logic_var * logic_info (* the logic definition *)
+  | Lvs_global of logic_var * term (* same as Lvs_let *)
 
-val preprocess_annot : code_annotation -> unit
-(** Preprocess of the predicate of a single code annotation and store
-    the results *)
+type lscope = lscope_var list
 
-val preprocess_predicate : predicate -> unit
-(** Preprocess a predicate and its children and store the results  *)
-
-val get_pred : predicate -> pred_or_term
-(** Retrieve the preprocessed form of a predicate *)
-val get_term : term -> term
-(** Retrieve the preprocessed form of a term *)
-val clear: unit -> unit
-(** clear the table of normalized predicates *)
+type pred_or_term =
+  | PoT_pred of predicate
+  | PoT_term of term

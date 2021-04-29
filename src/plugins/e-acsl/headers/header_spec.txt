@@ -79,6 +79,9 @@ share/e-acsl/observation_model/e_acsl_observation_model.c: CEA_LGPL_OR_PROPRIETA
 share/e-acsl/observation_model/e_acsl_observation_model.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/e_acsl.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/e_acsl_rtl.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/analyses/analyses_datatype.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/analyses/analyses_datatype.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/analyses/analyses_types.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/bound_variables.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/bound_variables.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/e_acsl_visitor.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL

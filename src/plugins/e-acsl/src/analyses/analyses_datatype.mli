@@ -20,31 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** This module is dedicated to some preprocessing on the predicates:
-    - It guards all the [Pvalid] and [Pvalid_read] clauses with
-      an adequate [Pinitialized] clause;
-    - It replaces all the applications [Papp] by a corresponding
-      term obtained as an application [Tapp]
-      The predicates that have undergone these changed are
-      called the preprocessed predicates.
-*)
+(** Datatypes for analyses types *)
 
-open Cil_types
 open Analyses_types
 
-val preprocess : file -> unit
-(** Preprocess all the predicates of the ast and store the results *)
-
-val preprocess_annot : code_annotation -> unit
-(** Preprocess of the predicate of a single code annotation and store
-    the results *)
-
-val preprocess_predicate : predicate -> unit
-(** Preprocess a predicate and its children and store the results  *)
-
-val get_pred : predicate -> pred_or_term
-(** Retrieve the preprocessed form of a predicate *)
-val get_term : term -> term
-(** Retrieve the preprocessed form of a term *)
-val clear: unit -> unit
-(** clear the table of normalized predicates *)
+module PredOrTerm: Datatype.S_with_collections with type t = pred_or_term

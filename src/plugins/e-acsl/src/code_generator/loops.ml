@@ -22,6 +22,7 @@
 
 open Cil
 open Cil_types
+open Analyses_types
 
 (**************************************************************************)
 (********************** Forward references ********************************)
@@ -291,7 +292,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
   match lscope_vars with
   | [] ->
     mk_innermost_block env
-  | Lscope.Lvs_quantif(t1, rel1, logic_x, rel2, t2) :: lscope_vars' ->
+  | Lvs_quantif(t1, rel1, logic_x, rel2, t2) :: lscope_vars' ->
     assert (rel1 == Rle && rel2 == Rlt);
     Typing.type_term ~use_gmp_opt:false ~lenv t1;
     Typing.type_term ~use_gmp_opt:false ~lenv t2;
@@ -418,7 +419,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     (* remove logic binding before returning *)
     Env.Logic_binding.remove env logic_x;
     [ start ;  stmt ], env
-  | Lscope.Lvs_let(lv, t) :: lscope_vars' ->
+  | Lvs_let(lv, t) :: lscope_vars' ->
     let ty = Typing.get_typ ~lenv t in
     let vi_of_lv, exp_of_lv, env = Env.Logic_binding.add ~ty env kf lv in
     let e, _, env = term_to_exp kf env t in
@@ -434,10 +435,10 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     Env.Logic_binding.remove env lv;
     (* return *)
     let_stmt :: stmts, env
-  | Lscope.Lvs_formal _ :: _ ->
+  | Lvs_formal _ :: _ ->
     Error.not_yet
       "creating nested loops from formal variable of a logic function"
-  | Lscope.Lvs_global _ :: _ ->
+  | Lvs_global _ :: _ ->
     Error.not_yet
       "creating nested loops from global logic variable"
 

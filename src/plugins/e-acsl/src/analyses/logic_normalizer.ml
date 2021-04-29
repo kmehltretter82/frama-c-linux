@@ -21,8 +21,7 @@
 (**************************************************************************)
 
 open Cil_types
-
-type pred_or_term = Lscope.pred_or_term
+open Analyses_types
 
 module Id_predicate =
   Datatype.Make_with_collections
@@ -53,7 +52,7 @@ end = struct
 
   let get_pred p =
     try Id_predicate.Hashtbl.find tbl_pred p
-    with Not_found -> Lscope.PoT_pred p
+    with Not_found -> PoT_pred p
 
   let memo_pred process p =
     try ignore (Id_predicate.Hashtbl.find tbl_pred p) with
@@ -98,7 +97,7 @@ let preprocess_pred ~loc p =
           | Pvalid _ -> Logic_const.pvalid ~loc (llabel, t)
           | _ -> assert false
         in
-        Some (Lscope.PoT_pred (Logic_const.pand ~loc (init, p_copy)))
+        Some (PoT_pred (Logic_const.pand ~loc (init, p_copy)))
       | _ -> None
     end
   | _ -> None

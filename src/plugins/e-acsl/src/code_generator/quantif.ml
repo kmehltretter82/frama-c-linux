@@ -22,6 +22,7 @@
 
 open Cil_types
 open Cil
+open Analyses_types
 
 (** Forward reference for [Translate_predicates.to_exp]. *)
 let predicate_to_exp_ref
@@ -92,7 +93,7 @@ let convert kf env loc ~is_forall quantif =
          and update logic scope in the process *)
       let lvs_guards, env = List.fold_right
           (fun (t1, lv, t2) (lvs_guards, env) ->
-             let lvs = Lscope.Lvs_quantif (t1, Rle, lv, Rlt, t2) in
+             let lvs = Lvs_quantif (t1, Rle, lv, Rlt, t2) in
              let env = Env.Logic_scope.extend env lvs in
              lvs :: lvs_guards, env)
           bound_vars

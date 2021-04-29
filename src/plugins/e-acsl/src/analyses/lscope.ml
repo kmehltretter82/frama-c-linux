@@ -21,14 +21,9 @@
 (**************************************************************************)
 
 open Cil_types
+open Analyses_types
 
-type lscope_var =
-  | Lvs_let of logic_var * term
-  | Lvs_quantif of term * relation * logic_var * relation * term
-  | Lvs_formal of logic_var * logic_info
-  | Lvs_global of logic_var * term
-
-type t = lscope_var list
+type t = lscope
 (* The logic scope is usually small, so a list is fine instead of a Map *)
 
 let empty = []
@@ -46,8 +41,6 @@ let exists lv t =
       Cil_datatype.Logic_var.equal lv lv'
   in
   List.exists is_lv t
-
-type pred_or_term = PoT_pred of predicate | PoT_term of term
 
 exception Lscope_used
 let is_used lscope pot =

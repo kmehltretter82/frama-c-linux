@@ -22,6 +22,7 @@
 
 open Cil_types
 open Cil_datatype
+open Analyses_types
 
 (* Convert \at on terms or predicates in which we can find purely
    logic variable. *)
@@ -32,7 +33,7 @@ open Cil_datatype
 
 val to_exp:
   loc:Location.t -> kernel_function -> Env.t ->
-  Lscope.pred_or_term -> logic_label -> exp * Env.t
+  pred_or_term -> logic_label -> exp * Env.t
 
 (*****************************************************************************)
 (**************************** Handling memory ********************************)

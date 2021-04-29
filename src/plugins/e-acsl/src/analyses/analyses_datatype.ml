@@ -20,31 +20,48 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** This module is dedicated to some preprocessing on the predicates:
-    - It guards all the [Pvalid] and [Pvalid_read] clauses with
-      an adequate [Pinitialized] clause;
-    - It replaces all the applications [Papp] by a corresponding
-      term obtained as an application [Tapp]
-      The predicates that have undergone these changed are
-      called the preprocessed predicates.
-*)
+(** Datatypes for analyses types *)
 
-open Cil_types
+open Cil_datatype
 open Analyses_types
 
-val preprocess : file -> unit
-(** Preprocess all the predicates of the ast and store the results *)
+module PredOrTerm =
+  Datatype.Make_with_collections
+    (struct
+      type t = pred_or_term
 
-val preprocess_annot : code_annotation -> unit
-(** Preprocess of the predicate of a single code annotation and store
-    the results *)
+      let name = "E_ACSL.PredOrTerm"
 
-val preprocess_predicate : predicate -> unit
-(** Preprocess a predicate and its children and store the results  *)
+      let reprs =
+        let reprs =
+          List.fold_left
+            (fun reprs t -> PoT_term t :: reprs)
+            []
+            Term.reprs
+        in
+        List.fold_left
+          (fun reprs p -> PoT_pred p :: reprs)
+          reprs
+          Predicate.reprs
 
-val get_pred : predicate -> pred_or_term
-(** Retrieve the preprocessed form of a predicate *)
-val get_term : term -> term
-(** Retrieve the preprocessed form of a term *)
-val clear: unit -> unit
-(** clear the table of normalized predicates *)
+      include Datatype.Undefined
+
+      let compare pot1 pot2 =
+        match pot1, pot2 with
+        | PoT_pred _, PoT_term _ -> -1
+        | PoT_term _, PoT_pred _ -> 1
+        | PoT_pred p1, PoT_pred p2 -> PredicateStructEq.compare p1 p2
+        | PoT_term t1, PoT_term t2 -> Term.compare t1 t2
+
+      let equal = Datatype.from_compare
+
+      let hash = function
+        | PoT_pred p -> 7 * PredicateStructEq.hash p
+        | PoT_term t -> 97 * Term.hash t
+
+      let pretty fmt = function
+        | PoT_pred p -> Printer.pp_predicate fmt p
+        | PoT_term t -> Printer.pp_term fmt t
+
+      let varname _ = "pred_or_term"
+    end)

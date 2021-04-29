@@ -23,6 +23,7 @@
 (** Generate C implementations of E-ACSL terms. *)
 
 open Cil_types
+open Analyses_types
 let dkey = Options.Dkey.translation
 
 (**************************************************************************)
@@ -797,7 +798,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
     e, adata, env, Typed_number.C_number, ""
   | Tat(t', label) ->
     let lscope = Env.Logic_scope.get env in
-    let pot = Lscope.PoT_term t' in
+    let pot = PoT_term t' in
     if Lscope.is_used lscope pot then
       let e, env = At_with_lscope.to_exp ~loc kf env pot label in
       let adata, env = Assert.register_term ~loc kf env t e adata in
@@ -854,7 +855,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
   | Tcomprehension _ -> Env.not_yet env "tset comprehension"
   | Trange _ -> Env.not_yet env "range"
   | Tlet(li, t) ->
-    let lvs = Lscope.Lvs_let(li.l_var_info, Misc.term_of_li li) in
+    let lvs = Lvs_let(li.l_var_info, Misc.term_of_li li) in
     let env = Env.Logic_scope.extend env lvs in
     let adata, env = Translate_utils.env_of_li ~adata ~loc kf env li in
     let e, adata, env = to_exp ~adata kf env t in

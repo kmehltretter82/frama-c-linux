@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 open Cil_types
+open Analyses_types
 open Contract_types
 
 (** Environments.
@@ -129,7 +130,7 @@ module Logic_scope: sig
   val get: t -> Lscope.t
   (** Return the logic scope associated to the environment. *)
 
-  val extend: t -> Lscope.lscope_var -> t
+  val extend: t -> lscope_var -> t
   (** Add a new logic variable with its associated information in the
       logic scope of the environment. *)
 
