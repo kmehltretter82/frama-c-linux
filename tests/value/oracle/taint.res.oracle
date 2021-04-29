@@ -5,230 +5,236 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   undet ∈ [--..--]
-  global ∈ {0}
-[eva] computing for function taint_1 <- main.
-  Called from tests/value/taint.c:112.
-[eva] tests/value/taint.c:20: 
-  Frama_C_dump_each:
-  # taint:
-  Locations (data):
-    x; y; buf[1..2]; w
-  Locations (control):
-    \nothing
-  ==END OF DUMP==
-[eva] Recording results for taint_1
-[eva] Done for function taint_1
-[eva] tests/value/taint.c:113: 
-  Frama_C_domain_show_each:
-  w : # taint: true
-[eva] computing for function taint_2 <- main.
-  Called from tests/value/taint.c:117.
-[eva:loop-unroll] tests/value/taint.c:27: Automatic loop unrolling.
+  tainted ∈ {0}
+[eva] computing for function taint_basic <- main.
+  Called from tests/value/taint.c:148.
 [eva] tests/value/taint.c:38: 
   Frama_C_dump_each:
   # taint:
   Locations (data):
-    t; u; x; buf{[0]; [3..4]}; w; z
+    tainted; t; u; x; buf[0]
   Locations (control):
-    t; x
+    w
   ==END OF DUMP==
-[eva] Recording results for taint_2
-[eva] Done for function taint_2
-[eva] tests/value/taint.c:118: 
-  Frama_C_domain_show_each:
-  w : # taint: true
-  z : # taint: true
-[eva] computing for function taint_3 <- main.
-  Called from tests/value/taint.c:121.
-[eva:loop-unroll] tests/value/taint.c:48: Automatic loop unrolling.
-[eva] tests/value/taint.c:49: 
-  Frama_C_domain_show_each:
-  z : # taint: false
-  y : # taint: false
+[eva] Recording results for taint_basic
+[eva] Done for function taint_basic
+[eva] computing for function taint_assume_1 <- main.
+  Called from tests/value/taint.c:151.
+[eva:loop-unroll] tests/value/taint.c:51: Automatic loop unrolling.
 [eva] tests/value/taint.c:52: 
-  Frama_C_domain_show_each:
-  z : # taint: false
-  y : # taint: false
-[eva] tests/value/taint.c:49: 
-  Frama_C_domain_show_each:
-  z : # taint: true
-  y : # taint: false
+  Frama_C_dump_each:
+  # taint:
+  Locations (data):
+    \nothing
+  Locations (control):
+    \nothing
+  ==END OF DUMP==
+[eva] tests/value/taint.c:55: 
+  Frama_C_dump_each:
+  # taint:
+  Locations (data):
+    \nothing
+  Locations (control):
+    \nothing
+  ==END OF DUMP==
 [eva] tests/value/taint.c:52: 
-  Frama_C_domain_show_each:
-  z : # taint: true
-  y : # taint: true
-[eva] tests/value/taint.c:49: 
-  Frama_C_domain_show_each:
-  z : # taint: true
-  y : # taint: true
+  Frama_C_dump_each:
+  # taint:
+  Locations (data):
+    x
+  Locations (control):
+    \nothing
+  ==END OF DUMP==
+[eva] tests/value/taint.c:55: 
+  Frama_C_dump_each:
+  # taint:
+  Locations (data):
+    x; y
+  Locations (control):
+    y
+  ==END OF DUMP==
 [eva] tests/value/taint.c:52: 
-  Frama_C_domain_show_each:
-  z : # taint: true
-  y : # taint: true
-[eva] tests/value/taint.c:61: 
   Frama_C_dump_each:
   # taint:
   Locations (data):
-    global; t; y; z; w
+    x; y
   Locations (control):
-    x; y; z
+    x; y
   ==END OF DUMP==
-[eva] Recording results for taint_3
-[eva] Done for function taint_3
-[eva] tests/value/taint.c:122: 
-  Frama_C_domain_show_each:
-  w : # taint: true
-  global : # taint: true
-[eva] computing for function taint_4 <- main.
-  Called from tests/value/taint.c:123.
-[eva] computing for function taint_1 <- taint_4 <- main.
-  Called from tests/value/taint.c:70.
-[eva] tests/value/taint.c:20: 
+[eva] tests/value/taint.c:55: 
   Frama_C_dump_each:
   # taint:
   Locations (data):
-    global; y; buf[2]; w
+    x; y
   Locations (control):
-    t; x; y; buf{[0]; [2]}
+    x; y
   ==END OF DUMP==
-[eva] Recording results for taint_1
-[eva] Done for function taint_1
-[eva] tests/value/taint.c:71: 
-  Frama_C_domain_show_each:
-  z : # taint: false
-[eva] Recording results for taint_4
-[eva] Done for function taint_4
-[eva] computing for function taint_5 <- main.
-  Called from tests/value/taint.c:125.
-[eva] using specification for function taint_5
-[eva] Done for function taint_5
-[eva] tests/value/taint.c:126: 
-  Frama_C_domain_show_each:
-  z : # taint: true
-  w : # taint: true
-[eva] computing for function taint_6 <- main.
-  Called from tests/value/taint.c:127.
-[eva] tests/value/taint.c:91: 
+[eva] tests/value/taint.c:68: 
   Frama_C_dump_each:
   # taint:
   Locations (data):
-    global; i; u; w; z
+    x; y
   Locations (control):
-    i; u
+    x; y
   ==END OF DUMP==
-[eva] Recording results for taint_6
-[eva] Done for function taint_6
-[eva] computing for function taint_7 <- main.
-  Called from tests/value/taint.c:130.
-[eva] tests/value/taint.c:105: 
+[eva] Recording results for taint_assume_1
+[eva] Done for function taint_assume_1
+[eva] computing for function taint_assume_2 <- main.
+  Called from tests/value/taint.c:152.
+[eva] tests/value/taint.c:85: 
   Frama_C_dump_each:
   # taint:
   Locations (data):
-    undet; global; t; z
+    x; y
+  Locations (control):
+    x; y
+  ==END OF DUMP==
+[eva] Recording results for taint_assume_2
+[eva] Done for function taint_assume_2
+[eva] computing for function taint_spec_assigns <- main.
+  Called from tests/value/taint.c:155.
+[eva] using specification for function taint_spec_assigns
+[eva] Done for function taint_spec_assigns
+[eva] tests/value/taint.c:157: 
+  Frama_C_domain_show_each:
+  l : # taint: false
+[eva] computing for function taint_goto_1 <- main.
+  Called from tests/value/taint.c:159.
+[eva] tests/value/taint.c:108: 
+  Frama_C_dump_each:
+  # taint:
+  Locations (data):
+    t
   Locations (control):
     x
   ==END OF DUMP==
-[eva] Recording results for taint_7
-[eva] Done for function taint_7
+[eva] Recording results for taint_goto_1
+[eva] Done for function taint_goto_1
+[eva] computing for function taint_goto_2 <- main.
+  Called from tests/value/taint.c:160.
+[eva] tests/value/taint.c:132: 
+  Frama_C_dump_each:
+  # taint:
+  Locations (data):
+    t
+  Locations (control):
+    x; y
+  ==END OF DUMP==
+[eva] Recording results for taint_goto_2
+[eva] Done for function taint_goto_2
+[eva] computing for function taint_call <- main.
+  Called from tests/value/taint.c:163.
+[eva] computing for function taint_basic <- taint_call <- main.
+  Called from tests/value/taint.c:140.
+[eva] tests/value/taint.c:38: 
+  Frama_C_dump_each:
+  # taint:
+  Locations (data):
+    tainted; t; u; x; buf[0]; t
+  Locations (control):
+    u; w; x; y; buf[0..1]
+  ==END OF DUMP==
+[eva] Recording results for taint_basic
+[eva] Done for function taint_basic
+[eva] tests/value/taint.c:143: 
+  Frama_C_domain_show_each:
+  x : # taint: false
+[eva] Recording results for taint_call
+[eva] Done for function taint_call
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
-[eva:final-states] Values at end of function taint_1:
-  t ∈ {1}
-  x ∈ {1; 2}
-  y ∈ {1; 2}
-  buf[0] ∈ {0}
-     [1..2] ∈ {0; 1}
-     [3..4] ∈ {0}
-[eva:final-states] Values at end of function taint_2:
-  t ∈ {0}
+[eva:final-states] Values at end of function taint_assume_1:
   x ∈ {3}
-  y ∈ {4}
-  buf[0] ∈ {0}
-     [1] ∈ {2}
-     [2] ∈ {0}
-     [3] ∈ {1}
-     [4] ∈ {0}
-[eva:final-states] Values at end of function taint_3:
-  global ∈ {2}
-  x ∈ {1}
   y ∈ {6}
-  z ∈ {3}
-  u ∈ {1}
-[eva:final-states] Values at end of function taint_4:
   z ∈ {1}
-[eva:final-states] Values at end of function taint_6:
-  i ∈ {11}
-  u ∈ {10}
-[eva:final-states] Values at end of function taint_7:
+[eva:final-states] Values at end of function taint_assume_2:
+  x ∈ {11}
+  y ∈ {10}
+[eva:final-states] Values at end of function taint_basic:
+  u ∈ {0; 1}
+  w ∈ {2}
+  x ∈ {1}
+  y ∈ {0}
+  buf[0] ∈ {2}
+     [1] ∈ {1}
+[eva:final-states] Values at end of function taint_call:
+  x ∈ {0}
+[eva:final-states] Values at end of function taint_goto_1:
   x ∈ {1} or UNINITIALIZED
   y ∈ {0}
+  z ∈ {1}
+  t ∈ [--..--]
+[eva:final-states] Values at end of function taint_goto_2:
+  x ∈ [--..--]
+  y ∈ {0} or UNINITIALIZED
+  z ∈ {1} or UNINITIALIZED
+  t ∈ [--..--]
 [eva:final-states] Values at end of function main:
-  global ∈ {2}
-  w ∈ {1}
-  z ∈ [--..--]
+  tainted ∈ {0}
+  l ∈ [--..--] or UNINITIALIZED
   __retres ∈ {0}
-[from] Computing for function taint_1
-[from] Done for function taint_1
-[from] Computing for function taint_2
-[from] Done for function taint_2
-[from] Computing for function taint_3
-[from] Done for function taint_3
-[from] Computing for function taint_4
-[from] Done for function taint_4
-[from] Computing for function taint_6
-[from] Done for function taint_6
-[from] Computing for function taint_7
-[from] Done for function taint_7
+[from] Computing for function taint_assume_1
+[from] Done for function taint_assume_1
+[from] Computing for function taint_assume_2
+[from] Done for function taint_assume_2
+[from] Computing for function taint_basic
+[from] Done for function taint_basic
+[from] Computing for function taint_call
+[from] Done for function taint_call
+[from] Computing for function taint_goto_1
+[from] Done for function taint_goto_1
+[from] Computing for function taint_goto_2
+[from] Done for function taint_goto_2
 [from] Computing for function main
-[from] Computing for function taint_5 <-main
-[from] Done for function taint_5
+[from] Computing for function taint_spec_assigns <-main
+[from] Done for function taint_spec_assigns
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
   These dependencies hold at termination for the executions that terminate:
-[from] Function taint_1:
+[from] Function taint_assume_1:
   NO EFFECTS
-[from] Function taint_2:
+[from] Function taint_assume_2:
   NO EFFECTS
-[from] Function taint_3:
-  global FROM t
-[from] Function taint_4:
+[from] Function taint_basic:
   NO EFFECTS
-[from] Function taint_5:
-  z FROM u
-[from] Function taint_6:
+[from] Function taint_call:
   NO EFFECTS
-[from] Function taint_7:
+[from] Function taint_goto_1:
   NO EFFECTS
+[from] Function taint_goto_2:
+  NO EFFECTS
+[from] Function taint_spec_assigns:
+  l FROM t
 [from] Function main:
-  global FROM \nothing
+  tainted FROM \nothing
   \result FROM \nothing
 [from] ====== END OF DEPENDENCIES ======
-[inout] Out (internal) for function taint_1:
-    t; x; y; buf[0..4]
-[inout] Inputs for function taint_1:
-    undet
-[inout] Out (internal) for function taint_2:
-    t; x; y; buf[0..4]
-[inout] Inputs for function taint_2:
+[inout] Out (internal) for function taint_assume_1:
+    x; y; z
+[inout] Inputs for function taint_assume_1:
     \nothing
-[inout] Out (internal) for function taint_3:
-    global; x; y; z; u
-[inout] Inputs for function taint_3:
-    \nothing
-[inout] Out (internal) for function taint_4:
-    z
-[inout] Inputs for function taint_4:
-    undet; global
-[inout] Out (internal) for function taint_6:
-    i; u
-[inout] Inputs for function taint_6:
-    \nothing
-[inout] Out (internal) for function taint_7:
+[inout] Out (internal) for function taint_assume_2:
     x; y
-[inout] Inputs for function taint_7:
+[inout] Inputs for function taint_assume_2:
     \nothing
+[inout] Out (internal) for function taint_basic:
+    u; w; x; y; buf[0..1]
+[inout] Inputs for function taint_basic:
+    undet
+[inout] Out (internal) for function taint_call:
+    x
+[inout] Inputs for function taint_call:
+    undet
+[inout] Out (internal) for function taint_goto_1:
+    x; y; z; t
+[inout] Inputs for function taint_goto_1:
+    undet
+[inout] Out (internal) for function taint_goto_2:
+    x; y; z; t
+[inout] Inputs for function taint_goto_2:
+    undet
 [inout] Out (internal) for function main:
-    global; w; z; __retres
+    tainted; l; __retres
 [inout] Inputs for function main:
-    undet; global
+    undet; tainted
