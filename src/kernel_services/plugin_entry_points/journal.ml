@@ -142,7 +142,7 @@ let print_trailer fmt =
   Format.fprintf fmt "@[(* Main *)@]@\n";
   Format.fprintf fmt "@[<hv 2>let main () =@;";
   Format.fprintf fmt
-    "@[<hv 0>@[<hv 2>Journal.keep_file@;\"%s\";@]@;"
+    "@[<hv 0>@[<hv 2>Journal.keep_file@; (Datatype.Filepath.of_string@; (\"%s\"));@]@;"
     name;
   Format.fprintf fmt "try run ()@;";
   Format.fprintf fmt "@[<v>with@;@[<hv 2>| Unreachable ->@ ";
@@ -170,14 +170,15 @@ let print_trailer fmt =
   (* close the outermost box *)
   Format.pp_close_box fmt ()
 
-let preserved_files = ref []
+let preserved_files : Datatype.Filepath.t list ref = ref []
 let keep_file s = preserved_files := s :: !preserved_files
 
 let get_filename =
   let cpt = ref 0 in
   let rec get_filename first =
-    let name = Format.asprintf "%a" Datatype.Filepath.pretty (get_name ()) in
-    if (not first && Sys.file_exists name) || List.mem name !preserved_files
+    let name_fp = get_name () in
+    let name = (name_fp:>string) in
+    if (not first && Sys.file_exists name) || List.mem name_fp !preserved_files
     then begin
       incr cpt;
       let suf = "_" ^ string_of_int !cpt in
@@ -193,7 +194,7 @@ let get_filename =
          filename := name ^ suf);
       get_filename false
     end else
-      name
+      name_fp
   in
   fun () -> get_filename true
 
@@ -208,9 +209,10 @@ let write () =
   in
   let error msg s = error "cannot %s journal (%s)." msg s in
   let filename = get_filename () in
-  feedback "writing journal in file `%s'." filename;
+  feedback "writing journal in file `%a'."
+    Datatype.Filepath.pretty filename;
   try
-    let cout = open_out filename in
+    let cout = open_out (filename:>string) in
     let fmt = Format.formatter_of_out_channel cout in
     Format.pp_set_margin fmt 78 (* line length *);
     (try write fmt with Sys_error s -> error "write into" s);
