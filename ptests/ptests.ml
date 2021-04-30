@@ -20,10 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** the options to launch the toplevel with if the test file is not
-     annotated with test options *)
-let default_options = "-journal-disable -check"
-
 let system =
   if Sys.os_type = "Win32" then
     fun f ->
@@ -172,6 +168,29 @@ let dir_config_file = "test_config"
     the pattern [test_file_regexp] will be considered as test files *)
 let test_file_regexp = ".*\\.\\(c\\|i\\)$"
 
+(* Splits the command string to separate the command name from the parameters
+   [let cmd_name,param=command_partition cmd in assert cmd=cmd_name^param]
+*)
+let command_partition =
+  let regexp_unescaped_blank = Str.regexp "[^\\ ] " in
+  fun cmd ->
+    match str_bounded_full_split regexp_unescaped_blank cmd 2 with
+    | [ Str.Text cmd ] ->
+      cmd, ""
+    | [ Str.Text cmd ; Str.Delim delim ] ->
+      cmd ^ (String.make 1 (String.get delim 0)), (String.make 1 (String.get delim 1))
+    | [ Str.Text cmd ; Str.Delim delim; Str.Text options ] ->
+      cmd ^ (String.make 1 (String.get delim 0)), (String.make 1 (String.get delim 1)) ^ options
+    | [ Str.Delim delim ] ->
+      (String.make 1 (String.get delim 0)), (String.make 1 (String.get delim 1))
+    | [ Str.Delim delim; Str.Text options ] ->
+      (String.make 1 (String.get delim 0)), (String.make 1 (String.get delim 1)) ^ options
+    | _ -> assert false
+
+let opt_to_byte_options =
+  let regex_cmxs = Str.regexp ("\\([^/]+\\)[.]cmxs\\($\\|[ \t]\\)") in
+  fun options -> str_global_replace regex_cmxs "\\1.cmo\\2" options
+
 let output_unix_error (exn : exn) =
   match exn with
   | Unix.Unix_error (error, _function, arg) ->
@@ -228,19 +247,10 @@ let do_cmp = ref (if Sys.os_type="Win32" then !do_diffs
                   else "cmp -s")
 let do_make = ref "make"
 let n = ref 4    (* the level of parallelism *)
-let suites = ref []
-(** options appended to toplevel for all tests *)
-let additional_options = ref ""
-(** options prepended to toplevel for all tests *)
-let additional_options_pre = ref ""
 
 (** special configuration, with associated oracles *)
 let special_config = ref ""
 let do_error_code = ref false
-
-let exclude_suites = ref []
-
-let exclude s = exclude_suites := s :: !exclude_suites
 
 let xunit = ref false
 
@@ -253,69 +263,25 @@ let lock_fprintf f =
 let lock_printf s = lock_fprintf Format.std_formatter s
 let lock_eprintf s = lock_fprintf Format.err_formatter s
 
+let suites = ref []
 let make_test_suite s =
   suites := s :: !suites
 
+let exclude_suites = ref []
+let exclude s = exclude_suites := s :: !exclude_suites
+
+let macro_post_options = ref "" (* value set to @PTEST_POST_OPTIONS@ macro *)
+let macro_pre_options  = ref "" (* value set to @PTEST_PRE_OPTIONS@  macro *)
+let macro_options = ref "@PTEST_PRE_OPTIONS@ @PTEST_OPT@ @PTEST_POST_OPTIONS@"
+let macro_default_options = ref "-journal-disable -check -no-autoload-plugins"
+
+let macro_frama_c_cmd = ref "@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@"
+let macro_frama_c      = ref "@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@ @PTEST_LOAD_OPTIONS@"
+let default_toplevel = ref "@frama-c@"
+
 (* Those variables are read from a ptests_config file *)
+let toplevel_path = ref "" (* value set to @frama-c-exe@ macro *)
 let default_suites = ref []
-let toplevel_path = ref ""
-
-(* Splits the command string to separate the command name from the parameters
-   [let cmd_name,param=command_partition cmd in assert cmd=cmd_name^param]
-*)
-let command_partition =
-  let regexp_unescaped_blank = Str.regexp "[^\\ ] " in
-  fun cmd ->
-    match str_bounded_full_split regexp_unescaped_blank cmd 2 with
-    | [ Str.Text cmd ] ->
-      cmd, ""
-    | [ Str.Text cmd ; Str.Delim delim ] ->
-      cmd ^ (String.make 1 (String.get delim 0)), (String.make 1 (String.get delim 1))
-    | [ Str.Text cmd ; Str.Delim delim; Str.Text options ] ->
-      cmd ^ (String.make 1 (String.get delim 0)), (String.make 1 (String.get delim 1)) ^ options
-    | [ Str.Delim delim ] ->
-      (String.make 1 (String.get delim 0)), (String.make 1 (String.get delim 1))
-    | [ Str.Delim delim; Str.Text options ] ->
-      (String.make 1 (String.get delim 0)), (String.make 1 (String.get delim 1)) ^ options
-    | _ -> assert false
-
-let opt_to_byte_options =
-  let regex_cmxs = Str.regexp ("\\([^/]+\\)[.]cmxs\\($\\|[ \t]\\)") in
-  fun options -> str_global_replace regex_cmxs "\\1.cmo\\2" options
-
-let opt_to_byte cmd =
-  let opt_to_byte toplevel =
-    match string_del_suffix "frama-c" toplevel with
-    | Some path -> path ^ "frama-c.byte"
-    | None ->
-      match string_del_suffix "toplevel.opt" toplevel with
-      | Some path -> path ^ "toplevel.byte"
-      | None ->
-        match string_del_suffix "frama-c-gui" toplevel with
-        | Some path -> path ^ "frama-c-gui.byte"
-        | None ->
-          match string_del_suffix "viewer.opt" toplevel with
-          | Some path -> path ^ "viewer.byte"
-          | None -> toplevel
-  in
-  let cmdname, options = command_partition cmd in
-  (opt_to_byte cmdname) ^ (opt_to_byte_options options)
-
-let change_toplevel_to_gui () =
-  let s = !toplevel_path in
-  match string_del_suffix "toplevel.opt" s with
-  | Some s -> toplevel_path := s ^ "viewer.opt"
-  | None ->
-    match string_del_suffix "toplevel.byte" s with
-    | Some s -> toplevel_path := s ^ "viewer.byte"
-    | None ->
-      match string_del_suffix "frama-c" s with
-      | Some s -> toplevel_path := s ^ "frama-c-gui"
-      | None ->
-        match string_del_suffix "frama-c.byte" s with
-        | Some s -> toplevel_path := s ^ "frama-c-gui.byte"
-        | None -> ()
-
 
 let () =
   Unix.putenv "LC_ALL" "C" (* some oracles, especially in Jessie, depend on the
@@ -425,13 +391,13 @@ let rec argspec =
     " Use native toplevel (default)";
     "-config", Arg.Set_string special_config,
     " <name> Use special configuration and oracles";
-    "-add-options", Arg.Set_string additional_options,
+    "-add-options", Arg.Set_string macro_post_options,
     "<options> Add additional options to be passed to the toplevels \
      that will be launched. <options> are added after standard test options";
-    "-add-options-pre", Arg.Set_string additional_options_pre,
+    "-add-options-pre", Arg.Set_string macro_pre_options,
     "<options> Add additional options to be passed to the toplevels \
      that will be launched. <options> are added before standard test options.";
-    "-add-options-post", Arg.Set_string additional_options,
+    "-add-options-post", Arg.Set_string macro_post_options,
     "Synonym of -add-options";
     "-exclude", Arg.String exclude,
     "<name> Exclude a test or a suite from the run";
@@ -541,7 +507,35 @@ let () =
   end
 
 (** Must be done after reading config *)
-let () = if !behavior = Gui then change_toplevel_to_gui ()
+let () =
+  if !use_byte then begin
+    match string_del_suffix "frama-c" !toplevel_path with
+    | Some path -> toplevel_path := path ^ "frama-c.byte"
+    | None ->
+      match string_del_suffix "toplevel.opt" !toplevel_path with
+      | Some path -> toplevel_path := path ^ "toplevel.byte"
+      | None ->
+        match string_del_suffix "frama-c-gui" !toplevel_path with
+        | Some path -> toplevel_path := path ^ "frama-c-gui.byte"
+        | None ->
+          match string_del_suffix "viewer.opt" !toplevel_path with
+          | Some path -> toplevel_path := path ^ "viewer.byte"
+          | None -> ()
+  end;
+  if !behavior = Gui then begin
+    match string_del_suffix "toplevel.opt" !toplevel_path with
+    | Some s -> toplevel_path := s ^ "viewer.opt"
+    | None ->
+      match string_del_suffix "toplevel.byte" !toplevel_path with
+      | Some s -> toplevel_path := s ^ "viewer.byte"
+      | None ->
+        match string_del_suffix "frama-c" !toplevel_path with
+        | Some s -> toplevel_path := s ^ "frama-c-gui"
+        | None ->
+          match string_del_suffix "frama-c.byte" !toplevel_path with
+          | Some s -> toplevel_path := s ^ "frama-c-gui.byte"
+          | None -> ()
+  end
 
 (* redefine name if special configuration expected *)
 let redefine_name name =
@@ -594,6 +588,12 @@ end = struct
 
 end
 
+type does_expand = {
+  has_ptest_file : bool;
+  has_ptest_opt : bool;
+  has_frama_c_exe : bool;
+}
+
 module Macros =
 struct
   module StringMap = Map.Make (String)
@@ -618,6 +618,9 @@ struct
     let macro_regex = Str.regexp "@\\([-A-Za-z_0-9]+\\)@" in
     fun macros s ->
       let has_ptest_file = ref false in
+      let has_ptest_opt = ref false in
+      let has_ptest_options = ref false in
+      let has_frama_c_exe = ref false in
       if !verbosity >= 3 then lock_printf "%% Expand: %s@." s;
       if !verbosity >= 4 then print_macros macros;
       let rec aux s =
@@ -627,9 +630,14 @@ struct
             if Str.string_match macro_regex s 0 then begin
               let macro = Str.matched_group 1 s in
               try
+                (match macro with
+                 | "PTEST_FILE" -> has_ptest_file := true
+                 | "PTEST_OPT" -> has_ptest_opt := true
+                 | "PTEST_OPTIONS" -> has_ptest_options := true
+                 | "frama-c-exe" -> has_frama_c_exe := true
+                 | _ -> ());
                 if !verbosity >= 4 then lock_printf "%%     - macro is %s\n%!" macro;
                 let replacement = find macro macros in
-                if String.(macro = "PTEST_FILE") then has_ptest_file := true;
                 if !verbosity >= 3 then
                   lock_printf "%%     - replacement for %s is %s\n%!" macro replacement;
                 aux replacement
@@ -645,7 +653,10 @@ struct
         let r = aux s in
         Mutex.unlock str_mutex;
         if !verbosity >= 3 then lock_printf "%% Expansion result: %s@." r;
-        !has_ptest_file, r
+        { has_ptest_file= !has_ptest_file;
+          has_ptest_opt= !has_ptest_opt;
+          has_frama_c_exe= !has_frama_c_exe;
+        }, r
       with e ->
         lock_eprintf "Uncaught exception %s\n%!" (Printexc.to_string e);
         Mutex.unlock str_mutex;
@@ -669,7 +680,6 @@ struct
   let append_expand name def macros =
     add name (get name macros ^ expand macros def) macros
 end
-
 
 type execnow =
   {
@@ -757,7 +767,13 @@ end = struct
 
   let default_macros () =
     let l = [
-      "frama-c", !toplevel_path;
+      "frama-c-exe",  !toplevel_path;
+      "frama-c-cmd",  !macro_frama_c_cmd;
+      "frama-c",      !macro_frama_c;
+      "PTEST_DEFAULT_OPTIONS",  !macro_default_options;
+      "PTEST_OPTIONS",          !macro_options;
+      "PTEST_PRE_OPTIONS",      !macro_pre_options;
+      "PTEST_POST_OPTIONS",     !macro_post_options;
       "PTEST_MAKE_MODULE", "make -s";
       "PTEST_MODULE", "";
       "PTEST_PLUGIN", "";
@@ -771,8 +787,8 @@ end = struct
       dc_execnow = [];
       dc_filter = None ;
       dc_exit_code = None;
-      dc_default_toplevel = !toplevel_path;
-      dc_commands = [ { toplevel= !toplevel_path; opts=default_options; macros=Macros.empty; exit_code=None; logs= []; timeout= ""} ];
+      dc_default_toplevel = !default_toplevel;
+      dc_commands = [ { toplevel= !default_toplevel; opts=""; macros=Macros.empty; exit_code=None; logs= []; timeout= ""} ];
       dc_dont_run = false;
       dc_load_module = "";
       dc_cmxs_module = StringSet.empty;
@@ -897,9 +913,10 @@ end = struct
         ("",current) deps
     in
     if String.(deps = "") then current
-    else
+    else begin
       let make_cmd = Macros.expand current.dc_macros "@PTEST_MAKE_MODULE@" in
       config_exec ~once:true ~file dir (make_cmd ^ deps) current
+    end
 
   let update_module_macros modules macros =
     let def = String.concat "," modules in
@@ -1253,7 +1270,7 @@ end = struct
         "PTEST_DIR", SubDir.get cmd.directory;
         "PTEST_RESULT",
         SubDir.get cmd.directory ^ "/" ^ redefine_name "result";
-        "PTEST_FILE", Filename.sanitize ptest_file;
+        "PTEST_FILE", ptest_file;
         "PTEST_NAME", ptest_name;
         "PTEST_NUMBER", string_of_int cmd.n;
         "PTEST_OPT", cmd.options;
@@ -1265,8 +1282,29 @@ end = struct
     let macros = Macros.add_list macros cmd.macros in
     let macros = Macros.add_defaults ~defaults macros in
     let process_macros s = Macros.expand macros s in
+    let toplevel =
+      let in_toplevel,toplevel= Macros.does_expand macros cmd.toplevel in
+      if not cmd.execnow then begin
+        let has_ptest_file, options =
+          if in_toplevel.has_ptest_opt then in_toplevel.has_ptest_file, []
+          else
+            let in_option,options= Macros.does_expand macros cmd.options in
+            (in_option.has_ptest_file || in_toplevel.has_ptest_file),
+            (if in_toplevel.has_frama_c_exe then
+               [ process_macros "@PTEST_PRE_OPTIONS@" ;
+                 options ;
+                 process_macros "@PTEST_POST_OPTIONS@" ;
+               ]
+             else [ options ])
+        in
+        String.concat " " (toplevel::(if has_ptest_file then options else ptest_file::options))
+      end
+      else toplevel
+    in
     { cmd with
       macros;
+      toplevel;
+      options = ""; (* no more usable *)
       log_files = List.map process_macros cmd.log_files;
       filter =
         match cmd.filter with
@@ -1274,42 +1312,12 @@ end = struct
         | Some filter -> Some (process_macros filter)
     }
 
-  let contains_frama_c_binary_name =
-    Str.regexp "[^( ]*\\(toplevel\\|viewer\\|frama-c-gui\\|frama-c[^-]\\).*"
-
-  let frama_c_binary_name =
-    Str.regexp "\\([^ ]*\\(toplevel\\|viewer\\|frama-c-gui\\|frama-c\\)\\(\\.opt\\|\\.byte\\|\\.exe\\)?\\)"
-
   let basic_command_string =
     fun command ->
-    let macros = command.macros in
-    let has_ptest_file_t, toplevel =
-      Macros.does_expand macros command.toplevel
-    in
-    let has_ptest_file_o, options = Macros.does_expand macros command.options in
-    let toplevel = if !use_byte then opt_to_byte toplevel else toplevel in
-    let toplevel, contains_frama_c_binary =
-      str_string_match_and_replace contains_frama_c_binary_name
-        frama_c_binary_name ~suffix:" -check" toplevel
-    in
-    let options =
-      if contains_frama_c_binary
-      then begin
-        let opt_load = Macros.expand macros (Macros.get "PTEST_LOAD_OPTIONS" macros) in
-        let opt_pre = Macros.expand macros !additional_options_pre in
-        let opt_post = Macros.expand macros !additional_options in
-        String.concat " " [opt_load ; opt_pre ; options ; opt_post]
-      end else options
-    in
-    let options = if !use_byte then opt_to_byte_options options else options in
     let raw_command =
-      String.concat " "
-        (if has_ptest_file_t || has_ptest_file_o || command.execnow then
-           [ toplevel ; options]
-         else begin
-           let file = Filename.sanitize @@ get_ptest_file command in
-           [ toplevel ; file ; options]
-         end)
+      (* necessary until OPT are using direct -load-module option *)
+      if !use_byte then opt_to_byte_options command.toplevel
+      else command.toplevel
     in
     if command.timeout = "" then raw_command
     else "ulimit -t " ^ command.timeout ^ " && " ^ raw_command
@@ -1553,12 +1561,7 @@ let do_command command =
         if !behavior <> Examine && not (!(execnow.ex_done) && execnow.ex_once)
         then begin
           remove_execnow_results execnow;
-          let cmd =
-            if !use_byte then
-              opt_to_byte execnow.ex_cmd
-            else
-              execnow.ex_cmd
-          in
+          let cmd = execnow.ex_cmd in
           if !verbosity >= 1 || !behavior = Show then begin
             lock_printf "%% launch %s@." cmd;
           end;
