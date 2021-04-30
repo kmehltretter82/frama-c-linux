@@ -253,12 +253,19 @@ handling of the CWE by \FramaC, as one of the following:
   \CWE{78}: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection') & Annotations & Requires annotating which functions may inject OS commands\\
   \CWE{90}: Improper Neutralization of Special Elements used in an LDAP Query ('LDAP Injection') & Annotations & Requires annotating which functions are LDAP-related\\
   \CWE{114}: Process Control & Annotations & Requires annotating sensitive functions and untrusted sources\\
+  \CWE{119}: Improper Restriction of Operations within the Bounds of a Memory Buffer & Handled & -\\
+  \CWE{120}: Buffer Copy without Checking Size of Input ('Classic Buffer Overflow') & Handled & -\\
   \CWE{121}: Stack-based Buffer Overflow & Handled & -\\
   \CWE{122}: Heap-based Buffer Overflow & Handled & -\\
   \CWE{123}: Write-what-where Condition & Handled & -\\
   \CWE{124}: Buffer Underwrite & Handled & -\\
+  \CWE{125}: Out-of-bounds Read & Handled & -\\
   \CWE{126}: Buffer Overread & Handled & -\\
   \CWE{127}: Buffer Underread & Handled & -\\
+  \CWE{128}: Wrap-around Error & Handled & Toggled by options \texttt{-warn-signed-overflow}, \texttt{-warn-unsigned-overflow}, \texttt{-warn-signed-downcast} and \texttt{-warn-unsigned-downcast}.\\
+  \CWE{129}: Improper Validation of Array Index & Handled & -\\
+  \CWE{127}: Buffer Underread & Handled & -\\
+  \CWE{131}: Incorrect Calculation of Buffer Size & Handled & Reported not directly at the allocation site, but during usage; the GUI allows navigating back to the source.\\
   \CWE{134}: Use of Externally-Controlled Format String & Annotations & Requires annotating which format strings come from external sources\\
   \CWE{176}: Improper Handling of Unicode Encoding & Annotations & Requires annotating Unicode-related functions and variables\\
   \CWE{188}: Reliance on Data Memory Layout & Partially Handled & \FramaC memory model handles some kinds of invalid accesses\\
@@ -354,7 +361,13 @@ handling of the CWE by \FramaC, as one of the following:
   \CWE{775}: Missing Release of File Descriptor or Handle & Annotations & Requires annotating resources and their lifecycles\\
   \CWE{780}: Use of RSA Algorithm Without OAEP & Not Handled & -\\
   \CWE{785}: Path Manipulation Function Without Max Sized Buffer & Annotations & Requires all relevant filepath-related functions to have correct annotations\\
+  \CWE{786}: Access of Memory Location Before Start of Buffer & Handled & -\\
+  \CWE{787}: Out-of-bounds Write & Handled & -\\
+  \CWE{788}: Access of Memory Location After End of Buffer & Handled & -\\
   \CWE{789}: Memory Allocation with Excessive Size Value & Annotations & Requires annotating memory limits\\
+  \CWE{823}: Use of Out-of-range Pointer Offset & Handled & -\\
+  \CWE{824}: Access of Uninitialized Pointer & Handled & -\\
+  \CWE{825}: Expired Pointer Dereference & Handled & -\\
   \CWE{832}: Unlock of Resource That is Not Locked & Annotations & Requires annotating resources and operations on them\\
   \CWE{835}: Infinite Loop & Partially Handled & Loops which, semantically, are {\em always} infinite are reported by the Nonterm plugin\\
   \CWE{843}: Access of Resource Using Incompatible Type ('Type Confusion') & Not Handled & -\\
