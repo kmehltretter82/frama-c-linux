@@ -1,1 +1,3 @@
+PLUGIN: aorai eva,from,scope report wp,rtegen
+MODULE: aorai_test
 MACRO: PROVE_OPTIONS

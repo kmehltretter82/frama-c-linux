@@ -1,11 +1,11 @@
 /* run.config
-   MODULE: @PTEST_NAME@
-   OPT: -journal-disable -then -main main2
+ PLUGIN: @EVA_PLUGINS@ pdg
+ MODULE: @PTEST_NAME@
+   OPT: -then -main main2
 */
 /* bug 971: */
 volatile foo;
 int v;
-
 void f1 () {
   v += 1;
 }

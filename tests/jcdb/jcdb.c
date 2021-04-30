@@ -5,7 +5,7 @@
    OPT: -json-compilation-database @PTEST_DIR@/with_arguments.json -no-autoload-plugins
  MODULE:
    EXECNOW: LOG list_files.res LOG list_files.err share/analysis-scripts/list_files.py @PTEST_DIR@/compile_commands_working.json > @PTEST_DIR@/result/list_files.res 2> @PTEST_DIR@/result/list_files.err
-   EXECNOW: LOG logic-pp-include.res LOG logic-pp-include.err @frama-c@ -json-compilation-database @PTEST_DIR@/logic-pp-include @PTEST_DIR@/logic-pp-include/no-stdio.c -print -no-autoload-plugins > @PTEST_DIR@/result/logic-pp-include.res 2> @PTEST_DIR@/result/logic-pp-include.err
+   EXECNOW: LOG logic-pp-include.res LOG logic-pp-include.err @frama-c@ -json-compilation-database @PTEST_DIR@/logic-pp-include @PTEST_DIR@/logic-pp-include/no-stdio.c -print > @PTEST_DIR@/result/logic-pp-include.res 2> @PTEST_DIR@/result/logic-pp-include.err
 */
 
 #include <stdio.h>

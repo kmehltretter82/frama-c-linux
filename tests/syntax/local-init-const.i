@@ -1,6 +1,8 @@
 /*run.config
-  OPT: -no-autoload-plugins -load-module eva,scope -eva -eva-verbose 0
+PLUGIN: eva,scope
+  OPT: -eva -eva-verbose 0
  */
+
 unsigned id(unsigned x) { return x; }
 
 void main() {

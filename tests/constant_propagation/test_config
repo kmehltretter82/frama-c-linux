@@ -1,1 +1,3 @@
+MACRO: CONSTANT_PROPAGATION_PLUGINS constant_propagation eva,scope
+PLUGIN: @CONSTANT_PROPAGATION_PLUGINS@
 OPT: -journal-disable -scf @EVA_OPTIONS@ -machdep x86_32

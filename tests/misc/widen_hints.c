@@ -1,4 +1,5 @@
 /* run.config
+PLUGIN: @EVA_PLUGINS@
  EXIT:1
    OPT: -eva @EVA_CONFIG@ -cpp-extra-args=-DSYNTAX_ERRORS -kernel-warn-key=annot-error=active
    OPT: -eva @EVA_CONFIG@ -cpp-extra-args=-DNONCONST
@@ -7,7 +8,6 @@
    OPT: -eva @EVA_CONFIG@ -cpp-extra-args=-DALLGLOBAL -eva-msg-key widen-hints
 */
 #define N 2
-
 const int x = 9;
 int not_const = 42; // cannot be used as widen hint
 

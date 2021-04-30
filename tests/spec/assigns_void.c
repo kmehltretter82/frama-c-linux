@@ -1,10 +1,10 @@
 /* run.config
- OPT: -print -journal-disable -kernel-warn-key=annot-error=active
- OPT: -eva @EVA_CONFIG@ -main g -print -no-annot -journal-disable
+ OPT: -print -kernel-warn-key=annot-error=active
+PLUGIN: eva,scope
+ OPT: -eva @EVA_CONFIG@ -main g -print -no-annot
  */
 //@ assigns *x;
 void f(void *x);
-
 void g() {
   int y;
   int* x = &y;

@@ -4,7 +4,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:alarm] tests/misc/well_typed_alarm.i:11: Warning: 
+[eva:alarm] tests/misc/well_typed_alarm.i:16: Warning: 
   pointer comparison. assert \pointer_comparable((void *)p, (void *)q);
 [eva] done for function main
 [eva:summary] ====== ANALYSIS SUMMARY ======

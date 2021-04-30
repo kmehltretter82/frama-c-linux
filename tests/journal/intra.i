@@ -1,5 +1,6 @@
 /* run.config
-   MODULE: @PTEST_NAME@
+ PLUGIN: @EVA_PLUGINS@ sparecode
+ MODULE: @PTEST_NAME@
    EXECNOW: BIN intra_journal.ml @frama-c@ -eva-show-progress -journal-enable -journal-name tests/journal/result/intra_journal.ml @PTEST_DIR@/@PTEST_NAME@.i > /dev/null 2> /dev/null
    CMD: @frama-c@
    OPT: -load-script tests/journal/result/intra_journal -journal-disable
@@ -12,7 +13,6 @@
  * slicing analysis removes statement having variables with
  * prefix "spare_" and "any_"
  */
-
 int G;
 
 int tmp (int a) {

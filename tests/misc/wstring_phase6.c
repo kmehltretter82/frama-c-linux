@@ -1,9 +1,9 @@
 /* run.config
+PLUGIN: variadic
  MODULE: @PTEST_NAME@
    OPT: -journal-disable -print -variadic-no-translation
 */
 #include <stdio.h>
-
 // See http://stackoverflow.com/questions/18102502/mixing-wide-and-narrow-string-literals-in-c
 int main(){
 printf( "%s\n", "123" "456" );

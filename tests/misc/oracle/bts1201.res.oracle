@@ -4,7 +4,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] tests/misc/bts1201.i:5: assertion got status valid.
+[eva] tests/misc/bts1201.i:8: assertion got status valid.
 [eva] done for function main
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------

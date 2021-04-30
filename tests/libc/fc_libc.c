@@ -1,6 +1,7 @@
 /* run.config*
+ PLUGIN: @EVA_PLUGINS@ metrics
  MODULE: check_libc_naming_conventions, check_const
-   OPT: -print -cpp-extra-args='-nostdinc -Ishare/libc' -metrics -metrics-libc -load-module metrics -eva @EVA_CONFIG@ -then -lib-entry -no-print -metrics-no-libc
+   OPT: -print -cpp-extra-args='-nostdinc -Ishare/libc' -metrics -metrics-libc -eva @EVA_CONFIG@ -then -lib-entry -no-print -metrics-no-libc
  MODULE:
    OPT: -print -print-libc -machdep x86_32
  MODULE: check_parsing_individual_headers
@@ -151,7 +152,6 @@
 #include "utmpx.h"
 #include "wchar.h"
 #include "wctype.h"
-
 void main() {
   /* The variables below must be const; otherwise the preconditions
      and the assigns/from of some functions will not match */

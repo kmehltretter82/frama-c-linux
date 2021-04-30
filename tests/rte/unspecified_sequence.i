@@ -1,3 +1,8 @@
+/* run.config
+ PLUGIN: @EVA_PLUGINS@
+   STDOPT:
+*/
+
 unsigned long long f(int x) {
   return 0;
 }

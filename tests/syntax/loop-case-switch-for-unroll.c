@@ -1,4 +1,5 @@
 /* run.config
+PLUGIN: eva,scope
    STDOPT: +"-eva-slevel 100 -eva"
    STDOPT: +"-ulevel 1 -eva-slevel 100 -eva"
    STDOPT: +"-ulevel 2 -eva-slevel 100 -eva"
@@ -6,7 +7,6 @@
    the result of Frama-C piped to:
      "| grep Frama_C_show_each | sed 's/^.*Frama_C_show_each_//'"
 */
-
 #ifdef __FRAMAC__
 #define print(line, s, a) Frama_C_show_each_ ## s ## _(a)
 #else

@@ -1,5 +1,5 @@
 [kernel:audit] Warning: 
-  different hashes for tests/misc/audit.c: got aec49f030fcf92bc135bd75e7088194f, expected 01010101010101010101010101010101
+  different hashes for tests/misc/audit.c: got f94ce1c8f5e5911260931783495e2c88, expected 01010101010101010101010101010101
 [kernel:audit] Warning: 
   different hashes for tests/misc/audit_included_but_not_listed.h: got c2cc488143a476f69cf2ed04c3439e6e, expected <none> (not in list)
 [kernel:audit] Warning: 

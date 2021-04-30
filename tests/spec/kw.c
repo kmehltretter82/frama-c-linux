@@ -1,3 +1,9 @@
+/* run.config
+COMMENT: eva plugin is required for the slevel annotation
+PLUGIN: eva
+  STDOPT:
+*/
+
 typedef int assert;
 
 assert behavior = 0;

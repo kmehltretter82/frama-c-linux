@@ -16,9 +16,11 @@
       "invocations": [
         {
           "commandLine":
-            "frama-c -check tests/sarif/std_string.c -eva -then -mdr-sarif-deterministic -mdr-gen sarif -mdr-out tests/sarif/result/std_string.sarif",
+            "frama-c -journal-disable -check -no-autoload-plugins -load-module=eva,from,scope,markdown_report tests/sarif/std_string.c -eva -then -mdr-sarif-deterministic -mdr-gen sarif -mdr-out tests/sarif/result/std_string.sarif",
           "arguments": [
-            "-check", "tests/sarif/std_string.c", "-eva", "-then",
+            "-journal-disable", "-check", "-no-autoload-plugins",
+            "-load-module=eva,from,scope,markdown_report",
+            "tests/sarif/std_string.c", "-eva", "-then",
             "-mdr-sarif-deterministic", "-mdr-gen", "sarif", "-mdr-out",
             "tests/sarif/result/std_string.sarif"
           ],

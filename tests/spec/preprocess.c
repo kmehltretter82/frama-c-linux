@@ -1,7 +1,7 @@
 /* run.config
-   OPT: -eva @EVA_CONFIG@ -journal-disable -print
+PLUGIN: eva,scope
+   OPT: -eva @EVA_CONFIG@ -print
 */
-
 // see bts 1357
 #define assert(x) (x)?1:0
 

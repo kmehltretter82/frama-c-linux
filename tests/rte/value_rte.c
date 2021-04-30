@@ -1,7 +1,7 @@
 /* run.config
+PLUGIN: eva,scope rtegen report
 OPT: -rte -then -eva @EVA_OPTIONS@ -then -report
 */
-
 #include "stdio.h"
 
 int main(){

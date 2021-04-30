@@ -1,2 +1,3 @@
-CMD: @frama-c@ -no-autoload-plugins -load-module wp -wp -wp-prover none -wp-print -wp-share ./share -wp-msg-key shell -wp-warn-key "pedantic-assigns=inactive"
+PLUGIN: wp
+CMD: @frama-c@ -wp -wp-prover none -wp-print -wp-share ./share -wp-msg-key shell -wp-warn-key "pedantic-assigns=inactive"
 OPT:

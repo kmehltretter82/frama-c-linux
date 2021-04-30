@@ -1,9 +1,9 @@
 /*run.config
+ PLUGIN: @EVA_PLUGINS@
   STDOPT: +"-machdep gcc_x86_64 -kernel-msg-key typing:pragma"
   STDOPT: +"-machdep gcc_x86_32"
   STDOPT: +"-machdep msvc_x86_64"
  */
-
 #include "pragma-pack-utils.h"
 
 #include <stdint.h>

@@ -4,8 +4,8 @@ EXECNOW: LOG @PTEST_NAME@.parse.log @frama-c@ @PTEST_FILE@ -save @PTEST_DIR@/res
 EXECNOW: LOG @PTEST_NAME@.eva.log @frama-c@ -load @PTEST_DIR@/result/@PTEST_NAME@_parse.sav -eva -save @PTEST_DIR@/result/@PTEST_NAME@_eva.sav > @PTEST_DIR@/result/@PTEST_NAME@.eva.log
 EXECNOW: LOG @PTEST_NAME@.sarif @frama-c@ -load @PTEST_DIR@/result/@PTEST_NAME@_eva.sav -then -mdr-out @PTEST_DIR@/result/@PTEST_NAME@.sarif -mdr-gen sarif -mdr-no-print-libc -mdr-sarif-deterministic
 */
-#include "__fc_builtin.h"
 
+#include "__fc_builtin.h"
 #define LENGTH 10
 
 int getValueFromArray(int *array, int len, int index) {
