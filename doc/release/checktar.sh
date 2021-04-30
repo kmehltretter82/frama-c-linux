@@ -32,7 +32,7 @@ do
     fi
 done
 
-RESULT=$(rgrep $HOME $DIR)
+RESULT=$(grep -Iir $HOME $DIR)
 
 if [[ "$RESULT" != "" ]]; then
     echo "### ERROR: Found some $HOME occurrences in the distribution"
