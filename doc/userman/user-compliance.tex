@@ -96,7 +96,7 @@ emitted by the Eva plugin and C undefined behaviors.
   freeable & {\em CC.179} & This is not an RTE category, but an alarm related to an ACSL precondition \\
   index\_bound & {\em CC.49} & \\
   initialization & {\em CC.11}, {\em CC.21}, {\em CC.180} & \\
-  mem\_access & {\em CC.33}, {\em CC.43}, {\em CC.47}, {\em CC.62}, {\em CC.64}, {\em CC.176} (among others) & \\
+  mem\_access & {\em CC.33}, {\em CC.43}, {\em CC.47}, {\em CC.62}, {\em CC.64}, {\em CC.176} (among others) & Alignment issues are currently not reported by Frama-C. \\
   overflow & {\em CC.24}, {\em CC.36}, {\em CC.50} &
   This category comprises the following RTEs:
   \texttt{signed\_overflow}, \texttt{unsigned\_overflow},
@@ -200,8 +200,8 @@ NIST's Software Assurance Metrics and Tool Evaluation
 (SAMATE\footnote{\url{https://samate.nist.gov/Main_Page.html}}),
 namely its Static Analysis Tool Expositions (SATE),
 which allowed us to identify some of the CWEs which
-\FramaC already can or cannot handle. The CWEs listed here are those present
-in Juliet's 1.3 C/C++ test suite, available at NIST SAMATE's website.
+\FramaC already can or cannot handle. The CWEs listed here are mostly those
+present in Juliet's 1.3 C/C++ test suite, available at NIST SAMATE's website.
 Several caveats apply; for instance, some Juliet tests marked as {\em bad}
 (that is, exhibiting a weakness) only do so for specific architectural
 configurations, e.g. 32-bit pointers. If \FramaC is run with a different
@@ -219,8 +219,6 @@ handling of the CWE by \FramaC, as one of the following:
 \item[Partially Handled] means the CWE is handled only in some specific cases;
   \FramaC can thus help {\em detect} occurrences of this CWE, but not
   {\em prove their absence};
-\item[Handled Indirectly] means the CWE is not identified at its point of
-  occurrence, but its side effects are reported by \FramaC;
 \item[Annotations] means the CWE could be handled by \FramaC, but some
   development is required; in practice, this often means user annotations
   will be required, e.g. for specifying the source of tainted data;
@@ -264,7 +262,6 @@ handling of the CWE by \FramaC, as one of the following:
   \CWE{127}: Buffer Underread & Handled & -\\
   \CWE{128}: Wrap-around Error & Handled & Toggled by options \texttt{-warn-signed-overflow}, \texttt{-warn-unsigned-overflow}, \texttt{-warn-signed-downcast} and \texttt{-warn-unsigned-downcast}.\\
   \CWE{129}: Improper Validation of Array Index & Handled & -\\
-  \CWE{127}: Buffer Underread & Handled & -\\
   \CWE{131}: Incorrect Calculation of Buffer Size & Handled & Reported not directly at the allocation site, but during usage; the GUI allows navigating back to the source.\\
   \CWE{134}: Use of Externally-Controlled Format String & Annotations & Requires annotating which format strings come from external sources\\
   \CWE{176}: Improper Handling of Unicode Encoding & Annotations & Requires annotating Unicode-related functions and variables\\
@@ -301,7 +298,7 @@ handling of the CWE by \FramaC, as one of the following:
   \CWE{390}: Error Without Action & Not Handled & -\\
   \CWE{391}: Unchecked Error Condition & Not Handled & -\\
   \CWE{400}: Uncontrolled Resource Consumption & Annotations & Requires annotating resource-related functions and variables\\
-  \CWE{401}: Missing Release of Memory after Effective Lifetime & Partially Handled & The Eva plugin contains a builtin to check for {\em some} cases of memory leaks; must be explicitly invoked\\
+  \CWE{401}: Missing Release of Memory after Effective Lifetime & Not Handled & -\\
   \CWE{404}: Improper Resource Shutdown or Release & Annotations & Requires annotating resources and functions manipulating them\\
   \CWE{415}: Double Free & Handled & -\\
   \CWE{416}: Use After Free & Handled & -\\
@@ -333,7 +330,7 @@ handling of the CWE by \FramaC, as one of the following:
   \CWE{563}: Unused Variable & Syntactic & Mostly syntactic in nature; compilers often warn about it\\
   \CWE{570}: Expression Always False & Syntactic & Mostly syntactic in nature; compilers often warn about it\\
   \CWE{571}: Expression Always True & Syntactic & Mostly syntactic in nature; compilers often warn about it\\
-  \CWE{587}: Assignment of Fixed Address to Pointer & Handled Indirectly & Detected via \texttt{-warn-invalid-pointer} at the assignment, otherwise indirectly at the point of usage; option \texttt{-absolute-valid-range} changes its behavior\\
+  \CWE{587}: Assignment of Fixed Address to Pointer & Handled & Detected via \texttt{-warn-invalid-pointer} at the assignment, otherwise indirectly at the point of usage; option \texttt{-absolute-valid-range} changes its behavior\\
   \CWE{588}: Attempt to Access Child of a Non-structure Pointer & Partially Handled & \FramaC emits warnings for certain types of incompatible casts\\
   \CWE{590}: Free Memory Not on Heap & Handled & -\\
   \CWE{591}: Sensitive Data Storage in Improperly Locked Memory & Not Handled & -\\
