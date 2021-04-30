@@ -23,7 +23,8 @@ More precisely, the grammars of terms and binders presented respectively
 Figures~\ref{fig:gram:term} and~\ref{fig:gram:binders} are the same than the one
 of \acsl, while Figure~\ref{fig:gram:pred} presents the grammar of
 predicates. The only differences introduced by \eacsl with respect to \acsl are
-the quantifications that must be guarded and the introduction of iterators.
+the fact that the quantifications that must be guarded and the introduction of
+iterators.
 
 \begin{figure}[htbp]
   \begin{cadre}
@@ -50,8 +51,9 @@ the quantifications that must be guarded and the introduction of iterators.
 \subsection*{Quantification}
 
 {\highlightnotimplemented The general form of quantifications (called
-    generalized quantification below), as described in Fig.~\ref{fig:gram:pred},
-    are restricted to a few \emph{finite enumerable types}: the types of bound
+    generalized quantifications below), as described in
+    Fig.~\ref{fig:gram:pred},
+    is restricted to a few \emph{finite enumerable types}: the types of bound
     variables must be \C integer types, enum types, pointer types, or their
     aliases.
 
@@ -93,8 +95,8 @@ identifiers $id$ are variable identifiers enclosed in the binder list.
 \subsection*{{\highlightnotimplemented{Iterator quantification}}} For
 iterating over other data structures, \eacsl introduces a notion of $iterators$
 over types that are introduced by a specific construct which attaches two sets
---- namely \texttt{nexts} and the \texttt{guards} --- to a binary predicate over
-a type $\tau$. Both sets must have the same cardinal. This construct is
+--- namely \texttt{nexts} and \texttt{guards} --- to a binary predicate over
+a type $\tau$.. This construct is
 described by the grammar of Figure~\ref{fig:gram:iterator}.
   \begin{figure}[htbp]
     \begin{cadre}
@@ -106,7 +108,8 @@ described by the grammar of Figure~\ref{fig:gram:iterator}.
   For a type $\tau$, \texttt{nexts} is a set of terms, and \texttt{guards} a set
   of predicates of the same cardinal. Each term in \texttt{nexts} is a function
   taking an argument of type $\tau$ and returning a value of type $\tau$ which
-  is a successor of its argument. Each predicate in the set gards takes an
+  is a successor of its argument. Each predicate in the set \texttt{guards}
+  takes an
   element of type $\tau$, and is valid (resp. invalid) to indicate that the
   iteration should continue on the corresponding successor (resp.  stop at the
   given argument).
@@ -388,8 +391,8 @@ with \lstinline|\old| and \lstinline|\result|.
 \except{ranges and \notimplemented{set comprehensions} are limited in order to
   be finite}
 
-Figure~\ref{fig:gram:locations} describes grammar of sets of terms. There are
-two differences with \acsl:
+Figure~\ref{fig:gram:locations} describes the grammar of sets of terms. There
+are two differences with \acsl:
 \begin{itemize}
 \item ranges necessarily have lower and upper bounds;
 \item a guard for each binder is required when defining set comprehension. The
@@ -445,7 +448,7 @@ set of even integers between 0 and 10.
 \indextt{assert}
 \nodiff
 
-Figure~\ref{fig:gram:assertions} summarizes grammar for assertions.
+Figure~\ref{fig:gram:assertions} summarizes the grammar for assertions.
 \begin{figure}[htbp]
   \begin{cadre}
     \input{assertions_modern.bnf}
@@ -461,7 +464,7 @@ Figure~\ref{fig:gram:assertions} summarizes grammar for assertions.
 
 \except{loop invariants lose their inductive nature}
 
-Figure~\ref{fig:gram:loops} shows grammar for loop annotations. There is no
+Figure~\ref{fig:gram:loops} shows the grammar for loop annotations. There is no
 syntactic difference with \acsl.
 \begin{figure}[htbp]
   \begin{cadre}
@@ -651,7 +654,7 @@ Figure~\ref{fig:gram:stcontracts} shows the grammar of statement contracts.
 
 \nodiff
 
-Figure~\ref{fig:gram:logic} presents grammar of logic definitions.
+Figure~\ref{fig:gram:logic} presents the grammar of logic definitions.
 
 \begin{figure}[htbp]
   \fbox{\begin{minipage}{0.97\linewidth}\vfill \input{logic_modern.bnf}
@@ -704,7 +707,7 @@ through semantic criteria.
 
 \nodiff
 
-Figure~\ref{fig:gram:logicdecl} presents grammar of inductive predicates.
+Figure~\ref{fig:gram:logicdecl} presents the grammar of axiomatic definitions.
 
 \begin{figure}[htbp]
   \fbox{\begin{minipage}{0.97\linewidth}\vfill \input{logicdecl_modern.bnf}
@@ -713,7 +716,7 @@ Figure~\ref{fig:gram:logicdecl} presents grammar of inductive predicates.
 \label{fig:gram:logicdecl}
 \end{figure}
 
-Axiomatic declarations in all their generality are not monitorable. Therefore,
+Axiomatic definitions in all their generality are not monitorable. Therefore,
 future versions of this document will restrict them syntactically and/or
 through semantic criteria.
 
