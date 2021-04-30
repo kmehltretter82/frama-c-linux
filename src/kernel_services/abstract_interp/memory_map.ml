@@ -87,6 +87,7 @@ sig
   val top : t
   val top_numerical : t
   val is_included : t -> t -> bool
+  val join: t -> t -> t
 end
 
 module type Config =
@@ -107,13 +108,13 @@ sig
   val top : t
   val zero : t
   val is_top : t -> bool
-  val reduce : (value -> value -> value) -> t -> location -> value
-  val extract : (value -> value -> value) -> t -> location -> t
+  val get : t -> location -> value
+  val extract :t -> location -> t
   val initialize : t -> location -> default -> t
-  val set : t -> location -> value -> t
+  val set : weak:bool -> t -> location -> value -> t
   val update : weak:bool -> (weak:bool -> value -> value) ->  t -> location -> t
   val erase : t -> location -> t
-  val overwrite : weak:bool -> (weak:bool -> value -> value -> value) -> t -> location -> t -> t
+  val overwrite : weak:bool -> t -> location -> t -> t
   val is_included : t -> t -> bool
   val join : (size:size -> value -> value -> value) -> t -> t -> t
   val widen : (size:size -> value -> value -> value) -> t -> t -> t
@@ -538,13 +539,13 @@ struct
         | _ -> raise (IncompatibleOffset Top) (* structure mismatch *)
       end
 
-  let reduce _f m offset =
+  let get m offset =
     match read m offset with
     | Scalar s, typ when are_typ_compatible s.scalar_type typ -> s.scalar_value
     | _ -> default_to_value Top
     | exception (IncompatibleOffset d) -> default_to_value d
 
-  let extract _join m offset =
+  let extract m offset =
     try
       fst (read m offset)
     with IncompatibleOffset d -> Default d
@@ -599,16 +600,23 @@ struct
     in
     write ~weak:false f m offset
 
-  let set m offset v =
-    let f ~weak (_old,t) =
-      assert (not weak);
-      Scalar {
-        scalar_value = v;
-        scalar_type = t;
-      }
+  let set ~weak m offset new_v =
+    let f ~weak (m,t) =
+      let scalar_value =
+        if weak then 
+          let old_v = match m with
+            | Scalar s when are_typ_compatible s.scalar_type t -> s.scalar_value
+            | Default d -> default_to_value d
+            | _ -> Value.top
+          in
+          Value.join old_v new_v
+        else
+          new_v
+      in
+      Scalar { scalar_value ; scalar_type=t }
     in
-    write ~weak:false f m offset
-
+    write ~weak f m offset
+    
   let update ~weak f' m offset =
     let f ~weak (m,t) =
       let old = match m with
@@ -629,9 +637,12 @@ struct
     in
     write ~weak:false f m offset
 
-  let overwrite ~weak f dst offset src =
-    let f' ~weak:_ (m,_t) =
-      join (fun ~size:_ -> f ~weak) m src
+  let overwrite ~weak dst offset src =
+    let f' ~weak (m,_t) =
+      if weak then
+        join (fun ~size:_ -> Value.join) m src
+      else
+        src
     in
     write ~weak f' dst offset
 end

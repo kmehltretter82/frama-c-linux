@@ -44,6 +44,7 @@ sig
   val top : t
   val top_numerical : t
   val is_included : t -> t -> bool
+  val join : t -> t -> t
 end
 
 module type Config =
@@ -71,17 +72,17 @@ sig
   (* Is the memory map completely unknown ? *)
   val is_top : t -> bool
 
-  (* Get a unique value from a set of locations *)
-  val reduce : (value -> value -> value) -> t -> location -> value
+  (* Get a value from a set of locations *)
+  val get : t -> location -> value
 
   (* Extract a sub map from a set of locations *)
-  val extract : (value -> value -> value) -> t -> location -> t
+  val extract : t -> location -> t
 
   (* Set a default value on a set of locations *)
   val initialize : t -> location -> default -> t
 
-  (* Set a unique value on a set of locations *)
-  val set : t -> location -> value -> t
+  (* Set a value on a set of locations *)
+  val set : weak:bool -> t -> location -> value -> t
 
   (* Update values on a set of locations *)
   val update : weak:bool -> (weak:bool -> value -> value) ->  t -> location -> t
@@ -90,7 +91,7 @@ sig
   val erase : t -> location -> t
 
   (* Copy a whole map over another *)
-  val overwrite : weak:bool -> (weak:bool -> value -> value -> value) -> t -> location -> t -> t
+  val overwrite : weak:bool -> t -> location -> t -> t
 
   (* Test inclusion of one memory map into another *)
   val is_included : t -> t -> bool

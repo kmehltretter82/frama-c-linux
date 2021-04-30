@@ -116,21 +116,29 @@ struct
     else
       match Cil.unrollType base_typ with
       | TArray (elem_typ, array_size, _, _) ->
-        (* TODO: Cil.bitsSizeOf doesn't work when elements are themselves array
-           of execution-time size *)
-        let elem_size = Integer.of_int (Cil.bitsSizeOf elem_typ) in
-        if Integer.is_zero elem_size then (* array of elements of size 0 *)
-          if Ival.is_zero ival then (* the whole range is valid *)
-            let sub = of_ival elem_typ typ ival in
-            Index (array_range array_size, elem_typ, sub)
-          else (* Non-zero offset cannot represent anything here *)
-            raise Abstract_interp.Error_Top
-        else
-          let range = Ival.scale_div ~pos:true elem_size ival
-          and range_rem = Ival.scale_rem ~pos:true elem_size ival in
-          let sub = of_ival elem_typ typ range_rem in
-          Index (range, elem_typ, sub)
-
+        begin try
+            let elem_size = Integer.of_int (Cil.bitsSizeOf elem_typ) in  
+            if Integer.is_zero elem_size then (* array of elements of size 0 *)
+              if Ival.is_zero ival then (* the whole range is valid *)
+                let sub = of_ival elem_typ typ ival in
+                Index (array_range array_size, elem_typ, sub)
+              else (* Non-zero offset cannot represent anything here *)
+                raise Abstract_interp.Error_Top
+            else
+              let range = Ival.scale_div ~pos:true elem_size ival
+              and range_rem = Ival.scale_rem ~pos:true elem_size ival in
+              let sub = of_ival elem_typ typ range_rem in
+              Index (range, elem_typ, sub)
+          with Cil.SizeOfError (_,_) ->
+            (* Cil.bitsSizeOf can raise an exception when elements are
+               themselves array of execution-time size *)
+            if Ival.is_zero ival then
+              let sub = of_ival elem_typ typ ival in
+              Index (ival, elem_typ, sub)
+            else
+              raise Abstract_interp.Error_Top
+        end
+            
       | TComp (ci, _, _) ->
         if not ci.cstruct then
           (* Ignore unions for now *)

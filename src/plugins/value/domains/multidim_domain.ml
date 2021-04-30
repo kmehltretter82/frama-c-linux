@@ -180,30 +180,25 @@ struct
   let get m loc =
     match loc with
     | `Top -> Value.top
-    | `Value loc -> Memory.reduce Value.join m loc
+    | `Value loc -> Memory.get m loc
 
   let extract m loc =
     match loc with
     | `Top -> Memory.top
-    | `Value loc -> Memory.extract Value.join m loc
+    | `Value loc -> Memory.extract m loc
 
   let initialize m loc init_value =
     match loc with
     | `Top -> Memory.top
     | `Value loc -> Memory.initialize m loc init_value
 
-  let update ~weak new_v m loc =
+  let set ~weak new_v m loc =
     match loc with
     | `Top -> Memory.top
     | `Value loc ->
-      let f ~weak old_v =
-        if weak
-        then Value.join old_v new_v
-        else new_v
-      in
-      Memory.update ~weak f m loc
+      Memory.set ~weak m loc new_v
 
-  let reduce f m loc =
+  let update ~weak f m loc =
     match loc with
     | `Top -> m
     | `Value loc ->
@@ -215,7 +210,7 @@ struct
           | `Value v -> v
           | `Bottom -> raise Abstract_interp.Error_Bottom
       in
-      Memory.update ~weak:false f' m loc
+      Memory.update ~weak f' m loc
 
   let erase m loc =
     match loc with
@@ -227,12 +222,7 @@ struct
     match loc with
     | `Top -> Memory.top
     | `Value loc ->
-      let f ~weak old_v new_v =
-        if weak
-        then Value.join old_v new_v
-        else new_v
-      in
-      Memory.overwrite ~weak f dst loc src
+      Memory.overwrite ~weak dst loc src
 end
 
 
@@ -323,12 +313,12 @@ struct
 
   (* Accesses *)
 
-  let load (state : state) (src : mdlocation) : value =
-    let load_base base loc r =
+  let get (state : state) (src : mdlocation) : value =
+    let get_base base loc r =
       let v = Base_Domain.get (find_or_top state base) loc in
       Bottom.join Value.join r (`Value v)
     in
-    match Location.fold load_base src `Bottom with
+    match Location.fold get_base src `Bottom with
     | `Bottom -> Value.top (* does not happen if the location is not empty *)
     | `Value v -> v
 
@@ -340,20 +330,20 @@ struct
     in
     Location.fold extract_base src `Bottom
 
-  let store (state : state) (dst : mdlocation) (v : value) =
+  let set (state : state) (dst : mdlocation) (v : value) =
     let weak = not (Location.is_singleton dst) in
-    let store_base base loc state =
+    let set_base base loc state =
       if covers_base base then
-        add base (Base_Domain.update ~weak v (find_or_top state base) loc) state
+        add base (Base_Domain.set ~weak v (find_or_top state base) loc) state
       else
         state
     in
-    Location.fold store_base dst state
+    Location.fold set_base dst state
 
   let overwrite (state : state) (dst : mdlocation) (src : mdlocation) =
     (* assert (Location.size dst = Location.size src); *)
     let weak = not (Location.is_singleton dst) in
-    match  extract state src with
+    match extract state src with
     | `Bottom -> state (* no source *)
     | `Value value ->
       let overwrite_base base loc state =
@@ -377,7 +367,7 @@ struct
     let update_base base loc state =
       if covers_base base then
         let map = find_or_top state base in
-        add base (Base_Domain.reduce f map loc) state
+        add base (Base_Domain.update ~weak:false f map loc) state
       else
         state (* destination base not covered : do nothing *)
     in
@@ -409,7 +399,7 @@ struct
     let v =
       try
         let loc = Location.of_lval oracle lv in
-        load state loc
+        get state loc
       with Abstract_interp.Error_Top | Abstract_interp.Error_Bottom -> Value.top
     in
     `Value (v, None), Alarmset.all
@@ -457,7 +447,7 @@ struct
       let dst = Location.of_lval oracle lval in
       match assigned_value with
       | Assign value ->
-        `Value (store state dst value)
+        `Value (set state dst value)
       | Copy (right, _value) ->
         try
           let src = Location.of_lval oracle right.lval in
