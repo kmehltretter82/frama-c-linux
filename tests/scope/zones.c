@@ -1,6 +1,6 @@
 /* run.config
-#   MODULE: @PTEST_NAME@
-   OPT: -load-module @PTEST_DIR@/@PTEST_NAME@ -eva @EVA_OPTIONS@ -journal-disable
+ MODULE: @PTEST_NAME@
+   OPT: -eva @EVA_OPTIONS@ -journal-disable
 */
 
 
