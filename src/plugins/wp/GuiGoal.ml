@@ -546,6 +546,11 @@ class pane (gprovers : GuiConfig.provers) =
           on_proof_context proof
             begin fun () ->
               text#clear ;
+              let main = ProofEngine.main proof in
+              if ProofSession.exists main then begin
+                text#printf "%a@." ProofSession.pp_script_for main ;
+                text#hrule ;
+              end ;
               scripter#tree proof ;
               text#hrule ;
               text#printf "%t@." (printer#goal (ProofEngine.head proof)) ;
