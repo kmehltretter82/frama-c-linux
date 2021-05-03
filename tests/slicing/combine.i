@@ -1,5 +1,5 @@
 /* run.config
- PLUGIN: constant_propagation @PLUGIN@
+ PLUGIN: constant_propagation @PTEST_PLUGIN@
  LIBS: libSelect
  MODULE: @PTEST_NAME@
    OPT: @EVA_OPTIONS@ -deps -journal-disable

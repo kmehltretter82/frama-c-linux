@@ -1,11 +1,11 @@
 /* run.config
-   PLUGIN: @PLUGIN@ report from,inout,eva,scope,variadic
+   PLUGIN: @PTEST_PLUGIN@ report from,inout,eva,scope,variadic
    OPT: -eva -then -report
    OPT: -wp-prop=@check
    OPT: -wp-prop=-@check
 */
 /* run.config_qualif
-   PLUGIN: @PLUGIN@ report
+   PLUGIN: @PTEST_PLUGIN@ report
    OPT: -wp-steps 5 -then -report
 */
 // note: eva and wp gives the same reporting

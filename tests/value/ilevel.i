@@ -1,5 +1,5 @@
 /* run.config*
-   PLUGIN: slicing sparecode @PLUGIN@
+   PLUGIN: slicing sparecode @PTEST_PLUGIN@
    OPT: -eva @EVA_CONFIG@ -slice-return main -then-on "Slicing export" -eva -eva-ilevel 16 -eva-show-progress -then-on "default" -eva-ilevel 17 -then -eva-ilevel 48
 */
 // Test in particular that ilevel is by-project, even though it is an ocaml ref

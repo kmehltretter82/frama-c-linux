@@ -1,6 +1,6 @@
 COMMENT: macros @EVA_PLUGINS@ (resp. @EVA_OPTIONS@ and @EVA_CONFIG@) are usables
 COMMENT: in test files redefining the PLUGIN (resp. OPT) directives.
-COMMENT: the PLUGIN directive sets automatically the @PLUGIN@ macro that can be
+COMMENT: the PLUGIN directive sets automatically the @PTEST_PLUGIN@ macro that can be
 COMMENT: used into others PLUGIN directives in order to extend the parent list
 COMMENT: of used plug'ins.
 

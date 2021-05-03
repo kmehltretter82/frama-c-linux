@@ -2,7 +2,7 @@ COMMENT: by default, no analysis is performed (since the PLUGIN directive
 COMMENT: is empty).
 COMMENT: to perform value analyses, the macro @EVA_PLUGINS@ (resp. @EVA_OPTIONS@)
 COMMENT: can be used into PLUGIN (resp. OPT) directives of specific test files.
-COMMENT: no changes of the @DEFAULT_OPTIONS@.
+COMMENT: no changes of the @PTEST_DEFAULT_OPTIONS@.
 
 PLUGIN:
 OPT: -print

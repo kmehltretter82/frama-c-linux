@@ -1,5 +1,5 @@
 /*run.config*
-  PLUGIN: @PLUGIN@ report
+  PLUGIN: @PTEST_PLUGIN@ report
   STDOPT: +"-main f -report -then -main g -then -lib-entry -main f -then -main g"
 */
 

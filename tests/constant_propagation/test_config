@@ -1,2 +1,2 @@
-PLUGIN: constant_propagation @PLUGIN@
+PLUGIN: constant_propagation @PTEST_PLUGIN@
 OPT: -journal-disable -scf @EVA_OPTIONS@ -machdep x86_32

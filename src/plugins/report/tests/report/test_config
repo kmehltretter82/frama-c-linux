@@ -1,1 +1,1 @@
-PLUGIN: @PLUGIN@ report
+PLUGIN: @PTEST_PLUGIN@ report

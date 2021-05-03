@@ -1,10 +1,10 @@
 /* run.config
-   PLUGIN: @PLUGIN@ report
+   PLUGIN: @PTEST_PLUGIN@ report
    OPT: -then -report
 */
 /* run.config_qualif
 <<<<<<< HEAD
-   PLUGIN: @PLUGIN@ report
+   PLUGIN: @PTEST_PLUGIN@ report
    OPT: -then -report
    EXECNOW: LOG stmt.log LOG f.dot LOG f_default_for_stmt_2.dot LOG g.dot LOG g_default_for_stmt_11.dot @frama-c@ -wp-precond-weakening -wp -wp-warn-key pedantic-assigns=inactive -wp-model Dump -wp-out . -wp-msg-key shell 1> stmt.log
 ||||||| ac7807782d

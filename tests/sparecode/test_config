@@ -1,2 +1,2 @@
-PLUGIN: @PLUGIN@ sparecode slicing
+PLUGIN: @PTEST_PLUGIN@ sparecode slicing
 OPT: -journal-disable @EVA_OPTIONS@ -sparecode-debug 1

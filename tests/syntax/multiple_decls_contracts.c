@@ -1,5 +1,5 @@
 /* run.config
-CMD: @frama-c-cmd@ @OPTIONS@
+CMD: @frama-c-cmd@ @PTEST_OPTIONS@
 OPT: ../../../../install/default/share/frama-c/share/libc/string.h @PTEST_FILE@ @PTEST_FILE@ -print
 OPT: @PTEST_FILE@ ../../../../install/default/share/frama-c/share/libc/string.h @PTEST_FILE@ -print
 OPT: @PTEST_FILE@ @PTEST_FILE@ ../../../../install/default/share/frama-c/share/libc/string.h -print

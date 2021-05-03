@@ -1,6 +1,6 @@
 /* run.config*
    OPT: @EVA_CONFIG@ -deps -show-indirect-deps
-   PLUGIN: users @PLUGIN@
+   PLUGIN: users @PTEST_PLUGIN@
    OPT: -calldeps -eva @EVA_CONFIG@ -users -then -input
 */
 int a,b,c,d;

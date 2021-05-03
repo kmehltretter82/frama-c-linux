@@ -1,6 +1,6 @@
 /* run.config
-   PLUGIN: wp rtegen @PLUGIN@
-   CMD: @frama-c@ -kernel-warn-key=annot-error=active -report-output classified.@PTEST_NUMBER@.json -wp -wp-msg-key shell @OPTIONS@
+   PLUGIN: wp rtegen @PTEST_PLUGIN@
+   CMD: @frama-c@ -kernel-warn-key=annot-error=active -report-output classified.@PTEST_NUMBER@.json -wp -wp-msg-key shell @PTEST_OPTIONS@
    LOG: classified.@PTEST_NUMBER@.json
    OPT: -wp-prover qed -report-unclassified-untried REVIEW -then -report-classify
 EXIT: 1

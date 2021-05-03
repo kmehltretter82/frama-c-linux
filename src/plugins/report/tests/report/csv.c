@@ -1,5 +1,5 @@
 /* run.config
-   PLUGIN: from inout scope eva @PLUGIN@
+   PLUGIN: from inout scope eva @PTEST_PLUGIN@
    LOG: csv.csv
    OPT: -eva-warn-copy-indeterminate=-main4 -eva -eva-show-progress -eva-remove-redundant-alarms -eva-warn-key=alarm=inactive -then -report-csv csv.csv -report-no-proven -then -report-csv= -eva-warn-key=alarm -eva-slevel 1
    COMMENT: first, do an analysis without any message, but check that the .csv is complete. Then, redo the analysis with value warnings. slevel 1 is just there to force Value to restart

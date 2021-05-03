@@ -1,5 +1,5 @@
 /* run.config*
-   PLUGIN: @PLUGIN@ report
+   PLUGIN: @PTEST_PLUGIN@ report
    STDOPT: +"-report -then -eva-slevel 10"
 */
 

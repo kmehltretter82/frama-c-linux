@@ -1,5 +1,5 @@
 /* run.config*
-   PLUGIN: @PLUGIN@ constant_propagation
+   PLUGIN: @PTEST_PLUGIN@ constant_propagation
    STDOPT: +"-eva-slevel-function main2:100000 -print -then -scf -then-on propagated -eva -eva-show-progress -no-scf"
 */
 int *p;

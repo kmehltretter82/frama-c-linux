@@ -1,5 +1,5 @@
 /* run.config*
-   PLUGIN: @PLUGIN@ report
+   PLUGIN: @PTEST_PLUGIN@ report
    STDOPT: +"-then -report"
 */
 int x;

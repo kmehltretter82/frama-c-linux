@@ -1,5 +1,5 @@
 /* run.config*
-   PLUGIN: @PLUGIN@ report
+   PLUGIN: @PTEST_PLUGIN@ report
    STDOPT: +"-deterministic -eva-no-memexec -eva-slevel-function init:3,main1:3,f2:4,main2:4,f4:3,main5:3,uninit:2,main9:2 -eva-split-return-function f2:0,f3:-2:-4,f4:4,f5:-2,NON_EXISTING:4,uninit:0,escaping:0 -eva-warn-copy-indeterminate=-uninit,-escaping,-main9 -permissive -then -report"
    STDOPT: +"-deterministic -eva-no-memexec -eva -out -input -deps -eva-slevel 6 -eva-split-return auto -eva-split-return-function f7:0:3 -eva-warn-copy-indeterminate=-uninit,-escaping,-main9 -then -report"
  EXIT:1

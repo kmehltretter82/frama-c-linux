@@ -1,6 +1,6 @@
 /* run.config
    EXECNOW: LOG save_load.sav.res LOG save_load.sav.err BIN @PTEST_NAME@.sav @frama-c@ -wp -wp-warn-key pedantic-assigns=inactive -wp-print -wp-prover none -save @PTEST_NAME@.sav > @PTEST_NAME@.sav.res 2> @PTEST_NAME@.sav.err
-   CMD: @frama-c@ -load %{dep:@PTEST_NAME@.sav} -wp-warn-key pedantic-assigns=inactive @OPTIONS@
+   CMD: @frama-c@ -load %{dep:@PTEST_NAME@.sav} -wp-warn-key pedantic-assigns=inactive @PTEST_OPTIONS@
    OPT: -print
    OPT: -wp -wp-prover none -wp-print
 */
