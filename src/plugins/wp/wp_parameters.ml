@@ -1206,7 +1206,7 @@ let get_output_dir d =
 (* --- Session dir                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let default = Sys.getcwd () ^ "/.frama-c"
+let default = Sys.getenv "PWD" ^ "/.frama-c"
 
 let has_session () =
   Session.is_set () ||

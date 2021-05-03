@@ -255,7 +255,7 @@ let gen_run remarks =
         (key, (dir :> string))
       ) (Filepath.all_symbolic_dirs ())
   in
-  let uriBases = ("PWD", Sys.getcwd ()) :: symbolicDirs in
+  let uriBases = ("PWD", Sys.getenv "PWD") :: symbolicDirs in
   let uriBasesJson =
     List.fold_left (fun acc (name, dir) ->
         let baseUri =

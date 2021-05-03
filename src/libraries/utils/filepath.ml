@@ -125,7 +125,12 @@ let insert base path_name =
       Array.set cache (hash land 255) (Some (path_name, path));
       path
 
-let cwd = insert dummy (Sys.getcwd())
+(* Note: we do not use `Sys.getcwd ()` because, if the current working
+   directory contains a symbolic link in its path, it will differ from
+   the one reported by getcwd. Since many path names come from the
+   command line, they are often provided with the symbolic name,
+   which leads to inconsistencies causing test oracles to differ. *)
+let cwd = insert dummy (Sys.getenv "PWD")
 
 type existence =
   | Must_exist

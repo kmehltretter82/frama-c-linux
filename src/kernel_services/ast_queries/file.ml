@@ -530,7 +530,7 @@ let build_cpp_cmd = function
           if Sys.is_directory jcdb_path then jcdb_path
           else Filename.dirname jcdb_path
         in
-        let cwd = Unix.getcwd () in
+        let cwd = Unix.getenv "PWD" in
         if cwd <> dir then
           "cd " ^ dir ^ " && " ^ cpp_command
         else cpp_command
