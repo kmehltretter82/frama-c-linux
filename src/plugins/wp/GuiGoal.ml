@@ -548,7 +548,11 @@ class pane (gprovers : GuiConfig.provers) =
               text#clear ;
               let main = ProofEngine.main proof in
               if ProofSession.exists main then begin
-                text#printf "%a@." ProofSession.pp_script_for main ;
+                text#printf
+                  (if ProofEngine.saved proof
+                   then "%a (@{<green>saved@})@."
+                   else "%a (@{<orange>modified@})@.")
+                  ProofSession.pp_script_for main ;
                 text#hrule ;
               end ;
               scripter#tree proof ;
