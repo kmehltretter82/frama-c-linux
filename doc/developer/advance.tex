@@ -954,13 +954,17 @@ the configuration header of a test (or a test suite).
 \textbf{Kind} & \textbf{Name} & \textbf{Specification} & \textbf{default}\\
 \hline
 \hline \multirow{4}{23mm}{\centering{Command}}
+& \texttt{PLUGIN}\nscodeidxdef{Test!Directive}{PLUGIN}
+& Plugins to be loaded with each subsequent
+& \texttt{from,inout,eva,scope,variadic} for tests under \texttt{./tests} directory
+\\
 & \texttt{CMD}\nscodeidxdef{Test!Directive}{CMD}
 & Program to run
 & \texttt{./bin/toplevel.opt}
 \\
 & \texttt{OPT}\nscodeidxdef{Test!Directive}{OPT}
 & Options given to the program
-& \texttt{-val -out -input -deps}
+& \texttt{-val -out -input -deps} for tests under \texttt{./tests} directory
 \\
 & \texttt{STDOPT}\nscodeidxdef{Test!Directive}{STDOPT}
 & Add and remove options from the default set

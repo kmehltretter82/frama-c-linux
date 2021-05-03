@@ -318,19 +318,33 @@ let example_msg =
      MACRO: <name> <def>  @[<v 0># Set a definition to the macro @@<name>@@.@]@  \
      @]@ \
      @[<v 1>\
-     Some predefined macros can be used in test commands:@  \
-     @@PTEST_DIR@@          # Dirname of the test file.@  \
-     @@PTEST_FILE@@         # Substituted by the test filename.@  \
-     @@PTEST_NAME@@         # Basename of the test file.@  \
-     @@PTEST_NUMBER@@       # Test command number.@  \
-     @@PTEST_CONFIG@@       # Test configuration suffix.@  \
-     @@PTEST_RESULT@@       # Shorthand alias to '@@PTEST_DIR@@/result@@PTEST_CONFIG@@' (the result directory dedicated to the tested configuration).@  \
-     @@PTEST_ORACLE@@       # Basename of the current oracle file (macro only usable in FILTER directives).@  \
-     @@PTEST_MODULE@@       # Current list of module defined by the MODULE directive.@  \
-     @@PTEST_LOAD_MODULE@@  # The '-load-module' option related to the MODULE directive.@  \
-     @@PTEST_PLUGIN@@      # Current list of plugins defined by the PLUGIN directive.@  \
-     @@PTEST_LOAD_PLUGIN@@ # The '-load-module' option related to the PLUGIN directive.@  \
-     @@PTEST_LOAD_OPTIONS@@ # Shorthand alias to '@@PTEST_LOAD_PLUGIN@@ @@PTEST_LOAD_MODULE@@' .@  \
+     Default directive values:@ \
+     FILEREG: %s@ \
+     CMD:     %s@ \
+     EXIT:    0@ \
+     @]@ \
+     @[<v 1>\
+     Some predefined macros can be used in test commands:@ \
+     @@PTEST_DIR@@          # Dirname of the test file.@ \
+     @@PTEST_FILE@@         # Substituted by the test filename.@ \
+     @@PTEST_NAME@@         # Basename of the test file.@ \
+     @@PTEST_NUMBER@@       # Test command number.@ \
+     @@PTEST_CONFIG@@       # Test configuration suffix.@ \
+     @@PTEST_RESULT@@       # Shorthand alias to '@@PTEST_DIR@@/result@@PTEST_CONFIG@@' (the result directory dedicated to the tested configuration).@ \
+     @@PTEST_ORACLE@@       # Basename of the current oracle file (macro only usable in FILTER directives).@ \
+     @@PTEST_MODULE@@       # Current list of module defined by the MODULE directive.@ \
+     @@PTEST_PLUGIN@@       # Current list of plugins defined by the PLUGIN directive.@ \
+     @]@ \
+     Other macros can only be used in test commands (CMD and EXECNOW directives):@  \
+     @@PTEST_DEFAULT_OPTIONS@@  # The default option list: %s@  \
+     @@PTEST_LOAD_MODULE@@      # The '-load-module' option related to the MODULE directive.@  \
+     @@PTEST_LOAD_PLUGIN@@      # The '-load-module' option related to the PLUGIN directive.@  \
+     @@PTEST_LOAD_OPTIONS@@     # Shorthand alias to '@@PTEST_LOAD_PLUGIN@@ @@PTEST_LOAD_MODULE@@' .@  \
+     @@PTEST_OPTIONS@@          # The current list of options related to OPT and STDOPT directives (for CMD directives).@  \
+     @@frama-c@@                # Shortcut defined as follow: %s@  \
+     @@frama-c-cmd@@            # Shortcut defined as follow: %s@  \
+     @@frama-c-exe@@            # set to the value of the 'TOPLEVEL_PATH' variable from './tests/ptests_config' file.@  \
+     @]@ \
      @[<v 1>\
      Examples:@ \
      ptests@ \
@@ -345,7 +359,11 @@ let example_msg =
      ptests -v -j 1                           \
      # to check the time taken by each test\
      @]@ @]"
-;;
+    test_file_regexp
+    !default_toplevel
+    !macro_default_options
+    !macro_frama_c
+    !macro_frama_c_cmd
 
 let umsg = "Usage: ptests [options] [names of test suites]";;
 
