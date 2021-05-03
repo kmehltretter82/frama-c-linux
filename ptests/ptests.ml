@@ -172,7 +172,7 @@ let example_msg =
      # An empty command drops the previous FILTER directives.@ \
      # Note: in such a command, the macro @@PTEST_ORACLE@@ is set to the basename of the oracle.@ \
      # This allows running a 'diff' command with the oracle of another test configuration:@ \
-     #    FILTER: diff --new-file @@PTEST_DIR@@/oracle_configuration/@@PTEST_ORACLE@@ @]@  \
+     #    FILTER: diff --new-file @@PTEST_DIR@@/oracle_configuration/@@PTEST_ORACLE@@ - @]@  \
      TIMEOUT: <delay>    @[<v 0># Set a timeout for all sub-test.@]@  \
      NOFRAMAC:           @[<v 0># Drops previous sub-test definitions and considers that there is no defined default sub-test.@]@  \
      GCC:                @[<v 0># Deprecated.@]@  \
@@ -812,11 +812,13 @@ end = struct
          let new_top =
            List.map
              (fun command ->
-                { command with opts= make_custom_opts ~file ~dir command.opts s;
-                               exit_code = current.dc_exit_code;
-                               logs= command.logs @ current.dc_default_log;
-                               timeout= current.dc_timeout;
-                               deps = deps_of_config ~deps:command.deps current
+                { toplevel= current.dc_default_toplevel;
+                  opts= make_custom_opts ~file ~dir command.opts s;
+                  macros= current.dc_macros;
+                  exit_code = current.dc_exit_code;
+                  logs= command.logs @ current.dc_default_log;
+                  timeout= current.dc_timeout;
+                  deps = deps_of_config ~deps:command.deps current
                 })
              (if !default_parsing_env.current_default_cmds = [] then
                default_commands current
