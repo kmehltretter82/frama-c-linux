@@ -144,6 +144,9 @@ export function getDocuments() { return appProxy.getPath('documents'); }
 /** Returns user's downloads directory. */
 export function getDownloads() { return appProxy.getPath('downloads'); }
 
+/** Returns temporary directory. */
+export function getTempDir() { return appProxy.getPath('temp'); }
+
 /**
    Working directory (Application Window).
 
