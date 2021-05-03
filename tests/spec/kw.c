@@ -1,5 +1,6 @@
 /* run.config
-   PLUGIN: eva
+ PLUGIN: eva
+   STDOPT:
 */
 typedef int assert;
 

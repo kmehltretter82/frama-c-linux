@@ -484,6 +484,7 @@ end
 
 module StringSet = Set.Make(String)
 type deps =  {
+  load_plugin: string list;
   load_module: string list;
   deps_cmd: string list;
 }
@@ -586,7 +587,8 @@ end = struct
         exit_code=None;
         macros=config.dc_macros;
         logs=[];
-        deps={ load_module=[];
+        deps={ load_plugin=[];
+               load_module=[];
                deps_cmd=[];
              };
         timeout=""
@@ -680,8 +682,9 @@ end = struct
       (* preserve options ordering *)
       List.fold_right (fun x s -> s ^ " " ^ x) opts ""
 
-  let deps_of_config ?(deps={load_module=[];deps_cmd=[]}) config =
+  let deps_of_config ?(deps={load_module=[];load_plugin=[];deps_cmd=[]}) config =
     { load_module = deps.load_module @ config.dc_load_module;
+      load_plugin = deps.load_plugin @ config.dc_plugins;
       deps_cmd = deps.deps_cmd @ config.dc_deps
     }
 
@@ -740,7 +743,7 @@ end = struct
     { current with
       dc_cmxs = l @ current.dc_cmxs;
       dc_load_module = deps;
-    }
+      dc_macros = Macros.add_list ["PTEST_MODULE", s] current.dc_macros }
 
   let config_macro ~drop:_ ~file ~dir s current =
     (* note: the expansion is donly done into the definition *)
@@ -1050,7 +1053,7 @@ let log_prefix ~env = gen_prefix (make_result_file ~env)
 let basic_command_string command =
   let plugins_options =
     let opt_plugin = if command.plugins = [] then ""
-      else Printf.sprintf "-load-plugin=%s" (String.concat "," command.plugins) in
+      else Printf.sprintf "-load-plugin=%s" (String.concat "," command.deps.load_plugin) in
     let opt_modules = if command.deps.load_module = [] then ""
       else Printf.sprintf "-load-module=%s" (String.concat "," command.deps.load_module) in
     String.concat " " [opt_plugin;opt_modules]
@@ -1361,7 +1364,8 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config =
     let dc_libs = List.map (fun s -> s^".cmxs") config.dc_libs in
     let deps_command macros deps =
       let subst = Macros.expand macros in
-      { load_module = List.map subst (dc_libs @ deps.load_module);
+      { load_plugin = List.map subst deps.load_plugin;
+        load_module = List.map subst (dc_libs @ deps.load_module);
         deps_cmd = List.map subst (dc_libs @ deps.load_module @ deps.deps_cmd);
       };
     in
