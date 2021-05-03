@@ -401,7 +401,7 @@ export interface Configuration {
   command?: string;
   /** Additional server arguments (default: empty). */
   params: string[];
-  /** Server socket (default: `ipc:///tmp/frama-c.<pid>.io`). */
+  /** Server socket (default: `ipc:///tmp/ivette.frama-c.<pid>.io`). */
   sockaddr?: string;
   /** Shutdown timeout before server is hard killed, in milliseconds
    *  (default: 300ms). */
