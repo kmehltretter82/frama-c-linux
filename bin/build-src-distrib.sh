@@ -211,15 +211,17 @@ function fill_wiki {
     PAGE_NAME=Frama-C-${FRAMAC_VERSION_AND_CODENAME}.md
     WIKI_PAGE=$WIKI_DIR/$PAGE_NAME
     run "mkdir -p $WIKI_DIR/manuals"
-    run "sed -i -e '/<!-- LAST RELEASE -->/a \
-- [${FRAMAC_VERSION} (${FRAMAC_VERSION_CODENAME})](Frama-C-${FRAMAC_VERSION_AND_CODENAME})' $WIKI_DIR/Home.md"
+    run "sed -e '/<!-- LAST RELEASE -->/a\\
+- [${FRAMAC_VERSION} (${FRAMAC_VERSION_CODENAME})](Frama-C-${FRAMAC_VERSION_AND_CODENAME})' -i.bak $WIKI_DIR/Home.md"
+    run "rm -f $WIKI_DIR/Home.md.bak"
     if test "$FINAL_RELEASE" = "yes"; then
         release_type="FINAL"
     else
         release_type="BETA"
     fi
-    run "sed -i -e '/<!-- LAST ${release_type} RELEASE -->/a \
-- [${FRAMAC_VERSION} (${FRAMAC_VERSION_CODENAME})](Frama-C-${FRAMAC_VERSION_AND_CODENAME})' $WIKI_DIR/_sidebar.md"
+    run "sed -e '/<!-- LAST ${release_type} RELEASE -->/a\\
+- [${FRAMAC_VERSION} (${FRAMAC_VERSION_CODENAME})](Frama-C-${FRAMAC_VERSION_AND_CODENAME})' -i.bak $WIKI_DIR/_sidebar.md"
+    run "rm -f $WIKI_DIR/_sidebar.md.bak"
     echo "# Frama-C release ${FRAMAC_VERSION} (${FRAMAC_VERSION_CODENAME})" > $WIKI_PAGE
     echo "## Sources" >> $WIKI_PAGE
     run "cp $OUT_DIR/$TARGZ_FILENAME $WIKI_DIR/downloads"
