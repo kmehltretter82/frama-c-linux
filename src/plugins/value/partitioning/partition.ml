@@ -337,7 +337,9 @@ struct
   let eval_exp_to_int state exp =
     let _valuation, ival = evaluate_exp_to_ival state exp in
     try
-      Integer.to_int (Ival.project_int ival)
+      match Integer.to_int_opt (Ival.project_int ival) with
+      | Some i -> i
+      | None -> fail ~exp "this partitioning parameter overflows an integer"
     with
     | Ival.Not_Singleton_Int ->
       fail ~exp "this partitioning parameter must evaluate to a singleton"

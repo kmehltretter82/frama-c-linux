@@ -94,7 +94,15 @@ struct
           Cil.visitCilTerm (new Logic_utils.simplify_const_lval global_init) t
         in
         match Logic_utils.constFoldTermToInt t with
-        | Some n -> Partition.IntLimit (Integer.to_int n)
+        | Some n ->
+          begin
+            match Integer.to_int_opt n with
+            | Some n' -> Partition.IntLimit n'
+            | None ->
+              warn "invalid loop unrolling parameter (%a); ignoring"
+                (Integer.pretty ~hexa:false) n;
+              default
+          end
         | None   ->
           try
             Partition.ExpLimit (term_to_exp t)
