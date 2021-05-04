@@ -1,0 +1,6 @@
+[kernel] Parsing tests/syntax/very_large_integers.c (with preprocessing)
+[kernel] tests/syntax/very_large_integers.c:29: Failure: 
+  constant(s) in case range too large: 0 ... 9999999999999999999
+[kernel] User Error: stopping on file "tests/syntax/very_large_integers.c" that has errors. Add
+  '-kernel-msg-key pp' for preprocessing command.
+[kernel] Frama-C aborted: invalid user input.
