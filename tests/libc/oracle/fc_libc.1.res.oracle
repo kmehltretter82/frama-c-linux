@@ -1741,6 +1741,12 @@ extern pid_t setsid(void);
  */
 extern int setuid(uid_t uid);
 
+/*@ ensures unslept: 0 ≤ \result ≤ \old(seconds);
+    assigns \result;
+    assigns \result \from seconds;
+ */
+extern unsigned int sleep(unsigned int seconds);
+
 /*@ assigns \nothing; */
 extern void sync(void);
 

@@ -114,6 +114,7 @@
     { "setsid": { "calls": 0, "address_taken": false } },
     { "setuid": { "calls": 0, "address_taken": false } },
     { "setvbuf": { "calls": 0, "address_taken": false } },
+    { "sleep": { "calls": 0, "address_taken": false } },
     { "sync": { "calls": 0, "address_taken": false } },
     { "sysconf": { "calls": 0, "address_taken": false } },
     { "tmpfile": { "calls": 0, "address_taken": false } },

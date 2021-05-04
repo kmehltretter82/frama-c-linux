@@ -558,6 +558,14 @@
   Called from tests/libc/unistd_h.c:104.
 [eva] Done for function pipe
 [eva] tests/libc/unistd_h.c:105: check 'ok' got status valid.
+[eva] computing for function sleep <- main.
+  Called from tests/libc/unistd_h.c:107.
+[eva] using specification for function sleep
+[eva] Done for function sleep
+[eva] computing for function sleep <- main.
+  Called from tests/libc/unistd_h.c:107.
+[eva] Done for function sleep
+[eva] tests/libc/unistd_h.c:108: assertion got status valid.
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -585,4 +593,5 @@
   tty ∈ {{ NULL ; &__fc_ttyname[0] }}
   halfpipe ∈ UNINITIALIZED
   pipefd[0..1] ∈ [0..1023] or UNINITIALIZED
+  unslept ∈ [0..42]
   __retres ∈ {0; 1}
