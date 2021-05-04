@@ -131,7 +131,7 @@ pkgs.lib.makeExtensible
         installPhase = ''
                true
         '';
-  };
+  } // { other-opam-selection = "main"; };
 
   build-distrib-tarball = mk_deriv {
         name = "frama-c-build-distrib-tarball";
@@ -174,7 +174,7 @@ pkgs.lib.makeExtensible
         installPhase = ''
                true
         '';
-  };
+  } // { other-opam-selection = "build-distrib-tarball"; };
 
   wp-qualif = mk_deriv {
         name = "frama-c-wp-qualif";
@@ -202,7 +202,7 @@ pkgs.lib.makeExtensible
         installPhase = ''
                true
         '';
-  };
+  } // { other-opam-selection = "main"; };
 
   aorai-prove = mk_deriv {
         name = "frama-c-aorai-prove";
@@ -230,7 +230,7 @@ pkgs.lib.makeExtensible
         installPhase = ''
           true
         '';
-  };
+  } // { other-opam-selection = "main"; };
 
   e-acsl-tests-dev = mk_deriv {
         name = "frama-c-e-acsl-tests-dev";
@@ -252,7 +252,7 @@ pkgs.lib.makeExtensible
         installPhase = ''
                true
         '';
-  };
+  } // { other-opam-selection = "main"; };
 
   internal = mk_deriv {
         name = "frama-c-internal";
