@@ -223,6 +223,29 @@ pkgs.lib.makeExtensible
         '';
   };
 
+  eva-tests = mk_deriv {
+        name = "frama-c-eva-tests";
+        buildInputs = self.mk_buildInputs { };
+        build_dir = self.main.build_dir;
+        src = self.main.build_dir + "/dir.tar";
+        sourceRoot = ".";
+        postUnpack = ''
+               find . \( -name "Makefile*" -or -name ".depend" -o -name "ptests_config" -o -name "config.status" \) -exec bash -c "t=\$(stat -c %y \"\$0\"); sed -i -e \"s&$(cat $build_dir/old_pwd)&$(pwd)&g\" \"\$0\"; touch -d \"\$t\" \"\$0\"" {} \;
+        '';
+        configurePhase = ''
+            true
+        '';
+        buildPhase = ''
+               make clean_share_link
+               make create_share_link
+               export CONFIGS="equality bitwise symblocs gauges octagon"
+               src/plugins/value/vtests -j 4
+        '';
+        installPhase = ''
+               true
+        '';
+  };
+
   e-acsl-tests-dev = mk_deriv {
         name = "frama-c-e-acsl-tests-dev";
         buildInputs = self.mk_buildInputs { nixPackages = [ pkgs.gmp pkgs.getopt ]; };
