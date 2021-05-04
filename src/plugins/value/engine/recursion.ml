@@ -46,13 +46,20 @@ let mark_unknown_requires kinstr kf funspec =
 
 let get_spec kinstr kf =
   let funspec = Annotations.funspec ~populate:false kf in
-  if Cil.is_empty_funspec funspec then
-    Value_parameters.abort ~current:true
-      "@[Recursive call to %a@ without a specification.@ Try to increase@ \
-       the %s parameter@ or write a specification@ for function %a.@]"
+  if Cil.is_empty_funspec funspec then begin
+    Value_parameters.error ~current:true
+      "@[Recursive call to %a@ without a specification.@ \
+       Generating probably incomplete assigns to interpret the call.@ \
+       Try to increase@ the %s parameter@ \
+       or write a correct specification@ for function %a.%t@]"
       Kernel_function.pretty kf
       Value_parameters.RecursiveUnroll.name
       Kernel_function.pretty kf
+      Value_util.pp_callstack;
+    Cil.CurrentLoc.set (Kernel_function.get_location kf);
+    ignore (!Annotations.populate_spec_ref kf funspec);
+    Annotations.funspec kf
+  end
   else
     let depth = Value_parameters.RecursiveUnroll.get () in
     let () =
