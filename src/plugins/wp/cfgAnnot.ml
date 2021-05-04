@@ -75,9 +75,9 @@ let normalize_pre ~goal kf bhv ?assumes ip =
     let module L = NormAtLabels in
     let labels = L.labels_fct_pre in
     let id = WpPropId.mk_pre_id kf Kglobal bhv ip in
-    let p = L.preproc_annot labels ip.ip_content.tp_statement in
+    let pre = ip.ip_content.tp_statement in
     let assumes = Option.map normalize_assumes assumes in
-    Some (id, implies ?assumes p)
+    Some (id, L.preproc_annot labels @@ implies ?assumes pre)
   else None
 
 let normalize_post ~goal kf bhv tk ?assumes (itk,ip) =
