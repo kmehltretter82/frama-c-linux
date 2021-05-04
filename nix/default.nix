@@ -236,8 +236,10 @@ pkgs.lib.makeExtensible
             true
         '';
         buildPhase = ''
+               make clean_share_link
+               make create_share_link
                export CONFIGS="equality bitwise symblocs gauges octagon"
-               src/plugins/value/vtests
+               src/plugins/value/vtests -j 4
         '';
         installPhase = ''
                true
