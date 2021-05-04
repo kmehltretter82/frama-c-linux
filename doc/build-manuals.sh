@@ -3,13 +3,13 @@
 # GNU parallel needs to be installed
 if ! command -v parallel >/dev/null 2>/dev/null; then
     echo "parallel is required"
-    exit 99
+    exit 127
 fi
 
 # latexmk needs to be installed
 if ! command -v latexmk >/dev/null 2>/dev/null; then
     echo "latexmk is required"
-    exit 99
+    exit 127
 fi
 
 cd $(dirname $0)

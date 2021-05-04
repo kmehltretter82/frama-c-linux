@@ -14,19 +14,19 @@ DEBUG=no
 # (special use of the 'case' construct)
 if test `echo $BASH_VERSION | sed "s/\([0-9]\).*/\1/" ` -lt 4; then
     echo "bash version >= 4 is required."
-    exit 99
+    exit 127
 fi
 
 # git-lfs needs to be installed
 if ! command -v git-lfs >/dev/null 2>/dev/null; then
     echo "git-lfs is required"
-    exit 99
+    exit 127
 fi
 
 # grep needs to be installed
 if ! command -v grep --version >/dev/null 2>/dev/null; then
     echo "grep is required"
-    exit 99
+    exit 127
 fi
 
 function run {
