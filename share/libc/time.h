@@ -24,14 +24,16 @@
 #define __FC_TIME_H
 #include "features.h"
 __PUSH_FC_STDLIB
+#include "__fc_define_clockid_t.h"
 #include "__fc_define_null.h"
 #include "__fc_define_size_t.h"
-#include "__fc_define_clockid_t.h"
+#include "__fc_define_time_t.h"
 #include "__fc_define_timer_t.h"
+#include "__fc_define_timespec.h"
 #include "__fc_string_axiomatic.h"
-
 #include "errno.h"
 #include "signal.h"
+
 /*
  * Names of the interval timers, and structure
  * defining a timer setting:
@@ -47,7 +49,6 @@ __BEGIN_DECLS
 typedef unsigned int clock_t;
 #define __clock_t_defined
 #endif
-#include "__fc_define_time_t.h"
 // From POSIX.1-2008: "The value of CLOCKS_PER_SEC shall be 1 million on
 // XSI-conformant systems. [...]"
 #define CLOCKS_PER_SEC ((time_t)1000000)
@@ -63,8 +64,6 @@ struct tm {
   int tm_yday; // days since January 1 [0, 365]
   int tm_isdst; // Daylight Saving Time flag
 };
-
-#include "__fc_define_timespec.h"
 
 struct itimerspec {
   struct timespec  it_interval;

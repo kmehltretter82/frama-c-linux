@@ -207,6 +207,7 @@ share/libc/__fc_define_suseconds_t.h: CEA_LGPL
 share/libc/__fc_define_time_t.h: CEA_LGPL
 share/libc/__fc_define_timer_t.h: CEA_LGPL
 share/libc/__fc_define_timespec.h: CEA_LGPL
+share/libc/__fc_define_timeval.h: CEA_LGPL
 share/libc/__fc_define_uid_and_gid.h: CEA_LGPL
 share/libc/__fc_define_useconds_t.h: CEA_LGPL
 share/libc/__fc_define_wchar_t.h: CEA_LGPL

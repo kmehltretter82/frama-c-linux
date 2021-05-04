@@ -24,17 +24,12 @@
 #define __FC_SYS_TIME_H__
 #include "../features.h"
 __PUSH_FC_STDLIB
-__BEGIN_DECLS
-
-#include "../__fc_define_time_t.h"
-#include "../__fc_define_suseconds_t.h"
 #include "../__fc_define_fd_set_t.h"
-#include "../__fc_define_timespec.h"
+#include "../__fc_define_suseconds_t.h"
+#include "../__fc_define_time_t.h"
+#include "../__fc_define_timeval.h"
 #include "../__fc_string_axiomatic.h"
-struct timeval {
-  time_t         tv_sec;
-  suseconds_t    tv_usec;
-};
+__BEGIN_DECLS
 
 struct timezone {
   int tz_minuteswest;
