@@ -75,13 +75,16 @@ let normalize_pre ~goal kf bhv ?assumes ip =
     let module L = NormAtLabels in
     let labels = L.labels_fct_pre in
     let id = WpPropId.mk_pre_id kf Kglobal bhv ip in
-    let p = L.preproc_annot labels ip.ip_content.tp_statement in
-    Some (id, implies ?assumes p)
+    let pre = ip.ip_content.tp_statement in
+    let assumes = Option.map normalize_assumes assumes in
+    Some (id, L.preproc_annot labels @@ implies ?assumes pre)
   else None
 
 let normalize_post ~goal kf bhv tk ?assumes (itk,ip) =
   if tk = itk && filter ~goal ip then
     let module L = NormAtLabels in
+    let at_pre e = Logic_const.pat (e, BuiltinLabel Pre) in
+    let assumes = Option.map (fun p -> normalize_assumes @@ at_pre p) assumes in
     let labels = L.labels_fct_post ~exit:(tk=Exits) in
     let id = WpPropId.mk_post_id kf Kglobal bhv (tk,ip) in
     let p = L.preproc_annot labels ip.ip_content.tp_statement in
@@ -238,7 +241,8 @@ module CallContract = WpContext.StaticGenerator(Kernel_function)
         setup_preconditions kf ;
         List.iter
           begin fun bhv ->
-            let assumes = normalize_assumes (Ast_info.behavior_assumes bhv) in
+            (* Normalization of assumes is specific to each case *)
+            let assumes = Ast_info.behavior_assumes bhv in
             let mk_cond = normalize_pre ~goal:true kf bhv ~assumes in
             let mk_hpre = normalize_pre ~goal:false kf bhv ~assumes in
             let mk_post = normalize_post ~goal:false kf bhv ~assumes in
