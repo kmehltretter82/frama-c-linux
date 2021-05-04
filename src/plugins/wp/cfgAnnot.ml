@@ -241,7 +241,7 @@ module CallContract = WpContext.StaticGenerator(Kernel_function)
         setup_preconditions kf ;
         List.iter
           begin fun bhv ->
-            (* No assumes normalization at this point, Here depends on usage *)
+            (* Normalization of assumes is specific to each case *)
             let assumes = Ast_info.behavior_assumes bhv in
             let mk_cond = normalize_pre ~goal:true kf bhv ~assumes in
             let mk_hpre = normalize_pre ~goal:false kf bhv ~assumes in
