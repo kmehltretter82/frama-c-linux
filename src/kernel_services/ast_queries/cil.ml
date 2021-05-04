@@ -4102,7 +4102,13 @@ and alignOfField (fi: fieldinfo) =
 and intOfAttrparam (a:attrparam) : int option =
   let rec doit a : int =
     match a with
-    |  AInt(n) -> Integer.to_int n
+    |  AInt(n) ->
+      begin
+        match Integer.to_int_opt n with
+        | Some n' -> n'
+        | None ->
+          raise (SizeOfError ("Overflow in integer attribute.", voidType))
+      end
     | ABinOp(PlusA, a1, a2) -> doit a1 + doit a2
     | ABinOp(MinusA, a1, a2) -> doit a1 - doit a2
     | ABinOp(Mult, a1, a2) -> doit a1 * doit a2
@@ -4410,9 +4416,9 @@ and bitsSizeOf t =
              Const(CInt64(l,_,_)) ->
              let sz = Integer.mul (Integer.of_int (bitsSizeOf bt)) l in
              let sz' =
-               try
-                 Integer.to_int sz
-               with Z.Overflow ->
+               match Integer.to_int_opt sz with
+               | Some i -> i
+               | None ->
                  raise
                    (SizeOfError
                       ("Array is so long that its size can't be "
@@ -5996,7 +6002,10 @@ let lenOfArray64 eo =
         ni
       | _ -> raise LenOfArray
     end
-let lenOfArray eo = Integer.to_int (lenOfArray64 eo)
+let lenOfArray eo =
+  match Integer.to_int_opt (lenOfArray64 eo) with
+  | None -> raise LenOfArray
+  | Some l -> l
 
 (*** Make an initializer for zeroing a data type ***)
 let rec makeZeroInit ~loc (t: typ) : init =

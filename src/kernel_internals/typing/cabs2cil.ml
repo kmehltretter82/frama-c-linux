@@ -3348,7 +3348,14 @@ let rec setOneInit this o preinit =
     let idx, (* Index in the current comp *)
         restoff (* Rest offset *) =
       match o with
-      | Index({enode = Const(CInt64(i,_,_))}, off) -> Integer.to_int i, off
+      | Index({enode = Const(CInt64(i,_,_))}, off) ->
+        begin
+          match Integer.to_int_opt i with
+          | Some i' -> i', off
+          | None -> Kernel.fatal ~current:true
+                      "integer too large: %a"
+                      (Integer.pretty ~hexa:true) i
+        end
       | Field (f, off) ->
         (* Find the index of the field *)
         let rec loop (idx: int) = function
@@ -3428,7 +3435,14 @@ let rec collectInitializer
         | Some len -> begin
             match constFoldToInt len with
             | Some ni when Integer.ge ni Integer.zero ->
-              (Integer.to_int ni), false
+              begin
+                match Integer.to_int_opt ni with
+                | Some ni' -> ni', false
+                | None ->
+                  Kernel.fatal ~current:true
+                    "Array length %a overflows int, cannot use initializer."
+                    Cil_printer.pp_exp len
+              end
             | _ ->
               Kernel.fatal ~current:true
                 "Array length %a is not a compile-time constant: \
@@ -5701,7 +5715,14 @@ and isIntegerConstant ghost (aexp) : int option =
   match doExp (ghost_local_env ghost) CMayConst aexp (AExp None) with
   | (_, c, e, _) when isEmpty c -> begin
       match Cil.constFoldToInt e with
-      | Some n -> (try Some (Integer.to_int n) with Z.Overflow -> None)
+      | Some n ->
+        begin
+          match Integer.to_int_opt n with
+          | Some n' -> Some n'
+          | None -> Kernel.fatal ~current:true
+                      "integer constant too large in expression: %a"
+                      Cil_printer.pp_exp e
+        end
       | _ -> None
     end
   | _ -> None
@@ -8467,7 +8488,13 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
 
                 let doidx = add_reads ~ghost idxe'.eloc r doidx in
                 match constFoldToInt idxe', isNotEmpty doidx with
-                | Some x, false -> Integer.to_int x, doidx
+                | Some x, false ->
+                  begin
+                    match Integer.to_int_opt x with
+                    | Some x' -> x', doidx
+                    | None -> abort_context
+                                "INDEX initialization designator overflows"
+                  end
                 | _ ->
                   abort_context
                     "INDEX initialization designator is not a constant"
@@ -8505,7 +8532,14 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
           Kernel.fatal ~current:true "Range designators are not constants";
         let first, last =
           match constFoldToInt idxs', constFoldToInt idxe' with
-          | Some s, Some e -> Integer.to_int s, Integer.to_int e
+          | Some s, Some e ->
+            begin
+              match Integer.to_int_opt s, Integer.to_int_opt e with
+              | Some s', Some e' -> s', e'
+              | _, _ ->
+                Kernel.fatal ~current:true
+                  "INDEX_RANGE initialization designator overflows"
+            end
           | _ ->
             Kernel.fatal ~current:true
               "INDEX_RANGE initialization designator is not a constant"
@@ -10062,7 +10096,16 @@ and doStatement local_env (s : Cabs.statement) : chunk =
         "Case statement with a non-constant";
     let il, ih =
       match constFoldToInt el', constFoldToInt eh' with
-      | Some il, Some ih -> Integer.to_int il, Integer.to_int ih
+      | Some il, Some ih ->
+        begin
+          match Integer.to_int_opt il, Integer.to_int_opt ih with
+          | Some il', Some ih' -> il', ih'
+          | _, _ ->
+            Kernel.fatal ~current:true
+              "constant(s) in case range too large: %a ... %a"
+              (Integer.pretty ~hexa:false) il
+              (Integer.pretty ~hexa:false) ih
+        end
       | _ ->
         Kernel.fatal ~current:true
           "Cannot understand the constants in case range"

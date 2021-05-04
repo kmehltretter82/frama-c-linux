@@ -606,8 +606,9 @@ val isArrayType: typ -> bool
 (** True if the argument is a struct of union type *)
 val isStructOrUnionType: typ -> bool
 
-(** Raised when {!Cil.lenOfArray} fails either because the length is [None]
-  * or because it is a non-constant expression *)
+(** Raised when {!Cil.lenOfArray} fails either because the length is [None],
+  * because it is a non-constant expression, or because it overflows an int.
+*)
 exception LenOfArray
 
 (** Call to compute the array length as present in the array type, to an
