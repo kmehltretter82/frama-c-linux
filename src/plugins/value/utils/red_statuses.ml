@@ -147,7 +147,8 @@ let compute_information (kinstr, alarm_or_prop, contexts) =
     match alarm_or_prop with
     | Alarm alarm ->
       let kf, stmt = kinstr_to_stmt kinstr in
-      let code_annot, _ = Alarms.to_annot kinstr alarm in
+      let loc = Cil_datatype.Stmt.loc stmt in
+      let code_annot, _ = Alarms.to_annot kinstr ~loc alarm in
       let property = Property.ip_of_code_annot_single kf stmt code_annot in
       kf, property, true
     | Prop ip -> kf_of_property ip, ip, false
