@@ -442,7 +442,7 @@ let stop_doing_flamegraph callstack =
 let reset_flamegraph () =
   match !oc_flamegraph with
   | None -> ()
-  | Some fd -> close_out fd; stack_flamegraph := []
+  | Some fd -> close_out fd; stack_flamegraph := []; oc_flamegraph := None
 
 
 (* -------------------------------------------------------------------------- *)
