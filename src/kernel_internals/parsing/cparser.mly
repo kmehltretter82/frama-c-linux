@@ -368,7 +368,7 @@ let in_ghost_block ?(battrs=[]) l =
 %token<Cabs.cabsloc> IF TRY EXCEPT FINALLY
 %token ELSE
 
-%token<Cabs.cabsloc> ATTRIBUTE INLINE NORETURN ASM TYPEOF FUNCTION__ PRETTY_FUNCTION__
+%token<Cabs.cabsloc> ATTRIBUTE INLINE NORETURN STATIC_ASSERT ASM TYPEOF FUNCTION__ PRETTY_FUNCTION__
 %token LABEL__
 %token<Cabs.cabsloc> BUILTIN_VA_ARG
 %token BLOCKATTRIBUTE
@@ -1080,6 +1080,14 @@ declaration:                                /* ISO 6.7.*/
           { doDeclaration (Some $1) ((snd $2)) (fst $2) $3 }
 |   SPEC decl_spec_list SEMICOLON
       { doDeclaration (Some $1) ((snd $2)) (fst $2) [] }
+|   STATIC_ASSERT LPAREN expression RPAREN
+      {
+        STATIC_ASSERT ($3, "", $1)
+      }
+|   STATIC_ASSERT LPAREN expression COMMA string_constant RPAREN
+      {
+        STATIC_ASSERT ($3, fst $5, $1)
+      }
 ;
 
 init_declarator_list:                       /* ISO 6.7 */

@@ -169,6 +169,7 @@ and definition =
   | ONLYTYPEDEF of specifier * cabsloc
   | GLOBASM of string * cabsloc
   | PRAGMA of expression * cabsloc
+  | STATIC_ASSERT of expression * string * cabsloc
   | LINKAGE of string * cabsloc * definition list (* extern "C" { ... } *)
   | GLOBANNOT of Logic_ptree.decl list
   (** Logical declaration (axiom, logic, etc.)*)

@@ -624,6 +624,9 @@ and print_def fmt def =
   | PRAGMA (a,_) ->
     fprintf fmt "@[#pragma %a@]@\n" print_expression a
 
+  | STATIC_ASSERT (e, s, _) ->
+    fprintf fmt "@[_Static_assert (%a, %s)@]@\n" print_expression e s
+
   | LINKAGE (n, _, dl) ->
     fprintf fmt "@[<2>extern@ %s@ {%a@;}@]" n (pp_list print_def) dl
 

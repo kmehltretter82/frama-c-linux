@@ -1043,6 +1043,16 @@ class cil_printer () = object (self)
             instr_terminator
 
       end
+    | Local_init(vi, AssignInit (SingleInit {
+        enode = BinOp (_, cond_exp, {enode = SizeOfStr s}, _)}), _) when
+        Cil.hasAttribute "_STATIC_ASSERT" vi.vattr ->
+      (* Hijack pretty-printer for a local _Static_assert *)
+      if s = "" then
+        fprintf fmt "@[<2>_Static_assert(%a)%s@]@\n"
+          self#exp cond_exp instr_terminator
+      else
+        fprintf fmt "@[<2>_Static_assert(%a, \"%s\")%s@]@\n"
+          self#exp cond_exp s instr_terminator
     | Local_init(vi, AssignInit i, _) ->
       Format.fprintf fmt "@[<2>%a =@ %a%s@]"
         self#vdecl vi self#init i instr_terminator
@@ -1380,7 +1390,10 @@ class cil_printer () = object (self)
       (* [JS 2012/12/07] could directly call self#attributesGen whenever we are
          sure than it puts its printing material inside a box *)
       fprintf fmt "@[%a@]" (self#attributesGen true) blk.battrs;
-    let locals_decl = List.filter (fun v -> not v.vdefined) blk.blocals in
+    let visible_decl v =
+      not (v.vdefined || Cil.hasAttribute "_STATIC_ASSERT" v.vattr)
+    in
+    let locals_decl = List.filter (fun v -> visible_decl v) blk.blocals in
     if locals_decl <> [] then
       Pretty_utils.pp_list ~pre:"@[<v>" ~sep:"@;" ~suf:"@]@ "
         self#vdecl_complete fmt locals_decl;
@@ -1778,6 +1791,20 @@ class cil_printer () = object (self)
         fprintf fmt "%a %a;@\n"
           self#pp_keyword (if comp.cstruct then "struct" else "union")
           self#varname comp.cname
+      | GVar (vi, {init = Some (SingleInit {
+          enode = BinOp (_, cond_exp, { enode = SizeOfStr s }, _) })}, l)
+        when Cil.hasAttribute "_STATIC_ASSERT" vi.vattr ->
+        (* Hijack pretty-printer for a global _Static_assert *)
+        self#line_directive ~forcefile:true fmt l;
+        Format.fprintf fmt "@[<hov 2>";
+        if s = "" then
+          fprintf fmt "_Static_assert(%a)"
+            self#exp cond_exp
+        else
+          fprintf fmt "_Static_assert(%a, \"%s\")"
+            self#exp cond_exp s;
+        fprintf fmt ";";
+        fprintf fmt "@]@\n";
       | GVar (vi, io, l) ->
         self#line_directive ~forcefile:true fmt l;
         Format.fprintf fmt "@[<hov 2>";

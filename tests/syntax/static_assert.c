@@ -1,0 +1,36 @@
+/* run.config
+   STDOPT: #"-c11"
+   EXIT: 1
+   STDOPT: #"-c11 -cpp-extra-args=-DFAIL"
+*/
+
+_Static_assert(1, "string");
+
+#include <assert.h>
+
+#ifdef FAIL
+static_assert(0, "fail");
+#endif
+
+_Static_assert(2); // without message string
+
+int main() {
+  static_assert(sizeof(int) > sizeof(char), "int must be greater than char");
+
+#ifdef FAIL
+  int a = 42;
+  static_assert(a == 42, "non-static condition");
+#endif
+
+  int ret = 42;
+
+  static_assert(3); // between statements
+
+  return ret;
+
+  _Static_assert(4, "after return");
+}
+
+#ifdef FAIL
+static_assert(0); // fail without message string
+#endif

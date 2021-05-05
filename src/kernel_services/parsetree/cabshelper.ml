@@ -156,6 +156,7 @@ let get_definitionloc (d : definition) : cabsloc =
   | ONLYTYPEDEF(_, l) -> l
   | GLOBASM(_, l) -> l
   | PRAGMA(_, l) -> l
+  | STATIC_ASSERT (_, _, l) -> l
   | LINKAGE (_, l, _) -> l
   | GLOBANNOT({Logic_ptree.decl_loc = l }::_) -> l
   | GLOBANNOT [] -> assert false
