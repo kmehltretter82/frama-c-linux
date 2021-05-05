@@ -93,6 +93,10 @@ __PUSH_FC_STDLIB
 #define POSIX_FADV_SEQUENTIAL 2
 #define POSIX_FADV_WILLNEED 3
 
+// Non-POSIX, but used in some code
+#define O_BINARY 0
+#define O_TEXT 0
+
 __BEGIN_DECLS
 
 struct flock
