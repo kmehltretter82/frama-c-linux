@@ -192,7 +192,7 @@ screen, select "Multiple Windows". On the second:
 - keep "Native opengl" selected,
 - select "Disable access control".
 
-Now specific settings must be provided in WSL, you can put the export commands
+Now specific settings must be provided in WSL. you can put the export commands
 in your `~/.bashrc` file, so this is done automatically when starting WSL.
 
 ##### WSL 1
