@@ -54,7 +54,7 @@ struct
     with Not_based_on_null ->
       `Value v
 
-  let top = top (* Locations.Location_Bytes.top_with_origin Origin.top *)
+  let top = top
   let top_numerical = top_int
 end
 
@@ -198,19 +198,16 @@ struct
     | `Value loc ->
       Memory.set ~weak m loc new_v
 
-  let update ~weak f m loc =
+  let reinforce f m loc =
     match loc with
     | `Top -> m
     | `Value loc ->
-      let f' ~weak x =
-        if weak
-        then x
-        else
-          match f x with
-          | `Value v -> v
-          | `Bottom -> raise Abstract_interp.Error_Bottom
+      let f' x =
+        match f x with
+        | `Value v -> v
+        | `Bottom -> raise Abstract_interp.Error_Bottom
       in
-      Memory.update ~weak f' m loc
+      Memory.reinforce f' m loc
 
   let erase m loc =
     match loc with
@@ -363,11 +360,12 @@ struct
     in
     Location.fold erase_base dst state
 
-  let update_loc (f : value -> value or_bottom) loc state =
+  let reinforce (f : value -> value or_bottom) (state : state)
+      (loc : mdlocation) =
     let update_base base loc state =
       if covers_base base then
         let map = find_or_top state base in
-        add base (Base_Domain.update ~weak:false f map loc) state
+        add base (Base_Domain.reinforce f map loc) state
       else
         state (* destination base not covered : do nothing *)
     in
@@ -420,21 +418,23 @@ struct
     | `Value {value={v=`Bottom}} -> raise Abstract_interp.Error_Bottom
     | `Value {value={v=`Value value}} -> value
 
-  let assume_exp _valuation _expr _record state = (*
+  let assume_exp valuation expr record state =
     let oracle = make_oracle valuation in
     try
       match expr.enode, record.value.v with
       | Lval lv, `Value value ->
         let loc = Location.of_lval oracle lv in
-        let update value' = `Value (Value.narrow value value') in
+        let update value' =
+          `Value (Value.narrow value value')
+        in
         if Location.is_singleton loc
-        then update_loc update loc state
+        then reinforce update state loc
         else state
       | _, `Bottom -> state (* Indeterminate value, ignore *)
       | _ -> state
     with
     (* Failed to evaluate the location *)
-      Abstract_interp.Error_Top | Abstract_interp.Error_Bottom -> *) state
+      Abstract_interp.Error_Top | Abstract_interp.Error_Bottom -> state
 
   let assume_valuation valuation state =
     valuation.Abstract_domain.fold (assume_exp valuation) state
@@ -515,7 +515,7 @@ struct
       match sources with
       | [] ->
         let dst = Location.of_precise_loc location in
-        initialize dst Memory_map.Numerical state
+        initialize dst Memory_map.Top state
       | _ ->
         remove state location
 
@@ -529,7 +529,7 @@ struct
         begin match Cil.unrollType (Logic_utils.logicCType typ) with
           | TFloat (fkind,_) ->
             let update = Value.backward_is_finite positive fkind in
-            `Value (update_loc update loc state)
+            `Value (reinforce update state loc)
           | _ | exception (Failure _) -> `Value state
         end
       | _ -> `Value state

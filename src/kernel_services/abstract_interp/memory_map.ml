@@ -112,7 +112,7 @@ sig
   val extract :t -> location -> t
   val initialize : t -> location -> default -> t
   val set : weak:bool -> t -> location -> value -> t
-  val update : weak:bool -> (weak:bool -> value -> value) ->  t -> location -> t
+  val reinforce : (value -> value) ->  t -> location -> t
   val erase : t -> location -> t
   val overwrite : weak:bool -> t -> location -> t -> t
   val is_included : t -> t -> bool
@@ -603,7 +603,7 @@ struct
   let set ~weak m offset new_v =
     let f ~weak (m,t) =
       let scalar_value =
-        if weak then 
+        if weak then
           let old_v = match m with
             | Scalar s when are_typ_compatible s.scalar_type t -> s.scalar_value
             | Default d -> default_to_value d
@@ -616,20 +616,19 @@ struct
       Scalar { scalar_value ; scalar_type=t }
     in
     write ~weak f m offset
-    
-  let update ~weak f' m offset =
-    let f ~weak (m,t) =
-      let old = match m with
-        | Scalar s when are_typ_compatible s.scalar_type t -> s.scalar_value
-        | Default d -> default_to_value d
-        | _ -> Value.top
-      in
-      Scalar {
-        scalar_value = f' ~weak old;
-        scalar_type = t;
-      }
+
+  let reinforce f' m offset =
+    let f ~weak (m,scalar_type) =
+      match m with
+      | m when weak -> m
+      | Scalar s when are_typ_compatible s.scalar_type scalar_type ->
+        Scalar { s with scalar_value = f' s.scalar_value }
+      | Default d ->
+        let scalar_value = f' (default_to_value d) in
+        Scalar { scalar_type; scalar_value }
+      | m -> m
     in
-    write ~weak f m offset
+    write ~weak:false f m offset
 
   let erase m offset =
     let f ~weak:_ (_m,_t) =

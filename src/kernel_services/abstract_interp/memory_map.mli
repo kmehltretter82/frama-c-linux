@@ -84,8 +84,9 @@ sig
   (* Set a value on a set of locations *)
   val set : weak:bool -> t -> location -> value -> t
 
-  (* Update values on a set of locations *)
-  val update : weak:bool -> (weak:bool -> value -> value) ->  t -> location -> t
+  (* Reinforce values on a set of locations when the locations match the
+     memory structure ; does nothing on locations that cannot be matched *)
+  val reinforce : (value -> value) ->  t -> location -> t
 
   (* Set top on a set of locations *)
   val erase : t -> location -> t

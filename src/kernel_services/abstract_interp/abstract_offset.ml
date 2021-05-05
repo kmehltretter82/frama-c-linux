@@ -117,7 +117,7 @@ struct
       match Cil.unrollType base_typ with
       | TArray (elem_typ, array_size, _, _) ->
         begin try
-            let elem_size = Integer.of_int (Cil.bitsSizeOf elem_typ) in  
+            let elem_size = Integer.of_int (Cil.bitsSizeOf elem_typ) in
             if Integer.is_zero elem_size then (* array of elements of size 0 *)
               if Ival.is_zero ival then (* the whole range is valid *)
                 let sub = of_ival elem_typ typ ival in
@@ -138,7 +138,7 @@ struct
             else
               raise Abstract_interp.Error_Top
         end
-            
+
       | TComp (ci, _, _) ->
         if not ci.cstruct then
           (* Ignore unions for now *)
