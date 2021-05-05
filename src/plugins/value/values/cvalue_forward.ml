@@ -528,9 +528,10 @@ let eval_float_constant f fkind fstring =
   if Fc_float.is_nan f
   then V.inject_float Fval.nan
   else
+    let all_rounding = Value_parameters.AllRoundingModesConstants.get in
     let fl, fu = match fstring with
-      | Some string when fkind = Cil_types.FLongDouble ||
-                         Value_parameters.AllRoundingModesConstants.get () ->
+      | Some "INFINITY" -> f, f (* Special case for the INFINITY macro. *)
+      | Some string when fkind = Cil_types.FLongDouble || all_rounding () ->
         let open Floating_point in
         let {f_lower; f_upper} = snd (parse string) in
         (* Computations are done in double. For long double constants, if we
