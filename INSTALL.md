@@ -135,35 +135,12 @@ but the instructions below may require some modifications).
 
 https://docs.microsoft.com/en-us/windows/wsl/install-win10
 
-Note: older builds of Windows 10 and systems without access to the
-      Microsoft Store may have no compatible Linux packages.
+Notes:
 
-##### PowerShell-based quick guide
-
-This is a quick guide based on running a PowerShell with administrator rights.
-Note that, depending on your build version of Windows 10, the Ubuntu package
-selected below may not work. If you are unsure, follow the above instructions
-from the Microsoft website.
-
-Inside PowerShell, run the following command to activate Windows Subsystem for Linux:
-
-```
-Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
-```
-
-Then, reboot the operating system.
-
-After rebooting, run again the PowerShell terminal with administrator rights.
-Move to your user directory, download the distribution and install it:
-
-```
-cd C:\Users\<Your User Directory>
-Invoke-WebRequest -Uri https://aka.ms/wslubuntu2004 -OutFile Ubuntu.appx -UseBasicParsing
-Add-AppxPackage .\Ubuntu.appx
-```
-
-Ubuntu should now be available in the Windows menu. Run it and follow the
-instructions to create a user.
+- older builds of Windows 10 and systems without access to the
+  Microsoft Store may have no compatible Linux packages.
+- in WSL 1, Frama-C/WP cannot use Why3 because of some missing features in WSL
+  support, thus using WSL 2 is **highly recommended**.
 
 #### Installing opam and Frama-C on WSL
 
@@ -184,6 +161,9 @@ eval $(opam env)
 opam install -y depext
 ```
 
+You can force a particular Ocaml version during `opam init` by using the option
+`-c <version>` if needed.
+
 Now, for installing Frama-C, run the following commands that will use `apt` to
 install the dependencies of the opam packages and then install them:
 
@@ -203,17 +183,33 @@ First, install VcXsrv from:
 https://sourceforge.net/projects/vcxsrv/
 
 The default installation settings should work.
-Now run it from the Windows menu (it is named XLaunch).
-On the first configuration screen, select "Multiple Windows". On the
-second, keep "Start no client" selected. On the third configuration step, add an
-additional parameter `-nocursor` in the field "Additional parameters for
-VcXsrv". You can save this configuration at the last step if you want, before
-clicking "Finish".
 
-Once it is done, the Xserver is ready. From WSL, run:
+Now run VcXsrv from the Windows menu (it is named XLaunch), the firewall
+must authorize both "Public" and "Private" domains. On the first configuration
+screen, select "Multiple Windows". On the second:
+
+- keep "Start no client" selected,
+- keep "Native opengl" selected,
+- select "Disable access control".
+
+Now specific settings must be provided in WSL, you can put the export commands
+in your `~/.bashrc` file, so this is done automatically when starting WSL.
+
+##### WSL 1
+
+The Xserver is ready. From WSL, run:
 
 ```
+export LIBGL_ALWAYS_INDIRECT=1
 export DISPLAY=:0
+frama-c-gui
+```
+
+##### WSL 2
+
+```
+export LIBGL_ALWAYS_INDIRECT=1
+export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2; exit;}'):0.0
 frama-c-gui
 ```
 
