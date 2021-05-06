@@ -1,5 +1,5 @@
 # paramaterised derivation with dependencies injected (callPackage style)
-{ pkgs, stdenv, src ? ../., opam2nix, ocaml ? "ocaml-ng.ocamlPackages_4_08.ocaml", plugins ? { } }:
+{ pkgs, stdenv, src ? ../., opam2nix, ocaml ? pkgs.ocaml-ng.ocamlPackages_4_08.ocaml, plugins ? { } }:
 
 let mydir = builtins.getEnv("PWD");
     mk-opam-selection = name: {
