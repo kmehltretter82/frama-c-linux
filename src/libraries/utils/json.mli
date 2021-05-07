@@ -178,6 +178,7 @@ val merge_array : Filepath.Normalized.t -> Yojson.Basic.t -> unit
 (**
    [from_file path] opens [path] and stores its JSON object in
    a memory cache, to be used by the other related functions.
+   @raise Yojson.Json_error if [path] is a malformed JSON file.
    @since Frama-C+dev
 *)
 val from_file: Filepath.Normalized.t -> Yojson.Basic.t
