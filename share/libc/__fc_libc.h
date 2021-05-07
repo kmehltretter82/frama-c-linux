@@ -104,6 +104,7 @@
 #include "time.h"
 #include "unistd.h"
 #include "utime.h"
+#include "utmp.h"
 #include "utmpx.h"
 #include "wchar.h"
 #include "wctype.h"
