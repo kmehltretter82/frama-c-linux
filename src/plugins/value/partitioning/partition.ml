@@ -166,7 +166,7 @@ type unroll_limit =
   | IntLimit of int
   | AutoUnroll of Cil_types.stmt * int * int
 
-type split_kind = Static | Dynamic
+type split_kind = Eva_annotations.split_kind = Static | Dynamic
 
 type action =
   | Enter_loop of unroll_limit
@@ -176,7 +176,7 @@ type action =
   | Ration of rationing
   | Restrict of Cil_types.exp * Integer.t list
   | Split of Cil_types.exp * split_kind * split_monitor
-  | Merge of Cil_types.exp * split_kind
+  | Merge of Cil_types.exp
   | Update_dynamic_splits
 
 exception InvalidAction
@@ -471,11 +471,9 @@ struct
         | Restrict (expr, expected_values) -> fun k s ->
           { k with ration_stamp = stamp_by_value expr expected_values s}
 
-        | Merge (exp, Static) -> fun k _x ->
-          { k with static_split = ExpMap.remove exp k.static_split }
-
-        | Merge (exp, Dynamic) -> fun k _x ->
-          { k with dynamic_split = ExpMap.remove exp k.dynamic_split }
+        | Merge exp -> fun k _x ->
+          { k with static_split = ExpMap.remove exp k.static_split;
+                   dynamic_split = ExpMap.remove exp k.dynamic_split }
       in
       map_keys transfer p
 

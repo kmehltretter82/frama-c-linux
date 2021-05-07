@@ -125,14 +125,13 @@ struct
     ValuePartitioning.fold add []
 
   let flow_actions stmt =
-    let kind = Partition.Static in
     let map_annot acc t =
       try
         let monitor = Partition.new_monitor ~split_limit in
         let action =
           match t with
-          | FlowSplit t -> Partition.Split (term_to_exp t, kind, monitor)
-          | FlowMerge t -> Partition.Merge (term_to_exp t, kind)
+          | FlowSplit (t, kind) -> Partition.Split (term_to_exp t, kind, monitor)
+          | FlowMerge t -> Partition.Merge (term_to_exp t)
         in
         action :: acc
       with

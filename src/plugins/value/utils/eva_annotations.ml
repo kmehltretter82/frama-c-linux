@@ -33,8 +33,10 @@ type unroll_annotation =
   | UnrollAmount of Cil_types.term
   | UnrollFull
 
+type split_kind = Static | Dynamic
+
 type flow_annotation =
-  | FlowSplit of term
+  | FlowSplit of term * split_kind
   | FlowMerge of term
 
 type taint_annotation = Cil_types.term list
@@ -232,6 +234,12 @@ module Merge = Register (struct
     let is_loop_annot = false
   end)
 
+module DynamicSplit = Register (struct
+    include SimpleTermAnnotation
+    let name = "dynamic_split"
+    let is_loop_annot = false
+  end)
+
 module Taint = Register (struct
     include ListTermAnnotation
     let name = "taint"
@@ -248,7 +256,8 @@ let get_slevel_annot stmt =
 let get_unroll_annot stmt = Unroll.get stmt
 
 let get_flow_annot stmt =
-  List.map (fun a -> FlowSplit a) (Split.get stmt) @
+  List.map (fun a -> FlowSplit (a, Static)) (Split.get stmt) @
+  List.map (fun a -> FlowSplit (a, Dynamic)) (DynamicSplit.get stmt) @
   List.map (fun a -> FlowMerge a) (Merge.get stmt)
 
 
@@ -257,7 +266,8 @@ let add_slevel_annot = Slevel.add
 let add_unroll_annot = Unroll.add
 
 let add_flow_annot ~emitter ~loc stmt = function
-  | FlowSplit annot -> Split.add ~emitter ~loc stmt annot
+  | FlowSplit (annot, Static) -> Split.add ~emitter ~loc stmt annot
+  | FlowSplit (annot, Dynamic) -> DynamicSplit.add ~emitter ~loc stmt annot
   | FlowMerge annot -> Merge.add ~emitter ~loc stmt annot
 
 

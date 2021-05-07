@@ -38,8 +38,10 @@ type unroll_annotation =
   | UnrollAmount of Cil_types.term
   | UnrollFull
 
+type split_kind = Static | Dynamic
+
 type flow_annotation =
-  | FlowSplit of Cil_types.term
+  | FlowSplit of Cil_types.term * split_kind
   | FlowMerge of Cil_types.term
 
 type taint_annotation = Cil_types.term list

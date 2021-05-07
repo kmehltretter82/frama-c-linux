@@ -87,10 +87,14 @@ module Eva_annotations: sig
     | UnrollAmount of Cil_types.term (** Unroll the n first iterations. *)
     | UnrollFull (** Unroll amount defined by -eva-default-loop-unroll. *)
 
+  type split_kind = Static | Dynamic
+
   (** Split/merge annotations for value partitioning.  *)
   type flow_annotation =
-    | FlowSplit of Cil_types.term (** Split states according to a term. *)
-    | FlowMerge of Cil_types.term (** Merge states separated by a previous split. *)
+    | FlowSplit of Cil_types.term * split_kind
+    (** Split states according to a term. *)
+    | FlowMerge of Cil_types.term
+    (** Merge states separated by a previous split. *)
 
   val add_slevel_annot : emitter:Emitter.t -> loc:Cil_types.location ->
     Cil_types.stmt -> slevel_annotation -> unit
