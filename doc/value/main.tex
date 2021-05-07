@@ -41,22 +41,6 @@
 {∈}{{$\in$ }}1
 }
 
-% The following definitions are used to differentiate between
-% the open-source manual and the closed-source one.
-% Source: http://tex.stackexchange.com/questions/62010
-% Note: does NOT work with xetex/luatex.
-% Also, note that some weird situations may arrive inside
-% \ifdefstring blocks, e.g. \lstinline blocks require escaping
-% backslashes, otherwise this file will not parse.
-\usepackage{etoolbox}
-\usepackage{catchfile}
-\newcommand{\getenv}[2][]{%
-  \CatchFileEdef{\temp}{"|kpsewhich --var-value #2"}{\endlinechar=-1\relax}%
-  \if\relax\detokenize{#1}\relax\temp\else\edef#1{\temp}\fi}
-
-% define \OPENSOURCE to the value of the OPENSOURCE environment variable
-\getenv[\OPENSOURCE]{OPENSOURCE}
-
 %==============================================================================
 \begin{document}
 
@@ -5299,22 +5283,25 @@ standard library function of the same name, minus the
 
 \begin{table}[!ht]
   \centering
-  \begin{tabular}{lllll}
-    \multicolumn{5}{c}{Floating-point builtins} \\
+  \begin{tabular}{llll}
+    \multicolumn{4}{c}{Floating-point builtins} \\
     \hline
     \lstinline|Frama_C_sqrt| &
-    \lstinline|Frama_C_cos| &
-    \lstinline|Frama_C_sin| &
-    \lstinline|Frama_C_log| &
-    \lstinline|Frama_C_log10| \\
+    \lstinline|Frama_C_pow| &
     \lstinline|Frama_C_exp| &
+    \lstinline|Frama_C_log| \\
+    \lstinline|Frama_C_log10| &
+    \lstinline|Frama_C_fmod| &
+    \lstinline|Frama_C_cos| &
+    \lstinline|Frama_C_sin| \\
+    \lstinline|Frama_C_acos| &
+    \lstinline|Frama_C_asin| &
+    \lstinline|Frama_C_atan| &
+    \lstinline|Frama_C_atan2| \\
     \lstinline|Frama_C_ceil| &
     \lstinline|Frama_C_floor| &
     \lstinline|Frama_C_round| &
-    \lstinline|Frama_C_trunc| \\
-    \lstinline|Frama_C_atan2| &
-    \lstinline|Frama_C_pow| &
-    \lstinline|Frama_C_fmod| &
+    \lstinline|Frama_C_trunc|
   \end{tabular}
 \end{table}
 Equivalent builtins exist for 32-bit float computations, with a name suffixed
@@ -5337,46 +5324,35 @@ Builtins for functions of the \lstinline|string.h| standard header.
   \end{tabular}
 \end{table}
 
+\begin{table}[!ht]
+  \centering
+  \begin{tabular}{ccc}
+    \multicolumn{3}{c}{Wide-character string manipulation builtins} \\
+    \hline
+    \lstinline|Frama_C_wmemchr| &
+    \lstinline|Frama_C_wcschr| &
+    \lstinline|Frama_C_wcslen|
+  \end{tabular}
+\end{table}
+
 \begin{important}
   \lstinline|rawmemchr| is a GNU extension to standard C.
 \end{important}
 
-\ifdefstring{\OPENSOURCE}{no}{
-  % These builtins are not available in the open-source release
-\subsection{Memory representation}
-These builtins allow to perform queries over the current abstract memory state.
-\begin{itemize}
-\item \lstinline|Frama_C_is_base_aligned(p,n)| checks that the pointer argument
-  \lstinline|p| is aligned on \lstinline|n| bytes, assuming that
-  \lstinline|\\base_addr(p)| is itself aligned according to the alignment
-  of is type (as defined by the current \lstinline+machdep+).
-\item \lstinline|Frama_C_offset(p)| returns the possible offsets of
-  \lstinline|p| with respect to its base address. That is,
-  \lstinline|Frama_C_offset(p) == \\offset(p)| holds. (But
-  \lstinline|Frama_C_offset(p)| can be used outside of ACSL fragments.)
-\end{itemize}
-}{ % open source version - do not mention builtins
-}
-
-\ifdefstring{\OPENSOURCE}{no}{
-  % These builtins are not available in the open-source release
 \subsection{Memory manipulation}
 These builtins perform operations on the abstract memory.
-They usually correspond to the standard C library function of the same name.
-\begin{itemize}
-\item \lstinline|Frama_C_memcpy|
-\item \lstinline|Frama_C_memset|
-\end{itemize}
-}{ % open source version - advertise memcpy/memset builtins
-\subsection{Memory manipulation}
-Builtins for the C standard library functions \lstinline|memcpy|,
-\lstinline|memmove| and
-\lstinline|memset|  exist, but they are not available in the
-open-source release of \FramaC.
+They correspond to the standard C library function of the same name.
 
-Please contact us if you would like to use them for academic and/or
-commercial purposes.
-}
+\begin{table}[!ht]
+  \centering
+  \begin{tabular}{ccc}
+    \multicolumn{3}{c}{Memory manipulation builtins} \\
+    \hline
+    \lstinline|Frama_C_memcpy| &
+    \lstinline|Frama_C_memset| &
+    \lstinline|Frama_C_memmove|
+  \end{tabular}
+\end{table}
 
 \subsection{Dynamic allocation}
 
@@ -5398,53 +5374,66 @@ They are listed here for completeness.
   \end{tabular}
 \end{table}
 
-\ifdefstring{\OPENSOURCE}{no}{
-  % These builtins are not available in the open-source release
+%% Undocumented builtins
+\begin{comment}
 
-\subsection{Operations on the abstract state}
+  \subsection{Operations on the abstract state}
 
-These builtins perform low-level operations on the abstract representation
-manipulated internally by \Eva{}. Usually not for the casual user.
+  These builtins perform low-level operations on the abstract representation
+  manipulated internally by \Eva{}. Usually not for the casual user.
 
+  \begin{itemize}
+  \item \lstinline|Frama_C_dump_assert_each| prints the abstract state as an
+    argument of a C assert.
+  \item \lstinline|Frama_C_dump_assignments_each| prints the abstract state as a
+    sequence of C assignments (potentially using \lstinline|Frama_C_interval|).
+  \item \lstinline|Frama_C_interval_split(low,high)|, where \lstinline|low|
+    and \lstinline|high| must be precise, will return a value between low and high,
+    using high-low distinct states, each one containing a single integer for the result.
+  \item \lstinline|Frama_C_ungarble| transforms a garbled mix into \lstinline|Top_int|.
+  \item \lstinline|Frama_C_watch_value(loc,s,target,n)| allows to check whether
+    the abstract value of the location \lstinline|((char *)loc)[0..s-1]| can be
+    equal to \lstinline|target|. \lstinline|n| is simply a way to identify the
+    watchpoint. \lstinline|s| and \lstinline|n| must be precise.
+    If this is the case, a message will be output.
+  \item \lstinline|Frama_C_watch_cardinal(loc,s,target,n)| is the same as above,
+    but the target is the number of elements that are contained in the abstract
+    state for loc (a message is output if this number is higher than target).
+  \end{itemize}
+
+  \subsection{Deterministic builtins}
+
+  These builtins can only be used in interpreter mode: they will abort execution
+  if the arguments they are given are not precise (i.e. do not correspond to a
+  single concrete value).
+  They correspond to the standard C library function of the same name.
+
+  \begin{table}[!ht]
+    \centering
+    \begin{tabular}{cccc}
+      \multicolumn{4}{c}{Deterministic builtins} \\
+      \hline
+      \lstinline|Frama_C_printf| &
+      \lstinline|Frama_C_snprintf| &
+      \lstinline|Frama_C_sprintf| &
+      \lstinline|Frama_C_wprintf|
+    \end{tabular}
+  \end{table}
+
+\end{comment}
+
+\subsection{Memory representation}
+These builtins allow to perform queries over the current abstract memory state.
 \begin{itemize}
-\item \lstinline|Frama_C_dump_assert_each| prints the abstract state as an
-  argument of a C assert.
-\item \lstinline|Frama_C_dump_assignments_each| prints the abstract state as a
-  sequence of C assignments (potentially using \lstinline|Frama_C_interval|).
-\item \lstinline|Frama_C_interval_split(low,high)|, where \lstinline|low|
-  and \lstinline|high| must be precise, will return a value between low and high,
-  using high-low distinct states, each one containing a single integer for the result.
-\item \lstinline|Frama_C_ungarble| transforms a garbled mix into \lstinline|Top_int|.
-\item \lstinline|Frama_C_watch_value(loc,s,target,n)| allows to check whether
-  the abstract value of the location \lstinline|((char *)loc)[0..s-1]| can be
-  equal to \lstinline|target|. \lstinline|n| is simply a way to identify the
-  watchpoint. \lstinline|s| and \lstinline|n| must be precise.
-  If this is the case, a message will be output.
-\item \lstinline|Frama_C_watch_cardinal(loc,s,target,n)| is the same as above,
-  but the target is the number of elements that are contained in the abstract
-  state for loc (a message is output if this number is higher than target).
+\item \lstinline|Frama_C_is_base_aligned(p,n)| checks that the pointer argument
+  \lstinline|p| is aligned on \lstinline|n| bytes, assuming that
+  \lstinline|\\base_addr(p)| is itself aligned according to the alignment
+  of is type (as defined by the current \lstinline+machdep+).
+\item \lstinline|Frama_C_offset(p)| returns the possible offsets of
+  \lstinline|p| with respect to its base address. That is,
+  \lstinline|Frama_C_offset(p) == \\offset(p)| holds. (But
+  \lstinline|Frama_C_offset(p)| can be used outside of ACSL fragments.)
 \end{itemize}
-
-\subsection{Deterministic builtins}
-
-These builtins can only be used in interpreter mode: they will abort execution
-if the arguments they are given are not precise (i.e. do not correspond to a
-single concrete value).
-They correspond to the standard C library function of the same name.
-
-\begin{table}[!ht]
-  \centering
-  \begin{tabular}{cccc}
-    \multicolumn{4}{c}{Deterministic builtins} \\
-    \hline
-    \lstinline|Frama_C_printf| &
-    \lstinline|Frama_C_snprintf| &
-    \lstinline|Frama_C_sprintf| &
-    \lstinline|Frama_C_wprintf|
-  \end{tabular}
-\end{table}
-}{ % open source version - do not mention builtins
-}
 
 \subsection{State-splitting builtins}
 
