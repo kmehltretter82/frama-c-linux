@@ -4,6 +4,7 @@
 \usepackage{lmodern}
 \usepackage{booktabs}
 \usepackage{calc}
+\usepackage{multirow}
 
 % Commandes pour mettre des ref dans l'index :
 \newcommand{\idb}[1]{\textbf{#1}}
@@ -3929,14 +3930,83 @@ analysis, both in terms of precision and performance. However, when dealing
 with large arrays and matrices, it is worth considering its usage.
 
 
-\section{Advanced analyses}
+\section{Analysis domains}
 \label{sec:eva}
-
 
 This section presents the analysis \emph{domains}
 available to improve the precision on specific code constructs.
 They can (and probably should) be enabled at the beginning of the analysis.
 Their only downside is that they increase the analysis time.
+
+Figure~\ref{fig:eva-domains} presents the list of currently available analysis
+domains, with a short description of each one.
+Most domains are also presented in more details in the following subsections.
+
+\begin{figure}
+  \begin{tabular}{lll>{\raggedright}m{7.5cm}}
+    Name & Log & Ref & Description\tabularnewline
+    \midrule
+    \midrule
+    cvalue & d-cvalue &  &
+    Main analysis domain, enabled by default. Should not be disabled.
+    \tabularnewline
+    \midrule
+    equality & d-equality & \ref{sec:symbolic-equalities} &
+    Infers equalities between C expressions. \\
+    Useful on most analyses and very efficient.
+    \tabularnewline
+    \midrule
+    symbolic-locations & d-symblocs & \ref{sec:reuse} &
+    Infers values at symbolic locations. \\
+    Useful on most analyses and very efficient.
+    \tabularnewline
+    \midrule
+    gauges & d-gauges & \ref{sec:gauges} &
+    Infers linear inequalities between variables modified within a loop. Efficient.
+    \tabularnewline
+    \midrule
+    octagon & d-octagon & \ref{sec:octagons} &
+    Infers relations between scalar variables. \\
+    Efficient but limited.
+    \tabularnewline
+    \midrule
+    bitwise & d-bitwise & \ref{sec:bitwise} &
+    Interprets more precisely some bitwise operations. Rarely useful.
+    \tabularnewline
+    \midrule
+    sign & d-sign &  &
+    Infers the sign of variables. Rarely useful.
+    \tabularnewline
+    \midrule
+    apron-box & \multirow{5}{*}{d-apron} & \multirow{5}{*}{\ref{sec:apron}} &
+    \multirow{5}{7.5cm}{Experimental and often costly. \\
+      Binding to the Apron library domains.}\tabularnewline
+    apron-octagon &  &  & \tabularnewline
+    apron-polka-equality &  &  & \tabularnewline
+    apron-polka-loose &  &  & \tabularnewline
+    apron-polka-strict &  &  & \tabularnewline
+    \midrule
+    numerors & d-numerors & \ref{sec:numerors} &
+    Experimental. Infers ranges for absolute and relative errors
+    in floating-point computations.
+    \tabularnewline
+    \midrule
+    inout & d-inout &  &
+    Experimental. Computes the input and output of each function.
+    \tabularnewline
+    \midrule
+    traces & d-traces &  &
+    Experimental. Builds an over-approximation of all traces leading to
+    a statement.
+    \tabularnewline
+    \midrule
+    printer & d-printer &  & Only useful for developers.
+    \tabularnewline
+    \bottomrule
+  \end{tabular}
+
+  \caption{Analysis domains \label{fig:eva-domains}}
+\end{figure}
 
 These analysis domains are enabled by the option \texttt{-eva-domains}, followed
 by a list of domain names. A list of the available domains, and a short
@@ -3967,9 +4037,9 @@ These analysis domains currently have some restrictions:
 However, the properties inferred by a specific domain at a program point may be
 inspected by using the directive \lstinline+Frama_C_dump_each+ or
 \lstinline+Frama_C_domain_show_each+ in the analyzed source code, and by
-enabling the log category of the given domain. These directives and domain log
-categories are described in Section~\ref{buitins_observation}.
-
+enabling the log category of the given domain. These directives are described
+in Section~\ref{buitins_observation}, and the log category of each domain
+is given by Figure~\ref{fig:eva-domains}.
 
 \subsection{Symbolic equalities}
 \label{sec:symbolic-equalities}
@@ -4199,11 +4269,11 @@ the APRON library \cite{DBLP:conf/cav/JeannetM09}. Assuming Frama-C has been
 compiled with support for Apron, the corresponding options are:
 
 \begin{description}
-\item[-eva-apron-box]: boxes/intervals
-\item[-eva-apron-oct]:  octagons
-\item[-eva-polka-equalities]:  linear equalities
-\item[-eva-polka-loose]: loose polyhedra
-\item[-eva-polka-strict]: strict polyhedra
+\item[-eva-domains apron-box]: boxes/intervals
+\item[-eva-domains apron-octagon]:  octagons
+\item[-eva-domains apron-polka-equality]:  linear equalities
+\item[-eva-domains apron-polka-loose]: loose polyhedra
+\item[-eva-domains apron-polka-strict]: strict polyhedra
 \end{description}
 
 The analysis is fully interprocedural. However, the binding is
@@ -5219,40 +5289,7 @@ each time the analyzer reaches the call.
 The internal states of each additional domain described in Section~\ref{sec:eva}
 are also displayed if the domain's log category has been enabled through the
 option \verb+-eva-msg-key category+, where \verb+category+ is the log category
-of the domain, shown in Figure~\ref{fig:log-category}.
-
-\begin{figure}
-  \begin{centering}
-    \begin{tabular}{lll}
-      Domain & Log category & Ref\tabularnewline
-      \midrule
-      \midrule
-      Symbolic equalities & \lstinline|d-eq| & \ref{sec:symbolic-equalities}
-      \tabularnewline
-      \midrule
-      Symbolic locations & \lstinline|d-symblocs| & \ref{sec:reuse}
-      \tabularnewline
-      \midrule
-      Gauges & \lstinline|d-gauges| & \ref{sec:gauges}
-      \tabularnewline
-      \midrule
-      Octagons & \lstinline|d-octagon| & \ref{sec:octagons}
-      \tabularnewline
-      \midrule
-      Bitwise & \lstinline|d-bitwise| & \ref{sec:bitwise}
-      \tabularnewline
-      \midrule
-      Apron binding & \lstinline|d-apron| & \ref{sec:apron}
-      \tabularnewline
-      \midrule
-      Numerors & \lstinline|d-numerors| & \ref{sec:numerors}
-      \tabularnewline
-      \bottomrule
-    \end{tabular}
-    \par\end{centering}
-    \caption{Log categories for additional domains \label{fig:log-category}}
-
-\end{figure}
+of the domain, shown in Figure~\ref{fig:eva-domains}.
 
 \subsection{Displaying internal properties about expressions}
 
