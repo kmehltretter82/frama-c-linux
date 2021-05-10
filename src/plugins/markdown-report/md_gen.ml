@@ -609,10 +609,15 @@ let gen_report ~draft:is_draft () =
   in
   let doc = Markdown.pandoc ~title ~authors ?date elements in
   let file = Mdr_params.Output.get() in
-  try
-    Command.print_file (file:>string) (fun fmt -> Markdown.pp_pandoc fmt doc) ;
-    Mdr_params.result "Report %a generated" Filepath.Normalized.pretty file
-  with Sys_error s ->
-    Mdr_params.warning
-      "Unable to open %a for writing (%s). No report generated"
-      Filepath.Normalized.pretty file s
+  if Filepath.Normalized.is_empty file then
+    Mdr_params.error "No output file specified (use option %s)."
+      Mdr_params.Output.option_name
+  else
+    try
+      Command.print_file (file:>string)
+        (fun fmt -> Markdown.pp_pandoc fmt doc) ;
+      Mdr_params.result "Report %a generated" Filepath.Normalized.pretty file
+    with Sys_error s ->
+      Mdr_params.warning
+        "Unable to open %a for writing (%s). No report generated"
+        Filepath.Normalized.pretty file s
