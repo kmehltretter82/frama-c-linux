@@ -467,8 +467,82 @@ extern float sinf(float x);
 */
 extern long double sinl(long double x);
 
+/*@
+  assigns errno, \result \from x;
+  behavior zero:
+    assumes zero_arg: \is_finite(x) && x == 0.;
+    assigns \result \from x;
+    ensures zero_res: \is_finite(\result) && \result == x;
+    ensures no_error: errno == \old(errno);
+  behavior finite_non_zero:
+    assumes finite_arg: \is_finite(x) && x != 0.;
+    assigns \result \from x;
+    ensures result_not_nan: !\is_NaN(\result);
+    ensures maybe_error: errno == \old(errno);
+  behavior infinity:
+    assumes infinite_arg: \is_infinite(x);
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+    ensures no_error: errno == \old(errno);
+  complete behaviors;
+  disjoint behaviors;
+*/
 extern double tan(double x);
+
+/*@
+  assigns errno, \result \from x;
+  behavior zero:
+    assumes zero_arg: \is_finite(x) && x == 0.;
+    assigns \result \from x;
+    ensures zero_res: \is_finite(\result) && \result == x;
+    ensures no_error: errno == \old(errno);
+  behavior finite_non_zero:
+    assumes finite_arg: \is_finite(x) && x != 0.;
+    assigns \result \from x;
+    ensures result_not_nan: !\is_NaN(\result);
+    ensures maybe_error: errno == \old(errno);
+  behavior infinity:
+    assumes infinite_arg: \is_infinite(x);
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+    ensures no_error: errno == \old(errno);
+  complete behaviors;
+  disjoint behaviors;
+*/
 extern float tanf(float x);
+
+/*@
+  assigns errno, \result \from x;
+  behavior zero:
+    assumes zero_arg: \is_finite(x) && x == 0.;
+    assigns \result \from x;
+    ensures zero_res: \is_finite(\result) && \result == x;
+    ensures no_error: errno == \old(errno);
+  behavior finite_non_zero:
+    assumes finite_arg: \is_finite(x) && x != 0.;
+    assigns \result \from x;
+    ensures result_not_nan: !\is_NaN(\result);
+    ensures maybe_error: errno == \old(errno);
+  behavior infinity:
+    assumes infinite_arg: \is_infinite(x);
+    ensures nan_result: \is_NaN(\result);
+    ensures errno_set: errno == EDOM;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+    ensures no_error: errno == \old(errno);
+  complete behaviors;
+  disjoint behaviors;
+*/
 extern long double tanl(long double x);
 
 /*@
