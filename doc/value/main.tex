@@ -5277,7 +5277,7 @@ a short description of their behavior.
 
 \subsection{Floating-point operations}
 
-Generally speaking, all functions mentioned below are the counter-part of the
+Generally speaking, all functions mentioned below are the counterpart of the
 standard library function of the same name, minus the
 \lstinline|Frama_C_| prefix.
 
@@ -5427,12 +5427,12 @@ These builtins allow to perform queries over the current abstract memory state.
 \begin{itemize}
 \item \lstinline|Frama_C_is_base_aligned(p,n)| checks that the pointer argument
   \lstinline|p| is aligned on \lstinline|n| bytes, assuming that
-  \lstinline|\\base_addr(p)| is itself aligned according to the alignment
-  of is type (as defined by the current \lstinline+machdep+).
+  \lstinline|\base_addr(p)| is itself aligned according to the alignment
+  of its type (as defined by the current \lstinline+machdep+).
 \item \lstinline|Frama_C_offset(p)| returns the possible offsets of
   \lstinline|p| with respect to its base address. That is,
-  \lstinline|Frama_C_offset(p) == \\offset(p)| holds. (But
-  \lstinline|Frama_C_offset(p)| can be used outside of ACSL fragments.)
+  \lstinline|Frama_C_offset(p) == \offset(p)| holds (but
+  \lstinline|Frama_C_offset(p)| can be used outside of ACSL fragments).
 \end{itemize}
 
 \subsection{State-splitting builtins}
@@ -5496,13 +5496,13 @@ The second family of builtins can be used to compute the cardinality.
   \end{tabular}
 \end{table}
 
-
-Prototypes for those builtins can be found in \lstinline+__fc_builtin.h+.
+For example:
 \lstinline|Frama_C_abstract_cardinal| returns \lstinline|12| on
 \lstinline+[6..36],0%3+, %
 while  \lstinline|Frama_C_abstract_min| and \lstinline|Frama_C_abstract_max|
 return \lstinline|6| and \lstinline|36| respectively.
 
+Prototypes for those builtins can be found in \lstinline+__fc_builtin.h+.
 
 
 
