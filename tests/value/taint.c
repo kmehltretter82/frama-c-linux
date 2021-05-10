@@ -31,10 +31,6 @@ void taint_basic(int t) {
     w = 1;
   else
     w = 2;
-
-  /* data-tainted: t, x, u, buf[t] (and 'tainted')
-     control-tainted: w
-     untainted: y */
   Frama_C_dump_each();
 }
 
@@ -62,9 +58,6 @@ void taint_assume_1() {
     /* Although 'z' does not post-dominate the 'x < 3', this latter is no more
        active here, hence 'z' remains untainted. */
     z++;
-  /* data-tainted: x, y
-     control-tainted: x, y
-     untainted: z */
   Frama_C_dump_each();
 }
 
@@ -80,8 +73,6 @@ void taint_assume_2() {
     }
     y++;
   }
-  /* data-tainted: x, y
-     control-tainted: x, y */
   Frama_C_dump_each();
 }
 
@@ -101,10 +92,6 @@ void taint_goto_1() {
     L: y = 0;
   }
   z = 1;
-
-  /* data-tainted: t
-     control-tainted: x
-     untainted: y, z */
   Frama_C_dump_each();
 }
 
@@ -125,10 +112,6 @@ void taint_goto_2() {
   /* Since this assign may be executed depending on the condition on 't', which
      is tainted, 'y' must be (control-)tainted. */
   L: y = 0;
-
-  /* data-tainted: t
-     control-tainted: x, y
-     untainted: z */
   Frama_C_dump_each();
 }
 

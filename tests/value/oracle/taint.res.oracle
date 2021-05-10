@@ -7,8 +7,8 @@
   undet ∈ [--..--]
   tainted ∈ {0}
 [eva] computing for function taint_basic <- main.
-  Called from tests/value/taint.c:148.
-[eva] tests/value/taint.c:38: 
+  Called from tests/value/taint.c:131.
+[eva] tests/value/taint.c:34: 
   Frama_C_dump_each:
   # taint:
   Locations (data):
@@ -19,9 +19,9 @@
 [eva] Recording results for taint_basic
 [eva] Done for function taint_basic
 [eva] computing for function taint_assume_1 <- main.
-  Called from tests/value/taint.c:151.
-[eva:loop-unroll] tests/value/taint.c:51: Automatic loop unrolling.
-[eva] tests/value/taint.c:52: 
+  Called from tests/value/taint.c:134.
+[eva:loop-unroll] tests/value/taint.c:47: Automatic loop unrolling.
+[eva] tests/value/taint.c:48: 
   Frama_C_dump_each:
   # taint:
   Locations (data):
@@ -29,7 +29,7 @@
   Locations (control):
     \nothing
   ==END OF DUMP==
-[eva] tests/value/taint.c:55: 
+[eva] tests/value/taint.c:51: 
   Frama_C_dump_each:
   # taint:
   Locations (data):
@@ -37,7 +37,7 @@
   Locations (control):
     \nothing
   ==END OF DUMP==
-[eva] tests/value/taint.c:52: 
+[eva] tests/value/taint.c:48: 
   Frama_C_dump_each:
   # taint:
   Locations (data):
@@ -45,7 +45,7 @@
   Locations (control):
     \nothing
   ==END OF DUMP==
-[eva] tests/value/taint.c:55: 
+[eva] tests/value/taint.c:51: 
   Frama_C_dump_each:
   # taint:
   Locations (data):
@@ -53,7 +53,7 @@
   Locations (control):
     y
   ==END OF DUMP==
-[eva] tests/value/taint.c:52: 
+[eva] tests/value/taint.c:48: 
   Frama_C_dump_each:
   # taint:
   Locations (data):
@@ -61,7 +61,7 @@
   Locations (control):
     x; y
   ==END OF DUMP==
-[eva] tests/value/taint.c:55: 
+[eva] tests/value/taint.c:51: 
   Frama_C_dump_each:
   # taint:
   Locations (data):
@@ -69,7 +69,7 @@
   Locations (control):
     x; y
   ==END OF DUMP==
-[eva] tests/value/taint.c:68: 
+[eva] tests/value/taint.c:61: 
   Frama_C_dump_each:
   # taint:
   Locations (data):
@@ -80,8 +80,8 @@
 [eva] Recording results for taint_assume_1
 [eva] Done for function taint_assume_1
 [eva] computing for function taint_assume_2 <- main.
-  Called from tests/value/taint.c:152.
-[eva] tests/value/taint.c:85: 
+  Called from tests/value/taint.c:135.
+[eva] tests/value/taint.c:76: 
   Frama_C_dump_each:
   # taint:
   Locations (data):
@@ -92,15 +92,15 @@
 [eva] Recording results for taint_assume_2
 [eva] Done for function taint_assume_2
 [eva] computing for function taint_spec_assigns <- main.
-  Called from tests/value/taint.c:155.
+  Called from tests/value/taint.c:138.
 [eva] using specification for function taint_spec_assigns
 [eva] Done for function taint_spec_assigns
-[eva] tests/value/taint.c:157: 
+[eva] tests/value/taint.c:140: 
   Frama_C_domain_show_each:
   l : # taint: false
 [eva] computing for function taint_goto_1 <- main.
-  Called from tests/value/taint.c:159.
-[eva] tests/value/taint.c:108: 
+  Called from tests/value/taint.c:142.
+[eva] tests/value/taint.c:95: 
   Frama_C_dump_each:
   # taint:
   Locations (data):
@@ -111,8 +111,8 @@
 [eva] Recording results for taint_goto_1
 [eva] Done for function taint_goto_1
 [eva] computing for function taint_goto_2 <- main.
-  Called from tests/value/taint.c:160.
-[eva] tests/value/taint.c:132: 
+  Called from tests/value/taint.c:143.
+[eva] tests/value/taint.c:115: 
   Frama_C_dump_each:
   # taint:
   Locations (data):
@@ -123,10 +123,10 @@
 [eva] Recording results for taint_goto_2
 [eva] Done for function taint_goto_2
 [eva] computing for function taint_call <- main.
-  Called from tests/value/taint.c:163.
+  Called from tests/value/taint.c:146.
 [eva] computing for function taint_basic <- taint_call <- main.
-  Called from tests/value/taint.c:140.
-[eva] tests/value/taint.c:38: 
+  Called from tests/value/taint.c:123.
+[eva] tests/value/taint.c:34: 
   Frama_C_dump_each:
   # taint:
   Locations (data):
@@ -136,7 +136,7 @@
   ==END OF DUMP==
 [eva] Recording results for taint_basic
 [eva] Done for function taint_basic
-[eva] tests/value/taint.c:143: 
+[eva] tests/value/taint.c:126: 
   Frama_C_domain_show_each:
   x : # taint: false
 [eva] Recording results for taint_call
