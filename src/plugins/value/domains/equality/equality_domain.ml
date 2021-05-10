@@ -39,7 +39,7 @@ let call_init_state kf =
   | "none" -> ISEmpty
   | _ -> assert false
 
-let dkey = Value_parameters.register_category "d-eq"
+let dkey = Value_parameters.register_category "d-equality"
 
 open Hcexprs
 
