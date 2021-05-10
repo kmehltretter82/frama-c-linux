@@ -104,7 +104,7 @@ type key = {
   branches : branch list;
   loops : (int * int) list; (* current iteration / max unrolling *)
   static_split : (Integer.t*split_monitor) SplitMap.t; (* exp->value*monitor *)
-  dynamic_split : (Integer.t*split_monitor) SplitMap.t; (* exp->value*monitor *)
+  dynamic_split : (Integer.t option * split_monitor) SplitMap.t; (* exp->value*monitor *)
 }
 
 module Key =
@@ -127,10 +127,13 @@ struct
     let compare_split (i1,_m1) (i2,_m2) =
       Integer.compare i1 i2
     in
+    let compare_optsplit (i1,_m1) (i2,_m2) =
+      Option.compare Integer.compare i1 i2
+    in
     Option.compare IntPair.compare k1.ration_stamp k2.ration_stamp
     <?> (LoopList.compare, k1.loops, k2.loops)
     <?> (SplitMap.compare compare_split, k1.static_split, k2.static_split)
-    <?> (SplitMap.compare compare_split, k1.dynamic_split, k2.dynamic_split)
+    <?> (SplitMap.compare compare_optsplit, k1.dynamic_split, k2.dynamic_split)
     <?> (BranchList.compare, k1.branches, k2.branches)
 
   let pretty fmt key =
@@ -151,7 +154,13 @@ struct
           SplitTerm.pretty t
           (Integer.pretty ~hexa:false) i)
       fmt
-      (SplitMap.bindings key.static_split @ SplitMap.bindings key.dynamic_split)
+      (SplitMap.bindings key.static_split);
+    Pretty_utils.pp_list ~pre:"{@[" ~sep:" ;@ " ~suf:"@]}"
+      (fun fmt (t,(i,_m)) -> Format.fprintf fmt "%a:%a"
+          SplitTerm.pretty t
+          (Pretty_utils.pp_opt (Integer.pretty ~hexa:false)) i)
+      fmt
+      (SplitMap.bindings key.dynamic_split)
 
   let exceed_rationing key = key.ration_stamp = None
 end
@@ -392,13 +401,13 @@ struct
 
   let split_state ~monitor (kind : split_kind) (term : split_term)
       (key : key) (state : state) : (key * state) list =
+    let add value map = SplitMap.add term (value, monitor) map in
     try
-      let add value map = SplitMap.add term (value, monitor) map in
       let update_key (v,x) =
         let k =
           match kind with
           | Static -> { key with static_split = add v key.static_split }
-          | Dynamic -> { key with dynamic_split = add v key.dynamic_split }
+          | Dynamic -> { key with dynamic_split = add (Some v) key.dynamic_split }
         in
         (k,x)
       in
@@ -409,6 +418,11 @@ struct
       in
       List.map update_key states
     with Operation_failed ->
+      let key =
+        match kind with
+        | Static -> key
+        | Dynamic -> { key with dynamic_split = add None key.dynamic_split }
+      in
       [(key,state)]
 
   let split ~monitor (kind : split_kind) (term : split_term) (p : t) =
