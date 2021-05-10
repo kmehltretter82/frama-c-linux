@@ -88,12 +88,15 @@ module Eva_annotations: sig
     | UnrollFull (** Unroll amount defined by -eva-default-loop-unroll. *)
 
   type split_kind = Static | Dynamic
+  type split_term =
+    | Expression of Cil_types.exp
+    | Predicate of Cil_types.predicate
 
   (** Split/merge annotations for value partitioning.  *)
   type flow_annotation =
-    | FlowSplit of Cil_types.term * split_kind
+    | FlowSplit of split_term * split_kind
     (** Split states according to a term. *)
-    | FlowMerge of Cil_types.term
+    | FlowMerge of split_term
     (** Merge states separated by a previous split. *)
 
   val add_slevel_annot : emitter:Emitter.t -> loc:Cil_types.location ->

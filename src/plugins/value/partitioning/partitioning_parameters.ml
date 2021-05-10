@@ -116,7 +116,8 @@ struct
       try
         let vi = Globals.Vars.find_from_astinfo name VGlobal in
         let monitor = Partition.new_monitor ~split_limit in
-        Partition.Split (Cil.evar vi, Partition.Dynamic, monitor) :: l
+        let expr = Partition.Expression (Cil.evar vi) in
+        Partition.Split (expr, Partition.Dynamic, monitor) :: l
       with Not_found ->
         warn ~current:false "cannot find the global variable %s for value \
                              partitioning; ignoring" name;
@@ -130,8 +131,8 @@ struct
         let monitor = Partition.new_monitor ~split_limit in
         let action =
           match t with
-          | FlowSplit (t, kind) -> Partition.Split (term_to_exp t, kind, monitor)
-          | FlowMerge t -> Partition.Merge (term_to_exp t)
+          | FlowSplit (t, kind) -> Partition.Split (t, kind, monitor)
+          | FlowMerge t -> Partition.Merge t
         in
         action :: acc
       with

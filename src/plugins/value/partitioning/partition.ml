@@ -53,7 +53,25 @@ let new_rationing ~limit ~merge = { current = ref 0; limit; merge }
 
 (* --- Keys --- *)
 
-module ExpMap = Cil_datatype.ExpStructEq.Map
+type split_term = Eva_annotations.split_term =
+  | Expression of Cil_types.exp
+  | Predicate of Cil_types.predicate
+
+module SplitTerm = struct
+  type t = split_term
+  let compare x y =
+    match x, y with
+    | Expression e1, Expression e2 -> Cil_datatype.ExpStructEq.compare e1 e2
+    | Predicate p1, Predicate p2 -> Logic_utils.compare_predicate p1 p2
+    | Expression _, Predicate _ -> 1
+    | Predicate _, Expression _ -> -1
+
+  let pretty fmt = function
+    | Expression e -> Printer.pp_exp fmt e
+    | Predicate p -> Printer.pp_predicate fmt p
+end
+
+module SplitMap = Map.Make (SplitTerm)
 module IntPair = Datatype.Pair (Datatype.Int) (Datatype.Int)
 module LoopList = Datatype.List (IntPair)
 module BranchList = Datatype.List (Datatype.Int)
@@ -85,8 +103,8 @@ type key = {
   ration_stamp : stamp;
   branches : branch list;
   loops : (int * int) list; (* current iteration / max unrolling *)
-  static_split : (Integer.t*split_monitor) ExpMap.t; (* exp->value*monitor *)
-  dynamic_split : (Integer.t*split_monitor) ExpMap.t; (* exp->value*monitor *)
+  static_split : (Integer.t*split_monitor) SplitMap.t; (* exp->value*monitor *)
+  dynamic_split : (Integer.t*split_monitor) SplitMap.t; (* exp->value*monitor *)
 }
 
 module Key =
@@ -98,8 +116,8 @@ struct
     ration_stamp = None;
     branches = [];
     loops = [];
-    static_split = ExpMap.empty;
-    dynamic_split = ExpMap.empty;
+    static_split = SplitMap.empty;
+    dynamic_split = SplitMap.empty;
   }
 
   let compare k1 k2 =
@@ -111,8 +129,8 @@ struct
     in
     Option.compare IntPair.compare k1.ration_stamp k2.ration_stamp
     <?> (LoopList.compare, k1.loops, k2.loops)
-    <?> (ExpMap.compare compare_split, k1.static_split, k2.static_split)
-    <?> (ExpMap.compare compare_split, k1.dynamic_split, k2.dynamic_split)
+    <?> (SplitMap.compare compare_split, k1.static_split, k2.static_split)
+    <?> (SplitMap.compare compare_split, k1.dynamic_split, k2.dynamic_split)
     <?> (BranchList.compare, k1.branches, k2.branches)
 
   let pretty fmt key =
@@ -129,11 +147,11 @@ struct
       fmt
       key.loops;
     Pretty_utils.pp_list ~pre:"{@[" ~sep:" ;@ " ~suf:"@]}"
-      (fun fmt (e,(i,_m)) -> Format.fprintf fmt "%a:%a"
-          Cil_printer.pp_exp e
+      (fun fmt (t,(i,_m)) -> Format.fprintf fmt "%a:%a"
+          SplitTerm.pretty t
           (Integer.pretty ~hexa:false) i)
       fmt
-      (ExpMap.bindings key.static_split @ ExpMap.bindings key.dynamic_split)
+      (SplitMap.bindings key.static_split @ SplitMap.bindings key.dynamic_split)
 
   let exceed_rationing key = key.ration_stamp = None
 end
@@ -175,8 +193,8 @@ type action =
   | Branch of branch * int
   | Ration of rationing
   | Restrict of Cil_types.exp * Integer.t list
-  | Split of Cil_types.exp * split_kind * split_monitor
-  | Merge of Cil_types.exp
+  | Split of split_term * split_kind * split_monitor
+  | Merge of split_term
   | Update_dynamic_splits
 
 exception InvalidAction
@@ -328,6 +346,26 @@ struct
     | Failure _ ->
       fail ~exp "this partitioning parameter is too big"
 
+  let split_by_predicate state predicate =
+    let env =
+      let states = function _ -> Abstract.Dom.top in
+      Abstract_domain.{ states; result = None }
+    in
+    let source = fst (predicate.Cil_types.pred_loc) in
+    let aux positive =
+      Abstract.Dom.reduce_by_predicate env state predicate positive
+      >>-: fun state' ->
+      let x = Abstract.Dom.evaluate_predicate env state' predicate in
+      if x == Unknown
+      then
+        Value_parameters.warning ~source ~once:true
+          "failing to learn perfectly from split predicate";
+      if Abstract.Dom.equal state' state then raise Operation_failed;
+      let value = if positive then Integer.one else Integer.zero in
+      value, state'
+    in
+    Bottom.all [ aux true; aux false ]
+
   (* --- Applying partitioning actions onto flows --------------------------- *)
 
   let stamp_by_value = match Abstract.Val.get Main_values.CVal.key with
@@ -352,10 +390,10 @@ struct
             None
           end
 
-  let split_state ~monitor (kind : split_kind) (exp : Cil_types.exp)
+  let split_state ~monitor (kind : split_kind) (term : split_term)
       (key : key) (state : state) : (key * state) list =
     try
-      let add value map = ExpMap.add exp (value, monitor) map in
+      let add value map = SplitMap.add term (value, monitor) map in
       let update_key (v,x) =
         let k =
           match kind with
@@ -364,13 +402,18 @@ struct
         in
         (k,x)
       in
-      List.map update_key (split_by_value ~monitor state exp)
+      let states =
+        match term with
+        | Expression exp -> split_by_value ~monitor state exp
+        | Predicate pred -> split_by_predicate state pred
+      in
+      List.map update_key states
     with Operation_failed ->
       [(key,state)]
 
-  let split ~monitor (kind : split_kind) (exp : Cil_types.exp) (p : t) =
+  let split ~monitor (kind : split_kind) (term : split_term) (p : t) =
     let add_split acc (key,state) =
-      split_state ~monitor kind exp key state @ acc
+      split_state ~monitor kind term key state @ acc
     in
     List.fold_left add_split [] p
 
@@ -385,7 +428,7 @@ struct
         List.fold_left resplit [] l
       in
       (* Foreach exp in original state: split *)
-      ExpMap.fold update_exp key.dynamic_split [(key,state)] @ acc
+      SplitMap.fold update_exp key.dynamic_split [(key,state)] @ acc
     in
     List.fold_left update_state [] p
 
@@ -472,8 +515,8 @@ struct
           { k with ration_stamp = stamp_by_value expr expected_values s}
 
         | Merge exp -> fun k _x ->
-          { k with static_split = ExpMap.remove exp k.static_split;
-                   dynamic_split = ExpMap.remove exp k.dynamic_split }
+          { k with static_split = SplitMap.remove exp k.static_split;
+                   dynamic_split = SplitMap.remove exp k.dynamic_split }
       in
       map_keys transfer p
 
