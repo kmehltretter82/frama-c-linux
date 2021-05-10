@@ -135,10 +135,14 @@ let check_warning_status json name (module Plugin: Log.Messages) =
       (Pretty_utils.pp_list ~sep:", " Format.pp_print_string) should_be_enabled
 
 let check_configuration path =
-  let json = Json.from_file path in
-  check_correctness_parameters json;
-  check_warning_status json "Kernel" (module Kernel);
-  check_warning_status json "Eva" (module Value_parameters)
+  try
+    let json = Json.from_file path in
+    check_correctness_parameters json;
+    check_warning_status json "Kernel" (module Kernel);
+    check_warning_status json "Eva" (module Value_parameters)
+  with Yojson.Json_error msg ->
+    Kernel.abort "error reading JSON file %a: %s"
+      Filepath.Normalized.pretty path msg
 
 let print_configuration path =
   print_correctness_parameters path;
