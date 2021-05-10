@@ -20,7 +20,7 @@
 \except{the quantifications must be guarded}
 
 More precisely, the grammars of terms and binders presented respectively
-Figures~\ref{fig:gram:term} and~\ref{fig:gram:binders} are the same than the one
+Figures~\ref{fig:gram:term} and~\ref{fig:gram:binders} are the same than the ones
 of \acsl, while Figure~\ref{fig:gram:pred} presents the grammar of
 predicates. The only differences introduced by \eacsl with respect to \acsl are
 the fact that the quantifications that must be guarded and the introduction of
@@ -64,7 +64,7 @@ In addition to generalized quantifications, a restricted form of guarded
 quantifications described in Fig.~\ref{fig:gram:guarded} is also recognized
 \emph{for (possibly infinite) enumerable types} (typically,
 \lstinline|integer|). In guarded quantifications, each bound variable must be
-guarded exactly once and, if its bounds depend on other bounded variables, these
+guarded exactly once and, if its bounds depend on other bound variables, these
 variables must be guarded earlier or guarded by the same guard. Additionnally,
 guards are limited to bound variables, meaning that the only allowed
 identifiers $id$ are variable identifiers enclosed in the binder list.
@@ -96,7 +96,7 @@ identifiers $id$ are variable identifiers enclosed in the binder list.
 iterating over other data structures, \eacsl introduces a notion of $iterators$
 over types that are introduced by a specific construct which attaches two sets
 --- namely \texttt{nexts} and \texttt{guards} --- to a binary predicate over
-a type $\tau$.. This construct is
+a type $\tau$. This construct is
 described by the grammar of Figure~\ref{fig:gram:iterator}.
   \begin{figure}[htbp]
     \begin{cadre}
@@ -219,7 +219,7 @@ invalid, so the rest of the conjunction (and in particular 1/0) is not
 evaluated. The fourth one is invalid since it is an existential quantification
 over an empty range.
 
-\emph{A contrario} the semantics of predicates below is undefined:
+\emph{A contrario} the semantics of the predicates below is undefined:
 \begin{itemize}
 \item \lstinline|1/0 == 1/0 && \false|
 \item \lstinline|-1 <= 1/0 <= 1 ==> \true|
@@ -283,7 +283,7 @@ Chalin on that topic~\cite{chalin05,chalin07}.
 More precisely, most real numbers are not representable at runtime with an
 infinite precisions. Consequently, most operations over them (e.g., equality)
 cannot be computed at runtime with an arbitrary precision. In such cases, it is
-the responsibility of each tool which interprets \eacsl to specify their
+the responsibility of each tool which interprets \eacsl to specify the
 level of precision (e.g., $1e^{-6}$) up to which it is sound, and/or to emit
 undefinitive verdicts (e.g., ``unknown'').
 
