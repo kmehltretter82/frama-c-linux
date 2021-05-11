@@ -17,6 +17,7 @@
 Open Source Release <next-release>
 ##################################
 
+-   Eva       [2021-05-11] Support for ACSL predicate \is_infinite.
 -*  Kernel    [2021-04-26] Do not crash on _Alignof(void): accept or properly
               reject, depending on machdep. Fixes pub/frama-c#2551
 -   Eva       [2021-04-21] Partial support for recursion:
