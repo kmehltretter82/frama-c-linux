@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** {1 Source code navigation history.} 
+(** {1 Source code navigation history.}
     @since Nitrogen-20111001 *)
 
 type history_elt =

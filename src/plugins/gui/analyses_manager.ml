@@ -41,14 +41,14 @@ let run title filter_name extension loader
     (fun () ->
        match dialog#run () with
        | `EXECUTE ->
-           let run f =
-             loader f;
-             !Db.Main.play ();
-             host_window#reset ()
-           in
-           Option.iter run dialog#filename;
+         let run f =
+           loader f;
+           !Db.Main.play ();
+           host_window#reset ()
+         in
+         Option.iter run dialog#filename;
        | `DELETE_EVENT | `CANCEL ->
-           ());
+         ());
   dialog#destroy ()
 
 let run_module =

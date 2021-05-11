@@ -21,46 +21,46 @@
 (**************************************************************************)
 
 include Plugin.Register
-  (struct
-     let name = "from analysis"
-     let shortname = "from"
-     let help = "functional dependencies"
-   end)
+    (struct
+      let name = "from analysis"
+      let shortname = "from"
+      let help = "functional dependencies"
+    end)
 
 module ForceDeps =
   WithOutput
     (struct
-       let option_name = "-deps"
-       let help = "force dependencies display"
-       let output_by_default = true
-     end)
+      let option_name = "-deps"
+      let help = "force dependencies display"
+      let output_by_default = true
+    end)
 
 module ForceCallDeps =
   WithOutput
     (struct
-       let option_name = "-calldeps"
-       let help = "force callsite-wise dependencies"
-       let output_by_default = true
-     end)
+      let option_name = "-calldeps"
+      let help = "force callsite-wise dependencies"
+      let output_by_default = true
+    end)
 
 module ShowIndirectDeps =
-False
+  False
     (struct
-       let option_name = "-show-indirect-deps"
-       let help = "experimental"
-     end)
+      let option_name = "-show-indirect-deps"
+      let help = "experimental"
+    end)
 
 module VerifyAssigns =
-False
+  False
     (struct
-       let option_name = "-from-verify-assigns"
-       let help = "verification of assigns/from clauses for functions with \
-         bodies. Implies -calldeps"
-     end)
+      let option_name = "-from-verify-assigns"
+      let help = "verification of assigns/from clauses for functions with \
+                  bodies. Implies -calldeps"
+    end)
 let () =
   VerifyAssigns.add_set_hook
     (fun _ new_ ->
-      if new_ then ForceCallDeps.set true)
+       if new_ then ForceCallDeps.set true)
 
 
 

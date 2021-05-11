@@ -56,10 +56,10 @@ module Make(D: DATA) = struct
     match t.first, t.last with
     | [], [] -> raise Empty
     | [], _ :: _ ->
-        transfer t;
-        (match t.first with
-         | [] -> assert false
-         | x :: _ -> x)
+      transfer t;
+      (match t.first with
+       | [] -> assert false
+       | x :: _ -> x)
     | x :: _, _ -> x
 
   let mem x t =
@@ -120,15 +120,15 @@ module Make(D: DATA) = struct
   let nth n t =
     try List.nth t.first n
     with Failure _ ->
-      try List.nth (List.rev t.last) (n - List.length t.first)
-      with Failure s -> invalid_arg s
+    try List.nth (List.rev t.last) (n - List.length t.first)
+    with Failure s -> invalid_arg s
 
   let idx x t =
     let i = ref 0 in
     try
       iter (fun e ->
-              if D.equal e x then raise Exit;
-              incr i)
+          if D.equal e x then raise Exit;
+          incr i)
         t;
       raise Not_found
     with Exit -> !i

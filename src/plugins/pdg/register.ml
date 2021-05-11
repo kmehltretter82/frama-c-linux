@@ -23,9 +23,9 @@
 let compute = Build.compute_pdg
 
 let pretty ?(bw=false) fmt pdg =
-    let kf = PdgTypes.Pdg.get_kf pdg in
-    Format.fprintf fmt "@[RESULT for %s:@]@\n@[ %a@]"
-      (Kernel_function.get_name kf) (PdgTypes.Pdg.pretty_bw ~bw) pdg
+  let kf = PdgTypes.Pdg.get_kf pdg in
+  Format.fprintf fmt "@[RESULT for %s:@]@\n@[ %a@]"
+    (Kernel_function.get_name kf) (PdgTypes.Pdg.pretty_bw ~bw) pdg
 
 let pretty_node short =
   if short then PdgTypes.Node.pretty
@@ -39,10 +39,10 @@ module Tbl =
   Kernel_function.Make_Table
     (PdgTypes.Pdg)
     (struct
-       let name = "Pdg.State"
-       let dependencies = [] (* postponed because !Db.From.self may
-                                not exist yet *)
-       let size = 17
+      let name = "Pdg.State"
+      let dependencies = [] (* postponed because !Db.From.self may
+                               not exist yet *)
+      let size = 17
     end)
 let () =
   Cmdline.run_after_extended_stage
@@ -83,7 +83,7 @@ let () =
 
   Db.Pdg.find_call_out_nodes_to_select := Sets.find_call_out_nodes_to_select;
   Db.Pdg.find_in_nodes_to_select_for_this_call :=
-         Sets.find_in_nodes_to_select_for_this_call;
+    Sets.find_in_nodes_to_select_for_this_call;
 
   Db.Pdg.direct_dpds := Sets.direct_dpds;
   Db.Pdg.direct_ctrl_dpds := Sets.direct_ctrl_dpds;
@@ -124,7 +124,7 @@ let () = Pdg_parameters.BuildAll.set_output_dependencies deps
 let compute_for_kf kf =
   let all = Pdg_parameters.BuildAll.get () in
   (all && !Db.Value.is_called kf) ||
-    Kernel_function.Set.mem kf (Pdg_parameters.BuildFct.get ())
+  Kernel_function.Set.mem kf (Pdg_parameters.BuildFct.get ())
 
 let compute () =
   !Db.Value.compute ();
@@ -140,7 +140,7 @@ let compute () =
   let pp_sep fmt () = Format.pp_print_string fmt "," in
   Pdg_parameters.(
     debug "Logging keys : %a"
-    (Format.pp_print_list ~pp_sep pp_category) (get_debug_keys ()));
+      (Format.pp_print_list ~pp_sep pp_category) (get_debug_keys ()));
   if Pdg_parameters.BuildAll.get () then
     Pdg_parameters.feedback "====== PDG GRAPH COMPUTED ======"
 

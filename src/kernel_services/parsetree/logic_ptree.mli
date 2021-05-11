@@ -79,7 +79,7 @@ type lexpr = {
 (* PL is for Parsed Logic *)
 (** kind of expression. *)
 and path_elt =
-    (** construct inside a functional update. *)
+  (** construct inside a functional update. *)
   | PLpathField of string
   | PLpathIndex of lexpr
 
@@ -87,10 +87,10 @@ and update_term =
   | PLupdateTerm of lexpr
   | PLupdateCont of ((path_elt list) * update_term) list
 and lexpr_node =
-    (* both terms and predicates *)
+  (* both terms and predicates *)
   | PLvar of string (** a variable *)
   | PLapp of string * string list * lexpr list (** an application. *)
-      (* terms *)
+  (* terms *)
   | PLlambda of quantifiers * lexpr (** a lambda abstraction. *)
   | PLlet of string * lexpr * lexpr (** local binding. *)
   | PLconstant of constant (** a constant. *)
@@ -108,12 +108,12 @@ and lexpr_node =
   | PLsizeof of logic_type (** sizeof a type. *)
   | PLsizeofE of lexpr (** sizeof the type of an expression. *)
   | PLupdate of lexpr * (path_elt list) * update_term
-      (** functional update of the field of a structure. *)
+  (** functional update of the field of a structure. *)
   | PLinitIndex of (lexpr * lexpr) list (** array constructor. *)
   | PLinitField of (string * lexpr) list (** struct/union constructor. *)
   | PLtypeof of lexpr (** type tag for an expression. *)
   | PLtype of logic_type (** type tag for a C type. *)
-      (* predicates *)
+  (* predicates *)
   | PLfalse (** false (either as a term or a predicate. *)
   | PLtrue (** true (either as a term or a predicate. *)
   | PLrel of lexpr * relation * lexpr (** comparison operator. *)
@@ -129,7 +129,7 @@ and lexpr_node =
   | PLbase_addr of string option * lexpr (** base address of a pointer. *)
   | PLoffset of string option * lexpr (** base address of a pointer. *)
   | PLblock_length of string option * lexpr (** length of the block pointed to by an
-                                expression. *)
+                                                expression. *)
   | PLvalid of string option * lexpr (** pointer is valid. *)
   | PLvalid_read of string option * lexpr (** pointer is valid for reading. *)
   | PLobject_pointer of string option * lexpr (** object pointer can be created. *)
@@ -142,24 +142,24 @@ and lexpr_node =
                                             dangling  *)
   | PLfresh of (string * string) option * lexpr * lexpr (** expression points to a newly allocated block. *)
   | PLseparated of lexpr list
-      (** separation predicate. *)
+  (** separation predicate. *)
   | PLnamed of string * lexpr (** named expression. *)
-      (* tsets *)
+  (* tsets *)
   | PLcomprehension of lexpr * quantifiers * lexpr option
-      (** set of expression defined in comprehension
-          ({t \{ e | integer i; P(i)\}})*)
+  (** set of expression defined in comprehension
+      ({t \{ e | integer i; P(i)\}})*)
   | PLset of lexpr list
-      (** sets of elements. *)
+  (** sets of elements. *)
   | PLunion of lexpr list
-      (** union of sets. *)
+  (** union of sets. *)
   | PLinter of lexpr list
-      (** intersection of sets. *)
+  (** intersection of sets. *)
   | PLempty
-      (** empty set. *)
+  (** empty set. *)
   | PLlist of lexpr list
-      (** list of elements. *)
+  (** list of elements. *)
   | PLrepeat of lexpr * lexpr
-      (** repeat a list of elements a number of times. *)
+  (** repeat a list of elements a number of times. *)
 
 type toplevel_predicate =
   { tp_kind: Cil_types.predicate_kind; tp_statement: lexpr }
@@ -177,12 +177,12 @@ type type_annot =  {inv_name: string;
 type model_annot =  {model_for_type: logic_type;
                      model_type : logic_type;
                      model_name: string; (** name of the model field. *)
-                   }
+                    }
 
 (** Concrete type definition. *)
 type typedef =
   | TDsum of (string * logic_type list) list
-      (** sum type, list of constructors *)
+  (** sum type, list of constructors *)
   | TDsyn of logic_type (** synonym of an existing type *)
 
 (** global declarations. *)
@@ -193,61 +193,61 @@ type decl = {
 and decl_node =
   | LDlogic_def of
       string * string list * string list *
-	logic_type * (logic_type * string) list * lexpr
-        (** [LDlogic_def(name,labels,type_params,
-                         return_type, parameters, definition)]
-            represents the definition of a logic function [name] whose
-	    return type is [return_type] and arguments are [parameters].
-	    Its label arguments are [labels]. Polymorphic functions have
-	    their type parameters in [type_params]. [definition] is the
-	    body of the defined function.*)
+      logic_type * (logic_type * string) list * lexpr
+  (** [LDlogic_def(name,labels,type_params,
+                   return_type, parameters, definition)]
+      represents the definition of a logic function [name] whose
+      return type is [return_type] and arguments are [parameters].
+      Its label arguments are [labels]. Polymorphic functions have
+      their type parameters in [type_params]. [definition] is the
+      body of the defined function.*)
   | LDlogic_reads of
       string * string list * string list *
-        logic_type * (logic_type * string) list * lexpr list option
-        (** [LDlogic_reads(name,labels,type_params,
-           return_type, parameters, reads_tsets)] represents the declaration
-           of logic function.  It has the same
-            arguments as [LDlogic_def], except that the definition is
-           abstracted to a set of read accesses in [read_tsets].
-         *)
+      logic_type * (logic_type * string) list * lexpr list option
+  (** [LDlogic_reads(name,labels,type_params,
+      return_type, parameters, reads_tsets)] represents the declaration
+      of logic function.  It has the same
+      arguments as [LDlogic_def], except that the definition is
+      abstracted to a set of read accesses in [read_tsets].
+  *)
   | LDtype of string * string list * typedef option
-      (** new logic type and its parameters, optionally followed by
-          its definition. *)
+  (** new logic type and its parameters, optionally followed by
+      its definition. *)
   | LDpredicate_reads of
       string * string list * string list *
-	(logic_type * string) list * lexpr list option
-        (** [LDpredicate_reads(name,labels,type_params,
-                              parameters, reads_tsets)]
-            represents the declaration of a new predicate. It is similar to
-            [LDlogic_reads] except that it has no [return_type].
-         *)
+      (logic_type * string) list * lexpr list option
+  (** [LDpredicate_reads(name,labels,type_params,
+                        parameters, reads_tsets)]
+      represents the declaration of a new predicate. It is similar to
+      [LDlogic_reads] except that it has no [return_type].
+  *)
   | LDpredicate_def of string * string list * string list *
-      (logic_type * string) list * lexpr
-        (** [LDpredicate_def(name,labels,type_params, parameters, def)]
-            represents the definition of a new predicate. It is similar to
-            [LDlogic_def] except that it has no [return_type].
+                       (logic_type * string) list * lexpr
+  (** [LDpredicate_def(name,labels,type_params, parameters, def)]
+      represents the definition of a new predicate. It is similar to
+      [LDlogic_def] except that it has no [return_type].
 
-         *)
+  *)
   | LDinductive_def of string * string list * string list *
-      (logic_type * string) list * (string * string list * string list * lexpr) list
-        (** [LDinductive_def(name,labels,type_params, parameters, indcases)]
-            represents an inductive definition of a new predicate.
-         *)
+                       (logic_type * string) list * (string * string list * string list * lexpr) list
+  (** [LDinductive_def(name,labels,type_params, parameters, indcases)]
+      represents an inductive definition of a new predicate.
+  *)
   | LDlemma of string * string list * string list * toplevel_predicate
-      (** LDlemma(name,labels,type_params,property) represents axioms and
-          lemmas. Axioms and admit lemmas are fusionned.
-          [labels] is the list of label arguments and
-          [type_params] the list of type parameters.
-          Last, [property] is the statement of the lemma.
-       *)
+  (** LDlemma(name,labels,type_params,property) represents axioms and
+      lemmas. Axioms and admit lemmas are fusionned.
+      [labels] is the list of label arguments and
+      [type_params] the list of type parameters.
+      Last, [property] is the statement of the lemma.
+  *)
   | LDaxiomatic of string * decl list
-        (** [LDaxiomatic(id,decls)]
-            represents a block of axiomatic definitions.*)
+  (** [LDaxiomatic(id,decls)]
+      represents a block of axiomatic definitions.*)
   | LDinvariant of string * lexpr (** global invariant. *)
   | LDtype_annot of type_annot    (** type invariant. *)
   | LDmodel_annot of model_annot    (** model field. *)
   | LDvolatile of lexpr list * (string option * string option)
-      (** volatile clause read/write. *)
+  (** volatile clause read/write. *)
   | LDextended of global_extension (** extended global annotation. *)
 
 
@@ -262,14 +262,14 @@ and from = (lexpr * deps)
 and assigns =
   | WritesAny (** Nothing specified. Anything can be written. *)
   | Writes of from list
-    (** list of locations that can be written. Empty list means \nothing. *)
+  (** list of locations that can be written. Empty list means \nothing. *)
 
-(** allocates and frees. 
+(** allocates and frees.
     @since Oxygen-20120901  *)
 and allocation =
   | FreeAlloc of lexpr list * lexpr list (** tsets. Empty list means \nothing. *)
-  | FreeAllocAny (** Nothing specified. Semantics depends on where it 
-		     is written. *)
+  | FreeAllocAny (** Nothing specified. Semantics depends on where it
+                     is written. *)
 
 (** variant of a loop or a recursive function. *)
 and variant = lexpr * string option
@@ -315,7 +315,7 @@ type spec = {
 
   mutable spec_disjoint_behaviors: string list list;
   (** list of disjoint behaviors.
-     It is possible to have more than one set of disjoint behaviors *)
+      It is possible to have more than one set of disjoint behaviors *)
 }
 
 (** Pragmas for the value analysis plugin of Frama-C. *)
@@ -374,10 +374,10 @@ type code_annot =
 
   | APragma of pragma (** pragma. *)
   | AExtended of string list * bool * extension
-    (** extension in a code or loop (when boolean flag is true) annotation.
-        @since Silicon-20161101
-        @modify 18.0-Argon
-    *)
+  (** extension in a code or loop (when boolean flag is true) annotation.
+      @since Silicon-20161101
+      @modify 18.0-Argon
+  *)
 
 (** custom trees *)
 
@@ -392,7 +392,7 @@ type annot =
   | Aspec  (* the real spec is parsed afterwards.
               See cparser.mly (grammar rules involving SPEC) for
               more details.
-            *) (** function specification. *)
+           *) (** function specification. *)
   | Acode_annot of location * code_annot (** code annotation. *)
   | Aloop_annot of location * code_annot list (** loop annotation. *)
   | Aattribute_annot of location * string (** attribute annotation. *)
@@ -404,7 +404,7 @@ type ext_decl =
   | Ext_macro of bool * string * lexpr (* lexpr contains a location *)
   | Ext_include of bool * string * location
 
-type ext_function = 
+type ext_function =
   | Ext_spec of spec * location (* function spec *)
   | Ext_stmt of string list * annot * location (* loop/code annotation. *)
   | Ext_glob of ext_decl

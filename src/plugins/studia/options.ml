@@ -23,10 +23,10 @@
 include
   Plugin.Register
     (struct
-       let name = "Studia"
-       let shortname = "studia"
-       let help = "Tools for Eva case studies"
-     end)
+      let name = "Studia"
+      let shortname = "studia"
+      let help = "Tools for Eva case studies"
+    end)
 
 
 

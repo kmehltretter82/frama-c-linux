@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** {b DEPRECATED.} Helpers around [Gtk_helper] to create side-panel widgets. 
+(** {b DEPRECATED.} Helpers around [Gtk_helper] to create side-panel widgets.
 
     This module should not be used anymore.
     The provided helpers allow for synchronizing plugin options with
@@ -47,8 +47,8 @@ val check : ?label:string -> bool field
 val menu : (string * 'a) list -> ?width:int -> 'a field
 val spinner : ?lower:int -> ?upper:int -> ?width:int -> int field
 val label : text:string -> packing:(GObj.widget -> unit) -> unit -> unit
-val button : 
-  label:string -> ?tooltip:string -> callback:(unit -> unit) -> 
+val button :
+  label:string -> ?tooltip:string -> callback:(unit -> unit) ->
   packing:(GObj.widget -> unit) -> unit -> unit
 
 class form : packing:(GObj.widget -> unit) -> object

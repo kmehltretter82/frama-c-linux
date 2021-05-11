@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Slicing  module public macros that should be used to avoid  using the type
-* concrete definition from other modules.
+ * concrete definition from other modules.
 *)
 
 (**/**)
@@ -29,7 +29,7 @@
 open Cil_types
 
 (**/**)
-  
+
 (** {2 Options} *)
 
 let str_level_option opt = match opt with
@@ -40,11 +40,11 @@ let str_level_option opt = match opt with
 
 let translate_num_to_slicing_level n =
   match n with
-      | 0 -> SlicingInternals.DontSlice
-      | 1 -> SlicingInternals.DontSliceButComputeMarks
-      | 2 -> SlicingInternals.MinNbSlice
-      | 3 -> SlicingInternals.MaxNbSlice
-      | _ -> raise SlicingTypes.WrongSlicingLevel
+  | 0 -> SlicingInternals.DontSlice
+  | 1 -> SlicingInternals.DontSliceButComputeMarks
+  | 2 -> SlicingInternals.MinNbSlice
+  | 3 -> SlicingInternals.MaxNbSlice
+  | _ -> raise SlicingTypes.WrongSlicingLevel
 
 let get_default_level_option defined_function =
   if defined_function || (SlicingParameters.Mode.SliceUndef.get ()) then
@@ -70,10 +70,10 @@ let get_kf_fi kf =
   with Not_found ->
     let fi_def, is_def =
       match kf.fundec with
-        | Declaration _ -> None, false
-        | Definition _ when !Db.Value.use_spec_instead_of_definition kf ->
-            None, false
-        | Definition (def, _) -> Some def, true
+      | Declaration _ -> None, false
+      | Definition _ when !Db.Value.use_spec_instead_of_definition kf ->
+        None, false
+      | Definition (def, _) -> Some def, true
     in
     let new_fi = {
       SlicingInternals.fi_kf = kf;
@@ -109,7 +109,7 @@ let ff_name ff =
   let fi = ff.SlicingInternals.ff_fct in
   let ff_id = get_ff_id ff in
   let fct_name = fi_name fi in
-    (fct_name ^ "_slice_" ^ (string_of_int (ff_id)))
+  (fct_name ^ "_slice_" ^ (string_of_int (ff_id)))
 
 let f_name f = match f with
   | SlicingInternals.FctSrc fct -> fi_name fct
@@ -137,14 +137,14 @@ let get_ff_pdg ff = get_fi_pdg ff.SlicingInternals.ff_fct
 let ff_slicing_level ff = ff.SlicingInternals.ff_fct.SlicingInternals.fi_level_option
 
 let change_fi_slicing_level fi slicing_level =
-    fi.SlicingInternals.fi_level_option <- slicing_level
+  fi.SlicingInternals.fi_level_option <- slicing_level
 
 (** @raise SlicingTypes.WrongSlicingLevel if [n] is not valid.
-* *)
+ * *)
 let change_slicing_level kf n =
   let slicing_level = translate_num_to_slicing_level n in
   let fi = get_kf_fi kf in (* build if if it doesn't exist *)
-    change_fi_slicing_level fi slicing_level
+  change_fi_slicing_level fi slicing_level
 
 (** {2 functions and slices} *)
 
@@ -155,7 +155,7 @@ let fi_slices fi = fi.SlicingInternals.fi_slices
 let equal_fi fi1 fi2 =
   let v1 = fi_svar fi1 in
   let v2 = fi_svar fi2 in
-    Cil_datatype.Varinfo.equal v1 v2
+  Cil_datatype.Varinfo.equal v1 v2
 
 let equal_ff ff1 ff2 = (equal_fi ff1.SlicingInternals.ff_fct ff2.SlicingInternals.ff_fct) &&
                        ((get_ff_id ff1) = (get_ff_id ff2))
@@ -170,7 +170,7 @@ let same_ff_call (f1,c1) (f2,c2) =
 
 let is_call_stmt stmt =
   match stmt.skind with
-    | Instr (Call _ | Local_init(_, ConsInit _,_)) -> true | _ -> false
+  | Instr (Call _ | Local_init(_, ConsInit _,_)) -> true | _ -> false
 
 let get_called_kf call_stmt = match call_stmt.skind with
   | Instr (Call (_, funcexp,_,_)) ->
@@ -193,10 +193,10 @@ let is_variadic kf =
 let get_fi_call call =
   try
     let kf = get_called_kf call in
-      if is_variadic kf then None
-      else
-        let fct_info = get_kf_fi kf in
-          Some fct_info
+    if is_variadic kf then None
+    else
+      let fct_info = get_kf_fi kf in
+      Some fct_info
   with SlicingTypes.PtrCallExpr -> None
 
 let is_src_fun_called kf =
@@ -208,11 +208,11 @@ let is_src_fun_visible kf =
   in is_src_fun_called kf || is_fi_top (get_kf_fi kf)
 
 let fi_has_persistent_selection fi =
-        (match fi.SlicingInternals.fi_init_marks with None -> false | _ -> true)
+  (match fi.SlicingInternals.fi_init_marks with None -> false | _ -> true)
 
 let has_persistent_selection kf =
   let fi = get_kf_fi kf in
-    fi_has_persistent_selection fi
+  fi_has_persistent_selection fi
 
 
 (*

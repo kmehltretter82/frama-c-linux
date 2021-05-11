@@ -73,7 +73,7 @@ module DomSet = struct
           | Value v, Value v' -> Stmt.Hptset.equal v v'
         let copy = map Cil_datatype.Stmt.Hptset.copy
         let mem_project = Datatype.never_any_project
-       end)
+      end)
 
 end
 
@@ -97,10 +97,10 @@ struct
     Cil_state_builder.Stmt_hashtbl
       (DomSet)
       (struct
-         let name = "postdominator." ^ X.name
-         let dependencies = Ast.self :: X.dependencies
-         let size = 503
-       end)
+        let name = "postdominator." ^ X.name
+        let dependencies = Ast.self :: X.dependencies
+        let size = 503
+      end)
 
   module PostComputer = struct
 
@@ -121,8 +121,8 @@ struct
       Db.yield ();
       Postdominators_parameters.debug ~level:2 "doStmt: %d" stmt.sid;
       match stmt.skind with
-        | Return _ -> Dataflow2.Done (DomSet.Value (Stmt.Hptset.singleton stmt))
-        | _ -> Dataflow2.Post (fun data -> DomSet.add stmt data)
+      | Return _ -> Dataflow2.Done (DomSet.Value (Stmt.Hptset.singleton stmt))
+      | _ -> Dataflow2.Post (fun data -> DomSet.add stmt data)
 
 
     let doInstr _ _ _ = Dataflow2.Default
@@ -132,17 +132,17 @@ struct
        the condition of the 'if' with always the same truth value *)
     let filterIf ifstmt next = match ifstmt.skind with
       | If (e, { bstmts = sthen :: _ }, { bstmts = [] }, _)
-          when not (Stmt.equal sthen next) ->
-          (* [next] is the syntactic successor of the 'if', ie the
-             'else' branch. If the condition is never false, then
-             [sthen] postdominates [next]. We must not follow the edge
-             from [ifstmt] to [next] *)
-          snd (X.eval_cond ifstmt e)
+        when not (Stmt.equal sthen next) ->
+        (* [next] is the syntactic successor of the 'if', ie the
+           'else' branch. If the condition is never false, then
+           [sthen] postdominates [next]. We must not follow the edge
+           from [ifstmt] to [next] *)
+        snd (X.eval_cond ifstmt e)
 
       | If (e, { bstmts = [] }, { bstmts = selse :: _ }, _)
-          when not (Stmt.equal selse next) ->
-          (* dual case *)
-          fst (X.eval_cond ifstmt e)
+        when not (Stmt.equal selse next) ->
+        (* dual case *)
+        fst (X.eval_cond ifstmt e)
 
       | _ -> true
 
@@ -172,13 +172,13 @@ struct
         Kernel_function.pretty kf;
       let f = kf.fundec in
       match f with
-        | Definition (f,_) ->
-          let stmts = f.sallstmts in
-          List.iter (fun s -> PostDom.add s DomSet.Top) stmts;
-          PostCompute.compute [return];
-          Postdominators_parameters.feedback ~level:2 "done for function %a"
-            Kernel_function.pretty kf
-        | Declaration _ -> ()
+      | Definition (f,_) ->
+        let stmts = f.sallstmts in
+        List.iter (fun s -> PostDom.add s DomSet.Top) stmts;
+        PostCompute.compute [return];
+        Postdominators_parameters.feedback ~level:2 "done for function %a"
+          Kernel_function.pretty kf
+      | Declaration _ -> ()
 
   let get_stmt_postdominators f stmt =
     let do_it () = PostDom.find stmt in
@@ -186,15 +186,15 @@ struct
     with Not_found -> compute_postdom f; do_it ()
 
   (** @raise Db.PostdominatorsTypes.Top when the statement postdominators
-  * have not been computed ie neither the return statement is reachable,
-  * nor the statement is in a natural loop. *)
+   * have not been computed ie neither the return statement is reachable,
+   * nor the statement is in a natural loop. *)
   let stmt_postdominators f stmt =
-      match get_stmt_postdominators f stmt with
-      | DomSet.Value s ->
-          Postdominators_parameters.debug ~level:1 "Postdom for %d are %a"
-            stmt.sid Stmt.Hptset.pretty s;
-          s
-      | DomSet.Top -> raise Db.PostdominatorsTypes.Top
+    match get_stmt_postdominators f stmt with
+    | DomSet.Value s ->
+      Postdominators_parameters.debug ~level:1 "Postdom for %d are %a"
+        stmt.sid Stmt.Hptset.pretty s;
+      s
+    | DomSet.Top -> raise Db.PostdominatorsTypes.Top
 
   let is_postdominator f ~opening ~closing =
     let open_postdominators = get_stmt_postdominators f opening in
@@ -204,7 +204,7 @@ struct
     let disp_all fmt =
       PostDom.iter
         (fun k v -> Format.fprintf fmt "Stmt:%d -> @[%a@]\n"
-           k.sid PostComputer.pretty v)
+            k.sid PostComputer.pretty v)
     in Postdominators_parameters.result "%t" disp_all
 
   let print_dot_postdom basename kf =
@@ -228,12 +228,12 @@ end
 
 module PostDomBasic =
   PostDomDb(
-    struct
-      let is_accessible _ = true
-      let dependencies = []
-      let name = "basic"
-      let eval_cond _ _ = true, true
-    end)
+  struct
+    let is_accessible _ = true
+    let dependencies = []
+    let name = "basic"
+    let eval_cond _ _ = true, true
+  end)
     (Db.Postdominators)
 
 
@@ -242,26 +242,26 @@ let output () =
   if dot_postdom <> "" then (
     Ast.compute ();
     Globals.Functions.iter (fun kf ->
-      if Kernel_function.is_definition kf then
-        !Db.Postdominators.print_dot dot_postdom kf)
+        if Kernel_function.is_definition kf then
+          !Db.Postdominators.print_dot dot_postdom kf)
   )
 
 let output, _ = State_builder.apply_once "Postdominators.Compute.output"
-  [PostDomBasic.PostDom.self] output
+    [PostDomBasic.PostDom.self] output
 
 let () = Db.Main.extend output
 
 
 module PostDomVal =
   PostDomDb(
-    struct
-      let is_accessible = Db.Value.is_reachable_stmt
-      let dependencies = [ Db.Value.self ]
-      let name = "value"
-      let eval_cond stmt _e =
-        Db.Value.condition_truth_value stmt
+  struct
+    let is_accessible = Db.Value.is_reachable_stmt
+    let dependencies = [ Db.Value.self ]
+    let name = "value"
+    let eval_cond stmt _e =
+      Db.Value.condition_truth_value stmt
 
-    end)
+  end)
     (Db.PostdominatorsValue)
 
 (*

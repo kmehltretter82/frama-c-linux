@@ -27,10 +27,10 @@ module Tbl =
   Cil_state_builder.Kinstr_hashtbl
     (Function_Froms)
     (struct
-       let name = "Callwise dependencies"
-       let size = 17
-       let dependencies = [ Db.Value.self ]
-     end)
+      let name = "Callwise dependencies"
+      let size = 17
+      let dependencies = [ Db.Value.self ]
+    end)
 let () = From_parameters.ForceCallDeps.set_output_dependencies [Tbl.self]
 
 let merge_call_froms table callsite froms =
@@ -47,9 +47,9 @@ type from_state = {
   value_initial_state: Db.Value.state (** State of Value at the beginning of
                                           the call *);
   table_for_calls: Function_Froms.t Kinstr.Hashtbl.t
-    (** State of the From plugin for each statement containing a function call
-        in the body of [current_function]. Updated incrementally each time
-        Value analyses such a statement *);
+(** State of the From plugin for each statement containing a function call
+    in the body of [current_function]. Updated incrementally each time
+    Value analyses such a statement *);
 }
 
 (** The state of the callwise From analysis. Only the top of this callstack
@@ -85,38 +85,38 @@ let call_for_individual_froms (call_type, value_initial_state, call_stack) =
       register_from froms
     in
     match call_type with
-    | `Def | `Memexec -> 
+    | `Def | `Memexec ->
       let table_for_calls = Kinstr.Hashtbl.create 7 in
       call_froms_stack :=
         { current_function; value_initial_state; table_for_calls } ::
         !call_froms_stack
     | `Builtin (Some (result,_)) ->
-       register_from result
+      register_from result
     | `Builtin None ->
-        let behaviors =
-          !Db.Value.valid_behaviors current_function value_initial_state
-        in
-        compute_from_behaviors behaviors
+      let behaviors =
+        !Db.Value.valid_behaviors current_function value_initial_state
+      in
+      compute_from_behaviors behaviors
     | `Spec spec ->
-        compute_from_behaviors spec.Cil_types.spec_behavior
+      compute_from_behaviors spec.Cil_types.spec_behavior
   end
 
 let end_record call_stack froms =
-    let (current_function_value, call_site) = List.hd call_stack in
-    record_callwise_dependencies_in_db call_site froms;
-    (* pop + record in top of stack the froms of function that just finished *)
-    match !call_froms_stack with
-      | {current_function} :: ({table_for_calls = table} :: _ as tail) ->
-          if current_function_value != current_function then
-            From_parameters.fatal "calldeps %a != %a@."
-              Kernel_function.pretty current_function
-              Kernel_function.pretty current_function_value;
-          call_froms_stack := tail;
-          merge_call_froms table call_site froms
+  let (current_function_value, call_site) = List.hd call_stack in
+  record_callwise_dependencies_in_db call_site froms;
+  (* pop + record in top of stack the froms of function that just finished *)
+  match !call_froms_stack with
+  | {current_function} :: ({table_for_calls = table} :: _ as tail) ->
+    if current_function_value != current_function then
+      From_parameters.fatal "calldeps %a != %a@."
+        Kernel_function.pretty current_function
+        Kernel_function.pretty current_function_value;
+    call_froms_stack := tail;
+    merge_call_froms table call_site froms
 
-    | _ ->  (* the entry point, probably *)
-        Tbl.mark_as_computed ();
-        call_froms_stack := []
+  | _ ->  (* the entry point, probably *)
+    Tbl.mark_as_computed ();
+    call_froms_stack := []
 
 
 module MemExec =
@@ -124,10 +124,10 @@ module MemExec =
     (Datatype.Int.Hashtbl)
     (Function_Froms)
     (struct
-       let size = 17
-       let dependencies = [Tbl.self]
-       let name = "From.Callwise.MemExec"
-     end)
+      let size = 17
+      let dependencies = [Tbl.self]
+      let name = "From.Callwise.MemExec"
+    end)
 
 let compute_call_from_value_states current_function states =
   let module To_Use = struct
@@ -156,50 +156,50 @@ let record_for_individual_froms (call_stack, value_res) =
     let froms = match value_res with
       | Value_types.Normal (states, _after_states)
       | Value_types.NormalStore ((states, _after_states), _) ->
-          let cur_kf, _ = List.hd call_stack in
-          let froms =
-            try
-              if !Db.Value.no_results (Kernel_function.get_definition cur_kf)
-              then
-                Function_Froms.top
-              else
-                compute_call_from_value_states cur_kf (Lazy.force states)
-            with Kernel_function.No_Definition -> Function_Froms.top
-          in
-          let pre_state = match !call_froms_stack with
-            | [] -> assert false
-            | { value_initial_state } :: _ -> value_initial_state
-          in
-          if From_parameters.VerifyAssigns.get () then
-	    !Db.Value.verify_assigns_froms cur_kf pre_state froms;
-          (match value_res with
-             | Value_types.NormalStore (_, memexec_counter) ->
-                 MemExec.replace memexec_counter froms
-             | _ -> ());
-          froms
+        let cur_kf, _ = List.hd call_stack in
+        let froms =
+          try
+            if !Db.Value.no_results (Kernel_function.get_definition cur_kf)
+            then
+              Function_Froms.top
+            else
+              compute_call_from_value_states cur_kf (Lazy.force states)
+          with Kernel_function.No_Definition -> Function_Froms.top
+        in
+        let pre_state = match !call_froms_stack with
+          | [] -> assert false
+          | { value_initial_state } :: _ -> value_initial_state
+        in
+        if From_parameters.VerifyAssigns.get () then
+          !Db.Value.verify_assigns_froms cur_kf pre_state froms;
+        (match value_res with
+         | Value_types.NormalStore (_, memexec_counter) ->
+           MemExec.replace memexec_counter froms
+         | _ -> ());
+        froms
 
       | Value_types.Reuse counter ->
-          MemExec.find counter
+        MemExec.find counter
     in
     end_record call_stack froms
-    
+
   end
 
 
 (* Register our callbacks inside the value analysis *)
 let () = From_parameters.ForceCallDeps.add_update_hook
-  (fun _bold bnew ->
-    if bnew then begin
-      Db.Value.Call_Type_Value_Callbacks.extend_once call_for_individual_froms;
-      Db.Value.Record_Value_Callbacks_New.extend_once
-        record_for_individual_froms;
-    end)
+    (fun _bold bnew ->
+       if bnew then begin
+         Db.Value.Call_Type_Value_Callbacks.extend_once call_for_individual_froms;
+         Db.Value.Record_Value_Callbacks_New.extend_once
+           record_for_individual_froms;
+       end)
 
 
 let force_compute_all_calldeps ()=
   if Db.Value.is_computed () then
     Project.clear
-      ~selection:(State_selection.with_dependencies Db.Value.self) 
+      ~selection:(State_selection.with_dependencies Db.Value.self)
       ();
   !Db.Value.compute ()
 

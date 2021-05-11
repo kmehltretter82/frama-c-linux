@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Syntactic loop unrolling. 
+(** Syntactic loop unrolling.
     Uses code transformation hook mechanism (after-cleanup phase)
     of {!File} and exports nothing.
 

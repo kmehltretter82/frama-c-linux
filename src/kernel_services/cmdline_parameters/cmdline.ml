@@ -115,27 +115,27 @@ let request_crash_report =
     Fc_config.version_and_codename
 
 let protect = function
-  | Sys.Break -> 
-      "User Interruption (Ctrl-C)" 
-      ^ if Kernel_debug_level.get () > 0 then "\n" ^ get_backtrace () else ""
+  | Sys.Break ->
+    "User Interruption (Ctrl-C)"
+    ^ if Kernel_debug_level.get () > 0 then "\n" ^ get_backtrace () else ""
   | Sys_error s -> Printf.sprintf "System error: %s" s
   | Unix.Unix_error(err, a, b) ->
-      let error = Printf.sprintf "System error: %s" (Unix.error_message err) in
-      (match a, b with
-       | "", "" -> error
-       | "", t | t, "" -> Printf.sprintf "%s (%s)" error t
-       | f, x -> Printf.sprintf "%s (%s %S)" error f x)
+    let error = Printf.sprintf "System error: %s" (Unix.error_message err) in
+    (match a, b with
+     | "", "" -> error
+     | "", t | t, "" -> Printf.sprintf "%s (%s)" error t
+     | f, x -> Printf.sprintf "%s (%s %S)" error f x)
   | Log.AbortError p ->
-      Printf.sprintf "%s aborted: invalid user input.%s"
-        (long_plugin_name p) (additional_info ())
+    Printf.sprintf "%s aborted: invalid user input.%s"
+      (long_plugin_name p) (additional_info ())
   | Log.AbortFatal p ->
-      let bt = get_backtrace () in
-      Printf.sprintf
-        "%s\n%s aborted: internal error.%s\n%s"
-        bt
-        (long_plugin_name p)
-        (additional_info ())
-        request_crash_report
+    let bt = get_backtrace () in
+    Printf.sprintf
+      "%s\n%s aborted: internal error.%s\n%s"
+      bt
+      (long_plugin_name p)
+      (additional_info ())
+      request_crash_report
   | Log.FeatureRequest(s, p, m) ->
     let name = long_plugin_name p in
     let pp_oloc fmt = function
@@ -149,12 +149,12 @@ let protect = function
        '[%s] %s'."
       pp_oloc s name (additional_info ()) name m
   | e ->
-      let bt = get_backtrace () in
-      Printf.sprintf
-        "%s\nUnexpected error (%s).\n%s"
-        bt
-        (Printexc.to_string e)
-        request_crash_report
+    let bt = get_backtrace () in
+    Printf.sprintf
+      "%s\nUnexpected error (%s).\n%s"
+      bt
+      (Printexc.to_string e)
+      request_crash_report
 
 (* ************************************************************************* *)
 (** {2 Exiting Frama-C} *)
@@ -241,14 +241,14 @@ let catch_toplevel_run ~f ~at_normal_exit ~on_error =
     cleanup ();
   with
   | Exit ->
-      bail_out ()
+    bail_out ()
   | exn when catch_at_toplevel exn ->
-      Kernel_log.feedback ~level:0 "%s" (protect exn);
-      run_on_error exn;
-      exit (exit_code exn)
+    Kernel_log.feedback ~level:0 "%s" (protect exn);
+    run_on_error exn;
+    exit (exit_code exn)
   | exn ->
-      run_on_error exn;
-      raise exn
+    run_on_error exn;
+    raise exn
 
 (* ************************************************************************* *)
 (** {2 Generic parsing way} *)
@@ -310,21 +310,21 @@ let parse known_options_list then_expected options_list =
       let setting = Hashtbl.find known_options option in
       let use_arg = match setting with
         | Unit f ->
-            if explicit then raise_error option "does not accept any argument";
-            f ();
-            false
+          if explicit then raise_error option "does not accept any argument";
+          f ();
+          false
         | Int f ->
-            let n =
-              try int_of_string arg
-              with Failure _ ->
-                raise_error option "requires an integer as argument"
-            in
-            f n;
-            true
+          let n =
+            try int_of_string arg
+            with Failure _ ->
+              raise_error option "requires an integer as argument"
+          in
+          f n;
+          true
         | String f ->
-            check_string_argname ();
-            f arg;
-            true
+          check_string_argname ();
+          f arg;
+          true
       in
       unknown_options, use_arg && not explicit, true
     with Not_found ->
@@ -334,37 +334,37 @@ let parse known_options_list then_expected options_list =
   let rec go unknown_options nb_used = function
     | [] -> unknown_options, nb_used, None
     | [ "-then" | "-then-last" | "-then-replace" as then_name ]
-        when then_expected ->
-        Kernel_log.warning "ignoring last option `%s'." then_name;
-        unknown_options, nb_used, None
+      when then_expected ->
+      Kernel_log.warning "ignoring last option `%s'." then_name;
+      unknown_options, nb_used, None
     | [ "-then-on" ] when then_expected ->
-        raise_error "-then-on" "requires a string as argument."
+      raise_error "-then-on" "requires a string as argument."
     | [ option ] ->
-        let unknown, use_arg, is_used =
-          parse_one_option unknown_options option ""
-        in
-        assert (not use_arg);
-        unknown, (if is_used then succ nb_used else nb_used), None
+      let unknown, use_arg, is_used =
+        parse_one_option unknown_options option ""
+      in
+      assert (not use_arg);
+      unknown, (if is_used then succ nb_used else nb_used), None
     | "-then" :: then_options when then_expected ->
-        unknown_options, nb_used, Some (then_options, Default)
+      unknown_options, nb_used, Some (then_options, Default)
     | "-then-last" :: then_options when then_expected ->
-        unknown_options, nb_used, Some (then_options, Last)
+      unknown_options, nb_used, Some (then_options, Last)
     | "-then-replace" :: then_options when then_expected ->
-        unknown_options, nb_used, Some (then_options, Replace)
+      unknown_options, nb_used, Some (then_options, Replace)
     | "-then-on" :: project_name :: then_options when then_expected ->
-        unknown_options, nb_used, Some (then_options, Name project_name)
+      unknown_options, nb_used, Some (then_options, Name project_name)
     | "-permissive" :: next_options ->
       permissive := true;
       go unknown_options nb_used next_options
     | option :: (arg :: next_options as arg_next) ->
-        let unknown, use_arg, is_used =
-          parse_one_option unknown_options option arg
-        in
-        let next = if use_arg then next_options else arg_next in
-        go
-          unknown
-          (if is_used then succ nb_used else nb_used)
-          next
+      let unknown, use_arg, is_used =
+        parse_one_option unknown_options option arg
+      in
+      let next = if use_arg then next_options else arg_next in
+      go
+        unknown
+        (if is_used then succ nb_used else nb_used)
+        next
   in
   try
     let unknown_options, nb_used, then_options = go [] 0 options_list in
@@ -459,7 +459,7 @@ module Plugin: sig
   val add_aliases:
     orig:string -> string -> group:string -> ?visible:bool -> ?deprecated:bool
     -> string list -> cmdline_option list
-  val replace_option_setting: 
+  val replace_option_setting:
     string -> plugin:string -> group:string -> option_setting -> unit
   val replace_option_help:
     string -> plugin:string -> group:string -> string -> unit
@@ -591,9 +591,9 @@ end = struct
       let options_in_group = find_group plugin group in
       let rec replace = function
         | [] ->
-            Kernel_log.fatal
-              "no option %s in plugin %s ((group of options %s)."
-              option_name plugin group
+          Kernel_log.fatal
+            "no option %s in plugin %s ((group of options %s)."
+            option_name plugin group
         | o :: _ when o.oname = option_name -> change o
         | _ :: l -> replace l
       in
@@ -644,11 +644,11 @@ struct
           plugin name S.name;*)
     let help = if help = "" then "undocumented" else help in
     let o =
-      { oname = name; 
+      { oname = name;
         argname = argname;
-        ohelp = help; 
-        ext_help = ext_help; 
-        ovisible = visible; 
+        ohelp = help;
+        ext_help = ext_help;
+        ovisible = visible;
         setting = setting }
     in
     add_for_parsing o;
@@ -656,7 +656,7 @@ struct
 
   let parse options_list =
     Kernel_log.feedback ~dkey
-      "parsing command line options of stage %S." 
+      "parsing command line options of stage %S."
       S.name;
     let options, nb_used, then_options =
       parse
@@ -735,7 +735,7 @@ let run_after_setting_files = After_setting.extend
 
 type stage = Early | Extending | Extended | Exiting | Loading | Configuring
 
-let add_option 
+let add_option
     name ~plugin ~group stage ?argname ~help ~visible ~ext_help setting =
   if name <> "" then
     let add = match stage with
@@ -861,13 +861,13 @@ let play_in_toplevel on_from_name nb_used play options =
         | Default -> current, play_in_toplevel_one_shot nb_used play options
         | Last ->
           (match !last_project_created_by_copy () with
-          | None -> Kernel_log.abort "no known last created project."
-          | Some p -> play_on options p)
+           | None -> Kernel_log.abort "no known last created project."
+           | Some p -> play_on options p)
         | Replace ->
           (match !last_project_created_by_copy () with
-          | None -> Kernel_log.abort "no known last created project."
-          | Some p ->
-            play_on (("-remove-projects=-@all,+" ^ current) :: options) p)
+           | None -> Kernel_log.abort "no known last created project."
+           | Some p ->
+             play_on (("-remove-projects=-@all,+" ^ current) :: options) p)
         | Name p -> play_on options p
       in
       aux last_current then_opts
@@ -949,17 +949,17 @@ let low_print_option_help fmt print_invisible o =
 
 let print_option_help fmt ~plugin ~group name =
   let p = Plugin.find plugin in
-  let options = 
-    try Hashtbl.find p.Plugin.groups group 
-    with Not_found -> 
+  let options =
+    try Hashtbl.find p.Plugin.groups group
+    with Not_found ->
       Kernel_log.fatal "[Cmdline.print_option_help] no group %s" group
   in
   (* linear search... *)
   let rec find_then_print = function
     | [] -> Kernel_log.fatal "[Cmdline.print_option_help] no option %s" name
-    | o :: tl -> 
-        if o.oname = name then ignore (low_print_option_help fmt true o)
-        else find_then_print tl
+    | o :: tl ->
+      if o.oname = name then ignore (low_print_option_help fmt true o)
+      else find_then_print tl
   in
   find_then_print !options
 
@@ -997,7 +997,7 @@ let plugin_help shortname =
   let p = Plugin.find shortname in
   if p.Plugin.name <> "" then begin
     assert (p.Plugin.short <> "");
-    Log.print_on_output 
+    Log.print_on_output
       (fun fmt ->
          Format.fprintf fmt "@[%s:@ %s@]@\n@[%s:@ %s@]@\n"
            "Plug-in name" p.Plugin.name
@@ -1022,15 +1022,15 @@ let plugin_help shortname =
             match sort_groups p.Plugin.groups with
             | [] -> ()
             | g :: l ->
-                let print_group newline (s, o) =
-                  if newline then Format.pp_print_newline fmt ();
-                  if s <> "" then
-                    Format.fprintf fmt "@[*** %s@]@\n@\n"
-                      (String.uppercase_ascii s);
-                  ignore (print_options !o)
-                in
-                print_group false g;
-                List.iter (print_group true) l));
+              let print_group newline (s, o) =
+                if newline then Format.pp_print_newline fmt ();
+                if s <> "" then
+                  Format.fprintf fmt "@[*** %s@]@\n@\n"
+                    (String.uppercase_ascii s);
+                ignore (print_options !o)
+              in
+              print_group false g;
+              List.iter (print_group true) l));
   raise Exit
 
 let help () =

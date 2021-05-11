@@ -111,7 +111,7 @@ class type item = object
 
 end
 
-(** How to handle a Frama-C menu. 
+(** How to handle a Frama-C menu.
     @since Boron-20100401 *)
 class menu_manager: ?packing:(GObj.widget -> unit) -> Gtk_helper.host ->
   object

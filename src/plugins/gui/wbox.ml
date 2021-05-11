@@ -49,15 +49,15 @@ let label ?(fill=false) ?style ?align ?padding text =
 let rec populate dir (box : #GPack.box) from = function
   | [] -> ()
   | Pack(e,padding,w)::ws ->
-      box#pack ~from ~expand:(dir e) ~padding w#coerce ;
-      populate dir box from ws
+    box#pack ~from ~expand:(dir e) ~padding w#coerce ;
+    populate dir box from ws
   | Void::ws ->
-      populate dir box from ws
+    populate dir box from ws
   | ToEnd::ws ->
-      if from = `START then
-        populate dir box `END (List.rev ws)
-      else
-        populate dir box from ws
+    if from = `START then
+      populate dir box `END (List.rev ws)
+    else
+      populate dir box from ws
 
 let hbox ws =
   let box = GPack.hbox ~show:true () in

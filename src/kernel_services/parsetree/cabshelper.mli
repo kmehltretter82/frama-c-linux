@@ -53,7 +53,7 @@ module Comments: sig
   val self: State.t
   (* adds a comment at a given location. *)
   val add: Cabs.cabsloc -> string -> unit
-  (*  gets all the comment located between the two positions. *) 
+  (*  gets all the comment located between the two positions. *)
   val get: Cabs.cabsloc -> string list
   (* iter over all registered comments. *)
   val iter: (Cabs.cabsloc -> string -> unit) -> unit

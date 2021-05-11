@@ -24,8 +24,8 @@ include Callgraph_api.S
 
 module Graphviz_attributes: Graph.Graphviz.GraphWithDotAttrs
   with type t = G.t
-  and type V.t = Kernel_function.t
-  and type E.t = G.E.t
+   and type V.t = Kernel_function.t
+   and type E.t = G.E.t
 
 (*
 Local Variables:

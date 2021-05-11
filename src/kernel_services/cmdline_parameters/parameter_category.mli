@@ -28,8 +28,8 @@ type 'a t
 (** [\tau t] is the type of a category for the type \tau. *)
 
 type 'a accessor =
-    < fold:'acc. ('a -> 'acc -> 'acc) -> 'acc -> 'acc (* fold on elements *);
-      mem:('a -> bool) (* mem *) >
+  < fold:'acc. ('a -> 'acc -> 'acc) -> 'acc -> 'acc (* fold on elements *);
+    mem:('a -> bool) (* mem *) >
 (** Type explaining how to manipulate the elements of the category. *)
 
 val create:

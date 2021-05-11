@@ -33,7 +33,7 @@ type t
 (** Type of a state selection.
     @since Carbon-20101201
     @plugin development guide
- *)
+*)
 
 val ty: t Type.t
 (** Type value representing {!t}.
@@ -115,9 +115,9 @@ module type S = sig
       @since Carbon-20101201 *)
 
   val list_union: t list -> t
-    (** Union of an arbitrary number of selection (0 gives an empty selection)
-        @since Oxygen-20120901
-     *)
+  (** Union of an arbitrary number of selection (0 gives an empty selection)
+      @since Oxygen-20120901
+  *)
 
   val diff: t -> t -> t
   (** Difference between two selections.

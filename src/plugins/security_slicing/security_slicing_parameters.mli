@@ -27,7 +27,7 @@
 include Plugin.S
 
 module Slicing: Parameter_sig.Bool
-  (** Perform the security slicing pre-analysis. *)
+(** Perform the security slicing pre-analysis. *)
 
 (*
 Local Variables:

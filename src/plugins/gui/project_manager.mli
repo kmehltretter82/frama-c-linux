@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** No function is exported. 
+(** No function is exported.
     Extension of the GUI in order to support project switching. *)
 
 (*

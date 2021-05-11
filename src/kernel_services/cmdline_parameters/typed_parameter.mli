@@ -25,11 +25,11 @@
     developer, you certainly prefer to use the API of {!Plugin} instead.
     @since Nitrogen-20111001 *)
 
-type ('a, 'b) gen_accessor = 
-    { get: unit -> 'a; 
-      set: 'a -> unit; 
-      add_set_hook: ('b -> 'b -> unit) -> unit;
-      add_update_hook: ('b -> 'b -> unit) -> unit }
+type ('a, 'b) gen_accessor =
+  { get: unit -> 'a;
+    set: 'a -> unit;
+    add_set_hook: ('b -> 'b -> unit) -> unit;
+    add_update_hook: ('b -> 'b -> unit) -> unit }
 
 type 'a accessor = ('a, 'a) gen_accessor
 
@@ -39,15 +39,15 @@ type typed_accessor =
   | String of string accessor * (unit -> string list) (** possible values *)
 
 type parameter = private
-    { name: string; (** Name of the option corresponding to the parameter. 
-			It is exactly the state name of the option (see
-			{!State.get_name}). *)
-      help: string; (** Help message *)
-      accessor: typed_accessor; (** How to get and set the value of the
-				    parameter *)
-      visible: bool; (** Is visible to the user, e.g. in the command-line help *)
-      reconfigurable: bool; (** Can be reconfigured, e.g. in the GUI *)
-      is_set: unit -> bool (** Is this option really set? *) }
+  { name: string; (** Name of the option corresponding to the parameter.
+                      It is exactly the state name of the option (see
+                      {!State.get_name}). *)
+    help: string; (** Help message *)
+    accessor: typed_accessor; (** How to get and set the value of the
+                                  parameter *)
+    visible: bool; (** Is visible to the user, e.g. in the command-line help *)
+    reconfigurable: bool; (** Can be reconfigured, e.g. in the GUI *)
+    is_set: unit -> bool (** Is this option really set? *) }
 
 include Datatype.S_with_collections with type t = parameter
 
@@ -59,9 +59,9 @@ val get_value: t -> string
 
 (**/**)
 (** Not for casual users. Use API of {!Plugin} instead. *)
-val create: 
-  name:string -> 
-  help:string -> 
+val create:
+  name:string ->
+  help:string ->
   accessor:typed_accessor ->
   visible:bool ->
   reconfigurable:bool ->

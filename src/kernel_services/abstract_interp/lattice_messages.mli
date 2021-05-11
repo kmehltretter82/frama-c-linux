@@ -24,13 +24,13 @@
 
 type t =
   | Approximation of string
-    (** Abstract transfer function that intentionally approximates its result *)
+  (** Abstract transfer function that intentionally approximates its result *)
   | Imprecision of string
-    (** Abstract transfer function not fully implemented *)
+  (** Abstract transfer function not fully implemented *)
   | Costly of string
-    (** Abstract operation will be costly *)
+  (** Abstract operation will be costly *)
   | Unsoundness of string
-    (** Unsound abstract operation *)
+  (** Unsound abstract operation *)
 
 type emitter
 

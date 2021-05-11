@@ -37,13 +37,13 @@ class virtual do_it_ = object(self)
 
   method! vstmt_aux s =
     match s.skind with
-      | UnspecifiedSequence seq ->
-          List.iter
-            (fun (stmt,_,_,_,_) ->
-               ignore (visitFramacStmt (self:>frama_c_visitor) stmt))
-            seq;
-          Cil.SkipChildren (* do not visit the additional lvals *)
-      | _ -> super#vstmt_aux s
+    | UnspecifiedSequence seq ->
+      List.iter
+        (fun (stmt,_,_,_,_) ->
+           ignore (visitFramacStmt (self:>frama_c_visitor) stmt))
+        seq;
+      Cil.SkipChildren (* do not visit the additional lvals *)
+    | _ -> super#vstmt_aux s
 
   method! vlval lv =
     let state = Db.Value.get_state self#current_kinstr in
@@ -86,9 +86,9 @@ class virtual do_it_ = object(self)
     if Db.Value.is_reachable (Db.Value.get_state self#current_kinstr) then begin
       match i with
       | Set (lv,exp,_) ->
-          self#do_assign lv;
-          ignore (visitFramacExpr (self:>frama_c_visitor) exp);
-          Cil.SkipChildren
+        self#do_assign lv;
+        ignore (visitFramacExpr (self:>frama_c_visitor) exp);
+        Cil.SkipChildren
 
       | Local_init(v, AssignInit i,_) ->
         let rec aux lv = function
@@ -126,13 +126,13 @@ class virtual do_it_ = object(self)
   method! vexpr exp =
     match exp.enode with
     | AddrOf lv | StartOf lv ->
-        let deps,_loc =
-          !Db.Value.lval_to_loc_with_deps (* loc ignored *)
-            ~deps:Zone.bottom
-            self#current_kinstr lv
-        in
-        self#join deps;
-        Cil.SkipChildren
+      let deps,_loc =
+        !Db.Value.lval_to_loc_with_deps (* loc ignored *)
+          ~deps:Zone.bottom
+          self#current_kinstr lv
+      in
+      self#join deps;
+      Cil.SkipChildren
     | SizeOfE _ | AlignOfE _ | SizeOf _ | AlignOf _ ->
       (* we're not evaluating an expression here: there's no input. *)
       Cil.SkipChildren
@@ -156,24 +156,24 @@ module Analysis = Cumulative_analysis.Make(
     module T = Locations.Zone
 
     class virtual do_it = do_it_
-end)
+  end)
 
 let get_internal = Analysis.kernel_function
 
 module Externals =
   Kernel_function.Make_Table(Locations.Zone)
     (struct
-       let name = "Inout.Inputs.Externals"
-       let dependencies = [ Analysis.Memo.self ]
-       let size = 17
-     end)
+      let name = "Inout.Inputs.Externals"
+      let dependencies = [ Analysis.Memo.self ]
+      let size = 17
+    end)
 
 let get_external =
   Externals.memo
     (fun kf ->
-      Zone.filter_base
-        (Callgraph.Uses.accept_base ~with_formals:false ~with_locals:false kf)
-        (get_internal kf))
+       Zone.filter_base
+         (Callgraph.Uses.accept_base ~with_formals:false ~with_locals:false kf)
+         (get_internal kf))
 
 let get_with_formals kf =
   Zone.filter_base

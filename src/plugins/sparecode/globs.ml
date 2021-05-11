@@ -47,32 +47,32 @@ class collect_visitor = object (self)
 
   method! vtype t = match t with
     | TNamed(ti,_) ->
-        (* we use the type name because direct typeinfo comparison
-        * doesn't wok. Anyway, CIL renames types if several type have the same
-        * name... *)
-        if Hashtbl.mem used_typeinfo ti.tname then SkipChildren
-        else begin
-          debug "add used typedef %s@." ti.tname;
-          Hashtbl.add used_typeinfo ti.tname ();
-          ignore (visitCilType (self:>Cil.cilVisitor) ti.ttype);
-          DoChildren
-        end
+      (* we use the type name because direct typeinfo comparison
+       * doesn't wok. Anyway, CIL renames types if several type have the same
+       * name... *)
+      if Hashtbl.mem used_typeinfo ti.tname then SkipChildren
+      else begin
+        debug "add used typedef %s@." ti.tname;
+        Hashtbl.add used_typeinfo ti.tname ();
+        ignore (visitCilType (self:>Cil.cilVisitor) ti.ttype);
+        DoChildren
+      end
     | TEnum(ei,_) ->
-        if Hashtbl.mem used_enuminfo ei.ename then SkipChildren
-        else begin
-          debug "add used enum %s@." ei.ename;
-          Hashtbl.add used_enuminfo ei.ename (); DoChildren
-        end
+      if Hashtbl.mem used_enuminfo ei.ename then SkipChildren
+      else begin
+        debug "add used enum %s@." ei.ename;
+        Hashtbl.add used_enuminfo ei.ename (); DoChildren
+      end
     | TComp(ci,_,_) ->
-        if Hashtbl.mem used_compinfo ci.cname then SkipChildren
-        else begin
-          debug "add used comp %s@." ci.cname;
-          Hashtbl.add used_compinfo ci.cname ();
-          List.iter
-            (fun f -> ignore (visitCilType (self:>Cil.cilVisitor) f.ftype))
-            (Option.value ~default:[] ci.cfields);
-          DoChildren
-        end
+      if Hashtbl.mem used_compinfo ci.cname then SkipChildren
+      else begin
+        debug "add used comp %s@." ci.cname;
+        Hashtbl.add used_compinfo ci.cname ();
+        List.iter
+          (fun f -> ignore (visitCilType (self:>Cil.cilVisitor) f.ftype))
+          (Option.value ~default:[] ci.cfields);
+        DoChildren
+      end
     | _ -> DoChildren
 
   method! vvrbl v =
@@ -82,27 +82,27 @@ class collect_visitor = object (self)
       ignore (visitCilType (self:>Cil.cilVisitor) v.vtype);
       try
         let init = Hashtbl.find var_init v in
-          ignore (visitCilInit (self:>Cil.cilVisitor) v NoOffset init)
+        ignore (visitCilInit (self:>Cil.cilVisitor) v NoOffset init)
       with Not_found -> ()
     end;
     DoChildren
 
   method! vglob_aux g = match g with
     | GFun (f, _) ->
-        debug "add function %s@." f.svar.vname;
-        Hashtbl.add used_variables f.svar ();
-        Cil.DoChildren
+      debug "add function %s@." f.svar.vname;
+      Hashtbl.add used_variables f.svar ();
+      Cil.DoChildren
     | GAnnot _ -> Cil.DoChildren
     | GVar (v, init, _) ->
-        let _ = match init.init with | None -> ()
-          | Some init ->
-              begin
-                Hashtbl.add var_init v init;
-                if Hashtbl.mem used_variables v then
-                  (* already used before its initialization (see bug #758) *)
-                  ignore (visitCilInit (self:>Cil.cilVisitor) v NoOffset init)
-              end
-        in Cil.SkipChildren
+      let _ = match init.init with | None -> ()
+                                   | Some init ->
+                                     begin
+                                       Hashtbl.add var_init v init;
+                                       if Hashtbl.mem used_variables v then
+                                         (* already used before its initialization (see bug #758) *)
+                                         ignore (visitCilInit (self:>Cil.cilVisitor) v NoOffset init)
+                                     end
+      in Cil.SkipChildren
     | GFunDecl _ -> DoChildren
     | _ -> Cil.SkipChildren
 
@@ -114,47 +114,47 @@ class filter_visitor prj = object
 
   method! vglob_aux g =
     match g with
-      | GFun (_f, _loc) (* function definition *)
-        -> Cil.DoChildren (* keep everything *)
-      | GVar (v, _, _) (* variable definition *)
-      | GVarDecl (v, _) | GFunDecl (_, v, _) -> (* variable/function declaration *)
-          if Hashtbl.mem used_variables v then DoChildren
-          else begin
-            debug "remove var %s@." v.vname;
-            ChangeTo []
-          end
-      | GType (ti, _loc) (* typedef *) ->
-          if Hashtbl.mem used_typeinfo ti.tname then DoChildren
-          else begin
-            debug "remove typedef %s@." ti.tname;
-            ChangeTo []
-          end
-      | GCompTag (ci, _loc) (* struct/union definition *)
-      | GCompTagDecl (ci, _loc) (* struct/union declaration *) ->
-          if Hashtbl.mem used_compinfo ci.cname then DoChildren
-          else begin
-            debug "remove comp %s@." ci.cname;
-            ChangeTo []
-          end
-      | GEnumTag (ei, _loc) (* enum definition *)
-      | GEnumTagDecl (ei, _loc) (* enum declaration *) ->
-          if Hashtbl.mem used_enuminfo ei.ename then DoChildren
-          else begin
-            debug "remove enum %s@." ei.ename;
-            DoChildren (* ChangeTo [] *)
-          end
-      | _ -> Cil.DoChildren
-  end
+    | GFun (_f, _loc) (* function definition *)
+      -> Cil.DoChildren (* keep everything *)
+    | GVar (v, _, _) (* variable definition *)
+    | GVarDecl (v, _) | GFunDecl (_, v, _) -> (* variable/function declaration *)
+      if Hashtbl.mem used_variables v then DoChildren
+      else begin
+        debug "remove var %s@." v.vname;
+        ChangeTo []
+      end
+    | GType (ti, _loc) (* typedef *) ->
+      if Hashtbl.mem used_typeinfo ti.tname then DoChildren
+      else begin
+        debug "remove typedef %s@." ti.tname;
+        ChangeTo []
+      end
+    | GCompTag (ci, _loc) (* struct/union definition *)
+    | GCompTagDecl (ci, _loc) (* struct/union declaration *) ->
+      if Hashtbl.mem used_compinfo ci.cname then DoChildren
+      else begin
+        debug "remove comp %s@." ci.cname;
+        ChangeTo []
+      end
+    | GEnumTag (ei, _loc) (* enum definition *)
+    | GEnumTagDecl (ei, _loc) (* enum declaration *) ->
+      if Hashtbl.mem used_enuminfo ei.ename then DoChildren
+      else begin
+        debug "remove enum %s@." ei.ename;
+        DoChildren (* ChangeTo [] *)
+      end
+    | _ -> Cil.DoChildren
+end
 
 module Result =
   State_builder.Hashtbl
     (Datatype.String.Hashtbl)
     (Project.Datatype)
     (struct
-       let name = "Sparecode without unused globals"
-       let size = 7
-       let dependencies = [ Ast.self ] (* delayed, see below *)
-     end)
+      let name = "Sparecode without unused globals"
+      let size = 7
+      let dependencies = [ Ast.self ] (* delayed, see below *)
+    end)
 
 let () =
   Cmdline.run_after_extended_stage

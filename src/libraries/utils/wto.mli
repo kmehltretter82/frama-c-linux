@@ -32,10 +32,10 @@
     by a list of components topologically ordered. *)
 type 'n component =
   | Component of 'n * 'n partition
-    (** A strongly connected component, described by its head node and the
-        remaining sub-components topologically ordered *)
+  (** A strongly connected component, described by its head node and the
+      remaining sub-components topologically ordered *)
   | Node of 'n
-    (** A single node without self loop *)
+  (** A single node without self loop *)
 
 (** A list of strongly connected components, sorted topologically *)
 and 'n partition = 'n component list
@@ -59,7 +59,7 @@ module Make(Node:sig
       Use "(fun _ _ -> 0)" for no specific preference. *)
 
   (** Implements Bourdoncle "Efficient chaotic iteration strategies with
-  widenings" algorithm to compute a WTO. *)
+      widenings" algorithm to compute a WTO. *)
   val partition: pref:pref -> init:Node.t -> succs:(Node.t -> Node.t list) -> Node.t partition
 
   val pretty_partition: Format.formatter -> Node.t partition -> unit

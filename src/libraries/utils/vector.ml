@@ -55,7 +55,7 @@ let do_shrink w n =
 let resize w n =
   let m = Array.length w.elt in
   if 0 <= n && n < m then do_shrink w n else
-    if n > m then do_grow w n
+  if n > m then do_grow w n
 
 let shrink w = resize w w.top
 
@@ -63,7 +63,7 @@ let size w = w.top
 let length w = w.top
 let capacity w = Array.length w.elt
 
-let get w k = 
+let get w k =
   if 0 <= k && k < w.top then w.elt.(k) else raise Not_found
 
 let set w k e =
@@ -78,7 +78,7 @@ let addi w e =
 
 let add w e = ignore (addi w e)
 
-let clear w = 
+let clear w =
   begin
     w.top <- 0 ;
     Array.fill w.elt 0 (Array.length w.elt) w.dumb ;
@@ -87,7 +87,7 @@ let clear w =
 let iter f w  = for k = 0 to w.top - 1 do f w.elt.(k) done
 let iteri f w = for k = 0 to w.top - 1 do f k w.elt.(k) done
 
-let map f w = 
+let map f w =
   {
     dumb = Obj.magic w.dumb ;
     top = w.top ;
@@ -104,8 +104,8 @@ let mapi f w =
 let find w ?default ?(exn=Not_found) k =
   if 0 <= k && k < w.top then w.elt.(k) else
     match default with
-      | None -> raise exn
-      | Some e -> e
+    | None -> raise exn
+    | Some e -> e
 
 let update w ?default k e =
   let exn = Invalid_argument "Vector.update" in

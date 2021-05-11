@@ -35,7 +35,7 @@ module WTO : Datatype.S with type t = wto
 val wto_of_kf : kernel_function -> wto
 
 
-(** the position of a statement in a wto given as the list of 
+(** the position of a statement in a wto given as the list of
     component heads *)
 type wto_index = stmt list
 

@@ -31,7 +31,7 @@
 module Output : sig
   include Log.Messages
   val dkey: category
-(** @since Fluorine-20130401 *)
+  (** @since Fluorine-20130401 *)
 end
 
 (* ************************************************************************** *)
@@ -39,7 +39,7 @@ end
 (* ************************************************************************** *)
 
 type t = private
-    { pid: int; mutable name: string; mutable unique_name: string }
+  { pid: int; mutable name: string; mutable unique_name: string }
 (** @since Carbon-20101201
     @plugin development guide *)
 
@@ -64,7 +64,7 @@ module Make_setter(X: sig val mem: string -> bool end) : sig
   (** @since Carbon-20101201 *)
 
   val set_name: t -> string -> unit
-(** @since Carbon-20101201 *)
+  (** @since Carbon-20101201 *)
 
 end
 

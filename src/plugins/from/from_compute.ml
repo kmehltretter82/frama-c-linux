@@ -40,24 +40,24 @@ let rec find_deps_no_transitivity state expr =
   (* The value of the expression [expr], just before executing the statement
      [instr], is a function of the values of the returned zones. *)
   match expr.enode with
-    | Info (e, _) -> find_deps_no_transitivity state e
-    | AlignOfE _| AlignOf _| SizeOfStr _ |SizeOfE _| SizeOf _ | Const _
-        -> Function_Froms.Deps.bottom
-    | AddrOf lv  | StartOf lv ->
-        let deps, _ = !Db.Value.lval_to_loc_with_deps_state (* loc ignored *)
-          state
-          ~deps:Zone.bottom
-          lv
-        in
-        Function_Froms.Deps.from_data_deps deps
-    | CastE (_, e)|UnOp (_, e, _) ->
-        find_deps_no_transitivity state e
-    | BinOp (_, e1, e2, _) ->
-        Function_Froms.Deps.join
-          (find_deps_no_transitivity state e1)
-          (find_deps_no_transitivity state e2)
-    | Lval v ->
-        find_deps_lval_no_transitivity state v
+  | Info (e, _) -> find_deps_no_transitivity state e
+  | AlignOfE _| AlignOf _| SizeOfStr _ |SizeOfE _| SizeOf _ | Const _
+    -> Function_Froms.Deps.bottom
+  | AddrOf lv  | StartOf lv ->
+    let deps, _ = !Db.Value.lval_to_loc_with_deps_state (* loc ignored *)
+        state
+        ~deps:Zone.bottom
+        lv
+    in
+    Function_Froms.Deps.from_data_deps deps
+  | CastE (_, e)|UnOp (_, e, _) ->
+    find_deps_no_transitivity state e
+  | BinOp (_, e1, e2, _) ->
+    Function_Froms.Deps.join
+      (find_deps_no_transitivity state e1)
+      (find_deps_no_transitivity state e2)
+  | Lval v ->
+    find_deps_lval_no_transitivity state v
 
 and find_deps_lval_no_transitivity state lv =
   let ind_deps, direct_deps, _exact =
@@ -72,108 +72,108 @@ let compute_using_prototype_for_state state kf assigns =
   let varinfo = Kernel_function.get_vi kf in
   let return_deps,deps =
     match assigns with
-      | WritesAny ->
-          From_parameters.warning "@[no assigns clauses@ for function %a.@]@ \
-                                   Results will be imprecise."
-                                  Kernel_function.pretty kf;
-          Function_Froms.Memory.(top_return, top)
-      | Writes assigns ->
-          let (rt_typ,_,_,_) = splitFunctionTypeVI varinfo in
-          let input_zone out ins =
-            (* Technically out is unused, but there is a signature problem *)
-              !Db.Value.assigns_inputs_to_zone state (Writes [out, ins])
+    | WritesAny ->
+      From_parameters.warning "@[no assigns clauses@ for function %a.@]@ \
+                               Results will be imprecise."
+        Kernel_function.pretty kf;
+      Function_Froms.Memory.(top_return, top)
+    | Writes assigns ->
+      let (rt_typ,_,_,_) = splitFunctionTypeVI varinfo in
+      let input_zone out ins =
+        (* Technically out is unused, but there is a signature problem *)
+        !Db.Value.assigns_inputs_to_zone state (Writes [out, ins])
+      in
+      let treat_assign acc (out, ins) =
+        try
+          let (output_loc_under, output_loc_over, _deps) =
+            !Db.Properties.Interp.loc_to_loc_under_over
+              ~result:None state out.it_content
           in
-          let treat_assign acc (out, ins) =
-            try
-	      let (output_loc_under, output_loc_over, _deps) =
-		!Db.Properties.Interp.loc_to_loc_under_over
-                  ~result:None state out.it_content
-              in
-              let input_zone = input_zone out ins in
-              (* assign clauses do not let us specify address
-                 dependencies for now, so we assume it is all data
-                 dependencies *)
-              let input_deps =
-                Function_Froms.Deps.from_data_deps input_zone
-              in
-              (* Weak update of the over-approximation of the zones assigned *)
-              let acc = Function_Froms.Memory.add_binding_loc ~exact:false
-                acc output_loc_over input_deps in
-	      let output_loc_under_zone = Locations.enumerate_valid_bits_under
-		Write output_loc_under in
-	      (* Now, perform a strong update on the zones that are guaranteed
-                 to be assigned (under-approximation) AND that do not depend
-                 on themselves.
-                 Note: here we remove an overapproximation from an
-		 underapproximation to get an underapproximation, which is not
-		 the usual direction. It works here because diff on non-top
-                 zones is an exact operation. *)
-	      let sure_out_zone =
-                Zone.(if equal top input_zone then bottom
-                      else diff output_loc_under_zone input_zone)
-              in
-	      let acc = Function_Froms.Memory.add_binding ~exact:true
-		acc sure_out_zone input_deps in
-	      acc
-            with Db.Properties.Interp.No_conversion ->
-              From_parameters.result
-                ~once:true ~current:true "Unable to extract assigns in %a"
-                Kernel_function.pretty kf;
-              acc
+          let input_zone = input_zone out ins in
+          (* assign clauses do not let us specify address
+             dependencies for now, so we assume it is all data
+             dependencies *)
+          let input_deps =
+            Function_Froms.Deps.from_data_deps input_zone
           in
-          let treat_ret_assign acc (out, from) =
-            let zone_from = input_zone out from in
-            (* assign clauses do not let us specify address dependencies for
-               now, so we assume it is all data dependencies *)
-            let inputs_deps = Function_Froms.Deps.from_data_deps zone_from in
-            try
-              let coffs =
-                !Db.Properties.Interp.loc_to_offset ~result:None out.it_content
-              in
-              List.fold_left
-                (fun acc coff ->
-                  let (base,width) = bitsOffset rt_typ coff in
-                  let size = Int_Base.inject (Int.of_int width) in
-                  Function_Froms.Memory.(add_to_return
-                                           ~start:base ~size ~m:acc inputs_deps)
-                )
-                acc coffs
-            with Db.Properties.Interp.No_conversion | SizeOfError _ ->
-              From_parameters.result  ~once:true ~current:true
-                "Unable to extract a proper offset. \
-                 Using FROM for the whole \\result";
-              let size = Bit_utils.sizeof rt_typ in
-              Function_Froms.(Memory.add_to_return ~size ~m:acc inputs_deps)
+          (* Weak update of the over-approximation of the zones assigned *)
+          let acc = Function_Froms.Memory.add_binding_loc ~exact:false
+              acc output_loc_over input_deps in
+          let output_loc_under_zone = Locations.enumerate_valid_bits_under
+              Write output_loc_under in
+          (* Now, perform a strong update on the zones that are guaranteed
+                   to be assigned (under-approximation) AND that do not depend
+                   on themselves.
+                   Note: here we remove an overapproximation from an
+             underapproximation to get an underapproximation, which is not
+             the usual direction. It works here because diff on non-top
+                   zones is an exact operation. *)
+          let sure_out_zone =
+            Zone.(if equal top input_zone then bottom
+                  else diff output_loc_under_zone input_zone)
           in
-          let return_assigns, other_assigns =
-            List.fold_left
-              (fun (ra,oa) (loc,_ as a) ->
-                if Logic_utils.is_result loc.it_content
-                then a::ra,oa else ra,a::oa)
-              ([],[]) assigns
+          let acc = Function_Froms.Memory.add_binding ~exact:true
+              acc sure_out_zone input_deps in
+          acc
+        with Db.Properties.Interp.No_conversion ->
+          From_parameters.result
+            ~once:true ~current:true "Unable to extract assigns in %a"
+            Kernel_function.pretty kf;
+          acc
+      in
+      let treat_ret_assign acc (out, from) =
+        let zone_from = input_zone out from in
+        (* assign clauses do not let us specify address dependencies for
+           now, so we assume it is all data dependencies *)
+        let inputs_deps = Function_Froms.Deps.from_data_deps zone_from in
+        try
+          let coffs =
+            !Db.Properties.Interp.loc_to_offset ~result:None out.it_content
           in
-          let return_assigns =
-            match return_assigns with
-              | [] when Cil.isVoidType rt_typ ->
-                  Function_Froms.Memory.default_return
-              | [] -> (* \from unspecified. *)
-                let size = Bit_utils.sizeof rt_typ in
-                Function_Froms.Memory.top_return_size size
-              | _ ->
-                  List.fold_left treat_ret_assign
-                    Function_Froms.Memory.default_return return_assigns
-          in
-          return_assigns,
           List.fold_left
-            treat_assign Function_Froms.Memory.empty other_assigns
+            (fun acc coff ->
+               let (base,width) = bitsOffset rt_typ coff in
+               let size = Int_Base.inject (Int.of_int width) in
+               Function_Froms.Memory.(add_to_return
+                                        ~start:base ~size ~m:acc inputs_deps)
+            )
+            acc coffs
+        with Db.Properties.Interp.No_conversion | SizeOfError _ ->
+          From_parameters.result  ~once:true ~current:true
+            "Unable to extract a proper offset. \
+             Using FROM for the whole \\result";
+          let size = Bit_utils.sizeof rt_typ in
+          Function_Froms.(Memory.add_to_return ~size ~m:acc inputs_deps)
+      in
+      let return_assigns, other_assigns =
+        List.fold_left
+          (fun (ra,oa) (loc,_ as a) ->
+             if Logic_utils.is_result loc.it_content
+             then a::ra,oa else ra,a::oa)
+          ([],[]) assigns
+      in
+      let return_assigns =
+        match return_assigns with
+        | [] when Cil.isVoidType rt_typ ->
+          Function_Froms.Memory.default_return
+        | [] -> (* \from unspecified. *)
+          let size = Bit_utils.sizeof rt_typ in
+          Function_Froms.Memory.top_return_size size
+        | _ ->
+          List.fold_left treat_ret_assign
+            Function_Froms.Memory.default_return return_assigns
+      in
+      return_assigns,
+      List.fold_left
+        treat_assign Function_Froms.Memory.empty other_assigns
   in
   { deps_return = return_deps; Function_Froms.deps_table = deps }
 
 module ZoneStmtMap = struct
   include
     Hptmap.Make(Stmt_Id)(Zone)(Hptmap.Comp_unused)
-    (struct let v = [[]] end)
-    (struct let l = [Ast.self] end)
+      (struct let v = [[]] end)
+      (struct let l = [Ast.self] end)
 
   let join =
     let decide _k z1 z2 = Zone.join z1 z2 in
@@ -184,17 +184,17 @@ end
 module Make (To_Use: To_Use) =
 struct
   type t' =
-      { additional_deps_table : ZoneStmtMap.t;
-        (** Additional control dependencies to add to all modified variables,
-            coming from the control statements encountered so far (If, Switch).
-            The statement information is used to remove the dependencies that
-            are no longer useful, when we reach a statement that post-dominates
-            the statement that gave rise to the dependency. *)
-        additional_deps : Zone.t;
-        (** Union of the sets in {!additional_deps_table} *)
-        deps_table : Function_Froms.Memory.t
-        (** dependency table *)
-      }
+    { additional_deps_table : ZoneStmtMap.t;
+      (** Additional control dependencies to add to all modified variables,
+          coming from the control statements encountered so far (If, Switch).
+          The statement information is used to remove the dependencies that
+          are no longer useful, when we reach a statement that post-dominates
+          the statement that gave rise to the dependency. *)
+      additional_deps : Zone.t;
+      (** Union of the sets in {!additional_deps_table} *)
+      deps_table : Function_Froms.Memory.t
+      (** dependency table *)
+    }
 
   let call_stack : kernel_function Stack.t = Stack.create ()
   (** Stack of function being processed *)
@@ -298,14 +298,14 @@ struct
     let pretty fmt (v: t) =
       display_one_from fmt v
 
-    let transfer_conditional_exp s exp state = 
+    let transfer_conditional_exp s exp state =
       let additional = find s state.deps_table exp in
       let additional = Function_Froms.Deps.to_zone additional in
       {state with
-        additional_deps_table =
-          ZoneStmtMap.add s additional state.additional_deps_table;
-        additional_deps =
-          Zone.join additional state.additional_deps }
+       additional_deps_table =
+         ZoneStmtMap.add s additional state.additional_deps_table;
+       additional_deps =
+         Zone.join additional state.additional_deps }
 
 
     let join_and_is_included new_ old =
@@ -349,8 +349,8 @@ struct
       let deps = Function_Froms.Deps.add_indirect_dep deps_right all_indirect in
       let access = if init then Read else Write in
       { state with deps_table =
-          Function_Froms.Memory.add_binding_precise_loc
-            ~exact access state.deps_table loc deps }
+                     Function_Froms.Memory.add_binding_precise_loc
+                       ~exact access state.deps_table loc deps }
 
     let transfer_call stmt dest f args _loc state =
       Db.yield ();
@@ -458,41 +458,41 @@ struct
     let transfer_instr stmt (i: instr) (state: t) =
       Db.yield ();
       match i with
-        | Set (lv, exp, _) ->
-              let comp_vars = find stmt state.deps_table exp in
-              let init = Cil.is_mutable_or_initialized lv in
-              transfer_assign stmt ~init lv comp_vars state
-        | Local_init(v, AssignInit i, _) ->
-          let rec aux lv i acc =
-            let doinit o i _ state = aux (Cil.addOffsetLval o lv) i state in
-            match i with
-            | SingleInit e ->
-              let comp_vars = find stmt acc.deps_table e in
-              transfer_assign stmt ~init:true lv comp_vars acc
-            | CompoundInit (ct, initl) ->
-              (* To avoid a performance issue, do not fold implicit initializers
-                 of scalar or large arrays. We still use implicit initializers
-                 for small struct arrays, as this may be more precise in case of
-                 padding bits. The 100 limit is arbitrary. *)
-              let implicit =
-                not (Cil.isArrayType ct &&
-                     (Cil.isArithmeticOrPointerType (Cil.typeOf_array_elem ct)
-                      || Ast_info.array_size ct > (Integer.of_int 100)))
-              in
-              let r = Cil.foldLeftCompound ~implicit ~doinit ~ct ~initl ~acc in
-              if implicit then r else
-                (* If implicit zero-initializers have been skipped, also mark
-                   the entire array as initialized from no dependency (nothing
-                   is read by the implicit zero-initializers). *)
-                transfer_assign stmt ~init:true lv Function_Froms.Deps.bottom r
-          in
-          aux (Cil.var v) i state
-        | Call (lvaloption,funcexp,argl,loc) ->
-          transfer_call stmt lvaloption funcexp argl loc state
-        | Local_init (v, ConsInit(f, args, kind), loc) ->
-          Cil.treat_constructor_as_func
-            (transfer_call stmt) v f args kind loc state
-        | Asm _ | Code_annot _ | Skip _ -> state
+      | Set (lv, exp, _) ->
+        let comp_vars = find stmt state.deps_table exp in
+        let init = Cil.is_mutable_or_initialized lv in
+        transfer_assign stmt ~init lv comp_vars state
+      | Local_init(v, AssignInit i, _) ->
+        let rec aux lv i acc =
+          let doinit o i _ state = aux (Cil.addOffsetLval o lv) i state in
+          match i with
+          | SingleInit e ->
+            let comp_vars = find stmt acc.deps_table e in
+            transfer_assign stmt ~init:true lv comp_vars acc
+          | CompoundInit (ct, initl) ->
+            (* To avoid a performance issue, do not fold implicit initializers
+               of scalar or large arrays. We still use implicit initializers
+               for small struct arrays, as this may be more precise in case of
+               padding bits. The 100 limit is arbitrary. *)
+            let implicit =
+              not (Cil.isArrayType ct &&
+                   (Cil.isArithmeticOrPointerType (Cil.typeOf_array_elem ct)
+                    || Ast_info.array_size ct > (Integer.of_int 100)))
+            in
+            let r = Cil.foldLeftCompound ~implicit ~doinit ~ct ~initl ~acc in
+            if implicit then r else
+              (* If implicit zero-initializers have been skipped, also mark
+                 the entire array as initialized from no dependency (nothing
+                 is read by the implicit zero-initializers). *)
+              transfer_assign stmt ~init:true lv Function_Froms.Deps.bottom r
+        in
+        aux (Cil.var v) i state
+      | Call (lvaloption,funcexp,argl,loc) ->
+        transfer_call stmt lvaloption funcexp argl loc state
+      | Local_init (v, ConsInit(f, args, kind), loc) ->
+        Cil.treat_constructor_as_func
+          (transfer_call stmt) v f args kind loc state
+      | Asm _ | Code_annot _ | Skip _ -> state
 
 
     let transfer_guard s e d =
@@ -502,7 +502,7 @@ struct
       let do_then, do_else =
         if isIntegralType t1 || isPointerType t1
         then Cvalue.V.contains_non_zero interpreted_e,
-          Cvalue.V.contains_zero interpreted_e
+             Cvalue.V.contains_zero interpreted_e
         else true, true (* TODO: a float condition is true iff != 0.0 *)
       in
       (if do_then then d else bottom),
@@ -517,9 +517,9 @@ struct
       let map' =
         ZoneStmtMap.fold
           (fun k _v acc_map ->
-            if !Db.Postdominators.is_postdominator kf ~opening:k ~closing:s
-            then ZoneStmtMap.remove k acc_map
-            else acc_map
+             if !Db.Postdominators.is_postdominator kf ~opening:k ~closing:s
+             then ZoneStmtMap.remove k acc_map
+             else acc_map
           ) map map
       in
       if not (map == map') then
@@ -536,24 +536,24 @@ struct
       | Instr i -> map_on_all_succs (transfer_instr s i data)
 
       | If(exp,_,_,_) ->
-      	let data = transfer_conditional_exp s exp data in
-      	Dataflows.transfer_if_from_guard transfer_guard s data
+        let data = transfer_conditional_exp s exp data in
+        Dataflows.transfer_if_from_guard transfer_guard s data
       | Switch(exp,_,_,_) ->
-      	let data = transfer_conditional_exp s exp data in
-      	Dataflows.transfer_switch_from_guard transfer_guard s data
+        let data = transfer_conditional_exp s exp data in
+        Dataflows.transfer_switch_from_guard transfer_guard s data
 
       | Return _ | Throw _ -> []
 
       | UnspecifiedSequence _ | Loop _ | Block _
       | Goto _ | Break _ | Continue _
       | TryExcept _ | TryFinally _ | TryCatch _
-	-> map_on_all_succs data
+        -> map_on_all_succs data
     ;;
 
     (* Filter out unreachable values. *)
-    let transfer_stmt s d = 
+    let transfer_stmt s d =
       if Db.Value.is_reachable (To_Use.get_value_state s) &&
-        not (Function_Froms.Memory.is_bottom d.deps_table)
+         not (Function_Froms.Memory.is_bottom d.deps_table)
       then transfer_stmt s d
       else []
 
@@ -566,12 +566,12 @@ struct
         let dt = List.fold_left bind_locals dt opened in
         let dt = List.fold_left unbind_locals dt closed in
         { d with deps_table = dt }
-      else 
-	bottom_from
+      else
+        bottom_from
 
     (* Filter the outgoing data using doEdge. *)
-    let transfer_stmt s d = 
-      let ds = transfer_stmt s d in 
+    let transfer_stmt s d =
+      let ds = transfer_stmt s d in
       List.map (fun (succ, d) -> (succ, doEdge s succ d)) ds
     ;;
 
@@ -582,17 +582,17 @@ struct
   let externalize return kf state =
     let deps_return =
       (match return.skind with
-      | Return (Some ({enode = Lval v}),_) ->
-        let deps, target, _exact =
-          lval_to_zone_with_deps ~for_writing:false return v
-        in
-        let z = Zone.join target deps in
-        let deps = Function_Froms.Memory.find_precise state.deps_table z in
-        let size = Bit_utils.sizeof (Cil.typeOfLval v) in
-        Function_Froms.(Memory.add_to_return ~size deps)
-      | Return (None,_) ->
-        Function_Froms.Memory.default_return
-      | _ -> assert false)
+       | Return (Some ({enode = Lval v}),_) ->
+         let deps, target, _exact =
+           lval_to_zone_with_deps ~for_writing:false return v
+         in
+         let z = Zone.join target deps in
+         let deps = Function_Froms.Memory.find_precise state.deps_table z in
+         let size = Bit_utils.sizeof (Cil.typeOfLval v) in
+         Function_Froms.(Memory.add_to_return ~size deps)
+       | Return (None,_) ->
+         Function_Froms.Memory.default_return
+       | _ -> assert false)
     in
     let accept = To_Use.keep_base kf in
     let deps_table =
@@ -610,24 +610,24 @@ struct
         try
           Stack.iter
             (fun g ->
-              if kf == g then begin
-                if Db.Value.ignored_recursive_call kf then
-                  From_parameters.error
-                    "during dependencies computations for %a, \
-                       ignoring probable recursive"
-                    Kernel_function.pretty kf;
-                raise Exit
-              end)
+               if kf == g then begin
+                 if Db.Value.ignored_recursive_call kf then
+                   From_parameters.error
+                     "during dependencies computations for %a, \
+                      ignoring probable recursive"
+                     Kernel_function.pretty kf;
+                 raise Exit
+               end)
             call_stack;
           Stack.push kf call_stack;
           let state =
             { empty_from with
-                deps_table = bind_locals empty_from.deps_table f.sbody }
+              deps_table = bind_locals empty_from.deps_table f.sbody }
           in
-	  let module Fenv =
-                (val Dataflows.function_env kf: Dataflows.FUNCTION_ENV)
+          let module Fenv =
+            (val Dataflows.function_env kf: Dataflows.FUNCTION_ENV)
           in
-	  let module Dataflow_arg = struct
+          let module Dataflow_arg = struct
             include Computer
             let init = [(Kernel_function.find_first_stmt kf, state)]
           end
@@ -640,8 +640,8 @@ struct
             let states =
               Stmt.Hashtbl.create Fenv.nb_stmts
             in
-	    Compute.iter_on_result (fun k record ->
-              Stmt.Hashtbl.add states k record.deps_table);
+            Compute.iter_on_result (fun k record ->
+                Stmt.Hashtbl.add states k record.deps_table);
             Db.From.Record_From_Callbacks.apply
               (call_stack, states, Dataflow_arg.callwise_states_with_formals)
           end;
@@ -653,17 +653,17 @@ struct
                 externalize
                   ret_id
                   kf
-		  Compute.before.(Fenv.to_ordered ret_id)
+                  Compute.before.(Fenv.to_ordered ret_id)
               else
                 raise Not_found
             with Not_found -> begin
-              From_parameters.result
-                "Non-terminating function %a (no dependencies)"
-                Kernel_function.pretty kf;
-              { Function_Froms.deps_return =
-                  Function_Froms.Memory.default_return;
-                deps_table = Function_Froms.Memory.bottom }
-            end
+                From_parameters.result
+                  "Non-terminating function %a (no dependencies)"
+                  Kernel_function.pretty kf;
+                { Function_Froms.deps_return =
+                    Function_Froms.Memory.default_return;
+                  deps_table = Function_Froms.Memory.bottom }
+              end
           in
           last_from
 
@@ -685,7 +685,7 @@ struct
       (let s = ref "" in
        Stack.iter
          (fun kf ->
-           s := !s^" <-"^(Format.asprintf "%a" Kernel_function.pretty kf))
+            s := !s^" <-"^(Format.asprintf "%a" Kernel_function.pretty kf))
          call_stack;
        !s);
     Db.yield ();

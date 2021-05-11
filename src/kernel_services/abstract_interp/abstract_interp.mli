@@ -105,8 +105,8 @@ module Make_Lattice_Set
   : Lattice_type.Lattice_Set with module O = Set
 
 module Make_Hashconsed_Lattice_Set
-  (V: Hptmap.Id_Datatype)
-  (Set: Hptset.S with type elt = V.t)
+    (V: Hptmap.Id_Datatype)
+    (Set: Hptset.S with type elt = V.t)
   : Lattice_type.Lattice_Set with module O = Set
 (** See e.g. base.ml and locations.ml to see how this functor should be
     applied. The [O] module passed as argument is the same as [O] in the

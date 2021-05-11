@@ -44,7 +44,7 @@
 open Cil_types
 
 let x86_16 = {
-  version          = 
+  version          =
     "x86 16 bits mode (gcc like compiler) with big or huge memory model";
   compiler = "generic";
   cpp_arch_flags   = ["-m16"];
@@ -72,8 +72,8 @@ let x86_16 = {
   alignof_str = 1;
   alignof_fun = -1;
   alignof_aligned= 8;
-         (* I don't know if attribute aligned is supported by any 16bits 
-            compiler. *)
+  (* I don't know if attribute aligned is supported by any 16bits
+     compiler. *)
   char_is_unsigned = false;
   const_string_literals = true;
   little_endian = true;

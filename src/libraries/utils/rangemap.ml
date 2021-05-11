@@ -107,54 +107,54 @@ module Make(Ord: Datatype.S)(Value: Value) = struct
     let hashtree = hashl lxor hashbinding lxor hashr in
     Node(l, x, d, r, (if hl >= hr then hl + 1 else hr + 1), hashtree)
 
-   let bal l x d r =
-      let hl = match l with Empty -> 0 | Node(_,_,_,_,h,_) -> h in
-      let hr = match r with Empty -> 0 | Node(_,_,_,_,h,_) -> h in
-      if hl > hr + 2 then begin
-        match l with
-          Empty -> invalid_arg "Rangemap.bal"
-        | Node(ll, lv, ld, lr, _, _) ->
-            if height ll >= height lr then
-              create ll lv ld (create lr x d r)
-            else begin
-              match lr with
-                Empty -> invalid_arg "Rangemap.bal"
-              | Node(lrl, lrv, lrd, lrr, _, _)->
-                  create (create ll lv ld lrl) lrv lrd (create lrr x d r)
-            end
-      end else if hr > hl + 2 then begin
-        match r with
-          Empty -> invalid_arg "Rangemap.bal"
-        | Node(rl, rv, rd, rr, _, _) ->
-            if height rr >= height rl then
-              create (create l x d rl) rv rd rr
-            else begin
-              match rl with
-                Empty -> invalid_arg "Rangemap.bal"
-              | Node(rll, rlv, rld, rlr, _, _) ->
-                  create (create l x d rll) rlv rld (create rlr rv rd rr)
-            end
-      end else
-        create l x d r
+  let bal l x d r =
+    let hl = match l with Empty -> 0 | Node(_,_,_,_,h,_) -> h in
+    let hr = match r with Empty -> 0 | Node(_,_,_,_,h,_) -> h in
+    if hl > hr + 2 then begin
+      match l with
+        Empty -> invalid_arg "Rangemap.bal"
+      | Node(ll, lv, ld, lr, _, _) ->
+        if height ll >= height lr then
+          create ll lv ld (create lr x d r)
+        else begin
+          match lr with
+            Empty -> invalid_arg "Rangemap.bal"
+          | Node(lrl, lrv, lrd, lrr, _, _)->
+            create (create ll lv ld lrl) lrv lrd (create lrr x d r)
+        end
+    end else if hr > hl + 2 then begin
+      match r with
+        Empty -> invalid_arg "Rangemap.bal"
+      | Node(rl, rv, rd, rr, _, _) ->
+        if height rr >= height rl then
+          create (create l x d rl) rv rd rr
+        else begin
+          match rl with
+            Empty -> invalid_arg "Rangemap.bal"
+          | Node(rll, rlv, rld, rlr, _, _) ->
+            create (create l x d rll) rlv rld (create rlr rv rd rr)
+        end
+    end else
+      create l x d r
 
-   let empty = Empty
+  let empty = Empty
 
-   let is_empty = function Empty -> true | _ -> false
+  let is_empty = function Empty -> true | _ -> false
 
-   let singleton x v = create Empty x v Empty
+  let singleton x v = create Empty x v Empty
 
-   let rec add x data = function
-        Empty ->
-          create Empty x data Empty
-      | Node(l, v, d, r, _, _) as node ->
-          let c = Ord.compare x v in
-          if c = 0 then
-            if Value.fast_equal d data then node
-            else create l x data r
-          else if c < 0 then
-            bal (add x data l) v d r
-          else
-            bal l v d (add x data r)
+  let rec add x data = function
+      Empty ->
+      create Empty x data Empty
+    | Node(l, v, d, r, _, _) as node ->
+      let c = Ord.compare x v in
+      if c = 0 then
+        if Value.fast_equal d data then node
+        else create l x data r
+      else if c < 0 then
+        bal (add x data l) v d r
+      else
+        bal l v d (add x data r)
 
   let rec find x = function
     | Empty ->
@@ -243,67 +243,67 @@ module Make(Ord: Datatype.S)(Value: Value) = struct
     let rec filt accu = function
       | Empty -> accu
       | Node(l, v, d, r, _, _) ->
-          filt (filt (if p v d then add v d accu else accu) l) r in
+        filt (filt (if p v d then add v d accu else accu) l) r in
     filt Empty s
 
   let partition p s =
     let rec part (t, f as accu) = function
       | Empty -> accu
       | Node(l, v, d, r, _, _) ->
-          part (part (if p v d then (add v d t, f) else (t, add v d f)) l) r in
+        part (part (if p v d then (add v d t, f) else (t, add v d f)) l) r in
     part (Empty, Empty) s
 
-    (* Same as create and bal, but no assumptions are made on the
-       relative heights of l and r. *)
+  (* Same as create and bal, but no assumptions are made on the
+     relative heights of l and r. *)
 
-    let rec join l v d r =
-      match (l, r) with
-        (Empty, _) -> add v d r
-      | (_, Empty) -> add v d l
-      | (Node(ll, lv, ld, lr, lh, _), Node(rl, rv, rd, rr, rh, _)) ->
-          if lh > rh + 2 then bal ll lv ld (join lr v d r) else
-          if rh > lh + 2 then bal (join l v d rl) rv rd rr else
-          create l v d r
+  let rec join l v d r =
+    match (l, r) with
+      (Empty, _) -> add v d r
+    | (_, Empty) -> add v d l
+    | (Node(ll, lv, ld, lr, lh, _), Node(rl, rv, rd, rr, rh, _)) ->
+      if lh > rh + 2 then bal ll lv ld (join lr v d r) else
+      if rh > lh + 2 then bal (join l v d rl) rv rd rr else
+        create l v d r
 
-    (* Merge two trees l and r into one.
-       All elements of l must precede the elements of r.
-       No assumption on the heights of l and r. *)
+  (* Merge two trees l and r into one.
+     All elements of l must precede the elements of r.
+     No assumption on the heights of l and r. *)
 
-    let concat t1 t2 =
-      match (t1, t2) with
-        (Empty, t) -> t
-      | (t, Empty) -> t
-      | (_, _) ->
-          let (x, d) = min_binding t2 in
-          join t1 x d (remove_min_binding t2)
+  let concat t1 t2 =
+    match (t1, t2) with
+      (Empty, t) -> t
+    | (t, Empty) -> t
+    | (_, _) ->
+      let (x, d) = min_binding t2 in
+      join t1 x d (remove_min_binding t2)
 
-    let concat_or_join t1 v d t2 =
-      match d with
-      | Some d -> join t1 v d t2
-      | None -> concat t1 t2
+  let concat_or_join t1 v d t2 =
+    match d with
+    | Some d -> join t1 v d t2
+    | None -> concat t1 t2
 
-    let rec split x = function
-        Empty ->
-          (Empty, None, Empty)
-      | Node(l, v, d, r, _, _) ->
-          let c = Ord.compare x v in
-          if c = 0 then (l, Some d, r)
-          else if c < 0 then
-            let (ll, pres, rl) = split x l in (ll, pres, join rl v d r)
-          else
-            let (lr, pres, rr) = split x r in (join l v d lr, pres, rr)
+  let rec split x = function
+      Empty ->
+      (Empty, None, Empty)
+    | Node(l, v, d, r, _, _) ->
+      let c = Ord.compare x v in
+      if c = 0 then (l, Some d, r)
+      else if c < 0 then
+        let (ll, pres, rl) = split x l in (ll, pres, join rl v d r)
+      else
+        let (lr, pres, rr) = split x r in (join l v d lr, pres, rr)
 
-    let rec merge f s1 s2 =
-      match (s1, s2) with
-        (Empty, Empty) -> Empty
-      | (Node (l1, v1, d1, r1, h1, _), _) when h1 >= height s2 ->
-          let (l2, d2, r2) = split v1 s2 in
-          concat_or_join (merge f l1 l2) v1 (f v1 (Some d1) d2) (merge f r1 r2)
-      | (_, Node (l2, v2, d2, r2, _h2, _)) ->
-          let (l1, d1, r1) = split v2 s1 in
-          concat_or_join (merge f l1 l2) v2 (f v2 d1 (Some d2)) (merge f r1 r2)
-      | _ ->
-          assert false
+  let rec merge f s1 s2 =
+    match (s1, s2) with
+      (Empty, Empty) -> Empty
+    | (Node (l1, v1, d1, r1, h1, _), _) when h1 >= height s2 ->
+      let (l2, d2, r2) = split v1 s2 in
+      concat_or_join (merge f l1 l2) v1 (f v1 (Some d1) d2) (merge f r1 r2)
+    | (_, Node (l2, v2, d2, r2, _h2, _)) ->
+      let (l1, d1, r1) = split v2 s1 in
+      concat_or_join (merge f l1 l2) v2 (f v2 d1 (Some d2)) (merge f r1 r2)
+    | _ ->
+      assert false
 
   type enumeration = End | More of key * Value.t * rangemap * enumeration
 
@@ -331,7 +331,7 @@ module Make(Ord: Datatype.S)(Value: Value) = struct
       | (_, End) -> false
       | (More(v1, d1, r1, e1), More(v2, d2, r2, e2)) ->
         Ord.equal v1 v2 && Value.equal d1 d2 &&
-      equal_aux (cons_enum r1 e1) (cons_enum r2 e2)
+        equal_aux (cons_enum r1 e1) (cons_enum r2 e2)
     in
     equal_aux (cons_enum m1 End) (cons_enum m2 End)
 
@@ -339,21 +339,21 @@ module Make(Ord: Datatype.S)(Value: Value) = struct
     let rec aux e1 e2 r = match e1, e2 with
       | (End, End) -> r
       | (End, More (k, v, t, e)) ->
-          f k None (Some v) (aux End (cons_enum t e) r)
+        f k None (Some v) (aux End (cons_enum t e) r)
       | (More (k, v, t, e), End) ->
-          f k (Some v) None (aux (cons_enum t e) End r)
+        f k (Some v) None (aux (cons_enum t e) End r)
       | (More (k1, v1, t1, e1'), More (k2, v2, t2, e2')) ->
-          let c = Ord.compare k1 k2 in
-          if c = 0 then
-            f k1 (Some v1) (Some v2)
-              (aux (cons_enum t1 e1') (cons_enum t2 e2') r)
-          else if c < 0 then
-            f k1 (Some v1) None
-              (aux (cons_enum t1 e1') e2 r)
-          else
-            f k2 (Some v2) None
-              (aux e1 (cons_enum t2 e2') r)
-      in aux (cons_enum m1 End) (cons_enum m2 End) r
+        let c = Ord.compare k1 k2 in
+        if c = 0 then
+          f k1 (Some v1) (Some v2)
+            (aux (cons_enum t1 e1') (cons_enum t2 e2') r)
+        else if c < 0 then
+          f k1 (Some v1) None
+            (aux (cons_enum t1 e1') e2 r)
+        else
+          f k2 (Some v2) None
+            (aux e1 (cons_enum t2 e2') r)
+    in aux (cons_enum m1 End) (cons_enum m2 End) r
 
   (* iter2, exists2 and for_all2 are essentially the same implementation
      as fold2 with the appropriate default value and operator, but
@@ -362,41 +362,41 @@ module Make(Ord: Datatype.S)(Value: Value) = struct
     let rec aux e1 e2 = match e1, e2 with
       | (End, End) -> ()
       | (End, More (k, v, t, e)) ->
-          f k None (Some v); aux End (cons_enum t e)
+        f k None (Some v); aux End (cons_enum t e)
       | (More (k, v, t, e), End) ->
-          f k (Some v) None; aux (cons_enum t e) End
+        f k (Some v) None; aux (cons_enum t e) End
       | (More (k1, v1, t1, e1'), More (k2, v2, t2, e2')) ->
-          let c = Ord.compare k1 k2 in
-          if c = 0 then (
-            f k1 (Some v1) (Some v2);
-            aux (cons_enum t1 e1') (cons_enum t2 e2')
-          ) else if c < 0 then (
-            f k1 (Some v1) None;
-            aux (cons_enum t1 e1') e2
-          ) else (
-            f k2 (Some v2) None;
-            aux e1 (cons_enum t2 e2')
-          )
+        let c = Ord.compare k1 k2 in
+        if c = 0 then (
+          f k1 (Some v1) (Some v2);
+          aux (cons_enum t1 e1') (cons_enum t2 e2')
+        ) else if c < 0 then (
+          f k1 (Some v1) None;
+          aux (cons_enum t1 e1') e2
+        ) else (
+          f k2 (Some v2) None;
+          aux e1 (cons_enum t2 e2')
+        )
     in aux (cons_enum m1 End) (cons_enum m2 End)
 
   let exists2 f m1 m2 =
     let rec aux e1 e2 = match e1, e2 with
       | (End, End) -> false
       | (End, More (k, v, t, e)) ->
-          f k None (Some v) || aux End (cons_enum t e)
+        f k None (Some v) || aux End (cons_enum t e)
       | (More (k, v, t, e), End) ->
-          f k (Some v) None || aux (cons_enum t e) End
+        f k (Some v) None || aux (cons_enum t e) End
       | (More (k1, v1, t1, e1'), More (k2, v2, t2, e2')) ->
-          let c = Ord.compare k1 k2 in
-          if c = 0 then
-            f k1 (Some v1) (Some v2) ||
-            aux (cons_enum t1 e1') (cons_enum t2 e2')
-          else if c < 0 then
-            f k1 (Some v1) None ||
-            aux (cons_enum t1 e1') e2
-          else
-            f k2 (Some v2) None ||
-            aux e1 (cons_enum t2 e2')
+        let c = Ord.compare k1 k2 in
+        if c = 0 then
+          f k1 (Some v1) (Some v2) ||
+          aux (cons_enum t1 e1') (cons_enum t2 e2')
+        else if c < 0 then
+          f k1 (Some v1) None ||
+          aux (cons_enum t1 e1') e2
+        else
+          f k2 (Some v2) None ||
+          aux e1 (cons_enum t2 e2')
     in aux (cons_enum m1 End) (cons_enum m2 End)
 
 
@@ -404,20 +404,20 @@ module Make(Ord: Datatype.S)(Value: Value) = struct
     let rec aux e1 e2 = match e1, e2 with
       | (End, End) -> true
       | (End, More (k, v, t, e)) ->
-          f k None (Some v) && aux End (cons_enum t e)
+        f k None (Some v) && aux End (cons_enum t e)
       | (More (k, v, t, e), End) ->
-          f k (Some v) None && aux (cons_enum t e) End
+        f k (Some v) None && aux (cons_enum t e) End
       | (More (k1, v1, t1, e1'), More (k2, v2, t2, e2')) ->
-          let c = Ord.compare k1 k2 in
-          if c = 0 then
-            f k1 (Some v1) (Some v2) &&
-            aux (cons_enum t1 e1') (cons_enum t2 e2')
-          else if c < 0 then
-            f k1 (Some v1) None &&
-            aux (cons_enum t1 e1') e2
-          else
-            f k2 (Some v2) None &&
-            aux e1 (cons_enum t2 e2')
+        let c = Ord.compare k1 k2 in
+        if c = 0 then
+          f k1 (Some v1) (Some v2) &&
+          aux (cons_enum t1 e1') (cons_enum t2 e2')
+        else if c < 0 then
+          f k1 (Some v1) None &&
+          aux (cons_enum t1 e1') e2
+        else
+          f k2 (Some v2) None &&
+          aux e1 (cons_enum t2 e2')
     in aux (cons_enum m1 End) (cons_enum m2 End)
 
 
@@ -491,58 +491,58 @@ module Make(Ord: Datatype.S)(Value: Value) = struct
 
 
   include Datatype.Make
-  (struct
-    type t = rangemap
-    let name = "(" ^ Ord.name ^ ", " ^ Value.name ^ ") rangemap"
-    open Structural_descr
-    let r = Recursive.create ()
-    let structural_descr =
-      t_sum
-        [| [| recursive_pack r;
-              Ord.packed_descr;
-              Value.packed_descr;
-              recursive_pack r;
-              p_int;
-              p_int |] |]
-    let () = Recursive.update r structural_descr
-    let reprs =
-      List.fold_left
-        (fun acc k ->
+      (struct
+        type t = rangemap
+        let name = "(" ^ Ord.name ^ ", " ^ Value.name ^ ") rangemap"
+        open Structural_descr
+        let r = Recursive.create ()
+        let structural_descr =
+          t_sum
+            [| [| recursive_pack r;
+                  Ord.packed_descr;
+                  Value.packed_descr;
+                  recursive_pack r;
+                  p_int;
+                  p_int |] |]
+        let () = Recursive.update r structural_descr
+        let reprs =
           List.fold_left
-            (fun acc v -> (Node(Empty, k, v, Empty, 0, 0)) :: acc)
-            acc
-            Value.reprs)
-        [ Empty ]
-        Ord.reprs
-    let equal = equal
-    let compare = compare
-    let hash = hash
-    let rehash = Datatype.identity
-    let copy =
-      if Ord.copy == Datatype.undefined || Value.copy == Datatype.undefined
-      then Datatype.undefined
-      else
-        let rec aux = 
-          function
-            | Empty -> Empty
-            | Node (l,x,d,r,_,_) ->
-              let l = aux l in
-              let x = Ord.copy x in
-              let d = Value.copy d in
-              let r = aux r in
-              create l x d r
-        in aux
+            (fun acc k ->
+               List.fold_left
+                 (fun acc v -> (Node(Empty, k, v, Empty, 0, 0)) :: acc)
+                 acc
+                 Value.reprs)
+            [ Empty ]
+            Ord.reprs
+        let equal = equal
+        let compare = compare
+        let hash = hash
+        let rehash = Datatype.identity
+        let copy =
+          if Ord.copy == Datatype.undefined || Value.copy == Datatype.undefined
+          then Datatype.undefined
+          else
+            let rec aux =
+              function
+              | Empty -> Empty
+              | Node (l,x,d,r,_,_) ->
+                let l = aux l in
+                let x = Ord.copy x in
+                let d = Value.copy d in
+                let r = aux r in
+                create l x d r
+            in aux
 
-    let internal_pretty_code = Datatype.undefined
-    let pretty = Datatype.undefined
-    let varname = Datatype.undefined
-    let mem_project =
-      if Ord.mem_project == Datatype.never_any_project &&
-        Value.mem_project == Datatype.never_any_project then
-          Datatype.never_any_project
-      else
-        (fun s -> exists (fun k v -> Ord.mem_project s k || Value.mem_project s v))
-   end)
+        let internal_pretty_code = Datatype.undefined
+        let pretty = Datatype.undefined
+        let varname = Datatype.undefined
+        let mem_project =
+          if Ord.mem_project == Datatype.never_any_project &&
+             Value.mem_project == Datatype.never_any_project then
+            Datatype.never_any_project
+          else
+            (fun s -> exists (fun k v -> Ord.mem_project s k || Value.mem_project s v))
+      end)
   let () = Type.set_ml_name ty None
 
 end

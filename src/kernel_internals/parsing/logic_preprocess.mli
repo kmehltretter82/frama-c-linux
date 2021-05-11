@@ -32,7 +32,7 @@
     to the name of intermediate files generated for pre-processing annotations
     (gcc pre-processing differs between .c and .cxx files)
 
-    @raises Sys_error if the file cannot be opened. 
+    @raises Sys_error if the file cannot be opened.
 
     @modifies Oxygen-20120901: added suffix argument
 

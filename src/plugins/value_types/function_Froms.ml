@@ -22,7 +22,7 @@
 
 open Locations
 
-module Deps = 
+module Deps =
 struct
 
   type deps = {
@@ -33,35 +33,35 @@ struct
   let to_zone {data; indirect} = Zone.join data indirect
 
   module DatatypeFromDeps = Datatype.Make(struct
-    type t = deps
+      type t = deps
 
-    let name = "Function_Froms.Deps.from_deps"
+      let name = "Function_Froms.Deps.from_deps"
 
-    let hash fd =
-      Zone.hash fd.data + 37 * Zone.hash fd.indirect
+      let hash fd =
+        Zone.hash fd.data + 37 * Zone.hash fd.indirect
 
-    let compare fd1 fd2 =
-      let c = Zone.compare fd1.data fd2.data in
-      if c <> 0 then c
-      else Zone.compare fd1.indirect fd2.indirect
+      let compare fd1 fd2 =
+        let c = Zone.compare fd1.data fd2.data in
+        if c <> 0 then c
+        else Zone.compare fd1.indirect fd2.indirect
 
-    let equal = Datatype.from_compare
+      let equal = Datatype.from_compare
 
-    let pretty fmt d = Zone.pretty fmt (to_zone d)
+      let pretty fmt d = Zone.pretty fmt (to_zone d)
 
-    let reprs =
-      List.map (fun z -> {data = z; indirect = z}) Zone.reprs
+      let reprs =
+        List.map (fun z -> {data = z; indirect = z}) Zone.reprs
 
-    let structural_descr =
-      Structural_descr.t_record [| Zone.packed_descr; Zone.packed_descr; |]
-    let rehash = Datatype.identity
+      let structural_descr =
+        Structural_descr.t_record [| Zone.packed_descr; Zone.packed_descr; |]
+      let rehash = Datatype.identity
 
-    let mem_project = Datatype.never_any_project
-    let varname _ = "da"
+      let mem_project = Datatype.never_any_project
+      let varname _ = "da"
 
-    let internal_pretty_code = Datatype.undefined
-    let copy = Datatype.undefined
-  end)
+      let internal_pretty_code = Datatype.undefined
+      let copy = Datatype.undefined
+    end)
 
   include DatatypeFromDeps
 
@@ -73,14 +73,14 @@ struct
       Format.fprintf fmt "\\nothing"
     | true, false ->
       Format.fprintf fmt "direct: %a"
-	Zone.pretty data
+        Zone.pretty data
     | false, true ->
       Format.fprintf fmt "indirect: %a"
-	Zone.pretty indirect
+        Zone.pretty indirect
     | false, false ->
       Format.fprintf fmt "indirect: %a; direct: %a"
-	Zone.pretty indirect
-	Zone.pretty data
+        Zone.pretty indirect
+        Zone.pretty data
 
   let from_data_deps z = { data = z; indirect = Zone.bottom }
   let from_indirect_deps z = { data = Zone.bottom; indirect = z }
@@ -128,62 +128,62 @@ end
 module DepsOrUnassigned = struct
 
   type deps_or_unassigned =
-  | DepsBottom
-  | Unassigned
-  | AssignedFrom of Deps.t
-  | MaybeAssignedFrom of Deps.t
+    | DepsBottom
+    | Unassigned
+    | AssignedFrom of Deps.t
+    | MaybeAssignedFrom of Deps.t
 
   module DatatypeDeps = Datatype.Make(struct
-    type t = deps_or_unassigned
+      type t = deps_or_unassigned
 
-    let name = "Function_Froms.Deps.deps"
+      let name = "Function_Froms.Deps.deps"
 
-    let pretty fmt = function
-      | DepsBottom -> Format.pp_print_string fmt "DEPS_BOTTOM"
-      | Unassigned -> Format.pp_print_string fmt "UNASSIGNED"
-      | AssignedFrom fd -> Deps.pretty_precise fmt fd
-      | MaybeAssignedFrom fd ->
-        (* '(or UNASSIGNED)' would be a better pretty-printer, we use
-           '(and SELF)' only for compatibility reasons *)
-        Format.fprintf fmt "%a (and SELF)" Deps.pretty_precise fd
+      let pretty fmt = function
+        | DepsBottom -> Format.pp_print_string fmt "DEPS_BOTTOM"
+        | Unassigned -> Format.pp_print_string fmt "UNASSIGNED"
+        | AssignedFrom fd -> Deps.pretty_precise fmt fd
+        | MaybeAssignedFrom fd ->
+          (* '(or UNASSIGNED)' would be a better pretty-printer, we use
+             '(and SELF)' only for compatibility reasons *)
+          Format.fprintf fmt "%a (and SELF)" Deps.pretty_precise fd
 
-    let hash = function
-      | DepsBottom -> 3
-      | Unassigned -> 17
-      | AssignedFrom fd -> 37 + 13 * Deps.hash fd
-      | MaybeAssignedFrom fd -> 57 + 123 * Deps.hash fd
+      let hash = function
+        | DepsBottom -> 3
+        | Unassigned -> 17
+        | AssignedFrom fd -> 37 + 13 * Deps.hash fd
+        | MaybeAssignedFrom fd -> 57 + 123 * Deps.hash fd
 
-    let compare d1 d2 = match d1, d2 with
-      | DepsBottom, DepsBottom
-      | Unassigned, Unassigned -> 0
-      | AssignedFrom fd1, AssignedFrom fd2
-      | MaybeAssignedFrom fd1, MaybeAssignedFrom fd2 ->
-        Deps.compare fd1 fd2
-      | DepsBottom, (Unassigned | AssignedFrom _ | MaybeAssignedFrom _)
-      | Unassigned, (AssignedFrom _ | MaybeAssignedFrom _)
-      | AssignedFrom _, MaybeAssignedFrom _ ->
-        -1
-      | (Unassigned | AssignedFrom _ | MaybeAssignedFrom _), DepsBottom
-      | (AssignedFrom _ | MaybeAssignedFrom _), Unassigned
-      | MaybeAssignedFrom _, AssignedFrom _ ->
-        1
+      let compare d1 d2 = match d1, d2 with
+        | DepsBottom, DepsBottom
+        | Unassigned, Unassigned -> 0
+        | AssignedFrom fd1, AssignedFrom fd2
+        | MaybeAssignedFrom fd1, MaybeAssignedFrom fd2 ->
+          Deps.compare fd1 fd2
+        | DepsBottom, (Unassigned | AssignedFrom _ | MaybeAssignedFrom _)
+        | Unassigned, (AssignedFrom _ | MaybeAssignedFrom _)
+        | AssignedFrom _, MaybeAssignedFrom _ ->
+          -1
+        | (Unassigned | AssignedFrom _ | MaybeAssignedFrom _), DepsBottom
+        | (AssignedFrom _ | MaybeAssignedFrom _), Unassigned
+        | MaybeAssignedFrom _, AssignedFrom _ ->
+          1
 
-    let equal = Datatype.from_compare
+      let equal = Datatype.from_compare
 
-    let reprs = Unassigned :: List.map (fun r -> AssignedFrom r) Deps.reprs
+      let reprs = Unassigned :: List.map (fun r -> AssignedFrom r) Deps.reprs
 
-    let structural_descr =
-      let d = Deps.packed_descr in
-      Structural_descr.t_sum [| [| d |]; [| d |] |]
-    let rehash = Datatype.identity
+      let structural_descr =
+        let d = Deps.packed_descr in
+        Structural_descr.t_sum [| [| d |]; [| d |] |]
+      let rehash = Datatype.identity
 
-    let mem_project = Datatype.never_any_project
-    let varname _ = "d"
+      let mem_project = Datatype.never_any_project
+      let varname _ = "d"
 
-    let internal_pretty_code = Datatype.undefined
-    let copy = Datatype.undefined
+      let internal_pretty_code = Datatype.undefined
+      let copy = Datatype.undefined
 
-  end)
+    end)
 
   let join d1 d2 = match d1, d2 with
     | DepsBottom, d | d, DepsBottom -> d
@@ -275,7 +275,7 @@ module DepsOrUnassigned = struct
       Format.fprintf fmt "%a (and SELF)" Zone.pretty (Deps.to_zone d)
 end
 
-module Memory = struct 
+module Memory = struct
   (** A From table is internally represented as a Lmap of [DepsOrUnassigned].
       However, the API mostly hides this fact, and exports access functions
       that take or return [Deps.t] values. This way, the user needs not
@@ -478,7 +478,7 @@ module Memory = struct
     let open Deps in
     let { data; indirect } = deps in
     (* depending directly on an indirect dependency -> indirect,
-     depending indirectly on a direct dependency  -> indirect *)
+       depending indirectly on a direct dependency  -> indirect *)
     let dirdeps = substitute_data_deps call_site_froms data in
     let inddeps = substitute_indirect_deps call_site_froms indirect in
     let dir = dirdeps.data in
@@ -510,8 +510,8 @@ module Memory = struct
 end
 
 type froms =
-    { deps_return : Memory.return;
-      deps_table : Memory.t }
+  { deps_return : Memory.return;
+    deps_table : Memory.t }
 
 let top = {
   deps_return = Memory.top_return;
@@ -529,23 +529,23 @@ let outputs { deps_table = t } =
   | Memory.Map(m) ->
     Memory.fold
       (fun z v acc ->
-	let open DepsOrUnassigned in
-	match v with
-	| DepsBottom | Unassigned -> acc
-	| AssignedFrom _ | MaybeAssignedFrom _ -> Locations.Zone.join z acc)
+         let open DepsOrUnassigned in
+         match v with
+         | DepsBottom | Unassigned -> acc
+         | AssignedFrom _ | MaybeAssignedFrom _ -> Locations.Zone.join z acc)
       m Locations.Zone.bottom
 
 let inputs ?(include_self=false) t =
   let aux b offm acc =
     Memory.LOffset.fold
       (fun itvs deps acc ->
-        let z = DepsOrUnassigned.to_zone deps in
-        let self = DepsOrUnassigned.may_be_unassigned deps in
-        let acc = Zone.join z acc in
-        match include_self, self, b with
-          | true, true, Some b ->
-            Zone.join acc (Zone.inject b itvs)
-          | _ -> acc
+         let z = DepsOrUnassigned.to_zone deps in
+         let self = DepsOrUnassigned.may_be_unassigned deps in
+         let acc = Zone.join z acc in
+         match include_self, self, b with
+         | true, true, Some b ->
+           Zone.join acc (Zone.inject b itvs)
+         | _ -> acc
       )
       offm
       acc
@@ -566,19 +566,19 @@ let pretty fmt { deps_return = r ; deps_table = t } =
 (** same as pretty, but uses the type of the function to output more
     precise information.
     @raise Error if the given type is not a function type
- *)
+*)
 let pretty_with_type ~indirect typ fmt { deps_return = r; deps_table = t } =
   let (rt_typ,_,_,_) = Cil.splitFunctionType typ in
   if Memory.is_bottom t
   then Format.fprintf fmt
-    "@[NON TERMINATING - NO EFFECTS@]"
+      "@[NON TERMINATING - NO EFFECTS@]"
   else
     let map_pretty =
-      if indirect 
+      if indirect
       then Memory.pretty_ind_data
-      else Memory.pretty 
+      else Memory.pretty
     in
-    if Cil.isVoidType rt_typ 
+    if Cil.isVoidType rt_typ
     then begin
       if Memory.is_empty t
       then Format.fprintf fmt "@[NO EFFECTS@]"
@@ -610,27 +610,27 @@ include Datatype.Make
       let reprs =
         List.fold_left
           (fun acc o ->
-            List.fold_left
-              (fun acc m -> { deps_return = o; deps_table = m } :: acc)
-              acc
-              Memory.reprs)
+             List.fold_left
+               (fun acc m -> { deps_return = o; deps_table = m } :: acc)
+               acc
+               Memory.reprs)
           []
           Deps.reprs
       let structural_descr =
         Structural_descr.t_record
           [| Deps.packed_descr;
              Memory.packed_descr |]
-       let name = "Function_Froms"
-       let hash = hash
-       let compare = Datatype.undefined
-       let equal = equal
-       let pretty = pretty
-       let internal_pretty_code = Datatype.undefined
-       let rehash = Datatype.identity
-       let copy = Datatype.undefined
-       let varname = Datatype.undefined
-       let mem_project = Datatype.never_any_project
-     end)
+      let name = "Function_Froms"
+      let hash = hash
+      let compare = Datatype.undefined
+      let equal = equal
+      let pretty = pretty
+      let internal_pretty_code = Datatype.undefined
+      let rehash = Datatype.identity
+      let copy = Datatype.undefined
+      let varname = Datatype.undefined
+      let mem_project = Datatype.never_any_project
+    end)
 
 (*
 Local Variables:

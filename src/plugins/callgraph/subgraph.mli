@@ -22,20 +22,20 @@
 
 (** Subgraph from a given vertex *)
 module Make
-  (G: sig
-    (** Graph datastructure *)
-    include Graph.Sig.G
-    val create: ?size:int -> unit -> t
-    val add_edge_e: t -> E.t -> unit
-  end)
-  (D: Datatype.S with type t = G.t  (** Graph datatype *))
-  (Info: sig
-    (** additional information *)
-    val self: State.t
-    val name: string (** name of the state *)
-    val get: unit -> G.t
-    val vertex: Kernel_function.t -> G.V.t
-  end) :
+    (G: sig
+       (** Graph datastructure *)
+       include Graph.Sig.G
+       val create: ?size:int -> unit -> t
+       val add_edge_e: t -> E.t -> unit
+     end)
+    (D: Datatype.S with type t = G.t  (** Graph datatype *))
+    (Info: sig
+       (** additional information *)
+       val self: State.t
+       val name: string (** name of the state *)
+       val get: unit -> G.t
+       val vertex: Kernel_function.t -> G.V.t
+     end) :
 sig
   val get: unit -> G.t
   val self: State.t

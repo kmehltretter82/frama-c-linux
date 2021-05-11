@@ -52,10 +52,10 @@ let pp_from_file fmt file =
     done
   with
   | End_of_file ->
-      close_in cin
+    close_in cin
   | err ->
-      close_in cin ;
-      raise err
+    close_in cin ;
+    raise err
 
 let rec bincopy buffer cin cout =
   let s = Bytes.length buffer in
@@ -157,19 +157,19 @@ let full_command_async cmd args ~stdin ~stdout ~stderr =
      match !last_result with
      | Result _ as r -> r
      | Not_ready _ as r ->
-         let child_id,status =
-           Unix.waitpid [Unix.WNOHANG; Unix.WUNTRACED] pid
-         in
-         if child_id = 0 then r
-         else (last_result := Result status; !last_result))
+       let child_id,status =
+         Unix.waitpid [Unix.WNOHANG; Unix.WUNTRACED] pid
+       in
+       if child_id = 0 then r
+       else (last_result := Result status; !last_result))
 
 let flush b f =
   match b with
   | None -> ()
   | Some b ->
-      try read_lines f
-            (fun line -> Buffer.add_string b line ; Buffer.add_char b '\n') ;
-      with Sys_error _ -> ()
+    try read_lines f
+          (fun line -> Buffer.add_string b line ; Buffer.add_char b '\n') ;
+    with Sys_error _ -> ()
 
 (*[LC] return the cancel function *)
 let cancelable_at_exit job =
@@ -222,18 +222,18 @@ let command_generic ~async ?stdout ?stderr cmd args =
     match !last_result with
     | Result _p as r -> r
     | Not_ready _ as r ->
-        let child_id,status = Unix.waitpid wait_flags pid in
-        if child_id = 0 then (assert async;r)
-        else
-          begin
-            let result = Result status in
-            flush stdout outf ;
-            flush stderr errf ;
-            delete () ;
-            deleted () ;
-            killed () ;
-            result
-          end
+      let child_id,status = Unix.waitpid wait_flags pid in
+      if child_id = 0 then (assert async;r)
+      else
+        begin
+          let result = Result status in
+          flush stdout outf ;
+          flush stderr errf ;
+          delete () ;
+          deleted () ;
+          killed () ;
+          result
+        end
   end
 
 let command_async ?stdout ?stderr cmd args =
@@ -248,19 +248,19 @@ let command ?(timeout=0) ?stdout ?stderr cmd args =
     let running () =
       match f () with
       | Not_ready terminate ->
-          begin
-            try
-              Db.yield () ;
-              if timeout > 0 && Unix.gettimeofday () -. !start > ftimeout then
-                raise Db.Cancel ;
-              true
-            with Db.Cancel as e ->
-              terminate ();
-              raise e
-          end
+        begin
+          try
+            Db.yield () ;
+            if timeout > 0 && Unix.gettimeofday () -. !start > ftimeout then
+              raise Db.Cancel ;
+            true
+          with Db.Cancel as e ->
+            terminate ();
+            raise e
+        end
       | Result r ->
-          res := r;
-          false
+        res := r;
+        false
     in while running () do Unix.sleepf 0.1 done ; !res
   else
     let f = command_generic ~async:false ?stdout ?stderr cmd args in

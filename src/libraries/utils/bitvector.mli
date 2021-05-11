@@ -31,11 +31,11 @@ type t
 val create : int -> t (** Create a vector of [n] bits, with all bits unset. *)
 val create_set : int -> t (** Create a vector of [n] bits, with all bits set.*)
 
-val capacity : t -> int 
+val capacity : t -> int
 (** Maximum number of bits in the bitvector. *)
 
-val resize : int -> t -> t 
-(** A copy of the bitvector up-to or down-to [n] bits. 
+val resize : int -> t -> t
+(** A copy of the bitvector up-to or down-to [n] bits.
     Extra bits up to final bitvector capacity are set to zero. *)
 
 val mem : t -> int -> bool
@@ -49,7 +49,7 @@ val equal: t -> t -> bool
 val compare: t -> t -> int
 val hash: t -> int
 
-(** {2 Bitwise Binary Operations} 
+(** {2 Bitwise Binary Operations}
     The first argument is the size of the vectors. *)
 
 val bnot: int -> t -> t
@@ -58,7 +58,7 @@ val bor: int -> t -> t -> t
 val bxor: int -> t -> t -> t        (* bitwise difference *)
 val beq: int -> t -> t -> t         (* bitwise equivalence/equality *)
 
-(** {2 Generic Bitwise Operations}. 
+(** {2 Generic Bitwise Operations}.
     Prefer using these rather than create intermediary bitvectors. *)
 
 val bitwise_op2: int -> (int -> int -> int) -> t -> t -> t
@@ -68,17 +68,17 @@ val bitwise_op4: int -> (int -> int -> int -> int -> int) -> t -> t -> t -> t ->
 (** {2 Sized Concatenation} *)
 
 val concat: t -> int -> t -> int -> t
-(** [concat b1 s1 b2 s2] concatenates 
-    the [s1] first bits of [b1] with 
+(** [concat b1 s1 b2 s2] concatenates
+    the [s1] first bits of [b1] with
     the [s2] first bits of [b2]. *)
 
 (** {2 Misc} *)
 
 val iter_true : (int -> unit) -> t -> unit
-  (** Iterates on all indexes of the bitvector with their bit set. *)
+(** Iterates on all indexes of the bitvector with their bit set. *)
 
 val fold_true : ('a -> int -> 'a) -> 'a -> t -> 'a
-  (** Iterates on all indexes of the bitvector with their bit set. *)
+(** Iterates on all indexes of the bitvector with their bit set. *)
 
 val find_next_true: t -> int -> int
 (** [find_next_true i a] returns the first index greater or equal to
@@ -87,8 +87,8 @@ val find_next_true: t -> int -> int
     larger than the array, then raise [Not_found]. *)
 
 val pretty : Format.formatter -> t -> unit
-  (** Bit vector, as blocs of 8-bits separated by space,
-      first bits to last bits from left to right. *)
+(** Bit vector, as blocs of 8-bits separated by space,
+    first bits to last bits from left to right. *)
 
 val pp_bits : Format.formatter -> int -> unit
-  (** 0b... format, for bytes only, most significant bits on left. *)
+(** 0b... format, for bytes only, most significant bits on left. *)

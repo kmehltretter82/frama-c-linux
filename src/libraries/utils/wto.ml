@@ -26,10 +26,10 @@
     by a list of components topologically ordered. *)
 type 'n component =
   | Component of 'n * 'n partition
-    (** A strongly connected component, described by its head node and the
-        remaining sub-components topologically ordered *)
+  (** A strongly connected component, described by its head node and the
+      remaining sub-components topologically ordered *)
   | Node of 'n
-    (** A single node without self loop *)
+  (** A single node without self loop *)
 
 (** A list of strongly connected components, sorted topologically *)
 and 'n partition = 'n component list
@@ -74,7 +74,7 @@ let flatten wto =
    - Each time we visit a node n, we push it on a stack. After the
      visit, n is popped, unless a path exists from n to an element
      earlier on the stack. So the stack contains elements currently
-     visited or that belongs to a non-trivial scc. Moreover, they 
+     visited or that belongs to a non-trivial scc. Moreover, they
      are in topological order.
 
    About the proof of Tarjan:

@@ -25,7 +25,7 @@ open Cil_datatype
 
 let rec pp_stmt fmt s = match s.skind with
   | Instr _ | Return _ | Goto _ | Break _ | Continue _ | TryFinally _
-  | TryExcept _ | Throw _ | TryCatch _ -> 
+  | TryExcept _ | Throw _ | TryCatch _ ->
     Printer.without_annot Printer.pp_stmt fmt s
   | If (e, _, _, _) ->
     Format.fprintf fmt "if(%a) <..>" Printer.pp_exp e
@@ -34,16 +34,16 @@ let rec pp_stmt fmt s = match s.skind with
   | Loop _ -> Format.fprintf fmt "while (...)"
   | Block b ->
     begin match b.bstmts with
-    | [] -> Format.fprintf fmt "<Block {}>"
-    | s :: _ -> Format.fprintf fmt "<Block { %a }>" pp_stmt s
+      | [] -> Format.fprintf fmt "<Block {}>"
+      | s :: _ -> Format.fprintf fmt "<Block { %a }>" pp_stmt s
     end
   | UnspecifiedSequence _ -> Format.fprintf fmt "TODO"
 
 let print_results fmt a =
   Pretty_utils.pp_list
-    (fun fmt s -> 
-      Format.fprintf fmt "@[<hov 2>%a (sid %d): %a@]" 
-	Printer.pp_location (Stmt.loc s) s.sid pp_stmt s
+    (fun fmt s ->
+       Format.fprintf fmt "@[<hov 2>%a (sid %d): %a@]"
+         Printer.pp_location (Stmt.loc s) s.sid pp_stmt s
     ) fmt a
 
 let compute_from_stmt stmt =
@@ -99,11 +99,11 @@ let slice (stmts:stmt list) =
 let all_pragmas_kf l =
   List.fold_left
     (fun acc (s, a) ->
-      match a.annot_content with
-        | APragma (Impact_pragma IPstmt) -> s :: acc
-        | APragma (Impact_pragma (IPexpr _)) ->
-            Options.not_yet_implemented "impact pragmas: expr"
-        | _ -> assert false)
+       match a.annot_content with
+       | APragma (Impact_pragma IPstmt) -> s :: acc
+       | APragma (Impact_pragma (IPexpr _)) ->
+         Options.not_yet_implemented "impact pragmas: expr"
+       | _ -> assert false)
     [] l
 
 let compute_pragmas () =
@@ -120,8 +120,8 @@ let compute_pragmas () =
       pragmas :=
         List.map
           (fun a -> s, a)
-        (Annotations.code_annot ~filter:Logic_utils.is_impact_pragma s)
-      @ !pragmas;
+          (Annotations.code_annot ~filter:Logic_utils.is_impact_pragma s)
+        @ !pragmas;
       Cil.DoChildren
   end
   in
@@ -129,19 +129,19 @@ let compute_pragmas () =
   let pragmas =
     Options.Pragma.fold
       (fun kf acc ->
-        (* Pragma option only accept defined functions. *)
-        let f = Kernel_function.get_definition kf in
-        ignore (Visitor.visitFramacFunction visitor f);
-        if !pragmas != [] then (kf, !pragmas) :: acc else acc)
+         (* Pragma option only accept defined functions. *)
+         let f = Kernel_function.get_definition kf in
+         ignore (Visitor.visitFramacFunction visitor f);
+         if !pragmas != [] then (kf, !pragmas) :: acc else acc)
       []
   in
   let skip = Compute_impact.skip () in
   (* compute impact analyses on each kf *)
   let nodes = List.fold_left
-    (fun nodes (kf, pragmas) ->
-       let pragmas_stmts = all_pragmas_kf pragmas in
-       Pdg_aux.NS.union nodes (compute_multiple_stmts skip kf pragmas_stmts)
-    ) Pdg_aux.NS.empty pragmas
+      (fun nodes (kf, pragmas) ->
+         let pragmas_stmts = all_pragmas_kf pragmas in
+         Pdg_aux.NS.union nodes (compute_multiple_stmts skip kf pragmas_stmts)
+      ) Pdg_aux.NS.empty pragmas
   in
   let stmts = Compute_impact.nodes_to_stmts nodes in
   if Options.Slicing.get () then ignore (slice stmts);

@@ -40,7 +40,7 @@ val merge_marks : sl_mark list -> sl_mark
 val inter_marks : sl_mark list -> sl_mark
 
 (** [combine_marks] add a new information to the old value.
-* @return (new_mark, is_new)
+ * @return (new_mark, is_new)
            where [is_new=true] if the new mark is not included in the old one.
 *)
 val combine_marks : sl_mark -> sl_mark -> (sl_mark * sl_mark)

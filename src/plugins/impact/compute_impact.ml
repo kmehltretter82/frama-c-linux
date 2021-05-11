@@ -60,58 +60,58 @@ type result = nodes KFM.t
 (* Modelization of a call. The first function (the caller) calls the second
    (the callee) at the given statement. *)
 module KfKfCall = Datatype.Triple_with_collections
-  (Kernel_function)(Kernel_function)(Cil_datatype.Stmt)
-  (struct let module_name = "Impact.Compute.KfKfCall" end)
+    (Kernel_function)(Kernel_function)(Cil_datatype.Stmt)
+    (struct let module_name = "Impact.Compute.KfKfCall" end)
 
 (** Worklist maintained by the plugin to build its results *)
 type worklist = {
   mutable todo: todolist (** nodes that are impacted, but that have not been
-       propagated yet. *);
+                             propagated yet. *);
 
   mutable result: result (** impacted nodes. This field only grows.
-       An invariant is that nodes in [todolist] are not already in [result],
-       except with differing [init] fields. *);
+                             An invariant is that nodes in [todolist] are not already in [result],
+                             except with differing [init] fields. *);
 
   mutable downward_calls: Pdg_aux.call_interface KfKfCall.Map.t
-    (** calls for which an input may be impacted. If so, we must compute the
-       impact within the called function. For each call, we associate to each
-       PDG input of the callee the nodes that define the input in the caller.
-       The contents of this field grow. *);
+(** calls for which an input may be impacted. If so, we must compute the
+    impact within the called function. For each call, we associate to each
+    PDG input of the callee the nodes that define the input in the caller.
+    The contents of this field grow. *);
 
   mutable callers: KFS.t (** all the callers of the functions in which the
-       initial nodes are located. Constant after initialization, used to
-       initialize [upward_calls] below. *);
+                             initial nodes are located. Constant after initialization, used to
+                             initialize [upward_calls] below. *);
 
   mutable upward_calls:  Pdg_aux.call_interface Lazy.t KfKfCall.Map.t
-    (** calls for which an output may be impacted. If so, we must compute the
-       impact after the call in the caller (which is part of the [callers]
-       field by construction). For each output node at the call point in the
-       caller, associate all the nodes of the callee that define this output.
-       The field is lazy: if the impact "dies" before before reaching the call,
-       we may avoid a costly computation. Constant once initialized. *);
+(** calls for which an output may be impacted. If so, we must compute the
+    impact after the call in the caller (which is part of the [callers]
+    field by construction). For each output node at the call point in the
+    caller, associate all the nodes of the callee that define this output.
+    The field is lazy: if the impact "dies" before before reaching the call,
+    we may avoid a costly computation. Constant once initialized. *);
 
   mutable fun_changed_downward: KFS.t (** Functions in which a new pdg node has
-       been found since the last iteration. The impact on downward calls with
-       those callers will have to be computed again. *);
+                                          been found since the last iteration. The impact on downward calls with
+                                          those callers will have to be computed again. *);
 
   mutable fun_changed_upward: KFS.t  (** Functions in which a new pdg node has
-       been found. The impact on upward calls to those callees
-       will have to be computed again. *);
+                                         been found. The impact on upward calls to those callees
+                                         will have to be computed again. *);
 
   mutable skip: Locations.Zone.t (** Locations for which the impact is
-       dismissed. Nodes that involve only those zones are skipped. Constant
-       after initialization *);
+                                     dismissed. Nodes that involve only those zones are skipped. Constant
+                                     after initialization *);
 
   mutable initial_nodes: nodes KFM.t
-       (** Nodes that are part of the initial impact query, or directly
-           equivalent to those (corresponding nodes in a caller). *);
+(** Nodes that are part of the initial impact query, or directly
+    equivalent to those (corresponding nodes in a caller). *);
 
   mutable unimpacted_initial: nodes KFM.t
-       (** Initial nodes (as defined above) that are not "self-impacting"
-           so far. Those nodes will not be part of the final results. *);
+(** Initial nodes (as defined above) that are not "self-impacting"
+    so far. Those nodes will not be part of the final results. *);
 
   mutable reason: reason_graph
-    (** Reasons why nodes in [result] are marked as impacted. *);
+(** Reasons why nodes in [result] are marked as impacted. *);
 
   compute_reason: bool (** compute the field [reason]; may be costly *);
 }
@@ -127,7 +127,7 @@ let result_by_kf wl kf =
 let result_to_node_origin (r: result) : Reason_graph.nodes_origin =
   KFM.fold
     (fun kf ns acc ->
-      NS.fold (fun (n, _) acc -> PdgTypes.Node.Map.add n kf acc) ns acc)
+       NS.fold (fun (n, _) acc -> PdgTypes.Node.Map.add n kf acc) ns acc)
     r PdgTypes.Node.Map.empty
 
 let initial_to_node_set (init: nodes KFM.t) : NS.t =
@@ -150,8 +150,8 @@ let remove_from_unimpacted_initial wl kf (n, z) =
 ;;
 
 (** Add a node to the sets of impacted nodes. Update the various fields
-   of the worklist that need it. [init] indicates that the node
-   is added only because it belongs to the set of initial nodes. *)
+    of the worklist that need it. [init] indicates that the node
+    is added only because it belongs to the set of initial nodes. *)
 let add_to_result wl n kf init =
   if init = false then remove_from_unimpacted_initial wl kf n;
   (* if useful, mark that a new node was found in [kf] *)
@@ -167,30 +167,30 @@ let add_to_result wl n kf init =
     case the node should be skipped entirely *)
 let node_to_skip skip n =
   match !Db.Pdg.node_key n with
-    | Key.SigKey (Signature.In (Signature.InImpl z))
-    | Key.SigKey (Signature.Out (Signature.OutLoc z))
-    | Key.SigCallKey (_, Signature.In (Signature.InImpl z))
-    | Key.SigCallKey (_, Signature.Out (Signature.OutLoc z)) ->
-        Locations.Zone.equal Locations.Zone.bottom
-          (Locations.Zone.diff z skip)
-    | _ -> false
+  | Key.SigKey (Signature.In (Signature.InImpl z))
+  | Key.SigKey (Signature.Out (Signature.OutLoc z))
+  | Key.SigCallKey (_, Signature.In (Signature.InImpl z))
+  | Key.SigCallKey (_, Signature.Out (Signature.OutLoc z)) ->
+    Locations.Zone.equal Locations.Zone.bottom
+      (Locations.Zone.diff z skip)
+  | _ -> false
 
 (** Auxiliary function, used to refuse some nodes that should not go in
     the results *)
 let filter wl (n, z) =
   not (Locations.Zone.is_bottom z) &&
   match !Db.Pdg.node_key n with
-    | Key.SigKey (Signature.In Signature.InCtrl) -> false
-        (* do not consider node [InCtrl]. YYY: find when this may happen *)
-    | Key.VarDecl _ -> false
-        (* do not consider variable declarations. This is probably impossible
-           in a forward analysis anyway. *)
-    | _ ->
-      if node_to_skip wl.skip n then (
-        Options.debug ~once:true ~level:2 "skipping node %a as required"
-          PdgTypes.Node.pretty n;
-        false)
-      else true
+  | Key.SigKey (Signature.In Signature.InCtrl) -> false
+  (* do not consider node [InCtrl]. YYY: find when this may happen *)
+  | Key.VarDecl _ -> false
+  (* do not consider variable declarations. This is probably impossible
+     in a forward analysis anyway. *)
+  | _ ->
+    if node_to_skip wl.skip n then (
+      Options.debug ~once:true ~level:2 "skipping node %a as required"
+        PdgTypes.Node.pretty n;
+      false)
+    else true
 
 (** Add a new edge in the graph explaining the results *)
 let add_to_reason wl ~nsrc ~ndst rt =
@@ -258,16 +258,16 @@ let add_to_do_part_of_initial wl kf pdg n =
        unimpacted_initial fields (it may leave the second later) *)
     Options.debug ~level:2 "node %a is a part of the initial impact"
       Pdg_aux.pretty_node n;
-   let unimpacted_kf = unimpacted_initial_by_kf wl kf in
-   let new_unimpacted = NS.add' n unimpacted_kf in
-   let new_initial = NS.add' n initial_nodes in
-   wl.unimpacted_initial <- KFM.add kf new_unimpacted wl.unimpacted_initial;
-   wl.initial_nodes <- KFM.add kf new_initial wl.initial_nodes;
+    let unimpacted_kf = unimpacted_initial_by_kf wl kf in
+    let new_unimpacted = NS.add' n unimpacted_kf in
+    let new_initial = NS.add' n initial_nodes in
+    wl.unimpacted_initial <- KFM.add kf new_unimpacted wl.unimpacted_initial;
+    wl.initial_nodes <- KFM.add kf new_initial wl.initial_nodes;
   end
 ;;
 
 (** From now on, most functions will pass [init = false] to [add_to_do_aux]. We
-   define an alias instead *)
+    define an alias instead *)
 let add_to_do = add_to_do_aux ~init:false
 
 
@@ -321,61 +321,61 @@ let add_downward_call wl (caller_kf, pdg) (called_kf, called_pdg) stmt =
     field [downward_calls]. *)
 let downward_one_call_node wl (pnode, _ as node) caller_kf pdg =
   match !Db.Pdg.node_key pnode with
-    | Key.SigKey (Signature.In Signature.InCtrl) (* never in the worklist *)
-    | Key.VarDecl _ (* never in the worklist *)
-    | Key.CallStmt _ (* pdg returns a SigCallKey instead *)
-        -> assert false
+  | Key.SigKey (Signature.In Signature.InCtrl) (* never in the worklist *)
+  | Key.VarDecl _ (* never in the worklist *)
+  | Key.CallStmt _ (* pdg returns a SigCallKey instead *)
+    -> assert false
 
-    | Key.SigKey _ | Key.Stmt _ | Key.Label _ ->
-        (* Only intraprocedural part needed, done by
-           [intraprocedural_one_node] *) ()
+  | Key.SigKey _ | Key.Stmt _ | Key.Label _ ->
+    (* Only intraprocedural part needed, done by
+       [intraprocedural_one_node] *) ()
 
-    | Key.SigCallKey(id, key) ->
-      let stmt = Key.call_from_id id in
-      let called_kfs = Db.Value.call_to_kernel_function stmt in
-      KFS.iter
-        (fun called_kf ->
-           let called_pdg = !Db.Pdg.get called_kf in
-           let nodes_callee, pdg_ok =
-             Options.debug ~level:3 "%a: considering call to %a"
-               Pdg_aux.pretty_node node Kernel_function.pretty called_kf;
-             try
-               (match key with
-                 | Signature.In (Signature.InNum n) ->
-                     (try [!Db.Pdg.find_input_node called_pdg n,
-                           Locations.Zone.top]
-                      with Not_found -> [])
-                 | Signature.In Signature.InCtrl ->
-                     (try [!Db.Pdg.find_entry_point_node called_pdg,
-                           Locations.Zone.top]
-                      with Not_found -> [])
-                 | Signature.In (Signature.InImpl _) -> assert false
-                 | Signature.Out _ -> []
-               ), true
-             with
-               | Db.Pdg.Top ->
-                   Options.warning
-                     "no precise pdg for function %s. \n\
-Ignoring this function in the analysis (potentially incorrect results)."
-                     (Kernel_function.get_name called_kf);
-                   [], false
-               | Db.Pdg.Bottom ->
-                   (*Function that fails or never returns immediately *)
-                   [], false
-               | Not_found -> assert false
-           in
-           Options.debug ~level:4 "Direct call nodes %a"
-             (Pretty_utils.pp_list ~sep:" " Pdg_aux.pretty_node) nodes_callee;
-           List.iter
-             (fun n ->
-                add_to_reason wl ~nsrc:node ~ndst:n InterproceduralDownward;
-                add_to_do wl called_kf called_pdg n
-             ) nodes_callee;
-           if pdg_ok then
-             add_downward_call wl (caller_kf, pdg) (called_kf, called_pdg) stmt
-        ) called_kfs;
-      Options.debug ~level:3 "propagation of call  %a done"
-        Pdg_aux.pretty_node node
+  | Key.SigCallKey(id, key) ->
+    let stmt = Key.call_from_id id in
+    let called_kfs = Db.Value.call_to_kernel_function stmt in
+    KFS.iter
+      (fun called_kf ->
+         let called_pdg = !Db.Pdg.get called_kf in
+         let nodes_callee, pdg_ok =
+           Options.debug ~level:3 "%a: considering call to %a"
+             Pdg_aux.pretty_node node Kernel_function.pretty called_kf;
+           try
+             (match key with
+              | Signature.In (Signature.InNum n) ->
+                (try [!Db.Pdg.find_input_node called_pdg n,
+                      Locations.Zone.top]
+                 with Not_found -> [])
+              | Signature.In Signature.InCtrl ->
+                (try [!Db.Pdg.find_entry_point_node called_pdg,
+                      Locations.Zone.top]
+                 with Not_found -> [])
+              | Signature.In (Signature.InImpl _) -> assert false
+              | Signature.Out _ -> []
+             ), true
+           with
+           | Db.Pdg.Top ->
+             Options.warning
+               "no precise pdg for function %s. \n\
+                Ignoring this function in the analysis (potentially incorrect results)."
+               (Kernel_function.get_name called_kf);
+             [], false
+           | Db.Pdg.Bottom ->
+             (*Function that fails or never returns immediately *)
+             [], false
+           | Not_found -> assert false
+         in
+         Options.debug ~level:4 "Direct call nodes %a"
+           (Pretty_utils.pp_list ~sep:" " Pdg_aux.pretty_node) nodes_callee;
+         List.iter
+           (fun n ->
+              add_to_reason wl ~nsrc:node ~ndst:n InterproceduralDownward;
+              add_to_do wl called_kf called_pdg n
+           ) nodes_callee;
+         if pdg_ok then
+           add_downward_call wl (caller_kf, pdg) (called_kf, called_pdg) stmt
+      ) called_kfs;
+    Options.debug ~level:3 "propagation of call  %a done"
+      Pdg_aux.pretty_node node
 
 
 
@@ -396,7 +396,7 @@ let downward_one_call_inputs wl kf_caller kf_callee (node, deps)  =
     let node' = (node, z) in
     NS.iter'
       (fun nsrc ->
-        add_to_reason wl ~nsrc ~ndst:node' InterproceduralDownward)
+         add_to_reason wl ~nsrc ~ndst:node' InterproceduralDownward)
       inter;
     add_to_do wl kf_callee (!Db.Pdg.get kf_callee) node';
 ;;
@@ -472,7 +472,7 @@ let upward_in_callers wl =
     if KFS.mem callee wl.fun_changed_upward then
       List.iter
         (fun (n, nodes) ->
-           let results_for_callee = result_by_kf wl callee in 
+           let results_for_callee = result_by_kf wl callee in
            if NS.intersects nodes results_for_callee then
              let inter = NS.inter nodes results_for_callee in
              let unimpacted_callee = unimpacted_initial_by_kf wl callee in
@@ -482,8 +482,8 @@ let upward_in_callers wl =
              let z = zone_restrict inter in
              let n = (n, z) in
              NS.iter' (fun nsrc ->
-                        add_to_reason wl ~nsrc ~ndst:n InterproceduralUpward
-                     ) inter;
+                 add_to_reason wl ~nsrc ~ndst:n InterproceduralUpward
+               ) inter;
              if init then
                add_to_do_part_of_initial wl caller (!Db.Pdg.get caller) n
              else
@@ -500,10 +500,10 @@ let upward_in_callers wl =
 
 (** Compute the initial state of the worklist. *)
 let initial_worklist ?(skip=Locations.Zone.bottom) ?(reason=false) nodes kf =
-  let initial = 
-      KFM.add kf
-        (List.fold_left (fun s n -> NS.add' n s) NS.empty nodes)
-        KFM.empty;
+  let initial =
+    KFM.add kf
+      (List.fold_left (fun s n -> NS.add' n s) NS.empty nodes)
+      KFM.empty;
   in
   let wl = {
     todo = NM.empty;
@@ -526,7 +526,7 @@ let initial_worklist ?(skip=Locations.Zone.bottom) ?(reason=false) nodes kf =
     if Options.Upward.get () then KFS.singleton kf else KFS.empty
   in
   (* Fill the [callers] and [upward_calls] fields *)
-  all_upward_callers wl initial_callers;  
+  all_upward_callers wl initial_callers;
   wl
 
 (** To compute the impact of a statement, find the initial PDG nodes that must
@@ -545,12 +545,12 @@ let initial_nodes ~skip kf stmt =
       in
       List.filter filter all
     with
-      | PdgTypes.Pdg.Top ->
-          Options.warning
-            "analysis of %a is too imprecise, impact cannot be computed@."
-            Kernel_function.pretty kf;
-          []
-      | Not_found -> assert false
+    | PdgTypes.Pdg.Top ->
+      Options.warning
+        "analysis of %a is too imprecise, impact cannot be computed@."
+        Kernel_function.pretty kf;
+      []
+    | Not_found -> assert false
   else begin
     Options.debug ~level:3 "stmt %d is dead. skipping." stmt.sid;
     []
@@ -575,16 +575,16 @@ let pick wl =
 let rec intraprocedural wl = match pick wl with
   | None -> ()
   | Some (pnode, { kf; pdg; init; zone }) ->
-      let node = pnode, zone in
-      add_to_result wl node kf init;
-      Db.yield ();
-      Options.debug ~level:2 "considering new node %a in %a:@ <%a>%t"
-        PdgTypes.Node.pretty pnode Kernel_function.pretty kf
-        Pdg_aux.pretty_node node
-        (fun fmt -> if init then Format.pp_print_string fmt " (init)");
-      intraprocedural_one_node wl node kf pdg;
-      downward_one_call_node wl node kf pdg;
-      intraprocedural wl
+    let node = pnode, zone in
+    add_to_result wl node kf init;
+    Db.yield ();
+    Options.debug ~level:2 "considering new node %a in %a:@ <%a>%t"
+      PdgTypes.Node.pretty pnode Kernel_function.pretty kf
+      Pdg_aux.pretty_node node
+      (fun fmt -> if init then Format.pp_print_string fmt " (init)");
+    intraprocedural_one_node wl node kf pdg;
+    downward_one_call_node wl node kf pdg;
+    intraprocedural wl
 
 let something_to_do wl = not (NM.is_empty wl.todo)
 
@@ -598,7 +598,7 @@ let rec fixpoint wl =
   if something_to_do wl then begin
     intraprocedural wl;
     (* Save functions on which the results have changed, as
-    [downward_calls_inputs] clears the field [fun_changed_downward] *)
+       [downward_calls_inputs] clears the field [fun_changed_downward] *)
     wl.fun_changed_upward <-
       KFS.union wl.fun_changed_downward wl.fun_changed_upward;
     downward_calls_inputs wl;
@@ -612,8 +612,8 @@ let rec fixpoint wl =
 
 let remove_unimpacted _kf impact initial =
   match impact, initial with
-    | None, None | Some _, None | None, Some _ (* impossible *) -> impact
-    | Some impact, Some initial -> Some (NS.diff impact initial)
+  | None, None | Some _, None | None, Some _ (* impossible *) -> impact
+  | Some impact, Some initial -> Some (NS.diff impact initial)
 
 (** Impact of a set of nodes. Once the worklist has reached its fixpoint,
     remove the initial nodes that are not self-impacting from the result,
@@ -673,7 +673,7 @@ let nodes_to_stmts ns =
     (* Do not generate a list immediately, some nodes would be duplicated *)
     NS.fold
       (fun (n, _z) acc ->
-        Option.fold ~none:acc ~some:(fun s -> Stmt.Set.add s acc) (get_stmt n)
+         Option.fold ~none:acc ~some:(fun s -> Stmt.Set.add s acc) (get_stmt n)
       ) ns  Stmt.Set.empty
   in
   Stmt.Set.elements set
@@ -704,20 +704,20 @@ let skip_bases vars =
 (** Computation of the [skip] field from the [-impact-skip] option *)
 let skip () =
   let bases = Options.Skip.fold
-    (fun name l ->
-      let vi = 
-        try
-          Base.of_varinfo (Globals.Vars.find_from_astinfo name VGlobal)
-        with Not_found ->
-          if name = "NULL" then Base.null
-          else
-            Options.abort "cannot skip unknown variable %s" name
-      in
-      vi :: l) []
+      (fun name l ->
+         let vi =
+           try
+             Base.of_varinfo (Globals.Vars.find_from_astinfo name VGlobal)
+           with Not_found ->
+             if name = "NULL" then Base.null
+             else
+               Options.abort "cannot skip unknown variable %s" name
+         in
+         vi :: l) []
   in
-  skip_bases bases  
+  skip_bases bases
 
-  
+
 
 (* TODO: dynamically register more high-level functions *)
 

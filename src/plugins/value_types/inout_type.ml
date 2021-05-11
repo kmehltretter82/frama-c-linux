@@ -56,69 +56,69 @@ let pretty_outputs = wrap_vbox pretty_outputs_aux
 open Locations
 
 include
-(Datatype.Make
- (struct
-  include Datatype.Serializable_undefined
-  type inout_t = t
-  type t = inout_t
-    let pretty fmt x =
-      Format.fprintf fmt "@[<v>";
-      pretty_operational_inputs_aux fmt x;
-      pretty_outputs_aux fmt x;
-      Format.fprintf fmt "@]"
+  (Datatype.Make
+     (struct
+       include Datatype.Serializable_undefined
+       type inout_t = t
+       type t = inout_t
+       let pretty fmt x =
+         Format.fprintf fmt "@[<v>";
+         pretty_operational_inputs_aux fmt x;
+         pretty_outputs_aux fmt x;
+         Format.fprintf fmt "@]"
 
-    let structural_descr =
-      let z = Locations.Zone.packed_descr in
-      Structural_descr.t_record [| z; z; z; z; z; z |]
-    let reprs =
-      List.map
-        (fun z ->
-          { over_inputs_if_termination = z;
-            under_outputs_if_termination = z;
-            over_inputs = z;
-            over_logic_inputs = z;
-            over_outputs = z;
-            over_outputs_if_termination = z;
-          }) Locations.Zone.reprs
-    let name = "Full.tt"
-    let hash
-        { over_inputs_if_termination = a;
-          under_outputs_if_termination = b;
-          over_inputs = c;
-          over_outputs = d;
-          over_outputs_if_termination = e;
-          over_logic_inputs = f;
-        } =
-      Zone.hash a +
-      17 * Zone.hash b +
-      587 * Zone.hash c +
-      1077 * Zone.hash d +
-      13119 * Zone.hash e +
-      15823 * Zone.hash f
-    let equal
-        { over_inputs_if_termination = a;
-          under_outputs_if_termination = b;
-          over_inputs = c;
-          over_outputs = d;
-          over_outputs_if_termination = e;
-          over_logic_inputs = f;
-        }
-        { over_inputs_if_termination = a';
-          under_outputs_if_termination = b';
-          over_inputs = c';
-          over_outputs = d';
-          over_outputs_if_termination = e';
-          over_logic_inputs = f';
-        } =
-      Zone.equal a a'
-      && Zone.equal b b'
-      && Zone.equal c c'
-      && Zone.equal d d'
-      && Zone.equal e e'
-      && Zone.equal f f'
-    let mem_project = Datatype.never_any_project
- end)
- : Datatype.S with type t := t)
+       let structural_descr =
+         let z = Locations.Zone.packed_descr in
+         Structural_descr.t_record [| z; z; z; z; z; z |]
+       let reprs =
+         List.map
+           (fun z ->
+              { over_inputs_if_termination = z;
+                under_outputs_if_termination = z;
+                over_inputs = z;
+                over_logic_inputs = z;
+                over_outputs = z;
+                over_outputs_if_termination = z;
+              }) Locations.Zone.reprs
+       let name = "Full.tt"
+       let hash
+           { over_inputs_if_termination = a;
+             under_outputs_if_termination = b;
+             over_inputs = c;
+             over_outputs = d;
+             over_outputs_if_termination = e;
+             over_logic_inputs = f;
+           } =
+         Zone.hash a +
+         17 * Zone.hash b +
+         587 * Zone.hash c +
+         1077 * Zone.hash d +
+         13119 * Zone.hash e +
+         15823 * Zone.hash f
+       let equal
+           { over_inputs_if_termination = a;
+             under_outputs_if_termination = b;
+             over_inputs = c;
+             over_outputs = d;
+             over_outputs_if_termination = e;
+             over_logic_inputs = f;
+           }
+           { over_inputs_if_termination = a';
+             under_outputs_if_termination = b';
+             over_inputs = c';
+             over_outputs = d';
+             over_outputs_if_termination = e';
+             over_logic_inputs = f';
+           } =
+         Zone.equal a a'
+         && Zone.equal b b'
+         && Zone.equal c c'
+         && Zone.equal d d'
+         && Zone.equal e e'
+         && Zone.equal f f'
+       let mem_project = Datatype.never_any_project
+     end)
+   : Datatype.S with type t := t)
 
 let map f v = {
   over_inputs_if_termination = f v.over_inputs_if_termination;

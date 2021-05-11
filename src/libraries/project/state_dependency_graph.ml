@@ -21,8 +21,8 @@
 (**************************************************************************)
 
 module type S = sig
-  module G: Graph.Sig.G with type V.t = State.t 
-			and type E.t = State.t * State.t
+  module G: Graph.Sig.G with type V.t = State.t
+                         and type E.t = State.t * State.t
   val graph: G.t
   val add_dependencies: from:State.t -> State.t list -> unit
   val add_codependencies: onto:State.t -> State.t list -> unit
@@ -45,7 +45,7 @@ module Dependency_graph = Graph.Imperative.Digraph.ConcreteBidirectional(State)
 
 module Static = struct
 
-  module G = Dependency_graph   
+  module G = Dependency_graph
   let graph = Dependency_graph.create ~size:7 ()
 
   let add_vertex graph v =
@@ -56,7 +56,7 @@ module Static = struct
     assert (Dependency_graph.(mem_vertex graph v1 && mem_vertex graph v2));
     Dependency_graph.add_edge graph v1 v2
 
-  let add_dependencies ~from deps = 
+  let add_dependencies ~from deps =
     List.iter (add_edge graph from) deps
 
   let add_codependencies ~onto codeps =

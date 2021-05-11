@@ -83,7 +83,7 @@ let incr_asserts stat = stat.asserts <- stat.asserts + 1
 let pretty_acsl_stats fmt stat =
   Format.fprintf fmt
     "@[<v 0>requires: %d total, %d in function contracts,\
-        %d in statement contracts@;\
+     %d in statement contracts@;\
      ensures: %d total, %d in function contracts, %d in statement contracts@;\
      behaviors: %d total, %d in function contracts, %d in statement contracts@;\
      assumes: %d total, %d in function contracts, %d in statement contracts@;\
@@ -92,7 +92,7 @@ let pretty_acsl_stats fmt stat =
      invariants: %d@;loop assigns: %d@;loop froms: %d@;variants: %d@;\
      asserts: %d@;@]"
     (stat.f_requires + stat.s_requires)
-    stat.f_requires stat.s_requires 
+    stat.f_requires stat.s_requires
     (stat.f_ensures + stat.s_ensures)
     stat.f_ensures stat.s_ensures
     (stat.f_behaviors + stat.s_behaviors)
@@ -137,7 +137,7 @@ let pretty_acsl_stats_html fmt stat =
      @{<tr>@{<td class=\"entry\">asserts@}@{<td class=\"stat\">%d@}@}@;\
      @}@]"
     (stat.f_requires + stat.s_requires)
-    stat.f_requires stat.s_requires 
+    stat.f_requires stat.s_requires
     (stat.f_ensures + stat.s_ensures)
     stat.f_ensures stat.s_ensures
     (stat.f_behaviors + stat.s_behaviors)
@@ -153,24 +153,24 @@ let pretty_acsl_stats_html fmt stat =
 
 module Acsl_stats =
   Datatype.Make(
-    struct
-      type t = acsl_stats
-      let reprs = [empty_acsl_stat ()]
-      let name = "Metrics_acsl.acsl_stats"
-      include Datatype.Serializable_undefined
-      let pretty = pretty_acsl_stats
-    end)
+  struct
+    type t = acsl_stats
+    let reprs = [empty_acsl_stat ()]
+    let name = "Metrics_acsl.acsl_stats"
+    include Datatype.Serializable_undefined
+    let pretty = pretty_acsl_stats
+  end)
 
 module Global_acsl_stats =
   State_builder.Ref(Acsl_stats)
     (struct
-        let name = "Metrics_acsl.Global_acsl_stats"
-        let dependencies =
-          [ Ast.self; Annotations.code_annot_state; Annotations.funspec_state;
-            Annotations.global_state
-          ]
-        let default = empty_acsl_stat
-     end)
+      let name = "Metrics_acsl.Global_acsl_stats"
+      let dependencies =
+        [ Ast.self; Annotations.code_annot_state; Annotations.funspec_state;
+          Annotations.global_state
+        ]
+      let default = empty_acsl_stat
+    end)
 
 module Functions_acsl_stats =
   State_builder.Hashtbl
@@ -181,7 +181,7 @@ module Functions_acsl_stats =
       let dependencies =
         [Ast.self; Annotations.code_annot_state; Annotations.funspec_state]
       let size = 17
-     end)
+    end)
 
 let get_kf_stats kf =
   try Functions_acsl_stats.find kf with Not_found -> empty_acsl_stat()
@@ -191,7 +191,7 @@ module Computed =
     (struct
       let name = "Metrics_acsl.Computed"
       let dependencies = [ Global_acsl_stats.self; Functions_acsl_stats.self]
-     end)
+    end)
 
 let treat_behavior local_stats ki b =
   let incr_behaviors =
@@ -218,15 +218,15 @@ let treat_behavior local_stats ki b =
   List.iter (incr_all incr_ensures) b.b_post_cond;
   List.iter (incr_all incr_assumes) b.b_assumes;
   (match b.b_assigns with
-    | WritesAny -> ()
-    | Writes l ->
-      incr_all incr_assigns ();
-      List.iter
-        (function
-          | (_,FromAny) -> ()
-          | (_,From _) -> incr_all incr_froms ())
-        l)
-  (*TODO: allocation *)
+   | WritesAny -> ()
+   | Writes l ->
+     incr_all incr_assigns ();
+     List.iter
+       (function
+         | (_,FromAny) -> ()
+         | (_,From _) -> incr_all incr_froms ())
+       l)
+(*TODO: allocation *)
 
 let add_function_contract_stats kf =
   let local_stats = get_kf_stats kf in
@@ -238,18 +238,18 @@ let add_code_annot_stats stmt _ ca =
   let local_stats = get_kf_stats kf in
   let incr_all f = f local_stats; f (Global_acsl_stats.get()) in
   match ca.annot_content with
-    | AAssert _ -> incr_all incr_asserts
-    | AStmtSpec (_,spec) ->
-      List.iter (treat_behavior local_stats (Kstmt stmt)) spec.spec_behavior
-    | AInvariant _ -> incr_all incr_invariants
-    | AVariant _ -> incr_all incr_variants
-    | AAssigns (_,WritesAny) -> ()
-    | AAssigns (_,Writes l) ->
-      incr_all incr_loop_assigns;
-      List.iter
-        (function (_,FromAny) -> () | (_,From _) -> incr_all incr_loop_froms) l
-    | AAllocation _ -> () (* TODO *)
-    | APragma _ | AExtended _ -> ()
+  | AAssert _ -> incr_all incr_asserts
+  | AStmtSpec (_,spec) ->
+    List.iter (treat_behavior local_stats (Kstmt stmt)) spec.spec_behavior
+  | AInvariant _ -> incr_all incr_invariants
+  | AVariant _ -> incr_all incr_variants
+  | AAssigns (_,WritesAny) -> ()
+  | AAssigns (_,Writes l) ->
+    incr_all incr_loop_assigns;
+    List.iter
+      (function (_,FromAny) -> () | (_,From _) -> incr_all incr_loop_froms) l
+  | AAllocation _ -> () (* TODO *)
+  | APragma _ | AExtended _ -> ()
 
 let compute () =
   if not (Computed.get()) then begin
@@ -266,9 +266,9 @@ let dump_html_global fmt = pretty_acsl_stats_html fmt (get_global_stats())
 let dump_html_by_function fmt =
   compute ();
   Functions_acsl_stats.iter
-    (fun kf stats -> 
-      Format.fprintf fmt "@{<h2>Function %a@}@;%a"
-        Kernel_function.pretty kf pretty_acsl_stats_html stats)
+    (fun kf stats ->
+       Format.fprintf fmt "@{<h2>Function %a@}@;%a"
+         Kernel_function.pretty kf pretty_acsl_stats_html stats)
 
 let dump_acsl_stats fmt =
   Metrics_base.mk_hdr 1 fmt "ACSL Statistics";
@@ -277,35 +277,35 @@ let dump_acsl_stats fmt =
     compute ();
     Functions_acsl_stats.iter
       (fun kf stats ->
-        let kf_name = Format.asprintf "%a" Kernel_function.pretty kf in
-        Format.fprintf fmt "@[<v 2>%a@;%a@]@;"
-          (Metrics_base.mk_hdr 2) kf_name pretty_acsl_stats stats)
+         let kf_name = Format.asprintf "%a" Kernel_function.pretty kf in
+         Format.fprintf fmt "@[<v 2>%a@;%a@]@;"
+           (Metrics_base.mk_hdr 2) kf_name pretty_acsl_stats stats)
   end else pretty_acsl_stats fmt (get_global_stats())
-    
+
 
 let dump_acsl_stats_html fmt =
   Format.pp_set_formatter_stag_functions fmt Metrics_base.html_stag_functions;
   Format.fprintf fmt
     "@[<v 0> <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"\
-          \"http://www.w3.org/TR/html4/strict.dtd\">@ \
-      @{<html>@ \
-      @{<head>@ \
-       @{<title>%s@}@ \
-       <meta content=\"text/html; charset=iso-8859-1\" \
-        http-equiv=\"Content-Type\"/>@ \
-        @{<style type=\"text/css\">%s@}@ \
-      @}@ \
-        @{<body>\
-         @[<v 2>@ \
-         @{<h1>%s@}@;\
-         %t@]@}@}@]@?"
+     \"http://www.w3.org/TR/html4/strict.dtd\">@ \
+     @{<html>@ \
+     @{<head>@ \
+     @{<title>%s@}@ \
+     <meta content=\"text/html; charset=iso-8859-1\" \
+     http-equiv=\"Content-Type\"/>@ \
+     @{<style type=\"text/css\">%s@}@ \
+     @}@ \
+     @{<body>\
+     @[<v 2>@ \
+     @{<h1>%s@}@;\
+     %t@]@}@}@]@?"
     "ACSL Metrics"
     Css_html.css
     (if Metrics_parameters.ByFunction.get ()
      then "Detailed ACSL statistics" else "Global ACSL statistics")
     (if Metrics_parameters.ByFunction.get ()
      then dump_html_global else dump_html_by_function)
-    
+
 
 let dump () =
   if not (Metrics_parameters.OutputFile.is_empty ()) then begin
@@ -314,15 +314,14 @@ let dump () =
       let chan = open_out (out:>string) in
       let fmt = Format.formatter_of_out_channel chan in
       (match Metrics_base.get_file_type out with
-            | Metrics_base.Html -> dump_acsl_stats_html fmt
-            | Metrics_base.Text -> dump_acsl_stats fmt
-            | Metrics_base.Json ->
-              Metrics_parameters.not_yet_implemented
-                "JSON format for ACSL metrics"
+       | Metrics_base.Html -> dump_acsl_stats_html fmt
+       | Metrics_base.Text -> dump_acsl_stats fmt
+       | Metrics_base.Json ->
+         Metrics_parameters.not_yet_implemented
+           "JSON format for ACSL metrics"
       );
       close_out chan
     with Sys_error s ->
       Metrics_parameters.abort "Cannot open file %a (%s)"
         Filepath.Normalized.pretty out s
   end else Metrics_parameters.result "%t" dump_acsl_stats
-

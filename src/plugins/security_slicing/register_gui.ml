@@ -28,9 +28,9 @@ module Make_HighlighterState(Info:sig val name: string end) =
   State_builder.List_ref
     (Cil_datatype.Stmt)
     (struct
-       let name = Info.name
-       let dependencies = [ Ast.self ]
-     end)
+      let name = Info.name
+      let dependencies = [ Ast.self ]
+    end)
 
 module ForwardHighlighterState =
   Make_HighlighterState(struct let name = "Security_gui.Forward" end)
@@ -45,18 +45,18 @@ let security_highlighter buffer loc ~start ~stop =
   let buffer = buffer#buffer in
   match loc with
   | PStmt (_,s) ->
-      let f = ForwardHighlighterState.get () in
-      if List.exists (fun k -> k.sid=s.sid) f then begin
-        let tag = make_tag buffer"forward" [`BACKGROUND "orange" ] in
-        apply_tag buffer tag start stop end;
-      let i = IndirectBackwardHighlighterState.get () in
-      if List.exists (fun k -> k.sid=s.sid) i then begin
-        let tag = make_tag buffer"indirect_backward" [`BACKGROUND  "cyan" ] in
-        apply_tag buffer tag start stop end;
-      let d = DirectHighlighterState.get () in
-      if List.exists (fun k -> k.sid=s.sid) d then begin
-        let tag = make_tag buffer"direct" [`BACKGROUND  "green" ] in
-        apply_tag buffer tag start stop end
+    let f = ForwardHighlighterState.get () in
+    if List.exists (fun k -> k.sid=s.sid) f then begin
+      let tag = make_tag buffer"forward" [`BACKGROUND "orange" ] in
+      apply_tag buffer tag start stop end;
+    let i = IndirectBackwardHighlighterState.get () in
+    if List.exists (fun k -> k.sid=s.sid) i then begin
+      let tag = make_tag buffer"indirect_backward" [`BACKGROUND  "cyan" ] in
+      apply_tag buffer tag start stop end;
+    let d = DirectHighlighterState.get () in
+    if List.exists (fun k -> k.sid=s.sid) d then begin
+      let tag = make_tag buffer"direct" [`BACKGROUND  "green" ] in
+      apply_tag buffer tag start stop end
   | PStmtStart _
   | PExp _ | PVDecl _ | PTermLval _ | PLval _ | PGlobal _ | PIP _ -> ()
 
@@ -65,9 +65,9 @@ let security_selector
   if button = 3 && Security_slicing_parameters.Slicing.get () then
     match localizable with
     | PStmt (_kf, ki) ->
-        ignore
-          (popup_factory#add_item "_Security component"
-             ~callback:
+      ignore
+        (popup_factory#add_item "_Security component"
+           ~callback:
              (fun () ->
                 ForwardHighlighterState.set
                   (Components.get_forward_component ki);

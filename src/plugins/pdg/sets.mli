@@ -24,8 +24,8 @@
 
 open Cil_types
 
-type nodes_and_undef = 
-    (PdgTypes.Node.t * Locations.Zone.t option) list * Locations.Zone.t option
+type nodes_and_undef =
+  (PdgTypes.Node.t * Locations.Zone.t option) list * Locations.Zone.t option
 
 (** {2 PDG nodes for some elements} *)
 
@@ -34,9 +34,9 @@ val find_simple_stmt_nodes: PdgTypes.Pdg.t -> stmt -> PdgTypes.Node.t list
 val find_stmt_and_blocks_nodes: PdgTypes.Pdg.t -> stmt -> PdgTypes.Node.t list
 val find_location_nodes_at_stmt:
   PdgTypes.Pdg.t -> stmt -> before:bool -> Locations.Zone.t -> nodes_and_undef
-val find_location_nodes_at_end: 
+val find_location_nodes_at_end:
   PdgTypes.Pdg.t -> Locations.Zone.t -> nodes_and_undef
-val find_location_nodes_at_begin: 
+val find_location_nodes_at_begin:
   PdgTypes.Pdg.t -> Locations.Zone.t -> nodes_and_undef
 val find_label_node: PdgTypes.Pdg.t -> stmt -> label -> PdgTypes.Node.t
 val find_decl_var_node: PdgTypes.Pdg.t -> varinfo -> PdgTypes.Node.t
@@ -45,7 +45,7 @@ val find_output_node: PdgTypes.Pdg.t -> PdgTypes.Node.t
 val find_all_input_nodes: PdgTypes.Pdg.t -> PdgTypes.Node.t list
 val find_entry_point_node: PdgTypes.Pdg.t -> PdgTypes.Node.t
 val find_top_input_node: PdgTypes.Pdg.t -> PdgTypes.Node.t
-val find_output_nodes: 
+val find_output_nodes:
   PdgTypes.Pdg.t -> PdgIndex.Signature.out_key -> nodes_and_undef
 
 
@@ -58,11 +58,11 @@ val find_call_output_node: PdgTypes.Pdg.t -> stmt -> PdgTypes.Node.t
 val find_call_stmts: kernel_function -> caller:kernel_function -> stmt list
 
 val find_call_out_nodes_to_select:
-  PdgTypes.Pdg.t -> PdgTypes.NodeSet.t -> PdgTypes.Pdg.t ->  stmt -> 
+  PdgTypes.Pdg.t -> PdgTypes.NodeSet.t -> PdgTypes.Pdg.t ->  stmt ->
   PdgTypes.Node.t list
 
 val find_in_nodes_to_select_for_this_call:
-  PdgTypes.Pdg.t -> PdgTypes.NodeSet.t -> stmt -> PdgTypes.Pdg.t -> 
+  PdgTypes.Pdg.t -> PdgTypes.NodeSet.t -> stmt -> PdgTypes.Pdg.t ->
   PdgTypes.Node.t list
 
 (** direct dependencies only:
@@ -76,11 +76,11 @@ val direct_addr_dpds: PdgTypes.Pdg.t -> PdgTypes.Node.t -> PdgTypes.Node.t list
 
 val find_nodes_all_dpds:
   PdgTypes.Pdg.t -> PdgTypes.Node.t list -> PdgTypes.Node.t list
-val find_nodes_all_data_dpds: 
+val find_nodes_all_data_dpds:
   PdgTypes.Pdg.t -> PdgTypes.Node.t list -> PdgTypes.Node.t list
-val find_nodes_all_ctrl_dpds: 
+val find_nodes_all_ctrl_dpds:
   PdgTypes.Pdg.t -> PdgTypes.Node.t list -> PdgTypes.Node.t list
-val find_nodes_all_addr_dpds: 
+val find_nodes_all_addr_dpds:
   PdgTypes.Pdg.t -> PdgTypes.Node.t list -> PdgTypes.Node.t list
 
 (** forward *)
@@ -94,6 +94,6 @@ val all_uses: PdgTypes.Pdg.t -> PdgTypes.Node.t list -> PdgTypes.Node.t list
 
 (** others *)
 
-val custom_related_nodes: 
-  (PdgTypes.Node.t -> PdgTypes.Node.t list) -> PdgTypes.Node.t list -> 
+val custom_related_nodes:
+  (PdgTypes.Node.t -> PdgTypes.Node.t list) -> PdgTypes.Node.t list ->
   PdgTypes.Node.t list

@@ -45,12 +45,12 @@ module Connex_components = struct
 end
 
 module Ordered_stmt = Kernel_function.Make_Table
-  (Datatype.Triple(Order)(Unorder)(Connex_components))
-  (struct
-    let name = "Dataflow2.Ordered_stmt"
-    let dependencies = [ Ast.self ]
-    let size = 17
-   end)
+    (Datatype.Triple(Order)(Unorder)(Connex_components))
+    (struct
+      let name = "Dataflow2.Ordered_stmt"
+      let dependencies = [ Ast.self ]
+      let size = 17
+    end)
 ;;
 
 (* Skeleton for an OCamlGraph topological sort *)
@@ -94,7 +94,7 @@ let get_ordered_stmt kf =
   let (_nb_scc,f_scc) = Connex.scc kf in
   let sccs = Array.make  nb_stmts (-1) in
   Array.iteri (fun ordered stmt ->
-    sccs.(ordered) <- f_scc stmt) ordered_to_stmt;
+      sccs.(ordered) <- f_scc stmt) ordered_to_stmt;
   (stmt_to_ordered, ordered_to_stmt, sccs);;
 
 type ordered_stmt = int;;

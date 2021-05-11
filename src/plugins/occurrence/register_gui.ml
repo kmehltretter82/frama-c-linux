@@ -33,43 +33,43 @@ let update_column = ref (fun _ -> ())
 module Enabled = State_builder.Ref
     (Datatype.Bool)
     (struct
-       let name = "Occurrence_gui.State"
-       let dependencies = [Register.self]
-       let default () = false
-     end)
+      let name = "Occurrence_gui.State"
+      let dependencies = [Register.self]
+      let default () = false
+    end)
 
 module ShowRead = State_builder.Ref
-  (Datatype.Bool)
-  (struct
-    let name = "Occurrence_gui.ShowRead"
-    let dependencies = []
-    let default () = true
-   end)
+    (Datatype.Bool)
+    (struct
+      let name = "Occurrence_gui.ShowRead"
+      let dependencies = []
+      let default () = true
+    end)
 
 module ShowWrite = State_builder.Ref
-  (Datatype.Bool)
-  (struct
-    let name = "Occurrence_gui.ShowWrite"
-    let dependencies = []
-    let default () = true
-   end)
+    (Datatype.Bool)
+    (struct
+      let name = "Occurrence_gui.ShowWrite"
+      let dependencies = []
+      let default () = true
+    end)
 
 let consider_access () =
   match ShowRead.get (), ShowWrite.get () with
-    | false, false -> (fun _ -> false)
-    | true,  true -> (fun _ -> true)
-    | true,  false ->
-        (fun ak -> ak = Register.Read  || ak = Register.Both)
-    | false, true ->
-        (fun ak -> ak = Register.Write || ak = Register.Both)
+  | false, false -> (fun _ -> false)
+  | true,  true -> (fun _ -> true)
+  | true,  false ->
+    (fun ak -> ak = Register.Read  || ak = Register.Both)
+  | false, true ->
+    (fun ak -> ak = Register.Write || ak = Register.Both)
 
 let filter_accesses l =
   match ShowRead.get (), ShowWrite.get () with
-    | false, false -> []
-    | true,  true -> l
-    | true,  false | false, true ->
-        let f = consider_access () in
-        List.filter (fun access -> f (Register.classify_accesses access)) l
+  | false, false -> []
+  | true,  true -> l
+  | true,  false | false, true ->
+    let f = consider_access () in
+    List.filter (fun access -> f (Register.classify_accesses access)) l
 
 let _ignore =
   Dynamic.register
@@ -102,39 +102,39 @@ let apply_on_vi f localizable = match localizable with
   | PVDecl(_,_,vi)
   | PLval(_, _, (Var vi, NoOffset))
   | PTermLval(_, _, _, (TVar { lv_origin = Some vi }, TNoOffset)) ->
-      if not (Cil.isFunctionType vi.vtype) then
-        f vi
+    if not (Cil.isFunctionType vi.vtype) then
+      f vi
   | _ -> ()
 
 let occurrence_highlighter buffer loc ~start ~stop =
   if Enabled.get () then
     match Register.get_last_result () with
     | None -> (* occurrence not computed *)
-        ()
+      ()
     | Some (result, vi) ->
-        let result = filter_accesses result in
-        let buffer = buffer#buffer in
-        let highlight () =
-          let tag = make_tag buffer "occurrence" [`BACKGROUND "yellow" ] in
-          apply_tag buffer tag start stop
+      let result = filter_accesses result in
+      let buffer = buffer#buffer in
+      let highlight () =
+        let tag = make_tag buffer "occurrence" [`BACKGROUND "yellow" ] in
+        apply_tag buffer tag start stop
+      in
+      match loc with
+      | PLval (_, ki, lval) ->
+        let same_lval (_kf, k, l) =
+          Kinstr.equal k ki && Lval.equal l lval
         in
-        match loc with
-        | PLval (_, ki, lval) ->
-            let same_lval (_kf, k, l) =
-              Kinstr.equal k ki && Lval.equal l lval
-            in
-            if List.exists same_lval result then highlight ()
-        | PTermLval (_,ki,_,term_lval) ->
-            let same_tlval (_kf, k, l) =
-              Logic_utils.is_same_tlval
-                (Logic_utils.lval_to_term_lval l)
-                term_lval
-              && Kinstr.equal k ki
-            in
-            if List.exists same_tlval result then highlight ()
-        | PVDecl(_, _,vi') when Varinfo.equal vi vi' ->
-            highlight ()
-        | PExp _ | PVDecl _ | PStmt _ | PStmtStart _ | PGlobal _ | PIP _ -> ()
+        if List.exists same_lval result then highlight ()
+      | PTermLval (_,ki,_,term_lval) ->
+        let same_tlval (_kf, k, l) =
+          Logic_utils.is_same_tlval
+            (Logic_utils.lval_to_term_lval l)
+            term_lval
+          && Kinstr.equal k ki
+        in
+        if List.exists same_tlval result then highlight ()
+      | PVDecl(_, _,vi') when Varinfo.equal vi vi' ->
+        highlight ()
+      | PExp _ | PVDecl _ | PStmt _ | PStmtStart _ | PGlobal _ | PIP _ -> ()
 
 module FollowFocus =
   State_builder.Ref
@@ -143,7 +143,7 @@ module FollowFocus =
       let name = "Occurrence_gui.FollowFocus"
       let dependencies = []
       let default () = false
-     end)
+    end)
 
 let occurrence_panel main_ui =
   let w = GPack.vbox  () in
@@ -153,25 +153,25 @@ let occurrence_panel main_ui =
     (GMisc.label ~xalign:0.0 ~text:"Current var: "
        ~packing:(selected_var_box#pack ~expand:false) ());
   let e = GMisc.label ~xalign:0.0
-    ~selectable:true
-    ~packing:(selected_var_box#pack ~expand:true ~fill:true)
-    ()
+      ~selectable:true
+      ~packing:(selected_var_box#pack ~expand:true ~fill:true)
+      ()
   in
   e#set_use_markup true;
   old_gtk_compat e#set_single_line_mode true;
   (* check_button enabled *)
   let refresh_enabled_button = on_bool
-    w
-    "Enable"
-    Enabled.get
-    (fun v -> Enabled.set v;
-      !update_column `Visibility;
-      main_ui#rehighlight ())
+      w
+      "Enable"
+      Enabled.get
+      (fun v -> Enabled.set v;
+        !update_column `Visibility;
+        main_ui#rehighlight ())
   in
   (* check_button followFocus *)
   let refresh_followFocus = on_bool w "Follow focus"
-    FollowFocus.get
-    FollowFocus.set
+      FollowFocus.get
+      FollowFocus.set
   in
   let h_read_write = GPack.hbox ~packing:w#pack () in
   let refresh_rw_aux f v =
@@ -181,11 +181,11 @@ let occurrence_panel main_ui =
   in
   let refresh_read =
     Gtk_helper.on_bool
-    ~tooltip:"Show only occurrences where the zone is read"
+      ~tooltip:"Show only occurrences where the zone is read"
       h_read_write "Read" ShowRead.get (refresh_rw_aux ShowRead.set) in
   let refresh_write =
     Gtk_helper.on_bool
-    ~tooltip:"Show only occurrences where the zone is written"
+      ~tooltip:"Show only occurrences where the zone is written"
       h_read_write "Write" ShowWrite.get (refresh_rw_aux ShowWrite.set) in
   let refresh =
     let old_vi = ref (-2) in
@@ -197,52 +197,52 @@ let occurrence_panel main_ui =
        let new_result = Register.get_last_result () in
        (match new_result with
         | None when !old_vi<> -1 ->
-            old_vi := -1; e#set_label "<i>None</i>"
+          old_vi := -1; e#set_label "<i>None</i>"
         | Some (_,vi) when vi.vid<> !old_vi->
-            old_vi := vi.vid;
-            e#set_label vi.vname
+          old_vi := vi.vid;
+          e#set_label vi.vname
         | _ -> ()))
   in
   "Occurrence",w#coerce,Some refresh
 
 let occurrence_selector
     (popup_factory:GMenu.menu GMenu.factory) main_ui ~button localizable =
-    apply_on_vi
-      (fun vi ->
+  apply_on_vi
+    (fun vi ->
        if button = 3 || FollowFocus.get () then begin
          let callback = find_occurrence main_ui vi in
          ignore (popup_factory#add_item "_Occurrence" ~callback);
          if FollowFocus.get () then
            ignore (Glib.Idle.add (fun () -> callback (); false))
        end)
-      localizable
+    localizable
 
 let file_tree_decorate (file_tree:Filetree.t) =
   update_column :=
     file_tree#append_pixbuf_column
       ~title:"Occurrence"
       (fun globs ->
-        match Register.get_last_result () with
-          | None -> (* occurrence not computed *)
-            [`STOCK_ID ""]
-          | Some (result, _) ->
-            let in_globals (kf,ki,_ as access) =
-              (let ak = Register.classify_accesses access in
-               consider_access () ak)
-              &&
-              match ki with
-                | Kglobal -> false
-                | Kstmt _ ->
-                  let kf = Option.get kf in
-                  let v0 = Kernel_function.get_vi kf in
-                  List.exists
-                    (fun glob -> match glob with
-                      | GFun ({svar =v1},_ ) -> Varinfo.equal v1 v0
-                      |  _ -> false)
-                    globs
-            in
-            if List.exists in_globals result then [`STOCK_ID "gtk-apply"]
-            else [`STOCK_ID ""])
+         match Register.get_last_result () with
+         | None -> (* occurrence not computed *)
+           [`STOCK_ID ""]
+         | Some (result, _) ->
+           let in_globals (kf,ki,_ as access) =
+             (let ak = Register.classify_accesses access in
+              consider_access () ak)
+             &&
+             match ki with
+             | Kglobal -> false
+             | Kstmt _ ->
+               let kf = Option.get kf in
+               let v0 = Kernel_function.get_vi kf in
+               List.exists
+                 (fun glob -> match glob with
+                    | GFun ({svar =v1},_ ) -> Varinfo.equal v1 v0
+                    |  _ -> false)
+                 globs
+           in
+           if List.exists in_globals result then [`STOCK_ID "gtk-apply"]
+           else [`STOCK_ID ""])
       (fun () -> Enabled.get ());
   !update_column `Visibility
 

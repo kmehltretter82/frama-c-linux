@@ -29,7 +29,7 @@ module Annot : Parameter_sig.Bool
 (** keep more things to keep all reachable annotations. *)
 
 module GlobDecl : Parameter_sig.Bool
-    (** remove unused global types and variables *)
+(** remove unused global types and variables *)
 
 (*
 Local Variables:

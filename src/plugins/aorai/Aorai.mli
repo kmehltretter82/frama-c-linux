@@ -26,7 +26,7 @@
 (* $Id: Ltl_to_acsl.mli,v 1.3 2008-10-10 16:03:25 uid588 Exp $ *)
 
 (**
-  Aorai plugin (AKA Ltl_to_acsl).
-  No function is directly exported: they are registered in {!Db.Aorai}.
+   Aorai plugin (AKA Ltl_to_acsl).
+   No function is directly exported: they are registered in {!Db.Aorai}.
 
 *)

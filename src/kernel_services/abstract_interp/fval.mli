@@ -120,7 +120,7 @@ val subdiv_float_interval : kind -> t -> t * t
     log10f(3, FE_TONEAREST) < log10f(3, FE_DOWNWARD).
 
     Also, we have observed bugs in [powf], which is called when [kind=Float32].
- *)
+*)
 
 val exp : kind -> t -> t
 val log: kind -> t -> t

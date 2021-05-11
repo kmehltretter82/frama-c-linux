@@ -48,18 +48,18 @@ end = struct
     Cil_state_builder.Varinfo_hashtbl
       (Occurrence_datatype)
       (struct
-         let size = 17
-         let name = "Occurrences.State"
-         let dependencies = [ Db.Value.self ]
-       end)
+        let size = 17
+        let name = "Occurrences.State"
+        let dependencies = [ Db.Value.self ]
+      end)
 
   module LastResult =
     State_builder.Option_ref
       (Varinfo)
       (struct
-         let name = "Occurrences.LastResult"
-         let dependencies = [ Ast.self; IState.self ]
-       end)
+        let name = "Occurrences.LastResult"
+        let dependencies = [ Ast.self; IState.self ]
+      end)
 
   let add vi kf ki lv = IState.add vi (kf, ki, lv)
 
@@ -80,21 +80,21 @@ end = struct
     let old, l =
       fold
         (fun v elt (old, l) -> match v, old with
-        | v, None ->
-          assert (l = []);
-          Some v, [ elt ]
-        | v, (Some old as some) when Varinfo.equal v old ->
-          some, elt :: l
-        | v, Some old ->
-          f old l;
-          Some v, [ elt ])
+           | v, None ->
+             assert (l = []);
+             Some v, [ elt ]
+           | v, (Some old as some) when Varinfo.equal v old ->
+             some, elt :: l
+           | v, Some old ->
+             f old l;
+             Some v, [ elt ])
         (None, [])
     in
     Option.iter (fun v -> f v l) old
 
   let fold_sorted f init =
     let map = IState.fold Varinfo.Map.add Varinfo.Map.empty in
-    Varinfo.Map.fold f map init       
+    Varinfo.Map.fold f map init
 
   let iter = iter_aux IState.fold
   let iter_sorted = iter_aux fold_sorted
@@ -114,10 +114,10 @@ class occurrence = object (self)
       try
         Locations.Zone.fold_topset_ok
           (fun b _ () ->
-            match b with
-              | Base.Var (vi, _) | Base.Allocated (vi, _, _) ->
-                  Occurrences.add vi self#current_kf ki lv
-              | _ -> ()
+             match b with
+             | Base.Var (vi, _) | Base.Allocated (vi, _, _) ->
+               Occurrences.add vi self#current_kf ki lv
+             | _ -> ()
           ) z ()
       with Abstract_interp.Error_Top ->
         error ~current:true "Found completely imprecise value (%a). Ignoring@."
@@ -130,8 +130,8 @@ class occurrence = object (self)
        let lv = !Db.Properties.Interp.term_lval_to_lval ~result:None tlv in
        ignore (self#vlval lv)
      with
-       (* Translation to lval failed.*)
-       | Db.Properties.Interp.No_conversion -> ());
+     (* Translation to lval failed.*)
+     | Db.Properties.Interp.No_conversion -> ());
     DoChildren
 
   method! vstmt_aux s =
@@ -163,40 +163,40 @@ let classify_accesses (_kf, ki, lv) =
   let is_lv = Cil_datatype.Lval.equal lv in
   let contained_exp = aux Cil.visitCilExpr in
   match ki with
-    | Kglobal -> (* Probably initializers *) Read
+  | Kglobal -> (* Probably initializers *) Read
 
-    | Kstmt { skind = Instr i } ->
-      (match i with
-        | Set (lv', e, _) ->
-            if is_lv lv' then
-              if contained_exp e then Both
-              else Write
-            else Read
+  | Kstmt { skind = Instr i } ->
+    (match i with
+     | Set (lv', e, _) ->
+       if is_lv lv' then
+         if contained_exp e then Both
+         else Write
+       else Read
 
-        | Call (Some lv', f, args, _) ->
-            if is_lv lv' then
-              if contained_exp f || List.exists contained_exp args then Both
-              else Write
-            else Read
+     | Call (Some lv', f, args, _) ->
+       if is_lv lv' then
+         if contained_exp f || List.exists contained_exp args then Both
+         else Write
+       else Read
 
-        | Local_init (v, _, _) ->
-          (match lv with
-           | Var v', _ when Cil_datatype.Varinfo.equal v v' ->
-             (* We are initializing v. We can't read from it at the same time.
-                Hence, there's no need to perform the additional checks done
-                in the cases above. *)
-             Write
-           | _ -> Read)
-
-        | Asm (_, _, Some { asm_outputs; asm_inputs },_) ->
-            if List.exists (fun (_, _, out) -> is_lv out) asm_outputs then
-              if List.exists (fun (_, _, inp) -> contained_exp inp) asm_inputs
-              then Both
-              else Write
-            else Read
-
+     | Local_init (v, _, _) ->
+       (match lv with
+        | Var v', _ when Cil_datatype.Varinfo.equal v v' ->
+          (* We are initializing v. We can't read from it at the same time.
+             Hence, there's no need to perform the additional checks done
+             in the cases above. *)
+          Write
         | _ -> Read)
-    | _ -> Read
+
+     | Asm (_, _, Some { asm_outputs; asm_inputs },_) ->
+       if List.exists (fun (_, _, out) -> is_lv out) asm_outputs then
+         if List.exists (fun (_, _, inp) -> contained_exp inp) asm_inputs
+         then Both
+         else Write
+       else Read
+
+     | _ -> Read)
+  | _ -> Read
 
 let compute, _self =
   let run () =
@@ -213,26 +213,26 @@ let get vi =
 let d_ki fmt = function
   | None, Kglobal -> Format.fprintf fmt "global"
   | Some kf, Kglobal ->
-      Format.fprintf fmt "specification of %a" Kernel_function.pretty kf
+    Format.fprintf fmt "specification of %a" Kernel_function.pretty kf
   | _, Kstmt s -> Format.fprintf fmt "sid %d" s.sid
 
 let print_one fmt v l =
-  Format.fprintf fmt "variable %s (%s):@\n" 
-    v.vname 
+  Format.fprintf fmt "variable %s (%s):@\n"
+    v.vname
     (if v.vglob then "global"
-     else 
-	let kf_name = match l with
-	  | [] -> assert false
-          | (Some kf, _, _) :: _ -> Kernel_function.get_name kf
-          | (None,Kstmt _,_)::_ -> assert false
-          | (None,Kglobal,_)::_ ->
-              fatal "inconsistent context for occurrence of variable %s" v.vname
-	in
-	if v.vformal then "parameter of " ^ kf_name
-	else "local of " ^ kf_name);
+     else
+       let kf_name = match l with
+         | [] -> assert false
+         | (Some kf, _, _) :: _ -> Kernel_function.get_name kf
+         | (None,Kstmt _,_)::_ -> assert false
+         | (None,Kglobal,_)::_ ->
+           fatal "inconsistent context for occurrence of variable %s" v.vname
+       in
+       if v.vformal then "parameter of " ^ kf_name
+       else "local of " ^ kf_name);
   List.iter
     (fun (kf, ki, lv) ->
-      Format.fprintf fmt "  %a: %a@\n" d_ki (kf,ki) Printer.pp_lval lv) l
+       Format.fprintf fmt "  %a: %a@\n" d_ki (kf,ki) Printer.pp_lval lv) l
 
 let print_all () =
   compute ();
@@ -249,11 +249,11 @@ let get =
   Journal.register
     "Occurrence.get"
     (Datatype.func
-    Varinfo.ty
-    (* [JS 2011/04/01] Datatype.list buggy in presence of journalisation.
-       See comment in datatype.ml *)
-    (*(Datatype.list (Datatype.pair Kinstr.ty Lval.ty))*)
-    (let module L = Datatype.List(Occurrence_datatype) in L.ty))
+       Varinfo.ty
+       (* [JS 2011/04/01] Datatype.list buggy in presence of journalisation.
+          See comment in datatype.ml *)
+       (*(Datatype.list (Datatype.pair Kinstr.ty Lval.ty))*)
+       (let module L = Datatype.List(Occurrence_datatype) in L.ty))
     get
 
 let print_all =

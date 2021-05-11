@@ -29,9 +29,9 @@ open Output
 
 (* re-exporting record fields *)
 type project = t = private
-    { pid : int;
-      mutable name : string;
-      mutable unique_name : string }
+  { pid : int;
+    mutable name : string;
+    mutable unique_name : string }
 
 let rehash_ref = ref (fun _ -> assert false)
 
@@ -60,7 +60,7 @@ module D =
       let pretty fmt p = Format.fprintf fmt "project %S" p.unique_name
       let varname p = "p_" ^ p.name
       let mem_project f x = f x
-     end)
+    end)
 include (D: Datatype.S_no_copy with type t = Project_skeleton.t)
 
 module Project_tbl = Hashtbl.Make(D)
@@ -171,30 +171,30 @@ module States_operations = struct
     iter_on_selection
       ?selection
       (fun s () ->
-        try
-          let n = get_unique_name s in
-          let d = Hashtbl.find tbl n in
-          (try
-             (private_ops s).unserialize dst d;
+         try
+           let n = get_unique_name s in
+           let d = Hashtbl.find tbl n in
+           (try
+              (private_ops s).unserialize dst d;
               (* do not remove if [State.Incompatible_datatype] occurs *)
-             Hashtbl.remove tbl n
-           with
-           | Not_found ->
-             fatal "unexpected 'Not_found' when unserializing; \
-                    possibly an issue with a hook"
-           | State.Incompatible_datatype _ ->
+              Hashtbl.remove tbl n
+            with
+            | Not_found ->
+              fatal "unexpected 'Not_found' when unserializing; \
+                     possibly an issue with a hook"
+            | State.Incompatible_datatype _ ->
               (* datatype of [s] on disk is incompatible with the one in RAM: as
                  [dst] is a new project, [s] is already equal to its default
                  value. However must clear the dependencies for consistency, but
                  it is doable only when all states are loaded. *)
-             State.Hashtbl.add invalid_on_disk s ())
-        with Not_found ->
+              State.Hashtbl.add invalid_on_disk s ())
+         with Not_found ->
            (* [s] is in RAM but not on disk: silently ignore it!  Furthermore,
               all the dependencies of [s] are consistent with this default
               value. So no need to clear them. Whenever the value of [s] in
               [dst] changes, the dependencies will be cleared (if required by
               the user). *)
-          ())
+           ())
       ();
     (* warns for the saved states that cannot be loaded
        (either they are not in RAM or they are incompatible). *)
@@ -203,7 +203,7 @@ module States_operations = struct
     in
     pp_err
       "%d state%s in saved file ignored. \
-%s this Frama-C configuration."
+       %s this Frama-C configuration."
       nb_ignored
       "It is invalid in"
       "They are invalid in";
@@ -215,15 +215,15 @@ module States_operations = struct
     let to_be_cleared =
       State.Hashtbl.fold
         (fun s () ->
-          State_selection.union
-            (State_selection.only_dependencies s))
+           State_selection.union
+             (State_selection.only_dependencies s))
         invalid_on_disk
         State_selection.empty
     in
     let nb_cleared = State_selection.cardinal to_be_cleared in
     if nb_cleared > 0 then begin
       pp_err "%d state%s in memory reset to their default value. \
-%s this Frama_C configuration."
+              %s this Frama_C configuration."
         nb_cleared
         "It is inconsistent in"
         "They are inconsistent in";
@@ -244,7 +244,7 @@ let guarded_feedback selection level fmt_msg =
         let states fmt =
           if n > 1 then Format.fprintf fmt " (for %d states)" n
           else Format.fprintf fmt " (for 1 state)"
-	in
+        in
         feedback ~dkey ~level ~append:states fmt_msg;
   else
     Pretty_utils.nullprintf fmt_msg
@@ -254,7 +254,7 @@ let dft_sel () = State_selection.full
 module Q = Qstack.Make(struct type t = project let equal = equal end)
 
 let projects = Q.create ()
-  (* The stack of projects. *)
+(* The stack of projects. *)
 
 let current () = Q.top projects
 let is_current p = equal p (current ())
@@ -263,8 +263,8 @@ let last_created_by_copy_ref: t option ref = ref None
 let () =
   Cmdline.last_project_created_by_copy :=
     (fun () -> match !last_created_by_copy_ref with
-    | None -> None
-    | Some p -> Some p.unique_name)
+       | None -> None
+       | Some p -> Some p.unique_name)
 
 let iter_on_projects f = Q.iter f projects
 let fold_on_projects f acc = Q.fold f acc projects
@@ -278,7 +278,7 @@ let from_unique_name uname =
 
 module Mem = struct
   let mem s =
-    try ignore (from_unique_name s); true 
+    try ignore (from_unique_name s); true
     with Unknown_project -> false
 end
 module Setter = Make_setter(Mem)
@@ -482,10 +482,10 @@ let journalized_clear =
     (lbl "selection" dft_sel State_selection.ty
        (lbl "project" current ty (Datatype.func Datatype.unit Datatype.unit)))
     (fun selection project () ->
-      guarded_feedback selection 2 "clearing project %S" project.unique_name;
-      Before_Clear_Hook.apply project;
-      States_operations.clear ~selection project;
-      After_Clear_Hook.apply project;
+       guarded_feedback selection 2 "clearing project %S" project.unique_name;
+       Before_Clear_Hook.apply project;
+       States_operations.clear ~selection project;
+       After_Clear_Hook.apply project;
        (*Gc.major ()*))
 
 let clear ?(selection=State_selection.full) ?(project=current()) () =
@@ -573,35 +573,35 @@ let save_all ?(selection=State_selection.full) filename =
 module Descr = struct
 
   let project_under_copy_ref: project option ref = ref None
-    (* The project which is currently copying. Only set by [create_by_copy].
-       In this case, there is no possible dangling project pointers (projects
-       at saving time and at loading time are the same).
-       Furthermore, we have to merge pre-existing projects and loaded
-       projects, except the project under copy. *)
+  (* The project which is currently copying. Only set by [create_by_copy].
+     In this case, there is no possible dangling project pointers (projects
+     at saving time and at loading time are the same).
+     Furthermore, we have to merge pre-existing projects and loaded
+     projects, except the project under copy. *)
 
   module Rehash =
     Hashtbl.Make
       (struct
-         type t = project
-         let hash p = Hashtbl.hash p.pid
-         let equal x y =
-           match !project_under_copy_ref with
-           | Some p when p.pid <> x.pid && p.pid <> y.pid ->
-               (* Merge projects on disk with pre-existing projects, except the
-                  project under copy; so don't use (==) in this context. *)
-               x.pid = y.pid
-           | None | Some _ ->
-               (* In all other cases, don't merge.
-                  (==) ensures that there is no sharing between a pre-existing
-                  project and a project on disk. Great! *)
-               x == y
-       end)
+        type t = project
+        let hash p = Hashtbl.hash p.pid
+        let equal x y =
+          match !project_under_copy_ref with
+          | Some p when p.pid <> x.pid && p.pid <> y.pid ->
+            (* Merge projects on disk with pre-existing projects, except the
+               project under copy; so don't use (==) in this context. *)
+            x.pid = y.pid
+          | None | Some _ ->
+            (* In all other cases, don't merge.
+               (==) ensures that there is no sharing between a pre-existing
+               project and a project on disk. Great! *)
+            x == y
+      end)
 
   let rehash_cache : project Rehash.t = Rehash.create 7
   let existing_projects : unit Project_tbl.t = Project_tbl.create 7
 
   let rehash p =
-(*    Format.printf "REHASHING %S (%d;%x)@." p.unique_name p.pid (Extlib.address_of_value p);*)
+    (*    Format.printf "REHASHING %S (%d;%x)@." p.unique_name p.pid (Extlib.address_of_value p);*)
     try
       Rehash.find rehash_cache p
     with Not_found ->
@@ -612,7 +612,7 @@ module Descr = struct
 
   let init project_under_copy =
     assert (Rehash.length rehash_cache = 0
-           && Project_tbl.length existing_projects = 0);
+            && Project_tbl.length existing_projects = 0);
     project_under_copy_ref := project_under_copy;
     Q.fold
       (fun acc p -> Project_tbl.add existing_projects p (); p :: acc)
@@ -621,22 +621,22 @@ module Descr = struct
 
   let finalize loaded_states selection =
     (match !project_under_copy_ref with
-    | None ->
-      List.iter
-        (fun ( (p, _)) ->
-          States_operations.clear_some_projects
-            ~selection
-            (fun p -> not (Project_tbl.mem existing_projects p))
-            p)
-        loaded_states
-    | Some _ ->
-      ());
+     | None ->
+       List.iter
+         (fun ( (p, _)) ->
+            States_operations.clear_some_projects
+              ~selection
+              (fun p -> not (Project_tbl.mem existing_projects p))
+              p)
+         loaded_states
+     | Some _ ->
+       ());
     Rehash.clear rehash_cache;
     Project_tbl.clear existing_projects
 
   let global_state name selection =
     let state_on_disk s =
-(*      Format.printf "State %S@." s;*)
+      (*      Format.printf "State %S@." s;*)
       let descr =
         try State.get_descr (State.get s)
         with State.Unknown -> Structural_descr.p_unit (* dummy value *)
@@ -653,11 +653,11 @@ module Descr = struct
       let unmarshal_states p =
         Descr.dynamic
           (fun () ->
-            (* Local states must be up-to-date according to [p] when
-	             unmarshalling states of [p] *)
-            unjournalized_set_current true selection p;
-            Before_load.apply ();
-            Descr.t_list tbl_on_disk)
+             (* Local states must be up-to-date according to [p] when
+                unmarshalling states of [p] *)
+             unjournalized_set_current true selection p;
+             Before_load.apply ();
+             Descr.t_list tbl_on_disk)
       in
       Descr.dependent_pair descr unmarshal_states
     in
@@ -665,16 +665,16 @@ module Descr = struct
       Descr.transform
         one_state
         (fun (p, s as c) ->
-          (* if we provide an explicit name different of the current one, 
-             rename project [p] *)
-          (match name with Some s when s <> p.name -> set_name p s | _ -> ());
-          Project_tbl.add existing_projects p ();
-          (* At this point, the local states are always up-to-date according
-             to the current project, since we load first the old current
-             project *)
-          States_operations.unserialize ~selection p s;
-          After_load.apply ();
-          c)
+           (* if we provide an explicit name different of the current one,
+              rename project [p] *)
+           (match name with Some s when s <> p.name -> set_name p s | _ -> ());
+           Project_tbl.add existing_projects p ();
+           (* At this point, the local states are always up-to-date according
+              to the current project, since we load first the old current
+              project *)
+           States_operations.unserialize ~selection p s;
+           After_load.apply ();
+           c)
     in
     Descr.t_pair
       (Descr.t_list final_one_state)
@@ -848,9 +848,9 @@ module Undo = struct
     if Cmdline.use_obj then begin
       clear_breakpoint ();
       filename := Filepath.Normalized.of_string
-        (try Extlib.temp_file_cleanup_at_exit short_filename ".sav"
-         with Extlib.Temp_file_error s ->
-           abort "cannot create temporary file: %s" s);
+          (try Extlib.temp_file_cleanup_at_exit short_filename ".sav"
+           with Extlib.Temp_file_error s ->
+             abort "cannot create temporary file: %s" s);
       Journal.prevent save_all !filename;
       Journal.save ()
     end

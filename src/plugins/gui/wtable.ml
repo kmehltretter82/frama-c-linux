@@ -111,8 +111,8 @@ class ['a] makecolumns ?packing ?width ?height
     method scroll =
       match scroll with
       | None ->
-          let s = GBin.scrolled_window ?width ?height () in
-          s#add view#coerce ; scroll <- Some s ; s
+        let s = GBin.scrolled_window ?width ?height () in
+        s#add view#coerce ; scroll <- Some s ; s
       | Some s -> s
 
     method pack packing = packing self#scroll#coerce
@@ -158,12 +158,12 @@ class ['a] makecolumns ?packing ?width ?height
             let y = int_of_float (Button.y evt) in
             match view#get_path_at_pos ~x ~y with
             | Some (path,col,_,_) ->
-                begin
-                  match model#custom_get_iter path with
-                  | None -> false
-                  | Some item ->
-                      let () = f item col in false
-                end
+              begin
+                match model#custom_get_iter path with
+                | None -> false
+                | Some item ->
+                  let () = f item col in false
+              end
             | _ -> false
           end
         else false
@@ -173,11 +173,11 @@ class ['a] makecolumns ?packing ?width ?height
       let callback () =
         match view#get_cursor () with
         | Some path , Some col ->
-            begin
-              match model#custom_get_iter path with
-              | None -> ()
-              | Some item -> f item col
-            end
+          begin
+            match model#custom_get_iter path with
+            | None -> ()
+            | Some item -> f item col
+          end
         | _ -> ()
       in ignore (view#connect#cursor_changed ~callback)
 
@@ -265,9 +265,9 @@ class ['a] glist_model (m : 'a listmodel) =
 
     method custom_iter_children e = match e with
       | None when (m#size > 0) ->
-          Some(m#get 0)
+        Some(m#get 0)
       | _ ->
-          None
+        None
 
     method custom_iter_has_child (_:'a) =
       false
@@ -279,7 +279,7 @@ class ['a] glist_model (m : 'a listmodel) =
     method custom_iter_nth_child r k = match r with
       | Some _ -> failwith "GwList: no nth-child"
       | None ->
-          if k < m#size then Some (m#get k) else None
+        if k < m#size then Some (m#get k) else None
 
     method custom_iter_parent (_:'a) = None
 

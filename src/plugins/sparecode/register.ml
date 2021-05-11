@@ -33,10 +33,10 @@ module Result =
        (struct let module_name = "Sparecode" end))
     (Project.Datatype)
     (struct
-       let name = "Sparecode"
-       let size = 7
-       let dependencies = [ Ast.self; Db.Value.self ] (* delayed, see below *)
-     end)
+      let name = "Sparecode"
+      let size = 7
+      let dependencies = [ Ast.self; Db.Value.self ] (* delayed, see below *)
+    end)
 
 let () =
   Cmdline.run_after_extended_stage
@@ -65,10 +65,10 @@ let journalized_rm_unused_globals  =
     unjournalized_rm_unused_globals
 
 let rm_unused_globals ?new_proj_name ?(project=Project.current ()) () =
-  let new_proj_name = 
-    match new_proj_name with 
-    | Some name -> name 
-    | None -> (Project.get_name project)^ " (without unused globals)" 
+  let new_proj_name =
+    match new_proj_name with
+    | Some name -> name
+    | None -> (Project.get_name project)^ " (without unused globals)"
   in
   journalized_rm_unused_globals new_proj_name project
 
@@ -101,9 +101,9 @@ let journalized_get =
        ~label2:("select_slice_pragma", None) Datatype.bool
        Project.ty)
     (fun select_annot select_slice_pragma ->
-      Result.memo
-        (fun _ -> run select_annot select_slice_pragma)
-        (select_annot, select_slice_pragma))
+       Result.memo
+         (fun _ -> run select_annot select_slice_pragma)
+         (select_annot, select_slice_pragma))
 
 (* add labels *)
 let get ~select_annot ~select_slice_pragma =

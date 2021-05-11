@@ -25,8 +25,8 @@
 (* ************************************************************************** *)
 
 module Make
-  (G:Graph.Sig.G with type V.t = Kernel_function.t)
-  (N:sig val name: string end) =
+    (G:Graph.Sig.G with type V.t = Kernel_function.t)
+    (N:sig val name: string end) =
 struct
 
   (* Topological iterations are memoized in order to improve efficiency when
@@ -39,7 +39,7 @@ struct
       (struct
         let name = "Callgraph.Uses" ^ N.name
         let dependencies = [ Cg.self ]
-       end)
+      end)
 
   module T = Graph.Topological.Make_stable(G)
 
@@ -61,15 +61,15 @@ let iter_in_order =
 
 let iter_in_rev_order =
   let module I =
-        Make
-          (struct
-            include Cg.G
-            (* inverse operations over successors required by
-               [Graph.Topological.G] *)
-            let iter_succ = iter_pred
-            let in_degree = out_degree
-           end)
-          (struct let name = "iter_in_rev_order" end)
+    Make
+      (struct
+        include Cg.G
+        (* inverse operations over successors required by
+           [Graph.Topological.G] *)
+        let iter_succ = iter_pred
+        let in_degree = out_degree
+      end)
+      (struct let name = "iter_in_rev_order" end)
   in
   fun f -> I.iter (Cg.get ()) f
 
@@ -80,11 +80,11 @@ let iter_on_aux iter_dir f kf =
     let rec aux kf =
       iter_dir
         (fun kf' ->
-          if not (Kernel_function.Hashtbl.mem visited kf') then begin
-            f kf';
-            Kernel_function.Hashtbl.add visited kf' ();
-            aux kf'
-          end)
+           if not (Kernel_function.Hashtbl.mem visited kf') then begin
+             f kf';
+             Kernel_function.Hashtbl.add visited kf' ();
+             aux kf'
+           end)
         cg
         kf
     in
@@ -97,8 +97,8 @@ let is_local_or_formal_of_caller v kf =
   try
     iter_on_callers
       (fun caller ->
-        if Base.is_formal_or_local v (Kernel_function.get_definition caller)
-        then raise Exit)
+         if Base.is_formal_or_local v (Kernel_function.get_definition caller)
+         then raise Exit)
       kf;
     false
   with Exit ->
@@ -109,11 +109,11 @@ let accept_base ~with_formals ~with_locals kf v =
   Base.is_global v
   ||
   (match with_formals, with_locals, kf.fundec with
-     | false, false, _ | false, _, Declaration _ -> false
-     | true,  false, Definition (fundec,_) -> Base.is_formal v fundec
-     | false, true, Definition (fundec, _) -> Base.is_local v fundec
-     | true,  true, Definition (fundec, _) -> Base.is_formal_or_local v fundec
-     | true , _, Declaration (_, vd, _, _) -> Base.is_formal_of_prototype v vd)
+   | false, false, _ | false, _, Declaration _ -> false
+   | true,  false, Definition (fundec,_) -> Base.is_formal v fundec
+   | false, true, Definition (fundec, _) -> Base.is_local v fundec
+   | true,  true, Definition (fundec, _) -> Base.is_formal_or_local v fundec
+   | true , _, Declaration (_, vd, _, _) -> Base.is_formal_of_prototype v vd)
   || is_local_or_formal_of_caller v kf
 
 let nb_calls () =

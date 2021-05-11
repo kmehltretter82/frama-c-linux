@@ -20,16 +20,16 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Undocumented. 
+(** Undocumented.
     Do not use this module if you don't know what you are doing. *)
 
 (* [JS 2011/10/03] Yet useless for the Frama-C platform. It seems to be only
-   used by a CEA private plug-in (AP via LC). 
+   used by a CEA private plug-in (AP via LC).
    To the authors/users of this module: please document it. *)
 
 type t
 
-val make: 
+val make:
   ?tab_pos:Gtk.Tags.position -> ?packing:(GObj.widget -> unit) -> unit -> t
 
 val get_notebook: t -> GPack.notebook

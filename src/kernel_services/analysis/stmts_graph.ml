@@ -33,13 +33,13 @@ struct
 
   module HV = Hashtbl.Make(Stmt)
   module HptmapStmtBool = Hptmap.Make
-    (Cil_datatype.Stmt_Id)
-    (struct include Datatype.Bool let pretty_debug = pretty end)
-    (Hptmap.Comp_unused)
-    (struct let v = [ [] ] end)
-    (struct let l = [ Ast.self ] end)
-    (* Clear the (non-project compliant) internal caches each time the ast
-       changes, which includes every time we switch project. *)
+      (Cil_datatype.Stmt_Id)
+      (struct include Datatype.Bool let pretty_debug = pretty end)
+      (Hptmap.Comp_unused)
+      (struct let v = [ [] ] end)
+      (struct let l = [ Ast.self ] end)
+  (* Clear the (non-project compliant) internal caches each time the ast
+     changes, which includes every time we switch project. *)
   let () = Ast.add_hook_on_update (fun _ -> HptmapStmtBool.clear_caches ())
 
   (* this a cache containing the path tests already computed *)
@@ -58,27 +58,27 @@ struct
   let check_path_using_filter filterfunc pc v1 v2 =
     let assoc = find_assoc_with_default pc v1 in
     try HptmapStmtBool.find v2 assoc
-    with Not_found -> 
+    with Not_found ->
       (* the path is not in cache; we check it with Dijkstra *)
       let visited = HV.create 97 in
       let q = Queue.create () in
       let rec loop () =
-	if Queue.is_empty q then begin
+        if Queue.is_empty q then begin
           add_to_cache pc v1 v2 false;
-	  false
-	end else begin
-	  let v = Queue.pop q in
+          false
+        end else begin
+          let v = Queue.pop q in
           add_to_cache  pc v1 v true;
-	  if Stmt.equal v v2 then
-	    true
-	  else begin
-	    if not (HV.mem visited v) then begin
-	      HV.add visited v ();
-	      List.iter (fun v' -> if filterfunc v' then Queue.add v' q) v.succs
-	    end;
-	    loop ()
-	  end
-	end
+          if Stmt.equal v v2 then
+            true
+          else begin
+            if not (HV.mem visited v) then begin
+              HV.add visited v ();
+              List.iter (fun v' -> if filterfunc v' then Queue.add v' q) v.succs
+            end;
+            loop ()
+          end
+        end
       in
       Queue.add v1 q;
       loop ()
@@ -107,7 +107,7 @@ module StmtCanReachCache =
       let name = "Eval_funs.StmtCanReachCache"
       let size = 17
       let dependencies = [ Ast.self ]
-     end)
+    end)
 
 let stmt_can_reach = StmtCanReachCache.memo stmt_can_reach
 
@@ -146,7 +146,7 @@ module TP = struct
        | Break _ -> Format.sprintf "BREAK <%d>" s.sid
        | Continue _ -> Format.sprintf "CONTINUE <%d>" s.sid
        | If(e,_,_,_) ->
-	 Format.asprintf "IF <%d>\n%a" s.sid Printer.pp_exp e
+         Format.asprintf "IF <%d>\n%a" s.sid Printer.pp_exp e
        | Switch _ ->  Format.sprintf "SWITCH <%d>" s.sid
        | Loop _ ->  Format.sprintf "WHILE(1) <%d>" s.sid
        | Block _ ->  Format.sprintf "BLOCK <%d>" s.sid
@@ -213,19 +213,19 @@ module StmtsGraphTbl=
          let name = "Stmts_Graph.StmtsGraphTbl"
          let reprs = [ SG.create () ]
          let mem_project = Datatype.never_any_project
-        end))
+       end))
     (struct
       let name = "StmtsGraphTbl"
       let size = 17
       let dependencies = [ Ast.self ]
-     end)
+    end)
 
 let get_graph kf =
   StmtsGraphTbl.memo
     (fun kf -> match kf.fundec with
-    | Definition (f,_) ->
-      compute_stmtgraph_func f
-    | Declaration _ -> assert false)
+       | Definition (f,_) ->
+         compute_stmtgraph_func f
+       | Declaration _ -> assert false)
     kf
 
 
@@ -260,7 +260,7 @@ module StmtStmts =
       let name = "Stmts_graph.StmtStmts"
       let size = 142
       let dependencies = [ Ast.self ]
-     end)
+    end)
 
 let rec get_block_stmts blk =
   let add stmts s = Stmt.Set.union (get_stmt_stmts s) stmts in
@@ -272,20 +272,20 @@ and get_stmt_stmts s =
     | Instr _ | Return _ | Throw _ -> Stmt.Set.singleton s
     | Continue _ | Break _ | Goto _ -> Stmt.Set.singleton s
     | Block b | Switch (_, b, _, _) | Loop (_, b, _, _, _) ->
-        Stmt.Set.add s (get_block_stmts b)
+      Stmt.Set.add s (get_block_stmts b)
     | UnspecifiedSequence seq ->
-        let b = Cil.block_from_unspecified_sequence seq in
-          Stmt.Set.add s (get_block_stmts b)
+      let b = Cil.block_from_unspecified_sequence seq in
+      Stmt.Set.add s (get_block_stmts b)
     | If (_, b1, b2, _) ->
-        let stmts =
-          Stmt.Set.union (get_block_stmts b1)(get_block_stmts b2)
-        in Stmt.Set.add s stmts
+      let stmts =
+        Stmt.Set.union (get_block_stmts b1)(get_block_stmts b2)
+      in Stmt.Set.add s stmts
     | TryCatch(t,c,_) ->
-      List.fold_left 
+      List.fold_left
         (fun acc (_,b) -> Stmt.Set.union acc (get_block_stmts b))
         (get_block_stmts t) c
     | TryExcept (_, _, _, _) | TryFinally (_, _, _) ->
-        Kernel.not_yet_implemented ~current:true "exception handling"
+      Kernel.not_yet_implemented ~current:true "exception handling"
   in
   StmtStmts.memo compute_stmt_stmts s
 
@@ -306,19 +306,19 @@ type waysout = { normal : EdgesDatatype.t ;
                  continues : EdgesDatatype.t ;
                  returns : EdgesDatatype.t ;
                  gotos : EdgesDatatype.t ;
-}
+               }
 let empty_waysout = { normal = []; breaks = []; continues = [];
                       returns = []; gotos = [] }
 
 module WaysOutDatatype =
   Datatype.Make
     (struct
-       include Datatype.Undefined (* TODO: unmarshal ? *)
-       type t = waysout
-       let reprs = [ empty_waysout ]
-       let name = "WaysOut"
-       let mem_project = Datatype.never_any_project
-     end)
+      include Datatype.Undefined (* TODO: unmarshal ? *)
+      type t = waysout
+      let reprs = [ empty_waysout ]
+      let name = "WaysOut"
+      let mem_project = Datatype.never_any_project
+    end)
 
 module StmtWaysOut =
   Cil_state_builder.Stmt_hashtbl (WaysOutDatatype)
@@ -326,35 +326,35 @@ module StmtWaysOut =
       let name = "Stmts_graphs.StmtWaysOut"
       let size = 142
       let dependencies = [ StmtStmts.self ]
-     end)
+    end)
 
 let compute_stmts_out_edges stmts =
   let do_s s waysout =
     (* if [s] has a successor [s'] which is not in [stmt] statements,
-    * add [s,s'] *)
+     * add [s,s'] *)
     let add s acc =
       let do_succ acc s' =
         if Stmt.Set.mem s' stmts then acc
         else (s, s')::acc
       in List.fold_left do_succ acc s.succs
     in match s.skind with
-          | Continue _ -> { waysout with continues = add s waysout.continues }
-          | Break _ -> { waysout with breaks = add s waysout.breaks }
-          | Return _ -> { waysout with returns = add s waysout.returns }
-          | Goto _ ->
-              begin
-                match s.succs with
-                  | { skind = Return _ }::[] ->
-                      { waysout with returns = add s waysout.returns }
-                  | _ -> { waysout with gotos = add s waysout.gotos }
-              end
-           | _ -> { waysout with normal = add s waysout.normal }
+    | Continue _ -> { waysout with continues = add s waysout.continues }
+    | Break _ -> { waysout with breaks = add s waysout.breaks }
+    | Return _ -> { waysout with returns = add s waysout.returns }
+    | Goto _ ->
+      begin
+        match s.succs with
+        | { skind = Return _ }::[] ->
+          { waysout with returns = add s waysout.returns }
+        | _ -> { waysout with gotos = add s waysout.gotos }
+      end
+    | _ -> { waysout with normal = add s waysout.normal }
   in
-    Stmt.Set.fold do_s stmts empty_waysout
+  Stmt.Set.fold do_s stmts empty_waysout
 
 let merge_waysout waysout =
-    waysout.normal @ waysout.breaks @ waysout.continues @
-    waysout.returns @ waysout.gotos
+  waysout.normal @ waysout.breaks @ waysout.continues @
+  waysout.returns @ waysout.gotos
 
 let select_waysout termination_kind waysout =
   match termination_kind with
@@ -386,7 +386,7 @@ let get_all_block_out_edges blk =
 
 let get_block_out_edges termination_kind blk =
   let waysout = compute_block_out_edges blk in
-    select_waysout termination_kind waysout
+  select_waysout termination_kind waysout
 
 let get_all_stmt_last_stmts s =
   List.map fst (get_all_stmt_out_edges s)
@@ -408,7 +408,7 @@ module StmtWaysIn =
       let name = "Stmts_graphs.StmtWaysIn"
       let size = 142
       let dependencies = [ StmtStmts.self ]
-     end)
+    end)
 
 let compute_stmts_in_edges stmts =
   let add s acc =
@@ -421,7 +421,7 @@ let compute_stmt_entry_stmts stmt =
   compute_stmts_in_edges (get_stmt_stmts stmt)
 
 let get_stmt_in_edges s =
-    StmtWaysIn.memo compute_stmt_entry_stmts s
+  StmtWaysIn.memo compute_stmt_entry_stmts s
 
 let get_block_in_edges blk =
   compute_stmts_in_edges (get_block_stmts blk)
