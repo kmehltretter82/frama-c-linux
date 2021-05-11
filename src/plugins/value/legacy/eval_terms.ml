@@ -737,6 +737,7 @@ let known_logic_funs = [
 let known_predicates = [
   "\\warning", ACSL;
   "\\is_finite", ACSL;
+  "\\is_infinite", ACSL;
   "\\is_plus_infinity", ACSL;
   "\\is_minus_infinity", ACSL;
   "\\is_NaN", ACSL;
@@ -2036,6 +2037,8 @@ let reduce_by_known_papp ~alarm_mode env positive li _labels args =
   match li.l_var_info.lv_name, args with
   | "\\is_finite", [arg] ->
     reduce_float (Fval.backward_is_finite ~positive) arg
+  | "\\is_infinite", [arg] ->
+    reduce_float (Fval.backward_is_infinite ~positive) arg
   | "\\is_plus_infinity", [arg] ->
     reduce_float (reduce_by_infinity ~pos:true) arg
   | "\\is_minus_infinity", [arg] ->
@@ -2555,6 +2558,7 @@ and eval_predicate env pred =
     in
     match li.l_var_info.lv_name, args with
     | "\\is_finite", [arg] -> unary_float Fval.is_finite arg
+    | "\\is_infinite", [arg] -> unary_float Fval.is_infinite arg
     | "\\is_plus_infinity", [arg] ->
       let pos_inf = Fval.pos_infinity Float_sig.Single in
       unary_float (fun f -> Fval.forward_comp Comp.Eq f pos_inf) arg
