@@ -2,8 +2,9 @@
 { pkgs, stdenv, src ? ../., opam2nix, ocaml ? pkgs.ocaml-ng.ocamlPackages_4_08.ocaml, plugins ? { } }:
 
 let mydir = builtins.getEnv("PWD");
-    mk-opam-selection = name: {
+    mk-opam-selection = { name, opamSrc?null, ... }: {
       inherit ocaml;
+      src = opamSrc;
       selection = "${mydir}/${name}-${ocaml.version}-opam-selection.nix";
     };
     opamPackages =
@@ -22,7 +23,7 @@ let mydir = builtins.getEnv("PWD");
               opamPackages ++ args.opamPackages
             else opamPackages
           ;
-          opam-selection = mk-opam-selection args.name;
+          opam-selection = mk-opam-selection args;
           buildInputs = args.buildInputs ++ opam2nix.buildInputs opam-selection;
       in
         stdenv.mkDerivation (
