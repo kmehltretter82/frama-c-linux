@@ -1,6 +1,8 @@
 /* run.config
    FILTER: sed -E -e '/atanf_/ s/([0-9][.][0-9]{6})[0-9]+/\1/g'
    STDOPT: #"-warn-special-float none" #"-cpp-extra-args=\"-DNONFINITE\"" #"-eva-slevel 4"
+   STDOPT: #"-warn-special-float nan" #"-cpp-extra-args=\"-DNONFINITE -DNONAN\"" #"-eva-slevel 4"
+   STDOPT: #"-eva-slevel 4"
 */
 #include <math.h>
 const double pi = 3.14159265358979323846264338327950288;
@@ -21,16 +23,22 @@ const double one = 1.0;
 const double minus_one = -1.0;
 const double large = 1e38;
 #ifdef NONFINITE
-const double huge_val = HUGE_VAL;
-const float huge_valf = HUGE_VALF;
-const long double huge_vall = HUGE_VALL;
+const float f_pos_inf = HUGE_VALF;
+const double pos_inf = HUGE_VAL;
+const long double ld_pos_inf = HUGE_VALL;
+const float f_neg_inf = -HUGE_VALF;
+const double neg_inf = -HUGE_VAL;
+const long double ld_neg_inf = -HUGE_VALL;
 const float infinity = INFINITY;
 #endif
 const double fp_ilogb0 = FP_ILOGB0;
 const double fp_ilogbnan = FP_ILOGBNAN;
 volatile int int_top;
 
-#define TEST_VAL_CONST(type,f,cst) type f##_##cst = f(cst)
+volatile int nondet;
+
+#define TEST_VAL_CONST(type,f,cst) \
+  if (nondet) { type f##_##cst = f(cst); }
 #define TEST_FUN_CONSTS(type,f,prefix)          \
   TEST_VAL_CONST(type,f,prefix##pi);            \
   TEST_VAL_CONST(type,f,prefix##half_pi);       \
@@ -45,25 +53,39 @@ volatile int int_top;
 // tests functions with 2 arguments, where the first one changes,
 // but the second one is fixed by the caller.
 // suffix prevents redeclaring variables with the same name
-#define TEST_VAL2_FST_CONST(type,f,cst,snd_arg,suffix) type f##_##cst##suffix = f(cst,snd_arg)
-#define TEST_FUN2_FST_CONSTS(type,f,prefix,snd_arg,suffix)    \
-  TEST_VAL2_FST_CONST(type,f,prefix##pi,snd_arg,suffix);            \
-  TEST_VAL2_FST_CONST(type,f,prefix##half_pi,snd_arg,suffix);  \
-  TEST_VAL2_FST_CONST(type,f,prefix##e,snd_arg,suffix);        \
-  TEST_VAL2_FST_CONST(type,f,zero,snd_arg,suffix);             \
-  TEST_VAL2_FST_CONST(type,f,minus_zero,snd_arg,suffix);       \
-  TEST_VAL2_FST_CONST(type,f,one,snd_arg,suffix);              \
-  TEST_VAL2_FST_CONST(type,f,minus_one,snd_arg,suffix);        \
-  TEST_VAL2_FST_CONST(type,f,large,snd_arg,suffix);            \
+#define TEST_VAL2_FST_CONST(type,f,cst,snd_arg,suffix)  \
+  if (nondet) { type f##_##cst##suffix = f(cst,snd_arg); }
+#define TEST_FUN2_FST_CONSTS(type,f,prefix,snd_arg,suffix)      \
+  TEST_VAL2_FST_CONST(type,f,prefix##pi,snd_arg,suffix);        \
+  TEST_VAL2_FST_CONST(type,f,prefix##half_pi,snd_arg,suffix);   \
+  TEST_VAL2_FST_CONST(type,f,prefix##e,snd_arg,suffix);         \
+  TEST_VAL2_FST_CONST(type,f,zero,snd_arg,suffix);              \
+  TEST_VAL2_FST_CONST(type,f,minus_zero,snd_arg,suffix);        \
+  TEST_VAL2_FST_CONST(type,f,one,snd_arg,suffix);               \
+  TEST_VAL2_FST_CONST(type,f,minus_one,snd_arg,suffix);         \
+  TEST_VAL2_FST_CONST(type,f,large,snd_arg,suffix);      \
   TEST_VAL2_FST_CONST(type,f,prefix##top,snd_arg,suffix)
 
+#ifdef NONFINITE
+#define TEST_FUN_NONFINITE(type,f,prefix)     \
+  TEST_VAL_CONST(type,f,prefix##pos_inf);     \
+  TEST_VAL_CONST(type,f,prefix##neg_inf)
+#else
+#define TEST_FUN_NONFINITE(type,f,prefix)
+#endif
+
+#define TEST_FUN_ALL_PREC(fun)                  \
+  TEST_FUN_CONSTS(double,fun,);                 \
+  TEST_FUN_CONSTS(float,fun ## f,f_);           \
+  TEST_FUN_CONSTS(long double,fun ## l,ld_);    \
+  TEST_FUN_NONFINITE(double,fun,);              \
+  TEST_FUN_NONFINITE(float,fun ## f,f_);        \
+  TEST_FUN_NONFINITE(long double,fun ## l,ld_)
+
 int main() {
-  TEST_FUN_CONSTS(double,atan,);
-  TEST_FUN_CONSTS(float,atanf,f_);
-  TEST_FUN_CONSTS(long double,atanl,ld_);
-  TEST_FUN_CONSTS(double,fabs,);
-  TEST_FUN_CONSTS(float,fabsf,f_);
-  TEST_FUN_CONSTS(long double,fabsl,ld_);
+  TEST_FUN_ALL_PREC(atan);
+  TEST_FUN_ALL_PREC(fabs);
+  TEST_FUN_ALL_PREC(tan);
   int exponent;
   TEST_FUN2_FST_CONSTS(double,frexp,,&exponent,);
   TEST_FUN2_FST_CONSTS(float,frexpf,f_,&exponent,);
@@ -77,9 +99,9 @@ int main() {
   TEST_FUN2_FST_CONSTS(double,ldexp,,-5,_minus5);
   TEST_FUN2_FST_CONSTS(float,ldexpf,f_,-5,_minus5);
   //TEST_FUN2_FST_CONSTS(long double,ldexpl,ld_,-5,_minus5);
-  TEST_FUN2_FST_CONSTS(double,ldexp,,100000,_huge);
-  TEST_FUN2_FST_CONSTS(float,ldexpf,f_,100000,_huge);
-  //TEST_FUN2_FST_CONSTS(long double,ldexpl,ld_,100000,_huge);
+  TEST_FUN2_FST_CONSTS(double,ldexp,,100000,_pos_inf);
+  TEST_FUN2_FST_CONSTS(float,ldexpf,f_,100000,_pos_inf);
+  //TEST_FUN2_FST_CONSTS(long double,ldexpl,ld_,100000,_pos_inf);
 
 #ifdef NONFINITE
   int r;
@@ -89,11 +111,13 @@ int main() {
   //@ assert r;
   r = isfinite(0.0f);
   //@ assert r;
-  r = isfinite(huge_val);
+  r = isfinite(pos_inf);
   //@ assert !r;
   r = isfinite(-INFINITY);
   //@ assert !r;
+#ifndef NONAN
   r = isfinite(NAN);
+#endif
   //@ assert !r;
 #endif
 }
