@@ -1,7 +1,28 @@
 \section{Changes}
 
 % Next version
-%\subsection*{Version \version}
+\subsection*{Version \version}
+
+\begin{itemize}
+  \item \changeinsection{expressions}{bitwise-or \lstinline|\^\^| is not lazy}
+  \item \changeinsection{expressions}{new extended syntax for quantifications}
+  \item \changeinsection{reals}{additional remark about real numbers and
+    operations over them}
+  \item \changeinsection{locations}{new extended syntax for set comprehensions}
+  \item \changeinsection{at}{more restrictive scoping rule for \lstinline|\\at|
+    constructs.}
+  \item \changeinsection{logicspec}{add lemmas and data invariants}
+  \item \changeinsection{inductivepredicates}{add inductive predicates
+    experimentally: the accepted subset will be refined in a future version}
+  \item \changeinsection{axiomatic}{add axiomatic declarations
+    experimentally: the accepted subset will be refined in a future version}
+  \item \changeinsection{polym-logic-types}{add polymorphic logic types}
+  \item \changeinsection{higherorder}{add higher-order logic constructions}
+  \item \changeinsection{concrete-logic-types}{add concrete logic types}
+  \item \changeinsection{reads}{add \lstinline|read| clauses}
+  \item \changeinsection{func-dep}{add dependencies information}
+  \item \changeinsection{volatile-variables}{add volatile constructs}
+\end{itemize}
 
 \subsection*{Version 1.16}
 \begin{itemize}
@@ -157,7 +178,8 @@ in \lstinline|\\at|}
 \begin{itemize}
 \item \changeinsection{expressions}{mark logic function and predicate
   applications as implemented}
-\item \changeinsection{fn-behavior}{mark admit clauses as implemented}
+\item \changeinsection{fn-behavior}{mark admit and check clauses as implemented}
+\item \changeinsection{loop_annot}{mark loop variants as implemented}
 \end{itemize}
 
 \subsection*{Version Titanium-22}

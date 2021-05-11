@@ -1,14 +1,16 @@
 \begin{syntax}
   literal ::= { "\true" } | { "\false" } ; boolean constants
-       | integer ; integer constants
-       | real ; real constants
-       | string ; string constants
-       | character ; character constants
+       | integer ; (lexical) integer constants
+       | real ; (lexical) real constants
+       | string ; (lexical) string constants
+       | character ; (lexical) character constants
        \
-  bin-op ::= "+" | "-" | "*" | [ "/" ] | [ "%" ] | "<<" | ">>";
+  bin-op ::= "+" | "-" | "*" | [ "/" ] | [ "%" ] ;
        | "==" | "!=" | "<=" | ">=" | ">" | "<" ;
        | [ "&&" ] | [ "||" ] | [ "^^" ] ; boolean operations
-       | "&" | "|" | "-->" | "<-->" | "^" ; bitwise operations
+       | "<<" | ">>" ;
+       | "&" | "|" | "-->"
+       | "<-->" | "^" ; bitwise operations
        \
   unary-op ::= "+" | "-" ; unary plus and minus
        | "!" ; boolean negation
@@ -17,11 +19,12 @@
        | "&" ; address-of operator
        \
   term ::= literal ; literal constants
-       | id ; variables
+       | id ; variables, function names
        | unary-op term ;
        | term bin-op term ;
        | term "[" term "]" ; array access
-       | { "{" term "\with" "[" term "]" "=" term "}" } ; array functional modifier
+       | { "{" term } ;
+              { "\with" "[" term "]" "=" term "}" } ; array functional modifier
        | term "." id  ; structure field access
        | { "{" term "\with" "."id "=" term "}" } ; field functional modifier
        | term "->" id ;
@@ -31,7 +34,11 @@
        | [ term "?" term ":" term ] ; ternary condition
        | "\let" id "=" term ";" term ; local binding
        | "sizeof" "(" term ")" ;
-       | "sizeof" "(" C-type-name ")" ;
+       | "sizeof" "(" C-type-expr ")" ;
        | id ":" term ; syntactic naming
        | string ":" term ; syntactic naming
+       \
+  poly-id ::= id ;
+       \
+  ident ::= id ;
 \end{syntax}

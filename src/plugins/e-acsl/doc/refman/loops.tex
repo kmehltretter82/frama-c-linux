@@ -1,28 +1,20 @@
 \begin{syntax}
   statement ::= "/*@" loop-annot "*/" ;
-  "while" "(" C-expression ")" C-statement ;
-  | "/*@" loop-annot "*/" ;
-    "for";
-  "(" C-expression ";" C-expression ";" C-expression ")";
-  statement ;
-  | "/*@" loop-annot "*/" ;
-  "do" C-statement ;
-  "while" "(" C-expression ")" ";"
+  C-iteration-statement ;
   \
-  loop-annot ::= loop-clause* ;
-  { loop-behavior* } ;
-  loop-variant?
+  loop-annot ::= loop-clause* { loop-behavior* } ;
+                 loop-variant? 
   \
-  loop-clause ::= loop-invariant ;
-                | { loop-assigns }
+  loop-clause ::= loop-invariant | { loop-assigns } ;
+                | { loop-allocation } ;
   \
-  [ loop-invariant ] ::= { clause-kind? } [ "loop" "invariant" pred ";" ] ;
+  [ loop-invariant ] ::= { clause-kind? } ;
+                         [ "loop" "invariant" pred ";" ] ;
   \
   { loop-assigns } ::= { "loop" "assigns" locations ";" } ;
   \
-  { loop-behavior } ::= { "for" id ("," id)* ":" } ;
-  { loop-clause* } ; \hspace{-35mm} annotation for behavior $id$
+  { loop-behavior } ::= { "for" id ("," id)* ":" loop-clause* } ; annotation for behavior $id$
   \
   loop-variant ::= "loop" "variant" term ";" ;
-  | "loop" "variant" term "for" id ";" ;  \hspace{-35mm} variant for relation $id$
+  | "loop" "variant" term "for" id ";" ;  variant for relation $id$
 \end{syntax}

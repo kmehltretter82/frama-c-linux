@@ -17,7 +17,11 @@ DEPS_MODERN=macros_modern.tex eacslversion.tex biblio.bib \
 	assertions_modern.bnf loops_modern.bnf st_contracts_modern.bnf \
 	logic_modern.bnf data_invariants_modern.bnf model_modern.bnf \
 	ghost_modern.bnf generalinvariants_modern.bnf iterator_modern.bnf \
-	abrupt_modern.bnf bsearch.c bsearch2.c link.c
+	guarded_quantif_modern.bnf inductive_modern.bnf logicdecl_modern.bnf \
+	higherorder_modern.bnf logictypedecl_modern.bnf logicreads_modern.bnf \
+	allocation_modern.bnf abrupt_modern.bnf dependencies_modern.bnf \
+	volatile-gram_modern.bnf \
+	bsearch.c bsearch2.c link.c
 
 ##############
 # Main rules #
