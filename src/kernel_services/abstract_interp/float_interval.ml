@@ -421,6 +421,13 @@ module Make (F: Float_sig.S) = struct
     | FRange.NaN -> Comp.False
     | FRange.Itv (_b, _e, nan) -> if nan then Comp.Unknown else Comp.True
 
+  let is_infinite = function
+    | FRange.NaN -> Comp.False
+    | FRange.Itv (b, e, nan) ->
+      if F.is_infinite b || F.is_infinite e
+      then if Cmp.equal b e && not nan then Comp.True else Comp.Unknown
+      else Comp.False
+
   let is_finite = function
     | FRange.NaN -> Comp.False
     | FRange.Itv (b, e, nan) ->
@@ -443,6 +450,19 @@ module Make (F: Float_sig.S) = struct
     | FRange.Itv (_, _, false) as v -> if positive then `Bottom else `Value v
     | FRange.Itv (b, e, true) ->
       if positive then `Value nan else `Value (FRange.inject ~nan:false b e)
+
+  let backward_is_infinite ~positive prec = function
+    | FRange.NaN as v -> if positive then `Bottom else `Value v
+    | FRange.Itv (b, e, nan) as f ->
+      if positive
+      then
+        match F.is_infinite b, F.is_infinite e with
+        | true, true -> `Value (if nan then FRange.inject ~nan:false b e else f)
+        | true, false -> `Value (FRange.inject ~nan:false b b)
+        | false, true -> `Value (FRange.inject ~nan:false e e)
+        | false, false -> `Bottom
+      else
+        narrow (FRange.add_nan (top_finite prec)) f
 
   let backward_is_finite ~positive prec = function
     | FRange.NaN as v -> if positive then `Bottom else `Value v
