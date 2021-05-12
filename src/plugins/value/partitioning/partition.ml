@@ -388,8 +388,7 @@ struct
             None
           end
 
-  let split_state ~monitor (term : split_term)
-      (key : key) (state : state) : (key * state) list =
+  let split_state ~monitor term (key, state) : (key * state) list =
     try
       let update_key (v, x) =
         { key with splits = SplitMap.add term v key.splits }, x
@@ -403,31 +402,28 @@ struct
     with Operation_failed -> [(key,state)]
 
   let split ~monitor (kind : split_kind) (term : split_term) (p : t) =
-    let add_split acc (key,state) =
+    let add_split (key, state) =
       let dynamic_splits =
         match kind with
         | Static -> SplitMap.remove term key.dynamic_splits
         | Dynamic -> SplitMap.add term monitor key.dynamic_splits
       in
       let key = { key with dynamic_splits } in
-      split_state ~monitor term key state @ acc
+      split_state ~monitor term (key, state)
     in
-    List.fold_left add_split [] p
+    Transitioning.List.concat_map add_split p
 
   let update_dynamic_splits p =
     (* Update one state *)
-    let update_state acc (key,state) =
+    let update_state (key, state) =
       (* Split the states in the list l for the given exp *)
-      let update_exp exp monitor l =
-        let resplit acc (k,x) =
-          split_state ~monitor exp k x @ acc
-        in
-        List.fold_left resplit [] l
+      let update_exp term monitor l =
+        Transitioning.List.concat_map (split_state ~monitor term) l
       in
       (* Foreach exp in original state: split *)
-      SplitMap.fold update_exp key.dynamic_splits [(key,state)] @ acc
+      SplitMap.fold update_exp key.dynamic_splits [(key,state)]
     in
-    List.fold_left update_state [] p
+    Transitioning.List.concat_map update_state p
 
   let map_keys (f : key -> state -> key) (p : t) : t =
     List.map (fun (k,x) -> f k x, x) p
