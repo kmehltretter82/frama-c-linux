@@ -864,6 +864,31 @@ name of the current alternative configuration
 fact two independent numbering schemes: one for \verb|EXECNOW| commands and
 one for regular tests (if more than one \verb|OPT|).\\
 \hline
+\verb|PTEST_RESULT| & shorthand alias to \verb|@PTEST_DIR@/result@PTEST_CONFIG@|
+(the result directory dedicated to the tested configuration)
+\hline
+\verb|@PTEST_ORACLE| & basename of the current oracle file (macro only usable in FILTER directives)
+\hline
+\verb|PTEST_MODULE| & current list of module defined by the \verb|MODULE| directive
+\hline
+\verb|PTEST_PLUGIN| & current list of plugins defined by the \verb|PLUGIN| directive
+\hline
+\verb|PTEST_DEFAULT_OPTIONS| & the default option list: \verb|-journal-disable| \verb|-check| \verb|-no-autoload-plugins|
+\hline
+\verb|PTEST_LOAD_MODULE| & the \verb|-load-module| option related to the \verb|MODULE| directive
+\hline
+\verb|PTEST_LOAD_PLUGIN| & the \verb|-load-module| option related to the \verb|PLUGIN| directive
+\hline
+\verb|PTEST_LOAD_OPTIONS| & shorthand alias to \verb|@PTEST_LOAD_PLUGIN@ @PTEST_LOAD_MODULE@|
+\hline
+\verb|PTEST_OPTIONS| & the current list of options related to \verb|OPT| and \verb|STDOPT| directives (for \verb|CMD| directives)
+\hline
+\verb|frama-c| & shortcut defined as follow: \verb|@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@ @PTEST_LOAD_OPTIONS@|
+\hline
+\verb|frama-c-cmd| & shortcut defined as follow: \verb|@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@|
+\hline
+\verb|frama-c-exe| & set to the value of the \verb|TOPLEVEL_PATH| variable from \verb|./tests/ptests_config| file
+\hline
 \end{tabular}
 \caption{Predefined macros for ptests}\label{fig:ptests-macros}
 \end{figure}
