@@ -207,27 +207,25 @@ module Unroll = Register (struct
 
 module SplitTermAnnotation =
 struct
-  type t = split_term
+  (* [split_term] plus the original term before conversion to a C expression,
+     when possible, to avoid changes due to its reconversion to a C term. *)
+  type t = split_term * Cil_types.term option
 
   let term_to_exp = !Db.Properties.Interp.term_to_exp ~result:None
 
-  let parse ~typing_context = function
+  let parse ~typing_context:context = function
     | [t] ->
       begin
         let open Logic_typing in
         let exception No_term in
         try
           let error _loc _fmt = raise No_term in
-          let typing_context = { typing_context with error } in
-          let term =
-            typing_context.type_term typing_context typing_context.pre_state t
-          in
-          Expression (term_to_exp term)
+          let context = { context with error } in
+          let term = context.type_term context context.pre_state t in
+          Expression (term_to_exp term), Some term
         with
         | No_term ->
-          Predicate
-            (typing_context.type_predicate
-               typing_context typing_context.pre_state t)
+          Predicate (context.type_predicate context context.pre_state t), None
         | Db.Properties.Interp.No_conversion ->
           Kernel.warning ~wkey:Kernel.wkey_annot_error ~once:true ~current:true
             "split/merge expressions must be valid expressions; ignoring";
@@ -236,17 +234,18 @@ struct
     | _ -> raise Parse_error
 
   let export = function
-    | Expression expr -> Ext_terms [ Logic_utils.expr_to_term expr ]
-    | Predicate pred -> Ext_preds [pred]
+    | Expression _, Some term -> Ext_terms [ term ]
+    | Expression expr, None -> Ext_terms [ Logic_utils.expr_to_term expr ]
+    | Predicate pred, _ -> Ext_preds [pred]
 
   let import = function
-    | Ext_terms [term] -> Expression (term_to_exp term)
-    | Ext_preds [pred] -> Predicate pred
+    | Ext_terms [term] -> Expression (term_to_exp term), Some term
+    | Ext_preds [pred] -> Predicate pred, None
     | _ -> assert false
 
   let print fmt = function
-    | Expression expr -> Printer.pp_exp fmt expr
-    | Predicate pred -> Printer.pp_predicate fmt pred
+    | Expression expr, _ -> Printer.pp_exp fmt expr
+    | Predicate pred, _ -> Printer.pp_predicate fmt pred
 end
 
 module Split = Register (struct
@@ -283,19 +282,23 @@ let get_slevel_annot stmt =
 let get_unroll_annot stmt = Unroll.get stmt
 
 let get_flow_annot stmt =
-  List.map (fun a -> FlowSplit (a, Static)) (Split.get stmt) @
-  List.map (fun a -> FlowSplit (a, Dynamic)) (DynamicSplit.get stmt) @
-  List.map (fun a -> FlowMerge a) (Merge.get stmt)
+  List.map (fun (a, _) -> FlowSplit (a, Static)) (Split.get stmt) @
+  List.map (fun (a, _) -> FlowSplit (a, Dynamic)) (DynamicSplit.get stmt) @
+  List.map (fun (a, _) -> FlowMerge a) (Merge.get stmt)
 
 
 let add_slevel_annot = Slevel.add
 
 let add_unroll_annot = Unroll.add
 
-let add_flow_annot ~emitter ~loc stmt = function
-  | FlowSplit (annot, Static) -> Split.add ~emitter ~loc stmt annot
-  | FlowSplit (annot, Dynamic) -> DynamicSplit.add ~emitter ~loc stmt annot
-  | FlowMerge annot -> Merge.add ~emitter ~loc stmt annot
+let add_flow_annot ~emitter ~loc stmt flow_annotation =
+  let f, annot =
+    match flow_annotation with
+    | FlowSplit (annot, Static) -> Split.add, annot
+    | FlowSplit (annot, Dynamic) -> DynamicSplit.add, annot
+    | FlowMerge annot -> Merge.add, annot
+  in
+  f ~emitter ~loc stmt (annot, None)
 
 
 module Subdivision = Register (struct
