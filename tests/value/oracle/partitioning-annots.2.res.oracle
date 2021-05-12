@@ -37,13 +37,13 @@
 [eva] tests/value/partitioning-annots.c:87: 
   Frama_C_show_each_before_second_merge: {1}, {2}, {1}
 [eva] tests/value/partitioning-annots.c:87: 
-  Frama_C_show_each_before_second_merge: {0}, {2}, {0}
-[eva] tests/value/partitioning-annots.c:87: 
   Frama_C_show_each_before_second_merge: {1}, {1}, {1}
 [eva] tests/value/partitioning-annots.c:87: 
-  Frama_C_show_each_before_second_merge: {0}, {1}, {0}
-[eva] tests/value/partitioning-annots.c:87: 
   Frama_C_show_each_before_second_merge: {1}, {0}, {1}
+[eva] tests/value/partitioning-annots.c:87: 
+  Frama_C_show_each_before_second_merge: {0}, {2}, {0}
+[eva] tests/value/partitioning-annots.c:87: 
+  Frama_C_show_each_before_second_merge: {0}, {1}, {0}
 [eva] tests/value/partitioning-annots.c:87: 
   Frama_C_show_each_before_second_merge: {0}, {0}, {0}
 [eva] tests/value/partitioning-annots.c:89: 
