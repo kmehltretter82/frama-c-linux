@@ -588,23 +588,6 @@ end = struct
 
 end
 
-type execnow =
-  {
-    ex_cmd: string;      (** command to launch *)
-    ex_log: string list; (** log files *)
-    ex_bin: string list; (** bin files *)
-    ex_dir: SubDir.t;    (** directory of test suite *)
-    ex_once: bool;       (** true iff the command has to be executed only once
-                             per config file (otherwise it is executed for
-                             every file of the test suite) *)
-    ex_done: bool ref;   (** has the command been already fully executed.
-                             Shared between all copies of this EXECNOW. Do
-                             NOT use a mutable field here, as execnows
-                             are duplicated using OCaml 'with' syntax. *)
-    ex_timeout: string;
-  }
-
-
 module Macros =
 struct
   module StringMap = Map.Make (String)
@@ -612,52 +595,55 @@ struct
 
   type t = string StringMap.t
 
-  let empty = StringMap.empty
+  let add_defaults ~defaults macros =
+    StringMap.merge (fun _k default cur ->
+        match cur with
+        | Some _ -> cur
+        | _ -> default) defaults macros
 
-  let macro_regex = Str.regexp "\\([^@]*\\)@\\([^@]*\\)@\\(.*\\)"
+  let empty = StringMap.empty
 
   let print_macros macros =
     lock_printf "%% Macros (%d):@."  (StringMap.cardinal macros);
     StringMap.iter (fun key data -> lock_printf "%% - %s -> %s@." key data) macros;
     lock_printf "%% End macros@."
 
-  let does_expand macros s =
-    if !verbosity >=4 then print_macros macros;
-    let rec aux n (ptest_file_matched,s as acc) =
-      if Str.string_match macro_regex s n then begin
-        let macro = Str.matched_group 2 s in
-        let ptest_file_matched = ptest_file_matched || macro = "PTEST_FILE" in
-        let start = Str.matched_group 1 s in
-        let rest = Str.matched_group 3 s in
-        let new_n = Str.group_end 1 in
-        let n, new_s =
-          if macro = "" then begin
-            new_n + 1, String.sub s 0 new_n ^ "@" ^ rest
-          end else begin
-            try
-              if !verbosity >= 4 then lock_printf "%%     - macro is %s\n%!" macro;
-              let replacement =  find macro macros in
-              if !verbosity >= 3 then
-                lock_printf "%%     - replacement for %s is %s\n%!" macro replacement;
-              new_n,
-              String.sub s 0 n ^ start ^ replacement ^ rest
-            with
-            | Not_found -> Str.group_end 2 + 1, s
-          end
+  let does_expand =
+    let macro_regex = Str.regexp "@\\([-A-Za-z_0-9]+\\)@" in
+    fun macros s ->
+      let has_ptest_file = ref false in
+      if !verbosity >= 3 then lock_printf "%% Expand: %s@." s;
+      if !verbosity >= 4 then print_macros macros;
+      let rec aux s =
+        let expand_macro = function
+          | Str.Text s -> s
+          | Str.Delim s ->
+            if Str.string_match macro_regex s 0 then begin
+              let macro = Str.matched_group 1 s in
+              try
+                if !verbosity >= 4 then lock_printf "%%     - macro is %s\n%!" macro;
+                let replacement = find macro macros in
+                if String.(macro = "PTEST_FILE") then has_ptest_file := true;
+                if !verbosity >= 3 then
+                  lock_printf "%%     - replacement for %s is %s\n%!" macro replacement;
+                aux replacement
+              with
+              | Not_found -> s
+            end
+            else s
         in
-        if !verbosity >= 4 then lock_printf "%%    - New string is %s\n%!" new_s;
-        let new_acc = ptest_file_matched, new_s in
-        if n <= String.length new_s then aux n new_acc else new_acc
-      end else acc
-    in
-    Mutex.lock str_mutex;
-    try
-      let res = aux 0 (false,s) in
-      Mutex.unlock str_mutex; res
-    with e ->
-      lock_eprintf "Uncaught exception %s\n%!" (Printexc.to_string e);
-      Mutex.unlock str_mutex;
-      raise e
+        String.concat "" (List.map expand_macro (Str.full_split macro_regex s))
+      in
+      try
+        Mutex.lock str_mutex;
+        let r = aux s in
+        Mutex.unlock str_mutex;
+        if !verbosity >= 3 then lock_printf "%% Expansion result: %s@." r;
+        !has_ptest_file, r
+      with e ->
+        lock_eprintf "Uncaught exception %s\n%!" (Printexc.to_string e);
+        Mutex.unlock str_mutex;
+        raise e
 
   let expand macros s =
     snd (does_expand macros s)
@@ -674,6 +660,24 @@ struct
   let append_expand name def macros =
     add name (get name macros ^ expand macros def) macros
 end
+
+
+type execnow =
+  {
+    ex_cmd: string;      (** command to launch *)
+    ex_macros: Macros.t; (** current macros *)
+    ex_log: string list; (** log files *)
+    ex_bin: string list; (** bin files *)
+    ex_dir: SubDir.t;    (** directory of test suite *)
+    ex_once: bool;       (** true iff the command has to be executed only once
+                             per config file (otherwise it is executed for
+                             every file of the test suite) *)
+    ex_done: bool ref;   (** has the command been already fully executed.
+                             Shared between all copies of this EXECNOW. Do
+                             NOT use a mutable field here, as execnows
+                             are duplicated using OCaml 'with' syntax. *)
+    ex_timeout: string;
+  }
 
 
 (** configuration of a directory/test. *)
@@ -767,7 +771,7 @@ end = struct
       dc_timeout = "";
     }
 
-  let scan_execnow ~once dir ex_timeout (s:string) =
+  let scan_execnow ~once dir ex_macros ex_timeout (s:string) =
     let rec aux (s:execnow) =
       try
         Scanf.sscanf s.ex_cmd "%_[ ]LOG%_[ ]%[-A-Za-z0-9_',+=:.\\@@]%_[ ]%s@\n"
@@ -789,6 +793,7 @@ end = struct
     in
     aux
       { ex_cmd = s;
+        ex_macros;
         ex_log = [];
         ex_bin = [];
         ex_dir = dir;
@@ -847,12 +852,12 @@ end = struct
 
 
   (* how to process options *)
-  let config_exec ~once ~drop:_ ~file:_ dir s current =
+  let config_exec ~once ~file:_ dir s current =
     { current with
       dc_execnow =
-        scan_execnow ~once dir current.dc_timeout s :: current.dc_execnow }
+        scan_execnow ~once dir current.dc_macros current.dc_timeout s :: current.dc_execnow }
 
-  let config_macro ~drop:_ ~file _dir s current =
+  let config_macro ~file _dir s current =
     let regex = Str.regexp "[ \t]*\\([^ \t@]+\\)\\([ \t]+\\(.*\\)\\|$\\)" in
     Mutex.lock str_mutex;
     if Str.string_match regex s 0 then begin
@@ -872,18 +877,12 @@ end = struct
 
   let set_load_modules deps macros =
     let name = "PTEST_LOAD_MODULES" in
-    let def = List.fold_left (fun acc s ->
-        match acc with
-        | "" -> s
-        | acc -> s ^ "," ^ acc)
-        ""
-        deps
-    in
+    let def = String.concat "," deps in
     if !verbosity >= 3 then
       lock_printf "%%   - Macro %s for -load-module with definition %s@." name def;
     Macros.add_list [name, def] macros
 
-  let add_make_modules ~drop ~file dir deps current =
+  let add_make_modules ~file dir deps current =
     let deps,current = List.fold_left (fun ((deps,curr) as acc) s ->
         if StringSet.mem s curr.dc_cmxs_module then acc
         else
@@ -894,23 +893,23 @@ end = struct
     if String.(deps = "") then current
     else
       let make_cmd = Macros.expand current.dc_macros "@PTEST_MAKE_MODULE@" in
-      config_exec ~once:true ~drop ~file dir (make_cmd ^ " " ^ deps) current
+      config_exec ~once:true ~file dir (make_cmd ^ " " ^ deps) current
 
-  let config_module ~drop ~file dir s current =
+  let config_module ~file dir s current =
     let s = Macros.expand current.dc_macros s in
     let deps = List.map (fun s -> "@PTEST_DIR@/" ^ (Filename.remove_extension s) ^ ".cmxs")
         (str_split_list s)
     in
-    let current = add_make_modules ~drop ~file dir deps current in
+    let current = add_make_modules ~file dir deps current in
     { current with dc_macros = set_load_modules deps current.dc_macros }
 
   let config_options =
     [ "CMD",
-      (fun ~drop:_ ~file:_ _ s current -> { current with dc_default_toplevel = s});
+      (fun ~file:_ _ s current -> { current with dc_default_toplevel = s});
 
       "OPT",
-      (fun ~drop ~file _ s current ->
-         if not (drop || current.dc_framac) then
+      (fun ~file _ s current ->
+         if not (current.dc_framac) then
            lock_eprintf
              "%s: a NOFRAMAC directive has been defined before a sub-test defined by a 'OPT' directive (That NOFRAMAC directive could be misleading.).@."
              file;
@@ -927,19 +926,20 @@ end = struct
            dc_commands = t :: current.dc_commands });
 
       "STDOPT",
-      (fun ~drop ~file _ s current ->
-         if not (drop || current.dc_framac) then
+      (fun ~file _ s current ->
+         if not current.dc_framac then
            lock_eprintf
              "%s: a NOFRAMAC directive has been defined before a sub-test defined by a 'STDOPT' directive (That NOFRAMAC directive could be misleading.).@."
              file;
          let new_top =
            List.map
              (fun command ->
-                { command with opts= make_custom_opts command.opts s;
-                               logs= command.logs @ current.dc_default_log;
-                               macros= current.dc_macros;
-                               exit_code = current.dc_exit_code;
-                               timeout= current.dc_timeout
+                { toplevel = current.dc_default_toplevel;
+                  opts= make_custom_opts command.opts s;
+                  logs= command.logs @ current.dc_default_log;
+                  macros= current.dc_macros;
+                  exit_code = current.dc_exit_code;
+                  timeout= current.dc_timeout
                 })
              !default_parsing_env.current_default_cmds
          in
@@ -947,10 +947,10 @@ end = struct
                         dc_default_log = !default_parsing_env.current_default_log });
 
       "FILEREG",
-      (fun ~drop:_ ~file:_ _ s current -> { current with dc_test_regexp = s });
+      (fun ~file:_ _ s current -> { current with dc_test_regexp = s });
 
       "FILTER",
-      (fun ~drop:_ ~file:_ _ s current ->
+      (fun ~file:_ _ s current ->
          let s = trim_right s in
          match current.dc_filter with
          | None when s="" -> { current with dc_filter = None }
@@ -958,18 +958,18 @@ end = struct
          | Some filter    -> { current with dc_filter = Some (s ^ " | " ^ filter) });
 
       "EXIT",
-      (fun ~drop:_ ~file:_ _ s current -> { current with dc_exit_code = Some s });
+      (fun ~file:_ _ s current -> { current with dc_exit_code = Some s });
 
       "GCC",
-      (fun ~drop ~file _ _ acc ->
-         if not drop then lock_eprintf "%s: GCC directive (DEPRECATED)@." file;
+      (fun ~file _ _ acc ->
+         lock_eprintf "%s: GCC directive (DEPRECATED)@." file;
          acc);
 
       "COMMENT",
-      (fun ~drop:_ ~file:_ _ _ acc -> acc);
+      (fun ~file:_ _ _ acc -> acc);
 
       "DONTRUN",
-      (fun ~drop:_ ~file:_ _ s current -> { current with dc_dont_run = true });
+      (fun ~file:_ _ s current -> { current with dc_dont_run = true });
 
       "EXECNOW", config_exec ~once:true;
       "EXEC", config_exec ~once:false;
@@ -979,14 +979,14 @@ end = struct
       "MODULE", config_module;
 
       "LOG",
-      (fun ~drop:_ ~file:_ _ s current -> { current with dc_default_log = s :: current.dc_default_log });
+      (fun ~file:_ _ s current -> { current with dc_default_log = s :: current.dc_default_log });
 
       "TIMEOUT",
-      (fun ~drop:_ ~file:_ _ s current -> { current with dc_timeout = s });
+      (fun ~file:_ _ s current -> { current with dc_timeout = s });
 
       "NOFRAMAC",
-      (fun ~drop ~file _ _ current ->
-         if not drop && current.dc_commands <> [] && current.dc_framac then
+      (fun ~file _ _ current ->
+         if current.dc_commands <> [] && current.dc_framac then
            lock_eprintf
              "%s: a NOFRAMAC directive has the effect of ignoring previous defined sub-tests (by some 'OPT' or 'STDOPT' directives that seems misleading). @."
              file;
@@ -1004,7 +1004,9 @@ end = struct
         Scanf.sscanf s "%[ *]%[A-Za-z0-9]: %s@\n"
           (fun _ name opt ->
              try
-               r := (List.assoc name config_options) ~drop ~file dir opt !r
+               let directive = List.assoc name config_options in
+               if not drop then
+                 r := directive ~file dir opt !r;
              with Not_found ->
                lock_eprintf "@[%s: unknown configuration option: %s@\n%!@]" file name)
       with
@@ -1093,7 +1095,7 @@ end
 
 type toplevel_command =
   { macros: Macros.t;
-    mutable log_files: string list;
+    log_files: string list;
     file : string ;
     nb_files : int ;
     options : string ;
@@ -1172,7 +1174,7 @@ module Cmd : sig
   val log_prefix : toplevel_command -> string
   val oracle_prefix : toplevel_command -> string
 
-  val get_macros : toplevel_command -> string Macros.StringMap.t
+  val expand_macros : defaults:Macros.t -> toplevel_command -> toplevel_command
 
   (* [basic_command_string cmd] does not redirect the outputs, and does
      not overwrite the result files *)
@@ -1206,7 +1208,7 @@ end = struct
 
   let get_ptest_file cmd = SubDir.make_file cmd.directory cmd.file
 
-  let get_macros cmd =
+  let expand_macros ~defaults cmd =
     let ptest_config =
       if !special_config = "" then "" else "_" ^ !special_config
     in
@@ -1225,7 +1227,17 @@ end = struct
         "PTEST_NUMBER", string_of_int cmd.n;
       ]
     in
-    Macros.add_list macros cmd.macros
+    let macros = Macros.add_list macros cmd.macros in
+    let macros = Macros.add_defaults ~defaults macros in
+    let process_macros s = Macros.expand macros s in
+    { cmd with
+      macros;
+      log_files = List.map process_macros cmd.log_files;
+      filter =
+        match cmd.filter with
+        | None -> None
+        | Some filter -> Some (process_macros filter)
+    }
 
   let contains_frama_c_binary_name =
     Str.regexp "[^( ]*\\(toplevel\\|viewer\\|frama-c-gui\\|frama-c[^-]\\).*"
@@ -1235,9 +1247,7 @@ end = struct
 
   let basic_command_string =
     fun command ->
-    let macros = get_macros command in
-    let logfiles = List.map (Macros.expand macros) command.log_files in
-    command.log_files <- logfiles;
+    let macros = command.macros in
     let has_ptest_file_t, toplevel =
       Macros.does_expand macros command.toplevel
     in
@@ -1314,9 +1324,7 @@ end = struct
     update_oracle (log_prefix ^ ".res.log") (oracle_prefix ^ ".res.oracle");
     update_oracle (log_prefix ^ ".err.log") (oracle_prefix ^ ".err.oracle");
     (* Update files related to LOG directives *)
-    let macros = get_macros command in
-    let log_files = List.map (Macros.expand macros) command.log_files in
-    List.iter (update_log_files command.directory) log_files
+    List.iter (update_log_files command.directory) command.log_files
 
 end
 
@@ -1435,8 +1443,6 @@ let do_command command =
         ignore (launch basic_command_string)
       end
       else begin
-        (* command string also replaces macros in logfiles names, which
-           is useful for Examine as well. *)
         let command_string = Cmd.command_string command in
         let summary_ret =
           if !behavior <> Examine
@@ -1932,7 +1938,7 @@ let dispatcher () =
         fun {toplevel; opts=options; logs=log_files; macros; exit_code; timeout} ->
           let n = !i in
           incr i;
-          let cmd =
+          Cmd.expand_macros ~defaults:config.dc_macros
             { file; options; toplevel; nb_files; directory; n; log_files;
               filter = config.dc_filter; macros;
               exit_code = begin
@@ -1945,12 +1951,6 @@ let dispatcher () =
               execnow=false;
               timeout;
             }
-          in
-          let macros = Cmd.get_macros cmd in
-          match cmd.filter with
-          | None -> cmd
-          | Some filter ->
-            { cmd with filter = Some (Macros.expand macros filter) }
       in
       let nb_files_execnow = List.length config.dc_execnow in
       let make_execnow_cmd =
@@ -1958,29 +1958,30 @@ let dispatcher () =
         fun execnow ->
           let n = !e in
           incr e;
-          let cmd =  {
-            file ;
-            nb_files = nb_files_execnow;
-            log_files = [];
-            options = "";
-            toplevel = execnow.ex_cmd;
-            exit_code = 0;
-            n;
-            directory;
-            filter = None; (* No filter for execnow command *)
-            macros = config.dc_macros;
-            execnow = true;
-            timeout = execnow.ex_timeout;
-          } in
-          let macros = Cmd.get_macros cmd in
-          let process_macros s = Macros.expand macros s in
+          let cmd = Cmd.expand_macros ~defaults:config.dc_macros
+              {file ;
+               nb_files = nb_files_execnow;
+               log_files = execnow.ex_log;
+               options = "";
+               toplevel = execnow.ex_cmd;
+               exit_code = 0;
+               n;
+               directory;
+               filter = None; (* No filter for execnow command *)
+               macros = execnow.ex_macros;
+               execnow = true;
+               timeout = execnow.ex_timeout;
+              }
+          in
+          let process_macros s = Macros.expand cmd.macros s in
           { ex_cmd = Cmd.basic_command_string cmd;
-            ex_log = List.map process_macros execnow.ex_log;
+            ex_macros = cmd.macros;
+            ex_log = cmd.log_files;
             ex_bin = List.map process_macros execnow.ex_bin;
             ex_dir = execnow.ex_dir;
             ex_once = execnow.ex_once;
             ex_done = execnow.ex_done;
-            ex_timeout = execnow.ex_timeout;
+            ex_timeout = cmd.timeout;
           }
       in
       let treat_option q cmd =

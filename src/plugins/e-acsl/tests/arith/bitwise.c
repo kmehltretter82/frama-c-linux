@@ -1,7 +1,7 @@
 /* run.config_ci, run.config_dev
    COMMENT: Support of bitwise operations
-   STDOPT: #"-warn-right-shift-negative -warn-left-shift-negative"
    MACRO: ROOT_EACSL_GCC_FC_EXTRA_EXT -warn-right-shift-negative -warn-left-shift-negative
+   STDOPT: #"-warn-right-shift-negative -warn-left-shift-negative"
 */
 
 #include <limits.h>
