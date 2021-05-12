@@ -13,9 +13,9 @@
 # '#?nnn'  : OLD-BTS entry #nnn                                               #
 ###############################################################################
 
-##################################
-Open Source Release <next-release>
-##################################
+###################################
+Open Source Release 23.0 (Vanadium)
+###################################
 
 -*  Kernel    [2021-04-26] Do not crash on _Alignof(void): accept or properly
               reject, depending on machdep. Fixes pub/frama-c#2551
