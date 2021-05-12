@@ -93,18 +93,19 @@ type branch = int
      (innermost loop first) It also stores the maximum number of unrolling ;
      this number varies from a state to another, as it is computed from
      an expression evaluated when we enter the loop.
-   - Static/Dynamic splits: track the splits applied to the state as a map
-     from the expression of the split to the value of this expression. Since
-     the split creates states in which the expression evalutates to a
+   - Splits: track the splits applied to the state as a map from the term of
+     the split to its value. Terms can be C expresssions or ACSL predicates.
+     Since the split creates states in which the expression evalutates to a
      singleton, the values of the map are integers.
      Static splits are only evaluated when the annotation is encountered
-     whereas dynamic splits are reevaluated regularly. *)
+     whereas dynamic splits are reevaluated regularly; a list of active
+     dynamic splits is also propagated in the key. *)
 type key = {
   ration_stamp : stamp;
   branches : branch list;
   loops : (int * int) list; (* current iteration / max unrolling *)
-  static_split : (Integer.t*split_monitor) SplitMap.t; (* exp->value*monitor *)
-  dynamic_split : (Integer.t option * split_monitor) SplitMap.t; (* exp->value*monitor *)
+  splits : Integer.t SplitMap.t; (* term -> value *)
+  dynamic_splits : split_monitor SplitMap.t; (* term -> monitor *)
 }
 
 module Key =
@@ -116,24 +117,18 @@ struct
     ration_stamp = None;
     branches = [];
     loops = [];
-    static_split = SplitMap.empty;
-    dynamic_split = SplitMap.empty;
+    splits = SplitMap.empty;
+    dynamic_splits = SplitMap.empty;
   }
 
   let compare k1 k2 =
     let (<?>) c (cmp,x,y) =
       if c = 0 then cmp x y else c
     in
-    let compare_split (i1,_m1) (i2,_m2) =
-      Integer.compare i1 i2
-    in
-    let compare_optsplit (i1,_m1) (i2,_m2) =
-      Option.compare Integer.compare i1 i2
-    in
     Option.compare IntPair.compare k1.ration_stamp k2.ration_stamp
     <?> (LoopList.compare, k1.loops, k2.loops)
-    <?> (SplitMap.compare compare_split, k1.static_split, k2.static_split)
-    <?> (SplitMap.compare compare_optsplit, k1.dynamic_split, k2.dynamic_split)
+    <?> (SplitMap.compare Integer.compare, k1.splits, k2.splits)
+    <?> (SplitMap.compare (fun _ _ -> 0), k1.dynamic_splits, k2.dynamic_splits)
     <?> (BranchList.compare, k1.branches, k2.branches)
 
   let pretty fmt key =
@@ -150,17 +145,11 @@ struct
       fmt
       key.loops;
     Pretty_utils.pp_list ~pre:"{@[" ~sep:" ;@ " ~suf:"@]}"
-      (fun fmt (t,(i,_m)) -> Format.fprintf fmt "%a:%a"
+      (fun fmt (t, i) -> Format.fprintf fmt "%a:%a"
           SplitTerm.pretty t
           (Integer.pretty ~hexa:false) i)
       fmt
-      (SplitMap.bindings key.static_split);
-    Pretty_utils.pp_list ~pre:"{@[" ~sep:" ;@ " ~suf:"@]}"
-      (fun fmt (t,(i,_m)) -> Format.fprintf fmt "%a:%a"
-          SplitTerm.pretty t
-          (Pretty_utils.pp_opt (Integer.pretty ~hexa:false)) i)
-      fmt
-      (SplitMap.bindings key.dynamic_split)
+      (SplitMap.bindings key.splits)
 
   let exceed_rationing key = key.ration_stamp = None
 end
@@ -399,17 +388,11 @@ struct
             None
           end
 
-  let split_state ~monitor (kind : split_kind) (term : split_term)
+  let split_state ~monitor (term : split_term)
       (key : key) (state : state) : (key * state) list =
-    let add value map = SplitMap.add term (value, monitor) map in
     try
-      let update_key (v,x) =
-        let k =
-          match kind with
-          | Static -> { key with static_split = add v key.static_split }
-          | Dynamic -> { key with dynamic_split = add (Some v) key.dynamic_split }
-        in
-        (k,x)
+      let update_key (v, x) =
+        { key with splits = SplitMap.add term v key.splits }, x
       in
       let states =
         match term with
@@ -417,17 +400,17 @@ struct
         | Predicate pred -> split_by_predicate state pred
       in
       List.map update_key states
-    with Operation_failed ->
-      let key =
-        match kind with
-        | Static -> key
-        | Dynamic -> { key with dynamic_split = add None key.dynamic_split }
-      in
-      [(key,state)]
+    with Operation_failed -> [(key,state)]
 
   let split ~monitor (kind : split_kind) (term : split_term) (p : t) =
     let add_split acc (key,state) =
-      split_state ~monitor kind term key state @ acc
+      let dynamic_splits =
+        match kind with
+        | Static -> SplitMap.remove term key.dynamic_splits
+        | Dynamic -> SplitMap.add term monitor key.dynamic_splits
+      in
+      let key = { key with dynamic_splits } in
+      split_state ~monitor term key state @ acc
     in
     List.fold_left add_split [] p
 
@@ -435,14 +418,14 @@ struct
     (* Update one state *)
     let update_state acc (key,state) =
       (* Split the states in the list l for the given exp *)
-      let update_exp exp (_i,monitor) l =
+      let update_exp exp monitor l =
         let resplit acc (k,x) =
-          split_state ~monitor Dynamic exp k x @ acc
+          split_state ~monitor exp k x @ acc
         in
         List.fold_left resplit [] l
       in
       (* Foreach exp in original state: split *)
-      SplitMap.fold update_exp key.dynamic_split [(key,state)] @ acc
+      SplitMap.fold update_exp key.dynamic_splits [(key,state)] @ acc
     in
     List.fold_left update_state [] p
 
@@ -528,9 +511,9 @@ struct
         | Restrict (expr, expected_values) -> fun k s ->
           { k with ration_stamp = stamp_by_value expr expected_values s}
 
-        | Merge exp -> fun k _x ->
-          { k with static_split = SplitMap.remove exp k.static_split;
-                   dynamic_split = SplitMap.remove exp k.dynamic_split }
+        | Merge term -> fun k _x ->
+          { k with splits = SplitMap.remove term k.splits;
+                   dynamic_splits = SplitMap.remove term k.dynamic_splits }
       in
       map_keys transfer p
 
