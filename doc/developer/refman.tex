@@ -185,10 +185,10 @@ generation/.style={-Latex,very thick,dashed,fill=none},
     \node[on chain,opt,draw=black] (user) {.Makefile.user};
   }
   {[start chain=specific going right,node distance=\bigpaddelta]
-    \node[on chain,plugin,draw=black,anchor=north east,yshift=-\largepadding]
-    at (opt-begin.south east) { specific Makefile for plug-in 1 };
+    \node[on chain,plugin,draw=black,anchor=north east,xshift=-\largepadding,yshift=-\largepadding]
+    at (opt-begin.south east) {Makefile for plug-in 1 };
     \node[on chain] {\ldots};
-    \node[on chain,plugin,draw=black] {specific Makefile for plugin $n$};
+    \node[on chain,plugin,draw=black] {Makefile for plugin $n$};
   }
 \end{scope}
 \matrix[anchor=north east,yshift=-\bigpadding,matrix of nodes,
@@ -225,7 +225,7 @@ Makefile $m_1$ is included in Makefile $m_2$
 \draw[plugin,include,bend right] (generated.north west) to (makefile.north east);
 \draw[generated,generation] (template) -- (generated);
 \draw[kernel,include] (generated) -- (dynamic);
-\draw[plugin,include] (dynamic) -- (node cs:name=specific-begin,angle=10);
+\draw[plugin,include,bend left] (dynamic) to (node cs:name=specific-begin,angle=10);
 \draw[plugin,include] (dynamic) -- (specific-end);
 \draw[opt,include] (user) -- (makefile);
 \draw[opt,include] (clean) -- (makefile);

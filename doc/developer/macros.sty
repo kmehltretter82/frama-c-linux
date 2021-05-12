@@ -208,12 +208,14 @@ bigarrow/.style={thick,>=Latex,red}
     start chain=#2 going below,
     node distance=\padding,
     every on chain/.style={rectangle},
+    remember picture,
     #1]
 }
 {\end{tikzpicture}}
 
 \newenvironment{tikz-hbox}[2][]
 {\begin{tikzpicture}[
+    remember picture,
     inner sep=0pt,
     every node/.style={transform shape},
     start chain=#2 going right,
@@ -223,7 +225,7 @@ bigarrow/.style={thick,>=Latex,red}
 {\end{tikzpicture}}
 
 \newcommand{\tikztitlebox}[3][]{%
-\begin{tikzpicture}[every node/.style={transform shape},#1,inner sep=0pt]
+\begin{tikzpicture}[every node/.style={transform shape},#1,inner sep=0pt,remember picture]
 \node[structural] (#2-content) {#3};
 \node[structural,above=\bigpaddelta,small-title] at (#2-content.north) (#2-title) {#2};
 \node[fit=(#2-content) (#2-title),
@@ -231,11 +233,12 @@ bigarrow/.style={thick,>=Latex,red}
 \end{tikzpicture}%
 }
 \newcommand{\tikztitleboxbig}[4][]{%
-\begin{tikzpicture}[inner sep=0pt,every node/.style={transform shape},#1]
-\node[structural] (#2-content) {#4};
-\node[above=1.5\bigpaddelta,big-title,structural] at (#2-content.north) (#2-title) {#2};
+\def\name{\detokenize{#2}}
+\begin{tikzpicture}[inner sep=0pt,every node/.style={transform shape},#1,remember picture]
+\node[structural] (\name-content) {#4};
+\node[above=1.5\bigpaddelta,big-title,structural,align=center] at (\name-content.north) (\name-title) {#2};
 \begin{scope}[on background layer]
-\node[fit=(#2-content) (#2-title), fill=#3,
+\node[fit=(\name-content) (\name-title), fill=#3,
       inner xsep=\padding, inner ysep=\bigpaddelta, draw, rounded corners=20pt,
       outer sep=0pt] {};
 \end{scope}
