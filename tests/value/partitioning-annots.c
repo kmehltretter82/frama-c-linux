@@ -1,12 +1,10 @@
 /* run.config*
    
-   STDOPT: #"-main test_unroll -eva-default-loop-unroll 10"
-   STDOPT: #"-main test_split"
+   STDOPT: #"-eva-default-loop-unroll 10"
    STDOPT: +"-main test_split -eva-partition-value k"
    STDOPT: #"-main test_loop_split -eva-partition-history 1"
    STDOPT: #"-main test_history -eva-partition-history 0"
    STDOPT: #"-main test_history -eva-partition-history 1"
-   STDOPT: #"-main test_slevel"
    */
 
 #include "__fc_builtin.h"
@@ -187,6 +185,5 @@ void main(void)
   test_slevel();
   test_unroll();
   test_split();
-  test_loop_split();
 }
 
