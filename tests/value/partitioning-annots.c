@@ -11,6 +11,8 @@
 
 #define N 10
 
+volatile nondet;
+
 void test_unroll()
 {
   int a[N], b[N], c[2*N], d[2*N], e[N];
@@ -87,6 +89,26 @@ void test_split()
   Frama_C_show_each_end(i,j,k);
 }
 
+void test_dynamic_split()
+{
+  int a, b;
+  //@ dynamic_split a;
+  if (nondet) {
+    a = Frama_C_interval(0, 2);
+    b = a;
+  }
+  Frama_C_show_each_split_with_uninit(a, b);
+  a = 0;
+  Frama_C_show_each_no_split(a, b);
+  a = Frama_C_interval(0, 2);
+  b = a;
+  //@ split a;
+  a = 0;
+  Frama_C_show_each_split(a, b);
+  //@ merge a;
+  Frama_C_show_each_no_split(a, b);
+}
+
 void test_loop_split()
 {
   int A[N];
@@ -136,8 +158,6 @@ void test_history()
     k = k / j;
 }
 
-volatile nondet;
-
 void test_slevel()
 {
   int a[N], b[N], c[N], d[N], e[4];
@@ -185,5 +205,6 @@ void main(void)
   test_slevel();
   test_unroll();
   test_split();
+  test_dynamic_split();
 }
 

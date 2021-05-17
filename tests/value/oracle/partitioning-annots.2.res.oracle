@@ -3,44 +3,44 @@
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
-  k ∈ {0}
   nondet ∈ [--..--]
+  k ∈ {0}
 [eva] computing for function Frama_C_interval <- test_loop_split.
-  Called from tests/value/partitioning-annots.c:105.
+  Called from tests/value/partitioning-annots.c:127.
 [eva] using specification for function Frama_C_interval
-[eva] tests/value/partitioning-annots.c:105: 
+[eva] tests/value/partitioning-annots.c:127: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- test_loop_split.
-  Called from tests/value/partitioning-annots.c:105.
+  Called from tests/value/partitioning-annots.c:127.
 [eva] Done for function Frama_C_interval
-[eva] tests/value/partitioning-annots.c:103: starting to merge loop iterations
+[eva] tests/value/partitioning-annots.c:125: starting to merge loop iterations
 [eva] computing for function Frama_C_interval <- test_loop_split.
-  Called from tests/value/partitioning-annots.c:105.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- test_loop_split.
-  Called from tests/value/partitioning-annots.c:105.
+  Called from tests/value/partitioning-annots.c:127.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- test_loop_split.
-  Called from tests/value/partitioning-annots.c:105.
+  Called from tests/value/partitioning-annots.c:127.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- test_loop_split.
-  Called from tests/value/partitioning-annots.c:105.
+  Called from tests/value/partitioning-annots.c:127.
 [eva] Done for function Frama_C_interval
-[eva:alarm] tests/value/partitioning-annots.c:112: Warning: 
+[eva] computing for function Frama_C_interval <- test_loop_split.
+  Called from tests/value/partitioning-annots.c:127.
+[eva] Done for function Frama_C_interval
+[eva:alarm] tests/value/partitioning-annots.c:134: Warning: 
   accessing uninitialized left-value. assert \initialized(&A[i]);
-[eva] tests/value/partitioning-annots.c:117: Frama_C_show_each: {9}, {42}
-[eva] tests/value/partitioning-annots.c:117: Frama_C_show_each: {8}, {42}
-[eva] tests/value/partitioning-annots.c:117: Frama_C_show_each: {7}, {42}
-[eva] tests/value/partitioning-annots.c:117: Frama_C_show_each: {6}, {42}
-[eva] tests/value/partitioning-annots.c:117: Frama_C_show_each: {5}, {42}
-[eva] tests/value/partitioning-annots.c:117: Frama_C_show_each: {4}, {42}
-[eva] tests/value/partitioning-annots.c:117: Frama_C_show_each: {3}, {42}
-[eva] tests/value/partitioning-annots.c:117: Frama_C_show_each: {2}, {42}
-[eva] tests/value/partitioning-annots.c:117: Frama_C_show_each: {1}, {42}
-[eva] tests/value/partitioning-annots.c:117: Frama_C_show_each: {0}, {42}
-[eva] tests/value/partitioning-annots.c:118: assertion got status valid.
-[eva] tests/value/partitioning-annots.c:121: 
+[eva] tests/value/partitioning-annots.c:139: Frama_C_show_each: {9}, {42}
+[eva] tests/value/partitioning-annots.c:139: Frama_C_show_each: {8}, {42}
+[eva] tests/value/partitioning-annots.c:139: Frama_C_show_each: {7}, {42}
+[eva] tests/value/partitioning-annots.c:139: Frama_C_show_each: {6}, {42}
+[eva] tests/value/partitioning-annots.c:139: Frama_C_show_each: {5}, {42}
+[eva] tests/value/partitioning-annots.c:139: Frama_C_show_each: {4}, {42}
+[eva] tests/value/partitioning-annots.c:139: Frama_C_show_each: {3}, {42}
+[eva] tests/value/partitioning-annots.c:139: Frama_C_show_each: {2}, {42}
+[eva] tests/value/partitioning-annots.c:139: Frama_C_show_each: {1}, {42}
+[eva] tests/value/partitioning-annots.c:139: Frama_C_show_each: {0}, {42}
+[eva] tests/value/partitioning-annots.c:140: assertion got status valid.
+[eva] tests/value/partitioning-annots.c:143: 
   Frama_C_show_each: {{ "Value 42 not found" }}
 [eva] Recording results for test_loop_split
 [eva] done for function test_loop_split
