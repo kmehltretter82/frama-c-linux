@@ -1,7 +1,7 @@
 opam-version: "2.0"
 name: "frama-c"
 synopsis: "Platform dedicated to the analysis of source code written in C"
-version: "22.0+dev"
+version: "23.0~rc1"
 description:"""
 Frama-C gathers several analysis techniques in a single collaborative
 framework, based on analyzers (called "plug-ins") that can build upon the
@@ -54,6 +54,7 @@ authors: [
   "Anne Pacalet"
   "Valentin Perrelle"
   "Guillaume Petiot"
+  "Dario Pinto"
   "Virgile Prevosto"
   "Armand Puccetti"
   "Virgile Robles"
@@ -65,7 +66,7 @@ authors: [
 homepage: "http://frama-c.com/"
 license: "LGPL-2.1-only"
 dev-repo: "git+https://git.frama-c.com/pub/frama-c.git"
-doc: "http://frama-c.com/download/user-manual-22.0-Titanium.pdf"
+doc: "http://frama-c.com/download/user-manual-23.0-Vanadium.pdf"
 bug-reports: "https://git.frama-c.com/pub/frama-c/issues"
 tags: [
   "deductive"

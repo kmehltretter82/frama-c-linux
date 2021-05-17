@@ -92,7 +92,7 @@ module Normalized: sig
 
   (** [to_string_list l] returns [l] as a list of strings containing the
       absolute paths to the elements of [l].
-      @since Frama-C+dev
+      @since 23.0-Vanadium
   *)
   val to_string_list: t list -> string list
 
@@ -122,28 +122,28 @@ module Normalized: sig
   val pp_abs: Format.formatter -> t -> unit
 
   (** Unknown filepath, used as 'dummy' for [Datatype.Filepath].
-      @deprecated Frama-C+dev use 'empty' instead
+      @deprecated 23.0-Vanadium use 'empty' instead
   *)
   val unknown: t
   [@@alert deprecated "Use Filepath.Normalized.empty instead"]
 
   (** @since 20.0-Calcium
-      @deprecated Frama-C+dev use 'is_empty' instead
+      @deprecated 23.0-Vanadium use 'is_empty' instead
   *)
   val is_unknown: t -> bool
   [@@alert deprecated "Use Filepath.Normalized.is_empty instead"]
 
   (** Empty filepath, used as 'dummy' for [Datatype.Filepath].
-      @since Frama-C+dev.
+      @since 23.0-Vanadium.
   *)
   val empty: t
 
-  (** @since Frama-C+dev *)
+  (** @since 23.0-Vanadium *)
   val is_empty: t -> bool
 
   (** [is_special_stdout f] returns [true] iff [f] is '-' (a single dash),
       which is a special notation for 'stdout'.
-      @since Frama-C+dev *)
+      @since 23.0-Vanadium *)
   val is_special_stdout: t -> bool
 
   (** [is_file f] returns [true] iff [f] points to a regular file
@@ -170,7 +170,7 @@ end
     (that is, it is prefixed by [base_name]), or to the current
     working directory if no base is specified.
     @since Aluminium-20160501
-    @modify Frama-C+dev argument types changed from string to Normalized.t
+    @modify 23.0-Vanadium argument types changed from string to Normalized.t
 *)
 val is_relative: ?base_name:Normalized.t -> Normalized.t -> bool
 
@@ -181,7 +181,7 @@ val is_relative: ?base_name:Normalized.t -> Normalized.t -> bool
 val add_symbolic_dir: string -> Normalized.t -> unit
 
 (** Remove all symbolic dirs that have been added earlier.
-    @since Frama-C+dev *)
+    @since 23.0-Vanadium *)
 val reset_symbolic_dirs: unit -> unit
 
 (** Returns the list of symbolic dirs added via [add_symbolic_dir], plus

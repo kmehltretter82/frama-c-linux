@@ -139,7 +139,7 @@ val field : string -> t -> t
     Note: no other functions should modify the contents of [path]; any
     modifications will be overwritten when the cache is flushed.
 
-    @since Frama-C+dev
+    @since 23.0-Vanadium
 *)
 
 (** Exception raised by the functions below when incompatible types are
@@ -160,7 +160,7 @@ exception CannotMerge of string
 
    @raise CannotMerge if the objects have conflicting types for
    the same keys, or if the root JSON element is not an object.
-   @since Frama-C+dev
+   @since 23.0-Vanadium
 *)
 val merge_object : Filepath.Normalized.t -> Yojson.Basic.t -> unit
 
@@ -171,7 +171,7 @@ val merge_object : Filepath.Normalized.t -> Yojson.Basic.t -> unit
    of elements.
 
    @raise CannotMerge if the root JSON element is not an array.
-   @since Frama-C+dev
+   @since 23.0-Vanadium
 *)
 val merge_array : Filepath.Normalized.t -> Yojson.Basic.t -> unit
 
@@ -179,7 +179,7 @@ val merge_array : Filepath.Normalized.t -> Yojson.Basic.t -> unit
    [from_file path] opens [path] and stores its JSON object in
    a memory cache, to be used by the other related functions.
    @raise Yojson.Json_error if [path] is a malformed JSON file.
-   @since Frama-C+dev
+   @since 23.0-Vanadium
 *)
 val from_file: Filepath.Normalized.t -> Yojson.Basic.t
 
@@ -187,6 +187,6 @@ val from_file: Filepath.Normalized.t -> Yojson.Basic.t
    Flushes the JSON objects in the cache. Returns the names of the written
    files.
 
-   @since Frama-C+dev
+   @since 23.0-Vanadium
 *)
 val flush_cache : unit -> Filepath.Normalized.t list

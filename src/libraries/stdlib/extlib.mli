@@ -211,7 +211,7 @@ val the: exn:exn -> 'a option -> 'a
     @raise Invalid_argument if the value is [None] and [exn] is not specified.
     @return v if the value is [Some v].
     @modify Magnesium-20151001 add optional argument [exn]
-    @modify Frama-C+dev optional argument [exn] now mandatory; otherwise,
+    @modify 23.0-Vanadium optional argument [exn] now mandatory; otherwise,
             use [Option.get], which is equivalent.
     @plugin development guide *)
 

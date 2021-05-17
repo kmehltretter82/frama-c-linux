@@ -107,7 +107,7 @@ val set_acceptEmptyCompinfo: unit -> unit
     Note that if the selected machdep is GCC or MSVC, this call has no effect
     as these modes already allow empty compinfos.
 
-    @since Frama-C+dev
+    @since 23.0-Vanadium
 *)
 
 val acceptEmptyCompinfo: unit -> bool
@@ -115,7 +115,7 @@ val acceptEmptyCompinfo: unit -> bool
     {!Cil.gccMode}, and can be forced by {!Cil.set_acceptEmptyCompinfo}
     otherwise.
 
-    @since Frama-C+dev
+    @since 23.0-Vanadium
 *)
 
 (* ************************************************************************* *)
@@ -325,7 +325,7 @@ val ulongLongType: typ
     It is equivalent to the ISO C int16_t type but without using the
     corresponding header.
     Must only be called if such type exists in the current architecture.
-    @since Frama-C+dev
+    @since 23.0-Vanadium
 *)
 val int16_t: unit -> typ
 
@@ -333,7 +333,7 @@ val int16_t: unit -> typ
     It is equivalent to the ISO C int32_t type but without using the
     corresponding header.
     Must only be called if such type exists in the current architecture.
-    @since Frama-C+dev
+    @since 23.0-Vanadium
 *)
 val int32_t: unit -> typ
 
@@ -341,7 +341,7 @@ val int32_t: unit -> typ
     It is equivalent to the ISO C int64_t type but without using the
     corresponding header.
     Must only be called if such type exists in the current architecture.
-    @since Frama-C+dev
+    @since 23.0-Vanadium
 *)
 val int64_t: unit -> typ
 
@@ -978,12 +978,12 @@ val need_cast: ?force:bool -> typ -> typ -> bool
     type is the same as the old type, then no cast is added, unless [force]
     is [true] (default is [false])
     @modify Fluorine-20130401 add [force] argument
-    @modify Frama-C+dev change order or arguments
+    @modify 23.0-Vanadium change order or arguments
 *)
 val mkCastT: ?force:bool -> oldt:typ -> newt:typ -> exp -> exp
 
 (** Like {!Cil.mkCastT} but uses typeOf to get [oldt]
-    @modify Frama-C+dev change order or arguments
+    @modify 23.0-Vanadium change order or arguments
 *)
 val mkCast: ?force:bool -> newt:typ -> exp -> exp
 
@@ -1121,7 +1121,7 @@ val mkPureExpr:
 (** Make a loop. Can contain Break or Continue.
     The kind of loop (while, for, dowhile) is given by [sattr]
     (none by default). Use {!Cil.mkWhile} for a While loop.
-    @modify Frama-C+dev add unit argument. Default type is no longer While,
+    @modify 23.0-Vanadium add unit argument. Default type is no longer While,
             use {!Cil.mkWhile} instead.
 *)
 val mkLoop: ?sattr:attributes -> guard:exp -> body:stmt list -> unit ->
@@ -1131,26 +1131,26 @@ val mkLoop: ?sattr:attributes -> guard:exp -> body:stmt list -> unit ->
     can contain Break but not Continue. Can be used with i a pointer
     or an integer. Start and done must have the same type but incr
     must be an integer
-    @modify Frama-C+dev add unit argument
+    @modify 23.0-Vanadium add unit argument
 *)
 val mkForIncr: ?sattr:attributes -> iter:varinfo -> first:exp -> stopat:exp ->
   incr:exp -> body:stmt list -> unit -> stmt list
 
 (** Make a for loop for(start; guard; next) \{ ... \}. The body can
     contain Break but not Continue !!!
-    @modify Frama-C+dev add unit argument
+    @modify 23.0-Vanadium add unit argument
 *)
 val mkFor: ?sattr:attributes -> start:stmt list -> guard:exp -> next: stmt list ->
   body: stmt list -> unit -> stmt list
 
 (** Make a while loop.
-    @since Frama-C+dev
+    @since 23.0-Vanadium
 *)
 val mkWhile: ?sattr:attributes -> guard:exp -> body:stmt list -> unit ->
   stmt list
 
 (** Make a do ... while loop.
-    @since Frama-C+dev
+    @since 23.0-Vanadium
 *)
 val mkDoWhile: ?sattr:attributes -> body:stmt list -> guard:exp -> unit ->
   stmt list
@@ -1441,13 +1441,13 @@ val global_attributes: global -> attributes
 
 (**
    Whether the given attributes contain libc indicators.
-   @since Frama-C+dev
+   @since 23.0-Vanadium
 *)
 val is_in_libc: attributes -> bool
 
 (**
    Whether the given global contains libc indicators.
-   @since Frama-C+dev
+   @since 23.0-Vanadium
 *)
 val global_is_in_libc: global -> bool
 

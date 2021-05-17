@@ -314,7 +314,7 @@ end
 
 (** Behavior of option "-add-symbolic-path"
     @since Neon-20140301
-    @modify Frama-C+dev inversed argument order (now uses path:name) *)
+    @modify 23.0-Vanadium inversed argument order (now uses path:name) *)
 module SymbolicPath: Parameter_sig.Filepath_map with type value = string
 
 module FloatNormal: Parameter_sig.Bool
@@ -359,13 +359,13 @@ end
 module Session_dir: Parameter_sig.Filepath
 (** Directory in which session files are searched.
     @since Neon-20140301
-    @modify Frama-C+dev parameter type is now Filepath instead of string
+    @modify 23.0-Vanadium parameter type is now Filepath instead of string
 *)
 
 module Config_dir: Parameter_sig.Filepath
 (** Directory in which config files are searched.
     @since Neon-20140301
-    @modify Frama-C+dev parameter type is now Filepath instead of string
+    @modify 23.0-Vanadium parameter type is now Filepath instead of string
 *)
 
 (* this stop special comment does not work as expected (and as explained in the

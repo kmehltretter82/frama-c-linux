@@ -150,7 +150,7 @@ end
 (* ************************************************************************* *)
 
 (** loads a list of Findlib packages
-    @since Frama-C+dev
+    @since 23.0-Vanadium
 *)
 val load_packages: string list -> unit
 
@@ -165,7 +165,7 @@ val load_module: string -> unit
 val set_module_load_path : string list -> unit
 
 (** [is_loaded package] returns [true] iff [package] has already been loaded.
-    @since Frama-C+dev
+    @since 23.0-Vanadium
 *)
 val is_loaded: string -> bool
 

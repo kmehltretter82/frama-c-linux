@@ -218,7 +218,7 @@ include Datatype.S_with_collections with type t = identified_property
     3. kind of property
     4. id of the property
 
-    @since Frama-C+dev
+    @since 23.0-Vanadium
 *)
 module Ordered_by_function:
   Datatype.S_with_collections with type t = identified_property

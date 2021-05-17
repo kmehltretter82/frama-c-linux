@@ -299,7 +299,7 @@ module type Filepath = sig
   (**
      Whether the Filepath is empty.
 
-     @since Frama-C+dev
+     @since 23.0-Vanadium
   *)
   val is_empty: unit -> bool
 end
