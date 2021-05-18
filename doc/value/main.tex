@@ -1361,12 +1361,24 @@ the 32-bit word read is made of the last two bytes from \lstinline|t[0]|
 and the first two bytes from \lstinline|t[1]|.
 
 \subsubsection{Call to an unknown function}
-The origin \lstinline$Library function L$ is used for the result of
-recursive functions or calls to function pointers whose value is not known
-precisely.
+The origin \lstinline$Library function L$ arises from the interpretation
+of a function specification, when an \lstinline|assigns| clause applies to
+pointer values.
+A function specification is only used for:
+\begin{itemize}
+\item
+  functions whose body is not provided, and for which no Eva builtins
+  exist. See section~\ref{builtins-list} for a list of available builtins.
+\item
+  recursive functions that cannot be completely analyzed;
+  see section~\ref{recursion} for more details.
+\item
+  functions given to the \verb+-eva-use-spec+ option;
+  see section~\ref{val-use-spec} for more details.
+\end{itemize}
 
 \subsubsection{Fusion of values with different alignments}
-The notation \lstinline$Merge L$ that memory states  with incompatible
+The notation \lstinline$Merge L$ indicates that memory states with incompatible
 alignments are fused together. In the example below,
 the memory states from
 the then branch and from the else branch contain in the array
