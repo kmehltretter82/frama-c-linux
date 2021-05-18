@@ -1361,12 +1361,24 @@ the 32-bit word read is made of the last two bytes from \lstinline|t[0]|
 and the first two bytes from \lstinline|t[1]|.
 
 \subsubsection{Call to an unknown function}
-The origin \lstinline$Library function L$ is used for the result of
-recursive functions or calls to function pointers whose value is not known
-precisely.
+The origin \lstinline$Library function L$ arises from the interpretation
+of a function specification, when an \lstinline|assigns| clause applies to
+pointer values.
+A function specification is only used for:
+\begin{itemize}
+\item
+  functions whose body is not provided, and for which no Eva builtins
+  exist. See section~\ref{builtins-list} for a list of available builtins.
+\item
+  recursive functions that cannot be completely analyzed;
+  see section~\ref{recursion} for more details.
+\item
+  functions given to the \verb+-eva-use-spec+ option;
+  see section~\ref{val-use-spec} for more details.
+\end{itemize}
 
 \subsubsection{Fusion of values with different alignments}
-The notation \lstinline$Merge L$ that memory states  with incompatible
+The notation \lstinline$Merge L$ indicates that memory states with incompatible
 alignments are fused together. In the example below,
 the memory states from
 the then branch and from the else branch contain in the array
@@ -2301,8 +2313,10 @@ prototypes (e.g. \lstinline|stdio.h| for \lstinline|printf|) are included.
 Calls to variadic functions in the C standard library also include
 ACSL specifications, which \Eva{} uses to interpret their behavior.
 
-Recursive functions are allowed in Frama-C, but they
-are not handled in the current version of the \Eva{} plug-in.
+Recursive functions are partially supported by \Eva{}: only a bounded
+number of recursive calls can be analyzed, and a user-written specification
+is required to interpret other calls.
+See section \ref{recursion} for more details.
 
 \section{Analyzing a partial or a complete application}
 
@@ -3329,6 +3343,80 @@ type of the function as its source of information for making
 informed assumptions. However, no guarantee is made that those assumptions
 over-approximate the real behavior of the function. The inferred
 contract should be verified carefully by the user.
+
+\subsection{Analyzing recursive functions}
+\label{recursion}
+
+By default, recursive calls are not analyzed; instead, \Eva{} uses the
+specification written by the user for the recursive function to interpret
+its recursive calls. The analysis of the function is then incomplete,
+as only its non-recursive calls are analyzed: values are inferred and
+alarms are emitted only for these calls.
+For the recursive calls, the analysis' soundness relies entirely on the
+specification provided by the user, which is not verified, and a warning
+is emitted.
+
+\begin{logs}
+[eva] file.c: Warning:
+  Using specification of function <name> for recursive calls.
+  Analysis of function <name> is thus incomplete and its soundness
+  relies on the written specification.
+\end{logs}
+
+If no ACSL contract is provided for the recursive function,
+a minimal specification is inferred by the \FramaC kernel
+from the function type, and an error is emitted.
+The specification is only generated to allow the analysis to continue
+past the recursive call, without any guarantees that it describes correctly
+the real behaviors of the function.
+In particular, only \lstinline|assigns| clauses are created, without any
+preconditions.
+It is the user's responsibility to replace this generated specification by
+a correct one.
+
+\subsubsection{Unrolling recursive calls}
+
+Option \lstinline|-eva-unroll-recursive-calls n| allows the precise analysis
+of recursive calls up to a depth of <n>. The function specification is only used
+when encountering a recursive call of depth greater than <n>.
+
+On the example below, analyzed with \lstinline|-eva-unroll-recursive-calls 10|:
+\begin{itemize}
+\item
+  the first call \lstinline|factorial(8)| is soundly and precisely analyzed
+  without any warnings;
+\item
+  the analysis of the second call \lstinline|factorial(20)| is incomplete and
+  produces a warning, as it resorts to the function specification for the tenth
+  recursive call.
+\end{itemize}
+
+\lstinputlisting{examples/parametrizing/recursion-simple.c}
+
+With option \lstinline|-eva-unroll-recursive-calls|,
+the analysis of a recursive function can thus be complete and sound,
+when the number of recursive calls can be bounded by the analysis.
+In that case, no ACSL specification is required for the analysis of the
+recursive function.
+
+However, even when the number of recursive calls is bounded in practice,
+the \Eva{} analysis might be too imprecise to be complete.
+
+\lstinputlisting{examples/parametrizing/recursion-imprecise.c}
+
+The above example presents a recursive function \lstinline|mod3|, which
+computes the congruence modulo 3 in up to three recursive calls.
+However, Eva is unable to perform a complete analysis of this function
+in the general case and will instead rely on the \lstinline|mod3| specification,
+as it cannot reduce the new argument value of the recursive calls, as shown
+by the successive values printed by the \lstinline|Frama_C_show_each| directive:
+
+\lstinputlisting[linerange={12-19}]
+                {examples/parametrizing/recursion-imprecise.log}
+
+Finally, note that the unrolling of a very large number of recursive calls can
+considerably slow down the analysis.
+
 
 \subsection{Using the specification of a function instead of its body}
 \label{val-use-spec}
