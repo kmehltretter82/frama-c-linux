@@ -5476,6 +5476,8 @@ and makeCompType ghost (isstruct: bool)
               Some 0, ftype
             | Some s as w ->
               begin
+                if s < 0 then
+                  Kernel.error ~current:true "negative bitfield width (%d)" s;
                 try
                   if s > Cil.bitsSizeOf ftype then
                     Kernel.error ~current:true
