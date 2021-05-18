@@ -5417,8 +5417,9 @@ and makeCompType ghost (isstruct: bool)
     let addFieldInfo ~last:last_field (flds : fieldinfo list)
         (((n,ndt,a,cloc) : A.name), (widtho : A.expression option))
       : fieldinfo list =
+      let source = fst cloc in
       if sto <> NoStorage || inl then
-        Kernel.error ~once:true ~current:true "Storage or inline not allowed for fields";
+        Kernel.error ~once:true ~source "Storage or inline not allowed for fields";
       let allowZeroSizeArrays = true in
       let ftype, fattr =
         doType
@@ -5431,10 +5432,10 @@ and makeCompType ghost (isstruct: bool)
          struct C2 { struct C1 c1; int dummy; };
       *)
       if Cil.isFunctionType ftype then
-        Kernel.error ~current:true
+        Kernel.error ~source
           "field `%s' declared as a function" n
       else if Cil.has_flexible_array_member ftype && isstruct then
-        Kernel.error ~current:true
+        Kernel.error ~source
           "field `%s' declared with a type containing a flexible array member."
           n
       else if not (Cil.isCompleteType ~allowZeroSizeArrays ftype)
@@ -5445,14 +5446,14 @@ and makeCompType ghost (isstruct: bool)
             (* possible flexible array member; check if struct contains at least
                one other field *)
             if flds = [] then (* struct is empty *)
-              Kernel.error ~current:true
+              Kernel.error ~source
                 "flexible array member '%s' (type %a) \
                  not allowed in otherwise empty struct"
                 n Cil_printer.pp_typ ftype
             else (* valid flexible array member *) ()
           end
         | _ ->
-          Kernel.error ~current:true
+          Kernel.error ~source
             "field `%s' is declared with incomplete type %a"
             n Cil_printer.pp_typ ftype
       end;
@@ -5464,11 +5465,11 @@ and makeCompType ghost (isstruct: bool)
              | TInt (_, _) -> ()
              | TEnum _ -> ()
              | _ ->
-               Kernel.error ~once:true ~source:(fst cloc)
+               Kernel.error ~once:true ~source
                  "Base type for bitfield is not an integer type");
             match isIntegerConstant ghost w with
             | None ->
-              Kernel.error ~source:(fst cloc)
+              Kernel.error ~source
                 "bitfield width is not an integer constant";
               (* error  does not immediately stop execution.
                  Hence, we return a placeholder here.
@@ -5477,15 +5478,15 @@ and makeCompType ghost (isstruct: bool)
             | Some s as w ->
               begin
                 if s < 0 then
-                  Kernel.error ~source:(fst cloc) "negative bitfield width (%d)" s;
+                  Kernel.error ~source "negative bitfield width (%d)" s;
                 try
                   if s > Cil.bitsSizeOf ftype then
-                    Kernel.error ~source:(fst cloc)
+                    Kernel.error ~source
                       "bitfield width (%d) exceeds its type (%a, %d bits)"
                       s Cil_printer.pp_typ ftype (Cil.bitsSizeOf ftype)
                 with
                   SizeOfError _ ->
-                  Kernel.fatal ~source:(fst cloc)
+                  Kernel.fatal ~source
                     "Unable to compute size of %a" Cil_printer.pp_typ ftype
               end;
               let ftype =

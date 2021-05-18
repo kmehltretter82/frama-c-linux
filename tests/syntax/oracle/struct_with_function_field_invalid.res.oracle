@@ -1,5 +1,5 @@
 [kernel] Parsing tests/syntax/struct_with_function_field_invalid.i (no preprocessing)
-[kernel] tests/syntax/struct_with_function_field_invalid.i:7: User Error: 
+[kernel] tests/syntax/struct_with_function_field_invalid.i:8: User Error: 
   field `f' declared as a function
 [kernel] User Error: stopping on file "tests/syntax/struct_with_function_field_invalid.i" that has
   errors.

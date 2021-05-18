@@ -5,7 +5,7 @@
   Too many initializers for structure
 [kernel] tests/value/empty_base.c:75: User Error: 
   field `z' declared with a type containing a flexible array member.
-[kernel] tests/value/empty_base.c:80: User Error: 
+[kernel] tests/value/empty_base.c:81: User Error: 
   field `f1' declared with a type containing a flexible array member.
 [kernel] User Error: stopping on file "tests/value/empty_base.c" that has errors. Add
   '-kernel-msg-key pp' for preprocessing command.
