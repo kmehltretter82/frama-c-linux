@@ -57,7 +57,7 @@ module Model_info: State_builder.Hashtbl
 module Lemmas: State_builder.Hashtbl
   with type key = string and type data = Cil_types.global_annotation
 
-(** @since Frama-C+dev *)
+(** @since 23.0-Vanadium *)
 module Axiomatics: State_builder.Hashtbl
   with type key = string and type data = Cil_types.location
 

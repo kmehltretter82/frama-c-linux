@@ -14,21 +14,21 @@ if (!@ARGV) {
 while (1) {
   my $FileName = shift @ARGV ;
 
-  # Exit code = number of duplicates found.  
+  # Exit code = number of duplicates found.
   exit $DupCount if (!$FileName) ;
 
-  open FILE, $FileName or die $!; 
-  
+  open FILE, $FileName or die $!;
+
   my $LastWord = "" ;
   my $LineNum = 0 ;
-  
+
   while (<FILE>) {
     chomp ;
 
     $LineNum ++ ;
-    
+
     my @words = split (/(\W+)/) ;
-    
+
     foreach my $word (@words) {
       # Skip spaces:
       next if $word =~ /^\s*$/ ;
@@ -38,9 +38,25 @@ while (1) {
         $LastWord = "" ;
         next ;
       }
-      
-      # Found a dup? 
-      if (lc($word) eq lc($LastWord)) {
+
+      # Skip numbers
+      if ($word =~ /^\d+$/) {
+        $LastWord = "" ;
+        next ;
+      }
+
+      # Found a dup?
+      # note: some words are ignored, such as "long long",
+      # or some variable/field names
+      if ($word eq $LastWord && length($word) >= 3 &&
+          !($word eq "lexbuf") &&
+          !($word eq "ofs") &&
+          !($word eq "addr") &&
+          !($word eq "ros") &&
+          !($word eq "end") &&
+          !($word eq "args") &&
+          !($word eq "pos") &&
+          !($word eq "long")) {
         print "$FileName:$LineNum $word\n" ;
         $DupCount ++ ;
       } # Thanks to Sean Cronin for tip on case.
@@ -49,7 +65,6 @@ while (1) {
       $LastWord = $word ;
     }
   }
-  
+
   close FILE ;
 }
-

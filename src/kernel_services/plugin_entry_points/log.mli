@@ -87,7 +87,7 @@ exception FeatureRequest of Filepath.position option * string * string
     You may catch [FeatureRequest(s,p,r)] to support degenerated behavior.
     The (optional) source location is s, the responsible plugin is 'p'
     and the feature request is 'r'.
-    @modified Frama-C+dev added source location.
+    @modified 23.0-Vanadium added source location.
 *)
 
 (* -------------------------------------------------------------------------- *)
@@ -214,7 +214,7 @@ module type Messages = sig
       If the exception is not caught, Frama-C displays a feature-request
       message to the user.
       @since Beryllium-20090901
-      @modified Frama-C+dev added current and source arguments.
+      @modified 23.0-Vanadium added current and source arguments.
   *)
 
   val deprecated: string -> now:string -> ('a -> 'b) -> ('a -> 'b)

@@ -339,7 +339,7 @@ val add_spec: ?register_children:bool -> spec contract_component_addition
 
     [register_children] is directly given to the function [add_behaviors].
 
-    @since Frama-C+dev
+    @since 23.0-Vanadium
 *)
 
 val add_behaviors:

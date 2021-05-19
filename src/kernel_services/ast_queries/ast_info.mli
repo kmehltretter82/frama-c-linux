@@ -69,7 +69,7 @@ val precondition : goal:bool -> funspec -> predicate
     With [~goal:true], only returns assert and check predicates.
     With [~goal:false], only returns assert and admit predicates.
     @since Carbon-20101201
-    @modify Frama-C+dev introduce [goal] flag
+    @modify 23.0-Vanadium introduce [goal] flag
 *)
 
 val behavior_assumes : funbehavior -> predicate
@@ -80,7 +80,7 @@ val behavior_precondition : goal:bool -> funbehavior -> predicate
 (** Builds the precondition from [b_assumes] and [b_requires] clauses.
     For flag [~goal] see {!Ast_info.precondition} above.
     @since Carbon-20101201
-    @modify Frama-C+dev introduce [goal] flag
+    @modify 23.0-Vanadium introduce [goal] flag
 *)
 
 val behavior_postcondition :
@@ -88,7 +88,7 @@ val behavior_postcondition :
 (** Builds the postcondition from [b_assumes] and [b_post_cond] clauses.
     For flag [~goal] see {Ast_info.precondition} above.
     @modify Boron-20100401 added termination kind as filtering argument.
-    @modify Frama-C+dev introduce [goal] flag
+    @modify 23.0-Vanadium introduce [goal] flag
 *)
 
 val disjoint_behaviors : funspec -> string list -> predicate

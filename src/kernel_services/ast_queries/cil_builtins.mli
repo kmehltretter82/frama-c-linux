@@ -99,7 +99,7 @@ module Builtin_functions :
     the machdep and initializing machine-dependent builtins. Hence, types
     such {!Cil.uint16_t} might be used if needed.
 
-    @since Frama-C+dev
+    @since 23.0-Vanadium
 *)
 val add_custom_builtin: (unit -> (string * typ * typ list * bool)) -> unit
 

@@ -1,7 +1,7 @@
 [kernel] Parsing tests/syntax/fam.i (no preprocessing)
 [kernel] tests/syntax/fam.i:16: User Error: 
   static initialization of flexible array members is an unsupported GNU extension
-[kernel] tests/syntax/fam.i:28: User Error: 
+[kernel] tests/syntax/fam.i:29: User Error: 
   field `b' is declared with incomplete type char []
 [kernel] tests/syntax/fam.i:28: User Error: 
   static initialization of flexible array members is an unsupported GNU extension

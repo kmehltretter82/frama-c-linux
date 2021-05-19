@@ -270,8 +270,8 @@ let populate_funspec kf spec =
   if Is_populated.mem kf then
     false (* No need to add the spec again *)
   else (
-    Is_populated.add kf ();
     populate_funspec_aux kf spec;
+    Is_populated.add kf ();
     true
   )
 

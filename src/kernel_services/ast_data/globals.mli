@@ -129,7 +129,7 @@ module Functions: sig
      name is [name], sorted according to [cmp]. If [cmp] is [None],
      the resulting order is unspecified.
 
-     @since Frama-C+dev
+     @since 23.0-Vanadium
   *)
 
   val find_def_by_name : string -> kernel_function

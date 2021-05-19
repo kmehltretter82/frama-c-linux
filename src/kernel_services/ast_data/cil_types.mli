@@ -349,7 +349,7 @@ and attrparam =
     assigned and that the fields have the right pointers to parents.).
     @plugin development guide
 
-    @since Frama-C+dev [cfields] is an option, [None] is used for incomplete
+    @since 23.0-Vanadium [cfields] is an option, [None] is used for incomplete
     types (in replacement of removed field [cdefined]) *)
 and compinfo = {
   mutable cstruct: bool;

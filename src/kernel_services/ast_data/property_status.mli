@@ -239,7 +239,7 @@ end
 val iter: (Property.t -> unit) -> unit
 val fold: (Property.t -> 'a -> 'a) -> 'a -> 'a
 
-(** @since Frama-C+dev *)
+(** @since 23.0-Vanadium *)
 val iter_sorted:
   cmp:(Property.t -> Property.t -> int) -> (Property.t -> unit) -> unit
 

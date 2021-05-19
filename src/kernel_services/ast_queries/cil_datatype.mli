@@ -85,7 +85,7 @@ module Location: sig
       starting position. Compares normalized filenames, lines and columns,
       but no absolute character offsets.
 
-      @since Frama-C+dev
+      @since 23.0-Vanadium
    *)
   val compare_start_semantic : location -> location -> int
 

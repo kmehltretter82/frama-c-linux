@@ -1,7 +1,7 @@
 [kernel] Parsing tests/syntax/incomplete_struct_field.i (no preprocessing)
 [kernel] tests/syntax/incomplete_struct_field.i:5: User Error: 
   declaration of array of incomplete type 'struct _s`
-[kernel] tests/syntax/incomplete_struct_field.i:5: User Error: 
+[kernel] tests/syntax/incomplete_struct_field.i:7: User Error: 
   field `v' is declared with incomplete type struct _s [12]
 [kernel] tests/syntax/incomplete_struct_field.i:5: User Error: 
   type struct _s is circular

@@ -57,6 +57,7 @@ let show main_ui =
     "Anne Pacalet";
     "Valentin Perrelle";
     "Guillaume Petiot";
+    "Dario Pinto";
     "Virgile Prevosto";
     "Armand Puccetti";
     "Virgile Robles";
