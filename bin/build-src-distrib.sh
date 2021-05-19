@@ -267,7 +267,7 @@ function add_install_page {
 }
 
 function add_event_page {
-    EVENT_WEBPAGE=_events/framac-$FRAMAC_VERSION.md
+    EVENT_WEBPAGE=_events/framac-$FRAMAC_VERSION_SAFE.md
     EVENT_WEBPAGE_PATH=$WEBSITE_DIR/$EVENT_WEBPAGE
 
     if [ "$VERSION_MINOR" != 0 ]; then
@@ -465,9 +465,9 @@ function fill_website {
 
 function create_website_branch {
     if test "$FINAL_RELEASE" = "yes"; then
-        BRANCH_NAME="release/stable-$FRAMAC_VERSION-$FRAMAC_VERSION_CODENAME_LOWER"
+        BRANCH_NAME="release/stable-$FRAMAC_VERSION_SAFE-$FRAMAC_VERSION_CODENAME_LOWER"
     else
-        BRANCH_NAME="release/beta-$FRAMAC_VERSION-$FRAMAC_VERSION_CODENAME_LOWER"
+        BRANCH_NAME="release/beta-$FRAMAC_VERSION_SAFE-$FRAMAC_VERSION_CODENAME_LOWER"
     fi
     # Chech whether release/<release> exists on the website
     git -C $WEBSITE_DIR show-ref --verify --quiet refs/heads/$BRANCH_NAME
@@ -493,7 +493,7 @@ function create_website_branch {
             run "git -C $WEBSITE_DIR checkout master"
             exit 1
     esac
-    run "git -C $WEBSITE_DIR commit -m \"$FRAMAC_VERSION_AND_CODENAME release\""
+    run "git -C $WEBSITE_DIR commit -m \"$FRAMAC_VERSION_SAFE-$FRAMAC_VERSION_CODENAME release\""
 }
 
 function commit_wiki {
@@ -508,7 +508,7 @@ function commit_wiki {
             echo "Abort wiki update."
             exit 1
     esac
-    run "git -C $WIKI_DIR commit -m \"$FRAMAC_VERSION_AND_CODENAME release\""
+    run "git -C $WIKI_DIR commit -m \"$FRAMAC_VERSION_SAFE-$FRAMAC_VERSION_CODENAME release\""
 }
 
 
@@ -568,10 +568,11 @@ if test \! -f VERSION ; then
 fi
 
 FRAMAC_VERSION=$(cat VERSION)
+FRAMAC_VERSION_SAFE="$(echo ${FRAMAC_VERSION} | sed -e "s/~/-/")"
 FRAMAC_TAG=$(git describe --tag)
 FRAMAC_VERSION_CODENAME=$(cat VERSION_CODENAME)
 FRAMAC_VERSION_CODENAME_LOWER=$(echo "$FRAMAC_VERSION_CODENAME" | tr '[:upper:]' '[:lower:]')
-FRAMAC_VERSION_AND_CODENAME="${FRAMAC_VERSION}-${FRAMAC_VERSION_CODENAME}"
+FRAMAC_VERSION_AND_CODENAME="${FRAMAC_VERSION_SAFE}-${FRAMAC_VERSION_CODENAME}"
 TARGZ_FILENAME=frama-c-${FRAMAC_VERSION_AND_CODENAME}.tar.gz
 
 VERSION_MODIFIER=$(cat VERSION | sed -e s/[0-9.]*\\\(.*\\\)/\\1/)
@@ -584,7 +585,7 @@ if [ "$VERSION_MODIFIER" == "+dev" ]; then
     proceed_anyway "Update VERSION and run the script again"
 fi
 
-if test "$FRAMAC_VERSION" != "$FRAMAC_TAG"; then
+if test  "$FRAMAC_VERSION_SAFE" != "$FRAMAC_TAG"; then
     echo "### WARNING: The current commit is not tagged with the current version:"
     echo "Frama-C Version: $FRAMAC_VERSION"
     echo "Frama-C Tag    : $FRAMAC_TAG"
@@ -737,7 +738,7 @@ case "${STEP}" in
         run "git worktree add -f --detach $BUILD_DIR $FRAMAC_BRANCH"
         run "cd $BUILD_DIR; autoconf"
         run "cd $BUILD_DIR; ./configure"
-        run "cd $BUILD_DIR; make -j OPEN_SOURCE=yes src-distrib"
+        run "cd $BUILD_DIR; make -j OPEN_SOURCE=yes DISTRIB=frama-c-${FRAMAC_VERSION_AND_CODENAME} src-distrib"
         # sanity check: markdown-report must be distributed
         run "tar tf $BUILD_DIR/$TARGZ_FILENAME | grep -q src/plugins/markdown-report"
         run "cp $BUILD_DIR/$TARGZ_FILENAME $OUT_DIR"
@@ -774,7 +775,7 @@ case "${STEP}" in
     8)
         step 8 "CHECK GENERATED DISTRIBUTION"
         assert_out_dir
-        TEST_DIR="$BUILD_DIR_ROOT/frama-c-$FRAMAC_VERSION-$FRAMAC_VERSION_CODENAME"
+        TEST_DIR="$BUILD_DIR_ROOT/frama-c-${FRAMAC_VERSION_AND_CODENAME}"
         run "mkdir -p $BUILD_DIR_ROOT"
         run "rm -rf $TEST_DIR"
         run "cp $OUT_DIR/$TARGZ_FILENAME $BUILD_DIR_ROOT"
