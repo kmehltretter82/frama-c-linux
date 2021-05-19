@@ -234,7 +234,7 @@ module TransferTaint = struct
         let is_taint_annotated = Zone.is_included lv_zone annot_zone in
         if is_taint_annotated
         then
-          { state with locs_data = Zone.join state.locs_data lv_zone }
+          state
         else
           (* Compute data-dependency with [state]: whenever [exp] (or its
              sub-expressions) is tainted, or [lv] is indexed by a tainted memory
