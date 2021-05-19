@@ -7,7 +7,7 @@
   undet ∈ [--..--]
   tainted ∈ {0}
 [eva] computing for function taint_basic <- main.
-  Called from tests/value/taint.c:131.
+  Called from tests/value/taint.c:143.
 [eva] tests/value/taint.c:34: 
   Frama_C_dump_each:
   # taint:
@@ -19,7 +19,7 @@
 [eva] Recording results for taint_basic
 [eva] Done for function taint_basic
 [eva] computing for function taint_assume_1 <- main.
-  Called from tests/value/taint.c:134.
+  Called from tests/value/taint.c:146.
 [eva:loop-unroll] tests/value/taint.c:47: Automatic loop unrolling.
 [eva] tests/value/taint.c:48: 
   Frama_C_dump_each:
@@ -80,7 +80,7 @@
 [eva] Recording results for taint_assume_1
 [eva] Done for function taint_assume_1
 [eva] computing for function taint_assume_2 <- main.
-  Called from tests/value/taint.c:135.
+  Called from tests/value/taint.c:147.
 [eva] tests/value/taint.c:76: 
   Frama_C_dump_each:
   # taint:
@@ -91,16 +91,28 @@
   ==END OF DUMP==
 [eva] Recording results for taint_assume_2
 [eva] Done for function taint_assume_2
+[eva] computing for function taint_undet_locs <- main.
+  Called from tests/value/taint.c:149.
+[eva] tests/value/taint.c:88: 
+  Frama_C_dump_each:
+  # taint:
+  Locations (data):
+    x; y; t
+  Locations (control):
+    \nothing
+  ==END OF DUMP==
+[eva] Recording results for taint_undet_locs
+[eva] Done for function taint_undet_locs
 [eva] computing for function taint_spec_assigns <- main.
-  Called from tests/value/taint.c:138.
+  Called from tests/value/taint.c:152.
 [eva] using specification for function taint_spec_assigns
 [eva] Done for function taint_spec_assigns
-[eva] tests/value/taint.c:140: 
+[eva] tests/value/taint.c:154: 
   Frama_C_domain_show_each:
   l : # taint: false
 [eva] computing for function taint_goto_1 <- main.
-  Called from tests/value/taint.c:142.
-[eva] tests/value/taint.c:95: 
+  Called from tests/value/taint.c:156.
+[eva] tests/value/taint.c:107: 
   Frama_C_dump_each:
   # taint:
   Locations (data):
@@ -111,8 +123,8 @@
 [eva] Recording results for taint_goto_1
 [eva] Done for function taint_goto_1
 [eva] computing for function taint_goto_2 <- main.
-  Called from tests/value/taint.c:143.
-[eva] tests/value/taint.c:115: 
+  Called from tests/value/taint.c:157.
+[eva] tests/value/taint.c:127: 
   Frama_C_dump_each:
   # taint:
   Locations (data):
@@ -123,9 +135,9 @@
 [eva] Recording results for taint_goto_2
 [eva] Done for function taint_goto_2
 [eva] computing for function taint_call <- main.
-  Called from tests/value/taint.c:146.
+  Called from tests/value/taint.c:160.
 [eva] computing for function taint_basic <- taint_call <- main.
-  Called from tests/value/taint.c:123.
+  Called from tests/value/taint.c:135.
 [eva] tests/value/taint.c:34: 
   Frama_C_dump_each:
   # taint:
@@ -136,7 +148,7 @@
   ==END OF DUMP==
 [eva] Recording results for taint_basic
 [eva] Done for function taint_basic
-[eva] tests/value/taint.c:126: 
+[eva] tests/value/taint.c:138: 
   Frama_C_domain_show_each:
   x : # taint: false
 [eva] Recording results for taint_call
@@ -170,6 +182,11 @@
   y ∈ {0} or UNINITIALIZED
   z ∈ {1} or UNINITIALIZED
   t ∈ [--..--]
+[eva:final-states] Values at end of function taint_undet_locs:
+  x ∈ {0}
+  y ∈ {0}
+  t ∈ {0}
+  p ∈ {{ &x ; &y }}
 [eva:final-states] Values at end of function main:
   tainted ∈ {0}
   l ∈ [--..--] or UNINITIALIZED
@@ -186,6 +203,8 @@
 [from] Done for function taint_goto_1
 [from] Computing for function taint_goto_2
 [from] Done for function taint_goto_2
+[from] Computing for function taint_undet_locs
+[from] Done for function taint_undet_locs
 [from] Computing for function main
 [from] Computing for function taint_spec_assigns <-main
 [from] Done for function taint_spec_assigns
@@ -206,6 +225,8 @@
   NO EFFECTS
 [from] Function taint_spec_assigns:
   l FROM t
+[from] Function taint_undet_locs:
+  NO EFFECTS
 [from] Function main:
   tainted FROM \nothing
   \result FROM \nothing
@@ -233,6 +254,10 @@
 [inout] Out (internal) for function taint_goto_2:
     x; y; z; t
 [inout] Inputs for function taint_goto_2:
+    undet
+[inout] Out (internal) for function taint_undet_locs:
+    x; y; t; p; tmp
+[inout] Inputs for function taint_undet_locs:
     undet
 [inout] Out (internal) for function main:
     tainted; l; __retres

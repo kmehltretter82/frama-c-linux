@@ -204,8 +204,8 @@ module TransferTaint = struct
         state
       | Kstmt stmt ->
         let to_loc = loc_of_lval valuation in
+        let ploc = to_loc lv.Eval.lval in
         let lv_zone =
-          let ploc = to_loc lv.Eval.lval in
           let loc = Precise_locs.imprecise_location ploc in
           Locations.enumerate_valid_bits Write loc
         in
@@ -249,7 +249,9 @@ module TransferTaint = struct
           in
           if intersect_state
           then { state with locs_data = Zone.join state.locs_data lv_zone }
-          else { state with locs_data = Zone.diff state.locs_data lv_zone }
+          else if Precise_locs.cardinal_zero_or_one ploc
+          then { state with locs_data = Zone.diff state.locs_data lv_zone }
+          else state
     in
     `Value state
 

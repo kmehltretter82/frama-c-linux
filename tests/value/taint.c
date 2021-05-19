@@ -76,6 +76,18 @@ void taint_assume_2() {
   Frama_C_dump_each();
 }
 
+void taint_undet_locs() {
+  int x, y, t = 0;
+  int *p = undet ? &x : &y;
+  //@ taint t;
+  x = t;
+  y = t;
+  /* Since 'p' may point to either 'x' or 'y', this assignment does not untaint
+     'x' nor 'y' (which must both remain data-tainted). */
+  *p = 0;
+  Frama_C_dump_each();
+}
+
 /*@ assigns *l \from t; */
 void taint_spec_assigns(int* l, int t);
 
@@ -133,6 +145,8 @@ int main(void) {
   tainted = 0;
   taint_assume_1();
   taint_assume_2();
+
+  taint_undet_locs();
 
   int l;
   taint_spec_assigns(&l, tainted);
