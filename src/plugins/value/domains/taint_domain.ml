@@ -394,12 +394,7 @@ module InternalTaint = struct
 
   let leave_scope _kf vars state =
     let remove_unscoped_bases =
-      let bases =
-        List.fold_left
-          (fun acc v -> Base.Set.add (Base.of_varinfo v) acc)
-          Base.Set.empty
-          vars
-      in
+      let bases = Base.Set.of_list (List.map Base.of_varinfo vars) in
       Zone.filter_base (fun b -> not (Base.Set.mem b bases))
     in
     { state with
