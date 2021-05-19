@@ -29,7 +29,7 @@ let check_signals, signal_abort =
   (fun () ->
      if !signal_emitted then begin
        signal_emitted := false;
-       raise Db.Value.Aborted
+       raise (Log.AbortError "eva")
      end),
   (fun () -> signal_emitted := true)
 
@@ -779,7 +779,7 @@ module Computer
            Kernel_function.pretty kf;
        | _ -> ());
       results, !Dataflow.cacheable
-    with Db.Value.Aborted as e ->
+    with Log.AbortError _ | Log.AbortFatal _ | Log.FeatureRequest _ as e ->
       (* analysis was aborted: pop the call stack and inform the caller *)
       Dataflow.mark_degeneration ();
       Dataflow.merge_results ();

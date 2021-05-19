@@ -275,15 +275,12 @@ let apply_builtin (builtin:builtin) call ~pre ~post =
     process_result call post call_result
   with
   | Invalid_nb_of_args n ->
-    Value_parameters.error ~current:true
+    Value_parameters.abort ~current:true
       "Invalid number of arguments for builtin %a: %d expected, %d found"
-      Kernel_function.pretty call.kf n (List.length arguments);
-    raise Db.Value.Aborted
+      Kernel_function.pretty call.kf n (List.length arguments)
   | Outside_builtin_possibilities ->
-    Value_parameters.warning ~once:true ~current:true
-      "Call to builtin %a failed, aborting." Kernel_function.pretty call.kf;
-    raise Db.Value.Aborted
-
+    Value_parameters.fatal ~current:true
+      "Call to builtin %a failed" Kernel_function.pretty call.kf
 
 (*
 Local Variables:

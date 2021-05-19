@@ -332,7 +332,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       in
       cleanup ();
       res
-    with Db.Value.Aborted as e ->
+    with Log.AbortError _ | Log.AbortFatal _ | Log.FeatureRequest _ as e ->
       InOutCallback.clear ();
       cleanup ();
       raise e

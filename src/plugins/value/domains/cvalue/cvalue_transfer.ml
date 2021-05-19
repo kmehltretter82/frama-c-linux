@@ -101,10 +101,9 @@ let write_abstract_value state (lval, loc, typ) assigned_value =
     Value_parameters.result
       "State before degeneration:@\n======%a@\n======="
       Cvalue.Model.pretty state;
-    Value_util.warning_once_current
+    Value_parameters.fatal ~current:true
       "writing at a completely unknown address@[%a@].@\nAborting."
-      Origin.pretty_as_reason orig;
-    raise Db.Value.Aborted
+      Origin.pretty_as_reason orig
   | _ ->
     let exact = Locations.cardinal_zero_or_one loc in
     let value =

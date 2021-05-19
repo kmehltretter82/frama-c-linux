@@ -627,10 +627,9 @@ let frama_c_interval_split _state actuals =
       with
       | Cvalue.V.Not_based_on_null
       | Ival.Not_Singleton_Int ->
-        Value_parameters.error
+        Value_parameters.abort
           "Invalid call to Frama_C_interval_split%a"
-          Value_util.pretty_actuals actuals;
-        raise Db.Value.Aborted
+          Value_util.pretty_actuals actuals
     end
   | _ -> raise (Builtins.Invalid_nb_of_args 2)
 

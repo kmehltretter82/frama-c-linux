@@ -344,16 +344,10 @@ module Make (Abstract: Abstractions.Eva) = struct
       post_analysis ();
       Abstract.Dom.post_analysis final_state;
       Value_results.print_summary ();
-    with
-    | Db.Value.Aborted ->
+    with Log.AbortError _ | Log.AbortFatal _ | Log.FeatureRequest _ as e ->
       Abstract.Dom.Store.mark_as_computed ();
       post_analysis_cleanup ~aborted:true;
-      (* Signal that a degeneration occurred *)
-      if Value_util.DegenerationPoints.length () > 0 then
-        Value_parameters.error
-          "Degeneration occurred:@\nresults are not correct for lines of code \
-           that can be reached from the degeneration point.@."
-
+      raise e
 
   let compute_from_entry_point kf ~lib_entry =
     pre_analysis ();
@@ -362,9 +356,9 @@ module Make (Abstract: Abstractions.Eva) = struct
       Kernel_function.pretty kf;
     let initial_state =
       try Init.initial_state_with_formals ~lib_entry kf
-      with Db.Value.Aborted ->
+      with Log.AbortError _ | Log.AbortFatal _ | Log.FeatureRequest _ as e ->
         post_analysis_cleanup ~aborted:true;
-        Value_parameters.abort "Degeneration occurred during initialization, aborting."
+        raise e
     in
     match initial_state with
     | `Bottom ->
