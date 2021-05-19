@@ -29,7 +29,7 @@
 [e-acsl] FRAMAC_SHARE/libc/sys/wait.h:86: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/unistd.h:854: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/unistd.h:856: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:354: Warning: 
@@ -104,9 +104,9 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] FRAMAC_SHARE/libc/unistd.h:857: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/unistd.h:859: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/unistd.h:857: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/unistd.h:859: Warning: 
   function __gen_e_acsl_fork: postcondition 'result_ok_child_or_error' got status unknown.
 [kernel:annot:missing-spec] tests/format/printf.c:180: Warning: 
   Neither code nor specification for function __e_acsl_builtin_printf, generating default assigns from the prototype

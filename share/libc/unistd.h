@@ -848,6 +848,8 @@ extern int          execvp(const char *path, char *const argv[]);
 extern void         _exit(int) __attribute__ ((__noreturn__));
 
 extern int          fchown(int, uid_t, gid_t);
+extern int          fchownat(int fd, const char *path, uid_t owner,
+                             gid_t group, int flag);
 extern int          fchdir(int);
 extern int          fdatasync(int);
 
