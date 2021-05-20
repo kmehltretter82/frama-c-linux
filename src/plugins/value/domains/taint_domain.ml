@@ -259,7 +259,7 @@ module TransferTaint = struct
     let state = filter_active_tainted_assumes stmt state in
     let state =
       let annot_zone = zone_of_taint_annot stmt in
-      { state with locs_control = Zone.join state.locs_control annot_zone }
+      { state with locs_data = Zone.join state.locs_data annot_zone }
     in
     (* Add [stmt] as assume statement in [state] as soon as [exp] is tainted. *)
     let to_loc = loc_of_lval valuation in
