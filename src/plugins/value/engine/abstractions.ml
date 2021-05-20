@@ -163,7 +163,7 @@ module Config = struct
       (module Inout_domain.D)
 
   let taint = make 5 "taint" ~experimental:true
-      "TODO"
+      "Taint analysis."
       (module Taint_domain)
 
   let traces =
