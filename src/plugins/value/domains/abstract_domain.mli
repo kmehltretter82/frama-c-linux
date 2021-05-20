@@ -466,38 +466,19 @@ module type S = sig
   val log_category : Value_parameters.category
 end
 
-
-(** Automatic storage of the states computed during the analysis. *)
-module type Store = sig
-  type state
-  val register_global_state: state or_bottom -> unit
-  val register_initial_state: Value_types.callstack -> state -> unit
-  val register_state_before_stmt: Value_types.callstack -> stmt -> state -> unit
-  val register_state_after_stmt: Value_types.callstack -> stmt -> state -> unit
-
-  (** Allows accessing the states inferred by an Eva analysis after it has
-      been computed with the domain enabled. *)
-  val get_global_state: unit -> state or_bottom
-  val get_initial_state: kernel_function -> state or_bottom
-  val get_initial_state_by_callstack:
-    kernel_function -> state Value_types.Callstack.Hashtbl.t or_top_or_bottom
-
-  val get_stmt_state: after:bool -> stmt -> state or_bottom
-  val get_stmt_state_by_callstack:
-    after:bool -> stmt -> state Value_types.Callstack.Hashtbl.t or_top_or_bottom
-end
-
 (** Full implementation of domains. Automatically built by
     {!Domain_builder.Complete} from an {!S_with_Structure} domain. *)
 module type Internal = sig
   include S
-  module Store: Store with type state := state
 
   (** This function is called after the analysis. The argument is the state
       computed at the return statement of the main function. The function can
       also access all states stored in the Store module during the analysis.
       If the analysis aborted, this function is not called. *)
   val post_analysis: t or_bottom -> unit
+
+  (** Storage of the states computed by the analysis. *)
+  module Store: Domain_store.S with type t := t
 end
 
 type 't key = 't Structure.Key_Domain.key
