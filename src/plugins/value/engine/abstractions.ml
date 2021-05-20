@@ -162,6 +162,10 @@ module Config = struct
       "Infers the inputs and outputs of each function."
       (module Inout_domain.D)
 
+  let taint = make 5 "taint" ~experimental:true
+      "Taint analysis."
+      (module Taint_domain)
+
   let traces =
     make 2 "traces" ~experimental:true
       "Builds an over-approximation of all the traces that lead \

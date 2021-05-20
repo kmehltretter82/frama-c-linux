@@ -287,10 +287,10 @@ module type Transfer = sig
     stmt -> (location, value) call -> recursion option ->
     pre:state -> post:state -> state or_bottom
 
-  (** Called on the Frama_C_show_each directives. Prints the internal properties
-      inferred by the domain in the [state] about the expression [exp]. Can use
-      the [valuation] resulting from the cooperative evaluation of the
-      expression. *)
+  (** Called on the Frama_C_domain_show_each directive. Prints the internal
+      properties inferred by the domain in the [state] about the expression
+      [exp]. Can use the [valuation] resulting from the cooperative evaluation of
+      the expression. *)
   val show_expr:
     (value, location, origin) valuation ->
     state -> Format.formatter -> exp -> unit
