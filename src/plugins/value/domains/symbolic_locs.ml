@@ -639,9 +639,6 @@ module Internal : Domain_builder.InputDomain
 
   let evaluate_predicate _ _ _ = Alarmset.Unknown
   let reduce_by_predicate _ state _ _ = `Value state
-
-  let storage = Value_parameters.SymbolicLocsStorage.get
-
 end
 
 module D = Domain_builder.Complete (Internal)

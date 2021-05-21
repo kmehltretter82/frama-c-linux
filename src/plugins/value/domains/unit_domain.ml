@@ -36,8 +36,6 @@ module Static = struct
     let join _ _ = ()
     let widen _ _ _ _ = ()
     let narrow _ _ = `Value ()
-
-    let storage () = false
   end
 
   include D

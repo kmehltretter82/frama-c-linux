@@ -567,8 +567,6 @@ struct
     merge ~cache ~symmetric:false ~idempotent:true
       ~decide_both ~decide_left:(Traversing decide_left) ~decide_right:Neutral
       current_input previous_output
-
-  let storage () = true
 end
 
 

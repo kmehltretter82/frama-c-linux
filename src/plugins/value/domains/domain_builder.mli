@@ -25,7 +25,6 @@
 
 module type InputDomain = sig
   include Abstract_domain.S
-  val storage: unit -> bool
 end
 
 module Complete

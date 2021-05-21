@@ -1322,8 +1322,6 @@ module Domain = struct
 
   let name = "Octagon domain"
   let log_category = Value_parameters.register_category "d-octagon"
-
-  let storage () = true
 end
 
 include Domain_builder.Complete (Domain)

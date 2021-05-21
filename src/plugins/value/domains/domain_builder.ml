@@ -22,7 +22,6 @@
 
 module type InputDomain = sig
   include Abstract_domain.S
-  val storage: unit -> bool
 end
 
 module Complete
@@ -139,8 +138,6 @@ module Complete_Minimal
            let mem_project = Datatype.never_any_project
          end)
        : Datatype.S_with_collections with type t := t)
-
-    let storage () = false
   end
 
   include Complete (D)
@@ -162,8 +159,6 @@ module Complete_Minimal_with_datatype
       (Datatype.With_collections
          (Domain) (struct let module_name = Domain.name end)
        : Datatype.S_with_collections with type t := t)
-
-    let storage () = false
   end
 
   include Complete (D)
@@ -256,8 +251,6 @@ module Complete_Simple_Cvalue (Domain: Simpler_domains.Simple_Cvalue)
     let relate _kf _bases _state = Base.SetLattice.top
     let filter _kf _ _bases state = state
     let reuse _kf _bases ~current_input:_ ~previous_output = previous_output
-
-    let storage () = false
   end
 
   include Complete (D)

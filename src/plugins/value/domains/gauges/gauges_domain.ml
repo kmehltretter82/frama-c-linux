@@ -1305,9 +1305,4 @@ module D_Impl : Abstract_domain.S
                        join crashes...)!! *)
 end
 
-module D =
-  Domain_builder.Complete
-    (struct
-      include D_Impl
-      let storage = Value_parameters.GaugesStorage.get
-    end)
+module D = Domain_builder.Complete (D_Impl)

@@ -268,8 +268,6 @@ module Internal
   let evaluate_predicate _ _ _ = Alarmset.Unknown
   let reduce_by_predicate _ state _ _ = `Value state
 
-  let storage () = true
-
   let top_query = `Value (Cvalue.V.top, None), Alarmset.all
 
   let extract_expr ~oracle:_ _context _state _expr = top_query

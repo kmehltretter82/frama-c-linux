@@ -27,7 +27,6 @@ module type InputDomain = sig
   include Datatype.S
   val top: t
   val join: t -> t -> t
-  val storage: unit -> bool
 end
 
 module type S = sig
@@ -174,7 +173,7 @@ module Make (Domain: InputDomain) = struct
       add stmt r
 
   let register_global_state state =
-    let storage = Domain.storage () in
+    let storage = not (Value_parameters.NoResultsDomains.mem Domain.name) in
     Storage.set storage;
     if storage then
       match state with

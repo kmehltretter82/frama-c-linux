@@ -693,9 +693,6 @@ module Make (Man : Input) = struct
   let relate _ _ _ = Base.SetLattice.top
   let filter _ _ _ state = state
   let reuse _ _ ~current_input:_ ~previous_output = previous_output
-
-  let storage = Value_parameters.ApronStorage.get
-
 end
 
 

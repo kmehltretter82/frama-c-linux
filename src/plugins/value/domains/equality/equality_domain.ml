@@ -169,8 +169,6 @@ module Internal = struct
     then `Value (Equality.Set.union e1 e2, d1, Locations.Zone.narrow z1 z2)
     else `Value (e1, d1, z1)
 
-  let storage = Value_parameters.EqualityStorage.get
-
   let post_analysis _state = ()
 end
 

@@ -27,7 +27,6 @@ module type InputDomain = sig
   include Datatype.S
   val top: t
   val join: t -> t -> t
-  val storage: unit -> bool
 end
 
 (** Automatic storage of the states computed during the analysis. *)

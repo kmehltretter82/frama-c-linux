@@ -413,9 +413,6 @@ module InternalTaint = struct
   let enter_loop _ state = state
   let incr_loop_counter _ state = state
   let leave_loop _ state = state
-
-  let storage () = true
-
 end
 
 
