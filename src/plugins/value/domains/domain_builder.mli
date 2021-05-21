@@ -32,6 +32,9 @@ module type InputDomain = sig
   val join: t -> t -> t
 end
 
+(** Part of an abstract domain signature automatically built by the
+    {!Complete} functor. These functions can be redefined to achieve
+    better precision or performance. See {!Abstract_domain} for more details. *)
 module type LeafDomain = sig
   type t
 
@@ -60,8 +63,8 @@ module type LeafDomain = sig
   val key: t Abstract_domain.key
 end
 
-module Complete (Domain: InputDomain) :
-  LeafDomain with type t := Domain.t
+(** Automatically builds some functions of an abstract domain. *)
+module Complete (Domain: InputDomain) : LeafDomain with type t := Domain.t
 
 module Complete_Minimal
     (Value: Abstract_value.S)
