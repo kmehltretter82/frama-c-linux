@@ -28,7 +28,7 @@ type precise_offset =
   | POZero (* Offset zero *)
   | POSingleton of Int.t (* Single offset *)
   | POPrecise of Ival.t * (Int.t (* cardinal *))
-       (* Offset exactly represented by an ival *)
+  (* Offset exactly represented by an ival *)
   | POImprecise of Ival.t (* Offset that could not be represented precisely *)
   | POShift of (* Shifted offset *)
       Ival.t (* number of bits/bytes to shift *) *
@@ -92,26 +92,26 @@ let rec imprecise_offset = function
 let rec _scale_offset scale po =
   assert (Int.gt scale Int.zero);
   match po with
-    | POBottom -> POBottom
-    | POZero -> POZero
-    | POSingleton i -> POSingleton (Int.mul i scale)
-    | POPrecise (i, c) -> POPrecise (Ival.scale scale i, c)
-    | POImprecise i -> POImprecise (Ival.scale scale i)
-    | POShift (shift, po, c) ->
-      POShift (Ival.scale scale shift, _scale_offset scale po, c)
+  | POBottom -> POBottom
+  | POZero -> POZero
+  | POSingleton i -> POSingleton (Int.mul i scale)
+  | POPrecise (i, c) -> POPrecise (Ival.scale scale i, c)
+  | POImprecise i -> POImprecise (Ival.scale scale i)
+  | POShift (shift, po, c) ->
+    POShift (Ival.scale scale shift, _scale_offset scale po, c)
 
 let shift_offset_by_singleton shift po =
   if Int.is_zero shift then
     po
   else
     match po with
-      | POBottom -> POBottom
-      | POZero -> POSingleton shift
-      | POSingleton i -> POSingleton (Int.add i shift)
-      | POPrecise (i, c) -> POPrecise (Ival.add_singleton_int shift i, c)
-      | POImprecise i -> POImprecise (Ival.add_singleton_int shift i)
-      | POShift (shift', po, c) ->
-        POShift (Ival.add_singleton_int shift shift', po, c)
+    | POBottom -> POBottom
+    | POZero -> POSingleton shift
+    | POSingleton i -> POSingleton (Int.add i shift)
+    | POPrecise (i, c) -> POPrecise (Ival.add_singleton_int shift i, c)
+    | POImprecise i -> POImprecise (Ival.add_singleton_int shift i)
+    | POShift (shift', po, c) ->
+      POShift (Ival.add_singleton_int shift shift', po, c)
 
 let inject_ival ival =
   if Ival.is_bottom ival then POBottom
@@ -130,44 +130,44 @@ let shift_offset shift po =
     POBottom
   else
     match po with
-      | POBottom -> POBottom
+    | POBottom -> POBottom
 
-      | POZero -> inject_ival shift
+    | POZero -> inject_ival shift
 
-      | POImprecise i -> POImprecise (Ival.add_int shift i)
+    | POImprecise i -> POImprecise (Ival.add_int shift i)
 
-      | POSingleton i ->
-        (match Ival.cardinal shift with
-          | Some c when small_cardinal c ->
-            if Int.equal c Int.one then
-              POSingleton (Int.add (Ival.project_int shift) i)
-            else
-              POPrecise (Ival.add_singleton_int i shift, c)
-          | _ -> POImprecise (Ival.add_int shift (imprecise_offset po)))
+    | POSingleton i ->
+      (match Ival.cardinal shift with
+       | Some c when small_cardinal c ->
+         if Int.equal c Int.one then
+           POSingleton (Int.add (Ival.project_int shift) i)
+         else
+           POPrecise (Ival.add_singleton_int i shift, c)
+       | _ -> POImprecise (Ival.add_int shift (imprecise_offset po)))
 
-      | POPrecise (_i, cpo) ->
-        (match Ival.cardinal shift with
-          | Some cs ->
-            let new_card = Int.mul cs cpo in
-            if small_cardinal new_card then
-              POShift (shift, po, new_card) (* may be a POPrecise depending
-                                               on ilevel *)
-            else
-              POImprecise (Ival.add_int shift (imprecise_offset po))
-          | None ->
-            POImprecise (Ival.add_int shift (imprecise_offset po)))
+    | POPrecise (_i, cpo) ->
+      (match Ival.cardinal shift with
+       | Some cs ->
+         let new_card = Int.mul cs cpo in
+         if small_cardinal new_card then
+           POShift (shift, po, new_card) (* may be a POPrecise depending
+                                            on ilevel *)
+         else
+           POImprecise (Ival.add_int shift (imprecise_offset po))
+       | None ->
+         POImprecise (Ival.add_int shift (imprecise_offset po)))
 
-      | POShift (_shift', _po', cpo) ->
-        (match Ival.cardinal shift with
-          | Some cs ->
-            let new_card = Int.mul cs cpo in
-            if small_cardinal new_card then
-              POShift (shift, po, new_card) (* may be a single POShift depending
-                                              on the cardinals of shift/shift'*)
-            else
-              POImprecise (Ival.add_int shift (imprecise_offset po))
-          | None ->
-            POImprecise (Ival.add_int shift (imprecise_offset po)))
+    | POShift (_shift', _po', cpo) ->
+      (match Ival.cardinal shift with
+       | Some cs ->
+         let new_card = Int.mul cs cpo in
+         if small_cardinal new_card then
+           POShift (shift, po, new_card) (* may be a single POShift depending
+                                            on the cardinals of shift/shift'*)
+         else
+           POImprecise (Ival.add_int shift (imprecise_offset po))
+       | None ->
+         POImprecise (Ival.add_int shift (imprecise_offset po)))
 
 type precise_location_bits =
   | PLBottom
@@ -206,8 +206,8 @@ let inject_location_bits loc =
 
 let combine_base_precise_offset base po =
   match po with
-    | POBottom -> PLBottom
-    | _ -> PLVarOffset (base, po)
+  | POBottom -> PLBottom
+  | _ -> PLVarOffset (base, po)
 
 let combine_loc_precise_offset loc po =
   try
@@ -284,45 +284,45 @@ let replace_base substitution po =
 
 let rec fold_offset f po acc =
   match po with
-    | POBottom -> f Ival.bottom acc
-    | POZero -> f Ival.zero acc
-    | POSingleton i -> f (Ival.inject_singleton i) acc
-    | POPrecise (iv, _) | POImprecise iv -> f iv acc
-    | POShift (shift, po', _) ->
-      let aux_po ival acc =
-        let aux_ival shift_i acc =
-          let ival' = Ival.add_singleton_int shift_i ival in
-          f ival' acc
-        in
-        Ival.fold_int aux_ival shift acc
+  | POBottom -> f Ival.bottom acc
+  | POZero -> f Ival.zero acc
+  | POSingleton i -> f (Ival.inject_singleton i) acc
+  | POPrecise (iv, _) | POImprecise iv -> f iv acc
+  | POShift (shift, po', _) ->
+    let aux_po ival acc =
+      let aux_ival shift_i acc =
+        let ival' = Ival.add_singleton_int shift_i ival in
+        f ival' acc
       in
-      fold_offset aux_po po' acc
+      Ival.fold_int aux_ival shift acc
+    in
+    fold_offset aux_po po' acc
 
 let fold f pl acc =
   match pl.loc with
-    | PLBottom -> acc
-    | PLLoc l -> f (make_loc l pl.size) acc
-    | PLVarOffset (b, po) ->
-      let aux_po ival acc =
-        let loc_b = Location_Bits.inject b ival in
-        let loc = make_loc loc_b pl.size in
-        f loc acc
-      in
-      fold_offset aux_po po acc
-    | PLLocOffset (loc, po) ->
-      let aux_po ival_po acc =
-        let aux_loc b ival_loc acc =
-          let aux_ival_loc i acc =
-            let ival = Ival.add_singleton_int i ival_po in
-            let loc_b = Location_Bits.inject b ival in
-            let loc = make_loc loc_b pl.size in
-            f loc acc
-          in
-          Ival.fold_int aux_ival_loc ival_loc acc
+  | PLBottom -> acc
+  | PLLoc l -> f (make_loc l pl.size) acc
+  | PLVarOffset (b, po) ->
+    let aux_po ival acc =
+      let loc_b = Location_Bits.inject b ival in
+      let loc = make_loc loc_b pl.size in
+      f loc acc
+    in
+    fold_offset aux_po po acc
+  | PLLocOffset (loc, po) ->
+    let aux_po ival_po acc =
+      let aux_loc b ival_loc acc =
+        let aux_ival_loc i acc =
+          let ival = Ival.add_singleton_int i ival_po in
+          let loc_b = Location_Bits.inject b ival in
+          let loc = make_loc loc_b pl.size in
+          f loc acc
         in
-        Location_Bits.fold_i aux_loc loc acc
+        Ival.fold_int aux_ival_loc ival_loc acc
       in
-      fold_offset aux_po po acc
+      Location_Bits.fold_i aux_loc loc acc
+    in
+    fold_offset aux_po po acc
 
 let enumerate_valid_bits access loc =
   let aux loc z = Zone.join z (enumerate_valid_bits access loc) in
@@ -333,25 +333,25 @@ let cardinal_zero_or_one pl =
   not (Int_Base.is_top pl.size) && cardinal_zero_or_one_location_bits pl.loc
 
 let valid_cardinal_zero_or_one ~for_writing pl =
-    match pl.loc with
-      | PLBottom -> true
-      | PLLoc lb ->
-        let loc = make_loc lb pl.size in
-        Locations.valid_cardinal_zero_or_one ~for_writing loc
-      | _ ->
-        try
-          ignore
-            (fold (fun loc found_one ->
-              let access = if for_writing then Write else Read in
-              let valid = Locations.valid_part access loc in
-              if Locations.is_bottom_loc loc then found_one
-              else
-                if Locations.cardinal_zero_or_one valid then
-                  if found_one then raise Exit else true
-                else raise Exit
-             ) pl false);
-          true
-        with Exit -> false
+  match pl.loc with
+  | PLBottom -> true
+  | PLLoc lb ->
+    let loc = make_loc lb pl.size in
+    Locations.valid_cardinal_zero_or_one ~for_writing loc
+  | _ ->
+    try
+      ignore
+        (fold (fun loc found_one ->
+             let access = if for_writing then Write else Read in
+             let valid = Locations.valid_part access loc in
+             if Locations.is_bottom_loc loc then found_one
+             else
+             if Locations.cardinal_zero_or_one valid then
+               if found_one then raise Exit else true
+             else raise Exit
+           ) pl false);
+      true
+    with Exit -> false
 
 let pretty_loc fmt loc =
   Format.fprintf fmt "%a (size:%a)"

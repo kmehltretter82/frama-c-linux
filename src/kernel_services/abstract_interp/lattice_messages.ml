@@ -40,13 +40,13 @@ let emit _emitter msg =
 let register _name = ()
 
 let emit_approximation emitter = Format.kfprintf (fun _fmt ->
-  let str = Format.flush_str_formatter() in
-  emit emitter (Approximation str)) Format.str_formatter
+    let str = Format.flush_str_formatter() in
+    emit emitter (Approximation str)) Format.str_formatter
 ;;
 
 let emit_costly emitter = Format.kfprintf (fun _fmt ->
-  let str = Format.flush_str_formatter() in
-  emit emitter (Costly str)) Format.str_formatter
+    let str = Format.flush_str_formatter() in
+    emit emitter (Costly str)) Format.str_formatter
 ;;
 
 let emit_imprecision emitter str =

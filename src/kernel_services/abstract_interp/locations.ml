@@ -34,7 +34,7 @@ module Initial_Values = struct
             [Base.null,Ival.top_float];
             [Base.null,Ival.top_single_precision_float];
             [Base.null,Ival.float_zeros];
-             ]
+          ]
 end
 
 (* Store the information that the location has at most cardinal 1, ignoring
@@ -79,10 +79,10 @@ module Location_Bytes = struct
   end
 
   include MapSetLattice
-    (* Invariant :
-       [Top (s, _) must always contain NULL, _and_ at least another base.
-       Top ({Null}, _) is replaced by Top_int]. See inject_top_origin_internal
-       below. *)
+  (* Invariant :
+     [Top (s, _) must always contain NULL, _and_ at least another base.
+     Top ({Null}, _) is replaced by Top_int]. See inject_top_origin_internal
+     below. *)
 
   let find_or_bottom = MapLattice.find_or_bottom
   let is_bottom = equal bottom
@@ -96,10 +96,10 @@ module Location_Bytes = struct
 
   let inject_ival i = inject Base.null i
 
-  let inject_float f = 
-    inject_ival 
+  let inject_float f =
+    inject_ival
       (Ival.inject_float
-	  (Fval.inject_singleton f))
+         (Fval.inject_singleton f))
 
   (** Check that those values correspond to {!Initial_Values} above. *)
   let singleton_zero = inject_ival Ival.zero
@@ -235,7 +235,7 @@ module Location_Bytes = struct
     track_garbled_mix (Top(Base.SetLattice.top, origin))
 
   (* This internal function builds a garbled mix, but does *not* track its
-     creation. This is useful for functions that transform existing GMs. *) 
+     creation. This is useful for functions that transform existing GMs. *)
   let inject_top_origin_internal o b =
     if Base.Hptset.(equal b empty || equal b Base.null_set) then
       top_int
@@ -259,128 +259,128 @@ module Location_Bytes = struct
   let narrow m1 m2 = normalize_top (narrow m1 m2)
   let meet m1 m2 = normalize_top (meet m1 m2)
 
- let topify_with_origin o v =
-   match v with
-   | Top (s,a) ->
-     Top (s, Origin.join a o)
-   | v when is_zero v -> v
-   | Map _ ->
-     if equal v bottom then v
-     else
-       match get_keys v with
-       | Base.SetLattice.Top -> top_with_origin o
-       | Base.SetLattice.Set b ->
-         track_garbled_mix (inject_top_origin_internal o b)
+  let topify_with_origin o v =
+    match v with
+    | Top (s,a) ->
+      Top (s, Origin.join a o)
+    | v when is_zero v -> v
+    | Map _ ->
+      if equal v bottom then v
+      else
+        match get_keys v with
+        | Base.SetLattice.Top -> top_with_origin o
+        | Base.SetLattice.Set b ->
+          track_garbled_mix (inject_top_origin_internal o b)
 
- let topify_with_origin_kind ok v =
-   let o = Origin.current ok in
-   topify_with_origin o v
+  let topify_with_origin_kind ok v =
+    let o = Origin.current ok in
+    topify_with_origin o v
 
- let get_bases = get_keys
+  let get_bases = get_keys
 
- let is_relationable m =
-   try
-     let b,_ = find_lonely_binding m in
-     match Base.validity b with
-     | Base.Empty | Base.Known _ | Base.Unknown _ | Base.Invalid -> true
-     | Base.Variable { Base.weak } -> not weak
-   with Not_found -> false
+  let is_relationable m =
+    try
+      let b,_ = find_lonely_binding m in
+      match Base.validity b with
+      | Base.Empty | Base.Known _ | Base.Unknown _ | Base.Invalid -> true
+      | Base.Variable { Base.weak } -> not weak
+    with Not_found -> false
 
- let topify_merge_origin v =
-   topify_with_origin_kind Origin.K_Merge v
+  let topify_merge_origin v =
+    topify_with_origin_kind Origin.K_Merge v
 
- let topify_misaligned_read_origin v =
-   topify_with_origin_kind Origin.K_Misalign_read v
+  let topify_misaligned_read_origin v =
+    topify_with_origin_kind Origin.K_Misalign_read v
 
- let topify_arith_origin v =
-   topify_with_origin_kind Origin.K_Arith v
+  let topify_arith_origin v =
+    topify_with_origin_kind Origin.K_Arith v
 
- let topify_leaf_origin v =
-   topify_with_origin_kind Origin.K_Leaf v
+  let topify_leaf_origin v =
+    topify_with_origin_kind Origin.K_Leaf v
 
- let may_reach base loc =
-   if Base.is_null base then true
-   else
-     match loc with
-     | Top (Base.SetLattice.Top, _) -> true
-     | Top (Base.SetLattice.Set s,_) ->
-         Base.Hptset.mem base s
-     | Map m -> try
-         ignore (M.find base m);
-         true
-       with Not_found -> false
+  let may_reach base loc =
+    if Base.is_null base then true
+    else
+      match loc with
+      | Top (Base.SetLattice.Top, _) -> true
+      | Top (Base.SetLattice.Set s,_) ->
+        Base.Hptset.mem base s
+      | Map m -> try
+          ignore (M.find base m);
+          true
+        with Not_found -> false
 
- let contains_addresses_of_locals is_local l =
-   match l with
-   | Top (Base.SetLattice.Top,_) -> true
-   | Top (Base.SetLattice.Set s, _) ->
-     Base.SetLattice.O.exists is_local s
-   | Map m ->
-     M.exists (fun b _ -> is_local b) m
+  let contains_addresses_of_locals is_local l =
+    match l with
+    | Top (Base.SetLattice.Top,_) -> true
+    | Top (Base.SetLattice.Set s, _) ->
+      Base.SetLattice.O.exists is_local s
+    | Map m ->
+      M.exists (fun b _ -> is_local b) m
 
- let remove_escaping_locals is_local v =
-   let non_local b = not (is_local b) in
-   match v with
-   | Top (Base.SetLattice.Top,_) -> true, v
-   | Top (Base.SetLattice.Set garble, orig) ->
-     let nonlocals = Base.Hptset.filter non_local garble in
-     if Base.Hptset.equal garble nonlocals then
-       false, v
-     else
-       true, inject_top_origin_internal orig nonlocals
-   | Map m ->
-     let nonlocals = M.filter non_local m in
-     if M.equal nonlocals m then
-       false, v
-     else
-       true, Map nonlocals
+  let remove_escaping_locals is_local v =
+    let non_local b = not (is_local b) in
+    match v with
+    | Top (Base.SetLattice.Top,_) -> true, v
+    | Top (Base.SetLattice.Set garble, orig) ->
+      let nonlocals = Base.Hptset.filter non_local garble in
+      if Base.Hptset.equal garble nonlocals then
+        false, v
+      else
+        true, inject_top_origin_internal orig nonlocals
+    | Map m ->
+      let nonlocals = M.filter non_local m in
+      if M.equal nonlocals m then
+        false, v
+      else
+        true, Map nonlocals
 
- let contains_addresses_of_any_locals =
-   let f base _offsets = Base.is_any_formal_or_local base in
-   let projection _base = Ival.top in
-   let cached_f =
-     cached_fold
-       ~cache_name:"loc_top_any_locals"
-       ~temporary:false
-       ~f
-       ~projection
-       ~joiner:(||)
-       ~empty:false
-   in
-   fun loc ->
-     try
-       cached_f loc
-     with Error_Top ->
-       assert (match loc with
-       | Top (Base.SetLattice.Top,_) -> true
-       | Top (Base.SetLattice.Set _top_param,_orig) ->
-           false
-       | Map _ -> false);
-       true
+  let contains_addresses_of_any_locals =
+    let f base _offsets = Base.is_any_formal_or_local base in
+    let projection _base = Ival.top in
+    let cached_f =
+      cached_fold
+        ~cache_name:"loc_top_any_locals"
+        ~temporary:false
+        ~f
+        ~projection
+        ~joiner:(||)
+        ~empty:false
+    in
+    fun loc ->
+      try
+        cached_f loc
+      with Error_Top ->
+        assert (match loc with
+            | Top (Base.SetLattice.Top,_) -> true
+            | Top (Base.SetLattice.Set _top_param,_orig) ->
+              false
+            | Map _ -> false);
+        true
 
- let replace_base substitution v =
-   let substitute replace make acc =
-     let modified, set' = replace substitution acc in
-     modified, if modified then make set' else v
-   in
-   match v with
-   | Top (Base.SetLattice.Top, _) -> false, v
-   | Top (Base.SetLattice.Set set, origin) ->
-     substitute Base.Hptset.replace (inject_top_origin_internal origin) set
-   | Map map ->
-     let decide _key  = Ival.join in
-     substitute (M.replace_key ~decide) (fun m -> Map m) map
+  let replace_base substitution v =
+    let substitute replace make acc =
+      let modified, set' = replace substitution acc in
+      modified, if modified then make set' else v
+    in
+    match v with
+    | Top (Base.SetLattice.Top, _) -> false, v
+    | Top (Base.SetLattice.Set set, origin) ->
+      substitute Base.Hptset.replace (inject_top_origin_internal origin) set
+    | Map map ->
+      let decide _key  = Ival.join in
+      substitute (M.replace_key ~decide) (fun m -> Map m) map
 
- let overlaps ~partial ~size mm1 mm2 =
-   match mm1, mm2 with
-   | Top _, _ | _, Top _ -> intersects mm1 mm2
-   | Map m1, Map m2 ->
-     M.symmetric_binary_predicate
-       Hptmap_sig.NoCache M.ExistentialPredicate
-       ~decide_fast:(fun _ _ -> M.PUnknown)
-       ~decide_one:(fun _ _ -> false)
-       ~decide_both:(fun _ x y -> Ival.overlaps ~partial ~size x y)
-       m1 m2
+  let overlaps ~partial ~size mm1 mm2 =
+    match mm1, mm2 with
+    | Top _, _ | _, Top _ -> intersects mm1 mm2
+    | Map m1, Map m2 ->
+      M.symmetric_binary_predicate
+        Hptmap_sig.NoCache M.ExistentialPredicate
+        ~decide_fast:(fun _ _ -> M.PUnknown)
+        ~decide_one:(fun _ _ -> false)
+        ~decide_both:(fun _ x y -> Ival.overlaps ~partial ~size x y)
+        m1 m2
 
   type size_widen_hint = Ival.size_widen_hint
   type numerical_widen_hint = Base.t -> Ival.numerical_widen_hint
@@ -441,64 +441,64 @@ module Zone = struct
   let pretty fmt m =
     match m with
     | Top (Base.SetLattice.Top,a) ->
-        Format.fprintf fmt "ANYTHING(origin:%a)"
-          Origin.pretty a
+      Format.fprintf fmt "ANYTHING(origin:%a)"
+        Origin.pretty a
     | Top (s,a) ->
-        Format.fprintf fmt "Unknown(%a, origin:%a)"
-          Base.SetLattice.pretty s
-          Origin.pretty a
+      Format.fprintf fmt "Unknown(%a, origin:%a)"
+        Base.SetLattice.pretty s
+        Origin.pretty a
     | Map _ when equal m bottom ->
-        Format.fprintf fmt "\\nothing"
+      Format.fprintf fmt "\\nothing"
     | Map off ->
-        let print_binding fmt (k, v) =
-          Format.fprintf fmt "@[<h>%a%a@]"
-            Base.pretty k
-            (Int_Intervals.pretty_typ (Base.typeof k)) v
-        in
-        Pretty_utils.pp_iter ~pre:"" ~suf:"" ~sep:";@,@ "
-          (fun f -> M.iter (fun k v -> f (k, v))) print_binding fmt off
+      let print_binding fmt (k, v) =
+        Format.fprintf fmt "@[<h>%a%a@]"
+          Base.pretty k
+          (Int_Intervals.pretty_typ (Base.typeof k)) v
+      in
+      Pretty_utils.pp_iter ~pre:"" ~suf:"" ~sep:";@,@ "
+        (fun f -> M.iter (fun k v -> f (k, v))) print_binding fmt off
 
   let valid_intersects = intersects
 
- let mem_base b = function
-   | Top (top_param, _) ->
-       Base.SetLattice.mem b top_param
-   | Map m -> M.mem b m
+  let mem_base b = function
+    | Top (top_param, _) ->
+      Base.SetLattice.mem b top_param
+    | Map m -> M.mem b m
 
- let shape = M.shape
+  let shape = M.shape
 
- let fold2_join_heterogeneous ~cache ~empty_left ~empty_right ~both ~join ~empty =
-   let f_top =
-     (* Build a zone corresponding to the garbled mix. Do not add NULL, we
-        are reasoning on zones. Inefficient if empty_right does not use
-        its argument, though... *)
-     let build_z set =
-       let aux b z = M.add b Int_Intervals.top z in
-       Map (Base.Hptset.fold aux set M.empty)
-     in
-     let empty_right set = empty_right (build_z set) in
-     let both base v = both base Int_Intervals.top v in
-     Base.SetLattice.O.fold2_join_heterogeneous
-       ~cache ~empty_left ~empty_right ~both ~join ~empty
-   in
-   let f_map =
-     let empty_right m = empty_right (Map m) in
-     let both base itvs v = both base itvs v in
-     M.fold2_join_heterogeneous
-       ~cache ~empty_left ~empty_right ~both ~join ~empty
-   in
-   fun z ->
-     match z with
-     | Top (Base.SetLattice.Top, _) -> raise Error_Top
-     | Top (Base.SetLattice.Set s, _) -> f_top s
-     | Map mm -> f_map mm
+  let fold2_join_heterogeneous ~cache ~empty_left ~empty_right ~both ~join ~empty =
+    let f_top =
+      (* Build a zone corresponding to the garbled mix. Do not add NULL, we
+         are reasoning on zones. Inefficient if empty_right does not use
+         its argument, though... *)
+      let build_z set =
+        let aux b z = M.add b Int_Intervals.top z in
+        Map (Base.Hptset.fold aux set M.empty)
+      in
+      let empty_right set = empty_right (build_z set) in
+      let both base v = both base Int_Intervals.top v in
+      Base.SetLattice.O.fold2_join_heterogeneous
+        ~cache ~empty_left ~empty_right ~both ~join ~empty
+    in
+    let f_map =
+      let empty_right m = empty_right (Map m) in
+      let both base itvs v = both base itvs v in
+      M.fold2_join_heterogeneous
+        ~cache ~empty_left ~empty_right ~both ~join ~empty
+    in
+    fun z ->
+      match z with
+      | Top (Base.SetLattice.Top, _) -> raise Error_Top
+      | Top (Base.SetLattice.Set s, _) -> f_top s
+      | Map mm -> f_map mm
 
 end
 
 
 type location =
-    { loc : Location_Bits.t;
-      size : Int_Base.t }
+  { loc : Location_Bits.t;
+    size : Int_Base.t }
 
 type access = Read | Write | No_access
 
@@ -518,36 +518,36 @@ exception Found_two
 
 let valid_cardinal_zero_or_one ~for_writing {loc=loc;size=size} =
   Location_Bits.equal Location_Bits.bottom loc ||
-    let found_one =
-      let already = ref false in
-      function () ->
-        if !already then raise Found_two;
-        already := true
-    in
-    try
+  let found_one =
+    let already = ref false in
+    function () ->
+      if !already then raise Found_two;
+      already := true
+  in
+  try
     match loc, size with
-      | Location_Bits.Top _, _ -> false
-      | _, Int_Base.Top -> false
-      | Location_Bits.Map m, Int_Base.Value size ->
-          Location_Bits.M.iter
-            (fun base offsets ->
-               if Base.is_weak base then raise Found_two;
-               let access =
-                 if for_writing then Base.Write size else Base.Read size
-               in
-               let valid_offsets =
-                 Ival.narrow offsets (Base.valid_offset access base)
-               in
-               if Ival.cardinal_zero_or_one valid_offsets
-               then begin
-                 if not (Ival.is_bottom valid_offsets)
-                 then found_one ()
-               end
-               else raise Found_two
-            ) m;
-          true
-    with
-      | Abstract_interp.Error_Top | Found_two -> false
+    | Location_Bits.Top _, _ -> false
+    | _, Int_Base.Top -> false
+    | Location_Bits.Map m, Int_Base.Value size ->
+      Location_Bits.M.iter
+        (fun base offsets ->
+           if Base.is_weak base then raise Found_two;
+           let access =
+             if for_writing then Base.Write size else Base.Read size
+           in
+           let valid_offsets =
+             Ival.narrow offsets (Base.valid_offset access base)
+           in
+           if Ival.cardinal_zero_or_one valid_offsets
+           then begin
+             if not (Ival.is_bottom valid_offsets)
+             then found_one ()
+           end
+           else raise Found_two
+        ) m;
+      true
+  with
+  | Abstract_interp.Error_Top | Found_two -> false
 
 
 let loc_bytes_to_loc_bits x =
@@ -607,7 +607,7 @@ let is_bottom_loc l = Location_Bits.(equal l.loc bottom)
 
 let cardinal_zero_or_one { loc = loc ; size = size } =
   Location_Bits.cardinal_zero_or_one loc &&
-    Int_Base.cardinal_zero_or_one size
+  Int_Base.cardinal_zero_or_one size
 
 let loc_equal { loc = loc1 ; size = size1 } { loc = loc2 ; size = size2 } =
   Int_Base.equal size1 size2 &&
@@ -630,29 +630,29 @@ let pretty_loc = pretty
 let pretty_english ~prefix fmt { loc = m ; size = size } =
   match m with
   | Location_Bits.Top (Base.SetLattice.Top,a) ->
-      Format.fprintf fmt "somewhere unknown (origin:%a)"
-        Origin.pretty a
+    Format.fprintf fmt "somewhere unknown (origin:%a)"
+      Origin.pretty a
   | Location_Bits.Top (s,a) ->
-      Format.fprintf fmt "somewhere in %a (origin:%a)"
-        Base.SetLattice.pretty s
-        Origin.pretty a
+    Format.fprintf fmt "somewhere in %a (origin:%a)"
+      Base.SetLattice.pretty s
+      Origin.pretty a
   | Location_Bits.Map _ when Location_Bits.(equal m bottom) ->
-      Format.fprintf fmt "nowhere"
+    Format.fprintf fmt "nowhere"
   | Location_Bits.Map off ->
-      let print_binding fmt (k, v) =
-	( match Ival.is_zero v, Base.validity k, size with
-	  true, Base.Known (_,s1), Int_Base.Value s2 when 
-	      Int.equal (Int.succ s1) s2 ->
-	    Format.fprintf fmt "@[<h>%a@]" Base.pretty k
+    let print_binding fmt (k, v) =
+      ( match Ival.is_zero v, Base.validity k, size with
+          true, Base.Known (_,s1), Int_Base.Value s2 when
+            Int.equal (Int.succ s1) s2 ->
+          Format.fprintf fmt "@[<h>%a@]" Base.pretty k
         | _ ->
-            Format.fprintf fmt "@[<h>%a with offsets %a@]"
-	      Base.pretty k
-	      Ival.pretty v)
-      in
-      Pretty_utils.pp_iter
-        ~pre:(if prefix then format_of_string "in " else "") ~suf:"" ~sep:";@,@ "
-	(fun f -> Location_Bits.M.iter (fun k v -> f (k, v)))
-        print_binding fmt off
+          Format.fprintf fmt "@[<h>%a with offsets %a@]"
+            Base.pretty k
+            Ival.pretty v)
+    in
+    Pretty_utils.pp_iter
+      ~pre:(if prefix then format_of_string "in " else "") ~suf:"" ~sep:";@,@ "
+      (fun f -> Location_Bits.M.iter (fun k v -> f (k, v)))
+      print_binding fmt off
 
 (* Case [Top (Top, _)] must be handled by caller. *)
 let enumerate_valid_bits_under_over under_over access {loc; size} =
@@ -683,7 +683,7 @@ let enumerate_valid_bits access loc =
     enumerate_valid_bits_under_over interval_from_ival_over access loc
 ;;
 
-let enumerate_valid_bits_under access loc = 
+let enumerate_valid_bits_under access loc =
   match loc.size with
   | Int_Base.Top -> Zone.bottom
   | Int_Base.Value _ ->
@@ -708,12 +708,12 @@ let valid_part access ?(bitfield=true) {loc = loc; size = size } =
   in
   let locbits =
     match loc with
-      | Location_Bits.Top (Base.SetLattice.Top, _) -> loc
-      | Location_Bits.Top (Base.SetLattice.Set _, _) ->
-          Location_Bits.(Map (fold_topset_ok compute_loc loc M.empty))
-      | Location_Bits.Map m ->
-        Location_Bits.Map
-          (Location_Bits.M.fold compute_loc m Location_Bits.M.empty)
+    | Location_Bits.Top (Base.SetLattice.Top, _) -> loc
+    | Location_Bits.Top (Base.SetLattice.Set _, _) ->
+      Location_Bits.(Map (fold_topset_ok compute_loc loc M.empty))
+    | Location_Bits.Map m ->
+      Location_Bits.Map
+        (Location_Bits.M.fold compute_loc m Location_Bits.M.empty)
   in
   make_loc locbits size
 
@@ -739,7 +739,7 @@ let enumerate_bits_under loc =
 let zone_of_varinfo var = enumerate_bits (loc_of_varinfo var)
 
 (** [invalid_part l] is an over-approximation of the invalid part
-   of the location [l] *)
+    of the location [l] *)
 let invalid_part l = l (* TODO (but rarely useful) *)
 
 let overlaps ~partial l1 l2 =
@@ -750,28 +750,28 @@ let overlaps ~partial l1 l2 =
 
 module Location =
   Datatype.Make
-      (struct
-        include Datatype.Serializable_undefined
-        type t = location
-        let structural_descr =
-          Structural_descr.t_record
-            [| Location_Bits.packed_descr; Int_Base.packed_descr |]
-        let reprs =
-          List.fold_left
-            (fun acc l ->
-              List.fold_left
-                (fun acc n -> { loc = l; size = n } :: acc)
-                acc
-                Int_Base.reprs)
-            []
-            Location_Bits.reprs
-        let name = "Locations.Location"
-        let mem_project = Datatype.never_any_project
-        let equal = loc_equal
-        let compare = loc_compare
-        let hash = loc_hash
-        let pretty = pretty_loc
-      end)
+    (struct
+      include Datatype.Serializable_undefined
+      type t = location
+      let structural_descr =
+        Structural_descr.t_record
+          [| Location_Bits.packed_descr; Int_Base.packed_descr |]
+      let reprs =
+        List.fold_left
+          (fun acc l ->
+             List.fold_left
+               (fun acc n -> { loc = l; size = n } :: acc)
+               acc
+               Int_Base.reprs)
+          []
+          Location_Bits.reprs
+      let name = "Locations.Location"
+      let mem_project = Datatype.never_any_project
+      let equal = loc_equal
+      let compare = loc_compare
+      let hash = loc_hash
+      let pretty = pretty_loc
+    end)
 
 (*
 Local Variables:

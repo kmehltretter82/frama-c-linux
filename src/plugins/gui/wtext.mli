@@ -50,7 +50,7 @@ class type ['a] marker =
 
     method add : 'a entry -> unit
     (** Register an entry *)
-    
+
   end
 
 class text : ?autoscroll:bool -> ?width:int -> ?indent:int -> unit ->
@@ -64,7 +64,7 @@ class text : ?autoscroll:bool -> ?width:int -> ?indent:int -> unit ->
     (** Append material to the text buffer, optionally scrolling it to the
         beginning of the message (defaults to autoscrolling setting).
 
-       	The underlying formatter (method [fmt]) recognizes the following default
+         The underlying formatter (method [fmt]) recognizes the following default
         tags:
         - ["bf"] bold face
         - ["it"] italic style
@@ -76,10 +76,10 @@ class text : ?autoscroll:bool -> ?width:int -> ?indent:int -> unit ->
         - ["fg:<color name>"] foreground color
         - ["bg:<color name>"] background color
         - ["link:<name>"] add a link marker
-        
+
         Properties for any tag (except parametric and mark) can be modified
         with method [set_tag_style].
-        
+
         [t#printf] is a shortcut for [Format.fprintf t#fmt] followed
         by flushing and optional scrolling. *)
 

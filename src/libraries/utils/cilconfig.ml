@@ -46,7 +46,7 @@ module H = Hashtbl
 
 (************************************************************************
 
- Configuration
+   Configuration
 
  ************************************************************************)
 
@@ -74,15 +74,15 @@ let findConfigurationInt (key: string) : int =
   match findConfiguration key with
     ConfInt i -> i
   | _ ->
-      Kernel.warning "Configuration %s is not an integer" key;
-      raise Not_found
+    Kernel.warning "Configuration %s is not an integer" key;
+    raise Not_found
 
 let findConfigurationFloat (key: string) : float =
   match findConfiguration key with
     ConfFloat i -> i
   | _ ->
-      Kernel.warning "Configuration %s is not a float" key;
-      raise Not_found
+    Kernel.warning "Configuration %s is not a float" key;
+    raise Not_found
 
 let useConfigurationInt (key: string) (f: int -> unit) =
   try f (findConfigurationInt key)
@@ -96,8 +96,8 @@ let findConfigurationString (key: string) : string =
   match findConfiguration key with
     ConfString s -> s
   | _ ->
-      Kernel.warning "Configuration %s is not a string" key;
-      raise Not_found
+    Kernel.warning "Configuration %s is not a string" key;
+    raise Not_found
 
 let useConfigurationString (key: string) (f: string -> unit) =
   try f (findConfigurationString key)
@@ -108,8 +108,8 @@ let findConfigurationBool (key: string) : bool =
   match findConfiguration key with
     ConfBool b -> b
   | _ ->
-      Kernel.warning "Configuration %s is not a boolean" key;
-      raise Not_found
+    Kernel.warning "Configuration %s is not a boolean" key;
+    raise Not_found
 
 let useConfigurationBool (key: string) (f: bool -> unit) =
   try f (findConfigurationBool key)
@@ -119,8 +119,8 @@ let findConfigurationList (key: string) : configData list  =
   match findConfiguration key with
     ConfList l -> l
   | _ ->
-      Kernel.warning "Configuration %s is not a list" key;
-      raise Not_found
+    Kernel.warning "Configuration %s is not a list" key;
+    raise Not_found
 
 let useConfigurationList (key: string) (f: configData list -> unit) =
   try f (findConfigurationList key)
@@ -134,31 +134,31 @@ let saveConfiguration (fname : Datatype.Filepath.t) =
     let rec loop (c: configData) : unit =
       match c with
         ConfInt i ->
-          Buffer.add_char buff 'i';
-          Buffer.add_string buff (string_of_int i);
-          Buffer.add_char buff ';'
+        Buffer.add_char buff 'i';
+        Buffer.add_string buff (string_of_int i);
+        Buffer.add_char buff ';'
 
       | ConfBool b ->
-          Buffer.add_char buff 'b';
-          Buffer.add_string buff (string_of_bool b);
-          Buffer.add_char buff ';'
+        Buffer.add_char buff 'b';
+        Buffer.add_string buff (string_of_bool b);
+        Buffer.add_char buff ';'
 
       | ConfFloat f ->
-          Buffer.add_char buff 'f';
-          Buffer.add_string buff (string_of_float f);
-          Buffer.add_char buff ';'
+        Buffer.add_char buff 'f';
+        Buffer.add_string buff (string_of_float f);
+        Buffer.add_char buff ';'
 
       | ConfString s ->
-          if String.contains s '"' then
-            Kernel.fatal "Guilib: configuration string contains quotes";
-          Buffer.add_char buff '"';
-          Buffer.add_string buff s;
-          Buffer.add_char buff '"'; (* '"' *)
+        if String.contains s '"' then
+          Kernel.fatal "Guilib: configuration string contains quotes";
+        Buffer.add_char buff '"';
+        Buffer.add_string buff s;
+        Buffer.add_char buff '"'; (* '"' *)
 
       | ConfList l ->
-          Buffer.add_char buff '[';
-          List.iter loop l;
-          Buffer.add_char buff ']'
+        Buffer.add_char buff '[';
+        List.iter loop l;
+        Buffer.add_char buff ']'
     in
     loop c;
     Buffer.contents buff
@@ -167,8 +167,8 @@ let saveConfiguration (fname : Datatype.Filepath.t) =
     let oc = open_out (fname :> string) in
     Kernel.debug "Saving configuration to %s@." (fname :> string);
     H.iter (fun k c ->
-      output_string oc (k ^ "\n");
-      output_string oc ((configToString c) ^ "\n"))
+        output_string oc (k ^ "\n");
+        output_string oc ((configToString c) ^ "\n"))
       configurationData;
     close_out oc
   with _ ->
@@ -192,18 +192,18 @@ let loadConfiguration (fname : Datatype.Filepath.t) : unit =
       if !idx >= l then raise Not_found;
       if Str.string_match intRegexp s !idx then begin
         idx := Str.match_end ();
-	let p = Str.matched_group 1 s in
+        let p = Str.matched_group 1 s in
         (try ConfInt (int_of_string p)
-	 with Failure _ ->
-	   Kernel.warning "Invalid integer configuration element %s" p;
-	   raise Not_found)
+         with Failure _ ->
+           Kernel.warning "Invalid integer configuration element %s" p;
+           raise Not_found)
       end else if Str.string_match floatRegexp s !idx then begin
         idx := Str.match_end ();
-	let p = Str.matched_group 1 s in
+        let p = Str.matched_group 1 s in
         (try ConfFloat (float_of_string p)
-	 with Failure _ ->
-	   Kernel.warning "Invalid float configuration element %s" p;
-	   raise Not_found)
+         with Failure _ ->
+           Kernel.warning "Invalid float configuration element %s" p;
+           raise Not_found)
       end else if Str.string_match boolRegexp s !idx then begin
         idx := Str.match_end ();
         ConfBool (bool_of_string (Str.matched_group 1 s))
@@ -227,27 +227,27 @@ let loadConfiguration (fname : Datatype.Filepath.t) : unit =
         ConfList (loop [])
       end else begin
         Kernel.warning "Bad configuration element in a list: %s"
-                  (String.sub s !idx (l - !idx));
+          (String.sub s !idx (l - !idx));
         raise Not_found
       end
     in
     getOne ()
   in
   (try
-    let ic = open_in (fname :> string) in
-    Kernel.debug "Loading configuration from %s@." (fname :> string);
-    (try
-      while true do
-        let k = input_line ic in
-        let s = input_line ic in
-        try
-          let c = stringToConfig s in
-          setConfiguration k c
-        with Not_found -> ()
-      done
-    with End_of_file -> ());
-    close_in ic;
-  with _ -> () (* no file, ignore *));
+     let ic = open_in (fname :> string) in
+     Kernel.debug "Loading configuration from %s@." (fname :> string);
+     (try
+        while true do
+          let k = input_line ic in
+          let s = input_line ic in
+          try
+            let c = stringToConfig s in
+            setConfiguration k c
+          with Not_found -> ()
+        done
+      with End_of_file -> ());
+     close_in ic;
+   with _ -> () (* no file, ignore *));
 
   ()
 

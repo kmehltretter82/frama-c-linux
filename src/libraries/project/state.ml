@@ -27,29 +27,29 @@ open Project_skeleton
 (* ************************************************************************** *)
 
 type state_on_disk =
-    { on_disk_value: Obj.t;
-      on_disk_computed: bool;
-      on_disk_saved: bool;
-      on_disk_digest: Digest.t }
+  { on_disk_value: Obj.t;
+    on_disk_computed: bool;
+    on_disk_saved: bool;
+    on_disk_digest: Digest.t }
 
 type private_ops =
-    { mutable descr: Structural_descr.pack;
-      create: t -> unit;
-      remove: t -> unit;
-      mutable clear: t -> unit;
-      mutable clear_some_projects: (t -> bool) -> t -> bool;
-      copy: t -> t -> unit;
-      commit: t -> unit;
-      update: t -> unit;
-      on_update: (unit -> unit) -> unit;
-      clean: unit -> unit;
-      serialize: t -> state_on_disk;
-      unserialize: t -> state_on_disk -> unit }
+  { mutable descr: Structural_descr.pack;
+    create: t -> unit;
+    remove: t -> unit;
+    mutable clear: t -> unit;
+    mutable clear_some_projects: (t -> bool) -> t -> bool;
+    copy: t -> t -> unit;
+    commit: t -> unit;
+    update: t -> unit;
+    on_update: (unit -> unit) -> unit;
+    clean: unit -> unit;
+    serialize: t -> state_on_disk;
+    unserialize: t -> state_on_disk -> unit }
 
 type state =
-    { unique_name: string;
-      mutable name: string;
-      private_ops: private_ops }
+  { unique_name: string;
+    mutable name: string;
+    private_ops: private_ops }
 
 module type Local = sig
   type t
@@ -112,7 +112,7 @@ include Datatype.Make_with_collections
       let pretty fmt s = Format.fprintf fmt "state %S" s.unique_name
       let varname = Datatype.undefined
       let mem_project = Datatype.never_any_project
-     end)
+    end)
 
 let is_dummy = equal dummy
 
@@ -147,8 +147,8 @@ let add_hook_on_update s f = s.private_ops.on_update f
 let states : t Datatype.String.Hashtbl.t = Datatype.String.Hashtbl.create 997
 
 exception Unknown
-let get s = 
-  try Datatype.String.Hashtbl.find states s 
+let get s =
+  try Datatype.String.Hashtbl.find states s
   with Not_found -> raise Unknown
 
 let delete s =
@@ -170,8 +170,8 @@ let add s =
 
 let unique_name_from_name =
   let module M =
-        Project_skeleton.Make_setter
-          (struct let mem s = Datatype.String.Hashtbl.mem states s end)
+    Project_skeleton.Make_setter
+      (struct let mem s = Datatype.String.Hashtbl.mem states s end)
   in
   M.make_unique_name
 

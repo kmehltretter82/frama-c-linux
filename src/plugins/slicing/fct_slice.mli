@@ -24,17 +24,17 @@ open SlicingInternals
 open Cil_types
 
 (** Return [true] if the source function is called
-* (even indirectly via transitivity) from a [Slice.t]. *)
+ * (even indirectly via transitivity) from a [Slice.t]. *)
 val is_src_fun_called :
-    Cil_types.kernel_function -> bool
+  Cil_types.kernel_function -> bool
 
 (** Return [true] if the source function is visible
-* (even indirectly via transitivity) from a [Slice.t]. *)
+ * (even indirectly via transitivity) from a [Slice.t]. *)
 val is_src_fun_visible :
-    Cil_types.kernel_function -> bool
+  Cil_types.kernel_function -> bool
 (**
-* @raise SlicingTypes.ExternalFunction if the function has no source code,
-*        because there cannot be any slice for it.
+ * @raise SlicingTypes.ExternalFunction if the function has no source code,
+ *        because there cannot be any slice for it.
    * @raise SlicingTypes.NoPdg when there is no PDG for the function.
 *)
 val make_new_ff : fct_info -> bool -> fct_slice * criterion list

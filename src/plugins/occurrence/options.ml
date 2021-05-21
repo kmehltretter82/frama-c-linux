@@ -21,18 +21,18 @@
 (**************************************************************************)
 
 include Plugin.Register
-  (struct
-     let name = "occurrence"
-     let shortname = "occurrence"
-     let help = "automatically computes where variables are used"
-   end)
+    (struct
+      let name = "occurrence"
+      let shortname = "occurrence"
+      let help = "automatically computes where variables are used"
+    end)
 
 module Print =
   False
     (struct
-       let option_name = "-occurrence"
-       let help = "print results of occurrence analysis"
-     end)
+      let option_name = "-occurrence"
+      let help = "print results of occurrence analysis"
+    end)
 
 (*
 Local Variables:

@@ -52,9 +52,9 @@ module Printer = struct
     let do_s ki postdom =
       let s = match ki with Kstmt s -> s | _  -> assert false in
       match postdom with None -> ()
-      | Some postdom ->
-        let do_edge p = f ((s, true), (p, true)) in
-        Stmt.Hptset.iter do_edge postdom
+                       | Some postdom ->
+                         let do_edge p = f ((s, true), (p, true)) in
+                         Stmt.Hptset.iter do_edge postdom
     in
     Kinstr.Hashtbl.iter do_s graph
 
@@ -73,7 +73,7 @@ module Printer = struct
     let color = if has_postdom then 0x7FFFD4 else 0xFF0000 in
     let attrib = (`Shape `Box) :: attrib in
     let attrib = (`Fillcolor color) :: attrib in
-      attrib
+    attrib
 
   let edge_attributes _s = []
 
@@ -88,20 +88,20 @@ let get_postdom kf graph s =
     | None -> Stmt.Hptset.empty
     | Some l -> l
   with Not_found ->
-    try
-      let postdom = !Db.Postdominators.stmt_postdominators kf s in
-      let postdom = Stmt.Hptset.remove s postdom in
-      Postdominators_parameters.debug "postdom for %d:%a = %a\n"
-        s.sid pretty_stmt s Stmt.Hptset.pretty postdom;
-      Kinstr.Hashtbl.add graph (Kstmt s) (Some postdom); postdom
-    with Db.PostdominatorsTypes.Top ->
-      Kinstr.Hashtbl.add graph (Kstmt s) None;
-      raise Db.PostdominatorsTypes.Top
+  try
+    let postdom = !Db.Postdominators.stmt_postdominators kf s in
+    let postdom = Stmt.Hptset.remove s postdom in
+    Postdominators_parameters.debug "postdom for %d:%a = %a\n"
+      s.sid pretty_stmt s Stmt.Hptset.pretty postdom;
+    Kinstr.Hashtbl.add graph (Kstmt s) (Some postdom); postdom
+  with Db.PostdominatorsTypes.Top ->
+    Kinstr.Hashtbl.add graph (Kstmt s) None;
+    raise Db.PostdominatorsTypes.Top
 
 (** [s_postdom] are [s] postdominators, including [s].
-* We don't have to represent the relation between s and s.
-* And because the postdom relation is transitive, if [p] is in [s_postdom],
-* we can remove [p_postdom] from [s_postdom] in order to have a clearer graph.
+ * We don't have to represent the relation between s and s.
+ * And because the postdom relation is transitive, if [p] is in [s_postdom],
+ * we can remove [p_postdom] from [s_postdom] in order to have a clearer graph.
 *)
 let reduce kf graph s =
   let remove p s_postdom =
@@ -112,7 +112,7 @@ let reduce kf graph s =
         let s_postdom = Stmt.Hptset.diff s_postdom p_postdom
         in s_postdom
       with Db.PostdominatorsTypes.Top -> assert false
-                                   (* p postdom s -> cannot be top *)
+      (* p postdom s -> cannot be top *)
     else s_postdom (* p has already been removed from s_postdom *)
   in
   try
@@ -129,18 +129,18 @@ let build_reduced_graph kf graph stmts =
 
 let build_dot filename kf =
   match kf.fundec with
-    | Definition (fct, _) ->
-      let stmts = fct.sallstmts in
-      let graph = Kinstr.Hashtbl.create (List.length stmts) in
-      let _ = build_reduced_graph kf graph stmts in
-      let name = Kernel_function.get_name kf in
-      let title = "Postdominators for function " ^ name in
-      let file = open_out filename in
-      PostdomGraph.output_graph file (title, graph);
-      close_out file
-    | Declaration _ ->
-        Kernel.error "cannot compute for a function without body %a"
-          Kernel_function.pretty kf
+  | Definition (fct, _) ->
+    let stmts = fct.sallstmts in
+    let graph = Kinstr.Hashtbl.create (List.length stmts) in
+    let _ = build_reduced_graph kf graph stmts in
+    let name = Kernel_function.get_name kf in
+    let title = "Postdominators for function " ^ name in
+    let file = open_out filename in
+    PostdomGraph.output_graph file (title, graph);
+    close_out file
+  | Declaration _ ->
+    Kernel.error "cannot compute for a function without body %a"
+      Kernel_function.pretty kf
 
 (*
 Local Variables:

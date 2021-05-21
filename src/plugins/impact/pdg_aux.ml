@@ -28,11 +28,11 @@ type node = PdgTypes.Node.t * Zone.t
 
 module NS = struct
   include Hptmap.Make
-    (PdgTypes.Node)
-    (Locations.Zone)
-    (Hptmap.Comp_unused)
-    (struct let v = [[]] end)
-    (struct let l = [Ast.self] end)
+      (PdgTypes.Node)
+      (Locations.Zone)
+      (Hptmap.Comp_unused)
+      (struct let v = [[]] end)
+      (struct let l = [Ast.self] end)
 
   let intersects =
     let name = "Impact.Pdg_aux.NS.intersects" in
@@ -41,9 +41,9 @@ module NS = struct
       symmetric_binary_predicate
         (Hptmap_sig.PersistentCache name)
         ExistentialPredicate
-	~decide_fast:decide_fast_intersection
-	~decide_one:(fun _ _ -> false)
-	~decide_both:z_intersects
+        ~decide_fast:decide_fast_intersection
+        ~decide_one:(fun _ _ -> false)
+        ~decide_both:z_intersects
     in
     fun s1 s2 -> map_intersects s1 s2
 
@@ -136,8 +136,8 @@ let pretty_node fmt (n, z) =
 let node_list_to_set ?(z=Zone.top) =
   List.fold_left
     (fun set (n, zopt) ->
-      match zopt, z with
-      | Some z, _ | None, z -> NS.add' (n, z) set
+       match zopt, z with
+       | Some z, _ | None, z -> NS.add' (n, z) set
     )
     NS.empty
 
@@ -155,14 +155,14 @@ let find_call_input_nodes pdg_caller call_stmt ?(z=Locations.Zone.top) in_key =
     let node = PdgIndex.Signature.find_in_info call_sgn in_key in
     [ node, None ]
   | PdgIndex.Signature.InImpl zone ->
-      let zone' = Locations.Zone.narrow zone z in
-      (* skip undef zone: any result different from None is due to calldeps or
-         some imprecision. *)
-      let nodes, _undef = 
-        !Db.Pdg.find_location_nodes_at_stmt
-          pdg_caller call_stmt ~before:true zone'
-      in
-      nodes
+    let zone' = Locations.Zone.narrow zone z in
+    (* skip undef zone: any result different from None is due to calldeps or
+       some imprecision. *)
+    let nodes, _undef =
+      !Db.Pdg.find_location_nodes_at_stmt
+        pdg_caller call_stmt ~before:true zone'
+    in
+    nodes
 
 let all_call_input_nodes ~caller:pdg_caller ~callee:(kf_callee, pdg_callee) call_stmt =
   let real_inputs =
@@ -178,11 +178,11 @@ let all_call_input_nodes ~caller:pdg_caller ~callee:(kf_callee, pdg_callee) call
       (in_node, in_nodes) :: acc
     in
     match in_key with
-      | Signature.InCtrl | Signature.InNum _ -> default ()
-      | Signature.InImpl z ->
-          if Locations.Zone.intersects z real_inputs
-          then default ~z:real_inputs ()
-          else acc
+    | Signature.InCtrl | Signature.InNum _ -> default ()
+    | Signature.InImpl z ->
+      if Locations.Zone.intersects z real_inputs
+      then default ~z:real_inputs ()
+      else acc
   in
   try
     let sgn = FctIndex.sgn (PdgTypes.Pdg.get_index pdg_callee) in
@@ -211,7 +211,7 @@ let all_call_out_nodes ~callee ~caller call_stmt =
       "cannot propagate impact into imprecisely analyzed caller function %a"
       Kernel_function.pretty (Kernel_function.find_englobing_kf call_stmt);
     []
-    
+
 (*
 Local Variables:
 compile-command: "make -C ../../.."

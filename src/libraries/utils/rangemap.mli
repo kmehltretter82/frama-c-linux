@@ -73,8 +73,8 @@ module type S = sig
       binding disappears. *)
 
   val singleton: key -> value -> t
-    (** [singleton x y] returns the one-element map that contains a binding [y]
-        for [x]. *)
+  (** [singleton x y] returns the one-element map that contains a binding [y]
+      for [x]. *)
 
   val find: key -> t -> value
   (** [find x m] returns the current binding of [x] in [m],
@@ -118,74 +118,74 @@ module type S = sig
       (in increasing order), and [d1 ... dN] are the associated data. *)
 
   val for_all: (key -> value -> bool) -> t -> bool
-    (** [for_all p m] checks if all the bindings of the map satisfy
-        the predicate [p]. *)
+  (** [for_all p m] checks if all the bindings of the map satisfy
+      the predicate [p]. *)
 
   val exists: (key -> value -> bool) -> t -> bool
-    (** [exists p m] checks if at least one binding of the map
-        satisfy the predicate [p].  *)
+  (** [exists p m] checks if at least one binding of the map
+      satisfy the predicate [p].  *)
 
   val filter: (key -> value -> bool) -> t -> t
-    (** [filter p m] returns the map with all the bindings in [m]
-        that satisfy predicate [p]. *)
+  (** [filter p m] returns the map with all the bindings in [m]
+      that satisfy predicate [p]. *)
 
   val partition: (key -> value -> bool) -> t -> t * t
-    (** [partition p m] returns a pair of maps [(m1, m2)], where
-        [m1] contains all the bindings of [s] that satisfy the
-        predicate [p], and [m2] is the map with all the bindings of
-        [s] that do not satisfy [p]. *)
+  (** [partition p m] returns a pair of maps [(m1, m2)], where
+      [m1] contains all the bindings of [s] that satisfy the
+      predicate [p], and [m2] is the map with all the bindings of
+      [s] that do not satisfy [p]. *)
 
 
   val cardinal: t -> int
-    (** Return the number of bindings of a map. *)
+  (** Return the number of bindings of a map. *)
 
   val bindings: t -> (key * value) list
-    (** Return the list of all bindings of the given map.
-        The returned list is sorted in increasing order with respect
-        to the ordering on keys *)
+  (** Return the list of all bindings of the given map.
+      The returned list is sorted in increasing order with respect
+      to the ordering on keys *)
 
   val min_binding: t -> (key * value)
-    (** Return the smallest binding of the given map (with respect to the
-        [Ord.compare] ordering), or raise [Not_found] if the map is empty. *)
+  (** Return the smallest binding of the given map (with respect to the
+      [Ord.compare] ordering), or raise [Not_found] if the map is empty. *)
 
   val max_binding: t -> (key * value)
-    (** Same as {!Map.S.min_binding}, but returns the largest binding
-        of the given map.  *)
+  (** Same as {!Map.S.min_binding}, but returns the largest binding
+      of the given map.  *)
 
   val choose: t -> (key * value)
-    (** Return one binding of the given map, or raise [Not_found] if
-        the map is empty. Which binding is chosen is unspecified,
-        but equal bindings will be chosen for equal maps. *)
+  (** Return one binding of the given map, or raise [Not_found] if
+      the map is empty. Which binding is chosen is unspecified,
+      but equal bindings will be chosen for equal maps. *)
 
 
   val merge: (key -> value option -> value option -> value option) -> t -> t -> t
-    (** [merge f m1 m2] computes a map whose keys is a subset of keys of [m1]
-        and of [m2]. The presence of each such binding, and the corresponding
-        value, is determined with the function [f].  *)
+  (** [merge f m1 m2] computes a map whose keys is a subset of keys of [m1]
+      and of [m2]. The presence of each such binding, and the corresponding
+      value, is determined with the function [f].  *)
 
   val for_all2: (key -> value option -> value option -> bool) -> t -> t -> bool
-    (** [for_all2 f m1 m2] returns true if and only if [f k v1 v2] holds
-        for each [k] present in either [m1] and [m2], [v_i] being
-        [Some (find k m_i)] if [k] is in [m_i], and [None] otherwise
-        (for [i=1] or [i=2]) *)
+  (** [for_all2 f m1 m2] returns true if and only if [f k v1 v2] holds
+      for each [k] present in either [m1] and [m2], [v_i] being
+      [Some (find k m_i)] if [k] is in [m_i], and [None] otherwise
+      (for [i=1] or [i=2]) *)
 
   val exists2: (key -> value option -> value option -> bool) -> t -> t -> bool
-    (** [exists2 f m1 m2] returns true if and only there exists
-        [k] present in [m1] or [m2] such that [f k v1 v2] holds,
-        [v_i] being [Some (find k m_i)] if [k] is in [m_i], and [None]
-          otherwise (for [i=1] or [i=2]) *)
+  (** [exists2 f m1 m2] returns true if and only there exists
+      [k] present in [m1] or [m2] such that [f k v1 v2] holds,
+      [v_i] being [Some (find k m_i)] if [k] is in [m_i], and [None]
+        otherwise (for [i=1] or [i=2]) *)
 
   val iter2: (key -> value option -> value option -> unit) -> t -> t -> unit
-    (** [iter2 f m1 m2] computes [f k v1 v2] for each [k] present in either
-        [m1] or [m2] (the [k] being presented in ascending order), [v_i] being
-        [Some (find k m_i)] if [k] is in [m_i], and [None] otherwise
-        (for [i=1] or [i=2]) *)
+  (** [iter2 f m1 m2] computes [f k v1 v2] for each [k] present in either
+      [m1] or [m2] (the [k] being presented in ascending order), [v_i] being
+      [Some (find k m_i)] if [k] is in [m_i], and [None] otherwise
+      (for [i=1] or [i=2]) *)
 
   val fold2: (key -> value option -> value option -> 'a -> 'a) -> t -> t -> 'a -> 'a
-    (** [fold2 f m1 m2 v] computes [(f k_N v1_N v2_N... (f k_1 v1_1 v2_1 a)...)]
-        where [k_1 ... k_N] are all the keys of all the bindings in either
-        [m1] or [m2] (in increasing order), [vi_j] being [Some (find k_j m_i)]
-        if [k_j] is in [m_i], and [None] otherwise (for [i=1] or [i=2]) *)
+  (** [fold2 f m1 m2 v] computes [(f k_N v1_N v2_N... (f k_1 v1_1 v2_1 a)...)]
+      where [k_1 ... k_N] are all the keys of all the bindings in either
+      [m1] or [m2] (in increasing order), [vi_j] being [Some (find k_j m_i)]
+      if [k_j] is in [m_i], and [None] otherwise (for [i=1] or [i=2]) *)
 end
 
 
@@ -217,15 +217,15 @@ module Make (Ord : Datatype.S) (Value : Value): sig
   val concerned_intervals:
     (key -> key -> fuzzy_order) ->
     key -> t -> (key*Value.t) list
-    (** Intervals that match the given key. The resulting list is sorted in
-        decreasing order. *)
+  (** Intervals that match the given key. The resulting list is sorted in
+      decreasing order. *)
 
-   exception Empty_rangemap
-   val lowest_binding : t -> key * Value.t
-   exception No_such_binding
-   val lowest_binding_above : (key -> bool) -> t -> key * Value.t
-   val add_whole : (key -> key -> fuzzy_order) -> key -> Value.t -> t -> t
-   val remove_whole : (key -> key -> fuzzy_order) -> key -> t -> t
+  exception Empty_rangemap
+  val lowest_binding : t -> key * Value.t
+  exception No_such_binding
+  val lowest_binding_above : (key -> bool) -> t -> key * Value.t
+  val add_whole : (key -> key -> fuzzy_order) -> key -> Value.t -> t -> t
+  val remove_whole : (key -> key -> fuzzy_order) -> key -> t -> t
 
 end
 

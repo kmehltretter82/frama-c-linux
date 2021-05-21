@@ -29,8 +29,8 @@
    - We never build regions; the nesting of natural loops suffice.
 
    - We do not compose transfer functions. Instead, we rely on the
-   fact that Ocaml has first-class functions, and associate to "loop
-   edges" functions describing the behaviour of loops.
+     fact that Ocaml has first-class functions, and associate to "loop
+     edges" functions describing the behaviour of loops.
 
    The composition of region of the Dragon Book does not fit well the
    translation to terms, for which composition of transfer function
@@ -60,7 +60,7 @@ struct
 
   let graph_size = N.Set.cardinal N.Graph.all_nodes
   let iter_nodes f = N.Set.iter f N.Graph.all_nodes
-  
+
   (****************************************************************)
   (* Back edges. *)
 
@@ -70,7 +70,7 @@ struct
     iter_nodes (fun n ->
         N.Graph.iter_succs n (fun head ->
             if N.DomTree.dominates head n
-            then N.Dict.set back_edges head 
+            then N.Dict.set back_edges head
                 (N.Set.add n (N.Dict.get back_edges head))));
     back_edges
   ;;

@@ -29,12 +29,12 @@ open Cil_types
 (**/**)
 
 let find_sub_stmts st = match st.skind with
-| If(_,bl1,bl2,_) | TryExcept (bl1, _, bl2, _)
-| TryFinally (bl1, bl2, _) -> bl1.bstmts@bl2.bstmts
-| Block bl | Loop (_,bl, _, _, _) | Switch (_, bl, _, _) ->  bl.bstmts
-| UnspecifiedSequence seq -> List.map (fun (x,_,_,_,_) -> x) seq
-| TryCatch(t,c,_) -> List.fold_left (fun acc (_,b) -> acc @ b.bstmts) t.bstmts c
-| Continue _|Break _|Goto (_, _)|Return (_, _)|Instr _|Throw _  -> []
+  | If(_,bl1,bl2,_) | TryExcept (bl1, _, bl2, _)
+  | TryFinally (bl1, bl2, _) -> bl1.bstmts@bl2.bstmts
+  | Block bl | Loop (_,bl, _, _, _) | Switch (_, bl, _, _) ->  bl.bstmts
+  | UnspecifiedSequence seq -> List.map (fun (x,_,_,_,_) -> x) seq
+  | TryCatch(t,c,_) -> List.fold_left (fun acc (_,b) -> acc @ b.bstmts) t.bstmts c
+  | Continue _|Break _|Goto (_, _)|Return (_, _)|Instr _|Throw _  -> []
 
 let str_call_sig ff call fmt =
   try
@@ -51,7 +51,7 @@ let str_call_sig ff call fmt =
     in
     Format.fprintf fmt "@[<v>@[<hov 2>/* sig call:@ %a */@]@ %t@]"
       SlicingMarks.pretty_sig sgn print_called
-  with Not_found -> 
+  with Not_found ->
     Format.fprintf fmt "@[/* invisible call */@]"
 
 class printerClass optional_ff = object(self)
@@ -62,40 +62,40 @@ class printerClass optional_ff = object(self)
     match opt_ff with
     | None -> super#vdecl fmt var
     | Some ff ->
-        if var.vglob  then
-          Format.fprintf fmt "@[/**/%a@]" super#vdecl var
-        else
-          let str_m =
-            try
-              let m = Fct_slice.get_local_var_mark ff var in
-                SlicingMarks.mark_to_string m
-            with Not_found -> "[---]"
-          in
-          Format.fprintf fmt "@[<hv>/* %s */@ %a@]"
-            str_m
-            super#vdecl var
+      if var.vglob  then
+        Format.fprintf fmt "@[/**/%a@]" super#vdecl var
+      else
+        let str_m =
+          try
+            let m = Fct_slice.get_local_var_mark ff var in
+            SlicingMarks.mark_to_string m
+          with Not_found -> "[---]"
+        in
+        Format.fprintf fmt "@[<hv>/* %s */@ %a@]"
+          str_m
+          super#vdecl var
 
   method! stmtkind sattr next fmt kind =
     let stmt_info fmt stmt = match opt_ff with
       | None -> Format.fprintf fmt "@[/* %d */@]" stmt.Cil_types.sid
       | Some ff ->
-          let str_m = try
+        let str_m = try
             let m = Fct_slice.get_stmt_mark ff stmt in
             SlicingMarks.mark_to_string m
           with Not_found -> "[---]"
-          in
-          if (SlicingMacros.is_call_stmt stmt)then 
-	    Format.fprintf fmt "@[<hv>%t@ /* %s */@]" 
-	      (str_call_sig ff stmt) str_m
-          else
-	    Format.fprintf fmt "@[/* %s */@]" str_m
+        in
+        if (SlicingMacros.is_call_stmt stmt)then
+          Format.fprintf fmt "@[<hv>%t@ /* %s */@]"
+            (str_call_sig ff stmt) str_m
+        else
+          Format.fprintf fmt "@[/* %s */@]" str_m
     in
     let s = Option.get self#current_stmt in
     try
       Format.fprintf fmt "@[<v>%a@ %a@]"
         stmt_info s
         (fun fmt -> super#stmtkind sattr next fmt) kind
-    with Not_found -> 
+    with Not_found ->
       (* some sub statements may be visible *)
       let sub_stmts = find_sub_stmts s in
       List.iter (self#stmt fmt) sub_stmts
@@ -123,8 +123,8 @@ let print_fct_from_pdg fmt ?ff pdg  =
   printer#global fmt glob
 
 let print_marked_ff fmt ff =
-  let pdg = SlicingMacros.get_ff_pdg ff in 
-  Format.fprintf fmt "@[<v>@[<hv>Print slice =@ %a@]@ @ %a@]" 
+  let pdg = SlicingMacros.get_ff_pdg ff in
+  Format.fprintf fmt "@[<v>@[<hv>Print slice =@ %a@]@ @ %a@]"
     Fct_slice.print_ff_sig ff
     (print_fct_from_pdg ~ff) pdg
 
@@ -157,11 +157,11 @@ module PrintProject = struct
   type tfi = Undef | PersistSelect | Other
 
   let fi_type fi = match fi.SlicingInternals.fi_def with
-      | Some _f ->
-          if SlicingMacros.fi_has_persistent_selection fi
-          then PersistSelect
-          else Other
-      | None -> Undef
+    | Some _f ->
+      if SlicingMacros.fi_has_persistent_selection fi
+      then PersistSelect
+      else Other
+    | None -> Undef
 
   let node_slice_callers () =
     (OptSliceCallers (SlicingParameters.Mode.Callers.get ()))
@@ -177,10 +177,10 @@ module PrintProject = struct
     let do_kf kf =
       let fi = SlicingMacros.get_kf_fi kf in
       let slices = SlicingMacros.fi_slices fi in
-        List.iter (fun ff -> f (Slice ff)) slices;
-        f (Src fi)
+      List.iter (fun ff -> f (Slice ff)) slices;
+      f (Src fi)
     in
-      Globals.Functions.iter do_kf
+    Globals.Functions.iter do_kf
 
   let iter_edges_slices f proj =
     let do_edge dest (ff_caller, call) =
@@ -197,8 +197,8 @@ module PrintProject = struct
       | [] -> ()
       | _ :: [] -> ()
       | rq1 :: rq2 :: rq_list ->
-          f (((Action (n, rq1)), (Action (n+1, rq2))), None);
-          do_act_edge (n+1) (rq2 :: rq_list)
+        f (((Action (n, rq1)), (Action (n+1, rq2))), None);
+        do_act_edge (n+1) (rq2 :: rq_list)
     in do_act_edge 1 proj.SlicingInternals.actions
 
   let iter_edges_src_fun f =
@@ -206,17 +206,17 @@ module PrintProject = struct
       let fi = SlicingMacros.get_kf_fi kf in
       let doit (kf_caller,_) =
         let fi_caller = SlicingMacros.get_kf_fi kf_caller in
-          f ((Src fi_caller, Src fi), None)
+        f ((Src fi_caller, Src fi), None)
       in List.iter doit (!Db.Value.callers kf)
     in
-      Globals.Functions.iter do_kf_calls
+    Globals.Functions.iter do_kf_calls
 
   let iter_edges_e f (_, proj) =
     match proj.SlicingInternals.actions with [] -> ()
-      | rq :: _ -> f ((node_slice_callers (), (Action (1, rq))), None);
-    iter_edges_slices f proj;
-    iter_edges_actions f proj;
-    iter_edges_src_fun f
+                                           | rq :: _ -> f ((node_slice_callers (), (Action (1, rq))), None);
+                                             iter_edges_slices f proj;
+                                             iter_edges_actions f proj;
+                                             iter_edges_src_fun f
 
   let color_soft_green = (0x7FFFD4)
   let color_medium_green = (0x00E598)
@@ -244,61 +244,61 @@ module PrintProject = struct
 
   let vertex_attributes v = match v with
     | Src fi    ->
-        let color = match fi_type fi with
-          | Undef -> (`Fillcolor color_soft_yellow)
-          | PersistSelect -> (`Fillcolor color_soft_orange)
-          | Other -> (`Fillcolor color_soft_green)
-        in color::[`Shape `Plaintext]
+      let color = match fi_type fi with
+        | Undef -> (`Fillcolor color_soft_yellow)
+        | PersistSelect -> (`Fillcolor color_soft_orange)
+        | Other -> (`Fillcolor color_soft_green)
+      in color::[`Shape `Plaintext]
     |  Slice ff ->
-        let color =  match fi_type ff.SlicingInternals.ff_fct with
-          | Undef -> assert false
-          | PersistSelect -> (`Fillcolor color_soft_orange)
-          | Other -> (`Fillcolor color_soft_green)
-        in color ::[`Shape `Ellipse]
+      let color =  match fi_type ff.SlicingInternals.ff_fct with
+        | Undef -> assert false
+        | PersistSelect -> (`Fillcolor color_soft_orange)
+        | Other -> (`Fillcolor color_soft_green)
+      in color ::[`Shape `Ellipse]
     |  Action (_, crit) ->
-        let label = Format.asprintf "%a" SlicingActions.print_crit crit in
-        let attrib = [] in
-        let attrib = (`Label label)::attrib in
-        let attrib = (`Fillcolor color_soft_pink)::attrib in
-        let attrib = (`Shape `Box)::attrib in
-          attrib
+      let label = Format.asprintf "%a" SlicingActions.print_crit crit in
+      let attrib = [] in
+      let attrib = (`Label label)::attrib in
+      let attrib = (`Fillcolor color_soft_pink)::attrib in
+      let attrib = (`Shape `Box)::attrib in
+      attrib
     | OptSlicingLevel mode ->
-        let label = ("SliceCalls = "^(SlicingMacros.str_level_option mode)) in
-        let attrib = [] in
-        let attrib = (`Label label)::attrib in
-        let attrib = (`Fillcolor color_soft_purple)::attrib in
-        let attrib = (`Shape `Ellipse)::attrib in
-        let attrib = (`Fontsize 10)::attrib in
-          attrib
+      let label = ("SliceCalls = "^(SlicingMacros.str_level_option mode)) in
+      let attrib = [] in
+      let attrib = (`Label label)::attrib in
+      let attrib = (`Fillcolor color_soft_purple)::attrib in
+      let attrib = (`Shape `Ellipse)::attrib in
+      let attrib = (`Fontsize 10)::attrib in
+      attrib
     | OptSliceCallers b ->
-        let label = ("SliceCallers = "^(if b then "true" else "false")) in
-        let attrib = [] in
-        let attrib = (`Label label)::attrib in
-        let attrib = (`Fillcolor color_soft_purple)::attrib in
-        let attrib = (`Shape `Ellipse)::attrib in
-        let attrib = (`Fontsize 10)::attrib in
-          attrib
+      let label = ("SliceCallers = "^(if b then "true" else "false")) in
+      let attrib = [] in
+      let attrib = (`Label label)::attrib in
+      let attrib = (`Fillcolor color_soft_purple)::attrib in
+      let attrib = (`Shape `Ellipse)::attrib in
+      let attrib = (`Fontsize 10)::attrib in
+      attrib
 
   let default_edge_attributes _ =
     let attrib = [] in
     let attrib = (`Fontsize 10)::attrib in
-      attrib
+    attrib
 
   let edge_attributes (e, call) =
     let attrib = match e with
-    | (Src _, Src _) -> [`Style `Invis]
-    | (OptSliceCallers _, _) -> [`Style `Invis]
-    | (_, OptSliceCallers _) -> [`Style `Invis]
-    | _ -> []
+      | (Src _, Src _) -> [`Style `Invis]
+      | (OptSliceCallers _, _) -> [`Style `Invis]
+      | (_, OptSliceCallers _) -> [`Style `Invis]
+      | _ -> []
     in match call with None -> attrib
-      | Some call -> (`Label (string_of_int call.sid)):: attrib
+                     | Some call -> (`Label (string_of_int call.sid)):: attrib
 
   let get_subgraph v =
     let mk_subgraph name attrib =
       let attrib = (*(`Label name) ::*) (`Style `Filled) :: attrib in
-          Some { Graph.Graphviz.DotAttributes.sg_name= name;
-                 sg_parent = None;
-                 sg_attributes = attrib }
+      Some { Graph.Graphviz.DotAttributes.sg_name= name;
+             sg_parent = None;
+             sg_attributes = attrib }
     in
     let f_subgraph fi =
       let name = SlicingMacros.fi_name fi in
@@ -308,19 +308,19 @@ module PrintProject = struct
         | PersistSelect -> (`Fillcolor color_medium_orange)
         | Other -> (`Fillcolor color_medium_green)
       in let attrib = color :: attrib in
-        mk_subgraph name attrib
+      mk_subgraph name attrib
     in
     let rq_subgraph =
       let name = "Requests" in
       let attrib = [] in
       let attrib = (`Fillcolor color_medium_pink) :: attrib in
       let attrib = (`Label name) :: attrib in
-        mk_subgraph name attrib
+      mk_subgraph name attrib
     in match v with
-      | Src fi -> f_subgraph fi
-      | Slice ff -> f_subgraph ff.SlicingInternals.ff_fct
-      | Action _ -> rq_subgraph
-      | OptSlicingLevel _ | OptSliceCallers _ -> rq_subgraph
+    | Src fi -> f_subgraph fi
+    | Slice ff -> f_subgraph ff.SlicingInternals.ff_fct
+    | Action _ -> rq_subgraph
+    | OptSlicingLevel _ | OptSliceCallers _ -> rq_subgraph
 
 end
 

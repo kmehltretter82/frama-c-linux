@@ -31,37 +31,37 @@
  * - data dependency.
  * An edge can carry one or several kinds.
  * A bottom edge means that there are no relation.
- *)
+*)
 module Dpd :
-  sig
-    type t
+sig
+  type t
 
-    type td = Ctrl | Addr | Data
+  type td = Ctrl | Addr | Data
 
-    val make : ?a:bool -> ?d:bool -> ?c:bool -> unit -> t
-    val top : t
-    val bottom : t
+  val make : ?a:bool -> ?d:bool -> ?c:bool -> unit -> t
+  val top : t
+  val bottom : t
 
-    val is_addr : t -> bool
-    val is_ctrl : t -> bool
-    val is_data : t -> bool
-    val adc_value : t -> bool * bool * bool
-    val is_dpd : td -> t -> bool
-    val is_bottom : t -> bool
-    val is_included : t -> t -> bool
+  val is_addr : t -> bool
+  val is_ctrl : t -> bool
+  val is_data : t -> bool
+  val adc_value : t -> bool * bool * bool
+  val is_dpd : td -> t -> bool
+  val is_bottom : t -> bool
+  val is_included : t -> t -> bool
 
-    val compare : t -> t -> int
-    val equal : t -> t -> bool
+  val compare : t -> t -> int
+  val equal : t -> t -> bool
 
-    val combine : t -> t -> t
-    val add : t -> td -> t
-    val inter : t -> t -> t
-    val intersect : t -> t -> bool
-    val minus : t -> t -> t
+  val combine : t -> t -> t
+  val add : t -> td -> t
+  val inter : t -> t -> t
+  val intersect : t -> t -> bool
+  val minus : t -> t -> t
 
-    val pretty_td : Format.formatter -> td -> unit
-    val pretty : Format.formatter -> t -> unit
-  end
+  val pretty_td : Format.formatter -> td -> unit
+  val pretty : Format.formatter -> t -> unit
+end
 
 (** A node of the PDG : includes some information to know where it comes
     from. *)
@@ -80,8 +80,8 @@ end
 module NodeSet : Hptset.S with type elt = Node.t
 
 (** Program dependence graph main part : the nodes of the graph represent
-   computations, and the edges represent the dependencies between these
-   computations. Only a few functions are exported, to build the graph
+    computations, and the edges represent the dependencies between these
+    computations. Only a few functions are exported, to build the graph
     in [pdg/build.ml]. Iterating over the PDG should be done using the
     functions in module [Pdg] below *)
 module G : sig
@@ -97,7 +97,7 @@ module G : sig
   val create : unit -> t
 
   val add_elem : t -> PdgIndex.Key.t -> Node.t
-  val add_dpd : 
+  val add_dpd :
     t -> Node.t -> Dpd.td -> Locations.Zone.t option -> Node.t -> unit
 end
 
@@ -118,13 +118,13 @@ type data_state =
 module Pdg : sig
 
   exception Top
-    (** can be raised by most of the functions when called with a Top PDG.
-        Top means that we were not able to compute the PDG for this
-        function. *)
+  (** can be raised by most of the functions when called with a Top PDG.
+      Top means that we were not able to compute the PDG for this
+      function. *)
 
   exception Bottom
-    (** exception raised when requiring the PDG of a function that is never
-        called. *)
+  (** exception raised when requiring the PDG of a function that is never
+      called. *)
 
   include Datatype.S
 
@@ -146,7 +146,7 @@ module Pdg : sig
   val iter_direct_codpds : t -> (Node.t -> unit) -> Node.t -> unit
 
   (** a dependency to another node. The dependency can be restricted to a zone.
-  * (None means no restriction ie. total dependency) *)
+   * (None means no restriction ie. total dependency) *)
   type dpd_info = (Node.t * Locations.Zone.t option)
 
   val get_all_direct_dpds : t -> Node.t -> dpd_info list
@@ -156,12 +156,12 @@ module Pdg : sig
   val get_x_direct_codpds : Dpd.td -> t -> Node.t -> dpd_info list
 
   val fold_direct_dpds : t ->
-      ('a -> Dpd.t * Locations.Zone.t option -> Node.t -> 'a) ->
-      'a -> Node.t -> 'a
+    ('a -> Dpd.t * Locations.Zone.t option -> Node.t -> 'a) ->
+    'a -> Node.t -> 'a
 
   val fold_direct_codpds : t ->
-      ('a -> Dpd.t * Locations.Zone.t option -> Node.t -> 'a) ->
-      'a -> Node.t -> 'a
+    ('a -> Dpd.t * Locations.Zone.t option -> Node.t -> 'a) ->
+    'a -> Node.t -> 'a
 
   val pretty_bw : ?bw:bool -> Format.formatter -> t -> unit
   val pretty_graph : ?bw:bool -> Format.formatter -> G.t -> unit

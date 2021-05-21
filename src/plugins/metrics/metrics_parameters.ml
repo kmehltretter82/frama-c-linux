@@ -22,10 +22,10 @@
 
 include Plugin.Register
     (struct
-       let name = "metrics"
-       let shortname = "metrics"
-       let help = "syntactic metrics"
-     end)
+      let name = "metrics"
+      let shortname = "metrics"
+      let help = "syntactic metrics"
+    end)
 
 module Enabled =
   WithOutput
@@ -33,7 +33,7 @@ module Enabled =
       let option_name = "-metrics"
       let help = "activate metrics computation"
       let output_by_default = true
-     end)
+    end)
 
 module ByFunction =
   WithOutput
@@ -41,7 +41,7 @@ module ByFunction =
       let option_name = "-metrics-by-function"
       let help = "also compute metrics on a per-function basis"
       let output_by_default = true
-     end)
+    end)
 
 module OutputFile =
   Filepath
@@ -53,16 +53,16 @@ module OutputFile =
       let help = "print some metrics into the specified file; \
                   the output format is recognized through the extension: \
                   .text/.txt for text, .html/.htm for HTML, or .json for JSON."
-     end)
+    end)
 
 module ValueCoverage =
   WithOutput (
-    struct
-      let option_name = "-metrics-eva-cover"
-      let help = "estimate Eva coverage w.r.t. \
-                  to reachable syntactic definitions"
-      let output_by_default = true
-    end)
+  struct
+    let option_name = "-metrics-eva-cover"
+    let help = "estimate Eva coverage w.r.t. \
+                to reachable syntactic definitions"
+    let output_by_default = true
+  end)
 let () = ValueCoverage.add_aliases [ "-metrics-value-cover" ]
 
 module AstType =
@@ -72,7 +72,7 @@ module AstType =
       let arg_name = "[cabs | cil | acsl]"
       let help = "apply metrics to Cabs or CIL AST, or to ACSL specs"
       let default = "cil"
-     end
+    end
     )
 
 module Libc =
@@ -81,7 +81,7 @@ module Libc =
       let option_name = "-metrics-libc"
       let help = "show functions from Frama-C standard C library in the \
                   results; deactivated by default."
-     end
+    end
     )
 
 
@@ -94,7 +94,7 @@ module SyntacticallyReachable =
       let arg_name = "f1,..,fn"
       let help = "compute an overapproximation of the functions reachable from \
                   f1,..,fn."
-     end
+    end
     )
 
 module LocalsSize =

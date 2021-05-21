@@ -70,7 +70,7 @@ module Api:sig
         [extract] function. *)
 
     val extract : ?f_slice_names:(kernel_function -> bool  -> int -> string) ->
-                   string -> Project.t
+      string -> Project.t
     (** Build a new [Db.Project.t] from all [Slice.t] of a project.
         The string argument is used for naming the new project.
         Can optionally specify how to name the sliced functions
@@ -80,10 +80,10 @@ module Api:sig
         - [src_visi] tells if the source function name is used
                      (if not, it can be used for a slice)
         - [num_slice] gives the number of the slice to name.
-        The entry point function is only exported once :
-        it is VERY recommended to give to it its original name,
-        even if it is sliced.
-        @modify Sulfur-20171101 argument order and arity. *)
+          The entry point function is only exported once :
+          it is VERY recommended to give to it its original name,
+          even if it is sliced.
+          @modify Sulfur-20171101 argument order and arity. *)
 
     (** {3 Not for casual users} *)
 
@@ -92,7 +92,7 @@ module Api:sig
         function) called from a [Slice.t]. *)
 
     val print_dot : filename:string -> title:string -> unit
-    (** May be used to for debugging... 
+    (** May be used to for debugging...
         Pretty print a representation of the slicing project (call graph)
         in a dot file which name is the given string. *)
 
@@ -167,7 +167,7 @@ module Api:sig
     val dyn_t : t Type.t
     (** For dynamic type checking and journalization. *)
 
-    type set 
+    type set
     (** Set of colored selections. *)
 
     val dyn_set : set Type.t
@@ -206,7 +206,7 @@ module Api:sig
 
     val select_stmt_lval :
       (set -> Mark.t -> Datatype.String.Set.t -> before:bool -> stmt ->
-        eval:stmt -> kernel_function -> set)
+       eval:stmt -> kernel_function -> set)
     (** To select lvalues (given as string) related to a statement.
         Variable names used in the sets of strings [~rd] and [~wr] are relative
         to the function scope.
@@ -219,14 +219,14 @@ module Api:sig
 
     val select_stmt_annots :
       (set -> Mark.t -> spare:bool -> threat:bool -> user_assert:bool ->
-        slicing_pragma:bool -> loop_inv:bool -> loop_var:bool ->
-        stmt -> kernel_function -> set)
+       slicing_pragma:bool -> loop_inv:bool -> loop_var:bool ->
+       stmt -> kernel_function -> set)
     (** To select the annotations related to a statement.
         Note: add also a transparent selection on the whole statement. *)
 
     val select_func_lval_rw :
       (set -> Mark.t -> rd:Datatype.String.Set.t -> wr:Datatype.String.Set.t ->
-        eval:stmt -> kernel_function -> set)
+       eval:stmt -> kernel_function -> set)
     (** To select rw accesses to lvalues (given as a string) related to a
         function.
         Variable names used in the sets of strings [~rd] and [~wr] are relative
@@ -260,8 +260,8 @@ module Api:sig
 
     val select_func_annots :
       (set -> Mark.t -> spare:bool -> threat:bool -> user_assert:bool ->
-        slicing_pragma:bool -> loop_inv:bool -> loop_var:bool ->
-        kernel_function -> set)
+       slicing_pragma:bool -> loop_inv:bool -> loop_var:bool ->
+       kernel_function -> set)
     (** To select the annotations related to a function. *)
 
     (** {3 Selectors that are not journalized} *)
@@ -278,13 +278,13 @@ module Api:sig
 
     val select_stmt_term :
       (set -> Mark.t -> term -> stmt ->
-        kernel_function -> set)
+       kernel_function -> set)
     (** To select a predicate value related to a statement.
         Note: add also a transparent selection on the whole statement. *)
 
     val select_stmt_pred :
       (set -> Mark.t -> predicate -> stmt ->
-        kernel_function -> set)
+       kernel_function -> set)
     (** To select a predicate value related to a statement.
         Note: add also a transparent selection on the whole statement. *)
 
@@ -297,14 +297,14 @@ module Api:sig
     val select_pdg_nodes :
       (set -> Mark.t  -> PdgTypes.Node.t list -> kernel_function -> set)
     (** To select nodes of the PDG
-       - if [is_ctrl_mark m],
-         propagate ctrl_mark on ctrl dependencies
-       - if [is_addr_mark m],
-         propagate addr_mark on addr dependencies
-       - if [is_data_mark m],
-         propagate data_mark on data dependencies
-       - mark the node with a spare_mark and propagate so that
-         the dependencies that were not selected yet will be marked spare. *)
+        - if [is_ctrl_mark m],
+          propagate ctrl_mark on ctrl dependencies
+        - if [is_addr_mark m],
+          propagate addr_mark on addr dependencies
+        - if [is_data_mark m],
+          propagate data_mark on data dependencies
+        - mark the node with a spare_mark and propagate so that
+          the dependencies that were not selected yet will be marked spare. *)
 
     (** {3 Not for casual users and not journalized} *)
 
@@ -315,7 +315,7 @@ module Api:sig
     val add_to_selects_internal : t -> set -> set
     val iter_selects_internal : (t -> unit) -> set -> unit
     val fold_selects_internal : ('a -> t -> 'a) -> 'a -> set -> 'a
- 
+
     val select_stmt_internal : (kernel_function -> ?select:t ->
                                 stmt -> Mark.t -> t)
     (** May be used to select a statement :
@@ -327,11 +327,11 @@ module Api:sig
           propagates data_mark on data dependencies of the statement
         - otherwise, marks the node with a spare_mark and propagate so that
           the dependencies that were not selected yet will be marked spare.
-        When the statement is a call, its functional inputs/outputs are
-        also selected (The call is still selected even it has no output).
-        When the statement is a composed one (block, if, etc...),
-        all the sub-statements are selected.
-        @raise SlicingTypes.NoPdg when there is no PDG for the
+          When the statement is a call, its functional inputs/outputs are
+          also selected (The call is still selected even it has no output).
+          When the statement is a composed one (block, if, etc...),
+          all the sub-statements are selected.
+          @raise SlicingTypes.NoPdg when there is no PDG for the
                [kernel_function] (related to [PdgTypes.Pdg.is_top]). *)
 
     val select_label_internal : (kernel_function -> ?select:t ->
@@ -422,7 +422,7 @@ module Api:sig
     val remove_uncalled : unit -> unit
     (** Remove the uncalled slice from the project. *)
 
-   (** {3 Getters} *)
+    (** {3 Getters} *)
 
     val get_all: kernel_function -> t list
     (** Get all slices related to a function. *)
@@ -482,13 +482,13 @@ module Api:sig
     (** {3 Applying the added requests} *)
 
     val apply_all: propagate_to_callers:bool -> unit
-      (** Apply all slicing requests. *)
+    (** Apply all slicing requests. *)
 
     (** {3 Adding slicing requests} *)
 
     val add_selection: Select.set -> unit
-      (** Add a selection request to all (existing) slices
-          of a function to the project requests. *)
+    (** Add a selection request to all (existing) slices
+        of a function to the project requests. *)
 
     val add_persistent_selection: Select.set -> unit
     (** Add a persistent selection request to all slices (already existing or
@@ -538,13 +538,13 @@ module Api:sig
         For example, new requests may be added to the list. *)
 
     val merge_slices: Slice.t  -> Slice.t -> replace:bool -> Slice.t
-      (** May be used to build a new slice which marks is a merge of the two given slices.
-          [choose_call] requests are added to the project in order to choose
-          the called functions for this new slice.
-          If [replace] is true, more requests are added to call this new
-          slice instead of the two original slices. When these requests will
-          be applied, the user will be able to remove those two slices using
-          [Db.Slicing.Slice.remove]. *)
+    (** May be used to build a new slice which marks is a merge of the two given slices.
+        [choose_call] requests are added to the project in order to choose
+        the called functions for this new slice.
+        If [replace] is true, more requests are added to call this new
+        slice instead of the two original slices. When these requests will
+        be applied, the user will be able to remove those two slices using
+        [Db.Slicing.Slice.remove]. *)
 
     val copy_slice: Slice.t -> Slice.t
     (** May be used to copy the input slice. The new slice is not called, so it is the user

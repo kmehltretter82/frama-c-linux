@@ -24,17 +24,17 @@
     This module does not depend of any of frama-c module. *)
 
 val nop: 'a -> unit
-  (** Do nothing. *)
+(** Do nothing. *)
 
 external id: 'a -> 'a = "%identity"
-  (** identity function.
-      @since Oxygen-20120901
-   *)
+(** identity function.
+    @since Oxygen-20120901
+*)
 
 
 val adapt_filename: string -> string
-  (** Ensure that the given filename has the extension "cmo" in bytecode
-      and "cmxs" in native *)
+(** Ensure that the given filename has the extension "cmo" in bytecode
+    and "cmxs" in native *)
 
 val max_cpt: int -> int -> int
 (** [max_cpt t1 t2] returns the maximum of [t1] and [t2] wrt the total ordering
@@ -58,18 +58,18 @@ val mk_labeled_fun: string -> 'a
     @raise Unregistered_function when not properly initialized *)
 
 val mk_fun: string -> ('a -> 'b) ref
-  (** Build a reference to an uninitialized function
-      @raise Unregistered_function when not properly initialized *)
+(** Build a reference to an uninitialized function
+    @raise Unregistered_function when not properly initialized *)
 
 (* ************************************************************************* *)
 (** {2 Function combinators} *)
 (* ************************************************************************* *)
 
 val ($) : ('b -> 'c) -> ('a -> 'b) -> 'a -> 'c
-  (** Composition. *)
+(** Composition. *)
 
 val swap: ('a -> 'b -> 'c) -> 'b -> 'a -> 'c
-  (** Swap arguments. *)
+(** Swap arguments. *)
 
 val uncurry: ('a -> 'b -> 'c) -> ('a * 'b) -> 'c
 
@@ -82,28 +82,28 @@ val iter_uncurry2:
 (* ************************************************************************* *)
 
 val as_singleton: 'a list -> 'a
-  (** returns the unique element of a singleton list.
-      @raise Invalid_argument on a non singleton list. *)
+(** returns the unique element of a singleton list.
+    @raise Invalid_argument on a non singleton list. *)
 
 val last: 'a list -> 'a
-  (** returns the last element of a list.
-      @raise Invalid_argument on an empty list
-      @since Nitrogen-20111001 *)
+(** returns the last element of a list.
+    @raise Invalid_argument on an empty list
+    @since Nitrogen-20111001 *)
 
 val filter_out: ('a -> bool) -> 'a list -> 'a list
-  (** Filter out elements that pass the test *)
+(** Filter out elements that pass the test *)
 
 val replace: ('a -> 'a -> bool) -> 'a -> 'a list -> 'a list
-  (** [replace cmp x l] replaces the first element [y] of [l] such that
-      [cmp x y] is true by [x]. If no such element exists, [x] is added
-      at the tail of [l].
-      @since Neon-20140301 
-   *)
+(** [replace cmp x l] replaces the first element [y] of [l] such that
+    [cmp x y] is true by [x]. If no such element exists, [x] is added
+    at the tail of [l].
+    @since Neon-20140301
+*)
 
 val filter_map: ('a -> bool) -> ('a -> 'b) -> 'a list -> 'b list
 val filter_map': ('a -> 'b) -> ('b -> bool) -> 'a list -> 'b list
 val filter_map_opt: ('a -> 'b option) -> 'a list -> 'b list
-  (** Combines [filter] and [map]. *)
+(** Combines [filter] and [map]. *)
 
 val fold_map: ('a -> 'b -> 'a * 'c) -> 'a -> 'b list -> 'a * 'c list
 (** Combines [fold_left] and [map] *)
@@ -116,56 +116,56 @@ val product_fold: ('a -> 'b -> 'c -> 'a) -> 'a -> 'b list -> 'c list -> 'a
 *)
 
 val product: ('a -> 'b -> 'c) -> 'a list -> 'b list -> 'c list
-  (** [product f l1 l2] applies [f] to all the pairs of an elt of [l1] and
-      an element of [l2].
-   *)
+(** [product f l1 l2] applies [f] to all the pairs of an elt of [l1] and
+    an element of [l2].
+*)
 
 val find_index: ('a -> bool) -> 'a list -> int
-  (** returns the index (starting at 0) of the first element verifying the
-      condition
-      @raise Not_found if no element in the list matches the condition
-   *)
+(** returns the index (starting at 0) of the first element verifying the
+    condition
+    @raise Not_found if no element in the list matches the condition
+*)
 
 val list_compare : ('a -> 'a -> int) -> 'a list -> 'a list -> int
-  (** Generic list comparison function, where the elements are compared
-      with the specified function
-      @since Boron-20100401 *)
+(** Generic list comparison function, where the elements are compared
+    with the specified function
+    @since Boron-20100401 *)
 
 val opt_of_list: 'a list -> 'a option
-  (** converts a list with 0 or 1 element into an option.
-      @raise Invalid_argument on lists with more than one argument
-      @since Oxygen-20120901 *)
+(** converts a list with 0 or 1 element into an option.
+    @raise Invalid_argument on lists with more than one argument
+    @since Oxygen-20120901 *)
 
 val find_opt : ('a -> 'b option) -> 'a list -> 'b
 [@@deprecated "Use List.find_opt instead."]
-  (** [find_option p l] returns the value [p e], [e] being the first
-      element of [l] such that [p e] is not [None]. Raise [Not_found] if there
-      is no such value the list l.
+(** [find_option p l] returns the value [p e], [e] being the first
+    element of [l] such that [p e] is not [None]. Raise [Not_found] if there
+    is no such value the list l.
 
-      @since Nitrogen-20111001
-      @deprecated 18.0-Argon use [List.find_opt] instead *)
+    @since Nitrogen-20111001
+    @deprecated 18.0-Argon use [List.find_opt] instead *)
 
 val iteri: (int -> 'a -> unit) -> 'a list -> unit
-  (** Same as iter, but the function to be applied take also as argument the
-      index of the element (starting from 0). Tail-recursive
-      @since Nitrogen-20111001 *)
+(** Same as iter, but the function to be applied take also as argument the
+    index of the element (starting from 0). Tail-recursive
+    @since Nitrogen-20111001 *)
 
 val mapi: (int -> 'a -> 'b) -> 'a list -> 'b list
-  (** Same as map, but the function to be applied take also as argument the
-      index of the element (starting from 0). Tail-recursive
-      @since Oxygen-20120901 *)
+(** Same as map, but the function to be applied take also as argument the
+    index of the element (starting from 0). Tail-recursive
+    @since Oxygen-20120901 *)
 
 val sort_unique: ('a -> 'a -> int) -> 'a list -> 'a list
-  (**  Same as List.sort , but also remove duplicates.
-       @deprecated use List.sort_uniq instead
-  *)
+(**  Same as List.sort , but also remove duplicates.
+     @deprecated use List.sort_uniq instead
+*)
 
 val subsets: int -> 'a list -> 'a list list
-  (** [subsets k l] computes the combinations of [k] elements from list [l].
-      E.g. subsets 2 [1;2;3;4] = [[1;2];[1;3];[1;4];[2;3];[2;4];[3;4]].
-      This function preserves the order of the elements in [l] when
-      computing the sublists. [l] should not contain duplicates.
-      @since Aluminium-20160501 *)
+(** [subsets k l] computes the combinations of [k] elements from list [l].
+    E.g. subsets 2 [1;2;3;4] = [[1;2];[1;3];[1;4];[2;3];[2;4];[3;4]].
+    This function preserves the order of the elements in [l] when
+    computing the sublists. [l] should not contain duplicates.
+    @since Aluminium-20160501 *)
 
 val list_first_n : int -> 'a list -> 'a list
 (** [list_first_n n l] returns the first [n] elements of the list. Tail
@@ -193,12 +193,12 @@ val opt_fold: ('a -> 'b -> 'b) -> 'a option -> 'b -> 'b
 
 (** [merge f k a b]  returns
     - [None] if both [a] and [b] are [None]
-    - [Some a'] (resp. [b'] if [b] (resp [a]) is [None] 
+    - [Some a'] (resp. [b'] if [b] (resp [a]) is [None]
       and [a] (resp. [b]) is [Some]
     - [f k a' b'] if both [a] and [b] are [Some]
-    
+
     It is mainly intended to be used with Map.merge
-    
+
     @since Oxygen-20120901
 *)
 val merge_opt:
@@ -216,7 +216,7 @@ val the: exn:exn -> 'a option -> 'a
     @plugin development guide *)
 
 val opt_hash: ('a -> int) -> 'a option -> int
-  (** @since Sodium-20150201 *)
+(** @since Sodium-20150201 *)
 
 (* ************************************************************************* *)
 (** {2 Booleans} *)
@@ -230,49 +230,49 @@ val xor: bool -> bool -> bool
 (* ************************************************************************* *)
 
 val string_prefix: ?strict:bool -> string -> string -> bool
-  (** [string_prefix ~strict p s] returns [true] if and only if [p] is a
-      prefix of the string [s]. If [strict] is true, the prefix must be strict
-      (that is, [s] must moreover be strictly longer than [p]. [strict]
-      is false by default.
-      @since Boron-20100401 *)
+(** [string_prefix ~strict p s] returns [true] if and only if [p] is a
+    prefix of the string [s]. If [strict] is true, the prefix must be strict
+    (that is, [s] must moreover be strictly longer than [p]. [strict]
+    is false by default.
+    @since Boron-20100401 *)
 
 val string_del_prefix: ?strict:bool -> string -> string -> string option
-  (** [string_del_prefix ~strict p s] returns [None] if [p] is not a prefix of
-      [s] and Some [s1] iff [s=p^s1].
-      @since Oxygen-20120901 *)
+(** [string_del_prefix ~strict p s] returns [None] if [p] is not a prefix of
+    [s] and Some [s1] iff [s=p^s1].
+    @since Oxygen-20120901 *)
 
 val string_suffix: ?strict:bool -> string -> string -> bool
-  (** [string_suffix ~strict suf s] returns [true] iff [suf] is a suffix of
-      string [s]. [strict], which defaults to [false], indicates whether [s]
-      should be strictly longer than [p].
-      @since Aluminium-20160501
-  *)
+(** [string_suffix ~strict suf s] returns [true] iff [suf] is a suffix of
+    string [s]. [strict], which defaults to [false], indicates whether [s]
+    should be strictly longer than [p].
+    @since Aluminium-20160501
+*)
 
 val string_del_suffix: ?strict:bool -> string -> string -> string option
-  (** [string_del_suffix ~strict suf s] returns [Some s1] when [s = s1 ^ suf]
-      and None of [suf] is not a suffix of [s].
-      @since Aluminium-20160501
-  *)
+(** [string_del_suffix ~strict suf s] returns [Some s1] when [s = s1 ^ suf]
+    and None of [suf] is not a suffix of [s].
+    @since Aluminium-20160501
+*)
 
 val string_split: string -> int -> string * string
-(** [string_split s i] returns the beginning of [s] up to char [i-1] and the 
+(** [string_split s i] returns the beginning of [s] up to char [i-1] and the
     end of [s] starting from char [i+1]
     @raise Invalid_argument if [i] is not in the range [[0,(length s -1)]]
     @since Oxygen-20120901 *)
 
-val make_unique_name: 
+val make_unique_name:
   (string -> bool) -> ?sep:string -> ?start:int -> string -> int*string
-  (** [make_unique_name mem s] returns [(0, s)] when [(mem s)=false]
-      otherwise returns [(n,new_string)] such that [new_string] is 
-      derived from [(s,sep,start)] and [(mem new_string)=false] and [n<>0] 
-      @since Oxygen-20120901 *)
+(** [make_unique_name mem s] returns [(0, s)] when [(mem s)=false]
+    otherwise returns [(n,new_string)] such that [new_string] is
+    derived from [(s,sep,start)] and [(mem new_string)=false] and [n<>0]
+    @since Oxygen-20120901 *)
 
 val strip_underscore: string -> string
 (** remove underscores at the beginning and end of a string. If a string
     is composed solely of underscores, return the empty string
 
     @since 18.0-Argon
-  *)
+*)
 
 val html_escape: string -> string
 
@@ -280,7 +280,7 @@ val html_escape: string -> string
     or raises an exception if the tag extension is unsupported.
 
     @since 22.0-Titanium
- *)
+*)
 val format_string_of_stag: Format.stag -> string
 
 (* ************************************************************************* *)
@@ -300,36 +300,36 @@ val try_finally: finally:(unit -> unit) -> ('a -> 'b) -> 'a -> 'b
 (* ************************************************************************* *)
 
 val mkdir : ?parents:bool -> string -> Unix.file_perm -> unit
-  (** [mkdir ?parents name perm] creates directory [name] with permission
-      [perm]. If [parents] is true, recursively create parent directories
-      if needed. [parents] defaults to false.
-      Note that this function may create some of the parent directories
-      and then fail to create the children, e.g. if [perm] does not allow
-      user execution of the created directory. This will leave the filesystem
-      in a modified state before raising an exception.
-      @raise Unix.Unix_error if cannot create [name] or its parents.
-      @since 19.0-Potassium  *)
+(** [mkdir ?parents name perm] creates directory [name] with permission
+    [perm]. If [parents] is true, recursively create parent directories
+    if needed. [parents] defaults to false.
+    Note that this function may create some of the parent directories
+    and then fail to create the children, e.g. if [perm] does not allow
+    user execution of the created directory. This will leave the filesystem
+    in a modified state before raising an exception.
+    @raise Unix.Unix_error if cannot create [name] or its parents.
+    @since 19.0-Potassium  *)
 
 val safe_at_exit : (unit -> unit) -> unit
-  (** Register function to call with [Stdlib.at_exit], but only
-      for non-child process (fork). The order of execution is preserved 
-      {i wrt} ordinary calls to [Stdlib.at_exit]. *)
+(** Register function to call with [Stdlib.at_exit], but only
+    for non-child process (fork). The order of execution is preserved
+    {i wrt} ordinary calls to [Stdlib.at_exit]. *)
 
 val cleanup_at_exit: string -> unit
-  (** [cleanup_at_exit file] indicates that [file] must be removed when the
-      program exits (except if exit is caused by a signal).
-      If [file] does not exist, nothing happens. *)
+(** [cleanup_at_exit file] indicates that [file] must be removed when the
+    program exits (except if exit is caused by a signal).
+    If [file] does not exist, nothing happens. *)
 
 exception Temp_file_error of string
 
 val temp_file_cleanup_at_exit: ?debug:bool -> string -> string -> string
-  (** Similar to [Filename.temp_file] except that the temporary file will be
-      deleted at the end of the execution (see above), unless [debug] is set
-      to true, in which case a message with the name of the kept file will be
-      printed.
-      @raise Temp_file_error if the temp file cannot be created.
-      @modify Nitrogen-20111001 may now raise Temp_file_error
-      @modify Oxygen-20120901 optional debug argument
+(** Similar to [Filename.temp_file] except that the temporary file will be
+    deleted at the end of the execution (see above), unless [debug] is set
+    to true, in which case a message with the name of the kept file will be
+    printed.
+    @raise Temp_file_error if the temp file cannot be created.
+    @modify Nitrogen-20111001 may now raise Temp_file_error
+    @modify Oxygen-20120901 optional debug argument
 *)
 
 val temp_dir_cleanup_at_exit: ?debug:bool -> string -> string
@@ -338,7 +338,7 @@ val temp_dir_cleanup_at_exit: ?debug:bool -> string -> string
     @modify Neon-20130301 add optional debug flag *)
 
 val safe_remove: string -> unit
-  (** Tries to delete a file and never fails. *)
+(** Tries to delete a file and never fails. *)
 
 val safe_remove_dir: string -> unit
 

@@ -32,16 +32,16 @@ let main () =
     let project_name = SlicingParameters.ProjectName.get () in
     Api.Project.reset_slicing ();
     Api.Request.add_persistent_cmdline ();
-      (* Apply all pending requests. *)
+    (* Apply all pending requests. *)
     if Api.Request.is_request_empty_internal () then
       begin
- 	SlicingParameters.warning "No internal slicing request from the command line." ;
-	if SlicingParameters.Mode.Callers.get () then
+        SlicingParameters.warning "No internal slicing request from the command line." ;
+        if SlicingParameters.Mode.Callers.get () then
           let kf_entry, _library = Globals.entry_point () in
-	  SlicingParameters.warning "Adding an extra request on the entry point of function: %a." Kernel_function.pretty kf_entry;
-	  let set = Api.Select.empty_selects in
-	  let set = Api.Select.select_func_calls_into set true kf_entry in
-	  Api.Request.add_persistent_selection set
+          SlicingParameters.warning "Adding an extra request on the entry point of function: %a." Kernel_function.pretty kf_entry;
+          let set = Api.Select.empty_selects in
+          let set = Api.Select.select_func_calls_into set true kf_entry in
+          Api.Request.add_persistent_selection set
       end;
 
     Api.Request.apply_all_internal ();

@@ -28,13 +28,13 @@
    statically unreachable statements (that do not have idoms), are
    mapped to None. *)
 module Dom_tree = State_builder.Hashtbl
-  (Cil_datatype.Stmt.Hashtbl)
-  (Datatype.Option(Cil_datatype.Stmt))
-  (struct
-    let name = "Dominators.dom_tree"
-    let dependencies = [ Ast.self ]
-    let size = 197
-   end)
+    (Cil_datatype.Stmt.Hashtbl)
+    (Datatype.Option(Cil_datatype.Stmt))
+    (struct
+      let name = "Dominators.dom_tree"
+      let dependencies = [ Ast.self ]
+      let size = 197
+    end)
 ;;
 
 (** Compute dominator information for the statements in a function *)
@@ -73,75 +73,75 @@ end
 
 module Compute(D:DIRECTION) = struct
 
-(* Computes the smallest common dominator between two statements. *)
-let nearest_common_ancestor find_domtree ord1 ord2 =
-  Kernel.debug ~dkey:Kernel.dkey_dominators "computing common ancestor %d %d"
-    (D.to_stmt ord1).sid (D.to_stmt ord2).sid;
-  let finger1 = ref ord1 in
-  let finger2 = ref ord2 in
-  while (!finger1 != !finger2) do (
-    while ( D.is_further_from_root !finger1 !finger2) do
-      finger1 := (match find_domtree !finger1 with
-      | None -> assert false
-      | Some x -> x)
+  (* Computes the smallest common dominator between two statements. *)
+  let nearest_common_ancestor find_domtree ord1 ord2 =
+    Kernel.debug ~dkey:Kernel.dkey_dominators "computing common ancestor %d %d"
+      (D.to_stmt ord1).sid (D.to_stmt ord2).sid;
+    let finger1 = ref ord1 in
+    let finger2 = ref ord2 in
+    while (!finger1 != !finger2) do (
+      while ( D.is_further_from_root !finger1 !finger2) do
+        finger1 := (match find_domtree !finger1 with
+            | None -> assert false
+            | Some x -> x)
+      done;
+      while ( D.is_further_from_root !finger2 !finger1) do
+        finger2 := (match find_domtree !finger2 with
+            | None -> assert false
+            | Some x -> x)
+      done;)
     done;
-    while ( D.is_further_from_root !finger2 !finger1) do
-      finger2 := (match find_domtree !finger2 with
-      | None -> assert false
-      | Some x -> x)
-    done;)
-  done;
-  !finger1
-;;
+    !finger1
+  ;;
 
-(* Note: None means either unprocessed, or that the statement has no
-   predecessor or that all its ancestors are at None *)
-(* based on "A Simple, Fast Dominance Algorithm" by K.D. Cooper et al *)
-let domtree () =
-  let domtree = Array.make D.nb_stmts None in
+  (* Note: None means either unprocessed, or that the statement has no
+     predecessor or that all its ancestors are at None *)
+  (* based on "A Simple, Fast Dominance Algorithm" by K.D. Cooper et al *)
+  let domtree () =
+    let domtree = Array.make D.nb_stmts None in
 
-  (* Initialize the dataflow: for each root, add itself to its own
-     set of dominators. *)
-  domtree.(D.root_stmt) <- Some D.root_stmt;
-  let changed = ref true in
-  while !changed do
-    changed := false;
-    D.iter (fun b ->
-      let ordered_preds = D.preds b in
-      let processed_preds =
-	let was_processed p = match domtree.(p) with
-	| None -> false
-	| Some(_) -> true
-	in
-	List.filter was_processed ordered_preds
-      in
-      match processed_preds with
-      | [] -> () (* No predecessor (e.g. unreachable stmt): leave it to None.*)
-      | first::rest ->
-        let find i = domtree.(i) in
-	let new_idom =
-	  List.fold_left (nearest_common_ancestor find) first rest
-	in
-	(match domtree.(b) with
-	| Some(old_idom) when old_idom == new_idom -> ()
-	| _ -> (domtree.(b) <- Some(new_idom); changed := true))
-    );
-  done;
-  (* The roots are not _immediate_ dominators of themselves, so revert
-     that now that the dataflow has finished. *)
-  domtree.(D.root_stmt) <- None;
-  domtree
-;;
-
-let display domtree =
-  Kernel.debug ~dkey:Kernel.dkey_dominators "Root is %d" (D.to_stmt 0).sid;
-  Array.iteri (fun orig dest -> match dest with
-  | Some(x) -> Kernel.debug ~dkey:Kernel.dkey_dominators "%s of %d is %d"
-    D.name (D.to_stmt orig).sid (D.to_stmt x).sid
-  | None -> Kernel.debug ~dkey:Kernel.dkey_dominators "no %s for %d"
-    D.name (D.to_stmt orig).sid)
+    (* Initialize the dataflow: for each root, add itself to its own
+       set of dominators. *)
+    domtree.(D.root_stmt) <- Some D.root_stmt;
+    let changed = ref true in
+    while !changed do
+      changed := false;
+      D.iter (fun b ->
+          let ordered_preds = D.preds b in
+          let processed_preds =
+            let was_processed p = match domtree.(p) with
+              | None -> false
+              | Some(_) -> true
+            in
+            List.filter was_processed ordered_preds
+          in
+          match processed_preds with
+          | [] -> () (* No predecessor (e.g. unreachable stmt): leave it to None.*)
+          | first::rest ->
+            let find i = domtree.(i) in
+            let new_idom =
+              List.fold_left (nearest_common_ancestor find) first rest
+            in
+            (match domtree.(b) with
+             | Some(old_idom) when old_idom == new_idom -> ()
+             | _ -> (domtree.(b) <- Some(new_idom); changed := true))
+        );
+    done;
+    (* The roots are not _immediate_ dominators of themselves, so revert
+       that now that the dataflow has finished. *)
+    domtree.(D.root_stmt) <- None;
     domtree
-;;
+  ;;
+
+  let display domtree =
+    Kernel.debug ~dkey:Kernel.dkey_dominators "Root is %d" (D.to_stmt 0).sid;
+    Array.iteri (fun orig dest -> match dest with
+        | Some(x) -> Kernel.debug ~dkey:Kernel.dkey_dominators "%s of %d is %d"
+                       D.name (D.to_stmt orig).sid (D.to_stmt x).sid
+        | None -> Kernel.debug ~dkey:Kernel.dkey_dominators "no %s for %d"
+                    D.name (D.to_stmt orig).sid)
+      domtree
+  ;;
 
 end
 
@@ -158,8 +158,8 @@ let direction_dom kf =
     (* Iterate on all statements, except the entry point. *)
     let iter f =
       for i = 0 to nb_stmts -1 do
-	if i != root_stmt
-	then f i
+        if i != root_stmt
+        then f i
       done;;
     let is_further_from_root p1 p2 = p1 > p2
     let preds s = List.map to_ordered (to_stmt s).Cil_types.preds
@@ -172,12 +172,12 @@ let direction_dom kf =
 (* Fill the project table with the dominators of a given function. *)
 let store_dom domtree to_stmt =
   Array.iteri( fun ord idom ->
-    let idom = Option.map to_stmt idom in
-    let stmt = to_stmt ord in
-    Kernel.debug ~dkey:Kernel.dkey_dominators "storing dom for %d: %s"
-      stmt.sid (match idom with None -> "self" | Some s ->string_of_int s.sid);
-    Dom_tree.add stmt idom
-  ) domtree
+      let idom = Option.map to_stmt idom in
+      let stmt = to_stmt ord in
+      Kernel.debug ~dkey:Kernel.dkey_dominators "storing dom for %d: %s"
+        stmt.sid (match idom with None -> "self" | Some s ->string_of_int s.sid);
+      Dom_tree.add stmt idom
+    ) domtree
 
 let compute_dom kf =
   let direction = direction_dom kf in
@@ -203,12 +203,12 @@ let compute_dom kf =
    a. *)
 (* TODO:
    - For each statement, associate its immediate post-dominator (if it
-   exists), and the list of sinks that dominates it
+     exists), and the list of sinks that dominates it
 
    - Attempt to find the post-dominator by intersection only if the
-   list of sinks of the points is the same. Otherwise, state that
-   there is no immediate post-dominator, and that the point is
-   dominated by the union of the lists of sinks of its successors.
+     list of sinks of the points is the same. Otherwise, state that
+     there is no immediate post-dominator, and that the point is
+     dominated by the union of the lists of sinks of its successors.
 *)
 let _compute_pdom kf =
   let (stmt_to_ordered,ordered_to_stmt,_) =
@@ -221,8 +221,8 @@ let _compute_pdom kf =
     let root_stmt = to_ordered (Kernel_function.find_return kf)
     let iter f =
       for i = nb_stmts -1 downto 0 do
-	if i != root_stmt
-	then f i
+        if i != root_stmt
+        then f i
       done;;
     let is_further_from_root p1 p2 = p1 < p2
     let preds s = List.map to_ordered (to_stmt s).Cil_types.succs

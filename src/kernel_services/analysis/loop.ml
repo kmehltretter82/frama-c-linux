@@ -27,10 +27,10 @@ module Natural_Loops =
   Kernel_function.Make_Table
     (Stmt.Map.Make(Datatype.List(Stmt)))
     (struct
-       let name = "natural_loops"
-       let size = 97
-       let dependencies = [ Ast.self ]
-     end)
+      let name = "natural_loops"
+      let size = 97
+      let dependencies = [ Ast.self ]
+    end)
 
 let pretty_natural_loops fmt loops =
   Stmt.Map.iter
@@ -46,21 +46,21 @@ let findNaturalLoops (f: fundec) =
   let loops =
     List.fold_left
       (fun acc b ->
-        (* Iterate over all successors, and see if they are among the
-           dominators for this block. Such a successor [s] is a natural loop,
-           and [b -> s] is a back-edge. *)
-        List.fold_left
-          (fun acc s ->
-            if Dominators.dominates s b then
-              let cur =
-                try Stmt.Map.find s acc
-                with Not_found -> []
-              in
-              Stmt.Map.add s (b :: cur) acc
-            else
-              acc)
-          acc
-          b.succs)
+         (* Iterate over all successors, and see if they are among the
+            dominators for this block. Such a successor [s] is a natural loop,
+            and [b -> s] is a back-edge. *)
+         List.fold_left
+           (fun acc s ->
+              if Dominators.dominates s b then
+                let cur =
+                  try Stmt.Map.find s acc
+                  with Not_found -> []
+                in
+                Stmt.Map.add s (b :: cur) acc
+              else
+                acc)
+           acc
+           b.succs)
       Stmt.Map.empty
       f.sallstmts
   in
@@ -74,17 +74,17 @@ let get_naturals kf =
       (fun kf ->
          match kf.fundec with
          | Declaration _ ->
-             Stmt.Map.empty
+           Stmt.Map.empty
          | Definition (cilfundec,_) ->
-             Kernel.debug ~dkey:Kernel.dkey_loops
-               "Compute natural loops for '%a'"
-               Kernel_function.pretty kf;
-             let naturals = findNaturalLoops cilfundec  in
-             Kernel.debug ~dkey:Kernel.dkey_loops
-               "Done computing natural loops for '%a':@.%a"
-               Kernel_function.pretty kf
-               pretty_natural_loops naturals;
-             naturals
+           Kernel.debug ~dkey:Kernel.dkey_loops
+             "Compute natural loops for '%a'"
+             Kernel_function.pretty kf;
+           let naturals = findNaturalLoops cilfundec  in
+           Kernel.debug ~dkey:Kernel.dkey_loops
+             "Done computing natural loops for '%a':@.%a"
+             Kernel_function.pretty kf
+             pretty_natural_loops naturals;
+           naturals
       )
       kf
   in
@@ -130,10 +130,10 @@ module Non_Natural_Loops =
   Kernel_function.Make_Table
     (Stmt.Set)
     (struct
-       let name = "Loop.non_natural_loops"
-       let size = 37
-       let dependencies = [ Ast.self ]
-     end)
+      let name = "Loop.non_natural_loops"
+      let size = 37
+      let dependencies = [ Ast.self ]
+    end)
 let get_non_naturals = Non_Natural_Loops.memo get_non_naturals
 
 let is_non_natural kf s = Stmt.Set.mem s (get_non_naturals kf)

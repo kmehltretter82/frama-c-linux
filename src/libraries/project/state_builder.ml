@@ -88,13 +88,13 @@ module Proxy = struct
         ~copy:do_nothing_2
         ~commit:do_nothing
         ~update:do_nothing
-	~on_update:do_nothing
+        ~on_update:do_nothing
         ~serialize:
-        (fun _ ->
-          { on_disk_value = Obj.repr ();
-            on_disk_computed = false;
-            on_disk_saved = false;
-            on_disk_digest = Type.digest Datatype.unit })
+          (fun _ ->
+             { on_disk_value = Obj.repr ();
+               on_disk_computed = false;
+               on_disk_saved = false;
+               on_disk_digest = Type.digest Datatype.unit })
         ~unserialize:do_nothing_2
         ~unique_name:(State.unique_name_from_name name)
         ~name
@@ -114,11 +114,11 @@ module States = struct
   let states = S.create 997
   let add k ty v = S.add states k ty v
   let find ?(prj=Project.current ()) k ty = S.find states k ty prj
-  let iter ?(prj=Project.current ()) f = 
+  let iter ?(prj=Project.current ()) f =
     S.iter (fun name ty get -> let s, b = get prj in f name ty s b) states
-  let fold ?(prj=Project.current ()) f acc = 
+  let fold ?(prj=Project.current ()) f acc =
     S.fold
-      (fun name ty get acc -> let s, b = get prj in f name ty s b acc) 
+      (fun name ty get acc -> let s, b = get prj in f name ty s b acc)
       states
       acc
 end
@@ -126,17 +126,17 @@ end
 module FCDatatype = Datatype
 
 module Register
-  (D: Datatype.S)
-  (Local_state: State.Local with type t = D.t)
-  (Info: sig include Info val unique_name: string end)
+    (D: Datatype.S)
+    (Local_state: State.Local with type t = D.t)
+    (Info: sig include Info val unique_name: string end)
   : S with module Datatype = D
-  =
+=
 struct
 
   let internal_name = ref ""
 
   let debug ~level op_name p =
-    debug ~dkey ~level "%s %S (project %s)" 
+    debug ~dkey ~level "%s %S (project %s)"
       op_name
       !internal_name
       (Project.get_unique_name p)
@@ -189,7 +189,7 @@ struct
     update_with ~force p v.state
 
   let clean () =
-      (*      Format.printf "cleaning %s@." !internal_name;*)
+    (*      Format.printf "cleaning %s@." !internal_name;*)
     Local_state.set (Local_state.create ());
     Tbl.clear tbl
 
@@ -251,12 +251,12 @@ struct
     assert Cmdline.use_obj;
     commit p;
     let v = find p in
-    let obj = 
-      if !must_save then begin 
-	debug ~level:4 "serializing" p;
-	!marshal v.state 
+    let obj =
+      if !must_save then begin
+        debug ~level:4 "serializing" p;
+        !marshal v.state
       end else
-	Obj.repr () 
+        Obj.repr ()
     in
     { State.on_disk_value = obj;
       on_disk_computed = v.computed;
@@ -311,7 +311,7 @@ struct
     (* register this state in the static graph and in projects *)
     State_dependency_graph.add_state self dependencies;
     States.add
-      Info.name 
+      Info.name
       D.ty
       (fun p -> let s = Tbl.find tbl p in s.state, s.computed);
     Project.iter_on_projects create
@@ -331,8 +331,8 @@ module type Ref = sig
 end
 
 module Ref
-  (Data: Datatype.S)
-  (Info: sig include Info val default: unit -> Data.t end) =
+    (Data: Datatype.S)
+    (Info: sig include Info val default: unit -> Data.t end) =
 struct
 
   type data = Data.t
@@ -341,17 +341,17 @@ struct
   let state = ref (create ())
 
   include Register
-  (Datatype.Ref(Data))
-  (struct
-     type t = data ref
-     let create = create
-     let clear tbl = tbl := Info.default ()
-     let get () = !state
-     let set x = state := x
-     let clear_some_projects f x =
-       if Data.mem_project f !x then begin clear x; true end else false
-   end)
-  (struct include Info let unique_name = name end)
+      (Datatype.Ref(Data))
+      (struct
+        type t = data ref
+        let create = create
+        let clear tbl = tbl := Info.default ()
+        let get () = !state
+        let set x = state := x
+        let clear_some_projects f x =
+          if Data.mem_project f !x then begin clear x; true end else false
+      end)
+      (struct include Info let unique_name = name end)
 
   let set v = !state := v
   let get () = !(!state)
@@ -377,17 +377,17 @@ module Option_ref(Data:Datatype.S)(Info: Info) = struct
   module D = Datatype.Ref(Datatype.Option(Data))
 
   include Register
-  (D)
-  (struct
-     type t = data option ref
-     let create = create
-     let clear tbl = tbl := None
-     let get () = !state
-     let set x = state := x
-     let clear_some_projects f x =
-       if D.mem_project f x then begin clear x; true end else false
-   end)
-  (struct include Info let unique_name = name end)
+      (D)
+      (struct
+        type t = data option ref
+        let create = create
+        let clear tbl = tbl := None
+        let get () = !state
+        let set x = state := x
+        let clear_some_projects f x =
+          if D.mem_project f x then begin clear x; true end else false
+      end)
+      (struct include Info let unique_name = name end)
 
   let set v = !state := Some v
   let get () = match !(!state) with None -> raise Not_found | Some v -> v
@@ -496,9 +496,9 @@ module type Hashtbl = sig
 end
 
 module Hashtbl
-  (H: Datatype.Hashtbl)
-  (Data: Datatype.S)
-  (Info: Info_with_size) =
+    (H: Datatype.Hashtbl)
+    (Data: Datatype.S)
+    (Info: Info_with_size) =
 struct
 
   type key = H.key
@@ -511,37 +511,37 @@ struct
   module D = H.Make(Data)
 
   include Register
-  (D)
-  (struct
-     type t = data H.t
-     let create = create
-     let clear = H.clear
-     let get () = !state
-     let set x = state := x
-     let clear_some_projects f h =
-(*       Format.printf "%S: %S %S@." Info.name H.Key.name Data.name;*)
-       let x =
-       if D.mem_project == Datatype.never_any_project then
-         false
-       else
-         (* [TODO] BUG: if [Data.mem_project f v] returns [true] and there are
-            several bindings for the key [k] of [v] (and [v] is not the last
-            added binding) *)
-         let found =
-           H.fold
-             (fun k v l ->
-               if H.Key.mem_project f k || Data.mem_project f v then k :: l
-               else l)
-             h
-             []
-         in
-         List.iter (H.remove h) found;
-         found <> []
-       in
-(*       Format.printf "DONE@.";*)
-       x
-   end)
-  (struct include Info let unique_name = name end)
+      (D)
+      (struct
+        type t = data H.t
+        let create = create
+        let clear = H.clear
+        let get () = !state
+        let set x = state := x
+        let clear_some_projects f h =
+          (*       Format.printf "%S: %S %S@." Info.name H.Key.name Data.name;*)
+          let x =
+            if D.mem_project == Datatype.never_any_project then
+              false
+            else
+              (* [TODO] BUG: if [Data.mem_project f v] returns [true] and there are
+                 several bindings for the key [k] of [v] (and [v] is not the last
+                 added binding) *)
+              let found =
+                H.fold
+                  (fun k v l ->
+                     if H.Key.mem_project f k || Data.mem_project f v then k :: l
+                     else l)
+                  h
+                  []
+              in
+              List.iter (H.remove h) found;
+              found <> []
+          in
+          (*       Format.printf "DONE@.";*)
+          x
+      end)
+      (struct include Info let unique_name = name end)
 
   let clear () = H.clear !state
   let length () = H.length !state
@@ -605,9 +605,9 @@ sig
 end
 
 module Weak_hashtbl
-  (W: Sub_caml_weak_hashtbl)
-  (Data: Datatype.S with type t = W.data)
-  (Info: Info_with_size) =
+    (W: Sub_caml_weak_hashtbl)
+    (Data: Datatype.S with type t = W.data)
+    (Info: Info_with_size) =
 struct
 
   type data = W.data
@@ -617,25 +617,25 @@ struct
   let state = ref (create ())
 
   include Register
-  (Datatype.Weak(W)(Data))
-  (struct
-     type t = W.t
-     let create = create
-     let clear = W.clear
-     let get () = !state
-     let set x = state := x
-     let clear_some_projects f h =
-       if Data.mem_project == Datatype.never_any_project then
-         false
-       else
-         let found =
-           W.fold
-             (fun k l -> if Data.mem_project f k then k :: l else l) h []
-         in
-         List.iter (W.remove h) found;
-         found <> []
-   end)
-  (struct include Info let unique_name = name end)
+      (Datatype.Weak(W)(Data))
+      (struct
+        type t = W.t
+        let create = create
+        let clear = W.clear
+        let get () = !state
+        let set x = state := x
+        let clear_some_projects f h =
+          if Data.mem_project == Datatype.never_any_project then
+            false
+          else
+            let found =
+              W.fold
+                (fun k l -> if Data.mem_project f k then k :: l else l) h []
+            in
+            List.iter (W.remove h) found;
+            found <> []
+      end)
+      (struct include Info let unique_name = name end)
 
   let merge k = W.merge !state k
   let add k = W.add !state k
@@ -654,34 +654,34 @@ module Caml_weak_hashtbl(Data: Datatype.S) =
   Weak_hashtbl(Weak.Make(Data))(Data)
 
 module Hashconsing_tbl_weak
-  (Data: sig
-    include Datatype.S
-    val equal_internal: t -> t -> bool
-    val hash_internal: t -> int
-    val initial_values: t list
-  end)
-  (Info: Info_with_size)
-  =
+    (Data: sig
+       include Datatype.S
+       val equal_internal: t -> t -> bool
+       val hash_internal: t -> int
+       val initial_values: t list
+     end)
+    (Info: Info_with_size)
+=
 struct
 
   (* OCaml module typing requires to name this module. Too bad :-( *)
   module W = struct
 
     include Weak.Make
-      (struct
-        include Data
-        let equal = Data.equal_internal
-        let hash = Data.hash_internal
-       end)
+        (struct
+          include Data
+          let equal = Data.equal_internal
+          let hash = Data.hash_internal
+        end)
 
     let add_initial_values h =
-(*      Format.printf "adding initial values for %s@." Info.name;*)
+      (*      Format.printf "adding initial values for %s@." Info.name;*)
       List.iter
         (fun vi ->
            let _r = merge h vi in
            (*  (* Check that we do not add the value twice, which is probably a
                bug in the calling interface *)
-           assert (r == vi) *) ())
+               assert (r == vi) *) ())
         Data.initial_values
 
     let create size =
@@ -715,29 +715,29 @@ struct
 end
 
 module Hashconsing_tbl_not_weak
-  (Data: sig
-    include Datatype.S
-    val equal_internal: t -> t -> bool
-    val hash_internal: t -> int
-    val initial_values: t list
-  end)
-  (Info: Info_with_size)
-  =
+    (Data: sig
+       include Datatype.S
+       val equal_internal: t -> t -> bool
+       val hash_internal: t -> int
+       val initial_values: t list
+     end)
+    (Info: Info_with_size)
+=
 struct
 
   (* OCaml module typing requires to name this module. Too bad :-( *)
   module W = struct
 
     module HW = FCHashtbl.Make
-      (struct
-        include Data
-        let equal = Data.equal_internal
-        let hash = Data.hash_internal
-       end)
-    
+        (struct
+          include Data
+          let equal = Data.equal_internal
+          let hash = Data.hash_internal
+        end)
+
     type data = Data.t
     type t = data HW.t
-    
+
     let merge h v =
       try HW.find h v
       with Not_found ->
@@ -745,7 +745,7 @@ struct
         v
 
     let count = HW.length
-    
+
     let add_initial_values h =
       List.iter (fun vi -> let _r = merge h vi in ()) Data.initial_values
 
@@ -764,7 +764,7 @@ struct
     let find_all = HW.find_all
     let find = HW.find
     let remove = HW.remove
-    let add h v = HW.replace h v v 
+    let add h v = HW.replace h v v
 
   end
 
@@ -779,14 +779,14 @@ module type Hashconsing_tbl =
        val equal_internal: t -> t -> bool
        val hash_internal: t -> int
        val initial_values: t list
-    end) ->
+     end) ->
   functor (Info: Info_with_size) ->
     Weak_hashtbl with type data = Data.t
 
 module Hashconsing_tbl =
   (val if Cmdline.deterministic
-       then (module Hashconsing_tbl_not_weak: Hashconsing_tbl)
-       else (module Hashconsing_tbl_weak: Hashconsing_tbl))
+    then (module Hashconsing_tbl_not_weak: Hashconsing_tbl)
+    else (module Hashconsing_tbl_weak: Hashconsing_tbl))
 
 (* ************************************************************************* *)
 (** {3 Counters} *)
@@ -806,27 +806,27 @@ module SharedCounter(Info : sig val name : string end) = struct
   module Cpt =
     Register
       (struct
-         include Datatype.Int
-         let descr =
-           Descr.transform
-             Descr.t_int
-             (fun n ->
-                cpt := Extlib.max_cpt n !cpt;
-                !cpt)
-       end)
+        include Datatype.Int
+        let descr =
+          Descr.transform
+            Descr.t_int
+            (fun n ->
+               cpt := Extlib.max_cpt n !cpt;
+               !cpt)
+      end)
       (struct
-         type t = int
-         let create () = !cpt
-         let clear _ = ()
-         let get () = !cpt
-         let set _ = ()
-         let clear_some_projects _ _ = false
-       end)
+        type t = int
+        let create () = !cpt
+        let clear _ = ()
+        let get () = !cpt
+        let set _ = ()
+        let clear_some_projects _ _ = false
+      end)
       (struct
-         let name = Info.name
-         let unique_name = Info.name
-         let dependencies = []
-       end)
+        let name = Info.name
+        let unique_name = Info.name
+        let dependencies = []
+      end)
 
   let next () = incr cpt ; !cpt
   let get () = !cpt
@@ -842,28 +842,28 @@ module Counter(Info : sig val name : string end) = struct
   module Cpt =
     Register
       (struct
-         include Datatype.Ref(Datatype.Int)
-         let descr =
-           Descr.transform
-             (Descr.t_ref Descr.t_int)
-             (fun n ->
-                let r = !cpt in
-                r := Extlib.max_cpt !n !r;
-                r)
-       end)
+        include Datatype.Ref(Datatype.Int)
+        let descr =
+          Descr.transform
+            (Descr.t_ref Descr.t_int)
+            (fun n ->
+               let r = !cpt in
+               r := Extlib.max_cpt !n !r;
+               r)
+      end)
       (struct
-         type t = int ref
-         let create = create
-         let clear x = x := 0
-         let get () = !cpt
-         let set x = cpt := x
-         let clear_some_projects _ _ = false
-       end)
+        type t = int ref
+        let create = create
+        let clear x = x := 0
+        let get () = !cpt
+        let set x = cpt := x
+        let clear_some_projects _ _ = false
+      end)
       (struct
-         let name = Info.name
-         let unique_name = Info.name
-         let dependencies = []
-       end)
+        let name = Info.name
+        let unique_name = Info.name
+        let dependencies = []
+      end)
 
   let next () = incr !cpt ; !(!cpt)
   let get () = !(!cpt)
@@ -890,26 +890,26 @@ module Queue(Data: Datatype.S)(Info: Info) = struct
   let state = ref (Queue.create ())
 
   include Register
-  (Datatype.Queue(Data))
-  (struct
-     type t = elt Queue.t
-     let create = Queue.create
-     let clear = Queue.clear
-     let get () = !state
-     let set x = state := x
-     let clear_some_projects f q =
-       if Data.mem_project == Datatype.never_any_project then
-         false
-       else
-         (* cannot remove a single element from a queue *)
-         try
-           Queue.iter (fun x -> if Data.mem_project f x then raise Exit) q;
-           false
-         with Exit ->
-           clear q;
-           true
-   end)
-  (struct include Info let unique_name = name end)
+      (Datatype.Queue(Data))
+      (struct
+        type t = elt Queue.t
+        let create = Queue.create
+        let clear = Queue.clear
+        let get () = !state
+        let set x = state := x
+        let clear_some_projects f q =
+          if Data.mem_project == Datatype.never_any_project then
+            false
+          else
+            (* cannot remove a single element from a queue *)
+            try
+              Queue.iter (fun x -> if Data.mem_project f x then raise Exit) q;
+              false
+            with Exit ->
+              clear q;
+              true
+      end)
+      (struct include Info let unique_name = name end)
 
   let add x = Queue.add x !state
   let iter f = Queue.iter f !state
@@ -942,27 +942,27 @@ struct
   let state = ref (Array.make 0 Info.default)
 
   include Register
-  (Datatype.Array(Data))
-  (struct
-     type t = elt array
-     let create () = Array.make 0 Info.default
-     let clear v  = Array.iteri (fun i _ -> v.(i) <- Info.default) v
-     let get () = !state
-     let set x = state := x
-     let clear_some_projects f q =
-       if Data.mem_project == Datatype.never_any_project then
-         false
-       else
-         let removed = ref false in
-         Array.iteri
-           (fun i x -> if Data.mem_project f x then begin
-             !state.(i) <- Info.default;
-             removed := true;
-           end
-           ) q;
-         !removed
-   end)
-  (struct include Info let unique_name = name end)
+      (Datatype.Array(Data))
+      (struct
+        type t = elt array
+        let create () = Array.make 0 Info.default
+        let clear v  = Array.iteri (fun i _ -> v.(i) <- Info.default) v
+        let get () = !state
+        let set x = state := x
+        let clear_some_projects f q =
+          if Data.mem_project == Datatype.never_any_project then
+            false
+          else
+            let removed = ref false in
+            Array.iteri
+              (fun i x -> if Data.mem_project f x then begin
+                   !state.(i) <- Info.default;
+                   removed := true;
+                 end
+              ) q;
+            !removed
+      end)
+      (struct include Info let unique_name = name end)
 
   let length () = Array.length !state
   let set_length i = state := Array.make i Info.default
@@ -985,7 +985,7 @@ let apply_once name dep f =
       (struct
         let dependencies = dep
         let name = name
-       end)
+      end)
   in
   (fun () ->
      if First.get () then begin
@@ -994,7 +994,7 @@ let apply_once name dep f =
          f ();
          if First.get () then First.set false
        (* assert
-          (verify (First.get () = false) 
+          (verify (First.get () = false)
           "%s is supposed to be applied once, but resets itself its status"
           name) *)
        with exn ->

@@ -23,22 +23,22 @@
 include Plugin.S
 
 module Pragma: Parameter_sig.Kernel_function_set
-  (** Use pragmas of given function. *)
+(** Use pragmas of given function. *)
 
 module Print: Parameter_sig.Bool
-  (** Print the impacted stmt on stdout. *)
+(** Print the impacted stmt on stdout. *)
 
 module Reason: Parameter_sig.Bool
-  (** Build the graphs that explains why a node is impacted. *)
+(** Build the graphs that explains why a node is impacted. *)
 
 module Slicing: Parameter_sig.Bool
-  (** Slicing from the impacted stmt. *)
+(** Slicing from the impacted stmt. *)
 
 module Skip: Parameter_sig.String_set
-  (** Consider that the variables in the string are not impacted *)
+(** Consider that the variables in the string are not impacted *)
 
 module Upward: Parameter_sig.Bool
-  (** Also compute impact within callers *)
+(** Also compute impact within callers *)
 
 val is_on: unit -> bool
 

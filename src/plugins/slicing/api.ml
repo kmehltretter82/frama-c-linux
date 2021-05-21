@@ -45,7 +45,7 @@ let self = SlicingState.self
 
 (* ---------------------------------------------------------------------- *)
 
-  (** {2 Functions with journalized side effects } *)
+(** {2 Functions with journalized side effects } *)
 
 let set_modes calls callers sliceUndef keepAnnotations () =
   SlicingParameters.Mode.Calls.set calls ;
@@ -77,7 +77,7 @@ module Project = struct
 
   (** {2 Values } *)
 
- let default_slice_names = SlicingTransform.default_slice_names
+  let default_slice_names = SlicingTransform.default_slice_names
   let () =
     Journal.Binding.add
       (Datatype.func3
@@ -176,11 +176,11 @@ module Select = struct
   let select_stmt set spare = SlicingCmds.select_stmt set ~spare
   let select_stmt = Journal.register "Slicing.Api.Select.select_stmt"
       (Datatype.func4
-       dyn_set
-       ~label2:("spare", None) Datatype.bool
-       Stmt.ty
-       Kernel_function.ty
-       dyn_set)
+         dyn_set
+         ~label2:("spare", None) Datatype.bool
+         Stmt.ty
+         Kernel_function.ty
+         dyn_set)
       select_stmt
   let select_stmt set ~spare =
     select_stmt set spare
@@ -219,38 +219,38 @@ module Select = struct
     SlicingCmds.select_stmt_lval set mark lval ~before stmt ~eval
   let select_stmt_lval = Journal.register "Slicing.Api.Select.select_stmt_lval"
       (Datatype.func4
-       dyn_set
-       Mark.dyn_t
-       Datatype.String.Set.ty
-       ~label4:("before", None) Datatype.bool
-       (Datatype.func3
-          Stmt.ty
-          ~label2:("eval", None) Stmt.ty
-          Kernel_function.ty
-          dyn_set))
-    select_stmt_lval
+         dyn_set
+         Mark.dyn_t
+         Datatype.String.Set.ty
+         ~label4:("before", None) Datatype.bool
+         (Datatype.func3
+            Stmt.ty
+            ~label2:("eval", None) Stmt.ty
+            Kernel_function.ty
+            dyn_set))
+      select_stmt_lval
   let select_stmt_lval set mark lval ~before stmt ~eval =
     select_stmt_lval set mark lval before stmt eval
 
   let select_stmt_annots set mark spare threat user_assert slicing_pragma loop_inv loop_var =
     SlicingCmds.select_stmt_annots set mark ~spare ~threat ~user_assert ~slicing_pragma ~loop_inv ~loop_var
   let select_stmt_annots = Journal.register
-    "Slicing.Api.Select.select_stmt_annots"
-    (Datatype.func4
-       dyn_set
-       Mark.dyn_t
-       ~label3:("spare", None) Datatype.bool
-       ~label4:("threat", None) Datatype.bool
-       (Datatype.func4
-          ~label1:("user_assert", None) Datatype.bool
-          ~label2:("slicing_pragma", None) Datatype.bool
-          ~label3:("loop_inv", None) Datatype.bool
-          ~label4:("loop_var", None) Datatype.bool
-          (Datatype.func2
-             Stmt.ty
-             Kernel_function.ty
-             dyn_set)))
-    select_stmt_annots
+      "Slicing.Api.Select.select_stmt_annots"
+      (Datatype.func4
+         dyn_set
+         Mark.dyn_t
+         ~label3:("spare", None) Datatype.bool
+         ~label4:("threat", None) Datatype.bool
+         (Datatype.func4
+            ~label1:("user_assert", None) Datatype.bool
+            ~label2:("slicing_pragma", None) Datatype.bool
+            ~label3:("loop_inv", None) Datatype.bool
+            ~label4:("loop_var", None) Datatype.bool
+            (Datatype.func2
+               Stmt.ty
+               Kernel_function.ty
+               dyn_set)))
+      select_stmt_annots
   let select_stmt_annots set mark ~spare ~threat ~user_assert ~slicing_pragma ~loop_inv ~loop_var =
     select_stmt_annots set mark spare threat user_assert slicing_pragma loop_inv loop_var
 
@@ -266,30 +266,30 @@ module Select = struct
   let select_func_lval_rw set mark rd wr eval =
     SlicingCmds.select_func_lval_rw set mark ~rd ~wr ~eval
   let select_func_lval_rw = Journal.register
-    "Slicing.Api.Select.select_func_lval_rw"
-    (Datatype.func4
-       dyn_set
-       Mark.dyn_t
-       ~label3:("rd", None) Datatype.String.Set.ty
-       ~label4:("wr", None) Datatype.String.Set.ty
-       (Datatype.func2
-          ~label1:("eval", None) Stmt.ty
-          Kernel_function.ty
-          dyn_set))
-    select_func_lval_rw
+      "Slicing.Api.Select.select_func_lval_rw"
+      (Datatype.func4
+         dyn_set
+         Mark.dyn_t
+         ~label3:("rd", None) Datatype.String.Set.ty
+         ~label4:("wr", None) Datatype.String.Set.ty
+         (Datatype.func2
+            ~label1:("eval", None) Stmt.ty
+            Kernel_function.ty
+            dyn_set))
+      select_func_lval_rw
   let select_func_lval_rw set mark ~rd ~wr ~eval =
-  select_func_lval_rw set mark rd wr eval
+    select_func_lval_rw set mark rd wr eval
 
   let select_func_return set spare =
     SlicingCmds.select_func_return set ~spare
   let select_func_return = Journal.register
-    "Slicing.Api.Select.select_func_return"
-    (Datatype.func3
-       dyn_set
-       ~label2:("spare", None) Datatype.bool
-       Kernel_function.ty
-       dyn_set)
-    select_func_return
+      "Slicing.Api.Select.select_func_return"
+      (Datatype.func3
+         dyn_set
+         ~label2:("spare", None) Datatype.bool
+         Kernel_function.ty
+         dyn_set)
+      select_func_return
   let select_func_return set ~spare = select_func_return set spare
 
   let select_func_calls_to set spare =
@@ -481,7 +481,7 @@ module Request = struct
   let propagate_user_marks =
     Journal.register "Slicing.Api.Request.propagate_user_marks"
       (Datatype.func Datatype.unit Datatype.unit)
-    SlicingCmds.topologic_propagation
+      SlicingCmds.topologic_propagation
 
   let copy_slice = Journal.register "Slicing.Api.Request.copy_slice"
       (Datatype.func
@@ -546,7 +546,7 @@ module Request = struct
   let add_selection = Journal.register "Slicing.Request.add_selection"
       (Datatype.func
          Select.dyn_set Datatype.unit)
-    SlicingCmds.add_selection
+      SlicingCmds.add_selection
 
   let add_persistent_selection =
     Journal.register "Slicing.Request.add_persistent_selection"
@@ -557,7 +557,7 @@ module Request = struct
   let add_persistent_cmdline =
     Journal.register "Slicing.Request.add_persistent_cmdline"
       (Datatype.func Datatype.unit Datatype.unit)
-    SlicingCmds.add_persistent_cmdline
+      SlicingCmds.add_persistent_cmdline
 
   (** {2 No needs of Journalization} *)
 

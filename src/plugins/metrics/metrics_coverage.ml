@@ -101,8 +101,8 @@ class callableFunctionsVisitor ~libc = object(self)
   method! visit_non_function_var vi =
     let r = super#visit_non_function_var vi in
     (match r with
-       | None -> ()
-       | Some init -> initializers <- (vi, init) :: initializers
+     | None -> ()
+     | Some init -> initializers <- (vi, init) :: initializers
     );
     r
 
@@ -138,68 +138,68 @@ type coverage_metrics = {
 
 class deadCallsVisitor fmt ~libc cov_metrics =
   let unseen = Varinfo.Set.diff cov_metrics.syntactic cov_metrics.semantic in
-object(self)
-  inherit coverageAuxVisitor ~libc
+  object(self)
+    inherit coverageAuxVisitor ~libc
 
-  val mutable current_initializer = None
+    val mutable current_initializer = None
 
-  (* When an unseen function is reachable by the body of a function reached,
-     or inside an initializer, display the information *)
-  method private reached_fun vi =
-    if Metrics_base.consider_function ~libc vi && Varinfo.Set.mem vi unseen then
-      match self#current_kf with
-      | None ->
+    (* When an unseen function is reachable by the body of a function reached,
+       or inside an initializer, display the information *)
+    method private reached_fun vi =
+      if Metrics_base.consider_function ~libc vi && Varinfo.Set.mem vi unseen then
+        match self#current_kf with
+        | None ->
           (match current_initializer with
-             | None -> assert false
-             | Some vinit ->
-                 Format.fprintf fmt
-                   "@[<h>Initializer of %s references %s (at %t)@]@ "
-                   vinit.vname vi.vname Cil.pp_thisloc
+           | None -> assert false
+           | Some vinit ->
+             Format.fprintf fmt
+               "@[<h>Initializer of %s references %s (at %t)@]@ "
+               vinit.vname vi.vname Cil.pp_thisloc
           )
-      | Some f ->
-        if Varinfo.Set.mem (Kernel_function.get_vi f) cov_metrics.semantic then
-          let mess =
-            match self#current_stmt with
+        | Some f ->
+          if Varinfo.Set.mem (Kernel_function.get_vi f) cov_metrics.semantic then
+            let mess =
+              match self#current_stmt with
               | Some
                   {skind =
                      Instr (
                        Call (_, {enode = Lval (Var v, NoOffset)}, _, _)
                      | Local_init (_, ConsInit(v, _, _),_))}
-                  when Varinfo.equal v vi -> "calls"
+                when Varinfo.equal v vi -> "calls"
               | _ -> "references"
-          in
-          Format.fprintf fmt
-            "@[<h>Function %a %s %s (at %a)@]@ "
-            Kernel_function.pretty f mess vi.vname
-            Location.pretty (Cil.CurrentLoc.get ())
+            in
+            Format.fprintf fmt
+              "@[<h>Function %a %s %s (at %a)@]@ "
+              Kernel_function.pretty f mess vi.vname
+              Location.pretty (Cil.CurrentLoc.get ())
 
-  method! vvrbl vi =
-    if Cil.isFunctionType vi.vtype then self#reached_fun vi;
-    Cil.SkipChildren (* no children anyway *)
+    method! vvrbl vi =
+      if Cil.isFunctionType vi.vtype then self#reached_fun vi;
+      Cil.SkipChildren (* no children anyway *)
 
-  (* uses initializers *)
-  method compute_and_print =
-    if not (Varinfo.Set.is_empty unseen) || cov_metrics.initializers <> [] then begin
-      Format.fprintf fmt "@[<v>%a@ "
-        (Metrics_base.mk_hdr 2) "References to non-analyzed functions";
-      let sorted_semantic =
-        List.sort compare_vi_names (Varinfo.Set.elements cov_metrics.semantic)
-      in
-      List.iter self#visit_function sorted_semantic;
-      let sorted_initializers =
-        List.sort (fun (v1, _) (v2, _) -> compare_vi_names v1 v2) cov_metrics.initializers
-      in
-      List.iter (fun (vinit, init) ->
-                   current_initializer <- Some vinit;
-                   ignore (Visitor.visitFramacInit
-                             (self:>Visitor.frama_c_visitor)
-                             vinit NoOffset init);
-                   current_initializer <- None;
-                ) sorted_initializers;
-      Format.fprintf fmt "@]"
-    end
+    (* uses initializers *)
+    method compute_and_print =
+      if not (Varinfo.Set.is_empty unseen) || cov_metrics.initializers <> [] then begin
+        Format.fprintf fmt "@[<v>%a@ "
+          (Metrics_base.mk_hdr 2) "References to non-analyzed functions";
+        let sorted_semantic =
+          List.sort compare_vi_names (Varinfo.Set.elements cov_metrics.semantic)
+        in
+        List.iter self#visit_function sorted_semantic;
+        let sorted_initializers =
+          List.sort (fun (v1, _) (v2, _) -> compare_vi_names v1 v2) cov_metrics.initializers
+        in
+        List.iter (fun (vinit, init) ->
+            current_initializer <- Some vinit;
+            ignore (Visitor.visitFramacInit
+                      (self:>Visitor.frama_c_visitor)
+                      vinit NoOffset init);
+            current_initializer <- None;
+          ) sorted_initializers;
+        Format.fprintf fmt "@]"
+      end
 
-end
+  end
 
 class coverageByFun = object
   inherit Visitor.frama_c_inplace
@@ -267,9 +267,9 @@ let compute_semantic ~libc =
           Metrics_base.consider_function ~libc
             (Kernel_function.get_vi kf)
        then begin
-        Metrics_parameters.feedback ~dkey:dkey_sem
-          "marking %a as called" Kernel_function.pretty kf;
-        res := Varinfo.Set.add (Kernel_function.get_vi kf) !res
+         Metrics_parameters.feedback ~dkey:dkey_sem
+           "marking %a as called" Kernel_function.pretty kf;
+         res := Varinfo.Set.add (Kernel_function.get_vi kf) !res
        end
     );
   !res

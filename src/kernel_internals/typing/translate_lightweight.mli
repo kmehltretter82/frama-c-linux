@@ -24,7 +24,7 @@
 
 (** Annotate files interpreting lightweight annotations. *)
 
-(** Code transformation that interprets __declspec annotations. 
+(** Code transformation that interprets __declspec annotations.
     Done after cleanup (see {! File.add_code_transformation_after_cleanup}).
     Name of the transformation is "lightweight spec"
 *)

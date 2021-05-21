@@ -27,14 +27,14 @@ type call_site = kernel_function * kinstr
 
 module Callsite = struct
   include Datatype.Pair_with_collections(Kernel_function)(Cil_datatype.Kinstr)
-    (struct let module_name = "Value_callbacks.Callpoint" end)
+      (struct let module_name = "Value_callbacks.Callpoint" end)
 
   let pretty fmt (kf, ki) =
     Format.fprintf fmt "%a@@%t" Kernel_function.pretty kf
       (fun fmt ->
-        match ki with
-        | Kglobal -> Format.pp_print_string fmt "<main>"
-        | Kstmt stmt -> Format.pp_print_int fmt stmt.sid
+         match ki with
+         | Kglobal -> Format.pp_print_string fmt "<main>"
+         | Kstmt stmt -> Format.pp_print_int fmt stmt.sid
       )
 end
 
@@ -123,4 +123,3 @@ Local Variables:
 compile-command: "make -C ../../.."
 End:
 *)
-

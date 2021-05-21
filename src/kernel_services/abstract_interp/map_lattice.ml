@@ -463,22 +463,22 @@ module Make_MapSet_Lattice
 
   let pretty fmt = function
     | Top (t, a) ->
-        Format.fprintf fmt "@[<hov 2>{{ mix of %a.@ Origin: %a}}@]"
-          KSet.pretty t Origin.pretty a
+      Format.fprintf fmt "@[<hov 2>{{ mix of %a.@ Origin: %a}}@]"
+        KSet.pretty t Origin.pretty a
     | Map m ->
-        Pretty_utils.pp_iter
-          ~pre:"@[<hv 3>{{ "
-          ~suf:" }}@]"
-          ~sep:";@ "
-          (fun pp map -> KVMap.iter (fun k v -> pp (k, v)) map)
-          (fun fmt (k, v) ->
-             Format.fprintf fmt "%a -> %a" Key.pretty k Value.pretty v)
-          fmt m
+      Pretty_utils.pp_iter
+        ~pre:"@[<hv 3>{{ "
+        ~suf:" }}@]"
+        ~sep:";@ "
+        (fun pp map -> KVMap.iter (fun k v -> pp (k, v)) map)
+        (fun fmt (k, v) ->
+           Format.fprintf fmt "%a -> %a" Key.pretty k Value.pretty v)
+        fmt m
 
   let pretty_debug fmt = function
     | Top (t, a) ->
-        Format.fprintf fmt "@[<hov 2>{{ mix of %a.@ Origin: %a}}@]"
-          KSet.pretty t Origin.pretty a
+      Format.fprintf fmt "@[<hov 2>{{ mix of %a.@ Origin: %a}}@]"
+        KSet.pretty t Origin.pretty a
     | Map m -> KVMap.pretty_debug fmt m
 
 

@@ -37,7 +37,7 @@ val add_init_state_input :
 
 (** Kind of 'join' of the two states
     but test before if the new state is included in ~old.
-   @return (true, old U new) if the result is a new state,
+    @return (true, old U new) if the result is a new state,
            (false, old) if new is included in old. *)
 val test_and_merge :
   old:data_state -> data_state -> bool * data_state

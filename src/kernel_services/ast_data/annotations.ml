@@ -152,8 +152,8 @@ let () =
   Ast.add_linked_state code_annot_state;
   Code_annots.add_hook_on_remove
     (fun e stmt l ->
-      let kf = find_englobing_kf stmt in
-      List.iter (fun a -> clear_linked_to_annot kf stmt e a) !l)
+       let kf = find_englobing_kf stmt in
+       List.iter (fun a -> clear_linked_to_annot kf stmt e a) !l)
 
 (**************************************************************************)
 (** {2 Getting annotations} *)
@@ -1407,9 +1407,9 @@ let insert_global_in_ast annot =
          Cil_datatype.Logic_info.Set.is_empty logic_vars
       then List.rev acc @ glob :: g :: l
       else begin
-          let deps = remove_declared_global c_vars logic_vars g in
-          insert_after deps (g :: acc) l
-        end
+        let deps = remove_declared_global c_vars logic_vars g in
+        insert_after deps (g :: acc) l
+      end
   in
   let globs = insert_after deps [] file.globals in
   file.globals <- globs
@@ -1614,9 +1614,9 @@ let remove_extended e kf ext =
   let set_spec spec _tbl =
     List.iter
       (fun b ->
-           b.b_extended <- Extlib.filter_out ((==) ext) b.b_extended;
-           Property_status.remove
-             (Property.(ip_of_extended (ELContract kf) ext)))
+         b.b_extended <- Extlib.filter_out ((==) ext) b.b_extended;
+         Property_status.remove
+           (Property.(ip_of_extended (ELContract kf) ext)))
       spec.spec_behavior
   in
   remove_in_funspec e kf set_spec

@@ -37,27 +37,27 @@ let add_proj_actions actions =
   proj.T.actions <- actions @ proj.T.actions
 
 (** Add a new slice for the function. It can be the case that it create actions
-* if the function has some persistent selection, that make function calls to
-* choose.
-* @raise SlicingTypes.NoPdg when the function has no PDG.
-* *)
+ * if the function has some persistent selection, that make function calls to
+ * choose.
+ * @raise SlicingTypes.NoPdg when the function has no PDG.
+ * *)
 let create_slice kf =
   let ff, actions = Fct_slice.make_new_ff (M.get_kf_fi kf) true in
   add_proj_actions actions; ff
 
 (** Delete [ff_to_remove] if it is not called.
-* @raise T.CantRemoveCalledFf if it is.
+ * @raise T.CantRemoveCalledFf if it is.
 *)
 let remove_ff ff_to_remove =
   let rec remove ff_list ff_num = match ff_list with
     | [] -> raise Not_found
     | ff :: tail ->
-        if ff.T.ff_id = ff_num then (Fct_slice.clear_ff ff; tail)
-        else ff :: (remove tail ff_num)
+      if ff.T.ff_id = ff_num then (Fct_slice.clear_ff ff; tail)
+      else ff :: (remove tail ff_num)
   in let fi = ff_to_remove.T.ff_fct in
   let ff_num = ff_to_remove.T.ff_id in
   let new_ff_list = remove fi.T.fi_slices ff_num in
-    fi.T.fi_slices <- new_ff_list
+  fi.T.fi_slices <- new_ff_list
 
 let call_src_and_remove_all_ff fi =
   let do_call actions (ff_caller, call_id) =
@@ -68,8 +68,8 @@ let call_src_and_remove_all_ff fi =
   let do_ff actions ff =
     let calls = ff.SlicingInternals.ff_called_by in
     let actions = List.fold_left do_call actions calls in
-      remove_ff ff;
-      actions
+    remove_ff ff;
+    actions
   in
   List.fold_left do_ff [] fi.T.fi_slices
 
@@ -79,42 +79,42 @@ let rec remove_uncalled_slices () =
   let check_ff changes ff =
     match ff.T.ff_called_by with [] -> remove_ff ff; true | _ -> changes
   in let check_fi changes fi =
-    if (M.fi_name fi) <> entry_name then
-      List.fold_left check_ff changes (M.fi_slices fi)
-    else changes
+       if (M.fi_name fi) <> entry_name then
+         List.fold_left check_ff changes (M.fi_slices fi)
+       else changes
   in let changes = M.fold_fi check_fi false in
-    if changes then remove_uncalled_slices () else ()
+  if changes then remove_uncalled_slices () else ()
 
 (** Build a new slice [ff] which contains the marks of [ff1] and [ff2]
-* and generate everything that is needed to choose the calls in [ff].
-* If [replace] also generate requests call [ff] instead of [ff1] and [ff2]. *)
+ * and generate everything that is needed to choose the calls in [ff].
+ * If [replace] also generate requests call [ff] instead of [ff1] and [ff2]. *)
 let merge_slices ff1 ff2 replace =
   let ff, ff_actions = Fct_slice.merge_slices ff1 ff2 in
-    if replace then
-      begin
-        let add actions (caller, call) =
-          let rq = SlicingActions.mk_crit_change_call caller call
-                                                      (T.CallSlice ff) in
-            rq :: actions
-        in
-        let actions = List.fold_left add [] ff2.T.ff_called_by in
-        let actions = List.fold_left add actions ff1.T.ff_called_by in
-          add_proj_actions actions
-      end;
-    add_proj_actions ff_actions;
-    ff
+  if replace then
+    begin
+      let add actions (caller, call) =
+        let rq = SlicingActions.mk_crit_change_call caller call
+            (T.CallSlice ff) in
+        rq :: actions
+      in
+      let actions = List.fold_left add [] ff2.T.ff_called_by in
+      let actions = List.fold_left add actions ff1.T.ff_called_by in
+      add_proj_actions actions
+    end;
+  add_proj_actions ff_actions;
+  ff
 
 let split_slice ff =
   let add (actions, slices) (caller, call) =
     let new_ff = Fct_slice.copy_slice ff in
     let rq = SlicingActions.mk_crit_change_call caller call
-               (T.CallSlice new_ff) in
-      rq::actions, new_ff::slices
+        (T.CallSlice new_ff) in
+    rq::actions, new_ff::slices
   in
   let calls = List.tl ff.T.ff_called_by in (* keep ff for the first call *)
   let actions, slices = List.fold_left add ([], [ff]) calls in
-    add_proj_actions actions;
-    slices
+  add_proj_actions actions;
+  slices
 
 (*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)
 (** {2 Getting information } *)
@@ -142,20 +142,20 @@ let add_fct_filter proj f_id criterion =
     *)
 
 (** Add an action to the action list to filter the function [fct_id] with
-  the given criterion. The filter gives a name to the result of the filter
-  which is a new slice if the function to filter is the source one,
-  or the given slice otherwise.
-  *)
+    the given criterion. The filter gives a name to the result of the filter
+    which is a new slice if the function to filter is the source one,
+    or the given slice otherwise.
+*)
 let add_fct_src_filter fi to_select =
   match to_select with
-    (* T.CuSelect []  : don't ignore empty selection because
-                        the input control node has to be selected anyway... *)
-    | T.CuSelect select ->
-        let filter = SlicingActions.mk_crit_fct_user_select fi select in
-          add_filter filter
-    | T.CuTop m ->
-        let filter = SlicingActions.mk_crit_fct_top fi m in
-          add_filter filter
+  (* T.CuSelect []  : don't ignore empty selection because
+                      the input control node has to be selected anyway... *)
+  | T.CuSelect select ->
+    let filter = SlicingActions.mk_crit_fct_user_select fi select in
+    add_filter filter
+  | T.CuTop m ->
+    let filter = SlicingActions.mk_crit_fct_top fi m in
+    add_filter filter
 
     (*
 let add_fct_src_filters proj fi actions =
@@ -164,13 +164,13 @@ let add_fct_src_filters proj fi actions =
 
 let add_fct_ff_filter ff to_select =
   match to_select with
-      | T.CuSelect [] ->
-          SlicingParameters.debug ~level:1
-            "[SlicingProject.add_fct_ff_filter] (ignored empty selection)"
-      | T.CuSelect select ->
-          let filter = SlicingActions.mk_ff_user_select ff select in
-            add_filter filter
-      | T.CuTop _ -> assert false
+  | T.CuSelect [] ->
+    SlicingParameters.debug ~level:1
+      "[SlicingProject.add_fct_ff_filter] (ignored empty selection)"
+  | T.CuSelect select ->
+    let filter = SlicingActions.mk_ff_user_select ff select in
+    add_filter filter
+  | T.CuTop _ -> assert false
 
 (*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)
 (** {2 Print} *)
@@ -186,8 +186,8 @@ let print_project fmt =
     | Cil_types.GFun (func, _) -> (* function definition *)
       let slices = get_slices func.Cil_types.svar in
       List.iter (PrintSlice.print_marked_ff fmt) slices
-      (* TODO see if we have to print the original function *)
-    | _ ->  
+    (* TODO see if we have to print the original function *)
+    | _ ->
       PrintSlice.print_original_glob fmt glob
   in
   let source = Ast.get () in
@@ -216,7 +216,7 @@ let pretty_slice fmt ff =
     add to the project worklist. *)
 let apply_fct_crit ff to_select =
   let actions = Fct_slice.apply_add_marks ff to_select in
-    actions
+  actions
 
 let apply_appli_crit appli_crit =
   match appli_crit with
@@ -234,34 +234,34 @@ let apply_appli_crit appli_crit =
       "This slicing criterion on application"
 
 (** Add persistent the marks [node_marks] in [fi] and also add the marks
-* to existing slices if any.
-* If the propagation is ON, some actions are generated to propagate the
-* persistent marks to the callers, and other actions are generated to
-* make all the calls to [fi] visible.
-* If there is no slice for [fi] we create a new one
-* if it is the original request.
-* It will be automatically created with the persistent marks.
-* If it is a propagation, no need to create a new slice
-* because it will be created when the call will be selected anyway.
-* *)
+ * to existing slices if any.
+ * If the propagation is ON, some actions are generated to propagate the
+ * persistent marks to the callers, and other actions are generated to
+ * make all the calls to [fi] visible.
+ * If there is no slice for [fi] we create a new one
+ * if it is the original request.
+ * It will be automatically created with the persistent marks.
+ * If it is a propagation, no need to create a new slice
+ * because it will be created when the call will be selected anyway.
+ * *)
 let add_persistent_marks fi node_marks orig propagate actions =
   let new_fi_marks, actions =
     Fct_slice.add_marks_to_fi fi node_marks propagate actions
   in
   let actions = match M.fi_slices fi with
     | [] -> (* no slice *)
-        let actions =
-          if orig then
-            let _ff, new_actions = Fct_slice.make_new_ff fi true in
-              (* TODO catch NoPdg and mark fi as Top *)
-              new_actions @ actions
-          else actions
-        in actions
+      let actions =
+        if orig then
+          let _ff, new_actions = Fct_slice.make_new_ff fi true in
+          (* TODO catch NoPdg and mark fi as Top *)
+          new_actions @ actions
+        else actions
+      in actions
     | slices ->
-        let add_filter acc ff =
-          let a = SlicingActions.mk_ff_user_select ff node_marks in a::acc
-        in
-          List.fold_left add_filter actions slices
+      let add_filter acc ff =
+        let a = SlicingActions.mk_ff_user_select ff node_marks in a::acc
+      in
+      List.fold_left add_filter actions slices
   in
   let actions =
     if propagate && new_fi_marks then
@@ -325,29 +325,29 @@ let apply_action filter =
   let new_filters =
     try match filter with
       | T.CrFct fct_crit ->
-          begin
-            try (apply_fct_action fct_crit)
-            with PdgTypes.Pdg.Bottom ->
-              SlicingParameters.debug ~level:1 "  -> action ABORTED (PDG is bottom)" ;
-              []
-          end
-    | T.CrAppli appli_crit ->
-          apply_appli_crit appli_crit
+        begin
+          try (apply_fct_action fct_crit)
+          with PdgTypes.Pdg.Bottom ->
+            SlicingParameters.debug ~level:1 "  -> action ABORTED (PDG is bottom)" ;
+            []
+        end
+      | T.CrAppli appli_crit ->
+        apply_appli_crit appli_crit
     with Not_found -> (* catch unprocessed Not_found here *) assert false
   in
-    SlicingParameters.debug ~level:1 "  -> %d generated filters : %a@."
-        (List.length new_filters)
-        SlicingActions.print_list_crit new_filters;
-    new_filters
+  SlicingParameters.debug ~level:1 "  -> %d generated filters : %a@."
+    (List.length new_filters)
+    SlicingActions.print_list_crit new_filters;
+  new_filters
 
 let get_next_filter () =
   let proj = SlicingState.get () in
   match proj.T.actions with
-    | [] ->
-      SlicingParameters.debug ~level:2
-        "[SlicingProject.get_next_filter] No more filter";
-      raise Not_found
-    | f :: tail -> proj.T.actions <- tail; f
+  | [] ->
+    SlicingParameters.debug ~level:2
+      "[SlicingProject.get_next_filter] No more filter";
+    raise Not_found
+  | f :: tail -> proj.T.actions <- tail; f
 
 let apply_next_action () =
   SlicingParameters.debug ~level:2 "[SlicingProject.apply_next_action]";
@@ -364,11 +364,11 @@ let apply_all_actions () =
   let proj = SlicingState.get () in
   let nb_actions = List.length proj.T.actions in
   let rec apply actions = match actions with [] -> ()
-    | a::actions ->
-        SlicingParameters.feedback ~level:2 "applying sub action...";
-        let new_filters = apply_action a in
-          apply new_filters;
-          apply actions
+                                           | a::actions ->
+                                             SlicingParameters.feedback ~level:2 "applying sub action...";
+                                             let new_filters = apply_action a in
+                                             apply new_filters;
+                                             apply actions
   in
   SlicingParameters.feedback ~level:1 "applying %d actions..." nb_actions;
   let rec apply_user n =

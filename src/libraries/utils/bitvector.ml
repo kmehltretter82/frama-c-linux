@@ -25,7 +25,7 @@
 (* ------------------------------------------------------------------------ *)
 
 (* Notes:
-   - Bits are counted from 0, in string order, then from least to 
+   - Bits are counted from 0, in string order, then from least to
      most significant. For instance the value of bit 11 is tested
      with (s.[1] land (1 lsl 3) == 0)
    - Strings can store more bits than the bitvector they represent;
@@ -34,8 +34,8 @@
      bitvector, which has to be provided in some informations (such as
      concat). We rely on the invariant that the extra bits are set to
      0 (this is important e.g. for equality testing). An alternative
-     design could have been not to explicitly ignore these extra bits 
-     in operations that are sensitive to them, but this seems more 
+     design could have been not to explicitly ignore these extra bits
+     in operations that are sensitive to them, but this seems more
      error-prone. *)
 
 type t = bytes
@@ -242,7 +242,7 @@ let concat bv1 size1 bv2 size2 =
   if fst_bits = 0 then
     (Bytes.blit bv2 0 copy len1 str2;
      copy)
-    
+
   (* Not aligned. *)
   else
     let rec loop prev_byte i =
@@ -265,7 +265,7 @@ let iter_true f s =
     if x <> 0 then
       let q = p lsl 3 in
       for r = 0 to 7 do
-	if x land (1 lsl r) <> 0 then f (q+r)
+        if x land (1 lsl r) <> 0 then f (q+r)
       done
   done
 
@@ -285,16 +285,16 @@ let find_next_true s k =
   try
     begin
       for r' = r to 7 do
-	if x land (1 lsl r') <> 0
-	then raise (Result ((p lsl 3) lor r'))
+        if x land (1 lsl r') <> 0
+        then raise (Result ((p lsl 3) lor r'))
       done;
       for p' = (p+1) to (Bytes.length s - 1) do
-	let x = int_of_char (Bytes.get s p') in
-	if x <> 0 then
-	  for r' = 0 to 7 do
-	    if x land (1 lsl r') <> 0
-	    then raise (Result ((p' lsl 3) lor r'))
-	  done
+        let x = int_of_char (Bytes.get s p') in
+        if x <> 0 then
+          for r' = 0 to 7 do
+            if x land (1 lsl r') <> 0
+            then raise (Result ((p' lsl 3) lor r'))
+          done
       done;
       raise Not_found
     end

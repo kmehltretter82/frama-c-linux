@@ -40,14 +40,14 @@ class virtual do_it_ = object(self)
     begin match base with
       | Var _ -> ()
       | Mem e ->
-          let state =
-            Db.Value.get_state (Kstmt (Option.get self#current_stmt))
-          in
-          let r = !Db.Value.eval_expr state e in
-          let loc = loc_bytes_to_loc_bits r in
-          let size = Bit_utils.sizeof_lval lv in
-          self#join
-            (enumerate_valid_bits Read (make_loc loc size))
+        let state =
+          Db.Value.get_state (Kstmt (Option.get self#current_stmt))
+        in
+        let r = !Db.Value.eval_expr state e in
+        let loc = loc_bytes_to_loc_bits r in
+        let size = Bit_utils.sizeof_lval lv in
+        self#join
+          (enumerate_valid_bits Read (make_loc loc size))
     end;
     DoChildren
 
@@ -66,7 +66,7 @@ module Analysis = Cumulative_analysis.Make(
     module T = Locations.Zone
 
     class virtual do_it = do_it_
-end)
+  end)
 
 let get_internal = Analysis.kernel_function
 
@@ -78,10 +78,10 @@ let externalize _return fundec x =
 module Externals =
   Kernel_function.Make_Table(Locations.Zone)
     (struct
-       let name = "Inout.Derefs.Externals"
-       let dependencies = [ Analysis.Memo.self ]
-       let size = 17
-     end)
+      let name = "Inout.Derefs.Externals"
+      let dependencies = [ Analysis.Memo.self ]
+      let size = 17
+    end)
 
 let get_external =
   Externals.memo

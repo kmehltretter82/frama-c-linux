@@ -23,14 +23,14 @@
 (** Journalize the API of a callgraph *)
 
 module Make
-  (C: sig
-    val name: string
-    val dump: unit -> unit
-    val compute: unit -> unit
-    type t
-    val ty: t Type.t
-    val get: unit -> t
-  end):
+    (C: sig
+       val name: string
+       val dump: unit -> unit
+       val compute: unit -> unit
+       type t
+       val ty: t Type.t
+       val get: unit -> t
+     end):
 sig
   val dump: unit -> unit
   val compute: unit -> unit

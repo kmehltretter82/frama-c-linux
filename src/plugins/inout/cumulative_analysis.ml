@@ -37,26 +37,26 @@ let fold_implicit_initializer typ =
 
 let specialize_state_on_call ?stmt kf =
   match stmt with
-    | Some ({ skind = Instr (Call (_, _, l, _)) } as stmt) ->
-        let at_stmt = Db.Value.get_stmt_state stmt in
-        if Cvalue.Model.is_top at_stmt then
-          Cvalue.Model.top (* can occur with -no-results-function option *)
-        else !Db.Value.add_formals_to_state at_stmt kf l
-    | Some
-        ({skind =
-            Instr(Local_init(v, ConsInit(_,args,kind),_))} as stmt) ->
-      let at_stmt = Db.Value.get_stmt_state stmt in
-      if Cvalue.Model.is_top at_stmt then
-        Cvalue.Model.top
-      else begin
-        let args =
-          match kind with
-          | Constructor -> Cil.mkAddrOfVi v :: args
-          | Plain_func -> args
-        in
-        !Db.Value.add_formals_to_state at_stmt kf args
-      end
-    | _ -> Db.Value.get_initial_state kf
+  | Some ({ skind = Instr (Call (_, _, l, _)) } as stmt) ->
+    let at_stmt = Db.Value.get_stmt_state stmt in
+    if Cvalue.Model.is_top at_stmt then
+      Cvalue.Model.top (* can occur with -no-results-function option *)
+    else !Db.Value.add_formals_to_state at_stmt kf l
+  | Some
+      ({skind =
+          Instr(Local_init(v, ConsInit(_,args,kind),_))} as stmt) ->
+    let at_stmt = Db.Value.get_stmt_state stmt in
+    if Cvalue.Model.is_top at_stmt then
+      Cvalue.Model.top
+    else begin
+      let args =
+        match kind with
+        | Constructor -> Cil.mkAddrOfVi v :: args
+        | Plain_func -> args
+      in
+      !Db.Value.add_formals_to_state at_stmt kf args
+    end
+  | _ -> Db.Value.get_initial_state kf
 
 
 class virtual ['a] cumulative_visitor = object
@@ -84,23 +84,23 @@ end
 
 
 module Make (X:
-  sig
-    val analysis_name: string
+             sig
+               val analysis_name: string
 
-    type t
-    module T: Datatype.S with type t = t
+               type t
+               module T: Datatype.S with type t = t
 
-    class virtual do_it: [t] cumulative_class
-  end) =
+               class virtual do_it: [t] cumulative_class
+             end) =
 struct
 
   module Memo =
     Kernel_function.Make_Table(X.T)
       (struct
-         let name = "Inout.Cumulative_analysis.Memo(" ^ X.analysis_name ^ ")"
-         let dependencies = [ Db.Value.self ]
-         let size = 97
-       end)
+        let name = "Inout.Cumulative_analysis.Memo(" ^ X.analysis_name ^ ")"
+        let dependencies = [ Db.Value.self ]
+        let size = 97
+      end)
 
   class do_it_cached call_stack = object(self)
     inherit X.do_it
@@ -161,8 +161,8 @@ struct
            do not cache the results. Maybe [compute_funspec] will be able
            to deliver a more precise result on this given statement *)
         match self#current_stmt with
-          | None -> self#compute_kf_with_spec_generic kf
-          | Some _stmt -> self#compute_funspec kf
+        | None -> self#compute_kf_with_spec_generic kf
+        | Some _stmt -> self#compute_funspec kf
       else
         try Memo.find kf
         with Not_found -> self#compute_kf_with_def kf

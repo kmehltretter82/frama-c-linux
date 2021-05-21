@@ -21,24 +21,24 @@
 (**************************************************************************)
 
 include Plugin.Register
-  (struct
-     let name = "sparecode"
-     let shortname = "sparecode"
-     let help = "code cleaner"
-   end)
+    (struct
+      let name = "sparecode"
+      let shortname = "sparecode"
+      let help = "code cleaner"
+    end)
 
 module Analysis =
   False(struct
-          let option_name = "-sparecode"
-          let help = "perform a spare code analysis"
-        end)
+    let option_name = "-sparecode"
+    let help = "perform a spare code analysis"
+  end)
 let () = Analysis.add_aliases ["-sparecode-analysis"]
 
 module Annot =
   True(struct
-         let option_name = "-sparecode-annot"
-         let help = "select more things to keep every reachable annotation"
-       end)
+    let option_name = "-sparecode-annot"
+    let help = "select more things to keep every reachable annotation"
+  end)
 
 module GlobDecl =
   False(struct

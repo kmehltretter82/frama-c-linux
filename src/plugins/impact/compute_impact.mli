@@ -52,7 +52,7 @@ val nodes_to_stmts: nodes -> stmt list
 val impact_in_kf: result -> Cil_types.kernel_function -> nodes
 
 val skip: unit -> Locations.Zone.t
-  (** computed from the option [-impact-skip] *)
+(** computed from the option [-impact-skip] *)
 
 (*
 Local Variables:

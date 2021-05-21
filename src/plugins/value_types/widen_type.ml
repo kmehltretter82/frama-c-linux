@@ -56,35 +56,35 @@ let empty = {
 }
 
 include Datatype.Make(struct
-  include Datatype.Serializable_undefined
-  type t = widen_hints
-  let name = "Widen_type.widen_hints"
-  let structural_descr =
-    Structural_descr.t_tuple
-      [| Priority_bases_stmt.packed_descr;
-         Ival.Widen_Hints.packed_descr;
-         Fc_float.Widen_Hints.packed_descr;
-         Num_hints_stmt.packed_descr;
-         Float_hints_stmt.packed_descr;
-         Num_hints_bases.packed_descr;
-         Float_hints_bases.packed_descr;
-         Num_hints_bases_stmt.packed_descr;
-         Float_hints_bases_stmt.packed_descr |]
-  let reprs =
-    Extlib.product
-      (fun wh fh ->
-         { priority_bases = Stmt.Map.empty;
-           default_hints = wh;
-           default_float_hints = fh;
-           default_hints_by_stmt = Stmt.Map.empty;
-           default_float_hints_by_stmt = Stmt.Map.empty;
-           hints_by_addr = Base.Map.empty;
-           float_hints_by_addr = Base.Map.empty;
-           float_hints_by_addr_by_stmt = Stmt.Map.empty;
-           hints_by_addr_by_stmt = Stmt.Map.empty
-         })
-      Ival.Widen_Hints.reprs Fc_float.Widen_Hints.reprs
-  let mem_project = Datatype.never_any_project
+    include Datatype.Serializable_undefined
+    type t = widen_hints
+    let name = "Widen_type.widen_hints"
+    let structural_descr =
+      Structural_descr.t_tuple
+        [| Priority_bases_stmt.packed_descr;
+           Ival.Widen_Hints.packed_descr;
+           Fc_float.Widen_Hints.packed_descr;
+           Num_hints_stmt.packed_descr;
+           Float_hints_stmt.packed_descr;
+           Num_hints_bases.packed_descr;
+           Float_hints_bases.packed_descr;
+           Num_hints_bases_stmt.packed_descr;
+           Float_hints_bases_stmt.packed_descr |]
+    let reprs =
+      Extlib.product
+        (fun wh fh ->
+           { priority_bases = Stmt.Map.empty;
+             default_hints = wh;
+             default_float_hints = fh;
+             default_hints_by_stmt = Stmt.Map.empty;
+             default_float_hints_by_stmt = Stmt.Map.empty;
+             hints_by_addr = Base.Map.empty;
+             float_hints_by_addr = Base.Map.empty;
+             float_hints_by_addr_by_stmt = Stmt.Map.empty;
+             hints_by_addr_by_stmt = Stmt.Map.empty
+           })
+        Ival.Widen_Hints.reprs Fc_float.Widen_Hints.reprs
+    let mem_project = Datatype.never_any_project
   end)
 
 let join wh1 wh2 =
@@ -174,15 +174,15 @@ let hints_for_base default_hints hints_by_base b =
     | b ->
       let validity = Base.validity b in
       match validity with
-        | Base.Known (_, m)
-        | Base.Unknown (_, _, m)
-        | Base.Variable { Base.max_alloc = m } ->
-          (* Try the frontier of the block: further accesses are invalid
-             anyway. This also works great for constant strings (this computes
-             the offset of the null terminator). *)
-          let bound = Integer.(pred (e_div (succ m) eight)) in
-          Ival.Widen_Hints.add bound widen_zero
-        | Base.Empty | Base.Invalid -> widen_zero
+      | Base.Known (_, m)
+      | Base.Unknown (_, _, m)
+      | Base.Variable { Base.max_alloc = m } ->
+        (* Try the frontier of the block: further accesses are invalid
+           anyway. This also works great for constant strings (this computes
+           the offset of the null terminator). *)
+        let bound = Integer.(pred (e_div (succ m) eight)) in
+        Ival.Widen_Hints.add bound widen_zero
+      | Base.Empty | Base.Invalid -> widen_zero
   )
 
 let hints_from_keys stmt h =

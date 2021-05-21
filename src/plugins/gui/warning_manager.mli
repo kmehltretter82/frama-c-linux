@@ -26,7 +26,7 @@ type t
 (** Type of the widget containing the warnings. *)
 
 val make :
-  packing:(GObj.widget -> unit) -> 
+  packing:(GObj.widget -> unit) ->
   callback:(Log.event -> GTree.view_column -> unit) -> t
 (** Build a new widget for storing the warnings. *)
 

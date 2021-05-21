@@ -28,9 +28,9 @@ let log_imprecision s = Lattice_messages.emit_imprecision emitter s
 
 module type Type = sig
   (* Binary abstract operations do not model precisely float/integer operations.
-   It is the responsibility of the callers to have two operands of the same
-   implicit type. The only exception is for [singleton_zero], which is the
-   correct representation of [0.] *)
+     It is the responsibility of the callers to have two operands of the same
+     implicit type. The only exception is for [singleton_zero], which is the
+     correct representation of [0.] *)
   type t = private
     | Bottom
     | Int of Int_val.t
@@ -922,7 +922,7 @@ let cast_float_to_int_inverse ~single_precision i =
               [(int)((real)min-epsilon)] would return [min-1]. Hence, we can
               simply return the float corresponding to [min] -- which can be
               represented precisely given [exact_min] and [exact_max]. *)
-        Int.to_float min 
+        Int.to_float min
     in
     (* All operations are dual w.r.t. the min bound. *)
     let maxf =

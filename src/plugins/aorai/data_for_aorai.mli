@@ -100,7 +100,7 @@ val is_single: seq_elt -> bool
 (** Returns a string guaranteed not to clash with C/ACSL keywords or an
     existing global.
     @since Nitrogen-20111001
- *)
+*)
 val get_fresh: string -> string
 
 (* Logic variables *)
@@ -165,7 +165,7 @@ val macro_pure   : string
 
 (** returns the C variable associated to a given state
     (non-deterministic mode only).
- *)
+*)
 val get_state_var: state -> varinfo
 
 (** returns the logic variable associated to a given state.
@@ -291,20 +291,20 @@ val set_returninfo : string -> Cil_types.varinfo -> unit
     If the variable is not found then an error message is print and an assert false is raised. *)
 val get_returninfo : string -> Cil_types.varinfo
 
-(** Given the representation of an auxiliary counter 
+(** Given the representation of an auxiliary counter
     (found in a {!Promelaast.Counter_incr}), returns the maximal value
     that it can take according to the automaton.
- *)
+*)
 val find_max_value: Cil_types.term -> Cil_types.term option
 
 (** information we have about the range of values that an auxiliary variable
     can take.
- *)
+*)
 type range =
   | Fixed of int (** constant value *)
   | Interval of int * int (** range of values *)
   | Bounded of int * Cil_types.term
-    (** range bounded by a logic term (depending on program parameter). *)
+  (** range bounded by a logic term (depending on program parameter). *)
   | Unbounded of int (** only the lower bound is known,
                          there is no upper bound *)
   | Unknown (** completely unknown relation. *)
@@ -324,7 +324,7 @@ val absolute_range: Cil_types.term -> int -> Range.t
 
 (** Given an auxiliary variable, a base for its variations and two ranges of
     variations, returns a range that encompasses both.
- *)
+*)
 val merge_range:
   Cil_types.term -> Cil_types.term -> Range.t -> Range.t -> Range.t
 
@@ -332,17 +332,17 @@ val merge_range:
 
 val tlval: Cil_types.term_lval -> Cil_types.term
 
-(** The propagated state: Mapping from possible start states 
-    to reachable states, with 
-     - set of states for the initial transition leading to the corresponding
+(** The propagated state: Mapping from possible start states
+    to reachable states, with
+    - set of states for the initial transition leading to the corresponding
        reachable state.
-     - set of states for the last transition.
-     - possible values for intermediate variables.
- *)
-type end_state = 
-    (Aorai_state.Set.t * Aorai_state.Set.t * Vals.t) Aorai_state.Map.t
+    - set of states for the last transition.
+    - possible values for intermediate variables.
+*)
+type end_state =
+  (Aorai_state.Set.t * Aorai_state.Set.t * Vals.t) Aorai_state.Map.t
 
-module Case_state: 
+module Case_state:
   Datatype.S with type t = end_state Aorai_state.Map.t
 
 type state = Case_state.t
@@ -352,11 +352,11 @@ val pretty_end_state: Aorai_state.t -> Format.formatter -> end_state -> unit
 val pretty_state: Format.formatter -> state -> unit
 
 (** [included_state st1 st2] is [true] iff [st1] is included in [st2], i.e:
-  - possible start states of [st1] are included in [st2]
-  - for each possible start state, reachable states in [st1] are included in
-    the one of [st2]
-  - for each possible path in [st1], range of possible values for intermediate
-    variables are included in the corresponding one in [st2].
+    - possible start states of [st1] are included in [st2]
+    - for each possible start state, reachable states in [st1] are included in
+      the one of [st2]
+    - for each possible path in [st1], range of possible values for intermediate
+      variables are included in the corresponding one in [st2].
 *)
 val included_state: state -> state -> bool
 
@@ -373,7 +373,7 @@ val merge_state: state -> state -> state
 (** Register a new init state for kernel function.
     If there is already an init state registered, the new one is merged with
     the old.
- *)
+*)
 val set_kf_init_state: Kernel_function.t -> state -> unit
 
 (** Register a new end state for kernel function.
@@ -406,7 +406,7 @@ val get_loop_init_state: Cil_types.stmt -> state
 val get_loop_invariant_state: Cil_types.stmt -> state
 
 val debug_computed_state: ?dkey:Aorai_option.category -> unit -> unit
-(** Pretty-prints all computed states. Default key is dataflow. *) 
+(** Pretty-prints all computed states. Default key is dataflow. *)
 
 (* ************************************************************************* *)
 (**{b Enumeration management}*)
@@ -439,7 +439,7 @@ val get_usedinfo : string -> Cil_types.enuminfo
 (** Simplify the automaton by removing transitions and states that are
     never active during an execution of the program.
     @raise Empty_automaton if the simplification result in an empty automaton.
- *)
+*)
 val removeUnusedTransitionsAndStates : unit -> unit
 
 (*

@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** The aim here is to select the statements where a data D
-* has the same value then a given starting program point L. *)
+ * has the same value then a given starting program point L. *)
 
 open Cil_types
 
@@ -31,17 +31,17 @@ let () = Plugin.default_msg_keys [cat_rm_asserts_name]
 module R =
   Plugin.Register
     (struct
-       let name = "scope"
-       let shortname = "scope"
-       let help = "data dependencies higher level functions"
-     end)
+      let name = "scope"
+      let shortname = "scope"
+      let help = "data dependencies higher level functions"
+    end)
 
 let cat_rm_asserts = R.register_category cat_rm_asserts_name
 
 (** {2 Computing a mapping between zones and modifying statements}
-We first go through all the function statements in other to build
-a mapping between each zone and the statements that are modifying it.
-**)
+    We first go through all the function statements in other to build
+    a mapping between each zone and the statements that are modifying it.
+ **)
 
 (** Statement identifier *)
 module StmtDefault = struct
@@ -87,8 +87,8 @@ let get_lval_zones ~for_writing stmt lval =
   dpds, exact, zone
 
 (** Add to [stmt] to [lmap] for all the locations modified by the statement.
-* Something to do only for calls and assignments.
-* *)
+ * Something to do only for calls and assignments.
+ * *)
 let register_modified_zones lmap stmt =
   let register lmap zone = InitSid.add_zone lmap zone stmt in
   let aux_out kf out =
@@ -96,46 +96,46 @@ let register_modified_zones lmap stmt =
     Locations.Zone.join out inout.Inout_type.over_outputs
   in
   match stmt.skind with
-      | Instr (Set (lval, _, _)) ->
+  | Instr (Set (lval, _, _)) ->
+    let _dpds, _, zone =
+      get_lval_zones ~for_writing:true  stmt lval
+    in
+    register lmap zone
+  | Instr (Local_init(v, i, _)) ->
+    let _, _, zone = get_lval_zones ~for_writing:true stmt (Cil.var v) in
+    let lmap_init = register lmap zone in
+    (match i with
+     | AssignInit _ -> lmap_init
+     | ConsInit(f,_,_) ->
+       let kf = Globals.Functions.get f in
+       let out = aux_out kf Locations.Zone.bottom in
+       register lmap_init out)
+  | Instr (Call (dst,funcexp,_args,_)) ->
+    begin
+      let lmap = match dst with
+        | None -> lmap
+        | Some lval ->
           let _dpds, _, zone =
-            get_lval_zones ~for_writing:true  stmt lval
+            get_lval_zones ~for_writing:true stmt lval
           in
           register lmap zone
-      | Instr (Local_init(v, i, _)) ->
-        let _, _, zone = get_lval_zones ~for_writing:true stmt (Cil.var v) in
-        let lmap_init = register lmap zone in
-        (match i with
-         | AssignInit _ -> lmap_init
-         | ConsInit(f,_,_) ->
-           let kf = Globals.Functions.get f in
-           let out = aux_out kf Locations.Zone.bottom in
-           register lmap_init out)
-      | Instr (Call (dst,funcexp,_args,_)) ->
-          begin
-            let lmap = match dst with
-              | None -> lmap
-              | Some lval ->
-                let _dpds, _, zone =
-                  get_lval_zones ~for_writing:true stmt lval
-                in
-                register lmap zone
-            in
-            let _, kfs =
-              !Db.Value.expr_to_kernel_function ~deps:None (Kstmt stmt) funcexp
-            in
-            let out =
-              Kernel_function.Hptset.fold aux_out kfs Locations.Zone.bottom
-            in
-            register lmap out
-          end
-      | _ -> lmap
+      in
+      let _, kfs =
+        !Db.Value.expr_to_kernel_function ~deps:None (Kstmt stmt) funcexp
+      in
+      let out =
+        Kernel_function.Hptset.fold aux_out kfs Locations.Zone.bottom
+      in
+      register lmap out
+    end
+  | _ -> lmap
 
 
 (** compute the mapping for the function
  * @raise Kernel_function.No_Definition if [kf] has no definition
- *)
+*)
 let compute kf =
-   R.debug ~level:1 "computing for function %a" Kernel_function.pretty kf;
+  R.debug ~level:1 "computing for function %a" Kernel_function.pretty kf;
   let f = Kernel_function.get_definition kf in
   let do_stmt lmap s =
     Cil.CurrentLoc.set (Cil_datatype.Stmt.loc s);
@@ -145,7 +145,7 @@ let compute kf =
   in
   let f_datas = List.fold_left do_stmt InitSid.empty f.sallstmts in
   R.debug ~level:2 "data init stmts : %a" InitSid.pretty f_datas;
-    f.sallstmts, f_datas (* TODO : store it ! *)
+  f.sallstmts, f_datas (* TODO : store it ! *)
 
 (** {2 Computing Scopes} *)
 
@@ -198,20 +198,20 @@ module State = struct
   type t = Start | NotSeen | Modif | SameVal
 
   let pretty fmt b = Format.fprintf fmt "%s" (match b with
-                                                | Start -> "Start"
-                                                | NotSeen -> "NotSeen"
-                                                | Modif -> "Modif"
-                                                | SameVal -> "SameVal")
+      | Start -> "Start"
+      | NotSeen -> "NotSeen"
+      | Modif -> "Modif"
+      | SameVal -> "SameVal")
 
   let bottom = NotSeen
 
   (* Just compute the "max" between elements of the lattice. *)
   let merge b1 b2 =
     let b = match b1, b2 with
-    | Start, _ | _, Start -> Start
-    | NotSeen, b | b, NotSeen -> b
-    | Modif, _ | _, Modif -> Modif
-    | SameVal, SameVal -> SameVal
+      | Start, _ | _, Start -> Start
+      | NotSeen, b | b, NotSeen -> b
+      | Modif, _ | _, Modif -> Modif
+      | SameVal, SameVal -> SameVal
     in b
   let join = merge;;
 
@@ -247,8 +247,8 @@ let backward_data_scope modif_stmts s kf =
   let modified s = StmtSetLattice.mem s modif_stmts in
   let module Fenv = (val Dataflows.function_env kf: Dataflows.FUNCTION_ENV) in
   let module Arg = struct
-      include BackwardScope(struct let modified = modified end)
-      let init = [(s,State.Start)];;
+    include BackwardScope(struct let modified = modified end)
+    let init = [(s,State.Start)];;
   end in
   let module Compute = Dataflows.Simple_backward(Fenv)(Arg) in
   Compute.pre_state
@@ -301,16 +301,16 @@ let forward_data_scope modif_stmts modif_edge s kf =
 (* Add only 'simple' statements. *)
 let add_s s acc =
   match s.skind with
-    | Instr _ | Return _ | Continue _ | Break _ | Goto _ | Throw _
-        -> Cil_datatype.Stmt.Hptset.add s acc
-    | Block _ | Switch _ | If _ | UnspecifiedSequence _ | Loop _
-    | TryExcept _ | TryFinally _ | TryCatch _
-        -> acc
+  | Instr _ | Return _ | Continue _ | Break _ | Goto _ | Throw _
+    -> Cil_datatype.Stmt.Hptset.add s acc
+  | Block _ | Switch _ | If _ | UnspecifiedSequence _ | Loop _
+  | TryExcept _ | TryFinally _ | TryCatch _
+    -> acc
 
 (** Do backward and then forward propagations and compute the 3 statement sets :
-* - forward only,
-* - forward and backward,
-* - backward only.
+ * - forward only,
+ * - forward and backward,
+ * - backward only.
 *)
 let find_scope allstmts modif_stmts modif_edge s kf =
   (* Add only statements for which the lvalue certainly did not change. *)
@@ -404,9 +404,9 @@ let is_modified_by_edge kf z s1 s2 =
   Locations.Zone.intersects z (PairStmts.Hashtbl.find modifs_edge (s1, s2))
 
 (** Try to find the statement set where [data] has the same value than
-* before [stmt].
+ * before [stmt].
  * @raise Kernel_function.No_Definition if [kf] has no definition
- *)
+*)
 let get_data_scope_at_stmt kf stmt lval =
   let dpds, _, zone = get_lval_zones ~for_writing:false stmt lval in
   (* TODO : is there something to do with 'exact' ? *)
@@ -419,15 +419,15 @@ let get_data_scope_at_stmt kf stmt lval =
   in
   R.debug
     "@[<hv 4>get_data_scope_at_stmt %a at %d @\n\
-                   modified by = %a@\n\
-                   f = %a@\nfb = %a@\nb = %a@]"
-      (* stmt at *)
+     modified by = %a@\n\
+     f = %a@\nfb = %a@\nb = %a@]"
+    (* stmt at *)
     Locations.Zone.pretty zone stmt.sid
-      (* modified by *)
+    (* modified by *)
     (Pretty_utils.pp_iter
        StmtSetLattice.iter ~sep:",@ " Cil_datatype.Stmt.pretty_sid)
     modif_stmts
-      (* scope *)
+    (* scope *)
     Cil_datatype.Stmt.Hptset.pretty f_scope
     Cil_datatype.Stmt.Hptset.pretty fb_scope
     Cil_datatype.Stmt.Hptset.pretty b_scope;
@@ -436,27 +436,27 @@ let get_data_scope_at_stmt kf stmt lval =
 exception ToDo
 
 let get_annot_zone kf stmt annot =
-    let add_zone z info =
-      let s = info.Db.Properties.Interp.To_zone.ki in
-      let before = info.Db.Properties.Interp.To_zone.before in
-      let zone = info.Db.Properties.Interp.To_zone.zone in
-        R.debug ~level:2 "[forward_prop_scope] need %a %s stmt %d@."
-          Locations.Zone.pretty zone
-          (if before then "before" else "after") s.sid;
-        if before && stmt.sid = s.sid then
-          Locations.Zone.join zone z
-        else (* TODO *)
-          raise ToDo
-    in
-    let (info, _), _ =
-      !Db.Properties.Interp.To_zone.from_stmt_annot annot (stmt, kf)
-    in
-    match info with
-      | None -> raise ToDo
-      | Some info ->
-          let zone = List.fold_left add_zone Locations.Zone.bottom info in
-            R.debug "[get_annot_zone] need %a" Locations.Zone.pretty zone ;
-            zone
+  let add_zone z info =
+    let s = info.Db.Properties.Interp.To_zone.ki in
+    let before = info.Db.Properties.Interp.To_zone.before in
+    let zone = info.Db.Properties.Interp.To_zone.zone in
+    R.debug ~level:2 "[forward_prop_scope] need %a %s stmt %d@."
+      Locations.Zone.pretty zone
+      (if before then "before" else "after") s.sid;
+    if before && stmt.sid = s.sid then
+      Locations.Zone.join zone z
+    else (* TODO *)
+      raise ToDo
+  in
+  let (info, _), _ =
+    !Db.Properties.Interp.To_zone.from_stmt_annot annot (stmt, kf)
+  in
+  match info with
+  | None -> raise ToDo
+  | Some info ->
+    let zone = List.fold_left add_zone Locations.Zone.bottom info in
+    R.debug "[get_annot_zone] need %a" Locations.Zone.pretty zone ;
+    zone
 
 
 module CA_Map = Cil_datatype.Code_annotation.Map
@@ -525,8 +525,8 @@ let code_annot_is_volatile ca =
   with VolatileFound -> true
 
 (** Return the set of stmts ([scope]) where [annot] has the same value
-   as at [stmt], and adds to [proven] the annotations that are identical to
-   [annot] at statements that are both in [scope] and dominated by [stmt].
+    as at [stmt], and adds to [proven] the annotations that are identical to
+    [annot] at statements that are both in [scope] and dominated by [stmt].
     [stmt] is not added to the set, and [annot] is not added to [proven]. *)
 let get_prop_scope_at_stmt ~warn kf stmt ?(proven=CA_Map.empty) annot =
   R.debug "[get_prop_scope_at_stmt] at stmt %d in %a : %a"
@@ -535,32 +535,32 @@ let get_prop_scope_at_stmt ~warn kf stmt ?(proven=CA_Map.empty) annot =
   let acc = (Cil_datatype.Stmt.Hptset.empty, proven) in
   if code_annot_is_volatile annot then acc
   else
-  try
-    let zone =  get_annot_zone kf stmt annot in
-    let allstmts, info = compute kf in
-    let modif_stmts = InitSid.find info zone in
-    let modifs_edge = is_modified_by_edge kf zone in
-    let pre_state, _ = forward_data_scope modif_stmts modifs_edge stmt kf in
-    begin match annot.annot_content with
-      | AAssert _ -> ()
-      | _ -> R.abort "only 'assert' are handled by get_prop_scope_at_stmt"
-    end;
-    let add ((acc_scope, acc_to_be_rm) as acc) s = match pre_state s with
-      | State.SameVal ->
-        if Dominators.dominates stmt s && not (Cil_datatype.Stmt.equal stmt s)
-        then
-          let acc_scope = add_s s acc_scope in
-          let acc_to_be_rm = check_stmt_annots (annot, stmt) s acc_to_be_rm in
-          (acc_scope, acc_to_be_rm)
-        else acc
-      | _ -> acc
-    in
-    List.fold_left add acc allstmts
-  with ToDo ->
-    if warn then
-      R.warning ~current:true ~once:true
-        "[get_annot_zone] don't know how to compute zone: skip this annotation";
-    acc
+    try
+      let zone =  get_annot_zone kf stmt annot in
+      let allstmts, info = compute kf in
+      let modif_stmts = InitSid.find info zone in
+      let modifs_edge = is_modified_by_edge kf zone in
+      let pre_state, _ = forward_data_scope modif_stmts modifs_edge stmt kf in
+      begin match annot.annot_content with
+        | AAssert _ -> ()
+        | _ -> R.abort "only 'assert' are handled by get_prop_scope_at_stmt"
+      end;
+      let add ((acc_scope, acc_to_be_rm) as acc) s = match pre_state s with
+        | State.SameVal ->
+          if Dominators.dominates stmt s && not (Cil_datatype.Stmt.equal stmt s)
+          then
+            let acc_scope = add_s s acc_scope in
+            let acc_to_be_rm = check_stmt_annots (annot, stmt) s acc_to_be_rm in
+            (acc_scope, acc_to_be_rm)
+          else acc
+        | _ -> acc
+      in
+      List.fold_left add acc allstmts
+    with ToDo ->
+      if warn then
+        R.warning ~current:true ~once:true
+          "[get_annot_zone] don't know how to compute zone: skip this annotation";
+      acc
 
 (** Collect the annotations that can be removed because they are redundant. *)
 class check_annot_visitor = object(self)
@@ -594,7 +594,7 @@ class check_annot_visitor = object(self)
     | GFun (fdec, _loc) when
         !Db.Value.is_called (Option.get self#current_kf) &&
         not (!Db.Value.no_results fdec)
-        ->
+      ->
       Cil.DoChildren
     | _ -> Cil.SkipChildren
 
@@ -613,8 +613,8 @@ let check_asserts () =
   R.feedback "check if there are some redundant assertions...";
   let to_be_removed = redundant_assertions () in
   let n = CA_Map.cardinal to_be_removed in
-    R.result "[check_asserts] %d assertion(s) could be removed@." n;
-    (list_proven to_be_removed)
+  R.result "[check_asserts] %d assertion(s) could be removed@." n;
+  (list_proven to_be_removed)
 
 (* erasing optional arguments, plus return a list*)
 let get_prop_scope_at_stmt kf stmt annot =
@@ -655,13 +655,13 @@ let get_data_scope_at_stmt =
   Journal.register
     "Scope.Datascope.get_data_scope_at_stmt"
     (Datatype.func3
-          Kernel_function.ty
-          Cil_datatype.Stmt.ty
-          Cil_datatype.Lval.ty
-          (Datatype.pair
-             Cil_datatype.Stmt.Hptset.ty
-             (Datatype.pair Cil_datatype.Stmt.Hptset.ty
-                            Cil_datatype.Stmt.Hptset.ty)))
+       Kernel_function.ty
+       Cil_datatype.Stmt.ty
+       Cil_datatype.Lval.ty
+       (Datatype.pair
+          Cil_datatype.Stmt.Hptset.ty
+          (Datatype.pair Cil_datatype.Stmt.Hptset.ty
+             Cil_datatype.Stmt.Hptset.ty)))
     get_data_scope_at_stmt
 
 let get_prop_scope_at_stmt =

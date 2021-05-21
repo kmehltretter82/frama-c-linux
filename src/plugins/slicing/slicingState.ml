@@ -32,9 +32,9 @@ let self = P.self
 let () =
   Cmdline.run_after_extended_stage
     (fun () ->
-      State_dependency_graph.add_codependencies
-        ~onto:self
-        [ !Db.Pdg.self; !Db.Inputs.self_external; !Db.Outputs.self_external ])
+       State_dependency_graph.add_codependencies
+         ~onto:self
+         [ !Db.Pdg.self; !Db.Inputs.self_external; !Db.Outputs.self_external ])
 
 let get () =
   try P.get ()

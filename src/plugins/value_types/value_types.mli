@@ -43,7 +43,7 @@ type callstack = call_site list
 
     Moreover, given two consecutive call-sites […(_,p);(g,_)…] in a callstack,
     program point [p] is then expected to live in function [g].
- *)
+*)
 
 module Callsite: Datatype.S_with_collections with type t = call_site
 module Callstack: sig
@@ -77,4 +77,3 @@ Local Variables:
 compile-command: "make -C ../../.."
 End:
 *)
-

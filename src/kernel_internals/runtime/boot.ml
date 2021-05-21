@@ -74,7 +74,7 @@ let () =
     ~at_normal_exit:Cmdline.run_normal_exit_hook
     ~on_error:Cmdline.run_error_exit_hook;
 
-(* Implicit exit 0 if we haven't exited yet *)
+  (* Implicit exit 0 if we haven't exited yet *)
 
 (*
 Local Variables:

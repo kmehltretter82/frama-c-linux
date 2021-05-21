@@ -25,7 +25,7 @@ let main () =
     if Options.Services.get () then begin
       if not (Services.is_computed ()) then Services.dump ()
     end else
-      if not (Cg.is_computed ()) then Cg.dump ()
+    if not (Cg.is_computed ()) then Cg.dump ()
 
 let () = Db.Main.extend main
 

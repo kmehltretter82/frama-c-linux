@@ -42,15 +42,15 @@ val map : ('a -> 'b) -> 'a t -> 'b t (** Result is shrunk. *)
 val mapi : (int -> 'a -> 'b) -> 'a t -> 'b t (** Result is shrunk. *)
 
 val find : 'a t -> ?default:'a -> ?exn:exn -> int -> 'a
-  (** Default exception is [Not_found].
-      If a [default] value is provided, no exception is raised. *)
+(** Default exception is [Not_found].
+    If a [default] value is provided, no exception is raised. *)
 
 val update : 'a t -> ?default:'a -> int -> 'a -> unit
-  (** Set value at index.
-      If the updated index is greater of equal to the vector size,
-      empty cells are inserted with the default value.
-      @raise Invalid_argument if the index is negative or when it exceeds the
-      the vector size but the default value is not provided. *)
+(** Set value at index.
+    If the updated index is greater of equal to the vector size,
+    empty cells are inserted with the default value.
+    @raise Invalid_argument if the index is negative or when it exceeds the
+    the vector size but the default value is not provided. *)
 
 val to_array : 'a t -> 'a array (** Makes a copy. *)
 val of_array : 'a array -> 'a t (** Makes a copy. *)
@@ -63,4 +63,3 @@ val resize : 'a t -> int -> unit
 
 (** Low-level interface. Sets capacity to content. *)
 val shrink : 'a t -> unit
-

@@ -62,10 +62,10 @@ class tool ?label ?tooltip ?content () =
       match details with
       | None -> hbox#coerce
       | Some w ->
-          let vbox = GPack.vbox ~show:true () in
-          vbox#pack ~expand:false hbox#coerce ;
-          vbox#pack ~expand:true ~fill:false w#coerce ;
-          vbox#coerce
+        let vbox = GPack.vbox ~show:true () in
+        vbox#pack ~expand:false hbox#coerce ;
+        vbox#pack ~expand:true ~fill:false w#coerce ;
+        vbox#coerce
 
     method tool = (self :> tool)
 
@@ -120,17 +120,17 @@ class panel () =
 
     val mutable lock = false
     val mutable tools = []
-    
+
     method add_widget (w : GObj.widget) =
       box#pack ~expand:false w
-    
+
     method add_tool (w : tool) =
       begin
         self#add_widget w#coerce ;
         w#on_active (self#active w) ;
         tools <- w :: tools ;
       end
-      
+
     method private active w a =
       if a && not lock then
         try
@@ -139,5 +139,5 @@ class panel () =
           lock <- false ;
         with e ->
           lock <- false ; raise e
-    
+
   end

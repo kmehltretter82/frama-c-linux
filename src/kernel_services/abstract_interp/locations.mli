@@ -42,7 +42,7 @@ module Location_Bytes : sig
 
   type t = private
     | Top of Base.SetLattice.t * Origin.t
-       (** Garbled mix of the addresses in the set *)
+    (** Garbled mix of the addresses in the set *)
     | Map of M.t (** Precise set of addresses+offsets *)
 
   type size_widen_hint = Ival.size_widen_hint
@@ -58,9 +58,9 @@ module Location_Bytes : sig
   include Datatype.S_with_collections with type t := t
 
   val singleton_zero : t
-    (** the set containing only the value for to the C expression [0] *)
+  (** the set containing only the value for to the C expression [0] *)
   val singleton_one : t
-    (** the set containing only the value [1] *)
+  (** the set containing only the value [1] *)
   val zero_or_one : t
 
   val is_zero : t -> bool
@@ -84,12 +84,12 @@ module Location_Bytes : sig
       bases, the offsets bound to these bases are joined. *)
 
   val diff : t -> t -> t
-    (** Over-approximation of difference. [arg2] needs to be exact or an
-        under_approximation. *)
+  (** Over-approximation of difference. [arg2] needs to be exact or an
+      under_approximation. *)
 
   val diff_if_one : t -> t -> t
-      (** Over-approximation of difference. [arg2] can be an
-          over-approximation. *)
+  (** Over-approximation of difference. [arg2] can be an
+      over-approximation. *)
 
   val shift : Ival.t -> t -> t
   val shift_under : Ival.t -> t -> t
@@ -112,31 +112,31 @@ module Location_Bytes : sig
   val topify_with_origin: Origin.t -> t -> t
   val topify_with_origin_kind: Origin.kind -> t -> t
   val inject_top_origin : Origin.t -> Base.Hptset.t -> t
-    (** [inject_top_origin origin p] creates a top with origin [origin]
-        and additional information [param] *)
+  (** [inject_top_origin origin p] creates a top with origin [origin]
+      and additional information [param] *)
   val top_with_origin: Origin.t -> t
-    (** Completely imprecise value. Use only as last resort. *)
+  (** Completely imprecise value. Use only as last resort. *)
 
 
   (* {2 Iterators} *)
 
   val fold_bases : (Base.t -> 'a -> 'a) -> t -> 'a -> 'a
-    (** Fold on all the bases of the location, including [Top bases].
-        @raise Error_Top in the case [Top Top]. *)
+  (** Fold on all the bases of the location, including [Top bases].
+      @raise Error_Top in the case [Top Top]. *)
   val fold_i : (Base.t -> Ival.t -> 'a -> 'a) -> t -> 'a -> 'a
-    (** Fold with offsets. 
-        @raise Error_Top in the cases [Top Top], [Top bases]. *)
+  (** Fold with offsets.
+      @raise Error_Top in the cases [Top Top], [Top bases]. *)
   val fold_topset_ok: (Base.t -> Ival.t -> 'a -> 'a) -> t -> 'a -> 'a
-    (** Fold with offsets, including in the case [Top bases]. In this case,
-        [Ival.top] is supplied to the iterator.
-        @raise Error_Top in the case [Top Top]. *)
+  (** Fold with offsets, including in the case [Top bases]. In this case,
+      [Ival.top] is supplied to the iterator.
+      @raise Error_Top in the case [Top Top]. *)
 
   val fold_enum : (t -> 'a -> 'a) -> t -> 'a -> 'a
-    (** [fold_enum f loc acc] enumerates the locations in [acc], and passes
-        them to [f]. Make sure to call {!cardinal_less_than} before calling
-        this function, as all possible combinations of bases/offsets are
-        presented to [f]. Raises {!Error_Top} if [loc] is [Top _] or if
-        one offset cannot be enumerated. *)
+  (** [fold_enum f loc acc] enumerates the locations in [acc], and passes
+      them to [f]. Make sure to call {!cardinal_less_than} before calling
+      this function, as all possible combinations of bases/offsets are
+      presented to [f]. Raises {!Error_Top} if [loc] is [Top _] or if
+      one offset cannot be enumerated. *)
 
   val cached_fold:
     cache_name:string ->
@@ -177,16 +177,16 @@ module Location_Bytes : sig
   val split : Base.t -> t -> Ival.t * t
 
   val get_bases : t -> Base.SetLattice.t
-    (** Returns the bases the location may point to. Never fails, but
-        may return [Base.SetLattice.Top]. *)
+  (** Returns the bases the location may point to. Never fails, but
+      may return [Base.SetLattice.Top]. *)
 
 
   (** {2 Local variables inside locations} *)
 
   val contains_addresses_of_locals : (M.key -> bool) -> t -> bool
-    (** [contains_addresses_of_locals is_local loc] returns [true]
-        if [loc] contains the address of a variable for which
-        [is_local] returns [true] *)
+  (** [contains_addresses_of_locals is_local loc] returns [true]
+      if [loc] contains the address of a variable for which
+      [is_local] returns [true] *)
 
   val remove_escaping_locals : (M.key -> bool) -> t -> bool * t
   (**  [remove_escaping_locals is_local v] removes from [v] the information
@@ -194,8 +194,8 @@ module Location_Bytes : sig
        returned boolean indicates that [v] contained some locals. *)
 
   val contains_addresses_of_any_locals : t -> bool
-    (** [contains_addresses_of_any_locals loc] returns [true] iff [loc] contains
-        the address of a local variable or of a formal variable. *)
+  (** [contains_addresses_of_any_locals loc] returns [true] iff [loc] contains
+      the address of a local variable or of a formal variable. *)
 
   (** {2 Misc} *)
 
@@ -204,20 +204,20 @@ module Location_Bytes : sig
   val is_relationable: t -> bool
 
   val may_reach : Base.t -> t -> bool
-    (** [may_reach base loc] is true if [base] might be accessed from [loc]. *)
+  (** [may_reach base loc] is true if [base] might be accessed from [loc]. *)
 
 
   val get_garbled_mix: unit -> t list
-    (** All the garbled mix that have been created so far, sorted by "temporal"
-        order of emission. *)
+  (** All the garbled mix that have been created so far, sorted by "temporal"
+      order of emission. *)
 
   val clear_garbled_mix: unit -> unit
-    (** Clear the information on created garbled mix. *)
+  (** Clear the information on created garbled mix. *)
 
   val do_track_garbled_mix: bool -> unit
   val track_garbled_mix: t -> t
 
-(**/**)
+  (**/**)
   val pretty_debug: t Pretty_utils.formatter
   val clear_caches: unit -> unit
 end
@@ -252,36 +252,36 @@ module Zone : sig
   val find: Base.t -> t -> Int_Intervals.t
 
   val mem_base : Base.t -> t -> bool
-    (** [mem_base b m] returns [true] if [b] is associated to something
-        or topified in [t], and [false] otherwise.
+  (** [mem_base b m] returns [true] if [b] is associated to something
+      or topified in [t], and [false] otherwise.
 
-        @since Carbon-20101201 *)
+      @since Carbon-20101201 *)
 
   val intersects : t -> t -> bool
 
-(** Assuming that [z1] and [z2] only contain valid bases,
-   [valid_intersects z1 z2] returns true iff [z1] and [z2] have a valid
-    intersection. *)
+  (** Assuming that [z1] and [z2] only contain valid bases,
+      [valid_intersects z1 z2] returns true iff [z1] and [z2] have a valid
+      intersection. *)
   val valid_intersects : t -> t -> bool
 
   (** {3 Folding} *)
 
   val filter_base : (Base.t -> bool) -> t -> t
-    (** [filter_base] can't raise Error_Top since it filters bases of [Top
-        bases]. Note: the filter may give an over-approximation (in the case
-        [Top Top]). *)
+  (** [filter_base] can't raise Error_Top since it filters bases of [Top
+      bases]. Note: the filter may give an over-approximation (in the case
+      [Top Top]). *)
 
   val fold_bases : (Base.t -> 'a -> 'a) -> t -> 'a -> 'a
-    (** [fold_bases] folds also bases of [Top bases].
-        @raise Error_Top in the case [Top Top]. *)
+  (** [fold_bases] folds also bases of [Top bases].
+      @raise Error_Top in the case [Top Top]. *)
 
   val fold_i : (Base.t -> Int_Intervals.t -> 'a -> 'a) -> t -> 'a -> 'a
-    (** [fold_i f l acc] folds [l] by base.
-        @raise Error_Top in the cases [Top Top], [Top bases]. *)
+  (** [fold_i f l acc] folds [l] by base.
+      @raise Error_Top in the cases [Top Top], [Top bases]. *)
 
   val fold_topset_ok : (Base.t -> Int_Intervals.t -> 'a -> 'a) -> t -> 'a -> 'a
-    (** [fold_i f l acc] folds [l] by base.
-        @raise Error_Top in the case [Top Top]. *)
+  (** [fold_i f l acc] folds [l] by base.
+      @raise Error_Top in the case [Top Top]. *)
 
   val cached_fold :
     cache_name:string ->
@@ -304,7 +304,7 @@ module Zone : sig
   (** {3 Misc} *)
   val shape: map_t -> Int_Intervals.t Hptmap.Shape(Base.Base).t
 
-(**/**)
+  (**/**)
   val clear_caches: unit -> unit
 end
 
@@ -389,7 +389,7 @@ val enumerate_valid_bits : access -> location -> Zone.t
 val enumerate_valid_bits_under : access -> location -> Zone.t
 
 val zone_of_varinfo : varinfo -> Zone.t
-  (** @since Carbon-20101201 *)
+(** @since Carbon-20101201 *)
 
 val loc_of_varinfo : varinfo -> location
 val loc_of_base : Base.t -> location

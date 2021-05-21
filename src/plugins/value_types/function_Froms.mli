@@ -52,14 +52,14 @@ end
 module DepsOrUnassigned : sig
 
   type deps_or_unassigned =
-  | DepsBottom (** Bottom of the lattice, never bound inside a memory state
-                   at a valid location. (May appear for bases for which the
-                   validity does not start at 0, currently only NULL.) *)
-  | Unassigned (** Location has never been assigned *)
-  | AssignedFrom of Deps.t (** Location guaranteed to have been overwritten,
-                               its contents depend on the [Deps.t] value *)
-  | MaybeAssignedFrom of Deps.t  (** Location may or may not have been
-                                     overwritten *)
+    | DepsBottom (** Bottom of the lattice, never bound inside a memory state
+                     at a valid location. (May appear for bases for which the
+                     validity does not start at 0, currently only NULL.) *)
+    | Unassigned (** Location has never been assigned *)
+    | AssignedFrom of Deps.t (** Location guaranteed to have been overwritten,
+                                 its contents depend on the [Deps.t] value *)
+    | MaybeAssignedFrom of Deps.t  (** Location may or may not have been
+                                       overwritten *)
   (** The lattice is [DepsBottom <= Unassigned], [DepsBottom <= AssignedFrom z],
       [Unassigned <= MaybeAssignedFrom] and
       [AssignedFrom z <= MaybeAssignedFrom z]. *)
@@ -149,9 +149,9 @@ end
 
 type froms = {
   deps_return : Memory.return
-       (** Dependencies for the returned value *);
+(** Dependencies for the returned value *);
   deps_table : Memory.t
-    (** Dependencies on all the zones modified by the function *);
+(** Dependencies on all the zones modified by the function *);
 }
 
 include Datatype.S with type t = froms
@@ -160,10 +160,10 @@ val join: froms -> froms -> froms
 
 val top: froms
 (** Display dependencies of a function, using the function's type to improve
-readability *)
+    readability *)
 val pretty_with_type: Cil_types.typ -> froms Pretty_utils.formatter
 (** Display dependencies of a function, using the function's type to improve
-readability, separating direct and indirect dependencies *)
+    readability, separating direct and indirect dependencies *)
 val pretty_with_type_indirect: Cil_types.typ -> froms Pretty_utils.formatter
 
 (** Extract the left part of a from result, ie. the zones that are written *)

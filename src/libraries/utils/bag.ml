@@ -59,11 +59,11 @@ let list = function
 
 let concat a b =
   match a,b with
-    | Empty,c | c,Empty -> c
-    | Elt x,t -> Add(x,t)
-    | t,Elt x -> App(t,x)
-    | Concat(a,b),c -> Concat(a,Concat(b,c)) (* 1-time optim *)
-    | _ -> Concat(a,b)
+  | Empty,c | c,Empty -> c
+  | Elt x,t -> Add(x,t)
+  | t,Elt x -> App(t,x)
+  | Concat(a,b),c -> Concat(a,Concat(b,c)) (* 1-time optim *)
+  | _ -> Concat(a,b)
 
 let rec ulist = function
   | [] -> Empty
@@ -125,19 +125,19 @@ let rec partition f = function
   | Empty -> Empty , Empty
   | Elt x as e -> if f x then e,Empty else Empty,e
   | Add(x,ts) ->
-      let pos,neg = partition f ts in
-      if f x then add x pos , neg else pos , add x neg
+    let pos,neg = partition f ts in
+    if f x then add x pos , neg else pos , add x neg
   | App(ts,x) ->
-      let ok = f x in
-      let pos,neg = partition f ts in
-      if ok then append pos x , neg else pos , append neg x
+    let ok = f x in
+    let pos,neg = partition f ts in
+    if ok then append pos x , neg else pos , append neg x
   | List xs ->
-      let pos,neg = List.partition f xs in
-      list pos , list neg
+    let pos,neg = List.partition f xs in
+    list pos , list neg
   | Concat(a,b) ->
-      let apos,aneg = partition f a in
-      let bpos,bneg = partition f b in
-      concat apos bpos , concat aneg bneg
+    let apos,aneg = partition f a in
+    let bpos,bneg = partition f b in
+    concat apos bpos , concat aneg bneg
 
 let rec is_empty = function
   | Empty | List [] -> true
@@ -149,18 +149,18 @@ let rec singleton = function
   | Empty | List _ -> None
   | Add(x,t) | App(t,x) -> if is_empty t then Some x else None
   | Concat(a,b) ->
-      match singleton a with
-        | Some x -> if is_empty b then Some x else None
-        | None -> if is_empty a then singleton b else None
+    match singleton a with
+    | Some x -> if is_empty b then Some x else None
+    | None -> if is_empty a then singleton b else None
 
 let rec collect t xs =
   match t with
-    | Elt x -> x :: xs
-    | Empty -> xs
-    | Add(x,t) -> x :: collect t xs
-    | App(t,x) -> collect t (x::xs)
-    | List ys -> ys @ xs
-    | Concat(a,b) -> collect a (collect b xs)
+  | Elt x -> x :: xs
+  | Empty -> xs
+  | Add(x,t) -> x :: collect t xs
+  | App(t,x) -> collect t (x::xs)
+  | List ys -> ys @ xs
+  | Concat(a,b) -> collect a (collect b xs)
 
 let elements t = collect t []
 

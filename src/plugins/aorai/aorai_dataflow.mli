@@ -25,4 +25,3 @@
 
 (** Compute the set of possible state at each function call and return. *)
 val compute: unit -> unit
-

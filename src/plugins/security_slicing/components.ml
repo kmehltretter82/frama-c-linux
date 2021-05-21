@@ -103,31 +103,31 @@ let get_node_stmt node = Key.stmt (!Db.Pdg.node_key node)
 module NodeKf = Datatype.Pair(PdgTypes.Node)(Kernel_function)
 
 (* type bwd_kind = Direct | Indirect
-type fwd_kind = Impact | Security
-type kind =
-  | Backward of bwd_kind
-  | Forward of fwd_kind
+   type fwd_kind = Impact | Security
+   type kind =
+   | Backward of bwd_kind
+   | Forward of fwd_kind
 
-(** Debugging purpose only *)
-let pretty_kind fmt = function
-  | Backward Direct -> Format.fprintf fmt "backward direct"
-  | Backward Indirect -> Format.fprintf fmt "backward indirect"
-  | Forward Security -> Format.fprintf fmt "forward"
-  | Forward Impact -> Format.fprintf fmt "impact"
+   (** Debugging purpose only *)
+   let pretty_kind fmt = function
+   | Backward Direct -> Format.fprintf fmt "backward direct"
+   | Backward Indirect -> Format.fprintf fmt "backward indirect"
+   | Forward Security -> Format.fprintf fmt "forward"
+   | Forward Impact -> Format.fprintf fmt "impact"
 *)
 
 (* Never plugged in. To be tested.
-module Memo : sig
-  val init: kind -> kernel_function -> unit
-  val push_function: stmt -> kernel_function -> unit
-  val pop_function: unit -> unit
-  val memo:
+   module Memo : sig
+   val init: kind -> kernel_function -> unit
+   val push_function: stmt -> kernel_function -> unit
+   val pop_function: unit -> unit
+   val memo:
     Pdg.t_node ->
     (unit -> (Pdg.t_node * kernel_function) list) ->
     (Pdg.t_node * kernel_function) list
-end = struct
+   end = struct
 
-  module Callstack = struct
+   module Callstack = struct
 
     type t =
         { mutable stack: (stmt * kernel_function) list;
@@ -157,21 +157,21 @@ end = struct
 
     let hash = Hashtbl.hash
 
-  end
+   end
 
-  (* *********************************************************************** *)
-  (* state: kind -> callstack -> (node * kf) -> (node * kf) list *)
+   (* *********************************************************************** *)
+   (* state: kind -> callstack -> (node * kf) -> (node * kf) list *)
 
-  module Nodekfs = Hashtbl.Make(NodeKf) (* (node * kf) -> (node * kf) list *)
+   module Nodekfs = Hashtbl.Make(NodeKf) (* (node * kf) -> (node * kf) list *)
 
-  module Callstacks = struct
+   module Callstacks = struct
     include Hashtbl.Make(Callstack) (* callstack -> nodekfs *)
     let memo tbl c =
       try find tbl c
       with Not_found -> let t = Nodekfs.create 7 in replace tbl c t; t
-  end
+   end
 
-  module Memo = struct
+   module Memo = struct
     include Hashtbl
     let memo tbl k callstack =
       try
@@ -183,18 +183,18 @@ end = struct
         Callstacks.replace callstacks callstack t;
         replace tbl k callstacks;
         t
-  end
+   end
 
-  type local_tbl = (Pdg.t_node * kernel_function) list Nodekfs.t
+   type local_tbl = (Pdg.t_node * kernel_function) list Nodekfs.t
 
-  type state =
+   type state =
       { mutable kind: kind;
         mutable callstack: Callstack.t;
         mutable local_tbl: local_tbl;
         memo_tbl: (kind, local_tbl Callstacks.t) Memo.t; }
-  (* *********************************************************************** *)
+   (* *********************************************************************** *)
 
-  let state =
+   let state =
     let spec = Cil.empty_funspec () in
     { kind = Backward Direct;
       callstack =
@@ -213,23 +213,23 @@ end = struct
       local_tbl = Nodekfs.create 0;
       memo_tbl = Hashtbl.create 5 }
 
-  let update () =
+   let update () =
     state.local_tbl <- Memo.memo state.memo_tbl state.kind state.callstack
 
-  let init k kf =
+   let init k kf =
     state.kind <- k;
     Callstack.init kf state.callstack;
     update ()
 
-  let push_function stmt kf =
+   let push_function stmt kf =
     Callstack.push stmt kf state.callstack;
     update ()
 
-  let pop_function () =
+   let pop_function () =
     Callstack.pop state.callstack;
     update ()
 
-  let memo node f =
+   let memo node f =
     let key = node, state.callstack.Callstack.current_kf in
     try
       Nodekfs.find state.local_tbl key
@@ -238,49 +238,49 @@ end = struct
       Nodekfs.replace state.local_tbl key value;
       value
 
-end
+   end
 *)
 
 (* used to enforce an invariant on [add] *)
 module Todolist : sig
   type todo = private
-      { node: PdgTypes.Node.t;
-        kf: kernel_function;
-        pdg: Db.Pdg.t;
-        callstack_length: int;
-        from_deep: bool }
+    { node: PdgTypes.Node.t;
+      kf: kernel_function;
+      pdg: Db.Pdg.t;
+      callstack_length: int;
+      from_deep: bool }
   type t = todo list
   val mk_init: kernel_function -> Db.Pdg.t -> PdgTypes.Node.t list -> todo list
-  val add: 
+  val add:
     PdgTypes.Node.t -> kernel_function -> Db.Pdg.t -> int -> bool -> t -> t
 end = struct
 
   type todo =
-      { node: PdgTypes.Node.t;
-        kf: kernel_function;
-        pdg: Db.Pdg.t;
-        callstack_length: int;
-        from_deep: bool }
+    { node: PdgTypes.Node.t;
+      kf: kernel_function;
+      pdg: Db.Pdg.t;
+      callstack_length: int;
+      from_deep: bool }
 
   type t = todo list
 
   let add n kf pdg len fd list =
     match !Db.Pdg.node_key n with
     | Key.SigKey (Signature.In Signature.InCtrl) ->
-        (* do not consider node [InCtrl]  *)
-        list
+      (* do not consider node [InCtrl]  *)
+      list
     | Key.VarDecl vi when not (Kernel.LibEntry.get () && vi.vglob) ->
-        (* do not consider variable declaration,
-           except if libEntry is set and they are globals
-           (i.e. we could have no further info about them) *)
-        list
+      (* do not consider variable declaration,
+         except if libEntry is set and they are globals
+         (i.e. we could have no further info about them) *)
+      list
     | _ ->
-        Security_slicing_parameters.debug ~level:2 "adding node %a (in %s)"
-          (!Db.Pdg.pretty_node false) n
-          (Kernel_function.get_name kf);
-        { node = n; kf = kf; pdg = pdg;
-          callstack_length = len; from_deep = fd }
-        :: list
+      Security_slicing_parameters.debug ~level:2 "adding node %a (in %s)"
+        (!Db.Pdg.pretty_node false) n
+        (Kernel_function.get_name kf);
+      { node = n; kf = kf; pdg = pdg;
+        callstack_length = len; from_deep = fd }
+      :: list
 
   let mk_init kf pdg =
     List.fold_left (fun acc n -> add n kf pdg 0 false acc) []
@@ -301,11 +301,11 @@ module Component = struct
     | Forward of fwd_kind
 
   type value =
-      { pdg: Db.Pdg.t;
-        mutable callstack_length: int;
-        mutable direct: bool;
-        mutable indirect_backward: bool;
-        mutable forward: bool }
+    { pdg: Db.Pdg.t;
+      mutable callstack_length: int;
+      mutable direct: bool;
+      mutable indirect_backward: bool;
+      mutable forward: bool }
 
   type t = value M.t
 
@@ -316,7 +316,7 @@ module Component = struct
   (** Returns [found, new_already] with:
       - [found] is [true] iff [elt] was previously added for [kind]
       - [new_already] is [already] updated with [elt] and its (new) associated
-      value. *)
+        value. *)
   let check_and_add first elt kind pdg len (already: t) =
     try
       (*        Format.printf "[security] check node %a (in %s, kind %a)@."
@@ -361,19 +361,19 @@ module Component = struct
     | Direct -> direct node
     | Indirect_Backward -> direct node @ !Db.Pdg.direct_ctrl_dpds pdg node
     | Forward Security ->
-        !Db.Pdg.direct_data_uses pdg node @ !Db.Pdg.direct_ctrl_uses pdg node
+      !Db.Pdg.direct_data_uses pdg node @ !Db.Pdg.direct_ctrl_uses pdg node
     | Forward Impact ->
-        !Db.Pdg.direct_data_uses pdg node @ !Db.Pdg.direct_ctrl_uses pdg node
-        @ !Db.Pdg.direct_addr_uses pdg node
+      !Db.Pdg.direct_data_uses pdg node @ !Db.Pdg.direct_ctrl_uses pdg node
+      @ !Db.Pdg.direct_addr_uses pdg node
 
   let search_input kind kf lazy_l =
     try
       match kind with
       | Forward _ -> Lazy.force lazy_l
       | Direct | Indirect_Backward ->
-          if !Db.Value.use_spec_instead_of_definition kf
-          then Lazy.force lazy_l
-          else []
+        if !Db.Value.use_spec_instead_of_definition kf
+        then Lazy.force lazy_l
+        else []
     with Not_found ->
       []
 
@@ -410,169 +410,169 @@ module Component = struct
           callstack_length = callstack_length; from_deep = from_deep }
         :: todolist
         ->
-          let elt = node, kf in
-          let found, result =
-            check_and_add first elt kind pdg callstack_length result
-          in
-          let todolist =
-            if found then begin
-              todolist
-            end else begin
-              Security_slicing_parameters.debug
-                ~level:2 "considering node %a (in %s)"
-                (!Db.Pdg.pretty_node false) node
-                (Kernel_function.get_name kf);
-              (* intraprocedural related_nodes *)
-              let related_nodes = one_step_related_nodes kind pdg node in
-              Security_slicing_parameters.debug ~level:3
-                "intraprocedural part done";
-              let todolist =
-                List.fold_left
-                  (fun todo n ->
-                     Todolist.add n kf pdg callstack_length false todo)
-                  todolist
-                  related_nodes
-              in
-              (* interprocedural part *)
-              let backward_from_deep compute_nodes =
-                (* [TODO optimisation:]
-                   en fait, regarder from_deep:
-                   si vrai, faire pour chaque caller
-                   sinon, faire uniquement pour le caller d'où on vient *)
-                match kind, callstack_length with
-                | (Direct | Indirect_Backward), 0 ->
-                    (* input of a deep security annotation: foreach call
-                       to [kf], compute its related nodes *)
-                    let do_caller todolist (caller, callsites) =
-                      (* Format.printf "[security of %s] search callers in %s
-                         for zone %a@."  (Kernel_function.get_name kf)
-                         (Kernel_function.get_name caller)
-                         Locations.Zone.pretty zone;*)
-                      let pdg_caller = !Db.Pdg.get caller in
-                      let do_call todolist callsite =
-                        match kind with
-                        | Direct | Indirect_Backward ->
-                            let nodes = compute_nodes pdg_caller callsite in
-                            List.fold_left
-                              (add_from_deep caller) todolist nodes
-                        | Forward _ ->
-                            todolist (* not considered here, see at end *)
-                      in
-                      List.fold_left do_call todolist callsites
-                    in
-                    List.fold_left do_caller todolist (!Db.Value.callers kf)
-                | _ ->
-                    todolist
-              in
-              let todolist =
-                match !Db.Pdg.node_key node with
-                | Key.SigKey (Signature.In Signature.InCtrl) ->
-                    assert false
-                | Key.SigKey (Signature.In (Signature.InImpl zone)) ->
-                    let compute_nodes pdg_caller callsite =
-                      let nodes, _undef_zone =
-                        !Db.Pdg.find_location_nodes_at_stmt
-                          pdg_caller callsite ~before:true zone
-                          (* TODO : use undef_zone (see FS#201)? *)
-                      in
-                      let nodes = List.map (fun (n, _z_part) -> n) nodes in
-                      (* TODO : use _z_part ? *)
-                      nodes
-                    in
-                    backward_from_deep compute_nodes
-                | Key.SigKey key ->
-                    let compute_nodes pdg_caller callsite =
-                      [ match key with
-                        | Signature.In (Signature.InNum n) ->
-                            !Db.Pdg.find_call_input_node pdg_caller callsite n
-                        | Signature.Out Signature.OutRet  ->
-                            !Db.Pdg.find_call_output_node pdg_caller callsite
-                        | Signature.In
-                            (Signature.InCtrl | Signature.InImpl _)
-                        | Signature.Out _ ->
-                            assert false ]
-                    in
-                    backward_from_deep compute_nodes
-                | Key.SigCallKey(id, key) ->
-                  (* the node is a call: search the related nodes inside the
-                     called function (see FS#155) *)
-                  if from_deep then
-                    (* already come from a deeper annotation:
-                       do not go again inside it *)
-                    todolist
-                  else
-                    let stmt = Key.call_from_id id in
-                    let called_kfs =
-                      Kernel_function.Hptset.elements
-                        (try Db.Value.call_to_kernel_function stmt
-                         with Db.Value.Not_a_call -> assert false)
-                    in
-                    let todolist =
+        let elt = node, kf in
+        let found, result =
+          check_and_add first elt kind pdg callstack_length result
+        in
+        let todolist =
+          if found then begin
+            todolist
+          end else begin
+            Security_slicing_parameters.debug
+              ~level:2 "considering node %a (in %s)"
+              (!Db.Pdg.pretty_node false) node
+              (Kernel_function.get_name kf);
+            (* intraprocedural related_nodes *)
+            let related_nodes = one_step_related_nodes kind pdg node in
+            Security_slicing_parameters.debug ~level:3
+              "intraprocedural part done";
+            let todolist =
+              List.fold_left
+                (fun todo n ->
+                   Todolist.add n kf pdg callstack_length false todo)
+                todolist
+                related_nodes
+            in
+            (* interprocedural part *)
+            let backward_from_deep compute_nodes =
+              (* [TODO optimisation:]
+                 en fait, regarder from_deep:
+                 si vrai, faire pour chaque caller
+                 sinon, faire uniquement pour le caller d'où on vient *)
+              match kind, callstack_length with
+              | (Direct | Indirect_Backward), 0 ->
+                (* input of a deep security annotation: foreach call
+                   to [kf], compute its related nodes *)
+                let do_caller todolist (caller, callsites) =
+                  (* Format.printf "[security of %s] search callers in %s
+                     for zone %a@."  (Kernel_function.get_name kf)
+                     (Kernel_function.get_name caller)
+                     Locations.Zone.pretty zone;*)
+                  let pdg_caller = !Db.Pdg.get caller in
+                  let do_call todolist callsite =
+                    match kind with
+                    | Direct | Indirect_Backward ->
+                      let nodes = compute_nodes pdg_caller callsite in
                       List.fold_left
-                        (fun todolist called_kf ->
-                          (* foreach called kf *)
-                          (*Format.printf
-                            "[security] search inside %s (from %s)@."
-                            (Kernel_function.get_name called_kf)
-                            (Kernel_function.get_name kf);*)
-                          let called_pdg = !Db.Pdg.get called_kf in
-                          let nodes =
-                            try
-                              match kind, key with
-                              | (Direct | Indirect_Backward),
-                            Signature.Out out_key  ->
-                                let nodes, _undef_zone =
-                                  !Db.Pdg.find_output_nodes called_pdg out_key
-                                (* TODO: use undef_zone (see FS#201) *)
-                                in
-                                let nodes =
-                                  List.map (fun (n, _z_part) -> n) nodes in
-                                   (* TODO : use _z_part ? *)
-                                nodes
-                              | _, Signature.In (Signature.InNum n) ->
-                                search_input kind called_kf
-                                  (lazy [!Db.Pdg.find_input_node called_pdg n])
-                              | _, Signature.In Signature.InCtrl ->
-                                search_input kind called_kf
-                                  (lazy
-                                     [!Db.Pdg.find_entry_point_node called_pdg])
-                              | _, Signature.In (Signature.InImpl _) ->
-                                assert false
-                              | Forward _, Signature.Out _ ->
-                                []
-                            with
-                            | Db.Pdg.Top ->
-                              Security_slicing_parameters.warning
-                                "no precise pdg for function %s. \n\
-Ignoring this function in the analysis (potentially incorrect results)."
-                                (Kernel_function.get_name called_kf);
-                              []
-                            | Db.Pdg.Bottom | Not_found -> assert false
-                          in
-                          List.fold_left
-                            (fun todo n ->
-                                  (*Format.printf "node %a inside %s@."
-                                    (!Db.Pdg.pretty_node false) n
-                                    (Kernel_function.get_name called_kf);*)
+                        (add_from_deep caller) todolist nodes
+                    | Forward _ ->
+                      todolist (* not considered here, see at end *)
+                  in
+                  List.fold_left do_call todolist callsites
+                in
+                List.fold_left do_caller todolist (!Db.Value.callers kf)
+              | _ ->
+                todolist
+            in
+            let todolist =
+              match !Db.Pdg.node_key node with
+              | Key.SigKey (Signature.In Signature.InCtrl) ->
+                assert false
+              | Key.SigKey (Signature.In (Signature.InImpl zone)) ->
+                let compute_nodes pdg_caller callsite =
+                  let nodes, _undef_zone =
+                    !Db.Pdg.find_location_nodes_at_stmt
+                      pdg_caller callsite ~before:true zone
+                      (* TODO : use undef_zone (see FS#201)? *)
+                  in
+                  let nodes = List.map (fun (n, _z_part) -> n) nodes in
+                  (* TODO : use _z_part ? *)
+                  nodes
+                in
+                backward_from_deep compute_nodes
+              | Key.SigKey key ->
+                let compute_nodes pdg_caller callsite =
+                  [ match key with
+                    | Signature.In (Signature.InNum n) ->
+                      !Db.Pdg.find_call_input_node pdg_caller callsite n
+                    | Signature.Out Signature.OutRet  ->
+                      !Db.Pdg.find_call_output_node pdg_caller callsite
+                    | Signature.In
+                        (Signature.InCtrl | Signature.InImpl _)
+                    | Signature.Out _ ->
+                      assert false ]
+                in
+                backward_from_deep compute_nodes
+              | Key.SigCallKey(id, key) ->
+                (* the node is a call: search the related nodes inside the
+                   called function (see FS#155) *)
+                if from_deep then
+                  (* already come from a deeper annotation:
+                     do not go again inside it *)
+                  todolist
+                else
+                  let stmt = Key.call_from_id id in
+                  let called_kfs =
+                    Kernel_function.Hptset.elements
+                      (try Db.Value.call_to_kernel_function stmt
+                       with Db.Value.Not_a_call -> assert false)
+                  in
+                  let todolist =
+                    List.fold_left
+                      (fun todolist called_kf ->
+                         (* foreach called kf *)
+                         (*Format.printf
+                           "[security] search inside %s (from %s)@."
+                           (Kernel_function.get_name called_kf)
+                           (Kernel_function.get_name kf);*)
+                         let called_pdg = !Db.Pdg.get called_kf in
+                         let nodes =
+                           try
+                             match kind, key with
+                             | (Direct | Indirect_Backward),
+                               Signature.Out out_key  ->
+                               let nodes, _undef_zone =
+                                 !Db.Pdg.find_output_nodes called_pdg out_key
+                                 (* TODO: use undef_zone (see FS#201) *)
+                               in
+                               let nodes =
+                                 List.map (fun (n, _z_part) -> n) nodes in
+                               (* TODO : use _z_part ? *)
+                               nodes
+                             | _, Signature.In (Signature.InNum n) ->
+                               search_input kind called_kf
+                                 (lazy [!Db.Pdg.find_input_node called_pdg n])
+                             | _, Signature.In Signature.InCtrl ->
+                               search_input kind called_kf
+                                 (lazy
+                                   [!Db.Pdg.find_entry_point_node called_pdg])
+                             | _, Signature.In (Signature.InImpl _) ->
+                               assert false
+                             | Forward _, Signature.Out _ ->
+                               []
+                           with
+                           | Db.Pdg.Top ->
+                             Security_slicing_parameters.warning
+                               "no precise pdg for function %s. \n\
+                                Ignoring this function in the analysis (potentially incorrect results)."
+                               (Kernel_function.get_name called_kf);
+                             []
+                           | Db.Pdg.Bottom | Not_found -> assert false
+                         in
+                         List.fold_left
+                           (fun todo n ->
+                              (*Format.printf "node %a inside %s@."
+                                (!Db.Pdg.pretty_node false) n
+                                (Kernel_function.get_name called_kf);*)
                               Todolist.add
                                 n called_kf called_pdg
                                 (callstack_length + 1) false todo)
-                            todolist
-                            nodes)
-                        todolist
-                        called_kfs
-                    in
-                    (match kind with
-                    | Direct | Indirect_Backward ->
+                           todolist
+                           nodes)
                       todolist
-                    | Forward _ ->
-                      List.fold_left
-                        (fun todolist called_kf ->
+                      called_kfs
+                  in
+                  (match kind with
+                   | Direct | Indirect_Backward ->
+                     todolist
+                   | Forward _ ->
+                     List.fold_left
+                       (fun todolist called_kf ->
                           let compute_from_stmt fold =
                             fold
                               (fun (n, kfn) _ acc ->
-                                if Kernel_function.equal kfn kf then n :: acc
-                                else acc)
+                                 if Kernel_function.equal kfn kf then n :: acc
+                                 else acc)
                           in
                           let from_stmt =
                             compute_from_stmt M.fold result [] in
@@ -580,14 +580,14 @@ Ignoring this function in the analysis (potentially incorrect results)."
                             (* initial nodes may be not in results *)
                             compute_from_stmt
                               (fun f e acc ->
-                                List.fold_left
-                                  (fun acc e -> f e [] acc) acc e)
+                                 List.fold_left
+                                   (fun acc e -> f e [] acc) acc e)
                               initial_nodes
                               from_stmt
                           in
                           let from_stmt = List.fold_left
-                            (fun s n -> PdgTypes.NodeSet.add n s)
-                            PdgTypes.NodeSet.empty from_stmt in
+                              (fun s n -> PdgTypes.NodeSet.add n s)
+                              PdgTypes.NodeSet.empty from_stmt in
                           let called_pdg = !Db.Pdg.get called_kf in
                           let nodes =
                             try
@@ -601,26 +601,26 @@ Ignoring this function in the analysis (potentially incorrect results)."
                           in
                           List.fold_left
                             (fun todo n ->
-                              Todolist.add
-                                n called_kf called_pdg
-                                (callstack_length + 1) false todo)
+                               Todolist.add
+                                 n called_kf called_pdg
+                                 (callstack_length + 1) false todo)
                             todolist
                             nodes)
-                        todolist
-                        called_kfs)
-                | Key.CallStmt _ | Key.VarDecl _ ->
-                  assert false
-                | Key.Stmt _ | Key.Label _ ->
-                  todolist
-              in
-              (* [TODO optimisation:] voir commentaire plus haut *)
-              match kind with
-              | (Direct | Indirect_Backward) -> todolist
-              | Forward _ -> forward_caller kf node todolist
-            end
-          in
-          (* recursive call *)
-          aux false result todolist
+                       todolist
+                       called_kfs)
+              | Key.CallStmt _ | Key.VarDecl _ ->
+                assert false
+              | Key.Stmt _ | Key.Label _ ->
+                todolist
+            in
+            (* [TODO optimisation:] voir commentaire plus haut *)
+            match kind with
+            | (Direct | Indirect_Backward) -> todolist
+            | Forward _ -> forward_caller kf node todolist
+          end
+        in
+        (* recursive call *)
+        aux false result todolist
     in
     aux true result nodes
 
@@ -726,10 +726,10 @@ Ignoring this function in the analysis (potentially incorrect results)."
     in
     Stmt.Set.elements set
 
-(*  let iter use_ctrl_dpds f kf stmt =
-    let action = if use_ctrl_dpds then whole else direct in
-    M.iter (fun elt _ -> f elt) (action kf stmt)
-*)
+  (*  let iter use_ctrl_dpds f kf stmt =
+      let action = if use_ctrl_dpds then whole else direct in
+      M.iter (fun elt _ -> f elt) (action kf stmt)
+  *)
 end
 
 (* ************************************************************************ *)
@@ -750,7 +750,7 @@ let get_indirect_backward_component =
   register "get_indirect_backward_component" Component.Indirect_Backward
 
 let get_forward_component = register "get_forward_component"
-  (Component.Forward Component.Security)
+    (Component.Forward Component.Security)
 
 let impact_analysis =
   Dynamic.register

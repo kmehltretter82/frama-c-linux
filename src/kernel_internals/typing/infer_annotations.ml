@@ -50,14 +50,14 @@ let assigns_from_prototype kf =
   let pointer_args =
     List.map
       (fun vi ->
-        let loc = vi.vdecl in
-        let t = tvar (cvar_to_lvar vi) in
-        let typ = vi.vtype in
-        if Cil.isVoidPtrType typ then
-          let const = typeHasAttribute "const" (Cil.typeOf_pointed typ) in
-          let typ' = if const then Cil.charConstPtrType else Cil.charPtrType in
-          (vi.vghost, Logic_utils.mk_cast ~loc typ' t, typ')
-        else (vi.vghost, t, typ)
+         let loc = vi.vdecl in
+         let t = tvar (cvar_to_lvar vi) in
+         let typ = vi.vtype in
+         if Cil.isVoidPtrType typ then
+           let const = typeHasAttribute "const" (Cil.typeOf_pointed typ) in
+           let typ' = if const then Cil.charConstPtrType else Cil.charPtrType in
+           (vi.vghost, Logic_utils.mk_cast ~loc typ' t, typ')
+         else (vi.vghost, t, typ)
       ) pointer_args
   in
   (* Generate the term [*(t+(0..))] with the appropriate array bounds (if
@@ -77,32 +77,32 @@ let assigns_from_prototype kf =
        type *)
     let rec mk_offset set typ =
       match Cil.unrollType typ with
-        | TArray (typ_elem, size, _, _) ->
-          let range = match size with
-            | None -> make_range None
-            | Some size ->
-              make_range (Cil.constFoldToInt size)
-          in
-          let offs, typ = mk_offset true typ_elem in
-          TIndex (range, offs), typ
-        | _ ->
-          TNoOffset,
-          (if set then make_set_type (Ctype typ) else (Ctype typ))
+      | TArray (typ_elem, size, _, _) ->
+        let range = match size with
+          | None -> make_range None
+          | Some size ->
+            make_range (Cil.constFoldToInt size)
+        in
+        let offs, typ = mk_offset true typ_elem in
+        TIndex (range, offs), typ
+      | _ ->
+        TNoOffset,
+        (if set then make_set_type (Ctype typ) else (Ctype typ))
     in
-(* make_set_type (Ctype typ_pointed) *)
+    (* make_set_type (Ctype typ_pointed) *)
 
     let typ_pointed = Cil.typeOf_pointed typ in
     (* Generate the initial term: [*(t+(0..))] for array types or char*
        pointers, *t for other pointer types. It would have been better to
        recognize formals with type [typ[]] instead of [typ *], but this
        information is lost during normalization *)
-    let t_range_node, set = 
+    let t_range_node, set =
       match findAttribute "arraylen" (typeAttr typ) with
-        | [AInt length] -> TBinOp (PlusPI, t, make_range (Some length)), true
-        | _ ->
-          if Cil.isAnyCharPtrType typ
-          then TBinOp (PlusPI, t, make_range None), true
-          else t.term_node, false
+      | [AInt length] -> TBinOp (PlusPI, t, make_range (Some length)), true
+      | _ ->
+        if Cil.isAnyCharPtrType typ
+        then TBinOp (PlusPI, t, make_range None), true
+        else t.term_node, false
     in
     let offset_arrays, typ_with_offset = mk_offset true typ_pointed in
     let t_range =
@@ -152,7 +152,7 @@ let assigns_from_prototype kf =
   | TVoid _ ->
     (* assigns all pointer args from basic args and content of pointer args *)
     arguments
-  | _ -> 
+  | _ ->
     (* assigns result from basic args and content of pointer args *)
     let loc = vi.vdecl in
     let result = Logic_const.(new_identified_term (tresult ~loc rtyp)) in
@@ -171,17 +171,17 @@ let emit_unknown_status_on_assigns kf bhv assigns =
   in
   Option.iter emit pptopt;
   match assigns with
-    | WritesAny -> ()
-    | Writes froms ->
-        let emit from =
-          let pptopt =
-            Property.ip_of_from
-              kf Kglobal
-              (Property.Id_contract (Datatype.String.Set.empty,bhv)) from
-          in
-          Option.iter emit pptopt
-        in
-        List.iter emit froms
+  | WritesAny -> ()
+  | Writes froms ->
+    let emit from =
+      let pptopt =
+        Property.ip_of_from
+          kf Kglobal
+          (Property.Id_contract (Datatype.String.Set.empty,bhv)) from
+      in
+      Option.iter emit pptopt
+    in
+    List.iter emit froms
 
 module Is_populated =
   State_builder.Hashtbl
@@ -191,19 +191,19 @@ module Is_populated =
       let size = 17
       let dependencies = [ Annotations.funspec_state ]
       let name = "Infer_annotations.Is_populated"
-     end)
+    end)
 
 let () = Ast.add_linked_state Is_populated.self
 
 let populate_funspec_aux kf spec =
   let name = Kernel_function.get_name kf in
   match spec.spec_behavior with
-  | [] -> 
+  | [] ->
     (* case 1: there is no initial specification -> use generated_behavior *)
     if not (is_frama_c_builtin name) then begin
       Kernel.warning ~once:true ~current:true ~wkey:Kernel.wkey_missing_spec
         "Neither code nor specification for function %a, \
-generating default assigns from the prototype"
+         generating default assigns from the prototype"
         Kernel_function.pretty kf;
     end;
     let assigns = Writes (assigns_from_prototype kf) in
@@ -211,7 +211,7 @@ generating default assigns from the prototype"
     Annotations.add_behaviors emitter kf [ bhv ];
     emit_unknown_status_on_assigns kf bhv assigns
 
-  | _ :: _ -> 
+  | _ :: _ ->
     (* case 2: there is a specification, so look at assigns clause *)
     let bhv = match Cil.find_default_behavior spec with
       | None -> Cil.mk_behavior ()
@@ -220,47 +220,47 @@ generating default assigns from the prototype"
     if bhv.b_assigns = WritesAny then
       (* case 2.2 : some assigns have to be generated *)
       (* step 2.1: looks at unguarded behaviors and then at complete
-	 behaviors *)
+         behaviors *)
       let warn_if_not_builtin explicit_name name orig_name =
-	if not (is_frama_c_builtin name) then
-	  Kernel.warning ~once:true ~current:true
-	    "No code nor %s assigns clause for function %a, \
-generating default assigns from the %s"
-	    explicit_name Kernel_function.pretty kf orig_name
+        if not (is_frama_c_builtin name) then
+          Kernel.warning ~once:true ~current:true
+            "No code nor %s assigns clause for function %a, \
+             generating default assigns from the %s"
+            explicit_name Kernel_function.pretty kf orig_name
       in
       let assigns = Ast_info.merge_assigns_from_spec ~warn:false spec in
-      let assigns = 
-	if assigns <> WritesAny then begin
-	  (* case 2.2.1. A correct assigns clause has been found *)  
-	  warn_if_not_builtin "explicit" name "specification";
-	  assigns
-	end else begin 
-	  (* case 2.2.1. No correct assigns clause can be found *)
-	  let assigns = 
-	    try (* Takes the union the assigns clauses, even if it 
-		   is not advertised as complete behaviors. 
-		   Not more arbitrary than using prototype to infer
-		   assigns.*)
-	      List.fold_left
-		(fun acc bhv -> 
-		  if Cil.is_default_behavior bhv then acc 
-		  else match acc, bhv.b_assigns with
-		  | _, WritesAny -> raise Not_found
-		  | WritesAny, a -> a
-		  | Writes l1, Writes l2 -> Writes (l1 @ l2))
-		WritesAny
-		spec.spec_behavior
-	    with Not_found -> 
-	      WritesAny
-	  in
-	  if assigns <> WritesAny then begin
-	    warn_if_not_builtin "implicit" name "specification" ;
-	    assigns 
-	  end else begin (* The union gave WritesAny, so use the prototype *)
-	    warn_if_not_builtin "implicit" name "prototype";
+      let assigns =
+        if assigns <> WritesAny then begin
+          (* case 2.2.1. A correct assigns clause has been found *)
+          warn_if_not_builtin "explicit" name "specification";
+          assigns
+        end else begin
+          (* case 2.2.1. No correct assigns clause can be found *)
+          let assigns =
+            try (* Takes the union the assigns clauses, even if it
+                   is not advertised as complete behaviors.
+                   Not more arbitrary than using prototype to infer
+                   assigns.*)
+              List.fold_left
+                (fun acc bhv ->
+                   if Cil.is_default_behavior bhv then acc
+                   else match acc, bhv.b_assigns with
+                     | _, WritesAny -> raise Not_found
+                     | WritesAny, a -> a
+                     | Writes l1, Writes l2 -> Writes (l1 @ l2))
+                WritesAny
+                spec.spec_behavior
+            with Not_found ->
+              WritesAny
+          in
+          if assigns <> WritesAny then begin
+            warn_if_not_builtin "implicit" name "specification" ;
+            assigns
+          end else begin (* The union gave WritesAny, so use the prototype *)
+            warn_if_not_builtin "implicit" name "prototype";
             Writes (assigns_from_prototype kf);
-	  end
-	end
+          end
+        end
       in
       Annotations.add_assigns
         ~keep_empty:false emitter kf ~behavior:bhv.b_name assigns;

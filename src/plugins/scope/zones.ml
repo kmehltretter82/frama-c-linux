@@ -61,7 +61,7 @@ let compute_new_data old_zone l_zone l_dpds exact r_dpds =
     let zone = if exact then Data.diff old_zone l_zone else old_zone in
     let zone = Data.merge zone l_dpds in
     let zone = Data.merge zone r_dpds in
-      (true, zone)
+    (true, zone)
   else (false, old_zone)
 
 (* the call result can be processed like a normal assignment *)
@@ -69,18 +69,18 @@ let process_call_res data stmt lvaloption froms =
   let data = match lvaloption with
     | None -> false, data
     | Some lval ->
-        let ret_dpds = froms.Function_Froms.deps_return in
-        let r_dpds = Function_Froms.Memory.collapse_return ret_dpds in
-        let r_dpds = Function_Froms.Deps.to_zone r_dpds in
-        let l_dpds, exact, l_zone =
-          Datascope.get_lval_zones ~for_writing:true  stmt lval in
-          compute_new_data data l_zone l_dpds exact r_dpds
+      let ret_dpds = froms.Function_Froms.deps_return in
+      let r_dpds = Function_Froms.Memory.collapse_return ret_dpds in
+      let r_dpds = Function_Froms.Deps.to_zone r_dpds in
+      let l_dpds, exact, l_zone =
+        Datascope.get_lval_zones ~for_writing:true  stmt lval in
+      compute_new_data data l_zone l_dpds exact r_dpds
   in data
 
 (* we need [data_after] zone after the call, so we need to add the dpds
-* of each output that intersects this zone.
-* Moreover, we need to add the part of [data_after] that has not been
-* modified for sure. *)
+ * of each output that intersects this zone.
+ * Moreover, we need to add the part of [data_after] that has not been
+ * modified for sure. *)
 let process_froms data_after froms =
   let from_table = froms.Function_Froms.deps_table in
   let process_out_call out deps (to_prop, used, new_data) =
@@ -91,13 +91,13 @@ let process_froms data_after froms =
     if (Data.intersects data_after out) then
       let to_prop = if exact then Data.diff to_prop out else to_prop in
       let new_data = Data.merge new_data out_dpds in
-         (to_prop, true, new_data)
+      (to_prop, true, new_data)
     else (to_prop, used, new_data)
   in
   let to_prop =
     (* part of data_after that we need to compute before call :
-    * = data_after minus all exact outputs.
-    * Don't use [data_after - (merge out)] to avoid approximation in merge *)
+     * = data_after minus all exact outputs.
+     * Don't use [data_after - (merge out)] to avoid approximation in merge *)
     data_after in
   let new_data = Data.bottom in (* add out_dpds when out intersects data_after*)
   let used = false in (* is the call needed ? *)
@@ -110,7 +110,7 @@ let process_froms data_after froms =
     | Function_Froms.Memory.Map m ->
       Function_Froms.Memory.fold process_out_call m (to_prop, used, new_data)
   in let data = Data.merge to_prop new_data in
-    (used, data)
+  (used, data)
 
 let process_call_args data called_kf stmt args =
   let param_list = Kernel_function.get_formals called_kf in
@@ -120,28 +120,28 @@ let process_call_args data called_kf stmt args =
     let exact = true in (* param is always a variable so asgn is exact *)
     let _used, data =
       compute_new_data data param_zone Data.bottom exact arg_dpds in
-      (* can ignore 'used' because if we need param, we already know that the
-      * call is needed *)
-      data
+    (* can ignore 'used' because if we need param, we already know that the
+     * call is needed *)
+    data
   in
   let rec do_param_arg data param_list args =
     match param_list, args with
-      | [], [] -> data
-      | p :: param_list, a :: args ->
-          let data = asgn_arg_to_param data p a in
-            do_param_arg data param_list args
-      | [], _ -> (* call to a variadic function *)
-          (* warning already sent during 'from' computation. *)
-          (* TODO : merge the remaining args in data ?... *)
-          data
-      | _, [] -> R.abort "call to a function with to few arguments"
+    | [], [] -> data
+    | p :: param_list, a :: args ->
+      let data = asgn_arg_to_param data p a in
+      do_param_arg data param_list args
+    | [], _ -> (* call to a variadic function *)
+      (* warning already sent during 'from' computation. *)
+      (* TODO : merge the remaining args in data ?... *)
+      data
+    | _, [] -> R.abort "call to a function with to few arguments"
   in do_param_arg data param_list args
 
 let process_one_call data stmt lvaloption froms =
   let res_used, data = process_call_res data stmt lvaloption froms in
   let out_used, data = process_froms data froms in
   let used = res_used || out_used in
-    used, data
+  used, data
 
 let process_call data_after stmt lvaloption funcexp args _loc =
   let funcexp_dpds, called_functions =
@@ -151,14 +151,14 @@ let process_call data_after stmt lvaloption funcexp args _loc =
   let used, data =
     try
       let froms = !Db.From.Callwise.find (Kstmt stmt) in
-        process_one_call data_after stmt lvaloption froms
+      process_one_call data_after stmt lvaloption froms
     with Not_found -> (* don't have callwise (-calldeps option) *)
       let do_call kf acc =
         (* notice that we use the same old data for each possible call *)
         (process_one_call data_after stmt lvaloption (!Db.From.get kf))::acc
       in
       let l = Kernel_function.Hptset.fold do_call called_functions [] in
-        (* in l, we have one result for each possible function called *)
+      (* in l, we have one result for each possible function called *)
       List.fold_left
         (fun (acc_u,acc_d) (u,d) -> (acc_u || u), Data.merge acc_d d)
         (false, Data.bottom)
@@ -173,7 +173,7 @@ let process_call data_after stmt lvaloption funcexp args _loc =
         data
     in
     let data =  Data.merge funcexp_dpds data in
-      used, data
+    used, data
   else begin
     assert (R.verify (Data.equal data data_after)
               "if statement not used, data doesn't change !");
@@ -221,28 +221,28 @@ module Computer (Param:sig val states : Ctx.t end) = struct
 
   let doInstr stmt instr data =
     match instr with
-      | Set (lval, exp, _) -> Dataflow2.Done (do_assign stmt lval exp data)
-      | Local_init (v, AssignInit i, _) ->
-        let rec aux lv i acc =
-          match i with
-          | SingleInit e -> do_assign stmt lv e data
-          | CompoundInit(ct, initl) ->
-            let implicit = true in
-            let doinit o i _ data = aux (Cil.addOffsetLval o lv) i data in
-            Cil.foldLeftCompound ~implicit ~doinit ~ct ~initl ~acc
-        in
-        Dataflow2.Done (aux (Cil.var v) i data)
-      |  Call (lvaloption,funcexp,args,loc) ->
-          let used, data = process_call data stmt lvaloption funcexp args loc in
-          let _ = if used then add_used_stmt stmt in
-            Dataflow2.Done data
-      | Local_init(v, ConsInit(f, args, k), l) ->
-        let used, data =
-          Cil.treat_constructor_as_func (process_call data stmt) v f args k l
-        in
-        if used then add_used_stmt stmt;
-        Dataflow2.Done data
-      | Skip _ | Code_annot _ | Asm _ -> Dataflow2.Default
+    | Set (lval, exp, _) -> Dataflow2.Done (do_assign stmt lval exp data)
+    | Local_init (v, AssignInit i, _) ->
+      let rec aux lv i acc =
+        match i with
+        | SingleInit e -> do_assign stmt lv e data
+        | CompoundInit(ct, initl) ->
+          let implicit = true in
+          let doinit o i _ data = aux (Cil.addOffsetLval o lv) i data in
+          Cil.foldLeftCompound ~implicit ~doinit ~ct ~initl ~acc
+      in
+      Dataflow2.Done (aux (Cil.var v) i data)
+    |  Call (lvaloption,funcexp,args,loc) ->
+      let used, data = process_call data stmt lvaloption funcexp args loc in
+      let _ = if used then add_used_stmt stmt in
+      Dataflow2.Done data
+    | Local_init(v, ConsInit(f, args, k), l) ->
+      let used, data =
+        Cil.treat_constructor_as_func (process_call data stmt) v f args k l
+      in
+      if used then add_used_stmt stmt;
+      Dataflow2.Done data
+    | Skip _ | Code_annot _ | Asm _ -> Dataflow2.Default
 
   let filterStmt _stmt _next = true
 
@@ -256,53 +256,53 @@ let compute_ctrl_info pdg ctrl_part used_stmts =
   let seen = Stmt.Hashtbl.create 50 in
   let rec add_node_ctrl_nodes new_stmts node =
     let ctrl_nodes = !Db.Pdg.direct_ctrl_dpds pdg node in
-      List.fold_left add_ctrl_node new_stmts ctrl_nodes
+    List.fold_left add_ctrl_node new_stmts ctrl_nodes
   and add_ctrl_node new_stmts ctrl_node =
     debug2 "[zones] add ctrl node %a@." PdgTypes.Node.pretty ctrl_node;
     match PdgTypes.Node.stmt ctrl_node with
-      | None -> (* node without stmt : add its ctrl_dpds *)
-          add_node_ctrl_nodes new_stmts ctrl_node
-      | Some stmt ->
-          debug2 "[zones] node %a is stmt %d@."
-            PdgTypes.Node.pretty ctrl_node stmt.sid;
-          if Stmt.Hashtbl.mem seen stmt then new_stmts
-          else
-            let ctrl_zone = match stmt.skind with
-              | Switch (exp,_,_,_) |  If (exp,_,_,_) -> Data.exp_zone stmt exp
-              | _ -> Data.bottom
-            in Ctx.add ctrl_part stmt ctrl_zone;
-               Stmt.Hashtbl.add seen stmt ();
-               debug2 "[zones] add ctrl zone %a at stmt %d@."
-                 Data.pretty ctrl_zone stmt.sid;
-               stmt::new_stmts
+    | None -> (* node without stmt : add its ctrl_dpds *)
+      add_node_ctrl_nodes new_stmts ctrl_node
+    | Some stmt ->
+      debug2 "[zones] node %a is stmt %d@."
+        PdgTypes.Node.pretty ctrl_node stmt.sid;
+      if Stmt.Hashtbl.mem seen stmt then new_stmts
+      else
+        let ctrl_zone = match stmt.skind with
+          | Switch (exp,_,_,_) |  If (exp,_,_,_) -> Data.exp_zone stmt exp
+          | _ -> Data.bottom
+        in Ctx.add ctrl_part stmt ctrl_zone;
+        Stmt.Hashtbl.add seen stmt ();
+        debug2 "[zones] add ctrl zone %a at stmt %d@."
+          Data.pretty ctrl_zone stmt.sid;
+        stmt::new_stmts
   and add_stmt_ctrl new_stmts stmt =
     debug1 "[zones] add ctrl of stmt %d@." stmt.sid;
     if Stmt.Hashtbl.mem seen stmt then new_stmts
     else begin
       Stmt.Hashtbl.add seen stmt ();
       match !Db.Pdg.find_simple_stmt_nodes pdg stmt with
-        | [] -> []
-        | n::_ -> add_node_ctrl_nodes new_stmts n
+      | [] -> []
+      | n::_ -> add_node_ctrl_nodes new_stmts n
     end
   in
   let rec add_stmts_ctrl stmts all_used_stmts =
     let all_used_stmts = stmts @ all_used_stmts in
     let new_stmts = List.fold_left add_stmt_ctrl [] stmts in
     let preds =  List.fold_left (fun acc s -> s.preds @ acc) [] new_stmts in
-      if preds <> [] then CtrlCompute.compute preds;
+    if preds <> [] then CtrlCompute.compute preds;
     let used_stmts = CtrlComputer.get_and_reset_used_stmts () in
-      if used_stmts = [] then all_used_stmts
-      else add_stmts_ctrl used_stmts all_used_stmts
+    if used_stmts = [] then all_used_stmts
+    else add_stmts_ctrl used_stmts all_used_stmts
   in
-    add_stmts_ctrl used_stmts []
+  add_stmts_ctrl used_stmts []
 
 let compute kf stmt lval =
   let f = Kernel_function.get_definition kf in
   let dpds, _exact, zone =
     Datascope.get_lval_zones ~for_writing:false stmt lval in
   let zone = Data.merge dpds zone in
-    debug1 "[zones] build for %a before %d in %a@\n"
-      Data.pretty zone stmt.sid Kernel_function.pretty kf;
+  debug1 "[zones] build for %a before %d in %a@\n"
+    Data.pretty zone stmt.sid Kernel_function.pretty kf;
   let data_part = Ctx.create 50 in
   List.iter (fun s -> Ctx.add data_part s Data.bottom) f.sallstmts;
   let _ = Ctx.add data_part stmt zone in
@@ -310,9 +310,9 @@ let compute kf stmt lval =
   let module DataCompute = Dataflow2.Backwards(DataComputer) in
   let _ = DataCompute.compute stmt.preds in
   let ctrl_part = data_part (* Ctx.create 50 *) in
-    (* it is confusing to have 2 part in the provided information,
-    * because in fact, it means nothing to separate them.
-    * So let's put everything in the same object *)
+  (* it is confusing to have 2 part in the provided information,
+   * because in fact, it means nothing to separate them.
+   * So let's put everything in the same object *)
   let used_stmts = DataComputer.get_and_reset_used_stmts () in
   let all_used_stmts =
     if used_stmts = [] then []
@@ -331,7 +331,7 @@ let pretty fmt stmt_zones =
   let pp s d = Format.fprintf fmt "Stmt:%d -> %a@." s.sid Data.pretty d in
   Stmt.Hashtbl.iter_sorted pp stmt_zones
 
-       (*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)
+(*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)
 
 let build_zones kf stmt lval =
   (* TODO: Journal.register *)
@@ -339,14 +339,14 @@ let build_zones kf stmt lval =
                      (Datatype.func Kernel_type.stmt
                         (Datatype.func Kernel_type.lval
                            (Datatype.couple Kernel_type.stmt_set zones_ty)))))
-                           *)
+  *)
   if stmt.preds = []
   then Stmt.Hptset.empty, Ctx.create 0
   else compute kf stmt lval
 
 let get_zones =
   (* TODO: Journal.register *)
-    (*(Datatype.func zones_ty (Datatype.func Kernel_type.stmt data_ty)))*)
+  (*(Datatype.func zones_ty (Datatype.func Kernel_type.stmt data_ty)))*)
   get
 
 let pretty_zones =

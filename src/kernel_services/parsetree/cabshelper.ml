@@ -45,82 +45,82 @@ open Cabs
 
 let nextident = ref 0
 let getident () =
-    nextident := !nextident + 1;
-    !nextident
+  nextident := !nextident + 1;
+  !nextident
 
 let cabslu = Cil_datatype.Location.unknown
 
 module Comments =
-  struct
-    module MapDest = struct
-      include Datatype.List(Datatype.Pair(Cil_datatype.Position)(Datatype.String))
-      let fast_equal (_:t) (_:t) = false
-    end
-    module MyTable = 
-      Rangemap.Make 
-        (Cil_datatype.Position)
-        (MapDest)
-    module MyState =
-      State_builder.Ref
-        (MyTable)
-        (struct
-          let name = "Cabshelper.Comments"
-          let dependencies = [ ]
-          (* depends from File.self and Ast.self which add 
-             the dependency themselves. *)
-          let default () = MyTable.empty
-         end)
-    let self = MyState.self
-    let () = Cil.dependency_on_ast self
+struct
+  module MapDest = struct
+    include Datatype.List(Datatype.Pair(Cil_datatype.Position)(Datatype.String))
+    let fast_equal (_:t) (_:t) = false
+  end
+  module MyTable =
+    Rangemap.Make
+      (Cil_datatype.Position)
+      (MapDest)
+  module MyState =
+    State_builder.Ref
+      (MyTable)
+      (struct
+        let name = "Cabshelper.Comments"
+        let dependencies = [ ]
+        (* depends from File.self and Ast.self which add
+           the dependency themselves. *)
+        let default () = MyTable.empty
+      end)
+  let self = MyState.self
+  let () = Cil.dependency_on_ast self
 
-    (* What matters is the beginning of the comment. *)
-    let add (first,last) comment =
-      let state = MyState.get () in
-      let acc = try MyTable.find first state with Not_found -> [] in
-      MyState.set ((MyTable.add first ((last,comment)::acc)) state)
+  (* What matters is the beginning of the comment. *)
+  let add (first,last) comment =
+    let state = MyState.get () in
+    let acc = try MyTable.find first state with Not_found -> [] in
+    MyState.set ((MyTable.add first ((last,comment)::acc)) state)
 
-    let get (first,last) =
-      let open Cil_datatype in
-      Kernel.debug ~dkey:Kernel.dkey_comments
-        "Searching for comments between positions %a and %a@."
-        Position.pretty first
-        Position.pretty last;
-      if Position.equal first Position.unknown ||
-         Position.equal last Position.unknown
-      then begin
-        Kernel.debug ~dkey:Kernel.dkey_comments "skipping dummy position@.";
-        []
-      end else
-        let r = MyTable.fold_range
-            (fun pos ->
-               match Cil_datatype.Position.compare first pos with
-               | n when n > 0 -> Rangemap.Below
-               | 0 -> Rangemap.Match
-               | _ ->
-                 if Cil_datatype.Position.compare pos last <= 0 then 
-                   Rangemap.Match
-                 else
-                   Rangemap.Above)
-            (fun _ comments acc -> acc @ List.rev_map snd comments)
-            (MyState.get ())
-            []
-        in
-        Kernel.debug ~dkey:Kernel.dkey_comments "%d results@." (List.length r);
-        r
-      
-    let iter f =
-      MyTable.iter 
-        (fun first comments ->
-          List.iter (fun (last,comment) -> f (first,last) comment) comments)
-        (MyState.get())
+  let get (first,last) =
+    let open Cil_datatype in
+    Kernel.debug ~dkey:Kernel.dkey_comments
+      "Searching for comments between positions %a and %a@."
+      Position.pretty first
+      Position.pretty last;
+    if Position.equal first Position.unknown ||
+       Position.equal last Position.unknown
+    then begin
+      Kernel.debug ~dkey:Kernel.dkey_comments "skipping dummy position@.";
+      []
+    end else
+      let r = MyTable.fold_range
+          (fun pos ->
+             match Cil_datatype.Position.compare first pos with
+             | n when n > 0 -> Rangemap.Below
+             | 0 -> Rangemap.Match
+             | _ ->
+               if Cil_datatype.Position.compare pos last <= 0 then
+                 Rangemap.Match
+               else
+                 Rangemap.Above)
+          (fun _ comments acc -> acc @ List.rev_map snd comments)
+          (MyState.get ())
+          []
+      in
+      Kernel.debug ~dkey:Kernel.dkey_comments "%d results@." (List.length r);
+      r
 
-    let fold f acc =
-      MyTable.fold
-        (fun first comments acc ->
-          List.fold_left
-            (fun acc (last,comment) -> f (first,last) comment acc) acc comments)
-        (MyState.get()) acc
-      
+  let iter f =
+    MyTable.iter
+      (fun first comments ->
+         List.iter (fun (last,comment) -> f (first,last) comment) comments)
+      (MyState.get())
+
+  let fold f acc =
+    MyTable.fold
+      (fun first comments acc ->
+         List.fold_left
+           (fun acc (last,comment) -> f (first,last) comment acc) acc comments)
+      (MyState.get()) acc
+
 end
 
 (*********** HELPER FUNCTIONS **********)
@@ -162,34 +162,34 @@ let get_definitionloc (d : definition) : cabsloc =
   | CUSTOM (_,_,l) -> l
 
 let get_statementloc (s : statement) : cabsloc =
-begin
-  match s.stmt_node with
-  | NOP(loc) -> loc
-  | COMPUTATION(_,loc) -> loc
-  | BLOCK(_,loc,_) -> loc
-  | SEQUENCE(_,_,loc) -> loc
-  | IF(_,_,_,loc) -> loc
-  | WHILE(_,_,_,loc) -> loc
-  | DOWHILE(_,_,_,loc) -> loc
-  | FOR(_,_,_,_,_,loc) -> loc
-  | BREAK(loc) -> loc
-  | CONTINUE(loc) -> loc
-  | RETURN(_,loc) -> loc
-  | SWITCH(_,_,loc) -> loc
-  | CASE(_,_,loc) -> loc
-  | CASERANGE(_,_,_,loc) -> loc
-  | DEFAULT(_,loc) -> loc
-  | LABEL(_,_,loc) -> loc
-  | GOTO(_,loc) -> loc
-  | COMPGOTO (_, loc) -> loc
-  | DEFINITION d -> get_definitionloc d
-  | ASM(_,_,_,loc) -> loc
-  | TRY_EXCEPT(_, _, _, loc) -> loc
-  | TRY_FINALLY(_, _, loc) -> loc
-  | (CODE_SPEC (_,l) |CODE_ANNOT (_,l)) -> l
-  | THROW(_,l) -> l
-  | TRY_CATCH(_,_,l) -> l
-end
+  begin
+    match s.stmt_node with
+    | NOP(loc) -> loc
+    | COMPUTATION(_,loc) -> loc
+    | BLOCK(_,loc,_) -> loc
+    | SEQUENCE(_,_,loc) -> loc
+    | IF(_,_,_,loc) -> loc
+    | WHILE(_,_,_,loc) -> loc
+    | DOWHILE(_,_,_,loc) -> loc
+    | FOR(_,_,_,_,_,loc) -> loc
+    | BREAK(loc) -> loc
+    | CONTINUE(loc) -> loc
+    | RETURN(_,loc) -> loc
+    | SWITCH(_,_,loc) -> loc
+    | CASE(_,_,loc) -> loc
+    | CASERANGE(_,_,_,loc) -> loc
+    | DEFAULT(_,loc) -> loc
+    | LABEL(_,_,loc) -> loc
+    | GOTO(_,loc) -> loc
+    | COMPGOTO (_, loc) -> loc
+    | DEFINITION d -> get_definitionloc d
+    | ASM(_,_,_,loc) -> loc
+    | TRY_EXCEPT(_, _, _, loc) -> loc
+    | TRY_FINALLY(_, _, loc) -> loc
+    | (CODE_SPEC (_,l) |CODE_ANNOT (_,l)) -> l
+    | THROW(_,l) -> l
+    | TRY_CATCH(_,_,l) -> l
+  end
 
 
 let explodeStringToInts (s: string) : int64 list =
@@ -202,7 +202,7 @@ let explodeStringToInts (s: string) : int64 list =
 let valueOfDigit chr =
   let int_value =
     match chr with
-      '0'..'9' -> (Char.code chr) - (Char.code '0')
+    '0'..'9' -> (Char.code chr) - (Char.code '0')
     | 'a'..'z' -> (Char.code chr) - (Char.code 'a') + 10
     | 'A'..'Z' -> (Char.code chr) - (Char.code 'A') + 10
     | _ -> Kernel.fatal "not a digit"
@@ -238,9 +238,9 @@ let mk_asm_templates =
     | [] when res = [] && Buffer.length buf = 0 -> [""]
     | [] when Buffer.length buf = 0 -> List.rev res
     | [] ->
-       let res = List.rev @@ Buffer.contents buf :: res in
-       Buffer.clear buf;
-       res
+      let res = List.rev @@ Buffer.contents buf :: res in
+      Buffer.clear buf;
+      res
     | str :: tail -> tail |> outer @@ inner res str 0
   and inner res template i =
     if i < String.length template then
@@ -250,15 +250,15 @@ let mk_asm_templates =
         if i < String.length template - 1 then
           match String.get template @@ i + 1 with
           | '\t' ->
-             Buffer.add_char buf '\t';
-             let res = Buffer.contents buf :: res in
-             Buffer.clear buf;
-             inner res template @@ i + 2
+            Buffer.add_char buf '\t';
+            let res = Buffer.contents buf :: res in
+            Buffer.clear buf;
+            inner res template @@ i + 2
           | c ->
-             let res = Buffer.contents buf :: res in
-             Buffer.clear buf;
-             Buffer.add_char buf c;
-             inner res template @@ i + 2
+            let res = Buffer.contents buf :: res in
+            Buffer.clear buf;
+            Buffer.add_char buf c;
+            inner res template @@ i + 2
         else
           let res = Buffer.contents buf :: res in
           Buffer.clear buf;

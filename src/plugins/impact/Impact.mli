@@ -28,13 +28,13 @@ open Cil_types
     @see <../impact/index.html> internal documentation. *)
 module Register : sig
   val compute_pragmas: (unit -> stmt list)
-    (** Compute the impact analysis from the impact pragma in the program.
-        Print and slice the results according to the parameters -impact-print
-        and -impact-slice.
-        @return the impacted statements *)
+  (** Compute the impact analysis from the impact pragma in the program.
+      Print and slice the results according to the parameters -impact-print
+      and -impact-slice.
+      @return the impacted statements *)
   val from_stmt: (stmt -> stmt list)
-    (** Compute the impact analysis of the given statement.
-        @return the impacted statements *)
+  (** Compute the impact analysis of the given statement.
+      @return the impacted statements *)
   val from_nodes:
     (kernel_function -> PdgTypes.Node.t list -> PdgTypes.NodeSet.t)
     (** Compute the impact analysis of the given set of PDG nodes,

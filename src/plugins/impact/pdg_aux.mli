@@ -82,6 +82,6 @@ val all_call_input_nodes:
 (** [all_call_out_nodes ~callee ~caller stmt] find all the nodes of [callee]
     that define the Call/Out nodes of [caller] for the call to [callee]
     that occurs at [stmt]. Each such out node is returned, with the set
-    of nodes that define it in [callee] *)    
+    of nodes that define it in [callee] *)
 val all_call_out_nodes :
   callee:Db.Pdg.t ->  caller:Db.Pdg.t -> stmt -> call_interface

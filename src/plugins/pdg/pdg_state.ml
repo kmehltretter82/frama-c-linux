@@ -24,7 +24,7 @@
     and provide the dependencies for the data,
     ie. it stores for each location the nodes of the pdg where its value
     was last defined.
-  *)
+*)
 
 let dkey = Pdg_parameters.register_category "state"
 
@@ -49,9 +49,9 @@ let pretty fmt state =
 
 let add_loc_node state ~exact loc node =
   P.debug ~dkey ~level:2 "add_loc_node (%s) : node %a -> %a@."
-      (if exact then "exact" else "merge")
-      PdgTypes.Node.pretty node
-      Locations.Zone.pretty loc ;
+    (if exact then "exact" else "merge")
+    PdgTypes.Node.pretty node
+    Locations.Zone.pretty loc ;
   if LocInfo.is_bottom state.loc_info then
     (* Do not add anything to a bottom state (which comes from an unreachable
        statement *)
@@ -68,20 +68,20 @@ let add_loc_node state ~exact loc node =
     make new_loc_info new_outputs
 
 (** this one is very similar to [add_loc_node] except that
-* we want to accumulate the nodes (exact = false) but nonetheless
-* define under_outputs like (exact = true) *)
+ * we want to accumulate the nodes (exact = false) but nonetheless
+ * define under_outputs like (exact = true) *)
 let add_init_state_input state loc node =
   match loc with
   | Locations.Zone.Top(_p,_o) ->
-      (* don't add top because it loses everything*)
-      state
+    (* don't add top because it loses everything*)
+    state
   | _ ->
-      let new_info = NodeSetLattice.inject_singleton node in
-      let new_loc_info =
-        LocInfo.add_binding ~exact:false state.loc_info loc new_info
-      in
-      let new_outputs = Locations.Zone.link state.under_outputs loc in
-      make new_loc_info new_outputs
+    let new_info = NodeSetLattice.inject_singleton node in
+    let new_loc_info =
+      LocInfo.add_binding ~exact:false state.loc_info loc new_info
+    in
+    let new_outputs = Locations.Zone.link state.under_outputs loc in
+    make new_loc_info new_outputs
 
 let test_and_merge ~old new_ =
   if LocInfo.is_included new_.loc_info old.loc_info
@@ -89,34 +89,34 @@ let test_and_merge ~old new_ =
   then (false, old)
   else
     (* Catch Bottom states, as under_outputs get a special value *)
-    if LocInfo.is_bottom old.loc_info then true, new_
-    else if LocInfo.is_bottom new_.loc_info then true, old
-    else
-      let new_loc_info = LocInfo.join old.loc_info new_.loc_info in
-      let new_outputs =
-        Locations.Zone.meet old.under_outputs new_.under_outputs
-      in
-      let new_state =
-        { loc_info = new_loc_info ; under_outputs = new_outputs }
-      in
-      true, new_state
+  if LocInfo.is_bottom old.loc_info then true, new_
+  else if LocInfo.is_bottom new_.loc_info then true, old
+  else
+    let new_loc_info = LocInfo.join old.loc_info new_.loc_info in
+    let new_outputs =
+      Locations.Zone.meet old.under_outputs new_.under_outputs
+    in
+    let new_state =
+      { loc_info = new_loc_info ; under_outputs = new_outputs }
+    in
+    true, new_state
 
 (** returns pairs of (n, z_opt) where n is a node that computes a part of [loc]
-* and z is the intersection between [loc] and the zone computed by the node.
-* @raise Cannot_fold if the state is top (TODO : something better ?)
-* *)
+ * and z is the intersection between [loc] and the zone computed by the node.
+ * @raise Cannot_fold if the state is top (TODO : something better ?)
+ * *)
 let get_loc_nodes_and_part state loc =
   let process z nodes acc =
     if Locations.Zone.intersects z loc then
       let z =
         if Locations.Zone.equal loc z
         then Some loc
-          (* Be careful not ot put None here, because if we have n_1 : (s1 =
-             s2) and then n_2 : (s1.b = 3) the state looks like :
-             s1.a -> n_1; s1.b -> n_2 ; s1.c -> n_1.  And if we
-             look for s1.a in that state, we get n_1 but this node
-             represent more that s1.a even if it is so in the
-             state...  *)
+        (* Be careful not ot put None here, because if we have n_1 : (s1 =
+           s2) and then n_2 : (s1.b = 3) the state looks like :
+           s1.a -> n_1; s1.b -> n_2 ; s1.c -> n_1.  And if we
+           look for s1.a in that state, we get n_1 but this node
+           represent more that s1.a even if it is so in the
+           state...  *)
         else Some (Locations.Zone.narrow z loc) in
       let add n acc =
         P.debug ~dkey ~level:2 "get_loc_nodes ->  %a@."

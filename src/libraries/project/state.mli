@@ -39,25 +39,25 @@ include Datatype.S_with_collections
 module type Local = sig
 
   type t
-    (** Type of the state to register. *)
+  (** Type of the state to register. *)
 
   val create: unit -> t
-    (** How to create a new fresh state which must be equal to the initial
-        state: that is, if you never change the state, [create ()] and [get
-        ()] must be equal (see invariant 1 below). *)
+  (** How to create a new fresh state which must be equal to the initial
+      state: that is, if you never change the state, [create ()] and [get
+      ()] must be equal (see invariant 1 below). *)
 
   val clear: t -> unit
-    (** How to clear a state. After clearing, the state should be
-        observationally the same that after its creation (see invariant 2
-        below). *)
+  (** How to clear a state. After clearing, the state should be
+      observationally the same that after its creation (see invariant 2
+      below). *)
 
   val get: unit -> t
-    (** How to access to the current state. Be aware of invariants 3 and 4
-        below. *)
+  (** How to access to the current state. Be aware of invariants 3 and 4
+      below. *)
 
   val set: t -> unit
-    (** How to change the current state. Be aware of invariants 3 and 4
-        below. *)
+  (** How to change the current state. Be aware of invariants 3 and 4
+      below. *)
 
   (** The four following invariants must hold.
       {ol
@@ -130,28 +130,28 @@ val add_hook_on_update: t -> (unit -> unit) -> unit
 
 (** @since Carbon-20101201 *)
 type state_on_disk =
-    { on_disk_value: Obj.t;
-      on_disk_computed: bool;
-      on_disk_saved: bool;
-      on_disk_digest: Digest.t }
+  { on_disk_value: Obj.t;
+    on_disk_computed: bool;
+    on_disk_saved: bool;
+    on_disk_digest: Digest.t }
 
 (** @since Carbon-20101201 *)
 type private_ops = private
-    { mutable descr: Structural_descr.pack;
-      create: project -> unit;
-      remove: project -> unit;
-      mutable clear: project -> unit;
-      mutable clear_some_projects: (project -> bool) -> project -> bool;
-      copy: project -> project -> unit;
-      commit: project -> unit;
-      update: project -> unit;
-      on_update: (unit -> unit) -> unit;
-      clean: unit -> unit;
-      serialize: project -> state_on_disk;
-      unserialize: project -> state_on_disk -> unit
-      (** @raise Incompatible_datatype if [state_on_disk] is not 
-                 compatible with the datatype expected by Frama-C's state *) 
-    }
+  { mutable descr: Structural_descr.pack;
+    create: project -> unit;
+    remove: project -> unit;
+    mutable clear: project -> unit;
+    mutable clear_some_projects: (project -> bool) -> project -> bool;
+    copy: project -> project -> unit;
+    commit: project -> unit;
+    update: project -> unit;
+    on_update: (unit -> unit) -> unit;
+    clean: unit -> unit;
+    serialize: project -> state_on_disk;
+    unserialize: project -> state_on_disk -> unit
+    (** @raise Incompatible_datatype if [state_on_disk] is not
+               compatible with the datatype expected by Frama-C's state *)
+  }
 
 exception Incompatible_datatype of string
 

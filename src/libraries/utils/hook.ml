@@ -39,13 +39,13 @@ module type Comparable = sig
 end
 
 module type S_ordered = sig
-    include S
-    type key
-    type id (** identifier of the hook *)
-    val register_key: key -> id
-    val extend: id -> (param->result)->unit
-    val extend_once: id -> (param->result) -> unit
-    val add_dependency: id -> id -> unit
+  include S
+  type key
+  type id (** identifier of the hook *)
+  val register_key: key -> id
+  val extend: id -> (param->result)->unit
+  val extend_once: id -> (param->result) -> unit
+  val add_dependency: id -> id -> unit
 end
 
 module type Iter_hook = S with type result = unit
@@ -62,12 +62,12 @@ module Build(P:sig type t end): Iter_hook with type param = P.t = struct
   let extend_once f = add_once f hooks
 
   let apply arg = Queue.iter (fun f -> f arg) hooks
-    (* [JS 06 October 2008] the following code iter in reverse order without
-       changing the order of the queue itself.
+  (* [JS 06 October 2008] the following code iter in reverse order without
+     changing the order of the queue itself.
 
-       let list = ref [] in
-       Queue.iter (fun f -> list := f :: !list) hooks;
-       List.iter (fun f -> f arg) !list *)
+     let list = ref [] in
+     Queue.iter (fun f -> list := f :: !list) hooks;
+     List.iter (fun f -> f arg) !list *)
 
   let is_empty () = Queue.is_empty hooks
   let clear () = Queue.clear hooks
@@ -90,8 +90,8 @@ end
 module Make() = Build(struct type t = unit end)
 
 module Make_graph
-  (P: sig module Id:Comparable type param type result end)
-  =
+    (P: sig module Id:Comparable type param type result end)
+=
 struct
   type key = P.Id.t
   type param = P.param
@@ -142,11 +142,11 @@ struct
 
   let clear () = Hooks.clear hooks
 
-  let length () = 
+  let length () =
     Hooks.fold_vertex (fun (_,q) l -> Queue.length q + l) hooks 0
 end
 
-module Build_ordered (P: sig module Id:Comparable type t end): 
+module Build_ordered (P: sig module Id:Comparable type t end):
   S_ordered with type key = P.Id.t and type param = P.t and type result = unit =
 struct
   include Make_graph(
@@ -154,7 +154,7 @@ struct
 
   let apply v =
     let apply_queue (_,q) = Queue.iter (fun f -> f v) q in
-    Apply.iter apply_queue hooks  
+    Apply.iter apply_queue hooks
 end
 
 module Make_ordered(P: sig module Id:Comparable end) =

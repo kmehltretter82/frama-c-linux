@@ -36,13 +36,13 @@ type ('a, 'b, 'c) metrics_panel = {
 *)
 let get_panel, set_panel, add_panel_action =
   let panel = ref {
-    top = None;
-    bottom = None;
-    actions = [];
-  } in
+      top = None;
+      bottom = None;
+      actions = [];
+    } in
   (fun () -> !panel),
   (fun top_widget bottom_widget ->
-    panel := { top = top_widget; bottom = bottom_widget; actions = []; }
+     panel := { top = top_widget; bottom = bottom_widget; actions = []; }
   ),
   (fun action -> panel := { !panel with actions = action :: !panel.actions; })
 ;;
@@ -50,14 +50,14 @@ let get_panel, set_panel, add_panel_action =
 (** Display the [table_contents] matrix as a GTK table *)
 let display_as_table table_contents (parent:GPack.box) =
   let table = GPack.table
-    ~columns:(List.length (List.hd table_contents))
-    ~rows:(List.length table_contents)
-    ~homogeneous:true
-    ~packing:parent#pack () in
+      ~columns:(List.length (List.hd table_contents))
+      ~rows:(List.length table_contents)
+      ~homogeneous:true
+      ~packing:parent#pack () in
   Extlib.iteri (fun i row ->
-    Extlib.iteri (fun j text ->
-      table#attach ~left:j ~top:i
-        ((GMisc.label ~justify:`LEFT ~text:text ()):>GObj.widget)) row)
+      Extlib.iteri (fun j text ->
+          table#attach ~left:j ~top:i
+            ((GMisc.label ~justify:`LEFT ~text:text ()):>GObj.widget)) row)
     table_contents ;
 ;;
 
@@ -79,12 +79,12 @@ let init_panel (main_ui: Design.main_window_extension_points) =
   let choices = GEdit.combo_box_text ~active:0 ~strings:[] ~packing:(up#pack) ()
   in
   let launch_button = GButton.button ~label:"Launch"
-    ~packing:(up#pack) ()
+      ~packing:(up#pack) ()
   in
   ignore(launch_button#connect#clicked (fun () ->
-    let actions = (get_panel ()).actions in
-    let sopt = GEdit.text_combo_get_active choices in
-    match sopt with
+      let actions = (get_panel ()).actions in
+      let sopt = GEdit.text_combo_get_active choices in
+      match sopt with
       | None -> ()
       | Some s ->
         if List.mem_assoc s actions then
@@ -93,7 +93,7 @@ let init_panel (main_ui: Design.main_window_extension_points) =
           ignore (main_ui#full_protect ~cancelable:true
                     (fun () -> action bottom))
         else ()
-  ) );
+    ) );
   set_panel (Some choices) (Some bottom);
   v
 ;;
@@ -101,8 +101,8 @@ let init_panel (main_ui: Design.main_window_extension_points) =
 let reset_panel _ =
   let metrics_panel = get_panel () in
   match metrics_panel.bottom with
-    | None -> ()
-    | Some b -> clear_container b;
+  | None -> ()
+  | Some b -> clear_container b;
 ;;
 
 

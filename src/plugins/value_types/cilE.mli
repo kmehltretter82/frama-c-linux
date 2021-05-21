@@ -33,20 +33,20 @@ type alarm_behavior = unit -> unit
 val a_ignore: alarm_behavior
 
 type warn_mode =
-    { defined_logic: alarm_behavior
-         (** operations that raise an error only in the C, not in the logic *);
-      unspecified: alarm_behavior (** defined but unspecified behaviors *);
-      others: alarm_behavior (** all the remaining undefined behaviors *);
-       }
-      (** An argument of type [warn_mode] can be supplied to some of the access
-          functions in {!Db.Value}  (the interface to the value analysis).
-          Each field of {!warn_mode} indicates the action to perform
-          for each category of alarm. These fields are not completely fixed
-          yet. However, you can use the value {!warn_none_mode} below
-          when you have to provide an argument of type [warn_mode]. *)
+  { defined_logic: alarm_behavior
+  (** operations that raise an error only in the C, not in the logic *);
+    unspecified: alarm_behavior (** defined but unspecified behaviors *);
+    others: alarm_behavior (** all the remaining undefined behaviors *);
+  }
+(** An argument of type [warn_mode] can be supplied to some of the access
+    functions in {!Db.Value}  (the interface to the value analysis).
+    Each field of {!warn_mode} indicates the action to perform
+    for each category of alarm. These fields are not completely fixed
+    yet. However, you can use the value {!warn_none_mode} below
+    when you have to provide an argument of type [warn_mode]. *)
 
 val warn_none_mode : warn_mode
-  (** Do not emit any message. *)
+(** Do not emit any message. *)
 
 (*
 Local Variables:
