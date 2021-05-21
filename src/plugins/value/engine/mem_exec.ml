@@ -21,12 +21,6 @@
 (**************************************************************************)
 
 
-module type Domain = sig
-  include Datatype.S_with_collections
-  include Abstract_domain.Reuse with type t := t
-end
-
-
 module SaveCounter =
   State_builder.SharedCounter(struct let name = "Mem_exec.save_counter" end)
 
@@ -54,7 +48,7 @@ let counter = ref 0
 
 module Make
     (Value : Datatype.S)
-    (Domain : Domain)
+    (Domain : Abstract_domain.S)
 = struct
 
   incr counter;

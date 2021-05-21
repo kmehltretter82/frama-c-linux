@@ -20,6 +20,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cil_types
+open Eval
+
 module type InputDomain = sig
   include Datatype.S
   val top: t
@@ -28,19 +31,56 @@ end
 
 module type LeafDomain = sig
   type t
+
+  val backward_location: t -> lval -> typ -> 'loc -> 'v -> ('loc * 'v) or_bottom
+  val reduce_further: t -> exp -> 'v -> (exp * 'v) list
+
+  val evaluate_predicate:
+    t Abstract_domain.logic_environment -> t -> predicate -> Alarmset.status
+  val reduce_by_predicate:
+    t Abstract_domain.logic_environment -> t -> predicate -> bool -> t or_bottom
+
+  val enter_loop: stmt -> t -> t
+  val incr_loop_counter: stmt -> t -> t
+  val leave_loop: stmt -> t -> t
+
+  val filter: kernel_function -> [`Pre | `Post] -> Base.Hptset.t -> t -> t
+  val reuse:
+    kernel_function -> Base.Hptset.t ->
+    current_input:t -> previous_output:t -> t
+
+  val show_expr: 'a -> t -> Format.formatter -> exp -> unit
   val post_analysis: t Bottom.or_bottom -> unit
+
   module Store: Domain_store.S with type t := t
+
   val key: t Abstract_domain.key
 end
 
 module Complete (Domain: InputDomain) = struct
 
+  let backward_location _state _lval _typ loc value = `Value (loc, value)
+  let reduce_further _state _expr _value = []
+
+  let evaluate_predicate _env _state _predicate = Alarmset.Unknown
+  let reduce_by_predicate _env state _predicate _positive = `Value state
+
+  let enter_loop _stmt state = state
+  let incr_loop_counter _stmt state = state
+  let leave_loop _stmt state = state
+
+  let filter _kf _kind _bases state = state
+  let reuse _kf _bases ~current_input:_ ~previous_output = previous_output
+
+  let show_expr _valuation _state fmt _expr =
+    Format.fprintf fmt "(not implemented)"
+
+  let post_analysis _state = ()
+
   module Store = Domain_store.Make (Domain)
 
   let key: Domain.t Structure.Key_Domain.key =
     Structure.Key_Domain.create_key Domain.name
-
-  let post_analysis _state = ()
 end
 
 open Simpler_domains
@@ -75,8 +115,6 @@ module Make_Minimal
   let top_answer = `Value (Value.top, None), Alarmset.all
   let extract_expr ~oracle:_ _context _state _expr = top_answer
   let extract_lval ~oracle:_ _context _state _lval _typ _location = top_answer
-  let backward_location _state _lval _typ location value = `Value (location, value)
-  let reduce_further _state _expr _value = []
 
   let update _valuation state = `Value state
 
@@ -98,12 +136,6 @@ module Make_Minimal
     assert (recursion = None);
     Domain.finalize_call stmt (simplify_call call) ~pre ~post
 
-  let show_expr _valuation = Domain.show_expr
-
-  let enter_loop _stmt state = state
-  let incr_loop_counter _stmt state = state
-  let leave_loop _stmt state = state
-
   let initialize_variable lval _location ~initialized value state =
     Domain.initialize_variable lval ~initialized value state
 
@@ -112,12 +144,8 @@ module Make_Minimal
     Domain.initialize_variable lval ~initialized:true Abstract_domain.Top state
 
   let logic_assign _assigns _location _state = top
-  let evaluate_predicate _ _ _ = Alarmset.Unknown
-  let reduce_by_predicate _ t _ _ = `Value t
 
   let relate _kf _bases _state = Base.SetLattice.top
-  let filter _kf _ _bases state = state
-  let reuse _kf _bases ~current_input:_ ~previous_output = previous_output
 end
 
 
@@ -203,11 +231,6 @@ module Complete_Simple_Cvalue (Domain: Simpler_domains.Simple_Cvalue)
       let v = Domain.extract_lval state lval typ location >>-: fun v -> v, None in
       v, Alarmset.all
 
-    let backward_location _state _lval _typ location value =
-      `Value (location, value)
-
-    let reduce_further _state _expr _value = []
-
     let find valuation expr =
       match valuation.Abstract_domain.find expr with
       | `Top -> `Top
@@ -239,12 +262,6 @@ module Complete_Simple_Cvalue (Domain: Simpler_domains.Simple_Cvalue)
       assert (recursion = None);
       Domain.finalize_call stmt call
 
-    let show_expr _valuation = Domain.show_expr
-
-    let enter_loop _stmt state = state
-    let incr_loop_counter _stmt state = state
-    let leave_loop _stmt state = state
-
     let initialize_variable lval _location ~initialized value state =
       Domain.initialize_variable lval ~initialized value state
 
@@ -253,12 +270,8 @@ module Complete_Simple_Cvalue (Domain: Simpler_domains.Simple_Cvalue)
       Domain.initialize_variable lval ~initialized:true Abstract_domain.Top state
 
     let logic_assign _assigns _location _state = top
-    let evaluate_predicate _ _ _ = Alarmset.Unknown
-    let reduce_by_predicate _ t _ _ = `Value t
 
     let relate _kf _bases _state = Base.SetLattice.top
-    let filter _kf _ _bases state = state
-    let reuse _kf _bases ~current_input:_ ~previous_output = previous_output
   end
 
   include D

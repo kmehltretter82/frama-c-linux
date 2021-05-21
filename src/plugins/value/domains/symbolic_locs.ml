@@ -482,10 +482,6 @@ module D : Abstract_domain.Leaf
     (* removed variables revert implicitly to Top *)
     Memory.remove_variables vars state
 
-  let enter_loop _ state = state
-  let incr_loop_counter _ state = state
-  let leave_loop _ state = state
-
   (* build a [get_locs] function from a valuation *)
   let get_locs valuation =
     fun lv ->
@@ -572,8 +568,6 @@ module D : Abstract_domain.Leaf
 
   let finalize_call _stmt _call _recursion ~pre:_ ~post = `Value post
 
-  let show_expr _valuation _state _fmt _expr = ()
-
   let top_query = `Value (V.top, None), Alarmset.all
 
   (* For extraction functions, if we have an information about the value,
@@ -591,14 +585,10 @@ module D : Abstract_domain.Leaf
     | None -> top_query
     | Some v -> `Value (v, None), Alarmset.none
 
-  let backward_location _state _lval _typ loc value =
-    (* Nothing to do. We could check if [[lval]] intersects [value] and
-       return [`Bottom] if it is not the case, but we have already supplied
-       [[lval]] during the forward propagation, so the intersection is probably
-       always non-empty. *)
-    `Value (loc, value)
-
-  let reduce_further _state _expr _value = [] (*Nothing intelligent to suggest*)
+  (* We could implement [backward_location if [[lval]] intersects [value] and
+     return [`Bottom] if it is not the case, but we have already supplied
+     [[lval]] during the forward propagation, so the intersection is probably
+     always non-empty. *)
 
   (* Memexec: the symbolic locations domain is relational, as it may infer a
      value for an expression or lvalue involving two different variables.
@@ -639,7 +629,4 @@ module D : Abstract_domain.Leaf
   let logic_assign _assigns location state =
     let loc = Precise_locs.imprecise_location location in
     Memory.kill loc state
-
-  let evaluate_predicate _ _ _ = Alarmset.Unknown
-  let reduce_by_predicate _ state _ _ = `Value state
 end

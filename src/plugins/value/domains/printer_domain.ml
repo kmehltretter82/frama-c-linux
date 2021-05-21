@@ -123,11 +123,6 @@ module Simple : Simpler_domains.Simple_Cvalue = struct
   let leave_scope _kf vi_list state =
     feedback "leave_scope %a"  pp_vi_list vi_list;
     state
-
-  (* --- Pretty printer --- *)
-
-  let show_expr _state _fmt exp =
-    feedback "show_expr %a" Printer.pp_exp exp
 end
 
 include Domain_builder.Complete_Simple_Cvalue (Simple)

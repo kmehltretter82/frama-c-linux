@@ -23,6 +23,9 @@
 (** Automatic builders to complete abstract domains from different
     simplified interfaces. *)
 
+open Cil_types
+open Eval
+
 module type InputDomain = sig
   include Datatype.S
   val top: t
@@ -31,12 +34,34 @@ end
 
 module type LeafDomain = sig
   type t
+
+  val backward_location: t -> lval -> typ -> 'loc -> 'v -> ('loc * 'v) or_bottom
+  val reduce_further: t -> exp -> 'v -> (exp * 'v) list
+
+  val evaluate_predicate:
+    t Abstract_domain.logic_environment -> t -> predicate -> Alarmset.status
+  val reduce_by_predicate:
+    t Abstract_domain.logic_environment -> t -> predicate -> bool -> t or_bottom
+
+  val enter_loop: stmt -> t -> t
+  val incr_loop_counter: stmt -> t -> t
+  val leave_loop: stmt -> t -> t
+
+  val filter: kernel_function -> [`Pre | `Post] -> Base.Hptset.t -> t -> t
+  val reuse:
+    kernel_function -> Base.Hptset.t ->
+    current_input:t -> previous_output:t -> t
+
+  val show_expr: 'a -> t -> Format.formatter -> exp -> unit
   val post_analysis: t Bottom.or_bottom -> unit
+
   module Store: Domain_store.S with type t := t
+
   val key: t Abstract_domain.key
 end
 
-module Complete (Domain: InputDomain) : LeafDomain with type t := Domain.t
+module Complete (Domain: InputDomain) :
+  LeafDomain with type t := Domain.t
 
 module Complete_Minimal
     (Value: Abstract_value.S)

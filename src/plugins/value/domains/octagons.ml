@@ -1065,8 +1065,6 @@ module Domain = struct
 
   let extract_lval ~oracle:_ _context _t _lval _typ _loc = top_value
 
-  let backward_location _t _lval _typ loc value = `Value (loc, value)
-
   let reduce_further state expr value =
     match expr.enode with
     | Lval (Var x, NoOffset) when Cil.isIntegralType x.vtype ->
@@ -1249,25 +1247,16 @@ module Domain = struct
       let modified = Locations.Zone.join post.modified pre.modified in
       `Value { post with modified }
 
-  let show_expr _valuation _state _fmt _expr = ()
-
   let logic_assign _logic_assign location state =
     let loc = Precise_locs.imprecise_location location in
     let zone = Locations.(enumerate_valid_bits Write loc) in
     let state = kill zone state in
     check "logic_assign" state
 
-  let evaluate_predicate _env _state _pred = Alarmset.Unknown
-  let reduce_by_predicate _env state _pred _positive = `Value state
-
   let enter_scope _kind _varinfos state = state
   let leave_scope _kf varinfos state =
     let state = List.fold_left State.remove state varinfos in
     check "leave_scope" state
-
-  let enter_loop _stmt state = state
-  let incr_loop_counter _stmt state = state
-  let leave_loop _stmt state = state
 
   let initialize_variable _lval _location ~initialized:_ _value state = state
   let initialize_variable_using_type _kind _varinfo state = state

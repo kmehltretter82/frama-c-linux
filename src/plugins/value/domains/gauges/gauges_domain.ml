@@ -1254,8 +1254,6 @@ module D : Abstract_domain.Leaf
     let state = List.fold_left aux_arg state call.arguments in
     `Value state
 
-  let show_expr _valuation _state _fmt _expr = ()
-
   let enter_loop = G.enter_loop
   let incr_loop_counter _ = G.inc
   let leave_loop = G.leave_loop
@@ -1279,10 +1277,6 @@ module D : Abstract_domain.Leaf
        and it is not clear that we know more than the Cvalue domain. *)
     `Value (v, None), Alarmset.all
 
-  let backward_location _state _lval _typ loc value = `Value (loc, value)
-
-  let reduce_further _state _expr _value = []
-
   (* Memexec *)
 
   let relate _kf _bases _state = match function_calls_handling with
@@ -1290,18 +1284,12 @@ module D : Abstract_domain.Leaf
     | IntraproceduralAll
     | IntraproceduralNonReferenced -> Base.SetLattice.empty
 
-  let filter _kf _kind _bases state = state
-
-  let reuse _kf _bases ~current_input:_ ~previous_output = previous_output
-
   (* Initial state *)
   let initialize_variable_using_type _ _ state = state
   let initialize_variable _ _ ~initialized:_ _ state = state
 
   (* Logic *)
   let logic_assign _assigns location state = kill location state
-  let evaluate_predicate _ _ _ = Alarmset.Unknown
-  let reduce_by_predicate _ state _ _ = `Value state
 
   let top = G.empty (* must not be used, not neutral w.r.t. join (because
                        join crashes...)!! *)

@@ -1142,18 +1142,9 @@ module D = struct
 
   let update _valuation state = `Value state
 
-  let show_expr _valuation state fmt _expr = Traces.pretty fmt state
-
   (* Memexec *)
   (* This domains infers no relation between variables. *)
   let relate _kf _bases _state = Base.SetLattice.bottom
-  (* Do not filter the state: the memexec cache will be applied only on function
-     calls for which the entry states are equal. This almost completely
-     disable memexec, but is always sound. *)
-  let filter _kf _kind _bases state = state
-  (* As memexec cache is only applied on equal entry states, the previous
-     output state is a correct output for the current input state. *)
-  let reuse _kf _bases ~current_input:_ ~previous_output:state = state
 
   let empty () = Traces.empty
   let initialize_variable lv _ ~initialized:_ _ state =
@@ -1176,17 +1167,10 @@ module D = struct
   let logic_assign _assign _location state =
     Traces.add_trans state (Msg "logic assign")
 
-  (* Logic *)
-  let evaluate_predicate _ _ _ = Alarmset.Unknown
-  let reduce_by_predicate _ state _ _ = `Value state
-
   let top_query = `Value (Cvalue.V.top, None), Alarmset.all
 
   let extract_expr ~oracle:_ _context _state _expr = top_query
   let extract_lval ~oracle:_ _context _state _lv _typ _locs = top_query
-
-  let backward_location _state _lval _typ loc value =
-    `Value (loc, value)
 
   let enter_loop stmt state =
     let state = Traces.add_trans state (Msg "enter_loop") in
@@ -1248,8 +1232,6 @@ module D = struct
 
   let leave_scope kf vars state =
     Traces.add_trans state (LeaveScope (kf, vars))
-
-  let reduce_further _state _expr _value = [] (*Nothing intelligent to suggest*)
 
   let output_dot filename state =
     let out = open_out filename in
