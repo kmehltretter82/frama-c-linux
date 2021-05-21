@@ -11,7 +11,7 @@
   d0 ∈ {1e-40}
 [eva] tests/float/const3.i:11: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   f1 ∈ {9.99994610111e-41}
   d0 ∈ {1e-40}
   __retres ∈ UNINITIALIZED

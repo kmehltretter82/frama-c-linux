@@ -855,6 +855,7 @@ module Internal = struct
              include Abstract_domain.Lattice with type state := state
            end)
 
+  let name = "traces"
   let log_category = Value_parameters.register_category "d-traces"
 
   let assign ki lv e _v _valuation state =

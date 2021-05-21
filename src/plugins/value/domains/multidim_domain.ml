@@ -251,7 +251,7 @@ struct
   type origin
 
 
-  let name = "Multidim domain"
+  let name = "multidim"
   let log_category = dkey
 
   let cache_name s =

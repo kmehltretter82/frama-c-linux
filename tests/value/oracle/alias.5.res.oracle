@@ -61,7 +61,7 @@
   Called from tests/value/alias.i:268.
 [eva] tests/value/alias.i:23: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   NULL[rbits 0 to 2047] ∈ [--..--]
   x_0 ∈ {{ (char *)&p2 }}
   q_0 ∈ {{ &p2 + {1} }}

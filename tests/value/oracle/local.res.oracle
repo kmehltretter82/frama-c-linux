@@ -35,7 +35,7 @@
   locals {d} escaping the scope of g through \result<g>
 [eva] tests/value/local.i:35: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   X ∈ ESCAPINGADDR
   Y ∈ ESCAPINGADDR
   Z ∈ ESCAPINGADDR

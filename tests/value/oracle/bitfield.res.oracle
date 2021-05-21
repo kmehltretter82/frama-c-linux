@@ -43,7 +43,7 @@
   Called from tests/value/bitfield.i:128.
 [eva] tests/value/bitfield.i:21: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   h ∈ {0}
   k ∈ {0}
   k8 ∈ {0}
@@ -162,7 +162,7 @@
   Called from tests/value/bitfield.i:167.
 [eva] tests/value/bitfield.i:146: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   h.a ∈ {0}
    .b ∈ [--..--]
    .c ∈ [--..--] or ESCAPINGADDR

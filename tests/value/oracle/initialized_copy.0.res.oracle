@@ -11,7 +11,7 @@
   accessing uninitialized left-value. assert \initialized(&b_0);
 [eva] tests/value/initialized_copy.i:38: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   w[0..9] ∈ {0}
   v ∈ [--..--]
   b_0 ∈ {1}
@@ -24,7 +24,7 @@
   accessing uninitialized left-value. assert \initialized(&c_0);
 [eva] tests/value/initialized_copy.i:65: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   w[0..9] ∈ {0}
   v ∈ [--..--]
   c_0 ∈ {67305985}
@@ -50,7 +50,7 @@
   accessing uninitialized left-value. assert \initialized(&v_1[i_0]);
 [eva] tests/value/initialized_copy.i:102: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   w[0..9] ∈ {0}
   v ∈ [--..--]
   i_0 ∈ [0..9]
@@ -66,7 +66,7 @@
   accessing uninitialized left-value. assert \initialized(&v_2[i_1]);
 [eva] tests/value/initialized_copy.i:112: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   w[0..9] ∈ {0; 12}
   v ∈ [--..--]
   i_1 ∈ [0..9]
@@ -91,7 +91,7 @@
 [eva] Done for function f
 [eva] tests/value/initialized_copy.i:144: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   w[0..9] ∈ {0; 12}
   v ∈ [--..--]
   a_7 ∈ {1}
@@ -107,7 +107,7 @@
 [eva] Done for function g
 [eva] tests/value/initialized_copy.i:152: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   w[0..9] ∈ {0; 12}
   v ∈ [--..--]
   a_8 ∈ {1}

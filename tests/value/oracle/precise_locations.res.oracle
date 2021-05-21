@@ -12,7 +12,7 @@
 [eva] tests/value/precise_locations.i:28: starting to merge loop iterations
 [eva] tests/value/precise_locations.i:33: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   t{[0..48]{.f1[0..4]; .f_inter[0..4]; .f2#; .f_inter2[0..4]; .[bits 328 to 351]#}; [49].f1[0..4]} ∈
    {0; 10} repeated %32 
    [49]{.f_inter[0..4]; .f2; .f_inter2[0..4]; .[bits 328 to 351]} ∈ {0}
@@ -42,7 +42,7 @@
 [eva] tests/value/precise_locations.i:39: Reusing old results for call to ct
 [eva] tests/value/precise_locations.i:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   t[0]{.f1[0..4]; .f_inter[0..4]} ∈ {0; 10; 20}
    [0].f2 ∈ [--..--]
    [bits 328 to 831]# ∈ {0; 10; 20} repeated %32, bits 8 to 511 
@@ -405,7 +405,7 @@
   r ∈ {0}
 [eva] tests/value/precise_locations.i:33: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   t[0].f1[0..4] ∈ {0; 10}
    [0]{.f_inter[0..4]; .f2; .f_inter2[0..4]; .[bits 328 to 351]} ∈ {0}
    [1].f1[0..4] ∈ {0; 10}
@@ -529,7 +529,7 @@
 [eva] tests/value/precise_locations.i:39: Reusing old results for call to ct
 [eva] tests/value/precise_locations.i:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   t[0].f1[0..4] ∈ {0; 10; 20}
    [0].f_inter[0..4] ∈ {0}
    [0].f2 ∈ {-99; 0}

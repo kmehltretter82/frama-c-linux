@@ -43,7 +43,7 @@
   Called from tests/value/cond_integer_cast_of_float.i:123.
 [eva] tests/value/cond_integer_cast_of_float.i:78: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   b ∈ {0}
   f1 ∈ [1.17000007629 .. 3.40282346639e+38]
   f2 ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
@@ -56,7 +56,7 @@
   ==END OF DUMP==
 [eva] tests/value/cond_integer_cast_of_float.i:81: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   b ∈ {0}
   f1 ∈ [-3.40282346639e+38 .. 1.16999995708]
   f2 ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
@@ -95,7 +95,7 @@
   assertion got status unknown.
 [eva] tests/value/cond_integer_cast_of_float.i:115: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   b ∈ {0}
   f1 ∈ [10.0000009537 .. 3.40282346639e+38]
   f2 ∈ [10.0000009537 .. 3.40282346639e+38]
@@ -116,7 +116,7 @@
   function main3: precondition 'd2' got status unknown.
 [eva] tests/value/cond_integer_cast_of_float.i:115: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   b ∈ {0}
   f1 ∈ [10.0000009537 .. 3.40282346639e+38]
   f2 ∈ [10.0000009537 .. 3.40282346639e+38]
@@ -173,7 +173,7 @@
   Called from tests/value/cond_integer_cast_of_float.i:123.
 [eva] tests/value/cond_integer_cast_of_float.i:78: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   b ∈ {0}
   f1 ∈ [0x1.2b85200000000p0 .. 0x1.fffffe0000000p127]
   f2 ∈ [-0x1.fffffe0000000p127 .. 0x1.fffffe0000000p127]
@@ -186,7 +186,7 @@
   ==END OF DUMP==
 [eva] tests/value/cond_integer_cast_of_float.i:81: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   b ∈ {0}
   f1 ∈ [-0x1.fffffe0000000p127 .. 0x1.2b851e0000000p0]
   f2 ∈ [-0x1.fffffe0000000p127 .. 0x1.fffffe0000000p127]
@@ -207,7 +207,7 @@
   Called from tests/value/cond_integer_cast_of_float.i:125.
 [eva] tests/value/cond_integer_cast_of_float.i:115: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   b ∈ {0}
   f1 ∈ [0x1.4000020000000p3 .. 0x1.fffffe0000000p127]
   f2 ∈ [0x1.4000020000000p3 .. 0x1.fffffe0000000p127]
@@ -224,7 +224,7 @@
   Called from tests/value/cond_integer_cast_of_float.i:127.
 [eva] tests/value/cond_integer_cast_of_float.i:115: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   b ∈ {0}
   f1 ∈ [0x1.4000020000000p3 .. 0x1.fffffe0000000p127]
   f2 ∈ [0x1.4000020000000p3 .. 0x1.fffffe0000000p127]

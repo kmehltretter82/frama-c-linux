@@ -364,7 +364,7 @@
   Called from tests/value/gauges.c:367.
 [eva] tests/value/gauges.c:306: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -424,7 +424,7 @@
 [eva] tests/value/gauges.c:304: starting to merge loop iterations
 [eva] tests/value/gauges.c:306: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -483,7 +483,7 @@
   ==END OF DUMP==
 [eva] tests/value/gauges.c:306: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -542,7 +542,7 @@
   ==END OF DUMP==
 [eva] tests/value/gauges.c:306: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -607,7 +607,7 @@
 [eva] tests/value/gauges.c:324: starting to merge loop iterations
 [eva] tests/value/gauges.c:325: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -668,7 +668,7 @@
 [eva] tests/value/gauges.c:321: starting to merge loop iterations
 [eva] tests/value/gauges.c:325: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}

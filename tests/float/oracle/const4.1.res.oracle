@@ -15,7 +15,7 @@
   f2 ∈ {3.40282346639e+38}
 [eva] tests/float/const4.i:11: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   f1 ∈ [3.39999995214e+38 .. 3.40000015497e+38]
   f2 ∈ {3.40282346639e+38}
   __retres ∈ UNINITIALIZED

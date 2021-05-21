@@ -6,7 +6,7 @@
   v ∈ [--..--]
 [eva] tests/value/conversion.i:16: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   x ∈ {1}
   y ∈ UNINITIALIZED
@@ -17,7 +17,7 @@
   assertion 'ASSUME' got status unknown.
 [eva] tests/value/conversion.i:21: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   x ∈ [0..1120000000]
   y ∈ UNINITIALIZED
@@ -28,7 +28,7 @@
   assertion 'ASSUME' got status unknown.
 [eva] tests/value/conversion.i:26: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   x ∈ [-10..10]
   y ∈ UNINITIALIZED
@@ -39,7 +39,7 @@
   assertion 'ASSUME' got status unknown.
 [eva] tests/value/conversion.i:31: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   x ∈ [-10..10]
   y ∈ [-10..10]
@@ -50,7 +50,7 @@
   assertion 'ASSUME' got status unknown.
 [eva] tests/value/conversion.i:36: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   x ∈ [1077936128..1084227584]
   y ∈ [-10..10]
@@ -61,7 +61,7 @@
   pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
 [eva] tests/value/conversion.i:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   x ∈ {{ (int)&x }}
   y ∈ [-10..10]
@@ -70,7 +70,7 @@
   ==END OF DUMP==
 [eva] tests/value/conversion.i:45: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   x[bits 0 to 15] ∈ {1}
    [bits 16 to 31] ∈ {2}
@@ -83,7 +83,7 @@
   assertion 'ASSUME' got status unknown.
 [eva] tests/value/conversion.i:53: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   x[bits 0 to 15] ∈ {1}
    [bits 16 to 31] ∈ {2}
@@ -118,7 +118,7 @@
   v ∈ [--..--]
 [eva] tests/value/conversion.i:16: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   x ∈ {1}
   y ∈ UNINITIALIZED
@@ -127,7 +127,7 @@
   ==END OF DUMP==
 [eva] tests/value/conversion.i:21: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   x ∈ [0..1120000000]
   y ∈ UNINITIALIZED
@@ -138,7 +138,7 @@
   non-finite float value. assert \is_finite(*((float *)(&x)));
 [eva] tests/value/conversion.i:26: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   x ∈ [0. .. 1.40129846432e-44]
   y ∈ UNINITIALIZED
@@ -147,7 +147,7 @@
   ==END OF DUMP==
 [eva] tests/value/conversion.i:31: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   x ∈ [-10..10]
   y ∈ [--..--]
@@ -156,7 +156,7 @@
   ==END OF DUMP==
 [eva] tests/value/conversion.i:36: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   x ∈ [1077936128..1084227584]
   y ∈ [--..--]
@@ -172,7 +172,7 @@
   The imprecision originates from Arithmetic {tests/value/conversion.i:39}
 [eva] tests/value/conversion.i:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   x ∈ {{ (int)&x }}
   y ∈ [--..--]
@@ -182,7 +182,7 @@
   ==END OF DUMP==
 [eva] tests/value/conversion.i:45: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   x[bits 0 to 15] ∈ {1}
    [bits 16 to 31] ∈ {2}
@@ -194,7 +194,7 @@
   accessing uninitialized left-value. assert \initialized((float *)(&l));
 [eva] tests/value/conversion.i:53: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   x[bits 0 to 15] ∈ {1}
    [bits 16 to 31] ∈ {2}

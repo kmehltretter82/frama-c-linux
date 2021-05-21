@@ -121,7 +121,7 @@ module Internal = struct
 
   type state = t
 
-  let name = "Equality domain"
+  let name = "equality"
   let log_category = dkey
   let key = Structure.Key_Domain.create_key "equality_domain"
 

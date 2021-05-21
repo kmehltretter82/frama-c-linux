@@ -104,7 +104,7 @@ module Internal  : Domain_builder.InputDomain
              include Abstract_domain.Lattice with type state := state
            end)
 
-  let name = "Bitwise domain"
+  let name = "bitwise"
   let log_category = dkey
 
   let empty _ = Memory.empty_map

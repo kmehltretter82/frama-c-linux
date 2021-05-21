@@ -7,7 +7,7 @@
   malloc_next_free ∈ {0}
 [eva] tests/builtins/linked_list.c:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[0..0x3FF] ∈ {0}
   __fc_errno ∈ [--..--]
   __fc_stderr ∈ {{ &__fc_initial_stderr }}
@@ -49,7 +49,7 @@
 [eva] Done for function malloc
 [eva] tests/builtins/linked_list.c:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[0..0x3FF] ∈ {0}
   __fc_errno ∈ [--..--]
   __fc_stderr ∈ {{ &__fc_initial_stderr }}
@@ -85,7 +85,7 @@
   ==END OF DUMP==
 [eva] tests/builtins/linked_list.c:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
         [4..0x3FF] ∈ {0}
   __fc_errno ∈ [--..--]
@@ -126,7 +126,7 @@
 [eva] Done for function malloc
 [eva] tests/builtins/linked_list.c:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
         [4..0x3FF] ∈ {0}
   __fc_errno ∈ [--..--]
@@ -163,7 +163,7 @@
   ==END OF DUMP==
 [eva] tests/builtins/linked_list.c:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
         [4..7] ∈ {0}
         [bits 64 to 95] ∈ {2}
@@ -207,7 +207,7 @@
 [eva] Done for function malloc
 [eva] tests/builtins/linked_list.c:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
         [4..7] ∈ {0}
         [bits 64 to 95] ∈ {2}
@@ -247,7 +247,7 @@
   ==END OF DUMP==
 [eva] tests/builtins/linked_list.c:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
         [4..7] ∈ {0}
         [bits 64 to 95] ∈ {2}
@@ -293,7 +293,7 @@
 [eva] Done for function malloc
 [eva] tests/builtins/linked_list.c:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
         [4..7] ∈ {0}
         [bits 64 to 95] ∈ {2}
@@ -335,7 +335,7 @@
   ==END OF DUMP==
 [eva] tests/builtins/linked_list.c:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
         [4..7] ∈ {0}
         [bits 64 to 95] ∈ {2}
@@ -383,7 +383,7 @@
 [eva] Done for function malloc
 [eva] tests/builtins/linked_list.c:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
         [4..7] ∈ {0}
         [bits 64 to 95] ∈ {2}
@@ -427,7 +427,7 @@
   ==END OF DUMP==
 [eva] tests/builtins/linked_list.c:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
         [4..7] ∈ {0}
         [bits 64 to 95] ∈ {2}
@@ -477,7 +477,7 @@
 [eva] Done for function malloc
 [eva] tests/builtins/linked_list.c:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
         [4..7] ∈ {0}
         [bits 64 to 95] ∈ {2}
@@ -523,7 +523,7 @@
   ==END OF DUMP==
 [eva] tests/builtins/linked_list.c:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
         [4..7] ∈ {0}
         [bits 64 to 95] ∈ {2}
@@ -575,7 +575,7 @@
 [eva] Done for function malloc
 [eva] tests/builtins/linked_list.c:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
         [4..7] ∈ {0}
         [bits 64 to 95] ∈ {2}
@@ -623,7 +623,7 @@
   ==END OF DUMP==
 [eva] tests/builtins/linked_list.c:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
         [4..7] ∈ {0}
         [bits 64 to 95] ∈ {2}
@@ -677,7 +677,7 @@
 [eva] Done for function malloc
 [eva] tests/builtins/linked_list.c:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
         [4..7] ∈ {0}
         [bits 64 to 95] ∈ {2}
@@ -727,7 +727,7 @@
   ==END OF DUMP==
 [eva] tests/builtins/linked_list.c:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
         [4..7] ∈ {0}
         [bits 64 to 95] ∈ {2}
@@ -783,7 +783,7 @@
 [eva] Done for function malloc
 [eva] tests/builtins/linked_list.c:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
         [4..7] ∈ {0}
         [bits 64 to 95] ∈ {2}
@@ -835,7 +835,7 @@
   ==END OF DUMP==
 [eva] tests/builtins/linked_list.c:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
         [4..7] ∈ {0}
         [bits 64 to 95] ∈ {2}
@@ -893,7 +893,7 @@
 [eva] Done for function malloc
 [eva] tests/builtins/linked_list.c:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
         [4..7] ∈ {0}
         [bits 64 to 95] ∈ {2}

@@ -10,7 +10,7 @@
 [eva] tests/builtins/realloc.c:12: allocating variable __malloc_main1_l12
 [eva] tests/builtins/realloc.c:15: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -40,7 +40,7 @@
   strong free on bases: {__malloc_main1_l12}
 [eva] tests/builtins/realloc.c:17: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -91,7 +91,7 @@
   strong free on bases: {__malloc_main2_l23}
 [eva] tests/builtins/realloc.c:27: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -135,7 +135,7 @@
 [eva] Done for function Frama_C_interval
 [eva] tests/builtins/realloc.c:44: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -168,7 +168,7 @@
   weak free on bases: {__malloc_main3_l32, __malloc_main3_l35}
 [eva] tests/builtins/realloc.c:48: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -241,7 +241,7 @@
   out of bounds write. assert \valid(p + i);
 [eva] tests/builtins/realloc.c:61: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -299,7 +299,7 @@
   strong free on bases: {__malloc_main4_l56}
 [eva] tests/builtins/realloc.c:69: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -365,7 +365,7 @@
 [eva] Done for function Frama_C_interval
 [eva] tests/builtins/realloc.c:83: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -396,7 +396,7 @@
   weak free on bases: {__malloc_main5_l76}
 [eva] tests/builtins/realloc.c:86: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -470,7 +470,7 @@
   strong free on bases: {__malloc_main7_l110}
 [eva] tests/builtins/realloc.c:116: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -497,7 +497,7 @@
   locals {x} escaping the scope of a block of main7 through __realloc_main7_l115
 [eva] tests/builtins/realloc.c:118: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -539,7 +539,7 @@
   strong free on bases: {__malloc_main8_l123}
 [eva] tests/builtins/realloc.c:127: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -580,7 +580,7 @@
   strong free on bases: {__malloc_main9_l132}
 [eva] tests/builtins/realloc.c:136: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -622,7 +622,7 @@
 [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
 [eva] tests/builtins/realloc.c:155: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -653,7 +653,7 @@
 [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
 [eva] tests/builtins/realloc.c:155: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}

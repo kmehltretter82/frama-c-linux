@@ -211,7 +211,7 @@
 [eva] Done for function Frama_C_interval
 [eva] tests/value/octagons.c:183: 
   Frama_C_dump_each:
-  # Octagon domain:
+  # octagon:
   {[ k - tmp ∈ {0}
      a - b ∈ [-8..0]
      b - c ∈ [0..8]

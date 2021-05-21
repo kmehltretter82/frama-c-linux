@@ -19,7 +19,7 @@
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva] tests/builtins/write-const.c:19: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {0}
   __fc_strerror[0..63] ∈ [--..--]
@@ -46,7 +46,7 @@
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] tests/builtins/write-const.c:26: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {0}
   __fc_strerror[0..63] ∈ [--..--]
@@ -70,7 +70,7 @@
   out of bounds write. assert \valid(p);
 [eva] tests/builtins/write-const.c:33: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {0}
   __fc_strerror[0..63] ∈ [--..--]
@@ -93,7 +93,7 @@
   out of bounds write. assert \valid(p);
 [eva] tests/builtins/write-const.c:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {0}
   __fc_strerror[0..63] ∈ [--..--]

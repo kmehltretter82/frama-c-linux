@@ -155,22 +155,22 @@
 [eva] tests/value/builtins_split.c:145: Call to builtin Frama_C_builtin_split
 [eva] tests/value/builtins_split.c:146: 
   Frama_C_domain_show_each_test6:
-  z : # Cvalue domain: {5} or UNINITIALIZED
+  z : # cvalue: {5} or UNINITIALIZED
 [eva] tests/value/builtins_split.c:146: 
   Frama_C_domain_show_each_test6:
-  z : # Cvalue domain: {4} or UNINITIALIZED
+  z : # cvalue: {4} or UNINITIALIZED
 [eva] tests/value/builtins_split.c:146: 
   Frama_C_domain_show_each_test6:
-  z : # Cvalue domain: {3} or UNINITIALIZED
+  z : # cvalue: {3} or UNINITIALIZED
 [eva] tests/value/builtins_split.c:146: 
   Frama_C_domain_show_each_test6:
-  z : # Cvalue domain: {2} or UNINITIALIZED
+  z : # cvalue: {2} or UNINITIALIZED
 [eva] tests/value/builtins_split.c:146: 
   Frama_C_domain_show_each_test6:
-  z : # Cvalue domain: {1} or UNINITIALIZED
+  z : # cvalue: {1} or UNINITIALIZED
 [eva] tests/value/builtins_split.c:146: 
   Frama_C_domain_show_each_test6:
-  z : # Cvalue domain: {0} or UNINITIALIZED
+  z : # cvalue: {0} or UNINITIALIZED
 [eva] Recording results for test6
 [eva] Done for function test6
 [eva] Recording results for main

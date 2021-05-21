@@ -10,7 +10,7 @@
 [eva] Done for function f1
 [eva] tests/value/narrow_behaviors.i:56: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   nondet ∈ [--..--]
   p.x ∈ {2}
    .y ∈ {1; 2}
@@ -18,7 +18,7 @@
   ==END OF DUMP==
 [eva] tests/value/narrow_behaviors.i:56: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   nondet ∈ {0}
   p{.x; .y} ∈ {1}
   __retres ∈ UNINITIALIZED
@@ -36,7 +36,7 @@
 [eva] Done for function f2
 [eva] tests/value/narrow_behaviors.i:57: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   nondet ∈ [--..--]
   p.x ∈ {2}
    .y ∈ {1; 2}
@@ -46,7 +46,7 @@
   ==END OF DUMP==
 [eva] tests/value/narrow_behaviors.i:57: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   nondet ∈ {0}
   p.x ∈ {2}
    .y ∈ {1; 2}
@@ -56,7 +56,7 @@
   ==END OF DUMP==
 [eva] tests/value/narrow_behaviors.i:57: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   nondet ∈ {0}
   p{.x; .y} ∈ {1}
   q.x ∈ {1; 2}
@@ -81,14 +81,14 @@
 [eva] Done for function f1
 [eva] tests/value/narrow_behaviors.i:62: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   nondet ∈ {0}
   r{.x; .y} ∈ {1}
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva] tests/value/narrow_behaviors.i:62: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   nondet ∈ {1}
   r{.x; .y} ∈ {2}
   __retres ∈ UNINITIALIZED
@@ -113,7 +113,7 @@
 [eva] Done for function f2
 [eva] tests/value/narrow_behaviors.i:63: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   nondet ∈ {0}
   r{.x; .y} ∈ {1}
   s.x ∈ {1; 2}

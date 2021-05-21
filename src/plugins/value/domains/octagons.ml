@@ -1320,7 +1320,7 @@ module Domain = struct
             relations = join_rel prev_output.relations current_input.relations;
             modified = current_input.modified }
 
-  let name = "Octagon domain"
+  let name = "octagon"
   let log_category = Value_parameters.register_category "d-octagon"
 end
 

@@ -6,7 +6,7 @@
 > [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
 > [eva] tests/builtins/realloc.c:155: 
 >   Frama_C_dump_each:
->   # Cvalue domain:
+>   # cvalue:
 >   __fc_heap_status ∈ [--..--]
 >   __fc_random_counter ∈ [--..--]
 >   __fc_rand_max ∈ {32767}
@@ -35,7 +35,7 @@
 > [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
 > [eva] tests/builtins/realloc.c:155: 
 >   Frama_C_dump_each:
->   # Cvalue domain:
+>   # cvalue:
 >   __fc_heap_status ∈ [--..--]
 >   __fc_random_counter ∈ [--..--]
 >   __fc_rand_max ∈ {32767}
@@ -64,7 +64,7 @@
 > [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
 > [eva] tests/builtins/realloc.c:155: 
 >   Frama_C_dump_each:
->   # Cvalue domain:
+>   # cvalue:
 >   __fc_heap_status ∈ [--..--]
 >   __fc_random_counter ∈ [--..--]
 >   __fc_rand_max ∈ {32767}
@@ -93,7 +93,7 @@
 > [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
 > [eva] tests/builtins/realloc.c:155: 
 >   Frama_C_dump_each:
->   # Cvalue domain:
+>   # cvalue:
 >   __fc_heap_status ∈ [--..--]
 >   __fc_random_counter ∈ [--..--]
 >   __fc_rand_max ∈ {32767}
@@ -122,7 +122,7 @@
 > [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
 > [eva] tests/builtins/realloc.c:155: 
 >   Frama_C_dump_each:
->   # Cvalue domain:
+>   # cvalue:
 >   __fc_heap_status ∈ [--..--]
 >   __fc_random_counter ∈ [--..--]
 >   __fc_rand_max ∈ {32767}
@@ -151,7 +151,7 @@
 > [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
 > [eva] tests/builtins/realloc.c:155: 
 >   Frama_C_dump_each:
->   # Cvalue domain:
+>   # cvalue:
 >   __fc_heap_status ∈ [--..--]
 >   __fc_random_counter ∈ [--..--]
 >   __fc_rand_max ∈ {32767}
@@ -180,7 +180,7 @@
 > [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
 > [eva] tests/builtins/realloc.c:155: 
 >   Frama_C_dump_each:
->   # Cvalue domain:
+>   # cvalue:
 >   __fc_heap_status ∈ [--..--]
 >   __fc_random_counter ∈ [--..--]
 >   __fc_rand_max ∈ {32767}
@@ -209,7 +209,7 @@
 > [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
 > [eva] tests/builtins/realloc.c:155: 
 >   Frama_C_dump_each:
->   # Cvalue domain:
+>   # cvalue:
 >   __fc_heap_status ∈ [--..--]
 >   __fc_random_counter ∈ [--..--]
 >   __fc_rand_max ∈ {32767}
@@ -238,7 +238,7 @@
 > [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
 > [eva] tests/builtins/realloc.c:155: 
 >   Frama_C_dump_each:
->   # Cvalue domain:
+>   # cvalue:
 >   __fc_heap_status ∈ [--..--]
 >   __fc_random_counter ∈ [--..--]
 >   __fc_rand_max ∈ {32767}
@@ -268,7 +268,7 @@
 > [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
 > [eva] tests/builtins/realloc.c:155: 
 >   Frama_C_dump_each:
->   # Cvalue domain:
+>   # cvalue:
 >   __fc_heap_status ∈ [--..--]
 >   __fc_random_counter ∈ [--..--]
 >   __fc_rand_max ∈ {32767}
@@ -297,7 +297,7 @@
 > [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
 > [eva] tests/builtins/realloc.c:155: 
 >   Frama_C_dump_each:
->   # Cvalue domain:
+>   # cvalue:
 >   __fc_heap_status ∈ [--..--]
 >   __fc_random_counter ∈ [--..--]
 >   __fc_rand_max ∈ {32767}
@@ -326,7 +326,7 @@
 > [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
 > [eva] tests/builtins/realloc.c:155: 
 >   Frama_C_dump_each:
->   # Cvalue domain:
+>   # cvalue:
 >   __fc_heap_status ∈ [--..--]
 >   __fc_random_counter ∈ [--..--]
 >   __fc_rand_max ∈ {32767}

@@ -10,7 +10,7 @@
 [eva] Done for function f
 [eva] tests/value/bitfield_receives_result.i:10: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   s.b ∈ {-1}
    .[bits 31 to 31] ∈ {0}
   tmp ∈ {-1}

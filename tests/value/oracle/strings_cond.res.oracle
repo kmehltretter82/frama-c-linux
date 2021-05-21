@@ -8,7 +8,7 @@
   Called from tests/value/strings_cond.i:8.
 [eva] tests/value/strings_cond.i:3: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   s ∈ {{ "Bla" }}
   ==END OF DUMP==
 [eva] tests/value/strings_cond.i:4: Frama_C_show_each_s: {{ "Bla" }}

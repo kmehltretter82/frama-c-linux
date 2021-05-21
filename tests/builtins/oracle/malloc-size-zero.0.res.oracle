@@ -52,7 +52,7 @@
 [eva] Done for function my_calloc
 [eva] tests/builtins/malloc-size-zero.c:33: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}

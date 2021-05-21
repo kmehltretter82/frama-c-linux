@@ -14,7 +14,7 @@
 [eva] tests/value/usp.i:17: Frama_C_show_each: {-1; 5}
 [eva] tests/value/usp.i:18: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   a ∈ {-12}
   b ∈ {5; 4294967295}
   p ∈ {{ (unsigned int *)&a }}

@@ -1129,7 +1129,7 @@ module D_Impl : Abstract_domain.S
 
   include G
 
-  let name = "Gauges domain"
+  let name = "gauges"
   let log_category = dkey
 
   let empty _ = G.empty

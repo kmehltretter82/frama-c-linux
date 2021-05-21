@@ -14,7 +14,7 @@
   Called from tests/float/alarms.i:70.
 [eva] tests/float/alarms.i:19: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   u1 ∈ [--..--]
   u2 ∈ [--..--]
   f ∈ [-inf .. inf] ∪ {NaN}

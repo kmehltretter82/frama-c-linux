@@ -34,7 +34,7 @@
   function strnlen: precondition 'valid_string_s' got status valid.
 [eva] tests/builtins/strnlen.c:17: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}

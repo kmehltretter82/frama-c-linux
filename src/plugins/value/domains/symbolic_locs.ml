@@ -469,7 +469,7 @@ module Internal : Domain_builder.InputDomain
              include Abstract_domain.Lattice with type state := state
            end)
 
-  let name = "Symbolic locations domain"
+  let name = "symbolic-locations"
   let log_category = dkey
 
   let empty _ = Memory.empty_map

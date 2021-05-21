@@ -181,7 +181,7 @@ module State = struct
       let mem_project = Datatype.never_any_project
     end )
 
-  let name = "Cvalue domain"
+  let name = "cvalue"
   let key = Structure.Key_Domain.create_key "cvalue_domain"
 
   type value = Model.value

@@ -27,7 +27,7 @@
   out of bounds read. assert \valid_read(q);
 [eva] tests/value/relation_shift.i:19: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   r1 ∈ [--..--]
   r2 ∈ [--..--]
   r3 ∈ {3}
