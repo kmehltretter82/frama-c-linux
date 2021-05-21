@@ -98,10 +98,10 @@ end
 module Domain : sig
   include Structure.Shape
     with type 'a key = 'a Structure.Key_Domain.key
-     and type 'a data = (module Abstract_domain.Internal with type state = 'a)
+     and type 'a data = (module Abstract_domain.S with type state = 'a)
 
   module type Internal = sig
-    include Abstract_domain.Internal
+    include Abstract_domain.S
     val structure: t structure
   end
 

@@ -538,6 +538,8 @@ module G = struct
       (Datatype.List(Datatype.Pair(Cil_datatype.Stmt)(IterationInfo)))
       (struct let module_name = "Values.Gauges_domain.G" end)
 
+  let name = "gauges"
+
   let empty = MV.empty, []
   let top (state: t) : t =
     let top_iteration_info = function
@@ -1117,7 +1119,7 @@ end
 
 let dkey = Value_parameters.register_category "d-gauges"
 
-module D_Impl : Abstract_domain.S
+module D : Abstract_domain.Leaf
   with type state = G.t
    and type value = Cvalue.V.t
    and type location = Precise_locs.precise_location
@@ -1128,8 +1130,8 @@ module D_Impl : Abstract_domain.S
   type origin
 
   include G
+  include Domain_builder.Complete (struct include G let top = empty end)
 
-  let name = "gauges"
   let log_category = dkey
 
   let empty _ = G.empty
@@ -1304,5 +1306,3 @@ module D_Impl : Abstract_domain.S
   let top = G.empty (* must not be used, not neutral w.r.t. join (because
                        join crashes...)!! *)
 end
-
-module D = Domain_builder.Complete (D_Impl)

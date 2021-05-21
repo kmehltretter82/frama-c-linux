@@ -231,7 +231,7 @@ struct
 end
 
 
-module DomainPrototype =
+module DomainLattice =
 struct
   (* The domain is essentially a map from bases to individual memory abstractions *)
   module Initial_Values = struct let v = [[]] end
@@ -240,16 +240,6 @@ struct
   include Hptmap.Make
       (Base.Base) (Memory)
       (Hptmap.Comp_unused) (Initial_Values) (Deps)
-
-  type state = t
-  type value = Value.t
-  type base = Base.t
-  type offset = Location.offset
-  type memory = Memory.t
-  type location = Precise_locs.precise_location
-  type mdlocation = Location.t (* should be = to location *)
-  type origin
-
 
   let name = "multidim"
   let log_category = dkey
@@ -294,6 +284,23 @@ struct
       if Memory.(is_top r) then None else Some r
     in
     inter ~cache:Hptmap_sig.NoCache ~symmetric:false ~idempotent:true ~decide
+
+end
+
+module Domain =
+struct
+
+  include DomainLattice
+  include Domain_builder.Complete (DomainLattice)
+
+  type state = t
+  type value = Value.t
+  type base = Base.t
+  type offset = Location.offset
+  type memory = Memory.t
+  type location = Precise_locs.precise_location
+  type mdlocation = Location.t (* should be = to location *)
+  type origin
 
 
   (* Bases handling *)
@@ -556,7 +563,7 @@ struct
   let relate _kf _bases _state = Base.SetLattice.empty
 
   let filter _kf _kind bases state =
-    filter (fun elt -> Base.Hptset.mem elt bases) state
+    DomainLattice.filter (fun elt -> Base.Hptset.mem elt bases) state
 
   let reuse _kf bases ~current_input ~previous_output =
     let cache = Hptmap_sig.NoCache in
@@ -569,5 +576,4 @@ struct
       current_input previous_output
 end
 
-
-include Domain_builder.Complete (DomainPrototype)
+include Domain

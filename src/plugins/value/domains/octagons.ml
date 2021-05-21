@@ -753,6 +753,9 @@ module State = struct
           Format.fprintf fmt "@[%a@]" Octagons.pretty octagons
       end)
 
+  let name = "octagon"
+  let log_category = Value_parameters.register_category "d-octagon"
+
   let pretty_debug fmt { octagons; intervals; relations } =
     Format.fprintf fmt "@[<v> Octagons: %a@; Intervals: %a@; Relations: %a@]"
       Octagons.pretty octagons Intervals.pretty intervals
@@ -1034,6 +1037,7 @@ end
 module Domain = struct
 
   include State
+  include Domain_builder.Complete (State)
 
   type value = Cvalue.V.t
   type location = Precise_locs.precise_location
@@ -1320,8 +1324,6 @@ module Domain = struct
             relations = join_rel prev_output.relations current_input.relations;
             modified = current_input.modified }
 
-  let name = "octagon"
-  let log_category = Value_parameters.register_category "d-octagon"
 end
 
-include Domain_builder.Complete (Domain)
+include Domain

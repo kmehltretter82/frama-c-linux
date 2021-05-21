@@ -215,6 +215,8 @@ module Memory = struct
 
     end)
 
+  let name = "symbolic-locations"
+
   let top = {
     values = K2V.M.empty;
     zones = K2Z.empty;
@@ -454,7 +456,7 @@ module Memory = struct
       syntactic_deps = B2K.union into.syntactic_deps t.syntactic_deps }
 end
 
-module Internal : Domain_builder.InputDomain
+module D : Abstract_domain.Leaf
   with type state = Memory.t
    and type value = V.t
    and type location = Precise_locs.precise_location
@@ -469,7 +471,8 @@ module Internal : Domain_builder.InputDomain
              include Abstract_domain.Lattice with type state := state
            end)
 
-  let name = "symbolic-locations"
+  include Domain_builder.Complete (Memory)
+
   let log_category = dkey
 
   let empty _ = Memory.empty_map
@@ -640,5 +643,3 @@ module Internal : Domain_builder.InputDomain
   let evaluate_predicate _ _ _ = Alarmset.Unknown
   let reduce_by_predicate _ state _ _ = `Value state
 end
-
-module D = Domain_builder.Complete (Internal)

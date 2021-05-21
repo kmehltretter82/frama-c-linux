@@ -464,12 +464,6 @@ module type S = sig
   (** Category for the messages about the domain.
       Must be created through {!Value_parameters.register_category}. *)
   val log_category : Value_parameters.category
-end
-
-(** Full implementation of domains. Automatically built by
-    {!Domain_builder.Complete} from an {!S_with_Structure} domain. *)
-module type Internal = sig
-  include S
 
   (** This function is called after the analysis. The argument is the state
       computed at the return statement of the main function. The function can
@@ -485,7 +479,7 @@ type 't key = 't Structure.Key_Domain.key
 
 (** Signature for a leaf module of a domain. *)
 module type Leaf = sig
-  include Internal
+  include S
 
   (** The key identifies the domain and the type [t] of its states. *)
   val key: t key

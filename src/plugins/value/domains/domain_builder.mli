@@ -24,14 +24,19 @@
     simplified interfaces. *)
 
 module type InputDomain = sig
-  include Abstract_domain.S
+  include Datatype.S
+  val top: t
+  val join: t -> t -> t
 end
 
-module Complete
-    (Domain: InputDomain)
-  : Abstract_domain.Leaf with type state = Domain.state
-                          and type value = Domain.value
-                          and type location = Domain.location
+module type LeafDomain = sig
+  type t
+  val post_analysis: t Bottom.or_bottom -> unit
+  module Store: Domain_store.S with type t := t
+  val key: t Abstract_domain.key
+end
+
+module Complete (Domain: InputDomain) : LeafDomain with type t := Domain.t
 
 module Complete_Minimal
     (Value: Abstract_value.S)

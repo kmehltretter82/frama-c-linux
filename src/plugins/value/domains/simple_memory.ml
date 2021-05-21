@@ -176,7 +176,7 @@ module Make_Memory (Value: Value) = struct
 
 end
 
-module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
+module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
 
   let table = Hashtbl.create 17
   let () =
@@ -186,7 +186,10 @@ module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
     try Some (Hashtbl.find table name)
     with Not_found -> None
 
-  include Make_Memory (Value)
+  module M = Make_Memory (Value)
+  include M
+
+  include Domain_builder.Complete (M)
 
   let name = Info.name
 
@@ -344,13 +347,7 @@ module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
     merge ~cache ~symmetric:false ~idempotent:true
       ~decide_both ~decide_left:(Traversing decide_left) ~decide_right:Neutral
       current_input previous_output
-end
 
-
-module Make_Domain (Info: sig val name: string end) (Value: Value) =
-struct
-  module M = Make_Internal (Info) (Value)
-  include Domain_builder.Complete (M)
   let add = M.add
   let find = M.find
   let remove = M.remove

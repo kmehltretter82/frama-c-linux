@@ -370,7 +370,7 @@ module Make (Man : Input) = struct
   let top = Abstract1.top man empty_env
   let make_top env = Abstract1.top man env
 
-  include Datatype.Make_with_collections (
+  module D = Datatype.Make_with_collections (
     struct
       include Datatype.Undefined
       type t = state
@@ -402,6 +402,7 @@ module Make (Man : Input) = struct
 
       let mem_project = Datatype.never_any_project
     end )
+  include D
 
   let name = Man.name
 
@@ -427,6 +428,14 @@ module Make (Man : Input) = struct
   let narrow s1 s2 =
     let s = Abstract1.meet man s1 s2 in
     if Abstract1.is_bottom man s then `Bottom else `Value s
+
+  include Domain_builder.Complete
+      (struct
+        include D
+        let name = name
+        let top = top
+        let join = join
+      end)
 
   let make_eval state =
     let env = Abstract1.env state in
@@ -728,7 +737,7 @@ end
 let () = Floating_point.set_round_nearest_even ()
 
 let make name (module Man: Input) =
-  let module Domain = Domain_builder.Complete (Make (Man)) in
+  let module Domain = Make (Man) in
   let descr =
     "Binding to the " ^ name ^ " domain of the Apron library. " ^
     "See http://apron.cri.ensmp.fr/library for more details."

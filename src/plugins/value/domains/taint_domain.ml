@@ -106,6 +106,8 @@ module LatticeTaint = struct
 
     end)
 
+  let name = "taint"
+
   (* Initial state at the start of the computation: nothing is tainted yet. *)
   let empty = {
     locs_data = Zone.bottom;
@@ -329,7 +331,7 @@ module ReuseTaint = struct
 end
 
 
-module InternalTaint = struct
+module TaintDomain = struct
   type state = taint
   type value = Cvalue.V.t
   type location = Precise_locs.precise_location
@@ -339,6 +341,8 @@ module InternalTaint = struct
              include Datatype.S_with_collections with type t = state
              include Abstract_domain.Lattice with type state := state
            end)
+
+  include Domain_builder.Complete (LatticeTaint)
 
   include (QueriesTaint: Abstract_domain.Queries
            with type state := state
@@ -354,7 +358,6 @@ module InternalTaint = struct
 
   include (ReuseTaint: Abstract_domain.Reuse with type t := state)
 
-  let name = "taint"
   let log_category = dkey
 
 
@@ -415,5 +418,4 @@ module InternalTaint = struct
   let leave_loop _ state = state
 end
 
-
-include Domain_builder.Complete (InternalTaint)
+include TaintDomain

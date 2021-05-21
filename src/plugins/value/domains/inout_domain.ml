@@ -95,6 +95,8 @@ module LatticeInout = struct
 
     end)
 
+  let name = "inout"
+
   (* Initial abstract at the beginning of the computation: nothing written
      or read so far. *)
   let empty = {
@@ -204,7 +206,7 @@ module Transfer = struct
 
 end
 
-module Internal
+module D
   (*: Domain_builder.InputDomain
     with type state = inout
     and type value = Cvalue.V.t
@@ -220,7 +222,8 @@ module Internal
              include Abstract_domain.Lattice with type state := state
            end)
 
-  let name = "inout"
+  include Domain_builder.Complete (LatticeInout)
+
   let log_category = Value_parameters.register_category "d-inout"
 
   let enter_scope _kind _vars state = state
@@ -283,9 +286,6 @@ module Internal
   let reduce_further _state _expr _value = [] (*Nothing intelligent to suggest*)
 
 end
-
-module D = Domain_builder.Complete (Internal)
-
 
 (*
 Local Variables:

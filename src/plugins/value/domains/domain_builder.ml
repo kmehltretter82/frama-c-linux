@@ -21,14 +21,20 @@
 (**************************************************************************)
 
 module type InputDomain = sig
-  include Abstract_domain.S
+  include Datatype.S
+  val top: t
+  val join: t -> t -> t
 end
 
-module Complete
-    (Domain: InputDomain)
-= struct
+module type LeafDomain = sig
+  type t
+  val post_analysis: t Bottom.or_bottom -> unit
+  module Store: Domain_store.S with type t := t
+  val key: t Abstract_domain.key
+end
 
-  include Domain
+module Complete (Domain: InputDomain) = struct
+
   module Store = Domain_store.Make (Domain)
 
   let key: Domain.t Structure.Key_Domain.key =
@@ -140,6 +146,7 @@ module Complete_Minimal
        : Datatype.S_with_collections with type t := t)
   end
 
+  include D
   include Complete (D)
 
 end
@@ -161,6 +168,7 @@ module Complete_Minimal_with_datatype
        : Datatype.S_with_collections with type t := t)
   end
 
+  include D
   include Complete (D)
 
 end
@@ -253,6 +261,7 @@ module Complete_Simple_Cvalue (Domain: Simpler_domains.Simple_Cvalue)
     let reuse _kf _bases ~current_input:_ ~previous_output = previous_output
   end
 
+  include D
   include Complete (D)
 end
 

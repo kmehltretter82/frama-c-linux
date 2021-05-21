@@ -86,10 +86,12 @@ module Memory = struct
     widen wh s1 s2
 
   let narrow x _y = `Value x
+
+  let name = "bitwise"
 end
 
 
-module Internal  : Domain_builder.InputDomain
+module D : Abstract_domain.Leaf
   with type state = Memory.t
    and type value = offsm_or_top
    and type location = Precise_locs.precise_location
@@ -104,7 +106,8 @@ module Internal  : Domain_builder.InputDomain
              include Abstract_domain.Lattice with type state := state
            end)
 
-  let name = "bitwise"
+  include Domain_builder.Complete (Memory)
+
   let log_category = dkey
 
   let empty _ = Memory.empty_map
@@ -233,6 +236,3 @@ module Internal  : Domain_builder.InputDomain
   let evaluate_predicate _ _ _ = Alarmset.Unknown
   let reduce_by_predicate _ state _ _ = `Value state
 end
-
-
-module D = Domain_builder.Complete (Internal)
