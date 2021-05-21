@@ -52,6 +52,7 @@ module type T =
 sig
   type t
 
+  val pretty : Format.formatter -> t -> unit
   val append : t -> t -> t (* Does not check that the appened offset fits *)
   val join : t -> t -> t
   val of_cil_offset : (Cil_types.exp -> Ival.t) -> Cil_types.typ -> Cil_types.offset -> t
@@ -70,6 +71,11 @@ module TypedOffset =
 struct
   type t = typed_offset
 
+  let rec pretty fmt = function
+  | NoOffset _t -> ()
+  | Field (fi, s) -> Format.fprintf fmt ".%s%a" fi.fname pretty s
+  | Index (i, _t, s) -> Format.fprintf fmt "[%a]%a" Ival.pretty i pretty s
+
   let rec append o1 o2 =
     match o1 with
     | NoOffset _t -> o2
@@ -86,13 +92,16 @@ struct
       Index (Ival.join i1 i2, t, join s1 s2)
     | _ -> raise Abstract_interp.Error_Top
 
-  let array_range array_size =
+  let array_bounds array_size =
     (* TODO: handle undefined sizes and not const foldable sizes *)
     match array_size with
-    | None -> Ival.top
+    | None -> None, None
     | Some size_exp ->
-      let u = Cil.constFoldToInt size_exp in
-      Ival.inject_range (Some Integer.zero) u
+      Some Integer.zero, Cil.constFoldToInt size_exp
+
+  let array_range array_size =
+    let l,u = array_bounds array_size in
+    Ival.inject_range l u
 
   let assert_valid_index idx size =
     let range = array_range size in
@@ -170,17 +179,18 @@ struct
     else
       of_ival base_typ typ ival
 
-  let index_of_term t = (* Exact constant ranges *)
+  let index_of_term array_size t = (* Exact constant ranges *)
     match t.Cil_types.term_node with
     | Tempty_set -> Ival.bottom
     | TConst (Integer (v, _)) -> Ival.inject_singleton v
     | Trange (l,u) ->
-      let eval_bound = function
-        | { Cil_types.term_node=TConst (Integer (v, _)) } -> v
-        | _ -> raise Abstract_interp.Error_Top
+      let eval bound = function
+        | None -> bound
+        | Some { Cil_types.term_node=TConst (Integer (v, _)) } -> Some v
+        | Some _ -> raise Abstract_interp.Error_Top
       in
-      let l' = Option.map eval_bound l
-      and u' = Option.map eval_bound u in
+      let lb, ub = array_bounds array_size in
+      let l' = eval lb l and u' = eval ub u in
       Ival.inject_range l' u'
     | _ -> raise Abstract_interp.Error_Top
 
@@ -191,7 +201,7 @@ struct
     | TIndex (index, sub) ->
       begin match Cil.unrollType base_typ with
         | TArray (elem_typ, array_size, _, _) ->
-          let idx = index_of_term index in
+          let idx = index_of_term array_size index in
           assert_valid_index idx array_size;
           Index (idx, elem_typ, of_term_offset elem_typ sub)
         | _ -> assert false
@@ -208,6 +218,10 @@ end
 module TypedOffsetOrTop =
 struct
   type t = [ `Value of typed_offset | `Top ]
+
+  let pretty fmt = function
+    | `Top -> Format.pp_print_string fmt "T"
+    | `Value o -> TypedOffset.pretty fmt o
 
   let append o1 o2 =
     match o1, o2 with

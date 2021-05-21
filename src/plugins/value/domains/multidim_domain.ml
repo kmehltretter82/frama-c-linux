@@ -42,9 +42,15 @@ struct
 
   let of_integer = inject_int
 
-  let zero = inject_int Integer.zero
+  let of_bit = function
+   | Memory_map.Zero -> inject_int Integer.zero
+   | Any (Set s) -> inject_top_origin Origin.top s
+   | Any (Top) -> top_with_origin Origin.top
 
-  let misaligned _v = top
+  let to_bit v =
+    if is_zero v
+    then Memory_map.Zero
+    else Memory_map.Any (get_bases v)
 
   let backward_is_finite positive fkind v =
     let prec = Fval.kind fkind in
@@ -53,9 +59,6 @@ struct
       Fval.backward_is_finite ~positive prec (project_float v) >>-: inject_float
     with Not_based_on_null ->
       `Value v
-
-  let top = top
-  let top_numerical = top_int
 end
 
 let no_oracle exp =
@@ -88,6 +91,10 @@ struct
   type offset = Offset.t
   type base = Base.t
   type t = offset Map.t
+
+  let _pretty = 
+    Pretty_utils.pp_iter2 ~sep:",@," ~between:":"
+      Map.iter Base.pretty Offset.pretty
 
   let empty = Map.empty
 
@@ -150,9 +157,9 @@ struct
 end
 
 
-(* The domain for *one* base *)
+(* Redefines the memory domain so it can handle top locations *)
 
-module Base_Domain =
+module Memory =
 struct
   module Config = struct let deps = [Ast.self] end
   module Memory = Memory_map.Make (Config) (Value)
@@ -162,7 +169,7 @@ struct
   struct
     include Datatype.Undefined
     include Memory
-    let name = "Multidim_domain.Base_Domain"
+    let name = "Multidim_domain.Memory"
     let reprs = [ Memory.top ]
   end
 
@@ -187,10 +194,10 @@ struct
     | `Top -> Memory.top
     | `Value loc -> Memory.extract m loc
 
-  let initialize m loc init_value =
+  let erase ~weak m loc bit_value =
     match loc with
     | `Top -> Memory.top
-    | `Value loc -> Memory.initialize m loc init_value
+    | `Value loc -> Memory.erase ~weak m loc bit_value
 
   let set ~weak new_v m loc =
     match loc with
@@ -209,12 +216,6 @@ struct
       in
       Memory.reinforce f' m loc
 
-  let erase m loc =
-    match loc with
-    | `Top -> m
-    | `Value loc ->
-      Memory.erase m loc
-
   let overwrite ~weak dst loc src =
     match loc with
     | `Top -> Memory.top
@@ -230,12 +231,14 @@ struct
   module Deps = struct let l = [Ast.self] end
 
   include Hptmap.Make
-      (Base.Base) (Base_Domain)
+      (Base.Base) (Memory)
       (Hptmap.Comp_unused) (Initial_Values) (Deps)
 
   type state = t
   type value = Value.t
   type base = Base.t
+  type offset = Location.offset
+  type memory = Memory.t
   type location = Precise_locs.precise_location
   type mdlocation = Location.t (* should be = to location *)
   type origin
@@ -256,7 +259,7 @@ struct
     let cache = cache_name "is_included" in
     let decide_fst _b _v1 = true (* v2 is top *) in
     let decide_snd _b _v2 = false (* v1 is top, v2 is not *) in
-    let decide_both _ v1 v2 = Base_Domain.is_included v1 v2 in
+    let decide_both _ v1 v2 = Memory.is_included v1 v2 in
     let decide_fast s t = if s == t then PTrue else PUnknown in
     binary_predicate cache UniversalPredicate
       ~decide_fast ~decide_fst ~decide_snd ~decide_both
@@ -264,7 +267,7 @@ struct
   let narrow =
     let cache = cache_name "narrow" in
     let decide _ v1 v2 =
-      Base_Domain.narrow v1 v2
+      Memory.narrow v1 v2
     in
     let narrow = join ~cache ~symmetric:true ~idempotent:true ~decide in
     fun a b -> `Value (narrow a b)
@@ -272,16 +275,16 @@ struct
   let join =
     let cache = cache_name "join" in
     let decide _ v1 v2 =
-      let r = Base_Domain.join v1 v2 in
-      if Base_Domain.(is_top r) then None else Some r
+      let r = Memory.join v1 v2 in
+      if Memory.(is_top r) then None else Some r
     in
     inter ~cache ~symmetric:true ~idempotent:true ~decide
 
   let widen kf stmt =
     let _,get_hints = Widen.getWidenHints kf stmt in
     let decide base b1 b2 =
-      let r = Base_Domain.widen (get_hints base) b1 b2 in
-      if Base_Domain.(is_top r) then None else Some r
+      let r = Memory.widen (get_hints base) b1 b2 in
+      if Memory.(is_top r) then None else Some r
     in
     inter ~cache:Hptmap_sig.NoCache ~symmetric:false ~idempotent:true ~decide
 
@@ -296,7 +299,7 @@ struct
     | CLogic_Var _ | String _ -> false
 
   let find_or_top (state : state) (b : base) =
-    try find b state with Not_found -> Base_Domain.top
+    try find b state with Not_found -> Memory.top
 
   let remove_var (state : state) (v : Cil_types.varinfo) =
     remove (Base.of_varinfo v) state
@@ -310,77 +313,48 @@ struct
 
   (* Accesses *)
 
-  let get (state : state) (src : mdlocation) : value =
-    let get_base base loc r =
-      let v = Base_Domain.get (find_or_top state base) loc in
-      Bottom.join Value.join r (`Value v)
+  let read (map : memory -> offset -> 'a) (reduce : 'a -> 'a -> 'a)
+      (state : state) (loc : mdlocation) : 'a or_bottom =
+    let f base off acc =
+      let v = map (find_or_top state base) off in
+      Bottom.join reduce (`Value v) acc
     in
-    match Location.fold get_base src `Bottom with
-    | `Bottom -> Value.top (* does not happen if the location is not empty *)
-    | `Value v -> v
+    Location.fold f loc `Bottom
 
-  let extract (state : state) (src : mdlocation) : Base_Domain.t or_bottom =
-    let extract_base base loc acc =
-      let map = find_or_top state base in
-      let value = Base_Domain.extract map loc in
-      Bottom.join Base_Domain.join acc (`Value value)
-    in
-    Location.fold extract_base src `Bottom
-
-  let set (state : state) (dst : mdlocation) (v : value) =
-    let weak = not (Location.is_singleton dst) in
-    let set_base base loc state =
+  let write (update : memory -> offset -> memory)
+      (state : state) (loc : mdlocation) : state =
+    let f base off state =
       if covers_base base then
-        add base (Base_Domain.set ~weak v (find_or_top state base) loc) state
+        add base (update (find_or_top state base) off) state
       else
         state
     in
-    Location.fold set_base dst state
+    Location.fold f loc state
 
-  let overwrite (state : state) (dst : mdlocation) (src : mdlocation) =
-    (* assert (Location.size dst = Location.size src); *)
+  let get (state : state) (src : mdlocation) : value or_bottom =
+    read Memory.get Value.join state src
+
+  let extract (state : state) (src : mdlocation) : Memory.t or_bottom =
+    read Memory.extract Memory.join state src
+
+  let set (state : state) (dst : mdlocation) (v : value) : state =
+    let weak = not (Location.is_singleton dst) in
+    write (Memory.set ~weak v) state dst
+
+  let overwrite (state : state) (dst : mdlocation) (src : mdlocation) : state =
     let weak = not (Location.is_singleton dst) in
     match extract state src with
     | `Bottom -> state (* no source *)
     | `Value value ->
-      let overwrite_base base loc state =
-        if covers_base base then
-          let map = find_or_top state base in
-          add base (Base_Domain.overwrite ~weak map loc value) state
-        else
-          state (* destination base not covered : do nothing *)
-      in
-      Location.fold overwrite_base dst state
+      write (fun m off -> Memory.overwrite ~weak m off value) state dst
 
-  let erase (state : state) (dst : mdlocation) =
-    let erase_base base loc state =
-      if mem base state
-      then add base (Base_Domain.erase (find_or_top state base) loc) state
-      else state
-    in
-    Location.fold erase_base dst state
+  let erase (state : state) (dst : mdlocation) (b : Memory_map.bit): state =
+    let weak = not (Location.is_singleton dst) in
+    write (fun m off -> Memory.erase ~weak m off b) state dst
 
-  let reinforce (f : value -> value or_bottom) (state : state)
-      (loc : mdlocation) =
-    let update_base base loc state =
-      if covers_base base then
-        let map = find_or_top state base in
-        add base (Base_Domain.reinforce f map loc) state
-      else
-        state (* destination base not covered : do nothing *)
-    in
-    Location.fold update_base loc state
-
-  let initialize dst init_value state =
-    (* dst must be exact, otherwise, we may initialize things that shouldn't *)
-    let initialize_base base loc state =
-      if covers_base base then
-        let map = find_or_top state base in
-        add base (Base_Domain.initialize map loc init_value) state
-      else
-        state
-    in
-    Location.fold initialize_base dst state
+  let reinforce (f : value -> value or_bottom) 
+      (state : state) (dst : mdlocation) : state =
+    write (fun m off -> Memory.reinforce f m off) state dst
 
   (* Eva Queries *)
 
@@ -397,10 +371,12 @@ struct
     let v =
       try
         let loc = Location.of_lval oracle lv in
-        get state loc
-      with Abstract_interp.Error_Top | Abstract_interp.Error_Bottom -> Value.top
+        get state loc >>-: fun v -> v, None
+      with
+      | Abstract_interp.Error_Top -> `Value (Value.top, None)
+      | Abstract_interp.Error_Bottom -> `Bottom
     in
-    `Value (v, None), Alarmset.all
+    v, Alarmset.all
 
   (* do nothing for now *)
   let backward_location _state _lval _typ loc value =
@@ -453,7 +429,7 @@ struct
           let src = Location.of_lval oracle right.lval in
           `Value (overwrite state dst src)
         with Abstract_interp.Error_Top | Abstract_interp.Error_Bottom ->
-          `Value (erase state dst)
+          `Value (erase state dst Memory_map.Bit.top)
     with Abstract_interp.Error_Top | Abstract_interp.Error_Bottom ->
       (* Failed to evaluate the left location *)
       `Value top
@@ -493,7 +469,7 @@ struct
           let loc = Location.of_lval oracle lval in
           match extract state loc with
           | `Bottom -> Format.fprintf fmt "⊥"
-          | `Value value -> Base_Domain.pretty fmt value
+          | `Value value -> Memory.pretty fmt value
         with Abstract_interp.Error_Top | Abstract_interp.Error_Bottom ->
           (* can't evaluate location : print nothing *)
           ()
@@ -515,7 +491,7 @@ struct
       match sources with
       | [] ->
         let dst = Location.of_precise_loc location in
-        initialize dst Memory_map.Top state
+        erase state dst Memory_map.Bit.numerical
       | _ ->
         remove state location
 
@@ -553,15 +529,15 @@ struct
   let initialize_variable lval _loc ~initialized:_ init_value state =
     let dst = Location.of_lval no_oracle lval in
     let d = match init_value with
-      | Abstract_domain.Top  -> Memory_map.Numerical
-      | Abstract_domain.Zero -> Memory_map.Zero
+      | Abstract_domain.Top  -> Memory_map.Bit.numerical
+      | Abstract_domain.Zero -> Memory_map.Bit.zero
     in
-    initialize dst d state
+    erase state dst d
 
   let initialize_variable_using_type _kind vi state =
     let lval = Cil.var vi in
     let dst = Location.of_lval no_oracle lval in
-    initialize dst Memory_map.Top state
+    erase state dst Memory_map.Bit.top
 
   let relate _kf _bases _state = Base.SetLattice.empty
 

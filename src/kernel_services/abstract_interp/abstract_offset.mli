@@ -24,6 +24,7 @@ module type T =
 sig
   type t
 
+  val pretty : Format.formatter -> t -> unit
   val append : t -> t -> t (* Does not check that the appened offset fits *)
   val join : t -> t -> t
   val of_cil_offset : (Cil_types.exp -> Ival.t) -> Cil_types.typ -> Cil_types.offset -> t

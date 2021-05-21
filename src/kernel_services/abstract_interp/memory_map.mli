@@ -22,10 +22,20 @@
 
 type size = Integer.t
 
-type default =
-  | Top (* Unknown everywhere *)
-  | Numerical (* Unknown but only numbers, no pointers at all *)
+type bit =
   | Zero (* Zero everywhere *)
+  | Any of Base.SetLattice.t (* Undetermined anywhere, and can contain bits
+                                of pointers. If the base set is empty,
+                                the bit can only come from numerical values. *)
+
+module Bit :
+sig
+  type t = bit
+
+  val top : t
+  val numerical : t
+  val zero : t
+end
 
 (* Values the memory is mapped to *)
 module type Value =
@@ -39,10 +49,8 @@ sig
   val compare : t -> t -> int
 
   val pretty : Format.formatter -> t -> unit
-  val zero : t
-  val misaligned : t -> t
-  val top : t
-  val top_numerical : t
+  val of_bit : bit -> t
+  val to_bit : t -> bit
   val is_included : t -> t -> bool
   val join : t -> t -> t
 end
@@ -78,21 +86,19 @@ sig
   (* Extract a sub map from a set of locations *)
   val extract : t -> location -> t
 
-  (* Set a default value on a set of locations *)
-  val initialize : t -> location -> default -> t
+  (* Erase / initialize the memory on a set of locations. *)
+  val erase : weak:bool -> t -> location -> bit -> t
 
   (* Set a value on a set of locations *)
   val set : weak:bool -> t -> location -> value -> t
+
+  (* Copy a whole map over another *)
+  val overwrite : weak:bool -> t -> location -> t -> t
 
   (* Reinforce values on a set of locations when the locations match the
      memory structure ; does nothing on locations that cannot be matched *)
   val reinforce : (value -> value) ->  t -> location -> t
 
-  (* Set top on a set of locations *)
-  val erase : t -> location -> t
-
-  (* Copy a whole map over another *)
-  val overwrite : weak:bool -> t -> location -> t -> t
 
   (* Test inclusion of one memory map into another *)
   val is_included : t -> t -> bool
