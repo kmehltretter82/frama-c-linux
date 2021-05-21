@@ -1249,10 +1249,11 @@ let digest wpo drv prover task =
 let batch pconf driver ?script ~timeout ~steplimit prover task =
   let steps = match steplimit with Some 0 -> None | _ -> steplimit in
   let limit =
+    let memlimit = Why3.Whyconf.memlimit (Why3.Whyconf.get_main (Why3Provers.config ())) in
     let def = Why3.Call_provers.empty_limit in
-    { def with
-      Why3.Call_provers.limit_time = Why3.Opt.get_def def.limit_time timeout;
+    { Why3.Call_provers.limit_time = Why3.Opt.get_def def.limit_time timeout;
       Why3.Call_provers.limit_steps = Why3.Opt.get_def def.limit_time steps;
+      Why3.Call_provers.limit_mem = memlimit;
     } in
   let with_steps = match steps, pconf.Why3.Whyconf.command_steps with
     | None, _ -> false
