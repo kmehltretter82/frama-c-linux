@@ -57,7 +57,7 @@ typedef struct contract_t __attribute__((__FC_BUILTIN__)) contract_t;
  * \return A structure to hold pieces of information about contracts at runtime.
  */
 /*@ assigns \result \from indirect:__fc_heap_status, indirect:size;
-  @ ensures \valid(\result); */
+  @ admit ensures \valid(\result); */
 contract_t * contract_init(size_t size) __attribute__((FC_BUILTIN));
 
 /*! \brief Cleanup the structure `c` previously allocated by
