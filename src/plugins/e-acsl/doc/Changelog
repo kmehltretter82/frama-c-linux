@@ -29,6 +29,8 @@ Plugin E-ACSL <next-release>
 Plugin E-ACSL 23.0 (Vanadium)
 #############################
 
+-* E-ACSL       [2021-05-25] Restore behavior of option -e-acsl-no-valid broken
+                since Titanium (included).
 -  E-ACSL       [2021-04-09] Add support for loop variant.
 -  E-ACSL       [2021-04-07] Add support for multiple binders in guarded
                 quantifications (frama-c/e-acsl#127).
