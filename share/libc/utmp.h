@@ -20,47 +20,91 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_UTMPX
-#define __FC_UTMPX
+// Note: this file is non-POSIX, but used by some coreutils.
+
+#ifndef __FC_UTMP
+#define __FC_UTMP
 #include "features.h"
 __PUSH_FC_STDLIB
 
 #include "__fc_define_pid_t.h"
-#include "stdint.h"
 #include "sys/time.h"
+#include "stdint.h"
 
 __BEGIN_DECLS
 
-// The sizes of arrays and values for the constants below are based on those
-// of the glibc, declared in the order given by POSIX.1-2008.
+#define _PATH_UTMP "/var/run/utmp"
+#define UTMP_FILE     _PATH_UTMP
+#define UTMP_FILENAME _PATH_UTMP
+#define _PATH_WTMP "/var/log/wtmp"
+#define WTMP_FILE     _PATH_WTMP
+#define WTMP_FILENAME _PATH_WTMP
 
-struct utmpx {
-  char ut_user[32];
-  char ut_id[4];
-  char ut_line[32];
-  char ut_host[256]; // not POSIX, but allowed by it, and present in glibc
-  pid_t ut_pid;
-  short ut_type;
-  struct timeval ut_tv;
-  int32_t ut_addr_v6[4]; // not POSIX, but allowed by it
-  char __glibc_reserved[20]; // not POSIX, but allowed by it
+#define UT_LINESIZE  32
+#define UT_NAMESIZE  32
+#define UT_HOSTSIZE  256
+
+struct lastlog
+{
+  time_t ll_time;
+  char ll_line[UT_LINESIZE];
+  char ll_host[UT_HOSTSIZE];
 };
 
-#define EMPTY 0
-#define BOOT_TIME 2
-#define OLD_TIME 4
-#define NEW_TIME 3
-#define USER_PROCESS 7
-#define INIT_PROCESS 5
-#define LOGIN_PROCESS 6
-#define DEAD_PROCESS 8
+struct exit_status
+{
+  short int e_termination;
+  short int e_exit;
+};
 
-extern void endutxent(void);
-extern struct utmpx *getutxent(void);
-extern struct utmpx *getutxid(const struct utmpx *);
-extern struct utmpx *getutxline(const struct utmpx *);
-extern struct utmpx *pututxline(const struct utmpx *);
-extern void setutxent(void);
+struct utmp
+{
+  short int ut_type;
+  pid_t ut_pid;
+  char ut_line[UT_LINESIZE];
+  char ut_id[4];
+  char ut_user[UT_NAMESIZE];
+  char ut_host[UT_HOSTSIZE];
+  struct exit_status ut_exit;
+  long int ut_session;
+  struct timeval ut_tv;
+  int32_t ut_addr_v6[4];
+  char __glibc_reserved[20]; // used by who.c
+};
+
+#define ut_name ut_user
+#define ut_time ut_tv.tv_sec
+
+extern int login_tty (int fd);
+extern void login (const struct utmp *entry);
+extern int logout (const char *ut_line);
+extern void logwtmp (const char *ut_line, const char *ut_name,
+                     const char *ut_host);
+
+extern void updwtmp (const char *wtmp_file, const struct utmp *utmp);
+
+extern int utmpname (const char *file);
+
+extern struct utmp *getutent (void);
+
+extern void setutent (void);
+
+extern void endutent (void);
+
+extern struct utmp *getutid (const struct utmp *id);
+
+extern struct utmp *getutline (const struct utmp *line);
+
+extern struct utmp *pututline (const struct utmp *utmp_ptr);
+
+extern int getutent_r (struct utmp *buffer, struct utmp **result);
+
+extern int getutid_r (const struct utmp *id, struct utmp *buffer,
+                      struct utmp **result);
+
+extern int getutline_r (const struct utmp *line,
+                        struct utmp *buffer, struct utmp **result);
+
 
 __END_DECLS
 __POP_FC_STDLIB

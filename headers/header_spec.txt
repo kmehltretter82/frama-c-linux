@@ -317,6 +317,7 @@ share/libc/time.h: CEA_LGPL
 share/libc/unistd.c: CEA_LGPL
 share/libc/unistd.h: CEA_LGPL
 share/libc/utime.h: CEA_LGPL
+share/libc/utmp.h: CEA_LGPL
 share/libc/utmpx.h: CEA_LGPL
 share/libc/wchar.c: CEA_LGPL
 share/libc/wchar.h: CEA_LGPL

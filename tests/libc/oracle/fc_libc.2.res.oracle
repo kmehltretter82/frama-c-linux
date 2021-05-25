@@ -124,6 +124,7 @@ skipping share/libc/tgmath.h
 [kernel] Parsing share/libc/time.h (with preprocessing)
 [kernel] Parsing share/libc/unistd.h (with preprocessing)
 [kernel] Parsing share/libc/utime.h (with preprocessing)
+[kernel] Parsing share/libc/utmp.h (with preprocessing)
 [kernel] Parsing share/libc/utmpx.h (with preprocessing)
 [kernel] Parsing share/libc/wchar.h (with preprocessing)
 [kernel] Parsing share/libc/wctype.h (with preprocessing)
