@@ -144,16 +144,8 @@ let poly f = function
   | Structure _ | T_pack _ as a ->
     try from_unmarshal (f (to_unmarshal a)) with Cannot_pack -> Unknown
 
-(* would be better to put it in Extlib, but no access to this library here *)
-let array_for_all f a =
-  try
-    Array.iter (fun x -> if not (f x) then raise Exit) a;
-    true
-  with Exit ->
-    false
-
 let is_abstract_array a =
-  array_for_all (fun x -> x = Pack Unmarshal.Abstract) a
+  Array.for_all (fun x -> x = Pack Unmarshal.Abstract) a
 
 let poly_arr f a =
   if is_abstract_array a then Abstract
@@ -185,7 +177,7 @@ let t_map_unchanged_compares = poly2 Unmarshal.t_map_unchangedcompares
 let t_hashtbl_unchanged_hashs = poly2 (Unmarshal.t_hashtbl_unchangedhashs)
 
 let t_sum a =
-  if array_for_all (is_abstract_array) a then Abstract
+  if Array.for_all (is_abstract_array) a then Abstract
   else Structure (Sum a)
 
 (* ********************************************************************** *)
