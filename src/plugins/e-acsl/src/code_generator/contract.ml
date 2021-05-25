@@ -72,20 +72,12 @@ module Rtl_call: sig
 end = struct
   let init_function_name = "contract_init"
 
-  let init_kf_lazy =
-    lazy
-      (Globals.Functions.find_by_name
-         (Functions.RTL.mk_api_name init_function_name))
-
   let ctyp_lazy =
     lazy
       (Globals.Types.find_type
          Logic_typing.Typedef (Functions.RTL.mk_api_name "contract_t"))
 
   let init ~loc ~result_name env kf count =
-    (* Tell Eva to use init as a builtin *)
-    let init_kf = Lazy.force init_kf_lazy in
-    Dep_eva.use_builtin init_kf "Frama_C_malloc";
     (* Add a call to init in the environment *)
     let ty = TPtr(Lazy.force ctyp_lazy, []) in
     Env.new_var
