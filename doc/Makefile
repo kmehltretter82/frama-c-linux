@@ -38,6 +38,7 @@ FRAMAC_DOCDIR ?= $(DOCDIR)/frama-c
 ###################
 
 VERSION=$(shell $(SED) -e 's/\\(.*\\)/\\1/' $(FRAMAC_SRC)/VERSION)
+VERSION_SAFE=$(subst ~,-,$(VERSION))
 
 ifeq ($(findstring +dev,$(VERSION)),+dev)
 DEVELOPMENT=yes

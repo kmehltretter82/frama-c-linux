@@ -7,7 +7,4 @@
 [e-acsl] tests/special/e-acsl-valid.c:24: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] tests/special/e-acsl-valid.c:12: Warning: 
-  E-ACSL construct `assigns clause in behavior' is not yet supported.
-  Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".

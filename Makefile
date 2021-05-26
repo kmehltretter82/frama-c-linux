@@ -39,6 +39,7 @@ endif
 ###################
 
 VERSION:=$(shell $(CAT) VERSION)
+VERSION_SAFE=$(subst ~,-,$(VERSION))
 VERSION_CODENAME:=$(shell $(CAT) VERSION_CODENAME)
 
 ###########################
@@ -2436,9 +2437,9 @@ CLIENT ?=
 
 DISTRIB_DIR=tmp
 ifeq ("$(CLIENT)","")
-VERSION_NAME:=$(VERSION)
+VERSION_NAME:=$(VERSION_SAFE)
 else
-VERSION_NAME:=$(VERSION)-$(CLIENT)
+VERSION_NAME:=$(VERSION_SAFE)-$(CLIENT)
 endif
 
 DISTRIB?=frama-c-$(VERSION_NAME)-$(VERSION_CODENAME)
@@ -2493,9 +2494,9 @@ endif
 	$(RM) -r $(DISTRIB_DIR)
 
 doc-companions:
-	$(MAKE) -C doc/developer archives VERSION=$(VERSION)-$(VERSION_CODENAME)
-	$(MV) doc/developer/hello-$(VERSION)-$(VERSION_CODENAME).tar.gz hello-$(VERSION)-$(VERSION_CODENAME).tar.gz
-	$(ECHO) "The documentation companion hello-$(VERSION)-$(VERSION_CODENAME).tar.gz has been generated."
+	$(MAKE) -C doc/developer archives VERSION=$(VERSION_SAFE)-$(VERSION_CODENAME)
+	$(MV) doc/developer/hello-$(VERSION_SAFE)-$(VERSION_CODENAME).tar.gz hello-$(VERSION_SAFE)-$(VERSION_CODENAME).tar.gz
+	$(ECHO) "The documentation companion hello-$(VERSION_SAFE)-$(VERSION_CODENAME).tar.gz has been generated."
 
 clean-distrib: dist-clean
 	$(PRINT_RM) distrib
