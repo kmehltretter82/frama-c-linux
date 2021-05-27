@@ -1766,7 +1766,14 @@ let prepare_from_c_files () =
   let audit_path = Kernel.AuditPrepare.get () in
   if not (Filepath.Normalized.is_empty audit_path) then begin
     let all_sources_tbl = compute_sources_table cpp_commands in
-    print_all_sources audit_path all_sources_tbl;
+    begin
+      try
+        print_all_sources audit_path all_sources_tbl
+      with Json.CannotMerge _ ->
+        Kernel.abort "%s already computed; it should be set by itself, \
+                      after the last '-then' in the command line."
+          Kernel.AuditPrepare.option_name
+    end;
     if not (Filepath.Normalized.is_special_stdout audit_path) then
       Kernel.feedback "Audit: sources list written to: %a@."
         Filepath.Normalized.pretty audit_path;

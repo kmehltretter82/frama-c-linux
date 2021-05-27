@@ -176,7 +176,14 @@ let force_compute () =
   if not (Kernel.AuditCheck.is_empty ()) then
     Eva_audit.check_configuration (Kernel.AuditCheck.get ());
   if not (Kernel.AuditPrepare.is_empty ()) then
-    Eva_audit.print_configuration (Kernel.AuditPrepare.get ());
+    begin
+      try
+        Eva_audit.print_configuration (Kernel.AuditPrepare.get ());
+      with Json.CannotMerge _ ->
+        Kernel.abort "%s already computed; it should be set by itself, \
+                      after the last '-then' in the command line."
+          Kernel.AuditPrepare.option_name
+    end;
   let kf, lib_entry = Globals.entry_point () in
   reset_analyzer ();
   let module Analyzer = (val snd !ref_analyzer) in
