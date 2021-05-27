@@ -487,19 +487,25 @@ $G(n) \equiv P(n)\Longrightarrow\,Q(n)$:
 \end{array}} \]
 
 \paragraph{Overflow} Integer Conversions \\
-This tactic rewrites machine integer conversions by identity,
-providing the converted value is in available range. The tactic applies on expression
-with pattern $\mathtt{to\_iota(e)}$ where \texttt{iota} is a a machine-integer name,
-\emph{eg.} \texttt{to\_uint32}.
+This tactic split machine integer conversions into three cases: value in integer
+range, lower than range and upper than range. The tactic applies on expression
+with pattern $\mathtt{to\_iota(e)}$ where \texttt{iota} is a a machine-integer
+name, \emph{eg.} \texttt{to\_uint32}.
 
 \[\TACTIC{\Delta\models G}{%
 \begin{array}[t]{rcl}
-\Delta\phantom{)} &\models & a \leq e \leq b \\
-\sigma(\Delta) & \models & \sigma(G)
+\sigma_{id}(\Delta) & \models & low \leq e \leq up \Rightarrow \sigma_{id}(G) \\
+\sigma_{+}(\Delta) & \models & low < e \Rightarrow \sigma_{+}(G) \\
+\sigma_{-}(\Delta) & \models & e < up \Rightarrow \sigma_{-}(G)
 \end{array}
 }\]
-where $\sigma = [ \mathtt{to\_iota}(e) \mapsto e ]$ and $[a..b]$ is the range
-of the \texttt{iota} integer domain.
+where
+\begin{itemize}
+  \item $[low..up]$ is the range of the \texttt{iota} integer domain,
+  \item $\sigma_{id} = [ \mathtt{to\_iota}(e) \mapsto e ]$,
+  \item $\sigma_{+}  = [ \mathtt{to\_iota}(e) \mapsto \mathtt{overflow}(e) ]$,
+  \item $\sigma_{-}  = [ \mathtt{to\_iota}(e) \mapsto \mathtt{overflow}(e) ]$.
+\end{itemize}
 
 \paragraph{Range} Enumerate a range of values for an integer term\\
 The user select any integer expression $e$ in the proof, and a range of numerical values $a\ldots b$. The proof goes by case for each $e=a\ldots e=b$, plus the side cases $e<a$ and $e>b$:
