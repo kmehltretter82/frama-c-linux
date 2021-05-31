@@ -284,8 +284,8 @@ let toplevel_path = ref "" (* value set to @frama-c-exe@ macro *)
 let default_suites = ref []
 
 let () =
-  Unix.putenv "LC_ALL" "C" (* some oracles, especially in Jessie, depend on the
-                              locale *)
+  Unix.putenv "LC_ALL" "C" (* for oracles that depend on the locale *)
+
 let example_msg =
   Format.sprintf
     "@.@[<v 0>\
