@@ -915,6 +915,7 @@ module N = struct
   let ( >= ) x y = p_leq y x
   let ( <> ) = p_neq
 
+  let ( ==> ) = p_imply
   let ( && ) = p_and
   let ( || ) = p_or
   let not = p_not

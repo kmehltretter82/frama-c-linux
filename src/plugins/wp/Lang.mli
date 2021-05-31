@@ -520,6 +520,7 @@ module N: sig
   val ( >= ): F.cmp (** {! F.p_leq } with inversed argument *)
   val ( <> ): F.cmp (** {! F.p_neq } *)
 
+  val ( ==> ): F.operator (** {! F.p_imply } *)
   val ( && ): F.operator (** {! F.p_and } *)
   val ( || ): F.operator (** {! F.p_or } *)
   val not: F.pred -> F.pred (** {! F.p_not } *)
