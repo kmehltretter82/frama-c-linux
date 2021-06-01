@@ -54,13 +54,13 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] tests/libc/netdb_c.c:33: Call to builtin memset
-[eva] tests/libc/netdb_c.c:33: 
+[eva] tests/libc/netdb_c.c:25: Call to builtin memset
+[eva] tests/libc/netdb_c.c:25: 
   function memset: precondition 'valid_s' got status valid.
 [eva] share/libc/string.h:121: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] computing for function getaddrinfo <- main.
-  Called from tests/libc/netdb_c.c:42.
+  Called from tests/libc/netdb_c.c:34.
 [eva] share/libc/netdb.c:56: Call to builtin malloc
 [eva] share/libc/netdb.c:56: allocating variable __malloc_getaddrinfo_l56
 [eva] share/libc/netdb.c:58: Call to builtin malloc
@@ -142,57 +142,57 @@
 [eva] Recording results for getaddrinfo
 [eva] Done for function getaddrinfo
 [eva] computing for function gai_strerror <- main.
-  Called from tests/libc/netdb_c.c:44.
+  Called from tests/libc/netdb_c.c:36.
 [eva] using specification for function gai_strerror
 [eva] Done for function gai_strerror
 [eva] computing for function fprintf_va_1 <- main.
-  Called from tests/libc/netdb_c.c:44.
+  Called from tests/libc/netdb_c.c:36.
 [eva] using specification for function fprintf_va_1
-[eva] tests/libc/netdb_c.c:44: 
+[eva] tests/libc/netdb_c.c:36: 
   function fprintf_va_1: precondition valid_read_string(format) got status valid.
-[eva] tests/libc/netdb_c.c:44: 
+[eva] tests/libc/netdb_c.c:36: 
   function fprintf_va_1: precondition valid_read_string(param0) got status valid.
 [eva] Done for function fprintf_va_1
 [eva] computing for function exit <- main.
-  Called from tests/libc/netdb_c.c:45.
+  Called from tests/libc/netdb_c.c:37.
 [eva] using specification for function exit
 [eva] Done for function exit
 [eva] computing for function socket <- main.
-  Called from tests/libc/netdb_c.c:54.
+  Called from tests/libc/netdb_c.c:46.
 [eva] using specification for function socket
 [eva] Done for function socket
 [eva] computing for function bind <- main.
-  Called from tests/libc/netdb_c.c:59.
+  Called from tests/libc/netdb_c.c:51.
 [eva] using specification for function bind
-[eva] tests/libc/netdb_c.c:59: 
+[eva] tests/libc/netdb_c.c:51: 
   function bind: precondition 'valid_sockfd,sockfd' got status valid.
-[eva] tests/libc/netdb_c.c:59: 
+[eva] tests/libc/netdb_c.c:51: 
   function bind: precondition 'valid_read_addr' got status valid.
 [eva] Done for function bind
 [eva] computing for function close <- main.
-  Called from tests/libc/netdb_c.c:62.
+  Called from tests/libc/netdb_c.c:54.
 [eva] using specification for function close
-[eva] tests/libc/netdb_c.c:62: 
+[eva] tests/libc/netdb_c.c:54: 
   function close: precondition 'valid_fd' got status valid.
 [eva] Done for function close
 [eva] computing for function fprintf_va_2 <- main.
-  Called from tests/libc/netdb_c.c:65.
+  Called from tests/libc/netdb_c.c:57.
 [eva] using specification for function fprintf_va_2
-[eva] tests/libc/netdb_c.c:65: 
+[eva] tests/libc/netdb_c.c:57: 
   function fprintf_va_2: precondition got status valid.
 [eva] Done for function fprintf_va_2
 [eva] computing for function exit <- main.
-  Called from tests/libc/netdb_c.c:66.
+  Called from tests/libc/netdb_c.c:58.
 [eva] Done for function exit
 [eva] computing for function freeaddrinfo <- main.
-  Called from tests/libc/netdb_c.c:69.
+  Called from tests/libc/netdb_c.c:61.
 [eva] using specification for function freeaddrinfo
-[eva] tests/libc/netdb_c.c:69: Warning: ignoring unsupported \allocates clause
-[eva] tests/libc/netdb_c.c:69: 
+[eva] tests/libc/netdb_c.c:61: Warning: ignoring unsupported \allocates clause
+[eva] tests/libc/netdb_c.c:61: 
   function freeaddrinfo: precondition 'addrinfo_valid' got status valid.
 [eva] Done for function freeaddrinfo
 [eva] computing for function gethostbyname <- main.
-  Called from tests/libc/netdb_c.c:71.
+  Called from tests/libc/netdb_c.c:63.
 [eva] computing for function res_search <- gethostbyname <- main.
   Called from share/libc/netdb.c:141.
 [eva] computing for function Frama_C_char_interval <- res_search <- 

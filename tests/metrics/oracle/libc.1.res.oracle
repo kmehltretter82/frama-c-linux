@@ -4,7 +4,7 @@
    bar (1 call); f (0 call); foo (1 call); g (address taken) (0 call);
    getopt (1 call); h (1 call); main (0 call); 
   
-  Specified-only functions (122)
+  Specified-only functions (123)
   ==============================
    _exit (0 call); access (0 call); chdir (0 call); chown (0 call);
    chroot (0 call); clearerr (0 call); clearerr_unlocked (0 call);
@@ -34,11 +34,11 @@
    seteuid (0 call); setgid (0 call); sethostname (0 call); setpgid (0 call);
    setregid (0 call); setresgid (0 call); setresuid (0 call);
    setreuid (0 call); setsid (0 call); setuid (0 call); setvbuf (0 call);
-   sync (0 call); sysconf (0 call); tmpfile (0 call); tmpnam (0 call);
-   tolower (0 call); toupper (0 call); ttyname (0 call); ungetc (0 call);
-   unlink (0 call); usleep (0 call); vfprintf (0 call); vfscanf (0 call);
-   vprintf (0 call); vscanf (0 call); vsnprintf (0 call); vsprintf (0 call);
-   write (0 call); 
+   sleep (0 call); sync (0 call); sysconf (0 call); tmpfile (0 call);
+   tmpnam (0 call); tolower (0 call); toupper (0 call); ttyname (0 call);
+   ungetc (0 call); unlink (0 call); usleep (0 call); vfprintf (0 call);
+   vfscanf (0 call); vprintf (0 call); vscanf (0 call); vsnprintf (0 call);
+   vsprintf (0 call); write (0 call); 
   
   Undefined and unspecified functions (0)
   =======================================
@@ -63,7 +63,7 @@
   Goto = 0
   Assignment = 9
   Exit point = 7
-  Function = 129
+  Function = 130
   Function call = 8
   Pointer dereferencing = 1
   Cyclomatic complexity = 7
@@ -91,7 +91,7 @@
   ----------------------------------------------------------------------------
 [metrics] Eva coverage statistics
   =======================
-  Syntactically reachable functions = 8 (out of 129)
+  Syntactically reachable functions = 8 (out of 130)
   Semantically reached functions = 8
   Coverage estimation = 100.0%
 [metrics] References to non-analyzed functions

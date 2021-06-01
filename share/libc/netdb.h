@@ -99,6 +99,14 @@ struct addrinfo
 # define NI_DGRAM	16	/* Look up UDP service rather than TCP.  */
 # define NI_NUMERICSCOPE 32
 
+// Non-POSIX
+#ifndef NI_MAXHOST
+# define NI_MAXHOST 1025
+#endif
+#ifndef NI_MAXSERV
+# define NI_MAXSERV 32
+#endif
+
 # define EAI_BADFLAGS	  -1	/* Invalid value for `ai_flags' field.  */
 # define EAI_NONAME	  -2	/* NAME or SERVICE is unknown.  */
 # define EAI_AGAIN	  -3	/* Temporary failure in name resolution.  */

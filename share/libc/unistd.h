@@ -1079,7 +1079,12 @@ extern pid_t        setsid(void);
 */
 extern int          setuid(uid_t uid);
 
-extern unsigned int sleep(unsigned int);
+/*@
+  assigns \result \from seconds;
+  ensures unslept: 0 <= \result <= seconds;
+ */
+extern unsigned int sleep(unsigned int seconds);
+
 extern void         swab(const void *, void *, ssize_t);
 extern int          symlink(const char *, const char *);
 
