@@ -33,9 +33,14 @@ type unroll_annotation =
   | UnrollAmount of Cil_types.term
   | UnrollFull
 
+type split_kind = Static | Dynamic
+type split_term =
+  | Expression of Cil_types.exp
+  | Predicate of Cil_types.predicate
+
 type flow_annotation =
-  | FlowSplit of term
-  | FlowMerge of term
+  | FlowSplit of split_term * split_kind
+  | FlowMerge of split_term
 
 type taint_annotation = Cil_types.term list
 
@@ -153,26 +158,6 @@ module Slevel = Register (struct
       | SlevelFull -> Format.pp_print_string fmt "full"
   end)
 
-module SimpleTermAnnotation =
-struct
-  type t = term
-
-  let parse ~typing_context = function
-    | [t] ->
-      let open Logic_typing in
-      typing_context.type_term typing_context typing_context.pre_state t
-    | _ -> raise Parse_error
-
-  let export t =
-    Ext_terms [t]
-
-  let import = function
-    | Ext_terms [t] -> t
-    | _ -> assert false
-
-  let print = Printer.pp_term
-end
-
 module ListTermAnnotation =
 struct
   type t = term list
@@ -220,15 +205,64 @@ module Unroll = Register (struct
       | UnrollAmount t -> Printer.pp_term fmt t
   end)
 
+module SplitTermAnnotation =
+struct
+  (* [split_term] plus the original term before conversion to a C expression,
+     when possible, to avoid changes due to its reconversion to a C term. *)
+  type t = split_term * Cil_types.term option
+
+  let term_to_exp = !Db.Properties.Interp.term_to_exp ~result:None
+
+  let parse ~typing_context:context = function
+    | [t] ->
+      begin
+        let open Logic_typing in
+        let exception No_term in
+        try
+          let error _loc _fmt = raise No_term in
+          let context = { context with error } in
+          let term = context.type_term context context.pre_state t in
+          Expression (term_to_exp term), Some term
+        with
+        | No_term ->
+          Predicate (context.type_predicate context context.pre_state t), None
+        | Db.Properties.Interp.No_conversion ->
+          Kernel.warning ~wkey:Kernel.wkey_annot_error ~once:true ~current:true
+            "split/merge expressions must be valid expressions; ignoring";
+          raise Parse_error
+      end
+    | _ -> raise Parse_error
+
+  let export = function
+    | Expression _, Some term -> Ext_terms [ term ]
+    | Expression expr, None -> Ext_terms [ Logic_utils.expr_to_term expr ]
+    | Predicate pred, _ -> Ext_preds [pred]
+
+  let import = function
+    | Ext_terms [term] -> Expression (term_to_exp term), Some term
+    | Ext_preds [pred] -> Predicate pred, None
+    | _ -> assert false
+
+  let print fmt = function
+    | Expression expr, _ -> Printer.pp_exp fmt expr
+    | Predicate pred, _ -> Printer.pp_predicate fmt pred
+end
+
 module Split = Register (struct
-    include SimpleTermAnnotation
+    include SplitTermAnnotation
     let name = "split"
     let is_loop_annot = false
   end)
 
 module Merge = Register (struct
-    include SimpleTermAnnotation
+    include SplitTermAnnotation
     let name = "merge"
+    let is_loop_annot = false
+  end)
+
+module DynamicSplit = Register (struct
+    include SplitTermAnnotation
+    let name = "dynamic_split"
     let is_loop_annot = false
   end)
 
@@ -248,17 +282,23 @@ let get_slevel_annot stmt =
 let get_unroll_annot stmt = Unroll.get stmt
 
 let get_flow_annot stmt =
-  List.map (fun a -> FlowSplit a) (Split.get stmt) @
-  List.map (fun a -> FlowMerge a) (Merge.get stmt)
+  List.map (fun (a, _) -> FlowSplit (a, Static)) (Split.get stmt) @
+  List.map (fun (a, _) -> FlowSplit (a, Dynamic)) (DynamicSplit.get stmt) @
+  List.map (fun (a, _) -> FlowMerge a) (Merge.get stmt)
 
 
 let add_slevel_annot = Slevel.add
 
 let add_unroll_annot = Unroll.add
 
-let add_flow_annot ~emitter ~loc stmt = function
-  | FlowSplit annot -> Split.add ~emitter ~loc stmt annot
-  | FlowMerge annot -> Merge.add ~emitter ~loc stmt annot
+let add_flow_annot ~emitter ~loc stmt flow_annotation =
+  let f, annot =
+    match flow_annotation with
+    | FlowSplit (annot, Static) -> Split.add, annot
+    | FlowSplit (annot, Dynamic) -> DynamicSplit.add, annot
+    | FlowMerge annot -> Merge.add, annot
+  in
+  f ~emitter ~loc stmt (annot, None)
 
 
 module Subdivision = Register (struct

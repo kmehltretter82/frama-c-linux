@@ -32,3 +32,8 @@
 *)
 
 (** {1 OCaml} *)
+
+module List: sig
+  (** since 4.10.0 *)
+  val concat_map: ('a -> 'b list) -> 'a list -> 'b list
+end

@@ -38,9 +38,15 @@ type unroll_annotation =
   | UnrollAmount of Cil_types.term
   | UnrollFull
 
+type split_kind = Static | Dynamic
+
+type split_term =
+  | Expression of Cil_types.exp
+  | Predicate of Cil_types.predicate
+
 type flow_annotation =
-  | FlowSplit of Cil_types.term
-  | FlowMerge of Cil_types.term
+  | FlowSplit of split_term * split_kind
+  | FlowMerge of split_term
 
 type taint_annotation = Cil_types.term list
 
