@@ -24,6 +24,9 @@
 Plugin WP <next-release>
 #########################
 
+- WP          [2021-06-01] -wp-smoke-tests detects incoherent assumes when no
+                           requires are specified, can be disabled with new
+                           option -wp-smoke-dead-assumes
 - TIP         [2021-05-31] Generalized Overflow tactic
 
 
