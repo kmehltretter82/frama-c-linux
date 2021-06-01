@@ -652,7 +652,7 @@ CPPFLAGS="$OLD_CPPFLAGS -m32"
 AC_PREPROC_IFELSE(
   [AC_LANG_SOURCE([/* Check if preprocessor supports option -m32 */])],
   [if test -e conftest.i; then
-    DEFAULT_CPP_SUPPORTED_ARCH_OPTS+='\"-m32\"; ';
+    DEFAULT_CPP_SUPPORTED_ARCH_OPTS="$DEFAULT_CPP_SUPPORTED_ARCH_OPTS "'\"-m32\";';
   fi], [])
 
 rm -f conftest.i
@@ -660,7 +660,7 @@ CPPFLAGS="$OLD_CPPFLAGS -m64"
 AC_PREPROC_IFELSE(
   [AC_LANG_SOURCE([/* Check if preprocessor supports option -m64 */])],
   [if test -e conftest.i; then
-    DEFAULT_CPP_SUPPORTED_ARCH_OPTS+='\"-m64\"; ';
+    DEFAULT_CPP_SUPPORTED_ARCH_OPTS="$DEFAULT_CPP_SUPPORTED_ARCH_OPTS "'\"-m64\";';
   fi], [])
 
 rm -f conftest.i
@@ -668,13 +668,13 @@ CPPFLAGS="$OLD_CPPFLAGS -m16"
 AC_PREPROC_IFELSE(
   [AC_LANG_SOURCE([/* Check if preprocessor supports option -m16 */])],
   [if test -e conftest.i; then
-    DEFAULT_CPP_SUPPORTED_ARCH_OPTS+='\"-m16\"; ';
+    DEFAULT_CPP_SUPPORTED_ARCH_OPTS="$DEFAULT_CPP_SUPPORTED_ARCH_OPTS "'\"-m16\";';
   fi], [])
 
 # revert CPPFLAGS to original value
 CPPFLAGS=$OLD_CPPFLAGS
 
-AC_MSG_RESULT(Default preprocessor supported architecture-related options: $DEFAULT_CPP_SUPPORTED_ARCH_OPTS)
+AC_MSG_RESULT(Default preprocessor supported architecture-related options:$DEFAULT_CPP_SUPPORTED_ARCH_OPTS)
 
 
 #################
