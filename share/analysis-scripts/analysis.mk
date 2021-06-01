@@ -65,12 +65,15 @@ ifneq (4.0,$(firstword $(sort $(MAKE_VERSION) 4.0)))
   $(error This Makefile requires Make >= 4.0 - available at http://ftp.gnu.org/gnu/make/)
 endif
 
-# Test if on a Mac (and therefore sed has fewer options)
-# Also test if /usr/bin/time is available, otherwise use the shell builtin
+# Test if sed has the '--unbuffered' option (GNU sed has, but neither macOS'
+# nor Busybox' have it, in which case we ignore it)
+SED_UNBUFFERED:=sed$(shell sed --unbuffered //p /dev/null 2>/dev/null && echo " --unbuffered" || true)
+
+# Test if on a Mac;
+# test if /usr/bin/time is available, otherwise use the shell builtin
 # (which has less options)
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Darwin)
-  SED_UNBUFFERED:=sed
 ifneq (,$(wildcard /usr/bin/time))
 define time_with_output
   /usr/bin/time -p
@@ -81,7 +84,6 @@ define time_with_output
 endef
 endif
 else
-  SED_UNBUFFERED:=sed --unbuffered
 ifneq (,$(wildcard /usr/bin/time))
 define time_with_output
   /usr/bin/time -f 'user_time=%U\nmemory=%M' -o "$(1)"
