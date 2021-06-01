@@ -318,8 +318,45 @@ let reachability = FRmap.memo
 (* --- Doome Status                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
+module Invalid_behaviors = struct
+  module String_set = Datatype.String.Set
+
+  include State_builder.Hashtbl(Kernel_function.Hashtbl)(String_set)
+      (struct
+        let name = "Wp.WpReached.Invalid_behavior"
+        let dependencies = [Ast.self]
+        let size = 32
+      end)
+
+  let add kf bhv =
+    let set =
+      try find kf
+      with Not_found -> String_set.empty
+    in
+    add kf (String_set.add bhv.b_name set)
+
+  let mem kf bhv =
+    try String_set.mem bhv.b_name (find kf)
+    with Not_found -> false
+end
+
 let set_invalid emitter tgt =
-  Property_status.emit emitter ~hyps:[] tgt Property_status.False_if_reachable
+  let open Property_status in
+  match tgt with
+  (* For invalid assumes, introduce "ensures false" in behavior on need *)
+  | Property.IPPredicate { ip_kind = PKAssumes(bhv) ; ip_kf ; ip_pred } ->
+      if not (Invalid_behaviors.mem ip_kf bhv) then begin
+        Invalid_behaviors.add ip_kf bhv ;
+        let pred_name = [ "Wp" ; "SmokeTest" ] in
+        let pred_loc = ip_pred.ip_content.tp_statement.pred_loc in
+        let p = { Logic_const.pfalse with pred_loc ; pred_name } in
+        let p = Logic_const.(new_predicate p) in
+        let pid = Property.ip_of_ensures ip_kf Kglobal bhv (Normal, p) in
+        Annotations.add_ensures emitter ip_kf ~behavior:bhv.b_name [Normal, p];
+        emit emitter ~hyps:[] pid False_if_reachable
+      end
+  | p ->
+      emit emitter ~hyps:[] p False_if_reachable
 
 let set_doomed emitter pid =
   List.iter (set_invalid emitter) (WpPropId.doomed_if_valid pid) ;

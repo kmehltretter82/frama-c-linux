@@ -116,11 +116,20 @@ let get_behavior_goals kf ?(smoking=false) ?(exits=false) bhv =
   let post_cond = normalize_post ~goal:true kf bhv in
   let p_asgn, e_asgn = normalize_fct_assigns kf ~exits bhv bhv.b_assigns in
   let smokes =
-    if smoking && bhv.b_requires <> [] then
+    let do_assumes =
+      Wp_parameters.SmokeDeadassumes.get() && bhv.b_assumes <> [] in
+    if smoking && (bhv.b_requires <> [] || do_assumes) then
       let bname =
         if Cil.is_default_behavior bhv then "default" else bhv.b_name in
-      let id = bname ^ "_requires" in
-      let doomed = Property.ip_requires_of_behavior kf Kglobal bhv in
+      let id, doomed =
+        if bhv.b_requires <> []
+        then
+          bname ^ "_requires",
+          Property.ip_requires_of_behavior kf Kglobal bhv
+        else
+          bname ^ "_assumes",
+          Property.ip_assumes_of_behavior kf Kglobal bhv
+      in
       [smoke kf ~id ~doomed ()]
     else []
   in

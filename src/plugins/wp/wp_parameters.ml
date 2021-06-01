@@ -401,6 +401,13 @@ module SmokeTests =
   end)
 
 let () = Parameter_customize.set_group wp_strategy
+module SmokeDeadassumes =
+  True(struct
+    let option_name = "-wp-smoke-dead-assumes"
+    let help = "When generating smoke tests, look for dead assumes"
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
 module SmokeDeadcode =
   True(struct
     let option_name = "-wp-smoke-dead-code"
