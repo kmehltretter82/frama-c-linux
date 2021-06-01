@@ -72,9 +72,9 @@ struct
   type t = typed_offset
 
   let rec pretty fmt = function
-  | NoOffset _t -> ()
-  | Field (fi, s) -> Format.fprintf fmt ".%s%a" fi.fname pretty s
-  | Index (i, _t, s) -> Format.fprintf fmt "[%a]%a" Ival.pretty i pretty s
+    | NoOffset _t -> ()
+    | Field (fi, s) -> Format.fprintf fmt ".%s%a" fi.fname pretty s
+    | Index (i, _t, s) -> Format.fprintf fmt "[%a]%a" Ival.pretty i pretty s
 
   let rec append o1 o2 =
     match o1 with

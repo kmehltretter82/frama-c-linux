@@ -439,10 +439,10 @@ struct
         }
       | Struct s, Raw b | Raw b, Struct s ->
         Struct {
-            s with
-            struct_value = FieldMap.map (join (Raw b)) s.struct_value;
-            struct_padding = Bit.join b s.struct_padding ;
-          }
+          s with
+          struct_value = FieldMap.map (join (Raw b)) s.struct_value;
+          struct_padding = Bit.join b s.struct_padding ;
+        }
       | Union u1, Union u2 when are_union_compatible u1 u2 ->
         Union {
           u1 with
@@ -470,15 +470,15 @@ struct
     | NoOffset _, m -> m (* TODO check type compatibility *)
     | Field (fi, offset'), Struct s when s.struct_info.ckey = fi.fcomp.ckey ->
       begin try
-        let m' = FieldMap.find fi s.struct_value in
-        read m' offset'
-      with Not_found ->
-        Raw s.struct_padding (* field undefined *)
+          let m' = FieldMap.find fi s.struct_value in
+          read m' offset'
+        with Not_found ->
+          Raw s.struct_padding (* field undefined *)
       end
     | Field (fi, offset'), Union u when u.union_field.forder = fi.forder ->
       read u.union_value offset'
     | Index (_index, elem_type, offset'), Array a
-        when are_typ_compatible a.array_cell_type elem_type ->
+      when are_typ_compatible a.array_cell_type elem_type ->
       read a.array_value offset'
     | _, _ -> Raw (raw m) (* structure mismatch *)
 

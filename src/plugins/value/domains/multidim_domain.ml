@@ -43,9 +43,9 @@ struct
   let of_integer = inject_int
 
   let of_bit = function
-   | Memory_map.Zero -> inject_int Integer.zero
-   | Any (Set s) -> inject_top_origin Origin.top s
-   | Any (Top) -> top_with_origin Origin.top
+    | Memory_map.Zero -> inject_int Integer.zero
+    | Any (Set s) -> inject_top_origin Origin.top s
+    | Any (Top) -> top_with_origin Origin.top
 
   let to_bit v =
     if is_zero v
@@ -92,7 +92,7 @@ struct
   type base = Base.t
   type t = offset Map.t
 
-  let _pretty = 
+  let _pretty =
     Pretty_utils.pp_iter2 ~sep:",@," ~between:":"
       Map.iter Base.pretty Offset.pretty
 
@@ -352,7 +352,7 @@ struct
     let weak = not (Location.is_singleton dst) in
     write (fun m off -> Memory.erase ~weak m off b) state dst
 
-  let reinforce (f : value -> value or_bottom) 
+  let reinforce (f : value -> value or_bottom)
       (state : state) (dst : mdlocation) : state =
     write (fun m off -> Memory.reinforce f m off) state dst
 
