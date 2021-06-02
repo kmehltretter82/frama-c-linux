@@ -1,0 +1,36 @@
+TEST 1: OK: Expected execution at tests/builtin/strcmp.c:32
+TEST 2: OK: Expected execution at tests/builtin/strcmp.c:33
+TEST 3: OK: Expected execution at tests/builtin/strcmp.c:34
+strcmp: string 1 string not NUL-terminated
+TEST 4: OK: Expected signal at tests/builtin/strcmp.c:37
+strcmp: string 2 string not NUL-terminated
+TEST 5: OK: Expected signal at tests/builtin/strcmp.c:39
+strcmp: string 1 string not NUL-terminated
+TEST 6: OK: Expected signal at tests/builtin/strcmp.c:41
+strcmp: string 2 string not NUL-terminated
+TEST 7: OK: Expected signal at tests/builtin/strcmp.c:43
+strcmp: string 2 string unallocated
+TEST 8: OK: Expected signal at tests/builtin/strcmp.c:45
+strcmp: string 1 string unallocated
+TEST 9: OK: Expected signal at tests/builtin/strcmp.c:46
+strcmp: string 1 string unallocated
+TEST 10: OK: Expected signal at tests/builtin/strcmp.c:51
+strcmp: string 2 string unallocated
+TEST 11: OK: Expected signal at tests/builtin/strcmp.c:52
+TEST 12: OK: Expected execution at tests/builtin/strcmp.c:64
+TEST 13: OK: Expected execution at tests/builtin/strcmp.c:65
+TEST 14: OK: Expected execution at tests/builtin/strcmp.c:66
+TEST 15: OK: Expected execution at tests/builtin/strcmp.c:68
+TEST 16: OK: Expected execution at tests/builtin/strcmp.c:69
+TEST 17: OK: Expected execution at tests/builtin/strcmp.c:73
+TEST 18: OK: Expected execution at tests/builtin/strcmp.c:75
+TEST 19: OK: Expected execution at tests/builtin/strcmp.c:77
+TEST 20: OK: Expected execution at tests/builtin/strcmp.c:79
+strncmp: string 2 string has insufficient length
+TEST 21: OK: Expected signal at tests/builtin/strcmp.c:82
+strncmp: string 2 string has insufficient length
+TEST 22: OK: Expected signal at tests/builtin/strcmp.c:84
+strncmp: string 2 string has insufficient length
+TEST 23: OK: Expected signal at tests/builtin/strcmp.c:85
+strncmp: string 1 string has insufficient length
+TEST 24: OK: Expected signal at tests/builtin/strcmp.c:87
