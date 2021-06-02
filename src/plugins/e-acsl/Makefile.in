@@ -176,10 +176,8 @@ PLUGIN_TESTS_DIRS := \
 	full-mtracking \
 	format \
 	temporal \
-	special
-# [JS 2019/02/26] deactivate tests 'builtin' as long as setjmp/longjmp is not
-# supported.
-#	builtin
+	special \
+	builtin
 
 PLUGIN_TESTS_LIB := $(EACSL_PLUGIN_DIR)/tests/print.ml
 
