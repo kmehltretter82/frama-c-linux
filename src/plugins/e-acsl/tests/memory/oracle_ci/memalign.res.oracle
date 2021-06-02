@@ -11,7 +11,7 @@
   E-ACSL construct `predicate performing read accesses' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:665: Warning: 
-  Some assumes clauses couldn't be translated.
+  Some assumes clauses could not be translated.
   Ignoring complete and disjoint behaviors annotations.
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:665: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
