@@ -127,7 +127,7 @@ struct
   type location = Abstract_offset.typed_offset
   type value = Value.t
 
-  type 'fieldmap memory' =
+  type 'fieldmap memory =
     | Raw of bit
     | Scalar of memory_scalar
     | Struct of 'fieldmap memory_struct
@@ -140,16 +140,16 @@ struct
   and 'fieldmap memory_struct = {
     struct_value: 'fieldmap;
     struct_info: Cil_types.compinfo;
-    struct_padding: bit; (* for missing fields *)
+    struct_padding: bit; (* for missing fields and padding *)
   }
   (* unions are handled separately from struct to avoid confusion and error *)
   and 'fieldmap memory_union = {
-    union_value: 'fieldmap memory';
+    union_value: 'fieldmap memory;
     union_field: Cil_types.fieldinfo;
     union_padding: bit;
   }
   and 'fieldmap memory_array = {
-    array_value: 'fieldmap memory';
+    array_value: 'fieldmap memory;
     array_cell_type: Cil_types.typ;
   }
 
@@ -166,7 +166,7 @@ struct
   end
 
   module rec Memory :
-    Hptmap.V with type t = FieldMap.t memory' =
+    Hptmap.V with type t = FieldMap.t memory =
   struct
     include Datatype.Make (
       struct
@@ -183,14 +183,14 @@ struct
      to FieldMap and no constants, only functions *)
   and MemorySafe :
   sig
-    type t = FieldMap.t memory'
+    type t = FieldMap.t memory
     val pretty : Format.formatter -> t -> unit
     val hash : t -> int
     val equal : t -> t -> bool
     val compare : t -> t -> int
   end =
   struct
-    type t = FieldMap.t memory'
+    type t = FieldMap.t memory
 
     let rec pretty fmt =
       let rec leading_indexes acc = function

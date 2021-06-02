@@ -56,7 +56,7 @@ sig
   val append : t -> t -> t (* Does not check that the appened offset fits *)
   val join : t -> t -> t
   val of_cil_offset : (Cil_types.exp -> Ival.t) -> Cil_types.typ -> Cil_types.offset -> t
-  val of_ival : Cil_types.typ -> Cil_types.typ -> Ival.t -> t
+  val of_ival : base_typ:Cil_types.typ -> typ:Cil_types.typ -> Ival.t -> t
   val of_term_offset : Cil_types.typ -> Cil_types.term_offset -> t
   val is_singleton : t -> bool
 end
@@ -97,7 +97,8 @@ struct
     match array_size with
     | None -> None, None
     | Some size_exp ->
-      Some Integer.zero, Cil.constFoldToInt size_exp
+      Some Integer.zero,
+      Option.map Integer.pred (Cil.constFoldToInt size_exp)
 
   let array_range array_size =
     let l,u = array_bounds array_size in
@@ -119,34 +120,34 @@ struct
         Index (idx, elem_typ, of_cil_offset oracle elem_typ sub)
       | _ -> assert false
 
-  let rec of_ival base_typ typ ival =
+  let rec of_ival ~base_typ ~typ ival =
     if Ival.is_zero ival && type_compatible base_typ typ then
       NoOffset typ
     else
       match Cil.unrollType base_typ with
       | TArray (elem_typ, array_size, _, _) ->
-        begin try
+        let range, rem =
+          try
             let elem_size = Integer.of_int (Cil.bitsSizeOf elem_typ) in
             if Integer.is_zero elem_size then (* array of elements of size 0 *)
               if Ival.is_zero ival then (* the whole range is valid *)
-                let sub = of_ival elem_typ typ ival in
-                Index (array_range array_size, elem_typ, sub)
+                array_range array_size, ival
               else (* Non-zero offset cannot represent anything here *)
                 raise Abstract_interp.Error_Top
             else
-              let range = Ival.scale_div ~pos:true elem_size ival
-              and range_rem = Ival.scale_rem ~pos:true elem_size ival in
-              let sub = of_ival elem_typ typ range_rem in
-              Index (range, elem_typ, sub)
+              Ival.scale_div ~pos:true elem_size ival,
+              Ival.scale_rem ~pos:true elem_size ival
           with Cil.SizeOfError (_,_) ->
             (* Cil.bitsSizeOf can raise an exception when elements are
                themselves array of execution-time size *)
             if Ival.is_zero ival then
-              let sub = of_ival elem_typ typ ival in
-              Index (ival, elem_typ, sub)
+              ival, ival
             else
               raise Abstract_interp.Error_Top
-        end
+          in
+          assert_valid_index range array_size;
+          let sub = of_ival ~base_typ:elem_typ ~typ rem in
+          Index (range, elem_typ, sub)
 
       | TComp (ci, _, _) ->
         if not ci.cstruct then
@@ -158,11 +159,11 @@ struct
             | fi :: q ->
               let offset, width = Cil.fieldBitsOffset fi in
               let l = Integer.(of_int offset) in
-              let u = Integer.(add l (of_int width)) in
+              let u = Integer.(pred (add l (of_int width))) in
               let range = Ival.inject_range (Some l) (Some u) in
               if Ival.is_included ival range then
                 let sub_ival = Ival.add_singleton_int (Integer.neg l) ival in
-                Field (fi, of_ival fi.ftype typ sub_ival)
+                Field (fi, of_ival ~base_typ:fi.ftype ~typ sub_ival)
               else
                 find_field q
           in
@@ -170,14 +171,14 @@ struct
 
       | _ -> raise Abstract_interp.Error_Top
 
-  let of_ival base_typ typ ival =
+  let of_ival ~base_typ ~typ ival =
     if Ival.is_small_set ival then
       let f i acc =
-        Bottom.join join acc (`Value (of_ival base_typ typ i))
+        Bottom.join join acc (`Value (of_ival ~base_typ ~typ i))
       in
       Bottom.non_bottom (Ival.fold_enum f ival `Bottom)
     else
-      of_ival base_typ typ ival
+      of_ival ~base_typ ~typ ival
 
   let index_of_term array_size t = (* Exact constant ranges *)
     match t.Cil_types.term_node with
@@ -239,8 +240,8 @@ struct
     try `Value (TypedOffset.of_cil_offset oracle base_typ offset)
     with Abstract_interp.Error_Top -> `Top
 
-  let of_ival base_typ typ ival =
-    try `Value (TypedOffset.of_ival base_typ typ ival)
+  let of_ival ~base_typ ~typ ival =
+    try `Value (TypedOffset.of_ival ~base_typ ~typ ival)
     with Abstract_interp.Error_Top -> `Top
 
   let of_term_offset base_typ toffset =

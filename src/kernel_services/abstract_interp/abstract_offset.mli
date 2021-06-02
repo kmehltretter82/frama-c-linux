@@ -28,7 +28,7 @@ sig
   val append : t -> t -> t (* Does not check that the appened offset fits *)
   val join : t -> t -> t
   val of_cil_offset : (Cil_types.exp -> Ival.t) -> Cil_types.typ -> Cil_types.offset -> t
-  val of_ival : Cil_types.typ -> Cil_types.typ -> Ival.t -> t
+  val of_ival : base_typ:Cil_types.typ -> typ:Cil_types.typ -> Ival.t -> t
   val of_term_offset : Cil_types.typ -> Cil_types.term_offset -> t
   val is_singleton : t -> bool
 end

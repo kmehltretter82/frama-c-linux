@@ -227,7 +227,7 @@ end
 module DomainPrototype =
 struct
   (* The domain is essentially a map from bases to individual memory abstractions *)
-  module Initial_Values = struct let v = [] end
+  module Initial_Values = struct let v = [[]] end
   module Deps = struct let l = [Ast.self] end
 
   include Hptmap.Make
@@ -269,7 +269,7 @@ struct
     let decide _ v1 v2 =
       Memory.narrow v1 v2
     in
-    let narrow = join ~cache ~symmetric:true ~idempotent:true ~decide in
+    let narrow = join ~cache ~symmetric:false ~idempotent:true ~decide in
     fun a b -> `Value (narrow a b)
 
   let join =

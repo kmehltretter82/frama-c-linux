@@ -138,7 +138,6 @@ module Domains =
       let arg_name = "d1,...,dn"
       let help = "Enable a list of analysis domains."
       let default = Datatype.String.Set.of_list ["cvalue"]
-      (* let default = Datatype.String.Set.singleton "cvalue" *)
     end)
 let () = add_precision_dep Domains.parameter
 
