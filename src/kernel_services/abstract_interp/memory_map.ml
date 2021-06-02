@@ -153,42 +153,17 @@ struct
     array_cell_type: Cil_types.typ;
   }
 
-  (* Instanciation of Hptmaps for the tree structure of the memory *)
+  (* Datatype prototype *)
 
-  module Initial_Values = struct let v = [[]] end
-
-  module Deps = struct let l = Config.deps end
-
-  module Keys =
-  struct
-    include Cil_datatype.Fieldinfo
-    let id f = f.Cil_types.forder (* At each node, all fields come from the same comp *)
-  end
-
-  module rec Memory :
-    Hptmap.V with type t = FieldMap.t memory =
-  struct
-    include Datatype.Make (
-      struct
-        include Datatype.Undefined
-        include MemorySafe
-        let name = "Memory_map.Typed"
-        let reprs = [ Raw Bit.top ]
-      end)
-    let pretty_debug = pretty
-  end
-
-  (* To allow recursive modules to be instanciated, there must be one safe
-     module in the cycle. This is it. It should contain all references
-     to FieldMap and no constants, only functions *)
-  and MemorySafe :
-  sig
-    type t = FieldMap.t memory
-    val pretty : Format.formatter -> t -> unit
-    val hash : t -> int
-    val equal : t -> t -> bool
-    val compare : t -> t -> int
-  end =
+  module Prototype (
+      FieldMap :
+      sig
+        type t
+        include Hptmap_sig.S
+          with type t := t
+           and type key = Cil_types.fieldinfo
+           and type v = t memory
+      end) =
   struct
     type t = FieldMap.t memory
 
@@ -300,6 +275,47 @@ struct
       | _, Struct _ -> -1
       | Union _, _ -> 1
       | _, Union _ -> -1
+  end
+
+
+  (* Instanciation of Hptmaps for the tree structure of the memory *)
+
+  module Initial_Values = struct let v = [[]] end
+
+  module Deps = struct let l = Config.deps end
+
+  module Keys =
+  struct
+    include Cil_datatype.Fieldinfo
+    let id f = f.Cil_types.forder (* At each node, all fields come from the same comp *)
+  end
+
+  module rec Memory :
+    Hptmap.V with type t = FieldMap.t memory =
+  struct
+    include Datatype.Make (
+      struct
+        include Datatype.Undefined
+        include MemorySafe
+        let name = "Memory_map.Typed"
+        let reprs = [ Raw Bit.top ]
+      end)
+    let pretty_debug = pretty
+  end
+
+  (* To allow recursive modules to be instanciated, there must be one safe
+     module in the cycle. This is it. It should contain all references
+     to FieldMap and no constants, only functions *)
+  and MemorySafe :
+  sig
+    type t = FieldMap.t memory
+    val pretty : Format.formatter -> t -> unit
+    val hash : t -> int
+    val equal : t -> t -> bool
+    val compare : t -> t -> int
+  end =
+  struct
+    include Prototype (FieldMap)
   end
 
   (* Maps for structures : field -> node *)
