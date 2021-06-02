@@ -1026,6 +1026,23 @@ let register_code_transformation_category s =
     after_id = Transform_after_cleanup.register_key s;
     prm_id = Transform_after_parameter_change.register_key s }
 
+module Cfg_recomputation_queue =
+  State_builder.Set_ref(Cil_datatype.Fundec.Set)
+    (struct
+      let name = "File.Cfg_recomputation_queue"
+      let dependencies = [Ast.self]
+    end)
+
+let () = Ast.add_linked_state Cfg_recomputation_queue.self
+
+let must_recompute_cfg f = Cfg_recomputation_queue.add f
+
+let recompute_cfg _ =
+  (* just in case f happens to modify the CFG *)
+  Cfg_recomputation_queue.iter
+    (fun f -> Cfg.clearCFGinfo ~clear_id:false f; Cfg.cfgFun f);
+  Cfg_recomputation_queue.clear ()
+
 let add_transform_parameter
     ~before ~after name f (p:(module Parameter_sig.S)) =
   let module P = (val p: Parameter_sig.S) in
@@ -1037,6 +1054,7 @@ let add_transform_parameter
         "applying %s to current AST, after option %s changed"
         name.name P.option_name;
       f (Ast.get());
+      recompute_cfg ();
       if Kernel.Check.get () then
         Filecheck.check_ast
           ("after code transformation: " ^ name.name ^
@@ -1057,23 +1075,6 @@ let add_transform_parameter
     (fun a ->
        Transform_after_parameter_change.add_dependency a.prm_id name.prm_id)
     after
-
-module Cfg_recomputation_queue =
-  State_builder.Set_ref(Cil_datatype.Fundec.Set)
-    (struct
-      let name = "File.Cfg_recomputation_queue"
-      let dependencies = [Ast.self]
-    end)
-
-let () = Ast.add_linked_state Cfg_recomputation_queue.self
-
-let must_recompute_cfg f = Cfg_recomputation_queue.add f
-
-let recompute_cfg _ =
-  (* just in case f happens to modify the CFG *)
-  Cfg_recomputation_queue.iter
-    (fun f -> Cfg.clearCFGinfo ~clear_id:false f; Cfg.cfgFun f);
-  Cfg_recomputation_queue.clear ()
 
 let transform_and_check name is_normalized f ast =
   let printer =
