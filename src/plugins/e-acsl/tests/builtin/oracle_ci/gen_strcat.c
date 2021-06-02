@@ -75,159 +75,6 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options);
  */
 pid_t __gen_e_acsl_fork(void);
 
-/*@ requires valid_string_src: valid_read_string(src);
-    requires valid_string_dest: valid_string(dest);
-    requires room_string: \valid(dest + (0 .. strlen(dest) + strlen(src)));
-    ensures
-      sum_of_lengths: strlen(\old(dest)) ≡ \old(strlen(dest) + strlen(src));
-    ensures
-      initialization: dest:
-        \initialized(\old(dest) + (0 .. \old(strlen(dest) + strlen(src))));
-    ensures
-      dest_null_terminated:
-        *(\old(dest) + \old(strlen(dest) + strlen(src))) ≡ 0;
-    ensures result_ptr: \result ≡ \old(dest);
-    assigns *(dest +
-              (strlen{Old}(dest) .. strlen{Old}(dest) + strlen{Old}(src))),
-            \result;
-    assigns
-    *(dest + (strlen{Old}(dest) .. strlen{Old}(dest) + strlen{Old}(src)))
-      \from *(src + (0 .. strlen{Old}(src)));
-    assigns \result \from dest;
- */
-char *__gen_e_acsl_strcat(char * restrict dest, char const * restrict src);
-
-/*@ requires valid_nstring_src: valid_read_nstring(src, n);
-    requires valid_string_dest: valid_string(dest);
-    ensures result_ptr: \result ≡ \old(dest);
-    assigns *(dest + (strlen{Old}(dest) .. strlen{Old}(dest) + n)), \result;
-    assigns *(dest + (strlen{Old}(dest) .. strlen{Old}(dest) + n))
-      \from *(src + (0 .. n));
-    assigns \result \from dest;
-    
-    behavior complete:
-      assumes
-        valid_string_src_fits: valid_read_string(src) ∧ strlen(src) ≤ n;
-      requires
-        room_string: \valid((dest + strlen(dest)) + (0 .. strlen(src)));
-      ensures
-        sum_of_lengths:
-          strlen(\old(dest)) ≡ \old(strlen(dest) + strlen(src));
-      assigns *(dest +
-                (strlen{Old}(dest) .. strlen{Old}(dest) + strlen{Old}(src))),
-              \result;
-      assigns
-      *(dest + (strlen{Old}(dest) .. strlen{Old}(dest) + strlen{Old}(src)))
-        \from *(src + (0 .. strlen{Old}(src)));
-      assigns \result \from dest;
-    
-    behavior partial:
-      assumes
-        valid_string_src_too_large:
-          ¬(valid_read_string(src) ∧ strlen(src) ≤ n);
-      requires room_string: \valid((dest + strlen(dest)) + (0 .. n));
-      ensures
-        sum_of_bounded_lengths:
-          strlen(\old(dest)) ≡ \old(strlen(dest)) + \old(n);
-      assigns *(dest + (strlen{Old}(dest) .. strlen{Old}(dest) + n)),
-              \result;
-      assigns *(dest + (strlen{Old}(dest) .. strlen{Old}(dest) + n))
-        \from *(src + (0 .. strlen{Old}(src)));
-      assigns \result \from dest;
- */
-char *__gen_e_acsl_strncat(char * restrict dest, char const * restrict src,
-                           size_t n);
-
-/*@ requires valid_nstring_src: valid_read_nstring(src, n);
-    requires valid_string_dest: valid_string(dest);
-    ensures result_ptr: \result ≡ \old(dest);
-    assigns *(dest + (strlen{Old}(dest) .. strlen{Old}(dest) + n)), \result;
-    assigns *(dest + (strlen{Old}(dest) .. strlen{Old}(dest) + n))
-      \from *(src + (0 .. n));
-    assigns \result \from dest;
-    
-    behavior complete:
-      assumes
-        valid_string_src_fits: valid_read_string(src) ∧ strlen(src) ≤ n;
-      requires
-        room_string: \valid((dest + strlen(dest)) + (0 .. strlen(src)));
-      ensures
-        sum_of_lengths:
-          strlen(\old(dest)) ≡ \old(strlen(dest) + strlen(src));
-      assigns *(dest +
-                (strlen{Old}(dest) .. strlen{Old}(dest) + strlen{Old}(src))),
-              \result;
-      assigns
-      *(dest + (strlen{Old}(dest) .. strlen{Old}(dest) + strlen{Old}(src)))
-        \from *(src + (0 .. strlen{Old}(src)));
-      assigns \result \from dest;
-    
-    behavior partial:
-      assumes
-        valid_string_src_too_large:
-          ¬(valid_read_string(src) ∧ strlen(src) ≤ n);
-      requires room_string: \valid((dest + strlen(dest)) + (0 .. n));
-      ensures
-        sum_of_bounded_lengths:
-          strlen(\old(dest)) ≡ \old(strlen(dest)) + \old(n);
-      assigns *(dest + (strlen{Old}(dest) .. strlen{Old}(dest) + n)),
-              \result;
-      assigns *(dest + (strlen{Old}(dest) .. strlen{Old}(dest) + n))
-        \from *(src + (0 .. strlen{Old}(src)));
-      assigns \result \from dest;
- */
-char *__gen_e_acsl_strncat(char * restrict dest, char const * restrict src,
-                           size_t n)
-{
-  char *__gen_e_acsl_at;
-  __e_acsl_contract_t *__gen_e_acsl_contract;
-  char *__retres;
-  __e_acsl_store_block((void *)(& dest),(size_t)8);
-  __gen_e_acsl_contract = __e_acsl_contract_init((size_t)2);
-  __gen_e_acsl_at = dest;
-  __retres = __e_acsl_builtin_strncat(dest,src,n);
-  __e_acsl_assert(__retres == __gen_e_acsl_at,1,"Postcondition","strncat",
-                  "result_ptr: \\result == \\old(dest)",
-                  "FRAMAC_SHARE/libc/string.h",430);
-  __e_acsl_contract_clean(__gen_e_acsl_contract);
-  __e_acsl_delete_block((void *)(& dest));
-  return __retres;
-}
-
-/*@ requires valid_string_src: valid_read_string(src);
-    requires valid_string_dest: valid_string(dest);
-    requires room_string: \valid(dest + (0 .. strlen(dest) + strlen(src)));
-    ensures
-      sum_of_lengths: strlen(\old(dest)) ≡ \old(strlen(dest) + strlen(src));
-    ensures
-      initialization: dest:
-        \initialized(\old(dest) + (0 .. \old(strlen(dest) + strlen(src))));
-    ensures
-      dest_null_terminated:
-        *(\old(dest) + \old(strlen(dest) + strlen(src))) ≡ 0;
-    ensures result_ptr: \result ≡ \old(dest);
-    assigns *(dest +
-              (strlen{Old}(dest) .. strlen{Old}(dest) + strlen{Old}(src))),
-            \result;
-    assigns
-    *(dest + (strlen{Old}(dest) .. strlen{Old}(dest) + strlen{Old}(src)))
-      \from *(src + (0 .. strlen{Old}(src)));
-    assigns \result \from dest;
- */
-char *__gen_e_acsl_strcat(char * restrict dest, char const * restrict src)
-{
-  char *__gen_e_acsl_at;
-  char *__retres;
-  __e_acsl_store_block((void *)(& dest),(size_t)8);
-  __gen_e_acsl_at = dest;
-  __retres = __e_acsl_builtin_strcat(dest,src);
-  __e_acsl_assert(__retres == __gen_e_acsl_at,1,"Postcondition","strcat",
-                  "result_ptr: \\result == \\old(dest)",
-                  "FRAMAC_SHARE/libc/string.h",421);
-  __e_acsl_delete_block((void *)(& dest));
-  return __retres;
-}
-
 /*@ ensures
       result_ok_child_or_error:
         \result ≡ 0 ∨ \result > 0 ∨ \result ≡ -1;
@@ -498,11 +345,7 @@ int main(int argc, char const **argv)
   __e_acsl_memory_init(& argc,(char ***)(& argv),(size_t)8);
   __e_acsl_globals_init();
   char *const_str = (char *)__gen_e_acsl_literal_string_6;
-  __e_acsl_store_block((void *)(& const_str),(size_t)8);
-  __e_acsl_full_init((void *)(& const_str));
   char *unalloc_str = malloc((unsigned long)5);
-  __e_acsl_store_block((void *)(& unalloc_str),(size_t)8);
-  __e_acsl_full_init((void *)(& unalloc_str));
   char *_barrier = malloc((unsigned long)1);
   char *empty_str = (char *)__gen_e_acsl_literal_string_7;
   free((void *)unalloc_str);
@@ -538,7 +381,7 @@ int main(int argc, char const **argv)
     {
       pid_t pid = __gen_e_acsl_fork();
       if (! pid) {
-        __gen_e_acsl_strcat(dest1,(char const *)const_str);
+        __e_acsl_builtin_strcat(dest1,(char const *)const_str);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -552,7 +395,7 @@ int main(int argc, char const **argv)
     {
       pid_t pid_0 = __gen_e_acsl_fork();
       if (! pid_0) {
-        __gen_e_acsl_strcat(dest3,(char const *)empty_str);
+        __e_acsl_builtin_strcat(dest3,(char const *)empty_str);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -566,7 +409,7 @@ int main(int argc, char const **argv)
     {
       pid_t pid_1 = __gen_e_acsl_fork();
       if (! pid_1) {
-        __gen_e_acsl_strcat(dest2,(char const *)const_str);
+        __e_acsl_builtin_strcat(dest2,(char const *)const_str);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -580,7 +423,7 @@ int main(int argc, char const **argv)
     {
       pid_t pid_2 = __gen_e_acsl_fork();
       if (! pid_2) {
-        __gen_e_acsl_strcat(unalloc_str,(char const *)const_str);
+        __e_acsl_builtin_strcat(unalloc_str,(char const *)const_str);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -594,7 +437,7 @@ int main(int argc, char const **argv)
     {
       pid_t pid_3 = __gen_e_acsl_fork();
       if (! pid_3) {
-        __gen_e_acsl_strcat(dest2,(char const *)unalloc_str);
+        __e_acsl_builtin_strcat(dest2,(char const *)unalloc_str);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -608,7 +451,7 @@ int main(int argc, char const **argv)
     {
       pid_t pid_4 = __gen_e_acsl_fork();
       if (! pid_4) {
-        __gen_e_acsl_strcat((char *)0,__gen_e_acsl_literal_string_7);
+        __e_acsl_builtin_strcat((char *)0,__gen_e_acsl_literal_string_7);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -622,7 +465,7 @@ int main(int argc, char const **argv)
     {
       pid_t pid_5 = __gen_e_acsl_fork();
       if (! pid_5) {
-        __gen_e_acsl_strcat(dest1,(char const *)0);
+        __e_acsl_builtin_strcat(dest1,(char const *)0);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -636,7 +479,7 @@ int main(int argc, char const **argv)
     {
       pid_t pid_6 = __gen_e_acsl_fork();
       if (! pid_6) {
-        __gen_e_acsl_strcat(const_str,(char const *)const_str);
+        __e_acsl_builtin_strcat(const_str,(char const *)const_str);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -650,7 +493,7 @@ int main(int argc, char const **argv)
     {
       pid_t pid_7 = __gen_e_acsl_fork();
       if (! pid_7) {
-        __gen_e_acsl_strcat(pd1,(char const *)pd1);
+        __e_acsl_builtin_strcat(pd1,(char const *)pd1);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -664,7 +507,7 @@ int main(int argc, char const **argv)
     {
       pid_t pid_8 = __gen_e_acsl_fork();
       if (! pid_8) {
-        __gen_e_acsl_strcat(pd1 + 3,(char const *)pd1);
+        __e_acsl_builtin_strcat(pd1 + 3,(char const *)pd1);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -678,7 +521,7 @@ int main(int argc, char const **argv)
     {
       pid_t pid_9 = __gen_e_acsl_fork();
       if (! pid_9) {
-        __gen_e_acsl_strcat(pd4 + 4,(char const *)pd4);
+        __e_acsl_builtin_strcat(pd4 + 4,(char const *)pd4);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -694,7 +537,7 @@ int main(int argc, char const **argv)
       if (! pid_10) {
         __e_acsl_initialize((void *)(pd4 + 5),sizeof(char));
         *(pd4 + 5) = (char)'\000';
-        __gen_e_acsl_strcat(pd4 + 5,(char const *)pd4);
+        __e_acsl_builtin_strcat(pd4 + 5,(char const *)pd4);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -746,8 +589,8 @@ int main(int argc, char const **argv)
     {
       pid_t pid_11 = __gen_e_acsl_fork();
       if (! pid_11) {
-        __gen_e_acsl_strncat(dest1_0,(char const *)const_str,
-                             (unsigned long)4);
+        __e_acsl_builtin_strncat(dest1_0,(char const *)const_str,
+                                 (unsigned long)4);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -761,8 +604,8 @@ int main(int argc, char const **argv)
     {
       pid_t pid_12 = __gen_e_acsl_fork();
       if (! pid_12) {
-        __gen_e_acsl_strncat(dest2_0,(char const *)const_str,
-                             (unsigned long)4);
+        __e_acsl_builtin_strncat(dest2_0,(char const *)const_str,
+                                 (unsigned long)4);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -776,8 +619,8 @@ int main(int argc, char const **argv)
     {
       pid_t pid_13 = __gen_e_acsl_fork();
       if (! pid_13) {
-        __gen_e_acsl_strncat(unalloc_str,(char const *)const_str,
-                             (unsigned long)1);
+        __e_acsl_builtin_strncat(unalloc_str,(char const *)const_str,
+                                 (unsigned long)1);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -791,8 +634,8 @@ int main(int argc, char const **argv)
     {
       pid_t pid_14 = __gen_e_acsl_fork();
       if (! pid_14) {
-        __gen_e_acsl_strncat(dest2_0,(char const *)unalloc_str,
-                             (unsigned long)1);
+        __e_acsl_builtin_strncat(dest2_0,(char const *)unalloc_str,
+                                 (unsigned long)1);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -806,8 +649,8 @@ int main(int argc, char const **argv)
     {
       pid_t pid_15 = __gen_e_acsl_fork();
       if (! pid_15) {
-        __gen_e_acsl_strncat((char *)0,(char const *)const_str,
-                             (unsigned long)1);
+        __e_acsl_builtin_strncat((char *)0,(char const *)const_str,
+                                 (unsigned long)1);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -821,7 +664,7 @@ int main(int argc, char const **argv)
     {
       pid_t pid_16 = __gen_e_acsl_fork();
       if (! pid_16) {
-        __gen_e_acsl_strncat(dest2_0,(char const *)0,(unsigned long)1);
+        __e_acsl_builtin_strncat(dest2_0,(char const *)0,(unsigned long)1);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -835,8 +678,8 @@ int main(int argc, char const **argv)
     {
       pid_t pid_17 = __gen_e_acsl_fork();
       if (! pid_17) {
-        __gen_e_acsl_strncat(const_str,(char const *)const_str,
-                             (unsigned long)1);
+        __e_acsl_builtin_strncat(const_str,(char const *)const_str,
+                                 (unsigned long)1);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -850,7 +693,7 @@ int main(int argc, char const **argv)
     {
       pid_t pid_18 = __gen_e_acsl_fork();
       if (! pid_18) {
-        __gen_e_acsl_strncat(pd1_0,(char const *)pd1_0,(unsigned long)1);
+        __e_acsl_builtin_strncat(pd1_0,(char const *)pd1_0,(unsigned long)1);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -864,7 +707,8 @@ int main(int argc, char const **argv)
     {
       pid_t pid_19 = __gen_e_acsl_fork();
       if (! pid_19) {
-        __gen_e_acsl_strncat(pd1_0 + 3,(char const *)pd1_0,(unsigned long)5);
+        __e_acsl_builtin_strncat(pd1_0 + 3,(char const *)pd1_0,
+                                 (unsigned long)5);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -878,7 +722,8 @@ int main(int argc, char const **argv)
     {
       pid_t pid_20 = __gen_e_acsl_fork();
       if (! pid_20) {
-        __gen_e_acsl_strncat(pd4_0 + 4,(char const *)pd4_0,(unsigned long)5);
+        __e_acsl_builtin_strncat(pd4_0 + 4,(char const *)pd4_0,
+                                 (unsigned long)5);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -899,8 +744,6 @@ int main(int argc, char const **argv)
     }
   }
   __retres = 0;
-  __e_acsl_delete_block((void *)(& unalloc_str));
-  __e_acsl_delete_block((void *)(& const_str));
   __e_acsl_memory_clean();
   return __retres;
 }

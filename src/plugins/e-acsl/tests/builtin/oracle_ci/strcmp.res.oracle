@@ -14,12 +14,6 @@
 [e-acsl] Warning: annotating undefined function `fork':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-[e-acsl] Warning: annotating undefined function `strcmp':
-  the generated program may miss memory instrumentation
-  if there are memory-related annotations.
-[e-acsl] Warning: annotating undefined function `strncmp':
-  the generated program may miss memory instrumentation
-  if there are memory-related annotations.
 [e-acsl] Warning: annotating undefined function `strdup':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
@@ -48,32 +42,6 @@
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:480: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:147: Warning: 
-  E-ACSL construct `logic functions with labels' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:148: Warning: 
-  E-ACSL construct `logic functions with labels' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:147: Warning: 
-  E-ACSL construct `assigns clause in behavior' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:150: Warning: 
-  E-ACSL construct `logic functions performing read accesses'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:140: Warning: 
-  E-ACSL construct `logic functions with labels' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:141: Warning: 
-  E-ACSL construct `logic functions with labels' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:140: Warning: 
-  E-ACSL construct `assigns clause in behavior' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:143: Warning: 
-  E-ACSL construct `logic functions performing read accesses'
-  is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/unistd.h:856: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.

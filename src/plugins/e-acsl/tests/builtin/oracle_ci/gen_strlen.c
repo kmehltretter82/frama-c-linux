@@ -69,13 +69,6 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options);
 pid_t __gen_e_acsl_fork(void);
 
 /*@ requires valid_string_s: valid_read_string(s);
-    ensures acsl_c_equiv: \result ≡ strlen(\old(s));
-    assigns \result;
-    assigns \result \from (indirect: *(s + (0 ..)));
- */
-size_t __gen_e_acsl_strlen(char const *s);
-
-/*@ requires valid_string_s: valid_read_string(s);
     assigns \result;
     assigns \result
       \from (indirect: *(s + (0 .. strlen{Old}(s)))),
@@ -147,18 +140,6 @@ char *__gen_e_acsl_strdup(char const *s)
     __e_acsl_contract_clean(__gen_e_acsl_contract);
     return __retres;
   }
-}
-
-/*@ requires valid_string_s: valid_read_string(s);
-    ensures acsl_c_equiv: \result ≡ strlen(\old(s));
-    assigns \result;
-    assigns \result \from (indirect: *(s + (0 ..)));
- */
-size_t __gen_e_acsl_strlen(char const *s)
-{
-  size_t __retres;
-  __retres = __e_acsl_builtin_strlen(s);
-  return __retres;
 }
 
 /*@ ensures
@@ -390,7 +371,7 @@ int main(int argc, char const **argv)
     pid_t pid = __gen_e_acsl_fork();
     if (! pid) {
       size_t tmp_1;
-      tmp_1 = __gen_e_acsl_strlen((char const *)empty_str);
+      tmp_1 = __e_acsl_builtin_strlen((char const *)empty_str);
       len = tmp_1 != (size_t)0;
       if (len) __gen_e_acsl_abort();
       __gen_e_acsl_exit(0);
@@ -407,7 +388,7 @@ int main(int argc, char const **argv)
     pid_t pid_0 = __gen_e_acsl_fork();
     if (! pid_0) {
       size_t tmp_3;
-      tmp_3 = __gen_e_acsl_strlen((char const *)heap_str);
+      tmp_3 = __e_acsl_builtin_strlen((char const *)heap_str);
       len = tmp_3 != (size_t)7;
       if (len) __gen_e_acsl_abort();
       __gen_e_acsl_exit(0);
@@ -424,7 +405,7 @@ int main(int argc, char const **argv)
     pid_t pid_1 = __gen_e_acsl_fork();
     if (! pid_1) {
       size_t tmp_5;
-      tmp_5 = __gen_e_acsl_strlen((char const *)(stack_str));
+      tmp_5 = __e_acsl_builtin_strlen((char const *)(stack_str));
       len = tmp_5 != (size_t)7;
       if (len) __gen_e_acsl_abort();
       __gen_e_acsl_exit(0);
@@ -441,7 +422,7 @@ int main(int argc, char const **argv)
     pid_t pid_2 = __gen_e_acsl_fork();
     if (! pid_2) {
       size_t tmp_7;
-      tmp_7 = __gen_e_acsl_strlen((char const *)const_str);
+      tmp_7 = __e_acsl_builtin_strlen((char const *)const_str);
       len = tmp_7 != (size_t)7;
       if (len) __gen_e_acsl_abort();
       __gen_e_acsl_exit(0);
@@ -460,7 +441,7 @@ int main(int argc, char const **argv)
     pid_t pid_3 = __gen_e_acsl_fork();
     if (! pid_3) {
       size_t tmp_9;
-      tmp_9 = __gen_e_acsl_strlen((char const *)heap_str);
+      tmp_9 = __e_acsl_builtin_strlen((char const *)heap_str);
       len = tmp_9 != (size_t)7;
       if (len) __gen_e_acsl_abort();
       __gen_e_acsl_exit(0);
@@ -477,7 +458,7 @@ int main(int argc, char const **argv)
     pid_t pid_4 = __gen_e_acsl_fork();
     if (! pid_4) {
       size_t tmp_11;
-      tmp_11 = __gen_e_acsl_strlen((char const *)(stack_str));
+      tmp_11 = __e_acsl_builtin_strlen((char const *)(stack_str));
       len = tmp_11 != (size_t)7;
       if (len) __gen_e_acsl_abort();
       __gen_e_acsl_exit(0);
@@ -495,7 +476,7 @@ int main(int argc, char const **argv)
     pid_t pid_5 = __gen_e_acsl_fork();
     if (! pid_5) {
       size_t tmp_13;
-      tmp_13 = __gen_e_acsl_strlen((char const *)heap_str);
+      tmp_13 = __e_acsl_builtin_strlen((char const *)heap_str);
       len = tmp_13 != (size_t)7;
       if (len) __gen_e_acsl_abort();
       __gen_e_acsl_exit(0);
