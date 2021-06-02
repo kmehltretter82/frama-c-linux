@@ -272,7 +272,7 @@ struct
         Cil_datatype.Typ.equal a1.array_cell_type a2.array_cell_type
       | (Raw _ | Scalar _ | Struct _ | Union _ | Array _), _ -> false
 
-    let compare m1 m2 =
+    let rec compare m1 m2 =
       let (<?>) c (cmp,x,y) =
         if c = 0 then cmp x y else c
       in
@@ -346,9 +346,6 @@ struct
 
   let are_union_compatible u1 u2 =
     Cil_datatype.Fieldinfo.equal u1.union_field u2.union_field
-
-  let typ_size t =
-    Integer.of_int (Cil.bitsSizeOf t)
 
   (* Conversion *)
 

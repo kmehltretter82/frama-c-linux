@@ -144,10 +144,10 @@ struct
               ival, ival
             else
               raise Abstract_interp.Error_Top
-          in
-          assert_valid_index range array_size;
-          let sub = of_ival ~base_typ:elem_typ ~typ rem in
-          Index (range, elem_typ, sub)
+        in
+        assert_valid_index range array_size;
+        let sub = of_ival ~base_typ:elem_typ ~typ rem in
+        Index (range, elem_typ, sub)
 
       | TComp (ci, _, _) ->
         if not ci.cstruct then
@@ -170,15 +170,6 @@ struct
           find_field (Option.value ~default:[] ci.cfields)
 
       | _ -> raise Abstract_interp.Error_Top
-
-  let of_ival ~base_typ ~typ ival =
-    if Ival.is_small_set ival then
-      let f i acc =
-        Bottom.join join acc (`Value (of_ival ~base_typ ~typ i))
-      in
-      Bottom.non_bottom (Ival.fold_enum f ival `Bottom)
-    else
-      of_ival ~base_typ ~typ ival
 
   let index_of_term array_size t = (* Exact constant ranges *)
     match t.Cil_types.term_node with
