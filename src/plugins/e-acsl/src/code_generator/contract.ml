@@ -595,7 +595,7 @@ let check_complete_and_disjoint kf kinstr env contract =
     Cil.CurrentLoc.set contract.location;
     Options.warning
       ~current:true
-      "@[Some assumes clauses couldn't be translated.@ Ignoring complete and \
+      "@[Some assumes clauses could not be translated.@ Ignoring complete and \
        disjoint behaviors annotations.@]";
     env
   end

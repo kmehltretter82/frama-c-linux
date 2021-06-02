@@ -2,112 +2,105 @@
 [e-acsl] Warning: annotating undefined function `exit':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
+[e-acsl] Warning: annotating undefined function `waitpid':
+  the generated program may miss memory instrumentation
+  if there are memory-related annotations.
+[e-acsl] Warning: annotating undefined function `fork':
+  the generated program may miss memory instrumentation
+  if there are memory-related annotations.
 [e-acsl] Warning: annotating undefined function `strcat':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
 [e-acsl] Warning: annotating undefined function `strncat':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-[kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdio.h:169: Warning: 
-  Neither code nor specification for function printf, generating default assigns from the prototype
-[kernel:annot:missing-spec] FRAMAC_SHARE/libc/setjmp.h:47: Warning: 
-  Neither code nor specification for function sigsetjmp, generating default assigns from the prototype
-[kernel:annot:missing-spec] tests/builtin/signalled.h:14: Warning: 
-  Neither code nor specification for function signal_eval, generating default assigns from the prototype
-[kernel:annot:missing-spec] tests/builtin/signalled.h:18: Warning: 
-  Neither code nor specification for function get_jmp_ctxt, generating default assigns from the prototype
-[kernel:annot:missing-spec] tests/builtin/signalled.h:20: Warning: 
-  Neither code nor specification for function set_handler, generating default assigns from the prototype
-[kernel:annot:missing-spec] tests/builtin/signalled.h:22: Warning: 
-  Neither code nor specification for function test_successful, generating default assigns from the prototype
-[e-acsl] FRAMAC_SHARE/libc/string.h:421: Warning: 
-  E-ACSL construct `logic function application' is not yet supported.
+[e-acsl] FRAMAC_SHARE/libc/string.h:432: Warning: 
+  E-ACSL construct `logic functions performing read accesses'
+  is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:422: Warning: 
-  E-ACSL construct `logic function application' is not yet supported.
+[e-acsl] FRAMAC_SHARE/libc/string.h:440: Warning: 
+  E-ACSL construct `logic functions performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:426: Warning: 
+  E-ACSL construct `logic functions with labels' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:427: Warning: 
-  E-ACSL construct `logic function application' is not yet supported.
+  E-ACSL construct `logic functions with labels' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:435: Warning: 
-  E-ACSL construct `logic function application' is not yet supported.
+[e-acsl] FRAMAC_SHARE/libc/string.h:433: Warning: 
+  E-ACSL construct `logic functions performing read accesses'
+  is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:435: Warning: 
-  E-ACSL construct `assigns clause in behavior' is not yet supported.
+[e-acsl] FRAMAC_SHARE/libc/string.h:441: Warning: 
+  E-ACSL construct `logic functions performing read accesses'
+  is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:427: Warning: 
-  E-ACSL construct `assigns clause in behavior' is not yet supported.
-  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:425: Warning: 
+  Some assumes clauses could not be translated.
+  Ignoring complete and disjoint behaviors annotations.
 [e-acsl] FRAMAC_SHARE/libc/string.h:425: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:406: Warning: 
-  E-ACSL construct `logic function application' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:407: Warning: 
-  E-ACSL construct `logic function application' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:408: Warning: 
-  E-ACSL construct `logic function returning an integer' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:408: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:430: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:437: Warning: 
+  E-ACSL construct `logic functions performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:437: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:445: Warning: 
+  E-ACSL construct `logic functions performing read accesses'
+  is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:411: Warning: 
-  E-ACSL construct `logic function returning an integer' is not yet supported.
+  E-ACSL construct `logic functions with labels' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:414: Warning: 
-  E-ACSL construct `logic function returning an integer' is not yet supported.
+[e-acsl] FRAMAC_SHARE/libc/string.h:412: Warning: 
+  E-ACSL construct `logic functions with labels' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:415: Warning: 
-  E-ACSL construct `logic function returning an integer' is not yet supported.
+[e-acsl] FRAMAC_SHARE/libc/string.h:413: Warning: 
+  E-ACSL construct `logic functions performing read accesses'
+  is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:416: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:410: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:416: Warning: 
+  E-ACSL construct `logic functions performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:419: Warning: 
+  E-ACSL construct `logic functions performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:420: Warning: 
+  E-ACSL construct `logic functions performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/unistd.h:856: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/sys/wait.h:79: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/sys/wait.h:86: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:470: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:472: Warning: 
+  E-ACSL construct `abnormal termination case in behavior'
+  is not yet supported.
+  Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
-[eva:initial-state] Values of globals at initialization
-  __e_acsl_init ∈ [--..--]
-  __e_acsl_heap_allocation_size ∈ [--..--]
-  __e_acsl_math_HUGE_VAL ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
-  __e_acsl_math_HUGE_VALF ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
-  __e_acsl_math_INFINITY ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
-  __e_acsl_sound_verdict ∈ [--..--]
-  __gen_e_acsl_literal_string ∈ {0}
-  __gen_e_acsl_literal_string_2 ∈ {0}
-  __gen_e_acsl_literal_string_3 ∈ {0}
-  __gen_e_acsl_literal_string_4 ∈ {0}
-  __gen_e_acsl_literal_string_5 ∈ {0}
-  __gen_e_acsl_literal_string_6 ∈ {0}
-  __gen_e_acsl_literal_string_7 ∈ {0}
-  __gen_e_acsl_literal_string_8 ∈ {0}
-  __gen_e_acsl_literal_string_9 ∈ {0}
-  __gen_e_acsl_literal_string_10 ∈ {0}
-  __gen_e_acsl_literal_string_11 ∈ {0}
-  __gen_e_acsl_literal_string_12 ∈ {0}
-  __gen_e_acsl_literal_string_13 ∈ {0}
-  __gen_e_acsl_literal_string_14 ∈ {0}
-  __gen_e_acsl_literal_string_15 ∈ {0}
-  __gen_e_acsl_literal_string_16 ∈ {0}
-  __gen_e_acsl_literal_string_17 ∈ {0}
-  __gen_e_acsl_literal_string_18 ∈ {0}
-  __gen_e_acsl_literal_string_19 ∈ {0}
-  __gen_e_acsl_literal_string_20 ∈ {0}
-  __gen_e_acsl_literal_string_21 ∈ {0}
-  __gen_e_acsl_literal_string_22 ∈ {0}
-  __gen_e_acsl_literal_string_23 ∈ {0}
-  __gen_e_acsl_literal_string_24 ∈ {0}
-  __gen_e_acsl_literal_string_25 ∈ {0}
-[eva] using specification for function __e_acsl_memory_init
-[eva] using specification for function __e_acsl_store_block
-[eva] using specification for function __e_acsl_full_init
-[eva] using specification for function __e_acsl_mark_readonly
-[eva] tests/builtin/strcat.c:11: allocating variable __malloc_main_l11
-[eva] tests/builtin/strcat.c:12: allocating variable __malloc_main_l12
-[eva] using specification for function get_jmp_ctxt
-[eva:alarm] tests/builtin/strcat.c:27: Warning: 
-  out of bounds read. assert \valid_read(jmp_ctxt);
-[eva] done for function main
+[eva:alarm] FRAMAC_SHARE/libc/unistd.h:859: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/unistd.h:859: Warning: 
+  function __gen_e_acsl_fork: postcondition 'result_ok_child_or_error' got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:416: Warning: 
+  function __gen_e_acsl_strcat: postcondition 'sum_of_lengths' got status unknown.

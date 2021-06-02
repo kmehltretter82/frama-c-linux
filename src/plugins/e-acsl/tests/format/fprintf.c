@@ -4,7 +4,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "signalled.h"
+#include "../utils/signalled.h"
 
 int main(int argc, const char **argv) {
   char *pstr = "Hello world!";

@@ -1,0 +1,27 @@
+TEST 1: OK: Expected execution at tests/builtin/strcpy.c:21
+TEST 2: OK: Expected execution at tests/builtin/strcpy.c:22
+strlen: insufficient space in destination string, at least 5 bytes required
+TEST 3: OK: Expected signal at tests/builtin/strcpy.c:23
+strlen: destination string space unallocated or cannot be written
+TEST 4: OK: Expected signal at tests/builtin/strcpy.c:24
+strlen: destination string space unallocated or cannot be written
+TEST 5: OK: Expected signal at tests/builtin/strcpy.c:25
+TEST 6: OK: Expected execution at tests/builtin/strcpy.c:26
+strcpy: overlapping memory areas
+TEST 7: OK: Expected signal at tests/builtin/strcpy.c:27
+TEST 8: OK: Expected execution at tests/builtin/strcpy.c:28
+strcpy: overlapping memory areas
+TEST 9: OK: Expected signal at tests/builtin/strcpy.c:29
+TEST 10: OK: Expected execution at tests/builtin/strcpy.c:32
+strncpy: insufficient space in destination string , at least 6 bytes required
+TEST 11: OK: Expected signal at tests/builtin/strcpy.c:33
+strncpy: destination string  space unallocated or cannot be written
+TEST 12: OK: Expected signal at tests/builtin/strcpy.c:34
+strncpy: destination string  space unallocated or cannot be written
+TEST 13: OK: Expected signal at tests/builtin/strcpy.c:35
+TEST 14: OK: Expected execution at tests/builtin/strcpy.c:36
+strncpy: overlapping memory areas
+TEST 15: OK: Expected signal at tests/builtin/strcpy.c:37
+TEST 16: OK: Expected execution at tests/builtin/strcpy.c:38
+strncpy: overlapping memory areas
+TEST 17: OK: Expected signal at tests/builtin/strcpy.c:39
