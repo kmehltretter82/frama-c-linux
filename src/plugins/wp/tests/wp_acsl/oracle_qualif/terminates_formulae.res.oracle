@@ -2,9 +2,17 @@
 [kernel] Parsing tests/wp_acsl/terminates_formulae.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
-[wp] 9 goals scheduled
-[wp] [Qed] Goal typed_call_terminates_part1 : Valid
-[wp] [Alt-Ergo] Goal typed_call_terminates_part2 : Unsuccess
+[wp] 17 goals scheduled
+[wp] [Qed] Goal typed_base_call_terminates_part1 : Valid
+[wp] [Alt-Ergo] Goal typed_base_call_terminates_part2 : Unsuccess
+[wp] [Qed] Goal typed_call_same_terminates_part1 : Valid
+[wp] [Qed] Goal typed_call_same_terminates_part2 : Valid
+[wp] [Qed] Goal typed_call_change_terminates_part1 : Valid
+[wp] [Alt-Ergo] Goal typed_call_change_terminates_part2 : Unsuccess
+[wp] [Qed] Goal typed_call_param_same_terminates_part1 : Valid
+[wp] [Qed] Goal typed_call_param_same_terminates_part2 : Valid
+[wp] [Qed] Goal typed_call_param_change_terminates_part1 : Valid
+[wp] [Alt-Ergo] Goal typed_call_param_change_terminates_part2 : Unsuccess
 [wp] [Qed] Goal typed_variant_terminates : Valid
 [wp] [Qed] Goal typed_variant_loop_assigns : Valid
 [wp] [Alt-Ergo] Goal typed_variant_loop_variant_decrease : Valid
@@ -12,12 +20,16 @@
 [wp] [Qed] Goal typed_no_variant_terminates_part1 : Valid
 [wp] [Alt-Ergo] Goal typed_no_variant_terminates_part2 : Unsuccess
 [wp] [Qed] Goal typed_no_variant_loop_assigns : Valid
-[wp] Proved goals:    7 / 9
-  Qed:             6 
-  Alt-Ergo:        1  (unsuccess: 2)
+[wp] Proved goals:   13 / 17
+  Qed:            12 
+  Alt-Ergo:        1  (unsuccess: 4)
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  call                      1        -        2      50.0%
+  base_call                 1        -        2      50.0%
+  call_same                 2        -        2       100%
+  call_change               1        -        2      50.0%
+  call_param_same           2        -        2       100%
+  call_param_change         1        -        2      50.0%
   variant                   3        1        4       100%
   no_variant                2        -        3      66.7%
 ------------------------------------------------------------

@@ -5,9 +5,11 @@
    OPT: -wp-variant-with-terminates
 */
 
+int a ;
+
 /*@
   axiomatic Ax {
-    predicate P reads \nothing ;
+    predicate P reads a ;
     predicate Q reads \nothing ;
   }
 */
@@ -18,8 +20,35 @@
 void terminates_P(void);
 
 //@ terminates Q ;
-void call(void){
+void base_call(void){
   terminates_P();
+}
+
+//@ terminates P ;
+void call_same(void){
+  terminates_P();
+}
+
+//@ terminates P ;
+void call_change(void){
+  a = 0 ;
+  terminates_P();
+}
+
+/*@ terminates *p ;
+    assigns \nothing ;
+*/
+void call_param(int* p);
+
+//@ terminates *p ;
+void call_param_same(int *p){
+  call_param(p);
+}
+
+//@ terminates *p ;
+void call_param_change(int *p){
+  *p = 0 ;
+  call_param(p);
 }
 
 //@ terminates Q ;
