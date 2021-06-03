@@ -479,6 +479,22 @@ module PrecondWeakening =
   end)
 
 let () = Parameter_customize.set_group wp_strategy
+module TerminatesDeclarations =
+  True(struct
+    let option_name = "-wp-declarations-terminate"
+    let help = "Function declarations without terminates specification are \
+                considered to terminate when called."
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
+module TerminatesDefinitions =
+  False(struct
+    let option_name = "-wp-definitions-terminate"
+    let help = "Function definitions without terminates specification are \
+                considered to terminate when called."
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
 module TerminatesVariantHyp =
   False(struct
     let option_name = "-wp-variant-with-terminates"

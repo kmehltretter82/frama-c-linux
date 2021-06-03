@@ -188,14 +188,19 @@ let get_terminates kf =
     (fun p -> WpPropId.mk_terminates_id kf Kglobal p, normalize_terminates p)
     (Annotations.funspec kf).spec_terminates
 
-let get_terminates_goal kf =
+let get_terminates_call kf =
   match (Annotations.funspec kf).spec_terminates with
   | Some p ->
       normalize_terminates p
   | None when Kernel_function.is_definition kf ->
-      Logic_const.pfalse
+      if Wp_parameters.TerminatesDefinitions.get ()
+      then Logic_const.ptrue
+      else Logic_const.pfalse
   | None ->
-      Logic_const.ptrue
+      if Wp_parameters.TerminatesDeclarations.get ()
+      then Logic_const.ptrue
+      else Logic_const.pfalse
+
 
 (* -------------------------------------------------------------------------- *)
 (* --- Contracts                                                          --- *)
@@ -284,7 +289,7 @@ module CallContract = WpContext.StaticGenerator(Kernel_function)
           | WritesAny -> WritesAny
           | Writes froms -> Writes (normalize_froms Normal froms)
         in
-        let terminates = get_terminates_goal kf in
+        let terminates = get_terminates_call kf in
         {
           contract_cond = List.rev !wcond ;
           contract_hpre = List.rev !whpre ;
