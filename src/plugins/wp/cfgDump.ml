@@ -106,6 +106,19 @@ let add_goal env (pid,pred) k =
   Format.fprintf !out "  %a -> %a [ style=dotted ] ;@." pretty u pretty k ;
   merge env u k
 
+let add_subgoal env (pid, t_pred) prop stmt _source k =
+  let u = node () in
+  if Wp_parameters.debug_atleast 1 then
+    Format.fprintf !out "  %a [ color=red , label=\"Prove %a @@ %a (%a)\" ] ;@."
+      pretty u
+      Printer.pp_predicate t_pred
+      Cil_printer.pp_stmt stmt
+      Printer.pp_predicate prop
+  else
+    Format.fprintf !out "  %a [ color=red , label=\"Prove %a\" ] ;@."
+      pretty u WpPropId.pp_propid pid ;
+  merge env u k
+
 let pp_assigns fmt = function
   | Cil_types.WritesAny -> Format.pp_print_string fmt " \\everything"
   | Cil_types.Writes [] -> Format.pp_print_string fmt " \\nothing"
@@ -223,7 +236,20 @@ let call_goal_precond env _stmt kf _es ~pre k =
           (fun (_,p) -> Format.fprintf fmt "\n@[<hov 2>Requires %a ;@]"
               Printer.pp_predicate p) pre
     end ;
-  ignore pre ;
+  Format.fprintf !out "  %a -> %a [ style=dotted ] ;@." pretty u pretty k ;
+  merge env u k
+
+let call_terminates env (_gpid, prop) _stmt kf _es ~callee_t k =
+  let _ = callee_t in
+  let u = node () in
+  Format.fprintf !out "  %a [ color=red , label=\"Prove PreCond %a%t\" ] ;@."
+    pretty u Kernel_function.pretty kf
+    begin fun fmt ->
+      if Wp_parameters.debug_atleast 1 then
+        Format.fprintf fmt "\n@[<hov 2>Terminates if %a[%s] ==> %a[%a];@]"
+          Printer.pp_predicate prop "Caller"
+          Printer.pp_predicate callee_t Kernel_function.pretty kf
+    end ;
   Format.fprintf !out "  %a -> %a [ style=dotted ] ;@." pretty u pretty k ;
   merge env u k
 

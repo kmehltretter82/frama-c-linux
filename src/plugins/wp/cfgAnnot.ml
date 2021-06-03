@@ -178,6 +178,25 @@ let get_disjoint_behaviors kf =
        L.preproc_annot L.labels_fct_pre @@ Ast_info.disjoint_behaviors spec bs
     ) spec.spec_disjoint_behaviors
 
+let normalize_terminates p =
+  let module L = NormAtLabels in
+  L.preproc_annot L.labels_fct_pre @@
+  Logic_const.pat (p.ip_content.tp_statement, BuiltinLabel Pre)
+
+let get_terminates kf =
+  Option.map
+    (fun p -> WpPropId.mk_terminates_id kf Kglobal p, normalize_terminates p)
+    (Annotations.funspec kf).spec_terminates
+
+let get_terminates_goal kf =
+  match (Annotations.funspec kf).spec_terminates with
+  | Some p ->
+      normalize_terminates p
+  | None when Kernel_function.is_definition kf ->
+      Logic_const.pfalse
+  | None ->
+      Logic_const.ptrue
+
 (* -------------------------------------------------------------------------- *)
 (* --- Contracts                                                          --- *)
 (* -------------------------------------------------------------------------- *)
@@ -189,6 +208,7 @@ type contract = {
   contract_exit : WpPropId.pred_info list ;
   contract_smoke : WpPropId.pred_info list ;
   contract_assigns : Cil_types.assigns ;
+  contract_terminates : Cil_types.predicate ;
 }
 
 let assigns_upper_bound behaviors =
@@ -264,13 +284,15 @@ module CallContract = WpContext.StaticGenerator(Kernel_function)
           | WritesAny -> WritesAny
           | Writes froms -> Writes (normalize_froms Normal froms)
         in
+        let terminates = get_terminates_goal kf in
         {
           contract_cond = List.rev !wcond ;
           contract_hpre = List.rev !whpre ;
           contract_post = List.rev !wpost ;
           contract_exit = List.rev !wexit ;
           contract_smoke = [] ;
-          contract_assigns = assigns
+          contract_assigns = assigns ;
+          contract_terminates = terminates ;
         }
     end)
 
@@ -383,6 +405,7 @@ let get_code_assertions ?(smoking=false) kf stmt =
 (* -------------------------------------------------------------------------- *)
 
 type loop_contract = {
+  loop_terminates: predicate option;
   (* to be verified at loop entry *)
   loop_established: WpPropId.pred_info list;
   (* to be assumed for loop current *)
@@ -396,6 +419,7 @@ type loop_contract = {
 }
 
 let reverse_loop_contract l = {
+  loop_terminates = l.loop_terminates ;
   loop_established = List.rev l.loop_established ;
   loop_invariants = List.rev l.loop_invariants ;
   loop_preserved = List.rev l.loop_preserved ;
@@ -439,9 +463,16 @@ module LoopContract = WpContext.StaticGenerator(CodeKey)
             | AVariant(term, None) ->
                 let vpos , vdec =
                   WpStrategy.mk_variant_properties kf stmt ca term in
-                { l with loop_preserved =
-                           normalize_annot vdec ::
-                           normalize_annot vpos ::
+                let intro_terminates (pid, v) =
+                  pid,
+                  match (Annotations.funspec kf).spec_terminates with
+                  | None -> v
+                  | Some t -> Logic_const.pimplies (normalize_terminates t, v)
+                in
+                { l with loop_terminates = None ;
+                         loop_preserved =
+                           intro_terminates (normalize_annot vdec) ::
+                           intro_terminates (normalize_annot vpos) ::
                            l.loop_preserved }
             | AAssigns(_,WritesAny) ->
                 let asgn = WpPropId.mk_loop_any_assigns_info stmt in
@@ -457,6 +488,7 @@ module LoopContract = WpContext.StaticGenerator(CodeKey)
                 end
             | _ -> l
           end stmt {
+          loop_terminates = Some Logic_const.pfalse ;
           loop_established = [] ;
           loop_invariants = [] ;
           loop_preserved = [] ;
@@ -465,12 +497,21 @@ module LoopContract = WpContext.StaticGenerator(CodeKey)
         }
     end)
 
-let get_loop_contract ?(smoking=false) kf stmt =
+let get_loop_contract ?(smoking=false) ?terminates kf stmt =
   let lc = LoopContract.get (kf,stmt) in
-  if smoking && not (WpReached.is_dead_code stmt) then
-    let g = smoke kf ~id:"dead_loop" ~unreachable:stmt () in
-    { lc with loop_smoke = g :: lc.loop_smoke }
-  else lc
+  let lc_smoke = if smoking && not (WpReached.is_dead_code stmt) then
+      let g = smoke kf ~id:"dead_loop" ~unreachable:stmt () in
+      { lc with loop_smoke = g :: lc.loop_smoke }
+    else lc
+  in
+  match lc_smoke.loop_terminates, terminates with
+  | None, _->
+      lc_smoke
+  | Some _, None ->
+      { lc_smoke with loop_terminates = None }
+  | Some loop_terminates, Some terminates ->
+      let prop = Logic_const.pimplies(terminates, loop_terminates) in
+      { lc_smoke with loop_terminates = Some prop }
 
 (* -------------------------------------------------------------------------- *)
 (* --- Clear Tablesnts                                                    --- *)

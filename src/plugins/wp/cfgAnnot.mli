@@ -56,6 +56,8 @@ val get_behavior_goals :
 val get_complete_behaviors : kernel_function -> pred_info list
 val get_disjoint_behaviors : kernel_function -> pred_info list
 
+val get_terminates : kernel_function -> pred_info option
+
 (* -------------------------------------------------------------------------- *)
 (* --- Property Accessors : Assertions                                    --- *)
 (* -------------------------------------------------------------------------- *)
@@ -76,6 +78,7 @@ val get_stmt_assigns : kernel_function -> stmt -> assigns_full_info list
 (* -------------------------------------------------------------------------- *)
 
 type loop_contract = {
+  loop_terminates: predicate option;
   (** to be verified at loop entry *)
   loop_established: pred_info list;
   (** to be assumed for loop current *)
@@ -88,7 +91,7 @@ type loop_contract = {
   loop_assigns: assigns_full_info list;
 }
 
-val get_loop_contract : ?smoking:bool ->
+val get_loop_contract : ?smoking:bool -> ?terminates:predicate ->
   kernel_function -> stmt -> loop_contract
 
 (* -------------------------------------------------------------------------- *)
@@ -102,6 +105,7 @@ type contract = {
   contract_exit : pred_info list ;
   contract_smoke : pred_info list ;
   contract_assigns : assigns ;
+  contract_terminates : predicate ;
 }
 
 val get_call_contract : ?smoking:stmt -> kernel_function -> stmt -> contract

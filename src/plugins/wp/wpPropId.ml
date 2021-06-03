@@ -44,6 +44,7 @@ type prop_kind =
   | PKVarPos      (** computation related to a loop variant being positive *)
   | PKAFctOut     (** computation related to the function assigns on normal termination *)
   | PKAFctExit    (** computation related to the function assigns on exit termination *)
+  | PKTerminates  (** computation related to the termination *)
   | PKSmoke      (** expected to fail *)
   | PKPre of kernel_function * stmt * Property.t
   (** precondition for function
@@ -177,6 +178,9 @@ let mk_pre_id kf ki b p =
 let mk_post_id kf ki b p =
   mk_prop PKProp (Property.ip_of_ensures kf ki b p)
 
+let mk_terminates_id kf kinstr p =
+  mk_prop PKTerminates (Property.ip_of_terminates kf kinstr p)
+
 let mk_stmt_post_id kf s b p =
   mk_prop PKProp (Property.ip_of_ensures kf (Kstmt s) b p)
 
@@ -214,6 +218,7 @@ let kind_order = function
   | PKCheck -> 9
   | PKTactic -> 10
   | PKSmoke -> 11
+  | PKTerminates -> 12
 
 let compare_kind k1 k2 = match k1, k2 with
     PKPre (kf1, ki1, p1), PKPre (kf2, ki2, p2) ->
@@ -328,7 +333,7 @@ end = struct
 
   let basename_of_prop_id p =
     match p.p_kind , p.p_prop with
-    | (PKTactic | PKCheck | PKProp | PKPropLoop | PKSmoke) , p ->
+    | (PKTactic | PKCheck | PKProp | PKPropLoop | PKSmoke | PKTerminates) , p ->
         base_id_prop_txt p
     | PKEstablished , p -> base_id_prop_txt p ^ "_established"
     | PKPreserved , p -> base_id_prop_txt p ^ "_preserved"
@@ -411,7 +416,8 @@ struct
 
   let get_prop_id_base p =
     match p.p_kind , p.p_prop with
-    | (PKTactic | PKCheck | PKProp | PKPropLoop | PKSmoke) , p -> get_ip p
+    | (PKTactic | PKCheck | PKProp | PKPropLoop | PKSmoke | PKTerminates) , p ->
+        get_ip p
     | PKEstablished , p -> get_ip p ^ "_established"
     | PKPreserved , p -> get_ip p ^ "_preserved"
     | PKVarDecr , p -> get_ip p ^ "_decrease"
@@ -563,6 +569,7 @@ let label_of_kind = function
   | PKVarPos -> "Positive"
   | PKAFctOut -> "Function assigns"
   | PKAFctExit -> "Exit assigns"
+  | PKTerminates -> "Terminates"
   | PKPre(kf,_,_) ->
       Printf.sprintf "Precondition for '%s'" (Kernel_function.get_name kf)
 
@@ -579,7 +586,7 @@ struct
     | None -> ()
     | Some(k,n) -> fprintf fmt " (%d/%d)" (succ k) n
   let pp_subprop fmt p = match p.p_kind with
-    | PKProp | PKTactic | PKCheck | PKPropLoop | PKSmoke -> ()
+    | PKProp | PKTactic | PKCheck | PKPropLoop | PKSmoke | PKTerminates -> ()
     | PKEstablished -> pp_print_string fmt " (established)"
     | PKPreserved -> pp_print_string fmt " (preserved)"
     | PKVarDecr -> pp_print_string fmt " (decrease)"
@@ -657,6 +664,7 @@ let propid_hints hs p =
   | PKVarPos , _ -> add_required hs "positive"
   | PKAFctOut , _ -> add_required hs "return"
   | PKAFctExit , _ -> add_required hs "exit"
+  | PKTerminates , _ -> add_required hs "terminates"
   | PKPre(kf,st,_) , _ ->
       add_required hs ("precond-" ^ Kernel_function.get_name kf) ;
       stmt_hints hs st
@@ -731,7 +739,7 @@ let prop_id_keys p =
 
 let pp_goal_kind fmt = function
   | PKTactic | PKSmoke | PKCheck
-  | PKProp | PKPropLoop | PKAFctOut | PKAFctExit
+  | PKProp | PKPropLoop | PKAFctOut | PKAFctExit | PKTerminates
   | PKPre _ -> ()
   | PKEstablished -> Format.pp_print_string fmt "Establishment of "
   | PKPreserved -> Format.pp_print_string fmt "Preservation of "
@@ -1040,14 +1048,15 @@ let split_map f pid gs =
 
 let subproofs id = match id.p_kind with
   | PKCheck -> 0
-  | PKProp | PKSmoke | PKTactic | PKPre _ | PKPropLoop -> 1
+  | PKProp | PKSmoke | PKTactic | PKPre _ | PKPropLoop | PKTerminates -> 1
   | PKEstablished | PKPreserved
   | PKVarDecr | PKVarPos
   | PKAFctExit | PKAFctOut -> 2
 
 let subproof_idx id = match id.p_kind with
   | PKCheck -> (-1) (* 0/0 *)
-  | PKProp | PKTactic | PKPre _ | PKSmoke | PKPropLoop -> 0 (* 1/1 *)
+  | PKProp | PKTactic | PKPre _ | PKSmoke | PKPropLoop
+  | PKTerminates -> 0 (* 1/1 *)
   | PKPreserved  -> 0 (* 1/2 *)
   | PKEstablished-> 1 (* 2/2 *)
   | PKVarDecr    -> 0 (* 1/2 *)
@@ -1097,7 +1106,8 @@ let get_induction p =
       | IPAssigns {ias_kf; ias_kinstr=Kstmt stmt} -> Some (ias_kf, stmt)
       | _ -> None
   in match p.p_kind with
-  | PKCheck|PKSmoke |PKAFctOut|PKAFctExit|PKPre _ | PKTactic -> None
+  | PKCheck|PKSmoke |PKAFctOut|PKAFctExit|PKPre _ | PKTactic| PKTerminates ->
+      None
   | PKProp ->
       let loop_stmt_opt = match get_stmt (property_of_id p) with
         | None -> None

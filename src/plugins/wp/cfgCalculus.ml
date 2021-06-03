@@ -139,6 +139,7 @@ struct
     body: Cfg.automaton option;
     succ: Cfg.vertex -> Cfg.G.edge list;
     dead: stmt -> bool ;
+    terminates: WpPropId.pred_info option ;
     we: W.t_env;
     wp: W.t_prop option Vhash.t; (* None is used for non-dag detection *)
     mutable wk: W.t_prop; (* end point *)
@@ -185,6 +186,11 @@ struct
 
   let prove_property env (p : WpPropId.pred_info) w =
     if is_selected ~goal:true env p then W.add_goal env.we p w else w
+
+  let prove_subproperty env (p : WpPropId.pred_info) prop stmt source w =
+    if is_selected ~goal:true env p
+    then W.add_subgoal env.we p prop stmt source w
+    else w
 
   (* --- Decomposition of WP Rules --- *)
 
@@ -235,11 +241,17 @@ struct
           is_default_bhv m &&
           WpLog.SmokeTests.get () &&
           WpLog.SmokeDeadloop.get () in
-        loop env a s (CfgAnnot.get_loop_contract ~smoking m.kf s)
+        let terminates = Option.map snd env.terminates in
+        loop env a s (CfgAnnot.get_loop_contract ~smoking ?terminates m.kf s)
     | Edges -> successors env a
 
   (* Compute loops *)
   and loop env a s (lc : CfgAnnot.loop_contract) : W.t_prop =
+    let insert_terminates w = match env.terminates, lc.loop_terminates with
+      | None, _ | _, None -> w (* no terminates goal or nothing to prove *)
+      | Some t, Some prop -> prove_subproperty env t prop s FromCode w
+    in
+    insert_terminates @@
     List.fold_right (prove_property env) lc.loop_established @@
     List.fold_right (use_assigns env) lc.loop_assigns @@
     W.label env.we None (Clabels.loop_current s) @@
@@ -319,10 +331,15 @@ struct
         ~pexit:c.contract_exit
         ~assigns:c.contract_assigns
         ~p_post ~p_exit in
-    if is_default_bhv env.mode then
-      let pre = List.filter (is_selected_callpre env) c.contract_cond in
-      W.call_goal_precond env.we s kf es ~pre w_call
-    else w_call
+    let w_pre = if is_default_bhv env.mode then
+        let pre = List.filter (is_selected_callpre env) c.contract_cond in
+        W.call_goal_precond env.we s kf es ~pre w_call
+      else w_call
+    in
+    match env.terminates with
+    | Some p when is_default_bhv env.mode && is_selected ~goal:true env p ->
+        W.call_terminates env.we p s kf es ~callee_t:c.contract_terminates w_pre
+    | _ -> w_pre
 
   let do_complete_disjoint env w =
     if not (is_default_bhv env.mode) then w
@@ -378,6 +395,12 @@ struct
         env.wk <- if exits then do_exit env ~formals b w else w ;
         wp env cfg.entry_point
 
+  let do_terminates env w =
+    match env.terminates with
+    | Some p when is_default_bhv env.mode && is_selected ~goal:true env p ->
+        prove_property env (fst p, Logic_const.ptrue) w
+    | _ -> w
+
   (* Putting everything together *)
   let compute ~mode ~props =
     let kf = mode.kf in
@@ -392,9 +415,10 @@ struct
          WpLog.SmokeTests.get () &&
          WpLog.SmokeDeadcode.get ()
       then CfgInfos.smoking infos else (fun _ -> false) in
+    let terminates = CfgAnnot.get_terminates kf in
     let env = {
       mode ; props ; body ;
-      succ ; dead ;
+      succ ; dead ; terminates ;
       we = W.new_env kf ;
       wp = Vhash.create 32 ;
       wk = W.empty ;
@@ -409,6 +433,7 @@ struct
       do_preconditions env ~formals bhv @@
       do_complete_disjoint env @@
       do_funbehavior env ~formals ~exits bhv @@
+      do_terminates env @@
       W.empty
     end
 

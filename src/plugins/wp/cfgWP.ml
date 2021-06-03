@@ -55,7 +55,7 @@ struct
 
   type target =
     | Gprop of P.t
-    | Geffect of P.t * Stmt.t * effect_source
+    | Gsource of P.t * Stmt.t * effect_source
     | Gposteffect of P.t
 
   module TARGET =
@@ -65,33 +65,33 @@ struct
       | FromCode -> 1 | FromCall -> 2 | FromReturn -> 3
     let hash = function
       | Gprop p | Gposteffect p -> P.hash p
-      | Geffect(p,s,e) -> P.hash p * 37 + 41 * Stmt.hash s + hsrc e
+      | Gsource(p,s,e) -> P.hash p * 37 + 41 * Stmt.hash s + hsrc e
     let compare g1 g2 =
       if g1 == g2 then 0 else
         match g1,g2 with
         | Gprop p1 , Gprop p2 -> P.compare p1 p2
         | Gprop _ , _ -> (-1)
         | _ , Gprop _ -> 1
-        | Geffect(p1,s1,e1) , Geffect(p2,s2,e2) ->
+        | Gsource(p1,s1,e1) , Gsource(p2,s2,e2) ->
             let c = P.compare p1 p2 in
             if c <> 0 then c else
               let c = Stmt.compare s1 s2 in
               if c <> 0 then c else
                 hsrc e1 - hsrc e2
-        | Geffect _ , _ -> (-1)
-        | _ , Geffect _ -> 1
+        | Gsource _ , _ -> (-1)
+        | _ , Gsource _ -> 1
         | Gposteffect p1 , Gposteffect p2 -> P.compare p1 p2
     let equal g1 g2 = (compare g1 g2 = 0)
-    let prop_id = function Gprop p | Gposteffect p | Geffect(p,_,_) -> p
-    let source = function Gprop _ | Gposteffect _ -> None | Geffect(_,s,e) -> Some(s,e)
+    let prop_id = function Gprop p | Gposteffect p | Gsource(p,_,_) -> p
+    let source = function Gprop _ | Gposteffect _ -> None | Gsource(_,s,e) -> Some(s,e)
     let is_smoke_test = function
       | Gprop p -> WpPropId.is_smoke_test p
-      | Gposteffect _ | Geffect _ -> false
+      | Gposteffect _ | Gsource _ -> false
     let pretty fmt = function
       | Gprop p -> WpPropId.pretty fmt p
-      | Geffect(p,s,FromCode) -> Format.fprintf fmt "%a at sid:%d" WpPropId.pretty p s.sid
-      | Geffect(p,s,FromCall) -> Format.fprintf fmt "Call %a at sid:%d" WpPropId.pretty p s.sid
-      | Geffect(p,s,FromReturn) -> Format.fprintf fmt "Return %a at sid:%d" WpPropId.pretty p s.sid
+      | Gsource(p,s,FromCode) -> Format.fprintf fmt "%a at sid:%d" WpPropId.pretty p s.sid
+      | Gsource(p,s,FromCall) -> Format.fprintf fmt "Call %a at sid:%d" WpPropId.pretty p s.sid
+      | Gsource(p,s,FromReturn) -> Format.fprintf fmt "Return %a at sid:%d" WpPropId.pretty p s.sid
       | Gposteffect p -> Format.fprintf fmt "%a post-effect" WpPropId.pretty p
   end
 
@@ -507,6 +507,18 @@ struct
          let vcs = add_vc (Gprop gpid) ~warn goal wp.vcs in
          { wp with vcs = vcs })
 
+  let add_subgoal wenv (gpid, _) predicate stmt source wp = in_wenv wenv wp
+      (fun env wp ->
+         let outcome = Warning.catch
+             ~severe:true ~effect:"Degenerated goal"
+             (L.pred `Positive env) predicate in
+         let warn,goal = match outcome with
+           | Warning.Result(warn,goal) -> warn,goal
+           | Warning.Failed warn -> warn,F.p_false
+         in
+         let vcs = add_vc (Gsource(gpid, stmt, source)) ~warn goal wp.vcs in
+         { wp with vcs = vcs })
+
   let add_assigns wenv (gpid,ainfo) wp = in_wenv wenv wp
       begin fun env wp ->
         let outcome = Warning.catch
@@ -577,7 +589,7 @@ struct
          in
          let target = match sloc with
            | None -> Gprop e.e_pid
-           | Some stmt -> Geffect(e.e_pid,stmt,source)
+           | Some stmt -> Gsource(e.e_pid,stmt,source)
          in
          Gmap.add target group vcs
       ) effects vcs
@@ -593,7 +605,7 @@ struct
       (fun e vcs ->
          let target = match stmt with
            | None -> Gprop e.e_pid
-           | Some s -> Geffect(e.e_pid,s,FromCode)
+           | Some s -> Gsource(e.e_pid,s,FromCode)
          in
          add_vc target ?warn F.p_false vcs)
       effects vcs
@@ -1025,6 +1037,52 @@ struct
                         add_vc (Gprop gid) ~warn p_false vcs
                  ) wp.vcs pre
              in { wp with vcs = vcs })
+
+  (* -------------------------------------------------------------------------- *)
+  (* --- WP RULE : call terminates                                          --- *)
+  (* -------------------------------------------------------------------------- *)
+
+  let call_terminates wenv (gpid, caller_t) stmt kf es ~callee_t wp =
+    in_wenv wenv wp
+      (fun env wp ->
+         let gid = Gsource(gpid, stmt, FromCall) in
+         let outcome = Warning.catch
+             ~severe:true ~effect:"Can not prove call termination"
+             (L.pred `Positive env) caller_t
+         in
+         match outcome with
+         | Warning.Failed warn ->
+             let vcs = add_vc gid ~warn p_false wp.vcs in
+             { wp with vcs = vcs }
+         | Warning.Result(warn, caller_t) ->
+             let sigma = L.current env in
+             let outcome = Warning.catch
+                 ~severe:true ~effect:"Can not prove call preconditions"
+                 (List.map (C.exp sigma)) es in
+             match outcome with
+             | Warning.Failed warn2 ->
+                 let warn = W.union warn warn2 in
+                 let vcs = add_vc gid ~warn p_false wp.vcs in
+                 { wp with vcs = vcs }
+             | Warning.Result(warn2, vs) ->
+                 let warn = W.union warn warn2 in
+                 let init = L.mem_at env Clabels.init in
+                 let call = L.call kf vs in
+                 let call_e = L.mk_env ~here:sigma () in
+                 let call_f = L.call_pre init call sigma in
+                 let outcome = Warning.catch
+                     ~severe:true ~effect:"Can not prove call precondition"
+                     (L.in_frame call_f (L.pred `Positive call_e)) callee_t in
+                 match outcome with
+                 | Warning.Result(warn3,callee_t) ->
+                     let warn = W.union warn warn3 in
+                     let goal = p_imply caller_t callee_t in
+                     let vcs = add_vc gid ~warn goal wp.vcs in
+                     { wp with vcs = vcs }
+                 | Warning.Failed warn3 ->
+                     let warn = W.union warn warn3 in
+                     let vcs = add_vc gid ~warn p_false wp.vcs in
+                     { wp with vcs = vcs })
 
   (* -------------------------------------------------------------------------- *)
   (* --- WP RULE : call postcondition                                       --- *)

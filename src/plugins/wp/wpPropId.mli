@@ -100,6 +100,7 @@ type prop_kind =
   | PKVarPos      (** computation related to a loop variant being positive *)
   | PKAFctOut     (** computation related to the function assigns on normal termination *)
   | PKAFctExit    (** computation related to the function assigns on exit termination *)
+  | PKTerminates  (** computation related to the termination *)
   | PKSmoke      (** smoke property *)
   | PKPre of kernel_function * stmt * Property.t (** precondition for function
                                                      at stmt, property of the require. Many information that should come
@@ -195,6 +196,9 @@ val mk_pre_id : kernel_function -> kinstr -> funbehavior ->
 
 val mk_post_id : kernel_function -> kinstr -> funbehavior ->
   termination_kind * identified_predicate -> prop_id
+
+val mk_terminates_id :
+  kernel_function -> kinstr -> identified_predicate -> prop_id
 
 val mk_stmt_post_id : kernel_function -> stmt -> funbehavior ->
   termination_kind * identified_predicate -> prop_id
