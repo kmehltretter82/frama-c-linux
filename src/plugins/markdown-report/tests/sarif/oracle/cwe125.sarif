@@ -16,9 +16,11 @@
       "invocations": [
         {
           "commandLine":
-            "frama-c -check tests/sarif/cwe125.c -save tests/sarif/result/cwe125_parse.sav",
+            "frama-c -journal-disable -check -no-autoload-plugins -load-module=eva,from,scope,markdown_report tests/sarif/cwe125.c -save tests/sarif/result/cwe125_parse.sav",
           "arguments": [
-            "-check", "tests/sarif/cwe125.c", "-save",
+            "-journal-disable", "-check", "-no-autoload-plugins",
+            "-load-module=eva,from,scope,markdown_report",
+            "tests/sarif/cwe125.c", "-save",
             "tests/sarif/result/cwe125_parse.sav"
           ],
           "exitCode": 0,
@@ -26,21 +28,25 @@
         },
         {
           "commandLine":
-            "frama-c -check -load tests/sarif/result/cwe125_parse.sav -eva -save tests/sarif/result/cwe125_eva.sav",
+            "frama-c -journal-disable -check -no-autoload-plugins -load-module=eva,from,scope,markdown_report -load tests/sarif/result/cwe125_parse.sav -eva -save tests/sarif/result/cwe125_eva.sav",
           "arguments": [
-            "-check", "-load", "tests/sarif/result/cwe125_parse.sav", "-eva",
-            "-save", "tests/sarif/result/cwe125_eva.sav"
+            "-journal-disable", "-check", "-no-autoload-plugins",
+            "-load-module=eva,from,scope,markdown_report", "-load",
+            "tests/sarif/result/cwe125_parse.sav", "-eva", "-save",
+            "tests/sarif/result/cwe125_eva.sav"
           ],
           "exitCode": 0,
           "executionSuccessful": true
         },
         {
           "commandLine":
-            "frama-c -check -load tests/sarif/result/cwe125_eva.sav -then -mdr-out tests/sarif/result/cwe125.sarif -mdr-gen sarif -mdr-no-print-libc -mdr-sarif-deterministic",
+            "frama-c -journal-disable -check -no-autoload-plugins -load-module=eva,from,scope,markdown_report -load tests/sarif/result/cwe125_eva.sav -then -mdr-out tests/sarif/result/cwe125.sarif -mdr-gen sarif -mdr-no-print-libc -mdr-sarif-deterministic",
           "arguments": [
-            "-check", "-load", "tests/sarif/result/cwe125_eva.sav", "-then",
-            "-mdr-out", "tests/sarif/result/cwe125.sarif", "-mdr-gen",
-            "sarif", "-mdr-no-print-libc", "-mdr-sarif-deterministic"
+            "-journal-disable", "-check", "-no-autoload-plugins",
+            "-load-module=eva,from,scope,markdown_report", "-load",
+            "tests/sarif/result/cwe125_eva.sav", "-then", "-mdr-out",
+            "tests/sarif/result/cwe125.sarif", "-mdr-gen", "sarif",
+            "-mdr-no-print-libc", "-mdr-sarif-deterministic"
           ],
           "exitCode": 0,
           "executionSuccessful": true

@@ -16,12 +16,13 @@
       "invocations": [
         {
           "commandLine":
-            "frama-c -check tests/sarif/libc.c -no-autoload-plugins -load-module eva,from,scope,markdown_report -eva -eva-no-results -mdr-gen sarif -mdr-sarif-deterministic -mdr-no-print-libc -mdr-out tests/sarif/result/without-libc.sarif",
+            "frama-c -journal-disable -check -no-autoload-plugins -load-module=eva,from,scope,markdown_report -eva -eva-no-results -mdr-gen sarif -mdr-sarif-deterministic tests/sarif/libc.c -mdr-no-print-libc -mdr-out tests/sarif/result/without-libc.sarif",
           "arguments": [
-            "-check", "tests/sarif/libc.c", "-no-autoload-plugins",
-            "-load-module", "eva,from,scope,markdown_report", "-eva",
+            "-journal-disable", "-check", "-no-autoload-plugins",
+            "-load-module=eva,from,scope,markdown_report", "-eva",
             "-eva-no-results", "-mdr-gen", "sarif",
-            "-mdr-sarif-deterministic", "-mdr-no-print-libc", "-mdr-out",
+            "-mdr-sarif-deterministic", "tests/sarif/libc.c",
+            "-mdr-no-print-libc", "-mdr-out",
             "tests/sarif/result/without-libc.sarif"
           ],
           "exitCode": 0,

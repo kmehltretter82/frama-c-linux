@@ -1,8 +1,8 @@
 /* run.config
+ PLUGIN: eva,scope
  MODULE: @PTEST_NAME@
    OPT: @EVA_OPTIONS@
 */
-
 struct S { int i; };
 
 /*@ lemma foo: \forall struct S x; x.i >= 0 || x.i < 0; */

@@ -1,4 +1,5 @@
 COMMENT: this directory is meant to test exclusively the front-end
 COMMENT: (parser, type-checker, linker, syntactic transformations)
-OPT: -print -journal-disable -check -machdep x86_32
+PLUGIN:
+OPT: -print -machdep x86_32
 FILEREG:.*\.\(c\|i\|ci\)$

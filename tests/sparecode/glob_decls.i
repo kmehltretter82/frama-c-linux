@@ -1,6 +1,7 @@
 /* run.config
- STDOPT: +"-lib-entry -sparecode-analysis "
- STDOPT: +"-lib-entry -slice-pragma main -slice-return main -then-on 'Slicing export' -print"
+  STDOPT: +"-lib-entry -sparecode-analysis "
+PLUGIN: @PTEST_PLUGIN@ slicing
+  STDOPT: +"-lib-entry -slice-pragma main -slice-return main -then-on 'Slicing export' -print"
  STDOPT: +"-sparecode-rm-unused-globals"
 */
 
@@ -17,7 +18,6 @@ Ps GPs;
 // Cannot be removed : used in spec
 typedef struct { int a; int b; } Ts2;
 Ts2 S2;
-
 
 typedef char Ts2bis;
 Ts2bis C = 'a';

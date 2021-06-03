@@ -1,6 +1,6 @@
 /* run.config
+ PLUGIN: @PTEST_PLUGIN@ constant_propagation sparecode
  MODULE: libSelect @PTEST_NAME@
-
    OPT: @EVA_OPTIONS@ -deps
 */
 

@@ -1,1 +1,2 @@
-OPT: -journal-disable -impact-print @EVA_OPTIONS@
+PLUGIN: @EVA_PLUGINS@ impact
+OPT: -impact-print @EVA_OPTIONS@

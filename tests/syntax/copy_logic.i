@@ -1,7 +1,7 @@
 /* run.config
+PLUGIN: eva,scope
    STDOPT: +"-copy" +"-eva"
  */
-
 /*@ predicate p(int x); */
 /*@ predicate q(int x) = x == 42; */
 /*@ logic int f (int y); */

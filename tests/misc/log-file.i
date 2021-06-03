@@ -6,6 +6,7 @@
    LOG: log-file-value-all.txt
    LOG: log-file-value-default.txt
    LOG: plugin-log-all.txt
+PLUGIN: @EVA_PLUGINS@
    STDOPT: #"-kernel-log w:@PTEST_RESULT@/log-file-kernel-warnings.txt,r:@PTEST_RESULT@/log-file-kernel-results.txt -eva-log f:@PTEST_RESULT@/log-file-feedback.txt,afewr:@PTEST_RESULT@/log-file-value-all.txt -eva-log :@PTEST_RESULT@/log-file-value-default.txt -then -kernel-log f:@PTEST_RESULT@/log-file-feedback.txt"
  MODULE: plugin_log
    OPT: -kernel-msg-key foo-category -kernel-log=a:@PTEST_RESULT@/plugin-log-all.txt

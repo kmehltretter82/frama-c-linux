@@ -1,5 +1,5 @@
 /* run.config
-   EXECNOW: LOG isset_sav.res LOG isset_sav.err BIN isset.sav ./bin/toplevel.opt -quiet -eva @EVA_OPTIONS@ -save tests/saveload/result/isset.sav tests/saveload/isset.c > ./tests/saveload/result/isset_sav.res 2> ./tests/saveload/result/isset_sav.err
+   EXECNOW: LOG isset_sav.res LOG isset_sav.err BIN isset.sav @frama-c@ -quiet -eva @EVA_OPTIONS@ -save tests/saveload/result/isset.sav tests/saveload/isset.c > ./tests/saveload/result/isset_sav.res 2> ./tests/saveload/result/isset_sav.err
    STDOPT: +"-quiet -load ./tests/saveload/result/isset.sav"
    STDOPT: +"-load ./tests/saveload/result/isset.sav"
    STDOPT: +"-eva @EVA_OPTIONS@ -load ./tests/saveload/result/isset.sav"

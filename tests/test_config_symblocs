@@ -1,7 +1,9 @@
+MACRO: EVA_PLUGINS from,inout,eva,scope,variadic
 MACRO: EVA_OPTIONS -eva-show-progress -eva-msg-key=-summary -eva-auto-loop-unroll 0 -eva-domains symbolic-locations
-MACRO: EVA_CONFIG @EVA_OPTIONS@ -no-autoload-plugins -load-module from,inout,eva,scope,variadic -machdep x86_32
+MACRO: EVA_CONFIG @EVA_OPTIONS@ -machdep x86_32
 
 # Compare the result with the oracle of the default config.
 FILTER: diff --new-file @PTEST_DIR@/oracle/@PTEST_ORACLE@ -
 
-OPT: -eva @EVA_CONFIG@ -journal-disable -out -input -deps
+PLUGIN: @EVA_PLUGINS@
+OPT: -eva @EVA_CONFIG@ -out -input -deps

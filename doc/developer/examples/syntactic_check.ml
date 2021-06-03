@@ -18,8 +18,8 @@ module M = Plugin.Register
 
 (* Each annotation in Frama-C has an emitter, for traceability.
    We create thus our own, and says that it will only be used to emit code
-   annotations, and that these annotations do not depend on Frama-C's command
-   line parameters.
+   annotations, and that these annotations do not depend
+   on Frama-C's command line parameters.
 *)
 let syntax_alarm =
   Emitter.create

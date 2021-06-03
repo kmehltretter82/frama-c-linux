@@ -1,10 +1,10 @@
 /* run.config
-OPT: -eva -eva-use-spec f
-OPT: -print
+PLUGIN: eva,scope
+    OPT: -eva -eva-use-spec f
+PLUGIN:
+    OPT: -print
 */
-
 /*@ check lemma easy_proof: \false; */ // should not be put in any environment
-
 /*@ check requires f_valid_x: \valid(x);
     assigns *x;
     check ensures f_init_x: *x == 0;

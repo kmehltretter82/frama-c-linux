@@ -1,8 +1,8 @@
 /* run.config
-OPT: -report
-OPT: -ulevel -1 -report
+PLUGIN: report
+  OPT: -report
+  OPT: -ulevel -1 -report
 */
-
 int u(void);
 
 char *strcpy(char*dst, char*src) {

@@ -949,18 +949,22 @@ Figure~\ref{fig:test-directives} shows all the directives that can be used in
 the configuration header of a test (or a test suite).
 \begin{figure}[ht]
 \begin{center}
-\begin{tabular}{|c|c|p{5cm}|l|}
+\begin{tabular}{|c|c|p{4.5cm}|p{5.2cm}|}
 \hline
 \textbf{Kind} & \textbf{Name} & \textbf{Specification} & \textbf{default}\\
 \hline
 \hline \multirow{4}{23mm}{\centering{Command}}
+& \texttt{PLUGIN}\nscodeidxdef{Test!Directive}{PLUGIN}
+& Plugins to be loaded with each subsequent run.
+& \texttt{from inout eva scope variadic} for tests under \texttt{./tests} directory
+\\
 & \texttt{CMD}\nscodeidxdef{Test!Directive}{CMD}
 & Program to run
 & \texttt{./bin/toplevel.opt}
 \\
 & \texttt{OPT}\nscodeidxdef{Test!Directive}{OPT}
 & Options given to the program
-& \texttt{-val -out -input -deps}
+& \texttt{-val -out -input -deps} for tests under \texttt{./tests} directory
 \\
 & \texttt{STDOPT}\nscodeidxdef{Test!Directive}{STDOPT}
 & Add and remove options from the default set
@@ -1015,7 +1019,7 @@ and report a failure
 & selects the files to test
 & \texttt{.*\bss.\bss(c|i\bss)}
 \\
-\hline \multirow{2}{23mm}{\centering{Miscellaneous}}
+\hline \multirow{2}{23mm}{\centering{Misc.}}
 & \texttt{COMMENT}\nscodeidxdef{Test!Directive}{COMMENT}
 & Comment in the configuration
 & \textit{None}
@@ -1175,9 +1179,9 @@ or
   In such a directive, the predefined macro \texttt{@PTEST\_ORACLE@} is set to the
   basename of the oracle.
   That allows running a \texttt{diff} command with the oracle of another
-  test configuration:
+  test configuration \texttt{config}:
   \begin{code}
-    FILTER: diff --new-file @PTEST_DIR@/oracle_configuration/@PTEST_ORACLE@ -
+FILTER: diff --new-file @PTEST_DIR@/oracle_config/@PTEST_ORACLE@ -
   \end{code}
   Chaining multiple filter commands is possible by defining several \texttt{FILTER} directives (they are applied in the reverse order),
   and an empty command drops the previous \texttt{FILTER} directives.

@@ -1,6 +1,6 @@
 /* run.config
-   EXECNOW: LOG save_load.sav.res LOG save_load.sav.err BIN @PTEST_NAME@.sav @frama-c@ -no-autoload-plugins -load-module wp -wp-warn-key pedantic-assigns=inactive -wp-share ./share -wp -wp-print -wp-prover none @PTEST_FILE@ -save @PTEST_DIR@/@PTEST_NAME@.sav > @PTEST_DIR@/result/@PTEST_NAME@.sav.res 2> @PTEST_DIR@/result/@PTEST_NAME@.sav.err
-   CMD: @frama-c@ -no-autoload-plugins -load-module wp -load @PTEST_DIR@/@PTEST_NAME@.sav -wp-warn-key pedantic-assigns=inactive
+   EXECNOW: LOG save_load.sav.res LOG save_load.sav.err BIN @PTEST_NAME@.sav @frama-c@ -wp-warn-key pedantic-assigns=inactive -wp-share ./share -wp -wp-print -wp-prover none @PTEST_FILE@ -save @PTEST_DIR@/@PTEST_NAME@.sav > @PTEST_DIR@/result/@PTEST_NAME@.sav.res 2> @PTEST_DIR@/result/@PTEST_NAME@.sav.err
+   CMD: @frama-c@ -load @PTEST_DIR@/@PTEST_NAME@.sav -wp-warn-key pedantic-assigns=inactive
    OPT: -print
    OPT: -wp -wp-prover none -wp-print
 */

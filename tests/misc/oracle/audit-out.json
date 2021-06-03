@@ -69,7 +69,7 @@
     }
   },
   "sources": {
-    "tests/misc/audit.c": "aec49f030fcf92bc135bd75e7088194f",
+    "tests/misc/audit.c": "f94ce1c8f5e5911260931783495e2c88",
     "tests/misc/audit_included.h": "c2cc488143a476f69cf2ed04c3439e6e",
     "tests/misc/audit_included_but_not_listed.h":
       "c2cc488143a476f69cf2ed04c3439e6e"

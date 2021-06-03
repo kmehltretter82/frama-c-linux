@@ -1,8 +1,8 @@
 /* run.config
-#   MODULE: @PTEST_NAME@
-   OPT: -load-module @PTEST_DIR@/@PTEST_NAME@ -eva @EVA_OPTIONS@ -journal-disable
+ PLUGIN: @EVA_PLUGINS@ pdg
+ MODULE: @PTEST_NAME@
+   OPT: -eva @EVA_OPTIONS@
 */
-
 
 /* bin/viewer.opt -eva @PTEST_DIR@/@PTEST_NAME@.c */
 

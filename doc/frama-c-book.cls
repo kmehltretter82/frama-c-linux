@@ -10,7 +10,6 @@
 % --------------------------------------------------------------------------
 \makeatletter
 \RequirePackage{kvoptions}
-\RequirePackage{kvoptions-patch}
 \SetupKeyvalOptions{
 family=framacbook,
 prefix=framacbook@,
@@ -18,7 +17,7 @@ prefix=framacbook@,
 \RequirePackage{ifthen}
 \DeclareVoidOption{web}{\PassOptionsToPackage{colorlinks,urlcolor=blue}{hyperref}}
 \DeclareVoidOption{paper}{\PassOptionsToPackage{pdfborder=0 0 0}{hyperref}}
-\DeclareStringOption[{version=4.0,modifier=by-sa}]{license}
+\DeclareStringOption[{type=CC,version=4.0,modifier=by-sa}]{license}
 \DeclareStringOption[english]{lang}
 \DeclareDefaultOption{\PassOptionsToClass{\CurrentOption}{report}}
 \PassOptionsToClass{a4paper,11pt,twoside,openright}{report}

@@ -1,7 +1,7 @@
 /* run.config
+  PLUGIN: variadic
    STDOPT: +"-machdep gcc_x86_32"
  */
-
 #include "stdint.h"
 
 #define likely(x)  __builtin_expect((x),1)

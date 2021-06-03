@@ -20,10 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** the options to launch the toplevel with if the test file is not
-     annotated with test options *)
-let default_options = "-journal-disable -check"
-
 let system =
   if Sys.os_type = "Win32" then
     fun f ->
@@ -195,24 +191,6 @@ let opt_to_byte_options =
   let regex_cmxs = Str.regexp ("\\([^/]+\\)[.]cmxs\\($\\|[ \t]\\)") in
   fun options -> str_global_replace regex_cmxs "\\1.cmo\\2" options
 
-let opt_to_byte cmd =
-  let opt_to_byte toplevel =
-    match string_del_suffix "frama-c" toplevel with
-    | Some path -> path ^ "frama-c.byte"
-    | None ->
-      match string_del_suffix "toplevel.opt" toplevel with
-      | Some path -> path ^ "toplevel.byte"
-      | None ->
-        match string_del_suffix "frama-c-gui" toplevel with
-        | Some path -> path ^ "frama-c-gui.byte"
-        | None ->
-          match string_del_suffix "viewer.opt" toplevel with
-          | Some path -> path ^ "viewer.byte"
-          | None -> toplevel
-  in
-  let cmdname, options = command_partition cmd in
-  (opt_to_byte cmdname) ^ (opt_to_byte_options options)
-
 let output_unix_error (exn : exn) =
   match exn with
   | Unix.Unix_error (error, _function, arg) ->
@@ -269,19 +247,10 @@ let do_cmp = ref (if Sys.os_type="Win32" then !do_diffs
                   else "cmp -s")
 let do_make = ref "make"
 let n = ref 4    (* the level of parallelism *)
-let suites = ref []
-(** options appended to toplevel for all tests *)
-let additional_options = ref ""
-(** options prepended to toplevel for all tests *)
-let additional_options_pre = ref ""
 
 (** special configuration, with associated oracles *)
 let special_config = ref ""
 let do_error_code = ref false
-
-let exclude_suites = ref []
-
-let exclude s = exclude_suites := s :: !exclude_suites
 
 let xunit = ref false
 
@@ -294,71 +263,88 @@ let lock_fprintf f =
 let lock_printf s = lock_fprintf Format.std_formatter s
 let lock_eprintf s = lock_fprintf Format.err_formatter s
 
+let suites = ref []
 let make_test_suite s =
   suites := s :: !suites
 
+let exclude_suites = ref []
+let exclude s = exclude_suites := s :: !exclude_suites
+
+let macro_post_options = ref "" (* value set to @PTEST_POST_OPTIONS@ macro *)
+let macro_pre_options  = ref "" (* value set to @PTEST_PRE_OPTIONS@  macro *)
+let macro_options = ref "@PTEST_PRE_OPTIONS@ @PTEST_OPT@ @PTEST_POST_OPTIONS@"
+let macro_default_options = ref "-journal-disable -check -no-autoload-plugins"
+
+let macro_frama_c_cmd = ref "@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@"
+let macro_frama_c      = ref "@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@ @PTEST_LOAD_OPTIONS@"
+let default_toplevel = ref "@frama-c@"
+
 (* Those variables are read from a ptests_config file *)
+let toplevel_path = ref "" (* value set to @frama-c-exe@ macro *)
 let default_suites = ref []
-let toplevel_path = ref ""
-
-let change_toplevel_to_gui () =
-  let s = !toplevel_path in
-  match string_del_suffix "toplevel.opt" s with
-  | Some s -> toplevel_path := s ^ "viewer.opt"
-  | None ->
-    match string_del_suffix "toplevel.byte" s with
-    | Some s -> toplevel_path := s ^ "viewer.byte"
-    | None ->
-      match string_del_suffix "frama-c" s with
-      | Some s -> toplevel_path := s ^ "frama-c-gui"
-      | None ->
-        match string_del_suffix "frama-c.byte" s with
-        | Some s -> toplevel_path := s ^ "frama-c-gui.byte"
-        | None -> ()
-
 
 let () =
-  Unix.putenv "LC_ALL" "C" (* some oracles, especially in Jessie, depend on the
-                              locale *)
+  Unix.putenv "LC_ALL" "C" (* for oracles that depend on the locale *)
+
 let example_msg =
   Format.sprintf
     "@.@[<v 0>\
      A test suite can be the name of a directory in ./tests or \
      the path to a file.@ @ \
      Directives of \"test_config[_<mode>]\" files:@  \
-     COMMENT: <comment>  @[<v 0># Just a comment line.@]@  \
-     FILEREG: <regexp>   @[<v 0># Ignores the files in suites whose name doesn't matche the pattern.@]@  \
-     DONTRUN:            @[<v 0># Ignores the file.@]@  \
+     COMMENT: <comment>   @[<v 0># Just a comment line.@]@  \
+     FILEREG: <regexp>    @[<v 0># Ignores the files in suites whose name doesn't matche the pattern.@]@  \
+     DONTRUN:             @[<v 0># Ignores the file.@]@  \
      EXECNOW: ([LOG|BIN] <file>)+ <command>  @[<v 0># Defines the command to execute to build a 'LOG' (textual) 'BIN' (binary) targets.@ \
      # Note: the textual targets are compared to oracles.@]@  \
-     MODULE: <module>... @[<v 0># Compile the module and adds the corresponding '-load-module' option to all sub-test commands.@]@  \
-     LOG: <file>...      @[<v 0># Defines targets built by the next sub-test command.@]@  \
-     CMD: <command>      @[<v 0># Defines the command to execute for all tests in order to get results to be compared to oracles.@]@  \
-     OPT: <options>      @[<v 0># Defines a sub-test using the 'CMD' definition: <command> <options>@]@  \
-     STDOPT: +<extra>    @[<v 0># Defines a sub-test and append the extra to the current option.@]@  \
-     STDOPT: #<extra>    @[<v 0># Defines a sub-test and prepend the extra to the current option.@]@  \
-     EXIT: <number>      @[<v 0># Defines the exit code required for the next sub-test commands.@]@  \
-     FILTER: <cmd>       @[<v 0># Performs a transformation on the test result files before the comparison from the oracles.@ \
+     MODULE: <module>...  @[<v 0># Compile the module and set the @PTEST_MODULE@ macro@]@  \
+     PLUGIN: <plugin>... @[<v 0># Set the @PTEST_PLUGIN@ macro.@]@  \
+     LOG: <file>...       @[<v 0># Defines targets built by the next sub-test command.@]@  \
+     CMD: <command>       @[<v 0># Defines the command to execute for all tests in order to get results to be compared to oracles.@]@  \
+     OPT: <options>       @[<v 0># Defines a sub-test using the 'CMD' definition: <command> <options>@]@  \
+     STDOPT: +<extra>     @[<v 0># Defines a sub-test and append the extra to the current option.@]@  \
+     STDOPT: #<extra>     @[<v 0># Defines a sub-test and prepend the extra to the current option.@]@  \
+     EXIT: <number>       @[<v 0># Defines the exit code required for the next sub-test commands.@]@  \
+     FILTER: <cmd>        @[<v 0># Performs a transformation on the test result files before the comparison from the oracles.@ \
      # The oracle will be compared from the standard output of the command: cat <test-output-file> | <cmd> .@ \
      # Chaining multiple filter commands is possible by defining several FILTER directives.@ \
      # An empty command drops the previous FILTER directives.@ \
      # Note: in such a command, the @@PTEST_ORACLE@@ macro is set to the basename of the oracle.@ \
      # This allows running a 'diff' command with the oracle of another test configuration:@ \
      #    FILTER: diff --new-file @@PTEST_DIR@@/oracle_configuration/@@PTEST_ORACLE@@ @]@  \
-     TIMEOUT: <delay>    @[<v 0># Set a timeout for all sub-test.@]@  \
-     NOFRAMAC:           @[<v 0># Drops previous sub-test definitions and considers that there is no defined default sub-test.@]@  \
-     GCC:                @[<v 0># Deprecated.@]@  \
-     MACRO: <name> <def> @[<v 0># Set a definition to the macro @@<name>@@.@]@  \
+     TIMEOUT: <delay>     @[<v 0># Set a timeout for all sub-test.@]@  \
+     NOFRAMAC:            @[<v 0># Drops previous sub-test definitions and considers that there is no defined default sub-test.@]@  \
+     GCC:                 @[<v 0># Deprecated.@]@  \
+     MACRO: <name> <def>  @[<v 0># Set a definition to the macro @@<name>@@.@]@  \
      @]@ \
      @[<v 1>\
-     Some predefined macros can be used in test commands:@  \
-     @@PTEST_DIR@@       # Dirname of the test file.@  \
-     @@PTEST_FILE@@      # Substituted by the test filename.@  \
-     @@PTEST_NAME@@      # Basename of the test file.@  \
-     @@PTEST_NUMBER@@    # Test command number.@  \
-     @@PTEST_CONFIG@@    # Test configuration suffix.@  \
-     @@PTEST_RESULT@@    # Shorthand alias to @@PTEST_DIR@@/result@@PTEST_CONFIG@@ (the result directory dedicated to the tested configuration).@  \
-     @@PTEST_ORACLE@@    # Basename of the current oracle file (macro only usable in FILTER directives).@  \
+     Default directive values:@ \
+     FILEREG: %s@ \
+     CMD:     %s@ \
+     EXIT:    0@ \
+     @]@ \
+     @[<v 1>\
+     Some predefined macros can be used in test commands:@ \
+     @@PTEST_DIR@@          # Dirname of the test file.@ \
+     @@PTEST_FILE@@         # Substituted by the test filename.@ \
+     @@PTEST_NAME@@         # Basename of the test file.@ \
+     @@PTEST_NUMBER@@       # Test command number.@ \
+     @@PTEST_CONFIG@@       # Test configuration suffix.@ \
+     @@PTEST_RESULT@@       # Shorthand alias to '@@PTEST_DIR@@/result@@PTEST_CONFIG@@' (the result directory dedicated to the tested configuration).@ \
+     @@PTEST_ORACLE@@       # Basename of the current oracle file (macro only usable in FILTER directives).@ \
+     @@PTEST_MODULE@@       # Current list of module defined by the MODULE directive.@ \
+     @@PTEST_PLUGIN@@       # Current list of plugins defined by the PLUGIN directive.@ \
+     @]@ \
+     Other macros can only be used in test commands (CMD and EXECNOW directives):@  \
+     @@PTEST_DEFAULT_OPTIONS@@  # The default option list: %s@  \
+     @@PTEST_LOAD_MODULE@@      # The '-load-module' option related to the MODULE directive.@  \
+     @@PTEST_LOAD_PLUGIN@@      # The '-load-module' option related to the PLUGIN directive.@  \
+     @@PTEST_LOAD_OPTIONS@@     # Shorthand alias to '@@PTEST_LOAD_PLUGIN@@ @@PTEST_LOAD_MODULE@@' .@  \
+     @@PTEST_OPTIONS@@          # The current list of options related to OPT and STDOPT directives (for CMD directives).@  \
+     @@frama-c@@                # Shortcut defined as follow: %s@  \
+     @@frama-c-cmd@@            # Shortcut defined as follow: %s@  \
+     @@frama-c-exe@@            # set to the value of the 'TOPLEVEL_PATH' variable from './tests/ptests_config' file.@  \
+     @]@ \
      @[<v 1>\
      Examples:@ \
      ptests@ \
@@ -373,7 +359,11 @@ let example_msg =
      ptests -v -j 1                           \
      # to check the time taken by each test\
      @]@ @]"
-;;
+    test_file_regexp
+    !default_toplevel
+    !macro_default_options
+    !macro_frama_c
+    !macro_frama_c_cmd
 
 let umsg = "Usage: ptests [options] [names of test suites]";;
 
@@ -419,13 +409,13 @@ let rec argspec =
     " Use native toplevel (default)";
     "-config", Arg.Set_string special_config,
     " <name> Use special configuration and oracles";
-    "-add-options", Arg.Set_string additional_options,
+    "-add-options", Arg.Set_string macro_post_options,
     "<options> Add additional options to be passed to the toplevels \
      that will be launched. <options> are added after standard test options";
-    "-add-options-pre", Arg.Set_string additional_options_pre,
+    "-add-options-pre", Arg.Set_string macro_pre_options,
     "<options> Add additional options to be passed to the toplevels \
      that will be launched. <options> are added before standard test options.";
-    "-add-options-post", Arg.Set_string additional_options,
+    "-add-options-post", Arg.Set_string macro_post_options,
     "Synonym of -add-options";
     "-exclude", Arg.String exclude,
     "<name> Exclude a test or a suite from the run";
@@ -535,7 +525,35 @@ let () =
   end
 
 (** Must be done after reading config *)
-let () = if !behavior = Gui then change_toplevel_to_gui ()
+let () =
+  if !use_byte then begin
+    match string_del_suffix "frama-c" !toplevel_path with
+    | Some path -> toplevel_path := path ^ "frama-c.byte"
+    | None ->
+      match string_del_suffix "toplevel.opt" !toplevel_path with
+      | Some path -> toplevel_path := path ^ "toplevel.byte"
+      | None ->
+        match string_del_suffix "frama-c-gui" !toplevel_path with
+        | Some path -> toplevel_path := path ^ "frama-c-gui.byte"
+        | None ->
+          match string_del_suffix "viewer.opt" !toplevel_path with
+          | Some path -> toplevel_path := path ^ "viewer.byte"
+          | None -> ()
+  end;
+  if !behavior = Gui then begin
+    match string_del_suffix "toplevel.opt" !toplevel_path with
+    | Some s -> toplevel_path := s ^ "viewer.opt"
+    | None ->
+      match string_del_suffix "toplevel.byte" !toplevel_path with
+      | Some s -> toplevel_path := s ^ "viewer.byte"
+      | None ->
+        match string_del_suffix "frama-c" !toplevel_path with
+        | Some s -> toplevel_path := s ^ "frama-c-gui"
+        | None ->
+          match string_del_suffix "frama-c.byte" !toplevel_path with
+          | Some s -> toplevel_path := s ^ "frama-c-gui.byte"
+          | None -> ()
+  end
 
 (* redefine name if special configuration expected *)
 let redefine_name name =
@@ -588,6 +606,12 @@ end = struct
 
 end
 
+type does_expand = {
+  has_ptest_file : bool;
+  has_ptest_opt : bool;
+  has_frama_c_exe : bool;
+}
+
 module Macros =
 struct
   module StringMap = Map.Make (String)
@@ -612,6 +636,9 @@ struct
     let macro_regex = Str.regexp "@\\([-A-Za-z_0-9]+\\)@" in
     fun macros s ->
       let has_ptest_file = ref false in
+      let has_ptest_opt = ref false in
+      let has_ptest_options = ref false in
+      let has_frama_c_exe = ref false in
       if !verbosity >= 3 then lock_printf "%% Expand: %s@." s;
       if !verbosity >= 4 then print_macros macros;
       let rec aux s =
@@ -621,9 +648,14 @@ struct
             if Str.string_match macro_regex s 0 then begin
               let macro = Str.matched_group 1 s in
               try
+                (match macro with
+                 | "PTEST_FILE" -> has_ptest_file := true
+                 | "PTEST_OPT" -> has_ptest_opt := true
+                 | "PTEST_OPTIONS" -> has_ptest_options := true
+                 | "frama-c-exe" -> has_frama_c_exe := true
+                 | _ -> ());
                 if !verbosity >= 4 then lock_printf "%%     - macro is %s\n%!" macro;
                 let replacement = find macro macros in
-                if String.(macro = "PTEST_FILE") then has_ptest_file := true;
                 if !verbosity >= 3 then
                   lock_printf "%%     - replacement for %s is %s\n%!" macro replacement;
                 aux replacement
@@ -639,7 +671,10 @@ struct
         let r = aux s in
         Mutex.unlock str_mutex;
         if !verbosity >= 3 then lock_printf "%% Expansion result: %s@." r;
-        !has_ptest_file, r
+        { has_ptest_file= !has_ptest_file;
+          has_ptest_opt= !has_ptest_opt;
+          has_frama_c_exe= !has_frama_c_exe;
+        }, r
       with e ->
         lock_eprintf "Uncaught exception %s\n%!" (Printexc.to_string e);
         Mutex.unlock str_mutex;
@@ -652,7 +687,10 @@ struct
     try find name macros with Not_found -> default
 
   let add_list l map =
-    List.fold_left (fun acc (k,v) -> add k v acc) map l
+    List.fold_left (fun acc (k,v) ->
+        if !verbosity >= 3 then
+          lock_printf "%%   - Adds macro %s with definition %s@." k v;
+        add k v acc) map l
 
   let add_expand name def macros =
     add name (expand macros def) macros
@@ -660,7 +698,6 @@ struct
   let append_expand name def macros =
     add name (get name macros ^ expand macros def) macros
 end
-
 
 type execnow =
   {
@@ -748,9 +785,16 @@ end = struct
 
   let default_macros () =
     let l = [
-      "frama-c", !toplevel_path;
+      "frama-c-exe",  !toplevel_path;
+      "frama-c-cmd",  !macro_frama_c_cmd;
+      "frama-c",      !macro_frama_c;
+      "PTEST_DEFAULT_OPTIONS",  !macro_default_options;
+      "PTEST_OPTIONS",          !macro_options;
+      "PTEST_PRE_OPTIONS",      !macro_pre_options;
+      "PTEST_POST_OPTIONS",     !macro_post_options;
       "PTEST_MAKE_MODULE", "make -s";
-      "PTEST_LOAD_MODULES", ""
+      "PTEST_MODULE", "";
+      "PTEST_PLUGIN", "";
     ]
     in
     Macros.add_list l Macros.empty
@@ -761,8 +805,8 @@ end = struct
       dc_execnow = [];
       dc_filter = None ;
       dc_exit_code = None;
-      dc_default_toplevel = !toplevel_path;
-      dc_commands = [ { toplevel= !toplevel_path; opts=default_options; macros=Macros.empty; exit_code=None; logs= []; timeout= ""} ];
+      dc_default_toplevel = !default_toplevel;
+      dc_commands = [ { toplevel= !default_toplevel; opts=""; macros=Macros.empty; exit_code=None; logs= []; timeout= ""} ];
       dc_dont_run = false;
       dc_load_module = "";
       dc_cmxs_module = StringSet.empty;
@@ -850,7 +894,6 @@ end = struct
       (* preserve options ordering *)
       List.fold_right (fun x s -> s ^ " " ^ x) opts ""
 
-
   (* how to process options *)
   let config_exec ~once ~file:_ dir s current =
     { current with
@@ -875,33 +918,51 @@ end = struct
       current
     end
 
-  let set_load_modules deps macros =
-    let name = "PTEST_LOAD_MODULES" in
-    let def = String.concat "," deps in
-    if !verbosity >= 3 then
-      lock_printf "%%   - Macro %s for -load-module with definition %s@." name def;
-    Macros.add_list [name, def] macros
+  let update_module s =
+    "@PTEST_DIR@/" ^ (Filename.remove_extension s) ^ (if !use_byte then ".cmo" else ".cmxs")
 
   let add_make_modules ~file dir deps current =
     let deps,current = List.fold_left (fun ((deps,curr) as acc) s ->
+        let s = update_module s in
         if StringSet.mem s curr.dc_cmxs_module then acc
         else
-          (s ^ " " ^ deps),
+          (deps ^ " " ^ s),
           { curr with dc_cmxs_module = StringSet.add s curr.dc_cmxs_module })
         ("",current) deps
     in
     if String.(deps = "") then current
-    else
+    else begin
       let make_cmd = Macros.expand current.dc_macros "@PTEST_MAKE_MODULE@" in
-      config_exec ~once:true ~file dir (make_cmd ^ " " ^ deps) current
+      config_exec ~once:true ~file dir (make_cmd ^ deps) current
+    end
+
+  let update_module_macros modules macros =
+    let def = String.concat "," modules in
+    let load_def = if String.(def = "") then "" else
+        "-load-module=" ^ (String.concat "," (List.map update_module modules))
+    in
+    Macros.add_list [ "PTEST_MODULE", def ;
+                      "PTEST_LOAD_MODULE", load_def ;
+                    ] macros
 
   let config_module ~file dir s current =
-    let s = Macros.expand current.dc_macros s in
-    let deps = List.map (fun s -> "@PTEST_DIR@/" ^ (Filename.remove_extension s) ^ ".cmxs")
-        (str_split_list s)
+    let deps = str_split_list (Macros.expand current.dc_macros s) in
+    let current = { current with dc_macros = update_module_macros deps current.dc_macros } in
+    add_make_modules ~file dir deps current
+
+  let update_plugin_macros plugins macros =
+    let def = String.concat "," plugins in
+    let load_def = if String.(def = "") then "" else
+        (* the option "-load-plugin" will be used in a future version for PLUGIN *)
+        "-load-module=" ^ def
     in
-    let current = add_make_modules ~file dir deps current in
-    { current with dc_macros = set_load_modules deps current.dc_macros }
+    Macros.add_list [ "PTEST_PLUGIN", def ;
+                      "PTEST_LOAD_PLUGIN", load_def  ;
+                    ] macros
+
+  let config_plugins ~file dir s current =
+    let deps = str_split_list (Macros.expand current.dc_macros s) in
+    { current with dc_macros = update_plugin_macros deps current.dc_macros }
 
   let config_options =
     [ "CMD",
@@ -977,6 +1038,8 @@ end = struct
       "MACRO", config_macro;
 
       "MODULE", config_module;
+
+      "PLUGIN", config_plugins;
 
       "LOG",
       (fun ~file:_ _ s current -> { current with dc_default_log = s :: current.dc_default_log });
@@ -1217,21 +1280,49 @@ end = struct
       try Filename.chop_extension cmd.file
       with Invalid_argument _ -> cmd.file
     in
+    let ptest_file = Filename.sanitize ptest_file in
+    let ptest_load_plugin = Macros.get "PTEST_LOAD_PLUGIN" cmd.macros in
+    let ptest_load_module = Macros.get "PTEST_LOAD_MODULE" cmd.macros in
     let macros =
       [ "PTEST_CONFIG", ptest_config;
         "PTEST_DIR", SubDir.get cmd.directory;
         "PTEST_RESULT",
         SubDir.get cmd.directory ^ "/" ^ redefine_name "result";
-        "PTEST_FILE", Filename.sanitize ptest_file;
+        "PTEST_FILE", ptest_file;
         "PTEST_NAME", ptest_name;
         "PTEST_NUMBER", string_of_int cmd.n;
+        "PTEST_OPT", cmd.options;
+        "PTEST_LOAD_OPTIONS", (String.concat " "
+                                 [ ptest_load_plugin ;
+                                   ptest_load_module ])
       ]
     in
     let macros = Macros.add_list macros cmd.macros in
     let macros = Macros.add_defaults ~defaults macros in
     let process_macros s = Macros.expand macros s in
+    let toplevel =
+      let in_toplevel,toplevel= Macros.does_expand macros cmd.toplevel in
+      if not cmd.execnow then begin
+        let has_ptest_file, options =
+          if in_toplevel.has_ptest_opt then in_toplevel.has_ptest_file, []
+          else
+            let in_option,options= Macros.does_expand macros cmd.options in
+            (in_option.has_ptest_file || in_toplevel.has_ptest_file),
+            (if in_toplevel.has_frama_c_exe then
+               [ process_macros "@PTEST_PRE_OPTIONS@" ;
+                 options ;
+                 process_macros "@PTEST_POST_OPTIONS@" ;
+               ]
+             else [ options ])
+        in
+        String.concat " " (toplevel::(if has_ptest_file then options else ptest_file::options))
+      end
+      else toplevel
+    in
     { cmd with
       macros;
+      toplevel;
+      options = ""; (* no more usable *)
       log_files = List.map process_macros cmd.log_files;
       filter =
         match cmd.filter with
@@ -1239,45 +1330,12 @@ end = struct
         | Some filter -> Some (process_macros filter)
     }
 
-  let contains_frama_c_binary_name =
-    Str.regexp "[^( ]*\\(toplevel\\|viewer\\|frama-c-gui\\|frama-c[^-]\\).*"
-
-  let frama_c_binary_name =
-    Str.regexp "\\([^ ]*\\(toplevel\\|viewer\\|frama-c-gui\\|frama-c\\)\\(\\.opt\\|\\.byte\\|\\.exe\\)?\\)"
-
   let basic_command_string =
     fun command ->
-    let macros = command.macros in
-    let has_ptest_file_t, toplevel =
-      Macros.does_expand macros command.toplevel
-    in
-    let has_ptest_file_o, options = Macros.does_expand macros command.options in
-    let toplevel = if !use_byte then opt_to_byte toplevel else toplevel in
-    let toplevel, contains_frama_c_binary =
-      str_string_match_and_replace contains_frama_c_binary_name
-        frama_c_binary_name ~suffix:" -check" toplevel
-    in
-    let options =
-      if contains_frama_c_binary
-      then begin
-        let opt_modules = match Macros.expand macros
-                                  (Macros.get "PTEST_LOAD_MODULES" macros) with
-        | "" -> ""
-        | s -> "-load-module=" ^ s ^ ""
-        in
-        let opt_pre = Macros.expand macros !additional_options_pre in
-        let opt_post = Macros.expand macros !additional_options in
-        opt_modules ^ opt_pre ^ " " ^ options ^ " " ^ opt_post
-      end else options
-    in
-    let options = if !use_byte then opt_to_byte_options options else options in
     let raw_command =
-      if has_ptest_file_t || has_ptest_file_o || command.execnow then
-        toplevel ^ " " ^ options
-      else begin
-        let file = Filename.sanitize @@ get_ptest_file command in
-        toplevel ^ " " ^ file ^ " " ^ options
-      end
+      (* necessary until OPT are using direct -load-module option *)
+      if !use_byte then opt_to_byte_options command.toplevel
+      else command.toplevel
     in
     if command.timeout = "" then raw_command
     else "ulimit -t " ^ command.timeout ^ " && " ^ raw_command
@@ -1521,12 +1579,7 @@ let do_command command =
         if !behavior <> Examine && not (!(execnow.ex_done) && execnow.ex_once)
         then begin
           remove_execnow_results execnow;
-          let cmd =
-            if !use_byte then
-              opt_to_byte execnow.ex_cmd
-            else
-              execnow.ex_cmd
-          in
+          let cmd = execnow.ex_cmd in
           if !verbosity >= 1 || !behavior = Show then begin
             lock_printf "%% launch %s@." cmd;
           end;
