@@ -124,7 +124,7 @@ struct
           | None -> `Top
           | Some base_typ ->
             let typ = Cil.typeOfLval lval in
-            Offset.(append (of_ival base_typ typ ival) offset)
+            Offset.(append (of_ival ~base_typ ~typ ival) offset)
         in
         Map.add base offset' map
       in
