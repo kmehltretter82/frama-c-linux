@@ -482,15 +482,15 @@ let () = Parameter_customize.set_group wp_strategy
 module TerminatesDeclarations =
   False(struct
     let option_name = "-wp-declarations-terminate"
-    let help = "Function declarations without terminates specification are \
-                considered to terminate when called."
+    let help = "Undefined external functions without terminates specification \
+                are considered to terminate when called."
   end)
 
 let () = Parameter_customize.set_group wp_strategy
 module TerminatesDefinitions =
   False(struct
     let option_name = "-wp-definitions-terminate"
-    let help = "Function definitions without terminates specification are \
+    let help = "Defined functions without terminates specification are \
                 considered to terminate when called."
   end)
 
@@ -498,7 +498,7 @@ let () = Parameter_customize.set_group wp_strategy
 module TerminatesVariantHyp =
   False(struct
     let option_name = "-wp-variant-with-terminates"
-    let help = "Prove variant under termination hypothesis."
+    let help = "Prove loop variant under the termination hypothesis."
   end)
 
 (* ------------------------------------------------------------------------ *)
