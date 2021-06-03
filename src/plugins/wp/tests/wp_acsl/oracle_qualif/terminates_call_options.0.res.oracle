@@ -2,17 +2,18 @@
 [kernel] Parsing tests/wp_acsl/terminates_call_options.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
-[wp] 4 goals scheduled
+[wp] 5 goals scheduled
 [wp] [Qed] Goal typed_definition_assigns : Valid
-[wp] [Qed] Goal typed_call_declaration_terminates : Valid
+[wp] [Qed] Goal typed_call_declaration_terminates_part1 : Valid
+[wp] [Alt-Ergo] Goal typed_call_declaration_terminates_part2 : Unsuccess
 [wp] [Qed] Goal typed_call_definition_terminates_part1 : Valid
 [wp] [Alt-Ergo] Goal typed_call_definition_terminates_part2 : Unsuccess
-[wp] Proved goals:    3 / 4
+[wp] Proved goals:    3 / 5
   Qed:             3 
-  Alt-Ergo:        0  (unsuccess: 1)
+  Alt-Ergo:        0  (unsuccess: 2)
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   definition                1        -        1       100%
-  call_declaration          1        -        1       100%
+  call_declaration          1        -        2      50.0%
   call_definition           1        -        2      50.0%
 ------------------------------------------------------------

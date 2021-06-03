@@ -6,14 +6,8 @@
   Function call_declaration
 ------------------------------------------------------------
 
-Goal Termination-condition (file tests/wp_acsl/terminates_call_options.i, line 19) in 'call_declaration' (1/2):
+Goal Termination-condition (file tests/wp_acsl/terminates_call_options.i, line 19) in 'call_declaration':
 Prove: true.
-
-------------------------------------------------------------
-
-Goal Termination-condition (file tests/wp_acsl/terminates_call_options.i, line 19) in 'call_declaration' (2/2):
-Call Effect at line 21
-Prove: false.
 
 ------------------------------------------------------------
 ------------------------------------------------------------

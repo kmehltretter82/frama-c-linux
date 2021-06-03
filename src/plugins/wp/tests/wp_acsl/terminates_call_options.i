@@ -1,13 +1,13 @@
 /* run.config
    OPT:
-   OPT: -wp-no-declarations-terminate -wp-definitions-terminate
+   OPT: -wp-declarations-terminate -wp-definitions-terminate
 */
 /* run.config_qualif
    OPT:
-   OPT: -wp-no-declarations-terminate -wp-definitions-terminate
+   OPT: -wp-declarations-terminate -wp-definitions-terminate
 */
 
-// -wp-declaration-terminates <--- default to TRUE
+// -wp-declaration-terminates <--- default to FALSE
 // -wp-definition-terminates  <--- default to FALSE
 
 //@ assigns \nothing ;
