@@ -4,8 +4,8 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
+[eva] tests/misc/ulevel.i:13: starting to merge loop iterations
 [eva] tests/misc/ulevel.i:12: starting to merge loop iterations
-[eva] tests/misc/ulevel.i:11: starting to merge loop iterations
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

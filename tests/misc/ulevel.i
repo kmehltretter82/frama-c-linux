@@ -1,5 +1,6 @@
 /* run.config
-   OPT: -then -ulevel-force -eva
+  PLUGIN: @EVA_PLUGINS@
+  OPT: -then -ulevel-force -eva
  */
 
 /* Tests the syntaxic loop unrolling when triggered by an option change
