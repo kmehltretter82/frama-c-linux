@@ -6,13 +6,13 @@
   Function call
 ------------------------------------------------------------
 
-Goal Termination-condition (file tests/wp_acsl/terminates_formulae.i, line 15) in 'call' (1/2):
+Goal Termination-condition (file tests/wp_acsl/terminates_formulae.i, line 20) in 'call' (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Termination-condition (file tests/wp_acsl/terminates_formulae.i, line 15) in 'call' (2/2):
-Call Effect at line 17
+Goal Termination-condition (file tests/wp_acsl/terminates_formulae.i, line 20) in 'call' (2/2):
+Call Effect at line 22
 Assume { (* Goal *) When: P_Q. }
 Prove: P_P.
 
@@ -21,18 +21,18 @@ Prove: P_P.
   Function no_variant
 ------------------------------------------------------------
 
-Goal Termination-condition (file tests/wp_acsl/terminates_formulae.i, line 28) in 'no_variant' (1/2):
+Goal Termination-condition (file tests/wp_acsl/terminates_formulae.i, line 33) in 'no_variant' (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Termination-condition (file tests/wp_acsl/terminates_formulae.i, line 28) in 'no_variant' (2/2):
-Effect at line 31
+Goal Termination-condition (file tests/wp_acsl/terminates_formulae.i, line 33) in 'no_variant' (2/2):
+Effect at line 36
 Prove: !P_Q.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_acsl/terminates_formulae.i, line 30):
+Goal Loop assigns (file tests/wp_acsl/terminates_formulae.i, line 35):
 Prove: true.
 
 ------------------------------------------------------------
@@ -40,23 +40,23 @@ Prove: true.
   Function variant
 ------------------------------------------------------------
 
-Goal Termination-condition (file tests/wp_acsl/terminates_formulae.i, line 20) in 'variant':
+Goal Termination-condition (file tests/wp_acsl/terminates_formulae.i, line 25) in 'variant':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_acsl/terminates_formulae.i, line 22):
+Goal Loop assigns (file tests/wp_acsl/terminates_formulae.i, line 27):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file tests/wp_acsl/terminates_formulae.i, line 25):
+Goal Decreasing of Loop variant at loop (file tests/wp_acsl/terminates_formulae.i, line 30):
 Assume { Type: is_uint32(i). (* Goal *) When: P_Q. (* Then *) Have: 0 < i. }
 Prove: to_uint32(i - 1) < i.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file tests/wp_acsl/terminates_formulae.i, line 25):
+Goal Positivity of Loop variant at loop (file tests/wp_acsl/terminates_formulae.i, line 30):
 Prove: true.
 
 ------------------------------------------------------------

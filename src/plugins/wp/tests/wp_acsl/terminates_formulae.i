@@ -1,4 +1,9 @@
-/* -wp-variant-with-terminates */
+/* run.config
+   OPT: -wp-variant-with-terminates
+*/
+/* run.config_qualif
+   OPT: -wp-variant-with-terminates
+*/
 
 /*@
   axiomatic Ax {

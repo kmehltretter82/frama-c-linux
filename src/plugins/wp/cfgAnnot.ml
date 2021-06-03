@@ -466,8 +466,9 @@ module LoopContract = WpContext.StaticGenerator(CodeKey)
                 let intro_terminates (pid, v) =
                   pid,
                   match (Annotations.funspec kf).spec_terminates with
-                  | None -> v
-                  | Some t -> Logic_const.pimplies (normalize_terminates t, v)
+                  | Some t when Wp_parameters.TerminatesVariantHyp.get () ->
+                      Logic_const.pimplies (normalize_terminates t, v)
+                  | _ -> v
                 in
                 { l with loop_terminates = None ;
                          loop_preserved =

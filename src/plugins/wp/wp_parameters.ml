@@ -478,6 +478,13 @@ module PrecondWeakening =
     let help = "Discard pre-conditions of side behaviours (sound but incomplete optimisation)."
   end)
 
+let () = Parameter_customize.set_group wp_strategy
+module TerminatesVariantHyp =
+  False(struct
+    let option_name = "-wp-variant-with-terminates"
+    let help = "Prove variant under termination hypothesis."
+  end)
+
 (* ------------------------------------------------------------------------ *)
 (* ---  Qed Simplifications                                             --- *)
 (* ------------------------------------------------------------------------ *)
