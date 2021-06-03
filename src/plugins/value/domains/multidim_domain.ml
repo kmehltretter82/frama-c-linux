@@ -107,7 +107,7 @@ struct
       not (Base.is_weak b) && Offset.is_singleton o
 
   (* Raises Abstract_domain.{Error_top,Error_bottom} *)
-  let of_lval oracle ((host,offset) as lval : Cil_types.lval) : t =
+  let of_lval oracle ((host,offset) : Cil_types.lval) : t =
     let oracle' exp =
       try Value.project_ival (oracle exp)
       with Value.Not_based_on_null -> Ival.top
@@ -123,7 +123,7 @@ struct
           match Base.typeof base with
           | None -> `Top
           | Some base_typ ->
-            let typ = Cil.typeOfLval lval in
+            let typ = Cil.typeOf_pointed (Cil.typeOf exp) in
             Offset.(append (of_ival ~base_typ ~typ ival) offset)
         in
         Map.add base offset' map
