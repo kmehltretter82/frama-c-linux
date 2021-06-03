@@ -30,3 +30,18 @@ void fails_decreases(int keep_going){
     if(! keep_going) i-- ;
   }
 }
+
+//@ terminates c1 != 0;
+void f1 (int c1, int c2) {
+  int cpt = c1 ;
+  /*@ loop invariant c1 >= 0 ==> 0 <= cpt <= c1 ;
+    @ loop assigns cpt ;
+    @ loop variant cpt ;
+    @*/
+  while (1) {
+    if (c1 || c2) {
+      cpt --;
+      if (cpt <= 0) break;
+    }
+  }
+}

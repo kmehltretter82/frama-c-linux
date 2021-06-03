@@ -3,6 +3,64 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
+  Function f1
+------------------------------------------------------------
+
+Goal Termination-condition (file tests/wp_acsl/terminates_variant_option.i, line 34) in 'f1':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Preservation of Invariant (file tests/wp_acsl/terminates_variant_option.i, line 37):
+Assume {
+  Type: is_sint32(c1_0) /\ is_sint32(cpt_0) /\ is_sint32(cpt_0 - 1).
+  (* Residual *)
+  When: c1_0 != 0.
+  (* Goal *)
+  When: 0 <= c1_0.
+  (* Invariant *)
+  Have: (cpt_0 <= c1_0) /\ (0 <= cpt_0).
+  (* Else *)
+  Have: 2 <= cpt_0.
+}
+Prove: (0 < cpt_0) /\ (cpt_0 <= (1 + c1_0)).
+
+------------------------------------------------------------
+
+Goal Establishment of Invariant (file tests/wp_acsl/terminates_variant_option.i, line 37):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Loop assigns (file tests/wp_acsl/terminates_variant_option.i, line 38):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file tests/wp_acsl/terminates_variant_option.i, line 41):
+Assume {
+  Type: is_sint32(cpt_0).
+  (* Invariant *)
+  Have: (cpt_0 <= 0) /\ (0 <= cpt_0).
+}
+Prove: false.
+
+------------------------------------------------------------
+
+Goal Positivity of Loop variant at loop (file tests/wp_acsl/terminates_variant_option.i, line 41):
+Assume {
+  Type: is_sint32(c1_0) /\ is_sint32(cpt_0) /\ is_sint32(cpt_0 - 1).
+  (* Residual *)
+  When: c1_0 != 0.
+  (* Invariant *)
+  Have: ((0 <= c1_0) -> ((cpt_0 <= c1_0) /\ (0 <= cpt_0))).
+  (* Else *)
+  Have: 2 <= cpt_0.
+}
+Prove: 0 <= cpt_0.
+
+------------------------------------------------------------
+------------------------------------------------------------
   Function fails_decreases
 ------------------------------------------------------------
 

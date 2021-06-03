@@ -2,7 +2,7 @@
 [kernel] Parsing tests/wp_acsl/terminates_variant_option.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
-[wp] 11 goals scheduled
+[wp] 17 goals scheduled
 [wp] [Qed] Goal typed_fails_positive_terminates : Valid
 [wp] [Alt-Ergo] Goal typed_fails_positive_loop_invariant_preserved : Valid
 [wp] [Qed] Goal typed_fails_positive_loop_invariant_established : Valid
@@ -14,11 +14,18 @@
 [wp] [Qed] Goal typed_fails_decreases_loop_assigns : Valid
 [wp] [Alt-Ergo] Goal typed_fails_decreases_loop_variant_decrease : Valid
 [wp] [Qed] Goal typed_fails_decreases_loop_variant_positive : Valid
-[wp] Proved goals:   11 / 11
-  Qed:             9 
-  Alt-Ergo:        2
+[wp] [Qed] Goal typed_f1_terminates : Valid
+[wp] [Alt-Ergo] Goal typed_f1_loop_invariant_preserved : Valid
+[wp] [Qed] Goal typed_f1_loop_invariant_established : Valid
+[wp] [Qed] Goal typed_f1_loop_assigns : Valid
+[wp] [Qed] Goal typed_f1_loop_variant_decrease : Valid
+[wp] [Alt-Ergo] Goal typed_f1_loop_variant_positive : Valid
+[wp] Proved goals:   17 / 17
+  Qed:            13 
+  Alt-Ergo:        4
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   fails_positive            6        1        7       100%
   fails_decreases           3        1        4       100%
+  f1                        4        2        6       100%
 ------------------------------------------------------------
