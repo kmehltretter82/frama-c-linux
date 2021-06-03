@@ -977,6 +977,15 @@ weakest precondition calculus.
   it is generally not necessary and it can generates a large number of
   verifications for structures with many (nested) fields. \texttt{-1} enables
   full unfolding.
+\item[\tt -wp-(no)-declarations-terminate] function declarations without
+  \texttt{terminates} specification are considered to terminate when called
+  (default is: \texttt{yes}).
+\item[\tt -wp-(no)-definitions-terminate] function definitions without
+  \texttt{terminates} specification are considered to terminate when called
+  (default is: \texttt{no}).
+\item[\tt -wp-(no)-variant-with-terminates] prove variant under termination
+  hypothesis (thus, under a \texttt{terminates \textbackslash{}false}, any
+  variant is trivial) (default is: \texttt{no}).
 \item[\tt -wp-(no)-dynamic] handles calls \textit{via} function pointers
   thanks to the dedicated \verb+@calls f1,...,fn+ code annotation (default is: \texttt{yes}).
 \end{description}
