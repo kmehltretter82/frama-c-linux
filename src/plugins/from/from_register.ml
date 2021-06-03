@@ -87,11 +87,14 @@ let iter_callwise_calls_sorted f =
   | None -> ()
   | Some d -> f Kglobal d
 
+let print_deps () =
+  From_parameters.feedback
+    "====== DEPENDENCIES COMPUTED ======@\n\
+     These dependencies hold at termination for the executions that terminate:";
+  display None;
+  From_parameters.feedback "====== END OF DEPENDENCIES ======"
 
-let main () =
-  let not_quiet = From_parameters.verbose_atleast 1 in
-  let forcedeps = From_parameters.ForceDeps.get () in
-  let forcecalldeps = From_parameters.ForceCallDeps.get () in
+let print_calldeps () =
   let treat_call s funtype =
     let caller = Kernel_function.find_englobing_kf s in
     let f, typ_f =
@@ -120,43 +123,42 @@ let main () =
     ),
     typ_f
   in
-  if forcedeps then begin
-    !Db.From.compute_all ();
+  From_parameters.feedback "====== DISPLAYING CALLWISE DEPENDENCIES ======";
+  iter_callwise_calls_sorted
+    (fun ki d ->
+       let header, typ =
+         match ki with
+         | Kglobal ->
+           (fun fmt -> Format.fprintf fmt "@[entry point:@]"),
+           Kernel_function.get_type (fst (Globals.entry_point ()))
+         | Kstmt ({skind = Instr (Call (_, ekf, _, _))} as s) ->
+           treat_call s (Cil.typeOf ekf)
+         | Kstmt ({skind = Instr (Local_init(_,ConsInit(f,_,_),_))} as s)->
+           treat_call s f.vtype
+         | _ -> assert false (* Not a call *)
+       in
+       From_parameters.printf ~header
+         "@[  %a@]"
+         ((if From_parameters.ShowIndirectDeps.get ()
+           then Function_Froms.pretty_with_type_indirect
+           else Function_Froms.pretty_with_type) typ)
+         d);
+  From_parameters.feedback "====== END OF CALLWISE DEPENDENCIES ======"
+
+let main () =
+  let not_quiet = From_parameters.verbose_atleast 1 in
+  if From_parameters.ForceDeps.get () then
     From_parameters.ForceDeps.output
       (fun () ->
-         From_parameters.feedback "====== DEPENDENCIES COMPUTED ======@\n\
-                                   These dependencies hold at termination for the executions that terminate:";
-         display None;
-         From_parameters.feedback "====== END OF DEPENDENCIES ======"
-      )
-  end;
-  if forcecalldeps then !Db.From.compute_all_calldeps ();
-  if not_quiet && forcecalldeps then begin
+         !Db.From.compute_all ();
+         print_deps ();
+      );
+  if From_parameters.ForceCallDeps.get () then
     From_parameters.ForceCallDeps.output
       (fun () ->
-         From_parameters.feedback "====== DISPLAYING CALLWISE DEPENDENCIES ======";
-         iter_callwise_calls_sorted
-           (fun ki d ->
-              let header, typ =
-                match ki with
-                | Kglobal ->
-                  (fun fmt -> Format.fprintf fmt "@[entry point:@]"),
-                  Kernel_function.get_type (fst (Globals.entry_point ()))
-                | Kstmt ({skind = Instr (Call (_, ekf, _, _))} as s) ->
-                  treat_call s (Cil.typeOf ekf)
-                | Kstmt ({skind = Instr (Local_init(_,ConsInit(f,_,_),_))} as s)->
-                  treat_call s f.vtype
-                | _ -> assert false (* Not a call *)
-              in
-              From_parameters.printf ~header
-                "@[  %a@]"
-                ((if From_parameters.ShowIndirectDeps.get ()
-                  then Function_Froms.pretty_with_type_indirect
-                  else Function_Froms.pretty_with_type) typ)
-                d);
-         From_parameters.feedback "====== END OF CALLWISE DEPENDENCIES ======";
+         !Db.From.compute_all_calldeps ();
+         if not_quiet then print_calldeps ();
       )
-  end
 
 let () = Db.Main.extend main
 
