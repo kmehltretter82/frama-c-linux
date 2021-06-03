@@ -20,34 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Implementation from Bit_utils *)
-let rec type_compatible t1 t2 =
-  match Cil.unrollType t1, Cil.unrollType t2 with
-  | TVoid _, TVoid _ -> true
-  | TInt (i1, _), TInt (i2, _) -> i1 = i2
-  | TFloat (f1, _), TFloat (f2, _) -> f1 = f2
-  | TPtr (t1, _), TPtr (t2, _) -> type_compatible t1 t2
-  | TArray (t1', s1, _, _), TArray (t2', s2, _, _) ->
-    type_compatible t1' t2' &&
-    (s1 == s2 || try Integer.equal (Cil.lenOfArray64 s1) (Cil.lenOfArray64 s2)
-     with Cil.LenOfArray -> false)
-  | TFun (r1, a1, v1, _), TFun (r2, a2, v2, _) ->
-    v1 = v2 && type_compatible r1 r2 &&
-    (match a1, a2 with
-     | None, _ | _, None -> true
-     | Some l1, Some l2 ->
-       try
-         List.for_all2
-           (fun (_, t1, _) (_, t2, _) -> type_compatible t1 t2) l1 l2
-       with Invalid_argument _ -> false)
-  | TNamed _, TNamed _ -> assert false
-  | TComp (c1, _, _), TComp (c2, _, _) -> c1.ckey = c2.ckey
-  | TEnum (e1, _), TEnum (e2, _) -> e1.ename = e2.ename
-  | TBuiltin_va_list _, TBuiltin_va_list _ -> true
-  | (TVoid _ | TInt _ | TFloat _ | TPtr _ | TArray _ | TFun _ | TNamed _ |
-     TComp _ | TEnum _ | TBuiltin_va_list _), _ ->
-    false
-
 module type T =
 sig
   type t
@@ -84,11 +56,11 @@ struct
 
   let rec join o1 o2 =
     match o1, o2 with
-    | NoOffset t, NoOffset t' when type_compatible t t' ->
+    | NoOffset t, NoOffset t' when Bit_utils.type_compatible t t' ->
       NoOffset t
     | Field (fi, s1), Field (fi', s2) when Cil_datatype.Fieldinfo.equal fi fi' ->
       Field (fi, join s1 s2)
-    | Index (i1, t, s1), Index (i2, t', s2) when type_compatible t t' ->
+    | Index (i1, t, s1), Index (i2, t', s2) when Bit_utils.type_compatible t t' ->
       Index (Ival.join i1 i2, t, join s1 s2)
     | _ -> raise Abstract_interp.Error_Top
 
@@ -121,7 +93,7 @@ struct
       | _ -> assert false
 
   let rec of_ival ~base_typ ~typ ival =
-    if Ival.is_zero ival && type_compatible base_typ typ then
+    if Ival.is_zero ival && Bit_utils.type_compatible base_typ typ then
       NoOffset typ
     else
       match Cil.unrollType base_typ with

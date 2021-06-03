@@ -96,6 +96,9 @@ val pretty_bits:
 
 (** {2 Mapping from numeric offsets to symbolic ones.} *)
 
+(** Comparison of the shape of two types. Attributes are completely ignored. *)
+val type_compatible: typ -> typ -> bool
+
 (** We want to find a symbolic offset that corresponds to a numeric one, with
     one additional criterion: *)
 type offset_match =
