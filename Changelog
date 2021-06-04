@@ -17,6 +17,7 @@
 Open Source Release <next-release>
 ##################################
 
+o   Ptests    [2021-06-03] Add new PLUGIN directive and new predefined macros.
 -   Eva       [2021-05-11] Support for ACSL predicate \is_infinite.
 
 ###################################
