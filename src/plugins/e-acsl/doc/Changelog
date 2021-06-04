@@ -25,6 +25,8 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-* E-ACSL       [2021-06-04] Do not translate contracts of E-ACSL built-ins.
+
 #############################
 Plugin E-ACSL 23.0 (Vanadium)
 #############################
