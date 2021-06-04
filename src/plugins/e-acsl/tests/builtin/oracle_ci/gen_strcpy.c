@@ -70,42 +70,6 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options);
  */
 pid_t __gen_e_acsl_fork(void);
 
-/*@ requires valid_string_src: valid_read_string(src);
-    requires room_string: \valid(dest + (0 .. strlen(src)));
-    requires
-      separation:
-        \separated(dest + (0 .. strlen(src)), src + (0 .. strlen(src)));
-    ensures equal_contents: strcmp(\old(dest), \old(src)) ≡ 0;
-    ensures result_ptr: \result ≡ \old(dest);
-    assigns *(dest + (0 .. strlen{Old}(src))), \result;
-    assigns *(dest + (0 .. strlen{Old}(src)))
-      \from *(src + (0 .. strlen{Old}(src)));
-    assigns \result \from dest;
- */
-char *__gen_e_acsl_strcpy(char * restrict dest, char const * restrict src);
-
-/*@ requires valid_nstring_src: valid_read_nstring(src, n);
-    requires room_nstring: \valid(dest + (0 .. n - 1));
-    requires separation: \separated(dest + (0 .. n - 1), src + (0 .. n - 1));
-    ensures result_ptr: \result ≡ \old(dest);
-    ensures initialization: \initialized(\old(dest) + (0 .. \old(n) - 1));
-    assigns *(dest + (0 .. n - 1)), \result;
-    assigns *(dest + (0 .. n - 1)) \from *(src + (0 .. n - 1));
-    assigns \result \from dest;
-    
-    behavior complete:
-      assumes src_fits: strlen(src) < n;
-      ensures equal_after_copy: strcmp(\old(dest), \old(src)) ≡ 0;
-    
-    behavior partial:
-      assumes src_too_long: n ≤ strlen(src);
-      ensures
-        equal_prefix:
-          memcmp{Post, Post}(\old(dest), \old(src), \old(n)) ≡ 0;
- */
-char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
-                           size_t n);
-
 /*@ requires valid_string_s: valid_read_string(s);
     assigns \result;
     assigns \result
@@ -164,7 +128,6 @@ char *__gen_e_acsl_strdup(char const *s)
 {
   __e_acsl_contract_t *__gen_e_acsl_contract;
   char *__retres;
-  __e_acsl_store_block((void *)(& __retres),(size_t)8);
   __gen_e_acsl_contract = __e_acsl_contract_init((size_t)2);
   __retres = strdup(s);
   {
@@ -177,224 +140,8 @@ char *__gen_e_acsl_strdup(char const *s)
                                                     "FRAMAC_SHARE/libc/string.h",
                                                     485);
     __e_acsl_contract_clean(__gen_e_acsl_contract);
-    __e_acsl_delete_block((void *)(& __retres));
     return __retres;
   }
-}
-
-/*@ requires valid_nstring_src: valid_read_nstring(src, n);
-    requires room_nstring: \valid(dest + (0 .. n - 1));
-    requires separation: \separated(dest + (0 .. n - 1), src + (0 .. n - 1));
-    ensures result_ptr: \result ≡ \old(dest);
-    ensures initialization: \initialized(\old(dest) + (0 .. \old(n) - 1));
-    assigns *(dest + (0 .. n - 1)), \result;
-    assigns *(dest + (0 .. n - 1)) \from *(src + (0 .. n - 1));
-    assigns \result \from dest;
-    
-    behavior complete:
-      assumes src_fits: strlen(src) < n;
-      ensures equal_after_copy: strcmp(\old(dest), \old(src)) ≡ 0;
-    
-    behavior partial:
-      assumes src_too_long: n ≤ strlen(src);
-      ensures
-        equal_prefix:
-          memcmp{Post, Post}(\old(dest), \old(src), \old(n)) ≡ 0;
- */
-char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
-                           size_t n)
-{
-  __e_acsl_mpz_t __gen_e_acsl_at_3;
-  char *__gen_e_acsl_at_2;
-  char *__gen_e_acsl_at;
-  __e_acsl_contract_t *__gen_e_acsl_contract;
-  char *__retres;
-  {
-    unsigned long __gen_e_acsl_size;
-    __e_acsl_mpz_t __gen_e_acsl_n;
-    __e_acsl_mpz_t __gen_e_acsl_;
-    __e_acsl_mpz_t __gen_e_acsl_sub;
-    __e_acsl_mpz_t __gen_e_acsl__2;
-    __e_acsl_mpz_t __gen_e_acsl_sub_2;
-    __e_acsl_mpz_t __gen_e_acsl_add;
-    unsigned long __gen_e_acsl__3;
-    unsigned long __gen_e_acsl_if;
-    int __gen_e_acsl_valid;
-    unsigned long __gen_e_acsl_size_2;
-    unsigned long __gen_e_acsl__4;
-    unsigned long __gen_e_acsl_if_2;
-    int __gen_e_acsl_valid_read;
-    unsigned long __gen_e_acsl_size_3;
-    unsigned long __gen_e_acsl__5;
-    unsigned long __gen_e_acsl_if_3;
-    int __gen_e_acsl_valid_read_2;
-    unsigned long __gen_e_acsl_size_4;
-    unsigned long __gen_e_acsl__6;
-    unsigned long __gen_e_acsl_if_4;
-    unsigned long __gen_e_acsl_size_5;
-    unsigned long __gen_e_acsl__7;
-    unsigned long __gen_e_acsl_if_5;
-    int __gen_e_acsl_separated;
-    __e_acsl_store_block((void *)(& src),(size_t)8);
-    __e_acsl_store_block((void *)(& dest),(size_t)8);
-    __gen_e_acsl_contract = __e_acsl_contract_init((size_t)2);
-    __gmpz_init_set_ui(__gen_e_acsl_n,n);
-    __gmpz_init_set_si(__gen_e_acsl_,1L);
-    __gmpz_init(__gen_e_acsl_sub);
-    __gmpz_sub(__gen_e_acsl_sub,
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl_n),
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
-    __gmpz_init_set_si(__gen_e_acsl__2,0L);
-    __gmpz_init(__gen_e_acsl_sub_2);
-    __gmpz_sub(__gen_e_acsl_sub_2,
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl_sub),
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
-    __gmpz_init(__gen_e_acsl_add);
-    __gmpz_add(__gen_e_acsl_add,
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl_sub_2),
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
-    __gen_e_acsl__3 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_add));
-    __gen_e_acsl_size = 1UL * __gen_e_acsl__3;
-    if (__gen_e_acsl_size <= 0UL) __gen_e_acsl_if = 0UL;
-    else __gen_e_acsl_if = __gen_e_acsl_size;
-    __gen_e_acsl_valid = __e_acsl_valid((void *)(dest + 1 * 0),
-                                        __gen_e_acsl_if,(void *)dest,
-                                        (void *)(& dest));
-    __e_acsl_assert(__gen_e_acsl_valid,1,"Precondition","strncpy",
-                    "room_nstring: \\valid(dest + (0 .. n - 1))",
-                    "FRAMAC_SHARE/libc/string.h",367);
-    __gen_e_acsl__4 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_add));
-    __gen_e_acsl_size_2 = 1UL * __gen_e_acsl__4;
-    if (__gen_e_acsl_size_2 <= 0UL) __gen_e_acsl_if_2 = 0UL;
-    else __gen_e_acsl_if_2 = __gen_e_acsl_size_2;
-    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(dest + 1 * 0),
-                                                  __gen_e_acsl_if_2,
-                                                  (void *)dest,
-                                                  (void *)(& dest));
-    /*@ assert E_ACSL: separated_guard: \valid_read(dest + (0 .. n - 1)); */
-    __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","strncpy",
-                    "separated_guard: \\valid_read(dest + (0 .. n - 1))",
-                    "FRAMAC_SHARE/libc/string.h",369);
-    __gen_e_acsl__5 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_add));
-    __gen_e_acsl_size_3 = 1UL * __gen_e_acsl__5;
-    if (__gen_e_acsl_size_3 <= 0UL) __gen_e_acsl_if_3 = 0UL;
-    else __gen_e_acsl_if_3 = __gen_e_acsl_size_3;
-    __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(src + 1 * 0),
-                                                    __gen_e_acsl_if_3,
-                                                    (void *)src,
-                                                    (void *)(& src));
-    /*@ assert E_ACSL: separated_guard: \valid_read(src + (0 .. n - 1)); */
-    __e_acsl_assert(__gen_e_acsl_valid_read_2,1,"RTE","strncpy",
-                    "separated_guard: \\valid_read(src + (0 .. n - 1))",
-                    "FRAMAC_SHARE/libc/string.h",369);
-    __gen_e_acsl__6 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_add));
-    __gen_e_acsl_size_4 = 1UL * __gen_e_acsl__6;
-    if (__gen_e_acsl_size_4 <= 0UL) __gen_e_acsl_if_4 = 0UL;
-    else __gen_e_acsl_if_4 = __gen_e_acsl_size_4;
-    __gen_e_acsl__7 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_add));
-    __gen_e_acsl_size_5 = 1UL * __gen_e_acsl__7;
-    if (__gen_e_acsl_size_5 <= 0UL) __gen_e_acsl_if_5 = 0UL;
-    else __gen_e_acsl_if_5 = __gen_e_acsl_size_5;
-    __gen_e_acsl_separated = __e_acsl_separated((size_t)2,dest + 1 * 0,
-                                                __gen_e_acsl_if_4,
-                                                src + 1 * 0,
-                                                __gen_e_acsl_if_5);
-    __e_acsl_assert(__gen_e_acsl_separated,1,"Precondition","strncpy",
-                    "separation: \\separated(dest + (0 .. n - 1), src + (0 .. n - 1))",
-                    "FRAMAC_SHARE/libc/string.h",369);
-    __gmpz_clear(__gen_e_acsl_n);
-    __gmpz_clear(__gen_e_acsl_);
-    __gmpz_clear(__gen_e_acsl_sub);
-    __gmpz_clear(__gen_e_acsl__2);
-    __gmpz_clear(__gen_e_acsl_sub_2);
-    __gmpz_clear(__gen_e_acsl_add);
-  }
-  {
-    __e_acsl_mpz_t __gen_e_acsl_n_2;
-    __gmpz_init_set_ui(__gen_e_acsl_n_2,n);
-    __gmpz_init_set(__gen_e_acsl_at_3,
-                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_n_2));
-    __gmpz_clear(__gen_e_acsl_n_2);
-  }
-  __gen_e_acsl_at_2 = dest;
-  __gen_e_acsl_at = dest;
-  __retres = __e_acsl_builtin_strncpy(dest,src,n);
-  {
-    unsigned long __gen_e_acsl_size_6;
-    __e_acsl_mpz_t __gen_e_acsl__8;
-    __e_acsl_mpz_t __gen_e_acsl_sub_3;
-    __e_acsl_mpz_t __gen_e_acsl__9;
-    __e_acsl_mpz_t __gen_e_acsl_sub_4;
-    __e_acsl_mpz_t __gen_e_acsl_add_2;
-    unsigned long __gen_e_acsl__10;
-    unsigned long __gen_e_acsl_if_6;
-    int __gen_e_acsl_initialized;
-    __e_acsl_assert(__retres == __gen_e_acsl_at,1,"Postcondition","strncpy",
-                    "result_ptr: \\result == \\old(dest)",
-                    "FRAMAC_SHARE/libc/string.h",372);
-    __gmpz_init_set_si(__gen_e_acsl__8,1L);
-    __gmpz_init(__gen_e_acsl_sub_3);
-    __gmpz_sub(__gen_e_acsl_sub_3,
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl_at_3),
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__8));
-    __gmpz_init_set_si(__gen_e_acsl__9,0L);
-    __gmpz_init(__gen_e_acsl_sub_4);
-    __gmpz_sub(__gen_e_acsl_sub_4,
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl_sub_3),
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__9));
-    __gmpz_init(__gen_e_acsl_add_2);
-    __gmpz_add(__gen_e_acsl_add_2,
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl_sub_4),
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__8));
-    __gen_e_acsl__10 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_add_2));
-    __gen_e_acsl_size_6 = 1UL * __gen_e_acsl__10;
-    if (__gen_e_acsl_size_6 <= 0UL) __gen_e_acsl_if_6 = 0UL;
-    else __gen_e_acsl_if_6 = __gen_e_acsl_size_6;
-    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(__gen_e_acsl_at_2 + 
-                                                             1 * 0),
-                                                    __gen_e_acsl_if_6);
-    __e_acsl_assert(__gen_e_acsl_initialized,1,"Postcondition","strncpy",
-                    "initialization: \\initialized(\\old(dest) + (0 .. \\old(n) - 1))",
-                    "FRAMAC_SHARE/libc/string.h",373);
-    __e_acsl_contract_clean(__gen_e_acsl_contract);
-    __e_acsl_delete_block((void *)(& src));
-    __e_acsl_delete_block((void *)(& dest));
-    __gmpz_clear(__gen_e_acsl__8);
-    __gmpz_clear(__gen_e_acsl_sub_3);
-    __gmpz_clear(__gen_e_acsl__9);
-    __gmpz_clear(__gen_e_acsl_sub_4);
-    __gmpz_clear(__gen_e_acsl_add_2);
-    __gmpz_clear(__gen_e_acsl_at_3);
-    return __retres;
-  }
-}
-
-/*@ requires valid_string_src: valid_read_string(src);
-    requires room_string: \valid(dest + (0 .. strlen(src)));
-    requires
-      separation:
-        \separated(dest + (0 .. strlen(src)), src + (0 .. strlen(src)));
-    ensures equal_contents: strcmp(\old(dest), \old(src)) ≡ 0;
-    ensures result_ptr: \result ≡ \old(dest);
-    assigns *(dest + (0 .. strlen{Old}(src))), \result;
-    assigns *(dest + (0 .. strlen{Old}(src)))
-      \from *(src + (0 .. strlen{Old}(src)));
-    assigns \result \from dest;
- */
-char *__gen_e_acsl_strcpy(char * restrict dest, char const * restrict src)
-{
-  char *__gen_e_acsl_at;
-  char *__retres;
-  __e_acsl_store_block((void *)(& src),(size_t)8);
-  __e_acsl_store_block((void *)(& dest),(size_t)8);
-  __gen_e_acsl_at = dest;
-  __retres = __e_acsl_builtin_strcpy(dest,src);
-  __e_acsl_assert(__retres == __gen_e_acsl_at,1,"Postcondition","strcpy",
-                  "result_ptr: \\result == \\old(dest)",
-                  "FRAMAC_SHARE/libc/string.h",361);
-  __e_acsl_delete_block((void *)(& src));
-  __e_acsl_delete_block((void *)(& dest));
-  return __retres;
 }
 
 /*@ ensures
@@ -642,34 +389,20 @@ int main(int argc, char const **argv)
   __e_acsl_memory_init(& argc,(char ***)(& argv),(size_t)8);
   __e_acsl_globals_init();
   char empty_str[1] = {(char)'\000'};
-  __e_acsl_store_block((void *)(empty_str),(size_t)1);
-  __e_acsl_full_init((void *)(& empty_str));
   char *const_str = (char *)__gen_e_acsl_literal_string_6;
-  __e_acsl_store_block((void *)(& const_str),(size_t)8);
-  __e_acsl_full_init((void *)(& const_str));
   char *src = __gen_e_acsl_strdup(__gen_e_acsl_literal_string_6);
-  __e_acsl_store_block((void *)(& src),(size_t)8);
-  __e_acsl_full_init((void *)(& src));
   char *dest1 = malloc((unsigned long)5);
-  __e_acsl_store_block((void *)(& dest1),(size_t)8);
-  __e_acsl_full_init((void *)(& dest1));
   char *dest2 = malloc((unsigned long)4);
-  __e_acsl_store_block((void *)(& dest2),(size_t)8);
-  __e_acsl_full_init((void *)(& dest2));
   char dest3[256] =
     {(char)'a', (char)'b', (char)'c', (char)'d', (char)'\000'};
-  __e_acsl_store_block((void *)(dest3),(size_t)256);
-  __e_acsl_full_init((void *)(& dest3));
   size_t len = (unsigned long)0;
   char *unalloc_str = malloc((unsigned long)5);
-  __e_acsl_store_block((void *)(& unalloc_str),(size_t)8);
-  __e_acsl_full_init((void *)(& unalloc_str));
   char *_barrier = malloc((unsigned long)1);
   free((void *)unalloc_str);
   {
     pid_t pid = __gen_e_acsl_fork();
     if (! pid) {
-      __gen_e_acsl_strcpy(dest1,(char const *)src);
+      __e_acsl_builtin_strcpy(dest1,(char const *)src);
       __gen_e_acsl_exit(0);
     }
     else {
@@ -683,7 +416,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_0 = __gen_e_acsl_fork();
     if (! pid_0) {
-      __gen_e_acsl_strcpy(empty_str,__gen_e_acsl_literal_string_8);
+      __e_acsl_builtin_strcpy(empty_str,__gen_e_acsl_literal_string_8);
       __gen_e_acsl_exit(0);
     }
     else {
@@ -697,7 +430,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_1 = __gen_e_acsl_fork();
     if (! pid_1) {
-      __gen_e_acsl_strcpy(dest2,(char const *)src);
+      __e_acsl_builtin_strcpy(dest2,(char const *)src);
       __gen_e_acsl_exit(0);
     }
     else {
@@ -711,7 +444,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_2 = __gen_e_acsl_fork();
     if (! pid_2) {
-      __gen_e_acsl_strcpy(unalloc_str,(char const *)src);
+      __e_acsl_builtin_strcpy(unalloc_str,(char const *)src);
       __gen_e_acsl_exit(0);
     }
     else {
@@ -725,7 +458,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_3 = __gen_e_acsl_fork();
     if (! pid_3) {
-      __gen_e_acsl_strcpy(const_str,(char const *)src);
+      __e_acsl_builtin_strcpy(const_str,(char const *)src);
       __gen_e_acsl_exit(0);
     }
     else {
@@ -739,7 +472,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_4 = __gen_e_acsl_fork();
     if (! pid_4) {
-      __gen_e_acsl_strcpy(src,(char const *)const_str);
+      __e_acsl_builtin_strcpy(src,(char const *)const_str);
       __gen_e_acsl_exit(0);
     }
     else {
@@ -753,7 +486,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_5 = __gen_e_acsl_fork();
     if (! pid_5) {
-      __gen_e_acsl_strcpy(src,(char const *)src);
+      __e_acsl_builtin_strcpy(src,(char const *)src);
       __gen_e_acsl_exit(0);
     }
     else {
@@ -767,7 +500,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_6 = __gen_e_acsl_fork();
     if (! pid_6) {
-      __gen_e_acsl_strcpy(& dest3[5],(char const *)(dest3));
+      __e_acsl_builtin_strcpy(& dest3[5],(char const *)(dest3));
       __gen_e_acsl_exit(0);
     }
     else {
@@ -781,7 +514,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_7 = __gen_e_acsl_fork();
     if (! pid_7) {
-      __gen_e_acsl_strcpy(& dest3[4],(char const *)(dest3));
+      __e_acsl_builtin_strcpy(& dest3[4],(char const *)(dest3));
       __gen_e_acsl_exit(0);
     }
     else {
@@ -795,7 +528,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_8 = __gen_e_acsl_fork();
     if (! pid_8) {
-      __gen_e_acsl_strncpy(dest1,(char const *)src,(unsigned long)5);
+      __e_acsl_builtin_strncpy(dest1,(char const *)src,(unsigned long)5);
       __gen_e_acsl_exit(0);
     }
     else {
@@ -809,7 +542,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_9 = __gen_e_acsl_fork();
     if (! pid_9) {
-      __gen_e_acsl_strncpy(dest1,(char const *)src,(unsigned long)6);
+      __e_acsl_builtin_strncpy(dest1,(char const *)src,(unsigned long)6);
       __gen_e_acsl_exit(0);
     }
     else {
@@ -823,7 +556,8 @@ int main(int argc, char const **argv)
   {
     pid_t pid_10 = __gen_e_acsl_fork();
     if (! pid_10) {
-      __gen_e_acsl_strncpy(unalloc_str,(char const *)src,(unsigned long)5);
+      __e_acsl_builtin_strncpy(unalloc_str,(char const *)src,
+                               (unsigned long)5);
       __gen_e_acsl_exit(0);
     }
     else {
@@ -837,7 +571,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_11 = __gen_e_acsl_fork();
     if (! pid_11) {
-      __gen_e_acsl_strncpy(const_str,(char const *)src,(unsigned long)5);
+      __e_acsl_builtin_strncpy(const_str,(char const *)src,(unsigned long)5);
       __gen_e_acsl_exit(0);
     }
     else {
@@ -851,7 +585,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_12 = __gen_e_acsl_fork();
     if (! pid_12) {
-      __gen_e_acsl_strncpy(src,(char const *)const_str,(unsigned long)5);
+      __e_acsl_builtin_strncpy(src,(char const *)const_str,(unsigned long)5);
       __gen_e_acsl_exit(0);
     }
     else {
@@ -865,7 +599,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_13 = __gen_e_acsl_fork();
     if (! pid_13) {
-      __gen_e_acsl_strncpy(src,(char const *)src,(unsigned long)5);
+      __e_acsl_builtin_strncpy(src,(char const *)src,(unsigned long)5);
       __gen_e_acsl_exit(0);
     }
     else {
@@ -879,7 +613,8 @@ int main(int argc, char const **argv)
   {
     pid_t pid_14 = __gen_e_acsl_fork();
     if (! pid_14) {
-      __gen_e_acsl_strncpy(& dest3[5],(char const *)(dest3),(unsigned long)5);
+      __e_acsl_builtin_strncpy(& dest3[5],(char const *)(dest3),
+                               (unsigned long)5);
       __gen_e_acsl_exit(0);
     }
     else {
@@ -893,7 +628,8 @@ int main(int argc, char const **argv)
   {
     pid_t pid_15 = __gen_e_acsl_fork();
     if (! pid_15) {
-      __gen_e_acsl_strncpy(& dest3[4],(char const *)(dest3),(unsigned long)5);
+      __e_acsl_builtin_strncpy(& dest3[4],(char const *)(dest3),
+                               (unsigned long)5);
       __gen_e_acsl_exit(0);
     }
     else {
@@ -908,13 +644,6 @@ int main(int argc, char const **argv)
   free((void *)dest1);
   free((void *)dest2);
   __retres = 0;
-  __e_acsl_delete_block((void *)(& unalloc_str));
-  __e_acsl_delete_block((void *)(dest3));
-  __e_acsl_delete_block((void *)(& dest2));
-  __e_acsl_delete_block((void *)(& dest1));
-  __e_acsl_delete_block((void *)(& src));
-  __e_acsl_delete_block((void *)(& const_str));
-  __e_acsl_delete_block((void *)(empty_str));
   __e_acsl_memory_clean();
   return __retres;
 }
