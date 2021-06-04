@@ -653,16 +653,131 @@ extern double expm1(double x);
 extern float expm1f(float x);
 extern long double expm1l(long double x);
 
-extern double frexp(double value, int *exp);
-extern float frexpf(float value, int *exp);
-extern long double frexpl(long double value, int *exp);
+/*@
+  requires valid_exp: \valid(exp);
+  assigns \result, *exp \from x;
+  behavior normal:
+    assumes finite_arg: \is_finite(x);
+    assumes arg_nonzero: x != 0.0;
+    ensures finite_result: \is_finite(\result);
+    ensures bounded_result: 0.5 <= \result < 1.0;
+    ensures initialization:exp: \initialized(exp);
+  behavior infinite:
+    assumes infinite_arg: \is_plus_infinity(x) || \is_minus_infinity(x);
+    ensures infinite_result: \is_infinite(\result);
+    ensures result_same_infinite: \result == x;
+  behavior zero:
+    assumes zero_arg: \is_finite(x) && x == 0.;
+    ensures finite_result: \is_finite(\result);
+    ensures zero_result: \result == 0.0;
+    ensures initialization:exp: \initialized(exp);
+    ensures zero_exp: *exp == 0;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
+*/
+extern double frexp(double x, int *exp);
+
+/*@
+  requires valid_exp: \valid(exp);
+  assigns \result, *exp \from x;
+  behavior normal:
+    assumes finite_arg: \is_finite(x);
+    assumes arg_nonzero: x != 0.0;
+    ensures finite_result: \is_finite(\result);
+    ensures bounded_result: 0.5 <= \result < 1.0;
+    ensures initialization:exp: \initialized(exp);
+  behavior infinite:
+    assumes infinite_arg: \is_plus_infinity(x) || \is_minus_infinity(x);
+    ensures infinite_result: \is_infinite(\result);
+    ensures result_same_infinite: \result == x;
+  behavior zero:
+    assumes zero_arg: \is_finite(x) && x == 0.;
+    ensures finite_result: \is_finite(\result);
+    ensures zero_result: \result == x;
+    ensures initialization:exp: \initialized(exp);
+    ensures zero_exp: *exp == 0;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
+*/
+extern float frexpf(float x, int *exp);
+
+/*@
+  requires valid_exp: \valid(exp);
+  assigns \result, *exp \from x;
+  behavior normal:
+    assumes finite_arg: \is_finite(x);
+    assumes arg_nonzero: x != 0.0;
+    ensures finite_result: \is_finite(\result);
+    ensures bounded_result: 0.5 <= \result < 1.0;
+    ensures initialization:exp: \initialized(exp);
+  behavior infinite:
+    assumes infinite_arg: \is_plus_infinity(x) || \is_minus_infinity(x);
+    ensures infinite_result: \is_infinite(\result);
+    ensures result_same_infinite: \result == x;
+  behavior zero:
+    assumes zero_arg: \is_finite(x) && x == 0.;
+    ensures finite_result: \is_finite(\result);
+    ensures zero_result: \result == x;
+    ensures initialization:exp: \initialized(exp);
+    ensures zero_exp: *exp == 0;
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
+*/
+extern long double frexpl(long double x, int *exp);
 
 extern int ilogb(double x);
 extern int ilogbf(float x);
 extern int ilogbl(long double x);
 
+/*@
+  assigns errno, \result \from x, exp;
+  behavior normal:
+    assumes finite_logic_res: \is_finite((double)(x * pow(2.0d, (double)exp)));
+    ensures finite_result: \is_finite(\result);
+    ensures errno: errno == ERANGE || errno == \old(errno); //ERANGE if underflow
+  behavior overflow_not_nan:
+    assumes not_nan_arg: !\is_NaN(x);
+    assumes infinite_logic_res: !\is_finite((double)(x * pow(2.0d, (double)exp)));
+    ensures infinite_result: \is_infinite(\result);
+    ensures errno: errno == ERANGE || errno == \old(errno);
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
+*/
 extern double ldexp(double x, int exp);
+
+/*@
+  assigns errno, \result \from x, exp;
+  behavior normal:
+    assumes finite_logic_res: \is_finite((float)(x * pow(2.0f, (float)exp)));
+    ensures finite_result: \is_finite(\result);
+    ensures errno: errno == ERANGE || errno == \old(errno); //ERANGE if underflow
+  behavior overflow_not_nan:
+    assumes not_nan_arg: !\is_NaN(x);
+    assumes infinite_logic_res: !\is_finite((float)(x * pow(2.0f, (float)exp)));
+    ensures infinite_result: \is_infinite(\result);
+    ensures errno: errno == ERANGE || errno == \old(errno);
+  behavior nan:
+    assumes nan_arg: \is_NaN(x);
+    assigns \result \from x;
+    ensures nan_result: \is_NaN(\result);
+  complete behaviors;
+  disjoint behaviors;
+*/
 extern float ldexpf(float x, int exp);
+
 extern long double ldexpl(long double x, int exp);
 
 /*@
