@@ -106,8 +106,8 @@ val restore: unit -> unit
 (** {2 Internal use only} *)
 (* ****************************************************************************)
 
-val keep_file: string -> unit
-(** This function has not to be used explicitly. Only offers functions
+val keep_file: Datatype.Filepath.t -> unit
+(** This function is not to be used explicitly. Only offers functions
     retrieving when running a journal file. *)
 
 val get_session_file: (string -> Datatype.Filepath.t) ref
