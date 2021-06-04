@@ -530,6 +530,12 @@ let build_cpp_cmd = function
           if Sys.is_directory jcdb_path then jcdb_path
           else Filename.dirname jcdb_path
         in
+        (* TODO: we currently use PWD instead of Sys.getcwd () because OCaml has
+           no function in its stdlib to resolve symbolic links (e.g. realpath)
+           for a given path. 'getcwd' always resolves them, but if the user
+           supplies a path with symbolic links, this may cause issues.
+           Instead of forcing the user to always provide resolved paths, we
+           currently choose to never resolve them. *)
         let cwd = Unix.getenv "PWD" in
         if cwd <> dir then
           "cd " ^ dir ^ " && " ^ cpp_command

@@ -255,6 +255,13 @@ let gen_run remarks =
         (key, (dir :> string))
       ) (Filepath.all_symbolic_dirs ())
   in
+  (* TODO: we currently use Sys.getenv "PWD" instead of Sys.getcwd ()
+     because OCaml has no function in its stdlib to resolve symbolic links
+     (e.g. realpath) for a given path.
+     'getcwd' always resolves them, but if the user supplies a path with
+     symbolic links, this may cause issues.
+     Instead of forcing the user to always provide resolved paths, we
+     currently choose to never resolve them. *)
   let uriBases = ("PWD", Sys.getenv "PWD") :: symbolicDirs in
   let uriBasesJson =
     List.fold_left (fun acc (name, dir) ->

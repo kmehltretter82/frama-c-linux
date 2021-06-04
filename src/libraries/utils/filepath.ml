@@ -125,11 +125,12 @@ let insert base path_name =
       Array.set cache (hash land 255) (Some (path_name, path));
       path
 
-(* Note: we do not use `Sys.getcwd ()` because, if the current working
-   directory contains a symbolic link in its path, it will differ from
-   the one reported by getcwd. Since many path names come from the
-   command line, they are often provided with the symbolic name,
-   which leads to inconsistencies causing test oracles to differ. *)
+(* TODO: we currently use PWD instead of Sys.getcwd () because OCaml has
+   no function in its stdlib to resolve symbolic links (e.g. realpath)
+   for a given path. 'getcwd' always resolves them, but if the user
+   supplies a path with symbolic links, this may cause issues.
+   Instead of forcing the user to always provide resolved paths, we
+   currently choose to never resolve them. *)
 let cwd = insert dummy (Sys.getenv "PWD")
 
 type existence =
