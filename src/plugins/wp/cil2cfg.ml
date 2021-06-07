@@ -1395,7 +1395,7 @@ struct
   type dot = {
     name: string;
     chan: out_channel;
-    fmt : Stdlib__format.formatter;
+    fmt : Format.formatter;
   }
 
   let create kf =
