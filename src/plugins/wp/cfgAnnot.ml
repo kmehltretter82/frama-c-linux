@@ -186,10 +186,10 @@ let normalize_terminates p =
 let get_terminates kf =
   Option.map
     (fun p -> WpPropId.mk_terminates_id kf Kglobal p, normalize_terminates p)
-    (Annotations.funspec kf).spec_terminates
+    (Annotations.terminates kf)
 
 let get_terminates_call kf =
-  match (Annotations.funspec kf).spec_terminates with
+  match Annotations.terminates kf with
   | Some p ->
       false, normalize_terminates p
   | None when Kernel_function.is_definition kf ->
@@ -472,7 +472,7 @@ module LoopContract = WpContext.StaticGenerator(CodeKey)
                   WpStrategy.mk_variant_properties kf stmt ca term in
                 let intro_terminates (pid, v) =
                   pid,
-                  match (Annotations.funspec kf).spec_terminates with
+                  match Annotations.terminates kf with
                   | Some t when Wp_parameters.TerminatesVariantHyp.get () ->
                       Logic_const.pimplies (normalize_terminates t, v)
                   | _ -> v
