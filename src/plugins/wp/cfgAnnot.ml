@@ -191,12 +191,14 @@ let get_terminates kf =
 let get_terminates_call kf =
   match (Annotations.funspec kf).spec_terminates with
   | Some p ->
-      normalize_terminates p
+      false, normalize_terminates p
   | None when Kernel_function.is_definition kf ->
+      true,
       if Wp_parameters.TerminatesDefinitions.get ()
       then Logic_const.ptrue
       else Logic_const.pfalse
   | None ->
+      true,
       if Wp_parameters.TerminatesDeclarations.get ()
       then Logic_const.ptrue
       else Logic_const.pfalse
@@ -213,7 +215,7 @@ type contract = {
   contract_exit : WpPropId.pred_info list ;
   contract_smoke : WpPropId.pred_info list ;
   contract_assigns : Cil_types.assigns ;
-  contract_terminates : Cil_types.predicate ;
+  contract_terminates : bool * Cil_types.predicate ;
 }
 
 let assigns_upper_bound behaviors =

@@ -338,7 +338,12 @@ struct
     in
     match env.terminates with
     | Some p when is_default_bhv env.mode && is_selected ~goal:true env p ->
-        W.call_terminates env.we p s kf es ~callee_t:c.contract_terminates w_pre
+        let generated, callee_t = c.contract_terminates in
+        if generated then
+          Wp_parameters.warning ~once:true
+            "Missing terminates clause on call to %a, defaults to %a"
+            Kernel_function.pretty kf Cil_printer.pp_predicate callee_t ;
+        W.call_terminates env.we p s kf es ~callee_t w_pre
     | _ -> w_pre
 
   let do_complete_disjoint env w =

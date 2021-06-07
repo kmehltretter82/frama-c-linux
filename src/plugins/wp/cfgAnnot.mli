@@ -105,7 +105,7 @@ type contract = {
   contract_exit : pred_info list ;
   contract_smoke : pred_info list ;
   contract_assigns : assigns ;
-  contract_terminates : predicate ;
+  contract_terminates : bool * predicate ; (* boolean: default generated *)
 }
 
 val get_call_contract : ?smoking:stmt -> kernel_function -> stmt -> contract
