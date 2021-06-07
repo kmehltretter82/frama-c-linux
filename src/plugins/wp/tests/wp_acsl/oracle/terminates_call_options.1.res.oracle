@@ -1,20 +1,20 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_acsl/terminates_call_options.i (no preprocessing)
+[kernel] Parsing tests/wp_acsl/terminates_call_options.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
-[wp] tests/wp_acsl/terminates_call_options.i:17: Warning: 
+[wp] tests/wp_acsl/terminates_call_options.c:19: Warning: 
   Missing terminates clause for definition, populates 'terminates \true'
-[wp] tests/wp_acsl/terminates_call_options.i:29: Warning: 
+[wp] tests/wp_acsl/terminates_call_options.c:31: Warning: 
   Missing terminates clause for no_spec_generates_goal, populates 'terminates \true'
-[wp] tests/wp_acsl/terminates_call_options.i:21: Warning: 
+[wp] tests/wp_acsl/terminates_call_options.c:23: Warning: 
   Missing terminates clause on call to declaration, defaults to \true
-[wp] tests/wp_acsl/terminates_call_options.i:30: Warning: 
+[wp] tests/wp_acsl/terminates_call_options.c:32: Warning: 
   Missing assigns clause (assigns 'everything' instead)
 ------------------------------------------------------------
   Function call_declaration
 ------------------------------------------------------------
 
-Goal Termination-condition (file tests/wp_acsl/terminates_call_options.i, line 19) in 'call_declaration':
+Goal Termination-condition (file tests/wp_acsl/terminates_call_options.c, line 21) in 'call_declaration':
 Prove: true.
 
 ------------------------------------------------------------
@@ -22,7 +22,7 @@ Prove: true.
   Function call_definition
 ------------------------------------------------------------
 
-Goal Termination-condition (file tests/wp_acsl/terminates_call_options.i, line 24) in 'call_definition':
+Goal Termination-condition (file tests/wp_acsl/terminates_call_options.c, line 26) in 'call_definition':
 Prove: true.
 
 ------------------------------------------------------------
@@ -35,11 +35,19 @@ Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
+  Function libc_call
+------------------------------------------------------------
+
+Goal Termination-condition (file tests/wp_acsl/terminates_call_options.c, line 35) in 'libc_call':
+Prove: true.
+
+------------------------------------------------------------
+------------------------------------------------------------
   Function no_spec_generates_goal
 ------------------------------------------------------------
 
 Goal Termination-condition (generated) in 'no_spec_generates_goal':
-Effect at line 30
+Effect at line 32
 Prove: false.
 
 ------------------------------------------------------------

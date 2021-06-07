@@ -1,13 +1,15 @@
 /* run.config
    OPT:
-   OPT: -wp-declarations-terminate -wp-definitions-terminate
+   OPT: -wp-declarations-terminate -wp-definitions-terminate -wp-frama-c-stdlib-terminate
 */
 /* run.config_qualif
    OPT:
-   OPT: -wp-declarations-terminate -wp-definitions-terminate
+   OPT: -wp-declarations-terminate -wp-definitions-terminate -wp-frama-c-stdlib-terminate
 */
 
-// -wp-declaration-terminates <--- default to FALSE
+#include <stdlib.h>
+
+// -wp-external-declaration-terminates <--- default to FALSE
 // -wp-definition-terminates  <--- default to FALSE
 
 //@ assigns \nothing ;
@@ -28,4 +30,9 @@ void call_definition(void){
 
 void no_spec_generates_goal(void){
   for(;;);
+}
+
+//@ terminates \true ;
+void libc_call(void){
+  (void) div(4,3);
 }

@@ -1,17 +1,17 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_acsl/terminates_call_options.i (no preprocessing)
+[kernel] Parsing tests/wp_acsl/terminates_call_options.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
-[wp] tests/wp_acsl/terminates_call_options.i:21: Warning: 
+[wp] tests/wp_acsl/terminates_call_options.c:23: Warning: 
   Missing terminates clause on call to declaration, defaults to \false
-[wp] tests/wp_acsl/terminates_call_options.i:26: Warning: 
+[wp] tests/wp_acsl/terminates_call_options.c:28: Warning: 
   Missing terminates clause on call to definition, defaults to \false
 ------------------------------------------------------------
   Function call_declaration
 ------------------------------------------------------------
 
-Goal Termination-condition (file tests/wp_acsl/terminates_call_options.i, line 19) in 'call_declaration':
-Call Effect at line 21
+Goal Termination-condition (file tests/wp_acsl/terminates_call_options.c, line 21) in 'call_declaration':
+Call Effect at line 23
 Prove: false.
 
 ------------------------------------------------------------
@@ -19,8 +19,8 @@ Prove: false.
   Function call_definition
 ------------------------------------------------------------
 
-Goal Termination-condition (file tests/wp_acsl/terminates_call_options.i, line 24) in 'call_definition':
-Call Effect at line 26
+Goal Termination-condition (file tests/wp_acsl/terminates_call_options.c, line 26) in 'call_definition':
+Call Effect at line 28
 Prove: false.
 
 ------------------------------------------------------------
@@ -30,5 +30,14 @@ Prove: false.
 
 Goal Assigns nothing in 'definition':
 Prove: true.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function libc_call
+------------------------------------------------------------
+
+Goal Termination-condition (file tests/wp_acsl/terminates_call_options.c, line 35) in 'libc_call':
+Call Effect at line 37
+Prove: false.
 
 ------------------------------------------------------------

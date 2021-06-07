@@ -208,20 +208,17 @@ let get_terminates kf =
       Some (WpPropId.mk_terminates_id kf Kglobal p, normalize_terminates p)
 
 let get_terminates_call kf =
+  let to_default option =
+    if option then Logic_const.ptrue else Logic_const.pfalse in
   match Annotations.terminates kf with
   | Some p ->
       false, normalize_terminates p
+  | None when Kernel_function.is_in_libc kf ->
+      false, to_default @@ Wp_parameters.TerminatesFCDeclarations.get ()
   | None when Kernel_function.is_definition kf ->
-      true,
-      if Wp_parameters.TerminatesDefinitions.get ()
-      then Logic_const.ptrue
-      else Logic_const.pfalse
+      true, to_default @@ Wp_parameters.TerminatesDefinitions.get ()
   | None ->
-      true,
-      if Wp_parameters.TerminatesDeclarations.get ()
-      then Logic_const.ptrue
-      else Logic_const.pfalse
-
+      true, to_default @@  Wp_parameters.TerminatesExtDeclarations.get ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Contracts                                                          --- *)
@@ -532,7 +529,7 @@ let get_loop_contract ?(smoking=false) ?terminates kf stmt =
     else lc
   in
   match lc_smoke.loop_terminates, terminates with
-  | None, _->
+  | None, _ ->
       lc_smoke
   | Some _, None ->
       { lc_smoke with loop_terminates = None }
