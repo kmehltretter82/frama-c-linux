@@ -160,7 +160,9 @@ char *eacsl_builtin_strcpy(char *dest, const char *src) {
   /* source and destination strings should not overlap */
   validate_overlapping_spaces
     ((uintptr_t)dest, size + 1, (uintptr_t)src, size + 1, "strcpy");
-  return strcpy(dest, src);
+  char * res = strcpy(dest, src);
+  eacsl_initialize(dest, size + 1);
+  return res;
 }
 
 char *eacsl_builtin_strncpy(char *dest, const char *src, size_t n) {
@@ -170,7 +172,9 @@ char *eacsl_builtin_strncpy(char *dest, const char *src, size_t n) {
   validate_writeable_space(dest, n, "strncpy", "destination string ");
   /* source and destination strings should not overlap */
   validate_overlapping_spaces((uintptr_t)dest, n, (uintptr_t)src, n, "strncpy");
-  return strncpy(dest, src, n);
+  char * res = strncpy(dest, src, n);
+  eacsl_initialize(dest, n);
+  return res;
 }
 
 int eacsl_builtin_strcmp(const char *s1, const char *s2) {
@@ -200,11 +204,14 @@ char *eacsl_builtin_strcat(char *dest, const char *src) {
   }
   validate_overlapping_spaces
     ((uintptr_t)src, src_sz + 1, (uintptr_t)dest, dest_sz + 1, "strcat");
-  return strcat(dest, src);
+  char * res = strcat(dest, src);
+  eacsl_initialize(&dest[dest_sz], src_sz + 1);
+  return res;
 }
 
 char *eacsl_builtin_strncat(char *dest, const char *src, size_t n) {
-  validate_allocated_string((char*)src, n, "strncat", "source string ");
+  long src_sz =
+    validate_allocated_string((char*)src, n, "strncat", "source string ");
   long dest_sz =
     validate_writeable_string((char*)dest, -1, "strcat", "destination string ");
   size_t avail_sz = eacsl_block_length(dest) - eacsl_offset(dest);
@@ -215,7 +222,9 @@ char *eacsl_builtin_strncat(char *dest, const char *src, size_t n) {
   }
   validate_overlapping_spaces
     ((uintptr_t)src, n, (uintptr_t)dest, dest_sz, "strcat");
-  return strncat(dest, src, n);
+  char * res = strncat(dest, src, n);
+  eacsl_initialize(&dest[dest_sz], src_sz + 1);
+  return res;
 }
 /* }}} */
 
@@ -227,12 +236,16 @@ void *eacsl_builtin_memcpy(void *dest, const void *src, size_t n) {
   validate_allocated_space((void*)src, n, "memcpy", "source space ");
   validate_writeable_space((void*)dest, n, "memcpy", "destination space ");
   validate_overlapping_spaces((uintptr_t)src, n, (uintptr_t)dest, n, "memcpy");
-  return memcpy(dest, src, n);
+  void * res = memcpy(dest, src, n);
+  eacsl_initialize(dest, n);
+  return res;
 }
 
 void *eacsl_builtin_memset(void *s, int c, size_t n) {
   validate_writeable_space((void*)s, n, "memset", "space ");
-  return memset(s, c, n);
+  void * res = memset(s, c, n);
+  eacsl_initialize(s, n);
+  return res;
 }
 
 int eacsl_builtin_memcmp(const void *s1, const void *s2, size_t n) {
@@ -245,7 +258,9 @@ int eacsl_builtin_memcmp(const void *s1, const void *s2, size_t n) {
 void *eacsl_builtin_memmove(void *dest, const void *src, size_t n) {
   validate_allocated_space((void*)src, n, "memcmp", "source space ");
   validate_writeable_space((void*)dest, n, "memcmp", "destination space ");
-  return memmove(dest, src, n);
+  void * res = memmove(dest, src, n);
+  eacsl_initialize(dest, n);
+  return res;
 }
 
 /* }}} */
