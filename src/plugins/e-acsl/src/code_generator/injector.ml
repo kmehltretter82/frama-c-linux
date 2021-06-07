@@ -88,7 +88,7 @@ let rec inject_in_init env kf_opt vi off = function
     in
     CompoundInit(typ, List.rev l), env
 
-let inject_in_local_init loc env kf vi = function
+let inject_in_local_init ~loc ~stmt env kf vi = function
   | ConsInit (fvi, sz :: _, _) as init
     when Functions.Libc.is_vla_alloc_name fvi.vname ->
     (* add a store statement when creating a variable length array *)
@@ -99,6 +99,13 @@ let inject_in_local_init loc env kf vi = function
   | ConsInit (caller, args, kind) ->
     let args, env = replace_literal_strings_in_args env (Some kf) args in
     let caller, args = rename_caller ~loc caller args in
+    let _, env =
+      if Libc.is_writing_memory caller then begin
+        let result = Var vi, NoOffset in
+        Libc.update_memory_model ~loc ~stmt env kf ~result caller args
+      end else
+        None, env
+    in
     ConsInit(caller, args, kind), env
 
   | AssignInit init ->
@@ -153,6 +160,14 @@ let inject_in_instr env kf stmt = function
         Cil.evar fvi, args
       | _ -> caller, args
     in
+    (* if this is a call to a libc function that writes into a memory block then
+       manually update the memory model *)
+    let result, env =
+      match caller.enode with
+      | Lval (Var cvi, _) when Libc.is_writing_memory cvi ->
+        Libc.update_memory_model ~loc ~stmt env kf ?result cvi args
+      | _ -> result, env
+    in
     (* add statement tracking initialization of return values *)
     let env =
       match result with
@@ -177,7 +192,7 @@ let inject_in_instr env kf stmt = function
   | Local_init(vi, linit, loc) ->
     let lv = Var vi, NoOffset in
     let env = add_initializer loc ~vi lv ~post:true stmt env kf in
-    let linit, env = inject_in_local_init loc env kf vi linit in
+    let linit, env = inject_in_local_init ~loc ~stmt env kf vi linit in
     Local_init(vi, linit, loc), env
 
   (* nothing to do: *)
