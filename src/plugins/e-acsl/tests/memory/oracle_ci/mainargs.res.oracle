@@ -14,22 +14,24 @@
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] tests/memory/mainargs.c:12: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status invalid.
 [eva:alarm] tests/memory/mainargs.c:12: Warning: assertion got status unknown.
 [eva:alarm] tests/memory/mainargs.c:13: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] tests/memory/mainargs.c:13: Warning: assertion got status unknown.
 [eva:alarm] tests/memory/mainargs.c:15: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status invalid.
 [eva:alarm] tests/memory/mainargs.c:15: Warning: 
   out of bounds read. assert \valid_read(argv + argc);
+[eva:alarm] tests/memory/mainargs.c:15: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] tests/memory/mainargs.c:15: Warning: assertion got status unknown.
 [eva:alarm] tests/memory/mainargs.c:16: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status invalid.
 [eva:alarm] tests/memory/mainargs.c:16: Warning: 
   out of bounds read. assert \valid_read(argv + argc);
 [eva:alarm] tests/memory/mainargs.c:16: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status invalid.
 [eva:alarm] tests/memory/mainargs.c:16: Warning: assertion got status unknown.
 [eva:alarm] tests/memory/mainargs.c:18: Warning: 
   function __gen_e_acsl_strlen: precondition 'valid_string_s' got status unknown.
@@ -38,8 +40,8 @@
 [eva:alarm] FRAMAC_SHARE/libc/string.h:130: Warning: 
   function __gen_e_acsl_strlen: postcondition 'acsl_c_equiv' got status unknown.
 [eva:alarm] tests/memory/mainargs.c:19: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status invalid.
 [eva:alarm] tests/memory/mainargs.c:19: Warning: assertion got status unknown.
 [eva:alarm] tests/memory/mainargs.c:20: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status invalid.
 [eva:alarm] tests/memory/mainargs.c:20: Warning: assertion got status unknown.

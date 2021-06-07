@@ -494,14 +494,16 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
         (* TODO: what if the type of the parameter is smaller than the infered
            type of the argument? For now, it is silently ignored (both
            statically and at runtime)... *)
-        List.iter (fun arg -> ignore (type_term ~use_gmp_opt:true arg)) args;
         (* TODO: recursive call in arguments of function call *)
         match li.l_body with
         | LBpred _ ->
+          List.iter (fun arg -> ignore (type_term ~use_gmp_opt:true arg)) args;
+
           (* possible to have an [LBpred] here because we transformed
              [Papp] into [Tapp] *)
           dup c_int
         | LBterm _ ->
+          List.iter (fun arg -> ignore (type_term ~use_gmp_opt:true arg)) args;
           begin match li.l_type with
             | None ->
               assert false
@@ -511,7 +513,26 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
               dup ty
           end
         | LBnone ->
-          Error.not_yet "logic functions with no definition nor reads clause"
+          (match args with
+           | [ t1; t2; lambda ] ->
+             let anonymous =
+               Logic_const.term (TBinOp(PlusA, t2, Cil.lone ())) Linteger
+             in
+             let ty_bound = Interval.infer anonymous in
+             let ty_bound =
+               ty_of_interv (Interval.join ty_bound (Interval.infer t1))
+             in
+             ignore
+               (type_term
+                  ~use_gmp_opt:true ~arith_operand:true ~ctx:ty_bound t1);
+             ignore
+               (type_term
+                  ~use_gmp_opt:true ~arith_operand:true ~ctx:ty_bound t2);
+             let ty = ty_of_interv (Interval.infer t) in
+             ignore (type_term ~use_gmp_opt:true ?ctx lambda);
+             dup ty
+           | _ -> Options.fatal "extended quantifier %a is not well formed"
+                    Printer.pp_logic_var li.l_var_info)
         | LBreads _ ->
           Error.not_yet "logic functions performing read accesses"
         | LBinductive _ ->
@@ -536,7 +557,8 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
       type_letin li li_t;
       ignore (type_term ~use_gmp_opt:true li_t);
       dup (type_term ~use_gmp_opt:true ?ctx t).ty
-
+    | Tlambda ([ _ ],lt) ->
+      dup (type_term ~use_gmp_opt:true ?ctx lt).ty;
     | Tlambda (_,_) -> Error.not_yet "lambda"
     | TDataCons (_,_) -> Error.not_yet "datacons"
     | TUpdate (_,_,_) -> Error.not_yet "update"

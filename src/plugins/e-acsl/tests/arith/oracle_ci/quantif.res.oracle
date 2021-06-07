@@ -70,30 +70,22 @@
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] tests/arith/quantif.i:21: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status invalid.
 [eva:alarm] tests/arith/quantif.i:21: Warning: assertion got status unknown.
-[eva:alarm] tests/arith/quantif.i:30: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] tests/arith/quantif.i:30: Warning: assertion got status unknown.
-[eva:alarm] tests/arith/quantif.i:36: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] tests/arith/quantif.i:37: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] tests/arith/quantif.i:38: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] tests/arith/quantif.i:39: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status invalid.
 [eva:alarm] tests/arith/quantif.i:46: Warning: assertion got status unknown.
 [eva:alarm] tests/arith/quantif.i:54: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status invalid.
 [eva:alarm] tests/arith/quantif.i:54: Warning: 
   assertion 'forall_multiple_binders_2' got status unknown.
 [eva:alarm] tests/arith/quantif.i:57: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status invalid.
 [eva:alarm] tests/arith/quantif.i:57: Warning: 
   assertion 'forall_multiple_binders_3' got status unknown.
 [eva:alarm] tests/arith/quantif.i:63: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status invalid.
 [eva:alarm] tests/arith/quantif.i:63: Warning: 
   assertion 'forall_unordered_binders' got status unknown.
 [eva:alarm] tests/arith/quantif.i:69: Warning: 

@@ -91,7 +91,6 @@ int main(void)
   /*@ assert \initialized(&v1[2]); */ ;
   __e_acsl_full_init((void *)(& v2));
   v2 = new_inversed(3,v1);
-  /*@ assert Eva: initialization: \initialized(v2 + 2); */
   LAST = *(v2 + 2);
   {
     int __gen_e_acsl_initialized_2;

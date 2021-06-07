@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 open Cil_types
+exception Error_Bottom
 
 (* Implements Figure 3 of J. Signoles' JFLA'15 paper "Rester statique pour
    devenir plus rapide, plus précis et plus mince".
@@ -230,6 +231,34 @@ let rec interv_of_typ ty = match Cil.unrollType ty with
     Nan
   | TNamed _ ->
     assert false
+
+(* Compute the interval of the extended quantifier \sum, \product and \numof.
+   [lbd_ival] is the interval of the lambda term, [k_ival] is the interval of the
+   quantifier and [name]  is the identifier of the extended quantifier (\sum,
+   \product or \numof). The returned ival is the interval of the extended
+   quantifier *)
+let interv_of_extended_quantifier lbd_ival k_ival name =
+  match lbd_ival, k_ival, name.lv_name with
+  | Ival lbd_Ival, Ival k_Ival, "\\sum" ->
+    (try
+       let min_lambda, max_lambda = Ival.min_and_max lbd_Ival in
+       let min_k, max_k = Ival.min_and_max k_Ival in
+       let compute_bound bound_lambda = (match bound_lambda, min_k, max_k with
+           | Some l1,  Some k1, Some k2 ->
+             Some(Z.mul l1 (Z.max (Z.sub k2 k1) Z.zero))
+           | _, None, Some _ -> Some Z.zero
+           | Some l1, _, None when (Z.compare l1 Z.zero) = 0 -> Some Z.zero
+           | None, Some k1, Some k2 when (Z.compare k2 k1) = 0 -> Some Z.zero
+           | Some _, _, None | None, _, _ -> None)
+       in
+       Ival
+         (Ival.inject_range (compute_bound min_lambda) (compute_bound max_lambda))
+     with Error_Bottom ->
+       Ival Ival.bottom)
+  | _, _, "\\product" ->  Error.not_yet "product"
+  | _, _, "\\numof" ->  Error.not_yet "numof"
+  | _, _, _ -> Options.fatal  "%a is not a valid extended quantifier"
+                 Printer.pp_logic_var name
 
 let interv_of_logic_typ = function
   | Ctype ty -> interv_of_typ ty
@@ -512,7 +541,7 @@ let rec infer t =
   | Tnull  -> singleton_of_int 0
   | TLogic_coerce (_, t) -> infer t
 
-  | Tapp (li, _, _args) ->
+  | Tapp (li, _, args) ->
     (match li.l_body with
      | LBpred _ ->
        Ival Ival.zero_or_one
@@ -530,6 +559,18 @@ let rec infer t =
            fixpoint i
        in
        fixpoint bottom
+     | LBnone when li.l_var_info.lv_name="\\sum" ->
+       (match args with
+        | [ t1; t2; {term_node = Tlambda([ k ], _)} as lambda ] ->
+          let i_inf = infer t1 in
+          let i_sup = infer t2 in
+          let k_ival = join i_inf i_sup in
+          Env.add k k_ival;
+          let lambda_ival = infer lambda in
+          interv_of_extended_quantifier
+            lambda_ival k_ival li.l_var_info
+        | _ -> Options.fatal "unexpected input for an extended quantifier %a"
+                 Printer.pp_logic_var li.l_var_info)
      | LBnone
      | LBreads _ ->
        (match li.l_type with
@@ -559,13 +600,15 @@ let rec infer t =
   | TConst (LReal lr) ->
     if lr.r_lower = lr.r_upper then Float(FDouble, Some lr.r_nearest)
     else Rational
+  | Tlambda ([ _ ],lt) ->
+    infer lt
+  | Tlambda (_,_)
   | TConst (LStr _ | LWStr _)
   | TBinOp (PlusPI,_,_)
   | TBinOp (IndexPI,_,_)
   | TBinOp (MinusPI,_,_)
   | TAddrOf _
   | TStartOf _
-  | Tlambda (_,_)
   | TDataCons (_,_)
   | Tbase_addr (_,_)
   | TUpdate (_,_,_)
