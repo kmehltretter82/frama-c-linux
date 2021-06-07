@@ -183,10 +183,29 @@ let normalize_terminates p =
   L.preproc_annot L.labels_fct_pre @@
   Logic_const.pat (p.ip_content.tp_statement, BuiltinLabel Pre)
 
+let wp_populate_terminates =
+  Emitter.create
+    "Populate terminates"
+    [Emitter.Property_status]
+    ~correctness:[] (* TBC *)
+    ~tuning:[] (* TBC *)
+
 let get_terminates kf =
-  Option.map
-    (fun p -> WpPropId.mk_terminates_id kf Kglobal p, normalize_terminates p)
-    (Annotations.terminates kf)
+  match Annotations.terminates kf with
+  | None
+    when Kernel_function.is_definition kf &&
+         Wp_parameters.TerminatesDefinitions.get () ->
+      let p = Logic_const.new_predicate @@ Logic_const.ptrue in
+      Wp_parameters.warning
+        ~source:(fst @@ Kernel_function.get_location kf) ~once:true
+        "Missing terminates clause for %a, populates 'terminates \\true'"
+        Kernel_function.pretty kf ;
+      Annotations.add_terminates wp_populate_terminates kf p ;
+      Some (WpPropId.mk_terminates_id kf Kglobal p, normalize_terminates p)
+  | None ->
+      None
+  | Some p ->
+      Some (WpPropId.mk_terminates_id kf Kglobal p, normalize_terminates p)
 
 let get_terminates_call kf =
   match Annotations.terminates kf with
@@ -472,9 +491,9 @@ module LoopContract = WpContext.StaticGenerator(CodeKey)
                   WpStrategy.mk_variant_properties kf stmt ca term in
                 let intro_terminates (pid, v) =
                   pid,
-                  match Annotations.terminates kf with
-                  | Some t when Wp_parameters.TerminatesVariantHyp.get () ->
-                      Logic_const.pimplies (normalize_terminates t, v)
+                  match get_terminates kf with
+                  | Some (_,t) when Wp_parameters.TerminatesVariantHyp.get () ->
+                      Logic_const.pimplies (t, v)
                   | _ -> v
                 in
                 { l with loop_terminates = None ;

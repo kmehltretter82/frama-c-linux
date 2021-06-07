@@ -25,3 +25,7 @@ void call_declaration(void){
 void call_definition(void){
   definition();
 }
+
+void no_spec_generates_goal(void){
+  for(;;);
+}

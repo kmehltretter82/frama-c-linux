@@ -2,19 +2,26 @@
 [kernel] Parsing tests/wp_acsl/terminates_call_options.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
+[wp] tests/wp_acsl/terminates_call_options.i:17: Warning: 
+  Missing terminates clause for definition, populates 'terminates \true'
+[wp] tests/wp_acsl/terminates_call_options.i:29: Warning: 
+  Missing terminates clause for no_spec_generates_goal, populates 'terminates \true'
 [wp] tests/wp_acsl/terminates_call_options.i:21: Warning: 
   Missing terminates clause on call to declaration, defaults to \true
-[wp] tests/wp_acsl/terminates_call_options.i:26: Warning: 
-  Missing terminates clause on call to definition, defaults to \true
-[wp] 3 goals scheduled
+[wp] tests/wp_acsl/terminates_call_options.i:30: Warning: 
+  Missing assigns clause (assigns 'everything' instead)
+[wp] 4 goals scheduled
 [wp] [Qed] Goal typed_definition_assigns : Valid
 [wp] [Qed] Goal typed_call_declaration_terminates : Valid
 [wp] [Qed] Goal typed_call_definition_terminates : Valid
-[wp] Proved goals:    3 / 3
-  Qed:             3
+[wp] [Alt-Ergo] Goal typed_no_spec_generates_goal_terminates : Unsuccess
+[wp] Proved goals:    3 / 4
+  Qed:             3 
+  Alt-Ergo:        0  (unsuccess: 1)
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   definition                1        -        1       100%
   call_declaration          1        -        1       100%
   call_definition           1        -        1       100%
+  no_spec_generates_goal    -        -        1       0.0%
 ------------------------------------------------------------

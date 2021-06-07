@@ -113,7 +113,7 @@ let selected_clause ~prop name getter kf =
 let selected_terminates ~prop kf =
   match Annotations.terminates kf with
   | None ->
-      false
+      Wp_parameters.TerminatesDefinitions.get ()
   | Some ip ->
       let tk_name = "@terminates" in
       let tp_names = WpPropId.user_pred_names ip.Cil_types.ip_content in
@@ -328,13 +328,12 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
     (fun p -> if WpPropId.filter_status p then WpAnnot.set_unreachable p)
     infos.doomed ;
   (* Trivial terminates *)
-  begin match Annotations.terminates kf with
-    | Some t
+  begin match CfgAnnot.get_terminates kf with
+    | Some (id, _t)
       when selected_terminates ~prop kf
         && infos.calls = Fset.empty
         && infos.no_variant_loops = Sset.empty ->
-        WpAnnot.set_trivially_terminates @@
-        WpPropId.mk_terminates_id kf Kglobal t
+        WpAnnot.set_trivially_terminates id
     | _ -> ()
   end ;
   (* Collected Infos *)

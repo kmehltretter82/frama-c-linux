@@ -2,10 +2,14 @@
 [kernel] Parsing tests/wp_acsl/terminates_call_options.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
+[wp] tests/wp_acsl/terminates_call_options.i:17: Warning: 
+  Missing terminates clause for definition, populates 'terminates \true'
+[wp] tests/wp_acsl/terminates_call_options.i:29: Warning: 
+  Missing terminates clause for no_spec_generates_goal, populates 'terminates \true'
 [wp] tests/wp_acsl/terminates_call_options.i:21: Warning: 
   Missing terminates clause on call to declaration, defaults to \true
-[wp] tests/wp_acsl/terminates_call_options.i:26: Warning: 
-  Missing terminates clause on call to definition, defaults to \true
+[wp] tests/wp_acsl/terminates_call_options.i:30: Warning: 
+  Missing assigns clause (assigns 'everything' instead)
 ------------------------------------------------------------
   Function call_declaration
 ------------------------------------------------------------
@@ -28,5 +32,14 @@ Prove: true.
 
 Goal Assigns nothing in 'definition':
 Prove: true.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function no_spec_generates_goal
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'no_spec_generates_goal':
+Effect at line 30
+Prove: false.
 
 ------------------------------------------------------------
