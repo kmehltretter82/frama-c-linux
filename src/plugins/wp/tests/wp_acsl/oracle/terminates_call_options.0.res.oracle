@@ -10,12 +10,7 @@
   Function call_declaration
 ------------------------------------------------------------
 
-Goal Termination-condition (file tests/wp_acsl/terminates_call_options.i, line 19) in 'call_declaration' (1/2):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Termination-condition (file tests/wp_acsl/terminates_call_options.i, line 19) in 'call_declaration' (2/2):
+Goal Termination-condition (file tests/wp_acsl/terminates_call_options.i, line 19) in 'call_declaration':
 Call Effect at line 21
 Prove: false.
 
@@ -24,12 +19,7 @@ Prove: false.
   Function call_definition
 ------------------------------------------------------------
 
-Goal Termination-condition (file tests/wp_acsl/terminates_call_options.i, line 24) in 'call_definition' (1/2):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Termination-condition (file tests/wp_acsl/terminates_call_options.i, line 24) in 'call_definition' (2/2):
+Goal Termination-condition (file tests/wp_acsl/terminates_call_options.i, line 24) in 'call_definition':
 Call Effect at line 26
 Prove: false.
 

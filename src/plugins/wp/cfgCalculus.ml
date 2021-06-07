@@ -400,12 +400,6 @@ struct
         env.wk <- if exits then do_exit env ~formals b w else w ;
         wp env cfg.entry_point
 
-  let do_terminates env w =
-    match env.terminates with
-    | Some p when is_default_bhv env.mode && is_selected ~goal:true env p ->
-        prove_property env (fst p, Logic_const.ptrue) w
-    | _ -> w
-
   (* Putting everything together *)
   let compute ~mode ~props =
     let kf = mode.kf in
@@ -438,7 +432,6 @@ struct
       do_preconditions env ~formals bhv @@
       do_complete_disjoint env @@
       do_funbehavior env ~formals ~exits bhv @@
-      do_terminates env @@
       W.empty
     end
 

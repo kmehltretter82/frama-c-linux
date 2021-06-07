@@ -6,11 +6,6 @@
   Function f1
 ------------------------------------------------------------
 
-Goal Termination-condition (file tests/wp_acsl/terminates_variant_option.i, line 34) in 'f1':
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Preservation of Invariant (file tests/wp_acsl/terminates_variant_option.i, line 37):
 Assume {
   Type: is_sint32(c1_0) /\ is_sint32(cpt_0) /\ is_sint32(cpt_0 - 1).
@@ -64,11 +59,6 @@ Prove: 0 <= cpt_0.
   Function fails_decreases
 ------------------------------------------------------------
 
-Goal Termination-condition (file tests/wp_acsl/terminates_variant_option.i, line 23) in 'fails_decreases':
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Loop assigns (file tests/wp_acsl/terminates_variant_option.i, line 26):
 Prove: true.
 
@@ -93,11 +83,6 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function fails_positive
-------------------------------------------------------------
-
-Goal Termination-condition (file tests/wp_acsl/terminates_variant_option.i, line 13) in 'fails_positive':
-Prove: true.
-
 ------------------------------------------------------------
 
 Goal Preservation of Invariant (file tests/wp_acsl/terminates_variant_option.i, line 15):

@@ -6,12 +6,7 @@
   Function base_call
 ------------------------------------------------------------
 
-Goal Termination-condition (file tests/wp_acsl/terminates_formulae.i, line 22) in 'base_call' (1/2):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Termination-condition (file tests/wp_acsl/terminates_formulae.i, line 22) in 'base_call' (2/2):
+Goal Termination-condition (file tests/wp_acsl/terminates_formulae.i, line 22) in 'base_call':
 Call Effect at line 24
 Assume { (* Heap *) Type: is_sint32(a). (* Goal *) When: P_Q. }
 Prove: P_P(a).
@@ -21,12 +16,7 @@ Prove: P_P(a).
   Function call_change
 ------------------------------------------------------------
 
-Goal Termination-condition (file tests/wp_acsl/terminates_formulae.i, line 32) in 'call_change' (1/2):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Termination-condition (file tests/wp_acsl/terminates_formulae.i, line 32) in 'call_change' (2/2):
+Goal Termination-condition (file tests/wp_acsl/terminates_formulae.i, line 32) in 'call_change':
 Call Effect at line 35
 Assume { (* Heap *) Type: is_sint32(a). (* Goal *) When: P_P(a). }
 Prove: P_P(0).
@@ -36,12 +26,7 @@ Prove: P_P(0).
   Function call_param_change
 ------------------------------------------------------------
 
-Goal Termination-condition (file tests/wp_acsl/terminates_formulae.i, line 48) in 'call_param_change' (1/2):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Termination-condition (file tests/wp_acsl/terminates_formulae.i, line 48) in 'call_param_change' (2/2):
+Goal Termination-condition (file tests/wp_acsl/terminates_formulae.i, line 48) in 'call_param_change':
 Call Effect at line 51
 Let x = Mint_0[p].
 Assume {
@@ -58,12 +43,7 @@ Prove: false.
   Function call_param_same
 ------------------------------------------------------------
 
-Goal Termination-condition (file tests/wp_acsl/terminates_formulae.i, line 43) in 'call_param_same' (1/2):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Termination-condition (file tests/wp_acsl/terminates_formulae.i, line 43) in 'call_param_same' (2/2):
+Goal Termination-condition (file tests/wp_acsl/terminates_formulae.i, line 43) in 'call_param_same':
 Call Effect at line 45
 Prove: true.
 
@@ -72,12 +52,7 @@ Prove: true.
   Function call_same
 ------------------------------------------------------------
 
-Goal Termination-condition (file tests/wp_acsl/terminates_formulae.i, line 27) in 'call_same' (1/2):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Termination-condition (file tests/wp_acsl/terminates_formulae.i, line 27) in 'call_same' (2/2):
+Goal Termination-condition (file tests/wp_acsl/terminates_formulae.i, line 27) in 'call_same':
 Call Effect at line 29
 Prove: true.
 
@@ -86,12 +61,7 @@ Prove: true.
   Function no_variant
 ------------------------------------------------------------
 
-Goal Termination-condition (file tests/wp_acsl/terminates_formulae.i, line 62) in 'no_variant' (1/2):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Termination-condition (file tests/wp_acsl/terminates_formulae.i, line 62) in 'no_variant' (2/2):
+Goal Termination-condition (file tests/wp_acsl/terminates_formulae.i, line 62) in 'no_variant':
 Effect at line 65
 Prove: !P_Q.
 
@@ -103,11 +73,6 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function variant
-------------------------------------------------------------
-
-Goal Termination-condition (file tests/wp_acsl/terminates_formulae.i, line 54) in 'variant':
-Prove: true.
-
 ------------------------------------------------------------
 
 Goal Loop assigns (file tests/wp_acsl/terminates_formulae.i, line 56):

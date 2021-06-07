@@ -22,6 +22,7 @@
 
 module Cfg = Interpreted_automata
 module Fset = Kernel_function.Set
+module Sset = Cil_datatype.Stmt.Set
 module Shash = Cil_datatype.Stmt.Hashtbl
 
 (* -------------------------------------------------------------------------- *)
@@ -37,6 +38,7 @@ type t = {
   mutable annots : bool; (* has goals to prove *)
   mutable doomed : WpPropId.prop_id Bag.t;
   mutable calls : Kernel_function.Set.t;
+  mutable no_variant_loops : Sset.t;
 }
 
 (* -------------------------------------------------------------------------- *)
@@ -166,6 +168,22 @@ let collect_calls ~bhv kf stmt =
   | _ -> Fset.empty
 
 (* -------------------------------------------------------------------------- *)
+(* --- No variant loops                                                   --- *)
+(* -------------------------------------------------------------------------- *)
+
+let collect_loops_no_variant stmt =
+  let open Cil_types in
+  let fold_no_variant _ = function
+    | { annot_content = AVariant _ } -> (&&) false
+    | _ -> (&&) true
+  in
+  match stmt.skind with
+  | Loop _ when Annotations.fold_code_annot fold_no_variant stmt true ->
+      Sset.singleton stmt
+  | _ ->
+      Sset.empty
+
+(* -------------------------------------------------------------------------- *)
 (* --- Memoization Key                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -247,6 +265,7 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
     annots = false ;
     doomed = Bag.empty ;
     calls = Fset.empty ;
+    no_variant_loops = Sset.empty
   } in
   let behaviors = Annotations.behaviors kf in
   (* Inits *)
@@ -264,6 +283,7 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
       Shash.iter
         (fun stmt (src,_) ->
            let fs = collect_calls ~bhv kf stmt in
+           let nv_loops = collect_loops_no_variant stmt in
            let dead = unreachable infos src in
            let ca = CfgAnnot.get_code_assertions kf stmt in
            let ca_pids = List.map fst ca.code_verified in
@@ -284,6 +304,8 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
                     Fset.exists (selected_call ~bhv ~prop) fs )
                then infos.annots <- true ;
                infos.calls <- Fset.union fs infos.calls ;
+               infos.no_variant_loops <-
+                 Sset.union nv_loops infos.no_variant_loops ;
              end
         ) cfg.stmt_table ;
       (* Dead Post Conditions *)
@@ -305,6 +327,16 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
   Bag.iter
     (fun p -> if WpPropId.filter_status p then WpAnnot.set_unreachable p)
     infos.doomed ;
+  (* Trivial terminates *)
+  begin match Annotations.terminates kf with
+    | Some t
+      when selected_terminates ~prop kf
+        && infos.calls = Fset.empty
+        && infos.no_variant_loops = Sset.empty ->
+        WpAnnot.set_trivially_terminates @@
+        WpPropId.mk_terminates_id kf Kglobal t
+    | _ -> ()
+  end ;
   (* Collected Infos *)
   infos
 
