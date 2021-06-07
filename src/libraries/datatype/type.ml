@@ -65,7 +65,6 @@ type concrete_repr =
   { mutable name: string;
     digest: Digest.t;
     structural_descr: Structural_descr.t;
-    mutable abstract: bool;
     mutable pp_ml_name: precedence -> Format.formatter -> unit }
 
 (* phantom type *)
@@ -99,7 +98,6 @@ let dummy =
   { name = "";
     digest = "";
     structural_descr = Structural_descr.t_unknown;
-    abstract = false;
     pp_ml_name = fun _ _ -> assert false }
 
 (* ****************************************************************************)
@@ -157,7 +155,6 @@ let register ?(closure=false) ~name ~ml_name structural_descr reprs =
       { name = name;
         digest = digest;
         structural_descr = structural_descr;
-        abstract = false;
         pp_ml_name = pp_ml_name }
     in
     let full_ty = { ty = ty; reprs = List.map Obj.repr reprs } in

@@ -29,7 +29,7 @@ type 'a category =
     ty: 'a Type.t;
     fold: 'b. ('a -> 'b -> 'b) -> 'b -> 'b;
     mem: 'a -> bool;
-    mutable states: State.t list }
+    states: State.t list }
 
 type 'a t = 'a category
 

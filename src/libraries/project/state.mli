@@ -137,11 +137,11 @@ type state_on_disk =
 
 (** @since Carbon-20101201 *)
 type private_ops = private
-  { mutable descr: Structural_descr.pack;
+  { descr: Structural_descr.pack;
     create: project -> unit;
     remove: project -> unit;
-    mutable clear: project -> unit;
-    mutable clear_some_projects: (project -> bool) -> project -> bool;
+    clear: project -> unit;
+    clear_some_projects: (project -> bool) -> project -> bool;
     copy: project -> project -> unit;
     commit: project -> unit;
     update: project -> unit;

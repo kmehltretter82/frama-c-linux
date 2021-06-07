@@ -159,7 +159,7 @@ val command :
 type 'a shared
 (** Shareable tasks. *)
 
-val shared : descr:string -> retry:bool -> (unit -> 'a task) -> 'a shared
+val shared : retry:bool -> (unit -> 'a task) -> 'a shared
 (** Build a shareable task.  The build function is called whenever a new
     instance is required but no shared instance task is actually running.
     Interrupted tasks (by Cancel or Timeout) are retried for further
