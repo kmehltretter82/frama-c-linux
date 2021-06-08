@@ -67,6 +67,9 @@ let is_writing_memory caller =
 
   | _ -> false
 
+let () =
+  Prepare_ast.is_libc_writing_memory_ref := is_writing_memory
+
 (** [get_result_var ~loc ~name kf ty env result_opt] returns an lvalue
     representing the result of the call to the libc function. If [result_opt]
     is [Some var] then this lvalue is directly returned, but if the return value

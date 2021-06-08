@@ -25,6 +25,13 @@ open Cil_datatype
 
 let dkey = Options.dkey_prepare
 
+(**************************************************************************)
+(********************** Forward references ********************************)
+(**************************************************************************)
+
+let is_libc_writing_memory_ref: (varinfo -> bool) ref =
+  Extlib.mk_fun "is_libc_writing_memory_ref"
+
 (* ********************************************************************** *)
 (* Environment *)
 (* ********************************************************************** *)
@@ -414,7 +421,9 @@ let prepare_global (globals, new_defs) = function
       let new_vi = Dup_functions.generate_vi vi in
       if Kernel_function.is_definition kf then
         prepare_fundec kf
-      else
+      else if not (!is_libc_writing_memory_ref vi) then
+        (* Only display the warning for functions where E-ACSL does not
+           explicitely update its memory model. *)
         (* TODO: this warning could be more precise if emitted during code
            generation; see also E-ACSL issue #85 about partial verdicts *)
         Options.warning
