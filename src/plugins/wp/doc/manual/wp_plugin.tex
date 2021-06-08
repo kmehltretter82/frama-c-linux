@@ -977,6 +977,9 @@ weakest precondition calculus.
   it is generally not necessary and it can generates a large number of
   verifications for structures with many (nested) fields. \texttt{-1} enables
   full unfolding.
+\item[\tt -wp-(no)-frama-c-stdlib-terminate] Frama-C libc functions without
+  \texttt{terminates} specification are considered to terminate when called
+  (default is: \texttt{no}).
 \item[\tt -wp-(no)-declarations-terminate] Undefined external functions without
   \texttt{terminates} specification are considered to terminate when called
   (default is: \texttt{no}).
