@@ -2,7 +2,9 @@
 [kernel] Parsing tests/wp_acsl/terminates_variant_option.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
-[wp] 14 goals scheduled
+[wp] tests/wp_acsl/terminates_variant_option.i:52: Warning: 
+  Loop variant is always trivially verified (terminates \false)
+[wp] 17 goals scheduled
 [wp] [Alt-Ergo] Goal typed_fails_positive_loop_invariant_preserved : Valid
 [wp] [Qed] Goal typed_fails_positive_loop_invariant_established : Valid
 [wp] [Qed] Goal typed_fails_positive_loop_assigns_part1 : Valid
@@ -17,12 +19,16 @@
 [wp] [Qed] Goal typed_f1_loop_assigns : Valid
 [wp] [Qed] Goal typed_f1_loop_variant_decrease : Valid
 [wp] [Alt-Ergo] Goal typed_f1_loop_variant_positive : Valid
-[wp] Proved goals:   14 / 14
-  Qed:            10 
+[wp] [Qed] Goal typed_trivial_variant_loop_assigns : Valid
+[wp] [Qed] Goal typed_trivial_variant_loop_variant_decrease : Valid
+[wp] [Qed] Goal typed_trivial_variant_loop_variant_positive : Valid
+[wp] Proved goals:   17 / 17
+  Qed:            13 
   Alt-Ergo:        4
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   fails_positive            5        1        6       100%
   fails_decreases           2        1        3       100%
   f1                        3        2        5       100%
+  trivial_variant           3        -        3       100%
 ------------------------------------------------------------

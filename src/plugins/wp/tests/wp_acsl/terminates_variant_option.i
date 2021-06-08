@@ -45,3 +45,11 @@ void f1 (int c1, int c2) {
     }
   }
 }
+
+//@ terminates \false ;
+void trivial_variant(void){
+  /*@ loop assigns \nothing ;
+      loop variant -1 ;
+  */
+  while(1);
+}

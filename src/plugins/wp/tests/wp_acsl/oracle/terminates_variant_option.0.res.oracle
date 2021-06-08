@@ -137,3 +137,21 @@ Assume {
 Prove: 0 <= v.
 
 ------------------------------------------------------------
+------------------------------------------------------------
+  Function trivial_variant
+------------------------------------------------------------
+
+Goal Loop assigns nothing:
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file tests/wp_acsl/terminates_variant_option.i, line 54):
+Prove: false.
+
+------------------------------------------------------------
+
+Goal Positivity of Loop variant at loop (file tests/wp_acsl/terminates_variant_option.i, line 54):
+Prove: false.
+
+------------------------------------------------------------

@@ -490,6 +490,11 @@ module LoopContract = WpContext.StaticGenerator(CodeKey)
                   pid,
                   match get_terminates kf with
                   | Some (_,t) when Wp_parameters.TerminatesVariantHyp.get () ->
+                      if Logic_utils.is_same_predicate t Logic_const.pfalse then
+                        Wp_parameters.warning
+                          ~source:(fst term.term_loc) ~once:true
+                          "Loop variant is always trivially verified \
+                           (terminates \\false)" ;
                       Logic_const.pimplies (t, v)
                   | _ -> v
                 in
