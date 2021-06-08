@@ -207,7 +207,7 @@ let get_terminates kf =
   | Some p ->
       Some (WpPropId.mk_terminates_id kf Kglobal p, normalize_terminates p)
 
-let get_terminates_call kf =
+let get_terminates_hyp kf =
   let to_default option =
     if option then Logic_const.ptrue else Logic_const.pfalse in
   match Annotations.terminates kf with
@@ -307,7 +307,7 @@ module CallContract = WpContext.StaticGenerator(Kernel_function)
           | WritesAny -> WritesAny
           | Writes froms -> Writes (normalize_froms Normal froms)
         in
-        let terminates = get_terminates_call kf in
+        let terminates = get_terminates_hyp kf in
         {
           contract_cond = List.rev !wcond ;
           contract_hpre = List.rev !whpre ;
@@ -488,15 +488,15 @@ module LoopContract = WpContext.StaticGenerator(CodeKey)
                   WpStrategy.mk_variant_properties kf stmt ca term in
                 let intro_terminates (pid, v) =
                   pid,
-                  match get_terminates kf with
-                  | Some (_,t) when Wp_parameters.TerminatesVariantHyp.get () ->
-                      if Logic_utils.is_same_predicate t Logic_const.pfalse then
-                        Wp_parameters.warning
-                          ~source:(fst term.term_loc) ~once:true
-                          "Loop variant is always trivially verified \
-                           (terminates \\false)" ;
-                      Logic_const.pimplies (t, v)
-                  | _ -> v
+                  let t = snd @@ get_terminates_hyp kf in
+                  if Wp_parameters.TerminatesVariantHyp.get () then begin
+                    if Logic_utils.is_same_predicate t Logic_const.pfalse then
+                      Wp_parameters.warning
+                        ~source:(fst term.term_loc) ~once:true
+                        "Loop variant is always trivially verified \
+                         (terminates \\false)" ;
+                    Logic_const.pimplies (t, v)
+                  end else v
                 in
                 { l with loop_terminates = None ;
                          loop_preserved =

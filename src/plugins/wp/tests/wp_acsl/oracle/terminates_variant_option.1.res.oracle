@@ -4,6 +4,8 @@
 [wp] Warning: Missing RTE guards
 [wp] tests/wp_acsl/terminates_variant_option.i:52: Warning: 
   Loop variant is always trivially verified (terminates \false)
+[wp] tests/wp_acsl/terminates_variant_option.i:59: Warning: 
+  Loop variant is always trivially verified (terminates \false)
 ------------------------------------------------------------
   Function f1
 ------------------------------------------------------------
@@ -132,6 +134,24 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Positivity of Loop variant at loop (file tests/wp_acsl/terminates_variant_option.i, line 54):
+Prove: true.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function trivial_variant_default
+------------------------------------------------------------
+
+Goal Loop assigns nothing:
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file tests/wp_acsl/terminates_variant_option.i, line 61):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Positivity of Loop variant at loop (file tests/wp_acsl/terminates_variant_option.i, line 61):
 Prove: true.
 
 ------------------------------------------------------------

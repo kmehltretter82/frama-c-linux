@@ -155,3 +155,21 @@ Goal Positivity of Loop variant at loop (file tests/wp_acsl/terminates_variant_o
 Prove: false.
 
 ------------------------------------------------------------
+------------------------------------------------------------
+  Function trivial_variant_default
+------------------------------------------------------------
+
+Goal Loop assigns nothing:
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file tests/wp_acsl/terminates_variant_option.i, line 61):
+Prove: false.
+
+------------------------------------------------------------
+
+Goal Positivity of Loop variant at loop (file tests/wp_acsl/terminates_variant_option.i, line 61):
+Prove: false.
+
+------------------------------------------------------------

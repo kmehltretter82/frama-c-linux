@@ -53,3 +53,10 @@ void trivial_variant(void){
   */
   while(1);
 }
+
+void trivial_variant_default(void){
+  /*@ loop assigns \nothing ;
+      loop variant -1 ;
+  */
+  while(1);
+}
