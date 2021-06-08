@@ -1,6 +1,13 @@
 [kernel] Parsing tests/syntax/very_large_integers.c (with preprocessing)
-[kernel] tests/syntax/very_large_integers.c:16: Failure: 
-  integer constant too large in expression: (unsigned long long)999999999999999999 + 9999999999999999999
+[kernel] tests/syntax/very_large_integers.c:16: User Error: 
+  integer constant too large in expression (unsigned long long)999999999999999999 + 9999999999999999999
+[kernel] tests/syntax/very_large_integers.c:17: User Error: 
+  bitfield width is not a valid integer constant
+[kernel] tests/syntax/very_large_integers.c:51: Warning: 
+  ignoring invalid aligned attribute: __aligned__(9223372036854775808)
+[kernel] tests/syntax/very_large_integers.c:51: Warning: 
+  ignoring invalid aligned attribute: __aligned__((9223372036854775808)+
+                                                   (9223372036854775808) )
 [kernel] User Error: stopping on file "tests/syntax/very_large_integers.c" that has errors. Add
   '-kernel-msg-key pp' for preprocessing command.
 [kernel] Frama-C aborted: invalid user input.

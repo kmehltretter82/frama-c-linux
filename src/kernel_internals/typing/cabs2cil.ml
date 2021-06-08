@@ -1191,6 +1191,22 @@ end
 let constFoldType (t:typ) : typ =
   visitCilType constFoldTypeVisitor t
 
+let to_integer i =
+  match Integer.to_int_opt i with
+  | Some i -> i
+  | None ->
+    Kernel.error ~current:true "integer too large: %a"
+      (Integer.pretty ~hexa:true) i;
+    -1
+
+let constFoldToInteger e =
+  try Option.map Integer.to_int (Cil.constFoldToInt e)
+  with Z.Overflow ->
+    Kernel.error ~current:true
+      "integer constant too large in expression %a"
+      Cil_printer.pp_exp e;
+    None
+
 let get_temp_name ghost () =
   let undolist = ref [] in
   let data = CurrentLoc.get() in
@@ -3348,14 +3364,7 @@ let rec setOneInit this o preinit =
     let idx, (* Index in the current comp *)
         restoff (* Rest offset *) =
       match o with
-      | Index({enode = Const(CInt64(i,_,_))}, off) ->
-        begin
-          match Integer.to_int_opt i with
-          | Some i' -> i', off
-          | None -> Kernel.fatal ~current:true
-                      "integer too large: %a"
-                      (Integer.pretty ~hexa:true) i
-        end
+      | Index({enode = Const(CInt64(i,_,_))}, off) -> to_integer i, off
       | Field (f, off) ->
         (* Find the index of the field *)
         let rec loop (idx: int) = function
@@ -3434,15 +3443,7 @@ let rec collectInitializer
         match leno with
         | Some len -> begin
             match constFoldToInt len with
-            | Some ni when Integer.ge ni Integer.zero ->
-              begin
-                match Integer.to_int_opt ni with
-                | Some ni' -> ni', false
-                | None ->
-                  Kernel.fatal ~current:true
-                    "Array length %a overflows int, cannot use initializer."
-                    Cil_printer.pp_exp len
-              end
+            | Some ni when Integer.ge ni Integer.zero -> to_integer ni, false
             | _ ->
               Kernel.fatal ~current:true
                 "Array length %a is not a compile-time constant: \
@@ -5505,7 +5506,7 @@ and makeCompType ghost (isstruct: bool)
             match isIntegerConstant ghost w with
             | None ->
               Kernel.error ~source
-                "bitfield width is not an integer constant";
+                "bitfield width is not a valid integer constant";
               (* error  does not immediately stop execution.
                  Hence, we return a placeholder here.
               *)
@@ -5713,18 +5714,7 @@ and getIntConstExp ghost (aexp) : exp =
 
 and isIntegerConstant ghost (aexp) : int option =
   match doExp (ghost_local_env ghost) CMayConst aexp (AExp None) with
-  | (_, c, e, _) when isEmpty c -> begin
-      match Cil.constFoldToInt e with
-      | Some n ->
-        begin
-          match Integer.to_int_opt n with
-          | Some n' -> Some n'
-          | None -> Kernel.fatal ~current:true
-                      "integer constant too large in expression: %a"
-                      Cil_printer.pp_exp e
-        end
-      | _ -> None
-    end
+  | (_, c, e, _) when isEmpty c -> constFoldToInteger e
   | _ -> None
 
 (* Process an expression and in the process do some type checking,
@@ -8531,18 +8521,11 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
         if isNotEmpty doidxs || isNotEmpty doidxe then
           Kernel.fatal ~current:true "Range designators are not constants";
         let first, last =
-          match constFoldToInt idxs', constFoldToInt idxe' with
-          | Some s, Some e ->
-            begin
-              match Integer.to_int_opt s, Integer.to_int_opt e with
-              | Some s', Some e' -> s', e'
-              | _, _ ->
-                Kernel.fatal ~current:true
-                  "INDEX_RANGE initialization designator overflows"
-            end
+          match constFoldToInteger idxs', constFoldToInteger idxe' with
+          | Some s, Some e -> s, e
           | _ ->
             Kernel.fatal ~current:true
-              "INDEX_RANGE initialization designator is not a constant"
+              "INDEX_RANGE initialization designator is not a valid constant"
         in
         if first < 0 || first > last then
           Kernel.error ~once:true ~current:true
@@ -10095,17 +10078,8 @@ and doStatement local_env (s : Cabs.statement) : chunk =
       Kernel.error ~once:true ~current:true
         "Case statement with a non-constant";
     let il, ih =
-      match constFoldToInt el', constFoldToInt eh' with
-      | Some il, Some ih ->
-        begin
-          match Integer.to_int_opt il, Integer.to_int_opt ih with
-          | Some il', Some ih' -> il', ih'
-          | _, _ ->
-            Kernel.fatal ~current:true
-              "constant(s) in case range too large: %a ... %a"
-              (Integer.pretty ~hexa:false) il
-              (Integer.pretty ~hexa:false) ih
-        end
+      match constFoldToInteger el', constFoldToInteger eh' with
+      | Some il, Some ih -> il, ih
       | _ ->
         Kernel.fatal ~current:true
           "Cannot understand the constants in case range"
