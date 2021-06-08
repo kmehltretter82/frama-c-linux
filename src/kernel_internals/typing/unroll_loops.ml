@@ -50,15 +50,8 @@ let update_info global_find_init emitter info spec =
               (new Logic_utils.simplify_const_lval global_find_init) spec
           in
           let i = Logic_utils.constFoldTermToInt t in
-          match i with
-          | Some i ->
-            begin
-              match Integer.to_int_opt i with
-              | Some _ as unroll_number -> { info with unroll_number }
-              | None -> Kernel.abort ~current:true
-                          "count too large in unrolling directive: %a"
-                          (Integer.pretty ~hexa:false) i
-            end
+          match Option.bind i Integer.to_int_opt with
+          | Some _ as unroll_number -> { info with unroll_number }
           | None ->
             Kernel.warning ~once:true ~current:true
               "ignoring unrolling directive (not an understood constant \

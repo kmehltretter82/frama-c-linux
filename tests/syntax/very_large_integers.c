@@ -1,4 +1,5 @@
 /* run.config
+   PLUGIN: @EVA_PLUGINS@
    EXIT: 1
    STDOPT: #"-cpp-extra-args=-DBITFIELD"
    STDOPT: #"-cpp-extra-args=-DARRAY_DECL"
@@ -8,6 +9,7 @@
    STDOPT: #"-cpp-extra-args=-DRANGE_DESIGNATOR"
    STDOPT: #"-cpp-extra-args=-DATTRIBUTE_CONSTANT"
    STDOPT: #"-cpp-extra-args=-DEVA_UNROLL -eva"
+   EXIT: 0
    STDOPT: #"-cpp-extra-args=-DUNROLL_PRAGMA"
 */
 volatile int nondet;
