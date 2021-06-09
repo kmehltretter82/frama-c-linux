@@ -116,7 +116,7 @@ sig
   val overwrite : weak:bool -> t -> location -> t -> t
   val reinforce : (value -> value) ->  t -> location -> t
   val is_included : t -> t -> bool
-  val join : (size:size -> value -> value -> value) -> t -> t -> t
+  val join : t -> t -> t
   val widen : (size:size -> value -> value -> value) -> t -> t -> t
   val pretty : Format.formatter -> t -> unit
 end
@@ -151,6 +151,8 @@ struct
   and 'fieldmap memory_array = {
     array_value: 'fieldmap memory;
     array_cell_type: Cil_types.typ;
+    array_range: Int_val.t; (* range of known cells *)
+    array_padding: bit; (* unknown cells outside the previous range *)
   }
 
   (* Datatype prototype *)
@@ -169,11 +171,11 @@ struct
 
     let rec pretty fmt =
       let rec leading_indexes acc = function
-        | Array a -> leading_indexes (() :: acc) a.array_value
+        | Array a -> leading_indexes (a.array_range :: acc) a.array_value
         | (Raw _ | Scalar _ | Struct _ | Union _) as m -> List.rev acc, m
       in
-      let pretty_index fmt () =
-        Format.fprintf fmt "[..]"
+      let pretty_index fmt range =
+        Format.fprintf fmt "[%a]" Int_val.pretty range
       in
       let pretty_indexes fmt l =
         Pretty_utils.pp_list pretty_index fmt l
@@ -206,7 +208,7 @@ struct
         Format.fprintf fmt "{@;<1 2>%t@ }"
           (fun fmt -> pretty_field fmt u.union_field u.union_value)
       | Array a ->
-        let indexes, sub = leading_indexes [()] a.array_value in
+        let indexes, sub = leading_indexes [a.array_range] a.array_value in
         Format.fprintf fmt "%a = %a"
           pretty_indexes indexes
           pretty sub
@@ -226,7 +228,9 @@ struct
           Bit.hash u.union_padding)
       | Array a -> Hashtbl.hash (
           hash a.array_value,
-          Cil_datatype.Typ.hash a.array_cell_type)
+          Cil_datatype.Typ.hash a.array_cell_type,
+          Int_val.hash a.array_range,
+          Bit.hash a.array_padding)
 
     let rec equal m1 m2 =
       match m1, m2 with
@@ -244,7 +248,9 @@ struct
         Cil_datatype.Fieldinfo.equal u1.union_field u2.union_field
       | Array a1, Array a2 ->
         equal a1.array_value a2.array_value &&
-        Cil_datatype.Typ.equal a1.array_cell_type a2.array_cell_type
+        Cil_datatype.Typ.equal a1.array_cell_type a2.array_cell_type &&
+        Int_val.equal a1.array_range a2.array_range &&
+        Bit.equal a1.array_padding a2.array_padding
       | (Raw _ | Scalar _ | Struct _ | Union _ | Array _), _ -> false
 
     let rec compare m1 m2 =
@@ -266,7 +272,9 @@ struct
         (Cil_datatype.Fieldinfo.compare, u1.union_field, u2.union_field)
       | Array a1, Array a2 ->
         compare a1.array_value a2.array_value <?>
-        (Cil_datatype.Typ.compare, a1.array_cell_type, a2.array_cell_type)
+        (Cil_datatype.Typ.compare, a1.array_cell_type, a2.array_cell_type) <?>
+        (Int_val.compare, a1.array_range, a2.array_range) <?>
+        (Bit.compare, a1.array_padding, a2.array_padding)
       | Raw _, _ -> 1
       | _, Raw _ -> -1
       | Scalar _, _ -> 1
@@ -369,7 +377,9 @@ struct
     let rec aux acc = function
       | Raw b -> Bit.join acc b
       | Scalar s -> Bit.join acc (Value.to_bit s.scalar_value)
-      | Array a -> aux acc a.array_value
+      | Array a ->
+        let acc = Bit.join acc a.array_padding in
+        aux acc a.array_value
       | Struct s ->
         let acc = Bit.join acc s.struct_padding in
         FieldMap.fold (fun _ x acc -> aux acc x) s.struct_value acc
@@ -389,6 +399,8 @@ struct
         Value.(is_included s1.scalar_value s2.scalar_value)
       | Array a1, Array a2 ->
         are_aray_compatible a1 a2 &&
+        Int_val.equal a1.array_range a2.array_range &&
+        Bit.is_included a1.array_padding a2.array_padding &&
         is_included a1.array_value a2.array_value
       | Struct s1, Struct s2 ->
         are_structs_compatible s1 s2 &&
@@ -428,7 +440,20 @@ struct
           scalar_value = f ~size (Value.of_bit b) s.scalar_value;
         }
       | Array a1, Array a2 when are_aray_compatible a1 a2 ->
-        Array { a1 with array_value = join a1.array_value a2.array_value }
+        let array_range = Int_val.join a1.array_range a2.array_range in
+        let array_value =
+          let v1 =
+            if not (Int_val.is_included array_range a1.array_range)
+            then join a1.array_value (Raw a1.array_padding) (* Increase the range of a1 *)
+            else a1.array_value
+          and v2 =
+            if not (Int_val.is_included array_range a2.array_range)
+            then join a2.array_value (Raw a2.array_padding) (* Increase the range of a2 *)
+            else a2.array_value
+          in
+          join v1 v2;
+        and array_padding = Bit.join a1.array_padding a2.array_padding in
+        Array { a1 with array_value; array_range; array_padding }
       | Array a, (Raw b) | (Raw b), Array a ->
         Array { a with array_value = join (Raw b) a.array_value }
       | Struct s1, Struct s2 when are_structs_compatible s1 s2 ->
@@ -475,34 +500,54 @@ struct
 
   let widen = join
 
+  let join = join (fun ~size:_ -> Value.join)
+
   (* Read/Write accesses *)
 
-  let rec read m offset =
-    match offset, m with
-    | NoOffset t, Scalar s when are_typ_compatible s.scalar_type t -> m
-    | NoOffset _, m -> m (* TODO check type compatibility *)
-    | Field (fi, offset'), Struct s when s.struct_info.ckey = fi.fcomp.ckey ->
-      begin try
-          let m' = FieldMap.find fi s.struct_value in
-          read m' offset'
-        with Not_found ->
-          Raw s.struct_padding (* field undefined *)
-      end
-    | Field (fi, offset'), Union u when u.union_field.forder = fi.forder ->
-      read u.union_value offset'
-    | Index (_index, elem_type, offset'), Array a
-      when are_typ_compatible a.array_cell_type elem_type ->
-      read a.array_value offset'
-    | _, _ -> Raw (raw m) (* structure mismatch *)
+  let read (map : 'a -> 'b) (reduce : 'b -> 'b -> 'b) m offset : 'b =
+    let apply m acc =
+      let v = map m in
+      Option.fold ~none:v ~some:(reduce v) acc
+    in
+    let rec aux m offset acc =
+      match offset, m with
+      | NoOffset t, Scalar s when are_typ_compatible s.scalar_type t ->
+        apply m acc
+      | NoOffset _, m ->
+        apply m acc (* TODO check type compatibility *)
+      | Field (fi, offset'), Struct s when s.struct_info.ckey = fi.fcomp.ckey ->
+        begin try
+            let m' = FieldMap.find fi s.struct_value in
+            aux m' offset' acc
+          with Not_found ->
+            apply (Raw s.struct_padding) acc (* field undefined *)
+        end
+      | Field (fi, offset'), Union u when u.union_field.forder = fi.forder ->
+        aux u.union_value offset' acc
+      | Index (index, elem_type, offset'), Array a
+        when are_typ_compatible a.array_cell_type elem_type ->
+        if Int_val.intersects index a.array_range then
+          let r = aux a.array_value offset' acc in (* Read inside range *)
+          if Int_val.is_included index a.array_range
+          then r
+          else apply (Raw a.array_padding) (Some r) (* Also read outside of range *)
+        else
+          apply (Raw a.array_padding) acc (* Only read outside of range *)
+      | _, _ ->  apply (Raw (raw m)) acc (* structure mismatch *)
+    in
+    aux m offset None
 
-  let get m offset =
-    match read m offset with
-    | Scalar s -> s.scalar_value
-    | m -> Value.of_bit (raw m)
+  let get : t -> location -> value =
+    let f = function
+      | Scalar s -> s.scalar_value
+      | m -> Value.of_bit (raw m)
+    in
+    read f Value.join
 
-  let extract = read
+  let extract : t -> location -> t =
+    read (fun x -> x) join
 
-  let rec write ~weak (f : weak:bool -> t -> Cil_types.typ -> t) m = function
+  let rec write (f : weak:bool -> t -> Cil_types.typ -> t) ~weak m = function
     | NoOffset t ->
       f ~weak m t
     | Field (fi, offset') ->
@@ -536,16 +581,33 @@ struct
           old with union_value = write f ~weak old.union_value offset'
         }
     | Index (index, elem_type, offset') ->
-      let old = match m with
-        | Array a when are_typ_compatible a.array_cell_type elem_type ->
-          a.array_value
-        | _ -> Raw (raw m)
-      in
-      let weak = weak || not (Ival.(is_included top index)) in
-      Array {
-        array_value = write f ~weak old offset';
-        array_cell_type = elem_type
-      }
+      match m with
+      | Array a when are_typ_compatible a.array_cell_type elem_type ->
+        (* The implementation of write-into-array is imprecise for now as it
+           can be improved when the write is completely out of the current
+           range. However, the implementation would be more complicated and
+           we have other plans to increase the precision. *)
+        let array_range = Int_val.join index a.array_range in
+        let weak = weak || not (Int_val.is_included array_range index) in
+        let old =
+          if Int_val.is_included array_range a.array_range
+          then a.array_value (* Range does not increase *)
+          else join a.array_value (Raw a.array_padding)
+        in
+        Array {
+          array_cell_type = a.array_cell_type;
+          array_value = write f ~weak old offset';
+          array_range = Int_val.join a.array_range index;
+          array_padding = a.array_padding;
+        }
+      | _ ->
+        let b = raw m in
+        Array {
+          array_cell_type = elem_type;
+          array_value = write f ~weak (Raw b) offset';
+          array_range = index;
+          array_padding = b;
+        }
 
   let set ~weak m offset new_v =
     let f ~weak m t =
@@ -575,7 +637,11 @@ struct
   let rec weak_erase b = function
     | Raw b' -> Raw (Bit.join b' b)
     | Scalar s -> Raw (Bit.join (Value.to_bit s.scalar_value) b)
-    | Array a -> Array { a with array_value = weak_erase b a.array_value }
+    | Array a -> Array {
+        a with
+        array_value = weak_erase b a.array_value;
+        array_padding = Bit.join a.array_padding b;
+      }
     | Struct s -> Struct {
         s with
         struct_padding = Bit.join s.struct_padding b;
@@ -599,7 +665,7 @@ struct
   let overwrite ~weak dst offset src =
     let f' ~weak m _t =
       if weak then
-        join (fun ~size:_ -> Value.join) m src
+        join m src
       else
         src
     in

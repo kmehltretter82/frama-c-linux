@@ -104,7 +104,7 @@ sig
   val is_included : t -> t -> bool
 
   (* Finest partition that is coarcer than both *)
-  val join : (size:size -> value -> value -> value) -> t -> t -> t
+  val join : t -> t -> t
 
   (* Partition widening *)
   val widen : (size:size -> value -> value -> value) -> t -> t -> t

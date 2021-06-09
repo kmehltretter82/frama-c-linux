@@ -179,6 +179,10 @@ let contains_non_zero = function
 
 exception Not_Singleton_Int = Int_val.Not_Singleton
 
+let project_int_val = function
+  | Int i -> Some i
+  | Bottom | Float _ -> None
+
 let project_int = function
   | Int i -> Int_val.project_int i
   | Bottom | Float _ -> raise Not_Singleton_Int

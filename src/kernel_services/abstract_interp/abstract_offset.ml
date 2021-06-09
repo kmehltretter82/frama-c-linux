@@ -27,7 +27,7 @@ sig
   val pretty : Format.formatter -> t -> unit
   val append : t -> t -> t (* Does not check that the appened offset fits *)
   val join : t -> t -> t
-  val of_cil_offset : (Cil_types.exp -> Ival.t) -> Cil_types.typ -> Cil_types.offset -> t
+  val of_cil_offset : (Cil_types.exp -> Int_val.t) -> Cil_types.typ -> Cil_types.offset -> t
   val of_ival : base_typ:Cil_types.typ -> typ:Cil_types.typ -> Ival.t -> t
   val of_term_offset : Cil_types.typ -> Cil_types.term_offset -> t
   val is_singleton : t -> bool
@@ -35,7 +35,7 @@ end
 
 type typed_offset =
   | NoOffset of Cil_types.typ
-  | Index of Ival.t * Cil_types.typ * typed_offset
+  | Index of Int_val.t * Cil_types.typ * typed_offset
   | Field of Cil_types.fieldinfo * typed_offset
 
 
@@ -46,7 +46,7 @@ struct
   let rec pretty fmt = function
     | NoOffset _t -> ()
     | Field (fi, s) -> Format.fprintf fmt ".%s%a" fi.fname pretty s
-    | Index (i, _t, s) -> Format.fprintf fmt "[%a]%a" Ival.pretty i pretty s
+    | Index (i, _t, s) -> Format.fprintf fmt "[%a]%a" Int_val.pretty i pretty s
 
   let rec append o1 o2 =
     match o1 with
@@ -61,7 +61,7 @@ struct
     | Field (fi, s1), Field (fi', s2) when Cil_datatype.Fieldinfo.equal fi fi' ->
       Field (fi, join s1 s2)
     | Index (i1, t, s1), Index (i2, t', s2) when Bit_utils.type_compatible t t' ->
-      Index (Ival.join i1 i2, t, join s1 s2)
+      Index (Int_val.join i1 i2, t, join s1 s2)
     | _ -> raise Abstract_interp.Error_Top
 
   let array_bounds array_size =
@@ -74,11 +74,11 @@ struct
 
   let array_range array_size =
     let l,u = array_bounds array_size in
-    Ival.inject_range l u
+    Int_val.inject_range l u
 
   let assert_valid_index idx size =
     let range = array_range size in
-    if not (Ival.is_included idx range) then
+    if not (Int_val.is_included idx range) then
       raise Abstract_interp.Error_Top
 
   let rec of_cil_offset oracle base_typ = function
@@ -92,8 +92,8 @@ struct
         Index (idx, elem_typ, of_cil_offset oracle elem_typ sub)
       | _ -> assert false
 
-  let rec of_ival ~base_typ ~typ ival =
-    if Ival.is_zero ival && Bit_utils.type_compatible base_typ typ then
+  let rec of_int_val ~base_typ ~typ ival =
+    if Int_val.is_zero ival && Bit_utils.type_compatible base_typ typ then
       NoOffset typ
     else
       match Cil.unrollType base_typ with
@@ -102,23 +102,23 @@ struct
           try
             let elem_size = Integer.of_int (Cil.bitsSizeOf elem_typ) in
             if Integer.is_zero elem_size then (* array of elements of size 0 *)
-              if Ival.is_zero ival then (* the whole range is valid *)
+              if Int_val.is_zero ival then (* the whole range is valid *)
                 array_range array_size, ival
               else (* Non-zero offset cannot represent anything here *)
                 raise Abstract_interp.Error_Top
             else
-              Ival.scale_div ~pos:true elem_size ival,
-              Ival.scale_rem ~pos:true elem_size ival
+              Int_val.scale_div ~pos:true elem_size ival,
+              Int_val.scale_rem ~pos:true elem_size ival
           with Cil.SizeOfError (_,_) ->
             (* Cil.bitsSizeOf can raise an exception when elements are
                themselves array of execution-time size *)
-            if Ival.is_zero ival then
+            if Int_val.is_zero ival then
               ival, ival
             else
               raise Abstract_interp.Error_Top
         in
         assert_valid_index range array_size;
-        let sub = of_ival ~base_typ:elem_typ ~typ rem in
+        let sub = of_int_val ~base_typ:elem_typ ~typ rem in
         Index (range, elem_typ, sub)
 
       | TComp (ci, _, _) ->
@@ -132,10 +132,10 @@ struct
               let offset, width = Cil.fieldBitsOffset fi in
               let l = Integer.(of_int offset) in
               let u = Integer.(pred (add l (of_int width))) in
-              let range = Ival.inject_range (Some l) (Some u) in
-              if Ival.is_included ival range then
-                let sub_ival = Ival.add_singleton_int (Integer.neg l) ival in
-                Field (fi, of_ival ~base_typ:fi.ftype ~typ sub_ival)
+              let range = Int_val.inject_range (Some l) (Some u) in
+              if Int_val.is_included ival range then
+                let sub_ival = Int_val.add_singleton (Integer.neg l) ival in
+                Field (fi, of_int_val ~base_typ:fi.ftype ~typ sub_ival)
               else
                 find_field q
           in
@@ -143,10 +143,14 @@ struct
 
       | _ -> raise Abstract_interp.Error_Top
 
+  let of_ival ~base_typ ~typ ival =
+    match Ival.project_int_val ival with
+    | Some ival -> of_int_val ~base_typ ~typ ival
+    | None -> raise Abstract_interp.Error_Top (* should not happen *)
+
   let index_of_term array_size t = (* Exact constant ranges *)
     match t.Cil_types.term_node with
-    | Tempty_set -> Ival.bottom
-    | TConst (Integer (v, _)) -> Ival.inject_singleton v
+    | TConst (Integer (v, _)) -> Int_val.inject_singleton v
     | Trange (l,u) ->
       let eval bound = function
         | None -> bound
@@ -155,7 +159,7 @@ struct
       in
       let lb, ub = array_bounds array_size in
       let l' = eval lb l and u' = eval ub u in
-      Ival.inject_range l' u'
+      Int_val.inject_range l' u'
     | _ -> raise Abstract_interp.Error_Top
 
   let rec of_term_offset base_typ = function
@@ -176,7 +180,7 @@ struct
     | NoOffset _ -> true
     | Field (_fi, sub) -> is_singleton sub
     | Index (ival, _elem_typ, sub) ->
-      Ival.is_singleton_int ival && is_singleton sub
+      Int_val.is_singleton ival && is_singleton sub
 end
 
 module TypedOffsetOrTop =

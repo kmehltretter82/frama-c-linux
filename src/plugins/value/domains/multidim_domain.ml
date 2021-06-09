@@ -109,8 +109,9 @@ struct
   (* Raises Abstract_domain.{Error_top,Error_bottom} *)
   let of_lval oracle ((host,offset) : Cil_types.lval) : t =
     let oracle' exp =
-      try Value.project_ival (oracle exp)
-      with Value.Not_based_on_null -> Ival.top
+      match Ival.project_int_val (Value.project_ival (oracle exp)) with
+      | Some int_val -> int_val
+      | None | exception Value.Not_based_on_null -> Int_val.top
     in
     let base_typ = Cil.typeOfLhost host in
     let offset = Offset.of_cil_offset oracle' base_typ offset in
@@ -181,7 +182,7 @@ struct
   let is_top = Memory.is_top
   let is_included = Memory.is_included
   let narrow = fun m1 _m2 -> m1
-  let join = Memory.join (fun ~size:_ v1 v2 -> Value.join v1 v2)
+  let join = Memory.join
   let widen h = Memory.widen (fun ~size v1 v2 -> Value.widen (size,h) v1 v2)
 
   let get m loc =
