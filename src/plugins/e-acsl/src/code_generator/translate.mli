@@ -63,6 +63,22 @@ val translate_rte_annots:
 (** Translate the given RTE annotations into runtime checks in the given
     environment. *)
 
+val gmp_to_sizet:
+  loc:location ->
+  name:string ->
+  ?check_lower_bound:bool ->
+  ?pp:term ->
+  kernel_function ->
+  Env.t ->
+  term ->
+  exp * Env.t
+(** Translate the given GMP integer to an expression of type [size_t]. RTE
+    checks are generated to ensure that the GMP value holds in this type.
+    The parameter [name] is used to generate relevant predicate names.
+    If [check_lower_bound] is set to [false], then the GMP value is assumed to
+    be positive.
+    If [pp] is provided, this term is used in the messages of the RTE checks. *)
+
 exception No_simple_term_translation of term
 (** Exceptin raised if [untyped_term_to_exp] would generate new statements in
     the environment *)

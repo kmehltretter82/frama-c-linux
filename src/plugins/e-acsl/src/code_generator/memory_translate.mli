@@ -60,3 +60,13 @@ val predicate_to_exp_ref:
 
 val term_to_exp_ref:
   (kernel_function -> Env.t -> term -> exp * Env.t) ref
+
+val gmp_to_sizet_ref:
+  (loc:location ->
+   name:string ->
+   ?check_lower_bound:bool ->
+   ?pp:term ->
+   kernel_function ->
+   Env.t ->
+   term ->
+   exp * Env.t) ref

@@ -34,6 +34,21 @@ let term_to_exp_ref
   : (kernel_function -> Env.t -> term -> exp * Env.t) ref
   = Extlib.mk_fun "term_to_exp_ref"
 
+let gmp_to_sizet_ref
+  : (loc:location ->
+     name:string ->
+     ?check_lower_bound:bool ->
+     ?pp:term ->
+     kernel_function ->
+     Env.t ->
+     term ->
+     exp * Env.t) ref
+  =
+  let func ~loc:_ ~name:_ ?check_lower_bound:_ ?pp:_ _kf _env _t =
+    Extlib.mk_labeled_fun "gmp_to_sizet_ref"
+  in
+  ref func
+
 (*****************************************************************************)
 (****************************** Ranges Elimination ***************************)
 (*****************************************************************************)
@@ -139,33 +154,8 @@ let call ~loc kf name ctx env t =
    The case where [!(0 <= size <= SIZE_MAX)] is an UB ==> guard against it.
    Since the case [0 <= size] is already checked before calling this function,
    only [size <= SIZE_MAX] is added as a guard. *)
-let gmp_to_sizet ~loc kf env size p =
-  let sizet = Cil.(theMachine.typeOfSizeOf) in
-  (* The guard *)
-  let sizet_max = Logic_const.tint
-      ~loc (Cil.max_unsigned_number (Cil.bitsSizeOf sizet))
-  in
-  let guard = Logic_const.prel ~loc (Rle, size, sizet_max) in
-  Typing.type_named_predicate ~must_clear:false guard;
-  let guard, env = !predicate_to_exp_ref kf env guard in
-  (* Translate term [size] into an exp of type [size_t] *)
-  let size, env = !term_to_exp_ref kf env size in
-  let  _, e, env = Env.new_var
-      ~loc
-      ~name:"size"
-      env
-      kf
-      None
-      sizet
-      (fun vi _ ->
-         [ Smart_stmt.runtime_check ~pred_kind:Assert Smart_stmt.RTE kf guard p;
-           Smart_stmt.rtl_call ~loc
-             ~result:(Cil.var vi)
-             ~prefix:""
-             "__gmpz_get_ui"
-             [ size ] ])
-  in
-  e, env
+let gmp_to_sizet ~loc ?pp kf env size _p =
+  !gmp_to_sizet_ref ~loc ~name:"offset" ~check_lower_bound:false ?pp kf env size
 
 (* Take a term of the form [ptr + r] where [ptr] is an address and [r] a range
    offset, and return a tuple [(ptr, size, env)] where [ptr] is the address of
@@ -246,7 +236,19 @@ let range_to_ptr_and_size ~loc kf env ptr r p =
   Typing.type_term ~use_gmp_opt:false size_term;
   let size, env = match Typing.get_number_ty size_term with
     | Typing.Gmpz ->
-      gmp_to_sizet ~loc kf env size_term p
+      (* Start by translating [size_term] to an expression so that the full term
+         with [\let] is not passed around. *)
+      let size_e, env = !term_to_exp_ref kf env size_term in
+      (* Since translating a GMP code should always produce a C variable, we
+         can reuse it as a term for the function [gmp_to_sizet]. *)
+      let cvar_term =
+        match size_e.enode with
+        | Lval (Var vi, NoOffset) -> Cil.cvar_to_term ~loc vi
+        | _ ->
+          Options.fatal
+            "translation to GMP code should always return a C variable"
+      in
+      gmp_to_sizet ~loc ~pp:size_term kf env cvar_term p
     | Typing.(C_integer _ | C_float _) ->
       !term_to_exp_ref kf env size_term
     | Typing.(Rational | Real | Nan) ->
