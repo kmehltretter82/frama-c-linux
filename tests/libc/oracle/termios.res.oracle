@@ -18,12 +18,17 @@
 [eva] tests/libc/termios.c:11: 
   function tcgetattr: precondition 'valid_termios_p' got status valid.
 [eva] Done for function tcgetattr
+[eva] computing for function tcgetattr <- main.
+  Called from tests/libc/termios.c:11.
+[eva] Done for function tcgetattr
+[eva:alarm] tests/libc/termios.c:13: Warning: 
+  accessing uninitialized left-value. assert \initialized(&tio.c_cflag);
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   Frama_C_entropy_source ∈ [--..--]
-  fd ∈ [--..--]
+  fd ∈ [-1..1023]
   tio ∈ [--..--] or UNINITIALIZED
   res ∈ {-1; 0}
   __retres ∈ {1; 8}

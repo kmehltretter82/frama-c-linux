@@ -1,8 +1,8 @@
-[variadic] FRAMAC_SHARE/libc/unistd.h:813: 
+[variadic] FRAMAC_SHARE/libc/unistd.h:814: 
   Declaration of variadic function execl.
-[variadic] FRAMAC_SHARE/libc/unistd.h:818: 
+[variadic] FRAMAC_SHARE/libc/unistd.h:819: 
   Declaration of variadic function execle.
-[variadic] FRAMAC_SHARE/libc/unistd.h:823: 
+[variadic] FRAMAC_SHARE/libc/unistd.h:824: 
   Declaration of variadic function execlp.
 [variadic] tests/known/exec_failed_requirement.c:7: 
   Translating call to execl to a call to execv.

@@ -26,6 +26,7 @@
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_string_axiomatic.h"
+#include "__fc_define_max_open_files.h"
 #include "__fc_define_size_t.h"
 #include "__fc_define_null.h"
 #include "__fc_define_ssize_t.h"

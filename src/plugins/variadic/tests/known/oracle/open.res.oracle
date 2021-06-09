@@ -1,7 +1,7 @@
-[variadic] FRAMAC_SHARE/libc/fcntl.h:117: 
+[variadic] FRAMAC_SHARE/libc/fcntl.h:118: 
   Declaration of variadic function fcntl.
-[variadic] FRAMAC_SHARE/libc/fcntl.h:120: Declaration of variadic function open.
-[variadic] FRAMAC_SHARE/libc/fcntl.h:126: 
+[variadic] FRAMAC_SHARE/libc/fcntl.h:121: Declaration of variadic function open.
+[variadic] FRAMAC_SHARE/libc/fcntl.h:128: 
   Declaration of variadic function openat.
 [variadic] tests/known/open.c:7: 
   Translating call to the specialized version open(char const *, int, mode_t).
@@ -30,9 +30,9 @@
   flag ∈ {0}
   mode ∈ {0}
   file ∈ {{ "file" }}
-  fd1 ∈ [--..--]
-  fd2 ∈ [--..--]
-  fd3 ∈ [--..--]
+  fd1 ∈ [-1..1023]
+  fd2 ∈ [-1..1023]
+  fd3 ∈ [-1..1023]
   __va_arg0 ∈ {0}
   __va_arg1 ∈ {3}
   __va_arg2 ∈ {{ "arg4" }}

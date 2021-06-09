@@ -28,6 +28,7 @@ __PUSH_FC_STDLIB
 #include "__fc_define_off_t.h"
 #include "__fc_define_pid_t.h"
 #include "__fc_define_mode_t.h"
+#include "__fc_define_max_open_files.h"
 #include "__fc_string_axiomatic.h"
 
 // The values for the constants below are based on an x86 Linux,
@@ -120,12 +121,14 @@ extern int fcntl(int fd, int cmd, ...);
 /*@
   requires valid_filename: valid_read_string(filename);
   assigns \result \from indirect:filename[0..], indirect:flags;
+  ensures valid_fd_or_error: \result == -1 || 0 <= \result < __FC_MAX_OPEN_FILES;
 */
 extern int open(const char *filename, int flags, ...);
 
 /*@
   requires valid_filename: valid_read_string(filename);
   assigns \result \from indirect:dirfd, indirect:filename[0..], indirect:flags;
+  ensures valid_fd_or_error: \result == -1 || 0 <= \result < __FC_MAX_OPEN_FILES;
 */
 extern int openat(int dirfd, const char *filename, int flags, ...);
 
@@ -154,6 +157,7 @@ extern int __va_fcntl_flock(int fd, int cmd, struct flock *arg);
   requires valid_filename: valid_read_string(filename);
   requires flag_not_CREAT: !(flags & O_CREAT) ;
   assigns \result \from indirect:filename[0..], indirect:flags;
+  ensures valid_fd_or_error: \result == -1 || 0 <= \result < __FC_MAX_OPEN_FILES;
 */
 extern int __va_open_void(const char *filename, int flags);
 
@@ -161,6 +165,7 @@ extern int __va_open_void(const char *filename, int flags);
   requires valid_filename: valid_read_string(filename);
   assigns \result \from indirect:filename[0..], indirect:flags,
     indirect:mode;
+  ensures valid_fd_or_error: \result == -1 || 0 <= \result < __FC_MAX_OPEN_FILES;
 */
 extern int __va_open_mode_t(const char *filename, int flags, mode_t mode);
 
@@ -169,6 +174,7 @@ extern int __va_open_mode_t(const char *filename, int flags, mode_t mode);
   requires flag_not_CREAT: !(flags & O_CREAT);
   assigns \result \from indirect:dirfd, indirect:filename[0..],
     indirect:flags;
+  ensures valid_fd_or_error: \result == -1 || 0 <= \result < __FC_MAX_OPEN_FILES;
 */
 extern int __va_openat_void(int dirfd, const char *filename, int flags);
 
@@ -176,6 +182,7 @@ extern int __va_openat_void(int dirfd, const char *filename, int flags);
   requires valid_filename: valid_read_string(filename);
   assigns \result \from indirect:dirfd, indirect:filename[0..], indirect:flags,
     indirect:mode;
+  ensures valid_fd_or_error: \result == -1 || 0 <= \result < __FC_MAX_OPEN_FILES;
 */
 extern int __va_openat_mode_t(int dirfd, const char *filename, int flags, mode_t mode);
 
