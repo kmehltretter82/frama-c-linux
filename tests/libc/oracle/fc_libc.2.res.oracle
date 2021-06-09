@@ -14,6 +14,7 @@
 [kernel] Parsing share/libc/__fc_define_intptr_t.h (with preprocessing)
 [kernel] Parsing share/libc/__fc_define_iovec.h (with preprocessing)
 [kernel] Parsing share/libc/__fc_define_key_t.h (with preprocessing)
+[kernel] Parsing share/libc/__fc_define_max_open_files.h (with preprocessing)
 [kernel] Parsing share/libc/__fc_define_mode_t.h (with preprocessing)
 [kernel] Parsing share/libc/__fc_define_nlink_t.h (with preprocessing)
 [kernel] Parsing share/libc/__fc_define_null.h (with preprocessing)

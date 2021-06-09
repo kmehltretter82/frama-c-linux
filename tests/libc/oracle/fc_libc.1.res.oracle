@@ -7545,6 +7545,7 @@ extern int creat(char const *filename, mode_t mode);
 extern int fcntl(int fd, int cmd, void * const *__va_params);
 
 /*@ requires valid_filename: valid_read_string(filename);
+    ensures valid_fd_or_error: \result ≡ -1 ∨ (0 ≤ \result < 1024);
     assigns \result;
     assigns \result
       \from (indirect: *(filename + (0 ..))), (indirect: flags);
@@ -7552,6 +7553,7 @@ extern int fcntl(int fd, int cmd, void * const *__va_params);
 extern int open(char const *filename, int flags, void * const *__va_params);
 
 /*@ requires valid_filename: valid_read_string(filename);
+    ensures valid_fd_or_error: \result ≡ -1 ∨ (0 ≤ \result < 1024);
     assigns \result;
     assigns \result
       \from (indirect: dirfd), (indirect: *(filename + (0 ..))),
@@ -7584,6 +7586,7 @@ extern int __va_fcntl_flock(int fd, int cmd, struct flock *arg);
 
 /*@ requires valid_filename: valid_read_string(filename);
     requires flag_not_CREAT: (flags & 0x40) ≡ 0;
+    ensures valid_fd_or_error: \result ≡ -1 ∨ (0 ≤ \result < 1024);
     assigns \result;
     assigns \result
       \from (indirect: *(filename + (0 ..))), (indirect: flags);
@@ -7591,6 +7594,7 @@ extern int __va_fcntl_flock(int fd, int cmd, struct flock *arg);
 extern int __va_open_void(char const *filename, int flags);
 
 /*@ requires valid_filename: valid_read_string(filename);
+    ensures valid_fd_or_error: \result ≡ -1 ∨ (0 ≤ \result < 1024);
     assigns \result;
     assigns \result
       \from (indirect: *(filename + (0 ..))), (indirect: flags),
@@ -7600,6 +7604,7 @@ extern int __va_open_mode_t(char const *filename, int flags, mode_t mode);
 
 /*@ requires valid_filename: valid_read_string(filename);
     requires flag_not_CREAT: (flags & 0x40) ≡ 0;
+    ensures valid_fd_or_error: \result ≡ -1 ∨ (0 ≤ \result < 1024);
     assigns \result;
     assigns \result
       \from (indirect: dirfd), (indirect: *(filename + (0 ..))),
@@ -7608,6 +7613,7 @@ extern int __va_open_mode_t(char const *filename, int flags, mode_t mode);
 extern int __va_openat_void(int dirfd, char const *filename, int flags);
 
 /*@ requires valid_filename: valid_read_string(filename);
+    ensures valid_fd_or_error: \result ≡ -1 ∨ (0 ≤ \result < 1024);
     assigns \result;
     assigns \result
       \from (indirect: dirfd), (indirect: *(filename + (0 ..))),
