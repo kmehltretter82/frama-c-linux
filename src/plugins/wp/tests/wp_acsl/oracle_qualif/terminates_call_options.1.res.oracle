@@ -2,17 +2,17 @@
 [kernel] Parsing tests/wp_acsl/terminates_call_options.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
-[wp] tests/wp_acsl/terminates_call_options.c:19: Warning: 
+[wp] tests/wp_acsl/terminates_call_options.c:20: Warning: 
   Missing terminates clause for definition, populates 'terminates \true'
-[wp] tests/wp_acsl/terminates_call_options.c:31: Warning: 
-  Missing terminates clause for no_spec_generates_goal, populates 'terminates \true'
-[wp] tests/wp_acsl/terminates_call_options.c:23: Warning: 
-  Missing terminates clause on call to declaration, defaults to \true
 [wp] tests/wp_acsl/terminates_call_options.c:32: Warning: 
+  Missing terminates clause for no_spec_generates_goal, populates 'terminates \true'
+[wp] tests/wp_acsl/terminates_call_options.c:24: Warning: 
+  Missing terminates clause on call to declaration, defaults to \true
+[wp] tests/wp_acsl/terminates_call_options.c:33: Warning: 
   Missing assigns clause (assigns 'everything' instead)
-[wp] tests/wp_acsl/terminates_call_options.c:38: Warning: 
+[wp] tests/wp_acsl/terminates_call_options.c:39: Warning: 
   Missing terminates clause on call to exit, defaults to \true
-[wp] tests/wp_acsl/terminates_call_options.c:37: Warning: 
+[wp] tests/wp_acsl/terminates_call_options.c:38: Warning: 
   Missing terminates clause on call to div, defaults to \true
 [wp] 5 goals scheduled
 [wp] [Qed] Goal typed_definition_assigns : Valid

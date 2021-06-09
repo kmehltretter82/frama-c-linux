@@ -9,8 +9,9 @@
 
 #include <stdlib.h>
 
-// -wp-external-declaration-terminates <--- default to FALSE
-// -wp-definition-terminates  <--- default to FALSE
+// -wp-declarations-terminate   <--- default to FALSE
+// -wp-definitions-terminate    <--- default to FALSE
+// -wp-frama-c-stdlib-terminate <--- default to FALSE
 
 //@ assigns \nothing ;
 void declaration(void);
