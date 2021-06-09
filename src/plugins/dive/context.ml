@@ -35,7 +35,6 @@ module Index = Datatype.Int.Hashtbl
 module NodeTable = FCHashtbl.Make (NodeRef)
 module NodeSet = Graph.Node.Set
 module BaseSet = Cil_datatype.Varinfo.Set
-module FunctionMap = Kernel_function.Map
 
 type t = {
   mutable graph: Graph.t;
@@ -43,7 +42,6 @@ type t = {
   mutable node_table: node NodeTable.t; (* node_kind * callstack -> node *)
   mutable unfolded_bases: BaseSet.t;
   mutable hidden_bases: BaseSet.t;
-  mutable focus: bool FunctionMap.t;
   mutable max_dep_fetch_count: int;
   mutable roots: NodeSet.t;
   mutable graph_diff: graph_diff;
@@ -60,7 +58,6 @@ let create () =
     node_table = NodeTable.create 13;
     unfolded_bases = BaseSet.empty;
     hidden_bases = BaseSet.empty;
-    focus = FunctionMap.empty;
     max_dep_fetch_count = 10;
     roots = NodeSet.empty;
     graph_diff = { last_root = None ; added_nodes=[] ; removed_nodes=[] };
@@ -70,7 +67,6 @@ let clear context =
   context.graph <- Graph.create ();
   context.vertex_table <- Index.create 13;
   context.node_table <- NodeTable.create 13;
-  context.focus <- FunctionMap.empty;
   context.max_dep_fetch_count <- 10;
   context.roots <- NodeSet.empty;
   context.graph_diff <- { last_root = None ; added_nodes=[] ; removed_nodes=[] }

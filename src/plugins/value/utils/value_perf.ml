@@ -47,10 +47,6 @@ module Call_info = struct
     (* How many times the function was called. *)
     mutable nb_calls: int;
 
-    (* How many times the call had to be computed (i.e. with calls
-       cached with memexec removed) *)
-    mutable nb_effective_calls: int;
-
     (* The accumulated execution time for past calls. *)
     mutable total_duration: float;
 
@@ -60,8 +56,7 @@ module Call_info = struct
   }
   ;;
 
-  let create() = { nb_calls = 0; nb_effective_calls = 0; total_duration = 0.0;
-                   since = [] };;
+  let create() = { nb_calls = 0; total_duration = 0.0; since = [] };;
 
   (* Represents the calls to the main function.  *)
   let main = create();;
@@ -342,7 +337,6 @@ let stop_doing_perf callstack =
 let reset_perf () =
   let reset_callinfo ci =
     ci.Call_info.nb_calls <- 0;
-    ci.Call_info.nb_effective_calls <- 0;
     ci.Call_info.total_duration <- 0.0;
     ci.Call_info.since <- []
   in
