@@ -6,6 +6,10 @@
   Missing terminates clause on call to declaration, defaults to \false
 [wp] tests/wp_acsl/terminates_call_options.c:28: Warning: 
   Missing terminates clause on call to definition, defaults to \false
+[wp] tests/wp_acsl/terminates_call_options.c:38: Warning: 
+  Missing terminates clause on call to exit, defaults to \false
+[wp] tests/wp_acsl/terminates_call_options.c:37: Warning: 
+  Missing terminates clause on call to div, defaults to \false
 ------------------------------------------------------------
   Function call_declaration
 ------------------------------------------------------------
@@ -36,8 +40,14 @@ Prove: true.
   Function libc_call
 ------------------------------------------------------------
 
-Goal Termination-condition (file tests/wp_acsl/terminates_call_options.c, line 35) in 'libc_call':
+Goal Termination-condition (file tests/wp_acsl/terminates_call_options.c, line 35) in 'libc_call' (1/2):
 Call Effect at line 37
+Prove: false.
+
+------------------------------------------------------------
+
+Goal Termination-condition (file tests/wp_acsl/terminates_call_options.c, line 35) in 'libc_call' (2/2):
+Call Effect at line 38
 Prove: false.
 
 ------------------------------------------------------------

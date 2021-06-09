@@ -328,7 +328,7 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
     (fun p -> if WpPropId.filter_status p then WpAnnot.set_unreachable p)
     infos.doomed ;
   (* Trivial terminates *)
-  begin match CfgAnnot.get_terminates kf with
+  begin match CfgAnnot.get_terminates_goal kf with
     | Some (id, _t)
       when selected_terminates ~prop kf
         && infos.calls = Fset.empty

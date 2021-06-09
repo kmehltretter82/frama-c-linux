@@ -35,4 +35,5 @@ void no_spec_generates_goal(void){
 //@ terminates \true ;
 void libc_call(void){
   (void) div(4,3);
+  exit(0);
 }

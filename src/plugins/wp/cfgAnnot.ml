@@ -190,35 +190,54 @@ let wp_populate_terminates =
     ~correctness:[] (* TBC *)
     ~tuning:[] (* TBC *)
 
-let get_terminates kf =
+type terminates_clause =
+  | Defined of WpPropId.prop_id * predicate
+  | Assumed of predicate
+
+let get_terminates_clause kf =
+  (* Note:
+   *  - user-defined terminates always returns Defined
+   *  - generated "terminates \true" are:
+   *      - first handled in a None case and returns Defined
+   *      - then handled in a Some case (as user defined) and returns Defined *)
+  let defined p =
+    Defined (WpPropId.mk_terminates_id kf Kglobal p, normalize_terminates p) in
+  let populate_true () =
+    let p = Logic_const.new_predicate @@ Logic_const.ptrue in
+    Wp_parameters.warning
+      ~source:(fst @@ Kernel_function.get_location kf) ~once:true
+      "Missing terminates clause for %a, populates 'terminates \\true'"
+      Kernel_function.pretty kf ;
+    Annotations.add_terminates wp_populate_terminates kf p ;
+    defined p
+  in
   match Annotations.terminates kf with
-  | None
-    when Kernel_function.is_definition kf &&
-         Wp_parameters.TerminatesDefinitions.get () ->
-      let p = Logic_const.new_predicate @@ Logic_const.ptrue in
-      Wp_parameters.warning
-        ~source:(fst @@ Kernel_function.get_location kf) ~once:true
-        "Missing terminates clause for %a, populates 'terminates \\true'"
-        Kernel_function.pretty kf ;
-      Annotations.add_terminates wp_populate_terminates kf p ;
-      Some (WpPropId.mk_terminates_id kf Kglobal p, normalize_terminates p)
+  | None when Kernel_function.is_in_libc kf ->
+      if not @@ Wp_parameters.TerminatesFCDeclarations.get ()
+      then Assumed Logic_const.pfalse
+      else if not @@ Kernel_function.is_definition kf
+      then Assumed Logic_const.ptrue
+      else populate_true ()
+  | None when Kernel_function.is_definition kf ->
+      if not @@ Wp_parameters.TerminatesDefinitions.get ()
+      then Assumed Logic_const.pfalse
+      else populate_true ()
   | None ->
-      None
+      if not @@ Wp_parameters.TerminatesExtDeclarations.get ()
+      then Assumed Logic_const.pfalse
+      else Assumed Logic_const.ptrue
   | Some p ->
-      Some (WpPropId.mk_terminates_id kf Kglobal p, normalize_terminates p)
+      defined p
+
+let get_terminates_goal kf =
+  match get_terminates_clause kf with
+  | Assumed _ -> None
+  | Defined (id, p) -> Some (id, p)
 
 let get_terminates_hyp kf =
-  let to_default option =
-    if option then Logic_const.ptrue else Logic_const.pfalse in
-  match Annotations.terminates kf with
-  | Some p ->
-      false, normalize_terminates p
-  | None when Kernel_function.is_in_libc kf ->
-      false, to_default @@ Wp_parameters.TerminatesFCDeclarations.get ()
-  | None when Kernel_function.is_definition kf ->
-      true, to_default @@ Wp_parameters.TerminatesDefinitions.get ()
-  | None ->
-      true, to_default @@  Wp_parameters.TerminatesExtDeclarations.get ()
+  match get_terminates_clause kf with
+  | Defined (_, p) -> false, p
+  | Assumed p -> true, p
 
 (* -------------------------------------------------------------------------- *)
 (* --- Contracts                                                          --- *)

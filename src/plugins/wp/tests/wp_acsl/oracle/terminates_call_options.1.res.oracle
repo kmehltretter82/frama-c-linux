@@ -10,6 +10,10 @@
   Missing terminates clause on call to declaration, defaults to \true
 [wp] tests/wp_acsl/terminates_call_options.c:32: Warning: 
   Missing assigns clause (assigns 'everything' instead)
+[wp] tests/wp_acsl/terminates_call_options.c:38: Warning: 
+  Missing terminates clause on call to exit, defaults to \true
+[wp] tests/wp_acsl/terminates_call_options.c:37: Warning: 
+  Missing terminates clause on call to div, defaults to \true
 ------------------------------------------------------------
   Function call_declaration
 ------------------------------------------------------------

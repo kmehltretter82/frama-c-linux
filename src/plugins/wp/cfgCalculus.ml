@@ -414,7 +414,7 @@ struct
          WpLog.SmokeTests.get () &&
          WpLog.SmokeDeadcode.get ()
       then CfgInfos.smoking infos else (fun _ -> false) in
-    let terminates = CfgAnnot.get_terminates kf in
+    let terminates = CfgAnnot.get_terminates_goal kf in
     let env = {
       mode ; props ; body ;
       succ ; dead ; terminates ;

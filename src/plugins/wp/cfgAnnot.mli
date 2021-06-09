@@ -56,7 +56,7 @@ val get_behavior_goals :
 val get_complete_behaviors : kernel_function -> pred_info list
 val get_disjoint_behaviors : kernel_function -> pred_info list
 
-val get_terminates : kernel_function -> pred_info option
+val get_terminates_goal : kernel_function -> pred_info option
 
 (* -------------------------------------------------------------------------- *)
 (* --- Property Accessors : Assertions                                    --- *)
@@ -105,7 +105,7 @@ type contract = {
   contract_exit : pred_info list ;
   contract_smoke : pred_info list ;
   contract_assigns : assigns ;
-  contract_terminates : bool * predicate ; (* boolean: default generated *)
+  contract_terminates : bool * predicate ; (* boolean: assumed terminates *)
 }
 
 val get_call_contract : ?smoking:stmt -> kernel_function -> stmt -> contract
