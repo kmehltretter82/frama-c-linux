@@ -215,8 +215,6 @@ let get_terminates_clause kf =
   | None when Kernel_function.is_in_libc kf ->
       if not @@ Wp_parameters.TerminatesFCDeclarations.get ()
       then Assumed Logic_const.pfalse
-      else if not @@ Kernel_function.is_definition kf
-      then Assumed Logic_const.ptrue
       else populate_true ()
   | None when Kernel_function.is_definition kf ->
       if not @@ Wp_parameters.TerminatesDefinitions.get ()
@@ -225,7 +223,7 @@ let get_terminates_clause kf =
   | None ->
       if not @@ Wp_parameters.TerminatesExtDeclarations.get ()
       then Assumed Logic_const.pfalse
-      else Assumed Logic_const.ptrue
+      else populate_true ()
   | Some p ->
       defined p
 
