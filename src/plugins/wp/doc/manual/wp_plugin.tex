@@ -1031,12 +1031,18 @@ inconsistent requirements, or on the loop with inconsistent invariants, and
 \textsf{WP} generates a user warning.
 
 \begin{description}
-\item[\tt -wp-(no)-smoke-tests] generates checks to detect inconsistencies.
-\item[\tt -wp-(no)-smoke-timeout] timeout to be used for trying to prove \verb+\false+
+\item[\tt -wp-(no)-smoke-tests] generates checks to detect inconsistencies
+  (default is: \texttt{no}).
+\item[\tt -wp-smoke-timeout] timeout to be used for trying to prove \verb+\false+
   on smoke-tests (default is \verb+2+ seconds).
-\item[\tt -wp-no-smoke-dead-code] exclude smoke tests for dead code.
-\item[\tt -wp-no-smoke-dead-loop] exclude smoke tests for inconsistent loop invariants.
-\item[\tt -wp-no-smoke-dead-call] exclude smoke tests for non-terminating calls.
+\item[\tt -wp-(no)-smoke-dead-assumes] includes smoke tests for dead assumes
+  (default is: \texttt{yes}).
+\item[\tt -wp-(no)-smoke-dead-call] includes smoke tests for non-terminating
+  calls (default is: \texttt{yes}).
+\item[\tt -wp-(no)-smoke-dead-code] includes smoke tests for dead code (default
+  is: \texttt{yes}).
+\item[\tt -wp-(no)-smoke-dead-loop] includes smoke tests for inconsistent loop
+  invariants (default is: \texttt{yes}).
 \end{description}
 
 When reporting prover results for smoke-tests, the \textsf{WP} displays

@@ -425,7 +425,7 @@ let () = Parameter_customize.set_group wp_strategy
 module SmokeDeadloop =
   True(struct
     let option_name = "-wp-smoke-dead-loop"
-    let help = "When generating smoke tests, look for inconsistent loop invairants"
+    let help = "When generating smoke tests, look for inconsistent loop invariants"
   end)
 
 let () = Parameter_customize.set_group wp_strategy
