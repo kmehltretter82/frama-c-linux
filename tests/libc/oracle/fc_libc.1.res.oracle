@@ -8274,6 +8274,27 @@ extern int getrusage(int who, struct rusage *r_usage);
  */
 extern int setrlimit(int resource, struct rlimit const *rlp);
 
+/*@ requires valid_in_fd: 0 ≤ in_fd < 1024;
+    requires valid_out_fd: 0 ≤ out_fd < 1024;
+    requires valid_offset_or_null: offset ≡ \null ∨ \valid(offset);
+    requires
+      initialization: offset: offset ≡ \null ∨ \initialized(offset);
+    ensures
+      error_or_chars_sent: \result ≡ -1 ∨ (0 ≤ \result ≤ \old(count));
+    ensures initialization: offset: \initialized(\old(offset));
+    assigns __fc_errno, \result, *offset;
+    assigns __fc_errno
+      \from (indirect: out_fd), (indirect: in_fd), (indirect: offset),
+            (indirect: count);
+    assigns \result
+      \from (indirect: out_fd), (indirect: in_fd), (indirect: offset),
+            (indirect: count);
+    assigns *offset
+      \from (indirect: out_fd), (indirect: in_fd), (indirect: offset),
+            (indirect: count);
+ */
+ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count);
+
 /*@ requires valid_buffer: \valid(buffer);
     assigns \result, *buffer;
     assigns \result \from __fc_time;
