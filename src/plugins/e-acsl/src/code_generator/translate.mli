@@ -53,6 +53,9 @@ val translate_predicate:
     If [pred_to_print] is set, then the runtime check will use this predicate as
     message. *)
 
+val term_to_exp: kernel_function -> Env.t -> term -> exp * Env.t
+(** Convert an ACSL term into a corresponding C expression. *)
+
 val translate_rte_annots:
   (Format.formatter -> 'a -> unit) ->
   'a ->
