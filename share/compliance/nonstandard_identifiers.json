@@ -8,6 +8,7 @@
         "makedev": {"header":"sys/types.h"},
         "option": {"header":"getopt.h"},
         "prioritynames": {"header":"syslog.h"},
+        "sendfile": {"header":"sys/sendfile.h"},
         "setresgid": {"header":"unistd.h"},
         "setresuid": {"header":"unistd.h"},
         "strcspn": {"header":"string.h"},

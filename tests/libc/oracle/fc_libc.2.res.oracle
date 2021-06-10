@@ -105,6 +105,7 @@ skipping share/libc/complex.h
 [kernel] Parsing share/libc/sys/random.h (with preprocessing)
 [kernel] Parsing share/libc/sys/resource.h (with preprocessing)
 [kernel] Parsing share/libc/sys/select.h (with preprocessing)
+[kernel] Parsing share/libc/sys/sendfile.h (with preprocessing)
 [kernel] Parsing share/libc/sys/shm.h (with preprocessing)
 [kernel] Parsing share/libc/sys/signal.h (with preprocessing)
 [kernel] Parsing share/libc/sys/socket.h (with preprocessing)

@@ -296,6 +296,7 @@ share/libc/sys/param.h: CEA_LGPL
 share/libc/sys/random.h: CEA_LGPL
 share/libc/sys/resource.h: CEA_LGPL
 share/libc/sys/select.h: CEA_LGPL
+share/libc/sys/sendfile.h: CEA_LGPL
 share/libc/sys/shm.h: CEA_LGPL
 share/libc/sys/signal.h: CEA_LGPL
 share/libc/sys/socket.h: CEA_LGPL

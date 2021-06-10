@@ -130,6 +130,7 @@
 #include "sys/random.h"
 #include "sys/resource.h"
 #include "sys/select.h"
+#include "sys/sendfile.h"
 #include "sys/shm.h"
 #include "sys/signal.h"
 #include "sys/socket.h"
