@@ -37,7 +37,7 @@ struct
 
   open Cil_types
 
-  (* Loggic types *)
+  (* Logic types *)
 
   let of_ltyp t = Single, t
   let integer = Single, Linteger
@@ -119,12 +119,12 @@ struct
   include Type
 
   (*
-    This modules exportes polymorphic variant to simulate subtyping.
+    This module exports polymorphic variant to simulate subtyping.
     It uses regular variant internally though, instead of using only the
     polymorphic variant, as
     1. it simplifies greatly the .mli since most of the types don't have
        to be exposed ; it also greatly simplifies mistyping errors for the user
-    2. recursive polymorphic variant do not allow inclusion of one into another
+    2. recursive polymorphic variants do not allow inclusion of one into another
     3. it is much easier to type the program with regular variants
   *)
 
@@ -303,7 +303,7 @@ struct
   let zero = of_int 0
   let one = of_int 1
 
-  (* Lvalules *)
+  (* Lvalues *)
 
   let var v = `var v
   let of_lval lv = `lval (CilLval lv)
@@ -869,7 +869,7 @@ struct
       Cil_types.If (ifthenelse_exp, then_block, block, loc)
     | Switch { switch_exp } ->
       let open Cil_types in
-      (* Case are only allowed in the current block by the case function *)
+      (* Cases are only allowed in the current block by the case function *)
       let contains_case stmt =
         List.exists (function Case _ -> true | _ -> false) stmt.labels
       in

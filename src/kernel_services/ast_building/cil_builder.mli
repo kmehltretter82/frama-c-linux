@@ -20,11 +20,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*
-- Permet l'utilisation des lval là où il faut des expression (sous typage)
-- Construit de la même manière le C et la logique
-- Pas nécessaire de renseigner la location partout
-- Interface unifiée vers les smart constructors
+(** This module is meant to build C or ACSL expressions in a unified way.
+    Compared to "classic" Cil functions it also avoid the necessity to provide
+    a location everywhere.
 *)
 
 module Type :
@@ -60,7 +58,7 @@ sig
   val ptr : ('v,'s) typ -> ('v,'v) typ
   val array : ?size:int -> ('v,'s) typ -> ('v,'s list) typ
 
-  (* Attrbutes *)
+  (* Attributes *)
   val attribute : ('v,'s) typ -> string -> Cil_types.attrparam list
     -> ('v,'s) typ
   val const : ('v,'s) typ -> ('v,'s) typ
@@ -113,7 +111,7 @@ sig
   val zero : [> const]
   val one : [> const]
 
-  (* LValues *)
+  (* Lvalues *)
 
   val var : Cil_types.varinfo -> [> var]
   val of_lval : Cil_types.lval -> [> lval]
