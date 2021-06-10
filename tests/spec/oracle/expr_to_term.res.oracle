@@ -76,4 +76,25 @@ int h(void)
   return_label: return __retres;
 }
 
+void expr_to_predicate(int x_0)
+{
+  return;
+}
+
+int z;
+/*@ ensures (int)(t | 5) ≢ 0;
+    ensures ¬(z < 5);
+    ensures z ≢ 0 ∧ t ≢ 0;
+    ensures z ≢ 0 ∧ t ≢ 0;
+    ensures ¬(z < 5);
+    ensures (int)(t | 5) ≢ 0;
+ */
+void i(void)
+{
+  expr_to_predicate((z && t) != 0);
+  expr_to_predicate(! (z < 5));
+  expr_to_predicate(t | 5);
+  return;
+}
+
 

@@ -1,8 +1,3 @@
-/*run.config
-STDOPT:
-STDOPT: #"-loop-no-branches"
-*/
-
 void main(void)
 {
   int i; int j;

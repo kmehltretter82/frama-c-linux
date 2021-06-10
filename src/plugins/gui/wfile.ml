@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -57,18 +57,18 @@ class dialog
         | None , None -> ignore (chooser#set_filename "")
         | None , Some path -> ignore (chooser#set_filename path)
         | Some dir , None ->
-            ignore (chooser#set_current_folder dir) ;
-            ignore (chooser#set_current_name "")
+          ignore (chooser#set_current_folder dir) ;
+          ignore (chooser#set_current_name "")
         | Some dir , Some file ->
-            ignore (chooser#set_current_folder dir) ;
-            ignore (chooser#set_current_name file)
+          ignore (chooser#set_current_folder dir) ;
+          ignore (chooser#set_current_name file)
       end ;
       let result = dialog#run () in
       dialog#misc#hide () ;
       match result with
       | `DELETE_EVENT -> ()
       | `SELECT ->
-          match chooser#get_filenames with | f::_ -> signal#fire f | _ -> ()
+        match chooser#get_filenames with | f::_ -> signal#fire f | _ -> ()
 
   end
 

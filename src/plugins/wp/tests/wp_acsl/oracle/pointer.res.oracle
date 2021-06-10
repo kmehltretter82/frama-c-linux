@@ -1,7 +1,6 @@
 # frama-c -wp [...]
 [kernel] Parsing tests/wp_acsl/pointer.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] tests/wp_acsl/pointer.i:50: Warning: 
   Uncomparable locations p_0 and mem:t.(0)
@@ -235,9 +234,13 @@ Goal Post-condition 'qed_ko,Eq_oracle_ko' in 'pointer':
 Prove: false.
 
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'compare':
-  /*@ behavior typed: requires \separated(&p,q+(..)); */
+[wp] tests/wp_acsl/pointer.i:63: Warning: 
+  Memory model hypotheses for function 'compare':
+  /*@ behavior wp_typed:
+        requires \separated(q + (..), &p); */
   void compare(int *q);
-[wp] Warning: Memory model hypotheses for function 'absurd':
-  /*@ behavior typed: requires \separated(&p,q+(..)); */
+[wp] tests/wp_acsl/pointer.i:73: Warning: 
+  Memory model hypotheses for function 'absurd':
+  /*@ behavior wp_typed:
+        requires \separated(q + (..), &p); */
   void absurd(int *q);

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -29,7 +29,7 @@ type 'a default_contents =
   | Bottom
   | Top of 'a
   | Constant of 'a
-  | Other 
+  | Other
 
 module Make_LOffset
     (V: sig
@@ -417,13 +417,13 @@ struct
         | Bottom ->
           (fun s t ->
              if s == t || is_empty s (*all bases present in t but not in s
-               are implicitly bound to Bottom in s, hence the inclusion holds *)
+                                       are implicitly bound to Bottom in s, hence the inclusion holds *)
              then PTrue
              else PUnknown)
         | Top _ ->
           (fun s t ->
              if s == t || is_empty t (*all bases present in s but not in t
-               are implicitly bound to Top in t, hence the inclusion holds *)
+                                       are implicitly bound to Top in t, hence the inclusion holds *)
              then PTrue
              else PUnknown)
         | _ -> (fun s t -> if s == t then PTrue else PUnknown)
@@ -502,7 +502,7 @@ struct
       let top = vtop () in
       `Value (Offsetmap.create_isotropic ~size top)
 
-    (* may raise Error_Top in the case Top Top *)  
+    (* may raise Error_Top in the case Top Top *)
     let copy_offsetmap src_loc size m =
       let treat_src k_src i_src acc =
         let validity = Base.validity k_src in
@@ -637,6 +637,14 @@ struct
     | Bottom -> Bottom
     | Top -> Top
     | Map m -> Map (M.remove b m)
+
+  let replace_base shape = function
+    | Bottom -> Bottom
+    | Top -> Top
+    | Map map as t ->
+      let decide _key = Offsetmap.join in
+      let modified, map = M.replace_key ~decide shape map in
+      if modified then Map map else t
 
   let is_reachable = function
     | Bottom -> false

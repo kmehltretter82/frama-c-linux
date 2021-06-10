@@ -2,7 +2,7 @@
    COMMENT: Test `strlen` E-ACSL built-ins
 */
 
-#include "signalled.h"
+#include "../utils/signalled.h"
 #include <string.h>
 #include <stdlib.h>
 

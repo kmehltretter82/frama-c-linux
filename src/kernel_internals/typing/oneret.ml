@@ -235,8 +235,8 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
                   (pands
                      (List.map
                         (fun p ->
-                           pold ~loc:p.ip_content.pred_loc
-                             (Logic_const.pred_of_id_pred p))
+                           let p = Logic_const.pred_of_id_pred p in
+                           pold ~loc:p.pred_loc p)
                         bhv.b_assumes),
                    pands
                      (List.fold_left
@@ -381,7 +381,8 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
           match !returns_assert with
           | { pred_content = Ptrue } -> [s; sg]
           | p ->
-            let a = Logic_const.new_code_annotation (AAssert ([],Assert,p)) in
+            let p = Logic_const.toplevel_predicate p in
+            let a = Logic_const.new_code_annotation (AAssert ([],p)) in
             let sta = mkStmt (Instr (Code_annot (a,loc))) in
             if callback<>None then
               ( let gclause = sta , a in
@@ -482,7 +483,7 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
     lastloc := !currentLoc ;  *) (* last location in the function *)
   f.sbody <- scanBlock true f.sbody ;
   if !haveGoto && !retStmt != dummyStmt then encapsulate_local_vars f;
-  Extlib.may do_callback callback
+  Option.iter do_callback callback
 
 (*
   Local Variables:

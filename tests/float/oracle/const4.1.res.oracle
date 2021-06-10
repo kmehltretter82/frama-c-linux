@@ -1,3 +1,5 @@
+[eva] Warning: Option -eva-all-rounding-modes-constants is now deprecated.
+  Please contact us if you need it.
 [kernel] Parsing tests/float/const4.i (no preprocessing)
 [kernel:parser:decimal-float] tests/float/const4.i:6: Warning: 
   Floating-point constant 3.4e38f is not represented exactly. Will use 0x1.ff933c0000000p127.

@@ -1,7 +1,6 @@
 # frama-c -wp -wp-rte [...]
 [kernel] Parsing tests/wp_gallery/frama_c_exo1_solved.c (with preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [rte] annotating function exo1
 [wp] Goal typed_exo1_ensures : not tried
 [wp] Goal typed_exo1_ensures_2 : not tried

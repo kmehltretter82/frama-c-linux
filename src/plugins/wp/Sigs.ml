@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -291,9 +291,10 @@ sig
   val datatype : string
   (** For projectification. Must be unique among models. *)
 
-  val hypotheses : unit -> MemoryContext.clause list
-  (** Computes the memory model hypotheses including separation and validity
-      clauses to be verified for this model. *)
+  val hypotheses : MemoryContext.partition -> MemoryContext.partition
+  (** Computes the memory model partitionning of the memory locations.
+      This function typically adds new elements to the partition received
+      in input (that can be empty). *)
 
   module Chunk : Chunk
   (** Memory model chunks. *)
@@ -421,6 +422,10 @@ sig
   (** Return the value of the object of the given type at the given location in
       the given memory state. *)
 
+  val load_init : sigma -> c_object -> loc -> term
+  (** Return the initialization status at the given location in the given
+      memory state. *)
+
   val copied : sigma sequence -> c_object -> loc -> loc -> equation list
   (**
      Return a set of equations that express a copy between two memory state.
@@ -430,14 +435,34 @@ sig
      [sigma.post] at [loc2].
   *)
 
+  val copied_init : sigma sequence -> c_object -> loc -> loc -> equation list
+  (**
+     Return a set of equations that express a copy of an initialized state
+     between two memory state.
+
+     [copied sigma ty loc1 loc2] returns a set of formula expressing that the
+     initialization status for an object [ty] is the same in [sigma.pre] at
+     [loc1] and in [sigma.post] at [loc2].
+  *)
+
   val stored : sigma sequence -> c_object -> loc -> term -> equation list
   (**
      Return a set of formula that express a modification between two memory
      state.
 
-     [copied sigma ty loc t] returns a set of formula expressing that
+     [stored sigma ty loc t] returns a set of formula expressing that
      [sigma.pre] and [sigma.post] are identical except for an object [ty] at
      location [loc] which is represented by [t] in [sigma.post].
+  *)
+
+  val stored_init : sigma sequence -> c_object -> loc -> term -> equation list
+  (**
+     Return a set of formula that express a modification of the initialization
+     status between two memory state.
+
+     [stored_init sigma ty loc t] returns a set of formula expressing that
+     [sigma.pre] and [sigma.post] are identical except for an object [ty] at
+     location [loc] which has a new init represented by [t] in [sigma.post].
   *)
 
   val assigned : sigma sequence -> c_object -> loc sloc -> equation list
@@ -586,7 +611,7 @@ sig
      Express that all objects in a range of locations have a given value.
 
      More precisely, [is_exp_range sigma loc ty a b v] express that
-     value at [( ty* )loc + k] equals [v], forall [a <= k < b].
+     value at [( ty* )loc + k] equals [v], forall [a <= k <= b].
      Value [v=None] stands for zero.
   *)
   val is_exp_range :
@@ -597,17 +622,25 @@ sig
   val unchanged : M.sigma -> M.sigma -> varinfo -> pred
   (** Express that a given variable has the same value in two memory states. *)
 
-  type warned_hyp = Warning.Set.t * pred
+  type warned_hyp = Warning.Set.t * (pred * pred)
 
-  val init : sigma:M.sigma -> varinfo -> init option -> warned_hyp list
-  (** Express that some variable has some initial value at the
-      given memory state.
+  val init :
+    sigma:M.sigma -> varinfo -> init option -> warned_hyp list
+    (** Express that some variable has some initial value at the
+        given memory state. The first predicate states the value,
+        the second, the initialization status.
 
-      Remark: [None] initializer are interpreted as zeroes. This is consistent
-      with the [init option] associated with global variables in CIL,
-      for which the default initializer are zeroes. There is no
-      [init option] value associated with local initializers.
-  *)
+        Note: we DO NOT merge values and initialization status
+        hypotheses as the factorization performed by Qed can make
+        predicates too hard to simplify later.
+
+        Remark: [None] initializer are interpreted as zeroes. This is consistent
+        with the [init option] associated with global variables in CIL,
+        for which the default initializer are zeroes. This function is called
+        for global initializers and local initializers ([Cil.Local_init]).
+        It is not called for local variables without initializers as they do not
+        have a [Cil.init option].
+    *)
 
 end
 
@@ -656,6 +689,9 @@ sig
 
   (** Update a frame with a specific environment for the given label. *)
   val set_at_frame : frame -> Clabels.c_label -> sigma -> unit
+
+  (** Chek if a frame already has a specific envioronement for the given label. *)
+  val has_at_frame : frame -> Clabels.c_label -> bool
 
   (** Same as [mem_at_frame] but for the current frame. *)
   val mem_frame : Clabels.c_label -> sigma
@@ -761,22 +797,21 @@ sig
   val pred : polarity -> env -> Cil_types.predicate -> pred
 
   (** Compile a term representing a set of memory locations into an abstract
-      region. When [~unfold:true], compound memory locations are expanded
-      field-by-field. *)
-  val region : env -> unfold:bool -> Cil_types.term -> region
+      region.  *)
+  val region : env -> Cil_types.term -> region
 
   (** Computes the region assigned by a list of froms. *)
   val assigned_of_lval :
-    env -> unfold:bool -> Cil_types.lval -> region
+    env -> Cil_types.lval -> region
 
   (** Computes the region assigned by a list of froms. *)
   val assigned_of_froms :
-    env -> unfold:bool -> from list -> region
+    env -> from list -> region
 
   (** Computes the region assigned by an assigns clause.
       [None] means everyhting is assigned. *)
   val assigned_of_assigns :
-    env -> unfold:bool -> assigns -> region option
+    env -> assigns -> region option
 
   (** Same as [term] above but reject any set of locations. *)
   val val_of_term : env -> Cil_types.term -> term
@@ -798,9 +833,12 @@ sig
 
   (** Check assigns inclusion.
       Compute a formula that checks whether written locations are either
-      invalid (at the given memory location)
-      or included in some assignable region. *)
-  val check_assigns : sigma -> written:region -> assignable:region -> pred
+      invalid (at the given memory location) or included in some assignable
+      region. When [~unfold:n && n <> 0], compound memory locations are expanded
+      field-by-field and arrays, cell-by-cell (by quantification). Up to [n]
+      levels are unfolded, -1 means unlimited. *)
+  val check_assigns :
+    unfold:int -> sigma -> written:region -> assignable:region -> pred
 
 end
 

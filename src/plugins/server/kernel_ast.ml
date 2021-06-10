@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -194,11 +194,19 @@ struct
         ~get:(fun (tag, _) -> Rich_text.to_string Printer_tag.pretty tag)
         model
     in
+    let () =
+      States.column
+        ~name:"sloc"
+        ~descr:(Md.plain "Source location")
+        ~data:(module Kernel_main.LogSource)
+        ~get:(fun (tag, _) -> fst (Printer_tag.loc_of_localizable tag))
+        model
+    in
     States.register_array
       ~package
       ~name:"markerInfo"
       ~descr:(Md.plain "Marker informations")
-      ~key:snd
+      ~key:snd ~keyType:Jstring
       ~iter model
 
   let create_tag = function
@@ -254,6 +262,25 @@ module Printer = Printer_tag.Make(Marker)
 (* --- Ast Data                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
+module Lval =
+struct
+  type t = kinstr * lval
+  let jtype = Marker.jlval
+  let to_json (kinstr, lval) =
+    let kf = match kinstr with
+      | Kglobal -> None
+      | Kstmt stmt -> Some (Kernel_function.find_englobing_kf stmt)
+    in
+    Marker.to_json (PLval (kf, kinstr, lval))
+  let of_json js =
+    let open Printer_tag in
+    match Marker.of_json js with
+    | PLval (_, kinstr, lval) -> kinstr, lval
+    | PVDecl (_, kinstr, vi) -> kinstr, Cil.var vi
+    | PGlobal (GVar (vi, _, _) | GVarDecl (vi, _)) -> Kglobal, Cil.var vi
+    | _ -> Data.failure "not a lval marker"
+end
+
 module Stmt =
 struct
   type t = stmt
@@ -295,7 +322,7 @@ end
 module KfMarker = struct
   type record
   let record : record Record.signature = Record.signature ()
-  let fct = Record.field record ~name:"function"
+  let fct = Record.field record ~name:"fct"
       ~descr:(Md.plain "Function") (module Kf)
   let marker = Record.field record ~name:"marker"
       ~descr:(Md.plain "Marker") (module Marker)
@@ -338,11 +365,13 @@ let () = Request.register ~package
     ~input:(module Kf) ~output:(module Jtext)
     begin fun kf ->
       let libc = Kernel.PrintLibc.get () in
-      if not libc then Kernel.PrintLibc.set true ;
-      let global = Kernel_function.get_global kf in
-      let ast = Jbuffer.to_json Printer.pp_global global in
-      if not libc then Kernel.PrintLibc.set false ;
-      ast
+      try
+        if not libc then Kernel.PrintLibc.set true ;
+        let global = Kernel_function.get_global kf in
+        let ast = Jbuffer.to_json Printer.pp_global global in
+        if not libc then Kernel.PrintLibc.set false ; ast
+      with err ->
+        if not libc then Kernel.PrintLibc.set false ; raise err
     end
 
 module Functions =
@@ -352,7 +381,30 @@ struct
 
   let signature kf =
     let global = Kernel_function.get_global kf in
-    Rich_text.to_string Printer_tag.pretty (PGlobal global)
+    let libc = Kernel.PrintLibc.get () in
+    try
+      if not libc then Kernel.PrintLibc.set true ;
+      let txt = Rich_text.to_string Printer_tag.pretty (PGlobal global) in
+      if not libc then Kernel.PrintLibc.set false ;
+      if Kernel_function.is_entry_point kf then (txt ^ " /* main */") else txt
+    with err ->
+      if not libc then Kernel.PrintLibc.set false ; raise err
+
+  let is_builtin kf =
+    Cil_builtins.is_builtin (Kernel_function.get_vi kf)
+
+  let is_stdlib kf =
+    let vi = Kernel_function.get_vi kf in
+    Cil.is_in_libc vi.vattr
+
+  let is_eva_analyzed kf =
+    if Db.Value.is_computed () then !Db.Value.is_called kf else false
+
+  let iter f =
+    Globals.Functions.iter
+      (fun kf ->
+         let name = Kernel_function.get_name kf in
+         if not (Ast_info.is_frama_c_builtin name) then f kf)
 
   let array : kernel_function States.array =
     begin
@@ -367,11 +419,46 @@ struct
         ~descr:(Md.plain "Signature")
         ~data:(module Data.Jstring)
         ~get:signature ;
+      States.column model
+        ~name:"main"
+        ~descr:(Md.plain "Is the function the main entry point")
+        ~data:(module Data.Jbool)
+        ~default:false
+        ~get:Kernel_function.is_entry_point;
+      States.column model
+        ~name:"defined"
+        ~descr:(Md.plain "Is the function defined?")
+        ~data:(module Data.Jbool)
+        ~default:false
+        ~get:Kernel_function.is_definition;
+      States.column model
+        ~name:"stdlib"
+        ~descr:(Md.plain "Is the function from the Frama-C stdlib?")
+        ~data:(module Data.Jbool)
+        ~default:false
+        ~get:is_stdlib;
+      States.column model
+        ~name:"builtin"
+        ~descr:(Md.plain "Is the function a Frama-C builtin?")
+        ~data:(module Data.Jbool)
+        ~default:false
+        ~get:is_builtin;
+      States.column model
+        ~name:"eva_analyzed"
+        ~descr:(Md.plain "Has the function been analyzed by Eva")
+        ~data:(module Data.Jbool)
+        ~default:false
+        ~get:is_eva_analyzed;
+      States.column model
+        ~name:"sloc"
+        ~descr:(Md.plain "Source location")
+        ~data:(module Kernel_main.LogSource)
+        ~get:(fun kf -> fst (Kernel_function.get_location kf));
       States.register_array model
         ~package ~key
         ~name:"functions"
         ~descr:(Md.plain "AST Functions")
-        ~iter:Globals.Functions.iter
+        ~iter
         ~add_reload_hook:Ast.add_hook_on_update ;
     end
 

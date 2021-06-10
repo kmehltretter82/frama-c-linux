@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -148,6 +148,7 @@ let printer _pp fmt ext =
   match ext with
   | Ext_id _ -> assert false
   | Ext_preds _ -> assert false
+  | Ext_annot _ -> assert false
   | Ext_terms terms ->
     match widen_hint_terms_of_terms terms with
     | Some (hint_lval, hint_terms) ->

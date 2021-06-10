@@ -1,7 +1,6 @@
 /* run.config*
-   GCC:
-   STDOPT: #"-main test_unroll -eva-default-loop-unroll 10"
-   STDOPT: #"-main test_split"
+   
+   STDOPT: #"-eva-default-loop-unroll 10"
    STDOPT: +"-main test_split -eva-partition-value k"
    STDOPT: #"-main test_loop_split -eva-partition-history 1"
    STDOPT: #"-main test_history -eva-partition-history 0"
@@ -12,10 +11,11 @@
 
 #define N 10
 
+volatile nondet;
 
 void test_unroll()
 {
-  int a[N], b[N], c[N], d[2*N], e[N];
+  int a[N], b[N], c[2*N], d[2*N], e[N];
 
   // The inner loop needs to be unrolled to allow strong updates
   // The outer loops doesn't need to be unrolled
@@ -40,10 +40,14 @@ void test_unroll()
 
   // At the end, we must have both arrays a and b to be fully initialized at 42
 
-  // Small loops can be unrolled without giving an unroll parameter
-  //@ loop unroll N;
-  for (int i = 0 ; i < N ; i++)
-    c[i] = 0;
+  // Small loops can be unrolled without giving an unroll amount.
+  // The actual limit of the number of iterations can be overriden with
+  // the option -eva-default-loop-unroll
+  // Here -eva-default-loop-unroll is set to a value not high enough to
+  // completely unroll the loop thus a warning should be emitted.
+  //@ loop unroll;
+  for (int i = 0 ; i < 2*N ; i++)
+    c[i] = i % 2;
 
   // Longer loops won't be completely unrolled when not giving a parameter
   //@ loop unroll N;
@@ -83,6 +87,26 @@ void test_split()
   Frama_C_show_each_before_second_merge(i,j,k);
   //@ merge j;
   Frama_C_show_each_end(i,j,k);
+}
+
+void test_dynamic_split()
+{
+  int a, b;
+  //@ dynamic_split a;
+  if (nondet) {
+    a = Frama_C_interval(0, 2);
+    b = a;
+  }
+  Frama_C_show_each_split_with_uninit(a, b);
+  a = 0;
+  Frama_C_show_each_no_split(a, b);
+  a = Frama_C_interval(0, 2);
+  b = a;
+  //@ split a;
+  a = 0;
+  Frama_C_show_each_split(a, b);
+  //@ merge a;
+  Frama_C_show_each_no_split(a, b);
 }
 
 void test_loop_split()
@@ -134,10 +158,53 @@ void test_history()
     k = k / j;
 }
 
+void test_slevel()
+{
+  int a[N], b[N], c[N], d[N], e[4];
+  //@slevel 10;
+  for (int i = 0; i < N; i++) {
+    a[i] = 42;
+  }
+  
+  //@slevel default;
+  for (int i = 0; i < N; i++) {
+    b[i] = 42;
+  }
+
+  //@slevel 20;
+  for (int i = 0; i < N; i++) {
+    if (nondet)
+      c[i] = 42;
+    else
+      c[i] = 33;
+  }
+
+  //@slevel 20;
+  for (int i = 0; i < N; i++) {
+    if (nondet)
+      d[i] = 42;
+    else
+      d[i] = 33;
+    //@slevel merge;
+    ; // Otherwise previous annotation is ignored
+  }
+  
+  //@slevel 0;
+  ;
+  //@slevel full;
+  for (int i = 0; i < 4; i++) {
+    if (nondet)
+      e[i] = 42;
+    else
+      e[i] = 33;
+  }
+}
+
 void main(void)
 {
+  test_slevel();
   test_unroll();
   test_split();
-  test_loop_split();
+  test_dynamic_split();
 }
 

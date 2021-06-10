@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2020                                               #
+#  Copyright (C) 2007-2021                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -34,6 +34,8 @@ m4_ifndef([FRAMAC_M4_MACROS],
         )
 
 check_plugin(mdr,PLUGIN_RELATIVE_PATH(plugin_file),[Markdown/SARIF report plug-in],yes)
+
+plugin_use(mdr,eva)
 
 plugin_require_pkg(mdr,ppx_deriving)
 plugin_require_pkg(mdr,ppx_deriving_yojson)

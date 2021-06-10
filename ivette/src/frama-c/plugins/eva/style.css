@@ -1,0 +1,260 @@
+/* -------------------------------------------------------------------------- */
+/* --- Probe Panel                                                        --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-probeinfo {
+    min-height: 32px;
+    padding-left: 6px;
+    padding-top: 2px;
+    padding-bottom: 4px;
+    width: 100%;
+    background: #ccc;
+    display: flex;
+}
+
+.eva-probeinfo-label {
+    flex: 0 1 auto;
+    min-width: 22px;
+    text-align: left;
+}
+
+.eva-probeinfo-code {
+    flex: 0 1 auto;
+    height: fit-content;
+    background: lightgrey;
+    min-width: 120px;
+    width: auto;
+    border: thin solid black;
+    padding-left: 6px;
+    padding-right: 6px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.eva-probeinfo-stmt {
+    flex: 0 0 auto;
+    margin-left: 2px;
+    margin-right: 0px;
+    margin-top: 2px;
+}
+
+.eva-probeinfo-button {
+    flex: 0 0 auto;
+    margin: 1px;
+    min-width: 16px;
+}
+
+.eva-probeinfo-state {
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Call Satck Info                                                    --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-info {
+    width: 100%;
+    flex-wrap: wrap;
+    background: #ccc;
+    padding-top: 3px;
+    padding-left: 12px;
+    padding-bottom: 2px;
+}
+
+.eva-callsite {
+    flex: 0 0 auto;
+    fill: #7cacbb;
+    background: #eee;
+    border-radius: 4px;
+    border: thin solid black;
+    padding-right: 7px;
+}
+
+.eva-callsite.eva-focused {
+    background: #cbe4cb;
+}
+
+.eva-callsite.eva-focused.eva-transient {
+    background: #f9dca6;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Alarms                                                             --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-cell-alarms {
+    fill: orange;
+    position: absolute;
+    top: -1px;
+    right: 3px;
+    z-index: 1;
+}
+
+.eva-alarm-info {
+    font-size: x-small;
+    padding: 0px;
+    margin: 1px;
+}
+
+.eva-alarm-none { display: none; }
+.eva-alarm-True { fill: green; }
+.eva-alarm-False { fill: #fb4e4a; }
+.eva-alarm-Unknown { fill: darkorange; }
+
+/* -------------------------------------------------------------------------- */
+/* --- Styling Values                                                     --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-stmt {
+    color: grey;
+    text-select: none;
+}
+
+.eva-sized-area {
+    padding: 3px;
+    white-space: pre;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Table Rows                                                         --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-row {
+    display: flex;
+    position: relative;
+    flex: 0 1 auto;
+    height: 100%;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Table Heads                                                        --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-function {
+    padding-top: 0px;
+    background: #ccc;
+}
+
+.eva-head {
+    padding-top: 2px;
+    color: #777;
+    text-align: center;
+    border-left: thin solid black;
+    border-bottom: thin solid black;
+}
+
+.eva-probes .eva-head {
+    border-top: thin solid black;
+}
+
+.eva-phantom {
+    visibility: hidden;
+    height: 0;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Table Cells                                                        --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-fct-fold {
+    margin-left: 4px;
+    margin-right: 8px;
+    padding: 0px;
+}
+
+.eva-fct-name {
+    padding: 0px;
+    font-weight: bold;
+}
+
+.eva-cell {
+    flex: 1 1 auto;
+    border-right: thin solid black;
+    border-bottom: thin solid black;
+}
+
+.eva-cell:nth-child(2) {
+    border-left: thin solid black;
+}
+
+.eva-probes .eva-cell {
+    padding: 2px;
+    text-align: center;
+    border-top: thin solid black;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Cell Diffs                                                         --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-diff-shadow {
+    border: solid transparent 2px;
+    position: relative;
+    z-index: -1;
+}
+
+.eva-diff-added { }
+.eva-diff-removed { text-decoration: strike }
+
+.eva-state-Here .eva-diff { background: #95f5ff; }
+.eva-state-After .eva-diff { background: #fff819; }
+.eva-state-Then .eva-diff { background: #c8e06e; }
+.eva-state-Else .eva-diff { background: #ff834e; }
+
+/* -------------------------------------------------------------------------- */
+/* --- Table Rows Background                                              --- */
+/* -------------------------------------------------------------------------- */
+
+/* --- Probes --- */
+
+.eva-probes .eva-cell {
+    background: #cbe4cb;
+}
+
+.eva-probes .eva-focused {
+    background: #02da02;
+}
+
+.eva-probes .eva-transient {
+    background: #fff0d5;
+}
+
+.eva-probes .eva-transient.eva-focused {
+    background: orange;
+}
+
+
+/* --- Values / Callstacks --- */
+
+.eva-values .eva-cell {
+    background: #eee;
+}
+
+.eva-values .eva-focused {
+    background: #e1e8f7;
+}
+
+.eva-values .eva-transient.eva-focused {
+    background: #fff0d5;
+}
+
+.eva-callstack.eva-row-odd .eva-cell {
+    background: #eee;
+}
+
+.eva-callstack.eva-row-even .eva-cell {
+    background: #e2e8e8;
+}
+
+.eva-callstack.eva-row-aligned {
+    background: lightblue;
+}
+
+.eva-callstack.eva-row-selected {
+    background: #f9dca6;
+}
+
+/* -------------------------------------------------------------------------- */

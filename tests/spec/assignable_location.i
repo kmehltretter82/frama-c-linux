@@ -1,4 +1,4 @@
-/* run.config 
+/* run.config
 OPT: -kernel-warn-key=annot-error=active
 */
 
@@ -16,6 +16,13 @@ double annotations_to_accept(typetab *t) {
   //@ requires r3: \valid( ((double *)t) + (0..1) ) ;
   //@ behavior b3: assigns ((double *)t)[0..1];
   return f(t);
+}
+
+/*@ behavior acc_0: assigns \result \from &x ;
+    behavior acc_1: assigns \result \from &f ;
+*/
+int * from_address_to_accept(int f){
+  return (void*)0 ;
 }
 
 
@@ -38,4 +45,11 @@ int annotations_to_reject(void) {
   //@ behavior to_reject_5: assigns lx;
   //@ behavior to_reject_6: assigns x \from lx;
   return g();
+}
+
+/*@ behavior rej_0: assigns \result \from &l ; */
+int * from_address_to_reject(int f){
+  int l ;
+  //@ behavior rej_1: assigns l \from &lx ;
+  return (void*)0 ;
 }

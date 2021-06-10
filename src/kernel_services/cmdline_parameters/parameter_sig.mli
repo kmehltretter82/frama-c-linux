@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -179,10 +179,13 @@ module type S_no_parameter = sig
 
   val equal: t -> t -> bool
 
-  val add_aliases: string list -> unit
+  val add_aliases: ?visible: bool -> ?deprecated:bool -> string list -> unit
   (** Add some aliases for this option. That is other option names which have
       exactly the same semantics that the initial option.
-      @raise Invalid_argument if one of the strings is empty *)
+      If [visible] is set to false, the aliases do not appear in help messages.
+      If [deprecated] is set to true, the use of the aliases emits a warning.
+      @raise Invalid_argument if one of the strings is empty
+      @modify 22.0-Titanium add [visible] and [deprecated] arguments. *)
 
   (**/**)
   val is_set: unit -> bool
@@ -290,7 +293,16 @@ module type With_output = sig
 end
 
 (** signature for normalized pathnames. *)
-module type Filepath = S with type t = Filepath.Normalized.t
+module type Filepath = sig
+  include S with type t = Filepath.Normalized.t
+
+  (**
+     Whether the Filepath is empty.
+
+     @since 23.0-Vanadium
+  *)
+  val is_empty: unit -> bool
+end
 
 (** signature for searching files in a specific directory. *)
 module type Specific_dir = sig

@@ -185,6 +185,21 @@
 [eva] tests/libc/wchar_h.c:66: 
   function wcsncat: no state left, precondition 'separation' got status valid.
 [eva] Done for function wcsncat
+[eva] computing for function wcscasecmp <- main.
+  Called from tests/libc/wchar_h.c:70.
+[eva] using specification for function wcscasecmp
+[eva] tests/libc/wchar_h.c:70: 
+  function wcscasecmp: precondition 'valid_wstring_ws1' got status valid.
+[eva] tests/libc/wchar_h.c:70: 
+  function wcscasecmp: precondition 'valid_wstring_ws2' got status valid.
+[eva] Done for function wcscasecmp
+[eva] computing for function wcscasecmp <- main.
+  Called from tests/libc/wchar_h.c:71.
+[eva] tests/libc/wchar_h.c:71: 
+  function wcscasecmp: precondition 'valid_wstring_ws1' got status valid.
+[eva] tests/libc/wchar_h.c:71: 
+  function wcscasecmp: precondition 'valid_wstring_ws2' got status valid.
+[eva] Done for function wcscasecmp
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -201,4 +216,5 @@
   wdst2[0..9] ∈ {65}
        [10] ∈ {0}
        [11..19] ∈ [--..--]
+  ir ∈ [--..--]
   __retres ∈ {0; 1}

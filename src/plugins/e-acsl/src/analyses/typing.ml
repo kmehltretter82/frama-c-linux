@@ -28,9 +28,12 @@ open Cil_types
 let dkey = Options.dkey_typing
 
 let compute_quantif_guards_ref
-  : (predicate -> logic_var list -> predicate ->
-     (term * relation * logic_var * relation * term) list) ref
-  = Extlib.mk_fun "compute_quantif_guards_ref"
+  : (is_forall:bool -> predicate ->logic_var list -> predicate ->
+     (term * relation * logic_var * relation * term) list * predicate) ref
+  = ref (fun ~is_forall:_ ->
+      raise
+        (Extlib.Unregistered_function
+           "Function 'compute_quantif_guards_ref' not registered yet"))
 
 (******************************************************************************)
 (** Datatype and constructor *)
@@ -321,7 +324,7 @@ let type_letin li li_t =
 (* type the term [t] in a context [ctx] by taking --e-acsl-gmp-only into account
    iff [use_gmp_opt] is true. *)
 let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
-  let ctx = Extlib.opt_map (mk_ctx ~use_gmp_opt) ctx in
+  let ctx = Option.map (mk_ctx ~use_gmp_opt) ctx in
   let dup ty = ty, ty in
   let compute_ctx ?ctx i =
     (* in order to get a minimal amount of generated casts for operators, the
@@ -485,8 +488,8 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
         in
         List.iter2 typ_arg li.l_profile args;
         (* [li.l_type is [None] for predicate only: not possible here.
-           Thus using [Extlib.the] is fine *)
-        dup (ty_of_logic_ty (Extlib.the li.l_type))
+           Thus using [Option.get] is fine *)
+        dup (ty_of_logic_ty (Option.get li.l_type))
       else begin
         (* TODO: what if the type of the parameter is smaller than the infered
            type of the argument? For now, it is silently ignored (both
@@ -593,7 +596,6 @@ let rec type_predicate p =
           Options.fatal "unexpected logic definition"
             Printer.pp_predicate p
       end
-    | Pseparated _ -> Error.not_yet "\\separated"
     | Pdangling _ -> Error.not_yet "\\dangling"
     | Prel(_, t1, t2) ->
       let i1 = Interval.infer t1 in
@@ -628,9 +630,17 @@ let rec type_predicate p =
       ignore (type_term ~use_gmp_opt:true li_t);
       (type_predicate p).ty
 
-    | Pforall(bounded_vars, { pred_content = Pimplies(hyps, goal) })
-    | Pexists(bounded_vars, { pred_content = Pand(hyps, goal) }) ->
-      let guards = !compute_quantif_guards_ref p bounded_vars hyps in
+    | Pforall(bounded_vars, ({ pred_content = Pimplies(_, _) } as p'))
+    | Pexists(bounded_vars, ({ pred_content = Pand(_, _) } as p')) ->
+      let is_forall =
+        match p.pred_content with
+        | Pforall _ -> true
+        | Pexists _ -> false
+        | _ -> assert false
+      in
+      let guards, goal =
+        !compute_quantif_guards_ref ~is_forall p bounded_vars p'
+      in
       let iv_plus_one iv =
         Interval.Ival (Ival.add_singleton_int Integer.one iv)
       in
@@ -681,6 +691,11 @@ let rec type_predicate p =
         guards;
       (type_predicate goal).ty
 
+    | Pseparated tlist ->
+      List.iter
+        (fun t -> ignore (type_term ~use_gmp_opt:false ~ctx:Nan t))
+        tlist;
+      c_int
     | Pinitialized(_, t)
     | Pfreeable(_, t)
     | Pallocable(_, t)
@@ -703,7 +718,7 @@ let type_term ~use_gmp_opt ?ctx t =
     Printer.pp_term t (Pretty_utils.pp_opt D.pretty) ctx;
   ignore (type_term ~use_gmp_opt ?ctx t)
 
-let type_named_predicate ?(must_clear=true) p =
+let type_named_predicate ~must_clear p =
   Options.feedback ~dkey ~level:3 "typing predicate '%a'."
     Printer.pp_predicate p;
   if must_clear then begin
@@ -747,12 +762,12 @@ let get_op t =
 
 let get_cast t =
   let info = Memo.get t in
-  try Extlib.opt_map typ_of_number_ty info.cast
+  try Option.map typ_of_number_ty info.cast
   with Not_a_number -> None
 
 let get_cast_of_predicate p =
   let info = type_predicate p in
-  try Extlib.opt_map typ_of_number_ty info.cast
+  try Option.map typ_of_number_ty info.cast
   with Not_a_number -> assert false
 
 let clear = Memo.clear

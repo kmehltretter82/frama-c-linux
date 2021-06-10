@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -270,7 +270,7 @@ let cardinal = function
 
 let cardinal_estimate ~size = function
   | Set s -> Int.of_int (Int_set.cardinal s)
-  | Itv i -> Extlib.opt_conv (Int.two_power size) (Int_interval.cardinal i)
+  | Itv i -> Option.value ~default:(Int.two_power size) (Int_interval.cardinal i)
 
 let cardinal_less_than v n =
   let c =
@@ -521,8 +521,8 @@ let shift_aux scale op (x: t) (y: t) =
     match y with
     | Set s -> Int_set.map_reduce (fun n -> scale (Int.two_power n) x) join s
     | Itv _ ->
-      let min = Extlib.opt_map Int.two_power (min_int y) in
-      let max = Extlib.opt_map Int.two_power (max_int y) in
+      let min = Option.map Int.two_power (min_int y) in
+      let max = Option.map Int.two_power (max_int y) in
       let modu = match min with None -> Int.one | Some m -> m in
       let factor = check_make ~min ~max ~rem:Int.zero ~modu in
       op x factor
@@ -660,6 +660,8 @@ end
 
 module type BitOperator =
 sig
+  (* Concrete version of the bitwise operator *)
+  val concrete_bitwise : Int.t -> Int.t -> Int.t
   (* Printable version of the operator *)
   val representation : string
   (* forward is given here as the lifted function of some bit operator op
@@ -682,6 +684,8 @@ end
 
 module And : BitOperator =
 struct
+  let concrete_bitwise = Int.logand
+
   let representation = "&"
 
   let forward v1 v2 =
@@ -701,6 +705,8 @@ end
 
 module Or : BitOperator =
 struct
+  let concrete_bitwise = Int.logor
+
   let representation = "|"
 
   let forward v1 v2 =
@@ -720,6 +726,8 @@ end
 
 module Xor : BitOperator =
 struct
+  let concrete_bitwise = Int.logxor
+
   let representation = "^"
 
   let forward v1 v2 =
@@ -893,7 +901,15 @@ struct
       acc := List.fold_left (set_bit (Bit i)) [] !acc;
       if List.length !acc > small_cardinal () then raise Do_not_fit_small_sets
     done;
-    let list = List.map (fun (r, _, _) -> r) !acc in
+    (* Keep only values that can actually be obtained *)
+    let is_admissible (r, v1, v2) =
+      match v1, v2 with
+      | Set s1, Set s2 ->
+        let op = Op.concrete_bitwise in
+        Int_set.(exists (fun i1 -> exists (fun i2 -> op i1 i2 = r) s2) s1)
+      | _, _ -> true
+    in
+    let list = Extlib.filter_map is_admissible (fun (r, _, _) -> r) !acc in
     Set (Int_set.inject_list list)
 
   (* If lower is true (resp. false), compute the lower (resp. upper) bound of
@@ -936,18 +952,22 @@ struct
     bound
 
   let bitwise_forward (v1 : t) (v2 : t) : t =
-    let r, modu = compute_modulo v1 v2 in
-    match result_size v1 v2 with
-    | None ->
-      (* We could do better here, as one of the bound may be finite. However,
-         this case should occur rarely or not at all. *)
-      inject_interval None None r modu
-    | Some size ->
-      try compute_small_set ~size v1 v2 r modu
-      with Do_not_fit_small_sets ->
-        let min = compute_bound ~size v1 v2 true
-        and max = compute_bound ~size v1 v2 false in
-        inject_interval (Some min) (Some max) r modu
+    match v1, v2 with
+    | Set s1, Set s2 ->
+      inject_set_or_top (Int_set.apply2 Op.concrete_bitwise s1 s2)
+    | _, _ ->
+      let r, modu = compute_modulo v1 v2 in
+      match result_size v1 v2 with
+      | None ->
+        (* We could do better here, as one of the bound may be finite. However,
+           this case should occur rarely or not at all. *)
+        inject_interval None None r modu
+      | Some size ->
+        try compute_small_set ~size v1 v2 r modu
+        with Do_not_fit_small_sets ->
+          let min = compute_bound ~size v1 v2 true
+          and max = compute_bound ~size v1 v2 false in
+          inject_interval (Some min) (Some max) r modu
 end
 
 let bitwise_or = let module M = BitwiseOperator (Or) in M.bitwise_forward

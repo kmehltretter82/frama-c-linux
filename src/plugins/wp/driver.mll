@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -71,6 +71,10 @@
   let newline lexbuf =
     lexbuf.lex_curr_p <-
       { lexbuf.lex_curr_p with pos_lnum = succ lexbuf.lex_curr_p.pos_lnum }
+
+  (*TODO[LC] Think about projectification ... *)
+  let dkey = Wp_parameters.register_category "includes"
+  let dkey_driver = Wp_parameters.register_category "driver"
 
   let rec conv_bal default (name,bal) =
     match bal with
@@ -460,7 +464,7 @@ and bal = parse
   let load_file ?(ontty=`Transient) file =
     try
       let path = Datatype.Filepath.of_string file in
-      Wp_parameters.feedback ~ontty "Loading driver '%a'"
+      Wp_parameters.feedback ~dkey:dkey_driver ~ontty "Loading driver '%a'"
         Datatype.Filepath.pretty path;
       let driver_dir = Filename.dirname file in
       let inc = open_in file in
@@ -481,10 +485,6 @@ and bal = parse
       Wp_parameters.abort
         ~current:false
         "Error in driver '%s': %s" file (Printexc.to_string exn)
-
-  (*TODO[LC] Think about projectification ... *)
-  let dkey = Wp_parameters.register_category "includes"
-  let dkey_driver = Wp_parameters.register_category "driver"
 
   let loaded : (string list, driver) Hashtbl.t =Hashtbl.create 10
   let load_driver () =

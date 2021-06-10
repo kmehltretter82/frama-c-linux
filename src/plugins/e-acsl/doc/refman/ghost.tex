@@ -1,36 +1,39 @@
 \begin{syntax}
 
-  ghost-type-specifier ::= C-type-specifier ;
-  | { logic-type } \
-  declaration ::= C-declaration ;
-  | "/*@" "ghost" ghost-declaration "*/" \
-  direct-declarator ::= C-direct-declarator ;
-    | direct-declarator ;
-    "(" C-parameter-type-list? ")";
-        {"/*@" "ghost"};
-          {"("ghost-parameter-list")"};
-          {"*/"}; ghost args
-        \
-  postfix-expression ::= C-postfix-expression ;
-    | postfix-expression ;
-     "(" C-argument-expression-list? ")";
-     {"/*@" "ghost"} ;
-     {  "(" ghost-argument-expression-list ")"};
-     {  "*/"} ; call with ghosts
-    \
-  statement ::= C-statement ;
-             | statements-ghost \
-  statements-ghost ::= "/*@" "ghost" ;
-                       ghost-statement+ "*/" \
-  ghost-selection-statement ::= C-selection-statement ;
+  C-type-qualifier ::= { "\ghost" } ; only in ghost
+  \
+  C-type-specifier ::= { logic-type }
+  \
+  logic-def ::= "ghost" C-declaration ;
+  \
+  C-direct-declarator ::=
+      C-direct-declarator ; function declarator
+      "(" C-parameter-type-list? ;
+      ")" "/*@" "ghost" "(" ;
+          C-parameter-type-list; with ghost params
+      ")" "*/";
+  \
+  C-postfix-expression ::=
+      C-postfix-expression ; function call
+      "(" C-argument-expression-list? ;
+       ")" "/*@" "ghost" "(" ;
+           C-argument-expression-list; with ghost args
+       ")";
+      "*/" ;
+   \
+  C-statement ::=
+      "/*@" "ghost";
+            C-statement+ ; ghost code
+      "*/" ;
     | "if" "(" C-expression ")";
        statement;
-      {"/*@" "ghost" "else"};
-      {  ghost-statement+ };
-      {  "*/"} \
-
-  struct-declaration ::= C-struct-declaration ;
-  | {"/*@" "ghost" };
-    {struct-declaration "*/"} ; ghost field
-
+       "/*@" "ghost" ;
+             "else" C-statement ; ghost alternative
+        C-statement* ; unconditional ghost code
+      "*/"
+  \
+  C-struct-declaration ::=
+    {"/*@" "ghost" };
+          {C-struct-declaration} ; ghost field
+    {"*/"}
 \end{syntax}

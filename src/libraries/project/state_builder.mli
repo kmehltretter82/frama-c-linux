@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -47,7 +47,7 @@ end
 module type S = sig
 
   val self: State.t
-    (** The kind of the registered state. *)
+  (** The kind of the registered state. *)
 
   val name: string
 
@@ -65,7 +65,7 @@ module type S = sig
 
   val add_hook_on_update: (Datatype.t -> unit) -> unit
   (** Add an hook which is applied each time (just before) the project library
-      changes the local value of the state.  
+      changes the local value of the state.
       @since Nitrogen-20111001 *)
 
   val howto_marshal: (Datatype.t -> 'a) -> ('a -> Datatype.t) -> unit
@@ -84,9 +84,9 @@ end
     required information.
     @plugin development guide *)
 module Register
-  (Datatype: Datatype.S)
-  (Local_state: State.Local with type t = Datatype.t)
-  (Info: sig include Info val unique_name: string end)
+    (Datatype: Datatype.S)
+    (Local_state: State.Local with type t = Datatype.t)
+    (Info: sig include Info val unique_name: string end)
   : S with module Datatype = Datatype
 
 (* ************************************************************************* *)
@@ -103,38 +103,38 @@ module Register
 module type Ref = sig
   include S
   type data
-    (** Type of the referenced value. *)
+  (** Type of the referenced value. *)
   val set: data -> unit
-    (** Change the referenced value. *)
+  (** Change the referenced value. *)
   val get: unit -> data
-    (** Get the referenced value. *)
+  (** Get the referenced value. *)
   val clear: unit -> unit
-    (** Reset the reference to its default value. *)
+  (** Reset the reference to its default value. *)
 end
 
 (** @plugin development guide *)
 module Ref
-  (Data:Datatype.S)
-  (Info:sig
-    include Info
-    val default: unit -> Data.t
-  end)
+    (Data:Datatype.S)
+    (Info:sig
+       include Info
+       val default: unit -> Data.t
+     end)
   : Ref with type data = Data.t
 
 (** Output signature of [Option_ref]. Note that [get] will raise [Not_found]
     if the stored data is [None]. Use [get_option] if you want to have
     access to the option.
- *)
+*)
 module type Option_ref = sig
   include Ref
   val memo: ?change:(data -> data) -> (unit -> data) -> data
-    (** Memoization. Compute on need the stored value.
-        If the data is already computed (i.e. is not [None]),
-        it is possible to change with [change]. *)
+  (** Memoization. Compute on need the stored value.
+      If the data is already computed (i.e. is not [None]),
+      it is possible to change with [change]. *)
   val map: (data -> data) -> data option
   val may: (data -> unit) -> unit
   val get_option : unit -> data option
-    (** @since Beryllium-20090901 *)
+  (** @since Beryllium-20090901 *)
 end
 
 (** Build a reference on an option. *)
@@ -192,56 +192,56 @@ module Float_ref(Info:sig include Info val default: unit -> float end) :
 module type Weak_hashtbl = sig
 
   include S
-    (** Hashtbl are a standard computation.
-        BUT it is INCORRECT to use projectified hashtables if keys have a
-        custom [rehash] function (see {!Project.DATATYPE_OUTPUT.rehash}) *)
+  (** Hashtbl are a standard computation.
+      BUT it is INCORRECT to use projectified hashtables if keys have a
+      custom [rehash] function (see {!Project.DATATYPE_OUTPUT.rehash}) *)
 
   type data
-    (** @since Boron-20100401 *)
+  (** @since Boron-20100401 *)
 
   val merge: data -> data
-    (** [merge x] returns an instance of [x] found in the table if any, or else
-        adds [x] and return [x].
-        @since Boron-20100401 *)
+  (** [merge x] returns an instance of [x] found in the table if any, or else
+      adds [x] and return [x].
+      @since Boron-20100401 *)
 
   val add: data -> unit
-    (** [add x] adds [x] to the table. If there is already an instance of [x],
-        it is unspecified which one will be returned by subsequent calls to
-        [find] and [merge].
-        @since Boron-20100401 *)
+  (** [add x] adds [x] to the table. If there is already an instance of [x],
+      it is unspecified which one will be returned by subsequent calls to
+      [find] and [merge].
+      @since Boron-20100401 *)
 
   val clear: unit -> unit
-    (** Clear the table.
-        @since Boron-20100401 *)
+  (** Clear the table.
+      @since Boron-20100401 *)
 
   val count: unit -> int
-    (** Length of the table.
-        @since Boron-20100401 *)
+  (** Length of the table.
+      @since Boron-20100401 *)
 
   val iter: (data -> unit) -> unit
-    (** @since Boron-20100401 *)
+  (** @since Boron-20100401 *)
 
   val fold: (data -> 'a -> 'a) -> 'a -> 'a
-    (** @since Boron-20100401 *)
+  (** @since Boron-20100401 *)
 
   val find: data -> data
-    (** [find x] returns an instance of [x] found in table.
-        @Raise Not_found if there is no such element.
-        @since Boron-20100401 *)
+  (** [find x] returns an instance of [x] found in table.
+      @Raise Not_found if there is no such element.
+      @since Boron-20100401 *)
 
   val find_all: data -> data list
-    (** [find_all x] returns a list of all the instances of [x] found in t.
-        @since Boron-20100401 *)
+  (** [find_all x] returns a list of all the instances of [x] found in t.
+      @since Boron-20100401 *)
 
   val mem: data -> bool
-    (** [mem x] returns [true] if there is at least one instance of [x] in the
-        table, [false] otherwise.
-        @since Boron-20100401 *)
+  (** [mem x] returns [true] if there is at least one instance of [x] in the
+      table, [false] otherwise.
+      @since Boron-20100401 *)
 
   val remove: data -> unit
-    (** [remove x] removes from the table one instance of [x]. Does nothing if
-        there is no instance of [x].
-        @since Boron-20100401 *)
+  (** [remove x] removes from the table one instance of [x]. Does nothing if
+      there is no instance of [x].
+      @since Boron-20100401 *)
 
 end
 
@@ -249,7 +249,7 @@ end
     [W].
     @since Boron-20100401 *)
 module Weak_hashtbl
-  (W: Weak.S)(Data: Datatype.S with type t = W.data)(Info: Info_with_size) :
+    (W: Weak.S)(Data: Datatype.S with type t = W.data)(Info: Info_with_size) :
   Weak_hashtbl with type data = W.data
 
 (** Build a weak hashtbl over a datatype [Data] by using [Weak.Make] provided
@@ -272,7 +272,7 @@ module type Hashconsing_tbl =
        val initial_values: t list
        (** Pre-existing values stored in the built table and shared by all
            existing projects. *)
-    end) ->
+     end) ->
   functor (Info: Info_with_size) ->
     Weak_hashtbl with type data = Data.t
 
@@ -305,20 +305,20 @@ module Hashconsing_tbl: Hashconsing_tbl
 (** Output signature of builders of hashtables. *)
 module type Hashtbl = sig
   include S
-    (** Hashtbl are a standard computation.
-        BUT that is INCORRECT to use projectified hashtables if keys have a
-        custom [rehash] function (see {!Project.DATATYPE_OUTPUT.rehash}) *)
+  (** Hashtbl are a standard computation.
+      BUT that is INCORRECT to use projectified hashtables if keys have a
+      custom [rehash] function (see {!Project.DATATYPE_OUTPUT.rehash}) *)
 
   type key
   type data
   val replace: key -> data -> unit
-    (** Add a new binding. The previous one is removed. *)
+  (** Add a new binding. The previous one is removed. *)
   val add: key -> data -> unit
-    (** Add a new binding. The previous one is only hidden. *)
+  (** Add a new binding. The previous one is only hidden. *)
   val clear: unit -> unit
-    (** Clear the table. *)
+  (** Clear the table. *)
   val length: unit -> int
-    (** Length of the table. *)
+  (** Length of the table. *)
   val iter: (key -> data -> unit) -> unit
   val iter_sorted:
     ?cmp:(key -> key -> int) -> (key -> data -> unit) -> unit
@@ -326,26 +326,26 @@ module type Hashtbl = sig
   val fold_sorted:
     ?cmp:(key -> key -> int) -> (key -> data -> 'a -> 'a) -> 'a -> 'a
   val memo: ?change:(data -> data) -> (key -> data) -> key -> data
-    (** Memoization. Compute on need the data associated to a given key using
-        the given function.
-        If the data is already computed, it is possible to change with
-        [change]. *)
+  (** Memoization. Compute on need the data associated to a given key using
+      the given function.
+      If the data is already computed, it is possible to change with
+      [change]. *)
   val find: key -> data
-    (** Return the current binding of the given key.
-        @raise Not_found if the key is not in the table. *)
+  (** Return the current binding of the given key.
+      @raise Not_found if the key is not in the table. *)
   val find_all: key -> data list
-    (** Return the list of all data associated with the given key. *)
+  (** Return the list of all data associated with the given key. *)
   val mem: key -> bool
   val remove: key -> unit
 end
 
 (** @plugin development guide *)
 module Hashtbl
-  (H: Datatype.Hashtbl (** hashtable implementation *))
-  (Data: Datatype.S (** datatype for values stored in the table *))
-  (Info: Info_with_size) :
+    (H: Datatype.Hashtbl (** hashtable implementation *))
+    (Data: Datatype.S (** datatype for values stored in the table *))
+    (Info: Info_with_size) :
   Hashtbl with type key = H.key and type data = Data.t
-          and module Datatype = H.Make(Data)
+                                and module Datatype = H.Make(Data)
 
 module Int_hashtbl(Data: Datatype.S)(Info:Info_with_size):
   Hashtbl with type key = int and type data = Data.t
@@ -366,7 +366,7 @@ module type Set_ref = sig
   val iter: (elt -> unit) -> unit
 end
 
-module Set_ref(S: Datatype.Set)(Info: Info) 
+module Set_ref(S: Datatype.Set)(Info: Info)
   : Set_ref with type elt = S.elt and type data = S.t
 
 (* ************************************************************************* *)
@@ -431,7 +431,7 @@ module Proxy : sig
   (** Add some states in the given proxy. *)
 
   val get: t -> State.t
-(** Getting the state corresponding to a proxy. *)
+  (** Getting the state corresponding to a proxy. *)
 
 end
 
@@ -442,10 +442,10 @@ end
 module type Counter = sig
 
   val next : unit -> int
-    (** Increments the counter and returns a fresh value *)
+  (** Increments the counter and returns a fresh value *)
 
   val get: unit -> int
-  (** @return the current value of the counter, without incrementing it. 
+  (** @return the current value of the counter, without incrementing it.
       @since Fluorine-20130401 *)
 
   val self: State.t
@@ -501,16 +501,16 @@ module Hashcons
 
 val apply_once:
   string -> State.t list -> (unit -> unit) -> (unit -> unit) * State.t
-    (** [apply_once name dep f] returns a closure applying [f] only once and the
-        state internally used. [name] and [dep] are respectively the name and
-        the dependencies of the local state created by this function.  Should
-        be used partially applied. If [f] raises an exception, then it is
-        considered as not applied. *)
+(** [apply_once name dep f] returns a closure applying [f] only once and the
+    state internally used. [name] and [dep] are respectively the name and
+    the dependencies of the local state created by this function.  Should
+    be used partially applied. If [f] raises an exception, then it is
+    considered as not applied. *)
 
 (** @since Fluorine-20130401 *)
-module States: sig 
+module States: sig
 
-  val iter: 
+  val iter:
     ?prj:Project.t -> (string -> 'a Type.t -> 'a -> bool -> unit) -> unit
   (** iterates a function [f] over all registered states.  Arguments of [f] are
       its name, its type value, its value for the given project
@@ -518,15 +518,15 @@ module States: sig
       already computed.  @since Fluorine-20130401 *)
 
   val fold:
-    ?prj:Project.t -> 
+    ?prj:Project.t ->
     (string -> 'a Type.t -> 'a -> bool -> 'acc -> 'acc) -> 'acc -> 'acc
   (** As iter, but for folding.
       @since Fluorine-20130401*)
 
   val find:
     ?prj:Project.t -> string -> 'a Type.t -> 'a * bool
-(** @return the value of a state given by its name (and if it is computed), in
-    the given project ([Project.current ()] by default) *)
+    (** @return the value of a state given by its name (and if it is computed), in
+        the given project ([Project.current ()] by default) *)
 
 end
 

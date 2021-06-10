@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -115,9 +115,9 @@ let eval_assigns kf state assigns =
     let clean_deps =
       Locations.Zone.filter_base
         (function
-           | Base.Var (v, _) | Base.Allocated (v, _, _) ->
-               not (Kernel_function.is_formal v kf)
-           | Base.CLogic_Var _ | Base.Null | Base.String _ -> true)
+          | Base.Var (v, _) | Base.Allocated (v, _, _) ->
+            not (Kernel_function.is_formal v kf)
+          | Base.CLogic_Var _ | Base.Null | Base.String _ -> true)
     in
     let out_term = out.it_content in
     let outputs_under, outputs_over, deps =
@@ -126,11 +126,11 @@ let eval_assigns kf state assigns =
         then (Zone.bottom, Zone.bottom, Zone.bottom)
         else
           let loc_out_under, loc_out_over, deps =
-	    !Db.Properties.Interp.loc_to_loc_under_over ~result:None state out_term
+            !Db.Properties.Interp.loc_to_loc_under_over ~result:None state out_term
           in
-	  (enumerate_valid_bits_under Write loc_out_under,
-	   enumerate_valid_bits Write loc_out_over,
-	   clean_deps deps)
+          (enumerate_valid_bits_under Write loc_out_under,
+           enumerate_valid_bits Write loc_out_over,
+           clean_deps deps)
       with Db.Properties.Interp.No_conversion ->
         Inout_parameters.warning ~current:true ~once:true
           "failed to interpret assigns clause '%a'" Printer.pp_term out_term;
@@ -140,16 +140,16 @@ let eval_assigns kf state assigns =
     let inputs =
       try
         match froms with
-          | FromAny -> Zone.top
-          | From l ->
-              let aux acc { it_content = from } =
-                let _, loc, deps =
-		  !Db.Properties.Interp.loc_to_loc_under_over None state from in
-                let acc = Zone.join (clean_deps deps) acc in
-                let z = enumerate_valid_bits Read loc in
-		Zone.join z acc
-              in
-              List.fold_left aux deps l
+        | FromAny -> Zone.top
+        | From l ->
+          let aux acc { it_content = from } =
+            let _, loc, deps =
+              !Db.Properties.Interp.loc_to_loc_under_over None state from in
+            let acc = Zone.join (clean_deps deps) acc in
+            let z = enumerate_valid_bits Read loc in
+            Zone.join z acc
+          in
+          List.fold_left aux deps l
       with Db.Properties.Interp.No_conversion ->
         Inout_parameters.warning ~current:true ~once:true
           "failed to interpret inputs in assigns clause '%a'"
@@ -173,21 +173,21 @@ let eval_assigns kf state assigns =
     }
   in
   match assigns with
-    | WritesAny ->
-       Inout_parameters.warning "@[no assigns clauses for@ function %a.@]@ \
-                                 Results will be imprecise."
-                                Kernel_function.pretty kf;
-       top
-    | Writes l  ->
-        let init = { bottom with under_outputs_d = Zone.bottom } in
-        let r = List.fold_left treat_one_zone init l in {
-          over_inputs = r.over_inputs_d;
-          over_logic_inputs = r.over_inputs_d;
-          over_inputs_if_termination = r.over_inputs_d;
-          under_outputs_if_termination = r.under_outputs_d;
-          over_outputs = r.over_outputs_d;
-          over_outputs_if_termination = r.over_outputs_d;
-        }
+  | WritesAny ->
+    Inout_parameters.warning "@[no assigns clauses for@ function %a.@]@ \
+                              Results will be imprecise."
+      Kernel_function.pretty kf;
+    top
+  | Writes l  ->
+    let init = { bottom with under_outputs_d = Zone.bottom } in
+    let r = List.fold_left treat_one_zone init l in {
+      over_inputs = r.over_inputs_d;
+      over_logic_inputs = r.over_inputs_d;
+      over_inputs_if_termination = r.over_inputs_d;
+      under_outputs_if_termination = r.under_outputs_d;
+      over_outputs = r.over_outputs_d;
+      over_outputs_if_termination = r.over_outputs_d;
+    }
 
 let compute_using_prototype_state state kf =
   let behaviors = !Db.Value.valid_behaviors kf state in
@@ -207,35 +207,33 @@ let compute_using_prototype ?stmt kf =
 module Internals =
   Kernel_function.Make_Table(Inout_type)
     (struct
-       let name = "Inout.Operational_inputs.Internals"
-       let dependencies = [ Db.Value.self ]
-       let size = 17
-     end)
+      let name = "Inout.Operational_inputs.Internals"
+      let dependencies = [ Db.Value.self ]
+      let size = 17
+    end)
 
 module CallsiteHash = Value_types.Callsite.Hashtbl
 
 (* Results of an an entire call, represented by a pair (stmt, kernel_function).
-   This table is filled by the [-inout-callwise] option, or for functions for
-   which only the specification is used. *)
+*)
 module CallwiseResults =
   State_builder.Hashtbl
-  (Value_types.Callsite.Hashtbl)
-  (Inout_type)
-  (struct
-    let size = 17
-    let dependencies = [Internals.self;
-                        Inout_parameters.ForceCallwiseInout.self]
-    let name = "Inout.Operational_inputs.CallwiseResults"
-   end)
+    (Value_types.Callsite.Hashtbl)
+    (Inout_type)
+    (struct
+      let size = 17
+      let dependencies = [Internals.self]
+      let name = "Inout.Operational_inputs.CallwiseResults"
+    end)
 
 module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
-  val _version: string (* Debug: Callwise or functionwise *)
-  val _kf: kernel_function (* Debug: Function being analyzed *)
-  val kf_pre_state: Db.Value.state (* Memory pre-state of the function. *)
-  val stmt_state: stmt -> Db.Value.state (* Memory state at the given stmt *)
-  val at_call: stmt -> kernel_function -> Inout_type.t (* Results of the
-      analysis for the given call. Must not contain locals or formals *)
-end) = struct
+    val _version: string (* Debug: Callwise or functionwise *)
+    val _kf: kernel_function (* Debug: Function being analyzed *)
+    val kf_pre_state: Db.Value.state (* Memory pre-state of the function. *)
+    val stmt_state: stmt -> Db.Value.state (* Memory state at the given stmt *)
+    val at_call: stmt -> kernel_function -> Inout_type.t (* Results of the
+                                                            analysis for the given call. Must not contain locals or formals *)
+  end) = struct
 
   (* We want to compute the in/out for all terminating and
      non-terminating points of the function. This is not immediate
@@ -373,7 +371,7 @@ end) = struct
     Annotations.iter_code_annot
       (fun _ ca ->
          match ca.annot_content with
-         | AAssert (_, _, p)
+         | AAssert (_, p)
          | AInvariant (_, true, p) ->
            begin
              let env =
@@ -382,7 +380,7 @@ end) = struct
                  ~here:(X.stmt_state stmt)
                  ()
              in
-             match Eva.Eval_terms.predicate_deps env p with
+             match Eva.Eval_terms.predicate_deps env p.tp_statement with
              | None ->
                (* To be sound, we should perform a join with the top zone here.
                   We do nothing instead because the latter behavior would
@@ -405,8 +403,8 @@ end) = struct
     match i with
     | Set (lv, exp, _) ->
       let state = X.stmt_state stmt in
-      let e_inputs = 
-        !Db.From.find_deps_no_transitivity_state state exp 
+      let e_inputs =
+        !Db.From.find_deps_no_transitivity_state state exp
       in
       add_out ~for_writing:true state lv e_inputs data
     | Local_init (v, AssignInit i, _) ->
@@ -517,30 +515,30 @@ let compute_externals_using_prototype ?stmt kf =
 
 let get_internal_aux ?stmt kf =
   match stmt with
-    | None -> !Db.Operational_inputs.get_internal kf
-    | Some stmt ->
-        try CallwiseResults.find (kf, Kstmt stmt)
-        with Not_found ->
-          if !Db.Value.use_spec_instead_of_definition kf then
-            compute_using_prototype ~stmt kf
-          else !Db.Operational_inputs.get_internal kf
+  | None -> !Db.Operational_inputs.get_internal kf
+  | Some stmt ->
+    try CallwiseResults.find (kf, Kstmt stmt)
+    with Not_found ->
+      if !Db.Value.use_spec_instead_of_definition kf then
+        compute_using_prototype ~stmt kf
+      else !Db.Operational_inputs.get_internal kf
 
 let get_external_aux ?stmt kf =
   match stmt with
-    | None -> !Db.Operational_inputs.get_external kf
-    | Some stmt ->
-        try
-          let internals = CallwiseResults.find (kf, Kstmt stmt) in
-          externalize ~with_formals:false kf internals
-        with Not_found ->
-          if !Db.Value.use_spec_instead_of_definition kf then
-            let r = compute_externals_using_prototype ~stmt kf in
-            CallwiseResults.add (kf, Kstmt stmt) r;
-            r
-          else !Db.Operational_inputs.get_external kf
+  | None -> !Db.Operational_inputs.get_external kf
+  | Some stmt ->
+    try
+      let internals = CallwiseResults.find (kf, Kstmt stmt) in
+      externalize ~with_formals:false kf internals
+    with Not_found ->
+      if !Db.Value.use_spec_instead_of_definition kf then
+        let r = compute_externals_using_prototype ~stmt kf in
+        CallwiseResults.add (kf, Kstmt stmt) r;
+        r
+      else !Db.Operational_inputs.get_external kf
 
 let extract_inout_from_froms froms =
-  let open Function_Froms in 
+  let open Function_Froms in
   let {deps_return; deps_table } = froms in
   let in_return = Deps.to_zone deps_return in
   let in_, out_ =
@@ -564,10 +562,6 @@ let extract_inout_from_froms froms =
 
 
 module Callwise = struct
-
-  let compute_callwise () =
-    Inout_parameters.ForceCallwiseInout.get () ||
-      Dynamic.Parameter.Bool.get "-memexec-all" ()
 
   let merge_call_in_local_table call local_table v =
     let prev =
@@ -600,41 +594,39 @@ module Callwise = struct
   let call_inout_stack = ref []
 
   let call_for_callwise_inout (call_type, state, call_stack) =
-    if compute_callwise () then begin
-      let (current_function, ki as call_site) = List.hd call_stack in
-      let merge_inout inout =
-        if ki = Kglobal 
-        then merge_call_in_global_tables call_site inout
-        else
-          let _above_function, table =
-            try List.hd !call_inout_stack
-            with Failure _ -> assert false
-          in
-          merge_call_in_local_table call_site table inout
-      in
-      match call_type with
-      | `Builtin {Value_types.c_from = Some (froms,sure_out) } ->
-         let in_, out_ = extract_inout_from_froms froms in
-         let inout = {
-           over_inputs_if_termination = in_;
-           over_inputs = in_;
-           over_logic_inputs = Zone.bottom;
-           over_outputs_if_termination = out_ ;
-           over_outputs = out_;
-           under_outputs_if_termination = sure_out;
-         } in
-         merge_inout inout
-      | `Def | `Memexec ->
-        let table_current_function = CallsiteHash.create 7 in
-        call_inout_stack :=
-          (current_function, table_current_function) :: !call_inout_stack
-      | `Spec spec ->
-        let inout =compute_using_given_spec_state state spec current_function in
-        merge_inout inout
-      | `Builtin { Value_types.c_from = None } ->
-        let inout = compute_using_prototype_state state current_function in
-        merge_inout inout
-    end;;
+    let (current_function, ki as call_site) = List.hd call_stack in
+    let merge_inout inout =
+      if ki = Kglobal
+      then merge_call_in_global_tables call_site inout
+      else
+        let _above_function, table =
+          try List.hd !call_inout_stack
+          with Failure _ -> assert false
+        in
+        merge_call_in_local_table call_site table inout
+    in
+    match call_type with
+    | `Builtin (Some (froms,sure_out)) ->
+      let in_, out_ = extract_inout_from_froms froms in
+      let inout = {
+        over_inputs_if_termination = in_;
+        over_inputs = in_;
+        over_logic_inputs = Zone.bottom;
+        over_outputs_if_termination = out_ ;
+        over_outputs = out_;
+        under_outputs_if_termination = sure_out;
+      } in
+      merge_inout inout
+    | `Def | `Memexec ->
+      let table_current_function = CallsiteHash.create 7 in
+      call_inout_stack :=
+        (current_function, table_current_function) :: !call_inout_stack
+    | `Spec spec ->
+      let inout =compute_using_given_spec_state state spec current_function in
+      merge_inout inout
+    | `Builtin None ->
+      let inout = compute_using_prototype_state state current_function in
+      merge_inout inout
 
 
   module MemExec =
@@ -642,10 +634,10 @@ module Callwise = struct
       (Datatype.Int.Hashtbl)
       (Inout_type)
       (struct
-         let size = 17
-         let dependencies = [Internals.self]
-         let name = "Operational_inputs.MemExec"
-   end)
+        let size = 17
+        let dependencies = [Internals.self]
+        let name = "Operational_inputs.MemExec"
+      end)
 
 
   let end_record call_stack inout =
@@ -654,18 +646,18 @@ module Callwise = struct
     let (current_function, _ as call_site) = List.hd call_stack in
     (* pop + record in top of stack the inout of function that just finished*)
     match !call_inout_stack with
-      | (current_function2, _) :: (((_caller, table) :: _) as tail) ->
-          if current_function2 != current_function then
-            Inout_parameters.fatal "callwise inout %a != %a@."
-              Kernel_function.pretty current_function (* g *)
-              Kernel_function.pretty current_function2 (* f *);
-          call_inout_stack := tail;
-          merge_call_in_local_table call_site table inout;
+    | (current_function2, _) :: (((_caller, table) :: _) as tail) ->
+      if current_function2 != current_function then
+        Inout_parameters.fatal "callwise inout %a != %a@."
+          Kernel_function.pretty current_function (* g *)
+          Kernel_function.pretty current_function2 (* f *);
+      call_inout_stack := tail;
+      merge_call_in_local_table call_site table inout;
 
-      | _ ->  (* the entry point, probably *)
-          merge_call_in_global_tables call_site inout;
-          call_inout_stack := [];
-          CallwiseResults.mark_as_computed ()
+    | _ ->  (* the entry point, probably *)
+      merge_call_in_global_tables call_site inout;
+      call_inout_stack := [];
+      CallwiseResults.mark_as_computed ()
 
   let compute_call_from_value_states kf call_stack states =
     let module Fenv = (val Dataflows.function_env kf: Dataflows.FUNCTION_ENV) in
@@ -711,31 +703,30 @@ module Callwise = struct
     Computer.end_dataflow ()
 
   let record_for_callwise_inout ((call_stack: Db.Value.callstack), value_res) =
-    if compute_callwise () then
-      let inout = match value_res with
-        | Value_types.Normal (states, _after_states)
-        | Value_types.NormalStore ((states, _after_states), _) ->
-            let kf, _ = List.hd call_stack in
-            let inout =
-              try
-                if !Db.Value.no_results (Kernel_function.get_definition kf) then
-                  top
-              else
-                compute_call_from_value_states kf call_stack (Lazy.force states)
-              with Kernel_function.No_Definition -> top
-            in
-            (match value_res with
-               | Value_types.NormalStore (_, memexec_counter) ->
-                   MemExec.replace memexec_counter inout
-               | _ -> ());
-            inout
+    let inout = match value_res with
+      | Value_types.Normal (states, _after_states)
+      | Value_types.NormalStore ((states, _after_states), _) ->
+        let kf, _ = List.hd call_stack in
+        let inout =
+          try
+            if !Db.Value.no_results (Kernel_function.get_definition kf) then
+              top
+            else
+              compute_call_from_value_states kf call_stack (Lazy.force states)
+          with Kernel_function.No_Definition -> top
+        in
+        (match value_res with
+         | Value_types.NormalStore (_, memexec_counter) ->
+           MemExec.replace memexec_counter inout
+         | _ -> ());
+        inout
 
-        | Value_types.Reuse counter ->
-            MemExec.find counter
-      in
-      Db.Operational_inputs.Record_Inout_Callbacks.apply
-        (call_stack, inout);
-      end_record call_stack inout
+      | Value_types.Reuse counter ->
+        MemExec.find counter
+    in
+    Db.Operational_inputs.Record_Inout_Callbacks.apply
+      (call_stack, inout);
+    end_record call_stack inout
 
 
   (* Register our callbacks inside the value analysis *)
@@ -756,24 +747,24 @@ module FunctionWise = struct
   let compute_internal_using_cfg kf =
     try
       let module Fenv =
-            (val Dataflows.function_env kf: Dataflows.FUNCTION_ENV)
+        (val Dataflows.function_env kf: Dataflows.FUNCTION_ENV)
       in
       let module Computer = Computer(Fenv)(struct
-        let _version = "functionwise"
-        let _kf = kf
-        let kf_pre_state = Db.Value.get_initial_state kf
-        let stmt_state s = Db.Value.get_stmt_state s
-        let at_call stmt kf = get_external_aux ~stmt kf
-      end) in
+          let _version = "functionwise"
+          let _kf = kf
+          let kf_pre_state = Db.Value.get_initial_state kf
+          let stmt_state s = Db.Value.get_stmt_state s
+          let at_call stmt kf = get_external_aux ~stmt kf
+        end) in
       Stack.iter
         (fun g -> if kf == g then begin
-          if Db.Value.ignored_recursive_call kf then
-            Inout_parameters.warning ~current:true
-              "During inout context analysis of %a:@ \
+             if Db.Value.ignored_recursive_call kf then
+               Inout_parameters.warning ~current:true
+                 "During inout context analysis of %a:@ \
                   ignoring probable recursive call."
-              Kernel_function.pretty kf;
-          raise Exit
-        end)
+                 Kernel_function.pretty kf;
+             raise Exit
+           end)
         call_stack;
       Stack.push kf call_stack;
 
@@ -785,12 +776,12 @@ module FunctionWise = struct
       result
 
     with Exit -> Inout_type.bottom (*TODO*) (*{
-    Inout_type.over_inputs_if_termination = empty.over_inputs_d ;
-    under_outputs_if_termination = empty.under_outputs_d;
-    over_inputs = empty.over_inputs_d;
-    over_outputs = empty.over_outputs_d;
-    over_outputs_if_termination = empty.over_outputs_d;
-  }*)
+                                              Inout_type.over_inputs_if_termination = empty.over_inputs_d ;
+                                              under_outputs_if_termination = empty.under_outputs_d;
+                                              over_inputs = empty.over_inputs_d;
+                                              over_outputs = empty.over_outputs_d;
+                                              over_outputs_if_termination = empty.over_outputs_d;
+                                              }*)
 
   let compute_internal_using_cfg kf =
     if !Db.Value.no_results (Kernel_function.get_definition kf) then
@@ -801,7 +792,7 @@ module FunctionWise = struct
         (let s = ref "" in
          Stack.iter
            (fun kf -> s := !s^" <-"^
-             (Format.asprintf "%a" Kernel_function.pretty kf))
+                           (Format.asprintf "%a" Kernel_function.pretty kf))
            call_stack;
          !s);
       let r = compute_internal_using_cfg kf in
@@ -816,14 +807,14 @@ let get_internal =
   Internals.memo
     (fun kf ->
        !Db.Value.compute ();
-       try Internals.find kf (* If [-inout-callwise] is set, the results may
-                              have been computed by the call to Value.compute *)
+       try Internals.find kf (* The results may have been computed by the call
+                                to Value.compute *)
        with
-         | Not_found ->
-             if!Db.Value.use_spec_instead_of_definition kf then
-               compute_using_prototype kf
-             else
-               FunctionWise.compute_internal_using_cfg kf
+       | Not_found ->
+         if!Db.Value.use_spec_instead_of_definition kf then
+           compute_using_prototype kf
+         else
+           FunctionWise.compute_internal_using_cfg kf
     )
 
 let raw_externals ~with_formals kf =
@@ -833,10 +824,10 @@ let raw_externals ~with_formals kf =
 module Externals =
   Kernel_function.Make_Table(Inout_type)
     (struct
-       let name = "External inouts full"
-       let dependencies = [ Internals.self ]
-       let size = 17
-     end)
+      let name = "External inouts full"
+      let dependencies = [ Internals.self ]
+      let size = 17
+    end)
 let get_external = Externals.memo (raw_externals ~with_formals:false)
 let compute_external kf = ignore (get_external kf)
 
@@ -845,10 +836,10 @@ let compute_external kf = ignore (get_external kf)
 module Externals_With_Formals =
   Kernel_function.Make_Table(Inout_type)
     (struct
-       let name = "Inout.Operational_inputs.Externals_With_Formals"
-       let dependencies = [ Internals.self ]
-       let size = 17
-     end)
+      let name = "Inout.Operational_inputs.Externals_With_Formals"
+      let dependencies = [ Internals.self ]
+      let size = 17
+    end)
 let get_external_with_formals =
   Externals_With_Formals.memo (raw_externals ~with_formals:true)
 let compute_external_with_formals kf = ignore (get_external_with_formals kf)

@@ -136,8 +136,23 @@
 ##############
 | ".*\.el" -> frame open: ";" line: ";" close:";"
 
+##########
+# Python #
+##########
+
+| ".*\.py" -> frame open: "#" line: "#" close:"#"
+| ".*\.py" -> skip multiline_match: "#!.*" multiline_match: "#-\*-.*"
+
 ##############
 # Misc files #
 ##############
 | "make_release" -> frame open:"#"  line:"#" close:"#"
 | "FAQ" -> frame open:"#"  line:"#" close:"#"
+
+##############
+# JavaScript files #
+##############
+| ".*\.js"  -> frame open:"/* "  line:"*" close:" */"
+| ".*\.ts"  -> frame open:"/* "  line:"*" close:" */"
+| ".*\.jsx" -> frame open:"/* "  line:"*" close:" */"
+| ".*\.tsx" -> frame open:"/* "  line:"*" close:" */"

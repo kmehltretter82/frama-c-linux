@@ -1,0 +1,3 @@
+[kernel] Parsing tests/loop_analysis/small_loop.i (no preprocessing)
+[loop] Maximum number of iterations by loop:
+  tests/loop_analysis/small_loop.i:5: 10

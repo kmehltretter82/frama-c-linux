@@ -1,13 +1,13 @@
 /* run.config
-   STDOPT: #"-machdep gcc_x86_64"
-   STDOPT: #"-machdep msvc_x86_64"
+PLUGIN: @EVA_PLUGINS@
+   STDOPT: +"-machdep gcc_x86_64"
+   STDOPT: +"-machdep msvc_x86_64"
  */
 // #pragma pack(0) is not supported by MSVC, but allowed in GCC.
 // In MSVC mode, we ignore it.
 // In GCC, its current (undocumented) behavior is equivalent to #pragma pack(),
 // that is, disable packing (reset to default). We emulate this behavior,
 // but with a warning.
-
 #include "pragma-pack-utils.h"
 
 #include <stdint.h>

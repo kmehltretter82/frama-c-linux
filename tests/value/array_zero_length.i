@@ -1,6 +1,7 @@
 /* run.config*
    OPT: -no-autoload-plugins -load-module inout,eva -eva @EVA_CONFIG@ -journal-disable -machdep gcc_x86_32
    OPT: -no-autoload-plugins -load-module inout,eva -eva @EVA_CONFIG@ -lib-entry -journal-disable -machdep gcc_x86_32
+ EXIT: 1
    OPT: -no-autoload-plugins -load-module inout,eva -eva @EVA_CONFIG@ -lib-entry -journal-disable
 */
 

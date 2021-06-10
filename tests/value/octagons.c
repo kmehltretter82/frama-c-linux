@@ -183,6 +183,19 @@ void dump () {
   Frama_C_dump_each();
 }
 
+/* Example initially provided by user kroeckx in the issue 2166 of the BTS,
+   imported as issue 301 on the public gitlab. Solved by the octagon domain. */
+void pub301 () {
+  unsigned int len = Frama_C_interval(1, 1024);
+  unsigned int n = Frama_C_interval(0, 63);
+  if (n != 0) {
+    if (len >= 64 || len + n >= 64) {
+      n = 64 - n;
+      len -= n; // [len] should stay between 0 and 1024.
+    }
+  }
+}
+
 void main () {
   demo ();
   integer_types ();
@@ -193,4 +206,5 @@ void main () {
   saturate ();
   interprocedural ();
   dump ();
+  pub301 ();
 }

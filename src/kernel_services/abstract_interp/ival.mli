@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -30,13 +30,13 @@ type t
 
 (** {2 General guidelines of this module}
 
-  - Functions suffixed by [_int] expect arguments that are integers. Hence,
-    they will fail on an ival with constructor [Float]. Conversely, [_float]
-    suffixed functions expect float arguments: the constructor [Float], or
-    the singleton set [ [| Int.zero |] ], that can be tested by {!is_zero}.
+    - Functions suffixed by [_int] expect arguments that are integers. Hence,
+      they will fail on an ival with constructor [Float]. Conversely, [_float]
+      suffixed functions expect float arguments: the constructor [Float], or
+      the singleton set [ [| Int.zero |] ], that can be tested by {!is_zero}.
 
-  - see the comment in {!Lattice_type} about over- and under-approximations,
-    and exact operations.
+    - see the comment in {!Lattice_type} about over- and under-approximations,
+      and exact operations.
 *)
 
 module Widen_Hints = Datatype.Integer.Set
@@ -46,7 +46,7 @@ type numerical_widen_hint = Widen_Hints.t * Fc_float.Widen_Hints.t
 include Datatype.S_with_collections with type t := t
 include Lattice_type.Full_AI_Lattice_with_cardinality
   with type t := t
-  and type widen_hint = size_widen_hint * numerical_widen_hint
+   and type widen_hint = size_widen_hint * numerical_widen_hint
 
 val is_bottom : t -> bool
 val overlaps: partial:bool -> size:Integer.t -> t -> t -> bool
@@ -160,8 +160,8 @@ val is_singleton_int : t -> bool
 exception Not_Singleton_Int
 
 val project_int : t -> Integer.t
-    (** @raise Not_Singleton_Int when the cardinal of the argument is not 1,
-        or if it is not an integer. *)
+(** @raise Not_Singleton_Int when the cardinal of the argument is not 1,
+    or if it is not an integer. *)
 
 val is_small_set: t -> bool
 

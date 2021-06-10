@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -58,6 +58,9 @@ type annot_kind =
   | AcallPre of bool * kernel_function
   (** annotation is a called function precondition :
       to be considered as hyp, and goal if bool=true *)
+  | AcallCheck of kernel_function
+  (** annotation is check-only called function precondition.
+      handled internally by {!add_prop_call_pre} below. *)
   | AcallPost of kernel_function
   (** annotation is a called function post check :
       to be considered as goal only (no hyp) *)

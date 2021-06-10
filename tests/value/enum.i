@@ -1,5 +1,5 @@
 /* run.config*
-  GCC:
+  
   STDOPT: #"-main f"
 */
 typedef enum counter {ZERO,ONE,TWO,LAST=TWO};

@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -26,8 +26,7 @@
 
 #include "features.h"
 __PUSH_FC_STDLIB
-#include "__fc_define_wint_t.h"
-
+#include <wchar.h>
 __BEGIN_DECLS
 
 extern int iswalnum(wint_t wc);

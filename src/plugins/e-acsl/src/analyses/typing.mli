@@ -101,9 +101,12 @@ val type_term: use_gmp_opt:bool -> ?ctx:number_ty -> term -> unit
     [use_gmp_opt] is false, then the conversion to the given context is done
     even if -e-acsl-gmp-only is set. *)
 
-val type_named_predicate: ?must_clear:bool -> predicate -> unit
+val type_named_predicate: must_clear:bool -> predicate -> unit
 (** Compute the type of each term of the given predicate.
-    Set {!must_clear} to false in order to not reset the environment. *)
+
+    If {!must_clear} is true, the typing environment is reset before translating
+    the predicate. The environment should be reset when translating a new
+    assertion, and kept otherwise. *)
 
 val clear: unit -> unit
 (** Remove all the previously computed types. *)
@@ -158,8 +161,8 @@ val typ_of_lty: logic_type -> typ
 (******************************************************************************)
 
 val compute_quantif_guards_ref
-  : (predicate -> logic_var list -> predicate ->
-     (term * relation * logic_var * relation * term) list) ref
+  : (is_forall:bool -> predicate -> logic_var list -> predicate ->
+     (term * relation * logic_var * relation * term) list * predicate) ref
 (** Forward reference. *)
 
 (*

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -73,7 +73,7 @@ module V_Offsetmap = struct
   include Cvalue.V_Offsetmap
 
   let pretty_generic ?typ ?pretty_v ?skip_v ?sep () fmt t =
-    let pretty_v = Extlib.opt_conv V_Or_Uninitialized.pretty_typ pretty_v in
+    let pretty_v = Option.value ~default:V_Or_Uninitialized.pretty_typ pretty_v in
     pretty_generic ?typ ~pretty_v ?skip_v ?sep () fmt t
 end
 
@@ -157,13 +157,19 @@ module Internal  : Domain_builder.InputDomain
 
   let assume _ _ _ _ state = `Value state
 
-  let finalize_call _stmt _call ~pre:_ ~post = `Value post
+  let finalize_call _stmt _call _recursion ~pre:_ ~post = `Value post
 
-  let start_call _stmt _call valuation state = update valuation state
+  let start_recursive_call recursion state =
+    let vars = List.map fst recursion.substitution @ recursion.withdrawal in
+    Memory.remove_variables vars state
+
+  let start_call _stmt _call recursion valuation state =
+    update valuation state >>-: fun state ->
+    Extlib.opt_fold start_recursive_call recursion state
 
   let show_expr _valuation _state _fmt _expr = ()
 
-  let extract_expr _oracle _state _exp =
+  let extract_expr ~oracle:_ _context _state _exp =
     `Value (Offsm_value.Offsm.top, None), Alarmset.all
 
   (* Basic 'find' on a location *)
@@ -176,7 +182,7 @@ module Internal  : Domain_builder.InputDomain
     then Offsm_value.Offsm.top
     else O o
 
-  let extract_lval _oracle state _lv typ locs =
+  let extract_lval ~oracle:_ _context state _lv typ locs =
     let o =
       if Cil.typeHasQualifier "volatile" typ ||
          not (Cil.isArithmeticOrPointerType typ)

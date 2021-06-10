@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Aorai plug-in of Frama-C.                        */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*    INRIA (Institut National de Recherche en Informatique et en         */
@@ -88,7 +88,10 @@ promela
                 st::l
               ) observed_states []
             in
-            (states , $3)
+            { states; trans = $3;
+              metavariables = Datatype.String.Map.empty;
+              observables = None;
+            }
         }
         | PROMELA_NEVER PROMELA_LBRACE states 
             PROMELA_SEMICOLON PROMELA_RBRACE EOF {
@@ -102,7 +105,11 @@ promela
                 st::l
               ) observed_states []
             in
-            (states , $3) }
+            { states; trans = $3;
+              metavariables = Datatype.String.Map.empty;
+              observables = None;
+            }
+        }
   ;
 
 states   
@@ -128,9 +135,9 @@ state
               trans 
             else
               let tr_list=
-                List.fold_left (fun l1 (cr,stop_st)  -> 
-                  List.fold_left (fun l2 st -> 
-                    {start=st;stop=stop_st;cross=Seq (to_seq cr);numt=(-1)}::l2
+                List.fold_left (fun l1 (cr,stop)  -> 
+                  List.fold_left (fun l2 start -> 
+                    {start;stop;cross=Seq (to_seq cr);actions=[];numt=(-1)}::l2
                   ) l1 stl
                 ) [] trl
               in
@@ -178,7 +185,7 @@ label
               (String.compare (String.sub $1 0 10) "accept_all")=0 
             then 
               trans:=
-                {start=old;stop=old;cross=Seq (to_seq PTrue);numt=(-1)}::!trans;
+                {start=old;stop=old;cross=Seq (to_seq PTrue);actions=[];numt=(-1)}::!trans;
             
             (* If the name includes accept then this state is 
                an acceptation one. *)

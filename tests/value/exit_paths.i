@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-wlevel 1"
+   STDOPT: +"-eva-widening-delay 1"
 */
 
 #include "__fc_builtin.h"

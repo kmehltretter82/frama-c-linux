@@ -1,5 +1,5 @@
 /*run.config
-  STDOPT: #"-eva-split-return auto -slevel 2"
+  STDOPT: #"-eva-split-return auto -eva-slevel 2"
 */
 // Extract based on Linux Programmer's Manual, GETADDRINFO(3) man page
 #include <sys/types.h>
@@ -11,14 +11,6 @@
 #include "netdb.c"
 
 #define BUF_SIZE 500
-
-// Non-POSIX
-#ifndef NI_MAXHOST
-# define NI_MAXHOST 1025
-#endif
-#ifndef NI_MAXSERV
-# define NI_MAXSERV 32
-#endif
 
 int main() {
   struct addrinfo hints;

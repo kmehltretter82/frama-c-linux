@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -477,7 +477,7 @@ class pos_to_localizable =
         | _ -> false
       in
       if not skip then
-        self#add_range (Stmt.loc s) (PStmt (Extlib.the self#current_kf, s));
+        self#add_range (Stmt.loc s) (PStmt (Option.get self#current_kf, s));
       begin
         match s.skind with
         | If (exp, _, _, _) ->

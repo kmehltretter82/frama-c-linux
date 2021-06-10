@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -421,6 +421,25 @@ class pane (gprovers : GuiConfig.provers) =
             save_script#set_enabled save ;
           end
 
+    method private update_pending kind proof n =
+      match ProofEngine.current proof with
+      | `Main | `Internal _ ->
+          next#set_enabled false ;
+          prev#set_enabled false ;
+          if n = 1 then
+            Pretty_utils.ksfprintf status#set_text "One %s Goal" kind
+          else
+            Pretty_utils.ksfprintf status#set_text "%d %s Goals" n kind
+      | `Leaf(k,_) ->
+          prev#set_enabled (0 < k) ;
+          next#set_enabled (k+1 < n) ;
+          if k = 0 && n = 1 then
+            Pretty_utils.ksfprintf status#set_text
+              "Last %s Goal" kind
+          else
+            Pretty_utils.ksfprintf status#set_text
+              "%s Goal #%d /%d" kind (succ k) n
+
     method private update_statusbar =
       match state with
       | Empty ->
@@ -442,20 +461,27 @@ class pane (gprovers : GuiConfig.provers) =
             help#set_enabled
               (match state with Proof _ -> not helpmode | _ -> false) ;
             match ProofEngine.status proof with
-            | `Main ->
+            | `Unproved ->
                 icon#set_icon GuiProver.ko_status ;
                 next#set_enabled false ;
                 prev#set_enabled false ;
                 cancel#set_enabled false ;
                 forward#set_enabled false ;
                 status#set_text "Non Proved Property" ;
-            | `Invalid ->
+            | `Invalid | `StillResist 0 ->
                 icon#set_icon GuiProver.wg_status ;
                 next#set_enabled false ;
                 prev#set_enabled false ;
                 cancel#set_enabled false ;
                 forward#set_enabled false ;
                 status#set_text "Invalid Smoke-test" ;
+            | `Passed ->
+                icon#set_icon GuiProver.smoke_status ;
+                next#set_enabled false ;
+                prev#set_enabled false ;
+                cancel#set_enabled false ;
+                forward#set_enabled false ;
+                status#set_text "Passed Smoke Test" ;
             | `Proved ->
                 icon#set_icon GuiProver.ok_status ;
                 next#set_enabled false ;
@@ -474,23 +500,12 @@ class pane (gprovers : GuiConfig.provers) =
                 icon#set_icon GuiProver.ko_status ;
                 forward#set_enabled nofork ;
                 cancel#set_enabled nofork ;
-                match ProofEngine.current proof with
-                | `Main | `Internal _ ->
-                    next#set_enabled false ;
-                    prev#set_enabled false ;
-                    if n = 1 then
-                      Pretty_utils.ksfprintf status#set_text "One Pending Goal"
-                    else
-                      Pretty_utils.ksfprintf status#set_text "%d Pending Goals" n
-                | `Leaf(k,_) ->
-                    prev#set_enabled (0 < k) ;
-                    next#set_enabled (k+1 < n) ;
-                    if k = 0 && n = 1 then
-                      Pretty_utils.ksfprintf status#set_text
-                        "Last Pending Goal"
-                    else
-                      Pretty_utils.ksfprintf status#set_text
-                        "%d/%d Pending Goals" (succ k) n
+                self#update_pending "Pending" proof n ;
+            | `StillResist n ->
+                icon#set_icon GuiProver.smoke_status ;
+                forward#set_enabled nofork ;
+                cancel#set_enabled nofork ;
+                self#update_pending "Smoking" proof n ;
           end
 
     method private update_tacticbar =
@@ -531,6 +546,15 @@ class pane (gprovers : GuiConfig.provers) =
           on_proof_context proof
             begin fun () ->
               text#clear ;
+              let main = ProofEngine.main proof in
+              if ProofSession.exists main then begin
+                text#printf
+                  (if ProofEngine.saved proof
+                   then "%a (@{<green>saved@})@."
+                   else "%a (@{<orange>modified@})@.")
+                  ProofSession.pp_script_for main ;
+                text#hrule ;
+              end ;
               scripter#tree proof ;
               text#hrule ;
               text#printf "%t@." (printer#goal (ProofEngine.head proof)) ;
@@ -601,7 +625,7 @@ class pane (gprovers : GuiConfig.provers) =
               VCS.pp_prover prv Wpo.pp_title wpo VCS.pp_result res
           end
         ~success:(fun _ _ -> Wutil.later self#commit)
-        ~pool (List.map (fun dp -> VCS.BatchMode , dp) provers)
+        ~pool (List.map (fun dp -> VCS.Batch , dp) provers)
 
     method private fork proof fork =
       Wutil.later
@@ -650,9 +674,10 @@ class pane (gprovers : GuiConfig.provers) =
                 self#search proof fork
               else
                 begin
+                  let provers = List.map (fun e -> e#prover) provers in
                   ProverScript.search
                     ~depth ~width ~auto
-                    ~provers:[ VCS.NativeAltErgo ]
+                    ~provers
                     ~result:
                       (fun wpo prv res ->
                          text#printf "[%a] %a : %a@."

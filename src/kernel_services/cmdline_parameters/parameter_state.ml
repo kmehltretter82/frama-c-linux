@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -74,13 +74,13 @@ let extend_no_reset_selection is_set s =
 (* ************************************************************************* *)
 
 module Make
-  (P: sig val shortname: string end)
-  (X: sig
-    include Datatype.S
-    val default: unit -> t
-    val option_name: string
-    val functor_name: string
-   end) =
+    (P: sig val shortname: string end)
+    (X: sig
+       include Datatype.S
+       val default: unit -> t
+       val option_name: string
+       val functor_name: string
+     end) =
 struct
 
   let is_dynamic = true
@@ -95,18 +95,18 @@ struct
   let () = match !Parameter_customize.cmdline_stage_ref with
     | Cmdline.Early | Cmdline.Extending | Cmdline.Extended
     | Cmdline.Exiting | Cmdline.Loading ->
-        Parameter_customize.do_not_projectify ()
+      Parameter_customize.do_not_projectify ()
     | Cmdline.Configuring ->
-        ()
+      ()
 
   (* quite an inlining of [State_builder.Ref]; but handle [projectify_ref] *)
   module Option_state_builder
-    (X:sig
-      include Datatype.S
-      val unique_name: string
-      val pretty_name: string
-      val default: unit -> t
-    end) =
+      (X:sig
+         include Datatype.S
+         val unique_name: string
+         val pretty_name: string
+         val default: unit -> t
+       end) =
   struct
 
     type data = X.t
@@ -115,24 +115,24 @@ struct
     let state = ref (create ())
 
     include State_builder.Register
-    (struct
-      include Datatype.Ref(X)
-      let descr = if must_save then descr else Descr.unmarshable
-     end)
-    (struct
-       type t = data ref
-       let get () = !state
-       let create = if projectify then create else (* do an alias *) get
-       let clear x = if projectify then x := X.default ()
-       let set x =
-         if projectify then state := x (* else there is already an alias *)
-       let clear_some_projects = Datatype.never_any_project
-     end)
-    (struct
-      let name = X.pretty_name
-      let unique_name = X.unique_name
-      let dependencies = []
-     end)
+        (struct
+          include Datatype.Ref(X)
+          let descr = if must_save then descr else Descr.unmarshable
+        end)
+        (struct
+          type t = data ref
+          let get () = !state
+          let create = if projectify then create else (* do an alias *) get
+          let clear x = if projectify then x := X.default ()
+          let set x =
+            if projectify then state := x (* else there is already an alias *)
+          let clear_some_projects = Datatype.never_any_project
+        end)
+        (struct
+          let name = X.pretty_name
+          let unique_name = X.unique_name
+          let dependencies = []
+        end)
 
     let set v = !state := v
     let get () = !(!state)
@@ -149,13 +149,13 @@ struct
           if X.option_name = "" then "Input C files" else X.option_name
         let unique_name = option_name
         let pretty_name = option_name
-       end)
+      end)
 
   module D = Datatype
   include Internal_state
 
   type t = Internal_state.data
-  let () = 
+  let () =
     extend_selection false self;
     if not reset_on_copy then extend_no_reset_selection false self
 
@@ -165,10 +165,10 @@ struct
     Option_state_builder
       (struct
         include D.Bool
-         let pretty_name = X.option_name ^ " is set"
-         let unique_name = pretty_name
-         let default () = false
-       end)
+        let pretty_name = X.option_name ^ " is set"
+        let unique_name = pretty_name
+        let default () = false
+      end)
   let () =
     State_dependency_graph.add_dependencies ~from:Is_set.self [ self ];
     extend_selection true Is_set.self;
@@ -181,9 +181,9 @@ struct
     add_set_hook f;
     add_hook_on_update
       (fun x ->
-        let old = get () in
-        let new_ = !x in
-        if not (X.equal old new_) then f old new_)
+         let old = get () in
+         let new_ = !x in
+         if not (X.equal old new_) then f old new_)
 
   let gen_journalized name ty set =
     let name =
@@ -232,7 +232,7 @@ struct
 
   let journalized_force_set = gen_journalized "set" X.ty force_set
 
-  let set x = 
+  let set x =
     Is_set.set true;
     if not (X.equal x (Internal_state.get ())) then journalized_force_set x
 
@@ -270,8 +270,9 @@ struct
 
   let option_name = X.option_name
 
-  let add_aliases = 
-    Cmdline.add_aliases option_name ~plugin:P.shortname ~group stage
+  let add_aliases ?visible ?deprecated =
+    Cmdline.add_aliases
+      option_name ~plugin:P.shortname ~group stage ?visible ?deprecated
 
   let print_help fmt =
     Cmdline.print_option_help fmt ~plugin:P.shortname ~group option_name

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -62,15 +62,17 @@ val is_smoke_test : prop_id -> bool
 (** test if the prop_id does not have a [no_wp:] in its name(s). *)
 val select_default : prop_id -> bool
 
-(** test if the prop_id has to be selected for the asked name.
-    Also returns a debug message to explain then answer. Includes
-    a test for [no_wp:]. *)
+(** test if the prop_id has to be selected for the asked names. *)
 val select_by_name : string list -> prop_id -> bool
 
-(** test if the prop_id has to be selected when we want to select the call
- * precondition the the [stmt] call (None means all the call preconditions).
- * Also returns a debug message to explain then answer. *)
+(** test if the prop_id has to be selected for the asked behavior names. *)
+val select_for_behaviors : string list -> prop_id -> bool
+
+(** test if the prop_id has to be selected when we want to select the call. *)
 val select_call_pre : stmt -> Property.t option -> prop_id -> bool
+
+(** From a list of names (of an identified terms), returns usable names. *)
+val ident_names : string list -> string list
 
 (*----------------------------------------------------------------------------*)
 
@@ -79,6 +81,13 @@ val prop_id_keys : prop_id -> string list * string list (* required , hints *)
 val get_propid : prop_id -> string (** Unique identifier of [prop_id] *)
 val get_legacy : prop_id -> string (** Unique legacy identifier of [prop_id] *)
 val pp_propid : Format.formatter -> prop_id -> unit (** Print unique id of [prop_id] *)
+
+val user_pred_names: toplevel_predicate -> string list
+val user_bhv_names: Property.identified_property -> string list
+val user_prop_names: Property.identified_property -> string list
+val are_selected_names: string list -> string list -> bool
+(** [are_selected_names asked names] checks if [names] of a property are
+    selected according to [asked] names. *)
 
 type prop_kind =
   | PKTactic      (** tactical sub-goal *)
@@ -123,6 +132,9 @@ val mk_assert_id : kernel_function -> stmt -> code_annotation -> prop_id
 val mk_loop_inv_id : kernel_function -> stmt ->
   established:bool -> code_annotation -> prop_id
 
+(** Invariant establishment and preservation, in this order *)
+val mk_loop_inv : kernel_function -> stmt -> code_annotation -> prop_id * prop_id
+
 (** Invariant used as hypothesis *)
 val mk_inv_hyp_id : kernel_function -> stmt -> code_annotation -> prop_id
 
@@ -142,8 +154,10 @@ val mk_bhv_from_id :
   kernel_function -> kinstr -> string list -> funbehavior ->
   from -> prop_id
 
-(** \from property of function behavior assigns. Must not be [FromAny]. *)
-val mk_fct_from_id : kernel_function -> funbehavior ->
+(** \from property of function behavior assigns. Must not be [FromAny].
+    The boolean indicate whether the function has exit node or not.
+*)
+val mk_fct_from_id : kernel_function -> bool -> funbehavior ->
   termination_kind -> from -> prop_id
 
 (** disjoint behaviors property.
@@ -170,12 +184,17 @@ val mk_stmt_assigns_id :
 val mk_loop_assigns_id : kernel_function -> stmt -> code_annotation ->
   from list -> prop_id option
 
-(** function assigns *)
-val mk_fct_assigns_id : kernel_function -> funbehavior ->
+(** function assigns
+    The boolean indicate whether the function has exit node or not.
+*)
+val mk_fct_assigns_id : kernel_function -> bool -> funbehavior ->
   termination_kind -> from list -> prop_id option
 
 val mk_pre_id : kernel_function -> kinstr -> funbehavior ->
   identified_predicate -> prop_id
+
+val mk_post_id : kernel_function -> kinstr -> funbehavior ->
+  termination_kind * identified_predicate -> prop_id
 
 val mk_stmt_post_id : kernel_function -> stmt -> funbehavior ->
   termination_kind * identified_predicate -> prop_id
@@ -225,6 +244,7 @@ val merge_assign_info :
 val mk_loop_assigns_desc : stmt -> from list -> assigns_desc
 
 val mk_stmt_assigns_desc : stmt -> from list -> assigns_desc
+val mk_stmt_assigns_any_desc : stmt -> assigns_desc
 
 val mk_asm_assigns_desc : stmt -> assigns_desc
 
@@ -269,5 +289,35 @@ val subproofs : prop_id -> int
 val subproof_idx : prop_id -> int
 
 val get_induction : prop_id -> stmt option
+
+(*----------------------------------------------------------------------------*)
+
+(*----------------------------------------------------------------------------*)
+
+(** A proof accumulator for a set of related prop_id *)
+type proof
+
+val create_proof : prop_id -> proof
+(** to be used only once for one of the related prop_id *)
+
+val add_proof : proof -> prop_id -> Property.t list -> unit
+(** accumulate in the proof the partial proof for this prop_id *)
+
+val add_invalid_proof : proof -> unit
+(** add an invalid proof result ; can not revert a complete proof *)
+
+val is_composed : proof -> bool
+(** whether a proof needs several lemma to be complete *)
+
+val is_proved : proof -> bool
+(** whether all partial proofs have been accumulated or not *)
+
+val is_invalid : proof -> bool
+(** whether an invalid proof result has been registered or not *)
+
+val target : proof -> Property.t
+val dependencies : proof -> Property.t list
+
+val filter_status : prop_id -> bool
 
 (*----------------------------------------------------------------------------*)

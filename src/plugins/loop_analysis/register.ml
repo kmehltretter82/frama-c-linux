@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,26 +20,21 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* [nobranches] defines whether this function will compute a full slevel
-   analysis (by default), or estimate loop bounds without
-   branching analysis (if [nobranches = true]). *)
-let analyze ?(nobranches=false) kf =
+let analyze kf =
   if Kernel_function.is_definition kf
   then
     if Cil_datatype.Stmt.Set.is_empty (Loop.get_non_naturals kf)
-    then (Loop_analysis.analyze kf;
-          Slevel_analysis.analyze ~nobranches kf)
+    then Loop_analysis.analyze kf
     else
       Options.warning "Could not analyze function %a;@ \
                        it contains a non-natural loop"
         Kernel_function.pretty kf
 ;;
 
-
-let main() =
+let main () =
   if Options.Run.get() then begin
-    Globals.Functions.iter (analyze ~nobranches:(Options.NoBranches.get()));
-    Slevel_analysis.display_results()
+    Globals.Functions.iter analyze;
+    Loop_analysis.display_results ();
   end
 ;;
 

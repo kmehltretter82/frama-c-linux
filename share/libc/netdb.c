@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -69,7 +69,9 @@ int getaddrinfo(
       ai -> ai_protocol = Frama_C_interval(0,IPPROTO_MAX);
       ai -> ai_addrlen = sizeof(*sa) ;
       ai -> ai_addr = sa ;
-      ai -> ai_canonname = "dummy" ;
+      ai -> ai_canonname = malloc(6);
+      if (!ai -> ai_canonname) return EAI_MEMORY;
+      strcpy(ai -> ai_canonname, "dummy");
       ai -> ai_next = NULL;
       *res = ai;
       return 0;
@@ -91,7 +93,7 @@ struct __fc_gethostbyname {
 
 struct __fc_gethostbyname __fc_ghbn;
 
-int res_search(const char *dname, int class, int type,
+static int res_search(const char *dname, int rec_class, int type,
                char *answer, int anslen) {
   for (int i = 0; i < anslen-1; i++) {
     answer[i] = Frama_C_char_interval(CHAR_MIN, CHAR_MAX);
@@ -132,7 +134,7 @@ struct hostent *gethostbyname(const char *name) {
         return &__fc_ghbn.host;
       }
 
-      if (*cp < '0' && *cp > '9' && *cp != '.') break;
+      if (*cp < '0' || *cp > '9' || *cp != '.') break;
     }
   }
 

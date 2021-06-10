@@ -54,7 +54,7 @@ open Cil_types;;
 open Ordered_stmt;;
 
 (** Environment relative to the function being processed, and function to
-   create them from Kf.  *)
+    create them from Kf.  *)
 module type FUNCTION_ENV = sig
   val to_ordered: stmt -> ordered_stmt
   val to_stmt: ordered_stmt -> stmt
@@ -97,8 +97,8 @@ end
 (** {2 Backward dataflow} *)
 
 (** Statement-based backward dataflow. Contrary to the forward dataflow,
-   the transfer function cannot differentiate the state before a
-   statement between different predecessors. *)
+    the transfer function cannot differentiate the state before a
+    statement between different predecessors. *)
 module type BACKWARD_MONOTONE_PARAMETER = sig
   include JOIN_SEMILATTICE
 
@@ -146,9 +146,9 @@ end
 (** {2 Forward dataflow} *)
 
 (** Edge-based forward dataflow. It is edge-based because the transfer
-   function can differentiate the state after a statement between
-   different successors. In particular, the state can be reduced
-   according to the conditions in if statements. *)
+    function can differentiate the state after a statement between
+    different successors. In particular, the state can be reduced
+    according to the conditions in if statements. *)
 module type FORWARD_MONOTONE_PARAMETER = sig
   include JOIN_SEMILATTICE
 
@@ -191,7 +191,7 @@ module Simple_forward(Fenv:FUNCTION_ENV)(P:FORWARD_MONOTONE_PARAMETER) : sig
 
       In this dataflow, the results are the pre-states of all the statements
       reachable from the statements from [P.init]. *)
-  
+
   val fold_on_result: ('a -> stmt -> P.t -> 'a) -> 'a -> 'a
   val iter_on_result: (stmt -> P.t -> unit) -> unit
 
@@ -200,7 +200,7 @@ module Simple_forward(Fenv:FUNCTION_ENV)(P:FORWARD_MONOTONE_PARAMETER) : sig
   val before:P.t Ordered_stmt.ordered_stmt_array
   (* TODO: Should disappear, together with Fenv? *)
   (**/**)
-  
+
 end;;
 
 (** {3 Helper functions for forward dataflow.} *)

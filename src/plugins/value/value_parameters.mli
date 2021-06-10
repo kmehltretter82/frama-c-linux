@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -42,7 +42,7 @@ module OctagonCall: Parameter_sig.Bool
 
 module TracesUnrollLoop: Parameter_sig.Bool
 module TracesUnifyLoop: Parameter_sig.Bool
-module TracesDot: Parameter_sig.String
+module TracesDot: Parameter_sig.Filepath
 module TracesProject: Parameter_sig.Bool
 
 module EqualityStorage: Parameter_sig.Bool
@@ -65,18 +65,17 @@ module WarnSignedConvertedDowncast: Parameter_sig.Bool
 module WarnPointerSubstraction: Parameter_sig.Bool
 module WarnCopyIndeterminate: Parameter_sig.Kernel_function_set
 
-module IgnoreRecursiveCalls: Parameter_sig.Bool
-
 module DescendingIteration: Parameter_sig.String
 module HierarchicalConvergence: Parameter_sig.Bool
 module WideningDelay: Parameter_sig.Int
 module WideningPeriod: Parameter_sig.Int
 
+module RecursiveUnroll: Parameter_sig.Int
+
 module SemanticUnrollingLevel: Parameter_sig.Int
 module SlevelFunction:
   Parameter_sig.Map with type key = Cil_types.kernel_function
                      and type value = int
-
 module SlevelMergeAfterLoop: Parameter_sig.Kernel_function_set
 
 module MinLoopUnroll : Parameter_sig.Int
@@ -90,15 +89,6 @@ module ArrayPrecisionLevel: Parameter_sig.Int
 
 module AllocatedContextValid: Parameter_sig.Bool
 module InitializationPaddingGlobals: Parameter_sig.String
-
-module SaveFunctionState:
-  Parameter_sig.Map with type key = Cil_types.kernel_function
-                     and type value = string
-module LoadFunctionState:
-  Parameter_sig.Map with type key = Cil_types.kernel_function
-                     and type value = string
-val get_SaveFunctionState : unit -> Cil_types.kernel_function * string
-val get_LoadFunctionState : unit -> Cil_types.kernel_function * string
 
 module Numerors_Real_Size : Parameter_sig.Int
 module Numerors_Mode : Parameter_sig.String
@@ -131,14 +121,12 @@ module SplitReturnFunction:
 module SplitGlobalStrategy: State_builder.Ref with type data = Split_strategy.t
 
 module ValShowProgress: Parameter_sig.Bool
-module ValShowInitialState: Parameter_sig.Bool
 module ValShowPerf: Parameter_sig.Bool
-module ValPerfFlamegraphs: Parameter_sig.String
+module ValPerfFlamegraphs: Parameter_sig.Filepath
 module ShowSlevel: Parameter_sig.Int
 module PrintCallstacks: Parameter_sig.Bool
-module AlarmsWarnings: Parameter_sig.Bool
-module ReportRedStatuses: Parameter_sig.String
-module NumerorsLogFile: Parameter_sig.String
+module ReportRedStatuses: Parameter_sig.Filepath
+module NumerorsLogFile: Parameter_sig.Filepath
 
 module MemExecAll: Parameter_sig.Bool
 
@@ -230,6 +218,12 @@ val dkey_callbacks : category
 (** Debug category used to print the usage of widenings. *)
 val dkey_widening : category
 
+(** Debug category used to print messages about recursive calls. *)
+val dkey_recursion : category
+
+(** Registers available cvalue builtins for the -eva-builtin option. *)
+val register_builtin: string -> unit
+
 (** Registers available domain names for the -eva-domains option. *)
 val register_domain: name:string -> descr:string -> unit
 
@@ -239,6 +233,10 @@ val enabled_domains: unit -> (string * string) list
 (** [use_builtin kf b] adds a builtin override for function `kf` to
     builtin `b`. *)
 val use_builtin: Cil_types.kernel_function -> string -> unit
+
+(** [use_global_value_partitioning vi] enable value partitioning on the global
+    variable `vi`. *)
+val use_global_value_partitioning: Cil_types.varinfo -> unit
 
 (*
 Local Variables:

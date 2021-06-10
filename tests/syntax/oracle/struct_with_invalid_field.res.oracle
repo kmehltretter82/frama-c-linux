@@ -1,0 +1,9 @@
+[kernel] Parsing tests/syntax/struct_with_invalid_field.i (no preprocessing)
+[kernel] tests/syntax/struct_with_invalid_field.i:8: User Error: 
+  field `f' declared as a function
+[kernel] tests/syntax/struct_with_invalid_field.i:14: User Error: 
+  negative bitfield width (-1)
+[kernel] tests/syntax/struct_with_invalid_field.i:15: User Error: 
+  negative bitfield width (-2147483648)
+[kernel] User Error: stopping on file "tests/syntax/struct_with_invalid_field.i" that has errors.
+[kernel] Frama-C aborted: invalid user input.

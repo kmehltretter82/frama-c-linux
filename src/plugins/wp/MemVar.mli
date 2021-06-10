@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -30,8 +30,8 @@ module type VarUsage =
 sig
   val datatype : string
   val param : varinfo -> MemoryContext.param
-  (** Memory Model Hypotheses *)
-  val hypotheses : unit -> MemoryContext.clause list
+  val iter: ?kf:kernel_function -> init:bool -> (varinfo -> unit) -> unit
+
 end
 
 module Make(V : VarUsage)(M : Sigs.Model) : Sigs.Model

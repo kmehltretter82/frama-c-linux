@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -21,50 +21,58 @@
 (**************************************************************************)
 
 open Cil_types
+open Eval
 
-(** Recursion *)
+module Varinfo = Cil_datatype.Varinfo
 
-(* Our current treatment for recursion -- use the specification for
-   the function that begins the recursive cycle -- is incorrect for
-   function with formals whose address is taken. Indeed, we do not know
-   which "instance" of the formal is updated by the specification. In
-   this case, warn the user. *)
-let check_formals_non_referenced kf =
-  let formals = Kernel_function.get_formals kf in
-  if List.exists (fun vi -> vi.vaddrof) formals then
-    Value_parameters.error ~current:true ~once:true
-      "function '%a' (involved in a recursive call) has a formal parameter \
-       whose address is taken. Analysis may be unsound."
+let mark_unknown_requires kinstr kf funspec =
+  let stmt =
+    match kinstr with
+    | Kglobal -> assert false
+    | Kstmt stmt -> stmt
+  in
+  let emitter = Value_util.emitter in
+  let status = Property_status.Dont_know in
+  let emit_behavior behavior =
+    let emit_predicate predicate =
+      let ip = Property.ip_of_requires kf Kglobal behavior predicate in
+      Statuses_by_call.setup_precondition_proxy kf ip;
+      let property = Statuses_by_call.precondition_at_call kf ip stmt in
+      Property_status.emit ~distinct:true emitter ~hyps:[] property status
+    in
+    List.iter emit_predicate behavior.b_requires
+  in
+  List.iter emit_behavior funspec.spec_behavior
+
+let get_spec kinstr kf =
+  let funspec = Annotations.funspec ~populate:false kf in
+  if Cil.is_empty_funspec funspec then begin
+    Value_parameters.error ~current:true
+      "@[Recursive call to %a@ without a specification.@ \
+       Generating probably incomplete assigns to interpret the call.@ \
+       Try to increase@ the %s parameter@ \
+       or write a correct specification@ for function %a.%t@]"
       Kernel_function.pretty kf
-
-let warn_recursive_call kf call_stack =
-  if Value_parameters.IgnoreRecursiveCalls.get ()
-  then begin
-    Value_util.warning_once_current
-      "@[recursive call@ during@ value@ analysis@ of %a \
-       @[(%a <- %a)@].@ Assuming@ the call@ has@ no effect.@ \
-       The analysis@ will@ be@ unsound.@]"
-      Kernel_function.pretty kf Kernel_function.pretty kf
-      Value_types.Callstack.pretty call_stack ;
-    check_formals_non_referenced kf;
-    Db.Value.recursive_call_occurred kf;
+      Value_parameters.RecursiveUnroll.name
+      Kernel_function.pretty kf
+      Value_util.pp_callstack;
+    Cil.CurrentLoc.set (Kernel_function.get_location kf);
+    ignore (!Annotations.populate_spec_ref kf funspec);
+    Annotations.funspec kf
   end
-  else begin
-    Value_parameters.error ~once:true ~current:true
-      "@[@[detected@ recursive@ call@ (%a <- %a)@]@;@[Use %s@ to@ \
-       ignore@ (beware@ this@ will@ make@ the analysis@ unsound)@]@]"
-      Kernel_function.pretty kf Value_types.Callstack.pretty call_stack
-      Value_parameters.IgnoreRecursiveCalls.option_name;
-    raise Db.Value.Aborted
-  end
-
-(* Check whether the function at the top of the call-stack starts a
-   recursive call. *)
-let is_recursive_call kf =
-  let call_stack = Value_util.call_stack () in
-  if List.exists (fun (f, _) -> f == kf) call_stack
-  then (warn_recursive_call kf call_stack; true)
-  else false
+  else
+    let depth = Value_parameters.RecursiveUnroll.get () in
+    let () =
+      Value_parameters.warning ~once:true ~current:true
+        "@[Using specification of function %a@ for recursive calls%s.@ \
+         Analysis of function %a@ is thus incomplete@ and its soundness@ \
+         relies on the written specification.@]"
+        Kernel_function.pretty kf
+        (if depth > 0 then Format.asprintf " of depth %i" depth else "")
+        Kernel_function.pretty kf
+    in
+    mark_unknown_requires kinstr kf funspec;
+    funspec
 
 (* Find a spec for a function [kf] that begins a recursive call. If [kf]
    has no existing specification, generate (an incorrect) one, and warn
@@ -89,7 +97,7 @@ let _spec_for_recursive_call kf =
       ~silent_about_merging_behav:true spec initial_spec;
     spec
 
-let empty_spec_for_recursive_call kf =
+let _empty_spec_for_recursive_call kf =
   let typ_res = Kernel_function.get_return_type kf in
   let empty = Cil.empty_funspec () in
   let assigns =
@@ -104,3 +112,79 @@ let empty_spec_for_recursive_call kf =
   let bhv = Cil.mk_behavior ~assigns ~name:Cil.default_behavior_name () in
   empty.spec_behavior <- [bhv];
   empty
+
+
+(* -------------------------------------------------------------------------- *)
+
+module CallDepth =
+  Datatype.Pair_with_collections (Kernel_function) (Datatype.Int)
+    (struct let module_name = "CallDepth" end)
+
+module VarCopies =
+  Datatype.List (Datatype.Pair (Varinfo) (Varinfo))
+
+module VarStack =
+  State_builder.Hashtbl
+    (CallDepth.Hashtbl)
+    (VarCopies)
+    (struct
+      let name = "Eva.Recursion.VarStack"
+      let dependencies = [ Ast.self ]
+      let size = 9
+    end)
+
+let copy_variable fundec depth varinfo =
+  let name = Format.asprintf "\\copy<%s>[%i]" varinfo.vname depth in
+  let v = Cil.copyVarinfo varinfo name in
+  Cil.refresh_local_name fundec v;
+  v
+
+let make_stack (kf, depth) =
+  let fundec =
+    try Kernel_function.get_definition kf
+    with Kernel_function.No_Definition -> assert false
+  in
+  let vars = Kernel_function.(get_formals kf @ get_locals kf) in
+  let copy v = v, copy_variable fundec depth v in
+  List.map copy vars
+
+let get_stack kf depth = VarStack.memo make_stack (kf, depth)
+
+let make_recursion call depth =
+  let dkey = Value_parameters.dkey_recursion in
+  Value_parameters.feedback ~dkey ~once:true ~current:true
+    "@[detected recursive call@ of function %a.@]"
+    Kernel_function.pretty call.kf;
+  let substitution = get_stack call.kf depth in
+  let add_if_copy acc argument =
+    match argument.avalue with
+    | Copy ({ lval = Var vi, _ }, _) -> Varinfo.Set.add vi acc
+    | _ -> acc
+  in
+  let empty = Varinfo.Set.empty in
+  let copied_varinfos = List.fold_left add_if_copy empty call.arguments in
+  let may_be_used (vi, _) = vi.vaddrof || Varinfo.Set.mem vi copied_varinfos in
+  let substitution, withdrawal = List.partition may_be_used substitution in
+  let withdrawal = List.map fst withdrawal in
+  let base_of_varinfo (v1, v2) = Base.of_varinfo v1, Base.of_varinfo v2 in
+  let list_substitution = List.map base_of_varinfo substitution in
+  let base_substitution = Base.substitution_from_list list_substitution in
+  let list_withdrawal = List.map Base.of_varinfo withdrawal in
+  let base_withdrawal = Base.Hptset.of_list list_withdrawal in
+  { depth; substitution; base_substitution; withdrawal; base_withdrawal; }
+
+let make call =
+  let is_same_kf (f, _) = Kernel_function.equal f call.kf in
+  let previous_calls = List.filter is_same_kf call.callstack in
+  let depth = List.length previous_calls in
+  if depth > 0
+  then Some (make_recursion call depth)
+  else None
+
+let revert recursion =
+  let revert (v1, v2) = v2, v1 in
+  let substitution = List.map revert recursion.substitution in
+  let base_of_varinfo (v1, v2) = Base.of_varinfo v1, Base.of_varinfo v2 in
+  let list = List.map base_of_varinfo substitution in
+  let base_substitution = Base.substitution_from_list list in
+  { recursion with substitution; base_substitution; }

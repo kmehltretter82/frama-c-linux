@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -246,7 +246,7 @@ module Base_checker = struct
         self#push_behavior_stack ();
         (* Initial AST does not have kf *)
         if is_normalized then begin
-          let kf = Extlib.the self#current_kf in
+          let kf = Option.get self#current_kf in
           if not (Kernel_function.is_definition kf) then
             check_abort
               "Kernel function %a is supposed to be a prototype, but it has a body"
@@ -307,7 +307,7 @@ module Base_checker = struct
            | Some _ -> (* can only happen in normalized mode. *)
              check_abort
                "Function %a does not have a return statement in its body"
-               Kernel_function.pretty (Extlib.the self#current_kf));
+               Kernel_function.pretty (Option.get self#current_kf));
           let check_one_stmt stmt _ =
             let check_cfg_edge stmt' =
               try
@@ -409,7 +409,7 @@ module Base_checker = struct
                 self#add_spec_behavior_names spec
               | _ -> assert false (* filter should prevent anything else. *))
             contracts;
-          let kf = Extlib.the self#current_kf in
+          let kf = Option.get self#current_kf in
           let s',kf' =
             try
               Kernel_function.find_from_sid s.sid
@@ -495,12 +495,12 @@ module Base_checker = struct
              | None ->
                check_abort
                  "Found a second return statement in body of function %a"
-                 Kernel_function.pretty (Extlib.the self#current_kf)
+                 Kernel_function.pretty (Option.get self#current_kf)
              | Some s' when s != s' ->
                check_abort
                  "Function %a is supposed to have as return statement %d:@\n%a@\n\
                   Found in its body statement %d:@\n%a@\n"
-                 Kernel_function.pretty (Extlib.the self#current_kf)
+                 Kernel_function.pretty (Option.get self#current_kf)
                  s'.sid Printer.pp_stmt s'
                  s.sid Printer.pp_stmt s
              | Some _ -> return_stmt <- None
@@ -509,15 +509,19 @@ module Base_checker = struct
          | _ -> Cil.ChangeDoChildrenPost (s,post_action));
 
       method private check_local_var v =
+        let prefix fmt =
+          Format.fprintf fmt "Local variable %a(%d) in function %a"
+            Printer.pp_varinfo v v.vid
+            Printer.pp_varinfo (Option.get self#current_func).svar
+        in
+        if v.vglob then check_abort "%t is marked as global" prefix;
+        if v.vformal then check_abort "%t is marked as formal" prefix;
         if Varinfo.Set.mem v local_vars then begin
           local_vars <- Varinfo.Set.remove v local_vars;
         end else begin
           check_abort
-            "In function %a, variable %a(%d) is supposed to be local to a block \
-             but not mentioned in the function's locals."
-            Printer.pp_varinfo
-            (Extlib.the self#current_func).svar
-            Printer.pp_varinfo v v.vid
+            "%t is present in a block's blocals but in the function's slocals"
+            prefix
         end
 
       method private check_local_static v =
@@ -525,7 +529,7 @@ module Base_checker = struct
           Format.fprintf fmt
             "Local variable %a(%d) in function %a"
             Printer.pp_varinfo v v.vid
-            Printer.pp_varinfo (Extlib.the self#current_func).svar
+            Printer.pp_varinfo (Option.get self#current_func).svar
         in
         if not v.vglob then
           check_abort
@@ -650,7 +654,7 @@ module Base_checker = struct
            names of statement contracts. *)
         if is_normalized then begin
           match ca.annot_content with
-          | AAssert(bhvs,_,_) | AStmtSpec(bhvs,_) | AInvariant (bhvs,_,_)
+          | AAssert(bhvs,_) | AStmtSpec(bhvs,_) | AInvariant (bhvs,_,_)
           | AAssigns(bhvs,_) | AAllocation(bhvs,_) | AExtended (bhvs,_,_) ->
             List.iter
               (fun b ->
@@ -893,7 +897,9 @@ module Base_checker = struct
         Compinfo.Hashtbl.add known_compinfos c c;
         Kernel.debug
           ~dkey:Kernel.dkey_check "Adding fields for type %s(%d)" c.cname c.ckey;
-        List.iter (fun x -> Fieldinfo.Hashtbl.add known_fields x x) c.cfields;
+        List.iter
+          (fun x -> Fieldinfo.Hashtbl.add known_fields x x)
+          (Option.value ~default:[] c.cfields);
         Cil.DoChildren
 
       method! vfieldinfo f =
@@ -1077,7 +1083,7 @@ module Base_checker = struct
                "field %s of type %a is not present in environment"
                mi.mi_name Printer.pp_typ mi.mi_base_type);
           Cil.DoChildren
-        | Dlemma(_,_,labels,_,_,_,_) ->
+        | Dlemma(_,labels,_,_,_,_) ->
           let old_labels = logic_labels in
           logic_labels <- labels @ logic_labels;
           Cil.DoChildrenPost (fun g -> logic_labels <- old_labels; g)
@@ -1355,8 +1361,8 @@ let check_ast ?is_normalized ?(ast = Ast.get()) what =
   let module M = (val !current_checker : Extensible_checker) in
   Kernel.debug ~dkey:Kernel.dkey_check
     "Checking integrity of %s (%snormalized):@\n%a"
-    what (if Extlib.opt_conv true is_normalized then "" else "not ")
-    (if Extlib.opt_conv true is_normalized
+    what (if Option.value ~default:true is_normalized then "" else "not ")
+    (if Option.value ~default:true is_normalized
      then Printer.pp_file else Cil_printer.pp_file)
     ast;
   Cil.visitCilFileSameGlobals

@@ -12,7 +12,7 @@
   Declaration of variadic function sprintf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:217: 
   Declaration of variadic function sscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:538: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:541: 
   Declaration of variadic function dprintf.
 [variadic] tests/known/stdio_scan.c:10: Warning: 
   Call to function fscanf with non-static format argument:
@@ -75,7 +75,7 @@
       \from (indirect: stream->__fc_FILE_id), stream->__fc_FILE_data,
             (indirect: *(format + (0 ..)));
  */
-int fscanf_va_1(FILE * __restrict stream, char const * __restrict format,
+int fscanf_va_1(FILE * restrict stream, char const * restrict format,
                 int *param0, char *param1, int *param2);
 
 /*@ requires \valid(param0);
@@ -102,7 +102,7 @@ int fscanf_va_1(FILE * __restrict stream, char const * __restrict format,
       \from (indirect: __fc_stdin->__fc_FILE_id), __fc_stdin->__fc_FILE_data,
             (indirect: *(format + (0 ..)));
  */
-int scanf_va_1(char const * __restrict format, int *param0, char *param1,
+int scanf_va_1(char const * restrict format, int *param0, char *param1,
                int *param2);
 
 /*@ requires \valid(param0);
@@ -121,7 +121,7 @@ int scanf_va_1(char const * __restrict format, int *param0, char *param1,
     assigns *param0
       \from (indirect: *(s + (0 ..))), (indirect: *(format + (0 ..)));
  */
-int sscanf_va_1(char const * __restrict s, char const * __restrict format,
+int sscanf_va_1(char const * restrict s, char const * restrict format,
                 int *param0, char *param1, int *param2);
 
 int main(void)
@@ -156,9 +156,9 @@ int main(void)
     sscanf((char const *)str,(char const *)format,
            (void * const *)(__va_args_26));
   }
-  fscanf_va_1(stream,"%d %s %d",& i,s,& j);
-  scanf_va_1("%d %s %d",& i,s,& j);
-  sscanf_va_1((char const *)str,"%d %s %d",& i,s,& j);
+  fscanf(stream,"%d %s %d",& i,s,& j); /* fscanf_va_1 */
+  scanf("%d %s %d",& i,s,& j); /* scanf_va_1 */
+  sscanf((char const *)str,"%d %s %d",& i,s,& j); /* sscanf_va_1 */
   __retres = 0;
   return __retres;
 }

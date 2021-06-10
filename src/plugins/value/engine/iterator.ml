@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -66,7 +66,7 @@ module Make_Dataflow
 
   let kf = AnalysisParam.kf
   let fundec = Kernel_function.get_definition kf
-  let cacheable = ref Value_types.Cacheable
+  let cacheable = ref Eval.Cacheable
 
 
   (* --- Plugin parameters --- *)
@@ -273,9 +273,9 @@ module Make_Dataflow
     let result, call_cacheable =
       Transfer.call stmt dest callee args state
     in
-    if call_cacheable = Value_types.NoCacheCallers then
+    if call_cacheable = Eval.NoCacheCallers then
       (* Propagate info that the current call cannot be cached either *)
-      cacheable := Value_types.NoCacheCallers;
+      cacheable := Eval.NoCacheCallers;
     Bottom.list_of_bot result
 
   let transfer_instr (stmt : stmt) (instr : instr) : transfer_function =
@@ -333,7 +333,7 @@ module Make_Dataflow
       match return_exp with
       | None -> id
       | Some return_exp ->
-        let vi_ret = Extlib.the (Library_functions.get_retres_vi kf) in
+        let vi_ret = Option.get (Library_functions.get_retres_vi kf) in
         let return_lval = Var vi_ret, NoOffset in
         let kstmt = Kstmt stmt in
         fun state ->
@@ -399,7 +399,7 @@ module Make_Dataflow
       | _ -> flow
     in
     (* Loop transitions *)
-    let the_stmt v = Extlib.the v.vertex_start_of in
+    let the_stmt v = Option.get v.vertex_start_of in
     let enter_loop f v =
       let f = Partition.enter_loop f (the_stmt v) in
       Partition.transfer (lift (Domain.enter_loop (the_stmt v))) f
@@ -479,7 +479,7 @@ module Make_Dataflow
              in this function. *)
           Partition.transfer (transfer_annotations stmt ~record:false) flow
         in
-        Extlib.may_map correct_over_widening ~dft:flow v.vertex_start_of
+        Option.fold ~some:correct_over_widening ~none:flow v.vertex_start_of
       end else
         flow
     in

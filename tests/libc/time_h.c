@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: #"-slevel 4"
+   STDOPT: #"-eva-slevel 4"
  */
 
 #include <time.h>
@@ -60,6 +60,9 @@ int main() {
   res_time = gmtime(&t);
   struct tm mytime2;
   res_time = gmtime_r(&t, &mytime2);
+
+  time_str = asctime(&mytime);
+  //@ assert valid_string(time_str);
 
   return 0;
 }

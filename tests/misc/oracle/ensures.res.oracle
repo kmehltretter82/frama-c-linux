@@ -4,7 +4,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:alarm] tests/misc/ensures.i:5: Warning: 
+[eva:alarm] tests/misc/ensures.i:8: Warning: 
   function main: postcondition got status invalid.
 [eva] done for function main
 [eva:summary] ====== ANALYSIS SUMMARY ======

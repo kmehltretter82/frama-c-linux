@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -19,3 +19,15 @@
 (*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
 (*                                                                        *)
 (**************************************************************************)
+
+module List = struct
+
+  let concat_map f l =
+    let rec aux f acc = function
+      | [] -> List.rev acc
+      | x :: l ->
+        let xs = f x in
+        aux f (List.rev_append xs acc) l
+    in aux f [] l
+
+end

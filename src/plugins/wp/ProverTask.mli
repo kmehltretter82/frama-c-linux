@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -85,7 +85,7 @@ val schedule : 'a Task.task -> unit
 val spawn :
   ?monitor:('a option -> unit) ->
   ?pool:Task.pool ->
-  all:bool ->
+  all:bool -> smoke:bool ->
   ('a * bool Task.task) list -> unit
 
 (** Spawn all the tasks over the server and retain the first 'validated' one.

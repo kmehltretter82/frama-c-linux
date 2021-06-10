@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -113,6 +113,7 @@ module Refreshers: sig
   val from: check
   val user_assertions: check
   val user_checks: check
+  val user_admits: check
   val rte: check
   val invariant: check
   val variant: check
@@ -242,6 +243,8 @@ struct
     add ~name:"User assertions" ~hint:"Show user assertions" ()
   let user_checks =
     add ~name:"User checks" ~hint:"Show user checks" ()
+  let user_admits =
+    add ~name:"User admits" ~hint:"Show user hypotheses" ()
   (* Function called when RTEs are enabled or disabled. *)
   let set_rte = ref (fun _b -> ())
   let rte = add ~set:(fun b -> !set_rte b) ~name:"RTEs"
@@ -364,6 +367,7 @@ struct
     from.add hb;
     user_assertions.add hb;
     user_checks.add hb;
+    user_admits.add hb;
     rte.add hb;
     invariant.add hb;
     variant.add hb;
@@ -629,21 +633,21 @@ let make_panel (main_ui:main_window_extension_points) =
     | IPPredicate {ip_kind=PKEnsures _;ip_kinstr=Kstmt _} ->
       ensures.get() && stmtSpec.get()
     | IPPredicate {ip_kind = PKTerminates} -> terminates.get ()
-    | IPAxiom _ -> false
     | IPTypeInvariant _ -> typeInvariants.get()
     | IPGlobalInvariant _ -> globalInvariants.get()
     | IPAxiomatic _ -> axiomatic.get () && not (onlyCurrent.get ())
     | IPLemma _ -> lemmas.get ()
     | IPComplete _ -> complete_disjoint.get ()
     | IPDisjoint _ -> complete_disjoint.get ()
-    | IPCodeAnnot {ica_ca={annot_content = AAssert (_, kind, _)} as ca} ->
+    | IPCodeAnnot {ica_ca={annot_content=AAssert(_, {tp_kind})} as ca} ->
       begin
         match Alarms.find ca with
         | Some a -> rte.get () && active_alarm a
         | None ->
-          match kind with
+          match tp_kind with
           | Assert -> user_assertions.get ()
           | Check -> user_checks.get ()
+          | Admit -> user_admits.get ()
       end
     | IPCodeAnnot {ica_ca={annot_content = AInvariant _}} ->
       invariant.get ()
@@ -677,7 +681,7 @@ let make_panel (main_ui:main_window_extension_points) =
     | Consolidation.Unknown_but_dead _ -> dead.get ()
     | Consolidation.Inconsistent _ -> inconsistent.get ()
   in
-  let visible_status = Extlib.may_map visible_status_aux ~dft:true in
+  let visible_status = Option.fold ~some:visible_status_aux ~none:true in
   let fill_model () =
     let add_ip ip =
       if visible ip then
@@ -690,7 +694,7 @@ let make_panel (main_ui:main_window_extension_points) =
 
     (* Will the results for this kf be ultimately displayed *)
     let display kf =
-      not (Cil.is_unused_builtin (Kernel_function.get_vi kf)) &&
+      not (Cil_builtins.is_unused_builtin (Kernel_function.get_vi kf)) &&
       not (onlyCurrent.get ()) ||
       (let kfvi = Kernel_function.get_vi kf in
        List.exists

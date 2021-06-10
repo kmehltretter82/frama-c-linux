@@ -1,4 +1,5 @@
 /* run.config
+PLUGIN: obfuscator
    OPT: -obfuscate -journal-disable
 */
 

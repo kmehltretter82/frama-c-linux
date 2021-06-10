@@ -40,15 +40,24 @@ val result_vi: kernel_function -> varinfo
 
 val is_fc_or_compiler_builtin: varinfo -> bool
 
+val is_fc_stdlib_generated: varinfo -> bool
+(** Returns true if the [varinfo] is a generated stdlib function. (For instance
+    generated function by the Variadic plug-in. *)
+
 val term_addr_of: loc:location -> term_lval -> typ -> term
 
 val cty: logic_type -> typ
 (** Assume that the logic type is indeed a C type. Just return it. *)
 
-val ptr_index: ?loc:location -> ?index:exp -> exp
-  -> Cil_types.exp * Cil_types.exp
-(** Split pointer-arithmetic expression of the type `p + i` into its
-    pointer and integer parts. *)
+val ptr_base: loc:location -> exp -> exp
+(** Takes an expression [e] and return [base] where [base] is the address [p]
+    if [e] is of the form [p + i] and [e] otherwise. *)
+
+val ptr_base_and_base_addr: loc:location -> exp -> exp * exp
+(* Takes an expression [e] and return a tuple [(base, base_addr)] where [base]
+   is the address [p] if [e] is of the form [p + i] and [e] otherwise, and
+   [base_addr] is the address [&p] if [e] is of the form [p + i] and 0
+   otherwise. *)
 
 val term_of_li: logic_info -> term
 (** [term_of_li li] assumes that [li.l_body] matches [LBterm t]
@@ -68,10 +77,6 @@ val term_has_lv_from_vi: term -> bool
 (** @return true iff the given term contains a variables that originates from
     a C varinfo, that is a non-purely logic variable. *)
 
-val mk_ptr_sizeof: typ -> location -> exp
-(** [mk_ptr_sizeof ptr_typ loc] takes the pointer typ [ptr_typ] that points
-    to a [typ] typ and returns [sizeof(typ)]. *)
-
 val name_of_binop: binop -> string
 (** @return the name of the given binop as a string. *)
 
@@ -87,6 +92,17 @@ val extract_uncoerced_lval: exp -> exp option
 
     If at some point the expression is neither a [CastE] nor an [Lval], then
     return [None]. *)
+
+val strip_casts: exp -> exp * typ list
+(** [strip casts e] strips the casts from the expression [e] and returns the
+    uncasted expression and the list of casts that were removed in order of
+    application. For example calling [strip_casts ((A)((B)((C)e)))] will return
+    the expression [e] and the list [[C; B; A]]. *)
+
+val add_casts: typ list -> exp -> exp
+(** [add_casts typs e] successively adds the casts in [typs] to the expression
+    [e]. For example calling [add_casts [C; B; A] e] will return the expression
+    [(A)((B)((C)e))]. *)
 
 (*
 Local Variables:

@@ -1,8 +1,11 @@
 /* run.config
-   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-   OPT: -eva-verbose 2 -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs -print
+ PLUGIN: @EVA_PLUGINS@
+ MODULE: @PTEST_NAME@
+   OPT: -eva-verbose 2 -print
 */
-void main() { //@ assert \true;
+
+void main() {
+  //@ assert \true;
 }
 
 void main2() {

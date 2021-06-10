@@ -1,5 +1,5 @@
 /* run.config* 
-OPT: @EVA_CONFIG@ -no-autoload-plugins -load-module from,inout,eva,report -slevel-function main2:20 -pp-annot -eva -then -report
+OPT: @EVA_CONFIG@ -no-autoload-plugins -load-module from,inout,eva,report -eva-slevel-function main2:20 -pp-annot -eva -then -report
 */
 
 /*@ requires valid: \valid(&t[0..s-1]);
@@ -59,9 +59,27 @@ void main4 () {
   while(x < a) x++;
 }
 
+extern int n;
+
+/* The reduction by the loop invariant after the widening must not jeopardize
+   the convergence of the analysis. */
+int main5(void) {
+  int i = 1;
+  int sn = 0;
+  /*@ loop invariant i <= sn+100; */
+  while (i <= n) {
+    Frama_C_show_each(sn, i);
+    sn += 2;
+    i ++;
+  }
+  return 0;
+}
+
+
 void main(int c) {
   main1(c);
   if (c) main2();
   main3();
   main4();
+  main5();
 }

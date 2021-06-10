@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -84,7 +84,7 @@ val iter:
     - [offset] is the offset at which [v] starts in the interval;
       it ranges over [0..size-1]. If [offset] is [0], [v] starts
       at the beginning of the interval. Otherwise, it starts at [offset-size].
- *)
+*)
 
 val fold:
   ((Int.t * Int.t) -> (v * Int.t * Rel.t) -> 'a -> 'a) ->
@@ -122,17 +122,17 @@ val map_on_values: (v -> v) -> t -> t
     relative to the beginning of the interval is kept unchanged. *)
 
 type map2_decide =
-   ReturnLeft | ReturnRight | ReturnConstant of v | Recurse
-(** This type describes different possibilities to accelerate a simultaneous
-    iteration on two offsetmaps. {!ReturnLeft} (resp. {!ReturnRight}) means
-    'return the left (resp. right) operand unchanged, and stop the recursive
-    descent'. [ReturnConstant v] means 'return a constant offsetmap of the good
-    size and that contains [v] everywhere'. It is always correct to return
-    {!Recurse}, which will force the recursion until the maps have been fully
-    decomposed.
+    ReturnLeft | ReturnRight | ReturnConstant of v | Recurse
+  (** This type describes different possibilities to accelerate a simultaneous
+      iteration on two offsetmaps. {!ReturnLeft} (resp. {!ReturnRight}) means
+      'return the left (resp. right) operand unchanged, and stop the recursive
+      descent'. [ReturnConstant v] means 'return a constant offsetmap of the good
+      size and that contains [v] everywhere'. It is always correct to return
+      {!Recurse}, which will force the recursion until the maps have been fully
+      decomposed.
 
-    Typical usage include functions that verify [f v v = v], maps [m] such that
-    [f m m' = m'], etc. *)
+      Typical usage include functions that verify [f v v = v], maps [m] such that
+      [f m m' = m'], etc. *)
 
 val map2_on_values:
   Hptmap_sig.cache_type -> (t -> t -> map2_decide) -> (v -> v -> v) -> t -> t -> t

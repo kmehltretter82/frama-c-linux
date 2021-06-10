@@ -77,3 +77,4 @@ lib/libeacsl-rtl-bittree-dbg.a
 lib/libeacsl-rtl-segment-dbg.a
 tests/csrv14/*
 src/local_config.ml
+src/dependencies/dep_eva.ml

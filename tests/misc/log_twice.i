@@ -1,8 +1,8 @@
 /* run.config
-   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-   OPT: @EVA_CONFIG@ -load-module @PTEST_DIR@/@PTEST_NAME@
+ PLUGIN: @EVA_PLUGINS@
+ MODULE: @PTEST_NAME@
+   OPT: @EVA_CONFIG@
 */
-
 int* f() {
   int x;
   return &x;

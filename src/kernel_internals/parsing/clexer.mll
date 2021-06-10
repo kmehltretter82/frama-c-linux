@@ -233,12 +233,12 @@ let init_lexicon _ =
           let filename =
             Filepath.Normalized.to_pretty_string (fst loc).pos_path
           in
-          (* TODO: when 4.07 becomes minimal OCaml version,
-             use String.to_seq and Seq.fold_left. *)
-          let l = ref [] in
-          let convert_char c = l:=Int64.of_int (Char.code c) :: !l in
-          String.iter convert_char filename;
-          CST_STRING (List.rev !l,loc)))
+          let seq = String.to_seq filename in
+          let convert_char c = Int64.of_int (Char.code c) in
+          let l =
+            Seq.fold_left (fun acc c -> convert_char c :: acc) [] seq
+          in
+          CST_STRING (List.rev l,loc)))
     ]
 
 

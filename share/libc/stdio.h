@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -371,11 +371,11 @@ extern size_t fwrite(const void * restrict ptr,
      FILE * restrict stream);
 
 /*@
+  //missing: assigns errno (EBADF, EOVERFLOW, ESPIPE);
   requires valid_stream: \valid(stream);
   requires valid_pos: \valid(pos);
-  requires initialization:pos: \initialized(pos);
-  assigns *pos \from indirect:*stream;
-  assigns \result \from indirect:*stream;
+  assigns \result, *pos \from indirect:*stream;
+  ensures initialization:pos: \initialized(pos);
  */
 extern int fgetpos(FILE * restrict stream,
      fpos_t * restrict pos);
@@ -399,10 +399,13 @@ extern int fseek(FILE *stream, long int offset, int whence);
 extern int fseeko(FILE *stream, off_t offset, int whence);
 
 /*@
+  //missing: assigns errno (EAGAIN, EBADF, EFBIG, EINTR, EIO, ENOSPC, EPIPE,
+  //                        ESPIPE, ENXIO);
   requires valid_stream: \valid(stream);
   requires valid_pos: \valid_read(pos);
   requires initialization:pos: \initialized(pos);
   assigns *stream \from *pos;
+  assigns \result \from indirect:*stream, indirect:*pos;
 */
 extern int fsetpos(FILE *stream, const fpos_t *pos);
 

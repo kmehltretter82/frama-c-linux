@@ -146,7 +146,7 @@ let _ = object (self)
            _args, 
            _loc) ->
       My_callstack.set
-        ((Extlib.the self#current_stmt, 
+        ((Option.get self#current_stmt,
           Globals.Functions.get v)
         :: (My_callstack.get ()));
       Cil.SkipChildren

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -44,7 +44,7 @@ let has_dkey (k:category) = is_debug_key_enabled k
 (* ---  WP Generation                                                   --- *)
 (* ------------------------------------------------------------------------ *)
 
-let wp_generation = add_group "Goal Selection"
+let wp_generation = add_group "Goal Generator"
 
 let () = Parameter_customize.set_group wp_generation
 let () = Parameter_customize.do_not_save ()
@@ -54,6 +54,21 @@ module WP =
     let help = "Generate proof obligations for all (selected) properties."
   end)
 let () = on_reset WP.clear
+
+let () = Parameter_customize.set_group wp_generation
+module Legacy =
+  False(struct
+    let option_name = "-wp-legacy"
+    let help = "Use legacy generator engine."
+  end)
+
+let () = Parameter_customize.set_group wp_generation
+module Dump =
+  Action(struct
+    let option_name = "-wp-dump"
+    let help = "Dump WP calculus graph."
+  end)
+let () = on_reset Dump.clear
 
 let () = Parameter_customize.set_group wp_generation
 let () = Parameter_customize.do_not_save ()
@@ -84,7 +99,7 @@ module Behaviors =
     (struct
       let option_name = "-wp-bhv"
       let arg_name = "b,..."
-      let help = "Select properties of the given behaviors (defaults to all behaviors) of the selected functions."
+      let help = "Select only properties belonging to listed behaviors."
     end)
 let () = on_reset Behaviors.clear
 
@@ -96,10 +111,14 @@ module Properties =
     (struct
       let option_name = "-wp-prop"
       let arg_name = "p,..."
-      let help = "Select properties having the one of the given tagnames (defaults to all properties).\n\
-                  You may also replace the tagname by '@category' for the selection of all properties of the given category.\n\
-                  Accepted categories are: lemmas, requires, assigns, ensures, exits, complete_behaviors, disjoint_behaviors, assert, check, invariant, variant, breaks, continues, returns.\n\
-                  Starts by a minus character to remove properties from the selection."
+      let help =
+        "Select properties based names and category.\n\
+         Use +name or +category to select properties and -name or -category\n\
+         to remove them from the selection. The '+' sign can be omitted.\n\
+         Categories are: @lemma, @requires, @assigns, @ensures, @exits,\n\
+         @assert, @invariant, @variant, @breaks, @continues, @returns,\n\
+         @complete_behaviors, @disjoint_behaviors and\n\
+         @check (which includes all check clauses)."
     end)
 let () = on_reset Properties.clear
 
@@ -151,21 +170,20 @@ let iter_fct phi = function
         (fun kf -> if not (Fct.mem kf fs) then phi kf)
   | Fct_list fs -> Fct.iter phi fs
 
-let get_kf () =
+let get_kfs () =
   if Functions.is_empty() then
     if SkipFunctions.is_empty () then Fct_all
     else Fct_skip (SkipFunctions.get())
   else
     Fct_list (Fct.diff (Functions.get()) (SkipFunctions.get()))
 
-let get_wp () =
+let get_fct () =
   if WP.get () || not (Functions.is_empty()) ||
      not (Behaviors.is_empty()) || not (Properties.is_empty())
-  then get_kf ()
+  then get_kfs ()
   else Fct_none
 
-let iter_wp f = iter_fct f (get_wp ())
-let iter_kf f = iter_fct f (get_kf ())
+let iter_kf f = iter_fct f (get_fct ())
 
 (* ------------------------------------------------------------------------ *)
 (* ---  Memory Models                                                   --- *)
@@ -383,6 +401,13 @@ module SmokeTests =
   end)
 
 let () = Parameter_customize.set_group wp_strategy
+module SmokeDeadassumes =
+  True(struct
+    let option_name = "-wp-smoke-dead-assumes"
+    let help = "When generating smoke tests, look for dead assumes"
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
 module SmokeDeadcode =
   True(struct
     let option_name = "-wp-smoke-dead-code"
@@ -412,9 +437,12 @@ module Split =
 
 let () = Parameter_customize.set_group wp_strategy
 module UnfoldAssigns =
-  False(struct
+  Int(struct
     let option_name = "-wp-unfold-assigns"
-    let help = "Unfold aggregates in assigns."
+    let default = 0
+    let arg_name = "n"
+    let help = "Unfold up to <n> levels of aggregates and arrays in assigns.\n\
+                Value -1 means unlimited depth (default 0)"
   end)
 
 let () = Parameter_customize.set_group wp_strategy
@@ -541,13 +569,6 @@ module Prenex =
   end)
 
 let () = Parameter_customize.set_group wp_simplifier
-module Bits =
-  True(struct
-    let option_name = "-wp-bits"
-    let help = "Use bit-test simplifications."
-  end)
-
-let () = Parameter_customize.set_group wp_simplifier
 module SimplifyIsCint =
   True(struct
     let option_name = "-wp-simplify-is-cint"
@@ -603,17 +624,27 @@ module Provers = String_list
       let option_name = "-wp-prover"
       let arg_name = "dp,..."
       let help =
-        "Submit proof obligations to external prover(s):\n\
-         - 'none' to skip provers\n\
-         - 'script' (session scripts only)\n\
-         - 'tip' (failed scripts only)\n\
-         - 'alt-ergo' (default)\n\
-         - 'altgr-ergo' (gui)\n\
-         - 'coq', 'coqide' (see also -wp-coq-script)\n\
-         - 'why3:<dp>' or '<dp>' (why3 prover, see -wp-detect)\n\
-         - 'native:alt-ergo'\n\
-         - 'native:coq'\n\
-         - 'native:coqide'\
+        "Submit proof obligations to prover(s):\n\
+         - 'none' (no prover run)\n\
+         - 'script' (replay all session scripts)\n\
+         - 'tip' (replay or init scripts for failed goals)\n\
+         - '<why3-prover>' (any Why-3 prover, see -wp-detect)\n\
+        "
+    end)
+
+let () = Parameter_customize.set_group wp_prover
+module Interactive = String
+    (struct
+      let option_name = "-wp-interactive"
+      let arg_name = "mode"
+      let default = "batch"
+      let help =
+        "WP mode for interactive Why-3 provers (eg: Coq):\n\
+         - 'batch': check current proof (default)\n\
+         - 'update': update and check proof\n\
+         - 'edit': edit proof before check\n\
+         - 'fix': check and edit proof if necessary\n\
+         - 'fixup': update proof and fix\n\
         "
     end)
 
@@ -726,6 +757,18 @@ module SmokeTimeout =
     let help =
       Printf.sprintf
         "Set the timeout (in seconds) for provers (default: %d)." default
+  end)
+
+let () = Parameter_customize.set_group wp_prover
+module InteractiveTimeout =
+  Int(struct
+    let option_name = "-wp-interactive-timeout"
+    let default = 30
+    let arg_name = "n"
+    let help =
+      Printf.sprintf
+        "Set the timeout (in seconds) for checking scripts\n\
+         of interactive provers (default: %d)." default
   end)
 
 let () = Parameter_customize.set_group wp_prover
@@ -1041,6 +1084,17 @@ module MemoryContext =
     end)
 
 let () = Parameter_customize.set_group wp_po
+let () = Parameter_customize.do_not_save ()
+
+module CheckMemoryContext =
+  False
+    (struct
+      let option_name = "-wp-check-memory-model"
+      let help = "Insert memory model hypotheses in function contracts and \
+                  check them on call. (experimental)"
+    end)
+
+let () = Parameter_customize.set_group wp_po
 module OutputDir =
   String(struct
     let option_name = "-wp-out"
@@ -1130,7 +1184,7 @@ let base_output () =
               | dir ->
                   make_output_dir dir ; dir in
       base_output := Some output;
-      Fc_Filepath.add_symbolic_dir "WPOUT" output ;
+      Fc_Filepath.(add_symbolic_dir "WPOUT" (Normalized.of_string output)) ;
       Datatype.Filepath.of_string output
   | Some output -> Datatype.Filepath.of_string output
 
@@ -1140,19 +1194,25 @@ let get_output () =
   let name = Project.get_unique_name project in
   if name = "default" then base
   else
-    let dir = Datatype.Filepath.concat base ("/" ^ name) in
+    let dir = Datatype.Filepath.concat base name in
     make_output_dir (dir :> string) ; dir
 
 let get_output_dir d =
   let base = get_output () in
-  let path = Datatype.Filepath.concat base ("/" ^ d) in
+  let path = Datatype.Filepath.concat base d in
   make_output_dir (path :> string) ; path
 
 (* -------------------------------------------------------------------------- *)
 (* --- Session dir                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let default = Sys.getcwd () ^ "/.frama-c"
+(* TODO: we currently use PWD instead of Sys.getcwd () because OCaml has
+   no function in its stdlib to resolve symbolic links (e.g. realpath)
+   for a given path. 'getcwd' always resolves them, but if the user
+   supplies a path with symbolic links, this may cause issues.
+   Instead of forcing the user to always provide resolved paths, we
+   currently choose to never resolve them. *)
+let default = Sys.getenv "PWD" ^ "/.frama-c"
 
 let has_session () =
   Session.is_set () ||
@@ -1169,7 +1229,7 @@ let get_session ~force () =
 
 let get_session_dir ~force d =
   let base = get_session ~force () in
-  let path = Datatype.Filepath.concat base ("/" ^ d) in
+  let path = Datatype.Filepath.concat base d in
   if force then make_output_dir (path :> string) ; path
 
 (* -------------------------------------------------------------------------- *)
@@ -1193,5 +1253,15 @@ let print_generated ?header file =
             Format.pp_print_string fmt s;
             Format.pp_print_newline fmt ())
     end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Debugging                                                          --- *)
+(* -------------------------------------------------------------------------- *)
+
+let protect e =
+  if debug_atleast 1 then false else
+    match e with
+    | Sys.Break | Db.Cancel | Log.AbortError _ | Log.AbortFatal _ -> false
+    | _ -> true
 
 (* -------------------------------------------------------------------------- *)

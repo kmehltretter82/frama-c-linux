@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -83,9 +83,11 @@ val volatile : ?warn:string -> unit -> bool
 
 (** {2 ACSL Equality} *)
 
+type matrixinfo = c_object * int option list
+
 val equal_object : c_object -> term -> term -> pred
 val equal_comp : compinfo -> term -> term -> pred
-val equal_array : Matrix.matrix -> term -> term -> pred
+val equal_array : matrixinfo -> term -> term -> pred
 
 (** {2 C and ACSL Constants} *)
 
@@ -97,8 +99,11 @@ val logic_constant : logic_constant -> term
 val constant_exp : exp -> term
 val constant_term : Cil_types.term -> term
 
+val always_initialized: varinfo -> bool
 val initialized_obj: c_object -> term
 val uninitialized_obj: c_object -> term
+
+val bytes_length_of_opaque_comp: compinfo -> term
 
 (** {2 Lifting Operations over Memory Values} *)
 

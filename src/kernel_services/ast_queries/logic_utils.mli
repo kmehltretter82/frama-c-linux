@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -315,12 +315,12 @@ val add_attribute_glob_annot:
 (** {2 Contracts } *)
 
 (** [true] if the behavior has only an assigns clause.
-    @since Frama-C+dev
+    @since 22.0-Titanium
 *)
 val behavior_has_only_assigns: behavior -> bool
 
 (** [true] if the only non-empty fields of the contract are assigns clauses
-    @since Frama-C+dev
+    @since 22.0-Titanium
 *)
 val funspec_has_only_assigns: funspec -> bool
 
@@ -444,12 +444,22 @@ val merge_funspec :
 val clear_funspec: funspec -> unit
 
 (** {2 Discriminating code_annotations} *)
+
+(** Checks if a predicate kind can be used as an hypothesis or requirement.
+    It is true for `Admit` and `Assert`, and false for `Check`. *)
+val use_predicate : predicate_kind -> bool
+
+(** Checks if a predicate kind shall be put under verification.
+    It is true for `Assert` and `Check`, and false for `Admit`. *)
+val verify_predicate : predicate_kind -> bool
+
 (** Functions below allows to test a special kind of code_annotation.
     Use them in conjunction with {!Annotations.get_filter} to retrieve
     a particular kind of annotations associated to a statement. *)
 
 val is_assert : code_annotation -> bool
 val is_check : code_annotation -> bool
+val is_admit : code_annotation -> bool
 val is_contract : code_annotation -> bool
 val is_stmt_invariant : code_annotation -> bool
 val is_loop_invariant : code_annotation -> bool

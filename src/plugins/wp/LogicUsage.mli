@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -33,11 +33,11 @@ val basename : varinfo -> string (** Trims the original name *)
 type logic_lemma = {
   lem_name : string ;
   lem_position : Filepath.position ;
-  lem_axiom : bool ;
   lem_types : string list ;
   lem_labels : logic_label list ;
-  lem_property : predicate ;
+  lem_predicate : toplevel_predicate ;
   lem_depends : logic_lemma list ; (** in reverse order *)
+  lem_attrs : attributes ;
 }
 
 type axiomatic = {
@@ -58,6 +58,7 @@ val compute : unit -> unit (** To force computation *)
 
 val ip_lemma : logic_lemma -> Property.t
 val iter_lemmas : (logic_lemma -> unit) -> unit
+val fold_lemmas : (logic_lemma -> 'a -> 'a) -> 'a -> 'a
 val logic_lemma : string -> logic_lemma
 val axiomatic : string -> axiomatic
 val section_of_lemma : string -> logic_section

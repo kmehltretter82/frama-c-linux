@@ -1,1 +1,7 @@
-EXECNOW: make -s @PTEST_DIR@/global_decl_loc.cmxs
+PLUGIN:
+MODULE: global_decl_loc
+MODULE:
+STDOPT:
+
+# COMMENT: Directive to add in your test file when using STDOPT:
+# COMMENT: PLUGIN: @EVA_PLUGINS@

@@ -21,20 +21,25 @@
 (**************************************************************************)
 
 open Cil_types
-open Cil_datatype
 
 (* ************************************************************************** *)
 (** {2 Handling the E-ACSL's C-libraries, part I} *)
 (* ************************************************************************** *)
 
 let is_fc_or_compiler_builtin vi =
-  Cil.is_builtin vi
+  Cil_builtins.is_builtin vi
   ||
   (let prefix_length = 10 (* number of characters in "__builtin_" *) in
    String.length vi.vname > prefix_length
    &&
    let prefix = String.sub vi.vname 0 prefix_length in
    Datatype.String.equal prefix "__builtin_")
+  ||
+  (Options.Replace_libc_functions.get ()
+   && Functions.RTL.has_rtl_replacement vi.vname)
+
+let is_fc_stdlib_generated vi =
+  Cil.hasAttribute "fc_stdlib_generated" vi.vattr
 
 (* ************************************************************************** *)
 (** {2 Handling \result} *)
@@ -57,6 +62,21 @@ let result_vi kf = match result_lhost kf with
 (** {2 Other stuff} *)
 (* ************************************************************************** *)
 
+let strip_casts e =
+  let rec aux casts e =
+    match e.enode with
+    | CastE(ty, e') -> aux (ty :: casts) e'
+    | _ -> e, casts
+  in
+  aux [] e
+
+let rec add_casts tys e =
+  match tys with
+  | [] -> e
+  | newt :: tl ->
+    let e = Cil.mkCast ~newt e in
+    add_casts tl e
+
 let term_addr_of ~loc tlv ty =
   Logic_const.taddrof ~loc tlv (Ctype (TPtr(ty, [])))
 
@@ -64,28 +84,53 @@ let cty = function
   | Ctype ty -> ty
   | lty -> Options.fatal "Expecting a C type. Got %a" Printer.pp_logic_type lty
 
-let rec ptr_index ?(loc=Location.unknown) ?(index=(Cil.zero loc)) exp =
-  let arith_op = function
-    | MinusPI -> MinusA
-    | PlusPI -> PlusA
-    | IndexPI -> PlusA
-    | _ -> assert false in
+(* Replace all trailing array subscripts of an lval with zero indices. *)
+let rec shift_offsets lv loc =
+  let lv, off = Cil.removeOffsetLval lv in
+  match off with
+  | Index _ ->
+    let lv = shift_offsets lv loc in
+    (* since the offset has been removed at the start of the function, add a new
+       0 offset to preserve the type of the lvalue. *)
+    Cil.addOffsetLval (Index (Cil.zero ~loc, NoOffset)) lv
+  | NoOffset | Field _ -> Cil.addOffsetLval off lv
+
+let rec ptr_base ~loc exp =
   match exp.enode with
-  | BinOp(op, lhs, rhs, _) ->
+  | BinOp(op, lhs, _, _) ->
     (match op with
      (* Pointer arithmetic: split pointer and integer parts *)
-     | MinusPI | PlusPI | IndexPI ->
-       let index = Cil.mkBinOp exp.eloc (arith_op op) index rhs in
-       ptr_index ~index lhs
+     | MinusPI | PlusPI | IndexPI -> ptr_base ~loc lhs
      (* Other arithmetic: treat the whole expression as pointer address *)
      | MinusPP | PlusA | MinusA | Mult | Div | Mod
      | BAnd | BXor | BOr | Shiftlt | Shiftrt
-     | Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr -> (exp, index))
-  | CastE _ -> ptr_index ~loc ~index (Cil.stripCasts exp)
-  | Info (exp, _) -> ptr_index ~loc ~index exp
-  | Const _ | StartOf _ | AddrOf _ | Lval _ | UnOp _ -> (exp, index)
+     | Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr -> exp)
+  (* AddressOf: if it is an addressof array then replace all trailing offsets
+     with zero offsets to get the base. *)
+  | AddrOf lv -> Cil.mkAddrOf ~loc (shift_offsets lv loc)
+  (* StartOf already points to the start of an array, return exp directly *)
+  | StartOf _ -> exp
+  (* Cast: strip cast and continue, then recast to original type. *)
+  | CastE _ ->
+    let exp, casts = strip_casts exp in
+    let base = ptr_base ~loc exp in
+    add_casts casts base
+  | Info (exp, _) -> ptr_base ~loc exp
+  | Const _ | Lval _ | UnOp _ -> exp
   | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _
     -> assert false
+
+let ptr_base_and_base_addr ~loc e =
+  let rec ptr_base_addr ~loc base =
+    match base.enode with
+    | AddrOf _ | StartOf _ | Const _ -> Cil.zero ~loc
+    | Lval lv -> Cil.mkAddrOrStartOf ~loc lv
+    | CastE _ -> ptr_base_addr ~loc (Cil.stripCasts base)
+    | _ -> assert false
+  in
+  let base = ptr_base ~loc e in
+  let base_addr  = ptr_base_addr ~loc base in
+  base, base_addr
 
 (* TODO: should not be in this file *)
 let term_of_li li =  match li.l_body with
@@ -145,11 +190,6 @@ let term_has_lv_from_vi t =
     false
   with Lv_from_vi_found ->
     true
-
-let mk_ptr_sizeof typ loc =
-  match Cil.unrollType typ with
-  | TPtr (t', _) -> Cil.new_exp ~loc (SizeOf t')
-  | _ -> assert false
 
 let finite_min_and_max i = match Ival.min_and_max i with
   | Some min, Some max -> min, max

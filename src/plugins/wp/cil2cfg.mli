@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -70,8 +70,8 @@ val pp_call_type : Format.formatter -> call_type -> unit
 val get_call_type : exp -> call_type
 
 type node_type = private
-  | Vstart | Vend | Vexit
-  | VfctIn | VfctOut
+  | Vstart | Vend
+  | VfctIn | VfctOut | VfctErr
   | VblkIn of block_type * block
   | VblkOut of block_type * block
   | Vstmt of stmt
@@ -177,3 +177,8 @@ sig
 end
 
 module HE (I : sig type t end) : HEsig with type ti = I.t
+
+module Dump :
+sig
+  val process: unit -> unit
+end

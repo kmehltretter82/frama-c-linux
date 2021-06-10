@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -51,63 +51,63 @@ let add_parameter (box:GPack.box) p =
   let hname = highlight name in
   (match p.Typed_parameter.accessor with
    | Typed_parameter.Bool ({ Typed_parameter.get = get; set = set }, None) ->
-       let name = if use_markup then hname else name in
-       (* fix bts#510: a parameter [p] must be set if and only if it is set by the
-          user in the launcher. In particular, it must not be reset to its old
-          value if setting another parameter [p'] modifies [p] via hooking. *)
-       let old = get () in
-       let set r = if r <> old then set r in
-       Kernel_hook.extend (on_bool ~tooltip ~use_markup box name get set);
+     let name = if use_markup then hname else name in
+     (* fix bts#510: a parameter [p] must be set if and only if it is set by the
+        user in the launcher. In particular, it must not be reset to its old
+        value if setting another parameter [p'] modifies [p] via hooking. *)
+     let old = get () in
+     let set r = if r <> old then set r in
+     Kernel_hook.extend (on_bool ~tooltip ~use_markup box name get set);
 
    | Typed_parameter.Bool
        ({ Typed_parameter.get = get; set = set }, Some negative_name) ->
-       let use_markup = is_set () in
-       let name, _negative_name =
-         if use_markup then hname, highlight negative_name
-         else name, negative_name
-       in
-       let old = get () in
-       let set r = if r <> old then set r in
-       Kernel_hook.extend
-         (on_bool ~tooltip ~use_markup box name (*negative_name*) get set);
+     let use_markup = is_set () in
+     let name, _negative_name =
+       if use_markup then hname, highlight negative_name
+       else name, negative_name
+     in
+     let old = get () in
+     let set r = if r <> old then set r in
+     Kernel_hook.extend
+       (on_bool ~tooltip ~use_markup box name (*negative_name*) get set);
 
    | Typed_parameter.Int ({ Typed_parameter.get = get; set = set }, range) ->
-       let use_markup = is_set () in
-       let name = if use_markup then hname else name in
-       let lower, upper = range () in
-       let old = get () in
-       let set r = if r <> old then set r in
-       Kernel_hook.extend
-         (on_int ~tooltip ~use_markup ~lower ~upper ~width:120 box name get set);
+     let use_markup = is_set () in
+     let name = if use_markup then hname else name in
+     let lower, upper = range () in
+     let old = get () in
+     let set r = if r <> old then set r in
+     Kernel_hook.extend
+       (on_int ~tooltip ~use_markup ~lower ~upper ~width:120 box name get set);
 
    | Typed_parameter.String
        ({ Typed_parameter.get = get; set = set }, possible_values) ->
-       let use_markup = is_set () in
-       let hname = if use_markup then hname else name in
-       let old = get () in
-       let widget_value = ref old in
-       let w_set r = widget_value := r in
-       let w_get () = !widget_value in
-       (match possible_values () with
-        | [] ->
-            let _refresh =
-              on_string ~tooltip ~use_markup ~width:250 box hname w_get w_set
-            in
-            Kernel_hook.extend
-              (fun () -> if !widget_value <> old then set !widget_value)
+     let use_markup = is_set () in
+     let hname = if use_markup then hname else name in
+     let old = get () in
+     let widget_value = ref old in
+     let w_set r = widget_value := r in
+     let w_get () = !widget_value in
+     (match possible_values () with
+      | [] ->
+        let _refresh =
+          on_string ~tooltip ~use_markup ~width:250 box hname w_get w_set
+        in
+        Kernel_hook.extend
+          (fun () -> if !widget_value <> old then set !widget_value)
 
-        | v ->
-            let validator s =
-              let b = List.mem s v in
-              if not b then Gui_parameters.error "invalid input `%s' for %s" s name;
-              b
-            in
-            let _refresh =
-              on_string_completion
-                ~tooltip ~use_markup ~validator v box hname w_get w_set
-            in
-            Kernel_hook.extend
-              (fun () -> if !widget_value <> old then set !widget_value))
+      | v ->
+        let validator s =
+          let b = List.mem s v in
+          if not b then Gui_parameters.error "invalid input `%s' for %s" s name;
+          b
+        in
+        let _refresh =
+          on_string_completion
+            ~tooltip ~use_markup ~validator v box hname w_get w_set
+        in
+        Kernel_hook.extend
+          (fun () -> if !widget_value <> old then set !widget_value))
   );
   use_markup
 
@@ -137,7 +137,10 @@ let add_group (box:GPack.box) label options =
   in
   let highlight =
     List.fold_right
-      (fun p b -> let is_set = add_parameter box p in b || is_set)
+      (fun p b ->
+         if p.Typed_parameter.reconfigurable then
+           let is_set = add_parameter box p in b || is_set
+         else b)
       options
       false
   in
@@ -275,7 +278,7 @@ let show ?height ?width ~(host:basic_main) () =
       `HORIZONTAL ~layout:`END ~packing:dialog#action_area#pack ()
   in
   let cancel =
-    GButton.button ~label:"Cancel" ~stock:`CANCEL ~packing:buttons#pack ()
+    GButton.button ~label:"Close" ~stock:`CANCEL ~packing:buttons#pack ()
   in
   ignore (cancel#connect#released dialog#destroy);
   let button_run =

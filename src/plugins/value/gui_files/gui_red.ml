@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -69,7 +69,8 @@ type red_alarm = {
 
 let get_predicate ca =
   match ca.annot_content with
-  | AAssert (_, _, p) -> { p with pred_name = [] }
+  | AAssert (_, p) ->
+    { p with tp_statement = { p.tp_statement with pred_name = [] }}
   | _ -> assert false
 
 let make_red_alarm function_name ki alarm callstacks =
@@ -84,7 +85,9 @@ let make_red_alarm function_name ki alarm callstacks =
   let ip = Property.ip_of_code_annot_single kf stmt ca in
   let kind = String.capitalize_ascii (Alarms.get_name alarm) in
   let p = get_predicate ca in
-  let acsl = Format.asprintf "@[<hov>%a@]" Cil_datatype.Predicate.pretty p in
+  let acsl =
+    Format.asprintf "@[<hov>%a@]" Cil_datatype.Toplevel_predicate.pretty p
+  in
   let alarm_or_prop = Red_statuses.Alarm alarm in
   { function_name; ip; kind; alarm_or_prop; acsl; callstacks }
 

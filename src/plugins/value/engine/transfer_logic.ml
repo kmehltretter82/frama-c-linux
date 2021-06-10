@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -137,7 +137,7 @@ let emit_message_and_status kind kf behavior ~active ~empty property named_pred 
 let create_conjunction l=
   let loc = match l with
     | [] -> None
-    | p :: _ -> Some p.ip_content.pred_loc
+    | p :: _ -> Some (Logic_const.pred_of_id_pred p).pred_loc
   in
   Logic_const.(List.fold_right (fun p1 p2 -> pand ?loc (p1, p2)) (List.map pred_of_id_pred l) ptrue)
 
@@ -220,8 +220,8 @@ let ip_from_precondition kf call_ki b pre =
 let process_inactive_behavior kf call_ki behavior =
   let emitted = ref false in
   (* We emit a valid status for every requires and ensures of the behavior. *)
-  List.iter (fun (tk, _ as post) ->
-      if tk = Normal then begin
+  List.iter (fun (tk, pred as post) ->
+      if tk = Normal && pred.ip_content.tp_kind <> Admit then begin
         emitted := true;
         if emit_postcond_status (post_kind kf) then
           let ip = Property.ip_of_ensures kf Kglobal behavior post in
@@ -229,9 +229,11 @@ let process_inactive_behavior kf call_ki behavior =
       end
     ) behavior.b_post_cond;
   List.iter (fun pre ->
-      emitted := true;
-      let ip = ip_from_precondition kf call_ki behavior pre in
-      emit_status ip Property_status.True;
+      if pre.ip_content.tp_kind <> Admit then begin
+        emitted := true;
+        let ip = ip_from_precondition kf call_ki behavior pre in
+        emit_status ip Property_status.True;
+      end
     ) behavior.b_requires;
   if !emitted then
     Value_parameters.result ~once:true ~current:true ~level:2
@@ -247,8 +249,8 @@ let process_inactive_postconds kf inactive_bhvs =
   List.iter
     (fun b ->
        let emitted = ref false in
-       List.iter (fun (tk, _ as post) ->
-           if tk = Normal then begin
+       List.iter (fun (tk, pred as post) ->
+           if tk = Normal && pred.ip_content.tp_kind <> Admit then begin
              emitted := true;
              if emit_postcond_status (post_kind kf) then
                let ip = Property.ip_of_ensures kf Kglobal b post in
@@ -384,11 +386,11 @@ module Make
     else (* Not enough slevel to split, and reduction not required *)
       States.singleton state
 
-  let eval_split_and_reduce limit active pred build_env state =
+  let eval_split_and_reduce limit ~reduce pred build_env state =
     let env = build_env state in
     let status = Domain.evaluate_predicate env state pred in
-    let  reduced_states =
-      if active then
+    let reduced_states =
+      if reduce then
         match status with
         | Alarmset.False   -> States.empty
         | Alarmset.True    ->
@@ -453,11 +455,13 @@ module Make
     let emit = emit_message_and_status kind kf behavior ~active in
     let aux_pred states pred =
       let pr = Logic_const.pred_of_id_pred pred in
+      let record = pred.ip_content.tp_kind <> Admit in
+      let reduce = active && pred.ip_content.tp_kind <> Check in
       let ip = build_prop pred in
       if ignore_predicate pr then
         states
       else if States.is_empty states then begin
-        emit ~empty:true ip pr Alarmset.True;
+        if record then emit ~empty:true ip pr Alarmset.True;
         states
       end
       else
@@ -465,14 +469,18 @@ module Make
           States.fold
             (fun state (acc_status, acc_states) ->
                let status, reduced_states =
-                 eval_split_and_reduce limit active pr build_env state
+                 eval_split_and_reduce limit ~reduce pr build_env state
                in
                (status :: acc_status,
                 fst (States.merge ~into:acc_states reduced_states)))
             states ([], States.empty)
         in
-        List.iter (fun status -> emit ~empty:false ip pr status) statuses;
-        check_ensures_false kf behavior active pr kind statuses;
+        if record
+        then
+          begin
+            List.iter (fun status -> emit ~empty:false ip pr status) statuses;
+            check_ensures_false kf behavior active pr kind statuses;
+          end;
         States.reorder reduced_states
     in
     List.fold_left aux_pred states ips
@@ -580,8 +588,7 @@ module Make
 
   let code_annotation_text ca =
     match ca.annot_content with
-    | AAssert (_, Assert, _) ->  "assertion"
-    | AAssert (_, Check, _) -> "check"
+    | AAssert (_,{tp_kind}) -> Cil_printer.name_of_assert tp_kind
     | AInvariant _ ->  "loop invariant"
     | APragma _  | AVariant _ | AAssigns _ | AAllocation _ | AStmtSpec _
     | AExtended _ ->
@@ -594,13 +601,14 @@ module Make
     | Some loc when not (Cil_datatype.Location.(equal loc unknown)) -> loc
     | _ -> Cil_datatype.Stmt.loc stmt
 
+
   (* Reduce the given states according to the given code annotations.
      If [record] is true, update the proof state of the code annotation.
      DO NOT PASS record=false unless you know what your are doing *)
   let interp_annot ~limit ~record kf ab stmt code_annot ~initial_state states =
     let ips = Property.ip_of_code_annot kf stmt code_annot in
     let source, _ = code_annotation_loc code_annot stmt in
-    let aux_interp ~reduce code_annot behav p =
+    let aux_interp ~record ~reduce code_annot behav p =
       let text = code_annotation_text code_annot in
       let in_behavior =
         match behav with
@@ -671,7 +679,7 @@ module Make
            'nice' ordering *)
         if reduce then States.reorder reduced_states else states
     in
-    let aux code_annot ~reduce behav p =
+    let aux code_annot ~record ~reduce behav p =
       if ignore_predicate p then
         states
       else if States.is_empty states then (
@@ -684,12 +692,14 @@ module Make
         end;
         states
       ) else
-        aux_interp ~reduce code_annot behav p
+        aux_interp ~record ~reduce code_annot behav p
     in
     match code_annot.annot_content with
-    | AAssert (behav, Check, p) -> aux ~reduce:false code_annot behav p
-    | AAssert (behav, Assert, p)
-    | AInvariant (behav, true, p) -> aux ~reduce:true code_annot behav p
+    | AAssert (behav, p)
+    | AInvariant (behav, true, p) ->
+      let record = record && p.tp_kind <> Admit in
+      let reduce = p.tp_kind <> Check in
+      aux ~record ~reduce code_annot behav p.tp_statement
     | APragma _
     | AInvariant (_, false, _)
     | AVariant _ | AAssigns _ | AAllocation _ | AExtended _

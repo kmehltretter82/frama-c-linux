@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,19 +20,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module Pervasives_string = String
+
 include Plugin.Register(
   struct
     let name = "Markdown report"
     let shortname = "mdr"
     let help = "generates a report in markdown format"
-  end)
-
-module Output = String(
-  struct
-    let option_name = "-mdr-out"
-    let arg_name = "f"
-    let default = "report.md"
-    let help = "sets the name of the output file to <f>"
   end)
 
 module Generate = String(
@@ -45,13 +39,36 @@ module Generate = String(
        none (default), md, draft and sarif"
   end)
 
+module Output : Parameter_sig.Filepath =
+struct
+  include Filepath(
+    struct
+      let option_name = "-mdr-out"
+      let arg_name = "f"
+      let file_kind = "Report"
+      let existence = Fc_Filepath.Indifferent
+      let help = "sets the name of the output file to <f>. \
+                  If <f> has no extension, it is chosen automatically based on \
+                  the report kind"
+    end)
+  let get () =
+    let s = get () in
+    if Pervasives_string.contains (Filename.basename (s:>string)) '.' then s
+    else
+      let kind = Generate.get () in
+      let ext = if kind = "sarif" then ".sarif" else ".md" in
+      Fc_Filepath.Normalized.concat s ext
+end
+
 let () =
   Generate.set_possible_values [ "none"; "md"; "draft"; "sarif" ]
 
-module Remarks = Empty_string(
+module Remarks = Filepath(
   struct
     let option_name = "-mdr-remarks"
     let arg_name = "f"
+    let file_kind = "Remarks file"
+    let existence = Fc_Filepath.Must_exist
     let help =
       "reads file <f> to add additional remarks to various sections of the report. \
        Must be in a format compatible with the file produced by -mdr-gen-draft. \
@@ -97,4 +114,18 @@ module Stubs = String_list(
     let option_name = "-mdr-stubs"
     let arg_name = "f1,...,fn"
     let help = "list of C files containing stub functions"
+  end)
+
+module PrintLibc = True(
+  struct
+    let option_name = "-mdr-print-libc"
+    let help =
+      "when set (default), reports include information about libc elements."
+  end)
+
+module SarifDeterministic = False(
+  struct
+    let option_name = "-mdr-sarif-deterministic"
+    let help = "omits non-deterministic data from SARIF reports, such as \
+                absolute file URIs and timestamps."
   end)

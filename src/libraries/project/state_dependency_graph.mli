@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -31,8 +31,8 @@
     @since Carbon-20101201 *)
 module type S = sig
 
-  module G: Graph.Sig.G with type V.t = State.t 
-			and type E.t = State.t * State.t
+  module G: Graph.Sig.G with type V.t = State.t
+                         and type E.t = State.t * State.t
   val graph: G.t
 
   val add_dependencies: from:State.t -> State.t list -> unit

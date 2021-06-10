@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -90,8 +90,10 @@ module type S = sig
   val is_negative: t -> Abstract_interp.Comp.result
 
   val is_finite: t -> Abstract_interp.Comp.result
+  val is_infinite: t -> Abstract_interp.Comp.result
   val is_not_nan: t -> Abstract_interp.Comp.result
   val backward_is_finite: positive:bool -> prec -> t -> t or_bottom
+  val backward_is_infinite: positive:bool -> prec -> t -> t or_bottom
   val backward_is_nan: positive:bool -> t -> t or_bottom
 
   (** [has_greater_min_bound f1 f2] returns 1 if the interval [f1] has a better

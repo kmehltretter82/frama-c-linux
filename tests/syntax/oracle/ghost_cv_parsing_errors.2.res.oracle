@@ -1,11 +1,11 @@
 [kernel] Parsing tests/syntax/ghost_cv_parsing_errors.c (with preprocessing)
-[kernel] tests/syntax/ghost_cv_parsing_errors.c:25: 
+[kernel] tests/syntax/ghost_cv_parsing_errors.c:26: 
   Use of \ghost out of ghost code:
-  Location: line 25, between columns 14 and 14
-  23    #ifdef IN_GHOST_ATTR
-  24    
-  25    int /*@ \ghost */ global ;
+  Location: line 26, between columns 14 and 14
+  24    #ifdef IN_GHOST_ATTR
+  25    
+  26    int /*@ \ghost */ global ;
         ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  26    
-  27    #endif
+  27    
+  28    #endif
 [kernel] Frama-C aborted: invalid user input.

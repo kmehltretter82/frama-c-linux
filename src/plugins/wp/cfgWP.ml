@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -35,7 +35,15 @@ open Lang.F
 open Sigs
 open Wpo
 
-module VC( C : Sigs.Compiler ) =
+module type VCgen =
+sig
+  include Mcfg.S
+  val register_lemma : logic_lemma -> unit
+  val compile_lemma : logic_lemma -> Wpo.t
+  val compile_wp : Wpo.index -> t_prop -> Wpo.t Bag.t
+end
+
+module VC( C : Sigs.Compiler ) : VCgen =
 struct
 
   open C
@@ -90,7 +98,7 @@ struct
   (* Authorized written region from an assigns specification *)
   type effect = {
     e_pid : P.t ; (* Assign Property *)
-    e_kind : a_kind ; (* Requires post effects (in case of loop-assigns) *)
+    e_post : bool ; (* Requires post effects (loop-assigns or post-assigns) *)
     e_label : c_label ; (* scope for collection *)
     e_valid : L.sigma ; (* sigma where locations are filtered for validity *)
     e_region : L.region ; (* expected from spec *)
@@ -101,6 +109,10 @@ struct
   struct
     type t = effect
     let compare e1 e2 = P.compare e1.e_pid e2.e_pid
+    let pretty fmt e =
+      Format.fprintf fmt "@[<hov 2>EFFECT %a:@ %a@]"
+        P.pretty e.e_pid (Cvalues.pp_region M.pretty) e.e_region
+    [@@ warning "-32"]
   end
 
   module G = Qed.Collection.Make(TARGET)
@@ -140,9 +152,15 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let pp_vc fmt vc =
-    Format.fprintf fmt "%a@ @[<hov 2>Prove %a@]"
-      Pcond.dump vc.hyps
-      F.pp_pred vc.goal
+    if Wp_parameters.debug_atleast 2 then
+      begin
+        List.iter
+          (Format.fprintf fmt "Have @[<hov 2>%a@]@." F.pp_pred)
+          (Conditions.extract vc.hyps) ;
+        Format.fprintf fmt "Goal @[<hov 2>%a@]@]@." F.pp_pred vc.goal ;
+      end
+    else
+      Pcond.dump_bundle ~clause:"Context" ~goal:vc.goal fmt vc.hyps
 
   let pp_vcs fmt vcs =
     let k = ref 0 in
@@ -244,15 +262,6 @@ struct
         deps = dset ;
         path = path ;
       }
-
-  let assume_vcs ?descr ?filter ?init whs vc =
-    List.fold_left
-      (fun vc (warn,hyp) -> assume_vc ?descr ?filter ?init ~warn [hyp] vc)
-      vc whs
-
-  let passify_vc pa vc =
-    let hs = Passive.conditions pa (occurs_vc vc) in
-    assume_vc hs vc
 
   (* -------------------------------------------------------------------------- *)
   (* --- Branching                                                          --- *)
@@ -362,6 +371,14 @@ struct
       (fun g -> Splitter.merge_all merge_vcs (List.map (goal g) cases))
       targets
 
+  let passify_vc pa vc =
+    let hs = Passive.conditions pa (occurs_vc vc) in
+    assume_vc hs vc
+
+  let passify_vcs pa vcs =
+    if Passive.is_empty pa then vcs
+    else gmap (passify_vc pa) vcs
+
   (* -------------------------------------------------------------------------- *)
   (* --- Merge for Calculus                                                 --- *)
   (* -------------------------------------------------------------------------- *)
@@ -383,8 +400,8 @@ struct
       (fun () ->
          let sigma,pa1,pa2 = merge_sigma wp1.sigma wp2.sigma in
          let effects = Eset.union wp1.effects wp2.effects in
-         let vcs1 = gmap (passify_vc pa1) wp1.vcs in
-         let vcs2 = gmap (passify_vc pa2) wp2.vcs in
+         let vcs1 = passify_vcs pa1 wp1.vcs in
+         let vcs2 = passify_vcs pa2 wp2.vcs in
          let vcs = gmerge vcs1 vcs2 in
          { sigma = sigma ; vcs = vcs ; effects = effects }
       ) ()
@@ -435,28 +452,30 @@ struct
     let from = ainfo.WpPropId.a_label in
     let sigma = L.mem_frame from in
     let authorized_region =
-      L.assigned_of_assigns ~unfold:false
+      L.assigned_of_assigns
         (match ainfo.a_kind with
          | StmtAssigns -> L.move_at env sigma
          | LoopAssigns -> env)
         ainfo.a_assigns
     in match authorized_region with
     | None -> None
-    | Some region -> Some {
-        e_pid = pid ;
-        e_kind = ainfo.a_kind ;
-        e_label = from ;
-        e_valid = sigma ;
-        e_region = region ;
-        e_warn = Warning.Set.empty ;
-      }
+    | Some region ->
+        let post = match ainfo.a_kind with
+          | LoopAssigns -> true
+          | StmtAssigns -> NormAtLabels.has_postassigns ainfo.a_assigns
+        in Some {
+          e_pid = pid ;
+          e_post = post ;
+          e_label = from ;
+          e_valid = sigma ;
+          e_region = region ;
+          e_warn = Warning.Set.empty ;
+        }
 
   let cc_posteffect e vcs =
-    match e.e_kind with
-    | StmtAssigns -> vcs
-    | LoopAssigns ->
-        let vc = { empty_vc with vars = L.vars e.e_region } in
-        Gmap.add (Gposteffect e.e_pid) (Splitter.singleton vc) vcs
+    if not e.e_post then vcs else
+      let vc = { empty_vc with vars = L.vars e.e_region } in
+      Gmap.add (Gposteffect e.e_pid) (Splitter.singleton vc) vcs
 
   (* -------------------------------------------------------------------------- *)
   (* --- WP RULES : adding axioms, hypotheses and goals                     --- *)
@@ -513,7 +532,8 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let assigns_condition (region : L.region) (e:effect) : F.pred =
-    L.check_assigns e.e_valid ~written:region ~assignable:e.e_region
+    let unfold = Wp_parameters.UnfoldAssigns.get () in
+    L.check_assigns ~unfold e.e_valid ~written:region ~assignable:e.e_region
 
   exception COLLECTED
 
@@ -547,14 +567,13 @@ struct
              vars = xs }
          in
          let group =
-           match e.e_kind with
-           | StmtAssigns ->
-               Splitter.singleton (setup empty_vc)
-           | LoopAssigns ->
-               try Splitter.map setup (Gmap.find (Gposteffect e.e_pid) vcs)
-               with Not_found ->
-                 Wp_parameters.fatal "Missing post-effect for %a"
-                   WpPropId.pretty e.e_pid
+           if not e.e_post then
+             Splitter.singleton (setup empty_vc)
+           else
+             try Splitter.map setup (Gmap.find (Gposteffect e.e_pid) vcs)
+             with Not_found ->
+               Wp_parameters.fatal "Missing post-effect for %a"
+                 WpPropId.pretty e.e_pid
          in
          let target = match sloc with
            | None -> Gprop e.e_pid
@@ -564,8 +583,8 @@ struct
       ) effects vcs
 
   let do_assigns ?descr ?stmt ~source ?hpid ?warn sequence
-      ~assigned ?(unfolded=assigned) effects vcs =
-    let vcs = check_assigns stmt source ?warn unfolded effects vcs in
+      ~assigned effects vcs =
+    let vcs = check_assigns stmt source ?warn assigned effects vcs in
     let eqmem = A.apply_assigns sequence assigned in
     gmap (assume_vc ?descr ?hpid ?stmt ?warn eqmem) vcs
 
@@ -579,13 +598,9 @@ struct
          add_vc target ?warn F.p_false vcs)
       effects vcs
 
-  let cc_region ~unfold cc data =
-    let assigned = cc ~unfold:false data in
-    assigned , if unfold then cc ~unfold:true data else assigned
-
-  let cc_assigned env ~unfold kind froms =
+  let cc_assigned env kind froms =
     let dummy = Sigma.create () in
-    let r0 = L.assigned_of_froms ~unfold:false (L.move_at env dummy) froms in
+    let r0 = L.assigned_of_froms (L.move_at env dummy) froms in
     let d0 = A.domain r0 in
     let s1 = L.current env in
     let s0 = Sigma.havoc s1 d0 in
@@ -594,12 +609,13 @@ struct
       | LoopAssigns -> s1
     in
     let cc_assigned = L.assigned_of_froms (L.move_at env sref) in
-    let assigned,unfolded = cc_region ~unfold cc_assigned froms in
+    let assigned = cc_assigned froms in
     let sequence = { pre=s0 ; post=s1 } in
-    sequence , assigned , unfolded
+    sequence , assigned
 
-  let use_assigns wenv stmt hpid ainfo wp = in_wenv wenv wp
+  let use_assigns wenv hpid ainfo wp = in_wenv wenv wp
       begin fun env wp ->
+        let stmt = ainfo.a_stmt in
         match ainfo.a_assigns with
 
         | WritesAny ->
@@ -609,17 +625,16 @@ struct
 
         | Writes froms ->
             let kind = ainfo.WpPropId.a_kind in
-            let unfold = Wp_parameters.UnfoldAssigns.get () in
             let outcome =
               Warning.catch ~severe:true ~effect:"Assigns everything"
-                (cc_assigned env ~unfold kind) froms
+                (cc_assigned env kind) froms
             in
             match outcome with
-            | Warning.Result(warn,(sequence,assigned,unfolded)) ->
+            | Warning.Result(warn,(sequence,assigned)) ->
                 let vcs =
                   do_assigns ~source:FromCode
                     ?hpid ?stmt ~warn sequence
-                    ~assigned ~unfolded
+                    ~assigned
                     wp.effects wp.vcs in
                 { sigma = Some sequence.pre ; vcs=vcs ; effects = wp.effects }
             | Warning.Failed warn ->
@@ -651,15 +666,20 @@ struct
     if Clabels.is_here label then wp else
       in_wenv wenv wp
         (fun env wp ->
+           let frame = L.get_frame () in
            let s_here = L.current env in
-           let s_labl = L.mem_frame label in
-           let pa = Sigma.join s_here s_labl in
+           let s_frame =
+             if L.has_at_frame frame label then
+               L.mem_at_frame frame label
+             else
+               (L.set_at_frame frame label s_here ; s_here) in
+           let pa = Sigma.join s_here s_frame in
            let stop,effects = Eset.partition (is_stopeffect label) wp.effects in
            let vcs = Gmap.filter (not_posteffect stop) wp.vcs in
-           let vcs = gmap (passify_vc pa) vcs in
+           let vcs = passify_vcs pa vcs in
            let vcs = check_nothing stop vcs in
            let vcs = state_vcs stmt s_here vcs in
-           { sigma = Some s_here ; vcs=vcs ; effects=effects })
+           { sigma = Some s_frame ; vcs=vcs ; effects=effects })
 
   (* -------------------------------------------------------------------------- *)
   (* --- WP RULE : assignation                                              --- *)
@@ -680,12 +700,18 @@ struct
     if Cil.isVolatileLval lv &&
        Cvalues.volatile ~warn:"unsafe write-access to volatile l-value" ()
     then None
-    else Some
-        begin
-          match expr.enode with
-          | Lval lv -> M.copied seq obj loc (C.lval seq.pre lv)
-          | _ -> M.stored seq obj loc (C.val_of_exp seq.pre expr)
-        end
+    else
+      let value = match expr.enode with
+        | Lval lv -> M.copied seq obj loc (C.lval seq.pre lv)
+        | _ -> M.stored seq obj loc (C.val_of_exp seq.pre expr)
+      in
+      let init = match expr.enode with
+        | Lval lv when Cil.(isStructOrUnionType @@ typeOfLval lv) ->
+            M.copied_init seq obj loc (C.lval seq.pre lv)
+        | _ ->
+            M.stored_init seq obj loc (Cvalues.initialized_obj obj)
+      in
+      Some (value @ init)
 
   let assign wenv stmt lv expr wp = in_wenv wenv wp
       begin fun env wp ->
@@ -700,14 +726,7 @@ struct
             { sigma = Some sigma ; vcs=vcs ; effects = wp.effects }
         | Warning.Result(l_warn,(obj,dom,seq,loc)) ->
             (* L-Value has been translated *)
-            let unfold = Wp_parameters.UnfoldAssigns.get () in
-            let assigned,unfolded =
-              if unfold && Ctypes.is_compound obj then
-                let env_pre = L.move_at env seq.pre in
-                cc_region ~unfold (L.assigned_of_lval env_pre) lv
-              else
-                let region = [obj,Sloc loc] in region,region
-            in
+            let assigned = [obj,Sloc loc] in
             let outcome = Warning.catch
                 ~severe:false ~effect:"Havoc l-value (unknown r-value)"
                 (cc_stored lv seq loc obj) expr in
@@ -717,7 +736,7 @@ struct
                 (* R-Value is unknown or L-Value is volatile *)
                 let warn = Warning.Set.union l_warn r_warn in
                 let vcs = do_assigns ~source:FromCode
-                    ~stmt ~warn seq ~assigned ~unfolded wp.effects wp.vcs in
+                    ~stmt ~warn seq ~assigned wp.effects wp.vcs in
                 { sigma = Some seq.pre ; vcs=vcs ; effects = wp.effects }
             | Warning.Result(r_warn,Some stored) ->
                 (* R-Value and effects has been translated *)
@@ -733,7 +752,7 @@ struct
                   else vc in
                 let vcs = gmap update wp.vcs in
                 let vcs =
-                  check_assigns (Some stmt) FromCode unfolded wp.effects vcs in
+                  check_assigns (Some stmt) FromCode assigned wp.effects vcs in
                 { sigma = Some seq.pre ; vcs=vcs ; effects = wp.effects }
       end
 
@@ -747,11 +766,23 @@ struct
     | Some exp ->
         in_wenv wenv wp
           begin fun env wp ->
-            let vr = L.result () in
-            let tr = L.return () in
-            let sigma = L.current env in
-            let returned = p_equal (C.result sigma tr vr) (C.return sigma tr exp) in
-            let vcs = gmap (assume_vc ~descr:"Return" ~stmt [returned]) wp.vcs in
+            let compile () =
+              let sigma = L.current env in
+              let vr = L.result () in
+              let tr = L.return () in
+              p_equal (C.result sigma tr vr) (C.return sigma tr exp) in
+            let outcome = Warning.catch
+                ~severe:false ~effect:"Result value discarded (unknown)"
+                compile () in
+            let warn, condition =
+              match outcome with
+              | Warning.Failed warn ->
+                  warn , p_true
+              | Warning.Result(warn,condition) ->
+                  warn , condition in
+            let vcs = gmap (
+                assume_vc ~descr:"Return" ~stmt ~warn [condition]
+              ) wp.vcs in
             { wp with vcs = vcs }
           end
 
@@ -806,8 +837,8 @@ struct
                   Some (Splitter.union (merge_vc) s1 s2)
                ) vcs1 vcs2
            else
-             let vcs1 = gmap (passify_vc pa1) wp1.vcs in
-             let vcs2 = gmap (passify_vc pa2) wp2.vcs in
+             let vcs1 = passify_vcs pa1 wp1.vcs in
+             let vcs2 = passify_vcs pa2 wp2.vcs in
              gbranch
                ~left:(assume_vc ~descr:"Then" ~stmt ~warn [cond])
                ~right:(assume_vc ~descr:"Else" ~stmt ~warn [p_not cond])
@@ -894,13 +925,14 @@ struct
              [C.unchanged shere sinit v]
          in { wp with vcs = gmap const_vc wp.vcs })
 
-  let init wenv var init wp = in_wenv wenv wp
+  let init wenv var opt_init wp = in_wenv wenv wp
       (fun env wp ->
+         let assume = assume_vc ~descr:"Initializer" ~filter:true ~init:true in
          let sigma = L.current env in
-         let init_vc = assume_vcs
-             ~init:true ~filter:true
-             ~descr:"Initializer"
-             (C.init ~sigma var init)
+         let init_vc vc =
+           List.fold_left
+             (fun vc (warn,(hv,hi)) -> assume ~warn [hi] (assume ~warn [hv] vc))
+             vc (C.init ~sigma var opt_init)
          in { wp with vcs = gmap init_vc wp.vcs })
 
   (* -------------------------------------------------------------------------- *)
@@ -1027,8 +1059,7 @@ struct
         let env = L.move_at env0 dummy in
         let init = L.mem_at env0 Clabels.init in
         let frame = L.call_pre init (L.call kf vs) dummy in
-        let unfold = Wp_parameters.UnfoldAssigns.get () in
-        let cc_froms = L.assigned_of_froms ~unfold env in
+        let cc_froms = L.assigned_of_froms env in
         Some (A.domain (L.in_frame frame cc_froms froms))
 
   let cc_havoc d s = match d with
@@ -1044,6 +1075,7 @@ struct
     let seq_post = cc_havoc dom_call seq_result.pre in
     let seq_exit = cc_havoc dom_call (sigma_at wexit) in
     (* Pre-State *)
+    (* Passive: joined later by call_proper *)
     let sigma_pre, _, _ = Sigma.merge seq_post.pre seq_exit.pre in
     let formals = List.map (C.exp sigma_pre) es in
     let call = L.call kf formals in
@@ -1080,14 +1112,15 @@ struct
         }
     | Writes froms ->
         let env = L.move_at env0 cenv.sigma_pre in
-        let unfold = Wp_parameters.UnfoldAssigns.get () in
-        let assigned,unfolded = L.in_frame cenv.frame_pre
-            (cc_region ~unfold (L.assigned_of_froms env))
-            froms in
-        let vcs_post = do_assigns ~descr:"Call Effects" ~source:FromCall
-            ~stmt cenv.seq_post ~assigned ~unfolded wpost.effects wpost.vcs in
-        let vcs_exit = do_assigns ~descr:"Exit Effects" ~source:FromCall
-            ~stmt cenv.seq_exit ~assigned ~unfolded wexit.effects wexit.vcs in
+        let cc_region = L.assigned_of_froms env in
+        let vcs_post =
+          let assigned = L.in_frame cenv.frame_post cc_region froms in
+          do_assigns ~descr:"Call Effects" ~source:FromCall
+            ~stmt cenv.seq_post ~assigned wpost.effects wpost.vcs in
+        let vcs_exit =
+          let assigned = L.in_frame cenv.frame_exit cc_region froms in
+          do_assigns ~descr:"Exit Effects" ~source:FromCall
+            ~stmt cenv.seq_exit ~assigned wexit.effects wexit.vcs in
         let vcs_result =
           match cenv.loc_result with
           | None -> vcs_post (* no result *)
@@ -1110,13 +1143,17 @@ struct
   let cc_result call = match call.loc_result with
     | None -> []
     | Some(tr,obj,loc) ->
-        (* [LC,VP] : the C left unspecified where to compute the lv *)
-        (* [LC,BY] : lv computed before, like in Value Analysis *)
-        let vr = M.load call.seq_result.post obj loc in
-        let re = L.in_frame call.frame_post L.result () in
-        let te = L.in_frame call.frame_post L.return () in
-        let value = C.result call.sigma_pre tr re in
-        [ C.equal_typ tr vr (C.cast tr te (Val value)) ]
+        let handler () = [ p_true ] in
+        let compile () =
+          (* [LC,VP] : the C left unspecified where to compute the lv *)
+          (* [LC,BY] : lv computed before, like in Value Analysis *)
+          let vr = M.load call.seq_result.post obj loc in
+          let re = L.in_frame call.frame_post L.result () in
+          let te = L.in_frame call.frame_post L.return () in
+          let value = C.result call.sigma_pre tr re in
+          [ C.equal_typ tr vr (C.cast tr te (Val value)) ]
+        in
+        Warning.handle ~handler ~severe:false ~effect:"Hide \\result" compile ()
 
   let cc_status f_caller f_callee =
     p_equal
@@ -1174,7 +1211,7 @@ struct
          match outcome with
          | Warning.Result(warn , wp) -> { wp with vcs = add_warnings warn wp.vcs }
          | Warning.Failed warn ->
-             let v_post = do_assigns_everything ~stmt ~warn p_post.effects p_exit.vcs in
+             let v_post = do_assigns_everything ~stmt ~warn p_post.effects p_post.vcs in
              let v_exit = do_assigns_everything ~stmt ~warn p_exit.effects p_exit.vcs in
              let effects = Eset.union p_post.effects p_exit.effects in
              let vcs = gmerge v_post v_exit in
@@ -1200,11 +1237,10 @@ struct
             let hs = M.frame (L.current env) in
             let vcs = gmap (assume_vc ~descr:"Heap" ~domain:true hs) wp.vcs in
             { wp with vcs }
-        | Mcfg.SC_Function_in -> wp
-        | Mcfg.SC_Function_frame ->
-            wp_scope env wp ~descr:"Function Frame" Enter xs
-        | Mcfg.SC_Function_out ->
-            wp_scope env wp ~descr:"Function Exit" Leave xs
+        | Mcfg.SC_Frame_in ->
+            wp_scope env wp ~descr:"Frame In" Enter xs
+        | Mcfg.SC_Frame_out ->
+            wp_scope env wp ~descr:"Frame Out" Leave xs
         | Mcfg.SC_Block_in ->
             wp_scope env wp ~descr:"Block In" Enter xs
         | Mcfg.SC_Block_out ->
@@ -1312,8 +1348,7 @@ struct
   (* --- WPO Grouper                                                        --- *)
   (* -------------------------------------------------------------------------- *)
 
-  (* NOTE: bug in ocamldoc in OCaml 4.02 prevents usage of 'P' here *)
-  module PMAP = Map.Make(WpPropId.PropId)
+  module PMAP = Map.Make(P)
 
   type group = {
     mutable verifs : VC_Annot.t Bag.t ;
@@ -1334,8 +1369,9 @@ struct
     else
       group.verifs <- Bag.concat group.verifs (make_vcqs target tags vc)
 
-  let compile collection index (wp : t_prop) =
+  let compile_wp index (wp : t_prop) =
     let groups = ref PMAP.empty in
+    let collection = ref Bag.empty in
     Gmap.iter_sorted
       (fun target -> Splitter.iter (group_vc groups target))
       wp.vcs ;
@@ -1373,121 +1409,56 @@ struct
           end
           pid group
 
-      end !groups
+      end !groups ;
+    !collection
 
-  let lemma = L.lemma
+  let register_lemma l = ignore (L.lemma l)
 
-end
-
-(* -------------------------------------------------------------------------- *)
-(* --- WPO Computer                                                       --- *)
-(* -------------------------------------------------------------------------- *)
-
-module KFmap = Kernel_function.Map
-
-module Computer(M : Sigs.Compiler) =
-struct
-
-  module VCG = VC(M)
-  module WP = Calculus.Cfg(VCG)
-
-  let compile_lemma l = ignore (VCG.lemma l)
-
-  let prove_lemma collection l =
-    if not l.lem_axiom then
-      begin
-        let id = WpPropId.mk_lemma_id l in
-        let def = VCG.lemma l in
-        let model = WpContext.get_model () in
-        let vca = {
-          Wpo.VC_Lemma.depends = l.lem_depends ;
-          Wpo.VC_Lemma.lemma = def ;
-          Wpo.VC_Lemma.sequent = None ;
-        } in
-        let index = match LogicUsage.section_of_lemma l.lem_name with
-          | LogicUsage.Toplevel _ -> Wpo.Axiomatic None
-          | LogicUsage.Axiomatic a -> Wpo.Axiomatic (Some a.ax_name) in
-        let mid = WpContext.MODEL.id model in
-        let sid = WpPropId.get_propid id in
-        let leg = WpPropId.get_legacy id in
-        let wpo = {
-          Wpo.po_model = model ;
-          Wpo.po_gid = Printf.sprintf "%s_%s" mid sid ;
-          Wpo.po_leg = Printf.sprintf "%s_%s" mid leg ;
-          Wpo.po_sid = sid ;
-          Wpo.po_name = Printf.sprintf "Lemma '%s'" l.lem_name ;
-          Wpo.po_idx = index ;
-          Wpo.po_pid = id ;
-          Wpo.po_formula = Wpo.GoalLemma vca ;
-        } in
-        Wpo.add wpo ;
-        collection := Bag.append !collection wpo ;
-      end
-
-  let prove_strategy collection model kf strategy =
-    let cfg = WpStrategy.cfg_of_strategy strategy in
-    let bhv = WpStrategy.get_bhv strategy in
-    let index = Wpo.Function( kf , bhv ) in
-    if WpRTE.missing_guards model kf then
-      Wp_parameters.warning ~current:false ~once:true
-        "Missing RTE guards" ;
-    try
-      let (results,_) = WP.compute cfg strategy in
-      List.iter (VCG.compile collection index) results
-    with Warning.Error(source,reason) ->
-      Wp_parameters.failure
-        ~current:false "From %s: %s" source reason
-
-  class wp (model:WpContext.model) =
-    object
-      val mutable lemmas : LogicUsage.logic_lemma Bag.t = Bag.empty
-      val mutable annots : WpStrategy.strategy Bag.t KFmap.t = KFmap.empty
-      method lemma = true
-      method model = model
-
-      method add_lemma lemma = lemmas <- Bag.append lemmas lemma
-
-      method add_strategy strategy =
-        let kf = WpStrategy.get_kf strategy in
-        let sf = try KFmap.find kf annots with Not_found -> Bag.empty in
-        annots <- KFmap.add kf (Bag.append sf strategy) annots
-
-      method compute : Wpo.t Bag.t =
-        begin
-          let collection = ref Bag.empty in
-          Lang.F.release () ;
-          WpContext.on_context (model,WpContext.Global)
-            begin fun () ->
-              LogicUsage.iter_lemmas compile_lemma ;
-              Bag.iter (prove_lemma collection) lemmas ;
-            end () ;
-          KFmap.iter
-            (fun kf strategies ->
-               WpContext.on_context (model,WpContext.Kf kf)
-                 begin fun () ->
-                   LogicUsage.iter_lemmas compile_lemma ;
-                   Bag.iter (prove_strategy collection model kf) strategies ;
-                 end ()
-            ) annots ;
-          lemmas <- Bag.empty ;
-          annots <- KFmap.empty ;
-          Lang.F.release () ;
-          !collection
-        end
+  let compile_lemma l =
+    begin
+      let id = WpPropId.mk_lemma_id l in
+      let def = L.lemma l in
+      let model = WpContext.get_model () in
+      let vca = {
+        Wpo.VC_Lemma.depends = l.lem_depends ;
+        Wpo.VC_Lemma.lemma = def ;
+        Wpo.VC_Lemma.sequent = None ;
+      } in
+      let index = match LogicUsage.section_of_lemma l.lem_name with
+        | LogicUsage.Toplevel _ -> Wpo.Axiomatic None
+        | LogicUsage.Axiomatic a -> Wpo.Axiomatic (Some a.ax_name) in
+      let mid = WpContext.MODEL.id model in
+      let sid = WpPropId.get_propid id in
+      let leg = WpPropId.get_legacy id in
+      let wpo = {
+        Wpo.po_model = model ;
+        Wpo.po_gid = Printf.sprintf "%s_%s" mid sid ;
+        Wpo.po_leg = Printf.sprintf "%s_%s" mid leg ;
+        Wpo.po_sid = sid ;
+        Wpo.po_name = Printf.sprintf "Lemma '%s'" l.lem_name ;
+        Wpo.po_idx = index ;
+        Wpo.po_pid = id ;
+        Wpo.po_formula = Wpo.GoalLemma vca ;
+      } in
+      Wpo.add wpo ; wpo
     end
 
 end
 
-(* Cache because computer functors can not be instantiated twice *)
-module COMPUTERS = Hashtbl.Make(WpContext.MODEL)
-let computers = COMPUTERS.create 1
+(* -------------------------------------------------------------------------- *)
+(* --- VCgen Cache                                                        --- *)
+(* -------------------------------------------------------------------------- *)
 
-let computer setup driver =
+(* Cache by Model Context *)
+let vcgenerators = WpContext.MINDEX.create 1
+
+let vcgen setup driver : (module VCgen) =
   let model = Factory.instance setup driver in
-  try COMPUTERS.find computers model
+  try WpContext.MINDEX.find vcgenerators model
   with Not_found ->
     let module M = (val Factory.(compiler setup.mheap setup.mvar)) in
-    let module VC = Computer(M) in
-    let generator = (new VC.wp model :> Generator.computer) in
-    COMPUTERS.add computers model generator ;
-    generator
+    let vcgen = (module VC(M) : VCgen) in
+    WpContext.MINDEX.add vcgenerators model vcgen ;
+    vcgen
+
+(* -------------------------------------------------------------------------- *)

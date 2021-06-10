@@ -1,0 +1,6 @@
+[
+    { "directory": ".",
+      "command": "gcc -Isubdir2",
+      "file": "subdir.c"
+    }
+]

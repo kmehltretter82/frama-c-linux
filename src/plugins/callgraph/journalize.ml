@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -21,14 +21,14 @@
 (**************************************************************************)
 
 module Make
-  (C: sig
-    val name: string
-    val dump: unit -> unit
-    val compute: unit -> unit
-    type t
-    val ty: t Type.t
-    val get: unit -> t
-  end) =
+    (C: sig
+       val name: string
+       val dump: unit -> unit
+       val compute: unit -> unit
+       type t
+       val ty: t Type.t
+       val get: unit -> t
+     end) =
 struct
   let name = "Callgraph." ^ C.name
   let unit_unit = Datatype.func Datatype.unit Datatype.unit

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -46,7 +46,8 @@ let get_formula po =
   match po.po_formula with
   | GoalLemma l -> l.VC_Lemma.lemma.Definitions.l_lemma
   | GoalAnnot { VC_Annot.goal = g } ->
-      WpContext.on_context (get_context po) Wpo.GOAL.compute_proof g
+      WpContext.on_context
+        (get_context po) (Wpo.GOAL.compute_proof ~pid:po.po_pid) g
 
 let clear = Wpo.clear
 let proof = Wpo.goals_of_property
@@ -69,24 +70,21 @@ let () = Property_status.register_property_remove_hook remove
 (* --- Generator Interface                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-let generator ?model () =
+let generator model =
   let setup = match model with
-    | None -> Register.cmdline ()
-    | Some s -> Factory.parse [s] in
-  let driver = Driver.load_driver () in
-  CfgWP.computer setup driver
+    | None -> None
+    | Some s -> Some (Factory.parse [s]) in
+  Generator.create ~dump:false ?setup ()
 
 let generate_ip ?model ip =
-  let gen = generator ?model () in
-  Generator.compute_ip gen ip
+  (generator model)#compute_ip ip
 
-let generate_kf ?model ?(bhv=[]) kf =
-  let gen = generator ?model () in
-  Generator.compute_kf gen ~bhv ~kf ()
+let generate_kf ?model ?bhv ?prop kf =
+  let kfs = Kernel_function.Set.singleton kf in
+  (generator model)#compute_main ~fct:(Fct_list kfs) ?bhv ?prop ()
 
 let generate_call ?model stmt =
-  let gen = generator ?model () in
-  Generator.compute_call gen stmt
+  (generator model)#compute_call stmt
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prover Interface                                                   --- *)
@@ -97,6 +95,6 @@ let spawn = Prover.spawn ~delayed:true
 
 let server = ProverTask.server
 let command ?provers ?tip vcs =
-  Register.do_wp_proofs_iter ?provers ?tip (fun f -> Bag.iter f vcs)
+  Register.do_wp_proofs ?provers ?tip vcs
 
 (* -------------------------------------------------------------------------- *)

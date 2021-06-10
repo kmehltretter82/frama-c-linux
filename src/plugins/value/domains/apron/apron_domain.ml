@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -329,8 +329,8 @@ let truncate_interval typ interval =
 let interval_to_ival interval =
   let inf = scalar_to_int interval.Interval.inf
   and sup = scalar_to_int interval.Interval.sup in
-  let inf = Extlib.opt_map Integer.of_int inf
-  and sup = Extlib.opt_map Integer.of_int sup in
+  let inf = Option.map Integer.of_int inf
+  and sup = Option.map Integer.of_int sup in
   Some (Ival.inject_range inf sup)
 
 let int_to_scalar positive = function
@@ -487,10 +487,10 @@ module Make (Man : Input) = struct
          apron state, whose environment raises the Failure exception. *)
       | Z.Overflow | Failure _ -> top
 
-  let extract_expr _oracle state expr =
+  let extract_expr ~oracle:_ _context state expr =
     compute state expr (Cil.typeOf expr)
 
-  let extract_lval _oracle state lval typ _loc =
+  let extract_lval ~oracle:_ _context state lval typ _loc =
     let expr = Value_util.lval_to_exp lval in
     compute state expr typ
 
@@ -634,7 +634,11 @@ module Make (Man : Input) = struct
     with
     | Out_of_Scope _ -> `Value state
 
-  let start_call _stmt call valuation state =
+  let start_call _stmt call recursion valuation state =
+    if recursion <> None
+    then
+      Value_parameters.abort ~current:true
+        "The binding to APRON domains does not support recursive calls.";
     update valuation state >>- fun state ->
     let eval = make_eval state in
     let oracle = make_oracle valuation in
@@ -669,7 +673,7 @@ module Make (Man : Input) = struct
     then `Bottom
     else `Value state
 
-  let finalize_call _stmt _call ~pre:_ ~post = `Value post
+  let finalize_call _stmt _call _recursion ~pre:_ ~post = `Value post
 
   let show_expr _valuation _state _fmt _expr = ()
 

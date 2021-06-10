@@ -1,0 +1,10 @@
+TEST 1: OK: Expected execution at tests/builtin/strlen.c:18
+TEST 2: OK: Expected execution at tests/builtin/strlen.c:19
+TEST 3: OK: Expected execution at tests/builtin/strlen.c:20
+TEST 4: OK: Expected execution at tests/builtin/strlen.c:21
+strlen: input string not NUL-terminated
+TEST 5: OK: Expected signal at tests/builtin/strlen.c:25
+strlen: input string not NUL-terminated
+TEST 6: OK: Expected signal at tests/builtin/strlen.c:26
+strlen: input string unallocated
+TEST 7: OK: Expected signal at tests/builtin/strlen.c:28

@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -29,7 +29,7 @@ __PUSH_FC_STDLIB
 
 __BEGIN_DECLS
 
-/*@ ghost extern int __fc_heap_status __attribute__((FRAMA_C_MODEL)); */
+/*@ ghost extern int __fc_heap_status; */
 
 /*@ axiomatic dynamic_allocation {
   @   predicate is_allocable{L}(integer n) // Can a block of n bytes be allocated?

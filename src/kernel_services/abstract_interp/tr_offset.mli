@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -28,12 +28,12 @@ type t = private
   | Invalid (** No location is valid *)
   | Set of Integer.t list (** Limited number of locations *)
   | Interval of (** min *) Integer.t *
-                (** max *) Integer.t *
-                (** modu *)Integer.t 
+                           (** max *) Integer.t *
+                           (** modu *)Integer.t
   | Overlap of (** min *) Integer.t *
-               (** max *) Integer.t *
-               Origin.t  (** The location covers the entire range [min..max],
-                             but consecutive offsets overlap *)
+                          (** max *) Integer.t *
+                          Origin.t  (** The location covers the entire range [min..max],
+                                        but consecutive offsets overlap *)
 
 val pretty: t Pretty_utils.formatter
 
@@ -62,7 +62,7 @@ val trim_by_validity :
       then we must emit an alarm. This translates to
       [start_to<min_valid || stop_to > max_sure_valid]. This convention works
       even when [min_valid..max_sure_valid] is not a real interval.
- *)
+*)
 
 (*
 Local Variables:

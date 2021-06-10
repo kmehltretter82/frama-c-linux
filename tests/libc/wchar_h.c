@@ -66,5 +66,8 @@ int main() {
     wcsncat(wdst2+10, wdst2, 10); // error: no separation
     //@ assert unreachable:\false;
   }
+
+  int ir = wcscasecmp(L"\0", L"\0");
+  ir = wcscasecmp(wsrc, L"\0");
   return 0;
 }

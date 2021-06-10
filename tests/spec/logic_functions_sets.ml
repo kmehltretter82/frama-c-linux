@@ -2,7 +2,7 @@ open Cil_types
 
 let check = function
   | Dfun_or_pred (li, _) ->
-    let decl_type = Extlib.the li.l_type in
+    let decl_type = Option.get li.l_type in
     let body_type = match li.l_body with
       | LBterm t -> t.term_type
       | _ -> assert false

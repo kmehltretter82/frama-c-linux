@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -26,7 +26,7 @@
 
 open Cil_types
 
-type reached
+type reachability
 (** control flow graph dedicated to smoke tests *)
 
 val is_predicate : bool -> predicate -> bool
@@ -39,14 +39,16 @@ val is_dead_annot : code_annotation -> bool
 val is_dead_code : stmt -> bool
 (** Checks whether the stmt has a dead-code annotation. *)
 
-val reached : Kernel_function.t -> reached
+val reachability : Kernel_function.t -> reachability
 (** memoized reached cfg for function *)
 
-val smoking : reached -> Cil_types.stmt -> bool
+val smoking : reachability -> Cil_types.stmt -> bool
 (** Returns whether a stmt need a smoke tests to avoid being unreachable.
     This is restricted to assignments, returns and calls not dominated
     another smoking statement. *)
 
-val dump : dir:Datatype.Filepath.t -> Kernel_function.t -> reached -> unit
+val dump : dir:Datatype.Filepath.t -> Kernel_function.t -> reachability -> unit
+
+val set_doomed : Emitter.t -> WpPropId.prop_id -> unit
 
 (* -------------------------------------------------------------------------- *)

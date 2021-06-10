@@ -1,11 +1,11 @@
 [kernel] Parsing tests/metrics/libc.c (with preprocessing)
-[metrics] Defined functions (6)
+[metrics] Defined functions (7)
   =====================
    bar (1 call); f (0 call); foo (1 call); g (address taken) (0 call);
-   getopt (1 call); main (0 call); 
+   getopt (1 call); h (1 call); main (0 call); 
   
-  Undefined functions (122)
-  =========================
+  Specified-only functions (123)
+  ==============================
    _exit (0 call); access (0 call); chdir (0 call); chown (0 call);
    chroot (0 call); clearerr (0 call); clearerr_unlocked (0 call);
    close (0 call); dup (0 call); dup2 (0 call); execl (0 call);
@@ -34,11 +34,15 @@
    seteuid (0 call); setgid (0 call); sethostname (0 call); setpgid (0 call);
    setregid (0 call); setresgid (0 call); setresuid (0 call);
    setreuid (0 call); setsid (0 call); setuid (0 call); setvbuf (0 call);
-   sync (0 call); sysconf (0 call); tmpfile (0 call); tmpnam (0 call);
-   tolower (0 call); toupper (0 call); ttyname (0 call); ungetc (0 call);
-   unlink (0 call); usleep (0 call); vfprintf (0 call); vfscanf (0 call);
-   vprintf (0 call); vscanf (0 call); vsnprintf (0 call); vsprintf (0 call);
-   write (0 call); 
+   sleep (0 call); sync (0 call); sysconf (0 call); tmpfile (0 call);
+   tmpnam (0 call); tolower (0 call); toupper (0 call); ttyname (0 call);
+   ungetc (0 call); unlink (0 call); usleep (0 call); vfprintf (0 call);
+   vfscanf (0 call); vprintf (0 call); vscanf (0 call); vsnprintf (0 call);
+   vsprintf (0 call); write (0 call); 
+  
+  Undefined and unspecified functions (0)
+  =======================================
+   
   
   'Extern' global variables (10)
   ==============================
@@ -51,18 +55,18 @@
   
   Global metrics
   ============== 
-  Sloc = 17
+  Sloc = 20
   Decision point = 0
   Global variables = 17
   If = 0
   Loop = 0
   Goto = 0
-  Assignment = 8
-  Exit point = 6
-  Function = 128
-  Function call = 7
+  Assignment = 9
+  Exit point = 7
+  Function = 130
+  Function call = 8
   Pointer dereferencing = 1
-  Cyclomatic complexity = 6
+  Cyclomatic complexity = 7
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -73,8 +77,8 @@
 [eva] done for function main
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
-  4 functions analyzed (out of 5): 80% coverage.
-  In these functions, 10 statements reached (out of 10): 100% coverage.
+  5 functions analyzed (out of 6): 83% coverage.
+  In these functions, 13 statements reached (out of 13): 100% coverage.
   ----------------------------------------------------------------------------
   No errors or warnings raised during the analysis.
   ----------------------------------------------------------------------------
@@ -87,16 +91,17 @@
   ----------------------------------------------------------------------------
 [metrics] Eva coverage statistics
   =======================
-  Syntactically reachable functions = 7 (out of 128)
-  Semantically reached functions = 7
+  Syntactically reachable functions = 8 (out of 130)
+  Semantically reached functions = 8
   Coverage estimation = 100.0%
 [metrics] References to non-analyzed functions
   ------------------------------------
 [metrics] Statements analyzed by Eva
   --------------------------
-  15 stmts in analyzed functions, 15 stmts analyzed (100.0%)
+  18 stmts in analyzed functions, 18 stmts analyzed (100.0%)
   bar: 2 stmts out of 2 (100.0%)
   foo: 2 stmts out of 2 (100.0%)
   g: 2 stmts out of 2 (100.0%)
   getopt: 5 stmts out of 5 (100.0%)
-  main: 4 stmts out of 4 (100.0%)
+  h: 2 stmts out of 2 (100.0%)
+  main: 5 stmts out of 5 (100.0%)

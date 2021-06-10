@@ -1,6 +1,6 @@
 /* run.config
-EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-OPT: -no-autoload-plugins -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs -print -constfold
+MODULE: @PTEST_NAME@
+OPT: -machdep x86_32 -no-autoload-plugins -print -constfold
 */
 
 int main(void) {

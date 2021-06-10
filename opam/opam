@@ -1,7 +1,7 @@
 opam-version: "2.0"
 name: "frama-c"
 synopsis: "Platform dedicated to the analysis of source code written in C"
-version: "21.1+dev"
+version: "23.0~rc1"
 description:"""
 Frama-C gathers several analysis techniques in a single collaborative
 framework, based on analyzers (called "plug-ins") that can build upon the
@@ -54,6 +54,7 @@ authors: [
   "Anne Pacalet"
   "Valentin Perrelle"
   "Guillaume Petiot"
+  "Dario Pinto"
   "Virgile Prevosto"
   "Armand Puccetti"
   "Virgile Robles"
@@ -63,9 +64,9 @@ authors: [
   "Boris Yakobowski"
 ]
 homepage: "http://frama-c.com/"
-license: "GNU Lesser General Public License version 2.1"
+license: "LGPL-2.1-only"
 dev-repo: "git+https://git.frama-c.com/pub/frama-c.git"
-doc: "http://frama-c.com/download/user-manual-21.1-Scandium.pdf"
+doc: "http://frama-c.com/download/user-manual-23.0-Vanadium.pdf"
 bug-reports: "https://git.frama-c.com/pub/frama-c/issues"
 tags: [
   "deductive"
@@ -86,9 +87,6 @@ tags: [
 build: [
   ["autoconf"] {pinned}
   ["./configure" "--prefix" prefix
-                 "--disable-gui" { !conf-gtksourceview:installed |
-                                   ( !conf-gnomecanvas:installed &
-                                     !lablgtk3:installed) }
                  "--mandir=%{man}%"
   ]
   [make "-j%{jobs}%"]
@@ -101,48 +99,49 @@ install: [
 ]
 
 run-test: [
-  [make "-j%{jobs}%" "PTESTS_OPTS=-error-code" "tests"]
+  [make "-j%{jobs}%" "PTESTS_OPTS=-error-code" "tests"] { arch != "ppc64" }
+  # tests are disabled on PPC64 due to floating-point oracle differences
+  # (some ULPs in libc trigonometric functions) and due to the lack of
+  # available hardware to test them locally
 ]
 
+# Please keep depends and depopts sorted by package name
 depends: [
-  "ocaml" { >= "4.05.0" & ( < "4.08.0~" | >= "4.08.1" ) }
-  "ocamlgraph" { >= "1.8.8" & < "1.9~" }
-  "ocamlfind" # needed beyond build stage, used by -load-module
-  "zarith"
   "conf-autoconf" { build }
-  ( ( "lablgtk" { >= "2.18.2" } & "conf-gnomecanvas" & "conf-gtksourceview" )
-    | ( "lablgtk3" { >= "3.0.beta4" & os!="macos" }
+  ( ( "lablgtk" { >= "2.18.8" } & "conf-gnomecanvas" & "conf-gtksourceview"
+      & ("ocamlgraph" { < "2.0" } | "ocamlgraph_gtk" ))
+    | ( "lablgtk3" { >= "3.1.0" & os!="macos" }
         & "lablgtk3-sourceview3" & "conf-gtksourceview3" ) )
   ( "alt-ergo-free" | "alt-ergo" )
   "conf-graphviz" { post }
+  "conf-time" { with-test }
+  "ocaml" { >= "4.08.1" }
+  "ocamlfind" # needed beyond build stage, used by -load-module
+  "ocamlgraph" { >= "1.8.8" }
+  "why3" { >= "1.4.0" & < "1.5~" }
   "yojson"
-  "why3" { >= "1.3.1" }
+  "zarith"
 ]
 
 depopts: [
   # cannot use {build}: Frama-C must be recompiled when Coq and libraries changes.
   # Coq: because .vo would would not be loadable by another version of Coq
   # libraries: because we use dynamic linking
+  "apron"
   "coq"
   "mlgmpidl"
-  "apron"
-  "zmq"
   "ppx_deriving"
   "ppx_deriving_yojson"
-]
-
-conflicts: [
-  "lablgtk" { < "2.18.2" } #for ocaml >= 4.02.1
-  "frama-c-e-acsl" #avoid mixing old releases of E-ACSL, it is already
-                   #distributed with this version of Frama-C
-  "frama-c-base"   #avoid mixing old releases of Frama-C, now that only the
-                   #'frama-c' package exists
+  "zmq"
 ]
 
 messages: [
   "The Frama-C/Wp now uses Why-3 for all provers (Cf. deprecated -wp-prover native:alt-ergo)"
   {alt-ergo:installed}
-  "The Frama-C/Wp native support for Coq is now deprecated (use TIP or Why-3 instead)."
+  "The Frama-C/Wp native support for Coq is deprecated and only activated with Coq.8.12.x (use TIP or Why-3 instead)."
   {coq:installed}
-  "WARNING: There is a known issue with OCaml 4.05.0 and ocamlfind 1.8.1 (https://github.com/ocaml/opam-repository/issues/10925) when upgrading from a previous ocamlfind. If the compilation of Frama-C fails, try downgrading ocamlfind to 1.8.0 or upgrading OCaml to > 4.05.0." { ocaml:version = "4.05.0" & ocamlfind:version = "1.8.1" }
+]
+
+post-messages: [
+  "Why3 provers setup: rm -f ~/.why3.conf ; why3 config detect"
 ]

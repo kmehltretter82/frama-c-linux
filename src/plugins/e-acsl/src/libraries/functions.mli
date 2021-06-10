@@ -38,6 +38,12 @@ val instrument: kernel_function -> bool
 (* ************************************************************************** *)
 
 module RTL: sig
+  val api_prefix: string
+  (** Prefix used for the public API of E-ACSL runtime library. *)
+
+  val temporal_prefix:string
+  (** Prefix used for the public API of E-ACSL runtime library dealing with
+      temporal analysis. *)
 
   val mk_api_name: string -> string
   (** Prefix a name (of a variable or a function) with a string that identifies

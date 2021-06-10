@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -22,3 +22,10 @@
 
 (** generates the report (either final or [draft] according to the flag) *)
 val gen_report: draft:bool -> unit -> unit
+
+(** Filled when Eva is loaded. *)
+module Eva_info: sig
+  val loaded: bool ref
+  val coverage_md_gen: (unit -> Markdown.elements) ref
+  val domains_md_gen: (unit -> (Markdown.text * Markdown.text) list) ref
+end

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -198,6 +198,7 @@ class mkcomposer
           Wutil.on filter (fun f -> wvalid <- f) ;
           Wutil.on range (fun r -> ranged <- r) ;
           ignore vmin ; ignore vmax ;
+          self#updated
         end
   end
 

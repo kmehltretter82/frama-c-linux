@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -27,11 +27,11 @@ module ShouldOutput =
   State_builder.True_ref
     (struct
       let dependencies = [Db.Value.self] (* To be completed if some computations
-                                          use some other results than value *)
+                                            use some other results than value *)
       let name = "Inout.Register.ShouldOuput"
-     end)
+    end)
 let () = Inout_parameters.Output.add_set_hook
-  (fun _ v -> if v then ShouldOutput.set true)
+    (fun _ v -> if v then ShouldOutput.set true)
 
 
 let main () =
@@ -46,7 +46,7 @@ let main () =
   let forceinputwithformals = Inout_parameters.ForceInputWithFormals.get () in
   if (forceout || forceexternalout || forceinput || forceinputwithformals
       || forcederef || forceinout || forceinoutwithformals) &&
-    Inout_parameters.Output.get () && ShouldOutput.get ()
+     Inout_parameters.Output.get () && ShouldOutput.get ()
   then begin
     ShouldOutput.set false;
     !Db.Value.compute ();

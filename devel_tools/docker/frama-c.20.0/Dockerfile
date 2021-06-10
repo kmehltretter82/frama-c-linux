@@ -1,7 +1,12 @@
-FROM debian:sid as base
+FROM debian:buster as base
 
-RUN apt update
-RUN apt install opam -y
+# Install non-OCaml dependencies + opam
+RUN apt-get update && apt-get install -y \
+    cvc4 \
+    opam \
+    z3 \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN opam init --disable-sandboxing --compiler=ocaml-base-compiler.4.05.0 -y
 
 # "RUN eval $(opam env)" does not work, so we manually set its variables
@@ -11,11 +16,10 @@ ENV OCAML_TOPLEVEL_PATH "/root/.opam/ocaml-base-compiler.4.05.0/lib/toplevel"
 ENV MANPATH "$MANPATH:/root/.opam/ocaml-base-compiler.4.05.0/man"
 ENV PATH "/root/.opam/ocaml-base-compiler.4.05.0/bin:$PATH"
 
-RUN opam update -y
-RUN opam install depext -y
+RUN opam update -y && opam install depext -y
 
 # Install packages from reference configuration
-RUN opam depext --install -y \
+RUN apt-get update && opam update -y && opam depext --install -y --verbose \
     alt-ergo.2.0.0 \
     apron.20160125 \
     conf-graphviz.0.1 \
@@ -26,7 +30,8 @@ RUN opam depext --install -y \
     why3.1.2.0 \
     yojson.1.7.0 \
     zarith.1.9.1 \
-    --verbose # intentionally left as last line in this RUN command
+    && rm -rf /var/lib/apt/lists/*
+
 RUN why3 config --detect-provers
 
 # with_source: keep Frama-C sources
@@ -47,12 +52,13 @@ RUN cd /root && \
 ARG with_test=no
 
 RUN if [ "${with_test}" != "no" ]; then \
-       opam depext --install -y \
+       apt-get update && \
+       opam update -y && opam depext --install -y \
            conf-python-3.1.0.0 \
            conf-time.1 \
            --verbose \
         && \
-        apt install python -y && \
+        rm -rf /var/lib/apt/lists/* && \
         cd /root/frama-c-* && \
         make tests; \
     fi

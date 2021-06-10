@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -29,8 +29,7 @@ let has_requires spec =
 
 let code_annotation_text ca =
   match ca.annot_content with
-  | AAssert (_, Assert, _) ->  "assertion"
-  | AAssert (_, Check, _) -> "check"
+  | AAssert (_, {tp_kind}) -> Cil_printer.name_of_assert tp_kind
   | AInvariant _ ->  "loop invariant"
   | APragma _  | AVariant _ | AAssigns _ | AAllocation _ | AStmtSpec _
   | AExtended _  ->
@@ -46,7 +45,7 @@ let code_annotation_loc ca stmt =
 
 let mark_unreachable () =
   let mark ppt =
-    if not (Property_status.automatically_proven ppt) then begin
+    if not (Property_status.automatically_computed ppt) then begin
       Value_parameters.debug "Marking property %a as dead"
         Description.pp_property ppt;
       let emit =
@@ -90,7 +89,7 @@ let mark_unreachable () =
         in
         match stmt.skind with
         | Instr (Call (_, e, _, _)) ->
-          Extlib.may mark_status (Kernel_function.get_called e)
+          Option.iter mark_status (Kernel_function.get_called e)
         | Instr(Local_init(_, ConsInit(f,_,_),_)) ->
           mark_status (Globals.Functions.get f)
         | _ -> ()
@@ -203,7 +202,8 @@ let mark_green_and_red () =
        currently skipped during evaluation. *)
     if contains_c_at ca || (Alarms.find ca <> None) then
       match ca.annot_content with
-      | AAssert (_, _, p) | AInvariant (_, true, p) ->
+      | AAssert (_, p) | AInvariant (_, true, p) ->
+        let p = p.tp_statement in
         let loc = code_annotation_loc ca stmt in
         Cil.CurrentLoc.set loc;
         let kf = Kernel_function.find_englobing_kf stmt in
@@ -246,7 +246,8 @@ let mark_invalid_initializers () =
     | None -> ()
     | Some _ ->
       match ca.annot_content with
-      | AAssert (_, _, p) ->
+      | AAssert (_, p) ->
+        let p = p.tp_statement in
         let ip = Property.ip_of_code_annot_single kf first_stmt ca in
         (* Evaluate in a fully empty state. Only predicates that do not
            depend on the memory will result in 'False' *)

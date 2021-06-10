@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -24,7 +24,7 @@ open Cil_types
 
 (** Experimental module *)
 
-(** Returns a clone of a kernel function and 
+(** Returns a clone of a kernel function and
     adds it into the AST next to the old one *)
 val clone_defined_kernel_function: kernel_function -> kernel_function
 

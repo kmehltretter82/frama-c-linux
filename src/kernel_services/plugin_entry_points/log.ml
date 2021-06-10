@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -49,7 +49,7 @@ let kernel_label_name = "kernel"
 (* --- Exception Management                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-exception FeatureRequest of string * string
+exception FeatureRequest of Filepath.position option * string * string
 exception AbortError of string (* plug-in *)
 exception AbortFatal of string (* plug-in *)
 
@@ -71,7 +71,7 @@ type terminal = {
   mutable delayed : (terminal -> unit) list ;
   mutable output : string -> int -> int -> unit ;
   (* Same as Format.make_formatter *)
-  mutable flush : unit -> unit ;  
+  mutable flush : unit -> unit ;
   (* Same as Format.make_formatter *)
 }
 
@@ -90,7 +90,7 @@ let is_ready t =
   | Locked | DelayedLock -> false
   | Ready -> true
 
-let term_clean t = 
+let term_clean t =
   if t.isatty && not t.clean then
     begin
       let u = "\r\027[K" in
@@ -126,7 +126,7 @@ let stdout = {
 
 let clean () = term_clean stdout
 
-let set_output ?(isatty=false) output flush = 
+let set_output ?(isatty=false) output flush =
   set_terminal stdout isatty output flush
 
 (* -------------------------------------------------------------------------- *)
@@ -204,7 +204,7 @@ let is_prefixed_event = function
 
 let is_single_line text =
   try ignore (String.index_from text 0 '\n') ; false
-  with Not_found -> true 
+  with Not_found -> true
 
 let echo_firstline output text p q width =
   let t = try String.index_from text p '\n' with Not_found -> succ q in
@@ -372,10 +372,13 @@ let () = Array.iteri
 (* -------------------------------------------------------------------------- *)
 
 let all_channels : (string,channelstate) Hashtbl.t = Hashtbl.create 31
-let default_emitters = Array.map (fun _ -> { listeners=[] ; echo=true }) all_kinds
+let default_emitters =
+  Array.map (fun _ -> { listeners=[] ; echo=true })
+    all_kinds
 
 let new_emitters () =
-  Array.map (fun e -> { listeners = e.listeners ; echo = e.echo }) default_emitters
+  Array.map (fun e -> { listeners = e.listeners ; echo = e.echo })
+    default_emitters
 
 let get_emitters plugin =
   try
@@ -477,6 +480,8 @@ let logtransient channel text =
          raise e
     ) buffer text
 
+let locked_listeners = ref false
+
 let logwithfinal finally channel
     ?(fire=true)    (* fire channel listeners *)
     ?emitwith       (* additional emitter *)
@@ -498,7 +503,7 @@ let logwithfinal finally channel
          Format.pp_print_newline fmt () ;
          Format.pp_print_flush fmt () ;
          let p,q = Rich_text.trim buffer in
-         let output = 
+         let output =
            if p <= q then
              let source = get_source current source in
              let message = Rich_text.range buffer p q in
@@ -514,8 +519,17 @@ let logwithfinal finally channel
                  let e = channel.emitters.(nth_kind kind) in
                  if echo && e.echo then
                    do_echo channel.terminal event ;
-                 Extlib.may (do_fire event) emitwith;
-                 if fire then List.iter (do_fire event) e.listeners ;
+                 Option.iter (do_fire event) emitwith;
+                 if fire && not !locked_listeners then
+                   begin
+                     try
+                       locked_listeners := true ;
+                       List.iter (do_fire event) e.listeners ;
+                       locked_listeners := false ;
+                     with exn ->
+                       locked_listeners := false ;
+                       raise exn
+                   end ;
                  Some event
                end
              else None
@@ -586,26 +600,26 @@ let deferred_raise ~fatal ~unreported event msg =
   logwithfinal finally channel ?append ~kind:event.evt_kind msg
 
 let treat_deferred_error () =
-    match !deferred_exn with
-    | DNo_exn -> ()
-    | DWarn_as_error event ->
-      let unreported = unreported_event event in
-      let wkey =
-        match event.evt_category with
-        | None -> ""
-        | Some s when s = unreported_error -> ""
-        | Some s -> s
-      in
-      deferred_raise ~fatal:false ~unreported event
-        "warning %s treated as deferred error." wkey
-    | DError event ->
-      let unreported = unreported_event event in
-      deferred_raise ~fatal:false ~unreported event
-        "Deferred error message was emitted during execution."
-    | DFatal event ->
-      let unreported = unreported_event event in
-      deferred_raise ~fatal:true ~unreported event
-        "Deferred internal error message was emitted during execution."
+  match !deferred_exn with
+  | DNo_exn -> ()
+  | DWarn_as_error event ->
+    let unreported = unreported_event event in
+    let wkey =
+      match event.evt_category with
+      | None -> ""
+      | Some s when s = unreported_error -> ""
+      | Some s -> s
+    in
+    deferred_raise ~fatal:false ~unreported event
+      "warning %s treated as deferred error." wkey
+  | DError event ->
+    let unreported = unreported_event event in
+    deferred_raise ~fatal:false ~unreported event
+      "Deferred error message was emitted during execution."
+  | DFatal event ->
+    let unreported = unreported_event event in
+    deferred_raise ~fatal:true ~unreported event
+      "Deferred internal error message was emitted during execution."
 
 (* -------------------------------------------------------------------------- *)
 (* --- Messages Interface                                                 --- *)
@@ -799,7 +813,8 @@ sig
   val fatal   : ('a,'b) pretty_aborter
   val verify  : bool -> ('a,bool) pretty_aborter
 
-  val not_yet_implemented : ('a,formatter,unit,'b) format4 -> 'a
+  val not_yet_implemented : ?current:bool -> ?source:Filepath.position ->
+    ('a,formatter,unit,'b) format4 -> 'a
   val deprecated : string -> now:string -> ('a -> 'b) -> 'a -> 'b
 
   val with_result  : (event option -> 'b) -> ('a,'b) pretty_aborter
@@ -939,7 +954,7 @@ struct
     List.rev
       (Category_trie.fold
          (fun cat status l  ->
-            (merge_category cat, Extlib.opt_conv Wactive status) :: l)
+            (merge_category cat, Option.value ~default:Wactive status) :: l)
          !warn_categories [])
 
   let is_warn_category s =
@@ -1189,12 +1204,13 @@ struct
     let em = channel.emitters.(nth_kind kd) in
     em.listeners <- em.listeners @ [f]
 
-  let not_yet_implemented text =
+  let not_yet_implemented ?(current=false) ?source text =
     let buffer = Buffer.create 80 in
+    let source = get_source current source in
     let finally fmt =
       Format.pp_print_flush fmt ();
       let msg = Buffer.contents buffer in
-      raise (FeatureRequest(channel.plugin,msg)) in
+      raise (FeatureRequest(source,channel.plugin,msg)) in
     let fmt = Format.formatter_of_buffer buffer in
     Format.kfprintf finally fmt text
 
@@ -1242,7 +1258,7 @@ struct
         with error ->
           unlock_terminal stdout fmt ; raise error
       end
-    else 
+    else
       Pretty_utils.nullprintf text
 
   let pp_all_warn_categories_status () =

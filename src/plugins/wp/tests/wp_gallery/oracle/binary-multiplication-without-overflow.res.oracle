@@ -1,10 +1,9 @@
 # frama-c -wp -wp-rte -warn-unsigned-overflow [...]
 [kernel] Parsing tests/wp_gallery/binary-multiplication-without-overflow.c (with preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [rte] annotating function BinaryMultiplication
-[wp] Goal typed_lemma_ax1_lack : not tried
-[wp] Goal typed_lemma_sizeof_ok_ok : trivial
+[wp] Goal typed_lemma_half : not tried
+[wp] Goal typed_lemma_size : trivial
 [wp] Goal typed_BinaryMultiplication_ensures_product : not tried
 [wp] Goal typed_BinaryMultiplication_assert_a1_ok_deductible : not tried
 [wp] Goal typed_BinaryMultiplication_loop_invariant_inv1_ok_preserved : not tried

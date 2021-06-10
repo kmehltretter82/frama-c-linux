@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -29,7 +29,7 @@ module type S = sig
 
   type state
   type value
-  type location
+  type loc
 
   val assign: state -> kinstr -> lval -> exp -> state or_bottom
 
@@ -37,7 +37,7 @@ module type S = sig
 
   val call:
     stmt -> lval option -> exp -> exp list -> state ->
-    state list or_bottom * Value_types.cacheable
+    state list or_bottom * Eval.cacheable
 
   val check_unspecified_sequence:
     Cil_types.stmt ->
@@ -50,18 +50,18 @@ module type S = sig
 
   type call_result = {
     states: state list or_bottom;
-    cacheable: Value_types.cacheable;
+    cacheable: Eval.cacheable;
     builtin: bool;
   }
 
   val compute_call_ref:
-    (stmt -> (location, value) call -> state -> call_result) ref
+    (stmt -> (loc, value) call -> recursion option -> state -> call_result) ref
 end
 
 module Make (Abstract: Abstractions.Eva)
   : S with type state = Abstract.Dom.t
        and type value = Abstract.Val.t
-       and type location = Abstract.Loc.location
+       and type loc = Abstract.Loc.location
 
 (*
 Local Variables:

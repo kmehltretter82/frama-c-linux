@@ -30,7 +30,7 @@ c -> 1
     4 -> Assign: tmp = 1 -> 5
     5 -> start_call: loop (true) -> 8
     6 -> Assign: tmp = 2 -> 7
-    7 -> start_call: loop (true) -> 40
+    7 -> start_call: loop (true) -> 39
     8 -> EnterScope: j -> 9
     9 -> Assign: j = tmp -> 10
     10 -> EnterScope: i -> 11
@@ -48,43 +48,41 @@ c -> 1
     22 -> Assign: i = i + 1 -> 23
     23 -> Assume: i < 3 false -> 24
     24 -> LeaveScope: i -> 25
-    25 -> LeaveScope: i -> 26
-    26 -> EnterScope: \result<loop> -> 27
-    27 -> Assign: \result<loop> = j -> 28
-    28 -> LeaveScope: j -> 36
-    36 -> finalize_call: loop -> 37
-    37 -> Assign: tmp = \result<loop> -> 38
-    38 -> LeaveScope: \result<loop> -> 39
-    39 -> EnterScope: \result<main> -> 80
-    40 -> EnterScope: j -> 41
-    41 -> Assign: j = tmp -> 42
-    42 -> EnterScope: i -> 44
-    44 -> initialize variable: i -> 45
-    45 -> Assign: i = 0 -> 46
-    46 -> enter_loop -> 47
-    47 -> Assume: i < 3 true -> 48
-    48 -> Assign: j = j + 1 -> 49
-    49 -> Assign: i = i + 1 -> 50
-    50 -> Assume: i < 3 true -> 51
-    51 -> Assign: j = j + 1 -> 52
-    52 -> Assign: i = i + 1 -> 53
-    53 -> Assume: i < 3 true -> 54
-    54 -> Assign: j = j + 1 -> 55
-    55 -> Assign: i = i + 1 -> 56
-    56 -> Assume: i < 3 false -> 57
-    57 -> LeaveScope: i -> 58
-    58 -> LeaveScope: i -> 59
-    59 -> EnterScope: \result<loop> -> 60
-    60 -> Assign: \result<loop> = j -> 61
-    61 -> LeaveScope: j -> 76
-    76 -> finalize_call: loop -> 77
-    77 -> Assign: tmp = \result<loop> -> 78
-    78 -> LeaveScope: \result<loop> -> 79
-    79 -> EnterScope: \result<main> -> 82
+    25 -> EnterScope: \result<loop> -> 26
+    26 -> Assign: \result<loop> = j -> 27
+    27 -> LeaveScope: j -> 35
+    35 -> finalize_call: loop -> 36
+    36 -> Assign: tmp = \result<loop> -> 37
+    37 -> LeaveScope: \result<loop> -> 38
+    38 -> EnterScope: \result<main> -> 78
+    39 -> EnterScope: j -> 40
+    40 -> Assign: j = tmp -> 41
+    41 -> EnterScope: i -> 43
+    43 -> initialize variable: i -> 44
+    44 -> Assign: i = 0 -> 45
+    45 -> enter_loop -> 46
+    46 -> Assume: i < 3 true -> 47
+    47 -> Assign: j = j + 1 -> 48
+    48 -> Assign: i = i + 1 -> 49
+    49 -> Assume: i < 3 true -> 50
+    50 -> Assign: j = j + 1 -> 51
+    51 -> Assign: i = i + 1 -> 52
+    52 -> Assume: i < 3 true -> 53
+    53 -> Assign: j = j + 1 -> 54
+    54 -> Assign: i = i + 1 -> 55
+    55 -> Assume: i < 3 false -> 56
+    56 -> LeaveScope: i -> 57
+    57 -> EnterScope: \result<loop> -> 58
+    58 -> Assign: \result<loop> = j -> 59
+    59 -> LeaveScope: j -> 74
+    74 -> finalize_call: loop -> 75
+    75 -> Assign: tmp = \result<loop> -> 76
+    76 -> LeaveScope: \result<loop> -> 77
+    77 -> EnterScope: \result<main> -> 80
+    78 -> Assign: \result<main> = tmp -> 79
+    79 -> join -> 82
     80 -> Assign: \result<main> = tmp -> 81
-    81 -> join -> 84
-    82 -> Assign: \result<main> = tmp -> 83
-    83 -> join -> 84 ]} at 84
+    81 -> join -> 82 ]} at 82
 [from] Computing for function loop
 [from] Done for function loop
 [from] Computing for function main

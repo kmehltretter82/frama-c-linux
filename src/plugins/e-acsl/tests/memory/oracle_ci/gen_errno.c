@@ -14,9 +14,10 @@ void __e_acsl_globals_init(void)
   return;
 }
 
-void __e_acsl_globals_delete(void)
+void __e_acsl_globals_clean(void)
 {
   __e_acsl_delete_block((void *)(& errno));
+  return;
 }
 
 int main(int argc, char const **argv)
@@ -39,13 +40,13 @@ int main(int argc, char const **argv)
       __gen_e_acsl_and = __gen_e_acsl_valid;
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,"Assertion","main","\\valid(p)",
+    __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","main","\\valid(p)",
                     "tests/memory/errno.c",11);
   }
   /*@ assert \valid(p); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(& p));
-  __e_acsl_globals_delete();
+  __e_acsl_globals_clean();
   __e_acsl_memory_clean();
   return __retres;
 }

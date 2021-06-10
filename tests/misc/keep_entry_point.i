@@ -1,6 +1,6 @@
 /* run.config
-EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-OPT: -main f -no-autoload-plugins -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs -print
+ MODULE: @PTEST_NAME@
+   OPT: -main f -no-autoload-plugins -print
 */
 
 static int f(void);

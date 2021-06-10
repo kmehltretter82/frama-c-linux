@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -72,7 +72,7 @@ type requestInfo = {
 
 type arrayInfo = {
   arr_key: string;
-  arr_kind: string;
+  arr_kind: jtype;
 }
 
 type declKindInfo =

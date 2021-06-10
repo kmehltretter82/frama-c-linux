@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -100,9 +100,9 @@ let save_project_as (main_ui: Design.main_window_extension_points) project =
     (fun () ->
        match dialog#run () with
        | `SAVE ->
-           Extlib.may
-             (save_in main_ui (dialog :> GWindow.window_skel) project)
-             (Extlib.opt_map Filepath.Normalized.of_string dialog#filename)
+         Option.iter
+           (save_in main_ui (dialog :> GWindow.window_skel) project)
+           (Option.map Filepath.Normalized.of_string dialog#filename)
        | `DELETE_EVENT | `CANCEL -> ());
   dialog#destroy ()
 
@@ -127,15 +127,15 @@ let load_project (host_window: Design.main_window_extension_points) =
   host_window#protect ~cancelable:true ~parent:(dialog:>GWindow.window_skel)
     (fun () -> match dialog#run () with
        | `OPEN ->
-           begin match dialog#filename with
-             | None -> ()
-             | Some f ->
-                 (try ignore (Project.load (Filepath.Normalized.of_string f))
-                  with Project.IOError s | Failure s ->
-                    host_window#error
-                      ~reset:true ~parent:(dialog:>GWindow.window_skel)
-                      "Cannot load: %s" s)
-           end
+         begin match dialog#filename with
+           | None -> ()
+           | Some f ->
+             (try ignore (Project.load (Filepath.Normalized.of_string f))
+              with Project.IOError s | Failure s ->
+                host_window#error
+                  ~reset:true ~parent:(dialog:>GWindow.window_skel)
+                  "Cannot load: %s" s)
+         end
        | `DELETE_EVENT | `CANCEL -> ());
   dialog#destroy ()
 
@@ -155,7 +155,7 @@ let reset ?filter (menu: GMenu.menu) =
              match acc with
              | [] -> raise Exit
              | p2 :: acc ->
-                 if compare_prj p1 p2 = 0 then acc else raise Exit)
+               if compare_prj p1 p2 = 0 then acc else raise Exit)
           !project_radios
           pl
       in
@@ -253,10 +253,10 @@ and make_project_entries ?filter window menu =
   match projects_list ?filter () with
   | [] -> assert (filter <> None)
   | (pa, _name) :: tl ->
-      let mk = mk_project_entry window menu in
-      let pa_item = mk pa in
-      let group = pa_item#group in
-      List.iter (fun (pa, _) -> ignore (mk ~group pa)) tl
+    let mk = mk_project_entry window menu in
+    let pa_item = mk pa in
+    let group = pa_item#group in
+    List.iter (fun (pa, _) -> ignore (mk ~group pa)) tl
 
 and recompute ?filter window menu =
   let is_reset = reset ?filter menu in

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -76,6 +76,7 @@ sig
 
   val guards : frame -> pred list
   val mem_frame : c_label -> sigma
+  val has_at_frame : frame -> c_label -> bool
   val mem_at_frame : frame -> c_label -> sigma
   val set_at_frame : frame -> c_label -> sigma -> unit
 
@@ -100,14 +101,12 @@ sig
   val term : env -> Cil_types.term -> term
   val pred : polarity -> env -> predicate -> pred
   val logic : env -> Cil_types.term -> logic
-  val region : env -> unfold:bool -> Cil_types.term -> M.loc Sigs.region
-  (** When [~unfold:true], decompose compound regions field by field *)
+  val region : env -> Cil_types.term -> M.loc Sigs.region
 
   val bootstrap_term : (env -> Cil_types.term -> term) -> unit
   val bootstrap_pred : (polarity -> env -> predicate -> pred) -> unit
   val bootstrap_logic : (env -> Cil_types.term -> logic) -> unit
-  val bootstrap_region :
-    (env -> unfold:bool -> Cil_types.term -> M.loc Sigs.region) -> unit
+  val bootstrap_region : (env -> Cil_types.term -> M.loc Sigs.region) -> unit
 
   (** {3 Application} *)
 

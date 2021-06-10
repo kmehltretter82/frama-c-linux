@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -101,6 +101,9 @@ let generate model kf =
   let cint = WpContext.on_context (model,WpContext.Kf kf) Cint.current () in
   List.iter (configure ~update ~generate:true kf cint) generator ;
   if !update then !Db.RteGen.annotate_kf kf
+
+let generate_all model =
+  Wp_parameters.iter_kf (generate model)
 
 let missing_guards model kf =
   let update = ref false in

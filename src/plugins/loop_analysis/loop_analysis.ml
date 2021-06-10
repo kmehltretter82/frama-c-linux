@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -572,7 +572,6 @@ module Store(* (B:sig *)
             () (* no value => cannot infer anything *)
       ) final_conds;
 
-    (* TODO: Use this table in a second pass, for the slevel analysis. *)
     if not !success then
       Options.debug "no success %a init %a body %a result %a"
         Cil_datatype.Stmt.pretty stmt pretty (value,conds)
@@ -642,3 +641,13 @@ let get_bounds stmt =
 
 let fold_bounds f acc =
   Loop_Max_Iteration.fold_sorted ~cmp:Cil_datatype.Stmt.compare f acc
+
+let display_results () =
+  let pretty_hashtbl fmt () =
+    Loop_Max_Iteration.iter_sorted
+      (fun stmt max ->
+         let loc = Cil_datatype.Stmt.loc stmt in
+         Format.fprintf fmt "%a: %i@," Printer.pp_location loc max)
+  in
+  Options.result "Maximum number of iterations by loop:@\n@[<v>%a@]"
+    pretty_hashtbl ()

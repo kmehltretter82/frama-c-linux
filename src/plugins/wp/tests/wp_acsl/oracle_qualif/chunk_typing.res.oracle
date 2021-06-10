@@ -1,7 +1,6 @@
 # frama-c -wp -wp-rte [...]
 [kernel] Parsing tests/wp_acsl/chunk_typing.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [rte] annotating function function
 [wp] 39 goals scheduled
 [wp] [Alt-Ergo] Goal typed_function_ensures : Valid
@@ -50,14 +49,19 @@
  Functions                 WP     Alt-Ergo  Total   Success
   function                 20       19       39       100%
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'function':
+[wp] tests/wp_acsl/chunk_typing.i:21: Warning: 
+  Memory model hypotheses for function 'function':
   /*@
-     behavior typed:
-     requires \separated(x+(..),
-                \union(i8+(..),u8+(..),i16+(..),u16+(..),i32+(..),u32+(..),
-                  i64+(..),u64+(..)));
+     behavior wp_typed:
+       requires \separated(i16 + (..), (char const *)x + (..));
+       requires \separated(i32 + (..), (char const *)x + (..));
+       requires \separated(i64 + (..), (char const *)x + (..));
+       requires \separated(i8 + (..), (char const *)x + (..));
+       requires \separated(u16 + (..), (char const *)x + (..));
+       requires \separated(u32 + (..), (char const *)x + (..));
+       requires \separated(u64 + (..), (char const *)x + (..));
+       requires \separated(u8 + (..), (char const *)x + (..));
      */
-  void function(signed char * /*[10]*/ i8, unsigned char * /*[10]*/ u8,
-                short * /*[10]*/ i16, unsigned short * /*[10]*/ u16,
-                int * /*[10]*/ i32, unsigned int * /*[10]*/ u32,
-                long long * /*[10]*/ i64, unsigned long long * /*[10]*/ u64);
+  void function(signed char i8[10], unsigned char u8[10], short i16[10],
+                unsigned short u16[10], int i32[10], unsigned int u32[10],
+                long long i64[10], unsigned long long u64[10]);

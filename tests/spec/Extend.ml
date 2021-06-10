@@ -40,7 +40,7 @@ let print_bar prt fmt ext =
     let l = Bar_table.find idx in
     Pretty_utils.pp_list
       ~pre:"@[<hov 2>" ~sep:",@ " ~suf:"@]" prt#predicate fmt l
-  | Ext_preds _ | Ext_terms _ ->
+  | Ext_preds _ | Ext_terms _ | Ext_annot _->
     Kernel.fatal "bar extension should have ids as arguments"
 
 let visit_bar vis ext =
@@ -56,7 +56,7 @@ let visit_bar vis ext =
       Bar_table.replace idx l';
       Cil.SkipChildren
     end
-  | Ext_terms _ | Ext_preds _ ->
+  | Ext_terms _ | Ext_preds _ | Ext_annot _ ->
       Kernel.fatal "bar extension should have ids as arguments"
 
 let type_baz typing_context _loc l =
@@ -104,6 +104,10 @@ let type_bla typing_context _loc l =
   in
   Ext_preds l
 
+let type_empty _ loc = function
+  | [] -> Ext_terms [];
+  | _ -> Kernel.abort ~loc "empty_extension should not have arguments"
+
 let () =
   Acsl_extension.register_behavior "foo" type_foo false ;
   Acsl_extension.register_code_annot_next_loop "lfoo" type_foo false ;
@@ -113,7 +117,8 @@ let () =
   Acsl_extension.register_behavior
     "bar" type_bar ~printer:print_bar ~visitor:visit_bar false ;
   Acsl_extension.register_behavior "bla" type_bla false ;
-  Acsl_extension.register_code_annot_next_both "baz" type_baz false
+  Acsl_extension.register_code_annot_next_both "baz" type_baz false;
+  Acsl_extension.register_code_annot "empty_extension" type_empty false
 
 let run () =
   Ast.compute ();

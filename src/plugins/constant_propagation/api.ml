@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -93,7 +93,7 @@ class propagate project fnames ~cast_intro = object(self)
       else
         oldt, newt
     in
-    let exp = Cil.mkCastT e oldt newt in
+    let exp = Cil.mkCastT oldt newt e in
     if cast_intro then
       exp
     else match exp.enode with
@@ -144,8 +144,8 @@ class propagate project fnames ~cast_intro = object(self)
         &&
         (* (2) [vi] is bound in this function *)
         (vi.vglob ||
-         Extlib.may_map
-           (Kernel_function.is_formal_or_local vi) ~dft:false
+         Option.fold
+           ~some:(Kernel_function.is_formal_or_local vi) ~none:false
            self#current_kf)
       in
       let change_to = match b with

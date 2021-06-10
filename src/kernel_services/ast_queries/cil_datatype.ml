@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -226,10 +226,15 @@ module Location = struct
   let to_lexing_loc (pos1, pos2) =
     Position.to_lexing_pos pos1, Position.to_lexing_pos pos2
 
-  let equal_start_semantic (pos1, _) (pos2, _) =
-    Filepath.(Datatype.Filepath.equal pos1.pos_path pos2.pos_path
-              && pos1.pos_lnum = pos2.pos_lnum
-              && pos1.pos_cnum - pos1.pos_bol = pos2.pos_cnum - pos2.pos_bol)
+  let compare_start_semantic (pos1, _) (pos2, _) =
+    let open Filepath in
+    let c = Datatype.Filepath.compare pos1.pos_path pos2.pos_path in
+    if c <> 0 then c else
+      let c = pos1.pos_lnum - pos2.pos_lnum in
+      if c <> 0 then c else
+        (pos1.pos_cnum - pos1.pos_bol) - (pos2.pos_cnum - pos2.pos_bol)
+
+  let equal_start_semantic l1 l2 = compare_start_semantic l1 l2 = 0
 
 end
 
@@ -467,9 +472,9 @@ and compare_array_sizes e1o e2o =
     match i1, i2 with
     | None, None -> (* inconclusive. do not return 0 *)
       !compare_exp_struct_eq e1 e2
-    | _ -> Extlib.opt_compare Integer.compare i1 i2
+    | _ -> Option.compare Integer.compare i1 i2
   in
-  Extlib.opt_compare compare_non_empty_size e1o e2o
+  Option.compare compare_non_empty_size e1o e2o
 
 and compare_type config t1 t2 =
   if t1 == t2 then 0
@@ -521,7 +526,7 @@ and compare_type config t1 t2 =
       index_typ a1 - index_typ a2
 
 and compare_arg_list  config l1 l2 =
-  Extlib.opt_compare
+  Option.compare
     (compare_list
        (fun (_n1, t1, l1) (_n2, t2, l2) ->
           (compare_chain (compare_type config) t1 t2
@@ -776,9 +781,8 @@ module Compinfo = struct
               corig_name = "";
               cname = "";
               ckey = -1;
-              cfields = [];
+              cfields = None;
               cattr = [];
-              cdefined = false;
               creferenced = false } ]
         let compare v1 v2 = Datatype.Int.compare v1.ckey v2.ckey
         let hash v = Hashtbl.hash v.ckey
@@ -804,6 +808,7 @@ module Fieldinfo = struct
                     List.fold_left
                       (fun acc loc ->
                          { fcomp = ci;
+                           forder = 0;
                            forig_name = "";
                            fname = "";
                            ftype = typ;
@@ -821,7 +826,7 @@ module Fieldinfo = struct
                  Typ.reprs)
             []
             Compinfo.reprs
-        let fid fi = fi.fcomp.ckey, fi.fname
+        let fid fi = fi.fcomp.ckey, fi.forder
         let compare f1 f2 = Extlib.compare_basic (fid f1) (fid f2)
         let hash f1 = Hashtbl.hash (fid f1)
         let equal f1 f2 = (fid f1) = (fid f2)
@@ -1982,7 +1987,7 @@ module Global_annotation = struct
           | Dtype(t1,_), Dtype(t2,_) -> Logic_type_info.compare t1 t2
           | Dtype _, _ -> -1
           | _, Dtype _ -> 1
-          | Dlemma (l1,_,_,_,_,attr1,_), Dlemma(l2,_,_,_,_,attr2,_) ->
+          | Dlemma (l1,_,_,_,attr1,_), Dlemma(l2,_,_,_,attr2,_) ->
             let res = Datatype.String.compare l1 l2 in
             if res = 0 then Attributes.compare attr1 attr2 else res
           | Dlemma _, _ -> -1
@@ -2017,7 +2022,7 @@ module Global_annotation = struct
           (* Empty axiomatic is weird but authorized. *)
           | Daxiomatic (_,g::_,_,_) -> 5 * hash g
           | Dtype (t,_) -> 7 * Logic_type_info.hash t
-          | Dlemma(n,_,_,_,_,_,_) -> 11 * Datatype.String.hash n
+          | Dlemma(n,_,_,_,_,_) -> 11 * Datatype.String.hash n
           | Dinvariant(l,_) -> 13 * Logic_info.hash l
           | Dtype_annot(l,_) -> 17 * Logic_info.hash l
           | Dmodel_annot(l,_) -> 19 * Model_info.hash l
@@ -2031,7 +2036,7 @@ module Global_annotation = struct
     | Dfun_or_pred(_, loc)
     | Daxiomatic(_, _, _, loc)
     | Dtype (_, loc)
-    | Dlemma(_, _, _, _, _, _, loc)
+    | Dlemma(_, _, _, _, _, loc)
     | Dinvariant(_, loc)
     | Dtype_annot(_, loc) -> loc
     | Dmodel_annot(_, loc) -> loc
@@ -2043,7 +2048,7 @@ module Global_annotation = struct
     | Dfun_or_pred({ l_var_info = { lv_attr }}, _) -> lv_attr
     | Daxiomatic(_, _, attr, _) -> attr
     | Dtype ({lt_attr}, _) -> lt_attr
-    | Dlemma(_, _, _, _, _, attr, _) -> attr
+    | Dlemma(_, _, _, _, attr, _) -> attr
     | Dinvariant({ l_var_info = { lv_attr }}, _) -> lv_attr
     | Dtype_annot({ l_var_info = { lv_attr}}, _) -> lv_attr
     | Dmodel_annot({ mi_attr }, _) -> mi_attr
@@ -2248,8 +2253,8 @@ module Code_annotation = struct
       end)
 
   let loc ca = match ca.annot_content with
-    | AAssert(_,_,{pred_loc=loc})
-    | AInvariant(_,_,{pred_loc=loc})
+    | AAssert(_,{ tp_statement = {pred_loc=loc}})
+    | AInvariant(_,_,{tp_statement = {pred_loc=loc}})
     | AVariant({term_loc=loc},_) -> Some loc
     | AAssigns _ | AAllocation _ | APragma _ | AExtended _
     | AStmtSpec _ -> None
@@ -2272,6 +2277,20 @@ module Predicate = struct
       end)
 end
 
+module Toplevel_predicate = struct
+  let pretty_ref = ref (fun _ _ -> assert false)
+  include Make
+      (struct
+        type t = toplevel_predicate
+        let name = "Toplevel_predicate"
+        let reprs =
+          [ { tp_statement = List.hd Predicate.reprs; tp_kind = Assert }]
+        let internal_pretty_code = Datatype.undefined
+        let pretty fmt x = !pretty_ref fmt x
+        let varname _ = "p"
+      end)
+end
+
 module Identified_predicate = struct
   let pretty_ref = ref (fun _ _ -> assert false)
   include Make_with_collections
@@ -2279,7 +2298,7 @@ module Identified_predicate = struct
         type t = identified_predicate
         let name = "Identified_predicate"
         let reprs =
-          [ { ip_content = List.hd Predicate.reprs; ip_id = -1} ]
+          [ { ip_content = List.hd Toplevel_predicate.reprs; ip_id = -1} ]
         let compare x y = Extlib.compare_basic x.ip_id y.ip_id
         let equal x y = x.ip_id = y.ip_id
         let copy = Datatype.undefined
@@ -2290,23 +2309,26 @@ module Identified_predicate = struct
       end)
 end
 
-module Funbehavior =
-  Datatype.Make
-    (struct
-      include Datatype.Serializable_undefined
-      type t = funbehavior
-      let name = "Funbehavior"
-      let reprs =
-        [ {  b_name = "default!"; (* Cil.default_behavior_name *)
-             b_requires = Identified_predicate.reprs;
-             b_assumes = Identified_predicate.reprs;
-             b_post_cond =
-               List.map (fun x -> Normal, x) Identified_predicate.reprs;
-             b_assigns = WritesAny;
-             b_allocation = FreeAllocAny;
-             b_extended = []; } ]
-      let mem_project = Datatype.never_any_project
-    end)
+module Funbehavior = struct
+  let pretty_ref = ref (fun _ _ -> assert false)
+  include Datatype.Make
+      (struct
+        include Datatype.Serializable_undefined
+        type t = funbehavior
+        let name = "Funbehavior"
+        let reprs =
+          [ {  b_name = "default!"; (* Cil.default_behavior_name *)
+               b_requires = Identified_predicate.reprs;
+               b_assumes = Identified_predicate.reprs;
+               b_post_cond =
+                 List.map (fun x -> Normal, x) Identified_predicate.reprs;
+               b_assigns = WritesAny;
+               b_allocation = FreeAllocAny;
+               b_extended = []; } ]
+        let pretty fmt x = !pretty_ref fmt x
+        let mem_project = Datatype.never_any_project
+      end)
+end
 
 module Funspec = struct
   let pretty_ref = ref (fun _ _ -> assert false)

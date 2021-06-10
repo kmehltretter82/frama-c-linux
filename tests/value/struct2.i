@@ -1,5 +1,5 @@
 /* run.config*
-  GCC:
+  
   STDOPT: #"-main f_precis -absolute-valid-range 0x1000-0x2000"
 */
 struct st1 {

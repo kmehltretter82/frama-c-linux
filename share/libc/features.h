@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -34,27 +34,12 @@
 #define __POP_FC_STDLIB
 #endif
 
-#if defined(__clang__) && defined(__cplusplus)
-# define __CLANG_IGNORE_ATTRS_PUSH__ \
-_Pragma("clang diagnostic push") \
-_Pragma("clang diagnostic ignored \"-Wunknown-attributes\"")
-# define __CLANG_IGNORE_ATTRS_POP__ \
-_Pragma("clang diagnostic pop")
-#else
-# define __CLANG_IGNORE_ATTRS_PUSH__
-# define __CLANG_IGNORE_ATTRS_POP__
-#endif
-
 #ifdef	__cplusplus
-# define __BEGIN_DECLS \
-extern "C" { \
-  __CLANG_IGNORE_ATTRS_PUSH__
-# define __END_DECLS \
-__CLANG_IGNORE_ATTRS_POP__ \
-}
+# define __BEGIN_DECLS	extern "C" {
+# define __END_DECLS	}
 #else
-# define __BEGIN_DECLS __CLANG_IGNORE_ATTRS_PUSH__
-# define __END_DECLS __CLANG_IGNORE_ATTRS_POP__
+# define __BEGIN_DECLS
+# define __END_DECLS
 #endif
 
 #undef __LEAF

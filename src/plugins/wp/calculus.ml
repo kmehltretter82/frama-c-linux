@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -76,12 +76,12 @@ module Cfg (W : Mcfg.S) = struct
   let add_assigns_hyp wenv obj h_assigns = match h_assigns with
     | WpPropId.AssignsLocations (h_id, a) ->
         let hid = Some h_id in
-        let obj = W.use_assigns wenv a.WpPropId.a_stmt hid a obj in
+        let obj = W.use_assigns wenv hid a obj in
         Some a.WpPropId.a_label, obj
     | WpPropId.AssignsAny a ->
         Wp_parameters.warning ~current:true ~once:true
           "Missing assigns clause (assigns 'everything' instead)" ;
-        let obj = W.use_assigns wenv a.WpPropId.a_stmt None a obj in
+        let obj = W.use_assigns wenv None a obj in
         Some a.WpPropId.a_label, obj
     | WpPropId.NoAssignsInfo -> None, obj
 
@@ -476,7 +476,7 @@ module Cfg (W : Mcfg.S) = struct
           | (Set (lv, e, _)) -> W.assign wenv s lv e obj
           | (Asm _) ->
               let asm = WpPropId.mk_asm_assigns_desc s in
-              W.use_assigns wenv asm.WpPropId.a_stmt None asm obj
+              W.use_assigns wenv None asm obj
           | (Call _) -> assert false
           | Skip _ | Code_annot _ -> obj
         end
@@ -495,9 +495,8 @@ module Cfg (W : Mcfg.S) = struct
        | Mcfg.SC_Global -> "global"
        | Mcfg.SC_Block_in -> "block in"
        | Mcfg.SC_Block_out -> "block out"
-       | Mcfg.SC_Function_in -> "function in"
-       | Mcfg.SC_Function_frame -> "function frame"
-       | Mcfg.SC_Function_out -> "function out" )
+       | Mcfg.SC_Frame_in -> "frame in"
+       | Mcfg.SC_Frame_out -> "frame out" )
       (Pretty_utils.pp_list  ~sep:", " Printer.pp_varinfo) vars;
     match scope with
     | Mcfg.(SC_Block_in | SC_Block_out) when vars = [] -> obj
@@ -564,13 +563,12 @@ module Cfg (W : Mcfg.S) = struct
           Wp_error.unsupported "strange CFGs."
       | Cil2cfg.VfctIn ->
           let obj = get_only_succ env cfg v in
-          let obj = wp_scope wenv formals Mcfg.SC_Function_in obj in
           let obj = wp_scope wenv [] Mcfg.SC_Global obj in
           obj
       | Cil2cfg.VblkIn (Cil2cfg.Bfct, b) ->
           let obj = get_only_succ env cfg v in
           let obj = wp_scope wenv b.blocals Mcfg.SC_Block_in obj in
-          let obj = wp_scope wenv formals Mcfg.SC_Function_frame obj in
+          let obj = wp_scope wenv formals Mcfg.SC_Frame_in obj in
           obj
       | Cil2cfg.VblkOut (Cil2cfg.Bfct, b) ->
           let obj = get_only_succ env cfg v in
@@ -601,10 +599,9 @@ module Cfg (W : Mcfg.S) = struct
       | Cil2cfg.Vloop _ | Cil2cfg.Vloop2 _ ->
           let get_loop_head = fun n -> get_only_succ env cfg n in
           wp_loop env v e get_loop_head
-      | Cil2cfg.VfctOut
-      | Cil2cfg.Vexit ->
+      | Cil2cfg.VfctOut | Cil2cfg.VfctErr ->
           let obj = get_only_succ env cfg v (* exitpost / postcondition *) in
-          wp_scope wenv formals Mcfg.SC_Function_out obj
+          wp_scope wenv formals Mcfg.SC_Frame_out obj
       | Cil2cfg.Vend ->
           W.empty
           (* LC : unused entry point...
@@ -620,49 +617,7 @@ module Cfg (W : Mcfg.S) = struct
     Cil.CurrentLoc.set old_loc;
     res
 
-  let compute_global_init wenv filter obj =
-    Globals.Vars.fold_in_file_order
-      (fun var initinfo obj ->
-         if var.vstorage = Extern then obj else
-           let do_init = match filter with
-             | `All -> true
-             | `InitConst -> WpStrategy.isGlobalInitConst var
-           in if not do_init then obj
-           else
-             let old_loc = Cil.CurrentLoc.get () in
-             Cil.CurrentLoc.set var.vdecl ;
-             let obj = W.init wenv var initinfo.init obj in
-             Cil.CurrentLoc.set old_loc ; obj
-      ) obj
-
-  let process_global_const wenv obj =
-    Globals.Vars.fold_in_file_order
-      (fun var _initinfo obj ->
-         if WpStrategy.isGlobalInitConst var
-         then W.const wenv var obj
-         else obj
-      ) obj
-
-  (* WP of global initializations. *)
-  let process_global_init wenv kf obj =
-    if WpStrategy.is_main_init kf then
-      begin
-        let obj = W.label wenv None Clabels.init obj in
-        compute_global_init wenv `All obj
-      end
-    else if W.has_init wenv then
-      begin
-        let obj =
-          if WpStrategy.isInitConst ()
-          then process_global_const wenv obj else obj in
-        let obj = W.use_assigns wenv None None WpPropId.mk_init_assigns obj in
-        let obj = W.label wenv None Clabels.init obj in
-        compute_global_init wenv `All obj
-      end
-    else
-    if WpStrategy.isInitConst ()
-    then compute_global_init wenv `InitConst obj
-    else obj
+  module Init = CfgInit.Make(W)
 
   let get_weakest_precondition cfg ((kf, _g, strategy, res, wenv) as env) =
     debug "[wp-cfg] start Pass1";
@@ -673,7 +628,7 @@ module Cfg (W : Mcfg.S) = struct
      * but if not, it will only fetch Pass1 result. *)
     let e_start = Cil2cfg.start_edge cfg in
     let obj = get_wp_edge env e_start in
-    let obj = process_global_init wenv kf obj in
+    let obj = Init.process_global_init wenv kf obj in
     let obj = match WpStrategy.strategy_kind strategy with
       | WpStrategy.SKannots -> obj
       | WpStrategy.SKfroms info ->

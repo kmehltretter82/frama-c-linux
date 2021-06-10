@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -354,7 +354,7 @@ end = struct
         in ok
       | _ -> false
 
-    method private get_finfo () = Extlib.the fi
+    method private get_finfo () = Option.get fi
 
     method private add_stmt_keep stmt =
       keep_stmts <- Stmt.Set.add stmt keep_stmts
@@ -432,10 +432,10 @@ end = struct
       new_locals
 
     method! vcode_annot v =
-      Extlib.may Cil.CurrentLoc.set (Cil_datatype.Code_annotation.loc v);
+      Option.iter Cil.CurrentLoc.set (Cil_datatype.Code_annotation.loc v);
       let stmt =
         Visitor_behavior.Get_orig.stmt
-          self#behavior (Extlib.the self#current_stmt)
+          self#behavior (Option.get self#current_stmt)
       in
       debug "[annotation] stmt %d : %a @."
         stmt.sid Printer.pp_code_annotation v;
@@ -448,9 +448,12 @@ end = struct
           Printer.pp_code_annotation v;
         ChangeTo
           (Logic_const.new_code_annotation
-             (AAssert ([], Assert,
-                       { pred_name = []; pred_loc = Cil_datatype.Location.unknown;
-                         pred_content = Ptrue})))
+             (AAssert
+                ([],
+                 Logic_const.toplevel_predicate
+                   { pred_name = [];
+                     pred_loc = Cil_datatype.Location.unknown;
+                     pred_content = Ptrue})))
       end
 
     method private process_call is_init_call call_stmt lval _f args loc =
@@ -709,12 +712,13 @@ end = struct
       Varinfo.Hashtbl.clear local_visible;
       Varinfo.Hashtbl.add spec_table f.svar
         (visitCilFunspec (self:>Cil.cilVisitor)
-           (Annotations.funspec ~populate:false (Extlib.the self#current_kf)));
+           (Annotations.funspec ~populate:false (Option.get self#current_kf)));
       SkipChildren
 
     method private visit_pred p =
       Logic_const.new_predicate
-        (visitCilPredicate (self:>Cil.cilVisitor) p.ip_content)
+        (visitCilPredicate (self:>Cil.cilVisitor)
+           (Logic_const.pred_of_id_pred p))
 
     method private visit_identified_term t =
       let t' = visitCilTerm (self:>Cil.cilVisitor) t.it_content in
@@ -733,11 +737,15 @@ end = struct
     method! vbehavior b =
       let finfo = self#get_finfo () in
 
-      let pre_visible p =  Info.fun_precond_visible finfo p.ip_content in
+      let pre_visible p =
+        Info.fun_precond_visible finfo (Logic_const.pred_of_id_pred p)
+      in
       b.b_assumes <- filter_list pre_visible self#visit_pred b.b_assumes;
       b.b_requires <- filter_list pre_visible self#visit_pred b.b_requires;
 
-      let ensure_visible (_,p) = Info.fun_postcond_visible finfo p.ip_content in
+      let ensure_visible (_,p) =
+        Info.fun_postcond_visible finfo (Logic_const.pred_of_id_pred p)
+      in
       b.b_post_cond <-
         filter_list ensure_visible (fun (k,p) -> k,self#visit_pred p)
           b.b_post_cond;
@@ -768,7 +776,7 @@ end = struct
 
     method! vspec spec =
       debug "@[[vspec] for %a @\n@]@."
-        Kernel_function.pretty (Extlib.the self#current_kf);
+        Kernel_function.pretty (Option.get self#current_kf);
       let finfo = self#get_finfo () in
       let b = Cil.visitCilBehaviors (self:>Cil.cilVisitor) spec.spec_behavior in
       let b = List.filter (not $ Cil.is_empty_behavior) b in
@@ -785,7 +793,7 @@ end = struct
       let new_term = match spec.spec_terminates with
         | None -> None
         | Some p ->
-          if Info.fun_precond_visible finfo p.ip_content
+          if Info.fun_precond_visible finfo (Logic_const.pred_of_id_pred p)
           then Some (self#visit_pred p)
           else None
       in
@@ -800,7 +808,7 @@ end = struct
                    *)
 
     method private build_proto is_first finfo loc =
-      let kf = Extlib.the self#current_kf in
+      let kf = Option.get self#current_kf in
       fi <- Some finfo;
       let new_var = ff_var fun_vars kf finfo in
       (* we're building a prototype. *)
@@ -880,9 +888,9 @@ end = struct
       end
 
     method private compute_fct_prototypes (_fct_var,loc) =
-      let finfo_list = Info.fct_info pinfo (Extlib.the self#current_kf) in
+      let finfo_list = Info.fct_info pinfo (Option.get self#current_kf) in
       debug "@[[compute_fct_prototypes] for %a (x%d)@\n@]@."
-        Kernel_function.pretty (Extlib.the self#current_kf)
+        Kernel_function.pretty (Option.get self#current_kf)
         (List.length finfo_list);
       let build_cil_proto is_first finfo =
         self#build_proto is_first finfo loc
@@ -896,7 +904,7 @@ end = struct
 
     method private compute_fct_definitions f loc =
       let fvar = f.Cil_types.svar in
-      let kf = Extlib.the self#current_kf in
+      let kf = Option.get self#current_kf in
       let finfo_list = Info.fct_info pinfo kf in
       debug "@[[compute_fct_definitions] for %a (x%d)@\n@]@."
         Kernel_function.pretty kf (List.length finfo_list);
@@ -919,7 +927,7 @@ end = struct
           Varinfo.Hashtbl.add fi_table new_fct_var finfo;
           debug "@[[build_cil_fct] -> %s@\n@]@."
             (Info.fct_name
-               (Kernel_function.get_vi (Extlib.the self#current_kf)) finfo);
+               (Kernel_function.get_vi (Option.get self#current_kf)) finfo);
           let action () =
             Queue.add
               (fun () ->

@@ -1,5 +1,5 @@
 /* run.config
-   GCC:
+   
    STDOPT: +"-inout -deps -main appel_ptr_fct -fct-pdg appel_ptr_fct "
    STDOPT: +"-inout -deps -main appel_ptr_fct_bis -fct-pdg appel_ptr_fct_bis "
 */

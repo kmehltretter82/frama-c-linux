@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -220,6 +220,7 @@ struct
           Clabels.init , init ;
           Clabels.pre , seq.pre ;
           Clabels.post , seq.post ;
+          Clabels.exit , seq.post ;
         ] ;
     }
 
@@ -257,6 +258,10 @@ struct
       triggers = [];
       types = [];
     }
+
+  let has_at_frame frame label =
+    assert (not (Clabels.is_here label));
+    LabelMap.mem label frame.labels
 
   let mem_at_frame frame label =
     assert (not (Clabels.is_here label));
@@ -469,13 +474,13 @@ struct
   let cc_logic : (env -> Cil_types.term -> logic) ref
     = ref (fun _ _ -> assert false)
   let cc_region
-    : (env -> unfold:bool -> Cil_types.term -> loc Sigs.region) ref
-    = ref (fun _ ~unfold _ -> ignore unfold ; assert false)
+    : (env -> Cil_types.term -> loc Sigs.region) ref
+    = ref (fun _ -> assert false)
 
   let term env t = !cc_term env t
   let pred polarity env t = !cc_pred polarity env t
   let logic env t = !cc_logic env t
-  let region env ~unfold t = !cc_region env ~unfold t
+  let region env t = !cc_region env t
   let reads env ts = List.iter (fun t -> ignore (logic env t.it_content)) ts
 
   let bootstrap_term cc = cc_term := cc
@@ -498,7 +503,7 @@ struct
     | Pforall(qs,q) -> strip_forall (xs @ qs) q
     | _ -> xs , p
 
-  let compile_lemma cluster name ~assumed types labels lemma =
+  let compile_lemma cluster name ~kind types labels lemma =
     let qs,prop = strip_forall [] lemma in
     let xs,tgs,domain,prop,_ =
       let cc_pred = pred `Positive in
@@ -508,7 +513,7 @@ struct
     {
       l_name = name ;
       l_types = List.length types ;
-      l_assumed = assumed ;
+      l_kind = kind ;
       l_triggers = [tgs] ;
       l_forall = xs ;
       l_cluster = cluster ;
@@ -539,7 +544,7 @@ struct
             let trigger = Trigger.of_term result in
             Definitions.define_lemma {
               l_name = name ;
-              l_assumed = true ;
+              l_kind = Admit ;
               l_types = ldef.d_types ;
               l_forall = ldef.d_params ;
               l_triggers = [[trigger]] ;
@@ -721,7 +726,7 @@ struct
     (* Re-compile final cases *)
     let cases = List.map
         (fun (case,labels,types,lemma) ->
-           compile_lemma cluster ~assumed:true case types labels lemma)
+           compile_lemma cluster ~kind:Admit case types labels lemma)
         cases in
     Definitions.update_symbol { ldef with d_definition = Inductive cases } ;
     type_for_signature l ldef sigp (* sufficient *) ; SIG sigm
@@ -770,7 +775,7 @@ struct
                     {
                       l_name ;
                       l_types = 0 ;
-                      l_assumed = true ;
+                      l_kind = Admit ;
                       l_triggers = [frame.triggers] ;
                       l_forall = vs ;
                       l_cluster = cluster ;
@@ -801,9 +806,9 @@ struct
       Wp_parameters.warning ~source:l.lem_position
         "Lemma '%s' has labels, consider using global invariant instead."
         l.lem_name ;
+    let { tp_kind = kind ; tp_statement = p } = l.lem_predicate in
     Definitions.define_lemma
-      (compile_lemma c ~assumed:l.lem_axiom
-         l.lem_name l.lem_types l.lem_labels l.lem_property)
+      (compile_lemma c ~kind l.lem_name l.lem_types l.lem_labels p)
 
   let define_axiomatic cluster ax =
     begin
@@ -867,7 +872,7 @@ struct
   let logic_profile phi =
     begin
       List.iter (fun x -> logic_type x.lv_type) phi.l_profile ;
-      Extlib.may logic_type phi.l_type ;
+      Option.iter logic_type phi.l_type ;
     end
 
   (* -------------------------------------------------------------------------- *)

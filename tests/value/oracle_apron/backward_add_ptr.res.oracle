@@ -1,0 +1,28 @@
+71c71,74
+< [eva] tests/value/backward_add_ptr.c:91: Reusing old results for call to gm
+---
+> [eva] computing for function gm <- main3 <- main.
+>   Called from tests/value/backward_add_ptr.c:91.
+> [eva] Recording results for gm
+> [eva] Done for function gm
+93c96,99
+< [eva] tests/value/backward_add_ptr.c:110: Reusing old results for call to gm
+---
+> [eva] computing for function gm <- main3 <- main.
+>   Called from tests/value/backward_add_ptr.c:110.
+> [eva] Recording results for gm
+> [eva] Done for function gm
+107c113,116
+< [eva] tests/value/backward_add_ptr.c:125: Reusing old results for call to gm
+---
+> [eva] computing for function gm <- main3 <- main.
+>   Called from tests/value/backward_add_ptr.c:125.
+> [eva] Recording results for gm
+> [eva] Done for function gm
+160c169,172
+< [eva] tests/value/backward_add_ptr.c:160: Reusing old results for call to gm
+---
+> [eva] computing for function gm <- main4 <- main.
+>   Called from tests/value/backward_add_ptr.c:160.
+> [eva] Recording results for gm
+> [eva] Done for function gm

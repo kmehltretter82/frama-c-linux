@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -74,7 +74,7 @@ void *calloc(size_t nmemb, size_t size)
   return p;
 }
 
-char *__fc_env[ARG_MAX] __attribute__((FRAMA_C_MODEL));
+char *__fc_env[ARG_MAX];
 // To provide for some non-determinism, __fc_initenv initializes the
 // environment with an arbitrary string
 #define __FC_INITENV_LEN 64
@@ -111,7 +111,7 @@ char *getenv(const char *name)
 
 int putenv(char *string)
 {
-  char *separator = strchr(string, '=');
+  char *separator __attribute__((unused)) = strchr(string, '=');
   //@ assert string_contains_separator: separator != \null;
   //@ assert name_is_not_empty: separator != string;
 

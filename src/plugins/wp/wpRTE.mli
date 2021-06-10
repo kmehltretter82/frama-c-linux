@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -23,6 +23,9 @@
 (** Invoke RTE to generate missing annotations
     for the given function and model. *)
 val generate : WpContext.model -> Kernel_function.t -> unit
+
+(** Invoke RTE on all selected functions *)
+val generate_all : WpContext.model -> unit
 
 (** Returns [true] if RTE annotations should be generated for
     the given function and model (and are not generated yet). *)

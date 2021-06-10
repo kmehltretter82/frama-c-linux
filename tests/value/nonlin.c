@@ -16,8 +16,14 @@ void subdivide_pointer () {
   int *q = p + i - i;
   /* The complete expression is a singleton: no subdivision. */
   y = *(&y + i - i);
-  /* The complete expression is an imprecise integer: subdivision (but not
+  /* The complete expression is an imprecise integer: subdivision (but no
      reduction, as it cannot improve the bounds of the result). */
+  y = *(p + i - i);
+  /* The subexpression contains a pointer, but the complete expression is an
+     integer, and the subdivision can reduce its value. */
+  int t[10] = {0, 1, 2, 4, 5, 6, 7, 8, 9};
+  p = &t[0];
+  i = Frama_C_interval(0, 10);
   y = *(p + i - i);
   /* The splitted lvalue contains a pointer value: no subdivision. */
   i = v ? i : (int) &x;

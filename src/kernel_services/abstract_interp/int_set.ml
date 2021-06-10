@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -152,7 +152,7 @@ let for_all f (a : Integer.t array) =
   let rec c i = i = l || ((f a.(i)) && c (succ i)) in
   c 0
 
-let exists = Extlib.array_exists
+let exists = Array.exists
 
 let iter = Array.iter
 let fold ?(increasing=true) =
@@ -318,7 +318,7 @@ let apply_bin_1_strict_decr f x (s : Integer.t array) =
   in
   c 0
 
-let apply2_n f (s1 : Integer.t array) (s2 : Integer.t array) =
+let apply2 f (s1 : Integer.t array) (s2 : Integer.t array) =
   let ps = ref empty_ps in
   let l1 = Array.length s1 in
   let l2 = Array.length s2 in
@@ -575,10 +575,10 @@ let complement_under ~min ~max set =
     end
   done;
   let b, e = Int.succ (get (!index-1)), Int.pred (get !index) in
-  let card = Int.(to_int (succ (sub e b))) in
-  if card <= 0 then `Bottom
-  else if card <= !small_cardinal
-  then `Set (Array.init card (fun i -> Int.add b (Int.of_int i)))
+  let card = Int.succ (Int.sub e b) in
+  if Int.(le card zero) then `Bottom
+  else if Int.le card (Int.of_int !small_cardinal)
+  then `Set (Array.init (Int.to_int card) (fun i -> Int.add b (Int.of_int i)))
   else `Top (b, e, Int.one)
 
 (* ------------------------------ Arithmetics ------------------------------- *)
@@ -588,7 +588,7 @@ let add_singleton = apply_bin_1_strict_incr Int.add
 let add s1 s2 =
   match s1, s2 with
   | [| x |], s | s, [| x |] -> `Set (apply_bin_1_strict_incr Int.add x s)
-  | _, _ -> apply2_n Int.add s1 s2
+  | _, _ -> apply2 Int.add s1 s2
 
 let add_under s1 s2 =
   match s1, s2 with
@@ -619,7 +619,7 @@ let scale f s =
 let mul s1 s2 =
   match s1, s2 with
   | s, [| x |] | [| x |], s -> `Set (scale x s)
-  | _, _ -> apply2_n Int.mul s1 s2
+  | _, _ -> apply2 Int.mul s1 s2
 
 let scale_div ~pos f s =
   assert (not (Int.is_zero f));

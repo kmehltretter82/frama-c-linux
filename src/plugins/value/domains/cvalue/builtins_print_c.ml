@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -140,7 +140,7 @@ let pretty_pointer_assignment fmt typname lv v =
     Kernel.abort ~current:true
       "pretty_pointer_assignment expected cardinal zero or one@ \
        for value %a (lv %s);@ \
-       (did you forget -val-no-alloc-returns-null?)" Cvalue.V.pretty v lv
+       (did you forget -eva-no-alloc-returns-null?)" Cvalue.V.pretty v lv
 
 let types = Hashtbl.create 7;;
 
@@ -325,25 +325,17 @@ let pretty_state_as_c_assignments fmt state =
 let frama_c_dump_assert state _actuals =
   Value_parameters.result ~current:true "Frama_C_dump_assert_each called:@\n(%a)@\nEnd of Frama_C_dump_assert_each output"
     pretty_state_as_c_assert state;
-  { Value_types.c_values = [None, state];
-    c_clobbered = Base.SetLattice.bottom;
-    c_from = None;
-    c_cacheable = Value_types.NoCache;
-  }
+  Builtins.States [state]
 
-let () = Builtins.register_builtin "Frama_C_dump_assert_each" frama_c_dump_assert
+let () = Builtins.register_builtin "Frama_C_dump_assert_each" NoCache frama_c_dump_assert
 
 let frama_c_dump_assignments state _actuals =
   Value_parameters.result ~current:true "Frama_C_dump_assignment_each called:@\n%a@\nEnd of Frama_C_dump_assignment_each output"
     pretty_state_as_c_assignments state;
-  { Value_types.c_values = [None, state];
-    c_clobbered = Base.SetLattice.bottom;
-    c_from = None;
-    c_cacheable = Value_types.NoCache;
-  }
+  Builtins.States [state]
 
 let () =
-  Builtins.register_builtin "Frama_C_dump_assignments_each" frama_c_dump_assignments
+  Builtins.register_builtin "Frama_C_dump_assignments_each" NoCache frama_c_dump_assignments
 
 
 (*

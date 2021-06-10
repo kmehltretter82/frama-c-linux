@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -311,6 +311,15 @@ let print_model_annot fmt ty =
     (print_logic_type None) ty.model_type
     ty.model_name
 
+let rec print_extended_decl fmt d =
+  let aux fmt d = print_extended_decl fmt d.extended_node in
+  match d with
+  | Ext_lexpr(name,d) ->
+    fprintf fmt "@[<2>%s@ %a@]" name (pp_list ~sep:",@ " print_lexpr) d
+  | Ext_extension(name,id,d) ->
+    fprintf fmt "@[<2>%s@ %s@ {@\n%a@]@\n}" name id
+      (pp_list ~sep:"@\n" aux) d
+
 let rec print_decl fmt d =
   match d.decl_node with
   | LDlogic_def(name,labels,tvar,rt,prms,body) ->
@@ -355,12 +364,12 @@ let rec print_decl fmt d =
       (pp_list ~pre:"<@[" ~sep:",@ " ~suf:"@>}" pp_print_string) tvar
       (pp_list ~sep:",@ " print_typed_ident) prms
       (pp_list ~sep:"@\n" print_case) cases
-  | LDlemma(name,is_axiom,labels,tvar,body) ->
+  | LDlemma(name,labels,tvar,body) ->
     fprintf fmt "@[<2>%a@ %s%a%a:@ %a;@]"
-      (pp_cond ~pr_false:"lemma" is_axiom) "axiom" name
+      Cil_printer.pp_lemma_kind body.tp_kind name
       (pp_list ~pre:"{@[" ~sep:",@ " ~suf:"@]}" pp_print_string) labels
       (pp_list ~pre:"<@[" ~sep:",@ " ~suf:"@>}" pp_print_string) tvar
-      print_lexpr body
+      print_lexpr body.tp_statement
   | LDaxiomatic (s,d) ->
     fprintf fmt "@[<2>axiomatic@ %s@ {@\n%a@]@\n}" s
       (pp_list ~sep:"@\n" print_decl) d
@@ -373,8 +382,7 @@ let rec print_decl fmt d =
       (pp_list ~pre:"@[" ~sep:",@ " ~suf:"@]" print_lexpr) tsets
       (pp_opt ~pre:"@ reads@ " pp_print_string) read
       (pp_opt ~pre:"@ writes@ " pp_print_string) write
-  | LDextended (s,l) ->
-    fprintf fmt "@[<2>%s@ %a@]" s (pp_list ~sep:",@ " print_lexpr) l
+  | LDextended d -> print_extended_decl fmt d
 
 let print_deps fmt deps =
   match deps with
@@ -409,14 +417,18 @@ let print_allocation ~isloop fmt fa =
 
 let print_clause name fmt e = fprintf fmt "@\n%s@ %a;" name print_lexpr e
 
+let print_tp_clause name fmt e =
+  let name = Cil_printer.string_of_predicate ~kw:name e.tp_kind in
+  print_clause name fmt e.tp_statement
+
 let print_post fmt (k,e) =
-  print_clause (Cil_printer.get_termination_kind_name k) fmt e
+  print_tp_clause (Cil_printer.get_termination_kind_name k) fmt e
 
 let print_behavior fmt bhv =
   fprintf fmt "@[<2>behavior@ %s:%a%a%a%a%a@]"
     bhv.b_name
     (pp_list ~pre:"" ~suf:"" (print_clause "assumes")) bhv.b_assumes
-    (pp_list ~pre:"" ~suf:"" (print_clause "requires")) bhv.b_requires
+    (pp_list ~pre:"" ~suf:"" (print_tp_clause "requires")) bhv.b_requires
     (pp_list ~pre:"" ~suf:"" print_post) bhv.b_post_cond
     (print_allocation ~isloop:false) bhv.b_allocation
     print_assigns bhv.b_assigns
@@ -463,10 +475,6 @@ let print_pragma fmt p =
   | Slice_pragma p -> fprintf fmt "slice@ pragma@ %a;" print_slice_pragma p
   | Impact_pragma p -> fprintf fmt "impact@ pragma@ %a;" print_impact_pragma p
 
-let print_assertion_kind fmt = function
-  | Assert -> pp_print_string fmt "assert"
-  | Check -> pp_print_string fmt "check"
-
 let print_extension fmt (name, ext) =
   fprintf fmt "%s %a" name (pp_list ~sep:",@ " print_lexpr) ext
 
@@ -475,16 +483,21 @@ let print_code_annot fmt ca =
     (pp_list ~pre:"for@ " ~sep:",@ " ~suf:":@ " pp_print_string) fmt bhvs
   in
   match ca with
-    AAssert(bhvs,kind,e) ->
+    AAssert(bhvs,e) ->
     fprintf fmt "%a%a@ %a;"
-      print_behaviors bhvs print_assertion_kind kind print_lexpr e
+      print_behaviors bhvs
+      Cil_printer.pp_assert_kind e.tp_kind
+      print_lexpr e.tp_statement
   | AStmtSpec (bhvs,s) ->
     fprintf fmt "%a%a"
       print_behaviors bhvs
       print_spec s
   | AInvariant (bhvs,loop,e) ->
-    fprintf fmt "%a%ainvariant@ %a;"
-      print_behaviors bhvs (pp_cond loop) "loop@ " print_lexpr e
+    let kw = if loop then "loop invariant" else "invariant" in
+    fprintf fmt "%a%a@ %a;"
+      print_behaviors bhvs
+      (Cil_printer.pp_predicate_kind ~kw) e.tp_kind
+      print_lexpr e.tp_statement
   | AVariant e -> fprintf fmt "loop@ variant@ %a;" print_variant e
   | AAssigns (bhvs,a) ->
     fprintf fmt "%aloop@ %a" print_behaviors bhvs print_assigns a

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -176,17 +176,22 @@ class visitor fmt c =
         engine#declare_type fmt (Lang.adt lt) (List.length lt.lt_params) def ;
       end
 
-    method on_comp c fts =
+    method private gen_on_comp kind c fts =
       begin
         self#paragraph ;
-        engine#declare_type fmt (Lang.comp c) 0 (Qed.Engine.Trec fts) ;
+        let adt = match kind with
+          | KValue -> Lang.comp c
+          | KInit -> Lang.comp_init c
+        in
+        let t = match fts with
+          | None -> Qed.Engine.Tabs
+          | Some fts -> Qed.Engine.Trec fts
+        in
+        engine#declare_type fmt adt 0 t ;
       end
 
-    method on_icomp c fts =
-      begin
-        self#paragraph ;
-        engine#declare_type fmt (Lang.comp_init c) 0 (Qed.Engine.Trec fts) ;
-      end
+    method on_comp = self#gen_on_comp KValue
+    method on_icomp = self#gen_on_comp KInit
 
     method on_dlemma l =
       begin
@@ -599,9 +604,9 @@ let prove_session ~mode w =
     compile_headers w.cw_includes false w.cw_headers >>=
     begin fun () ->
       match mode with
-      | BatchMode -> try_prove w
-      | EditMode -> try_coqide w
-      | FixMode ->
+      | Batch | Update -> try_prove w
+      | Edit -> try_coqide w
+      | Fix | FixUpdate ->
           begin
             try_prove w >>> function
             | Task.Result true -> Task.return true
@@ -650,7 +655,7 @@ let prove_annot wpo vcq ~mode =
     begin fun () ->
       let prop =
         WpContext.on_context (Wpo.get_context wpo)
-          GOAL.compute_proof vcq.VC_Annot.goal in
+          (GOAL.compute_proof ~pid:wpo.po_pid) vcq.VC_Annot.goal in
       prove_prop wpo ~mode ~axioms:None ~prop
     end
 

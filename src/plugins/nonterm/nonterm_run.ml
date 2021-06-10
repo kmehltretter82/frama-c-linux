@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -104,13 +104,17 @@ let pp_numbered_stacks fmt callstacks =
             Format.pp_print_int Value_types.Callstack.pretty))
       numbered_callstacks
 
+let wkey_stmt = Self.register_warn_category "stmt"
+
 let warn_nonterminating_statement stmt callstacks =
-  Self.warning ~source:(fst (Stmt.loc stmt))
+  Self.warning ~wkey:wkey_stmt ~source:(fst (Stmt.loc stmt))
     "non-terminating %a@\n%a"
     pretty_stmt_kind stmt pp_numbered_stacks callstacks
 
+let wkey_dead = Self.register_warn_category "dead-code"
+
 let warn_dead_code stmt =
-  Self.warning ~source:(fst (Stmt.loc stmt))
+  Self.warning ~wkey:wkey_dead ~source:(fst (Stmt.loc stmt))
     "%a is syntactically unreachable" pretty_stmt_kind stmt
 
 class dead_cc_collector kf = object
@@ -155,8 +159,10 @@ class dead_cc_collector kf = object
     Cil.DoChildren
 end
 
+let wkey_unreachable = Self.register_warn_category "unreachable"
+
 let warn_unreachable_statement stmt =
-  Self.warning ~source:(fst (Stmt.loc stmt))
+  Self.warning ~wkey:wkey_unreachable ~source:(fst (Stmt.loc stmt))
     "unreachable %a" pretty_stmt_kind stmt
 
 class unreachable_stmt_visitor kf to_ignore = object
@@ -239,7 +245,7 @@ let check_unreachable_statements kf ~to_ignore ~dead_code ~warned_kfs =
    are ignored if:
    1. the function is in the list of functions to be ignored;
    2. or the function has a body AND its specification is not being used
-      via -val-use-spec.
+      via -eva-use-spec.
    In case 2, the call is ignored because non-terminating statements inside
    it will already be reported. *)
 let ignore_kf name =

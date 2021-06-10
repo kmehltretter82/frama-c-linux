@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -60,21 +60,21 @@ class form : unit ->
 
     method add_label_widget : GObj.widget -> unit
     (** Inserts a small (fixed) widget in place of a label.
-        	Moves to right column. *)
+          Moves to right column. *)
 
     method add_field : ?label:string -> ?field:field -> GObj.widget -> unit
     (** Inserts an entry in the form.
         Optional label is inserted in right column is specified.
         Default [field] is [`Field].
         Moves to next line. *)
-      
+
     method add_row :
       ?field:field ->
       ?xpadding:int ->
       ?ypadding:int -> GObj.widget -> unit
-    (** Inserts a wide entry in the form, spanning the two columns.
-        Default [field] is [`Field].
-        Moves to next line. *)
+      (** Inserts a wide entry in the form, spanning the two columns.
+          Default [field] is [`Field].
+          Moves to next line. *)
   end
 
 (** {2 Tabbed-pane} *)

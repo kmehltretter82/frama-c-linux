@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -26,7 +26,7 @@
 
 type t = {
   remove_trivial: bool;
-  initialized: bool;
+  initialized: Kernel_function.Set.t ;
   mem_access: bool;
   div_mod: bool;
   shift: bool;
@@ -44,9 +44,10 @@ type t = {
   bool_value: bool;
 }
 
-let all = {
+let all () = {
   remove_trivial = true;
-  initialized = true;
+  initialized =
+    Globals.Functions.fold Kernel_function.Set.add Kernel_function.Set.empty;
   mem_access = true;
   div_mod = true;
   shift = true;
@@ -66,7 +67,7 @@ let all = {
 
 let none = {
   remove_trivial = false;
-  initialized = false;
+  initialized = Kernel_function.Set.empty;
   mem_access = false;
   div_mod = false;
   shift = false;
@@ -87,7 +88,7 @@ let none = {
 (* Which annotations should be added,
    from local options, or deduced from the options of RTE and the kernel *)
 
-let option (get : unit -> bool) = function None -> get () | Some flag -> flag
+let option get = function None -> get () | Some flag -> flag
 
 let default
     ?remove_trivial

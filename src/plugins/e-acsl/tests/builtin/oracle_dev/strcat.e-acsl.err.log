@@ -1,0 +1,40 @@
+TEST 1: OK: Expected execution at tests/builtin/strcat.c:27
+TEST 2: OK: Expected execution at tests/builtin/strcat.c:28
+strcat: insufficient space in destination string, available: 8 bytes, requires at least 9 bytes
+TEST 3: OK: Expected signal at tests/builtin/strcat.c:29
+strcat: destination string string unallocated
+TEST 4: OK: Expected signal at tests/builtin/strcat.c:30
+strcat: source string string unallocated
+TEST 5: OK: Expected signal at tests/builtin/strcat.c:31
+strcat: destination string string unallocated
+TEST 6: OK: Expected signal at tests/builtin/strcat.c:32
+strcat: source string string unallocated
+TEST 7: OK: Expected signal at tests/builtin/strcat.c:33
+strcat: destination string string is not writable
+TEST 8: OK: Expected signal at tests/builtin/strcat.c:34
+strcat: overlapping memory areas
+TEST 9: OK: Expected signal at tests/builtin/strcat.c:35
+strcat: overlapping memory areas
+TEST 10: OK: Expected signal at tests/builtin/strcat.c:36
+strcat: overlapping memory areas
+TEST 11: OK: Expected signal at tests/builtin/strcat.c:37
+TEST 12: OK: Expected execution at tests/builtin/strcat.c:38
+TEST 13: OK: Expected execution at tests/builtin/strcat.c:51
+strncat: insufficient space in destination string, available: 8 bytes, requires at least 9 bytes
+TEST 14: OK: Expected signal at tests/builtin/strcat.c:52
+strcat: destination string string unallocated
+TEST 15: OK: Expected signal at tests/builtin/strcat.c:53
+strncat: source string string unallocated
+TEST 16: OK: Expected signal at tests/builtin/strcat.c:54
+strcat: destination string string unallocated
+TEST 17: OK: Expected signal at tests/builtin/strcat.c:55
+strncat: source string string unallocated
+TEST 18: OK: Expected signal at tests/builtin/strcat.c:56
+strcat: destination string string is not writable
+TEST 19: OK: Expected signal at tests/builtin/strcat.c:57
+strcat: overlapping memory areas
+TEST 20: OK: Expected signal at tests/builtin/strcat.c:59
+strncat: insufficient space in destination string, available: 6 bytes, requires at least 7 bytes
+TEST 21: OK: Expected signal at tests/builtin/strcat.c:60
+strcat: overlapping memory areas
+TEST 22: OK: Expected signal at tests/builtin/strcat.c:61

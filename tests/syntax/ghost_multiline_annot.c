@@ -1,18 +1,18 @@
 /* run.config
    STDOPT: +" -cpp-extra-args=-DP0"
+ EXIT: 1
    STDOPT: +" -cpp-extra-args=-DP1"
    STDOPT: +" -cpp-extra-args=-DP2"
    STDOPT: +" -cpp-extra-args=-DP3"
    STDOPT: +" -cpp-extra-args=-DP4"
    STDOPT: +" -cpp-extra-args=-DP5"
+ EXIT: 0
    STDOPT: +" -cpp-extra-args=-DP6"
    STDOPT: +" -cpp-extra-args=-DP7"
    STDOPT: +" -cpp-extra-args=-DP8"
 */
-
 #ifdef P0
-int main(int c)
-{
+int main(int c) {
   /*@ ghost //@ requires c >= 0;
       int x = c;
       /@ loop invariant x >= 0;

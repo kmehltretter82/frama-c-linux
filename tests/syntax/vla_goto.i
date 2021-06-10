@@ -1,3 +1,9 @@
+/* run.config*
+ EXIT: 1
+   STDOPT:
+*/
+
+
 int case2(int arg) {
   {
     int a2[arg];

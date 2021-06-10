@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -29,6 +29,7 @@ val html_stag_functions : Format.formatter_stag_functions;;
     - level 1 headers are underlined by '='
     - level 2 headers by '-'
     - level 3 headers by '~'
+
     This function is supposed to follow reStructuredText's conventions.
 *)
 val mk_hdr : int -> Format.formatter -> string -> unit;;
@@ -52,7 +53,7 @@ module BasicMetrics : sig
                                  function, possibly more for a file.*)
     cptrs: int ;             (** Access to pointers *)
     cdecision_points: int ;  (** Decision points of the program: ifs,
-                              switch cases, exception handlers, ... *)
+                                 switch cases, exception handlers, ... *)
     cglob_vars: int;         (** Global variables *)
     ccyclo: int;             (** Cyclomatic complexity *)
   }
@@ -108,6 +109,10 @@ val pretty_set : Format.formatter -> int VInfoMap.t -> unit
 
 val pretty_extern_vars: Format.formatter -> VInfoSet.t -> unit
 
+(** Build a JSON list with the varinfos in [m], each as a JSON object with
+    the varinfo name as key and additional attributes as values. *)
+val json_of_varinfo_map : int VInfoMap.t -> Yojson.t
+
 (** Handling entry points informations *)
 val number_entry_points : int VInfoMap.t -> int
 ;;
@@ -115,6 +120,8 @@ val number_entry_points : int VInfoMap.t -> int
 val pretty_entry_points :
   Format.formatter -> int VInfoMap.t -> unit
 ;;
+
+val json_of_entry_points : int VInfoMap.t -> Yojson.t
 
 (** Get the filename where the definition of a varinfo occurs *)
 val file_of_vinfodef: Cil_types.varinfo -> Datatype.Filepath.t;;
@@ -133,12 +140,13 @@ val get_filename: Cabs.definition -> Datatype.Filepath.t;;
 type output_type =
   | Html
   | Text
+  | Json
 ;;
 
 (** get_file_type [extension] sets the output type according to [extension].
     Raises an error if [extension] is not among supported extensions or is empty.
 *)
-val get_file_type: string -> output_type;;
+val get_file_type: Filepath.Normalized.t -> output_type;;
 
 (** consider_function [vinfo] returns false if the varinfo is not a function we
     are interested in.
@@ -149,15 +157,14 @@ val get_file_type: string -> output_type;;
 val consider_function: libc:bool -> Cil_types.varinfo -> bool
 
 (** [consider_variable vinfo] returns false if the varinfo is not an object
-    variable we are interested in. Currently excluded variables are those
-    declared with attribute [__FRAMA_C_MODEL__].
+    variable we are interested in.
     If [libc] is false, do not consider variables from the Frama-C libc.
 *)
 val consider_variable: libc:bool -> Cil_types.varinfo -> bool
 
 (** Convert float to string with the following convention:
     - if the float is an integer (ie, it has no digits after the decimal point),
-    print it as such;
+      print it as such;
     - otherwise, print the first two digits after the decimal point.
 *)
 val float_to_string : float -> string ;;

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -24,6 +24,7 @@ let no_status = `Share "theme/default/never_tried.png"
 let ok_status = `Share "theme/default/surely_valid.png"
 let ko_status = `Share "theme/default/unknown.png"
 let wg_status = `Share "theme/default/surely_invalid.png"
+let smoke_status = `Share "theme/default/valid_under_hyp.png"
 
 let filter = function
   | VCS.Qed | VCS.Tactical | VCS.NativeCoq -> false

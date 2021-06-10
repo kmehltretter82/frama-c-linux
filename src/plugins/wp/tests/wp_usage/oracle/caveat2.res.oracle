@@ -1,9 +1,8 @@
 # frama-c -wp -wp-model 'Typed (Caveat)' [...]
 [kernel] Parsing tests/wp_usage/caveat2.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
-[wp] tests/wp_usage/caveat2.i:22: Warning: Undefined array-size (sint32[])
+[wp] tests/wp_usage/caveat2.i:14: Warning: Undefined array-size (sint32[])
 ------------------------------------------------------------
   Function job
 ------------------------------------------------------------
@@ -14,6 +13,9 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Post-condition 'A' in 'job':
+tests/wp_usage/caveat2.i:14: warning from Typed Model:
+ - Warning: No allocation size for variable 'b'
+   Reason: Undefined array-size (sint32[])
 Let a = global(G_b_26).
 Assume {
   Type: is_sint32(i_1) /\ is_sint32(n).
@@ -21,6 +23,9 @@ Assume {
   When: (0 <= i) /\ (i < n).
   (* Pre-condition *)
   Have: (0 <= n) /\ (n <= 3).
+  Have: ({ Init_p_0 with Init_F1_S_n = true }) = Init_p_0.
+  (* Loop assigns ... *)
+  Have: ({ Init_p_0 with Init_F1_S_a = v_1 }) = Init_p_0.
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
       (Mint_0[shift_sint32(a, i_2)] = v[i_2]))).
@@ -38,9 +43,12 @@ Assume {
   Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(1 + i).
   (* Pre-condition *)
   Have: (0 <= n) /\ (n <= 3).
+  Have: ({ Init_p_0 with Init_F1_S_n = true }) = Init_p_0.
+  (* Loop assigns ... *)
+  Have: ({ Init_p_0 with Init_F1_S_a = v }) = Init_p_0.
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (Mint_0[shift_sint32(global(G_b_26), i_1)] = v[i_1]))).
+      (Mint_0[shift_sint32(global(G_b_26), i_1)] = v_1[i_1]))).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= n).
   (* Then *)
@@ -56,9 +64,6 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Preservation of Invariant (file tests/wp_usage/caveat2.i, line 22):
-tests/wp_usage/caveat2.i:22: warning from Typed Model:
- - Warning: No allocation size for variable 'b'
-   Reason: Undefined array-size (sint32[])
 Let a = global(G_b_26).
 Assume {
   Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(1 + i).
@@ -66,6 +71,9 @@ Assume {
   When: (0 <= i_1) /\ (i_1 <= i).
   (* Pre-condition *)
   Have: (0 <= n) /\ (n <= 3).
+  Have: ({ Init_p_0 with Init_F1_S_n = true }) = Init_p_0.
+  (* Loop assigns ... *)
+  Have: ({ Init_p_0 with Init_F1_S_a = v_1 }) = Init_p_0.
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
       (Mint_0[shift_sint32(a, i_2)] = v[i_2]))).
@@ -98,11 +106,12 @@ Effect at line 25
 Prove: true.
 
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'job':
+[wp] tests/wp_usage/caveat2.i:17: Warning: 
+  Memory model hypotheses for function 'job':
   /*@
-     behavior typed_caveat:
-     requires \separated(p,b+(..));
-     requires \valid(p);
-     requires \valid(b+(..));
+     behavior wp_typed_caveat:
+       requires \valid(b + (..));
+       requires \valid(p);
+       requires \separated(p, b + (..));
      */
   void job(struct S *p, int n, int *b);

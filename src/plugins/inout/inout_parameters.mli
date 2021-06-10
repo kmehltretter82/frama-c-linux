@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -28,7 +28,6 @@ module ForceExternalOut: Parameter_sig.Bool
 module ForceInput: Parameter_sig.Bool
 module ForceInputWithFormals: Parameter_sig.Bool
 module ForceInout: Parameter_sig.Bool
-module ForceCallwiseInout: Parameter_sig.Bool
 module ForceInoutExternalWithFormals: Parameter_sig.Bool
 module ForceDeref: Parameter_sig.Bool
 

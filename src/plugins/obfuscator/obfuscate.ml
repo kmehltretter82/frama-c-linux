@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -52,12 +52,12 @@ class visitor = object
 
   method! vglob_aux = function
     | GType (ty,_) ->
-      if not (Cil.typeHasAttribute "fc_stdlib" ty.ttype) then
+      if not (Cil.is_in_libc (Cil.typeAttrs ty.ttype)) then
         ty.tname <- Dictionary.fresh Obfuscator_kind.Type ty.tname;
       Cil.DoChildren
     | GVarDecl (v, _) | GVar (v, _, _)
     | GFun ({svar = v}, _) | GFunDecl (_, v, _)
-      when Cil.is_unused_builtin v ->
+      when Cil_builtins.is_unused_builtin v ->
       Cil.SkipChildren
     | _ ->
       Cil.DoChildren
@@ -101,9 +101,9 @@ class visitor = object
     else begin
       if Cil.isFunctionType vi.vtype then begin
         if vi.vname <> "main"
-        && not (Cil.is_builtin vi)
-        && not (Cil.is_special_builtin vi.vname)
-        && not (Cil.hasAttribute "fc_stdlib" vi.vattr) then
+        && not (Cil_builtins.is_builtin vi)
+        && not (Cil_builtins.is_special_builtin vi.vname)
+        && not (Cil.is_in_libc vi.vattr) then
           vi.vname <- Dictionary.fresh Obfuscator_kind.Function vi.vname
       end
       else begin
@@ -150,11 +150,14 @@ class visitor = object
       Cil.SkipChildren
     else begin
       Identified_predicate.Hashtbl.add id_pred_visited p ();
-      let names = p.ip_content.pred_name in
+      let { tp_kind; tp_statement = pred } = p.ip_content in
+      let names = pred.pred_name in
       let names' =
         List.map (Dictionary.fresh Obfuscator_kind.Predicate) names
       in
-      let p' = { p with ip_content = { p.ip_content with pred_name = names'}} in
+      let pred' = { pred with pred_name = names' } in
+      let ip_content = Logic_const.toplevel_predicate ~kind:tp_kind pred' in
+      let p' = { p with ip_content } in
       Cil.ChangeDoChildrenPost (p', Extlib.id)
     end
 
@@ -166,8 +169,8 @@ class visitor = object
     | Daxiomatic(str, _, _, _) ->
       warn "axiomatic" str;
       Cil.DoChildren
-    | Dlemma(str, axiom, _, _, _, _, _) ->
-      warn (if axiom then "axiom" else "lemma") str;
+    | Dlemma(str, _, _, { tp_kind }, _, _) ->
+      warn (Cil_printer.string_of_lemma tp_kind) str;
       Cil.DoChildren
     | _ ->
       Cil.DoChildren

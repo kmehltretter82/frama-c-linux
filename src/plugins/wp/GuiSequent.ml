@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -341,7 +341,7 @@ class pcond
     (focus : step_selection)
     (plang : Pcond.state) =
   object(self)
-    inherit Pcond.sequence plang as super
+    inherit Pcond.seqengine plang as super
 
     (* All displayed entries *)
     val mutable domain = Vars.empty

@@ -1,15 +1,15 @@
 [kernel] Parsing tests/syntax/typedef_namespace_bts1500.c (with preprocessing)
-[kernel] tests/syntax/typedef_namespace_bts1500.c:20: 
+[kernel] tests/syntax/typedef_namespace_bts1500.c:21: 
   syntax error:
-  Location: between lines 20 and 23, before or at token: y
-  18    int main () {
-  19      digit x = 4;
+  Location: between lines 21 and 24, before or at token: y
+  19    int main () {
+  20      digit x = 4;
   
-  20      int digit = 3;
-  21      // error: digit is now a variable
-  22    #ifdef HIDING_TYPEDEF
-  23      digit y = 5;
+  21      int digit = 3;
+  22      // error: digit is now a variable
+  23    #ifdef HIDING_TYPEDEF
+  24      digit y = 5;
   
-  24    #endif
-  25      return x + digit+A;
+  25    #endif
+  26      return x + digit+A;
 [kernel] Frama-C aborted: invalid user input.

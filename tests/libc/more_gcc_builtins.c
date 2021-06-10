@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: #"-machdep gcc_x86_32"
+   STDOPT: +"-machdep gcc_x86_32"
  */
 
 volatile int v;

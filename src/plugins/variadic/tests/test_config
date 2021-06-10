@@ -1,1 +1,2 @@
-OPT: -no-autoload-plugins -load-module from,inout,eva,variadic,scope -check -print -kernel-verbose 0 -variadic-verbose 2 -eva -slevel 10 -eva-msg-key=-initial-state,-summary -eva-no-show-progress -eva-print
+PLUGIN: variadic from,inout,eva,scope
+OPT: -print -kernel-verbose 0 -variadic-verbose 2 -eva -eva-slevel 10 -eva-msg-key=-initial-state,-summary -eva-no-show-progress -eva-print

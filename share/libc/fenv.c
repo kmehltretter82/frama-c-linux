@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -33,13 +33,13 @@ __PUSH_FC_STDLIB
  */
 int fetestexcept( int excepts )
 {
-  static volatile int __fc_random_fetestexcept __attribute__((FRAMA_C_MODEL)); /* random represent the FPU status word. */
+  static volatile int __fc_random_fetestexcept; /* random represent the FPU status word. */
 
   return (0x00FF & __fc_random_fetestexcept); /* B, C3, TOSP, C2, C1, and C0 don't matter. Mask the selected bits. */
 }
 
 
-volatile fenv_t __fc_fenv_state __attribute__((FRAMA_C_MODEL));
+volatile fenv_t __fc_fenv_state;
 
 
 /** Saves the current floating-point environment in the object pointed to by

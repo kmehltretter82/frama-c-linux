@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -216,9 +216,10 @@ let local_printer: Printer.extensible_printer =
     method! code_annotation fmt ca =
       temporaries <- Cil_datatype.Varinfo.Set.empty;
       match ca.annot_content with
-      | AAssert (_, _, p) ->
+      | AAssert (_, p) ->
         (* ignore the ACSL name *)
-        Format.fprintf fmt "@[<v>@[assert@ %a;@]" self#predicate_node p.pred_content;
+        let p = p.tp_statement.pred_content in
+        Format.fprintf fmt "@[<v>@[assert@ %a;@]" self#predicate_node p;
         (* print temporary variables information *)
         if not (Cil_datatype.Varinfo.Set.is_empty temporaries) then begin
           Format.fprintf fmt "@ @[(%t)@]" self#pp_temporaries
@@ -228,7 +229,7 @@ let local_printer: Printer.extensible_printer =
 
     method private pp_temporaries fmt =
       let pp_var fmt vi =
-        Format.fprintf fmt "%s from@ @[%s@]" vi.vname (Extlib.the vi.vdescr)
+        Format.fprintf fmt "%s from@ @[%s@]" vi.vname (Option.get vi.vdescr)
       in
       Pretty_utils.pp_iter Cil_datatype.Varinfo.Set.iter
         ~pre:"" ~suf:"" ~sep:",@ " pp_var fmt temporaries

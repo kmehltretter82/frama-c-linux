@@ -347,7 +347,10 @@ and attrparam =
 (** The definition of a structure or union type. Use {!Cil.mkCompInfo} to make
     one and use {!Cil.copyCompInfo} to copy one (this ensures that a new key is
     assigned and that the fields have the right pointers to parents.).
-    @plugin development guide *)
+    @plugin development guide
+
+    @since 23.0-Vanadium [cfields] is an option, [None] is used for incomplete
+    types (in replacement of removed field [cdefined]) *)
 and compinfo = {
   mutable cstruct: bool;
   (** [true] if struct, [false] if union *)
@@ -365,20 +368,17 @@ and compinfo = {
       files might have different keys. Use {!Cil_const.copyCompInfo} to copy
       structures so that a new key is assigned. *)
 
-  mutable cfields: fieldinfo list;
+  mutable cfields: fieldinfo list option;
   (** Information about the fields. Notice that each fieldinfo has a pointer
       back to the host compinfo. This means that you should not share
-      fieldinfo's between two compinfo's *)
+      fieldinfo's between two compinfo's.
+
+      None value means that the type is incomplete. *)
 
   mutable cattr:   attributes;
   (** The attributes that are defined at the same time as the composite
       type. These attributes can be supplemented individually at each
       reference to this [compinfo] using the [TComp] type constructor. *)
-
-  mutable cdefined: bool;
-  (** This boolean flag can be used to distinguish between structures
-      that have not been defined and those that have been defined but have
-      no fields (such things are allowed in gcc). *)
 
   mutable creferenced: bool;
   (** [true] if used. Initially set to [false]. *)
@@ -399,6 +399,9 @@ and fieldinfo = {
   mutable fcomp: compinfo;
   (** The host structure that contains this field. There can be only one
       [compinfo] that contains the field. *)
+
+  mutable forder: int;
+  (** The position in the host structure. *)
 
   forig_name: string;
   (** original name as found in C file. *)
@@ -433,13 +436,14 @@ and fieldinfo = {
       expression. *)
 
   mutable fsize_in_bits: int option;
-  (** (Deprecated. Use {!Cil.bitsOffset} instead.) Similar to [fbitfield] for
-      all types of fields.
-      @deprecated only Jessie uses this *)
+  (** Similar to [fbitfield] for all types of fields.
+      Do not read this field directly. Use {!Cil.fieldBitsOffset} or
+      {!Cil.bitsOffset} instead. *)
 
   mutable foffset_in_bits: int option;
-  (** Offset at which the field starts in the structure. Do not read directly,
-      but use {!Cil.bitsOffset} instead. *)
+  (** Offset at which the field starts in the structure.
+      Do not read this field directly. Use {!Cil.fieldBitsOffset} or
+      {!Cil.bitsOffset} instead. *)
 
   mutable fpadding_in_bits: int option;
   (** (Deprecated.) Store the size of the padding that follows the field, if any.
@@ -1590,7 +1594,22 @@ and predicate_node =
     create fresh predicates *)
 and identified_predicate = {
   ip_id: int; (** identifier *)
-  ip_content: predicate; (** the predicate itself*)
+  ip_content: toplevel_predicate; (** the predicate itself*)
+}
+
+and predicate_kind =
+  | Assert
+  | Check
+  | Admit
+
+(** main statement of an annotation. *)
+and toplevel_predicate = {
+  tp_kind: predicate_kind;
+  (** whether the annotation is only used to check that [ip_content] holds, but
+      stays invisible for other verification tasks (see description of ACSL's
+      check keyword).
+  *)
+  tp_statement: predicate;
 }
 
 (** predicates with a location and an optional list of names *)
@@ -1601,7 +1620,7 @@ and predicate = {
 }
 
 (** variant of a loop or a recursive function. *)
-and variant = term * string option
+and variant = term * logic_info option
 
 (** allocates and frees.
     @since Oxygen-20120901  *)
@@ -1656,13 +1675,8 @@ and spec = {
     Each extension is associated with a keyword, and can be either a global
     annotation, the clause of a function contract, a code annotation,
     or a loop annotation.
-    An extension can be registered through the following functions:
-    - [Logic_typing.register_xxx_extension] for parsing and type-checking
-    - [Cil_printer.register_xxx_extension] for pretty-printing an
-      extended clause
-    - [Cil.register_xxx_extension] for visiting an extended clause
-      where xxx can be either [global], [behavior], [code_annot] or
-      [loop annot] depending on the level at which the extension should be seen.
+    An extension can be registered through the function
+    [Acsl_extension.register_xxx].
 
     It is _not_ possible to register the same keyword for annotations at two
     different levels (e.g. [global] and [behavior]), as this would make the
@@ -1683,6 +1697,7 @@ and acsl_extension_kind =
   | Ext_terms of term list
   | Ext_preds of predicate list
   (** a list of predicates, the most common case of for extensions *)
+  | Ext_annot of string * acsl_extension list
 
 (** Where are we expected to find corresponding extension keyword.
     @plugin development guide
@@ -1745,17 +1760,11 @@ and pragma =
   | Slice_pragma of slice_pragma
   | Impact_pragma of impact_pragma
 
-(** Kind of an assertion:
-    - an assert is both evaluated and used as hypothesis afterwards;
-    - a check is only evaluated, but is not used as an hypothesis: it does not
-      affect the analyses. *)
-and assertion_kind = Assert | Check
-
 (** all annotations that can be found in the code.
     This type shares the name of its constructors with
     {!Logic_ptree.code_annot}. *)
 and code_annotation_node =
-  | AAssert of string list * assertion_kind * predicate
+  | AAssert of string list * toplevel_predicate
   (** assertion to be checked. The list of strings is the list of
       behaviors to which this assertion applies. *)
 
@@ -1763,7 +1772,7 @@ and code_annotation_node =
   (** statement contract
       (potentially restricted to some enclosing behaviors). *)
 
-  | AInvariant of string list * bool * predicate
+  | AInvariant of string list * bool * toplevel_predicate
   (** loop/code invariant. The list of strings is the list of behaviors to which
       this invariant applies.  The boolean flag is true for normal loop
       invariants and false for invariant-as-assertions. *)
@@ -1813,10 +1822,9 @@ and global_annotation =
   | Daxiomatic of string * global_annotation list * attributes * location
   | Dtype of logic_type_info * location (** declaration of a logic type. *)
   | Dlemma of
-      string * bool * logic_label list * string list *
-      predicate * attributes * location
-  (** definition of a lemma. The boolean flag is [true] if the property should
-      be taken as an axiom and [false] if it must be proved.  *)
+      string * logic_label list * string list *
+      toplevel_predicate * attributes * location
+  (** definition of all kinds of lemmas (axioms are admit lemmas).  *)
   | Dinvariant of logic_info * location
   (** global invariant. The predicate does not have any argument. *)
   | Dtype_annot of logic_info * location

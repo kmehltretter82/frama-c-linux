@@ -1,6 +1,53 @@
 \section{Changes}
 
+% Next version
 \subsection*{Version \version}
+
+\begin{itemize}
+  \item \changeinsection{expressions}{bitwise-or \lstinline|\^\^| is not lazy}
+  \item \changeinsection{expressions}{new extended syntax for quantifications}
+  \item \changeinsection{reals}{additional remark about real numbers and
+    operations over them}
+  \item \changeinsection{locations}{new extended syntax for set comprehensions}
+  \item \changeinsection{at}{more restrictive scoping rule for \lstinline|\\at|
+    constructs.}
+  \item \changeinsection{logicspec}{add lemmas and data invariants}
+  \item \changeinsection{inductivepredicates}{add inductive predicates
+    experimentally: the accepted subset will be refined in a future version}
+  \item \changeinsection{axiomatic}{add axiomatic declarations
+    experimentally: the accepted subset will be refined in a future version}
+  \item \changeinsection{polym-logic-types}{add polymorphic logic types}
+  \item \changeinsection{higherorder}{add higher-order logic constructions}
+  \item \changeinsection{concrete-logic-types}{add concrete logic types}
+  \item \changeinsection{reads}{add \lstinline|read| clauses}
+  \item \changeinsection{func-dep}{add dependencies information}
+  \item \changeinsection{volatile-variables}{add volatile constructs}
+\end{itemize}
+
+\subsection*{Version 1.16}
+\begin{itemize}
+  \item Update according to \acsl 1.16
+  \begin{itemize}
+    \item \changeinsection{fn-behavior}{add the \lstinline|check| and
+      \lstinline|admit| clause kinds}
+    \item \changeinsection{assertions}{add the \lstinline|check| and
+      \lstinline|admit| clause kinds}
+    \item \changeinsection{generalized-invariants}{add the \lstinline|check| and
+      \lstinline|admit| clause kinds}
+    \item \changeinsection{loop_annot}{add the \lstinline|check| and
+      \lstinline|admit| clause kinds}
+  \end{itemize}
+\end{itemize}
+
+\subsection*{Version 1.15}
+\begin{itemize}
+\item Update according to \acsl 1.15:
+  \begin{itemize}
+  \item \changeinsection{ghost}{add the \lstinline|\\ghost| qualifier}
+  \end{itemize}
+\end{itemize}
+
+\subsection*{Version 1.14}
 \begin{itemize}
 \item Update according to \acsl 1.14:
   \begin{itemize}
@@ -124,7 +171,18 @@ in \lstinline|\\at|}
     {
 \section{Changes in \eacsl Implementation}
 
-\subsection*{Version \eacslpluginversion}
+% Next version
+%\subsection*{Version \eacslplugincodename-\eacslpluginversion}
+
+\subsection*{Version \eacslplugincodename-\eacslpluginversion}
+\begin{itemize}
+\item \changeinsection{expressions}{mark logic function and predicate
+  applications as implemented}
+\item \changeinsection{fn-behavior}{mark admit and check clauses as implemented}
+\item \changeinsection{loop_annot}{mark loop variants as implemented}
+\end{itemize}
+
+\subsection*{Version Titanium-22}
 
 \begin{itemize}
 \item \changeinsection{expressions}{support of bitwise operations}
@@ -137,6 +195,8 @@ in \lstinline|\\at|}
 \item \changeinsection{reals}{support of rational numbers and operations}
 \item \changeinsection{fn-behavior}{remove abrupt clauses from the list of
   exceptions}
+\item \changeinsection{fn-behavior}{support of \lstinline|complete behaviors|
+  and \lstinline|disjoint behaviors|}
 \item \changeinsection{statement_contract}{remove abrupt clauses from the list
   of exceptions}
 \item \changeinsection{abrupt}{add grammar for abrupt termination}

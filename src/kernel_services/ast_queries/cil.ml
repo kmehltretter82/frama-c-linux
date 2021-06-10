@@ -78,6 +78,8 @@ let set_dependencies_of_ast, dependency_on_ast  =
 let voidType = Cil_const.voidType
 let intType = TInt(IInt,[])
 let uintType = TInt(IUInt,[])
+let shortType = TInt(IShort, [])
+let ushortType = TInt(IUShort, [])
 let longType = TInt(ILong,[])
 let longLongType = TInt(ILongLong,[])
 let ulongType = TInt(IULong,[])
@@ -163,6 +165,13 @@ let theMachine = createMachine ()
 
 let msvcMode () = (theMachine.theMachine.compiler = "msvc")
 let gccMode () = (theMachine.theMachine.compiler = "gcc")
+
+let acceptEmptyCompinfo = ref false
+
+let set_acceptEmptyCompinfo () = acceptEmptyCompinfo := true
+
+let acceptEmptyCompinfo () =
+  msvcMode () || gccMode () || !acceptEmptyCompinfo
 
 let theMachineProject = ref (createMachine ())
 
@@ -441,7 +450,9 @@ let typeHasAttributeMemoryBlock a (ty:typ): bool =
     | TNamed (r, a') -> f a' ; visit r.ttype
     | TArray(t, _, _, a') -> f a'; visit t
     | TComp (comp, _, a') -> f a';
-      List.iter (fun fi -> f fi.fattr; visit fi.ftype) comp.cfields
+      List.iter
+        (fun fi -> f fi.fattr; visit fi.ftype)
+        (Option.value ~default:[] comp.cfields)
     | TVoid a'
     | TInt (_, a')
     | TFloat (_, a')
@@ -453,7 +464,6 @@ let typeHasAttributeMemoryBlock a (ty:typ): bool =
   try visit ty; false
   with Exit -> true
 
-let typeAddVolatile typ = typeAddAttributes [Attr ("volatile", [])] typ
 let typeAddGhost typ =
   if not (typeHasAttribute "ghost" typ) then
     typeAddAttributes [Attr ("ghost", [])] typ
@@ -605,6 +615,11 @@ let () = registerAttribute frama_c_mutable (AttrName false)
 let () =
   registerAttribute (Extlib.strip_underscore frama_c_mutable) (AttrName false)
 
+let frama_c_inlined = "__fc_inlined"
+let () = registerAttribute frama_c_inlined (AttrName false)
+let () =
+  registerAttribute (Extlib.strip_underscore frama_c_inlined) (AttrName false)
+
 let unrollType (t: typ) : typ =
   let rec withAttrs (al: attributes) (t: typ) : typ =
     match t with
@@ -650,7 +665,9 @@ let update_var_type v t =
   v.vtype <- if v.vghost then typeAddGhost t else t;
   match v.vlogic_var_assoc with
   | None -> ()
-  | Some lv -> lv.lv_type <- Ctype t
+  | Some lv ->
+    (* ghost attribute is irrelevant in ACSL. *)
+    lv.lv_type <- Ctype t
 
 (* Make a varinfo. Used mostly as a helper function below  *)
 let makeVarinfo
@@ -820,19 +837,8 @@ module Extensions = struct
 
   let visit name = !ref_visit name
 
-  let ref_deprecated_handler = ref (fun _ _ _ -> assert false)
-  let set_deprecated_handler ~handler =
-    ref_deprecated_handler := handler
-
-  let register_behavior name ext =
-    !ref_deprecated_handler name Ext_contract ext
 end
 let set_extension_handler = Extensions.set_handler
-
-(* Deprecated *)
-let set_deprecated_extension_handler = Extensions.set_deprecated_handler
-let register_behavior_extension = Extensions.register_behavior
-
 
 (* sm/gn: cil visitor interface for traversing Cil trees. *)
 (* Use visitCilStmt and/or visitCilFile to use this. *)
@@ -1722,7 +1728,7 @@ and visitCilLogicVarUse vis lv =
         we target the current project, builtins are by definition already
         tied to logic_infos and should not be copied.
      *)
-     not (Project.is_current (Extlib.the vis#project)) &&
+     not (Project.is_current (Option.get vis#project)) &&
      Logic_env.is_builtin_logic_function lv.lv_name
   then begin
     (* Do as if the variable has been declared.
@@ -1769,9 +1775,14 @@ and visitCilPredicate vis p =
   doVisitCil vis
     id vis#vpredicate childrenPredicate p
 
+and visitCilToplevel_predicate vis p =
+  let s = p.tp_statement in
+  let s' = visitCilPredicate vis s in
+  if s != s' then { p with tp_statement = s' } else p
+
 and childrenIdentified_predicate vis ip =
   let p = ip.ip_content in
-  let p' = visitCilPredicate vis p in
+  let p' = visitCilToplevel_predicate vis p in
   if p != p' then { ip with ip_content = p' }
   else ip
 
@@ -1984,6 +1995,9 @@ and childrenCilExtended vis p =
   | Ext_preds preds ->
     let preds' = mapNoCopy (visitCilPredicate vis) preds in
     if preds == preds' then p else Ext_preds preds'
+  | Ext_annot (id,annots) ->
+    let annots' = mapNoCopy (visitCilExtended vis) annots in
+    if annots == annots' then p else Ext_annot (id,annots')
 
 and visitCilPredicates vis ps = mapNoCopy (visitCilIdPredicate vis) ps
 
@@ -2088,11 +2102,11 @@ and childrenAnnotation vis a =
            Logic_env.add_logic_type ti'.lt_name ti')
         vis#get_filling_actions;
     if ti' != ti then Dtype (ti',loc) else a
-  | Dlemma(s,is_axiom,labels,tvars,p,attr,loc) ->
-    let p' = visitCilPredicate vis p in
+  | Dlemma(s,labels,tvars,p,attr,loc) ->
+    let p' = visitCilToplevel_predicate vis p in
     let attr' = visitCilAttributes vis attr in
     if p' != p || attr != attr' then
-      Dlemma(s,is_axiom,labels,tvars,p',attr',loc)
+      Dlemma(s,labels,tvars,p',attr',loc)
     else a
   | Dinvariant (p,loc) ->
     let p' = visitCilLogicInfo vis p in
@@ -2142,14 +2156,14 @@ and visitCilCodeAnnotation vis ca =
     vis (Visitor_behavior.ccode_annotation vis#behavior) vis#vcode_annot childrenCodeAnnot ca
 
 and childrenCodeAnnot vis ca =
-  let vPred p = visitCilPredicate vis p in
+  let vPred p = visitCilToplevel_predicate vis p in
   let vTerm t = visitCilTerm vis t in
   let vSpec s = visitCilFunspec vis s in
   let change_content annot = { ca with annot_content = annot } in
   match ca.annot_content with
-    AAssert (behav,kind,p) ->
+    AAssert (behav,p) ->
     let p' = vPred p in if p' != p then
-      change_content (AAssert (behav,kind,p'))
+      change_content (AAssert (behav,p'))
     else ca
   | APragma (Impact_pragma t) ->
     let t' = visitCilImpactPragma vis t in
@@ -2827,7 +2841,7 @@ let visitCilFieldInfo vis f =
   doVisitCil vis (Visitor_behavior.Memo.fieldinfo vis#behavior) vis#vfieldinfo childrenFieldInfo f
 
 let childrenCompInfo vis comp =
-  comp.cfields <- mapNoCopy (visitCilFieldInfo vis) comp.cfields;
+  comp.cfields <- optMapNoCopy (mapNoCopy (visitCilFieldInfo vis)) comp.cfields;
   comp.cattr <- visitCilAttributes vis comp.cattr;
   comp
 
@@ -3371,9 +3385,9 @@ let evar ?(loc=Location.unknown) vi = new_exp ~loc (Lval (var vi))
 
 let mkString ~loc s = new_exp ~loc (Const(CStr s))
 
-let mkLoop ?(sattr = [Attr("while", [])]) ~(guard:exp) ~(body: stmt list) : stmt list =
+let mkLoop ?sattr ~(guard:exp) ~(body: stmt list) () : stmt list =
   (* Do it like this so that the pretty printer recognizes it *)
-  [ mkStmt ~valid_sid:true ~sattr
+  [ mkStmt ~valid_sid:true ?sattr
       (Loop ([],
              mkBlock
                (mkStmt ~valid_sid:true
@@ -3382,28 +3396,43 @@ let mkLoop ?(sattr = [Attr("while", [])]) ~(guard:exp) ~(body: stmt list) : stmt
                       mkBlock [ mkStmt ~valid_sid:true (Break guard.eloc)], guard.eloc)) ::
                 body), guard.eloc, None, None)) ]
 
-let mkFor ~(start: stmt list) ~(guard: exp) ~(next: stmt list)
-    ~(body: stmt list) : stmt list =
-  (start @
-   (mkLoop ~sattr:[Attr("For",[])] ~guard ~body:(body @ next)))
+let mkWhile ?sattr ~(guard:exp) ~(body: stmt list) () : stmt list =
+  let sattr = [Attr("while", [])] @ Option.value ~default:[] sattr in
+  mkLoop ~sattr ~guard ~body ()
 
-let mkForIncr ~(iter : varinfo) ~(first: exp) ~(stopat: exp) ~(incr: exp)
-    ~(body: stmt list) : stmt list =
+let mkDoWhile ?sattr ~(body: stmt list) ~(guard:exp) () : stmt list =
+  let sattr = [Attr("dowhile", [])] @ Option.value ~default:[] sattr in
+  let exit_stmt =
+    mkStmt ~valid_sid:true
+      (If(guard, mkBlock [mkStmt ~valid_sid:true (Break guard.eloc)],
+          mkBlock [], guard.eloc))
+  in
+  let true_exp = one ~loc:guard.eloc in
+  mkLoop ~sattr ~guard:true_exp ~body:(body @ [exit_stmt]) ()
+
+let mkFor ?sattr ~(start: stmt list) ~(guard: exp) ~(next: stmt list)
+    ~(body: stmt list) () : stmt list =
+  let sattr = [Attr("for", [])] @ Option.value ~default:[] sattr in
+  (start @
+   (mkLoop ~sattr ~guard ~body:(body @ next)) ())
+
+let mkForIncr ?sattr ~(iter : varinfo) ~(first: exp) ~(stopat: exp) ~(incr: exp)
+    ~(body: stmt list) () : stmt list =
   (* See what kind of operator we need *)
   let nextop = match unrollTypeSkel iter.vtype with
     | TPtr _ -> PlusPI
     | _ -> PlusA
   in
-  mkFor
-    [ mkStmtOneInstr ~valid_sid:true (Set (var iter, first, first.eloc)) ]
-    (new_exp ~loc:stopat.eloc (BinOp(Lt, evar iter, stopat, intType)))
-    [ mkStmtOneInstr ~valid_sid:true
-        (Set
-           (var iter,
-            (new_exp ~loc:incr.eloc
-               (BinOp(nextop, evar iter, incr, iter.vtype))),
-            incr.eloc))]
-    body
+  mkFor ?sattr
+    ~start:[ mkStmtOneInstr ~valid_sid:true (Set (var iter, first, first.eloc)) ]
+    ~guard:(new_exp ~loc:stopat.eloc (BinOp(Lt, evar iter, stopat, intType)))
+    ~next:[ mkStmtOneInstr ~valid_sid:true
+              (Set
+                 (var iter,
+                  (new_exp ~loc:incr.eloc
+                     (BinOp(nextop, evar iter, incr, iter.vtype))),
+                  incr.eloc))]
+    ~body ()
 
 let block_from_unspecified_sequence us =
   mkBlock (List.map (fun (x,_,_,_,_) ->x) us)
@@ -3693,7 +3722,7 @@ let rec typeOf (e: exp) : typ =
   | AddrOf (lv) -> TPtr(typeOfLval lv, [])
   | StartOf (lv) ->
     match unrollType (typeOfLval lv) with
-    | TArray (t,_,_, _) -> TPtr(t, [])
+    | TArray (t,_,_,attrs) -> TPtr(t, attrs)
     | _ ->  Kernel.fatal ~current:true "typeOf: StartOf on a non-array"
 
 and typeOfInit (i: init) : typ =
@@ -4011,7 +4040,7 @@ let rec bytesAlignOf t =
         | f :: rest -> f :: dropZeros (f.fbitfield <> None) rest
         | [] -> []
       in
-      let fields = dropZeros false c.cfields in
+      let fields = dropZeros false (Option.value ~default:[] c.cfields) in
       List.fold_left
         (fun sofar f ->
            (* Bitfields with zero width do not contribute to the alignment in
@@ -4022,7 +4051,11 @@ let rec bytesAlignOf t =
     | TFun _ when not (msvcMode ()) ->
       theMachine.theMachine.alignof_fun
     | TFun _ as t -> raise (SizeOfError ("Undefined sizeof on a function.", t))
-    | TVoid _ as t -> raise (SizeOfError ("Undefined sizeof(void).", t))
+    | TVoid _ as t ->
+      if theMachine.theMachine.sizeof_void > 0 then
+        theMachine.theMachine.sizeof_void
+      else
+        raise (SizeOfError ("Undefined sizeof(void).", t))
   in
   process_aligned_attribute ~may_reduce:false
     (fun fmt -> !pp_typ_ref fmt t)
@@ -4138,7 +4171,7 @@ and process_aligned_attribute (pp:Format.formatter->unit) ~may_reduce attrs defa
 (* Computation of the offset of the field [fi], given the information [sofar]
    computed for the previous fields. [last] indicates that we are considering
    the last field of the struct. Set to [false] by default for unions. *)
-and offsetOfFieldAcc ?(last=false) ~(fi: fieldinfo) ~(sofar: offsetAcc) : offsetAcc =
+and offsetOfFieldAcc ~last ~(fi: fieldinfo) ~(sofar: offsetAcc) : offsetAcc =
   if msvcMode () then offsetOfFieldAcc_MSVC last fi sofar
   else offsetOfFieldAcc_GCC last fi sofar
 
@@ -4302,19 +4335,17 @@ and bitsSizeOf t =
   | TPtr _ -> 8 * theMachine.theMachine.sizeof_ptr
   | TBuiltin_va_list _ -> 8 * theMachine.theMachine.sizeof_ptr
   | TNamed (t, _) -> bitsSizeOf t.ttype
-  | TComp (comp, scache, _) when comp.cfields == [] ->
-    find_size_in_cache
-      scache
-      (fun () -> begin
-           (* sizeof() empty structs/arrays is only allowed on GCC/MSVC *)
-           if not comp.cdefined && not (gccMode () || msvcMode ()) then begin
-             raise
-               (SizeOfError
-                  (Format.sprintf "abstract type '%s'" (compFullName comp), t))
-           end else
-             0
-         end)
-
+  | TComp ({cfields=None} as comp, _, _) ->
+    raise
+      (SizeOfError
+         (Format.sprintf "abstract type '%s'" (compFullName comp), t))
+  | TComp ({cfields=Some[]}, scache,_) when acceptEmptyCompinfo() ->
+    find_size_in_cache scache (fun () -> 0)
+  | TComp ({cfields=Some[]} as comp,_,_) ->
+    (* sizeof() empty structs/arrays is only allowed on GCC/MSVC *)
+    raise
+      (SizeOfError
+         (Format.sprintf "empty struct '%s'" (compFullName comp), t))
   | TComp (comp, scache, _) when comp.cstruct -> (* Struct *)
     find_size_in_cache
       scache
@@ -4329,9 +4360,9 @@ and bitsSizeOf t =
          let lastoff =
            fold_struct_fields
              (fun ~last acc fi -> offsetOfFieldAcc ~last ~fi ~sofar:acc)
-             startAcc comp.cfields
+             startAcc (Option.get comp.cfields) (* Note: we treat None above *)
          in
-         if msvcMode () && lastoff.oaFirstFree = 0 && comp.cfields <> []
+         if msvcMode () && lastoff.oaFirstFree = 0
          then
            (* On MSVC if we have just a zero-width bitfields then the length
             * is 32 and is not padded  *)
@@ -4350,11 +4381,14 @@ and bitsSizeOf t =
              oaLastFieldWidth = 0;
              oaPrevBitPack = None;
            } in
-         let max =
-           List.fold_left (fun acc fi ->
-               let lastoff = offsetOfFieldAcc ?last:None ~fi ~sofar:startAcc in
-               if lastoff.oaFirstFree > acc then
-                 lastoff.oaFirstFree else acc) 0 comp.cfields in
+         let fold acc fi =
+           let lastoff = offsetOfFieldAcc ~last:false ~fi ~sofar:startAcc in
+           if lastoff.oaFirstFree > acc
+           then lastoff.oaFirstFree
+           else acc
+         in
+         (* Note: we treat None above *)
+         let max = List.fold_left fold 0 (Option.get comp.cfields) in
          (* Add trailing by simulating adding an extra field *)
          addTrailing max (8 * bytesAlignOf t))
 
@@ -4379,7 +4413,11 @@ and bitsSizeOf t =
              sz' (*WAS: addTrailing sz' (8 * bytesAlignOf t)*)
            | _ -> raise (SizeOfError ("Array with non-constant length.", t))
          end)
-  | TVoid _ -> 8 * theMachine.theMachine.sizeof_void
+  | TVoid _ ->
+    if theMachine.theMachine.sizeof_void >= 0 then
+      8 * theMachine.theMachine.sizeof_void
+    else
+      raise (SizeOfError ("Undefined sizeof(void).", t))
   | TFun _ ->
     if theMachine.theMachine.sizeof_fun >= 0 then
       8 * theMachine.theMachine.sizeof_fun
@@ -4406,6 +4444,30 @@ and sizeOf ~loc t =
     integer ~loc ((bitsSizeOf t) lsr 3)
   with SizeOfError _ -> new_exp ~loc (SizeOf(t))
 
+and fieldBitsOffset (f : fieldinfo) : int * int =
+  if  not f.fcomp.cstruct (* union *) then
+    (* All union fields start at offset 0 *)
+    0, bitsSizeOf f.ftype
+  else begin
+    if f.foffset_in_bits = None then begin
+      let aux ~last acc fi =
+        let acc' = offsetOfFieldAcc ~last ~fi ~sofar:acc in
+        fi.fsize_in_bits <- Some acc'.oaLastFieldWidth;
+        fi.foffset_in_bits <- Some acc'.oaLastFieldStart;
+        acc'
+      in
+      ignore (
+        fold_struct_fields aux
+          { oaFirstFree      = 0;
+            oaLastFieldStart = 0;
+            oaLastFieldWidth = 0;
+            oaPrevBitPack    = None }
+          (Option.value ~default:[] f.fcomp.cfields)
+      );
+    end;
+    Option.get f.foffset_in_bits, Option.get f.fsize_in_bits
+  end
+
 and bitsOffset (baset: typ) (off: offset) : int * int =
   let rec loopOff (baset: typ) (width: int) (start: int) = function
       NoOffset -> start, width
@@ -4419,38 +4481,12 @@ and bitsOffset (baset: typ) (off: offset) : int * int =
         let bitsbt = bitsSizeOf bt in
         loopOff bt bitsbt (start + ei * bitsbt) off
       end
-    | Field(f, off) when not f.fcomp.cstruct (* union *) ->
+    | Field(f, off) ->
       if check_invariants then
-        assert (match unrollType baset with
-            | TComp (ci, _, _) -> ci == f.fcomp
-            | _ -> false);
-      (* All union fields start at offset 0 *)
-      loopOff f.ftype (bitsSizeOf f.ftype) start off
-
-    | Field(f, off) (* struct *) ->
-      if check_invariants then
-        assert (match unrollType baset with
-            | TComp (ci, _, _) -> ci == f.fcomp
-            | _ -> false);
-      if f.foffset_in_bits = None then begin
-        let aux ~last acc fi =
-          let acc' = offsetOfFieldAcc ~last ~fi ~sofar:acc in
-          fi.fsize_in_bits <- Some acc'.oaLastFieldWidth;
-          fi.foffset_in_bits <- Some acc'.oaLastFieldStart;
-          acc'
-        in
-        ignore (
-          fold_struct_fields aux
-            { oaFirstFree      = 0;
-              oaLastFieldStart = 0;
-              oaLastFieldWidth = 0;
-              oaPrevBitPack    = None }
-            f.fcomp.cfields
-        );
-      end;
-      let offsbits, size =
-        Extlib.the f.foffset_in_bits, Extlib.the f.fsize_in_bits
-      in
+        (match unrollType baset with
+         | TComp (ci, _, _) -> assert (ci == f.fcomp)
+         | _ -> assert false);
+      let offsbits, size = fieldBitsOffset f in
       loopOff f.ftype size (start + offsbits) off
   in
   loopOff baset (bitsSizeOf baset) 0 off
@@ -4477,7 +4513,7 @@ and constFold (machdep: bool) (e: exp) : exp =
         Const(CInt64(i,_ik,repr)) -> begin
           match unop with
             Neg ->
-            let repr = Extlib.opt_map (fun s -> "-" ^ s) repr in
+            let repr = Option.map (fun s -> "-" ^ s) repr in
             kinteger64 ~loc ?repr ~kind:tk (Integer.neg i)
           | BNot -> kinteger64 ~loc ~kind:tk (Integer.lognot i)
           | LNot ->
@@ -4517,7 +4553,10 @@ and constFold (machdep: bool) (e: exp) : exp =
   | SizeOfStr s when machdep ->
     kinteger ~loc theMachine.kindOfSizeOf (1 + String.length s)
   | AlignOf t when machdep ->
-    kinteger ~loc theMachine.kindOfSizeOf (bytesAlignOf t)
+    begin
+      try kinteger ~loc theMachine.kindOfSizeOf (bytesAlignOf t)
+      with SizeOfError _ -> e
+    end
   | AlignOfE e when machdep -> begin
       (* The alignment of an expression is not always the alignment of its
        * type. I know that for strings this is not true *)
@@ -4851,389 +4890,6 @@ let interpret_character_constant char_list =
   end
 
 let invalidStmt = mkStmt (Instr (Skip Location.unknown))
-module Frama_c_builtins =
-  State_builder.Hashtbl
-    (Datatype.String.Hashtbl)
-    (Cil_datatype.Varinfo)
-    (struct
-      let name = "Cil.Frama_c_Builtins"
-      let dependencies = []
-      let size = 3
-    end)
-
-let () = dependency_on_ast Frama_c_builtins.self
-
-let is_builtin v = hasAttribute "FC_BUILTIN" v.vattr
-
-let is_unused_builtin v = is_builtin v && not v.vreferenced
-
-
-(* [VP] Should we projectify this ?*)
-let special_builtins_table = ref Datatype.String.Set.empty
-let special_builtins = Queue.create ()
-
-let is_special_builtin s =
-  Queue.fold (fun res f -> res || f s) false special_builtins
-
-let add_special_builtin_family f = Queue.add f special_builtins
-
-let add_special_builtin s =
-  special_builtins_table := Datatype.String.Set.add s !special_builtins_table
-
-let () = add_special_builtin_family
-    (fun s -> Datatype.String.Set.mem s !special_builtins_table)
-
-let () = List.iter add_special_builtin
-    [ "__builtin_stdarg_start"; "__builtin_va_arg";
-      "__builtin_va_start"; "__builtin_expect"; "__builtin_next_arg"; ]
-
-module Builtin_functions =
-  State_builder.Hashtbl
-    (Datatype.String.Hashtbl)
-    (Datatype.Triple(Typ)(Datatype.List(Typ))(Datatype.Bool))
-    (struct
-      let name = "Builtin_functions"
-      let dependencies = [ TheMachine.self ]
-      let size = 49
-    end)
-
-let add_builtin ?(prefix="__builtin_") s t l b =
-  Builtin_functions.add (prefix ^ s) (t, l, b)
-
-let () = registerAttribute "FC_BUILTIN" (AttrName true)
-
-(* Initialize the builtin functions after the machine has been initialized. *)
-let initGccBuiltins () : unit =
-  let sizeType = theMachine.upointType in
-  let add = add_builtin in
-  add "__fprintf_chk"
-    intType
-    (* first argument is really FILE*, not void*, but we don't want to build in
-       the definition for FILE *)
-    [ voidPtrType; intType; charConstPtrType ]
-    true;
-  add "__memcpy_chk"
-    voidPtrType
-    [ voidPtrType; voidConstPtrType; sizeType; sizeType ]
-    false;
-  add "__memmove_chk"
-    voidPtrType [ voidPtrType; voidConstPtrType; sizeType; sizeType ] false;
-  add "__mempcpy_chk"
-    voidPtrType [ voidPtrType; voidConstPtrType; sizeType; sizeType ] false;
-  add "__memset_chk"
-    voidPtrType [ voidPtrType; intType; sizeType; sizeType ] false;
-  add "__printf_chk" intType [ intType; charConstPtrType ] true;
-  add "__snprintf_chk"
-    intType [ charPtrType; sizeType; intType; sizeType; charConstPtrType ]
-    true;
-  add "__sprintf_chk"
-    intType [ charPtrType; intType; sizeType; charConstPtrType ] true;
-  add "__stpcpy_chk"
-    charPtrType [ charPtrType; charConstPtrType; sizeType ] false;
-  add "__strcat_chk"
-    charPtrType [ charPtrType; charConstPtrType; sizeType ] false;
-  add "__strcpy_chk"
-    charPtrType [ charPtrType; charConstPtrType; sizeType ] false;
-  add "__strncat_chk"
-    charPtrType [ charPtrType; charConstPtrType; sizeType; sizeType ] false;
-  add "__strncpy_chk"
-    charPtrType [ charPtrType; charConstPtrType; sizeType; sizeType ] false;
-  add "__vfprintf_chk"
-    intType
-    (* first argument is really FILE*, not void*, but we don't want to build in
-       the definition for FILE *)
-    [ voidPtrType; intType; charConstPtrType; TBuiltin_va_list [] ]
-    false;
-  add "__vprintf_chk"
-    intType [ intType; charConstPtrType; TBuiltin_va_list [] ] false;
-  add "__vsnprintf_chk"
-    intType
-    [ charPtrType; sizeType; intType; sizeType; charConstPtrType;
-      TBuiltin_va_list [] ]
-    false;
-  add "__vsprintf_chk"
-    intType
-    [ charPtrType; intType; sizeType; charConstPtrType; TBuiltin_va_list [] ]
-    false;
-
-  add "alloca" voidPtrType [ sizeType ] false;
-
-  add "acos" doubleType [ doubleType ] false;
-  add "acosf" floatType [ floatType ] false;
-  add "acosl" longDoubleType [ longDoubleType ] false;
-
-  add "asin" doubleType [ doubleType ] false;
-  add "asinf" floatType [ floatType ] false;
-  add "asinl" longDoubleType [ longDoubleType ] false;
-
-  add "atan" doubleType [ doubleType ] false;
-  add "atanf" floatType [ floatType ] false;
-  add "atanl" longDoubleType [ longDoubleType ] false;
-
-  add "atan2" doubleType [ doubleType; doubleType ] false;
-  add "atan2f" floatType [ floatType; floatType ] false;
-  add "atan2l" longDoubleType [ longDoubleType;
-                                longDoubleType ] false;
-
-  let uint16t = uint16_t () in
-  add "bswap16" uint16t [uint16t] false;
-
-  let uint32t = uint32_t () in
-  add "bswap32" uint32t [uint32t] false;
-
-  let uint64t = uint64_t () in
-  add "bswap64" uint64t [uint64t] false;
-
-  add "ceil" doubleType [ doubleType ] false;
-  add "ceilf" floatType [ floatType ] false;
-  add "ceill" longDoubleType [ longDoubleType ] false;
-
-  add "cos" doubleType [ doubleType ] false;
-  add "cosf" floatType [ floatType ] false;
-  add "cosl" longDoubleType [ longDoubleType ] false;
-
-  add "cosh" doubleType [ doubleType ] false;
-  add "coshf" floatType [ floatType ] false;
-  add "coshl" longDoubleType [ longDoubleType ] false;
-
-  add "constant_p" intType [ intType ] false;
-
-  add "exp" doubleType [ doubleType ] false;
-  add "expf" floatType [ floatType ] false;
-  add "expl" longDoubleType [ longDoubleType ] false;
-
-  add "expect" longType [ longType; longType ] false;
-
-  add "fabs" doubleType [ doubleType ] false;
-  add "fabsf" floatType [ floatType ] false;
-  add "fabsl" longDoubleType [ longDoubleType ] false;
-
-  add "ffs" intType [ uintType ] false;
-  add "ffsl" intType [ ulongType ] false;
-  add "ffsll" intType [ ulongLongType ] false;
-  add "frame_address" voidPtrType [ uintType ] false;
-
-  add "floor" doubleType [ doubleType ] false;
-  add "floorf" floatType [ floatType ] false;
-  add "floorl" longDoubleType [ longDoubleType ] false;
-
-  add "huge_val" doubleType [] false;
-  add "huge_valf" floatType [] false;
-  add "huge_vall" longDoubleType [] false;
-  add "ia32_lfence" voidType [] false;
-  add "ia32_mfence" voidType [] false;
-  add "ia32_sfence" voidType [] false;
-
-  add "inf" doubleType [] false;
-  add "inff" floatType [] false;
-  add "infl" longDoubleType [] false;
-  add "memcpy" voidPtrType [ voidPtrType; voidConstPtrType; sizeType ] false;
-  add "mempcpy" voidPtrType [ voidPtrType; voidConstPtrType; sizeType ] false;
-  add "memset" voidPtrType [ voidPtrType; intType; intType ] false;
-
-  add "fmod" doubleType [ doubleType ] false;
-  add "fmodf" floatType [ floatType ] false;
-  add "fmodl" longDoubleType [ longDoubleType ] false;
-
-  add "frexp" doubleType [ doubleType; intPtrType ] false;
-  add "frexpf" floatType [ floatType; intPtrType  ] false;
-  add "frexpl" longDoubleType [ longDoubleType; intPtrType  ] false;
-
-  add "ldexp" doubleType [ doubleType; intType ] false;
-  add "ldexpf" floatType [ floatType; intType  ] false;
-  add "ldexpl" longDoubleType [ longDoubleType; intType  ] false;
-
-  add "log" doubleType [ doubleType ] false;
-  add "logf" floatType [ floatType ] false;
-  add "logl" longDoubleType [ longDoubleType ] false;
-
-  add "log10" doubleType [ doubleType ] false;
-  add "log10f" floatType [ floatType ] false;
-  add "log10l" longDoubleType [ longDoubleType ] false;
-
-  add "modff" floatType [ floatType; TPtr(floatType,[]) ] false;
-  add "modfl"
-    longDoubleType [ longDoubleType; TPtr(longDoubleType, []) ] false;
-
-  add "nan" doubleType [ charConstPtrType ] false;
-  add "nanf" floatType [ charConstPtrType ] false;
-  add "nanl" longDoubleType [ charConstPtrType ] false;
-  add "nans" doubleType [ charConstPtrType ] false;
-  add "nansf" floatType [ charConstPtrType ] false;
-  add "nansl" longDoubleType [ charConstPtrType ] false;
-  add "object_size" sizeType [ voidPtrType; intType ] false;
-
-  add "parity" intType [ uintType ] false;
-  add "parityl" intType [ ulongType ] false;
-  add "parityll" intType [ ulongLongType ] false;
-
-  add "powi" doubleType [ doubleType; intType ] false;
-  add "powif" floatType [ floatType; intType ] false;
-  add "powil" longDoubleType [ longDoubleType; intType ] false;
-  add "prefetch" voidType [ voidConstPtrType ] true;
-  add "return" voidType [ voidConstPtrType ] false;
-  add "return_address" voidPtrType [ uintType ] false;
-
-  add "sin" doubleType [ doubleType ] false;
-  add "sinf" floatType [ floatType ] false;
-  add "sinl" longDoubleType [ longDoubleType ] false;
-
-  add "sinh" doubleType [ doubleType ] false;
-  add "sinhf" floatType [ floatType ] false;
-  add "sinhl" longDoubleType [ longDoubleType ] false;
-
-  add "sqrt" doubleType [ doubleType ] false;
-  add "sqrtf" floatType [ floatType ] false;
-  add "sqrtl" longDoubleType [ longDoubleType ] false;
-
-  add "stpcpy" charPtrType [ charPtrType; charConstPtrType ] false;
-  add "strchr" charPtrType [ charPtrType; intType ] false;
-  add "strcmp" intType [ charConstPtrType; charConstPtrType ] false;
-  add "strcpy" charPtrType [ charPtrType; charConstPtrType ] false;
-  add "strcspn" sizeType [ charConstPtrType; charConstPtrType ] false;
-  add "strncat" charPtrType [ charPtrType; charConstPtrType; sizeType ] false;
-  add "strncmp" intType [ charConstPtrType; charConstPtrType; sizeType ] false;
-  add "strncpy" charPtrType [ charPtrType; charConstPtrType; sizeType ] false;
-  add "strspn" sizeType [ charConstPtrType; charConstPtrType ] false;
-  add "strpbrk" charPtrType [ charConstPtrType; charConstPtrType ] false;
-  (* When we parse builtin_types_compatible_p, we change its interface *)
-  add "types_compatible_p"
-    intType
-    [ theMachine.typeOfSizeOf;(* Sizeof the type *)
-      theMachine.typeOfSizeOf (* Sizeof the type *) ]
-    false;
-  add "tan" doubleType [ doubleType ] false;
-  add "tanf" floatType [ floatType ] false;
-  add "tanl" longDoubleType [ longDoubleType ] false;
-
-  add "tanh" doubleType [ doubleType ] false;
-  add "tanhf" floatType [ floatType ] false;
-  add "tanhl" longDoubleType [ longDoubleType ] false;
-
-  add "unreachable" voidType [ ] false;
-
-  let int8_t = Some scharType in
-  let int16_t = try Some (int16_t ()) with Not_found -> None in
-  let int32_t = try Some (int32_t ()) with Not_found -> None in
-  let int64_t = try Some (int64_t ()) with Not_found -> None in
-  let uint8_t = Some ucharType in
-  let uint16_t = try Some (uint16_t ()) with Not_found -> None in
-  let uint32_t = try Some (uint32_t ()) with Not_found -> None in
-  let uint64_t = try Some (uint64_t ()) with Not_found -> None in
-
-  (* Binary monomorphic versions of atomic builtins *)
-  let atomic_instances =
-    [int8_t, "_int8_t";
-     int16_t,"_int16_t";
-     int32_t,"_int32_t";
-     int64_t,"_int64_t";
-     uint8_t, "_uint8_t";
-     uint16_t,"_uint16_t";
-     uint32_t,"_uint32_t";
-     uint64_t,"_uint64_t"]
-  in
-  let add_sync (typ,name) f =
-    match typ with
-    | Some typ ->
-      add ~prefix:"__sync_" (f^name) typ [ TPtr(typeAddVolatile typ,[]); typ] true
-    | None -> ()
-  in
-  let add_sync f =
-    List.iter (fun typ -> add_sync typ f) atomic_instances
-  in
-  add_sync "fetch_and_add";
-  add_sync "fetch_and_sub";
-  add_sync "fetch_and_or";
-  add_sync "fetch_and_and";
-  add_sync "fetch_and_xor";
-  add_sync "fetch_and_nand";
-  add_sync "add_and_fetch";
-  add_sync "sub_and_fetch";
-  add_sync "or_and_fetch";
-  add_sync "and_and_fetch";
-  add_sync "xor_and_fetch";
-  add_sync "nand_and_fetch";
-  add_sync "lock_test_and_set";
-  List.iter (fun (typ,n) ->
-      match typ with
-      | Some typ ->
-        add ~prefix:"" ("__sync_bool_compare_and_swap"^n)
-          intType
-          [ TPtr(typeAddVolatile typ,[]); typ ; typ]
-          true
-      | None -> ())
-    atomic_instances;
-  List.iter (fun (typ,n) ->
-      match typ with
-      | Some typ ->
-        add ~prefix:"" ("__sync_val_compare_and_swap"^n)
-          typ
-          [ TPtr(typeAddVolatile typ,[]); typ ; typ]
-          true
-      | None -> ())
-    atomic_instances;
-  List.iter (fun (typ,n) ->
-      match typ with
-      | Some typ ->
-        add ~prefix:"" ("__sync_lock_release"^n)
-          voidType
-          [ TPtr(typeAddVolatile typ,[]) ]
-          true;
-      | None -> ())
-    atomic_instances;
-  add ~prefix:"" "__sync_synchronize" voidType [] true
-;;
-
-(* Builtins related to va_list. Added to all non-msvc machdeps, because
-   Cabs2cil supposes they exist. *)
-let initVABuiltins () =
-  let hasbva = theMachine.theMachine.has__builtin_va_list in
-  let add = add_builtin in
-  add "next_arg"
-    (* When we parse builtin_next_arg we drop the second argument *)
-    (if hasbva then TBuiltin_va_list [] else voidPtrType) [] false;
-  if hasbva then begin
-    add "va_end" voidType [ TBuiltin_va_list [] ] false;
-    add "varargs_start" voidType [ TBuiltin_va_list [] ] false;
-    (* When we parse builtin_{va,stdarg}_start, we drop the second argument *)
-    add "va_start" voidType [ TBuiltin_va_list [] ] false;
-    add "stdarg_start" voidType [ TBuiltin_va_list [] ] false;
-    (* When we parse builtin_va_arg we change its interface *)
-    add "va_arg"
-      voidType
-      [ TBuiltin_va_list [];
-        theMachine.typeOfSizeOf;(* Sizeof the type *)
-        voidPtrType (* Ptr to res *) ]
-      false;
-    add "va_copy" voidType [ TBuiltin_va_list []; TBuiltin_va_list [] ] false;
-  end
-
-let initMsvcBuiltins () : unit =
-  (** Take a number of wide string literals *)
-  Builtin_functions.add "__annotation" (voidType, [ ], true)
-
-let init_common_builtins () =
-  add_builtin
-    "offsetof"
-    theMachine.typeOfSizeOf
-    [ theMachine.typeOfSizeOf ]
-    false
-
-let init_builtins () =
-  if not (TheMachine.is_computed ()) then
-    Kernel.fatal ~current:true "You must call initCIL before init_builtins" ;
-  if Builtin_functions.length () <> 0 then
-    Kernel.fatal ~current:true "Cil builtins already initialized." ;
-  init_common_builtins ();
-  if msvcMode () then
-    initMsvcBuiltins ()
-  else begin
-    initVABuiltins ();
-    if gccMode () then initGccBuiltins ();
-  end
-
-(** This is used as the location of the prototypes of builtin functions. *)
-let builtinLoc: location = Location.unknown
 
 let range_loc loc1 loc2 = fst loc1, snd loc2
 
@@ -5578,7 +5234,11 @@ let rec constFoldTermNodeAtTop = function
     (try integer_lconstant (bytesSizeOf typ)
      with SizeOfError _ -> t)
   | TSizeOfStr str -> integer_lconstant (String.length str + 1)
-  | TAlignOf typ -> integer_lconstant (bytesAlignOf typ)
+  | TAlignOf typ as t ->
+    begin
+      try integer_lconstant (bytesAlignOf typ)
+      with SizeOfError _ -> t
+    end
   | TSizeOfE { term_type= Ctype typ } -> constFoldTermNodeAtTop (TSizeOf typ)
   | TAlignOfE { term_type= Ctype typ }
     -> 	constFoldTermNodeAtTop (TAlignOf typ)
@@ -5717,7 +5377,7 @@ let global_annotation_attributes = function
   | Dvolatile (_,_,_,attrs,_) -> attrs
   | Daxiomatic (_,_,attrs,_) -> attrs
   | Dtype ({ lt_attr }, _) -> lt_attr
-  | Dlemma (_,_,_,_,_,attrs,_) -> attrs
+  | Dlemma (_,_,_,_,attrs,_) -> attrs
   | Dinvariant ({l_var_info = { lv_attr }}, _) -> lv_attr
   | Dtype_annot ({l_var_info = { lv_attr }}, _) -> lv_attr
   | Dmodel_annot ({ mi_attr }, _) -> mi_attr
@@ -5734,6 +5394,13 @@ let global_attributes = function
   | GPragma (attr, _) -> [attr]
   | GAnnot (gannot,_) -> global_annotation_attributes gannot
   | GAsm _ | GText _ -> []
+
+let is_in_libc attrs =
+  hasAttribute "fc_stdlib" attrs ||
+  hasAttribute "fc_stdlib_generated" attrs
+
+let global_is_in_libc g =
+  is_in_libc (global_attributes g)
 
 (***************************************************************************)
 
@@ -6107,9 +5774,11 @@ let isIntegerConstant e =
     e
 
 let getCompField cinfo fieldName =
-  List.find (fun fi -> fi.fname = fieldName) cinfo.cfields
+  List.find
+    (fun fi -> fi.fname = fieldName)
+    (Option.value ~default:[] cinfo.cfields)
 
-let mkCastT ?(force=false) ~(e: exp) ~(oldt: typ) ~(newt: typ) =
+let mkCastT ?(force=false) ~(oldt: typ) ~(newt: typ) e =
   let loc = e.eloc in
   (* Issue #!1546
      let force = force ||
@@ -6146,8 +5815,8 @@ let mkCastT ?(force=false) ~(e: exp) ~(oldt: typ) ~(newt: typ) =
   end else
     e
 
-let mkCast ?force ~(e: exp) ~(newt: typ) =
-  mkCastT ?force ~e ~oldt:(typeOf e) ~newt
+let mkCast ?force ~(newt: typ) e =
+  mkCastT ?force ~oldt:(typeOf e) ~newt e
 
 (* TODO: unify this with doBinOp in Cabs2cil. *)
 let mkBinOp ~loc op e1 e2 =
@@ -6156,8 +5825,8 @@ let mkBinOp ~loc op e1 e2 =
   let machdep = false in
   let make_expr common_type res_type =
     constFoldBinOp ~loc machdep op
-      (mkCastT e1 t1 common_type)
-      (mkCastT e2 t2 common_type)
+      (mkCastT t1 common_type e1)
+      (mkCastT t2 common_type e2)
       res_type
   in
   let doArithmetic () =
@@ -6178,7 +5847,7 @@ let mkBinOp ~loc op e1 e2 =
   let compare_pointer op ?cast1 ?cast2 e1 e2 =
     let do_cast e = function
       | None -> e
-      | Some t' -> mkCastT ~force:false ~e ~oldt:(typeOf e) ~newt:t'
+      | Some t' -> mkCastT ~force:false ~oldt:(typeOf e) ~newt:t' e
     in
     let e1, e2 =
       if need_cast ~force:true (typeOf e1) (typeOf e2) then
@@ -6209,14 +5878,14 @@ let mkBinOp ~loc op e1 e2 =
       let t1' = integralPromotion t1 in
       let t2' = integralPromotion t2 in
       constFoldBinOp ~loc machdep op
-        (mkCastT e1 t1 t1') (mkCastT e2 t2 t2') t1'
+        (mkCastT t1 t1' e1) (mkCastT t2 t2' e2) t1'
   | (PlusA|MinusA)
     when isArithmeticType t1 && isArithmeticType t2 -> doArithmetic ()
   | (PlusPI|MinusPI|IndexPI) when isPointerType t1 && isIntegralType t2 ->
     constFoldBinOp ~loc machdep op e1 e2 t1
   | MinusPP when isPointerType t1 && isPointerType t2 ->
     (* NB: Same as cabs2cil. Check if this is really what the standard says*)
-    constFoldBinOp ~loc machdep op e1 (mkCastT e2 t2 t1) intType
+    constFoldBinOp ~loc machdep op e1 (mkCastT t2 t1 e2) intType
   | (Eq|Ne|Lt|Le|Ge|Gt)
     when isArithmeticType t1 && isArithmeticType t2 ->
     doArithmeticComp ()
@@ -6246,8 +5915,8 @@ let mkBinOp_safe_ptr_cmp ~loc op e1 e2 =
       if isPointerType t1 && isPointerType t2
          && not (isZero e1) && not (isZero e2)
       then begin
-        mkCast ~force:true ~e:e1 ~newt:theMachine.upointType,
-        mkCast ~force:true ~e:e2 ~newt:theMachine.upointType
+        mkCast ~force:true ~newt:theMachine.upointType e1,
+        mkCast ~force:true ~newt:theMachine.upointType e2
       end else e1, e2
     | _ -> e1, e2
   in
@@ -6281,7 +5950,7 @@ let existsType (f: typ -> existsAction) (t: typ) : bool =
       false
     else begin
       Hashtbl.add memo c.ckey ();
-      List.exists (fun f -> loop f.ftype) c.cfields
+      List.exists (fun f -> loop f.ftype) (Option.value ~default:[] c.cfields)
     end
   in
   loop t
@@ -6333,16 +6002,18 @@ let rec makeZeroInit ~loc (t: typ) : init =
              (Field(f, NoOffset), makeZeroInit ~loc f.ftype) :: acc
            else
              acc)
-        comp.cfields []
+        (Option.value ~default:[] comp.cfields) []
     in
     CompoundInit (t', inits)
   | TComp (comp, _, _) when not comp.cstruct ->
     (match comp.cfields with
-     | [] -> CompoundInit(t, []) (* tolerate empty initialization. *)
-     | f :: _rest ->
+     | Some [] -> CompoundInit(t, []) (* tolerate empty initialization. *)
+     | Some (f :: _rest) ->
        (* ISO C99 [6.7.8.10] says that the first field of the union
           is the one we should initialize. *)
-       CompoundInit(t, [(Field(f, NoOffset), makeZeroInit ~loc f.ftype)]))
+       CompoundInit(t, [(Field(f, NoOffset), makeZeroInit ~loc f.ftype)])
+     | None ->
+       Kernel.fatal "Initialization of incomplete struct")
   | TArray(bt, Some len, _, _) as t' ->
     let n =
       match constFoldToInt len with
@@ -6363,7 +6034,7 @@ let rec makeZeroInit ~loc (t: typ) : init =
 
   | TPtr _ as t ->
     SingleInit(
-      if theMachine.insertImplicitCasts then mkCast (zero ~loc) t
+      if theMachine.insertImplicitCasts then mkCast t (zero ~loc)
       else zero ~loc)
   | x -> Kernel.fatal ~current:true "Cannot initialize type: %a" !pp_typ_ref x
 
@@ -6408,7 +6079,7 @@ let foldLeftCompound
                    Works because [initl] is sorted by Cabs2cil.*)
                 let good_offset i off = match off with
                   | Index (i', NoOffset) ->
-                    Integer.(equal (Extlib.the (constFoldToInt i')) (of_int i))
+                    Integer.(equal (Option.get (constFoldToInt i')) (of_int i))
                   | _ -> Kernel.fatal ~current:true
                            "Invalid initializer"
                 in
@@ -6448,8 +6119,8 @@ let has_flexible_array_member t =
     | _ -> false
   in
   match unrollType t with
-  | TComp (c,_,_) ->
-    c.cfields <> [] && is_flexible_array (Extlib.last c.cfields).ftype
+  | TComp ({ cfields = Some ((_::_) as l) },_,_) ->
+    is_flexible_array (Extlib.last l).ftype
   | _ -> false
 
 (* last_field is [true] if the given type is the type of the last field of
@@ -6470,9 +6141,9 @@ let rec isCompleteType ?allowZeroSizeArrays ?(last_field=false) t =
     is_complete_agg_member ~allowZeroSizeArrays ~last_field t
   | TArray(t, Some _, _, _) ->
     is_complete_agg_member ~allowZeroSizeArrays ~last_field t
-  | TComp (comp, _, _) -> (* Struct or union *)
-    comp.cdefined &&
-    complete_type_fields ~allowZeroSizeArrays comp.cstruct comp.cfields
+  | TComp ( { cfields = None } , _, _) -> false
+  | TComp ( { cstruct ; cfields = Some flds }, _, _) -> (* Struct or union *)
+    complete_type_fields ~allowZeroSizeArrays cstruct flds
   | TEnum({eitems = []},_) -> false
   | TEnum _ -> true
   | TInt _ | TFloat _ | TPtr _ | TBuiltin_va_list _ -> true
@@ -6569,7 +6240,8 @@ let uniqueVarNames (f: file) : unit =
             let data = CurrentLoc.get () in
             let newname, oldloc =
               Alpha.newAlphaName
-                ~alphaTable:gAlphaTable ~undolist ~lookupname ~data
+                ~alphaTable:gAlphaTable ~undolist:(Some undolist)
+                ~lookupname ~data
             in
             if false && newname <> v.vname then (* Disable this warning *)
               Kernel.warning
@@ -6599,6 +6271,8 @@ let uniqueVarNames (f: file) : unit =
 let is_case_label l = match l with
   | Case _ | Default _ -> true
   | _ -> false
+
+let init_builtins_ref : (unit -> unit) ref = Extlib.mk_fun "init_builtins_ref"
 
 let initCIL ~initLogicBuiltins machdep =
   if not (TheMachine.is_computed ()) then begin
@@ -6661,7 +6335,7 @@ let initCIL ~initLogicBuiltins machdep =
     (* projectify theMachine *)
     copyMachine theMachine !theMachineProject;
 
-    init_builtins ();
+    !init_builtins_ref ();
 
     Logic_env.Builtins.extend initLogicBuiltins;
 

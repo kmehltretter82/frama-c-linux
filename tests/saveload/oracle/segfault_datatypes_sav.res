@@ -4,8 +4,8 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] tests/saveload/segfault_datatypes.i:13: starting to merge loop iterations
-[eva:alarm] tests/saveload/segfault_datatypes.i:13: Warning: 
+[eva] tests/saveload/segfault_datatypes.i:12: starting to merge loop iterations
+[eva:alarm] tests/saveload/segfault_datatypes.i:12: Warning: 
   signed overflow. assert -2147483648 ≤ i - 1;
 [eva] Recording results for main
 [eva] done for function main

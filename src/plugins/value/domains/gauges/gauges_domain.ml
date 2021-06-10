@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -71,14 +71,14 @@ module G = struct
       Some (Integer.of_int (min n1 n2)), Some (Integer.of_int (max n1 n2))
 
     let enlarge i (b1, b2: t) : t =
-      (Extlib.opt_map (Integer.min i) b1, Extlib.opt_map (Integer.max i) b2)
+      (Option.map (Integer.min i) b1, Option.map (Integer.max i) b2)
 
     let lift fmin fmax (bmin1, bmax1: t) (bmin2, bmax2: t) : t =
       (opt2 fmin bmin1 bmin2, opt2 fmax bmax1 bmax2)
 
     let equal (bmin1, bmax1: t) (bmin2, bmax2: t) =
-      Extlib.opt_equal Integer.equal bmin1 bmin2 &&
-      Extlib.opt_equal Integer.equal bmax1 bmax2
+      Option.equal Integer.equal bmin1 bmin2 &&
+      Option.equal Integer.equal bmax1 bmax2
 
     let is_included (bmin1, bmax1: t) (bmin2, bmax2: t) =
       (match bmin1, bmin2 with
@@ -122,17 +122,17 @@ module G = struct
       | min, max -> `Value (min, max)
 
     let succ (b1, b2: t): t =
-      (Extlib.opt_map Integer.succ b1, Extlib.opt_map Integer.succ b2)
+      (Option.map Integer.succ b1, Option.map Integer.succ b2)
 
     let neg (bmin, bmax: t) : t =
-      Extlib.opt_map Integer.neg bmax, Extlib.opt_map Integer.neg bmin
+      Option.map Integer.neg bmax, Option.map Integer.neg bmin
 
     let mul_ct k (bmin, bmax: t) : t =
       let mul = Integer.mul k in
       if Integer.le k Integer.zero then
-        Extlib.opt_map mul bmax, Extlib.opt_map mul bmin
+        Option.map mul bmax, Option.map mul bmin
       else
-        Extlib.opt_map mul bmin, Extlib.opt_map mul bmax
+        Option.map mul bmin, Option.map mul bmax
 
     let mul (bmin1, bmax1: t) (bmin2, bmax2 as b2: t) : t =
       (* multiplication by infty *)
@@ -161,7 +161,7 @@ module G = struct
        widening of Ival. *)
     let widen ?threshold (min1, max1: t) (min2, max2: t) : t =
       let widen_unstable_min b1 b2 =
-        if Extlib.opt_equal Integer.equal b1 b2 then b1 else None
+        if Option.equal Integer.equal b1 b2 then b1 else None
       in
       let widen_unstable_max b1 b2 =
         match threshold with
@@ -464,19 +464,14 @@ module G = struct
     let widen _stmt ~widen_nb i1 i2 =
       let nb =
         if widen_nb then
-          let threshold =
-            None (* LoopAnalysis.Loop_analysis.get_bounds _stmt *)
-          in
-          (* TODO: since we cannot easily use LoopAnalysis here, we
-             should instead:
+          (* TODO:
              - collect the conditionals that exit the loop, as done
                for syntactic hints, if possible in a structured way
                (i.e. base + interval for which we exit the loop)
              - invert this interval using the gauges domain, to
                deduce the number of iterations from which we exit
              - use the max of those values as threshold. *)
-          let threshold = Extlib.opt_map Integer.of_int threshold in
-          let (min, max as w) = Bounds.widen ?threshold i1.nb i2.nb in
+          let (min, max as w) = Bounds.widen i1.nb i2.nb in
           (* Limit min bound to 0 *)
           if min = None then (Some Integer.zero, max) else w
         else
@@ -1213,7 +1208,7 @@ module D_Impl : Abstract_domain.S
     try `Value (G.assign to_loc to_val lv.lval e state)
     with Unassignable -> `Value (kill lv.lloc state)
 
-  let finalize_call _stmt _call ~pre ~post =
+  let finalize_call _stmt _call _recursion ~pre ~post =
     let state =
       match function_calls_handling with
       | FullInterprocedural -> post
@@ -1222,10 +1217,16 @@ module D_Impl : Abstract_domain.S
     in
     `Value state
 
-  let start_call _stmt call valuation state =
+  let start_recursive_call recursion state =
+    let vars = List.map fst recursion.substitution @ recursion.withdrawal in
+    remove_variables vars state
+
+  let start_call _stmt call recursion valuation state =
     let state =
       match function_calls_handling with
-      | FullInterprocedural -> update valuation state
+      | FullInterprocedural ->
+        update valuation state >>-: fun state ->
+        Extlib.opt_fold start_recursive_call recursion state
       | IntraproceduralAll
       | IntraproceduralNonReferenced -> `Value G.empty
     in
@@ -1259,10 +1260,10 @@ module D_Impl : Abstract_domain.S
 
   (* TODO: it would be interesting to return something here, but we
      currently need a valuation to perform the translation. *)
-  let extract_expr _oracle _state _exp =
+  let extract_expr ~oracle:_ _context _state _exp =
     `Value (Cvalue.V.top, None), Alarmset.all
 
-  let extract_lval _oracle state _lv typ loc =
+  let extract_lval ~oracle:_ _context state _lv typ loc =
     let v =
       try
         let b = loc_to_base (Precise_locs.imprecise_location loc) typ in

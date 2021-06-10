@@ -3,5 +3,4 @@
   Non-natural loop detected.
 [loop] Warning: Could not analyze function duff;
   it contains a non-natural loop
-[loop] Add this to your command line:
-  -slevel-function f:1
+[loop] Maximum number of iterations by loop:

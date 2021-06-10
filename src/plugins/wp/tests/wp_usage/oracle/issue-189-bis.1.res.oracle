@@ -1,7 +1,6 @@
 # frama-c -wp [...]
 [kernel] Parsing tests/wp_usage/issue-189-bis.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 
 Goal Post-condition 'memcpy,ok' in 'memcpy_context_vars':
@@ -12,7 +11,7 @@ Assume {
   Type: is_sint32(len_0) /\ is_sint32(len_1).
   (* Goal *)
   When: (0 <= i) /\ ((2 + i) <= len_0).
-  (* Pre-condition *)
+  (* Pre-condition 'write_access' *)
   Have: ((0 < len_0) -> (len_0 <= 1)).
   (* Invariant 'ok,cpy' *)
   Have: forall i_1 : Z. ((0 <= i_1) -> (((len_1 + i_1) < len_0) ->
@@ -44,7 +43,7 @@ Assume {
   Type: is_sint32(len_0) /\ is_sint32(len_1) /\ is_sint32(len_1 - 1).
   (* Goal *)
   When: (0 <= i) /\ ((i + len_1) <= len_0).
-  (* Pre-condition *)
+  (* Pre-condition 'write_access' *)
   Have: ((0 < len_0) -> (len_0 <= 1)).
   (* Invariant 'ok,cpy' *)
   Have: forall i_1 : Z. ((0 <= i_1) -> (((len_1 + i_1) < len_0) ->
@@ -82,7 +81,7 @@ Let a = global(G_src_47).
 Let a_1 = global(G_dst_48).
 Assume {
   Type: is_sint32(len_1) /\ is_sint32(len_0) /\ is_sint32(len_0 - 1).
-  (* Pre-condition *)
+  (* Pre-condition 'write_access' *)
   Have: ((0 < len_1) -> (len_1 <= 1)).
   (* Invariant 'ok,cpy' *)
   Have: forall i : Z. ((0 <= i) -> (((len_0 + i) < len_1) ->
@@ -144,7 +143,7 @@ Assume {
   Type: linked(Malloc_0).
   (* Goal *)
   When: !invalid(Malloc_0, tmp_0, 1).
-  (* Pre-condition *)
+  (* Pre-condition 'write_access' *)
   Have: ((0 < len_0) -> (len_0 <= 1)).
   (* Invariant 'ok,cpy' *)
   Have: forall i : Z. ((0 <= i) -> (((len_1 + i) < len_0) ->
@@ -168,11 +167,12 @@ Effect at line 59
 Prove: true.
 
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'memcpy_context_vars':
+[wp] tests/wp_usage/issue-189-bis.i:48: Warning: 
+  Memory model hypotheses for function 'memcpy_context_vars':
   /*@
-     behavior typed:
-     requires \separated(src,dst);
-     requires \valid(src);
-     requires \valid(dst);
+     behavior wp_typed:
+       requires \valid(dst);
+       requires \valid(src);
+       requires \separated(src, dst);
      */
   void memcpy_context_vars(unsigned char *src, unsigned char *dst, int len);

@@ -17,18 +17,21 @@
 \section{Logic expressions}
 \label{sec:expressions}
 
-\except{guarded quantificatication}.
+\except{the quantifications must be guarded}
 
-More precisely, grammars of terms and binders presented respectively
-Figures~\ref{fig:gram:term} and~\ref{fig:gram:binders} are the same than the one
-of \acsl, while Figure~\ref{fig:gram:pred} presents grammar of predicates. The
-only difference between \eacsl and \acsl predicates are quantifications.
+More precisely, the grammars of terms and binders presented respectively
+Figures~\ref{fig:gram:term} and~\ref{fig:gram:binders} are the same than the ones
+of \acsl, while Figure~\ref{fig:gram:pred} presents the grammar of
+predicates. The only differences introduced by \eacsl with respect to \acsl are
+the fact that the quantifications that must be guarded and the introduction of
+iterators.
 
 \begin{figure}[htbp]
   \begin{cadre}
     \input{term_modern.bnf}
   \end{cadre}
-  \caption{Grammar of terms}
+  \caption{Grammar of terms. The terminals \emph{id}, \emph{C-type-name}, and
+    various literals are the same as the corresponding \C lexical tokens.}
 \label{fig:gram:term}
 \end{figure}
 \begin{figure}[htbp]
@@ -46,40 +49,55 @@ only difference between \eacsl and \acsl predicates are quantifications.
 \end{figure}
 
 \subsection*{Quantification}
-\eacsl quantification must be computable. They are limited to two limited forms.
 
-\begin{description}
-\item[Guarded integer quantification] Guarded universal quantification is
-  denoted by
-\begin{lstlisting}
-\forall $\tau$ $x_1$,$\ldots$,$x_n$;
-  $a_1$ <= $x_1$ <= $b_1$ $\ldots$ && $a_n$ <= $x_n$ <= $b_n$
-  ==> p
-\end{lstlisting} and guarded existential quantification by
-\begin{lstlisting}
-\exists $\tau$ $x_1$,$\ldots$,$x_n$;
-  $a_1$ <= $x_1$ <= $b_1$ $\ldots$ && $a_n$ <= $x_n$ <= $b_n$
-  && p
-\end{lstlisting}
-Each variable must be guarded exactly once and the guard of $x_i$ must appear
-before the guard of $x_j$ if $i < j$ (\emph{i.e.} order of guards must follow
-order of binders).
+{\highlightnotimplemented The general form of quantifications (called
+    generalized quantifications below), as described in
+    Fig.~\ref{fig:gram:pred},
+    is restricted to a few \emph{finite enumerable types}: the types of bound
+    variables must be \C integer types, enum types, pointer types, or their
+    aliases.
 
-Following the definition, each quantified variable belongs to a finite
-interval. Since finite interval is only computable in practice for integers,
-this form of quantifier is limited to \texttt{integer} and its subtype. Thus
-there is no guarded quantification over \texttt{float}, \texttt{real}, \C
-pointers or logic types.
+\unefficient{Generalized quantification over large types (for instance, types
+  containing $2^{32}$ elements).}}
 
-\item[{\highlightnotimplemented{Iterator quantification}}] In order to iterate
-  over non-integer types, \eacsl introduces a notion of $iterators$ over types:
-  standard \acsl unguarded quantifications are only allowed over a type which an
-  iterator is attached to.
+In addition to generalized quantifications, a restricted form of guarded
+quantifications described in Fig.~\ref{fig:gram:guarded} is also recognized
+\emph{for (possibly infinite) enumerable types} (typically,
+\lstinline|integer|). In guarded quantifications, each bound variable must be
+guarded exactly once and, if its bounds depend on other bound variables, these
+variables must be guarded earlier or guarded by the same guard. Additionnally,
+guards are limited to bound variables, meaning that the only allowed
+identifiers $id$ are variable identifiers enclosed in the binder list.
 
-  Iterators are introduced by a specific construct which attachs two sets ---
-  namely \texttt{nexts} and the \texttt{guards} --- to a binary predicate over a
-  type $\tau$. Both sets must have the same cardinal. This construct is
-  described by the grammar of Figure~\ref{fig:gram:iterator}.
+\begin{figure}[htbp]
+  \begin{cadre}
+    \input{guarded_quantif_modern.bnf}
+  \end{cadre}
+  \caption{Grammar of guarded quantifications.}
+  \label{fig:gram:guarded}
+\end{figure}
+
+\ifthenelse{\boolean{PrintImplementationRq}}{%
+  \begin{notimplementedenv}
+    Guarded quantifications over pointer types and enum types are not yet
+    implemented.
+  \end{notimplementedenv}
+}
+
+\begin{example}
+  The following predicates are (labeled) guarded quantifications:
+  \begin{itemize}
+  \item \lstinline|sorted:| \Forall{} \lstinline|integer i, j; 0 <= i <= j < len ==> a[i] <= a[j]|
+  \item {\highlightnotimplemented \lstinline|is_c:| \Exists{} \lstinline|u8 *q; p <= q < p + len && *q == (u8)c|}
+  \end{itemize}
+\end{example}
+
+\subsection*{{\highlightnotimplemented{Iterator quantification}}} For
+iterating over other data structures, \eacsl introduces a notion of $iterators$
+over types that are introduced by a specific construct which attaches two sets
+--- namely \texttt{nexts} and \texttt{guards} --- to a binary predicate over
+a type $\tau$. This construct is
+described by the grammar of Figure~\ref{fig:gram:iterator}.
   \begin{figure}[htbp]
     \begin{cadre}
       \input{iterator_modern.bnf}
@@ -87,27 +105,26 @@ pointers or logic types.
     \caption{Grammar of iterator declarations}
     \label{fig:gram:iterator}
   \end{figure}
-  For a type $\tau$, \texttt{nexts} is a set of terms which take an argument of
-  type $\tau$ and return a value of type $\tau$ which computes the next element
-  in this type, while \texttt{guards} is a set of predicates which take an
-  argument of type $\tau$ and are valid (resp. invalid) to continue (resp. stop)
-  the iteration.
+  For a type $\tau$, \texttt{nexts} is a set of terms, and \texttt{guards} a set
+  of predicates of the same cardinal. Each term in \texttt{nexts} is a function
+  taking an argument of type $\tau$ and returning a value of type $\tau$ which
+  is a successor of its argument. Each predicate in the set \texttt{guards}
+  takes an
+  element of type $\tau$, and is valid (resp. invalid) to indicate that the
+  iteration should continue on the corresponding successor (resp.  stop at the
+  given argument).
 
   Furthermore, the guard of a quantification using an iterator must be the
   predicate given in the definition of the iterator. This abstract binary
   predicate takes two arguments of the same type. One of them must be unnamed by
   using a wildcard (character underscore \texttt{'\_'}). The unnamed argument
-  must be binded to the guantifier, while the other corresponds to the term from
+  must be bound to the quantifier, while the other corresponds to the term from
   which the iteration begins.
   \begin{example}
     The following example introduces binary trees and a predicate which is valid
     if and only if each value of a binary tree is even.
     \cinput{link.c}
   \end{example}
-
-\item[{\highlightnotimplemented{Unguarded quantification}}] They are only
-  allowed over boolean and char.
-\end{description}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -178,8 +195,8 @@ The semantics of all the below predicates are undefined:
 \end{itemize}
 \end{example}
 
-Furthermore, \C-like operators \lstinline|&&|, \lstinline+||+, \lstinline|^^|
-and \lstinline|_ ? _ : _| are lazy like in \C: their right members are evaluated
+Furthermore, \C-like operators \lstinline|&&|, \lstinline+||+, and
+\lstinline|_ ? _ : _| are lazy like in \C: their right members are evaluated 
 only if required. Thus the amount of undefinedness is limited. Consequently,
 predicate \lstinline|p ==> q| is also lazy since it is equivalent
 to \lstinline+!p || q+. It is also the case for guarded quantifications since
@@ -187,13 +204,13 @@ guards are conjunctions and for ternary condition since it is equivalent to a
 disjunction of implications.
 
 \begin{example}\label{ex:semantics}
-Below, the first, second and fourth predicates are invalid while the third
-one is valid:
+  All the predicates below are well defined. The first, second and fourth
+  predicates are invalid, whereas the third one is valid:
 \begin{itemize}
 \item \lstinline|\false && 1/0 == 1/0|
 \item \lstinline|\forall integer x, -1 <= x <= 1 ==> 1/x > 0|
 \item \lstinline|\forall integer x, 0 <= x <= 0 ==> \false ==> -1 <= 1/x <= 1|
-\item \lstinline|\exists integer x, 1 <= x <= 0 && -1 <= 1/x <= 1|
+\item \lstinline|\exists integer x, 1 <= x <= 0 && -1 <= 1/0 <= 1|
 \end{itemize}
 In particular, the second one is invalid since the quantification is in fact an
 enumeration over a finite number of elements, it amounts to
@@ -202,7 +219,7 @@ invalid, so the rest of the conjunction (and in particular 1/0) is not
 evaluated. The fourth one is invalid since it is an existential quantification
 over an empty range.
 
-\emph{A contrario} the semantics of predicates below is undefined:
+\emph{A contrario} the semantics of the predicates below is undefined:
 \begin{itemize}
 \item \lstinline|1/0 == 1/0 && \false|
 \item \lstinline|-1 <= 1/0 <= 1 ==> \true|
@@ -224,28 +241,31 @@ Below, the first term is well-defined, while the second one is undefined.
 \paragraph{Handling undefinedness in tools}
 
 It is the responsibility of each tool which interprets \eacsl to ensure that an
-undefined term is never evaluated. For instance, they may exit with a proper
-error message or, if they generate \C code, they may guard each generated
+undefined term is never evaluated. For instance, it may exit with a proper
+error message or, if it generates \C code, it may guard each generated
 undefined \C expression in order to be sure that they are always safely used.
+
+\ifthenelse{\boolean{PrintImplementationRq}}{%
+  The \eacsl plug-in of \framac generates such guards. \notimplemented{Yet,
+    a few guards are still missing.}
+
+}
 
 This behavior is consistent with both \acsl~\cite{acsl} and mainstream
 specification languages for runtime assertion checking like
 \jml~\cite{jml}. Consistency means that, if it exists and is defined, the \eacsl
 predicate corresponding to a valid (resp. invalid) \acsl predicate is valid
-(resp. invalid). Thus it is possible to reuse tools interpreting \acsl like the
-\framac's value analysis plug-in~\cite{value} in order to interpret \eacsl, and
+(resp. invalid). Thus it is possible to reuse tools interpreting \acsl (e.g.,
+\framac's \Eva~\cite{eva} or \Wp~\cite{wp} in order to interpret \eacsl, and
 it is also possible to perform runtime assertion checking of \eacsl predicates
 in the same way than \jml predicates. Reader interested by the implications
-(especially issues) of such a choice may read articles of Patrice
-Chalin~\cite{chalin05,chalin07}.
+(especially issues) of such a choice may read the articles of Patrice
+Chalin on that topic~\cite{chalin05,chalin07}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Typing}\label{sec:typing}
-\except{no user-defined types}
-
-It is not possible to define logic types introduced by the specification writer
-(see Section~\ref{sec:logicspec}).
+\nodiff
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -256,15 +276,24 @@ It is not possible to define logic types introduced by the specification writer
 
 \subsection{Real numbers and floating point numbers}
 \label{sec:reals}
-\nodiff
+\except{no quantification over real numbers and floating point numbers}
 
-\difficults{Exact real numbers and even floating point numbers}
+\difficults{Exact real numbers and even operations over floating point numbers}
 
-\begin{notimplementedenv}
-  Real numbers beyond rationals are currently not supported by the \eacsl
-  plug-in. Only rationals (in $\mathbb{Q}$) and floating point numbers are
-  supported.
-\end{notimplementedenv}
+More precisely, most real numbers are not representable at runtime with an
+infinite precisions. Consequently, most operations over them (e.g., equality)
+cannot be computed at runtime with an arbitrary precision. In such cases, it is
+the responsibility of each tool which interprets \eacsl to specify the
+level of precision (e.g., $1e^{-6}$) up to which it is sound, and/or to emit
+undefinitive verdicts (e.g., ``unknown'').
+
+\ifthenelse{\boolean{PrintImplementationRq}}{%
+  \begin{notimplementedenv}
+    Only floating point numbers (e.g., \texttt{0.1f}), rationals numbers (in
+    $\mathbb{Q}$) and operations over them are supported by the \eacsl
+    plug-in. Real numbers that are irrational numbers are not supported.
+  \end{notimplementedenv}
+}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -282,18 +311,17 @@ It is not possible to define logic types introduced by the specification writer
 
 \difficults{Logic arrays without an explicit length}
 
-\begin{notimplementedenv}
-  The \lstinline|\length| function is currently not supported by the \eacsl
-  plug-in.
-
-  The comparison of unions and structures is currently not supported by the
-  \eacsl plug-in.
-\end{notimplementedenv}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsection{String literals}
-\nodiff
+\ifthenelse{\boolean{PrintImplementationRq}}{%
+  \begin{notimplementedenv}
+    The following constructs are currently not supported by the \eacsl plug-in:
+    \begin{itemize}
+    \item built-in function \Length;
+    \item comparisons of unions and structures;
+    \item functional updates;
+    \item conversions of structure to structure.
+    \end{itemize}
+  \end{notimplementedenv}
+}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -303,12 +331,12 @@ It is not possible to define logic types introduced by the specification writer
 \label{sec:fn-behavior}
 \index{function contract}\index{contract}
 
-\except{no \lstinline|terminates|}
+\except{no clause \lstinline|terminates|}
 
-Figure~\ref{fig:gram:contracts} shows grammar of function
-contracts. This is a simplified version of \acsl one without
-\lstinline|terminates| clauses. Section~\ref{sec:termination} explains why
-\eacsl has no \lstinline|terminates| clause.
+Figure~\ref{fig:gram:contracts} shows the grammar of function contracts. This is
+a simplified version of \acsl one without \lstinline|terminates|
+clauses. Section~\ref{sec:termination} explains why \eacsl has no
+\lstinline|terminates| clause.
 
 \begin{figure}[htbp]
   \begin{cadre}
@@ -327,8 +355,8 @@ contracts. This is a simplified version of \acsl one without
 
 \nodiff
 
-Figure~\ref{fig:gram:oldandresult} summarizes grammar extension of terms with
-\lstinline|\old| and \lstinline|\result|.
+Figure~\ref{fig:gram:oldandresult} summarizes the grammar extension of terms
+with \lstinline|\old| and \lstinline|\result|.
 \begin{figure}[htbp]
   \begin{cadre}
       \input{oldandresult_modern.bnf}
@@ -344,7 +372,7 @@ Figure~\ref{fig:gram:oldandresult} summarizes grammar extension of terms with
 
 \nodiff
 
-\difficultwhy{\notimplemented{\lstinline|\\assigns|}}{the implementation of a
+\difficultwhy{\notimplemented{\lstinline|assigns|}}{the implementation of a
   memory model}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -363,11 +391,15 @@ Figure~\ref{fig:gram:oldandresult} summarizes grammar extension of terms with
 \except{ranges and \notimplemented{set comprehensions} are limited in order to
   be finite}
 
-Figure~\ref{fig:gram:locations} describes grammar of sets of terms. The only
-differences with \acsl are that both lower and upper bounds of ranges are
-mandatory and that the predicate inside set comprehension must be guarded and
-bind only one variable. In that way, each set of terms is finite and their
-members easily identifiable.
+Figure~\ref{fig:gram:locations} describes the grammar of sets of terms. There
+are two differences with \acsl:
+\begin{itemize}
+\item ranges necessarily have lower and upper bounds;
+\item a guard for each binder is required when defining set comprehension. The
+  requested constraints for guards are the very same than the ones for
+  quantifications.
+\end{itemize}
+  
 \begin{figure}[htbp]
   \fbox{\begin{minipage}{0.97\textwidth}
       \input{loc_modern.bnf}
@@ -378,21 +410,24 @@ members easily identifiable.
 
 \begin{notimplementedenv}
 \begin{example}\label{ex:tset}
-The set \lstinline*{ x | integer x; 0 <= x <= 9 || 20 <= x <= 29 }* denotes the
-set of all integers between 0 and 9 and between 20 and 29.
+The set \lstinline*{ x | integer x; 0 <= x <= 10 && x % 2 == 0}* denotes the
+set of even integers between 0 and 10.
 \end{example}
 \end{notimplementedenv}
 
-\begin{notimplementedenv}
-  Ranges are currently only supported in memory built-ins described in
-  Section~\ref{subsec:memory} and~\ref{sec:dangling}.
+\ifthenelse{\boolean{PrintImplementationRq}}{%
+  \begin{notimplementedenv}
+    Ranges are currently only supported in memory built-ins described in
+    Section~\ref{subsec:memory},~\ref{sec:initialized} and~\ref{sec:dangling}.
+  \end{notimplementedenv}
 
-\begin{example}
-The predicate \lstinline|\valid(&t[0 .. 9])| is supported and denotes that
-the ten first cells of the array \lstinline|t| are valid. Writing the term
-\lstinline|&t[0 .. 9]| alone, outside any memory built-in, is not yet supported.
-\end{example}
-\end{notimplementedenv}
+  \begin{example}
+    The predicate \lstinline|\\valid(&t[0 .. 9])| is supported and denotes
+    that the ten first cells of the array \lstinline|t| are valid. Writing the
+    term \lstinline|&t[0 .. 9]| alone, outside any memory built-in, is not yet
+    supported.
+  \end{example}
+}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -413,7 +448,7 @@ the ten first cells of the array \lstinline|t| are valid. Writing the term
 \indextt{assert}
 \nodiff
 
-Figure~\ref{fig:gram:assertions} summarizes grammar for assertions.
+Figure~\ref{fig:gram:assertions} summarizes the grammar for assertions.
 \begin{figure}[htbp]
   \begin{cadre}
     \input{assertions_modern.bnf}
@@ -429,7 +464,7 @@ Figure~\ref{fig:gram:assertions} summarizes grammar for assertions.
 
 \except{loop invariants lose their inductive nature}
 
-Figure~\ref{fig:gram:loops} shows grammar for loop annotations. There is no
+Figure~\ref{fig:gram:loops} shows the grammar for loop annotations. There is no
 syntactic difference with \acsl.
 \begin{figure}[htbp]
   \begin{cadre}
@@ -439,34 +474,36 @@ syntactic difference with \acsl.
   \label{fig:gram:loops}
 \end{figure}
 
-\difficultwhy{\notimplemented{\lstinline|loop assigns|}}{the implementation of a
-  memory model}
+\difficultswhy{\notimplemented{\lstinline|loop allocation|} and
+  \notimplemented{\lstinline|loop assigns|}}{the implementation of a memory
+  model}
 
 \subsubsection{Loop invariants}
 
 \index{invariant} The semantics of loop invariants is the same than the one
 defined in \acsl, except that they are not inductive. More precisely, if one
-does not take care of side effects (semantics of specifications about side
+does not take care of side effects (the semantics of specifications about side
 effects in loop is the same in \eacsl than the one in \acsl), a loop invariant
 $I$ is valid in \acsl if and only if:
 \begin{itemize}
 \item $I$ holds before entering the loop; and
 \item if $I$ is assumed true in some state where the loop condition $c$ is also
-  true, and if execution of the loop body in that state ends normally at the end
-  of the body or with a "continue" statement, $I$ is true in the resulting
+  true, and if the execution of the loop body in that state ends normally at the
+  end of the body or with a "continue" statement, $I$ is true in the resulting
   state.
 \end{itemize}
 
 In \eacsl, the same loop invariant $I$ is valid if and only if:
 \begin{itemize}
 \item $I$ holds before entering the loop; and
-\item if execution of the loop body in that state ends normally at the end of
-  the body or with a "continue" statement, $I$ is true in the resulting state.
+\item if the execution of the loop body in that state ends normally at the end
+  of the body or with a "continue" statement, $I$ is true in the resulting
+  state.
 \end{itemize}
 
 Thus the only difference with \acsl is that \eacsl does not assume that the
 invariant previously holds when one checks that it holds at the end of the loop
-body. In other words a loop invariant \lstinline|I| is equivalent to put an
+body. In other words a loop invariant \lstinline|I| is equivalent to putting an
 assertion \lstinline|I| just before entering the loop and at the very end of the
 loop body.
 
@@ -484,9 +521,12 @@ loop invariants are not inductive.
 \end{example}
 
 \subsubsection{General inductive invariant}
+\label{sec:generalized-invariants}
 
-Syntax of these kinds of invariant is shown Figure~\ref{fig:advancedinvariants}
-\begin{figure}[t]
+The syntax of this kind of invariant is shown
+Figure~\ref{fig:advancedinvariants}.
+
+\begin{figure}[htbp]
   \begin{cadre}
     \input{generalinvariants_modern.bnf}
   \end{cadre}
@@ -494,8 +534,8 @@ Syntax of these kinds of invariant is shown Figure~\ref{fig:advancedinvariants}
   \label{fig:advancedinvariants}
 \end{figure}
 
-In \eacsl, these kinds of invariants put everywhere in a loop body is exactly
-equivalent to an assertion.
+In \eacsl, a general inductive invariant may be written everywhere in a loop
+body, and is exactly equivalent to writing an assertion.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -504,46 +544,53 @@ equivalent to an assertion.
 
 \except{no forward references}
 
-The construct \verb|\at(t,id)| (where \verb|id| is a regular C label, a label
+The construct \verb|\at(t,id)| (where \verb|id| is a regular \C label, a label
 added within a ghost statement or a default logic label)
 follows the same rule than its \acsl counterpart, except that a more restrictive
 scoping rule must be respected in addition to the standard \acsl scoping rule:
-when evaluating \verb|\at(t,id)| at a propram point $p$, the program point $p'$
-denoted by \verb|id| must be executed after $p$ the program execution flow.
+\begin{itemize}
+\item when evaluating \verb|\at(t,id)| at a propram point $p$, the program point
+  $p'$ denoted by \verb|id| must be reached before $p$ in the program execution
+  flow; and
+\item when evaluating \verb|\at(t,id)|, for each \C left-value $x$ that
+  contributes to the definition of a (non-ghost) logic variable involved in $t$,
+  the equality \verb|\at(x,id) == \at(x,Here)| must hold, i.e. the value of $x$
+  must not be modified between the program points \verb|id| and \verb|Here|.
+\end{itemize}
+
+Below, the first example illustrates the first constraint, whereas the second
+example illustrates the second constraint.
 
 \begin{example}
-In the following example, both assertions are accepted and valid in \acsl, but
-only the first one is accepted and valid in \eacsl since evaluating the term
-\verb|\at(*(p+\at(*q,Here)),L1)| at \verb|L2| requires to evaluate the term
- \verb|\at(*q,Here)| at \verb|L1|: that is forbidden since \verb|L1| is executed
- before \verb|L2|.
-\cinput{at.c}
-
+  In the following example, both assertions are accepted and valid in \acsl, but
+  only the first one is accepted and valid in \eacsl since evaluating the term
+  \verb|\at(*(p+\at(*q,Here)),L1)| at \verb|L2| requires to evaluate the term
+  \verb|\at(*q,Here)| at \verb|L1|: that is forbidden since \verb|L1| is
+  executed before \verb|L2|.  \cinput{at.c}
 \end{example}
-
-For the time being, \verb|\at| can be applied to any term or predicate that uses
-quantified variables, let-binded variables and C variables.
 
 \begin{example}
-The \verb|\at| construct of the following example is supported.
-\cinput{at_on-purely-logic-variables.c}
-
+  In the following example, the first assertion is supported, while the second
+  one is not supported. Indeed, in the second assertion, the guard defining the
+  logic variable \verb|u| depends on \verb|n| whose value is modified between
+  \verb|L1| and \verb|L2|.
+  \cinput{at_on-purely-logic-variables.c}
 \end{example}
 
+\ifthenelse{\boolean{PrintImplementationRq}}{%
+  \begin{notimplementedenv}
+    Any \lstinline|\\at| construct involving a logic variable whose definition
+    depends on a \C variable is currently unsupported by plug-in \eacsl.
 
-\begin{notimplementedenv}
-However, quantified variables that use C variables in their bounds and
-let-binded variables that use C variables in their definition
-are not yet supported.
-
-\begin{example}
-The \verb|\at| construct of the following example is \emph{not yet} supported
-since the quantified variable \verb|i| uses the C variable \verb|n| in the
-definition of its upper bound.
-\cinput{at_on-purely-logic-variables_not-yet.c}
-
-\end{example}
-\end{notimplementedenv}
+    \begin{example}
+      The \lstinline|\\old| construct (special case of \lstinline|\\at|) of the
+      following example is \emph{not yet} supported since the guard of the
+      quantified variable \lstinline|i| depends on the \C variable \lstinline|n|
+      in the definition of its upper bound.
+      \cinput{at_on-purely-logic-variables_not-yet.c}
+    \end{example}
+  \end{notimplementedenv}
+}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -553,7 +600,7 @@ definition of its upper bound.
 
 \nodiff
 
-Figure~\ref{fig:gram:stcontracts} shows grammar of statement contracts.
+Figure~\ref{fig:gram:stcontracts} shows the grammar of statement contracts.
 
 \begin{figure}[htbp]
   \begin{cadre}
@@ -594,7 +641,8 @@ Figure~\ref{fig:gram:stcontracts} shows grammar of statement contracts.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Non-terminating functions}
-\absentexperimental
+\absentwhy{whether a function is guaranteed to terminate if some predicate $p$
+  holds is not a monitorable property}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -604,11 +652,9 @@ Figure~\ref{fig:gram:stcontracts} shows grammar of statement contracts.
 \label{sec:logicspec}
 \index{logic specification}\index{specification}
 
-\limited{stable and computable features}
+\nodiff
 
-Figure~\ref{fig:gram:logic} presents grammar of logic definitions. This is the
-same than the one of \acsl without polymorphic definitions, lemmas, nor
-axiomatics.
+Figure~\ref{fig:gram:logic} presents the grammar of logic definitions.
 
 \begin{figure}[htbp]
   \fbox{\begin{minipage}{0.97\linewidth}\vfill \input{logic_modern.bnf}
@@ -624,28 +670,63 @@ axiomatics.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Lemmas}
-\absentwhy{lemmas are user-given propositions. They are written usually to help
-  theorem provers to establish validity of specifications. Thus they are mostly
-  useful for verification activities based on deductive methods which are out of
-  the scope of \eacsl. Furthermore, they often requires human help to be proven,
-  although \eacsl targets are automatic tools}
+\subsection{\notimplemented{Lemmas}}
+\nodiff
+
+Lemmas are verified before running the function \lstinline|main| but after
+initializing global variables.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Inductive predicates}\label{sec:inductive}
-\absentwhy{inductive predicates are not computable if they really use their
-  inductive nature}
+\subsection{\notimplemented{Inductive predicates}}
+\label{sec:inductivepredicates}
+\index{inductive predicates}
+\experimental
+
+\nodiff
+
+Figure~\ref{fig:gram:inductive} presents the grammar of inductive predicates.
+
+\begin{figure}[htbp]
+  \fbox{\begin{minipage}{0.97\linewidth}\vfill \input{inductive_modern.bnf}
+    \vfill\end{minipage}}
+  \caption{Grammar for inductive predicates}
+\label{fig:gram:inductive}
+\end{figure}
+
+Inductive predicates in all their generality are not monitorable. Therefore,
+future versions of this document will restrict them syntactically (e.g., to
+definite Horn clauses (\url{http://en.wikipedia.org/wiki/Horn_clause}) and/or
+through semantic criteria.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Axiomatic definitions}
-\absentwhy{by nature, an axiomatic is not computable}
+\subsection{\notimplemented{Axiomatic definitions}}
+\label{sec:axiomatic}
+\experimental
+
+\nodiff
+
+Figure~\ref{fig:gram:logicdecl} presents the grammar of axiomatic definitions.
+
+\begin{figure}[htbp]
+  \fbox{\begin{minipage}{0.97\linewidth}\vfill \input{logicdecl_modern.bnf}
+    \vfill\end{minipage}}
+  \caption{Grammar for axiomatic declarations}
+\label{fig:gram:logicdecl}
+\end{figure}
+
+Axiomatic definitions in all their generality are not monitorable. Therefore,
+future versions of this document will restrict them syntactically and/or
+through semantic criteria.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Polymorphic logic types}
-\absentexperimental
+\subsection{\notimplemented{Polymorphic logic types}}
+\label{sec:polym-logic-types}
+\index{type!polymorphic}
+\index{polymorphism}
+\nodiff
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -655,13 +736,44 @@ axiomatics.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Higher-order logic constructions}
-\absentexperimental
+\subsection{\notimplemented{Higher-order logic constructions}}
+\label{sec:higherorder}
+
+\experimental
+
+\nodiff
+
+Figure~\ref{fig:gram:higherorder} introduces new term constructs for
+higher-order logic.
+
+\begin{figure}[htp]
+  \begin{cadre}
+      \input{higherorder_modern.bnf}
+    \end{cadre}
+  \caption{Grammar for higher-order constructs}
+\label{fig:gram:higherorder}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Concrete logic types}\label{sec:concrete-logic-types}
-\absentexperimental
+\subsection{\notimplemented{Concrete logic types}}
+\label{sec:concrete-logic-types}
+\index{type!concrete}
+\experimental
+
+\nodiff
+
+Figure~\ref{fig:gram:logictype} introduces new constructs for defining logic
+types and the associated new terms.
+
+\begin{figure}[htp]
+  \begin{cadre}
+      \index{type!record}\index{type!sum}
+      \input{logictypedecl_modern.bnf}
+    \end{cadre}
+  \caption{Grammar for concrete logic types and pattern-matching}
+\label{fig:gram:logictype}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -676,8 +788,24 @@ axiomatics.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Memory footprint specification: \texorpdfstring{\lstinline|reads|}{reads} clause}
-\absentexperimental
+\subsection{\notimplemented{Memory footprint specification: \texorpdfstring{\lstinline|reads|}{reads} clause}}
+\label{sec:reads}
+\experimental
+
+\nodiff
+
+Figure~\ref{fig:gram:logicreads} introduces \lstinline|reads| clauses.
+
+\begin{figure}[htp]
+  \begin{cadre}
+      \input{logicreads_modern.bnf}
+    \end{cadre}
+  \caption{Grammar for logic declarations with \lstinline|reads| clauses}
+\label{fig:gram:logicreads}
+\end{figure}
+
+\difficultswhy{\notimplemented{read clauses}}{the implementation of a memory
+  model}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -692,7 +820,7 @@ axiomatics.
 \section{Pointers and physical adressing}
 \label{sec:pointers}
 
-\except{separation}
+\nodiff
 
 Figure~\ref{fig:gram:memory} shows the additional constructs for terms and
 predicates which are related to memory location.
@@ -711,37 +839,46 @@ predicates which are related to memory location.
 \label{sec:memory} % for correctness of \changeinsection in Changes
 \nodiff
 
-\difficultswhy{\lstinline|\\base\_addr|,
-    \lstinline|\\block\_length|, \lstinline|\\valid|,
-    \lstinline|\\valid_read| and
-    \lstinline|\\offset|}{the implementation of a memory model}
+\difficultswhy{All memory-related built-in functions and predicates}{the
+  implementation of a memory model}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Separation}\label{sec:separation}
 \nodiff
 
-\difficultswhy{\notimplemented{\lstinline|\\separated|}}{the implementation of a
-  memory model}
+\difficultwhy{\lstinline|\\separated|}{the implementation of a memory model}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Allocation and deallocation}
-\difficultswhy{All these constructs}{the implementation of a memory model}
+\subsection{\notimplemented{Dynamic allocation and deallocation}}
 \label{sec:alloc-dealloc}
 \nodiff
 
+\difficultswhy{All these constructs}{the implementation of a memory model}
+
+Figure~\ref{fig:gram:allocation} introduces grammar for dynamic allocations and
+deallocations.
+
+\begin{figure}[htp]
+  \begin{cadre}
+      \input{allocation_modern.bnf}
+    \end{cadre}
+  \caption{Grammar for dynamic allocations and deallocations}
+\label{fig:gram:allocation}
+\end{figure}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Sets and lists}
+\section{\notimplemented{Sets and lists}}
 \index{location}
 
-\subsection{Finite sets}
+\subsection{\notimplemented{Finite sets}}
 \nodiff
 
-\subsection{Finite lists}
+\subsection{\notimplemented{Finite lists}}
 \nodiff
 
 Figure~\ref{fig:gram:list} shows the notations for built-in lists.
@@ -763,7 +900,7 @@ Figure~\ref{fig:gram:list} shows the notations for built-in lists.
 
 \nodiff
 
-Figure~\ref{fig:gram:abrupt} shows grammar of abrupt termination.
+Figure~\ref{fig:gram:abrupt} shows the grammar of abrupt terminations.
 
 \begin{figure}[htbp]
   \begin{cadre}
@@ -777,8 +914,21 @@ Figure~\ref{fig:gram:abrupt} shows grammar of abrupt termination.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Dependencies information}
-\absentexperimental
+\section{\notimplemented{Dependencies information}}
+\label{sec:func-dep}
+\experimental
+
+\nodiff
+
+Figure~\ref{fig:gram:dep} shows the grammar for dependencies information.
+
+\begin{figure}[htp]
+  \begin{cadre}
+      \input{dependencies_modern.bnf}
+    \end{cadre}
+  \caption{Grammar for dependencies information}
+\label{fig:gram:dep}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -801,6 +951,8 @@ invariants.
 \label{fig:gram:datainvariants}
 \end{figure}
 
+\unefficient{strong invariants}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Semantics}
@@ -814,7 +966,7 @@ invariants.
 
 \nodiff
 
-Figure~\ref{fig:gram:model} summarizes grammar for declarations of model
+Figure~\ref{fig:gram:model} summarizes the grammar for declarations of model
 variables and fields.
 \begin{figure}[htbp]
   \fbox{\begin{minipage}{0.97\linewidth}
@@ -832,10 +984,10 @@ variables and fields.
 \label{sec:ghost}
 \index{ghost}
 
-\except{no specific construct for volatile variables}
+\nodiff
 
-Figure~\ref{fig:gram:ghost} summarizes grammar for ghost statements which is the
-same than the one of \acsl.
+Figure~\ref{fig:gram:ghost} summarizes the grammar for ghost statements which is
+the same than the one of \acsl.
 \begin{figure}[htbp]
   \fbox{\begin{minipage}{0.98\linewidth}
       \input{ghost_modern.bnf}
@@ -846,20 +998,42 @@ same than the one of \acsl.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Volatile variables}
-\absentexperimental
+\subsection{\notimplemented{Volatile variables}}
+\label{sec:volatile-variables}
+\indextt{volatile}
+
+Figure~\ref{fig:gram:volatile} summarizes the grammar for volatile constructs.
+\begin{figure}[htp]
+  \begin{cadre}
+      \input{volatile-gram_modern.bnf}
+    \end{cadre}
+  \caption{Grammar for volatile constructs}
+\label{fig:gram:volatile}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Undefined values, dangling pointers}
+\section{Initialization and undefined values}
+\label{sec:initialized}
+\nodiff
+
+\difficultwhy{\lstinline|\\initialized|}{the implementation of a memory model}
+
+\ifthenelse{\boolean{PrintImplementationRq}}{%
+  \begin{notimplementedenv}
+    The \framac plug-in \eacsl does not support labels as arguments of
+    \lstinline|\\initialized|.
+  \end{notimplementedenv}
+}
+
+\section{\notimplemented{Dangling pointers}}
 \label{sec:dangling}
 \nodiff
 
-\difficultswhy{\lstinline|\\initialized| and
-  \notimplemented{\lstinline|\\dangling|}}{the implementation of a memory
-  model}
+\difficultwhy{\notimplemented{\lstinline|\\dangling|}}{the implementation of a
+  memory model}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -867,4 +1041,19 @@ same than the one of \acsl.
 
 \section{Well-typed pointers}
 \label{sec:typedpointers}
-\absentexperimental
+\absentwhy{it would require the implementation of a \C type system at runtime}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Logic attribute annotations}
+\absentwhy{logic attributes are implementation dependent; therefore their
+  meaning cannot be guessed by a general-purpose (runtime) verification tool}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Preprocessing for ACSL}
+\nodiff

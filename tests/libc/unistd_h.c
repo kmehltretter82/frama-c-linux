@@ -1,6 +1,6 @@
 /*run.config
-  STDOPT: #"-slevel 12" #"-val-split-return auto"
-  STDOPT: #"-variadic-no-translation" #"-slevel 12" #"-val-split-return auto"
+  STDOPT: #"-eva-slevel 12" #"-eva-split-return auto"
+  STDOPT: #"-variadic-no-translation" #"-eva-slevel 12" #"-eva-split-return auto"
 */
 #define _GNU_SOURCE
 #define _XOPEN_SOURCE 600
@@ -103,6 +103,9 @@ int main() {
   int pipefd[2];
   r = pipe(pipefd);
   //@ check ok: r == 0 || r == -1;
+
+  int unslept = sleep(42);
+  //@ assert 0 <= unslept <= 42;
 
   return 0;
 }

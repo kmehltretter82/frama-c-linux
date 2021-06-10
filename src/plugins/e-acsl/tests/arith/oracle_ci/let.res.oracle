@@ -9,7 +9,7 @@
 [eva:alarm] tests/arith/let.c:14: Warning: assertion got status unknown.
 [eva:alarm] tests/arith/let.c:17: Warning: assertion got status unknown.
 [eva:alarm] tests/arith/let.c:21: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] tests/arith/let.c:21: Warning: assertion got status unknown.
 [eva:alarm] tests/arith/let.c:24: Warning: assertion got status unknown.
 [eva:alarm] tests/arith/let.c:27: Warning: assertion got status unknown.

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -115,15 +115,16 @@ struct
   let mem w c = H.Map.mem c w.map
 
   let join a b =
-    let p = ref Passive.empty in
-    H.Map.iter2
-      (fun chunk x y ->
-         match x,y with
-         | Some x , Some y -> p := Passive.join x y !p
-         | Some x , None -> b.map <- H.Map.add chunk x b.map
-         | None , Some y -> a.map <- H.Map.add chunk y a.map
-         | None , None -> ())
-      a.map b.map ; !p
+    if a == b then Passive.empty else
+      let p = ref Passive.empty in
+      H.Map.iter2
+        (fun chunk x y ->
+           match x,y with
+           | Some x , Some y -> p := Passive.join x y !p
+           | Some x , None -> b.map <- H.Map.add chunk x b.map
+           | None , Some y -> a.map <- H.Map.add chunk y a.map
+           | None , None -> ())
+        a.map b.map ; !p
 
   let assigned ~pre ~post written =
     let p = ref Bag.empty in

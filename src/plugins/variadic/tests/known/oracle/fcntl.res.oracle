@@ -1,7 +1,7 @@
-[variadic] FRAMAC_SHARE/libc/fcntl.h:113: 
+[variadic] FRAMAC_SHARE/libc/fcntl.h:118: 
   Declaration of variadic function fcntl.
-[variadic] FRAMAC_SHARE/libc/fcntl.h:116: Declaration of variadic function open.
-[variadic] FRAMAC_SHARE/libc/fcntl.h:122: 
+[variadic] FRAMAC_SHARE/libc/fcntl.h:121: Declaration of variadic function open.
+[variadic] FRAMAC_SHARE/libc/fcntl.h:128: 
   Declaration of variadic function openat.
 [variadic] tests/known/fcntl.c:8: 
   Translating call to the specialized version fcntl(int, int).
@@ -59,8 +59,8 @@ int main(void)
   struct flock fl;
   int volatile choice = 0;
   int flags = __va_fcntl_void(0,1);
-  __va_fcntl_int(0,2,flags);
-  __va_fcntl_flock(0,5,& fl);
+  fcntl(0,2,flags); /* __va_fcntl_int */
+  fcntl(0,5,& fl); /* __va_fcntl_flock */
   switch (choice) {
     case 1:
     {
@@ -69,8 +69,8 @@ int main(void)
       void *__va_args[2] = {& __va_arg0, & __va_arg1};
       fcntl(0,2,(void * const *)(__va_args));
     }
-    case 2: __va_fcntl_void(0,2);
-    case 3: __va_fcntl_flock(0,2,& fl);
+    case 2: fcntl(0,2); /* __va_fcntl_void */
+    case 3: fcntl(0,2,& fl); /* __va_fcntl_flock */
     case 4:
     {
       double __va_arg0_9 = 0.5;

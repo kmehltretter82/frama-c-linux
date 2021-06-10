@@ -1,2 +1,4 @@
-EXECNOW: make -s tests/slicing/libSelect.cmxs tests/slicing/libAnim.cmxs
-OPT: @EVA_OPTIONS@
+MODULE: libSelect libAnim
+MODULE:
+PLUGIN: eva,scope,variadic slicing
+OPT: @EVA_OPTIONS@ -machdep x86_32

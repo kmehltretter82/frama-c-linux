@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -33,7 +33,7 @@ module type Generator_sig = sig
   val retype_args: override_key -> exp list -> exp list
   val args_for_original: override_key -> exp list -> exp list
   val generate_prototype: override_key -> (string * typ)
-  val generate_spec: override_key -> fundec -> location -> funspec
+  val generate_spec: override_key -> location -> fundec -> funspec
 end
 
 module type Instantiator = sig
@@ -50,7 +50,6 @@ module type Instantiator = sig
 end
 
 let build_body caller callee args_generator =
-  let open Extlib in
   let loc  = Cil_datatype.Location.unknown in
   let ret_var = match Cil.getReturnType caller.svar.vtype with
     | t when Cil.isVoidType t -> None
@@ -59,10 +58,10 @@ let build_body caller callee args_generator =
   let call =
     let args = List.map Cil.evar caller.sformals in
     let args = args_generator args in
-    Cil.mkStmt (Instr(call_function (opt_map Cil.var ret_var) callee args))
+    Cil.mkStmt (Instr(call_function (Option.map Cil.var ret_var) callee args))
   in
-  let ret = Cil.mkStmt (Return ( (opt_map Cil.evar ret_var), loc)) in
-  { (Cil.mkBlock [call ; ret]) with blocals = list_of_opt ret_var }
+  let ret = Cil.mkStmt (Return (Option.map Cil.evar ret_var, loc)) in
+  { (Cil.mkBlock [call ; ret]) with blocals = Option.to_list ret_var }
 
 module Make_instantiator (G: Generator_sig) = struct
   include G
@@ -91,7 +90,7 @@ module Make_instantiator (G: Generator_sig) = struct
     let spec = Cil.empty_funspec () in
     Globals.Functions.replace_by_definition spec fd loc ;
     let kf = Globals.Functions.get fd.svar in
-    let spec = generate_spec key fd loc in
+    let spec = generate_spec key loc fd in
     Annotations.add_behaviors Options.emitter kf spec.spec_behavior ;
     List.iter
       (Annotations.add_complete Options.emitter kf)

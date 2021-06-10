@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -27,16 +27,18 @@
 (** {2 Prover} *)
 
 type prover =
-  | Why3 of Why3Provers.t (* Prover via WHY *)
-  | NativeAltErgo (* Direct Alt-Ergo *)
-  | NativeCoq     (* Direct Coq and Coqide *)
-  | Qed           (* Qed Solver *)
-  | Tactical      (* Interactive Prover *)
+  | Why3 of Why3Provers.t (** Prover via WHY *)
+  | NativeAltErgo (** Direct Alt-Ergo *)
+  | NativeCoq     (** Direct Coq and Coqide *)
+  | Qed           (** Qed Solver *)
+  | Tactical      (** Interactive Prover *)
 
 type mode =
-  | BatchMode (* Only check scripts *)
-  | EditMode  (* Edit then check scripts *)
-  | FixMode   (* Try check script, then edit script on non-success *)
+  | Batch  (** Only check scripts *)
+  | Update (** Check and update scripts *)
+  | Edit   (** Edit then check scripts *)
+  | Fix    (** Try check script, then edit script on non-success *)
+  | FixUpdate (** Update & Fix *)
 
 module Pset : Set.S with type elt = prover
 module Pmap : Map.S with type key = prover
@@ -44,9 +46,10 @@ module Pmap : Map.S with type key = prover
 val name_of_prover : prover -> string
 val title_of_prover : prover -> string
 val filename_for_prover : prover -> string
-val prover_of_name : string -> prover option
-val mode_of_prover_name : string -> mode
 val title_of_mode : mode -> string
+
+val parse_mode : string -> mode
+val parse_prover : string -> prover option
 
 val pp_prover : Format.formatter -> prover -> unit
 val pp_mode : Format.formatter -> mode -> unit
@@ -119,7 +122,8 @@ val configure : result -> config
 val autofit : result -> bool (** Result that fits the default configuration *)
 
 val pp_result : Format.formatter -> result -> unit
-val pp_result_qualif : prover -> Format.formatter -> result -> unit
+val pp_result_qualif : ?updating:bool -> prover -> result ->
+  Format.formatter -> unit
 
 val compare : result -> result -> int (* best is minimal *)
 val merge : result -> result -> result

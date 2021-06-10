@@ -1,3 +1,9 @@
+/* run.config*
+PLUGIN: @EVA_PLUGINS@
+ EXIT: 1
+   STDOPT:
+*/
+
 void f(void) {}
 
 int main()

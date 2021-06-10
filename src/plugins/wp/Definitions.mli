@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -22,7 +22,6 @@
 
 open LogicUsage
 open Cil_types
-open Ctypes
 open Lang
 open Lang.F
 
@@ -33,7 +32,7 @@ val cluster : id:string -> ?title:string -> ?position:Filepath.position -> unit 
 val axiomatic : axiomatic -> cluster
 val section : logic_section -> cluster
 val compinfo : compinfo -> cluster
-val matrix : c_object -> cluster
+val matrix : unit -> cluster
 
 val cluster_id : cluster -> string (** Unique *)
 val cluster_title : cluster -> string
@@ -49,7 +48,7 @@ type typedef = (tau,field,lfun) Qed.Engine.ftypedef
 type dlemma = {
   l_name  : string ;
   l_cluster : cluster ;
-  l_assumed : bool ;
+  l_kind : predicate_kind ;
   l_types : int ;
   l_forall : var list ;
   l_triggers : trigger list list ; (** OR of AND-triggers *)
@@ -125,13 +124,28 @@ class virtual visitor : cluster ->
 
     (** {2 Visited definitions} *)
 
-    method virtual section : string -> unit (** Comment *)
-    method virtual on_library : string -> unit (** External library to import *)
-    method virtual on_cluster : cluster -> unit (** Outer cluster to import *)
-    method virtual on_type : logic_type_info -> typedef -> unit (** This local type must be defined *)
-    method virtual on_comp : compinfo -> (field * tau) list -> unit (** This local compinfo must be defined *)
-    method virtual on_icomp : compinfo -> (field * tau) list -> unit (** This local compinfo initialization must be defined *)
-    method virtual on_dlemma : dlemma -> unit (** This local lemma must be defined *)
-    method virtual on_dfun : dfun -> unit (** This local function must be defined *)
+    method virtual section : string -> unit
+    (** Comment *)
+
+    method virtual on_library : string -> unit
+    (** External library to import *)
+
+    method virtual on_cluster : cluster -> unit
+    (** Outer cluster to import *)
+
+    method virtual on_type : logic_type_info -> typedef -> unit
+    (** This local type must be defined *)
+
+    method virtual on_comp : compinfo -> (field * tau) list option -> unit
+    (** This local compinfo must be defined *)
+
+    method virtual on_icomp : compinfo -> (field * tau) list option -> unit
+    (** This local compinfo initialization must be defined *)
+
+    method virtual on_dlemma : dlemma -> unit
+    (** This local lemma must be defined *)
+
+    method virtual on_dfun : dfun -> unit
+    (** This local function must be defined *)
 
   end

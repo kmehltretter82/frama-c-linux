@@ -1,7 +1,7 @@
 [kernel] Parsing tests/syntax/cert_msc_38.c (with preprocessing)
-[kernel:CERT:MSC:38] Warning: 
+[kernel:CERT:MSC:38] tests/syntax/cert_msc_38.c:51: Warning: 
   va_arg is a standard macro. Its definition cannot be suppressed, see CERT C coding rules MSC38-C
-[kernel] tests/syntax/cert_msc_38.c:50: User Error: 
+[kernel] tests/syntax/cert_msc_38.c:51: User Error: 
   Cannot resolve variable va_arg
 [kernel] User Error: stopping on file "tests/syntax/cert_msc_38.c" that has errors. Add
   '-kernel-msg-key pp' for preprocessing command.

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -62,9 +62,9 @@ module State =
   State_builder.Option_ref
     (D)
     (struct
-       let name = "Callgraph.Cg"
-       let dependencies = [ Db.Value.self; Globals.Functions.self ]
-     end)
+      let name = "Callgraph.Cg"
+      let dependencies = [ Db.Value.self; Globals.Functions.self ]
+    end)
 
 let self = State.self
 let is_computed () = State.is_computed ()
@@ -80,16 +80,16 @@ let get_pointed_kfs =
         let o = object
           inherit Visitor.frama_c_inplace
           method !vexpr e = match e.enode with
-          | AddrOf (Var vi, NoOffset) when Cil.isFunctionType vi.vtype ->
-          (* function pointer *)
-            let kf =
-              try Globals.Functions.get vi
-              with Not_found -> assert false
-            in
-            l := kf :: !l;
-            Cil.SkipChildren
-          | _ ->
-            Cil.DoChildren
+            | AddrOf (Var vi, NoOffset) when Cil.isFunctionType vi.vtype ->
+              (* function pointer *)
+              let kf =
+                try Globals.Functions.get vi
+                with Not_found -> assert false
+              in
+              l := kf :: !l;
+              Cil.SkipChildren
+            | _ ->
+              Cil.DoChildren
         end
         in
         Visitor.visitFramacFileSameGlobals o (Ast.get ());
@@ -133,42 +133,42 @@ let syntactic_compute g =
 
     (* add defined functions into the graph *)
     method !vfunc _f =
-      G.add_vertex g (Extlib.the self#current_kf);
+      G.add_vertex g (Option.get self#current_kf);
       Cil.DoChildren
 
     (* add edges from callers to callees into the graph *)
     method !vinst = function
-    | Call(_, { enode = Lval(Var vi, NoOffset) }, _, _) ->
-      (* direct function call *)
-      let callee =
-        try Globals.Functions.get vi
-        with Not_found -> assert false
-      in
-      let caller = Extlib.the self#current_kf in
-      G.add_edge_e g (caller, Extlib.the self#current_stmt, callee);
-      Cil.SkipChildren
-    | Call _ ->
-      (* call via a function pointer: add an edge from each function which
-         the address is taken to this callee. *)
-      let pointed = get_pointed_kfs () in
-      let caller = Extlib.the self#current_kf in
-      List.iter
-        (fun callee ->
-          G.add_edge_e g (caller, Extlib.the self#current_stmt, callee))
-        pointed;
-      Cil.SkipChildren
-    | Local_init (_,ConsInit(v,_,_),_) ->
-      let callee =
-        try Globals.Functions.get v
-        with Not_found -> assert false
-      in
-      let caller = Extlib.the self#current_kf in
-      G.add_edge_e g (caller, Extlib.the self#current_stmt, callee);
-      Cil.SkipChildren
-    | Local_init (_, AssignInit _, _) | Set _
-    | Skip _ | Asm _ | Code_annot _  ->
-      (* skip children for efficiency *)
-      Cil.SkipChildren
+      | Call(_, { enode = Lval(Var vi, NoOffset) }, _, _) ->
+        (* direct function call *)
+        let callee =
+          try Globals.Functions.get vi
+          with Not_found -> assert false
+        in
+        let caller = Option.get self#current_kf in
+        G.add_edge_e g (caller, Option.get self#current_stmt, callee);
+        Cil.SkipChildren
+      | Call _ ->
+        (* call via a function pointer: add an edge from each function which
+           the address is taken to this callee. *)
+        let pointed = get_pointed_kfs () in
+        let caller = Option.get self#current_kf in
+        List.iter
+          (fun callee ->
+             G.add_edge_e g (caller, Option.get self#current_stmt, callee))
+          pointed;
+        Cil.SkipChildren
+      | Local_init (_,ConsInit(v,_,_),_) ->
+        let callee =
+          try Globals.Functions.get v
+          with Not_found -> assert false
+        in
+        let caller = Option.get self#current_kf in
+        G.add_edge_e g (caller, Option.get self#current_stmt, callee);
+        Cil.SkipChildren
+      | Local_init (_, AssignInit _, _) | Set _
+      | Skip _ | Asm _ | Code_annot _  ->
+        (* skip children for efficiency *)
+        Cil.SkipChildren
 
     (* for efficiency purpose, skip many items *)
     method !vexpr _ = Cil.SkipChildren
@@ -182,22 +182,22 @@ let syntactic_compute g =
   if not (Options.Uncalled.get () && Options.Uncalled_leaf.get ()) then
     G.iter_vertex
       (fun kf ->
-        let has_pred =
-          try
-            G.iter_pred (fun _ -> raise Exit) g kf;
-            false
-          with Exit ->
-            true
-        in
-        if not (has_pred (* no caller *) || is_entry_point kf)
-        then
-          let must_kept =
-            Options.Uncalled.get ()  (* uncalled functions must be kept *)
-            &&
-              (Options.Uncalled_leaf.get () (* uncalled leaf must be kept *)
-               || Kernel_function.is_definition kf (* [kf] is a leaf *))
-          in
-          if not must_kept then G.remove_vertex g kf)
+         let has_pred =
+           try
+             G.iter_pred (fun _ -> raise Exit) g kf;
+             false
+           with Exit ->
+             true
+         in
+         if not (has_pred (* no caller *) || is_entry_point kf)
+         then
+           let must_kept =
+             Options.Uncalled.get ()  (* uncalled functions must be kept *)
+             &&
+             (Options.Uncalled_leaf.get () (* uncalled leaf must be kept *)
+              || Kernel_function.is_definition kf (* [kf] is a leaf *))
+           in
+           if not must_kept then G.remove_vertex g kf)
       g
 
 (* complexity = O(number of function calls);
@@ -205,23 +205,23 @@ let syntactic_compute g =
 let semantic_compute g =
   Globals.Functions.iter
     (fun kf ->
-      let callers = !Db.Value.callers kf in
-      let must_add =
-        callers <> []  (* the function is called *)
-        || is_entry_point kf
-        ||
-          (Options.Uncalled.get () (* uncalled functions must be added *)
-           && (Options.Uncalled_leaf.get () (* uncalled leaf must be added *)
-               || Kernel_function.is_definition kf) (* [kf] is not a leaf *))
-      in
-      if must_add then begin
-        G.add_vertex g kf;
-        List.iter
-          (fun (caller, callsites) ->
-            List.iter
-              (fun stmt -> G.add_edge_e g (caller, stmt, kf)) callsites)
-          callers
-      end)
+       let callers = !Db.Value.callers kf in
+       let must_add =
+         callers <> []  (* the function is called *)
+         || is_entry_point kf
+         ||
+         (Options.Uncalled.get () (* uncalled functions must be added *)
+          && (Options.Uncalled_leaf.get () (* uncalled leaf must be added *)
+              || Kernel_function.is_definition kf) (* [kf] is not a leaf *))
+       in
+       if must_add then begin
+         G.add_vertex g kf;
+         List.iter
+           (fun (caller, callsites) ->
+              List.iter
+                (fun stmt -> G.add_edge_e g (caller, stmt, kf)) callsites)
+           callers
+       end)
 
 let compute () =
   let g = G.create () in
@@ -270,7 +270,7 @@ module Subgraph =
       let name = State.name
       let get = get
       let vertex kf = kf
-     end)
+    end)
 
 let dump () =
   let module GV = Graph.Graphviz.Dot(Graphviz_attributes) in
@@ -285,7 +285,7 @@ include Journalize.Make
       type t = G.t
       let ty = D.ty
       let get = get
-     end)
+    end)
 
 (*
 Local Variables:

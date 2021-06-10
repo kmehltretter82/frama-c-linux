@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -371,6 +371,9 @@ let rewrite ?at patterns sequent =
        let step = Conditions.(step ~descr (When guard)) in
        descr , Conditions.insert ?at step sequent
     ) patterns
+
+let condition name guard process seq =
+  ( name , (fst seq , guard) ) :: process seq
 
 (* -------------------------------------------------------------------------- *)
 (* --- Tactical Engines                                                   --- *)

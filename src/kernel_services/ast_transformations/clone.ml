@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -49,9 +49,9 @@ let clone_function_definition old_kf =
     Visitor.visitFramacFunspec visitor old_funspec
   in
   (* Creates the kernel function for the clone function. *)
-  let new_kf = 
-	(* NOTE: it would be better if the replace function would
-           return the associated kernel function that is new here *)
+  let new_kf =
+    (* NOTE: it would be better if the replace function would
+             return the associated kernel function that is new here *)
     Globals.Functions.replace_by_definition new_funspec new_fundec old_loc;
     try Globals.Functions.get new_fundec.svar
     with Not_found ->
@@ -66,25 +66,25 @@ let clone_defined_kernel_function old_kf =
   let new_kf = clone_function_definition old_kf in
   let new_fundec = Kernel_function.get_definition new_kf in
   let new_loc = Kernel_function.get_location new_kf in
-  let gfun = GFun (new_fundec, new_loc) in 
+  let gfun = GFun (new_fundec, new_loc) in
 
   let old_vi = Kernel_function.get_vi old_kf in
-  let is_old_fundec fundec = Cil_datatype.Varinfo.equal fundec.svar old_vi in 
+  let is_old_fundec fundec = Cil_datatype.Varinfo.equal fundec.svar old_vi in
   let is_old_gfun = function
     | GFun (fundec,_) -> is_old_fundec fundec
     | _ -> false
-  in 
+  in
   (* Scan the globals. Make sure this is tail recursive. *)
   let rec loop (acc: global list) = function
     | [] -> begin
-      match f.globinit with
-      | Some fundec when is_old_fundec fundec -> 
-	(* The clone function is the global initializer function. 
-	   Adds it at the end of the list of globals. *)
-	List.rev_append acc [gfun]
-      | _ -> Kernel.fatal "kernel function not found for %s(%d)" old_vi.vname old_vi.vid
-    end
-    | g :: restg when is_old_gfun g -> List.rev_append acc (g:: gfun ::restg) 
+        match f.globinit with
+        | Some fundec when is_old_fundec fundec ->
+          (* The clone function is the global initializer function.
+             Adds it at the end of the list of globals. *)
+          List.rev_append acc [gfun]
+        | _ -> Kernel.fatal "kernel function not found for %s(%d)" old_vi.vname old_vi.vid
+      end
+    | g :: restg when is_old_gfun g -> List.rev_append acc (g:: gfun ::restg)
     | g :: restg -> loop (g::acc) restg
   in
   (* Updates the list of globals *)

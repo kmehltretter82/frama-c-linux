@@ -1,6 +1,6 @@
 /* run.config_ci
    COMMENT: arrays
-   STDOPT: #"-slevel 5"
+   STDOPT: #"-eva-slevel 5"
 */
 
 int T1[3],T2[4];

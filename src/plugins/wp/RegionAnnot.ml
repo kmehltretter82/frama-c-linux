@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -212,7 +212,7 @@ let pp_region_spec pp fmt coma spec =
   begin
     if coma then Format.fprintf fmt ",@ " ;
     Format.fprintf fmt "@[<hv 2>" ;
-    Extlib.may (Format.fprintf fmt "%s:@ ") spec.region_name ;
+    Option.iter (Format.fprintf fmt "%s:@ ") spec.region_name ;
     let coma = pp_pattern_spec fmt spec.region_pattern in
     let coma = List.fold_left (pp_path_spec pp fmt) coma spec.region_lpath in
     Format.fprintf fmt "@]" ;
@@ -238,7 +238,7 @@ let flush env =
   let region_name = env.name in env.name <- None ;
   let region_pattern = env.pattern in env.pattern <- FREE ;
   let region_lpath = List.rev env.paths in env.paths <- [] ;
-  Extlib.may (fun a -> env.declared <- a::env.declared) region_name ;
+  Option.iter (fun a -> env.declared <- a::env.declared) region_name ;
   if not (region_name = None && region_lpath = []) then
     let region = { region_name ; region_pattern ; region_lpath } in
     env.specs <- region :: env.specs
@@ -270,7 +270,7 @@ let parse_varinfo env ~loc x =
     error env ~loc "Unknown variable (or region) '%s'" x
 
 let parse_fieldinfo env ~loc comp f =
-  try List.find (fun fd -> fd.fname = f) comp.cfields
+  try List.find (fun fd -> fd.fname = f) (Option.value ~default:[] comp.cfields)
   with Not_found ->
     error env ~loc "No field '%s' in compound type '%s'" f comp.cname
 
@@ -382,17 +382,26 @@ let rec parse_lpath env e =
       let comp =
         if Compinfo.equal fa.fcomp fb.fcomp then fa.fcomp
         else error env ~loc "Range of fields from incompatible types" in
-      let fields = field_range ~inside:false fa fb comp.cfields in
+      let fields =
+        field_range ~inside:false fa fb
+          (Option.value ~default:[] comp.cfields)
+      in
       let ltype = typeof_fields fields in
       { loc ; lnode = L_field(p,fields) ; ltype }
   | PLrange( Some a , None ) ->
       let p,fd = parse_fpath env a in
-      let fields = field_range ~inside:false fd fd fd.fcomp.cfields in
+      let fields =
+        field_range ~inside:false fd fd
+          (Option.value ~default:[] fd.fcomp.cfields)
+      in
       let ltype = typeof_fields fields in
       { loc ; lnode = L_field(p,fields) ; ltype }
   | PLrange( None , Some a ) ->
       let p,fd = parse_fpath env a in
-      let fields = field_range ~inside:true fd fd fd.fcomp.cfields in
+      let fields =
+        field_range ~inside:true fd fd
+          (Option.value ~default:[] fd.fcomp.cfields)
+      in
       let ltype = typeof_fields fields in
       { loc ; lnode = L_field(p,fields) ; ltype }
   | _ ->

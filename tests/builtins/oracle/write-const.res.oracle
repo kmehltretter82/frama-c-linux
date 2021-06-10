@@ -15,7 +15,7 @@
   function memcpy: precondition 'valid_src' got status valid.
 [eva] tests/builtins/write-const.c:18: 
   function memcpy: precondition 'separation' got status valid.
-[eva] share/libc/string.h:98: 
+[eva] share/libc/string.h:101: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva] tests/builtins/write-const.c:19: 
   Frama_C_dump_each:
@@ -42,7 +42,7 @@
 [eva] tests/builtins/write-const.c:25: Call to builtin memset
 [eva:alarm] tests/builtins/write-const.c:25: Warning: 
   function memset: precondition 'valid_s' got status unknown.
-[eva] share/libc/string.h:118: 
+[eva] share/libc/string.h:121: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] tests/builtins/write-const.c:26: 
   Frama_C_dump_each:

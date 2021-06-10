@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -405,12 +405,17 @@ let () = Context.register
 (* --- Models                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-let register_c_acsl_builtin name lfun ft =
-  let name = match ft with
-    | Float32 -> name ^ "f"
-    | Float64 -> name
+let hack_sqrt_builtin ft =
+  let choose xs =
+    match Context.get model with
+    | Real -> F.e_fun ~result:t_real Cmath.f_sqrt xs
+    | Float -> F.e_fun ~result:(ftau ft) (f_sqrt ft) xs
   in
-  LogicBuiltins.add_builtin name [F ft] (lfun ft)
+  let name = match ft with
+    | Float32 -> "sqrtf"
+    | Float64 -> "sqrt"
+  in
+  LogicBuiltins.hack name choose
 
 let () =
   let open LogicBuiltins in
@@ -418,7 +423,7 @@ let () =
     add_builtin "\\model" [F ft] (f_model ft) ;
     add_builtin "\\delta" [F ft] (f_delta ft) ;
     add_builtin "\\epsilon" [F ft] (f_epsilon ft) ;
-    register_c_acsl_builtin "sqrt" f_sqrt ft
+    hack_sqrt_builtin ft
   in
   register_builtin Float32 ;
   register_builtin Float64

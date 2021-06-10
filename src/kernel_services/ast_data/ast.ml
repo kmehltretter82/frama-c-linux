@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -28,25 +28,25 @@ include
   State_builder.Option_ref
     (Cil_datatype.File)
     (struct
-       let name = "AST"
-       
-       let dependencies =
-         [ Cil.selfMachine;
-           Kernel.SimplifyCfg.self;
-           Kernel.KeepSwitch.self;
-           Kernel.Constfold.self;
-           Kernel.ReadAnnot.self;
-           Kernel.PreprocessAnnot.self;
-           Kernel.Files.self;
-           Kernel.UnrollingLevel.self;
-           Kernel.Keep_unused_specified_functions.self;
-           Kernel.Keep_unused_types.self;
-           Cil.selfFormalsDecl ]
-     end)
+      let name = "AST"
+
+      let dependencies =
+        [ Cil.selfMachine;
+          Kernel.SimplifyCfg.self;
+          Kernel.KeepSwitch.self;
+          Kernel.Constfold.self;
+          Kernel.ReadAnnot.self;
+          Kernel.PreprocessAnnot.self;
+          Kernel.Files.self;
+          Kernel.UnrollingLevel.self;
+          Kernel.Keep_unused_specified_functions.self;
+          Kernel.Keep_unused_types.self;
+          Cil.selfFormalsDecl ]
+    end)
 
 let mark_as_computed () = mark_as_computed () (* eta-expansion required *)
 
-let linked_states = 
+let linked_states =
   ref
     [ Logic_env.Logic_info.self;
       Logic_env.Logic_type_info.self;
@@ -100,7 +100,7 @@ let set_default_initialization f = default_initialization := f
 
 module Computing =
   State_builder.False_ref(
-    struct let name = "Ast.computing" let dependencies = [] end)
+  struct let name = "Ast.computing" let dependencies = [] end)
 
 let force_compute () =
   if Computing.get () then
@@ -142,13 +142,13 @@ module UntypedFiles = struct
     else raise NoUntypedAst
 
   include State_builder.Option_ref
-    (Initial_datatype.List(Cil_datatype.Cabs_file))
-    (struct
-       let name = "Untyped AST"
-       let dependencies = (* the others delayed until file.ml *)
-         [ Cil.selfMachine;
-           self (* can't be computed without the AST *) ]
-     end)
+      (Initial_datatype.List(Cil_datatype.Cabs_file))
+      (struct
+        let name = "Untyped AST"
+        let dependencies = (* the others delayed until file.ml *)
+          [ Cil.selfMachine;
+            self (* can't be computed without the AST *) ]
+      end)
 
   let get () = memo (fun () -> compute_untyped (); get ())
 
@@ -162,7 +162,7 @@ module LastDecl =
       let name = "Ast.LastDecl"
       let dependencies = [ self ]
       let size = 47
-     end)
+    end)
 
 let compute_last_def_decl () =
   (* Only meaningful when we have definitely computed the AST. *)
@@ -170,9 +170,9 @@ let compute_last_def_decl () =
     let globs = (get ()).globals in
     let update_one_global g =
       match g with
-        | GVarDecl(v,_) | GFunDecl(_,v,_) | GVar (v,_,_) | GFun ({svar=v},_) ->
-          LastDecl.replace v g
-        | _ -> ()
+      | GVarDecl(v,_) | GFunDecl(_,v,_) | GVar (v,_,_) | GFun ({svar=v},_) ->
+        LastDecl.replace v g
+      | _ -> ()
     in
     List.iter update_one_global globs;
     LastDecl.mark_as_computed ()
@@ -203,9 +203,9 @@ let is_def_or_last_decl g =
       false
   in
   match g with
-    | GVarDecl(v,_) | GFunDecl (_,v,_) -> is_eq v
-    | GVar _ | GFun _ -> true
-    | _ -> false
+  | GVarDecl(v,_) | GFunDecl (_,v,_) -> is_eq v
+  | GVar _ | GFun _ -> true
+  | _ -> false
 
 let clear_last_decl () =
   let selection = State_selection.Static.with_dependencies LastDecl.self in

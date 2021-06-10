@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -44,7 +44,8 @@ module type S_no_log = sig
   module Config: Parameter_sig.Specific_dir
   val help: Cmdline.Group.t
   val messages: Cmdline.Group.t
-  val add_plugin_output_aliases: string list -> unit
+  val add_plugin_output_aliases:
+    ?visible:bool -> ?deprecated:bool -> string list -> unit
 end
 
 module type S = sig
@@ -115,16 +116,18 @@ type plugin =
     p_parameters: (string, Typed_parameter.t list) Hashtbl.t }
 
 let plugins: plugin list ref = ref []
+let cmp_plugins p1 p2 =
+  (* the kernel is the smallest plug-in *)
+  match p1.p_name, p2.p_name with
+  | s1, s2 when s1 = kernel_name && s2 = kernel_name -> 0
+  | s1, _ when s1 = kernel_name -> -1
+  | _, s2 when s2 = kernel_name -> 1
+  | s1, s2 -> String.compare s1 s2
 let iter_on_plugins f =
-  let cmp p1 p2 =
-    (* the kernel is the smaller plug-in *)
-    match p1.p_name, p2.p_name with
-    | s1, s2 when s1 = kernel_name && s2 = kernel_name -> 0
-    | s1, _ when s1 = kernel_name -> -1
-    | _, s2 when s2 = kernel_name -> 1
-    | s1, s2 -> String.compare s1 s2
-  in
-  List.iter f (List.sort cmp !plugins)
+  List.iter f (List.sort cmp_plugins !plugins)
+
+let fold_on_plugins (f : (plugin -> 'a -> 'a)) (acc : 'a) : 'a =
+  List.fold_left (fun acc e -> f e acc) acc (List.sort cmp_plugins !plugins)
 
 let is_present s = List.exists (fun p -> p.p_shortname = s) !plugins
 let get_from_name s = List.find (fun p -> p.p_name = s) !plugins
@@ -297,7 +300,7 @@ struct
   module Make_specific_dir
       (O: Parameter_sig.Input_with_arg)
       (D: sig
-         val dirs: unit -> string list
+         val dirs: unit -> Fc_Filepath.Normalized.t list
          val visible_ref: bool
        end)
   =
@@ -308,7 +311,7 @@ struct
 
     let () =
       Parameter_customize.set_cmdline_stage Cmdline.Extended;
-      if is_visible then Parameter_customize.do_iterate ()
+      if is_visible then Parameter_customize.is_reconfigurable ()
       else Parameter_customize.is_invisible ()
 
     module Dir_name =
@@ -348,11 +351,10 @@ struct
         let dirs = D.dirs () in
         assert (dirs <> []);
         if is_kernel
-        then
-          List.map Datatype.Filepath.of_string dirs
+        then dirs
         else
           List.map
-            (fun x -> Datatype.Filepath.of_string (x ^ "/" ^ plugin_subpath))
+            (fun x -> Datatype.Filepath.concat x plugin_subpath)
             dirs
       end
 
@@ -365,7 +367,7 @@ struct
             try
               List.fold_left
                 (fun dummy d ->
-                   let name = Datatype.Filepath.concat d ("/" ^ s) in
+                   let name = Datatype.Filepath.concat d s in
                    if Sys.file_exists (name :> string)
                    then raise (Found name)
                    else dummy)
@@ -386,7 +388,7 @@ struct
           let filepath =
             match base_dirs () with
             | [] -> assert false
-            | d :: _ -> Datatype.Filepath.concat d ("/" ^ s)
+            | d :: _ -> Datatype.Filepath.concat d s
           in
           match mode with
           | `Must_exist ->
@@ -414,7 +416,7 @@ struct
       let s_dirname = Filename.dirname s in
       let base_dir = get_dir ~mode s_dirname in
       let s_basename = Filename.basename s in
-      let filepath = Datatype.Filepath.concat base_dir ("/" ^ s_basename) in
+      let filepath = Datatype.Filepath.concat base_dir s_basename in
       match mode with
       | `Must_exist ->
         if Sys.file_exists (filepath :> string)
@@ -453,8 +455,10 @@ struct
         let dirs () = [
           if !session_is_set_ref () then !session_ref ()
           else
-            try Sys.getenv "FRAMAC_SESSION"
-            with Not_found -> "./.frama-c"]
+            Fc_Filepath.Normalized.of_string
+              (try Sys.getenv "FRAMAC_SESSION"
+               with Not_found -> "./.frama-c")
+        ]
         let visible_ref = !session_visible_ref
       end)
   let () =
@@ -473,20 +477,24 @@ struct
       end)
       (struct
         let dirs () = [
+          let to_path = Fc_Filepath.Normalized.of_string in
           let d, vis =
             if !config_is_set_ref () then !config_ref (), false
             else
-              try Sys.getenv "FRAMAC_CONFIG", false
+              try to_path (Sys.getenv "FRAMAC_CONFIG"), false
               with Not_found ->
-              try Sys.getenv "USERPROFILE", false (* Win32 *)
+              try to_path (Sys.getenv "USERPROFILE"), false (* Win32 *)
               with Not_found ->
               (* Unix like *)
-              try Sys.getenv "XDG_CONFIG_HOME", true
+              try to_path (Sys.getenv "XDG_CONFIG_HOME"), true
               with Not_found ->
-              try Sys.getenv "HOME" ^ "/.config", true
-              with Not_found -> ".", false
+              try
+                Fc_Filepath.Normalized.concat
+                  (to_path (Sys.getenv "HOME")) ".config", true
+              with Not_found -> to_path ".", false
           in
-          d ^ if vis then "/frama-c" else "/.frama-c"
+          Fc_Filepath.Normalized.concat
+            d (if vis then "frama-c" else ".frama-c")
         ]
         let visible_ref = !config_visible_ref
       end)
@@ -514,7 +522,7 @@ struct
     Parameter_customize.set_group messages;
     Parameter_customize.do_not_projectify ();
     Parameter_customize.do_not_journalize ();
-    Parameter_customize.do_iterate ();
+    Parameter_customize.is_reconfigurable ();
     if is_kernel () then begin
       Parameter_customize.set_cmdline_stage Cmdline.Early;
       Parameter_customize.set_module_name modname;
@@ -795,14 +803,14 @@ struct
     let is_kernel = is_kernel () in
     Warn_category.add_set_hook (parse_warn_directives is_kernel)
 
-  let add_plugin_output_aliases aliases =
+  let add_plugin_output_aliases ?visible ?deprecated aliases =
     let aliases = List.filter (fun alias -> alias <> "") aliases in
     let optname suffix = List.map (fun alias -> "-" ^ alias ^ suffix) aliases in
-    Help.add_aliases (optname "-help");
-    Verbose.add_aliases (optname "-verbose");
-    Debug_category.add_aliases (optname "-msg-key");
-    Warn_category.add_aliases (optname "-warn-key");
-    LogToFile.add_aliases (optname "-log")
+    Help.add_aliases ?visible ?deprecated (optname "-help");
+    Verbose.add_aliases ?visible ?deprecated (optname "-verbose");
+    Debug_category.add_aliases ?visible ?deprecated (optname "-msg-key");
+    Warn_category.add_aliases ?visible ?deprecated (optname "-warn-key");
+    LogToFile.add_aliases ?visible ?deprecated (optname "-log")
 
   let () = reset_plugin ()
 

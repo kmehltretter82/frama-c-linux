@@ -4,7 +4,7 @@
 %%MODERN \documentclass[a4paper,11pt,twoside,openright]{report}
 \documentclass[web,svgnames]{frama-c-book}
 
-\usepackage{xspace,alltt,calc,multirow,tabularx,bigdelim}
+\usepackage{xspace,alltt,calc,multirow,tabularx,bigdelim,spverbatim}
 \usepackage{amsmath}
 \IfFileExists{diagbox.sty} % Compatibility with newer diagbox and older slashbox
   {\usepackage{diagbox}
@@ -29,6 +29,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \input{./macros.sty}
+\input{./frama-c-affiliation.tex}
 \makeindex
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -47,7 +48,7 @@
 \author{Julien~Signoles with Thibaud~Antignac, Loïc~Correnson, Matthieu~Lemerre
 and Virgile~Prevosto}
 \begin{center}
-CEA LIST, Software Security Laboratory, Saclay,F-91191
+  \fcaffiliationen
 \end{center}
 \vfill
 \begin{flushleft}
@@ -100,13 +101,33 @@ described here may still evolve in the future.
 \section*{Acknowledgements}
 %\addcontentsline{toc}{chapter}{Acknowledgements}
 
-We gratefully thank all the people who contributed to this document: Gergö
-Barany, Patrick Baudin, Richard Bonichon, Pascal Cuoq, Zaynah Dargaye, Basile 
-Desloges,  Florent Garnier,
-Pierre-Loïc Garoche, Philippe Herrmann, Boris Hollas, Nikolaï Kosmatov,
-Jean-Christophe Léchenet, André Maroneze, Benjamin Monate, Yannick Moy,
-Anne Pacalet, Armand Puccetti, Muriel Roger and Boris
-Yakobowski. We also thank Johannes Kanig for his \langage{Mlpost}
+We gratefully thank all the people who contributed to this document:
+Michele Alberti,
+Gergö Barany,
+Patrick Baudin,
+Allan Blanchard,
+Richard Bonichon,
+David B\"uhler,
+Pascal Cuoq,
+Zaynah Dargaye,
+Basile Desloges,
+Florent Garnier,
+Pierre-Loïc Garoche,
+Philippe Herrmann,
+Boris Hollas,
+Nikolaï Kosmatov,
+Jean-Christophe Léchenet,
+Romain Maliach-Auguste,
+André Maroneze,
+Benjamin Monate,
+Yannick Moy,
+Anne Pacalet,
+Valentin Perrelle,
+Armand Puccetti,
+Muriel Roger and
+Boris Yakobowski.
+
+We also thank Johannes Kanig for his \langage{Mlpost}
 support\footnote{\url{http://mlpost.lri.fr}}, the tool formerly used for
 making figures of this document.
 

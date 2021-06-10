@@ -47,17 +47,17 @@ int *memmove_int(int *dest, int const *src, size_t len)
   return __retres;
 }
 
-void integer(int * /*[10]*/ src, int * /*[10]*/ dest)
+void integer(int src[10], int dest[10])
 {
-  int *res = memmove_int(dest,src,(unsigned int)10 * sizeof(int));
-  memmove_int(src,res,(unsigned int)10 * sizeof(int));
+  int *res = memmove_int(dest,src,(unsigned long)10 * sizeof(int));
+  memmove_int(src,res,(unsigned long)10 * sizeof(int));
   return;
 }
 
-void with_named(named * /*[10]*/ src, named * /*[10]*/ dest)
+void with_named(named src[10], named dest[10])
 {
-  named *res = memmove_int(dest,src,(unsigned int)10 * sizeof(named));
-  memmove_int(src,res,(unsigned int)10 * sizeof(named));
+  named *res = memmove_int(dest,src,(unsigned long)10 * sizeof(named));
+  memmove_int(src,res,(unsigned long)10 * sizeof(named));
   return;
 }
 
@@ -83,26 +83,27 @@ struct X *memmove_st_X(struct X *dest, struct X const *src, size_t len)
   return __retres;
 }
 
-void structure(struct X * /*[10]*/ src, struct X * /*[10]*/ dest)
+void structure(struct X src[10], struct X dest[10])
 {
-  struct X *res = memmove_st_X(dest,src,(unsigned int)10 * sizeof(struct X));
-  memmove_st_X(src,res,(unsigned int)10 * sizeof(struct X));
+  struct X *res =
+    memmove_st_X(dest,src,(unsigned long)10 * sizeof(struct X));
+  memmove_st_X(src,res,(unsigned long)10 * sizeof(struct X));
   return;
 }
 
-/*@ requires aligned_end: len % 4 ≡ 0;
+/*@ requires aligned_end: len % 8 ≡ 0;
     requires
-      valid_dest: \let __fc_len = len / 4; \valid(dest + (0 .. __fc_len - 1));
+      valid_dest: \let __fc_len = len / 8; \valid(dest + (0 .. __fc_len - 1));
     requires
       valid_read_src:
-        \let __fc_len = len / 4; \valid_read(src + (0 .. __fc_len - 1));
+        \let __fc_len = len / 8; \valid_read(src + (0 .. __fc_len - 1));
     ensures
       moved:
-        \let __fc_len = len / 4;
+        \let __fc_len = len / 8;
         ∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(dest + j0) ≡ *(src + j0);
     ensures result: \result ≡ dest;
-    assigns *(dest + (0 .. len / 4 - 1)), \result;
-    assigns *(dest + (0 .. len / 4 - 1)) \from *(src + (0 .. len / 4 - 1));
+    assigns *(dest + (0 .. len / 8 - 1)), \result;
+    assigns *(dest + (0 .. len / 8 - 1)) \from *(src + (0 .. len / 8 - 1));
     assigns \result \from dest;
  */
 int **memmove_ptr_int(int **dest, int * const *src, size_t len)
@@ -112,10 +113,10 @@ int **memmove_ptr_int(int **dest, int * const *src, size_t len)
   return __retres;
 }
 
-void pointers(int ** /*[10]*/ src, int ** /*[10]*/ dest)
+void pointers(int *src[10], int *dest[10])
 {
-  int **res = memmove_ptr_int(dest,src,(unsigned int)10 * sizeof(int *));
-  memmove_ptr_int(src,res,(unsigned int)10 * sizeof(int *));
+  int **res = memmove_ptr_int(dest,src,(unsigned long)10 * sizeof(int *));
+  memmove_ptr_int(src,res,(unsigned long)10 * sizeof(int *));
   return;
 }
 
@@ -149,32 +150,34 @@ int (*memmove_arr10_int(int (*dest)[10], int const (*src)[10], size_t len))[10]
 void nested(int (*src)[10], int (*dest)[10], int n)
 {
   int (*res)[10] =
-    memmove_arr10_int(dest,src,(unsigned int)n * sizeof(int [10]));
-  memmove_arr10_int(src,res,(unsigned int)n * sizeof(int [10]));
+    memmove_arr10_int(dest,src,(unsigned long)n * sizeof(int [10]));
+  memmove_arr10_int(src,res,(unsigned long)n * sizeof(int [10]));
   return;
 }
 
 void with_void(void *src, void *dest, int n)
 {
-  void *res = memmove(dest,(void const *)src,(unsigned int)n);
-  memmove(src,(void const *)res,(unsigned int)n);
+  void *res = memmove(dest,(void const *)src,(unsigned long)n);
+  memmove(src,(void const *)res,(unsigned long)n);
   return;
 }
 
 void with_incomplete(struct incomplete *src, struct incomplete *dest, int n)
 {
   struct incomplete *res =
-    memmove((void *)dest,(void const *)src,(unsigned int)n);
-  memmove((void *)src,(void const *)res,(unsigned int)n);
+    memmove((void *)dest,(void const *)src,(unsigned long)n);
+  memmove((void *)src,(void const *)res,(unsigned long)n);
   return;
 }
 
-void with_null_or_int(int * /*[10]*/ p)
+void with_null_or_int(int p[10])
 {
-  memmove((void *)0,(void const *)p,(unsigned int)10 * sizeof(int));
-  memmove((void *)p,(void const *)0,(unsigned int)10 * sizeof(int));
-  memmove((void *)((int *)42),(void const *)p,(unsigned int)10 * sizeof(int));
-  memmove((void *)p,(void const *)((int *)42),(unsigned int)10 * sizeof(int));
+  memmove((void *)0,(void const *)p,(unsigned long)10 * sizeof(int));
+  memmove((void *)p,(void const *)0,(unsigned long)10 * sizeof(int));
+  memmove((void *)((int *)42),(void const *)p,
+          (unsigned long)10 * sizeof(int));
+  memmove((void *)p,(void const *)((int *)42),
+          (unsigned long)10 * sizeof(int));
   return;
 }
 
@@ -213,19 +216,19 @@ int *memmove_int(int *dest, int const *src, size_t len)
   return __retres;
 }
 
-void integer(int *src, int *dest)
+void integer(int src[10], int dest[10])
 {
   int *res =
-    memmove_int(dest,(int const *)src,(unsigned int)10 * sizeof(int));
-  memmove_int(src,(int const *)res,(unsigned int)10 * sizeof(int));
+    memmove_int(dest,(int const *)src,(unsigned long)10 * sizeof(int));
+  memmove_int(src,(int const *)res,(unsigned long)10 * sizeof(int));
   return;
 }
 
-void with_named(named *src, named *dest)
+void with_named(named src[10], named dest[10])
 {
   named *res =
-    memmove_int(dest,(int const *)src,(unsigned int)10 * sizeof(named));
-  memmove_int(src,(int const *)res,(unsigned int)10 * sizeof(named));
+    memmove_int(dest,(int const *)src,(unsigned long)10 * sizeof(named));
+  memmove_int(src,(int const *)res,(unsigned long)10 * sizeof(named));
   return;
 }
 
@@ -252,29 +255,30 @@ struct X *memmove_st_X(struct X *dest, struct X const *src, size_t len)
   return __retres;
 }
 
-void structure(struct X *src, struct X *dest)
+void structure(struct X src[10], struct X dest[10])
 {
   struct X *res =
     memmove_st_X(dest,(struct X const *)src,
-                 (unsigned int)10 * sizeof(struct X));
-  memmove_st_X(src,(struct X const *)res,(unsigned int)10 * sizeof(struct X));
+                 (unsigned long)10 * sizeof(struct X));
+  memmove_st_X(src,(struct X const *)res,
+               (unsigned long)10 * sizeof(struct X));
   return;
 }
 
-/*@ requires aligned_end: len % 4 ≡ 0;
+/*@ requires aligned_end: len % 8 ≡ 0;
     requires
-      valid_dest: \let __fc_len = len / 4; \valid(dest + (0 .. __fc_len - 1));
+      valid_dest: \let __fc_len = len / 8; \valid(dest + (0 .. __fc_len - 1));
     requires
       valid_read_src:
-        \let __fc_len = len / 4; \valid_read(src + (0 .. __fc_len - 1));
+        \let __fc_len = len / 8; \valid_read(src + (0 .. __fc_len - 1));
     ensures
       moved:
-        \let __fc_len = \old(len) / 4;
+        \let __fc_len = \old(len) / 8;
         ∀ ℤ j0;
           0 ≤ j0 < __fc_len ⇒ *(\old(dest) + j0) ≡ *(\old(src) + j0);
     ensures result: \result ≡ \old(dest);
-    assigns *(dest + (0 .. len / 4 - 1)), \result;
-    assigns *(dest + (0 .. len / 4 - 1)) \from *(src + (0 .. len / 4 - 1));
+    assigns *(dest + (0 .. len / 8 - 1)), \result;
+    assigns *(dest + (0 .. len / 8 - 1)) \from *(src + (0 .. len / 8 - 1));
     assigns \result \from dest;
  */
 int **memmove_ptr_int(int **dest, int * const *src, size_t len)
@@ -284,11 +288,12 @@ int **memmove_ptr_int(int **dest, int * const *src, size_t len)
   return __retres;
 }
 
-void pointers(int **src, int **dest)
+void pointers(int *src[10], int *dest[10])
 {
   int **res =
-    memmove_ptr_int(dest,(int * const *)src,(unsigned int)10 * sizeof(int *));
-  memmove_ptr_int(src,(int * const *)res,(unsigned int)10 * sizeof(int *));
+    memmove_ptr_int(dest,(int * const *)src,
+                    (unsigned long)10 * sizeof(int *));
+  memmove_ptr_int(src,(int * const *)res,(unsigned long)10 * sizeof(int *));
   return;
 }
 
@@ -324,33 +329,35 @@ void nested(int (*src)[10], int (*dest)[10], int n)
 {
   int (*res)[10] =
     memmove_arr10_int(dest,(int const (*)[10])src,
-                      (unsigned int)n * sizeof(int [10]));
+                      (unsigned long)n * sizeof(int [10]));
   memmove_arr10_int(src,(int const (*)[10])res,
-                    (unsigned int)n * sizeof(int [10]));
+                    (unsigned long)n * sizeof(int [10]));
   return;
 }
 
 void with_void(void *src, void *dest, int n)
 {
-  void *res = memmove(dest,(void const *)src,(unsigned int)n);
-  memmove(src,(void const *)res,(unsigned int)n);
+  void *res = memmove(dest,(void const *)src,(unsigned long)n);
+  memmove(src,(void const *)res,(unsigned long)n);
   return;
 }
 
 void with_incomplete(struct incomplete *src, struct incomplete *dest, int n)
 {
   struct incomplete *res =
-    memmove((void *)dest,(void const *)src,(unsigned int)n);
-  memmove((void *)src,(void const *)res,(unsigned int)n);
+    memmove((void *)dest,(void const *)src,(unsigned long)n);
+  memmove((void *)src,(void const *)res,(unsigned long)n);
   return;
 }
 
-void with_null_or_int(int *p)
+void with_null_or_int(int p[10])
 {
-  memmove((void *)0,(void const *)p,(unsigned int)10 * sizeof(int));
-  memmove((void *)p,(void const *)0,(unsigned int)10 * sizeof(int));
-  memmove((void *)((int *)42),(void const *)p,(unsigned int)10 * sizeof(int));
-  memmove((void *)p,(void const *)((int *)42),(unsigned int)10 * sizeof(int));
+  memmove((void *)0,(void const *)p,(unsigned long)10 * sizeof(int));
+  memmove((void *)p,(void const *)0,(unsigned long)10 * sizeof(int));
+  memmove((void *)((int *)42),(void const *)p,
+          (unsigned long)10 * sizeof(int));
+  memmove((void *)p,(void const *)((int *)42),
+          (unsigned long)10 * sizeof(int));
   return;
 }
 

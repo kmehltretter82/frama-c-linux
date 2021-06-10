@@ -53,7 +53,7 @@ module Comments: sig
   val self: State.t
   (* adds a comment at a given location. *)
   val add: Cabs.cabsloc -> string -> unit
-  (*  gets all the comment located between the two positions. *) 
+  (*  gets all the comment located between the two positions. *)
   val get: Cabs.cabsloc -> string list
   (* iter over all registered comments. *)
   val iter: (Cabs.cabsloc -> string -> unit) -> unit
@@ -80,8 +80,9 @@ val is_attr_test: unit -> bool
 val mk_behavior :
   ?name:string ->
   ?assumes:Logic_ptree.lexpr list ->
-  ?requires:Logic_ptree.lexpr list ->
-  ?post_cond:(Cil_types.termination_kind * Logic_ptree.lexpr) list ->
+  ?requires:Logic_ptree.toplevel_predicate list ->
+  ?post_cond:
+    (Cil_types.termination_kind * Logic_ptree.toplevel_predicate) list ->
   ?assigns:Logic_ptree.assigns ->
   ?allocation:Logic_ptree.allocation ->
   ?extended:Logic_ptree.extension list ->

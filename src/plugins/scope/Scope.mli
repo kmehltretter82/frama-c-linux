@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -30,22 +30,22 @@ open Cil_datatype
 module Defs : sig
   val get_defs :
     Kernel_function.t -> stmt -> lval ->
-     (Stmt.Hptset.t * Locations.Zone.t option) option
+    (Stmt.Hptset.t * Locations.Zone.t option) option
   (** @return the set of statements that define [lval] before [stmt] in [kf].
       Also returns the zone that is possibly not defined.
       Can return [None] when the information is not available (Pdg missing). *)
 
   val get_defs_with_type :
     Kernel_function.t -> stmt -> lval ->
-     ((bool * bool) Stmt.Map.t * Locations.Zone.t option) option
-(** @return a map from the statements that define [lval] before [stmt] in
-        [kf]. The first boolean indicates the possibility of a direct
-        modification at this statement, ie. [lval = ...] or [lval = f()].
-        The second boolean indicates a possible indirect modification through
-        a call.
-        Also returns the zone that is possibly not defined.
-        Can return [None] when the information is not available (Pdg missing).
- *)
+    ((bool * bool) Stmt.Map.t * Locations.Zone.t option) option
+    (** @return a map from the statements that define [lval] before [stmt] in
+            [kf]. The first boolean indicates the possibility of a direct
+            modification at this statement, ie. [lval = ...] or [lval = f()].
+            The second boolean indicates a possible indirect modification through
+            a call.
+            Also returns the zone that is possibly not defined.
+            Can return [None] when the information is not available (Pdg missing).
+    *)
 end
 
 module Datascope : sig

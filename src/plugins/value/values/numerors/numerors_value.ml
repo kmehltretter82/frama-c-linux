@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -318,6 +318,7 @@ let assume_comparable _cmp v1 v2 = `Unknown (v1, v2)
 let rewrap_integer _ _ = top
 let backward_cast ~src_typ:_ ~dst_typ:_ ~src_val:_ ~dst_val:_ = `Value None
 let resolve_functions _ = `Top, true
+let replace_base _substitution t = t
 
 
 (*-----------------------------------------------------------------------------

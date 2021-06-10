@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -79,7 +79,7 @@ sig
   val cup : t -> t -> t
   val cup_differ : t -> t -> t * bool
   (* val leq : t -> t -> bool *) (* unused for now *)
-  (* val lcup : t list -> t *) (* unused for now *)
+  val lcup : t list -> t
   val fcup : ('a -> t) -> 'a list -> t
   val get : varinfo -> t -> access
   val access : varinfo -> access -> t -> t
@@ -120,7 +120,7 @@ struct
   (* let leq = Xmap.subset (fun _ -> Access.leq) *)
 
   (* unused for now *)
-  (* let rec lcup = function [] -> bot |[x] -> x |x::xs -> cup x (lcup xs)*)
+  let rec lcup = function [] -> bot |[x] -> x |x::xs -> cup x (lcup xs)
   let rec fcup f = function
       [] -> bot | [x] -> f x | x::xs -> cup (f x) (fcup f xs)
 
@@ -673,6 +673,7 @@ let cfun_spec env kf =
     method !vpredicate p = update_spec_env (pred env p)
     method !vterm t = update_spec_env (vterm env t)
   end in
+  AssignsCompleteness.compute kf ;
   let spec = Annotations.funspec kf in
   ignore (Cil.visitCilFunspec (visitor:>Cil.cilVisitor) spec) ;
   (* Partitioning the accesses of the spec for formals vs globals *)
@@ -683,7 +684,7 @@ let cfun_spec env kf =
 let cfun kf =
   let env = mk_ctx () in
   (* Skipping frama-c builtins?
-     if not (Cil.is_builtin (Kernel_function.get_vi kf)) then *)
+     if not (Cil_builtins.is_builtin (Kernel_function.get_vi kf)) then *)
   begin
     if Kernel_function.is_definition kf then cfun_code env kf ;
     cfun_spec env kf
@@ -731,6 +732,11 @@ let compute_usage () =
   Wp_parameters.feedback ~ontty:`Transient "Collecting variable usage" ;
   (* initial state from variable initializers *)
   let u_init = Globals.Vars.fold cvarinit E.bot in
+  (* Usage in lemmas *)
+  let u_lemmas =
+    LogicUsage.fold_lemmas
+      (fun l -> E.cup (pred (mk_ctx()) l.lem_predicate.tp_statement)) E.bot
+  in
   (* initial state by kf *)
   let usage = Globals.Functions.fold (fun kf env ->
       KFmap.insert (fun _ _u _old -> assert false) kf (cfun kf) env)
@@ -790,10 +796,12 @@ let compute_usage () =
       ignore (KFmap.interf (kf_fp state_fp) callers todo);
       fixpoint state_fp.todo
   in fixpoint todo ;
+  let u_init = E.cup u_init u_lemmas in
   (* TODO[LC]: prendre en compte la compilation des fonctions logiques et predicats ; Cf. add_lphi *)
   let usage =
     KFmap.map
-      (fun ctx -> E.cup (E.cup ctx.code ctx.spec_globals) ctx.spec_formals)
+      (fun ctx ->
+         E.lcup [ u_lemmas ; ctx.code ; ctx.spec_globals ; ctx.spec_formals])
       usage
   in u_init, usage
 
@@ -818,6 +826,61 @@ module S = State_builder.Option_ref(D)
 (* compute_usage is called once per project *)
 let usage () = S.memo compute_usage
 let is_computed () = S.is_computed ()
+
+(* ---------------------------------------------------------------------- *)
+(* --- Nullable variables                                             --- *)
+(* ---------------------------------------------------------------------- *)
+
+module Nullable =
+struct
+  let attribute_name = "wp_nullable"
+
+  let is_nullable vi =
+    vi.vformal && Cil.hasAttribute attribute_name vi.vattr
+
+  let make_nullable vi =
+    vi.vattr <- Cil.addAttribute (AttrAnnot attribute_name) vi.vattr
+
+  module Nullable_extension =
+  struct
+    let type_term typing_context loc e =
+      match e.Logic_ptree.lexpr_node with
+      | Logic_ptree.PLvar s ->
+          let lv = typing_context.Logic_typing.find_var s in
+          begin match lv.lv_origin with
+            | Some vi when Cil.isPointerType vi.vtype && vi.vformal ->
+                make_nullable vi ;
+                Logic_const.tvar ~loc lv
+            | _ ->
+                typing_context.error loc "No pointer: %s" s
+          end
+      | _  ->
+          typing_context.error loc "Illegal expression %a"
+            Logic_print.print_lexpr e
+
+    let typer typing_context loc l =
+      Ext_terms (List.map (type_term typing_context loc) l)
+  end
+
+  let () =
+    Acsl_extension.register_behavior
+      "wp_nullable_args" Nullable_extension.typer false
+
+  module HasNullable =
+    State_builder.Option_ref(Datatype.Bool)
+      (struct
+        let name = "Wp.RefUsage.HasNullable"
+        let dependencies = [Ast.self]
+      end)
+
+  let compute_nullable () =
+    let module F = Globals.Functions in
+    F.fold (fun f b ->
+        b || List.fold_left (fun b v -> b || is_nullable v) b (F.get_params f)
+      ) false
+
+  let has_nullable () = HasNullable.memo compute_nullable
+end
 
 (* ---------------------------------------------------------------------- *)
 (* --- API                                                            --- *)
@@ -846,6 +909,9 @@ let get ?kf ?(init=false) vi =
 
 let compute () = ignore (usage ())
 
+let is_nullable = Nullable.is_nullable
+let has_nullable = Nullable.has_nullable
+
 let print x m fmt = Access.pretty x fmt m
 
 let dump () =
@@ -859,7 +925,7 @@ let dump () =
       in Format.fprintf fmt "@[<hv 0>Init:@ %a@]@." E.pretty a_init ;
       KFmap.iter (fun kf m ->
           (* Do not dump results for frama-c builtins *)
-          if not (Cil.is_builtin (Kernel_function.get_vi kf)) then
+          if not (Cil_builtins.is_builtin (Kernel_function.get_vi kf)) then
             Format.fprintf fmt "@[<hv 0>Function %a:@ %a@]@."
               Kernel_function.pretty kf E.pretty m ;
         ) a_usage;

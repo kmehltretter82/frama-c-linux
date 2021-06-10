@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -76,9 +76,7 @@ let pretty fmt = function
   | PExp  (_, _, expr) -> Printer.pp_exp fmt expr
   | PTermLval (_, _, _, lv) -> Printer.pp_term_lval fmt lv
   | PIP prop -> Description.pp_property fmt prop
-  | PStmt(_,stmt) | PStmtStart (_, stmt) ->
-    let p = fst @@ Cil_datatype.Stmt.loc stmt in
-    Format.fprintf fmt "Statement at %a" Filepath.pp_pos p
+  | PStmt(_,stmt) | PStmtStart (_, stmt) -> Printer.pp_stmt fmt stmt
   | PGlobal g -> Printer.pp_global fmt (decl_of g)
 
 let pp_ki_loc fmt ki =
@@ -291,7 +289,7 @@ struct
       match current_ca with
         None ->
         let active = Datatype.String.Set.of_list active_behaviors in
-        Property.Id_contract (active ,Extlib.the self#current_behavior)
+        Property.Id_contract (active ,Option.get self#current_behavior)
       | Some ca -> Property.Id_loop ca
 
     (* When [stmt] is a call, this method "inlines" the preconditions of the
@@ -347,7 +345,7 @@ struct
       if Tag.unfold current
       then self#preconditions_at_call fmt current;
       Format.fprintf fmt "@{<%s>%a@}"
-        (Tag.create (PStmt (Extlib.the self#current_kf,current)))
+        (Tag.create (PStmt (Option.get self#current_kf,current)))
         (super#next_stmt next) current
 
     method! lval fmt lv =
@@ -420,8 +418,8 @@ struct
       | AAssert _ | AInvariant _ | APragma _ | AVariant _ ->
         let ip =
           Property.ip_of_code_annot_single
-            (Extlib.the self#current_kf)
-            (Extlib.the self#current_stmt)
+            (Option.get self#current_kf)
+            (Option.get self#current_stmt)
             ca
         in
         Format.fprintf fmt "@{<%s>%a@}"
@@ -465,10 +463,10 @@ struct
         super#requires p;
 
     method! requires fmt p =
-      let b = Extlib.the self#current_behavior in
+      let b = Option.get self#current_behavior in
       let ip =
         Property.ip_of_requires
-          (Extlib.the self#current_kf) self#current_kinstr b p
+          (Option.get self#current_kf) self#current_kinstr b p
       in
       self#requires_aux fmt (ip, p)
 
@@ -476,7 +474,7 @@ struct
       Format.fprintf fmt "@{<%s>%a@}"
         (self#tag_property
            (Property.ip_of_behavior
-              (Extlib.the self#current_kf)
+              (Option.get self#current_kf)
               self#current_kinstr
               active_behaviors b))
         super#behavior b
@@ -485,21 +483,21 @@ struct
       Format.fprintf fmt "@{<%s>%a@}"
         (self#tag_property
            (Property.ip_of_decreases
-              (Extlib.the self#current_kf) self#current_kinstr t))
+              (Option.get self#current_kf) self#current_kinstr t))
         super#decreases t;
 
     method! terminates fmt t =
       Format.fprintf fmt "@{<%s>%a@}"
         (self#tag_property
            (Property.ip_of_terminates
-              (Extlib.the self#current_kf) self#current_kinstr t))
+              (Option.get self#current_kf) self#current_kinstr t))
         super#terminates t;
 
     method! complete_behaviors fmt t =
       Format.fprintf fmt "@{<%s>%a@}"
         (self#tag_property
            (Property.ip_of_complete
-              (Extlib.the self#current_kf)
+              (Option.get self#current_kf)
               self#current_kinstr
               active_behaviors
               t))
@@ -509,31 +507,31 @@ struct
       Format.fprintf fmt "@{<%s>%a@}"
         (self#tag_property
            (Property.ip_of_disjoint
-              (Extlib.the self#current_kf)
+              (Option.get self#current_kf)
               self#current_kinstr
               active_behaviors
               t))
         super#disjoint_behaviors t
 
     method! assumes fmt p =
-      let b = Extlib.the self#current_behavior in
+      let b = Option.get self#current_behavior in
       Format.fprintf fmt "@{<%s>%a@}"
         (self#tag_property
            (Property.ip_of_assumes
-              (Extlib.the self#current_kf) self#current_kinstr b p))
+              (Option.get self#current_kf) self#current_kinstr b p))
         super#assumes p;
 
     method! post_cond fmt pc =
-      let b = Extlib.the self#current_behavior in
+      let b = Option.get self#current_behavior in
       Format.fprintf fmt "@{<%s>%a@}"
         (self#tag_property
            (Property.ip_of_ensures
-              (Extlib.the self#current_kf) self#current_kinstr b pc))
+              (Option.get self#current_kf) self#current_kinstr b pc))
         super#post_cond pc;
 
     method! assigns s fmt a =
       match
-        Property.ip_of_assigns (Extlib.the self#current_kf) self#current_kinstr
+        Property.ip_of_assigns (Option.get self#current_kf) self#current_kinstr
           self#current_behavior_or_loop a
       with
         None -> super#assigns s fmt a
@@ -546,9 +544,9 @@ struct
       | FromAny -> super#from s fmt from
       | From _ ->
         let ip =
-          Extlib.the
+          Option.get
             (Property.ip_of_from
-               (Extlib.the self#current_kf) self#current_kinstr
+               (Option.get self#current_kf) self#current_kinstr
                self#current_behavior_or_loop from)
         in
         Format.fprintf fmt "@{<%s>%a@}"
@@ -563,7 +561,7 @@ struct
 
     method! allocation ~isloop fmt a =
       match
-        Property.ip_of_allocation (Extlib.the self#current_kf) self#current_kinstr
+        Property.ip_of_allocation (Option.get self#current_kf) self#current_kinstr
           self#current_behavior_or_loop a
       with
         None -> super#allocation ~isloop fmt a
@@ -574,8 +572,8 @@ struct
     method! stmtkind sattr next fmt sk =
       (* Special tag denoting the start of the statement, WITHOUT any ACSL
          assertion/statement contract, etc. *)
-      let s = Extlib.the self#current_stmt in
-      let f = Extlib.the self#current_kf in
+      let s = Option.get self#current_stmt in
+      let f = Option.get self#current_kf in
       let tag = Tag.create (PStmtStart(f,s)) in
       Format.fprintf fmt "@{<%s>%a@}" tag (super#stmtkind sattr next) sk
 

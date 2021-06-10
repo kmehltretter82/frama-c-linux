@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -28,9 +28,9 @@ let log_imprecision s = Lattice_messages.emit_imprecision emitter s
 
 module type Type = sig
   (* Binary abstract operations do not model precisely float/integer operations.
-   It is the responsibility of the callers to have two operands of the same
-   implicit type. The only exception is for [singleton_zero], which is the
-   correct representation of [0.] *)
+     It is the responsibility of the callers to have two operands of the same
+     implicit type. The only exception is for [singleton_zero], which is the
+     correct representation of [0.] *)
   type t = private
     | Bottom
     | Int of Int_val.t
@@ -667,8 +667,8 @@ let backward_ge_int min v =
   | Float _ -> v
   | Int _ -> narrow v (inject_int (Int_val.inject_range min None))
 
-let backward_lt_int max v = backward_le_int (Extlib.opt_map Int.pred max) v
-let backward_gt_int min v = backward_ge_int (Extlib.opt_map Int.succ min) v
+let backward_lt_int max v = backward_le_int (Option.map Int.pred max) v
+let backward_gt_int min v = backward_ge_int (Option.map Int.succ min) v
 
 let diff_if_one value rem =
   match value, rem with
@@ -837,8 +837,8 @@ type overflow_float_to_int =
 
 let cast_float_to_int_non_nan ~signed ~size (min, max) =
   let all = create_all_values ~size ~signed in
-  let min_all = Extlib.the (min_int all) in
-  let max_all = Extlib.the (max_int all) in
+  let min_all = Option.get (min_int all) in
+  let max_all = Option.get (max_int all) in
   let conv f =
     try
       (* truncate_to_integer returns an integer that fits in a 64 bits
@@ -922,7 +922,7 @@ let cast_float_to_int_inverse ~single_precision i =
               [(int)((real)min-epsilon)] would return [min-1]. Hence, we can
               simply return the float corresponding to [min] -- which can be
               represented precisely given [exact_min] and [exact_max]. *)
-        Int.to_float min 
+        Int.to_float min
     in
     (* All operations are dual w.r.t. the min bound. *)
     let maxf =

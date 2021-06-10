@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -122,7 +122,7 @@ let to_lval = function
 
 let pretty fmt = function
   | (Scalar _ | Composite _ | Scattered _ | Unknown _) as kind ->
-    Cil_printer.pp_lval fmt (Extlib.the (to_lval kind))
+    Cil_printer.pp_lval fmt (Option.get (to_lval kind))
   | Alarm (_stmt,alarm) ->
     Cil_printer.pp_predicate fmt (Alarms.create_predicate alarm)
   | AbsoluteMemory ->

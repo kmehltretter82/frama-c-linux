@@ -1,7 +1,10 @@
 /* run.config
-   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-   STDOPT: +"-no-autoload-plugins -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs"
+ MODULE: @PTEST_NAME@
+ EXIT: 1
+   STDOPT: +"-no-autoload-plugins"
 */
+
+
 int f(void);
 
 int k(int *);

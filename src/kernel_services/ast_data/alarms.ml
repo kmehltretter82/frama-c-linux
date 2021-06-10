@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -138,13 +138,13 @@ module D =
           if n = 0 then Lval.compare lv1 lv2 else n
         | Index_out_of_bound(e11, e12), Index_out_of_bound(e21, e22) ->
           let n = Exp.compare e11 e21 in
-          if n = 0 then Extlib.opt_compare Exp.compare e12 e22 else n
+          if n = 0 then Option.compare Exp.compare e12 e22 else n
         | Invalid_pointer e1, Invalid_pointer e2 -> Exp.compare e1 e2
         | Invalid_shift(e1, n1), Invalid_shift(e2, n2) ->
           let n = Exp.compare e1 e2 in
-          if n = 0 then Extlib.opt_compare Datatype.Int.compare n1 n2 else n
+          if n = 0 then Option.compare Datatype.Int.compare n1 n2 else n
         | Pointer_comparison(e11, e12), Pointer_comparison(e21, e22) ->
-          let n = Extlib.opt_compare Exp.compare e11 e21 in
+          let n = Option.compare Exp.compare e11 e21 in
           if n = 0 then Exp.compare e12 e22 else n
         | Overflow(s1, e1, n1, b1), Overflow(s2, e2, n2, b2) ->
           let n = Stdlib.compare s1 s2 in
@@ -188,7 +188,7 @@ module D =
         | Function_pointer (e1, l1), Function_pointer (e2, l2) ->
           let n = Exp.compare e1 e2 in
           if n <> 0 then n
-          else Extlib.opt_compare (Extlib.list_compare Exp.compare) l1 l2
+          else Option.compare (Extlib.list_compare Exp.compare) l1 l2
         | Invalid_bool lv1, Invalid_bool lv2 -> Lval.compare lv1 lv2
         | _, (Division_by_zero _ | Memory_access _ |
               Index_out_of_bound _ | Invalid_pointer _ |
@@ -648,7 +648,7 @@ let create_predicate ?(loc=Location.unknown) alarm =
         | TPtr (TFun (ret, None, var, attrs), _), Some args ->
           let ltyps = List.map (fun arg -> "", Cil.typeOf arg, []) args in
           let typ = TFun (ret, Some ltyps, var, attrs) in
-          Cil.mkCast e (TPtr (typ, []))
+          Cil.mkCast (TPtr (typ, [])) e
         | t', _ ->
           Kernel.fatal
             "Trying to emit a Function_pointer alarm over expression %a \
@@ -705,7 +705,8 @@ let to_annot_aux kinstr ?(loc=Kinstr.loc kinstr) alarm =
   (*  Kernel.debug "registering alarm %a" D.pretty alarm;*)
   let add alarm =
     let pred = create_predicate ~loc alarm in
-    Logic_const.new_code_annotation (AAssert([], Assert, pred))
+    let pred = Logic_const.toplevel_predicate pred in
+    Logic_const.new_code_annotation (AAssert([], pred))
   in
   try
     let by_emitter = State.find kinstr in

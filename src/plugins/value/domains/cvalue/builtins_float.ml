@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -22,11 +22,6 @@
 
 open Cvalue
 
-let wrap_fk r = function
-  | Cil_types.FFloat -> Eval_op.wrap_float r
-  | Cil_types.FDouble -> Eval_op.wrap_double r
-  | _ -> assert false
-
 let restrict_float ~assume_finite fkind value =
   let truth = Cvalue_forward.assume_not_nan ~assume_finite fkind value in
   match truth with
@@ -44,35 +39,30 @@ let remove_special_float fk value =
   | "non-finite" -> restrict_float ~assume_finite:true fk value
   | _            -> assert false
 
-let arity2 fk caml_fun state actuals =
+let arity2 fk caml_fun _state actuals =
   match actuals with
-  | [_, arg1, _; _, arg2, _] ->
-    begin
-      let r =
-        try
-          let i1 = Cvalue.V.project_ival arg1 in
-          let f1 = Ival.project_float i1 in
-          let i2 = Cvalue.V.project_ival arg2 in
-          let f2 = Ival.project_float i2 in
-          let f' = Cvalue.V.inject_float (caml_fun (Fval.kind fk) f1 f2) in
-          remove_special_float fk f'
-        with Cvalue.V.Not_based_on_null ->
-          Cvalue.V.topify_arith_origin (V.join arg1 arg2)
-      in
-      { Value_types.c_values =
-          if V.is_bottom r then []
-          else [wrap_fk r fk, state ];
-        c_clobbered = Base.SetLattice.bottom;
-        c_from = None;
-        c_cacheable = Value_types.Cacheable; }
-    end
+  | [_, arg1; _, arg2] ->
+    let r =
+      try
+        let i1 = Cvalue.V.project_ival arg1 in
+        let f1 = Ival.project_float i1 in
+        let i2 = Cvalue.V.project_ival arg2 in
+        let f2 = Ival.project_float i2 in
+        let f' = Cvalue.V.inject_float (caml_fun (Fval.kind fk) f1 f2) in
+        remove_special_float fk f'
+      with Cvalue.V.Not_based_on_null ->
+        Cvalue.V.topify_arith_origin (V.join arg1 arg2)
+    in
+    let result = if V.is_bottom r then [] else [r] in
+    Builtins.Result result
   | _ -> raise (Builtins.Invalid_nb_of_args 2)
 
 let register_arity2 c_name fk f =
   let name = "Frama_C_" ^ c_name in
+  let replace = c_name in
   let t = Cil_types.TFloat (fk, []) in
   let typ () = t, [t; t] in
-  Builtins.register_builtin name ~replace:c_name ~typ (arity2 fk f)
+  Builtins.register_builtin name ~replace ~typ Cacheable (arity2 fk f)
 
 let () =
   let open Fval in
@@ -83,39 +73,35 @@ let () =
   register_arity2 "fmod" Cil_types.FDouble fmod;
   register_arity2 "fmodf" Cil_types.FFloat fmod
 
-let arity1 name fk caml_fun state actuals =
+let arity1 name fk caml_fun _state actuals =
   match actuals with
-  | [_, arg, _] -> begin
-      let r =
-        try
-          let i = Cvalue.V.project_ival arg in
-          let f = Ival.project_float i in
-          let f' = Cvalue.V.inject_float (caml_fun (Fval.kind fk) f) in
-          remove_special_float fk f'
-        with
-        | Cvalue.V.Not_based_on_null ->
-          if Cvalue.V.is_bottom arg then begin
-            V.bottom
-          end else begin
-            Value_parameters.result ~once:true ~current:true
-              "function %s applied to address" name;
-            Cvalue.V.topify_arith_origin arg
-          end
-      in
-      { Value_types.c_values =
-          if V.is_bottom r then []
-          else [wrap_fk r fk, state ];
-        c_clobbered = Base.SetLattice.bottom;
-        c_from = None;
-        c_cacheable = Value_types.Cacheable; }
-    end
+  | [_, arg] ->
+    let r =
+      try
+        let i = Cvalue.V.project_ival arg in
+        let f = Ival.project_float i in
+        let f' = Cvalue.V.inject_float (caml_fun (Fval.kind fk) f) in
+        remove_special_float fk f'
+      with
+      | Cvalue.V.Not_based_on_null ->
+        if Cvalue.V.is_bottom arg then begin
+          V.bottom
+        end else begin
+          Value_parameters.result ~once:true ~current:true
+            "function %s applied to address" name;
+          Cvalue.V.topify_arith_origin arg
+        end
+    in
+    let result = if V.is_bottom r then [] else [r] in
+    Builtins.Result result
   | _ -> raise (Builtins.Invalid_nb_of_args 1)
 
 let register_arity1 c_name fk f =
   let name = "Frama_C_" ^ c_name in
+  let replace = c_name in
   let t = Cil_types.TFloat (fk, []) in
   let typ () = t, [t] in
-  Builtins.register_builtin name ~replace:c_name ~typ (arity1 name fk f)
+  Builtins.register_builtin name ~replace ~typ Cacheable (arity1 name fk f)
 
 let () =
   let open Fval in

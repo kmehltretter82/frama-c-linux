@@ -1,5 +1,6 @@
 /* run.config*
-   STDOPT: #"-machdep gcc_x86_32"
+ EXIT: 1
+   STDOPT: +"-machdep gcc_x86_32"
    STDOPT:
  */
 // the tests above must be done separately because both fail:

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -44,9 +44,9 @@ let number_to_color n =
   let number = ref n in
   for _i = 0 to 7 do
     color := (!color lsl 1) +
-      (if !number land 1 <> 0 then 1 else 0) +
-      (if !number land 2 <> 0 then 256 else 0) +
-      (if !number land 4 <> 0 then 65536 else 0);
+             (if !number land 1 <> 0 then 1 else 0) +
+             (if !number land 2 <> 0 then 256 else 0) +
+             (if !number land 4 <> 0 then 65536 else 0);
     number := !number lsr 3
   done;
   !color
@@ -148,30 +148,25 @@ let rec list_compare cmp_elt l1 l2 =
   if l1 == l2 then 0
   else
     match l1, l2 with
-      | [], [] -> assert false (* included in l1 == l2 above *)
-      | [], _ :: _ -> -1
-      | _ :: _, [] -> 1
-      | v1::r1, v2::r2 ->
-          let c = cmp_elt v1 v2 in
-          if c = 0 then list_compare cmp_elt r1 r2 else c
-
-let list_of_opt =
-  function
-    | None -> []
-    | Some x -> [x]
+    | [], [] -> assert false (* included in l1 == l2 above *)
+    | [], _ :: _ -> -1
+    | _ :: _, [] -> 1
+    | v1::r1, v2::r2 ->
+      let c = cmp_elt v1 v2 in
+      if c = 0 then list_compare cmp_elt r1 r2 else c
 
 let opt_of_list =
   function
-    | [] -> None
-    | [a] -> Some a
-    | _ -> raise (Invalid_argument "Extlib.opt_of_list")
+  | [] -> None
+  | [a] -> Some a
+  | _ -> raise (Invalid_argument "Extlib.opt_of_list")
 
 let rec find_opt f = function
   | [] -> raise Not_found
   | e :: q ->
-      match f e with
-        | None -> find_opt f q
-        | Some v -> v
+    match f e with
+    | None -> find_opt f q
+    | Some v -> v
 
 let iteri f l = let i = ref 0 in List.iter (fun x -> f !i x; incr i) l
 
@@ -226,95 +221,28 @@ let list_slice ?(first = 0) ?last l =
   | None -> l
   | Some n -> list_first_n (normalize n - first) l
 
-
-(* ************************************************************************* *)
-(** {2 Arrays} *)
-(* ************************************************************************* *)
-
-let array_exists f a =
-  try
-    for i = 0 to Array.length a - 1 do
-      if f a.(i) then raise Exit
-    done;
-    false
-  with Exit -> true
-
-let array_existsi f a =
-  try
-    for i = 0 to Array.length a - 1 do
-      if f i a.(i) then raise Exit
-    done;
-    false
-  with Exit -> true
-
 (* ************************************************************************* *)
 (** {2 Options} *)
 (* ************************************************************************* *)
 
-let has_some = function None -> false | Some _ -> true
-
-let may f = function
-  | None -> ()
-  | Some x -> f x
-
-(** [may_map f ?dft x] applies [f] to the value of [x] if exists. Otherwise
-    returns the default value [dft].
-    Assume that either [x] or [dft] is defined. *)
-let may_map f ?dft x =
-  match x, dft with
-  | None, None -> assert false
-  | None, Some dft -> dft
-  | Some x, _ -> f x
-
-let opt_map f = function
-  | None -> None
-  | Some x -> Some (f x)
-
-let opt_conv default = function
-  | None -> default
-  | Some x -> x
-
-let opt_if b v = if b then None else Some v
-
 let opt_fold f o b =
   match o with
-    | None -> b
-    | Some a -> f a b
+  | None -> b
+  | Some a -> f a b
 
 let merge_opt f k o1 o2 =
   match o1,o2 with
-    | None, None -> None
-    | Some x, None | None, Some x -> Some x
-    | Some x1, Some x2 -> Some (f k x1 x2)
-
-let opt_bind f = function
-  | None -> None
-  | Some x -> f x
+  | None, None -> None
+  | Some x, None | None, Some x -> Some x
+  | Some x1, Some x2 -> Some (f k x1 x2)
 
 let opt_filter f = function
   | None -> None
   | (Some x) as o -> if f x then o else None
 
-let the ?exn = function
-  | None ->
-    begin match exn with
-      | None -> invalid_arg "Extlib.the"
-      | Some exn -> raise exn
-    end
+let the ~exn = function
+  | None -> raise exn
   | Some x -> x
-
-let find_or_none f v = try Some(f v) with Not_found -> None
-
-let opt_equal f v1 v2 = match v1, v2 with
-  | None, None -> true
-  | Some _, None | None, Some _ -> false
-  | Some v1, Some v2 -> f v1 v2
-
-let opt_compare f v1 v2 = match v1, v2 with
-  | None, None -> 0
-  | Some _, None -> 1
-  | None, Some _ -> -1
-  | Some v1, Some v2 -> f v1 v2
 
 let opt_hash hash v = match v with
   | None -> 31179
@@ -330,10 +258,7 @@ let xor x y = if x then not y else y
 (** {2 Performance} *)
 (* ************************************************************************* *)
 
-(* replace "noalloc" with [@@noalloc] for OCaml version >= 4.03.0 *)
-[@@@ warning "-3"]
-external address_of_value: 'a -> int = "address_of_value" "noalloc"
-[@@@ warning "+3"]
+external address_of_value: 'a -> int = "address_of_value" [@@noalloc]
 
 (* ************************************************************************* *)
 (** {2 Exception catcher} *)

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -231,7 +231,7 @@ let cleaned_outputs kf s =
     Callgraph.Uses.accept_base ~with_formals:true ~with_locals:true kf
   in
   let filter = Locations.Zone.filter_base accept in
-  Extlib.opt_map filter outs
+  Option.map filter outs
 
 let pretty_stmt_info (main_ui:main_ui) kf stmt =
   (* Is it an accessible statement ? *)
@@ -461,13 +461,17 @@ module Select (Eval: Eval) = struct
       | PVDecl (Some kf, Kstmt stmt, vi) ->
         let lv = (Var vi, NoOffset) in
         select_lv main_ui (GL_Stmt (kf, stmt)) lv
-      | PIP (IPCodeAnnot {ica_kf = kf; ica_stmt = stmt;
-                          ica_ca = {annot_content =
-                                      AAssert (_, _, p)
-                                    | AInvariant (_, true, p)} as ca
-                         } as ip) ->
+      | PIP (
+          IPCodeAnnot {
+            ica_kf = kf; ica_stmt = stmt;
+            ica_ca = {
+              annot_content =
+                AAssert (_, p) | AInvariant (_, true, p)
+            } as ca
+          } as ip) ->
         begin
           let loc = GL_Stmt (kf, stmt) in
+          let p = p.tp_statement in
           let alarm_or_property =
             match Alarms.find ca with
             | None -> Red_statuses.Prop ip

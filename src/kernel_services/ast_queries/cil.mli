@@ -51,46 +51,6 @@
 open Cil_types
 open Cil_datatype
 
-(* ************************************************************************* *)
-(** {2 Builtins management} *)
-(* ************************************************************************* *)
-
-(** This module associates the name of a built-in function that might be used
-    during elaboration with the corresponding varinfo.  This is done when
-    parsing ${FRAMAC_SHARE}/libc/__fc_builtins.h, which is always performed
-    before processing the actual list of files provided on the command line (see
-    {!File.init_from_c_files}).  Actual list of such built-ins is managed in
-    {!Cabs2cil}. *)
-module Frama_c_builtins:
-  State_builder.Hashtbl with type key = string and type data = Cil_types.varinfo
-
-val is_builtin: Cil_types.varinfo -> bool
-(** @return true if the given variable refers to a Frama-C builtin.
-    @since Fluorine-20130401 *)
-
-val is_unused_builtin: Cil_types.varinfo -> bool
-(** @return true if the given variable refers to a Frama-C builtin that
-    is not used in the current program. Plugins may (and in fact should)
-    hide this builtin from their outputs *)
-
-val is_special_builtin: string -> bool
-(** @return [true] if the given name refers to a special built-in function.
-    A special built-in function can have any number of arguments. It is up to
-    the plug-ins to know what to do with it.
-    @since Carbon-20101201 *)
-
-(** register a new special built-in function *)
-val add_special_builtin: string -> unit
-
-(** register a new family of special built-in functions.
-    @since Carbon-20101201
-*)
-val add_special_builtin_family: (string -> bool) -> unit
-
-(** initialize the C built-ins. Should be called once per project, after the
-    machine has been set. *)
-val init_builtins: unit -> unit
-
 (** Call this function to perform some initialization, and only after you have
     set [Cil.msvcMode]. [initLogicBuiltins] is the function to call to init
     logic builtins. The [Machdeps] argument is a description of the hardware
@@ -139,6 +99,24 @@ val selfMachine_is_computed: ?project:Project.project -> unit -> bool
 val msvcMode: unit -> bool
 val gccMode: unit -> bool
 
+val set_acceptEmptyCompinfo: unit -> unit
+(** After a call to this function, empty compinfos are allowed by the kernel,
+    this must be used as a configuration step equivalent to a machdep, except
+    that it is not a user configuration.
+
+    Note that if the selected machdep is GCC or MSVC, this call has no effect
+    as these modes already allow empty compinfos.
+
+    @since 23.0-Vanadium
+*)
+
+val acceptEmptyCompinfo: unit -> bool
+(** whether we accept empty struct. Implied by {!Cil.msvcMode} and
+    {!Cil.gccMode}, and can be forced by {!Cil.set_acceptEmptyCompinfo}
+    otherwise.
+
+    @since 23.0-Vanadium
+*)
 
 (* ************************************************************************* *)
 (** {2 Values for manipulating globals} *)
@@ -266,20 +244,6 @@ val pushGlobal: global -> types: global list ref
 (** An empty statement. Used in pretty printing *)
 val invalidStmt: stmt
 
-(** A list of the built-in functions for the current compiler (GCC or
-  * MSVC, depending on [!msvcMode]).  Maps the name to the
-  * result and argument types, and whether it is vararg.
-  * Initialized by {!Cil.initCIL}
-  *
-  * This map replaces [gccBuiltins] and [msvcBuiltins] in previous
-  * versions of CIL.*)
-module Builtin_functions :
-  State_builder.Hashtbl with type key = string
-                         and type data = typ * typ list * bool
-
-(** This is used as the location of the prototypes of builtin functions. *)
-val builtinLoc: location
-
 (** Returns a location that ranges over the two locations in arguments. *)
 val range_loc: location -> location -> location
 
@@ -339,6 +303,12 @@ val intType: typ
 (** unsigned int *)
 val uintType: typ
 
+(** short *)
+val shortType : typ
+
+(** unsigned short *)
+val ushortType : typ
+
 (** long *)
 val longType: typ
 
@@ -351,10 +321,34 @@ val ulongType: typ
 (** unsigned long long *)
 val ulongLongType: typ
 
+(** Any signed integer type of size 16 bits.
+    It is equivalent to the ISO C int16_t type but without using the
+    corresponding header.
+    Must only be called if such type exists in the current architecture.
+    @since 23.0-Vanadium
+*)
+val int16_t: unit -> typ
+
+(** Any signed integer type of size 32 bits.
+    It is equivalent to the ISO C int32_t type but without using the
+    corresponding header.
+    Must only be called if such type exists in the current architecture.
+    @since 23.0-Vanadium
+*)
+val int32_t: unit -> typ
+
+(** Any signed integer type of size 64 bits.
+    It is equivalent to the ISO C int64_t type but without using the
+    corresponding header.
+    Must only be called if such type exists in the current architecture.
+    @since 23.0-Vanadium
+*)
+val int64_t: unit -> typ
+
 (** Any unsigned integer type of size 16 bits.
     It is equivalent to the ISO C uint16_t type but without using the
     corresponding header.
-    Shall not be called if not such type exists in the current architecture.
+    Must only be called if such type exists in the current architecture.
     @since Nitrogen-20111001
 *)
 val uint16_t: unit -> typ
@@ -362,7 +356,7 @@ val uint16_t: unit -> typ
 (** Any unsigned integer type of size 32 bits.
     It is equivalent to the ISO C uint32_t type but without using the
     corresponding header.
-    Shall not be called if not such type exists in the current architecture.
+    Must only be called if such type exists in the current architecture.
     @since Nitrogen-20111001
 *)
 val uint32_t: unit -> typ
@@ -370,7 +364,7 @@ val uint32_t: unit -> typ
 (** Any unsigned integer type of size 64 bits.
     It is equivalent to the ISO C uint64_t type but without using the
     corresponding header.
-    Shall not be called if no such type exists in the current architecture.
+    Must only be called if such type exists in the current architecture.
     @since Nitrogen-20111001
 *)
 val uint64_t: unit -> typ
@@ -548,12 +542,12 @@ val isArithmeticType: typ -> bool
 
 (** True if the argument is a scalar type (i.e. integral, enum,
     floating point or pointer
-    @since Frama-C+dev
+    @since 22.0-Titanium
 *)
 val isScalarType: typ -> bool
 
 (** alias of isScalarType.
-    @deprecated Frama-C+dev use isScalarType instead
+    @deprecated 22.0-Titanium use isScalarType instead
 *)
 val isArithmeticOrPointerType: typ -> bool
 
@@ -984,11 +978,14 @@ val need_cast: ?force:bool -> typ -> typ -> bool
     type is the same as the old type, then no cast is added, unless [force]
     is [true] (default is [false])
     @modify Fluorine-20130401 add [force] argument
+    @modify 23.0-Vanadium change order or arguments
 *)
-val mkCastT: ?force:bool -> e:exp -> oldt:typ -> newt:typ -> exp
+val mkCastT: ?force:bool -> oldt:typ -> newt:typ -> exp -> exp
 
-(** Like {!Cil.mkCastT} but uses typeOf to get [oldt] *)
-val mkCast: ?force:bool -> e:exp -> newt:typ -> exp
+(** Like {!Cil.mkCastT} but uses typeOf to get [oldt]
+    @modify 23.0-Vanadium change order or arguments
+*)
+val mkCast: ?force:bool -> newt:typ -> exp -> exp
 
 (** Equivalent to [stripCasts] for terms. *)
 val stripTermCasts: term -> term
@@ -1122,21 +1119,41 @@ val mkPureExpr:
   ?loc:location -> exp -> stmt
 
 (** Make a loop. Can contain Break or Continue.
-    The kind of loop (While, For, DoWhile) is given by [sattr];
-    it is a While loop if unspecified. *)
-val mkLoop: ?sattr:attributes -> guard:exp -> body:stmt list -> stmt list
+    The kind of loop (while, for, dowhile) is given by [sattr]
+    (none by default). Use {!Cil.mkWhile} for a While loop.
+    @modify 23.0-Vanadium add unit argument. Default type is no longer While,
+            use {!Cil.mkWhile} instead.
+*)
+val mkLoop: ?sattr:attributes -> guard:exp -> body:stmt list -> unit ->
+  stmt list
 
 (** Make a for loop for(i=start; i<past; i += incr) \{ ... \}. The body
     can contain Break but not Continue. Can be used with i a pointer
     or an integer. Start and done must have the same type but incr
-    must be an integer *)
-val mkForIncr:  iter:varinfo -> first:exp -> stopat:exp -> incr:exp
-  -> body:stmt list -> stmt list
+    must be an integer
+    @modify 23.0-Vanadium add unit argument
+*)
+val mkForIncr: ?sattr:attributes -> iter:varinfo -> first:exp -> stopat:exp ->
+  incr:exp -> body:stmt list -> unit -> stmt list
 
 (** Make a for loop for(start; guard; next) \{ ... \}. The body can
-    contain Break but not Continue !!! *)
-val mkFor: start:stmt list -> guard:exp -> next: stmt list ->
-  body: stmt list -> stmt list
+    contain Break but not Continue !!!
+    @modify 23.0-Vanadium add unit argument
+*)
+val mkFor: ?sattr:attributes -> start:stmt list -> guard:exp -> next: stmt list ->
+  body: stmt list -> unit -> stmt list
+
+(** Make a while loop.
+    @since 23.0-Vanadium
+*)
+val mkWhile: ?sattr:attributes -> guard:exp -> body:stmt list -> unit ->
+  stmt list
+
+(** Make a do ... while loop.
+    @since 23.0-Vanadium
+*)
+val mkDoWhile: ?sattr:attributes -> body:stmt list -> guard:exp -> unit ->
+  stmt list
 
 (** creates a block with empty attributes from an unspecified sequence. *)
 val block_from_unspecified_sequence:
@@ -1206,7 +1223,7 @@ val partitionAttributes:  default:attributeClass ->
                 attribute list   (* AttrType *)
 
 (** Add an attribute. Maintains the attributes in sorted order of the second
-    argument *)
+    argument. The attribute is not added if it is already there. *)
 val addAttribute: attribute -> attributes -> attributes
 
 (** Add a list of attributes. Maintains the attributes in sorted order. The
@@ -1247,6 +1264,11 @@ val frama_c_init_obj: string
     @since 18.0-Argon
 *)
 val frama_c_mutable: string
+
+(** A block marked with this attribute is known to be inlined, i.e.
+    it replaces a call to an inline function.
+*)
+val frama_c_inlined: string
 
 (** [true] if the given lval is allowed to be assigned to thanks to
     a [frama_c_init_obj] or a [frama_c_mutable] attribute.
@@ -1416,6 +1438,18 @@ val global_annotation_attributes: global_annotation -> attributes
     @since 20.0-Calcium
 *)
 val global_attributes: global -> attributes
+
+(**
+   Whether the given attributes contain libc indicators.
+   @since 23.0-Vanadium
+*)
+val is_in_libc: attributes -> bool
+
+(**
+   Whether the given global contains libc indicators.
+   @since 23.0-Vanadium
+*)
+val global_is_in_libc: global -> bool
 
 exception NotAnAttrParam of exp
 
@@ -1754,22 +1788,6 @@ class type cilVisitor = object
       @plugin development guide *)
 
 end
-
-(** Indicates how an extended behavior clause is supposed to be visited.
-    The default behavior is [DoChildren], which ends up visiting
-    each identified predicate in the list and leave the id as is.
-
-    @plugin development guide
-
-    @since Sodium-20150201
-    @modify Silicon-20161101
-    @deprecated 21.0-Scandium
-*)
-val register_behavior_extension:
-  string ->
-  (cilVisitor -> acsl_extension_kind -> (acsl_extension_kind) visitAction)
-  -> unit
-[@@ deprecated "Use Acsl_extension.register_behavior instead (arg: ~visitor)"]
 
 (**/**)
 class internal_genericCilVisitor:
@@ -2165,7 +2183,8 @@ val sizeOf: loc:location -> typ -> exp
 
 (** The minimum alignment (in bytes) for a type. This function is
  * architecture dependent, so you should only call this after you call
- * {!Cil.initCIL}. *)
+ * {!Cil.initCIL}.
+ * Raises {!SizeOfError} when it cannot compute the alignment. *)
 val bytesAlignOf: typ -> int
 
 (** [intOfAttrparam a] tries to const-fold [a] into a numeric value.
@@ -2179,6 +2198,13 @@ val intOfAttrparam: attrparam -> int option
  * the size. This function is architecture dependent, so you should only call
  * this after you call {!Cil.initCIL}. *)
 val bitsOffset: typ -> offset -> int * int
+
+(** Give a field, returns the number of bits from the structure or union
+ * containing the field and the width (also expressed in bits) for the subobject
+ * denoted by the field. Raises {!Cil.SizeOfError} when it cannot compute
+ * the size. This function is architecture dependent, so you should only call
+ * this after you call {!Cil.initCIL}. *)
+val fieldBitsOffset: fieldinfo -> int * int
 
 (** Like map but try not to make a copy of the list *)
 val mapNoCopy: ('a -> 'a) -> 'a list -> 'a list
@@ -2337,10 +2363,11 @@ val set_extension_handler:
     @since 21.0-Scandium
 *)
 
-val set_deprecated_extension_handler:
-  handler:(string -> ext_category ->
-           (cilVisitor -> acsl_extension_kind -> acsl_extension_kind visitAction) ->
-           unit) -> unit
+(* ***********************************************************************)
+(** {2 Forward references} *)
+(* ***********************************************************************)
+
+val init_builtins_ref: (unit -> unit) ref
 
 (*
 Local Variables:

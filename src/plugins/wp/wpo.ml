@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -190,7 +190,19 @@ struct
 
   let is_trivial g = Conditions.is_trivial g.sequent
 
-  let apply phi g = g.sequent <- phi g.sequent
+  let dkey = Wp_parameters.register_category "qed"
+
+  let apply option phi g =
+    try
+      Db.yield () ;
+      Wp_parameters.debug ~dkey "Appy %s" option ;
+      g.sequent <- phi g.sequent ;
+    with exn when Wp_parameters.protect exn ->
+      Wp_parameters.warning ~current:false ~once:true
+        "Goal simplification aborted (%s):@\n\
+         Exception %S@\n\
+         Re-run with debug level 1+ for details."
+        option (Printexc.to_string exn)
 
   let default_simplifiers = [
     Wp_parameters.SimplifyIsCint.get, Cint.is_cint_simplifier ;
@@ -200,48 +212,46 @@ struct
   let preprocess g =
     if Wp_parameters.Let.get () then
       begin
-        apply Conditions.introduction_eq g ;
+        apply "introduction" Conditions.introduction_eq g ;
         let fold acc (get,solver) = if get () then solver::acc else acc in
         let solvers = List.fold_left fold [] default_simplifiers in
-        apply (Conditions.simplify ~solvers) g ;
+        apply "-wp-simplify-*" (Conditions.simplify ~solvers) g ;
         if Wp_parameters.FilterInit.get ()
-        then apply Conditions.init_filter g ;
+        then apply "-wp-filter-init" Conditions.init_filter g ;
         if Wp_parameters.Prune.get ()
-        then apply (Conditions.pruning ~solvers) g ;
+        then apply "-wp-pruning" (Conditions.pruning ~solvers) g ;
         if Wp_parameters.Filter.get ()
-        then apply Conditions.filter g ;
+        then apply "-wp-filter" Conditions.filter g ;
         if Wp_parameters.Parasite.get ()
-        then apply Conditions.parasite g ;
+        then apply "-wp-parasite" Conditions.parasite g ;
       end
     else
       begin
         if Wp_parameters.Clean.get ()
-        then apply Conditions.clean g ;
+        then apply "-wp-clean" Conditions.clean g ;
       end ;
     if Conditions.is_trivial g.sequent then
       g.sequent <- Conditions.trivial ;
     g.obligation <- Conditions.close g.sequent
 
-  let dkey = Wp_parameters.register_category "prover"
-
-  let safecompute g =
+  let safecompute ~pid g =
     begin
       g.simplified <- true ;
       let timer = ref 0.0 in
-      Wp_parameters.debug ~dkey "Simplify goal" ;
+      Wp_parameters.debug ~dkey "Simplify %a" WpPropId.pretty pid ;
       Command.time ~rmax:timer preprocess g ;
       Wp_parameters.debug ~dkey "Simplification time: %a"
         Rformat.pp_time !timer ;
       g.time <- !timer ;
     end
 
-  let compute g =
+  let compute ~pid g =
     if not g.simplified then
       Lang.local ~vars:(Conditions.vars_seq g.sequent)
-        safecompute g
+        (safecompute ~pid) g
 
-  let compute_proof g = compute g ; g.obligation
-  let compute_descr g = compute g ; g.sequent
+  let compute_proof ~pid g = compute ~pid g ; g.obligation
+  let compute_descr ~pid g = compute ~pid g ; g.sequent
   let get_descr g = g.sequent
   let qed_time g = g.time
 
@@ -283,8 +293,8 @@ struct
       List.iter
         (fun (prover,result) ->
            if result.verdict <> NoResult then
-             Format.fprintf fmt "Prover %a returns %a@\n"
-               pp_prover prover (pp_result_qualif prover) result
+             Format.fprintf fmt "Prover %a returns %t@\n"
+               pp_prover prover (pp_result_qualif prover result)
         ) results ;
     end
 
@@ -317,7 +327,7 @@ struct
     effect = None ;
   }
 
-  let resolve vcq = GOAL.compute_proof vcq.goal == Lang.F.p_true
+  let resolve ~pid vcq = GOAL.compute_proof ~pid vcq.goal == Lang.F.p_true
   let is_trivial vcq = GOAL.is_trivial vcq.goal
 
   let pp_effect fmt = function
@@ -343,13 +353,13 @@ struct
           Format.fprintf fmt "@].@\n" ;
         end ;
       pp_warnings fmt vc.warn ;
-      Pcond.pretty fmt (GOAL.compute_descr vc.goal) ;
+      Pcond.pretty fmt (GOAL.compute_descr ~pid vc.goal) ;
       List.iter
         (fun (prover,result) ->
            if result.verdict <> NoResult then
-             Format.fprintf fmt "Prover %a returns %a@\n"
+             Format.fprintf fmt "Prover %a returns %t@\n"
                pp_prover prover
-               (pp_result_qualif prover) result
+               (pp_result_qualif prover result)
         ) results ;
     end
 
@@ -571,7 +581,7 @@ type system = {
   mutable wpo_ip : WPOset.t Pmap.t ; (* ip -> WPOs *)
   mutable age : int WPOmap.t ; (* wpo -> age *)
   mutable results : Results.t WPOmap.t ; (* results collector *)
-  proofs : WpAnnot.proof Hproof.t ; (* proof collector *)
+  proofs : WpPropId.proof Hproof.t ; (* proof collector *)
 }
 
 let create_system () =
@@ -700,40 +710,19 @@ let get_proof g =
     try
       let proof = Hproof.find system.proofs (proof g target) in
       if is_smoke_test g then
-        if WpAnnot.is_proved proof then `Failed else
-        if WpAnnot.is_invalid proof then `Passed else
+        if WpPropId.is_proved proof then `Failed else
+        if WpPropId.is_invalid proof then `Passed else
           `Unknown
       else
-      if WpAnnot.is_proved proof then `Passed else `Unknown
+      if WpPropId.is_proved proof then `Passed else `Unknown
     with Not_found -> `Unknown
   in status , target
-
-let set_invalid emitter tgt =
-  Property_status.emit emitter ~hyps:[] tgt Property_status.False_if_reachable
-
-let set_doomed emitter pid =
-  List.iter (set_invalid emitter) (WpPropId.doomed_if_valid pid) ;
-  match WpPropId.unreachable_if_valid pid with
-  | Property.OLStmt(kf,stmt) ->
-      let ca =
-        let filter = WpReached.is_dead_annot in
-        match Annotations.code_annot ~emitter ~filter stmt with
-        | ca::_ -> ca
-        | [] ->
-            let pred_loc = Stmt.loc stmt in
-            let pred_name = [ "Wp" ; "SmokeTest" ] in
-            let pf = { Logic_const.pfalse with pred_loc ; pred_name } in
-            let ca = Logic_const.new_code_annotation (AAssert ([],Assert,pf)) in
-            Annotations.add_code_annot emitter ~kf stmt ca ; ca
-      in
-      List.iter (set_invalid emitter) (Property.ip_of_code_annot kf stmt ca)
-  | Property.OLGlob _ | Property.OLContract _ -> ()
 
 let find_proof system g =
   let pi = proof g (WpPropId.property_of_id g.po_pid) in
   try Hproof.find system.proofs pi
   with Not_found ->
-    let proof = WpAnnot.create_proof g.po_pid in
+    let proof = WpPropId.create_proof g.po_pid in
     Hproof.add system.proofs pi proof ; proof
 
 let clear_results g =
@@ -760,18 +749,18 @@ let set_result g p r =
       let smoke = is_smoke_test g in
       let proof = find_proof system g in
       let emitter = WpContext.get_emitter g.po_model in
-      let target = WpAnnot.target proof in
-      let unproved = not (WpAnnot.is_proved proof) in
+      let target = WpPropId.target proof in
+      let unproved = not (WpPropId.is_proved proof) in
       if VCS.is_valid r then
-        WpAnnot.add_proof proof g.po_pid (get_depend g)
+        WpPropId.add_proof proof g.po_pid (get_depend g)
       else if smoke then
-        WpAnnot.add_invalid_proof proof ;
-      let proved = WpAnnot.is_proved proof in
+        WpPropId.add_invalid_proof proof ;
+      let proved = WpPropId.is_proved proof in
       let status =
         if smoke then
           if proved
           then Property_status.False_if_reachable (* All goals SAT *)
-          else if WpAnnot.is_invalid proof
+          else if WpPropId.is_invalid proof
           then Property_status.True (* Some goal is UNSAT *)
           else Property_status.Dont_know (* Not finished yet *)
         else
@@ -779,9 +768,9 @@ let set_result g p r =
         then Property_status.True
         else Property_status.Dont_know
       in
-      let hyps = if smoke then [] else WpAnnot.dependencies proof in
+      let hyps = if smoke then [] else WpPropId.dependencies proof in
       Property_status.emit emitter ~hyps target status ;
-      if smoke && unproved && proved then set_doomed emitter g.po_pid ;
+      if smoke && unproved && proved then WpReached.set_doomed emitter g.po_pid ;
   end
 
 let has_verdict g p =
@@ -804,25 +793,27 @@ let is_trivial g =
   | GoalLemma vc -> VC_Lemma.is_trivial vc
   | GoalAnnot vc -> VC_Annot.is_trivial vc
 
-
 let reduce g =
   match g.po_formula with
-  | GoalLemma vc -> WpContext.on_context (get_context g) VC_Lemma.is_trivial vc
-  | GoalAnnot vc -> WpContext.on_context (get_context g) VC_Annot.resolve vc
+  | GoalLemma vc ->
+      WpContext.on_context (get_context g) VC_Lemma.is_trivial vc
+  | GoalAnnot vc ->
+      let pid = g.po_pid in
+      WpContext.on_context (get_context g) (VC_Annot.resolve ~pid) vc
 
 let resolve g =
   let valid = reduce g in
   if valid then
     let result = VCS.result ~solver:(qed_time g) VCS.Valid in
-    ignore (set_result g VCS.Qed result) ;
-    true
+    ( set_result g VCS.Qed result ; true )
   else false
 
 let compute g =
   let ctxt = get_context g in
   match g.po_formula with
   | GoalAnnot { VC_Annot.axioms ; VC_Annot.goal = goal } ->
-      axioms , WpContext.on_context ctxt GOAL.compute_descr goal
+      let pid = g.po_pid in
+      axioms , WpContext.on_context ctxt (GOAL.compute_descr ~pid) goal
   | GoalLemma ({ VC_Lemma.depends = depends ; VC_Lemma.lemma = lemma } as w) ->
       let open Definitions in
       Some( lemma.l_cluster , depends ) ,
@@ -834,6 +825,12 @@ let is_proved g =
 let is_unknown g = List.exists
     (fun (_,r) -> VCS.is_verdict r && not (VCS.is_valid r))
     ( get_results g )
+
+let is_passed g =
+  if is_smoke_test g then
+    not (is_proved g)
+  else
+    is_proved g
 
 let get_result =
   Dynamic.register ~plugin:"Wp" "Wpo.get_result" ~journalize:false
@@ -949,7 +946,7 @@ let goals_of_property =
 let prover_of_name =
   Dynamic.register ~plugin:"Wp" "Wpo.prover_of_name" ~journalize:false
     (Datatype.func Datatype.string (Datatype.option ProverType.ty))
-    VCS.prover_of_name
+    VCS.parse_prover
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prover and Files                                                   --- *)
@@ -998,3 +995,21 @@ let get_files w =
       ) results []
   in
   descr_files @ result_files
+
+(* -------------------------------------------------------------------------- *)
+(* --- Generators                                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+class type generator =
+  object
+    method model : WpContext.model
+    method compute_ip : Property.t -> t Bag.t
+    method compute_call : stmt -> t Bag.t
+    method compute_main :
+      ?fct:Wp_parameters.functions ->
+      ?bhv:string list ->
+      ?prop:string list ->
+      unit -> t Bag.t
+  end
+
+(* -------------------------------------------------------------------------- *)

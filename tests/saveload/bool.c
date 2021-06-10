@@ -1,11 +1,11 @@
 /* run.config
-   EXECNOW: BIN bool.sav LOG bool_sav.res LOG bool_sav.err ./bin/toplevel.opt -save ./tests/saveload/result/bool.sav -eva @EVA_OPTIONS@ ./tests/saveload/bool.c > tests/saveload/result/bool_sav.res 2> tests/saveload/result/bool_sav.err
+   EXECNOW: BIN bool.sav LOG bool_sav.res LOG bool_sav.err @frama-c@ -save ./tests/saveload/result/bool.sav -machdep x86_32 -eva @EVA_OPTIONS@ ./tests/saveload/bool.c > tests/saveload/result/bool_sav.res 2> tests/saveload/result/bool_sav.err
    STDOPT: +"-load ./tests/saveload/result/bool.sav -out -input -deps"
    STDOPT: +"-load ./tests/saveload/result/bool.sav -eva @EVA_OPTIONS@"
  */
 
 #include "stdbool.h"
-#include "share/libc/stdio.h"
+#include "stdio.h"
 
 bool x;
 int y;

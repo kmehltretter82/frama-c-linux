@@ -797,7 +797,17 @@ struct mallinfo {
   Try to persuade compilers to inline. The most critical functions for
   inlining are defined as macros, so these aren't used for them.
 */
-
+// MinGW defines `FORCEINLINE` as `__forceinline`, and defines `__forceinline`
+// with an "extern" storage class. Since the macro `FORCEINLINE` is used here
+// on `static` function, a compilation error occurs because `static` and
+// `extern` cannot be used at the same time.
+// This implementation "problem" is known to the MinGW team but is explicitely
+// marked as "won't fix": https://sourceforge.net/p/mingw-w64/bugs/269/
+// So the workaround here is to `undef FORCEINLINE` if the file is being
+// compiled by MinGW.
+#ifdef __MINGW32__ // defined for 32 bits and 64 bits MinGW
+#undef FORCEINLINE
+#endif
 #ifndef FORCEINLINE
   #if defined(__GNUC__)
 #define FORCEINLINE __inline __attribute__ ((always_inline))

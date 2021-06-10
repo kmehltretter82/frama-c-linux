@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -122,8 +122,8 @@ val return: 'a t -> (unit -> 'a) -> 'a t
     @raise Invalid_descriptor if the descriptor cannot be built. *)
 
 val dynamic: (unit -> 'a t) -> 'a t
-  (** Similar to {!Unmarshal.Dynamic}.
-      @raise Invalid_descriptor if the descriptor cannot be built. *)
+(** Similar to {!Unmarshal.Dynamic}.
+    @raise Invalid_descriptor if the descriptor cannot be built. *)
 
 (* ********************************************************************** *)
 (** {2 Coercions} *)

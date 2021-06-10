@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -39,7 +39,7 @@ let call_init_state kf =
   | "none" -> ISEmpty
   | _ -> assert false
 
-let dkey = Value_parameters.register_category "d-eq"
+let dkey = Value_parameters.register_category "d-equality"
 
 open Hcexprs
 
@@ -239,12 +239,12 @@ module Make
       v, Alarmset.none
     | None -> `Value (Value.top, None), Alarmset.all
 
-  let extract_expr (oracle: exp -> Value.t evaluated) (equalities, _, _) expr =
+  let extract_expr ~oracle _context (equalities, _, _) expr =
     let expr = Cil.constFold true expr in
     let atom_e = HCE.of_exp expr in
     coop_eval oracle equalities atom_e
 
-  let extract_lval oracle (equalities, _, _) lval _typ _location =
+  let extract_lval ~oracle _context (equalities, _, _) lval _typ _location =
     let atom_lv = HCE.of_lval lval in
     coop_eval oracle equalities atom_lv
 
@@ -260,7 +260,7 @@ module Make
       match Deps.intersects deps zone with
       | [] -> equalities, deps, modified_zone
       | atoms ->
-        let extract_lval h = Extlib.the (HCE.to_lval h) in
+        let extract_lval h = Option.get (HCE.to_lval h) in
         let atoms = List.map extract_lval atoms in
         let process eq atom = Equality.Set.remove kt atom eq in
         let equalities' = List.fold_left process equalities atoms in
@@ -473,16 +473,28 @@ module Make
       end
     | _ -> `Value state
 
-  let start_call _stmt call valuation state =
+  let start_recursive_call recursion state =
+    let vars = List.map fst recursion.substitution @ recursion.withdrawal in
+    unscope state vars
+
+  let start_call _stmt call recursion valuation state =
     let state =
-      match call_init_state call.kf with
-      | ISCaller  -> assign_formals valuation call state
-      | ISFormals -> assign_formals valuation call empty
-      | ISEmpty   -> empty
+      match recursion with
+      | Some recursion ->
+        (* No relation inferred from the assignment of formal parameters
+           for recursive calls, because the valuation cannot be used safely
+           as the substitution of local and formals variables has not been
+           applied to it. *)
+        start_recursive_call recursion state
+      | None ->
+        match call_init_state call.kf with
+        | ISCaller  -> assign_formals valuation call state
+        | ISFormals -> assign_formals valuation call empty
+        | ISEmpty   -> empty
     in
     `Value state
 
-  let finalize_call _stmt call ~pre ~post =
+  let finalize_call _stmt call _recursion ~pre ~post =
     if call_init_state call.kf = ISCaller then
       `Value post (* [pre] was the state inferred in the caller, and it
                      has been updated during the analysis of [kf] into

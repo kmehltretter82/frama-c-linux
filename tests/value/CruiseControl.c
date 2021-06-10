@@ -1,6 +1,6 @@
 /* run.config*
-   GCC:
-   STDOPT: #"-float-normal tests/value/CruiseControl_const.c -lib-entry -main CruiseControl -context-depth 10 -context-valid-pointers"
+   
+   STDOPT: #"-float-normal tests/value/CruiseControl_const.c -lib-entry -main CruiseControl -eva-context-depth 10 -eva-context-valid-pointers"
 
 */
 /*$************* SCADE_KCG KCG Version 5.1.1 (build i10) **************

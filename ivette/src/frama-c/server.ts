@@ -1,3 +1,25 @@
+/* ************************************************************************ */
+/*                                                                          */
+/*   This file is part of Frama-C.                                          */
+/*                                                                          */
+/*   Copyright (C) 2007-2021                                                */
+/*     CEA (Commissariat à l'énergie atomique et aux énergies               */
+/*          alternatives)                                                   */
+/*                                                                          */
+/*   you can redistribute it and/or modify it under the terms of the GNU    */
+/*   Lesser General Public License as published by the Free Software        */
+/*   Foundation, version 2.1.                                               */
+/*                                                                          */
+/*   It is distributed in the hope that it will be useful,                  */
+/*   but WITHOUT ANY WARRANTY; without even the implied warranty of         */
+/*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          */
+/*   GNU Lesser General Public License for more details.                    */
+/*                                                                          */
+/*   See the GNU Lesser General Public License version 2.1                  */
+/*   for more details (enclosed in the file licenses/LGPLv2.1).             */
+/*                                                                          */
+/* ************************************************************************ */
+
 // --------------------------------------------------------------------------
 // --- Frama-C Server
 // --------------------------------------------------------------------------
@@ -21,7 +43,7 @@ import { ChildProcess } from 'child_process';
 // --- Pretty Printing (Browser Console)
 // --------------------------------------------------------------------------
 
-const PP = new Dome.PP('Server');
+const D = new Dome.Debug('Server');
 
 // --------------------------------------------------------------------------
 // --- Events
@@ -32,7 +54,7 @@ const PP = new Dome.PP('Server');
 
  *  This event is emitted whenever the server status changes.
  */
-const STATUS = 'frama-c.server.status';
+const STATUS = new Dome.Event<Status>('frama-c.server.status');
 
 /**
  *  Server is actually started and running.
@@ -40,7 +62,7 @@ const STATUS = 'frama-c.server.status';
  *  This event is emitted when ther server _enters_ the `ON` state.
  *  The server is now ready to handle requests.
  */
-const READY = 'frama-c.server.ready';
+const READY = new Dome.Event('frama-c.server.ready');
 
 /**
  *  Server Status Notification Event
@@ -48,21 +70,18 @@ const READY = 'frama-c.server.ready';
  *  This event is emitted when ther server _leaves_ the `ON` state.
  *  The server is no more able to handle requests until restart.
  */
-const SHUTDOWN = 'frama-c.server.shutdown';
+const SHUTDOWN = new Dome.Event('frama-c.server.shutdown');
 
 /**
- *  Server Signal Prefix
+ *  Server Signal event constructor.
 
  *  Event `frama-c.server.signal.<id>'` for signal `<id>`.
  */
-const SIGNAL = 'frama-c.server.signal.';
-
-/**
- *  Server Signal Activity Prefix
-
- *  Event `frama-c.server.activity.<id>'` for signal `<id>`.
- */
-const ACTIVITY = 'frama-c.server.activity.';
+export class SIGNAL extends Dome.Event {
+  constructor(signal: string) {
+    super(`frama-c.server.signal.${signal}`);
+  }
+}
 
 // --------------------------------------------------------------------------
 // --- Server Status
@@ -200,22 +219,13 @@ export function getPending(): number {
  *  Register callback on `READY` event.
  *  @param {function} callback Invoked when the server enters [[ON]] stage.
  */
-export function onReady(callback: any) { Dome.on(READY, callback); }
+export function onReady(callback: () => void) { READY.on(callback); }
 
 /**
  *  Register callback on `SHUTDOWN` event.
  *  @param {function} callback Invoked when the server leaves [[ON]] stage.
  */
-export function onShutdown(callback: any) { Dome.on(SHUTDOWN, callback); }
-
-/**
- *  Register callback on a signal `ACTIVITY` event.
- *  @param {string} id The signal identifier to listen to.
- *  @param {function} callback Invoked with `callback(signal, active)`.
- */
-export function onActivity(signal: string, callback: any) {
-  Dome.on(ACTIVITY + signal, callback);
-}
+export function onShutdown(callback: () => void) { SHUTDOWN.on(callback); }
 
 // --------------------------------------------------------------------------
 // --- Status Update
@@ -223,15 +233,15 @@ export function onActivity(signal: string, callback: any) {
 
 function _status(newStatus: Status) {
   if (Dome.DEVEL && hasErrorStatus(newStatus)) {
-    PP.error(newStatus.error);
+    D.error(newStatus.error);
   }
 
   if (newStatus !== status) {
     const oldStatus = status;
     status = newStatus;
-    Dome.emit(STATUS);
-    if (oldStatus.stage === Stage.ON) Dome.emit(SHUTDOWN);
-    if (newStatus.stage === Stage.ON) Dome.emit(READY);
+    STATUS.emit(newStatus);
+    if (oldStatus.stage === Stage.ON) SHUTDOWN.emit();
+    if (newStatus.stage === Stage.ON) READY.emit();
   }
 }
 
@@ -256,7 +266,7 @@ export async function start() {
         await _launch();
         _status(okStatus(Stage.ON));
       } catch (error) {
-        PP.error(error.toString());
+        D.error(error.toString());
         buffer.append(error.toString(), '\n');
         _exit(error);
       }
@@ -368,12 +378,9 @@ export function restart() {
 export function clear() {
   switch (status.stage) {
     case Stage.FAILURE:
-      buffer.clear();
-      _status(okStatus(Stage.OFF));
-      return;
     case Stage.OFF:
       buffer.clear();
-      Dome.emit(STATUS);
+      _status(okStatus(Stage.OFF));
       return;
     default:
       return;
@@ -394,7 +401,7 @@ export interface Configuration {
   command?: string;
   /** Additional server arguments (default: empty). */
   params: string[];
-  /** Server socket (default: `ipc:///.frama-c.<pid>.io`). */
+  /** Server socket (default: `ipc:///tmp/ivette.frama-c.<pid>.io`). */
   sockaddr?: string;
   /** Shutdown timeout before server is hard killed, in milliseconds
    *  (default: 300ms). */
@@ -458,12 +465,14 @@ async function _launch() {
   }
   buffer.append('\n');
 
-  if (!cwd) cwd = System.getWorkingDir();
   if (!sockaddr) {
-    const socketfile = System.join(cwd, `.frama-c.${System.getPID()}.io`);
+    const tmp = System.getTempDir();
+    const pid = System.getPID();
+    const socketfile = System.join(tmp, `ivette.frama-c.${pid}.io`);
     System.atExit(() => System.remove(socketfile));
     sockaddr = `ipc://${socketfile}`;
   }
+  if (!cwd) cwd = System.getWorkingDir();
   logout = logout && System.join(cwd, logout);
   logerr = logerr && System.join(cwd, logerr);
   params = ['-server-zmq', sockaddr, '-then'].concat(params);
@@ -484,7 +493,7 @@ async function _launch() {
   process?.stdout?.on('data', logger);
   process?.stderr?.on('data', logger);
   process?.on('exit', (code: number | null, signal: string | null) => {
-    PP.log('Process exited');
+    D.log('Process exited');
 
     if (signal) {
       // [signal] is non-null.
@@ -514,7 +523,7 @@ async function _launch() {
 // --------------------------------------------------------------------------
 
 function _reset() {
-  PP.log('Reset to initial configuration');
+  D.log('Reset to initial configuration');
 
   rqCount = 0;
   queueCmd = [];
@@ -536,7 +545,7 @@ function _reset() {
 }
 
 function _kill() {
-  PP.log('Hard kill');
+  D.log('Hard kill');
 
   _reset();
   if (process) {
@@ -545,7 +554,7 @@ function _kill() {
 }
 
 async function _shutdown() {
-  PP.log('Shutdown');
+  D.log('Shutdown');
 
   _reset();
   queueCmd.push('SHUTDOWN');
@@ -587,13 +596,13 @@ function _exit(error?: Error) {
 
 class SignalHandler {
   id: any;
-  event: string;
+  event: Dome.Event;
   active: boolean;
   listen: boolean;
 
   constructor(id: any) {
     this.id = id;
-    this.event = SIGNAL + id;
+    this.event = new SIGNAL(id);
     this.active = false;
     this.listen = false;
     this.sigon = this.sigon.bind(this);
@@ -601,18 +610,21 @@ class SignalHandler {
     this.unplug = this.unplug.bind(this);
   }
 
-  on(callback: any) {
-    const n = Dome.emitter.listenerCount(this.event);
-    Dome.on(this.event, callback);
+  on(callback: () => void) {
+    const e = this.event;
+
+    const n = e.listenerCount();
+    e.on(callback);
     if (n === 0) {
       this.active = true;
       if (isRunning()) this.sigon();
     }
   }
 
-  off(callback: any) {
-    Dome.off(this.event, callback);
-    const n = Dome.emitter.listenerCount(this.event);
+  off(callback: () => void) {
+    const e = this.event;
+    e.off(callback);
+    const n = e.listenerCount();
     if (n === 0) {
       this.active = false;
       if (isRunning()) this.sigoff();
@@ -622,7 +634,6 @@ class SignalHandler {
   /* Bound to this */
   sigon() {
     if (this.active && !this.listen) {
-      Dome.emit(ACTIVITY + this.id, true);
       this.listen = true;
       queueCmd.push('SIGON', this.id);
       _flush();
@@ -632,7 +643,6 @@ class SignalHandler {
   /* Bound to this, Debounced */
   sigoff() {
     if (!this.active && this.listen) {
-      Dome.emit(ACTIVITY + this.id, false);
       if (isRunning()) {
         this.listen = false;
         queueCmd.push('SIGOFF', this.id);
@@ -699,13 +709,13 @@ export function useSignal(s: Signal, callback: any) {
 
 // --- Server Synchro
 
-Dome.on(READY, () => {
+READY.on(() => {
   signals.forEach((h: SignalHandler) => {
     h.sigon();
   });
 });
 
-Dome.on(SHUTDOWN, () => {
+SHUTDOWN.on(() => {
   signals.forEach((h: SignalHandler) => {
     h.unplug();
     (h.sigoff as unknown as _.Cancelable).cancel();
@@ -846,7 +856,7 @@ async function _send() {
         const resp = await zmqSocket?.receive();
         _receive(resp);
       } catch (error) {
-        PP.error(`Error in send/receive on ZMQ socket. ${error.toString()}`);
+        D.error(`Error in send/receive on ZMQ socket. ${error.toString()}`);
         _cancel(ids);
       }
       zmqIsBusy = false;
@@ -854,7 +864,7 @@ async function _send() {
       // No pending command nor pending response
       rqCount = 0;
     }
-    Dome.emit(STATUS);
+    STATUS.emit(status);
   }
 }
 
@@ -891,14 +901,14 @@ function _receive(resp: any) {
           break;
         case 'SIGNAL':
           rid = shift();
-          Dome.emit(SIGNAL + rid);
+          (new SIGNAL(rid)).emit();
           break;
         case 'WRONG':
           err = shift();
-          PP.error(`ZMQ Protocol Error: ${err}`);
+          D.error(`ZMQ Protocol Error: ${err}`);
           break;
         default:
-          PP.error(`Unknown Response: ${cmd}`);
+          D.error(`Unknown Response: ${cmd}`);
           unknownResponse = true;
           break;
       }

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -241,9 +241,10 @@ module Internal
     let effects = Transfer.effects_assume to_z e in
     `Value (Transfer.catenate state effects)
 
-  let start_call _stmt _call _valuation _state = `Value LatticeInout.empty
+  let start_call _stmt _call _recursion _valuation _state =
+    `Value LatticeInout.empty
 
-  let finalize_call _stmt _call ~pre ~post =
+  let finalize_call _stmt _call _recursion ~pre ~post =
     `Value (Transfer.catenate pre post)
 
   let update _valuation state = `Value state
@@ -271,8 +272,8 @@ module Internal
 
   let top_query = `Value (Cvalue.V.top, None), Alarmset.all
 
-  let extract_expr _oracle _state _expr = top_query
-  let extract_lval _oracle _state _lv _typ _locs = top_query
+  let extract_expr ~oracle:_ _context _state _expr = top_query
+  let extract_lval ~oracle:_ _context _state _lv _typ _locs = top_query
 
   let backward_location _state _lval _typ loc value =
     `Value (loc, value)

@@ -1,11 +1,11 @@
 /* run.config
-EXECNOW: make -s tests/syntax/Enum_repr.cmxs
-OPT: -load-module tests/syntax/Enum_repr.cmxs -enums int -print
-OPT: -load-module tests/syntax/Enum_repr.cmxs -enums gcc-short-enums -print
-OPT: -load-module tests/syntax/Enum_repr.cmxs -enums gcc-enums -print
+ MODULE: Enum_repr
+   OPT: -machdep x86_32 -enums int -print
+   OPT: -machdep x86_32 -enums gcc-short-enums -print
+   OPT: -machdep x86_32 -enums gcc-enums -print
 */
 
-// is represented by | int | gcc-enums          | gcc-short-enums 
+// is represented by | int | gcc-enums          | gcc-short-enums
 // foo               | int | unsigned int       | unsigned char
 // bar               | int | unsigned char      | unsigned char
 // bu1               | int | unsigned int       | unsigned int

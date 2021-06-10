@@ -1,4 +1,4 @@
-#include "share/libc/stddef.h"
+#include "stddef.h"
 
 int main(volatile int v) {
 

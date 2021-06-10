@@ -43,12 +43,17 @@
     "resolveJsonModule": true,                /* Allow to load JSON files as module. */
     "baseUrl": ".",                           /* Base directory to resolve non-absolute module names. */
     "paths": {                                /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */
-      "api/*": [ "api/*" ],
+      "ivette@ext": [ "src/renderer/Extensions.tsx" ],
+      "ivette@lab": [ "src/renderer/Laboratory.tsx" ],
+      "ivette": [ "src/ivette/index.tsx" ],
+      "ivette/*": [ "src/ivette/*" ],
+      "frama-c/api/*": [ "src/frama-c/api/generated/*" ],
       "frama-c/*": [ "src/frama-c/*" ],
-      "dome": [ "src/dome/src/renderer/dome.js" ],
-      "dome/system": [ "src/dome/src/misc/system.js" ],
-      "dome/misc/*": [ "src/dome/src/misc/*"],
-      "dome/*": [ "src/dome/src/renderer/*" ],
+      "dome": [ "src/dome/renderer/dome.tsx" ],
+      "dome/system": [ "src/dome/misc/system.js" ],
+      "dome/devtools": [ "src/dome/misc/devtools.js" ],
+      "dome/misc/*": [ "src/dome/misc/*"],
+      "dome/*": [ "src/dome/renderer/*" ],
       "codemirror/lib/codemirror": ["node_modules/@types/codemirror/index.d.ts"],
     },
     // "rootDirs": [],                        /* List of root folders whose combined content represents the structure of the project at runtime. */
@@ -99,9 +104,15 @@
     "readme": "./README.md",
     "inputFiles": [
       "doc/pages",
-      "src/frama-c", "api",
-      "src/dome/src/renderer",
-      "src/dome/src/misc",
+      "src/ivette/index.tsx",
+      "src/ivette/prefs.tsx",
+      "src/frama-c/server.ts",
+      "src/frama-c/states.ts",
+      "src/frama-c/utils.ts",
+      "src/frama-c/api/generated",
+      "src/dome/renderer",
+      "src/dome/misc/utils.ts",
+      "src/dome/misc/system.ts",
     ]
   }
 }

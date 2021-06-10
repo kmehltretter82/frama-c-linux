@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -19,8 +19,6 @@
 (*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
 (*                                                                        *)
 (**************************************************************************)
-
-open Cil_types
 
 module PLoc = struct
 
@@ -64,16 +62,18 @@ module PLoc = struct
       else `Unknown (l1, l2)
     else `True
 
+  let replace_base = Precise_locs.replace_base
+
   (* ------------------------------------------------------------------------ *)
   (*                              Offsets                                     *)
   (* ------------------------------------------------------------------------ *)
 
   let no_offset = Precise Precise_locs.offset_zero
 
-  let forward_field typ field = function
+  let forward_field _typ field = function
     | Precise offset ->
       begin try
-          let field = fst (Cil.bitsOffset typ (Field (field, NoOffset))) in
+          let field = fst (Cil.fieldBitsOffset field) in
           let field_i = Integer.of_int field in
           Precise (Precise_locs.shift_offset_by_singleton field_i offset)
         with Cil.SizeOfError _ -> Precise (Precise_locs.offset_top)
@@ -189,12 +189,12 @@ module PLoc = struct
       then `Bottom
       else `Value (new_mem, Precise new_off)
 
-  let backward_field typ field = function
+  let backward_field _typ field = function
     | Imprecise _ as x -> `Value x
     | Precise offset ->
       begin try
           let offset_ival = Precise_locs.imprecise_offset offset in
-          let field = fst (Cil.bitsOffset typ (Field (field, NoOffset))) in
+          let field = fst (Cil.fieldBitsOffset field) in
           let field_i = Integer.of_int (- field) in
           let ival = Ival.add_singleton_int field_i offset_ival in
           if Ival.is_bottom ival

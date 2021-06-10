@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -34,11 +34,13 @@ type prover =
   | Tactical      (* Interactive Prover *)
 
 type mode =
-  | BatchMode (* Only check scripts *)
-  | EditMode  (* Edit then check scripts *)
-  | FixMode   (* Try check script, then edit script on non-success *)
+  | Batch (* Only check scripts *)
+  | Update (* Check and update scripts *)
+  | Edit  (* Edit then check scripts *)
+  | Fix   (* Try to check script, then edit script on non-success *)
+  | FixUpdate (* Update and fix *)
 
-let prover_of_name = function
+let parse_prover = function
   | "" | "none" -> None
   | "qed" | "Qed" -> Some Qed
   | "native-alt-ergo" (* for wp-reports *)
@@ -70,13 +72,21 @@ let prover_of_name = function
             (String.concat ":" prv) (Why3Provers.print_wp p) ;
           Some (Why3 p)
       | NotFound ->
-          Wp_parameters.error "Prover '%s' not found in why3.conf" name ;
+          Wp_parameters.error ~once:true
+            "Prover '%s' not found in why3.conf" name ;
           None
 
-let mode_of_prover_name = function
-  | "native:coqedit" -> EditMode
-  | "native:coqide" | "native:altgr-ergo" -> FixMode
-  | _ -> BatchMode
+let parse_mode m =
+  match String.lowercase_ascii m with
+  | "fix" -> Fix
+  | "edit" -> Edit
+  | "batch" -> Batch
+  | "update" -> Update
+  | "fixup" -> FixUpdate
+  | _ ->
+      Wp_parameters.error ~once:true
+        "Unrecognized mode %S (use 'batch' instead)" m ;
+      Batch
 
 let name_of_prover = function
   | Why3 s -> Why3Provers.print_wp s
@@ -96,9 +106,11 @@ let title_of_prover = function
   | Tactical -> "Script"
 
 let title_of_mode = function
-  | FixMode -> "Fix"
-  | EditMode -> "Edit"
-  | BatchMode -> "Batch"
+  | Fix -> "Fix"
+  | Edit -> "Edit"
+  | Batch -> "Batch"
+  | Update -> "Update"
+  | FixUpdate -> "Fix Update"
 
 let sanitize_why3 s =
   let buffer = Buffer.create 80 in
@@ -122,8 +134,18 @@ let filename_for_prover = function
   | Tactical -> "Tactical"
 
 let is_auto = function
-  | Qed | NativeAltErgo | Why3 _ -> true
+  | Qed | NativeAltErgo -> true
   | Tactical | NativeCoq -> false
+  | Why3 p ->
+      match p.prover_name with
+      | "Alt-Ergo" | "CVC4" | "Z3" -> true
+      | "Coq" -> false
+      | _ ->
+          let config = Why3Provers.config () in
+          try
+            let prover_config = Why3.Whyconf.get_prover_config config p in
+            not prover_config.interactive
+          with Not_found -> true
 
 let cmp_prover p q =
   match p,q with
@@ -289,22 +311,24 @@ let cached r = if is_verdict r then { r with cached=true } else r
 
 let kfailed ?pos msg = Pretty_utils.ksfprintf (failed ?pos) msg
 
-let perfo dkey = not (Wp_parameters.has_dkey dkey)
-
-let pp_perf fmt r =
+let pp_perf_forced fmt r =
   begin
     let t = r.solver_time in
-    if t > Rformat.epsilon && perfo dkey_shell
+    if t > Rformat.epsilon
     then Format.fprintf fmt " (Qed:%a)" Rformat.pp_time t ;
     let t = r.prover_time in
-    if t > Rformat.epsilon && perfo dkey_shell
+    if t > Rformat.epsilon
     then Format.fprintf fmt " (%a)" Rformat.pp_time t ;
     let s = r.prover_steps in
-    if s > 0 && perfo dkey_shell
+    if s > 0
     then Format.fprintf fmt " (%d)" s ;
-    if r.cached && perfo dkey_shell
+    if r.cached
     then Format.fprintf fmt " (cached)" ;
   end
+
+let pp_perf_shell fmt r =
+  if not (Wp_parameters.has_dkey dkey_shell) then
+    pp_perf_forced fmt r
 
 let pp_result fmt r =
   match r.verdict with
@@ -312,36 +336,40 @@ let pp_result fmt r =
   | Computing _ -> Format.pp_print_string fmt "Computing"
   | Invalid -> Format.pp_print_string fmt "Invalid"
   | Failed -> Format.fprintf fmt "Failed@ %s" r.prover_errmsg
-  | Valid -> Format.fprintf fmt "Valid%a" pp_perf r
-  | Unknown -> Format.fprintf fmt "Unknown%a" pp_perf r
-  | Stepout -> Format.fprintf fmt "Step limit%a" pp_perf r
-  | Timeout -> Format.fprintf fmt "Timeout%a" pp_perf r
+  | Valid -> Format.fprintf fmt "Valid%a" pp_perf_shell r
+  | Unknown -> Format.fprintf fmt "Unknown%a" pp_perf_shell r
+  | Stepout -> Format.fprintf fmt "Step limit%a" pp_perf_shell r
+  | Timeout -> Format.fprintf fmt "Timeout%a" pp_perf_shell r
 
-let pp_cache_miss fmt st prover r =
-  let qualified =
-    match prover with
-    | Qed | Tactical -> true
-    | NativeAltErgo | NativeCoq -> r.verdict <> Timeout
-    | Why3 _ -> r.cached || r.prover_time < Rformat.epsilon
-  in
-  if not qualified && Wp_parameters.has_dkey dkey_shell then
-    Format.fprintf fmt "%s%a (unqualified)" st pp_perf r
+let is_qualified prover result =
+  match prover with
+  | Qed | Tactical -> true
+  | NativeAltErgo | NativeCoq -> result.verdict <> Timeout
+  | Why3 _ -> result.cached || result.prover_time < Rformat.epsilon
+
+let pp_cache_miss fmt st updating prover result =
+  if not updating
+  && not (is_qualified prover result)
+  && Wp_parameters.has_dkey dkey_shell
+  then
+    Format.fprintf fmt "%s%a (missing cache)" st pp_perf_forced result
   else
-    Format.pp_print_string fmt (if is_valid r then "Valid" else "Unsuccess")
+    Format.pp_print_string fmt @@
+    if is_valid result then "Valid" else "Unsuccess"
 
-let pp_result_qualif prover fmt r =
+let pp_result_qualif ?(updating=true) prover result fmt =
   if Wp_parameters.has_dkey dkey_shell then
-    match r.verdict with
+    match result.verdict with
     | NoResult -> Format.pp_print_string fmt "No Result"
     | Computing _ -> Format.pp_print_string fmt "Computing"
     | Invalid -> Format.pp_print_string fmt "Invalid"
-    | Failed -> Format.fprintf fmt "Failed@ %s" r.prover_errmsg
-    | Valid -> pp_cache_miss fmt "Valid" prover r
-    | Unknown -> pp_cache_miss fmt "Unsuccess" prover r
-    | Timeout -> pp_cache_miss fmt "Timeout" prover r
-    | Stepout -> pp_cache_miss fmt "Stepout" prover r
+    | Failed -> Format.fprintf fmt "Failed@ %s" result.prover_errmsg
+    | Valid -> pp_cache_miss fmt "Valid" updating prover result
+    | Unknown -> pp_cache_miss fmt "Unsuccess" updating prover result
+    | Timeout -> pp_cache_miss fmt "Timeout" updating prover result
+    | Stepout -> pp_cache_miss fmt "Stepout" updating prover result
   else
-    pp_result fmt r
+    pp_result fmt result
 
 let compare p q =
   let rank = function

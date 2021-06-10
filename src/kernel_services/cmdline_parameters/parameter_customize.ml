@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -81,19 +81,17 @@ let argument_must_be_existing_fun () =
 let group_ref = ref Cmdline.Group.default
 let set_group s = group_ref := s
 
-let do_iterate_ref = ref None
-let do_iterate () = do_iterate_ref := Some true
-let do_not_iterate () = do_iterate_ref := Some false
+let is_reconfigurable_ref = ref None
+let is_reconfigurable () = is_reconfigurable_ref := Some true
+let is_not_reconfigurable () = is_reconfigurable_ref := Some false
 
 let is_visible_ref = ref true
 let is_invisible () =
   is_visible_ref := false;
-  do_not_iterate ()
+  is_not_reconfigurable ()
 
 let use_category_ref = ref true
 let no_category () = use_category_ref := false
-
-let is_permissive_ref = ref false
 
 let find_kf_by_name: (string -> Cil_types.kernel_function) ref =
   Extlib.mk_fun "Parameter_customize.find_kf_by_name"
@@ -126,7 +124,7 @@ let reset () =
   must_save_ref := true;
   module_name_ref := empty_string;
   group_ref := Cmdline.Group.default;
-  do_iterate_ref := None;
+  is_reconfigurable_ref := None;
   is_visible_ref := true;
   argument_is_function_name_ref := false;
   argument_may_be_fundecl_ref := false;

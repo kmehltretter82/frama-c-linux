@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -295,5 +295,95 @@ let of_float f = `Float f
 let of_list xs = `List xs
 let of_array xs = `List (Array.to_list xs)
 let of_fields m = `Assoc m
+
+
+(* JSON file cache and merging *)
+
+exception CannotMerge of string
+
+(* Table of filepaths to JSON arrays, to be written at the end of a run *)
+let json_tbl = Hashtbl.create 3
+
+let rec merge_assoc_lists la lb =
+  let cmp = fun (k1, _) (k2, _) -> String.compare k1 k2 in
+  let rec aux acc l1 l2 =
+    match l1, l2 with
+    | [], [] -> acc
+    | [], l | l, [] -> List.rev_append l acc
+    | e1 :: r1, e2 :: r2 ->
+      let c = cmp e1 e2 in
+      if c < 0 then aux (e1 :: acc) r1 l2
+      else if c > 0 then aux (e2 :: acc) l1 r2
+      else (* c = 0 *)
+        let (k1, v1) = e1 in
+        let (_, v2) = e2 in
+        match v1, v2 with
+        | `Assoc a1, `Assoc a2 ->
+          let v = `Assoc (merge_assoc_lists a1 a2) in
+          aux ((k1, v) :: acc) r1 r2
+        | `List l1, `List l2 ->
+          let v = `List (l1 @ l2) in
+          aux ((k1, v) :: acc) r1 r2
+        | o1, o2 ->
+          let pp = Yojson.Basic.pretty_to_string in
+          raise (CannotMerge
+                   ("cannot merge heterogeneous objects '"
+                    ^ pp o1 ^ "' and '" ^ pp o2 ^ "'"))
+  in
+  let r = aux [] (List.sort cmp la) (List.sort cmp lb) in
+  List.rev r
+
+let merge_object path json_root_obj =
+  let open Yojson.Basic.Util in
+  let existing_root_obj =
+    try
+      match Hashtbl.find json_tbl path with
+      | `Assoc _ as root -> root
+      | _ -> raise (CannotMerge "JSON root element should be an object")
+    with Not_found ->
+      `Assoc []
+  in
+  let existing_assoc = existing_root_obj |> to_assoc in
+  let new_assoc = json_root_obj |> to_assoc in
+  let merged = merge_assoc_lists existing_assoc new_assoc in
+  let merged_obj = `Assoc merged in
+  Hashtbl.replace json_tbl path merged_obj
+
+let merge_array path json_root_array =
+  let open Yojson.Basic.Util in
+  let existing_root_array =
+    try
+      match Hashtbl.find json_tbl path with
+      | `List _ as root -> root
+      | _ -> raise (CannotMerge "JSON root element should be an array")
+    with Not_found ->
+      `List []
+  in
+  let existing_list = existing_root_array |> to_list in
+  let new_list = json_root_array |> to_list in
+  let merged_list = `List (existing_list @ new_list) in
+  Hashtbl.replace json_tbl path merged_list
+
+let flush_cache () =
+  let written =
+    Hashtbl.fold (fun (path : Filepath.Normalized.t) json acc ->
+        let oc = open_out (path:>string) in
+        Yojson.Basic.pretty_to_channel oc json;
+        output_char oc '\n'; (* ensure JSON file terminates with a newline *)
+        path :: acc
+      ) json_tbl []
+  in
+  Hashtbl.clear json_tbl;
+  List.rev written
+
+let json_cache = Hashtbl.create 3
+
+let from_file (path : Filepath.Normalized.t) =
+  try
+    Hashtbl.find json_cache path
+  with Not_found ->
+    let json = Yojson.Basic.from_file (path:>string) in
+    Hashtbl.replace json_cache path json;
+    json
 
 }

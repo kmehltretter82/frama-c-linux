@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Aorai plug-in of Frama-C.                        *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -66,8 +66,7 @@ let isCrossable tr func st =
     | TFalse -> False
     | TRel _ -> Undefined
   in
-  let cond,_ = tr.cross in
-  let res = isCross cond <> False in
+  let res = isCross tr.cross <> False in
   Aorai_option.debug ~level:2 "Function %a %s-state, \
                                transition %s -> %s is%s possible" Kernel_function.pretty func
     (if st=Call then "pre" else "post")
@@ -223,7 +222,8 @@ let isCrossableAtInit tr func =
         match base with
         | TVar v ->
           (try
-             Extlib.opt_bind
+             Option.bind
+               v.lv_origin
                (fun v ->
                   let init = Globals.Vars.find v in
                   let init = match init.Cil_types.init with
@@ -231,7 +231,6 @@ let isCrossableAtInit tr func =
                     | Some i -> i
                   in
                   aux_init off init)
-               v.lv_origin
            with Not_found -> None)
         | TMem t ->
           (match (aux t).term_node with
@@ -307,8 +306,7 @@ let isCrossableAtInit tr func =
     | TRel(rel,t1,t2) -> eval_rel_at_init rel t1 t2
 
   in
-  let (cond,_) = tr.cross in
-  match isCross cond with
+  match isCross tr.cross with
   | Bool3.True | Bool3.Undefined -> true
   | Bool3.False -> false
 
@@ -453,14 +451,113 @@ and tlval_to_lval (tlhost, toffset) res =
         should not see \result. *)
      | None -> Aorai_option.fatal "Unexpected \\result")
 
-(* Translate the cross condition of an automaton edge to an expression.
-   Used in mk_stmt. *)
-let crosscond_to_exp curr_f curr_status loc (cond,_) res =
+module Kf_bhv_cache =
+  Datatype.Pair_with_collections(Cil_datatype.Kf)(Datatype.String)
+    (struct let module_name = "Aorai_utils.Kf_bhv_cache" end)
 
+let bhv_aux_functions_table = Kf_bhv_cache.Hashtbl.create 7
+
+let get_bhv_aux_fct kf bhv =
+  match
+    Kf_bhv_cache.Hashtbl.find_opt bhv_aux_functions_table (kf,bhv.b_name)
+  with
+  | Some vi -> vi, false
+  | None ->
+    let loc = Cil_datatype.Location.unknown in
+    let ovi = Kernel_function.get_vi kf in
+    let vi = Cil_const.copy_with_new_vid ovi in
+    vi.vname <- Data_for_aorai.get_fresh (ovi.vname ^ "_bhv_" ^ bhv.b_name);
+    vi.vdefined <- false;
+    vi.vghost <- true;
+    let (_,args,varargs,_) = Cil.splitFunctionTypeVI ovi in
+    let typ = TFun(Cil.intType, args, varargs,[]) in
+    Cil.update_var_type vi typ;
+    Cil.setFormalsDecl vi typ;
+    vi.vattr <- [];
+    let assoc =
+      List.combine (Kernel_function.get_formals kf) (Cil.getFormalsDecl vi)
+    in
+    let vis = object
+      inherit Visitor.frama_c_copy (Project.current())
+      method! vlogic_var_use lv =
+        match lv.lv_origin with
+        | None -> JustCopy
+        | Some vi ->
+          (match
+             List.find_opt (fun (x,_) -> Cil_datatype.Varinfo.equal vi x) assoc
+           with
+           | None -> JustCopy
+           | Some (_,nvi) -> ChangeTo (Cil.cvar_to_lvar nvi))
+    end
+    in
+    let assumes = Visitor.visitFramacPredicates vis bhv.b_assumes in
+    let assumes = List.map Logic_const.refresh_predicate assumes in
+    let assigns = Writes [] in
+    let post_cond =
+      [Normal,
+       Logic_const.(
+         new_predicate
+           (prel (Req,tlogic_coerce (tresult Cil.intType) Linteger,lone())))]
+    in
+    let bhv_in =
+      Cil.mk_behavior ~name:bhv.b_name ~assumes ~assigns ~post_cond ()
+    in
+    let name = bhv.b_name ^ "_out" in
+    let assumes =
+      [ Logic_const.(
+            new_predicate (pnot (pands (List.map pred_of_id_pred assumes))))]
+    in
+    let assigns = Writes [] in
+    let post_cond =
+      [ Normal,
+        Logic_const.(
+          new_predicate
+            (prel
+               (Req, tlogic_coerce (tresult Cil.intType) Linteger, lzero())))]
+    in
+    let bhv_out = Cil.mk_behavior ~name ~assumes ~assigns ~post_cond () in
+    Globals.Functions.replace_by_declaration (Cil.empty_funspec()) vi loc;
+    let my_kf = Globals.Functions.get vi in
+    Annotations.add_behaviors
+      ~register_children:true Aorai_option.emitter my_kf [bhv_in; bhv_out];
+    Annotations.add_assigns
+      ~keep_empty:false Aorai_option.emitter my_kf (Writes []);
+    Annotations.add_complete Aorai_option.emitter my_kf
+      [bhv_in.b_name; bhv_out.b_name];
+    Annotations.add_disjoint Aorai_option.emitter my_kf
+      [bhv_in.b_name; bhv_out.b_name];
+    vi, true
+
+(** create a new abstract function call to decide whether we are in the
+    corresponding behavior or not. *)
+let mk_behavior_call generated_kf kf bhv =
+  let aux,generated = get_bhv_aux_fct kf bhv in
+  let res =
+    Cil.makeLocalVar
+      (Kernel_function.get_definition generated_kf)
+      ~ghost:true ~referenced:true ~insert:false
+      (get_fresh "bhv_aux") Cil.intType
+  in
+  let stmt =
+    Cil.mkStmtOneInstr
+      ~ghost:true
+      ~valid_sid:true
+      (Cil_types.Call (
+          Some (Var res, NoOffset),
+          Cil.evar aux,
+          List.map (fun x -> Cil.evar x) (Kernel_function.get_formals kf),
+          Cil_datatype.Location.unknown))
+  in
+  (res, stmt,
+   if generated then Cil_datatype.Varinfo.Set.singleton aux
+   else Cil_datatype.Varinfo.Set.empty)
+
+(* Translate the cross condition of an automaton edge to an expression.
+   Used in mk_stmt. This might generate calls to auxiliary functions, to
+   take into account a guard that uses a function behavior. *)
+let crosscond_to_exp generated_kf curr_f curr_status loc cond res =
   let check_current_event f status =
-    if Kernel_function.equal curr_f f && curr_status = status then
-      Cil.one loc
-    else Cil.zero loc
+    Kernel_function.equal curr_f f && curr_status = status
   in
   let rel_convert = function
     | Rlt -> Lt
@@ -473,28 +570,54 @@ let crosscond_to_exp curr_f curr_status loc (cond,_) res =
   let rec expnode_convert =
     function
     | TOr  (c1, c2) ->
-      let e1 = expnode_convert c1 in
+      let stmts1, vars1, defs1, e1 = expnode_convert c1 in
       (match Cil.isInteger e1 with
-       | None -> Cil.mkBinOp loc LOr e1 (expnode_convert c2)
+       | None ->
+         let stmts2, vars2, defs2, e2 = expnode_convert c2 in
+         stmts1 @ stmts2, vars1 @ vars2,
+         Cil_datatype.Varinfo.Set.union defs1 defs2,
+         Cil.mkBinOp loc LOr e1 e2
        | Some i when Integer.is_zero i -> expnode_convert c2
-       | Some _ -> e1)
+       | Some _ -> [], [], Cil_datatype.Varinfo.Set.empty,e1)
     | TAnd (c1, c2) ->
-      let e1 = expnode_convert c1 in
+      let stmts1, vars1, defs1, e1 = expnode_convert c1 in
       (match Cil.isInteger e1 with
-       | None -> Cil.mkBinOp loc LAnd e1 (expnode_convert c2)
-       | Some i when Integer.is_zero i -> e1
+       | None ->
+         let stmts2, vars2, defs2, e2 = expnode_convert c2 in
+         stmts1 @ stmts2, vars1 @vars2,
+         Cil_datatype.Varinfo.Set.union defs1 defs2,
+         Cil.mkBinOp loc LAnd e1 e2
+       | Some i when Integer.is_zero i ->
+         [], [], Cil_datatype.Varinfo.Set.empty, e1
        | Some _ -> expnode_convert c2)
     | TNot (c1) ->
-      let e1 = expnode_convert c1 in
+      let stmts1, vars1, defs1, e1 = expnode_convert c1 in
       (match Cil.isInteger e1 with
-       | None -> Cil.new_exp loc (UnOp(LNot, e1,Cil.intType))
-       | Some i when Integer.is_zero i -> Cil.one loc
-       | Some _ -> Cil.zero loc)
-    | TCall (f,_) -> check_current_event f Promelaast.Call
-    | TReturn f -> check_current_event f Promelaast.Return
-    | TTrue -> (Cil.one loc)
-    | TFalse -> (Cil.zero loc)
+       | None ->
+         stmts1, vars1, defs1, Cil.new_exp loc (UnOp(LNot, e1,Cil.intType))
+       | Some i when Integer.is_zero i ->
+         [], [], Cil_datatype.Varinfo.Set.empty, Cil.one loc
+       | Some _ -> [], [], Cil_datatype.Varinfo.Set.empty, Cil.zero loc)
+    | TCall (f,None) ->
+      if check_current_event f Promelaast.Call then
+        [], [], Cil_datatype.Varinfo.Set.empty, Cil.one loc
+      else
+        [], [], Cil_datatype.Varinfo.Set.empty, Cil.zero loc
+    | TCall (f, Some bhv) ->
+      if check_current_event f Promelaast.Call then begin
+        let res, stmt, new_kf = mk_behavior_call generated_kf f bhv in
+        [ stmt ], [res], new_kf, Cil.evar res
+      end else
+        [], [], Cil_datatype.Varinfo.Set.empty, Cil.zero loc
+    | TReturn f ->
+      if check_current_event f Promelaast.Return then
+        [], [], Cil_datatype.Varinfo.Set.empty, Cil.one loc
+      else
+        [], [], Cil_datatype.Varinfo.Set.empty, Cil.zero loc
+    | TTrue -> [], [], Cil_datatype.Varinfo.Set.empty, Cil.one loc
+    | TFalse -> [], [], Cil_datatype.Varinfo.Set.empty, Cil.zero loc
     | TRel(rel,t1,t2) ->
+      [], [], Cil_datatype.Varinfo.Set.empty,
       Cil.mkBinOp
         loc (rel_convert rel) (term_to_exp t1 res) (term_to_exp t2 res)
   in
@@ -506,6 +629,16 @@ let crosscond_to_exp curr_f curr_status loc (cond,_) res =
 (** Local copy of the file pointer *)
 let file = ref Cil.dummyFile
 
+let initFunction kf =
+  let fname = Kernel_function.get_name kf in
+  List.iter
+    (fun vi -> set_paraminfo fname vi.vname vi)
+    (Kernel_function.get_formals kf);
+  match (Kernel_function.find_return kf).skind with
+  | Cil_types.Return (Some { enode = Lval (Var vi,NoOffset) },_) ->
+    set_returninfo fname vi (* Add the vi of return stmt *)
+  | exception Kernel_function.No_Statement | _ -> () (* function without returned value *)
+
 (** Copy the file pointer locally in the class in order to ease globals
     management and initializes some tables. *)
 let initFile f =
@@ -513,27 +646,7 @@ let initFile f =
   Data_for_aorai.setCData ();
   (* Adding C variables into our hashtable *)
   Globals.Vars.iter (fun vi _ -> set_varinfo vi.vname vi);
-  Globals.Functions.iter
-    (fun kf ->
-       let fname = Kernel_function.get_name kf in
-       List.iter
-         (fun vi -> set_paraminfo fname vi.vname vi)
-         (Kernel_function.get_formals kf);
-       if not (Data_for_aorai.isIgnoredFunction fname) then
-         begin
-           try
-             let ret  = Kernel_function.find_return kf in
-             match ret.skind with
-             | Cil_types.Return (Some e,_) ->
-               (match e.enode with
-                | Lval (Var vi,NoOffset) ->
-                  set_returninfo fname vi (* Add the vi of return stmt *)
-                | _ -> () (* function without returned value *))
-             | _ -> () (* function without returned value *)
-           with Kernel_function.No_Statement ->
-             Aorai_option.fatal
-               "Don't know what to do with a function declaration"
-         end)
+  Globals.Functions.iter initFunction
 
 (** List of globals awaiting for adding into C file globals *)
 let globals_queue = ref []
@@ -561,46 +674,41 @@ let flush_globals () =
   Kernel_function.clear_sid_info ();
   globals_queue := []
 
-let mk_global glob = globals_queue := glob :: !globals_queue
+let add_global glob = globals_queue := glob :: !globals_queue
 
 (* Utilities for global variables *)
-let mk_global_c_initialized_vars name ty ini=
-  let vi = (Cil.makeGlobalVar name ty) in
-  vi.vghost<-true;
-  mk_global (GVar(vi,ini,vi.vdecl));
-  Globals.Vars.add vi ini;
-  set_varinfo name vi
-
-let mk_global_var_init vi ini =
-  vi.vghost<-true;
-  mk_global (GVar(vi,ini,vi.vdecl));
-  Globals.Vars.add vi ini;
+let add_gvar ?init vi =
+  let initinfo = {Cil_types.init} in
+  vi.vghost <- true;
+  vi.vstorage <- NoStorage;
+  add_global (GVar(vi,initinfo,vi.vdecl));
+  Globals.Vars.add vi initinfo;
   set_varinfo vi.vname vi
 
-let mk_global_var vi =
-  let ini =
-    {Cil_types.init=Some(Cil.makeZeroInit ~loc:(CurrentLoc.get()) vi.vtype)}
+let add_gvar_zeroinit vi =
+  add_gvar ~init:(Cil.makeZeroInit ~loc:(CurrentLoc.get()) vi.vtype) vi
+
+let mk_gvar ?init ~ty name =
+  (* See if the variable is already declared *)
+  let vi =
+    try
+      let ty' = typeAddAttributes [Attr ("ghost", [])] ty in
+      let vi = Globals.Vars.find_from_astinfo name VGlobal in
+      if not (Cil_datatype.Typ.equal vi.vtype ty') then
+        Aorai_option.abort "Global %s is declared with type %a instead of %a"
+          name Cil_printer.pp_typ vi.vtype Cil_printer.pp_typ ty';
+      Globals.Vars.remove vi;
+      vi
+    with Not_found ->
+      Cil.makeGlobalVar name ty
   in
-  mk_global_var_init vi ini
+  add_gvar ?init vi
 
-let mk_global_c_var_init name init =
-  let ty = Cil.typeOf init in
-  let vi = Cil.makeGlobalVar name ty in
-  vi.vghost <- true;
-  let ini = { Cil_types.init = Some(SingleInit init) } in
-  mk_global(GVar(vi,ini,vi.vdecl));
-  Globals.Vars.add vi ini;
-  set_varinfo name vi
+let mk_gvar_scalar ~init ?(ty = Cil.typeOf init) name =
+  mk_gvar ~init:(SingleInit init) ~ty name
 
-let mk_int_const value =
-  new_exp
-    ~loc:(CurrentLoc.get())
-    (Const(
-        CInt64(
-          Integer.of_int (value),
-          IInt,
-          Some(string_of_int(value))
-        )))
+let mk_integer value =
+  Cil.integer ~loc:(CurrentLoc.get()) value
 
 (* Utilities for global enumerations *)
 let mk_global_c_enum_type_tagged name elements_l =
@@ -617,14 +725,14 @@ let mk_global_c_enum_type_tagged name elements_l =
       (fun (e,i) ->
          { eiorig_name = e;
            einame = e;
-           eival = mk_int_const i;
+           eival = mk_integer i;
            eiloc = Location.unknown;
            eihost = einfo})
       elements_l
   in
   einfo.eitems <- l;
   set_usedinfo name einfo;
-  mk_global (GEnumTag(einfo, Location.unknown));
+  add_global (GEnumTag(einfo, Location.unknown));
   einfo
 
 let mk_global_c_enum_type name elements =
@@ -634,8 +742,9 @@ let mk_global_c_enum_type name elements =
   (* no need to rev the list, as the elements got their value already *)
   ignore (mk_global_c_enum_type_tagged name elements)
 
-let mk_global_c_initialized_enum name name_enuminfo ini =
-  mk_global_c_initialized_vars name (TEnum(get_usedinfo name_enuminfo,[])) ini
+let mk_gvar_enum ?init name name_enuminfo =
+  mk_gvar ?init ~ty:(TEnum(get_usedinfo name_enuminfo,[])) name
+
 
 (* ************************************************************************* *)
 (** {b Terms management / computation} *)
@@ -712,12 +821,14 @@ let is_state_pred state =
       (Req,one_term(),
        Logic_const.tvar (Data_for_aorai.get_state_logic_var state))
 
-let is_state_stmt (state,copy) loc =
-  if Aorai_option.Deterministic.get ()
-  then
-    mkStmtOneInstr
-      ~ghost:true (Set (Cil.var copy, int2enumstate_exp loc state.nums, loc))
-  else mkStmtOneInstr ~ghost:true (Set (Cil.var copy, Cil.one loc, loc))
+let is_state_non_det_stmt (_,copy) loc =
+  mkStmtOneInstr ~ghost:true (Set (Cil.var copy, Cil.one loc, loc))
+
+let is_state_det_stmt state loc =
+  let var = Data_for_aorai.get_varinfo curState in
+  mkStmtOneInstr
+    ~ghost:true (Set (Cil.var var, int2enumstate_exp loc state.nums, loc))
+
 
 let is_state_exp state loc =
   if Aorai_option.Deterministic.get ()
@@ -763,15 +874,33 @@ let is_out_of_state_exp state loc =
       (Cil.evar (Data_for_aorai.get_state_var state))
       (mk_int_exp 0)
 
+let assert_alive_automaton kf stmt =
+  let pred =
+    if Aorai_option.Deterministic.get() then
+      let reject_state = Data_for_aorai.get_reject_state() in
+      is_out_of_state_pred reject_state
+    else begin
+      let valid_states =
+        List.filter
+          (fun x -> not (Data_for_aorai.is_reject_state x))
+          (fst (Data_for_aorai.getGraph ()))
+      in
+      let valid_preds = List.map is_state_pred valid_states in
+      Logic_const.pors valid_preds
+    end
+  in
+  let pred = { pred with pred_name = "aorai_smoke_test" :: pred.pred_name } in
+  Annotations.add_assert Aorai_option.emitter ~kf stmt pred
+
 (* Utilities for other globals *)
 
-let mk_global_comment txt = mk_global (GText (txt))
+let mk_global_comment txt = add_global (GText (txt))
 
 (* ************************************************************************* *)
 (** {b Initialization management / computation} *)
 
 let mk_global_states_init root =
-  let (states,_ as auto) = Data_for_aorai.getAutomata () in
+  let (states,_ as auto) = Data_for_aorai.getGraph () in
   let states = List.sort Data_for_aorai.Aorai_state.compare states in
   let is_possible_init state =
     state.Promelaast.init = Bool3.True &&
@@ -785,17 +914,8 @@ let mk_global_states_init root =
        in
        let init = SingleInit init in
        let var = Data_for_aorai.get_state_var state in
-       mk_global_var_init var { Cil_types.init = Some init})
+       add_gvar ~init var)
     states
-
-let func_to_init name =
-  {Cil_types.init=
-     Some(SingleInit(
-         new_exp ~loc:(CurrentLoc.get()) (Const(func_to_cenum (name)))))}
-
-let funcStatus_to_init st =
-  {Cil_types.init=Some(SingleInit(new_exp ~loc:(CurrentLoc.get())
-                                    (Const(op_status_to_cenum (st)))))}
 
 class visit_decl_loops_init () =
   object(self)
@@ -806,7 +926,7 @@ class visit_decl_loops_init () =
         match stmt.skind with
         | Loop _ ->
           let scope = Kernel_function.find_enclosing_block stmt in
-          let f = Extlib.the self#current_func in
+          let f = Option.get self#current_func in
           let name = Data_for_aorai.loopInit ^ "_" ^ (string_of_int stmt.sid) in
           let typ =
             Cil.typeAddAttributes
@@ -924,7 +1044,7 @@ let pred_of_condition subst subst_res label cond =
   snd (aux None true cond)
 
 let mk_deterministic_lemma () =
-  let automaton = Data_for_aorai.getAutomata () in
+  let automaton = Data_for_aorai.getGraph () in
   let make_one_lemma state =
     let label = Cil_types.FormalLabel "L" in
     let disjoint_guards acc trans1 trans2 =
@@ -934,10 +1054,10 @@ let mk_deterministic_lemma () =
         let subst = Cil_datatype.Logic_var.Hashtbl.create 5 in
         let subst_res = Kernel_function.Hashtbl.create 5 in
         let guard1 =
-          pred_of_condition subst subst_res label (fst trans1.cross)
+          pred_of_condition subst subst_res label trans1.cross
         in
         let guard2 =
-          pred_of_condition subst subst_res label (fst trans2.cross)
+          pred_of_condition subst subst_res label trans2.cross
         in
         let pred = Logic_const.pnot (Logic_const.pand (guard1, guard2)) in
         let quants =
@@ -957,30 +1077,19 @@ let mk_deterministic_lemma () =
     in
     let trans = Path_analysis.get_transitions_of_state state automaton in
     let prop = Extlib.product_fold disjoint_guards ptrue trans trans in
+    let prop = Logic_const.toplevel_predicate ~kind:Check prop in
     let name = state.Promelaast.name ^ "_deterministic_trans" in
     let lemma =
-      Dlemma (name, false, [label],[],prop,[],Cil_datatype.Location.unknown)
+      Dlemma (name, [label],[],prop,[],Cil_datatype.Location.unknown)
     in
     Annotations.add_global Aorai_option.emitter lemma
   in
   List.iter make_one_lemma (fst automaton)
 
 let make_enum_states () =
-  let state_list =fst (Data_for_aorai.getAutomata()) in
+  let state_list =fst (Data_for_aorai.getGraph()) in
   let state_list =
     List.map (fun x -> (x.Promelaast.name, x.Promelaast.nums)) state_list
-  in
-  let state_list =
-    if not (Aorai_option.Deterministic.get ()) then state_list
-    else
-      (*[VP] Strictly speaking this is not needed, but Jessie tends
-        to consider that a value of enum type can only be one of the
-        tags, so that we must add this dummy state that is always a
-        possible value, even when a contract concludes that curState
-        is none of the others. Note that ISO C does not impose this
-        limitation to values of enum types.
-      *)
-      (get_fresh "aorai_reject_state", -2)::state_list
   in
   let enum = mk_global_c_enum_type_tagged states state_list in
   let mapping =
@@ -996,7 +1105,7 @@ let make_enum_states () =
 
 let getInitialState () =
   let loc = Cil_datatype.Location.unknown in
-  let states = fst (Data_for_aorai.getAutomata()) in
+  let states = fst (Data_for_aorai.getGraph()) in
   let s = List.find (fun x -> x.Promelaast.init = Bool3.True) states in
   Cil.new_exp ~loc (Const (CEnum (find_enum s.nums)))
 
@@ -1012,19 +1121,20 @@ let initGlobals root complete =
   mk_global_c_enum_type
     listOp
     (List.map
-       (fun e -> func_to_op_func e)
-       (getFunctions_from_c() @ getIgnoredFunctions()));
-  mk_global_c_initialized_enum curOp listOp
-    (func_to_init (Kernel_function.get_name root));
+       (fun kf -> func_to_op_func (Kernel_function.get_name kf))
+       (getObservablesFunctions() @ getIgnoredFunctions()));
+  mk_gvar_enum curOp listOp;
   mk_global_c_enum_type  listStatus (callStatus::[termStatus]);
-  mk_global_c_initialized_enum
-    curOpStatus listStatus (funcStatus_to_init Promelaast.Call);
+  mk_gvar_enum curOpStatus listStatus;
 
   mk_global_comment "//* ";
   mk_global_comment "//* States and Trans Variables";
-  if Aorai_option.Deterministic.get () then
-    mk_global_c_var_init curState (getInitialState())
-  else
+  if Aorai_option.Deterministic.get () then begin
+    mk_gvar_scalar ~init:(getInitialState()) curState;
+    let init = getInitialState() (* TODO a distinct initial value for history *)
+    and history = Data_for_aorai.whole_history () in
+    List.iter (fun name -> mk_gvar_scalar ~init name) history
+  end else
     mk_global_states_init root;
 
   if complete then begin
@@ -1037,9 +1147,17 @@ let initGlobals root complete =
   mk_global_comment "//****************** ";
   mk_global_comment "//* Auxiliary variables used in transition conditions";
   mk_global_comment "//*";
-  List.iter mk_global_var (Data_for_aorai.aux_variables());
+  List.iter add_gvar_zeroinit (Data_for_aorai.aux_variables());
 
-  if Aorai_option.Deterministic.get () then begin
+  let auto = Data_for_aorai.getAutomata () in
+  mk_global_comment "//* ";
+  mk_global_comment "//****************** ";
+  mk_global_comment "//* Metavariables";
+  mk_global_comment "//*";
+  Datatype.String.Map.iter (fun _ -> add_gvar_zeroinit) auto.metavariables;
+
+  if Aorai_option.Deterministic.get () &&
+     Aorai_option.GenerateDeterministicLemmas.get () then begin
     (* must flush now previous globals which are used in the lemmas in order to
        be able to put these last ones in the right places in the AST. *)
     flush_globals ();
@@ -1077,7 +1195,7 @@ let automaton_locations loc =
            Logic_const.new_identified_term
              (Logic_const.tvar
                 (Data_for_aorai.get_state_logic_var state)), FromAny)
-        (fst (Data_for_aorai.getAutomata()))
+        (fst (Data_for_aorai.getGraph()))
   in
   (Logic_const.new_identified_term
      (Logic_const.tvar ~loc
@@ -1137,13 +1255,13 @@ let action_assigns trans =
            (Cil.typeOfTermLval (host,my_off)))
         acc
     | Pebble_init(_,v,c) ->
-      let cc = Extlib.the c.lv_origin in
-      let cv = Extlib.the v.lv_origin in
+      let cc = Option.get c.lv_origin in
+      let cv = Option.get v.lv_origin in
       add_if_needed cv (Logic_const.tvar v)
         (add_if_needed cc (Logic_const.tvar c) acc)
     | Pebble_move(_,v1,_,v2) ->
-      let cv1 = Extlib.the v1.lv_origin in
-      let cv2 = Extlib.the v2.lv_origin in
+      let cv1 = Option.get v1.lv_origin in
+      let cv2 = Option.get v2.lv_origin in
       add_if_needed cv1 (Logic_const.tvar v1)
         (add_if_needed cv2 (Logic_const.tvar v2) acc)
   in
@@ -1151,11 +1269,11 @@ let action_assigns trans =
   let empty_pebble =
     match trans.start.multi_state, trans.stop.multi_state with
     | Some(_,aux), None ->
-      let caux = Extlib.the aux.lv_origin in
+      let caux = Option.get aux.lv_origin in
       add_if_needed caux (Logic_const.tvar aux) empty
     | _ -> empty
   in
-  let _,res = List.fold_left treat_one_action empty_pebble (snd trans.cross) in
+  let _,res = List.fold_left treat_one_action empty_pebble trans.actions in
   Writes res
 
 let get_reachable_trans state st auto current_state =
@@ -1201,7 +1319,7 @@ let get_reachable_trans_to state st auto current_state =
 (* force that we have a crossable transition for each state in which the
    automaton might be at current event. *)
 let force_transition loc f st current_state =
-  let (states, _ as auto) = Data_for_aorai.getAutomata () in
+  let (states, _ as auto) = Data_for_aorai.getGraph () in
   (* We iterate aux on all the states, to get
      - the predicate indicating in which states the automaton cannot possibly
        be before the transition (because we can't fire a transition from there).
@@ -1221,7 +1339,7 @@ let force_transition loc f st current_state =
     *)
     let add_one_trans (has_crossable_trans, crossable_non_reject) trans =
       let has_crossable_trans =
-        Logic_simplification.tor has_crossable_trans (fst trans.cross)
+        Logic_simplification.tor has_crossable_trans trans.cross
       in
       let crossable_non_reject =
         crossable_non_reject ||
@@ -1295,7 +1413,7 @@ let partition_action trans =
                                            *)
   in
   let treat_one_trans acc tr =
-    List.fold_left (treat_one_action tr.start) acc (snd tr.cross)
+    List.fold_left (treat_one_action tr.start) acc tr.actions
   in
   List.fold_left treat_one_trans Cil_datatype.Term_lval.Map.empty trans
 
@@ -1324,7 +1442,7 @@ forces that parent states of a state with action are mutually exclusive,
 at least at pebble level.
 *)
 let incompatible_states loc st current_state =
-  let (states,_ as auto) = Data_for_aorai.getAutomata () in
+  let (states,_ as auto) = Data_for_aorai.getGraph () in
   let aux precond state =
     let trans = get_reachable_trans_to state st auto current_state in
     let actions = partition_action trans in
@@ -1397,7 +1515,8 @@ let add_behavior_pebble_actions ~loc f st behaviors state trans =
     let set = Data_for_aorai.pebble_set_at set Logic_const.here_label in
     let treat_action guard res action =
       match action with
-      | Copy_value _ | Counter_incr _ | Counter_init _ -> res
+      | Copy_value _ | Counter_incr _ | Counter_init _ ->
+        res
       | Pebble_init (_,_,v) ->
         let a = Cil_const.make_logic_var_quant aux.lv_name aux.lv_type in
         let guard = rename_pred aux a guard in
@@ -1425,9 +1544,9 @@ let add_behavior_pebble_actions ~loc f st behaviors state trans =
         :: res
     in
     let treat_one_trans acc tr =
-      let guard = crosscond_to_pred (fst tr.cross) f st in
+      let guard = crosscond_to_pred tr.cross f st in
       let guard = Logic_const.pold guard in
-      List.fold_left (treat_action guard) acc (snd tr.cross)
+      List.fold_left (treat_action guard) acc tr.actions
     in
     let res = List.fold_left treat_one_trans [] trans in
     let res = Logic_const.term (Tunion res) set.term_type in
@@ -1436,14 +1555,50 @@ let add_behavior_pebble_actions ~loc f st behaviors state trans =
     in
     Cil.mk_behavior ~name ~assumes ~post_cond () :: behaviors
 
-let mk_action ~loc a =
+(* NB: we assume that the terms coming from YA automata keep quite simple.
+   Notably that they do not introduce themselves any \at. *)
+let make_old loc init t =
+  let vis =
+    object(self)
+      inherit Visitor.frama_c_inplace
+      val is_old = Stack.create ()
+      method private is_old =
+        if Stack.is_empty is_old then false else Stack.top is_old
+      method! vterm t =
+        match t.term_node with
+        | TLval lv ->
+          if Cil_datatype.Term_lval.Set.mem lv init then begin
+            if self#is_old then begin
+              Stack.push false is_old;
+              DoChildrenPost
+                (fun t ->
+                   ignore (Stack.pop is_old);
+                   Logic_const.(tat ~loc (t,here_label)))
+            end else DoChildren
+          end
+          else begin
+            if not self#is_old then begin
+              Stack.push true is_old;
+              DoChildrenPost
+                (fun t ->
+                   ignore (Stack.pop is_old);
+                   Logic_const.told ~loc t)
+            end else DoChildren
+          end
+        | _ -> DoChildren
+    end
+  in Visitor.visitFramacTerm vis t
+
+let mk_action ~loc init a =
   let term_lval lv =
     Logic_const.term ~loc (TLval lv) (Cil.typeOfTermLval lv)
   in
+  let add_lv lv = Cil_datatype.Term_lval.Set.add lv init in
   match a with
   | Counter_init lv ->
     [Logic_const.prel ~loc
-       (Req, term_lval lv, Logic_const.tinteger ~loc 1)]
+       (Req, term_lval lv, Logic_const.tinteger ~loc 1)],
+    add_lv lv
   | Counter_incr lv ->
     [Logic_const.prel ~loc
        (Req, term_lval lv,
@@ -1451,11 +1606,13 @@ let mk_action ~loc a =
           (TBinOp (PlusA,
                    Logic_const.told ~loc (term_lval lv),
                    Logic_const.tinteger ~loc 1))
-          (Cil.typeOfTermLval lv))]
-  | Pebble_init _ | Pebble_move _ -> [] (* Treated elsewhere *)
+          (Cil.typeOfTermLval lv))],
+    add_lv lv
+  | Pebble_init _ | Pebble_move _ -> [],init (* Treated elsewhere *)
   | Copy_value (lv,t) ->
     [Logic_const.prel ~loc
-       (Req, term_lval lv, Logic_const.told t)]
+       (Req, term_lval lv, make_old loc init t)],
+    add_lv lv
 
 let is_reachable state status =
   let treat_one_state _ map = Data_for_aorai.Aorai_state.Map.mem state map in
@@ -1495,28 +1652,59 @@ let get_accessible_transitions auto state status =
   Data_for_aorai.Aorai_state.Set.fold
     (fun s acc -> Path_analysis.get_edges s state auto @ acc) previous_set []
 
+let get_aux_var_bhv_name = function
+  | TVar v, _ ->
+    Data_for_aorai.get_fresh (v.lv_name ^ "_unchanged")
+  | lv ->
+    Aorai_option.fatal "unexpected lval for action variable: %a"
+      Printer.pp_term_lval lv
+
 (* Assumes that we don't have a multi-state here.
    pebbles are handled elsewhere
 *)
-let mk_unchanged_aux_vars trans =
-  let my_aux_vars = Cil_datatype.Term_lval.Set.empty in
-  let add_one_action acc = function
+let mk_unchanged_aux_vars_bhvs loc f st status =
+  let (states,_ as auto) = Data_for_aorai.getGraph() in
+  let add_state_trans acc state =
+    let trans = get_reachable_trans state st auto status in
+    List.rev_append trans acc
+  in
+  let crossable_trans =
+    List.fold_left add_state_trans [] states
+  in
+  let add_trans_aux_var trans map = function
     | Counter_init lv | Counter_incr lv | Copy_value (lv,_) ->
-      Cil_datatype.Term_lval.Set.add lv acc
-    | Pebble_init _ | Pebble_move _ -> acc
+      let other_trans =
+        match Cil_datatype.Term_lval.Map.find_opt lv map with
+        | Some l -> l
+        | None -> []
+      in
+      Cil_datatype.Term_lval.Map.add lv (trans :: other_trans) map
+    | Pebble_init _ | Pebble_move _ -> map
   in
-  let add_one_trans acc tr =
-    let (_,actions) = tr.cross in
-    List.fold_left add_one_action acc actions
+  let add_trans_aux_vars map trans =
+    List.fold_left (add_trans_aux_var trans) map trans.actions
   in
-  let my_aux_vars = List.fold_left add_one_trans my_aux_vars trans in
-  let treat_lval lv acc =
+  let possible_actions =
+    List.fold_left add_trans_aux_vars
+      Cil_datatype.Term_lval.Map.empty
+      crossable_trans
+  in
+  let out_trans trans =
+    Logic_const.new_predicate
+      (Logic_const.por ~loc
+         (is_out_of_state_pred trans.start,
+          Logic_const.pnot (crosscond_to_pred trans.cross f st)))
+  in
+  let mk_behavior lv trans acc =
+    let name = get_aux_var_bhv_name lv in
+    let assumes = List.map out_trans trans in
     let t = Data_for_aorai.tlval lv in
     let ot = Logic_const.told t in
     let p = Logic_const.prel (Req,t,ot) in
-    (Normal, Logic_const.new_predicate p) :: acc
+    let post_cond = [Normal, Logic_const.new_predicate p] in
+    Cil.mk_behavior ~name ~assumes ~post_cond () :: acc
   in
-  Cil_datatype.Term_lval.Set.fold treat_lval my_aux_vars []
+  Cil_datatype.Term_lval.Map.fold mk_behavior possible_actions []
 
 let mk_behavior ~loc auto kf e status state =
   Aorai_option.debug "analysis of state %s (%d)"
@@ -1539,15 +1727,14 @@ let mk_behavior ~loc auto kf e status state =
           List.fold_left
             (fun (in_guard, out_guard, all_assigns, action_bhvs) trans ->
                Aorai_option.debug "examining transition %d" trans.numt;
-               let (cond,actions) = trans.cross in
                Aorai_option.debug "transition %d is active" trans.numt;
-               let guard = crosscond_to_pred cond kf e in
+               let guard = crosscond_to_pred trans.cross kf e in
                let my_in_guard,my_out_guard =
                  match state.multi_state with
                  | None -> guard, Logic_const.pnot ~loc guard
                  | Some (_,aux) ->
                    let set =
-                     find_pebble_origin Logic_const.here_label actions
+                     find_pebble_origin Logic_const.here_label trans.actions
                    in
                    pebble_guard ~loc set aux guard,
                    pebble_guard_neg ~loc set aux guard
@@ -1556,7 +1743,7 @@ let mk_behavior ~loc auto kf e status state =
                  Logic_const.pand ~loc (out_guard, my_out_guard)
                in
                let in_guard, all_assigns, action_bhvs =
-                 match actions with
+                 match trans.actions with
                  | [] ->
                    (Logic_const.por ~loc (in_guard,my_in_guard),
                     all_assigns,
@@ -1576,30 +1763,34 @@ let mk_behavior ~loc auto kf e status state =
                      Normal,
                      Logic_const.new_predicate (is_state_pred state)
                    in
-                   let treat_one_action acc a =
-                     let posts = mk_action ~loc a in
+                   let treat_one_action (other_posts, init) a =
+                     let posts, init = mk_action ~loc init a in
                      match state.multi_state  with
                      | None ->
-                       acc @
+                       other_posts @
                        List.map
                          (fun x ->
                             (Normal, Logic_const.new_predicate x))
-                         posts
+                         posts,
+                       init
                      | Some (_,aux) ->
                        let set =
                          find_pebble_origin
-                           Logic_const.pre_label actions
+                           Logic_const.pre_label trans.actions
                        in
-                       acc @
+                       other_posts @
                        List.map
                          (fun x ->
                             (Normal,
                              Logic_const.new_predicate
                                (pebble_post ~loc set aux x)))
-                         posts
+                         posts,
+                       init
                    in
-                   let post_cond =
-                     List.fold_left treat_one_action [post_cond] actions
+                   let post_cond,_ =
+                     List.fold_left treat_one_action
+                       ([post_cond], Cil_datatype.Term_lval.Set.empty)
+                       trans.actions
                    in
                    let assigns = action_assigns trans in
                    let all_assigns = concat_assigns assigns all_assigns in
@@ -1647,7 +1838,7 @@ let mk_behavior ~loc auto kf e status state =
       else begin
         let post_cond =
           match state.multi_state with
-          | None -> mk_unchanged_aux_vars my_trans
+          | None -> [] (* Done elsewhere *)
           | Some (set,_) ->
             let set =
               Data_for_aorai.pebble_set_at set Logic_const.here_label
@@ -1702,11 +1893,8 @@ let auto_func_behaviors loc f st state =
   in
   Aorai_option.debug
     "func behavior for %a (%s)" Kernel_function.pretty f call_or_ret;
-  let (states, _) as auto = Data_for_aorai.getAutomata() in
-  (* requires is not needed for pre_func, as it is enforced by the
-     requires of the original C function itself (and the call to pre_func
-     by definition the first instruction of the function).
-  *)
+  let (states, _) as auto = Data_for_aorai.getGraph() in
+  let requires = auto_func_preconditions loc f st state in
   let post_cond =
     let called_pre =
       Logic_const.new_predicate
@@ -1734,9 +1922,6 @@ let auto_func_behaviors loc f st state =
     (* let old_pred = Aorai_utils.mk_old_state_pred loc in *)
     [(Normal, called_pre); (Normal, called_pre_2)]
   in
-  let requires =
-    if st = Promelaast.Call then [] else auto_func_preconditions loc f st state
-  in
   let mk_behavior (assigns, behaviors) status =
     let new_assigns, new_behaviors =
       mk_behavior ~loc auto f st state status
@@ -1748,11 +1933,14 @@ let auto_func_behaviors loc f st state =
   let global_behavior =
     Cil.mk_behavior ~requires ~post_cond ~assigns ()
   in
+  let non_action_behaviors =
+    mk_unchanged_aux_vars_bhvs loc f st state
+  in
   (* Keep behaviors ordered according to the states they describe *)
-  global_behavior :: (List.rev behaviors)
+  global_behavior :: (List.rev_append behaviors non_action_behaviors)
 
 
-let act_convert loc (_,act) res =
+let act_convert loc act res =
   let treat_one_act =
     function
     | Counter_init t_lval ->
@@ -1777,69 +1965,178 @@ let act_convert loc (_,act) res =
   in
   List.map treat_one_act act
 
-let copy_stmt s =
-  let vis = new Visitor.frama_c_refresh (Project.current()) in
-  Visitor.visitFramacStmt vis s
+let mk_transitions_stmt generated_kf loc f st res trans =
+  List.fold_right
+    (fun trans
+      (aux_stmts, aux_vars, new_funcs, exp_from_trans, stmt_from_action) ->
+      let (tr_stmts, tr_vars, tr_funcs, exp) =
+        crosscond_to_exp generated_kf f st loc trans.cross res
+      in
+      let cond = Cil.mkBinOp loc LAnd (is_state_exp trans.start loc) exp in
+      (tr_stmts @ aux_stmts,
+       tr_vars @ aux_vars,
+       Cil_datatype.Varinfo.Set.union tr_funcs new_funcs,
+       Cil.mkBinOp loc LOr exp_from_trans cond,
+       (Cil.copy_exp cond, act_convert loc trans.actions res)
+       :: stmt_from_action))
+    trans
+    ([],[],Cil_datatype.Varinfo.Set.empty, Cil.zero ~loc, [])
 
-(* mk_stmt loc (states, tr) f fst status state
+let mk_goto loc b =
+  let ghost = true in
+  match b.bstmts with
+  | [] -> Cil.mkBlock []
+  | [ { skind = Instr i } ] ->
+    let s = mkStmtOneInstr ~ghost i in
+    Cil.mkBlock [s]
+  | [ { skind = Goto (s,_) }] ->
+    let s' = mkStmt ~ghost (Goto (ref !s,loc)) in
+    Cil.mkBlock [s']
+  | s::_ ->
+    s.labels <-
+      (Label(Data_for_aorai.get_fresh "__aorai_label",loc,false)):: s.labels;
+    let s' = mkStmt ~ghost (Goto (ref s,loc)) in
+    Cil.mkBlock [s']
+
+let normalize_condition loc cond block1 block2 =
+  let rec aux cond b1 b2 =
+    match cond.enode with
+    | UnOp(LNot,e,_) -> aux e b2 b1
+    | BinOp(LAnd,e1,e2,_) ->
+      let b2' = mk_goto loc b2 in
+      let b1'= Cil.mkBlock [aux e2 b1 b2'] in
+      aux e1 b1' b2
+    | BinOp(LOr,e1,e2,_) ->
+      let b1' = mk_goto loc b1 in
+      let b2' = Cil.mkBlock [aux e2 b1' b2] in
+      aux e1 b1 b2'
+    | _ ->
+      Cil.mkStmt ~ghost:true (If(cond,b1,b2,loc))
+  in
+  aux cond block1 block2
+
+let mkIfStmt loc exp1 block1 block2 =
+  if Kernel.LogicalOperators.get() then
+    Cil.mkStmt ~ghost:true (If (exp1, block1, block2, loc))
+  else
+    normalize_condition loc exp1 block1 block2
+
+
+let mk_deterministic_stmt
+    generated_kf loc auto f fst status ret state
+    (other_stmts, other_funcs, other_vars, trans_stmts as res) =
+  if is_reachable state status then begin
+    let trans = get_accessible_transitions auto state status in
+    let aux_stmts, aux_vars, aux_funcs, _, stmt_from_action =
+      mk_transitions_stmt generated_kf loc f fst ret trans
+    in
+    let stmts =
+      List.fold_left
+        (fun acc (cond, stmt_act) ->
+           [mkIfStmt loc cond
+              (mkBlock (is_state_det_stmt state loc :: stmt_act))
+              (mkBlock acc)])
+        trans_stmts
+        (List.rev stmt_from_action)
+    in
+    aux_stmts @ other_stmts,
+    Cil_datatype.Varinfo.Set.union aux_funcs other_funcs,
+    aux_vars @ other_vars,
+    stmts
+  end else res
+
+(* mk_non_deterministic_stmt loc (states, tr) f fst status state
    Generates the statement updating the variable representing
    the state argument.
    If state is reachable, generates a "If then else" statement, else it is
    just an assignment.
    Used in auto_func_block. *)
-let mk_stmt loc (states, tr) f fst status ((st,_) as state) res =
+let mk_non_deterministic_stmt
+    generated_kf loc (states, tr) f fst status ((st,_) as state) res =
   if is_reachable st status then begin
     let useful_trans =  get_accessible_transitions (states,tr) st status in
-    let exp_from_trans,stmt_from_action =
-      List.split
-        (List.map
-           (function trans ->
-              (Cil.mkBinOp
-                 loc
-                 LAnd
-                 (is_state_exp trans.start loc)
-                 (crosscond_to_exp f fst loc trans.cross res)),
-              (act_convert loc trans.cross res)
-           )
-           useful_trans
-        )
+    let aux_stmts, new_vars, new_funcs, cond,stmt_from_action =
+      mk_transitions_stmt generated_kf loc f fst res useful_trans
     in
-    let mkIfStmt exp1 block1 block2 =
-      Cil.mkStmt ~ghost:true (If (exp1, block1, block2, loc))
+    let then_stmt = is_state_non_det_stmt state loc in
+    let else_stmt = [is_out_of_state_stmt state loc] in
+    let trans_stmts =
+      let actions =
+        List.fold_left
+          (fun acc (cond, stmt_act) ->
+             if stmt_act = [] then acc
+             else
+               (mkIfStmt loc cond (mkBlock stmt_act) (mkBlock []))::acc)
+          []
+          (List.rev stmt_from_action)
+      in
+      mkIfStmt loc cond (mkBlock [then_stmt]) (mkBlock else_stmt) :: actions
     in
-    let if_cond =
-      List.fold_left
-        (fun acc exp -> Cil.mkBinOp loc LOr exp acc)
-        (List.hd exp_from_trans)
-        (List.tl exp_from_trans)
-    in
-    let then_stmt = is_state_stmt state loc in
-    let else_stmt =
-      if Aorai_option.Deterministic.get () then []
-      else [is_out_of_state_stmt state loc]
-    in
-    if Aorai_option.Deterministic.get () then
-      List.fold_left2
-        (fun acc cond stmt_act ->
-           [mkIfStmt cond
-              (mkBlock (copy_stmt then_stmt :: stmt_act)) (mkBlock acc)])
-        else_stmt
-        (List.rev exp_from_trans)
-        (List.rev stmt_from_action)
-    else
-      List.fold_left2
-        (fun acc cond stmt_act ->
-           if stmt_act = [] then acc
-           else
-             (mkIfStmt cond (mkBlock stmt_act) (mkBlock []))::acc)
-        [mkIfStmt if_cond (mkBlock [then_stmt]) (mkBlock else_stmt)]
-        (List.rev exp_from_trans)
-        (List.rev stmt_from_action)
+    new_funcs, new_vars, aux_stmts @ trans_stmts
   end else
-  if Aorai_option.Deterministic.get () then []
-  else [is_out_of_state_stmt state loc]
+    Cil_datatype.Varinfo.Set.empty, [], [is_out_of_state_stmt state loc]
 
-let auto_func_block loc f st status res =
+let equalsStmt lval exp loc = (* assignment *)
+  Cil.mkStmtOneInstr ~ghost:true (Set (lval, exp, loc))
+
+let mk_deterministic_body generated_kf loc f st status res =
+  let (states, _ as auto) = Data_for_aorai.getGraph() in
+  let aux_stmts, aux_funcs, aux_vars, trans_stmts =
+    List.fold_right
+      (mk_deterministic_stmt generated_kf loc auto f st status res)
+      states
+      ([], Cil_datatype.Varinfo.Set.empty, [],
+       (* if all else fails, go to reject state. *)
+       [is_state_det_stmt (Data_for_aorai.get_reject_state()) loc])
+  in
+  aux_funcs, aux_vars, aux_stmts @ trans_stmts
+
+let mk_non_deterministic_body generated_kf loc f st status res =
+  (* For the following tests, we need a copy of every state. *)
+  let (states, _) as auto = Data_for_aorai.getGraph() in
+  let copies, local_var =
+    let bindings =
+      List.map
+        (fun st ->
+           let state_var = Data_for_aorai.get_state_var st in
+           let copy = Cil.copyVarinfo state_var (state_var.vname ^ "_tmp") in
+           copy.vglob <- false;
+           (st,copy))
+        states
+    in bindings, snd (List.split bindings)
+  in
+  let copies_update =
+    List.map
+      (fun (st,copy) ->
+         equalsStmt (Cil.var copy)
+           (Cil.evar ~loc (Data_for_aorai.get_state_var st)) loc)
+      copies
+  in
+  let new_funcs, local_var, main_stmt =
+    List.fold_left
+      (fun (new_funcs, aux_vars, stmts) state ->
+         let my_funcs, my_vars, my_stmts =
+           mk_non_deterministic_stmt generated_kf loc auto f st status state res
+         in
+         Cil_datatype.Varinfo.Set.union my_funcs new_funcs,
+         my_vars @ aux_vars,
+         my_stmts@stmts )
+      (Cil_datatype.Varinfo.Set.empty, local_var, [])
+      copies
+  in
+
+  (* Finally, we replace the state var values by the ones computed in copies. *)
+  let stvar_update =
+    List.map
+      (fun (state,copy) ->
+         equalsStmt
+           (Cil.var (Data_for_aorai.get_state_var state))
+           (Cil.evar ~loc copy) loc)
+      copies
+  in
+  new_funcs, local_var, copies_update @ main_stmt @ stvar_update
+
+let auto_func_block generated_kf loc f st status res =
   let dkey = func_body_dkey in
   let call_or_ret =
     match st with
@@ -1848,93 +2145,60 @@ let auto_func_block loc f st status res =
   in
   Aorai_option.debug
     ~dkey "func code for %a (%s)" Kernel_function.pretty f call_or_ret;
-  let (states, _) as auto = Data_for_aorai.getAutomata() in
 
-  (* For the following tests, we need a copy of every state. *)
-
-  let copies, local_var =
-    if Aorai_option.Deterministic.get () then begin
-      let orig = Data_for_aorai.get_varinfo curState in
-      let copy = Cil.copyVarinfo orig (orig.vname ^ "_tmp") in
-      List.map (fun st -> (st, copy)) states, [copy]
-    end else begin
-      let bindings =
-        List.map
-          (fun st ->
-             let state_var = Data_for_aorai.get_state_var st in
-             (st,Cil.copyVarinfo state_var (state_var.vname ^ "_tmp") ))
-          states
-      in bindings, snd (List.split bindings)
-    end
-  in
-  let equalsStmt lval exp = (* assignment *)
-    Cil.mkStmtOneInstr ~ghost:true (Set (lval, exp, loc))
-  in
   let stmt_begin_list =
-
     [
       (* First statement : what is the current status : called or return ? *)
       equalsStmt
-        (Cil.var (Data_for_aorai.get_varinfo Data_for_aorai.curOpStatus)) (* current status... *)
-        (Cil.new_exp loc (Const (Data_for_aorai.op_status_to_cenum st))); (* ... equals to what it is *)
-
-      (* Second statement : what is the current operation, i.e. which function ?  *)
+        (Cil.var (Data_for_aorai.get_varinfo Data_for_aorai.curOpStatus))
+        (Cil.new_exp loc (Const (Data_for_aorai.op_status_to_cenum st))) loc;
+      (* Second statement : what is the current operation,
+         i.e. which function ?  *)
       equalsStmt
-        (Cil.var (Data_for_aorai.get_varinfo Data_for_aorai.curOp)) (* current operation ... *)
-        (Cil.new_exp loc (Const (Data_for_aorai.func_to_cenum (Kernel_function.get_name f)))) (* ...equals to what it is  *)
+        (Cil.var (Data_for_aorai.get_varinfo Data_for_aorai.curOp))
+        (Cil.new_exp loc
+           (Const (Data_for_aorai.func_to_cenum (Kernel_function.get_name f))))
+        loc
     ]
-
-  in
-
-  (* As we work on copies, they need to be set to their actual values *)
-
-  let copies_update =
+  and stmt_history_update =
     if Aorai_option.Deterministic.get () then
-      let orig = Data_for_aorai.get_varinfo curState in
-      [ equalsStmt (Cil.var (List.hd local_var)) (Cil.evar ~loc orig) ]
+      let history = Data_for_aorai.whole_history ()
+      and cur_state = Data_for_aorai.(get_varinfo curState) in
+      let add_stmt (src,acc) dst_name =
+        let dst = Data_for_aorai.get_varinfo dst_name in
+        let stmt = equalsStmt (Cil.var dst) (Cil.evar ~loc src) loc in
+        dst, stmt :: acc
+      in
+      snd (List.fold_left add_stmt (cur_state,[]) history)
+    else if Aorai_option.InstrumentationHistory.get () > 0 then
+      Aorai_option.fatal "history is not implemented for non-deterministic \
+                          automaton"
+    else []
+  in
+  let new_funcs, local_var, main_stmt =
+    if Aorai_option.Deterministic.get() then
+      mk_deterministic_body generated_kf loc f st status res
     else
-      List.map
-        (fun (st,copy) ->
-           equalsStmt (Cil.var copy)
-             (Cil.evar ~loc (Data_for_aorai.get_state_var st)))
-        copies
+      mk_non_deterministic_body generated_kf loc f st status res
   in
-  (* For each state, we have to generate the statement that will update its copy. *)
-  let main_stmt =
-
-    List.fold_left
-      (fun acc state -> (mk_stmt loc auto f st status state res)@acc )
-      []
-      copies
-
+  let ret =
+    Cil.mkStmt ~ghost:true ~valid_sid:true (Cil_types.Return(None,loc))
   in
-
-  (* Finally, we replace the state var values by the ones computed in copies. *)
-  let stvar_update =
-    if Aorai_option.Deterministic.get () then
-      let orig = Data_for_aorai.get_varinfo curState in
-      [ equalsStmt (Cil.var orig) (Cil.evar (List.hd local_var))]
-    else
-      List.map
-        (fun (state,copy) ->
-           equalsStmt
-             (Cil.var (Data_for_aorai.get_state_var state))
-             (Cil.evar ~loc copy))
-        copies
-  in
-  let ret = [ Cil.mkStmt ~ghost:true (Cil_types.Return(None,loc)) ] in
+  if Aorai_option.SmokeTests.get () then begin
+    assert_alive_automaton generated_kf ret;
+  end;
   let res_block =
     (Cil.mkBlock
-       ( stmt_begin_list @ copies_update @ main_stmt @ stvar_update @ ret))
+       ( stmt_begin_list @ stmt_history_update @ main_stmt @ [ret]))
   in
   res_block.blocals <- local_var;
   Aorai_option.debug ~dkey "Generated body is:@\n%a"
     Printer.pp_block res_block;
-  res_block,local_var
+  new_funcs,res_block,local_var
 
 let get_preds_wrt_params_reachable_states state f status =
-  let auto = Data_for_aorai.getAutomata () in
-  let treat_one_trans acc tr = Logic_simplification.tor acc (fst tr.cross) in
+  let auto = Data_for_aorai.getGraph () in
+  let treat_one_trans acc tr = Logic_simplification.tor acc tr.cross in
   let find_trans state prev tr =
     Path_analysis.get_edges prev state auto @ tr
   in
@@ -1986,6 +2250,8 @@ let treat_val loc base range pred =
       let max = Logic_const.prel (Rle, loc, add max) in
       Logic_const.pand (min,max)
     | Unbounded min -> Logic_const.prel (Rle, add_cst min, loc)
+    | Unknown -> Logic_const.ptrue (* nothing is known: the loc can
+                                      take any value from then on. *)
   in
   Aorai_option.debug ~dkey:action_dkey "Action predicate: %a"
     Printer.pp_predicate res;

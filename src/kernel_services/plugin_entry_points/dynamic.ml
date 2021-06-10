@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -132,6 +132,8 @@ let once pkg =
   if Hashtbl.mem packages pkg then false
   else ( Hashtbl.add packages pkg () ; true )
 
+let is_loaded pkg = Hashtbl.mem packages pkg
+
 exception ArchiveError of string
 
 let load_archive pkg base file =
@@ -244,7 +246,7 @@ let load_script base =
     else
       Format.fprintf fmt "%s -c" Fc_config.ocamlc ;
     Format.fprintf fmt
-      " -g %s -warn-error a -I %s" Fc_config.ocaml_wflags Fc_config.libdir ;
+      " -g %s -warn-error a -I %s" Fc_config.ocaml_wflags (Fc_config.libdir :> string) ;
     if !Fc_config.is_gui && Fc_config.lablgtk <> "" then
       Format.fprintf fmt " -package %s" Fc_config.lablgtk;
     List.iter (fun p -> Format.fprintf fmt " -I %s" p) !load_path ;
@@ -283,11 +285,13 @@ let set_module_load_path path =
     if is_dir d then d::ps else
       ( if user then Klog.warning "cannot load '%s' (not a directory)" d
       ; ps ) in
+  let plugin_path = Filepath.Normalized.to_string_list Fc_config.plugin_dir in
   Klog.debug ~dkey "plugin_dir: %s"
-    (String.concat ocamlfind_path_separator Fc_config.plugin_dir);
+    (String.concat ocamlfind_path_separator plugin_path);
   load_path :=
     List.fold_right (add_dir ~user:true) path
-      (List.fold_right (add_dir ~user:false) (Fc_config.libdir::Fc_config.plugin_dir) []);
+      (List.fold_right (add_dir ~user:false)
+         ((Fc_config.libdir :> string) :: plugin_path) []);
   let env_ocamlpath =
     try Str.split (Str.regexp ocamlfind_path_separator) (Sys.getenv "OCAMLPATH")
     with Not_found -> []

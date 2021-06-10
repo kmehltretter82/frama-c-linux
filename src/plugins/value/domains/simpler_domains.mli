@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -42,7 +42,6 @@ type simple_call = {
   rest: exp list;                     (* Extra arguments. *)
   return: varinfo option;             (* Fake varinfo where the result of the
                                          call is stored. *)
-  recursive: bool;                    (* Is the call recursive? *)
 }
 
 (** Simplest interface for an abstract domain. No exchange of information with

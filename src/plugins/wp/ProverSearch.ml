@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -89,8 +89,10 @@ let search tree ?anchor ?sequent heuristics =
   let anchor = ProofEngine.anchor tree ?node:anchor () in
   let sequent =
     match sequent with
-    | Some s -> s | None -> snd (Wpo.compute (ProofEngine.goal anchor)) in
+    | Some s -> s
+    | None -> snd (Wpo.compute (ProofEngine.goal anchor)) in
   let lookup h = try h#search pool#add sequent with Not_found -> () in
+  Conditions.index sequent ;
   WpContext.on_context
     (ProofEngine.node_context anchor)
     (List.iter lookup) heuristics ;

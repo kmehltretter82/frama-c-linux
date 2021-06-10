@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -28,7 +28,7 @@ module Writes: sig
       indirectly (through the effects of a call) otherwise.  *)
   type effects = {
     direct: bool (** Direct affectation [lv = ...], or modification through
-                   a call to a leaf function. *);
+                     a call to a leaf function. *);
     indirect: bool (** Modification inside the body of called function
                        [f(...)]*);
   }

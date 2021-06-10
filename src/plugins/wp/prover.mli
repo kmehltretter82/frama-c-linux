@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -25,6 +25,11 @@ open VCS
 (* -------------------------------------------------------------------------- *)
 (* --- Prover Implementation against Task API                             --- *)
 (* -------------------------------------------------------------------------- *)
+
+val simplify :
+  ?start:(Wpo.t -> unit) ->
+  ?result:(Wpo.t -> prover -> result -> unit) ->
+  Wpo.t -> bool Task.task
 
 val prove : Wpo.t ->
   ?config:config ->

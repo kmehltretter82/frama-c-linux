@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -85,17 +85,17 @@ module V = struct
 
   let is_imprecise v =
     match v with
-      | Top _ -> true
-      | _ -> false
+    | Top _ -> true
+    | _ -> false
 
-  let is_topint v = equal top_int v 
+  let is_topint v = equal top_int v
 
   let is_bottom v = equal bottom v
 
   let is_isotropic v =
     match v with
-      | Top _ -> true
-      | Map _ -> is_topint v || is_bottom v || is_zero v
+    | Top _ -> true
+    | Map _ -> is_topint v || is_bottom v || is_zero v
 
   let contains_zero loc =
     let offset_contains_zero base offset =
@@ -141,7 +141,7 @@ module V = struct
      [typ]. Whenever possible, we print real addresses instead of bytes
      offsets. *)
   let pretty_base_offsets_typ typ fmt b i =
-    let typ_match = match Extlib.opt_map Cil.unrollType typ with
+    let typ_match = match Option.map Cil.unrollType typ with
       | Some (TPtr (typ_pointed, _)) ->
         if Cil.isVoidType typ_pointed then None else Some typ_pointed
       | _ -> None
@@ -192,8 +192,8 @@ module V = struct
           let o, ok = conv_offset o in
           if o = NoOffset then
             let o' = match Cil.unrollType typ_base with
-              | TArray _ -> Index (Cil.(zero builtinLoc), NoOffset)
-              | TComp (ci, _, _) -> Field (List.hd ci.cfields, NoOffset)
+              | TArray _ -> Index (Cil.(zero Cil_builtins.builtinLoc), NoOffset)
+              | TComp (ci, _, _) -> Field (List.hd (Option.get ci.cfields), NoOffset)
               | _ -> raise Bit_utils.NoMatchingOffset
             in o', ok
           else o, ok
@@ -265,23 +265,23 @@ module V = struct
     try
       let right = project_ival right in
       let result = project_ival result in
-      Ival.backward_mult_int_left ~right ~result >>-: Extlib.opt_map inject_ival
+      Ival.backward_mult_int_left ~right ~result >>-: Option.map inject_ival
     with Not_based_on_null -> `Value None
 
   let backward_rel_int_left op l r =
     let open Abstract_interp.Comp in
     match l with
-      | Top _  -> l
-      | Map m1 ->
-          try
-            let k,v2 = find_lonely_key r in
-            let v1 = find_or_bottom k m1 in
-            let v1' = Ival.backward_comp_int_left op v1 v2 in
-            let r = add k v1' l in
-            if (not (Base.equal k Base.null)) && (op = Ge || op = Gt)
-            then diff_if_one r singleton_zero
-            else r
-          with Not_found -> l
+    | Top _  -> l
+    | Map m1 ->
+      try
+        let k,v2 = find_lonely_key r in
+        let v1 = find_or_bottom k m1 in
+        let v1' = Ival.backward_comp_int_left op v1 v2 in
+        let r = add k v1' l in
+        if (not (Base.equal k Base.null)) && (op = Ge || op = Gt)
+        then diff_if_one r singleton_zero
+        else r
+      with Not_found -> l
 
   (* More aggressive reduction by relational pointer operators. This version
      assumes that \pointer_comparable alarms have been emitted, and that
@@ -313,8 +313,8 @@ module V = struct
         (* i1' and p1' are pointwise application of the comparison operator,
            and will be in the result in all cases. *)
         if debug then Kernel.result "%a %a %a %a %a -> %a %a"
-          Ival.pretty il pretty pl pretty_comp op Ival.pretty ir pretty pr
-          Ival.pretty il' pretty pl';
+            Ival.pretty il pretty pl pretty_comp op Ival.pretty ir pretty pr
+            Ival.pretty il' pretty pl';
         match op, zl, zr with
         | (Le | Lt), false, _ (*  il       + pl <~ (ir + ?0) + pr *)
         | (Ge | Gt), _, false (* (il + ?0) + pl >~  ir       + pr *) ->
@@ -375,10 +375,10 @@ module V = struct
           || (e2_zero && (op = Ge || op = Gt))
           then True (* if e1/e2 is NULL, then e2/e1 is a pointer *)
           else
-            if (e2_zero && (op = Le || op = Lt))
-            || (e1_zero && (op = Ge || op = Gt))
-            then False
-            else Unknown
+          if (e2_zero && (op = Le || op = Lt))
+          || (e1_zero && (op = Ge || op = Gt))
+          then False
+          else Unknown
         end
       end
     with Not_found -> Comp.Unknown
@@ -393,9 +393,9 @@ module V = struct
   let forward_comp_int ~signed op v1 v2 =
     let open Abstract_interp.Comp in
     match op with
-      | Eq -> forward_eq_int v1 v2
-      | Ne -> inv_truth (forward_eq_int v1 v2)
-      | Le | Ge | Lt | Gt -> forward_rel_int ~signed op v1 v2
+    | Eq -> forward_eq_int v1 v2
+    | Ne -> inv_truth (forward_eq_int v1 v2)
+    | Le | Ge | Lt | Gt -> forward_rel_int ~signed op v1 v2
 
 
   (** Casts and reinterpretation *)
@@ -428,9 +428,9 @@ module V = struct
     (* ok_garbled indicates that we do _not_ create a (new) garbled mix *)
     let pointer_part', ok_garbled =
       if Int.ge size (Int.of_int (Bit_utils.sizeofpointer ())) ||
-        is_bottom pointer_part || is_imprecise pointer_part
+         is_bottom pointer_part || is_imprecise pointer_part
       then pointer_part, true
-      else topify_arith_origin pointer_part, false      
+      else topify_arith_origin pointer_part, false
     in
     if ok_garbled && integer_part' == integer_part then
       v (* both pointer and integer part are unchanged *)
@@ -444,38 +444,38 @@ module V = struct
     to_int Ival.reinterpret_as_int ~size ~signed v
 
   let cast_float_to_int ~signed ~size v =
-   try
-     let v1 = project_ival v in
-     let r = Ival.cast_float_to_int ~signed ~size v1 in
-     inject_ival r
-   with Not_based_on_null ->
-     if is_bottom v
-     then v
-     else topify_arith_origin v
+    try
+      let v1 = project_ival v in
+      let r = Ival.cast_float_to_int ~signed ~size v1 in
+      inject_ival r
+    with Not_based_on_null ->
+      if is_bottom v
+      then v
+      else topify_arith_origin v
 
- let cast_float_to_int_inverse ~single_precision i =
-   try
-     let v1 = project_ival i in
-     let r = Ival.cast_float_to_int_inverse ~single_precision v1 in
-     Some (inject_ival r)
-   with Not_based_on_null -> None
+  let cast_float_to_int_inverse ~single_precision i =
+    try
+      let v1 = project_ival i in
+      let r = Ival.cast_float_to_int_inverse ~single_precision v1 in
+      Some (inject_ival r)
+    with Not_based_on_null -> None
 
- let cast_int_to_float kind v =
-   try
-     let i = project_ival v in
-     let r = Ival.cast_int_to_float kind i in
-     inject_ival r
-   with Not_based_on_null ->
-     if is_bottom v
-     then bottom
-     else topify_arith_origin v
+  let cast_int_to_float kind v =
+    try
+      let i = project_ival v in
+      let r = Ival.cast_int_to_float kind i in
+      inject_ival r
+    with Not_based_on_null ->
+      if is_bottom v
+      then bottom
+      else topify_arith_origin v
 
- let cast_int_to_float_inverse ~single_precision vf =
-   try
-     let ivf = project_ival vf in
-     let i = Ival.cast_int_to_float_inverse ~single_precision ivf in
-     Some (inject_ival i)
-   with Not_based_on_null -> None
+  let cast_int_to_float_inverse ~single_precision vf =
+    try
+      let ivf = project_ival vf in
+      let i = Ival.cast_int_to_float_inverse ~single_precision ivf in
+      Some (inject_ival i)
+    with Not_based_on_null -> None
 
   (** Binary functions *)
 
@@ -485,13 +485,13 @@ module V = struct
       let v2 = project_ival e2 in
       inject_ival (f v1 v2)
     with Not_based_on_null  ->
-      if is_bottom e1 || is_bottom e2 
+      if is_bottom e1 || is_bottom e2
       then bottom
       else begin
-	  join
-            (topify_with_origin_kind topify e1)
-            (topify_with_origin_kind topify e2)
-	end
+        join
+          (topify_with_origin_kind topify e1)
+          (topify_with_origin_kind topify e2)
+      end
 
   let arithmetic_function = import_function ~topify:Origin.K_Arith
 
@@ -520,23 +520,23 @@ module V = struct
         try
           Location_Bytes.shift (project_ival_bottom e2) e1
         with Not_based_on_null  ->
-          try (* On the off chance that someone writes [i+(int)&p]... *)
-            Location_Bytes.shift (project_ival_bottom e1) e2
-          with Not_based_on_null ->
-            join
-              (topify_with_origin_kind topify e1)
-              (topify_with_origin_kind topify e2)
+        try (* On the off chance that someone writes [i+(int)&p]... *)
+          Location_Bytes.shift (project_ival_bottom e1) e2
+        with Not_based_on_null ->
+          join
+            (topify_with_origin_kind topify e1)
+            (topify_with_origin_kind topify e2)
       end
     with Not_found ->
-      (* we end up here if the only way left to make this
-         addition is to convert e2 to an integer *)
-      try
-        let right = Ival.scale_int_base factor (project_ival_bottom e2)
-        in Location_Bytes.shift right e1
-      with Not_based_on_null  -> (* from [project_ival] *)
-        join
-          (topify_with_origin_kind topify e1)
-          (topify_with_origin_kind topify e2)
+    (* we end up here if the only way left to make this
+       addition is to convert e2 to an integer *)
+    try
+      let right = Ival.scale_int_base factor (project_ival_bottom e2)
+      in Location_Bytes.shift right e1
+    with Not_based_on_null  -> (* from [project_ival] *)
+      join
+        (topify_with_origin_kind topify e1)
+        (topify_with_origin_kind topify e2)
 
   (* Under-approximating variant of add_untyped. Takes two
      under-approximation, and returns an under-approximation.*)
@@ -544,13 +544,13 @@ module V = struct
     if Int_Base.equal factor (Int_Base.minus_one)
     then
       (* Note: we could do a "link" for each pair of matching bases in
-	 e1 and e2, so this is an underapproximation in the most
-	 common case. *)
+         e1 and e2, so this is an underapproximation in the most
+         common case. *)
       try
-	let b1, o1 = Location_Bytes.find_lonely_key e1 in
-	let b2, o2 = Location_Bytes.find_lonely_key e2 in
-	if Base.compare b1 b2 <> 0 then bottom
-	else inject_ival (Ival.sub_int_under o1 o2)
+        let b1, o1 = Location_Bytes.find_lonely_key e1 in
+        let b2, o2 = Location_Bytes.find_lonely_key e2 in
+        if Base.compare b1 b2 <> 0 then bottom
+        else inject_ival (Ival.sub_int_under o1 o2)
       with Not_found -> bottom
     else if Int_Base.equal factor Int_Base.one
     then
@@ -558,8 +558,8 @@ module V = struct
       with Not_based_on_null -> bottom
     else
       try
-	let right = Ival.scale_int_base factor (project_ival_bottom e2) in
-	Location_Bytes.shift_under right e1
+        let right = Ival.scale_int_base factor (project_ival_bottom e2) in
+        Location_Bytes.shift_under right e1
       with Not_based_on_null -> bottom
   ;;
 
@@ -648,14 +648,14 @@ module V = struct
   let merge_distinct_bits ~topify ~conflate_bottom value acc =
     if is_bottom acc || is_bottom value
     then begin
-        if conflate_bottom
-        then
-          bottom
-        else
-          join
-            (topify_with_origin_kind topify acc)
-            (topify_with_origin_kind topify value)
-      end
+      if conflate_bottom
+      then
+        bottom
+      else
+        join
+          (topify_with_origin_kind topify acc)
+          (topify_with_origin_kind topify value)
+    end
     else
       add_untyped ~topify ~factor:Int_Base.one value acc
 
@@ -668,7 +668,7 @@ module V = struct
       try
         let i = project_ival v in
         Ival.all_values ~size i
-    with Not_based_on_null -> 
+      with Not_based_on_null ->
         false
 
   let anisotropic_cast ~size v =
@@ -690,7 +690,7 @@ module V = struct
 
   let add_untyped ~factor v1 v2 =
     add_untyped ~topify:Origin.K_Arith ~factor v1 v2
-  
+
 end
 
 module V_Or_Uninitialized = struct
@@ -706,23 +706,20 @@ module V_Or_Uninitialized = struct
 
   let make ~initialized ~escaping v =
     match initialized, escaping with
-      | true, false  -> C_init_noesc v
-      | true, true   -> C_init_esc v
-      | false, false -> C_uninit_noesc v
-      | false, true  -> C_uninit_esc v
+    | true, false  -> C_init_noesc v
+    | true, true   -> C_init_esc v
+    | false, false -> C_uninit_noesc v
+    | false, true  -> C_uninit_esc v
 
   let mask_init = 2
   let mask_noesc = 1
 
-  (* replace "noalloc" with [@@noalloc] for OCaml version >= 4.03.0 *)
-  [@@@ warning "-3"]
-  external get_flags : t -> int = "caml_obj_tag" "noalloc"
-  [@@@ warning "+3"]
+  external get_flags : t -> int = "caml_obj_tag" [@@noalloc]
 
   let is_initialized v = (get_flags v land mask_init) <> 0
   let is_noesc v = (get_flags v land mask_noesc) <> 0
 
-  let get_v = function 
+  let get_v = function
     | C_uninit_esc  v
     | C_uninit_noesc v
     | C_init_esc v
@@ -740,7 +737,7 @@ module V_Or_Uninitialized = struct
     | 3 -> C_init_noesc v
     | _ -> assert false
 
-(* let (==>) = (fun x y -> (not x) || y) *)
+  (* let (==>) = (fun x y -> (not x) || y) *)
 
   type size_widen_hint = V.size_widen_hint
   type numerical_widen_hint = V.numerical_widen_hint
@@ -768,7 +765,7 @@ module V_Or_Uninitialized = struct
       (V.link (get_v t1) (get_v t2))
 
   let meet t1 t2 =
-   create
+    create
       ((get_flags t1) lor (get_flags t2))
       (V.meet (get_v t1) (get_v t2))
 
@@ -786,36 +783,36 @@ module V_Or_Uninitialized = struct
   let initialized v = C_init_noesc v
 
   let is_included t1 t2 =
-(*    (t2.initialized ==> t1.initialized) &&
-    (t2.no_escaping_adr ==> t1.no_escaping_adr) &&
-      V.is_included t1.v t2.v
-*)
+    (*    (t2.initialized ==> t1.initialized) &&
+          (t2.no_escaping_adr ==> t1.no_escaping_adr) &&
+          V.is_included t1.v t2.v
+    *)
     let flags1 = get_flags t1 in
     let flags2 = get_flags t2 in
     (lnot flags2) lor flags1 = -1 &&
-        V.is_included (get_v t1) (get_v t2)
+    V.is_included (get_v t1) (get_v t2)
 
   let pretty_aux pp fmt t =
     let no_escaping_adr = is_noesc t in
     let initialized = is_initialized t in
     let v = get_v t in
     match V.(equal bottom v), initialized, no_escaping_adr with
-      | false, false, false ->
-        Format.fprintf fmt "%a or UNINITIALIZED or ESCAPINGADDR" pp v
-      | true, false, false ->
-        Format.pp_print_string fmt "UNINITIALIZED or ESCAPINGADDR"
-      | false, false, true ->
-        Format.fprintf fmt "%a or UNINITIALIZED" pp v
-      | true, false, true ->
-        Format.pp_print_string fmt "UNINITIALIZED"
-      | false, true, false ->
-        Format.fprintf fmt "%a or ESCAPINGADDR" pp v
-      | true, true, false ->
-        Format.pp_print_string fmt "ESCAPINGADDR"
-      | false, true, true ->
-        pp fmt v
-      | true, true, true ->
-        Format.pp_print_string fmt "BOTVALUE"
+    | false, false, false ->
+      Format.fprintf fmt "%a or UNINITIALIZED or ESCAPINGADDR" pp v
+    | true, false, false ->
+      Format.pp_print_string fmt "UNINITIALIZED or ESCAPINGADDR"
+    | false, false, true ->
+      Format.fprintf fmt "%a or UNINITIALIZED" pp v
+    | true, false, true ->
+      Format.pp_print_string fmt "UNINITIALIZED"
+    | false, true, false ->
+      Format.fprintf fmt "%a or ESCAPINGADDR" pp v
+    | true, true, false ->
+      Format.pp_print_string fmt "ESCAPINGADDR"
+    | false, true, true ->
+      pp fmt v
+    | true, true, true ->
+      Format.pp_print_string fmt "BOTVALUE"
 
   let pretty fmt v = pretty_aux V.pretty fmt v
   let pretty_typ typ fmt v =
@@ -831,38 +828,38 @@ module V_Or_Uninitialized = struct
 
   include
     (Datatype.Make
-      (struct
-        type uninitialized = t
-        type t = uninitialized (* =     | C_uninit_esc of V.t
-                       | C_uninit_noesc of V.t
-                       | C_init_esc of V.t
-                       | C_init_noesc of V.t *)
-        let name = "Cvalue.V_Or_Uninitialized"
-        let structural_descr =
-	  let v = V.packed_descr in
+       (struct
+         type uninitialized = t
+         type t = uninitialized (* =     | C_uninit_esc of V.t
+                                   | C_uninit_noesc of V.t
+                                   | C_init_esc of V.t
+                                   | C_init_noesc of V.t *)
+         let name = "Cvalue.V_Or_Uninitialized"
+         let structural_descr =
+           let v = V.packed_descr in
            Structural_descr.t_sum [| [| v |]; [| v |]; [| v |]; [| v |] |]
-        let reprs =
-          List.fold_left
-            (fun acc v ->
-              List.fold_left
-                (fun acc v ->
-                  List.fold_left
-                    (fun acc v -> C_uninit_noesc v :: acc)
-                    (C_uninit_esc v :: acc)
-                    V.reprs)
-                (C_init_noesc v :: acc)
-                V.reprs)
-            (List.map (fun v -> C_init_esc v) V.reprs)
-            V.reprs
-        let hash = hash
-        let equal = equal
-        let compare = Datatype.undefined
-        let copy = Datatype.undefined
-        let rehash = Datatype.identity
-        let pretty = pretty
-        let internal_pretty_code = Datatype.undefined
-        let varname = Datatype.undefined
-        let mem_project = Datatype.never_any_project
+         let reprs =
+           List.fold_left
+             (fun acc v ->
+                List.fold_left
+                  (fun acc v ->
+                     List.fold_left
+                       (fun acc v -> C_uninit_noesc v :: acc)
+                       (C_uninit_esc v :: acc)
+                       V.reprs)
+                  (C_init_noesc v :: acc)
+                  V.reprs)
+             (List.map (fun v -> C_init_esc v) V.reprs)
+             V.reprs
+         let hash = hash
+         let equal = equal
+         let compare = Datatype.undefined
+         let copy = Datatype.undefined
+         let rehash = Datatype.identity
+         let pretty = pretty
+         let internal_pretty_code = Datatype.undefined
+         let varname = Datatype.undefined
+         let mem_project = Datatype.never_any_project
        end)
      : Datatype.S with type t := t)
 
@@ -911,6 +908,10 @@ module V_Or_Uninitialized = struct
       else t (* no update needed *)
     in
     removed, t'
+
+  let replace_base substitution t =
+    let modified, v = V.replace_base substitution (get_v t) in
+    modified, if modified then create (get_flags t) v else t
 
   let reduce_by_initializedness pos v =
     if pos then
@@ -1001,7 +1002,7 @@ module V_Offsetmap = struct
   let narrow_reinterpret x y =
     try `Value (OffsetmapNarrow.narrow_reinterpret x y)
     with NarrowReturnsBottom -> `Bottom
-  
+
 end
 
 module Default_offsetmap = struct
@@ -1010,10 +1011,10 @@ module Default_offsetmap = struct
     State_builder.Int_hashtbl
       (V_Offsetmap)
       (struct
-         let name = "Cvalue.Default_offsetmap.StringOffsetmaps"
-         let dependencies = [ Ast.self ]
-         let size = 17
-       end)
+        let name = "Cvalue.Default_offsetmap.StringOffsetmaps"
+        let dependencies = [ Ast.self ]
+        let size = 17
+      end)
   let () = Ast.add_monotonic_state StringOffsetmaps.self
 
   let default_offsetmap base =
@@ -1049,7 +1050,7 @@ module Default_offsetmap = struct
        sets of locals, but is is ok to have missing ones considered as being
        bound to Bottom.
      - for dynamic allocation, the default value is indeed Bottom
-   *)
+  *)
 
   let name = "Cvalue.Default_offsetmap"
 
@@ -1080,7 +1081,7 @@ module Model = struct
   let reduce_indeterminate_binding state l v =
     assert (Locations.cardinal_zero_or_one l);
     add_binding ~exact:true state l v
-    
+
   (* Overwrites the definition of add_binding coming from Lmap, with a
      signature change. *)
   let add_binding ~exact acc loc value =
@@ -1090,18 +1091,18 @@ module Model = struct
     List.fold_left
       (fun acc block -> remove_variables block.blocals acc) state blocks
 
- let cardinal_estimate state =
-   match state with
-   | Bottom -> CardinalEstimate.zero
-   | Top -> CardinalEstimate.infinite
-   | Map(m) ->
-     let count = ref (CardinalEstimate.one) in
-     let f _ offsetmap =
-       let offsetmap_card = V_Offsetmap.cardinal_estimate offsetmap in
-       count := CardinalEstimate.mul !count offsetmap_card
-     in
-     iter f m;
-     !count
+  let cardinal_estimate state =
+    match state with
+    | Bottom -> CardinalEstimate.zero
+    | Top -> CardinalEstimate.infinite
+    | Map(m) ->
+      let count = ref (CardinalEstimate.one) in
+      let f _ offsetmap =
+        let offsetmap_card = V_Offsetmap.cardinal_estimate offsetmap in
+        count := CardinalEstimate.mul !count offsetmap_card
+      in
+      iter f m;
+      !count
 end
 
 (*

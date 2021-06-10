@@ -27,8 +27,8 @@ open Cil_types
 val function_init_name: string
 (** Name of the function in which [mk_init_function] (see below) generates the
     code. *)
-val function_delete_name: string
-(** Name of the function in which [mk_delete_function] (see below) generates the
+val function_clean_name: string
+(** Name of the function in which [mk_clean_function] (see below) generates the
     code. *)
 
 val reset: unit -> unit
@@ -44,9 +44,9 @@ val mk_init_function: unit -> varinfo * fundec
 (** Generate a new C function containing the observers for global variable
     declarations and initializations. *)
 
-val mk_delete_function: unit -> varinfo * fundec
+val mk_clean_function: unit -> (varinfo * fundec) option
 (** Generate a new C function containing the observers for global variable
-    de-allocations. *)
+    de-allocations if there are global variables. *)
 
 (*
 Local Variables:

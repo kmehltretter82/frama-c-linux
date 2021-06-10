@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -70,8 +70,8 @@ let force_ast_compute
 (** {2 Specific functors} *)
 (* ************************************************************************* *)
 
-let iter_on_this_parameter stage =
-  match !Parameter_customize.do_iterate_ref, stage with
+let is_parameter_reconfigurable stage =
+  match !Parameter_customize.is_reconfigurable_ref, stage with
   | Some false, _
   | None, (Cmdline.Early | Cmdline.Extending | Cmdline.Extended
           | Cmdline.Exiting | Cmdline.Loading) ->
@@ -96,17 +96,15 @@ struct
   let parameters_ref : Typed_parameter.t list ref = ref []
   let parameters () = !parameters_ref
 
-  let add_parameter group stage param =
-    if iter_on_this_parameter stage then begin
-      parameters_ref := param :: !parameters_ref;
-      let parameter_groups = P.parameters in
-      try
-        let group_name = Cmdline.Group.name group in
-        let parameters = Hashtbl.find P.parameters group_name in
-        Hashtbl.replace parameter_groups group_name (param :: parameters)
-      with Not_found ->
-        assert false
-    end
+  let add_parameter group _stage param =
+    parameters_ref := param :: !parameters_ref;
+    let parameter_groups = P.parameters in
+    try
+      let group_name = Cmdline.Group.name group in
+      let parameters = Hashtbl.find P.parameters group_name in
+      Hashtbl.replace parameter_groups group_name (param :: parameters)
+    with Not_found ->
+      assert false
 
   (* ************************************************************************ *)
   (** {3 Bool} *)
@@ -212,8 +210,10 @@ struct
              add_set_hook = add_set_hook; add_update_hook = add_update_hook },
            negative_option)
       in
+      let reconfigurable = is_parameter_reconfigurable stage in
       let p =
-        Typed_parameter.create ~name ~help:X.help ~accessor:accessor ~is_set
+        Typed_parameter.create ~name ~help:X.help ~accessor:accessor
+          ~visible:is_visible ~reconfigurable ~is_set
       in
       add_parameter !Parameter_customize.group_ref stage p;
       Parameter_customize.reset ();
@@ -223,14 +223,15 @@ struct
           ~plugin X.option_name Typed_parameter.ty ~journalize:false p
       else p
 
-    let add_aliases list =
-      add_aliases list;
+    let add_aliases ?visible ?deprecated list =
+      add_aliases ?visible ?deprecated list;
       match !negative_option_ref with
       | None -> ()
       | Some negative_option ->
         let negative_list = List.map negate_name list in
         let plugin = P.shortname in
-        Cmdline.add_aliases negative_option ~plugin ~group stage negative_list
+        Cmdline.add_aliases
+          negative_option ~plugin ~group ?visible ?deprecated stage negative_list
 
   end
 
@@ -317,8 +318,10 @@ struct
              add_set_hook = add_set_hook; add_update_hook = add_update_hook },
            get_range)
       in
+      let reconfigurable = is_parameter_reconfigurable stage in
       let p =
-        Typed_parameter.create ~name ~help:X.help ~accessor ~is_set:is_set
+        Typed_parameter.create ~name ~help:X.help ~accessor
+          ~visible:is_visible ~reconfigurable ~is_set:is_set
       in
       add_parameter !Parameter_customize.group_ref stage p;
       add_option X.option_name;
@@ -424,8 +427,10 @@ struct
              add_set_hook = add_set_hook; add_update_hook = add_update_hook },
            get_possible_values)
       in
+      let reconfigurable = is_parameter_reconfigurable stage in
       let p =
-        Typed_parameter.create ~name ~help:X.help ~accessor ~is_set
+        Typed_parameter.create ~name ~help:X.help ~accessor
+          ~visible:is_visible ~reconfigurable ~is_set
       in
       add_parameter !Parameter_customize.group_ref stage p;
       add_option X.option_name;
@@ -475,7 +480,7 @@ struct
         (struct
           include Datatype.Filepath
           include X
-          let default () = Filepath.Normalized.unknown
+          let default () = Filepath.Normalized.empty
           let functor_name = "Filepath"
         end)
 
@@ -512,8 +517,10 @@ struct
              add_update_hook = parameter_add_update_hook },
            fun () -> [])
       in
+      let reconfigurable = is_parameter_reconfigurable stage in
       let p =
-        Typed_parameter.create ~name ~help:X.help ~accessor ~is_set
+        Typed_parameter.create ~name ~help:X.help ~accessor
+          ~visible:is_visible ~reconfigurable ~is_set
       in
       add_parameter !Parameter_customize.group_ref stage p;
       add_option X.option_name;
@@ -525,6 +532,7 @@ struct
       else
         p
 
+    let is_empty () = Filepath.Normalized.is_empty (get ())
   end
 
   (* ************************************************************************ *)
@@ -871,7 +879,7 @@ struct
          since an element may be added, then removed later (e.g +h,-@all):
          that has to be accepted *)
       if check then begin
-        Extlib.may parse_error unparsable;
+        Option.iter parse_error unparsable;
         C.iter check_possible_value col
       end;
       col
@@ -1030,7 +1038,7 @@ struct
       if must_exist then
         error s
       else
-      if !Parameter_customize.is_permissive_ref then begin
+      if Cmdline.permissive then begin
         P.L.warning "ignoring non-existing function%s '%s'."
           specific_msg s;
         set
@@ -1515,7 +1523,7 @@ struct
              let rec pp_custom_list = function
                | [] -> ()
                | v :: l ->
-                 Extlib.may
+                 Option.iter
                    (fun v -> Format.fprintf fmt ":%s" v)
                    (V.to_string ~key (Some v));
                  pp_custom_list l
@@ -1719,8 +1727,8 @@ struct
         f ();
       end
 
-    let add_aliases list =
-      add_aliases list;
+    let add_aliases ?visible ?deprecated list =
+      add_aliases ?visible ?deprecated list;
       Output.add_aliases (List.map (fun alias -> alias ^ "-print") list)
 
   end

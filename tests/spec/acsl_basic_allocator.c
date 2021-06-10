@@ -8,7 +8,7 @@
 /* This file presents the basic version of the allocator.                    */
 /*****************************************************************************/
 
-#include "share/libc/stdlib.h"
+#include "stdlib.h"
 
 #define DEFAULT_BLOCK_SIZE 1000
 
@@ -21,10 +21,10 @@ typedef struct _memory_block {
 } memory_block;
 
 /*@ type invariant inv_memory_block(memory_block mb) =
-  @   0 < mb.size && \offset(mb.data) == 0 && \block_length{Here}(mb.data) == mb.size ;
+  @   0 < mb.size && \offset(mb.data) == 0 && \block_length(mb.data) == mb.size ;
   @*/
 
-/*@ predicate used_memory_block{L}(memory_block mb) = 
+/*@ predicate used_memory_block{L}(memory_block mb) =
   @   mb.free == false && inv_memory_block(mb) ;
   @*/
 

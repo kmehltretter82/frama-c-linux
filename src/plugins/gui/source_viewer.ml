@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -55,7 +55,7 @@ let make ?name ~packing () =
       in
       original_source_window#set_marker_pixbuf "warning" pixbuf; *)
   original_source_window#misc#modify_font_by_name "Monospace";
-  original_source_window#misc#set_name (Extlib.opt_conv "source" name);
+  original_source_window#misc#set_name (Option.value ~default:"source" name);
   let original_source_buffer = original_source_window#source_buffer in
   set_language_to_C original_source_buffer;
 (*

@@ -45,9 +45,9 @@ void k(void) { X += Y; }
 
 // mix ensures + contract on return
 /*@ ensures X == 5; */
-int l() { 
+int l() {
   /*@ assert Y == 2; */
-  return X; 
+  return X;
 }
 
 // mix ensures and assumes
@@ -72,6 +72,40 @@ void m(void) { X += Y; }
   @   ensures X == 98; */
 void n(void) { X ++; }
 
+// several complete and disjoint clauses
+/*@
+    requires X > -1000;
+    ensures X == \old(Y);
+
+    behavior neg:
+        assumes Y < 0;
+        requires Y < 1;
+        ensures X == \old(Y);
+
+    behavior pos:
+        assumes Y >= 0;
+        requires Y > -1;
+        ensures X == \old(Y);
+
+    behavior odd:
+        assumes Y % 2 == 1;
+        requires (Y % 2) - 1 == 0;
+        ensures X == \old(Y);
+
+    behavior even:
+        assumes Y % 2 == 0;
+        requires (Y % 2) + 1 == 1;
+        ensures X == \old(Y);
+
+    complete behaviors neg, pos;
+    complete behaviors odd, even;
+    complete behaviors;
+
+    disjoint behaviors neg, pos;
+    disjoint behaviors odd, even;
+*/
+void o(void) { X = Y; }
+
 int main(void) {
   f();
   g();
@@ -82,5 +116,6 @@ int main(void) {
   l();
   m();
   n();
+  o();
   return 0;
 }

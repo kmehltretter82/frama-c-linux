@@ -1,7 +1,3 @@
-/* run.config
-   STDOPT: #"-loop-max-slevel 20"
-   STDOPT:
-*/
 volatile int nondet;
 int main() {
   int i;

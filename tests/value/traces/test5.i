@@ -1,7 +1,7 @@
 /* run.config
-   STDOPT: #"-eva-domains traces -value-msg-key d-traces -slevel 10" +"-then-last -val -slevel 10 -print -no-eva-traces-domain"
+ EXIT: 1
+   STDOPT: #"-eva-domains traces -eva-msg-key d-traces -eva-slevel 10" +"-then-last -eva -eva-slevel 10 -print -no-eva-traces-domain"
 */
-
 
 /* Check the fix for the creation of expression by dataflows2 for
    switch (conversion to list of if) */

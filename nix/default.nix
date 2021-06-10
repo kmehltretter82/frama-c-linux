@@ -3,13 +3,12 @@
 
 let mk_buildInputs = { opamPackages ? [], nixPackages ? [] } :
     [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl pkgs.file pkgs.which pkgs.dos2unix] ++ nixPackages ++ opam2nix.build {
-           specs = opam2nix.toSpecs ([ "ocamlfind" "zarith" "ocamlgraph" "yojson"
-                { name = "coq"; constraint = "=8.11.1";  }
-                { name = "why3" ; constraint = "=1.3.1"; }
-                { name = "why3-coq" ; constraint = "=1.3.1"; }
-                { name = "menhir"; constraint = "=20190924"; }
-                { name = "dune"; constraint = "=1.11.4"; }
-                { name = "camlzip"; constraint = "=1.07"; }  #so that why3 is always compiled with it
+           specs = opam2nix.toSpecs ([ "ocamlfind" "zarith" "ocamlgraph" "yojson" "zmq"
+                "ppx_deriving" "ppx_deriving_yojson"
+                { name = "coq"; constraint = "=8.12.0";  }
+                { name = "alt-ergo" ; constraint = "=2.2.0"; }
+                { name = "why3" ; constraint = "=1.4.0"; }
+                { name = "why3-coq" ; constraint = "=1.4.0"; }
                 ] ++ opamPackages
               );
            ocamlAttr = ocaml_version;
@@ -24,13 +23,15 @@ let mk_buildInputs = { opamPackages ? [], nixPackages ? [] } :
         } // args);
 in
 
-rec {
+pkgs.lib.makeExtensible
+(self: {
   inherit src mk_buildInputs;
   buildInputs = mk_buildInputs {};
-  installed = main.out;
+  installed = self.main.out;
   main = mk_deriv {
         name = "frama-c";
-        inherit src buildInputs;
+        src = self.src;
+        buildInputs =self.buildInputs;
         outputs = [ "out" "build_dir" ];
         postPatch = ''
                patchShebangs .
@@ -72,9 +73,14 @@ rec {
 
   lint = mk_deriv {
         name = "frama-c-lint";
-        inherit src;
-        buildInputs = (mk_buildInputs { opamPackages = [ { name = "ocp-indent"; constraint = "=1.7.0"; } ];} )
-                      ++ [ pkgs.bc plugins.headache.installed ];
+        src = self.src;
+        buildInputs =
+          (self.mk_buildInputs {
+            nixPackages = [ pkgs.bc ];
+            opamPackages = [
+              { name = "ocp-indent"; constraint = "=1.7.0"; }
+              { name = "headache"; constraint = "=1.05"; }
+            ];} );
         outputs = [ "out" ];
         postPatch = ''
                patchShebangs .
@@ -96,9 +102,9 @@ rec {
 
   tests = mk_deriv {
         name = "frama-c-test";
-        inherit buildInputs;
-        build_dir = main.build_dir;
-        src = main.build_dir + "/dir.tar";
+        buildInputs = self.buildInputs;
+        build_dir = self.main.build_dir;
+        src = self.main.build_dir + "/dir.tar";
         sourceRoot = ".";
         postUnpack = ''
                find . \( -name "Makefile*" -or -name ".depend" -o -name "ptests_config" -o -name "config.status" \) -exec bash -c "t=\$(stat -c %y \"\$0\"); sed -i -e \"s&$(cat $build_dir/old_pwd)&$(pwd)&g\" \"\$0\"; touch -d \"\$t\" \"\$0\"" {} \;
@@ -118,8 +124,12 @@ rec {
 
   build-distrib-tarball = mk_deriv {
         name = "frama-c-build-distrib-tarball";
-        inherit src;
-        buildInputs = buildInputs ++ [ plugins.headache.installed ];
+        src = self.src;
+        buildInputs =
+          (self.mk_buildInputs {
+            opamPackages = [
+              { name = "headache"; constraint = "=1.05"; }
+            ];} );
         outputs = [ "out" ];
         postPatch = ''
                patchShebangs .
@@ -141,8 +151,8 @@ rec {
 
   build-from-distrib-tarball = mk_deriv {
         name = "frama-c-build-from-distrib-tarball";
-        inherit buildInputs;
-        src = build-distrib-tarball.out ;
+        buildInputs = self.buildInputs;
+        src = self.build-distrib-tarball.out ;
         outputs = [ "out" ];
         configurePhase = ''
                unset CC
@@ -159,11 +169,9 @@ rec {
 
   wp-qualif = mk_deriv {
         name = "frama-c-wp-qualif";
-        buildInputs = mk_buildInputs { opamPackages = [
-                    { name = "alt-ergo"; constraint = "=2.0.0"; }
-               ]; };
-        build_dir = main.build_dir;
-        src = main.build_dir + "/dir.tar";
+        buildInputs = self.mk_buildInputs { };
+        build_dir = self.main.build_dir;
+        src = self.main.build_dir + "/dir.tar";
         sourceRoot = ".";
         postUnpack = ''
                find . \( -name "Makefile*" -or -name ".depend" -o -name "ptests_config" -o -name "config.status" \) -exec bash -c "t=\$(stat -c %y \"\$0\"); sed -i -e \"s&$(cat $build_dir/old_pwd)&$(pwd)&g\" \"\$0\"; touch -d \"\$t\" \"\$0\"" {} \;
@@ -176,7 +184,7 @@ rec {
                make create_share_link
                mkdir home
                HOME=$(pwd)/home
-               why3 config --full-config
+               why3 config detect
                make src/plugins/wp/tests/test_config_qualif
                export FRAMAC_WP_CACHE=replay
                export FRAMAC_WP_CACHEDIR=${plugins.wp-cache.src}
@@ -187,11 +195,62 @@ rec {
         '';
   };
 
+  aorai-prove = mk_deriv {
+        name = "frama-c-aorai-prove";
+        buildInputs = self.mk_buildInputs { };
+        build_dir = self.main.build_dir;
+        src = self.main.build_dir + "/dir.tar";
+        sourceRoot = ".";
+        postUnpack = ''
+               find . \( -name "Makefile*" -or -name ".depend" -o -name "ptests_config" -o -name "test_config*" -o -name "config.status" \) -exec bash -c "t=\$(stat -c %y \"\$0\"); sed -i -e \"s&$(cat $build_dir/old_pwd)&$(pwd)&g\" \"\$0\"; touch -d \"\$t\" \"\$0\"" {} \;
+        '';
+        configurePhase = ''
+           true
+        '';
+
+        buildPhase = ''
+          make clean_share_link
+          make create_share_link
+          mkdir home
+          HOME=$(pwd)/home
+          why3 config detect
+          make src/plugins/aorai/tests/ptests_config
+          make PTESTS_OPTS="-config prove -error-code" Aorai_TESTS
+        '';
+
+        installPhase = ''
+          true
+        '';
+  };
+
+  eva-tests = mk_deriv {
+        name = "frama-c-eva-tests";
+        buildInputs = self.mk_buildInputs { };
+        build_dir = self.main.build_dir;
+        src = self.main.build_dir + "/dir.tar";
+        sourceRoot = ".";
+        postUnpack = ''
+               find . \( -name "Makefile*" -or -name ".depend" -o -name "ptests_config" -o -name "config.status" \) -exec bash -c "t=\$(stat -c %y \"\$0\"); sed -i -e \"s&$(cat $build_dir/old_pwd)&$(pwd)&g\" \"\$0\"; touch -d \"\$t\" \"\$0\"" {} \;
+        '';
+        configurePhase = ''
+            true
+        '';
+        buildPhase = ''
+               make clean_share_link
+               make create_share_link
+               export CONFIGS="equality bitwise symblocs gauges octagon"
+               src/plugins/value/vtests -j 4
+        '';
+        installPhase = ''
+               true
+        '';
+  };
+
   e-acsl-tests-dev = mk_deriv {
         name = "frama-c-e-acsl-tests-dev";
-        buildInputs = mk_buildInputs { nixPackages = [ pkgs.gmp pkgs.getopt ]; };
-        build_dir = main.build_dir;
-        src = main.build_dir + "/dir.tar";
+        buildInputs = self.mk_buildInputs { nixPackages = [ pkgs.gmp pkgs.getopt ]; };
+        build_dir = self.main.build_dir;
+        src = self.main.build_dir + "/dir.tar";
         sourceRoot = ".";
         postUnpack = ''
                find . \( -name "Makefile*" -or -name ".depend" -o -name "ptests_config" -o -name "config.status" \) -exec bash -c "t=\$(stat -c %y \"\$0\"); sed -i -e \"s&$(cat $build_dir/old_pwd)&$(pwd)&g\" \"\$0\"; touch -d \"\$t\" \"\$0\"" {} \;
@@ -211,8 +270,8 @@ rec {
 
   internal = mk_deriv {
         name = "frama-c-internal";
-        inherit src;
-        buildInputs = (mk_buildInputs { opamPackages = [ "xml-light" ]; } ) ++
+        src = self.src;
+        buildInputs = (self.mk_buildInputs { opamPackages = [ "xml-light" ]; } ) ++
                     [ pkgs.getopt
                       pkgs.libxslt pkgs.libxml2 pkgs.autoPatchelfHook
                       pkgs.swiProlog
@@ -237,8 +296,8 @@ rec {
            chmod -R u+w -- "$sourceRoot/src/plugins/counter-examples"
            cp -r --preserve=mode "$genassigns_src" "$sourceRoot/src/plugins/genassigns"
            chmod -R u+w -- "$sourceRoot/src/plugins/genassigns"
-           cp -r --preserve=mode "$frama_clang_src" "$sourceRoot/src/plugins/frama-clang"
-           chmod -R u+w -- "$sourceRoot/src/plugins/frama-clang"
+           # cp -r --preserve=mode "$frama_clang_src" "$sourceRoot/src/plugins/frama-clang"
+           # chmod -R u+w -- "$sourceRoot/src/plugins/frama-clang"
            cp -r --preserve=mode "$pathcrawler_src" "$sourceRoot/src/plugins/pathcrawler"
            chmod -R u+w -- "$sourceRoot/src/plugins/pathcrawler"
            cp -r --preserve=mode "$mthread_src" "$sourceRoot/src/plugins/mthread"
@@ -269,6 +328,14 @@ rec {
                 autoPatchelf src/plugins/pathcrawler
                 make -j 4
                 ln -sr src/plugins/pathcrawler/share share/pc
+                # Setup Why3
+                mkdir home
+                HOME=$(pwd)/home
+                why3 config detect
+                # Setup WP related
+                export CAVEAT_IMPORTER_NIX_MODE=yes
+                export FRAMAC_WP_CACHE=replay
+                export FRAMAC_WP_CACHEDIR=${plugins.wp-cache.src}
                 make tests -j4 PTESTS_OPTS="-error-code -j 4"
         '';
         installPhase = ''
@@ -276,4 +343,4 @@ rec {
         '';
   };
 
-}
+})

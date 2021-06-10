@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -38,8 +38,8 @@ module type Location_map_bitwise = sig
 
   module LOffset :
     module type of Offsetmap_bitwise_sig
-      with type v = v
-      and type intervals = Int_Intervals.t
+    with type v = v
+     and type intervals = Int_Intervals.t
 
   val is_empty : t -> bool
   val is_bottom : t -> bool
@@ -128,7 +128,7 @@ struct
           let to_bottom = LOffset.create ~size V.bottom in
           let range = Int_Intervals.inject_bounds ib ie in
           match LOffset.add_binding_intervals
-           ~validity ~exact:true range V.default to_bottom
+                  ~validity ~exact:true range V.default to_bottom
           with
           | `Bottom -> assert false
           | `Value m -> m
@@ -231,8 +231,8 @@ struct
         type t = lmap
         let reprs = Top :: List.map (fun b -> Map b) LBase.reprs
         let structural_descr =
-	  Structural_descr.t_sum [| [| LBase.packed_descr |] |]
-         let name = LOffset.name ^ " lmap_bitwise"
+          Structural_descr.t_sum [| [| LBase.packed_descr |] |]
+        let name = LOffset.name ^ " lmap_bitwise"
         let hash = hash
         let equal = equal
         let compare = compare
@@ -242,21 +242,21 @@ struct
         let copy = Datatype.undefined
         let varname = Datatype.undefined
         let mem_project = Datatype.never_any_project
-       end)
+      end)
 
   let fold f m acc =
     LBase.fold
       (fun k offsetmap acc ->
-        LOffset.fold
-          (fun itvs v acc ->
-            let z = Zone.inject k itvs in
-            f z v acc)
-          offsetmap
-          acc)
+         LOffset.fold
+           (fun itvs v acc ->
+              let z = Zone.inject k itvs in
+              f z v acc)
+           offsetmap
+           acc)
       m
       acc
 
- let fold_base f m acc = LBase.fold f m acc
+  let fold_base f m acc = LBase.fold f m acc
 
   let fold_fuse_same f m acc =
     let f' b offs acc =
@@ -266,152 +266,152 @@ struct
     in
     fold_base f' m acc
 
- let add_binding ~exact m (loc:Zone.t) v  =
-   let aux_base_offset base offs m =
-     let validity = Base.validity base in
-     try
-       let offsm = find_or_default base m in
-       match LOffset.add_binding_intervals ~validity ~exact offs v offsm with
-       | `Bottom -> m
-       | `Value new_offsetmap -> LBase.add base new_offsetmap m
-     with Invalid_base -> m
-   in
-   match loc, m with
-   | Zone.Top (Base.SetLattice.Top, _),_|_,Top -> Top
-   | _, Bottom -> Bottom
-   | _, Map m -> Map (Zone.fold_topset_ok aux_base_offset loc m)
+  let add_binding ~exact m (loc:Zone.t) v  =
+    let aux_base_offset base offs m =
+      let validity = Base.validity base in
+      try
+        let offsm = find_or_default base m in
+        match LOffset.add_binding_intervals ~validity ~exact offs v offsm with
+        | `Bottom -> m
+        | `Value new_offsetmap -> LBase.add base new_offsetmap m
+      with Invalid_base -> m
+    in
+    match loc, m with
+    | Zone.Top (Base.SetLattice.Top, _),_|_,Top -> Top
+    | _, Bottom -> Bottom
+    | _, Map m -> Map (Zone.fold_topset_ok aux_base_offset loc m)
 
- let add_binding_loc ~exact m loc v  =
-   let aux_base_offset base offs m =
-     let validity = Base.validity base in
-     try
-       let offsm = find_or_default base m in
-       let new_offsetmap =
-         LOffset.add_binding_ival ~validity ~exact offs ~size:loc.size v offsm
-       in
-       match new_offsetmap with
-       | `Bottom -> m
-       | `Value new_offsetmap -> LBase.add base new_offsetmap m
-     with Invalid_base -> m
-   in
-   match loc.loc, m with
-   | Location_Bits.Top (Base.SetLattice.Top, _),_|_,Top -> Top
-   | _, Bottom -> Bottom
-   | _, Map m ->
-     Map (Location_Bits.fold_topset_ok aux_base_offset loc.loc m)
+  let add_binding_loc ~exact m loc v  =
+    let aux_base_offset base offs m =
+      let validity = Base.validity base in
+      try
+        let offsm = find_or_default base m in
+        let new_offsetmap =
+          LOffset.add_binding_ival ~validity ~exact offs ~size:loc.size v offsm
+        in
+        match new_offsetmap with
+        | `Bottom -> m
+        | `Value new_offsetmap -> LBase.add base new_offsetmap m
+      with Invalid_base -> m
+    in
+    match loc.loc, m with
+    | Location_Bits.Top (Base.SetLattice.Top, _),_|_,Top -> Top
+    | _, Bottom -> Bottom
+    | _, Map m ->
+      Map (Location_Bits.fold_topset_ok aux_base_offset loc.loc m)
 
- let add_base b offsm = function
-   | Bottom | Top as m -> m
-   | Map m -> Map (LBase.add b offsm m)
+  let add_base b offsm = function
+    | Bottom | Top as m -> m
+    | Map m -> Map (LBase.add b offsm m)
 
- let remove_base b = function
-   | Bottom | Top as m -> m
-   | Map m -> Map (LBase.remove b m)
+  let remove_base b = function
+    | Bottom | Top as m -> m
+    | Map m -> Map (LBase.remove b m)
 
- let join_on_map =
-   (* [join t Empty] is [t] if unbound bases are bound to [bottom] by default*)
-   if V.(equal default bottom)
-   then
-     LBase.join
-       ~cache:(Hptmap_sig.PersistentCache "lmap_bitwise.join")
-       ~decide:(fun _ v1 v2 -> LOffset.join v1 v2)
-       ~symmetric:true ~idempotent:true
-   else
-     let decide =
-       let get b = function Some v -> v | None -> default_offsetmap b in
-       fun b v1 v2 -> LOffset.join (get b v1) (get b v2)
-     in
-     LBase.generic_join
-       ~cache:(Hptmap_sig.PersistentCache "lmap_bitwise.join")
-       ~symmetric:true ~idempotent:true ~decide
+  let join_on_map =
+    (* [join t Empty] is [t] if unbound bases are bound to [bottom] by default*)
+    if V.(equal default bottom)
+    then
+      LBase.join
+        ~cache:(Hptmap_sig.PersistentCache "lmap_bitwise.join")
+        ~decide:(fun _ v1 v2 -> LOffset.join v1 v2)
+        ~symmetric:true ~idempotent:true
+    else
+      let decide =
+        let get b = function Some v -> v | None -> default_offsetmap b in
+        fun b v1 v2 -> LOffset.join (get b v1) (get b v2)
+      in
+      LBase.generic_join
+        ~cache:(Hptmap_sig.PersistentCache "lmap_bitwise.join")
+        ~symmetric:true ~idempotent:true ~decide
 
 
- let join m1 m2 =
-   let result = match m1, m2 with
-   | Top, _ | _, Top -> Top
-   | Bottom, m | m, Bottom -> m
-   | Map m1, Map m2 -> Map (join_on_map m1 m2)
-   in
-   (*Format.printf "JoinBitWise: m1=%a@\nm2=%a@\nRESULT=%a@\n"
-     pretty m1
-     pretty m2
-     pretty result;*)
-   result
+  let join m1 m2 =
+    let result = match m1, m2 with
+      | Top, _ | _, Top -> Top
+      | Bottom, m | m, Bottom -> m
+      | Map m1, Map m2 -> Map (join_on_map m1 m2)
+    in
+    (*Format.printf "JoinBitWise: m1=%a@\nm2=%a@\nRESULT=%a@\n"
+      pretty m1
+      pretty m2
+      pretty result;*)
+    result
 
- let map f = function
-   | Top -> Top
-   | Bottom -> Bottom
-   | Map m -> Map (LBase.map (fun m -> LOffset.map f m) m)
+  let map f = function
+    | Top -> Top
+    | Bottom -> Bottom
+    | Map m -> Map (LBase.map (fun m -> LOffset.map f m) m)
 
- let map2 ~cache ~symmetric ~idempotent ~empty_neutral fv f =
-   let aux = LOffset.map2 cache fv f in
-   let decide b om1 om2 = match om1, om2 with
-     | None, None -> assert false (* decide is never called in this case *)
-     | Some m1, None -> aux m1 (default_offsetmap b)
-     | None, Some m2 -> aux (default_offsetmap b) m2
-     | Some m1, Some m2 -> aux m1 m2
-   in
-   if empty_neutral
-   then LBase.join ~symmetric ~idempotent ~cache ~decide:(fun _ m1 m2 -> aux m1 m2)
-   else LBase.generic_join ~symmetric ~idempotent ~cache ~decide
+  let map2 ~cache ~symmetric ~idempotent ~empty_neutral fv f =
+    let aux = LOffset.map2 cache fv f in
+    let decide b om1 om2 = match om1, om2 with
+      | None, None -> assert false (* decide is never called in this case *)
+      | Some m1, None -> aux m1 (default_offsetmap b)
+      | None, Some m2 -> aux (default_offsetmap b) m2
+      | Some m1, Some m2 -> aux m1 m2
+    in
+    if empty_neutral
+    then LBase.join ~symmetric ~idempotent ~cache ~decide:(fun _ m1 m2 -> aux m1 m2)
+    else LBase.generic_join ~symmetric ~idempotent ~cache ~decide
 
- let is_included_map =
-   let name = Format.asprintf "Lmap_bitwise(%s).is_included" V.name in
-   let decide_fst b offs1 = LOffset.is_included offs1 (default_offsetmap b) in
-   let decide_snd b offs2 = LOffset.is_included (default_offsetmap b) offs2 in
-   let decide_both _ offs1 offs2 = LOffset.is_included offs1 offs2 in
-   LBase.binary_predicate (Hptmap_sig.PersistentCache name) LBase.UniversalPredicate
-     ~decide_fast:LBase.decide_fast_inclusion
-     ~decide_fst ~decide_snd ~decide_both
+  let is_included_map =
+    let name = Format.asprintf "Lmap_bitwise(%s).is_included" V.name in
+    let decide_fst b offs1 = LOffset.is_included offs1 (default_offsetmap b) in
+    let decide_snd b offs2 = LOffset.is_included (default_offsetmap b) offs2 in
+    let decide_both _ offs1 offs2 = LOffset.is_included offs1 offs2 in
+    LBase.binary_predicate (Hptmap_sig.PersistentCache name) LBase.UniversalPredicate
+      ~decide_fast:LBase.decide_fast_inclusion
+      ~decide_fst ~decide_snd ~decide_both
 
- let is_included m1 m2 =
-   match m1, m2 with
+  let is_included m1 m2 =
+    match m1, m2 with
     | _, Top -> true
     | Top ,_ -> false
     | Bottom, _ -> true
     | _, Bottom -> false
     | Map m1, Map m2 -> is_included_map m1 m2
 
- let filter_base f m =
-   match m with
-   | Top -> Top
-   | Bottom -> Bottom
-   | Map m ->
-       let result =
-         LBase.fold (fun k v acc -> if f k then LBase.add k v acc else acc)
-           m
-           LBase.empty
-       in
-       Map result
+  let filter_base f m =
+    match m with
+    | Top -> Top
+    | Bottom -> Bottom
+    | Map m ->
+      let result =
+        LBase.fold (fun k v acc -> if f k then LBase.add k v acc else acc)
+          m
+          LBase.empty
+      in
+      Map result
 
- let find m loc =
-   match loc, m with
-     | Zone.Top _, _ | _, Top -> V.top
-     | _, Bottom -> V.bottom
-     | Zone.Map _, Map m ->
-         let treat_offset base itvs acc =
-           let validity = Base.validity base in
-           if validity = Base.Invalid then acc
-           else
-             let offsetmap = find_or_default base m in
-             let v = LOffset.find_iset ~validity itvs offsetmap in
-             V.join acc v
-         in
-         Zone.fold_i treat_offset loc V.bottom
+  let find m loc =
+    match loc, m with
+    | Zone.Top _, _ | _, Top -> V.top
+    | _, Bottom -> V.bottom
+    | Zone.Map _, Map m ->
+      let treat_offset base itvs acc =
+        let validity = Base.validity base in
+        if validity = Base.Invalid then acc
+        else
+          let offsetmap = find_or_default base m in
+          let v = LOffset.find_iset ~validity itvs offsetmap in
+          V.join acc v
+      in
+      Zone.fold_i treat_offset loc V.bottom
 
- let fold_join_zone ~both ~conv ~empty_map ~join ~empty =
-   let cache = Hptmap_sig.PersistentCache "Lmap_bitwise.fold_on_zone" in
-   let empty_left _ = empty (* zone over which to fold is empty *) in
-   let empty_right z = empty_map z in
-   let both b itvs map_b = conv b (both itvs map_b) in
-   let fmap =
-     Zone.fold2_join_heterogeneous
-       ~cache ~empty_left ~empty_right ~both ~join ~empty
-   in
-   fun z m -> fmap z (LBase.shape m)
+  let fold_join_zone ~both ~conv ~empty_map ~join ~empty =
+    let cache = Hptmap_sig.PersistentCache "Lmap_bitwise.fold_on_zone" in
+    let empty_left _ = empty (* zone over which to fold is empty *) in
+    let empty_right z = empty_map z in
+    let both b itvs map_b = conv b (both itvs map_b) in
+    let fmap =
+      Zone.fold2_join_heterogeneous
+        ~cache ~empty_left ~empty_right ~both ~join ~empty
+    in
+    fun z m -> fmap z (LBase.shape m)
 
 
- let shape = LBase.shape
+  let shape = LBase.shape
 
 end
 

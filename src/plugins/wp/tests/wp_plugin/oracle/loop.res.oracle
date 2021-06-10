@@ -1,7 +1,6 @@
 # frama-c -wp [...]
 [kernel] Parsing tests/wp_plugin/loop.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function init
@@ -18,7 +17,9 @@ Assume {
   (* Goal *)
   When: (i_1 <= b) /\ (a <= i_1) /\ is_sint32(i_1).
   (* Pre-condition *)
-  Have: (a <= b) /\ valid_rw(Malloc_0, a_1, 1 + b - a).
+  Have: valid_rw(Malloc_0, a_1, 1 + b - a).
+  (* Pre-condition *)
+  Have: a <= b.
   (* Invariant 'qed_ok' *)
   Have: forall i_2 : Z. ((a <= i_2) -> ((i_2 < i) ->
       (a_2[shift_sint32(t, i_2)] = e))).
@@ -40,7 +41,9 @@ Assume {
   (* Heap *)
   Type: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
-  Have: (a <= b) /\ valid_rw(Malloc_0, a_1, 1 + b - a).
+  Have: valid_rw(Malloc_0, a_1, 1 + b - a).
+  (* Pre-condition *)
+  Have: a <= b.
   (* Invariant 'qed_ok' *)
   Have: forall i_1 : Z. ((a <= i_1) -> ((i_1 < i) ->
       (havoc(Mint_undef_0, Mint_0, a_1, i - a)[shift_sint32(t, i_1)] = e))).
@@ -59,7 +62,9 @@ Assume {
   (* Heap *)
   Type: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
-  Have: (a <= b) /\ valid_rw(Malloc_0, shift_sint32(t, a), 1 + b - a).
+  Have: valid_rw(Malloc_0, shift_sint32(t, a), 1 + b - a).
+  (* Pre-condition *)
+  Have: a <= b.
 }
 Prove: a <= (1 + b).
 
@@ -76,7 +81,9 @@ Assume {
   (* Goal *)
   When: (a <= i_1) /\ (i_1 <= i) /\ is_sint32(i_1).
   (* Pre-condition *)
-  Have: (a <= b) /\ valid_rw(Malloc_0, a_1, 1 + b - a).
+  Have: valid_rw(Malloc_0, a_1, 1 + b - a).
+  (* Pre-condition *)
+  Have: a <= b.
   (* Invariant 'qed_ok' *)
   Have: forall i_2 : Z. ((a <= i_2) -> ((i_2 < i) ->
       (a_2[shift_sint32(t, i_2)] = e))).
@@ -117,7 +124,9 @@ Assume {
   (* Goal *)
   When: !invalid(Malloc_0, a_2, 1).
   (* Pre-condition *)
-  Have: (a <= b) /\ valid_rw(Malloc_0, a_1, 1 + b - a).
+  Have: valid_rw(Malloc_0, a_1, 1 + b - a).
+  (* Pre-condition *)
+  Have: a <= b.
   (* Invariant 'qed_ok' *)
   Have: forall i_1 : Z. ((a <= i_1) -> ((i_1 < i) ->
       (havoc(Mint_undef_0, Mint_0, a_1, i - a)[shift_sint32(t, i_1)] = e))).
@@ -141,7 +150,9 @@ Assume {
   (* Heap *)
   Type: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
-  Have: (a <= b) /\ valid_rw(Malloc_0, a_1, 1 + b - a).
+  Have: valid_rw(Malloc_0, a_1, 1 + b - a).
+  (* Pre-condition *)
+  Have: a <= b.
 }
 Prove: i <= (1 + b).
 

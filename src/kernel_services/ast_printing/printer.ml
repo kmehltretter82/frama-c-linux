@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -122,7 +122,7 @@ class printer_with_annot () = object (self)
   method! private stmt_has_annot s = Annotations.has_code_annot s
 
   method! private has_annot =
-    Extlib.may_map self#stmt_has_annot ~dft:false self#current_stmt
+    Option.fold ~some:self#stmt_has_annot ~none:false self#current_stmt
 
   method! private inline_block ctxt blk =
     super#inline_block ctxt blk
@@ -143,7 +143,7 @@ class printer_with_annot () = object (self)
        then begin
          declared_globs <- Cil_datatype.Varinfo.Set.add vi declared_globs;
          (* pretty prints the spec, but not for built-ins*)
-         if not (Cil.Builtin_functions.mem vi.vname) then
+         if not (Cil_builtins.Builtin_functions.mem vi.vname) then
            self#pretty_funspec fmt kf
        end
      with Not_found ->
@@ -157,7 +157,12 @@ class printer_with_annot () = object (self)
       let comments = Globals.get_comments_global glob in
       Pretty_utils.pp_list
         ~sep:"@\n" ~suf:"@\n"
-        (fun fmt s -> Format.fprintf fmt "/* %s */" s) fmt comments
+        (fun fmt s ->
+           if String.contains s '\n' || String.contains s '\r' then
+             Format.fprintf fmt "/*%s*/" s
+           else
+             Format.fprintf fmt "//%s" s
+        ) fmt comments
     end;
     (* Out of tree global annotations are pretty printed before the first
        variable declaration of the first function definition. *)
@@ -200,8 +205,12 @@ class printer_with_annot () = object (self)
       let comments = Globals.get_comments_stmt s in
       if comments <> [] then
         Pretty_utils.pp_list ~sep:"@\n" ~suf:"@]@\n"
-          (fun fmt s -> Format.fprintf fmt "@[/* %s */@]" s)
-          fmt comments
+          (fun fmt s ->
+             if String.contains s '\n' || String.contains s '\r' then
+               Format.fprintf fmt "@[/*%s*/@]" s
+             else
+               Format.fprintf fmt "@[//%s@]" s
+          ) fmt comments
     end;
     if verbose || Kernel.is_debug_key_enabled Kernel.dkey_print_sid then
       Format.fprintf fmt "@[/* sid:%d */@]@\n" s.sid ;
@@ -272,6 +281,7 @@ let () = Cil_datatype.Term_lval.pretty_ref := pp_term_lval
 let () = Cil_datatype.Term_offset.pretty_ref := pp_term_offset
 let () = Cil_datatype.Code_annotation.pretty_ref := pp_code_annotation
 let () = Cil_datatype.Funspec.pretty_ref := pp_funspec
+let () = Cil_datatype.Funbehavior.pretty_ref := pp_behavior
 
 let () = Cil_datatype.Label.pretty_ref := pp_label
 let () = Cil_datatype.Compinfo.pretty_ref := pp_compinfo
@@ -288,6 +298,7 @@ let () = Cil_datatype.Logic_label.pretty_ref := pp_logic_label
 let () = Cil_datatype.Global_annotation.pretty_ref := pp_global_annotation
 let () = Cil_datatype.Global.pretty_ref := pp_global
 let () = Cil_datatype.Predicate.pretty_ref := pp_predicate
+let () = Cil_datatype.Toplevel_predicate.pretty_ref := pp_toplevel_predicate
 let () = Cil_datatype.Identified_predicate.pretty_ref := pp_identified_predicate
 let () = Cil_datatype.Fundec.pretty_ref := pp_fundec
 

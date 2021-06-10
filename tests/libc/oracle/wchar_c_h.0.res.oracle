@@ -185,6 +185,33 @@
   function wmemchr: precondition 'initialization' got status valid.
 [eva] tests/libc/wchar_c_h.c:70: 
   function wmemchr: precondition 'danglingness' got status valid.
+[eva] computing for function wcsdup <- main.
+  Called from tests/libc/wchar_c_h.c:73.
+[eva] share/libc/wchar.c:98: Call to builtin wcslen
+[eva] share/libc/wchar.c:98: 
+  function wcslen: precondition 'valid_string_s' got status valid.
+[eva] share/libc/wchar.c:99: Call to builtin malloc
+[eva] share/libc/wchar.c:99: allocating variable __malloc_wcsdup_l99
+[eva] computing for function wmemcpy <- wcsdup <- main.
+  Called from share/libc/wchar.c:104.
+[eva] Recording results for wmemcpy
+[eva] Done for function wmemcpy
+[eva] Recording results for wcsdup
+[eva] Done for function wcsdup
+[eva] computing for function wcsdup <- main.
+  Called from tests/libc/wchar_c_h.c:75.
+[eva] share/libc/wchar.c:98: Call to builtin wcslen
+[eva] share/libc/wchar.c:99: Call to builtin malloc
+[eva] share/libc/wchar.c:99: allocating variable __malloc_wcsdup_l99_0
+[eva] computing for function wmemcpy <- wcsdup <- main.
+  Called from share/libc/wchar.c:104.
+[eva] Recording results for wmemcpy
+[eva] Done for function wmemcpy
+[eva] Recording results for wcsdup
+[eva] Done for function wcsdup
+[eva] tests/libc/wchar_c_h.c:76: Call to builtin free
+[eva] tests/libc/wchar_c_h.c:76: 
+  function free: precondition 'freeable' got status valid.
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -234,16 +261,38 @@
      [4] ∈ {116}
      [5..19] ∈ UNINITIALIZED
 [eva:final-states] Values at end of function wmemcpy:
-  buf[0] ∈ {72}
-     [1] ∈ {97}
-     [2] ∈ {121}
-     [3] ∈ {115}
-     [4] ∈ {116}
-     [5..19] ∈ UNINITIALIZED
+  buf[0..4] ∈ [--..--]
+     [5] ∈ {0} or UNINITIALIZED
+     [6..19] ∈ UNINITIALIZED
+  __malloc_wcsdup_l99[0] ∈ {65}
+                     [1] ∈ {66}
+                     [2] ∈ {67}
+                     [3] ∈ {0}
+  __malloc_wcsdup_l99_0[0] ∈ {65}
+                       [1] ∈ {66}
+                       [2] ∈ {67}
+                       [3] ∈ {0}
+[eva:final-states] Values at end of function wcsdup:
+  __fc_errno ∈ [--..--]
+  __fc_heap_status ∈ [--..--]
+  l ∈ {4}
+  p ∈ {{ NULL ; &__malloc_wcsdup_l99[0] ; &__malloc_wcsdup_l99_0[0] }}
+  __retres ∈
+          {{ NULL ; &__malloc_wcsdup_l99[0] ; &__malloc_wcsdup_l99_0[0] }}
+  __malloc_wcsdup_l99[0] ∈ {65}
+                     [1] ∈ {66}
+                     [2] ∈ {67}
+                     [3] ∈ {0}
+  __malloc_wcsdup_l99_0[0] ∈ {65}
+                       [1] ∈ {66}
+                       [2] ∈ {67}
+                       [3] ∈ {0}
 [eva:final-states] Values at end of function wmemset:
   buf[0..4] ∈ [--..--]
      [5..19] ∈ UNINITIALIZED
 [eva:final-states] Values at end of function main:
+  __fc_errno ∈ [--..--]
+  __fc_heap_status ∈ [--..--]
   sc1 ∈ {{ L"Needle" }}
   sc2 ∈ {{ L"Haystack" }}
   buf[0..4] ∈ [--..--] or UNINITIALIZED
@@ -267,4 +316,13 @@
   wcr ∈ {{ L"ABC" + {8} }}
   wmr1 ∈ {0}
   wmr2 ∈ {{ L"ABC" + {8} }}
+  dupbuf ∈ {{ NULL ; &__malloc_wcsdup_l99_0[0] }} or ESCAPINGADDR
   __retres ∈ {0}
+  __malloc_wcsdup_l99[0] ∈ {65}
+                     [1] ∈ {66}
+                     [2] ∈ {67}
+                     [3] ∈ {0}
+  __malloc_wcsdup_l99_0[0] ∈ {65}
+                       [1] ∈ {66}
+                       [2] ∈ {67}
+                       [3] ∈ {0}

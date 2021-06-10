@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -27,8 +27,23 @@ open Cil_types
 
 (* TODO: These types are already defined in Value_util. *)
 type call_site = kernel_function * kinstr
+(** Value call-site.
+    A callsite [(f,p)] represents a call at function [f] invoked
+    {i from} program point [p].
+*)
+
 type callstack = call_site list
-(** Value callstacks, as used e.g. in Db.Value hooks *)
+(** Value callstacks, as used e.g. in Db.Value hooks.
+
+    The head call site [(f,p)] is the most recent one,
+    where current function [f] has been called from program point [p].
+
+    Therefore, the tail call site is expected to be [(main,Kglobal)]
+    where [main] is the global entry point.
+
+    Moreover, given two consecutive call-sites […(_,p);(g,_)…] in a callstack,
+    program point [p] is then expected to live in function [g].
+*)
 
 module Callsite: Datatype.S_with_collections with type t = call_site
 module Callstack: sig
@@ -48,37 +63,10 @@ type 'a callback_result =
   | NormalStore of 'a * int
   | Reuse of int
 
-type cacheable =
-  | Cacheable (** Functions whose result can be safely cached *)
-  | NoCache (** Functions whose result should not be cached, but for
-                which the caller can still be cached. Typically, functions
-                printing something during the analysis. *)
-  | NoCacheCallers (** Functions for which neither the call, neither the
-                       callers, can be cached *)
-
-
-(** Results of a a call to a function *)
-type call_result = {
-  c_values: (** Memory states after the call *)
-    (Cvalue.V_Offsetmap.t option
-       (** the value returned (ie. what is after the 'return' C keyword). *)
-     * Cvalue.Model.t
-       (** the memory state after the function has been executed *))
-    list;
-
-  c_clobbered: Base.SetLattice.t
-    (** An over-approximation of the bases in which addresses of local
-        variables might have been written *);
-
-  c_cacheable: cacheable
-    (** Is it possible to cache the result of this call? *);
-
-  c_from: (Function_Froms.froms * Locations.Zone.t) option
-    (** If not None, the froms of the function, and its sure outputs;
-        i.e. the dependencies of the result, and the dependencies
-        of each zone written to. *)
-}
-
+type call_froms = (Function_Froms.froms * Locations.Zone.t) option
+(** If not None, the froms of the function, and its sure outputs;
+    i.e. the dependencies of the result, and the dependencies
+    of each zone written to. *)
 
 (** Dependencies for the evaluation of a term or a predicate: for each
     program point involved, sets of zones that must be read *)
@@ -89,4 +77,3 @@ Local Variables:
 compile-command: "make -C ../../.."
 End:
 *)
-

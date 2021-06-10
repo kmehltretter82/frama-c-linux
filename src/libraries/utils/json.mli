@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -125,3 +125,68 @@ val field : string -> t -> t
     [Null] is considered an empty object.
     @raise Not_found if the field is absent from the object.
     @raise Invalid_argument if the object is not an [Assoc] or [Null] object. *)
+
+(** The functions below read and write to JSON files asynchronously; they are
+    intended to be called at different times during execution.
+    To avoid reopening, re-reading and rewriting the same file several times,
+    they instead operate as following:
+    - Read the file on first use, and store it in memory;
+    - Perform merge operations using the in-memory representations;
+    - Flush the final form to disk before quitting Frama-C.
+      The latter is done via function [json_flush_cache] below, which is setup
+      to run with an [at_exit] trigger.
+
+    Note: no other functions should modify the contents of [path]; any
+    modifications will be overwritten when the cache is flushed.
+
+    @since 23.0-Vanadium
+*)
+
+(** Exception raised by the functions below when incompatible types are
+    merged. *)
+exception CannotMerge of string
+
+(**
+   [merge_object path json_obj] recursively merges the object [json_obj] into the
+   JSON file [path]. If [path] does not exist, it is created.
+   Merge consists in combining values with the same key, e.g. if [path]
+   already contains an object [{"kernel": {"options": ["a"]}}], and
+   [json_obj] is [{"kernel": {"options": ["b"]}}], the result will be
+   [{"kernel": {"options": ["a", "b"]}}]. Cannot merge heterogeneous
+   objects, i.e. in the previous example, if "options" were associated
+   with a string in [path], trying to merge an array into it would
+   raise [CannotMerge].
+   The merged object is updated in the memory cache.
+
+   @raise CannotMerge if the objects have conflicting types for
+   the same keys, or if the root JSON element is not an object.
+   @since 23.0-Vanadium
+*)
+val merge_object : Filepath.Normalized.t -> Yojson.Basic.t -> unit
+
+(**
+   [merge_list path json_array] merges the array [json_array] into the
+   JSON file [path]. See [merge_object] for more details.
+   Unlike objects, arrays are merged by simply concatenating their list
+   of elements.
+
+   @raise CannotMerge if the root JSON element is not an array.
+   @since 23.0-Vanadium
+*)
+val merge_array : Filepath.Normalized.t -> Yojson.Basic.t -> unit
+
+(**
+   [from_file path] opens [path] and stores its JSON object in
+   a memory cache, to be used by the other related functions.
+   @raise Yojson.Json_error if [path] is a malformed JSON file.
+   @since 23.0-Vanadium
+*)
+val from_file: Filepath.Normalized.t -> Yojson.Basic.t
+
+(**
+   Flushes the JSON objects in the cache. Returns the names of the written
+   files.
+
+   @since 23.0-Vanadium
+*)
+val flush_cache : unit -> Filepath.Normalized.t list

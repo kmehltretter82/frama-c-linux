@@ -4,7 +4,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2020                                               #
+#  Copyright (C) 2007-2021                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -26,28 +26,46 @@
 # GNUmakefile template): it parses the output and suggests useful commands
 # whenever it can, by calling frama-c-script itself.
 
-import subprocess
-import sys
+import argparse
 import os
 import re
+import subprocess
+import sys
 from functools import partial
+import tempfile
 
-if len(sys.argv) < 3:
-   print("usage: %s path-to-frama-c-script target" % sys.argv[0])
-   print("       Builds the specified target, parsing the output to")
-   print("       identify and recommend actions in case of failure.")
-   print("       The first argument must be the path to the frama-c-script")
-   print("       binary.")
-   sys.exit(1)
+MIN_PYTHON = (3, 6) # for automatic Path conversions
+if sys.version_info < MIN_PYTHON:
+    sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)
 
-framac_script = sys.argv[1]
-target = sys.argv[2]
-args = sys.argv[3:]
+parser = argparse.ArgumentParser(description="""
+Builds the specified target, parsing the output to identify and recommend
+actions in case of failure.""")
+parser.add_argument('--make-dir', metavar='DIR', default=".frama-c",
+                    help='directory containing the makefile (default: .frama-c)')
 
-out = subprocess.Popen(['make', target] + args,
-                       stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+(make_dir_arg, args) = parser.parse_known_args()
+make_dir = vars(make_dir_arg)["make_dir"]
+args = args[1:]
 
-output = out.communicate()[0].decode('utf-8')
+framac_bin = os.getenv('FRAMAC_BIN')
+if not framac_bin:
+   sys.exit("error: FRAMAC_BIN not in environment (set by frama-c-script)")
+framac_script = f"{framac_bin}/frama-c-script"
+
+output_lines = []
+cmd_list = ['make', "-C", make_dir] + args
+with subprocess.Popen(cmd_list,
+                      stdout=subprocess.PIPE,
+                      stderr=subprocess.PIPE) as proc:
+  while True:
+    line = proc.stdout.readline()
+    if line:
+       sys.stdout.buffer.write(line)
+       sys.stdout.flush()
+       output_lines.append(line.decode('utf-8'))
+    else:
+       break
 
 re_missing_spec = re.compile("Neither code nor specification for function ([^,]+),")
 re_recursive_call_start = re.compile("detected recursive call")
@@ -55,14 +73,13 @@ re_recursive_call_end = re.compile("Use -eva-ignore-recursive-calls to ignore")
 
 tips = []
 
-lines = iter(output.splitlines())
+lines = iter(output_lines)
 for line in lines:
-    print(line)
     match = re_missing_spec.search(line)
     if match:
        fname = match.group(1)
        def action(fname):
-           out = subprocess.Popen([framac_script, "find-fun", fname],
+           out = subprocess.Popen([framac_script, "find-fun", "-C", make_dir, fname],
                                   stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
            output = out.communicate()[0].decode('utf-8')
            re_possible_definers = re.compile("Possible definitions for function")

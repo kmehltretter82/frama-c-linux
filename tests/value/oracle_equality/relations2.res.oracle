@@ -1,0 +1,6 @@
+59c59
+<   n ∈ [0..512]
+---
+>   n ∈ [1..512]
+133d132
+< [eva] tests/value/relations2.i:57: Frama_C_show_each_NO2:

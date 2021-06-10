@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -53,9 +53,12 @@ let () =
     signature
     begin fun rq () ->
       set_version rq Fc_config.version ;
-      set_datadir rq Fc_config.datadir ;
-      set_libdir rq Fc_config.libdir ;
-      set_pluginpath rq Fc_config.plugin_dir ;
+      set_datadir rq (Fc_config.datadir :> string) ;
+      set_libdir rq (Fc_config.libdir :> string) ;
+      let pluginpath =
+        Filepath.Normalized.to_string_list Fc_config.plugin_dir
+      in
+      set_pluginpath rq pluginpath ;
     end
 
 (* -------------------------------------------------------------------------- *)
@@ -90,10 +93,15 @@ struct
 
   let to_json p =
     let path = Filepath.(Normalized.to_pretty_string p.pos_path) in
+    let file =
+      if Server_parameters.has_relative_filepath ()
+      then path
+      else (p.Filepath.pos_path :> string)
+    in
     `Assoc [
       "dir"  , `String (Filename.dirname path) ;
       "base" , `String (Filename.basename path) ;
-      "file" , `String (p.Filepath.pos_path :> string) ;
+      "file" , `String file ;
       "line" , `Int p.Filepath.pos_lnum ;
     ]
 

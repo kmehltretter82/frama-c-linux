@@ -3,8 +3,8 @@
  */
 
 /* run.config_qualif
-   OPT: -wp-smoke-tests
-   OPT: -wp-smoke-tests -wp-split
+   OPT: -wp-smoke-tests -wp-steps 100
+   OPT: -wp-smoke-tests -wp-steps 100 -wp-split
 */
 
 //@ assigns \nothing ;

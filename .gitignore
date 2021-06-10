@@ -34,6 +34,7 @@ autom4te.cache
 /config.log
 /config.status
 /frama-c-*.tar.gz
+/distributed
 /.log.autoconf
 /.Makefile.user
 /ocamlgraph/
@@ -52,6 +53,7 @@ autom4te.cache
 /tests/crowbar/mutable
 /tests/crowbar/output-*
 /tests/crowbar/test_ghost_cfg
+/tests/fc_script/compile_commands.json
 /tests/journal/intra.byte
 /tests/misc/my_visitor_plugin/my_visitor.opt
 /tests/misc/my_visitor.sav
@@ -98,8 +100,10 @@ autom4te.cache
 /doc/aorai/frama-c-aorai-example.tgz
 /doc/aorai/frama-c-aorai-example
 /doc/aorai/main.pdf
+/doc/aorai/ya_file.tex
 /doc/aorai/basic_ya.tex
 /doc/aorai/extended_ya.tex
+/doc/aorai/ya_variables.tex
 
 /doc/code/print_api/*.html
 /doc/code/print_api/*.dot
@@ -113,6 +117,11 @@ autom4te.cache
 /doc/code/studia
 /doc/code/qed
 /doc/code/wp
+
+/doc/developer/tutorial/viewcfg/src/META.frama-c-viewcfg
+/doc/developer/tutorial/viewcfg/src/Makefile
+/doc/developer/tutorial/viewcfg/src/gui/
+/doc/developer/tutorial/viewcfg/src/top/
 
 /doc/doxygen
 
@@ -190,7 +199,6 @@ Makefile.plugin.generated
 /src/libraries/utils/json.ml
 /src/kernel_internals/runtime/toplevel_boot.ml
 /src/kernel_internals/runtime/fc_config.ml
-/src/kernel_internals/runtime/frama_c_config.ml
 /src/kernel_internals/parsing/logic_lexer.ml
 /src/kernel_internals/parsing/logic_parser.ml
 /src/kernel_internals/parsing/logic_parser.mli
@@ -199,14 +207,15 @@ Makefile.plugin.generated
 /src/kernel_internals/parsing/cparser.ml
 /src/kernel_internals/parsing/cparser.mli
 /src/libraries/stdlib/transitioning.ml
-/src/plugins/gui/dgraph.ml
-/src/plugins/gui/dgraph.mli
+/src/plugins/callgraph/cg_viewer.ml
+/src/plugins/gui/debug_manager.ml
 /src/plugins/gui/dgraph_helper.ml
 /src/plugins/gui/GSourceView.ml
 /src/plugins/gui/GSourceView.mli
 /src/plugins/gui/GSourceView2.ml
 /src/plugins/gui/GSourceView2.mli
 /src/plugins/gui/gtk_compat.ml
+/src/plugins/markdown-report/META
 
 # generated tar.gz files
 

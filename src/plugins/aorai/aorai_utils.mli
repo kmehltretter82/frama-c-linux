@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Aorai plug-in of Frama-C.                        *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -32,12 +32,12 @@ open Promelaast
 *)
 
 val isCrossable:
-  (typed_condition * action) trans -> kernel_function -> funcStatus -> bool
+  typed_trans -> kernel_function -> funcStatus -> bool
 
 (** Given a transition and the main entry point it returns if
     the cross condition can be satisfied at the beginning of the program. *)
 val isCrossableAtInit:
-  (typed_condition * action) trans -> kernel_function -> bool
+  typed_trans -> kernel_function -> bool
 
 (** This function rewrites a cross condition into an ACSL expression.
     Moreover, by giving current operation name and its status (call or
@@ -70,9 +70,6 @@ val host_state_term: unit -> Cil_types.term_lval
 (** Returns the predicate saying that automaton is in
     corresponding state. *)
 val is_state_pred: state -> predicate
-
-(** Returns the statement saying the state is affected *)
-val is_state_stmt: state * Cil_types.varinfo -> location -> Cil_types.stmt
 
 (** Returns the boolean expression saying the state is affected *)
 val is_state_exp: state -> location -> Cil_types.exp
@@ -126,16 +123,24 @@ val auto_func_behaviors:
   Cil_types.location -> kernel_function -> Promelaast.funcStatus ->
   Data_for_aorai.state -> Cil_types.funbehavior list
 
-(** [auto_func_block loc f status st res]
+(** [auto_func_block current_kf loc f status st res]
     generates the body of pre & post functions.
-    res must be [None] for a pre-function and [Some v] for a post-func where
-    [v] is the formal corresponding to the value returned by the original
-    function. If the original function returns [Void], [res] must be [None].
-    It also returns the local variables list declared in the body. *)
+    - [current_kf] is the auxiliary function currently being defined.
+    - [res] must be [None] for a pre-function and [Some v] for a post-func where
+      [v] is the formal corresponding to the value returned by the original
+      function. If the original function returns [Void], [res] must be [None].
+
+    @returns [funcs, block, locals], where
+    - funcs is the set of auxiliary functions that are used to determine
+      whether a particular behavior of original callee is taken
+    - block is the sequence of instructions that perform the transition
+    - locals is the list of local variables.
+*)
 val auto_func_block:
+  Kernel_function.t ->
   Cil_types.location -> kernel_function -> Promelaast.funcStatus ->
   Data_for_aorai.state -> Cil_types.varinfo option ->
-  Cil_types.block * Cil_types.varinfo list
+  Cil_datatype.Varinfo.Set.t * Cil_types.block * Cil_types.varinfo list
 
 val get_preds_pre_wrt_params :  kernel_function -> predicate
 

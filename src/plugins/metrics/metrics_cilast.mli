@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -31,9 +31,10 @@ class type sloc_visitor = object
   inherit Visitor.generic_frama_c_visitor
 
   (* Get the number of times a function has been called if it has been
-     defined (fundef) or not (fundecl).
+     defined (fundef), specified (funspec), or just declared (fundecl).
   *)
   method fundecl_calls: int Metrics_base.VInfoMap.t
+  method funspec_calls: int Metrics_base.VInfoMap.t
   method fundef_calls: int Metrics_base.VInfoMap.t
   method extern_global_vars: Metrics_base.VInfoSet.t
 
@@ -54,7 +55,7 @@ class type sloc_visitor = object
   method get_metrics_map:
     (Metrics_base.BasicMetrics.t Metrics_base.OptionKf.Map.t)
       Datatype.Filepath.Map.t
-  (** Compute and return per-function metrics *)
+      (** Compute and return per-function metrics *)
 end
 
 class slocVisitor : libc:bool -> sloc_visitor ;;
@@ -64,6 +65,7 @@ val get_global_metrics : libc:bool -> Metrics_base.BasicMetrics.t ;;
 
 type cilast_metrics = {
   fundecl_calls: int Metrics_base.VInfoMap.t;
+  funspec_calls: int Metrics_base.VInfoMap.t;
   fundef_calls: int Metrics_base.VInfoMap.t;
   extern_global_vars: Metrics_base.VInfoSet.t;
   basic_global_metrics: Metrics_base.BasicMetrics.t
@@ -91,11 +93,11 @@ val compute_locals_size: Kernel_function.t -> unit;;
     Returns [None] if there is no entry point. *)
 val reachable_from_main: unit -> Cil_types.varinfo list option;;
 
-(** Computes the set of files defining all global variables syntactically 
+(** Computes the set of files defining all global variables syntactically
     reachable from the entry point of the program
     (as given by [reachable_from_main]).
     This function requires a defined entry point.
- *)
+*)
 val used_files: unit -> Datatype.Filepath.Set.t
 
 (** Pretty-prints the result of [used_files] in a verbose way. *)

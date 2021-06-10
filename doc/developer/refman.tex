@@ -185,10 +185,10 @@ generation/.style={-Latex,very thick,dashed,fill=none},
     \node[on chain,opt,draw=black] (user) {.Makefile.user};
   }
   {[start chain=specific going right,node distance=\bigpaddelta]
-    \node[on chain,plugin,draw=black,anchor=north east,yshift=-\largepadding]
-    at (opt-begin.south east) { specific Makefile for plug-in 1 };
+    \node[on chain,plugin,draw=black,anchor=north east,xshift=-\largepadding,yshift=-\largepadding]
+    at (opt-begin.south east) {Makefile for plug-in 1 };
     \node[on chain] {\ldots};
-    \node[on chain,plugin,draw=black] {specific Makefile for plugin $n$};
+    \node[on chain,plugin,draw=black] {Makefile for plugin $n$};
   }
 \end{scope}
 \matrix[anchor=north east,yshift=-\bigpadding,matrix of nodes,
@@ -225,7 +225,7 @@ Makefile $m_1$ is included in Makefile $m_2$
 \draw[plugin,include,bend right] (generated.north west) to (makefile.north east);
 \draw[generated,generation] (template) -- (generated);
 \draw[kernel,include] (generated) -- (dynamic);
-\draw[plugin,include] (dynamic) -- (node cs:name=specific-begin,angle=10);
+\draw[plugin,include,bend left] (dynamic) to (node cs:name=specific-begin,angle=10);
 \draw[plugin,include] (dynamic) -- (specific-end);
 \draw[opt,include] (user) -- (makefile);
 \draw[opt,include] (clean) -- (makefile);
@@ -842,7 +842,7 @@ to your needs. See \texttt{ocamlmerlin -help} for the list of flags.
 Ptests pre-defines a certain number of macros for each test about to be run.
 Figure~\ref{fig:ptests-macros} gives their definition.
 \begin{figure}[htbp]
-\begin{tabular}{|p{3cm}|p{10cm}|}
+\begin{tabular}{|p{4.5cm}|p{10cm}|}
 \hline
 Name & Expansion \\
 \hline
@@ -863,6 +863,31 @@ name of the current alternative configuration
 \verb|PTEST_NUMBER| & rank of current test in the test file. There are in
 fact two independent numbering schemes: one for \verb|EXECNOW| commands and
 one for regular tests (if more than one \verb|OPT|).\\
+\hline
+\verb|PTEST_RESULT| & shorthand alias to \verb|@PTEST_DIR@/result@PTEST_CONFIG@|
+(the result directory dedicated to the tested configuration)\\
+\hline
+\verb|PTEST_ORACLE| & basename of the current oracle file (macro only usable in FILTER directives)\\
+\hline
+\verb|PTEST_MODULE| & current list of module defined by the \verb|MODULE| directive\\
+\hline
+\verb|PTEST_PLUGIN| & current list of plugins defined by the \verb|PLUGIN| directive\\
+\hline
+\verb|PTEST_DEFAULT_OPTIONS| & the default option list: \verb|-journal-disable| \verb|-check| \verb|-no-autoload-plugins|\\
+\hline
+\verb|PTEST_LOAD_MODULE| & the \verb|-load-module| option related to the \verb|MODULE| directive\\
+\hline
+\verb|PTEST_LOAD_PLUGIN| & the \verb|-load-module| option related to the \verb|PLUGIN| directive\\
+\hline
+\verb|PTEST_LOAD_OPTIONS| & shorthand alias to \spverb|@PTEST_LOAD_PLUGIN@ @PTEST_LOAD_MODULE@|\\
+\hline
+\verb|PTEST_OPTIONS| & the current list of options related to \verb|OPT| and \verb|STDOPT| directives (for \verb|CMD| directives)\\
+\hline
+\verb|frama-c| & shortcut defined as follows: \spverb|@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@ @PTEST_LOAD_OPTIONS@|\\
+\hline
+\verb|frama-c-cmd| & shortcut defined as follows: \spverb|@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@|\\
+\hline
+\verb|frama-c-exe| & set to the value of the \verb|TOPLEVEL_PATH| variable from \verb|./tests/ptests_config| file\\
 \hline
 \end{tabular}
 \caption{Predefined macros for ptests}\label{fig:ptests-macros}

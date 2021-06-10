@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -356,7 +356,7 @@ let reset_perf () =
 (* --- Flamegraphs                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-(* Set to [Some _] if option [-val-dump-flamegraph] is set and [main] is
+(* Set to [Some _] if option [-eva-flamegraph] is set and [main] is
    currently being analyzed and the file is ok. Otherwise, set to [None]. *)
 let oc_flamegraph = ref None
 
@@ -395,11 +395,11 @@ let start_doing_flamegraph callstack =
   | [] -> assert false
   | [_] ->
     (* Analysis of main *)
-    let file = Value_parameters.ValPerfFlamegraphs.get () in
-    if file <> "" then begin
+    if not (Value_parameters.ValPerfFlamegraphs.is_empty ()) then begin
+      let file = Value_parameters.ValPerfFlamegraphs.get () in
       try
         (* Flamegraphs must be computed. Set up the stack and the output file *)
-        let oc = open_out file in
+        let oc = open_out (file:>string) in
         oc_flamegraph := Some oc;
         stack_flamegraph := [ (Sys.time (), 0.) ]
       with e ->
@@ -442,7 +442,7 @@ let stop_doing_flamegraph callstack =
 let reset_flamegraph () =
   match !oc_flamegraph with
   | None -> ()
-  | Some fd -> close_out fd; stack_flamegraph := []
+  | Some fd -> close_out fd; stack_flamegraph := []; oc_flamegraph := None
 
 
 (* -------------------------------------------------------------------------- *)

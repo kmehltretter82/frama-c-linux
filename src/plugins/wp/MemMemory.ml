@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -47,8 +47,14 @@ let f_shift  = Lang.extern_f ~library ~result:t_addr "shift"
 let f_global = Lang.extern_f ~library ~result:t_addr ~category:L.Injection "global"
 let f_null   = Lang.extern_f ~library ~result:t_addr "null"
 
-let f_base_offset = Lang.extern_f ~library
-    ~category:Qed.Logic.Injection ~result:L.Int "base_offset"
+let a_table = Lang.datatype ~library "table"
+let t_table = L.Data(a_table,[])
+
+let f_table_of_base = Lang.extern_f ~library
+    ~category:Qed.Logic.Function ~result:t_table "table_of_base"
+
+let f_table_to_offset = Lang.extern_f ~library
+    ~category:Qed.Logic.Injection ~result:L.Int "table_to_offset"
 
 let ty_fst_arg = function
   | Some l :: _ -> l
@@ -108,7 +114,9 @@ let a_offset p = e_fun f_offset [p]
 let a_global b = e_fun f_global [b]
 let a_shift l k = e_fun f_shift [l;k]
 let a_addr b k = a_shift (a_global b) k
-let a_base_offset k = e_fun f_base_offset [k]
+let a_base_offset b k =
+  let offset_index = e_fun f_table_of_base [b] in
+  e_fun f_table_to_offset [offset_index ; k]
 
 (* -------------------------------------------------------------------------- *)
 (* --- Qed Simplifiers                                                    --- *)
@@ -231,27 +239,28 @@ let is_separated args = F.is_true (r_separated args)
 (* --- Simplifier for 'included'                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-(*
-logic a : int
-logic b : int
+(* See: tests/why3/test_memory.why
 
-predicate R =     p.base = q.base
+   logic a : int
+   logic b : int
+
+   predicate R = p.base = q.base
               /\ (q.offset <= p.offset)
               /\ (p.offset + a <= q.offset + b)
 
-predicate included = 0 < a -> ( 0 <= b and R )
-predicate a_empty = a <= 0
-predicate b_negative = b < 0
+   predicate included = 0 < a -> ( 0 <= b and R )
+   predicate a_empty = a <= 0
+   predicate b_negative = b < 0
 
-lemma SAME_P: p=q -> (R <-> a<=b)
-lemma SAME_A: a=b -> (R <-> p=q)
+   lemma SAME_P: p=q -> (R <-> a<=b)
+   lemma SAME_A: a=b -> (R <-> p=q)
 
-goal INC_P:  p=q -> (included <-> ( 0 < a -> a <= b )) (by SAME_P)
-goal INC_A:  a=b -> 0 < a -> (included <-> R) (by SAME_A)
-goal INC_1:  a_empty -> (included <-> true)
-goal INC_2:  b_negative -> (included <-> a_empty)
-goal INC_3:  not R -> (included <-> a_empty)
-goal INC_4:  not a_empty -> not b_negative -> (included <-> R)
+   goal INC_P:  p=q -> (included <-> ( 0 < a -> a <= b )) (by SAME_P)
+   goal INC_A:  a=b -> 0 < a -> (included <-> R) (by SAME_A)
+   goal INC_1:  a_empty -> (included <-> true)
+   goal INC_2:  b_negative -> (included <-> a_empty)
+   goal INC_3:  not R -> (included <-> a_empty)
+   goal INC_4:  not a_empty -> not b_negative -> (included <-> R)
 *)
 
 let r_included = function
@@ -334,6 +343,32 @@ let phi_addr_of_int p =
     | _ -> raise Not_found
 
 (* -------------------------------------------------------------------------- *)
+(* --- Simplifier for (in)validity                                        --- *)
+(* -------------------------------------------------------------------------- *)
+
+let null_base p = e_eq (F.e_fun f_base [p]) F.e_zero
+
+(* See: tests/why3/test_memory.why *)
+
+(* - lemma valid_rd_null: forall m n p. p.base = 0 -> (n <= 0 <-> valid_rd m p n)
+   - lemma valid_rw_null: forall m n p. p.base = 0 -> (n <= 0 <-> valid_rw m p n)
+*)
+let r_valid_unref = function
+  | [_; p; n] when F.decide (null_base p) ->
+      e_leq n e_zero
+  | _ -> raise Not_found
+
+(* - lemma valid_obj_null: forall m n. valid_obj m null n *)
+let r_valid_obj = function
+  | [_; p; _] when F.decide (e_eq p a_null) -> e_true
+  | _ -> raise Not_found
+
+(* - lemma invalid_null: forall m n p. p.base = 0 -> invalid m p n *)
+let r_invalid = function
+  | [_; p; _] when F.decide (null_base p) -> e_true
+  | _ -> raise Not_found
+
+(* -------------------------------------------------------------------------- *)
 (* --- Simplifiers Registration                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -350,6 +385,10 @@ let () = Context.register
       F.set_builtin_get f_havoc r_get_havoc ;
       F.set_builtin_1 f_addr_of_int phi_addr_of_int ;
       F.set_builtin_1 f_int_of_addr phi_int_of_addr ;
+      F.set_builtin p_invalid r_invalid ;
+      F.set_builtin p_valid_rd r_valid_unref ;
+      F.set_builtin p_valid_rw r_valid_unref ;
+      F.set_builtin p_valid_obj r_valid_obj ;
     end
 
 (* -------------------------------------------------------------------------- *)
@@ -387,20 +426,20 @@ type range =
 
 let range ~shift ~addrof ~sizeof = function
   | Sigs.Rloc(obj,loc) ->
-      LOC( addrof loc , F.e_int (sizeof obj) )
+      LOC( addrof loc , sizeof obj )
   | Sigs.Rrange(loc,obj,Some a,Some b) ->
       let s = sizeof obj in
       let p = addrof (shift loc obj a) in
-      let n = e_fact s (e_range a b) in
+      let n = e_mul s (e_range a b) in
       LOC( p , n )
   | Sigs.Rrange(loc,_obj,None,None) ->
       RANGE( a_base (addrof loc) , Vset.range None None )
   | Sigs.Rrange(loc,obj,Some a,None) ->
       let s = sizeof obj in
-      RANGE( a_base (addrof loc) , Vset.range (Some (e_fact s a)) None )
+      RANGE( a_base (addrof loc) , Vset.range (Some (e_mul s a)) None )
   | Sigs.Rrange(loc,obj,None,Some b) ->
       let s = sizeof obj in
-      RANGE( a_base (addrof loc) , Vset.range None (Some (e_fact s b)) )
+      RANGE( a_base (addrof loc) , Vset.range None (Some (e_mul s b)) )
 
 let range_set = function
   | LOC(l,n) ->

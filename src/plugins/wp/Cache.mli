@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -30,11 +30,17 @@ val get_hits : unit -> int
 val get_miss : unit -> int
 val get_removed : unit -> int
 
+val is_updating : unit -> bool
+
 val cleanup_cache : unit -> unit
 
-type runner =
-  timeout:int option -> steplimit:int option ->
-  Why3.Driver.driver -> Why3Provers.t -> Why3.Task.task ->
+type 'a digest = Why3Provers.t -> 'a -> string
+
+type 'a runner =
+  timeout:int option -> steplimit:int option -> Why3Provers.t -> 'a ->
   VCS.result Task.task
 
-val get_result: Wpo.t -> runner -> runner
+val get_result: digest:('a digest) -> runner:('a runner) -> 'a runner
+val clear_result: digest:('a digest) -> Why3Provers.t -> 'a -> unit
+
+(**************************************************************************)

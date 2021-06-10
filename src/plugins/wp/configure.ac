@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of WP plug-in of Frama-C.                           #
 #                                                                        #
-#  Copyright (C) 2007-2020                                               #
+#  Copyright (C) 2007-2021                                               #
 #    CEA (Commissariat a l'energie atomique et aux energies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -63,15 +63,15 @@ case $WHY3VERSION in
         AC_MSG_RESULT([not found!])
         plugin_disable(wp,[why3 not found])
         ;;
-      0.* | 1.[[012]].* | 1.3.0)
-        AC_MSG_RESULT([found $WHY3VERSION: requires 1.3.1+])
+      0.* | 1.[[0123]].*)
+        AC_MSG_RESULT([found $WHY3VERSION: requires 1.4.0+])
         plugin_disable(wp,[non-supported why3 $WHY3VERSION])
         ;;
-      1.3.*)
+      1.4.*)
         AC_MSG_RESULT([found $WHY3VERSION: ok])
         ;;
       *)
-        AC_MSG_RESULT([found $WHY3VERSION: might work (should be 1.3.1+)])
+        AC_MSG_RESULT([found $WHY3VERSION: might work (should be 1.4.0+)])
         ;;
 esac
 fi
@@ -85,16 +85,14 @@ if test "$ENABLE_WP" != "no"; then
     if test "$COQC" = "yes" ; then
       COQVERSION=`coqc -v | sed -n -e 's|.*version* *\([[^ ]]*\) .*$|\1|p' `
       case $COQVERSION in
-        8.7*|8.8*|8.9*|8.10*|8.11.*|trunk)
+        8.12.*|trunk)
           AC_MSG_RESULT(coqc version $COQVERSION found)
           ;;
         *)
-          AC_MSG_RESULT(unsupported coqc version $COQVERSION)
+          AC_MSG_RESULT(unsupported coqc version $COQVERSION for - deprecated - native backend)
           COQC="no"
           ;;
       esac
-    else
-      AC_MSG_NOTICE(rerun configure to make wp using coq 8.7.2 or higher)
     fi
   else
     COQC="no"

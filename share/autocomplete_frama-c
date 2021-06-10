@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2020                                               #
+#  Copyright (C) 2007-2021                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -127,11 +127,11 @@ _frama-c ()
   else
       case "$cur" in
 	  -*-*)
-	      sub_option="$(frama-c -autocomplete | grep -E -o " $cur[^*]+" |sort |uniq)";
+	      sub_option="$(frama-c -autocomplete @all | grep -E -o " $cur[^*]+" |sort |uniq)";
 	      COMPREPLY=( $( compgen -W "${sub_option}"  -- $cur ) );;
 
 	  -*)
-	      basic_options="$(frama-c -autocomplete | grep -E -o " \-[^-]+-?" |sort |uniq)"
+	      basic_options="$(frama-c -autocomplete @all | grep -E -o " \-[^-]+-?" |sort |uniq)"
   	      COMPREPLY=( $( compgen -W  "${basic_options}" -- $cur ) );;
 	  *)
 	      compopt -o default

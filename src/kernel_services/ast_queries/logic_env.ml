@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -29,23 +29,32 @@ module Extensions = struct
   let ref_is_extension = ref (fun _ -> assert false)
   let ref_category = ref (fun _ -> assert false)
   let ref_preprocess = ref (fun _ -> assert false)
+  let ref_is_extension_block = ref (fun _ -> assert false)
+  let ref_preprocess_block = ref (fun _ -> assert false)
 
-  let set_extension_handler ~category ~is_extension ~preprocess =
+  let set_extension_handler
+      ~category ~is_extension ~preprocess ~is_extension_block ~preprocess_block =
     assert (not !initialized) ;
     ref_is_extension := is_extension ;
     ref_category := category ;
     ref_preprocess := preprocess ;
+    ref_is_extension_block := is_extension_block;
+    ref_preprocess_block := preprocess_block;
     initialized := true ;
     ()
 
   let is_extension s = !ref_is_extension s
+  let is_extension_block s = !ref_is_extension_block s
   let category s = !ref_category s
   let preprocess s = !ref_preprocess s
+  let preprocess_block s = !ref_preprocess_block s
 end
 let set_extension_handler = Extensions.set_extension_handler
 let is_extension = Extensions.is_extension
+let is_extension_block = Extensions.is_extension_block
 let extension_category = Extensions.category
 let preprocess_extension = Extensions.preprocess
+let preprocess_extension_block = Extensions.preprocess_block
 
 module CurrentLoc = Cil_const.CurrentLoc
 
@@ -137,6 +146,14 @@ module Lemmas =
       let size = 17
     end)
 
+module Axiomatics =
+  State_builder.Hashtbl(Datatype.String.Hashtbl)(Cil_datatype.Location)
+    (struct
+      let name = "Logic_env.Axiomatics"
+      let dependencies = []
+      let size = 17
+    end)
+
 module Model_info =
   State_builder.Hashtbl
     (Datatype.String.Hashtbl)
@@ -155,6 +172,7 @@ let init_dependencies from =
       Logic_type_info.self;
       Logic_ctor_info.self;
       Lemmas.self;
+      Axiomatics.self;
       Model_info.self;
     ]
 
@@ -321,6 +339,7 @@ let prepare_tables () =
   Logic_type_info.clear ();
   Logic_info.clear ();
   Lemmas.clear ();
+  Axiomatics.clear();
   Model_info.clear ();
   Logic_type_builtin.iter Logic_type_info.add;
   Logic_ctor_builtin.iter Logic_ctor_info.add;

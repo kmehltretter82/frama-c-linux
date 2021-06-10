@@ -1,11 +1,11 @@
 /* run.config
-   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-   OPT: -journal-disable -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs -then -main main2
+ PLUGIN: @EVA_PLUGINS@ pdg
+ MODULE: @PTEST_NAME@
+   OPT: -then -main main2
 */
 /* bug 971: */
 volatile foo;
 int v;
-
 void f1 () {
   v += 1;
 }

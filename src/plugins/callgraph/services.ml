@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -30,8 +30,8 @@ let initial_service_roots cg =
         (* otherwise use every uncalled function *)
         Cg.G.fold_vertex
           (fun v set ->
-            if Cg.G.in_degree cg v = 0 then Kernel_function.Set.add v set
-            else set)
+             if Cg.G.in_degree cg v = 0 then Kernel_function.Set.add v set
+             else set)
           cg
           Kernel_function.Set.empty
     else
@@ -73,7 +73,7 @@ module State =
     (struct
       let name = "Callgraph.Services"
       let dependencies = [ Cg.self; Kernel.MainFunction.self ]
-     end)
+    end)
 
 (* eta-expansion required to mask optional argument [?project] *)
 let is_computed () = State.is_computed ()
@@ -104,7 +104,7 @@ module Subgraph =
       let name = State.name
       let get = get
       let vertex = S.vertex
-     end)
+    end)
 
 let dump () =
   let sg = Subgraph.get () in
@@ -119,7 +119,7 @@ include Journalize.Make
       type t = S.Service_graph.t
       let ty = S.Service_graph.Datatype.ty
       let get = get
-     end)
+    end)
 
 (*
 Local Variables:

@@ -1,5 +1,5 @@
 /* run.config
-   GCC:
+   
    STDOPT: +"-lib-entry -main simple -fct-pdg simple "
    STDOPT: +"-lib-entry -main simple_with_break -fct-pdg simple_with_break "
    STDOPT: +"-lib-entry -main infinite -fct-pdg infinite "

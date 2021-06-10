@@ -1,4 +1,5 @@
 /* run.config
+ EXIT: 1
    OPT:-cpp-extra-args="-DIN_TYPE"
    OPT:-cpp-extra-args="-DIN_DECL"
    OPT:-cpp-extra-args="-DIN_GHOST_ATTR"

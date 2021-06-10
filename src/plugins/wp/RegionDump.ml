@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -159,7 +159,7 @@ let dotregion dot map region node =
            G.link dot [node;delta;R.get target] [`Dotted]
         ) region ;
     if Wp.has_dkey offset_key then
-      Extlib.may
+      Option.iter
         (fun target ->
            let label = if Region.is_shifted target then "[..]" else "*" in
            let deref = G.inode dot (`Label label :: attr_offset) in
@@ -229,7 +229,7 @@ let dotregion dot map region node =
       (fun target ->
          G.edge dot node (R.get target) [`Color "green"]
       ) region ;
-    Extlib.may
+    Option.iter
       (fun target ->
          G.edge dot node (R.get target) [`Color "red"]
       ) (Region.get_merged map region) ;

@@ -3,7 +3,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2020                                               #
+#  Copyright (C) 2007-2021                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -33,7 +33,6 @@ fi
 
 OCAML_VERSION=$(ocamlc -version)
 case $OCAML_VERSION in
-4.05*|4.06*|4.07*) DYNLINK='load_printer "dynlink.cma"';;
 4.08*)
     echo "impossible to load dynlink in ocamldebug for version $OCAML_VERSION";
     echo "pretty-printers will not be loaded";

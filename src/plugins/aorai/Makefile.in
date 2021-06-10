@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of Aorai plug-in of Frama-C.                        #
 #                                                                        #
-#  Copyright (C) 2007-2020                                               #
+#  Copyright (C) 2007-2021                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #    INRIA (Institut National de Recherche en Informatique et en         #
@@ -41,6 +41,7 @@ PLUGIN_DIR ?=.
 PLUGIN_ENABLE:=@ENABLE_AORAI@
 PLUGIN_NAME:=Aorai
 PLUGIN_GENERATED:= $(addprefix ${PLUGIN_DIR}/, \
+		aorai_eva_analysis.ml \
 		promelalexer_withexps.ml promelaparser_withexps.ml \
 		promelaparser_withexps.mli \
 		promelalexer.ml promelaparser.ml promelaparser.mli \
@@ -51,6 +52,8 @@ PLUGIN_CMO:= bool3 \
 	path_analysis \
 	promelaoutput \
 	logic_simplification \
+	aorai_graph \
+	aorai_metavariables \
 	data_for_aorai \
 	aorai_utils \
 	ltl_output \
@@ -65,22 +68,44 @@ PLUGIN_CMO:= bool3 \
 	promelalexer_withexps \
 	aorai_dataflow \
 	aorai_visitors \
+	aorai_eva_analysis \
 	aorai_register
 PLUGIN_CMI:= ltlast promelaast
 
 PLUGIN_DISTRIBUTED:=$(PLUGIN_ENABLE)
-PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure
+PLUGIN_DISTRIB_EXTERNAL:= \
+	aorai_eva_analysis.enabled.ml aorai_eva_analysis.disabled.ml \
+	Makefile.in configure.ac configure
 PLUGIN_HAS_EXT_DOC:=no # [JS 2010/07/28] was 'yes'
                        # but prevent 'make src-distrib to work
+PLUGIN_DEPENDENCIES:=
 
-# if ltltoba is not present, do not attempt to run any test.
-ifneq (@HAS_LTLTOBA@,yes)
-PLUGIN_NO_TEST:=yes
-PLUGIN_NO_DEFAULT_TEST:=yes
+# Dynamic dependencies
+
+ifneq "$(ENABLE_EVA)" "no"
+PLUGIN_DEPENDENCIES+= Eva
+AORAI_EVA_ANALYSIS:= $(PLUGIN_DIR)/aorai_eva_analysis.enabled.ml
+else
+AORAI_EVA_ANALYSIS:= $(PLUGIN_DIR)/aorai_eva_analysis.disabled.ml
 endif
 
-PLUGIN_TESTS_DIRS:=aorai
-PLUGIN_TESTS_LIB:=$(PLUGIN_DIR)/tests/aorai/Aorai_test.ml $(PLUGIN_DIR)/tests/aorai/name_projects.ml
+$(PLUGIN_DIR)/aorai_eva_analysis.ml: $(AORAI_EVA_ANALYSIS)
+	$(PRINT_MAKING) $@
+	$(CP) $(AORAI_EVA_ANALYSIS) $@
+	$(CHMOD_RO) $@
+
+$(PLUGIN_DIR)/aorai_eva_analysis.ml: $(PLUGIN_DIR)/Makefile share/Makefile.config
+
+# Tests
+
+# aorai_ya can always be run
+PLUGIN_TESTS_DIRS:=ya
+
+ifeq (@HAS_LTLTOBA@,yes)
+PLUGIN_TESTS_DIRS+=ltl
+endif
+
+PLUGIN_TESTS_LIB:=$(PLUGIN_DIR)/tests/Aorai_test.ml $(PLUGIN_DIR)/tests/ya/name_projects.ml
 
 include $(FRAMAC_SHARE)/Makefile.dynamic
 
@@ -101,7 +126,7 @@ $(Aorai_DIR)/tests/test_config_prove: \
 	$(SED) -e 's!@AORAI_WP_SHARE@!$(AORAI_WP_SHARE)!' $< > $@
 	$(CHMOD_RO) $@
 
-Aorai_DEFAULT_TESTS: $(Aorai_DIR)/tests/aorai/Aorai_test.cmxs $(Aorai_DIR)/tests/aorai/Aorai_test.cmo $(Aorai_DIR)/tests/aorai/name_projects.cmxs $(Aorai_DIR)/tests/aorai/name_projects.cmo
+Aorai_DEFAULT_TESTS: $(Aorai_DIR)/tests/Aorai_test.cmxs $(Aorai_DIR)/tests/Aorai_test.cmo $(Aorai_DIR)/tests/ya/name_projects.cmxs $(Aorai_DIR)/tests/ya/name_projects.cmo
 
 # Regenerating the Makefile on need
 

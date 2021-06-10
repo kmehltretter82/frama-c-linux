@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -26,6 +26,7 @@
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_string_axiomatic.h"
+#include "__fc_define_max_open_files.h"
 #include "__fc_define_size_t.h"
 #include "__fc_define_null.h"
 #include "__fc_define_ssize_t.h"
@@ -848,6 +849,8 @@ extern int          execvp(const char *path, char *const argv[]);
 extern void         _exit(int) __attribute__ ((__noreturn__));
 
 extern int          fchown(int, uid_t, gid_t);
+extern int          fchownat(int fd, const char *path, uid_t owner,
+                             gid_t group, int flag);
 extern int          fchdir(int);
 extern int          fdatasync(int);
 
@@ -1077,7 +1080,12 @@ extern pid_t        setsid(void);
 */
 extern int          setuid(uid_t uid);
 
-extern unsigned int sleep(unsigned int);
+/*@
+  assigns \result \from seconds;
+  ensures unslept: 0 <= \result <= seconds;
+ */
+extern unsigned int sleep(unsigned int seconds);
+
 extern void         swab(const void *, void *, ssize_t);
 extern int          symlink(const char *, const char *);
 

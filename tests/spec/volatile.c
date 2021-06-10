@@ -2,7 +2,7 @@
    OPT: tests/spec/volatile_aux.c -print -copy
 */
 
-#include "tests/spec/volatile.h"
+#include "volatile.h"
 
 //@volatile x,y writes w ;
 //@volatile y,z reads r writes w; // partially KO: y already has a writes

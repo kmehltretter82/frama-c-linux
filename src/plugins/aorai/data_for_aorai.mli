@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Aorai plug-in of Frama-C.                        *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -42,10 +42,8 @@ exception Empty_automaton
 
 module Aorai_state: Datatype.S_with_collections with type t = Promelaast.state
 
-module Aorai_typed_trans: 
-  Datatype.S_with_collections 
-  with 
-    type t = (Promelaast.typed_condition * Promelaast.action) Promelaast.trans
+module Aorai_typed_trans:
+  Datatype.S_with_collections with type t = Promelaast.typed_trans
 
 (** Initializes some tables according to data from Cil AST. *)
 val setCData : unit -> unit
@@ -55,7 +53,6 @@ val add_logic : string -> Cil_types.logic_info -> unit
 
 (** *)
 val get_logic : string -> Cil_types.logic_info
-
 
 (** *)
 val add_predicate : string -> Cil_types.logic_info -> unit
@@ -103,7 +100,7 @@ val is_single: seq_elt -> bool
 (** Returns a string guaranteed not to clash with C/ACSL keywords or an
     existing global.
     @since Nitrogen-20111001
- *)
+*)
 val get_fresh: string -> string
 
 (* Logic variables *)
@@ -133,8 +130,9 @@ val curOpStatus  : string
 (** Name of curState C generated variable (Table of states that can be synchronized with the program) *)
 val curState     : string
 
-(** Name of curStateOld C generated variable (Last value of curState) *)
-val curStateOld  : string
+(** Name of the history variables (History of previous states) *)
+val history  : int -> string
+val whole_history  : unit -> string list
 
 (** Name of curTrans C generated variable (Last transitions that can be crossed) *)
 val curTrans     : string
@@ -167,7 +165,7 @@ val macro_pure   : string
 
 (** returns the C variable associated to a given state
     (non-deterministic mode only).
- *)
+*)
 val get_state_var: state -> varinfo
 
 (** returns the logic variable associated to a given state.
@@ -202,10 +200,13 @@ val buch_sync    : string
 
 val new_state: string -> state
 
-val new_trans: state -> state -> 'a -> 'a trans
+val new_trans: state -> state -> 'c -> 'a list -> ('c,'a) trans
 
 (** Return the buchi automata as stored after parsing *)
 val getAutomata : unit -> Promelaast.typed_automaton
+
+(** Return only the graph part of the automata *)
+val getGraph : unit -> state list * typed_trans list
 
 (** Type-checks the parsed automaton and stores the result.
     This might introduce new global variables in case of sequences.
@@ -218,20 +219,19 @@ val getNumberOfTransitions : unit -> int
 (** return the number of states of the automata *)
 val getNumberOfStates : unit -> int
 
-(** Return the list of all function name observed in the C file. *)
-val getFunctions_from_c : unit -> string list
+(** Return the list of all function name observed in the C file, except ignored functions. *)
+val getObservablesFunctions : unit -> Cil_types.kernel_function list
 
-(** Return the list of all variables name observed in the C file. *)
-val getVariables_from_c : unit -> string list
-
-(** Return the list of names of all ignored functions. A function is ignored if it is used in C file and if its declaration is unavailable. *)
-val getIgnoredFunctions : unit -> string list
-
-(** Return the list of names of all ignored functions. A function is ignored if it is used in C file and if its declaration is unavailable. *)
-val addIgnoredFunction : string -> unit
+(** Return the list of names of observable but ignored functions.
+    A function is ignored if it is used in C file and if its declaration
+    is unavailable. *)
+val getIgnoredFunctions : unit -> Cil_types.kernel_function list
 
 (** Return true if and only if the given string fname denotes an ignored function. *)
-val isIgnoredFunction : string -> bool
+val isIgnoredFunction : Cil_types.kernel_function -> bool
+
+(** Return true if and only if the given function can be observed *)
+val isObservableFunction : Cil_types.kernel_function -> bool
 
 (** returns the state of given index.
     @since Nitrogen-20111001
@@ -244,11 +244,16 @@ val getStateName : int -> string
     sequences. *)
 val is_reject_state: state -> bool
 
+(** [true] iff a rejecting state already exists. *)
+val has_reject_state: unit -> bool
+
+(** return the rejecting state of the graph, creating it if needed. *)
+val get_reject_state: unit -> state
+
 (** returns the transition having the corresponding id.
     @raise Not_found if this is not the case.
 *)
-val getTransition:
-  int -> (Promelaast.typed_condition * Promelaast.action) Promelaast.trans
+val getTransition: int -> Promelaast.typed_trans
 
 (* ************************************************************************* *)
 (**{b Variables information} Usually it seems very useful to access to varinfo
@@ -286,22 +291,23 @@ val set_returninfo : string -> Cil_types.varinfo -> unit
     If the variable is not found then an error message is print and an assert false is raised. *)
 val get_returninfo : string -> Cil_types.varinfo
 
-(** Given the representation of an auxiliary counter 
+(** Given the representation of an auxiliary counter
     (found in a {!Promelaast.Counter_incr}), returns the maximal value
     that it can take according to the automaton.
- *)
+*)
 val find_max_value: Cil_types.term -> Cil_types.term option
 
 (** information we have about the range of values that an auxiliary variable
     can take.
- *)
+*)
 type range =
   | Fixed of int (** constant value *)
   | Interval of int * int (** range of values *)
   | Bounded of int * Cil_types.term
-    (** range bounded by a logic term (depending on program parameter). *)
+  (** range bounded by a logic term (depending on program parameter). *)
   | Unbounded of int (** only the lower bound is known,
                          there is no upper bound *)
+  | Unknown (** completely unknown relation. *)
 
 module Range: Datatype.S_with_collections with type t = range
 
@@ -318,7 +324,7 @@ val absolute_range: Cil_types.term -> int -> Range.t
 
 (** Given an auxiliary variable, a base for its variations and two ranges of
     variations, returns a range that encompasses both.
- *)
+*)
 val merge_range:
   Cil_types.term -> Cil_types.term -> Range.t -> Range.t -> Range.t
 
@@ -326,17 +332,17 @@ val merge_range:
 
 val tlval: Cil_types.term_lval -> Cil_types.term
 
-(** The propagated state: Mapping from possible start states 
-    to reachable states, with 
-     - set of states for the initial transition leading to the corresponding
+(** The propagated state: Mapping from possible start states
+    to reachable states, with
+    - set of states for the initial transition leading to the corresponding
        reachable state.
-     - set of states for the last transition.
-     - possible values for intermediate variables.
- *)
-type end_state = 
-    (Aorai_state.Set.t * Aorai_state.Set.t * Vals.t) Aorai_state.Map.t
+    - set of states for the last transition.
+    - possible values for intermediate variables.
+*)
+type end_state =
+  (Aorai_state.Set.t * Aorai_state.Set.t * Vals.t) Aorai_state.Map.t
 
-module Case_state: 
+module Case_state:
   Datatype.S with type t = end_state Aorai_state.Map.t
 
 type state = Case_state.t
@@ -346,11 +352,11 @@ val pretty_end_state: Aorai_state.t -> Format.formatter -> end_state -> unit
 val pretty_state: Format.formatter -> state -> unit
 
 (** [included_state st1 st2] is [true] iff [st1] is included in [st2], i.e:
-  - possible start states of [st1] are included in [st2]
-  - for each possible start state, reachable states in [st1] are included in
-    the one of [st2]
-  - for each possible path in [st1], range of possible values for intermediate
-    variables are included in the corresponding one in [st2].
+    - possible start states of [st1] are included in [st2]
+    - for each possible start state, reachable states in [st1] are included in
+      the one of [st2]
+    - for each possible path in [st1], range of possible values for intermediate
+      variables are included in the corresponding one in [st2].
 *)
 val included_state: state -> state -> bool
 
@@ -367,7 +373,7 @@ val merge_state: state -> state -> state
 (** Register a new init state for kernel function.
     If there is already an init state registered, the new one is merged with
     the old.
- *)
+*)
 val set_kf_init_state: Kernel_function.t -> state -> unit
 
 (** Register a new end state for kernel function.
@@ -400,7 +406,7 @@ val get_loop_init_state: Cil_types.stmt -> state
 val get_loop_invariant_state: Cil_types.stmt -> state
 
 val debug_computed_state: ?dkey:Aorai_option.category -> unit -> unit
-(** Pretty-prints all computed states. Default key is dataflow. *) 
+(** Pretty-prints all computed states. Default key is dataflow. *)
 
 (* ************************************************************************* *)
 (**{b Enumeration management}*)
@@ -433,7 +439,7 @@ val get_usedinfo : string -> Cil_types.enuminfo
 (** Simplify the automaton by removing transitions and states that are
     never active during an execution of the program.
     @raise Empty_automaton if the simplification result in an empty automaton.
- *)
+*)
 val removeUnusedTransitionsAndStates : unit -> unit
 
 (*

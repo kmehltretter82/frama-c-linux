@@ -1,7 +1,7 @@
 /*run.config
-OPT: -no-autoload-plugins -load-module from,inout,loopanalysis,eva,scope -val -val-show-progress -then -loop
+PLUGIN: from,inout,loopanalysis,eva,scope
+OPT: -eva -eva-show-progress -then -loop
 */
-
 void f1(int n) {
   for (int i = 1; i < n+2; i++); // i IN [1..6] (6)
 }

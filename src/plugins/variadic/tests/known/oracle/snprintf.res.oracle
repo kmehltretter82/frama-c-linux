@@ -12,7 +12,7 @@
   Declaration of variadic function sprintf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:217: 
   Declaration of variadic function sscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:538: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:541: 
   Declaration of variadic function dprintf.
 [variadic] tests/known/snprintf.c:12: 
   Translating call to snprintf to a call to the specialized version snprintf_va_1.
@@ -21,7 +21,7 @@
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
-[eva] FRAMAC_SHARE/libc/string.h:118: 
+[eva] FRAMAC_SHARE/libc/string.h:121: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] using specification for function snprintf_va_1
 [eva] tests/known/snprintf.c:12: 
@@ -61,8 +61,8 @@ int volatile nondet;
     assigns *(s + (0 ..))
       \from (indirect: n), (indirect: *(format + (0 ..))), *(param0 + (0 ..));
  */
-int snprintf_va_1(char * __restrict s, size_t n,
-                  char const * __restrict format, char *param0);
+int snprintf_va_1(char * restrict s, size_t n, char const * restrict format,
+                  char *param0);
 
 /*@ requires valid_read_string(param0);
     requires valid_read_string(format);
@@ -76,25 +76,25 @@ int snprintf_va_1(char * __restrict s, size_t n,
     assigns *(s + (0 ..))
       \from (indirect: n), (indirect: *(format + (0 ..))), *(param0 + (0 ..));
  */
-int snprintf_va_2(char * __restrict s, size_t n,
-                  char const * __restrict format, char *param0);
+int snprintf_va_2(char * restrict s, size_t n, char const * restrict format,
+                  char *param0);
 
 int main(void)
 {
   int __retres;
   char data[100];
   size_t tmp_0;
-  memset((void *)(data),'A',(unsigned int)99);
+  memset((void *)(data),'A',(unsigned long)99);
   data[99] = (char)0;
   char dest[50] = {(char)'\000'};
   if (nondet) {
     size_t tmp;
     tmp = strlen((char const *)(data));
-    snprintf_va_1(dest,tmp,"%s",data);
+    snprintf(dest,tmp,"%s",data); /* snprintf_va_1 */
     /*@ assert \false; */ ;
   }
   tmp_0 = strlen((char const *)(data));
-  snprintf_va_2(dest,tmp_0 / (size_t)2,"%s",data);
+  snprintf(dest,tmp_0 / (size_t)2,"%s",data); /* snprintf_va_2 */
   __retres = 0;
   return __retres;
 }

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -297,14 +297,14 @@ let add_zeroes = add_v (V_Or_Uninitialized.initialized Cvalue.V.singleton_zero)
    [orig_state]: state before any allocation, returned in case of failure;
    [state_after_alloc]: state in case the allocation is successful;
    [returns_null]: if given, forces the result to consider/ignore the
-   possibility of failure, despite -val-alloc-returns-null. *)
+   possibility of failure, despite -eva-alloc-returns-null. *)
 let wrap_fallible_alloc ?returns_null ret orig_state state_after_alloc =
   let default_returns_null = Value_parameters.AllocReturnsNull.get () in
-  let returns_null = Extlib.opt_conv default_returns_null returns_null in
-  let success = Eval_op.wrap_ptr ret, state_after_alloc in
+  let returns_null = Option.value ~default:default_returns_null returns_null in
+  let success = Some ret, state_after_alloc in
   if returns_null
   then
-    let failure = Eval_op.wrap_ptr Cvalue.V.singleton_zero, orig_state in
+    let failure = Some Cvalue.V.singleton_zero, orig_state in
     [ success ; failure ]
   else [ success ]
 
@@ -485,7 +485,7 @@ let choose_base_allocation () =
 let register_malloc ?replace name ?returns_null prefix region =
   let builtin state args =
     let size = match args with
-      | [ _, size, _ ] -> size
+      | [ _, size ] -> size
       | _ -> raise (Builtins.Invalid_nb_of_args 1)
     in
     let allocate_base = choose_base_allocation () in
@@ -493,14 +493,12 @@ let register_malloc ?replace name ?returns_null prefix region =
     let new_state = add_uninitialized state new_base max_alloc in
     let ret = V.inject new_base Ival.zero in
     let c_values = wrap_fallible_alloc ?returns_null ret state new_state in
-    { Value_types.c_values = c_values ;
-      c_clobbered = Base.SetLattice.bottom;
-      c_cacheable = Value_types.NoCacheCallers;
-      c_from = None; }
+    let c_clobbered = Base.SetLattice.bottom in
+    Builtins.Full { c_values; c_clobbered; c_from = None; }
   in
   let name = "Frama_C_" ^ name in
   let typ () = Cil.voidPtrType, [Cil.theMachine.Cil.typeOfSizeOf] in
-  Builtins.register_builtin ?replace name builtin ~typ
+  Builtins.register_builtin ?replace name NoCacheCallers builtin ~typ
 
 let () =
   register_malloc ~replace:"malloc" "malloc" "malloc" Base.Malloc;
@@ -526,7 +524,7 @@ let alloc_size_ok intended_size =
 let calloc_builtin state args =
   let nmemb, sizev =
     match args with
-    | [(_, nmemb, _); (_, size, _)] -> nmemb, size
+    | [(_, nmemb); (_, size)] -> nmemb, size
     | _ -> raise (Builtins.Invalid_nb_of_args 2)
   in
   let size = Cvalue.V.mul nmemb sizev in
@@ -536,7 +534,7 @@ let calloc_builtin state args =
       "calloc out of bounds: assert(nmemb * size <= SIZE_MAX)";
   let c_values =
     if size_ok = Alarmset.False (* size always overflows *)
-    then [Eval_op.wrap_ptr Cvalue.V.singleton_zero, state]
+    then [Some Cvalue.V.singleton_zero, state]
     else
       let allocate_base = choose_base_allocation () in
       let base, max_valid = allocate_base Base.Malloc "calloc" size state in
@@ -547,18 +545,17 @@ let calloc_builtin state args =
       let ret = V.inject base Ival.zero in
       wrap_fallible_alloc ?returns_null ret state new_state
   in
-  { Value_types.c_values;
-    c_clobbered = Base.SetLattice.bottom;
-    c_cacheable = Value_types.NoCacheCallers;
-    c_from = None; }
+  let c_clobbered = Base.SetLattice.bottom in
+  Builtins.Full { c_values; c_clobbered; c_from = None; }
 
 let () =
   let name = "Frama_C_calloc" in
+  let replace = "calloc" in
   let typ () =
     let sizeof_typ = Cil.theMachine.Cil.typeOfSizeOf in
     Cil.voidPtrType, [ sizeof_typ; sizeof_typ ]
   in
-  Builtins.register_builtin ~replace:"calloc" name calloc_builtin ~typ
+  Builtins.register_builtin ~replace name NoCacheCallers calloc_builtin ~typ
 
 (* ---------------------------------- Free ---------------------------------- *)
 
@@ -650,44 +647,37 @@ let free_aux state ~strong bases_to_remove  =
 (* Builtin for [free] function *)
 let frama_c_free state actuals =
   match actuals with
-  | [ _, arg, _ ] ->
+  | [ _, arg ] ->
     let bases_to_remove, card_to_remove, _null = resolve_bases_to_free arg in
+    let c_clobbered = Base.SetLattice.bottom in
     if card_to_remove = 0 then
-      { Value_types.c_values = [];
-        c_clobbered = Base.SetLattice.bottom;
-        c_from = None;
-        c_cacheable = Value_types.Cacheable; }
+      Builtins.Full { c_values = []; c_clobbered; c_from = None; }
     else
       let strong = card_to_remove <= 1 in
       let state, changed = free_aux state ~strong bases_to_remove in
-      { Value_types.c_values = [None, state];
-        c_clobbered = Base.SetLattice.bottom;
-        c_from = Some changed;
-        c_cacheable = Value_types.Cacheable;
-      }
+      let c_values = [None, state] in
+      Builtins.Full { c_values; c_clobbered; c_from = Some changed; }
   | _ -> raise (Builtins.Invalid_nb_of_args 1)
 
 let () =
-  Builtins.register_builtin ~replace:"free" "Frama_C_free" frama_c_free
-    ~typ:(fun () -> (Cil.voidType, [Cil.voidPtrType]))
+  Builtins.register_builtin ~replace:"free" "Frama_C_free" Cacheable
+    frama_c_free ~typ:(fun () -> (Cil.voidType, [Cil.voidPtrType]))
 
 (* built-in for [__fc_vla_free] function. By construction, VLA should always
    be mapped to a single base. *)
 let frama_c_vla_free state actuals =
   match actuals with
-  | [ _, arg, _] ->
+  | [ _, arg ] ->
     let bases_to_remove, _card_to_remove, _null = resolve_bases_to_free arg in
     let state, changed = free_aux state ~strong:true bases_to_remove in
-    { Value_types.c_values = [None, state];
-      c_clobbered = Base.SetLattice.bottom;
-      c_from = Some changed;
-      c_cacheable = Value_types.Cacheable;
-    }
+    let c_values = [None, state] in
+    let c_clobbered = Base.SetLattice.bottom in
+    Builtins.Full { c_values; c_clobbered; c_from = Some changed; }
   | _ -> raise (Builtins.Invalid_nb_of_args 1)
 
 let () =
   Builtins.register_builtin
-    ~replace:"__fc_vla_free" "Frama_C_vla_free" frama_c_vla_free
+    ~replace:"__fc_vla_free" "Frama_C_vla_free" Cacheable frama_c_vla_free
     ~typ:(fun () -> (Cil.voidType, [Cil.voidPtrType]))
 
 let free_automatic_bases stack state =
@@ -830,7 +820,7 @@ let choose_bases_reallocation () =
 let realloc_builtin state args =
   let ptr, size =
     match args with
-    | [ (_, ptr, _); (_, size, _) ] -> ptr, size
+    | [ (_, ptr); (_, size) ] -> ptr, size
     | _ -> raise (Builtins.Invalid_nb_of_args 2)
   in
   let bases, card_ok, null = resolve_bases_to_free ptr in
@@ -843,20 +833,17 @@ let realloc_builtin state args =
     (* free old bases. *)
     let new_state, changed = free_aux new_state ~strong bases in
     let c_values = wrap_fallible_alloc ret state new_state in
-    { Value_types.c_values;
-      c_clobbered = Builtins.clobbered_set_from_ret new_state ret;
-      c_cacheable = Value_types.NoCacheCallers;
-      c_from = Some changed; }
+    let c_clobbered = Builtins.clobbered_set_from_ret new_state ret in
+    Builtins.Full { c_values; c_clobbered; c_from = Some changed; }
   else (* Invalid call. *)
-    { Value_types.c_values = [] ;
-      c_clobbered = Base.SetLattice.bottom;
-      c_cacheable = Value_types.NoCacheCallers;
-      c_from = None; }
+    let c_clobbered = Base.SetLattice.bottom in
+    Builtins.Full { c_values = []; c_clobbered; c_from = None; }
 
 let () =
   let name = "Frama_C_realloc" in
+  let replace = "realloc" in
   let typ () = Cil.(voidPtrType, [voidPtrType; theMachine.typeOfSizeOf]) in
-  Builtins.register_builtin ~replace:"realloc" name realloc_builtin ~typ
+  Builtins.register_builtin ~replace name NoCacheCallers realloc_builtin ~typ
 
 (* ----------------------------- Leak detection ----------------------------- *)
 
@@ -892,14 +879,12 @@ let check_leaked_malloced_bases state _ =
         Value_util.warning_once_current "memory leak detected for %a"
           Base.pretty base)
     alloced_bases;
-  { Value_types.c_values = [None,state] ;
-    c_clobbered = Base.SetLattice.bottom;
-    c_cacheable = Value_types.NoCacheCallers;
-    c_from = None;
-  }
+  let c_clobbered = Base.SetLattice.bottom in
+  Builtins.Full { c_values = [None,state]; c_clobbered; c_from = None; }
 
 let () =
-  Builtins.register_builtin "Frama_C_check_leak" check_leaked_malloced_bases
+  Builtins.register_builtin "Frama_C_check_leak" NoCacheCallers
+    check_leaked_malloced_bases
 
 
 (*

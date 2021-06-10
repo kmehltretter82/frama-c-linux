@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2020                                               #
+#  Copyright (C) 2007-2021                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -65,12 +65,15 @@ ifneq (4.0,$(firstword $(sort $(MAKE_VERSION) 4.0)))
   $(error This Makefile requires Make >= 4.0 - available at http://ftp.gnu.org/gnu/make/)
 endif
 
-# Test if on a Mac (and therefore sed has fewer options)
-# Also test if /usr/bin/time is available, otherwise use the shell builtin
+# Test if sed has the '--unbuffered' option (GNU sed has, but neither macOS'
+# nor Busybox' have it, in which case we ignore it)
+SED_UNBUFFERED:=sed$(shell sed --unbuffered //p /dev/null 2>/dev/null && echo " --unbuffered" || true)
+
+# Test if on a Mac;
+# test if /usr/bin/time is available, otherwise use the shell builtin
 # (which has less options)
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Darwin)
-  SED_UNBUFFERED:=sed
 ifneq (,$(wildcard /usr/bin/time))
 define time_with_output
   /usr/bin/time -p
@@ -81,10 +84,9 @@ define time_with_output
 endef
 endif
 else
-  SED_UNBUFFERED:=sed --unbuffered
 ifneq (,$(wildcard /usr/bin/time))
 define time_with_output
-  /usr/bin/time --format='user_time=%U\nmemory=%M' --output="$(1)"
+  /usr/bin/time -f 'user_time=%U\nmemory=%M' -o "$(1)"
 endef
 else
 define time_with_output
@@ -96,9 +98,13 @@ endif
 # --- Utilities ---
 
 define display_command =
-  $(info )
-  $(info $(shell tput setaf 4)Command: $(1)$(shell tput sgr0))
-  $(info )
+  @{
+    echo '';
+    [ -t 1 ] && tput setaf 4;
+    echo "Command: $(strip $(1))";
+    [ -t 1 ] && tput sgr0;
+    echo '';
+  }
 endef
 
 empty :=
@@ -118,7 +124,7 @@ EVAFLAGS   ?= \
   -eva-print-callstacks -eva-warn-key alarm=inactive \
   -no-deps-print -no-calldeps-print \
   -eva-warn-key garbled-mix \
-  -memexec-all -calldeps -permissive -from-verbose 0 \
+  -calldeps -from-verbose 0 \
   $(if $(EVABUILTINS), -eva-builtin=$(call fc_list,$(EVABUILTINS)),) \
   $(if $(EVAUSESPECS), -eva-use-spec $(call fc_list,$(EVAUSESPECS)),)
 FCFLAGS    ?=
@@ -143,7 +149,7 @@ clean-backups:
 
 HR_TIMESTAMP := $(shell date +"%H:%M:%S %d/%m/%Y")# Human readable
 DIR          := $(dir $(lastword $(MAKEFILE_LIST)))
-SHELL        := /bin/bash
+SHELL        := $(shell which bash)
 .SHELLFLAGS  := -eu -o pipefail -c
 
 .ONESHELL:

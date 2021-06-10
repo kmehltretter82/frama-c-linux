@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -46,7 +46,7 @@ module Computer
 
     val compute:
       kernel_function -> kinstr -> Abstract.Dom.t ->
-      Abstract.Dom.t list or_bottom * Value_types.cacheable
+      Abstract.Dom.t list or_bottom * Eval.cacheable
 
   end
 

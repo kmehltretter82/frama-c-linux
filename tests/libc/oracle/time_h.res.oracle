@@ -226,6 +226,15 @@
 [eva] computing for function gmtime_r <- main.
   Called from tests/libc/time_h.c:62.
 [eva] Done for function gmtime_r
+[eva] computing for function asctime <- main.
+  Called from tests/libc/time_h.c:64.
+[eva] using specification for function asctime
+[eva] tests/libc/time_h.c:64: 
+  function asctime: precondition 'valid_timeptr' got status valid.
+[eva] tests/libc/time_h.c:64: 
+  function asctime: precondition 'initialization,init_timeptr' got status valid.
+[eva] Done for function asctime
+[eva:alarm] tests/libc/time_h.c:65: Warning: assertion got status unknown.
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

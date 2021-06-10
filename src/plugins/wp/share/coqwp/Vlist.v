@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -40,6 +40,7 @@ Hint Rewrite List.app_assoc List.app_nil_l List.app_nil_r : list.
   (* --- Classical Lists for Alt-Ergo                                 --- *)
   (* -------------------------------------------------------------------- *)
 Require Import Qedlib.
+Require Import Lia.
 
 (* Why3 goal *)
 Definition list : forall (a:Type), Type.
@@ -399,11 +400,7 @@ intros p q w h1 h2. unfold vlist_eq ; simpl ; split ; auto with zarith.
         rewrite length_repeat ; auto with zarith.
         replace (i - p * length A) with (i + (-p) * length A).
         rewrite Z.rem_add ; auto with zarith.
-        apply Z.mul_nonneg_nonneg ; auto with zarith.
-        replace (i + -p * length A) with (i - p * length A) ; auto with zarith.
-        rewrite Z.mul_opp_l. rewrite Z.add_opp_r. auto.
-        rewrite Z.mul_opp_l. rewrite Z.add_opp_r. auto.
-        rewrite length_repeat ; auto with zarith.
+        lia. rewrite length_repeat. lia. auto.
 Qed.
 
 (* Why3 goal *)

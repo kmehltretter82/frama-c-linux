@@ -3,7 +3,7 @@
   STDOPT: +"-eva-msg-key=summary -main minimal"
   STDOPT: +"-eva-msg-key=summary -main bottom"
   STDOPT: +"-eva-msg-key=summary -main main"
-  STDOPT: +"-rte -eva-msg-key=summary -main main"
+  STDOPT: +"-rte -eva-msg-key=summary -main main -slevel 0"
 */
 
 /* Tests the summary on the smallest possible program. */

@@ -21,7 +21,7 @@ let warn_if_not_const kf string typ vi loc =
         string Printer.pp_varinfo vi string
 
 let check_annot kf _ (a: identified_predicate) =
-  let p = a.ip_content.pred_content in
+  let p = (Logic_const.pred_of_id_pred a).pred_content in
   match p with
   | Pvalid (_, t) | Pvalid_read (_, t)
   | Papp ({l_var_info={lv_name=("valid_string"|"valid_read_string")}},

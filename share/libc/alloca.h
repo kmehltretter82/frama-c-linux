@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -28,7 +28,7 @@ __PUSH_FC_STDLIB
 
 __BEGIN_DECLS
 
-/*@ ghost extern int __fc_stack_status __attribute__((FRAMA_C_MODEL)); */
+/*@ ghost extern int __fc_stack_status; */
 
 // Note: alloca is considered to never fail, unlike malloc
 // Currently, ACSL does not allow specifying that the memory allocated by

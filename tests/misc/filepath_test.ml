@@ -16,4 +16,8 @@ let () =
   Kernel.feedback "relativize(./tests/..): %s"
     (Filepath.relativize "./tests/..");
   Kernel.feedback "relativize(/a/bc/d,base_name:/a/b/): %s"
-    (Filepath.relativize ~base_name:"/a/b/" "/a/bc/d")
+    (Filepath.relativize ~base_name:"/a/b/" "/a/bc/d");
+  Filepath.add_symbolic_dir "SYMB" (Filepath.Normalized.of_string "/tmp/symb/");
+  Kernel.feedback "pretty with symbolic path: %a"
+    Filepath.Normalized.pretty
+    (Filepath.Normalized.of_string "/tmp/symb/file.c")

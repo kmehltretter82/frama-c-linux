@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Aorai plug-in of Frama-C.                        *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -23,35 +23,35 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val print_raw_automata : 
-  Format.formatter -> Promelaast.typed_automaton -> unit
+open Promelaast
 
-val print_parsed_expression: Format.formatter -> Promelaast.expression -> unit
+type 'a printer = Format.formatter -> 'a -> unit
 
-val print_parsed_condition: Format.formatter -> Promelaast.condition -> unit
+val print_state : state printer
+val print_statel : state list printer
 
-val print_seq_elt: Format.formatter -> Promelaast.seq_elt -> unit
+module Parsed:
+sig
+  val print_expression: expression printer
+  val print_condition: condition printer
+  val print_seq_elt: seq_elt printer
+  val print_sequence: sequence printer
+  val print_guard: guard printer
+  val print_action: action printer
+  val print_actionl: action list printer
+end
 
-val print_sequence: Format.formatter -> Promelaast.sequence -> unit
+module Typed:
+sig
+  val print_condition : typed_condition printer
+  val print_action: typed_action printer
+  val print_actionl: typed_action list printer
+  val print_transition: typed_trans printer
+  val print_transitionl: typed_trans list printer
+  val print_automata : typed_automaton printer
+  val output_dot_automata : typed_automaton -> string -> unit
+end
 
-val print_parsed: Format.formatter -> Promelaast.parsed_condition -> unit
-
-val print_condition: Format.formatter -> Promelaast.typed_condition -> unit
-
-val print_action: Format.formatter -> Promelaast.action -> unit
-
-val print_transition:
-  Format.formatter -> 
-  (Promelaast.typed_condition * Promelaast.action) Promelaast.trans -> unit
-
-val print_transitionl:
-  Format.formatter ->
-  (Promelaast.typed_condition * Promelaast.action) Promelaast.trans list -> unit
-
-val print_state : Format.formatter -> Promelaast.state -> unit
-val print_statel : Format.formatter -> Promelaast.state list -> unit
-
-val output_dot_automata : Promelaast.typed_automaton -> string -> unit
 
 (*
 Local Variables:

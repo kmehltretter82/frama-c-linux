@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -499,14 +499,12 @@ let to_do_on_select
         "This is a complete behaviors clause.@.%a@."
         pretty_predicate_status ip;
       main_ui#view_original (location ip)
-    | PIP(IPAxiom _ as ip) ->
-      main_ui#pretty_information "This is an axiom.@.";
-      main_ui#view_original (location ip)
     | PIP(IPAxiomatic _ as ip) ->
       main_ui#pretty_information "This is an axiomatic.@.";
       main_ui#view_original (location ip)
-    | PIP(IPLemma _ as ip) ->
-      main_ui#pretty_information "This is a lemma.@.";
+    | PIP(IPLemma { il_pred } as ip) ->
+      main_ui#pretty_information "This is a %a.@."
+        Cil_printer.pp_lemma_kind il_pred.tp_kind;
       main_ui#view_original (location ip)
     | PIP(IPTypeInvariant _ as ip) ->
       main_ui#pretty_information "This is a type invariant.@.";
@@ -602,7 +600,7 @@ let to_do_on_select
           (if vi.vaddrof then "" else "not ")
       end else begin
         main_ui#view_original vi.vdecl;
-        let kf = Extlib.the kf in
+        let kf = Option.get kf in
         main_ui#pretty_information
           "This is the declaration of %s %a in function %a%t@."
           (formal_or_local vi) Varinfo.pretty vi
@@ -1034,13 +1032,13 @@ class main_window () : main_window_extension_points =
         let m =
           new Menu_manager.menu_manager
             ~packing:(toplevel_vbox#pack ~expand:false ~fill:false ~from:`START)
-            ~host:(self :> Gtk_helper.host)
+            (self :> Gtk_helper.host)
         in
         menu_manager <- Some m;
         m
       | Some s ->
         s
-    method file_tree = Extlib.the file_tree
+    method file_tree = Option.get file_tree
     method file_tree_view = file_tree_view
     method annot_window = annot_window
 
@@ -1101,7 +1099,7 @@ class main_window () : main_window_extension_points =
            ignore (expander#drag#connect#ending (fun _ -> dragged_frame:=None));
 
            (* Refreshers *)
-           Extlib.may
+           Option.iter
              (fun refresh ->
                 to_refresh:=
                   (fun ()->
@@ -1442,7 +1440,7 @@ class main_window () : main_window_extension_points =
           begin
             let text =
               if use_dialog then
-                Extlib.opt_conv ""
+                Option.value ~default:""
                   (Gtk_helper.input_string
                      ~parent:main_window
                      ~title:"Find global" ~ok:"Find" ~cancel:"Cancel"
@@ -1486,7 +1484,7 @@ class main_window () : main_window_extension_points =
       | Some (where,viewer) ->
         let text =
           if use_dialog then
-            Extlib.opt_conv ""
+            Option.value ~default:""
               (Gtk_helper.input_string
                  ~parent:main_window
                  ~title:("Find " ^ where) ~ok:"Find" ~cancel:"Cancel"
@@ -1696,9 +1694,9 @@ class main_window () : main_window_extension_points =
           GtkMisc.Label.set_text label text
         in
         let callback e _column =
-          Extlib.may
+          Option.iter
             (fun pos ->
-               Extlib.may self#scroll (Pretty_source.loc_to_localizable pos);
+               Option.iter self#scroll (Pretty_source.loc_to_localizable pos);
                (* Note: the code below generates double scrolling:
                   the previous call to self#scroll causes the original source
                   viewer to scroll to the beginning of the function, and then
@@ -1708,14 +1706,24 @@ class main_window () : main_window_extension_points =
         in
         Warning_manager.make ~packing ~callback
       in
+      let outdated_warnings = ref false in
       let display_warnings () =
-        Messages.reset_once_flag ();
+        outdated_warnings := false ;
         Warning_manager.clear warning_manager;
         Messages.iter (fun event -> Warning_manager.append warning_manager event);
         let text = Format.sprintf "Messages (%d)" (Messages.nb_messages ()) in
         let label = GtkMisc.Label.cast warnings_tab_label#as_widget in
         GtkMisc.Label.set_text label text
       in
+      register_reset_extension (fun _ -> display_warnings ());
+      Messages.add_global_hook (fun () ->
+          if not !outdated_warnings then
+            begin
+              outdated_warnings := true ;
+              Wutil.later display_warnings
+            end
+        );
+      Messages.reset_once_flag ();
       display_warnings ();
 
       (* Management of navigation history *)
@@ -1728,7 +1736,6 @@ class main_window () : main_window_extension_points =
             self#scroll l
         );
 
-      register_reset_extension (fun _ -> display_warnings ());
       self#default_screen ();
       menu_manager#refresh ();
       Project.register_after_set_current_hook
@@ -1818,8 +1825,8 @@ class main_window () : main_window_extension_points =
   end
 
 let make_splash () =
-  GMain.Rc.add_default_file (Fc_config.datadir ^"/frama-c.rc");
-  GMain.Rc.add_default_file (Fc_config.datadir ^"/frama-c-user.rc");
+  GMain.Rc.add_default_file ((Fc_config.datadir:>string) ^"/frama-c.rc");
+  GMain.Rc.add_default_file ((Fc_config.datadir:>string) ^"/frama-c-user.rc");
   (*print_endline ("BOOT: " ^ (Glib.Main.setlocale `ALL None));*)
   let (_:string) = GtkMain.Main.init ~setlocale:false () in
   (*print_endline ("START: " ^ (Glib.Main.setlocale `ALL None));*)

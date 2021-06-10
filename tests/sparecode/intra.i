@@ -1,11 +1,13 @@
 /* run.config
    STDOPT: +"-sparecode-analysis"
+PLUGIN: @PTEST_PLUGIN@ slicing
    STDOPT: +"-sparecode-debug 0 -slicing-level 2 -slice-return main -then-last -print"
+PLUGIN: @SPARECODE_PLUGINS@
    STDOPT: +"-sparecode-debug 0 -main main2 -sparecode-analysis"
+PLUGIN: @PTEST_PLUGIN@ slicing
    STDOPT: +"-sparecode-debug 0 -main main2 -slice-return main2 -then-last -print"
    STDOPT: +"-sparecode-debug 0 -main main2 -slice-return main2 -slice-assert f10 -then-last -print"
 */
-
 /* Waiting for results such as:
  * spare code analysis removes statements having variables with
  * prefix "spare_"
@@ -13,9 +15,7 @@
  * slicing analysis removes statement having variables with
  * prefix "spare_" and "any_"
  */
-
 int G;
-
 int tmp (int a) {
   int x = a;
   //@ assert x == a ;

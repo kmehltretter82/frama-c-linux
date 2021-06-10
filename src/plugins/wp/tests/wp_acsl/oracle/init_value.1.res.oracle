@@ -1,7 +1,6 @@
 # frama-c -wp -wp-no-let [...]
 [kernel] Parsing tests/wp_acsl/init_value.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function fa1
@@ -15,7 +14,7 @@ Assume {
   Type: is_sint32(x) /\ is_sint32(x_1) /\ is_sint32(x_2) /\
       is_sint32(ta1_0[4]).
   (* Heap *)
-  Type: IsArray1_sint32(ta1_0).
+  Type: IsArray_sint32(ta1_0).
 }
 Prove: (x_1 = x) /\ (x_2 = x_1).
 
@@ -27,7 +26,7 @@ Assume {
   Type: is_sint32(ta1_0[0]) /\ is_sint32(ta1_0[1]) /\ is_sint32(ta1_0[3]) /\
       is_sint32(x).
   (* Heap *)
-  Type: IsArray1_sint32(ta1_0).
+  Type: IsArray_sint32(ta1_0).
 }
 Prove: x = 0.
 
@@ -39,7 +38,7 @@ Assume {
   Type: is_sint32(ta1_0[0]) /\ is_sint32(ta1_0[1]) /\ is_sint32(x) /\
       is_sint32(ta1_0[4]).
   (* Heap *)
-  Type: IsArray1_sint32(ta1_0).
+  Type: IsArray_sint32(ta1_0).
 }
 Prove: x = 1.
 
@@ -55,7 +54,7 @@ Let x_2 = ta2_0[4].
 Assume {
   Type: is_sint32(x) /\ is_sint32(x_1) /\ is_sint32(x_2).
   (* Heap *)
-  Type: IsArray1_sint32(ta2_0).
+  Type: IsArray_sint32(ta2_0).
 }
 Prove: (x_1 = x) /\ (x_2 = x_1).
 
@@ -66,7 +65,7 @@ Let x = ta2_0[4].
 Assume {
   Type: is_sint32(ta2_0[0]) /\ is_sint32(ta2_0[1]) /\ is_sint32(x).
   (* Heap *)
-  Type: IsArray1_sint32(ta2_0).
+  Type: IsArray_sint32(ta2_0).
 }
 Prove: x = 1.
 
@@ -77,7 +76,7 @@ Let x = ta2_0[1].
 Assume {
   Type: is_sint32(ta2_0[0]) /\ is_sint32(x) /\ is_sint32(ta2_0[4]).
   (* Heap *)
-  Type: IsArray1_sint32(ta2_0).
+  Type: IsArray_sint32(ta2_0).
 }
 Prove: x = 1.
 
@@ -95,8 +94,8 @@ Assume {
   Type: is_sint32(x) /\ is_sint32(x_1) /\ is_sint32(ta2_0[4]) /\
       is_sint32(x_2) /\ is_sint32(x_3).
   (* Heap *)
-  Type: IsArray1_sint32(ta1_0) /\ IsArray1_sint32(ta2_0) /\
-      IsArray1_sint32(ta3_0).
+  Type: IsArray_sint32(ta1_0) /\ IsArray_sint32(ta2_0) /\
+      IsArray_sint32(ta3_0).
 }
 Prove: (x_1 = x) /\ (x_3 = x_2).
 
@@ -108,8 +107,8 @@ Assume {
   Type: is_sint32(ta1_0[2]) /\ is_sint32(ta1_0[4]) /\ is_sint32(ta2_0[4]) /\
       is_sint32(x) /\ is_sint32(ta3_0[2]).
   (* Heap *)
-  Type: IsArray1_sint32(ta1_0) /\ IsArray1_sint32(ta2_0) /\
-      IsArray1_sint32(ta3_0).
+  Type: IsArray_sint32(ta1_0) /\ IsArray_sint32(ta2_0) /\
+      IsArray_sint32(ta3_0).
 }
 Prove: x = 1.
 
@@ -121,8 +120,8 @@ Assume {
   Type: is_sint32(ta1_0[2]) /\ is_sint32(ta1_0[4]) /\ is_sint32(ta2_0[4]) /\
       is_sint32(ta3_0[0]) /\ is_sint32(x).
   (* Heap *)
-  Type: IsArray1_sint32(ta1_0) /\ IsArray1_sint32(ta2_0) /\
-      IsArray1_sint32(ta3_0).
+  Type: IsArray_sint32(ta1_0) /\ IsArray_sint32(ta2_0) /\
+      IsArray_sint32(ta3_0).
 }
 Prove: x = 1.
 
@@ -134,8 +133,8 @@ Assume {
   Type: is_sint32(ta1_0[2]) /\ is_sint32(ta1_0[4]) /\ is_sint32(x) /\
       is_sint32(ta3_0[0]) /\ is_sint32(ta3_0[2]).
   (* Heap *)
-  Type: IsArray1_sint32(ta1_0) /\ IsArray1_sint32(ta2_0) /\
-      IsArray1_sint32(ta3_0).
+  Type: IsArray_sint32(ta1_0) /\ IsArray_sint32(ta2_0) /\
+      IsArray_sint32(ta3_0).
 }
 Prove: x = 1.
 
@@ -155,7 +154,7 @@ Assume {
   Type: IsS5(a) /\ IsS5(a_1) /\ IsS5(a_2) /\ is_sint32(a.F5_a) /\
       is_sint32(x) /\ is_sint32(x_1) /\ is_sint32(a_3.F5_c).
   (* Heap *)
-  Type: IsArray1S5(ts1_0).
+  Type: IsArray_S5(ts1_0).
 }
 Prove: (x_1 = x) /\ EqS5(a, a_1) /\ EqS5(a_1, a_2).
 
@@ -169,7 +168,7 @@ Assume {
   Type: IsS5(a) /\ IsS5(ts1_0[1]) /\ IsS5(ts1_0[3]) /\ is_sint32(a.F5_a) /\
       is_sint32(a_1.F5_a) /\ is_sint32(a_1.F5_b) /\ is_sint32(x).
   (* Heap *)
-  Type: IsArray1S5(ts1_0).
+  Type: IsArray_S5(ts1_0).
 }
 Prove: x = 1.
 
@@ -183,7 +182,7 @@ Assume {
   Type: IsS5(a) /\ IsS5(ts1_0[1]) /\ IsS5(ts1_0[3]) /\ is_sint32(x) /\
       is_sint32(a_1.F5_a) /\ is_sint32(a_1.F5_b) /\ is_sint32(a_1.F5_c).
   (* Heap *)
-  Type: IsArray1S5(ts1_0).
+  Type: IsArray_S5(ts1_0).
 }
 Prove: x = 1.
 
@@ -205,9 +204,8 @@ Assume {
       is_sint64(u.F4_U_b) /\ is_sint16((u.F4_U_t)[0]) /\ is_sint32(a_4) /\
       is_sint32(a_1).
   (* Heap *)
-  Type: IsArray1_sint32(t) /\ IsArray1_sint32(t1_0) /\
-      IsArray1_uint8(tab_0) /\ IsS2_St(st_0) /\ IsS3_Sc(sc2_0) /\
-      IsS3_Sc(sc3_0) /\ IsU4_U(u).
+  Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
+      IsS2_St(st_0) /\ IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ IsU4_U(u).
   (* Initializer *)
   Init: (u.F4_U_a) = (-1).
   (* Initializer *)
@@ -272,9 +270,8 @@ Assume {
       is_sint64(u.F4_U_b) /\ is_sint16((u.F4_U_t)[0]) /\ is_sint32(a_4) /\
       is_sint32(a_1).
   (* Heap *)
-  Type: IsArray1_sint32(t) /\ IsArray1_sint32(t1_0) /\
-      IsArray1_uint8(tab_0) /\ IsS2_St(st_0) /\ IsS3_Sc(sc2_0) /\
-      IsS3_Sc(sc3_0) /\ IsU4_U(u).
+  Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
+      IsS2_St(st_0) /\ IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ IsU4_U(u).
   (* Initializer *)
   Init: (u.F4_U_a) = (-1).
   (* Initializer *)
@@ -339,9 +336,8 @@ Assume {
       is_sint64(u.F4_U_b) /\ is_sint16((u.F4_U_t)[0]) /\ is_sint32(a_4) /\
       is_sint32(a_1).
   (* Heap *)
-  Type: IsArray1_sint32(t) /\ IsArray1_sint32(t1_0) /\
-      IsArray1_uint8(tab_0) /\ IsS2_St(st_0) /\ IsS3_Sc(sc2_0) /\
-      IsS3_Sc(sc3_0) /\ IsU4_U(u).
+  Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
+      IsS2_St(st_0) /\ IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ IsU4_U(u).
   (* Initializer *)
   Init: (u.F4_U_a) = (-1).
   (* Initializer *)
@@ -407,9 +403,8 @@ Assume {
       is_sint64(u.F4_U_b) /\ is_sint16((u.F4_U_t)[0]) /\ is_sint32(a_4) /\
       is_sint32(a_1).
   (* Heap *)
-  Type: IsArray1_sint32(t) /\ IsArray1_sint32(t1_0) /\
-      IsArray1_uint8(tab_0) /\ IsS2_St(st_0) /\ IsS3_Sc(sc2_0) /\
-      IsS3_Sc(sc3_0) /\ IsU4_U(u).
+  Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
+      IsS2_St(st_0) /\ IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ IsU4_U(u).
   (* Initializer *)
   Init: (u.F4_U_a) = (-1).
   (* Initializer *)
@@ -474,9 +469,8 @@ Assume {
       is_sint64(u.F4_U_b) /\ is_sint16((u.F4_U_t)[0]) /\ is_sint32(a_4) /\
       is_sint32(a_1).
   (* Heap *)
-  Type: IsArray1_sint32(t) /\ IsArray1_sint32(t1_0) /\
-      IsArray1_uint8(tab_0) /\ IsS2_St(st_0) /\ IsS3_Sc(sc2_0) /\
-      IsS3_Sc(sc3_0) /\ IsU4_U(u).
+  Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
+      IsS2_St(st_0) /\ IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ IsU4_U(u).
   (* Initializer *)
   Init: (u.F4_U_a) = (-1).
   (* Initializer *)
@@ -542,9 +536,8 @@ Assume {
       is_sint64(u.F4_U_b) /\ is_sint16((u.F4_U_t)[0]) /\ is_sint32(a_4) /\
       is_sint32(a_1).
   (* Heap *)
-  Type: IsArray1_sint32(t) /\ IsArray1_sint32(t1_0) /\
-      IsArray1_uint8(tab_0) /\ IsS2_St(st_0) /\ IsS3_Sc(sc2_0) /\
-      IsS3_Sc(sc3_0) /\ IsU4_U(u).
+  Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
+      IsS2_St(st_0) /\ IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ IsU4_U(u).
   (* Initializer *)
   Init: (u.F4_U_a) = (-1).
   (* Initializer *)
@@ -610,9 +603,8 @@ Assume {
       is_sint64(u.F4_U_b) /\ is_sint16((u.F4_U_t)[0]) /\ is_sint32(a_4) /\
       is_sint32(a_1).
   (* Heap *)
-  Type: IsArray1_sint32(t) /\ IsArray1_sint32(t1_0) /\
-      IsArray1_uint8(tab_0) /\ IsS2_St(st_0) /\ IsS3_Sc(sc2_0) /\
-      IsS3_Sc(sc3_0) /\ IsU4_U(u).
+  Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
+      IsS2_St(st_0) /\ IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ IsU4_U(u).
   (* Initializer *)
   Init: (u.F4_U_a) = (-1).
   (* Initializer *)
@@ -678,9 +670,8 @@ Assume {
       is_sint64(x_1) /\ is_sint16((u.F4_U_t)[0]) /\ is_sint32(a_4) /\
       is_sint32(a_1).
   (* Heap *)
-  Type: IsArray1_sint32(t) /\ IsArray1_sint32(t1_0) /\
-      IsArray1_uint8(tab_0) /\ IsS2_St(st_0) /\ IsS3_Sc(sc2_0) /\
-      IsS3_Sc(sc3_0) /\ IsU4_U(u).
+  Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
+      IsS2_St(st_0) /\ IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ IsU4_U(u).
   (* Initializer *)
   Init: (u.F4_U_a) = (-1).
   (* Initializer *)
@@ -746,9 +737,8 @@ Assume {
       is_sint64(u.F4_U_b) /\ is_sint16(a_5) /\ is_sint32(a_4) /\
       is_sint32(a_1).
   (* Heap *)
-  Type: IsArray1_sint32(t) /\ IsArray1_sint32(t1_0) /\
-      IsArray1_uint8(tab_0) /\ IsS2_St(st_0) /\ IsS3_Sc(sc2_0) /\
-      IsS3_Sc(sc3_0) /\ IsU4_U(u).
+  Type: IsArray_sint32(t) /\ IsArray_sint32(t1_0) /\ IsArray_uint8(tab_0) /\
+      IsS2_St(st_0) /\ IsS3_Sc(sc2_0) /\ IsS3_Sc(sc3_0) /\ IsU4_U(u).
   (* Initializer *)
   Init: (u.F4_U_a) = (-1).
   (* Initializer *)

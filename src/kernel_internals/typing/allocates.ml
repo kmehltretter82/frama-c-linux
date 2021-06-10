@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -28,9 +28,9 @@ let add_allocates_loop stmt =
   let _behav = Cil.default_behavior_name in
   let all_default _ rca r =
     match rca.annot_content with
-      | AAllocation (b, alloc) ->
-          r && (b <> [] || alloc = FreeAllocAny)
-      | _ -> r
+    | AAllocation (b, alloc) ->
+      r && (b <> [] || alloc = FreeAllocAny)
+    | _ -> r
   in
   let all_default = Annotations.fold_code_annot all_default stmt true in
   if all_default then
@@ -47,19 +47,19 @@ let add_allocates_nothing_funspec kf =
       ~keep_empty:false Emitter.kernel kf ~behavior (FreeAlloc ([], []))
 
 class vis_add_loop_allocates =
-object
-  inherit Visitor.frama_c_inplace
+  object
+    inherit Visitor.frama_c_inplace
 
-  method! vstmt s =
-    (match s.skind with
-      | Loop _ -> add_allocates_loop s;
-      | _ -> ()
-    );
-    Cil.DoChildren
+    method! vstmt s =
+      (match s.skind with
+       | Loop _ -> add_allocates_loop s;
+       | _ -> ()
+      );
+      Cil.DoChildren
 
-  method! vinst _ = Cil.SkipChildren
+    method! vinst _ = Cil.SkipChildren
 
-end
+  end
 
 let add_allocates_nothing () =
   Globals.Functions.iter add_allocates_nothing_funspec;

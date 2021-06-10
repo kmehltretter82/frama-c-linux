@@ -7,7 +7,7 @@ char *__gen_e_acsl_literal_string;
 void f(void) __attribute__((__constructor__));
 void f(void)
 {
-  printf(__gen_e_acsl_literal_string);
+  printf(__gen_e_acsl_literal_string); /* printf_va_1 */
   char *buf = malloc((unsigned long)10 * sizeof(char));
   free((void *)buf);
   return;
@@ -36,7 +36,7 @@ int main(void)
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   __e_acsl_globals_init();
-  printf(__gen_e_acsl_literal_string_2);
+  printf(__gen_e_acsl_literal_string_2); /* printf_va_2 */
   __retres = 0;
   __e_acsl_memory_clean();
   return __retres;

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -129,7 +129,7 @@ let coerce_type typ =
   else if Cil.isFloatingType ty then Lreal
   else Ctype typ
 
-let predicate_of_identified_predicate ip = ip.ip_content
+let predicate_of_identified_predicate ip = ip.ip_content.tp_statement
 
 let translate_old_label s p =
   let get_label () =
@@ -354,8 +354,8 @@ and numeric_bound ltyp = function
 
 let is_zero_comparable t =
   match unroll_type t.term_type with
-  | Ctype (TInt _ | TFloat _ | TPtr _ | TArray _ | TFun _) -> true
-  | Ctype _ -> false
+  | Ctype (TInt _ | TFloat _ | TPtr _ | TArray _ | TFun _ | TEnum _) -> true
+  | Ctype (TVoid _ | TNamed _ | TComp _ | TBuiltin_va_list _) -> false
   | Linteger | Lreal -> true
   | Ltype ({lt_name},[]) -> lt_name = Utf8_logic.boolean
   | Ltype _ -> false
@@ -373,7 +373,7 @@ let scalar_term_conversion conversion t =
     let ctrue = Logic_env.Logic_ctor_info.find "\\true" in
     conversion ~loc true t (term ~loc (TDataCons(ctrue,[])) boolean_type) in
   match unroll_type t.term_type with
-  | Ctype (TInt _) -> int_conversion t
+  | Ctype (TInt _ | TEnum _) -> int_conversion t
   | Ctype (TFloat _) as ltyp -> real_conversion ~ltyp t
   | Ctype (TPtr _) -> ptr_conversion t
   | Ctype (TArray _) -> ptr_conversion t
@@ -385,7 +385,7 @@ let scalar_term_conversion conversion t =
   | Ltype ({lt_name = name},[]) when name = Utf8_logic.boolean ->
     bool_conversion t
   | Ltype _ | Lvar _ | Larrow _
-  | Ctype (TVoid _ | TNamed _ | TComp _ | TEnum _ | TBuiltin_va_list _)
+  | Ctype (TVoid _ | TNamed _ | TComp _ | TBuiltin_va_list _)
     -> Kernel.fatal
          "Cannot convert a term of type %a"
          Cil_printer.pp_logic_type t.term_type
@@ -417,7 +417,8 @@ let float_builtin prefix fkind =
   let name = match fkind with
     | FFloat -> Printf.sprintf "\\%s_float" prefix
     | FDouble -> Printf.sprintf "\\%s_double" prefix
-    | FLongDouble -> Kernel.not_yet_implemented "Builtins for long double type"
+    | FLongDouble ->
+      Kernel.not_yet_implemented ~current:true "Builtins for long double type"
   in match Logic_env.find_all_logic_functions name with
   | [ lf ] -> Some lf
   | _ -> Kernel.fatal "Missing or ambiguous builtin %S" name
@@ -435,6 +436,20 @@ let get_float_unop op typ =
   | TFloat(fkind,_) , Neg  -> float_builtin "neg" fkind
   | _ -> None
 
+let is_boolean_exp e =
+  match e.enode with
+  | BinOp(op,_,_,_) -> is_boolean_binop op
+  | UnOp(LNot,_,_) -> true
+  | _ -> false
+
+let get_bool_kind e =
+  match Cil.isInteger e with
+  | Some i ->
+    if Integer.(equal i zero) then `False else
+    if Integer.(equal i one) then `True else
+      `Term
+  | None -> if is_boolean_exp e then `Bool else `Term
+
 let rec expr_to_term ?(coerce=false) e =
   let loc = e.eloc in
   let typ = Cil.typeOf e in
@@ -444,12 +459,12 @@ let rec expr_to_term ?(coerce=false) e =
     | Const c -> TConst (constant_to_lconstant c) , coerce_type typ
     | StartOf lv -> TStartOf (lval_to_term_lval lv) , ctyp
     | AddrOf lv -> TAddrOf (lval_to_term_lval lv) , ctyp
+    | BinOp (op, _, _, _) when is_boolean_binop op ->
+      let tc = expr_to_boolean e in
+      Tif( tc , Cil.lone ~loc () , Cil.lzero ~loc () ),
+      Linteger
     | BinOp (op, a, b, _) ->
-      if is_boolean_binop op then
-        let tc = expr_to_boolean e in
-        Tif( tc , Cil.lone ~loc () , Cil.lzero ~loc () ),
-        Linteger
-      else begin match get_float_binop op typ with
+      begin match get_float_binop op typ with
         | Some phi ->
           let va = expr_to_term a in
           let vb = expr_to_term b in
@@ -511,17 +526,38 @@ and offset_to_term_offset = function
 and expr_to_boolean e =
   let open Cil_types in
   let tbool n = Logic_const.term n Logic_const.boolean_type in
-  match e.enode with
-  | UnOp(BNot, a,_) ->
-    tbool @@ TUnOp(BNot, expr_to_boolean a)
-  | BinOp((BAnd|BOr) as op,a,b,_) ->
-    let va = expr_to_boolean a in
-    let vb = expr_to_boolean b in
-    tbool @@ TBinOp(op,va,vb)
-  | BinOp(op, a, b, _) when is_boolean_binop op ->
+  let tnot t = tbool @@ TUnOp(LNot, t) in
+  let tcompare op a b =
     let va = expr_to_term ~coerce:true a in
     let vb = expr_to_term ~coerce:true b in
     tbool @@ TBinOp(op,va,vb)
+  in
+  match e.enode with
+  | UnOp(LNot, a,_) -> tnot (expr_to_boolean a)
+  | BinOp((LAnd|LOr) as op,a,b,_) ->
+    let va = expr_to_boolean a in
+    let vb = expr_to_boolean b in
+    tbool @@ TBinOp(op,va,vb)
+  | BinOp(Eq, a, b, _) ->
+    begin
+      match get_bool_kind a , get_bool_kind b with
+      | `True , `Bool -> expr_to_boolean b
+      | `Bool , `True -> expr_to_boolean a
+      | `False , `Bool -> tnot @@ expr_to_boolean b
+      | `Bool , `False -> tnot @@ expr_to_boolean a
+      | _ -> tcompare Eq a b
+    end
+  | BinOp(Ne, a, b, _) ->
+    begin
+      match get_bool_kind a , get_bool_kind b with
+      | `False , `Bool -> expr_to_boolean b
+      | `Bool , `False -> expr_to_boolean a
+      | `True , `Bool -> tnot @@ expr_to_boolean b
+      | `Bool , `True -> tnot @@ expr_to_boolean a
+      | _ -> tcompare Ne a b
+    end
+  | BinOp((Lt | Gt | Le | Ge) as op, a, b, _) ->
+    tcompare op a b
   | _ ->
     let t = expr_to_term ~coerce:true e in
     if is_zero_comparable t then
@@ -534,6 +570,7 @@ and expr_to_boolean e =
 and expr_to_predicate e =
   let open Cil_types in
   let unamed = Logic_const.unamed ~loc:e.eloc in
+  let pnot p = unamed @@ Pnot p in
   let prel r a b =
     let va = expr_to_term ~coerce:true a in
     let vb = expr_to_term ~coerce:true b in
@@ -543,14 +580,30 @@ and expr_to_predicate e =
   | BinOp(Le, a, b, _) -> prel Rle a b
   | BinOp(Gt, a, b, _) -> prel Rgt a b
   | BinOp(Ge, a, b, _) -> prel Rge a b
-  | BinOp(Eq, a, b, _) -> prel Req a b
-  | BinOp(Ne, a, b, _) -> prel Rneq a b
-  | BinOp(BAnd, a, b, _) ->
+  | BinOp(Eq, a, b, _) ->
+    begin
+      match get_bool_kind a , get_bool_kind b with
+      | `True , `Bool -> expr_to_predicate b
+      | `Bool , `True -> expr_to_predicate a
+      | `False , `Bool -> pnot @@ expr_to_predicate b
+      | `Bool , `False -> pnot @@ expr_to_predicate a
+      | _ -> prel Req a b
+    end
+  | BinOp(Ne, a, b, _) ->
+    begin
+      match get_bool_kind a , get_bool_kind b with
+      | `False , `Bool -> expr_to_predicate b
+      | `Bool , `False -> expr_to_predicate a
+      | `True , `Bool -> pnot @@ expr_to_predicate b
+      | `Bool , `True -> pnot @@ expr_to_predicate a
+      | _ -> prel Rneq a b
+    end
+  | BinOp(LAnd, a, b, _) ->
     unamed @@ Pand(expr_to_predicate a,expr_to_predicate b)
-  | BinOp(BOr, a, b, _) ->
+  | BinOp(LOr, a, b, _) ->
     unamed @@ Por(expr_to_predicate a,expr_to_predicate b)
-  | UnOp(BNot, a, _) ->
-    unamed @@ Pnot(expr_to_predicate a)
+  | UnOp(LNot, a, _) ->
+    pnot @@ expr_to_predicate a
   | _ ->
     let t = expr_to_term ~coerce:true e in
     if is_zero_comparable t then
@@ -670,8 +723,8 @@ let rec add_attribute_glob_annot a g =
     Daxiomatic(n,List.map (add_attribute_glob_annot a) l,
                Cil.addAttribute a al,loc)
   | Dtype(ti,_) -> ti.lt_attr <- Cil.addAttribute a ti.lt_attr; g
-  | Dlemma(n,ax,labs,t,p,al,l) ->
-    Dlemma(n,ax,labs,t,p,Cil.addAttribute a al,l)
+  | Dlemma(n,labs,t,p,al,l) ->
+    Dlemma(n,labs,t,p,Cil.addAttribute a al,l)
   | Dmodel_annot (mi,_) -> mi.mi_attr <- Cil.addAttribute a mi.mi_attr; g
   | Dcustom_annot(c,n,al,l) -> Dcustom_annot(c,n,Cil.addAttribute a al, l)
   | Dextended (e,al,l) -> Dextended(e,Cil.addAttribute a al,l)
@@ -1037,8 +1090,13 @@ and is_same_predicate pred1 pred2 =
   is_same_list Datatype.String.equal pred1.pred_name pred2.pred_name &&
   is_same_predicate_node pred1.pred_content pred2.pred_content
 
+
+and is_same_toplevel_predicate p1 p2 =
+  p1.tp_kind = p2.tp_kind &&
+  is_same_predicate p1.tp_statement p2.tp_statement
+
 and is_same_identified_predicate p1 p2 =
-  is_same_predicate p1.ip_content p2.ip_content
+  is_same_toplevel_predicate p1.ip_content p2.ip_content
 
 and is_same_identified_term l1 l2 =
   is_same_term l1.it_content l2.it_content
@@ -1129,7 +1187,7 @@ let is_same_pragma p1 p2 =
   | Impact_pragma p1, Impact_pragma p2 -> is_same_impact_pragma p1 p2
   | (Loop_pragma _ | Slice_pragma _ | Impact_pragma _), _ -> false
 
-let is_same_extension x1 x2 =
+let rec is_same_extension x1 x2 =
   Datatype.String.equal x1.ext_name x2.ext_name &&
   (x1.ext_has_status = x2.ext_has_status) &&
   match x1.ext_kind, x2.ext_kind with
@@ -1138,16 +1196,18 @@ let is_same_extension x1 x2 =
     is_same_list is_same_term t1 t2
   | Ext_preds p1, Ext_preds p2 ->
     is_same_list is_same_predicate p1 p2
-  | (Ext_id _ | Ext_preds _ | Ext_terms _), _ -> false
+  | Ext_annot (id1, a1), Ext_annot (id2, a2) ->
+    is_same_string id1 id2 && is_same_list is_same_extension a1 a2
+  | (Ext_id _ | Ext_preds _ | Ext_terms _ | Ext_annot _ ), _ -> false
 
 let is_same_code_annotation (ca1:code_annotation) (ca2:code_annotation) =
   match ca1.annot_content, ca2.annot_content with
-  | AAssert(l1,k1,p1), AAssert(l2,k2,p2) ->
-    is_same_list (=) l1 l2 && k1 = k2 && is_same_predicate p1 p2
+  | AAssert(l1,p1), AAssert(l2,p2) ->
+    is_same_list (=) l1 l2 && is_same_toplevel_predicate p1 p2
   | AStmtSpec (l1,s1), AStmtSpec (l2,s2) ->
     is_same_list (=) l1 l2 && is_same_spec s1 s2
   | AInvariant(l1,b1,p1), AInvariant(l2,b2,p2) ->
-    is_same_list (=) l1 l2 && b1 = b2 && is_same_predicate p1 p2
+    is_same_list (=) l1 l2 && b1 = b2 && is_same_toplevel_predicate p1 p2
   | AVariant v1, AVariant v2 -> is_same_variant v1 v2
   | AAssigns(l1,a1), AAssigns(l2,a2) ->
     is_same_list (=) l1 l2 && is_same_assigns a1 a2
@@ -1173,11 +1233,11 @@ let rec is_same_global_annotation ga1 ga2 =
     id1 = id2 && is_same_list is_same_global_annotation ga1 ga2
     && is_same_attributes attr1 attr2
   | Dtype (t1,_), Dtype (t2,_) -> is_same_logic_type_info t1 t2
-  | Dlemma(n1,ax1,labs1,typs1,st1,attr1,_),
-    Dlemma(n2,ax2,labs2,typs2,st2,attr2,_) ->
-    is_same_string n1 n2 && ax1 = ax2 &&
+  | Dlemma(n1,labs1,typs1,st1,attr1,_),
+    Dlemma(n2,labs2,typs2,st2,attr2,_) ->
+    is_same_string n1 n2 &&
     is_same_list is_same_logic_label labs1 labs2 &&
-    is_same_list (=) typs1 typs2 && is_same_predicate st1 st2 &&
+    is_same_list (=) typs1 typs2 && is_same_toplevel_predicate st1 st2 &&
     is_same_attributes attr1 attr2
   | Dinvariant (li1,_), Dinvariant (li2,_) -> is_same_logic_info li1 li2
   | Dtype_annot (li1,_), Dtype_annot (li2,_) -> is_same_logic_info li1 li2
@@ -2169,11 +2229,17 @@ let lhost_c_type thost =
      | _ -> assert false)
   | TResult ty -> ty
 
+let use_predicate = function Assert | Admit -> true | Check -> false
+let verify_predicate = function Assert | Check -> true | Admit -> false
+
 let is_assert ca =
-  match ca.annot_content with AAssert (_, Assert, _) -> true | _ -> false
+  match ca.annot_content with AAssert (_, p) -> p.tp_kind = Assert | _ -> false
 
 let is_check ca =
-  match ca.annot_content with AAssert (_, Check, _) -> true | _ -> false
+  match ca.annot_content with AAssert (_, p) -> p.tp_kind = Check | _ -> false
+
+let is_admit ca =
+  match ca.annot_content with AAssert (_, p) -> p.tp_kind = Admit | _ -> false
 
 let is_contract ca =
   match ca.annot_content with AStmtSpec _ -> true | _ -> false
@@ -2217,7 +2283,7 @@ let is_loop_annot s =
 
 let is_trivial_annotation a =
   match a.annot_content with
-  | AAssert (_,_,a) -> is_trivially_true a
+  | AAssert (_,a) -> is_trivially_true a.tp_statement
   | APragma _ | AStmtSpec _ | AInvariant _ | AVariant _
   | AAssigns _| AAllocation _ | AExtended _
     -> false
@@ -2518,8 +2584,8 @@ and bitsLogicOffset ltyp off : Integer.t * Integer.t =
         (* Force the computation of the fields fsize_in_bits and
            foffset_in_bits *)
         ignore (Cil.bitsOffset typ (Field (f, NoOffset)));
-        let size = Integer.of_int (Extlib.the f.fsize_in_bits) in
-        let offset_f = Integer.of_int (Extlib.the f.foffset_in_bits) in
+        let size = Integer.of_int (Option.get f.fsize_in_bits) in
+        let offset_f = Integer.of_int (Option.get f.foffset_in_bits) in
         loopOff f.ftype size (Integer.add start offset_f) off
       end
       else
@@ -2551,7 +2617,7 @@ let rec fold_itv f b e acc =
 let find_init_by_index init i =
   let same_offset (off, _) = match off with
     | Index (i', NoOffset) ->
-      Integer.equal i (Extlib.the (Cil.isInteger i'))
+      Integer.equal i (Option.get (Cil.isInteger i'))
     | _ -> false
   in
   snd (List.find same_offset init)

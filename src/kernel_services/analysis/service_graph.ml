@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -39,26 +39,26 @@ module type S = sig
   val entry_point: unit -> Service_graph.V.t option
   module TP: Graph.Graphviz.GraphWithDotAttrs
     with type t = Service_graph.t
-    and type V.t = node vertex
-    and type E.t = Service_graph.E.t
+     and type V.t = node vertex
+     and type E.t = Service_graph.E.t
 end
 
 module Make
-  (G: sig
-     type t
-     module V: sig
-       include Graph.Sig.COMPARABLE
-       val id: t -> int
-       val name: t -> string
-       val attributes: t -> Graph.Graphviz.DotAttributes.vertex list
-       val entry_point: unit -> t option
-     end
-     val iter_vertex : (V.t -> unit) -> t -> unit
-     val iter_succ : (V.t -> unit) -> t -> V.t -> unit
-     val iter_pred : (V.t -> unit) -> t -> V.t -> unit
-     val fold_pred : (V.t -> 'a -> 'a) -> t -> V.t -> 'a -> 'a
-     val datatype_name: string
-   end) =
+    (G: sig
+       type t
+       module V: sig
+         include Graph.Sig.COMPARABLE
+         val id: t -> int
+         val name: t -> string
+         val attributes: t -> Graph.Graphviz.DotAttributes.vertex list
+         val entry_point: unit -> t option
+       end
+       val iter_vertex : (V.t -> unit) -> t -> unit
+       val iter_succ : (V.t -> unit) -> t -> V.t -> unit
+       val iter_pred : (V.t -> unit) -> t -> V.t -> unit
+       val fold_pred : (V.t -> 'a -> 'a) -> t -> V.t -> 'a -> 'a
+       val datatype_name: string
+     end) =
 struct
 
   type graph = G.t
@@ -92,7 +92,7 @@ struct
           let name = G.datatype_name ^ " Service_graph.Service_graph.t"
           let reprs = [ M.create () ]
           let mem_project = Datatype.never_any_project
-         end)
+        end)
     let () = Type.set_ml_name Datatype.ty None
     let add_labeled_edge g src l dst =
       if mem_edge g src dst then begin
@@ -125,10 +125,12 @@ struct
   let edge_invariant src dst = function
     | Inter_functions ->
       if not (Vertex.equal src.root dst.root || dst.is_root) then
-	Kernel.failure
+        Kernel.failure
           "Correctness bug when computing services.\n\
-PLEASE REPORT AS MAJOR BUG on http://bts.frama-c.com with the following info.\n\
-Src:%s in %s (is_root:%b) Dst:%s in %s (is_root:%b)"
+           PLEASE REPORT AS MAJOR BUG on \
+           https://git.frama-c.com/pub/frama-c/issues \
+           with the following info.\n\
+           Src:%s in %s (is_root:%b) Dst:%s in %s (is_root:%b)"
           (G.V.name src.node)
           (G.V.name src.root.node)
           src.is_root
@@ -137,10 +139,12 @@ Src:%s in %s (is_root:%b) Dst:%s in %s (is_root:%b)"
           dst.is_root
     | Inter_services | Both ->
       if not (src.is_root && dst.is_root) then
-	Kernel.failure
+        Kernel.failure
           "Correctness bug when computing services.\n\
-PLEASE REPORT AS MAJOR BUG on http://bts.frama-c.com with the following info.\n\
-Src root:%s in %s (is_root:%b) Dst:%s in %s (is_root:%b) [2d case]"
+           PLEASE REPORT AS MAJOR BUG on \
+           https://git.frama-c.com/pub/frama-c/issues \
+           with the following info.\n\
+           Src root:%s in %s (is_root:%b) Dst:%s in %s (is_root:%b) [2d case]"
           (G.V.name src.node)
           (G.V.name src.root.node)
           src.is_root
@@ -182,8 +186,8 @@ Src root:%s in %s (is_root:%b) Dst:%s in %s (is_root:%b) [2d case]"
           { node = node; is_root = false; root = root }
       in
       (match G.V.entry_point () with
-      | Some e when G.V.equal node e -> entry_point_ref := Some v
-      | None | Some _ -> ());
+       | Some e when G.V.equal node e -> entry_point_ref := Some v
+       | None | Some _ -> ());
       let s = match incomming_s with
         | Fresh_if_unchanged | Unknown_cycle | Final _ -> In_service v.root
         | To_be_confirmed root -> Maybe_fresh root
@@ -198,14 +202,14 @@ Src root:%s in %s (is_root:%b) Dst:%s in %s (is_root:%b) [2d case]"
         let service =
           G.fold_pred
             (fun node' acc ->
-              try
-                let _, s' = Vertices.find node' in
-                merge_service acc s'
-              with Not_found ->
-		(* cycle *)
-		match acc with
-		| Fresh_if_unchanged | Unknown_cycle -> Unknown_cycle
-		| To_be_confirmed v | Final v -> To_be_confirmed v)
+               try
+                 let _, s' = Vertices.find node' in
+                 merge_service acc s'
+               with Not_found ->
+               (* cycle *)
+               match acc with
+               | Fresh_if_unchanged | Unknown_cycle -> Unknown_cycle
+               | To_be_confirmed v | Final v -> To_be_confirmed v)
             g
             node
             Fresh_if_unchanged
@@ -226,11 +230,11 @@ Src root:%s in %s (is_root:%b) Dst:%s in %s (is_root:%b) [2d case]"
         try
           G.iter_pred
             (fun node' ->
-              try
-                let v', _ = Vertices.find node' in
-                if not (Vertex.equal root v'.root) then raise Exit
-              with Not_found ->
-                assert false)
+               try
+                 let v', _ = Vertices.find node' in
+                 if not (Vertex.equal root v'.root) then raise Exit
+               with Not_found ->
+                 assert false)
             g
             node
         (* old status is confirmed: nothing to do *)
@@ -252,32 +256,32 @@ Src root:%s in %s (is_root:%b) Dst:%s in %s (is_root:%b) [2d case]"
     let visited = HVertex.create 7 in
     G.iter_vertex
       (fun node ->
-        let v = find node in
-        HVertex.reset visited;
-        G.iter_succ
-          (fun node' ->
-            let succ = find node' in
-            if not (HVertex.mem visited succ.node) then begin
-              HVertex.add visited succ.node ();
-              Service_graph.add_labeled_edge callg v Inter_functions succ;
-              let src_root = v.root in
-              let dst_root = succ.root in
-              if not (Vertex.equal src_root dst_root) then begin
-                Service_graph.add_labeled_edge
-                  callg
-                  src_root
-                  Inter_services
-                  dst_root
-              (* JS: no need of a 'service_to_function' edge since
-                 it is not possible to have an edge starting from a
-                 no-root vertex and going to another service.
+         let v = find node in
+         HVertex.reset visited;
+         G.iter_succ
+           (fun node' ->
+              let succ = find node' in
+              if not (HVertex.mem visited succ.node) then begin
+                HVertex.add visited succ.node ();
+                Service_graph.add_labeled_edge callg v Inter_functions succ;
+                let src_root = v.root in
+                let dst_root = succ.root in
+                if not (Vertex.equal src_root dst_root) then begin
+                  Service_graph.add_labeled_edge
+                    callg
+                    src_root
+                    Inter_services
+                    dst_root
+                    (* JS: no need of a 'service_to_function' edge since
+                       it is not possible to have an edge starting from a
+                       no-root vertex and going to another service.
 
-                 no need of a 'function_to_service' edge too since the only
-                 possible edges between two services go to a root. *)
-              end
-            end)
-          g
-          node)
+                       no need of a 'function_to_service' edge too since the only
+                       possible edges between two services go to a root. *)
+                end
+              end)
+           g
+           node)
       g
 
   let compute g initial_roots =
@@ -322,7 +326,7 @@ Src root:%s in %s (is_root:%b) Dst:%s in %s (is_root:%b) [2d case]"
         let sr = root_id (Service_graph.E.src e) in
         [ `Color (Extlib.number_to_color sr) ]
       in
-      if !inter_services_ref then 
+      if !inter_services_ref then
         color e
       else
         match Service_graph.E.label e with

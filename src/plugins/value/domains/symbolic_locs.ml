@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -563,9 +563,15 @@ module Internal : Domain_builder.InputDomain
 
   let assume _stmt _exp _pos valuation state = update valuation state
 
-  let start_call _stmt _call valuation state = update valuation state
+  let start_recursive_call recursion state =
+    let vars = List.map fst recursion.substitution @ recursion.withdrawal in
+    Memory.remove_variables vars state
 
-  let finalize_call _stmt _call ~pre:_ ~post = `Value post
+  let start_call _stmt _call recursion valuation state =
+    update valuation state >>-: fun state ->
+    Extlib.opt_fold start_recursive_call recursion state
+
+  let finalize_call _stmt _call _recursion ~pre:_ ~post = `Value post
 
   let show_expr _valuation _state _fmt _expr = ()
 
@@ -576,12 +582,12 @@ module Internal : Domain_builder.InputDomain
      this point. Hence, the alarms have already been emitted, and we can
      return [Alarmset.none]. *)
 
-  let extract_expr _oracle state expr =
+  let extract_expr ~oracle:_ _context state expr =
     match Memory.find_expr expr state with
     | None -> top_query
     | Some v -> `Value (v, None), Alarmset.none
 
-  let extract_lval _oracle state lv _typ _locs =
+  let extract_lval ~oracle:_ _context state lv _typ _locs =
     match Memory.find_lval lv state with
     | None -> top_query
     | Some v -> `Value (v, None), Alarmset.none

@@ -1,3 +1,7 @@
+/* run.config*
+   STDOPT: +"-machdep gcc_x86_64"
+*/
+
 #include <string.h>
 
 volatile int nondet;

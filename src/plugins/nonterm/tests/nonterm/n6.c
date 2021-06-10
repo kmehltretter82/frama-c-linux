@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: #"-val-builtin memcpy:Frama_C_memcpy"
+   STDOPT: #"-eva-builtin memcpy:Frama_C_memcpy"
  */
 
 #include <string.h>

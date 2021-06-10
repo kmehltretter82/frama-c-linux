@@ -4,6 +4,7 @@
 \usepackage{lmodern}
 \usepackage{booktabs}
 \usepackage{calc}
+\usepackage{multirow}
 
 % Commandes pour mettre des ref dans l'index :
 \newcommand{\idb}[1]{\textbf{#1}}
@@ -35,25 +36,11 @@
 
 \newcommand{\Eva}{\textsf{Eva}}
 
+\input{./frama-c-affiliation.tex}
+
 \lstset{literate=%
 {∈}{{$\in$ }}1
 }
-
-% The following definitions are used to differentiate between
-% the open-source manual and the closed-source one.
-% Source: http://tex.stackexchange.com/questions/62010
-% Note: does NOT work with xetex/luatex.
-% Also, note that some weird situations may arrive inside
-% \ifdefstring blocks, e.g. \lstinline blocks require escaping
-% backslashes, otherwise this file will not parse.
-\usepackage{etoolbox}
-\usepackage{catchfile}
-\newcommand{\getenv}[2][]{%
-  \CatchFileEdef{\temp}{"|kpsewhich --var-value #2"}{\endlinechar=-1\relax}%
-  \if\relax\detokenize{#1}\relax\temp\else\edef#1{\temp}\fi}
-
-% define \OPENSOURCE to the value of the OPENSOURCE environment variable
-\getenv[\OPENSOURCE]{OPENSOURCE}
 
 %==============================================================================
 \begin{document}
@@ -70,7 +57,7 @@
   With Matthieu Lemerre, André Maroneze,
   Valentin Perrelle and Virgile Prevosto}
 \begin{tabular}{l}
-CEA LIST, Software Reliability Laboratory, Saclay, F-91191 \\
+  \fcaffiliationen
 \end{tabular}
 \vfill
 \begin{flushleft}
@@ -1374,12 +1361,24 @@ the 32-bit word read is made of the last two bytes from \lstinline|t[0]|
 and the first two bytes from \lstinline|t[1]|.
 
 \subsubsection{Call to an unknown function}
-The origin \lstinline$Library function L$ is used for the result of
-recursive functions or calls to function pointers whose value is not known
-precisely.
+The origin \lstinline$Library function L$ arises from the interpretation
+of a function specification, when an \lstinline|assigns| clause applies to
+pointer values.
+A function specification is only used for:
+\begin{itemize}
+\item
+  functions whose body is not provided, and for which no Eva builtins
+  exist. See section~\ref{builtins-list} for a list of available builtins.
+\item
+  recursive functions that cannot be completely analyzed;
+  see section~\ref{recursion} for more details.
+\item
+  functions given to the \verb+-eva-use-spec+ option;
+  see section~\ref{val-use-spec} for more details.
+\end{itemize}
 
 \subsubsection{Fusion of values with different alignments}
-The notation \lstinline$Merge L$ that memory states  with incompatible
+The notation \lstinline$Merge L$ indicates that memory states with incompatible
 alignments are fused together. In the example below,
 the memory states from
 the then branch and from the else branch contain in the array
@@ -1483,7 +1482,7 @@ This may happen on:
   according to the \isoc{} standard. However, a footnote also explains that
   conversion between pointers and integers is ``\emph{intended to
   be consistent with the addressing structure of the execution environment}''.
-  This is why Eva also also authorizes conversion of integers:
+  This is why Eva also authorizes conversion of integers:
   \begin{itemize}
   \item in the range of valid absolute addresses
     (according to \texttt{absolute-valid-range})
@@ -2031,6 +2030,50 @@ by the Report plugin.
 The summary display can be disabled by using option
 \lstinline|-eva-msg-key=-summary|.
 
+\subsection{Audit messages ({\em experimental})}
+
+Using options \lstinline|-audit-prepare| and \lstinline|-audit-check|, the
+user can produce and check some information relevant for auditing purposes.
+
+\lstinline|-audit-prepare <file>| outputs the following information:
+
+\begin{itemize}
+\item the list of all source files used during parsing: not only those
+  given in the command line, but also those in \lstinline|#include|
+  directives, recursively. This usually includes Frama-C's standard library.
+  For each file, its MD5 checksum is also printed;
+\item the list of {\em enabled} and {\em disabled} warning categories,
+  for the kernel as well as for \Eva{}. Warning categories are considered
+  disabled when set to one of the following actions: {\em inactive},
+  {\em feedback}, and {\em feedback-once}. All other actions are considered
+  as enabled;
+\item the list of Eva's {\em correctness parameters}, along with their values
+  at the moment when Eva is run.
+\end{itemize}
+
+The information is written to \lstinline|<file>|, in JSON format, unless it
+is the special value \lstinline|-| (given as \lstinline|-audit-prepare=-|),
+in which case the information is printed to the standard output in text format.
+
+The complementary option \lstinline|-audit-check file| takes a JSON file
+produced by \lstinline|-audit-prepare| and checks if all checksums, warning
+category statuses and correctness parameters match. Any discrepancies are
+reported and result in an error by default.
+
+The main intent of these options is to help users perform audit-related
+tasks concerning an analysis performed with Eva. It also helps fine-tuning
+analyses without affecting its correctness; for instance, since it omits
+information related to parameters which do not affect correctness, the user
+is free to adjust them to improve the speed and precision of the analysis.
+
+Note that these options are still in experimental stage, and should not be
+blindly relied upon for strict auditing purposes. For instance, they do
+not record information related to syntactic transformations performed by
+plugins such as \textsf{Variadic}, which can have an indirect impact on
+its correctness.
+
+Please contact the Frama-C development team if you intend to use these
+options in a production setting.
 
 \section{About these alarms the user is supposed to check\ldots}
 
@@ -2270,8 +2313,10 @@ prototypes (e.g. \lstinline|stdio.h| for \lstinline|printf|) are included.
 Calls to variadic functions in the C standard library also include
 ACSL specifications, which \Eva{} uses to interpret their behavior.
 
-Recursive functions are allowed in Frama-C, but they
-are not handled in the current version of the \Eva{} plug-in.
+Recursive functions are partially supported by \Eva{}: only a bounded
+number of recursive calls can be analyzed, and a user-written specification
+is required to interpret other calls.
+See section \ref{recursion} for more details.
 
 \section{Analyzing a partial or a complete application}
 
@@ -3299,6 +3344,80 @@ informed assumptions. However, no guarantee is made that those assumptions
 over-approximate the real behavior of the function. The inferred
 contract should be verified carefully by the user.
 
+\subsection{Analyzing recursive functions}
+\label{recursion}
+
+By default, recursive calls are not analyzed; instead, \Eva{} uses the
+specification written by the user for the recursive function to interpret
+its recursive calls. The analysis of the function is then incomplete,
+as only its non-recursive calls are analyzed: values are inferred and
+alarms are emitted only for these calls.
+For the recursive calls, the analysis' soundness relies entirely on the
+specification provided by the user, which is not verified, and a warning
+is emitted.
+
+\begin{logs}
+[eva] file.c: Warning:
+  Using specification of function <name> for recursive calls.
+  Analysis of function <name> is thus incomplete and its soundness
+  relies on the written specification.
+\end{logs}
+
+If no ACSL contract is provided for the recursive function,
+a minimal specification is inferred by the \FramaC kernel
+from the function type, and an error is emitted.
+The specification is only generated to allow the analysis to continue
+past the recursive call, without any guarantees that it describes correctly
+the real behaviors of the function.
+In particular, only \lstinline|assigns| clauses are created, without any
+preconditions.
+It is the user's responsibility to replace this generated specification by
+a correct one.
+
+\subsubsection{Unrolling recursive calls}
+
+Option \lstinline|-eva-unroll-recursive-calls n| allows the precise analysis
+of recursive calls up to a depth of <n>. The function specification is only used
+when encountering a recursive call of depth greater than <n>.
+
+On the example below, analyzed with \lstinline|-eva-unroll-recursive-calls 10|:
+\begin{itemize}
+\item
+  the first call \lstinline|factorial(8)| is soundly and precisely analyzed
+  without any warnings;
+\item
+  the analysis of the second call \lstinline|factorial(20)| is incomplete and
+  produces a warning, as it resorts to the function specification for the tenth
+  recursive call.
+\end{itemize}
+
+\lstinputlisting{examples/parametrizing/recursion-simple.c}
+
+With option \lstinline|-eva-unroll-recursive-calls|,
+the analysis of a recursive function can thus be complete and sound,
+when the number of recursive calls can be bounded by the analysis.
+In that case, no ACSL specification is required for the analysis of the
+recursive function.
+
+However, even when the number of recursive calls is bounded in practice,
+the \Eva{} analysis might be too imprecise to be complete.
+
+\lstinputlisting{examples/parametrizing/recursion-imprecise.c}
+
+The above example presents a recursive function \lstinline|mod3|, which
+computes the congruence modulo 3 in up to three recursive calls.
+However, Eva is unable to perform a complete analysis of this function
+in the general case and will instead rely on the \lstinline|mod3| specification,
+as it cannot reduce the new argument value of the recursive calls, as shown
+by the successive values printed by the \lstinline|Frama_C_show_each| directive:
+
+\lstinputlisting[linerange={12-19}]
+                {examples/parametrizing/recursion-imprecise.log}
+
+Finally, note that the unrolling of a very large number of recursive calls can
+considerably slow down the analysis.
+
+
 \subsection{Using the specification of a function instead of its body}
 \label{val-use-spec}
 
@@ -3899,14 +4018,83 @@ analysis, both in terms of precision and performance. However, when dealing
 with large arrays and matrices, it is worth considering its usage.
 
 
-\section{Advanced analyses}
+\section{Analysis domains}
 \label{sec:eva}
-
 
 This section presents the analysis \emph{domains}
 available to improve the precision on specific code constructs.
 They can (and probably should) be enabled at the beginning of the analysis.
 Their only downside is that they increase the analysis time.
+
+Figure~\ref{fig:eva-domains} presents the list of currently available analysis
+domains, with a short description of each one.
+Most domains are also presented in more details in the following subsections.
+
+\begin{figure}
+  \begin{tabular}{lll>{\raggedright}m{7.5cm}}
+    Name & Log & Ref & Description\tabularnewline
+    \midrule
+    \midrule
+    cvalue & d-cvalue &  &
+    Main analysis domain, enabled by default. Should not be disabled.
+    \tabularnewline
+    \midrule
+    equality & d-equality & \ref{sec:symbolic-equalities} &
+    Infers equalities between C expressions. \\
+    Useful on most analyses and very efficient.
+    \tabularnewline
+    \midrule
+    symbolic-locations & d-symblocs & \ref{sec:reuse} &
+    Infers values at symbolic locations. \\
+    Useful on most analyses and very efficient.
+    \tabularnewline
+    \midrule
+    gauges & d-gauges & \ref{sec:gauges} &
+    Infers linear inequalities between variables modified within a loop. Efficient.
+    \tabularnewline
+    \midrule
+    octagon & d-octagon & \ref{sec:octagons} &
+    Infers relations between scalar variables. \\
+    Efficient but limited.
+    \tabularnewline
+    \midrule
+    bitwise & d-bitwise & \ref{sec:bitwise} &
+    Interprets more precisely some bitwise operations. Rarely useful.
+    \tabularnewline
+    \midrule
+    sign & d-sign &  &
+    Infers the sign of variables. Rarely useful.
+    \tabularnewline
+    \midrule
+    apron-box & \multirow{5}{*}{d-apron} & \multirow{5}{*}{\ref{sec:apron}} &
+    \multirow{5}{7.5cm}{Experimental and often costly. \\
+      Binding to the Apron library domains.}\tabularnewline
+    apron-octagon &  &  & \tabularnewline
+    apron-polka-equality &  &  & \tabularnewline
+    apron-polka-loose &  &  & \tabularnewline
+    apron-polka-strict &  &  & \tabularnewline
+    \midrule
+    numerors & d-numerors & \ref{sec:numerors} &
+    Experimental. Infers ranges for absolute and relative errors
+    in floating-point computations.
+    \tabularnewline
+    \midrule
+    inout & d-inout &  &
+    Experimental. Computes the input and output of each function.
+    \tabularnewline
+    \midrule
+    traces & d-traces &  &
+    Experimental. Builds an over-approximation of all traces leading to
+    a statement.
+    \tabularnewline
+    \midrule
+    printer & d-printer &  & Only useful for developers.
+    \tabularnewline
+    \bottomrule
+  \end{tabular}
+
+  \caption{Analysis domains \label{fig:eva-domains}}
+\end{figure}
 
 These analysis domains are enabled by the option \texttt{-eva-domains}, followed
 by a list of domain names. A list of the available domains, and a short
@@ -3937,9 +4125,9 @@ These analysis domains currently have some restrictions:
 However, the properties inferred by a specific domain at a program point may be
 inspected by using the directive \lstinline+Frama_C_dump_each+ or
 \lstinline+Frama_C_domain_show_each+ in the analyzed source code, and by
-enabling the log category of the given domain. These directives and domain log
-categories are described in Section~\ref{buitins_observation}.
-
+enabling the log category of the given domain. These directives are described
+in Section~\ref{buitins_observation}, and the log category of each domain
+is given by Figure~\ref{fig:eva-domains}.
 
 \subsection{Symbolic equalities}
 \label{sec:symbolic-equalities}
@@ -4169,11 +4357,11 @@ the APRON library \cite{DBLP:conf/cav/JeannetM09}. Assuming Frama-C has been
 compiled with support for Apron, the corresponding options are:
 
 \begin{description}
-\item[-eva-apron-box]: boxes/intervals
-\item[-eva-apron-oct]:  octagons
-\item[-eva-polka-equalities]:  linear equalities
-\item[-eva-polka-loose]: loose polyhedra
-\item[-eva-polka-strict]: strict polyhedra
+\item[-eva-domains apron-box]: boxes/intervals
+\item[-eva-domains apron-octagon]:  octagons
+\item[-eva-domains apron-polka-equality]:  linear equalities
+\item[-eva-domains apron-polka-loose]: loose polyhedra
+\item[-eva-domains apron-polka-strict]: strict polyhedra
 \end{description}
 
 The analysis is fully interprocedural. However, the binding is
@@ -5189,40 +5377,7 @@ each time the analyzer reaches the call.
 The internal states of each additional domain described in Section~\ref{sec:eva}
 are also displayed if the domain's log category has been enabled through the
 option \verb+-eva-msg-key category+, where \verb+category+ is the log category
-of the domain, shown in Figure~\ref{fig:log-category}.
-
-\begin{figure}
-  \begin{centering}
-    \begin{tabular}{lll}
-      Domain & Log category & Ref\tabularnewline
-      \midrule
-      \midrule
-      Symbolic equalities & \lstinline|d-eq| & \ref{sec:symbolic-equalities}
-      \tabularnewline
-      \midrule
-      Symbolic locations & \lstinline|d-symblocs| & \ref{sec:reuse}
-      \tabularnewline
-      \midrule
-      Gauges & \lstinline|d-gauges| & \ref{sec:gauges}
-      \tabularnewline
-      \midrule
-      Octagons & \lstinline|d-octagon| & \ref{sec:octagons}
-      \tabularnewline
-      \midrule
-      Bitwise & \lstinline|d-bitwise| & \ref{sec:bitwise}
-      \tabularnewline
-      \midrule
-      Apron binding & \lstinline|d-apron| & \ref{sec:apron}
-      \tabularnewline
-      \midrule
-      Numerors & \lstinline|d-numerors| & \ref{sec:numerors}
-      \tabularnewline
-      \bottomrule
-    \end{tabular}
-    \par\end{centering}
-    \caption{Log categories for additional domains \label{fig:log-category}}
-
-\end{figure}
+of the domain, shown in Figure~\ref{fig:eva-domains}.
 
 \subsection{Displaying internal properties about expressions}
 
@@ -5235,7 +5390,7 @@ By default, only the internal representation of variables by the main domain
 (see Section~\ref{sec:values}) are shown. The properties inferred by each
 additional domain are also printed if the domain's log category has been enabled
 through the option \verb+-eva-msg-key category+, where \verb+category+ is the
-log category of the domain, shown in Figure~\ref{fig:log-category}. The
+log category of the domain, shown in Figure~\ref{fig:eva-domains}. The
 information printed by the additional domains is currently very limited.
 
 
@@ -5247,28 +5402,31 @@ a short description of their behavior.
 
 \subsection{Floating-point operations}
 
-Generally speaking, all functions mentioned below are the counter-part of the
+Generally speaking, all functions mentioned below are the counterpart of the
 standard library function of the same name, minus the
 \lstinline|Frama_C_| prefix.
 
 \begin{table}[!ht]
   \centering
-  \begin{tabular}{lllll}
-    \multicolumn{5}{c}{Floating-point builtins} \\
+  \begin{tabular}{llll}
+    \multicolumn{4}{c}{Floating-point builtins} \\
     \hline
     \lstinline|Frama_C_sqrt| &
-    \lstinline|Frama_C_cos| &
-    \lstinline|Frama_C_sin| &
-    \lstinline|Frama_C_log| &
-    \lstinline|Frama_C_log10| \\
+    \lstinline|Frama_C_pow| &
     \lstinline|Frama_C_exp| &
+    \lstinline|Frama_C_log| \\
+    \lstinline|Frama_C_log10| &
+    \lstinline|Frama_C_fmod| &
+    \lstinline|Frama_C_cos| &
+    \lstinline|Frama_C_sin| \\
+    \lstinline|Frama_C_acos| &
+    \lstinline|Frama_C_asin| &
+    \lstinline|Frama_C_atan| &
+    \lstinline|Frama_C_atan2| \\
     \lstinline|Frama_C_ceil| &
     \lstinline|Frama_C_floor| &
     \lstinline|Frama_C_round| &
-    \lstinline|Frama_C_trunc| \\
-    \lstinline|Frama_C_atan2| &
-    \lstinline|Frama_C_pow| &
-    \lstinline|Frama_C_fmod| &
+    \lstinline|Frama_C_trunc|
   \end{tabular}
 \end{table}
 Equivalent builtins exist for 32-bit float computations, with a name suffixed
@@ -5291,46 +5449,35 @@ Builtins for functions of the \lstinline|string.h| standard header.
   \end{tabular}
 \end{table}
 
+\begin{table}[!ht]
+  \centering
+  \begin{tabular}{ccc}
+    \multicolumn{3}{c}{Wide-character string manipulation builtins} \\
+    \hline
+    \lstinline|Frama_C_wmemchr| &
+    \lstinline|Frama_C_wcschr| &
+    \lstinline|Frama_C_wcslen|
+  \end{tabular}
+\end{table}
+
 \begin{important}
   \lstinline|rawmemchr| is a GNU extension to standard C.
 \end{important}
 
-\ifdefstring{\OPENSOURCE}{no}{
-  % These builtins are not available in the open-source release
-\subsection{Memory representation}
-These builtins allow to perform queries over the current abstract memory state.
-\begin{itemize}
-\item \lstinline|Frama_C_is_base_aligned(p,n)| checks that the pointer argument
-  \lstinline|p| is aligned on \lstinline|n| bytes, assuming that
-  \lstinline|\\base_addr(p)| is itself aligned according to the alignment
-  of is type (as defined by the current \lstinline+machdep+).
-\item \lstinline|Frama_C_offset(p)| returns the possible offsets of
-  \lstinline|p| with respect to its base address. That is,
-  \lstinline|Frama_C_offset(p) == \\offset(p)| holds. (But
-  \lstinline|Frama_C_offset(p)| can be used outside of ACSL fragments.)
-\end{itemize}
-}{ % open source version - do not mention builtins
-}
-
-\ifdefstring{\OPENSOURCE}{no}{
-  % These builtins are not available in the open-source release
 \subsection{Memory manipulation}
 These builtins perform operations on the abstract memory.
-They usually correspond to the standard C library function of the same name.
-\begin{itemize}
-\item \lstinline|Frama_C_memcpy|
-\item \lstinline|Frama_C_memset|
-\end{itemize}
-}{ % open source version - advertise memcpy/memset builtins
-\subsection{Memory manipulation}
-Builtins for the C standard library functions \lstinline|memcpy|,
-\lstinline|memmove| and
-\lstinline|memset|  exist, but they are not available in the
-open-source release of \FramaC.
+They correspond to the standard C library function of the same name.
 
-Please contact us if you would like to use them for academic and/or
-commercial purposes.
-}
+\begin{table}[!ht]
+  \centering
+  \begin{tabular}{ccc}
+    \multicolumn{3}{c}{Memory manipulation builtins} \\
+    \hline
+    \lstinline|Frama_C_memcpy| &
+    \lstinline|Frama_C_memset| &
+    \lstinline|Frama_C_memmove|
+  \end{tabular}
+\end{table}
 
 \subsection{Dynamic allocation}
 
@@ -5352,53 +5499,66 @@ They are listed here for completeness.
   \end{tabular}
 \end{table}
 
-\ifdefstring{\OPENSOURCE}{no}{
-  % These builtins are not available in the open-source release
+%% Undocumented builtins
+\begin{comment}
 
-\subsection{Operations on the abstract state}
+  \subsection{Operations on the abstract state}
 
-These builtins perform low-level operations on the abstract representation
-manipulated internally by \Eva{}. Usually not for the casual user.
+  These builtins perform low-level operations on the abstract representation
+  manipulated internally by \Eva{}. Usually not for the casual user.
 
+  \begin{itemize}
+  \item \lstinline|Frama_C_dump_assert_each| prints the abstract state as an
+    argument of a C assert.
+  \item \lstinline|Frama_C_dump_assignments_each| prints the abstract state as a
+    sequence of C assignments (potentially using \lstinline|Frama_C_interval|).
+  \item \lstinline|Frama_C_interval_split(low,high)|, where \lstinline|low|
+    and \lstinline|high| must be precise, will return a value between low and high,
+    using high-low distinct states, each one containing a single integer for the result.
+  \item \lstinline|Frama_C_ungarble| transforms a garbled mix into \lstinline|Top_int|.
+  \item \lstinline|Frama_C_watch_value(loc,s,target,n)| allows to check whether
+    the abstract value of the location \lstinline|((char *)loc)[0..s-1]| can be
+    equal to \lstinline|target|. \lstinline|n| is simply a way to identify the
+    watchpoint. \lstinline|s| and \lstinline|n| must be precise.
+    If this is the case, a message will be output.
+  \item \lstinline|Frama_C_watch_cardinal(loc,s,target,n)| is the same as above,
+    but the target is the number of elements that are contained in the abstract
+    state for loc (a message is output if this number is higher than target).
+  \end{itemize}
+
+  \subsection{Deterministic builtins}
+
+  These builtins can only be used in interpreter mode: they will abort execution
+  if the arguments they are given are not precise (i.e. do not correspond to a
+  single concrete value).
+  They correspond to the standard C library function of the same name.
+
+  \begin{table}[!ht]
+    \centering
+    \begin{tabular}{cccc}
+      \multicolumn{4}{c}{Deterministic builtins} \\
+      \hline
+      \lstinline|Frama_C_printf| &
+      \lstinline|Frama_C_snprintf| &
+      \lstinline|Frama_C_sprintf| &
+      \lstinline|Frama_C_wprintf|
+    \end{tabular}
+  \end{table}
+
+\end{comment}
+
+\subsection{Memory representation}
+These builtins allow to perform queries over the current abstract memory state.
 \begin{itemize}
-\item \lstinline|Frama_C_dump_assert_each| prints the abstract state as an
-  argument of a C assert.
-\item \lstinline|Frama_C_dump_assignments_each| prints the abstract state as a
-  sequence of C assignments (potentially using \lstinline|Frama_C_interval|).
-\item \lstinline|Frama_C_interval_split(low,high)|, where \lstinline|low|
-  and \lstinline|high| must be precise, will return a value between low and high,
-  using high-low distinct states, each one containing a single integer for the result.
-\item \lstinline|Frama_C_ungarble| transforms a garbled mix into \lstinline|Top_int|.
-\item \lstinline|Frama_C_watch_value(loc,s,target,n)| allows to check whether
-  the abstract value of the location \lstinline|((char *)loc)[0..s-1]| can be
-  equal to \lstinline|target|. \lstinline|n| is simply a way to identify the
-  watchpoint. \lstinline|s| and \lstinline|n| must be precise.
-  If this is the case, a message will be output.
-\item \lstinline|Frama_C_watch_cardinal(loc,s,target,n)| is the same as above,
-  but the target is the number of elements that are contained in the abstract
-  state for loc (a message is output if this number is higher than target).
+\item \lstinline|Frama_C_is_base_aligned(p,n)| checks that the pointer argument
+  \lstinline|p| is aligned on \lstinline|n| bytes, assuming that
+  \lstinline|\base_addr(p)| is itself aligned according to the alignment
+  of its type (as defined by the current \lstinline+machdep+).
+\item \lstinline|Frama_C_offset(p)| returns the possible offsets of
+  \lstinline|p| with respect to its base address. That is,
+  \lstinline|Frama_C_offset(p) == \offset(p)| holds (but
+  \lstinline|Frama_C_offset(p)| can be used outside of ACSL fragments).
 \end{itemize}
-
-\subsection{Deterministic builtins}
-
-These builtins can only be used in interpreter mode: they will abort execution
-if the arguments they are given are not precise (i.e. do not correspond to a
-single concrete value).
-They correspond to the standard C library function of the same name.
-
-\begin{table}[!ht]
-  \centering
-  \begin{tabular}{cccc}
-    \multicolumn{4}{c}{Deterministic builtins} \\
-    \hline
-    \lstinline|Frama_C_printf| &
-    \lstinline|Frama_C_snprintf| &
-    \lstinline|Frama_C_sprintf| &
-    \lstinline|Frama_C_wprintf|
-  \end{tabular}
-\end{table}
-}{ % open source version - do not mention builtins
-}
 
 \subsection{State-splitting builtins}
 
@@ -5461,13 +5621,13 @@ The second family of builtins can be used to compute the cardinality.
   \end{tabular}
 \end{table}
 
-
-Prototypes for those builtins can be found in \lstinline+__fc_builtin.h+.
+For example:
 \lstinline|Frama_C_abstract_cardinal| returns \lstinline|12| on
 \lstinline+[6..36],0%3+, %
 while  \lstinline|Frama_C_abstract_min| and \lstinline|Frama_C_abstract_max|
 return \lstinline|6| and \lstinline|36| respectively.
 
+Prototypes for those builtins can be found in \lstinline+__fc_builtin.h+.
 
 
 

@@ -70,7 +70,7 @@ struct
   let array ?size = function
     | (_,Ctype t) as typ ->
       let to_exp = Cil.integer ~loc:unknown_loc in
-      let size = Extlib.opt_map to_exp size in
+      let size = Option.map to_exp size in
       Listed typ,
       Ctype (TArray (t, size, Cil.empty_size_cache (), []))
     | _, _ -> raise NotACType
@@ -215,7 +215,7 @@ struct
     | Pred pred ->
       pretty_pred fmt pred
   and pretty_exp_opt fmt o =
-    Extlib.may (pretty_exp fmt) o
+    Option.iter (pretty_exp fmt) o
   and pretty_app fmt (name,labels,args) =
     Format.fprintf fmt "%s{%a}(%a)"
       name
@@ -469,9 +469,9 @@ struct
       Cil.new_exp ~loc (Cil_types.Lval (build_lval ~loc lval))
     | Unop (op,e) ->
       let e' = build_exp ~loc e in
-      let t = Cil.typeOf e' in
-      let t' = Cil.integralPromotion t in
-      Cil.(new_exp ~loc (Cil_types.UnOp (op, mkCastT e' t t', t')))
+      let oldt = Cil.typeOf e' in
+      let newt = Cil.integralPromotion oldt in
+      Cil.(new_exp ~loc (Cil_types.UnOp (op, mkCastT ~oldt ~newt e', oldt)))
     | Binop (op,e1,e2) ->
       let is_pointer_type e =
         Cil.(isPointerType (typeOf e))
@@ -487,14 +487,14 @@ struct
       in
       Cil.mkBinOp ~loc op' e1' e2'
     | Cast (Cil_types.Ctype newt, e) ->
-      Cil.mkCast ~force:false ~e:(build_exp ~loc e) ~newt
+      Cil.mkCast ~force:false ~newt (build_exp ~loc e)
     | Cast _ ->
       raise NotACType
     | Addr lv ->
       Cil.mkAddrOrStartOf ~loc (build_lval ~loc lv)
 
   let rec build_term_lval ~loc ~restyp = function
-    | Result -> Cil_types.(TResult (Extlib.the restyp), TNoOffset)
+    | Result -> Cil_types.(TResult (Option.get restyp), TNoOffset)
     | CilLval _ as lv -> raise (CInLogic (`lval lv))
     | Var v -> Cil_types.(TVar (Cil.cvar_to_lvar v), TNoOffset)
     | Mem t ->
@@ -578,8 +578,8 @@ struct
       let ty = Cil.typeOfTermLval tlval in
       Logic_utils.mk_logic_AddrOf ~loc tlval ty
     | Range (t1,t2) ->
-      let t1' = Extlib.opt_map (build_term ~loc ~restyp) t1
-      and t2' = Extlib.opt_map (build_term ~loc ~restyp) t2 in
+      let t1' = Option.map (build_term ~loc ~restyp) t1
+      and t2' = Option.map (build_term ~loc ~restyp) t2 in
       Logic_const.trange ~loc (t1',t2')
     | App (logic_info, labels, args) ->
       let ty = match logic_info.l_type with
@@ -660,9 +660,9 @@ struct
   let cil_constant c = build_constant (harden_const c)
   let cil_lval ~loc lv = build_lval ~loc (harden_lval lv)
   let cil_lval_opt ~loc lv =
-    Extlib.opt_map (build_lval ~loc) (harden_lval_opt lv)
+    Option.map (build_lval ~loc) (harden_lval_opt lv)
   let cil_exp ~loc e = build_exp ~loc (harden_exp e)
-  let cil_exp_opt ~loc e = Extlib.opt_map (build_exp ~loc) (harden_exp_opt e)
+  let cil_exp_opt ~loc e = Option.map (build_exp ~loc) (harden_exp_opt e)
   let cil_exp_list ~loc l = List.map (cil_exp ~loc) l
   let cil_term_lval ~loc ?restyp lv =
     build_term_lval ~loc ~restyp (harden_lval lv)
@@ -747,7 +747,7 @@ struct
     | Assign (dest,src) ->
       Cil_types.Set (build_lval ~loc dest, build_exp ~loc src, loc)
     | Call (dest,callee,args) ->
-      let dest' = Extlib.opt_map (build_lval ~loc) dest
+      let dest' = Option.map (build_lval ~loc) dest
       and callee' = build_exp ~loc callee
       and args' = List.map (build_exp ~loc) args in
       Cil_types.Call (dest', callee', args', loc)
@@ -887,7 +887,7 @@ struct
     owner := None
 
   let set_owner o =
-    if Extlib.has_some !owner then
+    if Option.is_some !owner then
       raise (WrongContext "already in a function");
     owner := Some o
 
@@ -1005,7 +1005,7 @@ struct
 
   let open_function ?ghost ?vorig_name name =
     check_empty ();
-    let vorig_name = Extlib.opt_conv name vorig_name in
+    let vorig_name = Option.value ~default:name vorig_name in
     let fundec = Cil.emptyFunction vorig_name in
     fundec.svar.vdecl <- loc;
     fundec.svar.vname <- name;
@@ -1014,19 +1014,19 @@ struct
     `var fundec.Cil_types.svar
 
   let open_block ?into ?ghost () =
-    Extlib.may set_owner into;
+    Option.iter set_owner into;
     push (new_block ?ghost Block)
 
   let open_ghost ?into () =
     open_block ?into ~ghost:true ()
 
   let open_switch ?into exp =
-    Extlib.may set_owner into;
+    Option.iter set_owner into;
     let switch_exp = cil_exp ~loc exp in
     push (new_block (Switch {switch_exp}))
 
   let open_if ?into exp =
-    Extlib.may set_owner into;
+    Option.iter set_owner into;
     let ifthen_exp = cil_exp ~loc exp in
     push (new_block (IfThen {ifthen_exp}))
 
@@ -1194,7 +1194,7 @@ struct
     `var v
 
   let local ?ghost ?init ty name =
-    let init = Extlib.opt_map (values ty) init in
+    let init = Option.map (values ty) init in
     local' ?ghost ?init (cil_typ ty) name
 
   let local_copy ?(ghost=false) ?(suffix="_tmp") (`var vi) =

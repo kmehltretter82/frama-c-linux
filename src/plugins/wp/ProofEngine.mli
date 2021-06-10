@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -35,7 +35,15 @@ val validate : ?incomplete:bool -> tree -> unit
 
 (** Leaves are numbered from 0 to n-1 *)
 
-type status = [ `Main | `Invalid | `Proved | `Pending of int ]
+
+type status = [
+  | `Unproved (** proof obligation not proved *)
+  | `Proved   (** proof obligation is proved *)
+  | `Pending of int (** proof is pending *)
+  | `Passed   (** smoke test is passed (PO is not proved) *)
+  | `Invalid  (** smoke test has failed (PO is proved) *)
+  | `StillResist of int (** proof is pending *)
+]
 type current = [ `Main | `Internal of node | `Leaf of int * node ]
 type position = [ `Main | `Node of node | `Leaf of int ]
 

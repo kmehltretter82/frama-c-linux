@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -23,7 +23,6 @@
 open Cil_types
 open Va_types
 open Options
-module Cil = Extends.Cil
 module List = Extends.List
 module Typ = Extends.Typ
 
@@ -130,7 +129,7 @@ let cast_arg i paramtyp exp =
           (i + 1)
           pretty_typ argtyp pretty_typ paramtyp
     end;
-  Cil.mkCast ~force:false ~e:exp ~newt:paramtyp
+  Cil.mkCast ~force:false ~newt:paramtyp exp
 
 
 (* cast a list of args to the tparams list of types and remove unused args *)
@@ -293,6 +292,9 @@ let overloaded_call ~fundec overload block loc mk_call vf args =
       raise Translate_call_exn;
   in
 
+  (* Store the translation *)
+  Replacements.add new_callee vf.vf_decl;
+
   (* Rebuild the call *)
   Self.result ~current:true ~level:2
     "Translating call to the specialized version %a."
@@ -397,7 +399,7 @@ let build_specialized_fun env loc vf format_fun tvparams =
     in
     Build.parameter typ ("param" ^ string_of_int i)
   in
-  let sformals = List.map add_static_param (Extlib.the params)
+  let sformals = List.map add_static_param (Option.get params)
   and vformals = List.mapi add_variadic_param tvparams
   in
 
@@ -433,7 +435,7 @@ let build_specialized_fun env loc vf format_fun tvparams =
       | `ArgInArray (Some precision) ->
         let nterm = match precision with
           | PStar ->
-            let size_arg = List.nth vformals (Extlib.the pos - 1) in
+            let size_arg = List.nth vformals (Option.get pos - 1) in
             Build.(cast integer size_arg)
           | PInt n ->
             Build.of_int n
@@ -566,6 +568,9 @@ let format_fun_call ~fundec env format_fun scope loc mk_call vf args =
   (* Create the new callee *)
   let glob, new_callee = build_specialized_fun env loc vf format_fun tvparams in
   new_globals := glob :: !new_globals;
+
+  (* Store the translation *)
+  Replacements.add new_callee vf.vf_decl;
 
   (* Translate the call *)
   Self.result ~current:true ~level:2

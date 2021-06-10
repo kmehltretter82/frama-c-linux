@@ -1,12 +1,12 @@
 /* run.config
-   STDOPT: +"-slevel 100 -eva"
-   STDOPT: +"-ulevel 1 -slevel 100 -eva"
-   STDOPT: +"-ulevel 2 -slevel 100 -eva"
+PLUGIN: eva,scope
+   STDOPT: +"-eva-slevel 100 -eva"
+   STDOPT: +"-ulevel 1 -eva-slevel 100 -eva"
+   STDOPT: +"-ulevel 2 -eva-slevel 100 -eva"
    COMMENT: compile and run with GCC, save output to a file, and compare it to
    the result of Frama-C piped to:
      "| grep Frama_C_show_each | sed 's/^.*Frama_C_show_each_//'"
 */
-
 #ifdef __FRAMAC__
 #define print(line, s, a) Frama_C_show_each_ ## s ## _(a)
 #else

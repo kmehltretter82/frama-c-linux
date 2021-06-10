@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -147,7 +147,8 @@ let compute_information (kinstr, alarm_or_prop, contexts) =
     match alarm_or_prop with
     | Alarm alarm ->
       let kf, stmt = kinstr_to_stmt kinstr in
-      let code_annot, _ = Alarms.to_annot kinstr alarm in
+      let loc = Cil_datatype.Stmt.loc stmt in
+      let code_annot, _ = Alarms.to_annot kinstr ~loc alarm in
       let property = Property.ip_of_code_annot_single kf stmt code_annot in
       kf, property, true
     | Prop ip -> kf_of_property ip, ip, false
@@ -175,8 +176,9 @@ let print_information fmt { loc; kf; alarm; kind; text; status; contexts } =
     dir file lnum kf alarm kind contexts status text
 
 let output file =
-  Value_parameters.feedback "Listing red statuses in file %s" file;
-  let channel = open_out file in
+  Value_parameters.feedback "Listing red statuses in file %a"
+    Filepath.Normalized.pretty file;
+  let channel = open_out (file:>string) in
   let fmt = Format.formatter_of_out_channel channel in
   Format.pp_set_margin fmt 1000000;
   Format.fprintf fmt "@[<v>";
@@ -189,5 +191,4 @@ let output file =
   Format.fprintf fmt "@]%!"
 
 let report () =
-  let file = Value_parameters.ReportRedStatuses.get () in
-  if file <> "" then output file
+  Value_parameters.ReportRedStatuses.(if not (is_empty ()) then output (get ()))

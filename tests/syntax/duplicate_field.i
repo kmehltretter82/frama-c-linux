@@ -1,3 +1,8 @@
+/* run.config*
+ EXIT: 1
+   STDOPT:
+*/
+
 struct test{
    int x;
    int x;

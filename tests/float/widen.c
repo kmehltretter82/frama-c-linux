@@ -1,6 +1,6 @@
 /* run.config*
-  STDOPT: #"-warn-special-float non-finite -wlevel 3"
-  STDOPT: #"-warn-special-float none -wlevel 3"
+  STDOPT: #"-warn-special-float non-finite -eva-widening-delay 3"
+  STDOPT: #"-warn-special-float none -eva-widening-delay 3"
 */
 
 volatile int rand;

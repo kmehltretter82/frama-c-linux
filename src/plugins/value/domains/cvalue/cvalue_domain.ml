@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -40,7 +40,7 @@ module Model = struct
      function in cvalue_transfer. *)
   type origin = value
 
-  let extract_expr _ _ _ = `Value (Cvalue.V.top, None), Alarmset.all
+  let extract_expr _state _expr = `Value (Cvalue.V.top, None), Alarmset.all
 
   let indeterminate_alarms lval v =
     let open Cvalue.V_Or_Uninitialized in
@@ -112,7 +112,7 @@ module Model = struct
         let v = if Cvalue.V.is_bottom v then `Bottom else `Value (v, None) in
         v, alarms
 
-  let extract_lval _oracle state lval typ loc =
+  let extract_lval state lval typ loc =
     if Cil.isArithmeticOrPointerType typ
     then extract_scalar_lval state lval typ loc
     else extract_aggregate_lval state lval typ loc
@@ -201,9 +201,10 @@ module State = struct
 
   type origin = Model.origin
 
-  let extract_expr evaluate (s, _) expr = Model.extract_expr evaluate s expr
-  let extract_lval oracle (s, _) lval typ loc =
-    Model.extract_lval oracle s lval typ loc
+  let extract_expr ~oracle:_ _context (s, _) expr =
+    Model.extract_expr s expr
+  let extract_lval ~oracle:_ _context (s, _) lval typ loc =
+    Model.extract_lval s lval typ loc
   let backward_location (state, _) lval typ precise_loc value =
     Model.backward_location state lval typ precise_loc value
   let reduce_further _ _ _ = []
@@ -229,15 +230,53 @@ module State = struct
     Cvalue_transfer.assume stmt expr positive valuation s >>-: fun s ->
     s, clob
 
-  let start_call stmt call valuation (s, _clob) =
-    Cvalue_transfer.start_call stmt call valuation s >>-: fun state ->
-    state, Locals_scoping.bottom ()
+  let is_direct_recursion stmt call =
+    try
+      let kf = Kernel_function.find_englobing_kf stmt in
+      Kernel_function.equal kf call.kf
+    with Not_found -> false (* Should not happen *)
 
-  let finalize_call stmt call ~pre ~post =
-    let (post_state, post_clob) = post
-    and pre_state, clob = pre in
+  let start_recursive_call stmt call recursion (state, clob) =
+    let direct = is_direct_recursion stmt call in
+    let state = Model.remove_variables recursion.withdrawal state in
+    let substitution = recursion.base_substitution in
+    let clob = if direct then clob else Locals_scoping.top () in
+    let state = Locals_scoping.substitute substitution clob state in
+    Model.replace_base substitution state
+
+  let start_call stmt call recursion valuation (state, clob) =
+    (* Uses the [valuation] to update the [state] before the substitution
+       for recursive calls. *)
+    Cvalue_transfer.update valuation state >>- fun state ->
+    let state =
+      match recursion with
+      | None -> state
+      | Some recursion -> start_recursive_call stmt call recursion (state, clob)
+    in
+    Cvalue_transfer.start_call stmt call recursion valuation state
+    >>-: fun state -> state, Locals_scoping.bottom ()
+
+  let finalize_recursive_call stmt call ~pre recursion state =
+    let direct = is_direct_recursion stmt call in
+    let pre, clob = pre in
+    let substitution = recursion.base_substitution in
+    let state = Model.replace_base substitution state in
+    let clob = if direct then clob else Locals_scoping.top () in
+    let state = Locals_scoping.substitute substitution clob state in
+    let shape = Base.Hptset.shape recursion.base_withdrawal in
+    let inter = Cvalue.Model.filter_by_shape shape pre in
+    Cvalue.Model.merge ~into:state inter
+
+  let finalize_call stmt call recursion ~pre ~post =
+    let (pre, clob) = pre in
+    let (post, post_clob) = post in
     Locals_scoping.(remember_bases_with_locals clob post_clob.clob);
-    Cvalue_transfer.finalize_call stmt call ~pre:pre_state ~post:post_state
+    let post =
+      Extlib.opt_fold
+        (finalize_recursive_call stmt call ~pre:(pre, clob))
+        recursion post
+    in
+    Cvalue_transfer.finalize_call stmt call recursion ~pre ~post
     >>-: fun state ->
     state, clob
 
@@ -279,34 +318,21 @@ module State = struct
     then `Value (state, clob)
     else `Bottom
 
-  let pp_eval_error fmt e =
-    if e <> Eval_terms.CAlarm then
-      Format.fprintf fmt "@ (%a)" Eval_terms.pretty_logic_evaluation_error e
-
-  let evaluate_from_clause env (_, ins as assign) =
-    let open Cil_types in
-    match ins with
-    | FromAny -> Cvalue.V.top_int
-    | From l ->
-      try
-        (* Evaluates the contents of one element of the from clause, topify them,
-           and add them to the current state of the evaluation in acc. *)
-        let one_from_contents acc { it_content = t } =
-          let loc =
-            Eval_terms.(eval_tlval_as_location ~alarm_mode:Ignore env t)
-          in
-          let state = Eval_terms.env_current_state env in
-          let v = Cvalue.Model.find ~conflate_bottom:false state loc in
+  let evaluate_from_clause state deps =
+    (* Evaluates the contents of one element of the from clause, topify them,
+       and add them to the current state of the evaluation in acc. *)
+    let one_from_contents acc dep =
+      if dep.direct
+      then
+        match dep.location with
+        | None -> Cvalue.V.top
+        | Some location ->
+          let location = Precise_locs.imprecise_location location in
+          let v = Cvalue.Model.find ~conflate_bottom:false state location in
           Cvalue.V.join acc (Cvalue.V.topify_leaf_origin v)
-        in
-        let filter x = not (List.mem "indirect" x.it_content.term_name) in
-        let direct = List.filter filter l in
-        List.fold_left one_from_contents Cvalue.V.top_int direct
-      with Eval_terms.LogicEvalError e ->
-        Value_util.warning_once_current
-          "@[<hov 0>cannot interpret 'from'@ @[<hov 2>clause '%a'@]%a"
-          Printer.pp_from assign pp_eval_error e;
-        Cvalue.V.top
+      else acc
+    in
+    List.fold_left one_from_contents Cvalue.V.top_int deps
 
   let logic_assign logic_assign location (state, sclob) =
     match logic_assign with
@@ -314,10 +340,9 @@ module State = struct
       let location = Precise_locs.imprecise_location location
       and value = Cvalue.V.top in
       Cvalue.Model.add_binding ~exact:false state location value, sclob
-    | Some (Assigns assign, (pre_state, _)) ->
+    | Some (Assigns (_assign, deps), (pre_state, _)) ->
       let location = Precise_locs.imprecise_location location in
-      let env = Eval_terms.env_assigns pre_state in
-      let value = evaluate_from_clause env assign in
+      let value = evaluate_from_clause pre_state deps in
       Locals_scoping.remember_if_locals_in_value sclob location value;
       Cvalue.Model.add_binding ~exact:false state location value, sclob
     | Some ((Frees _ | Allocates _), _) -> state, sclob

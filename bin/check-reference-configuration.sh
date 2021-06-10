@@ -17,19 +17,10 @@ fi
 
 version_via_opam() {
     v=$(opam info -f installed-version "$1" 2>/dev/null)
-    if [ "$v" = "" -o "$v" = "--" ]; then
+    if [ "$v" = "" ] || [ "$v" = "--" ]; then
         echo "NOT"
     else
-        echo $v
-    fi
-}
-
-version_via_ocamlfind() {
-    v=$(ocamlfind query -format "$1" 2>/dev/null)
-    if [ "$v" = "" ]; then
-        echo "NOT"
-    else
-        echo $v
+        echo "$v"
     fi
 }
 
@@ -54,13 +45,11 @@ all_packages=""
 for package in $packages; do
     name=${package%%.*}
     all_packages+=" $package"
-    working_version=$(echo $package | sed 's/^[^.]*\.//')
+    working_version=$(echo "$package" | sed 's/^[^.]*\.//')
     if [ "$opam" != "NOT" ]; then
-        actual_version=$(version_via_opam $name)
-    elif [ "$ocamlfind" != "NOT" ]; then
-        actual_version=$(version_via_ocamlfind $name)
+        actual_version=$(version_via_opam "$name")
     else
-        echo "error: neither opam nor ocamlfind found."
+        echo "error: opam not found."
         exit 1
     fi
     if [ "$working_version" != "$actual_version" ]; then
@@ -76,5 +65,5 @@ if [ $has_any_diffs -ne 0 ]; then
     echo "    opam switch create ${working_ocaml}"
     echo "    opam install depext"
     echo "    opam depext --install$all_packages"
-    echo "    rm -f ~/.why3.conf && why3 config --full-config"
+    echo "    rm -f ~/.why3.conf && why3 config --detect"
 fi

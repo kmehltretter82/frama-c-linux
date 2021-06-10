@@ -4,7 +4,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] tests/misc/issue109.i:10: assertion got status valid.
+[eva] tests/misc/issue109.i:15: assertion got status valid.
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -17,7 +17,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] tests/misc/issue109.i:10: assertion got status valid.
+[eva] tests/misc/issue109.i:15: assertion got status valid.
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

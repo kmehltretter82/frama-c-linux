@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -46,8 +46,22 @@ val refresh_code_annotation: code_annotation -> code_annotation
 *)
 val refresh_spec: funspec -> funspec
 
-(** creates a new identified predicate with a fresh id. *)
-val new_predicate: predicate -> identified_predicate
+(** creates a new toplevel predicate.
+    [predicate_kind] is [Assert] by default. It can be set to:
+    - [Check] for a predicate that should only be used to check a property,
+      without adding it as hypothesis for the rest of the verification.
+    - [Admit] for a predicate that is an hypothesis for the rest of the
+      verification and should not be checked by Frama-C.
+
+    See {!Cil_types.toplevel_predicate} for more information.
+    @since 22.0-Titanium
+*)
+val toplevel_predicate: ?kind:predicate_kind -> predicate -> toplevel_predicate
+
+(** creates a new identified predicate with a fresh id.
+    @modify 22.0-Titanium add [only_check] optional parameter
+*)
+val new_predicate: ?kind:predicate_kind -> predicate -> identified_predicate
 
 (** creates a new acsl_extension with a fresh id.
     @plugin development guide
@@ -110,7 +124,7 @@ val pold: ?loc:location -> predicate -> predicate
 (** application of predicate*)
 val papp:
   ?loc:location ->
-  logic_info * logic_label list * term list -> 
+  logic_info * logic_label list * term list ->
   predicate
 
 (** && *)
@@ -131,15 +145,15 @@ val pands: predicate list -> predicate
 val pors: predicate list -> predicate
 
 (** local binding *)
-val plet: 
+val plet:
   ?loc:location -> logic_info -> predicate -> predicate
 
 (** ==> *)
-val pimplies : 
+val pimplies :
   ?loc:location -> predicate * predicate -> predicate
 
 (** ? : *)
-val pif: 
+val pif:
   ?loc:location -> term * predicate * predicate -> predicate
 
 (** <==> *)
@@ -285,7 +299,7 @@ val boolean_type: logic_type
 val term : ?loc:Location.t -> term_node -> logic_type -> term
 
 (** &
- @deprecated Neon-20130301 {!Logic_utils.mk_AddrOf} is easier to use.*)
+    @deprecated Neon-20130301 {!Logic_utils.mk_AddrOf} is easier to use.*)
 val taddrof: ?loc:Location.t -> term_lval -> logic_type -> term
 
 (** [..] of integers *)
@@ -297,7 +311,7 @@ val tinteger: ?loc:Location.t -> int -> term
 (** integer constant *)
 val tinteger_s64: ?loc:Location.t -> int64 -> term
 
-(** integer constant 
+(** integer constant
     @since Oxygen-20120901 *)
 val tint: ?loc:Location.t -> Integer.t -> term
 
@@ -313,7 +327,7 @@ val tstring: ?loc:Location.t -> string -> term
 (** \at *)
 val tat: ?loc:Location.t -> term * logic_label -> term
 
-(** \old 
+(** \old
     @since Nitrogen-20111001
 *)
 val told: ?loc:Location.t -> term -> term
@@ -333,7 +347,7 @@ val tlogic_coerce: ?loc:Location.t -> term -> logic_type -> term
 (** [true] if the term is \result (potentially enclosed in \at)*)
 val is_result: term -> bool
 
-(** [true] if the term is \exit_status (potentially enclosed in \at) 
+(** [true] if the term is \exit_status (potentially enclosed in \at)
     @since Nitrogen-20111001
 *)
 val is_exit_status: term -> bool

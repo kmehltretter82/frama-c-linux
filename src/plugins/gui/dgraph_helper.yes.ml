@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -19,6 +19,8 @@
 (*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
 (*                                                                        *)
 (**************************************************************************)
+
+open DGRAPH_MODULE
 
 let graph_window ~parent ~title make_view =
   let height = int_of_float (float parent#default_height *. 3. /. 4.) in
@@ -46,13 +48,13 @@ let graph_window_through_dot ~parent ~title dot_formatter =
     Format.pp_print_flush fmt ();
     let view =
       snd
-        (Dgraph.DGraphContainer.Dot.from_dot_with_commands ~packing temp_file)
+        (DGraphContainer.Dot.from_dot_with_commands ~packing temp_file)
     in
     view
   in
   try
     graph_window ~parent ~title make_view
-  with Dgraph.DGraphModel.DotError _ as exn ->
+  with DGRAPH_ERROR _ as exn ->
     Gui_parameters.error
       "@[cannot display dot graph:@ %s@]"
       (Printexc.to_string exn)

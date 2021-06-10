@@ -1,0 +1,6 @@
+579a580,581
+> [eva] tests/idct/ieee_1180_1990.c:100: 
+>   Call to builtin Frama_C_sqrt for function sqrt
+605a608,609
+> [eva] tests/idct/ieee_1180_1990.c:140: 
+>   Call to builtin Frama_C_sqrt for function sqrt

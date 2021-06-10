@@ -53,7 +53,7 @@ int *pack(int first, void * const *__va_params)
     if (! tmp) break;
     size ++;
   }
-  ret = (int *)malloc(sizeof(int) * (unsigned int)(size + 1));
+  ret = (int *)malloc(sizeof(int) * (unsigned long)(size + 1));
   *(ret + 0) = first;
   list = __va_params;
   i = 0;

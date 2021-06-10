@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -54,7 +54,7 @@ let pp_labels fmt stmt =
   | ls -> Format.fprintf fmt " '%s'" (String.concat "," ls)
 
 let pp_idpred kloc fmt idpred =
-  let np = idpred.ip_content in
+  let np = Logic_const.pred_of_id_pred idpred in
   if np.pred_name <> []
   then Format.fprintf fmt " '%s'" (String.concat "," np.pred_name)
   else pp_kloc kloc fmt np.pred_loc
@@ -95,12 +95,17 @@ let pp_bhv fmt bhv =
   if not (Cil.is_default_behavior bhv) then
     Format.fprintf fmt " for '%s'" bhv.b_name
 
-let pp_bhvs fmt = function
-  | [] -> ()
-  | b::bs ->
-    Format.fprintf fmt " @[<hov 0>'%s'" b ;
-    List.iter (fun b -> Format.fprintf fmt ",@ '%s'" b) bs ;
-    Format.fprintf fmt "@]"
+let pp_bhvs fmt bhvs =
+  if Datatype.String.Set.is_empty bhvs then
+    ()
+  else
+    Pretty_utils.pp_iter
+      ~pre:" @[<hov 0>"
+      ~suf:"@]"
+      ~sep:",@ "
+      Datatype.String.Set.iter
+      (fun fmt s -> Format.fprintf fmt "'%s'" s)
+      fmt bhvs
 
 let pp_for fmt = function
   | [] -> ()
@@ -110,14 +115,15 @@ let pp_named fmt nx =
   if nx.pred_name <> [] then
     Format.fprintf fmt " '%s'" (String.concat "," nx.pred_name)
 
+let pp_top fmt tp = pp_named fmt tp.tp_statement
+
 let pp_code_annot fmt ca =
   match ca.annot_content with
-  | AAssert(bs,Assert,np) ->
-    Format.fprintf fmt "assertion%a%a" pp_for bs pp_named np
-  | AAssert(bs,Check,np) ->
-    Format.fprintf fmt "check%a%a" pp_for bs pp_named np
-  | AInvariant(bs,_,np) ->
-    Format.fprintf fmt "invariant%a%a" pp_for bs pp_named np
+  | AAssert(bs,tp) ->
+    Format.fprintf fmt "%a%a%a"
+      Cil_printer.pp_assert_kind tp.tp_kind pp_for bs pp_top tp
+  | AInvariant(bs,_,tp) ->
+    Format.fprintf fmt "invariant%a%a" pp_for bs pp_top tp
   | AAssigns(bs,_) -> Format.fprintf fmt "assigns%a" pp_for bs
   | AAllocation(bs,_) -> Format.fprintf fmt "allocates_frees%a" pp_for bs
   | APragma _ -> Format.pp_print_string fmt "pragma"
@@ -215,8 +221,11 @@ let pp_capitalize fmt s =
 let pp_acsl_extension fmt {ext_name} = pp_capitalize fmt ext_name
 
 let rec pp_prop kfopt kiopt kloc fmt = function
-  | IPAxiom {il_name=s} -> Format.fprintf fmt "Axiom '%s'" s
-  | IPLemma {il_name=s} -> Format.fprintf fmt "Lemma '%s'" s
+  | IPLemma {il_name=s; il_pred=p} ->
+    (match p.tp_kind with
+     | Admit -> Format.fprintf fmt "Axiom '%s'" s
+     | Assert -> Format.fprintf fmt "Lemma '%s'" s
+     | Check ->  Format.fprintf fmt "Check Lemma '%s'" s)
   | IPTypeInvariant {iti_name=s} -> Format.fprintf fmt "Type invariant '%s'" s
   | IPGlobalInvariant {igi_name=s} -> Format.fprintf fmt "Global invariant '%s'" s
   | IPAxiomatic {iax_name=s} -> Format.fprintf fmt "Axiomatic '%s'" s
@@ -253,21 +262,23 @@ let rec pp_prop kfopt kiopt kloc fmt = function
       pp_bhvs ic_bhvs
       (pp_opt kiopt (pp_kinstr kloc)) ic_kinstr
       (pp_opt kiopt pp_active) ic_active
-  | IPCodeAnnot {ica_ca={annot_content=AAssert(bs,Assert,np)}} ->
-    Format.fprintf fmt "Assertion%a%a%a"
+  | IPCodeAnnot {ica_ca={annot_content=AAssert(bs,tp)}} ->
+    let kind =
+      match tp.tp_kind with
+      | Assert -> "Assertion"
+      | Check -> "Check"
+      | Admit -> "Admit"
+    in
+    Format.fprintf fmt "%s%a%a%a"
+      kind
       pp_for bs
-      pp_named np
-      (pp_kloc kloc) np.pred_loc
-  | IPCodeAnnot {ica_ca={annot_content=AAssert(bs,Check,np)}} ->
-    Format.fprintf fmt "Check%a%a%a"
-      pp_for bs
-      pp_named np
-      (pp_kloc kloc) np.pred_loc
-  | IPCodeAnnot {ica_ca={annot_content=AInvariant(bs,_,np)}} ->
+      pp_top tp
+      (pp_kloc kloc) tp.tp_statement.pred_loc
+  | IPCodeAnnot {ica_ca={annot_content=AInvariant(bs,_,tp)}} ->
     Format.fprintf fmt "Invariant%a%a%a"
       pp_for bs
-      pp_named np
-      (pp_kloc kloc) np.pred_loc
+      pp_top tp
+      (pp_kloc kloc) tp.tp_statement.pred_loc
   | IPCodeAnnot {ica_ca={annot_content=AExtended(bs,_,{ext_name})};ica_stmt} ->
     Format.fprintf fmt "%a%a %a"
       pp_capitalize ext_name pp_for bs (pp_stmt kloc) ica_stmt
@@ -360,18 +371,19 @@ let to_string pp elt =
   Buffer.contents b
 
 let code_annot_kind_and_node code_annot = match code_annot.annot_content with
-  | AAssert (_, kind, {pred_content; pred_name}) ->
+  | AAssert (_, {tp_kind; tp_statement = {pred_content; pred_name}}) ->
     let kind = match Alarms.find code_annot with
       | Some alarm -> Alarms.get_name alarm
       | None ->
-        if List.exists ((=) "missing_return") pred_name
-        then "missing_return"
-        else match kind with
+        if List.exists ((=) "missing_return") pred_name then "missing_return"
+        else
+          match tp_kind with
           | Assert -> "user assertion"
           | Check -> "user check"
+          | Admit -> "user hypothesis"
     in
     Some (kind, to_string Printer.pp_predicate_node pred_content)
-  | AInvariant (_, _, {pred_content}) ->
+  | AInvariant (_, _, {tp_statement = {pred_content}}) ->
     Some ("loop invariant", to_string Printer.pp_predicate_node pred_content)
   | _ -> None
 
@@ -471,28 +483,32 @@ let for_order k = function
   | [] -> [I k]
   | bs -> I (succ k) :: named_order bs
 let annot_order = function
-  | {annot_content=AAssert(bs,Check,np)} ->
-    for_order 0 bs @ named_order np.pred_name
-  | {annot_content=AAssert(bs,Assert,np)} ->
-    for_order 2 bs @ named_order np.pred_name
-  | {annot_content=AInvariant(bs,_,np)} ->
-    for_order 4 bs @ named_order np.pred_name
-  | _ -> [I 6]
+  | {annot_content=AAssert(bs,tp)} when tp.tp_kind = Assert ->
+    for_order 0 bs @ named_order tp.tp_statement.pred_name
+  | {annot_content=AAssert(bs,tp)} when tp.tp_kind = Check ->
+    for_order 2 bs @ named_order tp.tp_statement.pred_name
+  | {annot_content=AAssert(bs,tp)} when tp.tp_kind = Admit ->
+    for_order 4 bs @ named_order tp.tp_statement.pred_name
+  | {annot_content=AInvariant(bs,_,tp)} ->
+    for_order 6 bs @ named_order tp.tp_statement.pred_name
+  | _ -> [I 8]
 let loop_order = function
   | Id_contract (active,b) -> [B b; A active]
   | Id_loop _ -> []
 
 let rec ip_order = function
   | IPAxiomatic {iax_name=a} -> [I 0;S a]
-  | IPAxiom {il_name=a} | IPLemma {il_name=a} -> [I 1;S a]
+  | IPLemma {il_name=a} -> [I 1;S a]
   | IPOther {io_name=s;io_loc=OLContract kf} -> [I 3;F kf;S s]
   | IPOther {io_name=s;io_loc=OLStmt (kf, stmt)} -> [I 4;F kf;K (Kstmt stmt);S s]
   | IPOther {io_name=s;io_loc=OLGlob _} -> [I 5; S s]
   | IPBehavior {ib_kf;ib_kinstr;ib_active;ib_bhv} ->
     [I 6;F ib_kf;K ib_kinstr;B ib_bhv; A ib_active]
   | IPComplete {ic_kf;ic_kinstr;ic_active;ic_bhvs} ->
+    let ic_bhvs = Datatype.String.Set.elements ic_bhvs in
     [I 7;F ic_kf;K ic_kinstr; A ic_active] @ for_order 0 ic_bhvs
   | IPDisjoint {ic_kf;ic_kinstr;ic_active;ic_bhvs} ->
+    let ic_bhvs = Datatype.String.Set.elements ic_bhvs in
     [I 8;F ic_kf;K ic_kinstr; A ic_active] @ for_order 0 ic_bhvs
   | IPPredicate {ip_kind;ip_kf;ip_kinstr} ->
     [I 9;F ip_kf;K ip_kinstr] @ kind_order ip_kind

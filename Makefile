@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2020                                               #
+#  Copyright (C) 2007-2021                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -39,6 +39,7 @@ endif
 ###################
 
 VERSION:=$(shell $(CAT) VERSION)
+VERSION_SAFE=$(subst ~,-,$(VERSION))
 VERSION_CODENAME:=$(shell $(CAT) VERSION_CODENAME)
 
 ###########################
@@ -256,29 +257,39 @@ DISTRIB_FILES:=\
       $(LIBC_FILES)							\
       share/analysis-scripts/analysis.mk                                \
       share/analysis-scripts/benchmark_database.py                      \
+      share/analysis-scripts/build_callgraph.py                         \
       share/analysis-scripts/cmd-dep.sh                                 \
       share/analysis-scripts/concat-csv.sh                              \
       share/analysis-scripts/clone.sh                                   \
       share/analysis-scripts/creduce.sh                                 \
+      share/analysis-scripts/detect_recursion.py                        \
       share/analysis-scripts/epilogue.mk                                \
+      share/analysis-scripts/estimate_difficulty.py                     \
       share/analysis-scripts/fc_stubs.c                                 \
       share/analysis-scripts/find_fun.py                                \
       share/analysis-scripts/flamegraph.pl                              \
       share/analysis-scripts/frama_c_results.py                         \
       share/analysis-scripts/function_finder.py                         \
       share/analysis-scripts/git_utils.py                               \
+      share/analysis-scripts/heuristic_list_functions.py                \
       share/analysis-scripts/list_files.py                              \
+      share/analysis-scripts/list_functions.ml                          \
       share/analysis-scripts/make_template.py                           \
       share/analysis-scripts/make_wrapper.py                            \
+      share/analysis-scripts/normalize_jcdb.py                          \
       share/analysis-scripts/parse-coverage.sh                          \
+      share/analysis-scripts/print_callgraph.py                         \
       share/analysis-scripts/prologue.mk                                \
       share/analysis-scripts/README.md                                  \
       share/analysis-scripts/results_display.py                         \
+      share/analysis-scripts/script_for_creduce_fatal.sh                \
+      share/analysis-scripts/script_for_creduce_non_fatal.sh            \
       share/analysis-scripts/summary.py                                 \
       share/analysis-scripts/template.mk                                \
       $(wildcard share/emacs/*.el) share/autocomplete_frama-c           \
       share/_frama-c                                                    \
       share/compliance/c11_functions.json                               \
+      share/compliance/c11_headers.json                                 \
       share/compliance/glibc_functions.json                             \
       share/compliance/nonstandard_identifiers.json                     \
       share/compliance/posix_identifiers.json                           \
@@ -317,7 +328,7 @@ DISTRIB_FILES:=\
       opam/opam \
 
 # Test files to be included in the distribution (without header checking).
-# Plug-ins should use PLUGIN_DISTRIB_TESTS to export their test files. 
+# Plug-ins should use PLUGIN_DISTRIB_TESTS to export their test files.
 DISTRIB_TESTS=$(shell git ls-files \
                   tests \
                   src/plugins/aorai/tests \
@@ -338,7 +349,7 @@ DOC_GEN_FILES:=$(addprefix doc/code/,\
 
 # additional compilation targets for 'make all'.
 # cannot be delayed after 'make all'
-EXTRAS	= ptests bin/fc-config$(EXE)
+EXTRAS	= ptests
 
 ifneq ($(ENABLE_GUI),no)
 ifeq ($(HAS_LABLGTK),yes)
@@ -412,25 +423,6 @@ clean_share_link:
 	fi
 
 clean:: clean_share_link
-
-##############
-# Ocamlgraph #
-##############
-
-# dgraph (included in ocamlgraph)
-#[LC] Cf https://github.com/backtracking/ocamlgraph/pull/32
-ifeq ($(HAS_GNOMECANVAS),yes)
-ifneq ($(ENABLE_GUI),no)
-GRAPH_GUICMO= dgraph.cmo
-GRAPH_GUICMX= dgraph.cmx
-GRAPH_GUIO= dgraph.o
-HAS_DGRAPH=yes
-else # enable_gui is no: disable dgraph
-HAS_DGRAPH=no
-endif
-else # gnome_canvas is not yes: disable dgraph
-HAS_DGRAPH=no
-endif
 
 ##################
 # Frama-C Kernel #
@@ -537,13 +529,14 @@ KERNEL_CMO=\
 	src/kernel_services/ast_queries/logic_const.cmo              \
 	src/kernel_services/visitors/visitor_behavior.cmo		\
 	src/kernel_services/ast_queries/cil.cmo                      \
+	src/kernel_services/ast_queries/cil_builtins.cmo             \
 	src/kernel_internals/parsing/errorloc.cmo                      \
 	src/kernel_services/ast_printing/cil_printer.cmo                \
 	src/kernel_services/ast_printing/cil_descriptive_printer.cmo    \
 	src/kernel_services/parsetree/cabs.cmo                               \
 	src/kernel_services/parsetree/cabshelper.cmo                         \
-	src/kernel_services/ast_printing/logic_print.cmo                \
 	src/kernel_services/ast_queries/logic_utils.cmo              \
+	src/kernel_services/ast_printing/logic_print.cmo                \
 	src/kernel_internals/parsing/logic_parser.cmo                  \
 	src/kernel_internals/parsing/logic_lexer.cmo                   \
 	src/kernel_services/ast_queries/logic_typing.cmo             \
@@ -627,6 +620,8 @@ KERNEL_CMO=\
 	src/kernel_services/ast_transformations/clone.cmo                           \
 	src/kernel_services/ast_transformations/filter.cmo                          \
 	src/kernel_services/ast_transformations/inline.cmo              \
+	src/kernel_internals/runtime/dump_config.cmo                    \
+	src/kernel_services/ast_transformations/contract_special_float.cmo   \
 	src/kernel_internals/runtime/special_hooks.cmo                  \
 	src/kernel_internals/runtime/messages.cmo                       \
 	src/kernel_services/ast_building/cil_builder.cmo                       \
@@ -739,18 +734,6 @@ src/plugins/gui/gtk_compat.ml: src/plugins/gui/gtk_compat.2.ml
 endif
 GENERATED+=src/plugins/gui/gtk_compat.ml
 
-ifeq ($(HAS_DGRAPH),yes)
-  DGRAPHFILES:=debug_manager
-  src/plugins/gui/dgraph_helper.ml: src/plugins/gui/dgraph_helper.yes.ml
-	$(CP) $< $@
-	$(CHMOD_RO) $@
-else
-  DGRAPHFILES:=
-  src/plugins/gui/dgraph_helper.ml: src/plugins/gui/dgraph_helper.no.ml
-	$(CP) $< $@
-	$(CHMOD_RO) $@
-endif
-
 SINGLE_GUI_CMO:= \
 	wutil_once \
 	gtk_compat \
@@ -813,10 +796,11 @@ PLUGIN_DIR:=src/plugins/callgraph
 PLUGIN_CMO:= options journalize subgraph cg services uses register
 ifeq ($(HAS_DGRAPH),yes)
 PLUGIN_GUI_CMO:=cg_viewer
+PLUGIN_GENERATED:=$(PLUGIN_DIR)/cg_viewer.ml
 else
 PLUGIN_GUI_CMO:=
-PLUGIN_DISTRIB_EXTERNAL:=cg_viewer.ml
 endif
+PLUGIN_DISTRIB_EXTERNAL:=cg_viewer.yes.ml
 PLUGIN_CMI:= callgraph_api
 PLUGIN_INTERNAL_TEST:=yes
 PLUGIN_TESTS_DIRS:=callgraph
@@ -866,7 +850,7 @@ endif
 # General rules for ordering files within PLUGIN_CMO:
 # - try to keep the legacy Value before Eva
 PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode value_parameters \
-	utils/value_perf utils/eva_annotations \
+	utils/eva_audit utils/value_perf utils/eva_annotations \
 	utils/value_util utils/red_statuses \
 	utils/mark_noresults \
 	utils/widen_hints_ext utils/widen \
@@ -900,8 +884,7 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode value_parameters \
 	domains/cvalue/builtins_memory domains/cvalue/builtins_print_c \
 	domains/cvalue/builtins_watchpoint \
 	domains/cvalue/builtins_float domains/cvalue/builtins_split \
-	domains/inout_domain \
-	utils/state_import \
+	domains/inout_domain domains/taint_domain \
 	legacy/eval_terms legacy/eval_annots \
 	domains/powerset engine/transfer_logic \
 	domains/cvalue/cvalue_transfer domains/cvalue/cvalue_init \
@@ -965,10 +948,10 @@ PLUGIN_DISTRIBUTED:=yes
 PLUGIN_INTERNAL_TEST:=yes
 PLUGIN_TESTS_DIRS:=rte rte_manual
 PLUGIN_TESTS_LIB:=\
-  tests/rte/my_annotation/my_annotation.ml \
-  tests/rte/rte_api/rte_get_annot.ml \
-  tests/rte/compute_annot/compute_annot.ml \
-  tests/rte/my_annot_proxy/my_annot_proxy.ml
+  tests/rte/my_annotation.ml \
+  tests/rte/rte_get_annot.ml \
+  tests/rte/compute_annot.ml \
+  tests/rte/my_annot_proxy.ml
 $(eval $(call include_generic_plugin_Makefile,$(PLUGIN_NAME)))
 
 #################
@@ -1282,8 +1265,8 @@ MODULES_TODOC+= $(filter-out src/plugins/gui/book_manager.mli,\
 GUICMI = $(GUICMO:.cmo=.cmi)
 GUICMX = $(SINGLE_GUI_CMX) $(PLUGIN_GUI_CMX_LIST)
 
-$(GUICMI) $(GUICMO) bin/viewer.byte$(EXE): BFLAGS+= $(GUI_INCLUDES)
-$(GUICMX) bin/viewer.opt$(EXE): OFLAGS+= $(GUI_INCLUDES)
+$(GUICMI) $(GUICMO) bin/viewer.byte$(EXE): BFLAGS+= $(GUI_INCLUDES) $(THREAD)
+$(GUICMX) bin/viewer.opt$(EXE): OFLAGS+= $(GUI_INCLUDES) $(THREAD)
 
 $(PLUGIN_DYN_DEP_GUI_CMO_LIST): BFLAGS+= $(GUI_INCLUDES)
 $(PLUGIN_DYN_DEP_GUI_CMX_LIST): OFLAGS+= $(GUI_INCLUDES)
@@ -1661,10 +1644,10 @@ dots: $(ALL_CMO)
 	$(QUIET_MAKE) doc/call_graph.ps
 
 # pandoc is required to regenerate the manpage
-man/frama-c.1: man/frama-c.1.header man/frama-c.1.md
+man/frama-c.1: man/frama-c.1.md Makefile
 	$(PRINT) 'generating $@'
 	$(RM) $@
-	pandoc -s -t man -H $^ | tail -n +5 > man/frama-c.1
+	pandoc -s -t man $< > $@
 	$(CHMOD_RO) $@
 
 # Checking consistency with the current implementation
@@ -1709,7 +1692,13 @@ check-devguide: $(CHECK_CODE) $(DOC_DEPEND) $(DOC_DIR)/kernel-doc.ocamldoc
 
 ALL_ML_FILES:=$(shell find src -name '*.ml' -print -o -name '*.mli' -print -o -path '*/tests' -prune '!' -name '*')
 ALL_ML_FILES+=ptests/ptests.ml
-MANUAL_ML_FILES:=$(filter-out $(GENERATED) $(PLUGIN_GENERATED_LIST), $(ALL_ML_FILES))
+
+ifeq ($(origin MANUAL_ML_FILES),undefined)
+MANUAL_ML_FILES:=$(ALL_ML_FILES)
+endif
+
+MANUAL_ML_FILES:=\
+  $(filter-out $(GENERATED) $(PLUGIN_GENERATED_LIST), $(MANUAL_ML_FILES))
 
 # Allow control of files to be linted/fixed by external sources
 # (e.g. pre-commit hook that will concentrate on files which have changed)
@@ -1956,17 +1945,22 @@ install:: install-lib-$(OCAMLBEST)
 	  share/analysis-scripts/function_finder.py \
 	  share/analysis-scripts/git_utils.py \
 	  share/analysis-scripts/list_files.py \
+	  share/analysis-scripts/list_functions.ml \
 	  share/analysis-scripts/make_template.py \
 	  share/analysis-scripts/make_wrapper.py \
+	  share/analysis-scripts/normalize_jcdb.py \
 	  share/analysis-scripts/parse-coverage.sh \
 	  share/analysis-scripts/prologue.mk \
 	  share/analysis-scripts/README.md \
 	  share/analysis-scripts/results_display.py \
+	  share/analysis-scripts/script_for_creduce_fatal.sh \
+	  share/analysis-scripts/script_for_creduce_non_fatal.sh \
 	  share/analysis-scripts/summary.py \
 	  share/analysis-scripts/template.mk \
 	  $(FRAMAC_DATADIR)/analysis-scripts
 	$(MKDIR) $(FRAMAC_DATADIR)/compliance
 	$(CP) share/compliance/c11_functions.json \
+	  share/compliance/c11_headers.json \
 	  share/compliance/glibc_functions.json \
 	  share/compliance/nonstandard_identifiers.json \
 	  share/compliance/posix_identifiers.json \
@@ -2003,9 +1997,7 @@ install:: install-lib-$(OCAMLBEST)
 	fi
 	$(CP) bin/ptests.$(OCAMLBEST)$(EXE) \
 	      $(BINDIR)/ptests.$(OCAMLBEST)$(EXE)
-	if [ -x bin/fc-config$(EXE) ] ; then \
-		$(CP) bin/fc-config$(EXE) $(BINDIR)/frama-c-config$(EXE); \
-	fi
+	$(CP) bin/frama-c-config $(BINDIR)/frama-c-config; \
 	if [ -x bin/frama-c-script ] ; then \
 		$(CP) bin/frama-c-script $(BINDIR)/frama-c-script; \
 	fi
@@ -2059,6 +2051,7 @@ uninstall::
 HEADER_SPEC := $(DEFAULT_HEADER_SPEC)
 # The list can be extended by external plugins using PLUGIN_HEADER_SPEC variable
 HEADER_SPEC += $(PLUGIN_HEADER_SPEC_LIST)
+HEADER_SPEC += ivette/./headers/header_spec.txt
 # Default list of header specification files can be overloaded.
 HEADER_SPEC_FILE?=$(HEADER_SPEC)
 
@@ -2149,15 +2142,20 @@ check-headers: $(HDRCK)
 	 # using 'file' built-in, only available on make 4.0+
 	 # for make 4.0+, using the 'file' function could be a better solution,
 	 # although it seems to segfault in 4.0 (but not in 4.1)
-	$(RM) file_list_to_check.tmp file_list_exceptions.tmp
+	$(RM) distrib_files.tmp distrib_tests.tmp header_exceptions.tmp
 	@$(foreach file,$(DISTRIB_FILES),\
-			echo $(file) >> file_list_to_check.tmp$(NEWLINE))
+			echo $(file) >> distrib_files.tmp$(NEWLINE))
+	@$(foreach file,$(DISTRIB_TESTS),\
+			echo $(file) >> distrib_tests.tmp$(NEWLINE))
 	@$(foreach file,$(HEADER_EXCEPTIONS),\
-			echo $(file) >> file_list_exceptions.tmp$(NEWLINE))
+			echo $(file) >> header_exceptions.tmp$(NEWLINE))
 
+	echo "Checking that distributed files terminate with a newline..."
+	bin/check_newline.sh distrib_files.tmp
+	bin/check_newline.sh distrib_tests.tmp
 	@if command -v file >/dev/null 2>/dev/null; then \
 		echo "Checking that distributed files do not use iso-8859..."; \
-		file --mime-encoding -f file_list_to_check.tmp | \
+		file --mime-encoding -f distrib_files.tmp -f distrib_tests.tmp | \
 			grep "iso-8859" \
 			| $(SED) "s/^/error: invalid encoding in /" \
 			| ( ! grep "error: invalid encoding" ); \
@@ -2168,10 +2166,10 @@ check-headers: $(HDRCK)
 		$(addprefix -header-dirs ,$(CURRENT_HEADER_DIRS)) \
 		$(addprefix -forbidden-headers ,$(DISTRIB_PROPRIETARY_HEADERS)) \
 		-headache-config-file ./headers/headache_config.txt \
-		-distrib-file file_list_to_check.tmp \
-		-header-except-file file_list_exceptions.tmp \
+		-distrib-file distrib_files.tmp \
+		-header-except-file header_exceptions.tmp \
 		$(HEADER_SPEC_FILE)
-	$(RM) file_list_to_check.tmp file_list_exceptions.tmp
+	$(RM) distrib_files.tmp distrib_tests.tmp header_exceptions.tmp
 
 ########################################################################
 # Makefile is rebuilt whenever Makefile.in or configure.in is modified #
@@ -2260,7 +2258,6 @@ clean:: $(PLUGIN_LIST:=_CLEAN) \
 	$(PRINT_RM) binaries
 	$(RM) bin/toplevel.byte$(EXE) bin/viewer.byte$(EXE) \
 		bin/ptests.byte$(EXE) bin/*.opt$(EXE) bin/toplevel.top$(EXE)
-	$(RM) bin/fc-config$(EXE)
 
 smartclean:
 	$(MAKE) -f share/Makefile.clean smartclean
@@ -2303,6 +2300,10 @@ GENERATED+=share/frama-c.rc
 PLUGIN_DEP_LIST:=$(PLUGIN_LIST)
 
 .PHONY: depend
+
+# tell make not to remove generated files even if they are only a byproduct
+# of making .depend.
+.PRECIOUS: $(GENERATED) share/Makefile.dynamic_config
 
 # in case .depend is absent, we will make it. Otherwise, it will be left
 # untouched. Only make depend will force a recomputation of dependencies
@@ -2397,7 +2398,9 @@ DISTRIB_FILES += $(wildcard $(PLUGIN_DISTRIBUTED_LIST)                   \
 DISTRIB_FILES:=$(filter-out $(GENERATED) $(PLUGIN_GENERATED_LIST),\
                   $(DISTRIB_FILES))
 
-DISTRIB_TESTS += $(wildcard $(PLUGIN_DIST_TESTS_LIST)) 
+sinclude ivette/Makefile.distrib
+
+DISTRIB_TESTS += $(wildcard $(PLUGIN_DIST_TESTS_LIST))
 
 
 SPECIFIED_OPEN_SOURCE:=$(OPEN_SOURCE)
@@ -2412,12 +2415,9 @@ else
 DISTRIB_HEADERS:=open-source
 # for checking that distributed files aren't under proprietary licence.
 DISTRIB_PROPRIETARY_HEADERS:=$(CEA_PROPRIETARY_HEADERS)
-# DISTRIB_TESTS contents files that can be distributed without header checking
+# DISTRIB_TESTS contains files that can be distributed without header checking
 DISTRIB_TESTS:=$(filter-out $(CEA_PROPRIETARY_FILES) ,\
                   $(DISTRIB_TESTS))
-# DISTRIB_FILES contents files that can be distributed with header checking
-DISTRIB_FILES:=$(filter-out $(CEA_PROPRIETARY_FILES) ,\
-                  $(DISTRIB_FILES))
 endif
 
 # Set some variables for `headers`target.
@@ -2439,9 +2439,9 @@ CLIENT ?=
 
 DISTRIB_DIR=tmp
 ifeq ("$(CLIENT)","")
-VERSION_NAME:=$(VERSION)
+VERSION_NAME:=$(VERSION_SAFE)
 else
-VERSION_NAME:=$(VERSION)-$(CLIENT)
+VERSION_NAME:=$(VERSION_SAFE)-$(CLIENT)
 endif
 
 DISTRIB?=frama-c-$(VERSION_NAME)-$(VERSION_CODENAME)
@@ -2496,9 +2496,9 @@ endif
 	$(RM) -r $(DISTRIB_DIR)
 
 doc-companions:
-	$(MAKE) -C doc/developer archives VERSION=$(VERSION)-$(VERSION_CODENAME)
-	$(MV) doc/developer/hello-$(VERSION)-$(VERSION_CODENAME).tar.gz hello-$(VERSION)-$(VERSION_CODENAME).tar.gz
-	$(ECHO) "The documentation companion hello-$(VERSION)-$(VERSION_CODENAME).tar.gz has been generated."
+	$(MAKE) -C doc/developer archives VERSION=$(VERSION_SAFE)-$(VERSION_CODENAME)
+	$(MV) doc/developer/hello-$(VERSION_SAFE)-$(VERSION_CODENAME).tar.gz hello-$(VERSION_SAFE)-$(VERSION_CODENAME).tar.gz
+	$(ECHO) "The documentation companion hello-$(VERSION_SAFE)-$(VERSION_CODENAME).tar.gz has been generated."
 
 clean-distrib: dist-clean
 	$(PRINT_RM) distrib

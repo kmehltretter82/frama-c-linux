@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Aorai plug-in of Frama-C.                        *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -33,7 +33,7 @@ open Cil
 let dkey = Aorai_option.register_category "action"
 
 let get_acceptance_pred () =
-  let (st,_) = Data_for_aorai.getAutomata () in
+  let (st,_) = Data_for_aorai.getGraph () in
   List.fold_left
     (fun acc s ->
        match s.acceptation with
@@ -46,6 +46,7 @@ let get_call_name exp = match exp.enode with
   | Lval(Var(vi),NoOffset) -> vi.vname
   | _ ->
     Aorai_option.not_yet_implemented
+      ~source:(fst exp.eloc)
       "At this time, only explicit calls are allowed by the Aorai plugin."
 
 (****************************************************************************)
@@ -60,162 +61,60 @@ let get_call_name exp = match exp.enode with
    not be projectified.
 *)
 
-(* the various kinds of auxiliary functions. *)
-type func_auto_mode =
-    Not_auto_func (* original C function. *)
-  | Pre_func of kernel_function (* Pre_func f denotes a function updating
-                                   the automaton when f is called. *)
-  | Post_func of kernel_function (* Post_func f denotes a function updating
-                                    the automaton when returning from f. *)
+module Aux_funcs =
+struct
+  (* the various kinds of auxiliary functions. *)
+  type kind =
+    | Not_aux_func (* original C function. *)
+    | Aux of kernel_function
+    (* Checks whether we are in the corresponding behavior of the function. *)
+    | Pre of kernel_function
+    (* Pre_func f denotes a function updating the automaton when f is called. *)
+    | Post of kernel_function
+    (* Post_func f denotes a function updating the automaton
+       when returning from f. *)
 
-(* table from auxiliary functions to the corresponding original one. *)
-let func_orig_table = Cil_datatype.Varinfo.Hashtbl.create 17
+  module Table = Cil_datatype.Varinfo.Hashtbl
 
-let kind_of_func vi =
-  try Cil_datatype.Varinfo.Hashtbl.find func_orig_table vi
-  with Not_found -> Not_auto_func
+  (* table from auxiliary functions to the corresponding original one. *)
+  let table = Table.create 17
+
+  let add vi kind =
+    Table.add table vi kind
+
+  let add_aux kf vi =
+    add vi (Aux kf)
+
+  let kind vi =
+    try Table.find table vi with Not_found -> Not_aux_func
+
+  let iter f =
+    Table.iter f table
+end
+
 
 (* The following functions will be used to generate C code for pre & post
    functions. *)
 
-let mk_auto_fct_block kf status auto_state res =
+let mk_auto_fct_block kf_aux kf status auto_state res =
   let loc = Kernel_function.get_location kf in
-  Aorai_utils.auto_func_block loc kf status auto_state res
+  Aorai_utils.auto_func_block kf_aux loc kf status auto_state res
 
-let mk_pre_fct_block kf =
+let mk_pre_fct_block kf_pre kf =
   mk_auto_fct_block
+    kf_pre
     kf
     Promelaast.Call
     (Data_for_aorai.get_kf_init_state kf)
     None
 
-let mk_post_fct_block kf res =
+let mk_post_fct_block kf_post kf res =
   mk_auto_fct_block
+    kf_post
     kf
     Promelaast.Return
     (Data_for_aorai.get_kf_return_state kf)
     res
-
-(**
-   This visitor adds an auxiliary function for each C function which takes
-   care of setting the automaton in a correct state before calling the
-   original one, and replaces each occurrence of the original function by
-   the auxiliary one. It also takes care of changing the automaton at function's
-   return.
-*)
-class visit_adding_code_for_synchronisation =
-  object (self)
-    inherit Visitor.frama_c_inplace
-
-    val aux_post_table = Kernel_function.Hashtbl.create 17
-
-    method! vglob_aux g =
-      match g with
-      | GFun (fundec,loc) ->
-        let kf = Extlib.the self#current_kf in
-        let vi = Kernel_function.get_vi kf in
-        let vi_pre = Cil_const.copy_with_new_vid vi in
-        vi_pre.vname <- Data_for_aorai.get_fresh (vi_pre.vname ^ "_pre_func");
-        vi_pre.vdefined <- true;
-        vi_pre.vghost <- true;
-        Cil_datatype.Varinfo.Hashtbl.add func_orig_table vi_pre (Pre_func kf);
-        (* TODO:
-           - what about protos that have no specified args
-             (NB: cannot be identified here because of implem of Kernel_function).
-           - what about varargs?
-        *)
-        let (rettype,args,varargs,_) = Cil.splitFunctionTypeVI vi_pre in
-        Cil.update_var_type vi_pre (TFun(Cil.voidType, args, varargs,[]));
-        vi_pre.vattr <- [];
-
-        (* in particular get rid of __no_return if set in vi*)
-
-        let arg =
-          if Cil.isVoidType rettype
-          then []
-          else ["res",rettype,[]]
-        in
-        let vi_post =
-          Cil.makeGlobalVar ~ghost:true
-            (Data_for_aorai.get_fresh (vi.vname ^ "_post_func"))
-            (TFun(voidType,Some arg,false,[]))
-        in
-        Kernel_function.Hashtbl.add aux_post_table kf vi_post;
-        Cil_datatype.Varinfo.Hashtbl.add func_orig_table vi_post (Post_func kf);
-        let fun_dec_pre = Cil.emptyFunctionFromVI vi_pre in
-        let fun_dec_post = Cil.emptyFunctionFromVI vi_post in
-        (* For a future analysis of function arguments,
-           we have to update the function's formals. Search
-           for LBLsformals. *)
-        Cil.setFunctionTypeMakeFormals
-          fun_dec_pre (TFun(Cil.voidType, args, varargs,[]));
-        Cil.setFunctionTypeMakeFormals
-          fun_dec_post (TFun(voidType,Some arg,false,[]));
-        (* We will now fill the function with the result
-           of the automaton's analysis. *)
-        let pre_block,pre_locals = mk_pre_fct_block kf in
-        let post_block,post_locals =
-          mk_post_fct_block kf (Extlib.opt_of_list fun_dec_post.sformals)
-        in
-        fun_dec_pre.slocals <- pre_locals;
-        fun_dec_pre.sbody <- pre_block;
-        fun_dec_pre.svar.vdefined <- true;
-        fun_dec_post.slocals <- post_locals;
-        fun_dec_post.sbody <- post_block;
-        fun_dec_post.svar.vdefined <- true;
-        let globs = [ GFun(fun_dec_pre,loc); GFun(fun_dec_post,loc);] in
-        fundec.sbody.bstmts <-
-          Cil.mkStmtOneInstr ~ghost:true
-            (Call(None,Cil.evar ~loc vi_pre,
-                  List.map (fun x -> Cil.evar ~loc x)
-                    (Kernel_function.get_formals kf),
-                  loc))
-          :: fundec.sbody.bstmts;
-        Globals.Functions.replace_by_definition
-          (Cil.empty_funspec()) fun_dec_pre loc;
-        Globals.Functions.replace_by_definition
-          (Cil.empty_funspec()) fun_dec_post loc;
-        (* Finally, we update the CFG for the new fundec *)
-        let keepSwitch = Kernel.KeepSwitch.get() in
-        Cfg.prepareCFG ~keepSwitch fun_dec_pre;
-        Cfg.cfgFun fun_dec_pre;
-        Cfg.prepareCFG ~keepSwitch fun_dec_post;
-        Cfg.cfgFun fun_dec_post;
-        ChangeDoChildrenPost([g], fun x -> globs @ x)
-      | _ -> DoChildren
-
-    method! vstmt_aux stmt =
-      match stmt.skind with
-      | Return (res,loc)  ->
-        let kf = Extlib.the self#current_kf in
-        let vi = Kernel_function.get_vi kf in
-        let current_function = vi.vname in
-        if not (Data_for_aorai.isIgnoredFunction current_function) then begin
-          let args = match res with
-            | None -> []
-            | Some exp -> [Cil.copy_exp exp]
-          in
-          let aux_vi =
-            try Kernel_function.Hashtbl.find aux_post_table kf
-            with Not_found ->
-              Aorai_option.fatal
-                "Function %a has no associated post_func"
-                Kernel_function.pretty kf
-          in
-          let call =
-            mkStmtOneInstr
-              ~ghost:true (Call (None,Cil.evar ~loc aux_vi,args,loc))
-          in
-          let new_return = mkStmt ~valid_sid:true stmt.skind in
-          let new_stmts = [call; new_return] in
-          stmt.skind<-Block(Cil.mkBlock(new_stmts))
-        end;
-        SkipChildren
-      | _ -> DoChildren
-
-  end
-
-(*********************************************************************)
 
 (* update from formals of original C function to one of the auxiliary
    function (f_aux or f_pre)
@@ -253,6 +152,149 @@ class change_result new_kf =
         TResult _ -> ChangeTo (TVar (Cil.cvar_to_lvar v))
       | _ -> DoChildren
   end
+
+(**
+   This visitor adds an auxiliary function for each C function which takes
+   care of setting the automaton in a correct state before calling the
+   original one, and replaces each occurrence of the original function by
+   the auxiliary one. It also takes care of changing the automaton at function's
+   return.
+*)
+class visit_adding_code_for_synchronisation =
+  object (self)
+    inherit Visitor.frama_c_inplace
+
+    val aux_post_table = Kernel_function.Hashtbl.create 17
+
+    method do_fundec fundec loc =
+      let kf = Option.get self#current_kf in
+      let vi = Kernel_function.get_vi kf in
+      let vi_pre = Cil_const.copy_with_new_vid vi in
+      vi_pre.vname <- Data_for_aorai.get_fresh (vi_pre.vname ^ "_pre_func");
+      vi_pre.vdefined <- true;
+      vi_pre.vghost <- true;
+      Aux_funcs.(add vi_pre (Pre kf));
+      (* TODO:
+         - what about protos that have no specified args
+           (NB: cannot be identified here because of implem of Kernel_function).
+         - what about varargs?
+      *)
+      let (rettype,args,varargs,_) = Cil.splitFunctionTypeVI vi_pre in
+      Cil.update_var_type vi_pre (TFun(Cil.voidType, args, varargs,[]));
+      vi_pre.vattr <- [];
+
+      (* in particular get rid of __no_return if set in vi*)
+
+      let arg =
+        if Cil.isVoidType rettype
+        then []
+        else ["res",rettype,[]]
+      in
+      let vi_post =
+        Cil.makeGlobalVar ~ghost:true
+          (Data_for_aorai.get_fresh (vi.vname ^ "_post_func"))
+          (TFun(voidType,Some arg,false,[]))
+      in
+      Kernel_function.Hashtbl.add aux_post_table kf vi_post;
+      Aux_funcs.(add vi_post (Post kf));
+      let fun_dec_pre = Cil.emptyFunctionFromVI vi_pre in
+      let fun_dec_post = Cil.emptyFunctionFromVI vi_post in
+      (* For a future analysis of function arguments,
+         we have to update the function's formals. Search
+         for LBLsformals. *)
+      Cil.setFunctionTypeMakeFormals
+        fun_dec_pre (TFun(Cil.voidType, args, varargs,[]));
+      Cil.setFunctionTypeMakeFormals
+        fun_dec_post (TFun(voidType,Some arg,false,[]));
+      (* We will now fill the function with the result
+         of the automaton's analysis. *)
+      Globals.Functions.replace_by_definition
+        (Cil.empty_funspec()) fun_dec_pre loc;
+      Globals.Functions.replace_by_definition
+        (Cil.empty_funspec()) fun_dec_post loc;
+      let kf_pre = Globals.Functions.get vi_pre in
+      let kf_post = Globals.Functions.get vi_post in
+      let aux_func_pre, pre_block,pre_locals = mk_pre_fct_block kf_pre kf in
+      let aux_func_post, post_block,post_locals =
+        mk_post_fct_block
+          kf_post kf (Extlib.opt_of_list fun_dec_post.sformals)
+      in
+      let vis = new change_formals kf kf_pre in (* Replace original formals *)
+      fun_dec_pre.slocals <- pre_locals;
+      fun_dec_pre.sbody <- Visitor.visitFramacBlock vis pre_block;
+      fun_dec_pre.svar.vdefined <- true;
+      fun_dec_post.slocals <- post_locals;
+      fun_dec_post.sbody <- post_block;
+      fun_dec_post.svar.vdefined <- true;
+      let aux_funcs =
+        Cil_datatype.Varinfo.Set.union aux_func_pre aux_func_post
+      in
+      let globs =
+        Cil_datatype.Varinfo.Set.fold
+          (fun x acc ->
+             GFunDecl(Cil.empty_funspec(),x,loc) :: acc) aux_funcs
+          [ GFun(fun_dec_pre,loc); GFun(fun_dec_post,loc)]
+      in
+      Cil_datatype.Varinfo.Set.iter (Aux_funcs.add_aux kf) aux_funcs;
+      fundec.sbody.bstmts <-
+        Cil.mkStmtOneInstr ~ghost:true
+          (Call(None,Cil.evar ~loc vi_pre,
+                List.map (fun x -> Cil.evar ~loc x)
+                  (Kernel_function.get_formals kf),
+                loc))
+        :: fundec.sbody.bstmts;
+      (* Finally, we update the CFG for the new fundec *)
+      let keepSwitch = Kernel.KeepSwitch.get() in
+      Cfg.prepareCFG ~keepSwitch fun_dec_pre;
+      Cfg.cfgFun fun_dec_pre;
+      Cfg.prepareCFG ~keepSwitch fun_dec_post;
+      Cfg.cfgFun fun_dec_post;
+      globs
+
+    method! vglob_aux g =
+      match g with
+      | GFun (fundec,loc) ->
+        let kf = Globals.Functions.get fundec.svar in
+        if Data_for_aorai.isObservableFunction kf then
+          let globs = self#do_fundec fundec loc in
+          ChangeDoChildrenPost([g], fun x -> globs @ x)
+        else
+          DoChildren
+      | _ -> DoChildren
+
+    method! vstmt_aux stmt =
+      match stmt.skind with
+      | Return (res,loc)  ->
+        let kf = Option.get self#current_kf in
+        if Data_for_aorai.isObservableFunction kf then begin
+          let args = match res with
+            | None -> []
+            | Some exp -> [Cil.copy_exp exp]
+          in
+          let aux_vi =
+            try Kernel_function.Hashtbl.find aux_post_table kf
+            with Not_found ->
+              Aorai_option.fatal
+                "Function %a has no associated post_func"
+                Kernel_function.pretty kf
+          in
+          let call =
+            mkStmtOneInstr
+              ~ghost:true (Call (None,Cil.evar ~loc aux_vi,args,loc))
+          in
+          let new_return = mkStmt ~valid_sid:true stmt.skind in
+          let new_stmts = [call; new_return] in
+          stmt.skind<-Block(Cil.mkBlock(new_stmts))
+        end;
+        SkipChildren
+      | _ -> DoChildren
+
+  end
+
+
+(*********************************************************************)
+
+
 
 let post_treatment_loops = Hashtbl.create 97
 
@@ -351,24 +393,24 @@ let pred_reachable reachable_states =
       (nb, reachable,
        Logic_const.pand (unreachable, Aorai_utils.is_out_of_state_pred state))
   in
-  let (states,_) = Data_for_aorai.getAutomata () in
+  let (states,_) = Data_for_aorai.getGraph () in
   let (nb, reachable, unreachable) =
     List.fold_left treat_one_state (0,pfalse,ptrue) states
   in
   (nb > 1, reachable, unreachable)
 
 let possible_start kf (start,int) =
-  let auto = Data_for_aorai.getAutomata () in
+  let auto = Data_for_aorai.getGraph () in
   let trans = Path_analysis.get_edges start int auto in
   let treat_one_trans cond tr =
     Logic_const.por
-      (cond, Aorai_utils.crosscond_to_pred (fst tr.cross) kf Promelaast.Call)
+      (cond, Aorai_utils.crosscond_to_pred tr.cross kf Promelaast.Call)
   in
   let cond = List.fold_left treat_one_trans Logic_const.pfalse trans in
   Logic_const.pand (Aorai_utils.is_state_pred start, cond)
 
 let neg_trans kf trans =
-  let auto = Data_for_aorai.getAutomata () in
+  let auto = Data_for_aorai.getGraph () in
   let rec aux l acc =
     match l with
     | [] -> acc
@@ -389,7 +431,7 @@ let neg_trans kf trans =
              List.fold_left
                (fun cond tr ->
                   Logic_simplification.tand
-                    cond (Logic_simplification.tnot (fst tr.cross)))
+                    cond (Logic_simplification.tnot tr.cross))
                cond trans)
           TTrue same_start
       in
@@ -463,6 +505,7 @@ let get_unchanged_aux_var loc current_state =
 class visit_adding_pre_post_from_buch treatloops =
 
   let predicate_to_invariant kf stmt pred =
+    let pred = Logic_const.toplevel_predicate pred in
     Annotations.add_code_annot
       Aorai_option.emitter
       ~kf
@@ -506,7 +549,7 @@ class visit_adding_pre_post_from_buch treatloops =
         predicate_to_invariant kf stmt pred
       end
     in
-    let (states,_) = Data_for_aorai.getAutomata () in
+    let (states,_) = Data_for_aorai.getGraph () in
     List.iter treat_one_state states;
     if has_multiple_choice then begin
       let add_possible_state state _ acc =
@@ -563,7 +606,7 @@ class visit_adding_pre_post_from_buch treatloops =
     Data_for_aorai.Aorai_state.Map.fold treat_one_state possible_states []
   in
   let partition_pre_state map =
-    let (states,_) = Data_for_aorai.getAutomata () in
+    let (states,_) = Data_for_aorai.getGraph () in
     let is_equiv st1 st2 =
       let check_one _ o1 o2 =
         match o1, o2 with
@@ -819,7 +862,7 @@ class visit_adding_pre_post_from_buch treatloops =
               in
               (i+1,bhv :: bhvs)
           in
-          let (states,_) = Data_for_aorai.getAutomata () in
+          let (states,_) = Data_for_aorai.getGraph () in
           List.rev (snd (List.fold_left aux (0,bhvs) states))
         end
     in
@@ -885,13 +928,13 @@ class visit_adding_pre_post_from_buch treatloops =
     method private leave_block () = !(Stack.pop has_call)
 
     method! vfunc f =
-      let my_kf = Extlib.the self#current_kf in
+      let my_kf = Option.get self#current_kf in
       let vi = Kernel_function.get_vi my_kf in
       let spec = Annotations.funspec my_kf in
       let loc = Kernel_function.get_location my_kf in
-      (match kind_of_func vi with
-       | Pre_func _ | Post_func _ -> ()
-       | Not_auto_func -> (* Normal C function *)
+      (match Aux_funcs.kind vi with
+       | Aux_funcs.Pre _ | Post _ | Aux _ -> ()
+       | Not_aux_func -> (* Normal C function *)
          let bhvs = mk_post my_kf in
          let my_state = Data_for_aorai.get_kf_init_state my_kf in
          let requires = needs_zero_one_choice my_state in
@@ -917,13 +960,13 @@ class visit_adding_pre_post_from_buch treatloops =
 
     method! vglob_aux g =
       match g with
-      | GFun(f,_)  ->
-        let my_kf = Extlib.the self#current_kf in
+      | GFun _ ->
+        let my_kf = Option.get self#current_kf in
         (* don't use get_spec, as we'd generate default assigns,
            while we'll fill the spec just below. *)
         let vi = Kernel_function.get_vi my_kf in
-        (match kind_of_func vi with
-         | Pre_func kf ->
+        (match Aux_funcs.kind vi with
+         | Aux_funcs.Pre kf ->
            (* must advance the automaton according to current call. *)
            let bhvs = mk_pre_fct_spec kf in
            let vis = new change_formals kf my_kf in
@@ -931,9 +974,8 @@ class visit_adding_pre_post_from_buch treatloops =
              Visitor.visitFramacBehaviors vis bhvs
            in
            Annotations.add_behaviors Aorai_option.emitter my_kf bhvs;
-           f.sbody <- Visitor.visitFramacBlock vis f.sbody;
            SkipChildren
-         | Post_func kf ->
+         | Post kf ->
            (* must advance the automaton according to return event. *)
            let (rt, _, _, _) =
              Cil.splitFunctionTypeVI (Kernel_function.get_vi kf)
@@ -953,12 +995,13 @@ class visit_adding_pre_post_from_buch treatloops =
            in
            Annotations.add_behaviors Aorai_option.emitter my_kf bhvs;
            SkipChildren
-         | Not_auto_func -> DoChildren (* they are not considered here. *))
+         | Aux _ | Not_aux_func ->
+           DoChildren (* they are not considered here. *))
 
       | _ -> DoChildren;
 
     method! vstmt_aux stmt =
-      let kf = Extlib.the self#current_kf in
+      let kf = Option.get self#current_kf in
       let treat_loop body_ref stmt =
         let init_state = Data_for_aorai.get_loop_init_state stmt in
         let inv_state = Data_for_aorai.get_loop_invariant_state stmt in
@@ -1082,7 +1125,7 @@ class visit_adding_pre_post_from_buch treatloops =
           List.iter
             (update_assigns
                (Cil_datatype.Stmt.loc stmt)
-               (Extlib.the self#current_kf)
+               (Option.get self#current_kf)
                (Kstmt stmt))
             specs;
           s

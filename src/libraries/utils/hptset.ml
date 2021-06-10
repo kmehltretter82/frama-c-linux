@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -58,57 +58,61 @@ module type S = sig
   include Datatype.S_with_collections
   include S_Basic_Compare with type t := t
 
-    val contains_single_elt: t -> elt option
-    val intersects: t -> t -> bool
+  val contains_single_elt: t -> elt option
+  val intersects: t -> t -> bool
 
-    type action = Neutral | Absorbing | Traversing of (elt -> bool)
+  type action = Neutral | Absorbing | Traversing of (elt -> bool)
 
-    val merge :
-      cache:Hptmap_sig.cache_type ->
-      symmetric:bool ->
-      idempotent:bool ->
-      decide_both:(elt -> bool) ->
-      decide_left:action ->
-      decide_right:action ->
-      t -> t -> t
+  val merge :
+    cache:Hptmap_sig.cache_type ->
+    symmetric:bool ->
+    idempotent:bool ->
+    decide_both:(elt -> bool) ->
+    decide_left:action ->
+    decide_right:action ->
+    t -> t -> t
 
-    type 'a shape
-    val shape: t -> unit shape
-    val from_shape: 'a shape -> t
+  type 'a shape
+  val shape: t -> unit shape
+  val from_shape: 'a shape -> t
 
-    val fold2_join_heterogeneous:
-      cache:Hptmap_sig.cache_type ->
-      empty_left:('a shape -> 'b) ->
-      empty_right:(t -> 'b) ->
-      both:(elt -> 'a -> 'b) ->
-      join:('b -> 'b -> 'b) ->
-      empty:'b ->
-      t -> 'a shape ->
-      'b
+  val partition_with_shape: 'a shape -> t -> t * t
 
-    val clear_caches: unit -> unit
+  val fold2_join_heterogeneous:
+    cache:Hptmap_sig.cache_type ->
+    empty_left:('a shape -> 'b) ->
+    empty_right:(t -> 'b) ->
+    both:(elt -> 'a -> 'b) ->
+    join:('b -> 'b -> 'b) ->
+    empty:'b ->
+    t -> 'a shape ->
+    'b
 
-    val pretty_debug: t Pretty_utils.formatter
+  val replace: elt shape -> t -> bool * t
+
+  val clear_caches: unit -> unit
+
+  val pretty_debug: t Pretty_utils.formatter
 end
 
 module Make(X: Hptmap.Id_Datatype)
-  (Initial_Values : sig val v : X.t list list end)
-  (Datatype_deps: sig val l : State.t list end) :   sig
-    include S with type elt = X.t
-              and type 'a shape = 'a Hptmap.Shape(X).t
-    val self : State.t
-  end
-  = struct
+    (Initial_Values : sig val v : X.t list list end)
+    (Datatype_deps: sig val l : State.t list end) :   sig
+  include S with type elt = X.t
+             and type 'a shape = 'a Hptmap.Shape(X).t
+  val self : State.t
+end
+= struct
 
   type elt = X.t
 
   module M =
     Hptmap.Make
-    (X)
-    (struct include Datatype.Unit let pretty_debug = pretty end)
-    (Hptmap.Comp_unused)
-    (struct let v = List.map (List.map (fun k -> k, ())) Initial_Values.v end)
-    (Datatype_deps)
+      (X)
+      (struct include Datatype.Unit let pretty_debug = pretty end)
+      (Hptmap.Comp_unused)
+      (struct let v = List.map (List.map (fun k -> k, ())) Initial_Values.v end)
+      (Datatype_deps)
 
   include M
 
@@ -220,6 +224,10 @@ module Make(X: Hptmap.Id_Datatype)
   let fold2_join_heterogeneous ~cache ~empty_left ~empty_right ~both ~join ~empty =
     let both k () v = both k v in
     fold2_join_heterogeneous ~cache ~empty_left ~empty_right ~both ~join ~empty
+
+  let replace =
+    let decide _k () () = () in
+    replace_key ~decide
 
 end
 

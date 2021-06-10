@@ -1,7 +1,6 @@
 # frama-c -wp [...]
 [kernel] Parsing tests/wp_plugin/convert.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [wp] 2 goals scheduled
 [wp] [Alt-Ergo] Goal typed_lemma_ceil : Valid
 [wp] [Alt-Ergo] Goal typed_lemma_floor : Valid

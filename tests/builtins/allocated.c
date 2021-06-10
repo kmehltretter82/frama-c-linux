@@ -1,6 +1,6 @@
 /* run.config*
-   STDOPT: +"-slevel 1 -eva-mlevel 0"
-   STDOPT: +"-slevel 999 -eva-alloc-builtin fresh"
+   STDOPT: +"-eva-slevel 1 -eva-mlevel 0"
+   STDOPT: +"-eva-slevel 999 -eva-alloc-builtin fresh"
 */
 #define assert_bottom(exp) if (nondet) {exp; Frama_C_show_each_unreachable();}
 

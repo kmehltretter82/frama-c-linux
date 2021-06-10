@@ -1,6 +1,6 @@
 /* run.config
-EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-OPT: -no-autoload-plugins -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs -copy -kernel-warn-key=annot-error=active
+MODULE: @PTEST_NAME@
+OPT: -no-autoload-plugins -copy -kernel-warn-key=annot-error=active
 */
 
 /*@ foo x == 0;
@@ -48,6 +48,7 @@ void loop (void) {
   //@ for ca_foo: ca_foo \true;
   //@ ns_foo \true;
   //@ baz \true;
+  //@ empty_extension;
   /*@ loop invariant \true; */
   while (0) { }
 }

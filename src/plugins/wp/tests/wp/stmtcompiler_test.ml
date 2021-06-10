@@ -19,17 +19,17 @@ let run () =
 
   let provers =
     List.fold_right
-      (fun pname prvs -> match VCS.prover_of_name pname with
+      (fun pname prvs -> match VCS.parse_prover pname with
          | None -> prvs
          | Some VCS.Tactical -> prvs
-         | Some prv -> (VCS.mode_of_prover_name pname, prv) :: prvs)
+         | Some prv -> (VCS.Batch, prv) :: prvs)
       ["qed"] []
   in
 
   let spawn goal =
     let result _ prv res =
-      Format.printf "[%a] %a@.@\n"
-        VCS.pp_prover prv (VCS.pp_result_qualif prv) res
+      Format.printf "[%a] %t@.@\n"
+        VCS.pp_prover prv (VCS.pp_result_qualif prv res)
     in
     let server = ProverTask.server () in
     Prover.spawn goal ~delayed:true ~result provers;

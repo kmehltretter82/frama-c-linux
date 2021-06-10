@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -26,7 +26,7 @@ type t
 (** Type of the widget containing the warnings. *)
 
 val make :
-  packing:(GObj.widget -> unit) -> 
+  packing:(GObj.widget -> unit) ->
   callback:(Log.event -> GTree.view_column -> unit) -> t
 (** Build a new widget for storing the warnings. *)
 

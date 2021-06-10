@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -138,8 +138,7 @@ let use_spec_instead_of_definition kf =
   not (Kernel_function.is_definition kf) ||
   Ast_info.is_frama_c_builtin (Kernel_function.get_name kf) ||
   Builtins.is_builtin_overridden kf ||
-  Kernel_function.Set.mem kf (Value_parameters.UsePrototype.get ()) ||
-  Value_parameters.LoadFunctionState.mem kf
+  Kernel_function.Set.mem kf (Value_parameters.UsePrototype.get ())
 
 let eval_predicate ~pre ~here p =
   let open Eval_terms in
@@ -234,7 +233,7 @@ and eval_deps_offset state o = match o with
     Locations.Zone.join (eval_deps state i) (eval_deps_offset state o)
 
 let notify_opt with_alarms alarms =
-  Extlib.may (fun mode -> Alarmset.notify mode alarms) with_alarms
+  Option.iter (fun mode -> Alarmset.notify mode alarms) with_alarms
 
 let eval_expr_with_valuation ?with_alarms deps state expr=
   let state = inject_cvalue state in
@@ -380,7 +379,7 @@ module Export (Eval : Eval) = struct
         state
         lv
     in
-    Extlib.opt_conv Locations.Zone.bottom deps, r
+    Option.value ~default:Locations.Zone.bottom deps, r
 
   let lval_to_loc_with_deps kinstr ?with_alarms ~deps lv =
     let state = Db.Value.noassert_get_state kinstr in
@@ -395,7 +394,7 @@ module Export (Eval : Eval) = struct
       lval_to_precise_loc_deps_state ?with_alarms
         ~deps ~reduce_valid_index:(Kernel.SafeArrays.get ()) state lv
     in
-    let deps = Extlib.opt_conv Locations.Zone.bottom deps in
+    let deps = Option.value ~default:Locations.Zone.bottom deps in
     deps, ploc
 
   let lval_to_precise_loc_with_deps_state =
@@ -451,7 +450,7 @@ module Export (Eval : Eval) = struct
 
   let expr_to_kernel_function_state ?with_alarms state ~deps exp =
     let r, deps = resolv_func_vinfo ?with_alarms deps state exp in
-    Extlib.opt_conv Locations.Zone.bottom deps, r
+    Option.value ~default:Locations.Zone.bottom deps, r
 
   let expr_to_kernel_function kinstr ?with_alarms ~deps exp =
     let state_to_joined_kernel_function state (z_acc, kf_acc) =

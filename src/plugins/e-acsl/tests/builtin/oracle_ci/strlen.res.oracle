@@ -5,92 +5,62 @@
 [e-acsl] Warning: annotating undefined function `exit':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-[e-acsl] Warning: annotating undefined function `strlen':
+[e-acsl] Warning: annotating undefined function `waitpid':
+  the generated program may miss memory instrumentation
+  if there are memory-related annotations.
+[e-acsl] Warning: annotating undefined function `fork':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
 [e-acsl] Warning: annotating undefined function `strdup':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-[kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdio.h:169: Warning: 
-  Neither code nor specification for function printf, generating default assigns from the prototype
-[kernel:annot:missing-spec] FRAMAC_SHARE/libc/setjmp.h:47: Warning: 
-  Neither code nor specification for function sigsetjmp, generating default assigns from the prototype
-[kernel:annot:missing-spec] tests/builtin/signalled.h:14: Warning: 
-  Neither code nor specification for function signal_eval, generating default assigns from the prototype
-[kernel:annot:missing-spec] tests/builtin/signalled.h:18: Warning: 
-  Neither code nor specification for function get_jmp_ctxt, generating default assigns from the prototype
-[kernel:annot:missing-spec] tests/builtin/signalled.h:20: Warning: 
-  Neither code nor specification for function set_handler, generating default assigns from the prototype
-[kernel:annot:missing-spec] tests/builtin/signalled.h:22: Warning: 
-  Neither code nor specification for function test_successful, generating default assigns from the prototype
+[e-acsl] FRAMAC_SHARE/libc/string.h:471: Warning: 
+  E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:475: Warning: 
+  E-ACSL construct `predicate performing read accesses' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:482: Warning: 
+  E-ACSL construct `predicate performing read accesses' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:471: Warning: 
+  E-ACSL construct `logic functions with labels' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:471: Warning: 
+  Some assumes clauses could not be translated.
+  Ignoring complete and disjoint behaviors annotations.
+[e-acsl] FRAMAC_SHARE/libc/string.h:471: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:478: Warning: 
+  E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:480: Warning: 
+  E-ACSL construct `logic functions performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:480: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/unistd.h:857: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/sys/wait.h:79: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/sys/wait.h:86: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:470: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:472: Warning: 
+  E-ACSL construct `abnormal termination case in behavior'
+  is not yet supported.
+  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:457: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:469: Warning: 
-  E-ACSL construct `logic function application' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:469: Warning: 
-  E-ACSL construct `assigns clause in behavior' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:476: Warning: 
-  E-ACSL construct `logic function application' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:125: Warning: 
-  E-ACSL construct `logic function application' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:125: Warning: 
-  E-ACSL construct `assigns clause in behavior' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:127: Warning: 
-  E-ACSL construct `logic function returning an integer' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:127: Warning: 
-  E-ACSL construct `assigns clause in behavior' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:469: Warning: 
-  E-ACSL construct `assigns clause in behavior' is not yet supported.
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:459: Warning: 
+  E-ACSL construct `abnormal termination case in behavior'
+  is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
-[eva:initial-state] Values of globals at initialization
-  __e_acsl_init ∈ [--..--]
-  __e_acsl_heap_allocation_size ∈ [--..--]
-  __e_acsl_math_HUGE_VAL ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
-  __e_acsl_math_HUGE_VALF ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
-  __e_acsl_math_INFINITY ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
-  __e_acsl_sound_verdict ∈ [--..--]
-  __gen_e_acsl_literal_string ∈ {0}
-  __gen_e_acsl_literal_string_2 ∈ {0}
-  __gen_e_acsl_literal_string_3 ∈ {0}
-  __gen_e_acsl_literal_string_4 ∈ {0}
-  __gen_e_acsl_literal_string_5 ∈ {0}
-  __gen_e_acsl_literal_string_6 ∈ {0}
-  __gen_e_acsl_literal_string_7 ∈ {0}
-  __gen_e_acsl_literal_string_8 ∈ {0}
-  __gen_e_acsl_literal_string_9 ∈ {0}
-  __gen_e_acsl_literal_string_10 ∈ {0}
-  __gen_e_acsl_literal_string_11 ∈ {0}
-[eva] using specification for function __e_acsl_memory_init
-[eva] using specification for function __e_acsl_store_block
-[eva] using specification for function __e_acsl_full_init
-[eva] using specification for function __e_acsl_mark_readonly
-[eva] using specification for function strdup
-[eva:libc:unsupported-spec] FRAMAC_SHARE/libc/string.h:466: Warning: 
-  The specification of function 'strdup' is currently not supported by Eva.
-  Consider adding FRAMAC_SHARE/libc/string.c
-  to the analyzed source files.
-[eva] FRAMAC_SHARE/libc/string.h:466: Warning: 
-  ignoring unsupported \allocates clause
-[eva] using specification for function __e_acsl_delete_block
-[eva:alarm] FRAMAC_SHARE/libc/string.h:472: Warning: 
-  function __gen_e_acsl_strdup, behavior allocation: postcondition 'allocation' got status unknown. (Behavior may be inactive, no reduction performed.)
-[eva:alarm] FRAMAC_SHARE/libc/string.h:474: Warning: 
-  function __gen_e_acsl_strdup, behavior allocation: postcondition 'result_valid_string_and_same_contents' got status invalid. (Behavior may be inactive, no reduction performed.)
-[eva:alarm] FRAMAC_SHARE/libc/string.h:479: Warning: 
-  function __gen_e_acsl_strdup, behavior no_allocation: postcondition 'result_null' got status unknown. (Behavior may be inactive, no reduction performed.)
-[eva] using specification for function get_jmp_ctxt
-[eva:alarm] tests/builtin/strlen.c:18: Warning: 
-  out of bounds read. assert \valid_read(jmp_ctxt);
-[eva] done for function main

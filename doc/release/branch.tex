@@ -21,6 +21,9 @@ $\rightarrow$ Repository $\rightarrow$ Protected Branches.
 
 \section{Creating the branch}
 
+Note that you must be member of the GitLab groups "frama-c", "dev" and have
+access to each plugin of continuous integration.
+
 Create the branch \texttt{stable/release}, where \texttt{release} is the
 element name, using the \texttt{frama-ci} tool:
 \begin{enumerate}
@@ -64,7 +67,7 @@ the issues should be tagged with the current release, or with the next one.
 
 Create headers in the Changelog(s). This is to avoid some merge conflicts,
 but also so that merge requests add information in the proper part of
-the Changelog.   
+the Changelog.
 
 \begin{itemize}
 \item Add the following in the Changelog, in \texttt{stable/element}
@@ -86,7 +89,7 @@ This should go directly below
 
 From now on, Changelog items corresponding to MR merged into \texttt{master}
 must be placed between these two banners. This should minimize conflicts when
-merging back \texttt{stable/element} into \texttt{master}
+merging back \texttt{stable/element} into \texttt{master}.
 
 \todo{Do the same thing in the manuals that contain a Changelog?}
 

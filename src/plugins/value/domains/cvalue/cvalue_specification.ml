@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -127,7 +127,7 @@ let check_fct_assigns kf ab ~pre_state found_froms =
        | WritesAny -> ()
        | Writes(assigns_deps) ->
          let bol = Property.Id_contract (Datatype.String.Set.empty,b) in
-         let ip = Extlib.the (Property.ip_of_assigns kf Kglobal bol b.b_assigns)
+         let ip = Option.get (Property.ip_of_assigns kf Kglobal bol b.b_assigns)
          in
          let source = fst (Property.location ip) in
          (* First, check the assigns. *)
@@ -163,7 +163,7 @@ let check_fct_assigns kf ab ~pre_state found_froms =
              let status_txt, status =
                check_from pre_state asgn assigns_zone deps found_froms
              in
-             let ip = Extlib.the (Property.ip_of_from kf Kglobal bol from) in
+             let ip = Option.get (Property.ip_of_from kf Kglobal bol from) in
              let source = fst (asgn.it_content.term_loc) in
              msg_status status ~once:true ~source
                "%a: \\from ... part in assign clause got status %s.%a%t"

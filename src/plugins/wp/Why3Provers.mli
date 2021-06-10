@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -41,6 +41,7 @@ val compare : t -> t -> int
 val provers : unit -> t list
 val provers_set : unit -> Why3.Whyconf.Sprover.t
 val is_available : t -> bool
+val is_mainstream : t -> bool
 val has_shortcut : t -> string -> bool
 
 (**************************************************************************)

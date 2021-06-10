@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,6 +20,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
+let load_eva_info () =
+  if not !Md_gen.Eva_info.loaded && Dynamic.is_loaded "frama-c-eva"
+  then begin
+    let eva_info = "frama-c-markdown_report.eva_info" in
+    Dynamic.load_packages [eva_info];
+  end
+
+(*  end *)
+
 let main () =
   match Mdr_params.Generate.get () with
   | "none" -> ()
@@ -30,4 +39,6 @@ let main () =
     Mdr_params.fatal "Unexpected value for option %s: %s"
       Mdr_params.Generate.option_name s
 
-let () = Db.Main.extend main
+let () =
+  Cmdline.run_after_extended_stage load_eva_info;
+  Db.Main.extend main

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -21,47 +21,47 @@
 (**************************************************************************)
 
 type 'a accessor =
-    < fold:'acc. ('a -> 'acc -> 'acc) -> 'acc -> 'acc (* folder on elements *);
- mem:('a -> bool) (* mem *) >
+  < fold:'acc. ('a -> 'acc -> 'acc) -> 'acc -> 'acc (* folder on elements *);
+    mem:('a -> bool) (* mem *) >
 
-type 'a category = 
-    { name: string; 
-      ty: 'a Type.t;
-      fold: 'b. ('a -> 'b -> 'b) -> 'b -> 'b;
-      mem: 'a -> bool;
-      mutable states: State.t list }
+type 'a category =
+  { name: string;
+    ty: 'a Type.t;
+    fold: 'b. ('a -> 'b -> 'b) -> 'b -> 'b;
+    mem: 'a -> bool;
+    mutable states: State.t list }
 
 type 'a t = 'a category
 
-module Categories = struct 
+module Categories = struct
 
   module By_name = Type.String_tbl(struct type 'a t = 'a category end)
 
   (* categories are indexed by [ty] and [name].
      To be typable, the [ty] is encoded by its digest, which is a string *)
   let tbl
-      : By_name.t Datatype.String.Hashtbl.t 
-      = Datatype.String.Hashtbl.create 7
+    : By_name.t Datatype.String.Hashtbl.t
+    = Datatype.String.Hashtbl.create 7
 
   let check c =
     try
       let internal = Datatype.String.Hashtbl.find tbl (Type.digest c.ty) in
-      try 
-	ignore (By_name.find internal c.name c.ty);
-	(* just a warning for compatibility purpose: E.g if the kernel creates a
-	   new standard category at release N, then plug-ins which already
-	   create this category at release N-1 would be warned, but still work
-	   as before. *)
-	Cmdline.Kernel_log.warning "overriding category `%s' for type `%s'" 
-	  c.name
-	  (Type.name c.ty)
+      try
+        ignore (By_name.find internal c.name c.ty);
+        (* just a warning for compatibility purpose: E.g if the kernel creates a
+           new standard category at release N, then plug-ins which already
+           create this category at release N-1 would be warned, but still work
+           as before. *)
+        Cmdline.Kernel_log.warning "overriding category `%s' for type `%s'"
+          c.name
+          (Type.name c.ty)
       with
       | By_name.Unbound_value _ -> ()
       | By_name.Incompatible_type _ -> assert false
     with Not_found ->
       ()
 
-  let add c  = 
+  let add c  =
     check c;
     let internal =
       try Datatype.String.Hashtbl.find tbl (Type.digest c.ty)
@@ -72,12 +72,12 @@ module Categories = struct
 end
 
 let create name ty ~register states (accessor: 'a accessor) =
-  let c = 
-    { name; 
-      ty; 
-      fold = (fun x acc -> accessor#fold x acc); 
-      mem = accessor#mem; 
-      states } 
+  let c =
+    { name;
+      ty;
+      fold = (fun x acc -> accessor#fold x acc);
+      mem = accessor#mem;
+      states }
   in
   if register then Categories.add c else Categories.check c;
   c

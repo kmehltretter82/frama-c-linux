@@ -75,13 +75,13 @@ module Mk: sig
 end = struct
 
   let store_reference ~loc flow lhs rhs =
+    let prefix = RTL.temporal_prefix in
     let fname = match flow with
       | Direct -> "store_nblock"
       | Indirect -> "store_nreferent"
       | Copy -> Options.fatal "Copy flow type in store_reference"
     in
-    let fname = RTL.mk_temporal_name fname in
-    Smart_stmt.lib_call ~loc fname [ Cil.mkAddrOf ~loc lhs; rhs ]
+    Smart_stmt.rtl_call ~loc ~prefix fname [ Cil.mkAddrOf ~loc lhs; rhs ]
 
   let save_param ~loc flow lhs pos =
     let infix = match flow with
@@ -89,17 +89,19 @@ end = struct
       | Indirect -> "nreferent"
       | Copy -> "copy"
     in
+    let prefix = RTL.temporal_prefix in
     let fname = "save_" ^ infix ^ "_parameter" in
-    let fname = RTL.mk_temporal_name fname in
-    Smart_stmt.lib_call ~loc fname [ lhs ; Cil.integer ~loc pos ]
+    Smart_stmt.rtl_call ~loc ~prefix fname [ lhs ; Cil.integer ~loc pos ]
 
   let pull_param ~loc vi pos =
+    let prefix = RTL.temporal_prefix in
+    let fname = "pull_parameter" in
     let exp = Cil.mkAddrOfVi vi in
-    let fname = RTL.mk_temporal_name "pull_parameter" in
     let sz = Cil.kinteger ~loc IULong (Cil.bytesSizeOf vi.vtype) in
-    Smart_stmt.lib_call ~loc fname [ exp ; Cil.integer ~loc pos ; sz ]
+    Smart_stmt.rtl_call ~loc ~prefix fname [ exp ; Cil.integer ~loc pos ; sz ]
 
   let handle_return_referent ~save ~loc lhs =
+    let prefix = RTL.temporal_prefix in
     let fname = match save with
       | true -> "save_return"
       | false -> "pull_return"
@@ -108,15 +110,17 @@ end = struct
     (match (Cil.typeOf lhs) with
      | TPtr _ -> ()
      | _ -> Error.not_yet "Struct in return");
-    Smart_stmt.lib_call ~loc (RTL.mk_temporal_name fname) [ lhs ]
+    Smart_stmt.rtl_call ~loc ~prefix fname [ lhs ]
 
   let reset_return_referent ~loc =
-    Smart_stmt.lib_call ~loc (RTL.mk_temporal_name "reset_return") []
+    let prefix = RTL.temporal_prefix in
+    Smart_stmt.rtl_call ~loc ~prefix "reset_return" []
 
   let temporal_memcpy_struct ~loc lhs rhs =
-    let fname  = RTL.mk_temporal_name "memcpy" in
+    let prefix = RTL.temporal_prefix in
+    let fname  = "memcpy" in
     let size = Cil.sizeOf ~loc (Cil.typeOfLval lhs) in
-    Smart_stmt.lib_call ~loc fname [ Cil.mkAddrOf ~loc lhs; rhs; size ]
+    Smart_stmt.rtl_call ~loc ~prefix fname [ Cil.mkAddrOf ~loc lhs; rhs; size ]
 end
 (* }}} *)
 
@@ -142,9 +146,9 @@ let assign ?(ltype) lhs rhs loc =
   in
   match Cil.unrollType ltype with
   | TPtr _ ->
-    let base, _ = Misc.ptr_index rhs in
+    let base = Misc.ptr_base ~loc:rhs.eloc rhs in
     let rhs, flow =
-      (match base.enode with
+      (match (Cil.stripCasts base).enode with
        | AddrOf _
        | StartOf _ -> rhs, Direct
        (* Unary operator describes !, ~ or -: treat it same as Const since
@@ -207,7 +211,7 @@ let mk_stmt_from_assign loc lhs rhs =
     | Direct | Indirect -> Mk.store_reference ~loc flow lhs rhs
     | Copy -> Mk.temporal_memcpy_struct ~loc lhs rhs
   in
-  Extlib.opt_map fn (assign lhs rhs loc)
+  Option.map fn (assign lhs rhs loc)
 (* }}} *)
 
 (* ************************************************************************** *)
@@ -216,10 +220,10 @@ let mk_stmt_from_assign loc lhs rhs =
 
 (* Top-level handler for Set instructions *)
 let set_instr ?(post=false) current_stmt loc lhs rhs env kf =
-  if Mmodel_analysis.must_model_lval ~kf lhs then
-    Extlib.may_map
-      (fun stmt -> Env.add_stmt ~before:current_stmt ~post env kf stmt)
-      ~dft:env
+  if Memory_tracking.must_monitor_lval ~kf lhs then
+    Option.fold
+      ~some:(fun stmt -> Env.add_stmt ~before:current_stmt ~post env kf stmt)
+      ~none:env
       (mk_stmt_from_assign loc lhs rhs)
   else
     env
@@ -245,16 +249,16 @@ end = struct
            let lv = Mem(param), NoOffset in
            let ltype = Cil.typeOf param in
            let vals = assign ~ltype lv param loc in
-           Extlib.may_map
-             (fun (_, rhs, flow) ->
-                let env =
-                  if Mmodel_analysis.must_model_exp ~kf param then
-                    let stmt = Mk.save_param ~loc flow rhs index in
-                    Env.add_stmt ~before:current_stmt ~post:false env kf stmt
-                  else env
-                in
-                (env, index+1))
-             ~dft:(env, index+1)
+           Option.fold
+             ~some:(fun (_, rhs, flow) ->
+                 let env =
+                   if Memory_tracking.must_monitor_exp ~kf param then
+                     let stmt = Mk.save_param ~loc flow rhs index in
+                     Env.add_stmt ~before:current_stmt ~post:false env kf stmt
+                   else env
+                 in
+                 (env, index+1))
+             ~none:(env, index+1)
              vals)
         (env, 0)
         args
@@ -281,32 +285,33 @@ end = struct
        been instrumented, then information about referent numbers should be
        stored in the internal data structure and it is retrieved using
        [pull_return] added via a call to [Mk.handle_return_referent] *)
-    Extlib.may_map
-      (fun (lhs, rhs, flow) ->
-         let flow, rhs = match flow with
-           | Indirect when alloc -> Direct, (Smart_exp.deref ~loc rhs)
-           | _ -> flow, rhs
-         in
-         let stmt =
-           if alloc then
-             Mk.store_reference ~loc flow lhs rhs
-           else
-             Mk.handle_return_referent ~save:false ~loc (Cil.mkAddrOf ~loc lhs)
-         in
-         Env.add_stmt ~before:current_stmt ~post:true env kf stmt)
-      ~dft:env
+    Option.fold
+      ~some:(fun (lhs, rhs, flow) ->
+          let flow, rhs = match flow with
+            | Indirect when alloc -> Direct, (Smart_exp.deref ~loc rhs)
+            | _ -> flow, rhs
+          in
+          let stmt =
+            if alloc then
+              Mk.store_reference ~loc flow lhs rhs
+            else
+              Mk.handle_return_referent ~save:false ~loc (Cil.mkAddrOf ~loc lhs)
+          in
+          Env.add_stmt ~before:current_stmt ~post:true env kf stmt)
+      ~none:env
       vals
 
   (* Update local environment with a statement tracking temporal metadata
      associated with memcpy/memset call *)
   let call_memxxx current_stmt loc args fexp env kf =
     if Libc.is_memcpy fexp || Libc.is_memset fexp then
+      let prefix = RTL.temporal_prefix in
       let name = match fexp.enode with
         | Lval(Var vi, _) -> vi.vname
         | _ -> Options.fatal "[Temporal.call_memxxx] not a left-value"
       in
       let stmt =
-        Smart_stmt.lib_call ~loc (RTL.mk_temporal_name name) args
+        Smart_stmt.rtl_call ~loc ~prefix name args
       in
       Env.add_stmt ~before:current_stmt ~post:false env kf stmt
     else
@@ -320,8 +325,11 @@ end = struct
        it makes sense to make this somewhat-debug-level-call. In production mode
        the implementation of the function should be empty and compiler should
        be able to optimize that code out. *)
-    let name = (RTL.mk_temporal_name "reset_parameters") in
-    let stmt = Smart_stmt.lib_call ~loc name [] in
+    let stmt =
+      let prefix = RTL.temporal_prefix in
+      let name = "reset_parameters" in
+      Smart_stmt.rtl_call ~loc ~prefix name []
+    in
     let env = Env.add_stmt ~before:current_stmt ~post:false env kf stmt in
     let stmt = Mk.reset_return_referent ~loc in
     let env = Env.add_stmt ~before:current_stmt ~post:false env kf stmt in
@@ -339,12 +347,12 @@ end = struct
     (* Memory allocating functions have no definitions so below expression
        should capture them *)
     let alloc = not has_def in
-    Extlib.may_map
-      (fun lhs ->
-         if Mmodel_analysis.must_model_lval ~kf lhs then
-           call_with_ret ~alloc current_stmt loc lhs env kf
-         else env)
-      ~dft:env
+    Option.fold
+      ~some:(fun lhs ->
+          if Memory_tracking.must_monitor_lval ~kf lhs then
+            call_with_ret ~alloc current_stmt loc lhs env kf
+          else env)
+      ~none:env
       ret
 end
 (* }}} *)
@@ -371,7 +379,7 @@ end = struct
         inits
 
   let instr current_stmt vi li loc env kf =
-    if Mmodel_analysis.must_model_vi ~kf vi then
+    if Memory_tracking.must_monitor_vi ~kf vi then
       match li with
       | AssignInit init ->
         handle_init current_stmt NoOffset loc vi init env kf
@@ -391,7 +399,7 @@ end
 (* Update local environment with a statement tracking temporal metadata
    associated with adding a function argument to a stack frame *)
 let track_argument ?(typ) param index env kf =
-  let typ = Extlib.opt_conv param.vtype typ in
+  let typ = Option.value ~default:param.vtype typ in
   match Cil.unrollType typ with
   | TPtr _
   | TComp _ ->
@@ -421,7 +429,7 @@ let handle_return_stmt loc ret env kf =
   | _ -> Options.fatal "Something other than Lval in return"
 
 let handle_return_stmt loc ret env kf =
-  if Mmodel_analysis.must_model_exp ~kf ret then
+  if Memory_tracking.must_monitor_exp ~kf ret then
     handle_return_stmt loc ret env kf
   else
     env
@@ -491,7 +499,7 @@ let handle_function_parameters kf env =
     let env, _ = List.fold_left
         (fun (env, index) param ->
            let env =
-             if Mmodel_analysis.must_model_vi ~kf param
+             if Memory_tracking.must_monitor_vi ~kf param
              then track_argument param index env kf
              else env
            in
@@ -507,7 +515,7 @@ let handle_stmt stmt env kf =
     match stmt.skind with
     | Instr instr -> handle_instruction stmt instr env kf
     | Return(ret, loc) ->
-      Extlib.may_map (fun ret -> handle_return_stmt loc ret env kf) ~dft:env ret
+      Option.fold ~some:(fun ret -> handle_return_stmt loc ret env kf) ~none:env ret
     | Goto _ | Break _ | Continue _ | If _ | Switch _ | Loop _ | Block _
     | UnspecifiedSequence _ | Throw _ | TryCatch _ | TryFinally _
     | TryExcept _ -> env

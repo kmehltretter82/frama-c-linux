@@ -3,7 +3,6 @@
 [kernel] tests/wp_typed/array_initialized.c:13: Warning: 
   Too many initializers for array g
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function main1
@@ -274,7 +273,7 @@ Prove: valid_rw(Malloc_0, Mptr_0[shift_PTR(a, i)], 1).
 Goal Post-condition (file tests/wp_typed/array_initialized.c, line 288) in 'simpl':
 Let x = Mint_0[shift_sint32(t, 0)].
 Assume {
-  Type: is_sint32(x).
+  Type: is_sint32(simpl_0) /\ is_sint32(x).
   (* Heap *)
   Type: region(t.base) <= 0.
   (* Goal *)
@@ -283,8 +282,8 @@ Assume {
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 49) ->
       (Mint_0[shift_sint32(t, i_1)] = x))).
   If 0 <= x
-  Then { (* Return *) Have: simpl_0 = 1. }
-  Else { (* Return *) Have: simpl_0 = 0. }
+  Then { Have: simpl_0 = 1. }
+  Else { Have: simpl_0 = 0. }
 }
 Prove: (0 <= Mint_0[shift_sint32(t, i)]) <-> (simpl_0 = 1).
 

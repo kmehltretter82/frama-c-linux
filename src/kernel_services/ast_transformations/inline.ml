@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -109,6 +109,7 @@ let inline_call loc caller callee return args =
       self#set_current_kf caller;
       Cil.DoChildrenPost
         (fun fd ->
+           List.iter (fun v -> v.vformal <- false) fd.sformals;
            caller_fd.slocals <-
              caller_fd.slocals @ fd.sformals @ fd.slocals;
            let add_init vi arg =
@@ -230,7 +231,7 @@ let inliner functions_to_inline = object (self)
                 let scope = Stack.top block_stack in
                 let v =
                   Cil.makeLocalVar
-                    (Extlib.the self#current_func)
+                    (Option.get self#current_func)
                     ~scope ~temp:true "__inline_tmp" rt
                 in
                 true, Some (Cil.var v), args
@@ -240,7 +241,7 @@ let inliner functions_to_inline = object (self)
               let scope = Stack.top block_stack in
               let v =
                 Cil.makeLocalVar
-                  (Extlib.the self#current_func)
+                  (Option.get self#current_func)
                   ~scope ~temp:true "__inline_tmp" t
               in
               true, Some (Cil.var v), args
@@ -257,9 +258,12 @@ let inliner functions_to_inline = object (self)
           let block =
             inline_call
               (Cil_datatype.Stmt.loc stmt)
-              (Extlib.the self#current_kf)
+              (Option.get self#current_kf)
               callee return_aux args
           in
+          let fun_name = Kernel_function.get_name callee in
+          let new_attribute = (Attr (Cil.frama_c_inlined,[AStr fun_name])) in
+          block.battrs <- Cil.addAttribute new_attribute block.battrs;
           let skind =
             if needs_assign then begin
               match return_aux, return with

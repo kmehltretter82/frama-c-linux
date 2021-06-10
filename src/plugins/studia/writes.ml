@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -56,7 +56,7 @@ class find_write zlval = object (self)
   val mutable res = ([] : (stmt * effects) list)
 
   method! vinst i =
-    let stmt = Extlib.the self#current_stmt in
+    let stmt = Option.get self#current_stmt in
     begin
       let aux_call lvopt _kf _args _loc =
         (* Direct effect through the writing of [lvopt], or indirect inside

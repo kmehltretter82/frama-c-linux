@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -23,10 +23,10 @@
 include
   Plugin.Register
     (struct
-       let name = "Studia"
-       let shortname = "studia"
-       let help = "Tools for Eva case studies"
-     end)
+      let name = "Studia"
+      let shortname = "studia"
+      let help = "Tools for Eva case studies"
+    end)
 
 
 

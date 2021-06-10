@@ -13,10 +13,15 @@ class visit = object
       [{ stmt_ghost = false;
          stmt_node =
            CODE_ANNOT(
-             AAssert([], Assert,
-                     { lexpr_node =
-                         PLat ({ lexpr_node = PLtrue; lexpr_loc = loc},"Pre");
-                       lexpr_loc = loc}), loc)};
+             AAssert(
+               [],
+               { tp_kind = Assert;
+                 tp_statement =
+                   { lexpr_node =
+                       PLat ({ lexpr_node = PLtrue; lexpr_loc = loc},"Pre");
+                     lexpr_loc = loc}
+               }),
+             loc)};
        s]
 end
 

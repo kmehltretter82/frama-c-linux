@@ -1,9 +1,9 @@
 /* run.config
-   STDOPT: +"-inline-calls @all"
+PLUGIN: eva,scope
+   STDOPT: +"-inline-calls @all -kernel-msg-key printer:attrs"
    STDOPT: +"-inline-calls @inline"
    STDOPT: +"-inline-calls @inline -remove-inlined @inline"
  */
-
 int f() {
   return 2;
 }

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -342,7 +342,7 @@ let json_of_result (p : VCS.prover) (r : VCS.result) =
   `Assoc (name :: verdict :: (time @ steps))
 
 let prover_of_json js =
-  try VCS.prover_of_name (js >? "prover" |> Json.string)
+  try VCS.parse_prover (js >? "prover" |> Json.string)
   with Not_found -> None
 
 let result_of_json js =

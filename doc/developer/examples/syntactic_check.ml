@@ -18,8 +18,8 @@ module M = Plugin.Register
 
 (* Each annotation in Frama-C has an emitter, for traceability.
    We create thus our own, and says that it will only be used to emit code
-   annotations, and that these annotations do not depend on Frama-C's command
-   line parameters.
+   annotations, and that these annotations do not depend
+   on Frama-C's command line parameters.
 *)
 let syntax_alarm =
   Emitter.create
@@ -43,7 +43,7 @@ class non_zero_divisor prj = object (self)
       | Kglobal -> assert false
       | Kstmt s -> s
     in
-    let kf = Extlib.the self#current_kf in
+    let kf = Option.get self#current_kf in
     (* The above statement and function are related to the original project. We
        need to attach the new assertion to the corresponding statement and
        function of the new project. Cil provides functions to convert a

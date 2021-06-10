@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -131,48 +131,14 @@ let split_command_args s =
     never need quotes. *)
 let quote_define_argument arg = Format.sprintf "%S" arg
 
-let parse_entry jcdb_dir r =
-  let open Yojson.Basic.Util in
-  let filename = r |> member "file" |> to_string in
-  let dirname  = r |> member "directory" |> to_string_option |> Extlib.opt_conv jcdb_dir in
-  let dirname =
-    if Filename.is_relative dirname then Filename.concat jcdb_dir dirname
-    else dirname
-  in
-  let dirname = Filepath.normalize dirname in
-  let path = Datatype.Filepath.of_string ~base_name:dirname filename in
-
-  (* get the list of arguments, and a flag indicating if the arguments
-     were given via 'command' or 'arguments'; the latter require quoting *)
-  let string_option_list, requote =
-    (* Note: the JSON Compilation Databse specification specifies that
-       "either arguments or command is required", but does NOT specify what
-       happens when both are present. There is a LLVM commit from 2015
-       (https://reviews.llvm.org/D10365) that mentions:
-       "Arguments and Command can now be in the same compilation database for
-        the same file. Arguments are preferred when both are present."
-       The code below follows this behavior. *)
-    try
-      let args = List.map to_string (r |> member "arguments" |> to_list) in
-      args, true
-    with _ ->
-    try
-      let s = r |> member "command" |> to_string in
-      split_command_args s, false
-    with _ ->
-      Kernel.abort "compilation database: expected 'arguments' or 'command'"
-  in
-  (* conversion for '-I' flags *)
-  let convert_path arg =
-    if Filename.is_relative arg then Filename.concat dirname arg
-    else arg
-  in
+(* Filters and normalize useful flags: -I, -D, -U, ... *)
+let filter_useful_flags ~requote option_list =
   let convert_define arg =
     if requote then quote_define_argument arg else arg
   in
   let process_prefix prefix suffix =
     match prefix with
-    | Path s -> s ^ convert_path suffix
+    | Path s -> s ^ suffix
     | Define s -> s ^ convert_define suffix
     | Undefine s -> s ^ suffix
   in
@@ -208,24 +174,30 @@ let parse_entry jcdb_dir r =
             let new_arg = process_prefix prefix arg in
             (None, new_arg :: acc_res)
           end
-      ) (None, []) string_option_list
+      ) (None, []) option_list
   in
-  (* Note: the same file may be compiled several times, under different
-     (and possibly incompatible) configurations, leading to multiple
-     occurrences in the list. Since we cannot infer which of them is the
-     "right" one, we replace them with the latest ones found, warning the
-     user if previous flags were different. *)
-  let flags = List.rev res in
+  List.rev res
+
+(* The same file may be compiled several times, under different
+   (and possibly incompatible) configurations, leading to multiple
+   occurrences in the list. Since we cannot infer which of them is the
+   "right" one, we replace them with the latest ones found, warning the
+   user if previous flags were different. *)
+let update_flags_verbosely path flags =
   try
     let previous_flags = Flags.find path in
     if previous_flags <> flags then
-      let removed_flags = List.filter (fun e -> not (List.mem e previous_flags)) flags in
+      let removed_flags =
+        List.filter (fun e -> not (List.mem e previous_flags)) flags
+      in
       let removed_str =
         if removed_flags = [] then "" else
           Format.asprintf "@ Old flags no longer present: %a"
             (Pretty_utils.pp_list ~sep:" " Format.pp_print_string) removed_flags
       in
-      let added_flags = List.filter (fun e -> not (List.mem e flags)) previous_flags in
+      let added_flags =
+        List.filter (fun e -> not (List.mem e flags)) previous_flags
+      in
       let added_str =
         if added_flags = [] then "" else
           Format.asprintf "@ New flags not previously present: %a"
@@ -239,8 +211,42 @@ let parse_entry jcdb_dir r =
   | Not_found ->
     Flags.add path flags
 
+let parse_compilation_entry jcdb_dir r =
+  let open Yojson.Basic.Util in
+  let filename = r |> member "file" |> to_string in
+  let dirname  = r |> member "directory" |> to_string_option |> Option.value ~default:jcdb_dir in
+  let dirname =
+    if Filename.is_relative dirname then Filename.concat jcdb_dir dirname
+    else dirname
+  in
+  let dirname = Filepath.normalize dirname in
+  let path = Datatype.Filepath.of_string ~base_name:dirname filename in
+
+  (* get the list of arguments, and a flag indicating if the arguments
+     were given via 'command' or 'arguments'; the latter require quoting *)
+  let string_option_list, requote =
+    (* Note: the JSON Compilation Database specification specifies that
+       "either arguments or command is required", but does NOT specify what
+       happens when both are present. There is a LLVM commit from 2015
+       (https://reviews.llvm.org/D10365) that mentions:
+       "Arguments and Command can now be in the same compilation database for
+        the same file. Arguments are preferred when both are present."
+       The code below follows this behavior. *)
+    try
+      let args = List.map to_string (r |> member "arguments" |> to_list) in
+      args, true
+    with _ ->
+    try
+      let s = r |> member "command" |> to_string in
+      split_command_args s, false
+    with _ ->
+      Kernel.abort "compilation database: expected 'arguments' or 'command'"
+  in
+  let flags = filter_useful_flags ~requote string_option_list in
+  update_flags_verbosely path flags
+
 let compute_flags_from_file () =
-  let database = Kernel.JsonCompilationDatabase.get () in
+  let database = (Kernel.JsonCompilationDatabase.get () :> string) in
   let jcdb_dir, jcdb_path =
     if Sys.is_directory database then
       database, Filename.concat database "compile_commands.json"
@@ -253,7 +259,7 @@ let compute_flags_from_file () =
       let r_list =
         Yojson.Basic.from_file jcdb_path |> Yojson.Basic.Util.to_list
       in
-      List.iter (parse_entry jcdb_dir) r_list;
+      List.iter (parse_compilation_entry jcdb_dir) r_list;
     with
     | Sys_error msg
     | Yojson.Json_error msg
@@ -264,7 +270,7 @@ let compute_flags_from_file () =
   Flags.mark_as_computed ()
 
 let get_flags f =
-  if Kernel.JsonCompilationDatabase.get () <> "" then begin
+  if not (Kernel.JsonCompilationDatabase.is_empty ()) then begin
     if not (Flags.is_computed ()) then compute_flags_from_file ();
     try
       let flags = Flags.find f in

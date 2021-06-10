@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -63,6 +63,7 @@ struct
   let mk_frame = C.mk_frame
   let in_frame = C.in_frame
   let mem_frame = C.mem_frame
+  let has_at_frame = C.has_at_frame
   let mem_at_frame = C.mem_at_frame
   let set_at_frame = C.set_at_frame
   let mem_at = C.mem_at
@@ -273,9 +274,11 @@ struct
     | EQ_loc
     | EQ_plain
     | EQ_float of c_float
-    | EQ_array of Matrix.matrix
+    | EQ_array of matrixinfo
     | EQ_comp of compinfo
     | EQ_incomparable
+
+  and matrixinfo = c_object * int option list
 
   let eqsort_of_type t =
     match Logic_utils.unroll_type ~unroll_typedef:false t with
@@ -287,7 +290,7 @@ struct
         | C_int _ -> EQ_plain
         | C_float f -> EQ_float f
         | C_comp c -> EQ_comp c
-        | C_array a -> EQ_array (Matrix.of_array a)
+        | C_array a -> EQ_array (Ctypes.array_dimensions a)
 
   let eqsort_of_comparison a b =
     match eqsort_of_type a.term_type , eqsort_of_type b.term_type with
@@ -295,7 +298,7 @@ struct
     | EQ_loc , EQ_loc -> EQ_loc
     | EQ_comp c1 , EQ_comp c2 ->
         if Compinfo.equal c1 c2 then EQ_comp c1 else EQ_incomparable
-    | EQ_array (t1,d1) , EQ_array (t2,d2) ->
+    | EQ_array(t1,d1) , EQ_array(t2,d2) ->
         if Ctypes.equal t1 t2 then
           match Matrix.merge d1 d2 with
           | Some d -> EQ_array(t1,d)
@@ -896,37 +899,18 @@ struct
   (* --- Set of locations for a term representing a set of l-values         --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let rec compound_offsets = function
-    | C_comp comp when comp.cstruct ->
-        List.fold_left
-          (fun offsets fd ->
-             List.fold_left
-               (fun offsets (obj,ofs) ->
-                  (obj , TField(fd,ofs)) :: offsets
-               ) offsets (compound_offsets (Ctypes.object_of fd.ftype))
-          ) [] comp.cfields
-    | obj -> [obj , TNoOffset]
-
-  let assignable_lval env ~unfold lv =
+  let assignable_lval env lv =
     match fst lv with
     | TResult _  | TVar{lv_name="\\exit_status"} -> [] (* special case ! *)
     | _ ->
-        let offsets =
-          let obj = Ctypes.object_of_logic_type (Cil.typeOfTermLval lv) in
-          if unfold then compound_offsets obj else [obj , TNoOffset]
-        in
-        List.concat
-          (List.map
-             (fun (obj,offset) ->
-                let lv = Logic_const.addTermOffsetLval offset lv in
-                L.region obj (addr_lval env lv))
-             offsets)
+        let obj = Ctypes.object_of_logic_type (Cil.typeOfTermLval lv) in
+        L.region obj (addr_lval env lv)
 
-  let assignable env ~unfold t =
+  let assignable env t =
     match t.term_node with
     | Tempty_set -> []
-    | TLval lv -> assignable_lval env ~unfold lv
-    | Tunion ts -> List.concat (List.map (C.region env ~unfold) ts)
+    | TLval lv -> assignable_lval env lv
+    | Tunion ts -> List.concat (List.map (C.region env) ts)
     | Tinter _ -> Warning.error "Intersection in assigns not implemented yet"
     | Tcomprehension(t,qs,cond) ->
         begin
@@ -942,22 +926,22 @@ struct
                | (Sarray _ | Srange _ | Sdescr _) as sloc ->
                    let ys,l,extend = L.rdescr sloc in
                    Sdescr(xs@ys,l,p_conj (extend :: conditions))
-            ) (C.region env ~unfold t)
+            ) (C.region env t)
         end
 
     | Tat(t,label) ->
-        C.region ~unfold (C.env_at env (Clabels.of_logic label)) t
+        C.region (C.env_at env (Clabels.of_logic label)) t
 
     | Tlet( { l_var_info=v ; l_body=LBterm a } , b ) ->
         let va = C.logic env a in
-        C.region ~unfold (C.env_let env v va) b
+        C.region (C.env_let env v va) b
 
     | Tlet _ ->
         Warning.error "Complex let-binding not implemented yet (%a)"
           Printer.pp_term t
 
     | TCastE (_,t)
-    | TLogic_coerce(_,t) -> C.region env ~unfold t
+    | TLogic_coerce(_,t) -> C.region env t
 
     | TBinOp _ | TUnOp _ | Trange _ | TUpdate _ | Tapp _ | Tif _
     | TConst _ | Tnull | TDataCons _ | Tlambda _
@@ -1020,8 +1004,8 @@ struct
   let logic env t =
     Context.with_current_loc t.term_loc (term_trigger env) t
 
-  let region env ~unfold t =
-    Context.with_current_loc t.term_loc (assignable env ~unfold) t
+  let region env t =
+    Context.with_current_loc t.term_loc (assignable env) t
 
   let () = C.bootstrap_pred pred
   let () = C.bootstrap_term term
@@ -1034,17 +1018,17 @@ struct
   (* --- Regions                                                            --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let assigned_of_lval env ~unfold (lv : Cil_types.lval) =
-    assignable_lval env ~unfold (Logic_utils.lval_to_term_lval lv)
+  let assigned_of_lval env (lv : Cil_types.lval) =
+    assignable_lval env (Logic_utils.lval_to_term_lval lv)
 
-  let assigned_of_froms env ~unfold froms =
+  let assigned_of_froms env froms =
     List.concat
       (List.map
-         (fun ({it_content=wr},_deps) -> region env ~unfold wr) froms)
+         (fun ({it_content=wr},_deps) -> region env wr) froms)
 
-  let assigned_of_assigns env ~unfold = function
+  let assigned_of_assigns env = function
     | WritesAny -> None
-    | Writes froms -> Some (assigned_of_froms env ~unfold froms)
+    | Writes froms -> Some (assigned_of_froms env froms)
 
   let occurs_opt x = function None -> false | Some t -> F.occurs x t
 
@@ -1079,12 +1063,63 @@ struct
   (* --- CheckAssigns                                                       --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let check_assigns sigma ~written ~assignable =
+  let rec assignable_region unfold reg assignable =
+    let inclusion = p_any (L.included reg) assignable in
+    if unfold = 0 then inclusion
+    else p_or inclusion (assignable_unfolded_region unfold reg assignable)
+
+  (* Note that when a region cannot be unfolded anymore (that is, when it is a
+     [Sloc] with atomic type, including unknown size arrays and opaque structs),
+     the function return [p_false]. *)
+  and assignable_unfolded_region unfold (obj, sloc) assignable =
+    let range size = Some e_zero, Some (e_sub (e_int size) e_one) in
+    match sloc with
+    | Sloc loc ->
+        begin match obj with
+          | C_pointer _ | C_int _ | C_float _
+          | C_comp { cfields = None } | C_array { arr_flat = None } ->
+              (* Nothing to unfold *)
+              p_false
+
+          | C_comp { cfields = Some fields } ->
+              let assignable_field f =
+                let reg = Ctypes.object_of f.ftype, Sloc (M.field loc f) in
+                assignable_region (unfold-1) reg assignable
+              in
+              p_conj (List.map assignable_field fields)
+
+          | C_array { arr_flat = Some { arr_size=len ; arr_cell=typ } } ->
+              let obj = Ctypes.object_of typ in
+              assignable_unfolded_range unfold loc obj (range len) assignable
+        end
+
+    | Sarray (loc, obj, len) ->
+        assignable_unfolded_range unfold loc obj (range len) assignable
+
+    | Srange (loc, obj, b, e) ->
+        assignable_unfolded_range unfold loc obj (b, e) assignable
+
+    | Sdescr (xs, loc, guard) ->
+        assignable_unfolded_descr unfold obj xs loc guard assignable
+
+  and assignable_unfolded_range unfold loc obj (low, up) =
+    let x = Lang.freshvar ~basename:"k" Lang.t_int in
+    let k = e_var x in
+    let guard = Vset.in_range k low up in
+    let loc = M.shift loc obj k in
+    assignable_unfolded_descr unfold obj [x] loc guard
+
+  and assignable_unfolded_descr unfold obj xs loc guard assignable =
+    p_forall xs
+      (p_imply guard
+         (assignable_region (unfold-1) (obj, Sloc loc) assignable))
+
+  let check_assigns ~unfold sigma ~written ~assignable =
     p_all
-      (fun seg ->
+      (fun reg ->
          p_imply
-           (p_not (L.invalid sigma seg))
-           (p_any (L.included seg) assignable)
+           (p_not (L.invalid sigma reg))
+           (assignable_region unfold reg assignable)
       ) (written : region)
 
 end

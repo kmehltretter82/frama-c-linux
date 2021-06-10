@@ -1,19 +1,18 @@
 # frama-c -wp [...]
 [kernel] Parsing tests/wp/wp_behavior.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function behaviors
 ------------------------------------------------------------
 
-Goal Complete behaviors 'Y', 'X':
+Goal Complete behaviors 'X', 'Y':
 Assume { (* Pre-condition *) Have: P_R. }
 Prove: P_CX \/ P_CY.
 
 ------------------------------------------------------------
 
-Goal Disjoint behaviors 'Y', 'X':
+Goal Disjoint behaviors 'X', 'Y':
 Assume { (* Pre-condition *) Have: P_R. }
 Prove: (!P_CX) \/ (!P_CY).
 
@@ -39,9 +38,9 @@ Assume {
   (* Pre-condition *)
   Have: P_R.
   (* Pre-condition for 'X' *)
-  Have: P_RX.
-  (* Pre-condition for 'X' *)
   Have: P_CX.
+  (* Pre-condition for 'X' *)
+  Have: P_RX.
   (* Assertion *)
   Have: P_Q.
 }
@@ -61,9 +60,9 @@ Assume {
   (* Pre-condition *)
   Have: P_R.
   (* Pre-condition for 'X' *)
-  Have: P_RX.
-  (* Pre-condition for 'X' *)
   Have: P_CX.
+  (* Pre-condition for 'X' *)
+  Have: P_RX.
   (* Assertion *)
   Have: P_Q.
   (* Then *)
@@ -84,9 +83,9 @@ Assume {
   (* Pre-condition *)
   Have: P_R.
   (* Pre-condition for 'X' *)
-  Have: P_RX.
-  (* Pre-condition for 'X' *)
   Have: P_CX.
+  (* Pre-condition for 'X' *)
+  Have: P_RX.
   (* Assertion *)
   Have: P_Q.
 }
@@ -102,9 +101,9 @@ Assume {
   (* Pre-condition *)
   Have: P_R.
   (* Pre-condition for 'Y' *)
-  Have: P_RY.
-  (* Pre-condition for 'Y' *)
   Have: P_CY.
+  (* Pre-condition for 'Y' *)
+  Have: P_RY.
   (* Assertion *)
   Have: P_Q.
 }
@@ -124,9 +123,9 @@ Assume {
   (* Pre-condition *)
   Have: P_R.
   (* Pre-condition for 'Y' *)
-  Have: P_RY.
-  (* Pre-condition for 'Y' *)
   Have: P_CY.
+  (* Pre-condition for 'Y' *)
+  Have: P_RY.
   (* Assertion *)
   Have: P_Q.
   (* Then *)
@@ -147,9 +146,9 @@ Assume {
   (* Pre-condition *)
   Have: P_R.
   (* Pre-condition for 'Y' *)
-  Have: P_RY.
-  (* Pre-condition for 'Y' *)
   Have: P_CY.
+  (* Pre-condition for 'Y' *)
+  Have: P_RY.
   (* Assertion *)
   Have: P_Q.
 }
@@ -280,9 +279,9 @@ Assume {
   (* Pre-condition for 'X' *)
   Have: P_CX.
   (* Pre-condition for 'X' *)
-  Have: P_RX1.
-  (* Pre-condition for 'X' *)
   Have: P_RX.
+  (* Pre-condition for 'X' *)
+  Have: P_RX1.
 }
 Prove: q = p.
 

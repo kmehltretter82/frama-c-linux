@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -147,7 +147,7 @@ let iter (inspector:inspector) =
         Kernel_function.Map.iter
           (fun kf ips ->
              let vi = Kernel_function.get_vi kf in
-             if not (Cil.is_unused_builtin vi) then
+             if not (Cil_builtins.is_unused_builtin vi) then
                report (fun () -> inspector#function_section kf) inspector#property !ips)
           !functions ;
         inspector#finished ;
@@ -166,13 +166,13 @@ class visit_properties (phi : Property.t -> unit) =
 
     method! vspec fspec =
       Property.ip_of_spec
-        (Extlib.the self#current_kf) self#current_kinstr ~active:[] fspec |>
+        (Option.get self#current_kf) self#current_kinstr ~active:[] fspec |>
       List.iter phi ;
       Cil.DoChildren
 
     method! vcode_annot ca =
       Property.ip_of_code_annot
-        (Extlib.the self#current_kf) (Extlib.the self#current_stmt) ca |>
+        (Option.get self#current_kf) (Option.get self#current_stmt) ca |>
       List.iter phi ;
       Cil.DoChildren
 

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -418,7 +418,7 @@ sig
 
   (** {3 Support for Builtins} *)
 
-  val set_builtin : Fun.t -> (term list -> term) -> unit
+  val set_builtin : ?force: bool -> Fun.t -> (term list -> term) -> unit
   (** Register a simplifier for function [f]. The computation code
         may raise [Not_found], in which case the symbol is not interpreted.
 
@@ -428,33 +428,58 @@ sig
 
         Highest priority is [0].
         Recursive calls must be performed on strictly smaller terms.
+
+        The [force] parameters defaults to [false], when it is [true], if there
+        exist another builtin, it is replaced with the new one. Use with care.
+
+        @modify 22.0-Titanium add optional [force] parameter
   *)
 
-  val set_builtin' : Fun.t -> (term list -> tau option -> term) -> unit
+  val set_builtin' :
+    ?force: bool -> Fun.t -> (term list -> tau option -> term) -> unit
 
-  val set_builtin_map : Fun.t -> (term list -> term list) -> unit
+  val set_builtin_map :
+    ?force: bool ->  Fun.t -> (term list -> term list) -> unit
   (** Register a builtin for rewriting [f a1..an] into [f b1..bm].
 
       This is short cut for [set_builtin], where the head application of [f] avoids
       to run into an infinite loop.
+
+      The [force] parameters defaults to [false], when it is [true], if there
+      exist another builtin, it is replaced with the new one. Use with care.
+
+      @modify 22.0-Titanium add optional [force] parameter
   *)
 
-  val set_builtin_get : Fun.t -> (term list -> tau option -> term -> term) -> unit
+  val set_builtin_get :
+    ?force: bool -> Fun.t -> (term list -> tau option -> term -> term) -> unit
   (** [set_builtin_get f rewrite] register a builtin
       for rewriting [(f a1..an)[k]] into [rewrite (a1..an) k].
       The type given is the type of (f a1..an).
+
+      The [force] parameters defaults to [false], when it is [true], if there
+      exist another builtin, it is replaced with the new one. Use with care.
+
+      @modify 22.0-Titanium add optional [force] parameter
   *)
 
-  val set_builtin_eq : Fun.t -> (term -> term -> term) -> unit
+  val set_builtin_eq :
+    ?force: bool -> Fun.t -> (term -> term -> term) -> unit
   (** Register a builtin equality for comparing any term with head-symbol.
         {b Must} only use recursive comparison for strictly smaller terms.
         The recognized term with head function symbol is passed first.
 
         Highest priority is [0].
         Recursive calls must be performed on strictly smaller terms.
+
+        The [force] parameters defaults to [false], when it is [true], if there
+        exist another builtin, it is replaced with the new one. Use with care.
+
+        @modify 22.0-Titanium add optional [force] parameter
   *)
 
-  val set_builtin_leq : Fun.t -> (term -> term -> term) -> unit
+  val set_builtin_leq :
+    ?force: bool -> Fun.t -> (term -> term -> term) -> unit
   (** Register a builtin for comparing any term with head-symbol.
         {b Must} only use recursive comparison for strictly smaller terms.
         The recognized term with head function symbol can be on both sides.
@@ -462,6 +487,11 @@ sig
 
         Highest priority is [0].
         Recursive calls must be performed on strictly smaller terms.
+
+        The [force] parameters defaults to [false], when it is [true], if there
+        exist another builtin, it is replaced with the new one. Use with care.
+
+        @modify 22.0-Titanium add optional [force] parameter
   *)
 
   (** {3 Specific Patterns} *)

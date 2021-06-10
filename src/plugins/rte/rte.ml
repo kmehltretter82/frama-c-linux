@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -52,7 +52,7 @@ let valid_index ~remove_trivial ~on_alarm e size =
     let v_e = get_expr_val e in
     let v_size = get_expr_val size in
     let neg_ok =
-      Extlib.may_map ~dft:false (Integer.le Integer.zero) v_e
+      Option.fold ~none:false ~some:(Integer.le Integer.zero) v_e
       || Cil.isUnsignedInteger (Cil.typeOf e)
     in
     if not neg_ok then alarm Lower_bound;
@@ -106,47 +106,22 @@ let lval_assertion ~read_only ~remove_trivial ~on_alarm lv =
 
 (* assertion for lvalue initialization *)
 let lval_initialized_assertion ~remove_trivial:_ ~on_alarm lv =
-  let rec check_array_initialized default off typ in_struct l =
-    match off with
-    | NoOffset ->
-      begin
-        match typ with
-        | TComp({cstruct = false; cfields} ,_,_) ->
-          (match cfields with
-           | [] -> () (* empty union, supported by gcc with size 0.
-                         Trivially initialized. *)
-           | _ ->
-             let llv =
-               List.map
-                 (fun fi -> Cil.addOffsetLval (Field (fi, NoOffset)) lv)
-                 cfields
-             in
-             if default then
-               on_alarm ~invalid:false (Alarms.Uninitialized_union llv))
-        | _ ->
-          if default then
-            on_alarm ~invalid:false (Alarms.Uninitialized lv)
-      end
-    | Field (fi, off) ->
-      (* Mark that we went through a struct field, then recurse *)
-      check_array_initialized default off fi.ftype true l
-    | Index (_e, off) ->
-      match Cil.unrollType typ with
-      | TArray (bt, Some _size, _, _) ->
-        check_array_initialized true off bt in_struct l
-      | TArray (bt, None, _, _) -> check_array_initialized true off bt in_struct l
-      | _ -> assert false
-  in
-
+  let typ = Cil.typeOfLval lv in
   match lv with
-  | Var vi , off ->
-    let loc = fst vi.vdecl in
-    let ignored_cases = vi.vglob || vi.vformal || vi.vtemp in
-    check_array_initialized (not ignored_cases) off vi.vtype false loc
-  | (Mem e as lh), off ->
-    let loc = fst e.eloc in
-    if not (Cil.isFunctionType (Cil.typeOfLval lv)) then
-      check_array_initialized true off (Cil.typeOfLhost lh) false loc
+  | Var vi, NoOffset ->
+    (** Note: here [lv] has structure/union type or fundamental type.
+        We exclude structures and unions. And for fundamental types:
+        - globals (initialized and then only written with initialized values)
+        - formals (checked at function call)
+        - temporary variables (initialized during AST normalization)
+    *)
+    if not (vi.vglob || vi.vformal || vi.vtemp)
+    && not (Cil.isStructOrUnionType typ)
+    then
+      on_alarm ~invalid:false (Alarms.Uninitialized lv)
+  | _ ->
+    if not (Cil.isFunctionType typ || Cil.isStructOrUnionType typ) then
+      on_alarm ~invalid:false (Alarms.Uninitialized lv)
 
 (* assertion for unary minus signed overflow *)
 let uminus_assertion ~remove_trivial ~on_alarm exp =
@@ -451,18 +426,23 @@ let finite_float_assertion ~remove_trivial:_ ~on_alarm (fkind, exp) =
 let pointer_call ~remove_trivial:_ ~on_alarm (e, args) =
   on_alarm ~invalid:false (Alarms.Function_pointer (e, Some args))
 
+let rec is_safe_offset = function
+  | NoOffset -> true
+  | Field(fi,o) -> fi.fcomp.cstruct && not fi.faddrof && is_safe_offset o
+  | Index(_,o) -> is_safe_offset o
+
 let is_safe_pointer_value = function
   | Lval (Var vi, offset) ->
     (* Reading a pointer variable must emit an alarm if an invalid pointer value
        could have been written without previous alarm, through:
        - an union type, in which case [offset] is not NoOffset;
        - an untyped write, in which case the address of [vi] is taken. *)
-    not vi.vaddrof && offset = NoOffset
+    not vi.vaddrof && is_safe_offset offset
   | AddrOf (_, NoOffset) | StartOf (_, NoOffset) -> true
   | CastE (_typ, e) ->
     (* 0 can always be converted into a NULL pointer. *)
     let v = get_expr_val e in
-    Extlib.may_map ~dft:false Integer.(equal zero) v
+    Option.fold ~none:false ~some:Integer.(equal zero) v
   | _ -> false
 
 let pointer_value ~remove_trivial ~on_alarm expr =

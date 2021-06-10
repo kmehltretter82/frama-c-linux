@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -641,7 +641,7 @@ struct
       if a == b then 0 else
         let cmp = cmp_struct compare a b in
         if cmp <> 0 then cmp else
-          Extlib.opt_compare Tau.compare a.tau b.tau
+          Option.compare Tau.compare a.tau b.tau
 
 
   end
@@ -715,7 +715,7 @@ struct
           | NOT p,NOT q -> p==q
           | CMP(c,a,b),CMP(c',a',b') -> c=c' && a==a' && b==b'
           | FUN(f,xs,t) , FUN(g,ys,t') -> Fun.equal f g && Hcons.equal_list (==) xs ys
-                                          && Extlib.opt_equal Tau.equal t t'
+                                          && Option.equal Tau.equal t t'
           | _ -> false
       end)
 
@@ -1009,40 +1009,41 @@ struct
   let c_builtin_lt  a b = distribute_if_over_operation true (fun a b -> operation (CMP(LT ,a,b))) a b !extern_lt  a b
   let c_builtin_leq a b = distribute_if_over_operation true (fun a b -> operation (CMP(LEQ,a,b))) a b !extern_leq a b
 
-  let prepare_builtin f m =
+  let prepare_builtin ~force f m =
     release () ;
-    if BUILTIN.mem f m then
+    if BUILTIN.mem f m && not force then
       let msg = Printf.sprintf
           "Builtin already registered for '%s'" (Fun.debug f) in
       raise (Failure msg)
 
-  let set_builtin' f p =
+  let set_builtin' ?(force=false) f p =
     begin
-      prepare_builtin f !state.builtins_fun ;
+      prepare_builtin ~force f !state.builtins_fun ;
       !state.builtins_fun <- BUILTIN.add f p !state.builtins_fun ;
     end
 
-  let set_builtin f p = set_builtin' f (fun es _ -> p es)
+  let set_builtin ?force f p = set_builtin' ?force f (fun es _ -> p es)
 
-  let set_builtin_get f p =
+  let set_builtin_get ?(force=false) f p =
     begin
-      prepare_builtin f !state.builtins_get ;
+      prepare_builtin ~force f !state.builtins_get ;
       !state.builtins_get <- BUILTIN.add f p !state.builtins_get ;
     end
 
-  let set_builtin_eq f p =
+  let set_builtin_eq ?(force=false) f p =
     begin
-      prepare_builtin f !state.builtins_eq ;
+      prepare_builtin ~force f !state.builtins_eq ;
       !state.builtins_eq <- BUILTIN.add f p !state.builtins_eq ;
     end
 
-  let set_builtin_leq f p =
+  let set_builtin_leq ?(force=false) f p =
     begin
-      prepare_builtin f !state.builtins_leq ;
+      prepare_builtin ~force f !state.builtins_leq ;
       !state.builtins_leq <- BUILTIN.add f p !state.builtins_leq ;
     end
 
-  let set_builtin_map f phi = set_builtin' f (fun es tau -> c_fun f (phi es) tau)
+  let set_builtin_map ?force f phi =
+    set_builtin' ?force f (fun es tau -> c_fun f (phi es) tau)
 
   (* -------------------------------------------------------------------------- *)
   (* --- Negation                                                           --- *)
@@ -2238,8 +2239,10 @@ struct
     let fresh sigma t = fresh sigma.pool t
 
     let call f e =
-      let v = f e in
-      validate "Qed.Subst.add_fun" v ; v
+      if lc_closed e then
+        let v = f e in
+        validate "Qed.Subst.add_fun" v ; v
+      else raise Not_found
 
     let rec compute e = function
       | EMPTY -> raise Not_found

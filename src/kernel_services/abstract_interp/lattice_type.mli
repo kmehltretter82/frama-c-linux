@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -58,22 +58,22 @@ end
 
 (** {2 Over- and under-approximations}
 
-  Nearly all abstract operations implemented in the lattices of Frama-C
-  are *over-approximations*: the (abstract) operation assumes that its operands
-  are already over-approximations, and returns a result that over-approximates
-  (abstracts) the results that would have been given by the concrete operation
-  on the concretization of the arguments.
+    Nearly all abstract operations implemented in the lattices of Frama-C
+    are *over-approximations*: the (abstract) operation assumes that its operands
+    are already over-approximations, and returns a result that over-approximates
+    (abstracts) the results that would have been given by the concrete operation
+    on the concretization of the arguments.
 
-  Conversely, some functions, suffixed by [_under] assumes that their arguments
-  are under-approximations, and returns a result that under-approximates the
-  concrete operation. The functions [link] and [meet] in
-  {With_Under_Approximation} are exceptions, that are not suffixed by [_under].
+    Conversely, some functions, suffixed by [_under] assumes that their arguments
+    are under-approximations, and returns a result that under-approximates the
+    concrete operation. The functions [link] and [meet] in
+    {With_Under_Approximation} are exceptions, that are not suffixed by [_under].
 
-  Finally, some functions are *exact*, in the sense that they preserve the
-  concretization of the concrete function. Hence, they implement
-  over-approximations when given over-approximated arguments, and
-  under-approximations when given under-approximated ones. This 'exact'
-  property is usually mentioned in the comments for the function. *)
+    Finally, some functions are *exact*, in the sense that they preserve the
+    concretization of the concrete function. Hence, they implement
+    over-approximations when given over-approximated arguments, and
+    under-approximations when given under-approximated ones. This 'exact'
+    property is usually mentioned in the comments for the function. *)
 
 
 module type With_Intersects = sig
@@ -91,22 +91,22 @@ module type With_Enumeration = sig
       elements to enumerate. *)
 
   val cardinal_less_than: t -> int -> int
-(** Raises {!Abstract_interp.Not_less_than} whenever the cardinal of the
-    given lattice is strictly higher than the given integer. *)
+  (** Raises {!Abstract_interp.Not_less_than} whenever the cardinal of the
+      given lattice is strictly higher than the given integer. *)
 end
 
 module type With_Diff = sig
   type t
   val diff : t -> t -> t
-    (** [diff t1 t2] is an over-approximation of [t1-t2]. [t2] must
-        be an under-approximation or exact. *)
+  (** [diff t1 t2] is an over-approximation of [t1-t2]. [t2] must
+      be an under-approximation or exact. *)
 end
 
 module type With_Diff_One = sig
   type t
   val diff_if_one : t -> t -> t
-    (** [diff_if_one t1 t2] is an over-approximation of [t1-t2].
-        @return [t1] if [t2] is not a singleton. *)
+  (** [diff_if_one t1 t2] is an over-approximation of [t1-t2].
+      @return [t1] if [t2] is not a singleton. *)
 end
 
 module type With_Cardinal_One = sig
@@ -120,8 +120,8 @@ module type With_Widening = sig
   type widen_hint (** hints for the widening *)
 
   val widen: widen_hint -> t -> t -> t
-    (** [widen h t1 t2] is an over-approximation of [join t1 t2].
-        Assumes [is_included t1 t2] *)
+  (** [widen h t1 t2] is an over-approximation of [join t1 t2].
+      Assumes [is_included t1 t2] *)
 end
 
 
@@ -217,8 +217,8 @@ module type Lattice_Set = sig
   module O: Hptset
   type t = private Set of O.t | Top
   include AI_Lattice_with_cardinal_one
-  with type t := t
-  and type widen_hint = O.t
+    with type t := t
+     and type widen_hint = O.t
   val inject_singleton: O.elt -> t
   val inject: O.t -> t
   val empty: t

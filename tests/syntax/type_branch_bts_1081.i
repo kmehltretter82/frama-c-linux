@@ -1,3 +1,8 @@
+/* run.config*
+ EXIT: 1
+   STDOPT:
+*/
+
 int main(){
   int foo, x, y;
   foo ? (void)x : (signed char)y; 

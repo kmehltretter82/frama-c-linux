@@ -7,7 +7,7 @@
         - [Installing Frama-C from opam repository](#installing-frama-c-from-opam-repository)
         - [Installing Custom Versions of Frama-C](#installing-custom-versions-of-frama-c)
         - [Installing Frama-C on Windows via WSL](#installing-frama-c-on-windows-via-wsl)
-        - [Installing Frama-C on macOS](#installing-frama-c-on-mac-os)
+        - [Installing Frama-C on macOS](#installing-frama-c-on-macos)
     - [Installing Frama-C via your Linux distribution (Debian/Ubuntu/Fedora)](#installing-frama-c-via-your-linux-distribution-debianubuntufedora)
     - [Compiling from source](#compiling-from-source)
         - [Quick Start](#quick-start)
@@ -19,7 +19,7 @@
         - [Documentation files: (in `/INSTALL_DIR/share/frama-c/doc`)](#documentation-files-in-install_dirshareframa-cdoc)
         - [Object files: (in `/INSTALL_DIR/lib/frama-c`)](#object-files-in-install_dirlibframa-c)
         - [Plugin files: (in `/INSTALL_DIR/lib/frama-c/plugins`)](#plugin-files-in-install_dirlibframa-cplugins)
-        - [Man files: (in `/INSTALL_DIR/man/man1`)](#man-files-in-install_dirmanman1)
+        - [Man files: (in `/INSTALL_DIR/share/man/man1`)](#man-files-in-install_dirsharemanman1)
 - [Installing Additional Frama-C Plugins](#installing-additional-frama-c-plugins)
     - [HAVE FUN WITH FRAMA-C!](#have-fun-with-frama-c)
 
@@ -85,14 +85,14 @@ Actually, you can use any prover supported by Why3 in combination with Frama-C/W
 Most provers are available on all platforms. After their installation,
 Why3 must be configured to make them available for Frama-C/WP:
 
-    ```shell
-    why3 config --detect
-    ```
+```shell
+why3 config --detect
+```
 
 ### Reference configuration
 
 See file [reference-configuration.md](reference-configuration.md)
-for a set of packages that is known to work with Frama-C 21 (Scandium).
+for a set of packages that is known to work with Frama-C 22 (Titanium).
 
 ### Installing Custom Versions of Frama-C
 
@@ -129,41 +129,18 @@ following tools:
 #### Prerequisites: WSL + a Linux distribution
 
 For enabling WSL on Windows, you may follow these instructions
-(we tested with Ubuntu 18.04 LTS;
+(we tested with Ubuntu 20.04 LTS;
 other distributions/versions should also work,
 but the instructions below may require some modifications).
 
 https://docs.microsoft.com/en-us/windows/wsl/install-win10
 
-Note: older builds of Windows 10 and systems without access to the
-      Microsoft Store may have no compatible Linux packages.
+Notes:
 
-##### PowerShell-based quick guide
-
-This is a quick guide based on running a PowerShell with administrator rights.
-Note that, depending on your build version of Windows 10, the Ubuntu package
-selected below may not work. If you are unsure, follow the above instructions
-from the Microsoft website.
-
-Inside PowerShell, run the following command to activate Windows Subsystem for Linux:
-
-```
-Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
-```
-
-Then, reboot the operating system.
-
-After rebooting, run again the PowerShell terminal with administrator rights.
-Move to your user directory, download the distribution and install it:
-
-```
-cd C:\Users\<Your User Directory>
-Invoke-WebRequest -Uri https://aka.ms/wsl-ubuntu-1804 -OutFile Ubuntu.appx -UseBasicParsing
-Add-AppxPackage .\Ubuntu.appx
-```
-
-Ubuntu should now be available in the Windows menu. Run it and follow the
-instructions to create a user.
+- older builds of Windows 10 and systems without access to the
+  Microsoft Store may have no compatible Linux packages.
+- in WSL 1, Frama-C/WP cannot use Why3 because of some missing features in WSL
+  support, thus using WSL 2 is **highly recommended**.
 
 #### Installing opam and Frama-C on WSL
 
@@ -171,19 +148,21 @@ For installing opam, some packages are required. The following commands can be
 run to update the system and install those packages:
 
 ```
-sudo add-apt-repository -y ppa:avsm/ppa # unnecessary for Ubuntu 20.04
 sudo apt update
 sudo apt upgrade
-sudo apt install make m4 gcc opam
+sudo apt install make m4 gcc opam yaru-theme-gtk yaru-theme-icon
 ```
 
 Then opam can be set up using these commands:
 
 ```
-opam init --disable-sandboxing -c 4.05.0 --shell-setup
+opam init --disable-sandboxing --shell-setup
 eval $(opam env)
 opam install -y depext
 ```
+
+You can force a particular Ocaml version during `opam init` by using the option
+`-c <version>` if needed.
 
 Now, for installing Frama-C, run the following commands that will use `apt` to
 install the dependencies of the opam packages and then install them:
@@ -204,17 +183,33 @@ First, install VcXsrv from:
 https://sourceforge.net/projects/vcxsrv/
 
 The default installation settings should work.
-Now run it from the Windows menu (it is named XLaunch).
-On the first configuration screen, select "Multiple Windows". On the
-second, keep "Start no client" selected. On the third configuration step, add an
-additional parameter `-nocursor` in the field "Additional parameters for
-VcXsrv". You can save this configuration at the last step if you want, before
-clicking "Finish".
 
-Once it is done, the Xserver is ready. From WSL, run:
+Now run VcXsrv from the Windows menu (it is named XLaunch), the firewall
+must authorize both "Public" and "Private" domains. On the first configuration
+screen, select "Multiple Windows". On the second:
+
+- keep "Start no client" selected,
+- keep "Native opengl" selected,
+- select "Disable access control".
+
+Now specific settings must be provided in WSL. you can put the export commands
+in your `~/.bashrc` file, so this is done automatically when starting WSL.
+
+##### WSL 1
+
+The Xserver is ready. From WSL, run:
 
 ```
+export LIBGL_ALWAYS_INDIRECT=1
 export DISPLAY=:0
+frama-c-gui
+```
+
+##### WSL 2
+
+```
+export LIBGL_ALWAYS_INDIRECT=1
+export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2; exit;}'):0.0
 frama-c-gui
 ```
 
@@ -415,7 +410,7 @@ available:
 
 - `frama-c`
 - `frama-c-gui`       if available
-- `frama-c-config`    displays Frama-C configuration paths
+- `frama-c-config`    lightweight wrapper used to display configuration paths
 - `frama-c.byte`      bytecode version of frama-c
 - `frama-c-gui.byte`  bytecode version of frama-c-gui, if available
 - `ptests.opt`        testing tool for Frama-c

@@ -42,4 +42,11 @@ void main(void)
   return;
 }
 
+/*@ requires 0. ≡ -(ℝ)f;
+    requires 0. ≡ (ℝ)f + -(ℝ)f;
+    requires 0. ≡ -(ℝ)d;
+    requires 0. ≡ (ℝ)d + -(ℝ)d;
+ */
+void unop_coerce(float f, double d);
+
 

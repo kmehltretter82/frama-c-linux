@@ -16,3 +16,16 @@ struct S* p ;
    \offset( &p->a[i] ) <= \offset( &p->a[j] ) ;
  */
 void f(void){return;}
+
+struct { int a ; int b ; } x ;
+struct { int a ; int b ; } y ;
+struct { double a ; int b ; } z ;
+
+void g(void){
+  int *xb = &x.b;
+  int *yb = &y.b;
+  int *zb = &z.b;
+
+  //@ check KO: \offset(xb) == \offset(zb) ;
+  //@ check KO: \offset(xb) != \offset(yb) ;
+}

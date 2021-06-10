@@ -3,7 +3,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2020                                               #
+#  Copyright (C) 2007-2021                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -22,7 +22,7 @@
 ##########################################################################
 
 # Accept '-check' to avoid issues with ptests
-while [ $# -ge 1 -a "$1" = "-check" ]; do
+while [ $# -ge 1 ] && [ "$1" = "-check" ]; do
     shift
 done
 
@@ -31,16 +31,49 @@ usage() {
    echo ""
    echo "  where cmd is:"
    echo ""
+   echo "  - configure machdep"
+   echo "      Runs an existing configure script to only consider files"
+   echo "      in Frama-C's libc; this will hopefully disable non-essential"
+   echo "      and non-POSIX external libraries."
+   echo "      (run 'frama-c -machdep help' to get the list of machdeps)."
+   echo ""
+   echo "  - creduce <args>"
+   echo "      Use the external tool C-Reduce to minimize C files when"
+   echo "      debugging crashes and fatal errors. Run without arguments for"
+   echo "      more details."
+   echo ""
+   echo "  - estimate-difficulty file..."
+   echo "      Applies several heuristics to try and estimate the difficulty"
+   echo "      of analyzing the specified files with Frama-C."
+   echo ""
+   echo "  - find-fun function-name [dir...]"
+   echo "      Lists files in dir... declaring or defining function-name"
+   echo "      [default: PWD /usr/include]."
+   echo "      Heuristics-based: neither correct nor complete."
+   echo ""
+   echo "  - flamegraph flamegraph.txt [dir]"
+   echo "      Generates flamegraph.svg and flamegraph.html in dir"
+   echo "      [default: FRAMAC_SESSION]."
+   echo "      Also opens it in a browser, unless variable NOGUI is set."
+   echo ""
    echo "  - help"
-   echo "      Display this help message and exit."
+   echo "      Displays this help message and exits."
    echo ""
-   echo "  - make-template [dir]"
-   echo "      Interactively prepares a template for analyses,"
-   echo "      writing it to dir/GNUmakefile [default: .frama-c]."
+   echo "  - heuristic-detect-recursion file..."
+   echo "      Uses a heuristic, syntactic-based, callgraph to detect recursive"
+   echo "      calls. Results are guaranteed neither correct nor complete."
    echo ""
-   echo "  - make-path [dir]"
-   echo "      [for Frama-C developers and advanced users without Frama-C in the path]"
-   echo "      Creates a path.mk file in dir [default: .frama-c]."
+   echo "  - heuristic-list-functions want_defs want_decls file..."
+   echo "      Uses heuristics to find possible function definitions and declarations."
+   echo "      If [want_defs] is true, lists definitions."
+   echo "      If [want_decls] is true, lists declarations."
+   echo "      Results are guaranteed neither correct nor complete."
+   echo ""
+   echo "  - heuristic-print-callgraph [--dot outfile] file..."
+   echo "      Prints a heuristic, syntactic-based, callgraph for the"
+   echo "      specified files. Use --dot outfile to print it in DOT"
+   echo "      (Graphviz) format, to [outfile]. If [outfile] is '-',"
+   echo "      prints to stdout."
    echo ""
    echo "  - list-files [path/to/compile_commands.json]"
    echo "      Lists all sources in the given compile_commands.json"
@@ -48,26 +81,14 @@ usage() {
    echo "      Also lists files defining a 'main' function"
    echo "      (heuristics-based; neither correct nor complete)."
    echo ""
-   echo "  - flamegraph flamegraph.txt [dir]"
-   echo "      Generates flamegraph.svg and flamegraph.html in dir"
-   echo "      [default: FRAMAC_SESSION]."
-   echo "      Also opens it in a browser, unless variable NOGUI is set."
+   echo "  - list-functions [files] [Frama-C options]"
+   echo "      Parses all sources in [files] and lists all function"
+   echo "      definitions, with source location and number of statements."
+   echo "      Accepts Frama-C options (e.g. -cpp-extra-args for parsing)."
    echo ""
-   echo "  - find-fun function-name [dir...]"
-   echo "      Lists files in dir... declaring or defining function-name"
-   echo "      [default: PWD /usr/include]."
-   echo "      Heuristics-based: neither correct nor complete."
-   echo ""
-   echo "  - summary [options]"
-   echo "      Monitors and summarizes multiple analyses dispatched by a Makefile"
-   echo "      in the current PWD."
-   echo "      Use $0 summary --help for more informations."
-   echo ""
-   echo "  - configure machdep"
-   echo "      Runs an existing configure script to only consider files"
-   echo "      in Frama-C's libc; this will hopefully disable non-essential"
-   echo "      and non-POSIX external libraries."
-   echo "      (run 'frama-c -machdep help' to get the list of machdeps)."
+   echo "  - make-template [dir]"
+   echo "      Interactively prepares a template for analyses,"
+   echo "      writing it to dir/GNUmakefile [default: .frama-c]."
    echo ""
    echo "  - make-wrapper target arg..."
    echo "      Runs 'make target arg...', parsing the output to suggest"
@@ -77,7 +98,12 @@ usage() {
    echo "      Applies some transformations to an existing compile_commands.json"
    echo "      (such as relativizing paths) to improve portability."
    echo "      [default: ./compile_commands.json]"
-   exit $1
+   echo ""
+   echo "  - summary [options]"
+   echo "      Monitors and summarizes multiple analyses dispatched by a Makefile"
+   echo "      in the current PWD."
+   echo "      Use $0 summary --help for more informations."
+   exit "$1"
 }
 
 if [ $# -lt 1 ]; then
@@ -85,7 +111,10 @@ if [ $# -lt 1 ]; then
 fi
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
-FRAMAC_SHARE=$("${DIR}/frama-c-config" -share)
+# All scripts called by frama-c-script may rely on FRAMAC_BIN pointing to the
+# directory containing frama-c, frama-c-config and frama-c-script.
+export FRAMAC_BIN="$DIR"
+FRAMAC_SHARE=$("${DIR}/frama-c-config" -print-share-path)
 if [ -z ${FRAMAC_SESSION+x} ]; then
     FRAMAC_SESSION="./.frama-c";
 fi
@@ -120,34 +149,6 @@ open_file() {
     esac
 }
 
-make_path() {
-    dir=".frama-c"
-    if [ "$#" -gt 0 ]; then
-        dir="$1"
-    fi
-    if [ ! -d "$dir" ]; then
-        read -p "Directory '$dir' does not exist. Create it? [y/N] " yn
-        case $yn in
-            [Yy])
-                mkdir -p "$dir"
-            ;;
-            *)
-                echo "Exiting without creating."
-                exit 0;;
-        esac
-    fi
-    cat <<EOF > "${dir}/path.mk"
-FRAMAC_DIR=${DIR}
-ifeq (\$(wildcard \$(FRAMAC_DIR)),)
-# Frama-C not installed locally; using the version in the PATH
-else
-FRAMAC=\$(FRAMAC_DIR)/frama-c
-FRAMAC_GUI=\$(FRAMAC_DIR)/frama-c-gui
-endif
-EOF
-    echo "Wrote to: ${dir}/path.mk"
-}
-
 flamegraph() {
     if [ "$#" -eq 0 ]; then
         echo "error: 'flamegraph' command requires a path";
@@ -165,11 +166,7 @@ flamegraph() {
         dir="$FRAMAC_SESSION"
     fi
     if [ ! -d "$dir" ]; then
-        mkdir "$dir"
-        if [ $? -ne 0 ]; then
-            echo "error: could not create '$dir'"
-            exit 1
-        fi
+        mkdir "$dir" || { echo "error: could not create '$dir'"; exit 1; }
     fi
     out_svg="$dir/flamegraph.svg"
     "${FRAMAC_SHARE}/analysis-scripts/flamegraph.pl" \
@@ -203,41 +200,9 @@ configure_for_frama_c() {
         echo "error: 'configure' command requires a machdep";
         exit 1
     fi
-    MACHDEP="$(echo $1 | tr a-z A-Z)"
+    MACHDEP=${1^^} # to uppercase
     shift
     CPP="gcc -E -nostdinc -fno-builtin -I${FRAMAC_SHARE}/libc -D__FC_MACHDEP_${MACHDEP}" ./configure "$@"
-}
-
-normalize_jcdb() {
-    path=""
-    if [ "$#" -eq 0 ]; then
-        path="./compile_commands.json"
-    else
-        path="$1"
-    fi
-    if [ ! -e "$path" ]; then
-        echo "error: cannot find file: $path";
-        exit 1
-    fi
-    sed "s|$PWD/||g" "$path" > "${path}.tmp"
-    cmp -s "$path" "${path}.tmp"
-    if [ $? -eq 0 ]; then
-        echo "No changes to be applied to $path"
-        rm "${path}.tmp"
-    else
-        echo "Differences to be applied to $path:"
-        diff -u0 "$path" "${path}.tmp"
-        read -p "Normalize $path? [y/N] " yn
-        case $yn in
-            [Yy])
-                mv "${path}.tmp" "$path"
-                echo "Normalization applied to $path"
-            ;;
-            *)
-                echo "Exiting without overwriting."
-                exit 0;;
-        esac
-    fi
 }
 
 case "$command" in
@@ -246,20 +211,22 @@ case "$command" in
         ;;
     "make-template")
         shift;
-        export FRAMAC="${DIR}/frama-c"
-        ${FRAMAC_SHARE}/analysis-scripts/make_template.py "$@";
-        ;;
-    "make-path")
-        shift;
-        make_path "$@";
+        "${FRAMAC_SHARE}"/analysis-scripts/make_template.py "$@";
         ;;
     "list-files")
         shift;
-        ${FRAMAC_SHARE}/analysis-scripts/list_files.py "$@";
+        "${FRAMAC_SHARE}"/analysis-scripts/list_files.py "$@";
+        ;;
+    "list-functions")
+        shift;
+        # to avoid a slow startup, we only load plugins which perform syntactic
+        # transformations. This may trigger annotation errors due to missing
+        # plugins, so we disable those
+        "${DIR}"/frama-c "$@" -no-autoload-plugins -load-module variadic,instantiate,"${FRAMAC_SHARE}"/analysis-scripts/list_functions.ml -kernel-warn-key annot-error=inactive -kernel-verbose 0;
         ;;
     "find-fun")
         shift;
-        ${FRAMAC_SHARE}/analysis-scripts/find_fun.py "$@";
+        "${FRAMAC_SHARE}"/analysis-scripts/find_fun.py "$@";
         ;;
     "flamegraph")
         shift;
@@ -267,19 +234,39 @@ case "$command" in
         ;;
     "summary")
         shift;
-        ${FRAMAC_SHARE}/analysis-scripts/summary.py "$@";
+        "${FRAMAC_SHARE}"/analysis-scripts/summary.py "$@";
         ;;
     "configure")
         shift;
         configure_for_frama_c "$@";
         ;;
+    "heuristic-print-callgraph")
+        shift;
+        ${FRAMAC_SHARE}/analysis-scripts/print_callgraph.py "$@";
+        ;;
+    "heuristic-detect-recursion")
+        shift;
+        ${FRAMAC_SHARE}/analysis-scripts/detect_recursion.py "$@";
+        ;;
+    "heuristic-list-functions")
+        shift;
+        ${FRAMAC_SHARE}/analysis-scripts/heuristic_list_functions.py "$@";
+        ;;
+    "estimate-difficulty")
+        shift;
+        ${FRAMAC_SHARE}/analysis-scripts/estimate_difficulty.py "$@";
+        ;;
     "make-wrapper")
         shift;
-        ${FRAMAC_SHARE}/analysis-scripts/make_wrapper.py "$0" "$@";
+        "${FRAMAC_SHARE}"/analysis-scripts/make_wrapper.py "$0" "$@";
         ;;
     "normalize-jcdb")
         shift;
-        normalize_jcdb "$@";
+        "${FRAMAC_SHARE}"/analysis-scripts/normalize_jcdb.py "$@";
+        ;;
+    "creduce")
+        shift;
+        ${FRAMAC_SHARE}/analysis-scripts/creduce.sh "$@";
         ;;
     *)
         echo "error: unrecognized command: $command";

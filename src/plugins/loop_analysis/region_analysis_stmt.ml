@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -56,7 +56,7 @@ struct
             then loop s) v.Cil_types.succs
       in loop entry_node; !visited
     ;;
-    
+
     let exit_nodes =
       let ret = Kernel_function.find_return M.kf in
       if Set.mem ret all_nodes then [ret] else [];;

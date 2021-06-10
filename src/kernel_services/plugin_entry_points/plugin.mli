@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -64,12 +64,14 @@ module type S_no_log = sig
   (** The group containing options -*-debug and -*-verbose.
       @since Boron-20100401 *)
 
-  val add_plugin_output_aliases: string list -> unit
-  (** Adds aliases to the options -plugin-help, -plugin-verbose, -plugin-log,
-      -plugin-msg-key, and -plugin-warn-key.
-      [add_plugin_output_aliases [alias]] adds the aliases -alias-help,
-      -alias-verbose, etc.
-      @since 18.0-Argon *)
+  val add_plugin_output_aliases:
+    ?visible:bool -> ?deprecated:bool -> string list -> unit
+    (** Adds aliases to the options -plugin-help, -plugin-verbose, -plugin-log,
+        -plugin-msg-key, and -plugin-warn-key.
+        [add_plugin_output_aliases [alias]] adds the aliases -alias-help,
+        -alias-verbose, etc.
+        @since 18.0-Argon
+        @modify 22.0-Titanium add [visible] and [deprecated] arguments. *)
 end
 
 (** Provided plug-general services for plug-ins.
@@ -87,9 +89,10 @@ type plugin = private
     p_shortname: string;
     p_help: string;
     p_parameters: (string, Typed_parameter.t list) Hashtbl.t }
-(** Only iterable parameters (see {!do_iterate} and {!do_not_iterate}) are
-    registered in the field [p_parameters].
-    @since Beryllium-20090901 *)
+(** @since Beryllium-20090901
+    @modify 22.0-Titanium previously only "iterable" parameters were included,
+                        now all parameters are.
+*)
 
 module type General_services = sig
   include S
@@ -167,8 +170,12 @@ val get: string -> plugin
     @deprecated since Oxygen-20120901 *)
 
 val iter_on_plugins: (plugin -> unit) -> unit
-(** Iterate on each registered plug-ins.
+(** Iterate on each registered plug-in.
     @since Beryllium-20090901 *)
+
+val fold_on_plugins: (plugin -> 'a -> 'a) -> 'a -> 'a
+(** Fold [f] on each registered plug-in.
+    @since 22.0-Titanium *)
 
 (**/**)
 (* ************************************************************************* *)
@@ -179,10 +186,10 @@ val positive_debug_ref: int ref
 (** @since Boron-20100401 *)
 
 val session_is_set_ref: (unit -> bool) ref
-val session_ref: (unit -> string) ref
+val session_ref: (unit -> Filepath.Normalized.t) ref
 
 val config_is_set_ref: (unit -> bool) ref
-val config_ref: (unit -> string) ref
+val config_ref: (unit -> Filepath.Normalized.t) ref
 
 (**/**)
 

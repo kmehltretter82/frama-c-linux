@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -61,34 +61,6 @@ val normalize: ?existence:existence -> ?base_name:string -> string -> string
     @since Aluminium-20160501 *)
 val relativize: ?base_name:string -> string -> string
 
-(** returns true if the file is relative to [base]
-    (that is, it is prefixed by [base_name]), or to the current
-    working directory if no base is specified.
-    @since Aluminium-20160501 *)
-val is_relative: ?base_name:string -> string -> bool
-
-(** DEPRECATED: use [Normalized.to_pretty_string] instead.
-    Pretty-print a path according to these rules:
-    - relative filenames are kept, except for leading './', which are stripped;
-    - absolute filenames are relativized if their prefix is included in the
-      current working directory; also, symbolic names are resolved,
-      i.e. the result may be prefixed by known aliases (e.g. FRAMAC_SHARE).
-      See {!add_symbolic_dir} for more details.
-      Therefore, the result of this function may not designate a valid name
-      in the filesystem.
-
-    @since Neon-20140301
-    @deprecated since 18.0-Argon
-*)
-val pretty: string -> string
-[@@deprecated "Use Filepath.Normalized.to_pretty_string instead."]
-
-(** [add_symbolic_dir name dir] indicates that the (absolute) path [dir] must
-    be replaced by [name] when pretty-printing paths.
-    This alias ensures that system-dependent paths such as FRAMAC_SHARE are
-    printed identically in different machines. *)
-val add_symbolic_dir: string -> string -> unit
-
 (** The [Normalized] module is simply a wrapper that ensures that paths are
     always normalized. Used by [Datatype.Filepath].
     @since 18.0-Argon *)
@@ -103,8 +75,12 @@ module Normalized: sig
   *)
   val of_string: ?existence:existence -> ?base_name:string -> string -> t
 
-  (** @return the normalized path resulting from the concatenation of the given
-      path and string. *)
+  (** [concat ~existence dir file] returns the normalized path
+      resulting from the concatenation of [dir] ^ "/" ^ [file].
+      The resulting path must respect [existence].
+
+      @since 22.0-Titanium
+  *)
   val concat: ?existence:existence -> t -> string -> t
 
   (** [to_pretty_string p] returns [p] prettified,
@@ -113,6 +89,12 @@ module Normalized: sig
       is not a path.
       See [pretty] for details about usage. *)
   val to_pretty_string: t -> string
+
+  (** [to_string_list l] returns [l] as a list of strings containing the
+      absolute paths to the elements of [l].
+      @since 23.0-Vanadium
+  *)
+  val to_string_list: t list -> string list
 
   val equal: t -> t -> bool
 
@@ -139,12 +121,75 @@ module Normalized: sig
   (** Pretty-prints the normalized (absolute) path. *)
   val pp_abs: Format.formatter -> t -> unit
 
-  (** Unknown filepath, used as 'dummy' for [Datatype.Filepath]. *)
+  (** Unknown filepath, used as 'dummy' for [Datatype.Filepath].
+      @deprecated 23.0-Vanadium use 'empty' instead
+  *)
   val unknown: t
+  [@@alert deprecated "Use Filepath.Normalized.empty instead"]
 
-  (** @since 20.0-Calcium *)
+  (** @since 20.0-Calcium
+      @deprecated 23.0-Vanadium use 'is_empty' instead
+  *)
   val is_unknown: t -> bool
+  [@@alert deprecated "Use Filepath.Normalized.is_empty instead"]
+
+  (** Empty filepath, used as 'dummy' for [Datatype.Filepath].
+      @since 23.0-Vanadium.
+  *)
+  val empty: t
+
+  (** @since 23.0-Vanadium *)
+  val is_empty: t -> bool
+
+  (** [is_special_stdout f] returns [true] iff [f] is '-' (a single dash),
+      which is a special notation for 'stdout'.
+      @since 23.0-Vanadium *)
+  val is_special_stdout: t -> bool
+
+  (** [is_file f] returns [true] iff [f] points to a regular file
+      (or a symbolic link pointing to a file).
+      Returns [false] if any errors happen when [stat]'ing the file.
+      @since 22.0-Titanium *)
+  val is_file: t -> bool
+
+  (** [to_base_uri path] returns a pair [prefix, rest], according to the
+      prettified value of [path]:
+      - if it starts with symbolic path SYMB, prefix is Some "SYMB";
+      - if it is a relative path, prefix is Some "PWD";
+      - else (an absolute path), prefix is None.
+        [rest] contains everything after the '/' following the prefix.
+        E.g. for the path "FRAMAC_SHARE/libc/string.h", returns
+        ("FRAMAC_SHARE", "libc/string.h").
+
+      @since 22.0-Titanium
+  *)
+  val to_base_uri: t -> string option * string
 end
+
+(** returns true if the file is relative to [base]
+    (that is, it is prefixed by [base_name]), or to the current
+    working directory if no base is specified.
+    @since Aluminium-20160501
+    @modify 23.0-Vanadium argument types changed from string to Normalized.t
+*)
+val is_relative: ?base_name:Normalized.t -> Normalized.t -> bool
+
+(** [add_symbolic_dir name dir] indicates that the (absolute) path [dir] must
+    be replaced by [name] when pretty-printing paths.
+    This alias ensures that system-dependent paths such as FRAMAC_SHARE are
+    printed identically in different machines. *)
+val add_symbolic_dir: string -> Normalized.t -> unit
+
+(** Remove all symbolic dirs that have been added earlier.
+    @since 23.0-Vanadium *)
+val reset_symbolic_dirs: unit -> unit
+
+(** Returns the list of symbolic dirs added via [add_symbolic_dir], plus
+    preexisting ones (e.g. FRAMAC_SHARE), as pairs (name, dir).
+
+    @since 22.0-Titanium
+*)
+val all_symbolic_dirs: unit -> (string * Normalized.t) list
 
 (** Describes a position in a source file.
     @since 18.0-Argon

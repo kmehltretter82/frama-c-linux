@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -24,9 +24,8 @@ open Cil_types
 
 type scope =
   | SC_Global
-  | SC_Function_in    (* Just before the pre-state *)
-  | SC_Function_frame (* Just after the introduction of formals *)
-  | SC_Function_out   (* Post-state *)
+  | SC_Frame_in
+  | SC_Frame_out
   | SC_Block_in
   | SC_Block_out
 
@@ -74,8 +73,8 @@ module type S = sig
   (** [use_assigns env hid kind assgn goal] performs the havoc on the goal.
    * [hid] should be [None] iff [assgn] is [WritesAny],
    * and tied to the corresponding identified_property otherwise.*)
-  val use_assigns : t_env -> stmt option -> WpPropId.prop_id option ->
-    WpPropId.assigns_desc -> t_prop -> t_prop
+  val use_assigns : t_env ->
+    WpPropId.prop_id option -> WpPropId.assigns_desc -> t_prop -> t_prop
 
   val label  : t_env -> stmt option -> Clabels.c_label -> t_prop -> t_prop
   val init : t_env -> varinfo -> init option -> t_prop -> t_prop
