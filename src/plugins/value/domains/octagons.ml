@@ -349,7 +349,7 @@ module Rewriting = struct
       let min_bound = Eval_typ.range_lower_bound range in
       let ival_range = Ival.inject_range (Some min_bound) (Some max_bound) in
       let aux has_better_bound bound bound_kind alarms =
-        if has_better_bound ival ival_range >= 0
+        if Ival.is_bottom ival || has_better_bound ival ival_range >= 0
         then
           let alarm = Alarms.Overflow (overflow, expr, bound, bound_kind) in
           Alarmset.set alarm Alarmset.True alarms
