@@ -120,8 +120,8 @@ int main(void)
     __e_acsl_store_block((void *)(__va_args),(size_t)8);
     __e_acsl_full_init((void *)(& __va_args));
     tmp = vol(6,(void * const *)(__va_args));
-    __e_acsl_delete_block((void *)(& __va_arg0));
     __e_acsl_delete_block((void *)(__va_args));
+    __e_acsl_delete_block((void *)(& __va_arg0));
   }
   __e_acsl_delete_block((void *)(& y));
   __e_acsl_delete_block((void *)(& x));

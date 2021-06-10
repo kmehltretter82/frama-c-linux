@@ -24,7 +24,7 @@
 [eva] FRAMAC_SHARE/libc/string.h:121: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] using specification for function snprintf_va_1
-[eva] tests/known/snprintf.c:12: 
+[eva] FRAMAC_SHARE/libc/stdio.h:213: 
   Cannot evaluate range bound format_length(format) - 1
   (unsupported ACSL construct: logic function format_length). Approximating
 [eva:alarm] tests/known/snprintf.c:12: Warning: 
@@ -49,11 +49,11 @@
 #include "string.h"
 #include "strings.h"
 int volatile nondet;
-/*@ requires
+/*@ requires valid_read_string(param0);
+    requires valid_read_string(format);
+    requires
       \valid(s + (0 .. n - 1)) ∨
       \valid(s + (0 .. format_length(format) - 1));
-    requires valid_read_string(format);
-    requires valid_read_string(param0);
     assigns \result, *(s + (0 ..));
     assigns \result
       \from (indirect: n), (indirect: *(format + (0 ..))),
@@ -64,11 +64,11 @@ int volatile nondet;
 int snprintf_va_1(char * restrict s, size_t n, char const * restrict format,
                   char *param0);
 
-/*@ requires
+/*@ requires valid_read_string(param0);
+    requires valid_read_string(format);
+    requires
       \valid(s + (0 .. n - 1)) ∨
       \valid(s + (0 .. format_length(format) - 1));
-    requires valid_read_string(format);
-    requires valid_read_string(param0);
     assigns \result, *(s + (0 ..));
     assigns \result
       \from (indirect: n), (indirect: *(format + (0 ..))),

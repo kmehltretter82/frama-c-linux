@@ -51,11 +51,11 @@
 #include "stdarg.h"
 #include "stddef.h"
 #include "stdio.h"
-/*@ requires valid_read_string(format);
+/*@ requires \valid(param0);
     requires \valid(param2);
-    requires \valid(param0);
-    ensures \initialized(param2);
+    requires valid_read_string(format);
     ensures \initialized(param0);
+    ensures \initialized(param2);
     assigns \result, stream->__fc_FILE_data, *param2, *(param1 + (0 ..)),
             *param0;
     assigns \result
@@ -78,11 +78,11 @@
 int fscanf_va_1(FILE * restrict stream, char const * restrict format,
                 int *param0, char *param1, int *param2);
 
-/*@ requires valid_read_string(format);
+/*@ requires \valid(param0);
     requires \valid(param2);
-    requires \valid(param0);
-    ensures \initialized(param2);
+    requires valid_read_string(format);
     ensures \initialized(param0);
+    ensures \initialized(param2);
     assigns \result, __fc_stdin->__fc_FILE_data, *param2, *(param1 + (0 ..)),
             *param0;
     assigns \result
@@ -105,12 +105,12 @@ int fscanf_va_1(FILE * restrict stream, char const * restrict format,
 int scanf_va_1(char const * restrict format, int *param0, char *param1,
                int *param2);
 
-/*@ requires valid_read_string(s);
-    requires valid_read_string(format);
+/*@ requires \valid(param0);
     requires \valid(param2);
-    requires \valid(param0);
-    ensures \initialized(param2);
+    requires valid_read_string(format);
+    requires valid_read_string(s);
     ensures \initialized(param0);
+    ensures \initialized(param2);
     assigns \result, *param2, *(param1 + (0 ..)), *param0;
     assigns \result
       \from (indirect: *(s + (0 ..))), (indirect: *(format + (0 ..)));

@@ -35,7 +35,7 @@
 [eva] Initial state computed
 [eva] using specification for function wmemset
 [eva] using specification for function swprintf_va_1
-[eva] tests/known/swprintf.c:12: 
+[eva] FRAMAC_SHARE/libc/wchar.h:274: 
   Cannot evaluate range bound wformat_length(format) - 1
   (unsupported ACSL construct: logic function wformat_length). Approximating
 [eva:alarm] tests/known/swprintf.c:12: Warning: 
@@ -62,11 +62,11 @@
 #include "time.h"
 #include "wchar.h"
 int volatile nondet;
-/*@ requires
+/*@ requires valid_read_wstring(param0);
+    requires valid_read_wstring(format);
+    requires
       \valid(ws + (0 .. n - 1)) ∨
       \valid(ws + (0 .. wformat_length(format) - 1));
-    requires valid_read_wstring(format);
-    requires valid_read_wstring(param0);
     assigns \result, *(ws + (0 ..));
     assigns \result
       \from (indirect: n), (indirect: *(format + (0 ..))),
@@ -77,11 +77,11 @@ int volatile nondet;
 int swprintf_va_1(wchar_t *ws, size_t n, wchar_t const *format,
                   wchar_t *param0);
 
-/*@ requires
+/*@ requires valid_read_wstring(param0);
+    requires valid_read_wstring(format);
+    requires
       \valid(ws + (0 .. n - 1)) ∨
       \valid(ws + (0 .. wformat_length(format) - 1));
-    requires valid_read_wstring(format);
-    requires valid_read_wstring(param0);
     assigns \result, *(ws + (0 ..));
     assigns \result
       \from (indirect: n), (indirect: *(format + (0 ..))),

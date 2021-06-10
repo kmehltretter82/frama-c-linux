@@ -24,7 +24,7 @@ open Cil_types
 open Options
 module List = Extends.List
 module Typ = Extends.Typ
-module Build = Va_build
+module Build = Cil_builder.Pure
 
 
 (* Types of variadic parameter and argument *)
@@ -99,32 +99,30 @@ let translate_va_builtin caller inst =
   in
 
   let translate_va_arg () =
-    let va_list, typ, lval = match args with
+    let va_list, ty, lv = match args with
       | [{enode=Lval va_list};
-         {enode=SizeOf typ};
-         {enode=CastE(_, {enode=AddrOf lval})}] -> va_list, typ, lval
+         {enode=SizeOf ty};
+         {enode=CastE(_, {enode=AddrOf lv})}] -> va_list, ty, lv
       | _ -> Self.fatal "Unexpected arguments to va_arg"
     in
     (* Check validity of type *)
-    if Cil.isIntegralType typ then begin
-      let promoted_type = Cil.integralPromotion typ in
-      if promoted_type <> typ then
+    if Cil.isIntegralType ty then begin
+      let promoted_type = Cil.integralPromotion ty in
+      if promoted_type <> ty then
         Self.warning ~current:true
           "Wrong type argument in va_start: %a is promoted to %a when used \
            in the variadic part of the arguments. (You should pass %a to \
            va_start)"
-          Printer.pp_typ typ
+          Printer.pp_typ ty
           Printer.pp_typ promoted_type
           Printer.pp_typ promoted_type
     end;
     (* Build the replacing instruction *)
-    let mk_lval_exp lval = Cil.new_exp ~loc (Lval lval)  in
-    let mk_mem exp = mk_lval_exp (Cil.mkMem ~addr:exp ~off:NoOffset) in
-    let mk_cast exp typ = Cil.mkCast ~force:false ~newt:typ exp in
-    let src = mk_mem (mk_cast (mk_mem (mk_lval_exp va_list)) (TPtr (typ,[])))
-    in
-    [ Set (lval, src, loc);
-      Set (va_list, Cil.increm (mk_lval_exp va_list) 1, loc) ]
+    let va_list, ty, lv = Build.(of_lval va_list, of_ctyp ty, of_lval lv) in
+    List.map (Build.cil_instr ~loc) Build.([
+        lv := mem (cast (ptr ty) (mem va_list));
+        va_list += of_int 1
+      ])
   in
 
   begin match vi.vname with
@@ -139,7 +137,6 @@ let translate_va_builtin caller inst =
 (* Translation of calls to variadic functions *)
 
 let translate_call ~fundec ~ghost block loc mk_call callee pars =
-
   (* Log translation *)
   Self.result ~current:true ~level:2
     "Generic translation of call to variadic function.";
@@ -151,29 +148,27 @@ let translate_call ~fundec ~ghost block loc mk_call callee pars =
   let variadic_size = (List.length r_exps) - (List.length g_params) in
   let v_exps, g_exps = List.break variadic_size r_exps in
 
+  (* Start build *)
+  let module Build = Cil_builder.Stateful (struct let loc = loc end) in
+  Build.open_block ~into:fundec ~ghost ();
+
   (* Create temporary variables to hold parameters *)
-  let add_var i exp =
-    let typ = Cil.typeOf exp
-    and name = "__va_arg" ^ string_of_int i in
-    let res = Cil.makeLocalVar ~ghost fundec ~scope:block name typ in
-    res.vdefined <- true;
-    res
+  let add_var i e =
+    let name = "__va_arg" ^ string_of_int i in
+    Build.(local' (Cil.typeOf e) name ~init:(of_exp e))
   in
   let vis = List.mapi add_var v_exps in
 
-  (* Assign parameters to these *)
-  let instrs = List.map2 (Build.vi_init ~loc) vis v_exps in
-
   (* Build an array to store addresses *)
-  let addrs = List.map Cil.mkAddrOfVi vis in
-  let vargs, assigns = Build.array_init ~loc fundec ~ghost block
-      "__va_args" Cil.voidPtrType addrs
+  let init = match vis with (* C standard forbids arrays of size 0 *)
+    | [] -> [Build.of_init (Cil.makeZeroInit ~loc Cil.voidPtrType)]
+    | l -> List.map Build.addr l
   in
-  let instrs = instrs @ [assigns] in
+  let ty = Build.(array (ptr void) ~size:(List.length init)) in
+  let vargs = Build.(local ty "__va_args" ~init) in
 
   (* Translate the call *)
-  let exp_vargs = Cil.mkAddrOrStartOf ~loc (Cil.var vargs) in
-  let new_arg = Cil.mkCast ~force:false ~newt:(vpar_typ []) exp_vargs in
-  let new_args = s_exps @ [new_arg] @ g_exps in
-  let call = mk_call callee new_args in
-  instrs @ [call]
+  let new_arg = Build.(cil_exp ~loc (cast' (vpar_typ []) (addr vargs))) in
+  let new_args = (s_exps @ [new_arg] @ g_exps) in
+  Build.of_instr (mk_call callee new_args);
+  Build.finish_instr_list ~scope:block ()
