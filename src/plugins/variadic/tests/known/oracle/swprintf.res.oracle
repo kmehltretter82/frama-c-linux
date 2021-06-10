@@ -35,7 +35,7 @@
 [eva] Initial state computed
 [eva] using specification for function wmemset
 [eva] using specification for function swprintf_va_1
-[eva] tests/known/swprintf.c:12: 
+[eva] FRAMAC_SHARE/libc/wchar.h:274: 
   Cannot evaluate range bound wformat_length(format) - 1
   (unsupported ACSL construct: logic function wformat_length). Approximating
 [eva:alarm] tests/known/swprintf.c:12: Warning: 

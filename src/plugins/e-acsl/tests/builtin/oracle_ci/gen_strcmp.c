@@ -127,9 +127,9 @@ __inline static void fail_ncomp(int cond, char *fmt, int l, int r)
       __e_acsl_store_block((void *)(__va_args),(size_t)16);
       __e_acsl_full_init((void *)(& __va_args));
       fprintf(stderr,(char const *)fmt,(void * const *)(__va_args));
-      __e_acsl_delete_block((void *)(& __va_arg0));
-      __e_acsl_delete_block((void *)(& __va_arg1));
       __e_acsl_delete_block((void *)(__va_args));
+      __e_acsl_delete_block((void *)(& __va_arg1));
+      __e_acsl_delete_block((void *)(& __va_arg0));
     }
     __gen_e_acsl_abort();
   }

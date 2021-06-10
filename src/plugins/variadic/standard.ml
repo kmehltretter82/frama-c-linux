@@ -370,9 +370,11 @@ let format_length typ =
   find_predicate_by_width typ "format_length" "wformat_length"
 
 
-let build_specialized_fun env loc vf format_fun tvparams =
+let build_specialized_fun env vf format_fun tvparams =
   let open Format_types in
-  let module Build = Cil_builder.Stateful (struct let loc = loc end) in
+  let module Build =
+    Cil_builder.Stateful (struct let loc = vf.vf_decl.vdecl end)
+  in
 
   (* Choose function name *)
   let name = vf.vf_decl.vorig_name in
@@ -566,7 +568,7 @@ let format_fun_call ~fundec env format_fun scope loc mk_call vf args =
   in
 
   (* Create the new callee *)
-  let glob, new_callee = build_specialized_fun env loc vf format_fun tvparams in
+  let glob, new_callee = build_specialized_fun env vf format_fun tvparams in
   new_globals := glob :: !new_globals;
 
   (* Store the translation *)
