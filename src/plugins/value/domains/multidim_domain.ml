@@ -43,14 +43,14 @@ struct
   let of_integer = inject_int
 
   let of_bit = function
-    | Memory_map.Zero -> inject_int Integer.zero
+    | Abstract_memory.Zero -> inject_int Integer.zero
     | Any (Set s) -> inject_top_origin Origin.top s
     | Any (Top) -> top_with_origin Origin.top
 
   let to_bit v =
     if is_zero v
-    then Memory_map.Zero
-    else Memory_map.Any (get_bases v)
+    then Abstract_memory.Zero
+    else Abstract_memory.Any (get_bases v)
 
   let backward_is_finite positive fkind v =
     let prec = Fval.kind fkind in
@@ -163,7 +163,7 @@ end
 module Memory =
 struct
   module Config = struct let deps = [Ast.self] end
-  module Memory = Memory_map.Make (Config) (Value)
+  module Memory = Abstract_memory.Make (Config) (Value)
 
   module Prototype =
   (* Datatype *)
@@ -349,7 +349,7 @@ struct
     | `Value value ->
       write (fun m off -> Memory.overwrite ~weak m off value) state dst
 
-  let erase (state : state) (dst : mdlocation) (b : Memory_map.bit): state =
+  let erase (state : state) (dst : mdlocation) (b : Abstract_memory.bit): state =
     let weak = not (Location.is_singleton dst) in
     write (fun m off -> Memory.erase ~weak m off b) state dst
 
@@ -430,7 +430,7 @@ struct
           let src = Location.of_lval oracle right.lval in
           `Value (overwrite state dst src)
         with Abstract_interp.Error_Top | Abstract_interp.Error_Bottom ->
-          `Value (erase state dst Memory_map.Bit.top)
+          `Value (erase state dst Abstract_memory.Bit.top)
     with Abstract_interp.Error_Top | Abstract_interp.Error_Bottom ->
       (* Failed to evaluate the left location *)
       `Value top
@@ -492,7 +492,7 @@ struct
       match sources with
       | [] ->
         let dst = Location.of_precise_loc location in
-        erase state dst Memory_map.Bit.numerical
+        erase state dst Abstract_memory.Bit.numerical
       | _ ->
         remove state location
 
@@ -530,15 +530,15 @@ struct
   let initialize_variable lval _loc ~initialized:_ init_value state =
     let dst = Location.of_lval no_oracle lval in
     let d = match init_value with
-      | Abstract_domain.Top  -> Memory_map.Bit.numerical
-      | Abstract_domain.Zero -> Memory_map.Bit.zero
+      | Abstract_domain.Top  -> Abstract_memory.Bit.numerical
+      | Abstract_domain.Zero -> Abstract_memory.Bit.zero
     in
     erase state dst d
 
   let initialize_variable_using_type _kind vi state =
     let lval = Cil.var vi in
     let dst = Location.of_lval no_oracle lval in
-    erase state dst Memory_map.Bit.top
+    erase state dst Abstract_memory.Bit.top
 
   let relate _kf _bases _state = Base.SetLattice.empty
 

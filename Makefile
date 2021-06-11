@@ -598,7 +598,7 @@ KERNEL_CMO=\
 	src/kernel_services/abstract_interp/lmap_bitwise.cmo            \
 	src/kernel_services/abstract_interp/multidim.cmo                \
 	src/kernel_services/abstract_interp/abstract_offset.cmo         \
-	src/kernel_services/abstract_interp/memory_map.cmo              \
+	src/kernel_services/abstract_interp/abstract_memory.cmo         \
 	src/kernel_services/visitors/visitor.cmo                        \
 	src/kernel_services/ast_data/statuses_by_call.cmo               \
 	src/kernel_services/ast_printing/printer_tag.cmo                \

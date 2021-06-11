@@ -437,6 +437,8 @@ src/kernel_services/README.md: .ignore
 src/kernel_services/abstract_interp/README.md: .ignore
 src/kernel_services/abstract_interp/abstract_interp.ml: CEA_LGPL
 src/kernel_services/abstract_interp/abstract_interp.mli: CEA_LGPL
+src/kernel_services/abstract_interp/abstract_memory.ml: CEA_LGPL
+src/kernel_services/abstract_interp/abstract_memory.mli: CEA_LGPL
 src/kernel_services/abstract_interp/abstract_offset.ml: CEA_LGPL
 src/kernel_services/abstract_interp/abstract_offset.mli: CEA_LGPL
 src/kernel_services/abstract_interp/base.ml: CEA_LGPL
@@ -477,8 +479,6 @@ src/kernel_services/abstract_interp/locations.ml: CEA_LGPL
 src/kernel_services/abstract_interp/locations.mli: CEA_LGPL
 src/kernel_services/abstract_interp/map_lattice.ml: CEA_LGPL
 src/kernel_services/abstract_interp/map_lattice.mli: CEA_LGPL
-src/kernel_services/abstract_interp/memory_map.ml: CEA_LGPL
-src/kernel_services/abstract_interp/memory_map.mli: CEA_LGPL
 src/kernel_services/abstract_interp/multidim.ml: CEA_LGPL
 src/kernel_services/abstract_interp/multidim.mli: CEA_LGPL
 src/kernel_services/abstract_interp/offsetmap.ml: CEA_LGPL
