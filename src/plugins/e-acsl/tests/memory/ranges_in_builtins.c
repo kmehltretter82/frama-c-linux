@@ -73,4 +73,9 @@ int main(void) {
 
   char c = 'w';
   f(&c, 5);
+
+  char t5[4] = {'a', 'b', 'c', 'd'};
+  /*@ assert \valid(&t5[2..3]); */
+
+  return 0;
 }

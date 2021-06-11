@@ -49,9 +49,9 @@ int main(void)
     __gen_e_acsl_size_2 = 1 * ((9 - 0) + 1);
     if (__gen_e_acsl_size_2 <= 0) __gen_e_acsl_if_2 = 0;
     else __gen_e_acsl_if_2 = __gen_e_acsl_size_2;
-    __gen_e_acsl_valid_2 = __e_acsl_valid((void *)(& t + 1 * 0),
+    __gen_e_acsl_valid_2 = __e_acsl_valid((void *)(t + 1 * 0),
                                           (size_t)__gen_e_acsl_if_2,
-                                          (void *)(& t),(void *)0);
+                                          (void *)(t),(void *)0);
     __e_acsl_assert(__gen_e_acsl_valid_2,1,"Assertion","main",
                     "\\valid(&t[0 .. 9])","tests/bts/bts2406.c",11);
   }
