@@ -175,8 +175,6 @@ let force_compute () =
   Value_parameters.configure_precision ();
   if not (Kernel.AuditCheck.is_empty ()) then
     Eva_audit.check_configuration (Kernel.AuditCheck.get ());
-  if not (Kernel.AuditPrepare.is_empty ()) then
-    Eva_audit.print_configuration (Kernel.AuditPrepare.get ());
   let kf, lib_entry = Globals.entry_point () in
   reset_analyzer ();
   let module Analyzer = (val snd !ref_analyzer) in

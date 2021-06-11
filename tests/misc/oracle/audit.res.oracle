@@ -5,7 +5,6 @@
 [kernel:audit] Warning: 
   missing files:
   tests/misc/non_existing_file.h
-[kernel] Audit: sources list written to: tests/misc/result/audit-out.json
 [kernel] Parsing tests/misc/audit.c (with preprocessing)
 [kernel:parser:decimal-float] tests/misc/audit.c:10: Warning: 
   Floating-point constant 2.1 is not represented exactly. Will use 0x1.0cccccccccccdp1.
@@ -31,4 +30,6 @@
     f
 [inout] Inputs for function main:
     \nothing
+[kernel] Audit: sources list written to: tests/misc/result/audit-out.json
+[eva] Audit: eva configuration written to: tests/misc/result/audit-out.json
 [kernel] Wrote: tests/misc/result/audit-out.json
