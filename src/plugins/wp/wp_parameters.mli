@@ -101,6 +101,10 @@ module SimplifyForall : Parameter_sig.Bool
 module SimplifyType : Parameter_sig.Bool
 module CalleePreCond : Parameter_sig.Bool
 module PrecondWeakening : Parameter_sig.Bool
+module TerminatesExtDeclarations : Parameter_sig.Bool
+module TerminatesFCDeclarations : Parameter_sig.Bool
+module TerminatesDefinitions : Parameter_sig.Bool
+module TerminatesVariantHyp : Parameter_sig.Bool
 
 (** {2 Prover Interface} *)
 

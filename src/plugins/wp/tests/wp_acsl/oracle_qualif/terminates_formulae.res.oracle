@@ -1,0 +1,28 @@
+# frama-c -wp [...]
+[kernel] Parsing tests/wp_acsl/terminates_formulae.i (no preprocessing)
+[wp] Running WP plugin...
+[wp] Warning: Missing RTE guards
+[wp] 10 goals scheduled
+[wp] [Alt-Ergo] Goal typed_base_call_terminates : Unsuccess
+[wp] [Qed] Goal typed_call_same_terminates : Valid
+[wp] [Alt-Ergo] Goal typed_call_change_terminates : Unsuccess
+[wp] [Qed] Goal typed_call_param_same_terminates : Valid
+[wp] [Alt-Ergo] Goal typed_call_param_change_terminates : Unsuccess
+[wp] [Qed] Goal typed_variant_loop_assigns : Valid
+[wp] [Alt-Ergo] Goal typed_variant_loop_variant_decrease : Valid
+[wp] [Qed] Goal typed_variant_loop_variant_positive : Valid
+[wp] [Alt-Ergo] Goal typed_no_variant_terminates : Unsuccess
+[wp] [Qed] Goal typed_no_variant_loop_assigns : Valid
+[wp] Proved goals:    6 / 10
+  Qed:             5 
+  Alt-Ergo:        1  (unsuccess: 4)
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  base_call                 -        -        1       0.0%
+  call_same                 1        -        1       100%
+  call_change               -        -        1       0.0%
+  call_param_same           1        -        1       100%
+  call_param_change         -        -        1       0.0%
+  variant                   2        1        3       100%
+  no_variant                1        -        2      50.0%
+------------------------------------------------------------

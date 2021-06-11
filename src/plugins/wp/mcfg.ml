@@ -67,6 +67,8 @@ module type S = sig
   val add_axiom : WpPropId.prop_id -> LogicUsage.logic_lemma -> unit
   val add_hyp  : t_env -> WpPropId.pred_info -> t_prop -> t_prop
   val add_goal : t_env -> WpPropId.pred_info -> t_prop -> t_prop
+  val add_subgoal : t_env -> WpPropId.pred_info ->
+    predicate -> stmt -> WpPropId.effect_source -> t_prop -> t_prop
 
   val add_assigns : t_env -> WpPropId.assigns_info -> t_prop -> t_prop
 
@@ -100,6 +102,10 @@ module type S = sig
     kernel_function -> exp list ->
     pre: WpPropId.pred_info list ->
     t_prop -> t_prop
+
+  val call_terminates : t_env -> WpPropId.pred_info ->
+    stmt -> kernel_function -> exp list ->
+    callee_t:predicate -> t_prop -> t_prop
 
   val call : t_env -> stmt ->
     lval option -> kernel_function -> exp list ->

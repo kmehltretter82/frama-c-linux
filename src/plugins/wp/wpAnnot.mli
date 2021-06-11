@@ -35,6 +35,7 @@ open Cil_types
 val unreachable_proved : int ref
 val unreachable_failed : int ref
 val set_unreachable : WpPropId.prop_id -> unit
+val set_trivially_terminates : WpPropId.prop_id -> unit
 
 type asked_assigns = NoAssigns | OnlyAssigns | WithAssigns
 

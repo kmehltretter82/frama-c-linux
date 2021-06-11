@@ -77,6 +77,20 @@ let set_unreachable pid =
     List.iter emit pids
 
 (* -------------------------------------------------------------------------- *)
+(* --- Status of Terminates Annotations                                   --- *)
+(* -------------------------------------------------------------------------- *)
+let wp_trivially_terminates =
+  Emitter.create
+    "Trivial Termination"
+    [Emitter.Property_status]
+    ~correctness:[] (* TBC *)
+    ~tuning:[] (* TBC *)
+
+let set_trivially_terminates p =
+  let pid = WpPropId.property_of_id p in
+  Property_status.emit wp_trivially_terminates ~hyps:[] pid Property_status.True
+
+(* -------------------------------------------------------------------------- *)
 (* --- Preconditions at Callsites                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
