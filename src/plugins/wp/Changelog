@@ -24,6 +24,14 @@
 Plugin WP <next-release>
 #########################
 
+- WP          [2021-06-11] Adds an experimental support of "terminates" clauses.
+                           Adds the options -wp-declaration-terminate and
+                          -wp-frama-c-stdlib to claims that external functions
+                           terminates.
+                           Adds -wp-declarations-terminate option to claims that
+                           defined function terminates.
+                           Adds -wp-variant-with-terminates to verify loop
+                           variants under the termination hypothesis.
 - WP          [2021-06-01] -wp-smoke-tests detects incoherent assumes when no
                            requires are specified, can be disabled with new
                            option -wp-smoke-dead-assumes
