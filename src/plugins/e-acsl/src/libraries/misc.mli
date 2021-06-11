@@ -44,8 +44,6 @@ val is_fc_stdlib_generated: varinfo -> bool
 (** Returns true if the [varinfo] is a generated stdlib function. (For instance
     generated function by the Variadic plug-in. *)
 
-val term_addr_of: loc:location -> term_lval -> typ -> term
-
 val cty: logic_type -> typ
 (** Assume that the logic type is indeed a C type. Just return it. *)
 

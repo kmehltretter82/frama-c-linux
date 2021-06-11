@@ -868,9 +868,11 @@ and predicate_content_to_exp ?name kf env p =
       call_valid t p
     end else begin
       match t.term_node, t.term_type with
-      | TLval tlv, Ctype ty ->
+      | TLval tlv, lty ->
         let init =
-          Logic_const.pinitialized ~loc (llabel, Misc.term_addr_of ~loc tlv ty)
+          Logic_const.pinitialized
+            ~loc
+            (llabel, Logic_utils.mk_logic_AddrOf ~loc tlv lty)
         in
         Typing.type_named_predicate ~must_clear:false init;
         let p = Logic_const.pand ~loc (init, p) in
