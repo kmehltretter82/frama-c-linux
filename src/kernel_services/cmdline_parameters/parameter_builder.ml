@@ -354,10 +354,13 @@ struct
         end)
 
     let add_option name =
+      let help =
+        Format.asprintf "%s (preferably use %s=\"%s\")" X.help name X.arg_name
+      in
       Cmdline.add_option
         name
         ~argname:X.arg_name
-        ~help:X.help
+        ~help
         ~visible:is_visible
         ~ext_help:!Parameter_customize.optional_help_ref
         ~plugin:P.shortname
