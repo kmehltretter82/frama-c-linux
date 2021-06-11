@@ -1664,7 +1664,11 @@ let print_all_sources out all_sources_tbl =
           `Assoc (List.map (fun (f, hash) -> f, `String hash) sorted_elems)
          )]
     in
-    Json.merge_object out json
+    try Json.merge_object out json
+    with Json.CannotMerge _ ->
+      Kernel.abort "%s already computed; it should be set by itself, \
+                    after the last '-then' in the command line."
+        Kernel.AuditPrepare.option_name
   end
 
 let compute_sources_table cpp_commands =
@@ -1766,14 +1770,7 @@ let prepare_from_c_files () =
   let audit_path = Kernel.AuditPrepare.get () in
   if not (Filepath.Normalized.is_empty audit_path) then begin
     let all_sources_tbl = compute_sources_table cpp_commands in
-    begin
-      try
-        print_all_sources audit_path all_sources_tbl
-      with Json.CannotMerge _ ->
-        Kernel.abort "%s already computed; it should be set by itself, \
-                      after the last '-then' in the command line."
-          Kernel.AuditPrepare.option_name
-    end;
+    print_all_sources audit_path all_sources_tbl;
     if not (Filepath.Normalized.is_special_stdout audit_path) then
       Kernel.feedback "Audit: sources list written to: %a@."
         Filepath.Normalized.pretty audit_path;

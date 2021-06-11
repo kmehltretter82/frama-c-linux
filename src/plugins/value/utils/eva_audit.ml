@@ -145,6 +145,11 @@ let check_configuration path =
       Filepath.Normalized.pretty path msg
 
 let print_configuration path =
-  print_correctness_parameters path;
-  print_warning_status path "Kernel" (module Kernel);
-  print_warning_status path "Eva" (module Value_parameters)
+  try
+    print_correctness_parameters path;
+    print_warning_status path "Kernel" (module Kernel);
+    print_warning_status path "Eva" (module Value_parameters)
+  with Json.CannotMerge _ ->
+    Kernel.abort "%s already computed; it should be set by itself, \
+                  after the last '-then' in the command line."
+      Kernel.AuditPrepare.option_name
