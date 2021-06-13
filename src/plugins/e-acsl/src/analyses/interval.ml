@@ -237,28 +237,43 @@ let rec interv_of_typ ty = match Cil.unrollType ty with
    quantifier and [name]  is the identifier of the extended quantifier (\sum,
    \product or \numof). The returned ival is the interval of the extended
    quantifier *)
-let interv_of_extended_quantifier lbd_ival k_ival name =
-  match lbd_ival, k_ival, name.lv_name with
-  | Ival lbd_Ival, Ival k_Ival, "\\sum" ->
+let interv_of_extended_quantifier lbd_ival i_ival j_ival name =
+  match lbd_ival, i_ival, j_ival, name.lv_name with
+  | Ival lbd_Ival, Ival i_ival, Ival j_ival, "\\sum" ->
     (try
        let min_lambda, max_lambda = Ival.min_and_max lbd_Ival in
-       let min_k, max_k = Ival.min_and_max k_Ival in
-       let compute_bound bound_lambda = (match bound_lambda, min_k, max_k with
-           | Some l1,  Some k1, Some k2 ->
-             Some(Z.mul l1 (Z.max (Z.sub k2 k1) Z.zero))
-           | _, None, Some _ -> Some Z.zero
-           | Some l1, _, None when (Z.compare l1 Z.zero) = 0 -> Some Z.zero
-           | None, Some k1, Some k2 when (Z.compare k2 k1) = 0 -> Some Z.zero
-           | Some _, _, None | None, _, _ -> None)
+       let i_inf, i_sup = Ival.min_and_max i_ival in
+       let j_inf, j_sup = Ival.min_and_max j_ival in
+       let compute_bound bound_lambda is_inf_bound =
+         let cond =
+           match bound_lambda with
+           | Some lambda ->
+             (is_inf_bound && ((Z.compare lambda Z.zero)==1)) ||
+             ((not is_inf_bound) && ((Z.compare lambda Z.zero)=(-1)))
+           | None -> false
+         in
+         match bound_lambda, i_inf, i_sup, j_inf, j_sup with
+         | Some lambda, _,Some i_sup, Some j_inf, _  when cond->
+           Some (Z.mul lambda (Z.max (Z.sub j_inf i_sup) Z.zero))
+         | _, _, _, _, _ when cond -> Some Z.zero
+         | Some lambda,  Some i_inf, _, _, Some j_sup ->
+           Some (Z.mul lambda (Z.max (Z.sub j_sup i_inf) Z.zero))
+         | Some lambda, _, _ , _, _ when (Z.compare lambda Z.zero) = 0 ->
+           Some Z.zero
+         | None, Some i_inf, _, _, Some j_sup when (Z.compare j_sup i_inf) = 0 ->
+           Some Z.zero
+         |  _, _, _, _, _ -> None
        in
        Ival
-         (Ival.inject_range (compute_bound min_lambda) (compute_bound max_lambda))
+         (Ival.inject_range
+            (compute_bound min_lambda true)
+            (compute_bound max_lambda false))
      with Error_Bottom ->
        Ival Ival.bottom)
-  | _, _, "\\product" ->  Error.not_yet "product"
-  | _, _, "\\numof" ->  Error.not_yet "numof"
-  | _, _, _ -> Options.fatal  "%a is not a valid extended quantifier"
-                 Printer.pp_logic_var name
+  | _, _, _, "\\product" ->  Error.not_yet "product"
+  | _, _, _, "\\numof" ->  Error.not_yet "numof"
+  | _, _, _, _ -> Options.fatal  "%a is not a valid extended quantifier"
+                    Printer.pp_logic_var name
 
 let interv_of_logic_typ = function
   | Ctype ty -> interv_of_typ ty
@@ -562,13 +577,13 @@ let rec infer t =
      | LBnone when li.l_var_info.lv_name="\\sum" ->
        (match args with
         | [ t1; t2; {term_node = Tlambda([ k ], _)} as lambda ] ->
-          let i_inf = infer t1 in
-          let i_sup = infer t2 in
-          let k_ival = join i_inf i_sup in
+          let i_ival = infer t1 in
+          let j_ival = infer t2 in
+          let k_ival = join i_ival j_ival in
           Env.add k k_ival;
           let lambda_ival = infer lambda in
           interv_of_extended_quantifier
-            lambda_ival k_ival li.l_var_info
+            lambda_ival i_ival j_ival li.l_var_info
         | _ -> Options.fatal "unexpected input for an extended quantifier %a"
                  Printer.pp_logic_var li.l_var_info)
      | LBnone
