@@ -29,6 +29,7 @@ open Abstract_offset
 type size = Integer.t
 
 type bit =
+  | Uninitialized
   | Zero
   | Any of Base.SetLattice.t
 
@@ -38,40 +39,46 @@ struct
 
   type t = bit
 
+  let uninitialized = Uninitialized
+  let zero = Zero
+  let numerical = Any Bases.empty
   let top = Any Bases.top
 
-  let numerical = Any Bases.empty
-
-  let zero = Zero
-
   let hash = function
+    | Uninitialized -> 7
     | Zero -> 3
     | Any set -> Bases.hash set
 
   let equal d1 d2 =
     match d1,d2 with
+    | Uninitialized, Uninitialized -> true
     | Zero, Zero -> true
-    | Zero, Any _ | Any _, Zero -> false
     | Any set1, Any set2 -> Bases.equal set1 set2
+    | _, _ -> false
 
   let compare d1 d2 =
     match d1,d2 with
+    | Uninitialized, Uninitialized -> 0
     | Zero, Zero -> 0
-    | Zero, Any _ -> 1
-    | Any _, Zero -> -1
     | Any set1, Any set2 -> Bases.compare set1 set2
+    | Uninitialized, _ -> 1
+    | _, Uninitialized -> -1
+    | Zero, _ -> 1
+    | _, Zero -> -1
 
   let is_included d1 d2 =
     match d1, d2 with
+    | Uninitialized, _ -> true
+    | _, Uninitialized -> false
+    | Zero, _ -> true
+    | _, Zero -> false
     | Any set1, Any set2 -> Bases.is_included set1 set2
-    | Any _, Zero -> false
-    | Zero, (Zero | Any _) -> true
 
   let join d1 d2 =
     match d1, d2 with
+    | Uninitialized, d | d, Uninitialized -> d
+    | Zero, d | d, Zero -> d
     | Any set1, Any set2 -> Any (Bases.join set1 set2)
-    | Any set, Zero | Zero, Any set -> Any set
-    | Zero, Zero -> Zero
 end
 
 module type Value =
@@ -194,6 +201,7 @@ struct
       function
       | Raw b ->
         begin match b with
+          | Uninitialized -> Format.fprintf fmt "UNINITIALIZED"
           | Zero -> Format.fprintf fmt "0"
           | Any (Set set) when Base.SetLattice.O.is_empty set ->
             Format.fprintf fmt "[--..--]"

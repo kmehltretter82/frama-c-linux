@@ -23,7 +23,8 @@
 type size = Integer.t
 
 type bit =
-  | Zero (* Zero everywhere *)
+  | Uninitialized (* Uninitialized everywhere *)
+  | Zero (* Zero or uninitialized everywhere *)
   | Any of Base.SetLattice.t (* Undetermined anywhere, and can contain bits
                                 of pointers. If the base set is empty,
                                 the bit can only come from numerical values. *)
@@ -32,9 +33,10 @@ module Bit :
 sig
   type t = bit
 
-  val top : t
-  val numerical : t
+  val uninitialized : t
   val zero : t
+  val numerical : t
+  val top : t
 end
 
 (* Values the memory is mapped to *)

@@ -43,12 +43,15 @@ struct
   let of_integer = inject_int
 
   let of_bit = function
-    | Abstract_memory.Zero -> inject_int Integer.zero
+    | Abstract_memory.Uninitialized -> bottom
+    | Zero -> inject_int Integer.zero
     | Any (Set s) -> inject_top_origin Origin.top s
     | Any (Top) -> top_with_origin Origin.top
 
   let to_bit v =
-    if is_zero v
+    if is_bottom v
+    then Abstract_memory.Uninitialized
+    else if is_zero v
     then Abstract_memory.Zero
     else Abstract_memory.Any (get_bases v)
 
@@ -105,6 +108,9 @@ struct
     | None -> false
     | Some (b,o) ->
       not (Base.is_weak b) && Offset.is_singleton o
+
+  let of_var (vi : Cil_types.varinfo) : t =
+    Map.singleton (Base.of_varinfo vi) (`Value (NoOffset vi.vtype))
 
   (* Raises Abstract_domain.{Error_top,Error_bottom} *)
   let of_lval oracle ((host,offset) : Cil_types.lval) : t =
@@ -477,8 +483,15 @@ struct
       end
     | _ -> ()
 
-  let enter_scope _kind _vars state = state
-  let leave_scope _kf vars state = remove_vars state vars
+  let enter_scope _kind vars state =
+    let enter_one state v =
+      let dst = Location.of_var v in
+      erase state dst Abstract_memory.Bit.uninitialized
+    in
+    List.fold_left enter_one state vars
+
+  let leave_scope _kf vars state =
+    remove_vars state vars
 
   let enter_loop _ state = state
   let incr_loop_counter _ state = state

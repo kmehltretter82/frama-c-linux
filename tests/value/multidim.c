@@ -1,7 +1,7 @@
 /* run.config*
    STDOPT: +"-eva-msg-key d-multidim -eva-domains multidim -eva-plevel 0"
 */
-
+#include "__fc_builtin.h"
 #define N 4
 #define M 4
 
@@ -28,9 +28,16 @@ s w[M];
   */
 void f();
 
+volatile int nondet;
+
 void main(s x) {
-  s y = {{{{3.0}}}};
-  Frama_C_domain_show_each(x, y, z, w);
+  s y1 = {{{{3.0}}}};
+  s y2;
+
+  if (nondet)
+    y2.t1[0].f = 4.0;
+
+  Frama_C_domain_show_each(x, y1, y2, z, w);
 
   /* The multidim domain wont infer anything except the structure from the
      assign: it considers x can contain anything including pointers, and thus no
@@ -52,4 +59,8 @@ void main(s x) {
   }
   
   Frama_C_domain_show_each(w);
+
+  t t1 = w[Frama_C_interval(0,M-1)].t1[Frama_C_interval(0,N-1)];
+
+  Frama_C_domain_show_each(t1);
 }
