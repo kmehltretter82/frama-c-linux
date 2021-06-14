@@ -77,9 +77,6 @@ let rec add_casts tys e =
     let e = Cil.mkCast ~newt e in
     add_casts tl e
 
-let term_addr_of ~loc tlv ty =
-  Logic_const.taddrof ~loc tlv (Ctype (TPtr(ty, [])))
-
 let cty = function
   | Ctype ty -> ty
   | lty -> Options.fatal "Expecting a C type. Got %a" Printer.pp_logic_type lty

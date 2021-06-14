@@ -138,10 +138,10 @@ int main(void)
       __gen_e_acsl_size = 8 * ((9 - 0) + 1);
       if (__gen_e_acsl_size <= 0) __gen_e_acsl_if = 0;
       else __gen_e_acsl_if = __gen_e_acsl_size;
-      __gen_e_acsl_valid_read_8 = __e_acsl_valid_read((void *)((char *)(& array) + 
+      __gen_e_acsl_valid_read_8 = __e_acsl_valid_read((void *)((char *)(array) + 
                                                                8 * 0),
                                                       (size_t)__gen_e_acsl_if,
-                                                      (void *)(& array),
+                                                      (void *)(array),
                                                       (void *)0);
       /*@ assert E_ACSL: separated_guard: \valid_read(&array[0 .. 9]); */
       __e_acsl_assert(__gen_e_acsl_valid_read_8,1,"RTE","main",
@@ -150,10 +150,10 @@ int main(void)
       __gen_e_acsl_size_2 = 8 * ((19 - 10) + 1);
       if (__gen_e_acsl_size_2 <= 0) __gen_e_acsl_if_2 = 0;
       else __gen_e_acsl_if_2 = __gen_e_acsl_size_2;
-      __gen_e_acsl_valid_read_9 = __e_acsl_valid_read((void *)((char *)(& array) + 
+      __gen_e_acsl_valid_read_9 = __e_acsl_valid_read((void *)((char *)(array) + 
                                                                8 * 10),
                                                       (size_t)__gen_e_acsl_if_2,
-                                                      (void *)(& array),
+                                                      (void *)(array),
                                                       (void *)0);
       /*@ assert E_ACSL: separated_guard: \valid_read(&array[10 .. 19]); */
       __e_acsl_assert(__gen_e_acsl_valid_read_9,1,"RTE","main",
@@ -166,10 +166,10 @@ int main(void)
       if (__gen_e_acsl_size_4 <= 0) __gen_e_acsl_if_4 = 0;
       else __gen_e_acsl_if_4 = __gen_e_acsl_size_4;
       __gen_e_acsl_separated_3 = __e_acsl_separated((size_t)2,
-                                                    (char *)(& array) + 8 * 0,
+                                                    (char *)(array) + 8 * 0,
                                                     __gen_e_acsl_if_3,
-                                                    (char *)(& array) + 
-                                                    8 * 10,__gen_e_acsl_if_4);
+                                                    (char *)(array) + 8 * 10,
+                                                    __gen_e_acsl_if_4);
       __e_acsl_assert(__gen_e_acsl_separated_3,1,"Assertion","main",
                       "\\separated(&array[0 .. 9], &array[10 .. 19])",
                       "tests/memory/separated.c",21);
@@ -190,10 +190,10 @@ int main(void)
       __gen_e_acsl_size_5 = 8 * ((10 - 0) + 1);
       if (__gen_e_acsl_size_5 <= 0) __gen_e_acsl_if_5 = 0;
       else __gen_e_acsl_if_5 = __gen_e_acsl_size_5;
-      __gen_e_acsl_valid_read_10 = __e_acsl_valid_read((void *)((char *)(& array) + 
+      __gen_e_acsl_valid_read_10 = __e_acsl_valid_read((void *)((char *)(array) + 
                                                                 8 * 0),
                                                        (size_t)__gen_e_acsl_if_5,
-                                                       (void *)(& array),
+                                                       (void *)(array),
                                                        (void *)0);
       /*@ assert E_ACSL: separated_guard: \valid_read(&array[0 .. 10]); */
       __e_acsl_assert(__gen_e_acsl_valid_read_10,1,"RTE","main",
@@ -202,10 +202,10 @@ int main(void)
       __gen_e_acsl_size_6 = 8 * ((15 - 5) + 1);
       if (__gen_e_acsl_size_6 <= 0) __gen_e_acsl_if_6 = 0;
       else __gen_e_acsl_if_6 = __gen_e_acsl_size_6;
-      __gen_e_acsl_valid_read_11 = __e_acsl_valid_read((void *)((char *)(& array) + 
+      __gen_e_acsl_valid_read_11 = __e_acsl_valid_read((void *)((char *)(array) + 
                                                                 8 * 5),
                                                        (size_t)__gen_e_acsl_if_6,
-                                                       (void *)(& array),
+                                                       (void *)(array),
                                                        (void *)0);
       /*@ assert E_ACSL: separated_guard: \valid_read(&array[5 .. 15]); */
       __e_acsl_assert(__gen_e_acsl_valid_read_11,1,"RTE","main",
@@ -218,9 +218,9 @@ int main(void)
       if (__gen_e_acsl_size_8 <= 0) __gen_e_acsl_if_8 = 0;
       else __gen_e_acsl_if_8 = __gen_e_acsl_size_8;
       __gen_e_acsl_separated_4 = __e_acsl_separated((size_t)2,
-                                                    (char *)(& array) + 8 * 0,
+                                                    (char *)(array) + 8 * 0,
                                                     __gen_e_acsl_if_7,
-                                                    (char *)(& array) + 8 * 5,
+                                                    (char *)(array) + 8 * 5,
                                                     __gen_e_acsl_if_8);
       __e_acsl_assert(! __gen_e_acsl_separated_4,1,"Assertion","main",
                       "!\\separated(&array[0 .. 10], &array[5 .. 15])",
@@ -242,10 +242,10 @@ int main(void)
       __gen_e_acsl_size_9 = 8 * ((19 - 0) + 1);
       if (__gen_e_acsl_size_9 <= 0) __gen_e_acsl_if_9 = 0;
       else __gen_e_acsl_if_9 = __gen_e_acsl_size_9;
-      __gen_e_acsl_valid_read_12 = __e_acsl_valid_read((void *)((char *)(& array) + 
+      __gen_e_acsl_valid_read_12 = __e_acsl_valid_read((void *)((char *)(array) + 
                                                                 8 * 0),
                                                        (size_t)__gen_e_acsl_if_9,
-                                                       (void *)(& array),
+                                                       (void *)(array),
                                                        (void *)0);
       /*@ assert E_ACSL: separated_guard: \valid_read(&array[0 .. 19]); */
       __e_acsl_assert(__gen_e_acsl_valid_read_12,1,"RTE","main",
@@ -254,10 +254,10 @@ int main(void)
       __gen_e_acsl_size_10 = 8 * ((15 - 5) + 1);
       if (__gen_e_acsl_size_10 <= 0) __gen_e_acsl_if_10 = 0;
       else __gen_e_acsl_if_10 = __gen_e_acsl_size_10;
-      __gen_e_acsl_valid_read_13 = __e_acsl_valid_read((void *)((char *)(& array) + 
+      __gen_e_acsl_valid_read_13 = __e_acsl_valid_read((void *)((char *)(array) + 
                                                                 8 * 5),
                                                        (size_t)__gen_e_acsl_if_10,
-                                                       (void *)(& array),
+                                                       (void *)(array),
                                                        (void *)0);
       /*@ assert E_ACSL: separated_guard: \valid_read(&array[5 .. 15]); */
       __e_acsl_assert(__gen_e_acsl_valid_read_13,1,"RTE","main",
@@ -270,9 +270,9 @@ int main(void)
       if (__gen_e_acsl_size_12 <= 0) __gen_e_acsl_if_12 = 0;
       else __gen_e_acsl_if_12 = __gen_e_acsl_size_12;
       __gen_e_acsl_separated_5 = __e_acsl_separated((size_t)2,
-                                                    (char *)(& array) + 8 * 0,
+                                                    (char *)(array) + 8 * 0,
                                                     __gen_e_acsl_if_11,
-                                                    (char *)(& array) + 8 * 5,
+                                                    (char *)(array) + 8 * 5,
                                                     __gen_e_acsl_if_12);
       __e_acsl_assert(! __gen_e_acsl_separated_5,1,"Assertion","main",
                       "!\\separated(&array[0 .. 19], &array[5 .. 15])",
@@ -323,10 +323,10 @@ int main(void)
       __gen_e_acsl_size_13 = 8 * ((1 - 0) + 1);
       if (__gen_e_acsl_size_13 <= 0) __gen_e_acsl_if_13 = 0;
       else __gen_e_acsl_if_13 = __gen_e_acsl_size_13;
-      __gen_e_acsl_valid_read_16 = __e_acsl_valid_read((void *)((char *)(& array) + 
+      __gen_e_acsl_valid_read_16 = __e_acsl_valid_read((void *)((char *)(array) + 
                                                                 8 * 0),
                                                        (size_t)__gen_e_acsl_if_13,
-                                                       (void *)(& array),
+                                                       (void *)(array),
                                                        (void *)0);
       /*@ assert E_ACSL: separated_guard: \valid_read(&array[0 .. 1]); */
       __e_acsl_assert(__gen_e_acsl_valid_read_16,1,"RTE","main",
@@ -335,10 +335,10 @@ int main(void)
       __gen_e_acsl_size_14 = 8 * ((2 - 1) + 1);
       if (__gen_e_acsl_size_14 <= 0) __gen_e_acsl_if_14 = 0;
       else __gen_e_acsl_if_14 = __gen_e_acsl_size_14;
-      __gen_e_acsl_valid_read_17 = __e_acsl_valid_read((void *)((char *)(& array) + 
+      __gen_e_acsl_valid_read_17 = __e_acsl_valid_read((void *)((char *)(array) + 
                                                                 8 * 1),
                                                        (size_t)__gen_e_acsl_if_14,
-                                                       (void *)(& array),
+                                                       (void *)(array),
                                                        (void *)0);
       /*@ assert E_ACSL: separated_guard: \valid_read(&array[1 .. 2]); */
       __e_acsl_assert(__gen_e_acsl_valid_read_17,1,"RTE","main",
@@ -351,9 +351,9 @@ int main(void)
       if (__gen_e_acsl_size_16 <= 0) __gen_e_acsl_if_16 = 0;
       else __gen_e_acsl_if_16 = __gen_e_acsl_size_16;
       __gen_e_acsl_separated_7 = __e_acsl_separated((size_t)2,
-                                                    (char *)(& array) + 8 * 0,
+                                                    (char *)(array) + 8 * 0,
                                                     __gen_e_acsl_if_15,
-                                                    (char *)(& array) + 8 * 1,
+                                                    (char *)(array) + 8 * 1,
                                                     __gen_e_acsl_if_16);
       __e_acsl_assert(! __gen_e_acsl_separated_7,1,"Assertion","main",
                       "!\\separated(&array[0 .. 1], &array[1 .. 2])",
@@ -375,10 +375,10 @@ int main(void)
       __gen_e_acsl_size_17 = 8 * ((5 - 15) + 1);
       if (__gen_e_acsl_size_17 <= 0) __gen_e_acsl_if_17 = 0;
       else __gen_e_acsl_if_17 = __gen_e_acsl_size_17;
-      __gen_e_acsl_valid_read_18 = __e_acsl_valid_read((void *)((char *)(& array) + 
+      __gen_e_acsl_valid_read_18 = __e_acsl_valid_read((void *)((char *)(array) + 
                                                                 8 * 15),
                                                        (size_t)__gen_e_acsl_if_17,
-                                                       (void *)(& array),
+                                                       (void *)(array),
                                                        (void *)0);
       /*@ assert E_ACSL: separated_guard: \valid_read(&array[15 .. 5]); */
       __e_acsl_assert(__gen_e_acsl_valid_read_18,1,"RTE","main",
@@ -387,10 +387,10 @@ int main(void)
       __gen_e_acsl_size_18 = 8 * ((19 - 0) + 1);
       if (__gen_e_acsl_size_18 <= 0) __gen_e_acsl_if_18 = 0;
       else __gen_e_acsl_if_18 = __gen_e_acsl_size_18;
-      __gen_e_acsl_valid_read_19 = __e_acsl_valid_read((void *)((char *)(& array) + 
+      __gen_e_acsl_valid_read_19 = __e_acsl_valid_read((void *)((char *)(array) + 
                                                                 8 * 0),
                                                        (size_t)__gen_e_acsl_if_18,
-                                                       (void *)(& array),
+                                                       (void *)(array),
                                                        (void *)0);
       /*@ assert E_ACSL: separated_guard: \valid_read(&array[0 .. 19]); */
       __e_acsl_assert(__gen_e_acsl_valid_read_19,1,"RTE","main",
@@ -403,10 +403,9 @@ int main(void)
       if (__gen_e_acsl_size_20 <= 0) __gen_e_acsl_if_20 = 0;
       else __gen_e_acsl_if_20 = __gen_e_acsl_size_20;
       __gen_e_acsl_separated_8 = __e_acsl_separated((size_t)2,
-                                                    (char *)(& array) + 
-                                                    8 * 15,
+                                                    (char *)(array) + 8 * 15,
                                                     __gen_e_acsl_if_19,
-                                                    (char *)(& array) + 8 * 0,
+                                                    (char *)(array) + 8 * 0,
                                                     __gen_e_acsl_if_20);
       __e_acsl_assert(__gen_e_acsl_separated_8,1,"Assertion","main",
                       "\\separated(&array[15 .. 5], &array[0 .. 19])",
@@ -428,10 +427,10 @@ int main(void)
       __gen_e_acsl_size_21 = 8 * ((-3 - 0) + 1);
       if (__gen_e_acsl_size_21 <= 0) __gen_e_acsl_if_21 = 0;
       else __gen_e_acsl_if_21 = __gen_e_acsl_size_21;
-      __gen_e_acsl_valid_read_20 = __e_acsl_valid_read((void *)((char *)(& array) + 
+      __gen_e_acsl_valid_read_20 = __e_acsl_valid_read((void *)((char *)(array) + 
                                                                 8 * 0),
                                                        (size_t)__gen_e_acsl_if_21,
-                                                       (void *)(& array),
+                                                       (void *)(array),
                                                        (void *)0);
       /*@ assert E_ACSL: separated_guard: \valid_read(&array[0 .. -3]); */
       __e_acsl_assert(__gen_e_acsl_valid_read_20,1,"RTE","main",
@@ -440,10 +439,10 @@ int main(void)
       __gen_e_acsl_size_22 = 8 * ((19 - 0) + 1);
       if (__gen_e_acsl_size_22 <= 0) __gen_e_acsl_if_22 = 0;
       else __gen_e_acsl_if_22 = __gen_e_acsl_size_22;
-      __gen_e_acsl_valid_read_21 = __e_acsl_valid_read((void *)((char *)(& array) + 
+      __gen_e_acsl_valid_read_21 = __e_acsl_valid_read((void *)((char *)(array) + 
                                                                 8 * 0),
                                                        (size_t)__gen_e_acsl_if_22,
-                                                       (void *)(& array),
+                                                       (void *)(array),
                                                        (void *)0);
       /*@ assert E_ACSL: separated_guard: \valid_read(&array[0 .. 19]); */
       __e_acsl_assert(__gen_e_acsl_valid_read_21,1,"RTE","main",
@@ -456,9 +455,9 @@ int main(void)
       if (__gen_e_acsl_size_24 <= 0) __gen_e_acsl_if_24 = 0;
       else __gen_e_acsl_if_24 = __gen_e_acsl_size_24;
       __gen_e_acsl_separated_9 = __e_acsl_separated((size_t)2,
-                                                    (char *)(& array) + 8 * 0,
+                                                    (char *)(array) + 8 * 0,
                                                     __gen_e_acsl_if_23,
-                                                    (char *)(& array) + 8 * 0,
+                                                    (char *)(array) + 8 * 0,
                                                     __gen_e_acsl_if_24);
       __e_acsl_assert(__gen_e_acsl_separated_9,1,"Assertion","main",
                       "\\separated(&array[0 .. -3], &array[0 .. 19])",

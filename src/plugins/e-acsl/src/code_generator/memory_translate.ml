@@ -339,7 +339,6 @@ let extract_quantifiers ~loc args =
     ([], [])
     args
 
-
 (* [call_with_tset
       ~loc
       ~arg_from_range
@@ -443,7 +442,7 @@ let call_with_tset ~loc ~arg_from_range ~arg_from_term ?(prepend_n_args=false) k
                assert (Logic_const.is_set_type t.term_type);
                let lty_noset = Logic_const.type_of_element t.term_type in
                let ptr =
-                 Logic_const.taddrof ~loc (TVar lv, TNoOffset) lty_noset
+                 Logic_const.term ~loc (TStartOf (TVar lv, TNoOffset)) lty_noset
                in
                arg_from_range ~loc kf env rev_args ptr r p
              | _ ->
