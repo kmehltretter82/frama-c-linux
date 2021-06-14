@@ -25,6 +25,8 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-* E-ACSL       [2021-06-14] Fix pointer address on memory annotations with
+                range indices (frama-c/e-acsl#148).
 -* E-ACSL       [2021-06-04] Do not translate contracts of E-ACSL built-ins.
 
 #############################
