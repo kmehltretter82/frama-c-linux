@@ -300,7 +300,7 @@ struct
 
   module Deps = struct let l = Config.deps end
 
-  module Keys =
+  module Field =
   struct
     include Cil_datatype.Fieldinfo
     let id f = f.Cil_types.forder (* At each node, all fields come from the same comp *)
@@ -339,7 +339,7 @@ struct
     Hptmap_sig.S
     with type key = Cil_types.fieldinfo
      and type v = Memory.t =
-    Hptmap.Make (Keys) (Memory) (Hptmap.Comp_unused) (Initial_Values) (Deps)
+    Hptmap.Make (Field) (Memory) (Hptmap.Comp_unused) (Initial_Values) (Deps)
 
   (* Caches *)
 
@@ -377,7 +377,7 @@ struct
     s1.struct_info.ckey = s2.struct_info.ckey
 
   let are_union_compatible u1 u2 =
-    Cil_datatype.Fieldinfo.equal u1.union_field u2.union_field
+    Field.equal u1.union_field u2.union_field
 
   (* Conversion *)
 
@@ -463,7 +463,11 @@ struct
         and array_padding = Bit.join a1.array_padding a2.array_padding in
         Array { a1 with array_value; array_range; array_padding }
       | Array a, (Raw b) | (Raw b), Array a ->
-        Array { a with array_value = join (Raw b) a.array_value }
+        Array {
+          a with
+          array_value = join (Raw b) a.array_value;
+          array_padding = Bit.join b a.array_padding;
+        }
       | Struct s1, Struct s2 when are_structs_compatible s1 s2 ->
         let decide b =
           FieldMap.Traversing (fun _fi m -> Some (join (Raw b) m))
@@ -512,38 +516,34 @@ struct
 
   (* Read/Write accesses *)
 
-  let read (map : 'a -> 'b) (reduce : 'b -> 'b -> 'b) m offset : 'b =
-    let apply m acc =
-      let v = map m in
-      Option.fold ~none:v ~some:(reduce v) acc
-    in
-    let rec aux m offset acc =
+  let read (map : t -> 'a) (reduce : 'a -> 'a -> 'a) m offset : 'a =
+    let rec aux m offset =
       match offset, m with
       | NoOffset t, Scalar s when are_typ_compatible s.scalar_type t ->
-        apply m acc
+        map m
       | NoOffset _, m ->
-        apply m acc (* TODO check type compatibility *)
+        map m (* TODO check type compatibility *)
       | Field (fi, offset'), Struct s when s.struct_info.ckey = fi.fcomp.ckey ->
         begin try
             let m' = FieldMap.find fi s.struct_value in
-            aux m' offset' acc
+            aux m' offset'
           with Not_found ->
-            apply (Raw s.struct_padding) acc (* field undefined *)
+            map (Raw s.struct_padding) (* field undefined *)
         end
-      | Field (fi, offset'), Union u when u.union_field.forder = fi.forder ->
-        aux u.union_value offset' acc
+      | Field (fi, offset'), Union u when Field.equal u.union_field fi ->
+        aux u.union_value offset'
       | Index (index, elem_type, offset'), Array a
         when are_typ_compatible a.array_cell_type elem_type ->
         if Int_val.intersects index a.array_range then
-          let r = aux a.array_value offset' acc in (* Read inside range *)
+          let r = aux a.array_value offset' in (* Read inside range *)
           if Int_val.is_included index a.array_range
           then r
-          else apply (Raw a.array_padding) (Some r) (* Also read outside of range *)
+          else reduce r (map (Raw a.array_padding)) (* Also read outside of range *)
         else
-          apply (Raw a.array_padding) acc (* Only read outside of range *)
-      | _, _ ->  apply (Raw (raw m)) acc (* structure mismatch *)
+          map (Raw a.array_padding) (* Only read outside of range *)
+      | _, _ ->  map (Raw (raw m)) (* structure mismatch *)
     in
-    aux m offset None
+    aux m offset
 
   let get : t -> location -> value =
     let f = function
@@ -577,7 +577,7 @@ struct
         }
       else (* Unions *)
         let old = match m with
-          | Union u when u.union_field.forder = fi.forder -> u
+          | Union u when Field.equal u.union_field fi -> u
           | _ ->
             let b = raw m in {
               union_value = Raw b;
@@ -605,7 +605,7 @@ struct
         Array {
           array_cell_type = a.array_cell_type;
           array_value = write f ~weak old offset';
-          array_range = Int_val.join a.array_range index;
+          array_range;
           array_padding = a.array_padding;
         }
       | _ ->
