@@ -401,7 +401,7 @@ struct
 
   let is_included =
     let rec is_included m1 m2 = match m1, m2 with
-      | Raw _, _ | _, Raw _ -> Bit.is_included (raw m1) (raw m2)
+      | _, Raw r -> Bit.is_included (raw m1) r
       | Scalar s1, Scalar s2 ->
         are_scalar_compatible s1 s2 &&
         Value.(is_included s1.scalar_value s2.scalar_value)
@@ -424,6 +424,7 @@ struct
         are_union_compatible u1 u2 &&
         Bit.is_included u1.union_padding u2.union_padding &&
         is_included u1.union_value u2.union_value
+      | Raw _, (Scalar _ | Array _ | Struct _ | Union _)
       | Scalar _, (Array _ | Struct _ | Union _)
       | Array _, (Scalar _ | Struct _ | Union _)
       | Struct _, (Scalar _ | Array _ | Union _)
