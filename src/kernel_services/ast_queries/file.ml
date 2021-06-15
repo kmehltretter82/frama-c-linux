@@ -1664,7 +1664,10 @@ let print_all_sources out all_sources_tbl =
           `Assoc (List.map (fun (f, hash) -> f, `String hash) sorted_elems)
          )]
     in
-    Json.merge_object out json
+    try Json.merge_object out json
+    with Json.CannotMerge _ ->
+      Kernel.failure "%s: error when writing json file %a."
+        Kernel.AuditPrepare.option_name Filepath.Normalized.pretty out
   end
 
 let compute_sources_table cpp_commands =
@@ -1752,6 +1755,21 @@ let print_and_exit cpp_commands =
   List.iter (fun (_f, ocmd) -> Option.iter print_cpp_cmd ocmd) cpp_commands;
   raise Cmdline.Exit
 
+let prepare_audit () =
+  let audit_path = Kernel.AuditPrepare.get () in
+  if not (Filepath.Normalized.is_empty audit_path) then
+    let files = Files.get () in (* Allow pre-registration of prologue files *)
+    let cpp_commands = List.map (fun f -> (f, build_cpp_cmd f)) files in
+    let all_sources_tbl = compute_sources_table cpp_commands in
+    print_all_sources audit_path all_sources_tbl;
+    (* This is normally done by another hook at normal exit, but it is done
+       before our hook, so we need to redo it. *)
+    if not (Filepath.Normalized.is_special_stdout audit_path) then
+      Kernel.feedback "Audit: sources list written to: %a@."
+        Filepath.Normalized.pretty audit_path
+
+let () = Cmdline.at_normal_exit prepare_audit
+
 let prepare_from_c_files () =
   init_cil ();
   let files = Files.get () in (* Allow pre-registration of prolog files *)
@@ -1762,14 +1780,6 @@ let prepare_from_c_files () =
     let all_sources_tbl = compute_sources_table cpp_commands in
     let expected_hashes = source_hashes_of_json audit_check_path in
     check_source_hashes expected_hashes all_sources_tbl
-  end;
-  let audit_path = Kernel.AuditPrepare.get () in
-  if not (Filepath.Normalized.is_empty audit_path) then begin
-    let all_sources_tbl = compute_sources_table cpp_commands in
-    print_all_sources audit_path all_sources_tbl;
-    if not (Filepath.Normalized.is_special_stdout audit_path) then
-      Kernel.feedback "Audit: sources list written to: %a@."
-        Filepath.Normalized.pretty audit_path;
   end;
   let cil, cabs_files = files_to_cabs_cil files cpp_commands in
   prepare_cil_file cil;

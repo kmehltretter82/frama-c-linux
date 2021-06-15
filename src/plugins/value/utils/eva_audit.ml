@@ -145,6 +145,19 @@ let check_configuration path =
       Filepath.Normalized.pretty path msg
 
 let print_configuration path =
-  print_correctness_parameters path;
-  print_warning_status path "Kernel" (module Kernel);
-  print_warning_status path "Eva" (module Value_parameters)
+  try
+    print_correctness_parameters path;
+    print_warning_status path "Kernel" (module Kernel);
+    print_warning_status path "Eva" (module Value_parameters);
+    if not (Filepath.Normalized.is_special_stdout path) then
+      Value_parameters.feedback "Audit: eva configuration written to: %a"
+        Filepath.Normalized.pretty path;
+  with Json.CannotMerge _ ->
+    Kernel.failure "%s: error when writing json file %a."
+      Kernel.AuditPrepare.option_name Filepath.Normalized.pretty path
+
+let prepare_audit () =
+  if not (Kernel.AuditPrepare.is_empty ()) then
+    print_configuration (Kernel.AuditPrepare.get ())
+
+let () = Cmdline.at_normal_exit prepare_audit

@@ -175,7 +175,12 @@ let flush_json_files () =
       Kernel.feedback "Wrote: %a" Filepath.Normalized.pretty fp)
     written
 
-let () = Cmdline.at_normal_exit (fun () -> flush_json_files ())
+(* Registers an exit hook that flushes Json objects and writes JSON files. This
+   hook must be run last (in case other hooks modifiy JSON objects), so it is
+   registered after the extended stage, when plug-ins have been loaded. *)
+let () =
+  Cmdline.run_after_extended_stage
+    (fun () -> Cmdline.at_normal_exit (fun () -> flush_json_files ()))
 
 let run_list_all_plugin_options () =
   if not (Kernel.AutocompleteHelp.is_empty ()) then begin
