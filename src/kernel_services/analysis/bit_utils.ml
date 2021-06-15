@@ -462,24 +462,24 @@ type offset_match =
   | MatchFirst
 
 (* Comparison of the shape of two types.  Attributes are completely ignored. *)
-let rec equal_type_no_attribute t1 t2 =
+let rec type_compatible t1 t2 =
   match Cil.unrollType t1, Cil.unrollType t2 with
   | TVoid _, TVoid _ -> true
   | TInt (i1, _), TInt (i2, _) -> i1 = i2
   | TFloat (f1, _), TFloat (f2, _) -> f1 = f2
-  | TPtr (t1, _), TPtr (t2, _) -> equal_type_no_attribute t1 t2
+  | TPtr (t1, _), TPtr (t2, _) -> type_compatible t1 t2
   | TArray (t1', s1, _, _), TArray (t2', s2, _, _) ->
-    equal_type_no_attribute t1' t2' &&
+    type_compatible t1' t2' &&
     (s1 == s2 || try Integer.equal (Cil.lenOfArray64 s1) (Cil.lenOfArray64 s2)
      with Cil.LenOfArray -> false)
   | TFun (r1, a1, v1, _), TFun (r2, a2, v2, _) ->
-    v1 = v2 && equal_type_no_attribute r1 r2 &&
+    v1 = v2 && type_compatible r1 r2 &&
     (match a1, a2 with
      | None, _ | _, None -> true
      | Some l1, Some l2 ->
        try
          List.for_all2
-           (fun (_, t1, _) (_, t2, _) -> equal_type_no_attribute t1 t2) l1 l2
+           (fun (_, t1, _) (_, t2, _) -> type_compatible t1 t2) l1 l2
        with Invalid_argument _ -> false)
   | TNamed _, TNamed _ -> assert false
   | TComp (c1, _, _), TComp (c2, _, _) -> c1.ckey = c2.ckey
@@ -495,7 +495,7 @@ let offset_matches om typ =
   match om with
   | MatchFirst -> true
   | MatchSize size -> Integer.equal size (Integer.of_int (Cil.bitsSizeOf typ))
-  | MatchType typ' -> equal_type_no_attribute typ typ'
+  | MatchType typ' -> type_compatible typ typ'
 
 (* Can we match [om] inside a cell of an array whose elements have size
    [size_elt] *)

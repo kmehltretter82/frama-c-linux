@@ -172,6 +172,12 @@ module Config = struct
        to a statement."
       (module Traces_domain.D)
 
+  let multidim =
+    make 2 "multidim" ~experimental:true
+      "Improve the precision over arrays of structures or multidimensional \
+       arrays."
+      (module Multidim_domain)
+
   let printer =
     make 2 "printer"
       "Debug domain, only useful for developers. Prints the transfer functions \

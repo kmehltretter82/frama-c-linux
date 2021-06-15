@@ -159,6 +159,8 @@ val is_singleton_int : t -> bool
 
 exception Not_Singleton_Int
 
+val project_int_val : t -> Int_val.t option
+
 val project_int : t -> Integer.t
 (** @raise Not_Singleton_Int when the cardinal of the argument is not 1,
     or if it is not an integer. *)

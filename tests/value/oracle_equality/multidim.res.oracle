@@ -1,0 +1,17 @@
+76a77,78
+> [kernel] tests/value/multidim.c:56: 
+>   more than 0(20) elements to enumerate. Approximating.
+78a81,82
+> [kernel] tests/value/multidim.c:57: 
+>   more than 0(20) elements to enumerate. Approximating.
+80a85,86
+> [kernel] tests/value/multidim.c:56: 
+>   more than 0(28) elements to enumerate. Approximating.
+82a89,90
+> [kernel] tests/value/multidim.c:57: 
+>   more than 0(28) elements to enumerate. Approximating.
+125,128d132
+< [kernel] tests/value/multidim.c:56: 
+<   more than 0(28) elements to enumerate. Approximating.
+< [kernel] tests/value/multidim.c:57: 
+<   more than 0(28) elements to enumerate. Approximating.

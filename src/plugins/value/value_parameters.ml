@@ -137,7 +137,7 @@ module Domains =
       let option_name = "-eva-domains"
       let arg_name = "d1,...,dn"
       let help = "Enable a list of analysis domains."
-      let default = Datatype.String.Set.singleton "cvalue"
+      let default = Datatype.String.Set.of_list ["cvalue"]
     end)
 let () = add_precision_dep Domains.parameter
 
