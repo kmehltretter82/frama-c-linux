@@ -564,7 +564,8 @@ struct
       | _ -> load_loc ~assume:false sigma obj l
     end
 
-  let load_init _sigma _obj _loc = e_false
+  let load_init _sigma obj _loc =
+    e_var @@ Lang.freshvar ~basename:"i" @@ Lang.init_of_object obj
 
   (* -------------------------------------------------------------------------- *)
   (* ---  Memory Store                                                      --- *)
