@@ -193,6 +193,8 @@ struct
       Sigma.pretty s Ctypes.pretty obj pretty l (pp_value pretty) v;
     v
 
+  let load_init _s _obj _l = e_false
+
   let stored seq obj l t =
     let preds = M.stored seq obj l t in
     debug_access "@[stored %a@, %a@, %a@, %a ->@, %a@]@."
@@ -200,12 +202,16 @@ struct
       (Pretty_utils.pp_list pp_equation) preds;
     preds
 
+  let stored_init _seq _obj _l _v = []
+
   let copied seq obj ll rl =
     let preds = M.copied seq obj ll rl in
     debug_access "@[copied %a@, %a@, %a@, %a ->@, %a@]@."
       (pp_sequence Sigma.pretty) seq Ctypes.pretty obj pretty ll pretty rl
       (Pretty_utils.pp_list pp_equation) preds;
     preds
+
+  let copied_init _seq _obj _ll _rl = []
 
   let assigned seq obj sloc =
     let preds = M.assigned seq obj sloc in

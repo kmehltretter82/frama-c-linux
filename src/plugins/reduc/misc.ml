@@ -23,7 +23,7 @@ let validate_ip ip =
   Property_status.emit emitter ~hyps:[] ip Property_status.True
 
 let assert_and_validate ~kf stmt p =
-  let p =  { tp_only_check = false; tp_statement = p } in
+  let p =  { tp_kind = Assert ; tp_statement = p } in
   let annot = Logic_const.new_code_annotation (AAssert([], p)) in
   Annotations.add_code_annot emitter ~kf stmt annot ;
   List.iter

@@ -61,13 +61,14 @@ end
 let rec collect_off typ =
   match typ with
   | TInt _ | TFloat _ -> [ NoOffset ]
-  | TComp ({cfields = flds}, _, _) ->
+  | TComp ({cfields = Some flds}, _, _) ->
     List.fold_left collect_fields [] flds
   | TArray (arrtyp, e_opt, _, _) ->
     debug "Array of length %a" (Pretty_utils.pp_opt Printer.pp_exp) e_opt;
     begin try collect_array arrtyp [] (Cil.lenOfArray64 e_opt)
       with Cil.LenOfArray -> [] end
-  | TVoid _ | TFun _ | TPtr _ | TEnum _ | TNamed _ | TBuiltin_va_list _ -> []
+  | TVoid _ | TFun _ | TPtr _ | TEnum _ | TNamed _ | TBuiltin_va_list _
+  | TComp ({cfields = None}, _, _)-> []
 
 and collect_fields acc fld =
   let offs = collect_off fld.ftype in

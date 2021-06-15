@@ -31,8 +31,8 @@ let interval_to_predicate_opt ~loc te min max =
   Extlib.merge_opt
     (fun _ pmin pmax -> Logic_const.pand ~loc (pmin, pmax))
     ()
-    (Extlib.opt_map min_predicate min)
-    (Extlib.opt_map max_predicate max)
+    (Option.map min_predicate min)
+    (Option.map max_predicate max)
 
 (* [congruence_to_predicate_opt ~loc te rem modulo] may create a congruence
    predicate where [te] mod [modulo] equals [rem] *)
@@ -126,7 +126,7 @@ let base_offset_to_predicate ~loc t b o =
 let _base_offsets_to_predicate ~loc t (m: Cvalue.V.M.t) =
   let aux b o (acc: predicate list) =
     let p_opt = base_offset_to_predicate ~loc t b o in
-    (Extlib.list_of_opt p_opt) @ acc
+    (Option.to_list p_opt) @ acc
   in
   match Cvalue.V.M.fold aux m [] with
   | [] -> None

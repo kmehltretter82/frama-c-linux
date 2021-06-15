@@ -218,7 +218,7 @@ let configure () =
   if not (Db.Value.is_computed ()) then
     Warning.error ~source:"Value Model"
       "A previous Value analysis is needed by this memory model.";
-  let orig_pointer = Context.push Lang.pointer (fun _ -> t_addr) in
+  let orig_pointer = Context.push Lang.pointer t_addr in
   let rollback () =
     Context.pop Lang.pointer orig_pointer;
   in
@@ -309,7 +309,7 @@ module TermV = WpContext.Generator(Value)
         | [] -> ()
         | bs ->
           Definitions.define_lemma {
-              l_kind = `Axiom;
+              l_kind = Cil_types.Admit;
               l_name = name; l_types = 0; l_triggers = []; l_forall = [];
               l_lemma = lemma bs;
               l_cluster = cluster_dummy ();
@@ -573,6 +573,8 @@ let load sigma obj l = match load sigma obj l with
       Ctypes.pp_object obj pretty l pretty l';
     v
 
+let load_init _sgima _obj _l = e_false
+
 (* -------------------------------------------------------------------------- *)
 (* ---  Memory Store                                                      --- *)
 (* -------------------------------------------------------------------------- *)
@@ -605,9 +607,13 @@ let stored : sigma sequence -> c_object -> loc -> term -> equation list = fun se
   | C_pointer _ -> stored seq obj l e
   | _ -> not_yet_obj obj
 
+let stored_init _seq _obj _l _v = []
+
 let copied : sigma sequence -> c_object -> loc -> loc -> equation list = fun seq obj ll lr ->
   debug_flow "copied";
   stored seq obj ll (loadvalue seq.pre obj lr)
+
+let copied_init _seq _obj _ll _rl = []
 
 let assigned : sigma sequence -> c_object -> loc sloc -> equation list = fun _ _ _ ->
   debug_flow "assigned";

@@ -13,14 +13,14 @@ class hypotheses_visitor (env: Collect.env) = object(self)
   inherit Visitor.generic_frama_c_visitor (Visitor_behavior.inplace ())
 
   method! vstmt_aux stmt =
-    let kf = Extlib.the (self#current_kf) in
+    let kf = Option.get (self#current_kf) in
     let state = Db.Value.get_stmt_state stmt in
     if Collect.should_annotate_stmt env stmt then begin
       let vars = Collect.get_relevant_vars_stmt env kf stmt in
       List.iter
         (fun e ->
            let p_opt = pred_opt_from_expr_state state e in
-           Extlib.may (Misc.assert_and_validate ~kf stmt) p_opt)
+           Option.iter (Misc.assert_and_validate ~kf stmt) p_opt)
         vars
     end;
     Cil.DoChildren

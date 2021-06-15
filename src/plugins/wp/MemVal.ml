@@ -209,7 +209,7 @@ struct
   let datatype = "MemVal." ^ V.datatype
   let configure () =
     let rollback = V.configure () in
-    let orig_pointer = Context.push Lang.pointer (fun _typ -> t_addr) in
+    let orig_pointer = Context.push Lang.pointer t_addr in
     let rollback () =
       rollback ();
       Context.pop Lang.pointer orig_pointer;
@@ -384,7 +384,7 @@ struct
            *   F.set_builtin_2 f_rd (phi_read ~obj ~read:f_rd ~write:f_wr)
            * end; *)
           Definitions.define_lemma {
-            l_kind = `Axiom;
+            l_kind = Cil_types.Admit;
             l_name = name; l_types = 0;
             l_triggers = [];
             l_forall = [xw; xo; xv];
@@ -413,7 +413,7 @@ struct
           in
           let cluster = cluster () in
           Definitions.define_lemma {
-            l_kind = `Axiom;
+            l_kind = Cil_types.Admit;
             l_name = name; l_types = 0;
             l_triggers = [];
             l_forall = [xw; xwo; xro; xv];
@@ -564,6 +564,8 @@ struct
       | _ -> load_loc ~assume:false sigma obj l
     end
 
+  let load_init _sigma _obj _loc = e_false
+
   (* -------------------------------------------------------------------------- *)
   (* ---  Memory Store                                                      --- *)
   (* -------------------------------------------------------------------------- *)
@@ -587,12 +589,16 @@ struct
     in
     store [ ] (V.domain l.loc_v)
 
+  let stored_init _seq _obj _loc _t = []
+
   let copied seq obj ll lr =
     let v = match load seq.pre obj lr with
       | Sigs.Val v -> v
       | Sigs.Loc l -> l.loc_t
     in
     stored seq obj ll v
+
+  let copied_init _seq _obj _ll _lr = []
 
   let assigned _s _obj _sloc = [ Assert F.p_true ]
 
@@ -634,7 +640,7 @@ struct
       LOC (la, n)
     | Rrange (l, obj, a_opt, b_opt) ->
       let f = F.e_fact (Ctypes.sizeof_object obj) in
-      RANGE (l, Vset.range (Extlib.opt_map f a_opt) (Extlib.opt_map f b_opt))
+      RANGE (l, Vset.range (Option.map f a_opt) (Option.map f b_opt))
 
   (* -------------------------------------------------------------------------- *)
   (* ---  Validity                                                          --- *)
