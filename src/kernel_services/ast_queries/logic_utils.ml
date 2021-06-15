@@ -275,7 +275,15 @@ let constant_to_lconstant c = match c with
     LReal (real_of_float s f)
 
 let lconstant_to_constant c = match c with
-  | Integer (i,s) -> CInt64(i,Cil.intKindForValue i false,s)
+  | Integer (i,s) ->
+    begin
+      try
+        CInt64(i,Cil.intKindForValue i false,s)
+      with Cil.Not_representable ->
+        Kernel.fatal
+          "Cannot represent logical integer in C: %a"
+          (Integer.pretty ~hexa:false) i
+    end
   | LStr s -> CStr s
   | LWStr s -> CWStr s
   | LChr s -> CChr s

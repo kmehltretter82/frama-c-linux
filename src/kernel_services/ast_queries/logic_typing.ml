@@ -880,7 +880,11 @@ struct
       let tokens = explode content in
       let value,_= Cil.interpret_character_constant tokens in
       term ~loc (TConst (constant_to_lconstant value)) Linteger
-    | _ -> Cil.parseIntLogic ~loc s
+    | _ ->
+      try
+        Cil.parseIntLogic ~loc s
+      with Cil.ParseIntError msg ->
+        Kernel.fatal ~source:(fst loc) "%s" msg
 
   let find_logic_label loc env l =
     try Lenv.find_logic_label l env

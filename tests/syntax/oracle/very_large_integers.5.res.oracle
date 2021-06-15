@@ -1,9 +1,9 @@
 [kernel] Parsing tests/syntax/very_large_integers.c (with preprocessing)
-[kernel] tests/syntax/very_large_integers.c:44: User Error: 
+[kernel] tests/syntax/very_large_integers.c:48: User Error: 
   integer constant too large in expression -9999999999999999999U
-[kernel] tests/syntax/very_large_integers.c:44: User Error: 
+[kernel] tests/syntax/very_large_integers.c:48: User Error: 
   integer constant too large in expression 9999999999999999999U
-[kernel] tests/syntax/very_large_integers.c:44: Failure: 
+[kernel] tests/syntax/very_large_integers.c:48: Failure: 
   INDEX_RANGE initialization designator is not a valid constant
 [kernel] User Error: stopping on file "tests/syntax/very_large_integers.c" that has errors. Add
   '-kernel-msg-key pp' for preprocessing command.

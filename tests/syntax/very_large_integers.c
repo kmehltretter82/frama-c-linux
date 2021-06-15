@@ -8,10 +8,13 @@
    STDOPT: #"-cpp-extra-args=-DINIT_DESIGNATOR2"
    STDOPT: #"-cpp-extra-args=-DRANGE_DESIGNATOR"
    STDOPT: #"-cpp-extra-args=-DATTRIBUTE_CONSTANT"
+   STDOPT: #"-cpp-extra-args=-DLOGIC_CONSTANT"
+   STDOPT: #"-cpp-extra-args=-DLOGIC_CONSTANT_OCTAL"
    STDOPT: #"-cpp-extra-args=-DEVA_UNROLL -eva"
    EXIT: 0
    STDOPT: #"-cpp-extra-args=-DUNROLL_PRAGMA"
 */
+
 volatile int nondet;
 
 #ifdef BITFIELD
@@ -24,6 +27,7 @@ struct st {
 int arr[9999999999999999999U+18000000000000000000U];
 char arr1[99999999999999999999U];
 #endif
+
 #ifdef CASE_RANGE
 unsigned long nondetul;
 void case_range() {
@@ -57,6 +61,14 @@ typedef struct {
 } stt ;
 
 //@ logic integer too_large_integer = 9999999999999999999;
+
+#ifdef LOGIC_CONSTANT
+//@ type too_large_logic_array = int[9999999999999999999U];
+#endif
+
+#ifdef LOGIC_CONSTANT_OCTAL
+//@ type too_large_logic_array_octal = int[09876543210];
+#endif
 
 int main() {
 #ifdef EVA_UNROLL
