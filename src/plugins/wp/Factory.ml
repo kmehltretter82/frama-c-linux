@@ -24,7 +24,7 @@
 (* --- Model Factory                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
-type mheap = Hoare | ZeroAlias | Region | Typed of MemTyped.pointer | Eva1 | Eva2
+type mheap = Hoare | ZeroAlias | Region | Typed of MemTyped.pointer | Eva
 type mvar = Raw | Var | Ref | Caveat
 
 type setup = {
@@ -68,8 +68,7 @@ let descr_mheap d = function
   | ZeroAlias -> main d "zeroalias"
   | Hoare -> main d "hoare"
   | Typed p -> main d "typed" ; descr_mtyped d p
-  | Eva1 -> main d "eva1"
-  | Eva2 -> main d "eva2"
+  | Eva -> main d "eva"
 
 let descr_mvar d = function
   | Var -> ()
@@ -257,7 +256,6 @@ module Comp_MemTyped = MakeCompiler(MemTyped)
 module Comp_Typed_Var = MakeCompiler(Model_Typed_Var)
 module Comp_Typed_Ref = MakeCompiler(Model_Typed_Ref)
 module Comp_Caveat = MakeCompiler(Model_Caveat)
-module Comp_MemValue = MakeCompiler(MemValue)
 module Comp_MemVal = MakeCompiler(MemVal)
 
 
@@ -271,8 +269,7 @@ let compiler mheap mvar : (module Sigs.Compiler) =
   | Typed _ , Raw     -> (module Comp_MemTyped)
   | Typed _ , Var     -> (module Comp_Typed_Var)
   | Typed _ , Ref     -> (module Comp_Typed_Ref)
-  | Eva1, _           -> (module Comp_MemVal)
-  | Eva2, _           -> (module Comp_MemValue)
+  | Eva, _            -> (module Comp_MemVal)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Tuning                                                             --- *)
@@ -282,8 +279,7 @@ let configure_mheap = function
   | Hoare -> MemEmpty.configure ()
   | ZeroAlias -> MemZeroAlias.configure ()
   | Region -> MemRegion.configure ()
-  | Eva1 -> MemVal.configure ()
-  | Eva2 -> MemValue.configure ()
+  | Eva -> MemVal.configure ()
   | Typed p ->
       let rollback_memtyped = MemTyped.configure () in
       let orig_memtyped_pointer = Context.push MemTyped.pointer p in
@@ -368,9 +364,8 @@ let update_config ~warning m s = function
   | "TYPED" -> { s with mheap = Typed MemTyped.Fits }
   | "CAST" -> { s with mheap = Typed MemTyped.Unsafe }
   | "NOCAST" -> { s with mheap = Typed MemTyped.NoCast }
-  | "EVA1" -> { s with mheap = Eva1 }
+  | "EVA" -> { s with mheap = Eva }
   | "CAVEAT" -> { s with mvar = Caveat }
-  | "EVA2" -> { s with mheap = Eva2 }
   | "RAW" -> { s with mvar = Raw }
   | "REF" -> { s with mvar = Ref }
   | "VAR" -> { s with mvar = Var }

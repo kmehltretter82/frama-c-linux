@@ -205,7 +205,8 @@ module Model =
                   * '+raw' no logic variable\n\
                   * '+ref' by-reference-style pointers detection\n\
                   * '+nat/+int' natural / machine-integers arithmetics\n\
-                  * '+real/+float' real / IEEE floating point arithmetics"
+                  * '+real/+float' real / IEEE floating point arithmetics\n\
+                  * 'Eva' (experimental) based on the results from Eva plugin"
     end)
 
 let () = Parameter_customize.set_group wp_model

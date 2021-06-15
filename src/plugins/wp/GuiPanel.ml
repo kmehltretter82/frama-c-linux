@@ -128,7 +128,7 @@ let run_and_prove
 (* ---  Model Panel                                                     --- *)
 (* ------------------------------------------------------------------------ *)
 
-type memory = TREE | HOARE | TYPED | REGION | EVA1 | EVA2
+type memory = TREE | HOARE | TYPED | REGION | EVA
 
 class model_selector (main : Design.main_window_extension_points) =
   let dialog = new Wpane.dialog
@@ -136,8 +136,7 @@ class model_selector (main : Design.main_window_extension_points) =
   let memory = new Widget.group HOARE in
   let r_hoare  = memory#add_radio ~label:"Hoare Memory Model" ~value:HOARE () in
   let r_typed  = memory#add_radio ~label:"Typed Memory Model" ~value:TYPED () in
-  let r_eva1  = memory#add_radio ~label:"Eva Memory Model 1" ~value:EVA1 () in
-  let r_eva2  = memory#add_radio ~label:"Eva Memory Model 2" ~value:EVA2 () in
+  let r_eva    = memory#add_radio ~label:"Eva Memory Model" ~value:EVA () in
   let c_casts  = new Widget.checkbox ~label:"Unsafe casts" () in
   let c_byref  = new Widget.checkbox ~label:"Reference Arguments" () in
   let c_ctxt   = new Widget.checkbox ~label:"Context Arguments (Caveat)" () in
@@ -150,8 +149,7 @@ class model_selector (main : Design.main_window_extension_points) =
       begin
         dialog#add_row r_hoare#coerce ;
         dialog#add_row r_typed#coerce ;
-        dialog#add_row r_eva1#coerce ;
-        dialog#add_row r_eva2#coerce ;
+        dialog#add_row r_eva#coerce ;
         dialog#add_row c_casts#coerce ;
         dialog#add_row c_byref#coerce ;
         dialog#add_row c_ctxt#coerce ;
@@ -179,8 +177,7 @@ class model_selector (main : Design.main_window_extension_points) =
          | Region -> memory#set REGION
          | Hoare -> memory#set HOARE
          | Typed m -> memory#set TYPED ; c_casts#set (m = MemTyped.Unsafe)
-         | Eva1 -> memory#set EVA1
-         | Eva2 -> memory#set EVA2
+         | Eva -> memory#set EVA
         ) ;
         c_byref#set (s.mvar = Ref) ;
         c_ctxt#set (s.mvar = Caveat) ;
@@ -195,8 +192,7 @@ class model_selector (main : Design.main_window_extension_points) =
         | HOARE -> Hoare
         | TYPED -> Typed
                      (if c_casts#get then MemTyped.Unsafe else MemTyped.Fits)
-        | EVA1 -> Eva1
-        | EVA2 -> Eva2
+        | EVA -> Eva
       in {
         mheap = m ;
         mvar = if c_ctxt#get then Caveat else if c_byref#get then Ref else Var ;
