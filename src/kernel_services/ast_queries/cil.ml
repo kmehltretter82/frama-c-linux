@@ -3240,11 +3240,12 @@ let parseIntAux (str:string) =
     let doAcc what =
       if Integer.ge what base
       then
-        Kernel.fatal ~current:true
-          "Invalid digit %a in integer constant '%s' in base %a."
-          (Integer.pretty ~hexa:false) what
-          str
-          (Integer.pretty ~hexa:false) base;
+        raise (ParseIntError
+                 (Format.asprintf
+                    "Invalid digit %a in integer literal '%s' in base %a."
+                    (Integer.pretty ~hexa:false) what
+                    str
+                    (Integer.pretty ~hexa:false) base));
       let acc' =
         Integer.add what (Integer.mul base acc) in
       toInt base acc' (idx + 1)
@@ -3261,7 +3262,8 @@ let parseIntAux (str:string) =
         doAcc (Integer.of_int (10 + Char.code ch - Char.code 'A'))
       else
         raise (ParseIntError
-                 (Format.asprintf "Invalid integer constant: %s" str))
+                 (Format.asprintf
+                    "Invalid character %c in integer literal: %s" ch str))
   in
   let i =
     if octalhexbin && l >= 2 then
@@ -3278,45 +3280,37 @@ let parseIntAux (str:string) =
   i,kinds
 
 let parseInt s =
-  try
-    fst (parseIntAux s)
-  with ParseIntError msg ->
-    Kernel.fatal ~current:true "%s" msg
+  fst (parseIntAux s)
+
+let parseInt_opt str =
+  try Some (parseInt str)
+  with ParseIntError _ -> None
 
 let parseIntLogic ~loc str =
-  try
-    let i,_= parseIntAux str in
-    { term_node = TConst (Integer (i,Some str)) ; term_loc = loc;
-      term_name = []; term_type = Linteger;}
-  with ParseIntError msg ->
-    Kernel.fatal ~current:true "%s" msg
+  let i,_= parseIntAux str in
+  { term_node = TConst (Integer (i,Some str)) ; term_loc = loc;
+    term_name = []; term_type = Linteger;}
+
+let parseIntLogic_opt ~loc str =
+  try Some (parseIntLogic ~loc str)
+  with ParseIntError _ -> None
 
 let parseIntExp ~loc repr =
-  try
-    let i,kinds = parseIntAux repr in
-    let rec loop = function
-      | k::rest ->
-        if fitsInInt k i then (* i fits in the current type. *)
-          kinteger64 ~loc ~repr ~kind:k i
-        else loop rest
-      | [] ->
-        Kernel.fatal ~source:(fst loc) "Cannot represent the integer %s" repr
-    in
-    loop kinds
-  with ParseIntError msg ->
-    Kernel.fatal ~current:true "%s" msg
+  let i,kinds = parseIntAux repr in
+  let rec loop = function
+    | k::rest ->
+      if fitsInInt k i then (* i fits in the current type. *)
+        kinteger64 ~loc ~repr ~kind:k i
+      else loop rest
+    | [] ->
+      raise (ParseIntError
+               (Format.asprintf "Cannot represent the integer %s" repr))
+  in
+  loop kinds
 
 let parseIntExp_opt ~loc repr =
   try
-    let i,kinds = parseIntAux repr in
-    let rec loop = function
-      | k::rest ->
-        if fitsInInt k i then (* i fits in the current type. *)
-          Some (kinteger64 ~loc ~repr ~kind:k i)
-        else loop rest
-      | [] -> None
-    in
-    loop kinds
+    Some (parseIntExp loc repr)
   with ParseIntError _ -> None
 
 let mkStmtCfg ~before ~(new_stmtkind:stmtkind) ~(ref_stmt:stmt) : stmt =
@@ -4129,13 +4123,9 @@ and alignOfField (fi: fieldinfo) =
 and intOfAttrparam (a:attrparam) : int option =
   let rec doit a : int =
     match a with
-    |  AInt(n) ->
-      begin
-        match Integer.to_int_opt n with
-        | Some n' -> n'
-        | None ->
-          raise (SizeOfError ("Overflow in integer attribute.", voidType))
-      end
+    | AInt(n) ->
+      Extlib.the ~exn:(SizeOfError ("Overflow in integer attribute.", voidType))
+        (Integer.to_int_opt n)
     | ABinOp(PlusA, a1, a2) -> doit a1 + doit a2
     | ABinOp(MinusA, a1, a2) -> doit a1 - doit a2
     | ABinOp(Mult, a1, a2) -> doit a1 * doit a2

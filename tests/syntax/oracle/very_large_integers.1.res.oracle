@@ -1,8 +1,8 @@
 [kernel] Parsing tests/syntax/very_large_integers.c (with preprocessing)
 [kernel] tests/syntax/very_large_integers.c:25: User Error: 
-  invalid integer constant: 99999999999999999999U
+  Cannot represent the integer 99999999999999999999U
 [kernel] tests/syntax/very_large_integers.c:25: User Error: 
-  invalid integer constant: 99999999999999999999U
+  Cannot represent the integer 99999999999999999999U
 [kernel] tests/syntax/very_large_integers.c:53: Warning: 
   ignoring invalid aligned attribute: __aligned__(9223372036854775808)
 [kernel] tests/syntax/very_large_integers.c:53: Warning: 

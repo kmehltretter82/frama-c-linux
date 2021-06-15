@@ -5310,7 +5310,7 @@ and doType (ghost:bool) isFuncArg
                 Attr("arraylen", [ la ]) :: static
               with NotAnAttrParam _ -> begin
                   Kernel.warning ~once:true ~current:true
-                    "Cannot represent the length '%a'of array as an attribute"
+                    "Cannot represent the length '%a' of array as an attribute"
                     Cil_printer.pp_exp l
                   ;
                   static (* Leave unchanged *)
@@ -5999,7 +5999,14 @@ and doExp local_env
     | Cabs.CONSTANT ct -> begin
         match ct with
         | Cabs.CONST_INT str -> begin
-            let res = parseIntExp ~loc str in
+            let res =
+              try parseIntExp ~loc str
+              with Cil.ParseIntError msg ->
+                Kernel.error ~current:true "%s" msg;
+                (* assign an arbitrary expression,
+                   since we must return something *)
+                Cil.one ~loc
+            in
             finishExp [] (unspecified_chunk empty) res (typeOf res)
           end
 

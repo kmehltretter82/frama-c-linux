@@ -1036,20 +1036,47 @@ val typeOf_array_elem : typ -> typ
 val is_fully_arithmetic: typ -> bool
 (** Returns [true] whenever the type contains only arithmetic types *)
 
-(** Convert a string representing a C integer literal to an expression.
+(** Exception raised by several parseInt* functions.
+    @since Frama-C+dev
+*)
+exception ParseIntError of string
+
+(** Convert a string representing a C integer literal to an Integer.
     Handles the prefixes 0x and 0 and the suffixes L, U, UL, LL, ULL.
+    @raise ParseIntError if there is an error parsing the string
+           (e.g. invalid characters).
+    @modify Frama-C+dev now raises ParseIntError.
 *)
 val parseInt: string -> Integer.t
+
+(** Like [parseInt], but returns [None] in case of failure.
+    @since Frama-C+dev
+*)
+val parseInt_opt: string -> Integer.t option
+
+(** Like [parseInt], but converts to an expression.
+    @raise ParseIntError if the string cannot be converted
+           (e.g., too large, or contains invalid characters).
+    @modify Frama-C+dev now raises ParseIntError.
+*)
 val parseIntExp: loc:location -> string -> exp
-val parseIntLogic: loc:location -> string -> term
 
 (** Like [parseIntExp], but returns [None] in case of failure.
     @since Frama-C+dev
 *)
 val parseIntExp_opt: loc:location -> string -> exp option
 
-(** Convert a string representing a C integer literal to an expression.
-    Handles the prefixes 0x and 0 and the suffixes L, U, UL, LL, ULL *)
+(** Like [parseInt], but converts to a logic term.
+    @raise ParseIntError if there is an error parsing the string
+           (e.g. invalid characters).
+    @modify Frama-C+dev now raises ParseIntError.
+*)
+val parseIntLogic: loc:location -> string -> term
+
+(** Like [parseIntLogic], but returns [None] in case of failure.
+    @since Frama-C+dev
+*)
+val parseIntLogic_opt: loc:location -> string -> term option
 
 val appears_in_expr: varinfo -> exp -> bool
 (** @return true if the given variable appears in the expression. *)
