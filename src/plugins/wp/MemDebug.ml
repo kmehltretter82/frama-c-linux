@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2017                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -48,18 +48,18 @@ let pp_value pp_loc fmt = function
 let pp_rloc pp_loc fmt = function
   | Rloc(_obj,l) -> Format.fprintf fmt "[@{%a}@]" pp_loc l
   | Rrange(l,_obj,tmin,tmax) ->
-    Format.fprintf fmt "@[%a+(%a..%a)@]" pp_loc l
-      (Pretty_utils.pp_opt pp_term) tmin (Pretty_utils.pp_opt pp_term) tmax
+      Format.fprintf fmt "@[%a+(%a..%a)@]" pp_loc l
+        (Pretty_utils.pp_opt pp_term) tmin (Pretty_utils.pp_opt pp_term) tmax
 
 let pp_sloc pp_loc fmt = function
   | Sloc l -> Format.fprintf fmt "@[{%a}@]" pp_loc l
   | Sarray(l,_obj,size) -> Format.fprintf fmt "@[%a+(0..%d)@]" pp_loc l size
   | Srange(l,_obj,tmin,tmax) ->
-    Format.fprintf fmt "@[%a+(%a..%a)@]" pp_loc l
-      (Pretty_utils.pp_opt pp_term) tmin (Pretty_utils.pp_opt pp_term) tmax
+      Format.fprintf fmt "@[%a+(%a..%a)@]" pp_loc l
+        (Pretty_utils.pp_opt pp_term) tmin (Pretty_utils.pp_opt pp_term) tmax
   | Sdescr(xs,l,p) ->
-    Format.fprintf fmt "@[{ %a @,| %a@,; %a }@]" pp_loc l
-      (Pretty_utils.pp_list pp_var) xs pp_pred p
+      Format.fprintf fmt "@[{ %a @,| %a@,; %a }@]" pp_loc l
+        (Pretty_utils.pp_list pp_var) xs pp_pred p
 
 (* ------------------------------------------------------------------------ *)
 (* ---- Debug Memory Model                                             ---- *)
