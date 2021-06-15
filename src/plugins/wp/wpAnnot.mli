@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,54 +20,24 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cil_types
+
 (** Every access to annotations have to go through here,
   * so this is the place where we decide what the computation
   * is allowed to use. *)
 
-open Cil_types
+(* ########################################################################## *)
+(* ###      WARNING:  DEPRECATED API                                      ### *)
+(* ########################################################################## *)
 
 (*----------------------------------------------------------------------------*)
 
-(** A proof accumulator for a set of related prop_id *)
-type proof
-
-val create_proof : WpPropId.prop_id -> proof
-(** to be used only once for one of the related prop_id *)
-
-val add_proof : proof -> WpPropId.prop_id -> Property.t list -> unit
-(** accumulate in the proof the partial proof for this prop_id *)
-
-val add_invalid_proof : proof -> unit
-(** add an invalid proof result ; can not revert a complete proof *)
-
-val is_composed : proof -> bool
-(** whether a proof needs several lemma to be complete *)
-
-val is_proved : proof -> bool
-(** whether all partial proofs have been accumulated or not *)
-
-val is_invalid : proof -> bool
-(** whether an invalid proof result has been registered or not *)
-
-val target : proof -> Property.t
-val dependencies : proof -> Property.t list
-
-val filter_status : WpPropId.prop_id -> bool
-
-(*----------------------------------------------------------------------------*)
-
-val get_called_preconditions_at : kernel_function -> stmt -> Property.t list
-val get_called_post_conditions : kernel_function -> Property.t list
-val get_called_exit_conditions : kernel_function -> Property.t list
-val get_called_assigns : kernel_function -> Property.t list
-
-(*----------------------------------------------------------------------------*)
+val unreachable_proved : int ref
+val unreachable_failed : int ref
+val set_unreachable : WpPropId.prop_id -> unit
+val set_trivially_terminates : WpPropId.prop_id -> unit
 
 type asked_assigns = NoAssigns | OnlyAssigns | WithAssigns
-
-val get_id_prop_strategies :
-  model:WpContext.model ->
-  ?assigns:asked_assigns -> Property.t -> WpStrategy.strategy list
 
 val get_call_pre_strategies :
   model:WpContext.model ->
@@ -79,5 +49,8 @@ val get_function_strategies :
   ?bhv:string list ->
   ?prop:string list ->
   Kernel_function.t -> WpStrategy.strategy list
+
+val get_property_strategies :
+  model:WpContext.model -> Property.t -> WpStrategy.strategy list
 
 (*----------------------------------------------------------------------------*)

@@ -7,14 +7,7 @@
 int A[] = { 1, 2, 3, 4};
 int *PA;
 
-struct Zero { } ZERO;
-
 int main(void) {
-  /* Zero-sized blocks */
-  struct Zero zero;
-  /*@ assert \block_length(&ZERO) == 0; */
-  /*@ assert \block_length(&zero) == 0; */
-
   /* Global memory */
   PA = (int*)&A;
   /*@ assert \block_length(&A[0]) == sizeof(A); */

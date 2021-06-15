@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -30,16 +30,16 @@ type wto = stmt Wto.partition
 (* ********************************************************************** *)
 
 module Scheduler = Wto.Make
-  (struct
-    include Cil_datatype.Stmt
-    let pretty fmt s = Format.pp_print_int fmt s.sid
-  end)
+    (struct
+      include Cil_datatype.Stmt
+      let pretty fmt s = Format.pp_print_int fmt s.sid
+    end)
 
 let build_wto kf =
   let init = Kernel_function.find_first_stmt kf
   and succs = fun stmt -> List.rev stmt.succs
   in
-  Scheduler.partition ?pref:None ~init ~succs
+  Scheduler.partition ~pref:(fun _ _ -> 0) ~init ~succs
 
 
 (* ********************************************************************** *)
@@ -50,13 +50,13 @@ let build_wto kf =
 module WTO =
   Datatype.Make
     (struct
-       include Datatype.Serializable_undefined
-       type t = wto
-       let name = "Wto_statement.WTO"
-       let pretty = Scheduler.pretty_partition
-       let copy w = w
-       let reprs = [List.map (fun s -> Wto.Node s) Cil_datatype.Stmt.reprs]
-     end)
+      include Datatype.Serializable_undefined
+      type t = wto
+      let name = "Wto_statement.WTO"
+      let pretty = Scheduler.pretty_partition
+      let copy w = w
+      let reprs = [List.map (fun s -> Wto.Node s) Cil_datatype.Stmt.reprs]
+    end)
 
 module WTOState =
   Kernel_function.Make_Table
@@ -65,7 +65,7 @@ module WTOState =
       let size = 97
       let name = "Wto_statement.WTOState"
       let dependencies = [Ast.self]
-     end)
+    end)
 
 (** Returns the wto of a kernel function *)
 let wto_of_kf = WTOState.memo build_wto;;
@@ -88,7 +88,7 @@ module WTOIndex =
         Pretty_utils.pp_list ~sep:","
           (fun fmt stmt -> Format.pp_print_int fmt stmt.sid)
       let copy w = w
-     end)
+    end)
 
 module StmtTable = Cil_datatype.Stmt.Hashtbl
 
@@ -99,7 +99,7 @@ module WTOIndexState =
       let size = 97
       let name = "Wto_statement.WTOIndexState"
       let dependencies = [Ast.self]
-     end)
+    end)
 
 let build_wto_index_table kf =
   let table = StmtTable.create 17 in
@@ -115,7 +115,7 @@ let build_wto_index_table kf =
   iter_wto [] (wto_of_kf kf);
   table
 
-let get_wto_index_table = 
+let get_wto_index_table =
   WTOIndexState.memo build_wto_index_table
 
 let wto_index_of_stmt stmt =
@@ -140,4 +140,3 @@ let wto_index_diff index1 index2 =
 
 let wto_index_diff_of_stmt stmt1 stmt2 =
   wto_index_diff (wto_index_of_stmt stmt1) (wto_index_of_stmt stmt2)
-

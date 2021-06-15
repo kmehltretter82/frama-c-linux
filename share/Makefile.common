@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2020                                               #
+#  Copyright (C) 2007-2021                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -43,6 +43,7 @@ FRAMAC_SRC_DIRS= plugins/pdg_types plugins/value_types \
 	       kernel_services/ast_data \
 	       kernel_services/ast_queries \
 	       kernel_services/ast_printing \
+	       kernel_services/ast_building \
 	       kernel_services/cmdline_parameters \
 	       kernel_services/plugin_entry_points \
 	       kernel_services/abstract_interp \

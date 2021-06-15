@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -31,7 +31,8 @@ let iter f e =
   Queue.add e q ;
   while not (Queue.is_empty q) do
     let e = Queue.pop q in
-    f e ; F.lc_iter (fun e -> Queue.push e q) e
+    if F.lc_closed e then f e ;
+    F.lc_iter (fun e -> Queue.push e q) e
   done
 
 let once f e =
@@ -42,7 +43,8 @@ let once f e =
   Queue.add e q ;
   while not (Queue.is_empty q) do
     let e = Queue.pop q in
-    f e ; F.lc_iter (fun e -> if once m e then Queue.push e q) e
+    if F.lc_closed e then f e ;
+    F.lc_iter (fun e -> if once m e then Queue.push e q) e
   done
 
 (* -------------------------------------------------------------------------- *)
@@ -151,3 +153,5 @@ let lookup ~occur ~inside =
       ) inside ;
     raise Not_found
   with Found e -> e
+
+(* -------------------------------------------------------------------------- *)

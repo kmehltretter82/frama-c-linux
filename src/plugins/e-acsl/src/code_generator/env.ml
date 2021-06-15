@@ -54,6 +54,11 @@ type local_env = {
   rte: bool
 }
 
+type loop_env = {
+  variant: (term * logic_info option) option;
+  invariants: toplevel_predicate list;
+}
+
 type t = {
   lscope: Lscope.t;
   lscope_reset: bool;
@@ -67,8 +72,8 @@ type t = {
   (* Stack of contracts for active functions and statements *)
   var_mapping: Varinfo.t Stack.t Logic_var.Map.t;
   (* records of C bindings for logic vars *)
-  loop_invariants: predicate list list;
-  (* list of loop invariants for each currently visited loops *)
+  loop_envs: loop_env list;
+  (* list of loop environment for each currently visited loops *)
   cpt: int;
   (* counter used when generating variables *)
 }
@@ -88,6 +93,9 @@ let empty_local_env =
     mp_tbl = empty_mp_tbl;
     rte = true }
 
+let empty_loop_env =
+  { variant = None;
+    invariants = [] }
 let empty =
   { lscope = Lscope.empty;
     lscope_reset = true;
@@ -97,7 +105,7 @@ let empty =
     env_stack = [];
     contract_stack = [];
     var_mapping = Logic_var.Map.empty;
-    loop_invariants = [];
+    loop_envs = [];
     cpt = 0 }
 
 let top env = match env.env_stack with
@@ -113,15 +121,36 @@ let has_no_new_stmt env =
 (* ************************************************************************** *)
 
 let push_loop env =
-  { env with loop_invariants = [] :: env.loop_invariants }
+  { env with loop_envs = empty_loop_env :: env.loop_envs }
 
-let add_loop_invariant env inv = match env.loop_invariants with
+let top_loop_env env =
+  match env.loop_envs with
   | [] -> assert false
-  | invs :: tl -> { env with loop_invariants = (inv :: invs) :: tl }
+  | loop_env :: tl -> loop_env, tl
 
-let pop_loop env = match env.loop_invariants with
+let set_loop_variant ?measure env t =
+  let loop_env, tl = top_loop_env env in
+  let loop_env = { loop_env with variant = Some (t, measure) } in
+  { env with loop_envs = loop_env :: tl }
+
+let add_loop_invariant env inv =
+  match env.loop_envs with
   | [] -> assert false
-  | invs :: tl -> invs, { env with loop_invariants = tl }
+  | loop_env :: tl ->
+    let loop_env = { loop_env with invariants = inv :: loop_env.invariants} in
+    { env with loop_envs = loop_env :: tl }
+
+let top_loop_variant env =
+  let loop_env, _ = top_loop_env env in
+  loop_env.variant
+
+let top_loop_invariants env =
+  let loop_env, _ = top_loop_env env in
+  loop_env.invariants
+
+let pop_loop env =
+  let _, tl = top_loop_env env in
+  { env with loop_envs = tl }
 
 (* ************************************************************************** *)
 (** {2 RTEs} *)
@@ -134,6 +163,20 @@ let rte env b =
 let generate_rte env =
   let local_env, _ = top env in
   local_env.rte
+
+let with_rte ~f env rte_value =
+  let old_rte_value = generate_rte env in
+  let env = rte env rte_value in
+  let env = f env in
+  let env = rte env old_rte_value in
+  env
+
+let with_rte_and_result ~f env rte_value =
+  let old_rte_value = generate_rte env in
+  let env = rte env rte_value in
+  let other, env = f env in
+  let env = rte env old_rte_value in
+  other, env
 
 (* ************************************************************************** *)
 
@@ -201,9 +244,9 @@ let do_new_var ~loc ?(scope=Varname.Block) ?(name="") env kf t ty mk_stmts =
         env_stack = local_env :: tl_env }
     | Varname.Block ->
       let local_env =
-        { block_info = new_block;
-          mp_tbl = extend_tbl local_env.mp_tbl;
-          rte = false (* must be already checked by mk_stmts *) }
+        { local_env with
+          block_info = new_block;
+          mp_tbl = extend_tbl local_env.mp_tbl }
       in
       { env with
         cpt = n;
@@ -213,8 +256,7 @@ let do_new_var ~loc ?(scope=Varname.Block) ?(name="") env kf t ty mk_stmts =
     let new_global_vars = (v, lscope) :: env.new_global_vars in
     let local_env =
       { local_env with
-        block_info = new_block;
-        rte = false (* must be already checked by mk_stmts *) }
+        block_info = new_block }
     in
     { env with
       new_global_vars = new_global_vars;
@@ -308,8 +350,15 @@ module Logic_binding = struct
     try
       let varinfos = Logic_var.Map.find logic_v env.var_mapping in
       Stack.top varinfos
-    with Not_found | Stack.Empty ->
-      assert false
+    with
+    | Not_found ->
+      Options.fatal
+        "Unable to find logic var '%a' in environment mappings"
+        Printer.pp_logic_var logic_v
+    | Stack.Empty ->
+      Options.fatal
+        "Empty mapping stack for logic var '%a' in environment"
+        Printer.pp_logic_var logic_v
 
   let remove env logic_v =
     try
@@ -342,7 +391,7 @@ let add_assert kf stmt annot =
 
 let add_stmt ?(post=false) ?before env kf stmt =
   if not post then
-    Extlib.may (fun old -> E_acsl_label.move kf ~old stmt) before;
+    Option.iter (fun old -> E_acsl_label.move kf ~old stmt) before;
   let local_env, tl = top env in
   let block = local_env.block_info in
   let block =

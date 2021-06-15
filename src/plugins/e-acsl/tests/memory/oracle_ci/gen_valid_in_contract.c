@@ -90,7 +90,7 @@ struct list *__gen_e_acsl_f(struct list *l)
                                                       sizeof(struct list *),
                                                       (void *)(& l->next),
                                                       (void *)0);
-        __e_acsl_assert(__gen_e_acsl_valid_read,"RTE","f",
+        __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","f",
                         "mem_access: \\valid_read(&l->next)",
                         "tests/memory/valid_in_contract.c",17);
         __gen_e_acsl_valid_2 = __e_acsl_valid((void *)l->next,
@@ -113,14 +113,14 @@ struct list *__gen_e_acsl_f(struct list *l)
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)0);
     if (__gen_e_acsl_assumes_value) __e_acsl_assert(__retres == __gen_e_acsl_at,
-                                                    "Postcondition","f",
+                                                    1,"Postcondition","f",
                                                     "B1: \\result == \\old(l)",
                                                     "tests/memory/valid_in_contract.c",
                                                     15);
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)1);
     if (__gen_e_acsl_assumes_value) __e_acsl_assert(__retres == __gen_e_acsl_at_2,
-                                                    "Postcondition","f",
+                                                    1,"Postcondition","f",
                                                     "B2: \\result == \\old(l)",
                                                     "tests/memory/valid_in_contract.c",
                                                     18);

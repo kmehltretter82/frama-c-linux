@@ -1,5 +1,8 @@
 /* run.config
+
+ EXIT: 1
    OPT:-cpp-extra-args="-DFAIL_DECL_TYPE"
+ EXIT: 0
    OPT:-load-script @PTEST_DIR@/@PTEST_NAME@.ml
 */
 

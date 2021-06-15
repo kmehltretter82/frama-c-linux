@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of WP plug-in of Frama-C.                           #
 #                                                                        #
-#  Copyright (C) 2007-2020                                               #
+#  Copyright (C) 2007-2021                                               #
 #    CEA (Commissariat a l'energie atomique et aux energies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -61,9 +61,10 @@ PLUGIN_NAME:=Wp
 PLUGIN_CMO:= \
 	rformat wprop \
 	wp_parameters wp_error \
-	dyncall ctypes clabels \
 	Why3Provers \
-	Context Warning MemoryContext wpContext \
+	Context Warning \
+	dyncall ctypes clabels \
+	AssignsCompleteness MemoryContext wpContext \
 	LogicUsage RefUsage \
 	Layout Region \
 	RegionAnnot RegionAccess RegionDump RegionAnalysis \
@@ -81,23 +82,26 @@ PLUGIN_CMO:= \
 	Sigma MemLoader MemDebug \
 	MemEmpty MemZeroAlias MemVar \
 	MemMemory MemTyped MemRegion MemValue MemVal \
-	wpReached wpRTE wpAnnot \
+	wpReached wpRTE wpAnnot wpTarget \
 	CfgCompiler StmtSemantics \
 	VCS script proof wpo wpReport \
 	Footprint Tactical Strategy \
-	TacSplit TacChoice TacRange \
+	TacSplit TacChoice TacRange TacInduction \
 	TacArray TacCompound TacUnfold \
 	TacHavoc TacInstance TacLemma \
 	TacFilter TacCut WpTac TacNormalForm \
 	TacRewrite TacBitwised TacBitrange TacBittest TacShift \
+	TacSequence \
 	TacCongruence TacOverflow Auto \
 	ProofSession ProofScript ProofEngine \
 	ProverTask ProverErgo ProverCoq \
 	filter_axioms Cache ProverWhy3 \
 	driver prover ProverSearch ProverScript \
-	Generator Factory \
+	Factory \
+	cfgInit cfgAnnot cfgInfos cfgCalculus \
 	calculus cfgDump cfgWP \
-	register VC
+	wpGenerator cfgGenerator \
+	Generator register VC
 
 PLUGIN_CMI:=
 
@@ -128,7 +132,7 @@ CEA_WP_GENEREATED= script.ml rformat.ml driver.ml
 # --------------------------------------------------------------------------
 
 PLUGIN_TESTS_DIRS:= \
-  wp wp_plugin wp_acsl wp_bts \
+  why3 wp wp_plugin wp_acsl wp_bts \
   wp_store wp_hoare wp_typed wp_usage \
   wp_gallery wp_manual wp_tip \
   wp_region
@@ -234,7 +238,7 @@ WP_API_BASE= \
 	LogicUsage.mli RefUsage.mli \
 	normAtLabels.mli \
 	wpPropId.mli mcfg.ml \
-	Context.mli Warning.mli wpContext.mli \
+	Context.mli Warning.mli AssignsCompleteness.mli wpContext.mli \
 	Lang.mli Repr.mli Passive.mli Splitter.mli \
 	LogicBuiltins.mli Definitions.mli \
 	Cint.mli Cfloat.mli Vset.mli Cstring.mli \

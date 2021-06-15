@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -36,6 +36,7 @@ val concat : 'a t -> 'a t -> 'a t
 
 val map : ('a -> 'b) -> 'a t -> 'b t
 val umap : ('a -> 'b t) -> 'a t -> 'b t
+val umap_list : ('a -> 'b t) -> 'a list -> 'b t
 
 val iter : ('a -> unit) -> 'a t -> unit
 val fold_left : ('b -> 'a -> 'b) -> 'b -> 'a t -> 'b

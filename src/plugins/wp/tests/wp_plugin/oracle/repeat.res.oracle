@@ -20,7 +20,9 @@ Assume {
   (* Heap *)
   Type: is_sint32(calls_0).
   (* Pre-condition *)
-  Have: (L_sequence(calls_0) = nil) /\ (0 <= n).
+  Have: 0 <= n.
+  (* Pre-condition *)
+  Have: L_sequence(calls_0) = nil.
   (* Invariant *)
   Have: ([ 1, 2 ] *^ i) = a.
   (* Invariant *)
@@ -51,7 +53,9 @@ Assume {
   (* Heap *)
   Type: is_sint32(calls_1).
   (* Pre-condition *)
-  Have: (L_sequence(calls_1) = nil) /\ (0 <= n).
+  Have: 0 <= n.
+  (* Pre-condition *)
+  Have: L_sequence(calls_1) = nil.
   (* Invariant *)
   Have: (a_2 *^ i) = a.
   (* Invariant *)
@@ -124,7 +128,9 @@ Assume {
   (* Heap *)
   Type: is_sint32(calls_0).
   (* Pre-condition *)
-  Have: (L_sequence(calls_0) = nil) /\ (0 <= n).
+  Have: 0 <= n.
+  (* Pre-condition *)
+  Have: L_sequence(calls_0) = nil.
   (* Call 'f' *)
   Have: L_sequence(calls_1) = [ 1 ].
   (* Invariant *)
@@ -147,7 +153,9 @@ Assume {
   (* Heap *)
   Type: is_sint32(calls_0).
   (* Pre-condition *)
-  Have: (L_sequence(calls_0) = nil) /\ (0 <= n).
+  Have: 0 <= n.
+  (* Pre-condition *)
+  Have: L_sequence(calls_0) = nil.
   (* Call 'f' *)
   Have: L_sequence(calls_1) = [ 1 ].
   (* Invariant *)
@@ -180,7 +188,9 @@ Assume {
   (* Heap *)
   Type: is_sint32(calls_0).
   (* Pre-condition *)
-  Have: (L_sequence(calls_0) = nil) /\ (0 <= n).
+  Have: 0 <= n.
+  (* Pre-condition *)
+  Have: L_sequence(calls_0) = nil.
   (* Call 'f' *)
   Have: L_sequence(calls_1) = [ 1 ].
   (* Invariant *)

@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Aorai plug-in of Frama-C.                        */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*    INRIA (Institut National de Recherche en Informatique et en         */
@@ -32,7 +32,11 @@ open Logic_ptree
 open Promelaast
 open Bool3
 
-type options = Deterministic | Init of string list | Accept of string list
+type options =
+  | Deterministic
+  | Init of string list
+  | Accept of string list
+  | Observables of string list
 
 let to_seq c =
   [{ condition = Some c;
@@ -42,7 +46,7 @@ let to_seq c =
    }]
 
 let is_no_repet (min,max) =
-  let is_one c = Extlib.may_map Data_for_aorai.is_cst_one ~dft:false c in
+  let is_one c = Option.fold ~some:Data_for_aorai.is_cst_one ~none:false c in
   is_one min && is_one max
 
 let observed_states      = Hashtbl.create 1
@@ -104,13 +108,22 @@ let check_state st =
    Aorai_option.abort
     "Error: the state '%s' is used but never defined." st.name
 
-let interpret_option = function
+let interpret_option auto = function
   | Init states ->
-    List.iter set_init_state states
+    List.iter set_init_state states; auto
   | Accept states ->
-    List.iter set_accept_state states
+    List.iter set_accept_state states; auto
   | Deterministic ->
-    Aorai_option.Deterministic.set true
+    Aorai_option.Deterministic.set true; auto
+  | Observables names ->
+    let module Set = Datatype.String.Set in
+    let new_set = Set.of_list names in
+    let observables =
+      match auto.observables with
+      | None -> Some new_set
+      | Some set -> Some (Set.union set new_set)
+    in
+    { auto with observables }
 
 let build_automaton options metavariables trans =
   let htable_to_list table = Hashtbl.fold (fun _ st l -> st :: l) table [] in
@@ -119,15 +132,15 @@ let build_automaton options metavariables trans =
   and metavariables =
     List.fold_left add_metavariable Datatype.String.Map.empty metavariables
   in
-  List.iter interpret_option options;
+  let auto = { states; trans; metavariables; observables = None } in
+  let auto = List.fold_left interpret_option auto options in
   List.iter check_state states;
   if not (List.exists (fun st -> st.init=True) states) then
     Aorai_option.abort "Automaton does not declare an initial state";
   if undefined_states <> [] then
     Aorai_option.abort "Error: the state(s) %a are used but never defined."
       (Pretty_utils.pp_list ~sep:"," Format.pp_print_string) undefined_states;
-  { states; trans; metavariables }
-
+  auto
 
 type pre_cond = Behavior of string | Pre of Promelaast.condition
 
@@ -145,27 +158,18 @@ type pre_cond = Behavior of string | Pre of Promelaast.condition
 %token NOT DOT AMP
 %token COLON SEMI_COLON COMMA PIPE CARET QUESTION COLUMNCOLUMN
 %token EQ LT GT LE GE NEQ PLUS MINUS SLASH STAR PERCENT OR AND
-%token INIT ACCEPT DETERMINISTIC METAVAR
 %token OTHERWISE
 %token EOF
 
-%nonassoc highest
-%left LPAREN RPAREN
-%left LCURLY
-%right EQ LT GT LE GE NEQ PLUS MINUS SLASH STAR PERCENT OR AND
-/* [VP] priorities taken from cparser.mly */
-%left LSQUARE RSQUARE
-%left DOT
-%nonassoc NOT TRUE FALSE
-%nonassoc QUESTION
-%right SEMI_COLON
-%nonassoc lowest
+%left STAR
+%left DOT RARROW
+%left LSQUARE
 
 %type <Promelaast.parsed_automaton> main
 %start main
 %%
 
-main : options metavars states { build_automaton $1 $2 $3 }
+main : options metavars states EOF { build_automaton $1 $2 $3 }
 
 options
   : options option { $1 @ [$2] }
@@ -178,6 +182,7 @@ option
     | "init" -> Init $3
     | "accept" -> Accept $3
     | "deterministic" -> Deterministic
+    | "observables" -> Observables $3
     | _ ->  Aorai_option.abort "unknown option: '%s'" $2
   }
 
@@ -261,7 +266,6 @@ seq:
 ;
 
 guard:
-  | single_cond { to_seq $1 }
   | LSQUARE non_empty_seq RSQUARE { $2 }
   | IDENTIFIER pre_cond LPAREN seq RPAREN post_cond
       { let pre_cond =
@@ -296,15 +300,16 @@ guard:
 
 pre_cond:
   | COLUMNCOLUMN IDENTIFIER { Behavior $2 }
-  | LBRACELBRACE single_cond RBRACERBRACE { Pre $2 }
+  | LBRACELBRACE cond RBRACERBRACE { Pre $2 }
 ;
 
 post_cond:
   | /* epsilon */ { None }
-  | LBRACELBRACE single_cond RBRACERBRACE { Some $2 }
+  | LBRACELBRACE cond RBRACERBRACE { Some $2 }
 ;
 
 seq_elt:
+  | cond { to_seq $1 }
   | guard repetition {
     let min, max = $2 in
     match $1 with
@@ -318,7 +323,7 @@ seq_elt:
 ;
 
 repetition:
-  | /* empty */ %prec highest
+  | /* empty */
       { Some Data_for_aorai.cst_one, Some Data_for_aorai.cst_one }
   | PLUS { Some Data_for_aorai.cst_one, None}
   | STAR { None, None }
@@ -328,17 +333,23 @@ repetition:
   | LCURLY arith_relation COMMA RCURLY { Some $2, None }
   | LCURLY COMMA arith_relation RCURLY { None, Some $3 }
 
-single_cond:
+cond:
+  | conjunction OR cond { POr ($1,$3) }
+  | conjunction { $1 }
+
+conjunction:
+  | atomic_cond AND conjunction { PAnd($1,$3) }
+  | atomic_cond { $1 }
+
+atomic_cond:
   | CALLORRETURN_OF  LPAREN IDENTIFIER RPAREN
       { POr (PCall ($3,None), PReturn $3) }
   | CALL_OF  LPAREN IDENTIFIER RPAREN { PCall ($3,None) }
   | RETURN_OF  LPAREN IDENTIFIER RPAREN { PReturn $3 }
   | TRUE { PTrue }
   | FALSE { PFalse }
-  | NOT single_cond { PNot $2 }
-  | single_cond AND single_cond { PAnd ($1,$3) }
-  | single_cond OR single_cond { POr ($1,$3) }
-  | LPAREN single_cond RPAREN { $2 }
+  | NOT atomic_cond { PNot $2 }
+  | LPAREN cond RPAREN { $2 }
   | logic_relation { $1 }
 ;
 
@@ -349,24 +360,24 @@ logic_relation
   | arith_relation LE arith_relation { PRel(Le, $1, $3) }
   | arith_relation GE arith_relation { PRel(Ge, $1, $3) }
   | arith_relation NEQ arith_relation { PRel(Neq, $1, $3) }
-  | arith_relation %prec TRUE { PRel (Neq, $1, PCst(IntConstant "0")) }
+/*  | arith_relation { PRel (Neq, $1, PCst(IntConstant "0")) } */
   ;
 
 arith_relation
   : arith_relation_mul PLUS arith_relation { PBinop(Badd,$1,$3) }
   | arith_relation_mul MINUS arith_relation { PBinop(Bsub,$1,$3) }
-  | arith_relation_mul %prec highest { $1 }
+  | arith_relation_mul { $1 }
   ;
 
 arith_relation_mul
-  : arith_relation_mul SLASH access_or_const { PBinop(Bdiv,$1,$3) }
-  | arith_relation_mul STAR access_or_const { PBinop(Bmul, $1, $3) }
-  | arith_relation_mul PERCENT access_or_const { PBinop(Bmod, $1, $3) }
-  | arith_relation_bw %prec highest { $1 }
+  : arith_relation_mul SLASH arith_relation_bw { PBinop(Bdiv,$1,$3) }
+  | arith_relation_mul STAR arith_relation_bw { PBinop(Bmul, $1, $3) }
+  | arith_relation_mul PERCENT arith_relation_bw { PBinop(Bmod, $1, $3) }
+  | arith_relation_bw { $1 }
   ;
 
 arith_relation_bw
-  : access_or_const %prec highest { $1 }
+  : access_or_const { $1 }
   | arith_relation_bw AMP access_or_const { PBinop(Bbw_and,$1,$3) }
   | arith_relation_bw PIPE access_or_const { PBinop(Bbw_or,$1,$3) }
   | arith_relation_bw CARET access_or_const { PBinop(Bbw_xor,$1,$3) }
@@ -375,13 +386,13 @@ arith_relation_bw
 access_or_const
   : INT { PCst (IntConstant $1) }
   | MINUS INT { PUnop (Uminus, PCst (IntConstant $2)) }
-  | access %prec TRUE { $1 }
-  | LPAREN arith_relation RPAREN { $2 }
+  | access { $1 }
   ;
 
 /* returns a lval */
 access
   : access DOT IDENTIFIER { PField($1,$3) }
+  | access RARROW IDENTIFIER { PField(PUnop(Ustar,$1),$3) }
   | access LSQUARE access_or_const RSQUARE { PArrget($1,$3) }
   | access_leaf     {$1}
   ;
@@ -390,25 +401,15 @@ access_leaf
   : STAR access { PUnop (Ustar,$2) }
   | IDENTIFIER LPAREN RPAREN DOT IDENTIFIER { PPrm($1,$5) }
   | IDENTIFIER { PVar $1 }
-  | LPAREN access RPAREN { $2 }
+  | LPAREN arith_relation RPAREN { $2 }
   | METAVAR { PMetavar $1 }
   ;
 
 actions
   : /* epsilon */                   { [] }
-  | non_empty_actions opt_semicolon { $1 }
-  ;
-
-non_empty_actions
-  : non_empty_actions SEMI_COLON action { $1 @ [$3] }
-  | action                              { [$1] }
+  | action actions { $1 :: $2 }
   ;
 
 action
-  : METAVAR AFF arith_relation { Metavar_assign ($1, $3) }
-  ;
-
-opt_semicolon
-  : /* empty */ {}
-  | SEMI_COLON  {}
+  : METAVAR AFF arith_relation SEMI_COLON { Metavar_assign ($1, $3) }
   ;

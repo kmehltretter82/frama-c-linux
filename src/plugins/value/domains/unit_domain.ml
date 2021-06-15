@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -55,16 +55,16 @@ module Make
   type origin
 
   let eval_top = `Value (Value.top, None), Alarmset.all
-  let extract_expr _ _ _ = eval_top
-  let extract_lval _ _ _ _ _ = eval_top
+  let extract_expr ~oracle:_ _ _ _ = eval_top
+  let extract_lval ~oracle:_ _ _ _ _ _ = eval_top
   let backward_location _ _ _ loc value = `Value (loc, value)
   let reduce_further _ _ _  = []
 
   let update _ _ = `Value ()
   let assign _ _ _ _ _ _ = `Value ()
   let assume _ _ _ _ _ = `Value ()
-  let start_call _ _ _ _ = `Value ()
-  let finalize_call _ _ ~pre:_ ~post:_ = `Value ()
+  let start_call _ _ _ _ _ = `Value ()
+  let finalize_call _ _ _ ~pre:_ ~post:_ = `Value ()
   let show_expr _ _ _ _ = ()
 
   let logic_assign _ _ _ = ()

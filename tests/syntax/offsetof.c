@@ -1,4 +1,4 @@
-#include "share/libc/stddef.h"
+#include "stddef.h"
 
 struct c {char ca;};
 void main(void) {

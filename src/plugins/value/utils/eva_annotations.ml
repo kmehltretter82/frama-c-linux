@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -33,9 +33,16 @@ type unroll_annotation =
   | UnrollAmount of Cil_types.term
   | UnrollFull
 
+type split_kind = Static | Dynamic
+type split_term =
+  | Expression of Cil_types.exp
+  | Predicate of Cil_types.predicate
+
 type flow_annotation =
-  | FlowSplit of term
-  | FlowMerge of term
+  | FlowSplit of split_term * split_kind
+  | FlowMerge of split_term
+
+type taint_annotation = Cil_types.term list
 
 type allocation_kind = By_stack | Fresh | Fresh_weak | Imprecise
 
@@ -99,8 +106,8 @@ struct
 
   let add ~emitter ~loc stmt annot =
     let param = M.export annot in
-    let extension = Logic_const.new_acsl_extension "slevel" loc false param in
-    let annot_node = Cil_types.AExtended ([], false, extension) in
+    let extension = Logic_const.new_acsl_extension name loc false param in
+    let annot_node = Cil_types.AExtended ([], is_loop_annot, extension) in
     let code_annotation = Logic_const.new_code_annotation annot_node in
     Annotations.add_code_annot emitter stmt code_annotation
 end
@@ -151,24 +158,23 @@ module Slevel = Register (struct
       | SlevelFull -> Format.pp_print_string fmt "full"
   end)
 
-module SimpleTermAnnotation =
+module ListTermAnnotation =
 struct
-  type t = term
+  type t = term list
 
-  let parse ~typing_context = function
-    | [t] ->
-      let open Logic_typing in
-      typing_context.type_term typing_context typing_context.pre_state t
-    | _ -> raise Parse_error
+  let parse ~typing_context =
+    let open Logic_typing in
+    List.map (typing_context.type_term typing_context typing_context.pre_state)
 
   let export t =
-    Ext_terms [t]
+    Ext_terms t
 
   let import = function
-    | Ext_terms [t] -> t
+    | Ext_terms t -> t
     | _ -> assert false
 
-  let print = Printer.pp_term
+  let print fmt =
+    Format.fprintf fmt "%a" (Pretty_utils.pp_list Printer.pp_term)
 end
 
 module Unroll = Register (struct
@@ -199,18 +205,75 @@ module Unroll = Register (struct
       | UnrollAmount t -> Printer.pp_term fmt t
   end)
 
+module SplitTermAnnotation =
+struct
+  (* [split_term] plus the original term before conversion to a C expression,
+     when possible, to avoid changes due to its reconversion to a C term. *)
+  type t = split_term * Cil_types.term option
+
+  let term_to_exp = !Db.Properties.Interp.term_to_exp ~result:None
+
+  let parse ~typing_context:context = function
+    | [t] ->
+      begin
+        let open Logic_typing in
+        let exception No_term in
+        try
+          let error _loc _fmt = raise No_term in
+          let context = { context with error } in
+          let term = context.type_term context context.pre_state t in
+          Expression (term_to_exp term), Some term
+        with
+        | No_term ->
+          Predicate (context.type_predicate context context.pre_state t), None
+        | Db.Properties.Interp.No_conversion ->
+          Kernel.warning ~wkey:Kernel.wkey_annot_error ~once:true ~current:true
+            "split/merge expressions must be valid expressions; ignoring";
+          raise Parse_error
+      end
+    | _ -> raise Parse_error
+
+  let export = function
+    | Expression _, Some term -> Ext_terms [ term ]
+    | Expression expr, None -> Ext_terms [ Logic_utils.expr_to_term expr ]
+    | Predicate pred, _ -> Ext_preds [pred]
+
+  let import = function
+    | Ext_terms [term] -> Expression (term_to_exp term), Some term
+    | Ext_preds [pred] -> Predicate pred, None
+    | _ -> assert false
+
+  let print fmt = function
+    | Expression expr, _ -> Printer.pp_exp fmt expr
+    | Predicate pred, _ -> Printer.pp_predicate fmt pred
+end
+
 module Split = Register (struct
-    include SimpleTermAnnotation
+    include SplitTermAnnotation
     let name = "split"
     let is_loop_annot = false
   end)
 
 module Merge = Register (struct
-    include SimpleTermAnnotation
+    include SplitTermAnnotation
     let name = "merge"
     let is_loop_annot = false
   end)
 
+module DynamicSplit = Register (struct
+    include SplitTermAnnotation
+    let name = "dynamic_split"
+    let is_loop_annot = false
+  end)
+
+module Taint = Register (struct
+    include ListTermAnnotation
+    let name = "taint"
+    let is_loop_annot = false
+  end)
+
+let get_taint_annot = Taint.get
+let add_taint_annot = Taint.add
 
 let get_slevel_annot stmt =
   try Some (List.hd (Slevel.get stmt))
@@ -219,17 +282,23 @@ let get_slevel_annot stmt =
 let get_unroll_annot stmt = Unroll.get stmt
 
 let get_flow_annot stmt =
-  List.map (fun a -> FlowSplit a) (Split.get stmt) @
-  List.map (fun a -> FlowMerge a) (Merge.get stmt)
+  List.map (fun (a, _) -> FlowSplit (a, Static)) (Split.get stmt) @
+  List.map (fun (a, _) -> FlowSplit (a, Dynamic)) (DynamicSplit.get stmt) @
+  List.map (fun (a, _) -> FlowMerge a) (Merge.get stmt)
 
 
 let add_slevel_annot = Slevel.add
 
 let add_unroll_annot = Unroll.add
 
-let add_flow_annot ~emitter ~loc stmt = function
-  | FlowSplit annot -> Split.add ~emitter ~loc stmt annot
-  | FlowMerge annot -> Merge.add ~emitter ~loc stmt annot
+let add_flow_annot ~emitter ~loc stmt flow_annotation =
+  let f, annot =
+    match flow_annotation with
+    | FlowSplit (annot, Static) -> Split.add, annot
+    | FlowSplit (annot, Dynamic) -> DynamicSplit.add, annot
+    | FlowMerge annot -> Merge.add, annot
+  in
+  f ~emitter ~loc stmt (annot, None)
 
 
 module Subdivision = Register (struct
@@ -290,7 +359,7 @@ module Allocation = struct
           (* Be kind and return By_stack by default. Someone is bound to write a
              visitor that will simplify our term into something unrecognizable. *)
           begin match term_node with
-            | TConst (LStr s) -> Extlib.opt_conv By_stack (of_string s)
+            | TConst (LStr s) -> Option.value ~default:By_stack (of_string s)
             | _ -> By_stack
           end
         | _ -> assert false
@@ -301,7 +370,7 @@ module Allocation = struct
 
   let get stmt =
     match get stmt with
-    | [] -> Extlib.the (of_string (Value_parameters.AllocBuiltin.get ()))
+    | [] -> Option.get (of_string (Value_parameters.AllocBuiltin.get ()))
     | [x] -> x
     | x :: _ ->
       Value_parameters.warning ~current:true ~once:true

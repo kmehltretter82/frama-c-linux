@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -322,7 +322,7 @@ class slocVisitor ~libc : sloc_visitor = object(self)
         | Dvolatile (_, _, _, _, _) -> " (Volatile) "
         | Daxiomatic (s, _, _, _) -> s
         | Dtype (lti, _) ->  lti.lt_name
-        | Dlemma (ln, _, _, _, _, _, _) ->  ln
+        | Dlemma (ln, _, _, _, _, _) ->  ln
         | Dinvariant (toto, _) -> toto.l_var_info.lv_name
         | Dtype_annot (ta, _) -> ta.l_var_info.lv_name
         | Dmodel_annot (mi, _) -> mi.mi_name
@@ -662,6 +662,28 @@ let pp_funinfo fmt vis =
     Metrics_base.pretty_entry_points vis#fundef_calls
 ;;
 
+let json_of_funinfo vis =
+  let fundef =
+    ("defined-functions", json_of_varinfo_map vis#fundef_calls)
+  in
+  let funspec =
+    ("specified-only-functions", json_of_varinfo_map vis#funspec_calls)
+  in
+  let fundecl =
+    ("undefined-functions", json_of_varinfo_map vis#fundecl_calls)
+  in
+  let extern_vars =
+    VInfoSet.fold (fun vi acc -> `String vi.vname :: acc)
+      vis#extern_global_vars []
+  in
+  let extern =
+    ("extern-global-vars", `List (List.rev extern_vars))
+  in
+  let entry_points =
+    ("entry-points", json_of_entry_points vis#fundef_calls)
+  in
+  `Assoc [fundef; funspec; fundecl; extern; entry_points]
+
 let pp_with_funinfo fmt cil_visitor =
   Format.fprintf fmt "@[<v 0>%a@ %a@]"
     pp_funinfo cil_visitor
@@ -712,21 +734,25 @@ let compute_on_cilast ~libc =
       "@[<v 0>Cil AST@ %t@]" cil_visitor#pp_detailed_text_metrics;
   (*  let r =  metrics_to_result cil_visitor in *)
   (* Print the result to file if required *)
-  let out_fname = Metrics_parameters.OutputFile.get () in
-  begin
-    if out_fname <> "" then
-      try
-        let oc = open_out_bin out_fname in
-        let fmt = Format.formatter_of_out_channel oc in
-        (match Metrics_base.get_file_type out_fname with
-         | Html -> dump_html fmt cil_visitor
-         | Text -> pp_with_funinfo fmt cil_visitor
-        );
-        close_out oc;
-      with Sys_error _ ->
-        Metrics_parameters.failure "Cannot open file %s.@." out_fname
-    else Metrics_parameters.result "%a" pp_with_funinfo cil_visitor
+  if not (Metrics_parameters.OutputFile.is_empty ()) then begin
+    let out_fname = Metrics_parameters.OutputFile.get () in
+    try
+      let oc = open_out_bin (out_fname:>string) in
+      let fmt = Format.formatter_of_out_channel oc in
+      (match Metrics_base.get_file_type out_fname with
+       | Html -> dump_html fmt cil_visitor
+       | Text -> pp_with_funinfo fmt cil_visitor
+       | Json ->
+         let json = json_of_funinfo cil_visitor in
+         Yojson.pretty_print fmt json;
+         Format.fprintf fmt "@." (* ensure the file ends with a newline *)
+      );
+      close_out oc;
+    with Sys_error _ ->
+      Metrics_parameters.failure "Cannot open file %a.@."
+        Filepath.Normalized.pretty out_fname
   end
+  else Metrics_parameters.result "%a" pp_with_funinfo cil_visitor
 
 (* Visitor for the recursive estimation of a stack size.
    Its arguments are the function currently being visited and the current

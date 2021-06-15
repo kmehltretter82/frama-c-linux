@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -40,14 +40,20 @@ type node = {
   id : int ;
   mutable flow : flow ;
   mutable prev : node list ;
-  mutable reached : bool option ;
+  mutable protected : bool option ;
+  (* whether the node is dominated by unreachable node or by a smoke test *)
+  mutable unreachable : bool option ;
+  (* whether the node is unreachable from the entry point *)
 }
 
 let kid = ref 0
 
 let node () =
   incr kid ;
-  { id = !kid ; prev = [] ; reached = None ; flow = F_goto }
+  { id = !kid ; prev = [] ;
+    protected = None ;
+    unreachable = None ;
+    flow = F_goto }
 
 (* -------------------------------------------------------------------------- *)
 (* --- Unrolled Loop                                                      --- *)
@@ -83,10 +89,10 @@ let rec is_predicate cond p =
 let is_dead_annot ca =
   match ca.annot_content with
   | APragma (Loop_pragma (Unroll_specs [ spec ; _ ])) ->
-      false && is_unrolled_completely spec
+      is_unrolled_completely spec
   | AAssert([],p)
   | AInvariant([],_,p) ->
-      not p.tp_only_check && is_predicate false p.tp_statement
+      Logic_utils.use_predicate p.tp_kind && is_predicate false p.tp_statement
   | _ -> false
 
 let is_dead_code stmt =
@@ -102,8 +108,8 @@ let is_dead_code stmt =
 (* --- Compute CFG                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-type reached = node Stmt.Map.t
-type cfg = reached ref
+type reachability = node Stmt.Map.t
+type cfg = reachability ref (* working cfg during compilation *)
 
 let of_stmt cfg s =
   try Stmt.Map.find s !cfg with Not_found ->
@@ -133,11 +139,8 @@ type env = {
 
 let rec stmt env s b =
   let a = of_stmt env.cfg s in
-  if is_dead_code s then
-    a.flow <- F_dead
-  else
-    a.flow <- skind env a b s.skind ;
-  a
+  let f = skind env a b s.skind in
+  a.flow <- if is_dead_code s then F_dead else f ; a
 
 and skind env a b = function
   | Instr i -> flow i (goto a b)
@@ -177,29 +180,46 @@ and sequence env seq b = match seq with
 (* --- Compute Reachability                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-let rec reached node =
-  match node.reached with
+let rec unreachable node =
+  match node.unreachable with
   | Some r -> r
   | None ->
-      node.reached <- Some true ; (* cut loops *)
-      let r = List.for_all reached_after node.prev in
-      node.reached <- Some r ; r
+      node.unreachable <- Some true ; (* cut loops *)
+      let r =
+        match node.flow with
+        | F_dead -> true
+        | F_entry -> false
+        | F_goto | F_effect | F_return | F_branch | F_call ->
+            List.for_all unreachable node.prev
+      in node.unreachable <- Some r ; r
 
-and reached_after node =
-  match node.flow with
-  | F_goto -> reached node
-  | F_effect | F_entry | F_dead -> true
-  | F_return | F_branch | F_call -> false
+let rec protected node =
+  match node.protected with
+  | Some r -> r
+  | None ->
+      node.protected <- Some false ; (* cut loops *)
+      let r =
+        match node.flow with
+        | F_dead | F_entry -> true
+        | F_goto | F_effect | F_return | F_branch | F_call ->
+            node.prev <> [] && List.for_all protected_by node.prev
+      in node.protected <- Some r ; r
+
+and protected_by prev =
+  match prev.flow with
+  | F_dead | F_entry | F_effect -> true
+  | F_goto -> protected prev
+  | F_call | F_branch | F_return -> unreachable prev
 
 let smoking_node n =
   match n.flow with
-  | F_effect | F_call | F_return -> not (reached n)
+  | F_effect | F_call | F_return -> not (protected n)
   | F_goto | F_branch | F_entry | F_dead -> false
 
 (* returns true if the stmt requires a reachability smoke test *)
-let smoking nodes stmt =
-  try Stmt.Map.find stmt nodes |> smoking_node
-  with Not_found -> false
+let smoking reachability stmt =
+  try Stmt.Map.find stmt reachability |> smoking_node
+  with Not_found -> true
 
 let compute kf =
   try
@@ -230,14 +250,10 @@ let dump ~dir kf reached =
   N.define dot
     (fun a na ->
        let attr =
-         if smoking_node a
-         then [`Filled;`Fillcolor "orange"]
-         else
-           match a.flow with
-           | F_entry | F_effect | F_return | F_call ->
-               [`Filled;`Fillcolor "green"]
-           | F_dead -> [`Filled;`Fillcolor "red"]
-           | F_branch | F_goto -> []
+         if smoking_node a then [`Filled;`Fillcolor "orange"]
+         else if protected a then [`Filled;`Fillcolor "green"]
+         else if unreachable a then [`Filled;`Fillcolor "red"]
+         else []
        in G.node dot na attr ;
        List.iter
          (fun b ->
@@ -262,7 +278,8 @@ let dump ~dir kf reached =
          | UnspecifiedSequence  _ -> Printf.sprintf "Seq. s%d" s.sid
          | Throw _ | TryExcept _ | TryCatch _ | TryFinally _ ->
              Printf.sprintf "Exn. s%d" s.sid
-       in G.node dot (N.get n) [`Box;`Label label])
+       in G.node dot (N.get n)
+         [`Box;`Label (Printf.sprintf "s%d n%d: %s" s.sid n.id label)])
     reached ;
   G.run dot ;
   G.close dot ;
@@ -276,7 +293,7 @@ let dump ~dir kf reached =
 module FRmap = Kernel_function.Make_Table
     (Datatype.Make
        (struct
-         type t = reached
+         type t = reachability
          include Datatype.Serializable_undefined
          let reprs = [Stmt.Map.empty]
          let name = "WpReachable.reached"
@@ -289,12 +306,74 @@ module FRmap = Kernel_function.Make_Table
 
 let dkey = Wp_parameters.register_category "reached"
 
-let reached = FRmap.memo
+let reachability = FRmap.memo
     begin fun kf ->
       let r = compute kf in
       (if Wp_parameters.has_dkey dkey then
          let dir = Wp_parameters.get_session_dir ~force:true "reach" in
          dump ~dir kf r ) ; r
     end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Doome Status                                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
+module Invalid_behaviors = struct
+  module String_set = Datatype.String.Set
+
+  include State_builder.Hashtbl(Kernel_function.Hashtbl)(String_set)
+      (struct
+        let name = "Wp.WpReached.Invalid_behavior"
+        let dependencies = [Ast.self]
+        let size = 32
+      end)
+
+  let add kf bhv =
+    let set =
+      try find kf
+      with Not_found -> String_set.empty
+    in
+    add kf (String_set.add bhv.b_name set)
+
+  let mem kf bhv =
+    try String_set.mem bhv.b_name (find kf)
+    with Not_found -> false
+end
+
+let set_invalid emitter tgt =
+  let open Property_status in
+  match tgt with
+  (* For invalid assumes, introduce "ensures false" in behavior on need *)
+  | Property.IPPredicate { ip_kind = PKAssumes(bhv) ; ip_kf ; ip_pred } ->
+      if not (Invalid_behaviors.mem ip_kf bhv) then begin
+        Invalid_behaviors.add ip_kf bhv ;
+        let pred_name = [ "Wp" ; "SmokeTest" ] in
+        let pred_loc = ip_pred.ip_content.tp_statement.pred_loc in
+        let p = { Logic_const.pfalse with pred_loc ; pred_name } in
+        let p = Logic_const.(new_predicate p) in
+        let pid = Property.ip_of_ensures ip_kf Kglobal bhv (Normal, p) in
+        Annotations.add_ensures emitter ip_kf ~behavior:bhv.b_name [Normal, p];
+        emit emitter ~hyps:[] pid False_if_reachable
+      end
+  | p ->
+      emit emitter ~hyps:[] p False_if_reachable
+
+let set_doomed emitter pid =
+  List.iter (set_invalid emitter) (WpPropId.doomed_if_valid pid) ;
+  match WpPropId.unreachable_if_valid pid with
+  | Property.OLStmt(kf,stmt) ->
+      let ca =
+        match Annotations.code_annot ~emitter ~filter:is_dead_annot stmt with
+        | ca::_ -> ca
+        | [] ->
+            let pred_loc = Stmt.loc stmt in
+            let pred_name = [ "Wp" ; "SmokeTest" ] in
+            let pf = { Logic_const.pfalse with pred_loc ; pred_name } in
+            let pf = Logic_const.toplevel_predicate pf in
+            let ca = Logic_const.new_code_annotation (AAssert ([],pf)) in
+            Annotations.add_code_annot emitter ~kf stmt ca ; ca
+      in
+      List.iter (set_invalid emitter) (Property.ip_of_code_annot kf stmt ca)
+  | Property.OLGlob _ | Property.OLContract _ -> ()
 
 (* -------------------------------------------------------------------------- *)

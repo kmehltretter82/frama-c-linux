@@ -323,7 +323,7 @@ let process_stdlib_pragma name args =
     match args with
     | [ ACons ("pop",_) ] -> pop_stdheader (); None
     | [ ACons ("push",_); AStr s ] ->
-      let base_name = Fc_config.framac_libc in
+      let base_name = (Fc_config.framac_libc:>string) in
       let relative_name = Filepath.relativize ~base_name s in
       push_stdheader relative_name;
       None
@@ -388,7 +388,7 @@ let packing_pragma_stack = Stack.create ()
 let current_packing_pragma = ref None
 let pretty_current_packing_pragma fmt =
   let align =
-    Extlib.opt_conv (Integer.of_int theMachine.theMachine.alignof_aligned)
+    Option.value ~default:(Integer.of_int theMachine.theMachine.alignof_aligned)
       !current_packing_pragma
   in
   (Integer.pretty ~hexa:false) fmt align
@@ -688,10 +688,10 @@ let isTransparentUnion (t: typ) : fieldinfo option =
     (* Turn transparent unions into the type of their first field *)
     if typeHasAttribute "transparent_union" t then begin
       match comp.cfields with
-      | [] ->
+      | Some [] | None ->
         abort_context
           "Empty transparent union: %s" (compFullName comp)
-      | f :: _ -> Some f
+      | Some (f :: _) -> Some f
     end else
       None
   | _ -> None
@@ -967,7 +967,7 @@ let alphaTable : location Alpha.alphaTable = H.create 307
  * foo" or "union bar" *)
 
 let fresh_global lookupname =
-  fst (Alpha.newAlphaName alphaTable lookupname (CurrentLoc.get ()))
+  fst (Alpha.newAlphaName alphaTable None lookupname (CurrentLoc.get ()))
 
 (* To keep different name scopes different, we add prefixes to names
  * specifying the kind of name: the kind can be one of "" for variables or
@@ -1026,7 +1026,7 @@ let newAlphaName
   in
   let data = CurrentLoc.get () in
   let newname, oldloc =
-    Alpha.newAlphaName ~alphaTable ?undolist ~lookupname ~data
+    Alpha.newAlphaName ~alphaTable ~undolist ~lookupname ~data
   in
   (match undo_scope, undolist with
    | None, None -> ()
@@ -1199,7 +1199,7 @@ let get_temp_name ghost () =
   let data = CurrentLoc.get() in
   let name = if ghost then "g_tmp" else "tmp" in
   let name, _ =
-    Alpha.newAlphaName ~alphaTable ~undolist ~lookupname:name ~data
+    Alpha.newAlphaName ~alphaTable ~undolist:(Some undolist) ~lookupname:name ~data
   in
   let undolist = !undolist in
   Alpha.undoAlphaChanges ~alphaTable ~undolist;
@@ -1208,6 +1208,7 @@ let get_temp_name ghost () =
 (* Create a new temporary variable *)
 let newTempVar ~ghost loc descr (descrpure:bool) typ =
   let t' = (!typeForInsertedVar) typ in
+  let t' = Cil.typeRemoveAttributes ["const"] t' in
   let name = get_temp_name ghost () in
   let vi = makeVarinfo ~ghost ~temp:true ~loc false false name t' in
   vi.vdescr <- Some descr;
@@ -1262,7 +1263,8 @@ let createCompInfo (iss: bool) (n: string) ~(norig: string) : compinfo * bool =
   with Not_found -> begin
       (* Create a compinfo. This will have "cdefined" false. *)
       let res =
-        Cil_const.mkCompInfo iss n ~norig (fun _ ->[]) (fc_stdlib_attribute [])
+        Cil_const.mkCompInfo
+          iss n ~norig (fun _ -> None) (fc_stdlib_attribute [])
       in
       H.add compInfoNameEnv key res;
       res, true
@@ -1334,6 +1336,15 @@ let canDropStatement (s: stmt) : bool =
   ignore (visitCilStmt vis s);
   !pRes
 
+let fail_if_incompatible_sizeof ~ensure_complete op typ =
+  if Cil.isFunctionType typ && Cil.theMachine.theMachine.sizeof_fun < 0 then
+    Kernel.error ~current:true "%s called on function only allowed for GCC" op;
+  let is_void = Cil.isVoidType typ in
+  if is_void && Cil.theMachine.theMachine.sizeof_void < 0 then
+    Kernel.error ~current:true "%s on void type only allowed for GCC/MSVC" op;
+  if ensure_complete && not (Cil.isCompleteType typ) && not is_void then
+    Kernel.error ~current:true
+      "%s on incomplete type '%a'" op Cil_printer.pp_typ typ
 
 (******** CASTS *********)
 
@@ -1366,7 +1377,7 @@ let rec is_boolean_result e =
 (* Like Cil.mkCastT, but it calls typeForInsertedCast *)
 let makeCastT ~(e: exp) ~(oldt: typ) ~(newt: typ) =
   if need_cast oldt newt then
-    Cil.mkCastT e oldt (!typeForInsertedCast e oldt newt)
+    Cil.mkCastT oldt (!typeForInsertedCast e oldt newt) e
   else e
 
 let makeCast ~(e: exp) ~(newt: typ) =
@@ -2650,8 +2661,8 @@ let rec combineTypes (what: combineWhat) (oldt: typ) (t: typ) : typ =
            evaluate them. Check first machine independent comparison. *)
         let checkEqualSize (machdep: bool) =
           let size_t = Cil.theMachine.Cil.typeOfSizeOf in
-          let size_t_oldsz' = Cil.mkCast ~force:false ~e:oldsz' ~newt:size_t in
-          let size_t_sz' = Cil.mkCast ~force:false ~e:sz' ~newt:size_t in
+          let size_t_oldsz' = Cil.mkCast ~force:false ~newt:size_t oldsz' in
+          let size_t_sz' = Cil.mkCast ~force:false ~newt:size_t sz' in
           ExpStructEq.equal
             (constFold machdep size_t_oldsz')
             (constFold machdep size_t_sz')
@@ -2850,7 +2861,7 @@ let rec castTo ?context ?(fromsource=false)
   end else begin
     let nt' = if fromsource then nt' else !typeForInsertedCast e ot' nt' in
     let result = (nt', if theMachine.insertImplicitCasts || fromsource then
-                    Cil.mkCastT ~force:true ~e ~oldt:ot ~newt:nt' else e)
+                    Cil.mkCastT ~force:true ~oldt:ot ~newt:nt' e else e)
     in
     let error s =
       if fromsource then abort_context s else Kernel.fatal ~current:true s
@@ -2870,10 +2881,10 @@ let rec castTo ?context ?(fromsource=false)
       else
         nt,
         Cil.mkCastT
+          ot nt'
           (constFold true
              (new_exp  ~loc:e.eloc
                 (BinOp(Ne,e,Cil.integer ~loc:e.eloc 0,intType))))
-          ot nt'
     | TInt(_,_), TInt(_,_) ->
       (* We used to ignore attributes on integer-integer casts. Not anymore *)
       (* if ikindo = ikindn then (nt, e) else *)
@@ -3216,7 +3227,7 @@ let setupBuiltin ?(force_keep=false) name ?spec (resTyp, args_or_argtypes, isva)
     | None -> empty_funspec ()
     | Some s -> s
   in
-  cabsPushGlobal (GFunDecl (funspec, v, Cil.builtinLoc));
+  cabsPushGlobal (GFunDecl (funspec, v, Cil_builtins.builtinLoc));
   Cil.unsafeSetFormalsDecl v args;
   if force_keep then
     v.vattr <- Cil.addAttribute (Attr ("FC_BUILTIN",[])) v.vattr;
@@ -3341,7 +3352,7 @@ let rec setOneInit this o preinit =
           | f' :: _ when f'.fname = f.fname -> idx
           | _ :: restf -> loop (idx + 1) restf
         in
-        loop 0 f.fcomp.cfields, off
+        loop 0 (Option.value ~default:[] f.fcomp.cfields), off
       | _ -> abort_context "setOneInit: non-constant index"
     in
     let pMaxIdx, pArray =
@@ -3518,7 +3529,8 @@ let rec collectInitializer
             let rest, reads' = collect (idx+1) reads' restf in
             (Field(f, NoOffset), thisi) :: rest, reads'
       in
-      let init, reads = collect 0 reads comp.cfields in
+      let init, reads =
+        collect 0 reads (Option.value ~default:[] comp.cfields) in
       CompoundInit (thistype, init), thistype, reads
 
     | TComp (comp, _, _), CompoundPre (pMaxIdx, pArray) when not comp.cstruct ->
@@ -3542,7 +3554,7 @@ let rec collectInitializer
       if Cil.msvcMode () && !pMaxIdx != 0 then
         Kernel.warning ~current:true
           "On MSVC we can initialize only the first field of a union";
-      let init, reads = findField 0 comp.cfields in
+      let init, reads = findField 0 (Option.value ~default:[] comp.cfields) in
       CompoundInit (thistype, [ init ]), thistype, reads
 
     | _ -> Kernel.fatal ~current:true "collectInitializer"
@@ -3683,7 +3695,7 @@ let fieldsToInit
      the resulting fields are in reverse order *)
   let rec add_comp (offset : offset) (comp : compinfo) acc =
     let in_union = not comp.cstruct in
-    add_fields offset in_union comp.cfields acc
+    add_fields offset in_union (Option.value ~default:[] comp.cfields) acc
   and add_fields (offset : offset) (in_union : bool) (l : fieldinfo list) acc =
     match l with
     | [] -> acc
@@ -3716,7 +3728,7 @@ let fieldsToInit
   in
   let found, r = add_comp NoOffset comp (designator = None, []) in
   begin if not found then
-      let fn = Extlib.the designator in
+      let fn = Option.get designator in
       Kernel.fatal ~current:true "Cannot find designated field %s" fn;
   end;
   List.rev r
@@ -3743,7 +3755,9 @@ let find_field_offset cond (fidlist: fieldinfo list) : offset =
     | fid :: rest when prefix anonCompFieldName fid.fname -> begin
         match unrollType fid.ftype with
         | TComp (ci, _, _) ->
-          (try let off = search ci.cfields in Field(fid,off)
+          (try
+             let off = search (Option.value ~default:[] ci.cfields) in
+             Field(fid,off)
            with Not_found -> search rest  (* Continue searching *))
         | _ ->
           abort_context "unnamed field type is not a struct/union"
@@ -3754,7 +3768,7 @@ let find_field_offset cond (fidlist: fieldinfo list) : offset =
 
 let findField n comp =
   try
-    find_field_offset (fun x -> x.fname = n) comp.cfields
+    find_field_offset (fun x -> x.fname = n) (Option.value ~default:[] comp.cfields)
   with Not_found ->
     abort_context "Cannot find field %s in type %s" n (Cil.compFullName comp)
 
@@ -3904,7 +3918,7 @@ let optConstFoldBinOp loc machdep bop e1 e2 t =
 let integral_cast ty t =
   raise
     (Failure
-       (Format.asprintf "term %a has type %a, but %a is expected."
+       (Format.asprintf "term %a has type %a, but %a is expected"
           Cil_printer.pp_term t Cil_printer.pp_logic_type Linteger Cil_printer.pp_typ ty))
 
 (* Exception raised by the instance of Logic_typing local to this module.
@@ -3918,7 +3932,7 @@ struct
   let anonCompFieldName = anonCompFieldName
   let conditionalConversion = logicConditionalConversion
   let find_macro _ = raise Not_found
-  let find_var ?label ~var =
+  let find_var ?label var =
     let find_from_curr_env test =
       (* logic has always access to the ghost variables. *)
       match Datatype.String.Hashtbl.find ghost_env var with
@@ -4242,11 +4256,11 @@ let append_chunk_to_annot ~ghost annot_chunk current_chunk =
         match current_chunk.stmts with
         | [(s1, m1, w1, r1, c1); (s2, m2, w2, r2, c2)] ->
           Extlib.swap
-            Extlib.opt_bind
-            (collapseCallCast (s2,s1)) (* the chunk list is reversed.*)
+            Option.bind
             (function
               | [ s1' ] -> Some (s1', m1 @ m2, w1 @ w2, r1 @ r2, c1 @ c2)
               | _ -> None (* should not happen. *))
+            (collapseCallCast (s2,s1)) (* the chunk list is reversed.*)
         | _ -> None
       in
       match res with
@@ -5157,7 +5171,9 @@ and doType (ghost:bool) isFuncArg
                  Cil_printer.pp_exp cst
              else
                Kernel.error ~once:true ~current:true
-                 "Array length %a is not a compile-time constant."
+                 "Array length %a is not a compile-time constant,@ \
+                  and currently VLAs may only have their first dimension \
+                  as variable."
                  Cil_printer.pp_exp cst
            | _ -> ());
           if Cil.isZero len' && not allowZeroSizeArrays &&
@@ -5253,7 +5269,7 @@ and doType (ghost:bool) isFuncArg
        * our life a lot, and is what the standard requires. *)
       let turnArrayIntoPointer (bt: typ)
           (lo: exp option) (a: attributes) : typ =
-        let _real_a = dropAttribute "static" a in
+        let main_attrs = dropAttribute "static" a in
         let a' : attributes =
           match lo with
           | None -> []
@@ -5275,7 +5291,8 @@ and doType (ghost:bool) isFuncArg
                 end
             end
         in
-        TPtr(bt, a')
+        let attrs = Cil.addAttributes a' main_attrs in
+        TPtr(bt, attrs)
       in
       let rec fixupArgumentTypes (argidx: int) (args: varinfo list) : unit =
         match args with
@@ -5384,8 +5401,14 @@ and makeCompType ghost (isstruct: bool)
   (* Create the self cell for use in fields and forward references. Or maybe
    * one exists already from a forward reference  *)
   let comp, _ = createCompInfo isstruct n' norig in
-  let doFieldGroup ~is_first_group ~is_last_group ((s: A.spec_elem list),
-                                                   (nl: (A.name * A.expression option) list)) =
+  let rec fold f acc = function
+    | [] -> acc
+    | [x] -> f ~last:true acc x
+    | x :: l -> fold f (f ~last:false acc x) l
+  in
+
+  let addFieldGroup ~last:last_group (flds : fieldinfo list)
+      ((s: A.spec_elem list), (nl: (A.name * A.expression option) list)) =
     (* Do the specifiers exactly once *)
     let sugg = match nl with
       | [] -> ""
@@ -5393,13 +5416,14 @@ and makeCompType ghost (isstruct: bool)
     in
     let bt, sto, inl, attrs = doSpecList ghost sugg s in
     (* Do the fields *)
-    let makeFieldInfo ~is_first_field ~is_last_field
+    let addFieldInfo ~last:last_field (flds : fieldinfo list)
         (((n,ndt,a,cloc) : A.name), (widtho : A.expression option))
-      : fieldinfo =
+      : fieldinfo list =
+      let source = fst cloc in
       if sto <> NoStorage || inl then
-        Kernel.error ~once:true ~current:true "Storage or inline not allowed for fields";
+        Kernel.error ~once:true ~source "Storage or inline not allowed for fields";
       let allowZeroSizeArrays = true in
-      let ftype, nattr =
+      let ftype, fattr =
         doType
           ~allowZeroSizeArrays ghost false (AttrName false) bt
           (A.PARENTYPE(attrs, ndt, a))
@@ -5410,32 +5434,32 @@ and makeCompType ghost (isstruct: bool)
          struct C2 { struct C1 c1; int dummy; };
       *)
       if Cil.isFunctionType ftype then
-        Kernel.error ~current:true
+        Kernel.error ~source
           "field `%s' declared as a function" n
       else if Cil.has_flexible_array_member ftype && isstruct then
-        Kernel.error ~current:true
+        Kernel.error ~source
           "field `%s' declared with a type containing a flexible array member."
           n
       else if not (Cil.isCompleteType ~allowZeroSizeArrays ftype)
       then begin
         match Cil.unrollType ftype with
-        | TArray(_,None,_,_) when is_last_field ->
+        | TArray(_,None,_,_) when last_group && last_field ->
           begin
             (* possible flexible array member; check if struct contains at least
                one other field *)
-            if is_first_field then (* struct is empty *)
-              Kernel.error ~current:true
+            if flds = [] then (* struct is empty *)
+              Kernel.error ~source
                 "flexible array member '%s' (type %a) \
                  not allowed in otherwise empty struct"
                 n Cil_printer.pp_typ ftype
             else (* valid flexible array member *) ()
           end
         | _ ->
-          Kernel.error ~current:true
+          Kernel.error ~source
             "field `%s' is declared with incomplete type %a"
             n Cil_printer.pp_typ ftype
       end;
-      let width, ftype =
+      let fbitfield, ftype =
         match widtho with
         | None -> None, ftype
         | Some w -> begin
@@ -5443,13 +5467,30 @@ and makeCompType ghost (isstruct: bool)
              | TInt (_, _) -> ()
              | TEnum _ -> ()
              | _ ->
-               Kernel.error ~once:true ~current:true
+               Kernel.error ~once:true ~source
                  "Base type for bitfield is not an integer type");
             match isIntegerConstant ghost w with
             | None ->
-              Kernel.fatal ~current:true
-                "bitfield width is not an integer constant"
+              Kernel.error ~source
+                "bitfield width is not an integer constant";
+              (* error  does not immediately stop execution.
+                 Hence, we return a placeholder here.
+              *)
+              Some 0, ftype
             | Some s as w ->
+              begin
+                if s < 0 then
+                  Kernel.error ~source "negative bitfield width (%d)" s;
+                try
+                  if s > Cil.bitsSizeOf ftype then
+                    Kernel.error ~source
+                      "bitfield width (%d) exceeds its type (%a, %d bits)"
+                      s Cil_printer.pp_typ ftype (Cil.bitsSizeOf ftype)
+                with
+                  SizeOfError _ ->
+                  Kernel.fatal ~source
+                    "Unable to compute size of %a" Cil_printer.pp_typ ftype
+              end;
               let ftype =
                 typeAddAttributes
                   [Attr (bitfield_attribute_name, [AInt (Integer.of_int s)])]
@@ -5458,9 +5499,14 @@ and makeCompType ghost (isstruct: bool)
               w, ftype
           end
       in
+      (* Compute the order of the field in the structure *)
+      let forder = match flds with
+        | [] -> 0
+        | { forder=previous_order } :: _ -> previous_order + 1
+      in
       (* If the field is unnamed and its type is a structure of union type
        * then give it a distinguished name  *)
-      let n' =
+      let fname =
         if n = missingFieldName then begin
           match unrollType ftype with
           | TComp _ -> begin
@@ -5488,56 +5534,40 @@ and makeCompType ghost (isstruct: bool)
               (if comp.cstruct then "struct" else "union")
               comp.cname;
           end else
-            List.iter (fun f -> is_circular f.ftype) comp'.cfields;
+            List.iter
+              (fun f -> is_circular f.ftype)
+              (Option.value ~default:[] comp'.cfields);
         | _ -> ()
       in
       is_circular ftype;
-      { fcomp     =  comp;
+      { fcomp =  comp;
+        forder;
         forig_name = n;
-        fname     =  n';
-        ftype     =  ftype;
-        fbitfield =  width;
-        fattr     =  nattr;
-        floc      =  convLoc cloc;
-        faddrof   = false;
+        fname;
+        ftype;
+        fbitfield;
+        fattr;
+        floc =  convLoc cloc;
+        faddrof = false;
         fsize_in_bits = None;
         foffset_in_bits = None;
         fpadding_in_bits = None;
-      }
+      } :: flds
     in
-    let rec map_but_last l =
-      match l with
-      | [] -> []
-      | [f] ->
-        [makeFieldInfo ~is_first_field:false ~is_last_field:is_last_group f]
-      | f::l ->
-        let fi = makeFieldInfo ~is_first_field:false ~is_last_field:false f in
-        [fi] @ map_but_last l
-    in
-    match nl with
-    | [] -> []
-    | [f] ->
-      [makeFieldInfo ~is_first_field:is_first_group ~is_last_field:is_last_group f]
-    | f::l ->
-      let fi =
-        makeFieldInfo ~is_first_field:is_first_group ~is_last_field:false f
-      in
-      [fi] @ map_but_last l
+    fold addFieldInfo flds nl
   in
 
   (* Do regular fields first. *)
-  let flds =
-    List.filter (function FIELD _ -> true | TYPE_ANNOT _ -> false) nglist in
-  let flds =
-    List.map (function FIELD (f,g) -> (f,g) | _ -> assert false) flds in
-  let last = List.length flds -  1 in
-  let doField i = doFieldGroup ~is_first_group:(i=0) ~is_last_group:(i=last) in
-  let flds = List.concat (List.mapi doField flds) in
+  let to_field = function
+    | TYPE_ANNOT _ -> None
+    | FIELD (f,g) -> Some (f,g) in
+  let flds = Extlib.filter_map_opt to_field nglist in
+  let flds = List.rev (fold addFieldGroup [] flds) in
 
-  let fld_table = Cil_datatype.Fieldinfo.Hashtbl.create 17 in
+  let fld_table = Hashtbl.create 17 in
   let check f =
     try
-      let oldf = Cil_datatype.Fieldinfo.Hashtbl.find fld_table f in
+      let oldf = Hashtbl.find fld_table f.fname in
       let source = fst f.floc in
       Kernel.error ~source
         "field %s occurs multiple times in aggregate %a. \
@@ -5546,41 +5576,44 @@ and makeCompType ghost (isstruct: bool)
         (fst oldf.floc).Filepath.pos_lnum
     with Not_found ->
       (* Do not add unnamed bitfields: they can share the empty name. *)
-      if f.fname <> "" then Cil_datatype.Fieldinfo.Hashtbl.add fld_table f f
+      if f.fname <> "" then Hashtbl.add fld_table f.fname f
   in
+  if flds = [] && not (Cil.acceptEmptyCompinfo ()) then
+    Kernel.error ~current:true ~once:true
+      "empty %ss only allowed for GCC/MSVC"
+      (if comp.cstruct then "struct" else "union");
   List.iter check flds;
-  if comp.cfields <> [] then begin
+  if comp.cfields <> None then begin
+    let old_fields = Option.get comp.cfields in
     (* This appears to be a multiply defined structure. This can happen from
      * a construct like "typedef struct foo { ... } A, B;". This is dangerous
      * because at the time B is processed some forward references in { ... }
      * appear as backward references, which could lead to circularity in
      * the type structure. We do a thorough check and then we reuse the type
      * for A *)
-    if List.length comp.cfields <> List.length flds
+    if List.length old_fields <> List.length flds
     || (List.exists2 (fun f1 f2 -> not (Cil_datatype.Typ.equal f1.ftype f2.ftype))
-          comp.cfields flds)
+          old_fields flds)
     then
       Kernel.error ~once:true ~current:true
         "%s seems to be multiply defined" (compFullName comp)
   end else
     begin
-      comp.cfields <- flds;
+      comp.cfields <- Some flds;
       let fields_with_pragma_attrs =
         List.map (fun fld ->
             (* note: in the call below, we CANNOT use fld.fcomp.cattr because it has not
                been filled in yet, so we need to pass the list of attributes [a] to it *)
             {fld with fattr = (process_pragmas_pack_align_field_attributes fld fld.fattr a)}
-          ) comp.cfields
+          ) flds
       in
-      comp.cfields <- fields_with_pragma_attrs
+      comp.cfields <- Some fields_with_pragma_attrs
     end;
 
   (*  ignore (E.log "makeComp: %s: %a\n" comp.cname d_attrlist a); *)
   let a = Cil.addAttributes comp.cattr a in
   comp.cattr <- process_pragmas_pack_align_comp_attributes comp a;
   let res = TComp (comp,empty_size_cache (), []) in
-  (* This compinfo is defined, even if there are no fields *)
-  comp.cdefined <- true;
   (* Create a typedef for this one *)
   cabsPushGlobal (GCompTag (comp, CurrentLoc.get ()));
 
@@ -6003,14 +6036,8 @@ and doExp local_env
 
     | A.TYPE_SIZEOF (bt, dt) ->
       let typ = doOnlyType local_env.is_ghost bt dt in
-      let res =
-        if Cil.isCompleteType typ then new_exp ~loc (SizeOf typ)
-        else begin
-          Kernel.error ~once:true ~current:true
-            "sizeof on incomplete type '%a'" Cil_printer.pp_typ typ;
-          new_exp ~loc (Const (CStr ("booo sizeof(incomplete)")))
-        end
-      in
+      fail_if_incompatible_sizeof ~ensure_complete:true "sizeof" typ;
+      let res = new_exp ~loc (SizeOf typ) in
       finishExp [] (unspecified_chunk empty) res theMachine.typeOfSizeOf
 
     | A.EXPR_SIZEOF e ->
@@ -6019,9 +6046,7 @@ and doExp local_env
       let (_, se, e', lvt) =
         doExp (no_paren_local_env local_env) CNoConst e AExpLeaveArrayFun
       in
-      if Cil.isFunctionType lvt && Cil.theMachine.theMachine.sizeof_fun < 0 then
-        Kernel.abort ~current:true
-          "sizeof() called on function";
+      fail_if_incompatible_sizeof ~ensure_complete:false "sizeof()" lvt;
       let scope_chunk = drop_chunk "sizeof" se e e' in
       let size =
         match e'.enode with
@@ -6038,16 +6063,15 @@ and doExp local_env
 
     | A.TYPE_ALIGNOF (bt, dt) ->
       let typ = doOnlyType local_env.is_ghost bt dt in
-      finishExp [] (unspecified_chunk empty) (new_exp ~loc (AlignOf(typ)))
-        theMachine.typeOfSizeOf
+      fail_if_incompatible_sizeof ~ensure_complete:true "alignof" typ;
+      let res = new_exp ~loc (AlignOf typ) in
+      finishExp [] (unspecified_chunk empty) res theMachine.typeOfSizeOf
 
     | A.EXPR_ALIGNOF e ->
       let (_, se, e', lvt) =
         doExp (no_paren_local_env local_env) CNoConst e AExpLeaveArrayFun
       in
-      if Cil.isFunctionType lvt && Cil.theMachine.theMachine.alignof_fun < 0
-      then
-        Kernel.abort ~current:true "alignof() called on a function.";
+      fail_if_incompatible_sizeof ~ensure_complete:false "alignof()" lvt;
       let scope_chunk = drop_chunk "alignof" se e e' in
       let e'' =
         match e'.enode with (* If we are taking the alignof an
@@ -6284,7 +6308,7 @@ and doExp local_env
             finishExp []
               (se' +++
                (mkStmtOneInstr ~ghost:local_env.is_ghost ~valid_sid
-                  (Set(lv, makeCastT result tresult t,
+                  (Set(lv, snd (castTo tresult t result),
                        CurrentLoc.get ())),[],[lv],r'))
               e'
               t
@@ -6339,7 +6363,7 @@ and doExp local_env
               (se' +++
                (mkStmtOneInstr ~ghost:local_env.is_ghost ~valid_sid
                   (Set(lv,
-                       makeCastT opresult tresult (typeOfLval lv),
+                       snd (castTo tresult (typeOfLval lv) opresult),
                        CurrentLoc.get ())),
                 [],[lv], r'))
               result
@@ -6671,7 +6695,7 @@ and doExp local_env
        * functions alone*)
       let isSpecialBuiltin =
         match f''.enode with
-        | Lval (Var fv, NoOffset) -> Cil.is_special_builtin fv.vname
+        | Lval (Var fv, NoOffset) -> Cil_builtins.is_special_builtin fv.vname
         | _ -> false
       in
       let init_chunk = unspecified_chunk empty in
@@ -8111,7 +8135,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
         (* ISO 6.7.8 para 14: final NUL added only if no size specified, or
          * if there is room for it; btw, we can't rely on zero-init of
          * globals, since this array might be a local variable *)
-        if ((not (Extlib.has_some leno)) ||
+        if (Option.is_none leno ||
             ((String.length s) < (integerArrayLength leno)))
         then ref [init Int64.zero]
         else ref []
@@ -8189,7 +8213,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
         (* ISO 6.7.8 para 14: final NUL added only if no size specified, or
          * if there is room for it; btw, we can't rely on zero-init of
          * globals, since this array might be a local variable *)
-        if (not (Extlib.has_some leno)
+        if (Option.is_none leno
             || ((List.length s) < (integerArrayLength leno)))
         then [init Int64.zero]
         else [])
@@ -8223,7 +8247,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
     (* Start over with the fields *)
     doInit local_env asconst add_implicit_ensures preinit so acc allinitl
   (* An incomplete structure with any initializer is an error. *)
-  | TComp (comp, _, _), _ :: restil when not comp.cdefined ->
+  | TComp (comp, _, _), _ :: restil when comp.cfields = None ->
     Kernel.error ~current:true ~once:true
       "variable `%s' has initializer but incomplete type" so.host.vname;
     doInit local_env asconst add_implicit_ensures preinit so acc restil
@@ -8329,7 +8353,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
         [(A.NEXT_INIT, A.SINGLE_INIT oneinit)]
     else
       (* If this is a GNU extension with field-to-union cast find the field *)
-      let fi = findField ci.cfields in
+      let fi = findField (Option.value ~default:[] ci.cfields) in
       (* Change the designator and redo *)
       doInit
         local_env asconst add_implicit_ensures preinit so acc
@@ -8524,7 +8548,7 @@ and createGlobal ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool * A
     if inite != A.NO_INIT  then
       Kernel.error ~once:true ~current:true
         "Function declaration with initializer (%s)\n" vi.vname;
-  end else if Extlib.has_some logic_spec then begin
+  end else if Option.is_some logic_spec then begin
     Kernel.warning ~wkey:Kernel.wkey_annot_error ~current:true ~once:true
       "Global variable %s is not a function. It cannot have a contract."
       vi.vname
@@ -8714,7 +8738,7 @@ and cleanup_autoreference vi chunk =
 
       method! vinst = function
         | Call _ | Local_init(_,ConsInit _,_) ->
-          calls := ref (Extlib.the self#current_stmt) :: !calls;
+          calls := ref (Option.get self#current_stmt) :: !calls;
           DoChildren
         | _ -> DoChildren
 
@@ -9098,7 +9122,7 @@ and doDecl local_env (isglobal: bool) : A.definition -> chunk = function
             Kernel.warning ~current:true "Unexpected attribute in #pragma";
             Some (Attr ("", [a']))
         in
-        Extlib.may
+        Option.iter
           (fun a'' ->
              cabsPushGlobal (GPragma (a'', CurrentLoc.get ())))
           a'';
@@ -9444,7 +9468,7 @@ and doDecl local_env (isglobal: bool) : A.definition -> chunk = function
             if !currentFunctionFDEC.svar.vname = "main" then
               [],res
             else begin
-              Kernel.warning ~current:true
+              Kernel.warning ~current:true ~wkey:Kernel.wkey_cert_msc_37
                 "Body of function %s falls-through. \
                  Adding a return statement"
                 !currentFunctionFDEC.svar.vname;
@@ -9456,7 +9480,7 @@ and doDecl local_env (isglobal: bool) : A.definition -> chunk = function
                to get there anyway. *)
             let null_ptr = makeCastT (zero ~loc) intType (TPtr(rt,[])) in
             let res = Some (new_exp ~loc (Lval (mkMem null_ptr NoOffset))) in
-            Kernel.warning ~current:true
+            Kernel.warning ~current:true ~wkey:Kernel.wkey_cert_msc_37
               "Body of function %s falls-through. \
                Adding a return statement"
               !currentFunctionFDEC.svar.vname;
@@ -10316,7 +10340,7 @@ let convFile (path, f) =
   Logic_env.prepare_tables ();
   anonCompFieldNameId := 0;
   Kernel.debug ~level:2 "Converting CABS->CIL" ;
-  Cil.Builtin_functions.iter_sorted
+  Cil_builtins.Builtin_functions.iter_sorted
     (fun name (resTyp, argTypes, isva) ->
        ignore (setupBuiltin name (resTyp, ArgTypes argTypes, isva)));
   let globalidx = ref 0 in

@@ -1,10 +1,13 @@
 /* run.config
-EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-OPT: -json-compilation-database @PTEST_DIR@ -print
-OPT: @PTEST_DIR@/jcdb2.c -json-compilation-database @PTEST_DIR@/with_arguments.json -print
-OPT: -json-compilation-database @PTEST_DIR@/with_arguments.json -no-autoload-plugins -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs
-EXECNOW: LOG list_files.res LOG list_files.err share/analysis-scripts/list_files.py @PTEST_DIR@/compile_commands_working.json > @PTEST_DIR@/result/list_files.res 2> @PTEST_DIR@/result/list_files.err
+   OPT: -json-compilation-database @PTEST_DIR@ -print
+   OPT: @PTEST_DIR@/jcdb2.c -json-compilation-database @PTEST_DIR@/with_arguments.json -print
+ MODULE: @PTEST_NAME@
+   OPT: -json-compilation-database @PTEST_DIR@/with_arguments.json -no-autoload-plugins
+ MODULE:
+   EXECNOW: LOG list_files.res LOG list_files.err share/analysis-scripts/list_files.py @PTEST_DIR@/compile_commands_working.json > @PTEST_DIR@/result/list_files.res 2> @PTEST_DIR@/result/list_files.err
+   EXECNOW: LOG logic-pp-include.res LOG logic-pp-include.err @frama-c@ -json-compilation-database @PTEST_DIR@/logic-pp-include @PTEST_DIR@/logic-pp-include/no-stdio.c -print > @PTEST_DIR@/result/logic-pp-include.res 2> @PTEST_DIR@/result/logic-pp-include.err
 */
+
 #include <stdio.h>
 
 #ifdef TOUNDEF

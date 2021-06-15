@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -117,9 +117,9 @@ module Kf =
   State_builder.Option_ref
     (Datatype.Int.Hashtbl.Make(Datatype.Triple(Kf)(Stmt)(Datatype.List(Block))))
     (struct
-       let name = "Kernel_function.Kf"
-       let dependencies = [ Ast.self ]
-     end)
+      let name = "Kernel_function.Kf"
+      let dependencies = [ Ast.self ]
+    end)
 
 let self = Kf.self
 
@@ -139,22 +139,22 @@ let compute () =
            opened_blocks <- b :: opened_blocks;
            Cil.ChangeDoChildrenPost
              (b,fun b -> opened_blocks <- List.tl opened_blocks; b)
-	 method! vstmt s =
-	   Datatype.Int.Hashtbl.add h s.sid (self#kf, s, opened_blocks);
-	   Cil.DoChildren
-	 method! vglob g =
-	   begin match g with
-	   | GFun (fd, _) ->
-	       (try
+         method! vstmt s =
+           Datatype.Int.Hashtbl.add h s.sid (self#kf, s, opened_blocks);
+           Cil.DoChildren
+         method! vglob g =
+           begin match g with
+             | GFun (fd, _) ->
+               (try
                   let kf = Globals.Functions.get fd.svar in
-	          current_kf <- Some kf;
+                  current_kf <- Some kf;
                 with Not_found ->
                   Kernel.fatal "No kernel function for function %a"
                     Cil_datatype.Varinfo.pretty fd.svar)
-	   | _ ->
-	       ()
-	   end;
-	   Cil.DoChildren
+             | _ ->
+               ()
+           end;
+           Cil.DoChildren
        end
        in
        Cil.visitCilFile (visitor :> Cil.cilVisitor) p;
@@ -212,7 +212,7 @@ let find_enclosing_block s =
 let () = Globals.find_enclosing_block:= find_enclosing_block
 
 let find_all_enclosing_blocks s =
-   let table = compute () in
+  let table = compute () in
   let (_,_,b) = Datatype.Int.Hashtbl.find table s.sid in b
 
 let find_stmt_in_block b s =
@@ -312,13 +312,13 @@ let stmt_in_loop kf stmt =
     val is_in_loop = Stack.create ()
     method! vstmt s =
       match s.skind with
-        | Loop _ ->
-          Stack.push true is_in_loop;
-          if Cil_datatype.Stmt.equal s stmt then raise (Res.Found true);
-          Cil.DoChildrenPost (fun s -> ignore (Stack.pop is_in_loop); s)
-        | _ when Cil_datatype.Stmt.equal s stmt ->
-          raise (Res.Found (Stack.top is_in_loop))
-        | _  -> Cil.DoChildren
+      | Loop _ ->
+        Stack.push true is_in_loop;
+        if Cil_datatype.Stmt.equal s stmt then raise (Res.Found true);
+        Cil.DoChildrenPost (fun s -> ignore (Stack.pop is_in_loop); s)
+      | _ when Cil_datatype.Stmt.equal s stmt ->
+        raise (Res.Found (Stack.top is_in_loop))
+      | _  -> Cil.DoChildren
     initializer Stack.push false is_in_loop
   end
   in
@@ -327,8 +327,8 @@ let stmt_in_loop kf stmt =
       (Cil.visitCilFunction vis (get_definition kf));
     false
   with
-    | Res.Found f -> f
-    | No_Definition -> false (* Not the good kf obviously. *)
+  | Res.Found f -> f
+  | No_Definition -> false (* Not the good kf obviously. *)
 
 let find_enclosing_loop kf stmt =
   let module Res = struct exception Found of Cil_types.stmt end in
@@ -337,25 +337,25 @@ let find_enclosing_loop kf stmt =
     val loops = Stack.create ()
     method! vstmt s =
       match s.skind with
-        | Loop _ ->
-          Stack.push s loops;
-          Cil.DoChildrenPost (fun s -> ignore (Stack.pop loops); s)
-        | _ when Cil_datatype.Stmt.equal s stmt ->
-          raise (Res.Found (Stack.top loops))
-        | _ -> Cil.DoChildren
+      | Loop _ ->
+        Stack.push s loops;
+        Cil.DoChildrenPost (fun s -> ignore (Stack.pop loops); s)
+      | _ when Cil_datatype.Stmt.equal s stmt ->
+        raise (Res.Found (Stack.top loops))
+      | _ -> Cil.DoChildren
   end
   in
   try
     (match stmt.skind with
-      | Loop _ -> stmt
-      | _ ->
-        ignore
-          (Cil.visitCilFunction vis (get_definition kf));
-        raise Not_found)
+     | Loop _ -> stmt
+     | _ ->
+       ignore
+         (Cil.visitCilFunction vis (get_definition kf));
+       raise Not_found)
   with
-    | No_Definition -> raise Not_found (* Not the good kf obviously. *)
-    | Stack.Empty -> raise Not_found (* statement outside of a loop *)
-    | Res.Found s -> s
+  | No_Definition -> raise Not_found (* Not the good kf obviously. *)
+  | Stack.Empty -> raise Not_found (* statement outside of a loop *)
+  | Res.Found s -> s
 
 exception Got_return of stmt
 exception No_Statement
@@ -447,8 +447,8 @@ let find_label kf label =
 
 let get_called fct = match fct.enode with
   | Lval (Var vkf, NoOffset) ->
-      (try Some (Globals.Functions.get vkf)
-       with Not_found -> None)
+    (try Some (Globals.Functions.get vkf)
+     with Not_found -> None)
   | _ -> None
 
 (* ************************************************************************* *)
@@ -462,13 +462,13 @@ module KfCallers =
     (struct
       let name = "Kernel_function.KfCallers"
       let dependencies = [ Ast.self ]
-     end)
+    end)
 
 let called_kernel_function fct =
   match fct.enode with
-    | Lval (Var vinfo,NoOffset) ->
-        (try Some(Globals.Functions.get vinfo) with Not_found -> None)
-    | _ -> None
+  | Lval (Var vinfo,NoOffset) ->
+    (try Some(Globals.Functions.get vinfo) with Not_found -> None)
+  | _ -> None
 
 class callsite_visitor hmap = object (self)
   inherit Cil.nopCilVisitor
@@ -478,8 +478,8 @@ class callsite_visitor hmap = object (self)
   (* Go into functions *)
   method! vglob = function
     | GFun(fd,_) ->
-        current_kf <- Some(Globals.Functions.get fd.svar) ;
-        Cil.DoChildren
+      current_kf <- Some(Globals.Functions.get fd.svar) ;
+      Cil.DoChildren
     | _ -> Cil.SkipChildren
 
   (* Inspect stmt calls *)
@@ -489,12 +489,12 @@ class callsite_visitor hmap = object (self)
       CallSites.replace hmap callee ((self#kf,stmt)::sites)
     in
     match stmt.skind with
-      | Instr(Call(_,fct,_,_)) ->
-        Extlib.may add_call (called_kernel_function fct); Cil.SkipChildren
-      | Instr (Local_init (_, ConsInit(f,_,_),_)) ->
-        add_call (Globals.Functions.get f); Cil.SkipChildren
-      | Instr _ -> Cil.SkipChildren
-      | _ -> Cil.DoChildren
+    | Instr(Call(_,fct,_,_)) ->
+      Option.iter add_call (called_kernel_function fct); Cil.SkipChildren
+    | Instr (Local_init (_, ConsInit(f,_,_),_)) ->
+      add_call (Globals.Functions.get f); Cil.SkipChildren
+    | Instr _ -> Cil.SkipChildren
+    | _ -> Cil.DoChildren
 
   (* Skip many other things ... *)
   method! vexpr _ = Cil.SkipChildren
@@ -563,6 +563,12 @@ let is_definition kf =
   | Definition _ -> true
   | Declaration _ -> false
 
+let is_in_libc kf =
+  let attrs = match kf.fundec with
+    | Definition ({ svar = { vattr } },_)
+    | Declaration (_, { vattr }, _, _) -> vattr
+  in Cil.is_in_libc attrs
+
 let is_first_stmt kf stmt =
   try
     let first = find_first_stmt kf in
@@ -578,12 +584,11 @@ let is_return_stmt kf stmt =
     false
 
 let is_entry_point kf =
-  let main, _ = Globals.entry_point () in
-  equal kf main
+  try equal kf (fst (Globals.entry_point ()))
+  with Globals.No_such_entry_point _ -> false
 
 let is_main kf =
-  let name = get_name kf in
-  Datatype.String.equal name "main"
+  String.equal (get_name kf) "main"
 
 let returns_void kf =
   let result_type,_,_,_ = Cil.splitFunctionType (get_type kf) in
@@ -601,8 +606,8 @@ let get_formal_position v kf =
   Extlib.find_index (fun vv -> v.vid = vv.vid) (get_formals kf)
 
 let is_local v kf = match kf.fundec with
-    | Definition(fd, _) -> Ast_info.Function.is_local v fd
-    | Declaration _ -> false
+  | Definition(fd, _) -> Ast_info.Function.is_local v fd
+  | Declaration _ -> false
 
 let is_formal_or_local v kf =
   (not v.vglob) && (is_formal v kf || is_local v kf)
@@ -615,9 +620,9 @@ module Make_Table = State_builder.Hashtbl(Cil_datatype.Kf.Hashtbl)
 
 module Hptset = struct
   include Hptset.Make
-    (Cil_datatype.Kf)
-    (struct let v = [ [ ] ] end)
-    (struct let l = [ Ast.self ] end)
+      (Cil_datatype.Kf)
+      (struct let v = [ [ ] ] end)
+      (struct let l = [ Ast.self ] end)
   let () = Ast.add_monotonic_state self
   let () = Ast.add_hook_on_update clear_caches
 end
@@ -641,33 +646,33 @@ module Get_global =
       let name = "Kernel_function.get_global"
       let size = 8
       let dependencies = [ Globals.Functions.self ]
-     end)
+    end)
 
 let compute_get_global () =
   Cil.iterGlobals
     (Ast.get ())
     (function
-    | GFun({ svar = vi }, _) | GFunDecl(_, vi, _) as g
-         when Ast.is_def_or_last_decl g ->
-      let kf =
-        try Globals.Functions.get vi
-        with Not_found ->
-          Kernel.fatal
-            "[Kernel_function.compute_get_global] unknown function %a"
-            Cil_datatype.Varinfo.pretty vi
-      in
-      Get_global.replace kf g
-    | _ -> ())
+      | GFun({ svar = vi }, _) | GFunDecl(_, vi, _) as g
+        when Ast.is_def_or_last_decl g ->
+        let kf =
+          try Globals.Functions.get vi
+          with Not_found ->
+            Kernel.fatal
+              "[Kernel_function.compute_get_global] unknown function %a"
+              Cil_datatype.Varinfo.pretty vi
+        in
+        Get_global.replace kf g
+      | _ -> ())
 
 let get_global =
   Get_global.memo
     (fun kf ->
-      compute_get_global ();
-      try Get_global.find kf
-      with Not_found ->
-        Kernel.fatal
-          "[Kernel_function.get_global] unknown function %a"
-          pretty kf)
+       compute_get_global ();
+       try Get_global.find kf
+       with Not_found ->
+         Kernel.fatal
+           "[Kernel_function.get_global] unknown function %a"
+           pretty kf)
 
 (*
 Local Variables:

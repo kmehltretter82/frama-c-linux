@@ -37,10 +37,9 @@ open Cil_types
 val reset: unit -> unit
 
 val tapp_to_exp:
-  loc:location ->
-  string -> Env.t -> kernel_function ->
-  term -> logic_info -> Typing.number_ty list -> exp list ->
-  varinfo * exp * Env.t
+  kernel_function -> Env.t -> ?eargs:exp list -> term -> exp * Env.t
+(** Translate a Tapp term to an expression. If the optional argument [eargs] is
+    provided, then these expressions are used as arguments of the fonction. *)
 
 val add_generated_functions: global list -> global list
 (* @return the input list of globals in which the generated functions have been

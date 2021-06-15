@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -39,6 +39,8 @@ val iter_kf : (Kernel_function.t -> unit) -> unit
 (** {2 Goal Selection} *)
 
 module WP          : Parameter_sig.Bool
+module Dump        : Parameter_sig.Bool
+module Legacy      : Parameter_sig.Bool
 module Behaviors   : Parameter_sig.String_list
 module Properties  : Parameter_sig.String_list
 module StatusAll   : Parameter_sig.Bool
@@ -85,11 +87,10 @@ module Clean: Parameter_sig.Bool
 module Filter: Parameter_sig.Bool
 module Parasite: Parameter_sig.Bool
 module Prenex: Parameter_sig.Bool
-module Bits: Parameter_sig.Bool
 module Ground: Parameter_sig.Bool
 module Reduce: Parameter_sig.Bool
 module ExtEqual : Parameter_sig.Bool
-module UnfoldAssigns : Parameter_sig.Bool
+module UnfoldAssigns : Parameter_sig.Int
 module Split: Parameter_sig.Bool
 module SplitMax: Parameter_sig.Int
 module SplitDepth: Parameter_sig.Int
@@ -100,6 +101,10 @@ module SimplifyForall : Parameter_sig.Bool
 module SimplifyType : Parameter_sig.Bool
 module CalleePreCond : Parameter_sig.Bool
 module PrecondWeakening : Parameter_sig.Bool
+module TerminatesExtDeclarations : Parameter_sig.Bool
+module TerminatesFCDeclarations : Parameter_sig.Bool
+module TerminatesDefinitions : Parameter_sig.Bool
+module TerminatesVariantHyp : Parameter_sig.Bool
 
 (** {2 Prover Interface} *)
 
@@ -150,13 +155,12 @@ module Report: Parameter_sig.String_list
 module ReportJson: Parameter_sig.String
 module ReportName: Parameter_sig.String
 module MemoryContext: Parameter_sig.Bool
-module CheckModelHypotheses: Parameter_sig.Bool
+module CheckMemoryContext: Parameter_sig.Bool
 module SmokeTests: Parameter_sig.Bool
+module SmokeDeadassumes: Parameter_sig.Bool
 module SmokeDeadloop: Parameter_sig.Bool
 module SmokeDeadcode: Parameter_sig.Bool
 module SmokeDeadcall: Parameter_sig.Bool
-
-val wkey_imprecise_hypotheses_assigns: warn_category
 
 (** {2 Getters} *)
 
@@ -175,3 +179,5 @@ val print_generated: ?header:string -> string -> unit
 (** print the given file if the debugging category
     "print-generated" is set *)
 val cat_print_generated: category
+
+val protect : exn -> bool

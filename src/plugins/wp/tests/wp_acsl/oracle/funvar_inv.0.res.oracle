@@ -26,7 +26,7 @@ Let x = G[0].
 Assume {
   Type: is_sint32(i) /\ is_sint32(x) /\ is_sint32(G[1]).
   (* Heap *)
-  Type: IsArray1_sint32(G).
+  Type: IsArray_sint32(G).
   If i <= 3
   Then { (* Else *) Have: G[i] = 0. }
 }
@@ -42,7 +42,7 @@ Let x = G[0].
 Assume {
   Type: is_sint32(i) /\ is_sint32(x).
   (* Heap *)
-  Type: IsArray1_sint32(G).
+  Type: IsArray_sint32(G).
   (* Goal *)
   When: (x != 0) /\ (G[1] = 0).
   If i <= 3
@@ -68,7 +68,7 @@ Let x = G[0].
 Assume {
   Type: is_sint32(i) /\ is_sint32(x) /\ is_sint32(G[1]).
   (* Heap *)
-  Type: IsArray1_sint32(G).
+  Type: IsArray_sint32(G).
   If i <= 3
   Then { (* Else *) Have: G[i] = 0. }
 }
@@ -84,7 +84,7 @@ Let x = G[0].
 Assume {
   Type: is_sint32(i) /\ is_sint32(x).
   (* Heap *)
-  Type: IsArray1_sint32(G).
+  Type: IsArray_sint32(G).
   (* Goal *)
   When: (x != 0) /\ (G[1] = 0).
   If i <= 3
@@ -110,7 +110,7 @@ Let x = G[0].
 Assume {
   Type: is_sint32(i) /\ is_sint32(x) /\ is_sint32(G[1]).
   (* Heap *)
-  Type: IsArray1_sint32(G).
+  Type: IsArray_sint32(G).
   If i <= 3
   Then { (* Else *) Have: G[i] = 0. }
 }
@@ -126,7 +126,7 @@ Let x = G[0].
 Assume {
   Type: is_sint32(i) /\ is_sint32(x).
   (* Heap *)
-  Type: IsArray1_sint32(G).
+  Type: IsArray_sint32(G).
   (* Goal *)
   When: (x != 0) /\ (G[1] = 0).
   If i <= 3
@@ -140,3 +140,18 @@ Goal Loop assigns 'qed_ok':
 Prove: true.
 
 ------------------------------------------------------------
+[wp] tests/wp_acsl/funvar_inv.i:26: Warning: 
+  Memory model hypotheses for function 'f':
+  /*@ behavior wp_hoare:
+        ensures \separated(\result, (int *)G + (..)); */
+  int *f(void);
+[wp] tests/wp_acsl/funvar_inv.i:40: Warning: 
+  Memory model hypotheses for function 'f2':
+  /*@ behavior wp_hoare:
+        ensures \separated(\result, (int *)G + (..)); */
+  int *f2(void);
+[wp] tests/wp_acsl/funvar_inv.i:55: Warning: 
+  Memory model hypotheses for function 'g':
+  /*@ behavior wp_hoare:
+        ensures \separated(\result, (int *)G + (..)); */
+  int *g(void);

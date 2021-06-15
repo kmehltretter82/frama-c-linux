@@ -44,7 +44,7 @@
 open Cil_types
 
 let x86_16 = {
-  version          = 
+  version          =
     "x86 16 bits mode (gcc like compiler) with big or huge memory model";
   compiler = "generic";
   cpp_arch_flags   = ["-m16"];
@@ -56,7 +56,7 @@ let x86_16 = {
   sizeof_float     = 4;
   sizeof_double    = 8;
   sizeof_longdouble  = 16;
-  sizeof_void      = 1;
+  sizeof_void      = -1;
   sizeof_fun       = -1;
   size_t = "unsigned int";
   wchar_t = "int";
@@ -72,8 +72,8 @@ let x86_16 = {
   alignof_str = 1;
   alignof_fun = -1;
   alignof_aligned= 8;
-         (* I don't know if attribute aligned is supported by any 16bits 
-            compiler. *)
+  (* I don't know if attribute aligned is supported by any 16bits
+     compiler. *)
   char_is_unsigned = false;
   const_string_literals = true;
   little_endian = true;
@@ -83,7 +83,7 @@ let x86_16 = {
 
 let gcc_x86_16 = { x86_16 with
                    compiler = "gcc";
-                   sizeof_fun = 1; alignof_fun = 1;
+                   sizeof_void = 1; sizeof_fun = 1; alignof_fun = 1;
                  }
 
 let x86_32 = {
@@ -98,7 +98,7 @@ let x86_32 = {
   sizeof_float     = 4;
   sizeof_double    = 8;
   sizeof_longdouble  = 12;
-  sizeof_void      = 1;
+  sizeof_void      = -1;
   sizeof_fun       = -1;
   size_t = "unsigned int";
   wchar_t = "int";
@@ -123,7 +123,7 @@ let x86_32 = {
 
 let gcc_x86_32 = { x86_32 with
                    compiler = "gcc";
-                   sizeof_fun = 1; alignof_fun = 1;
+                   sizeof_void = 1; sizeof_fun = 1; alignof_fun = 1;
                  }
 
 let x86_64 = {
@@ -138,7 +138,7 @@ let x86_64 = {
   sizeof_float     = 4;
   sizeof_double    = 8;
   sizeof_longdouble  = 16;
-  sizeof_void      = 1;
+  sizeof_void      = -1;
   sizeof_fun       = -1;
   size_t = "unsigned long";
   wchar_t = "int";
@@ -163,7 +163,7 @@ let x86_64 = {
 
 let gcc_x86_64 = { x86_64 with
                    compiler = "gcc";
-                   sizeof_fun = 1; alignof_fun = 1;
+                   sizeof_void = 1; sizeof_fun = 1; alignof_fun = 1;
                  }
 
 let ppc_32 = {

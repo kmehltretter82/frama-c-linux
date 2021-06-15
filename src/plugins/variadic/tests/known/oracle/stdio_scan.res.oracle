@@ -51,11 +51,11 @@
 #include "stdarg.h"
 #include "stddef.h"
 #include "stdio.h"
-/*@ requires valid_read_string(format);
+/*@ requires \valid(param0);
     requires \valid(param2);
-    requires \valid(param0);
-    ensures \initialized(param2);
+    requires valid_read_string(format);
     ensures \initialized(param0);
+    ensures \initialized(param2);
     assigns \result, stream->__fc_FILE_data, *param2, *(param1 + (0 ..)),
             *param0;
     assigns \result
@@ -75,14 +75,14 @@
       \from (indirect: stream->__fc_FILE_id), stream->__fc_FILE_data,
             (indirect: *(format + (0 ..)));
  */
-int fscanf_va_1(FILE * __restrict stream, char const * __restrict format,
+int fscanf_va_1(FILE * restrict stream, char const * restrict format,
                 int *param0, char *param1, int *param2);
 
-/*@ requires valid_read_string(format);
+/*@ requires \valid(param0);
     requires \valid(param2);
-    requires \valid(param0);
-    ensures \initialized(param2);
+    requires valid_read_string(format);
     ensures \initialized(param0);
+    ensures \initialized(param2);
     assigns \result, __fc_stdin->__fc_FILE_data, *param2, *(param1 + (0 ..)),
             *param0;
     assigns \result
@@ -102,15 +102,15 @@ int fscanf_va_1(FILE * __restrict stream, char const * __restrict format,
       \from (indirect: __fc_stdin->__fc_FILE_id), __fc_stdin->__fc_FILE_data,
             (indirect: *(format + (0 ..)));
  */
-int scanf_va_1(char const * __restrict format, int *param0, char *param1,
+int scanf_va_1(char const * restrict format, int *param0, char *param1,
                int *param2);
 
-/*@ requires valid_read_string(s);
-    requires valid_read_string(format);
+/*@ requires \valid(param0);
     requires \valid(param2);
-    requires \valid(param0);
-    ensures \initialized(param2);
+    requires valid_read_string(format);
+    requires valid_read_string(s);
     ensures \initialized(param0);
+    ensures \initialized(param2);
     assigns \result, *param2, *(param1 + (0 ..)), *param0;
     assigns \result
       \from (indirect: *(s + (0 ..))), (indirect: *(format + (0 ..)));
@@ -121,7 +121,7 @@ int scanf_va_1(char const * __restrict format, int *param0, char *param1,
     assigns *param0
       \from (indirect: *(s + (0 ..))), (indirect: *(format + (0 ..)));
  */
-int sscanf_va_1(char const * __restrict s, char const * __restrict format,
+int sscanf_va_1(char const * restrict s, char const * restrict format,
                 int *param0, char *param1, int *param2);
 
 int main(void)
@@ -156,9 +156,9 @@ int main(void)
     sscanf((char const *)str,(char const *)format,
            (void * const *)(__va_args_26));
   }
-  fscanf_va_1(stream,"%d %s %d",& i,s,& j);
-  scanf_va_1("%d %s %d",& i,s,& j);
-  sscanf_va_1((char const *)str,"%d %s %d",& i,s,& j);
+  fscanf(stream,"%d %s %d",& i,s,& j); /* fscanf_va_1 */
+  scanf("%d %s %d",& i,s,& j); /* scanf_va_1 */
+  sscanf((char const *)str,"%d %s %d",& i,s,& j); /* sscanf_va_1 */
   __retres = 0;
   return __retres;
 }

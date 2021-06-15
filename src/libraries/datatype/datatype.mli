@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -32,15 +32,15 @@
 (** Values associated to each datatype.
     Some others are provided directly in module {!Type}. *)
 type 'a t = private
-    { equal: 'a -> 'a -> bool;
-      compare: 'a -> 'a -> int;
-      hash: 'a -> int;
-      copy: 'a -> 'a;
-      internal_pretty_code: Type.precedence -> Format.formatter -> 'a -> unit;
-      pretty_code: Format.formatter -> 'a -> unit;
-      pretty: Format.formatter -> 'a -> unit;
-      varname: 'a -> string;
-      mem_project: (Project_skeleton.t -> bool) -> 'a -> bool }
+  { equal: 'a -> 'a -> bool;
+    compare: 'a -> 'a -> int;
+    hash: 'a -> int;
+    copy: 'a -> 'a;
+    internal_pretty_code: Type.precedence -> Format.formatter -> 'a -> unit;
+    pretty_code: Format.formatter -> 'a -> unit;
+    pretty: Format.formatter -> 'a -> unit;
+    varname: 'a -> string;
+    mem_project: (Project_skeleton.t -> bool) -> 'a -> bool }
 
 (** A type with its type value. *)
 module type Ty = sig
@@ -90,8 +90,8 @@ module type S_no_copy = sig
       for journalisation. *)
 
   val mem_project: (Project_skeleton.t -> bool) -> t -> bool
-(** [mem_project f x] must return [true] iff there is a value [p] of type
-    [Project.t] in [x] such that [f p] returns [true]. *)
+  (** [mem_project f x] must return [true] iff there is a value [p] of type
+      [Project.t] in [x] such that [f p] returns [true]. *)
 
 end
 
@@ -99,7 +99,7 @@ end
 module type S = sig
   include S_no_copy
   val copy: t -> t
-(** Deep copy: no possible sharing between [x] and [copy x]. *)
+  (** Deep copy: no possible sharing between [x] and [copy x]. *)
 end
 
 (* ********************************************************************** *)
@@ -123,12 +123,12 @@ val mem_project: 'a Type.t -> (Project_skeleton.t -> bool) -> 'a -> bool
 (* ********************************************************************** *)
 
 val undefined: 'a -> 'b
-(** Must be used if you don't want to implement a required function. 
+(** Must be used if you don't want to implement a required function.
     @plugin development guide *)
 
 val identity: 'a -> 'a
 (** Must be used if you want to implement a required function by [fun x ->
-    x]. Only useful for implementing [rehash] and [copy]. 
+    x]. Only useful for implementing [rehash] and [copy].
     @plugin development guide *)
 
 val from_compare: 'a -> 'a -> bool
@@ -141,16 +141,16 @@ val from_pretty_code: Format.formatter -> 'a -> unit
 
 val never_any_project: (Project_skeleton.t -> bool) -> 'a -> bool
 (** Must be used for [mem_project] if values of your type does never contain
-    any project. 
+    any project.
     @plugin development guide *)
 
 val pp_fail: Type.precedence -> Format.formatter -> 'a -> unit
 (** Must be used for [internal_pretty_code] if this pretty-printer must
-    fail only when called. 
+    fail only when called.
     @plugin development guide *)
 
 (** Sub-signature of {!S}.
-  @plugin development guide *)
+    @plugin development guide *)
 module type Undefined = sig
   val structural_descr: Structural_descr.t
   val equal: 'a -> 'a -> bool
@@ -171,13 +171,13 @@ end
     let reprs = ...
     let name = ...
     let mem_project = ... (* Usually, Datatype.never_any_project *)
-(* define only useful functions for this datatype *)
+    (* define only useful functions for this datatype *)
     end] *)
 module Undefined: Undefined
 
 (** Same as {!Undefined}, but the type is supposed to be marshallable by the
     standard OCaml way (in particular, no hash-consing or projects inside
-    the type). 
+    the type).
     @plugin development guide *)
 module Serializable_undefined: Undefined
 
@@ -220,15 +220,15 @@ module type Make_input = sig
 
 end
 
-(** Generic datatype builder. 
+(** Generic datatype builder.
     @plugin development guide *)
 module Make(X: Make_input): S with type t = X.t
 
 (** Additional info for building [Set], [Map] and [Hashtbl]. *)
 module type Functor_info = sig
   val module_name: string
-(** Must be a valid OCaml module name corresponding to the module name you are
-    defining by applying the functor. *)
+  (** Must be a valid OCaml module name corresponding to the module name you are
+      defining by applying the functor. *)
 end
 
 (** A standard OCaml set signature extended with datatype operations. *)
@@ -248,8 +248,8 @@ module type Map = sig
   (** Datatype for the keys of the map. *)
 
   module Make(Data: S) : S with type t = Data.t t
-(** Build a datatype of the map according to the datatype of values in the
-    map. *)
+  (** Build a datatype of the map according to the datatype of values in the
+      map. *)
 
 end
 
@@ -271,8 +271,8 @@ module type Hashtbl = sig
   (** Datatype for the keys of the hashtbl. *)
 
   module Make(Data: S) : S with type t = Data.t t
-(** Build a datatype of the hashtbl according to the datatype of values in the
-    hashtbl. *)
+  (** Build a datatype of the hashtbl according to the datatype of values in the
+      hashtbl. *)
 
 end
 
@@ -337,7 +337,7 @@ val string: string Type.t
 
 module Formatter: S with type t = Format.formatter
 val formatter: Format.formatter Type.t
-  
+
 (* module Big_int: S_with_collections with type t = Integer.t *)
 (* val big_int: Big_int.t Type.t *)
 (** @deprecated use Integer instead. *)
@@ -364,28 +364,28 @@ end
 module type Polymorphic = sig
   include Type.Polymorphic
   module Make(T: S) : S with type t = T.t poly
-(** Create a datatype for a monomorphic instance of the polymorphic type. *)
+  (** Create a datatype for a monomorphic instance of the polymorphic type. *)
 end
 
 (** Functor for polymorphic types with only 1 type variable.
     @plugin development guide *)
 module Polymorphic
-  (P: sig
-    include Type.Polymorphic_input
-    val mk_equal: ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
-    val mk_compare: ('a -> 'a -> int) -> 'a t -> 'a t -> int
-    val mk_hash: ('a -> int) -> 'a t -> int
-    val map: ('a -> 'a) -> 'a t -> 'a t
-    val mk_internal_pretty_code:
-      (Type.precedence -> Format.formatter -> 'a -> unit) ->
-      Type.precedence -> Format.formatter -> 'a t -> unit
-    val mk_pretty:
-      (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
-    val mk_varname: ('a -> string) -> 'a t -> string
-    val mk_mem_project:
-      ((Project_skeleton.t -> bool) -> 'a -> bool) ->
-      (Project_skeleton.t -> bool) -> 'a t -> bool
-  end) :
+    (P: sig
+       include Type.Polymorphic_input
+       val mk_equal: ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
+       val mk_compare: ('a -> 'a -> int) -> 'a t -> 'a t -> int
+       val mk_hash: ('a -> int) -> 'a t -> int
+       val map: ('a -> 'a) -> 'a t -> 'a t
+       val mk_internal_pretty_code:
+         (Type.precedence -> Format.formatter -> 'a -> unit) ->
+         Type.precedence -> Format.formatter -> 'a t -> unit
+       val mk_pretty:
+         (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
+       val mk_varname: ('a -> string) -> 'a t -> string
+       val mk_mem_project:
+         ((Project_skeleton.t -> bool) -> 'a -> bool) ->
+         (Project_skeleton.t -> bool) -> 'a t -> bool
+     end) :
   Polymorphic with type 'a poly = 'a P.t
 
 (** Output signature of {!Polymorphic2}. *)
@@ -394,31 +394,31 @@ module type Polymorphic2 = sig
   module Make(T1: S)(T2: S) : S with type t = (T1.t, T2.t) poly
 end
 
-(** Functor for polymorphic types with 2 type variables. 
+(** Functor for polymorphic types with 2 type variables.
     @plugin development guide *)
 module Polymorphic2
-  (P: sig
-    include Type.Polymorphic2_input
-    val mk_equal:
-      ('a -> 'a -> bool) -> ('b -> 'b -> bool) -> ('a, 'b) t -> ('a, 'b) t ->
-      bool
-    val mk_compare:
-      ('a -> 'a -> int) -> ('b -> 'b -> int) -> ('a, 'b) t -> ('a, 'b) t -> int
-    val mk_hash: ('a -> int) -> ('b -> int) -> ('a, 'b) t -> int
-    val map: ('a -> 'a) -> ('b -> 'b) -> ('a, 'b) t -> ('a, 'b) t
-    val mk_internal_pretty_code:
-      (Type.precedence -> Format.formatter -> 'a -> unit) ->
-      (Type.precedence -> Format.formatter -> 'b -> unit) ->
-      Type.precedence -> Format.formatter -> ('a, 'b) t -> unit
-    val mk_pretty:
-      (Format.formatter -> 'a -> unit) -> (Format.formatter -> 'b -> unit) ->
-      Format.formatter -> ('a, 'b) t -> unit
-    val mk_varname: ('a -> string) -> ('b -> string) -> ('a, 'b) t -> string
-    val mk_mem_project:
-      ((Project_skeleton.t -> bool) -> 'a -> bool) ->
-      ((Project_skeleton.t -> bool) -> 'b -> bool) ->
-      (Project_skeleton.t -> bool) -> ('a, 'b) t -> bool
-  end) :
+    (P: sig
+       include Type.Polymorphic2_input
+       val mk_equal:
+         ('a -> 'a -> bool) -> ('b -> 'b -> bool) -> ('a, 'b) t -> ('a, 'b) t ->
+         bool
+       val mk_compare:
+         ('a -> 'a -> int) -> ('b -> 'b -> int) -> ('a, 'b) t -> ('a, 'b) t -> int
+       val mk_hash: ('a -> int) -> ('b -> int) -> ('a, 'b) t -> int
+       val map: ('a -> 'a) -> ('b -> 'b) -> ('a, 'b) t -> ('a, 'b) t
+       val mk_internal_pretty_code:
+         (Type.precedence -> Format.formatter -> 'a -> unit) ->
+         (Type.precedence -> Format.formatter -> 'b -> unit) ->
+         Type.precedence -> Format.formatter -> ('a, 'b) t -> unit
+       val mk_pretty:
+         (Format.formatter -> 'a -> unit) -> (Format.formatter -> 'b -> unit) ->
+         Format.formatter -> ('a, 'b) t -> unit
+       val mk_varname: ('a -> string) -> ('b -> string) -> ('a, 'b) t -> string
+       val mk_mem_project:
+         ((Project_skeleton.t -> bool) -> 'a -> bool) ->
+         ((Project_skeleton.t -> bool) -> 'b -> bool) ->
+         (Project_skeleton.t -> bool) -> ('a, 'b) t -> bool
+     end) :
   Polymorphic2 with type ('a, 'b) poly = ('a, 'b) P.t
 
 (** Output signature of {!Polymorphic3}.
@@ -432,45 +432,45 @@ end
     @since Oxygen-20120901
     @plugin development guide *)
 module Polymorphic3
-  (P: sig
-    include Type.Polymorphic3_input
-    val mk_equal:
-      ('a -> 'a -> bool) -> ('b -> 'b -> bool) -> ('c -> 'c -> bool) ->
-      ('a, 'b, 'c) t -> ('a, 'b, 'c) t ->
-      bool
-    val mk_compare:
-      ('a -> 'a -> int) -> ('b -> 'b -> int) -> ('c -> 'c -> int) ->
-      ('a, 'b, 'c) t -> ('a, 'b, 'c) t -> int
-    val mk_hash: 
-      ('a -> int) -> ('b -> int) -> ('c -> int) -> ('a, 'b, 'c) t -> int
-    val map: 
-      ('a -> 'a) -> ('b -> 'b) -> ('c -> 'c) -> ('a, 'b, 'c) t -> ('a, 'b, 'c) t
-    val mk_internal_pretty_code:
-      (Type.precedence -> Format.formatter -> 'a -> unit) ->
-      (Type.precedence -> Format.formatter -> 'b -> unit) ->
-      (Type.precedence -> Format.formatter -> 'c -> unit) ->
-      Type.precedence -> Format.formatter -> ('a, 'b, 'c) t -> unit
-    val mk_pretty:
-      (Format.formatter -> 'a -> unit) -> 
-      (Format.formatter -> 'b -> unit) ->
-      (Format.formatter -> 'c -> unit) ->
-      Format.formatter -> ('a, 'b, 'c) t -> unit
-    val mk_varname: 
-      ('a -> string) -> ('b -> string) -> ('c -> string) -> 
-      ('a, 'b, 'c) t -> string
-    val mk_mem_project:
-      ((Project_skeleton.t -> bool) -> 'a -> bool) ->
-      ((Project_skeleton.t -> bool) -> 'b -> bool) ->
-      ((Project_skeleton.t -> bool) -> 'c -> bool) ->
-      (Project_skeleton.t -> bool) -> ('a, 'b, 'c) t -> bool
-  end) :
+    (P: sig
+       include Type.Polymorphic3_input
+       val mk_equal:
+         ('a -> 'a -> bool) -> ('b -> 'b -> bool) -> ('c -> 'c -> bool) ->
+         ('a, 'b, 'c) t -> ('a, 'b, 'c) t ->
+         bool
+       val mk_compare:
+         ('a -> 'a -> int) -> ('b -> 'b -> int) -> ('c -> 'c -> int) ->
+         ('a, 'b, 'c) t -> ('a, 'b, 'c) t -> int
+       val mk_hash:
+         ('a -> int) -> ('b -> int) -> ('c -> int) -> ('a, 'b, 'c) t -> int
+       val map:
+         ('a -> 'a) -> ('b -> 'b) -> ('c -> 'c) -> ('a, 'b, 'c) t -> ('a, 'b, 'c) t
+       val mk_internal_pretty_code:
+         (Type.precedence -> Format.formatter -> 'a -> unit) ->
+         (Type.precedence -> Format.formatter -> 'b -> unit) ->
+         (Type.precedence -> Format.formatter -> 'c -> unit) ->
+         Type.precedence -> Format.formatter -> ('a, 'b, 'c) t -> unit
+       val mk_pretty:
+         (Format.formatter -> 'a -> unit) ->
+         (Format.formatter -> 'b -> unit) ->
+         (Format.formatter -> 'c -> unit) ->
+         Format.formatter -> ('a, 'b, 'c) t -> unit
+       val mk_varname:
+         ('a -> string) -> ('b -> string) -> ('c -> string) ->
+         ('a, 'b, 'c) t -> string
+       val mk_mem_project:
+         ((Project_skeleton.t -> bool) -> 'a -> bool) ->
+         ((Project_skeleton.t -> bool) -> 'b -> bool) ->
+         ((Project_skeleton.t -> bool) -> 'c -> bool) ->
+         (Project_skeleton.t -> bool) -> ('a, 'b, 'c) t -> bool
+     end) :
   Polymorphic3 with type ('a, 'b, 'c) poly = ('a, 'b, 'c) P.t
 
 (** Output signature of {!Polymorphic4}.
     @since Oxygen-20120901 *)
 module type Polymorphic4 = sig
   include Type.Polymorphic4
-  module Make(T1:S)(T2:S)(T3:S)(T4:S) 
+  module Make(T1:S)(T2:S)(T3:S)(T4:S)
     : S with type t = (T1.t, T2.t, T3.t, T4.t) poly
 end
 
@@ -478,45 +478,45 @@ end
     @since Oxygen-20120901
     @plugin development guide *)
 module Polymorphic4
-  (P: sig
-    include Type.Polymorphic4_input
-    val mk_equal:
-      ('a -> 'a -> bool) -> ('b -> 'b -> bool) -> 
-      ('c -> 'c -> bool) -> ('d -> 'd -> bool) ->
-      ('a, 'b, 'c, 'd) t -> ('a, 'b, 'c, 'd) t ->
-      bool
-    val mk_compare:
-      ('a -> 'a -> int) -> ('b -> 'b -> int) -> 
-      ('c -> 'c -> int) -> ('d -> 'd -> int) ->
-      ('a, 'b, 'c, 'd) t -> ('a, 'b, 'c, 'd) t -> int
-    val mk_hash: 
-      ('a -> int) -> ('b -> int) -> ('c -> int) -> ('d -> int) -> 
-      ('a, 'b, 'c, 'd) t -> int
-    val map: 
-      ('a -> 'a) -> ('b -> 'b) -> ('c -> 'c) -> ('d -> 'd) ->
-      ('a, 'b, 'c, 'd) t -> ('a, 'b, 'c, 'd) t
-    val mk_internal_pretty_code:
-      (Type.precedence -> Format.formatter -> 'a -> unit) ->
-      (Type.precedence -> Format.formatter -> 'b -> unit) ->
-      (Type.precedence -> Format.formatter -> 'c -> unit) ->
-      (Type.precedence -> Format.formatter -> 'd -> unit) ->
-      Type.precedence -> Format.formatter -> ('a, 'b, 'c, 'd) t -> unit
-    val mk_pretty:
-      (Format.formatter -> 'a -> unit) -> 
-      (Format.formatter -> 'b -> unit) ->
-      (Format.formatter -> 'c -> unit) ->
-      (Format.formatter -> 'd -> unit) ->
-      Format.formatter -> ('a, 'b, 'c, 'd) t -> unit
-    val mk_varname: 
-      ('a -> string) -> ('b -> string) -> ('c -> string) -> ('d -> string) -> 
-      ('a, 'b, 'c, 'd) t -> string
-    val mk_mem_project:
-      ((Project_skeleton.t -> bool) -> 'a -> bool) ->
-      ((Project_skeleton.t -> bool) -> 'b -> bool) ->
-      ((Project_skeleton.t -> bool) -> 'c -> bool) ->
-      ((Project_skeleton.t -> bool) -> 'd -> bool) ->
-      (Project_skeleton.t -> bool) -> ('a, 'b, 'c, 'd) t -> bool
-  end) :
+    (P: sig
+       include Type.Polymorphic4_input
+       val mk_equal:
+         ('a -> 'a -> bool) -> ('b -> 'b -> bool) ->
+         ('c -> 'c -> bool) -> ('d -> 'd -> bool) ->
+         ('a, 'b, 'c, 'd) t -> ('a, 'b, 'c, 'd) t ->
+         bool
+       val mk_compare:
+         ('a -> 'a -> int) -> ('b -> 'b -> int) ->
+         ('c -> 'c -> int) -> ('d -> 'd -> int) ->
+         ('a, 'b, 'c, 'd) t -> ('a, 'b, 'c, 'd) t -> int
+       val mk_hash:
+         ('a -> int) -> ('b -> int) -> ('c -> int) -> ('d -> int) ->
+         ('a, 'b, 'c, 'd) t -> int
+       val map:
+         ('a -> 'a) -> ('b -> 'b) -> ('c -> 'c) -> ('d -> 'd) ->
+         ('a, 'b, 'c, 'd) t -> ('a, 'b, 'c, 'd) t
+       val mk_internal_pretty_code:
+         (Type.precedence -> Format.formatter -> 'a -> unit) ->
+         (Type.precedence -> Format.formatter -> 'b -> unit) ->
+         (Type.precedence -> Format.formatter -> 'c -> unit) ->
+         (Type.precedence -> Format.formatter -> 'd -> unit) ->
+         Type.precedence -> Format.formatter -> ('a, 'b, 'c, 'd) t -> unit
+       val mk_pretty:
+         (Format.formatter -> 'a -> unit) ->
+         (Format.formatter -> 'b -> unit) ->
+         (Format.formatter -> 'c -> unit) ->
+         (Format.formatter -> 'd -> unit) ->
+         Format.formatter -> ('a, 'b, 'c, 'd) t -> unit
+       val mk_varname:
+         ('a -> string) -> ('b -> string) -> ('c -> string) -> ('d -> string) ->
+         ('a, 'b, 'c, 'd) t -> string
+       val mk_mem_project:
+         ((Project_skeleton.t -> bool) -> 'a -> bool) ->
+         ((Project_skeleton.t -> bool) -> 'b -> bool) ->
+         ((Project_skeleton.t -> bool) -> 'c -> bool) ->
+         ((Project_skeleton.t -> bool) -> 'd -> bool) ->
+         (Project_skeleton.t -> bool) -> ('a, 'b, 'c, 'd) t -> bool
+     end) :
   Polymorphic4 with type ('a, 'b, 'c, 'd) poly = ('a, 'b, 'c, 'd) P.t
 
 (* ****************************************************************************)
@@ -584,21 +584,21 @@ module Triple_with_collections(T1: S)(T2: S)(T3: S)(Info: Functor_info):
   S_with_collections with type t = T1.t * T2.t * T3.t
 
 (** @since Nitrogen-20111001 *)
-module Quadruple(T1: S)(T2: S)(T3: S)(T4:S): 
+module Quadruple(T1: S)(T2: S)(T3: S)(T4:S):
   S with type t = T1.t * T2.t * T3.t * T4.t
-val quadruple: 
+val quadruple:
   'a Type.t -> 'b Type.t -> 'c Type.t -> 'd Type.t -> ('a * 'b * 'c * 'd) Type.t
 (** @since Fluorine-20130401 *)
 
 (** @since Nitrogen-20111001 *)
 module Quadruple_with_collections
-  (T1: S)(T2: S)(T3: S)(T4:S)(Info: Functor_info):
+    (T1: S)(T2: S)(T3: S)(T4:S)(Info: Functor_info):
   S_with_collections with type t = T1.t * T2.t * T3.t * T4.t
 
 (** @plugin development guide *)
 module Function
-  (T1: sig include S val label: (string * (unit -> t) option) option end)
-  (T2: S)
+    (T1: sig include S val label: (string * (unit -> t) option) option end)
+    (T2: S)
   : S with type t = T1.t -> T2.t
 
 val func:
@@ -609,8 +609,8 @@ val func:
 
 val optlabel_func:
   string -> (unit -> 'a) -> 'a Type.t -> 'b Type.t -> ('a -> 'b) Type.t
-  (** [optlabel_func lab dft ty1 ty2] is equivalent to
-      [func ~label:(lab, Some dft) ty1 ty2] *)
+(** [optlabel_func lab dft ty1 ty2] is equivalent to
+    [func ~label:(lab, Some dft) ty1 ty2] *)
 
 val func2:
   ?label1:string * (unit -> 'a) option -> 'a Type.t ->
@@ -636,15 +636,15 @@ val func4:
   ('a -> 'b -> 'c -> 'd -> 'e) Type.t
 
 module Set
-  (S: Set.S)(E: S with type t = S.elt)(Info : Functor_info):
+    (S: Set.S)(E: S with type t = S.elt)(Info : Functor_info):
   Set with type t = S.t and type elt = E.t
 
 module Map
-  (M: Map.S)(Key: S with type t = M.key)(Info: Functor_info) :
+    (M: Map.S)(Key: S with type t = M.key)(Info: Functor_info) :
   Map with type 'a t = 'a M.t and type key = M.key and module Key = Key
 
 module Hashtbl
-  (H: Hashtbl_with_descr)(Key: S with type t = H.key)(Info : Functor_info):
+    (H: Hashtbl_with_descr)(Key: S with type t = H.key)(Info : Functor_info):
   Hashtbl with type 'a t = 'a H.t and type key = H.key and module Key = Key
 
 module type Sub_caml_weak_hashtbl = sig

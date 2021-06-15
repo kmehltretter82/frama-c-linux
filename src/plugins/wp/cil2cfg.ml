@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -806,7 +806,8 @@ let get_stmt_node env s =
   | Instr _  | Return _ ->  get_node env (Vstmt s)
   | Switch (e, _, _, _) -> get_node env (Vswitch (s, e))
   | TryExcept _ | TryFinally _ | Throw _ | TryCatch _ ->
-      Wp_parameters.not_yet_implemented "[cfg] exception handling"
+      Wp_parameters.not_yet_implemented
+        ~source:(fst (Cil_datatype.Stmt.loc s)) "[cfg] exception handling"
 
 let cfg_stmt_goto env s next =
   let node = get_node env (Vstmt s) in
@@ -942,7 +943,8 @@ and cfg_stmt env s next =
   | Switch (e, b, lstmts, _) ->
       cfg_switch env s e b lstmts next
   | TryExcept _ | TryFinally _ | Throw _ | TryCatch _ ->
-      Wp_parameters.not_yet_implemented "[cfg] exception handling"
+      Wp_parameters.not_yet_implemented
+        ~source:(fst (Cil_datatype.Stmt.loc s)) "[cfg] exception handling"
 
 and cfg_block_with ?continue ?break env bkind block next =
   let s_continue = env.node_continue in
@@ -1384,5 +1386,68 @@ module KfCfg =
     end)
 
 let get kf = KfCfg.memo create kf
+
+(* ------------------------------------------------------------------------ *)
+(** {2 CFG dump} *)
+
+module Dump =
+struct
+  type dot = {
+    name: string;
+    chan: out_channel;
+    fmt : Format.formatter;
+  }
+
+  let create kf =
+    let name = Kernel_function.get_name kf in
+    let name =
+      Filename.concat (Wp_parameters.get_output () :> string) ("Cil2CFG_" ^ name)
+    in
+    let chan = open_out (name ^ ".dot") in
+    let fmt  = Format.formatter_of_out_channel chan in
+    let out = { name ; chan ; fmt } in
+    Format.fprintf fmt "digraph %a {@\n" Kernel_function.pretty kf ;
+    Format.fprintf fmt "  rankdir = TB ;@\n" ;
+    Format.fprintf fmt "  node [ style = filled, shape = box ] ;@\n" ;
+    out
+
+  let finalize out =
+    Format.fprintf out.fmt "}@." ;
+    close_out out.chan ;
+    let name = out.name in
+    ignore (Sys.command (Printf.sprintf "dot -Tpdf %s.dot > %s.pdf" name name))
+
+  let pp_id fmt (id, sid) =
+    Format.fprintf fmt "N%03d%03d" sid id
+
+  let pp_content fmt = function
+    | None ->
+        Format.fprintf fmt "label=\"No statement\""
+    | Some s ->
+        Format.fprintf fmt "label=\"wp:sid%d@\n%a\""
+          s.sid Cil_printer.pp_stmt s
+
+  let pp_node fmt n =
+    Format.fprintf fmt "  %a [ %a ];@\n"
+      pp_id (node_id n) pp_content (node_stmt_opt n)
+
+  let pp_edge fmt e =
+    Format.fprintf fmt
+      "  %a -> %a [ label=\"%a\"];@\n"
+      pp_id (node_id (edge_src e))
+      pp_id (node_id (edge_dst e))
+      EL.pretty (edge_type e)
+
+  let process_kf kf =
+    let cfg = (get kf).graph in
+    let dot = create kf in
+    CFG.iter_vertex (Format.fprintf dot.fmt "%a" pp_node) cfg ;
+    CFG.iter_edges_e (Format.fprintf dot.fmt "%a" pp_edge) cfg ;
+    finalize dot
+
+  let process () =
+    Globals.Functions.iter process_kf
+
+end
 
 (* ------------------------------------------------------------------------ *)

@@ -35,7 +35,7 @@
 #ifdef __FC_STDLIB
 #include <__fc_alloc_axiomatic.h>
 #else
-/*@ ghost extern int __fc_heap_status __attribute__((FRAMA_C_MODEL)); */
+/*@ ghost extern int __fc_heap_status; */
 #endif
 
 #define contract_t                            export_alias(contract_t)
@@ -57,7 +57,7 @@ typedef struct contract_t __attribute__((__FC_BUILTIN__)) contract_t;
  * \return A structure to hold pieces of information about contracts at runtime.
  */
 /*@ assigns \result \from indirect:__fc_heap_status, indirect:size;
-  @ ensures \valid(\result); */
+  @ admit ensures \valid(\result); */
 contract_t * contract_init(size_t size) __attribute__((FC_BUILTIN));
 
 /*! \brief Cleanup the structure `c` previously allocated by

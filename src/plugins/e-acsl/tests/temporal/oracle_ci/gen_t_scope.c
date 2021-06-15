@@ -38,7 +38,7 @@ int main(void)
       __gen_e_acsl_and = __gen_e_acsl_valid;
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(! __gen_e_acsl_and,"Assertion","main","!\\valid(p)",
+    __e_acsl_assert(! __gen_e_acsl_and,1,"Assertion","main","!\\valid(p)",
                     "tests/temporal/t_scope.c",16);
   }
   /*@ assert ¬\valid(p); */ ;
@@ -54,7 +54,7 @@ int main(void)
       __gen_e_acsl_and_2 = __gen_e_acsl_valid_2;
     }
     else __gen_e_acsl_and_2 = 0;
-    __e_acsl_assert(! __gen_e_acsl_and_2,"Assertion","main","!\\valid(q)",
+    __e_acsl_assert(! __gen_e_acsl_and_2,1,"Assertion","main","!\\valid(q)",
                     "tests/temporal/t_scope.c",17);
   }
   /*@ assert ¬\valid(q); */ ;
@@ -77,7 +77,7 @@ int main(void)
         __gen_e_acsl_and_3 = __gen_e_acsl_valid_3;
       }
       else __gen_e_acsl_and_3 = 0;
-      __e_acsl_assert(__gen_e_acsl_and_3,"Assertion","main","\\valid(p)",
+      __e_acsl_assert(__gen_e_acsl_and_3,1,"Assertion","main","\\valid(p)",
                       "tests/temporal/t_scope.c",22);
     }
     /*@ assert \valid(p); */ ;
@@ -95,16 +95,16 @@ int main(void)
         __gen_e_acsl_and_4 = __gen_e_acsl_valid_4;
       }
       else __gen_e_acsl_and_4 = 0;
-      __e_acsl_assert(! __gen_e_acsl_and_4,"Assertion","main","!\\valid(q)",
-                      "tests/temporal/t_scope.c",25);
+      __e_acsl_assert(! __gen_e_acsl_and_4,1,"Assertion","main",
+                      "!\\valid(q)","tests/temporal/t_scope.c",25);
     }
     /*@ assert ¬\valid(q); */ ;
     {
       int __gen_e_acsl_valid_5;
       __gen_e_acsl_valid_5 = __e_acsl_valid((void *)(& j),sizeof(int),
                                             (void *)(& j),(void *)0);
-      __e_acsl_assert(__gen_e_acsl_valid_5,"Assertion","main","\\valid(&j)",
-                      "tests/temporal/t_scope.c",26);
+      __e_acsl_assert(__gen_e_acsl_valid_5,1,"Assertion","main",
+                      "\\valid(&j)","tests/temporal/t_scope.c",26);
     }
     /*@ assert \valid(&j); */ ;
     __e_acsl_delete_block((void *)(& j));
@@ -131,8 +131,8 @@ int main(void)
         __gen_e_acsl_and_5 = __gen_e_acsl_valid_6;
       }
       else __gen_e_acsl_and_5 = 0;
-      __e_acsl_assert(! __gen_e_acsl_and_5,"Assertion","main","!\\valid(p)",
-                      "tests/temporal/t_scope.c",35);
+      __e_acsl_assert(! __gen_e_acsl_and_5,1,"Assertion","main",
+                      "!\\valid(p)","tests/temporal/t_scope.c",35);
     }
     /*@ assert ¬\valid(p); */ ;
     __e_acsl_full_init((void *)(& q));
@@ -153,7 +153,7 @@ int main(void)
         __gen_e_acsl_and_6 = __gen_e_acsl_valid_7;
       }
       else __gen_e_acsl_and_6 = 0;
-      __e_acsl_assert(__gen_e_acsl_and_6,"Assertion","main","\\valid(p)",
+      __e_acsl_assert(__gen_e_acsl_and_6,1,"Assertion","main","\\valid(p)",
                       "tests/temporal/t_scope.c",38);
     }
     /*@ assert \valid(p); */ ;

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -70,6 +70,10 @@ val make_escaping_fundec:
     [fdec] is used to detect whether we are deallocating the outer scope of a
     function, in which case a different warning is emitted. *)
 
+val substitute:
+  Base.substitution -> clobbered_set -> Cvalue.Model.t -> Cvalue.Model.t
+(** [substitute substitution clob state] applies [substitution] to all pointer
+    values in the offsetmaps bound to variables in [clob] in [state]. *)
 
 (*
 Local Variables:

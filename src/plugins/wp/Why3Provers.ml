@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -26,10 +26,7 @@
 
 let cfg = lazy
   begin
-    try
-      let config = Why3.Whyconf.read_config None in
-      let config = Why3.Whyconf.load_default_config_if_needed config in
-      config
+    try Why3.Whyconf.init_config None
     with exn ->
       Wp_parameters.abort "%a" Why3.Exn_printer.exn_printer exn
   end
@@ -46,10 +43,10 @@ let configure =
       begin
         let args = Array.of_list ("why3"::Wp_parameters.Why3Flags.get ()) in
         begin try
-            Arg.parse_argv ~current:(ref 0) args
+            Why3.Getopt.parse_all
               (Why3.Debug.Args.[desc_debug;desc_debug_all;desc_debug_list])
               (fun opt -> raise (Arg.Bad ("unknown option: " ^ opt)))
-              "Why3 options"
+              args
           with Arg.Bad s | Arg.Help s -> Wp_parameters.abort "%s" s
         end;
         ignore (Why3.Debug.Args.option_list ());
@@ -64,7 +61,6 @@ let find_opt s =
   try
     let config = Lazy.force cfg in
     let filter = Why3.Whyconf.parse_filter_prover s in
-    let filter = Why3.Whyconf.filter_prover_with_shortcut config filter in
     Some ((Why3.Whyconf.filter_one_prover config filter).Why3.Whyconf.prover)
   with
   | Why3.Whyconf.ProverNotFound _
@@ -78,14 +74,18 @@ let find_fallback name =
   match find_opt name with
   | Some prv -> Exact prv
   | None ->
-      match String.split_on_char ',' name with
-      | shortname :: _ :: _ ->
-          begin
-            match find_opt (String.lowercase_ascii shortname) with
-            | Some prv -> Fallback prv
-            | None -> NotFound
-          end
-      | _ -> NotFound
+      (* Why3 should deal with this intermediate case *)
+      match find_opt (String.lowercase_ascii name) with
+      | Some prv -> Exact prv
+      | None ->
+          match String.split_on_char ',' name with
+          | shortname :: _ :: _ ->
+              begin
+                match find_opt (String.lowercase_ascii shortname) with
+                | Some prv -> Fallback prv
+                | None -> NotFound
+              end
+          | _ -> NotFound
 
 let print_why3 = Why3.Whyconf.prover_parseable_format
 let print_wp s =

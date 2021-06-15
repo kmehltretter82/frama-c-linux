@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -32,7 +32,7 @@
     to the name of intermediate files generated for pre-processing annotations
     (gcc pre-processing differs between .c and .cxx files)
 
-    @raises Sys_error if the file cannot be opened. 
+    @raises Sys_error if the file cannot be opened.
 
     @modifies Oxygen-20120901: added suffix argument
 

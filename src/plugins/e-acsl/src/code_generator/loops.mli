@@ -25,13 +25,14 @@
 open Cil_types
 
 (**************************************************************************)
-(************************* Loop invariants ********************************)
+(************************* Loop annotations *******************************)
 (**************************************************************************)
 
-val preserve_invariant:
+val handle_annotations:
   Env.t -> Kernel_function.t -> stmt -> stmt * Env.t
-(** Modify the given stmt loop to insert the code which preserves its loop
-    invariants. Also return the modified environment. *)
+(** Modify the given stmt loop to insert the code which verifies the loop
+    annotations, ie. preserves its loop invariants and checks the loop variant.
+    Also return the modified environment. *)
 
 (**************************************************************************)
 (**************************** Nested loops ********************************)
@@ -52,7 +53,7 @@ val mk_nested_loops:
 (**************************************************************************)
 
 val translate_predicate_ref:
-  (kernel_function -> Env.t -> predicate -> Env.t) ref
+  (kernel_function -> Env.t -> toplevel_predicate -> Env.t) ref
 
 val predicate_to_exp_ref:
   (kernel_function -> Env.t -> predicate -> exp * Env.t) ref

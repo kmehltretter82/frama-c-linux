@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -93,10 +93,12 @@ struct
     | C_int _ -> is_zero_int (M.load sigma obj l)
     | C_float _ -> is_zero_float (M.load sigma obj l)
     | C_pointer _ -> is_zero_ptr (M.load sigma obj l)
-    | C_comp c ->
+    | C_comp { cfields = None } ->
+        p_true (* cannot say anything interesting here *)
+    | C_comp { cfields = Some fields } ->
         p_all
           (fun f -> is_zero sigma (Ctypes.object_of f.ftype) (M.field l f))
-          c.cfields
+          fields
     | C_array a ->
         (*TODO[LC] make zero-initializers model-dependent.
                    For instance, a[N][M] becomes a[N*M] in MemTyped,
@@ -113,7 +115,7 @@ struct
   let is_exp_range sigma l obj a b v =
     let x = Lang.freshvar ~basename:"k" Logic.Int in
     let k = e_var x in
-    let range = [ p_leq a k ; p_lt k b ] in
+    let range = [ p_leq a k ; p_leq k b ] in
     let init =
       match v with
       | None -> is_zero sigma obj (M.shift l obj k)
@@ -443,31 +445,45 @@ struct
         ~severe:false ~effect:"Skip initializer"
         (fun () ->
            let l = lval sigma lv in
-           match init with
-           | Some e ->
-               let v = M.load sigma obj l in
-               p_equal (val_of_exp sigma e) (cval v)
-           | None -> is_zero sigma obj l
+           let value_hyp = match init with
+             | Some e ->
+                 let v = M.load sigma obj l in
+                 p_equal (val_of_exp sigma e) (cval v)
+             | None -> is_zero sigma obj l
+           in
+           let init_hyp = match init with
+             | Some { enode = Lval lv_init }
+               when Cil.(isStructOrUnionType @@ typeOfLval lv_init) ->
+                 let l_initializer = lval sigma lv_init in
+                 p_equal
+                   (M.load_init sigma obj l)
+                   (M.load_init sigma obj l_initializer)
+             | _ ->
+                 M.initialized sigma (Rloc(obj, l))
+           in
+           value_hyp, init_hyp
         ) () in
     match outcome with
-    | Warning.Failed warn -> warn , F.p_true
+    | Warning.Failed warn -> warn , (F.p_true, F.p_true)
     | Warning.Result(warn , hyp) -> warn , hyp
 
-  let init_range ~sigma lv typ a b value =
+  let init_range ~sigma lv typ low up value =
     let obj = Ctypes.object_of typ in
     let outcome = Warning.catch
         ~severe:false ~effect:"Skip initializer"
         (fun () ->
            let l = lval sigma lv in
-           let e = Extlib.opt_map (exp sigma) value in
-           is_exp_range sigma l obj (e_bigint a) (e_bigint b) e
+           let e = Option.map (exp sigma) value in
+           let low = e_bigint low and up = e_bigint up in
+           (is_exp_range sigma l obj low up e),
+           (M.initialized sigma (Rrange(l, obj, Some low, Some up)))
         ) () in
     match outcome with
-    | Warning.Failed warn -> warn , F.p_true
+    | Warning.Failed warn -> warn , (F.p_true, F.p_true)
     | Warning.Result(warn , hyp) -> warn , hyp
 
 
-  type warned_hyp = Warning.Set.t * Lang.F.pred
+  type warned_hyp = Warning.Set.t * (Lang.F.pred * Lang.F.pred)
 
   (* Hypothesis for initialization of one variable *)
   let rec init_variable ~sigma lv init acc =
@@ -480,8 +496,12 @@ struct
         let ct = constfold_ctyp ct in
         let acc = (* updated acc with default init of structure *)
           match ct with
-          | TComp (cp,_,_) when cp.cstruct && (* not for union... *)
-                                (List.length initl) < (List.length cp.cfields) ->
+          | TComp ( { cfields = None },_,_) ->
+              Wp_parameters.fatal
+                "Initializer for incomplete type %a" Cil_printer.pp_typ ct
+          | TComp ( { cstruct ; cfields = Some fields },_,_)
+            when cstruct && (* not for union... *)
+                 (List.length initl) < (List.length fields) ->
               (* default init for unintialized field of a struct *)
               List.fold_left
                 (fun acc f ->
@@ -497,7 +517,7 @@ struct
                          (Cil.addOffsetLval (Field(f, NoOffset)) lv)
                          f.ftype None in
                      init :: acc)
-                acc (List.rev cp.cfields)
+                acc (List.rev fields)
 
           | _ -> acc
         in
@@ -517,8 +537,7 @@ struct
               | (_,None) -> acc (* nothing was delayed *)
               | (il,Some (i0,_,exp)) when Integer.lt il i0 ->
                   (* Added pred: \forall i \in [il .. i0] ; t[i]==exp *)
-                  let i2 = Integer.succ i0 in
-                  init_range ~sigma lv ty il i2 (Some exp) :: acc
+                  init_range ~sigma lv ty il i0 (Some exp) :: acc
               | (_il,Some (_i0,off,exp)) ->
                   (* case [_il=_i0], so uses [off] corresponding to [_i0]
                      Added pred: t[i]==exp*)
@@ -531,7 +550,7 @@ struct
                   if Integer.ge i0 i1 then (* no hole *) acc
                   else (* defaults values
                           Added pred: \forall i \in [i0 .. i1[ ; t[i]==default *)
-                    init_range ~sigma lv ty i0 i1 None :: acc
+                    init_range ~sigma lv ty i0 (Integer.pred i1) None :: acc
             in
             let acc, delayed =
               List.fold_left

@@ -52,11 +52,12 @@
 [wp] Goal typed_ref_equal_elements_loop_variant_positive : not tried
 [wp] Goal typed_ref_equal_elements_loop_variant_2_decrease : not tried
 [wp] Goal typed_ref_equal_elements_loop_variant_2_positive : not tried
-[wp] Warning: Memory model hypotheses for function 'equal_elements':
+[wp] tests/wp_gallery/frama_c_exo3_solved.old.c:73: Warning: 
+  Memory model hypotheses for function 'equal_elements':
   /*@
-     behavior typed_ref:
-       requires \separated(v1, v2, a + (..));
+     behavior wp_typed_ref:
        requires \valid(v1);
        requires \valid(v2);
+       requires \separated(v1, v2, a + (..));
      */
   void equal_elements(int *a, int *v1, int *v2);

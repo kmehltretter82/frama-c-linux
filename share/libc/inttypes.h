@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -253,9 +253,12 @@ typedef struct __fc_imaxdiv_t
   } imaxdiv_t;
 
 /* ISO C: 7.8.2 */
-/*@ 
-  requires abs_representable: (intmax_t)(-c) != c ;
-  assigns \result \from c ; 
+/*@
+  requires abs_representable: c > INTMAX_MIN;
+  assigns \result \from c;
+  ensures positive_result: \result >= 0.;
+  ensures equal_magnitude_result: \result == c || \result == -c;
+  ensures logical_abs_result: \result == \abs(c);
 */
 extern intmax_t imaxabs(intmax_t c);
 

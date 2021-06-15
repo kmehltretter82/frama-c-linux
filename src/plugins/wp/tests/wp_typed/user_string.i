@@ -22,7 +22,7 @@
    assigns \nothing;
    ensures \exists integer i; Length_of_str_is(s,i) && \result == i;
  @*/
-int strlen(const char *s) {
+long long strlen(const char *s) {
   const char *ss = s;
   /*@
       loop invariant BASE: \base_addr(s) == \base_addr(ss) ;

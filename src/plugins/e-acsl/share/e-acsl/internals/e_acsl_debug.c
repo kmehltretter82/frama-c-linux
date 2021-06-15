@@ -24,6 +24,7 @@
 #include <fcntl.h>
 
 #include "../observation_model/internals/e_acsl_omodel_debug.h"
+#include "e_acsl_config.h"
 #include "e_acsl_private_assert.h"
 #include "e_acsl_rtl_io.h"
 
@@ -45,8 +46,13 @@ void initialize_report_file(int *argc, char ***argv) {
   if (!strcmp(dlog_name, "-") || !strcmp(dlog_name, "1")) {
     dlog_fd = 2;
   } else {
-    dlog_fd = open(dlog_name, O_WRONLY | O_CREAT | O_TRUNC  |O_NONBLOCK
+#if E_ACSL_OS_IS_LINUX
+    dlog_fd = open(dlog_name, O_WRONLY | O_CREAT | O_TRUNC | O_NONBLOCK
       | O_NOCTTY, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+#elif E_ACSL_OS_IS_WINDOWS
+    dlog_fd = _open(dlog_name, _O_WRONLY | _O_CREAT | _O_TRUNC,
+      _S_IREAD | _S_IWRITE);
+#endif
   }
   if (dlog_fd == -1)
     private_abort("Cannot open file descriptor for %s\n", dlog_name);

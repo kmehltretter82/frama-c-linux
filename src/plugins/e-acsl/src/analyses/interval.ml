@@ -406,7 +406,9 @@ let infer_sizeof ty =
   try singleton_of_int (Cil.bytesSizeOf ty)
   with Cil.SizeOfError _ -> interv_of_typ Cil.theMachine.Cil.typeOfSizeOf
 
-let infer_alignof ty = singleton_of_int (Cil.bytesAlignOf ty)
+let infer_alignof ty =
+  try singleton_of_int (Cil.bytesAlignOf ty)
+  with Cil.SizeOfError _ -> interv_of_typ Cil.theMachine.Cil.typeOfSizeOf
 
 let rec infer t =
   let get_cty t = match t.term_type with Ctype ty -> ty | _ -> assert false in

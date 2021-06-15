@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -196,7 +196,7 @@ class validity =
 module Havoc =
 struct
   let tactical = Tactical.export (new havoc)
-  let strategy ?(priority=1.0) ~havoc =
+  let strategy ?(priority=1.0) havoc =
     Strategy.{
       priority ;
       tactical ;

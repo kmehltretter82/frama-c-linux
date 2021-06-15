@@ -16,8 +16,6 @@ int fact(int n)
   }
   tmp = __gen_e_acsl_fact(n - 1);
   ;
-  /*@ assert Eva: signed_overflow: -2147483648 ≤ n * tmp; */
-  /*@ assert Eva: signed_overflow: n * tmp ≤ 2147483647; */
   __retres = n * tmp;
   return_label: return __retres;
 }
@@ -26,7 +24,7 @@ int main(void)
 {
   int __retres;
   int x = __gen_e_acsl_fact(5);
-  __e_acsl_assert(x == 120,"Assertion","main","x == 120",
+  __e_acsl_assert(x == 120,1,"Assertion","main","x == 120",
                   "tests/bts/bts1395.i",14);
   /*@ assert x ≡ 120; */ ;
   __retres = 0;
@@ -37,8 +35,8 @@ int main(void)
 int __gen_e_acsl_fact(int n)
 {
   int __retres;
-  __e_acsl_assert(n > 0,"Precondition","fact","n > 0","tests/bts/bts1395.i",
-                  6);
+  __e_acsl_assert(n > 0,1,"Precondition","fact","n > 0",
+                  "tests/bts/bts1395.i",6);
   __retres = fact(n);
   return __retres;
 }

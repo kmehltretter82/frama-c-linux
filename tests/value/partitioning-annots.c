@@ -1,17 +1,17 @@
 /* run.config*
-   GCC:
-   STDOPT: #"-main test_unroll -eva-default-loop-unroll 10"
-   STDOPT: #"-main test_split"
+   
+   STDOPT: #"-eva-default-loop-unroll 10"
    STDOPT: +"-main test_split -eva-partition-value k"
    STDOPT: #"-main test_loop_split -eva-partition-history 1"
    STDOPT: #"-main test_history -eva-partition-history 0"
    STDOPT: #"-main test_history -eva-partition-history 1"
-   STDOPT: #"-main test_slevel"
    */
 
 #include "__fc_builtin.h"
 
 #define N 10
+
+volatile nondet;
 
 void test_unroll()
 {
@@ -89,6 +89,26 @@ void test_split()
   Frama_C_show_each_end(i,j,k);
 }
 
+void test_dynamic_split()
+{
+  int a, b;
+  //@ dynamic_split a;
+  if (nondet) {
+    a = Frama_C_interval(0, 2);
+    b = a;
+  }
+  Frama_C_show_each_split_with_uninit(a, b);
+  a = 0;
+  Frama_C_show_each_no_split(a, b);
+  a = Frama_C_interval(0, 2);
+  b = a;
+  //@ split a;
+  a = 0;
+  Frama_C_show_each_split(a, b);
+  //@ merge a;
+  Frama_C_show_each_no_split(a, b);
+}
+
 void test_loop_split()
 {
   int A[N];
@@ -138,8 +158,6 @@ void test_history()
     k = k / j;
 }
 
-volatile nondet;
-
 void test_slevel()
 {
   int a[N], b[N], c[N], d[N], e[4];
@@ -187,6 +205,6 @@ void main(void)
   test_slevel();
   test_unroll();
   test_split();
-  test_loop_split();
+  test_dynamic_split();
 }
 

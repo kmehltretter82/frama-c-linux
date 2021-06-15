@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -42,7 +42,7 @@ sig
   val name : string
 
   type loc
-  val sizeof : c_object -> int
+  val sizeof : c_object -> term
   val field : loc -> fieldinfo -> loc
   val shift : loc -> c_object -> term -> loc
 
@@ -80,7 +80,7 @@ sig
   val set_init_atom : Sigma.t -> loc -> term -> Chunk.t * term
   val set_init : c_object -> loc -> length:term ->
     Chunk.t -> current:term -> term
-  val monotonic_init : Sigma.t -> Sigma.t -> pred
+  (* val monotonic_init : Sigma.t -> Sigma.t -> pred *)
 
 end
 
@@ -91,13 +91,16 @@ sig
   val domain : c_object -> M.loc -> M.Sigma.domain
 
   val load : M.Sigma.t -> c_object -> M.loc -> M.loc Sigs.value
-  val loadvalue : M.Sigma.t -> c_object -> M.loc -> term
+  val load_init : M.Sigma.t -> c_object -> M.loc -> term
+  val load_value : M.Sigma.t -> c_object -> M.loc -> term
 
   val havoc : M.Sigma.t sequence -> c_object -> M.loc -> equation list
   val havoc_length : M.Sigma.t sequence -> c_object -> M.loc -> term -> equation list
 
   val stored : M.Sigma.t sequence -> c_object -> M.loc -> term -> equation list
+  val stored_init : M.Sigma.t sequence -> c_object -> M.loc -> term -> equation list
   val copied : M.Sigma.t sequence -> c_object -> M.loc -> M.loc -> equation list
+  val copied_init : M.Sigma.t sequence -> c_object -> M.loc -> M.loc -> equation list
 
   val assigned : M.Sigma.t sequence -> c_object -> M.loc sloc -> equation list
 

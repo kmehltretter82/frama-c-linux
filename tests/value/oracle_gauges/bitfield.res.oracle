@@ -1,0 +1,16 @@
+138a139,153
+> [eva] tests/value/bitfield.i:71: 
+>   Frama_C_show_each:
+>   {{ garbled mix of &{b} (origin: Misaligned {tests/value/bitfield.i:70}) }}
+> [eva] tests/value/bitfield.i:73: 
+>   Frama_C_show_each:
+>   {{ garbled mix of &{b} (origin: Misaligned {tests/value/bitfield.i:70}) }}
+> [eva] computing for function leaf <- imprecise_bts_1671 <- main.
+>   Called from tests/value/bitfield.i:70.
+> [eva] Done for function leaf
+> [eva] tests/value/bitfield.i:71: 
+>   Frama_C_show_each:
+>   {{ garbled mix of &{b} (origin: Misaligned {tests/value/bitfield.i:70}) }}
+> [eva] tests/value/bitfield.i:73: 
+>   Frama_C_show_each:
+>   {{ garbled mix of &{b} (origin: Misaligned {tests/value/bitfield.i:70}) }}

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -152,8 +152,8 @@ let () =
   Ast.add_linked_state code_annot_state;
   Code_annots.add_hook_on_remove
     (fun e stmt l ->
-      let kf = find_englobing_kf stmt in
-      List.iter (fun a -> clear_linked_to_annot kf stmt e a) !l)
+       let kf = find_englobing_kf stmt in
+       List.iter (fun a -> clear_linked_to_annot kf stmt e a) !l)
 
 (**************************************************************************)
 (** {2 Getting annotations} *)
@@ -408,7 +408,7 @@ let code_annot ?emitter ?filter stmt =
         | Some f -> List.filter f l)
      with Not_found -> [])
   | None ->
-    let filter = Extlib.opt_map (fun filter _ e -> filter e) filter in
+    let filter = Option.map (fun filter _ e -> filter e) filter in
     fst (List.split (code_annot_emitter ?filter stmt))
 
 let pre_register_funspec ?tbl ?(emitter=Emitter.end_user) ?(force=false) kf =
@@ -625,8 +625,8 @@ let iter_complete f =
 let iter_disjoint f =
   iter_spec_gen (fun s -> s.spec_disjoint_behaviors) List.iter f
 
-let iter_terminates f = iter_spec_gen (fun s -> s.spec_terminates) Extlib.may f
-let iter_decreases f = iter_spec_gen (fun s -> s.spec_variant) Extlib.may f
+let iter_terminates f = iter_spec_gen (fun s -> s.spec_terminates) Option.iter f
+let iter_decreases f = iter_spec_gen (fun s -> s.spec_variant) Option.iter f
 
 let iter_bhv_gen get iter f kf b =
   let get spec =
@@ -909,15 +909,15 @@ let add_behaviors ?(register_children=true) e kf ?stmt ?active bhvs =
            let ip = Property.ip_from_of_behavior kf ki active bhv in
            List.iter Property_status.remove ip;
            let ip = Property.ip_assigns_of_behavior kf ki active bhv in
-           Extlib.may Property_status.remove ip;
+           Option.iter Property_status.remove ip;
            let ip = Property.ip_allocation_of_behavior kf ki active bhv in
-           Extlib.may Property_status.remove ip;
+           Option.iter Property_status.remove ip;
            let ip = Property.ip_from_of_behavior kf ki active b' in
            List.iter Property_status.register ip;
            let ip = Property.ip_assigns_of_behavior kf ki active b' in
-           Extlib.may Property_status.register ip;
+           Option.iter Property_status.register ip;
            let ip = Property.ip_allocation_of_behavior kf ki active b' in
-           Extlib.may Property_status.register ip;
+           Option.iter Property_status.register ip;
          end;
          let ip = Property.ip_of_behavior kf ki active b' in
          Property_status.register ip;
@@ -1000,6 +1000,19 @@ let add_disjoint e kf ?stmt ?active l =
     let active = match active with None -> [] | Some l -> l in
     Property_status.register (Property.ip_of_disjoint kf (kinstr stmt) active l)
   end
+
+let add_spec ?register_children e kf ?stmt ?active spec =
+  add_behaviors ?register_children e kf ?stmt ?active spec.spec_behavior;
+  Option.iter (fun variant -> add_decreases e kf variant) spec.spec_variant;
+  Option.iter
+    (fun terminates -> add_terminates e kf ?stmt ?active terminates)
+    spec.spec_terminates;
+  List.iter
+    (fun complete -> add_complete e kf ?stmt ?active complete)
+    spec.spec_complete_behaviors;
+  List.iter
+    (fun disjoint -> add_disjoint e kf ?stmt ?active disjoint)
+    spec.spec_disjoint_behaviors
 
 let extend_behavior
     e kf ?stmt ?active ?(behavior=Cil.default_behavior_name) set_bhv =
@@ -1103,10 +1116,10 @@ let add_assigns ~keep_empty e kf ?stmt ?active ?behavior a =
           Thus must remove the previous property before adding the new one *)
        List.iter Property_status.remove
          (Property.ip_from_of_behavior kf ki active full_bhv);
-       Extlib.may Property_status.remove
+       Option.iter Property_status.remove
          (Property.ip_assigns_of_behavior kf ki active full_bhv);
        full_bhv.b_assigns <- merge_assigns keep_empty full_bhv.b_assigns a;
-       Extlib.may Property_status.register
+       Option.iter Property_status.register
          (Property.ip_assigns_of_behavior kf ki active full_bhv);
        List.iter Property_status.register
          (Property.ip_from_of_behavior kf ki active full_bhv);
@@ -1129,11 +1142,11 @@ let add_allocates ~keep_empty e kf ?stmt ?active ?behavior a =
     e_bhv.b_allocation <-
       merge_allocation ~keep_empty e_bhv.b_allocation a;
     let active = match active with None -> [] | Some l -> l in
-    Extlib.may Property_status.remove
+    Option.iter Property_status.remove
       (Property.ip_allocation_of_behavior kf ki active full_bhv);
     full_bhv.b_allocation <-
       merge_allocation ~keep_empty full_bhv.b_allocation a;
-    Extlib.may Property_status.register
+    Option.iter Property_status.register
       (Property.ip_allocation_of_behavior kf ki active full_bhv);
   in
   let old_spec = get_full_spec kf ?stmt ?behavior:active () in
@@ -1206,7 +1219,7 @@ let add_code_annot ?(keep_empty=true) emitter ?kf stmt ca =
        if spec.spec_variant <> None then
          Kernel.fatal
            "statement contract cannot have a decrease clause";
-       Extlib.may
+       Option.iter
          (add_terminates emitter kf ~stmt ~active) spec.spec_terminates;
        List.iter
          (add_complete emitter kf ~stmt ~active)
@@ -1317,12 +1330,17 @@ let add_code_annot ?(keep_empty=true) emitter ?kf stmt ca =
     fill_tables ca (Property.ip_of_code_annot kf stmt ca)
 
 let add_assert e ?kf stmt a =
-  let a = Logic_const.toplevel_predicate ~only_check:false a in
+  let a = Logic_const.toplevel_predicate ~kind:Assert a in
   let a = Logic_const.new_code_annotation (AAssert ([],a)) in
   add_code_annot e ?kf stmt a
 
 let add_check e ?kf stmt a =
-  let a = Logic_const.toplevel_predicate ~only_check:true a in
+  let a = Logic_const.toplevel_predicate ~kind:Check a in
+  let a = Logic_const.new_code_annotation (AAssert ([],a)) in
+  add_code_annot e ?kf stmt a
+
+let add_admit e ?kf stmt a =
+  let a = Logic_const.toplevel_predicate ~kind:Admit a in
   let a = Logic_const.new_code_annotation (AAssert ([],a)) in
   add_code_annot e ?kf stmt a
 
@@ -1389,9 +1407,9 @@ let insert_global_in_ast annot =
          Cil_datatype.Logic_info.Set.is_empty logic_vars
       then List.rev acc @ glob :: g :: l
       else begin
-          let deps = remove_declared_global c_vars logic_vars g in
-          insert_after deps (g :: acc) l
-        end
+        let deps = remove_declared_global c_vars logic_vars g in
+        insert_after deps (g :: acc) l
+      end
   in
   let globs = insert_after deps [] file.globals in
   file.globals <- globs
@@ -1585,7 +1603,7 @@ let remove_allocates e kf p =
          if b.b_allocation == p then begin
            b.b_allocation <- FreeAllocAny;
            let info = Id_contract (Datatype.String.Set.empty,b) in
-           Extlib.may Property_status.remove
+           Option.iter Property_status.remove
              (Property.ip_of_allocation kf Kglobal info p)
          end)
       spec.spec_behavior
@@ -1596,9 +1614,9 @@ let remove_extended e kf ext =
   let set_spec spec _tbl =
     List.iter
       (fun b ->
-           b.b_extended <- Extlib.filter_out ((==) ext) b.b_extended;
-           Property_status.remove
-             (Property.(ip_of_extended (ELContract kf) ext)))
+         b.b_extended <- Extlib.filter_out ((==) ext) b.b_extended;
+         Property_status.remove
+           (Property.(ip_of_extended (ELContract kf) ext)))
       spec.spec_behavior
   in
   remove_in_funspec e kf set_spec
@@ -1611,14 +1629,14 @@ let remove_assigns e kf p =
          if b.b_assigns == p then begin
            b.b_assigns <- WritesAny;
            let info = Id_contract(Datatype.String.Set.empty, b) in
-           Extlib.may Property_status.remove
+           Option.iter Property_status.remove
              (Property.ip_of_assigns kf Kglobal info p);
            (match p with
             | WritesAny -> ()
             | Writes l ->
               List.iter
                 (fun f ->
-                   Extlib.may
+                   Option.iter
                      Property_status.remove
                      (Property.ip_of_from kf Kglobal info f)) l)
          end)

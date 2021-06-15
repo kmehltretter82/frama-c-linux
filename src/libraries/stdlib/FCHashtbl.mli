@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -32,21 +32,21 @@ module type S = sig
 
   val iter_sorted:
     ?cmp:(key -> key -> int) -> (key -> 'a -> unit) -> 'a t -> unit
-    (** Iter on the hashtbl, but respecting the order on keys induced
-        by [cmp]. Use [Stdlib.compare] if [cmp] not given.
+  (** Iter on the hashtbl, but respecting the order on keys induced
+      by [cmp]. Use [Stdlib.compare] if [cmp] not given.
 
-	If the table contains several bindings for the same key, they
-	are passed to [f] in reverse order of introduction, that is,
-	the most recent binding is passed first. *)
+      If the table contains several bindings for the same key, they
+      are passed to [f] in reverse order of introduction, that is,
+      the most recent binding is passed first. *)
 
   val fold_sorted:
     ?cmp:(key -> key -> int) -> (key -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
-    (** Fold on the hashtbl, but respecting the order on keys induced
-        by [cmp]. Use [Stdlib.compare] if [cmp] not given.
+  (** Fold on the hashtbl, but respecting the order on keys induced
+      by [cmp]. Use [Stdlib.compare] if [cmp] not given.
 
-	If the table contains several bindings for the same key, they
-	are passed to [f] in reverse order of introduction, that is,
-	the most recent binding is passed first. *)
+      If the table contains several bindings for the same key, they
+      are passed to [f] in reverse order of introduction, that is,
+      the most recent binding is passed first. *)
 
   val iter_sorted_by_entry:
     cmp:((key * 'a) -> (key * 'a) -> int) -> (key -> 'a -> unit) -> 'a t -> unit
@@ -60,9 +60,9 @@ module type S = sig
     cmp:('a -> 'a -> int) -> (key -> 'a -> unit) -> 'a t -> unit
   val fold_sorted_by_value:
     cmp:('a -> 'a -> int) -> (key -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
-(** Iter or fold on the hashtable, respecting the order on entries
-    given by [cmp]. The relative order for entries whose values is
-    equal according to cmp, is not specified. *)
+  (** Iter or fold on the hashtable, respecting the order on entries
+      given by [cmp]. The relative order for entries whose values is
+      equal according to cmp, is not specified. *)
 
   val find_opt: 'a t -> key -> 'a option
   val find_def: 'a t -> key -> 'a  -> 'a
@@ -80,4 +80,3 @@ module Make(H: Hashtbl.HashedType) : S with type key = H.t
 
 val hash : 'a -> int
 val hash_param : int -> int -> 'a -> int
-

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-# 24 "src/kernel_internals/runtime/config.ml.in"
+# 24 "src/kernel_internals/runtime/fc_config.ml.in"
 
 let version = "@VERSION@"
 let codename = "@VERSION_CODENAME@"
@@ -38,9 +38,10 @@ let ocamlc = "@OCAMLC@"
 let ocamlopt = "@OCAMLOPT@"
 let ocaml_wflags = "@WARNINGS@"
 
-let getenv_list name =
+let getenv_list name : Filepath.Normalized.t list =
   let path = Sys.getenv name in
-  Str.split (Str.regexp ":") path
+  let dirs = Str.split (Str.regexp ":") path in
+  List.map Filepath.Normalized.of_string dirs
 
 let add_symbolic_dir_list name = function
   | [d] -> Filepath.add_symbolic_dir name d
@@ -52,8 +53,10 @@ let add_symbolic_dir_list name = function
         ds
 
 
-let datadir = try Sys.getenv "FRAMAC_SHARE" with Not_found -> "@FRAMAC_DATADIR@"
-let framac_libc = datadir ^ "/libc"
+let datadir =
+  Filepath.Normalized.of_string
+    (try Sys.getenv "FRAMAC_SHARE" with Not_found -> "@FRAMAC_DATADIR@")
+let framac_libc = Filepath.Normalized.concat datadir "libc"
 let extra_datadir = try getenv_list "FRAMAC_EXTRA_SHARE" with Not_found -> []
 let () = add_symbolic_dir_list "FRAMAC_EXTRA_SHARE" extra_datadir
 (** After so that it has the priority for pretty printing *)
@@ -61,16 +64,24 @@ let () = Filepath.add_symbolic_dir "FRAMAC_SHARE" datadir
 
 let datadirs = datadir::extra_datadir
 
-let libdir = try Sys.getenv "FRAMAC_LIB" with Not_found -> "@FRAMAC_LIBDIR@"
+let libdir =
+  Filepath.Normalized.of_string
+    (try Sys.getenv "FRAMAC_LIB" with Not_found -> "@FRAMAC_LIBDIR@")
 let () = Filepath.add_symbolic_dir "FRAMAC_LIB" libdir
 let plugin_dir =
   try
     getenv_list "FRAMAC_PLUGIN"
   with Not_found ->
-    try [ Sys.getenv "FRAMAC_LIB" ^ "/plugins" ]
-    with Not_found -> [ "@FRAMAC_PLUGINDIR@" ]
+  try
+    let dir =
+      Filepath.Normalized.concat
+        (Filepath.Normalized.of_string (Sys.getenv "FRAMAC_LIB")) "plugins"
+    in
+    [dir]
+  with Not_found -> [ Filepath.Normalized.of_string "@FRAMAC_PLUGINDIR@" ]
 
-let plugin_path = String.concat ":" plugin_dir
+let plugin_path =
+  String.concat ":" (Filepath.Normalized.to_string_list plugin_dir)
 
 let () = add_symbolic_dir_list "FRAMAC_PLUGIN" plugin_dir
 

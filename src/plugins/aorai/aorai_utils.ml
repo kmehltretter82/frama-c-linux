@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Aorai plug-in of Frama-C.                        *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -222,7 +222,8 @@ let isCrossableAtInit tr func =
         match base with
         | TVar v ->
           (try
-             Extlib.opt_bind
+             Option.bind
+               v.lv_origin
                (fun v ->
                   let init = Globals.Vars.find v in
                   let init = match init.Cil_types.init with
@@ -230,7 +231,6 @@ let isCrossableAtInit tr func =
                     | Some i -> i
                   in
                   aux_init off init)
-               v.lv_origin
            with Not_found -> None)
         | TMem t ->
           (match (aux t).term_node with
@@ -629,6 +629,16 @@ let crosscond_to_exp generated_kf curr_f curr_status loc cond res =
 (** Local copy of the file pointer *)
 let file = ref Cil.dummyFile
 
+let initFunction kf =
+  let fname = Kernel_function.get_name kf in
+  List.iter
+    (fun vi -> set_paraminfo fname vi.vname vi)
+    (Kernel_function.get_formals kf);
+  match (Kernel_function.find_return kf).skind with
+  | Cil_types.Return (Some { enode = Lval (Var vi,NoOffset) },_) ->
+    set_returninfo fname vi (* Add the vi of return stmt *)
+  | exception Kernel_function.No_Statement | _ -> () (* function without returned value *)
+
 (** Copy the file pointer locally in the class in order to ease globals
     management and initializes some tables. *)
 let initFile f =
@@ -636,27 +646,7 @@ let initFile f =
   Data_for_aorai.setCData ();
   (* Adding C variables into our hashtable *)
   Globals.Vars.iter (fun vi _ -> set_varinfo vi.vname vi);
-  Globals.Functions.iter
-    (fun kf ->
-       let fname = Kernel_function.get_name kf in
-       List.iter
-         (fun vi -> set_paraminfo fname vi.vname vi)
-         (Kernel_function.get_formals kf);
-       if not (Data_for_aorai.isIgnoredFunction fname) then
-         begin
-           try
-             let ret  = Kernel_function.find_return kf in
-             match ret.skind with
-             | Cil_types.Return (Some e,_) ->
-               (match e.enode with
-                | Lval (Var vi,NoOffset) ->
-                  set_returninfo fname vi (* Add the vi of return stmt *)
-                | _ -> () (* function without returned value *))
-             | _ -> () (* function without returned value *)
-           with Kernel_function.No_Statement ->
-             Aorai_option.fatal
-               "Don't know what to do with a function declaration"
-         end)
+  Globals.Functions.iter initFunction
 
 (** List of globals awaiting for adding into C file globals *)
 let globals_queue = ref []
@@ -684,46 +674,41 @@ let flush_globals () =
   Kernel_function.clear_sid_info ();
   globals_queue := []
 
-let mk_global glob = globals_queue := glob :: !globals_queue
+let add_global glob = globals_queue := glob :: !globals_queue
 
 (* Utilities for global variables *)
-let mk_global_c_initialized_vars name ty ini=
-  let vi = (Cil.makeGlobalVar name ty) in
-  vi.vghost<-true;
-  mk_global (GVar(vi,ini,vi.vdecl));
-  Globals.Vars.add vi ini;
-  set_varinfo name vi
-
-let mk_global_var_init vi ini =
-  vi.vghost<-true;
-  mk_global (GVar(vi,ini,vi.vdecl));
-  Globals.Vars.add vi ini;
+let add_gvar ?init vi =
+  let initinfo = {Cil_types.init} in
+  vi.vghost <- true;
+  vi.vstorage <- NoStorage;
+  add_global (GVar(vi,initinfo,vi.vdecl));
+  Globals.Vars.add vi initinfo;
   set_varinfo vi.vname vi
 
-let mk_global_var vi =
-  let ini =
-    {Cil_types.init=Some(Cil.makeZeroInit ~loc:(CurrentLoc.get()) vi.vtype)}
+let add_gvar_zeroinit vi =
+  add_gvar ~init:(Cil.makeZeroInit ~loc:(CurrentLoc.get()) vi.vtype) vi
+
+let mk_gvar ?init ~ty name =
+  (* See if the variable is already declared *)
+  let vi =
+    try
+      let ty' = typeAddAttributes [Attr ("ghost", [])] ty in
+      let vi = Globals.Vars.find_from_astinfo name VGlobal in
+      if not (Cil_datatype.Typ.equal vi.vtype ty') then
+        Aorai_option.abort "Global %s is declared with type %a instead of %a"
+          name Cil_printer.pp_typ vi.vtype Cil_printer.pp_typ ty';
+      Globals.Vars.remove vi;
+      vi
+    with Not_found ->
+      Cil.makeGlobalVar name ty
   in
-  mk_global_var_init vi ini
+  add_gvar ?init vi
 
-let mk_global_c_var_init name init =
-  let ty = Cil.typeOf init in
-  let vi = Cil.makeGlobalVar name ty in
-  vi.vghost <- true;
-  let ini = { Cil_types.init = Some(SingleInit init) } in
-  mk_global(GVar(vi,ini,vi.vdecl));
-  Globals.Vars.add vi ini;
-  set_varinfo name vi
+let mk_gvar_scalar ~init ?(ty = Cil.typeOf init) name =
+  mk_gvar ~init:(SingleInit init) ~ty name
 
-let mk_int_const value =
-  new_exp
-    ~loc:(CurrentLoc.get())
-    (Const(
-        CInt64(
-          Integer.of_int (value),
-          IInt,
-          Some(string_of_int(value))
-        )))
+let mk_integer value =
+  Cil.integer ~loc:(CurrentLoc.get()) value
 
 (* Utilities for global enumerations *)
 let mk_global_c_enum_type_tagged name elements_l =
@@ -740,14 +725,14 @@ let mk_global_c_enum_type_tagged name elements_l =
       (fun (e,i) ->
          { eiorig_name = e;
            einame = e;
-           eival = mk_int_const i;
+           eival = mk_integer i;
            eiloc = Location.unknown;
            eihost = einfo})
       elements_l
   in
   einfo.eitems <- l;
   set_usedinfo name einfo;
-  mk_global (GEnumTag(einfo, Location.unknown));
+  add_global (GEnumTag(einfo, Location.unknown));
   einfo
 
 let mk_global_c_enum_type name elements =
@@ -757,8 +742,9 @@ let mk_global_c_enum_type name elements =
   (* no need to rev the list, as the elements got their value already *)
   ignore (mk_global_c_enum_type_tagged name elements)
 
-let mk_global_c_initialized_enum name name_enuminfo ini =
-  mk_global_c_initialized_vars name (TEnum(get_usedinfo name_enuminfo,[])) ini
+let mk_gvar_enum ?init name name_enuminfo =
+  mk_gvar ?init ~ty:(TEnum(get_usedinfo name_enuminfo,[])) name
+
 
 (* ************************************************************************* *)
 (** {b Terms management / computation} *)
@@ -888,9 +874,27 @@ let is_out_of_state_exp state loc =
       (Cil.evar (Data_for_aorai.get_state_var state))
       (mk_int_exp 0)
 
+let assert_alive_automaton kf stmt =
+  let pred =
+    if Aorai_option.Deterministic.get() then
+      let reject_state = Data_for_aorai.get_reject_state() in
+      is_out_of_state_pred reject_state
+    else begin
+      let valid_states =
+        List.filter
+          (fun x -> not (Data_for_aorai.is_reject_state x))
+          (fst (Data_for_aorai.getGraph ()))
+      in
+      let valid_preds = List.map is_state_pred valid_states in
+      Logic_const.pors valid_preds
+    end
+  in
+  let pred = { pred with pred_name = "aorai_smoke_test" :: pred.pred_name } in
+  Annotations.add_assert Aorai_option.emitter ~kf stmt pred
+
 (* Utilities for other globals *)
 
-let mk_global_comment txt = mk_global (GText (txt))
+let mk_global_comment txt = add_global (GText (txt))
 
 (* ************************************************************************* *)
 (** {b Initialization management / computation} *)
@@ -910,17 +914,8 @@ let mk_global_states_init root =
        in
        let init = SingleInit init in
        let var = Data_for_aorai.get_state_var state in
-       mk_global_var_init var { Cil_types.init = Some init})
+       add_gvar ~init var)
     states
-
-let func_to_init name =
-  {Cil_types.init=
-     Some(SingleInit(
-         new_exp ~loc:(CurrentLoc.get()) (Const(func_to_cenum (name)))))}
-
-let funcStatus_to_init st =
-  {Cil_types.init=Some(SingleInit(new_exp ~loc:(CurrentLoc.get())
-                                    (Const(op_status_to_cenum (st)))))}
 
 class visit_decl_loops_init () =
   object(self)
@@ -931,7 +926,7 @@ class visit_decl_loops_init () =
         match stmt.skind with
         | Loop _ ->
           let scope = Kernel_function.find_enclosing_block stmt in
-          let f = Extlib.the self#current_func in
+          let f = Option.get self#current_func in
           let name = Data_for_aorai.loopInit ^ "_" ^ (string_of_int stmt.sid) in
           let typ =
             Cil.typeAddAttributes
@@ -1082,10 +1077,10 @@ let mk_deterministic_lemma () =
     in
     let trans = Path_analysis.get_transitions_of_state state automaton in
     let prop = Extlib.product_fold disjoint_guards ptrue trans trans in
-    let prop = Logic_const.toplevel_predicate ~only_check:true prop in
+    let prop = Logic_const.toplevel_predicate ~kind:Check prop in
     let name = state.Promelaast.name ^ "_deterministic_trans" in
     let lemma =
-      Dlemma (name, false, [label],[],prop,[],Cil_datatype.Location.unknown)
+      Dlemma (name, [label],[],prop,[],Cil_datatype.Location.unknown)
     in
     Annotations.add_global Aorai_option.emitter lemma
   in
@@ -1095,18 +1090,6 @@ let make_enum_states () =
   let state_list =fst (Data_for_aorai.getGraph()) in
   let state_list =
     List.map (fun x -> (x.Promelaast.name, x.Promelaast.nums)) state_list
-  in
-  let state_list =
-    if not (Aorai_option.Deterministic.get ()) then state_list
-    else
-      (*[VP] Strictly speaking this is not needed, but Jessie tends
-        to consider that a value of enum type can only be one of the
-        tags, so that we must add this dummy state that is always a
-        possible value, even when a contract concludes that curState
-        is none of the others. Note that ISO C does not impose this
-        limitation to values of enum types.
-      *)
-      (get_fresh "aorai_reject_state", -2)::state_list
   in
   let enum = mk_global_c_enum_type_tagged states state_list in
   let mapping =
@@ -1138,19 +1121,20 @@ let initGlobals root complete =
   mk_global_c_enum_type
     listOp
     (List.map
-       (fun e -> func_to_op_func e)
-       (getFunctions_from_c() @ getIgnoredFunctions()));
-  mk_global_c_initialized_enum curOp listOp
-    (func_to_init (Kernel_function.get_name root));
+       (fun kf -> func_to_op_func (Kernel_function.get_name kf))
+       (getObservablesFunctions() @ getIgnoredFunctions()));
+  mk_gvar_enum curOp listOp;
   mk_global_c_enum_type  listStatus (callStatus::[termStatus]);
-  mk_global_c_initialized_enum
-    curOpStatus listStatus (funcStatus_to_init Promelaast.Call);
+  mk_gvar_enum curOpStatus listStatus;
 
   mk_global_comment "//* ";
   mk_global_comment "//* States and Trans Variables";
-  if Aorai_option.Deterministic.get () then
-    mk_global_c_var_init curState (getInitialState())
-  else
+  if Aorai_option.Deterministic.get () then begin
+    mk_gvar_scalar ~init:(getInitialState()) curState;
+    let init = getInitialState() (* TODO a distinct initial value for history *)
+    and history = Data_for_aorai.whole_history () in
+    List.iter (fun name -> mk_gvar_scalar ~init name) history
+  end else
     mk_global_states_init root;
 
   if complete then begin
@@ -1163,16 +1147,17 @@ let initGlobals root complete =
   mk_global_comment "//****************** ";
   mk_global_comment "//* Auxiliary variables used in transition conditions";
   mk_global_comment "//*";
-  List.iter mk_global_var (Data_for_aorai.aux_variables());
+  List.iter add_gvar_zeroinit (Data_for_aorai.aux_variables());
 
   let auto = Data_for_aorai.getAutomata () in
   mk_global_comment "//* ";
   mk_global_comment "//****************** ";
   mk_global_comment "//* Metavariables";
   mk_global_comment "//*";
-  Datatype.String.Map.iter (fun _ -> mk_global_var) auto.metavariables;
+  Datatype.String.Map.iter (fun _ -> add_gvar_zeroinit) auto.metavariables;
 
-  if Aorai_option.Deterministic.get () then begin
+  if Aorai_option.Deterministic.get () &&
+     Aorai_option.GenerateDeterministicLemmas.get () then begin
     (* must flush now previous globals which are used in the lemmas in order to
        be able to put these last ones in the right places in the AST. *)
     flush_globals ();
@@ -1270,13 +1255,13 @@ let action_assigns trans =
            (Cil.typeOfTermLval (host,my_off)))
         acc
     | Pebble_init(_,v,c) ->
-      let cc = Extlib.the c.lv_origin in
-      let cv = Extlib.the v.lv_origin in
+      let cc = Option.get c.lv_origin in
+      let cv = Option.get v.lv_origin in
       add_if_needed cv (Logic_const.tvar v)
         (add_if_needed cc (Logic_const.tvar c) acc)
     | Pebble_move(_,v1,_,v2) ->
-      let cv1 = Extlib.the v1.lv_origin in
-      let cv2 = Extlib.the v2.lv_origin in
+      let cv1 = Option.get v1.lv_origin in
+      let cv2 = Option.get v2.lv_origin in
       add_if_needed cv1 (Logic_const.tvar v1)
         (add_if_needed cv2 (Logic_const.tvar v2) acc)
   in
@@ -1284,7 +1269,7 @@ let action_assigns trans =
   let empty_pebble =
     match trans.start.multi_state, trans.stop.multi_state with
     | Some(_,aux), None ->
-      let caux = Extlib.the aux.lv_origin in
+      let caux = Option.get aux.lv_origin in
       add_if_needed caux (Logic_const.tvar aux) empty
     | _ -> empty
   in
@@ -1997,8 +1982,45 @@ let mk_transitions_stmt generated_kf loc f st res trans =
     trans
     ([],[],Cil_datatype.Varinfo.Set.empty, Cil.zero ~loc, [])
 
+let mk_goto loc b =
+  let ghost = true in
+  match b.bstmts with
+  | [] -> Cil.mkBlock []
+  | [ { skind = Instr i } ] ->
+    let s = mkStmtOneInstr ~ghost i in
+    Cil.mkBlock [s]
+  | [ { skind = Goto (s,_) }] ->
+    let s' = mkStmt ~ghost (Goto (ref !s,loc)) in
+    Cil.mkBlock [s']
+  | s::_ ->
+    s.labels <-
+      (Label(Data_for_aorai.get_fresh "__aorai_label",loc,false)):: s.labels;
+    let s' = mkStmt ~ghost (Goto (ref s,loc)) in
+    Cil.mkBlock [s']
+
+let normalize_condition loc cond block1 block2 =
+  let rec aux cond b1 b2 =
+    match cond.enode with
+    | UnOp(LNot,e,_) -> aux e b2 b1
+    | BinOp(LAnd,e1,e2,_) ->
+      let b2' = mk_goto loc b2 in
+      let b1'= Cil.mkBlock [aux e2 b1 b2'] in
+      aux e1 b1' b2
+    | BinOp(LOr,e1,e2,_) ->
+      let b1' = mk_goto loc b1 in
+      let b2' = Cil.mkBlock [aux e2 b1' b2] in
+      aux e1 b1 b2'
+    | _ ->
+      Cil.mkStmt ~ghost:true (If(cond,b1,b2,loc))
+  in
+  aux cond block1 block2
+
 let mkIfStmt loc exp1 block1 block2 =
-  Cil.mkStmt ~ghost:true (If (exp1, block1, block2, loc))
+  if Kernel.LogicalOperators.get() then
+    Cil.mkStmt ~ghost:true (If (exp1, block1, block2, loc))
+  else
+    normalize_condition loc exp1 block1 block2
+
 
 let mk_deterministic_stmt
     generated_kf loc auto f fst status ret state
@@ -2063,7 +2085,9 @@ let mk_deterministic_body generated_kf loc f st status res =
     List.fold_right
       (mk_deterministic_stmt generated_kf loc auto f st status res)
       states
-      ([], Cil_datatype.Varinfo.Set.empty, [],[])
+      ([], Cil_datatype.Varinfo.Set.empty, [],
+       (* if all else fails, go to reject state. *)
+       [is_state_det_stmt (Data_for_aorai.get_reject_state()) loc])
   in
   aux_funcs, aux_vars, aux_stmts @ trans_stmts
 
@@ -2136,6 +2160,20 @@ let auto_func_block generated_kf loc f st status res =
            (Const (Data_for_aorai.func_to_cenum (Kernel_function.get_name f))))
         loc
     ]
+  and stmt_history_update =
+    if Aorai_option.Deterministic.get () then
+      let history = Data_for_aorai.whole_history ()
+      and cur_state = Data_for_aorai.(get_varinfo curState) in
+      let add_stmt (src,acc) dst_name =
+        let dst = Data_for_aorai.get_varinfo dst_name in
+        let stmt = equalsStmt (Cil.var dst) (Cil.evar ~loc src) loc in
+        dst, stmt :: acc
+      in
+      snd (List.fold_left add_stmt (cur_state,[]) history)
+    else if Aorai_option.InstrumentationHistory.get () > 0 then
+      Aorai_option.fatal "history is not implemented for non-deterministic \
+                          automaton"
+    else []
   in
   let new_funcs, local_var, main_stmt =
     if Aorai_option.Deterministic.get() then
@@ -2143,10 +2181,15 @@ let auto_func_block generated_kf loc f st status res =
     else
       mk_non_deterministic_body generated_kf loc f st status res
   in
-  let ret = [ Cil.mkStmt ~ghost:true (Cil_types.Return(None,loc)) ] in
+  let ret =
+    Cil.mkStmt ~ghost:true ~valid_sid:true (Cil_types.Return(None,loc))
+  in
+  if Aorai_option.SmokeTests.get () then begin
+    assert_alive_automaton generated_kf ret;
+  end;
   let res_block =
     (Cil.mkBlock
-       ( stmt_begin_list @ main_stmt @ ret))
+       ( stmt_begin_list @ stmt_history_update @ main_stmt @ [ret]))
   in
   res_block.blocals <- local_var;
   Aorai_option.debug ~dkey "Generated body is:@\n%a"
@@ -2207,6 +2250,8 @@ let treat_val loc base range pred =
       let max = Logic_const.prel (Rle, loc, add max) in
       Logic_const.pand (min,max)
     | Unbounded min -> Logic_const.prel (Rle, add_cst min, loc)
+    | Unknown -> Logic_const.ptrue (* nothing is known: the loc can
+                                      take any value from then on. *)
   in
   Aorai_option.debug ~dkey:action_dkey "Action predicate: %a"
     Printer.pp_predicate res;

@@ -1,3 +1,7 @@
+/* run.config*
+ EXIT: 1
+   STDOPT:
+*/
 typedef struct _s {
   int i;
   struct _s v[12];

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -432,7 +432,7 @@ sig
         The [force] parameters defaults to [false], when it is [true], if there
         exist another builtin, it is replaced with the new one. Use with care.
 
-        @modify Frama-C+dev add optional [force] parameter
+        @modify 22.0-Titanium add optional [force] parameter
   *)
 
   val set_builtin' :
@@ -448,7 +448,7 @@ sig
       The [force] parameters defaults to [false], when it is [true], if there
       exist another builtin, it is replaced with the new one. Use with care.
 
-      @modify Frama-C+dev add optional [force] parameter
+      @modify 22.0-Titanium add optional [force] parameter
   *)
 
   val set_builtin_get :
@@ -460,7 +460,7 @@ sig
       The [force] parameters defaults to [false], when it is [true], if there
       exist another builtin, it is replaced with the new one. Use with care.
 
-      @modify Frama-C+dev add optional [force] parameter
+      @modify 22.0-Titanium add optional [force] parameter
   *)
 
   val set_builtin_eq :
@@ -475,7 +475,7 @@ sig
         The [force] parameters defaults to [false], when it is [true], if there
         exist another builtin, it is replaced with the new one. Use with care.
 
-        @modify Frama-C+dev add optional [force] parameter
+        @modify 22.0-Titanium add optional [force] parameter
   *)
 
   val set_builtin_leq :
@@ -491,7 +491,7 @@ sig
         The [force] parameters defaults to [false], when it is [true], if there
         exist another builtin, it is replaced with the new one. Use with care.
 
-        @modify Frama-C+dev add optional [force] parameter
+        @modify 22.0-Titanium add optional [force] parameter
   *)
 
   (** {3 Specific Patterns} *)

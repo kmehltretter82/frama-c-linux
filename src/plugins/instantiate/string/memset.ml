@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -139,9 +139,8 @@ let generate_requires loc ptr value len =
     ])
 
 let generate_assigns loc t ptr value len =
-  let open Extlib in
   let ptr_range = new_identified_term (tunref_range_bytes_len ~loc ptr len) in
-  let value = list_of_opt (opt_map new_identified_term value) in
+  let value = Option.to_list (Option.map new_identified_term value) in
   let set = ptr_range, From value in
   let result = new_identified_term (tresult t) in
   let res = result, From [ new_identified_term ptr ] in
@@ -163,7 +162,7 @@ let generate_ensures e loc t ptr value len =
       { (presult_ptr ~loc t ptr) with pred_name = [ "result"] }
     ])
 
-let generate_spec (_t, e) { svar = vi } loc =
+let generate_spec (_t, e) loc { svar = vi } =
   let (cptr, cvalue, clen) = match Cil.getFormalsDecl vi with
     | [ ptr ; value ; len ] -> ptr, (Some value), len
     | [ ptr ; len ] -> ptr, None, len
@@ -172,7 +171,7 @@ let generate_spec (_t, e) { svar = vi } loc =
   let t = cptr.vtype in
   let ptr = cvar_to_tvar cptr in
   let len = cvar_to_tvar clen in
-  let value = Extlib.opt_map cvar_to_tvar cvalue in
+  let value = Option.map cvar_to_tvar cvalue in
   let requires = generate_requires loc ptr value len in
   let assigns  = generate_assigns loc t ptr value len in
   let ensures  = generate_ensures e loc t ptr value len in
@@ -189,7 +188,7 @@ let rec contains_union_type t =
   match Cil.unrollType t with
   | TComp({ cstruct = false }, _, _) ->
     true
-  | TComp({ cfields = fields }, _, _) ->
+  | TComp({ cfields = Some fields }, _, _) ->
     List.exists contains_union_type (List.map (fun f -> f.ftype) fields)
   | TArray(t, _, _, _) ->
     contains_union_type t
@@ -254,7 +253,7 @@ let retype_args (_t, e) args =
       | Value_of t -> base_char_type t
       | _ -> unexpected "trying to retype arguments on an ill-typed call"
     in
-    let v = Cil.mkCast (Cil.stripCasts v) base_type in
+    let v = Cil.mkCast base_type (Cil.stripCasts v) in
     [ ptr ; v ; n ]
   | Some fv, [ ptr ; v ; n ] ->
     let ptr = Cil.stripCasts ptr in

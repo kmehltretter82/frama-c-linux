@@ -1,22 +1,26 @@
 \begin{syntax}
-  [ function-contract ] ::= requires-clause*
-                            { decreases-clause? } simple-clause*
-                            named-behavior* completeness-clause*
+  [ function-contract ] ::= requires-clause* ;
+                            { decreases-clause? } simple-clause* ;
+                            named-behavior* completeness-clause* ;
   \
-  requires-clause ::= "requires" pred ";"
+  clause-kind ::= "check" | "admit"
   \
-  { decreases-clause } ::= { "decreases" term ("for" id)? ";" }
+  requires-clause ::= clause-kind? "requires" pred ";"
   \
-  [ simple-clause ] ::= { assigns-clause } | ensures-clause
-                        | { allocation-clause} | { abrupt-clause }
+  { decreases-clause } ::= { "decreases" term ("for" ident)? ";" }
+  \
+  simple-clause ::= { assigns-clause } | ensures-clause ;
+                  | { allocation-clause} | { abrupt-clause }
   \
   { assigns-clause } ::= { "assigns" locations ";" }
   \
-  { locations } ::= { location ("," location) * | "\nothing" }
+  { locations } ::= { locations-list | "\nothing" }
+  \
+  { locations-list } ::= { location ("," location) * }
   \
   { location } ::= { tset }
   \
-  ensures-clause ::= "ensures" pred ";"
+  ensures-clause ::= clause-kind? "ensures" pred ";"
   \
   named-behavior ::= "behavior" id ":" behavior-body
   \
@@ -24,6 +28,6 @@
   \
   assumes-clause ::= "assumes" pred ";"
   \
-  completeness-clause ::= "complete" "behaviors" (id (","id)*)? ";"
+  completeness-clause ::= "complete" "behaviors" (id (","id)*)? ";" ;
                         | "disjoint" "behaviors" (id (","id)*)? ";"
 \end{syntax}

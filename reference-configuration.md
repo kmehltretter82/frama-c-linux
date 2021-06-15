@@ -9,7 +9,7 @@ compiling Frama-C+dev, on a machine with gcc <= 9[^gcc-10]
 - ocamlfind.1.8.1
 - ocamlgraph.1.8.8
 - ppx_deriving_yojson.3.5.2 (for mdr, optional)
-- why3.1.3.3
+- why3.1.4.0
 - yojson.1.7.0
 - zarith.1.9.1
 - zmq.5.1.3 (for server, optional)

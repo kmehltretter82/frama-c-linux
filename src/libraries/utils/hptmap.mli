@@ -33,9 +33,9 @@ type tag
 
 (** Type of the keys of the map. *)
 module type Id_Datatype = sig
-    include Datatype.S
-    val id: t -> int (** Identity of a key. Must verify [id k >= 0] and
-                         [equal k1 k2 ==> id k1 = id k2] *)
+  include Datatype.S
+  val id: t -> int (** Identity of a key. Must verify [id k >= 0] and
+                       [equal k1 k2 ==> id k1 = id k2] *)
 end
 
 (** Values stored in the map *)
@@ -57,38 +57,38 @@ module Shape (Key : Id_Datatype): sig
 end
 
 module Make
-  (Key : Id_Datatype)
-  (V : V)
-  (Compositional_bool : sig
-     (** A boolean information is maintained for each tree, by composing the
-         boolean on the subtrees and the value information present on each leaf.
-         See {!Comp_unused} for a default implementation. *)
+    (Key : Id_Datatype)
+    (V : V)
+    (Compositional_bool : sig
+       (** A boolean information is maintained for each tree, by composing the
+           boolean on the subtrees and the value information present on each leaf.
+           See {!Comp_unused} for a default implementation. *)
 
-     val e: bool  (** Value for the empty tree *)
-     val f : Key.t -> V.t -> bool  (** Value for a leaf *)
-     val compose : bool -> bool -> bool
+       val e: bool  (** Value for the empty tree *)
+       val f : Key.t -> V.t -> bool  (** Value for a leaf *)
+       val compose : bool -> bool -> bool
        (** Composition of the values of two subtrees *)
-   end)
-  (Initial_Values : sig
-    val v : (Key.t*V.t) list list
-    (** List of the maps that must be shared between all instances of Frama-C
-        (the maps being described by the list of their elements).
-        Must include all maps that are exported at Caml link-time when the
-        functor is applied. This usually includes at least the empty map, hence
-        [v] nearly always contains [[]]. *)
-  end)
-  (Datatype_deps: sig
-    val l : State.t list
-    (** Dependencies of the hash-consing table. The table will be cleared
-        whenever one of those dependencies is cleared. *)
-  end)
+     end)
+    (Initial_Values : sig
+       val v : (Key.t*V.t) list list
+       (** List of the maps that must be shared between all instances of Frama-C
+           (the maps being described by the list of their elements).
+           Must include all maps that are exported at Caml link-time when the
+           functor is applied. This usually includes at least the empty map, hence
+           [v] nearly always contains [[]]. *)
+     end)
+    (Datatype_deps: sig
+       val l : State.t list
+       (** Dependencies of the hash-consing table. The table will be cleared
+           whenever one of those dependencies is cleared. *)
+     end)
   : Hptmap_sig.S with type key = Key.t
                   and type v = V.t
                   and type 'a shape = 'a Shape(Key).t
                   and type prefix = prefix
 
 (** Default implementation for the [Compositional_bool] argument of the functor
-  {!Make}. To be used when no interesting compositional bit can be computed. *)
+    {!Make}. To be used when no interesting compositional bit can be computed. *)
 module Comp_unused : sig
   val e : bool
   val f : 'a -> 'b -> bool

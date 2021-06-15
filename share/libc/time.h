@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -78,7 +78,7 @@ struct itimerspec {
 #define CLOCK_MONOTONIC 1
 #define TIMER_ABSTIME 1
 
-//@ ghost volatile unsigned int __fc_time __attribute__((FRAMA_C_MODEL));
+//@ ghost volatile unsigned int __fc_time;
 
 /*@ assigns \result \from __fc_time; */
 extern clock_t clock(void);
@@ -206,7 +206,7 @@ extern int clock_gettime(clockid_t clk_id, struct timespec *tp);
   @ }                                           // calling thread
 */
 
-/*@ ghost volatile int __fc_interrupted __attribute__((FRAMA_C_MODEL)); */
+/*@ ghost volatile int __fc_interrupted; */
 
 /*@ // missing: may assign to errno: EINTR, EINVAL, ENOTSUP
     // missing: assigns \result, rmtp \from 'clock having id clock_id'

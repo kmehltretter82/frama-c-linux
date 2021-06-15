@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -25,4 +25,4 @@
 
 (** [get_remarks f] retrieves the elements associated to various sections
     of the report, referenced by their anchor. *)
-val get_remarks: string -> Markdown.element list Datatype.String.Map.t
+val get_remarks: Filepath.Normalized.t -> Markdown.element list Datatype.String.Map.t

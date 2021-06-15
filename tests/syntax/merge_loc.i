@@ -1,6 +1,6 @@
 /* run.config
-   EXECNOW: make -s tests/syntax/pp_lines.cmxs
-   STDOPT: #"-load-module tests/syntax/pp_lines.cmxs"
+ MODULE: pp_lines
+   STDOPT:
 */
 
 // Test locations when cabs2cil merges declarations and tentative definitions

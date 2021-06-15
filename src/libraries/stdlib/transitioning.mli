@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -32,3 +32,8 @@
 *)
 
 (** {1 OCaml} *)
+
+module List: sig
+  (** since 4.10.0 *)
+  val concat_map: ('a -> 'b list) -> 'a list -> 'b list
+end

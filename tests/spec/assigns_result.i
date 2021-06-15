@@ -1,8 +1,8 @@
 /* run.config
+PLUGIN: eva,scope
    STDOPT: +"-deps @EVA_OPTIONS@"
 */
 int X,Y;
-
 /*@ assigns \result;
     assigns \exit_status;
 */

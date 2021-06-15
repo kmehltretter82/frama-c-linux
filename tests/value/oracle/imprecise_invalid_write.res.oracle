@@ -1,9 +1,9 @@
 [kernel] Parsing tests/value/imprecise_invalid_write.i (no preprocessing)
-[kernel] tests/value/imprecise_invalid_write.i:5: Warning: 
+[kernel:CERT:MSC:37] tests/value/imprecise_invalid_write.i:5: Warning: 
   Body of function main1 falls-through. Adding a return statement
-[kernel] tests/value/imprecise_invalid_write.i:10: Warning: 
+[kernel:CERT:MSC:37] tests/value/imprecise_invalid_write.i:10: Warning: 
   Body of function main2 falls-through. Adding a return statement
-[kernel] tests/value/imprecise_invalid_write.i:17: Warning: 
+[kernel:CERT:MSC:37] tests/value/imprecise_invalid_write.i:17: Warning: 
   Body of function main3 falls-through. Adding a return statement
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state

@@ -22,27 +22,30 @@
   h                         1        -        1       100%
   s                         5        -        6      83.3%
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'f':
+[wp] tests/wp_hoare/refguards.i:10: Warning: 
+  Memory model hypotheses for function 'f':
   /*@
-     behavior typed_ref:
-       requires \separated(c, d, {a + (..), b + (..)});
+     behavior wp_typed_ref:
        requires \valid(c);
        requires \valid(d);
+       requires \separated(c, d, {a + (..), b + (..)});
      */
   void f(int *a, int *b, int *c, int *d, int k);
-[wp] Warning: Memory model hypotheses for function 'h':
+[wp] tests/wp_hoare/refguards.i:25: Warning: 
+  Memory model hypotheses for function 'h':
   /*@
-     behavior typed_ref:
-       requires \separated(c, d);
+     behavior wp_typed_ref:
        requires \valid(c);
        requires \valid(d);
+       requires \separated(c, d);
      */
   void h(int *c, int *d, int k);
-[wp] Warning: Memory model hypotheses for function 's':
+[wp] tests/wp_hoare/refguards.i:39: Warning: 
+  Memory model hypotheses for function 's':
   /*@
-     behavior typed_ref:
-       requires \separated(c, d);
+     behavior wp_typed_ref:
        requires \valid(c);
        requires \valid(d);
+       requires \separated(c, d);
      */
   void s(int **c, int **d, int k);

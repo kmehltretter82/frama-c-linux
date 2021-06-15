@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -27,7 +27,8 @@ open Cil_types
 let is_return s = match s.skind with Return _ -> true | _ -> false
 let is_loop s =   match s.skind with Loop _ -> true | _ -> false
 
-let warn ?(current = true) = Kernel.warning ~once:true ~current
+let warn ?(current = true) =
+  Kernel.warning ~wkey:Kernel.wkey_annot_error ~once:true ~current
 
 module Make (Kf : sig val kf: kernel_function end) =
 struct
@@ -98,11 +99,12 @@ struct
           try
             Partition.ExpLimit (term_to_exp t)
           with Db.Properties.Interp.No_conversion ->
-            warn "loop unrolling parameters must be valid expressions";
+            warn "loop unrolling parameters must be valid expressions; \
+                  ignoring";
             default
       end
     | _ ->
-      warn "ignoring invalid unroll annotation";
+      warn "invalid unroll annotation; ignoring";
       default
 
   let history_size = HistoryPartitioning.get ()
@@ -114,28 +116,28 @@ struct
       try
         let vi = Globals.Vars.find_from_astinfo name VGlobal in
         let monitor = Partition.new_monitor ~split_limit in
-        Partition.Split (Cil.evar vi, Partition.Dynamic, monitor) :: l
+        let expr = Partition.Expression (Cil.evar vi) in
+        Partition.Split (expr, Partition.Dynamic, monitor) :: l
       with Not_found ->
         warn ~current:false "cannot find the global variable %s for value \
-                             partitioning" name;
+                             partitioning; ignoring" name;
         l
     in
     ValuePartitioning.fold add []
 
   let flow_actions stmt =
-    let kind = Partition.Static in
     let map_annot acc t =
       try
         let monitor = Partition.new_monitor ~split_limit in
         let action =
           match t with
-          | FlowSplit t -> Partition.Split (term_to_exp t, kind, monitor)
-          | FlowMerge t -> Partition.Merge (term_to_exp t, kind)
+          | FlowSplit (t, kind) -> Partition.Split (t, kind, monitor)
+          | FlowMerge t -> Partition.Merge t
         in
         action :: acc
       with
         Db.Properties.Interp.No_conversion ->
-        warn "split/merge expressions must be valid expressions";
+        warn "split/merge expressions must be valid expressions; ignoring";
         acc (* Impossible to convert term to lval *)
     in
     List.fold_left map_annot [] (get_flow_annot stmt)

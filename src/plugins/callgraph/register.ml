@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -21,11 +21,11 @@
 (**************************************************************************)
 
 let main () =
-  if Options.Filename.get () <> "" then
+  if not (Options.Filename.is_empty ()) then
     if Options.Services.get () then begin
       if not (Services.is_computed ()) then Services.dump ()
     end else
-      if not (Cg.is_computed ()) then Cg.dump ()
+    if not (Cg.is_computed ()) then Cg.dump ()
 
 let () = Db.Main.extend main
 

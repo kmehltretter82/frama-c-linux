@@ -13,7 +13,7 @@ void f(void)
 void g(int *C, int *D)
 {
   __e_acsl_store_block((void *)(& C),(size_t)8);
-  __e_acsl_assert(1,"Assertion","g","\\initialized(&C)",
+  __e_acsl_assert(1,1,"Assertion","g","\\initialized(&C)",
                   "tests/memory/ptr_init.c",16);
   /*@ assert \initialized(&C); */ ;
   __e_acsl_delete_block((void *)(& C));
@@ -37,6 +37,7 @@ void __e_acsl_globals_clean(void)
 {
   __e_acsl_delete_block((void *)(& B));
   __e_acsl_delete_block((void *)(& A));
+  return;
 }
 
 int main(void)
@@ -54,14 +55,14 @@ int main(void)
   __e_acsl_full_init((void *)(& x));
   x = y;
   f();
-  __e_acsl_assert(1,"Assertion","main","\\initialized(&A)",
+  __e_acsl_assert(1,1,"Assertion","main","\\initialized(&A)",
                   "tests/memory/ptr_init.c",25);
   /*@ assert \initialized(&A); */ ;
   {
     int __gen_e_acsl_initialized;
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& x),
                                                     sizeof(int *));
-    __e_acsl_assert(__gen_e_acsl_initialized,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_initialized,1,"Assertion","main",
                     "\\initialized(&x)","tests/memory/ptr_init.c",26);
   }
   /*@ assert \initialized(&x); */ ;

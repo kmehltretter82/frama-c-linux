@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -493,7 +493,7 @@ let iter_stat ?first ?sep ?last ~from start next=
           | Some app -> app v
         in
         let next app =
-          let item = (Extlib.the !items) in
+          let item = (Option.get !items) in
           apply item app;
           items := next item
         in

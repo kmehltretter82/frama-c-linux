@@ -34,10 +34,9 @@ Assume {
     Have: i_1 = i.
     (* Then *)
     Have: Mint_0[shift_sint32(q, j)] <= x.
-    (* Return *)
     Have: diag_0 = 0.
   }
-  Else { (* Return *) Have: diag_0 = 1. }
+  Else { Have: diag_0 = 1. }
 }
 Prove: (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < n) ->
         (forall i_3 : Z. ((0 <= i_3) -> ((i_3 < m) ->

@@ -30,7 +30,7 @@ let stmt sk = Cil.mkStmt ~valid_sid:true sk
 let instr i = stmt (Instr i)
 let block_stmt blk = stmt (Block blk)
 let block_from_stmts stmts = block_stmt (Cil.mkBlock stmts)
-let call ~loc ?result e args = instr (Call(result, e, args, loc))
+let call_instr ~loc ?result e args = instr (Call(result, e, args, loc))
 
 let assigns ~loc ~result e = instr (Set(result, e, loc))
 
@@ -44,6 +44,7 @@ type annotation_kind =
   | Precondition
   | Postcondition
   | Invariant
+  | Variant
   | RTE
 
 let kind_to_string loc k =
@@ -54,6 +55,7 @@ let kind_to_string loc k =
      | Precondition -> "Precondition"
      | Postcondition -> "Postcondition"
      | Invariant -> "Invariant"
+     | Variant -> "Variant"
      | RTE -> "RTE")
 
 let block stmt b = match b.bstmts with
@@ -68,13 +70,7 @@ let block stmt b = match b.bstmts with
 (* E-ACSL specific code *)
 (* ********************************************************************** *)
 
-let lib_call ~loc ?result fname args =
-  let vi =
-    try Rtl.Symbols.find_vi fname
-    with Rtl.Symbols.Unregistered _ as exn ->
-    try Builtins.find fname
-    with Not_found -> raise exn
-  in
+let do_call ~loc ?result vi args =
   let f = Cil.evar ~loc vi in
   vi.vreferenced <- true;
   let make_args ~variadic args param_ty =
@@ -87,7 +83,7 @@ let lib_call ~loc ?result fname args =
           | TPtr _, TArray _, _ -> assert false
           | _, _, _ -> arg
         in
-        let e = Cil.mkCast ~force:false ~newt:ty ~e in
+        let e = Cil.mkCast ~force:false ~newt:ty e in
         make_rev_args (e :: res) args_tl param_ty_tl
       | arg :: args_tl, [] when variadic -> make_rev_args (arg :: res) args_tl []
       | [], [] -> res
@@ -95,7 +91,7 @@ let lib_call ~loc ?result fname args =
         Options.fatal
           "Mismatch between the number of expressions given and the number \
            of arguments in the signature when calling function '%s'"
-          fname
+          vi.vname
     in
     List.rev (make_rev_args [] args param_ty)
   in
@@ -104,10 +100,27 @@ let lib_call ~loc ?result fname args =
     | TFun(_, None, _, _) -> []
     | _ -> assert false
   in
-  call ~loc ?result f args
+  call_instr ~loc ?result f args
 
-let rtl_call ~loc ?result fname args =
-  lib_call ~loc ?result (Functions.RTL.mk_api_name fname) args
+let call ~loc ?result fname args =
+  let kf =
+    try Globals.Functions.find_by_name fname
+    with Not_found ->
+      Options.fatal "Unable to find function '%s'" fname
+  in
+  let vi = Globals.Functions.get_vi kf in
+  do_call ~loc ?result vi args
+
+let rtl_call ~loc ?result ?(prefix=Functions.RTL.api_prefix) fname args =
+  let fname = prefix ^ fname in
+  let vi =
+    try Rtl.Symbols.find_vi fname
+    with Rtl.Symbols.Unregistered _ as exn ->
+    try Builtins.find fname
+    with Not_found ->
+      raise exn
+  in
+  do_call ~loc ?result vi args
 
 (* ************************************************************************** *)
 (** {2 Handling the E-ACSL's C-libraries, part II} *)
@@ -166,25 +179,33 @@ let mark_readonly vi =
   let loc = vi.vdecl in
   rtl_call ~loc "mark_readonly" [ Cil.evar ~loc vi ]
 
-let runtime_check_with_msg ~loc msg kind kf e =
+let runtime_check_with_msg ~loc msg ~pred_kind kind kf e =
+  let blocking =
+    match pred_kind with
+    | Assert -> Cil.one ~loc
+    | Check -> Cil.zero ~loc
+    | Admit ->
+      Options.fatal "No runtime check should be generated for 'admit' clauses"
+  in
   let file = (fst loc).Filepath.pos_path in
   let line = (fst loc).Filepath.pos_lnum in
   rtl_call ~loc
     "assert"
     [ e;
+      blocking;
       kind_to_string loc kind;
       Cil.mkString ~loc (Functions.RTL.get_original_name kf);
       Cil.mkString ~loc msg;
       Cil.mkString ~loc (Filepath.Normalized.to_pretty_string file);
       Cil.integer loc line ]
 
-let runtime_check kind kf e p =
+let runtime_check ~pred_kind kind kf e p =
   let loc = p.pred_loc in
   let msg =
     Kernel.Unicode.without_unicode
       (Format.asprintf "%a@?" Printer.pp_predicate) p
   in
-  runtime_check_with_msg ~loc msg kind kf e
+  runtime_check_with_msg ~loc msg ~pred_kind kind kf e
 
 (*
 Local Variables:

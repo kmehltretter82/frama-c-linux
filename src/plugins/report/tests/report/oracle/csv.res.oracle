@@ -31,8 +31,6 @@
 [eva] computing for function main3 <- main.
   Called from tests/report/csv.c:56.
 [eva] tests/report/csv.c:33: Call to builtin pow
-[eva] tests/report/csv.c:33: 
-  function pow: precondition 'finite_args' got status valid.
 [eva] Recording results for main3
 [eva] Done for function main3
 [eva] computing for function main4 <- main.
@@ -62,11 +60,12 @@
 [eva:final-states] Values at end of function main4:
   d ∈ [1. .. 1.79769313486e+308]
 [eva:final-states] Values at end of function main3:
+  __fc_errno ∈ [--..--]
   f1 ∈ [-2147483648. .. 2147483647.]
   f2 ∈ [-2147483648. .. 2147483647.]
   r ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
 [eva:final-states] Values at end of function main:
-  
+  __fc_errno ∈ [--..--]
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   5 functions analyzed (out of 5): 100% coverage.
@@ -84,8 +83,8 @@
   ----------------------------------------------------------------------------
   Evaluation of the logical properties reached by the analysis:
     Assertions        0 valid     0 unknown     0 invalid      0 total
-    Preconditions     2 valid     4 unknown     1 invalid      7 total
-  28% of the logical properties reached have been proven.
+    Preconditions     1 valid     4 unknown     1 invalid      6 total
+  16% of the logical properties reached have been proven.
   ----------------------------------------------------------------------------
 [report] Dumping properties in 'tests/report/result/csv.csv'
 [eva] Analyzing a complete application starting at main
@@ -167,11 +166,12 @@
 [eva:final-states] Values at end of function main4:
   d ∈ [1. .. 1.79769313486e+308]
 [eva:final-states] Values at end of function main3:
+  __fc_errno ∈ [--..--]
   f1 ∈ [-2147483648. .. 2147483647.]
   f2 ∈ [-2147483648. .. 2147483647.]
   r ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
 [eva:final-states] Values at end of function main:
-  
+  __fc_errno ∈ [--..--]
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   5 functions analyzed (out of 5): 100% coverage.
@@ -189,6 +189,6 @@
   ----------------------------------------------------------------------------
   Evaluation of the logical properties reached by the analysis:
     Assertions        0 valid     0 unknown     0 invalid      0 total
-    Preconditions     2 valid     4 unknown     1 invalid      7 total
-  28% of the logical properties reached have been proven.
+    Preconditions     1 valid     4 unknown     1 invalid      6 total
+  16% of the logical properties reached have been proven.
   ----------------------------------------------------------------------------

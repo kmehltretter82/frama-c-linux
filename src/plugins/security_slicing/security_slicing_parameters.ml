@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -21,18 +21,18 @@
 (**************************************************************************)
 
 include Plugin.Register
-  (struct
-     let name = "security-slicing"
-     let shortname = "security-slicing"
-     let help = "security slicing (experimental, undocumented)"
-   end)
+    (struct
+      let name = "security-slicing"
+      let shortname = "security-slicing"
+      let help = "security slicing (experimental, undocumented)"
+    end)
 
 module Slicing =
   False
     (struct
-       let option_name = "-security-slicing"
-       let help = "perform the security slicing analysis"
-     end)
+      let option_name = "-security-slicing"
+      let help = "perform the security slicing analysis"
+    end)
 
 (*
 Local Variables:

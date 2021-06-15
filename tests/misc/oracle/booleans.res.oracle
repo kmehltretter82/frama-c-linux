@@ -4,7 +4,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:alarm] tests/misc/booleans.i:7: Warning: check got status invalid.
+[eva:alarm] tests/misc/booleans.i:9: Warning: check got status invalid.
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -327,7 +327,7 @@ module Lenv = struct
   }
 
   let string_of_current_label env =
-    Extlib.opt_bind (
+    Option.bind env.current_logic_label (
       function
       | FormalLabel _ -> None
       | BuiltinLabel Init -> Some "Init"
@@ -345,7 +345,6 @@ module Lenv = struct
          | None -> None
          | Some (Label (lab,_,_)) -> Some lab
          | Some _ -> None))
-      env.current_logic_label
 
   let fresh_var env name kind typ =
     let name =
@@ -489,7 +488,7 @@ type typing_context = {
   anonCompFieldName : string;
   conditionalConversion : typ -> typ -> typ;
   find_macro : string -> lexpr;
-  find_var : ?label:string -> var:string -> logic_var;
+  find_var : ?label:string -> string -> logic_var;
   find_enum_tag : string -> exp * typ;
   find_comp_field: compinfo -> string -> offset;
   find_type : type_namespace -> string -> typ;
@@ -528,11 +527,13 @@ module Extensions = struct
   let initialized = ref false
   let ref_is_extension = ref (fun _ -> assert false)
   let ref_typer = ref (fun _ _ _ _ -> assert false)
+  let ref_typer_block = ref (fun _ _ _ _ -> assert false)
 
-  let set_handler ~is_extension ~typer =
+  let set_handler ~is_extension ~typer ~typer_block =
     assert (not !initialized) ;
     ref_is_extension := is_extension ;
     ref_typer := typer ;
+    ref_typer_block := typer_block;
     initialized := true
 
   let is_extension name = !ref_is_extension name
@@ -540,39 +541,13 @@ module Extensions = struct
   let typer name ~typing_context:typing_context ~loc =
     !ref_typer name typing_context loc
 
-  (* For deprecated functions *)
-  let ref_deprecated_handler = ref (fun _ _ _ _  -> assert false)
+  let typer_block name ~typing_context:typing_context ~loc =
+    !ref_typer_block name typing_context loc
 
-  let set_deprecated_handler ~handler =
-    ref_deprecated_handler := handler
-
-  let deprecated_register name category status typer =
-    let typer typing_context loc = typer ~typing_context ~loc in
-    !ref_deprecated_handler name category status typer
 end
 let set_extension_handler = Extensions.set_handler
-
-(* Deprecated ACSL extensions functions *)
-let set_deprecated_extension_handler =
-  Extensions.set_deprecated_handler
-
-let register_behavior_extension name f =
-  Extensions.deprecated_register name Ext_contract f
-
-let register_global_extension name f =
-  Extensions.deprecated_register name Ext_global f
-
-let register_code_annot_extension name f =
-  Extensions.deprecated_register name (Ext_code_annot Ext_here) f
-
-let register_code_annot_next_stmt_extension name f =
-  Extensions.deprecated_register name (Ext_code_annot Ext_next_stmt) f
-
-let register_code_annot_next_loop_extension name f =
-  Extensions.deprecated_register name (Ext_code_annot Ext_next_loop) f
-
-let register_code_annot_next_both_extension name f =
-  Extensions.deprecated_register name (Ext_code_annot Ext_next_both) f
+let get_typer = Extensions.typer
+let get_typer_block = Extensions.typer_block
 
 let rec arithmetic_conversion ty1 ty2 =
   match unroll_type ty1, unroll_type ty2 with
@@ -664,7 +639,7 @@ module Make
        val anonCompFieldName : string
        val conditionalConversion : typ -> typ -> typ
        val find_macro : string -> lexpr
-       val find_var : ?label:string -> var:string -> logic_var
+       val find_var : ?label:string -> string -> logic_var
        val find_enum_tag : string -> exp * typ
        val find_comp_field: compinfo -> string -> offset
        val find_type : type_namespace -> string -> typ
@@ -791,7 +766,9 @@ struct
     with Not_found ->
       (match Cil.unrollType ty with
        | TComp(comp,_,_) ->
-         List.exists (fun x -> x.fname = f) comp.cfields
+         List.exists
+           (fun x -> x.fname = f)
+           (Option.value ~default:[] comp.cfields)
        | _ -> false)
 
   let plain_type_of_c_field loc f ty =
@@ -885,6 +862,36 @@ struct
     | Ltype _ | Linteger | Lreal | Lvar _ | Larrow _ ->
       C.error loc "not a C type"
 
+  let parseInt loc s =
+    let explode s =
+      let l = ref [] in
+      String.iter (fun c -> l:=Int64.of_int (Char.code c) :: !l) s;
+      List.rev !l
+    in
+    match String.get s 0 with
+    | 'L' -> (* L'wide_char' *)
+      let content = String.sub s 2 (String.length s - 3) in
+      let tokens = explode content in
+      let value = Cil.reduce_multichar Cil.theMachine.Cil.wcharType tokens
+      in
+      tinteger_s64 ~loc value
+    | '\'' -> (* 'char' *)
+      let content = String.sub s 1 (String.length s - 2) in
+      let tokens = explode content in
+      let value,_= Cil.interpret_character_constant tokens in
+      term ~loc (TConst (constant_to_lconstant value)) Linteger
+    | _ -> Cil.parseIntLogic ~loc s
+
+  let find_logic_label loc env l =
+    try Lenv.find_logic_label l env
+    with Not_found ->
+    (* look for a C label *)
+    try
+      let lab = C.find_label l in
+      StmtLabel lab
+    with Not_found ->
+      C.error loc "logic label `%s' not found" l
+
   let logic_type ctxt loc env t =
     (* force calls to go through ctxt *)
     let module [@warning "-60"] C = struct end in
@@ -897,7 +904,12 @@ struct
     | LTarray (ty,length) ->
       let size = match length with
         | ASnone -> None
-        | ASinteger s -> Some (parseIntExp ~loc s)
+        | ASinteger s ->
+          let t = parseInt loc s in
+          (match t.term_node with
+           | TConst lconst ->
+             Some (new_exp ~loc (Const (lconstant_to_constant lconst)))
+           | _ -> Kernel.fatal ~loc "integer literal not parsed as constant")
         | ASidentifier s ->
           let size = ctxt.type_term ctxt env
               {lexpr_node=PLvar(s);lexpr_loc=loc} in
@@ -1765,7 +1777,7 @@ struct
 
 
   let conditional_conversion loc env rel t1 t2 =
-    let is_rel = Extlib.has_some rel in
+    let is_rel = Option.is_some rel in
     (* a comparison is mainly a function of type 'a -> 'a -> Bool/Prop.
        performs the needed unifications on both sides.*)
     let var = fresh_type_var "cmp" in
@@ -1799,7 +1811,7 @@ struct
         else if isArithmeticType ty1 && isArithmeticType ty2 then begin
           if is_same_type lty1 lty2 then begin
             if is_rel then begin
-              let rel = Extlib.the rel in
+              let rel = Option.get rel in
               let kind =
                 match Cil.unrollType ty1 with
                 | TFloat (FFloat,_) -> "float"
@@ -1899,36 +1911,6 @@ struct
     else logic_coerce typ t
 
   (* Typing terms *)
-
-  let parseInt loc s =
-    let explode s =
-      let l = ref [] in
-      String.iter (fun c -> l:=Int64.of_int (Char.code c) :: !l) s;
-      List.rev !l
-    in
-    match String.get s 0 with
-    | 'L' -> (* L'wide_char' *)
-      let content = String.sub s 2 (String.length s - 3) in
-      let tokens = explode content in
-      let value = Cil.reduce_multichar Cil.theMachine.Cil.wcharType tokens
-      in
-      tinteger_s64 ~loc value
-    | '\'' -> (* 'char' *)
-      let content = String.sub s 1 (String.length s - 2) in
-      let tokens = explode content in
-      let value,_= Cil.interpret_character_constant tokens in
-      term ~loc (TConst (constant_to_lconstant value)) Linteger
-    | _ -> Cil.parseIntLogic ~loc s
-
-  let find_logic_label loc env l =
-    try Lenv.find_logic_label l env
-    with Not_found ->
-    (* look for a C label *)
-    try
-      let lab = C.find_label l in
-      StmtLabel lab
-    with Not_found ->
-      C.error loc "logic label `%s' not found" l
 
   let find_old_label loc env =
     try Lenv.find_logic_label "Old" env
@@ -2308,14 +2290,22 @@ struct
       accept_array: bool;
       accept_models: bool;
       accept_func_ptr: bool;
+      accept_addrs: bool;
+      accept_const: bool;
     }
 
   let lval_addressable_mode =
     { accept_empty = false; accept_formal = true; accept_array = true;
-      accept_models = false; accept_func_ptr = true; }
+      accept_models = false; accept_func_ptr = true; accept_addrs = false;
+      accept_const = true; }
   let lval_assignable_mode =
     { accept_empty = true; accept_formal = true; accept_array = false;
-      accept_models = true; accept_func_ptr = false; }
+      accept_models = true; accept_func_ptr = false; accept_addrs = false;
+      accept_const = false; }
+  let lval_assigns_dependency_mode =
+    { accept_empty = true; accept_formal = true; accept_array = false;
+      accept_models = true; accept_func_ptr = false; accept_addrs = true;
+      accept_const = true; }
 
   let is_fct_ptr lv = Cil.isLogicFunctionType (Cil.typeOfTermLval lv)
 
@@ -2334,14 +2324,25 @@ struct
                else
                  false (* pure logic variable, at least as long as
                           model variables are not supported. *)
-             | Some v -> not v.vformal || m.accept_formal
+             | Some v ->
+               (not v.vformal || m.accept_formal) &&
+               (not (Cil.isConstType v.vtype) || m.accept_const)
            end
          | TResult _ -> m.accept_models
          | _ -> true) &&
         (match snd (Logic_utils.remove_term_offset loff) with
          | TModel _ -> m.accept_models
+         | TField(f, _) -> not (Cil.isConstType f.ftype) || m.accept_const
          | _ -> true)
-      | TAddrOf lv -> is_fct_ptr lv && m.accept_func_ptr
+      | TAddrOf lv when is_fct_ptr lv -> m.accept_func_ptr
+      | TAddrOf lv | TStartOf lv ->
+        m.accept_addrs &&
+        (* note that we assume that 'lv' is adressable. *)
+        begin match lv with
+          | TVar { lv_origin = Some _ }, _ | TMem _, _ -> true
+          | TVar { lv_origin = None }, _ -> false
+          | _ -> false
+        end
       | Tif (_,t1,t2) -> aux t1 && aux t2
 
       | Tunion l | Tinter l -> List.for_all aux l
@@ -2351,7 +2352,7 @@ struct
 
       | Trange _ | TConst _ | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ | TAlignOf _
       | TAlignOfE _ | TUnOp (_,_) | TBinOp (_,_,_) | TCastE (_,_)
-      | TStartOf _ | Tlambda (_,_) | TDataCons (_,_) | Tbase_addr (_,_)
+      | Tlambda (_,_) | TDataCons (_,_) | Tbase_addr (_,_)
       | Toffset (_,_) | Tblock_length (_,_) | Tnull | Tapp _
       | TUpdate (_,_,_) | Ttypeof _ | Ttype _ ->
         false
@@ -2583,7 +2584,7 @@ struct
         with Not_found ->
         try
           let label = Lenv.string_of_current_label env in
-          let info = ctxt.find_var ?label ~var:x in
+          let info = ctxt.find_var ?label x in
           (match info.lv_origin with
            | Some lv ->
              check_current_label loc env;
@@ -2675,7 +2676,8 @@ struct
       TUnOp (BNot, t), logic_arithmetic_promotion t.term_type
     | PLunop (Uminus, t) ->
       let t = type_num_term ctxt env t in
-      TUnOp (Neg, t), logic_arithmetic_promotion t.term_type
+      let ty = logic_arithmetic_promotion t.term_type in
+      TUnOp (Neg, mk_cast t ty), ty
     | PLunop (Ustar, t) ->
       check_current_label loc env;
       (* memory access need a current label to have some semantics *)
@@ -2950,7 +2952,7 @@ struct
       if is_set_type t.term_type then begin
         ctxt.error loc "sets of sets are not supported yet"
       end else begin
-        let pred = Extlib.opt_map (predicate env) pred in
+        let pred = Option.map (predicate env) pred in
         Tcomprehension(t,quants,pred), (make_set_type t.term_type)
       end
     | PLempty
@@ -3109,6 +3111,27 @@ struct
     in
     lift_set check_lval t
 
+  and term_from f t =
+    let check_from t =
+      match t.term_node with
+      | TAddrOf lv when is_fun_ptr t.term_type ->
+        f lv
+          { t with
+            term_type = type_of_pointed t.term_type;
+            term_node = TLval lv }
+      | TLval lv
+      | TLogic_coerce(_,{term_node = TLval lv })
+      | Tat({term_node = TLval lv},_) -> f lv t
+      | TStartOf lv
+      | Tat ({term_node = TStartOf lv}, _)
+      | TAddrOf lv
+      | Tat ({term_node = TAddrOf lv}, _) ->
+        f lv t
+      | _ -> C.error t.term_loc "not a dependency value: %a"
+               Cil_printer.pp_term t
+    in
+    lift_set check_from t
+
   and type_logic_app env loc f labels ttl =
     (* support for overloading *)
     let infos =
@@ -3116,7 +3139,7 @@ struct
       with Not_found ->
         C.find_all_logic_functions f in
     match infos with
-    | [] -> C.error loc "unbound function %s" f
+    | [] -> C.error loc "unbound logic function %s" f
     | [info] ->
       begin
         let labels = List.map (find_logic_label loc env) labels in
@@ -3249,10 +3272,11 @@ struct
       (other_prms @ prms), p
     | _ -> [], ctxt.type_predicate ctxt env p0
 
-  let term_lval_assignable ctxt ~accept_formal env t =
+  let term_lval_assignable ctxt ~accept_formal ~accept_const env t =
     let module [@warning "-60"] C = struct end in
     let t = ctxt.type_term ctxt env t in
-    if not (check_lval_kind { lval_assignable_mode with accept_formal } t) then
+    let mode = { lval_assignable_mode with accept_formal ; accept_const } in
+    if not (check_lval_kind mode t) then
       ctxt.error t.term_loc "not an assignable left value: %a"
         Cil_printer.pp_term t;
     lift_set (term_lval (fun _ t -> t)) t
@@ -3448,18 +3472,26 @@ struct
     | PLcomprehension _ | PLset _ | PLunion _ | PLinter _ | PLempty ->
       ctxt.error loc "expecting a predicate and not tsets"
 
+  let term_as_dependency ctxt env t =
+    let module [@warning "-60"] C = struct end in
+    let t = ctxt.type_term ctxt env t in
+    if not (check_lval_kind lval_assigns_dependency_mode t) then
+      ctxt.error t.term_loc "not a valid dependency: %a"
+        Cil_printer.pp_term t ;
+    lift_set (term_from (fun _ t -> t)) t
+
   let type_from ctxt ~accept_formal env (l,d) =
     let module [@warning "-60"] C = struct end in
     (* Yannick: [assigns *\at(\result,Post)] should be allowed *)
     let tl =
-      term_lval_assignable ctxt ~accept_formal env l
+      term_lval_assignable ctxt ~accept_formal ~accept_const:false env l
     in
     let tl = Logic_const.new_identified_term tl in
     match d with
       FromAny -> (tl,Cil_types.FromAny)
     | From f ->
       let tf =
-        List.map (term_lval_assignable ctxt ~accept_formal:true env) f
+        List.map (term_as_dependency ctxt env) f
       in
       let tf =
         List.map
@@ -3509,13 +3541,17 @@ struct
 
   let type_variant env = function
     | (t, None) -> (type_int_term (base_ctxt env) env t, None)
-    | (t, r) -> (term env t, r)
+    | (t, Some r) ->
+      let loc = t.lexpr_loc in
+      let t = term env t in
+      let li, _, _, _ = type_logic_app env loc r [] [t; t] in
+      (t, Some li)
 
   let id_predicate env pred = Logic_const.new_predicate (predicate env pred)
 
   let id_predicate_top env pred =
-    let { tp_only_check = only_check; tp_statement = pred } = pred in
-    Logic_const.new_predicate ~only_check (predicate env pred)
+    let { tp_kind = kind; tp_statement = pred } = pred in
+    Logic_const.new_predicate ~kind (predicate env pred)
 
   let id_term_ptr env t =
     let loc = t.lexpr_loc in
@@ -3548,18 +3584,6 @@ struct
     | Widen_hints l ->
       let accept t = accept_int t || accept_var t in
       Cil_types.Widen_hints (List.map (term_accept accept) l)
-
-  let type_annot loc ti =
-    let env = append_here_label (append_init_label (Lenv.empty())) in
-    let this_type = plain_logic_type loc env ti.this_type in
-    let v = Cil_const.make_logic_var_formal ti.this_name this_type in
-    let env = Lenv.add_var ti.this_name v env in
-    let body = predicate env ti.inv in
-    let infos = Cil_const.make_logic_info ti.inv_name in
-    infos.l_profile <- [v];
-    infos.l_labels <- [Logic_const.here_label];
-    infos.l_body <- LBpred body;
-    add_logic_function loc infos; infos
 
   let model_annot loc ti =
     let env = Lenv.empty() in
@@ -3710,9 +3734,9 @@ struct
             loc "%s clause isn't allowed into statement contract" clause;
         x
     in
-    let v = Extlib.opt_map (type_variant env)
+    let v = Option.map (type_variant env)
         (none_for_stmt_contract "decreases" s.spec_variant) in
-    let t = Extlib.opt_map (id_predicate env)
+    let t = Option.map (id_predicate env)
         (none_for_stmt_contract "terminates" s.spec_terminates) in
     let my_names = check_unique_behavior_names loc [] b in
     let bnames = old_behaviors @ my_names in
@@ -3781,10 +3805,10 @@ struct
   let code_annot loc current_behaviors current_return_type ca =
     let source = fst loc in
     let annot = match ca with
-      | AAssert (behav,{tp_only_check=only_check; tp_statement = p}) ->
+      | AAssert (behav,{tp_kind = kind; tp_statement = p}) ->
         check_behavior_names loc current_behaviors behav;
         let p = predicate (code_annot_env()) p in
-        let p = Logic_const.toplevel_predicate ~only_check p in
+        let p = Logic_const.toplevel_predicate ~kind p in
         Cil_types.AAssert(behav,p)
       | APragma (Impact_pragma sp) ->
         Cil_types.APragma
@@ -3811,10 +3835,10 @@ struct
         Cil_types.AStmtSpec (behav,my_spec)
       | AVariant v ->
         Cil_types.AVariant (type_variant (loop_annot_env ()) v)
-      | AInvariant (behav,f,{ tp_only_check = only_check; tp_statement = i}) ->
+      | AInvariant (behav,f,{ tp_kind = kind; tp_statement = i}) ->
         let env = if f then loop_annot_env () else code_annot_env () in
         check_behavior_names loc current_behaviors behav;
-        let p = Logic_const.toplevel_predicate ~only_check (predicate env i) in
+        let p = Logic_const.toplevel_predicate ~kind (predicate env i) in
         Cil_types.AInvariant (behav,f,p)
       | AAllocation (behav,fa) ->
         check_behavior_names loc current_behaviors behav;
@@ -3923,7 +3947,7 @@ struct
     in let rt_vars = ref Datatype.String.Set.empty
     in let prm_vars = ref Datatype.String.Set.empty
     in
-    ignore(Extlib.opt_map (Cil.visitCilLogicType (obj rt_vars)) return_type);
+    ignore(Option.map (Cil.visitCilLogicType (obj rt_vars)) return_type);
     List.iter
       (fun v -> ignore (Cil.visitCilLogicType (obj prm_vars) v.lv_type)) p;
     if not (Datatype.String.Set.subset !rt_vars !prm_vars) then
@@ -3984,6 +4008,15 @@ struct
     info.l_labels <- labels;
     add_logic_function loc info;
     env,info
+
+  let type_annot loc ti =
+    let p = ti.this_type, ti.this_name in
+    (* Note: Logic_decl registers the logic function *)
+    let env, info = logic_decl loc ti.inv_name [] [] [p] in
+    let body = predicate env ti.inv in
+    info.l_body <- LBpred body;
+    update_info_wrt_default_label info;
+    info
 
   let type_datacons loc env type_info (name,params) =
     (try
@@ -4103,9 +4136,16 @@ struct
       if in_axiomatic then
         (* Not supported yet. See issue 43 on ACSL's github repository. *)
         C.error loc "Nested axiomatic. Ignoring body of %s" id
-      else
+      else begin
+        let change oldloc =
+          C.error loc
+            "Duplicated axiomatics %s (first occurrence at %a)"
+            id Cil_printer.pp_location oldloc
+        in
         let l = List.map (annot true) decls in
+        ignore (Logic_env.Axiomatics.memo ~change (fun _ -> loc) id);
         Daxiomatic(id,l,[],loc)
+      end
     | LDtype(s,l,def) ->
       let env = init_type_variables loc l in
       let my_info =
@@ -4116,43 +4156,44 @@ struct
         }
       in
       add_logic_type loc my_info;
-      let tdef = Extlib.opt_map (typedef loc env my_info) def in
+      let tdef = Option.map (typedef loc env my_info) def in
       if is_cyclic_typedef s tdef then
         C.error loc "Definition of %s is cyclic" s;
       my_info.lt_def <- tdef;
       Dtype (my_info,loc)
-    | LDlemma (x,is_axiom, labels, poly,
-               { tp_only_check = only_check; tp_statement = e}) ->
+    | LDlemma (x,labels, poly, {tp_kind = kind; tp_statement = e}) ->
       if Logic_env.Lemmas.mem x then begin
         let old_def = Logic_env.Lemmas.find x in
+        let old_kind = match old_def with
+          | Dlemma(_,_,_,{tp_kind },_,_) -> tp_kind
+          | _ -> Assert in
         let old_loc = Cil_datatype.Global_annotation.loc old_def in
-        let is_axiom =
-          match old_def with
-          | Dlemma(_, is_axiom, _, _, _, _, _) -> is_axiom
-          | _ ->
-            Kernel.fatal ~current:true
-              "Logic_env.get_lemma must return Dlemma"
-        in
-        C.error loc "%s is already registered as %s (%a)"
-          x (if is_axiom then "axiom" else "lemma")
+        C.error loc "%a %s is already registered as %a (%a)"
+          Cil_printer.pp_lemma_kind kind x
+          Cil_printer.pp_lemma_kind old_kind
           Cil_datatype.Location.pretty old_loc
       end;
       let labels,env = annot_env loc labels poly in
-      let p = Logic_const.toplevel_predicate ~only_check (predicate env e) in
+      let p = Logic_const.toplevel_predicate ~kind (predicate env e) in
       let labels = match !Lenv.default_label with
         | None -> labels
         | Some lab -> [lab]
       in
-      let def = Dlemma (x,is_axiom, labels, poly,  p, [], loc) in
+      let def = Dlemma (x,labels, poly,  p, [], loc) in
       Logic_env.Lemmas.add x def;
       def
     | LDinvariant (s, e) ->
-      let env = append_here_label (append_init_label (Lenv.empty())) in
-      let p = predicate env e in
+      let labels,env = annot_env loc [] [] in
       let li = Cil_const.make_logic_info s in
-      li.l_labels <- [Logic_const.here_label];
+      let p = predicate env e in
+      let labels = match !Lenv.default_label with
+        | None -> labels
+        | Some lab -> [lab]
+      in
+      li.l_labels <- labels;
       li.l_body <- LBpred p;
       add_logic_function loc li;
+      update_info_wrt_default_label li;
       Dinvariant (li,loc)
     | LDtype_annot l ->
       Dtype_annot (type_annot loc l,loc)
@@ -4162,8 +4203,10 @@ struct
       let env = Lenv.empty () in
       let ctxt = base_ctxt env in
       let tsets =
+        let accept_formal = false in
+        let accept_const  = true in
         List.map
-          (term_lval_assignable ctxt ~accept_formal:false env) tsets
+          (term_lval_assignable ctxt ~accept_formal ~accept_const env) tsets
       in
       let checks_tsets_type fct ctyp =
         List.iter
@@ -4240,9 +4283,16 @@ struct
       let rvi_opt = get_volatile_fct checks_reads_fct rd_opt in
       let wvi_opt = get_volatile_fct checks_writes_fct wr_opt in
       Dvolatile (tsets, rvi_opt, wvi_opt, [], loc)
-    | LDextended (kind, content) ->
+    | LDextended (Ext_lexpr(kind, content)) ->
       let typing_context = base_ctxt (Lenv.empty ()) in
       let status,tcontent = Extensions.typer kind ~typing_context ~loc content in
+      let textended = Logic_const.new_acsl_extension kind loc status tcontent in
+      Dextended (textended, [], loc)
+    | LDextended (Ext_extension (kind, name, content)) ->
+      let typing_context = base_ctxt (Lenv.empty ()) in
+      let status,tcontent =
+        Extensions.typer_block kind ~typing_context ~loc (name,content)
+      in
       let textended = Logic_const.new_acsl_extension kind loc status tcontent in
       Dextended (textended, [], loc)
 

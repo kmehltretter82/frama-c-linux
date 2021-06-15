@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -34,7 +34,7 @@ module Simple : Simpler_domains.Simple_Cvalue = struct
   (* In this domain, the states contain nothing. We use [unit] as type formal
      the state and we reuse [Datatype.Unit] as a base for our domain. *)
   include Datatype.Unit
-  let name = "Printer domain"
+  let name = "printer"
 
   (* --- Lattice operators --- *)
 

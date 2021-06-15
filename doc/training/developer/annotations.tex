@@ -95,8 +95,8 @@ let _ = object
   method vcode_annot =
     let ppts = 
       Property.ip_of_code_annot 
-        (Extlib.the self#current_kf)
-        (Extlib.the self#current_stmt)
+        (Option.get self#current_kf)
+        (Option.get self#current_stmt)
     in
     Pretty_utils.pp_list "%a" 
       Property.pretty ppts;    

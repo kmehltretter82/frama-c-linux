@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -49,3 +49,5 @@ val locate : select:term -> inside:term -> occurrence
 
 (** Retrieve back the [k]-th occurrence of a footprint inside a term. *)
 val lookup : occur:occurrence -> inside:term -> term
+
+(* -------------------------------------------------------------------------- *)

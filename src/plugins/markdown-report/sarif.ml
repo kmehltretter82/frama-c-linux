@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -98,10 +98,8 @@ module ArtifactLocation = struct
   let default = create ~uri:"" ()
 
   let of_loc loc =
-    let open Filepath in
-    (* by construction, we have an absolute path here, no need for uriBase *)
-    let uri = ((fst loc).pos_path :> string) in
-    create ~uri ()
+    let uriBaseId, uri = Filepath.(Normalized.to_base_uri (fst loc).pos_path) in
+    create ~uri ?uriBaseId ()
 end
 
 module ArtifactLocationDictionary = Json_dictionary(ArtifactLocation)
@@ -462,6 +460,7 @@ module Driver = struct
     semanticVersion: (string [@default ""]);
     fileVersion: (string [@default ""]);
     downloadUri: (string [@default ""]);
+    informationUri: (string [@default ""]);
     sarifLoggerVersion: (string [@default ""]);
     language: (string [@default "en-US"]);
     properties: (Properties.t [@default Properties.default]);
@@ -474,13 +473,14 @@ module Driver = struct
       ?(semanticVersion="")
       ?(fileVersion="")
       ?(downloadUri="")
+      ?(informationUri="")
       ?(sarifLoggerVersion="")
       ?(language="en-US")
       ?(properties=Properties.default)
       ()
     =
     { name; fullName; version; semanticVersion; fileVersion;
-      downloadUri; sarifLoggerVersion; language; properties }
+      downloadUri; informationUri; sarifLoggerVersion; language; properties }
 
   let default = create ~name:"" ()
 end

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -54,10 +54,10 @@ sig
   val trivial : t
   val is_trivial : t -> bool
   val make : Conditions.sequent -> t
-  val compute_proof : t -> F.pred
-  val compute_descr : t -> Conditions.sequent
+  val compute : pid:WpPropId.prop_id -> t -> unit
+  val compute_proof : pid:WpPropId.prop_id -> t -> F.pred
+  val compute_descr : pid:WpPropId.prop_id -> t -> Conditions.sequent
   val get_descr : t -> Conditions.sequent
-  val compute : t -> unit
   val qed_time : t -> float
 end
 
@@ -88,8 +88,8 @@ sig
     effect : (stmt * effect_source) option ;
   }
 
-  val resolve : t -> bool
   val is_trivial : t -> bool
+  val resolve : pid:prop_id -> t -> bool
   val cache_descr : pid:prop_id -> t -> (prover * result) list -> string
 
 end
@@ -210,3 +210,29 @@ val pp_goal_flow : Format.formatter -> t -> unit
 
 (** Dynamically exported. *)
 val prover_of_name : string -> prover option
+
+(* -------------------------------------------------------------------------- *)
+(* --- Generators                                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+(** VC Generator interface. *)
+
+class type generator =
+  object
+    method model : WpContext.model
+    (** Generate VCs for the given Property. *)
+    method compute_ip : Property.t -> t Bag.t
+    (** Generate VCs for call preconditions at the given statement. *)
+    method compute_call : stmt -> t Bag.t
+    (** Generate VCs for all functions
+        matching provided behaviors and property names.
+        For `~bhv` and `~prop` optional arguments,
+        default and empty list means {i all} properties. *)
+    method compute_main :
+      ?fct:Wp_parameters.functions ->
+      ?bhv:string list ->
+      ?prop:string list ->
+      unit -> t Bag.t
+  end
+
+(* -------------------------------------------------------------------------- *)

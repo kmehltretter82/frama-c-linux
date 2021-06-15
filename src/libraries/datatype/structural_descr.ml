@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -48,7 +48,7 @@ module Recursive = struct
         type t = recursive
         let equal = (==)
         let hash = Hashtbl.hash
-       end)
+      end)
 
   let positions = Tbl.create 7
   let arrays = Tbl.create 7
@@ -144,18 +144,10 @@ let poly f = function
   | Structure _ | T_pack _ as a ->
     try from_unmarshal (f (to_unmarshal a)) with Cannot_pack -> Unknown
 
-(* would be better to put it in Extlib, but no access to this library here *)
-let array_for_all f a =
-  try
-    Array.iter (fun x -> if not (f x) then raise Exit) a;
-    true
-  with Exit ->
-    false
+let is_abstract_array a =
+  Array.for_all (fun x -> x = Pack Unmarshal.Abstract) a
 
-let is_abstract_array a = 
-  array_for_all (fun x -> x = Pack Unmarshal.Abstract) a
-
-let poly_arr f a = 
+let poly_arr f a =
   if is_abstract_array a then Abstract
   else
     try
@@ -184,8 +176,8 @@ let poly2 f a b = match a, b with
 let t_map_unchanged_compares = poly2 Unmarshal.t_map_unchangedcompares
 let t_hashtbl_unchanged_hashs = poly2 (Unmarshal.t_hashtbl_unchangedhashs)
 
-let t_sum a = 
-  if array_for_all (is_abstract_array) a then Abstract 
+let t_sum a =
+  if Array.for_all (is_abstract_array) a then Abstract
   else Structure (Sum a)
 
 (* ********************************************************************** *)
@@ -202,7 +194,7 @@ module Unmarshal_tbl =
       type t = Unmarshal.t
       let equal = (==)
       let hash = Hashtbl.hash
-     end)
+    end)
 
 let unmarshal_visited = Unmarshal_tbl.create 7
 
@@ -213,7 +205,7 @@ module Tbl =
       type t = u
       let equal = (==)
       let hash = Hashtbl.hash
-     end)
+    end)
 
 let visited = Tbl.create 7
 
@@ -310,15 +302,15 @@ and  are_consistent_unmarshal d1 d2 = match d1, d2 with
        d2 == d2'
      with Not_found ->
        (* Keep already visited terms in order to prevent looping when visiting
-	  recursive terms. However, remove them from the table after visiting in
-	  order to not pollute it when visiting cousins: fixed bts #1277.
-	  Would be better to use a persistent table instead of a mutable one,
-	  but not possible to provide a (terminating) comparison. *)
+          recursive terms. However, remove them from the table after visiting in
+          order to not pollute it when visiting cousins: fixed bts #1277.
+          Would be better to use a persistent table instead of a mutable one,
+          but not possible to provide a (terminating) comparison. *)
        Unmarshal_tbl.add unmarshal_consistent_visited d1 d2;
        let b = are_consistent_unmarshal_structures s1 s2 in
        Unmarshal_tbl.remove unmarshal_consistent_visited d1;
        b)
-  | Unmarshal.Abstract, Unmarshal.Structure _ -> 
+  | Unmarshal.Abstract, Unmarshal.Structure _ ->
     true (* we provide a more precise version: accept it *)
   | _, _ ->
     false
@@ -355,14 +347,14 @@ and are_consistent_aux d1 d2 = match d1, d2 with
        Tbl.add consistent_visited d1 d2;
        are_consistent_structures s1 s2)
   | d, T_pack s | T_pack s, d -> are_consistent_unmarshal (to_unmarshal d) s
-  | Abstract, Structure _ -> 
+  | Abstract, Structure _ ->
     true  (* we provide a more precise version: accept it *)
   | Structure _, Abstract -> false
   | _, _ -> false
 
 let are_consistent d1 d2 =
   assert (Unmarshal_tbl.length unmarshal_consistent_visited = 0
-         && Tbl.length consistent_visited = 0);
+          && Tbl.length consistent_visited = 0);
   let b = are_consistent_aux d1 d2 in
   Unmarshal_tbl.clear unmarshal_consistent_visited;
   Tbl.clear consistent_visited;

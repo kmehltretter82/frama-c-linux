@@ -1,0 +1,7 @@
+36,37d35
+< [eva:alarm] tests/builtins/alloc_weak.c:30: Warning: 
+<   accessing uninitialized left-value. assert \initialized(p);
+912c910
+<   r ∈ [--..--]
+---
+>   r ∈ {42}

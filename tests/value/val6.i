@@ -1,5 +1,5 @@
 /* run.config*
-   GCC:
+   
    STDOPT: #"-main f -absolute-valid-range 0x1-0xFFFFF"
    STDOPT: #"-main f1 -absolute-valid-range 0x1-0xFFFFF"
 */

@@ -187,20 +187,24 @@ let mk_init_function () =
   vi, fundec
 
 let mk_clean_function () =
-  (* Create and register [__e_acsl_globals_clean] function with definition
-     for de-allocation of global variables *)
-  let vi, fundec, _kf = mk_function function_clean_name in
-  (* Generate delete statements and add them to the function body *)
-  let stmts =
-    Varinfo.Hashtbl.fold_sorted
-      (fun vi _l acc ->
-         if Misc.is_fc_or_compiler_builtin vi then acc
-         else Smart_stmt.delete_stmt vi :: acc)
-      tbl
-      []
-  in
-  fundec.sbody.bstmts <- stmts;
-  vi, fundec
+  if Varinfo.Hashtbl.length tbl = 0 then
+    None
+  else
+    (* Create and register [__e_acsl_globals_clean] function with definition
+       for de-allocation of global variables *)
+    let vi, fundec, _kf = mk_function function_clean_name in
+    (* Generate delete statements and add them to the function body *)
+    let return = Cil.mkStmt ~valid_sid:true (Return (None, Location.unknown)) in
+    let stmts =
+      Varinfo.Hashtbl.fold_sorted
+        (fun vi _l acc ->
+           if Misc.is_fc_or_compiler_builtin vi then acc
+           else Smart_stmt.delete_stmt vi :: acc)
+        tbl
+        [return]
+    in
+    fundec.sbody.bstmts <- stmts;
+    Some (vi, fundec)
 
 (*
 Local Variables:

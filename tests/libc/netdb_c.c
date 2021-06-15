@@ -12,14 +12,6 @@
 
 #define BUF_SIZE 500
 
-// Non-POSIX
-#ifndef NI_MAXHOST
-# define NI_MAXHOST 1025
-#endif
-#ifndef NI_MAXSERV
-# define NI_MAXSERV 32
-#endif
-
 int main() {
   struct addrinfo hints;
   struct addrinfo *result, *rp;

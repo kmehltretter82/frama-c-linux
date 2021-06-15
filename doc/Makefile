@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2020                                               #
+#  Copyright (C) 2007-2021                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -38,6 +38,7 @@ FRAMAC_DOCDIR ?= $(DOCDIR)/frama-c
 ###################
 
 VERSION=$(shell $(SED) -e 's/\\(.*\\)/\\1/' $(FRAMAC_SRC)/VERSION)
+VERSION_SAFE=$(subst ~,-,$(VERSION))
 
 ifeq ($(findstring +dev,$(VERSION)),+dev)
 DEVELOPMENT=yes

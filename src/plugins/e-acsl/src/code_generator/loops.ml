@@ -28,7 +28,7 @@ open Cil_types
 (**************************************************************************)
 
 let translate_predicate_ref
-  : (kernel_function -> Env.t -> predicate -> Env.t) ref
+  : (kernel_function -> Env.t -> toplevel_predicate -> Env.t) ref
   = Extlib.mk_fun "translate_predicate_ref"
 
 let predicate_to_exp_ref
@@ -40,17 +40,129 @@ let term_to_exp_ref
   = Extlib.mk_fun "term_to_exp_ref"
 
 (**************************************************************************)
-(************************* Loop invariants ********************************)
+(************************* Loop annotations *******************************)
 (**************************************************************************)
 
-let preserve_invariant env kf stmt = match stmt.skind with
+let handle_annotations env kf stmt =
+  match stmt.skind with
   | Loop(_, ({ bstmts = stmts } as blk), loc, cont, break) ->
-    let rec handle_invariants (stmts, env as acc) = function
-      | [] ->
-        (* empty loop body: no need to verify the invariant twice *)
-        acc
+    (* Loop variant, save the current value of the variant *)
+    let stmts, env, variant =
+      match Env.top_loop_variant env with
+      | Some (t, measure_opt) ->
+        let env = Env.set_annotation_kind env Smart_stmt.Variant in
+        let env = Env.push env in
+        Typing.type_term ~use_gmp_opt:true t;
+        let ty = Typing.get_typ t in
+        let e, env = !term_to_exp_ref kf env t in
+        let vi_old, e_old, env =
+          Env.new_var
+            ~loc
+            ~scope:Varname.Function
+            ~name:"old_variant"
+            env
+            kf
+            (Some t)
+            ty
+            (fun _ _ -> [])
+        in
+        let stmt =
+          Smart_stmt.assigns ~loc ~result:(Cil.var vi_old) e
+        in
+        let blk, env =
+          Env.pop_and_get env stmt ~global_clear:false Env.Middle
+        in
+        Smart_stmt.block_stmt blk :: stmts, env, Some (t, e_old, measure_opt)
+      | None -> stmts, env, None
+    in
+    (* Auxiliary function to generate variant and invariant checks *)
+    let rec aux (stmts, env) = function
+      | [] -> begin
+          (* No statements remaining in the loop: variant check *)
+          let env = Env.set_annotation_kind env Smart_stmt.Variant in
+          match variant with
+          | Some (t, e_old, Some measure) ->
+            let env = Env.push env in
+            let t_old = { t with term_node = t.term_node } in
+            let tapp =
+              { term_node = Tapp(measure, [], [t_old; t]);
+                term_loc = loc;
+                term_name = [];
+                term_type = Linteger;}
+            in
+            Typing.type_term ~use_gmp_opt:true tapp;
+            let e, env = !term_to_exp_ref kf env t in
+            let e_tapp, env =
+              Logic_functions.tapp_to_exp kf env ~eargs:[e_old; e] tapp
+            in
+            let msg =
+              Format.asprintf
+                "%s(old %a, %a)"
+                measure.l_var_info.lv_name
+                Printer.pp_term t_old
+                Printer.pp_term t
+            in
+            let stmt =
+              Smart_stmt.runtime_check_with_msg
+                ~loc
+                msg
+                ~pred_kind:Assert
+                Smart_stmt.Variant
+                kf
+                e_tapp
+            in
+            let blk, env =
+              Env.pop_and_get env stmt ~global_clear:false Env.Middle
+            in
+            let stmts = Smart_stmt.block_stmt blk :: stmts in
+            stmts, env
+          | Some (t, e_old, None) ->
+            let env = Env.push env in
+            Typing.type_term ~use_gmp_opt:true t;
+            let e, env = !term_to_exp_ref kf env t in
+            let msg1 =
+              Format.asprintf
+                "(old %a) %a 0"
+                Printer.pp_term t
+                Printer.pp_relation Rge
+            in
+            let msg2 =
+              Format.asprintf
+                "(old %a) > %a"
+                Printer.pp_term t
+                Printer.pp_term t
+            in
+            let stmt =
+              Smart_stmt.block_from_stmts [
+                Smart_stmt.runtime_check_with_msg
+                  ~loc
+                  msg1
+                  ~pred_kind:Assert
+                  Smart_stmt.Variant
+                  kf
+                  (Cil.mkBinOp ~loc Ge e_old (Cil.zero ~loc));
+                Smart_stmt.runtime_check_with_msg
+                  ~loc
+                  msg2
+                  ~pred_kind:Assert
+                  Smart_stmt.Variant
+                  kf
+                  (Cil.mkBinOp ~loc Gt e_old e)
+              ]
+            in
+            let blk, env =
+              Env.pop_and_get env stmt ~global_clear:false Env.Middle
+            in
+            let stmts = Smart_stmt.block_stmt blk :: stmts in
+            stmts, env
+          | None ->
+            stmts, env
+        end
       | [ last ] ->
-        let invariants, env = Env.pop_loop env in
+        (* Last statement of the loop: invariant check *)
+        (* Optimisation to only verify invariant on a non-empty body loop. *)
+        let invariants = Env.top_loop_invariants env in
+        let env = Env.set_annotation_kind env Smart_stmt.Invariant in
         let env = Env.push env in
         let env =
           let translate_named_predicate = !translate_predicate_ref in
@@ -59,15 +171,15 @@ let preserve_invariant env kf stmt = match stmt.skind with
         let blk, env =
           Env.pop_and_get env last ~global_clear:false Env.Before
         in
-        Smart_stmt.block last blk :: stmts, env
-      | s :: tl ->
-        handle_invariants (s :: stmts, env) tl
+        aux (Smart_stmt.block last blk :: stmts, env) []
+      | hd :: tl -> aux (hd :: stmts, env) tl
     in
-    let env = Env.set_annotation_kind env Smart_stmt.Invariant in
-    let stmts, env = handle_invariants ([], env) stmts in
+    let stmts, env = aux ([], env) stmts in
+    (* The loop annotations have been handled, the loop environment can be
+       popped *)
+    let env = Env.pop_loop env in
     let new_blk = { blk with bstmts = List.rev stmts } in
-    { stmt with skind = Loop([], new_blk, loc, cont, break) },
-    env
+    { stmt with skind = Loop([], new_blk, loc, cont, break) }, env
   | _ ->
     stmt, env
 
@@ -152,7 +264,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       (* whenever provided, [ty] is known to be the type of the result *)
       let tone = Cil.lone ~loc () in
       let res = Logic_const.term ~loc (TBinOp(PlusA, t, tone)) Linteger in
-      Extlib.may
+      Option.iter
         (fun ty ->
            Typing.unsafe_set tone ~ctx:ty ctx;
            Typing.unsafe_set t ~ctx:ty ctx;
@@ -251,7 +363,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       | Some p ->
         let e, env = !predicate_to_exp_ref kf (Env.push env) p in
         let stmt, env =
-          Smart_stmt.runtime_check Smart_stmt.RTE kf e p, env
+          Smart_stmt.runtime_check ~pred_kind:Assert Smart_stmt.RTE kf e p, env
         in
         let b, env = Env.pop_and_get env stmt ~global_clear:false Env.After in
         let guard_for_small_type = Smart_stmt.block_stmt b in

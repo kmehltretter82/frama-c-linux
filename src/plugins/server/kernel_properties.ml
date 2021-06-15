@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -66,6 +66,7 @@ struct
 
   let t_assert = t_kind "assert" "Assertion"
   let t_check = t_kind "check" "Check"
+  let t_admit = t_kind "admit" "Hypothesis"
   let t_loop_invariant = t_loop "invariant"
   let t_loop_assigns = t_loop "assigns"
   let t_loop_variant = t_loop "variant"
@@ -81,6 +82,7 @@ struct
   let t_axiomatic = t_kind "axiomatic" "Axiomatic definitions"
   let t_axiom = t_kind "axiom" "Logical axiom"
   let t_lemma = t_kind "lemma" "Logical lemma"
+  let t_check_lemma = t_kind "check_lemma" "Logical check lemma"
 
   let p_ext = Enum.prefix kinds ~name:"ext" ~var:"<clause>"
       ~descr:(Md.plain "ACSL extension `<clause>`")
@@ -107,15 +109,17 @@ struct
       end
     | IPExtended { ie_ext={ ext_name } } -> Enum.instance p_ext ext_name
     | IPAxiomatic _ -> t_axiomatic
-    | IPAxiom _ -> t_axiom
-    | IPLemma _ -> t_lemma
+    | IPLemma { il_pred = { tp_kind = Admit } } -> t_axiom
+    | IPLemma { il_pred = { tp_kind = Assert } } -> t_lemma
+    | IPLemma { il_pred = { tp_kind = Check } } -> t_check_lemma
     | IPBehavior _ -> t_behavior
     | IPComplete _ -> t_complete
     | IPDisjoint _ -> t_disjoint
     | IPCodeAnnot { ica_ca={ annot_content } } ->
       begin match annot_content with
-        | AAssert (_, {tp_only_check = false}) -> t_assert
-        | AAssert (_, {tp_only_check = true }) -> t_check
+        | AAssert (_, {tp_kind = Assert}) -> t_assert
+        | AAssert (_, {tp_kind = Check }) -> t_check
+        | AAssert (_, {tp_kind = Admit }) -> t_admit
         | AStmtSpec _ -> t_code_contract
         | AInvariant(_,false,_) -> t_code_invariant
         | AInvariant(_,true,_) -> t_loop_invariant
@@ -163,7 +167,7 @@ struct
 
   let t_status value name ?label descr =
     Enum.tag ~name
-      ?label:(Extlib.opt_map Md.plain label)
+      ?label:(Option.map Md.plain label)
       ~descr:(Md.plain descr) ~value status
 
   open Property_status.Feedback
@@ -281,7 +285,7 @@ let () = States.column model ~name:"status"
     ~data:(module PropStatus)
     ~get:(Property_status.Feedback.get)
 
-let () = States.column model ~name:"function"
+let () = States.column model ~name:"fct"
     ~descr:(Md.plain "Function")
     ~data:(module Joption(Kf)) ~get:Property.get_kf
 
@@ -297,24 +301,24 @@ let () = States.column model ~name:"source"
 let () = States.column model ~name:"alarm"
     ~descr:(Md.plain "Alarm name (if the property is an alarm)")
     ~data:(module Joption(Jstring))
-    ~get:(fun ip -> Extlib.opt_map Alarms.get_short_name (find_alarm ip))
+    ~get:(fun ip -> Option.map Alarms.get_short_name (find_alarm ip))
 
 let () = States.column model ~name:"alarm_descr"
     ~descr:(Md.plain "Alarm description (if the property is an alarm)")
     ~data:(module Joption(Jstring))
-    ~get:(fun ip -> Extlib.opt_map Alarms.get_description (find_alarm ip))
+    ~get:(fun ip -> Option.map Alarms.get_description (find_alarm ip))
 
 let () = States.column model ~name:"predicate"
     ~descr:(Md.plain "Predicate")
     ~data:(module Joption(Jstring))
-    ~get:(fun ip -> Extlib.opt_map snd (Description.property_kind_and_node ip))
+    ~get:(fun ip -> Option.map snd (Description.property_kind_and_node ip))
 
 let is_relevant ip =
   match Property.get_kf ip with
   | None -> true
   | Some kf ->
     not (Ast_info.is_frama_c_builtin (Kernel_function.get_name kf)
-         || Cil.is_unused_builtin (Kernel_function.get_vi kf))
+         || Cil_builtins.is_unused_builtin (Kernel_function.get_vi kf))
 
 let iter f = Property_status.iter (fun ip -> if is_relevant ip then f ip)
 let add_update_hook f =
@@ -330,6 +334,7 @@ let array =
     ~name:"status"
     ~descr:(Md.plain "Status of Registered Properties")
     ~key:(fun ip -> Kernel_ast.Marker.create (PIP ip))
+    ~keyType:Kernel_ast.Marker.jproperty
     ~iter
     ~add_update_hook
     ~add_remove_hook

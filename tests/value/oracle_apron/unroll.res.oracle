@@ -1,0 +1,7 @@
+13,14d12
+< [eva:alarm] tests/value/unroll.i:34: Warning: 
+<   signed overflow. assert -2147483648 ≤ j - 1;
+26c24
+<   j ∈ [-2147483648..-123]
+---
+>   j ∈ {-238}

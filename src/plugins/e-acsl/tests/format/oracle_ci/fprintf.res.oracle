@@ -14,7 +14,7 @@
 [e-acsl] Warning: annotating undefined function `fork':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-[e-acsl] FRAMAC_SHARE/libc/unistd.h:854: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/unistd.h:857: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/sys/wait.h:79: Warning: 
@@ -41,9 +41,9 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] FRAMAC_SHARE/libc/unistd.h:857: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/unistd.h:857: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/unistd.h:860: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/unistd.h:860: Warning: 
   function __gen_e_acsl_fork: postcondition 'result_ok_child_or_error' got status unknown.
 [kernel:annot:missing-spec] tests/format/fprintf.c:15: Warning: 
   Neither code nor specification for function __e_acsl_builtin_fprintf, generating default assigns from the prototype

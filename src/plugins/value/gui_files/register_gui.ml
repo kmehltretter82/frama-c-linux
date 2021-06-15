@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -231,7 +231,7 @@ let cleaned_outputs kf s =
     Callgraph.Uses.accept_base ~with_formals:true ~with_locals:true kf
   in
   let filter = Locations.Zone.filter_base accept in
-  Extlib.opt_map filter outs
+  Option.map filter outs
 
 let pretty_stmt_info (main_ui:main_ui) kf stmt =
   (* Is it an accessible statement ? *)

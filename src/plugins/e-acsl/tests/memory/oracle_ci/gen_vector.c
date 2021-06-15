@@ -41,7 +41,7 @@ int *new_inversed(int len, int *v)
       __gmpz_clear(__gen_e_acsl_block_length_2);
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,"Assertion","new_inversed",
+    __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","new_inversed",
                     "\\valid(v) && \\offset(v) + len * sizeof(int) <= \\block_length(v)",
                     "tests/memory/vector.c",11);
   }
@@ -75,9 +75,9 @@ int main(void)
   {
     int __gen_e_acsl_valid;
     __gen_e_acsl_valid = __e_acsl_valid((void *)(& v1[2]),sizeof(int),
-                                        (void *)(& v1[2]),(void *)0);
-    __e_acsl_assert(__gen_e_acsl_valid,"Assertion","main","\\valid(&v1[2])",
-                    "tests/memory/vector.c",21);
+                                        (void *)(v1),(void *)0);
+    __e_acsl_assert(__gen_e_acsl_valid,1,"Assertion","main",
+                    "\\valid(&v1[2])","tests/memory/vector.c",21);
   }
   /*@ assert \valid(&v1[2]); */ ;
   LAST = v1[2];
@@ -85,7 +85,7 @@ int main(void)
     int __gen_e_acsl_initialized;
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& v1[2]),
                                                     sizeof(int));
-    __e_acsl_assert(__gen_e_acsl_initialized,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_initialized,1,"Assertion","main",
                     "\\initialized(&v1[2])","tests/memory/vector.c",23);
   }
   /*@ assert \initialized(&v1[2]); */ ;
@@ -97,11 +97,11 @@ int main(void)
     int __gen_e_acsl_initialized_2;
     __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(v2 + 2),
                                                       sizeof(int));
-    __e_acsl_assert(__gen_e_acsl_initialized_2,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_initialized_2,1,"Assertion","main",
                     "\\initialized(v2 + 2)","tests/memory/vector.c",26);
   }
   /*@ assert \initialized(v2 + 2); */ ;
-  __e_acsl_assert(LAST == 1,"Assertion","main","LAST == 1",
+  __e_acsl_assert(LAST == 1,1,"Assertion","main","LAST == 1",
                   "tests/memory/vector.c",27);
   /*@ assert LAST ≡ 1; */ ;
   free((void *)v2);

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -48,7 +48,7 @@ type arrayflat = {
   arr_size     : int ; (** number of elements in the array *)
   arr_dim      : int ; (** number of dimensions in the array *)
   arr_cell     : typ ; (** type of elementary cells of the flatten array. Never an array. *)
-  arr_cell_nbr : int ; (** number of elementary cells in the flatten array *)
+  arr_cell_nbr : int64 ; (** number of elementary cells in the flatten array *)
 }
 
 type arrayinfo = {
@@ -131,7 +131,7 @@ val array_size : arrayinfo -> int option
 val array_dimensions : arrayinfo -> c_object * int option list
 (** Returns the list of dimensions the array consists of.
     None-dimension means undefined one. *)
-val dimension_of_object : c_object -> (int * int) option
+val dimension_of_object : c_object -> (int * int64) option
 (** Returns None for 1-dimension objects, and Some(d,N) for d-matrix with N cells *)
 
 val i_convert : c_int -> c_int -> c_int
@@ -142,6 +142,8 @@ val pp_int : Format.formatter -> c_int -> unit
 val pp_float : Format.formatter -> c_float -> unit
 val pp_object : Format.formatter -> c_object -> unit
 
+val i_name : c_int -> string
+val f_name : c_float -> string
 val basename : c_object -> string
 val compare : c_object -> c_object -> int
 val equal : c_object -> c_object -> bool

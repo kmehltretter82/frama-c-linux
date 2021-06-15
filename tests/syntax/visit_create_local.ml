@@ -4,7 +4,7 @@ open Cil
 class cF = object(self) inherit Visitor.frama_c_inplace
 
 method! vstmt s =
-let fd = (Extlib.the self#current_func) in
+let fd = (Option.get self#current_func) in
 match s.skind with
 | Instr (Set (lv,e,loc)) ->
     let vi = makeLocalVar fd "varbidon" (typeOf e) in

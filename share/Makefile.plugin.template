@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2020                                               #
+#  Copyright (C) 2007-2021                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -1014,6 +1014,7 @@ $(PLUGIN_DIR)/@PLUGIN_NAME@_DEP_REDO:
 $(PLUGIN_DIR)/@PLUGIN_NAME@_DEP:
 $(PLUGIN_DIR)/@PLUGIN_NAME@_CLEAN:
 $(PLUGIN_DIR)/@PLUGIN_NAME@_CLEAN_DOC:
+$(PLUGIN_DIR)/@PLUGIN_NAME@_DIST_CLEAN:
 endif
 
 # Reset each "local" plugin variable

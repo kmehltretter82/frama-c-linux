@@ -1,0 +1,3 @@
+29a30,31
+> [kernel] tests/value/imprecise_invalid_write.i:9: 
+>   imprecise size for variable main1 (Undefined sizeof on a function.)

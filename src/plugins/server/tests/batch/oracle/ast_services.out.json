@@ -3,8 +3,30 @@
     "id": "GET-1",
     "data": {
       "updated": [
-        { "key": "kf#24", "name": "g", "signature": "int g(int y);" },
-        { "key": "kf#20", "name": "f", "signature": "int f(int x);" }
+        {
+          "key": "kf#24",
+          "name": "g",
+          "signature": "int g(int y);",
+          "defined": true,
+          "sloc": {
+            "dir": "tests/batch",
+            "base": "ast_services.i",
+            "file": "tests/batch/ast_services.i",
+            "line": 8
+          }
+        },
+        {
+          "key": "kf#20",
+          "name": "f",
+          "signature": "int f(int x);",
+          "defined": true,
+          "sloc": {
+            "dir": "tests/batch",
+            "base": "ast_services.i",
+            "file": "tests/batch/ast_services.i",
+            "line": 7
+          }
+        }
       ],
       "removed": [],
       "reload": true,

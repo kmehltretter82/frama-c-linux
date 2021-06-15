@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,26 +20,26 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type ('a, 'b) gen_accessor = 
-    { get: unit -> 'a; 
-      set: 'a -> unit; 
-      add_set_hook: ('b -> 'b -> unit) -> unit;
-      add_update_hook: ('b -> 'b -> unit) -> unit }
+type ('a, 'b) gen_accessor =
+  { get: unit -> 'a;
+    set: 'a -> unit;
+    add_set_hook: ('b -> 'b -> unit) -> unit;
+    add_update_hook: ('b -> 'b -> unit) -> unit }
 
 type 'a accessor = ('a, 'a) gen_accessor
 
-type typed_accessor = 
+type typed_accessor =
   | Bool of bool accessor * string option (** the negative option, if any *)
   | Int of int accessor * (unit -> int * int) (** getting range *)
   | String of string accessor * (unit -> string list) (** possible values *)
 
-type parameter = 
-    { name: string; 
-      help: string; 
-      accessor: typed_accessor;
-      visible: bool;
-      reconfigurable: bool;
-      is_set: unit -> bool }
+type parameter =
+  { name: string;
+    help: string;
+    accessor: typed_accessor;
+    visible: bool;
+    reconfigurable: bool;
+    is_set: unit -> bool }
 
 include
   Datatype.Make_with_collections
@@ -48,16 +48,16 @@ include
       let name = "Parameter.t"
       let rehash = Datatype.identity
       let structural_descr = Structural_descr.t_unknown
-      let reprs = 
+      let reprs =
         [ { name = "bool_opt";
             help = "dummy bool option";
-            accessor = 
-            Bool 
-              ({ get = (fun () -> false); 
-                 set = (fun _ -> ()); 
-                 add_set_hook = (fun _ -> ());
-		 add_update_hook = (fun _ -> ()) },
-               None);
+            accessor =
+              Bool
+                ({ get = (fun () -> false);
+                   set = (fun _ -> ());
+                   add_set_hook = (fun _ -> ());
+                   add_update_hook = (fun _ -> ()) },
+                 None);
             visible = false ;
             reconfigurable = false ;
             is_set = fun () -> false }
@@ -68,13 +68,13 @@ include
       let copy x = x (* The representation of the parameter is immutable *)
       let pretty fmt x = Format.pp_print_string fmt x.name
       let internal_pretty_code = Datatype.undefined
-      let varname _ = assert false 
-          (* unused if internal_pretty_code undefined *)
+      let varname _ = assert false
+      (* unused if internal_pretty_code undefined *)
       let mem_project = Datatype.never_any_project
-     end)
+    end)
 
 let parameters = Datatype.String.Hashtbl.create 97
-  
+
 let create ~name ~help ~accessor ~visible ~reconfigurable ~is_set =
   let p = { name; help; accessor; visible; reconfigurable; is_set } in
   (* parameter name unicity already checks in [Plugin]. *)
@@ -90,7 +90,7 @@ let pretty_value fmt p = match p.accessor with
   | String(a, _) -> Format.fprintf fmt "%s" (a.get ())
 
 let get_value p = Format.asprintf "%a" pretty_value p
- 
+
 (*
 Local Variables:
 compile-command: "make -C ../../.."

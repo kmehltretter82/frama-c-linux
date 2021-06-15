@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -50,13 +50,13 @@ end
 (** Signature for a callgraph. Each edge is labeled by the callsite. Its source
     is the caller, while the destination is the callee. *)
 module type S = Graph with type G.V.t = Kernel_function.t
-                      and type G.E.label = Cil_types.stmt
+                       and type G.E.label = Cil_types.stmt
 
 (** Signature for a graph of services *)
 module type Services = sig
 
   include Graph with type G.V.t = Kernel_function.t Service_graph.vertex
-                and type G.E.label = Service_graph.edge
+                 and type G.E.label = Service_graph.edge
 
   val entry_point: unit -> G.V.t option
   val is_root: Kernel_function.t -> bool

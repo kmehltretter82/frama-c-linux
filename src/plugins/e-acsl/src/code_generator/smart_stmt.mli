@@ -56,14 +56,21 @@ val break: loc:location -> stmt
 (* E-ACSL specific code: build calls to its RTL API *)
 (* ********************************************************************** *)
 
-val lib_call: loc:location -> ?result:lval -> string -> exp list -> stmt
+val call: loc:location -> ?result:lval -> string -> exp list -> stmt
+(** Construct a call to a function with the given name.
+    @raise Not_found if the given string does not represent a function in the
+    AST, for instance if the function does not exist. *)
+
+val rtl_call:
+  loc:location -> ?result:lval -> ?prefix:string -> string -> exp list -> stmt
 (** Construct a call to a library function with the given name.
+
+    [prefix] defaults to the E-ACSL RTL API prefix and can be explicitely
+    provided to call functions without this prefix.
+
     @raise Rtl.Symbols.Unregistered if the given string does not represent
     such a function or if library functions were never registered (only possible
     when using E-ACSL through its API). *)
-
-val rtl_call: loc:location -> ?result:lval -> string -> exp list -> stmt
-(** Special version of [lib_call] for E-ACSL's RTL functions. *)
 
 val store_stmt: ?str_size:exp -> varinfo -> stmt
 (** Construct a call to [__e_acsl_store_block] that observes the allocation of
@@ -97,22 +104,27 @@ type annotation_kind =
   | Precondition
   | Postcondition
   | Invariant
+  | Variant
   | RTE
 
 val runtime_check:
-  annotation_kind -> kernel_function -> exp -> predicate -> stmt
-(** [runtime_check kind kf e p] generates a runtime check for predicate [p]
-    by building a call to [__e_acsl_assert]. [e] (or [!e] if [reverse] is set to
-    [true]) is the C translation of [p], [kf] is the current kernel_function and
-    [kind] is the annotation kind of [p]. *)
+  pred_kind:predicate_kind -> annotation_kind -> kernel_function -> exp ->
+  predicate -> stmt
+(** [runtime_check ~pred_kind kind kf e p] generates a runtime check for
+    predicate [p] by building a call to [__e_acsl_assert]. [e] (or [!e] if
+    [reverse] is set to [true]) is the C translation of [p], [kf] is the current
+    kernel_function, [kind] is the annotation kind of [p] and [pred_kind]
+    indicates if the assert should be blocking or not. *)
 
 val runtime_check_with_msg:
-  loc:location -> string -> annotation_kind -> kernel_function -> exp -> stmt
-(** [runtime_check_with_msg kind kf e msg] generates a runtime check for [e]
-    (or [!e] if [reverse] is [true]) by building a call to [__e_acsl_assert].
-    [msg] is the message printed if the runtime check fails. [loc] is the
-    location printed in the message if the runtime check fails. [kf] is the
-    current kernel_function and [kind] is the annotation kind of [p]. *)
+  loc:location -> string -> pred_kind:predicate_kind -> annotation_kind ->
+  kernel_function -> exp -> stmt
+(** [runtime_check_with_msg ~loc msg ~pred_kind kind kf e] generates a runtime
+    check for [e] (or [!e] if [reverse] is [true]) by building a call to
+    [__e_acsl_assert]. [msg] is the message printed if the runtime check fails.
+    [loc] is the location printed in the message if the runtime check fails.
+    [kf] is the current kernel_function, [kind] is the annotation kind of [p]
+    and [pred_kind] indicates if the assert should be blocking or not. *)
 
 (*
 Local Variables:

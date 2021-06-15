@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -124,6 +124,10 @@ module Make
       | `Value s1, `Value s2 -> `Value (List.filter (fun f -> List.mem f s1) s2)
     in
     list, b1 && b2
+
+  let replace_base substitution (left, right) =
+    Left.replace_base substitution left,
+    Right.replace_base substitution right
 
   let reduce (orig_left, orig_right) left right = match left, right with
     | None, None            -> None

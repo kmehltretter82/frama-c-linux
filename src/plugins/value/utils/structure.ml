@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -164,7 +164,7 @@ module Open
       KMap.union (fun _k a _b -> Some a) l r
     | Option (s, default) ->
       let l = compute_getters s in
-      KMap.map (lift_get (Extlib.opt_conv default)) l
+      KMap.map (lift_get (Option.value ~default:default)) l
 
   let getters = compute_getters M.structure
   let get (type a) (key: a Shape.key) : (M.t -> a) option =
@@ -192,7 +192,7 @@ module Open
       KMap.union (fun _k a _b -> Some a) l r
     | Option (s, _) ->
       let l = compute_setters s in
-      KMap.map (lift_set Extlib.opt_map) l
+      KMap.map (lift_set Option.map) l
 
   let setters = compute_setters M.structure
   let set (type a) (key: a Shape.key) : (a -> M.t -> M.t) =

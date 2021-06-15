@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -29,7 +29,7 @@ module Untried: Parameter_sig.Bool
 module Specialized: Parameter_sig.Bool
 module Proven: Parameter_sig.Bool
 
-module CSVFile: Parameter_sig.String
+module CSVFile: Parameter_sig.Filepath
 module Classify: Parameter_sig.Bool
 module Rules: Parameter_sig.String_list
 module Warning: Parameter_sig.String
@@ -39,10 +39,10 @@ module UntriedStatus: Parameter_sig.String
 module UnknownStatus: Parameter_sig.String
 module InvalidStatus: Parameter_sig.String
 
-module Output: Parameter_sig.String
-module OutputReviews: Parameter_sig.String
-module OutputErrors: Parameter_sig.String
-module OutputUnclassified: Parameter_sig.String
+module Output: Parameter_sig.Filepath
+module OutputReviews: Parameter_sig.Filepath
+module OutputErrors: Parameter_sig.Filepath
+module OutputUnclassified: Parameter_sig.Filepath
 module AbsolutePath: Parameter_sig.Bool
 module Stdout: Parameter_sig.Bool
 module Stderr: Parameter_sig.Bool

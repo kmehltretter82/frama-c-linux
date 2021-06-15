@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -40,7 +40,7 @@ module Comp = struct
   type t = Lt | Gt | Le | Ge | Eq | Ne
 
   type result = truth = True | False | Unknown
-  
+
   let inv = function
     | Gt -> Le
     | Lt -> Ge
@@ -286,11 +286,11 @@ module Make_Lattice_Base (V:Lattice_Value):(Lattice_Base with type l = V.t) = st
       fun e1 e2 ->
         if e1==e2 then 0 else
           match e1,e2 with
-            | Top,_ -> 1
-            | _, Top -> -1
-            | Bottom, _ -> -1
-            | _, Bottom -> 1
-            | Value e1,Value e2 -> V.compare e1 e2
+          | Top,_ -> 1
+          | _, Top -> -1
+          | Bottom, _ -> -1
+          | _, Bottom -> 1
+          | Value e1,Value e2 -> V.compare e1 e2
 
   let equal v1 v2 = match v1, v2 with
     | Top, Top | Bottom, Bottom -> true
@@ -308,10 +308,10 @@ module Make_Lattice_Base (V:Lattice_Value):(Lattice_Base with type l = V.t) = st
   (** This is exact *)
   let meet b1 b2 =
     if b1 == b2 then b1 else
-    match b1,b2 with
-    | Bottom, _ | _, Bottom -> Bottom
-    | Top , v | v, Top -> v
-    | Value v1, Value v2 -> if (V.compare v1 v2)=0 then b1 else Bottom
+      match b1,b2 with
+      | Bottom, _ | _, Bottom -> Bottom
+      | Top , v | v, Top -> v
+      | Value v1, Value v2 -> if (V.compare v1 v2)=0 then b1 else Bottom
 
   (** This is exact *)
   let narrow = meet
@@ -331,19 +331,19 @@ module Make_Lattice_Base (V:Lattice_Value):(Lattice_Base with type l = V.t) = st
 
   let transform f = fun t1 t2 ->
     match t1,t2 with
-      | Bottom, _ | _, Bottom -> Bottom
-      | Top, _ | _, Top -> Top
-      | Value v1, Value v2 -> Value (f v1 v2)
+    | Bottom, _ | _, Bottom -> Bottom
+    | Top, _ | _, Top -> Top
+    | Value v1, Value v2 -> Value (f v1 v2)
 
   let pretty fmt t =
     match t with
-      | Top -> Format.fprintf fmt "Top"
-      | Bottom ->  Format.fprintf fmt "Bottom"
-      | Value v -> Format.fprintf fmt "{%a}" V.pretty v
+    | Top -> Format.fprintf fmt "Top"
+    | Bottom ->  Format.fprintf fmt "Bottom"
+    | Value v -> Format.fprintf fmt "{%a}" V.pretty v
 
   let is_included t1 t2 =
     let b = (t1 == t2) ||
-      (equal (meet t1 t2) t1)
+            (equal (meet t1 t2) t1)
     in
     (* Format.printf
        "[Lattice]%a is included in %a: %b @\n"
@@ -353,23 +353,23 @@ module Make_Lattice_Base (V:Lattice_Value):(Lattice_Base with type l = V.t) = st
   let intersects t1 t2 = not (equal (meet t1 t2) Bottom)
 
   include
-  (Datatype.Make
-  (struct
-    type t = base (*= Top | Bottom | Value of l*)
-    let name = V.name ^ " lattice_base"
-    let structural_descr = Structural_descr.t_sum [| [| V.packed_descr |] |]
-    let reprs = Top :: Bottom :: List.map (fun v -> Value v) V.reprs
-    let equal = equal
-    let compare = compare
-    let hash = hash
-    let rehash = Datatype.identity
-    let copy = Datatype.undefined
-    let internal_pretty_code = Datatype.undefined
-    let pretty = pretty
-    let varname = Datatype.undefined
-    let mem_project = Datatype.never_any_project
-   end) :
-  Datatype.S with type t := t)
+    (Datatype.Make
+       (struct
+         type t = base (*= Top | Bottom | Value of l*)
+         let name = V.name ^ " lattice_base"
+         let structural_descr = Structural_descr.t_sum [| [| V.packed_descr |] |]
+         let reprs = Top :: Bottom :: List.map (fun v -> Value v) V.reprs
+         let equal = equal
+         let compare = compare
+         let hash = hash
+         let rehash = Datatype.identity
+         let copy = Datatype.undefined
+         let internal_pretty_code = Datatype.undefined
+         let pretty = pretty
+         let varname = Datatype.undefined
+         let mem_project = Datatype.never_any_project
+       end) :
+       Datatype.S with type t := t)
   let () = Type.set_ml_name ty None
 
 end
@@ -388,15 +388,15 @@ module Int = struct
 
   (** execute [f] on [inf], [inf + step], ... *)
   let fold f ~inf ~sup ~step acc =
-(*    Format.printf "Int.fold: inf:%a sup:%a step:%a@\n"
-       pretty inf pretty sup pretty step; *)
+    (*    Format.printf "Int.fold: inf:%a sup:%a step:%a@\n"
+           pretty inf pretty sup pretty step; *)
     let nb_loop = e_div (sub sup inf) step in
     let rec fold_incr ~counter ~inf acc =
       if equal counter onethousand then
         Lattice_messages.emit_costly msg_emitter
           "enumerating %a integers" pretty nb_loop;
       if le inf sup then begin
-          (*          Format.printf "Int.fold: %a@\n" pretty inf; *)
+        (*          Format.printf "Int.fold: %a@\n" pretty inf; *)
         fold_incr ~counter:(succ counter) ~inf:(add step inf) (f inf acc)
       end else acc
     in
@@ -547,8 +547,8 @@ struct
   let cardinal_zero_or_one v = match v with
     | Bottom -> true
     | Product (t1, t2) ->
-        (L1.cardinal_zero_or_one t1) &&
-          (L2.cardinal_zero_or_one t2)
+      (L1.cardinal_zero_or_one t1) &&
+      (L2.cardinal_zero_or_one t2)
 
   let compare =
     if L1.compare == Datatype.undefined || L2.compare == Datatype.undefined then (
@@ -560,12 +560,12 @@ struct
     else fun x x' ->
       if x == x' then 0 else
         match x,x' with
-          | Bottom, Bottom -> 0
-          | Bottom, Product _ -> 1
-          | Product _,Bottom -> -1
-          | (Product (a,b)), (Product (a',b')) ->
-              let c = L1.compare a a' in
-              if c = 0 then L2.compare b b' else c
+        | Bottom, Bottom -> 0
+        | Bottom, Product _ -> 1
+        | Product _,Bottom -> -1
+        | (Product (a,b)), (Product (a',b')) ->
+          let c = L1.compare a a' in
+          if c = 0 then L2.compare b b' else c
 
   let equal x x' =
     if x == x' then true else
@@ -574,19 +574,19 @@ struct
       | Bottom, Product _ -> false
       | Product _,Bottom -> false
       | (Product (a,b)), (Product (a',b')) ->
-          L1.equal a a' && L2.equal b b'
+        L1.equal a a' && L2.equal b b'
 
   let top = Product(L1.top,L2.top)
 
   let bottom = Bottom
 
   let fst x = match x with
-    Bottom -> L1.bottom
-  | Product(x1,_) -> x1
+      Bottom -> L1.bottom
+    | Product(x1,_) -> x1
 
   let snd x = match x with
-    Bottom -> L2.bottom
-  | Product(_,x2) -> x2
+      Bottom -> L2.bottom
+    | Product(_,x2) -> x2
 
   let condition_to_be_bottom x1 x2 =
     let c1 = (L1.equal x1 L1.bottom)  in
@@ -610,29 +610,29 @@ struct
       match x1,x2 with
       | Bottom, v | v, Bottom -> v
       | Product (l1,ll1), Product (l2,ll2) ->
-          Product(L1.join l1 l2, L2.join ll1 ll2)
+        Product(L1.join l1 l2, L2.join ll1 ll2)
 
   let link x1 x2 =
     if x1 == x2 then x1 else
       match x1,x2 with
       | Bottom, v | v, Bottom -> v
       | Product (l1,ll1), Product (l2,ll2) ->
-          Product(L1.link l1 l2, L2.link ll1 ll2)
+        Product(L1.link l1 l2, L2.link ll1 ll2)
 
   let narrow x1 x2 =
     if x1 == x2 then x1 else
-    match x1,x2 with
-    | Bottom, _ | _, Bottom -> Bottom
-    | Product (l1,ll1), Product (l2,ll2) ->
+      match x1,x2 with
+      | Bottom, _ | _, Bottom -> Bottom
+      | Product (l1,ll1), Product (l2,ll2) ->
         let l1 = L1.narrow l1 l2 in
         let l2 = L2.narrow ll1 ll2 in
         inject l1 l2
 
   let meet x1 x2 =
     if x1 == x2 then x1 else
-    match x1,x2 with
-    | Bottom, _ | _, Bottom -> Bottom
-    | Product (l1,ll1), Product (l2,ll2) ->
+      match x1,x2 with
+      | Bottom, _ | _, Bottom -> Bottom
+      | Product (l1,ll1), Product (l2,ll2) ->
         let l1 = L1.meet l1 l2 in
         let l2 = L2.meet ll1 ll2 in
         inject l1 l2
@@ -640,15 +640,15 @@ struct
   let pretty fmt x =
     match x with
       Bottom ->
-        Format.fprintf fmt "BotProd"
+      Format.fprintf fmt "BotProd"
     | Product(l1,l2) ->
-        Format.fprintf fmt "(%a,%a)" L1.pretty l1 L2.pretty l2
+      Format.fprintf fmt "(%a,%a)" L1.pretty l1 L2.pretty l2
 
   let intersects  x1 x2 =
     match x1,x2 with
     | Bottom, _ | _, Bottom -> false
     | Product (l1,ll1), Product (l2,ll2) ->
-        (L1.intersects l1 l2) && (L2.intersects ll1 ll2)
+      (L1.intersects l1 l2) && (L2.intersects ll1 ll2)
 
   let is_included x1 x2 =
     (x1 == x2) ||
@@ -656,33 +656,33 @@ struct
     | Bottom, _ -> true
     | _, Bottom -> false
     | Product (l1,ll1), Product (l2,ll2) ->
-        (L1.is_included l1 l2) && (L2.is_included ll1 ll2)
+      (L1.is_included l1 l2) && (L2.is_included ll1 ll2)
 
   include (Datatype.Make
-      (struct
-        type t = product (*= Product of t1*t2 | Bottom*)
-        let name = "(" ^ L1.name ^ ", " ^ L2.name ^ ") lattice_product"
-        let structural_descr =
-          Structural_descr.t_sum [| [| L1.packed_descr; L2.packed_descr |] |]
-        let reprs =
-          Bottom ::
-            List.fold_left
-            (fun acc l1 ->
-              List.fold_left
-                (fun acc l2 -> Product(l1, l2) :: acc) acc L2.reprs)
-            []
-            L1.reprs
-        let equal = equal
-        let compare = compare
-        let hash = hash
-        let rehash = Datatype.identity
-        let copy = Datatype.undefined
-        let internal_pretty_code = Datatype.undefined
-        let pretty = pretty
-        let varname = Datatype.undefined
-        let mem_project = Datatype.never_any_project
-       end) :
-      Datatype.S with type t := t)
+             (struct
+               type t = product (*= Product of t1*t2 | Bottom*)
+               let name = "(" ^ L1.name ^ ", " ^ L2.name ^ ") lattice_product"
+               let structural_descr =
+                 Structural_descr.t_sum [| [| L1.packed_descr; L2.packed_descr |] |]
+               let reprs =
+                 Bottom ::
+                 List.fold_left
+                   (fun acc l1 ->
+                      List.fold_left
+                        (fun acc l2 -> Product(l1, l2) :: acc) acc L2.reprs)
+                   []
+                   L1.reprs
+               let equal = equal
+               let compare = compare
+               let hash = hash
+               let rehash = Datatype.identity
+               let copy = Datatype.undefined
+               let internal_pretty_code = Datatype.undefined
+               let pretty = pretty
+               let varname = Datatype.undefined
+               let mem_project = Datatype.never_any_project
+             end) :
+             Datatype.S with type t := t)
   let () = Type.set_ml_name ty None
 
 end
@@ -698,9 +698,9 @@ struct
 
   let hash (v1, v2) = L1.hash v1 + 31 * L2.hash v2
 
-  let cardinal_zero_or_one (t1, t2) = 
-        (L1.cardinal_zero_or_one t1) &&
-          (L2.cardinal_zero_or_one t2)
+  let cardinal_zero_or_one (t1, t2) =
+    (L1.cardinal_zero_or_one t1) &&
+    (L2.cardinal_zero_or_one t2)
 
   let compare =
     if L1.compare == Datatype.undefined || L2.compare == Datatype.undefined then (
@@ -712,15 +712,15 @@ struct
     else fun x x' ->
       if x == x' then 0 else
         match x,x' with
-          | (a,b), (a',b') ->
-              let c = L1.compare a a' in
-              if c = 0 then L2.compare b b' else c
+        | (a,b), (a',b') ->
+          let c = L1.compare a a' in
+          if c = 0 then L2.compare b b' else c
 
   let equal x x' =
     if x == x' then true else
       match x,x' with
       | ( (a,b)), ( (a',b')) ->
-          L1.equal a a' && L2.equal b b'
+        L1.equal a a' && L2.equal b b'
 
   let top = (L1.top,L2.top)
 
@@ -746,41 +746,41 @@ struct
     L1.meet l1 l2, L2.meet ll1 ll2
 
   let pretty fmt (l1, l2) =
-        Format.fprintf fmt "(%a,%a)" L1.pretty l1 L2.pretty l2
+    Format.fprintf fmt "(%a,%a)" L1.pretty l1 L2.pretty l2
 
   let intersects  (l1,ll1) (l2,ll2) =
-        (L1.intersects l1 l2) && (L2.intersects ll1 ll2)
+    (L1.intersects l1 l2) && (L2.intersects ll1 ll2)
 
   let is_included x1 x2 =
     (x1 == x2) ||
     match x1,x2 with
     |  (l1,ll1),  (l2,ll2) ->
-        (L1.is_included l1 l2) && (L2.is_included ll1 ll2)
+      (L1.is_included l1 l2) && (L2.is_included ll1 ll2)
 
   include
     (Datatype.Make
-      (struct
-        type uproduct = t
-        type t = uproduct (*= t1*t2 *)
-        let name = "(" ^ L1.name ^ ", " ^ L2.name ^ ") lattice_uproduct"
-        let structural_descr =
-          Structural_descr.t_sum [| [| L1.packed_descr; L2.packed_descr |] |]
-        let reprs =
-            List.fold_left
-            (fun acc l1 ->
-              List.fold_left
-                (fun acc l2 -> (l1, l2) :: acc) acc L2.reprs)
-            []
-            L1.reprs
-        let equal = equal
-        let compare = compare
-        let hash = hash
-        let rehash = Datatype.identity
-        let copy = Datatype.undefined
-        let internal_pretty_code = Datatype.undefined
-        let pretty = pretty
-        let varname = Datatype.undefined
-        let mem_project = Datatype.never_any_project
+       (struct
+         type uproduct = t
+         type t = uproduct (*= t1*t2 *)
+         let name = "(" ^ L1.name ^ ", " ^ L2.name ^ ") lattice_uproduct"
+         let structural_descr =
+           Structural_descr.t_sum [| [| L1.packed_descr; L2.packed_descr |] |]
+         let reprs =
+           List.fold_left
+             (fun acc l1 ->
+                List.fold_left
+                  (fun acc l2 -> (l1, l2) :: acc) acc L2.reprs)
+             []
+             L1.reprs
+         let equal = equal
+         let compare = compare
+         let hash = hash
+         let rehash = Datatype.identity
+         let copy = Datatype.undefined
+         let internal_pretty_code = Datatype.undefined
+         let pretty = pretty
+         let varname = Datatype.undefined
+         let mem_project = Datatype.never_any_project
        end):
        Datatype.S with type t := t)
   let () = Type.set_ml_name ty None
@@ -789,7 +789,7 @@ end
 
 module Make_Lattice_Sum (L1:AI_Lattice_with_cardinal_one) (L2:AI_Lattice_with_cardinal_one):
   (Lattice_Sum with type t1 = L1.t and type t2 = L2.t)
-  =
+=
 struct
   type t1 = L1.t
   type t2 = L2.t
@@ -813,12 +813,12 @@ struct
 
   let widen (wh1, wh2) t1 t2 =
     match t1,t2 with
-      | T1 x,T1 y ->
-          T1 (L1.widen wh1 x y)
-      | T2 x,T2 y ->
-          T2 (L2.widen wh2 x y)
-      | Top,Top | Bottom,Bottom -> t1
-      | _,_ -> Top
+    | T1 x,T1 y ->
+      T1 (L1.widen wh1 x y)
+    | T2 x,T2 y ->
+      T2 (L2.widen wh2 x y)
+    | Top,Top | Bottom,Bottom -> t1
+    | _,_ -> Top
 
   let compare =
     if L1.compare == Datatype.undefined || L2.compare == Datatype.undefined then (
@@ -830,24 +830,24 @@ struct
     else fun u v ->
       if u == v then 0 else
         match u,v with
-          | Top,Top | Bottom,Bottom -> 0
-          | Bottom,_ | _,Top -> 1
-          | Top,_ |_,Bottom -> -1
-          | T1 _ , T2 _ -> 1
-          | T2 _ , T1 _ -> -1
-          | T1 t1,T1 t1' -> L1.compare t1 t1'
-          | T2 t1,T2 t1' -> L2.compare t1 t1'
+        | Top,Top | Bottom,Bottom -> 0
+        | Bottom,_ | _,Top -> 1
+        | Top,_ |_,Bottom -> -1
+        | T1 _ , T2 _ -> 1
+        | T2 _ , T1 _ -> -1
+        | T1 t1,T1 t1' -> L1.compare t1 t1'
+        | T2 t1,T2 t1' -> L2.compare t1 t1'
 
   let equal u v =
     if u == v then false
     else
       match u, v with
-        | Top,Top | Bottom,Bottom -> true
-        | Bottom,_ | _,Top | Top,_ |_,Bottom -> false
-        | T1 _ , T2 _ -> false
-        | T2 _ , T1 _ -> false
-        | T1 t1,T1 t1' -> L1.equal t1 t1'
-        | T2 t2,T2 t2' -> L2.equal t2 t2'
+      | Top,Top | Bottom,Bottom -> true
+      | Bottom,_ | _,Top | Top,_ |_,Bottom -> false
+      | T1 _ , T2 _ -> false
+      | T2 _ , T1 _ -> false
+      | T1 t1,T1 t1' -> L1.equal t1 t1'
+      | T2 t2,T2 t2' -> L2.equal t2 t2'
 
   (** Forbid [L1 Bottom] *)
   let inject_t1 x =
@@ -861,10 +861,10 @@ struct
 
   let pretty fmt v =
     match v with
-      | T1 x -> L1.pretty fmt x
-      | T2 x -> L2.pretty fmt x
-      | Top -> Format.fprintf fmt "<TopSum>"
-      | Bottom -> Format.fprintf fmt "<BottomSum>"
+    | T1 x -> L1.pretty fmt x
+    | T2 x -> L2.pretty fmt x
+    | Top -> Format.fprintf fmt "<TopSum>"
+    | Bottom -> Format.fprintf fmt "<BottomSum>"
 
   let join u v =
     if u == v then u else
@@ -873,9 +873,9 @@ struct
       | T2 t1,T2 t2 -> T2 (L2.join t1 t2)
       | Bottom,x| x,Bottom -> x
       | _,_ ->
-          (*Format.printf
-            "Degenerating collision : %a <==> %a@\n" pretty u pretty v;*)
-          top
+        (*Format.printf
+          "Degenerating collision : %a <==> %a@\n" pretty u pretty v;*)
+        top
 
   let link u v =
     if u == v then u else
@@ -884,13 +884,13 @@ struct
       | T2 t1,T2 t2 -> T2 (L2.link t1 t2)
       | Bottom,x| x,Bottom -> x
       | _,_ ->
-          (*Format.printf
-            "Degenerating collision : %a <==> %a@\n" pretty u pretty v;*)
-          top
+        (*Format.printf
+          "Degenerating collision : %a <==> %a@\n" pretty u pretty v;*)
+        top
 
   let narrow u v =
     if u == v then u else
-    match u,v with
+      match u,v with
       | T1 t1,T1 t2 -> inject_t1 (L1.narrow t1 t2)
       | T2 t1,T2 t2 -> inject_t2 (L2.narrow t1 t2)
       | (T1 _ | T2 _),Top -> u
@@ -901,7 +901,7 @@ struct
 
   let meet u v =
     if u == v then u else
-    match u,v with
+      match u,v with
       | T1 t1,T1 t2 -> inject_t1 (L1.meet t1 t2)
       | T2 t1,T2 t2 -> inject_t2 (L2.meet t1 t2)
       | (T1 _ | T2 _),Top -> u
@@ -913,45 +913,45 @@ struct
 
   let intersects u v =
     match u,v with
-      | Bottom,_ | _,Bottom -> false
-      | Top,_ |_,Top -> true
-      | T1 _,T1 _ -> true
-      | T2 _,T2 _ -> true
-      | _,_ -> false
+    | Bottom,_ | _,Bottom -> false
+    | Top,_ |_,Top -> true
+    | T1 _,T1 _ -> true
+    | T2 _,T2 _ -> true
+    | _,_ -> false
 
   let is_included u v =
     (u == v) ||
     let b = match u,v with
-    | Bottom,_ | _,Top -> true
-    | Top,_ | _,Bottom -> false
-    | T1 t1,T1 t2 -> L1.is_included t1 t2
-    | T2 t1,T2 t2 -> L2.is_included t1 t2
-    | _,_ -> false
+      | Bottom,_ | _,Top -> true
+      | Top,_ | _,Bottom -> false
+      | T1 t1,T1 t2 -> L1.is_included t1 t2
+      | T2 t1,T2 t2 -> L2.is_included t1 t2
+      | _,_ -> false
     in
     (* Format.printf
-      "[Lattice_Sum]%a is included in %a: %b @\n" pretty u pretty v b;*)
+       "[Lattice_Sum]%a is included in %a: %b @\n" pretty u pretty v b;*)
     b
 
 
   include Datatype.Make
-  (struct
-    type t = sum
-    let name = "(" ^ L1.name ^ ", " ^ L2.name ^ ") lattice_sum"
-    let structural_descr = Structural_descr.t_unknown
-    let reprs =
-      Top :: Bottom
-      :: List.fold_left
-        (fun acc t -> T2 t :: acc) (List.map (fun t -> T1 t) L1.reprs) L2.reprs
-    let equal = equal
-    let compare = compare
-    let hash = hash
-    let rehash = Datatype.undefined
-    let copy = Datatype.undefined
-    let internal_pretty_code = Datatype.undefined
-    let pretty = pretty
-    let varname = Datatype.undefined
-    let mem_project = Datatype.never_any_project
-   end)
+      (struct
+        type t = sum
+        let name = "(" ^ L1.name ^ ", " ^ L2.name ^ ") lattice_sum"
+        let structural_descr = Structural_descr.t_unknown
+        let reprs =
+          Top :: Bottom
+          :: List.fold_left
+            (fun acc t -> T2 t :: acc) (List.map (fun t -> T1 t) L1.reprs) L2.reprs
+        let equal = equal
+        let compare = compare
+        let hash = hash
+        let rehash = Datatype.undefined
+        let copy = Datatype.undefined
+        let internal_pretty_code = Datatype.undefined
+        let pretty = pretty
+        let varname = Datatype.undefined
+        let mem_project = Datatype.never_any_project
+      end)
   let () = Type.set_ml_name ty None
 
 end

@@ -1,7 +1,7 @@
-[variadic] FRAMAC_SHARE/libc/fcntl.h:113: 
+[variadic] FRAMAC_SHARE/libc/fcntl.h:118: 
   Declaration of variadic function fcntl.
-[variadic] FRAMAC_SHARE/libc/fcntl.h:116: Declaration of variadic function open.
-[variadic] FRAMAC_SHARE/libc/fcntl.h:122: 
+[variadic] FRAMAC_SHARE/libc/fcntl.h:121: Declaration of variadic function open.
+[variadic] FRAMAC_SHARE/libc/fcntl.h:128: 
   Declaration of variadic function openat.
 [variadic] tests/known/openat.c:8: 
   Translating call to the specialized version openat(int, char const *, int, mode_t).
@@ -40,8 +40,8 @@ int main(void)
   mode_t mode1 = (unsigned int)0;
   int mode2 = 0;
   char *file = (char *)"file";
-  __va_openat_mode_t(0,(char const *)file,flag,mode1);
-  __va_openat_mode_t(0,(char const *)file,flag,(mode_t)mode2);
+  openat(0,(char const *)file,flag,mode1); /* __va_openat_mode_t */
+  openat(0,(char const *)file,flag,(mode_t)mode2); /* __va_openat_mode_t */
   {
     double __va_arg0 = 3.0;
     void *__va_args[1] = {& __va_arg0};

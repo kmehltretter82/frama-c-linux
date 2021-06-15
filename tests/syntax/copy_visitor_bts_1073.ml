@@ -7,7 +7,7 @@ object(self)
   method! vglob_aux g =
     match g with
       | GFun (f,loc) ->
-        let my_kf = Extlib.the self#current_kf in
+        let my_kf = Option.get self#current_kf in
         let f1 = Visitor.visitFramacFunction (self:>Visitor.frama_c_visitor) f
         in
         let v2 = Cil.copyVarinfo f.svar (f.svar.vname ^ "1") in

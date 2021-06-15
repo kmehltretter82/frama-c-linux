@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -383,8 +383,8 @@ struct
     begin match edge with
       | Goto n1 -> pp_edge n1
       | Branch (_, n1, n2)->
-          Extlib.may pp_edge n1;
-          Extlib.may pp_edge n2
+          Option.iter pp_edge n1;
+          Option.iter pp_edge n2
       | Either ns -> List.iter pp_edge ns
       | Implies ns -> List.iter (fun (_,a) -> pp_edge a) ns
       | Effect (e, n') ->
@@ -812,9 +812,9 @@ struct
             if Node.equal n' n'' then Some e
             else Some (Goto n'')
         | Branch (c,n1,n2) ->
-            let n1' = Extlib.opt_map find n1 in
-            let n2' = Extlib.opt_map find n2 in
-            if Extlib.opt_equal Node.equal n1 n1' && Extlib.opt_equal Node.equal n2 n2'
+            let n1' = Option.map find n1 in
+            let n2' = Option.map find n2 in
+            if Option.equal Node.equal n1 n1' && Option.equal Node.equal n2 n2'
             then Some e
             else Some (Branch(c,n1',n2'))
         | Either l ->
@@ -1435,7 +1435,7 @@ struct
             to_sequence_bool ~mode pre posts env in
       let predssigmas =
         Node.Map.merge
-          (fun _ p s -> Some (Extlib.opt_conv F.p_false p, Extlib.opt_conv (S.create ()) s))
+          (fun _ p s -> Some (Option.value ~default:F.p_false p, Option.value ~default:(S.create ()) s))
           preds sigmas in
       (** readd simplified nodes *)
       let predssigmas =

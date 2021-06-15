@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -30,8 +30,8 @@ exception Not_equal
 
 let is_call_stmt stmt =
   match stmt.skind with
-    | Instr (Call _|Local_init(_,ConsInit _,_)) -> true
-    | _ -> false
+  | Instr (Call _|Local_init(_,ConsInit _,_)) -> true
+  | _ -> false
 
 module Signature = struct
   type in_key = InCtrl | InNum of int | InImpl of Locations.Zone.t
@@ -39,14 +39,14 @@ module Signature = struct
   type key = In of in_key | Out of out_key
 
   type 'info t =
-      { in_ctrl : 'info option ;
-        in_params : (int * 'info) list ;
-        (** implicit inputs :
-            Maybe we should use [Lmap_bitwise.Make_bitwise] ?
-            but that would make things a lot more complicated... :-? *)
-        in_implicits : (Locations.Zone.t * 'info) list ;
-        out_ret : 'info option ;
-        outputs : (Locations.Zone.t * 'info) list }
+    { in_ctrl : 'info option ;
+      in_params : (int * 'info) list ;
+      (** implicit inputs :
+          Maybe we should use [Lmap_bitwise.Make_bitwise] ?
+          but that would make things a lot more complicated... :-? *)
+      in_implicits : (Locations.Zone.t * 'info) list ;
+      out_ret : 'info option ;
+      outputs : (Locations.Zone.t * 'info) list }
 
   module Str_descr = struct
     open Structural_descr
@@ -55,14 +55,14 @@ module Signature = struct
     let key = t_sum [| [| pack in_key |]; [| pack out_key |] |]
 
     let t d_info = t_record
-          [| pack (t_option d_info);
-             pack (t_list (t_tuple [| p_int; pack d_info |]));
-             pack (t_list (t_tuple [| Locations.Zone.packed_descr;
-                                      pack d_info |]));
-             pack (t_option d_info);
-             pack (t_list (t_tuple [| Locations.Zone.packed_descr;
-                                      pack d_info |]));
-          |]
+        [| pack (t_option d_info);
+           pack (t_list (t_tuple [| p_int; pack d_info |]));
+           pack (t_list (t_tuple [| Locations.Zone.packed_descr;
+                                    pack d_info |]));
+           pack (t_option d_info);
+           pack (t_list (t_tuple [| Locations.Zone.packed_descr;
+                                    pack d_info |]));
+        |]
   end
 
   let empty = { in_ctrl = None ;
@@ -103,25 +103,25 @@ module Signature = struct
     try (0 = cmp_out_key k1 k2) with Not_equal -> false
 
   (** add a mapping between [num] and [info] in [lst].
-  * if we already have something for [num], use function [merge] *)
+   * if we already have something for [num], use function [merge] *)
   let add_in_list lst num info merge =
     let new_e = (num, info) in
     let rec add_to_l l =
       match l with [] -> [new_e]
-        | (ne, old_e) as e :: tl ->
-            if ne = num then
-              let e = merge old_e info in (num, e)::tl
-            else if ne < num then e :: (add_to_l tl) else new_e :: l
+                 | (ne, old_e) as e :: tl ->
+                   if ne = num then
+                     let e = merge old_e info in (num, e)::tl
+                   else if ne < num then e :: (add_to_l tl) else new_e :: l
     in add_to_l lst
 
   let add_loc l_loc loc info merge =
     let rec add lst = match lst with
       | [] -> [(loc, info)]
       | (l, e)::tl ->
-          if Locations.Zone.equal l loc then
-            let new_e = merge e info in (loc, new_e)::tl
-          else
-            begin
+        if Locations.Zone.equal l loc then
+          let new_e = merge e info in (loc, new_e)::tl
+        else
+          begin
               (*
               if (Locations.Zone.intersects l loc) then
                 begin
@@ -130,8 +130,8 @@ module Signature = struct
                   assert false
                 end;
                    *)
-              (l, e)::(add tl)
-            end
+            (l, e)::(add tl)
+          end
     in add l_loc
 
   let add_replace replace _old_e new_e =
@@ -139,33 +139,33 @@ module Signature = struct
 
   let add_input sgn n info ~replace =
     { sgn with in_params =
-        add_in_list sgn.in_params n info (add_replace replace) }
+                 add_in_list sgn.in_params n info (add_replace replace) }
 
   let add_impl_input sgn loc info ~replace =
     { sgn with in_implicits =
-        add_loc sgn.in_implicits loc info (add_replace replace) }
+                 add_loc sgn.in_implicits loc info (add_replace replace) }
 
   let add_output sgn loc info ~replace =
     { sgn with outputs =
-        add_loc sgn.outputs loc info (add_replace replace) }
+                 add_loc sgn.outputs loc info (add_replace replace) }
 
   let add_in_ctrl sgn info ~replace =
     let new_info = match sgn.in_ctrl with None -> info
-      | Some old -> add_replace replace old info
+                                        | Some old -> add_replace replace old info
     in { sgn with in_ctrl = Some new_info }
 
   let add_out_ret sgn info ~replace =
     let new_info = match sgn.out_ret with None -> info
-      | Some old -> add_replace replace old info
+                                        | Some old -> add_replace replace old info
     in { sgn with out_ret = Some new_info }
 
   let add_info sgn key info ~replace =
     match key with
-      | In InCtrl -> add_in_ctrl sgn info replace
-      | In (InNum n) -> add_input sgn n info replace
-      | In (InImpl loc) -> add_impl_input sgn loc info replace
-      | Out OutRet -> add_out_ret sgn info replace
-      | Out (OutLoc k) -> add_output sgn k info replace
+    | In InCtrl -> add_in_ctrl sgn info replace
+    | In (InNum n) -> add_input sgn n info replace
+    | In (InImpl loc) -> add_impl_input sgn loc info replace
+    | Out OutRet -> add_out_ret sgn info replace
+    | Out (OutLoc k) -> add_output sgn k info replace
 
   let find_input sgn n =
     try
@@ -178,10 +178,10 @@ module Signature = struct
     let rec find l = match l with
       | [] -> raise Not_found
       | (loc, e)::tl ->
-          if Locations.Zone.equal out_key loc then e
-          else find tl
+        if Locations.Zone.equal out_key loc then e
+        else find tl
     in
-      find sgn.outputs
+    find sgn.outputs
 
   let find_out_ret sgn = match sgn.out_ret with
     | Some i -> i
@@ -192,13 +192,13 @@ module Signature = struct
     | None -> raise Not_found
 
   (** try to find an exact match with loc.
-  * we shouldn't try to find a zone that we don't have... *)
+   * we shouldn't try to find a zone that we don't have... *)
   let find_implicit_input sgn loc =
     let rec find l = match l with
       | [] -> raise Not_found
       | (in_loc, e)::tl ->
-          if Locations.Zone.equal in_loc loc then e
-          else find tl
+        if Locations.Zone.equal in_loc loc then e
+        else find tl
     in
     find sgn.in_implicits
 
@@ -280,12 +280,12 @@ module Signature = struct
     | (InNum n)  -> Format.fprintf fmt "In%d" n
     | InCtrl -> Format.fprintf fmt "InCtrl"
     | InImpl loc ->
-        Format.fprintf fmt "@[<hv 1>In(%a)@]" Locations.Zone.pretty loc
+      Format.fprintf fmt "@[<hv 1>In(%a)@]" Locations.Zone.pretty loc
 
   let pretty_out_key fmt key = match key with
     | OutRet -> Format.fprintf fmt "OutRet"
     | OutLoc loc ->
-        Format.fprintf fmt "@[<hv 1>Out(%a)@]" Locations.Zone.pretty loc
+      Format.fprintf fmt "@[<hv 1>Out(%a)@]" Locations.Zone.pretty loc
 
   let pretty_key fmt key = match key with
     | In in_key  -> pretty_in_key fmt in_key
@@ -294,7 +294,7 @@ module Signature = struct
   let pretty pp fmt sgn =
     Pretty_utils.pp_iter ~pre:"@[<v>" ~suf:"@]" ~sep:"@," iter
       (fun fmt (k,i) ->
-        Format.fprintf fmt "@[<hv>(%a:@ %a)@]" pretty_key k pp i)
+         Format.fprintf fmt "@[<hv>(%a:@ %a)@]" pretty_key k pp i)
       fmt sgn
 
 end
@@ -303,18 +303,18 @@ module Key = struct
 
   type key =
     | SigKey of Signature.key
-        (** input/output nodes of the function *)
+    (** input/output nodes of the function *)
     | VarDecl of Cil_types.varinfo
-        (** local, parameter or global variable definition *)
+    (** local, parameter or global variable definition *)
     | Stmt of Cil_types.stmt
-        (** simple statement (not call) excluding its label (stmt.id) *)
+    (** simple statement (not call) excluding its label (stmt.id) *)
     | CallStmt of Cil_types.stmt
-        (** call statement *)
+    (** call statement *)
     | Label of stmt * Cil_types.label
-        (** Labels are considered as function elements by themselves. *)
+    (** Labels are considered as function elements by themselves. *)
     | SigCallKey of Cil_types.stmt * Signature.key
-        (** Key for an element of a call (input or output).
-         * The call is identified by the statement. *)
+    (** Key for an element of a call (input or output).
+     * The call is identified by the statement. *)
 
   let entry_point = SigKey (Signature.in_ctrl_key)
   let top_input = SigKey (Signature.in_top_key)
@@ -341,11 +341,11 @@ module Key = struct
 
   let stmt key =
     match key with
-      | SigCallKey (call, _) -> Some call
-      | CallStmt call -> Some call
-      | Stmt stmt -> Some stmt
-      | Label (stmt, _) -> Some stmt
-      | _ -> None
+    | SigCallKey (call, _) -> Some call
+    | CallStmt call -> Some call
+    | Stmt stmt -> Some stmt
+    | Label (stmt, _) -> Some stmt
+    | _ -> None
 
   (* see PrintPdg.pretty_key : can't be here because it uses Db... *)
   let pretty_node fmt k =
@@ -357,7 +357,7 @@ module Key = struct
       | Block _ -> Format.pp_print_string fmt "block"
       | Goto _ | Break _ | Continue _ | Return _ | Instr _ | Throw _ ->
         Format.fprintf fmt "@[<h 1>%a@]"
-	  (Printer.without_annot Printer.pp_stmt) s
+          (Printer.without_annot Printer.pp_stmt) s
       | UnspecifiedSequence _ ->
         Format.pp_print_string fmt "unspecified sequence"
       | TryExcept _ | TryFinally _  | TryCatch _ ->
@@ -377,36 +377,36 @@ module Key = struct
         call.sid Signature.pretty_key sgn print_stmt call
 
   include Datatype.Make
-        (struct
-          include Datatype.Serializable_undefined
-          type t = key
-          let name = "PdgIndex.Key"
-          open Cil_datatype
-          let reprs =
-            List.fold_left
-              (fun acc v ->
-                List.fold_left
-                  (fun acc s -> Stmt s :: acc)
-                  (VarDecl v :: acc)
-                  Stmt.reprs)
-              []
-              Varinfo.reprs
-          open Structural_descr
-          let structural_descr =
-            let p_key = pack Signature.Str_descr.key in
-            t_sum
-              [|
-                [| p_key |];
-                [| Varinfo.packed_descr |];
-                [| Stmt.packed_descr |];
-                [| Cil_datatype.Stmt.packed_descr |];
-                [| Cil_datatype.Stmt.packed_descr; Label.packed_descr |];
-                [| Cil_datatype.Stmt.packed_descr; p_key |];
-              |]
-          let rehash = Datatype.identity
-          let pretty = pretty_node
-          let mem_project = Datatype.never_any_project
-         end)
+      (struct
+        include Datatype.Serializable_undefined
+        type t = key
+        let name = "PdgIndex.Key"
+        open Cil_datatype
+        let reprs =
+          List.fold_left
+            (fun acc v ->
+               List.fold_left
+                 (fun acc s -> Stmt s :: acc)
+                 (VarDecl v :: acc)
+                 Stmt.reprs)
+            []
+            Varinfo.reprs
+        open Structural_descr
+        let structural_descr =
+          let p_key = pack Signature.Str_descr.key in
+          t_sum
+            [|
+              [| p_key |];
+              [| Varinfo.packed_descr |];
+              [| Stmt.packed_descr |];
+              [| Cil_datatype.Stmt.packed_descr |];
+              [| Cil_datatype.Stmt.packed_descr; Label.packed_descr |];
+              [| Cil_datatype.Stmt.packed_descr; p_key |];
+            |]
+        let rehash = Datatype.identity
+        let pretty = pretty_node
+        let mem_project = Datatype.never_any_project
+      end)
 
 end
 
@@ -425,14 +425,14 @@ module RKey = struct
          There seems to be bug in the pdg, only one 'case :' per statement is
          present. This avoids removing the other 'case' clauses
          (see tests/slicing/switch.c *)
-         53 * Cil_datatype.Stmt.hash s (* 7 * Cil_datatype.Label.hash l *)
+      53 * Cil_datatype.Stmt.hash s (* 7 * Cil_datatype.Label.hash l *)
     | _ -> assert false
 
   let equal k1 k2 = match k1, k2 with
     | Key.VarDecl v1, Key.VarDecl v2 -> Cil_datatype.Varinfo.equal v1 v2
     | Key.Stmt s1, Key.Stmt s2 -> Cil_datatype.Stmt.equal s1 s2
     | Key.Label (s1, _l1), Key.Label (s2, _l2) ->
-        (* See [hash] above *)
+      (* See [hash] above *)
       Cil_datatype.Stmt.equal s1 s2  (* && Cil_datatype.Label.equal l1 l2 *)
     | _ -> false
 end
@@ -444,12 +444,12 @@ module H = struct
 end
 
 module FctIndex = struct
- 
+
   type ('node_info, 'call_info) t = {
     (** inputs and outputs of the function *)
     mutable sgn : 'node_info Signature.t ;
     (** calls signatures *)
-    mutable calls : 
+    mutable calls :
       (Cil_types.stmt * ('call_info option * 'node_info Signature.t)) list ;
     (** everything else *)
     other : 'node_info H.t
@@ -461,9 +461,9 @@ module FctIndex = struct
       [| pack (Signature.Str_descr.t d_ninfo);
          pack (t_list (t_tuple [| Cil_datatype.Stmt.packed_descr;
                                   pack (t_tuple [|
-                                          pack (t_option d_cinfo);
-                                          pack (Signature.Str_descr.t d_ninfo);
-                                        |])
+                                      pack (t_option d_cinfo);
+                                      pack (Signature.Str_descr.t d_ninfo);
+                                    |])
                                |]));
          pack (H.structural_descr d_ninfo);
       |]
@@ -479,22 +479,22 @@ module FctIndex = struct
   let merge_info_calls calls1 calls2 merge_a merge_b =
     let merge_info  (b1, sgn1) (b2, sgn2) =
       let b = match b1, b2 with None, _ -> b2 | _, None -> b1
-        | Some b1, Some b2 -> Some (merge_b b1 b2)
+                              | Some b1, Some b2 -> Some (merge_b b1 b2)
       in let sgn = Signature.merge sgn1 sgn2 merge_a in
-        (b, sgn)
+      (b, sgn)
     in
     let rec merge l1 l2 = match l1, l2 with
       | [], _ -> l2
       | _, [] -> l1
       | ((call1, info1) as c1) :: tl1,
         ((call2, info2) as c2) :: tl2 ->
-          let id1 = call1.sid in
-          let id2 = call2.sid in
-            if id1 = id2 then
-              let info = merge_info info1 info2 in
-                (call1, info) :: (merge tl1 tl2)
-            else if id1 < id2 then c1 :: (merge tl1 l2)
-            else c2 :: (merge l1 tl2)
+        let id1 = call1.sid in
+        let id2 = call2.sid in
+        if id1 = id2 then
+          let info = merge_info info1 info2 in
+          (call1, info) :: (merge tl1 tl2)
+        else if id1 < id2 then c1 :: (merge tl1 l2)
+        else c2 :: (merge l1 tl2)
     in merge calls1 calls2
 
   let merge idx1 idx2 merge_a merge_b =
@@ -507,60 +507,60 @@ module FctIndex = struct
       in H.replace table k a
     in H.iter add idx2.other;
     let calls = merge_info_calls idx1.calls idx2.calls merge_a merge_b in
-      {sgn = sgn; calls = calls; other = table}
+    {sgn = sgn; calls = calls; other = table}
 
   let add_info_call idx call e ~replace =
     let sid = call.sid in
     let rec add l = match l with
       | [] -> [(call, (Some e, Signature.empty))]
       | ((call1, (_e1, sgn1)) as c1) :: tl ->
-          let sid1 = call1.sid in
-          if sid = sid1 then
-            (if replace then (call, (Some e, sgn1)) :: tl else raise AddError)
-          else if sid < sid1 then
-            (call, (Some e, Signature.empty)) :: l
-          else c1 :: (add tl)
+        let sid1 = call1.sid in
+        if sid = sid1 then
+          (if replace then (call, (Some e, sgn1)) :: tl else raise AddError)
+        else if sid < sid1 then
+          (call, (Some e, Signature.empty)) :: l
+        else c1 :: (add tl)
     in idx.calls <- add idx.calls
 
   let add_info_call_key idx key =
     match key with
     | Key.CallStmt call -> add_info_call idx call
-        | _ -> assert false
+    | _ -> assert false
 
   let add_info_sig_call calls call k e replace =
     let new_sgn old = Signature.add_info old k e replace in
     let rec add l = match l with
       | [] -> [(call, (None, new_sgn Signature.empty))]
       | ((call1, (e1, sgn1)) as c1) :: tl ->
-          let sid = call.sid in
-          let sid1 = call1.sid in
-          if sid = sid1
-          then (call, (e1, new_sgn sgn1)) :: tl
-          else if sid < sid1
-          then (call, (None, new_sgn Signature.empty)) :: l
-          else (c1 :: (add tl))
+        let sid = call.sid in
+        let sid1 = call1.sid in
+        if sid = sid1
+        then (call, (e1, new_sgn sgn1)) :: tl
+        else if sid < sid1
+        then (call, (None, new_sgn Signature.empty)) :: l
+        else (c1 :: (add tl))
     in add calls
 
   let find_call idx call =
     let rec find l = match l with
       | [] ->  raise Not_found
       | (call1, e1) :: tl ->
-          let sid = call.sid in
-          let sid1 = call1.sid in
-          if sid = sid1 then e1
-          else if sid < sid1 then raise Not_found
-          else find tl
+        let sid = call.sid in
+        let sid1 = call1.sid in
+        if sid = sid1 then e1
+        else if sid < sid1 then raise Not_found
+        else find tl
     in
     find idx.calls
 
   let find_call_key idx key =
     match key with
     | Key.CallStmt call -> find_call idx call
-        | _ -> assert false
+    | _ -> assert false
 
   let find_info_call idx call =
     let (e1, _sgn1) = find_call idx call in
-      match e1 with Some e -> e | None -> raise Not_found
+    match e1 with Some e -> e | None -> raise Not_found
 
   let find_info_call_key idx key =
     match key with
@@ -569,21 +569,21 @@ module FctIndex = struct
 
   let find_info_sig_call idx call k =
     let (_e1, sgn1) = find_call idx call in
-      Signature.find_info sgn1 k
+    Signature.find_info sgn1 k
 
   let find_all_info_sig_call idx call =
-      let (_e1, sgn1) = find_call idx call in
-      Signature.fold (fun l (_k,i) -> i::l) [] sgn1
+    let (_e1, sgn1) = find_call idx call in
+    Signature.fold (fun l (_k,i) -> i::l) [] sgn1
 
   let add_replace idx key e replace =
     let hfct = if replace then H.replace else H.add in
     match key with
-      | Key.SigKey k ->
-          idx.sgn <- Signature.add_info idx.sgn k e replace
-      | Key.CallStmt _ -> raise CallStatement (* see add_info_call *)
-      | Key.SigCallKey (call, k) ->
-          idx.calls <- add_info_sig_call idx.calls call k e replace
-      | Key.VarDecl _ | Key.Stmt _ | Key.Label _ -> hfct idx.other key e
+    | Key.SigKey k ->
+      idx.sgn <- Signature.add_info idx.sgn k e replace
+    | Key.CallStmt _ -> raise CallStatement (* see add_info_call *)
+    | Key.SigCallKey (call, k) ->
+      idx.calls <- add_info_sig_call idx.calls call k e replace
+    | Key.VarDecl _ | Key.Stmt _ | Key.Label _ -> hfct idx.other key e
 
   let add idx key e = add_replace idx key e false
 
@@ -593,42 +593,42 @@ module FctIndex = struct
 
   let find_info idx key =
     match key with
-      | Key.SigKey k -> Signature.find_info idx.sgn k
-      | Key.CallStmt _ -> raise CallStatement (* see find_info_call *)
-      | Key.SigCallKey (call, k) -> find_info_sig_call idx call k
-      | Key.VarDecl _ | Key.Stmt _ | Key.Label _ ->
-          (try H.find idx.other key
-           with Not_found -> raise Not_found)
+    | Key.SigKey k -> Signature.find_info idx.sgn k
+    | Key.CallStmt _ -> raise CallStatement (* see find_info_call *)
+    | Key.SigCallKey (call, k) -> find_info_sig_call idx call k
+    | Key.VarDecl _ | Key.Stmt _ | Key.Label _ ->
+      (try H.find idx.other key
+       with Not_found -> raise Not_found)
 
   let find_all idx key =
     match key with
-      | Key.CallStmt call -> find_all_info_sig_call idx call
-      | _ -> let info = find_info idx key in [info]
+    | Key.CallStmt call -> find_all_info_sig_call idx call
+    | _ -> let info = find_info idx key in [info]
 
   let find_label idx lab =
     let collect k info res = match k with
-      | Key.Label (_,k_lab) -> 
-          if Cil_datatype.Label.equal k_lab lab then  info :: res else res
+      | Key.Label (_,k_lab) ->
+        if Cil_datatype.Label.equal k_lab lab then  info :: res else res
       | _ -> res
     in
     let infos = H.fold collect idx.other [] in
-      match infos with
-          info :: [] -> info | [] -> raise Not_found | _ -> assert false
+    match infos with
+      info :: [] -> info | [] -> raise Not_found | _ -> assert false
 
   let fold_calls f idx acc =
     let process acc (call, (_i, _sgn as i_sgn)) = f call i_sgn acc in
     List.fold_left process acc idx.calls
 
   let fold f idx acc =
-    let acc = Signature.fold 
-                (fun acc (k, info) -> f (Key.SigKey k) info acc) 
-                acc idx.sgn in
+    let acc = Signature.fold
+        (fun acc (k, info) -> f (Key.SigKey k) info acc)
+        acc idx.sgn in
     let acc = H.fold (fun k info acc -> f k info acc) idx.other acc in
-    List.fold_left 
-      (fun acc (call, (_, sgn)) -> 
-        Signature.fold (fun acc (k, info) -> 
-          f (Key.SigCallKey (call, k)) info acc) 
-          acc sgn) 
+    List.fold_left
+      (fun acc (call, (_, sgn)) ->
+         Signature.fold (fun acc (k, info) ->
+             f (Key.SigCallKey (call, k)) info acc)
+           acc sgn)
       acc idx.calls
 
 end

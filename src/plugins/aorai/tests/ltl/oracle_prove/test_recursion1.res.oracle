@@ -5,7 +5,6 @@
   parsing obsolete ACSL construct '\valid_range(addr,min,max)'. '\valid(addr+(min..max))' should be used instead.
 [kernel] tests/ltl/test_recursion1.c:54: Warning: 
   parsing obsolete ACSL construct '\valid_range(addr,min,max)'. '\valid(addr+(min..max))' should be used instead.
-[aorai] Welcome to the Aorai plugin
 [kernel] Parsing TMPDIR/aorai_test_recursion1_0.i (no preprocessing)
-[wp] Warning: No definition for 'string_len' interpreted as reads nothing
 [wp] Warning: Missing RTE guards
+[wp] Warning: No definition for 'string_len' interpreted as reads nothing

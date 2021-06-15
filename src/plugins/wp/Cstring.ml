@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -76,7 +76,7 @@ module LIT = WpContext.Generator(STR)
         define_lemma {
           l_name = prefix ^ "_literal" ;
           l_cluster = cluster () ;
-          l_kind = `Axiom ;
+          l_kind = Admit ;
           l_types = 0 ;
           l_forall = [] ;
           l_triggers = [] ;

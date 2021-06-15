@@ -60,7 +60,7 @@ int main(void)
     __gen_e_acsl_valid = __e_acsl_valid((void *)((char *)a + 4 * 0),
                                         (size_t)__gen_e_acsl_if,(void *)a,
                                         (void *)(& a));
-    __e_acsl_assert(__gen_e_acsl_valid,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_valid,1,"Assertion","main",
                     "\\valid(a + (0 .. 4))",
                     "tests/memory/ranges_in_builtins.c",19);
   }
@@ -76,7 +76,7 @@ int main(void)
     __gen_e_acsl_valid_2 = __e_acsl_valid((void *)((char *)a + 4 * 4),
                                           (size_t)__gen_e_acsl_if_2,
                                           (void *)a,(void *)(& a));
-    __e_acsl_assert(__gen_e_acsl_valid_2,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_valid_2,1,"Assertion","main",
                     "\\valid(a + (4 .. 7 + j))",
                     "tests/memory/ranges_in_builtins.c",21);
   }
@@ -91,7 +91,7 @@ int main(void)
     __gen_e_acsl_valid_3 = __e_acsl_valid((void *)((char *)a + 4 * 10),
                                           (size_t)__gen_e_acsl_if_3,
                                           (void *)a,(void *)(& a));
-    __e_acsl_assert(! __gen_e_acsl_valid_3,"Assertion","main",
+    __e_acsl_assert(! __gen_e_acsl_valid_3,1,"Assertion","main",
                     "!\\valid(a + (10 .. 11))",
                     "tests/memory/ranges_in_builtins.c",22);
   }
@@ -109,7 +109,7 @@ int main(void)
     __gen_e_acsl_valid_4 = __e_acsl_valid((void *)(b + 1 * 0),
                                           (size_t)__gen_e_acsl_if_4,
                                           (void *)b,(void *)(& b));
-    __e_acsl_assert(__gen_e_acsl_valid_4,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_valid_4,1,"Assertion","main",
                     "\\valid(b + (0 .. 9))",
                     "tests/memory/ranges_in_builtins.c",27);
   }
@@ -124,7 +124,7 @@ int main(void)
     __gen_e_acsl_valid_5 = __e_acsl_valid((void *)(b + 1 * 10),
                                           (size_t)__gen_e_acsl_if_5,
                                           (void *)b,(void *)(& b));
-    __e_acsl_assert(! __gen_e_acsl_valid_5,"Assertion","main",
+    __e_acsl_assert(! __gen_e_acsl_valid_5,1,"Assertion","main",
                     "!\\valid(b + (10 .. 15))",
                     "tests/memory/ranges_in_builtins.c",28);
   }
@@ -139,10 +139,10 @@ int main(void)
     __gen_e_acsl_size_6 = 8 * ((2 - 0) + 1);
     if (__gen_e_acsl_size_6 <= 0) __gen_e_acsl_if_6 = 0;
     else __gen_e_acsl_if_6 = __gen_e_acsl_size_6;
-    __gen_e_acsl_valid_6 = __e_acsl_valid((void *)((char *)(& t) + 8 * 0),
+    __gen_e_acsl_valid_6 = __e_acsl_valid((void *)((char *)(t) + 8 * 0),
                                           (size_t)__gen_e_acsl_if_6,
-                                          (void *)(& t),(void *)0);
-    __e_acsl_assert(__gen_e_acsl_valid_6,"Assertion","main",
+                                          (void *)(t),(void *)0);
+    __e_acsl_assert(__gen_e_acsl_valid_6,1,"Assertion","main",
                     "\\valid(&t[0 .. 2])",
                     "tests/memory/ranges_in_builtins.c",31);
   }
@@ -154,10 +154,10 @@ int main(void)
     __gen_e_acsl_size_7 = 8 * ((5 - 3) + 1);
     if (__gen_e_acsl_size_7 <= 0) __gen_e_acsl_if_7 = 0;
     else __gen_e_acsl_if_7 = __gen_e_acsl_size_7;
-    __gen_e_acsl_valid_7 = __e_acsl_valid((void *)((char *)(& t) + 8 * 3),
+    __gen_e_acsl_valid_7 = __e_acsl_valid((void *)((char *)(t) + 8 * 3),
                                           (size_t)__gen_e_acsl_if_7,
-                                          (void *)(& t),(void *)0);
-    __e_acsl_assert(! __gen_e_acsl_valid_7,"Assertion","main",
+                                          (void *)(t),(void *)0);
+    __e_acsl_assert(! __gen_e_acsl_valid_7,1,"Assertion","main",
                     "!\\valid(&t[3 .. 5])",
                     "tests/memory/ranges_in_builtins.c",32);
   }
@@ -174,10 +174,10 @@ int main(void)
     __gen_e_acsl_size_8 = 8 * ((1 - 0) + 1);
     if (__gen_e_acsl_size_8 <= 0) __gen_e_acsl_if_8 = 0;
     else __gen_e_acsl_if_8 = __gen_e_acsl_size_8;
-    __gen_e_acsl_initialized = __e_acsl_initialized((void *)((char *)(& t2) + 
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)((char *)(t2) + 
                                                              8 * 0),
                                                     (size_t)__gen_e_acsl_if_8);
-    __e_acsl_assert(__gen_e_acsl_initialized,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_initialized,1,"Assertion","main",
                     "\\initialized(&t2[0 .. 1])",
                     "tests/memory/ranges_in_builtins.c",38);
   }
@@ -189,10 +189,10 @@ int main(void)
     __gen_e_acsl_size_9 = 8 * ((3 - 2) + 1);
     if (__gen_e_acsl_size_9 <= 0) __gen_e_acsl_if_9 = 0;
     else __gen_e_acsl_if_9 = __gen_e_acsl_size_9;
-    __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)((char *)(& t2) + 
+    __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)((char *)(t2) + 
                                                                8 * 2),
                                                       (size_t)__gen_e_acsl_if_9);
-    __e_acsl_assert(! __gen_e_acsl_initialized_2,"Assertion","main",
+    __e_acsl_assert(! __gen_e_acsl_initialized_2,1,"Assertion","main",
                     "!\\initialized(&t2[2 .. 3])",
                     "tests/memory/ranges_in_builtins.c",39);
   }
@@ -206,7 +206,7 @@ int main(void)
     else __gen_e_acsl_if_10 = __gen_e_acsl_size_10;
     __gen_e_acsl_initialized_3 = __e_acsl_initialized((void *)(b + 1 * 0),
                                                       (size_t)__gen_e_acsl_if_10);
-    __e_acsl_assert(! __gen_e_acsl_initialized_3,"Assertion","main",
+    __e_acsl_assert(! __gen_e_acsl_initialized_3,1,"Assertion","main",
                     "!\\initialized(b + (0 .. 9))",
                     "tests/memory/ranges_in_builtins.c",41);
   }
@@ -249,7 +249,7 @@ int main(void)
       __gen_e_acsl_range_2 ++;
     }
     e_acsl_end_loop2: ;
-    __e_acsl_assert(! __gen_e_acsl_forall,"Assertion","main",
+    __e_acsl_assert(! __gen_e_acsl_forall,1,"Assertion","main",
                     "!\\initialized(&t3[n - 1 .. n + 2][1][0 .. 1])",
                     "tests/memory/ranges_in_builtins.c",46);
   }
@@ -264,9 +264,9 @@ int main(void)
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)((char *)(& t3[6][1][0]) + 
                                                            4 * 2),
                                                   (size_t)__gen_e_acsl_if_11,
-                                                  (void *)(& t3[6][1][0]),
+                                                  (void *)(& t3[0][0][0]),
                                                   (void *)0);
-    __e_acsl_assert(! __gen_e_acsl_valid_read,"Assertion","main",
+    __e_acsl_assert(! __gen_e_acsl_valid_read,1,"Assertion","main",
                     "!\\valid_read(&t3[6][1][0] + (2 .. 10))",
                     "tests/memory/ranges_in_builtins.c",48);
   }
@@ -282,7 +282,7 @@ int main(void)
         int __gen_e_acsl_valid_read_2;
         __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(& t3[__gen_e_acsl_range_3][1]),
                                                         sizeof(float [4]),
-                                                        (void *)(& t3[__gen_e_acsl_range_3][1]),
+                                                        (void *)(& t3[0][0]),
                                                         (void *)0);
         if (__gen_e_acsl_valid_read_2) ;
         else {
@@ -293,7 +293,7 @@ int main(void)
       __gen_e_acsl_range_3 ++;
     }
     e_acsl_end_loop3: ;
-    __e_acsl_assert(__gen_e_acsl_forall_3,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_forall_3,1,"Assertion","main",
                     "\\valid_read(&t3[n - 1 .. n + 2][1])",
                     "tests/memory/ranges_in_builtins.c",49);
   }
@@ -311,7 +311,7 @@ int main(void)
         int __gen_e_acsl_valid_8;
         __gen_e_acsl_valid_8 = __e_acsl_valid((void *)(& t4[4][__gen_e_acsl_range_4][2]),
                                               sizeof(int),
-                                              (void *)(& t4[4][__gen_e_acsl_range_4][2]),
+                                              (void *)(& t4[0][0][0]),
                                               (void *)0);
         if (__gen_e_acsl_valid_8) ;
         else {
@@ -322,7 +322,7 @@ int main(void)
       __gen_e_acsl_range_4 ++;
     }
     e_acsl_end_loop4: ;
-    __e_acsl_assert(__gen_e_acsl_forall_4,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_forall_4,1,"Assertion","main",
                     "\\let x = 5; \\valid(&t4[4][0 .. x][2])",
                     "tests/memory/ranges_in_builtins.c",52);
   }
@@ -341,7 +341,7 @@ int main(void)
     __gen_e_acsl_initialized_5 = __e_acsl_initialized((void *)((char *)(& s.a[0]) + 
                                                                4 * 1),
                                                       (size_t)__gen_e_acsl_if_12);
-    __e_acsl_assert(__gen_e_acsl_initialized_5,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_initialized_5,1,"Assertion","main",
                     "\\initialized(&s.a[0] + (1 .. 1))",
                     "tests/memory/ranges_in_builtins.c",56);
   }
@@ -357,7 +357,7 @@ int main(void)
     __gen_e_acsl_initialized_6 = __e_acsl_initialized((void *)((char *)s.b + 
                                                                4 * 0),
                                                       (size_t)__gen_e_acsl_if_13);
-    __e_acsl_assert(! __gen_e_acsl_initialized_6,"Assertion","main",
+    __e_acsl_assert(! __gen_e_acsl_initialized_6,1,"Assertion","main",
                     "!\\initialized(s.b + (0 .. 1))",
                     "tests/memory/ranges_in_builtins.c",57);
   }
@@ -382,7 +382,7 @@ int main(void)
                                                     sizeof(int *),
                                                     (void *)multi_dynamic,
                                                     (void *)(& multi_dynamic));
-    __e_acsl_assert(__gen_e_acsl_valid_read_3,"RTE","main",
+    __e_acsl_assert(__gen_e_acsl_valid_read_3,1,"RTE","main",
                     "mem_access: \\valid_read(multi_dynamic + 4)",
                     "tests/memory/ranges_in_builtins.c",66);
     __gen_e_acsl_size_14 = 4 * ((7 - 1) + 1);
@@ -393,7 +393,7 @@ int main(void)
                                           (size_t)__gen_e_acsl_if_14,
                                           (void *)*(multi_dynamic + 4),
                                           (void *)(multi_dynamic + 4));
-    __e_acsl_assert(__gen_e_acsl_valid_9,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_valid_9,1,"Assertion","main",
                     "\\valid(*(multi_dynamic + 4) + (1 .. 7))",
                     "tests/memory/ranges_in_builtins.c",66);
   }
@@ -409,7 +409,26 @@ int main(void)
   __e_acsl_store_block((void *)(& c),(size_t)1);
   __e_acsl_full_init((void *)(& c));
   __gen_e_acsl_f(& c,(long)5);
+  char t5[4] = {(char)'a', (char)'b', (char)'c', (char)'d'};
+  __e_acsl_store_block((void *)(t5),(size_t)4);
+  __e_acsl_full_init((void *)(& t5));
+  {
+    int __gen_e_acsl_size_15;
+    int __gen_e_acsl_if_15;
+    int __gen_e_acsl_valid_10;
+    __gen_e_acsl_size_15 = 1 * ((3 - 2) + 1);
+    if (__gen_e_acsl_size_15 <= 0) __gen_e_acsl_if_15 = 0;
+    else __gen_e_acsl_if_15 = __gen_e_acsl_size_15;
+    __gen_e_acsl_valid_10 = __e_acsl_valid((void *)(t5 + 1 * 2),
+                                           (size_t)__gen_e_acsl_if_15,
+                                           (void *)(t5),(void *)0);
+    __e_acsl_assert(__gen_e_acsl_valid_10,1,"Assertion","main",
+                    "\\valid(&t5[2 .. 3])",
+                    "tests/memory/ranges_in_builtins.c",78);
+  }
+  /*@ assert \valid(&t5[2 .. 3]); */ ;
   __retres = 0;
+  __e_acsl_delete_block((void *)(t5));
   __e_acsl_delete_block((void *)(& c));
   __e_acsl_delete_block((void *)(& multi_dynamic));
   __e_acsl_delete_block((void *)(& s));
@@ -489,14 +508,14 @@ void __gen_e_acsl_g(long *ptr, size_t size)
                     (__e_acsl_mpz_struct const *)(__gen_e_acsl_mul));
     __gen_e_acsl_le_3 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_size_3),
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
-    __e_acsl_assert(__gen_e_acsl_le_2 <= 0,"RTE","g",
+    __e_acsl_assert(__gen_e_acsl_le_2 <= 0,1,"RTE","g",
                     "\\valid(ptr + (0 .. size - 1))",
                     "tests/memory/ranges_in_builtins.c",7);
     __gen_e_acsl_size_4 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_if));
     __gen_e_acsl_valid = __e_acsl_valid((void *)((char *)ptr + 8 * 0),
                                         __gen_e_acsl_size_4,(void *)ptr,
                                         (void *)(& ptr));
-    __e_acsl_assert(__gen_e_acsl_valid,"Precondition","g",
+    __e_acsl_assert(__gen_e_acsl_valid,1,"Precondition","g",
                     "\\valid(ptr + (0 .. size - 1))",
                     "tests/memory/ranges_in_builtins.c",7);
     __gmpz_clear(__gen_e_acsl_size);
@@ -584,7 +603,7 @@ void __gen_e_acsl_g(long *ptr, size_t size)
                     (__e_acsl_mpz_struct const *)(__gen_e_acsl_mul_2));
     __gen_e_acsl_le_6 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_size_7),
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__7));
-    __e_acsl_assert(__gen_e_acsl_le_5 <= 0,"RTE","g",
+    __e_acsl_assert(__gen_e_acsl_le_5 <= 0,1,"RTE","g",
                     "\\valid(\\old(ptr) + (0 .. \\old(size) + 1))",
                     "tests/memory/ranges_in_builtins.c",8);
     __gen_e_acsl_size_9 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_if_2));
@@ -593,7 +612,7 @@ void __gen_e_acsl_g(long *ptr, size_t size)
                                           __gen_e_acsl_size_9,
                                           (void *)__gen_e_acsl_at,
                                           (void *)(& __gen_e_acsl_at));
-    __e_acsl_assert(! __gen_e_acsl_valid_2,"Postcondition","g",
+    __e_acsl_assert(! __gen_e_acsl_valid_2,1,"Postcondition","g",
                     "!\\valid(\\old(ptr) + (0 .. \\old(size) + 1))",
                     "tests/memory/ranges_in_builtins.c",8);
     __e_acsl_delete_block((void *)(& ptr));
@@ -679,14 +698,14 @@ void __gen_e_acsl_f(char *s, long n)
                     (__e_acsl_mpz_struct const *)(__gen_e_acsl_mul));
     __gen_e_acsl_le_3 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_size_2),
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__4));
-    __e_acsl_assert(__gen_e_acsl_le_2 <= 0,"RTE","f",
+    __e_acsl_assert(__gen_e_acsl_le_2 <= 0,1,"RTE","f",
                     "\\valid(s + (3 .. n + 1000))",
                     "tests/memory/ranges_in_builtins.c",5);
     __gen_e_acsl_size_3 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_if));
     __gen_e_acsl_valid = __e_acsl_valid((void *)(s + 1 * 3),
                                         __gen_e_acsl_size_3,(void *)s,
                                         (void *)(& s));
-    __e_acsl_assert(! __gen_e_acsl_valid,"Precondition","f",
+    __e_acsl_assert(! __gen_e_acsl_valid,1,"Precondition","f",
                     "!\\valid(s + (3 .. n + 1000))",
                     "tests/memory/ranges_in_builtins.c",5);
     __gmpz_clear(__gen_e_acsl_size);

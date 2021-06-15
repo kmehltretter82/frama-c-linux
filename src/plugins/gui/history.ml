@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -37,17 +37,17 @@ module HistoryElt = struct
         let equal e1 e2 = match e1, e2 with
           | Global g1, Global g2 -> Cil_datatype.Global.equal g1 g2
           | Localizable l1, Localizable l2 ->
-              Printer_tag.Localizable.equal l1 l2
+            Printer_tag.Localizable.equal l1 l2
           | (Global _ | Localizable _), __ -> false
       end)
   (* Identify two elements that belong to the same function *)
   let in_same_fun e1 e2 =
     let f = function
       | Global (GFunDecl (_, vi, _) | GFun ({svar = vi}, _)) ->
-          (try Some (Globals.Functions.get vi)
-           with Not_found -> None)
+        (try Some (Globals.Functions.get vi)
+         with Not_found -> None)
       | Localizable l ->
-          Pretty_source.kf_of_localizable l
+        Pretty_source.kf_of_localizable l
       | _ -> None
     in
     match f e1 with
@@ -104,21 +104,21 @@ let set_display_elt_callback f = display_elt := f
 
 let show_current () =
   let h = CurrentHistory.get () in
-  Extlib.may !display_elt h.current;
+  Option.iter !display_elt h.current;
   CurrentHistory.set h
 
 let back () =
   let h = CurrentHistory.get () in
   match h.current, h.back with
   | Some cur, prev :: prevs ->
-      let h' = {back = prevs; current = Some prev; forward= cur::h.forward} in
-      !display_elt prev;
-      CurrentHistory.set h'
+    let h' = {back = prevs; current = Some prev; forward= cur::h.forward} in
+    !display_elt prev;
+    CurrentHistory.set h'
 
   | None, prev :: prevs ->
-      let h' = { back = prevs; current = Some prev ; forward = h.forward } in
-      !display_elt prev;
-      CurrentHistory.set h'
+    let h' = { back = prevs; current = Some prev ; forward = h.forward } in
+    !display_elt prev;
+    CurrentHistory.set h'
 
   | _, [] -> ()
 
@@ -126,14 +126,14 @@ let forward () =
   let h = CurrentHistory.get () in
   match h.current, h.forward with
   | Some cur, next :: nexts ->
-      let h' = { back = cur::h.back; current = Some next; forward = nexts} in
-      !display_elt next;
-      CurrentHistory.set h'
+    let h' = { back = cur::h.back; current = Some next; forward = nexts} in
+    !display_elt next;
+    CurrentHistory.set h'
 
   | None, next :: nexts ->
-      let h' = { back = h.back; current = Some next; forward = nexts } in
-      !display_elt next;
-      CurrentHistory.set h'
+    let h' = { back = h.back; current = Some next; forward = nexts } in
+    !display_elt next;
+    CurrentHistory.set h'
 
   | _, [] -> ()
 
@@ -148,12 +148,12 @@ let push cur =
   let h' = match h.current with
     | None -> { back = h.back; current = Some cur; forward = [] }
     | Some prev ->
-        if HistoryElt.equal cur prev
-        then h
-        else if HistoryElt.in_same_fun cur prev then
-          { h with current = Some cur }
-        else
-          { back = prev :: h.back; current = Some cur; forward = [] }
+      if HistoryElt.equal cur prev
+      then h
+      else if HistoryElt.in_same_fun cur prev then
+        { h with current = Some cur }
+      else
+        { back = prev :: h.back; current = Some cur; forward = [] }
   in
   CurrentHistory.set h'
 
@@ -224,13 +224,13 @@ let translate_history_elt old_helt =
          GAnnot(Dtype(               {lt_name = new_name},_)  ,        new_loc))
       | (GAnnot(Daxiomatic(          old_name,_,_,_),                  old_loc),
          GAnnot(Daxiomatic(          new_name,_,_,_),                  new_loc))
-      | (GAnnot(Dlemma(              old_name,_,_,_,_,_,_),            old_loc),
-         GAnnot(Dlemma(              new_name,_,_,_,_,_,_),            new_loc))
+      | (GAnnot(Dlemma(              old_name,_,_,_,_,_),              old_loc),
+         GAnnot(Dlemma(              new_name,_,_,_,_,_),              new_loc))
       | (GAnnot(Dfun_or_pred({l_var_info= {lv_name=old_name}},_),      old_loc),
          GAnnot(Dfun_or_pred({l_var_info= {lv_name=new_name}},_),      new_loc))
 
         when test_name_file old_name new_name old_loc new_loc ->
-          raise (Found_global new_g)
+        raise (Found_global new_g)
 
       | GAsm _, GAsm _
       | GText _, GText _
@@ -250,7 +250,7 @@ let translate_history_elt old_helt =
   in
   let open Pretty_source in
   let open Cil_datatype in
-  let global_Global g = Extlib.opt_map (fun x -> Global x) (global g) in
+  let global_Global g = Option.map (fun x -> Global x) (global g) in
   match old_helt with
   | Global old_g -> global_Global old_g
   | Localizable (PGlobal old_g) -> global_Global old_g
@@ -258,39 +258,39 @@ let translate_history_elt old_helt =
   | Localizable ( PStmt(kf,_) | PStmtStart(kf,_) |
                   PLval(Some kf,_,_) | PExp(Some kf,_,_)
                 | PTermLval(Some kf,_,_,_) as loc) ->
-      begin match global (kf_to_global kf) with
-        | None ->
-            (** The kernel function can't be found nothing to say *)
-            None
-        | Some g ->
-            (** Try to stay at the same offset in the function *)
-            let old_kf_loc = fst (Kernel_function.get_location kf) in
-            let old_loc = match ki_of_localizable loc with
-              | Kstmt s -> fst (Stmt.loc s)
-              | Kglobal -> (* fallback *) old_kf_loc
-            in
-            let offset = old_loc.Filepath.pos_lnum - old_kf_loc.Filepath.pos_lnum in
-            let new_kf_loc = fst (Global.loc g) in
-            let new_loc = {new_kf_loc with
-                           Filepath.pos_lnum = new_kf_loc.Filepath.pos_lnum + offset;
-                           Filepath.pos_cnum = old_loc.Filepath.pos_cnum;
-                          }
-            in
-            match Pretty_source.loc_to_localizable new_loc with
-            | None -> (** the line is unknown *)
-                Some (Global g)
-            | Some locali ->
-                begin match kf_of_localizable locali with
-                  | None -> (** not in a kf so return the start of the function *)
-                      Some (Global g)
-                  | Some kf when not (Global.equal (kf_to_global kf) g) ->
-                      (** Fall in the wrong global, so return the start of the function *)
-                      Some (Global g)
-                  | _ ->
-                      (** Fall in the correct global *)
-                      Some (Localizable locali)
-                end
-      end
+    begin match global (kf_to_global kf) with
+      | None ->
+        (** The kernel function can't be found nothing to say *)
+        None
+      | Some g ->
+        (** Try to stay at the same offset in the function *)
+        let old_kf_loc = fst (Kernel_function.get_location kf) in
+        let old_loc = match ki_of_localizable loc with
+          | Kstmt s -> fst (Stmt.loc s)
+          | Kglobal -> (* fallback *) old_kf_loc
+        in
+        let offset = old_loc.Filepath.pos_lnum - old_kf_loc.Filepath.pos_lnum in
+        let new_kf_loc = fst (Global.loc g) in
+        let new_loc = {new_kf_loc with
+                       Filepath.pos_lnum = new_kf_loc.Filepath.pos_lnum + offset;
+                       Filepath.pos_cnum = old_loc.Filepath.pos_cnum;
+                      }
+        in
+        match Pretty_source.loc_to_localizable new_loc with
+        | None -> (** the line is unknown *)
+          Some (Global g)
+        | Some locali ->
+          begin match kf_of_localizable locali with
+            | None -> (** not in a kf so return the start of the function *)
+              Some (Global g)
+            | Some kf when not (Global.equal (kf_to_global kf) g) ->
+              (** Fall in the wrong global, so return the start of the function *)
+              Some (Global g)
+            | _ ->
+              (** Fall in the correct global *)
+              Some (Localizable locali)
+          end
+    end
   | Localizable (PLval(None,_,_) | PExp(None,_,_) | PTermLval(None,_,_,_)
                 | PVDecl(None,_,_)) -> (** no names useful? *) None
   | Localizable (PIP _ ) -> (** no names available *) None

@@ -25,7 +25,7 @@ int main(void)
         __gen_e_acsl_and = __gen_e_acsl_valid;
       }
       else __gen_e_acsl_and = 0;
-      __e_acsl_assert(__gen_e_acsl_and,"Assertion","main","\\valid(p)",
+      __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","main","\\valid(p)",
                       "tests/bts/bts1740.i",11);
     }
     /*@ assert \valid(p); */ ;
@@ -48,7 +48,7 @@ int main(void)
       __gen_e_acsl_and_2 = __gen_e_acsl_valid_2;
     }
     else __gen_e_acsl_and_2 = 0;
-    __e_acsl_assert(! __gen_e_acsl_and_2,"Assertion","main","!\\valid(p)",
+    __e_acsl_assert(! __gen_e_acsl_and_2,1,"Assertion","main","!\\valid(p)",
                     "tests/bts/bts1740.i",16);
   }
   __retres = 0;

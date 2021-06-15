@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -107,20 +107,30 @@ module Functions: sig
 
   val mem_name: string -> bool
   (** @return [true] iff there is a function with such a name
-      @since Frama-C+dev *)
+      @since 22.0-Titanium *)
 
   val mem_def_name: string -> bool
   (** @return [true] iff there is a function definition with such a name
-      @since Frama-C+dev *)
+      @since 22.0-Titanium *)
 
   val mem_decl_name: string -> bool
   (** @return [true] iff there is a function declaration with such a name
-      @since Frama-C+dev *)
+      @since 22.0-Titanium *)
 
   (** {2 Searching} *)
 
   val find_by_name : string -> kernel_function
   (** @raise Not_found if there is no function of this name. *)
+
+  val find_all_by_orig_name : ?cmp:(kernel_function -> kernel_function -> int) ->
+    string -> kernel_function list
+  (**
+     [find_all_by_orig_name ?cmp name] returns the list of functions whose original
+     name is [name], sorted according to [cmp]. If [cmp] is [None],
+     the resulting order is unspecified.
+
+     @since 23.0-Vanadium
+  *)
 
   val find_def_by_name : string -> kernel_function
   (** @raise Not_found if there is no function definition of this name. *)
@@ -236,7 +246,7 @@ module Types : sig
   val mem_enum_tag: string -> bool
   (** @return [true] iff there is an enum constant with the given name in the
       AST.
-      @since Frama-C+dev *)
+      @since 22.0-Titanium *)
 
   val find_enum_tag: string -> exp * typ
   (** Find an enum constant from its name in the AST.
@@ -245,7 +255,7 @@ module Types : sig
   val mem_type: Logic_typing.type_namespace -> string -> bool
   (** @return [true] iff there is a type with the given name in the given
       namespace in the AST.
-      @since Frama-C+dev *)
+      @since 22.0-Titanium *)
 
   val find_type: Logic_typing.type_namespace -> string -> typ
   (** Find a type from its name in the AST.

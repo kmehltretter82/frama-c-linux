@@ -1,7 +1,7 @@
 /* run.config
+PLUGIN: eva,scope
     STDOPT: +"-eva -eva-verbose 2"
 */
-
 //@ logic integer foo(int x) = x + 2 ;
 
 int main() {

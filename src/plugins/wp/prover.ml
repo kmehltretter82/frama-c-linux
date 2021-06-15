@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -121,7 +121,15 @@ let spawn wpo ~delayed
             prover , task
          ) provers)
   else
-    let process = simplify ?start ?result wpo in
+    let process = simplify ?start ?result wpo >>= fun ok ->
+      begin
+        match success with
+        | None -> ()
+        | Some on_success ->
+            on_success wpo (if ok then Some VCS.Qed else None) ;
+      end ;
+      Task.return ()
+    in
     let thread = Task.thread process in
     let server = ProverTask.server () in
     Task.spawn server ?pool thread

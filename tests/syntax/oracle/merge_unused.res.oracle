@@ -13,7 +13,7 @@
      int i ;
   };
   
-  First declaration was at tests/syntax/merge_unused.c:11
+  First declaration was at tests/syntax/merge_unused.c:12
   Current declaration is at tests/syntax/merge_unused.h:7
   Current declaration is unused, silently removing it
 [kernel] User Error: Incompatible declaration for G3:

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -37,7 +37,7 @@ val is_top: t -> bool
 
 val inject: Integer.t -> t
 val project: t -> Integer.t
-  (** @raise Error_Top if the argument is {!Top}. *)
+(** @raise Error_Top if the argument is {!Top}. *)
 
 val cardinal_zero_or_one: t -> bool
 

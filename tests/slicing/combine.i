@@ -1,7 +1,7 @@
 /* run.config
-   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-   CMD: @frama-c@ -load-module tests/slicing/libSelect.cmxs -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs
-   OPT: @EVA_OPTIONS@ -deps -journal-disable
+ PLUGIN: @PTEST_PLUGIN@ constant_propagation sparecode
+ MODULE: libSelect @PTEST_NAME@
+   OPT: @EVA_OPTIONS@ -deps
 */
 
 //@ assigns \result \from x;

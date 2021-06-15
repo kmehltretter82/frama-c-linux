@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -24,11 +24,6 @@ open Cil_types
 
 (** {2 Callstacks related types and functions} *)
 
-(** A call_stack is a list, telling which function was called at which
-    site. The head of the list tells about the latest call. *)
-type call_site = (kernel_function * kinstr)
-type callstack = call_site list
-
 (** Functions dealing with call stacks. *)
 val clear_call_stack : unit -> unit
 val pop_call_stack : unit -> unit
@@ -36,7 +31,7 @@ val push_call_stack : kernel_function -> kinstr -> unit
 
 (** The current function is the one on top of the call stack. *)
 val current_kf : unit -> kernel_function
-val call_stack : unit -> callstack
+val call_stack : unit -> Value_types.callstack
 
 (** Prints the current callstack. *)
 val pp_callstack : Format.formatter -> unit
@@ -48,7 +43,7 @@ val emitter : Emitter.t
 val get_slevel : Kernel_function.t -> Value_parameters.SlevelFunction.value
 val get_subdivision: stmt -> int
 val pretty_actuals :
-  Format.formatter -> (Cil_types.exp * Cvalue.V.t * 'b) list -> unit
+  Format.formatter -> (Cil_types.exp * Cvalue.V.t) list -> unit
 val pretty_current_cfunction_name : Format.formatter -> unit
 val warning_once_current : ('a, Format.formatter, unit) format -> 'a
 

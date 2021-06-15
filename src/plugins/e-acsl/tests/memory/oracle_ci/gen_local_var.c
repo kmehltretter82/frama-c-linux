@@ -25,7 +25,7 @@ struct list *add(struct list *l, int i)
       __gen_e_acsl_and = __gen_e_acsl_valid;
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,"Assertion","add","\\valid(new)",
+    __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","add","\\valid(new)",
                     "tests/memory/local_var.c",15);
   }
   /*@ assert \valid(new); */ ;

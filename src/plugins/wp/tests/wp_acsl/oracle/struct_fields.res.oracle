@@ -4,9 +4,9 @@
 [rte] annotating function foo
 [wp] 2 goals scheduled
 ---------------------------------------------
---- Context 'typed_foo' Cluster 'Chunk' 
+--- Context 'typed_foo' Cluster 'Init_S1_X' 
 ---------------------------------------------
-theory Chunk
+theory Init_S1_X
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool *)
@@ -21,18 +21,8 @@ theory Chunk
   
   (* use map.Map *)
   
-  (* use frama_c_wp.memory.Memory *)
-  
-  (* use frama_c_wp.cint.Cint *)
-  
-  predicate is_sint8_chunk (m:addr -> int) =
-    forall a:addr. is_sint8 (get m a)
-  
-  predicate is_sint16_chunk (m:addr -> int) =
-    forall a:addr. is_sint16 (get m a)
-  
-  predicate is_sint32_chunk (m:addr -> int) =
-    forall a:addr. is_sint32 (get m a)
+  type Init_S1_X =
+    | Init_S1_X1 (Init_F1_X_a:bool) (Init_F1_X_b:bool) (Init_F1_X_c:bool)
 end
 ---------------------------------------------
 --- Context 'typed_foo' Cluster 'S1_X' 
@@ -92,6 +82,12 @@ theory Compound
     addr -> int) : S1_X =
     S1_X1 (get mchar (shiftfield_F1_X_a p)) (get mint (shiftfield_F1_X_b p))
     (get mint1 (shiftfield_F1_X_c p))
+  
+  (* use Init_S1_X *)
+  
+  function Load_Init_S1_X (p:addr) (init:addr -> bool) : Init_S1_X =
+    Init_S1_X1 (get init (shiftfield_F1_X_a p))
+    (get init (shiftfield_F1_X_b p)) (get init (shiftfield_F1_X_c p))
   
   Q_Load_S1_X_update_Mchar0 :
     forall mchar:addr -> int, mint:addr -> int, mint1:addr -> int, p:addr, q:
@@ -161,6 +157,56 @@ theory Compound
      separated p 3 q n ->
      Load_S1_X p mchar mint (havoc mint2 mint1 q n)
      = Load_S1_X p mchar mint mint1
+  
+  Q_Load_Init_S1_X_update_Init0 :
+    forall init:addr -> bool, p:addr, q:addr, v:bool
+     [Load_Init_S1_X p (set init q v)].
+     separated p 3 q 1 ->
+     Load_Init_S1_X p (set init q v) = Load_Init_S1_X p init
+  
+  Q_Load_Init_S1_X_eqmem_Init0 :
+    forall init:addr -> bool, init1:addr -> bool, n:int, p:addr, q:addr
+     [Load_Init_S1_X p init, eqmem init init1 q n| Load_Init_S1_X p init1,
+     eqmem init init1 q n].
+     included p 3 q n ->
+     eqmem init init1 q n -> Load_Init_S1_X p init1 = Load_Init_S1_X p init
+  
+  Q_Load_Init_S1_X_havoc_Init0 :
+    forall init:addr -> bool, init1:addr -> bool, n:int, p:addr, q:addr
+     [Load_Init_S1_X p (havoc init1 init q n)].
+     separated p 3 q n ->
+     Load_Init_S1_X p (havoc init1 init q n) = Load_Init_S1_X p init
+end
+---------------------------------------------
+--- Context 'typed_foo' Cluster 'Chunk' 
+---------------------------------------------
+theory Chunk
+  (* use why3.BuiltIn.BuiltIn *)
+  
+  (* use bool.Bool *)
+  
+  (* use int.Int *)
+  
+  (* use int.ComputerDivision *)
+  
+  (* use real.RealInfix *)
+  
+  (* use frama_c_wp.qed.Qed *)
+  
+  (* use map.Map *)
+  
+  (* use frama_c_wp.memory.Memory *)
+  
+  (* use frama_c_wp.cint.Cint *)
+  
+  predicate is_sint8_chunk (m:addr -> int) =
+    forall a:addr. is_sint8 (get m a)
+  
+  predicate is_sint16_chunk (m:addr -> int) =
+    forall a:addr. is_sint16 (get m a)
+  
+  predicate is_sint32_chunk (m:addr -> int) =
+    forall a:addr. is_sint32 (get m a)
 end
 [wp:print-generated] 
   theory WP
@@ -180,15 +226,16 @@ end
     
     (* use frama_c_wp.memory.Memory *)
     
-    (* use Chunk *)
-    
-    (* use S1_X *)
+    (* use Init_S1_X *)
     
     (* use Compound *)
     
+    (* use Chunk *)
+    
     goal wp_goal :
-      forall t:addr -> bool, t1:int -> int, t2:addr -> int, t3:addr -> int, t4:
-       addr -> int, a:addr.
+      forall t:addr -> bool, x:Init_S1_X, t1:int -> int, t2:addr -> int, t3:
+       addr -> int, t4:addr -> int, a:addr.
+       Load_Init_S1_X a t = x ->
        region (base a) <= 0 ->
        is_sint16_chunk t3 ->
        is_sint32_chunk t4 ->
@@ -251,9 +298,6 @@ Assume {
       is_sint8_chunk(Mchar_0).
   Type: IsS1_X(r) /\ is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
       is_sint8_chunk(Mchar_0).
-  (* Block In *)
-  Have: ({ Init_F1_X_a = false ; Init_F1_X_b = false ; Init_F1_X_c = false }) =
-      Init_r_0.
 }
 Prove: valid_rd(Malloc_0, p, 3).
 
@@ -273,11 +317,10 @@ Assume {
       is_sint8_chunk(Mchar_0).
   Type: IsS1_X(r) /\ is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
       is_sint8_chunk(Mchar_0).
-  (* Block In *)
-  Have: ({ Init_F1_X_a = false ; Init_F1_X_b = false ; Init_F1_X_c = false }) =
-      Init_r_0.
   (* Assertion 'rte,mem_access' *)
   Have: valid_rd(Malloc_0, p, 3).
+  (* Initializer *)
+  Init: Load_Init_S1_X(p, Init_0) = Init_r_0.
   (* Initializer *)
   Init: a = r.
 }

@@ -10,7 +10,7 @@
   no \from part for clause 'assigns five_times;'
 [eva:alarm] tests/spec/statement_behavior.c:17: Warning: 
   assertion got status unknown.
-[eva:alarm] tests/spec/statement_behavior.c:4: Warning: 
+[eva:alarm] tests/spec/statement_behavior.c:5: Warning: 
   function pfsqopfc: postcondition got status unknown.
 [eva:alarm] tests/spec/statement_behavior.c:18: Warning: 
   accessing uninitialized left-value. assert \initialized(&five_times);

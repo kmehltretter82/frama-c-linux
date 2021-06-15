@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -177,3 +177,8 @@ sig
 end
 
 module HE (I : sig type t end) : HEsig with type ti = I.t
+
+module Dump :
+sig
+  val process: unit -> unit
+end

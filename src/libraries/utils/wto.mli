@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -32,10 +32,10 @@
     by a list of components topologically ordered. *)
 type 'n component =
   | Component of 'n * 'n partition
-    (** A strongly connected component, described by its head node and the
-        remaining sub-components topologically ordered *)
+  (** A strongly connected component, described by its head node and the
+      remaining sub-components topologically ordered *)
   | Node of 'n
-    (** A single node without self loop *)
+  (** A single node without self loop *)
 
 (** A list of strongly connected components, sorted topologically *)
 and 'n partition = 'n component list
@@ -53,11 +53,14 @@ module Make(Node:sig
   end):sig
 
   type pref = Node.t -> Node.t -> int
-  (** partial order of preference for the choice of the head of a loop *)
+  (** Partial order of preference for the choice of the head of a loop.
+      [pref current_head new_candidate] must return < 0 if [new_candidate]
+      is preferred to [current_head].
+      Use "(fun _ _ -> 0)" for no specific preference. *)
 
   (** Implements Bourdoncle "Efficient chaotic iteration strategies with
-  widenings" algorithm to compute a WTO. *)
-  val partition: ?pref:pref -> init:Node.t -> succs:(Node.t -> Node.t list) -> Node.t partition
+      widenings" algorithm to compute a WTO. *)
+  val partition: pref:pref -> init:Node.t -> succs:(Node.t -> Node.t list) -> Node.t partition
 
   val pretty_partition: Format.formatter -> Node.t partition -> unit
   val pretty_component: Format.formatter -> Node.t component -> unit

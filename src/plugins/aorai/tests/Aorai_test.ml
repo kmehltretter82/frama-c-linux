@@ -71,11 +71,17 @@ let extend () =
           wp_compute_kf kf
       in
       run f;
+      let tmpdir = Filename.get_temp_dir_name () in
+      let tmpdir =
+        match Filename.chop_suffix_opt ~suffix:"/" tmpdir with
+        | None -> tmpdir
+        | Some dir -> dir
+      in
       let tmpfile =
-        Filename.get_temp_dir_name () ^ "/aorai_" ^
-        (Filename.chop_extension
-           (Filename.basename (List.hd (Kernel.Files.get()):>string))) ^ "_" ^
-        (string_of_int (TestNumber.get ())) ^ ".i"
+        tmpdir ^ "/aorai_" ^
+        Filename.(
+          chop_extension (basename (List.hd (Kernel.Files.get()):>string))) ^
+        "_" ^ (string_of_int (TestNumber.get ())) ^ ".i"
       in
       let () =
         Extlib.safe_at_exit
@@ -86,14 +92,18 @@ let extend () =
       in
       let chan = open_out tmpfile in
       let fmt = Format.formatter_of_out_channel chan in
-      File.pretty_ast ~prj:(Project.from_unique_name "aorai") ~fmt ();
+      let aorai_prj = Project.from_unique_name "aorai" in
+      Project.on aorai_prj Kernel.PrintLibc.on ();
+      File.pretty_ast ~prj:aorai_prj ~fmt ();
       close_out chan;
       let selection =
         State_selection.of_list [ InternalWpShare.self; ProveAuxSpec.self ]
       in
       Project.copy ~selection my_project;
       Project.set_current my_project;
-      Kernel.SymbolicPath.add ("TMPDIR:"^Filename.get_temp_dir_name());
+      Kernel.SymbolicPath.add
+        (Filepath.Normalized.of_string (Filename.get_temp_dir_name ()),
+         Some "TMPDIR");
       Files.append_after [ Filepath.Normalized.of_string tmpfile ];
       Kernel.LogicalOperators.on ();
       Constfold.off ();
@@ -101,6 +111,9 @@ let extend () =
       if ProveAuxSpec.get () then begin
         if InternalWpShare.is_set() then
           Wp.Wp_parameters.Share.set (InternalWpShare.get());
+        Wp.Wp_parameters.Let.off();
+        Wp.Wp_parameters.Split.on();
+        Wp.Wp_parameters.SplitMax.set 32;
         Wp.Wp_parameters.Verbose.set 0;
         Globals.Functions.iter check_auto_func;
       end else begin

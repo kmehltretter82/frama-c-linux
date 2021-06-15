@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -284,7 +284,7 @@ struct
       let neg = Q.sign q < 0 in
       let int,frac,exp = (group 1 s), (group 2 s), (group 3 s) in
       let exp = if String.equal exp "" then None else Some exp in
-      let ty = Extlib.the (of_tau ~cnv tau) in
+      let ty = Option.get (of_tau ~cnv tau) in
       why3_real ty ~radix:16 ~neg ~int ~frac ?exp ()
     else raise Not_found
 
@@ -895,7 +895,7 @@ class visitor (ctx:context) c =
           let decl = Why3.Decl.create_data_decl [tys,[cstr,fields]] in
           ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
 
-    method private on_comp_gen kind c (fts:(Lang.field * Lang.tau) list) =
+    method private on_comp_gen kind c fts =
       begin
         let make_id = match kind with
           | Lang.KValue -> Lang.comp_id
@@ -905,7 +905,7 @@ class visitor (ctx:context) c =
           let cmp = Lang.Field.compare f g in
           if cmp = 0 then assert false (* by definition *) else cmp
         in
-        let fts = List.sort compare_field fts in
+        let fts = Option.map (List.sort compare_field) fts in
         (*TODO:NUPW: manage UNIONS *)
         let id = Why3.Ident.id_fresh (make_id c) in
         let ts = Why3.Ty.create_tysymbol id [] Why3.Ty.NoDef in
@@ -918,9 +918,15 @@ class visitor (ctx:context) c =
           let ls = Why3.Term.create_lsymbol id [ty] ty_ctr in
           (Some ls,Why3.Opt.get ty_ctr)
         in
-        let fields = List.map map fts in
-        let constr = Why3.Term.create_fsymbol ~constr:1 id (List.map snd fields) ty in
-        let decl = Why3.Decl.create_data_decl [ts,[constr,List.map fst fields]] in
+        let fields = Option.map (List.map map) fts in
+        let decl = match fields with
+          | None -> Why3.Decl.create_ty_decl ts
+          | Some fields ->
+              let constr =
+                Why3.Term.create_fsymbol ~constr:1 id (List.map snd fields) ty
+              in
+              Why3.Decl.create_data_decl [ts,[constr,List.map fst fields]]
+        in
         ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
       end
 
@@ -939,11 +945,12 @@ class visitor (ctx:context) c =
       id, t
 
     method on_dlemma l =
-      let kind = Why3.Decl.(if l.l_kind = `Axiom then Paxiom else Plemma) in
-      let cnv = empty_cnv ctx in
-      let id, t = self#make_lemma cnv l in
-      let decl = Why3.Decl.create_prop_decl kind id t in
-      ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl
+      if l.l_kind <> Check then
+        let kind = Why3.Decl.(if l.l_kind = Admit then Paxiom else Plemma) in
+        let cnv = empty_cnv ctx in
+        let id, t = self#make_lemma cnv l in
+        let decl = Why3.Decl.create_prop_decl kind id t in
+        ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl
 
     method on_dfun d =
       Wp_parameters.debug ~dkey:dkey_api "Define %a@." Lang.Fun.pretty d.d_lfun ;
@@ -1082,7 +1089,7 @@ let prove_goal ~id ~title ~name ?axioms t =
   end;
   th, decl
 
-let prove_prop ?axioms ~pid ~prop =
+let prove_prop ?axioms ~pid prop =
   let id = WpPropId.get_propid pid in
   let title = Pretty_utils.to_string WpPropId.pretty pid in
   let name = "WP" in
@@ -1097,15 +1104,15 @@ let task_of_wpo wpo =
   | Wpo.GoalAnnot v ->
       let pid = wpo.Wpo.po_pid in
       let axioms = v.Wpo.VC_Annot.axioms in
-      let prop = Wpo.GOAL.compute_proof v.Wpo.VC_Annot.goal in
+      let prop = Wpo.GOAL.compute_proof ~pid v.Wpo.VC_Annot.goal in
       (* Format.printf "Goal: %a@." Lang.F.pp_pred prop; *)
-      prove_prop ~pid ~prop ?axioms
+      prove_prop ~pid prop ?axioms
   | Wpo.GoalLemma v ->
       let lemma = v.Wpo.VC_Lemma.lemma in
       let depends = v.Wpo.VC_Lemma.depends in
       let prop = Lang.F.p_forall lemma.l_forall lemma.l_lemma in
       let axioms = Some(lemma.l_cluster,depends) in
-      prove_prop ~pid ~prop ?axioms
+      prove_prop ~pid prop ?axioms
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prover Task                                                        --- *)
@@ -1115,7 +1122,7 @@ let prover_task env prover task =
   let config = Why3Provers.config () in
   let prover_config = Why3.Whyconf.get_prover_config config prover in
   let drv = Why3.Whyconf.load_driver (Why3.Whyconf.get_main config)
-      env prover_config.driver prover_config.extra_drivers in
+      env prover_config in
   let remove_for_prover =
     if prover.prover_name = "Alt-Ergo"
     then Filter_axioms.remove_for_altergo
@@ -1197,7 +1204,7 @@ let ping_prover_call p =
       Wp_parameters.debug ~dkey
         "@[@[Why3 result for %a:@] @[%a@] and @[%a@]@."
         Why3.Whyconf.print_prover p.prover
-        (Why3.Call_provers.print_prover_result ~json_model:false) pr
+        (Why3.Call_provers.print_prover_result ~json:false) pr
         VCS.pp_result r;
       Task.Return (Task.Result r)
 
@@ -1242,10 +1249,11 @@ let digest wpo drv prover task =
 let batch pconf driver ?script ~timeout ~steplimit prover task =
   let steps = match steplimit with Some 0 -> None | _ -> steplimit in
   let limit =
+    let memlimit = Why3.Whyconf.memlimit (Why3.Whyconf.get_main (Why3Provers.config ())) in
     let def = Why3.Call_provers.empty_limit in
-    { def with
-      Why3.Call_provers.limit_time = Why3.Opt.get_def def.limit_time timeout;
+    { Why3.Call_provers.limit_time = Why3.Opt.get_def def.limit_time timeout;
       Why3.Call_provers.limit_steps = Why3.Opt.get_def def.limit_time steps;
+      Why3.Call_provers.limit_mem = memlimit;
     } in
   let with_steps = match steps, pconf.Why3.Whyconf.command_steps with
     | None, _ -> false

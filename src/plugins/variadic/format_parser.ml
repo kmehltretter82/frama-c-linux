@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -39,41 +39,41 @@ let check_flag spec flag =
   let cs = spec.f_conversion_specifier in
   match flag, cs with
   | FSharp, #has_alternative_form -> true
-  | FZero, #integer_specifier when Extlib.has_some spec.f_precision ->
-      warn "Flag 0 is ignored when a precision is specified"; false
+  | FZero, #integer_specifier when Option.is_some spec.f_precision ->
+    warn "Flag 0 is ignored when a precision is specified"; false
   | FZero, #numeric_specifier when List.mem FMinus spec.f_flags ->
-      warn "Flag 0 is ignored when flag - is also specified."; false
+    warn "Flag 0 is ignored when flag - is also specified."; false
   | FZero, #numeric_specifier -> true
   | FMinus, cs when cs <> `n -> true
   | FSpace, #signed_specifier when List.mem FPlus spec.f_flags ->
-      warn "Flag ' ' is ignored when flag + is also specified."; false
+    warn "Flag ' ' is ignored when flag + is also specified."; false
   | FSpace, #signed_specifier -> true
   | FPlus, (#signed_specifier | #float_specifier) -> true
-  | _ -> 
-      warn "Flag %a and conversion specififer %a are not compatibles."
-        pp_flag flag
-        pp_cs (spec.f_conversion_specifier,spec.f_capitalize);
-      raise Invalid_format
+  | _ ->
+    warn "Flag %a and conversion specififer %a are not compatibles."
+      pp_flag flag
+      pp_cs (spec.f_conversion_specifier,spec.f_capitalize);
+    raise Invalid_format
 
 let check_cs_compatibility cs capitalized has_field_width has_precision =
   match cs with
   | (`n | `c | `p) as cs when has_precision ->
-      warn "Conversion specifier %a does not expect a precision."
-        pp_cs (cs, capitalized) ;
-      raise Invalid_format
+    warn "Conversion specifier %a does not expect a precision."
+      pp_cs (cs, capitalized) ;
+    raise Invalid_format
   | `n when has_field_width ->
-      warn "Conversion specifier n does not expect a field width.";
-      raise Invalid_format
+    warn "Conversion specifier n does not expect a field width.";
+    raise Invalid_format
   | _ -> ()
 
 let rec make_flags_unique = function
   | [] -> []
   | f :: l ->
-      if List.mem f l then (
-        warn "Multiple usage of flag '%a'." pp_flag f;
-        make_flags_unique l
-      ) else
-        f :: make_flags_unique l
+    if List.mem f l then (
+      warn "Multiple usage of flag '%a'." pp_flag f;
+      make_flags_unique l
+    ) else
+      f :: make_flags_unique l
 
 (* When checking, we don't really care which type are returned but only if
    it can be returned *)
@@ -147,27 +147,27 @@ struct
   let get (s,i : t) : char =
     try let c = Format_string.get_char s !i in incr i; c
     with Format_string.OutOfBounds -> '\000'
-      |  Format_string.NotAscii _ -> '\026'
+       |  Format_string.NotAscii _ -> '\026'
 
   let last (s,i : t) : char =
     try Format_string.get_char s (!i - 1)
     with Format_string.OutOfBounds -> '\000'
-      |  Format_string.NotAscii _ -> '\026'
+       |  Format_string.NotAscii _ -> '\026'
 
   let peek (s,i : t) : char =
     try Format_string.get_char s !i
     with Format_string.OutOfBounds -> '\000'
-      |  Format_string.NotAscii _ -> '\026'
+       |  Format_string.NotAscii _ -> '\026'
 
   let getall (f : char -> bool) (s,i as b : t) : string =
     let start = !i in
     let len = ref 0 in
     begin try
-      while f (get b) do
-        incr len;
-      done;
-      back b; (* last char has not been matched *)
-    with _ -> ()
+        while f (get b) do
+          incr len;
+        done;
+        back b; (* last char has not been matched *)
+      with _ -> ()
     end;
     Format_string.sub_string s start !len
 end
@@ -203,10 +203,10 @@ let parse_assignement_suppression b =
 let rec parse_flags b =
   match Buffer.get b with
   | '-' -> FMinus :: parse_flags b
-  | '+' -> FPlus :: parse_flags b 
-  | ' ' -> FSpace :: parse_flags b 
-  | '#' -> FSharp :: parse_flags b 
-  | '0' -> FZero :: parse_flags b 
+  | '+' -> FPlus :: parse_flags b
+  | ' ' -> FSpace :: parse_flags b
+  | '#' -> FSharp :: parse_flags b
+  | '0' -> FZero :: parse_flags b
   | _ -> Buffer.back b; []
 
 let parse_f_fw b =
@@ -223,11 +223,11 @@ let parse_s_fw b =
 let parse_precision b =
   match Buffer.peek b with
   | '.' ->  Buffer.consume b; Some
-    begin match Buffer.peek b with
-    | '*' -> Buffer.consume b; PStar
-    | '-' | '0'..'9'-> PInt (parse_int b)
-    | _ -> PInt 0
-    end
+      begin match Buffer.peek b with
+        | '*' -> Buffer.consume b; PStar
+        | '-' | '0'..'9'-> PInt (parse_int b)
+        | _ -> PInt 0
+      end
   | _ -> None
 
 let parse_lm b =
@@ -244,11 +244,11 @@ let parse_lm b =
 
 let parse_brackets_interior b =
   let first = ref true and circ = ref false in
-  let matching = function 
-  | ']' when not !first -> false
-  | '^' when !first && not !circ -> circ := true; true
-  | '\000' -> warn "Unterminated brackets."; raise Invalid_format
-  | _ -> first := false; true
+  let matching = function
+    | ']' when not !first -> false
+    | '^' when !first && not !circ -> circ := true; true
+    | '\000' -> warn "Unterminated brackets."; raise Invalid_format
+    | _ -> first := false; true
   in
   let s = Buffer.getall matching b in
   Buffer.consume b;
@@ -270,14 +270,14 @@ let parse_f_cs b =
   | 'g' | 'G' -> `g
   | 'a' | 'A' -> `a
   | '\000' ->
-     warn "Missing conversion specifier at the end of format.";
-     raise Invalid_format
+    warn "Missing conversion specifier at the end of format.";
+    raise Invalid_format
   | '\026' ->
-     warn "Conversion specifiers must be ascii characters.";
-     raise Invalid_format
+    warn "Conversion specifiers must be ascii characters.";
+    raise Invalid_format
   | c ->
-     warn "Unknown conversion specifier %c." c;
-     raise Invalid_format
+    warn "Unknown conversion specifier %c." c;
+    raise Invalid_format
 
 let parse_s_cs b =
   match Buffer.peek b with
@@ -320,4 +320,3 @@ let parse_s_format s = parse_aux parse_s_spec (Buffer.create s)
 let parse_format typ s = match typ with
   | PrintfLike -> FFormat (parse_f_format s)
   | ScanfLike -> SFormat (parse_s_format s)
-

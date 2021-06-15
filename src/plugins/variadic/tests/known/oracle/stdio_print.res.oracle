@@ -67,8 +67,8 @@
 #include "stdarg.h"
 #include "stddef.h"
 #include "stdio.h"
-/*@ requires valid_read_string(format);
-    requires valid_read_string(param1);
+/*@ requires valid_read_string(param1);
+    requires valid_read_string(format);
     assigns \result, stream->__fc_FILE_data;
     assigns \result
       \from (indirect: stream->__fc_FILE_id),
@@ -80,11 +80,11 @@
             (indirect: *(format + (0 ..))), param2, *(param1 + (0 ..)),
             param0;
  */
-int fprintf_va_1(FILE * __restrict stream, char const * __restrict format,
+int fprintf_va_1(FILE * restrict stream, char const * restrict format,
                  int param0, char *param1, int param2);
 
-/*@ requires valid_read_string(format);
-    requires valid_read_string(param1);
+/*@ requires valid_read_string(param1);
+    requires valid_read_string(format);
     assigns \result, __fc_stdout->__fc_FILE_data;
     assigns \result
       \from (indirect: __fc_stdout->__fc_FILE_id),
@@ -96,14 +96,14 @@ int fprintf_va_1(FILE * __restrict stream, char const * __restrict format,
             __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
             param2, *(param1 + (0 ..)), param0;
  */
-int printf_va_1(char const * __restrict format, int param0, char *param1,
+int printf_va_1(char const * restrict format, int param0, char *param1,
                 int param2);
 
-/*@ requires
+/*@ requires valid_read_string(param1);
+    requires valid_read_string(format);
+    requires
       \valid(s + (0 .. n - 1)) ∨
       \valid(s + (0 .. format_length(format) - 1));
-    requires valid_read_string(format);
-    requires valid_read_string(param1);
     assigns \result, *(s + (0 ..));
     assigns \result
       \from (indirect: n), (indirect: *(format + (0 ..))),
@@ -113,12 +113,11 @@ int printf_va_1(char const * __restrict format, int param0, char *param1,
       \from (indirect: n), (indirect: *(format + (0 ..))), param2,
             *(param1 + (0 ..)), param0;
  */
-int snprintf_va_1(char * __restrict s, size_t n,
-                  char const * __restrict format, int param0, char *param1,
-                  int param2);
+int snprintf_va_1(char * restrict s, size_t n, char const * restrict format,
+                  int param0, char *param1, int param2);
 
-/*@ requires valid_read_string(format);
-    requires valid_read_string(param1);
+/*@ requires valid_read_string(param1);
+    requires valid_read_string(format);
     assigns \result, *(s + (0 ..));
     assigns \result
       \from (indirect: *(format + (0 ..))), (indirect: param2),
@@ -127,19 +126,19 @@ int snprintf_va_1(char * __restrict s, size_t n,
       \from (indirect: *(format + (0 ..))), param2, *(param1 + (0 ..)),
             param0;
  */
-int sprintf_va_1(char * __restrict s, char const * __restrict format,
-                 int param0, char *param1, int param2);
+int sprintf_va_1(char * restrict s, char const * restrict format, int param0,
+                 char *param1, int param2);
 
-/*@ requires valid_read_string(format);
+/*@ requires valid_read_string(param1);
     requires valid_read_string(param2);
-    requires valid_read_string(param1);
+    requires valid_read_string(format);
     assigns \result;
     assigns \result
       \from (indirect: fd), (indirect: *(format + (0 ..))),
             (indirect: *(param2 + (0 ..))), (indirect: *(param1 + (0 ..))),
             (indirect: param0);
  */
-int dprintf_va_1(int fd, char const * __restrict format, int param0,
+int dprintf_va_1(int fd, char const * restrict format, int param0,
                  char *param1, char *param2);
 
 int main(void)
@@ -185,11 +184,11 @@ int main(void)
     void *__va_args_40[3] = {& __va_arg0_34, & __va_arg1_36, & __va_arg2_38};
     dprintf(1,(char const *)format,(void * const *)(__va_args_40));
   }
-  fprintf_va_1(stream,"%d %s %d",1,(char *)"2",3);
-  printf_va_1("%d %s %d",1,(char *)"2",3);
-  snprintf_va_1(str,size,"%d %s %d",1,(char *)"2",3);
-  sprintf_va_1(str,"%d %s %d",1,(char *)"2",3);
-  dprintf_va_1(1,"%d %s %s",1,(char *)"3",(char *)"4");
+  fprintf(stream,"%d %s %d",1,(char *)"2",3); /* fprintf_va_1 */
+  printf("%d %s %d",1,(char *)"2",3); /* printf_va_1 */
+  snprintf(str,size,"%d %s %d",1,(char *)"2",3); /* snprintf_va_1 */
+  sprintf(str,"%d %s %d",1,(char *)"2",3); /* sprintf_va_1 */
+  dprintf(1,"%d %s %s",1,(char *)"3",(char *)"4"); /* dprintf_va_1 */
   __retres = 0;
   return __retres;
 }

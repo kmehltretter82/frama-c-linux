@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -673,6 +673,7 @@ let cfun_spec env kf =
     method !vpredicate p = update_spec_env (pred env p)
     method !vterm t = update_spec_env (vterm env t)
   end in
+  AssignsCompleteness.compute kf ;
   let spec = Annotations.funspec kf in
   ignore (Cil.visitCilFunspec (visitor:>Cil.cilVisitor) spec) ;
   (* Partitioning the accesses of the spec for formals vs globals *)
@@ -683,7 +684,7 @@ let cfun_spec env kf =
 let cfun kf =
   let env = mk_ctx () in
   (* Skipping frama-c builtins?
-     if not (Cil.is_builtin (Kernel_function.get_vi kf)) then *)
+     if not (Cil_builtins.is_builtin (Kernel_function.get_vi kf)) then *)
   begin
     if Kernel_function.is_definition kf then cfun_code env kf ;
     cfun_spec env kf
@@ -734,7 +735,7 @@ let compute_usage () =
   (* Usage in lemmas *)
   let u_lemmas =
     LogicUsage.fold_lemmas
-      (fun l -> E.cup (pred (mk_ctx()) l.lem_property)) E.bot
+      (fun l -> E.cup (pred (mk_ctx()) l.lem_predicate.tp_statement)) E.bot
   in
   (* initial state by kf *)
   let usage = Globals.Functions.fold (fun kf env ->
@@ -827,6 +828,61 @@ let usage () = S.memo compute_usage
 let is_computed () = S.is_computed ()
 
 (* ---------------------------------------------------------------------- *)
+(* --- Nullable variables                                             --- *)
+(* ---------------------------------------------------------------------- *)
+
+module Nullable =
+struct
+  let attribute_name = "wp_nullable"
+
+  let is_nullable vi =
+    vi.vformal && Cil.hasAttribute attribute_name vi.vattr
+
+  let make_nullable vi =
+    vi.vattr <- Cil.addAttribute (AttrAnnot attribute_name) vi.vattr
+
+  module Nullable_extension =
+  struct
+    let type_term typing_context loc e =
+      match e.Logic_ptree.lexpr_node with
+      | Logic_ptree.PLvar s ->
+          let lv = typing_context.Logic_typing.find_var s in
+          begin match lv.lv_origin with
+            | Some vi when Cil.isPointerType vi.vtype && vi.vformal ->
+                make_nullable vi ;
+                Logic_const.tvar ~loc lv
+            | _ ->
+                typing_context.error loc "No pointer: %s" s
+          end
+      | _  ->
+          typing_context.error loc "Illegal expression %a"
+            Logic_print.print_lexpr e
+
+    let typer typing_context loc l =
+      Ext_terms (List.map (type_term typing_context loc) l)
+  end
+
+  let () =
+    Acsl_extension.register_behavior
+      "wp_nullable_args" Nullable_extension.typer false
+
+  module HasNullable =
+    State_builder.Option_ref(Datatype.Bool)
+      (struct
+        let name = "Wp.RefUsage.HasNullable"
+        let dependencies = [Ast.self]
+      end)
+
+  let compute_nullable () =
+    let module F = Globals.Functions in
+    F.fold (fun f b ->
+        b || List.fold_left (fun b v -> b || is_nullable v) b (F.get_params f)
+      ) false
+
+  let has_nullable () = HasNullable.memo compute_nullable
+end
+
+(* ---------------------------------------------------------------------- *)
 (* --- API                                                            --- *)
 (* ---------------------------------------------------------------------- *)
 
@@ -853,6 +909,9 @@ let get ?kf ?(init=false) vi =
 
 let compute () = ignore (usage ())
 
+let is_nullable = Nullable.is_nullable
+let has_nullable = Nullable.has_nullable
+
 let print x m fmt = Access.pretty x fmt m
 
 let dump () =
@@ -866,7 +925,7 @@ let dump () =
       in Format.fprintf fmt "@[<hv 0>Init:@ %a@]@." E.pretty a_init ;
       KFmap.iter (fun kf m ->
           (* Do not dump results for frama-c builtins *)
-          if not (Cil.is_builtin (Kernel_function.get_vi kf)) then
+          if not (Cil_builtins.is_builtin (Kernel_function.get_vi kf)) then
             Format.fprintf fmt "@[<hv 0>Function %a:@ %a@]@."
               Kernel_function.pretty kf E.pretty m ;
         ) a_usage;

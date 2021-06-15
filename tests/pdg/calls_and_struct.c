@@ -1,5 +1,5 @@
 /* run.config
-   GCC:
+   
    STDOPT: +"-deps -input -out -inout -pdg"
    */
 

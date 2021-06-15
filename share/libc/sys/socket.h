@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -291,7 +291,7 @@ struct __fc_sockfds_type { int x; };
 //@ ghost struct __fc_sockfds_type __fc_sockfds[__FC_MAX_OPEN_SOCKETS];
 
 /* Represents the creation of new file descriptors for sockets. */
-//@ ghost extern int __fc_socket_counter __attribute__((__FRAMA_C_MODEL__));
+//@ ghost extern int __fc_socket_counter;
 
 // __fc_sockfds represents the state of open socket descriptors.
 //@ ghost volatile int __fc_open_sock_fds;
@@ -443,8 +443,29 @@ extern int listen(int sockfd, int backlog);
  */
 extern ssize_t recv(int sockfd, void * buf, size_t len, int flags);
 
-extern ssize_t recvfrom(int, void *, size_t, int,
-        struct sockaddr *, socklen_t *);
+
+/*@
+  requires valid_sockfd: 0 <= sockfd < __FC_MAX_OPEN_SOCKETS;
+  requires valid_buffer_length: \valid((char *)buf+(0 .. len-1));
+  requires valid_addrbuf_or_null: (\valid(addrbuf_len) &&
+                                   \initialized(addrbuf_len) &&
+                                   \valid((char *)addrbuf+(0 .. *addrbuf_len-1)))
+                                  || (addrbuf == \null && addrbuf_len == \null);
+  assigns *((char *)buf+(0 .. len-1)), __fc_sockfds[sockfd], \result
+          \from sockfd, len, flags, __fc_sockfds[sockfd];
+  assigns *addrbuf_len \from indirect:sockfd, indirect: len,
+                             indirect:flags, __fc_sockfds[sockfd];
+  assigns *((char *)addrbuf+(0 .. \old(*addrbuf_len)-1))
+          \from indirect:sockfd, indirect: len,
+                         indirect:flags, __fc_sockfds[sockfd];
+  ensures result_error_or_received_length: \result == -1 || 0 <= \result <= len;
+  ensures initialization:buf: \initialized(((char *)buf+(0 .. \result-1)));
+  ensures initialization:addrbuf:
+          addrbuf != \null ==>
+            \initialized(((char *)addrbuf+(0 .. \old(*addrbuf_len)-1)));
+*/
+extern ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags,
+                        struct sockaddr *addrbuf, socklen_t *addrbuf_len);
 
 /*@ requires valid_sockfd: 0 <= sockfd < __FC_MAX_OPEN_SOCKETS;
   @ requires msg_control_has_room:
@@ -483,8 +504,22 @@ extern ssize_t recvmsg(int sockfd, struct msghdr *hdr, int flags);
  */
 extern ssize_t send(int sockfd, const void *buf, size_t len, int flags);
 extern ssize_t sendmsg(int, const struct msghdr *, int);
-extern ssize_t sendto(int, const void *, size_t, int, const struct sockaddr *,
-        socklen_t);
+
+/*@
+  requires available_sockfd: 0 <= sockfd < __FC_MAX_OPEN_SOCKETS;
+  requires buf_len_ok: \valid_read(((char*)buf)+(0 .. len - 1));
+  assigns errno
+    \from indirect:sockfd, indirect:__fc_sockfds[sockfd],
+          indirect:((char *)buf)[0..len], flags;
+  assigns __fc_sockfds[sockfd]
+    \from __fc_sockfds[sockfd], ((char *)buf)[0..len], flags;
+  assigns \result
+    \from indirect:sockfd, indirect:__fc_sockfds[sockfd],
+          indirect:((char*)buf)[0..len], indirect:flags;
+  ensures error_or_chars_sent: \result == -1 || 0 <= \result <= len;
+ */
+extern ssize_t sendto(int sockfd, const void *buf, size_t len, int flags,
+                      const struct sockaddr *address, socklen_t address_len);
 
 /*@
   requires valid_sockfd: 0 <= sockfd < __FC_MAX_OPEN_SOCKETS;

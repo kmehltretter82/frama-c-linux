@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -41,8 +41,8 @@ module type Location_map_bitwise = sig
 
   module LOffset :
     module type of Offsetmap_bitwise_sig
-      with type v = v
-      and type intervals = Int_Intervals.t
+    with type v = v
+     and type intervals = Int_Intervals.t
 
   val is_empty : t -> bool
   val is_bottom : t -> bool
@@ -76,19 +76,19 @@ module type Location_map_bitwise = sig
       of type [map] to force their user to handle the cases Top and Bottom
       explicitly. *)
   val fold: (Zone.t -> v -> 'a -> 'a) -> map -> 'a -> 'a
-    (** [fold f m] folds a function [f] on the bindings in [m]. Contiguous
-        bits with the same value are merged into a single zone. Different bases
-        are presented in different zones. *)
+  (** [fold f m] folds a function [f] on the bindings in [m]. Contiguous
+      bits with the same value are merged into a single zone. Different bases
+      are presented in different zones. *)
 
   val fold_base : (Base.t -> LOffset.t -> 'a -> 'a) -> map -> 'a -> 'a
 
   val fold_fuse_same : (Zone.t -> v -> 'a -> 'a) -> map -> 'a -> 'a
-    (** Same behavior as [fold], except if two non-contiguous ranges [r1] and
-        [r2] of a given base are mapped to the same value.
-        [fold] will call its argument [f] on each range successively
-        (hence, in our example, on [r1] and [r2] separately).
-        Conversely, [fold_fuse_same] will call [f] directly on [r1 U r2],
-        U being the join on sets of intervals. *)
+  (** Same behavior as [fold], except if two non-contiguous ranges [r1] and
+      [r2] of a given base are mapped to the same value.
+      [fold] will call its argument [f] on each range successively
+      (hence, in our example, on [r1] and [r2] separately).
+      Conversely, [fold_fuse_same] will call [f] directly on [r1 U r2],
+      U being the join on sets of intervals. *)
 
   val fold_join_zone:
     both:(Int_Intervals.t -> LOffset.t -> 'a) ->

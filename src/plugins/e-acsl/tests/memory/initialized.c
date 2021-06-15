@@ -84,6 +84,52 @@ int main(void) {
   /*@assert ! \initialized(p); */
   /*@assert ! \initialized(q); */
 
+  /* Specially crafted calloc and realloc calls to check corner cases of
+   * initialization */
+  q = calloc(3, sizeof(int));
+  /*@ assert \initialized(&q[0..2]); */
+  q = realloc(q, 6 * sizeof(int));
+  /*@ assert \initialized(&q[0..2]); */
+  /*@ assert ! \initialized(&q[3]); */
+  /*@ assert ! \initialized(&q[4]); */
+  /*@ assert ! \initialized(&q[5]); */
+  free(q);
+  q = calloc(7, sizeof(int));
+  /*@ assert \initialized(&q[0..6]); */
+  q = realloc(q, 8 * sizeof(int));
+  /*@ assert \initialized(&q[0..6]); */
+  /*@ assert ! \initialized(&q[7]); */
+  q = realloc(q, 10 * sizeof(int));
+  /*@ assert \initialized(&q[0..6]); */
+  /*@ assert ! \initialized(&q[7]); */
+  /*@ assert ! \initialized(&q[8]); */
+  /*@ assert ! \initialized(&q[9]); */
+  free(q);
+  q = calloc(2, sizeof(int));
+  /*@ assert \initialized(&q[0..1]); */
+  q = realloc(q, 4 * sizeof(int));
+  /*@ assert \initialized(&q[0..1]); */
+  /*@ assert ! \initialized(&q[2]); */
+  /*@ assert ! \initialized(&q[3]); */
+  free(q);
+  q = calloc(6, sizeof(int));
+  /*@ assert \initialized(&q[0..5]); */
+  q = realloc(q, 3 * sizeof(int));
+  /*@ assert \initialized(&q[0..2]); */
+  free(q);
+  q = malloc(6 * sizeof(int));
+  /*@ assert ! \initialized(&q[0]); */
+  /*@ assert ! \initialized(&q[1]); */
+  /*@ assert ! \initialized(&q[2]); */
+  /*@ assert ! \initialized(&q[3]); */
+  /*@ assert ! \initialized(&q[4]); */
+  /*@ assert ! \initialized(&q[5]); */
+  q = realloc(q, 3 * sizeof(int));
+  /*@ assert ! \initialized(&q[0]); */
+  /*@ assert ! \initialized(&q[1]); */
+  /*@ assert ! \initialized(&q[2]); */
+  free(q);
+
   /* Spoofing access to a non-existing stack address */
   q = (int*)(&q - 1024*5);
   /*assert ! \initialized(q); */

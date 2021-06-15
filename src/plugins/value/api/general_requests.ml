@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -30,6 +30,12 @@ let package =
     ~title:"Eva General Services"
     ~readme:"eva.md"
     ()
+
+let () = Request.register ~package
+    ~kind:`GET ~name:"isComputed"
+    ~descr:(Markdown.plain "True if the Eva analysis has been done")
+    ~input:(module Data.Junit) ~output:(module Data.Jbool)
+    Db.Value.is_computed
 
 let is_computed kf =
   Db.Value.is_computed () &&

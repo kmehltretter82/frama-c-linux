@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -29,11 +29,15 @@ open Cil_types
 (** {2 registered ACSL extensions } *)
 
 val is_extension: string -> bool
+val is_extension_block: string -> bool
 
 val extension_category: string -> ext_category
 
 val preprocess_extension:
   string -> Logic_ptree.lexpr list -> Logic_ptree.lexpr list
+
+val preprocess_extension_block:
+  string -> string * Logic_ptree.extended_decl list -> string * Logic_ptree.extended_decl list
 
 (** {2 Global Tables} *)
 module Logic_info: State_builder.Hashtbl
@@ -52,6 +56,10 @@ module Model_info: State_builder.Hashtbl
 (** @since Oxygen-20120901 *)
 module Lemmas: State_builder.Hashtbl
   with type key = string and type data = Cil_types.global_annotation
+
+(** @since 23.0-Vanadium *)
+module Axiomatics: State_builder.Hashtbl
+  with type key = string and type data = Cil_types.location
 
 val builtin_states: State.t list
 
@@ -208,6 +216,10 @@ val set_extension_handler:
   category:(string -> ext_category) ->
   is_extension:(string -> bool) ->
   preprocess:(string -> Logic_ptree.lexpr list -> Logic_ptree.lexpr list) ->
+  is_extension_block:(string -> bool) ->
+  preprocess_block:
+    (string -> string * Logic_ptree.extended_decl list ->
+     string * Logic_ptree.extended_decl list) ->
   unit
 (** Used to setup references related to the handling of ACSL extensions.
     If your name is not [Acsl_extension], do not call this

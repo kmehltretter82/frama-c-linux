@@ -424,65 +424,45 @@
   ----------------------------------------------------------------------------
   No logical properties have been reached by the analysis.
   ----------------------------------------------------------------------------
-[loop] Functions with loops whose bounds we could not find:
-  g1
-  g2
-  g3
-  g4
-[loop] Functions with loops whose estimated bounds were larger than -loop-max-slevel
-  (we recommend setting their slevel to 0 to avoid wasting time):
-  g5 (estimated bounds: 2147483646)
-  g6 (estimated bounds: 2147483647)
-  g7 (estimated bounds: 2147483647)
-  g8 (estimated bounds: 2147483646)
-[loop] Add this to your command line:
-  -val-slevel-merge-after-loop g1 \
-  -val-slevel-merge-after-loop g2 \
-  -val-slevel-merge-after-loop g3 \
-  -val-slevel-merge-after-loop g4 \
-  -slevel-function g1:0 \
-  -slevel-function g2:0 \
-  -slevel-function g3:0 \
-  -slevel-function g4:0 \
-  -slevel-function g5:0 \
-  -slevel-function g6:0 \
-  -slevel-function g7:0 \
-  -slevel-function g8:0 \
-  -slevel-function f1:6 \
-  -slevel-function f2:7 \
-  -slevel-function f2_u_const:7 \
-  -slevel-function f3:7 \
-  -slevel-function f4:6 \
-  -slevel-function f5:4 \
-  -slevel-function f6:5 \
-  -slevel-function f7:5 \
-  -slevel-function f8:4 \
-  -slevel-function h1:21 \
-  -slevel-function h2:22 \
-  -slevel-function h3:22 \
-  -slevel-function h4:21 \
-  -slevel-function h5:21 \
-  -slevel-function h6:22 \
-  -slevel-function h7:22 \
-  -slevel-function h8:21 \
-  -slevel-function i1:13 \
-  -slevel-function i2:14 \
-  -slevel-function i3:3 \
-  -slevel-function i4:4 \
-  -slevel-function j1:41 \
-  -slevel-function j2:42 \
-  -slevel-function j3:19 \
-  -slevel-function j4:20 \
-  -slevel-function main:1 \
-  -slevel-function ne1:43 \
-  -slevel-function ne2:146 \
-  -slevel-function ne3:46 \
-  -slevel-function ne4:46 \
-  -slevel-function nev1:43 \
-  -slevel-function nev2:146 \
-  -slevel-function nev3:46 \
-  -slevel-function nev4:46 \
-  -slevel-function nev5:43 \
-  -slevel-function nev6:146 \
-  -slevel-function nev7:46 \
-  -slevel-function nev8:46
+[loop] Maximum number of iterations by loop:
+  tests/loop_analysis/with_value.i:6: 6
+  tests/loop_analysis/with_value.i:10: 7
+  tests/loop_analysis/with_value.i:14: 7
+  tests/loop_analysis/with_value.i:18: 6
+  tests/loop_analysis/with_value.i:22: 4
+  tests/loop_analysis/with_value.i:26: 5
+  tests/loop_analysis/with_value.i:30: 5
+  tests/loop_analysis/with_value.i:34: 4
+  tests/loop_analysis/with_value.i:54: 2147483646
+  tests/loop_analysis/with_value.i:58: 2147483647
+  tests/loop_analysis/with_value.i:62: 2147483647
+  tests/loop_analysis/with_value.i:66: 2147483646
+  tests/loop_analysis/with_value.i:70: 21
+  tests/loop_analysis/with_value.i:74: 22
+  tests/loop_analysis/with_value.i:78: 22
+  tests/loop_analysis/with_value.i:82: 21
+  tests/loop_analysis/with_value.i:86: 21
+  tests/loop_analysis/with_value.i:90: 22
+  tests/loop_analysis/with_value.i:94: 22
+  tests/loop_analysis/with_value.i:98: 21
+  tests/loop_analysis/with_value.i:102: 13
+  tests/loop_analysis/with_value.i:106: 14
+  tests/loop_analysis/with_value.i:110: 3
+  tests/loop_analysis/with_value.i:114: 4
+  tests/loop_analysis/with_value.i:118: 41
+  tests/loop_analysis/with_value.i:122: 42
+  tests/loop_analysis/with_value.i:126: 19
+  tests/loop_analysis/with_value.i:130: 20
+  tests/loop_analysis/with_value.i:134: 7
+  tests/loop_analysis/with_value.i:138: 43
+  tests/loop_analysis/with_value.i:142: 146
+  tests/loop_analysis/with_value.i:146: 46
+  tests/loop_analysis/with_value.i:150: 46
+  tests/loop_analysis/with_value.i:154: 43
+  tests/loop_analysis/with_value.i:158: 146
+  tests/loop_analysis/with_value.i:162: 46
+  tests/loop_analysis/with_value.i:166: 46
+  tests/loop_analysis/with_value.i:170: 43
+  tests/loop_analysis/with_value.i:174: 146
+  tests/loop_analysis/with_value.i:178: 46
+  tests/loop_analysis/with_value.i:182: 46

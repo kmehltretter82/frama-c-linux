@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -44,7 +44,7 @@ let has_dkey (k:category) = is_debug_key_enabled k
 (* ---  WP Generation                                                   --- *)
 (* ------------------------------------------------------------------------ *)
 
-let wp_generation = add_group "Goal Selection"
+let wp_generation = add_group "Goal Generator"
 
 let () = Parameter_customize.set_group wp_generation
 let () = Parameter_customize.do_not_save ()
@@ -54,6 +54,21 @@ module WP =
     let help = "Generate proof obligations for all (selected) properties."
   end)
 let () = on_reset WP.clear
+
+let () = Parameter_customize.set_group wp_generation
+module Legacy =
+  False(struct
+    let option_name = "-wp-legacy"
+    let help = "Use legacy generator engine."
+  end)
+
+let () = Parameter_customize.set_group wp_generation
+module Dump =
+  Action(struct
+    let option_name = "-wp-dump"
+    let help = "Dump WP calculus graph."
+  end)
+let () = on_reset Dump.clear
 
 let () = Parameter_customize.set_group wp_generation
 let () = Parameter_customize.do_not_save ()
@@ -386,6 +401,13 @@ module SmokeTests =
   end)
 
 let () = Parameter_customize.set_group wp_strategy
+module SmokeDeadassumes =
+  True(struct
+    let option_name = "-wp-smoke-dead-assumes"
+    let help = "When generating smoke tests, look for dead assumes"
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
 module SmokeDeadcode =
   True(struct
     let option_name = "-wp-smoke-dead-code"
@@ -403,7 +425,7 @@ let () = Parameter_customize.set_group wp_strategy
 module SmokeDeadloop =
   True(struct
     let option_name = "-wp-smoke-dead-loop"
-    let help = "When generating smoke tests, look for inconsistent loop invairants"
+    let help = "When generating smoke tests, look for inconsistent loop invariants"
   end)
 
 let () = Parameter_customize.set_group wp_strategy
@@ -415,9 +437,12 @@ module Split =
 
 let () = Parameter_customize.set_group wp_strategy
 module UnfoldAssigns =
-  False(struct
+  Int(struct
     let option_name = "-wp-unfold-assigns"
-    let help = "Unfold aggregates in assigns."
+    let default = 0
+    let arg_name = "n"
+    let help = "Unfold up to <n> levels of aggregates and arrays in assigns.\n\
+                Value -1 means unlimited depth (default 0)"
   end)
 
 let () = Parameter_customize.set_group wp_strategy
@@ -451,6 +476,36 @@ module PrecondWeakening =
   False(struct
     let option_name = "-wp-precond-weakening"
     let help = "Discard pre-conditions of side behaviours (sound but incomplete optimisation)."
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
+module TerminatesExtDeclarations =
+  False(struct
+    let option_name = "-wp-declarations-terminate"
+    let help = "Undefined external functions without terminates specification \
+                are considered to terminate when called."
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
+module TerminatesDefinitions =
+  False(struct
+    let option_name = "-wp-definitions-terminate"
+    let help = "Defined functions without terminates specification are \
+                considered to terminate when called."
+  end)
+
+module TerminatesFCDeclarations =
+  False(struct
+    let option_name = "-wp-frama-c-stdlib-terminate"
+    let help = "Frama-C stdlib functions without terminates specification \
+                are considered to terminate when called."
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
+module TerminatesVariantHyp =
+  False(struct
+    let option_name = "-wp-variant-with-terminates"
+    let help = "Prove loop variant under the termination hypothesis."
   end)
 
 (* ------------------------------------------------------------------------ *)
@@ -541,13 +596,6 @@ module Prenex =
   False(struct
     let option_name = "-wp-prenex"
     let help = "Normalize nested foralls into prenex-form"
-  end)
-
-let () = Parameter_customize.set_group wp_simplifier
-module Bits =
-  True(struct
-    let option_name = "-wp-bits"
-    let help = "Use bit-test simplifications."
   end)
 
 let () = Parameter_customize.set_group wp_simplifier
@@ -1065,24 +1113,16 @@ module MemoryContext =
       let help = "Warn Against Memory Model Hypotheses"
     end)
 
-let wkey_imprecise_hypotheses_assigns =
-  register_warn_category "hypotheses:assigns"
-let () = set_warn_status wkey_imprecise_hypotheses_assigns Log.Winactive
-
 let () = Parameter_customize.set_group wp_po
 let () = Parameter_customize.do_not_save ()
 
-module CheckModelHypotheses =
+module CheckMemoryContext =
   False
     (struct
-      let option_name = "-wp-check-model-hypotheses"
+      let option_name = "-wp-check-memory-model"
       let help = "Insert memory model hypotheses in function contracts and \
                   check them on call. (experimental)"
     end)
-
-let wkey_imprecise_hypotheses_assigns =
-  register_warn_category "hypotheses:assigns"
-let () = set_warn_status wkey_imprecise_hypotheses_assigns Log.Winactive
 
 let () = Parameter_customize.set_group wp_po
 module OutputDir =
@@ -1174,7 +1214,7 @@ let base_output () =
               | dir ->
                   make_output_dir dir ; dir in
       base_output := Some output;
-      Fc_Filepath.add_symbolic_dir "WPOUT" output ;
+      Fc_Filepath.(add_symbolic_dir "WPOUT" (Normalized.of_string output)) ;
       Datatype.Filepath.of_string output
   | Some output -> Datatype.Filepath.of_string output
 
@@ -1196,7 +1236,13 @@ let get_output_dir d =
 (* --- Session dir                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let default = Sys.getcwd () ^ "/.frama-c"
+(* TODO: we currently use PWD instead of Sys.getcwd () because OCaml has
+   no function in its stdlib to resolve symbolic links (e.g. realpath)
+   for a given path. 'getcwd' always resolves them, but if the user
+   supplies a path with symbolic links, this may cause issues.
+   Instead of forcing the user to always provide resolved paths, we
+   currently choose to never resolve them. *)
+let default = Sys.getenv "PWD" ^ "/.frama-c"
 
 let has_session () =
   Session.is_set () ||
@@ -1237,5 +1283,15 @@ let print_generated ?header file =
             Format.pp_print_string fmt s;
             Format.pp_print_newline fmt ())
     end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Debugging                                                          --- *)
+(* -------------------------------------------------------------------------- *)
+
+let protect e =
+  if debug_atleast 1 then false else
+    match e with
+    | Sys.Break | Db.Cancel | Log.AbortError _ | Log.AbortFatal _ -> false
+    | _ -> true
 
 (* -------------------------------------------------------------------------- *)

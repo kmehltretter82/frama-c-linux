@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -194,7 +194,7 @@ let ouptput_to_dot out_channel g =
       Some {
         sg_name = "cs_" ^ (string_of_int !callstack_counter);
         sg_attributes = [build_label (Kernel_function.get_name kf)];
-        sg_parent = Extlib.opt_map (fun sg -> sg.sg_name) parent;
+        sg_parent = Option.map (fun sg -> sg.sg_name) parent;
       }
   and get_file_subgraph filename =
     FileTable.memo file_table filename build_file_subgraph

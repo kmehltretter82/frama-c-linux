@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -32,9 +32,9 @@ let self = P.self
 let () =
   Cmdline.run_after_extended_stage
     (fun () ->
-      State_dependency_graph.add_codependencies
-        ~onto:self
-        [ !Db.Pdg.self; !Db.Inputs.self_external; !Db.Outputs.self_external ])
+       State_dependency_graph.add_codependencies
+         ~onto:self
+         [ !Db.Pdg.self; !Db.Inputs.self_external; !Db.Outputs.self_external ])
 
 let get () =
   try P.get ()
@@ -44,8 +44,8 @@ let may f = match P.get_option () with
   | None -> ()
   | Some _ -> f ()
 
-let may_map ~dft f = match P.get_option () with
-  | None -> dft
+let may_map ~none f = match P.get_option () with
+  | None -> none
   | Some _ -> f ()
 
 let reset_slicing () =

@@ -25,8 +25,8 @@ extern int __e_acsl_sound_verdict;
         equal_prefix:
           memcmp{Post, Post}(\old(dest), \old(src), \old(n)) ≡ 0;
  */
-char *__gen_e_acsl_strncpy(char * __restrict dest,
-                           char const * __restrict src, size_t n);
+char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
+                           size_t n);
 
 /*@ requires valid_nstring_src: valid_read_nstring(src, n);
     requires room_nstring: \valid(dest + (0 .. n - 1));
@@ -47,8 +47,8 @@ char *__gen_e_acsl_strncpy(char * __restrict dest,
         equal_prefix:
           memcmp{Post, Post}(\old(dest), \old(src), \old(n)) ≡ 0;
  */
-char *__gen_e_acsl_strncpy(char * __restrict dest,
-                           char const * __restrict src, size_t n)
+char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
+                           size_t n)
 {
   __e_acsl_mpz_t __gen_e_acsl_at_3;
   char *__gen_e_acsl_at_2;
@@ -106,9 +106,9 @@ char *__gen_e_acsl_strncpy(char * __restrict dest,
     __gen_e_acsl_valid = __e_acsl_valid((void *)(dest + 1 * 0),
                                         __gen_e_acsl_if,(void *)dest,
                                         (void *)(& dest));
-    __e_acsl_assert(__gen_e_acsl_valid,"Precondition","strncpy",
-                    "\\valid(dest + (0 .. n - 1))",
-                    "FRAMAC_SHARE/libc/string.h",364);
+    __e_acsl_assert(__gen_e_acsl_valid,1,"Precondition","strncpy",
+                    "room_nstring: \\valid(dest + (0 .. n - 1))",
+                    "FRAMAC_SHARE/libc/string.h",367);
     __gen_e_acsl__4 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_add));
     __gen_e_acsl_size_2 = 1UL * __gen_e_acsl__4;
     if (__gen_e_acsl_size_2 <= 0UL) __gen_e_acsl_if_2 = 0UL;
@@ -118,9 +118,9 @@ char *__gen_e_acsl_strncpy(char * __restrict dest,
                                                   (void *)dest,
                                                   (void *)(& dest));
     /*@ assert E_ACSL: separated_guard: \valid_read(dest + (0 .. n - 1)); */
-    __e_acsl_assert(__gen_e_acsl_valid_read,"RTE","strncpy",
+    __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","strncpy",
                     "separated_guard: \\valid_read(dest + (0 .. n - 1))",
-                    "FRAMAC_SHARE/libc/string.h",366);
+                    "FRAMAC_SHARE/libc/string.h",369);
     __gen_e_acsl__5 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_add));
     __gen_e_acsl_size_3 = 1UL * __gen_e_acsl__5;
     if (__gen_e_acsl_size_3 <= 0UL) __gen_e_acsl_if_3 = 0UL;
@@ -130,9 +130,9 @@ char *__gen_e_acsl_strncpy(char * __restrict dest,
                                                     (void *)src,
                                                     (void *)(& src));
     /*@ assert E_ACSL: separated_guard: \valid_read(src + (0 .. n - 1)); */
-    __e_acsl_assert(__gen_e_acsl_valid_read_2,"RTE","strncpy",
+    __e_acsl_assert(__gen_e_acsl_valid_read_2,1,"RTE","strncpy",
                     "separated_guard: \\valid_read(src + (0 .. n - 1))",
-                    "FRAMAC_SHARE/libc/string.h",366);
+                    "FRAMAC_SHARE/libc/string.h",369);
     __gen_e_acsl__6 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_add));
     __gen_e_acsl_size_4 = 1UL * __gen_e_acsl__6;
     if (__gen_e_acsl_size_4 <= 0UL) __gen_e_acsl_if_4 = 0UL;
@@ -145,9 +145,9 @@ char *__gen_e_acsl_strncpy(char * __restrict dest,
                                                 __gen_e_acsl_if_4,
                                                 src + 1 * 0,
                                                 __gen_e_acsl_if_5);
-    __e_acsl_assert(__gen_e_acsl_separated,"Precondition","strncpy",
-                    "\\separated(dest + (0 .. n - 1), src + (0 .. n - 1))",
-                    "FRAMAC_SHARE/libc/string.h",366);
+    __e_acsl_assert(__gen_e_acsl_separated,1,"Precondition","strncpy",
+                    "separation: \\separated(dest + (0 .. n - 1), src + (0 .. n - 1))",
+                    "FRAMAC_SHARE/libc/string.h",369);
     __gmpz_clear(__gen_e_acsl_n);
     __gmpz_clear(__gen_e_acsl_);
     __gmpz_clear(__gen_e_acsl_sub);
@@ -175,9 +175,9 @@ char *__gen_e_acsl_strncpy(char * __restrict dest,
     unsigned long __gen_e_acsl__10;
     unsigned long __gen_e_acsl_if_6;
     int __gen_e_acsl_initialized;
-    __e_acsl_assert(__retres == __gen_e_acsl_at,"Postcondition","strncpy",
-                    "\\result == \\old(dest)","FRAMAC_SHARE/libc/string.h",
-                    369);
+    __e_acsl_assert(__retres == __gen_e_acsl_at,1,"Postcondition","strncpy",
+                    "result_ptr: \\result == \\old(dest)",
+                    "FRAMAC_SHARE/libc/string.h",372);
     __gmpz_init_set_si(__gen_e_acsl__8,1L);
     __gmpz_init(__gen_e_acsl_sub_3);
     __gmpz_sub(__gen_e_acsl_sub_3,
@@ -199,9 +199,9 @@ char *__gen_e_acsl_strncpy(char * __restrict dest,
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(__gen_e_acsl_at_2 + 
                                                              1 * 0),
                                                     __gen_e_acsl_if_6);
-    __e_acsl_assert(__gen_e_acsl_initialized,"Postcondition","strncpy",
-                    "\\initialized(\\old(dest) + (0 .. \\old(n) - 1))",
-                    "FRAMAC_SHARE/libc/string.h",370);
+    __e_acsl_assert(__gen_e_acsl_initialized,1,"Postcondition","strncpy",
+                    "initialization: \\initialized(\\old(dest) + (0 .. \\old(n) - 1))",
+                    "FRAMAC_SHARE/libc/string.h",373);
     __e_acsl_contract_clean(__gen_e_acsl_contract);
     __e_acsl_delete_block((void *)(& src));
     __e_acsl_delete_block((void *)(& dest));
@@ -252,7 +252,7 @@ int main(void)
                                                       sizeof(char),
                                                       (void *)srcbuf,
                                                       (void *)(& srcbuf));
-        __e_acsl_assert(! __gen_e_acsl_valid_read,"Assertion","main",
+        __e_acsl_assert(! __gen_e_acsl_valid_read,1,"Assertion","main",
                         "!\\valid_read(srcbuf + i)","tests/bts/bts2252.c",17);
       }
       /*@ assert ¬\valid_read(srcbuf + i); */ ;

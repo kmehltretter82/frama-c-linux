@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -145,12 +145,12 @@ class ['a] warray ?(dir=`VERTICAL) ?(entry = no_entry) () =
       let zs = match after with
         | None -> x :: ys
         | Some z ->
-            let rec hook z x = function
-              | [] -> [x]
-              | y::ys ->
-                  if y = z then z :: x :: ys
-                  else y :: hook z x ys
-            in hook z x ys
+          let rec hook z x = function
+            | [] -> [x]
+            | y::ys ->
+              if y = z then z :: x :: ys
+              else y :: hook z x ys
+          in hook z x ys
       in self#set zs
 
     method remove x = self#set (self#others x)
@@ -255,13 +255,13 @@ class ['a] dialog ~title ~window ?(resize=false) () =
       in box#pack ~expand:false w#coerce ;
       match action with
       | `ALT r | `SELECT r | `DEFAULT r ->
-          w#connect (fun () -> self#select r)
+        w#connect (fun () -> self#select r)
       | `CANCEL ->
-          w#connect (fun () -> self#select `CANCEL)
+        w#connect (fun () -> self#select `CANCEL)
       | `APPLY ->
-          w#connect (fun () -> self#select `APPLY)
+        w#connect (fun () -> self#select `APPLY)
       | `ACTION f ->
-          w#connect f
+        w#connect f
 
     method select r =
       begin

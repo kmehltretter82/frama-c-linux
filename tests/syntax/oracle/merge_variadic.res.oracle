@@ -3,7 +3,7 @@
 [kernel:linker:drop-conflicting-unused] Warning: 
   Incompatible declaration for open:
   different vararg specifiers
-  First declaration was at tests/syntax/merge_variadic.i:4
+  First declaration was at tests/syntax/merge_variadic.i:5
   Current declaration is at tests/syntax/merge_variadic_aux.i:5
   Current declaration is unused, silently removing it
 [kernel:linker:drop-conflicting-unused] Warning: 

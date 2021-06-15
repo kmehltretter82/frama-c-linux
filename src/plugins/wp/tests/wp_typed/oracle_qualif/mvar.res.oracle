@@ -13,3 +13,11 @@
  Functions                 WP     Alt-Ergo  Total   Success
   Job                       -        1        1       100%
 ------------------------------------------------------------
+[wp] tests/wp_typed/mvar.i:8: Warning: 
+  Memory model hypotheses for function 'Write':
+  /*@
+     behavior wp_typed:
+       requires \separated(p + (..), (char *)A + (..));
+       requires \separated(p + (0 ..), (char *)A + (..));
+     */
+  extern void Write(char *p, int n);

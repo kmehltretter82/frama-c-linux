@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -24,7 +24,6 @@
 (** {2 Kernel as an almost standard plug-in} *)
 (* ************************************************************************* *)
 
-module CamlString = String
 module FcPlugin = Plugin
 
 let () = Plugin.register_kernel ()
@@ -87,6 +86,7 @@ let dkey_rmtmps = register_category "parser:rmtmps"
 let dkey_referenced = register_category "parser:referenced"
 
 let dkey_pp = register_category "pp"
+let dkey_pp_logic = register_category "pp:logic"
 let dkey_compilation_db = register_category "pp:compilation-db"
 
 let dkey_print_bitfields = register_category "printer:bitfields"
@@ -167,6 +167,8 @@ let wkey_int_conversion =
 
 let wkey_cert_exp_46 = register_warn_category "CERT:EXP:46"
 
+let wkey_cert_msc_37 = register_warn_category "CERT:MSC:37"
+
 let wkey_cert_msc_38 = register_warn_category "CERT:MSC:38"
 let () = set_warn_status wkey_cert_msc_38 Log.Werror
 
@@ -185,12 +187,17 @@ let wkey_no_proto = register_warn_category "typing:no-proto"
 
 let wkey_missing_spec = register_warn_category "annot:missing-spec"
 
+let wkey_multi_from = register_warn_category "annot:multi-from"
+
 let wkey_decimal_float = register_warn_category "parser:decimal-float"
 let () = set_warn_status wkey_decimal_float Log.Wonce
 
 let wkey_acsl_extension = register_warn_category "acsl-extension"
 
 let wkey_cmdline = register_warn_category "cmdline"
+
+let wkey_audit = register_warn_category "audit"
+let () = set_warn_status wkey_audit Log.Werror
 
 (* ************************************************************************* *)
 (** {2 Specialised functors for building kernel parameters} *)
@@ -244,13 +251,6 @@ module Zero(X:Input_with_arg) =
 module String
     (X: sig include Input_with_arg val default: string end) =
   P.String
-    (struct
-      let () = Parameter_customize.set_module_name X.module_name
-      include X
-    end)
-
-module String_set(X: Input_with_arg) =
-  P.String_set
     (struct
       let () = Parameter_customize.set_module_name X.module_name
       include X
@@ -604,16 +604,49 @@ module Time =
 let () = Parameter_customize.set_group messages
 let () = Parameter_customize.do_not_projectify ()
 module SymbolicPath =
-  String_set (* TODO: to be replaced by an hashtbl *)
+  Filepath_map
     (struct
       let option_name = "-add-symbolic-path"
       let module_name = "SymbolicPath"
       let arg_name = "name_1:path_1,...,name_n:path_n"
+      let existence = Filepath.Indifferent
+      let file_kind = "directory"
       let help =
-        "When displaying file locations, replace (absolute) path by the \
+        "When displaying file locations, replace (absolute) path with the \
          corresponding symbolic name"
     end)
 
+let () =
+  SymbolicPath.add_update_hook
+    (fun _old map ->
+       (* keep module [Filepath] synchronized with [SymbolicPath] *)
+       Filepath.reset_symbolic_dirs ();
+       Datatype.Filepath.Map.iter
+         (fun n p -> Filepath.add_symbolic_dir p n) map)
+
+(* [SymbolicPath] is better to be not projectified,
+   but must be saved: use a fake state for saving it without projectifying it *)
+module SymbolicPathFakeState =
+  State_builder.Register
+    (Datatype.Unit)
+    (struct
+      type t = unit
+      let create () = ()
+      let clear () = ()
+      let get () = ()
+      let set () = ()
+      let clear_some_projects _f () = false
+    end)
+    (struct
+      let name = "SymbolicPathFakeState"
+      let unique_name = name
+      let dependencies = []
+    end)
+
+let () =
+  SymbolicPathFakeState.howto_marshal
+    (fun () -> SymbolicPath.get ())
+    (fun paths -> SymbolicPath.set paths)
 
 (* ************************************************************************* *)
 (** {2 Input / Output Source Code} *)
@@ -709,22 +742,6 @@ module CodeOutput = struct
   let () = Extlib.safe_at_exit close_all
 
 end
-
-let add_path s =
-  try
-    let n = CamlString.index s ':' in
-    let name = CamlString.sub s 0 n in
-    let path = CamlString.sub s (n+1) (CamlString.length s - (n+1)) in
-    Filepath.add_symbolic_dir name path
-  with Not_found ->
-    warning "%s is not a valid option argument for -add-symbolic-path. \
-             It will be ignored" s
-
-let () =
-  SymbolicPath.add_set_hook
-    (fun o n ->
-       let d = Datatype.String.Set.diff n o in
-       Datatype.String.Set.iter add_path d)
 
 let () = Parameter_customize.set_group inout_source
 let () = Parameter_customize.do_not_projectify ()
@@ -893,10 +910,12 @@ let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
 let () = Parameter_customize.set_group saveload
 let () = Parameter_customize.do_not_projectify ()
 module Session_dir =
-  P.Empty_string
+  P.Filepath
     (struct
       let option_name = "-session"
-      let arg_name = ""
+      let arg_name = "path"
+      let existence = Filepath.Indifferent
+      let file_kind = "directory"
       let help = "directory in which session files are searched"
     end)
 let () = Plugin.session_is_set_ref := Session_dir.is_set
@@ -906,10 +925,12 @@ let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
 let () = Parameter_customize.set_group saveload
 let () = Parameter_customize.do_not_projectify ()
 module Config_dir =
-  P.Empty_string
+  P.Filepath
     (struct
       let option_name = "-config"
-      let arg_name = ""
+      let arg_name = "path"
+      let existence = Filepath.Indifferent
+      let file_kind = "directory"
       let help = "directory in which configuration files are searched"
     end)
 let () = Plugin.config_is_set_ref := Config_dir.is_set
@@ -929,11 +950,15 @@ module Machdep =
     (struct
       let module_name = "Machdep"
       let option_name = "-machdep"
-      let default = "x86_32"
+      let default =
+        try Sys.getenv "FRAMAC_MACHDEP"
+        with Not_found -> "x86_64"
       let arg_name = "machine"
       let help =
         "use <machine> as the current machine dependent configuration. \
-         See \"-machdep help\" for a list"
+         See \"-machdep help\" for a list. The environment variable \
+         FRAMAC_MACHDEP can be used to override the default value. The command \
+         line parameter still has priority over the default value"
     end)
 
 let () = Parameter_customize.set_group parsing
@@ -1021,6 +1046,41 @@ module PrintCppCommands =
       let option_name = "-print-cpp-commands"
       let help = "prints the preprocessing command(s) used by Frama-C \
                   and exits."
+    end)
+
+let () = Parameter_customize.set_group parsing
+let () = Parameter_customize.do_not_reset_on_copy ()
+module AuditPrepare =
+  P.Filepath
+    (struct
+      let option_name = "-audit-prepare"
+      let arg_name = "path"
+      let existence = Filepath.Indifferent
+      let file_kind = "json"
+      let help = "produces audit-related information, such as the list of all \
+                  source files used during parsing (including those in include \
+                  directives) with checksums. Some plug-ins may produce \
+                  additional audit-related information. \
+                  Prints the information as JSON to the specified file, or \
+                  if the file is '-', prints as text to the standard output. \
+                  Requires -cpp-frama-c-compliant."
+    end)
+
+let () = Parameter_customize.set_group parsing
+let () = Parameter_customize.do_not_reset_on_copy ()
+module AuditCheck =
+  P.Filepath
+    (struct
+      let option_name = "-audit-check"
+      let arg_name = "path"
+      let existence = Filepath.Must_exist
+      let file_kind = "json"
+      let help = "reads an audit JSON file (produced by -audit-prepare) and \
+                  checks compliance w.r.t. it; e.g., if the source files \
+                  were declared and have the expected checksum. \
+                  Raises a warning (with warning key 'audit') in case of \
+                  failed checks. \
+                  Requires -cpp-frama-c-compliant."
     end)
 
 let () = Parameter_customize.set_group parsing

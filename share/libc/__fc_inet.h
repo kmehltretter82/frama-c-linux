@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -76,18 +76,15 @@ struct sockaddr_in6 {
 // Non-POSIX
 #define INADDR_NONE ((in_addr_t) 0xffffffff)
 
-#define IN6ADDR_ANY 0
-#define IN6ADDR_BROADCAST 0XFFFFFFFFFFFFFFFFULL
+#define IN6ADDR_ANY_INIT {{0}}
+#define IN6ADDR_LOOPBACK_INIT {{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 }}
 #define INET6_ADDRSTRLEN 46
 
 // Not required by POSIX
 #define INADDR_LOOPBACK (uint32_t)0x7F000001
 
-const struct in6_addr in6addr_any={{0}};
-const struct in6_addr in6addr_loopback=
-  {{0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
-    0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF}}
-  ;
+extern const struct in6_addr in6addr_any;
+extern const struct in6_addr in6addr_loopback;
 
 struct ipv6_mreq {
   struct in6_addr  ipv6mr_multiaddr;

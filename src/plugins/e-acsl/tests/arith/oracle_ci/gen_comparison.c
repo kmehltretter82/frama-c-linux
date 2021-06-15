@@ -6,57 +6,57 @@ int main(void)
   int __retres;
   int x = 0;
   int y = 1;
-  __e_acsl_assert(x < y,"Assertion","main","x < y",
+  __e_acsl_assert(x < y,1,"Assertion","main","x < y",
                   "tests/arith/comparison.i",7);
   /*@ assert x < y; */ ;
-  __e_acsl_assert(y > x,"Assertion","main","y > x",
+  __e_acsl_assert(y > x,1,"Assertion","main","y > x",
                   "tests/arith/comparison.i",8);
   /*@ assert y > x; */ ;
-  __e_acsl_assert(x <= 0,"Assertion","main","x <= 0",
+  __e_acsl_assert(x <= 0,1,"Assertion","main","x <= 0",
                   "tests/arith/comparison.i",9);
   /*@ assert x ≤ 0; */ ;
-  __e_acsl_assert(y >= 1,"Assertion","main","y >= 1",
+  __e_acsl_assert(y >= 1,1,"Assertion","main","y >= 1",
                   "tests/arith/comparison.i",10);
   /*@ assert y ≥ 1; */ ;
   char *s = (char *)"toto";
-  __e_acsl_assert(s == s,"Assertion","main","s == s",
+  __e_acsl_assert(s == s,1,"Assertion","main","s == s",
                   "tests/arith/comparison.i",12);
   /*@ assert s ≡ s; */ ;
-  __e_acsl_assert(1,"Assertion","main","5 < 18","tests/arith/comparison.i",
+  __e_acsl_assert(1,1,"Assertion","main","5 < 18","tests/arith/comparison.i",
                   15);
   /*@ assert 5 < 18; */ ;
-  __e_acsl_assert(1,"Assertion","main","32 > 3","tests/arith/comparison.i",
+  __e_acsl_assert(1,1,"Assertion","main","32 > 3","tests/arith/comparison.i",
                   16);
   /*@ assert 32 > 3; */ ;
-  __e_acsl_assert(1,"Assertion","main","12 <= 13","tests/arith/comparison.i",
-                  17);
+  __e_acsl_assert(1,1,"Assertion","main","12 <= 13",
+                  "tests/arith/comparison.i",17);
   /*@ assert 12 ≤ 13; */ ;
-  __e_acsl_assert(1,"Assertion","main","123 >= 12",
+  __e_acsl_assert(1,1,"Assertion","main","123 >= 12",
                   "tests/arith/comparison.i",18);
   /*@ assert 123 ≥ 12; */ ;
-  __e_acsl_assert(1,"Assertion","main","0xff == 0xff",
+  __e_acsl_assert(1,1,"Assertion","main","0xff == 0xff",
                   "tests/arith/comparison.i",19);
   /*@ assert 0xff ≡ 0xff; */ ;
-  __e_acsl_assert(1,"Assertion","main","1 != 2","tests/arith/comparison.i",
+  __e_acsl_assert(1,1,"Assertion","main","1 != 2","tests/arith/comparison.i",
                   20);
   /*@ assert 1 ≢ 2; */ ;
-  __e_acsl_assert(1,"Assertion","main","-5 < 18","tests/arith/comparison.i",
-                  22);
+  __e_acsl_assert(1,1,"Assertion","main","-5 < 18",
+                  "tests/arith/comparison.i",22);
   /*@ assert -5 < 18; */ ;
-  __e_acsl_assert(1,"Assertion","main","32 > -3","tests/arith/comparison.i",
-                  23);
+  __e_acsl_assert(1,1,"Assertion","main","32 > -3",
+                  "tests/arith/comparison.i",23);
   /*@ assert 32 > -3; */ ;
-  __e_acsl_assert(1,"Assertion","main","-12 <= 13",
+  __e_acsl_assert(1,1,"Assertion","main","-12 <= 13",
                   "tests/arith/comparison.i",24);
   /*@ assert -12 ≤ 13; */ ;
-  __e_acsl_assert(1,"Assertion","main","123 >= -12",
+  __e_acsl_assert(1,1,"Assertion","main","123 >= -12",
                   "tests/arith/comparison.i",25);
   /*@ assert 123 ≥ -12; */ ;
-  __e_acsl_assert(1,"Assertion","main","-0xff == -0xff",
+  __e_acsl_assert(1,1,"Assertion","main","-0xff == -0xff",
                   "tests/arith/comparison.i",26);
   /*@ assert -0xff ≡ -0xff; */ ;
-  __e_acsl_assert(1,"Assertion","main","1 != -2","tests/arith/comparison.i",
-                  27);
+  __e_acsl_assert(1,1,"Assertion","main","1 != -2",
+                  "tests/arith/comparison.i",27);
   /*@ assert 1 ≢ -2; */ ;
   __retres = 0;
   return __retres;

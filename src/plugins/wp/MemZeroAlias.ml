@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -36,7 +36,7 @@ let datatype = "MemZeroAlias"
 
 let configure () =
   begin
-    let orig_pointer = Context.push Lang.pointer (fun _typ -> Logic.Int) in
+    let orig_pointer = Context.push Lang.pointer Logic.Int in
     let orig_null    = Context.push Cvalues.null (p_equal e_zero) in
     let rollback () =
       Context.pop Lang.pointer orig_pointer ;
@@ -200,13 +200,19 @@ let set s m ks v = if ks = [] then v else update (e_var (Sigma.get s m)) ks v
 let load sigma obj l =
   if Ctypes.is_pointer obj then Loc (Star l) else Val(value sigma l)
 
+let load_init _sigma _obj _l = Warning.error ~source "Mem0Alias: No initialized"
+
 let stored seq _obj l e =
   let m,ks = access l in
   let x = F.e_var (Sigma.get seq.post m) in
   [Set( x , set seq.pre m ks e )]
 
+let stored_init _seq _obj _l _e = Warning.error ~source "Mem0Alias: No initialized"
+
 let copied seq obj a b =
   stored seq obj a (value seq.pre b)
+
+let copied_init _seq _obj _a _b = Warning.error ~source "Mem0Alias: No initialized"
 
 let assigned _s _obj _sloc = []
 

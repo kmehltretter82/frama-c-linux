@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -24,14 +24,15 @@
 
 let () =
   begin
-    Wutil.share := Fc_config.datadir;
+    Wutil.share := (Fc_config.datadir :> string);
     Wutil.flush := (fun msg -> Gui_parameters.warning "%s" msg);
   end
 
 let framac_logo, framac_icon =
   try
     let img ext =
-      Some (GdkPixbuf.from_file (Fc_config.datadir ^ "/frama-c." ^ ext))
+      Some (GdkPixbuf.from_file
+              ((Fc_config.datadir:>string) ^ "/frama-c." ^ ext))
     in
     img "png", img "ico"
   with
@@ -732,7 +733,7 @@ class error_manager ?reset (o_parent:GWindow.window_skel) : host =
       let w = GWindow.message_dialog
           ~message
           ~message_type:`ERROR
-          ~parent:(Extlib.opt_conv o_parent parent)
+          ~parent:(Option.value ~default:o_parent parent)
           ~buttons:GWindow.Buttons.ok
           ~title:"Error"
           ~position:`CENTER_ALWAYS
@@ -945,7 +946,7 @@ let source_files_chooser (main_ui: source_files_chooser_host) defaults f =
           (fun () -> f (get_all ()))
       | `DELETE_EVENT | `CANCEL ->
         ());
-    Extlib.may (fun f ->
+    Option.iter (fun f ->
         Configuration.set "last_opened_dir"
           (Configuration.ConfString f)) filechooser#current_folder;
     dialog#destroy ()

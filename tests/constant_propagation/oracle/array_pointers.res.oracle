@@ -12,7 +12,7 @@
 [eva:final-states] Values at end of function main:
   q ∈ {{ &p + {4} }}
   r ∈ {{ &p + {8} }}
-  s ∈ {1}
+  s ∈ [--..--]
 [scf] beginning constant propagation
 [kernel] tests/constant_propagation/array_pointers.i:10: Warning: 
   using size of 'void'

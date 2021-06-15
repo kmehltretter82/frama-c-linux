@@ -145,7 +145,7 @@ let doDeclaration logic_spec (loc: cabsloc) (specs: spec_elem list) (nl: init_na
         match logic_spec with
         | None -> None
         | Some (loc, _ as ls) -> begin
-            Extlib.opt_map
+            Option.map
               (fun (loc', spec) ->
                  let name =
                    match nl with
@@ -181,7 +181,7 @@ let doFunctionDef spec (loc: cabsloc)
                   (b: block) : definition =
   let fname = (specs, n) in
   let name = match n with (n,_,_,_) -> n in
-  Extlib.may (fun (spec, _) -> check_funspec_abrupt_clauses name spec) spec;
+  Option.iter (fun (spec, _) -> check_funspec_abrupt_clauses name spec) spec;
   let b = if !ghost_global then { b with bstmts = in_ghost b.bstmts } else b in
   FUNDEF (spec, fname, b, loc, lend)
 
@@ -1403,7 +1403,7 @@ function_def:  /* (* ISO 6.9.1 *) */
             let (loc, specs, decl) = $2 in
             let spec_loc =
               let loc = fst $1 in
-              Extlib.opt_map
+              Option.map
                 (fun (loc', spec) -> spec, (loc, loc'))
                 (Logic_lexer.spec $1)
             in
@@ -1528,7 +1528,7 @@ attribute:
 |   VOLATILE              { ("volatile",[]), $1 }
 |   GHOST                 { ("ghost",[]), $1 }
 |   ATTRIBUTE_ANNOT       { let annot, loc = $1 in
-			    ("$annot:" ^ annot, []), loc }
+			    (Cil.mkAttrAnnot annot, []), loc }
 ;
 
 /* (* sm: I need something that just includes __attribute__ and nothing more,

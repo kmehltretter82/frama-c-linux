@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -112,13 +112,13 @@ val frames : addr:term -> offset:term -> sizeof:term ->
 val separated :
   shift:('a -> Ctypes.c_object -> term -> 'a) ->
   addrof:('a -> term) ->
-  sizeof:(Ctypes.c_object -> int) ->
+  sizeof:(Ctypes.c_object -> term) ->
   'a Sigs.rloc -> 'a Sigs.rloc -> pred
 
 val included :
   shift:('a -> Ctypes.c_object -> term -> 'a) ->
   addrof:('a -> term) ->
-  sizeof:(Ctypes.c_object -> int) ->
+  sizeof:(Ctypes.c_object -> term) ->
   'a Sigs.rloc -> 'a Sigs.rloc -> pred
 
 (* -------------------------------------------------------------------------- *)

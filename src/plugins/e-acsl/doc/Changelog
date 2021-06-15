@@ -25,6 +25,58 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-* E-ACSL       [2021-06-14] Fix pointer address on memory annotations with
+                range indices (frama-c/e-acsl#148).
+-* E-ACSL       [2021-06-04] Do not translate contracts of E-ACSL built-ins.
+
+#############################
+Plugin E-ACSL 23.0 (Vanadium)
+#############################
+
+-* E-ACSL       [2021-05-25] Restore behavior of option -e-acsl-no-valid broken
+                since Titanium (included).
+-  E-ACSL       [2021-04-09] Add support for loop variant.
+-  E-ACSL       [2021-04-07] Add support for multiple binders in guarded
+                quantifications (frama-c/e-acsl#127).
+-* runtime      [2021-04-08] Fix backtrace output on failed assertion
+                (frama-c/e-acsl#151).
+-* runtime      [2021-04-08] Fix incorrect check on program arguments when the
+                main function takes no arguments (frama-c/e-acsl#151).
+-* runtime      [2021-03-30] Fix the end address of the memory segments in the
+                RTL layouts.
+-  E-ACSL       [2021-03-25] Add support for `check` and `admit` annotations
+                (frama-c/e-acsl#142).
+-* E-ACSL       [2021-03-25] Fix wrong computation of the base pointer when
+                calling \valid predicate leading to undetected array overflows.
+-* E-ACSL       [2021-02-24] Fix crash when running another analysis after
+                E-ACSL caused by E-ACSL breaking some internal kernel invariant
+                (frama-c/e-acsl#145).
+-  e-acsl-gcc   [2021-02-24] Try to find Frama-C binary in script or development
+                directory if not present in PATH (frama-c/e-acsl#104).
+-  e-acsl-gcc   [2021-02-24] Remove obsolete options from documentation and bash
+                completion script (frama-c/e-acsl#104).
+-  e-acsl-gcc   [2021-02-24] Deactivate Variadic translation when using
+                incompatible option --validate-format-strings
+                (frama-c/e-acsl#104).
+-  e-acsl-gcc   [2021-02-24] Do not load Frama-C plugins when retrieving share
+                and plugins paths (frama-c/e-acsl#104).
+-* runtime      [2021-02-18] Fix integration of contracts from the runtime
+                library into Frama-C (#@999).
+-* E-ACSL       [2021-01-12] Fix crash when comparing two structs, which is
+                currently unsupported (frama-c/e-acsl#139).
+-* Makefile     [2021-01-05] Fix dependencies in bytecode-only compilation.
+-  E-ACSL       [2020-12-09] Add RTL support for Windows.
+-  E-ACSL       [2020-11-17] Update e-acsl-gcc.sh so that the library dlmalloc
+                can be compiled and used from sources.
+
+#############################
+Plugin E-ACSL 22.0 (Titanium)
+#############################
+
+-* E-ACSL       [2020-11-16] Fix soundness bug when checking
+                initialization of a chunk of heap memory block.
+-  E-ACSL       [2020-10-14] Add Support for Variadic generated functions in
+                the AST (frama-c/e-acsl#128).
 -  E-ACSL       [2020-10-06] Add support for the `\separated` predicate.
                 (frama-c/e-acsl#31)
 -* E-ACSL       [2020-10-06] Fix a soundness bug when translating a range with a

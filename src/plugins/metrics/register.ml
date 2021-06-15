@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -24,18 +24,18 @@ open Metrics_parameters
 ;;
 
 let () = Enabled.set_output_dependencies
-  [ Ast.self; AstType.self; OutputFile.self; SyntacticallyReachable.self;
-    Libc.self ]
+    [ Ast.self; AstType.self; OutputFile.self; SyntacticallyReachable.self;
+      Libc.self ]
 ;;
 
 let syntactic ?(libc=Metrics_parameters.Libc.get ()) () =
   begin
     match AstType.get () with
-      | "cil" -> Metrics_cilast.compute_on_cilast ~libc
-      (* Cabs metrics are experimental. unregistered, unjournalized *)
-      | "cabs" -> Metrics_cabs.compute_on_cabs ()
-      | "acsl" -> Metrics_acsl.dump()
-      | _ -> assert false (* the possible values are checked by the kernel*)
+    | "cil" -> Metrics_cilast.compute_on_cilast ~libc
+    (* Cabs metrics are experimental. unregistered, unjournalized *)
+    | "cabs" -> Metrics_cabs.compute_on_cabs ()
+    | "acsl" -> Metrics_acsl.dump()
+    | _ -> assert false (* the possible values are checked by the kernel*)
   end;
   SyntacticallyReachable.iter
     (fun kf ->

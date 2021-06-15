@@ -12,9 +12,9 @@
   Called from tests/libc/netinet_in_h.c:6.
 [eva] using specification for function printf_va_1
 [eva] tests/libc/netinet_in_h.c:6: 
-  function printf_va_1: precondition valid_read_string(format) got status valid.
-[eva] tests/libc/netinet_in_h.c:6: 
   function printf_va_1: precondition valid_read_string(param0) got status valid.
+[eva] tests/libc/netinet_in_h.c:6: 
+  function printf_va_1: precondition valid_read_string(format) got status valid.
 [eva] Done for function printf_va_1
 [eva] Recording results for main
 [eva] done for function main
@@ -23,5 +23,10 @@
   __fc_inet_ntoa_array[0..14] ∈ [--..--]
                       [15] ∈ {0}
   addr ∈ {0}
+  sockaddr6_any ∈ {0}
+  sockaddr6_loopback{.sin6_family; .sin6_port; .sin6_flowinfo; .sin6_addr.s6_addr[0..14]} ∈
+                    {0}
+                    .sin6_addr.s6_addr[15] ∈ {1}
+                    .sin6_scope_id ∈ {0}
   __retres ∈ {0}
   S___fc_stdout[0..1] ∈ [--..--]

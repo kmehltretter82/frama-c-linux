@@ -494,12 +494,10 @@ Section~\ref{tut2:hello}). Each variable set in this example has to be set
 by any plug-in.
 \codeidx{Makefile.dynamic}
 \codeidx{FRAMAC\_SHARE}
-\codeidx{FRAMAC\_LIBDIR}
 \codeidx{PLUGIN\_CMO}
 \codeidx{PLUGIN\_NAME}
 \makefileinput{./tutorial/hello/generated/makefile_multiple/Makefile}
-\texttt{FRAMAC\_SHARE} must be set to the \framac share directory while
-\texttt{FRAMAC\_LIBDIR} must be set to the \framac lib directory.
+\texttt{FRAMAC\_SHARE} must be set to the \framac share directory.
 \texttt{PLUGIN\_NAME} is the capitalized name of your plug-in while
 \texttt{PLUGIN\_CMO} is the list of the files $.cmo$ generated from your \caml
 sources.
@@ -596,18 +594,19 @@ otherwise.
 
 \codeidx{clean-install}
 \codeidx{install}
-In addition, if a plug-in wishes to install custom files to
-\texttt{FRAMAC\_LIBDIR} through the \texttt{install::} target,
-this target must depend on \texttt{clean-install}. 
-Indeed, \framac's main \texttt{Makefile} removes
-all existing files in this directory before performing a fresh installation,
-in order to avoid potential interference with an obsolete (and usually
-incompatible) module from a previous installation. Adding the dependency thus
-ensures that the removal will take place before any new file has been installed
-in the directory.
+In addition, if a plug-in wishes to install custom files through the
+\texttt{install::} target, this target must depend on \texttt{clean-install}.
+Indeed, \framac's main \texttt{Makefile} needs to remove all existing files
+before performing a fresh installation, in order to avoid potential interference
+with an obsolete (and usually incompatible) module from a previous installation.
+Adding the dependency thus ensures that the removal will take place before any
+new file has been installed.
 
-\begin{example} If a plug-in wants to install \texttt{external/my\_lib.cm*}
-in addition to the normal plugin files, it should use the following code:
+\begin{example} If a plug-in wants to install \texttt{external/my\_lib.cm*} in
+  addition to the normal plugin files, it should use the following code:
+  \footnote{Note that the variable \texttt{FRAMAC\_LIBDIR} is automatically set
+    in the \framac \texttt{Makefile} to the value provided by the command
+    \texttt{frama-c-config -print-libpath}.\codeidx{FRAMAC\_LIBDIR}}
 \begin{makefilecode}
 install:: clean-install
         $(PRINT_INSTALL) "My beautiful library"
@@ -700,14 +699,14 @@ Ok  = 16 of 16
 sequences. These options are detailed in Section~\ref{ptests:options}.
 
 \begin{example}
-If the code of plug-in \texttt{plug-in} has changed, a typical sequence of tests
+If the code of plug-in \texttt{plugin} has changed, a typical sequence of tests
 is the following one.
 \begin{shell}
-\$ ./bin/ptests.opt plug-in
-\$ ./bin/ptests.opt -update plug-in
+\$ ./bin/ptests.opt plugin
+\$ ./bin/ptests.opt -update plugin
 \$ make tests
 \end{shell}
-So we first run the tests suite corresponding to \texttt{plug-in} in order to
+So we first run the tests suite corresponding to \texttt{plugin} in order to
 display what tests have been modified by the changes. After checking the
 displayed differences, we validate the changes by updating the
 oracles\index{Oracle}. Finally we run all the test suites\index{Test!Suite} in
@@ -716,8 +715,8 @@ order to ensure that the changes do not break anything else in \framac.
 \begin{example}
 For adding a new test, the typical sequence of command is the following.
 \begin{shell}
-\$ ./bin/ptests.opt -show tests/plug-in/new_test.c
-\$ ./bin/ptests.opt -update tests/plug-in/new_test.c
+\$ ./bin/ptests.opt -show tests/plugin/new_test.c
+\$ ./bin/ptests.opt -update tests/plugin/new_test.c
 \$ make tests
 \end{shell}
 We first ask \ptests to print the output of the test on the command line, check
@@ -776,10 +775,13 @@ Section~\ref{ptests:directives}.
   \texttt{STDOPT} directives:
 
   \begin{listing-nonumber}
-    MODULE: @PTEST_DIR@/@PTEST_NAME@.cmxs
+    MODULE: script.cmx
     STDOPT: +"-opt1" ...
     STDOPT: #"-opt2" ...
   \end{listing-nonumber}
+  The {\tt .cmx} extension is optional and the prefix {\tt @PTEST\_DIR@/}
+  is automatically added to the module names (the directive accepts a list
+  of modules that can be separed by blank or comma).
 
   In addition, if the same script {\tt tests/suite/script.ml}
   is shared by several test files in {\tt tests/suite},
@@ -833,7 +835,7 @@ base. Common cases include:
 This is possible with option \texttt{-config} of \ptests, which takes as
 argument the name of a special test configuration, as in
 \begin{shell}
-\$ ./bin/ptests.opt -config <special_name> plug-in
+\$ ./bin/ptests.opt -config <special_name> plugin
 \end{shell}
 
 Then, the directives for this test can be found:
@@ -861,7 +863,7 @@ configuration: \lstinline+/* run.config* +.
 All operations for this test configuration should take option
 \texttt{-config} in argument, as in
 \begin{shell}
-\$ ./bin/ptests.opt -update -config <special_name> plug-in
+\$ ./bin/ptests.opt -update -config <special_name> plugin
 \end{shell}
 
 \begin{important}
@@ -947,27 +949,35 @@ Figure~\ref{fig:test-directives} shows all the directives that can be used in
 the configuration header of a test (or a test suite).
 \begin{figure}[ht]
 \begin{center}
-\begin{tabular}{|c|c|p{5cm}|l|}
+\begin{tabular}{|c|c|p{4.5cm}|p{5.2cm}|}
 \hline
 \textbf{Kind} & \textbf{Name} & \textbf{Specification} & \textbf{default}\\
 \hline
 \hline \multirow{4}{23mm}{\centering{Command}}
+& \texttt{PLUGIN}\nscodeidxdef{Test!Directive}{PLUGIN}
+& Plugins to be loaded with each subsequent run.
+& \texttt{from inout eva scope variadic} for tests under \texttt{./tests} directory
+\\
 & \texttt{CMD}\nscodeidxdef{Test!Directive}{CMD}
 & Program to run
 & \texttt{./bin/toplevel.opt}
 \\
 & \texttt{OPT}\nscodeidxdef{Test!Directive}{OPT}
 & Options given to the program
-& \texttt{-val -out -input -deps}
+& \texttt{-val -out -input -deps} for tests under \texttt{./tests} directory
 \\
 & \texttt{STDOPT}\nscodeidxdef{Test!Directive}{STDOPT}
 & Add and remove options from the default set
 & \textit{None}
 \\
+& \texttt{EXIT}\nscodeidxdef{Test!Directive}{EXIT}
+& Indicate expected exit status if not 0.
+& \textit{None}
+\\
 & \texttt{LOG}\nscodeidxdef{Test!Directive}{LOG}
 & Add an additional file to compare against an oracle
 & \textit{None}
-\\ 
+\\
 & \texttt{EXECNOW}\nscodeidxdef{Test!Directive}{EXECNOW}
 & Run a command before the following commands. When specified in a configuration
 file, run it only once.
@@ -982,7 +992,7 @@ file, run it only once.
 & \textit{None}
 \\
 & \texttt{FILTER}\nscodeidxdef{Test!Directive}{FILTER}
-& Command used to filter results
+& Command reading the standard input used to filter results. In such a command, the predefined macro \texttt{@PTEST\_ORACLE@} is set to the basename of the oracle.
 & \textit{None}
 \\
 & \texttt{MODULE}\nscodeidxdef{Test!Directive}{MODULE}
@@ -1009,7 +1019,7 @@ and report a failure
 & selects the files to test
 & \texttt{.*\bss.\bss(c|i\bss)}
 \\
-\hline \multirow{2}{23mm}{\centering{Miscellaneous}}
+\hline \multirow{2}{23mm}{\centering{Misc.}}
 & \texttt{COMMENT}\nscodeidxdef{Test!Directive}{COMMENT}
 & Comment in the configuration
 & \textit{None}
@@ -1072,13 +1082,22 @@ the sequence above is read in order and defines a configuration level
   \texttt{CMD}\nscodeidx{Test!Directive}{CMD} is the last
   \texttt{CMD} directive of the preceding configuration level.
 \item \texttt{LOG} adds a file to be compared against an oracle in the
-  next \texttt{OPT} directive. Several files can be monitored from a single
-  \texttt{OPT} directive, through several \texttt{LOG} directives. 
+  next \texttt{OPT} or \texttt{STDOPT} directive. Several files can be monitored from a single
+  \texttt{OPT}/\texttt{STDOPT} directive, through several \texttt{LOG} directives. 
   These files must be generated in the result
   directory of the corresponding suite (and potentially alternative
   configuration).
   After an \texttt{OPT} or \texttt{STDOPT} directive is encountered,
   the set of additional \texttt{LOG} files is reset to its default.
+\item By default, \framac is expected to return successfully (i.e., with
+  an exit status of 0). If a test is supposed to lead to an error, an
+  \texttt{EXIT} directive must be used. It takes as argument an integer
+  (typically 1 to denote a user error) representing the expected exit status
+  for the subsequent tests. All tests triggered by \texttt{OPT} or
+  \texttt{STDOPT} directives encountered after the \texttt{EXIT} directive
+  will be expected to exit with the corresponding status, until a new
+  \texttt{EXIT} directive is encountered. (\texttt{EXIT: 0} will thus
+  indicate that subsequent tests are expected to exit normally).
 \item If there are several directives \texttt{OPT} in the same
   configuration level, they correspond to different test cases. The
   \texttt{OPT} directive(s) of a given configuration level replace(s)
@@ -1139,7 +1158,7 @@ or
   \texttt{@macro-name@} in a \texttt{CMD}, \texttt{LOG}, \texttt{OPT},
   \texttt{STDOPT} or \texttt{EXECNOW} directive at this configuration level
   or in any level below it will be replaced by \texttt{content}. Existing
-  pre-defined macros are listed in section~\ref{sec:ptests-macros}.
+  predefined macros are listed in section~\ref{sec:ptests-macros}.
 \item \texttt{MODULE}\nscodeidx{Test!Directive}{MODULE}
  directive takes as argument the name of a \texttt{.cmxs}
   module. It will then add a directive to compile this file with the
@@ -1153,6 +1172,19 @@ or
   the suite. This directive is only
   usable in a \texttt{test\_config}\codeidx{test\_config}
   configuration file.
+\item The \texttt{FILTER}\nscodeidx{Test!Directive}{FILTER} directive specifies
+  a transformation on the test result files before the comparison to the oracles.
+  The filtering command read the result from the standard input and the oracle
+  will be compared with the standard output of that command.
+  In such a directive, the predefined macro \texttt{@PTEST\_ORACLE@} is set to the
+  basename of the oracle.
+  That allows running a \texttt{diff} command with the oracle of another
+  test configuration \texttt{config}:
+  \begin{code}
+FILTER: diff --new-file @PTEST_DIR@/oracle_config/@PTEST_ORACLE@ -
+  \end{code}
+  Chaining multiple filter commands is possible by defining several \texttt{FILTER} directives (they are applied in the reverse order),
+  and an empty command drops the previous \texttt{FILTER} directives.
 \end{itemize}
 
 \begin{important}
@@ -3258,7 +3290,7 @@ their execution order.
   plug-in are determined during this stage.
 
 \item \textbf{The Exiting Stage:} this step is reserved for commands
-  that makes \framac exit before starting any analysis at all, such as
+  that make \framac exit before starting any analysis at all, such as
   printing help information:
   \begin{enumerate}[(a)]
 
@@ -3313,7 +3345,7 @@ their execution order.
   \begin{enumerate}[(a)]
   \item first, the command line options registered for the
     \texttt{Cmdline.Configuring}\sscodeidxdef{Cmdline}{stage}{Configuring} stage
-    are treated. Command line parameters that do not begin by an hyphen
+    are treated. Command line parameters that do not begin by a hyphen
     (character \texttt{'-'}) are \emph{not} options and are treated as
     \textsf{C} files. Thus they are added to the list of files to be
     preprocessed or parsed for building the \texttt{AST} (on demand);
@@ -3327,7 +3359,7 @@ their execution order.
   according to those indicated on the command line. More precisely:
 
   \begin{enumerate}[(a)]
-  \item first, each argument of the command line which does not begin by an
+  \item first, each argument of the command line which does not begin by a
     hyphen (character \texttt{'-'}) is registered for later analysis;
   \item then, the hooks registered through
     \texttt{Cmdline.run\_after\_setting\_files}
@@ -3493,7 +3525,7 @@ source files is to use an option such as \verb+-include+ in GCC.
   Contents of \verb+tests/misc/custom_machdep/__fc_machdep_custom.h+, used as
   example for creating custom machdeps. Notice the unusual size for \verb+int+
   (3 bytes), selected for testing purposes only, and inconsistent with the
-  the chosen values for \verb+INT_MIN+ and \verb+INT_MAX+, which do not fit
+  chosen values for \verb+INT_MIN+ and \verb+INT_MAX+, which do not fit
   in 3 bytes.
 \lstinputlisting{../../tests/misc/custom_machdep/__fc_machdep_custom.h}
 \end{example}
@@ -3901,7 +3933,6 @@ division in the program, stating that the divisor is not zero:
 \sscodeidx{Cil\_types}{binop}{Mod}
 \scodeidx{Logic\_utils}{expr\_to\_term}
 \scodeidx{Logic\_const}{prel}
-\scodeidx{Extlib}{the}
 \sscodeidx{Cil}{cilVisitor}{get\_filling\_actions}
 \sscodeidx{Cil}{visitAction}{DoChildren}
 \scodeidx{File}{create\_project\_from\_visitor}

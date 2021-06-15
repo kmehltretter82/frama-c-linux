@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -1595,9 +1595,11 @@ struct
     let visited = ref Tset.empty in
     let rec term_is_init_in_states states t =
       let raise_if_is_init t s =
-        match Mstate.lookup s t with
-        | Mlval(_, KInit) | Mchunk(_, KInit) -> raise Found
-        | _ -> ()
+        if Lang.F.is_primitive t then ()
+        else
+          match Mstate.lookup s t with
+          | Mlval(_, KInit) | Mchunk(_, KInit) -> raise Found
+          | _ -> ()
       in
       if Tset.mem t !visited then ()
       else begin

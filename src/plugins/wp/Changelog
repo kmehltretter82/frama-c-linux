@@ -24,12 +24,54 @@
 Plugin WP <next-release>
 #########################
 
+- WP          [2021-06-11] Adds an experimental support of "terminates" clauses.
+                           Adds the options -wp-declaration-terminate and
+                          -wp-frama-c-stdlib to claims that external functions
+                           terminates.
+                           Adds -wp-declarations-terminate option to claims that
+                           defined function terminates.
+                           Adds -wp-variant-with-terminates to verify loop
+                           variants under the termination hypothesis.
+- WP          [2021-06-01] -wp-smoke-tests detects incoherent assumes when no
+                           requires are specified, can be disabled with new
+                           option -wp-smoke-dead-assumes
+- TIP         [2021-05-31] Generalized Overflow tactic
+
+
+#########################
+Plugin WP 23.0 (Vanadium)
+#########################
+
+- WP          [2020-03-01] Section « Limitation & Roadmap » added to the WP manual.
+- WP          [2020-03-01] New internal WP engine, fixing many issues related to
+                           control flow graph and local variable scoping.
+                           Support for stmt contracts has been removed.
+                           Support for looping gotos has been removed.
+                           Altough unsound, the legacy engine is still
+                           accessible via -wp-legacy option.
+- WP          [2020-01-25] Improved -wp-unfold-assigns <depth>
+                           Now recursively applies to all compounds
+-* WP         [2020-01-20] Fixes opaque structures handling
+- TIP         [2020-11-06] New tactic: Sequence unrolling
+- TIP         [2020-11-05] New tactic: Induction
+- WP          [2020-11-04] Removed option -wp-bits (now always enabled)
+
+#########################
+Plugin WP 22.0 (Titanium)
+#########################
+
+- WP          [2020-10-14] New warning "pedantic-assigns". WP needs precise
+                           'assigns ... \from ...' specification about out
+                           pointers (\result and assigned pointers) to generate
+                           precise proof hypotheses.
+- WP          [2020-10-14] Hypotheses: out pointers (\result + written pointers)
 - WP          [2020-10-07] New tactic Bit-Test range
 - WP          [2020-09-21] Added support for Why3 interactive prover (Coq)
+- WP          [2020-09-21] Added support for Why3 Coq interactive prover
 - WP          [2020-09-21] New option -wp-interactive <mode>
 - WP          [2020-09-21] New option -wp-interactive-timeout <seconds>
-- WP          [2020-09-17] New experimental option: -wp-check-model-hypotheses
-                           Generates requires in contracts for model hypotheses
+- WP          [2020-09-17] New experimental option: -wp-check-memory-model
+                           Insert function contracts for model hypotheses
 - WP          [2020-09-17] Hypotheses: assigned memory locations
 - WP          [2020-09-11] Support for generalized @check ACSL annotations
 - WP          [2020-07-06] Removed debug keys "no-xxx-info" (subsumed by "shell")

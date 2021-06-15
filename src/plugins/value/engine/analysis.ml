@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -40,10 +40,11 @@ module type Results = sig
   val eval_lval_to_loc: state -> lval -> location evaluated
   val eval_function_exp:
     state -> ?args:exp list -> exp ->  kernel_function list evaluated
+  val assume_cond : stmt -> state -> exp -> bool -> state or_bottom
 end
 
 module type S = sig
-  include Abstractions.S
+  include Abstractions.Eva
   include Results with type state := Dom.state
                    and type value := Val.t
                    and type location := Loc.location
@@ -95,6 +96,11 @@ module Make (Abstract: Abstractions.S) = struct
   let eval_function_exp state ?args e =
     Eval.eval_function_exp e ?args state >>=: (List.map fst)
 
+  let assume_cond stmt state cond positive =
+    fst (Eval.reduce state cond positive) >>- fun valuation ->
+    let dval = Eval.to_domain_valuation valuation in
+    Dom.assume stmt cond positive dval state
+
 end
 
 
@@ -121,8 +127,15 @@ let current_analyzer () = (module (val (snd !ref_analyzer)): S)
    Useful for the GUI parts that depend on it. *)
 module Analyzer_Hook = Hook.Build (struct type t = (module S) end)
 
+(* Set of hooks called whenever the current Analyzer is computed.
+   Useful for the GUI parts that depend on it. *)
+module Computed_Hook = Hook.Build (struct type t = unit end)
+
 (* Register a new hook. *)
 let register_hook = Analyzer_Hook.extend
+
+(* Register a new computed hook. *)
+let register_computed_hook = Computed_Hook.extend
 
 (* Sets the current Analyzer module for a given configuration.
    Calls the hooks above. *)
@@ -160,10 +173,15 @@ let reset_analyzer () =
 let force_compute () =
   Ast.compute ();
   Value_parameters.configure_precision ();
+  if not (Kernel.AuditCheck.is_empty ()) then
+    Eva_audit.check_configuration (Kernel.AuditCheck.get ());
+  if not (Kernel.AuditPrepare.is_empty ()) then
+    Eva_audit.print_configuration (Kernel.AuditPrepare.get ());
   let kf, lib_entry = Globals.entry_point () in
   reset_analyzer ();
   let module Analyzer = (val snd !ref_analyzer) in
-  Analyzer.compute_from_entry_point ~lib_entry kf
+  Analyzer.compute_from_entry_point ~lib_entry kf ;
+  Computed_Hook.apply ()
 
 (* Resets the Analyzer when the current project is changed. *)
 let () =

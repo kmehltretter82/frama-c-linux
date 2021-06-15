@@ -15,3 +15,11 @@
  Functions                 WP     Alt-Ergo  Total   Success
   f                         3        1        5      80.0%
 ------------------------------------------------------------
+[wp] tests/wp_plugin/subset_fopen.c:13: Warning: 
+  Memory model hypotheses for function 'fopen':
+  /*@
+     behavior wp_typed:
+       requires \separated(&_p__fc_fopen, {filename + (..), mode + (..)});
+       ensures \separated(\result, &_p__fc_fopen);
+     */
+  FILE *fopen(char const * restrict filename, char const * restrict mode);

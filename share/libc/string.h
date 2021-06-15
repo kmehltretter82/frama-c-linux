@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2020                                               */
+/*  Copyright (C) 2007-2021                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -86,6 +86,9 @@ extern int memcmp (const void *s1, const void *s2, size_t n);
   @   ensures result_null: \result == \null;
   @*/
 extern void *memchr(const void *s, int c, size_t n);
+
+// Non-POSIX; GNU extension
+extern void *memrchr(const void *s, int c, size_t n);
 
 // Copy memory
 

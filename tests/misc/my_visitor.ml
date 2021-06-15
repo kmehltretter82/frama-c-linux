@@ -55,7 +55,7 @@ class foo = object (self)
 
   method! vstmt_aux stmt =
     let loc = Cil.CurrentLoc.get () in
-    add_assert loc (Extlib.the self#current_kf) stmt;
+    add_assert loc (Option.get self#current_kf) stmt;
     DoChildren
 
   method! vglob_aux _ = DoChildren

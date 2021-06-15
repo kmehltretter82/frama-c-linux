@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -49,20 +49,20 @@ let new_watchpoint name_lv loc v n =
 
 let add_watch make_watch state actuals =
   match actuals with
-  | [(dst_e, dst, _); (_, size, _); (_, target_value, _); (_, number, _)] ->
+  | [(dst_e, dst); (_, size); (_, target_value); (_, number)] ->
     let size =
       try
         let size = Cvalue.V.project_ival size in
         Int.mul Int.eight (Ival.project_int size)
       with V.Not_based_on_null | Ival.Not_Singleton_Int ->
-        raise Db.Value.Outside_builtin_possibilities
+        raise Builtins.Outside_builtin_possibilities
     in
     let number =
       try
         let number = Cvalue.V.project_ival number in
         Ival.project_int number
       with V.Not_based_on_null | Ival.Not_Singleton_Int ->
-        raise Db.Value.Outside_builtin_possibilities
+        raise Builtins.Outside_builtin_possibilities
     in
     let loc_bits = Locations.loc_bytes_to_loc_bits dst in
     let loc = Locations.make_loc loc_bits (Int_Base.inject size) in
@@ -76,10 +76,7 @@ let add_watch make_watch state actuals =
     then
       watch_table :=
         (new_watchpoint dst_e loc target_w number) :: current;
-    { Value_types.c_values = [None, state];
-      c_clobbered = Base.SetLattice.bottom;
-      c_from = None;
-      c_cacheable = Value_types.Cacheable }
+    Builtins.States [state]
   | _ -> raise (Builtins.Invalid_nb_of_args 4)
 
 let make_watch_value target_value = Value target_value
@@ -90,13 +87,13 @@ let make_watch_cardinal target_value =
     Cardinal (Integer.to_int (Ival.project_int target_value))
   with V.Not_based_on_null | Ival.Not_Singleton_Int
      | Z.Overflow (* from Integer.to_int *) ->
-    raise Db.Value.Outside_builtin_possibilities
+    raise Builtins.Outside_builtin_possibilities
 
 let () =
-  Builtins.register_builtin "Frama_C_watch_value" (add_watch make_watch_value)
+  Builtins.register_builtin "Frama_C_watch_value" Cacheable
+    (add_watch make_watch_value)
 let () =
-  Builtins.register_builtin
-    "Frama_C_watch_cardinal"
+  Builtins.register_builtin "Frama_C_watch_cardinal" Cacheable
     (add_watch make_watch_cardinal)
 
 let watch_hook (stmt, _callstack, states) =

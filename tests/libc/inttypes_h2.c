@@ -22,4 +22,11 @@ void main() {
   r = imaxdiv(a, b);
   //@ assert r.quot == 2;
   //@ assert r.rem == 1;
+
+  a = imaxabs(INTMAX_MAX);
+  //@ assert a == INTMAX_MAX;
+  a = imaxabs(INTMAX_MIN + 1);
+  //@ assert a >= 0;
+  a = imaxabs(0);
+  //@ assert a == 0;
 }

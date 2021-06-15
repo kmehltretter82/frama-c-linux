@@ -1,6 +1,6 @@
 /* run.config
-   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-   STDOPT: +"-load-module @PTEST_DIR@/@PTEST_NAME@ -lib-entry -main f -pdg -inout "
+ MODULE: @PTEST_NAME@
+   STDOPT: +"-lib-entry -main f -pdg -inout "
 */
 
 

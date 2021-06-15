@@ -17,7 +17,8 @@
   local_frame               -        1        1       100%
   global_frame              3        -        5      60.0%
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'global_frame':
-  /*@ behavior typed:
+[wp] tests/wp_bts/bts_1828.i:56: Warning: 
+  Memory model hypotheses for function 'global_frame':
+  /*@ behavior wp_typed:
         requires \separated(one, &zero); */
   void global_frame(int *one, int arg);

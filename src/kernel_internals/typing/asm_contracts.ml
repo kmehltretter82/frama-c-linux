@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -104,7 +104,7 @@ let extract_mem_term ~loc acc tlv =
   match Logic_utils.unroll_type (Cil.typeOfTermLval tlv) with
   | Ctype (TPtr _ ) -> access_ptr_elts ~loc tlv :: acc
   | Ctype (TArray(_,e,_,_)) ->
-    let size = Extlib.opt_bind (Cil.constFoldToInt ~machdep:true) e in
+    let size = Option.bind e (Cil.constFoldToInt ~machdep:true) in
     access_elts ~loc ?size tlv :: acc
   | _ -> acc
 
@@ -116,8 +116,8 @@ class visit_assembly =
     inherit Visitor.frama_c_inplace
 
     method! vinst i =
-      let stmt = Extlib.the self#current_stmt in
-      let kf = Extlib.the self#current_kf in
+      let stmt = Option.get self#current_stmt in
+      let kf = Option.get self#current_kf in
       match i with
       | Asm(_, _, Some { asm_outputs; asm_inputs; asm_clobbers }, loc) ->
         let lv_out, lv_from = find_out_lval asm_outputs in
@@ -195,7 +195,7 @@ class visit_assembly =
              List.iter
                Property_status.(
                  fun x -> emit emitter ~hyps:[] x True)
-               (Extlib.list_of_opt ip_assigns @ ip_from)
+               (Option.to_list ip_assigns @ ip_from)
            end
          | [ { annot_content = AStmtSpec ([], spec) } ] ->
            (* Already existing contracts. Just add assigns clause for

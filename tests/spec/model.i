@@ -1,6 +1,6 @@
 /* run.config
-EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-STDOPT: +"-no-autoload-plugins -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs"
+MODULE: @PTEST_NAME@
+STDOPT: +"-no-autoload-plugins"
 */
 struct S { int x; int y; };
 typedef struct S T;

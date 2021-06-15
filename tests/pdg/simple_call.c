@@ -1,5 +1,5 @@
 /* run.config
-   GCC:
+   
    STDOPT: +"-fct-pdg main "
    STDOPT: +"-main call_in_loop -fct-pdg call_in_loop "
    STDOPT: +"-main call_mix_G1_G2 -fct-pdg call_mix_G1_G2 "

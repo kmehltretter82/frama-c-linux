@@ -9,6 +9,8 @@ void memvar(void)
   //@check P2:  !\object_pointer(&x+2);
 }
 
+//@ logic char* GET = \null ;
+
 void pointer(void)
 {
   int x;
@@ -18,7 +20,8 @@ void pointer(void)
   //@check P0:   \object_pointer(p);
   //@check P1:   \object_pointer(p+1);
   //@check P2:  !\object_pointer(p+2);
-  //@check NULL: \object_pointer(\null);
+  //@check qed_NULL: \object_pointer(\null);
+  //@check prover_NULL: \object_pointer(GET);
 }
 
 void array(void)

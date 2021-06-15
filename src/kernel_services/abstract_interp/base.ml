@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -41,69 +41,69 @@ type validity =
 let pretty_validity fmt v =
   match v with
   | Empty -> Format.fprintf fmt "Empty"
-  | Unknown (b,k,e)  -> 
-      Format.fprintf fmt "Unknown %a/%a/%a"
-	Int.pretty b (Pretty_utils.pp_opt Int.pretty) k Int.pretty e
+  | Unknown (b,k,e)  ->
+    Format.fprintf fmt "Unknown %a/%a/%a"
+      Int.pretty b (Pretty_utils.pp_opt Int.pretty) k Int.pretty e
   | Known (b,e)  -> Format.fprintf fmt "Known %a-%a" Int.pretty b Int.pretty e
   | Invalid -> Format.fprintf fmt "Invalid"
   | Variable variable_v ->
-      Format.fprintf fmt "Variable [0..%a--%a]"
-	Int.pretty variable_v.min_alloc Int.pretty variable_v.max_alloc
+    Format.fprintf fmt "Variable [0..%a--%a]"
+      Int.pretty variable_v.min_alloc Int.pretty variable_v.max_alloc
 
 module Validity = Datatype.Make
-  (struct
-    type t = validity
-    let name = "Base.validity"
-    let structural_descr = Structural_descr.t_abstract
-    let reprs = [ Known (Int.zero, Int.one) ]
+    (struct
+      type t = validity
+      let name = "Base.validity"
+      let structural_descr = Structural_descr.t_abstract
+      let reprs = [ Known (Int.zero, Int.one) ]
 
-    (* Invalid > Variable > Unknown > Known > Empty *)
-    let compare v1 v2 = match v1, v2 with
-      | Empty, Empty -> 0
-      | Known (b1, e1), Known (b2, e2) ->
-        let c = Int.compare b1 b2 in
-        if c = 0 then Int.compare e1 e2 else c
-      | Unknown (b1, m1, e1), Unknown (b2, m2, e2) ->
-        let c = Int.compare b1 b2 in
-        if c = 0 then
-          let c = Extlib.opt_compare Int.compare m1 m2 in
+      (* Invalid > Variable > Unknown > Known > Empty *)
+      let compare v1 v2 = match v1, v2 with
+        | Empty, Empty -> 0
+        | Known (b1, e1), Known (b2, e2) ->
+          let c = Int.compare b1 b2 in
           if c = 0 then Int.compare e1 e2 else c
-        else c
-      | Variable v1, Variable v2 ->
-        let c = Int.compare v1.min_alloc v2.min_alloc in
-        if c = 0 then
-          let c = Int.compare v1.max_alloc v2.max_alloc in
-          if c = 0 then Int.compare v1.max_allocable v2.max_allocable
+        | Unknown (b1, m1, e1), Unknown (b2, m2, e2) ->
+          let c = Int.compare b1 b2 in
+          if c = 0 then
+            let c = Option.compare Int.compare m1 m2 in
+            if c = 0 then Int.compare e1 e2 else c
           else c
-        else c
-      | Invalid, Invalid -> 0
-      | Empty, (Known _ | Unknown _ | Variable _ | Invalid)
-      | Known _, (Unknown _ | Variable _ | Invalid)
-      | Unknown _, (Variable _ | Invalid)
-      | Variable _, Invalid -> -1
-      | Invalid, (Variable _ | Unknown _ | Known _ | Empty)
-      | Variable _, (Unknown _ | Known _ | Empty)
-      | Unknown _, (Known _ | Empty)
-      | Known _, Empty -> 1
+        | Variable v1, Variable v2 ->
+          let c = Int.compare v1.min_alloc v2.min_alloc in
+          if c = 0 then
+            let c = Int.compare v1.max_alloc v2.max_alloc in
+            if c = 0 then Int.compare v1.max_allocable v2.max_allocable
+            else c
+          else c
+        | Invalid, Invalid -> 0
+        | Empty, (Known _ | Unknown _ | Variable _ | Invalid)
+        | Known _, (Unknown _ | Variable _ | Invalid)
+        | Unknown _, (Variable _ | Invalid)
+        | Variable _, Invalid -> -1
+        | Invalid, (Variable _ | Unknown _ | Known _ | Empty)
+        | Variable _, (Unknown _ | Known _ | Empty)
+        | Unknown _, (Known _ | Empty)
+        | Known _, Empty -> 1
 
-    let equal = Datatype.from_compare
+      let equal = Datatype.from_compare
 
-    let hash v = match v with
-      | Empty -> 13
-      | Invalid -> 37
-      | Known (b, e) -> Hashtbl.hash (3, Int.hash b, Int.hash e)
-      | Unknown (b, m, e) ->
-        Hashtbl.hash (7, Int.hash b, Extlib.opt_hash Int.hash m, Int.hash e)
-      | Variable variable_v ->
-        Hashtbl.hash (Int.hash variable_v.min_alloc, Int.hash variable_v.max_alloc)
+      let hash v = match v with
+        | Empty -> 13
+        | Invalid -> 37
+        | Known (b, e) -> Hashtbl.hash (3, Int.hash b, Int.hash e)
+        | Unknown (b, m, e) ->
+          Hashtbl.hash (7, Int.hash b, Extlib.opt_hash Int.hash m, Int.hash e)
+        | Variable variable_v ->
+          Hashtbl.hash (Int.hash variable_v.min_alloc, Int.hash variable_v.max_alloc)
 
-    let pretty = pretty_validity
-    let mem_project = Datatype.never_any_project
-    let internal_pretty_code = Datatype.pp_fail
-    let rehash = Datatype.identity
-    let copy (x:t) = x
-    let varname _ = "v"
-   end)
+      let pretty = pretty_validity
+      let mem_project = Datatype.never_any_project
+      let internal_pretty_code = Datatype.pp_fail
+      let rehash = Datatype.identity
+      let copy (x:t) = x
+      let varname _ = "v"
+    end)
 
 type cstring = CSString of string | CSWstring of Escape.wstring
 
@@ -128,20 +128,20 @@ let null = Null
 
 let is_null x = match x with Null -> true | _ -> false
 
-let pretty fmt t = 
+let pretty fmt t =
   match t with
-    | String (_, CSString s) -> Format.fprintf fmt "%S" s
-    | String (_, CSWstring s) -> 
-        Format.fprintf fmt "L\"%s\"" (Escape.escape_wstring s)
-    | Var (t,_) | Allocated (t,_,_) -> Printer.pp_varinfo fmt t
-    | CLogic_Var (lvi, _, _) -> Printer.pp_logic_var fmt lvi
-    | Null -> Format.pp_print_string fmt "NULL"
+  | String (_, CSString s) -> Format.fprintf fmt "%S" s
+  | String (_, CSWstring s) ->
+    Format.fprintf fmt "L\"%s\"" (Escape.escape_wstring s)
+  | Var (t,_) | Allocated (t,_,_) -> Printer.pp_varinfo fmt t
+  | CLogic_Var (lvi, _, _) -> Printer.pp_logic_var fmt lvi
+  | Null -> Format.pp_print_string fmt "NULL"
 
 let pretty_addr fmt t =
   (match t with
-    | Var _ | CLogic_Var _ | Allocated _ ->
-      Format.pp_print_string fmt "&"
-    | String _ | Null -> ()
+   | Var _ | CLogic_Var _ | Allocated _ ->
+     Format.pp_print_string fmt "&"
+   | String _ | Null -> ()
   );
   pretty fmt t
 
@@ -154,24 +154,24 @@ let typeof v =
   | Null -> None
   | Var (v,_) | Allocated(v,_,_) -> Some (unrollType v.vtype)
 
-let cstring_bitlength s = 
-  let u, l = 
+let cstring_bitlength s =
+  let u, l =
     match s with
     | CSString s ->
-	bitsSizeOf charType, (String.length s)
+      bitsSizeOf charType, (String.length s)
     | CSWstring s ->
-	bitsSizeOf theMachine.wcharType, (List.length s)
+      bitsSizeOf theMachine.wcharType, (List.length s)
   in
   Int.of_int (u*(succ l))
 
 let bits_sizeof v =
   match v with
-    | String (_,e) ->
-        Int_Base.inject (cstring_bitlength e)
-    | Null -> Int_Base.top
-    | Var (v,_) | Allocated (v,_,_) ->
-        Bit_utils.sizeof_vid v
-    | CLogic_Var (_, ty, _) -> Bit_utils.sizeof ty
+  | String (_,e) ->
+    Int_Base.inject (cstring_bitlength e)
+  | Null -> Int_Base.top
+  | Var (v,_) | Allocated (v,_,_) ->
+    Bit_utils.sizeof_vid v
+  | CLogic_Var (_, ty, _) -> Bit_utils.sizeof ty
 
 let dep_absolute = [Kernel.AbsoluteValidRange.self]
 
@@ -179,32 +179,32 @@ module MinValidAbsoluteAddress =
   State_builder.Ref
     (Abstract_interp.Int)
     (struct
-       let name = "MinValidAbsoluteAddress"
-       let dependencies = dep_absolute
-       let default () = Abstract_interp.Int.zero
-     end)
+      let name = "MinValidAbsoluteAddress"
+      let dependencies = dep_absolute
+      let default () = Abstract_interp.Int.zero
+    end)
 
 module MaxValidAbsoluteAddress =
   State_builder.Ref
     (Abstract_interp.Int)
     (struct
-       let name = "MaxValidAbsoluteAddress"
-       let dependencies = dep_absolute
-       let default () = Abstract_interp.Int.minus_one
-     end)
+      let name = "MaxValidAbsoluteAddress"
+      let dependencies = dep_absolute
+      let default () = Abstract_interp.Int.minus_one
+    end)
 
 let () =
   Kernel.AbsoluteValidRange.add_set_hook
     (fun _ x ->
        try Scanf.sscanf x "%s@-%s"
-         (fun min max ->
-(* let mul_CHAR_BIT = Int64.mul (Int64.of_int (bitsSizeOf charType)) in *)
-(* the above is what we would like to write but it is too early *)
-	   let mul_CHAR_BIT = Int.mul Int.eight in 
-            MinValidAbsoluteAddress.set
-              (mul_CHAR_BIT (Int.of_string min));
-            MaxValidAbsoluteAddress.set
-              ((Int.pred (mul_CHAR_BIT (Int.succ (Int.of_string max))))))
+             (fun min max ->
+                (* let mul_CHAR_BIT = Int64.mul (Int64.of_int (bitsSizeOf charType)) in *)
+                (* the above is what we would like to write but it is too early *)
+                let mul_CHAR_BIT = Int.mul Int.eight in
+                MinValidAbsoluteAddress.set
+                  (mul_CHAR_BIT (Int.of_string min));
+                MaxValidAbsoluteAddress.set
+                  ((Int.pred (mul_CHAR_BIT (Int.succ (Int.of_string max))))))
        with End_of_file | Scanf.Scan_failure _ | Failure _
           | Invalid_argument _ as e ->
          Kernel.abort "Invalid -absolute-valid-range integer-integer: each integer may be in decimal, hexadecimal (0x, 0X), octal (0o) or binary (0b) notation and has to hold in 64 bits. A correct example is -absolute-valid-range 1-0xFFFFFF0.@\nError was %S@."
@@ -221,7 +221,7 @@ let validity_from_size size =
 let validity_from_known_size size =
   match size with
   | Int_Base.Value size ->
-          (* all start to be valid at offset 0 *)
+    (* all start to be valid at offset 0 *)
     validity_from_size size
   | Int_Base.Top ->
     Unknown (Int.zero, None, Bit_utils.max_bit_address ())
@@ -230,15 +230,15 @@ let validity b =
   match b with
   | Var (_,v) | CLogic_Var (_, _, v) | Allocated (_,_,v) -> v
   | Null ->
-      let mn = min_valid_absolute_address ()in
-      let mx = max_valid_absolute_address () in
-      if Integer.gt mx mn then
-        Known (mn, mx)
-      else
-        Invalid
+    let mn = min_valid_absolute_address ()in
+    let mx = max_valid_absolute_address () in
+    if Integer.gt mx mn then
+      Known (mn, mx)
+    else
+      Invalid
   | String _ ->
-      let size = bits_sizeof b in
-      validity_from_known_size size
+    let size = bits_sizeof b in
+    validity_from_known_size size
 
 let is_read_only base =
   match base with
@@ -257,8 +257,8 @@ let rec final_empty_struct = function
   | TComp (compinfo, _, _) ->
     begin
       match compinfo.cfields with
-      | [] -> true
-      | l ->
+      | Some [] | None -> true
+      | Some l ->
         let last_field = List.(hd (rev l)) in
         try Cil.bitsSizeOf last_field.ftype = 0
         with Cil.SizeOfError _ -> false
@@ -341,7 +341,7 @@ let is_function base =
   match base with
   | String _ | Null | CLogic_Var _ | Allocated _ -> false
   | Var(v,_) ->
-      isFunctionType v.vtype
+    isFunctionType v.vtype
 
 let equal v w = (id v) = (id w)
 
@@ -349,13 +349,15 @@ let is_aligned_by b alignment =
   if Int.is_zero alignment
   then false
   else
-    match b with
-    | Var (v,_) | Allocated(v,_,_) ->
+    try
+      match b with
+      | Var (v,_) | Allocated(v,_,_) ->
         Int.is_zero (Int.e_rem (Int.of_int (Cil.bytesAlignOf v.vtype)) alignment)
-    | CLogic_Var (_, ty, _) ->
-      Int.is_zero (Int.e_rem (Int.of_int (Cil.bytesAlignOf ty)) alignment)
-    | Null -> true
-    | String _ -> Int.is_one alignment
+      | CLogic_Var (_, ty, _) ->
+        Int.is_zero (Int.e_rem (Int.of_int (Cil.bytesAlignOf ty)) alignment)
+      | Null -> true
+      | String _ -> Int.is_one alignment
+    with Cil.SizeOfError _ -> false
 
 let is_any_formal_or_local v =
   match v with
@@ -403,11 +405,11 @@ let is_block_local v block =
 let validity_from_type v =
   if isFunctionType v.vtype then Invalid
   else
-  let max_valid = Bit_utils.sizeof_vid v in
-  match max_valid with
-  | Int_Base.Top ->
-    Unknown (Int.zero, None, Bit_utils.max_bit_address ())
-  | Int_Base.Value size -> validity_from_size size
+    let max_valid = Bit_utils.sizeof_vid v in
+    match max_valid with
+    | Int_Base.Top ->
+      Unknown (Int.zero, None, Bit_utils.max_bit_address ())
+    | Int_Base.Value size -> validity_from_size size
 
 type range_validity =
   | Invalid_range
@@ -436,30 +438,31 @@ let update_variable_validity v ~weak ~min_alloc ~max_alloc =
 
 module Base = struct
   include Datatype.Make_with_collections
-  (struct
-    type t = base
-    let name = "Base"
-    let structural_descr = Structural_descr.t_abstract (* TODO better *)
-    let reprs = [ Null ]
-    let equal = equal
-    let compare = compare
-    let pretty = pretty
-    let hash = hash
-    let mem_project = Datatype.never_any_project
-    let internal_pretty_code = Datatype.pp_fail
-    let rehash = Datatype.identity
-    let copy = Datatype.undefined
-    let varname = Datatype.undefined
-   end)
+      (struct
+        type t = base
+        let name = "Base"
+        let structural_descr = Structural_descr.t_abstract (* TODO better *)
+        let reprs = [ Null ]
+        let equal = equal
+        let compare = compare
+        let pretty = pretty
+        let hash = hash
+        let mem_project = Datatype.never_any_project
+        let internal_pretty_code = Datatype.pp_fail
+        let rehash = Datatype.identity
+        let copy = Datatype.undefined
+        let varname = Datatype.undefined
+      end)
   let id = id
+  let pretty_debug = pretty
 end
 
 include Base
 
 module Hptset = Hptset.Make
-  (Base)
-  (struct let v = [ [ ]; [Null] ] end)
-  (struct let l = [ Ast.self ] end)
+    (Base)
+    (struct let v = [ [ ]; [Null] ] end)
+    (struct let l = [ Ast.self ] end)
 let () = Ast.add_monotonic_state Hptset.self
 let () = Ast.add_hook_on_update Hptset.clear_caches
 
@@ -469,10 +472,10 @@ module VarinfoNotSource =
   Cil_state_builder.Varinfo_hashtbl
     (Base)
     (struct
-       let name = "Base.VarinfoLogic"
-       let dependencies = [ Ast.self ]
-       let size = 89
-     end)
+      let name = "Base.VarinfoLogic"
+      let dependencies = [ Ast.self ]
+      let size = 89
+    end)
 let () = Ast.add_monotonic_state VarinfoNotSource.self
 
 let base_of_varinfo varinfo =
@@ -484,12 +487,12 @@ module Validities =
   Cil_state_builder.Varinfo_hashtbl
     (Base)
     (struct
-       let name = "Base.Validities"
-       let dependencies = [ Ast.self ]
-         (* No dependency on Kernel.AbsoluteValidRange.self needed:
-            the null base is not present in this table (not a varinfo) *)
-       let size = 117
-     end)
+      let name = "Base.Validities"
+      let dependencies = [ Ast.self ]
+      (* No dependency on Kernel.AbsoluteValidRange.self needed:
+         the null base is not present in this table (not a varinfo) *)
+      let size = 117
+    end)
 let () = Ast.add_monotonic_state Validities.self
 
 let of_varinfo_aux = Validities.memo base_of_varinfo
@@ -508,9 +511,9 @@ let register_allocated_var varinfo deallocation validity =
 
 let of_c_logic_var lv =
   match Logic_utils.unroll_type lv.lv_type with
-    | Ctype ty ->
-      CLogic_Var (lv, ty, validity_from_known_size (Bit_utils.sizeof ty))
-    | _ -> Kernel.fatal "Logic variable with a non-C type %s" lv.lv_name
+  | Ctype ty ->
+    CLogic_Var (lv, ty, validity_from_known_size (Bit_utils.sizeof ty))
+  | _ -> Kernel.fatal "Logic variable with a non-C type %s" lv.lv_name
 
 let of_varinfo varinfo =
   if varinfo.vsource
@@ -533,10 +536,10 @@ module LiteralStrings =
     (Datatype.Int.Hashtbl)
     (Base)
     (struct
-       let name = "literal strings"
-       let dependencies = [ Ast.self ]
-       let size = 17
-     end)
+      let name = "literal strings"
+      let dependencies = [ Ast.self ]
+      let size = 17
+    end)
 let () = Ast.add_monotonic_state LiteralStrings.self
 
 let of_string_exp e =
@@ -549,6 +552,17 @@ let of_string_exp e =
 
 module SetLattice = Make_Hashconsed_Lattice_Set(Base)(Hptset)
 
+module BMap =
+  Hptmap.Make (Base) (Base) (Hptmap.Comp_unused)
+    (struct let v = [ [] ] end)
+    (struct let l = [ Ast.self ] end)
+
+type substitution = base Hptmap.Shape(Base).t
+
+let substitution_from_list list =
+  let add map (key, elt) = BMap.add key elt map in
+  let bmap = List.fold_left add BMap.empty list in
+  BMap.shape bmap
 
 (*
 Local Variables:

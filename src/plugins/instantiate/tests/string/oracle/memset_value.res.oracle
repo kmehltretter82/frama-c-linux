@@ -66,10 +66,10 @@ char *memset_char(char *ptr, char value, size_t len)
   return __retres;
 }
 
-void chars(char * /*[10]*/ dest, char value)
+void chars(char dest[10], char value)
 {
-  char *res = memset_char(dest,value,(unsigned int)10);
-  memset_char(res,value,(unsigned int)10);
+  char *res = memset_char(dest,value,(unsigned long)10);
+  memset_char(res,value,(unsigned long)10);
   return;
 }
 
@@ -90,10 +90,10 @@ unsigned char *memset_uchar(unsigned char *ptr, unsigned char value,
   return __retres;
 }
 
-void uchars(char * /*[10]*/ dest, unsigned char value)
+void uchars(char dest[10], unsigned char value)
 {
-  unsigned char *res = memset_char(dest,(char)value,(unsigned int)10);
-  memset_uchar(res,value,(unsigned int)10);
+  unsigned char *res = memset_char(dest,(char)value,(unsigned long)10);
+  memset_uchar(res,value,(unsigned long)10);
   return;
 }
 
@@ -118,75 +118,76 @@ char (*memset_arr10_char(char (*ptr)[10], char value, size_t len))[10]
   return __retres;
 }
 
-void nested_chars(char (* /*[10]*/ dest)[10], char value)
+void nested_chars(char dest[10][10], char value)
 {
-  char (*res)[10] = memset_arr10_char(dest,value,(unsigned int)100);
-  memset_arr10_char(res,value,(unsigned int)100);
+  char (*res)[10] = memset_arr10_char(dest,value,(unsigned long)100);
+  memset_arr10_char(res,value,(unsigned long)100);
   return;
 }
 
-void integer(int * /*[10]*/ dest, int value)
+void integer(int dest[10], int value)
 {
-  int *res = memset((void *)dest,value,(unsigned int)10 * sizeof(int));
-  memset((void *)res,value,(unsigned int)10 * sizeof(int));
+  int *res = memset((void *)dest,value,(unsigned long)10 * sizeof(int));
+  memset((void *)res,value,(unsigned long)10 * sizeof(int));
   return;
 }
 
-void with_enum(enum E * /*[10]*/ dest, int value)
+void with_enum(enum E dest[10], int value)
 {
-  enum E *res = memset((void *)dest,value,(unsigned int)10 * sizeof(enum E));
-  memset((void *)res,value,(unsigned int)10 * sizeof(enum E));
+  enum E *res =
+    memset((void *)dest,value,(unsigned long)10 * sizeof(enum E));
+  memset((void *)res,value,(unsigned long)10 * sizeof(enum E));
   return;
 }
 
-void with_named(named * /*[10]*/ dest, int value)
+void with_named(named dest[10], int value)
 {
-  named *res = memset((void *)dest,value,(unsigned int)10 * sizeof(named));
-  memset((void *)res,value,(unsigned int)10 * sizeof(named));
+  named *res = memset((void *)dest,value,(unsigned long)10 * sizeof(named));
+  memset((void *)res,value,(unsigned long)10 * sizeof(named));
   return;
 }
 
-void structure(struct X * /*[10]*/ dest, int value)
+void structure(struct X dest[10], int value)
 {
   struct X *res =
-    memset((void *)dest,value,(unsigned int)10 * sizeof(struct X));
-  memset((void *)res,value,(unsigned int)10 * sizeof(struct X));
+    memset((void *)dest,value,(unsigned long)10 * sizeof(struct X));
+  memset((void *)res,value,(unsigned long)10 * sizeof(struct X));
   return;
 }
 
-void pointers(int ** /*[10]*/ dest, int value)
+void pointers(int *dest[10], int value)
 {
-  int **res = memset((void *)dest,value,(unsigned int)10 * sizeof(int *));
-  memset((void *)res,value,(unsigned int)10 * sizeof(int *));
+  int **res = memset((void *)dest,value,(unsigned long)10 * sizeof(int *));
+  memset((void *)res,value,(unsigned long)10 * sizeof(int *));
   return;
 }
 
 void nested(int (*dest)[10], int n, int value)
 {
   int (*res)[10] =
-    memset((void *)dest,value,(unsigned int)n * sizeof(int [10]));
-  memset((void *)res,value,(unsigned int)n * sizeof(int [10]));
+    memset((void *)dest,value,(unsigned long)n * sizeof(int [10]));
+  memset((void *)res,value,(unsigned long)n * sizeof(int [10]));
   return;
 }
 
 void with_void(void *dest, int value)
 {
-  void *res = memset(dest,value,(unsigned int)10);
-  memset(res,value,(unsigned int)10);
+  void *res = memset(dest,value,(unsigned long)10);
+  memset(res,value,(unsigned long)10);
   return;
 }
 
 void with_incomplete(struct incomplete *dest, int value)
 {
-  struct incomplete *res = memset((void *)dest,value,(unsigned int)10);
-  memset((void *)res,value,(unsigned int)10);
+  struct incomplete *res = memset((void *)dest,value,(unsigned long)10);
+  memset((void *)res,value,(unsigned long)10);
   return;
 }
 
 void with_null_or_int(int value)
 {
-  memset((void *)0,value,(unsigned int)10);
-  memset((void *)((int *)42),value,(unsigned int)10);
+  memset((void *)0,value,(unsigned long)10);
+  memset((void *)((int *)42),value,(unsigned long)10);
   return;
 }
 
@@ -225,10 +226,10 @@ char *memset_char(char *ptr, char value, size_t len)
   return __retres;
 }
 
-void chars(char *dest, char value)
+void chars(char dest[10], char value)
 {
-  char *res = memset_char(dest,value,(unsigned int)10);
-  memset_char(res,value,(unsigned int)10);
+  char *res = memset_char(dest,value,(unsigned long)10);
+  memset_char(res,value,(unsigned long)10);
   return;
 }
 
@@ -251,10 +252,10 @@ unsigned char *memset_uchar(unsigned char *ptr, unsigned char value,
   return __retres;
 }
 
-void uchars(char *dest, unsigned char value)
+void uchars(char dest[10], unsigned char value)
 {
-  unsigned char *res = memset_char(dest,(char)value,(unsigned int)10);
-  memset_uchar(res,value,(unsigned int)10);
+  unsigned char *res = memset_char(dest,(char)value,(unsigned long)10);
+  memset_uchar(res,value,(unsigned long)10);
   return;
 }
 
@@ -280,75 +281,76 @@ char (*memset_arr10_char(char (*ptr)[10], char value, size_t len))[10]
   return __retres;
 }
 
-void nested_chars(char (*dest)[10], char value)
+void nested_chars(char dest[10][10], char value)
 {
-  char (*res)[10] = memset_arr10_char(dest,value,(unsigned int)100);
-  memset_arr10_char(res,value,(unsigned int)100);
+  char (*res)[10] = memset_arr10_char(dest,value,(unsigned long)100);
+  memset_arr10_char(res,value,(unsigned long)100);
   return;
 }
 
-void integer(int *dest, int value)
+void integer(int dest[10], int value)
 {
-  int *res = memset((void *)dest,value,(unsigned int)10 * sizeof(int));
-  memset((void *)res,value,(unsigned int)10 * sizeof(int));
+  int *res = memset((void *)dest,value,(unsigned long)10 * sizeof(int));
+  memset((void *)res,value,(unsigned long)10 * sizeof(int));
   return;
 }
 
-void with_enum(enum E *dest, int value)
+void with_enum(enum E dest[10], int value)
 {
-  enum E *res = memset((void *)dest,value,(unsigned int)10 * sizeof(enum E));
-  memset((void *)res,value,(unsigned int)10 * sizeof(enum E));
+  enum E *res =
+    memset((void *)dest,value,(unsigned long)10 * sizeof(enum E));
+  memset((void *)res,value,(unsigned long)10 * sizeof(enum E));
   return;
 }
 
-void with_named(named *dest, int value)
+void with_named(named dest[10], int value)
 {
-  named *res = memset((void *)dest,value,(unsigned int)10 * sizeof(named));
-  memset((void *)res,value,(unsigned int)10 * sizeof(named));
+  named *res = memset((void *)dest,value,(unsigned long)10 * sizeof(named));
+  memset((void *)res,value,(unsigned long)10 * sizeof(named));
   return;
 }
 
-void structure(struct X *dest, int value)
+void structure(struct X dest[10], int value)
 {
   struct X *res =
-    memset((void *)dest,value,(unsigned int)10 * sizeof(struct X));
-  memset((void *)res,value,(unsigned int)10 * sizeof(struct X));
+    memset((void *)dest,value,(unsigned long)10 * sizeof(struct X));
+  memset((void *)res,value,(unsigned long)10 * sizeof(struct X));
   return;
 }
 
-void pointers(int **dest, int value)
+void pointers(int *dest[10], int value)
 {
-  int **res = memset((void *)dest,value,(unsigned int)10 * sizeof(int *));
-  memset((void *)res,value,(unsigned int)10 * sizeof(int *));
+  int **res = memset((void *)dest,value,(unsigned long)10 * sizeof(int *));
+  memset((void *)res,value,(unsigned long)10 * sizeof(int *));
   return;
 }
 
 void nested(int (*dest)[10], int n, int value)
 {
   int (*res)[10] =
-    memset((void *)dest,value,(unsigned int)n * sizeof(int [10]));
-  memset((void *)res,value,(unsigned int)n * sizeof(int [10]));
+    memset((void *)dest,value,(unsigned long)n * sizeof(int [10]));
+  memset((void *)res,value,(unsigned long)n * sizeof(int [10]));
   return;
 }
 
 void with_void(void *dest, int value)
 {
-  void *res = memset(dest,value,(unsigned int)10);
-  memset(res,value,(unsigned int)10);
+  void *res = memset(dest,value,(unsigned long)10);
+  memset(res,value,(unsigned long)10);
   return;
 }
 
 void with_incomplete(struct incomplete *dest, int value)
 {
-  struct incomplete *res = memset((void *)dest,value,(unsigned int)10);
-  memset((void *)res,value,(unsigned int)10);
+  struct incomplete *res = memset((void *)dest,value,(unsigned long)10);
+  memset((void *)res,value,(unsigned long)10);
   return;
 }
 
 void with_null_or_int(int value)
 {
-  memset((void *)0,value,(unsigned int)10);
-  memset((void *)((int *)42),value,(unsigned int)10);
+  memset((void *)0,value,(unsigned long)10);
+  memset((void *)((int *)42),value,(unsigned long)10);
   return;
 }
 

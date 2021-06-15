@@ -4,16 +4,22 @@ MACRO: DEST @PTEST_RESULT@/@PTEST_NAME@
 MACRO: OUT @PTEST_NAME@.res.log
 MACRO: ERR @PTEST_NAME@.err.log
 MACRO: EACSL_ERR @PTEST_NAME@.e-acsl.err.log
+
 COMMENT: Define the following macro to "no" in a test to stop the execution of `e-acsl-gcc.sh`
 MACRO: ROOT_EACSL_GCC_ENABLE yes
 COMMENT: Default options for `e-acsl-gcc.sh`
 MACRO: ROOT_EACSL_GCC_MISC_OPTS -q -X
 COMMENT: Default options for the frama-c invocation
-MACRO: ROOT_EACSL_GCC_FC_EXTRA -journal-disable -verbose 0 -kernel-warn-key *=inactive
+MACRO: ROOT_EACSL_GCC_FC_EXTRA -journal-disable -verbose 0
+
+PLUGIN: E_ACSL eva,scope,variadic rtegen
+
+EXEC: LOG @EACSL_ERR@ if test "@ROOT_EACSL_GCC_ENABLE@" = "yes"; then ./scripts/e-acsl-gcc.sh -I @frama-c-exe@ -c @ROOT_EACSL_GCC_MISC_OPTS@ --frama-c-extra="@PTEST_DEFAULT_OPTIONS@ @PTEST_LOAD_OPTIONS@ @ROOT_EACSL_GCC_FC_EXTRA@ @ROOT_EACSL_GCC_FC_EXTRA_EXT@" @ROOT_EACSL_GCC_OPTS_EXT@ -o @DEST@.gcc.c -O @DEST@ @PTEST_FILE@ > @PTEST_RESULT@/@OUT@ 2> @PTEST_RESULT@/@ERR@ && ./@DEST@.e-acsl 2>&1 1>/dev/null | @ROOT_EACSL_EXEC_FILTER@ > @PTEST_RESULT@/@EACSL_ERR@; fi
+
+COMMENT: These next macros can be redefined in a test file
 COMMENT: Define the following macro in a test to pass extra options to the frama-c invocation
 MACRO: ROOT_EACSL_GCC_FC_EXTRA_EXT
 COMMENT: Define the following macro in a test to pass extra options to `e-acsl-gcc.sh`
 MACRO: ROOT_EACSL_GCC_OPTS_EXT
 COMMENT: Define the following macro in a test to filter the output of the test execution
 MACRO: ROOT_EACSL_EXEC_FILTER cat
-EXEC: LOG @EACSL_ERR@ if test "@ROOT_EACSL_GCC_ENABLE@" = "yes"; then ./scripts/e-acsl-gcc.sh -I @frama-c@ -c @ROOT_EACSL_GCC_MISC_OPTS@ --frama-c-extra="@ROOT_EACSL_GCC_FC_EXTRA@ @ROOT_EACSL_GCC_FC_EXTRA_EXT@" @ROOT_EACSL_GCC_OPTS_EXT@ -o @DEST@.gcc.c -O @DEST@ @PTEST_FILE@ > @PTEST_RESULT@/@OUT@ 2> @PTEST_RESULT@/@ERR@ && ./@DEST@.e-acsl 2>&1 1>/dev/null | @ROOT_EACSL_EXEC_FILTER@ > @PTEST_RESULT@/@EACSL_ERR@; fi

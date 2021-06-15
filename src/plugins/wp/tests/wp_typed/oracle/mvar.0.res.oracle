@@ -11,10 +11,18 @@
 Goal Post-condition (file tests/wp_typed/mvar.i, line 12) in 'Job':
 Assume {
   (* Heap *)
-  Type: IsArray1_sint8(A).
+  Type: IsArray_sint8(A).
   (* Call 'Write' *)
   Have: A[0] = 1.
 }
 Prove: P_equal(1, 1).
 
 ------------------------------------------------------------
+[wp] tests/wp_typed/mvar.i:8: Warning: 
+  Memory model hypotheses for function 'Write':
+  /*@
+     behavior wp_typed:
+       requires \separated(p + (..), (char *)A + (..));
+       requires \separated(p + (0 ..), (char *)A + (..));
+     */
+  extern void Write(char *p, int n);

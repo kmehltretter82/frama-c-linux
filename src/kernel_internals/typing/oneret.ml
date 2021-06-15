@@ -483,7 +483,7 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
     lastloc := !currentLoc ;  *) (* last location in the function *)
   f.sbody <- scanBlock true f.sbody ;
   if !haveGoto && !retStmt != dummyStmt then encapsulate_local_vars f;
-  Extlib.may do_callback callback
+  Option.iter do_callback callback
 
 (*
   Local Variables:

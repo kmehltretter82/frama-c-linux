@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -172,7 +172,7 @@ let append_source_tab w titre =
   in
   let window = (Source_viewer.make ~packing:sw#add ()) in
   ignore
-    (cbutton#connect#clicked 
+    (cbutton#connect#clicked
        ~callback:(fun () -> delete_view_and_loc w window ()));
   (* Remove default pango menu for textviews *)
   ignore (window#event#connect#button_press ~callback:
@@ -180,7 +180,7 @@ let append_source_tab w titre =
   Q.add_at_end window w.views;
   let last = pred (Q.length w.views) in
   (* THIS CALLS THE SWITCH_PAGE CALLBACK IMMEDIATELY! *)
-  w.notebook#goto_page last;  
+  w.notebook#goto_page last;
   window
 
 (*

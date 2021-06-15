@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -112,6 +112,17 @@ module type Lattice = sig
       without impeding the analysis: [meet x y = `Value x] is always sound. *)
 end
 
+(** Context from the engine evaluation about a domain query. *)
+type evaluation_context = {
+  root: bool;
+  (** Is the queried expression the "root" expression being evaluated, or is it
+      a sub-expression? *)
+  subdivision: int;
+  (** Maximum number of subdivisions for the current evaluation.
+      See {!Subdivided_evaluation} for more details. *)
+  subdivided: bool;
+  (** Is the current evaluation a subdivision of the complete evaluation? *)
+}
 
 (** Extraction of information: queries for values or locations inferred by a
     domain about expressions and lvalues.
@@ -137,20 +148,29 @@ module type Queries = sig
            value of the expression [exp], and [o] is the origin of the value,
            which can be None. *)
 
+  (** When evaluating an expression, the evaluation engine asks the domains
+      for abstract values and alarms at each lvalue (via [extract_lval]) and
+      each sub-expressions (via [extract_expr]).
+      In these queries:
+      - [oracle] is an evaluation function and can be used to find the answer
+        by evaluating some others expressions, especially by relational domain.
+        No recursive evaluation should be done by this function.
+      - [context] record gives some information about
+        the current evaluation. *)
+
   (** Query function for compound expressions:
-      [eval oracle t exp] returns the known value of [exp] by the state [t].
-      [oracle] is an evaluation function and can be used to find the answer
-      by evaluating some others expressions, especially by relational domain.
-      No recursive evaluation should be done by this function. *)
+      [extract_expr ~oracle context t exp] returns the known value of [exp]
+      by the state [t]. See above for more details on queries. *)
   val extract_expr :
-    (exp -> value evaluated) ->
+    oracle:(exp -> value evaluated) -> evaluation_context ->
     state -> exp -> (value * origin option) evaluated
 
   (** Query function for lvalues:
-      [find oracle t lval typ loc] returns the known value stored at
-      the location [loc] of the left value [lval] of type [typ]. *)
+      [extract_lval ~oracle context t lval typ loc] returns the known value
+      stored at the location [loc] of the left value [lval] of type [typ].
+      See above for more details on queries. *)
   val extract_lval :
-    (exp -> value evaluated) ->
+    oracle:(exp -> value evaluated) -> evaluation_context ->
     state -> lval -> typ -> location -> (value * origin option) evaluated
 
   (** [backward_location state lval typ loc v] reduces the location [loc] of the
@@ -231,16 +251,27 @@ module type Transfer = sig
     stmt -> exp -> bool ->
     (value, location, origin) valuation -> state -> state or_bottom
 
-  (** [start_call stmt call valuation state] returns an initial state
+  (** [start_call stmt call recursion valuation state] returns an initial state
       for the analysis of a called function. In particular, this function
       should introduce the formal parameters in the state, if necessary.
       - [stmt] is the statement of the call site;
       - [call] represents the call: the called function and the arguments;
+      - [recursion] is the information needed to interpret a recursive call.
+        It is None if the call is not recursive.
       - [state] is the abstract state at the call site, before the call;
       - [valuation] is a cache for all values and locations computed during
-        the evaluation of the function and its arguments. *)
+        the evaluation of the function and its arguments.
+
+      On recursive calls, [recursion] contains some substitution of variables
+      to be applied on the domain state to prevent mixing up local variables
+      and formal parameters of different recursive calls.
+      See {!Eval.recursion} for more details.
+      This substitution has been applied on values and expressions in [call],
+      but not in the [valuation] given as argument. If the domain uses some
+      information from the [valuation] on a recursive call, it must apply the
+      substitution on it. *)
   val start_call:
-    stmt -> (location, value) call ->
+    stmt -> (location, value) call -> recursion option ->
     (value, location, origin) valuation -> state -> state or_bottom
 
   (** [finalize_call stmt call ~pre ~post] computes the state after a function
@@ -248,15 +279,18 @@ module type Transfer = sig
       end of the called function.
       - [stmt] is the statement of the call site;
       - [call] represents the function call and its arguments.
+      - [recursion] is the information needed to interpret a recursive call.
+        It is None if the call is not recursive.
       - [pre] and [post] are the states before and at the end of the call
         respectively. *)
   val finalize_call:
-    stmt -> (location, value) call -> pre:state -> post:state -> state or_bottom
+    stmt -> (location, value) call -> recursion option ->
+    pre:state -> post:state -> state or_bottom
 
-  (** Called on the Frama_C_show_each directives. Prints the internal properties
-      inferred by the domain in the [state] about the expression [exp]. Can use
-      the [valuation] resulting from the cooperative evaluation of the
-      expression. *)
+  (** Called on the Frama_C_domain_show_each directive. Prints the internal
+      properties inferred by the domain in the [state] about the expression
+      [exp]. Can use the [valuation] resulting from the cooperative evaluation of
+      the expression. *)
   val show_expr:
     (value, location, origin) valuation ->
     state -> Format.formatter -> exp -> unit
@@ -364,7 +398,8 @@ module type S = sig
       interpreted and the pre-state in which the terms of the clause are
       evaluated. The clause can be an assigns, allocates or frees clause.
       [loc] is then the memory location concerned by the clause. *)
-  val logic_assign: (logic_assign * state) option -> location -> state -> state
+  val logic_assign:
+    (location logic_assign * state) option -> location -> state -> state
 
   (** Evaluates a [predicate] to a logical status in the current [state].
       The [logic_environment] contains the states at some labels and the

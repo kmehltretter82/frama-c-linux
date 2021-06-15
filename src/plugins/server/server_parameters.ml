@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -60,16 +60,24 @@ let server_doc = add_group "Server Doc Generation"
 let () = Parameter_customize.set_group server_doc
 let () = Parameter_customize.do_not_save ()
 
-module Doc = P.String
+module Doc = P.Filepath
     (struct
       let option_name = "-server-doc"
       let arg_name = "dir"
-      let default = ""
+      let file_kind = "Directory"
+      let existence = Fc_Filepath.Must_exist
       let help = "Output a markdown documentation of the server in <dir>"
     end)
 
 let wpage = register_warn_category "inconsistent-page"
 let wkind = register_warn_category "inconsistent-kind"
 let wname = register_warn_category "invalid-name"
+
+(* -------------------------------------------------------------------------- *)
+(* --- Filepath Normalization                                             --- *)
+(* -------------------------------------------------------------------------- *)
+
+let use_relative_filepath = register_category "use-relative-filepath"
+let has_relative_filepath () = is_debug_key_enabled use_relative_filepath
 
 (* -------------------------------------------------------------------------- *)

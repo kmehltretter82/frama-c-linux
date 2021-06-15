@@ -161,7 +161,7 @@ let get_suffix_idx rename_mode infix =
  * been used. *)
 
 let alphaWorker      ~(alphaTable: 'a alphaTable)
-    ?undolist
+    ~undolist
     ~(lookupname: string) ~(data:'a)
     (make_new: bool) : string * 'a =
   let prefix, infix = splitNameForAlpha ~lookupname in
@@ -184,9 +184,7 @@ let alphaWorker      ~(alphaTable: 'a alphaTable)
            (fun fmt (s,_) -> Format.fprintf fmt "%s" (Integer.to_string s)))
         suffixes;
       (* Save the undo info *)
-      (match undolist with
-         Some l -> l := AlphaChangedSuffix (rc, !rc) :: !l
-       | _ -> ());
+      Option.iter (fun l -> l := AlphaChangedSuffix (rc, !rc) :: !l) undolist;
       let newname, newmin, (olddata: 'a), newsuffixes =
         match
           List.filter (fun (n, _) -> Integer.equal n curr_idx) suffixes
@@ -211,9 +209,7 @@ let alphaWorker      ~(alphaTable: 'a alphaTable)
             H.add
               infixes newinfix
               (ref (Integer.minus_one, [(Integer.minus_one, data)]));
-            (match undolist with
-             | Some l -> l:= AlphaAddedSuffix (prefix,newsuffix)::!l
-             | None -> ());
+            Option.iter (fun l -> l := AlphaAddedSuffix (prefix, newsuffix) :: !l) undolist;
             base ^ newsuffix, newmin, l, (newmin, data) :: suffixes
           end else lookupname, min, data, suffixes
         |  _ -> (Kernel.fatal "Cil.alphaWorker")
@@ -239,12 +235,12 @@ let alphaWorker      ~(alphaTable: 'a alphaTable)
   newname, olddata
 
 
-let newAlphaName ~alphaTable ?undolist ~lookupname ~data =
-  alphaWorker ~alphaTable ?undolist ~lookupname ~data true
+let newAlphaName ~alphaTable ~undolist ~lookupname ~data =
+  alphaWorker ~alphaTable ~undolist ~lookupname ~data true
 
 (** Just register the name so that we will not use in the future *)
-let registerAlphaName ~alphaTable ?undolist ~lookupname ~data =
-  ignore (alphaWorker ~alphaTable ?undolist ~lookupname ~data false)
+let registerAlphaName ~alphaTable ~lookupname ~data =
+  ignore (alphaWorker ~alphaTable ~undolist:None ~lookupname ~data false)
 
 let getAlphaPrefix ~lookupname = splitNameForAlpha ~lookupname
 

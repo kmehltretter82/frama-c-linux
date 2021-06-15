@@ -1,6 +1,6 @@
 /* run.config
-   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-   OPT: -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs -eva @EVA_OPTIONS@ -deps -journal-disable
+   MODULE: @PTEST_NAME@
+   OPT: -eva @EVA_OPTIONS@ -deps -journal-disable
 */
 
 int x,y,z;

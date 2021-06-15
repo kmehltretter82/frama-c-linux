@@ -1,5 +1,5 @@
 /* run.config*
-   GCC:
+   
    STDOPT: +"-no-input -no-out -deref"
 */
 int a,b,c,d,e,*p, t[10];

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -33,7 +33,6 @@ val possible_value_of_integral_const: constant -> Integer.t option
 val possible_value_of_integral_expr: exp -> Integer.t option
 val value_of_integral_const: constant -> Integer.t
 val value_of_integral_expr: exp -> Integer.t
-val constant_expr: loc:location -> Integer.t -> exp
 val is_null_expr: exp -> bool
 val is_non_null_expr: exp -> bool
 
@@ -62,56 +61,68 @@ val possible_value_of_integral_term: term -> Integer.t option
     @since Oxygen-20120901 *)
 
 val term_lvals_of_term: term -> term_lval list
-  (** @return the list of all the term lvals of a given term.
-      Purely syntactic function. *)
+(** @return the list of all the term lvals of a given term.
+    Purely syntactic function. *)
 
-val precondition : funspec -> predicate
-  (** Builds the precondition from [b_assumes] and [b_requires] clauses. 
-      @since Carbon-20101201 *)
+val precondition : goal:bool -> funspec -> predicate
+(** Builds the precondition from [b_assumes] and [b_requires] clauses.
+    With [~goal:true], only returns assert and check predicates.
+    With [~goal:false], only returns assert and admit predicates.
+    @since Carbon-20101201
+    @modify 23.0-Vanadium introduce [goal] flag
+*)
 
 val behavior_assumes : funbehavior -> predicate
-  (** Builds the conjunction of the [b_assumes].
-      @since Nitrogen-20111001 *)
-                                        
-val behavior_precondition : funbehavior -> predicate
-  (** Builds the precondition from [b_assumes] and [b_requires] clauses. 
-      @since Carbon-20101201 *)
+(** Builds the conjunction of the [b_assumes].
+    @since Nitrogen-20111001 *)
 
-val behavior_postcondition : funbehavior -> termination_kind -> predicate
-  (** Builds the postcondition from [b_assumes] and [b_post_cond] clauses. 
-      @modify Boron-20100401 added termination kind as filtering argument. *)
+val behavior_precondition : goal:bool -> funbehavior -> predicate
+(** Builds the precondition from [b_assumes] and [b_requires] clauses.
+    For flag [~goal] see {!Ast_info.precondition} above.
+    @since Carbon-20101201
+    @modify 23.0-Vanadium introduce [goal] flag
+*)
+
+val behavior_postcondition :
+  goal:bool -> funbehavior -> termination_kind -> predicate
+(** Builds the postcondition from [b_assumes] and [b_post_cond] clauses.
+    For flag [~goal] see {Ast_info.precondition} above.
+    @modify Boron-20100401 added termination kind as filtering argument.
+    @modify 23.0-Vanadium introduce [goal] flag
+*)
 
 val disjoint_behaviors : funspec -> string list -> predicate
-  (** Builds the [disjoint_behaviors] property for the behavior names.
-      @since Nitrogen-20111001 *)
+(** Builds the [disjoint_behaviors] property for the behavior names.
+    @since Nitrogen-20111001 *)
 
 val complete_behaviors : funspec -> string list -> predicate
-  (** Builds the [disjoint_behaviors] property for the behavior names.
-      @since Nitrogen-20111001 *)
+(** Builds the [disjoint_behaviors] property for the behavior names.
+    @since Nitrogen-20111001 *)
 
-val merge_assigns_from_complete_bhvs: 
+val merge_assigns_from_complete_bhvs:
   ?warn:bool -> ?unguarded:bool -> funbehavior list -> string list list -> assigns
-  (** @return the assigns of an unguarded behavior (when [unguarded]=true)
-      or a set of complete behaviors.
-      - the funbehaviors can come from either a statement contract or a function
-      contract. 
-      - the list of sets of behavior names can come from the contract of the
+(** @return the assigns of an unguarded behavior (when [unguarded]=true)
+    or a set of complete behaviors.
+    - the funbehaviors can come from either a statement contract or a function
+      contract.
+    - the list of sets of behavior names can come from the contract of the
       related function.
-      Optional [warn] argument can be used to force emitting or cancelation of 
-      warnings.
-      @since Oxygen-20120901 *)
+
+    Optional [warn] argument can be used to force emitting or cancelation of
+    warnings.
+    @since Oxygen-20120901 *)
 
 val merge_assigns_from_spec: ?warn:bool -> funspec -> assigns
 (** It is a shortcut for [merge_assigns_from_complete_bhvs
     spec.spec_complete_behaviors spec.spec_behavior].  Optional [warn] argument
-    can be used to force emitting or cancelation of warnings 
+    can be used to force emitting or cancelation of warnings
     @return the assigns of an unguarded behavior or a set of complete behaviors.
-    @since Oxygen-20120901 *) 
+    @since Oxygen-20120901 *)
 
 val merge_assigns: ?warn:bool -> funbehavior list -> assigns
-(** Returns the assigns of an unguarded behavior. 
+(** Returns the assigns of an unguarded behavior.
     @modify Oxygen-20120901 Optional [warn] argument added which can be used to
-    force emitting or cancelation of warnings. *) 
+    force emitting or cancelation of warnings. *)
 
 val variable_term: location -> logic_var -> term
 val constant_term: location -> Integer.t -> term
@@ -153,21 +164,21 @@ val pointed_type: typ -> typ
 (* ************************************************************************** *)
 
 val is_function_type : varinfo -> bool
-  (** Return [true] iff the type of the given varinfo is a function type. *)
+(** Return [true] iff the type of the given varinfo is a function type. *)
 
 (** Operations on cil function. *)
 module Function: sig
   val formal_args: varinfo -> (string * typ * attributes) list
-    (** Returns the list of the named formal arguments of a function.
-        Never call on a variable of non functional type.*)
+  (** Returns the list of the named formal arguments of a function.
+      Never call on a variable of non functional type.*)
 
   val is_formal: varinfo -> fundec -> bool
   val is_local: varinfo -> fundec -> bool
   val is_formal_or_local: varinfo -> fundec -> bool
   val is_formal_of_prototype:
     varinfo (* to check *) -> varinfo (* of the prototype *) -> bool
-    (** [is_formal_of_prototype v f] returns [true] iff [f] is a prototype and
-        [v] is one of its formal parameters. *)
+  (** [is_formal_of_prototype v f] returns [true] iff [f] is a prototype and
+      [v] is one of its formal parameters. *)
 
   val is_definition: cil_function -> bool
   val get_vi: cil_function -> varinfo

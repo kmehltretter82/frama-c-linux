@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -25,7 +25,7 @@
 type flag = FMinus | FPlus | FSpace | FSharp | FZero
 type flags = flag list
 
-type f_field_width = [ `FWStar | `FWInt of int (** positive integer *)] 
+type f_field_width = [ `FWStar | `FWInt of int (** positive integer *)]
 type s_field_width = [ `FWInt of int ]
 type any_field_width = [ f_field_width | s_field_width ]
 
@@ -45,7 +45,7 @@ type f_conversion_specifier =
   [ numeric_specifier | `c | `s | `p | `n ]
 type s_conversion_specifier =
   [ f_conversion_specifier | `Brackets of string ]
-type any_conversion_specifier = 
+type any_conversion_specifier =
   [ s_conversion_specifier | f_conversion_specifier ]
 
 type f_conversion_specification = {
@@ -66,8 +66,8 @@ type s_conversion_specification = {
 
 (** A format element is either a character or a conversion specification. *)
 type 'spec token =
-| Char of char
-| Specification of 'spec
+  | Char of char
+  | Specification of 'spec
 
 type f_format = f_conversion_specification token list
 type s_format = s_conversion_specification token list

@@ -6,7 +6,7 @@ condition ::= 'CALL''('id')' | 'RETURN''('id')' ;
       | condition '||' condition ;
       | '(' condition ')' | relation
 \\
-relation ::= expr relop expr | expr;
+relation ::= expr relop expr;
 \\
 relop ::= '<' | '<=' | '==' | '!=' | '>=' | '>' 
 \\

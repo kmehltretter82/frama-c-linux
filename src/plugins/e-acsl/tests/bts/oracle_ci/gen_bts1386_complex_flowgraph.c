@@ -276,6 +276,7 @@ void __e_acsl_globals_clean(void)
 {
   __e_acsl_delete_block((void *)(target));
   __e_acsl_delete_block((void *)(source));
+  return;
 }
 
 int main(void)

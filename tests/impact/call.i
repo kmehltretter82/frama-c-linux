@@ -1,5 +1,5 @@
 /* run.config
-   GCC:
+   
    STDOPT: +"-impact-pragma main"
    STDOPT: +"-impact-pragma main2" +"-main main2"
    STDOPT: +"-impact-pragma main3" +"-main main3"

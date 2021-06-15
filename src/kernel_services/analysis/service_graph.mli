@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -28,7 +28,7 @@ val frama_c_display: bool -> unit
     @since Oxygen-20120901 *)
 
 type 'a vertex = private
-    { node: 'a; mutable is_root: bool; mutable root: 'a vertex }
+  { node: 'a; mutable is_root: bool; mutable root: 'a vertex }
 
 type edge = private Inter_services | Inter_functions | Both
 
@@ -54,33 +54,33 @@ module type S = sig
 
   module TP: Graph.Graphviz.GraphWithDotAttrs
     with type t = Service_graph.t
-    and type V.t = node vertex
-    and type E.t = Service_graph.E.t
-(** @since Beryllium-20090902 *)
+     and type V.t = node vertex
+     and type E.t = Service_graph.E.t
+     (** @since Beryllium-20090902 *)
 
 end
 
 (** Generic functor implementing the services algorithm according to a graph
     implementation. *)
 module Make
-  (G: sig
-     type t
-     module V: sig
-       (** @modify Oxygen-20120901 require [compare] *)
-       include Graph.Sig.COMPARABLE
-       val id: t -> int
+    (G: sig
+       type t
+       module V: sig
+         (** @modify Oxygen-20120901 require [compare] *)
+         include Graph.Sig.COMPARABLE
+         val id: t -> int
          (** assume [id >= 0] and unique for each vertices of the graph *)
-       val name: t -> string
-       val attributes: t -> Graph.Graphviz.DotAttributes.vertex list
-       val entry_point: unit -> t option
-     (** @modify Nitrogen-20111001 return an option*)
-     end
-     val iter_vertex : (V.t -> unit) -> t -> unit
-     val iter_succ : (V.t -> unit) -> t -> V.t -> unit
-     val iter_pred : (V.t -> unit) -> t -> V.t -> unit
-     val fold_pred : (V.t -> 'a -> 'a) -> t -> V.t -> 'a -> 'a
-     val datatype_name: string
-   end) :
+         val name: t -> string
+         val attributes: t -> Graph.Graphviz.DotAttributes.vertex list
+         val entry_point: unit -> t option
+         (** @modify Nitrogen-20111001 return an option*)
+       end
+       val iter_vertex : (V.t -> unit) -> t -> unit
+       val iter_succ : (V.t -> unit) -> t -> V.t -> unit
+       val iter_pred : (V.t -> unit) -> t -> V.t -> unit
+       val fold_pred : (V.t -> 'a -> 'a) -> t -> V.t -> 'a -> 'a
+       val datatype_name: string
+     end) :
   S with type node = G.V.t and type graph = G.t
 
 (*

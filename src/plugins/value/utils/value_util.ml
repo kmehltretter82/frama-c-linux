@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -24,11 +24,7 @@ open Cil_types
 
 (* Callstacks related types and functions *)
 
-(* Function called, and calling instruction. *)
-type call_site = (kernel_function * kinstr)
-type callstack =  call_site list
-
-let call_stack : callstack ref = ref []
+let call_stack : Value_types.callstack ref = ref []
 (* let call_stack_for_callbacks : (kernel_function * kinstr) list ref = ref [] *)
 
 let clear_call_stack () =
@@ -88,7 +84,7 @@ let get_subdivision stmt =
     x
 
 let pretty_actuals fmt actuals =
-  let pp fmt (e,x,_) = Cvalue.V.pretty_typ (Some (Cil.typeOf e)) fmt x in
+  let pp fmt (e,x) = Cvalue.V.pretty_typ (Some (Cil.typeOf e)) fmt x in
   Pretty_utils.pp_flowlist pp fmt actuals
 
 let pretty_current_cfunction_name fmt =
@@ -186,7 +182,7 @@ let zero e =
   | TPtr _ ->
     let ik = Cil.(theMachine.upointKind) in
     let zero = Cil.new_exp ~loc (Const (CInt64 (Integer.zero, ik, None))) in
-    Cil.mkCast ~force:true ~e:zero ~newt:typ
+    Cil.mkCast ~force:true ~newt:typ zero
   | typ -> Value_parameters.fatal ~current:true "non-scalar type %a"
              Printer.pp_typ typ
 
@@ -335,7 +331,7 @@ and height_offset = function
 let skip_specifications kf =
   Value_parameters.SkipLibcSpecs.get () &&
   Kernel_function.is_definition kf &&
-  Cil.hasAttribute "fc_stdlib" (Kernel_function.get_vi kf).vattr
+  Cil.is_in_libc (Kernel_function.get_vi kf).vattr
 
 (*
 Local Variables:

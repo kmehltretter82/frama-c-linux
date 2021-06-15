@@ -12,8 +12,6 @@ unsigned long long my_pow(unsigned int x, unsigned int n)
   }
   tmp_0 = my_pow(x,n / (unsigned int)2);
   tmp = (int)tmp_0;
-  /*@ assert Eva: signed_overflow: -2147483648 ≤ tmp * tmp; */
-  /*@ assert Eva: signed_overflow: tmp * tmp ≤ 2147483647; */
   tmp *= tmp;
   if (n % (unsigned int)2 == (unsigned int)0) {
     __retres = (unsigned long long)tmp;
@@ -54,13 +52,13 @@ int main(void)
                                         (__e_acsl_mpz_struct const *)(__gen_e_acsl__3));
     __gmpz_init(__gen_e_acsl_mod);
     /*@ assert E_ACSL: 2 ≢ 0; */
-    __e_acsl_assert(__gen_e_acsl_mod_guard != 0,"Assertion","main","2 != 0",
-                    "tests/arith/longlong.i",17);
+    __e_acsl_assert(__gen_e_acsl_mod_guard != 0,1,"Assertion","main",
+                    "2 != 0","tests/arith/longlong.i",17);
     __gmpz_tdiv_r(__gen_e_acsl_mod,
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_add),
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
     __gen_e_acsl__4 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_mod));
-    __e_acsl_assert(__gen_e_acsl__4 == 1L,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl__4 == 1L,1,"Assertion","main",
                     "(2 * x + 1) % 2 == 1","tests/arith/longlong.i",17);
     __gmpz_clear(__gen_e_acsl_);
     __gmpz_clear(__gen_e_acsl_x);

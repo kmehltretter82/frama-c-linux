@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -104,7 +104,7 @@ struct
       match V.param x with
       | ByRef ->
           "ra_" ^ LogicUsage.basename x
-      | NotUsed | ByValue | ByShift | ByAddr | InContext | InArray ->
+      | NotUsed | ByValue | ByShift | ByAddr | InContext _ | InArray _ ->
           "ta_" ^ LogicUsage.basename x
     let is_framed = is_framed_var
   end
@@ -205,6 +205,7 @@ struct
       alloc = ALLOC.create () ;
       mem = M.Sigma.create () ;
     }
+
     let copy s = {
       vars = SIGMA.copy s.vars ;
       init = INIT.copy s.init ;
@@ -516,8 +517,8 @@ struct
   type mem =
     | CVAL (* By-Value variable *)
     | CREF (* By-Ref variable *)
-    | CTXT (* In-context pointer *)
-    | CARR (* In-context array *)
+    | CTXT of MemoryContext.validity (* In-context pointer *)
+    | CARR of MemoryContext.validity (* In-context array *)
     | HEAP (* In-heap variable *)
 
   type loc =
@@ -562,8 +563,8 @@ struct
   let vtype m x =
     match m with
     | CVAL | HEAP -> x.vtype
-    | CTXT | CREF -> Cil.typeOf_pointed x.vtype
-    | CARR -> Ast_info.array_type (Cil.typeOf_pointed x.vtype)
+    | CTXT _ | CREF -> Cil.typeOf_pointed x.vtype
+    | CARR _ -> Ast_info.array_type (Cil.typeOf_pointed x.vtype)
 
   let vobject m x = Ctypes.object_of (vtype m x)
 
@@ -592,15 +593,15 @@ struct
   let pp_mem fmt = function
     | CVAL -> Format.pp_print_string fmt "var"
     | CREF -> Format.pp_print_string fmt "ref"
-    | CTXT -> Format.pp_print_string fmt "ptr"
-    | CARR -> Format.pp_print_string fmt "arr"
+    | CTXT _ -> Format.pp_print_string fmt "ptr"
+    | CARR _ -> Format.pp_print_string fmt "arr"
     | HEAP -> Format.pp_print_string fmt "mem"
 
   (* re-uses strings that are used into the description of -wp-xxx-vars *)
   let pp_var_model fmt = function
     | ByValue | ByShift | NotUsed -> Format.pp_print_string fmt "non-aliased" (* cf.  -wp-unalias-vars *)
     | ByRef -> Format.pp_print_string fmt "by reference" (* cf. -wp-ref-vars *)
-    | InContext | InArray -> Format.pp_print_string fmt "in an isolated context" (* cf. -wp-context-vars *)
+    | InContext _ | InArray _ -> Format.pp_print_string fmt "in an isolated context" (* cf. -wp-context-vars *)
     | ByAddr -> Format.pp_print_string fmt "aliased" (* cf. -wp-alias-vars *)
 
   let pretty fmt = function
@@ -631,7 +632,36 @@ struct
   let cvar x = match V.param x with
     | NotUsed | ByValue | ByShift -> Val(CVAL,x,[])
     | ByAddr -> Val(HEAP,x,[])
-    | InContext | InArray | ByRef -> Ref x
+    | InContext _ | InArray _ | ByRef -> Ref x
+
+  (* -------------------------------------------------------------------------- *)
+  (* ---  Nullable locations                                                --- *)
+  (* -------------------------------------------------------------------------- *)
+
+  module Nullable = WpContext.Generator(Varinfo)
+      (struct
+        let name = "MemVar.Nullable"
+        type key = varinfo
+        type data = lfun
+
+        let compile v =
+          let result = t_addr () in
+          let lfun = Lang.generated_f ~result "pointer_%s" v.vname in
+          let cluster =
+            Definitions.cluster ~id:"Globals" ~title:"Context pointers" ()
+          in
+          Definitions.define_symbol {
+            d_lfun = lfun ;
+            d_types = 0 ;
+            d_params = [] ;
+            d_definition = Definitions.Logic result ;
+            d_cluster = cluster
+          } ;
+          lfun
+      end)
+
+  let nullable_address v =
+    Lang.F.e_fun (Nullable.get v) []
 
   (* -------------------------------------------------------------------------- *)
   (* ---  Lifting                                                           --- *)
@@ -644,7 +674,11 @@ struct
   let mseq_of_seq seq = { pre = seq.pre.mem ; post = seq.post.mem }
 
   let mloc_of_path m x ofs =
-    List.fold_left moffset (M.cvar (vbase m x)) ofs
+    let l = match m with
+      | CTXT Nullable | CARR Nullable -> M.pointer_loc @@ nullable_address x
+      | _ -> M.cvar (vbase m x)
+    in
+    List.fold_left moffset l ofs
 
   let mloc_of_loc = function
     | Loc l -> l
@@ -683,14 +717,18 @@ struct
     | Loc l -> M.block_length sigma.mem obj l
     | Ref x -> noref ~op:"block-length of" x
     | Val(m,x,_) ->
-        let obj = Ctypes.object_of (vtype m x) in
-        let size =
-          if Ctypes.sizeof_defined obj
-          then Ctypes.sizeof_object obj
-          else if Wp_parameters.ExternArrays.get ()
-          then max_int
-          else Warning.error ~source:"MemVar" "Unknown array-size"
-        in F.e_int size
+        begin match Ctypes.object_of (vtype m x) with
+          | C_comp ({ cfields = None } as c) ->
+              Cvalues.bytes_length_of_opaque_comp c
+          | obj ->
+              let size =
+                if Ctypes.sizeof_defined obj
+                then Ctypes.sizeof_object obj
+                else if Wp_parameters.ExternArrays.get ()
+                then max_int
+                else Warning.error ~source:"MemVar" "Unknown array-size"
+              in F.e_int size
+        end
 
   let cast obj l = Loc(M.cast obj (mloc_of_loc l))
   let loc_of_int e a = Loc(M.loc_of_int e a)
@@ -726,9 +764,9 @@ struct
   let load sigma obj = function
     | Ref x ->
         begin match V.param x with
-          | ByRef     -> Sigs.Loc(Val(CREF,x,[]))
-          | InContext -> Sigs.Loc(Val(CTXT,x,[]))
-          | InArray   -> Sigs.Loc(Val(CARR,x,[]))
+          | ByRef       -> Sigs.Loc(Val(CREF,x,[]))
+          | InContext n -> Sigs.Loc(Val(CTXT n,x,[]))
+          | InArray n   -> Sigs.Loc(Val(CARR n,x,[]))
           | NotUsed | ByAddr | ByValue | ByShift -> assert false
         end
     | Val((CREF|CVAL),x,ofs) ->
@@ -737,41 +775,49 @@ struct
         Cvalues.map_value
           (fun l -> Loc l)
           (M.load sigma.mem obj l)
-    | Val((CTXT|CARR|HEAP) as m,x,ofs) ->
+    | Val((CTXT _|CARR _|HEAP) as m,x,ofs) ->
         Cvalues.map_value
           (fun l -> Loc l)
           (M.load sigma.mem obj (mloc_of_path m x ofs))
+
+  let load_init sigma obj = function
+    | Ref _ ->
+        e_true
+    | Val((CREF|CVAL),x,_) when Cvalues.always_initialized x ->
+        Cvalues.initialized_obj obj
+    | Val((CREF|CVAL),x,ofs) ->
+        access_init (get_init_term sigma x) ofs
+    | Loc l ->
+        M.load_init sigma.mem obj l
+    | Val((CTXT _|CARR _|HEAP) as m,x,ofs) ->
+        M.load_init sigma.mem obj (mloc_of_path m x ofs)
 
   (* -------------------------------------------------------------------------- *)
   (* ---  Memory Store                                                      --- *)
   (* -------------------------------------------------------------------------- *)
 
-  (* Note that this function purposely does not update init state *)
-  let memvar_stored seq _obj l v =
+  let memvar_stored kind seq x ofs v =
+    let get_term, update = match kind with
+      | KValue -> get_term, update
+      | KInit -> get_init_term, update_init
+    in
+    let v1 = get_term seq.pre x in
+    let v2 = get_term seq.post x in
+    Set( v2 , update v1 ofs v )
+
+  let gen_stored kind seq obj l v =
+    let mstored = match kind with KValue -> M.stored | KInit -> M.stored_init in
     match l with
     | Ref x -> noref ~op:"write to" x
     | Val((CREF|CVAL),x,ofs) ->
-        let v1 = get_term seq.pre x in
-        let v2 = get_term seq.post x in
-        Set( v2 , update v1 ofs v )
-    | _ -> failwith "MemVar stored on a non MemVar location"
-
-  let memvar_set_init seq x ofs v =
-    if x.vformal || x.vglob then []
-    else
-      let v1 = get_init_term seq.pre x in
-      let v2 = get_init_term seq.post x in
-      [ Set( v2 , update_init v1 ofs v ) ]
-
-  let stored seq obj l v = match l with
-    | Ref x -> noref ~op:"write to" x
-    | Val((CREF|CVAL),x,ofs) ->
-        let init = Cvalues.initialized_obj obj in
-        (memvar_stored seq obj l v) :: (memvar_set_init seq x ofs init)
-    | Val((CTXT|CARR|HEAP) as m,x,ofs) ->
-        M.stored (mseq_of_seq seq) obj (mloc_of_path m x ofs) v
+        [memvar_stored kind seq x ofs v]
+    | Val((CTXT _|CARR _|HEAP) as m,x,ofs) ->
+        mstored (mseq_of_seq seq) obj (mloc_of_path m x ofs) v
     | Loc l ->
-        M.stored (mseq_of_seq seq) obj l v
+        mstored (mseq_of_seq seq) obj l v
+
+  let stored = gen_stored KValue
+  let stored_init = gen_stored KInit
 
   let copied seq obj l1 l2 =
     let v = match load seq.pre obj l2 with
@@ -779,12 +825,17 @@ struct
       | Sigs.Loc l -> pointer_val l
     in stored seq obj l1 v
 
+  let copied_init seq obj l1 l2 =
+    stored_init seq obj l1 (load_init seq.pre obj l2)
+
   (* -------------------------------------------------------------------------- *)
   (* ---  Pointer Comparison                                                --- *)
   (* -------------------------------------------------------------------------- *)
 
   let is_null = function
     | Loc l -> M.is_null l
+    | Val ((CTXT Nullable|CARR Nullable)as m,x,ofs) ->
+        M.is_null (mloc_of_path m x ofs)
     | Ref _ | Val _ -> F.p_false
 
   let rec offset = function
@@ -826,7 +877,7 @@ struct
   exception ShiftMismatch
 
   let is_heap_allocated = function
-    | CREF | CVAL -> false | HEAP | CTXT | CARR -> true
+    | CREF | CVAL -> false | HEAP | CTXT _ | CARR _ -> true
 
   let shift_mismatch l =
     Wp_parameters.fatal "Invalid shift : %a" pretty l
@@ -903,8 +954,8 @@ struct
     | OBJ , _ , [Shift(te,k)] -> Some(te,k,obj)
     | OBJ , C_comp c , (Field fd :: ofs) ->
         begin
-          match List.rev c.cfields with
-          | fd0::_ when Fieldinfo.equal fd fd0 ->
+          match Option.map List.rev c.cfields with
+          | Some (fd0::_) when Fieldinfo.equal fd fd0 ->
               last_field_shift acs (Ctypes.object_of fd.ftype) ofs
           | _ -> None
         end
@@ -934,7 +985,9 @@ struct
     else
       match mem with
       | CVAL | HEAP -> p_bool (ALLOC.value sigma.alloc x)
-      | CREF | CTXT | CARR -> p_true
+      | CREF | CTXT Valid | CARR Valid -> p_true
+      | CTXT Nullable | CARR Nullable ->
+          p_not @@ M.is_null (mloc_of_path mem x [])
 
   (* segment *)
 
@@ -1043,40 +1096,31 @@ struct
     match obj with
     | C_int _ | C_float _ | C_pointer _ ->
         p_bool (access_init (get_init_term sigma x) ofs)
-    | C_array { arr_flat=flat } ->
+    | C_array { arr_flat=flat ; arr_element = te } ->
         let size = match flat with
           | None -> unsized_array ()
-          | Some { arr_size } -> arr_size
+          | Some { arr_size } -> arr_size in
+        let elt = Ctypes.object_of te in
+        initialized_range sigma elt x ofs (e_int 0) (e_int (size-1))
+    | C_comp { cfields = None } ->
+        Lang.F.p_equal
+          (access_init (get_init_term sigma x) ofs)
+          (Cvalues.initialized_obj obj)
+    | C_comp { cfields = Some fields } ->
+        let init_field fd =
+          let obj_fd = Ctypes.object_of fd.ftype in
+          let ofs_fd = ofs @ [Field fd] in
+          initialized_loc sigma obj_fd x ofs_fd
         in
-        initialized_range sigma obj x ofs (e_int 0)(e_int (size-1))
-    | C_comp ci ->
-        let mk_pred f =
-          let obj = Ctypes.object_of f.ftype in
-          let ofs = ofs @ [Field f] in
-          initialized_loc sigma obj x ofs
-        in
-        Lang.F.p_conj (List.map mk_pred ci.cfields)
-  and initialized_range sigma obj x ofs low up =
-    match obj with
-    | C_array { arr_element=t } ->
-        let v = Lang.freshvar ~basename:"i" Lang.t_int in
-        let hyp = p_and (p_leq low (e_var v)) (p_leq (e_var v) up) in
-        let obj = Ctypes.object_of t in
-        let ofs = ofs @ [ Shift(obj, e_var v) ] in
-        let sub = initialized_loc sigma obj x ofs in
-        Lang.F.p_forall [v] (p_imply hyp sub)
-    | C_comp _ ->
-        let hd = match ofs with
-          | Field f :: _ -> Ctypes.object_of f.ftype
-          | Shift(obj, _) :: _ -> obj
-          | [] -> assert false
-        in
-        begin match hd with
-          | C_array _ -> initialized_range sigma hd x ofs low up
-          | _ -> raise ShiftMismatch
-        end
-    | _ ->
-        raise ShiftMismatch
+        Lang.F.p_conj (List.map init_field fields)
+
+  and initialized_range sigma elt x ofs lo up =
+    let i = Lang.freshvar ~basename:"i" Lang.t_int in
+    let vi = e_var i in
+    let ofs = ofs @ [ Shift(elt, vi) ] in
+    let range_i = p_and (p_leq lo vi) (p_leq vi up) in
+    let init_i = initialized_loc sigma elt x ofs in
+    Lang.F.p_forall [i] (p_imply range_i init_i)
 
   let initialized sigma l =
     match l with
@@ -1085,11 +1129,11 @@ struct
           | Ref _ -> p_true
           | Loc l -> M.initialized sigma.mem (Rloc(obj,l))
           | Val(m,x,p) ->
-              if (x.vformal || x.vglob) then
-                try valid_offset RW (vobject m x) p
-                with ShiftMismatch -> shift_mismatch l
-              else if is_heap_allocated m then
+              if is_heap_allocated m then
                 M.initialized sigma.mem (Rloc(obj,mloc_of_loc l))
+              else if Cvalues.always_initialized x then
+                try valid_offset RD (vobject m x) p
+                with ShiftMismatch -> shift_mismatch l
               else
                 initialized_loc sigma obj x p
         end
@@ -1099,17 +1143,26 @@ struct
           | Loc l -> M.initialized sigma.mem (Rrange(l,elt,Some a, Some b))
           | Val(m,x,p) ->
               try
-                let in_array = valid_range RW (vobject m x) p (elt, a, b) in
-                let initialized =
-                  if x.vformal || x.vglob then p_true
-                  else initialized_range sigma (vobject m x) x p a b
-                in
-                F.p_imply (F.p_leq a b) (p_and in_array initialized)
-              with ShiftMismatch ->
                 if is_heap_allocated m then
                   let l = mloc_of_loc l in
                   M.initialized sigma.mem (Rrange(l,elt,Some a, Some b))
-                else shift_mismatch l
+                else
+                  let rec normalize obj = function
+                    | [] -> [], a, b
+                    | [Shift(elt, i)] when Ctypes.equal obj elt ->
+                        [], F.e_add a i, F.e_add b i
+                    | f :: ofs ->
+                        let l, a, b = normalize obj ofs in f :: l, a, b
+                  in
+                  let p, a, b = normalize elt p in
+                  let in_array = valid_range RD (vobject m x) p (elt, a, b) in
+                  let initialized =
+                    if Cvalues.always_initialized x then p_true
+                    else initialized_range sigma elt x p a b
+                  in
+                  F.p_imply (F.p_leq a b) (p_and in_array initialized)
+              with ShiftMismatch ->
+                shift_mismatch l
         end
     | Rrange(l, _,a,b) ->
         Warning.error
@@ -1126,11 +1179,13 @@ struct
     | TInt _ | TFloat _ | TVoid _ | TEnum _ | TNamed _ | TBuiltin_va_list _
       -> F.p_true
     | TPtr _ | TFun _ -> phi v
-    | TComp({ cfields },_,_) ->
+    | TComp({ cfields = None },_,_) ->
+        F.p_true
+    | TComp({ cfields = Some fields },_,_) ->
         F.p_all
           (fun fd ->
              forall_pointers phi (e_getfield v (Cfield (fd, KValue))) fd.ftype)
-          cfields
+          fields
     | TArray(elt,_,_,_) ->
         let k = Lang.freshvar Qed.Logic.Int in
         F.p_forall [k] (forall_pointers phi (e_get v (e_var k)) elt)
@@ -1160,7 +1215,7 @@ struct
 
   let is_mvar_alloc x =
     match V.param x with
-    | ByRef | InContext | InArray | NotUsed -> false
+    | ByRef | InContext _ | InArray _ | NotUsed -> false
     | ByValue | ByShift | ByAddr -> true
 
   let alloc sigma xs =
@@ -1190,13 +1245,26 @@ struct
     match scope with
     | Leave -> []
     | Enter ->
-        let xs = List.filter (fun v -> not v.vformal && not v.vglob) xs in
-        let uninitialized v =
-          let value = Cvalues.uninitialized_obj (Ctypes.object_of v.vtype) in
-          Lang.F.p_equal (access_init (get_init_term seq.post v) []) value
+        let init_status v =
+          if v.vdefined || Cvalues.always_initialized v || not@@ is_mvar_alloc v
+          then None
+          else
+            let i = Cvalues.uninitialized_obj (Ctypes.object_of v.vtype) in
+            Some (Lang.F.p_equal (access_init (get_init_term seq.post v) []) i)
         in
-        List.map uninitialized xs
+        List.filter_map init_status xs
 
+  let is_nullable m v =
+    let addr = nullable_address v in
+    p_or
+      (M.is_null @@ M.pointer_loc addr)
+      (p_equal (M.pointer_val @@ M.cvar (vbase m v)) addr)
+
+  let nullable_scope v =
+    match V.param v with
+    | InContext Nullable -> Some (is_nullable (CTXT Nullable) v)
+    | InArray Nullable -> Some (is_nullable (CARR Nullable) v)
+    | _ -> None
 
   let scope seq scope xs =
     let xm = List.filter is_mem xs in
@@ -1204,7 +1272,8 @@ struct
     let hmem = M.scope smem scope xm in
     let hvars = scope_vars seq scope xs in
     let hinit = scope_init seq scope xs in
-    hvars @ hinit @ hmem
+    let hcontext = List.filter_map nullable_scope xs in
+    hvars @ hinit @ hmem @ hcontext
 
   let global sigma p = M.global sigma.mem p
 
@@ -1237,7 +1306,9 @@ struct
                  let bg = e_getfield b cg in
                  let eqg = p_forall ys (p_equal ag bg) in
                  eqg :: hs
-            ) hs f.fcomp.cfields
+            ) hs
+            (* Note: we have field accesses, everything here is thus complete *)
+            (Option.get f.fcomp.cfields)
 
       | Shift(_,e) :: ofs ->
           let y = Lang.freshvar ~basename:"k" Qed.Logic.Int in
@@ -1268,8 +1339,9 @@ struct
     let conds = assigned_path KValue [p_sloc] xs [] a b ofs in
     List.map (fun p -> Assert p) conds
 
+  (*
   let monotonic_initialized_genset s xs mem x ofs p =
-    if x.vformal || x.vglob then [Assert p_true]
+    if always_init x then [Assert p_true]
     else
       let valid = valid_offset_path s.post Sigs.RW mem x ofs in
       let a = get_init_term s.pre x in
@@ -1282,19 +1354,26 @@ struct
       in
       let conds = assigned_path KInit [not_p; exact_p] xs [] a b ofs in
       List.map (fun p -> Assert p) conds
+  *)
 
   (* -------------------------------------------------------------------------- *)
   (* ---  Assigned                                                          --- *)
   (* -------------------------------------------------------------------------- *)
 
   let rec monotonic_initialized seq obj x ofs =
-    if x.vformal || x.vglob then p_true
+    if Cvalues.always_initialized x then p_true
     else
       match obj with
+      (* Structure initialization is not monotonic *)
+      | C_comp _ -> p_true
+      (* Neither is initialization of arrays of structures *)
+      | C_array { arr_element=t } when Cil.isStructOrUnionType t -> p_true
+
       | C_int _ | C_float _ | C_pointer _ ->
           p_imply
             (p_bool (access_init (get_init_term seq.pre x) ofs))
             (p_bool (access_init (get_init_term seq.post x) ofs))
+
       | C_array { arr_flat=flat ; arr_element=t } ->
           let size = match flat with
             | None -> unsized_array ()
@@ -1308,32 +1387,21 @@ struct
           let hyp = Vset.in_range (e_var v) low up in
           let in_range = monotonic_initialized seq obj x ofs in
           Lang.F.p_forall [v] (p_imply hyp in_range)
-      | C_comp ci ->
-          let mk_pred f =
-            let obj = Ctypes.object_of f.ftype in
-            let ofs = ofs @ [Field f] in
-            monotonic_initialized seq obj x ofs
-          in
-          Lang.F.p_conj (List.map mk_pred ci.cfields)
-
-  let memvar_assigned seq obj loc v =
-    match loc with
-    | Ref x -> noref ~op:"write to" x
-    | Val((CREF|CVAL),x,ofs) ->
-        let init = e_var (Lang.freshvar ~basename:"v" (init_of_object obj)) in
-        (memvar_stored seq obj loc v) ::
-        Assert(monotonic_initialized seq obj x ofs) ::
-        (memvar_set_init seq x ofs init)
-    | _ -> failwith "MemVar assigned on a non MemVar location"
 
   let assigned_loc seq obj = function
     | Ref x -> noref ~op:"assigns to" x
     | Val((CVAL|CREF),x,[]) ->
         [ Assert (monotonic_initialized seq obj x []) ]
-    | Val((CVAL|CREF),_,_) as vloc ->
-        let v = Lang.freshvar ~basename:"v" (Lang.tau_of_object obj) in
-        memvar_assigned seq obj vloc (e_var v)
-    | Val((HEAP|CTXT|CARR) as m,x,ofs) ->
+    | Val((CVAL|CREF),x,ofs) ->
+        let value = Lang.freshvar ~basename:"v" (tau_of_object obj) in
+        memvar_stored KValue seq x ofs (e_var value) ::
+        if Cil.isStructOrUnionType x.vtype then []
+        else begin
+          let init = Lang.freshvar ~basename:"v" (init_of_object obj) in
+          Assert(monotonic_initialized seq obj x ofs) ::
+          [ memvar_stored KInit seq x ofs (e_var init) ]
+        end
+    | Val((HEAP|CTXT _|CARR _) as m,x,ofs) ->
         M.assigned (mseq_of_seq seq) obj (Sloc (mloc_of_path m x ofs))
     | Loc l ->
         M.assigned (mseq_of_seq seq) obj (Sloc l)
@@ -1342,20 +1410,19 @@ struct
     match l with
     | Ref x -> noref ~op:"assigns to" x
     | Val((CVAL|CREF),x,[]) ->
-        (* Note that 'obj' above corresponds to the elements *)
-        let obj = Ctypes.object_of x.vtype in
-        [ Assert (monotonic_initialized seq obj x []) ]
-    | Val((CVAL|CREF),x,ofs) as vloc ->
-        let te = Lang.tau_of_object elt in
-        let v = Lang.freshvar ~basename:"v" Qed.Logic.(Array(Int,te)) in
-        let rec get_obj obj = function
-          | [] -> obj
-          | Field(fi) :: l -> get_obj (Ctypes.object_of fi.ftype) l
-          | Shift(obj, _) :: l -> get_obj obj l
-        in
-        let obj = get_obj (Ctypes.object_of x.vtype) ofs in
-        memvar_assigned seq obj vloc (e_var v)
-    | Val((HEAP|CTXT|CARR) as m,x,ofs) ->
+        if Ctypes.is_compound elt then []
+        else
+          (* Note that 'obj' above corresponds to the elements *)
+          let obj = Ctypes.object_of x.vtype in
+          [ Assert (monotonic_initialized seq obj x []) ]
+
+    | Val((CVAL|CREF),x,ofs) ->
+        let f_array t =
+          e_var (Lang.freshvar ~basename:"v" Qed.Logic.(Array(Int, t))) in
+        [ memvar_stored KValue seq x ofs (f_array @@ Lang.tau_of_object elt) ;
+          memvar_stored KInit  seq x ofs (f_array @@ Lang.init_of_object elt) ]
+
+    | Val((HEAP|CTXT _|CARR _) as m,x,ofs) ->
         let l = mloc_of_path m x ofs in
         M.assigned (mseq_of_seq seq) obj (Sarray(l,elt,n))
     | Loc l ->
@@ -1366,13 +1433,13 @@ struct
     | Ref x -> noref ~op:"assigns to" x
     | Loc l ->
         M.assigned (mseq_of_seq seq) obj (Srange(l,elt,a,b))
-    | Val((HEAP|CTXT|CARR) as m,x,ofs) ->
+    | Val((HEAP|CTXT _|CARR _) as m,x,ofs) ->
         M.assigned (mseq_of_seq seq) obj (Srange(mloc_of_path m x ofs,elt,a,b))
     | Val((CVAL|CREF) as m,x,ofs) ->
         let k = Lang.freshvar ~basename:"k" Qed.Logic.Int in
         let p = Vset.in_range (e_var k) a b in
         let ofs = ofs_shift elt (e_var k) ofs in
-        (monotonic_initialized_genset seq [k] m x ofs p) @
+        (* (monotonic_initialized_genset seq [k] m x ofs p) @*)
         (assigned_genset seq [k] m x ofs p)
 
   let assigned_descr seq obj xs l p =
@@ -1380,10 +1447,10 @@ struct
     | Ref x -> noref ~op:"assigns to" x
     | Loc l ->
         M.assigned (mseq_of_seq seq) obj (Sdescr(xs,l,p))
-    | Val((HEAP|CTXT|CARR) as m,x,ofs) ->
+    | Val((HEAP|CTXT _|CARR _) as m,x,ofs) ->
         M.assigned (mseq_of_seq seq) obj (Sdescr(xs,mloc_of_path m x ofs,p))
     | Val((CVAL|CREF) as m,x,ofs) ->
-        (monotonic_initialized_genset seq xs m x ofs p) @
+        (* (monotonic_initialized_genset seq xs m x ofs p) @ *)
         (assigned_genset seq xs m x ofs p)
 
   let assigned seq obj = function
@@ -1449,10 +1516,16 @@ struct
     | Rrange(Val((CVAL|CREF),x,ofs),obj,a,b) ->
         Fseg(x,range ofs obj a b)
 
-    (* in M: *)
-    | Rloc(obj,Val((CTXT|CARR|HEAP) as m,x,ofs)) ->
+    (* Nullable: force M without symbolic access *)
+    | Rloc(obj,Val((CTXT Nullable|CARR Nullable) as m,x,ofs)) ->
+        Lseg(Rloc(obj, mloc_of_path m x ofs))
+    | Rrange(Val((CTXT Nullable|CARR Nullable) as m,x,ofs),obj,a,b) ->
+        Lseg(Rrange(mloc_of_path m x ofs, obj, a, b))
+
+    (* Otherwise: use M with symbolic access *)
+    | Rloc(obj,Val((CTXT Valid|CARR Valid|HEAP) as m,x,ofs)) ->
         Mseg(Rloc(obj,mloc_of_path m x ofs),x,delta obj x ofs)
-    | Rrange(Val((CTXT|CARR|HEAP) as m,x,ofs),obj,a,b) ->
+    | Rrange(Val((CTXT Valid|CARR Valid|HEAP) as m,x,ofs),obj,a,b) ->
         Mseg(Rrange(mloc_of_path m x ofs,obj,a,b),x,range ofs obj a b)
 
   (* -------------------------------------------------------------------------- *)
@@ -1523,11 +1596,10 @@ struct
     match l with
     | Ref x | Val((CVAL|CREF),x,_) ->
         let init =
-          if not (x.vformal || x.vglob) then [ Init x ]
-          else []
+          if not @@ Cvalues.always_initialized x then [ Init x ] else []
         in
         Heap.Set.of_list ((Var x) :: init)
-    | Loc _ | Val((CTXT|CARR|HEAP),_,_) ->
+    | Loc _ | Val((CTXT _|CARR _|HEAP),_,_) ->
         M.Heap.Set.fold
           (fun m s -> Heap.Set.add (Mem m) s)
           (M.domain obj (mloc_of_loc l)) Heap.Set.empty

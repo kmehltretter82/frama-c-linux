@@ -13,11 +13,11 @@ Assume {
   (* Heap *)
   Type: (region(array_0.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns ... *)
-  Have: monotonic_init(Init_0, a).
+  Have: cinits(a).
   (* Else *)
   Have: 10 <= i.
 }
-Prove: IsInitArray1_int(array_0, 10, a).
+Prove: IsInitArray_sint32(array_0, 10, a).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -33,11 +33,11 @@ Assume {
   (* Heap *)
   Type: (region(pg_array_0.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns ... *)
-  Have: monotonic_init(Init_0, a) /\ monotonic_init(a, a_1).
+  Have: cinits(a) /\ cinits(a_1).
   (* Else *)
   Have: 10 <= i.
 }
-Prove: IsInitArray1_int(pg_array_0, 10, a_1).
+Prove: IsInitArray_sint32(pg_array_0, 10, a_1).
 
 ------------------------------------------------------------
 
@@ -50,11 +50,11 @@ Assume {
   (* Heap *)
   Type: (region(pg_array_0.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns ... *)
-  Have: monotonic_init(Init_0, a_1) /\ monotonic_init(a_1, a_2).
+  Have: cinits(a_1) /\ cinits(a_2).
   (* Else *)
   Have: 10 <= i.
 }
-Prove: IsInitArray1_int(a, 10, a_2).
+Prove: IsInitArray_sint32(a, 10, a_2).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -62,33 +62,21 @@ Prove: IsInitArray1_int(a, 10, a_2).
 ------------------------------------------------------------
 
 Goal Check 'FAIL' (file tests/wp_acsl/assigned_not_initialized_memtyped.i, line 38):
-Let a = global(G_glob_atomic_39).
-Let m = Init_0[a <- i_1 | Init_0[a]].
-Let P = m[pg_atomic_0].
-Assume {
-  Type: is_sint32(i_2).
-  (* Heap *)
-  Type: (region(pg_atomic_0.base) <= 0) /\ cinits(Init_0).
-  (* Loop assigns ... *)
-  Have: monotonic_init(Init_0, m) /\
-      monotonic_init(m, m[pg_atomic_0 <- i | P]).
-  (* Else *)
-  Have: 10 <= i_2.
-}
-Prove: (i=true) \/ (P=true).
+Assume { Type: is_sint32(i_1). (* Else *) Have: 10 <= i_1. }
+Prove: (i=true).
 
 ------------------------------------------------------------
 
 Goal Check 'OK' (file tests/wp_acsl/assigned_not_initialized_memtyped.i, line 39):
 Let a = global(G_glob_atomic_39).
-Let m = Init_0[a <- i | Init_0[a]].
-Let m_1 = m[pg_atomic_0 <- i_1 | m[pg_atomic_0]].
+Let m = Init_0[a <- i].
+Let m_1 = m[pg_atomic_0 <- i_1].
 Assume {
   Type: is_sint32(i_2).
   (* Heap *)
   Type: (region(pg_atomic_0.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns ... *)
-  Have: monotonic_init(Init_0, m) /\ monotonic_init(m, m_1).
+  Have: cinits(m) /\ cinits(m_1).
   (* Else *)
   Have: 10 <= i_2.
 }
@@ -107,7 +95,7 @@ Assume {
   (* Heap *)
   Type: (region(pg_comp_0.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns ... *)
-  Have: monotonic_init(Init_0, a) /\ monotonic_init(a, a_1).
+  Have: cinits(a) /\ cinits(a_1).
   (* Else *)
   Have: 10 <= i.
 }
@@ -115,7 +103,7 @@ Prove: IsInit_S1_S(pg_comp_0, a_1).
 
 ------------------------------------------------------------
 
-Goal Check 'OK' (file tests/wp_acsl/assigned_not_initialized_memtyped.i, line 50):
+Goal Check 'FAIL' (file tests/wp_acsl/assigned_not_initialized_memtyped.i, line 50):
 Let a = global(G_glob_comp_45).
 Let a_1 = havoc(Init_undef_1, Init_0, a, 11).
 Let a_2 = havoc(Init_undef_0, a_1, pg_comp_0, 11).
@@ -124,7 +112,7 @@ Assume {
   (* Heap *)
   Type: (region(pg_comp_0.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns ... *)
-  Have: monotonic_init(Init_0, a_1) /\ monotonic_init(a_1, a_2).
+  Have: cinits(a_1) /\ cinits(a_2).
   (* Else *)
   Have: 10 <= i.
 }
@@ -136,17 +124,8 @@ Prove: IsInit_S1_S(a, a_2).
 ------------------------------------------------------------
 
 Goal Check 'FAIL' (file tests/wp_acsl/assigned_not_initialized_memtyped.i, line 16):
-Let P = Init_0[ptr_0].
-Assume {
-  Type: is_sint32(i_1).
-  (* Heap *)
-  Type: (region(ptr_0.base) <= 0) /\ cinits(Init_0).
-  (* Loop assigns ... *)
-  Have: monotonic_init(Init_0, Init_0[ptr_0 <- i | P]).
-  (* Else *)
-  Have: 10 <= i_1.
-}
-Prove: (i=true) \/ (P=true).
+Assume { Type: is_sint32(i_1). (* Else *) Have: 10 <= i_1. }
+Prove: (i=true).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -160,7 +139,7 @@ Assume {
   (* Heap *)
   Type: (region(s.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns ... *)
-  Have: monotonic_init(Init_0, a).
+  Have: cinits(a).
   (* Else *)
   Have: 10 <= i.
 }

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -97,7 +97,7 @@ type typing_context = {
   anonCompFieldName : string;
   conditionalConversion : typ -> typ -> typ;
   find_macro : string -> Logic_ptree.lexpr;
-  find_var : ?label:string -> var:string -> logic_var;
+  find_var : ?label:string -> string -> logic_var;
   (** the label argument is a C label (obeying the restrictions
       of which label can be present in a \at). If present, the scope for
       searching local C variables is the one of the statement with
@@ -151,108 +151,6 @@ type typing_context = {
   on_error: 'a 'b. ('a -> 'b) -> (unit -> unit) -> 'a -> 'b
 }
 
-(** [register_behavior_extension name status f] registers a
-    typing function [f] to
-    be used to type function contract clause with name [name].
-    The boolean flags specifies if the extension can be assigned
-    a property status or not.
-
-    Here is a basic example:
-
-    let count = ref 0 in
-    let foo_typer ~typing_context ~loc ps =
-    match ps with p::[] ->
-       Ext_preds
-       [
-             (typing_context.type_predicate
-                typing_context
-                (typing_context.post_state [Normal])
-                p)])
-      | [] -> let id = !count in incr count; Ext_id id
-      | _ -> typing_context.error loc "expecting a predicate after keyword FOO"
-    let () = register_behavior_extension "FOO" false foo_typer
-
-    @plugin development guide
-
-    @since Carbon-20101201
-    @modify Silicon-20161101 change type of the function
-    @modify 19.0-Potassium add [status] argument
-    @deprecated 21.0-Scandium
-*)
-val register_behavior_extension:
-  string -> bool ->
-  (typing_context:typing_context -> loc:location ->
-   Logic_ptree.lexpr list -> acsl_extension_kind) -> unit
-[@@ deprecated "Use Acsl_extension.register_behavior instead"]
-
-(** register an extension for global annotation.
-
-    @plugin development guide
-
-    @since 18.0-Argon
-    @deprecated 21.0-Scandium
-*)
-val register_global_extension:
-  string -> bool ->
-  (typing_context:typing_context -> loc: location ->
-   Logic_ptree.lexpr list -> acsl_extension_kind) -> unit
-[@@ deprecated "Use Acsl_extension.register_global instead"]
-
-(** register an extension for code annotation to be evaluated at _current_
-    program point.
-
-    @plugin development guide
-
-    @since 18.0-Argon
-    @deprecated 21.0-Scandium
-*)
-val register_code_annot_extension:
-  string -> bool ->
-  (typing_context: typing_context -> loc: location ->
-   Logic_ptree.lexpr list -> acsl_extension_kind) -> unit
-[@@ deprecated "Use Acsl_extension.register_code_annot instead"]
-
-(** register an extension for code annotation to be evaluated for the _next_
-    statement.
-
-    @plugin development guide
-
-    @since 18.0-Argon
-    @deprecated 21.0-Scandium
-*)
-val register_code_annot_next_stmt_extension:
-  string -> bool ->
-  (typing_context: typing_context -> loc: location ->
-   Logic_ptree.lexpr list -> acsl_extension_kind) -> unit
-[@@ deprecated "Use Acsl_extension.register_code_annot_next_stmt instead"]
-
-(** register an extension for loop annotation.
-
-    @plugin development guide
-
-    @since 18.0-Argon
-    @deprecated 21.0-Scandium
-*)
-val register_code_annot_next_loop_extension:
-  string -> bool ->
-  (typing_context: typing_context -> loc: location ->
-   Logic_ptree.lexpr list -> acsl_extension_kind) -> unit
-[@@ deprecated "Use Acsl_extension.register_code_annot_next_loop instead"]
-
-
-(** register an extension both for code and loop annotations.
-
-    @plugin development guide
-
-    @since 18.0-Argon
-    @deprecated 21.0-Scandium
-*)
-val register_code_annot_next_both_extension:
-  string -> bool ->
-  (typing_context: typing_context -> loc: location ->
-   Logic_ptree.lexpr list -> acsl_extension_kind) -> unit
-[@@ deprecated "Use Acsl_extension.register_code_annot_next_both instead"]
-
 module Make
     (C :
      sig
@@ -262,7 +160,7 @@ module Make
        val anonCompFieldName : string
        val conditionalConversion : typ -> typ -> typ
        val find_macro : string -> Logic_ptree.lexpr
-       val find_var : ?label:string -> var:string -> logic_var
+       val find_var : ?label:string -> string -> logic_var
        (** see corresponding field in {!Logic_typing.typing_context}. *)
        val find_enum_tag : string -> exp * typ
        val find_type : type_namespace -> string -> typ
@@ -389,19 +287,28 @@ val set_extension_handler:
   is_extension:(string -> bool) ->
   typer:(string -> typing_context -> location -> Logic_ptree.lexpr list ->
          (bool * acsl_extension_kind)) ->
+  typer_block:(string -> typing_context ->
+               Filepath.position * Filepath.position ->
+               string * Logic_ptree.extended_decl list ->
+               bool * Cil_types.acsl_extension_kind) ->
   unit
 (** Used to setup references related to the handling of ACSL extensions.
     If your name is not [Acsl_extension], do not call this
     @since 21.0-Scandium
 *)
 
-(**/**)
-val set_deprecated_extension_handler:
-  handler:(string -> ext_category -> bool ->
-           (typing_context -> location -> Logic_ptree.lexpr list ->
-            acsl_extension_kind) ->
-           unit) ->
-  unit
+val get_typer :
+  string ->
+  typing_context:typing_context ->
+  loc:Filepath.position * Filepath.position ->
+  Logic_ptree.lexpr list -> bool * Cil_types.acsl_extension_kind
+
+val get_typer_block:
+  string ->
+  typing_context:typing_context ->
+  loc:Logic_ptree.location ->
+  string * Logic_ptree.extended_decl list ->
+  bool * Cil_types.acsl_extension_kind
 
 (*
 Local Variables:

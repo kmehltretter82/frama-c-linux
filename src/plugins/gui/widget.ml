@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -71,23 +71,23 @@ class label ?(style=`Label) ?(align=`Left) ?width ?text () =
       match fg , c with
       | None , `NORMAL -> ()
       | Some c0 , `NORMAL ->
-          w#misc#modify_fg [ `NORMAL , `COLOR c0 ]
+        w#misc#modify_fg [ `NORMAL , `COLOR c0 ]
       | None , (#GDraw.color as c) ->
         fg <- Some (w#misc#style#fg `NORMAL) ;
         w#misc#modify_fg [ `NORMAL , c ]
       | Some _ , (#GDraw.color as c) ->
-          w#misc#modify_fg [ `NORMAL , c ]
+        w#misc#modify_fg [ `NORMAL , c ]
 
     method set_bg (c : color) =
       match bg , c with
       | None , `NORMAL -> ()
       | Some c0 , `NORMAL ->
-          w#misc#modify_bg [ `NORMAL , `COLOR c0 ]
+        w#misc#modify_bg [ `NORMAL , `COLOR c0 ]
       | None , (#GDraw.color as c) ->
         bg <- Some (w#misc#style#bg `NORMAL) ;
         w#misc#modify_bg [ `NORMAL , c ]
       | Some _ , (#GDraw.color as c) ->
-          w#misc#modify_bg [ `NORMAL , c ]
+        w#misc#modify_bg [ `NORMAL , c ]
 
     initializer
       Wutil.on width w#set_width_chars ;
@@ -96,10 +96,10 @@ class label ?(style=`Label) ?(align=`Left) ?width ?text () =
       | `Code -> set_monospace w
       | `Title -> set_bold_font w
       | `Descr ->
-          w#set_single_line_mode false ;
-          w#set_line_wrap true ;
-          w#set_justify `LEFT ;
-          set_small_font w
+        w#set_single_line_mode false ;
+        w#set_line_wrap true ;
+        w#set_justify `LEFT ;
+        set_small_font w
 
     method set_text = w#set_text
     method set_tooltip msg =
@@ -143,7 +143,7 @@ let shared_icon (f:string) =
         default_icon ()
     in Hashtbl.add pixbufs f pixbuf ; pixbuf
 
-let gimage = function 
+let gimage = function
   | `None -> GMisc.image ()
   | `Share f -> GMisc.image ~pixbuf:(shared_icon f) ()
   | #GtkStock.id as stock -> GMisc.image ~stock ()
@@ -181,12 +181,12 @@ class button_skel ?align ?(icon=`None) ?tooltip (button:GButton.button_skel) =
       match i with
       | `None -> button#unset_image ()
       | #icon as icn ->
-          let image =
-            try List.assoc icn images
-            with Not_found ->
-              let img = gimage icn in
-              images <- (icn,img)::images ; img
-          in button#set_image image#coerce
+        let image =
+          try List.assoc icn images
+          with Not_found ->
+            let img = gimage icn in
+            images <- (icn,img)::images ; img
+        in button#set_image image#coerce
   end
 
 class button ?align ?icon ?label ?(border=true) ?tooltip () =

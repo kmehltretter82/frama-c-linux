@@ -1,5 +1,17 @@
 #! /usr/bin/env bash
 
+# GNU parallel needs to be installed
+if ! command -v parallel >/dev/null 2>/dev/null; then
+    echo "parallel is required"
+    exit 127
+fi
+
+# latexmk needs to be installed
+if ! command -v latexmk >/dev/null 2>/dev/null; then
+    echo "latexmk is required"
+    exit 127
+fi
+
 cd $(dirname $0)
 
 usage () {
@@ -20,7 +32,7 @@ fi
 set -e
 
 if [ ! -e acsl ]; then
-    echo "error: 'acsl' not in doc; clone git@github.com:acsl-language/acsl.git"
+    echo "error: 'acsl' not in doc; try: git clone git@github.com:acsl-language/acsl.git"
     exit 1
 fi
 
@@ -32,21 +44,27 @@ ACSL_SUFFIX=$(grep acslversion acsl/version.tex | sed 's/.*{\([^{}\\]*\).*/\1/')
 EACSL_SUFFIX=$(grep 'newcommand{\\eacsllangversion' ../src/plugins/e-acsl/doc/refman/main.tex | sed 's/.*{\([^{}\\]*\).*/\1/')
 # sanity check
 if [ "$EACSL_SUFFIX" = "" ]; then
-    echo "error: could not retrive E-ACSL version from ../src/plugins/e-acsl/doc/refman/main.tex"
+    echo "error: could not retrieve E-ACSL version from ../src/plugins/e-acsl/doc/refman/main.tex"
     exit 1
 fi
 
 build () {
 
     echo "##### Building $1"
-    make -C $(dirname $1) $(basename $1) || \
-         (echo "######### $1 failed" ; exit 1)
-    echo "##### $1 done"
+    set +e
+    make -C $(dirname $1) $(basename $1)
+    ret=$?
+    if [ $ret -eq 0 ]; then
+        echo "##### $1 done"
+    else
+        echo "######### $1 failed"
+        exit 1
+    fi
     # extract extension, add suffix, re-append extension
     MANUAL=${2%.*}-$3.${2##*.}
     cp -f $1 manuals/$MANUAL
     echo "##### $MANUAL copied"
-    ln -srf manuals/$MANUAL manuals/$2
+    
 }
 
 EACSL_DOC=../src/plugins/e-acsl/doc

@@ -9,7 +9,7 @@ class print_term = object(self)
   inherit Visitor.frama_c_inplace
 
   method private should_print =
-    let n = Kernel_function.get_name (Extlib.the self#current_kf) in
+    let n = Kernel_function.get_name (Option.get self#current_kf) in
     n = "f" || n = "main"
 
   method! vterm v =

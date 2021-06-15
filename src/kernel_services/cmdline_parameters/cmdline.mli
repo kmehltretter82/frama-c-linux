@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,12 +20,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Command line parsing. 
+(** Command line parsing.
     @plugin development guide *)
 
 (* ************************************************************************** *)
 (** {2 Stage configurations}
-(* ************************************************************************** *)
+    (* ************************************************************************** *)
 
     Frama-C uses several stages for parsing its command line.
     Each of them may be customized. *)
@@ -50,57 +50,57 @@ type stage =
                     set may be modified to take into account cmdline options.
                     Just after this stage, Frama-C will run the plug-in mains.
                     @plugin development guide *)
-    (** The different stages, from the first to be executed to the last one.
-        @since Beryllium-20090601-beta1 *)
+(** The different stages, from the first to be executed to the last one.
+    @since Beryllium-20090601-beta1 *)
 
 val run_after_early_stage: (unit -> unit) -> unit
-  (** Register an action to be executed at the end of the early stage.
-      @plugin development guide
-      @since Beryllium-20090901 *)
+(** Register an action to be executed at the end of the early stage.
+    @plugin development guide
+    @since Beryllium-20090901 *)
 
 val run_during_extending_stage: (unit -> unit) -> unit
-  (** Register an action to be executed during the extending stage.
-      @plugin development guide
-      @since Beryllium-20090901 *)
+(** Register an action to be executed during the extending stage.
+    @plugin development guide
+    @since Beryllium-20090901 *)
 
 val run_after_extended_stage: (unit -> unit) -> unit
-  (** Register an action to be executed at the end of the extended stage.
-      @plugin development guide
-      @since Beryllium-20090901 *)
+(** Register an action to be executed at the end of the extended stage.
+    @plugin development guide
+    @since Beryllium-20090901 *)
 
 type exit
-  (** @since Beryllium-20090901 *)
+(** @since Beryllium-20090901 *)
 
 val nop : exit
-  (** @since Beryllium-20090901
-      @plugin development guide *)
+(** @since Beryllium-20090901
+    @plugin development guide *)
 
 exception Exit
-  (** @since Beryllium-20090901
-      @plugin development guide *)
+(** @since Beryllium-20090901
+    @plugin development guide *)
 
 val run_after_exiting_stage: (unit -> exit) -> unit
-  (** Register an action to be executed at the end of the exiting stage.
-      The guarded action must finish by [exit n].
-      @plugin development guide
-      @since Beryllium-20090601-beta1 *)
+(** Register an action to be executed at the end of the exiting stage.
+    The guarded action must finish by [exit n].
+    @plugin development guide
+    @since Beryllium-20090601-beta1 *)
 
 val run_after_loading_stage: (unit -> unit) -> unit
-  (** Register an action to be executed at the end of the loading stage.
-      @plugin development guide
-      @since Beryllium-20090601-beta1 *)
+(** Register an action to be executed at the end of the loading stage.
+    @plugin development guide
+    @since Beryllium-20090601-beta1 *)
 
 val is_going_to_load: unit -> unit
-  (** To be call if one action is going to run after the loading stage.
-      It is not necessary to call this function if the running action is set by
-      an option put on the command line.
-      @since Beryllium-20090601-beta1
-      @plugin development guide *)
+(** To be call if one action is going to run after the loading stage.
+    It is not necessary to call this function if the running action is set by
+    an option put on the command line.
+    @since Beryllium-20090601-beta1
+    @plugin development guide *)
 
 val run_after_configuring_stage: (unit -> unit) -> unit
-  (** Register an action to be executed at the end of the configuring stage.
-      @plugin development guide
-      @since Beryllium-20090601-beta1 *)
+(** Register an action to be executed at the end of the configuring stage.
+    @plugin development guide
+    @since Beryllium-20090601-beta1 *)
 
 val run_after_setting_files: (string list -> unit) -> unit
 (** Register an action to be executed just after setting the files put on the
@@ -109,17 +109,17 @@ val run_after_setting_files: (string list -> unit) -> unit
     @since Carbon-20101201 *)
 
 val at_normal_exit: (unit -> unit) -> unit
-  (** Register a hook executed whenever Frama-C exits without error (the exit
-      code is 0).
-      @since Boron-20100401 *)
+(** Register a hook executed whenever Frama-C exits without error (the exit
+    code is 0).
+    @since Boron-20100401 *)
 
 val at_error_exit: (exn -> unit) -> unit
-  (** Register a hook executed whenever Frama-C exits with error (the exit
-      code is greater than 0). The argument of the hook is the exception at the
-      origin of the error.
-      @since Boron-20100401
-      @modify Neon-20130301 add the exception as argument of the
-      hook. *)
+(** Register a hook executed whenever Frama-C exits with error (the exit
+    code is greater than 0). The argument of the hook is the exception at the
+    origin of the error.
+    @since Boron-20100401
+    @modify Neon-20130301 add the exception as argument of the
+    hook. *)
 
 (** Group of command line options.
     @since Beryllium-20090901 *)
@@ -127,18 +127,18 @@ module Group : sig
   type t (** @since Beryllium-20090901 *)
   val default: t (** @since Beryllium-20090901 *)
   val name: t -> string
-    (** @since Beryllium-20090901 *)
+  (** @since Beryllium-20090901 *)
 
   (**/**)
   (** Kernel internals *)
 
   val add: ?memo:bool -> plugin:string -> string -> t * bool
-    (** Add a new group of options to the given plugin.
-        If [memo] is [true], just return the already registered group if any.
-        If [memo] is [false], cannot add twice a group with the same name.
-        @return the group corresponding to the given name. Also return [true]
-        iff the group has just been created.
-        @since Beryllium-20090901 *)
+  (** Add a new group of options to the given plugin.
+      If [memo] is [true], just return the already registered group if any.
+      If [memo] is [false], cannot add twice a group with the same name.
+      @return the group corresponding to the given name. Also return [true]
+      iff the group has just been created.
+      @since Beryllium-20090901 *)
   (**/**)
 
 end
@@ -147,7 +147,7 @@ end
 
 (* ************************************************************************** *)
 (* ************************************************************************** *)
-(** From here: functions required by Kernel Internals only! 
+(** From here: functions required by Kernel Internals only!
     You should not use them! *)
 (* ************************************************************************** *)
 (* ************************************************************************** *)
@@ -157,8 +157,8 @@ end
 (* ************************************************************************** *)
 
 val protect: exn -> string
-  (** Messages for exceptions raised by Frama-C
-      @since Boron-20100401 *)
+(** Messages for exceptions raised by Frama-C
+    @since Boron-20100401 *)
 
 val catch_at_toplevel: exn -> bool
 (** @return true iff the given exception is caught by the Frama-C toplevel.
@@ -169,38 +169,38 @@ val catch_toplevel_run:
   at_normal_exit:(unit -> unit) ->
   on_error:(exn -> unit) ->
   unit
-    (** Run [f]. When done, either call [at_normal_exit] if running [f] was ok;
-        or call [on_error] (and exits) in other cases.
-        @modify Boron-20100401  additional arguments. They are now
-        labelled
-	@modify Neon-20140301 add the exception as argument of
-	[on_error].
-        @modify Magnesium-20151001 Removed argument [~quit]
-    *)
+(** Run [f]. When done, either call [at_normal_exit] if running [f] was ok;
+    or call [on_error] (and exits) in other cases.
+    @modify Boron-20100401  additional arguments. They are now
+    labelled
+    @modify Neon-20140301 add the exception as argument of
+    [on_error].
+    @modify Magnesium-20151001 Removed argument [~quit]
+*)
 
 val run_normal_exit_hook: unit -> unit
-  (** Run all the hooks registered by {!at_normal_exit}.
-      @since Boron-20100401 *)
+(** Run all the hooks registered by {!at_normal_exit}.
+    @since Boron-20100401 *)
 
 val run_error_exit_hook: exn -> unit
-  (** Run all the hooks registered by {!at_normal_exit}.
-      @since Boron-20100401
-      @modify Neon-20130301 add the exception as argument. *)
+(** Run all the hooks registered by {!at_normal_exit}.
+    @since Boron-20100401
+    @modify Neon-20130301 add the exception as argument. *)
 
 val error_occurred: exn -> unit
-  (** Remember that an error occurred.
-      So {!run_error_exit_hook} will be called when Frama-C will exit.
-      @since Boron-20100401
-      @modify Neon-20130301 add the exception as argument, 
-      fix spelling. *)
+(** Remember that an error occurred.
+    So {!run_error_exit_hook} will be called when Frama-C will exit.
+    @since Boron-20100401
+    @modify Neon-20130301 add the exception as argument,
+    fix spelling. *)
 
 val bail_out: unit -> 'a
-  (** Stop Frama-C with exit 0.
-      @since Boron-20100401 *)
+(** Stop Frama-C with exit 0.
+    @since Boron-20100401 *)
 
 (* ************************************************************************** *)
 (** {2 Special functions}
-(* ************************************************************************** *)
+    (* ************************************************************************** *)
 
     These functions should not be used by a standard plug-in developer. *)
 
@@ -223,42 +223,42 @@ val parse_and_boot:
     [on_from_name] *)
 
 val nb_given_options: unit -> int
-  (** Number of options provided by the user on the command line.
-      Should not be called before the end of the command line parsing.
-      @since Beryllium-20090601-beta1 *)
+(** Number of options provided by the user on the command line.
+    Should not be called before the end of the command line parsing.
+    @since Beryllium-20090601-beta1 *)
 
 val use_cmdline_files: (Datatype.Filepath.t list -> unit) -> unit
-  (** What to do with the list of files put on the command lines.
-      @since Beryllium-20090601-beta1 *)
+(** What to do with the list of files put on the command lines.
+    @since Beryllium-20090601-beta1 *)
 
 val help: unit -> exit
-  (** Display the help of Frama-C
-      @since Beryllium-20090601-beta1 *)
+(** Display the help of Frama-C
+    @since Beryllium-20090601-beta1 *)
 
 val list_plugins: unit -> exit
-  (** Display the list of installed plug-ins 
-      @since Magnesium-20151001 *)
+(** Display the list of installed plug-ins
+    @since Magnesium-20151001 *)
 
 val explain_cmdline : unit -> exit
 
 val plugin_help: string -> exit
-  (** Display the help of the given plug-in (given by its shortname).
-      @since Beryllium-20090601-beta1 *)
+(** Display the help of the given plug-in (given by its shortname).
+    @since Beryllium-20090601-beta1 *)
 
-val print_option_help: 
+val print_option_help:
   Format.formatter -> plugin:string -> group:Group.t -> string -> unit
 (** Pretty print the help of the option (given by its plug-in, its group and its
     name) in the provided formatter.
     @since Oxygen-20120901 *)
 
 val add_plugin: ?short:string -> string -> help:string -> unit
-  (** [add_plugin ~short name ~help] adds a new plug-in recognized by the
-      command line of Frama-C. If the shortname is not specified, then the name
-      is used as the shortname. By convention, if the name and the shortname
-      are equal to "", then the register "plug-in" is the Frama-C kernel
-      itself.
-      @raise Invalid_argument if the same shortname is registered twice
-      @since Beryllium-20090601-beta1 *)
+(** [add_plugin ~short name ~help] adds a new plug-in recognized by the
+    command line of Frama-C. If the shortname is not specified, then the name
+    is used as the shortname. By convention, if the name and the shortname
+    are equal to "", then the register "plug-in" is the Frama-C kernel
+    itself.
+    @raise Invalid_argument if the same shortname is registered twice
+    @since Beryllium-20090601-beta1 *)
 
 (** @since Beryllium-20090601-beta1 *)
 type option_setting =
@@ -277,17 +277,17 @@ val add_option:
   ext_help:(unit,Format.formatter,unit) format ->
   option_setting ->
   unit
-    (** [add_option name ~plugin stage ~argname ~help setting]
-        adds a new option of the given [name] recognized by the command line of
-        Frama-C. If the [name] is the empty string, nothing is done.
-        [plugin] is the shortname of the plug-in.
-        [argname] is the name of the argument which can be used of the
-        description [help]. Both of them are used by the help of the
-        registered option. If [help] is [None], then the option is not shown
-        in the help.
-        @since Beryllium-20090601-beta1
-        @modify Carbon-20101201 
-	@modify Oxygen-20120901 change type of ~help and add ~visible. *)
+(** [add_option name ~plugin stage ~argname ~help setting]
+    adds a new option of the given [name] recognized by the command line of
+    Frama-C. If the [name] is the empty string, nothing is done.
+    [plugin] is the shortname of the plug-in.
+    [argname] is the name of the argument which can be used of the
+    description [help]. Both of them are used by the help of the
+    registered option. If [help] is [None], then the option is not shown
+    in the help.
+    @since Beryllium-20090601-beta1
+    @modify Carbon-20101201
+    @modify Oxygen-20120901 change type of ~help and add ~visible. *)
 
 val add_option_without_action:
   string ->
@@ -319,11 +319,11 @@ val add_aliases:
     If [deprecated] is set to true, the use of the aliases emits a warning.
     @Invalid_argument if an alias name is the empty string
     @since Carbon-20110201
-    @modify Frama-c+dev add [visible] and [deprecated] arguments. *)
+    @modify 22.0-Titanium add [visible] and [deprecated] arguments. *)
 
-val replace_option_setting: 
+val replace_option_setting:
   string -> plugin:string -> group:Group.t -> option_setting -> unit
-(** Replace the previously registered option setting. 
+(** Replace the previously registered option setting.
     @since Sodium-20150201 *)
 
 val replace_option_help:
@@ -333,7 +333,7 @@ val replace_option_help:
 
 (* ************************************************************************** *)
 (** {2 Special parameters}
-(* ************************************************************************** *)
+    (* ************************************************************************** *)
 
     Frama-c parameters depending on the command line argument and set at the
     very beginning of the Frama-C initialization.
@@ -363,40 +363,40 @@ module Kernel_verbose_level: Level
 (** @since Fluorine-20130401 *)
 
 val kernel_debug_atleast_ref: (int -> bool) ref
-  (** @since Boron-20100401 *)
+(** @since Boron-20100401 *)
 
 val kernel_verbose_atleast_ref: (int -> bool) ref
-  (** @since Boron-20100401 *)
+(** @since Boron-20100401 *)
 
 val journal_enable: bool
-  (** @since Beryllium-20090601-beta1 *)
+(** @since Beryllium-20090601-beta1 *)
 
 val journal_isset: bool
-  (** -journal-enable/disable explicitly set on the command line.
-      @since Boron-20100401 *)
+(** -journal-enable/disable explicitly set on the command line.
+    @since Boron-20100401 *)
 
 val use_obj: bool
-  (** @since Beryllium-20090601-beta1 *)
+(** @since Beryllium-20090601-beta1 *)
 
 val use_type: bool
-  (** @since Beryllium-20090601-beta1 *)
+(** @since Beryllium-20090601-beta1 *)
 
 val quiet: bool
-  (** Must not be used for something else that initializing values
-      @since Beryllium-20090601-beta1 *)
+(** Must not be used for something else that initializing values
+    @since Beryllium-20090601-beta1 *)
 
 val deterministic: bool
-  (** Indicates that the plugins should strive to be as deterministic as
-      possible in their outputs. Higher memory consumption or analysis time
-      are acceptable, as reproducibility is more important.
-      @since Aluminium-20160501 *)
+(** Indicates that the plugins should strive to be as deterministic as
+    possible in their outputs. Higher memory consumption or analysis time
+    are acceptable, as reproducibility is more important.
+    @since Aluminium-20160501 *)
 
 val permissive: bool
-  (** Downgrades some command-line errors to warnings, such as
-      unknown option names and invalid values for some options
-      (e.g. non-existent function names).
+(** Downgrades some command-line errors to warnings, such as
+    unknown option names and invalid values for some options
+    (e.g. non-existent function names).
 
-      @since Frama-C+dev *)
+    @since 22.0-Titanium *)
 
 val last_project_created_by_copy: (unit -> string option) ref
 

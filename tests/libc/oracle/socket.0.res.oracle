@@ -59,10 +59,10 @@
 [eva] computing for function printf_va_1 <- test_read <- main.
   Called from tests/libc/socket.c:62.
 [eva] using specification for function printf_va_1
-[eva] tests/libc/socket.c:62: 
-  function printf_va_1: precondition valid_read_string(format) got status valid.
 [eva:alarm] tests/libc/socket.c:62: Warning: 
   function printf_va_1: precondition valid_read_string(param0) got status unknown.
+[eva] tests/libc/socket.c:62: 
+  function printf_va_1: precondition valid_read_string(format) got status valid.
 [eva] Done for function printf_va_1
 [eva] Recording results for test_read
 [eva] Done for function test_read
@@ -93,12 +93,12 @@
 [eva] computing for function printf_va_2 <- test_readv <- main.
   Called from tests/libc/socket.c:75.
 [eva] using specification for function printf_va_2
-[eva] tests/libc/socket.c:75: 
-  function printf_va_2: precondition valid_read_string(format) got status valid.
-[eva:alarm] tests/libc/socket.c:75: Warning: 
-  function printf_va_2: precondition valid_read_nstring(param1, 3) got status unknown.
 [eva:alarm] tests/libc/socket.c:75: Warning: 
   function printf_va_2: precondition valid_read_nstring(param0, 2) got status unknown.
+[eva:alarm] tests/libc/socket.c:75: Warning: 
+  function printf_va_2: precondition valid_read_nstring(param1, 3) got status unknown.
+[eva] tests/libc/socket.c:75: 
+  function printf_va_2: precondition valid_read_string(format) got status valid.
 [eva] Done for function printf_va_2
 [eva] Recording results for test_readv
 [eva] Done for function test_readv
@@ -123,12 +123,12 @@
 [eva] computing for function printf_va_3 <- test_recvmsg <- main.
   Called from tests/libc/socket.c:95.
 [eva] using specification for function printf_va_3
-[eva] tests/libc/socket.c:95: 
-  function printf_va_3: precondition valid_read_string(format) got status valid.
-[eva:alarm] tests/libc/socket.c:95: Warning: 
-  function printf_va_3: precondition valid_read_nstring(param1, 3) got status unknown.
 [eva:alarm] tests/libc/socket.c:95: Warning: 
   function printf_va_3: precondition valid_read_nstring(param0, 2) got status unknown.
+[eva:alarm] tests/libc/socket.c:95: Warning: 
+  function printf_va_3: precondition valid_read_nstring(param1, 3) got status unknown.
+[eva] tests/libc/socket.c:95: 
+  function printf_va_3: precondition valid_read_string(format) got status valid.
 [eva] Done for function printf_va_3
 [eva] Recording results for test_recvmsg
 [eva] Done for function test_recvmsg
@@ -143,7 +143,7 @@
 [eva] using specification for function memset
 [eva] tests/libc/socket.c:103: 
   function memset: precondition 'valid_s' got status valid.
-[eva] share/libc/string.h:118: 
+[eva] share/libc/string.h:121: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] Done for function memset
 [eva] computing for function bind <- test_server_echo <- main.

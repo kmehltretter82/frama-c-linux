@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -53,15 +53,16 @@ module Make
   type location = Convert.extended_location
   type origin = Domain.origin
 
-  let extract_expr oracle state exp =
+  let extract_expr ~oracle context state exp =
     let oracle exp = oracle exp >>=: Convert.restrict_val in
-    Domain.extract_expr oracle state exp >>=: fun (value, origin) ->
+    Domain.extract_expr ~oracle context state exp >>=: fun (value, origin) ->
     Convert.extend_val value, origin
 
-  let extract_lval oracle state lval typ loc =
+  let extract_lval ~oracle context state lval typ loc =
     let oracle exp = oracle exp >>=: Convert.restrict_val in
     let loc = Convert.restrict_loc loc in
-    Domain.extract_lval oracle state lval typ loc >>=: fun (value, origin) ->
+    Domain.extract_lval ~oracle context state lval typ loc
+    >>=: fun (value, origin) ->
     Convert.extend_val value, origin
 
   let backward_location state lval typ loc value =
@@ -115,15 +116,25 @@ module Make
   let assume stmt expr positive valuation state =
     Domain.assume stmt expr positive (lift_valuation valuation) state
 
-  let start_call stmt call valuation state =
-    Domain.start_call stmt (lift_call call) (lift_valuation valuation) state
+  let start_call stmt call recursion valuation state =
+    Domain.start_call
+      stmt (lift_call call) recursion (lift_valuation valuation) state
 
-  let finalize_call stmt call ~pre ~post =
-    Domain.finalize_call stmt (lift_call call) ~pre ~post
+  let finalize_call stmt call recursion ~pre ~post =
+    Domain.finalize_call stmt (lift_call call) recursion ~pre ~post
 
   let show_expr valuation = Domain.show_expr (lift_valuation valuation)
 
+  let lift_logic_dep dep =
+    let location = Option.map Convert.restrict_loc dep.location in
+    { dep with location }
+
+  let lift_logic_assigns = function
+    | Assigns (term, dep) -> Assigns (term, List.map lift_logic_dep dep)
+    | (Allocates _ | Frees _) as x -> x
+
   let logic_assign assigns location state =
+    let assigns = Option.map (fun (a, s) -> lift_logic_assigns a, s) assigns in
     Domain.logic_assign assigns (Convert.restrict_loc location) state
 
   let evaluate_predicate = Domain.evaluate_predicate

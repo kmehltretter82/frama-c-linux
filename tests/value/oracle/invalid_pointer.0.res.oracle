@@ -8,7 +8,7 @@
   NULL[rbits 80 to 247] ∈ [--..--]
   undet ∈ [--..--]
 [eva] computing for function pointer_computation <- main.
-  Called from tests/value/invalid_pointer.c:172.
+  Called from tests/value/invalid_pointer.c:190.
 [eva:alarm] tests/value/invalid_pointer.c:20: Warning: 
   invalid pointer creation. assert \object_pointer(p - 1);
 [eva:alarm] tests/value/invalid_pointer.c:23: Warning: 
@@ -37,7 +37,7 @@
 [eva] Recording results for pointer_computation
 [eva] Done for function pointer_computation
 [eva] computing for function pointer_in_loops <- main.
-  Called from tests/value/invalid_pointer.c:173.
+  Called from tests/value/invalid_pointer.c:191.
 [eva] tests/value/invalid_pointer.c:43: 
   Trace partitioning superposing up to 100 states
 [eva:alarm] tests/value/invalid_pointer.c:52: Warning: 
@@ -45,7 +45,7 @@
 [eva] Recording results for pointer_in_loops
 [eva] Done for function pointer_in_loops
 [eva] computing for function int_conversion <- main.
-  Called from tests/value/invalid_pointer.c:174.
+  Called from tests/value/invalid_pointer.c:192.
 [eva:alarm] tests/value/invalid_pointer.c:64: Warning: 
   invalid pointer creation. assert \object_pointer((int *)42);
 [eva] computing for function Frama_C_interval <- int_conversion <- main.
@@ -72,7 +72,7 @@
 [eva] Recording results for int_conversion
 [eva] Done for function int_conversion
 [eva] computing for function addrof <- main.
-  Called from tests/value/invalid_pointer.c:175.
+  Called from tests/value/invalid_pointer.c:193.
 [eva:alarm] tests/value/invalid_pointer.c:82: Warning: 
   invalid pointer creation. assert \object_pointer(&a[11]);
 [eva:alarm] tests/value/invalid_pointer.c:84: Warning: 
@@ -82,7 +82,7 @@
 [eva] Recording results for addrof
 [eva] Done for function addrof
 [eva] computing for function union_pointer <- main.
-  Called from tests/value/invalid_pointer.c:176.
+  Called from tests/value/invalid_pointer.c:194.
 [eva:alarm] tests/value/invalid_pointer.c:102: Warning: 
   invalid pointer creation. assert \object_pointer(u.pointer);
 [eva:alarm] tests/value/invalid_pointer.c:105: Warning: 
@@ -90,7 +90,7 @@
 [eva] Recording results for union_pointer
 [eva] Done for function union_pointer
 [eva] computing for function write_pointer <- main.
-  Called from tests/value/invalid_pointer.c:177.
+  Called from tests/value/invalid_pointer.c:195.
 [eva:alarm] tests/value/invalid_pointer.c:115: Warning: 
   invalid pointer creation. assert \object_pointer(p);
 [eva:alarm] tests/value/invalid_pointer.c:118: Warning: 
@@ -98,7 +98,7 @@
 [eva] Recording results for write_pointer
 [eva] Done for function write_pointer
 [eva] computing for function object_pointer_predicate <- main.
-  Called from tests/value/invalid_pointer.c:178.
+  Called from tests/value/invalid_pointer.c:196.
 [eva] tests/value/invalid_pointer.c:127: assertion got status valid.
 [eva:alarm] tests/value/invalid_pointer.c:129: Warning: 
   invalid pointer creation. assert \object_pointer(p - 1);
@@ -150,15 +150,25 @@
   invalid pointer creation. assert \object_pointer((int *)100);
 [eva] Recording results for object_pointer_predicate
 [eva] Done for function object_pointer_predicate
+[eva] computing for function flexible_array_member <- main.
+  Called from tests/value/invalid_pointer.c:197.
+[eva:alarm] tests/value/invalid_pointer.c:181: Warning: 
+  invalid pointer creation. assert \object_pointer(&s1.fam[1]);
+[eva:alarm] tests/value/invalid_pointer.c:185: Warning: 
+  invalid pointer creation. assert \object_pointer(p_0 + 1);
+[kernel] tests/value/invalid_pointer.c:185: Warning: 
+  all target addresses were invalid. This path is assumed to be dead.
+[eva] Recording results for flexible_array_member
+[eva] Done for function flexible_array_member
 [eva] computing for function signal <- main.
-  Called from tests/value/invalid_pointer.c:180.
+  Called from tests/value/invalid_pointer.c:199.
 [eva] using specification for function signal
 [eva] Done for function signal
 [eva] computing for function signal <- main.
-  Called from tests/value/invalid_pointer.c:181.
+  Called from tests/value/invalid_pointer.c:200.
 [eva] Done for function signal
 [eva] computing for function signal <- main.
-  Called from tests/value/invalid_pointer.c:182.
+  Called from tests/value/invalid_pointer.c:201.
 [eva] Done for function signal
 [eva] Recording results for main
 [eva] done for function main
@@ -186,11 +196,17 @@
   assertion 'Eva,pointer_value' got final status invalid.
 [eva] tests/value/invalid_pointer.c:165: 
   assertion 'Eva,pointer_value' got final status invalid.
+[eva] tests/value/invalid_pointer.c:181: 
+  assertion 'Eva,pointer_value' got final status invalid.
+[eva] tests/value/invalid_pointer.c:185: 
+  assertion 'Eva,pointer_value' got final status invalid.
 [scope:rm_asserts] removing 2 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function addrof:
   p ∈ {{ &a + [0..40],0%4 }}
   offset ∈ [--..--]
+[eva:final-states] Values at end of function flexible_array_member:
+  s1 ∈ {0}
 [eva:final-states] Values at end of function int_conversion:
   Frama_C_entropy_source ∈ [--..--]
   x ∈ [15..31]
@@ -347,6 +363,8 @@
   Frama_C_entropy_source ∈ [--..--]
 [from] Computing for function addrof
 [from] Done for function addrof
+[from] Computing for function flexible_array_member
+[from] Done for function flexible_array_member
 [from] Computing for function int_conversion
 [from] Computing for function Frama_C_interval <-int_conversion
 [from] Done for function Frama_C_interval
@@ -372,6 +390,8 @@
   \result FROM Frama_C_entropy_source; min; max
 [from] Function addrof:
   NO EFFECTS
+[from] Function flexible_array_member:
+  NO EFFECTS
 [from] Function int_conversion:
   Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
 [from] Function object_pointer_predicate:
@@ -392,6 +412,10 @@
 [inout] Out (internal) for function addrof:
     p; offset
 [inout] Inputs for function addrof:
+    undet
+[inout] Out (internal) for function flexible_array_member:
+    s1; p; p_0
+[inout] Inputs for function flexible_array_member:
     undet
 [inout] Out (internal) for function int_conversion:
     Frama_C_entropy_source; x; p

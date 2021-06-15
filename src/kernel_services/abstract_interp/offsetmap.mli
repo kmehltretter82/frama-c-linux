@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -27,7 +27,7 @@
 module Make (V : module type of Offsetmap_lattice_with_isotropy) :
   module type of Offsetmap_sig
   with type v = V.t
-  and type widen_hint = V.numerical_widen_hint
+   and type widen_hint = V.numerical_widen_hint
 
 (**/**)
 (* Exported as Int_Intervals, do not use this module directly *)
@@ -38,13 +38,13 @@ module Int_Intervals: module type of Int_Intervals_sig
 (** Maps from intervals to simple values. The documentation of the returned
     maps is in module {!Offsetmap_bitwise_sig}. *)
 module Make_bitwise(V: sig
-  include Lattice_type.Bounded_Join_Semi_Lattice
-  include Lattice_type.With_Narrow with type t := t
-  include Lattice_type.With_Top with type t := t
-end) :
+    include Lattice_type.Bounded_Join_Semi_Lattice
+    include Lattice_type.With_Narrow with type t := t
+    include Lattice_type.With_Top with type t := t
+  end) :
   module type of Offsetmap_bitwise_sig
-    with type v = V.t
-    and type intervals = Int_Intervals.t
+  with type v = V.t
+   and type intervals = Int_Intervals.t
 
 
 (**/**)

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -63,8 +63,8 @@ let t_record x _ =
     let x =
       Array.map
         (fun x -> match x with
-        | Nopack | Recursive _ -> raise Invalid_descriptor
-        | Pack x -> coerce x)
+           | Nopack | Recursive _ -> raise Invalid_descriptor
+           | Pack x -> coerce x)
         x
     in
     unsafe_pack (Unmarshal.t_record x)
@@ -91,7 +91,7 @@ let t_queue = t_poly Unmarshal.t_queue
 let of_type ty = pack (Type.structural_descr ty)
 let of_structural ty d =
   let ty_d = Type.structural_descr ty in
-  if not (Type.may_use_obj ()) || Structural_descr.are_consistent ty_d d 
+  if not (Type.may_use_obj ()) || Structural_descr.are_consistent ty_d d
   then pack d
   else invalid_arg "Descr.of_structural: inconsistent descriptor"
 
@@ -126,8 +126,8 @@ module Unmarshal_tbl =
       type t = Unmarshal.t
       let equal = (==)
       let hash = Hashtbl.hash (* [JS 2012/07/10] what about recursive datatypes?
-				 Look like [hash] could loop... *)
-     end)
+                                 Look like [hash] could loop... *)
+    end)
 
 let visited = Unmarshal_tbl.create 7
 
@@ -136,10 +136,10 @@ let rec transform_unmarshal_structure term x = function
     let l = ref [] in
     Array.iter
       (fun a ->
-        Array.iteri
-          (fun i y ->
-            if x == y then l := (a, i) :: !l else transform_unmarshal term x y)
-          a)
+         Array.iteri
+           (fun i y ->
+              if x == y then l := (a, i) :: !l else transform_unmarshal term x y)
+           a)
       arr;
     List.iter (fun (a, i) -> a.(i) <- term) !l
   | Unmarshal.Dependent_pair(d, _) | Unmarshal.Array d ->

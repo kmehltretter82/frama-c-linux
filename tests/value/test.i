@@ -1,5 +1,5 @@
 /* run.config*
-  GCC:
+  
   STDOPT: #"-main inst_F6 -absolute-valid-range 0x200-0x199"
   STDOPT: #"-main f"
 */

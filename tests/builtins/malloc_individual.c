@@ -2,7 +2,7 @@
    STDOPT: #"-eva-alloc-builtin fresh"
 */
 
-#include "share/libc/stdlib.c"
+#include "stdlib.c"
 
 int *p;
 int A,B,C;

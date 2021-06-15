@@ -24,6 +24,10 @@
 
 open Cil_types
 
+val name_of_mpz_arith_bop: binop -> string
+(** [name_of_mpz_arith_bop bop] returns the name of the GMP function on integer
+    corresponding to the [bop] arithmetic operation. *)
+
 val init: loc:location -> exp -> stmt
 (** build stmt [mpz_init(v)] or [mpq_init(v)] depending on typ of [v] *)
 

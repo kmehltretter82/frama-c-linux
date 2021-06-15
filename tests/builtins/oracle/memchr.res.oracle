@@ -152,7 +152,7 @@
 [eva] tests/builtins/memchr.c:193: Call to builtin memset
 [eva] tests/builtins/memchr.c:193: 
   function memset: precondition 'valid_s' got status valid.
-[eva] share/libc/string.h:118: 
+[eva] share/libc/string.h:121: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] Recording results for init_array_nondet
 [eva] Done for function init_array_nondet
@@ -538,12 +538,12 @@
 [eva] tests/builtins/memchr.c:376: assertion got status valid.
 [eva] tests/builtins/memchr.c:377: assertion got status valid.
 [eva] tests/builtins/memchr.c:379: Call to builtin memchr
-[eva:alarm] tests/builtins/memchr.c:379: Warning: 
-  function memchr: precondition 'valid' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:379: Warning: 
-  function memchr: precondition 'initialization' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:379: Warning: 
-  function memchr: precondition 'danglingness' got status unknown.
+[eva] tests/builtins/memchr.c:379: 
+  function memchr: precondition 'valid' got status valid.
+[eva] tests/builtins/memchr.c:379: 
+  function memchr: precondition 'initialization' got status valid.
+[eva] tests/builtins/memchr.c:379: 
+  function memchr: precondition 'danglingness' got status valid.
 [eva] tests/builtins/memchr.c:379: Frama_C_show_each_mymemchr: {1}
 [eva] tests/builtins/memchr.c:380: Call to builtin memchr
 [eva:alarm] tests/builtins/memchr.c:380: Warning: 
@@ -1308,9 +1308,15 @@
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function memchr_big_array:
   c ∈ {0}
-  u[0..199] ∈ {270729319} or UNINITIALIZED
-  r[0..200] ∈ {270729319} or UNINITIALIZED
-  t[0..999999] ∈ {270729319} or UNINITIALIZED
+  u[0][bits 0 to 15]# ∈ {270729319}%32, bits 0 to 15 
+   [bits 16 to 6399]# ∈
+   {270729319} or UNINITIALIZED repeated %32, bits 16 to 6399 
+  r[0][bits 0 to 15]# ∈ {270729319} or UNINITIALIZED%32, bits 0 to 15 
+   [bits 16 to 6431]# ∈
+   {270729319} or UNINITIALIZED repeated %32, bits 16 to 6431 
+  t[0][bits 0 to 15]# ∈ {270729319} or UNINITIALIZED%32, bits 0 to 15 
+   [bits 16 to 31999999]# ∈
+   {270729319} or UNINITIALIZED repeated %32, bits 16 to 31999999 
   p ∈ {{ &t + [0..3999996],0%4 }}
   len_u ∈ {1}
   len_r ∈ {1}
@@ -1339,13 +1345,12 @@
   z2 ∈ {0}
 [eva:final-states] Values at end of function memchr_initialization:
   c ∈ {0}
-  empty_or_uninitialized[0] ∈ {0} or UNINITIALIZED
+  empty_or_uninitialized[0] ∈ {0}
   z1 ∈ {0}
-  s[0] ∈ {1} or UNINITIALIZED
+  s[0] ∈ {1}
    [1] ∈ {0}
   z2 ∈ {1}
-  t[0..1] ∈ {10}
-   [2] ∈ {10} or UNINITIALIZED
+  t[0..2] ∈ {10}
    [3] ∈ {0}
   z3 ∈ {3}
 [eva:final-states] Values at end of function memchr_misc:
@@ -1381,7 +1386,7 @@
   s1 ∈ {{ "mno\000pqr" ; "MNOP\000QRS" }}
   sz5 ∈ {3; 4}
   sz6 ∈ {3; 4}
-  maybe_init[0] ∈ {65} or UNINITIALIZED
+  maybe_init[0] ∈ {65}
             [1] ∈ {0}
   sz8 ∈ {1}
 [eva:final-states] Values at end of function memchr_misc_array:

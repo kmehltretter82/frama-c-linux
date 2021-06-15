@@ -35,70 +35,20 @@
 [loop] tests/loop_analysis/ne.i:127: Warning: 
   termination condition may not be reached (infinite loop?)
   loop amounts to: for (i = 0; i != -5; i += 15)
-[loop] Functions with loops whose bounds we could not find:
-  f02
-  f04
-  f06
-  f08
-  f10
-  f12
-  f14
-  f16
-  no_iter01
-  no_iter02
-  no_iter03
-  no_iter04
-  no_iter05
-  no_iter06
-  no_iter07
-  no_iter08
-[loop] Add this to your command line:
-  -val-slevel-merge-after-loop f02 \
-  -val-slevel-merge-after-loop f04 \
-  -val-slevel-merge-after-loop f06 \
-  -val-slevel-merge-after-loop f08 \
-  -val-slevel-merge-after-loop f10 \
-  -val-slevel-merge-after-loop f12 \
-  -val-slevel-merge-after-loop f14 \
-  -val-slevel-merge-after-loop f16 \
-  -val-slevel-merge-after-loop no_iter01 \
-  -val-slevel-merge-after-loop no_iter02 \
-  -val-slevel-merge-after-loop no_iter03 \
-  -val-slevel-merge-after-loop no_iter04 \
-  -val-slevel-merge-after-loop no_iter05 \
-  -val-slevel-merge-after-loop no_iter06 \
-  -val-slevel-merge-after-loop no_iter07 \
-  -val-slevel-merge-after-loop no_iter08 \
-  -slevel-function f02:0 \
-  -slevel-function f04:0 \
-  -slevel-function f06:0 \
-  -slevel-function f08:0 \
-  -slevel-function f10:0 \
-  -slevel-function f12:0 \
-  -slevel-function f14:0 \
-  -slevel-function f16:0 \
-  -slevel-function no_iter01:0 \
-  -slevel-function no_iter02:0 \
-  -slevel-function no_iter03:0 \
-  -slevel-function no_iter04:0 \
-  -slevel-function no_iter05:0 \
-  -slevel-function no_iter06:0 \
-  -slevel-function no_iter07:0 \
-  -slevel-function no_iter08:0 \
-  -slevel-function a1:43 \
-  -slevel-function a2:146 \
-  -slevel-function a3:51 \
-  -slevel-function a4:154 \
-  -slevel-function a5:46 \
-  -slevel-function a6:46 \
-  -slevel-function a7:54 \
-  -slevel-function a8:54 \
-  -slevel-function f01:4 \
-  -slevel-function f03:4 \
-  -slevel-function f05:1 \
-  -slevel-function f07:1 \
-  -slevel-function f09:1 \
-  -slevel-function f11:6 \
-  -slevel-function f13:4 \
-  -slevel-function f15:1 \
-  -slevel-function main:1
+[loop] Maximum number of iterations by loop:
+  tests/loop_analysis/ne.i:2: 43
+  tests/loop_analysis/ne.i:6: 146
+  tests/loop_analysis/ne.i:10: 51
+  tests/loop_analysis/ne.i:14: 154
+  tests/loop_analysis/ne.i:18: 46
+  tests/loop_analysis/ne.i:22: 46
+  tests/loop_analysis/ne.i:26: 54
+  tests/loop_analysis/ne.i:30: 54
+  tests/loop_analysis/ne.i:34: 4
+  tests/loop_analysis/ne.i:42: 4
+  tests/loop_analysis/ne.i:50: 1
+  tests/loop_analysis/ne.i:58: 1
+  tests/loop_analysis/ne.i:66: 1
+  tests/loop_analysis/ne.i:74: 6
+  tests/loop_analysis/ne.i:82: 4
+  tests/loop_analysis/ne.i:90: 1

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -26,7 +26,8 @@ let should_memorize_function f =
          f (Value_parameters.NoResultsFunctions.get ()))
 
 let () = Db.Value.no_results :=
-    (fun fd -> not (should_memorize_function fd))
+    (fun fd -> not (should_memorize_function fd)
+               || not (Value_parameters.Domains.mem "cvalue"))
 
 (* Signal that some results are not stored. The gui, or some calls to
    Db.Value, may fail ungracefully *)

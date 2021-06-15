@@ -1,7 +1,7 @@
 /* run.config
-STDOPT: +"-print"
+PLUGIN: @EVA_PLUGINS@
+  STDOPT: +"-print"
 */
-
 struct s {
   int a;
   char data[]; // FAM

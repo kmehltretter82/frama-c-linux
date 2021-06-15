@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -159,8 +159,8 @@ class type main_window_extension_points = object
   (** register an action to perform when button is released on a given
       localizable.
       If the button 3 is released, the first argument is popped as a
-      contextual menu. 
-      	@plugin development guide *)
+      contextual menu.
+        @plugin development guide *)
 
   method register_source_highlighter :
     (reactive_buffer -> Pretty_source.localizable ->
@@ -234,7 +234,7 @@ class type main_window_extension_points = object
       be used (line numbers, etc.). *)
 
   method help_message : 'a 'b.
-                             (<event : GObj.event_ops ; .. > as 'a) ->
+    (<event : GObj.event_ops ; .. > as 'a) ->
     ('b, Format.formatter, unit) format ->
     'b
     (** Help message displayed when entering the widget *)

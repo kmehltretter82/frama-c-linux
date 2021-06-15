@@ -4,7 +4,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:alarm] tests/misc/bts1347.i:5: Warning: 
+[eva:alarm] tests/misc/bts1347.i:8: Warning: 
   out of bounds read. assert \valid_read(x);
 [eva] Recording results for f
 [eva] done for function f
@@ -13,7 +13,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:alarm] tests/misc/bts1347.i:6: Warning: 
+[eva:alarm] tests/misc/bts1347.i:12: Warning: 
   out of bounds read. assert \valid_read(tmp);
                       (tmp from x++)
 [eva] Recording results for g
@@ -24,22 +24,22 @@
 --- Properties of Function 'f'
 --------------------------------------------------------------------------------
 
-[  Dead   ] Assertion 'emitter' (file tests/misc/bts1347.i, line 5)
+[  Dead   ] Assertion 'emitter' (file tests/misc/bts1347.i, line 8)
             Locally valid, but unreachable.
             By Eva because:
-             - Unreachable return (file tests/misc/bts1347.i, line 5)
-[Unreachable] Unreachable return (file tests/misc/bts1347.i, line 5)
+             - Unreachable return (file tests/misc/bts1347.i, line 8)
+[Unreachable] Unreachable return (file tests/misc/bts1347.i, line 8)
             by Eva.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'g'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion 'Eva,mem_access' (file tests/misc/bts1347.i, line 6)
+[    -    ] Assertion 'Eva,mem_access' (file tests/misc/bts1347.i, line 12)
             tried with Eva.
-[ Partial ] Assertion 'emitter' (file tests/misc/bts1347.i, line 6)
+[ Partial ] Assertion 'emitter' (file tests/misc/bts1347.i, line 12)
             By emitter, with pending:
-             - Assertion 'Eva,mem_access' (file tests/misc/bts1347.i, line 6)
+             - Assertion 'Eva,mem_access' (file tests/misc/bts1347.i, line 12)
 
 --------------------------------------------------------------------------------
 --- Status Report Summary
@@ -55,9 +55,9 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:alarm] tests/misc/bts1347.i:5: Warning: 
+[eva:alarm] tests/misc/bts1347.i:8: Warning: 
   out of bounds read. assert \valid_read(x);
-[eva] tests/misc/bts1347.i:5: assertion 'emitter' got status valid.
+[eva] tests/misc/bts1347.i:8: assertion 'emitter' got status valid.
 [eva] Recording results for f
 [eva] done for function f
 [eva] Analyzing an incomplete application starting at g
@@ -65,9 +65,9 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:alarm] tests/misc/bts1347.i:6: Warning: 
+[eva:alarm] tests/misc/bts1347.i:12: Warning: 
   out of bounds read. assert \valid_read(tmp);
                       (tmp from x++)
-[eva] tests/misc/bts1347.i:6: assertion 'emitter' got status valid.
+[eva] tests/misc/bts1347.i:12: assertion 'emitter' got status valid.
 [eva] Recording results for g
 [eva] done for function g

@@ -1,5 +1,5 @@
 /* run.config*
-  GCC:
+  
   STDOPT: #"-main zero_ou_un_0 -out-external"
   STDOPT: #"-main un_1 -out-external"
 

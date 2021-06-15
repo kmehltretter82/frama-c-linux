@@ -2,12 +2,13 @@
 [kernel] Parsing tests/wp_typed/unit_tset.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
-[wp] 2 goals scheduled
-[wp] [Qed] Goal typed_complex_assigns : Valid
+[wp] 3 goals scheduled
+[wp] [Qed] Goal typed_complex_assigns_exit : Valid
+[wp] [Qed] Goal typed_complex_assigns_normal : Valid
 [wp] [Qed] Goal typed_complex_call_job_requires : Valid
-[wp] Proved goals:    2 / 2
-  Qed:             2
+[wp] Proved goals:    3 / 3
+  Qed:             3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  complex                   2        -        2       100%
+  complex                   3        -        3       100%
 ------------------------------------------------------------

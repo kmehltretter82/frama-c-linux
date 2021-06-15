@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -29,46 +29,44 @@
 val filename : string -> string -> string
 
 val pp_to_file : string -> (Format.formatter -> unit) -> unit
-  (** [pp_to_file file pp] runs [pp] on a formatter that writes into [file].
-      The formatter is always properly flushed and closed on return.
-      Exceptions in [pp] are re-raised after closing. *)
+(** [pp_to_file file pp] runs [pp] on a formatter that writes into [file].
+    The formatter is always properly flushed and closed on return.
+    Exceptions in [pp] are re-raised after closing. *)
 
 val pp_from_file : Format.formatter -> string -> unit
-  (** [pp_from_file fmt file] dumps the content of [file] into the [fmt].
-      Exceptions in [pp] are re-raised after closing. *)
+(** [pp_from_file fmt file] dumps the content of [file] into the [fmt].
+    Exceptions in [pp] are re-raised after closing. *)
 
 val bincopy : bytes -> in_channel -> out_channel -> unit
-  (** [copy buffer cin cout] reads [cin] until end-of-file
-      and copy it in [cout].
-      [buffer] is a temporary string used during the copy.
-      Recommended size is [2048].
-      @modify Silicon-20161101 [buffer] has now type [bytes] instead of [string]
- *)
+(** [copy buffer cin cout] reads [cin] until end-of-file
+    and copy it in [cout].
+    [buffer] is a temporary string used during the copy.
+    Recommended size is [2048].
+    @modify Silicon-20161101 [buffer] has now type [bytes] instead of [string]
+*)
 
 val copy : string -> string -> unit
-  (** [copy source target] copies source file to target file using [bincopy]. *)
+(** [copy source target] copies source file to target file using [bincopy]. *)
 
 val read_file : string -> (in_channel -> 'a) -> 'a
-  (** Properly close the channel and re-raise exceptions *)
+(** Properly close the channel and re-raise exceptions *)
 val read_lines : string -> (string -> unit) -> unit
-  (** Iter over all text lines in the file *)
+(** Iter over all text lines in the file *)
 val write_file : string -> (out_channel -> 'a) -> 'a
-  (** Properly close the channel and re-raise exceptions *)
+(** Properly close the channel and re-raise exceptions *)
 val print_file : string -> (Format.formatter -> 'a) -> 'a
-  (** Properly flush and close the channel and re-raise exceptions *)
+(** Properly flush and close the channel and re-raise exceptions *)
 
 (* ************************************************************************* *)
 (** {2 Timing Utility} *)
 (* ************************************************************************* *)
 
 type timer = float ref
-type 'a result = Result of 'a | Error of Printexc.raw_backtrace * exn
-val catch : ('a -> 'b) -> 'a -> 'b result
-val return : 'a result -> 'a
+
 val time : ?rmax:timer -> ?radd:timer -> ('a -> 'b) -> 'a -> 'b
-  (** Compute the elapsed time with [Sys.time].
-      The [rmax] timer is maximized and the [radd] timer is cumulated.
-      Computed result is returned, or exception is re-raised. *)
+(** Compute the elapsed time with [Sys.time].
+    The [rmax] timer is maximized and the [radd] timer is cumulated.
+    Computed result is returned, or exception is re-raised. *)
 
 (* ************************************************************************* *)
 (** {2 System commands} *)
@@ -80,15 +78,15 @@ val full_command :
   -> stdout:Unix.file_descr
   -> stderr:Unix.file_descr
   -> Unix.process_status
-  (** Same arguments as {Unix.create_process} but returns only when
-      execution is complete.
-      @raise Sys_error when a system error occurs *)
+(** Same arguments as {Unix.create_process} but returns only when
+    execution is complete.
+    @raise Sys_error when a system error occurs *)
 
 type process_result =
   | Not_ready of (unit -> unit)
   | Result of Unix.process_status
-      (** [Not_ready f] means that the child process is not yet finished and
-          may be terminated manually with [f ()]. *)
+  (** [Not_ready f] means that the child process is not yet finished and
+      may be terminated manually with [f ()]. *)
 
 val full_command_async :
   string -> string array
@@ -96,26 +94,26 @@ val full_command_async :
   -> stdout:Unix.file_descr
   -> stderr:Unix.file_descr
   -> (unit -> process_result)
-  (** Same arguments as {Unix.create_process}.
-      @return a function to call to check if the process execution
-      is complete.
-      You must call this function until it returns a Result
-      to prevent Zombie processes.
-      @raise Sys_error when a system error occurs *)
+(** Same arguments as {Unix.create_process}.
+    @return a function to call to check if the process execution
+    is complete.
+    You must call this function until it returns a Result
+    to prevent Zombie processes.
+    @raise Sys_error when a system error occurs *)
 
 val command_async :
   ?stdout:Buffer.t ->
   ?stderr:Buffer.t ->
   string -> string array
   -> (unit -> process_result)
-  (** Same arguments as {Unix.create_process}.
-      @return a function to call to check if the process execution
-      is complete.
-      You must call this function until it returns a Result
-      to prevent Zombie processes.
-      When this function returns a Result, the stdout and stderr of the child
-      process will be filled into the arguments buffer.
-      @raise Sys_error when a system error occurs *)
+(** Same arguments as {Unix.create_process}.
+    @return a function to call to check if the process execution
+    is complete.
+    You must call this function until it returns a Result
+    to prevent Zombie processes.
+    When this function returns a Result, the stdout and stderr of the child
+    process will be filled into the arguments buffer.
+    @raise Sys_error when a system error occurs *)
 
 val command :
   ?timeout:int ->
@@ -123,11 +121,11 @@ val command :
   ?stderr:Buffer.t ->
   string -> string array
   -> Unix.process_status
-  (** Same arguments as {Unix.create_process}.
-      When this function returns, the stdout and stderr of the child
-      process will be filled into the arguments buffer.
-      @raise Sys_error when a system error occurs
-      @raise Db.Cancel when the computation is interrupted or on timeout *)
+(** Same arguments as {Unix.create_process}.
+    When this function returns, the stdout and stderr of the child
+    process will be filled into the arguments buffer.
+    @raise Sys_error when a system error occurs
+    @raise Db.Cancel when the computation is interrupted or on timeout *)
 
 (*
 Local Variables:

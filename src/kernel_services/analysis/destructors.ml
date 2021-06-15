@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -32,7 +32,7 @@ let add_destructor (_, l as acc) var =
       let e =
         match Globals.Functions.get_params kf with
         | vi :: _ ->
-          if Cil.need_cast (Cil.typeOf e) vi.vtype then Cil.mkCast e vi.vtype
+          if Cil.need_cast (Cil.typeOf e) vi.vtype then Cil.mkCast vi.vtype e
           else e
         | [] ->
           Kernel.fatal
@@ -244,7 +244,7 @@ class vis flag = object(self)
         Kernel.fatal ~current:true
           "%a in function %a is expected to have a single successor"
           Printer.pp_stmt s
-          Kernel_function.pretty (Extlib.the self#current_kf)
+          Kernel_function.pretty (Option.get self#current_kf)
     in
     let treat_succ_open kind s succ =
       (* The jump must not bypass a vla initialization in the opened blocks. *)
@@ -280,7 +280,8 @@ class vis flag = object(self)
 end
 
 let treat_one_function flag kf =
-  if not (Cil.is_special_builtin (Kernel_function.get_name kf)) then begin
+  if not (Cil_builtins.is_special_builtin (Kernel_function.get_name kf))
+  then begin
     let my_flag = ref false in
     let vis = new vis my_flag in
     ignore (Visitor.visitFramacKf vis kf);

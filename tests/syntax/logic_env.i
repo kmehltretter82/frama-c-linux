@@ -1,6 +1,6 @@
 /* run.config
-EXECNOW: make -s @PTEST_DIR@/logic_env_script.cmxs
-OPT: -load-module @PTEST_DIR@/logic_env_script
+ MODULE: logic_env_script
+   OPT: -no-autoload-plugins
 */
 
 //@ predicate foo(integer x) = x == 0;

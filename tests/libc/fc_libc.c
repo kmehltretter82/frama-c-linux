@@ -1,19 +1,20 @@
 /* run.config*
-   EXECNOW: make -s @PTEST_DIR@/check_libc_naming_conventions.cmxs
-   EXECNOW: make -s @PTEST_DIR@/check_const.cmxs
-   EXECNOW: make -s @PTEST_DIR@/check_parsing_individual_headers.cmxs
-   EXECNOW: make -s @PTEST_DIR@/check_libc_anonymous_tags.cmxs
-   EXECNOW: make -s @PTEST_DIR@/check_compliance.cmxs
-   OPT: -load-module @PTEST_DIR@/check_libc_naming_conventions -print -cpp-extra-args='-nostdinc -Ishare/libc' -metrics -metrics-libc -load-module @PTEST_DIR@/check_const -load-module metrics -eva @EVA_CONFIG@ -then -lib-entry -no-print -metrics-no-libc
-   OPT: -print -print-libc
-   OPT: -load-module @PTEST_DIR@/check_parsing_individual_headers
-   OPT: -load-module @PTEST_DIR@/check_libc_anonymous_tags
-   OPT: -load-module @PTEST_DIR@/check_compliance -kernel-msg-key printer:attrs
-   CMD: ./tests/libc/check_full_libc.sh
+ PLUGIN: @EVA_PLUGINS@ metrics
+ MODULE: check_libc_naming_conventions, check_const
+   OPT: -print -cpp-extra-args='-nostdinc -Ishare/libc' -metrics -metrics-libc -eva @EVA_CONFIG@ -then -lib-entry -no-print -metrics-no-libc
+ MODULE:
+   OPT: -print -print-libc -machdep x86_32
+ MODULE: check_parsing_individual_headers
+   OPT:
+ MODULE: check_libc_anonymous_tags
+   OPT:
+ MODULE: check_compliance
+   OPT: -kernel-msg-key printer:attrs
+ MODULE:
+ CMD: ./tests/libc/check_full_libc.sh
    OPT:
 **/
 #define __FC_REG_TEST
-
 // Some functions such as usleep() are only defined for older of POSIX headers,
 // while others may be defined only by newer ones, so it is not possible to
 // test all of them. We nevertheless define some headers to test additional
@@ -22,7 +23,7 @@
 #define _POSIX_C_SOURCE 200112L
 #define _GNU_SOURCE 1
 
-#include "share/libc/__fc_runtime.c"
+#include "__fc_runtime.c"
 
 #include "alloca.h"
 #include "arpa/inet.h"
@@ -44,6 +45,7 @@
 #include "__fc_define_fd_set_t.h"
 #include "__fc_define_file.h"
 #include "__fc_define_fpos_t.h"
+#include "__fc_define_fs_cnt.h"
 #include "__fc_define_id_t.h"
 #include "__fc_define_ino_t.h"
 #include "__fc_define_intptr_t.h"
@@ -128,10 +130,12 @@
 #include "sys/random.h"
 #include "sys/resource.h"
 #include "sys/select.h"
+#include "sys/sendfile.h"
 #include "sys/shm.h"
 #include "sys/signal.h"
 #include "sys/socket.h"
 #include "sys/stat.h"
+#include "sys/statvfs.h"
 #include "sys/time.h"
 #include "sys/times.h"
 #include "sys/timex.h"
@@ -139,16 +143,17 @@
 #include "sys/uio.h"
 #include "sys/un.h"
 #include "sys/utsname.h"
+#include "sys/vfs.h"
 #include "sys/wait.h"
 #include "termios.h"
 #include "tgmath.h"
 #include "time.h"
 #include "unistd.h"
 #include "utime.h"
+#include "utmp.h"
 #include "utmpx.h"
 #include "wchar.h"
 #include "wctype.h"
-
 void main() {
   /* The variables below must be const; otherwise the preconditions
      and the assigns/from of some functions will not match */

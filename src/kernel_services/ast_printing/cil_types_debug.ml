@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -200,16 +200,14 @@ and pp_compinfo fmt compinfo =
        ckey=%a;\
        cfields=%a;\
        cattr=%a;\
-       cdefined=%a;\
        creferenced=%a;\
        }"
       pp_bool compinfo.cstruct
       pp_string compinfo.corig_name
       pp_string compinfo.cname
       pp_int compinfo.ckey
-      (pp_list pp_fieldinfo) compinfo.cfields
+      (pp_option (pp_list pp_fieldinfo)) compinfo.cfields
       pp_attributes compinfo.cattr
-      pp_bool compinfo.cdefined
       pp_bool compinfo.creferenced
   else
     Format.fprintf fmt
@@ -608,7 +606,7 @@ and pp_location fmt (pos_start,pos_end) =
 
 and pp_if_loc_known prefix suffix fmt loc =
   if print_locations &&
-     not (Filepath.Normalized.is_unknown (fst loc).Filepath.pos_path)
+     not (Filepath.Normalized.is_empty (fst loc).Filepath.pos_path)
   then Format.fprintf fmt "%s%a%s" prefix pp_location loc suffix
   else ()
 
@@ -884,9 +882,14 @@ and pp_identified_predicate fmt identified_predicate =
     identified_predicate.ip_id
     pp_toplevel_predicate identified_predicate.ip_content
 
+and pp_predicate_kind fmt = function
+  | Assert -> Format.fprintf fmt "Assert"
+  | Check -> Format.fprintf fmt "Check"
+  | Admit -> Format.fprintf fmt "Admit"
+
 and pp_toplevel_predicate fmt toplevel_predicate =
-  Format.fprintf fmt "{tp_only_check=%B;tp_statement=%a}"
-    toplevel_predicate.tp_only_check
+  Format.fprintf fmt "{tp_kind=%a;tp_statement=%a}"
+    pp_predicate_kind toplevel_predicate.tp_kind
     pp_predicate toplevel_predicate.tp_statement
 
 and pp_predicate fmt predicate = Format.fprintf fmt "{%a%apred_content=%a}"
@@ -921,6 +924,8 @@ and pp_acsl_extension_kind fmt = function
   | Ext_id(int) -> Format.fprintf fmt "Ext_id(%a)"  pp_int int
   | Ext_terms(term_list) -> Format.fprintf fmt "Ext_terms(%a)"  (pp_list pp_term) term_list
   | Ext_preds(predicate_list) -> Format.fprintf fmt "Ext_preds(%a)"  (pp_list pp_predicate) predicate_list
+  | Ext_annot(string,annotation_list) ->
+    Format.fprintf fmt "Ext_annots(%a,%a)" pp_string string (pp_list pp_acsl_extension) annotation_list
 
 and pp_behavior fmt behavior =
   Format.fprintf fmt
@@ -1012,8 +1017,8 @@ and pp_global_annotation fmt = function
       pp_attributes attributes  pp_location location
   | Dtype(logic_type_info,location) ->
     Format.fprintf fmt "Dtype(%a,%a)"  pp_logic_type_info logic_type_info  pp_location location
-  | Dlemma(string,bool,logic_label_list,string_list,predicate,attributes,location) ->
-    Format.fprintf fmt "Dlemma(%a,%a,%a,%a,%a,%a,%a)"  pp_string string  pp_bool bool
+  | Dlemma(string,logic_label_list,string_list,predicate,attributes,location) ->
+    Format.fprintf fmt "Dlemma(%a,%a,%a,%a,%a,%a)"  pp_string string
       (pp_list pp_logic_label) logic_label_list (pp_list pp_string) string_list
       pp_toplevel_predicate predicate
       pp_attributes attributes  pp_location location
@@ -1032,7 +1037,7 @@ and pp_global_annotation fmt = function
 
 and pp_custom_tree fmt _custom_tree = Format.fprintf fmt "CustomDummy"
 
-and pp_variant fmt = pp_pair pp_term (pp_option pp_string) fmt
+and pp_variant fmt = pp_pair pp_term (pp_option pp_logic_info) fmt
 
 let pp_kinstr fmt = function
   | Kstmt(stmt) -> Format.fprintf fmt "Kstmt(%a)"  pp_stmt stmt

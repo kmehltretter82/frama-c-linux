@@ -43,7 +43,7 @@ void build_tree(tree_desc *desc)
       __gen_e_acsl_and = __gen_e_acsl_valid;
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,"Assertion","build_tree",
+    __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","build_tree",
                     "\\valid(extra)","tests/temporal/t_global_init.c",39);
   }
   /*@ assert \valid(extra); */ ;
@@ -118,6 +118,7 @@ void __e_acsl_globals_clean(void)
   __e_acsl_delete_block((void *)(& l_desc));
   __e_acsl_delete_block((void *)(extra_lbits));
   __e_acsl_delete_block((void *)(strings));
+  return;
 }
 
 int main(int argc, char const **argv)
@@ -165,7 +166,7 @@ int main(int argc, char const **argv)
       __gen_e_acsl_and = __gen_e_acsl_valid_read;
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,"Assertion","main","\\valid_read(p)",
+    __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","main","\\valid_read(p)",
                     "tests/temporal/t_global_init.c",57);
   }
   /*@ assert \valid_read(p); */ ;
@@ -189,7 +190,7 @@ int main(int argc, char const **argv)
         __gen_e_acsl_and_2 = __gen_e_acsl_valid_read_2;
       }
       else __gen_e_acsl_and_2 = 0;
-      __e_acsl_assert(__gen_e_acsl_and_2,"RTE","main",
+      __e_acsl_assert(__gen_e_acsl_and_2,1,"RTE","main",
                       "mem_access: \\valid_read(p)",
                       "tests/temporal/t_global_init.c",58);
       __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)*p,
@@ -198,8 +199,8 @@ int main(int argc, char const **argv)
       __gen_e_acsl_and_3 = __gen_e_acsl_valid_read_3;
     }
     else __gen_e_acsl_and_3 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_3,"Assertion","main","\\valid_read(*p)",
-                    "tests/temporal/t_global_init.c",58);
+    __e_acsl_assert(__gen_e_acsl_and_3,1,"Assertion","main",
+                    "\\valid_read(*p)","tests/temporal/t_global_init.c",58);
   }
   /*@ assert \valid_read(*p); */ ;
   __retres = 0;

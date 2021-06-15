@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -102,14 +102,14 @@ theory Cint
   meta "remove_for_" lemma is_to_uint
   meta "remove_for_" lemma is_to_sint
 
-  axiom is_to_uint8 : forall x:int [ is_uint8(to_uint8 x) ]. is_uint8 (to_uint8 x)
-  axiom is_to_sint8 : forall x:int [ is_sint8(to_sint8 x) ]. is_sint8 (to_sint8 x)
-  axiom is_to_uint16 : forall x:int [ is_uint16(to_uint16 x) ]. is_uint16 (to_uint16 x)
-  axiom is_to_sint16 : forall x:int [ is_sint16(to_sint16 x) ]. is_sint16 (to_sint16 x)
-  axiom is_to_uint32 : forall x:int [ is_uint32(to_uint32 x) ]. is_uint32 (to_uint32 x)
-  axiom is_to_sint32 : forall x:int [ is_sint32(to_sint32 x) ]. is_sint32 (to_sint32 x)
-  axiom is_to_uint64 : forall x:int [ is_uint64(to_uint64 x) ]. is_uint64 (to_uint64 x)
-  axiom is_to_sint64 : forall x:int [ is_sint64(to_sint64 x) ]. is_sint64 (to_sint64 x)
+  axiom is_to_uint8 : forall x:int. is_uint8 (to_uint8 x)
+  axiom is_to_sint8 : forall x:int. is_sint8 (to_sint8 x)
+  axiom is_to_uint16 : forall x:int. is_uint16 (to_uint16 x)
+  axiom is_to_sint16 : forall x:int. is_sint16 (to_sint16 x)
+  axiom is_to_uint32 : forall x:int. is_uint32 (to_uint32 x)
+  axiom is_to_sint32 : forall x:int. is_sint32 (to_sint32 x)
+  axiom is_to_uint64 : forall x:int. is_uint64 (to_uint64 x)
+  axiom is_to_sint64 : forall x:int. is_sint64 (to_sint64 x)
 
   (** * C-Integer Conversions are identity when in-range * **)
 

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -183,6 +183,9 @@ val split : (string * pred) list -> process
 val rewrite : ?at:int -> (string * pred * term * term) list -> process
 (** For each pattern [(descr,guard,src,tgt)] replace [src] with [tgt]
     under condition [guard], inserted in position [at]. *)
+
+val condition : string -> pred -> process -> process
+(** Apply process, but only after proving some condition *)
 
 (** {2 Tactical Plug-in} *)
 

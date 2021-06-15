@@ -104,7 +104,7 @@ end = struct
     type data = Varinfo.Hptset.t option
     let apply f =
       try
-        let kf = Extlib.opt_conv (Kernel_function.dummy()) !current_kf in
+        let kf = Option.value ~default:(Kernel_function.dummy()) !current_kf in
         let h = Kernel_function.Hashtbl.find tbl kf in
         f h
       with Not_found ->
@@ -641,12 +641,12 @@ end = struct
        let fundec = Kernel_function.get_definition kf in
        let stmts, returns = Dataflow.find_stmts fundec in
        if is_init then
-         Extlib.may
+         Option.iter
            (fun set ->
               List.iter
                 (fun s ->
                    let old =
-                     try Extlib.the (Stmt.Hashtbl.find tbl s)
+                     try Option.get (Stmt.Hashtbl.find tbl s)
                      with Not_found -> assert false
                    in
                    Stmt.Hashtbl.replace
@@ -657,7 +657,7 @@ end = struct
            init_set
        else begin
          List.iter (fun s -> Stmt.Hashtbl.add tbl s None) stmts;
-         Extlib.may
+         Option.iter
            (fun set ->
               List.iter
                 (fun s -> Stmt.Hashtbl.replace tbl s (Some set))

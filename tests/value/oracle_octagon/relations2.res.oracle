@@ -1,0 +1,29 @@
+25c25
+<   len ∈ [--..--]
+---
+>   len ∈ [0..1023]
+36,37c36
+< [eva] tests/value/relations2.i:17: 
+<   Frama_C_show_each_end: [0..4294967295], [0..64]
+---
+> [eva] tests/value/relations2.i:17: Frama_C_show_each_end: [0..1023], [0..64]
+59c58
+<   n ∈ [0..512]
+---
+>   n ∈ [1..512]
+69,71d67
+< [eva:alarm] tests/value/relations2.i:34: Warning: 
+<   accessing out of bounds index.
+<   assert (unsigned int)(i - (unsigned int)(t + 1)) < 514;
+80c76
+<   n ∈ [0..512]
+---
+>   n ∈ [1..512]
+97c93
+<   n ∈ [0..512]
+---
+>   n ∈ [1..512]
+140c136
+<   len ∈ [--..--]
+---
+>   len ∈ [0..1023]

@@ -4,7 +4,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2020                                               #
+#  Copyright (C) 2007-2021                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -32,6 +32,7 @@ import re
 import subprocess
 import sys
 from functools import partial
+import tempfile
 
 MIN_PYTHON = (3, 6) # for automatic Path conversions
 if sys.version_info < MIN_PYTHON:
@@ -40,7 +41,7 @@ if sys.version_info < MIN_PYTHON:
 parser = argparse.ArgumentParser(description="""
 Builds the specified target, parsing the output to identify and recommend
 actions in case of failure.""")
-parser.add_argument('--make-dir', metavar='DIR', default=".frama-c", nargs=1,
+parser.add_argument('--make-dir', metavar='DIR', default=".frama-c",
                     help='directory containing the makefile (default: .frama-c)')
 
 (make_dir_arg, args) = parser.parse_known_args()
@@ -49,13 +50,22 @@ args = args[1:]
 
 framac_bin = os.getenv('FRAMAC_BIN')
 if not framac_bin:
-   sys.exit("error: FRAMAC_BIN not in environment")
+   sys.exit("error: FRAMAC_BIN not in environment (set by frama-c-script)")
 framac_script = f"{framac_bin}/frama-c-script"
 
-out = subprocess.Popen(['make', "-C", make_dir] + args,
-                       stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-
-output = out.communicate()[0].decode('utf-8')
+output_lines = []
+cmd_list = ['make', "-C", make_dir] + args
+with subprocess.Popen(cmd_list,
+                      stdout=subprocess.PIPE,
+                      stderr=subprocess.PIPE) as proc:
+  while True:
+    line = proc.stdout.readline()
+    if line:
+       sys.stdout.buffer.write(line)
+       sys.stdout.flush()
+       output_lines.append(line.decode('utf-8'))
+    else:
+       break
 
 re_missing_spec = re.compile("Neither code nor specification for function ([^,]+),")
 re_recursive_call_start = re.compile("detected recursive call")
@@ -63,9 +73,8 @@ re_recursive_call_end = re.compile("Use -eva-ignore-recursive-calls to ignore")
 
 tips = []
 
-lines = iter(output.splitlines())
+lines = iter(output_lines)
 for line in lines:
-    print(line)
     match = re_missing_spec.search(line)
     if match:
        fname = match.group(1)

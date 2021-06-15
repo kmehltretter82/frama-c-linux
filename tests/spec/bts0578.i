@@ -1,6 +1,6 @@
 /* run.config
-   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-   OPT: -print -load-module ./@PTEST_DIR@/@PTEST_NAME@
+ MODULE: @PTEST_NAME@
+   OPT: -print -no-autoload-plugins
 */
 
 /*@ behavior foo: ensures \true; */

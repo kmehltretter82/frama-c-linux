@@ -8,7 +8,7 @@ class visit prj =
   object(self)
     inherit Visitor.frama_c_copy prj
     method! vbehavior b =
-      let kf = Extlib.the self#current_kf in
+      let kf = Option.get self#current_kf in
       if Kernel_function.get_name kf = "main" then begin
         let x = Globals.Vars.find_from_astinfo "X" VGlobal in
         let x = Cil.cvar_to_lvar x in
@@ -35,7 +35,7 @@ class visit prj =
     method! vstmt_aux stmt =
       match stmt.skind with
       | Return _ ->
-        let kf = Extlib.the self#current_kf in
+        let kf = Option.get self#current_kf in
         let requires = [ Logic_const.new_predicate (Logic_const.ptrue) ] in
         let post_cond =
           [ Normal, Logic_const.new_predicate (Logic_const.pfalse) ]

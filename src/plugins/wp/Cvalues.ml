@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -70,20 +70,106 @@ and constant_term t =
   | TConst c -> logic_constant c
   | _ -> Warning.error "constant(%a)" Printer.pp_term t
 
+(* -------------------------------------------------------------------------- *)
+(* --- Initialization values                                              --- *)
+(* -------------------------------------------------------------------------- *)
+
+module OPAQUE_COMP_INIT = struct
+  type initialization_funs = {
+    init: lfun ;
+    uninit: lfun ;
+  }
+  include WpContext.Generator(Cil_datatype.Compinfo)
+      (struct
+        let name = "Cvalues.EmptyCompInit"
+        type key = compinfo
+        type data = initialization_funs
+        let compile c =
+          if c.cfields <> None then
+            Wp_parameters.fatal
+              "Asking for opaque struct init on non opaque struct" ;
+          let result = Lang.t_init c in
+          let generate_init name =
+            Lang.generated_f ~params:[] ~result "%s" name
+          in
+          let init = generate_init ("Initialized" ^ Lang.comp_id c) in
+          let uninit = generate_init ("Uninitialized" ^ Lang.comp_id c) in
+          (* Registration *)
+          Definitions.define_symbol {
+            d_cluster = Definitions.compinfo c ;
+            d_lfun = init ; d_types = 0 ; d_params = [] ;
+            d_definition = Logic result ;
+          } ;
+          Definitions.define_symbol {
+            d_cluster = Definitions.compinfo c ;
+            d_lfun = uninit ; d_types = 0 ; d_params = [] ;
+            d_definition = Logic result ;
+          } ;
+          { init ; uninit }
+      end)
+end
+
+let initialized_value_opaque_comp value comp =
+  let pick_fun r =
+    if value = e_true then r.OPAQUE_COMP_INIT.init
+    else r.uninit
+  in
+  Lang.F.e_fun (pick_fun (OPAQUE_COMP_INIT.get comp)) []
+
 let rec init_value value obj =
   match obj with
   | C_int _ | C_float _ | C_pointer _ -> value
-  | C_comp ci ->
-      let make_term f =
-        Cfield (f, KInit), init_value value (object_of f.ftype)
-      in
-      Lang.F.e_record (List.map make_term ci.cfields)
+  | C_comp ci -> init_comp_value value ci
   | C_array _ as arr ->
       Lang.F.e_const Lang.t_int
         (init_value value (object_of_array_elem arr))
+and init_comp_value value ci =
+  match ci.cfields with
+  | None -> initialized_value_opaque_comp value ci
+  | Some fields ->
+      let make f = Cfield (f, KInit), init_value value (object_of f.ftype) in
+      Lang.F.e_record (List.map make fields)
 
 let initialized_obj = init_value e_true
 let uninitialized_obj = init_value e_false
+
+let always_initialized x =
+  (x.vformal || x.vglob) && not @@ Cil.isStructOrUnionType x.vtype
+
+(* -------------------------------------------------------------------------- *)
+(* --- Length of empty compinfos                                          --- *)
+(* -------------------------------------------------------------------------- *)
+
+module OPAQUE_COMP_BYTES_LENGTH = WpContext.Generator(Cil_datatype.Compinfo)
+    (struct
+      let name = "Cvalues.EmptyCompBytesLength"
+      type key = compinfo
+      type data = lfun
+      let compile c =
+        if c.cfields <> None then
+          Wp_parameters.fatal
+            "Asking for opaque struct length on non opaque struct" ;
+        let result = Lang.t_int in
+        let f_name = "BytesLength_of_" ^ (comp_id c) in
+        let l_name = "Positive_" ^ f_name in
+        let size = Lang.generated_f ~params:[] ~result "%s" f_name in
+        Definitions.define_symbol {
+          d_cluster = Definitions.compinfo c ;
+          d_lfun = size ; d_types = 0 ; d_params = [] ;
+          d_definition = Logic result ;
+        } ;
+        let min_size = if Cil.acceptEmptyCompinfo () then e_zero else e_one in
+        Definitions.define_lemma {
+          l_kind = Admit ; l_name ;
+          l_types = 0 ; l_triggers = [] ; l_forall = [] ;
+          l_cluster = Definitions.compinfo c ;
+          l_lemma = Lang.F.(p_leq min_size (e_fun size []))
+        } ;
+        size
+    end)
+
+let bytes_length_of_opaque_comp c =
+  Lang.F.e_fun (OPAQUE_COMP_BYTES_LENGTH.get c) []
 
 (* -------------------------------------------------------------------------- *)
 
@@ -98,8 +184,10 @@ and is_constrained_obj = function
   | C_array a -> is_constrained a.arr_element
   | C_comp c -> is_constrained_comp c
 
-and is_constrained_comp c =
-  List.exists (fun f -> is_constrained f.ftype) c.cfields
+and is_constrained_comp { cfields } =
+  match cfields with
+  | None -> false
+  | Some l -> List.exists (fun f -> is_constrained f.ftype) l
 
 module type CASES =
 sig
@@ -126,17 +214,14 @@ struct
 
   let array_name te ds =
     let dim = List.length ds in
+    let pp_dim fmt d = if d > 1 then Format.fprintf fmt "_d%d" d in
     match te with
     | C_int i ->
-        Format.asprintf "%sArray%d_%a" C.prefix dim model_int i
-    | C_float _ ->
-        Format.asprintf "%sArray%d_float" C.prefix dim
-    | C_pointer _ ->
-        Format.asprintf "%sArray%d_pointer" C.prefix dim
+        Format.asprintf "%sArray%a_%a" C.prefix pp_dim dim model_int i
     | C_comp c ->
-        Format.asprintf "%sArray%d%s" C.prefix dim (Lang.comp_id c)
-    | C_array _ ->
-        Wp_parameters.fatal "Unflatten array (%s %a)" C.prefix Ctypes.pretty te
+        Format.asprintf "%sArray%a_%s" C.prefix pp_dim dim (Lang.comp_id c)
+    | C_float _ | C_pointer _ | C_array _ ->
+        assert false
 
   let rec is_obj obj t =
     match obj with
@@ -159,29 +244,39 @@ struct
       (Lang.generated_p (C.prefix ^ Lang.comp_id c))
       (fun lfun ->
          let basename = if c.cstruct then "S" else "U" in
-         let s = Lang.freshvar ~basename (Lang.tau_of_comp c) in
-         let def = p_all
-             (fun f ->
-                is_typ f.ftype (e_getfield (e_var s) (Lang.Cfield (f, KValue))))
-             c.cfields
+         let s = Lang.freshvar ~basename (Lang.t_comp c) in
+         let dfun =
+           match c.cfields with
+           | None -> Logic Lang.t_prop
+           | Some fields ->
+               let value f = e_getfield (e_var s) (Lang.Cfield (f, KValue)) in
+               let def = p_all (fun f -> is_typ f.ftype (value f)) fields in
+               Predicate(Def,def)
          in {
            d_lfun = lfun ; d_types = 0 ; d_params = [s] ;
            d_cluster = Definitions.compinfo c ;
-           d_definition = Predicate(Def,def) ;
+           d_definition = dfun ;
          })
       [s]
 
-  and is_array te ds t =
+  and is_array elt ds t =
     Definitions.call_pred
-      (Lang.generated_p (array_name te ds))
+      (Lang.generated_p (array_name elt ds))
       (fun lfun ->
-         let x = Lang.freshvar ~basename:"T" (Matrix.tau te ds) in
-         let ks = List.map (fun _d -> Lang.freshvar ~basename:"k" Logic.Int) ds in
+         let cluster =
+           match elt with
+           | C_comp c -> Definitions.compinfo c
+           | _ -> Definitions.matrix () in
+         let te = Lang.tau_of_object elt in
+         let d = List.length ds in
+         let x = Lang.freshvar ~basename:"T" (Lang.t_matrix te d) in
+         let fk _d = Lang.freshvar ~basename:"k" Logic.Int in
+         let ks = List.map fk ds in
          let e = List.fold_left (fun a k -> e_get a (e_var k)) (e_var x) ks in
-         let def = p_forall ks (is_obj te e) in
+         let def = p_forall ks (is_obj elt e) in
          {
            d_lfun = lfun ; d_types = 0 ; d_params = [x] ;
-           d_cluster = Definitions.matrix te ;
+           d_cluster = cluster ;
            d_definition = Predicate(Def,def) ;
          }
       ) [t]
@@ -233,7 +328,7 @@ let ldomain ltype =
 
 let volatile ?warn () =
   Wp_parameters.Volatile.get () ||
-  ( Extlib.may
+  ( Option.iter
       (fun w -> Warning.emit ~severe:false
           ~effect:"ignore volatile attribute" "%s" w)
       warn ; false )
@@ -253,34 +348,68 @@ let rec reduce_eqcomp = function
 (* --- ACSL Array Equality                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-module EQARRAY = WpContext.Generator(Matrix.NATURAL)
+module AKEY =
+struct
+  type t = base * Matrix.t
+  and base = I | F of c_float | P | C of compinfo
+  let make elt ds =
+    let base = match elt with
+      | C_int _ -> I
+      | C_float f -> F f
+      | C_pointer _ -> P
+      | C_comp c -> C c
+      | C_array _ -> assert false
+    in base , ds
+  let key = function
+    | I -> "int"
+    | P -> "ptr"
+    | F f -> Ctypes.f_name f
+    | C c -> Lang.comp_id c
+  let cluster = function
+    | I | P | F _ -> Definitions.matrix ()
+    | C c -> Definitions.compinfo c
+  let tau = function
+    | I -> Lang.t_int
+    | F f -> Lang.t_float f
+    | P -> Lang.t_addr ()
+    | C c -> Lang.t_comp c
+  let equal = function
+    | I | F _ | P -> F.p_equal
+    | C c -> !equal_rec (C_comp c)
+  let compare (a,p) (b,q) =
+    let cmp = String.compare (key a) (key b) in
+    if cmp <> 0 then cmp else Matrix.compare p q
+  let pretty fmt (a,ds) =
+    Format.fprintf fmt "%s%a" (key a) Matrix.pp_suffix_id ds
+end
+
+module EQARRAY = WpContext.Generator(AKEY)
     (struct
-      open Matrix
       let name = "Cvalues.EqArray"
-      type key = matrix
+      type key = AKEY.t
       type data = lfun
-      let compile (te,ds) =
+      let compile (a,ds) =
         (* Contextual Symbol *)
         let lfun = Lang.generated_f
             ~context:true
             ~sort:Logic.Sprop
-            "EqArray%s_%s" (Matrix.id ds) (Matrix.natural_id te) in
+            "EqArray_%s%a" (AKEY.key a) Matrix.pp_suffix_id ds in
         (* Simplification of the symbol *)
         Lang.F.set_builtin lfun reduce_eqcomp ;
         (* Definition of the symbol *)
-        let denv = Matrix.denv ds in
-        let tau = Matrix.tau te ds in
+        let denv = Matrix.cc_env ds in
+        let tau = Matrix.cc_tau (AKEY.tau a) ds in
         let xa = Lang.freshvar ~basename:"T" tau in
         let xb = Lang.freshvar ~basename:"T" tau in
         let ta = e_var xa in
         let tb = e_var xb in
         let ta_xs = List.fold_left e_get ta denv.index_val in
         let tb_xs = List.fold_left e_get tb denv.index_val in
-        let property = p_hyps (denv.index_range) (!equal_rec te ta_xs tb_xs) in
+        let property = p_hyps (denv.index_range) (AKEY.equal a ta_xs tb_xs) in
         let definition = p_forall denv.index_var property in
         (* Registration *)
         Definitions.define_symbol {
-          d_cluster = Definitions.matrix te ;
+          d_cluster = AKEY.cluster a ;
           d_lfun = lfun ; d_types = 0 ;
           d_params = denv.size_var @ [xa ; xb ] ;
           d_definition = Predicate(Def,definition) ;
@@ -303,22 +432,28 @@ module EQCOMP = WpContext.Generator(Cil_datatype.Compinfo)
         Lang.F.set_builtin lfun reduce_eqcomp ;
         (* Definition of the symbol *)
         let basename = if c.cstruct then "S" else "U" in
-        let xa = Lang.freshvar ~basename (Lang.tau_of_comp c) in
-        let xb = Lang.freshvar ~basename (Lang.tau_of_comp c) in
+        let tc = Lang.t_comp c in
+        let xa = Lang.freshvar ~basename tc in
+        let xb = Lang.freshvar ~basename tc in
         let ra = e_var xa in
         let rb = e_var xb in
-        let def = p_all
-            (fun f ->
-               let fd = Cfield (f, KValue) in
-               !equal_rec (Ctypes.object_of f.ftype)
-                 (e_getfield ra fd) (e_getfield rb fd))
-            c.cfields
+        let d_definition =
+          match c.cfields with
+          | None -> Logic Lang.t_prop
+          | Some fields ->
+              let def = p_all
+                  (fun f ->
+                     let fd = Cfield (f, KValue) in
+                     !equal_rec (Ctypes.object_of f.ftype)
+                       (e_getfield ra fd) (e_getfield rb fd))
+                  fields
+              in Predicate(Def, def)
         in
         (* Registration *)
         Definitions.define_symbol {
           d_cluster = Definitions.compinfo c ;
           d_lfun = lfun ; d_types = 0 ; d_params = [xa;xb] ;
-          d_definition = Predicate(Def,def) ;
+          d_definition ;
         } ; lfun
     end)
 
@@ -326,17 +461,20 @@ module EQCOMP = WpContext.Generator(Cil_datatype.Compinfo)
 (* --- ACSL Equality                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
+type matrixinfo = c_object * int option list
+
 let equal_comp c a b = p_call (EQCOMP.get c) [a;b]
 let equal_array m a b =
-  match m with
-  | _obj , [None] -> p_equal a b
-  | m -> p_call (EQARRAY.get m) (Matrix.size m @ [a;b])
+  let elt,ns = m in
+  let ds = Matrix.of_dims ns in
+  let ms = Matrix.cc_dims ns in
+  p_call (EQARRAY.get @@ AKEY.make elt ds) (ms @ [a;b])
 
 let equal_object obj a b =
   match obj with
   | C_int _ | C_float _ | C_pointer _ -> p_equal a b
   | C_comp c -> equal_comp c a b
-  | C_array t -> equal_array (Matrix.of_array t) a b
+  | C_array m -> equal_array (Ctypes.array_dimensions m) a b
 
 let () = equal_rec := equal_object
 

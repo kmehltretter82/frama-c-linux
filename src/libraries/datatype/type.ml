@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -62,11 +62,11 @@ let par p_caller p_callee fmt pp =
   else Format.fprintf fmt "%t" pp
 
 type concrete_repr =
-    { mutable name: string;
-      digest: Digest.t;
-      structural_descr: Structural_descr.t;
-      mutable abstract: bool;
-      mutable pp_ml_name: precedence -> Format.formatter -> unit }
+  { mutable name: string;
+    digest: Digest.t;
+    structural_descr: Structural_descr.t;
+    mutable abstract: bool;
+    mutable pp_ml_name: precedence -> Format.formatter -> unit }
 
 (* phantom type *)
 type 'a t = concrete_repr
@@ -108,16 +108,16 @@ let dummy =
 
 let mk_dyn_pp name = function
   | None ->
-    let pp fmt = 
+    let pp fmt =
       let plugin_name = match Str.split (Str.regexp_string ".") name with
-	| [] -> None
-	| p :: _ -> Some p
+        | [] -> None
+        | p :: _ -> Some p
       in
       match plugin_name with
-      | None ->  
-	Format.fprintf fmt "(failwith \"%s is not a printable type name\")" name
+      | None ->
+        Format.fprintf fmt "(failwith \"%s is not a printable type name\")" name
       | Some p ->
-	Format.fprintf fmt "%s.ty" p
+        Format.fprintf fmt "%s.ty" p
     in
     (fun p fmt -> par p Basic fmt pp)
   | Some s ->
@@ -157,7 +157,7 @@ let register ?(closure=false) ~name ~ml_name structural_descr reprs =
       { name = name;
         digest = digest;
         structural_descr = structural_descr;
-	abstract = false;
+        abstract = false;
         pp_ml_name = pp_ml_name }
     in
     let full_ty = { ty = ty; reprs = List.map Obj.repr reprs } in
@@ -171,15 +171,15 @@ exception No_abstract_type of string
 module Abstract(T: sig val name: string end) = struct
   type t
   let ty =
-    if !use_obj then 
+    if !use_obj then
       try (Hashtbl.find types T.name).ty
       with Not_found -> raise (No_abstract_type T.name)
     else failwith "Cannot call `Type.Abstract' in `no obj' mode"
   let () =
     let p = match Str.split (Str.regexp_string ".") T.name with
-      | [] -> 
-	failwith "name as argument of `Type.Abstract' must be a valid OCaml \
-type name"
+      | [] ->
+        failwith "name as argument of `Type.Abstract' must be a valid OCaml \
+                  type name"
       | p :: _ -> p
     in
     !add_abstract_types p T.name
@@ -253,7 +253,7 @@ module Polymorphic(T: Polymorphic_input) = struct
 
   type 'a poly = 'a T.t
 
-  let ml_name from_ty = 
+  let ml_name from_ty =
     Format.asprintf "%s.instantiate %t"
       T.module_name
       (from_ty.pp_ml_name Call)
@@ -309,7 +309,7 @@ module Concrete_pair =
       type t = concrete_repr * concrete_repr
       let hash (x,y) = Hashtbl.hash (hash x, hash y)
       let equal (x1,y1) (x2,y2) = equal x1 x2 && equal y1 y2
-     end)
+    end)
 
 module Polymorphic2(T: Polymorphic2_input) = struct
 
@@ -350,8 +350,8 @@ module Polymorphic2(T: Polymorphic2_input) = struct
         in
         Concrete_pair.add memo_tbl key ty;
         Tbl.add instances ty key;
-	Tbl.add embedded_types ty a;
-	Tbl.add embedded_types ty b;
+        Tbl.add embedded_types ty a;
+        Tbl.add embedded_types ty b;
         ty, true
     else
       dummy, false
@@ -380,7 +380,7 @@ module Function = struct
   type ('a, 'b) poly = 'a -> 'b
 
   type instance =
-      { arg: concrete_repr; ret: concrete_repr; label: string option }
+    { arg: concrete_repr; ret: concrete_repr; label: string option }
 
   module Memo =
     Hashtbl.Make
@@ -388,13 +388,13 @@ module Function = struct
         type t = instance
         let hash x = Hashtbl.hash (hash x.arg, hash x.ret, x.label)
         let equal x y =
-	  equal x.arg y.arg && equal x.ret y.ret && x.label = y.label
-       end)
+          equal x.arg y.arg && equal x.ret y.ret && x.label = y.label
+      end)
   let memo_tbl : concrete_repr Memo.t = Memo.create 17
   let instances
-      : (instance * Obj.t (* default value of the optional label *) option)
-      Tbl.t
-      = Tbl.create 17
+    : (instance * Obj.t (* default value of the optional label *) option)
+        Tbl.t
+    = Tbl.create 17
 
   let is_instance_of ty = Tbl.mem instances ty
 
@@ -453,8 +453,8 @@ module Function = struct
         in
         Memo.add memo_tbl key ty;
         Tbl.add instances ty (key, o);
-	Tbl.add embedded_types ty a;
-	Tbl.add embedded_types ty b;
+        Tbl.add embedded_types ty a;
+        Tbl.add embedded_types ty b;
         ty, true
     else
       dummy, false
@@ -487,9 +487,9 @@ module Concrete_triple =
     (struct
       type t = concrete_repr * concrete_repr * concrete_repr
       let hash (x,y,z) = Hashtbl.hash (hash x, hash y, hash z)
-      let equal (x1,y1,z1) (x2,y2,z2) = 
-	equal x1 x2 && equal y1 y2 && equal z1 z2
-     end)
+      let equal (x1,y1,z1) (x2,y2,z2) =
+        equal x1 x2 && equal y1 y2 && equal z1 z2
+    end)
 
 module Polymorphic3(T:Polymorphic3_input) = struct
 
@@ -497,8 +497,8 @@ module Polymorphic3(T:Polymorphic3_input) = struct
 
   let memo_tbl: concrete_repr Concrete_triple.t = Concrete_triple.create 17
   let instances
-      : (concrete_repr * concrete_repr * concrete_repr) Tbl.t 
-      = Tbl.create 17
+    : (concrete_repr * concrete_repr * concrete_repr) Tbl.t
+    = Tbl.create 17
 
   let ml_name from_ty1 from_ty2 from_ty3 =
     Format.asprintf
@@ -518,11 +518,11 @@ module Polymorphic3(T:Polymorphic3_input) = struct
           List.fold_left
             (fun acc r1 ->
                List.fold_left
-                 (fun acc r2 -> 
-		   List.fold_left
-		     (fun acc r3 -> T.reprs r1 r2 r3 @ acc)
-		     acc
-		     (unsafe_reprs c))
+                 (fun acc r2 ->
+                    List.fold_left
+                      (fun acc r3 -> T.reprs r1 r2 r3 @ acc)
+                      acc
+                      (unsafe_reprs c))
                  acc
                  (unsafe_reprs b))
             []
@@ -532,17 +532,17 @@ module Polymorphic3(T:Polymorphic3_input) = struct
           register
             ~name:(T.name a b c)
             ~ml_name:(Some (ml_name a b c))
-            (T.structural_descr 
-	       a.structural_descr 
-	       b.structural_descr
-	       c.structural_descr)
+            (T.structural_descr
+               a.structural_descr
+               b.structural_descr
+               c.structural_descr)
             reprs
         in
         Concrete_triple.add memo_tbl key ty;
         Tbl.add instances ty key;
-	Tbl.add embedded_types ty a;
-	Tbl.add embedded_types ty b;
-	Tbl.add embedded_types ty c;
+        Tbl.add embedded_types ty a;
+        Tbl.add embedded_types ty b;
+        Tbl.add embedded_types ty c;
         ty, true
     else
       dummy, false
@@ -574,7 +574,7 @@ end
 
 module type Polymorphic4 = sig
   type ('a, 'b, 'c, 'd) poly
-  val instantiate: 
+  val instantiate:
     'a t -> 'b t -> 'c t -> 'd t -> ('a, 'b, 'c, 'd) poly t * bool
   val is_instance_of: 'a t -> bool
   val get_instance: ('a, 'b, 'c, 'd) poly t -> 'a t * 'b t * 'c t * 'd t
@@ -585,21 +585,21 @@ module Concrete_quadruple =
     (struct
       type t = concrete_repr * concrete_repr * concrete_repr * concrete_repr
       let hash (x,y,z,t) = Hashtbl.hash (hash x, hash y, hash z, hash t)
-      let equal (x1,y1,z1,t1) (x2,y2,z2,t2) = 
-	equal x1 x2 && equal y1 y2 && equal z1 z2 && equal t1 t2
-     end)
+      let equal (x1,y1,z1,t1) (x2,y2,z2,t2) =
+        equal x1 x2 && equal y1 y2 && equal z1 z2 && equal t1 t2
+    end)
 
 module Polymorphic4(T:Polymorphic4_input) = struct
 
   type ('a, 'b, 'c, 'd) poly = ('a, 'b, 'c, 'd) T.t
 
   let memo_tbl
-      : concrete_repr Concrete_quadruple.t 
-      = Concrete_quadruple.create 17
+    : concrete_repr Concrete_quadruple.t
+    = Concrete_quadruple.create 17
 
   let instances
-      : (concrete_repr * concrete_repr * concrete_repr * concrete_repr) Tbl.t 
-      = Tbl.create 17
+    : (concrete_repr * concrete_repr * concrete_repr * concrete_repr) Tbl.t
+    = Tbl.create 17
 
   let ml_name from_ty1 from_ty2 from_ty3 from_ty4 =
     Format.asprintf
@@ -620,15 +620,15 @@ module Polymorphic4(T:Polymorphic4_input) = struct
           List.fold_left
             (fun acc r1 ->
                List.fold_left
-                 (fun acc r2 -> 
-		   List.fold_left
-		     (fun acc r3 -> 
-		       List.fold_left
-			 (fun acc r4 -> T.reprs r1 r2 r3 r4 @ acc)
-			 acc
-			 (unsafe_reprs d))
-		     acc
-		     (unsafe_reprs c))
+                 (fun acc r2 ->
+                    List.fold_left
+                      (fun acc r3 ->
+                         List.fold_left
+                           (fun acc r4 -> T.reprs r1 r2 r3 r4 @ acc)
+                           acc
+                           (unsafe_reprs d))
+                      acc
+                      (unsafe_reprs c))
                  acc
                  (unsafe_reprs b))
             []
@@ -638,19 +638,19 @@ module Polymorphic4(T:Polymorphic4_input) = struct
           register
             ~name:(T.name a b c d)
             ~ml_name:(Some (ml_name a b c d))
-            (T.structural_descr 
-	       a.structural_descr 
-	       b.structural_descr
-	       c.structural_descr
-	       d.structural_descr)
+            (T.structural_descr
+               a.structural_descr
+               b.structural_descr
+               c.structural_descr
+               d.structural_descr)
             reprs
         in
         Concrete_quadruple.add memo_tbl key ty;
         Tbl.add instances ty key;
-	Tbl.add embedded_types ty a;
-	Tbl.add embedded_types ty b;
-	Tbl.add embedded_types ty c;
-	Tbl.add embedded_types ty d;
+        Tbl.add embedded_types ty a;
+        Tbl.add embedded_types ty b;
+        Tbl.add embedded_types ty c;
+        Tbl.add embedded_types ty d;
         ty, true
     else
       dummy, false
@@ -698,17 +698,17 @@ end = struct
           if tag = 0 then
             0
           else if tag = Obj.closure_tag then
-            (* Buggy code with OCaml 4.01, deactivated for now 
-            (* assumes that the first word of a closure does not change in
+            (* Buggy code with OCaml 4.01, deactivated for now
+               (* assumes that the first word of a closure does not change in
                any way (even by Gc.compact invocation). *)
                Obj.magic (Obj.field x 0)*)
-	       (* to be tested (suggested by Damien D.): add a 'xor 0' *)
-(*	       Obj.magic (Obj.field x 0)*)
+            (* to be tested (suggested by Damien D.): add a 'xor 0' *)
+            (*         Obj.magic (Obj.field x 0)*)
             0
           else
             Hashtbl.hash x
-          else
-            0
+        else
+          0
     end)
 
   type 'a t = 'a O.t Tbl.t
@@ -738,7 +738,7 @@ end = struct
     with Not_found ->
       false
 
-  let iter tbl f = 
+  let iter tbl f =
     Tbl.iter (fun ty objs -> O.iter (fun o v -> f ty (Obj.obj o) v) objs) tbl
 
 end
@@ -757,8 +757,8 @@ module type Heterogeneous_table = sig
 end
 
 module Make_tbl
-  (Key: sig include Hashtbl.HashedType val to_string: t -> string end)
-  (Info: sig type 'a t end) =
+    (Key: sig include Hashtbl.HashedType val to_string: t -> string end)
+    (Info: sig type 'a t end) =
 struct
 
   type key = Key.t
@@ -788,12 +788,12 @@ struct
   let find tbl s ty =
     if !use_obj then
       let name = Key.to_string s in
-        let data = 
-          try H.find tbl s with Not_found -> raise (Unbound_value name)
-        in
-        if ty.digest <> data.ty.digest then
-          type_error name ty.name data.ty.name;
-        Obj.obj data.o
+      let data =
+        try H.find tbl s with Not_found -> raise (Unbound_value name)
+      in
+      if ty.digest <> data.ty.digest then
+        type_error name ty.name data.ty.name;
+      Obj.obj data.o
     else
       invalid_arg "cannot call function 'find' in the 'no obj' mode"
 
@@ -810,11 +810,11 @@ end
 module String_tbl =
   Make_tbl
     (struct
-       type t = string
-       let hash x = Hashtbl.hash x
-       let equal : string -> string -> bool = (=)
-       let to_string x = x
-     end)
+      type t = string
+      let hash x = Hashtbl.hash x
+      let equal : string -> string -> bool = (=)
+      let to_string x = x
+    end)
 
 (*
 Local Variables:

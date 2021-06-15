@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2020                                               #
+#  Copyright (C) 2007-2021                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -37,7 +37,7 @@ PLUGIN_DIR ?= .
 PLUGIN_ENABLE := @ENABLE_VARIADIC@
 PLUGIN_NAME := Variadic
 PLUGIN_CMI := format_types va_types
-PLUGIN_CMO := options extends va_build environment \
+PLUGIN_CMO := options extends environment replacements \
               format_string format_pprint format_typer format_parser \
               generic standard classify translate \
               register

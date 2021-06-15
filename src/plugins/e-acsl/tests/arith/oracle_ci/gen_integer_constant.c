@@ -5,15 +5,15 @@ int main(void)
 {
   int __retres;
   int x;
-  __e_acsl_assert(1,"Assertion","main","0 == 0",
+  __e_acsl_assert(1,1,"Assertion","main","0 == 0",
                   "tests/arith/integer_constant.i",6);
   /*@ assert 0 ≡ 0; */ ;
   x = 0;
   x ++;
-  __e_acsl_assert(1,"Assertion","main","0 != 1",
+  __e_acsl_assert(1,1,"Assertion","main","0 != 1",
                   "tests/arith/integer_constant.i",8);
   /*@ assert 0 ≢ 1; */ ;
-  __e_acsl_assert(1,"Assertion","main",
+  __e_acsl_assert(1,1,"Assertion","main",
                   "1152921504606846975 == 0xfffffffffffffff",
                   "tests/arith/integer_constant.i",9);
   /*@ assert 1152921504606846975 ≡ 0xfffffffffffffff; */ ;
@@ -24,7 +24,7 @@ int main(void)
                         "340282366920938463463374607431768211455",10);
     __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_),
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
-    __e_acsl_assert(__gen_e_acsl_eq == 0,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_eq == 0,1,"Assertion","main",
                     "0xffffffffffffffffffffffffffffffff == 0xffffffffffffffffffffffffffffffff",
                     "tests/arith/integer_constant.i",11);
     __gmpz_clear(__gen_e_acsl_);

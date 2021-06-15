@@ -37,7 +37,7 @@ int main(void)
   __e_acsl_store_block((void *)(t),(size_t)28);
   __e_acsl_full_init((void *)(& t));
   int n = __gen_e_acsl_sorted(t,7);
-  __e_acsl_assert(n == 1,"Assertion","main","n == 1","tests/bts/bts1324.i",
+  __e_acsl_assert(n == 1,1,"Assertion","main","n == 1","tests/bts/bts1324.i",
                   23);
   /*@ assert n ≡ 1; */ ;
   __retres = 0;
@@ -69,7 +69,7 @@ int __gen_e_acsl_sorted(int *t, int n)
         __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(t + __gen_e_acsl_i),
                                                       sizeof(int),(void *)t,
                                                       (void *)(& t));
-        __e_acsl_assert(__gen_e_acsl_valid_read,"RTE","sorted",
+        __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","sorted",
                         "mem_access: \\valid_read(t + __gen_e_acsl_i)",
                         "tests/bts/bts1324.i",6);
         __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(t + (
@@ -77,7 +77,7 @@ int __gen_e_acsl_sorted(int *t, int n)
                                                         sizeof(int),
                                                         (void *)t,
                                                         (void *)(& t));
-        __e_acsl_assert(__gen_e_acsl_valid_read_2,"RTE","sorted",
+        __e_acsl_assert(__gen_e_acsl_valid_read_2,1,"RTE","sorted",
                         "mem_access: \\valid_read(t + (long)(__gen_e_acsl_i - 1))",
                         "tests/bts/bts1324.i",6);
         if (*(t + (__gen_e_acsl_i - 1L)) <= *(t + __gen_e_acsl_i)) ;
@@ -97,7 +97,7 @@ int __gen_e_acsl_sorted(int *t, int n)
     int __gen_e_acsl_assumes_value;
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)0);
-    if (__gen_e_acsl_assumes_value) __e_acsl_assert(__retres == 1,
+    if (__gen_e_acsl_assumes_value) __e_acsl_assert(__retres == 1,1,
                                                     "Postcondition","sorted",
                                                     "yes: \\result == 1",
                                                     "tests/bts/bts1324.i",7);

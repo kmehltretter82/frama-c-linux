@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -52,10 +52,10 @@ let pp_from_file fmt file =
     done
   with
   | End_of_file ->
-      close_in cin
+    close_in cin
   | err ->
-      close_in cin ;
-      raise err
+    close_in cin ;
+    raise err
 
 let rec bincopy buffer cin cout =
   let s = Bytes.length buffer in
@@ -111,23 +111,23 @@ let print_file file job =
 (* -------------------------------------------------------------------------- *)
 
 type timer = float ref
-type 'a result = Result of 'a | Error of Printexc.raw_backtrace * exn
 let dt_max tm dt = match tm with Some r when dt > !r -> r := dt | _ -> ()
 let dt_add tm dt = match tm with Some r -> r := !r +. dt | _ -> ()
-let return = function Result x -> x | Error (bt,e) -> Printexc.raise_with_backtrace e bt
-let catch f x = try Result(f x) with e ->
-  let bt = Printexc.get_raw_backtrace () in
-  Error (bt,e)
 let time ?rmax ?radd job data =
-  begin
-    let t0 = Sys.time () in
-    let re = catch job data in
+  let t0 = Sys.time () in
+  try
+    let result = job data in
     let t1 = Sys.time () in
     let dt = t1 -. t0 in
     dt_max rmax dt ;
     dt_add radd dt ;
-    return re ;
-  end
+    result
+  with exn ->
+    let t1 = Sys.time () in
+    let dt = t1 -. t0 in
+    dt_max rmax dt ;
+    dt_add radd dt ;
+    raise exn
 
 (* -------------------------------------------------------------------------- *)
 (* --- Process                                                            --- *)
@@ -157,19 +157,19 @@ let full_command_async cmd args ~stdin ~stdout ~stderr =
      match !last_result with
      | Result _ as r -> r
      | Not_ready _ as r ->
-         let child_id,status =
-           Unix.waitpid [Unix.WNOHANG; Unix.WUNTRACED] pid
-         in
-         if child_id = 0 then r
-         else (last_result := Result status; !last_result))
+       let child_id,status =
+         Unix.waitpid [Unix.WNOHANG; Unix.WUNTRACED] pid
+       in
+       if child_id = 0 then r
+       else (last_result := Result status; !last_result))
 
 let flush b f =
   match b with
   | None -> ()
   | Some b ->
-      try read_lines f
-            (fun line -> Buffer.add_string b line ; Buffer.add_char b '\n') ;
-      with Sys_error _ -> ()
+    try read_lines f
+          (fun line -> Buffer.add_string b line ; Buffer.add_char b '\n') ;
+    with Sys_error _ -> ()
 
 (*[LC] return the cancel function *)
 let cancelable_at_exit job =
@@ -222,18 +222,18 @@ let command_generic ~async ?stdout ?stderr cmd args =
     match !last_result with
     | Result _p as r -> r
     | Not_ready _ as r ->
-        let child_id,status = Unix.waitpid wait_flags pid in
-        if child_id = 0 then (assert async;r)
-        else
-          begin
-            let result = Result status in
-            flush stdout outf ;
-            flush stderr errf ;
-            delete () ;
-            deleted () ;
-            killed () ;
-            result
-          end
+      let child_id,status = Unix.waitpid wait_flags pid in
+      if child_id = 0 then (assert async;r)
+      else
+        begin
+          let result = Result status in
+          flush stdout outf ;
+          flush stderr errf ;
+          delete () ;
+          deleted () ;
+          killed () ;
+          result
+        end
   end
 
 let command_async ?stdout ?stderr cmd args =
@@ -248,19 +248,19 @@ let command ?(timeout=0) ?stdout ?stderr cmd args =
     let running () =
       match f () with
       | Not_ready terminate ->
-          begin
-            try
-              Db.yield () ;
-              if timeout > 0 && Unix.gettimeofday () -. !start > ftimeout then
-                raise Db.Cancel ;
-              true
-            with Db.Cancel as e ->
-              terminate ();
-              raise e
-          end
+        begin
+          try
+            Db.yield () ;
+            if timeout > 0 && Unix.gettimeofday () -. !start > ftimeout then
+              raise Db.Cancel ;
+            true
+          with Db.Cancel as e ->
+            terminate ();
+            raise e
+        end
       | Result r ->
-          res := r;
-          false
+        res := r;
+        false
     in while running () do Unix.sleepf 0.1 done ; !res
   else
     let f = command_generic ~async:false ?stdout ?stderr cmd args in

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -49,6 +49,21 @@ let rec constFoldTermToLogicReal = function
     end
   | _ -> None
 
+
+module Global_Static_Hints =
+  State_builder.Ref
+    (Widen_type)
+    (struct
+      let dependencies = [ Ast.self ]
+      let name = "Widen.Global_Static_Hints"
+      let default = Widen_type.default
+    end)
+let () = Ast.add_monotonic_state Global_Static_Hints.self
+
+let update_global_hints new_hints =
+  let hints = Widen_type.join (Global_Static_Hints.get ()) new_hints in
+  Global_Static_Hints.set hints;
+
 class pragma_widen_visitor init_widen_hints init_enclosing_loops = object(self)
   inherit Visitor.frama_c_inplace
 
@@ -56,16 +71,16 @@ class pragma_widen_visitor init_widen_hints init_enclosing_loops = object(self)
   val enclosing_loops = init_enclosing_loops
 
   method private add_int_thresholds ?base int_thresholds =
-    widen_hints :=
-      Widen_type.join
-        (Widen_type.num_hints None(*see note*) base int_thresholds)
-        !widen_hints
+    let new_hints = Widen_type.num_hints None(*see note*) base int_thresholds in
+    if Option.fold ~none:false ~some:Base.is_global base
+    then update_global_hints new_hints
+    else widen_hints := Widen_type.join new_hints !widen_hints
 
   method private add_float_thresholds ?base float_thresholds =
-    widen_hints :=
-      Widen_type.join
-        (Widen_type.float_hints None(*see note*) base float_thresholds)
-        !widen_hints
+    let new_hints = Widen_type.float_hints None base float_thresholds in
+    if Option.fold ~none:false ~some:Base.is_global base
+    then update_global_hints new_hints
+    else widen_hints := Widen_type.join new_hints !widen_hints
 
   method private add_var_hints ~stmt hints =
     widen_hints := Widen_type.join (Widen_type.var_hints stmt hints) !widen_hints
@@ -157,6 +172,25 @@ class pragma_widen_visitor init_widen_hints init_enclosing_loops = object(self)
         List.iter aux_loop enclosing_loops;
         Cil.DoChildren
       end
+    | Instr (Set ((Var vi, _), exp, _) ) ->
+      let rec find_candidates expr =
+        match expr.enode with
+        | BinOp (Mod, _, modu, _typ) -> [modu]
+        | BinOp (BAnd, e1, e2, _typ) -> [e1; e2]
+        | CastE (_, expr)
+        | Info (expr, _) -> find_candidates expr
+        | _ -> []
+      in
+      let process expr =
+        match Cil.constFoldToInt expr with
+        | None -> ()
+        | Some i ->
+          let base = Base.of_varinfo vi in
+          let threshold = Ival.Widen_Hints.singleton (Integer.pred i) in
+          self#add_int_thresholds ~base threshold
+      in
+      List.iter process (find_candidates exp);
+      Cil.DoChildren
     | _ -> Cil.DoChildren
 
   method! vexpr (e:exp) = begin
@@ -370,35 +404,18 @@ class hints_visitor init_widen_hints global = object(self)
     Cil.DoChildren
 end
 
-module Global_Static_Hints =
-  State_builder.Ref
-    (Widen_type)
-    (struct
-      let dependencies = [ Ast.self ]
-      let name = "Widen.Global_Static_Hints"
-      let default = Widen_type.default
-    end)
-let () = Ast.add_monotonic_state Global_Static_Hints.self
-
-(* Global widen hints, used for all functions *)
-let global_widen_hints () =
-  if (not (Global_Static_Hints.is_computed ())) then
-    begin
-      Value_parameters.debug ~dkey "computing global widen hints";
-      let global_widen_hints = ref (Widen_type.default ()) in
-      Globals.Functions.iter_on_fundecs (fun fd ->
-          let visitor = new hints_visitor global_widen_hints true in
-          ignore (Visitor.visitFramacFunction visitor fd)
-        );
-      Global_Static_Hints.set !global_widen_hints;
-      Global_Static_Hints.mark_as_computed ();
-      !global_widen_hints
-    end
-  else
-    Global_Static_Hints.get ()
+(* Precompute global widen hints, used for all functions *)
+let compute_global_static_hints () =
+  Value_parameters.debug ~dkey "computing global widen hints";
+  let global_widen_hints = ref (Global_Static_Hints.get ()) in
+  Globals.Functions.iter_on_fundecs (fun fd ->
+      let visitor = new hints_visitor global_widen_hints true in
+      ignore (Visitor.visitFramacFunction visitor fd)
+    );
+  Global_Static_Hints.set !global_widen_hints
 
 let per_function_static_hints fdec =
-  let widen_hints = ref (global_widen_hints ()) in
+  let widen_hints = ref Widen_type.empty in
   let visitor_pragma = new pragma_widen_visitor widen_hints [] in
   ignore (Visitor.visitFramacFunction visitor_pragma fdec);
   let visitor_local = new hints_visitor widen_hints false in
@@ -418,6 +435,7 @@ let () = Ast.add_monotonic_state Per_Function_Static_Hints.self
 
 (* parse and precompute global and local static hints *)
 let precompute_widen_hints () =
+  compute_global_static_hints ();
   Globals.Functions.iter_on_fundecs
     (fun fd ->
        Per_Function_Static_Hints.replace fd (per_function_static_hints fd))
@@ -517,7 +535,7 @@ module Dynamic_Hints =
       let name = "Widen.Dynamic_Hints"
       let default = Widen_type.default
     end)
-let () = Ast.add_monotonic_state Global_Static_Hints.self
+let () = Ast.add_monotonic_state Dynamic_Hints.self
 
 (* The contents of this table should always be the join Dynamic_hints
    and Per_Function_Static_Hints, for the functions that have been computed.
@@ -534,12 +552,13 @@ module Per_Function_Hints =
 let () = Ast.add_monotonic_state Per_Function_Hints.self
 
 let extract_per_function_hints fdec =
+  let global = Global_Static_Hints.get () in
   let for_fdec =
     try Per_Function_Static_Hints.find fdec
     with Not_found -> assert false
   in
   let dynamic = Dynamic_Hints.get () in
-  Widen_type.join for_fdec dynamic
+  Widen_type.join (Widen_type.join global for_fdec) dynamic
 
 let per_function_hints = Per_Function_Hints.memo extract_per_function_hints
 

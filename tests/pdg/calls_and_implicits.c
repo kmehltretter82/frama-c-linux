@@ -1,5 +1,5 @@
 /* run.config
- *    GCC:
+ *    
  *    STDOPT: +"-fct-pdg main -inout"
  *
  */

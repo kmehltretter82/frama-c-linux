@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -480,7 +480,7 @@ struct
         (struct
           include Datatype.Filepath
           include X
-          let default () = Filepath.Normalized.unknown
+          let default () = Filepath.Normalized.empty
           let functor_name = "Filepath"
         end)
 
@@ -532,6 +532,7 @@ struct
       else
         p
 
+    let is_empty () = Filepath.Normalized.is_empty (get ())
   end
 
   (* ************************************************************************ *)
@@ -878,7 +879,7 @@ struct
          since an element may be added, then removed later (e.g +h,-@all):
          that has to be accepted *)
       if check then begin
-        Extlib.may parse_error unparsable;
+        Option.iter parse_error unparsable;
         C.iter check_possible_value col
       end;
       col
@@ -1522,7 +1523,7 @@ struct
              let rec pp_custom_list = function
                | [] -> ()
                | v :: l ->
-                 Extlib.may
+                 Option.iter
                    (fun v -> Format.fprintf fmt ":%s" v)
                    (V.to_string ~key (Some v));
                  pp_custom_list l

@@ -10,14 +10,14 @@
   s1 ∈ {0}
   i ∈ [--..--]
 [eva] computing for function main1 <- main.
-  Called from tests/value/sizeof.i:40.
+  Called from tests/value/sizeof.i:51.
 [eva] tests/value/sizeof.i:10: assertion got status valid.
 [eva] tests/value/sizeof.i:14: assertion got status valid.
 [eva] tests/value/sizeof.i:17: assertion got status valid.
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
-  Called from tests/value/sizeof.i:41.
+  Called from tests/value/sizeof.i:52.
 [eva:alarm] tests/value/sizeof.i:32: Warning: 
   pointer downcast. assert (unsigned int)(&s1) ≤ 2147483647;
 [eva] tests/value/sizeof.i:32: 
@@ -37,8 +37,12 @@
   assert \valid(&p->t[(unsigned int)(sizeof(int [10]) - (unsigned int)i)]);
 [eva] Recording results for main2
 [eva] Done for function main2
+[eva] computing for function sizeof_void <- main.
+  Called from tests/value/sizeof.i:53.
+[eva] Recording results for sizeof_void
+[eva] Done for function sizeof_void
 [eva] computing for function f <- main.
-  Called from tests/value/sizeof.i:42.
+  Called from tests/value/sizeof.i:54.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] Recording results for main
@@ -54,6 +58,13 @@
 [eva:final-states] Values at end of function main2:
   s1 ∈ [--..--]
   p ∈ {{ &s1 + [-36..36] }}
+[eva:final-states] Values at end of function sizeof_void:
+  size_void ∈ {1}
+  size_ptr ∈ {4}
+  size_void_expr ∈ {1}
+  align_void ∈ {1}
+  align_ptr ∈ {4}
+  align_void_expr ∈ {1}
 [eva:final-states] Values at end of function main:
   sz_str ∈ {4}
   sz_typ ∈ {1}
@@ -66,6 +77,8 @@
 [from] Done for function main1
 [from] Computing for function main2
 [from] Done for function main2
+[from] Computing for function sizeof_void
+[from] Done for function sizeof_void
 [from] Computing for function main
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
@@ -79,6 +92,8 @@
   align_typ FROM \nothing
 [from] Function main2:
   s1 FROM i (and SELF)
+[from] Function sizeof_void:
+  NO EFFECTS
 [from] Function main:
   sz_str FROM \nothing
   sz_typ FROM \nothing
@@ -98,6 +113,10 @@
     s1; p
 [inout] Inputs for function main2:
     i
+[inout] Out (internal) for function sizeof_void:
+    size_void; size_ptr; size_void_expr; align_void; align_ptr; align_void_expr
+[inout] Inputs for function sizeof_void:
+    \nothing
 [inout] Out (internal) for function main:
     sz_str; sz_typ; align_str; align_typ; s1
 [inout] Inputs for function main:
@@ -149,6 +168,18 @@ void main2(void)
   return;
 }
 
+void sizeof_void(void)
+{
+  void *p;
+  int size_void = (int)sizeof(void);
+  int size_ptr = (int)sizeof(p);
+  int size_void_expr = (int)sizeof(*p);
+  int align_void = (int)__alignof__(void);
+  int align_ptr = (int)__alignof__(p);
+  int align_void_expr = (int)__alignof__(*p);
+  return;
+}
+
 void f(int sz)
 {
   return;
@@ -158,6 +189,7 @@ void main(int *p, int *q, int j)
 {
   main1();
   main2();
+  sizeof_void();
   f((int)(sizeof(*p) * (unsigned int)j));
   return;
 }

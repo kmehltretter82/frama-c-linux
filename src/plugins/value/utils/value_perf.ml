@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -47,10 +47,6 @@ module Call_info = struct
     (* How many times the function was called. *)
     mutable nb_calls: int;
 
-    (* How many times the call had to be computed (i.e. with calls
-       cached with memexec removed) *)
-    mutable nb_effective_calls: int;
-
     (* The accumulated execution time for past calls. *)
     mutable total_duration: float;
 
@@ -60,8 +56,7 @@ module Call_info = struct
   }
   ;;
 
-  let create() = { nb_calls = 0; nb_effective_calls = 0; total_duration = 0.0;
-                   since = [] };;
+  let create() = { nb_calls = 0; total_duration = 0.0; since = [] };;
 
   (* Represents the calls to the main function.  *)
   let main = create();;
@@ -342,7 +337,6 @@ let stop_doing_perf callstack =
 let reset_perf () =
   let reset_callinfo ci =
     ci.Call_info.nb_calls <- 0;
-    ci.Call_info.nb_effective_calls <- 0;
     ci.Call_info.total_duration <- 0.0;
     ci.Call_info.since <- []
   in
@@ -395,11 +389,11 @@ let start_doing_flamegraph callstack =
   | [] -> assert false
   | [_] ->
     (* Analysis of main *)
-    let file = Value_parameters.ValPerfFlamegraphs.get () in
-    if file <> "" then begin
+    if not (Value_parameters.ValPerfFlamegraphs.is_empty ()) then begin
+      let file = Value_parameters.ValPerfFlamegraphs.get () in
       try
         (* Flamegraphs must be computed. Set up the stack and the output file *)
-        let oc = open_out file in
+        let oc = open_out (file:>string) in
         oc_flamegraph := Some oc;
         stack_flamegraph := [ (Sys.time (), 0.) ]
       with e ->
@@ -442,7 +436,7 @@ let stop_doing_flamegraph callstack =
 let reset_flamegraph () =
   match !oc_flamegraph with
   | None -> ()
-  | Some fd -> close_out fd; stack_flamegraph := []
+  | Some fd -> close_out fd; stack_flamegraph := []; oc_flamegraph := None
 
 
 (* -------------------------------------------------------------------------- *)

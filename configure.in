@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2020                                               #
+#  Copyright (C) 2007-2021                                               #
 #    CEA   (Commissariat à l'énergie atomique et aux énergies            #
 #           alternatives)                                                #
 #    INRIA (Institut National de Recherche en Informatique et en         #
@@ -82,11 +82,18 @@ if test "$VERBOSEMAKE" = yes ; then
   AC_MSG_RESULT(Make will be verbose.)
 fi
 
-##########################################
-# Check for invalid command-line options #
-##########################################
+##############################################################
+# Check for invalid command-line options and build directory #
+##############################################################
 case $prefix in
   *\ * ) AC_MSG_ERROR(spaces not allowed in --prefix argument "$prefix");;
+  * ) ;;
+esac
+
+case $(pwd) in
+  *\ * ) AC_MSG_ERROR(spaces not allowed in build directory "$(pwd)");;
+  *\'* ) AC_MSG_ERROR(single quotes not allowed in build directory "$(pwd)");;
+  *\"* ) AC_MSG_ERROR(double quotes not allowed in build directory "$(pwd)");;
   * ) ;;
 esac
 
@@ -279,6 +286,10 @@ if test -z "$OCAMLGRAPH" ; then
   AC_MSG_ERROR(Cannot find ocamlgraph via ocamlfind \
 (requires ocamlgraph 1.8.5 or higher).)
 fi
+
+AC_SUBST(HAS_OCAMLGRAPH_2)
+HAS_OCAMLGRAPH_2=no
+
 case $OCAMLGRAPH in
       0.* | 1.[[01234567]].* \
       | 1.8.0 | 1.8.0+dev \
@@ -287,10 +298,14 @@ case $OCAMLGRAPH in
       | 1.8.3 | 1.8.3+dev \
       | 1.8.4 | 1.8.4+dev)
         AC_MSG_ERROR(found $OCAMLGRAPH: requires 1.8.5 or higher.);;
-      1.8.5 | 1.8.6 | 1.8.7)
+      1.8.5 | 1.8.6 | 1.8.7|1.8.8)
+        AC_MSG_RESULT(found);;
+      2.0.*)
+        HAS_OCAMLGRAPH_2=yes
         AC_MSG_RESULT(found);;
       *)
-        AC_MSG_RESULT(found $OCAMLGRAPH: should work);;
+        HAS_OCAMLGRAPH_2=yes
+        AC_MSG_RESULT(found $OCAMLGRAPH: should work, but is not tested);;
 esac
 
 # zarith
@@ -397,7 +412,7 @@ else
   HAS_LANDMARKS="no"
 fi
 
-# Python 3 (for analysis-scripts)
+# Python 3 (for analysis-scripts, and for several tests: compliance, jcdb, ...)
 ########
 
 AC_MSG_CHECKING(for python3)
@@ -421,6 +436,8 @@ else
      ;;
   esac
 fi
+
+plugin_use_external(tests,python3)
 
 ############
 # Platform #
@@ -635,7 +652,7 @@ CPPFLAGS="$OLD_CPPFLAGS -m32"
 AC_PREPROC_IFELSE(
   [AC_LANG_SOURCE([/* Check if preprocessor supports option -m32 */])],
   [if test -e conftest.i; then
-    DEFAULT_CPP_SUPPORTED_ARCH_OPTS+='\"-m32\"; ';
+    DEFAULT_CPP_SUPPORTED_ARCH_OPTS="$DEFAULT_CPP_SUPPORTED_ARCH_OPTS "'\"-m32\";';
   fi], [])
 
 rm -f conftest.i
@@ -643,7 +660,7 @@ CPPFLAGS="$OLD_CPPFLAGS -m64"
 AC_PREPROC_IFELSE(
   [AC_LANG_SOURCE([/* Check if preprocessor supports option -m64 */])],
   [if test -e conftest.i; then
-    DEFAULT_CPP_SUPPORTED_ARCH_OPTS+='\"-m64\"; ';
+    DEFAULT_CPP_SUPPORTED_ARCH_OPTS="$DEFAULT_CPP_SUPPORTED_ARCH_OPTS "'\"-m64\";';
   fi], [])
 
 rm -f conftest.i
@@ -651,13 +668,13 @@ CPPFLAGS="$OLD_CPPFLAGS -m16"
 AC_PREPROC_IFELSE(
   [AC_LANG_SOURCE([/* Check if preprocessor supports option -m16 */])],
   [if test -e conftest.i; then
-    DEFAULT_CPP_SUPPORTED_ARCH_OPTS+='\"-m16\"; ';
+    DEFAULT_CPP_SUPPORTED_ARCH_OPTS="$DEFAULT_CPP_SUPPORTED_ARCH_OPTS "'\"-m16\";';
   fi], [])
 
 # revert CPPFLAGS to original value
 CPPFLAGS=$OLD_CPPFLAGS
 
-AC_MSG_RESULT(Default preprocessor supported architecture-related options: $DEFAULT_CPP_SUPPORTED_ARCH_OPTS)
+AC_MSG_RESULT(Default preprocessor supported architecture-related options:$DEFAULT_CPP_SUPPORTED_ARCH_OPTS)
 
 
 #################
@@ -733,7 +750,13 @@ plugin_require(from_analysis,callgraph)
 check_plugin(gui,src/plugins/gui,[support for gui],yes)
 
 plugin_require_external(gui,lablgtk)
-plugin_use_external(gui,gnomecanvas)
+# in ocamlgraph 2, the gtk part is separated. Hence if we found it,
+# there's no need to check specifically for gnomecanvas
+if test "$HAS_OCAMLGRAPH_2" = "yes"; then
+  plugin_use_external(gui,ocaml_ocamlgraph_gtk)
+else
+  plugin_use_external(gui,gnomecanvas)
+fi
 plugin_require_external(gui,gtksourceview)
 plugin_use_external(gui,dot)
 
@@ -743,7 +766,7 @@ plugin_use_external(gui,dot)
 check_plugin(impact,src/plugins/impact,[support for impact plugin],yes)
 
 plugin_use(impact,gui)
-plugin_use(impact,slicing)
+plugin_require(impact,slicing)
 plugin_require(impact,pdg)
 plugin_require(impact,eva)
 plugin_require(impact,inout)
@@ -809,6 +832,7 @@ plugin_require(slicing,from_analysis)
 plugin_require(slicing,pdg)
 plugin_require(slicing,eva)
 plugin_require(slicing,callgraph)
+plugin_require(slicing,sparecode)
 plugin_use(slicing,gui)
 
 # spare code
@@ -818,6 +842,7 @@ check_plugin(sparecode,src/plugins/sparecode,
              [support for sparecode plugin],yes)
 plugin_require(sparecode,pdg)
 plugin_require(sparecode,eva)
+plugin_require(sparecode,users)
 
 # users
 #######
@@ -833,7 +858,8 @@ check_plugin(eva,src/plugins/value,
              [support for value analysis],yes)
 plugin_use(eva,gui)
 plugin_use(eva,scope)
-plugin_use(eva,callgraph)
+plugin_require(eva,callgraph)
+plugin_require(eva,server)
 
 ####################
 # External plugins #
@@ -973,13 +999,17 @@ configure_library([LABLGTK],
                   [$LABLGTKPATH_FOR_CONFIGURE/lablgtk.$LIB_SUFFIX not found.],
                   no)
 
+if test "$HAS_OCAMLGRAPH_2" = yes; then
+  configure_pkg([ocamlgraph_gtk],[package ocamlgraph_gtk not found])
+fi
+
 # dot and xdot tools
 ####################
 
 configure_tool([DOT],[dot],[dot not found: you should install GraphViz],no)
 
 configure_tool([UNIX2DOS],[unix2dos],
-               [unix2dos not found: you should install tofrodos],no)
+               [unix2dos not found: you should install dos2unix],no)
 
 plugin_use_external(tests,unix2dos)
 
@@ -990,6 +1020,13 @@ plugin_use_external(tests,unix2dos)
 new_section "checking for plug-in dependencies"
 
 check_frama_c_dependencies
+
+AC_SUBST(HAS_DGRAPH)
+if test "$HAS_OCAMLGRAPH_2" = "yes"; then
+  HAS_DGRAPH=$HAS_OCAML_OCAMLGRAPH_GTK;
+else
+  HAS_DGRAPH=$HAS_GNOMECANVAS
+fi
 
 ############################
 # Substitutions to perform #

@@ -2,7 +2,7 @@
    DONTRUN: main test file is volatile.c
 */
 
-#include "tests/spec/volatile.h"
+#include "volatile.h"
 
 int f (int x) {
   x++;

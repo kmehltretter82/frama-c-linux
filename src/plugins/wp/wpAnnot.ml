@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -28,45 +28,14 @@ let debug fmt = Wp_parameters.debug ~dkey fmt
 
 open Cil_types
 open Cil_datatype
-
-(* -------------------------------------------------------------------------- *)
-(* --- Selection of relevant assigns and postconditions                   --- *)
-(* -------------------------------------------------------------------------- *)
-
-(* Properties for kf-conditions of termination-kind 'tkind' *)
-let get_called_postconds (tkind:termination_kind) kf =
-  let bhvs = Annotations.behaviors kf in
-  List.fold_left
-    (fun properties bhv ->
-       List.fold_left
-         (fun properties postcond ->
-            if tkind = fst postcond then
-              let pid_spec = Property.ip_of_ensures kf Kglobal bhv postcond in
-              pid_spec :: properties
-            else properties)
-         properties bhv.b_post_cond)
-    []
-    bhvs
-
-let get_called_post_conditions = get_called_postconds Cil_types.Normal
-let get_called_exit_conditions = get_called_postconds Cil_types.Exits
-
-(** Properties for assigns of kf *)
-let get_called_assigns kf =
-  let bhvs = Annotations.behaviors kf in
-  List.fold_left
-    (fun properties bhv ->
-       if Cil.is_default_behavior bhv then
-         match Property.ip_assigns_of_behavior kf Kglobal [] bhv with
-         | None -> properties
-         | Some ip -> ip :: properties
-       else properties)
-    []
-    bhvs
+open Logic_utils
 
 (* -------------------------------------------------------------------------- *)
 (* --- Status of Unreachable Annotations                                  --- *)
 (* -------------------------------------------------------------------------- *)
+
+let unreachable_proved = ref 0
+let unreachable_failed = ref 0
 
 let wp_unreachable =
   Emitter.create
@@ -76,95 +45,57 @@ let wp_unreachable =
     ~tuning:[] (* TBC *)
 
 let set_unreachable pid =
-  let open Property in
-  let emit = function
-    | IPPredicate {ip_kind = PKAssumes _} -> ()
-    | p ->
-        debug "unreachable annotation %a@." Property.pretty p;
-        Property_status.emit wp_unreachable ~hyps:[] p Property_status.True
-  in
-  let pids = match WpPropId.property_of_id pid with
-    | IPPredicate {ip_kind = PKAssumes _} -> []
-    | IPBehavior {ib_kf; ib_kinstr; ib_active; ib_bhv} ->
-        let active = Datatype.String.Set.elements ib_active in
-        (ip_post_cond_of_behavior ib_kf ib_kinstr active ib_bhv) @
-        (ip_requires_of_behavior ib_kf ib_kinstr ib_bhv)
-    | IPExtended _ -> []
-    (* Extended clauses might concern anything. Don't validate them
-       unless we know exactly what is going on. *)
-    | p ->
-        Wp_parameters.result "[CFG] Goal %a : Valid (Unreachable)"
-          WpPropId.pp_propid pid ; [p]
-  in
-  List.iter emit pids
-
-(*----------------------------------------------------------------------------*)
-(* Proofs                                                                     *)
-(*----------------------------------------------------------------------------*)
-
-type proof = {
-  target : Property.t ;
-  proved : proofpart array ;
-  mutable invalid : bool ;
-  mutable dependencies : Property.Set.t ;
-} and proofpart =
-    | Noproof
-    | Complete
-    | Parts of Bitvector.t
-
-let target p = p.target
-let dependencies p =
-  Property.Set.elements (Property.Set.remove p.target p.dependencies)
-
-let create_proof ip =
-  let n = WpPropId.subproofs ip in
-  {
-    target = WpPropId.property_of_id ip ;
-    proved = Array.make n Noproof ;
-    dependencies = Property.Set.empty ;
-    invalid = false ;
-  }
-
-let add_proof pf ip hs =
-  begin
-    if not (Property.equal (WpPropId.property_of_id ip) pf.target)
-    then Wp_parameters.fatal "Partial proof inconsistency" ;
-    List.iter
-      (fun iph ->
-         if not (WpPropId.is_requires iph) then
-           pf.dependencies <- Property.Set.add iph pf.dependencies
-      ) hs ;
-    let k = WpPropId.subproof_idx ip in
-    match WpPropId.parts_of_id ip with
-    | None -> pf.proved.(k) <- Complete
-    | Some(p,n) ->
-        match pf.proved.(k) with
-        | Complete -> ()
-        | Noproof ->
-            let bv = Bitvector.create n in
-            Bitvector.set_range bv 0 (p-1) ;
-            Bitvector.set_range bv (p+1) (n-1) ;
-            pf.proved.(k) <- Parts bv
-        | Parts bv ->
-            Bitvector.clear bv p ;
-            if Bitvector.is_empty bv
-            then pf.proved.(k) <- Complete
-  end
-
-let add_invalid_proof pf = pf.invalid <- true
-
-let is_composed pf =
-  Array.length pf.proved > 1
-
-let is_proved pf =
-  Array.for_all (function Complete -> true | _ -> false) pf.proved
-
-let is_invalid pf =
-  pf.invalid && not (is_proved pf)
+  if WpPropId.is_smoke_test pid then
+    begin
+      let source = WpPropId.source_of_id pid in
+      WpReached.set_doomed wp_unreachable pid ;
+      incr unreachable_failed ;
+      Wp_parameters.warning ~source "Failed smoke-test"
+    end
+  else
+    let open Property in
+    let emit = function
+      | IPPredicate {ip_kind = PKAssumes _} -> ()
+      | p ->
+          debug "unreachable annotation %a@." Property.pretty p;
+          Property_status.emit wp_unreachable ~hyps:[] p Property_status.True
+    in
+    let pids = match WpPropId.property_of_id pid with
+      | IPPredicate {ip_kind = PKAssumes _} -> []
+      | IPBehavior {ib_kf; ib_kinstr; ib_active; ib_bhv} ->
+          let active = Datatype.String.Set.elements ib_active in
+          (ip_post_cond_of_behavior ib_kf ib_kinstr active ib_bhv) @
+          (ip_requires_of_behavior ib_kf ib_kinstr ib_bhv)
+      | IPExtended _ -> []
+      (* Extended clauses might concern anything. Don't validate them
+         unless we know exactly what is going on. *)
+      | p ->
+          incr unreachable_proved ;
+          Wp_parameters.result "[CFG] Goal %a : Valid (Unreachable)"
+            WpPropId.pp_propid pid ; [p]
+    in
+    List.iter emit pids
 
 (* -------------------------------------------------------------------------- *)
-(* --- PID for Functions                                                  --- *)
+(* --- Status of Terminates Annotations                                   --- *)
 (* -------------------------------------------------------------------------- *)
+let wp_trivially_terminates =
+  Emitter.create
+    "Trivial Termination"
+    [Emitter.Property_status]
+    ~correctness:[] (* TBC *)
+    ~tuning:[] (* TBC *)
+
+let set_trivially_terminates p =
+  let pid = WpPropId.property_of_id p in
+  Property_status.emit wp_trivially_terminates ~hyps:[] pid Property_status.True
+
+(* -------------------------------------------------------------------------- *)
+(* --- Preconditions at Callsites                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+let call_preconditions =
+  Statuses_by_call.all_call_preconditions_at ~warn_missing:true
 
 let mk_call_pre_id called_kf bhv s_call called_pre =
   (* TODOclean : quite dirty here ! *)
@@ -174,13 +105,6 @@ let mk_call_pre_id called_kf bhv s_call called_pre =
     Statuses_by_call.precondition_at_call called_kf called_pre s_call in
   WpPropId.mk_call_pre_id called_kf s_call called_pre called_pre_p
 
-(* -------------------------------------------------------------------------- *)
-(* --- Preconditions                                                      --- *)
-(* -------------------------------------------------------------------------- *)
-
-let call_preconditions =
-  Statuses_by_call.all_call_preconditions_at ~warn_missing:true
-
 (* Preconditions at call-point as WpPropId.t *)
 let preconditions_at_call s = function
   | Cil2cfg.Static kf ->
@@ -189,8 +113,9 @@ let preconditions_at_call s = function
       List.map aux preconds
   | Cil2cfg.Dynamic _ -> []
 
-let get_called_preconditions_at kf stmt =
-  List.map snd (call_preconditions kf stmt)
+(* ########################################################################## *)
+(* ###      WARNING:  DEPRECATED API BELOW THIS LINE                      ### *)
+(* ########################################################################## *)
 
 (*----------------------------------------------------------------------------*)
 (* Strategy and annotations                                                   *)
@@ -238,7 +163,7 @@ module HdefAnnotBhv = Cil2cfg.HE (struct type t = (stmt * int) end)
 type strategy_info = {
   kf : Kernel_function.t;
   cfg : Cil2cfg.t;
-  reached : WpReached.reached option ;
+  reachability : WpReached.reachability option ;
   cur_bhv : asked_bhv;
   asked_bhvs : asked_bhv list;
   asked_prop : asked_prop;
@@ -303,23 +228,9 @@ let filter_speconly config pid =
     | _ -> false
   else true
 
-let filter_status pid =
-  Wp_parameters.StatusAll.get () ||
-  begin
-    let module C = Property_status.Consolidation in
-    match C.get (WpPropId.property_of_id pid) with
-    | C.Never_tried -> true
-    | C.Considered_valid | C.Inconsistent _ -> false
-    | C.Valid _ | C.Valid_under_hyp _
-    | C.Invalid_but_dead _ | C.Valid_but_dead _ | C.Unknown_but_dead _ ->
-        Wp_parameters.StatusTrue.get ()
-    | C.Unknown _ -> Wp_parameters.StatusMaybe.get ()
-    | C.Invalid _ | C.Invalid_under_hyp _ -> Wp_parameters.StatusFalse.get ()
-  end
-
 let filter_configstatus config pid =
   (match config.asked_prop with IdProp _ -> true | _ -> false) ||
-  (filter_status pid)
+  (WpPropId.filter_status pid)
 
 let filter_asked config pid =
   match config.asked_prop with
@@ -409,7 +320,7 @@ let add_stmt_assigns_goal config s active acc b l_post = match b.b_assigns with
       | Some id ->
           if goal_to_select config id then
             let kf = config.kf in
-            let labels = NormAtLabels.labels_stmt_assigns ~kf s l_post in
+            let labels = NormAtLabels.labels_stmt_assigns_l ~kf s l_post in
             let assigns = NormAtLabels.preproc_assigns labels assigns in
             let a_desc = WpPropId.mk_stmt_assigns_desc s assigns in
             WpStrategy.add_assigns acc WpStrategy.Agoal id a_desc
@@ -418,12 +329,13 @@ let add_stmt_assigns_goal config s active acc b l_post = match b.b_assigns with
 let add_fct_assigns_goal config acc tkind b = match b.b_assigns with
   | WritesAny -> acc
   | Writes assigns ->
-      let id = WpPropId.mk_fct_assigns_id config.kf b tkind assigns in
+      let has_exit = Cil2cfg.has_exit (Cil2cfg.get config.kf) in
+      let id = WpPropId.mk_fct_assigns_id config.kf has_exit b tkind assigns in
       match id with
       | None -> acc
       | Some id ->
           if goal_to_select config id then
-            let labels = NormAtLabels.labels_fct_assigns in
+            let labels = NormAtLabels.labels_fct_assigns ~exit:false in
             let assigns' = NormAtLabels.preproc_assigns labels assigns in
             let a_desc = WpPropId.mk_kf_assigns_desc assigns' in
             WpStrategy.add_assigns acc WpStrategy.Agoal id a_desc
@@ -749,7 +661,7 @@ let add_called_post called_kf termination_kind acc =
     let kind = WpStrategy.AcallHyp called_kf in
     let assumes = (Ast_info.behavior_assumes b) in
     let add_post acc (tk, p) =
-      if tk = termination_kind && not p.ip_content.tp_only_check
+      if tk = termination_kind && use_predicate p.ip_content.tp_kind
       then WpStrategy.add_prop_call_post acc kind called_kf b tk ~assumes p
       else acc
     in List.fold_left add_post acc b.b_post_cond
@@ -759,7 +671,7 @@ let add_called_post called_kf termination_kind acc =
 let add_call_checks config s kf posts exits =
   if cur_fct_default_bhv config
   && Wp_parameters.SmokeTests.get ()
-  && Wp_parameters.SmokeDeadcode.get ()
+  && Wp_parameters.SmokeDeadcall.get ()
   then
     WpStrategy.add_prop_dead_call kf s posts exits
   else
@@ -826,7 +738,8 @@ let add_variant_annot config s ca var_exp loop_entry loop_back =
   in loop_entry, loop_back
 
 let add_loop_invariant_annot config vloop s ca b_list inv acc =
-  let only_check = inv.tp_only_check in
+  let hyp = use_predicate inv.tp_kind in
+  let goal = verify_predicate inv.tp_kind in
   let inv = inv.tp_statement in
   let assigns, loop_entry, loop_back , loop_core = acc in
   (* we have to prove that inv is true for each edge that goes
@@ -837,22 +750,29 @@ let add_loop_invariant_annot config vloop s ca b_list inv acc =
   | TBRpart (* TODO: PKPartial *)
     ->
       begin
-        let loop_entry = add_prop_loop_inv ~established:true config loop_entry
-            WpStrategy.Agoal s ca inv in
-        let loop_back = add_prop_loop_inv ~established:false config loop_back
-            WpStrategy.Agoal s ca inv in
+        let loop_entry =
+          if goal then
+            add_prop_loop_inv ~established:true config loop_entry
+              WpStrategy.Agoal s ca inv
+          else loop_entry in
+        let loop_back =
+          if goal then
+            add_prop_loop_inv ~established:false config loop_back
+              WpStrategy.Agoal s ca inv
+          else loop_back in
         let loop_core =
-          if only_check then loop_core
-          else
+          if hyp then
             add_prop_inv_fixpoint config loop_core WpStrategy.Ahyp s ca inv
-        in
+          else loop_core in
         assigns, loop_entry , loop_back , loop_core
       end
-  | TBRhyp when not only_check ->
-      let kind = WpStrategy.Ahyp in
-      let loop_core = add_prop_inv_fixpoint config loop_core kind s ca inv
-      in assigns, loop_entry , loop_back , loop_core
-  | TBRhyp | TBRno -> acc
+  | TBRhyp ->
+      if hyp then
+        let kind = WpStrategy.Ahyp in
+        let loop_core = add_prop_inv_fixpoint config loop_core kind s ca inv
+        in assigns, loop_entry , loop_back , loop_core
+      else acc
+  | TBRno -> acc
 
 (** Returns the annotations for the three edges of the loop node:
  * - loop_entry : goals for the edge entering in the loop
@@ -915,7 +835,7 @@ let get_loop_annots config vloop s =
 let add_stmt_deadcode_smoke config acc s =
   if cur_fct_default_bhv config
   then
-    match config.reached with
+    match config.reachability with
     | Some r when WpReached.smoking r s ->
         WpStrategy.add_prop_dead_code acc config.kf s
     | _ -> acc
@@ -940,24 +860,25 @@ let get_stmt_annots config v s =
         let acc = match is_annot_for_config config v s b_list with
           | TBRno -> acc
           | TBRhyp ->
-              if p.tp_only_check then acc
-              else
+              if use_predicate p.tp_kind then
                 let b_acc =
                   WpStrategy.add_prop_assert
                     b_acc WpStrategy.Ahyp kf s a p.tp_statement
                 in (b_acc, (a_acc, e_acc))
+              else acc
           | TBRok | TBRpart ->
               let id = WpPropId.mk_assert_id config.kf s a in
               let goal = goal_to_select config id in
-              if p.tp_only_check && not goal then acc
-              else
-                let kind =
-                  WpStrategy.(if p.tp_only_check then Agoal else Aboth goal)
-                in
+              let add, kind =
+                match p.tp_kind with
+                | Admit -> true, WpStrategy.Ahyp
+                | Assert -> true, Aboth goal
+                | Check -> goal, Agoal
+              in if add then
                 let b_acc =
                   WpStrategy.add_prop_assert b_acc kind kf s a p.tp_statement
-                in
-                (b_acc, (a_acc, e_acc))
+                in (b_acc, (a_acc, e_acc))
+              else acc
         in acc
     | AAllocation (_b_list, _frees_allocates) ->
         (* [PB] TODO *) acc
@@ -1123,8 +1044,8 @@ let add_global_annotations annots =
           "Global invariant not handled yet ('%s' ignored)"
           linfo.l_var_info.lv_name;
         ()
-    | Dlemma (name,_,_,_,p,_,_) ->
-        if not (p.tp_only_check) then
+    | Dlemma (name,_,_,p,_,_) ->
+        if use_predicate p.tp_kind then
           WpStrategy.add_axiom annots (LogicUsage.logic_lemma name)
 
   and do_globals gs = List.iter do_global gs in
@@ -1282,13 +1203,13 @@ class vexit kf acc =
       Cil.DoChildren
   end
 
-let process_unreached_annots cfg =
+let process_unreached_annots cfg reachability =
   debug "collecting unreachable annotations@.";
   let unreached = Cil2cfg.unreachable_nodes cfg in
   let kf = Cil2cfg.cfg_kf cfg in
   let spec = Annotations.funspec kf in
   let add_id acc id =
-    if filter_status id then id::acc
+    if WpPropId.filter_status id then id::acc
     else (* non-selected property : nothing to do *) acc
   in
   let do_post b tk acc (termk, _ as p) =
@@ -1297,6 +1218,16 @@ let process_unreached_annots cfg =
   let do_bhv termk acc b = List.fold_left (do_post b termk) acc b.b_post_cond in
   let do_annot s _ a acc =
     List.fold_left add_id acc (WpPropId.mk_code_annot_ids kf s a)
+  in
+  let do_stmt s acc =
+    let acc =
+      match reachability with
+      | None -> acc
+      | Some r ->
+          if WpReached.smoking r s then
+            WpPropId.mk_smoke kf ~id:"unreachable" ~unreachable:s () :: acc
+          else acc
+    in Annotations.fold_code_annot (do_annot s) s acc
   in
   let do_node acc n =
     debug
@@ -1312,13 +1243,13 @@ let process_unreached_annots cfg =
         ignore Visitor.(visitFramacKf (visitor :> frama_c_visitor) kf) ;
         visitor#acc
     | Cil2cfg.Vcall (s, _, call, _) ->
-        Annotations.fold_code_annot (do_annot s) s acc @
+        do_stmt s acc @
         preconditions_at_call s call
     | Cil2cfg.Vstmt s
     | Cil2cfg.VblkIn (Cil2cfg.Bstmt s, _)
     | Cil2cfg.VblkOut (Cil2cfg.Bstmt s, _)
     | Cil2cfg.Vtest (true, s, _) | Cil2cfg.Vloop (_, s) | Cil2cfg.Vswitch (s,_)
-      -> Annotations.fold_code_annot (do_annot s) s acc
+      -> do_stmt s acc
     | Cil2cfg.Vtest (false, _, _) | Cil2cfg.Vloop2 _
     | Cil2cfg.VblkIn _ | Cil2cfg.VblkOut _ | Cil2cfg.Vend -> acc
   in
@@ -1329,11 +1260,6 @@ let process_unreached_annots cfg =
 (*----------------------------------------------------------------------------*)
 (* Everything must go through here.                                           *)
 (*----------------------------------------------------------------------------*)
-
-let get_cfg kf model =
-  if Wp_parameters.RTE.get () then WpRTE.generate model kf ;
-  let cfg = Cil2cfg.get kf in
-  let _ = process_unreached_annots cfg in cfg
 
 let build_configs assigns kf model behaviors ki property =
   debug "[get_strategies] for behaviors names: %a@."
@@ -1348,16 +1274,18 @@ let build_configs assigns kf model behaviors ki property =
         debug
           "[get_strategies] select stmt %d properties@." s.sid
   in
-  let cfg = get_cfg kf model in
-  let reached =
+  if Wp_parameters.RTE.get () then WpRTE.generate model kf ;
+  let cfg = Cil2cfg.get kf in
+  let reachability =
     if Wp_parameters.SmokeTests.get ()
     && Wp_parameters.SmokeDeadcode.get ()
-    then Some (WpReached.reached kf)
+    then Some (WpReached.reachability kf)
     else None in
+  process_unreached_annots cfg reachability ;
   let def_annot_bhv, bhvs = find_behaviors kf cfg ki behaviors in
   if bhvs <> [] then debug "[get_strategies] %d behaviors" (List.length bhvs);
   let mk_bhv_config bhv = {
-    kf; reached; cfg;
+    kf; reachability; cfg;
     cur_bhv = bhv;
     asked_prop = property;
     asked_bhvs = bhvs;
@@ -1460,3 +1388,34 @@ let get_function_strategies ~model
     ?(assigns=WithAssigns) ?(bhv=[]) ?(prop=[]) kf =
   let prop = match prop with [] -> AllProps | _ -> NamedProp prop in
   get_strategies assigns kf model bhv None prop
+
+let get_property_strategies ~model ip =
+  let open Property in
+  match ip with
+  | IPBehavior {ib_kf; ib_bhv} ->
+      let bhv = [ib_bhv.Cil_types.b_name] in
+      let assigns = WithAssigns in
+      get_function_strategies ~model ~assigns ~bhv ib_kf
+  | IPComplete _
+  | IPDisjoint _
+  | IPCodeAnnot _
+  | IPAllocation _
+  | IPAssigns _
+  | IPDecrease _
+  | IPPredicate _
+    ->
+      let assigns = WithAssigns in
+      get_id_prop_strategies ~model ~assigns ip
+
+  | IPAxiomatic _
+  | IPLemma _
+  | IPFrom _
+  | IPReachable _
+  | IPPropertyInstance _
+  | IPOther _
+  | IPTypeInvariant _
+  | IPGlobalInvariant _
+  | IPExtended _
+    ->
+      Wp_parameters.result "Nothing to compute for '%a'" pretty ip ;
+      []

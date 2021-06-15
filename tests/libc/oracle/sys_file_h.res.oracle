@@ -26,6 +26,6 @@
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
-  fd ∈ [--..--]
+  fd ∈ [-1..1023]
   r ∈ {-1; 0}
   __retres ∈ {0}

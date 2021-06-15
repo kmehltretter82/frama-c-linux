@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -27,6 +27,6 @@ val get_flags : Datatype.Filepath.t -> string list
 
 (** [has_entry f] returns true iff [f] has an entry in the JSON compilation
     database. Must only be called if a JCDB file has been specified.
-    @since Frama-C+dev
+    @since 22.0-Titanium
 *)
 val has_entry : Datatype.Filepath.t -> bool

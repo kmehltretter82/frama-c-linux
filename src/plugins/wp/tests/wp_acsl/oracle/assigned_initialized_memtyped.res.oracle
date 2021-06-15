@@ -6,32 +6,32 @@
   Function array
 ------------------------------------------------------------
 
-Goal Check 'CHECK' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 69):
+Goal Check 'FAILS' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 69):
 Let m = Init_0[shiftfield_F1_S_i(s) <- true].
 Let a = shiftfield_F1_S_a(s).
 Let a_1 = shift_sint32(a, 0).
-Let a_2 = havoc(Init_undef_1, m, a_1, 10).
-Let a_3 = havoc(Init_undef_0, m, a_1, 10).
+Let a_2 = havoc(Init_undef_0, m, a_1, 10).
+Let a_3 = havoc(Init_undef_1, m, a_1, 10).
 Assume {
   Type: is_sint32(i) /\ is_sint32(i_1).
   (* Heap *)
   Type: (region(s.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns ... *)
-  Have: monotonic_init(m, a_2).
+  Have: cinits(a_3).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10) /\
       (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-       (a_2[shift_sint32(a, i_2)]=true)))).
+       (a_3[shift_sint32(a, i_2)]=true)))).
   (* Else *)
   Have: 10 <= i.
   (* Loop assigns 'CHECK' *)
-  Have: monotonic_init(a_2, a_3).
+  Have: cinits(a_2).
   (* Invariant *)
   Have: (0 <= i_1) /\ (i_1 <= 10).
   (* Else *)
   Have: 10 <= i_1.
 }
-Prove: IsInit_S1_S(s, a_3).
+Prove: IsInit_S1_S(s, a_2).
 
 ------------------------------------------------------------
 
@@ -55,22 +55,22 @@ Prove: true.
   Function assigned_glob
 ------------------------------------------------------------
 
-Goal Check 'CHECK' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 126):
+Goal Check 'FAILS' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 126):
 Assume { (* Heap *) Type: cinits(Init_0). }
 Prove: IsInit_S1_S(global(G_glob_82), Init_0).
 
 ------------------------------------------------------------
 
 Goal Preservation of Invariant 'CHECK' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 129):
-Let m = Init_0[shiftfield_F1_S_i(pg_0) <- true].
 Let a = shiftfield_F1_S_a(pg_0).
-Let a_1 = havoc(Init_undef_0, m, shift_sint32(a, 0), 10).
+Let a_1 = havoc(Init_undef_0, Init_0[shiftfield_F1_S_i(pg_0) <- true],
+            shift_sint32(a, 0), 10).
 Assume {
   Type: is_sint32(i) /\ is_sint32(1 + i).
   (* Heap *)
   Type: (region(pg_0.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns 'CHECK' *)
-  Have: monotonic_init(m, a_1).
+  Have: cinits(a_1).
   (* Invariant 'CHECK' *)
   Have: (0 <= i) /\ (i <= 10) /\
       (forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
@@ -89,59 +89,59 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'CHECK' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 142):
+Goal Check 'FAILS' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 142):
 Let m = Init_0[shiftfield_F1_S_i(pg_0) <- true].
-Let a = shiftfield_F1_S_a(pg_0).
-Let a_1 = havoc(Init_undef_1, m, shift_sint32(a, 0), 10).
-Let a_2 = havoc(Init_undef_0, m, pg_0, 11).
+Let a = havoc(Init_undef_0, m, pg_0, 11).
+Let a_1 = shiftfield_F1_S_a(pg_0).
+Let a_2 = havoc(Init_undef_1, m, shift_sint32(a_1, 0), 10).
 Assume {
   Type: is_sint32(i) /\ is_sint32(i_1).
   (* Heap *)
   Type: (region(pg_0.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns 'CHECK' *)
-  Have: monotonic_init(m, a_1).
+  Have: cinits(a_2).
   (* Invariant 'CHECK' *)
   Have: (0 <= i) /\ (i <= 10) /\
       (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-       (a_1[shift_sint32(a, i_2)]=true)))).
+       (a_2[shift_sint32(a_1, i_2)]=true)))).
   (* Else *)
   Have: 10 <= i.
   (* Loop assigns 'CHECK' *)
-  Have: monotonic_init(a_1, a_2).
+  Have: cinits(a).
   (* Invariant *)
   Have: (0 <= i_1) /\ (i_1 <= 10).
   (* Else *)
   Have: 10 <= i_1.
 }
-Prove: IsInit_S1_S(pg_0, a_2).
+Prove: IsInit_S1_S(pg_0, a).
 
 ------------------------------------------------------------
 
-Goal Check 'CHECK' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 143):
+Goal Check 'FAILS' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 143):
 Let m = Init_0[shiftfield_F1_S_i(pg_0) <- true].
-Let a = shiftfield_F1_S_a(pg_0).
-Let a_1 = havoc(Init_undef_1, m, shift_sint32(a, 0), 10).
-Let a_2 = havoc(Init_undef_0, m, pg_0, 11).
+Let a = havoc(Init_undef_0, m, pg_0, 11).
+Let a_1 = shiftfield_F1_S_a(pg_0).
+Let a_2 = havoc(Init_undef_1, m, shift_sint32(a_1, 0), 10).
 Assume {
   Type: is_sint32(i) /\ is_sint32(i_1).
   (* Heap *)
   Type: (region(pg_0.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns 'CHECK' *)
-  Have: monotonic_init(m, a_1).
+  Have: cinits(a_2).
   (* Invariant 'CHECK' *)
   Have: (0 <= i) /\ (i <= 10) /\
       (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-       (a_1[shift_sint32(a, i_2)]=true)))).
+       (a_2[shift_sint32(a_1, i_2)]=true)))).
   (* Else *)
   Have: 10 <= i.
   (* Loop assigns 'CHECK' *)
-  Have: monotonic_init(a_1, a_2).
+  Have: cinits(a).
   (* Invariant *)
   Have: (0 <= i_1) /\ (i_1 <= 10).
   (* Else *)
   Have: 10 <= i_1.
 }
-Prove: IsInit_S1_S(global(G_glob_82), a_2).
+Prove: IsInit_S1_S(global(G_glob_82), a).
 
 ------------------------------------------------------------
 
@@ -197,31 +197,31 @@ Prove: (-1) <= i.
   Function comp
 ------------------------------------------------------------
 
-Goal Check 'CHECK' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 118):
+Goal Check 'FAILS' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 118):
 Let m = Init_0[shiftfield_F1_S_i(s) <- true].
-Let a = shiftfield_F1_S_a(s).
-Let a_1 = havoc(Init_undef_1, m, shift_sint32(a, 0), 10).
-Let a_2 = havoc(Init_undef_0, m, s, 11).
+Let a = havoc(Init_undef_0, m, s, 11).
+Let a_1 = shiftfield_F1_S_a(s).
+Let a_2 = havoc(Init_undef_1, m, shift_sint32(a_1, 0), 10).
 Assume {
   Type: is_sint32(i) /\ is_sint32(i_1).
   (* Heap *)
   Type: (region(s.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns ... *)
-  Have: monotonic_init(m, a_1).
+  Have: cinits(a_2).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10) /\
       (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-       (a_1[shift_sint32(a, i_2)]=true)))).
+       (a_2[shift_sint32(a_1, i_2)]=true)))).
   (* Else *)
   Have: 10 <= i.
   (* Loop assigns 'CHECK' *)
-  Have: monotonic_init(a_1, a_2).
+  Have: cinits(a).
   (* Invariant *)
   Have: (0 <= i_1) /\ (i_1 <= 10).
   (* Else *)
   Have: 10 <= i_1.
 }
-Prove: IsInit_S1_S(s, a_2).
+Prove: IsInit_S1_S(s, a).
 
 ------------------------------------------------------------
 
@@ -260,34 +260,33 @@ Prove: (-1) <= i.
   Function descr
 ------------------------------------------------------------
 
-Goal Check 'CHECK' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 99):
-Let a = shiftfield_F1_S_i(s).
-Let m = Init_1[a <- true].
-Let a_1 = shiftfield_F1_S_a(s).
-Let a_2 = shift_sint32(a_1, 0).
-Let a_3 = havoc(Init_undef_0, m, a_2, 10).
+Goal Check 'FAILS' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 99):
+Let a = shiftfield_F1_S_a(s).
+Let a_1 = shiftfield_F1_S_i(s).
+Let a_2 = shift_sint32(a, 0).
+Let a_3 = havoc(Init_undef_0, Init_1[a_1 <- true], a_2, 10).
 Assume {
   Type: is_sint32(i) /\ is_sint32(i_1).
   (* Heap *)
   Type: (region(s.base) <= 0) /\ cinits(Init_1).
   (* Loop assigns ... *)
-  Have: monotonic_init(m, a_3).
+  Have: cinits(a_3).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10) /\
       (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-       (a_3[shift_sint32(a_1, i_2)]=true)))).
+       (a_3[shift_sint32(a, i_2)]=true)))).
   (* Else *)
   Have: 10 <= i.
   (* Loop assigns 'CHECK' *)
-  Have: monotonic_init(a_3, Init_0) /\
+  Have: cinits(Init_0) /\
       (forall a_4 : addr.
        ((forall i_2 : Z. (((i_2 = 0) \/ (i_2 = 2) \/ (i_2 = 4)) ->
-         (shift_sint32(a_1, i_2) != a_4))) ->
+         (shift_sint32(a, i_2) != a_4))) ->
        ((a_3[a_4]=true) <-> (Init_0[a_4]=true)))) /\
       (forall a_4 : addr.
        ((forall i_2 : Z. (((i_2 = 0) \/ (i_2 = 2) \/ (i_2 = 4)) ->
-         (shift_sint32(a_1, i_2) != a_4))) ->
-       (havoc(Mint_undef_0, Mint_0[a <- 0], a_2, 10)[a_4] = Mint_1[a_4]))).
+         (shift_sint32(a, i_2) != a_4))) ->
+       (havoc(Mint_undef_0, Mint_0[a_1 <- 0], a_2, 10)[a_4] = Mint_1[a_4]))).
   (* Else *)
   Have: 10 <= i_1.
 }
@@ -350,28 +349,27 @@ Prove: true.
   Function field
 ------------------------------------------------------------
 
-Goal Check 'CHECK' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 51):
+Goal Check 'FAILS' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 51):
 Let a = shiftfield_F1_S_i(s).
-Let m = Init_0[a <- true].
 Let a_1 = shiftfield_F1_S_a(s).
-Let a_2 = havoc(Init_undef_0, m, shift_sint32(a_1, 0), 10).
-Let a_3 = a_2[a <- true].
+Let a_2 = havoc(Init_undef_0, Init_0[a <- true], shift_sint32(a_1, 0), 10).
+Let a_3 = a_2[a <- i].
 Assume {
-  Type: is_sint32(i) /\ is_sint32(i_1).
+  Type: is_sint32(i_1) /\ is_sint32(i_2).
   (* Heap *)
   Type: (region(s.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns ... *)
-  Have: monotonic_init(m, a_2).
+  Have: cinits(a_2).
   (* Invariant *)
-  Have: (0 <= i) /\ (i <= 10) /\
-      (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-       (a_2[shift_sint32(a_1, i_2)]=true)))).
-  (* Else *)
-  Have: 10 <= i.
-  (* Loop assigns 'CHECK' *)
-  Have: monotonic_init(a_2, a_3).
+  Have: (0 <= i_1) /\ (i_1 <= 10) /\
+      (forall i_3 : Z. ((0 <= i_3) -> ((i_3 < i_1) ->
+       (a_2[shift_sint32(a_1, i_3)]=true)))).
   (* Else *)
   Have: 10 <= i_1.
+  (* Loop assigns 'CHECK' *)
+  Have: cinits(a_3).
+  (* Else *)
+  Have: 10 <= i_2.
 }
 Prove: IsInit_S1_S(s, a_3).
 
@@ -391,18 +389,17 @@ Prove: true.
   Function index
 ------------------------------------------------------------
 
-Goal Check 'CHECK' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 84):
-Let m = Init_0[shiftfield_F1_S_i(s) <- true].
+Goal Check 'FAILS' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 84):
 Let a = shiftfield_F1_S_a(s).
-Let a_1 = havoc(Init_undef_0, m, shift_sint32(a, 0), 10).
-Let a_2 = shift_sint32(a, 4).
-Let a_3 = a_1[a_2 <- i | Init_undef_0[a_2]].
+Let a_1 = havoc(Init_undef_0, Init_0[shiftfield_F1_S_i(s) <- true],
+            shift_sint32(a, 0), 10).
+Let a_2 = a_1[shift_sint32(a, 4) <- i].
 Assume {
   Type: is_sint32(i_1) /\ is_sint32(i_2).
   (* Heap *)
   Type: (region(s.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns ... *)
-  Have: monotonic_init(m, a_1).
+  Have: cinits(a_1).
   (* Invariant *)
   Have: (0 <= i_1) /\ (i_1 <= 10) /\
       (forall i_3 : Z. ((0 <= i_3) -> ((i_3 < i_1) ->
@@ -410,11 +407,11 @@ Assume {
   (* Else *)
   Have: 10 <= i_1.
   (* Loop assigns 'CHECK' *)
-  Have: monotonic_init(a_1, a_3).
+  Have: cinits(a_2).
   (* Else *)
   Have: 10 <= i_2.
 }
-Prove: IsInit_S1_S(s, a_3).
+Prove: IsInit_S1_S(s, a_2).
 
 ------------------------------------------------------------
 
@@ -439,15 +436,15 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Preservation of Invariant 'CHECK' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 16):
-Let m = Init_0[shiftfield_F1_S_i(s) <- true].
 Let a = shiftfield_F1_S_a(s).
-Let a_1 = havoc(Init_undef_0, m, shift_sint32(a, 0), 10).
+Let a_1 = havoc(Init_undef_0, Init_0[shiftfield_F1_S_i(s) <- true],
+            shift_sint32(a, 0), 10).
 Assume {
   Type: is_sint32(i) /\ is_sint32(1 + i).
   (* Heap *)
   Type: (region(s.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns 'CHECK' *)
-  Have: monotonic_init(m, a_1).
+  Have: cinits(a_1).
   (* Invariant 'CHECK' *)
   Have: (0 <= i) /\ (i <= 10) /\
       (forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
@@ -467,15 +464,15 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Check 'CHECK' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 21):
-Let m = Init_0[shiftfield_F1_S_i(s) <- true].
 Let a = shiftfield_F1_S_a(s).
-Let a_1 = havoc(Init_undef_0, m, shift_sint32(a, 0), 10).
+Let a_1 = havoc(Init_undef_0, Init_0[shiftfield_F1_S_i(s) <- true],
+            shift_sint32(a, 0), 10).
 Assume {
   Type: is_sint32(i).
   (* Heap *)
   Type: (region(s.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns 'CHECK' *)
-  Have: monotonic_init(m, a_1).
+  Have: cinits(a_1).
   (* Invariant 'CHECK' *)
   Have: (0 <= i) /\ (i <= 10) /\
       (forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
@@ -507,17 +504,17 @@ Prove: true.
   Function range
 ------------------------------------------------------------
 
-Goal Check 'CHECK' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 36):
-Let m = Init_0[shiftfield_F1_S_i(s) <- true].
+Goal Check 'FAILS' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 36):
 Let a = shiftfield_F1_S_a(s).
-Let a_1 = havoc(Init_undef_1, m, shift_sint32(a, 0), 10).
+Let a_1 = havoc(Init_undef_1, Init_0[shiftfield_F1_S_i(s) <- true],
+            shift_sint32(a, 0), 10).
 Let a_2 = havoc(Init_undef_0, a_1, shift_sint32(a, 1), 4).
 Assume {
   Type: is_sint32(i) /\ is_sint32(i_1).
   (* Heap *)
   Type: (region(s.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns ... *)
-  Have: monotonic_init(m, a_1).
+  Have: cinits(a_1).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10) /\
       (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
@@ -525,7 +522,7 @@ Assume {
   (* Else *)
   Have: 10 <= i.
   (* Loop assigns 'CHECK' *)
-  Have: monotonic_init(a_1, a_2).
+  Have: cinits(a_2).
   (* Else *)
   Have: 10 <= i_1.
 }

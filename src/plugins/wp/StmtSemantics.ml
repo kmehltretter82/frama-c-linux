@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -98,7 +98,7 @@ struct
                subst_formals = Varinfo.Map.empty} in
     env @* [
       Clabels.init, Cfg.node ();
-      Clabels.at_exit, Cfg.node();
+      Clabels.exit, Cfg.node();
     ]
 
   (* -------------------------------------------------------------------------- *)
@@ -380,7 +380,7 @@ struct
         @* [Clabels.init, env @: Clabels.init;
             Clabels.pre, pre_node; Clabels.here, pre_node;
             Clabels.next, post_node; Clabels.post, post_node;
-            Clabels.at_exit, env @: Clabels.at_exit]
+            Clabels.exit, env @: Clabels.exit]
       in
 
       (* TODO: Call inlining. *)
@@ -391,7 +391,7 @@ struct
       @^ result (env_call @* [(Clabels.here, return_node);
                               (Clabels.next, next_node)])
       @^ exit_status (env_call @* [(Clabels.here, exit_stop);
-                                   (Clabels.next, env @: Clabels.at_exit)])
+                                   (Clabels.next, env @: Clabels.exit)])
 
   and call
     : env -> lval option -> exp -> exp list -> paths
@@ -416,7 +416,10 @@ struct
         let here = Sigma.create () in
         let next = Sigma.create () in
         (*TODO: make something of warnings *)
-        let hyp = Lang.F.p_all snd (C.init ~sigma:next vi (Some init)) in
+        let init = C.init ~sigma:next vi (Some init) in
+        let hyp_value = Lang.F.p_all (fun (_, h) -> fst h) init in
+        let hyp_init =  Lang.F.p_all (fun (_, h) -> snd h) init in
+        let hyp = Lang.F.p_and hyp_init hyp_value in
         effect (env @: Clabels.here) (Cfg.E.create {pre=here; post=next} hyp) (env @: Clabels.next)
     | Skip _ | Code_annot _ -> goto (env @: Clabels.here) (env @: Clabels.next)
 
@@ -466,7 +469,7 @@ struct
         (fun acc post -> acc @^ post_cond Exits post_at_exit_env post)
         nop b.b_post_cond
       @^ goto post_normal_behavior  (env @: Clabels.post)
-      @^ goto post_at_exit_behavior (env @: Clabels.at_exit)
+      @^ goto post_at_exit_behavior (env @: Clabels.exit)
     in
     let env = env @* [Clabels.here, env @: Clabels.pre; Clabels.next, env @: Clabels.post] in
     parallel behavior env spec.spec_behavior
@@ -476,7 +479,7 @@ struct
     let lenv = L.mk_env () in (* TODO: lenv for ghost code. *)
     let here = Sigma.create () in
     let authorized_region = L.in_frame frame
-        (L.assigned_of_assigns ~unfold:false lenv) a in
+        (L.assigned_of_assigns lenv) a in
     match authorized_region with
     | None -> goto (env @: Clabels.here) (env @: Clabels.next)
     | Some region ->
@@ -594,7 +597,7 @@ struct
     let next = (a.return_point,Vertex.Set.empty) in
     let wto =
       WTO.partition
-        ?pref:None (* natural loop keep the heads *)
+        ~pref:(fun _ _ -> 0) (* natural loops keep their heads *)
         ~succs:(UnrollUnnatural.G.succ g)
         ~init:here in
 
@@ -669,7 +672,10 @@ struct
     let cfg_init = Globals.Vars.fold_in_file_order
         (fun var initinfo cfg ->
            if var.vstorage = Extern then cfg else
-             let h = Lang.F.p_all snd (C.init ~sigma:sinit var initinfo.init) in
+             let init = C.init ~sigma:sinit var initinfo.init in
+             let hvalue = Lang.F.p_all (fun (_, h) -> fst h) init in
+             let hinit =  Lang.F.p_all (fun (_, h) -> snd h) init in
+             let h = Lang.F.p_and hvalue hinit in
              let h = Cfg.P.create
                  (Cfg.Node.Map.add ninit sinit Cfg.Node.Map.empty)
                  h

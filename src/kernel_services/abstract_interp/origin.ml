@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -67,7 +67,7 @@ let compare o1 o2 = match o1, o2 with
   | Leaf s1, Leaf s2
   | Merge s1, Merge s2
   | Arith s1, Arith s2 ->
-      LocationLattice.compare s1 s2
+    LocationLattice.compare s1 s2
 
   | Well, Well | Unknown, Unknown -> 0
 
@@ -76,14 +76,14 @@ let compare o1 o2 = match o1, o2 with
   | Merge _, (Arith _ | Well | Unknown)
   | Arith _, (Well | Unknown)
   | Well, Unknown ->
-      -1
+    -1
 
   | Unknown, (Well | Arith _ | Merge _ | Leaf _ | Misalign_read _)
   | Well, (Arith _ | Merge _ | Leaf _ | Misalign_read _)
   | Arith _, (Merge _ | Leaf _ | Misalign_read _)
   | Merge _, (Leaf _ | Misalign_read _)
   | Leaf _, Misalign_read _
-      -> 1
+    -> 1
 
 let top = Unknown
 let is_top x = equal top x
@@ -96,15 +96,15 @@ let pretty_source fmt = function
 
 let pretty fmt o = match o with
   | Unknown ->
-      Format.fprintf fmt "Unknown"
+    Format.fprintf fmt "Unknown"
   | Misalign_read o ->
-      Format.fprintf fmt "Misaligned%a" pretty_source o
+    Format.fprintf fmt "Misaligned%a" pretty_source o
   | Leaf o ->
-      Format.fprintf fmt "Library function%a" pretty_source o
+    Format.fprintf fmt "Library function%a" pretty_source o
   | Merge o ->
-      Format.fprintf fmt "Merge%a" pretty_source o
+    Format.fprintf fmt "Merge%a" pretty_source o
   | Arith o ->
-      Format.fprintf fmt "Arithmetic%a" pretty_source o
+    Format.fprintf fmt "Arithmetic%a" pretty_source o
   | Well ->       Format.fprintf fmt "Well"
 
 let pretty_as_reason fmt org =
@@ -139,7 +139,7 @@ include Datatype.Make
       let pretty = pretty
       let varname = Datatype.undefined
       let mem_project = Datatype.never_any_project
-     end)
+    end)
 
 let bottom = Arith(LocationLattice.bottom)
 
@@ -152,17 +152,17 @@ let join o1 o2 =
       | Unknown,_ | _, Unknown -> Unknown
       | Well,_ | _ , Well   -> Well
       | Misalign_read o1, Misalign_read o2 ->
-          Misalign_read(LocationLattice.join o1 o2)
+        Misalign_read(LocationLattice.join o1 o2)
       | _, (Misalign_read _ as m) | (Misalign_read _ as m), _ -> m
       | Leaf o1, Leaf o2 ->
-          Leaf(LocationLattice.join o1 o2)
+        Leaf(LocationLattice.join o1 o2)
       | (Leaf _ as m), _ | _, (Leaf _ as m) -> m
       | Merge o1, Merge o2 ->
-          Merge(LocationLattice.join o1 o2)
+        Merge(LocationLattice.join o1 o2)
       | (Merge _ as m), _ | _, (Merge _ as m) -> m
       | Arith o1, Arith o2 ->
-          Arith(LocationLattice.join o1 o2)
-            (* | (Arith _ as m), _ | _, (Arith _ as m) -> m *)
+        Arith(LocationLattice.join o1 o2)
+        (* | (Arith _ as m), _ | _, (Arith _ as m) -> m *)
   in
   (*  Format.printf "Origin.join %a %a -> %a@." pretty o1 pretty o2 pretty result;
   *)
@@ -175,35 +175,35 @@ let meet o1 o2 =
   then o1
   else
     match o1, o2 with
-      | Arith o1, Arith o2 ->
-          Arith(LocationLattice.meet o1 o2)
-      | (Arith _ as m), _ | _, (Arith _ as m) -> m
-      | Merge o1, Merge o2 ->
-          Merge(LocationLattice.meet o1 o2)
-      | (Merge _ as m), _ | _, (Merge _ as m) -> m
-      | Leaf o1, Leaf o2 ->
-          Leaf(LocationLattice.meet o1 o2)
-      | (Leaf _ as m), _ | _, (Leaf _ as m) -> m
-      | Misalign_read o1, Misalign_read o2 ->
-          Misalign_read(LocationLattice.meet o1 o2)
-      | _, (Misalign_read _ as m) | (Misalign_read _ as m), _ -> m
-      | Well, Well -> Well
-      | Well,m | m, Well -> m
-      | Unknown, Unknown -> Unknown
+    | Arith o1, Arith o2 ->
+      Arith(LocationLattice.meet o1 o2)
+    | (Arith _ as m), _ | _, (Arith _ as m) -> m
+    | Merge o1, Merge o2 ->
+      Merge(LocationLattice.meet o1 o2)
+    | (Merge _ as m), _ | _, (Merge _ as m) -> m
+    | Leaf o1, Leaf o2 ->
+      Leaf(LocationLattice.meet o1 o2)
+    | (Leaf _ as m), _ | _, (Leaf _ as m) -> m
+    | Misalign_read o1, Misalign_read o2 ->
+      Misalign_read(LocationLattice.meet o1 o2)
+    | _, (Misalign_read _ as m) | (Misalign_read _ as m), _ -> m
+    | Well, Well -> Well
+    | Well,m | m, Well -> m
+    | Unknown, Unknown -> Unknown
 
 let narrow o1 o2 =
   if o1 == o2
   then o1
   else
     match o1, o2 with
-      | Arith o1, Arith o2 -> Arith (LocationLattice.narrow o1 o2)
-      | Merge o1, Merge o2 -> Merge (LocationLattice.narrow o1 o2)
-      | Leaf o1, Leaf o2 -> Leaf (LocationLattice.narrow o1 o2)
-      | Misalign_read o1, Misalign_read o2 ->
-          Misalign_read (LocationLattice.narrow o1 o2)
-      | Well, Well -> Well
-      | Unknown, m | m, Unknown -> m
-      | _, _ -> Unknown
+    | Arith o1, Arith o2 -> Arith (LocationLattice.narrow o1 o2)
+    | Merge o1, Merge o2 -> Merge (LocationLattice.narrow o1 o2)
+    | Leaf o1, Leaf o2 -> Leaf (LocationLattice.narrow o1 o2)
+    | Misalign_read o1, Misalign_read o2 ->
+      Misalign_read (LocationLattice.narrow o1 o2)
+    | Well, Well -> Well
+    | Unknown, m | m, Unknown -> m
+    | _, _ -> Unknown
 
 let is_included o1 o2 =
   (equal o1 (meet o1 o2))

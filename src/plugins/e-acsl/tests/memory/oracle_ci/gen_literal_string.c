@@ -18,11 +18,11 @@ void f(void)
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(T + G),
                                                   sizeof(char),(void *)T,
                                                   (void *)(& T));
-    __e_acsl_assert(__gen_e_acsl_valid_read,"RTE","f",
+    __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","f",
                     "mem_access: \\valid_read(T + G)",
                     "tests/memory/literal_string.i",11);
-    __e_acsl_assert((int)*(T + G) == 98,"Assertion","f","*(T + G) == \'b\'",
-                    "tests/memory/literal_string.i",11);
+    __e_acsl_assert((int)*(T + G) == 98,1,"Assertion","f",
+                    "*(T + G) == \'b\'","tests/memory/literal_string.i",11);
   }
   /*@ assert *(T + G) ≡ 'b'; */ ;
   G ++;
@@ -89,6 +89,7 @@ void __e_acsl_globals_clean(void)
   __e_acsl_delete_block((void *)(& S2));
   __e_acsl_delete_block((void *)(& S));
   __e_acsl_delete_block((void *)(& T));
+  return;
 }
 
 int main(void)
@@ -104,17 +105,17 @@ int main(void)
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(S + G2),
                                                   sizeof(char),(void *)S,
                                                   (void *)(& S));
-    __e_acsl_assert(__gen_e_acsl_valid_read,"RTE","main",
+    __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","main",
                     "mem_access: \\valid_read(S + G2)",
                     "tests/memory/literal_string.i",25);
-    __e_acsl_assert((int)*(S + G2) == 111,"Assertion","main",
+    __e_acsl_assert((int)*(S + G2) == 111,1,"Assertion","main",
                     "*(S + G2) == \'o\'","tests/memory/literal_string.i",25);
   }
   /*@ assert *(S + G2) ≡ 'o'; */ ;
   {
     int __gen_e_acsl_initialized;
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)S,sizeof(char));
-    __e_acsl_assert(__gen_e_acsl_initialized,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_initialized,1,"Assertion","main",
                     "\\initialized(S)","tests/memory/literal_string.i",26);
   }
   /*@ assert \initialized(S); */ ;
@@ -123,7 +124,7 @@ int main(void)
     __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)S2,sizeof(char),
                                                     (void *)S2,
                                                     (void *)(& S2));
-    __e_acsl_assert(__gen_e_acsl_valid_read_2,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_valid_read_2,1,"Assertion","main",
                     "\\valid_read(S2)","tests/memory/literal_string.i",27);
   }
   /*@ assert \valid_read(S2); */ ;
@@ -139,7 +140,7 @@ int main(void)
       __gen_e_acsl_and = __gen_e_acsl_valid;
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(! __gen_e_acsl_and,"Assertion","main","!\\valid(SS)",
+    __e_acsl_assert(! __gen_e_acsl_and,1,"Assertion","main","!\\valid(SS)",
                     "tests/memory/literal_string.i",28);
   }
   /*@ assert ¬\valid(SS); */ ;

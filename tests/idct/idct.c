@@ -1,5 +1,5 @@
 /* run.config*
-   GCC:
+   
    DONTRUN:
 */
 /* IDCT: a fixed point IDCT implementation.

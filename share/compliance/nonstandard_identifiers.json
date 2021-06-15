@@ -1,19 +1,20 @@
 {
     "description": "Non-ISO C, Non-POSIX identifiers known to the Frama-C standard library",
     "source":"Manpages, mostly Linux and BSD",
-    "data":[
-        {"ident":"facilitynames", "header":"syslog.h"},
-        {"ident":"getresgid", "header":"unistd.h"},
-        {"ident":"getresuid", "header":"unistd.h"},
-        {"ident":"makedev", "header":"sys/types.h"},
-        {"ident":"option", "header":"getopt.h"},
-        {"ident":"prioritynames", "header":"syslog.h"},
-        {"ident":"setresgid", "header":"unistd.h"},
-        {"ident":"setresuid", "header":"unistd.h"},
-        {"ident":"strcspn", "header":"string.h"},
-        {"ident":"strlcat", "header":"string.h"},
-        {"ident":"strlcpy", "header":"string.h"},
-        {"ident":"wcslcat", "header":"wchar.h"},
-        {"ident":"wcslcpy", "header":"wchar.h"}
-    ]
+    "data":{
+        "facilitynames": {"header":"syslog.h"},
+        "getresgid": {"header":"unistd.h"},
+        "getresuid": {"header":"unistd.h"},
+        "makedev": {"header":"sys/types.h"},
+        "option": {"header":"getopt.h"},
+        "prioritynames": {"header":"syslog.h"},
+        "sendfile": {"header":"sys/sendfile.h"},
+        "setresgid": {"header":"unistd.h"},
+        "setresuid": {"header":"unistd.h"},
+        "strcspn": {"header":"string.h"},
+        "strlcat": {"header":"string.h"},
+        "strlcpy": {"header":"string.h"},
+        "wcslcat": {"header":"wchar.h"},
+        "wcslcpy": {"header":"wchar.h"}
+    }
 }

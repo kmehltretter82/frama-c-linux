@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -300,14 +300,6 @@ let env_only_here state = {
                    contracts *);
 }
 
-(* Return the base and the type corresponding to the logic var if it is within
-   the scope of the supported ones. Fail otherwise. *)
-let c_logic_var lvi =
-  match Logic_utils.unroll_type lvi.lv_type with
-  | Ctype ty when Cil.isIntegralType ty ->
-    (Base.of_c_logic_var lvi), ty
-  | _ -> unsupported_lvar lvi
-
 let top_float =
   let neg_infinity = Fval.F.of_float neg_infinity
   and pos_infinity = Fval.F.of_float infinity in
@@ -322,26 +314,46 @@ let bind_logic_vars env lvs =
     match Logic_utils.unroll_type lv.lv_type with
     | Linteger -> bind_logic_var Ival.top
     | Lreal -> bind_logic_var top_float
-    | _ ->
-      try
-        let b, cty = c_logic_var lv in
-        let size = Int.of_int (Cil.bitsSizeOf cty) in
-        let v = Cvalue.V_Or_Uninitialized.initialized V.top_int in
-        let state = Model.add_base_value b ~size v ~size_v:Int.one state in
-        state, logic_vars
-      with Cil.SizeOfError _ -> unsupported_lvar lv
+    | Ctype ctyp when Cil.isIntegralType ctyp ->
+      let base = Base.of_c_logic_var lv in
+      let size = Int.of_int (Cil.bitsSizeOf ctyp) in
+      let v = Cvalue.V_Or_Uninitialized.initialized V.top_int in
+      let state = Model.add_base_value base ~size v ~size_v:Int.one state in
+      state, logic_vars
+    | _ -> unsupported_lvar lv
   in
   let state = env_current_state env in
   let state, logic_vars = List.fold_left bind_one (state, env.logic_vars) lvs in
   overwrite_current_state { env with logic_vars } state
 
+let copy_logic_vars ~src ~dst lvars =
+  let copy_one env lvar =
+    match Logic_utils.unroll_type lvar.lv_type with
+    | Linteger | Lreal ->
+      let value = LogicVarEnv.find lvar src.logic_vars in
+      let logic_vars = LogicVarEnv.add lvar value env.logic_vars in
+      { env with logic_vars }
+    | Ctype _ ->
+      begin
+        let base = Base.of_c_logic_var lvar in
+        match Model.find_base base (env_current_state src) with
+        | `Bottom | `Top -> env
+        | `Value offsm ->
+          let state = Model.add_base base offsm (env_current_state env) in
+          overwrite_current_state env state
+      end
+    | _ -> unsupported_lvar lvar
+  in
+  List.fold_left copy_one dst lvars
+
 let unbind_logic_vars env lvs =
   let unbind_one (state, logic_vars) lv =
     match Logic_utils.unroll_type lv.lv_type with
     | Linteger | Lreal -> state, LogicVarEnv.remove lv logic_vars
-    | _ ->
-      let b, _ = c_logic_var lv in
-      Model.remove_base b state, logic_vars
+    | Ctype _ ->
+      let base = Base.of_c_logic_var lv in
+      Model.remove_base base state, logic_vars
+    | _ -> unsupported_lvar lv
   in
   let state = env_current_state env in
   let state, logic_vars = List.fold_left unbind_one (state, env.logic_vars) lvs in
@@ -548,7 +560,7 @@ let constraint_trange idx size_arr =
     match idx.term_node with
     | Trange ((None as low), up) | Trange (low, (None as up)) -> begin
         let loc = idx.term_loc in
-        match Extlib.opt_bind Cil.constFoldToInt size_arr with
+        match Option.bind size_arr Cil.constFoldToInt with
         | None -> idx
         | Some size ->
           let low = match low with (* constrained l.h.s *)
@@ -568,28 +580,20 @@ let constraint_trange idx size_arr =
 
 (* Applies a cvalue [builtin] to the list of arguments [args_list] in the
    current state of [env]. Returns [v, alarms], where [v] is the resulting
-   cvalue, or [None] if the builtin leads to [bottom]. *)
+   cvalue, which can be bottom. *)
 let apply_logic_builtin builtin env args_list =
   (* the call below could in theory return Builtins.Invalid_nb_of_args,
      but logic typing constraints prevent that. *)
-  let res, alarms = builtin (env_current_state env) args_list in
-  match res with
-  | None -> None
-  | Some offsm ->
-    let v = Extlib.the (Cvalue.V_Offsetmap.single_interval_value offsm) in
-    let v = Cvalue.V_Or_Uninitialized.get_v v in
-    Some (v, alarms)
+  builtin (env_current_state env) args_list
 
 (* Never raises exceptions; instead, returns [-1,+oo] in case of alarms
    (most imprecise result possible for the logic strlen/wcslen predicates). *)
 let eval_logic_charlen wrapper env v ldeps =
   let eover =
-    match apply_logic_builtin wrapper env [v] with
-    | None -> Cvalue.V.bottom
-    | Some (v, alarms) ->
-      if alarms
-      then Cvalue.V.inject_ival (Ival.inject_range (Some Int.minus_one) None)
-      else v
+    let v, alarms = apply_logic_builtin wrapper env [v] in
+    if alarms && not (Cvalue.V.is_bottom v)
+    then Cvalue.V.inject_ival (Ival.inject_range (Some Int.minus_one) None)
+    else v
   in
   let eunder = under_from_over eover in
   (* the C strlen function has type size_t, but the logic strlen function has
@@ -600,19 +604,16 @@ let eval_logic_charlen wrapper env v ldeps =
 (* Evaluates the logical predicates strchr/wcschr. *)
 let eval_logic_charchr builtin env s c ldeps_s ldeps_c =
   let eover =
-    match apply_logic_builtin builtin env [s; c] with
-    | None -> Cvalue.V.bottom
-    | Some (r, alarms) ->
-      if alarms
-      then Cvalue.V.zero_or_one
-      else
-        let ctrue = Cvalue.V.contains_non_zero r
-        and cfalse = Cvalue.V.contains_zero r in
-        match ctrue, cfalse with
-        | true, true -> Cvalue.V.zero_or_one
-        | true, false -> Cvalue.V.singleton_one
-        | false, true -> Cvalue.V.singleton_zero
-        | false, false -> assert false (* a logic alarm would have been raised*)
+    let v, alarms = apply_logic_builtin builtin env [s; c] in
+    if Cvalue.V.is_bottom v then v else
+    if alarms then Cvalue.V.zero_or_one else
+      let ctrue = Cvalue.V.contains_non_zero v
+      and cfalse = Cvalue.V.contains_zero v in
+      match ctrue, cfalse with
+      | true, true -> Cvalue.V.zero_or_one
+      | true, false -> Cvalue.V.singleton_one
+      | false, true -> Cvalue.V.singleton_zero
+      | false, false -> assert false (* a logic alarm would have been raised*)
   in
   let eunder = under_from_over eover in
   (* the C strchr function has type char*, but the logic strchr predicate has
@@ -629,11 +630,12 @@ let eval_logic_memchr_off builtin env s c n =
   let n_pos = Cvalue.V.narrow positive pred_n in
   let eover =
     if Cvalue.V.is_bottom n_pos then minus_one else
-      match apply_logic_builtin builtin env [s.eover; c.eover; n_pos] with
-      | None -> pred_n
-      | Some (v, alarms) ->
-        if alarms then Cvalue.V.join pred_n v else
-        if Cvalue.V.equal n_pos pred_n then v else Cvalue.V.join minus_one v
+      let args = [s.eover; c.eover; n_pos] in
+      let v, alarms = apply_logic_builtin builtin env args in
+      if Cvalue.V.is_bottom v then pred_n else
+      if alarms then Cvalue.V.join pred_n v else
+      if Cvalue.V.equal n_pos pred_n then v else
+        Cvalue.V.join minus_one v
   in
   let ldeps = join_logic_deps s.ldeps (join_logic_deps c.ldeps n.ldeps) in
   { (einteger eover) with ldeps }
@@ -654,11 +656,11 @@ let eval_is_allocable size =
 (* returns true iff the logic variable is defined by the
    Frama-C standard library *)
 let comes_from_fc_stdlib lvar =
-  Cil.hasAttribute "fc_stdlib" lvar.lv_attr ||
+  Cil.is_in_libc lvar.lv_attr ||
   match lvar.lv_origin with
   | None -> false
   | Some vi ->
-    Cil.hasAttribute "fc_stdlib" vi.vattr
+    Cil.is_in_libc vi.vattr
 
 (* As usual in this file, [dst_typ] may be misleading: the 'size' is
    meaningless, because [src_typ] may actually be a logic type. Thus,
@@ -735,6 +737,7 @@ let known_logic_funs = [
 let known_predicates = [
   "\\warning", ACSL;
   "\\is_finite", ACSL;
+  "\\is_infinite", ACSL;
   "\\is_plus_infinity", ACSL;
   "\\is_minus_infinity", ACSL;
   "\\is_NaN", ACSL;
@@ -1168,9 +1171,15 @@ and eval_binop ~alarm_mode env op t1 t2 =
 
 and eval_tlhost ~alarm_mode env lv =
   match lv with
-  | TVar { lv_origin = Some v } ->
-    let loc = Location_Bits.inject (Base.of_varinfo v) Ival.zero in
-    { etype = v.vtype;
+  | TVar lvar ->
+    let base, typ =
+      match lvar.lv_origin, Logic_utils.unroll_type lvar.lv_type with
+      | Some v, _ -> Base.of_varinfo v, v.vtype
+      | None, Ctype typ -> Base.of_c_logic_var lvar, typ
+      | _ -> unsupported_lvar lvar
+    in
+    let loc = Location_Bits.inject base Ival.zero in
+    { etype = typ;
       ldeps = empty_logic_deps;
       eover = loc;
       eunder = under_loc_from_over loc;
@@ -1184,14 +1193,6 @@ and eval_tlhost ~alarm_mode env lv =
          eunder = loc; eover = loc;
          empty = false; }
      | None -> no_result ())
-  | TVar ({ lv_origin = None } as tlv) ->
-    let b, ty = c_logic_var tlv in
-    let loc = Location_Bits.inject b Ival.zero in
-    { etype = ty;
-      ldeps = empty_logic_deps;
-      eover = loc;
-      eunder = under_loc_from_over loc;
-      empty = false; }
   | TMem t ->
     let r = eval_term ~alarm_mode env t in
     let tres = match Cil.unrollType r.etype with
@@ -1250,7 +1251,7 @@ and eval_toffset ~alarm_mode env typ toffset =
 
   | TField (fi, remaining) ->
     let size_current default =
-      try Ival.of_int (fst (Cil.bitsOffset typ (Field(fi, NoOffset))))
+      try Ival.of_int (fst (Cil.fieldBitsOffset fi))
       with Cil.SizeOfError _ -> default
     in
     let attrs = Cil.filter_qualifier_attributes (Cil.typeAttrs typ) in
@@ -1681,12 +1682,12 @@ let eval_valid_read_str ~wide env v =
     if wide then Builtins_string.frama_c_wcslen_wrapper
     else Builtins_string.frama_c_strlen_wrapper
   in
-  match apply_logic_builtin wrapper env [v] with
-  | None -> (* bottom state => string always invalid *) False
-  | Some (_res, alarms) ->
-    if alarms
-    then (* alarm => string possibly invalid *) Unknown
-    else (* no alarm => string always valid for reading *) True
+  let v, alarms = apply_logic_builtin wrapper env [v] in
+  if Cvalue.V.is_bottom v
+  then False (* bottom state => string always invalid *)
+  else if alarms
+  then Unknown (* alarm => string possibly invalid *)
+  else True (* no alarm => string always valid for reading *)
 
 (* Evaluates a [valid_string] or [valid_wstring] predicate.
    First, we check the constness of the arguments.
@@ -2036,6 +2037,8 @@ let reduce_by_known_papp ~alarm_mode env positive li _labels args =
   match li.l_var_info.lv_name, args with
   | "\\is_finite", [arg] ->
     reduce_float (Fval.backward_is_finite ~positive) arg
+  | "\\is_infinite", [arg] ->
+    reduce_float (Fval.backward_is_infinite ~positive) arg
   | "\\is_plus_infinity", [arg] ->
     reduce_float (reduce_by_infinity ~pos:true) arg
   | "\\is_minus_infinity", [arg] ->
@@ -2427,14 +2430,32 @@ and eval_predicate env pred =
 
     | Pforall (varl, p') | Pexists (varl, p') ->
       begin
-        try
-          let env = bind_logic_vars env varl in
-          let r = do_eval env p' in
-          match p.pred_content with
-          | Pexists _ -> if r = False then False else Unknown
-          | Pforall _ -> if r = True then True else Unknown
-          | _ -> assert false
-        with LogicEvalError _ee -> Unknown (* No error display? *)
+        (* If [p'] is true (or false) for all possible values of [varl],
+           then so is Pforall(varl, p') and Pexists(varl, p'). *)
+        let env = bind_logic_vars env varl in
+        let r = do_eval env p' in
+        if r <> Unknown then r else
+          (* Otherwise:
+             - if [p'] evaluates to [false] for at least some values of [varl],
+               then Pforall (varl, p') is false.
+             - if [p'] evaluates to [true] for at least some values of [varl],
+               then Pexists (varl, p') is true.
+
+             In order to find such values, we reduce the environment by assuming
+             [p'] is true (for Pexists) or false (for Pforall), and then we
+             reevaluate [p'] with these values. *)
+          let positive =
+            match p.pred_content with Pforall _ -> false | _ -> true
+          in
+          let reduced_env = reduce_by_predicate ~alarm_mode env positive p' in
+          (* Reduce the values of logical variables [varl] in [env] according to
+             [reduced_env]. To be more precise, we could reduce them to
+             singleton values — for instance by using the interval bounds. *)
+          let env = copy_logic_vars ~src:reduced_env ~dst:env varl in
+          match p.pred_content, do_eval env p' with
+          | Pexists _, True -> True
+          | Pforall _, False -> False
+          | _ -> Unknown
       end
 
     | Pnot p ->  begin match do_eval env p with
@@ -2537,6 +2558,7 @@ and eval_predicate env pred =
     in
     match li.l_var_info.lv_name, args with
     | "\\is_finite", [arg] -> unary_float Fval.is_finite arg
+    | "\\is_infinite", [arg] -> unary_float Fval.is_infinite arg
     | "\\is_plus_infinity", [arg] ->
       let pos_inf = Fval.pos_infinity Float_sig.Single in
       unary_float (fun f -> Fval.forward_comp Comp.Eq f pos_inf) arg

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -29,24 +29,24 @@ type callback_state =
   | Unit_callback of (unit -> unit)
   | Bool_callback of (bool -> unit) * (unit -> bool)
 
-type entry = 
+type entry =
   { e_where: where;
     e_callback: callback_state;
     e_sensitive: unit -> bool }
 
-let toolbar 
-    ?(sensitive=(fun _ -> true)) ~icon ~label ?(tooltip=label) callback = 
+let toolbar
+    ?(sensitive=(fun _ -> true)) ~icon ~label ?(tooltip=label) callback =
   { e_where = Toolbar (icon, label, tooltip);
     e_callback = callback;
     e_sensitive = sensitive }
 
-let menubar ?(sensitive=(fun _ -> true)) ?icon text callback = 
+let menubar ?(sensitive=(fun _ -> true)) ?icon text callback =
   { e_where = Menubar (icon, text);
     e_callback = callback;
     e_sensitive = sensitive }
 
-let toolmenubar 
-    ?(sensitive=(fun _ -> true)) ~icon ~label ?(tooltip=label) callback = 
+let toolmenubar
+    ?(sensitive=(fun _ -> true)) ~icon ~label ?(tooltip=label) callback =
   { e_where = ToolMenubar (icon, label, tooltip);
     e_callback = callback;
     e_sensitive = sensitive }
@@ -88,10 +88,10 @@ class item ?menu ?menu_item ?button group = object (self)
     match button with Some b -> Some (bt_type_as_skel b) | None -> None
 
   method add_accelerator modifier c =
-    Extlib.may
+    Option.iter
       (fun (i : GMenu.menu_item_skel) ->
          i#add_accelerator
-           ~group ~flags:[ `VISIBLE ] ~modi:[ modifier ] (int_of_char c)) 
+           ~group ~flags:[ `VISIBLE ] ~modi:[ modifier ] (int_of_char c))
       self#menu_item_skel
 
   method menu: GMenu.menu option = menu
@@ -112,7 +112,7 @@ let add_submenu container ~pos label =
 external set_menu :  Obj.t -> unit = "ige_mac_menu_set_menu_bar"
 *)
 
-class menu_manager ?packing ~host:(_:Gtk_helper.host) =
+class menu_manager ?packing (_:Gtk_helper.host) =
   let menubar = GMenu.menu_bar ?packing () in
   (*  let () = set_menu (Obj.field (Obj.repr ((menubar)#as_widget)) 1) in *)
   let factory = new GMenu.factory menubar in
@@ -138,11 +138,11 @@ class menu_manager ?packing ~host:(_:Gtk_helper.host) =
       let items = self#add_entries ?title (snd debug_item_and_menu) entries in
       let action item =
         if show () then begin
-          Extlib.may (fun i -> i#misc#show ()) item#menu_item;
-          Extlib.may (fun i -> i#misc#show ()) item#tool_button
+          Option.iter (fun i -> i#misc#show ()) item#menu_item;
+          Option.iter (fun i -> i#misc#show ()) item#tool_button
         end else begin
-          Extlib.may (fun i -> i#misc#hide ()) item#menu_item;
-          Extlib.may (fun i -> i#misc#hide ()) item#tool_button
+          Option.iter (fun i -> i#misc#hide ()) item#menu_item;
+          Option.iter (fun i -> i#misc#hide ()) item#tool_button
         end
       in
       let l = List.rev debug_actions in
@@ -198,23 +198,23 @@ class menu_manager ?packing ~host:(_:Gtk_helper.host) =
 *)
         let b = match callback with
           | Unit_callback callback ->
-              let b = GButton.tool_button
-                  ~label:tooltip ~stock ~packing:toolbar_packing ()
-              in
-              b#set_label label;
-              ignore (b#connect#clicked ~callback);
-              BStandard b
+            let b = GButton.tool_button
+                ~label:tooltip ~stock ~packing:toolbar_packing ()
+            in
+            b#set_label label;
+            ignore (b#connect#clicked ~callback);
+            BStandard b
           | Bool_callback (callback, active) ->
-              let b = GButton.toggle_tool_button
-                  ~active:(active ()) ~label:tooltip ~stock
-                  ~packing:toolbar_packing ()
-              in
-              b#set_label tooltip;
-              ignore (b#connect#toggled
-                        ~callback:(fun () -> callback b#get_active));
-              set_active_states <-
-                (fun () -> b#set_active (active ())) :: set_active_states;
-              BToggle b
+            let b = GButton.toggle_tool_button
+                ~active:(active ()) ~label:tooltip ~stock
+                ~packing:toolbar_packing ()
+            in
+            b#set_label tooltip;
+            ignore (b#connect#toggled
+                      ~callback:(fun () -> callback b#get_active));
+            set_active_states <-
+              (fun () -> b#set_active (active ())) :: set_active_states;
+            BToggle b
         in
         (bt_type_as_skel b)#misc#set_tooltip_text tooltip;
         toolbar_buttons <- (b, sensitive) :: toolbar_buttons;
@@ -234,8 +234,8 @@ class menu_manager ?packing ~host:(_:Gtk_helper.host) =
             (match title with
              | None -> container_packing, container
              | Some s ->
-                 let sub = snd (add_submenu container ~pos:!menu_pos s) in
-                 (fun w -> sub#append w), sub
+               let sub = snd (add_submenu container ~pos:!menu_pos s) in
+               (fun w -> sub#append w), sub
             )
         in
         lazy (fst !!aux), lazy (snd !!aux)
@@ -248,24 +248,24 @@ class menu_manager ?packing ~host:(_:Gtk_helper.host) =
       let add_item_menu stock_opt label callback sensitive =
         let item = match stock_opt, callback with
           | None, Unit_callback callback ->
-              let mi = GMenu.menu_item ~packing:!!menubar_packing ~label () in
-              ignore (mi#connect#activate callback);
-              MStandard mi
+            let mi = GMenu.menu_item ~packing:!!menubar_packing ~label () in
+            ignore (mi#connect#activate callback);
+            MStandard mi
           | Some stock, Unit_callback callback ->
-              let image = (GMisc.image ~stock ~xalign:0. () :> GObj.widget) in
-              let text = label in
-              let packing = !!menubar_packing in
-              let mi = Gtk_helper.image_menu_item ~image ~text ~packing in
-              ignore (mi#connect#activate callback);
-              MStandard mi
+            let image = (GMisc.image ~stock ~xalign:0. () :> GObj.widget) in
+            let text = label in
+            let packing = !!menubar_packing in
+            let mi = Gtk_helper.image_menu_item ~image ~text ~packing in
+            ignore (mi#connect#activate callback);
+            MStandard mi
           | _, Bool_callback (callback, active) ->
-              let mi = GMenu.check_menu_item
-                  ~packing:!!menubar_packing ~label ~active:(active ()) ()
-              in
-              ignore (mi#connect#activate (fun () -> callback mi#active));
-              set_active_states <-
-                (fun () -> mi#set_active (active ())) :: set_active_states;
-              MCheck mi
+            let mi = GMenu.check_menu_item
+                ~packing:!!menubar_packing ~label ~active:(active ()) ()
+            in
+            ignore (mi#connect#activate (fun () -> callback mi#active));
+            set_active_states <-
+              (fun () -> mi#set_active (active ())) :: set_active_states;
+            MCheck mi
         in
         menubar_items <- (item, sensitive) :: menubar_items;
         item
@@ -278,15 +278,15 @@ class menu_manager ?packing ~host:(_:Gtk_helper.host) =
       let add_item { e_where = kind; e_callback = callback; e_sensitive = sensitive} =
         match kind with
         | Toolbar(stock, label, tooltip) ->
-            let button = add_item_toolbar stock label tooltip callback sensitive in
-            new item ~button factory#accel_group
+          let button = add_item_toolbar stock label tooltip callback sensitive in
+          new item ~button factory#accel_group
         | Menubar(stock_opt, label) ->
-            let menu_item = add_item_menu stock_opt label callback sensitive in
-            new item ~menu:!!in_menu ~menu_item factory#accel_group
+          let menu_item = add_item_menu stock_opt label callback sensitive in
+          new item ~menu:!!in_menu ~menu_item factory#accel_group
         | ToolMenubar(stock, label, tooltip) ->
-            let button = add_item_toolbar stock label tooltip callback sensitive in
-            let menu_item = add_item_menu (Some stock) label callback sensitive in
-            new item ~menu:!!in_menu ~menu_item ~button factory#accel_group
+          let button = add_item_toolbar stock label tooltip callback sensitive in
+          let menu_item = add_item_menu (Some stock) label callback sensitive in
+          new item ~menu:!!in_menu ~menu_item ~button factory#accel_group
       in
       let edit_menubar =
         List.exists

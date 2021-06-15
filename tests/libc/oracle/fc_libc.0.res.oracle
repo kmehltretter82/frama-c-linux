@@ -4,16 +4,16 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] tests/libc/fc_libc.c:155: assertion got status valid.
-[eva] tests/libc/fc_libc.c:156: assertion got status valid.
-[eva] tests/libc/fc_libc.c:157: assertion got status valid.
-[eva] tests/libc/fc_libc.c:158: assertion got status valid.
+[eva] tests/libc/fc_libc.c:160: assertion got status valid.
+[eva] tests/libc/fc_libc.c:161: assertion got status valid.
+[eva] tests/libc/fc_libc.c:162: assertion got status valid.
+[eva] tests/libc/fc_libc.c:163: assertion got status valid.
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   
-[metrics] Defined functions (83)
+[metrics] Defined functions (84)
   ======================
    Frama_C_abort (1 call); Frama_C_char_interval (1 call);
    Frama_C_double_interval (0 call); Frama_C_float_interval (0 call);
@@ -34,14 +34,14 @@
    posix_memalign (0 call); putenv (0 call); realpath (0 call);
    res_search (1 call); setenv (0 call); setlocale (0 call);
    strcasecmp (0 call); strcat (0 call); strchr (3 calls); strcmp (0 call);
-   strcpy (0 call); strdup (0 call); strerror (0 call); strlen (6 calls);
+   strcpy (1 call); strdup (0 call); strerror (0 call); strlen (6 calls);
    strncat (0 call); strncmp (0 call); strncpy (2 calls); strndup (0 call);
    strnlen (0 call); strrchr (0 call); strsignal (0 call); strstr (0 call);
    tolower (0 call); toupper (0 call); unsetenv (0 call); wcscat (0 call);
-   wcscpy (0 call); wcslen (2 calls); wcsncat (0 call); wcsncpy (0 call);
-   wmemcpy (0 call); wmemset (0 call); 
+   wcscpy (0 call); wcsdup (0 call); wcslen (3 calls); wcsncat (0 call);
+   wcsncpy (0 call); wmemcpy (1 call); wmemset (0 call); 
   
-  Specified-only functions (411)
+  Specified-only functions (422)
   ==============================
    FD_CLR (0 call); FD_ISSET (0 call); FD_SET (0 call); FD_ZERO (0 call);
    Frama_C_int_interval (0 call); Frama_C_long_interval (0 call);
@@ -75,10 +75,10 @@
    acoshf (0 call); acoshl (0 call); acosl (0 call); alloca (0 call);
    asctime (0 call); asin (0 call); asinf (0 call); asinl (0 call);
    at_quick_exit (0 call); atan (0 call); atan2 (0 call); atan2f (0 call);
-   atanf (0 call); atanl (0 call); atexit (0 call); atof (0 call);
-   atol (0 call); atoll (0 call); basename (0 call); bind (0 call);
-   bsearch (0 call); bzero (0 call); ceil (0 call); ceilf (0 call);
-   ceill (0 call); cfgetispeed (0 call); cfgetospeed (0 call);
+   atan2l (0 call); atanf (0 call); atanl (0 call); atexit (0 call);
+   atof (0 call); atol (0 call); atoll (0 call); basename (0 call);
+   bind (0 call); bsearch (0 call); bzero (0 call); ceil (0 call);
+   ceilf (0 call); ceill (0 call); cfgetispeed (0 call); cfgetospeed (0 call);
    cfsetispeed (0 call); cfsetospeed (0 call); chdir (0 call); chown (0 call);
    chroot (0 call); clearerr (0 call); clearerr_unlocked (0 call);
    clock (0 call); clock_gettime (0 call); clock_nanosleep (0 call);
@@ -95,8 +95,9 @@
    flockfile (0 call); floor (0 call); floorf (0 call); floorl (0 call);
    fmod (0 call); fmodf (0 call); fopen (0 call); fork (0 call);
    fputc (0 call); fputs (0 call); fread (0 call); free (1 call);
-   freeaddrinfo (0 call); freopen (0 call); fseek (0 call); fseeko (0 call);
-   fsetpos (0 call); ftell (0 call); ftello (0 call); ftrylockfile (0 call);
+   freeaddrinfo (0 call); freopen (0 call); frexp (0 call); frexpf (0 call);
+   frexpl (0 call); fseek (0 call); fseeko (0 call); fsetpos (0 call);
+   ftell (0 call); ftello (0 call); ftrylockfile (0 call);
    funlockfile (0 call); fwrite (0 call); gai_strerror (0 call); getc (0 call);
    getc_unlocked (0 call); getchar (0 call); getchar_unlocked (0 call);
    getcwd (0 call); getegid (0 call); geteuid (0 call); getgid (0 call);
@@ -111,21 +112,21 @@
    iconv_open (0 call); inet_addr (2 calls); inet_ntoa (0 call);
    inet_ntop (0 call); inet_pton (0 call); isascii (0 call); isatty (0 call);
    jrand48 (0 call); kill (0 call); killpg (0 call); labs (0 call);
-   lcong48 (0 call); ldiv (0 call); listen (0 call); llabs (0 call);
-   lldiv (0 call); localtime (0 call); log (0 call); log10 (0 call);
-   log10f (0 call); log10l (0 call); log2 (0 call); log2f (0 call);
-   log2l (0 call); logf (0 call); logl (0 call); longjmp (0 call);
-   lrand48 (0 call); lseek (0 call); lstat (0 call); makedev (0 call);
-   malloc (8 calls); mblen (0 call); mbstowcs (0 call); mbtowc (0 call);
-   mkdir (0 call); mkfifo (0 call); mknod (0 call); mkstemp (0 call);
-   mktime (0 call); mrand48 (0 call); nan (0 call); nanf (0 call);
-   nanl (0 call); nanosleep (0 call); nrand48 (0 call); ntohl (0 call);
-   ntohs (0 call); open (0 call); openat (0 call); opendir (0 call);
-   openlog (0 call); pathconf (0 call); pclose (0 call); perror (0 call);
-   pipe (0 call); poll (0 call); popen (0 call); pow (0 call); powf (0 call);
-   pthread_cond_broadcast (0 call); pthread_cond_destroy (0 call);
-   pthread_cond_init (0 call); pthread_cond_wait (0 call);
-   pthread_create (0 call); pthread_join (0 call);
+   lcong48 (0 call); ldexp (0 call); ldexpf (0 call); ldiv (0 call);
+   listen (0 call); llabs (0 call); lldiv (0 call); localtime (0 call);
+   log (0 call); log10 (0 call); log10f (0 call); log10l (0 call);
+   log2 (0 call); log2f (0 call); log2l (0 call); logf (0 call); logl (0 call);
+   longjmp (0 call); lrand48 (0 call); lseek (0 call); lstat (0 call);
+   makedev (0 call); malloc (10 calls); mblen (0 call); mbstowcs (0 call);
+   mbtowc (0 call); mkdir (0 call); mkfifo (0 call); mknod (0 call);
+   mkstemp (0 call); mktime (0 call); mrand48 (0 call); nan (0 call);
+   nanf (0 call); nanl (0 call); nanosleep (0 call); nrand48 (0 call);
+   ntohl (0 call); ntohs (0 call); open (0 call); openat (0 call);
+   opendir (0 call); openlog (0 call); pathconf (0 call); pclose (0 call);
+   perror (0 call); pipe (0 call); poll (0 call); popen (0 call); pow (0 call);
+   powf (0 call); pthread_cond_broadcast (0 call);
+   pthread_cond_destroy (0 call); pthread_cond_init (0 call);
+   pthread_cond_wait (0 call); pthread_create (0 call); pthread_join (0 call);
    pthread_mutex_destroy (0 call); pthread_mutex_init (0 call);
    pthread_mutex_lock (0 call); pthread_mutex_unlock (0 call);
    pthread_mutexattr_destroy (0 call); pthread_mutexattr_init (0 call);
@@ -133,11 +134,12 @@
    putchar (0 call); putchar_unlocked (0 call); puts (0 call); qsort (0 call);
    quick_exit (0 call); raise (0 call); rand (0 call); random (0 call);
    read (0 call); readdir (0 call); readv (0 call); realloc (3 calls);
-   recv (0 call); recvmsg (0 call); remove (0 call); rename (0 call);
-   rewind (0 call); round (0 call); roundf (0 call); roundl (0 call);
-   seed48 (0 call); select (0 call); send (0 call); setbuf (0 call);
-   setegid (0 call); seteuid (0 call); setgid (0 call); sethostname (0 call);
-   setitimer (0 call); setjmp (0 call); setlogmask (0 call); setpgid (0 call);
+   recv (0 call); recvfrom (0 call); recvmsg (0 call); remove (0 call);
+   rename (0 call); rewind (0 call); round (0 call); roundf (0 call);
+   roundl (0 call); seed48 (0 call); select (0 call); send (0 call);
+   sendfile (0 call); sendto (0 call); setbuf (0 call); setegid (0 call);
+   seteuid (0 call); setgid (0 call); sethostname (0 call); setitimer (0 call);
+   setjmp (0 call); setlogmask (0 call); setpgid (0 call);
    setpriority (0 call); setregid (0 call); setresgid (0 call);
    setresuid (0 call); setreuid (0 call); setrlimit (0 call); setsid (0 call);
    setsockopt (0 call); settimeofday (0 call); setuid (0 call);
@@ -145,37 +147,40 @@
    sigdelset (0 call); sigemptyset (0 call); sigfillset (0 call);
    sigismember (0 call); siglongjmp (0 call); signal (0 call);
    sigprocmask (0 call); sin (0 call); sinf (0 call); sinl (0 call);
-   socket (0 call); socketpair (0 call); sqrt (0 call); sqrtf (0 call);
-   sqrtl (0 call); srand (0 call); srand48 (0 call); srandom (0 call);
-   stat (0 call); stpcpy (0 call); strcasestr (0 call); strchrnul (0 call);
-   strcoll (0 call); strcspn (0 call); strftime (0 call); strlcat (0 call);
-   strlcpy (0 call); strncasecmp (0 call); strpbrk (0 call); strsep (0 call);
-   strspn (0 call); strtod (0 call); strtof (0 call); strtoimax (0 call);
-   strtok (0 call); strtok_r (0 call); strtol (0 call); strtold (0 call);
-   strtoll (0 call); strtoul (0 call); strtoull (0 call); strxfrm (0 call);
-   sync (0 call); sysconf (0 call); syslog (0 call); system (0 call);
-   tcflush (0 call); tcgetattr (0 call); tcsetattr (0 call); time (0 call);
-   times (0 call); tmpfile (0 call); tmpnam (0 call); trunc (0 call);
-   truncf (0 call); truncl (0 call); ttyname (0 call); tzset (0 call);
-   umask (0 call); uname (0 call); ungetc (0 call); unlink (0 call);
-   usleep (0 call); utimes (0 call); vfprintf (0 call); vfscanf (0 call);
-   vprintf (0 call); vscanf (0 call); vsnprintf (0 call); vsprintf (0 call);
-   vsyslog (0 call); wait (0 call); waitpid (0 call); wcschr (0 call);
-   wcscmp (0 call); wcscspn (0 call); wcslcat (0 call); wcslcpy (0 call);
-   wcsncmp (0 call); wcspbrk (0 call); wcsrchr (0 call); wcsspn (0 call);
-   wcsstr (0 call); wcstombs (0 call); wctomb (0 call); wmemchr (0 call);
-   wmemcmp (0 call); wmemmove (0 call); write (0 call); 
+   sleep (0 call); socket (0 call); socketpair (0 call); sqrt (0 call);
+   sqrtf (0 call); sqrtl (0 call); srand (0 call); srand48 (0 call);
+   srandom (0 call); stat (0 call); stpcpy (0 call); strcasestr (0 call);
+   strchrnul (0 call); strcoll (0 call); strcspn (0 call); strftime (0 call);
+   strlcat (0 call); strlcpy (0 call); strncasecmp (0 call); strpbrk (0 call);
+   strsep (0 call); strspn (0 call); strtod (0 call); strtof (0 call);
+   strtoimax (0 call); strtok (0 call); strtok_r (0 call); strtol (0 call);
+   strtold (0 call); strtoll (0 call); strtoul (0 call); strtoull (0 call);
+   strxfrm (0 call); sync (0 call); sysconf (0 call); syslog (0 call);
+   system (0 call); tcflush (0 call); tcgetattr (0 call); tcsetattr (0 call);
+   time (0 call); times (0 call); tmpfile (0 call); tmpnam (0 call);
+   trunc (0 call); truncf (0 call); truncl (0 call); ttyname (0 call);
+   tzset (0 call); umask (0 call); uname (0 call); ungetc (0 call);
+   unlink (0 call); usleep (0 call); utimes (0 call); vfprintf (0 call);
+   vfscanf (0 call); vprintf (0 call); vscanf (0 call); vsnprintf (0 call);
+   vsprintf (0 call); vsyslog (0 call); wait (0 call); waitpid (0 call);
+   wcscasecmp (0 call); wcschr (0 call); wcscmp (0 call); wcscspn (0 call);
+   wcslcat (0 call); wcslcpy (0 call); wcsncmp (0 call); wcspbrk (0 call);
+   wcsrchr (0 call); wcsspn (0 call); wcsstr (0 call); wcstombs (0 call);
+   wctomb (0 call); wmemchr (0 call); wmemcmp (0 call); wmemmove (0 call);
+   write (0 call); 
   
   Undefined and unspecified functions (1)
   =======================================
    __builtin_abort (1 call); 
   
-  'Extern' global variables (16)
+  'Extern' global variables (21)
   ==============================
    __fc_basename; __fc_dirname; __fc_getpwuid_pw_dir; __fc_getpwuid_pw_name;
-   __fc_getpwuid_pw_passwd; __fc_getpwuid_pw_shell; __fc_hostname; __fc_locale;
-   __fc_locale_names; __fc_mblen_state; __fc_mbtowc_state; __fc_wctomb_state;
-   optarg; opterr; optopt; tzname
+   __fc_getpwuid_pw_passwd; __fc_getpwuid_pw_shell; __fc_heap_status;
+   __fc_hostname; __fc_locale; __fc_locale_names; __fc_mblen_state;
+   __fc_mbtowc_state; __fc_random_counter; __fc_socket_counter;
+   __fc_stack_status; __fc_tz; __fc_wctomb_state; optarg; opterr; optopt;
+   tzname
   
   Potential entry points (1)
   ==========================
@@ -183,18 +188,21 @@
   
   Global metrics
   ============== 
-  Sloc = 1127
-  Decision point = 213
-  Global variables = 70
-  If = 198
+  Sloc = 1145
+  Decision point = 215
+  Global variables = 86
+  If = 200
   Loop = 43
-  Goto = 97
-  Assignment = 459
-  Exit point = 83
-  Function = 495
-  Function call = 93
-  Pointer dereferencing = 159
-  Cyclomatic complexity = 296
+  Goto = 99
+  Assignment = 466
+  Exit point = 84
+  Function = 507
+  Function call = 98
+  Pointer dereferencing = 161
+  Cyclomatic complexity = 299
+[kernel] :0: Warning: unnamed requires
+[kernel] share/libc/sys/socket.h:451: Warning: 
+  clause with '\initialized' must contain name 'initialization'
 /* Generated by Frama-C */
 #include "__fc_builtin.c"
 #include "__fc_builtin.h"
@@ -245,6 +253,7 @@
 #include "stropts.h"
 #include "sys/file.h"
 #include "sys/resource.h"
+#include "sys/sendfile.h"
 #include "sys/socket.h"
 #include "sys/stat.h"
 #include "sys/time.h"

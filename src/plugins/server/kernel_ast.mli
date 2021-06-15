@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -30,6 +30,7 @@ open Cil_types
 module Kf : Data.S with type t = kernel_function
 module Ki : Data.S with type t = kinstr
 module Stmt : Data.S with type t = stmt
+module Lval : Data.S with type t = kinstr * lval
 
 module Marker :
 sig

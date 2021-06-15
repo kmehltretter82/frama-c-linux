@@ -1,1 +1,2 @@
-STDOPT: +"-load-module" +"occurrence" -"-eva" -"-out" -"-input" -"-deps" +"-occurrence-verbose 1"
+PLUGIN: eva,scope occurrence
+STDOPT: -"-eva" -"-out" -"-input" -"-deps" +"-occurrence-verbose 1"

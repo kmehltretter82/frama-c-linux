@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -618,11 +618,11 @@ let smp_eq_with_land a b =
 let smp_eq_with_lor a b =
   let b1 = match_integer b in
   let es = match_fun f_lor a in
-  try (* b1==(a2|t22) <==> (b1^a2)==(~a2&e) *)
+  try (* b1==(a2|e) <==> (b1^a2)==(~a2&e) *)
     let a2,es = match_integer_extraction es in
     let k1 = Integer.logxor b1 a2 in
     let k2 = Integer.lognot a2 in
-    e_eq (e_zint k1) (e_fun f_land ((e_zint k2)::es))
+    e_eq (e_zint k1) (e_fun f_land [e_zint k2 ; e_fun f_lor es])
   with Not_found when b == e_zero ->
     (* 0==(a1|a2) <=> (0==a1 && 0==a2) *)
     F.e_and (List.map (e_eq b) es)
@@ -765,7 +765,7 @@ let smp_leq_with_lsr x y =
       (* p >= 0 ==> ( 0 <= (a >> p) <==> 0 <= a )*)
       e_leq e_zero a
     else
-      (* p >= 0 ==> ( x <= (a >> p) <= y <==> x <= a/(2**p) ) *)
+      (* p >= 0 ==> ( x <= (a >> p) <==> x <= a/(2**p) ) *)
       let k = two_power_k p in
       e_leq x (e_div a (e_zint k))
   with Not_found ->
@@ -800,41 +800,40 @@ type l_builtin = {
 let () =
   Context.register
     begin fun () ->
-      if Wp_parameters.Bits.get () then
-        begin
-          let mk_builtin n f ?eq ?leq smp = n, { f ; eq; leq; smp } in
+      begin
+        let mk_builtin n f ?eq ?leq smp = n, { f ; eq; leq; smp } in
 
-          (* From [smp_mk_bit_stdlib], the built-in [f_bit_stdlib] is such that there is
-             no creation of [e_fun f_bit_stdlib args] *)
-          let bi_lbit_stdlib = mk_builtin "f_bit_stdlib" f_bit_stdlib smp_mk_bit_stdlib in
-          let bi_lbit = mk_builtin "f_bit" f_bit_positive smp_bitk_positive in
-          let bi_lnot = mk_builtin "f_lnot" f_lnot ~eq:smp_eq_with_lnot
-              (smp1 Integer.lognot) in
-          let bi_lxor = mk_builtin "f_lxor" f_lxor ~eq:smp_eq_with_lxor
-              (smp2 f_lxor Integer.logxor) in
-          let bi_lor  = mk_builtin "f_lor" f_lor  ~eq:smp_eq_with_lor
-              (smp2 f_lor  Integer.logor) in
-          let bi_land = mk_builtin "f_land" f_land ~eq:smp_eq_with_land ~leq:smp_leq_with_land
-              smp_land in
-          let bi_lsl  = mk_builtin "f_lsl" f_lsl ~eq:smp_eq_with_lsl ~leq:smp_leq_with_lsl
-              (smp_shift Integer.shift_left) in
-          let bi_lsr  = mk_builtin "f_lsr" f_lsr ~eq:smp_eq_with_lsr ~leq:smp_leq_with_lsr
-              (smp_shift Integer.shift_right) in
+        (* From [smp_mk_bit_stdlib], the built-in [f_bit_stdlib] is such that there is
+           no creation of [e_fun f_bit_stdlib args] *)
+        let bi_lbit_stdlib = mk_builtin "f_bit_stdlib" f_bit_stdlib smp_mk_bit_stdlib in
+        let bi_lbit = mk_builtin "f_bit" f_bit_positive smp_bitk_positive in
+        let bi_lnot = mk_builtin "f_lnot" f_lnot ~eq:smp_eq_with_lnot
+            (smp1 Integer.lognot) in
+        let bi_lxor = mk_builtin "f_lxor" f_lxor ~eq:smp_eq_with_lxor
+            (smp2 f_lxor Integer.logxor) in
+        let bi_lor  = mk_builtin "f_lor" f_lor  ~eq:smp_eq_with_lor
+            (smp2 f_lor  Integer.logor) in
+        let bi_land = mk_builtin "f_land" f_land ~eq:smp_eq_with_land ~leq:smp_leq_with_land
+            smp_land in
+        let bi_lsl  = mk_builtin "f_lsl" f_lsl ~eq:smp_eq_with_lsl ~leq:smp_leq_with_lsl
+            (smp_shift Integer.shift_left) in
+        let bi_lsr  = mk_builtin "f_lsr" f_lsr ~eq:smp_eq_with_lsr ~leq:smp_leq_with_lsr
+            (smp_shift Integer.shift_right) in
 
-          List.iter
-            begin fun (_name, { f; eq; leq; smp }) ->
-              F.set_builtin f smp ;
-              (match eq with
-               | None -> ()
-               | Some eq -> F.set_builtin_eq f eq);
-              (match leq with
-               | None -> ()
-               | Some leq -> F.set_builtin_leq f leq)
-            end
-            [bi_lbit_stdlib ; bi_lbit; bi_lnot; bi_lxor; bi_lor; bi_land; bi_lsl; bi_lsr];
+        List.iter
+          begin fun (_name, { f; eq; leq; smp }) ->
+            F.set_builtin f smp ;
+            (match eq with
+             | None -> ()
+             | Some eq -> F.set_builtin_eq f eq);
+            (match leq with
+             | None -> ()
+             | Some leq -> F.set_builtin_leq f leq)
+          end
+          [bi_lbit_stdlib ; bi_lbit; bi_lnot; bi_lxor; bi_lor; bi_land; bi_lsl; bi_lsr];
 
-          Lang.For_export.set_builtin_eq f_land export_eq_with_land
-        end
+        Lang.For_export.set_builtin_eq f_land export_eq_with_land
+      end
     end
 
 (* ACSL Semantics *)

@@ -11,7 +11,7 @@
 Goal Assertion (file tests/wp_typed/array_initialized.c, line 71):
 Assume {
   (* Heap *)
-  Type: IsArray1_sint32(g).
+  Type: IsArray_sint32(g).
   (* Goal *)
   When: (0 <= i) /\ (i <= 499).
   (* Initializer *)
@@ -27,7 +27,7 @@ Prove: g[i] = 0.
 Goal Assertion (file tests/wp_typed/array_initialized.c, line 185):
 Assume {
   (* Heap *)
-  Type: IsArray1_sint32(h1_0) /\ IsArray1_sint32(h2_0).
+  Type: IsArray_sint32(h1_0) /\ IsArray_sint32(h2_0).
   (* Goal *)
   When: (0 <= i) /\ (i <= 499).
   (* Initializer *)
@@ -270,7 +270,7 @@ Prove: valid_rw(Malloc_0, p[i], 1).
 Goal Post-condition (file tests/wp_typed/array_initialized.c, line 288) in 'simpl':
 Let x = Mint_0[shift_sint32(t, 0)].
 Assume {
-  Type: is_sint32(x).
+  Type: is_sint32(simpl_0) /\ is_sint32(x).
   (* Heap *)
   Type: region(t.base) <= 0.
   (* Goal *)
@@ -279,8 +279,8 @@ Assume {
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 49) ->
       (Mint_0[shift_sint32(t, i_1)] = x))).
   If 0 <= x
-  Then { (* Return *) Have: simpl_0 = 1. }
-  Else { (* Return *) Have: simpl_0 = 0. }
+  Then { Have: simpl_0 = 1. }
+  Else { Have: simpl_0 = 0. }
 }
 Prove: (0 <= Mint_0[shift_sint32(t, i)]) <-> (simpl_0 = 1).
 

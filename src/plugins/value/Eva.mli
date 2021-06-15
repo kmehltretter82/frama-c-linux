@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -40,6 +40,10 @@ module Value_parameters: sig
       to interpret calls to function [kf].
       Raises [Not_found] if there is no builtin of name [name]. *)
   val use_builtin: Cil_types.kernel_function -> string -> unit
+
+  (** [use_global_value_partitioning vi] instructs the analysis to use
+      value partitioning on the global variable [vi]. *)
+  val use_global_value_partitioning: Cil_types.varinfo -> unit
 end
 
 module Eval_terms: sig
@@ -83,10 +87,17 @@ module Eva_annotations: sig
     | UnrollAmount of Cil_types.term (** Unroll the n first iterations. *)
     | UnrollFull (** Unroll amount defined by -eva-default-loop-unroll. *)
 
+  type split_kind = Static | Dynamic
+  type split_term =
+    | Expression of Cil_types.exp
+    | Predicate of Cil_types.predicate
+
   (** Split/merge annotations for value partitioning.  *)
   type flow_annotation =
-    | FlowSplit of Cil_types.term (** Split states according to a term. *)
-    | FlowMerge of Cil_types.term (** Merge states separated by a previous split. *)
+    | FlowSplit of split_term * split_kind
+    (** Split states according to a term. *)
+    | FlowMerge of split_term
+    (** Merge states separated by a previous split. *)
 
   val add_slevel_annot : emitter:Emitter.t -> loc:Cil_types.location ->
     Cil_types.stmt -> slevel_annotation -> unit
@@ -96,4 +107,35 @@ module Eva_annotations: sig
     Cil_types.stmt -> flow_annotation -> unit
   val add_subdivision_annot : emitter:Emitter.t -> loc:Cil_types.location ->
     Cil_types.stmt -> int -> unit
+end
+
+(** Analysis builtins for the cvalue domain, more efficient than the analysis
+    of the C functions. See {builtins.mli} for more details. *)
+module Builtins: sig
+  open Cil_types
+
+  exception Invalid_nb_of_args of int
+  exception Outside_builtin_possibilities
+
+  type builtin_type = unit -> typ * typ list
+  type cacheable = Cacheable | NoCache | NoCacheCallers
+
+  type full_result = {
+    c_values: (Cvalue.V.t option * Cvalue.Model.t) list;
+    c_clobbered: Base.SetLattice.t;
+    c_from: (Function_Froms.froms * Locations.Zone.t) option;
+  }
+
+  type call_result =
+    | States of Cvalue.Model.t list
+    | Result of Cvalue.V.t list
+    | Full of full_result
+
+  type builtin = Cvalue.Model.t -> (exp * Cvalue.V.t) list -> call_result
+
+  val register_builtin:
+    string -> ?replace:string -> ?typ:builtin_type -> cacheable ->
+    builtin -> unit
+
+  val is_builtin: string -> bool
 end

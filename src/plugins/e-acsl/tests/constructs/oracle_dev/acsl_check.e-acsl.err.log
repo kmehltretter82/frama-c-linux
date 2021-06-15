@@ -1,0 +1,13 @@
+tests/constructs/acsl_check.c: In function 'main'
+tests/constructs/acsl_check.c:18: Error: Assertion failed:
+	The failing predicate is:
+	a == 1.
+tests/constructs/acsl_check.c: In function 'f'
+tests/constructs/acsl_check.c:4: Error: Precondition failed:
+	The failing predicate is:
+	a != 0.
+tests/constructs/acsl_check.c: In function 'f'
+tests/constructs/acsl_check.c:5: Error: Postcondition failed:
+	The failing predicate is:
+	\result != 0.
+SHOULD BE PRINTED IN EXECUTION LOG

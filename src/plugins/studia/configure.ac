@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2020                                               #
+#  Copyright (C) 2007-2021                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -39,6 +39,7 @@ check_plugin(studia,PLUGIN_RELATIVE_PATH(plugin_file),
              [support for studia plug-in],yes)
 
 plugin_require(studia,eva)
+plugin_require(studia,server)
 
 #######################
 # Generating Makefile #

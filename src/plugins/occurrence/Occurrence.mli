@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -30,11 +30,11 @@ module Register: sig
   val get_last_result:
     unit -> ((kernel_function option * kinstr * lval) list * varinfo) option
   val get: (varinfo -> (kernel_function option * kinstr * lval) list)
-    (** Return the occurrences of the given varinfo.
-        An occurrence [ki, lv] is a left-value [lv] which uses the location of
-        [vi] at the position [ki]. *)
+  (** Return the occurrences of the given varinfo.
+      An occurrence [ki, lv] is a left-value [lv] which uses the location of
+      [vi] at the position [ki]. *)
   val print_all: (unit -> unit)
-    (** Print all the occurrence of each variable declarations. *)
+  (** Print all the occurrence of each variable declarations. *)
 end
 
 (*

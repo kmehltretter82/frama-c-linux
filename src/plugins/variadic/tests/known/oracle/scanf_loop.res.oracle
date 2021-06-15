@@ -31,8 +31,8 @@
 #include "stddef.h"
 #include "stdio.h"
 int volatile nondet;
-/*@ requires valid_read_string(format);
-    requires \valid(param0);
+/*@ requires \valid(param0);
+    requires valid_read_string(format);
     ensures \initialized(param0);
     assigns \result, __fc_stdin->__fc_FILE_data, *param0;
     assigns \result
@@ -46,14 +46,14 @@ int volatile nondet;
       \from (indirect: __fc_stdin->__fc_FILE_id), __fc_stdin->__fc_FILE_data,
             (indirect: *(format + (0 ..)));
  */
-int scanf_va_1(char const * __restrict format, int *param0);
+int scanf_va_1(char const * restrict format, int *param0);
 
 int main(void)
 {
   int n;
   while (1) {
     int tmp;
-    tmp = scanf_va_1("%d",& n);
+    tmp = scanf("%d",& n); /* scanf_va_1 */
     if (! (tmp > 0)) break;
     if (nondet) break;
   }

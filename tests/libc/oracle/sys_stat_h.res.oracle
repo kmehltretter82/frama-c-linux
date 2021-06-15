@@ -13,8 +13,8 @@
 [eva] computing for function close <- main.
   Called from tests/libc/sys_stat_h.c:12.
 [eva] using specification for function close
-[eva:alarm] tests/libc/sys_stat_h.c:12: Warning: 
-  function close: precondition 'valid_fd' got status unknown.
+[eva] tests/libc/sys_stat_h.c:12: 
+  function close: precondition 'valid_fd' got status valid.
 [eva] Done for function close
 [eva] computing for function stat <- main.
   Called from tests/libc/sys_stat_h.c:14.

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -24,6 +24,7 @@ let dkey = Wp_parameters.register_category "strategy" (* debugging key *)
 let debug fmt = Wp_parameters.debug ~dkey fmt
 
 open Cil_types
+open Logic_utils
 open LogicUsage
 
 (* -------------------------------------------------------------------------- *)
@@ -171,7 +172,7 @@ let add_prop_fct_pre_bhv acc kind kf bhv =
     Logic_const.(pat (p,pre_label))
   in
   let requires =
-    List.filter (fun x -> not x.ip_content.tp_only_check) bhv.b_requires
+    List.filter (fun x -> use_predicate x.ip_content.tp_kind) bhv.b_requires
   in
   let requires = Logic_const.pands (List.map norm_pred requires) in
   let assumes = Logic_const.pands (List.map norm_pred bhv.b_assumes) in
@@ -183,21 +184,23 @@ let add_prop_fct_pre_bhv acc kind kf bhv =
   add_prop acc kind id p
 
 let add_prop_fct_pre acc kind kf bhv ~assumes pre =
-  if pre.ip_content.tp_only_check then acc else begin
+  if use_predicate pre.ip_content.tp_kind then begin
     let id = WpPropId.mk_pre_id kf Kglobal bhv pre in
     let labels = NormAtLabels.labels_fct_pre in
     let p = Logic_const.pred_of_id_pred pre in
     let p = Logic_const.(pat (p,pre_label)) in
     let p = normalize id ?assumes labels p in
     add_prop acc kind id p
-  end
+  end else acc
 
 let add_prop_fct_post acc kind kf  bhv tkind post =
-  let id = WpPropId.mk_fct_post_id kf bhv (tkind, post) in
-  let labels = NormAtLabels.labels_fct_post in
-  let p = Logic_const.pred_of_id_pred post in
-  let p = normalize id labels p in
-  add_prop acc kind id p
+  if verify_predicate post.ip_content.tp_kind then begin
+    let id = WpPropId.mk_fct_post_id kf bhv (tkind, post) in
+    let labels = NormAtLabels.labels_fct_post ~exit:false in
+    let p = Logic_const.pred_of_id_pred post in
+    let p = normalize id labels p in
+    add_prop acc kind id p
+  end else acc
 
 let add_prop_fct_bhv_pre acc kind kf bhv =
   let assumes = None in
@@ -206,11 +209,13 @@ let add_prop_fct_bhv_pre acc kind kf bhv =
   List.fold_left add acc bhv.b_assumes
 
 let add_prop_stmt_pre acc kind kf s bhv ~assumes pre =
-  let id = WpPropId.mk_pre_id kf (Kstmt s) bhv pre in
-  let labels = NormAtLabels.labels_stmt_pre ~kf s in
-  let p = Logic_const.pred_of_id_pred pre in
-  let p = normalize id labels ?assumes p in
-  add_prop acc kind id p
+  if use_predicate pre.ip_content.tp_kind then begin
+    let id = WpPropId.mk_pre_id kf (Kstmt s) bhv pre in
+    let labels = NormAtLabels.labels_stmt_pre ~kf s in
+    let p = Logic_const.pred_of_id_pred pre in
+    let p = normalize id labels ?assumes p in
+    add_prop acc kind id p
+  end else acc
 
 let add_prop_stmt_bhv_requires acc kind kf s bhv ~with_assumes =
   let assumes =
@@ -227,14 +232,16 @@ let add_prop_stmt_spec_pre acc kind kf s spec =
   in List.fold_left add_bhv_pre acc spec.spec_behavior
 
 let add_prop_stmt_post acc kind kf s bhv tkind l_post ~assumes post =
-  let id = WpPropId.mk_stmt_post_id kf s bhv (tkind, post) in
-  let labels = NormAtLabels.labels_stmt_post ~kf s l_post in
-  let p = Logic_const.pred_of_id_pred post in
-  let p = normalize id labels ?assumes p in
-  add_prop acc kind id p
+  if verify_predicate post.ip_content.tp_kind then begin
+    let id = WpPropId.mk_stmt_post_id kf s bhv (tkind, post) in
+    let labels = NormAtLabels.labels_stmt_post_l ~kf s l_post in
+    let p = Logic_const.pred_of_id_pred post in
+    let p = normalize id labels ?assumes p in
+    add_prop acc kind id p
+  end else acc
 
 let update_kind kind pre =
-  if pre.ip_content.tp_only_check then begin
+  if pre.ip_content.tp_kind = Check then begin
     match kind with
     | AcallPre(false,_) -> None
     | AcallPre(true, kf) -> Some (AcallCheck kf)
@@ -254,14 +261,14 @@ let add_prop_call_pre acc kind id ~assumes pre =
 
 let add_prop_call_post acc kind called_kf bhv tkind ~assumes post =
   let id = WpPropId.mk_fct_post_id called_kf bhv (tkind, post) in
-  let labels = NormAtLabels.labels_fct_post in
+  let labels = NormAtLabels.labels_fct_post ~exit:false in
   let p = Logic_const.pred_of_id_pred post in
   let p = normalize id labels ~assumes p in
   add_prop acc kind id p
 
 let add_prop_assert acc kind kf s ca p =
   let id = WpPropId.mk_assert_id kf s ca in
-  let labels = NormAtLabels.labels_assert_before ~kf s in
+  let labels = NormAtLabels.labels_assert ~kf s in
   let p = normalize id labels p in
   add_prop acc kind id p
 
@@ -318,6 +325,11 @@ let add_prop_dead_call kf stmt acc_posts acc_exits =
 
 (* -------------------------------------------------------------------------- *)
 
+let from_has_deps = function _, FromAny -> false | _, From _ -> true
+let assigns_has_deps = function
+  | WritesAny -> false
+  | Writes l -> List.exists from_has_deps l
+
 let add_assigns acc kind id a_desc =
   let take_assigns () =
     debug "take %a %a" WpPropId.pp_propid id WpPropId.pp_assigns_desc a_desc;
@@ -334,6 +346,11 @@ let add_assigns acc kind id a_desc =
     | Agoal -> true, {info with a_goal = take_assigns ()}
     | _ -> Wp_parameters.fatal "Assigns prop can only be Hyp or Goal"
   in let acc = { acc with info = info } in
+  if goal && assigns_has_deps a_desc.a_assigns then
+    Wp_parameters.warning
+      ~once: true ~current:false ~wkey:AssignsCompleteness.wkey_pedantic
+      "WP uses \\from to generate precise hypotheses, however their proof is \
+       not supported yet" ;
   if goal then { acc with has_asgn_goal = true} else acc
 
 let add_assigns_any acc kind asgn =
@@ -393,7 +410,7 @@ let add_stmt_spec_assigns_hyp acc kf s l_post spec =
       | None -> add_assigns_any acc Ahyp
                   (WpPropId.mk_stmt_any_assigns_info s)
       | Some id ->
-          let labels = NormAtLabels.labels_stmt_assigns ~kf s l_post in
+          let labels = NormAtLabels.labels_stmt_assigns_l ~kf s l_post in
           let assigns = NormAtLabels.preproc_assigns labels assigns in
           let a_desc = WpPropId.mk_stmt_assigns_desc s assigns in
           add_assigns acc Ahyp id a_desc
@@ -421,8 +438,9 @@ let add_call_assigns_hyp acc kf_caller s ~called_kf l_post spec_opt =
               let asgn = WpPropId.mk_stmt_any_assigns_info s in
               add_assigns_any acc (AcallHyp called_kf) asgn
           | Some pid ->
-              let kf = kf_caller in
-              let labels = NormAtLabels.labels_stmt_assigns ~kf s l_post in
+              ignore l_post ;
+              (* let kf = kf_caller in *)
+              let labels = NormAtLabels.labels_fct_assigns ~exit:false (* ~kf s l_post *) in
               let assigns = NormAtLabels.preproc_assigns labels assigns in
               let a_desc = WpPropId.mk_stmt_assigns_desc s assigns in
               add_assigns acc (AcallHyp called_kf) pid a_desc
@@ -454,13 +472,14 @@ let add_fct_bhv_assigns_hyp acc kf tkind b = match b.b_assigns with
       let id = WpPropId.mk_kf_any_assigns_info () in
       add_assigns_any acc Ahyp id
   | Writes assigns ->
-      let id = WpPropId.mk_fct_assigns_id kf b tkind assigns in
+      let has_exit = Cil2cfg.has_exit (Cil2cfg.get kf) in
+      let id = WpPropId.mk_fct_assigns_id kf has_exit   b tkind assigns in
       match id with
       | None ->
           let id = WpPropId.mk_kf_any_assigns_info () in
           add_assigns_any acc Ahyp id
       | Some id ->
-          let labels = NormAtLabels.labels_fct_assigns in
+          let labels = NormAtLabels.labels_fct_assigns ~exit:false in
           let assigns' = NormAtLabels.preproc_assigns labels assigns in
           let a_desc = WpPropId.mk_kf_assigns_desc assigns' in
           add_assigns acc Ahyp id a_desc
@@ -658,7 +677,7 @@ let add_all_axioms tbl =
   let rec do_g g =
     match g with
     | Daxiomatic (_ax_name, globs,_,_) -> do_globs globs
-    | Dlemma (name,_,_,_,_,_,_) ->
+    | Dlemma (name,_,_,_,_,_) ->
         let lem = LogicUsage.logic_lemma name in
         add_axiom tbl lem
     | _ -> ()

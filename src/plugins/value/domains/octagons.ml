@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -349,7 +349,7 @@ module Rewriting = struct
       let min_bound = Eval_typ.range_lower_bound range in
       let ival_range = Ival.inject_range (Some min_bound) (Some max_bound) in
       let aux has_better_bound bound bound_kind alarms =
-        if has_better_bound ival ival_range >= 0
+        if Ival.is_bottom ival || has_better_bound ival ival_range >= 0
         then
           let alarm = Alarms.Overflow (overflow, expr, bound, bound_kind) in
           Alarmset.set alarm Alarmset.True alarms
@@ -1041,7 +1041,7 @@ module Domain = struct
 
   let top_value = `Value (Cvalue.V.top, None), Alarmset.all
 
-  let extract_expr oracle state expr =
+  let extract_expr ~oracle _context state expr =
     let evaluate_expr expr =
       match fst (oracle expr) with
       | `Bottom -> `Top (* should not happen *)
@@ -1059,7 +1059,7 @@ module Domain = struct
     then `Bottom, Alarmset.all
     else `Value (Cvalue.V.inject_ival ival, None), alarms
 
-  let extract_lval _oracle _t _lval _typ _loc = top_value
+  let extract_lval ~oracle:_ _context _t _lval _typ _loc = top_value
 
   let backward_location _t _lval _typ loc value = `Value (loc, value)
 
@@ -1216,17 +1216,29 @@ module Domain = struct
 
   let assume _stmt _exp _bool = update
 
-  let start_call _stmt call valuation state =
+  let start_recursive_call recursion state =
+    let vars = List.map fst recursion.substitution @ recursion.withdrawal in
+    List.fold_left State.remove state vars
+
+  let start_call _stmt call recursion valuation state =
     if intraprocedural ()
     then `Value (empty ())
     else
       let state = { state with modified = Locations.Zone.bottom } in
-      let assign_formal state { formal; concrete; avalue } =
-        state >>- assign_variable formal concrete avalue valuation
-      in
-      List.fold_left assign_formal (`Value state) call.arguments
+      match recursion with
+      | Some recursion ->
+        (* No relation inferred from the assignment of formal parameters
+           for recursive calls, because the valuation cannot be used safely
+           as the substitution of local and formals variables has not been
+           applied to it. *)
+        `Value (start_recursive_call recursion state)
+      | None ->
+        let assign_formal state { formal; concrete; avalue } =
+          state >>- assign_variable formal concrete avalue valuation
+        in
+        List.fold_left assign_formal (`Value state) call.arguments
 
-  let finalize_call _stmt _call ~pre ~post =
+  let finalize_call _stmt _call _recursion ~pre ~post =
     if intraprocedural ()
     then `Value (kill post.modified pre)
     else

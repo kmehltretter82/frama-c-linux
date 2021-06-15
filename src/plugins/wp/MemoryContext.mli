@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -22,7 +22,9 @@
 
 open Cil_types
 
-type param = NotUsed | ByAddr | ByValue | ByShift | ByRef | InContext | InArray
+type validity = Valid | Nullable
+type param = NotUsed | ByAddr | ByValue | ByShift | ByRef
+           | InContext of validity | InArray of validity
 
 val pp_param: Format.formatter -> param -> unit
 
@@ -35,5 +37,5 @@ val compute: string -> (kernel_function -> partition) -> unit
 
 val add_behavior:
   kernel_function -> string -> (kernel_function -> partition) -> unit
-val get_behavior:
-  kernel_function -> string -> (kernel_function -> partition) -> behavior option
+val warn:
+  kernel_function -> string -> (kernel_function -> partition) -> unit
