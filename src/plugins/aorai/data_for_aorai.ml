@@ -739,8 +739,13 @@ let type_expr metaenv env ?tr ?current e =
       let var = Logic_const.tvar (Cil.cvar_to_lvar (find_metavar s metaenv)) in
       env, var, cond
     | PCst (Logic_ptree.IntConstant s) ->
-      let e = Cil.parseIntLogic ~loc s in
-      env, e, cond
+      begin
+        try
+          let e = Cil.parseIntLogic ~loc s in
+          env, e, cond
+        with ParseIntError msg ->
+          raise_error msg
+      end
     | PCst (Logic_ptree.FloatConstant str) ->
       env, Logic_utils.parse_float ~loc str, cond
     | PCst (Logic_ptree.StringConstant s) ->
