@@ -1443,7 +1443,7 @@ let rec isCabsZeroExp e = match e.expr_node with
      | SINGLE_INIT e -> isCabsZeroExp e
      | NO_INIT | COMPOUND_INIT _ -> false)
   | CONSTANT (CONST_INT i) ->
-    Integer.is_zero (Cil.parseInt i)
+    Option.fold ~none:false ~some:Integer.is_zero (Cil.parseInt_opt i)
   | _ -> false
 
 module BlockChunk =

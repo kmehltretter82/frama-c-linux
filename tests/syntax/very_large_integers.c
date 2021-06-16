@@ -11,6 +11,7 @@
    STDOPT: #"-cpp-extra-args=-DLOGIC_CONSTANT"
    STDOPT: #"-cpp-extra-args=-DLOGIC_CONSTANT_OCTAL"
    STDOPT: #"-cpp-extra-args=-DEVA_UNROLL -eva"
+   STDOPT: #"-cpp-extra-args=-DCABS_DOWHILE"
    EXIT: 0
    STDOPT: #"-cpp-extra-args=-DUNROLL_PRAGMA"
 */
@@ -78,6 +79,9 @@ int main() {
   while (nondet);
   //@ slevel 9999999999999999999;
   while (nondet);
+#endif
+#ifdef CABS_DOWHILE
+  do { } while (09);
 #endif
 #ifdef UNROLL_PRAGMA
   //@ loop pragma UNROLL 99999999999999999999;

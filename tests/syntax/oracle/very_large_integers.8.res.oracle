@@ -1,10 +1,10 @@
 [kernel] Parsing tests/syntax/very_large_integers.c (with preprocessing)
-[kernel] tests/syntax/very_large_integers.c:57: Warning: 
+[kernel] tests/syntax/very_large_integers.c:58: Warning: 
   ignoring invalid aligned attribute: __aligned__(9223372036854775808)
-[kernel] tests/syntax/very_large_integers.c:57: Warning: 
+[kernel] tests/syntax/very_large_integers.c:58: Warning: 
   ignoring invalid aligned attribute: __aligned__((9223372036854775808)+
                                                    (9223372036854775808) )
-[kernel] tests/syntax/very_large_integers.c:70: Failure: 
+[kernel] tests/syntax/very_large_integers.c:71: Failure: 
   Invalid digit 9 in integer literal '09876543210' in base 8.
 [kernel] User Error: stopping on file "tests/syntax/very_large_integers.c" that has errors. Add
   '-kernel-msg-key pp' for preprocessing command.
