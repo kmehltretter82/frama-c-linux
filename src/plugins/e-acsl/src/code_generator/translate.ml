@@ -890,23 +890,9 @@ and predicate_content_to_exp ?name kf env p =
            let name = "separated_guard" in
            let p = Logic_const.pvalid_read ~loc (BuiltinLabel Here, t) in
            let p = { p with pred_name = name :: p.pred_name } in
-           let e, env =
-             predicate_content_to_exp
-               ~name
-               kf
-               env
-               p
-           in
-           let stmt =
-             Smart_stmt.runtime_check
-               ~pred_kind:Assert
-               Smart_stmt.RTE
-               kf
-               e
-               p
-           in
-           Env.add_assert kf stmt p;
-           Env.add_stmt env kf stmt
+           let tp = Logic_const.toplevel_predicate ~kind:Assert p in
+           let annot = Logic_const.new_code_annotation (AAssert ([],tp)) in
+           translate_rte_annots Printer.pp_code_annotation annot kf env [annot]
         )
         env
         tlist
