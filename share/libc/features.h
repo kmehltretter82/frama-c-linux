@@ -100,6 +100,9 @@
 #ifndef __attribute_artificial__
 # define __attribute_artificial__ /* Ignore */
 #endif
+#ifndef __attribute_pure__
+# define __attribute_pure__ /* Ignore */
+#endif
 
 #undef __attribute_warn_unused_result__
 #define __attribute_warn_unused_result__ /* empty */
