@@ -1680,25 +1680,25 @@ let rec hash_term (acc,depth,tot) t =
   else begin
     match t.term_node with
     | TConst c -> (acc + hash_logic_constant c, tot - 1)
-    | TLval lv -> hash_tlval (acc+19,depth - 1,tot -1) lv
-    | TSizeOf t -> (acc + 38 + Typ.hash t, tot - 1)
-    | TSizeOfE t -> hash_term (acc+57,depth -1, tot-1) t
-    | TSizeOfStr s -> (acc + 76 + Hashtbl.hash s, tot - 1)
-    | TAlignOf t -> (acc + 95 + Typ.hash t, tot - 1)
-    | TAlignOfE t -> hash_term (acc+114,depth-1,tot-1) t
-    | TUnOp(op,t) -> hash_term (acc+133+Hashtbl.hash op,depth-1,tot-2) t
+    | TLval lv -> hash_tlval (acc+2,depth - 1,tot -1) lv
+    | TSizeOf t -> (acc + 3 + Typ.hash t, tot - 1)
+    | TSizeOfE t -> hash_term (acc+5,depth -1, tot-1) t
+    | TSizeOfStr s -> (acc + 7 + Hashtbl.hash s, tot - 1)
+    | TAlignOf t -> (acc + 11 + Typ.hash t, tot - 1)
+    | TAlignOfE t -> hash_term (acc+13,depth-1,tot-1) t
+    | TUnOp(op,t) -> hash_term (acc+17+Hashtbl.hash op,depth-1,tot-2) t
     | TBinOp(bop,t1,t2) ->
       let hash1,tot1 =
-        hash_term (acc+152+Hashtbl.hash bop,depth-1,tot-2) t1
+        hash_term (acc+19+Hashtbl.hash bop,depth-1,tot-2) t1
       in
       hash_term (hash1,depth-1,tot1) t2
     | TCastE(ty,t) ->
       let hash1 = Typ.hash ty in
-      hash_term (acc+171+hash1,depth-1,tot-2) t
-    | TAddrOf lv -> hash_tlval (acc+190,depth-1,tot-1) lv
-    | TStartOf lv -> hash_tlval (acc+209,depth-1,tot-1) lv
+      hash_term (acc+23+hash1,depth-1,tot-2) t
+    | TAddrOf lv -> hash_tlval (acc+29,depth-1,tot-1) lv
+    | TStartOf lv -> hash_tlval (acc+31,depth-1,tot-1) lv
     | Tapp (li,labs,apps) ->
-      let hash1 = acc + 228 + Logic_info.hash li in
+      let hash1 = acc + 37 + Logic_info.hash li in
       let hash_lb (acc,tot) l =
         if tot = 0 then raise (StopRecursion acc)
         else (acc + hash_label l,tot - 1)
@@ -1711,51 +1711,51 @@ let rec hash_term (acc,depth,tot) t =
         if tot = 0 then raise (StopRecursion acc)
         else (acc + Logic_var.hash lv,tot-1)
       in
-      let (acc,tot) = List.fold_left hash_var (acc+247,tot-1) quants in
+      let (acc,tot) = List.fold_left hash_var (acc+41,tot-1) quants in
       hash_term (acc,depth-1,tot-1) t
     | TDataCons(ctor,args) ->
-      let hash = acc + 266 + Logic_ctor_info.hash ctor in
+      let hash = acc + 43 + Logic_ctor_info.hash ctor in
       let hash_one_term (acc,tot) t = hash_term (acc,depth-1,tot) t in
       List.fold_left hash_one_term (hash,tot-1) args
     | Tif(t1,t2,t3) ->
-      let hash1,tot1 = hash_term (acc+285,depth-1,tot) t1 in
+      let hash1,tot1 = hash_term (acc+47,depth-1,tot) t1 in
       let hash2,tot2 = hash_term (hash1,depth-1,tot1) t2 in
       hash_term (hash2,depth-1,tot2) t3
     | Tat(t,l) ->
-      let hash = acc + 304 + hash_label l in
+      let hash = acc + 53 + hash_label l in
       hash_term (hash,depth-1,tot-2) t
     | Tbase_addr (l,t) ->
-      let hash = acc + 323 + hash_label l in
+      let hash = acc + 59 + hash_label l in
       hash_term (hash,depth-1,tot-2) t
     | Tblock_length (l,t) ->
-      let hash = acc + 342 + hash_label l in
+      let hash = acc + 61 + hash_label l in
       hash_term (hash,depth-1,tot-2) t
     | Toffset (l,t) ->
-      let hash = acc + 351 + hash_label l in
+      let hash = acc + 67 + hash_label l in
       hash_term (hash,depth-1,tot-2) t
-    | Tnull -> acc+361, tot - 1
+    | Tnull -> acc+71, tot - 1
     | TUpdate(t1,off,t2) ->
-      let hash1,tot1 = hash_term (acc+418,depth-1,tot-1) t1 in
+      let hash1,tot1 = hash_term (acc+73,depth-1,tot-1) t1 in
       let hash2,tot2 = hash_toffset (hash1,depth-1,tot1) off in
       hash_term (hash2,depth-1,tot2) t2
-    | Ttypeof t -> hash_term (acc+437,depth-1,tot-1) t
-    | Ttype t -> acc + 456 + Typ.hash t, tot - 1
-    | Tempty_set -> acc + 475, tot - 1
+    | Ttypeof t -> hash_term (acc+79,depth-1,tot-1) t
+    | Ttype t -> acc + 83 + Typ.hash t, tot - 1
+    | Tempty_set -> acc + 89, tot - 1
     | Tunion tl ->
       let hash_one_term (acc,tot) t = hash_term (acc,depth-1,tot) t in
-      List.fold_left hash_one_term (acc+494,tot-1) tl
+      List.fold_left hash_one_term (acc+97,tot-1) tl
     | Tinter tl ->
       let hash_one_term (acc,tot) t = hash_term (acc,depth-1,tot) t in
-      List.fold_left hash_one_term (acc+513,tot-1) tl
+      List.fold_left hash_one_term (acc+101,tot-1) tl
     | Tcomprehension (t,quants,_) -> (* TODO: hash predicates *)
       let hash_var (acc,tot) lv =
         if tot = 0 then raise (StopRecursion acc)
         else (acc + Logic_var.hash lv,tot-1)
       in
-      let (acc,tot) = List.fold_left hash_var (acc+532,tot-1) quants in
+      let (acc,tot) = List.fold_left hash_var (acc+103,tot-1) quants in
       hash_term (acc,depth-1,tot-1) t
     | Trange(t1,t2) ->
-      let acc = acc + 551 in
+      let acc = acc + 107 in
       let acc,tot =
         match t1 with
           None -> acc,tot - 1
@@ -1768,9 +1768,9 @@ let rec hash_term (acc,depth,tot) t =
          | Some t -> hash_term (acc,depth-1,tot-1) t)
     | Tlet(li,t) ->
       hash_term
-        (acc + 570 + Hashtbl.hash li.l_var_info.lv_name, depth-1, tot-1)
+        (acc + 109 + Hashtbl.hash li.l_var_info.lv_name, depth-1, tot-1)
         t
-    | TLogic_coerce(_,e) -> hash_term (acc + 587, depth - 1, tot - 1) e
+    | TLogic_coerce(_,e) -> hash_term (acc + 113, depth - 1, tot - 1) e
   end
 
 and hash_tlval (acc,depth,tot) (h,o) =
