@@ -637,6 +637,145 @@
 #ifndef _M_X64
 # define _M_X64 1
 #endif
+
+/* errno.h */
+#define __FC_EPERM 1
+#define __FC_ENOENT 2
+#define __FC_ESRCH 3
+#define __FC_EINTR 4
+#define __FC_EIO 5
+#define __FC_ENXIO 6
+#define __FC_E2BIG 7
+#define __FC_ENOEXEC 8
+#define __FC_EBADF 9
+#define __FC_ECHILD 10
+#define __FC_EAGAIN 11
+#define __FC_ENOMEM 12
+#define __FC_EACCES 13
+#define __FC_EFAULT 14
+//NOT IN MSVC: #define __FC_ENOTBLK
+#define __FC_EBUSY 16
+#define __FC_EEXIST 17
+#define __FC_EXDEV 18
+#define __FC_ENODEV 19
+#define __FC_ENOTDIR 20
+#define __FC_EISDIR 21
+#define __FC_EINVAL 22
+#define __FC_ENFILE 23
+#define __FC_EMFILE 24
+#define __FC_ENOTTY 25
+#define __FC_ETXTBSY 139
+#define __FC_EFBIG 27
+#define __FC_ENOSPC 28
+#define __FC_ESPIPE 29
+#define __FC_EROFS 30
+#define __FC_EMLINK 31
+#define __FC_EPIPE 32
+#define __FC_EDOM 33
+#define __FC_ERANGE 34
+#define __FC_EDEADLK 36
+#define __FC_ENAMETOOLONG 38
+#define __FC_ENOLCK 39
+#define __FC_ENOSYS 40
+#define __FC_ENOTEMPTY 41
+#define __FC_ELOOP 114
+#define __FC_EWOULDBLOCK 140
+#define __FC_ENOMSG 122
+#define __FC_EIDRM 111
+//NOT IN MSVC: #define __FC_ECHRNG
+//NOT IN MSVC: #define __FC_EL2NSYNC
+//NOT IN MSVC: #define __FC_EL3HLT
+//NOT IN MSVC: #define __FC_EL3RST
+//NOT IN MSVC: #define __FC_ELNRNG
+//NOT IN MSVC: #define __FC_EUNATCH
+//NOT IN MSVC: #define __FC_ENOCSI
+//NOT IN MSVC: #define __FC_EL2HLT
+//NOT IN MSVC: #define __FC_EBADE
+//NOT IN MSVC: #define __FC_EBADR
+//NOT IN MSVC: #define __FC_EXFULL
+//NOT IN MSVC: #define __FC_ENOANO
+//NOT IN MSVC: #define __FC_EBADRQC
+//NOT IN MSVC: #define __FC_EBADSLT
+#define __FC_EDEADLOCK 36
+//NOT IN MSVC: #define __FC_EBFONT
+#define __FC_ENOSTR 125
+#define __FC_ENODATA 120
+#define __FC_ETIME 137
+#define __FC_ENOSR 124
+//NOT IN MSVC: #define __FC_ENONET
+//NOT IN MSVC: #define __FC_ENOPKG
+//NOT IN MSVC: #define __FC_EREMOTE
+#define __FC_ENOLINK 121
+//NOT IN MSVC: #define __FC_EADV
+//NOT IN MSVC: #define __FC_ESRMNT
+//NOT IN MSVC: #define __FC_ECOMM
+#define __FC_EPROTO 134
+//NOT IN MSVC: #define __FC_EMULTIHOP
+//NOT IN MSVC: #define __FC_EDOTDOT
+#define __FC_EBADMSG 104
+#define __FC_EOVERFLOW 132
+//NOT IN MSVC: #define __FC_ENOTUNIQ
+//NOT IN MSVC: #define __FC_EBADFD
+//NOT IN MSVC: #define __FC_EREMCHG
+//NOT IN MSVC: #define __FC_ELIBACC
+//NOT IN MSVC: #define __FC_ELIBBAD
+//NOT IN MSVC: #define __FC_ELIBSCN
+//NOT IN MSVC: #define __FC_ELIBMAX
+//NOT IN MSVC: #define __FC_ELIBEXEC
+#define __FC_EILSEQ 42
+//NOT IN MSVC: #define __FC_ERESTART
+//NOT IN MSVC: #define __FC_ESTRPIPE
+//NOT IN MSVC: #define __FC_EUSERS
+#define __FC_ENOTSOCK 128
+#define __FC_EDESTADDRREQ 109
+#define __FC_EMSGSIZE 115
+#define __FC_EPROTOTYPE 136
+#define __FC_ENOPROTOOPT 123
+#define __FC_EPROTONOSUPPORT 135
+//NOT IN MSVC: #define __FC_ESOCKTNOSUPPORT
+#define __FC_ENOTSUP 129
+#define __FC_EOPNOTSUPP 130
+//NOT IN MSVC: #define __FC_EPFNOSUPPORT
+#define __FC_EAFNOSUPPORT 102
+#define __FC_EADDRINUSE 100
+#define __FC_EADDRNOTAVAIL 101
+#define __FC_ENETDOWN 116
+#define __FC_ENETUNREACH 118
+#define __FC_ENETRESET 117
+#define __FC_ECONNABORTED 106
+#define __FC_ECONNRESET 108
+#define __FC_ENOBUFS 119
+#define __FC_EISCONN 113
+#define __FC_ENOTCONN 126
+//NOT IN MSVC: #define __FC_ESHUTDOWN
+//NOT IN MSVC: #define __FC_ETOOMANYREFS
+#define __FC_ETIMEDOUT 138
+#define __FC_ECONNREFUSED 107
+//NOT IN MSVC: #define __FC_EHOSTDOWN
+#define __FC_EHOSTUNREACH 110
+#define __FC_EALREADY 103
+#define __FC_EINPROGRESS 112
+//NOT IN MSVC: #define __FC_ESTALE
+//NOT IN MSVC: #define __FC_EUCLEAN
+//NOT IN MSVC: #define __FC_ENOTNAM
+//NOT IN MSVC: #define __FC_ENAVAIL
+//NOT IN MSVC: #define __FC_EISNAM
+//NOT IN MSVC: #define __FC_EREMOTEIO
+//NOT IN MSVC: #define __FC_EDQUOT
+//NOT IN MSVC: #define __FC_ENOMEDIUM
+//NOT IN MSVC: #define __FC_EMEDIUMTYPE
+#define __FC_ECANCELED 105
+//NOT IN MSVC: #define __FC_ENOKEY
+//NOT IN MSVC: #define __FC_EKEYEXPIRED
+//NOT IN MSVC: #define __FC_EKEYREVOKED
+//NOT IN MSVC: #define __FC_EKEYREJECTED
+#define __FC_EOWNERDEAD 133
+#define __FC_ENOTRECOVERABLE 127
+//NOT IN MSVC: #define __FC_ERFKILL
+//NOT IN MSVC: #define __FC_EHWPOISON
+
+
+
 // End of MSVC_X86_64
 #else
 #error Must define __FC_MACHDEP_<M>, where <M> is one of the            \
