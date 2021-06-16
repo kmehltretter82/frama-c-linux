@@ -117,7 +117,6 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
                                                   __gen_e_acsl_if_2,
                                                   (void *)dest,
                                                   (void *)(& dest));
-    /*@ assert E_ACSL: separated_guard: \valid_read(dest + (0 .. n - 1)); */
     __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","strncpy",
                     "separated_guard: \\valid_read(dest + (0 .. n - 1))",
                     "FRAMAC_SHARE/libc/string.h",369);
@@ -129,7 +128,6 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
                                                     __gen_e_acsl_if_3,
                                                     (void *)src,
                                                     (void *)(& src));
-    /*@ assert E_ACSL: separated_guard: \valid_read(src + (0 .. n - 1)); */
     __e_acsl_assert(__gen_e_acsl_valid_read_2,1,"RTE","strncpy",
                     "separated_guard: \\valid_read(src + (0 .. n - 1))",
                     "FRAMAC_SHARE/libc/string.h",369);
