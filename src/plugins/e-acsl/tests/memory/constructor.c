@@ -1,4 +1,4 @@
-/* run.config_ci
+/* run.config
    COMMENT: bts #2405. Memory not initialized for code executed before main.
 */
 

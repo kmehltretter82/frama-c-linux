@@ -1,4 +1,4 @@
-/* run.config_ci, run.config_dev
+/* run.config, run.config_dev
    COMMENT: Check that command line parameters are properly tracked
 */
 

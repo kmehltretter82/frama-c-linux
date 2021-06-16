@@ -1,4 +1,4 @@
-/* run.config_ci, run.config_dev
+/* run.config, run.config_dev
  * COMMENT: Check that the RTE checks are generated for every part of a
  * behavior, and are generated at the right place.
  */

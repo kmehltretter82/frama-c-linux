@@ -1,4 +1,4 @@
-/* run.config_ci
+/* run.config
    COMMENT: Checking heap memory size
    STDOPT: +"-eva-no-builtins-auto"
 */

@@ -1,4 +1,4 @@
-/* run.config_ci
+/* run.config
    COMMENT: test of a local initializer which contains an annotation
    LOG: gen_@PTEST_NAME@.c
    STDOPT: #"@MACHDEP@ -lib-entry -eva -then -no-lib-entry"

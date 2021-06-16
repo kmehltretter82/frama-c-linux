@@ -1,4 +1,4 @@
-/* run.config_ci
+/* run.config
    COMMENT: Check that variables declared in the body of switch statements are
    correctly tracked.
 */

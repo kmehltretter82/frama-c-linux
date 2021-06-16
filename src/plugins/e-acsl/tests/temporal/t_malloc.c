@@ -1,4 +1,4 @@
-/* run.config_ci, run.config_dev
+/* run.config, run.config_dev
   COMMENT: Temporal analysis with respect dynamic memory allocation.
   COMMENT: malloc-free-malloc errors
 */

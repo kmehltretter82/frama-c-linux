@@ -1,4 +1,4 @@
-/* run.config_ci, run.config_dev
+/* run.config, run.config_dev
    COMMENT: Check that statements generated via temporal analysis are handled
    COMMENT: properly, i.e., if a statement has a label attached then all
    COMMENT: the generated statements are inserted after that label

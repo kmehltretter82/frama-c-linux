@@ -1,4 +1,4 @@
-/* run.config_ci, run.config_dev
+/* run.config, run.config_dev
    STDOPT: +"-eva-unroll-recursive-calls 10 -eva-slevel 7"
  */
 
