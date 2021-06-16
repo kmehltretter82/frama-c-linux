@@ -4945,6 +4945,8 @@ extern int fgetpos(FILE * restrict stream, fpos_t * restrict pos);
 
 /*@ requires valid_stream: \valid(stream);
     requires whence_enum: whence ≡ 0 ∨ whence ≡ 1 ∨ whence ≡ 2;
+    ensures
+      errno_set: __fc_errno ∈ {11, 9, 27, 4, 22, 5, 28, 75, 32, 29, 6};
     assigns *stream, \result, __fc_errno;
     assigns *stream \from *stream, (indirect: offset), (indirect: whence);
     assigns \result
@@ -4956,6 +4958,8 @@ extern int fseek(FILE *stream, long offset, int whence);
 
 /*@ requires valid_stream: \valid(stream);
     requires whence_enum: whence ≡ 0 ∨ whence ≡ 1 ∨ whence ≡ 2;
+    ensures
+      errno_set: __fc_errno ∈ {11, 9, 27, 4, 22, 5, 28, 75, 32, 29, 6};
     assigns *stream, \result, __fc_errno;
     assigns *stream \from *stream, (indirect: offset), (indirect: whence);
     assigns \result
@@ -4968,9 +4972,12 @@ extern int fseeko(FILE *stream, off_t offset, int whence);
 /*@ requires valid_stream: \valid(stream);
     requires valid_pos: \valid_read(pos);
     requires initialization: pos: \initialized(pos);
-    assigns *stream, \result;
+    ensures errno_set: __fc_errno ∈ {11, 9, 27, 4, 5, 28, 32, 29, 6};
+    assigns *stream, \result, __fc_errno;
     assigns *stream \from *pos;
     assigns \result \from (indirect: *stream), (indirect: *pos);
+    assigns __fc_errno
+      \from __fc_errno, (indirect: *stream), (indirect: *pos);
  */
 extern int fsetpos(FILE *stream, fpos_t const *pos);
 
@@ -4979,6 +4986,7 @@ extern int fsetpos(FILE *stream, fpos_t const *pos);
       success_or_error:
         \result ≡ -1 ∨
         (\result ≥ 0 ∧ __fc_errno ≡ \old(__fc_errno));
+    ensures errno_set: __fc_errno ∈ {9, 75, 29};
     assigns \result, __fc_errno;
     assigns \result \from (indirect: *stream);
     assigns __fc_errno \from (indirect: *stream);
@@ -4990,6 +4998,7 @@ extern long ftell(FILE *stream);
       success_or_error:
         \result ≡ -1 ∨
         (\result ≥ 0 ∧ __fc_errno ≡ \old(__fc_errno));
+    ensures errno_set: __fc_errno ∈ {9, 75, 29};
     assigns \result, __fc_errno;
     assigns \result \from (indirect: *stream);
     assigns __fc_errno \from (indirect: *stream);
