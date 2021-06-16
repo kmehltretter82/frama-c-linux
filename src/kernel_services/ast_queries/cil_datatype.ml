@@ -120,6 +120,33 @@ let rank_term = function
   | Toffset _ -> 31
   | TLogic_coerce _ -> 32
 
+let rank_predicate = function
+  | Pfalse -> 0
+  | Ptrue -> 1
+  | Papp _ -> 2
+  | Pseparated _ -> 3
+  | Prel _ -> 4
+  | Pand _ -> 5
+  | Por _ -> 6
+  | Pxor _ -> 7
+  | Pimplies _ -> 8
+  | Piff _ -> 9
+  | Pnot _ -> 10
+  | Pif _ -> 11
+  | Plet _ -> 12
+  | Pforall _ -> 13
+  | Pexists _ -> 14
+  | Pat _ -> 15
+  | Pobject_pointer _ -> 16
+  | Pvalid_read _ -> 17
+  | Pvalid _ -> 18
+  | Pvalid_function _ -> 19
+  | Pinitialized _ -> 20
+  | Pdangling _ -> 21
+  | Pallocable _ -> 22
+  | Pfreeable _ -> 23
+  | Pfresh _ -> 24
+
 
 (**************************************************************************)
 (** {3 Cabs types} *)
@@ -1591,12 +1618,12 @@ let rec compare_term t1 t2 =
     | Tlet(x1,t1) , Tlet(x2,t2) ->
       let c = Logic_info.compare x1 x2 in
       if c <> 0 then c else compare_term t1 t2
-    | Tcomprehension (t1, q1, _p1), Tcomprehension (t2, q2, _p2) ->
+    | Tcomprehension (t1, q1, p1), Tcomprehension (t2, q2, p2) ->
       let c = compare_term t1 t2 in
       if c <> 0 then c
       else
         let cq = compare_list Logic_var.compare q1 q2 in
-        if cq <> 0 then cq else assert false (* TODO !*)
+        if cq <> 0 then cq else Option.compare compare_predicate p1 p2
     | TLogic_coerce(ty1,e1), TLogic_coerce(ty2,e2) ->
       let ct = Logic_type.compare ty1 ty2 in
       if ct <> 0 then ct
@@ -1650,12 +1677,88 @@ and compare_logic_label l1 l2 = match l1, l2 with
 
 and compare_ctor c1 c2 = String.compare c1.ctor_name c2.ctor_name
 
-and compare_bound b1 b2 = match b1, b2 with
-  | None , None -> 0
-  | Some _ , None -> 1
-  | None , Some _ -> (-1)
-  | Some x , Some y -> compare_term x y
+and compare_bound b1 b2 = Option.compare compare_term b1 b2
 
+and compare_predicate p1 p2 =
+  let r1 = rank_predicate p1.pred_content in
+  let r2 = rank_predicate p2.pred_content in
+  if r1 <> r2 then r1 - r2 else
+    match p1.pred_content, p2.pred_content with
+    | Pfalse, Pfalse -> 0
+    | Ptrue, Ptrue -> 0
+    | Papp(i1,labels1,args1), Papp(i2,labels2,args2) ->
+      let c = Logic_info.compare i1 i2 in
+      if c <> 0 then c
+      else
+        let c = compare_list compare_logic_label labels1 labels2 in
+        if c <> 0 then c
+        else compare_list compare_term args1 args2
+    | Prel(r1,lt1,rt1), Prel(r2,lt2,rt2) ->
+      let c = compare r1 r2 in
+      if c <> 0 then c
+      else
+        let c = compare_term lt1 lt2 in
+        if c <> 0 then c
+        else compare_term rt1 rt2
+    | Pand(lp1,rp1), Pand(lp2,rp2) | Por(lp1,rp1), Por(lp2,rp2)
+    | Pxor (lp1,rp1), Pxor(lp2,rp2) | Pimplies(lp1,rp1), Pimplies(lp2,rp2)
+    | Piff(lp1,rp1), Piff(lp2,rp2) ->
+      let c = compare_predicate lp1 lp2 in
+      if c <> 0 then c
+      else compare_predicate rp1 rp2
+    | Pnot p1, Pnot p2 ->
+      compare_predicate p1 p2
+    | Pif (c1,t1,e1), Pif(c2,t2,e2) ->
+      let c = compare_term c1 c2 in
+      if c <> 0 then c
+      else
+        let c = compare_predicate t1 t2 in
+        if c <> 0 then c
+        else compare_predicate e1 e2
+    | Plet (d1,p1), Plet(d2,p2) ->
+      let c = Logic_info.compare d1 d2 in
+      if c <> 0 then c
+      else compare_predicate p1 p2
+    | Pforall(q1,p1), Pforall(q2,p2) ->
+      let c = compare_list Logic_var.compare q1 q2 in
+      if c <> 0 then c
+      else compare_predicate p1 p2
+    | Pexists(q1,p1), Pexists(q2,p2) ->
+      let c = compare_list Logic_var.compare q1 q2 in
+      if c <> 0 then c
+      else compare_predicate p1 p2
+    | Pat(p1,l1), Pat(p2,l2) ->
+      let c = compare_logic_label l1 l2 in
+      if c <> 0 then c else compare_predicate p1 p2
+    | Pallocable (l1,t1), Pallocable (l2,t2)
+    | Pfreeable (l1,t1), Pfreeable (l2,t2)
+    | Pvalid (l1,t1), Pvalid (l2,t2)
+    | Pvalid_read (l1,t1), Pvalid_read (l2,t2)
+    | Pobject_pointer (l1,t1), Pobject_pointer (l2,t2)
+    | Pinitialized (l1,t1), Pinitialized (l2,t2)
+    | Pdangling (l1,t1), Pdangling (l2,t2) ->
+      let c = compare_logic_label l1 l2 in
+      if c <> 0 then c else compare_term t1 t2
+    | Pvalid_function t1, Pvalid_function t2 ->
+      compare_term t1 t2
+    | Pfresh (l1,m1,t1,n1), Pfresh (l2,m2,t2,n2) ->
+      let c = compare_logic_label l1 l2 in
+      if c <> 0 then c
+      else
+        let c = compare_logic_label m1 m2 in
+        if c <> 0 then c
+        else
+          let c = compare_term t1 t2 in
+          if c <> 0 then c
+          else compare_term n1 n2
+    | Pseparated(seps1), Pseparated(seps2) ->
+      compare_list compare_term seps1 seps2
+    | (Pfalse | Ptrue | Papp _ | Prel _ | Pand _ | Por _ | Pimplies _
+      | Piff _ | Pnot _ | Pif _ | Plet _ | Pforall _ | Pexists _
+      | Pat _ | Pvalid _ | Pvalid_read _ | Pobject_pointer _ | Pvalid_function _
+      | Pinitialized _ | Pdangling _
+      | Pfresh _ | Pallocable _ | Pfreeable _ | Pxor _ | Pseparated _
+      ), _ -> assert false
 
 exception StopRecursion of int
 
@@ -1680,25 +1783,25 @@ let rec hash_term (acc,depth,tot) t =
   else begin
     match t.term_node with
     | TConst c -> (acc + hash_logic_constant c, tot - 1)
-    | TLval lv -> hash_tlval (acc+19,depth - 1,tot -1) lv
-    | TSizeOf t -> (acc + 38 + Typ.hash t, tot - 1)
-    | TSizeOfE t -> hash_term (acc+57,depth -1, tot-1) t
-    | TSizeOfStr s -> (acc + 76 + Hashtbl.hash s, tot - 1)
-    | TAlignOf t -> (acc + 95 + Typ.hash t, tot - 1)
-    | TAlignOfE t -> hash_term (acc+114,depth-1,tot-1) t
-    | TUnOp(op,t) -> hash_term (acc+133+Hashtbl.hash op,depth-1,tot-2) t
+    | TLval lv -> hash_tlval (acc+2,depth - 1,tot -1) lv
+    | TSizeOf t -> (acc + 3 + Typ.hash t, tot - 1)
+    | TSizeOfE t -> hash_term (acc+5,depth -1, tot-1) t
+    | TSizeOfStr s -> (acc + 7 + Hashtbl.hash s, tot - 1)
+    | TAlignOf t -> (acc + 11 + Typ.hash t, tot - 1)
+    | TAlignOfE t -> hash_term (acc+13,depth-1,tot-1) t
+    | TUnOp(op,t) -> hash_term (acc+17+Hashtbl.hash op,depth-1,tot-2) t
     | TBinOp(bop,t1,t2) ->
       let hash1,tot1 =
-        hash_term (acc+152+Hashtbl.hash bop,depth-1,tot-2) t1
+        hash_term (acc+19+Hashtbl.hash bop,depth-1,tot-2) t1
       in
       hash_term (hash1,depth-1,tot1) t2
     | TCastE(ty,t) ->
       let hash1 = Typ.hash ty in
-      hash_term (acc+171+hash1,depth-1,tot-2) t
-    | TAddrOf lv -> hash_tlval (acc+190,depth-1,tot-1) lv
-    | TStartOf lv -> hash_tlval (acc+209,depth-1,tot-1) lv
+      hash_term (acc+23+hash1,depth-1,tot-2) t
+    | TAddrOf lv -> hash_tlval (acc+29,depth-1,tot-1) lv
+    | TStartOf lv -> hash_tlval (acc+31,depth-1,tot-1) lv
     | Tapp (li,labs,apps) ->
-      let hash1 = acc + 228 + Logic_info.hash li in
+      let hash1 = acc + 37 + Logic_info.hash li in
       let hash_lb (acc,tot) l =
         if tot = 0 then raise (StopRecursion acc)
         else (acc + hash_label l,tot - 1)
@@ -1711,51 +1814,54 @@ let rec hash_term (acc,depth,tot) t =
         if tot = 0 then raise (StopRecursion acc)
         else (acc + Logic_var.hash lv,tot-1)
       in
-      let (acc,tot) = List.fold_left hash_var (acc+247,tot-1) quants in
+      let (acc,tot) = List.fold_left hash_var (acc+41,tot-1) quants in
       hash_term (acc,depth-1,tot-1) t
     | TDataCons(ctor,args) ->
-      let hash = acc + 266 + Logic_ctor_info.hash ctor in
+      let hash = acc + 43 + Logic_ctor_info.hash ctor in
       let hash_one_term (acc,tot) t = hash_term (acc,depth-1,tot) t in
       List.fold_left hash_one_term (hash,tot-1) args
     | Tif(t1,t2,t3) ->
-      let hash1,tot1 = hash_term (acc+285,depth-1,tot) t1 in
+      let hash1,tot1 = hash_term (acc+47,depth-1,tot) t1 in
       let hash2,tot2 = hash_term (hash1,depth-1,tot1) t2 in
       hash_term (hash2,depth-1,tot2) t3
     | Tat(t,l) ->
-      let hash = acc + 304 + hash_label l in
+      let hash = acc + 53 + hash_label l in
       hash_term (hash,depth-1,tot-2) t
     | Tbase_addr (l,t) ->
-      let hash = acc + 323 + hash_label l in
+      let hash = acc + 59 + hash_label l in
       hash_term (hash,depth-1,tot-2) t
     | Tblock_length (l,t) ->
-      let hash = acc + 342 + hash_label l in
+      let hash = acc + 61 + hash_label l in
       hash_term (hash,depth-1,tot-2) t
     | Toffset (l,t) ->
-      let hash = acc + 351 + hash_label l in
+      let hash = acc + 67 + hash_label l in
       hash_term (hash,depth-1,tot-2) t
-    | Tnull -> acc+361, tot - 1
+    | Tnull -> acc+71, tot - 1
     | TUpdate(t1,off,t2) ->
-      let hash1,tot1 = hash_term (acc+418,depth-1,tot-1) t1 in
+      let hash1,tot1 = hash_term (acc+73,depth-1,tot-1) t1 in
       let hash2,tot2 = hash_toffset (hash1,depth-1,tot1) off in
       hash_term (hash2,depth-1,tot2) t2
-    | Ttypeof t -> hash_term (acc+437,depth-1,tot-1) t
-    | Ttype t -> acc + 456 + Typ.hash t, tot - 1
-    | Tempty_set -> acc + 475, tot - 1
+    | Ttypeof t -> hash_term (acc+79,depth-1,tot-1) t
+    | Ttype t -> acc + 83 + Typ.hash t, tot - 1
+    | Tempty_set -> acc + 89, tot - 1
     | Tunion tl ->
       let hash_one_term (acc,tot) t = hash_term (acc,depth-1,tot) t in
-      List.fold_left hash_one_term (acc+494,tot-1) tl
+      List.fold_left hash_one_term (acc+97,tot-1) tl
     | Tinter tl ->
       let hash_one_term (acc,tot) t = hash_term (acc,depth-1,tot) t in
-      List.fold_left hash_one_term (acc+513,tot-1) tl
-    | Tcomprehension (t,quants,_) -> (* TODO: hash predicates *)
+      List.fold_left hash_one_term (acc+101,tot-1) tl
+    | Tcomprehension (t,quants,p) ->
       let hash_var (acc,tot) lv =
         if tot = 0 then raise (StopRecursion acc)
         else (acc + Logic_var.hash lv,tot-1)
       in
-      let (acc,tot) = List.fold_left hash_var (acc+532,tot-1) quants in
-      hash_term (acc,depth-1,tot-1) t
+      let (acc,tot) = List.fold_left hash_var (acc+103,tot-1) quants in
+      let (acc,tot) = hash_term (acc,depth-1,tot-1) t in
+      (match p with
+       | None -> acc, tot - 1
+       | Some p -> hash_predicate (acc, depth - 1, tot - 1) p)
     | Trange(t1,t2) ->
-      let acc = acc + 551 in
+      let acc = acc + 107 in
       let acc,tot =
         match t1 with
           None -> acc,tot - 1
@@ -1768,9 +1874,9 @@ let rec hash_term (acc,depth,tot) t =
          | Some t -> hash_term (acc,depth-1,tot-1) t)
     | Tlet(li,t) ->
       hash_term
-        (acc + 570 + Hashtbl.hash li.l_var_info.lv_name, depth-1, tot-1)
+        (acc + 109 + Hashtbl.hash li.l_var_info.lv_name, depth-1, tot-1)
         t
-    | TLogic_coerce(_,e) -> hash_term (acc + 587, depth - 1, tot - 1) e
+    | TLogic_coerce(_,e) -> hash_term (acc + 113, depth - 1, tot - 1) e
   end
 
 and hash_tlval (acc,depth,tot) (h,o) =
@@ -1801,6 +1907,101 @@ and hash_toffset (acc, depth, tot) t =
     | TIndex (t, o) ->
       let hash, tot = hash_term (acc+73, depth - 1, tot - 1) t in
       hash_toffset (hash, depth - 1, tot) o
+  end
+
+and hash_predicate (acc, depth, tot) p =
+  if tot <= 0 || depth <= 0 then raise (StopRecursion acc)
+  else begin
+    match p.pred_content with
+    | Pfalse -> acc + 2, tot - 1
+    | Ptrue -> acc + 3, tot - 1
+    | Papp(li,labels,args) ->
+      let hash1 = acc + 5 + Logic_info.hash li in
+      let hash_lb (acc, tot) l =
+        if tot = 0 then raise (StopRecursion acc)
+        else (acc + hash_label l, tot - 1)
+      in
+      let hash_one_term (acc, tot) t = hash_term (acc, depth - 1, tot) t in
+      let res = List.fold_left hash_lb (hash1, tot - 1) labels in
+      List.fold_left hash_one_term res args
+    | Prel(r,lt,rt) ->
+      let hashr = acc + 7 + Hashtbl.hash r in
+      let hashlt, totlt = hash_term (hashr, depth - 1, tot - 1) lt in
+      hash_term (hashlt, depth - 1, totlt) rt
+    | Pand(lp,rp) ->
+      let hashlp, totlp = hash_predicate (acc + 11, depth - 1, tot - 1) lp in
+      hash_predicate (hashlp, depth - 1, totlp) rp
+    | Por(lp,rp) ->
+      let hashlp, totlp = hash_predicate (acc + 13, depth - 1, tot - 1) lp in
+      hash_predicate (hashlp, depth - 1, totlp) rp
+    | Pxor (lp,rp) ->
+      let hashlp, totlp = hash_predicate (acc + 17, depth - 1, tot - 1) lp in
+      hash_predicate (hashlp, depth - 1, totlp) rp
+    | Pimplies(lp,rp) ->
+      let hashlp, totlp = hash_predicate (acc + 19, depth - 1, tot - 1) lp in
+      hash_predicate (hashlp, depth - 1, totlp) rp
+    | Piff(lp,rp) ->
+      let hashlp, totlp = hash_predicate (acc + 23, depth - 1, tot - 1) lp in
+      hash_predicate (hashlp, depth - 1, totlp) rp
+    | Pnot p -> hash_predicate (acc + 29, depth - 1, tot - 1) p
+    | Pif (c,t,e) ->
+      let hashc, totc = hash_term (acc + 31, depth - 1, tot - 1) c in
+      let hasht, tott = hash_predicate (hashc, depth - 1, totc) t in
+      hash_predicate (hasht, depth - 1, tott) e
+    | Plet (d,p) ->
+      let hashli = acc + 37 + Logic_info.hash d in
+      hash_predicate (hashli, depth - 1, tot - 1) p
+    | Pforall(q,p) ->
+      let hash_var (acc, tot) lv =
+        if tot = 0 then raise (StopRecursion acc)
+        else (acc + Logic_var.hash lv, tot - 1)
+      in
+      let (acc, tot) = List.fold_left hash_var (acc + 41, tot - 1) q in
+      hash_predicate (acc, depth - 1, tot - 1) p
+    | Pexists(q,p) ->
+      let hash_var (acc, tot) lv =
+        if tot <= 0 then raise (StopRecursion acc)
+        else (acc + Logic_var.hash lv, tot - 1)
+      in
+      let (acc, tot) = List.fold_left hash_var (acc + 43, tot - 1) q in
+      hash_predicate (acc, depth - 1, tot - 1) p
+    | Pat(p,l) ->
+      let hashp, totp = hash_predicate (acc + 47, depth - 1, tot - 1) p in
+      hashp + hash_label l, totp - 1
+    | Pallocable (l,t) ->
+      let hashl = acc + 53 + hash_label l in
+      hash_term (hashl, depth - 1, tot - 2) t
+    | Pfreeable (l,t) ->
+      let hashl = acc + 59 + hash_label l in
+      hash_term (hashl, depth - 1, tot - 2) t
+    | Pvalid (l,t) ->
+      let hashl = acc + 61 + hash_label l in
+      hash_term (hashl, depth - 1, tot - 2) t
+    | Pvalid_read (l,t) ->
+      let hashl = acc + 67 + hash_label l in
+      hash_term (hashl, depth - 1, tot - 2) t
+    | Pobject_pointer (l,t) ->
+      let hashl = acc + 71 + hash_label l in
+      hash_term (hashl, depth - 1, tot - 2) t
+    | Pinitialized (l,t) ->
+      let hashl = acc + 73 + hash_label l in
+      hash_term (hashl, depth - 1, tot - 2) t
+    | Pdangling (l,t) ->
+      let hashl = acc + 79 + hash_label l in
+      hash_term (hashl, depth - 1, tot - 2) t
+    | Pvalid_function t ->
+      hash_term (acc + 83, depth - 1, tot - 1) t
+    | Pfresh (l,m,t,n) ->
+      let hashl = acc + 89 + hash_label l in
+      let hashm = hashl + hash_label m in
+      let hasht, tott = hash_term (hashm, depth - 1, tot - 3) t in
+      hash_term (hasht, depth - 1, tott) n
+    | Pseparated(seps) ->
+      let hash_one_term (acc, tot) t = hash_term (acc, depth - 1, tot) t in
+      List.fold_left
+        hash_one_term
+        (acc + 97, tot - 1)
+        seps
   end
 
 let hash_fct f t = try fst (f (0,10,100) t) with StopRecursion n -> n
@@ -2306,6 +2507,26 @@ module Identified_predicate = struct
         let internal_pretty_code = Datatype.undefined
         let pretty fmt x = !pretty_ref fmt x
         let varname _ = "id_predyes"
+      end)
+end
+
+module PredicateStructEq = struct
+  let pretty_ref = ref (fun _ _ -> assert false)
+  include Make_with_collections
+      (struct
+        type t = predicate
+        let name = "PredicateStructEq"
+        let reprs =
+          [ { pred_name = [ "" ];
+              pred_loc = Location.unknown;
+              pred_content = Pfalse } ]
+        let compare = compare_predicate
+        let equal = Datatype.from_compare
+        let copy = Datatype.undefined
+        let hash = hash_fct hash_predicate
+        let internal_pretty_code = Datatype.undefined
+        let pretty fmt x = !pretty_ref fmt x
+        let varname _ = "p"
       end)
 end
 
