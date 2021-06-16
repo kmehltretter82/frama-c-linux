@@ -434,6 +434,11 @@ val isCompleteType: ?allowZeroSizeArrays:bool -> typ -> bool
     @since 18.0-Argon
 *)
 val has_flexible_array_member: typ -> bool
+(** [true] iff the given type has flexible array member.
+
+    @modify Frama-C+dev in GCC/MSVC mode recursively searches in the type of the
+    last field.
+*)
 
 (** Unroll a type until it exposes a non
  * [TNamed]. Will collect all attributes appearing in [TNamed]!!! *)

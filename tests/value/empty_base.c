@@ -72,7 +72,7 @@ struct f2 {
 void gcc_zero_length_examples() {
   struct foo { int x; int y[]; };
   //struct foo a = { 1, { 2, 3, 4, 5 } };
-  struct bar { struct foo z; }; // error expected here
+  struct bar { struct foo z; }; // error expected here in standard mode
   struct bar c = { { 1, { } } };
   struct f1 {
     int x; int y[];
@@ -80,6 +80,7 @@ void gcc_zero_length_examples() {
   struct f2 {
     struct f1 f1; int data[3];
   } f2 = { { 1 }, { 2, 3, 4 } }; // error expected here
+  struct baz { struct bar f; }; // error expected here in standard mode
 }
 
 int main() {

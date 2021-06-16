@@ -6122,16 +6122,18 @@ let foldLeftCompound
 
   | _ -> Kernel.fatal ~current:true "Type of Compound is not array or struct or union"
 
-let has_flexible_array_member t =
+let rec has_flexible_array_member t =
   let is_flexible_array t =
     match unrollType t with
     | TArray (_, None, _, _) -> true
-    | TArray (_, Some z, _, _) -> gccMode() && isZero z
+    | TArray (_, Some z, _, _) -> (msvcMode() || gccMode()) && isZero z
     | _ -> false
   in
   match unrollType t with
   | TComp ({ cfields = Some ((_::_) as l) },_,_) ->
-    is_flexible_array (Extlib.last l).ftype
+    let last = (Extlib.last l).ftype in
+    is_flexible_array last ||
+    ((gccMode() || msvcMode()) && has_flexible_array_member last)
   | _ -> false
 
 (* last_field is [true] if the given type is the type of the last field of
