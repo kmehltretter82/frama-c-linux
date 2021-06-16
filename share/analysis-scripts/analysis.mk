@@ -35,6 +35,7 @@
 # EVAFLAGS      flags to use with the Eva plugin
 # EVABUILTINS   Eva builtins to be set (via -eva-builtin)
 # EVAUSESPECS   Eva functions to be overridden by specs (-eva-use-spec)
+# WPFLAGS       flags to use with the WP plugin
 #
 # FLAMEGRAPH    If set (to any value), running an analysis will produce an
 #               SVG + HTML flamegraph at the end.
@@ -127,6 +128,7 @@ EVAFLAGS   ?= \
   -calldeps -from-verbose 0 \
   $(if $(EVABUILTINS), -eva-builtin=$(call fc_list,$(EVABUILTINS)),) \
   $(if $(EVAUSESPECS), -eva-use-spec $(call fc_list,$(EVAUSESPECS)),)
+WPFLAGS    ?=
 FCFLAGS    ?=
 FCGUIFLAGS ?=
 
@@ -157,7 +159,7 @@ SHELL        := $(shell which bash)
 .FORCE:
 .SUFFIXES: # Disable make builtins
 
-%.parse/command %.eva/command:
+%.parse/command %.eva/command %.wp/command:
 	@#
 
 %.parse: SOURCES = $(filter-out %/command,$^)
@@ -184,7 +186,7 @@ SHELL        := $(shell which bash)
 	  printf 'cmd_args=%q\n' "$(subst ",\",$(wordlist 2,999,$(PARSE)))"
 	} >> $@/stats.txt
 	mv $@/{running,command}
-	touch $@ # Update timestamp and prevents remake if nothing changes
+	touch $@ # Update timestamp and prevent remake if nothing changes
 
 %.eva: EVA = $(FRAMAC) $(FCFLAGS) -eva $(EVAFLAGS)
 %.eva: PARSE_RESULT = $(word 1,$(subst ., ,$*)).parse
@@ -225,6 +227,34 @@ SHELL        := $(shell which bash)
 	fi
 	mv $@/{running,command}
 	touch $@ # Update timestamp and prevents remake if nothing changes
+
+%.wp: WP = $(FRAMAC) $(FCFLAGS) -wp $(WPFLAGS)
+%.wp: PARSE_RESULT = $(word 1,$(subst ., ,$*)).parse
+%.wp: $$(PARSE_RESULT) $$(shell $(DIR)cmd-dep.sh $$@/command $$(WP)) $(if $(BENCHMARK),.FORCE,)
+	@$(call display_command,$(WP))
+	mkdir -p $@
+	mv -f $@/{command,running}
+	{
+	  $(call time_with_output,$@/stats.txt) \
+	    $(WP) \
+	      -load $(PARSE_RESULT)/framac.sav -save $@/framac.sav \
+	      -kernel-log w:$@/warnings.log \
+	      -wp-log w:$@/warnings.log \
+	      -then \
+	      -report-csv $@/alarms.csv -report-no-proven \
+	      -report-log w:$@/warnings.log \
+	    || ($(RM) $@/stats.txt && false) # Prevents having error code reporting in stats.txt
+	} 2>&1 |
+	  tee $@/wp.log
+	{
+	  printf 'timestamp=%q\n' "$(HR_TIMESTAMP)";
+	  printf 'warnings=%s\n' "`cat $@/warnings.log | grep ':\[\(wp\|kernel\)\]' | wc -l`";
+	  printf 'alarms=%s\n' "`expr $$(cat $@/alarms.csv | wc -l) - 1`";
+	  printf 'cmd_args=%q\n' "$(subst ",\",$(wordlist 2,999,$(WP)))";
+	  printf 'benchmark_tag=%s' "$(BENCHMARK)"
+	} >> $@/stats.txt
+	mv $@/{running,command}
+	touch $@ # Update timestamp and prevent remake if nothing changes
 
 %.gui: %
 	$(FRAMAC_GUI) $(FCGUIFLAGS) -load $^/framac.sav &
