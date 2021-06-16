@@ -37,6 +37,36 @@ let replace_literal_string_in_exp env kf_opt (* None for globals *) e =
   | None -> e, env
   | Some kf -> Literal_observer.subst_all_literals_in_exp env kf e
 
+let replace_literal_strings_in_args env kf_opt (* None for globals *) args =
+  List.fold_right
+    (fun a (args, env) ->
+       let a, env = replace_literal_string_in_exp env kf_opt a in
+       a :: args, env)
+    args
+    ([], env)
+
+(* rewrite names of functions for which we have alternative definitions in the
+   RTL. *)
+let rename_caller ~loc caller args =
+  if Options.Replace_libc_functions.get ()
+  && Functions.RTL.has_rtl_replacement caller.vname then begin
+    (* rewrite names of functions for which we have alternative definitions in
+       the RTL. *)
+    let fvi = Rtl.Symbols.libc_replacement caller in
+    fvi, args
+  end
+  else if Options.Validate_format_strings.get ()
+       && Functions.Libc.is_printf_name caller.vname then
+    (* rewrite names of format functions (such as printf). This case differs
+       from the above because argument list of format functions is extended with
+       an argument describing actual variadic arguments *)
+    (* replacement name, e.g., [printf] -> [__e_acsl_builtin_printf] *)
+    let fvi = Rtl.Symbols.libc_replacement caller in
+    let fmt = Functions.Libc.get_printf_argument_str ~loc caller.vname args in
+    fvi, fmt :: args
+  else
+    caller, args
+
 let rec inject_in_init env kf_opt vi off = function
   | SingleInit e as init ->
     if vi.vglob then Global_observer.add_initializer vi off init;
@@ -64,72 +94,18 @@ let inject_in_local_init loc env kf vi = function
     let env = Env.add_stmt ~post:true env kf store in
     init, env
 
-  | ConsInit (fvi, args, kind)
-    when Options.Validate_format_strings.get ()
-      && Functions.Libc.is_printf_name fvi.vname
-    ->
-    (* rewrite libc function names (e.g., [printf]). *)
-    let name = Functions.RTL.libc_replacement_name fvi.vname in
-    let new_vi = try Builtins.find name with Not_found -> assert false in
-    let fmt = Functions.Libc.get_printf_argument_str ~loc fvi.vname args in
-    ConsInit(new_vi, fmt :: args, kind), env
-
-  | ConsInit (fvi, _, _) as init
-    when Options.Replace_libc_functions.get ()
-      && Functions.RTL.has_rtl_replacement fvi.vname
-    ->
-    (* rewrite names of functions for which we have alternative definitions in
-       the RTL. *)
-    fvi.vname <- Functions.RTL.libc_replacement_name fvi.vname;
-    init, env
+  | ConsInit (caller, args, kind) ->
+    let args, env = replace_literal_strings_in_args env (Some kf) args in
+    let caller, args = rename_caller ~loc caller args in
+    ConsInit(caller, args, kind), env
 
   | AssignInit init ->
     let init, env = inject_in_init env (Some kf) vi NoOffset init in
     AssignInit init, env
 
-  | ConsInit(vi, l, ck) ->
-    let l, env =
-      List.fold_right
-        (fun e (l, env) ->
-           let e, env = replace_literal_string_in_exp env (Some kf) e in
-           e :: l, env)
-        l
-        ([], env)
-    in
-    ConsInit(vi, l, ck), env
-
 (* ************************************************************************** *)
 (* Instructions and statements *)
 (* ************************************************************************** *)
-
-(* rewrite names of functions for which we have alternative definitions in the
-   RTL. *)
-let rename_caller loc args exp = match exp.enode with
-  | Lval(Var vi, _)
-    when Options.Replace_libc_functions.get ()
-      && Functions.RTL.has_rtl_replacement vi.vname
-    ->
-    vi.vname <- Functions.RTL.libc_replacement_name vi.vname;
-    exp, args
-
-  | Lval(Var vi, _)
-    when Options.Validate_format_strings.get ()
-      && Functions.Libc.is_printf_name vi.vname
-    ->
-    (* rewrite names of format functions (such as printf). This case differs
-       from the above because argument list of format functions is extended with
-       an argument describing actual variadic arguments *)
-    (* replacement name, e.g., [printf] -> [__e_acsl_builtin_printf] *)
-    let name = Functions.RTL.libc_replacement_name vi.vname in
-    (* variadic arguments descriptor *)
-    let fmt = Functions.Libc.get_printf_argument_str ~loc vi.vname args in
-    (* get the library function we need. Cannot just rewrite the name as AST
-       check will then fail *)
-    let vi = try Rtl.Symbols.find_vi name with Not_found -> assert false in
-    Cil.evar vi, fmt :: args
-
-  | _ ->
-    exp, args
 
 (* TODO: should be better documented *)
 let add_initializer loc ?vi lv ?(post=false) stmt env kf =
@@ -167,15 +143,14 @@ let inject_in_instr env kf stmt = function
     Set(lv, e, loc), env
 
   | Call(result, caller, args, loc) ->
-    let args, env =
-      List.fold_right
-        (fun a (args, env) ->
-           let a, env = replace_literal_string_in_exp env (Some kf) a in
-           a :: args, env)
-        args
-        ([], env)
+    let args, env = replace_literal_strings_in_args env (Some kf) args in
+    let caller, args =
+      match caller.enode with
+      | Lval (Var fvi, _) ->
+        let fvi, args = rename_caller loc fvi args in
+        Cil.evar fvi, args
+      | _ -> caller, args
     in
-    let caller, args = rename_caller loc args caller in
     (* add statement tracking initialization of return values *)
     let env =
       match result with
