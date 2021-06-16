@@ -5,27 +5,27 @@ void f_signed(int a, int b)
 {
   int c = a << 2;
   __e_acsl_assert(0 <= a,1,"RTE","f_signed","shift: 0 <= a",
-                  "tests/arith/bitwise.c",12);
+                  "tests/arith/bitwise.c",14);
   __e_acsl_assert((long)c == a << 2L,1,"Assertion","f_signed","c == a << 2",
-                  "tests/arith/bitwise.c",12);
+                  "tests/arith/bitwise.c",14);
   /*@ assert c ≡ a << 2; */ ;
   int d = b >> 2;
   __e_acsl_assert(0 <= b,1,"RTE","f_signed","shift: 0 <= b",
-                  "tests/arith/bitwise.c",14);
+                  "tests/arith/bitwise.c",16);
   __e_acsl_assert(d == b >> 2,1,"Assertion","f_signed","d == b >> 2",
-                  "tests/arith/bitwise.c",14);
+                  "tests/arith/bitwise.c",16);
   /*@ assert d ≡ b >> 2; */ ;
   int e = a | b;
   __e_acsl_assert((long)e == (a | (long)b),1,"Assertion","f_signed",
-                  "e == (a | b)","tests/arith/bitwise.c",16);
+                  "e == (a | b)","tests/arith/bitwise.c",18);
   /*@ assert e ≡ (a | b); */ ;
   int f = a & b;
   __e_acsl_assert((long)f == (a & (long)b),1,"Assertion","f_signed",
-                  "f == (a & b)","tests/arith/bitwise.c",18);
+                  "f == (a & b)","tests/arith/bitwise.c",20);
   /*@ assert f ≡ (a & b); */ ;
   int g = a ^ b;
   __e_acsl_assert((long)g == (a ^ (long)b),1,"Assertion","f_signed",
-                  "g == (a ^ b)","tests/arith/bitwise.c",20);
+                  "g == (a ^ b)","tests/arith/bitwise.c",22);
   /*@ assert g ≡ (a ^ b); */ ;
   return;
 }
@@ -34,23 +34,23 @@ void f_unsigned(unsigned int a, unsigned int b)
 {
   unsigned int c = a << 2u;
   __e_acsl_assert((unsigned long)c == a << 2UL,1,"Assertion","f_unsigned",
-                  "c == a << 2","tests/arith/bitwise.c",26);
+                  "c == a << 2","tests/arith/bitwise.c",28);
   /*@ assert c ≡ a << 2; */ ;
   unsigned int d = b >> 2u;
   __e_acsl_assert(d == b >> 2U,1,"Assertion","f_unsigned","d == b >> 2",
-                  "tests/arith/bitwise.c",28);
+                  "tests/arith/bitwise.c",30);
   /*@ assert d ≡ b >> 2; */ ;
   unsigned int e = a | b;
   __e_acsl_assert(e == (a | b),1,"Assertion","f_unsigned","e == (a | b)",
-                  "tests/arith/bitwise.c",30);
+                  "tests/arith/bitwise.c",32);
   /*@ assert e ≡ (a | b); */ ;
   unsigned int f = a & b;
   __e_acsl_assert(f == (a & b),1,"Assertion","f_unsigned","f == (a & b)",
-                  "tests/arith/bitwise.c",32);
+                  "tests/arith/bitwise.c",34);
   /*@ assert f ≡ (a & b); */ ;
   unsigned int g = a ^ b;
   __e_acsl_assert(g == (a ^ b),1,"Assertion","f_unsigned","g == (a ^ b)",
-                  "tests/arith/bitwise.c",34);
+                  "tests/arith/bitwise.c",36);
   /*@ assert g ≡ (a ^ b); */ ;
   return;
 }
@@ -78,7 +78,7 @@ void g_signed(int a, int b)
     */
     __e_acsl_assert(__gen_e_acsl_b_shiftl_guard,1,"RTE","g_signed",
                     "shiftl_rhs_fits_in_mp_bitcnt_t: 0 <= b <= 18446744073709551615",
-                    "tests/arith/bitwise.c",40);
+                    "tests/arith/bitwise.c",42);
     __gen_e_acsl_b_shiftl_coerced = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_b));
     __gmpz_init_set_si(__gen_e_acsl_,0L);
     __gen_e_acsl_a_shiftl_guard = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_a),
@@ -86,14 +86,14 @@ void g_signed(int a, int b)
     __gmpz_init(__gen_e_acsl_shiftl);
     /*@ assert E_ACSL: a ≥ 0; */
     __e_acsl_assert(__gen_e_acsl_a_shiftl_guard >= 0,1,"RTE","g_signed",
-                    "a >= 0","tests/arith/bitwise.c",40);
+                    "a >= 0","tests/arith/bitwise.c",42);
     __gmpz_mul_2exp(__gen_e_acsl_shiftl,
                     (__e_acsl_mpz_struct const *)(__gen_e_acsl_a),
                     __gen_e_acsl_b_shiftl_coerced);
     __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_c),
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_shiftl));
     __e_acsl_assert(__gen_e_acsl_eq == 0,1,"Assertion","g_signed",
-                    "c == a << b","tests/arith/bitwise.c",40);
+                    "c == a << b","tests/arith/bitwise.c",42);
     __gmpz_clear(__gen_e_acsl_c);
     __gmpz_clear(__gen_e_acsl_a);
     __gmpz_clear(__gen_e_acsl_b);
@@ -122,7 +122,7 @@ void g_signed(int a, int b)
     */
     __e_acsl_assert(__gen_e_acsl_b_shiftr_guard,1,"RTE","g_signed",
                     "shiftr_rhs_fits_in_mp_bitcnt_t: 0 <= b <= 18446744073709551615",
-                    "tests/arith/bitwise.c",42);
+                    "tests/arith/bitwise.c",44);
     __gen_e_acsl_b_shiftr_coerced = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_b_2));
     __gmpz_init_set_si(__gen_e_acsl__2,0L);
     __gen_e_acsl_a_shiftr_guard = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_a_2),
@@ -130,14 +130,14 @@ void g_signed(int a, int b)
     __gmpz_init(__gen_e_acsl_shiftr);
     /*@ assert E_ACSL: a ≥ 0; */
     __e_acsl_assert(__gen_e_acsl_a_shiftr_guard >= 0,1,"RTE","g_signed",
-                    "a >= 0","tests/arith/bitwise.c",42);
+                    "a >= 0","tests/arith/bitwise.c",44);
     __gmpz_tdiv_q_2exp(__gen_e_acsl_shiftr,
                        (__e_acsl_mpz_struct const *)(__gen_e_acsl_a_2),
                        __gen_e_acsl_b_shiftr_coerced);
     __gen_e_acsl_eq_2 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_d),
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_shiftr));
     __e_acsl_assert(__gen_e_acsl_eq_2 == 0,1,"Assertion","g_signed",
-                    "d == a >> b","tests/arith/bitwise.c",42);
+                    "d == a >> b","tests/arith/bitwise.c",44);
     __gmpz_clear(__gen_e_acsl_d);
     __gmpz_clear(__gen_e_acsl_a_2);
     __gmpz_clear(__gen_e_acsl_b_2);
@@ -168,7 +168,7 @@ void g_signed(int a, int b)
     */
     __e_acsl_assert(__gen_e_acsl_cst_shiftl_guard,1,"RTE","g_signed",
                     "shiftl_rhs_fits_in_mp_bitcnt_t: 0 <= 1 <= 18446744073709551615",
-                    "tests/arith/bitwise.c",44);
+                    "tests/arith/bitwise.c",46);
     __gen_e_acsl_cst_shiftl_coerced = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl__4));
     __gmpz_init_set_si(__gen_e_acsl__5,0L);
     __gen_e_acsl_shiftl_guard = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_add),
@@ -177,7 +177,7 @@ void g_signed(int a, int b)
     /*@ assert E_ACSL: 18446744073709551615ULL + 1 ≥ 0; */
     __e_acsl_assert(__gen_e_acsl_shiftl_guard >= 0,1,"RTE","g_signed",
                     "18446744073709551615ULL + 1 >= 0",
-                    "tests/arith/bitwise.c",44);
+                    "tests/arith/bitwise.c",46);
     __gmpz_mul_2exp(__gen_e_acsl_shiftl_2,
                     (__e_acsl_mpz_struct const *)(__gen_e_acsl_add),
                     __gen_e_acsl_cst_shiftl_coerced);
@@ -185,7 +185,7 @@ void g_signed(int a, int b)
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__5));
     __e_acsl_assert(__gen_e_acsl_ne != 0,1,"Assertion","g_signed",
                     "(18446744073709551615ULL + 1) << 1 != 0",
-                    "tests/arith/bitwise.c",44);
+                    "tests/arith/bitwise.c",46);
     __gmpz_clear(__gen_e_acsl__3);
     __gmpz_clear(__gen_e_acsl__4);
     __gmpz_clear(__gen_e_acsl_add);
@@ -216,7 +216,7 @@ void g_signed(int a, int b)
     */
     __e_acsl_assert(__gen_e_acsl_cst_shiftr_guard,1,"RTE","g_signed",
                     "shiftr_rhs_fits_in_mp_bitcnt_t: 0 <= 1 <= 18446744073709551615",
-                    "tests/arith/bitwise.c",45);
+                    "tests/arith/bitwise.c",47);
     __gen_e_acsl_cst_shiftr_coerced = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl__7));
     __gmpz_init_set_si(__gen_e_acsl__8,0L);
     __gen_e_acsl_shiftr_guard = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_add_2),
@@ -225,14 +225,14 @@ void g_signed(int a, int b)
     /*@ assert E_ACSL: 18446744073709551615ULL + 1 ≥ 0; */
     __e_acsl_assert(__gen_e_acsl_shiftr_guard >= 0,1,"RTE","g_signed",
                     "18446744073709551615ULL + 1 >= 0",
-                    "tests/arith/bitwise.c",45);
+                    "tests/arith/bitwise.c",47);
     __gmpz_tdiv_q_2exp(__gen_e_acsl_shiftr_2,
                        (__e_acsl_mpz_struct const *)(__gen_e_acsl_add_2),
                        __gen_e_acsl_cst_shiftr_coerced);
     __gen_e_acsl__9 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_shiftr_2));
     __e_acsl_assert(__gen_e_acsl__9 != 0UL,1,"Assertion","g_signed",
                     "(18446744073709551615ULL + 1) >> 1 != 0",
-                    "tests/arith/bitwise.c",45);
+                    "tests/arith/bitwise.c",47);
     __gmpz_clear(__gen_e_acsl__6);
     __gmpz_clear(__gen_e_acsl__7);
     __gmpz_clear(__gen_e_acsl_add_2);
@@ -258,7 +258,7 @@ void g_signed(int a, int b)
     */
     __e_acsl_assert(__gen_e_acsl_cst_shiftl_guard_2,1,"RTE","g_signed",
                     "shiftl_rhs_fits_in_mp_bitcnt_t: 0 <= 65 <= 18446744073709551615",
-                    "tests/arith/bitwise.c",46);
+                    "tests/arith/bitwise.c",48);
     __gen_e_acsl_cst_shiftl_coerced_2 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl__11));
     __gmpz_init_set_si(__gen_e_acsl__12,0L);
     __gen_e_acsl_cst_shiftl_guard_3 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__10),
@@ -266,14 +266,14 @@ void g_signed(int a, int b)
     __gmpz_init(__gen_e_acsl_shiftl_3);
     /*@ assert E_ACSL: 1 ≥ 0; */
     __e_acsl_assert(__gen_e_acsl_cst_shiftl_guard_3 >= 0,1,"RTE","g_signed",
-                    "1 >= 0","tests/arith/bitwise.c",46);
+                    "1 >= 0","tests/arith/bitwise.c",48);
     __gmpz_mul_2exp(__gen_e_acsl_shiftl_3,
                     (__e_acsl_mpz_struct const *)(__gen_e_acsl__10),
                     __gen_e_acsl_cst_shiftl_coerced_2);
     __gen_e_acsl_ne_2 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_shiftl_3),
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__12));
     __e_acsl_assert(__gen_e_acsl_ne_2 != 0,1,"Assertion","g_signed",
-                    "1 << 65 != 0","tests/arith/bitwise.c",46);
+                    "1 << 65 != 0","tests/arith/bitwise.c",48);
     __gmpz_clear(__gen_e_acsl__10);
     __gmpz_clear(__gen_e_acsl__11);
     __gmpz_clear(__gen_e_acsl__12);
@@ -309,7 +309,7 @@ void g_signed(int a, int b)
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__16));
     __e_acsl_assert(__gen_e_acsl_ne_3 != 0,1,"Assertion","g_signed",
                     "((18446744073709551615ULL + 1) | ((-9223372036854775807LL - 1LL) - 1)) != 0",
-                    "tests/arith/bitwise.c",47);
+                    "tests/arith/bitwise.c",49);
     __gmpz_clear(__gen_e_acsl__13);
     __gmpz_clear(__gen_e_acsl__14);
     __gmpz_clear(__gen_e_acsl_add_3);
@@ -355,7 +355,7 @@ void g_signed(int a, int b)
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_bxor));
     __e_acsl_assert(__gen_e_acsl_ne_4 != 0,1,"Assertion","g_signed",
                     "((18446744073709551615ULL + 1) & ((-9223372036854775807LL - 1LL) - 1)) !=\n((18446744073709551615ULL + 1) ^ ((-9223372036854775807LL - 1LL) - 1))",
-                    "tests/arith/bitwise.c",48);
+                    "tests/arith/bitwise.c",50);
     __gmpz_clear(__gen_e_acsl__17);
     __gmpz_clear(__gen_e_acsl__18);
     __gmpz_clear(__gen_e_acsl_add_4);
@@ -395,7 +395,7 @@ void g_unsigned(unsigned int a, unsigned int b)
     */
     __e_acsl_assert(__gen_e_acsl_b_shiftl_guard,1,"RTE","g_unsigned",
                     "shiftl_rhs_fits_in_mp_bitcnt_t: 0 <= b <= 18446744073709551615",
-                    "tests/arith/bitwise.c",55);
+                    "tests/arith/bitwise.c",57);
     __gen_e_acsl_b_shiftl_coerced = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_b));
     __gmpz_init_set_si(__gen_e_acsl_,0L);
     __gen_e_acsl_a_shiftl_guard = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_a),
@@ -403,14 +403,14 @@ void g_unsigned(unsigned int a, unsigned int b)
     __gmpz_init(__gen_e_acsl_shiftl);
     /*@ assert E_ACSL: a ≥ 0; */
     __e_acsl_assert(__gen_e_acsl_a_shiftl_guard >= 0,1,"RTE","g_unsigned",
-                    "a >= 0","tests/arith/bitwise.c",55);
+                    "a >= 0","tests/arith/bitwise.c",57);
     __gmpz_mul_2exp(__gen_e_acsl_shiftl,
                     (__e_acsl_mpz_struct const *)(__gen_e_acsl_a),
                     __gen_e_acsl_b_shiftl_coerced);
     __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_c),
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_shiftl));
     __e_acsl_assert(__gen_e_acsl_eq == 0,1,"Assertion","g_unsigned",
-                    "c == a << b","tests/arith/bitwise.c",55);
+                    "c == a << b","tests/arith/bitwise.c",57);
     __gmpz_clear(__gen_e_acsl_c);
     __gmpz_clear(__gen_e_acsl_a);
     __gmpz_clear(__gen_e_acsl_b);
@@ -439,7 +439,7 @@ void g_unsigned(unsigned int a, unsigned int b)
     */
     __e_acsl_assert(__gen_e_acsl_b_shiftr_guard,1,"RTE","g_unsigned",
                     "shiftr_rhs_fits_in_mp_bitcnt_t: 0 <= b <= 18446744073709551615",
-                    "tests/arith/bitwise.c",57);
+                    "tests/arith/bitwise.c",59);
     __gen_e_acsl_b_shiftr_coerced = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_b_2));
     __gmpz_init_set_si(__gen_e_acsl__2,0L);
     __gen_e_acsl_a_shiftr_guard = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_a_2),
@@ -447,14 +447,14 @@ void g_unsigned(unsigned int a, unsigned int b)
     __gmpz_init(__gen_e_acsl_shiftr);
     /*@ assert E_ACSL: a ≥ 0; */
     __e_acsl_assert(__gen_e_acsl_a_shiftr_guard >= 0,1,"RTE","g_unsigned",
-                    "a >= 0","tests/arith/bitwise.c",57);
+                    "a >= 0","tests/arith/bitwise.c",59);
     __gmpz_tdiv_q_2exp(__gen_e_acsl_shiftr,
                        (__e_acsl_mpz_struct const *)(__gen_e_acsl_a_2),
                        __gen_e_acsl_b_shiftr_coerced);
     __gen_e_acsl_eq_2 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_d),
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_shiftr));
     __e_acsl_assert(__gen_e_acsl_eq_2 == 0,1,"Assertion","g_unsigned",
-                    "d == a >> b","tests/arith/bitwise.c",57);
+                    "d == a >> b","tests/arith/bitwise.c",59);
     __gmpz_clear(__gen_e_acsl_d);
     __gmpz_clear(__gen_e_acsl_a_2);
     __gmpz_clear(__gen_e_acsl_b_2);
@@ -485,7 +485,7 @@ void g_unsigned(unsigned int a, unsigned int b)
     */
     __e_acsl_assert(__gen_e_acsl_cst_shiftl_guard,1,"RTE","g_unsigned",
                     "shiftl_rhs_fits_in_mp_bitcnt_t: 0 <= 1u <= 18446744073709551615",
-                    "tests/arith/bitwise.c",59);
+                    "tests/arith/bitwise.c",61);
     __gen_e_acsl_cst_shiftl_coerced = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl__4));
     __gmpz_init_set_si(__gen_e_acsl__5,0L);
     __gen_e_acsl_shiftl_guard = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_add),
@@ -494,7 +494,7 @@ void g_unsigned(unsigned int a, unsigned int b)
     /*@ assert E_ACSL: 18446744073709551615ULL + 1u ≥ 0; */
     __e_acsl_assert(__gen_e_acsl_shiftl_guard >= 0,1,"RTE","g_unsigned",
                     "18446744073709551615ULL + 1u >= 0",
-                    "tests/arith/bitwise.c",59);
+                    "tests/arith/bitwise.c",61);
     __gmpz_mul_2exp(__gen_e_acsl_shiftl_2,
                     (__e_acsl_mpz_struct const *)(__gen_e_acsl_add),
                     __gen_e_acsl_cst_shiftl_coerced);
@@ -502,7 +502,7 @@ void g_unsigned(unsigned int a, unsigned int b)
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__5));
     __e_acsl_assert(__gen_e_acsl_ne != 0,1,"Assertion","g_unsigned",
                     "(18446744073709551615ULL + 1u) << 1u != 0",
-                    "tests/arith/bitwise.c",59);
+                    "tests/arith/bitwise.c",61);
     __gmpz_clear(__gen_e_acsl__3);
     __gmpz_clear(__gen_e_acsl__4);
     __gmpz_clear(__gen_e_acsl_add);
@@ -533,7 +533,7 @@ void g_unsigned(unsigned int a, unsigned int b)
     */
     __e_acsl_assert(__gen_e_acsl_cst_shiftr_guard,1,"RTE","g_unsigned",
                     "shiftr_rhs_fits_in_mp_bitcnt_t: 0 <= 1u <= 18446744073709551615",
-                    "tests/arith/bitwise.c",60);
+                    "tests/arith/bitwise.c",62);
     __gen_e_acsl_cst_shiftr_coerced = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl__7));
     __gmpz_init_set_si(__gen_e_acsl__8,0L);
     __gen_e_acsl_shiftr_guard = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_add_2),
@@ -542,14 +542,14 @@ void g_unsigned(unsigned int a, unsigned int b)
     /*@ assert E_ACSL: 18446744073709551615ULL + 1u ≥ 0; */
     __e_acsl_assert(__gen_e_acsl_shiftr_guard >= 0,1,"RTE","g_unsigned",
                     "18446744073709551615ULL + 1u >= 0",
-                    "tests/arith/bitwise.c",60);
+                    "tests/arith/bitwise.c",62);
     __gmpz_tdiv_q_2exp(__gen_e_acsl_shiftr_2,
                        (__e_acsl_mpz_struct const *)(__gen_e_acsl_add_2),
                        __gen_e_acsl_cst_shiftr_coerced);
     __gen_e_acsl__9 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_shiftr_2));
     __e_acsl_assert(__gen_e_acsl__9 != 0UL,1,"Assertion","g_unsigned",
                     "(18446744073709551615ULL + 1u) >> 1u != 0",
-                    "tests/arith/bitwise.c",60);
+                    "tests/arith/bitwise.c",62);
     __gmpz_clear(__gen_e_acsl__6);
     __gmpz_clear(__gen_e_acsl__7);
     __gmpz_clear(__gen_e_acsl_add_2);
@@ -575,7 +575,7 @@ void g_unsigned(unsigned int a, unsigned int b)
     */
     __e_acsl_assert(__gen_e_acsl_cst_shiftl_guard_2,1,"RTE","g_unsigned",
                     "shiftl_rhs_fits_in_mp_bitcnt_t: 0 <= 65u <= 18446744073709551615",
-                    "tests/arith/bitwise.c",61);
+                    "tests/arith/bitwise.c",63);
     __gen_e_acsl_cst_shiftl_coerced_2 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl__11));
     __gmpz_init_set_si(__gen_e_acsl__12,0L);
     __gen_e_acsl_cst_shiftl_guard_3 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__10),
@@ -583,14 +583,14 @@ void g_unsigned(unsigned int a, unsigned int b)
     __gmpz_init(__gen_e_acsl_shiftl_3);
     /*@ assert E_ACSL: 1u ≥ 0; */
     __e_acsl_assert(__gen_e_acsl_cst_shiftl_guard_3 >= 0,1,"RTE",
-                    "g_unsigned","1u >= 0","tests/arith/bitwise.c",61);
+                    "g_unsigned","1u >= 0","tests/arith/bitwise.c",63);
     __gmpz_mul_2exp(__gen_e_acsl_shiftl_3,
                     (__e_acsl_mpz_struct const *)(__gen_e_acsl__10),
                     __gen_e_acsl_cst_shiftl_coerced_2);
     __gen_e_acsl_ne_2 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_shiftl_3),
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__12));
     __e_acsl_assert(__gen_e_acsl_ne_2 != 0,1,"Assertion","g_unsigned",
-                    "1u << 65u != 0","tests/arith/bitwise.c",61);
+                    "1u << 65u != 0","tests/arith/bitwise.c",63);
     __gmpz_clear(__gen_e_acsl__10);
     __gmpz_clear(__gen_e_acsl__11);
     __gmpz_clear(__gen_e_acsl__12);
@@ -619,7 +619,7 @@ void g_unsigned(unsigned int a, unsigned int b)
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__15));
     __e_acsl_assert(__gen_e_acsl_ne_3 != 0,1,"Assertion","g_unsigned",
                     "((18446744073709551615ULL + 1u) | 1u) != 0",
-                    "tests/arith/bitwise.c",62);
+                    "tests/arith/bitwise.c",64);
     __gmpz_clear(__gen_e_acsl__13);
     __gmpz_clear(__gen_e_acsl__14);
     __gmpz_clear(__gen_e_acsl_add_3);
@@ -652,7 +652,7 @@ void g_unsigned(unsigned int a, unsigned int b)
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_bxor));
     __e_acsl_assert(__gen_e_acsl_ne_4 != 0,1,"Assertion","g_unsigned",
                     "((18446744073709551615ULL + 1u) & 1u) !=\n((18446744073709551615ULL + 1u) ^ 1u)",
-                    "tests/arith/bitwise.c",63);
+                    "tests/arith/bitwise.c",65);
     __gmpz_clear(__gen_e_acsl__16);
     __gmpz_clear(__gen_e_acsl__17);
     __gmpz_clear(__gen_e_acsl_add_4);

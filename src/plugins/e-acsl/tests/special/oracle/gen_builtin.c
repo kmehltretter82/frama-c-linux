@@ -40,7 +40,8 @@ int __gen_e_acsl_f(int i)
     int __gen_e_acsl_incr_app;
     __gen_e_acsl_incr_app = incr(__gen_e_acsl_at);
     __e_acsl_assert(__retres == __gen_e_acsl_incr_app,1,"Postcondition","f",
-                    "\\result == incr(\\old(i))","tests/special/builtin.i",9);
+                    "\\result == incr(\\old(i))","tests/special/builtin.i",
+                    11);
     return __retres;
   }
 }
