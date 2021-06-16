@@ -1,4 +1,4 @@
-/* run.config, run.config_dev
+/* run.config
    COMMENT: Check local compound variable initializers
 */
 

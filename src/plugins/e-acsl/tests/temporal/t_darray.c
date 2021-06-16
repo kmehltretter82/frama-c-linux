@@ -1,4 +1,4 @@
-/* run.config, run.config_dev
+/* run.config
    COMMENT: Checking propagation of referent numbers in arrays
 */
 

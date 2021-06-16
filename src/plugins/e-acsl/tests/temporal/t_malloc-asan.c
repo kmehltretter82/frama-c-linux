@@ -1,4 +1,4 @@
-/* run.config, run.config_dev
+/* run.config
    COMMENT: Temporal analysis with respect dynamic memory allocation.
    COMMENT: malloc-free-malloc errors
    COMMENT: This test is a modification aiming targeting AddressSanitizer and
