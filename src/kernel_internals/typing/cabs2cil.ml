@@ -5426,7 +5426,7 @@ and makeCompType ghost (isstruct: bool)
       let source = fst cloc in
       if sto <> NoStorage || inl then
         Kernel.error ~once:true ~source "Storage or inline not allowed for fields";
-      let allowZeroSizeArrays = true in
+      let allowZeroSizeArrays = Cil.gccMode () || Cil.msvcMode () in
       let ftype, fattr =
         doType
           ~allowZeroSizeArrays ghost false (AttrName false) bt
@@ -5440,7 +5440,10 @@ and makeCompType ghost (isstruct: bool)
       if Cil.isFunctionType ftype then
         Kernel.error ~source
           "field `%s' declared as a function" n
-      else if Cil.has_flexible_array_member ftype && isstruct then
+      else if Cil.has_flexible_array_member ftype && isstruct &&
+              (* GCC and MSVC accept fields with flexible array member *)
+              not (Cil.gccMode() || Cil.msvcMode ())
+      then
         Kernel.error ~source
           "field `%s' declared with a type containing a flexible array member."
           n
