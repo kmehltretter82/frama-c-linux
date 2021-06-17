@@ -386,6 +386,8 @@ extern int fgetpos(FILE * restrict stream,
   assigns *stream \from *stream, indirect:offset, indirect:whence;
   assigns \result, __fc_errno \from indirect:*stream, indirect:offset,
                                     indirect:whence;
+  ensures errno_set: __fc_errno \in {EAGAIN, EBADF, EFBIG, EINTR, EINVAL, EIO,
+                                     ENOSPC, EOVERFLOW, EPIPE, ESPIPE, ENXIO};
 */
 extern int fseek(FILE *stream, long int offset, int whence);
 
@@ -395,17 +397,20 @@ extern int fseek(FILE *stream, long int offset, int whence);
   assigns *stream \from *stream, indirect:offset, indirect:whence;
   assigns \result, __fc_errno \from indirect:*stream, indirect:offset,
                                     indirect:whence;
+  ensures errno_set: __fc_errno \in {EAGAIN, EBADF, EFBIG, EINTR, EINVAL, EIO,
+                                     ENOSPC, EOVERFLOW, EPIPE, ESPIPE, ENXIO};
 */
 extern int fseeko(FILE *stream, off_t offset, int whence);
 
 /*@
-  //missing: assigns errno (EAGAIN, EBADF, EFBIG, EINTR, EIO, ENOSPC, EPIPE,
-  //                        ESPIPE, ENXIO);
   requires valid_stream: \valid(stream);
   requires valid_pos: \valid_read(pos);
   requires initialization:pos: \initialized(pos);
   assigns *stream \from *pos;
   assigns \result \from indirect:*stream, indirect:*pos;
+  assigns __fc_errno \from __fc_errno, indirect:*stream, indirect:*pos;
+  ensures errno_set: __fc_errno \in {EAGAIN, EBADF, EFBIG, EINTR, EIO,
+                                     ENOSPC, EPIPE, ESPIPE, ENXIO};
 */
 extern int fsetpos(FILE *stream, const fpos_t *pos);
 
@@ -414,6 +419,7 @@ extern int fsetpos(FILE *stream, const fpos_t *pos);
   assigns \result, __fc_errno \from indirect:*stream ;
   ensures success_or_error:
     \result == -1 || (\result >= 0 && __fc_errno == \old(__fc_errno));
+  ensures errno_set: __fc_errno \in {EBADF, EOVERFLOW, ESPIPE};
 */
 extern long int ftell(FILE *stream);
 
@@ -422,6 +428,7 @@ extern long int ftell(FILE *stream);
   assigns \result, __fc_errno \from indirect:*stream ;
   ensures success_or_error:
     \result == -1 || (\result >= 0 && __fc_errno == \old(__fc_errno));
+  ensures errno_set: __fc_errno \in {EBADF, EOVERFLOW, ESPIPE};
 */
 extern off_t ftello(FILE *stream);
 
