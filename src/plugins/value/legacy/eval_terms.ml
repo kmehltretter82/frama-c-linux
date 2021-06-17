@@ -586,6 +586,22 @@ let apply_logic_builtin builtin env args_list =
      but logic typing constraints prevent that. *)
   builtin (env_current_state env) args_list
 
+let eval_logic_string_literal str =
+  let string_literal_len str =
+    (* Look for the first occurrence of the '\0' character, otherwise
+       return the string length. *)
+    try
+      Bytes.index_from (Bytes.of_string str) 0 '\x00'
+    with Not_found -> String.length str
+  in
+  let eover =
+    Cvalue.V.inject_ival
+      (Ival.inject_singleton (Integer.of_int (string_literal_len str)))
+  in
+  let eunder = under_from_over eover in
+  let etype = Cil.intType in
+  { etype; ldeps = empty_logic_deps; eover; empty = false; eunder }
+
 (* Never raises exceptions; instead, returns [-1,+oo] in case of alarms
    (most imprecise result possible for the logic strlen/wcslen predicates). *)
 let eval_logic_charlen wrapper env v ldeps =
@@ -1340,13 +1356,17 @@ and eval_known_logic_function ~alarm_mode env li labels args =
   let lvi = li.l_var_info in
   match lvi.lv_name, li.l_type, labels, args with
   | ("strlen" | "wcslen") as b,  _, [lbl], [arg] ->
-    let r = eval_term ~alarm_mode env arg in
-    let builtin =
-      if b = "strlen" then Builtins_string.frama_c_strlen_wrapper
-      else Builtins_string.frama_c_wcslen_wrapper
-    in
-    eval_logic_charlen builtin { env with e_cur = lbl } r.eover r.ldeps
-
+    begin
+      match arg.term_node with
+      | TConst (LStr str) -> eval_logic_string_literal str
+      | _ ->
+        let r = eval_term ~alarm_mode env arg in
+        let builtin =
+          if b = "strlen" then Builtins_string.frama_c_strlen_wrapper
+          else Builtins_string.frama_c_wcslen_wrapper
+        in
+        eval_logic_charlen builtin { env with e_cur = lbl } r.eover r.ldeps
+    end
   | ("memchr_off" | "wmemchr_off") as b,  _, [lbl], [arg_s; arg_c; arg_n] ->
     let s = eval_term ~alarm_mode env arg_s in
     let c = eval_term ~alarm_mode env arg_c in
