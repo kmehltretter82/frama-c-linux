@@ -4951,7 +4951,7 @@ let mk_behavior ?(name=default_behavior_name) ?(assumes=[]) ?(requires=[])
   }
 
 let spare_attributes_for_c_cast =
-  "declspec"::"arraylen"::"fc_stdlib"::qualifier_attributes
+  "unused"::"declspec"::"arraylen"::"fc_stdlib"::qualifier_attributes
 
 let type_remove_attributes_for_c_cast =
   typeRemoveAttributes spare_attributes_for_c_cast
