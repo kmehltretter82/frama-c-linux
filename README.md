@@ -28,22 +28,34 @@ properties. Plug-ins can also collaborate via their APIs.
 
 ## Installation
 
-For more detailed information about installing opam/Frama-C,
-see [INSTALL.md](INSTALL.md).
-
 Frama-C is available through [opam](http://opam.ocaml.org/), the
-OCaml package manager. This is the preferred installation method. Be sure
-to install opam v2.0 or higher. Then the following sequence of commands
-should install frama-c and its gui:
+OCaml package manager. If you have it, simply run:
 
-    opam init
-    opam install depext
-    opam depext frama-c
-    opam install frama-c
+    opam install depext # handles external (non-OCaml) dependencies
+    opam depext frama-c --install
 
 Frama-C is developed mainly in Linux, often tested in macOS
 (via Homebrew), and occasionally tested on Windows
 (via the Windows Subsystem for Linux).
+
+For detailed installation instructions and troubleshooting,
+see [INSTALL.md](INSTALL.md).
+
+### Development branch
+
+To install the development branch of Frama-C (updated nightly):
+
+    opam pin add frama-c https://git.frama-c.com/frama-c#master
+
+If installation fails due to missing external dependencies, try using
+`depext` to install them and then Frama-C, using the same commands from the
+[Installation](#installation) section.
+
+### Distribution packages
+
+Some Linux distributions have a `frama-c` package, kindly provided by
+distribution packagers. Note that they may not correspond to the latest
+Frama-C release.
 
 ## Usage
 

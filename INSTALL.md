@@ -34,15 +34,12 @@ First you need to install opam, then you may install Frama-C using opam.
 
 Several Linux distributions already include an `opam` package.
 
-**Note:** make sure your opam version is >= 2.0.0.
-
 macOS has opam through Homebrew.
 
 Windows users can install opam via WSL (Windows Subsystem for Linux).
 
-If your system does not have an opam package >= 2.0.0, you can
-[compile it from source](#compiling-from-source),
-or use the provided opam binaries available at:
+If your system does not have an opam package >= 2, you can use the provided
+opam binaries available at:
 
 http://opam.ocaml.org/doc/Install.html
 
@@ -62,14 +59,15 @@ its `depext` plug-in: issuing the two commands
 will install the appropriate system packages (this of course requires
 administrator rights on the system).
 
-If your system is not supported by `depext`, you will need to install
-Gtk, GtkSourceView, GnomeCanvas and GMP, including development libraries,
-separately. If you do so, please consider providing the system name and list of
-packages (e.g. via a [Gitlab issue](https://git.frama-c.com/pub/frama-c/issues/new))
-so that we can add it to the Frama-C `depext` package.
+If your system is not supported by `depext`, you can simply try:
 
-    # install Frama-C
     opam install frama-c
+
+If there are errors due to missing external dependencies, opam may emit a
+message indicating which packages to install. If this is not sufficient,
+there may be missing dependencies in opam's `depext` tool. In this case,
+you may [create a Gitlab issue](https://git.frama-c.com/pub/frama-c/issues/new)
+indicating your distribution and error message.
 
 ### Configuring provers for Frama-C/WP
 
@@ -86,13 +84,13 @@ Most provers are available on all platforms. After their installation,
 Why3 must be configured to make them available for Frama-C/WP:
 
 ```shell
-why3 config --detect
+why3 config detect
 ```
 
 ### Reference configuration
 
 See file [reference-configuration.md](reference-configuration.md)
-for a set of packages that is known to work with Frama-C 22 (Titanium).
+for a set of packages that is known to work with Frama-C 23 (Vanadium).
 
 ### Installing Custom Versions of Frama-C
 
