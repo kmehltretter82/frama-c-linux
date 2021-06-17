@@ -1137,29 +1137,36 @@ module Dataflow (D : Domain) =
 struct
   module Results = Vertex.Hashtbl
 
-  let fixpoint kf initial_value =
+  let compute ~forward kf ?(wto=get_wto kf) initial_value =
     let automaton = get_automaton kf in
     let graph = automaton.graph in
-    let wto = get_wto kf in
     let results = Results.create (G.nb_vertex graph) in
 
     (* Compute the transfer function for the given edge and add the result to
        acc *)
-    let process_edge (v1,e,_v2) acc =
+    let process_edge (v1,e,v2) acc =
       (* Retrieve origin value *)
-      match Results.find_opt results v1 with
-      | None -> acc (* No previous value *)
-      | Some value ->
-        match D.transfer e.edge_transition value with
-        | None -> acc
-        | Some new_value -> new_value :: acc
+      let value =
+        if forward
+        then Results.find_opt results v1
+        else Results.find_opt results v2
+      in
+      let result = Option.bind value (D.transfer e.edge_transition) in
+      Option.to_list result @ acc
     in
 
     (* Compute the abstract value for the given control point ; compute all
        incoming transfer functions *)
     let process_vertex v =
-      let incomming = G.fold_pred_e process_edge graph v []
-      and initial = if v == automaton.entry_point then [initial_value] else []
+      let incomming =
+        if forward
+        then G.fold_pred_e process_edge graph v []
+        else G.fold_succ_e process_edge graph v []
+      and initial =
+        if forward && v == automaton.entry_point ||
+           not forward && v == automaton.return_point
+        then [initial_value]
+        else []
       in
       match initial @ incomming with
       | [] -> (* Zero incomming values -> Bottom *)
@@ -1185,7 +1192,9 @@ struct
     in
 
     let rec iterate_list l =
-      List.iter iterate_element l
+      if forward
+      then List.iter iterate_element l
+      else List.iter iterate_element (List.rev l)
     and iterate_element = function
       | Wto.Node v ->
         ignore (process_vertex v)
@@ -1200,4 +1209,10 @@ struct
     in
     iterate_list wto;
     results
+
+  let fixpoint ?wto kf initial_value =
+    compute ~forward:true kf ?wto initial_value
+
+  let backward_fixpoint ?wto kf initial_value =
+    compute ~forward:false kf ?wto initial_value
 end

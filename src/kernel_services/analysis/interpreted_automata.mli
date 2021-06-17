@@ -289,5 +289,8 @@ end
 (** Builds a simple dataflow analysis over an input domain. *)
 module Dataflow (D : Domain) :
 sig
-  val fixpoint : Cil_types.kernel_function -> D.t -> D.t Vertex.Hashtbl.t
+  val fixpoint : ?wto:wto ->
+    Cil_types.kernel_function ->  D.t -> D.t Vertex.Hashtbl.t
+  val backward_fixpoint : ?wto:wto ->
+    Cil_types.kernel_function ->  D.t -> D.t Vertex.Hashtbl.t
 end
