@@ -261,8 +261,10 @@ let gen_run remarks =
      'getcwd' always resolves them, but if the user supplies a path with
      symbolic links, this may cause issues.
      Instead of forcing the user to always provide resolved paths, we
-     currently choose to never resolve them. *)
-  let uriBases = ("PWD", Sys.getenv "PWD") :: symbolicDirs in
+     currently choose to never resolve them.
+     We only resort to getcwd() to avoid issues when PWD does not exist. *)
+  let pwd = try Sys.getenv "PWD" with Not_found -> Sys.getcwd () in
+  let uriBases = ("PWD", pwd) :: symbolicDirs in
   let uriBasesJson =
     List.fold_left (fun acc (name, dir) ->
         let baseUri =

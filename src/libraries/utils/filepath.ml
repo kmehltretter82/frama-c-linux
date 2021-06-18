@@ -130,8 +130,10 @@ let insert base path_name =
    for a given path. 'getcwd' always resolves them, but if the user
    supplies a path with symbolic links, this may cause issues.
    Instead of forcing the user to always provide resolved paths, we
-   currently choose to never resolve them. *)
-let cwd = insert dummy (Sys.getenv "PWD")
+   currently choose to never resolve them.
+   Note that, in rare situations (e.g. some Docker images), PWD does not
+   exist in the environment, so in that case, we fallback to Sys.getcwd. *)
+let cwd = insert dummy (try Sys.getenv "PWD" with Not_found -> Sys.getcwd ())
 
 type existence =
   | Must_exist
