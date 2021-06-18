@@ -124,10 +124,24 @@ module Enumitem: S_with_collections_pretty with type t = enumitem
 *)
 module Wide_string: S_with_collections with type t = int64 list
 
+(** Signature type for datatype modules of constants/expressions/lvalues
+    based on structural equality instead of id. *)
+module type S_with_collections_struct_eq = sig
+  include S_with_collections
+
+  (** Stricter comparison where integer and floating-point constants with
+      different textual representations in the source code are not equal,
+      even if they have the same type and value. *)
+  val compare_strict: t -> t -> int
+end
+
 (**
    @since Oxygen-20120901
 *)
-module Constant: S_with_collections_pretty with type t = constant
+module Constant: sig
+  include S_with_collections_struct_eq with type t = constant
+  val pretty_ref: (Format.formatter -> t -> unit) ref
+end
 
 (** Note that the equality is based on eid. For structural equality, use
     {!ExpStructEq} *)
@@ -136,7 +150,7 @@ module Exp: sig
   val dummy: exp (** @since Nitrogen-20111001 *)
 end
 
-module ExpStructEq: S_with_collections with type t = exp
+module ExpStructEq: S_with_collections_struct_eq with type t = exp
 
 module Fieldinfo: S_with_collections_pretty with type t = fieldinfo
 
@@ -173,14 +187,14 @@ module Lval: S_with_collections_pretty with type t = lval
 (**
    @since Oxygen-20120901
 *)
-module LvalStructEq: S_with_collections with type t = lval
+module LvalStructEq: S_with_collections_struct_eq with type t = lval
 
 (** Same remark as for Lval.
     For structural equality, use {!OffsetStructEq}. *)
 module Offset: S_with_collections_pretty with type t = offset
 
 (** @since Oxygen-20120901 *)
-module OffsetStructEq: S_with_collections with type t = offset
+module OffsetStructEq: S_with_collections_struct_eq with type t = offset
 
 module Stmt_Id:  Hptmap.Id_Datatype with type t = stmt
 module Stmt: sig

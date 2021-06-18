@@ -909,15 +909,26 @@ module Enumitem = struct
       end)
 end
 
-let compare_constant c1 c2 = match c1, c2 with
-  | CInt64(v1,k1,_), CInt64(v2,k2,_) ->
-    compare_chain Integer.compare v1 v2 Extlib.compare_basic k1 k2
+(* If [strict] is true, the comparaison of integer and floating-point constants
+   takes into account their textual representation (if any). Otherwise,
+   constants with the same type and value are equal even if their textual
+   representations differ. *)
+let compare_constant ~strict c1 c2 = match c1, c2 with
+  | CInt64(v1,k1,s1), CInt64(v2,k2,s2) ->
+    let r = compare_chain Integer.compare v1 v2 Extlib.compare_basic k1 k2 in
+    if r = 0 && strict
+    then Option.compare Datatype.String.compare s1 s2
+    else r
   | CStr s1, CStr s2 -> Datatype.String.compare s1 s2
   | CWStr s1, CWStr s2 -> compare_list Datatype.Int64.compare s1 s2
   | CChr c1, CChr c2 -> Datatype.Char.compare c1 c2
-  | CReal (f1,k1,_), CReal(f2,k2,_) ->
-    compare_chain Datatype.Float.compare f1 f2
-      Extlib.compare_basic k1 k2
+  | CReal (f1,k1,s1), CReal(f2,k2,s2) ->
+    let r =
+      compare_chain Datatype.Float.compare f1 f2 Extlib.compare_basic k1 k2
+    in
+    if r = 0 && strict
+    then Option.compare Datatype.String.compare s1 s2
+    else r
   | CEnum e1, CEnum e2 -> Enumitem.compare e1 e2
   | (CInt64 _, (CStr _ | CWStr _ | CChr _ | CReal _ | CEnum _)) -> 1
   | (CStr _, (CWStr _ | CChr _ | CReal _ | CEnum _)) -> 1
@@ -934,16 +945,26 @@ let hash_const c =
   | CInt64 (n,k,_) -> Integer.hash n + Hashtbl.hash k
   | CEnum ei -> 95 + Enumitem.hash ei
 
+module type S_with_collections_struct_eq = sig
+  include Datatype.S_with_collections
+  val compare_strict: t -> t -> int
+end
+
 module StructEq =
 struct
-  let rec compare_exp e1 e2 =
+  (* If [strict] is true, the comparaison of integer and floating-point constants
+     takes into account their textual representation (if any). Otherwise,
+     constants with the same type and value are equal even if their textual
+     representations differ. *)
+  let rec compare_exp ~strict e1 e2 =
+    let compare_exp = compare_exp ~strict in
     match e1.enode, e2.enode with
     | Const (CStr _), Const (CStr _)
     | Const (CWStr _), Const (CWStr _) -> compare e1.eid e2.eid
-    | Const c1, Const c2 -> compare_constant c1 c2
+    | Const c1, Const c2 -> compare_constant ~strict c1 c2
     | Const _, _ -> 1
     | _, Const _ -> -1
-    | Lval lv1, Lval lv2 -> compare_lval lv1 lv2
+    | Lval lv1, Lval lv2 -> compare_lval ~strict lv1 lv2
     | Lval _, _ -> 1
     | _, Lval _ -> -1
     | SizeOf t1, SizeOf t2 -> Typ.compare t1 t2
@@ -985,40 +1006,40 @@ struct
       if res = 0 then compare_exp e1 e2 else res
     | CastE _, _ -> 1
     | _, CastE _ -> -1
-    | AddrOf lv1, AddrOf lv2 -> compare_lval lv1 lv2
+    | AddrOf lv1, AddrOf lv2 -> compare_lval ~strict lv1 lv2
     | AddrOf _, _ -> 1
     | _, AddrOf _ -> -1
-    | StartOf lv1, StartOf lv2 -> compare_lval lv1 lv2
+    | StartOf lv1, StartOf lv2 -> compare_lval ~strict lv1 lv2
     | StartOf _, _ -> 1
     | _, StartOf _ -> -1
     | Info _, Info _ ->
       Cmdline.Kernel_log.fatal
         "[exp_compare] Info node is obsolete. Do not use it"
 
-  and compare_lval (h1,o1) (h2,o2) =
-    let res = compare_lhost h1 h2 in
-    if res = 0 then compare_offset o1 o2 else res
+  and compare_lval ~strict (h1,o1) (h2,o2) =
+    let res = compare_lhost ~strict h1 h2 in
+    if res = 0 then compare_offset ~strict o1 o2 else res
 
-  and compare_lhost h1 h2 =
+  and compare_lhost ~strict h1 h2 =
     match h1, h2 with
     | Var v1, Var v2 -> Varinfo.compare v1 v2
     | Var _, Mem _ -> 1
-    | Mem e1, Mem e2 -> compare_exp e1 e2
+    | Mem e1, Mem e2 -> compare_exp ~strict e1 e2
     | Mem _, Var _ -> -1
 
-  and compare_offset o1 o2 =
+  and compare_offset ~strict o1 o2 =
     match o1, o2 with
     | NoOffset, NoOffset -> 0
     | NoOffset, _ -> 1
     | _, NoOffset -> -1
     | Field(f1,o1), Field(f2, o2) ->
       let res = Fieldinfo.compare f1 f2 in
-      if res = 0 then compare_offset o1 o2 else res
+      if res = 0 then compare_offset ~strict o1 o2 else res
     | Field _, _ -> 1
     | _, Field _ -> -1
     | Index(e1, o1), Index(e2, o2) ->
-      let res = compare_exp e1 e2 in
-      if res = 0 then compare_offset o1 o2 else res
+      let res = compare_exp ~strict e1 e2 in
+      if res = 0 then compare_offset ~strict o1 o2 else res
 
   let prime = 83047
   let rec hash_exp acc e =
@@ -1069,25 +1090,28 @@ struct
         type t = constant
         let name = "Constant"
         let reprs = [ CInt64(Integer.zero, IInt, Some "0") ]
-        let compare = compare_constant
+        let compare = compare_constant ~strict:false
         let hash = hash_const
         let equal = Datatype.from_compare
         let pretty fmt t = !pretty_ref fmt t
       end)
+  let compare_strict = compare_constant ~strict:true
 end
 
-module ExpStructEq =
-  Make_with_collections
-    (struct
-      include Datatype.Undefined
-      type t = exp
-      let name = "ExpStructEq"
-      let reprs = [ Exp.dummy ]
-      let compare = StructEq.compare_exp
-      let hash = StructEq.hash_exp 7863
-      let equal = Datatype.from_compare
-      let pretty fmt t = !Exp.pretty_ref fmt t
-    end)
+module ExpStructEq = struct
+  include Make_with_collections
+      (struct
+        include Datatype.Undefined
+        type t = exp
+        let name = "ExpStructEq"
+        let reprs = [ Exp.dummy ]
+        let compare = StructEq.compare_exp ~strict:false
+        let hash = StructEq.hash_exp 7863
+        let equal = Datatype.from_compare
+        let pretty fmt t = !Exp.pretty_ref fmt t
+      end)
+  let compare_strict = StructEq.compare_exp ~strict:true
+end
 let () = compare_exp_struct_eq := ExpStructEq.compare
 
 module Block = struct
@@ -1174,20 +1198,22 @@ module Lval = struct
       end)
 end
 
-module LvalStructEq =
-  Make_with_collections
-    (struct
-      type t = lval
-      let name = "LvalStructEq"
-      let reprs = List.map (fun v -> Var v, NoOffset) Varinfo.reprs
-      let compare = StructEq.compare_lval
-      let equal = Datatype.from_compare
-      let hash = StructEq.hash_lval 13598
-      let copy = Datatype.undefined
-      let internal_pretty_code = Datatype.undefined
-      let pretty fmt x = !Lval.pretty_ref fmt x
-      let varname _ = "lv"
-    end)
+module LvalStructEq = struct
+  include Make_with_collections
+      (struct
+        type t = lval
+        let name = "LvalStructEq"
+        let reprs = List.map (fun v -> Var v, NoOffset) Varinfo.reprs
+        let compare = StructEq.compare_lval ~strict:false
+        let equal = Datatype.from_compare
+        let hash = StructEq.hash_lval 13598
+        let copy = Datatype.undefined
+        let internal_pretty_code = Datatype.undefined
+        let pretty fmt x = !Lval.pretty_ref fmt x
+        let varname _ = "lv"
+      end)
+  let compare_strict = StructEq.compare_lval ~strict:true
+end
 
 module Offset = struct
   let pretty_ref = ref (fun _ -> assert false)
@@ -1206,20 +1232,22 @@ module Offset = struct
       end)
 end
 
-module OffsetStructEq =
-  Make_with_collections
-    (struct
-      type t = offset
-      let name = "OffsetStructEq"
-      let reprs = [NoOffset]
-      let compare = StructEq.compare_offset
-      let equal = Datatype.from_compare
-      let hash = StructEq.hash_offset 75489
-      let copy = Datatype.undefined
-      let internal_pretty_code = Datatype.undefined
-      let pretty fmt x = !Offset.pretty_ref fmt x
-      let varname _ = "offs"
-    end)
+module OffsetStructEq = struct
+  include Make_with_collections
+      (struct
+        type t = offset
+        let name = "OffsetStructEq"
+        let reprs = [NoOffset]
+        let compare = StructEq.compare_offset ~strict:false
+        let equal = Datatype.from_compare
+        let hash = StructEq.hash_offset 75489
+        let copy = Datatype.undefined
+        let internal_pretty_code = Datatype.undefined
+        let pretty fmt x = !Offset.pretty_ref fmt x
+        let varname _ = "offs"
+      end)
+  let compare_strict = StructEq.compare_offset ~strict:true
+end
 
 (**************************************************************************)
 (** {3 ACSL types} *)
