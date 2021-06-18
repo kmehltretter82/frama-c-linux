@@ -1199,6 +1199,10 @@ struct
       | Wto.Node v ->
         ignore (process_vertex v)
       | Wto.Component (v, w) ->
+        (* Do at least one iteration *)
+        process_vertex v;
+        iterate_list w;
+        (* Then reach a fixpoint *)
         while
           let previous = Results.find_opt results v in
           process_vertex v;
