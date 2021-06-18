@@ -22,8 +22,29 @@
 
 open Cil_types
 
-module Exp = Cil_datatype.ExpStructEq
-module Lval = Cil_datatype.LvalStructEq
+(* The default comparison of Cil_datatype does not distinguish constants
+   with different textual representations in the source code when they
+   represent the same value.
+   However, when option -eva-all-rounding-modes-constants is enabled, the
+   evaluation of floating-point constants may differ according to their
+   textual representation: when the constant is not exactly representable in the
+   floating-point type, an interval is used instead of the nearest singleton
+   value. In this case, two constants with the same nearest value but different
+   textual representation may not be equal. We thus use the [compare_strict]
+   comparison, which also compares the textual representation of constants. *)
+
+(* Do not use collections (set, map, table) based on the less strict [compare]. *)
+module Exp : Datatype.S with type t = exp = struct
+  include Cil_datatype.ExpStructEq
+  let compare = compare_strict
+  let equal a b = compare_strict a b = 0
+end
+
+module Lval : Datatype.S with type t = lval = struct
+  include Cil_datatype.LvalStructEq
+  let compare = compare_strict
+  let equal a b = compare_strict a b = 0
+end
 
 (* lvalues are never stored under a constructor [E]. *)
 type unhashconsed_exprs = E of Exp.t | LV of Lval.t
