@@ -382,7 +382,7 @@ let build_specialized_fun env vf format_fun tvparams =
   let new_name = name ^ "_va_" ^ (string_of_int vf.vf_specialization_count) in
 
   (* Start building the function *)
-  let funvar = Build.open_function new_name in
+  let funvar = Build.open_function ~vorig_name:name new_name in
 
   (* Set function return type and attributes *)
   let ret_typ, params, _, attrs = Cil.splitFunctionType vf.vf_original_type in
