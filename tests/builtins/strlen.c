@@ -330,6 +330,22 @@ void negative_offsets() {
   char dest[100 * 2];
 }
 
+/* Tests the evaluation of the ACSL logic function strlen on literal strings */
+void logic_literal_strlen () {
+  //@ assert strlen("") == 0;
+  //@ assert strlen("literal") == 7;
+  //@ assert strlen("contains a \0 in the middle") == 11;
+  if (nondet)
+    //@ assert strlen("") == 1;
+    ;
+  if (nondet)
+    //@ assert strlen("literal") == 8;
+    ;
+  if (nondet)
+    //@ assert strlen("contains a \0 in the middle") == 10;
+    ;
+}
+
 int main (int c) {
   small_sets();
   zero_termination();
@@ -342,5 +358,6 @@ int main (int c) {
   escaping();
   big_array();
   negative_offsets();
+  logic_literal_strlen();
   return 0;
 }
