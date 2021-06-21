@@ -586,22 +586,6 @@ let apply_logic_builtin builtin env args_list =
      but logic typing constraints prevent that. *)
   builtin (env_current_state env) args_list
 
-let eval_logic_string_literal str =
-  let string_literal_len str =
-    (* Look for the first occurrence of the '\0' character, otherwise
-       return the string length. *)
-    try
-      Bytes.index_from (Bytes.of_string str) 0 '\x00'
-    with Not_found -> String.length str
-  in
-  let eover =
-    Cvalue.V.inject_ival
-      (Ival.inject_singleton (Integer.of_int (string_literal_len str)))
-  in
-  let eunder = under_from_over eover in
-  let etype = Cil.intType in
-  { etype; ldeps = empty_logic_deps; eover; empty = false; eunder }
-
 (* Never raises exceptions; instead, returns [-1,+oo] in case of alarms
    (most imprecise result possible for the logic strlen/wcslen predicates). *)
 let eval_logic_charlen wrapper env v ldeps =
@@ -1358,7 +1342,14 @@ and eval_known_logic_function ~alarm_mode env li labels args =
   | ("strlen" | "wcslen") as b,  _, [lbl], [arg] ->
     begin
       match arg.term_node with
-      | TConst (LStr str) -> eval_logic_string_literal str
+      | TConst (LStr str) ->
+        (* Look for the first occurrence of the '\0' character, otherwise
+           return the string length. *)
+        let length =
+          try String.index str '\x00'
+          with Not_found -> String.length str
+        in
+        einteger (Cvalue.V.inject_int (Integer.of_int length))
       | _ ->
         let r = eval_term ~alarm_mode env arg in
         let builtin =
