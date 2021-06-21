@@ -133,21 +133,20 @@ let translate_variadics (file : file) =
       let ghost = (Option.get self#current_stmt).ghost in
       let make_new_args mk_call f args =
         let vf = Table.find classification f in
-        try
-          let call_translator = match vf.vf_class with
-            | Overload o -> Standard.overloaded_call ~fundec o
-            | Aggregator a -> Standard.aggregator_call ~fundec ~ghost a
-            | FormatFun f -> Standard.format_fun_call ~fundec env f
-            | Builtin ->
-              Self.result ~level:2 ~current:true
-                "Call to variadic builtin %s left untransformed." f.vname;
-              raise Not_found
-            | _ -> raise Standard.Translate_call_exn
-          in
-          call_translator block loc mk_call vf args
-        with Standard.Translate_call_exn ->
-          Generic.translate_call
-            ~fundec ~ghost block loc mk_call (Cil.evar ~loc f) args
+        try begin
+          match vf.vf_class with
+          | Overload o -> Standard.overloaded_call ~fundec o block loc mk_call vf args
+          | Aggregator a -> Standard.aggregator_call ~fundec ~ghost a block loc mk_call vf args
+          | FormatFun f -> Standard.format_fun_call ~fundec env f block loc mk_call vf args
+          | Builtin ->
+            Self.result ~level:2 ~current:true
+              "Call to variadic builtin %s left untransformed." f.vname;
+            raise Not_found
+          | _ ->
+            Generic.translate_call
+              ~fundec ~ghost block loc mk_call (Cil.evar ~loc f) args
+        end with Standard.Translate_call_exn callee ->
+          Standard.fallback_fun_call ~callee loc mk_call vf args
       in
       begin match i with
         | Call(_, {enode = Lval(Var vi, _)}, _, _)

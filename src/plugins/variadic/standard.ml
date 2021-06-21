@@ -38,12 +38,23 @@ let pp_overload name fmt l =
 
 let new_globals : (global list) ref = ref []
 
+(* State to store the number of fallback functions generated for a particular
+   function name. This number is used to generate a unique function name. *)
+module Fallback_counts =
+  State_builder.Hashtbl
+    (Datatype.String.Hashtbl)
+    (Datatype.Int)
+    (struct
+      let size = 17
+      let name = "fallback_counts"
+      let dependencies = [ Options.Enabled.self; Options.Strict.self ]
+    end)
 
 (* ************************************************************************ *)
 (* Call translation                                                         *)
 (* ************************************************************************ *)
 
-exception Translate_call_exn
+exception Translate_call_exn of varinfo
 
 (* Extended integer types (e.g. int8_t, uint_least16_t, int_fast32_t)
    do not have their own character modifiers, but instead use macros that are
@@ -133,7 +144,7 @@ let cast_arg i paramtyp exp =
 
 
 (* cast a list of args to the tparams list of types and remove unused args *)
-let match_args tparams args =
+let match_args ~callee tparams args =
   (* Remove unused arguments *)
   let paramcount = List.length tparams
   and argcount = List.length args in
@@ -146,7 +157,7 @@ let match_args tparams args =
     Self.warning ~current:true
       "Not enough arguments: expected %d, given %d."
       paramcount argcount;
-    raise Translate_call_exn
+    raise (Translate_call_exn callee)
   );
 
   (* Translate params *)
@@ -157,12 +168,72 @@ let match_args tparams args =
 (* translate a call by applying argument matching/pruning and changing
    callee *)
 let match_call ~loc ~fundec scope mk_call new_callee new_tparams args =
-  let new_args, unused_args = match_args new_tparams args in
+  let new_args, unused_args = match_args ~callee:new_callee new_tparams args in
   let call = mk_call (Cil.evar ~loc new_callee) new_args in
   let reads =
     List.map (fun e -> Cil.mkPureExprInstr ~fundec ~scope e) unused_args
   in
   reads @ [call]
+
+(* ************************************************************************ *)
+(* Fallback calls                                                           *)
+(* ************************************************************************ *)
+
+let fallback_fun_call ~callee loc mk_call vf args =
+  let build_fallback_fun ~vf args =
+    let module Build =
+      Cil_builder.Stateful (struct let loc = vf.vf_decl.vdecl end)
+    in
+
+    (* Choose function name *)
+    let name = callee.vname in
+    let vorig_name = callee.vorig_name in
+    let count =
+      try Fallback_counts.find name
+      with Not_found -> 0
+    in
+    let count = count + 1 in
+    Fallback_counts.replace name count;
+    let new_name = name ^ "_fallback_" ^ (string_of_int count) in
+
+    (* Start building the function *)
+    let funvar = Build.open_function ~vorig_name new_name in
+
+    (* Set function return type and attributes *)
+    let ret_typ, params, _, attrs = Cil.splitFunctionType vf.vf_original_type in
+    Build.set_return_type' ret_typ;
+    List.iter Build.add_attribute attrs;
+    Build.add_stdlib_generated ();
+
+    (* Add parameters *)
+    let fixed_params_count = Typ.params_count vf.vf_original_type in
+    let add_static_param (name,typ,attributes) =
+      ignore (Build.parameter ~attributes typ name)
+    and add_variadic_param i e =
+      let typ = Cil.typeOf e in
+      ignore (Build.parameter typ ("param" ^ string_of_int i))
+    in
+    List.iter add_static_param (Option.get params);
+    List.iteri add_variadic_param (List.drop fixed_params_count args);
+
+    (* Build the default behaviour *)
+    let glob = Build.finish_declaration ~register:false () in
+    glob, Build.cil_varinfo funvar
+  in
+
+  (* Create the new callee *)
+  let glob, new_callee = build_fallback_fun ~vf args in
+  new_globals := glob :: !new_globals;
+
+  (* Store the translation *)
+  Replacements.add new_callee vf.vf_decl;
+
+  (* Translate the call *)
+  Self.result ~current:true ~level:2
+    "Fallback translation of call %s to a call to the specialized version %s."
+    vf.vf_decl.vorig_name new_callee.vname;
+  let call = mk_call (Cil.evar ~loc new_callee) args in
+  [call]
 
 (* ************************************************************************ *)
 (* Aggregator calls                                                         *)
@@ -185,7 +256,7 @@ let aggregator_call ~fundec ~ghost aggregator scope loc mk_call vf args =
     Self.warning ~current:true
       "Not enough arguments: expected %d, given %d."
       paramcount argcount;
-    raise Translate_call_exn;
+    raise (Translate_call_exn vf.vf_decl);
   end;
 
   (* Compute the size of the aggregation *)
@@ -196,7 +267,7 @@ let aggregator_call ~fundec ~ghost aggregator scope loc mk_call vf args =
         with Not_found ->
           Self.warning ~current:true
             "Failed to find a sentinel (NULL pointer) in the argument list.";
-          raise Translate_call_exn;
+          raise (Translate_call_exn vf.vf_decl);
       end
   in
 
@@ -204,7 +275,7 @@ let aggregator_call ~fundec ~ghost aggregator scope loc mk_call vf args =
   let tparams_left = List.take a_pos tparams in
   let tparams_right = List.drop (a_pos + 1) tparams in
   let new_tparams = tparams_left @ List.make size ptyp @ tparams_right in
-  let new_args, unused_args = match_args new_tparams args in
+  let new_args, unused_args = match_args ~callee:vf.vf_decl new_tparams args in
 
   (* Split the arguments *)
   let args_left, args_rem = List.break a_pos new_args in
@@ -225,7 +296,7 @@ let aggregator_call ~fundec ~ghost aggregator scope loc mk_call vf args =
   let size = List.length init in
   let vaggr = Build.(local (array ~size (of_ctyp ptyp)) pname ~init) in
   let new_args = args_left @ [Build.(cil_exp ~loc (addr vaggr))] @ args_right in
-  let new_args,_ = match_args tparams new_args in
+  let new_args,_ = match_args ~callee:vf.vf_decl tparams new_args in
   Build.(List.iter pure (List.map of_exp unused_args));
   Build.of_instr (mk_call (Cil.evar ~loc a_target) new_args);
   Build.finish_instr_list ~scope ()
@@ -280,7 +351,7 @@ let overloaded_call ~fundec overload block loc mk_call vf args =
          @[<v>       %a@]"
         name (pp_overload name) overload
         (pp_prototype name) (List.map Cil.typeOf args);
-      raise Translate_call_exn;
+      raise (Translate_call_exn vf.vf_decl);
     | [(tparams,vi)] -> (* Exactly one matching prototype *)
       tparams, vi
     | l -> (* Several matching prototypes *)
@@ -289,7 +360,7 @@ let overloaded_call ~fundec overload block loc mk_call vf args =
          %a"
         name
         (pp_overload name) l;
-      raise Translate_call_exn;
+      raise (Translate_call_exn vf.vf_decl);
   in
 
   (* Store the translation *)
@@ -546,10 +617,10 @@ let format_fun_call ~fundec env format_fun scope loc mk_call vf args =
         Self.warning ~current:true
           "Call to function %s with non-static format argument:@ \
            no specification will be generated." vf.vf_decl.vorig_name;
-        raise Translate_call_exn (* No syntactic hint *)
+        raise (Translate_call_exn vf.vf_decl) (* No syntactic hint *)
       | Some s -> Format_parser.parse_format format_fun.f_kind s
     with
-    | Format_parser.Invalid_format -> raise Translate_call_exn
+    | Format_parser.Invalid_format -> raise (Translate_call_exn vf.vf_decl)
   in
 
   (* Try to type expected parameters if possible *)
@@ -564,7 +635,7 @@ let format_fun_call ~fundec env format_fun scope loc mk_call vf args =
          Note that due to cleanup, the type may have been defined in the \
          original code but not used anywhere."
         type_name;
-      raise Translate_call_exn
+      raise (Translate_call_exn vf.vf_decl)
   in
 
   (* Create the new callee *)
