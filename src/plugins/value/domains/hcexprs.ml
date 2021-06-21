@@ -33,18 +33,9 @@ open Cil_types
    textual representation may not be equal. We thus use the [compare_strict]
    comparison, which also compares the textual representation of constants. *)
 
-(* Do not use collections (set, map, table) based on the less strict [compare]. *)
-module Exp : Datatype.S with type t = exp = struct
-  include Cil_datatype.ExpStructEq
-  let compare = compare_strict
-  let equal a b = compare_strict a b = 0
-end
+module Exp = Cil_datatype.ExpStructEqStrict
 
-module Lval : Datatype.S with type t = lval = struct
-  include Cil_datatype.LvalStructEq
-  let compare = compare_strict
-  let equal a b = compare_strict a b = 0
-end
+module Lval = Cil_datatype.LvalStructEqStrict
 
 (* lvalues are never stored under a constructor [E]. *)
 type unhashconsed_exprs = E of Exp.t | LV of Lval.t

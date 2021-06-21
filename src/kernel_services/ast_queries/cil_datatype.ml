@@ -945,10 +945,25 @@ let hash_const c =
   | CInt64 (n,k,_) -> Integer.hash n + Hashtbl.hash k
   | CEnum ei -> 95 + Enumitem.hash ei
 
-module type S_with_collections_struct_eq = sig
-  include Datatype.S_with_collections
-  val compare_strict: t -> t -> int
+module type Make_cmp_input = sig
+  include Datatype.Make_input
+  val compare: strict:bool -> t -> t -> int
 end
+
+module Make_compare_non_strict(M: Make_cmp_input) =
+  Datatype.Make_with_collections(
+  struct
+    include M
+    let compare = M.compare ~strict:false
+  end)
+
+module Make_compare_strict(M: Make_cmp_input) =
+  Datatype.Make_with_collections(
+  struct
+    include M
+    let compare = M.compare ~strict:true
+    let name = M.name ^ "Strict"
+  end)
 
 module StructEq =
 struct
@@ -1081,38 +1096,43 @@ module Wide_string =
   Datatype.List_with_collections(Datatype.Int64)
     (struct let module_name = "Cil_datatype.Wide_string" end)
 
-module Constant =
+module Constant_input =
 struct
   let pretty_ref = Extlib.mk_fun "Cil_datatype.Constant.pretty_ref"
-  include Make_with_collections
-      (struct
-        include Datatype.Undefined
-        type t = constant
-        let name = "Constant"
-        let reprs = [ CInt64(Integer.zero, IInt, Some "0") ]
-        let compare = compare_constant ~strict:false
-        let hash = hash_const
-        let equal = Datatype.from_compare
-        let pretty fmt t = !pretty_ref fmt t
-      end)
-  let compare_strict = compare_constant ~strict:true
+  include Datatype.Serializable_undefined
+  type t = constant
+  let name = "Constant"
+  let reprs = [ CInt64(Integer.zero, IInt, Some "0") ]
+  let compare = compare_constant
+  let hash = hash_const
+  let equal = Datatype.from_compare
+  let pretty fmt t = !pretty_ref fmt t
 end
 
-module ExpStructEq = struct
-  include Make_with_collections
-      (struct
-        include Datatype.Undefined
-        type t = exp
-        let name = "ExpStructEq"
-        let reprs = [ Exp.dummy ]
-        let compare = StructEq.compare_exp ~strict:false
-        let hash = StructEq.hash_exp 7863
-        let equal = Datatype.from_compare
-        let pretty fmt t = !Exp.pretty_ref fmt t
-      end)
-  let compare_strict = StructEq.compare_exp ~strict:true
+module Constant = struct
+  include
+    Make_compare_non_strict(Constant_input)
+  let pretty_ref = Constant_input.pretty_ref
 end
+
+module ConstantStrict =
+  Make_compare_strict(Constant_input)
+
+module ExpStructEq_input = struct
+  include Datatype.Serializable_undefined
+  type t = exp
+  let name = "ExpStructEq"
+  let structural_descr = Structural_descr.t_abstract
+  let reprs = [ Exp.dummy ]
+  let compare = StructEq.compare_exp
+  let hash = StructEq.hash_exp 7863
+  let equal = Datatype.from_compare
+  let pretty fmt t = !Exp.pretty_ref fmt t
+end
+
+module ExpStructEq = Make_compare_non_strict(ExpStructEq_input)
 let () = compare_exp_struct_eq := ExpStructEq.compare
+module ExpStructEqStrict = Make_compare_strict(ExpStructEq_input)
 
 module Block = struct
   let pretty_ref = Extlib.mk_fun "Cil_datatype.Block.pretty_ref"
@@ -1198,22 +1218,24 @@ module Lval = struct
       end)
 end
 
-module LvalStructEq = struct
-  include Make_with_collections
-      (struct
-        type t = lval
-        let name = "LvalStructEq"
-        let reprs = List.map (fun v -> Var v, NoOffset) Varinfo.reprs
-        let compare = StructEq.compare_lval ~strict:false
-        let equal = Datatype.from_compare
-        let hash = StructEq.hash_lval 13598
-        let copy = Datatype.undefined
-        let internal_pretty_code = Datatype.undefined
-        let pretty fmt x = !Lval.pretty_ref fmt x
-        let varname _ = "lv"
-      end)
-  let compare_strict = StructEq.compare_lval ~strict:true
+module LvalStructEq_input = struct
+  include Datatype.Serializable_undefined
+  type t = lval
+  let name = "LvalStructEq"
+  let reprs = List.map (fun v -> Var v, NoOffset) Varinfo.reprs
+  let structural_descr = Structural_descr.t_abstract
+  let compare = StructEq.compare_lval
+  let equal = Datatype.from_compare
+  let hash = StructEq.hash_lval 13598
+  let copy = Datatype.undefined
+  let internal_pretty_code = Datatype.undefined
+  let pretty fmt x = !Lval.pretty_ref fmt x
+  let varname _ = "lv"
 end
+
+module LvalStructEq = Make_compare_non_strict(LvalStructEq_input)
+
+module LvalStructEqStrict = Make_compare_strict(LvalStructEq_input)
 
 module Offset = struct
   let pretty_ref = ref (fun _ -> assert false)
@@ -1232,22 +1254,23 @@ module Offset = struct
       end)
 end
 
-module OffsetStructEq = struct
-  include Make_with_collections
-      (struct
-        type t = offset
-        let name = "OffsetStructEq"
-        let reprs = [NoOffset]
-        let compare = StructEq.compare_offset ~strict:false
-        let equal = Datatype.from_compare
-        let hash = StructEq.hash_offset 75489
-        let copy = Datatype.undefined
-        let internal_pretty_code = Datatype.undefined
-        let pretty fmt x = !Offset.pretty_ref fmt x
-        let varname _ = "offs"
-      end)
-  let compare_strict = StructEq.compare_offset ~strict:true
+module OffsetStructEq_input = struct
+  include Datatype.Serializable_undefined
+  type t = offset
+  let name = "OffsetStructEq"
+  let reprs = [NoOffset]
+  let structural_descr = Structural_descr.t_abstract
+  let compare = StructEq.compare_offset
+  let equal = Datatype.from_compare
+  let hash = StructEq.hash_offset 75489
+  let copy = Datatype.undefined
+  let internal_pretty_code = Datatype.undefined
+  let pretty fmt x = !Offset.pretty_ref fmt x
+  let varname _ = "offs"
 end
+
+module OffsetStructEq = Make_compare_non_strict(OffsetStructEq_input)
+module OffsetStructEqStrict = Make_compare_strict(OffsetStructEq_input)
 
 (**************************************************************************)
 (** {3 ACSL types} *)
