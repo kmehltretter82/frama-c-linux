@@ -1119,6 +1119,18 @@ src/plugins/qed/pretty.ml: CEA_WP
 src/plugins/qed/pretty.mli: CEA_WP
 src/plugins/qed/term.ml: CEA_WP
 src/plugins/qed/term.mli: CEA_WP
+src/plugins/reduc/Reduc.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/reduc/collect.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/reduc/collect.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/reduc/hyp.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/reduc/hyp.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/reduc/misc.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/reduc/misc.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/reduc/reduc_options.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/reduc/reduc_options.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/reduc/register.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/reduc/value2acsl.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/reduc/value2acsl.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/report/.gitignore: .ignore
 src/plugins/report/Makefile.in: CEA_LGPL_OR_PROPRIETARY
 src/plugins/report/Report.mli: CEA_LGPL_OR_PROPRIETARY
@@ -1579,6 +1591,8 @@ src/plugins/wp/Matrix.ml: CEA_WP
 src/plugins/wp/Matrix.mli: CEA_WP
 src/plugins/wp/MemoryContext.ml: CEA_WP
 src/plugins/wp/MemoryContext.mli: CEA_WP
+src/plugins/wp/MemDebug.ml: CEA_WP
+src/plugins/wp/MemDebug.mli: CEA_WP
 src/plugins/wp/MemEmpty.ml: CEA_WP
 src/plugins/wp/MemEmpty.mli: CEA_WP
 src/plugins/wp/MemLoader.ml: CEA_WP
@@ -1589,6 +1603,8 @@ src/plugins/wp/MemRegion.ml: CEA_WP
 src/plugins/wp/MemRegion.mli: CEA_WP
 src/plugins/wp/MemTyped.ml: CEA_WP
 src/plugins/wp/MemTyped.mli: CEA_WP
+src/plugins/wp/MemVal.ml: CEA_WP
+src/plugins/wp/MemVal.mli: CEA_WP
 src/plugins/wp/MemVar.ml: CEA_WP
 src/plugins/wp/MemVar.mli: CEA_WP
 src/plugins/wp/MemZeroAlias.ml: CEA_WP

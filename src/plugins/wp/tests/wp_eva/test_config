@@ -1,0 +1,1 @@
+CMD: @frama-c@ -no-autoload-plugins -load-module eva,scope,reduc,wp -eva -eva-no-print -eva-verbose 0 @PTEST_FILE@ -then -reduc -reduc-gen-annot all -then -no-reduc -wp -wp-print -wp-prover none -wp-share ./share -wp-msg-key shell

@@ -1,9 +1,9 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  This file is part of WP plug-in of Frama-C.                           *)
+(*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
 (*  Copyright (C) 2007-2021                                               *)
-(*    CEA (Commissariat a l'energie atomique et aux energies              *)
+(*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
 (*  you can redistribute it and/or modify it under the terms of the GNU   *)
@@ -20,60 +20,25 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* -------------------------------------------------------------------------- *)
-(* --- Mathematics for Why-3                                              --- *)
-(* -------------------------------------------------------------------------- *)
+module Options = Reduc_options
 
-theory Cmath [@ W:non_conservative_extension:N]
-  use int.Int
-  use int.Abs
-  use real.RealInfix
+let command_line () =
+  let varh = match Options.GenVars.get () with
+    | "all" -> Collect.VarAll
+    | _ -> Options.fatal "Not a valid variable heuristic" in
+  let annoth = match Options.GenAnnot.get () with
+    | "all" -> Collect.AnnotAll
+    | "inout" -> Collect.AnnotInout
+    | _ -> Options.fatal "Not a valid annotation heuristic"
+  in
+  varh, annoth
 
-  lemma abs_def :
-    forall x:int [abs(x)].
-    if x >= 0 then abs(x)=x else abs(x)=(-x)
+let main () =
+  if (Options.Reduc.get ()) then begin
+    let varh, annoth = command_line () in
+    let env = Alarms.fold Collect.get_relevant (Collect.empty_env varh annoth) in
+    Hyp.generate_hypotheses env;
+    ()
+  end
 
-end
-
-theory IAbs
-  use export int.Abs
-end
-
-theory RAbs
-  use export real.Abs
-end
-
-theory Square [@ W:non_conservative_extension:N]
-
-  use real.RealInfix
-  use real.Square
-
-  lemma sqrt_lin1 : forall x:real [sqrt(x)]. 1. <. x -> sqrt(x) <. x
-  lemma sqrt_lin0 : forall x:real [sqrt(x)]. 0. <. x <. 1. -> x <. sqrt(x)
-  lemma sqrt_0 : sqrt(0.) = 0.
-  lemma sqrt_1 : sqrt(1.) = 1.
-
-end
-
-theory ExpLog [@ W:non_conservative_extension:N]
-
-  use real.RealInfix
-  use real.ExpLog
-
-  axiom exp_pos : forall x:real. exp x >. 0.
-
-end
-
-theory ArcTrigo
-
-  use real.RealInfix
-  use real.Trigonometry as Trigo
-
-  function atan (x : real) : real = Trigo.atan x
-  function asin real : real
-  function acos real : real
-
-  lemma Sin_asin: forall x:real. -. 1.0 <=. x <=. 1.0 -> Trigo.sin (asin x) = x
-  lemma Cos_acos: forall x:real. -. 1.0 <=. x <=. 1.0 -> Trigo.cos (acos x) = x
-
-end
+let () = Db.Main.extend main

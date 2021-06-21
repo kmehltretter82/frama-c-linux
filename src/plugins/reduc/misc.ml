@@ -1,9 +1,9 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  This file is part of WP plug-in of Frama-C.                           *)
+(*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
 (*  Copyright (C) 2007-2021                                               *)
-(*    CEA (Commissariat a l'energie atomique et aux energies              *)
+(*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
 (*  you can redistribute it and/or modify it under the terms of the GNU   *)
@@ -20,60 +20,34 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* -------------------------------------------------------------------------- *)
-(* --- Mathematics for Why-3                                              --- *)
-(* -------------------------------------------------------------------------- *)
+open Cil_types
 
-theory Cmath [@ W:non_conservative_extension:N]
-  use int.Int
-  use int.Abs
-  use real.RealInfix
+module Options = Reduc_options
 
-  lemma abs_def :
-    forall x:int [abs(x)].
-    if x >= 0 then abs(x)=x else abs(x)=(-x)
 
-end
+exception Not_implemented of string
 
-theory IAbs
-  use export int.Abs
-end
+let not_implemented ~what =
+  Options.warning "Not implemented: `%s'. Ignoring." what
 
-theory RAbs
-  use export real.Abs
-end
 
-theory Square [@ W:non_conservative_extension:N]
+let emitter =
+  Emitter.create
+    "Reduc"
+    [ Emitter.Code_annot; Emitter.Property_status ]
+    ~correctness:[]
+    ~tuning:[]
 
-  use real.RealInfix
-  use real.Square
+(* ******************************************************)
+(*      Annotations and function contracts helpers      *)
+(* ******************************************************)
+let validate_ip ip =
+  Property_status.emit emitter ~hyps:[] ip Property_status.True
 
-  lemma sqrt_lin1 : forall x:real [sqrt(x)]. 1. <. x -> sqrt(x) <. x
-  lemma sqrt_lin0 : forall x:real [sqrt(x)]. 0. <. x <. 1. -> x <. sqrt(x)
-  lemma sqrt_0 : sqrt(0.) = 0.
-  lemma sqrt_1 : sqrt(1.) = 1.
-
-end
-
-theory ExpLog [@ W:non_conservative_extension:N]
-
-  use real.RealInfix
-  use real.ExpLog
-
-  axiom exp_pos : forall x:real. exp x >. 0.
-
-end
-
-theory ArcTrigo
-
-  use real.RealInfix
-  use real.Trigonometry as Trigo
-
-  function atan (x : real) : real = Trigo.atan x
-  function asin real : real
-  function acos real : real
-
-  lemma Sin_asin: forall x:real. -. 1.0 <=. x <=. 1.0 -> Trigo.sin (asin x) = x
-  lemma Cos_acos: forall x:real. -. 1.0 <=. x <=. 1.0 -> Trigo.cos (acos x) = x
-
-end
+let assert_and_validate ~kf stmt p =
+  let p =  { tp_kind = Assert ; tp_statement = p } in
+  let annot = Logic_const.new_code_annotation (AAssert([], p)) in
+  Annotations.add_code_annot emitter ~kf stmt annot ;
+  List.iter
+    validate_ip
+    (Property.ip_of_code_annot kf stmt annot)
