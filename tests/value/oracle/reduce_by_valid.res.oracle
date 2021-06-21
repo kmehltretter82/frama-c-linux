@@ -13,7 +13,7 @@
   S_f1_0_S_vs[0..1] ∈ [--..--]
   S_f1_1_S_vs[0..1] ∈ [--..--]
 [eva] computing for function main1 <- main.
-  Called from tests/value/reduce_by_valid.i:260.
+  Called from tests/value/reduce_by_valid.i:297.
 [eva:alarm] tests/value/reduce_by_valid.i:14: Warning: 
   assertion got status unknown.
 [eva:alarm] tests/value/reduce_by_valid.i:17: Warning: 
@@ -21,7 +21,7 @@
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
-  Called from tests/value/reduce_by_valid.i:261.
+  Called from tests/value/reduce_by_valid.i:298.
 [eva:alarm] tests/value/reduce_by_valid.i:29: Warning: 
   assertion got status unknown.
 [eva:alarm] tests/value/reduce_by_valid.i:31: Warning: 
@@ -33,14 +33,14 @@
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] computing for function main3 <- main.
-  Called from tests/value/reduce_by_valid.i:262.
+  Called from tests/value/reduce_by_valid.i:299.
 [eva] tests/value/reduce_by_valid.i:48: assertion got status valid.
 [eva:alarm] tests/value/reduce_by_valid.i:49: Warning: 
   assertion got status unknown.
 [eva] Recording results for main3
 [eva] Done for function main3
 [eva] computing for function main4 <- main.
-  Called from tests/value/reduce_by_valid.i:263.
+  Called from tests/value/reduce_by_valid.i:300.
 [eva:alarm] tests/value/reduce_by_valid.i:54: Warning: 
   assertion got status unknown.
 [eva:alarm] tests/value/reduce_by_valid.i:55: Warning: 
@@ -52,7 +52,7 @@
 [eva] Recording results for main4
 [eva] Done for function main4
 [eva] computing for function main5 <- main.
-  Called from tests/value/reduce_by_valid.i:264.
+  Called from tests/value/reduce_by_valid.i:301.
 [eva:locals-escaping] tests/value/reduce_by_valid.i:72: Warning: 
   locals {x} escaping the scope of a block of main5 through p
 [eva] tests/value/reduce_by_valid.i:74: assertion got status valid.
@@ -65,23 +65,23 @@
 [eva] Recording results for main5
 [eva] Done for function main5
 [eva] computing for function main6 <- main.
-  Called from tests/value/reduce_by_valid.i:265.
-[eva:alarm] tests/value/reduce_by_valid.i:265: Warning: 
+  Called from tests/value/reduce_by_valid.i:302.
+[eva:alarm] tests/value/reduce_by_valid.i:302: Warning: 
   function main6: precondition 'r1' got status unknown.
-[eva:alarm] tests/value/reduce_by_valid.i:265: Warning: 
+[eva:alarm] tests/value/reduce_by_valid.i:302: Warning: 
   function main6: precondition 'r2' got status unknown.
-[eva:alarm] tests/value/reduce_by_valid.i:265: Warning: 
+[eva:alarm] tests/value/reduce_by_valid.i:302: Warning: 
   function main6: precondition 'r3' got status unknown.
-[eva] tests/value/reduce_by_valid.i:265: 
+[eva] tests/value/reduce_by_valid.i:302: 
   function main6: precondition 'r4' got status valid.
-[eva:alarm] tests/value/reduce_by_valid.i:265: Warning: 
+[eva:alarm] tests/value/reduce_by_valid.i:302: Warning: 
   function main6: precondition 'r5' got status unknown.
-[eva] tests/value/reduce_by_valid.i:265: 
+[eva] tests/value/reduce_by_valid.i:302: 
   function main6: precondition 'r6' got status valid.
 [eva] Recording results for main6
 [eva] Done for function main6
 [eva] computing for function main7 <- main.
-  Called from tests/value/reduce_by_valid.i:266.
+  Called from tests/value/reduce_by_valid.i:303.
 [eva] tests/value/reduce_by_valid.i:111: assertion got status valid.
 [eva] tests/value/reduce_by_valid.i:112: assertion got status valid.
 [eva] tests/value/reduce_by_valid.i:113: assertion got status valid.
@@ -92,7 +92,7 @@
 [eva] Recording results for main7
 [eva] Done for function main7
 [eva] computing for function main8 <- main.
-  Called from tests/value/reduce_by_valid.i:267.
+  Called from tests/value/reduce_by_valid.i:304.
 [eva:alarm] tests/value/reduce_by_valid.i:137: Warning: 
   assertion got status unknown.
 [eva] tests/value/reduce_by_valid.i:138: assertion got status valid.
@@ -106,14 +106,14 @@
 [eva] Recording results for main8
 [eva] Done for function main8
 [eva] computing for function main9 <- main.
-  Called from tests/value/reduce_by_valid.i:268.
+  Called from tests/value/reduce_by_valid.i:305.
 [eva:alarm] tests/value/reduce_by_valid.i:162: Warning: 
   assertion got status unknown.
 [eva] tests/value/reduce_by_valid.i:165: assertion got status valid.
 [eva] Recording results for main9
 [eva] Done for function main9
 [eva] computing for function main10 <- main.
-  Called from tests/value/reduce_by_valid.i:269.
+  Called from tests/value/reduce_by_valid.i:306.
 [eva:alarm] tests/value/reduce_by_valid.i:176: Warning: 
   out of bounds write. assert \valid((int *)p);
 [eva] tests/value/reduce_by_valid.i:177: 
@@ -151,7 +151,7 @@
 [eva] Recording results for main10
 [eva] Done for function main10
 [eva] computing for function main11 <- main.
-  Called from tests/value/reduce_by_valid.i:270.
+  Called from tests/value/reduce_by_valid.i:307.
 [eva:alarm] tests/value/reduce_by_valid.i:228: Warning: 
   assertion got status unknown.
 [eva] tests/value/reduce_by_valid.i:230: 
@@ -178,6 +178,47 @@
   assertion got status unknown.
 [eva] Recording results for main11
 [eva] Done for function main11
+[eva] computing for function main12 <- main.
+  Called from tests/value/reduce_by_valid.i:308.
+[eva] computing for function garbled_mix <- main12 <- main.
+  Called from tests/value/reduce_by_valid.i:272.
+[eva] using specification for function garbled_mix
+[eva] Done for function garbled_mix
+[eva] tests/value/reduce_by_valid.i:272: 
+  Assigning imprecise value to p.
+  The imprecision originates from Library function
+  {tests/value/reduce_by_valid.i:272}
+[eva] tests/value/reduce_by_valid.i:273: 
+  Frama_C_show_each_gm:
+  {{ garbled mix of &{x; a}
+  (origin: Library function {tests/value/reduce_by_valid.i:272}) }}
+[eva:alarm] tests/value/reduce_by_valid.i:275: Warning: 
+  out of bounds write. assert \valid(p);
+[eva:alarm] tests/value/reduce_by_valid.i:277: Warning: 
+  assertion got status unknown.
+[eva] tests/value/reduce_by_valid.i:278: 
+  Frama_C_show_each_reduced_gm: {{ &x ; &a + [0..16] }}
+[eva] computing for function reduced_garbled_mix <- main12 <- main.
+  Called from tests/value/reduce_by_valid.i:282.
+[eva] using specification for function reduced_garbled_mix
+[eva] Done for function reduced_garbled_mix
+[eva] tests/value/reduce_by_valid.i:283: check got status valid.
+[eva] computing for function reduced_garbled_mix <- main12 <- main.
+  Called from tests/value/reduce_by_valid.i:287.
+[eva] Done for function reduced_garbled_mix
+[eva:alarm] tests/value/reduce_by_valid.i:288: Warning: 
+  out of bounds write. assert \valid(r);
+[eva] computing for function garbled_mix <- main12 <- main.
+  Called from tests/value/reduce_by_valid.i:290.
+[eva] Done for function garbled_mix
+[eva] tests/value/reduce_by_valid.i:290: 
+  Assigning imprecise value to r.
+  The imprecision originates from Library function
+  {tests/value/reduce_by_valid.i:290}
+[eva:alarm] tests/value/reduce_by_valid.i:291: Warning: 
+  assertion got status unknown.
+[eva] Recording results for main12
+[eva] Done for function main12
 [eva] Recording results for main
 [eva] done for function main
 [scope:rm_asserts] removing 12 assertion(s)
@@ -243,6 +284,13 @@
     [59..98] ∈ UNINITIALIZED
     [99..157] ∈ {2} or UNINITIALIZED
   p ∈ {{ &tc + [-8..50] }}
+[eva:final-states] Values at end of function main12:
+  x ∈ {17; 18; 19; 20; 21} or UNINITIALIZED
+  y ∈ {16}
+  a[0..4] ∈ [--..--] or UNINITIALIZED
+  p ∈ {{ &x ; &a + [0..16] }}
+  q ∈ {{ &x ; &a + [0..16] }}
+  r ∈ {{ &x ; &a + [0..16] }}
 [eva:final-states] Values at end of function main:
   t[0..2] ∈ {0}
    [3] ∈ {0; 1}
@@ -281,10 +329,18 @@
 [from] Done for function main8
 [from] Computing for function main9
 [from] Done for function main9
+[from] Computing for function main12
+[from] Computing for function garbled_mix <-main12
+[from] Done for function garbled_mix
+[from] Computing for function reduced_garbled_mix <-main12
+[from] Done for function reduced_garbled_mix
+[from] Done for function main12
 [from] Computing for function main
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
   These dependencies hold at termination for the executions that terminate:
+[from] Function garbled_mix:
+  \result FROM p
 [from] Function main1:
   t[3] FROM v (and SELF)
    [4] FROM v
@@ -307,6 +363,10 @@
 [from] Function main8:
   NO EFFECTS
 [from] Function main9:
+  NO EFFECTS
+[from] Function reduced_garbled_mix:
+  \result FROM p
+[from] Function main12:
   NO EFFECTS
 [from] Function main:
   t[3] FROM v (and SELF)
@@ -357,6 +417,10 @@
 [inout] Out (internal) for function main9:
     tc{[0..58]; [99..157]}; p
 [inout] Inputs for function main9:
+    v
+[inout] Out (internal) for function main12:
+    x; y; a[0..4]; p; tmp; q; tmp_0; r; tmp_1; tmp_2
+[inout] Inputs for function main12:
     v
 [inout] Out (internal) for function main:
     t[3..4]; u[0..4]; S_f1_0_S_vs[0]
