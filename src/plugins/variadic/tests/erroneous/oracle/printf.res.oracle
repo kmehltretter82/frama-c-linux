@@ -18,4 +18,4 @@
 [variadic] tests/erroneous/printf.c:8: Warning: 
   Flag ' ' and conversion specififer e are not compatibles.
 [variadic] tests/erroneous/printf.c:8: 
-  Generic translation of call to variadic function.
+  Fallback translation of call printf to a call to the specialized version printf_fallback_1.

@@ -18,17 +18,17 @@
   Call to function fscanf with non-static format argument:
   no specification will be generated.
 [variadic] tests/known/stdio_scan.c:10: 
-  Generic translation of call to variadic function.
+  Fallback translation of call fscanf to a call to the specialized version fscanf_fallback_1.
 [variadic] tests/known/stdio_scan.c:11: Warning: 
   Call to function scanf with non-static format argument:
   no specification will be generated.
 [variadic] tests/known/stdio_scan.c:11: 
-  Generic translation of call to variadic function.
+  Fallback translation of call scanf to a call to the specialized version scanf_fallback_1.
 [variadic] tests/known/stdio_scan.c:12: Warning: 
   Call to function sscanf with non-static format argument:
   no specification will be generated.
 [variadic] tests/known/stdio_scan.c:12: 
-  Generic translation of call to variadic function.
+  Fallback translation of call sscanf to a call to the specialized version sscanf_fallback_1.
 [variadic] tests/known/stdio_scan.c:14: 
   Translating call to fscanf to a call to the specialized version fscanf_va_1.
 [variadic] tests/known/stdio_scan.c:15: 
@@ -43,6 +43,8 @@
 [eva] done for function main
 [eva] tests/known/stdio_scan.c:10: 
   assertion 'Eva,initialization' got final status invalid.
+[kernel:annot:missing-spec] tests/known/stdio_scan.c:10: Warning: 
+  Neither code nor specification for function fscanf_fallback_1, generating default assigns from the prototype
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   NON TERMINATING FUNCTION
@@ -51,6 +53,27 @@
 #include "stdarg.h"
 #include "stddef.h"
 #include "stdio.h"
+/*@ assigns \result, *stream, *param0, *(param1 + (0 ..)), *param2;
+    assigns \result
+      \from *stream, *(format + (0 ..)), *param0, *(param1 + (0 ..)), *param2;
+    assigns *stream
+      \from *stream, *(format + (0 ..)), *param0, *(param1 + (0 ..)), *param2;
+    assigns *param0
+      \from *stream, *(format + (0 ..)), *param0, *(param1 + (0 ..)), *param2;
+    assigns *(param1 + (0 ..))
+      \from *stream, *(format + (0 ..)), *param0, *(param1 + (0 ..)), *param2;
+    assigns *param2
+      \from *stream, *(format + (0 ..)), *param0, *(param1 + (0 ..)), *param2;
+ */
+int fscanf_fallback_1(FILE * restrict stream, char const * restrict format,
+                      int *param0, char *param1, int *param2);
+
+int scanf_fallback_1(char const * restrict format, int *param0, char *param1,
+                     int *param2);
+
+int sscanf_fallback_1(char const * restrict s, char const * restrict format,
+                      int *param0, char *param1, int *param2);
+
 /*@ requires \valid(param0);
     requires \valid(param2);
     requires valid_read_string(format);
@@ -133,29 +156,10 @@ int main(void)
   int i;
   int j;
   char *s;
-  {
-    int *__va_arg0 = & i;
-    /*@ assert Eva: initialization: \initialized(&s); */
-    char *__va_arg1 = s;
-    int *__va_arg2 = & j;
-    void *__va_args[3] = {& __va_arg0, & __va_arg1, & __va_arg2};
-    fscanf(stream,(char const *)format,(void * const *)(__va_args));
-  }
-  {
-    int *__va_arg0_12 = & i;
-    char *__va_arg1_14 = s;
-    int *__va_arg2_16 = & j;
-    void *__va_args_18[3] = {& __va_arg0_12, & __va_arg1_14, & __va_arg2_16};
-    scanf((char const *)format,(void * const *)(__va_args_18));
-  }
-  {
-    int *__va_arg0_20 = & i;
-    char *__va_arg1_22 = s;
-    int *__va_arg2_24 = & j;
-    void *__va_args_26[3] = {& __va_arg0_20, & __va_arg1_22, & __va_arg2_24};
-    sscanf((char const *)str,(char const *)format,
-           (void * const *)(__va_args_26));
-  }
+  /*@ assert Eva: initialization: \initialized(&s); */
+  fscanf(stream,(char const *)format,& i,s,& j); /* fscanf_fallback_1 */
+  scanf((char const *)format,& i,s,& j); /* scanf_fallback_1 */
+  sscanf((char const *)str,(char const *)format,& i,s,& j); /* sscanf_fallback_1 */
   fscanf(stream,"%d %s %d",& i,s,& j); /* fscanf_va_1 */
   scanf("%d %s %d",& i,s,& j); /* scanf_va_1 */
   sscanf((char const *)str,"%d %s %d",& i,s,& j); /* sscanf_va_1 */
