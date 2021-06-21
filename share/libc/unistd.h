@@ -1104,7 +1104,7 @@ extern pid_t        tcgetpgrp(int);
 extern int          tcsetpgrp(int, pid_t);
 extern int          truncate(const char *, off_t);
 
-extern volatile char __fc_ttyname[TTY_NAME_MAX];
+__FC_EXTERN volatile char __fc_ttyname[TTY_NAME_MAX];
 volatile char *__fc_p_ttyname = __fc_ttyname;
 
 /*@

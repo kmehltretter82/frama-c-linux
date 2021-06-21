@@ -286,7 +286,7 @@ extern void srandom(unsigned int seed);
 // used to check if some *48() functions have called the seed initializer
 int __fc_random48_init;
 
-extern unsigned short __fc_random48_counter[3];
+__FC_EXTERN unsigned short __fc_random48_counter[3];
 unsigned short *__fc_p_random48_counter = __fc_random48_counter;
 
 /*@

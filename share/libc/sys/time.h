@@ -99,8 +99,9 @@ extern int gettimeofday(struct timeval * restrict tv, void * restrict tz);
 */
 extern int settimeofday(const struct timeval *tv, const struct timezone *tz);
 
-#if (defined _POSIX_C_SOURCE && (_POSIX_C_SOURCE) >= 200112L) ||        \
-  (defined _XOPEN_SOURCE && (_XOPEN_SOURCE) >= 600)
+// Note: definitions related to itimerval are obsolescent in POSIX and may be
+// removed in future versions. Strictly conforming applications should not use
+// them.
 #define ITIMER_REAL    0
 #define ITIMER_VIRTUAL 1
 #define ITIMER_PROF    2
@@ -199,7 +200,6 @@ extern int getitimer(int which, struct itimerval *curr_value);
 extern int setitimer (int which,
       const struct itimerval *restrict new_value,
       struct itimerval *restrict old_value);
-#endif
 
 // Non-POSIX, non-C99 functions (present in Linux and most BSDs)
 extern void timeradd(struct timeval *a, struct timeval *b,

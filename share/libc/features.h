@@ -115,5 +115,12 @@
 
 #define __USE_ISOC99	1
 
+// When linking code including Frama-C's libc, we avoid adding 'extern'
+// to some variable declarations. In this case, __FC_EXTERN is defined to
+// the empty string. Otherwise, define it to 'extern'.
+#ifndef __FC_EXTERN
+#define __FC_EXTERN extern
+#endif
+
 /* end __FC_FEATURES_H */
 #endif
