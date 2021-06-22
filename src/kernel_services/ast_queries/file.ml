@@ -367,7 +367,7 @@ let machdep_help () =
   let m = Kernel.Machdep.get () in
   if m = "help" then begin
     Kernel.feedback
-      "@[supported machines are%t@ (default is x86_32).@]"
+      "@[supported machines are%t@ (default is x86_64).@]"
       pretty_machdeps;
     raise Cmdline.Exit
   end else

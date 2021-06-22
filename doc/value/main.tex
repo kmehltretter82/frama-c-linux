@@ -378,13 +378,13 @@ would be during an actual compilation.
 
 There are analyses where the influence of host platform parameters
 is not noticeable. The analysis we are embarking on is not one of them.
-If you pre-process the Skein source code with a 64-bit compiler and
-then analyze it with Frama-C targeting its default 32-bit platform,
+If you pre-process the Skein source code with a 32-bit compiler and
+then analyze it with Frama-C targeting its default 64-bit platform,
 the analysis will be meaningless and you won't be able to make sense of
 this tutorial.
-If you are using a 64-bit compiler, simply match
+If you are using a 32-bit compiler, simply match
 Frama-C's target platform with your host header files by systematically adding 
-the option \verb|-machdep x86_64| to all commands in
+the option \verb|-machdep x86_32| to all commands in
 this tutorial.
 
 The ``\lstinline|>log|'' part of the command sends all
@@ -3246,7 +3246,7 @@ sets a number of parameters for the low-level description of the
 target platform, including the 
 \emph{endianness} of the target and size of each C type.
 The option \lstinline|-machdep help| provides a list of currently supported
-platforms. The default is \lstinline|x86_32|, an IA-32 processor with
+platforms. The default is \lstinline|x86_64|, an AMD64-compatible processor with
 what are roughly the default compilation choices of gcc.
 
 \subsubsection{Targeting a different platform}

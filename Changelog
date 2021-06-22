@@ -72,8 +72,8 @@ o!  Kernel    [2021-01-15] Make cfields list optional. None means undefined,
               removed cdefined field
 -*  RTE       [2021-01-13] Remove spurious assert when comparing function
               pointer to NULL (fixes #@940)
--   Kernel    [2021-01-12] Set default machdep to x86_64; allow setting machdep
-              via environment variable FRAMAC_MACHDEP.
+-   Kernel    [2021-01-12] Set default machdep to x86_64 (was x86_32);
+              allow setting machdep via environment variable FRAMAC_MACHDEP.
 -   Kernel    [2021-01-08] Allow -add-symbolic-path to survive saves/loads and
               invert argument order (path:name).
 -*  Eva       [2020-12-05] Fixes a crash when subdividing the evaluation of
