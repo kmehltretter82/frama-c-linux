@@ -1340,13 +1340,24 @@ and eval_known_logic_function ~alarm_mode env li labels args =
   let lvi = li.l_var_info in
   match lvi.lv_name, li.l_type, labels, args with
   | ("strlen" | "wcslen") as b,  _, [lbl], [arg] ->
-    let r = eval_term ~alarm_mode env arg in
-    let builtin =
-      if b = "strlen" then Builtins_string.frama_c_strlen_wrapper
-      else Builtins_string.frama_c_wcslen_wrapper
-    in
-    eval_logic_charlen builtin { env with e_cur = lbl } r.eover r.ldeps
-
+    begin
+      match arg.term_node with
+      | TConst (LStr str) ->
+        (* Look for the first occurrence of the '\0' character, otherwise
+           return the string length. *)
+        let length =
+          try String.index str '\x00'
+          with Not_found -> String.length str
+        in
+        einteger (Cvalue.V.inject_int (Integer.of_int length))
+      | _ ->
+        let r = eval_term ~alarm_mode env arg in
+        let builtin =
+          if b = "strlen" then Builtins_string.frama_c_strlen_wrapper
+          else Builtins_string.frama_c_wcslen_wrapper
+        in
+        eval_logic_charlen builtin { env with e_cur = lbl } r.eover r.ldeps
+    end
   | ("memchr_off" | "wmemchr_off") as b,  _, [lbl], [arg_s; arg_c; arg_n] ->
     let s = eval_term ~alarm_mode env arg_s in
     let c = eval_term ~alarm_mode env arg_c in
