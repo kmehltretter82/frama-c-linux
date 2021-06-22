@@ -256,6 +256,43 @@ void main11() {
   //@ assert \valid(q+(0 .. len-1));
 }
 
+/*@ assigns \result \from p; */
+int* garbled_mix (int *p);
+
+/*@ assigns \result \from p;
+    ensures \valid_read(\result); */
+int* reduced_garbled_mix (int *p);
+
+/* Tests reduction of garbled mix values by \valid and \valid_read. */
+void main12(void) {
+  int x;
+  const y = 16;
+  int a[5];
+  int *p = v ? &x : &a[0];
+  p = garbled_mix(p);
+  Frama_C_show_each_gm(p);
+  if (v)
+    *p = 17;
+  else {
+    /*@ assert \valid(p); */
+    Frama_C_show_each_reduced_gm(p);
+    *p = 18;
+  }
+  int *q = v ? &x : &a[0];
+  q = reduced_garbled_mix(q);
+  /*@ check \valid(q); */
+  *q = 19;
+  int *r = v ? &x : v ? &y : &a[0];
+  if (v) {
+    r = reduced_garbled_mix(r);
+    *r = 20;
+  } else {
+    r = garbled_mix(r);
+    /*@ assert \valid(r); */
+    *r = 21;
+  }
+}
+
 void main () {
   main1();
   main2();
@@ -268,4 +305,5 @@ void main () {
   main9();
   main10();
   main11();
+  main12();
 }

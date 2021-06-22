@@ -127,30 +127,22 @@ let reduce_by_initialized_defined f loc state =
     state
 
 let reduce_by_valid_loc ~positive access loc typ state =
-  try
-    let value = Cvalue.Model.find state loc in
-    if Cvalue.V.is_imprecise value then
-      (* we won't reduce anything anyway, and we may lose information if loc
-         contains misaligned data *)
-      raise Exit;
-    let loc_bits = Locations.loc_bytes_to_loc_bits value in
-    let size = Bit_utils.sizeof_pointed typ in
-    let value_as_loc = Locations.make_loc loc_bits size in
-    let reduced_value =
-      Locations.loc_to_loc_without_size
-        (if positive
-         then Locations.valid_part access value_as_loc
-         else Locations.invalid_part value_as_loc )
-    in
-    if V.equal value reduced_value
-    then state
-    else begin
-      if V.equal V.bottom reduced_value
-      then Cvalue.Model.bottom
-      else
-        Cvalue.Model.reduce_previous_binding state loc reduced_value
-    end
-  with Exit -> state
+  let value = Cvalue.Model.find state loc in
+  let loc_bits = Locations.loc_bytes_to_loc_bits value in
+  let size = Bit_utils.sizeof_pointed typ in
+  let value_as_loc = Locations.make_loc loc_bits size in
+  let reduced_value =
+    Locations.loc_to_loc_without_size
+      (if positive
+       then Locations.valid_part access value_as_loc
+       else Locations.invalid_part value_as_loc )
+  in
+  if V.equal value reduced_value
+  then state
+  else
+  if V.equal V.bottom reduced_value
+  then Cvalue.Model.bottom
+  else Cvalue.Model.reduce_previous_binding state loc reduced_value
 
 let make_loc_contiguous loc =
   try

@@ -29,9 +29,6 @@ char *__gen_e_acsl_getenv(char const *name)
   {
     int __gen_e_acsl_or;
     __e_acsl_temporal_save_return((void *)(& __retres));
-    /*@ assert
-        Eva: ptr_comparison: \pointer_comparable((void *)__retres, (void *)0);
-    */
     if (__retres == (char *)0) __gen_e_acsl_or = 1;
     else {
       int __gen_e_acsl_valid;
@@ -88,9 +85,6 @@ int main(int argc, char const **argv)
   __e_acsl_full_init((void *)(& g2));
   {
     int __gen_e_acsl_or;
-    /*@ assert
-        Eva: ptr_comparison: \pointer_comparable((void *)g1, (void *)0);
-    */
     if (g1 == (char *)0) __gen_e_acsl_or = 1;
     else {
       int __gen_e_acsl_initialized;
@@ -113,9 +107,6 @@ int main(int argc, char const **argv)
   /*@ assert g1 ≡ \null ∨ \valid(g1); */ ;
   {
     int __gen_e_acsl_or_2;
-    /*@ assert
-        Eva: ptr_comparison: \pointer_comparable((void *)g2, (void *)0);
-    */
     if (g2 == (char *)0) __gen_e_acsl_or_2 = 1;
     else {
       int __gen_e_acsl_initialized_2;
