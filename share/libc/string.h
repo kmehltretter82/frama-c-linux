@@ -104,6 +104,19 @@ extern void *memrchr(const void *s, int c, size_t n);
 extern void *memcpy(void *restrict dest,
 		    const void *restrict src, size_t n);
 
+// Non-POSIX; GNU extension
+/*@ requires valid_dest: valid_or_empty(dest, n);
+  @ requires valid_src: valid_read_or_empty(src, n);
+  @ requires separation:
+  @   \separated(((char *)dest)+(0..n-1),((char *)src)+(0..n-1));
+  @ assigns ((char*)dest)[0..n - 1] \from ((char*)src)[0..n-1];
+  @ assigns \result \from dest, n;
+  @ ensures copied_contents: memcmp{Post,Pre}((char*)dest,(char*)src,n) == 0;
+  @ ensures result_next_byte: \result == dest + n;
+  @*/
+extern void *mempcpy(void *restrict dest,
+                     const void *restrict src, size_t n);
+
 /*@ requires valid_dest: valid_or_empty(dest, n);
   @ requires valid_src: valid_read_or_empty(src, n);
   @ assigns ((char*)dest)[0..n - 1] \from ((char*)src)[0..n-1];

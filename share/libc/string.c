@@ -41,6 +41,22 @@ void* memcpy(void* restrict dest, const void* restrict src, size_t n)
   return dest;
 }
 
+// Non-POSIX; GNU extension
+void* mempcpy(void* restrict dest, const void* restrict src, size_t n)
+{
+  size_t i;
+  /*@
+    loop invariant no_eva: 0 <= i <= n;
+    loop invariant no_eva: \forall ℤ k; 0 <= k < i ==> ((char*)dest)[k] == ((char*)src)[k];
+    loop assigns i, ((char*)dest)[0 .. n-1];
+    loop variant n - i;
+   */
+  for (i = 0; i < n; i++) {
+    ((char*)dest)[i] = ((char*)src)[i];
+  }
+  return (char*)dest + i;
+}
+
 // memoverlap: auxiliary function that returns
 //   0 if p[0..n-1] and q[0..n-1] do not overlap;
 //   -1/+1 otherwise, according to whether p is before or after q in the memory
@@ -208,6 +224,16 @@ char* strcpy(char *dest, const char *src)
     dest[i] = src[i];
   dest[i] = 0;
   return dest;
+}
+
+// POSIX.1-2008
+char* stpcpy(char *dest, const char *src)
+{
+  size_t i;
+  for (i = 0; src[i] != 0; i++)
+    dest[i] = src[i];
+  dest[i] = 0;
+  return dest + i;
 }
 
 char *strncpy(char *dest, const char *src, size_t n)
