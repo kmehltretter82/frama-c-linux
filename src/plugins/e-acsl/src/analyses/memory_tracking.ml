@@ -639,6 +639,15 @@ end = struct
     if not is_init then Env.add kf tbl;
     (try
        let fundec = Kernel_function.get_definition kf in
+       (* FIXME: Since the memory tracking analysis is launched during the
+          translation, we need to recompute the CFG of the function before the
+          dataflow analysis.
+          This fix is just temporary and should be removed once the correct fix
+          is applied: identifying in an early pre-analysis if some memory
+          annotations are used, and in that case launch the memory tracking in a
+          pre-analysis. *)
+       Cfg.clearCFGinfo ~clear_id:false fundec;
+       Cfg.cfgFun fundec;
        let stmts, returns = Dataflow.find_stmts fundec in
        if is_init then
          Option.iter
