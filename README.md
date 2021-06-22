@@ -47,9 +47,10 @@ To install the development branch of Frama-C (updated nightly):
 
     opam pin add frama-c https://git.frama-c.com/frama-c#master
 
+This command will *pin* the development version of Frama-C and try to install it.
 If installation fails due to missing external dependencies, try using
-`depext` to install them and then Frama-C, using the same commands from the
-[Installation](#installation) section.
+the same commands from the [Installation](#installation) section to get the
+external dependencies and then install Frama-C.
 
 ### Distribution packages
 
