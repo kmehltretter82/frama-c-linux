@@ -40,6 +40,7 @@ mkdir -p manuals
 
 
 FC_SUFFIX=$(cat ../VERSION)-$(cat ../VERSION_CODENAME)
+FC_SUFFIX="$(echo ${FC_SUFFIX} | sed -e "s/~/-/")"
 ACSL_SUFFIX=$(grep acslversion acsl/version.tex | sed 's/.*{\([^{}\\]*\).*/\1/')
 EACSL_SUFFIX=$(grep 'newcommand{\\eacsllangversion' ../src/plugins/e-acsl/doc/refman/main.tex | sed 's/.*{\([^{}\\]*\).*/\1/')
 # sanity check
