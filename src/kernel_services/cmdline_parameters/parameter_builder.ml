@@ -997,6 +997,7 @@ struct
 
     let mem e = E.Set.mem e (get ())
     let exists f = E.Set.exists f (get ())
+    let get_default () = X.default
 
   end
 
@@ -1213,6 +1214,8 @@ struct
     let append_before l = set (l @ get ())
     let append_after l = set (get () @ l)
 
+    let get_default () = X.default
+
   end
 
   module String_list(X: Parameter_sig.Input_with_arg) =
@@ -1409,6 +1412,7 @@ struct
 
     let find k = K.Map.find k (get ())
     let mem k = K.Map.mem k (get ())
+    let get_default () = X.default
     let () = find_ref := (fun k -> K.Map.find k (get_nomemo ()))
 
   end
@@ -1646,6 +1650,7 @@ struct
 
     let find k = K.Map.find k (get ())
     let mem k = K.Map.mem k (get ())
+    let get_default () = X.default
     let () = find_ref := (fun k -> K.Map.find k (get_nomemo ()))
 
   end

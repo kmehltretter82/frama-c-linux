@@ -161,6 +161,8 @@ struct
 
   let is_default () = X.equal (X.default ()) (Internal_state.get ())
 
+  let get_default () = X.default ()
+
   module Is_set =
     Option_state_builder
       (struct
