@@ -65,5 +65,5 @@ if [ $has_any_diffs -ne 0 ]; then
     echo "    opam switch create ${working_ocaml}"
     echo "    opam install depext"
     echo "    opam depext --install$all_packages"
-    echo "    rm -f ~/.why3.conf && why3 config --detect"
+    echo "    rm -f ~/.why3.conf && why3 config detect"
 fi
