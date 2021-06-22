@@ -44,7 +44,6 @@ let dkey = Value_parameters.register_category "d-taint"
    Frama_C_domain_show_each directive. *)
 let dkey_debug = Value_parameters.register_category "d-taint-debug"
 
-
 module LatticeTaint = struct
 
   let pp_locs_only fmt t =
@@ -391,3 +390,13 @@ module TaintDomain = struct
 end
 
 include TaintDomain
+
+let flag =
+  let name = "taint"
+  and descr = "Taint analysis"
+  and experimental = true
+  and abstraction =
+    Abstractions.{ values = Single (module Main_values.CVal);
+                   domain = Domain (module TaintDomain); }
+  in
+  Abstractions.register ~name ~descr ~experimental abstraction
