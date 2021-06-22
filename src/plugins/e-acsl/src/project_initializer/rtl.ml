@@ -79,7 +79,7 @@ end = struct
     with Not_found -> raise (Unregistered s)
 
   let libc_replacement fvi =
-    let name = Functions.RTL.libc_replacement_name fvi.vname in
+    let name = Functions.RTL.libc_replacement_name fvi.vorig_name in
     try
       find_vi name
     with Unregistered _ ->
