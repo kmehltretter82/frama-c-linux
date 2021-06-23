@@ -261,9 +261,8 @@ end
 
 
 (** Dataflow computation: simple data-flow analysis using interpreted automata.
-    This is mostly intended as an example for using interpreted automata;
-    see also tests/misc/interpreted_automata_dataflow.ml for a complete example
-    using this dataflow. *)
+    See tests/misc/interpreted_automata_dataflow.ml for a complete example
+    using this dataflow computation. *)
 
 (** Input domain for a simple dataflow analysis. *)
 module type Domain =
@@ -289,8 +288,36 @@ end
 (** Builds a simple dataflow analysis over an input domain. *)
 module Dataflow (D : Domain) :
 sig
-  val fixpoint : ?wto:wto ->
-    Cil_types.kernel_function ->  D.t -> D.t Vertex.Hashtbl.t
-  val backward_fixpoint : ?wto:wto ->
-    Cil_types.kernel_function ->  D.t -> D.t Vertex.Hashtbl.t
+  type result = automaton * D.t Vertex.Hashtbl.t
+
+  val fixpoint : ?wto:wto -> Cil_types.kernel_function ->  D.t -> result
+  val backward_fixpoint : ?wto:wto -> Cil_types.kernel_function ->  D.t -> result
+
+  module Result :
+  sig
+    (** Extract the result at the entry point of the analysed function *)
+    val at_entry : result -> D.t option
+
+    (** Extract the result at the return point of the analysed function (just
+        after the return transfer function) *)
+    val at_return : result -> D.t option
+
+    (** Extract the result obtained for the control point immediately before the
+        given statement *)
+    val before : result -> Cil_types.stmt -> D.t option
+
+    (** Extract the result obtained for the control point immediately after the
+        given statement *)
+    val after : result -> Cil_types.stmt -> D.t option
+
+    (** Iter on the results obtained at each vertex of the graph.
+        Do nothing  when the vertex is not reachable (for instance if transfer
+        returned None) *)
+    val iter_vertex : (vertex -> D.t -> unit) -> result -> unit
+
+    (** Iter on the results obtained before each statements of the function.
+        Do nothing  when the vertex is not reachable (for instance if transfer
+        returned None) *)
+    val iter_stmt : (Cil_types.stmt -> D.t -> unit) -> result -> unit
+  end
 end

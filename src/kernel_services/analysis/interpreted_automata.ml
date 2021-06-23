@@ -1135,12 +1135,14 @@ end
 
 module Dataflow (D : Domain) =
 struct
-  module Results = Vertex.Hashtbl
+  type result = automaton * D.t Vertex.Hashtbl.t
+
+  module States = Vertex.Hashtbl
 
   let compute ~forward kf ?(wto=get_wto kf) initial_value =
     let automaton = get_automaton kf in
     let graph = automaton.graph in
-    let results = Results.create (G.nb_vertex graph) in
+    let results = States.create (G.nb_vertex graph) in
 
     (* Compute the transfer function for the given edge and add the result to
        acc *)
@@ -1148,8 +1150,8 @@ struct
       (* Retrieve origin value *)
       let value =
         if forward
-        then Results.find_opt results v1
-        else Results.find_opt results v2
+        then States.find_opt results v1
+        else States.find_opt results v2
       in
       let result = Option.bind value (D.transfer e.edge_transition) in
       Option.to_list result @ acc
@@ -1170,16 +1172,16 @@ struct
       in
       match initial @ incomming with
       | [] -> (* Zero incomming values -> Bottom *)
-        Results.remove results v
+        States.remove results v
       | v1 :: vl ->
         (* Join incomming values *)
         let result = List.fold_left D.join v1 vl in
-        Results.add results v result
+        States.add results v result
     in
 
     (* widen returns whether it is necessary to continue to iterate or not *)
     let widen v previous =
-      let current = Results.find_opt results v in
+      let current = States.find_opt results v in
       match previous, current with
       | _, None -> false (* Current is bottom, let's quit *)
       | None, _ -> true (* Previous was bottom *)
@@ -1187,7 +1189,7 @@ struct
         match D.widen v1 v2 with
         | None -> false (* End of iteration *)
         | Some value -> (* new value *)
-          Results.add results v value;
+          States.add results v value;
           true
     in
 
@@ -1204,7 +1206,7 @@ struct
         iterate_list w;
         (* Then reach a fixpoint *)
         while
-          let previous = Results.find_opt results v in
+          let previous = States.find_opt results v in
           process_vertex v;
           widen v previous
         do
@@ -1212,11 +1214,41 @@ struct
         done;
     in
     iterate_list wto;
-    results
+    automaton, results
 
   let fixpoint ?wto kf initial_value =
     compute ~forward:true kf ?wto initial_value
 
   let backward_fixpoint ?wto kf initial_value =
     compute ~forward:false kf ?wto initial_value
+
+
+  module Result =
+  struct
+    module Stmts = Cil_datatype.Stmt.Hashtbl
+
+    let (>>) o f = Option.map f o
+    let (>>:) = Option.bind
+
+    let at_entry (automaton,states) =
+      States.find_opt states automaton.entry_point
+
+    let at_return (automaton,states) =
+      States.find_opt states automaton.return_point
+
+    let before (automaton,states) stmt =
+      Stmts.find_opt automaton.stmt_table stmt >> fst >>: States.find_opt states
+
+    let after (automaton,states) stmt =
+      Stmts.find_opt automaton.stmt_table stmt >> snd >>: States.find_opt states
+
+    let iter_vertex f (_automaton,states) =
+      States.iter f states
+
+    let iter_stmt f (_automaton,states) =
+      let f' v s =
+        Option.iter (fun stmt -> f stmt s) v.vertex_start_of
+      in
+      States.iter f' states
+  end
 end

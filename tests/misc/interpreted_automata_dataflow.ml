@@ -104,9 +104,7 @@ module Dataflow = Interpreted_automata.Dataflow (ConstantsDomain)
 let run () =
   let main_kf, _ = Globals.entry_point () in
   let results = Dataflow.fixpoint main_kf ConstantsDomain.top in
-  let result = Interpreted_automata.(
-      Vertex.Hashtbl.find results (get_automaton main_kf).return_point)
-  in
+  let result = Dataflow.Result.at_return results in
   Kernel.result "Results at the end of function %s:@.%a"
     (Kernel_function.get_name main_kf)
     ConstantsDomain.pretty result
