@@ -271,4 +271,8 @@
 /* time.h */
 #define __FC_TIME_T long
 
+/* signal.h */
+#define __FC_NSIG 65
+#define __FC__NSIG __FC_NSIG
+
 #endif

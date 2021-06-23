@@ -126,7 +126,7 @@
   function sigaction: precondition 'valid_read_act_or_null' got status valid.
 [eva] tests/libc/signal_h.c:48: 
   function sigaction: precondition 'separation,separated_acts' got status valid.
-[eva] share/libc/signal.h:216: 
+[eva] share/libc/signal.h:222: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic coercion struct sigaction -> set<struct sigaction>
 [eva] Done for function sigaction
 [eva] computing for function sigaction <- main.
@@ -142,6 +142,7 @@
 [eva:invalid-assigns] tests/libc/signal_h.c:51: 
   Completely invalid destination for assigns clause *oldact. Ignoring.
 [eva] Done for function sigaction
+[eva] tests/libc/signal_h.c:55: assertion 'valid_nsig' got status valid.
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

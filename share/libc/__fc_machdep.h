@@ -774,7 +774,8 @@
 //NOT IN MSVC: #define __FC_ERFKILL
 //NOT IN MSVC: #define __FC_EHWPOISON
 
-
+/* signal.h */
+#define __FC_NSIG 23
 
 // End of MSVC_X86_64
 #else
