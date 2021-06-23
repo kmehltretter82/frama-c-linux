@@ -1,5 +1,6 @@
 /* run.config
-OPT: -load-script tests/misc/interpreted_automata_dataflow.ml
+OPT: -load-script @PTEST_DIR@/@PTEST_NAME@.ml
+LOG: interpreted_automata_dataflow.dot
 */
 
 /* Tests the dataflow functor of interpreted automata via a caml script

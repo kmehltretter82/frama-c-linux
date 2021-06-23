@@ -153,8 +153,16 @@ val get_wto : Cil_types.kernel_function -> wto
 (** Extract an exit strategy from a component, i.e. a sub-wto where all
     vertices lead outside the wto without passing through the head. *)
 val exit_strategy : graph -> vertex Wto.component -> wto
+
+type 'a labelling =
+  [ `Stmt
+  | `Vertex
+  | `Both
+  | `Custom of Format.formatter -> 'a -> unit
+  ]
+
 (** Output the automaton in dot format *)
-val output_to_dot : out_channel -> ?number:[`Stmt|`Vertex] -> ?wto:wto ->
+val output_to_dot : out_channel -> ?labelling:vertex labelling -> ?wto:wto ->
   automaton -> unit
 
 (** the position of a statement in a wto given as the list of
@@ -199,7 +207,7 @@ module Compute: sig
       vertices lead outside the wto without passing through the head. *)
   val exit_strategy : graph -> vertex Wto.component -> wto
   (** Output the automaton in dot format *)
-  val output_to_dot : out_channel -> ?number:[`Stmt|`Vertex] -> ?wto:wto ->
+  val output_to_dot : out_channel -> ?labelling:vertex labelling  -> ?wto:wto ->
     automaton -> unit
 
 
@@ -252,7 +260,8 @@ module UnrollUnnatural : sig
     include Datatype.S with type t = Version.t Wto.partition
   end
 
-  val output_to_dot : out_channel -> ?number:[`Stmt|`Vertex] -> ?wto:WTO.t -> G.t -> unit
+  val output_to_dot : out_channel -> ?labelling:Version.t labelling ->
+    ?wto:WTO.t -> G.t -> unit
 
   val unroll_unnatural_loop :
     automaton -> wto -> Compute.wto_index_table -> G.t
@@ -288,7 +297,7 @@ end
 (** Builds a simple dataflow analysis over an input domain. *)
 module Dataflow (D : Domain) :
 sig
-  type result = automaton * D.t Vertex.Hashtbl.t
+  type result = automaton * wto * D.t Vertex.Hashtbl.t
 
   val fixpoint : ?wto:wto -> Cil_types.kernel_function ->  D.t -> result
   val backward_fixpoint : ?wto:wto -> Cil_types.kernel_function ->  D.t -> result
@@ -319,5 +328,15 @@ sig
         Do nothing  when the vertex is not reachable (for instance if transfer
         returned None) *)
     val iter_stmt : (Cil_types.stmt -> D.t -> unit) -> result -> unit
+
+    (** Output result to the given channel. Must be supplied with a pretty
+        printer for abstract values *)
+    val to_dot_output : (Format.formatter -> D.t -> unit) ->
+      result -> out_channel -> unit
+
+    (** Output result to a file with the given path. Must be supplied with
+        pretty printer for abstract values *)
+    val to_dot_file : (Format.formatter -> D.t -> unit) ->
+      result -> Filepath.Normalized.t -> unit
   end
 end

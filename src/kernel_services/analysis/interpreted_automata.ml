@@ -695,6 +695,13 @@ let exit_strategy graph component =
 (* --- Output to dot                                                  --- *)
 (* ---------------------------------------------------------------------- *)
 
+type 'a labelling =
+  [ `Stmt
+  | `Vertex
+  | `Both
+  | `Custom of Format.formatter -> 'a -> unit
+  ]
+
 let pretty_kind fmt = function
   | Invariant -> Format.pp_print_string fmt "Invariant"
   | Assert -> Format.pp_print_string fmt "Assert"
@@ -735,9 +742,41 @@ module MakeDot
 = struct
 
   let htmllabel fmt =
-    Pretty_utils.ksfprintf (fun s -> `HtmlLabel (Extlib.html_escape s) ) fmt
+    let string_to_label s =
+      (* Escape for html embedding *)
+      let substitution s =
+        match Str.matched_string s with
+        | "<" -> "&lt;"
+        | ">" -> "&gt;"
+        | "&" -> "&amp;"
+        | "\n" -> "<br />"
+        | s -> s (* should not happen *)
+      and regexp = Str.regexp "<\\|>\\|&\\|\n" in
+      let s = Str.global_substitute regexp substitution s in
+      let s = if s = "" then " " else s in (* graph viewers doesn't like empty labels *)
+      `HtmlLabel s
+    in
+    Pretty_utils.ksfprintf string_to_label fmt
 
-  let output_to_dot out_channel ?(number=`Stmt) ?wto g =
+  let output_to_dot out_channel ?(labelling:V.t labelling=`Both) ?wto g =
+    (* Vertex labelling *)
+    let vertex_label v =
+      match labelling with
+      | `Stmt ->
+        begin match V.start_of v with
+          | None -> htmllabel "~"
+          | Some stmt -> htmllabel "%d" stmt.sid
+        end
+      | `Vertex ->
+        htmllabel "%a" V.pretty v
+      | `Both ->
+        begin match V.start_of v with
+          | None -> htmllabel "%a" V.pretty v
+          | Some stmt -> htmllabel "%a@s%d" V.pretty v stmt.sid
+        end
+      | `Custom f ->
+        htmllabel "%a" f v
+    in
     (* Build vertex attributes and subgraphs from wto if present *)
     let open Graph.Graphviz.DotAttributes in
     let module Table = V.Hashtbl in
@@ -749,15 +788,7 @@ module MakeDot
     in
     let component_count = ref 0 in
     let donode subgraph head v =
-      let label =
-        match number with
-        | `Stmt -> begin
-            match (V.start_of v) with
-            | Some stmt -> htmllabel "%i" stmt.sid
-            | None -> htmllabel "~"
-          end
-        | `Vertex -> htmllabel "%a" V.pretty v
-      in
+      let label = vertex_label v in
       let vertex_attributes =
         if head && Option.is_some subgraph
         then [`Shape `Invtriangle ; label]
@@ -792,13 +823,7 @@ module MakeDot
         let vertex_attributes v =
           try let (x,_,_,_) = Table.find subgraphs v in x
           with Not_found ->
-            let l = if wto = None then [] else [`Style `Dashed] in
-            let pretty fmt v =
-              V.pretty fmt v ;
-              match V.start_of v with
-              | None -> ()
-              | Some s -> Format.fprintf fmt "@s%d" s.sid
-            in (htmllabel "%a" pretty v)::l
+            vertex_label v :: if wto = None then [] else [`Style `Dashed]
         let get_subgraph v =
           try let (_,x,_,_) = Table.find subgraphs v in x
           with Not_found -> None
@@ -819,8 +844,8 @@ end
 module GDot =
   MakeDot(struct include Vertex let start_of v = v.vertex_start_of end)(G)
 
-let output_to_dot out_channel ?number ?wto g =
-  GDot.output_to_dot  out_channel ?number ?wto g.graph
+let output_to_dot out_channel ?labelling ?wto g =
+  GDot.output_to_dot  out_channel ?labelling ?wto g.graph
 
 (* ---------------------------------------------------------------------- *)
 (* --- WTO Indexes                                                    --- *)
@@ -1035,8 +1060,8 @@ module UnrollUnnatural  = struct
       let start_of (v,_) = v.vertex_start_of
     end)(G)
 
-  let output_to_dot out_channel ?number ?wto g =
-    GDot.output_to_dot  out_channel ?number ?wto g
+  let output_to_dot out_channel ?labelling ?wto g =
+    GDot.output_to_dot  out_channel ?labelling ?wto g
 
   let unroll_unnatural_loop
       (g:automaton) (wto:wto) (index:Compute.wto_index_table) : G.t =
@@ -1135,7 +1160,7 @@ end
 
 module Dataflow (D : Domain) =
 struct
-  type result = automaton * D.t Vertex.Hashtbl.t
+  type result = automaton * wto * D.t Vertex.Hashtbl.t
 
   module States = Vertex.Hashtbl
 
@@ -1214,7 +1239,7 @@ struct
         done;
     in
     iterate_list wto;
-    automaton, results
+    automaton, wto, results
 
   let fixpoint ?wto kf initial_value =
     compute ~forward:true kf ?wto initial_value
@@ -1230,25 +1255,37 @@ struct
     let (>>) o f = Option.map f o
     let (>>:) = Option.bind
 
-    let at_entry (automaton,states) =
+    let at_entry (automaton,_wto,states) =
       States.find_opt states automaton.entry_point
 
-    let at_return (automaton,states) =
+    let at_return (automaton,_wto,states) =
       States.find_opt states automaton.return_point
 
-    let before (automaton,states) stmt =
+    let before (automaton,_wto,states) stmt =
       Stmts.find_opt automaton.stmt_table stmt >> fst >>: States.find_opt states
 
-    let after (automaton,states) stmt =
+    let after (automaton,_wto,states) stmt =
       Stmts.find_opt automaton.stmt_table stmt >> snd >>: States.find_opt states
 
-    let iter_vertex f (_automaton,states) =
+    let iter_vertex f (_automaton,_wto,states) =
       States.iter f states
 
-    let iter_stmt f (_automaton,states) =
+    let iter_stmt f (_automaton,_wto,states) =
       let f' v s =
         Option.iter (fun stmt -> f stmt s) v.vertex_start_of
       in
       States.iter f' states
+
+    let to_dot_output pp_value (automaton,wto,states) out =
+      let pp_vertex fmt v =
+        match States.find_opt states v with
+        | None -> Format.fprintf fmt "⊥"
+        | Some v -> pp_value fmt v
+      in
+      output_to_dot out ~labelling:(`Custom pp_vertex) ~wto automaton
+
+    let to_dot_file pp_value result filepath =
+      let out = open_out (filepath : Filepath.Normalized.t :> string) in
+      to_dot_output pp_value result out
   end
 end

@@ -104,7 +104,17 @@ module Dataflow = Interpreted_automata.Dataflow (ConstantsDomain)
 let run () =
   let main_kf, _ = Globals.entry_point () in
   let main_name = Kernel_function.get_name main_kf in
+  (* Run the analysis *)
   let results = Dataflow.fixpoint main_kf ConstantsDomain.top in
+  (* Output to dot *)
+  let filepath =
+    let open Filename in
+    let (/) = concat in
+    dirname __FILE__ / "result" / remove_extension (basename __FILE__) ^ ".dot"
+  in
+  let filepath = Filepath.Normalized.of_string filepath in
+  Dataflow.Result.to_dot_file ConstantsDomain.pretty results filepath;
+  (* Output result to stdout *)
   match Dataflow.Result.at_return results with
   | None -> 
     Kernel.result "No result at the end of function %s." main_name
