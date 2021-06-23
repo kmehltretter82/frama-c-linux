@@ -1176,7 +1176,7 @@ struct
       | v1 :: vl ->
         (* Join incomming values *)
         let result = List.fold_left D.join v1 vl in
-        States.add results v result
+        States.replace results v result
     in
 
     (* widen returns whether it is necessary to continue to iterate or not *)
@@ -1189,7 +1189,7 @@ struct
         match D.widen v1 v2 with
         | None -> false (* End of iteration *)
         | Some value -> (* new value *)
-          States.add results v value;
+          States.replace results v value;
           true
     in
 
