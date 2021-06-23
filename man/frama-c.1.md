@@ -1,5 +1,5 @@
 ---
-title: 'FRAMA-C(1) 2021-02-16'
+title: 'FRAMA-C(1) 2021-06-18'
 header-includes:
 - |
   ```{=man}
@@ -332,7 +332,7 @@ Loading order is preserved and additional dependencies can be listed in
 -machdep *machine*
 : uses *machine* as the current machine-dependent configuration (size of the
 various integer types, endiandness, ...). The list of currently supported
-machines is available through option *-machdep help*. Default is **x86_32**.
+machines is available through option *-machdep help*. Default is **x86_64**.
 
 -main *f*
 : sets *f* as the entry point of the analysis. Defaults to **main**.
