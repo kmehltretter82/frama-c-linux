@@ -103,11 +103,14 @@ module Dataflow = Interpreted_automata.Dataflow (ConstantsDomain)
 
 let run () =
   let main_kf, _ = Globals.entry_point () in
+  let main_name = Kernel_function.get_name main_kf in
   let results = Dataflow.fixpoint main_kf ConstantsDomain.top in
-  let result = Dataflow.Result.at_return results in
-  Kernel.result "Results at the end of function %s:@.%a"
-    (Kernel_function.get_name main_kf)
-    ConstantsDomain.pretty result
+  match Dataflow.Result.at_return results with
+  | None -> 
+    Kernel.result "No result at the end of function %s." main_name
+  | Some result ->
+    Kernel.result "Results at the end of function %s:@.%a" main_name
+      ConstantsDomain.pretty result
 
 let () =
   Db.Main.extend run
