@@ -18,27 +18,27 @@
   Call to function fprintf with non-static format argument:
   no specification will be generated.
 [variadic] tests/known/stdio_print.c:9: 
-  Generic translation of call to variadic function.
+  Fallback translation of call fprintf to a call to the specialized version fprintf_fallback_1.
 [variadic] tests/known/stdio_print.c:10: Warning: 
   Call to function printf with non-static format argument:
   no specification will be generated.
 [variadic] tests/known/stdio_print.c:10: 
-  Generic translation of call to variadic function.
+  Fallback translation of call printf to a call to the specialized version printf_fallback_1.
 [variadic] tests/known/stdio_print.c:11: Warning: 
   Call to function snprintf with non-static format argument:
   no specification will be generated.
 [variadic] tests/known/stdio_print.c:11: 
-  Generic translation of call to variadic function.
+  Fallback translation of call snprintf to a call to the specialized version snprintf_fallback_1.
 [variadic] tests/known/stdio_print.c:12: Warning: 
   Call to function sprintf with non-static format argument:
   no specification will be generated.
 [variadic] tests/known/stdio_print.c:12: 
-  Generic translation of call to variadic function.
+  Fallback translation of call sprintf to a call to the specialized version sprintf_fallback_1.
 [variadic] tests/known/stdio_print.c:13: Warning: 
   Call to function dprintf with non-static format argument:
   no specification will be generated.
 [variadic] tests/known/stdio_print.c:13: 
-  Generic translation of call to variadic function.
+  Fallback translation of call dprintf to a call to the specialized version dprintf_fallback_1.
 [variadic] tests/known/stdio_print.c:15: 
   Translating call to fprintf to a call to the specialized version fprintf_va_1.
 [variadic] tests/known/stdio_print.c:16: 
@@ -58,7 +58,7 @@
 [eva] tests/known/stdio_print.c:9: 
   assertion 'Eva,initialization' got final status invalid.
 [kernel:annot:missing-spec] tests/known/stdio_print.c:9: Warning: 
-  Neither code nor specification for function fprintf, generating default assigns from the prototype
+  Neither code nor specification for function fprintf_fallback_1, generating default assigns from the prototype
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   NON TERMINATING FUNCTION
@@ -67,6 +67,28 @@
 #include "stdarg.h"
 #include "stddef.h"
 #include "stdio.h"
+/*@ assigns \result, *stream;
+    assigns \result
+      \from *stream, *(format + (0 ..)), *(param1 + (0 ..)), param0, param2;
+    assigns *stream
+      \from *stream, *(format + (0 ..)), *(param1 + (0 ..)), param0, param2;
+ */
+int fprintf_fallback_1(FILE * restrict stream, char const * restrict format,
+                       int param0, char const *param1, int param2);
+
+int printf_fallback_1(char const * restrict format, int param0,
+                      char const *param1, int param2);
+
+int snprintf_fallback_1(char * restrict s, size_t n,
+                        char const * restrict format, int param0,
+                        char const *param1, int param2);
+
+int sprintf_fallback_1(char * restrict s, char const * restrict format,
+                       int param0, char const *param1, int param2);
+
+int dprintf_fallback_1(int fd, char const * restrict format, int param0,
+                       char const *param1, char const *param2);
+
 /*@ requires valid_read_string(param1);
     requires valid_read_string(format);
     assigns \result, stream->__fc_FILE_data;
@@ -148,42 +170,12 @@ int main(void)
   char *format;
   char *str;
   size_t size;
-  {
-    int __va_arg0 = 1;
-    char const *__va_arg1 = "2";
-    int __va_arg2 = 3;
-    void *__va_args[3] = {& __va_arg0, & __va_arg1, & __va_arg2};
-    /*@ assert Eva: initialization: \initialized(&format); */
-    fprintf(stream,(char const *)format,(void * const *)(__va_args));
-  }
-  {
-    int __va_arg0_10 = 1;
-    char const *__va_arg1_12 = "2";
-    int __va_arg2_14 = 3;
-    void *__va_args_16[3] = {& __va_arg0_10, & __va_arg1_12, & __va_arg2_14};
-    printf((char const *)format,(void * const *)(__va_args_16));
-  }
-  {
-    int __va_arg0_18 = 1;
-    char const *__va_arg1_20 = "2";
-    int __va_arg2_22 = 3;
-    void *__va_args_24[3] = {& __va_arg0_18, & __va_arg1_20, & __va_arg2_22};
-    snprintf(str,size,(char const *)format,(void * const *)(__va_args_24));
-  }
-  {
-    int __va_arg0_26 = 1;
-    char const *__va_arg1_28 = "2";
-    int __va_arg2_30 = 3;
-    void *__va_args_32[3] = {& __va_arg0_26, & __va_arg1_28, & __va_arg2_30};
-    sprintf(str,(char const *)format,(void * const *)(__va_args_32));
-  }
-  {
-    int __va_arg0_34 = 1;
-    char const *__va_arg1_36 = "3";
-    char const *__va_arg2_38 = "4";
-    void *__va_args_40[3] = {& __va_arg0_34, & __va_arg1_36, & __va_arg2_38};
-    dprintf(1,(char const *)format,(void * const *)(__va_args_40));
-  }
+  /*@ assert Eva: initialization: \initialized(&format); */
+  fprintf(stream,(char const *)format,1,"2",3); /* fprintf_fallback_1 */
+  printf((char const *)format,1,"2",3); /* printf_fallback_1 */
+  snprintf(str,size,(char const *)format,1,"2",3); /* snprintf_fallback_1 */
+  sprintf(str,(char const *)format,1,"2",3); /* sprintf_fallback_1 */
+  dprintf(1,(char const *)format,1,"3","4"); /* dprintf_fallback_1 */
   fprintf(stream,"%d %s %d",1,(char *)"2",3); /* fprintf_va_1 */
   printf("%d %s %d",1,(char *)"2",3); /* printf_va_1 */
   snprintf(str,size,"%d %s %d",1,(char *)"2",3); /* snprintf_va_1 */

@@ -11,11 +11,11 @@
 [variadic] tests/erroneous/exec.c:7: Warning: 
   Failed to find a sentinel (NULL pointer) in the argument list.
 [variadic] tests/erroneous/exec.c:7: 
-  Generic translation of call to variadic function.
+  Fallback translation of call execlp to a call to the specialized version execlp_fallback_1.
 [variadic] tests/erroneous/exec.c:9: Warning: 
   Not enough arguments: expected 5, given 4.
 [variadic] tests/erroneous/exec.c:9: 
-  Generic translation of call to variadic function.
+  Fallback translation of call execle to a call to the specialized version execle_fallback_1.
 [variadic] tests/erroneous/exec.c:11: Warning: 
   Incorrect type for argument 5. The argument will be cast from int to char * const *.
 [variadic] tests/erroneous/exec.c:11: 

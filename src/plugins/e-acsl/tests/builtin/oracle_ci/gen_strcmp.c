@@ -116,21 +116,7 @@ char *__gen_e_acsl_strdup(char const *s);
 __inline static void fail_ncomp(int cond, char *fmt, int l, int r)
 {
   if (cond) {
-    {
-      int __va_arg0 = l;
-      __e_acsl_store_block((void *)(& __va_arg0),(size_t)4);
-      __e_acsl_full_init((void *)(& __va_arg0));
-      int __va_arg1 = r;
-      __e_acsl_store_block((void *)(& __va_arg1),(size_t)4);
-      __e_acsl_full_init((void *)(& __va_arg1));
-      void *__va_args[2] = {& __va_arg0, & __va_arg1};
-      __e_acsl_store_block((void *)(__va_args),(size_t)16);
-      __e_acsl_full_init((void *)(& __va_args));
-      fprintf(stderr,(char const *)fmt,(void * const *)(__va_args));
-      __e_acsl_delete_block((void *)(__va_args));
-      __e_acsl_delete_block((void *)(& __va_arg1));
-      __e_acsl_delete_block((void *)(& __va_arg0));
-    }
+    fprintf(stderr,(char const *)fmt,l,r); /* fprintf_fallback_1 */
     __gen_e_acsl_abort();
   }
   return;
