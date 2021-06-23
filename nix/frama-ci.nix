@@ -1,13 +1,14 @@
 #To copy in other repository
-{ pkgs ? import <nixpkgs> {}, password}:
+{ password}:
 
 let
     src = builtins.fetchGit {
             "url" = "https://bobot:${password}@git.frama-c.com/frama-c/Frama-CI.git";
             "name" = "Frama-CI";
-            "rev" = "f86e807d6f440ac4479b78f8419dfd817803419d";
-            "ref" = "feature/wp/versions-bump";
+            "rev" = "c573f802c66f3821d0bac5f0b71eceaed26b26f1";
+            "ref" = "feature/upgrade-opam2nix";
     };
+    pkgs = import "${src}/pkgs.nix" {};
  in
  {
   src = src;
