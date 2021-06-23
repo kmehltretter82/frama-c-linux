@@ -79,6 +79,9 @@ let set_unreachable pid =
 (* -------------------------------------------------------------------------- *)
 (* --- Status of Terminates Annotations                                   --- *)
 (* -------------------------------------------------------------------------- *)
+
+let trivial_terminates = ref 0
+
 let wp_trivially_terminates =
   Emitter.create
     "Trivial Termination"
@@ -87,6 +90,8 @@ let wp_trivially_terminates =
     ~tuning:[] (* TBC *)
 
 let set_trivially_terminates p =
+  incr trivial_terminates ;
+  Wp_parameters.result "[CFG] Goal %a : Valid (Trivial)" WpPropId.pp_propid p ;
   let pid = WpPropId.property_of_id p in
   Property_status.emit wp_trivially_terminates ~hyps:[] pid Property_status.True
 
