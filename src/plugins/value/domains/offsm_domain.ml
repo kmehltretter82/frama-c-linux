@@ -208,12 +208,16 @@ module Internal  : Domain_builder.InputDomain
   let relate _kf _bases _state = Base.SetLattice.empty
   let filter _kf _kind bases state =
     Memory.filter_by_shape (Base.Hptset.shape bases) state
-  let reuse _kf _bases ~current_input:state ~previous_output:output =
+
+  let reuse _kf bases ~current_input:input ~previous_output:output =
+    let input =
+      Memory.filter_base (fun b -> not (Base.Hptset.mem b bases)) input
+    in
     let state =
       match output with
       | Memory.Bottom | Memory.Top as state -> state
       | Memory.Map outputs ->
-        Memory.fold Memory.add_base outputs state
+        Memory.fold Memory.add_base outputs input
     in
     state
 
