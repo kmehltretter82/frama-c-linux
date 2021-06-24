@@ -753,7 +753,7 @@ module MakeDot
         | s -> s (* should not happen *)
       and regexp = Str.regexp "<\\|>\\|&\\|\n" in
       let s = Str.global_substitute regexp substitution s in
-      let s = if s = "" then " " else s in (* graph viewers doesn't like empty labels *)
+      let s = if s = "" then " " else s in (* graph viewers don't like empty labels *)
       `HtmlLabel s
     in
     Pretty_utils.ksfprintf string_to_label fmt
