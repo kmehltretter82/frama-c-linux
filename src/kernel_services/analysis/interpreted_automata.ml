@@ -695,7 +695,7 @@ let exit_strategy graph component =
 (* --- Output to dot                                                  --- *)
 (* ---------------------------------------------------------------------- *)
 
-type 'a labelling =
+type 'a labeling =
   [ `Stmt
   | `Vertex
   | `Both
@@ -758,10 +758,10 @@ module MakeDot
     in
     Pretty_utils.ksfprintf string_to_label fmt
 
-  let output_to_dot out_channel ?(labelling:V.t labelling=`Both) ?wto g =
-    (* Vertex labelling *)
+  let output_to_dot out_channel ?(labeling:V.t labeling=`Both) ?wto g =
+    (* Vertex labeling *)
     let vertex_label v =
-      match labelling with
+      match labeling with
       | `Stmt ->
         begin match V.start_of v with
           | None -> htmllabel "~"
@@ -844,8 +844,8 @@ end
 module GDot =
   MakeDot(struct include Vertex let start_of v = v.vertex_start_of end)(G)
 
-let output_to_dot out_channel ?labelling ?wto g =
-  GDot.output_to_dot  out_channel ?labelling ?wto g.graph
+let output_to_dot out_channel ?labeling ?wto g =
+  GDot.output_to_dot  out_channel ?labeling ?wto g.graph
 
 (* ---------------------------------------------------------------------- *)
 (* --- WTO Indexes                                                    --- *)
@@ -1060,8 +1060,8 @@ module UnrollUnnatural  = struct
       let start_of (v,_) = v.vertex_start_of
     end)(G)
 
-  let output_to_dot out_channel ?labelling ?wto g =
-    GDot.output_to_dot  out_channel ?labelling ?wto g
+  let output_to_dot out_channel ?labeling ?wto g =
+    GDot.output_to_dot  out_channel ?labeling ?wto g
 
   let unroll_unnatural_loop
       (g:automaton) (wto:wto) (index:Compute.wto_index_table) : G.t =
@@ -1185,7 +1185,7 @@ struct
     (* Compute the abstract value for the given control point ; compute all
        incoming transfer functions *)
     let process_vertex v =
-      let incomming =
+      let incoming =
         if forward
         then G.fold_pred_e process_edge graph v []
         else G.fold_succ_e process_edge graph v []
@@ -1195,11 +1195,11 @@ struct
         then [initial_value]
         else []
       in
-      match initial @ incomming with
-      | [] -> (* Zero incomming values -> Bottom *)
+      match initial @ incoming with
+      | [] -> (* Zero incoming values -> Bottom *)
         States.remove results v
       | v1 :: vl ->
-        (* Join incomming values *)
+        (* Join incoming values *)
         let result = List.fold_left D.join v1 vl in
         States.replace results v result
     in
@@ -1282,7 +1282,7 @@ struct
         | None -> Format.fprintf fmt "⊥"
         | Some v -> pp_value fmt v
       in
-      output_to_dot out ~labelling:(`Custom pp_vertex) ~wto automaton
+      output_to_dot out ~labeling:(`Custom pp_vertex) ~wto automaton
 
     let to_dot_file pp_value result filepath =
       let out = open_out (filepath : Filepath.Normalized.t :> string) in

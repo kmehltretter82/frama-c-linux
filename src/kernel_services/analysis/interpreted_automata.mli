@@ -154,7 +154,7 @@ val get_wto : Cil_types.kernel_function -> wto
     vertices lead outside the wto without passing through the head. *)
 val exit_strategy : graph -> vertex Wto.component -> wto
 
-type 'a labelling =
+type 'a labeling =
   [ `Stmt
   | `Vertex
   | `Both
@@ -162,7 +162,7 @@ type 'a labelling =
   ]
 
 (** Output the automaton in dot format *)
-val output_to_dot : out_channel -> ?labelling:vertex labelling -> ?wto:wto ->
+val output_to_dot : out_channel -> ?labeling:vertex labeling -> ?wto:wto ->
   automaton -> unit
 
 (** the position of a statement in a wto given as the list of
@@ -207,7 +207,7 @@ module Compute: sig
       vertices lead outside the wto without passing through the head. *)
   val exit_strategy : graph -> vertex Wto.component -> wto
   (** Output the automaton in dot format *)
-  val output_to_dot : out_channel -> ?labelling:vertex labelling  -> ?wto:wto ->
+  val output_to_dot : out_channel -> ?labeling:vertex labeling  -> ?wto:wto ->
     automaton -> unit
 
 
@@ -260,7 +260,7 @@ module UnrollUnnatural : sig
     include Datatype.S with type t = Version.t Wto.partition
   end
 
-  val output_to_dot : out_channel -> ?labelling:Version.t labelling ->
+  val output_to_dot : out_channel -> ?labeling:Version.t labeling ->
     ?wto:WTO.t -> G.t -> unit
 
   val unroll_unnatural_loop :
