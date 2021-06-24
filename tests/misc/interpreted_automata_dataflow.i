@@ -1,6 +1,6 @@
 /* run.config
+LOG: @PTEST_NAME@.dot
 OPT: -load-script @PTEST_DIR@/@PTEST_NAME@.ml
-LOG: interpreted_automata_dataflow.dot
 */
 
 /* Tests the dataflow functor of interpreted automata via a caml script
