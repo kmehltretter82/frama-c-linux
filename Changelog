@@ -17,6 +17,9 @@
 Open Source Release <next-release>
 ##################################
 
+-*  Variadic  [2021-06-23] Create a fallback specialisation if there is an error
+              while translating a variadic call so that no variadic call are
+              left in the AST after Variadic.
 o   Kernel    [2021-06-10] New module Cil_builder, simplifies C and ACSL code
                            generation.
 o   Ptests    [2021-06-03] Add new PLUGIN directive and new predefined macros.
