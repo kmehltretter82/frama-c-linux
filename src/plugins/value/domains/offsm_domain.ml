@@ -86,8 +86,6 @@ module Memory = struct
     widen wh s1 s2
 
   let narrow x _y = `Value x
-
-  let name = "bitwise"
 end
 
 

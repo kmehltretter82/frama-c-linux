@@ -215,8 +215,6 @@ module Memory = struct
 
     end)
 
-  let name = "symbolic-locations"
-
   let top = {
     values = K2V.M.empty;
     zones = K2Z.empty;

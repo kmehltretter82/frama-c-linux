@@ -571,8 +571,6 @@ module Traces = struct
 
     end)
 
-  let name = "traces"
-
   let view m =
     if m == top then `Top
     else `Other m

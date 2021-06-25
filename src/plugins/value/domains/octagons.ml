@@ -753,7 +753,6 @@ module State = struct
           Format.fprintf fmt "@[%a@]" Octagons.pretty octagons
       end)
 
-  let name = "octagon"
   let log_category = Value_parameters.register_category "d-octagon"
 
   let pretty_debug fmt { octagons; intervals; relations } =

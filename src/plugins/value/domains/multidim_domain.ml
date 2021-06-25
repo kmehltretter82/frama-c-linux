@@ -241,7 +241,6 @@ struct
       (Base.Base) (Memory)
       (Hptmap.Comp_unused) (Initial_Values) (Deps)
 
-  let name = "multidim"
   let log_category = dkey
 
   let cache_name s =

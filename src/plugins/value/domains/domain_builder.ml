@@ -589,9 +589,9 @@ module Restrict
 
   module Store = struct
 
-    let register_global_state state =
+    let register_global_state b state =
       let state = state >>-: get_state in
-      Domain.Store.register_global_state state
+      Domain.Store.register_global_state b state
 
     let lift_register f state = f (get_state state)
 

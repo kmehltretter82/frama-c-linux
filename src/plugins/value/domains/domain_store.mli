@@ -32,7 +32,13 @@ end
 (** Automatic storage of the states computed during the analysis. *)
 module type S = sig
   type t
-  val register_global_state: t or_bottom -> unit
+
+  (** Called once at the analysis beginning for the entry state of the main
+      function. The boolean indicates whether the states of this domain must be
+      saved during the analysis, according to options -eva-no-results. If it is
+      false, register functions must do nothing, and get functions return Top. *)
+  val register_global_state: bool -> t or_bottom -> unit
+
   val register_initial_state: Value_types.callstack -> t -> unit
   val register_state_before_stmt: Value_types.callstack -> stmt -> t -> unit
   val register_state_after_stmt: Value_types.callstack -> stmt -> t -> unit

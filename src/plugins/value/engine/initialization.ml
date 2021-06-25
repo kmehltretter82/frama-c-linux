@@ -397,7 +397,8 @@ module Make
         state
       end
     in
-    Domain.Store.register_global_state init_state;
+    let b = Value_parameters.ResultsAll.get () in
+    Domain.Store.register_global_state b init_state;
     print_initial_cvalue_state init_state;
     init_state >>-: add_main_formals kf
 

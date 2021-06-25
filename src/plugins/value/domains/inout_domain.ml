@@ -95,8 +95,6 @@ module LatticeInout = struct
 
     end)
 
-  let name = "inout"
-
   (* Initial abstract at the beginning of the computation: nothing written
      or read so far. *)
   let empty = {

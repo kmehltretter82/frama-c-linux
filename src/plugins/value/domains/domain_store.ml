@@ -31,7 +31,7 @@ end
 
 module type S = sig
   type t
-  val register_global_state: t or_bottom -> unit
+  val register_global_state: bool -> t or_bottom -> unit
   val register_initial_state: Value_types.callstack -> t -> unit
   val register_state_before_stmt: Value_types.callstack -> stmt -> t -> unit
   val register_state_after_stmt: Value_types.callstack -> stmt -> t -> unit
@@ -172,8 +172,7 @@ module Make (Domain: InputDomain) = struct
       Callstack.Hashtbl.add r callstack v;
       add stmt r
 
-  let register_global_state state =
-    let storage = not (Value_parameters.NoResultsDomains.mem Domain.name) in
+  let register_global_state storage state =
     Storage.set storage;
     if storage then
       match state with

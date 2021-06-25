@@ -324,9 +324,9 @@ module Make
     | `Bottom, _ | _, `Bottom -> `Bottom
 
   module Store = struct
-    let register_global_state state =
-      Left.Store.register_global_state (state >>-: fst);
-      Right.Store.register_global_state (state >>-: snd)
+    let register_global_state b state =
+      Left.Store.register_global_state b (state >>-: fst);
+      Right.Store.register_global_state b (state >>-: snd)
     let register_initial_state callstack (left, right) =
       Left.Store.register_initial_state callstack left;
       Right.Store.register_initial_state callstack right

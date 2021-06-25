@@ -352,7 +352,6 @@ let ival_to_interval = function
 module type Input = sig
   type t
   val manager: t Manager.t
-  val name: string
 end
 
 module Make (Man : Input) = struct
@@ -404,8 +403,6 @@ module Make (Man : Input) = struct
     end )
   include D
 
-  let name = Man.name
-
   let is_included = Abstract1.is_leq man
 
   let join s1 s2 =
@@ -432,7 +429,6 @@ module Make (Man : Input) = struct
   include Domain_builder.Complete
       (struct
         include D
-        let name = name
         let top = top
         let join = join
       end)
@@ -694,29 +690,24 @@ end
 module Apron_Octagon = struct
   type t = Oct.t
   let manager = Oct.manager_alloc ()
-  let name = "apron-octagon"
 end
 
 module Apron_Box = struct
   type t = Box.t
   let manager = Box.manager_alloc ()
-  let name = "apron-box"
 end
 
 module Apron_Polka_Loose = struct
   type t = Polka.loose Polka.t
   let manager = Polka.manager_alloc_loose ()
-  let name = "apron-polka-loose"
 end
 module Apron_Polka_Strict = struct
   type t = Polka.strict Polka.t
   let manager = Polka.manager_alloc_strict ()
-  let name = "apron-polka-strict"
 end
 module Apron_Polka_Equalities = struct
   type t = Polka.equalities Polka.t
   let manager = Polka.manager_alloc_equalities ()
-  let name = "apron-polka-equality"
 end
 
 (** Apron manager allocation changes the rounding mode. *)

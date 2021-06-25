@@ -106,8 +106,6 @@ module LatticeTaint = struct
 
     end)
 
-  let name = "taint"
-
   (* Initial state at the start of the computation: nothing is tainted yet. *)
   let empty = {
     locs_data = Zone.bottom;

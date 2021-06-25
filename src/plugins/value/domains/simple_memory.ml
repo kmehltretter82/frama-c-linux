@@ -191,8 +191,6 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
 
   include Domain_builder.Complete (M)
 
-  let name = Info.name
-
   type state = t
   type value = Value.t
   type location = Precise_locs.precise_location
