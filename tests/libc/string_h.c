@@ -156,5 +156,8 @@ int main(int argc, char **argv)
   d = nondet ? 'a' : 'n';
   char *chr2 = strchr(c, d);
   char *nul2 = strchrnul(c, d);
+  char pdest[10];
+  char *pend = mempcpy(pdest, "gnu-only function", 9);
+  //@ assert imprecise: pend == pdest + 9 && *pend == '\0';
   return 0;
 }
