@@ -710,7 +710,7 @@ char *__gen_e_acsl_strcpy(char * restrict dest, char const * restrict src)
   __retres = strcpy(dest,src);
   __e_acsl_assert(__retres == __gen_e_acsl_at,1,"Postcondition","strcpy",
                   "result_ptr: \\result == \\old(dest)",
-                  "FRAMAC_SHARE/libc/string.h",361);
+                  "FRAMAC_SHARE/libc/string.h",374);
   __e_acsl_delete_block((void *)(& src));
   __e_acsl_delete_block((void *)(& dest));
   return __retres;
@@ -778,17 +778,17 @@ char *__gen_e_acsl_strchr(char const *s, int c)
       else __gen_e_acsl_and = 0;
       __e_acsl_assert(__gen_e_acsl_and,1,"RTE","strchr",
                       "mem_access: \\valid_read(__retres)",
-                      "FRAMAC_SHARE/libc/string.h",164);
+                      "FRAMAC_SHARE/libc/string.h",177);
       __gen_e_acsl_base_addr = __e_acsl_base_addr((void *)__retres);
       __gen_e_acsl_base_addr_2 = __e_acsl_base_addr((void *)__gen_e_acsl_at_2);
       __e_acsl_assert(__gen_e_acsl_base_addr == __gen_e_acsl_base_addr_2,1,
                       "Postcondition","strchr",
                       "found: result_same_base: \\base_addr(\\result) == \\base_addr(\\old(s))",
-                      "FRAMAC_SHARE/libc/string.h",165);
+                      "FRAMAC_SHARE/libc/string.h",178);
       __e_acsl_assert((int)*__retres == (int)((char)__gen_e_acsl_at),1,
                       "Postcondition","strchr",
                       "found: result_char: *\\result == (char)\\old(c)",
-                      "FRAMAC_SHARE/libc/string.h",164);
+                      "FRAMAC_SHARE/libc/string.h",177);
     }
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)1);
@@ -796,7 +796,7 @@ char *__gen_e_acsl_strchr(char const *s, int c)
                                                     "Postcondition","strchr",
                                                     "not_found: result_null: \\result == \\null",
                                                     "FRAMAC_SHARE/libc/string.h",
-                                                    171);
+                                                    184);
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)2);
     if (__gen_e_acsl_assumes_value) {
@@ -811,7 +811,7 @@ char *__gen_e_acsl_strchr(char const *s, int c)
       }
       __e_acsl_assert(__gen_e_acsl_or,1,"Postcondition","strchr",
                       "default: result_null_or_same_base:\n  \\result == \\null || \\base_addr(\\result) == \\base_addr(\\old(s))",
-                      "FRAMAC_SHARE/libc/string.h",174);
+                      "FRAMAC_SHARE/libc/string.h",187);
     }
     __e_acsl_contract_clean(__gen_e_acsl_contract);
     __e_acsl_delete_block((void *)(& s));

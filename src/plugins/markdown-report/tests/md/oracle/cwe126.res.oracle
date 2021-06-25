@@ -6,7 +6,7 @@
   
 [eva] tests/md/cwe126.c:76: allocating variable __malloc_goodG2B_l76
 [eva] using specification for function exit
-[eva] FRAMAC_SHARE/libc/string.h:121: 
+[eva] FRAMAC_SHARE/libc/string.h:134: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] tests/md/cwe126.c:62: starting to merge loop iterations
 [eva] tests/md/cwe126.c:40: 

@@ -9,7 +9,7 @@
 [eva] tests/builtins/memset_malloc_0.c:18: Call to builtin memset
 [eva] tests/builtins/memset_malloc_0.c:18: 
   function memset: precondition 'valid_s' got status valid.
-[eva] share/libc/string.h:121: 
+[eva] share/libc/string.h:134: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] Recording results for main
 [eva] done for function main

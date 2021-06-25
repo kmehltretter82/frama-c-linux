@@ -138,7 +138,7 @@ char *__gen_e_acsl_strdup(char const *s)
                                                     "Postcondition","strdup",
                                                     "no_allocation: result_null: \\result == \\null",
                                                     "FRAMAC_SHARE/libc/string.h",
-                                                    485);
+                                                    498);
     __e_acsl_contract_clean(__gen_e_acsl_contract);
     return __retres;
   }
