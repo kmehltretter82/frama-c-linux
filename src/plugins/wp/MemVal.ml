@@ -144,7 +144,7 @@ let phi_shift p i =
     (* | Logic.Fun (f, [b]) when f == f_global -> a_addr b i *)
     | _ -> raise Not_found
 
-let phi_read ~obj ~read ~write mem off = match F.repr mem with
+let _phi_read ~obj ~read ~write mem off = match F.repr mem with
   | Logic.Fun (f, [_; o; v]) when f == write && off == o -> v
   (*read_tau (write_tau m o v) o == v*)
   | Logic.Fun (f, [m; o; _]) when f == write ->
