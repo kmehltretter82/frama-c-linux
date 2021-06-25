@@ -20,7 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-
 type (_,_) eq = Eq : ('a,'a) eq
 
 module type Key = sig
@@ -36,22 +35,49 @@ module type Key = sig
   val tag: 'a key -> int
 end
 
+module Key = struct
+  type _ key = ..
+
+  module type Key = sig
+    type t
+    type _ key += Key : t key
+  end
+
+  type 'a k = (module Key with type t = 'a)
+
+  let create (type a) () =
+    let module M = struct
+      type t = a
+      type _ key += Key : t key
+    end in
+    (module M : Key with type t = a)
+
+  let eq_type (type a) (type b) (x : a k) (y : b k) : (a, b) eq option =
+    let module A = (val x : Key with type t = a) in
+    let module B = (val y : Key with type t = b) in
+    match A.Key with
+    | B.Key -> Some Eq
+    | _     -> None
+end
+
 module Make () = struct
 
-  type 'a key = { tag: int;
+  type 'a key = { key: 'a Key.k;
+                  tag: int;
                   name: string }
 
   let c = ref (-1)
   let id () = incr c; !c
 
-  let create_key name = { tag = id (); name }
+  let create_key name =
+    { key = Key.create ();
+      tag = id ();
+      name }
+
+  let eq_type : type a b. a key -> b key -> (a, b) eq option = fun x y ->
+    Key.eq_type x.key y.key
 
   let equal x y = x.tag = y.tag
-  let eq_type : type a b. a key -> b key -> (a,b) eq option = fun a b ->
-    if equal a b
-    then Some ((Obj.magic (Eq : (a,a) eq)) : (a,b) eq)
-    else None
-
   let compare x y = Stdlib.compare x.tag y.tag
   let hash x = x.tag
   let tag x = x.tag
