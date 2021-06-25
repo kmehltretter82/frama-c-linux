@@ -336,7 +336,7 @@ extern char *strtok_r(char *restrict s, const char *restrict delim, char **restr
   @*/
 extern char *strsep (char **stringp, const char *delim);
 
-extern char __fc_strerror[64];
+__FC_EXTERN char __fc_strerror[64];
 char * const __fc_p_strerror = __fc_strerror;
 
 // Note: postcondition "result_nul_terminated" is only a temporary patch,
@@ -514,7 +514,7 @@ extern char *stpncpy(char *restrict dest, const char *restrict src, size_t n);
 //extern char *strerror_l(int errnum, locale_t locale);
 extern int strerror_r(int errnum, char *strerrbuf, size_t buflen);
 
-extern char __fc_strsignal[64];
+__FC_EXTERN char __fc_strsignal[64];
 char * const __fc_p_strsignal = __fc_strsignal;
 
 /*@ //missing: requires valid_signal(signum);

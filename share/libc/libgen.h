@@ -28,7 +28,7 @@
 __PUSH_FC_STDLIB
 __BEGIN_DECLS
 
-extern char __fc_basename[__FC_PATH_MAX];
+__FC_EXTERN char __fc_basename[__FC_PATH_MAX];
 char *__fc_p_basename = __fc_basename;
 
 /*@ // missing: assigns path[0 ..], __fc_p_basename[0 ..] \from 'filesystem';
@@ -40,7 +40,7 @@ char *__fc_p_basename = __fc_basename;
 */
 extern char *basename(char *path);
 
-extern char __fc_dirname[__FC_PATH_MAX];
+__FC_EXTERN char __fc_dirname[__FC_PATH_MAX];
 char *__fc_p_dirname = __fc_dirname;
 
 /*@ // missing: assigns path[0 ..], __fc_p_dirname[0 ..] \from 'filesystem';

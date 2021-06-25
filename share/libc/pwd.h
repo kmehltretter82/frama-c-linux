@@ -44,10 +44,10 @@ struct passwd {
   char    *pw_shell;
 };
 
-extern char __fc_getpwuid_pw_name[64];
-extern char __fc_getpwuid_pw_passwd[64];
-extern char __fc_getpwuid_pw_dir[64];
-extern char __fc_getpwuid_pw_shell[64];
+__FC_EXTERN char __fc_getpwuid_pw_name[64];
+__FC_EXTERN char __fc_getpwuid_pw_passwd[64];
+__FC_EXTERN char __fc_getpwuid_pw_dir[64];
+__FC_EXTERN char __fc_getpwuid_pw_shell[64];
 
 struct passwd __fc_pwd =
   {.pw_name = __fc_getpwuid_pw_name,

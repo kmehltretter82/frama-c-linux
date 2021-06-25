@@ -207,7 +207,7 @@ extern int sigdelset(sigset_t *set, int signum);
 */
 extern int sigismember(const sigset_t *set, int signum);
 
-extern struct sigaction __fc_sigaction[SIGRTMAX+1];
+__FC_EXTERN struct sigaction __fc_sigaction[SIGRTMAX+1];
 struct sigaction *__fc_p_sigaction = __fc_sigaction;
 
 /*@ // missing: errno may be set to EINVAL when trying to set some signals
