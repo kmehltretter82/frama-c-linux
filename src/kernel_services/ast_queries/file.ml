@@ -535,8 +535,9 @@ let build_cpp_cmd = function
            for a given path. 'getcwd' always resolves them, but if the user
            supplies a path with symbolic links, this may cause issues.
            Instead of forcing the user to always provide resolved paths, we
-           currently choose to never resolve them. *)
-        let cwd = Unix.getenv "PWD" in
+           currently choose to never resolve them.
+           We only resort to getcwd() to avoid issues when PWD does not exist. *)
+        let cwd = try Unix.getenv "PWD" with Not_found -> Sys.getcwd () in
         if cwd <> dir then
           "cd " ^ dir ^ " && " ^ cpp_command
         else cpp_command
