@@ -165,6 +165,10 @@ module type S_no_parameter = sig
   val is_default: unit -> bool
   (** Is the option equal to its default value? *)
 
+  val get_default: unit -> t
+  (** Get the default value for the option.
+      @since Frama-C+dev *)
+
   val option_name: string
   (** Name of the option on the command-line
       @since Carbon-20110201  *)
