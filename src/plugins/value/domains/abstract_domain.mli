@@ -65,9 +65,9 @@
       logical predicates, to the initialization of an initial state, and to the
       {!Mem_exec} cache.
 
-    Thu functor {!Domain_builder.Complete} automatically builds some of the
+    The functor {!Domain_builder.Complete} automatically builds some of the
     functions required by the {!S} signature. However, these functions can
-    also be redefine in the domain to achieve better precision or performance.
+    also be redefined in the domain to achieve better precision or performance.
 
     Domains can then be lifted on more general values and locations through
     {!Domain_lift.Make}, and be combined through {!Domain_product.Make}.
@@ -452,7 +452,7 @@ module type S = sig
 
   (** {3 Miscellaneous } *)
 
-  (** Transfer function called when entering/leaving a loop, and at each
+  (** Transfer functions called when entering/leaving a loop, and at each
       loop iteration. Defined as identity by {!Domain_builder.Complete}. *)
 
   val enter_loop: stmt -> state -> state

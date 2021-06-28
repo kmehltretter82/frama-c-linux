@@ -36,7 +36,7 @@ module type S = sig
   val register_state_before_stmt: Value_types.callstack -> stmt -> t -> unit
   val register_state_after_stmt: Value_types.callstack -> stmt -> t -> unit
 
-  (** Allows accessing the ts inferred by an Eva analysis after it has
+  (** Allows accessing the states inferred by an Eva analysis after it has
       been computed with the domain enabled. *)
   val get_global_state: unit -> t or_bottom
   val get_initial_state: kernel_function -> t or_bottom

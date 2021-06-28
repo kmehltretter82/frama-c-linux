@@ -36,14 +36,14 @@ module type S = sig
   (** Called once at the analysis beginning for the entry state of the main
       function. The boolean indicates whether the states of this domain must be
       saved during the analysis, according to options -eva-no-results. If it is
-      false, register functions must do nothing, and get functions return Top. *)
+      false, register functions do nothing, and get functions return Top. *)
   val register_global_state: bool -> t or_bottom -> unit
 
   val register_initial_state: Value_types.callstack -> t -> unit
   val register_state_before_stmt: Value_types.callstack -> stmt -> t -> unit
   val register_state_after_stmt: Value_types.callstack -> stmt -> t -> unit
 
-  (** Allows accessing the ts inferred by an Eva analysis after it has
+  (** Allows accessing the states inferred by an Eva analysis after it has
       been computed with the domain enabled. *)
   val get_global_state: unit -> t or_bottom
   val get_initial_state: kernel_function -> t or_bottom
