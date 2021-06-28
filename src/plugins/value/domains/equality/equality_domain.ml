@@ -122,7 +122,6 @@ module Internal = struct
   type state = t
 
   let log_category = dkey
-  let key = Structure.Key_Domain.create_key "equality_domain"
 
   type equalities = Equality.Set.t
   let project (t, _, _) = t
@@ -167,11 +166,10 @@ module Internal = struct
     if Deps.equal d1 d2
     then `Value (Equality.Set.union e1 e2, d1, Locations.Zone.narrow z1 z2)
     else `Value (e1, d1, z1)
-
-  let post_analysis _state = ()
 end
 
-module Store = Domain_store.Make (Internal)
+module Store = Domain_builder.Complete (Internal)
+
 
 (* ------------------------- Abstract Domain -------------------------------- *)
 
@@ -180,7 +178,7 @@ module Make
 = struct
 
   include Internal
-  module Store = Store
+  include Store
 
   let get_cvalue = Value.get Main_values.CVal.key
 
@@ -199,8 +197,6 @@ module Make
            then acc else (e, value) :: acc)
         equality []
     | None -> []
-
-  let backward_location _state _lv _typ loc value = `Value (loc, value)
 
   (* Remove all 'origin' information from the Cvalue component of a value.
      Since we perform evaluations at the current statement, the origin
@@ -517,15 +513,8 @@ module Make
     let zone = Locations.(enumerate_valid_bits Write loc) in
     kill Hcexprs.Modified zone state
 
-  let evaluate_predicate _ _ _ = Alarmset.Unknown
-  let reduce_by_predicate _ state _ _ = `Value state
-
   let enter_scope _kind _vars state = state
   let leave_scope _kf vars state = unscope state vars
-
-  let enter_loop _ state = state
-  let incr_loop_counter _ state = state
-  let leave_loop _ state = state
 
   let empty () = empty
   let initialize_variable _ _ ~initialized:_ _ state = state
@@ -535,9 +524,4 @@ module Make
     match call_init_state kf with
     | ISEmpty | ISFormals -> Base.SetLattice.empty
     | ISCaller -> Base.SetLattice.top
-
-  let filter _kf _kind _bases state = state
-
-  let reuse _kf _bases ~current_input:_ ~previous_output:state = state
-
 end
