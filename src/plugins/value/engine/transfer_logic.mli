@@ -73,6 +73,7 @@ module type LogicDomain = sig
     t Abstract_domain.logic_environment -> t -> predicate -> Alarmset.status
   val reduce_by_predicate:
     t Abstract_domain.logic_environment -> t -> predicate -> bool -> t or_bottom
+  val interpret_acsl_extension: acsl_extension -> t -> t
 end
 
 module Make

@@ -263,6 +263,10 @@ module Make
     Right.reduce_by_predicate right_env right pred positive >>-: fun right ->
     left, right
 
+  let interpret_acsl_extension extension (left, right) =
+    Left.interpret_acsl_extension extension left,
+    Right.interpret_acsl_extension extension right
+
   let enter_scope kind vars (left, right) =
     Left.enter_scope kind vars left, Right.enter_scope kind vars right
   let leave_scope kf vars (left, right) =

@@ -410,6 +410,10 @@ module type S = sig
   val reduce_by_predicate:
     state logic_environment -> state -> predicate -> bool -> state or_bottom
 
+  (** Interprets an ACSL extension.
+      Defined by {!Domain_builder.Complete} as the identity. *)
+  val interpret_acsl_extension: acsl_extension -> state -> state
+
   (** {3 Scoping and initialization } *)
 
   (** Scoping: abstract transformers for entering and exiting blocks.
