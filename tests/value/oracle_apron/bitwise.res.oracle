@@ -1,0 +1,7 @@
+107c107,110
+< [eva] tests/value/bitwise.i:172: Reusing old results for call to set_zero
+---
+> [eva] computing for function set_zero <- bug6 <- main.
+>   Called from tests/value/bitwise.i:172.
+> [eva] Recording results for set_zero
+> [eva] Done for function set_zero

@@ -1,3 +1,0 @@
-15,16d14
-< [eva:alarm] tests/value/partitioning-annots.c:138: Warning: 
-<   division by zero. assert j ≢ 0;
