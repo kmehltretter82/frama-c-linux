@@ -391,6 +391,147 @@ end
 
 include TaintDomain
 
+(* Registers ACSL builtin predicate \tainted. *)
+let () =
+  let a_name = "tainted" in
+  let a_type = Lvar a_name in
+  let builtin_logic_info =
+    { bl_name = "\\tainted";
+      bl_labels = [];
+      bl_params = [ a_name ];
+      bl_type = None;
+      bl_profile = ["p", a_type];
+    }
+  in
+  Logic_env.add_builtin_logic_function_gen
+    Logic_utils.is_same_builtin_profile builtin_logic_info
+
+(* Interpretation of logic by the taint domain, using the cvalue domain. *)
+module TaintLogic = struct
+
+  let eval_tlval_zone cvalue_state term =
+    let env = Eval_terms.env_only_here cvalue_state in
+    let alarm_mode = Eval_terms.Fail in
+    try
+      let access = Locations.Read in
+      Some (Eval_terms.eval_tlval_as_zone_under_over ~alarm_mode access env term)
+    with Eval_terms.LogicEvalError _ -> None
+
+  let eval_term_deps cvalue_state term =
+    let env = Eval_terms.env_only_here cvalue_state in
+    let alarm_mode = Eval_terms.Fail in
+    try
+      let result = Eval_terms.eval_term ~alarm_mode env term in
+      match Logic_label.Map.bindings result.ldeps with
+      | [ BuiltinLabel Here, zone ] -> Some (Zone.bottom, zone)
+      | _ -> None
+    with Eval_terms.LogicEvalError _ -> None
+
+  let eval_term_zone cvalue_state term =
+    match eval_tlval_zone cvalue_state term with
+    | Some _ as x -> x
+    | None -> eval_term_deps cvalue_state term
+
+  let reduce_by_taint_predicate cvalue_state state term positive =
+    match eval_term_zone cvalue_state term with
+    | None -> state
+    | Some (under, _over) ->
+      if positive
+      then { state with locs_data = Zone.join state.locs_data under }
+      else { state with locs_data = Zone.diff state.locs_data under }
+
+  let rec reduce_by_predicate cvalue_state state predicate positive =
+    match positive, predicate.pred_content with
+    | true, Pand (p1, p2)
+    | false, Por (p1, p2) ->
+      let state = reduce_by_predicate cvalue_state state p1 positive in
+      reduce_by_predicate cvalue_state state p2 positive
+    | true,Por (p1,p2 )
+    | false,Pand (p1, p2) ->
+      let state1 = reduce_by_predicate cvalue_state state p1 positive in
+      let state2 = reduce_by_predicate cvalue_state state p2 positive in
+      join state1 state2
+    | _, Pnot p -> reduce_by_predicate cvalue_state state p (not positive)
+    | _, Papp ( {l_var_info = {lv_name = "\\tainted"}}, _labels, [arg]) ->
+      reduce_by_taint_predicate cvalue_state state arg positive
+    | _ -> state
+
+  let evaluate_taint_predicate cvalue_state state term =
+    match eval_term_zone cvalue_state term with
+    | None -> Alarmset.Unknown
+    | Some (_under, over) ->
+      if Zone.intersects over state.locs_data
+      then Alarmset.Unknown
+      else Alarmset.False
+
+  let evaluate_predicate cvalue_state state predicate =
+    let rec evaluate predicate =
+      match predicate.pred_content with
+      | Papp ( {l_var_info = {lv_name = "\\tainted"}}, _labels, [arg]) ->
+        evaluate_taint_predicate cvalue_state state arg
+      | Ptrue -> True
+      | Pfalse -> False
+      | Pand (p1, p2) ->
+        begin
+          match evaluate p1, evaluate p2 with
+          | True, True -> True
+          | False, _ | _, False -> False
+          | _ -> Unknown
+        end
+      | Por (p1, p2) ->
+        begin
+          match evaluate p1, evaluate p2 with
+          | True, _ | _, True -> True
+          | False, False -> False
+          | _ -> Unknown
+        end
+      | Pnot p ->
+        begin
+          match evaluate p with
+          | True -> False
+          | False -> True
+          | Unknown -> Unknown
+        end
+      | _ -> Unknown
+    in
+    evaluate predicate
+end
+
+let interpret_taint_logic (module Abstract: Abstractions.S) : (module Abstractions.S) =
+  match Abstract.Dom.get Cvalue_domain.State.key, Abstract.Dom.get key with
+  | None, _
+  | _, None -> (module Abstract)
+  | Some get_cvalue_state, Some get_taint_state ->
+    let module Dom = struct
+      include Abstract.Dom
+
+      let evaluate_predicate env state predicate =
+        match evaluate_predicate env state predicate with
+        | Unknown ->
+          let cvalue = fst (get_cvalue_state state)
+          and taint = get_taint_state state in
+          TaintLogic.evaluate_predicate cvalue taint predicate
+        | x -> x
+
+      let reduce_by_predicate env state predicate positive =
+        match reduce_by_predicate env state predicate positive with
+        | `Bottom -> `Bottom
+        | `Value state ->
+          let cvalue = fst (get_cvalue_state state)
+          and taint = get_taint_state state in
+          let taint =
+            TaintLogic.reduce_by_predicate cvalue taint predicate positive
+          in
+          `Value (Abstract.Dom.set key taint state)
+    end
+    in
+    (module struct
+      module Val = Abstract.Val
+      module Loc = Abstract.Loc
+      module Dom = Dom
+    end)
+
+(* Registers the domain. *)
 let flag =
   let name = "taint"
   and descr = "Taint analysis"
@@ -400,3 +541,5 @@ let flag =
                    domain = Domain (module TaintDomain); }
   in
   Abstractions.register ~name ~descr ~experimental abstraction
+
+let () = Abstractions.register_hook interpret_taint_logic
