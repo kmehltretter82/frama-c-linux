@@ -174,7 +174,7 @@ struct
     | _ -> assert false
 
   let print fmt =
-    Format.fprintf fmt "%a" (Pretty_utils.pp_list Printer.pp_term)
+    Format.fprintf fmt "%a" (Pretty_utils.pp_list ~sep:", " Printer.pp_term)
 end
 
 module Unroll = Register (struct
