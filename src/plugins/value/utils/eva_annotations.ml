@@ -42,8 +42,6 @@ type flow_annotation =
   | FlowSplit of split_term * split_kind
   | FlowMerge of split_term
 
-type taint_annotation = Cil_types.term list
-
 type allocation_kind = By_stack | Fresh | Fresh_weak | Imprecise
 
 (* We use two representations for annotations :
@@ -158,25 +156,6 @@ module Slevel = Register (struct
       | SlevelFull -> Format.pp_print_string fmt "full"
   end)
 
-module ListTermAnnotation =
-struct
-  type t = term list
-
-  let parse ~typing_context =
-    let open Logic_typing in
-    List.map (typing_context.type_term typing_context typing_context.pre_state)
-
-  let export t =
-    Ext_terms t
-
-  let import = function
-    | Ext_terms t -> t
-    | _ -> assert false
-
-  let print fmt =
-    Format.fprintf fmt "%a" (Pretty_utils.pp_list ~sep:", " Printer.pp_term)
-end
-
 module Unroll = Register (struct
     type t = unroll_annotation
 
@@ -265,15 +244,6 @@ module DynamicSplit = Register (struct
     let name = "dynamic_split"
     let is_loop_annot = false
   end)
-
-module Taint = Register (struct
-    include ListTermAnnotation
-    let name = "taint"
-    let is_loop_annot = false
-  end)
-
-let get_taint_annot = Taint.get
-let add_taint_annot = Taint.add
 
 let get_slevel_annot stmt =
   try Some (List.hd (Slevel.get stmt))

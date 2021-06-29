@@ -348,6 +348,7 @@ end
 
 include TaintDomain
 
+
 (* Registers ACSL builtin predicate \tainted. *)
 let () =
   let a_name = "tainted" in
@@ -362,6 +363,17 @@ let () =
   in
   Logic_env.add_builtin_logic_function_gen
     Logic_utils.is_same_builtin_profile builtin_logic_info
+
+(* Registers ACSL extension "taint" (statement annotation)
+   and "taints" (behavior extension). *)
+let () =
+  let typer context _loc args =
+    let open Logic_typing in
+    let parse context = context.type_term context context.pre_state in
+    Ext_terms (List.map (parse context) args)
+  in
+  Acsl_extension.register_behavior "taints" typer false;
+  Acsl_extension.register_code_annot_next_stmt "taint" typer false
 
 (* Interpretation of logic by the taint domain, using the cvalue domain. *)
 module TaintLogic = struct
@@ -502,6 +514,7 @@ let interpret_taint_logic (module Abstract: Abstractions.S) : (module Abstractio
 
       let interpret_acsl_extension extension state =
         if String.equal extension.ext_name "taint"
+        || String.equal extension.ext_name "taints"
         then
           match extension.ext_kind with
           | Ext_terms terms ->
