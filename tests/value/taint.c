@@ -93,8 +93,8 @@ void taint_spec_assigns(int* l, int t);
 
 void taint_goto_1() {
   int x, y, z, t;
-  //@ taint t;
   t = undet;
+  //@ taint t;
   if (t > 0) {
     x = 1;
     goto L;
@@ -110,8 +110,8 @@ void taint_goto_1() {
 void taint_goto_2() {
   int x, y, z, t;
   x = undet;
-  //@ taint t;
   t = undet;
+  //@ taint t;
   if (x > 0) {
     if (t < 100) {
       x = 1;
