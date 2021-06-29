@@ -378,66 +378,65 @@ let () =
 (* Interpretation of logic by the taint domain, using the cvalue domain. *)
 module TaintLogic = struct
 
-  let eval_tlval_zone cvalue_state term =
-    let env = Eval_terms.env_only_here cvalue_state in
+  let eval_tlval_zone cvalue_env term =
     let alarm_mode = Eval_terms.Fail in
     try
       let access = Locations.Read in
-      Some (Eval_terms.eval_tlval_as_zone_under_over ~alarm_mode access env term)
+      Some (Eval_terms.eval_tlval_as_zone_under_over
+              ~alarm_mode access cvalue_env term)
     with Eval_terms.LogicEvalError _ -> None
 
-  let eval_term_deps cvalue_state term =
-    let env = Eval_terms.env_only_here cvalue_state in
+  let eval_term_deps cvalue_env term =
     let alarm_mode = Eval_terms.Fail in
     try
-      let result = Eval_terms.eval_term ~alarm_mode env term in
+      let result = Eval_terms.eval_term ~alarm_mode cvalue_env term in
       match Logic_label.Map.bindings result.ldeps with
       | [ BuiltinLabel Here, zone ] -> Some (Zone.bottom, zone)
       | _ -> None
     with Eval_terms.LogicEvalError _ -> None
 
-  let eval_term_zone cvalue_state term =
-    match eval_tlval_zone cvalue_state term with
+  let eval_term_zone cvalue_env term =
+    match eval_tlval_zone cvalue_env term with
     | Some _ as x -> x
-    | None -> eval_term_deps cvalue_state term
+    | None -> eval_term_deps cvalue_env term
 
-  let reduce_by_taint_predicate cvalue_state state term positive =
-    match eval_term_zone cvalue_state term with
+  let reduce_by_taint_predicate cvalue_env state term positive =
+    match eval_term_zone cvalue_env term with
     | None -> state
     | Some (under, _over) ->
       if positive
       then { state with locs_data = Zone.join state.locs_data under }
       else { state with locs_data = Zone.diff state.locs_data under }
 
-  let rec reduce_by_predicate cvalue_state state predicate positive =
+  let rec reduce_by_predicate cvalue_env state predicate positive =
     match positive, predicate.pred_content with
     | true, Pand (p1, p2)
     | false, Por (p1, p2) ->
-      let state = reduce_by_predicate cvalue_state state p1 positive in
-      reduce_by_predicate cvalue_state state p2 positive
+      let state = reduce_by_predicate cvalue_env state p1 positive in
+      reduce_by_predicate cvalue_env state p2 positive
     | true,Por (p1,p2 )
     | false,Pand (p1, p2) ->
-      let state1 = reduce_by_predicate cvalue_state state p1 positive in
-      let state2 = reduce_by_predicate cvalue_state state p2 positive in
+      let state1 = reduce_by_predicate cvalue_env state p1 positive in
+      let state2 = reduce_by_predicate cvalue_env state p2 positive in
       join state1 state2
-    | _, Pnot p -> reduce_by_predicate cvalue_state state p (not positive)
+    | _, Pnot p -> reduce_by_predicate cvalue_env state p (not positive)
     | _, Papp ( {l_var_info = {lv_name = "\\tainted"}}, _labels, [arg]) ->
-      reduce_by_taint_predicate cvalue_state state arg positive
+      reduce_by_taint_predicate cvalue_env state arg positive
     | _ -> state
 
-  let evaluate_taint_predicate cvalue_state state term =
-    match eval_term_zone cvalue_state term with
+  let evaluate_taint_predicate cvalue_env state term =
+    match eval_term_zone cvalue_env term with
     | None -> Alarmset.Unknown
     | Some (_under, over) ->
       if Zone.intersects over state.locs_data
       then Alarmset.Unknown
       else Alarmset.False
 
-  let evaluate_predicate cvalue_state state predicate =
+  let evaluate_predicate cvalue_env state predicate =
     let rec evaluate predicate =
       match predicate.pred_content with
       | Papp ( {l_var_info = {lv_name = "\\tainted"}}, _labels, [arg]) ->
-        evaluate_taint_predicate cvalue_state state arg
+        evaluate_taint_predicate cvalue_env state arg
       | Ptrue -> True
       | Pfalse -> False
       | Pand (p1, p2) ->
@@ -465,9 +464,9 @@ module TaintLogic = struct
     in
     evaluate predicate
 
-  let interpret_taint_extension cvalue_state taint terms =
+  let interpret_taint_extension cvalue_env taint terms =
     let taint_term taint term =
-      match eval_tlval_zone cvalue_state term with
+      match eval_tlval_zone cvalue_env term with
       | None ->
         Value_parameters.warning ~wkey ~current:true ~once:true
           "Cannot evaluate term %a in taint annotation; ignoring."
@@ -493,35 +492,39 @@ let interpret_taint_logic (module Abstract: Abstractions.S) : (module Abstractio
     let module Dom = struct
       include Abstract.Dom
 
+      let get_states env state =
+        let taint = get_taint_state state in
+        let get_cvalue state = fst (get_cvalue_state state) in
+        let states label = get_cvalue (env.Abstract_domain.states label) in
+        let cvalue_env = Abstract_domain.{ env with states = states } in
+        Eval_terms.make_env cvalue_env (get_cvalue state), taint
+
       let evaluate_predicate env state predicate =
         match evaluate_predicate env state predicate with
         | Unknown ->
-          let cvalue = fst (get_cvalue_state state)
-          and taint = get_taint_state state in
-          TaintLogic.evaluate_predicate cvalue taint predicate
+          let cvalue_env, taint = get_states env state in
+          TaintLogic.evaluate_predicate cvalue_env taint predicate
         | x -> x
 
       let reduce_by_predicate env state predicate positive =
         match reduce_by_predicate env state predicate positive with
         | `Bottom -> `Bottom
         | `Value state ->
-          let cvalue = fst (get_cvalue_state state)
-          and taint = get_taint_state state in
+          let cvalue_env, taint = get_states env state in
           let taint =
-            TaintLogic.reduce_by_predicate cvalue taint predicate positive
+            TaintLogic.reduce_by_predicate cvalue_env taint predicate positive
           in
           `Value (Abstract.Dom.set key taint state)
 
-      let interpret_acsl_extension extension _env state =
+      let interpret_acsl_extension extension env state =
         if String.equal extension.ext_name "taint"
         || String.equal extension.ext_name "taints"
         then
           match extension.ext_kind with
           | Ext_terms terms ->
-            let cvalue = fst (get_cvalue_state state)
-            and taint = get_taint_state state in
+            let cvalue_env, taint = get_states env state in
             let taint =
-              TaintLogic.interpret_taint_extension cvalue taint terms
+              TaintLogic.interpret_taint_extension cvalue_env taint terms
             in
             Abstract.Dom.set key taint state
           | _ ->
