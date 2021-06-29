@@ -45,7 +45,8 @@ module type LeafDomain = sig
     t Abstract_domain.logic_environment -> t -> predicate -> Alarmset.status
   val reduce_by_predicate:
     t Abstract_domain.logic_environment -> t -> predicate -> bool -> t or_bottom
-  val interpret_acsl_extension: acsl_extension -> t -> t
+  val interpret_acsl_extension:
+    acsl_extension -> t Abstract_domain.logic_environment -> t -> t
 
   val enter_loop: stmt -> t -> t
   val incr_loop_counter: stmt -> t -> t

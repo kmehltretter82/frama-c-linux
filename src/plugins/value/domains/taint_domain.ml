@@ -512,7 +512,7 @@ let interpret_taint_logic (module Abstract: Abstractions.S) : (module Abstractio
           in
           `Value (Abstract.Dom.set key taint state)
 
-      let interpret_acsl_extension extension state =
+      let interpret_acsl_extension extension _env state =
         if String.equal extension.ext_name "taint"
         || String.equal extension.ext_name "taints"
         then

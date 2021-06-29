@@ -39,7 +39,8 @@ module type LeafDomain = sig
     t Abstract_domain.logic_environment -> t -> predicate -> Alarmset.status
   val reduce_by_predicate:
     t Abstract_domain.logic_environment -> t -> predicate -> bool -> t or_bottom
-  val interpret_acsl_extension: acsl_extension -> t -> t
+  val interpret_acsl_extension:
+    acsl_extension -> t Abstract_domain.logic_environment -> t -> t
 
   val enter_loop: stmt -> t -> t
   val incr_loop_counter: stmt -> t -> t
@@ -65,7 +66,7 @@ module Complete (Domain: InputDomain) = struct
 
   let evaluate_predicate _env _state _predicate = Alarmset.Unknown
   let reduce_by_predicate _env state _predicate _positive = `Value state
-  let interpret_acsl_extension _extension state = state
+  let interpret_acsl_extension _extension _env state = state
 
   let enter_loop _stmt state = state
   let incr_loop_counter _stmt state = state
@@ -546,8 +547,8 @@ module Restrict
       then Some (f state, mode)
       else x
 
-  let interpret_acsl_extension extension =
-    lift (Domain.interpret_acsl_extension extension)
+  let interpret_acsl_extension extension env =
+    lift (Domain.interpret_acsl_extension extension (lift_env env))
 
   let enter_scope kind varinfos = lift (Domain.enter_scope kind varinfos)
   let leave_scope kf varinfos = lift (Domain.leave_scope kf varinfos)

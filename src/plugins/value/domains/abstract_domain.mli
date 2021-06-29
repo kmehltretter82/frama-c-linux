@@ -412,7 +412,8 @@ module type S = sig
 
   (** Interprets an ACSL extension.
       Defined by {!Domain_builder.Complete} as the identity. *)
-  val interpret_acsl_extension: acsl_extension -> state -> state
+  val interpret_acsl_extension:
+    acsl_extension -> state logic_environment -> state -> state
 
   (** {3 Scoping and initialization } *)
 

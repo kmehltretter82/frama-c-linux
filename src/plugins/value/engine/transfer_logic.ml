@@ -304,7 +304,8 @@ module type LogicDomain = sig
     t Abstract_domain.logic_environment -> t -> predicate -> Alarmset.status
   val reduce_by_predicate:
     t Abstract_domain.logic_environment -> t -> predicate -> bool -> t or_bottom
-  val interpret_acsl_extension: acsl_extension -> t -> t
+  val interpret_acsl_extension:
+    acsl_extension -> t Abstract_domain.logic_environment -> t -> t
 end
 
 module Make
@@ -505,8 +506,11 @@ module Make
           let states =
             eval_and_reduce kf b active k posts states build_prop build_env
           in
+          let interpret_extension extension state =
+            Domain.interpret_acsl_extension extension (build_env state) state
+          in
           List.fold_left
-            (fun acc e -> States.map (Domain.interpret_acsl_extension e) acc)
+            (fun acc e -> States.map (interpret_extension e) acc)
             states b.b_extended
       in
       List.fold_left check_one_behavior post_states behaviors
@@ -711,7 +715,11 @@ module Make
     | AVariant _ | AAssigns _ | AAllocation _
     | AStmtSpec _ (*TODO*) -> states
     | AExtended (_, _, extension) ->
-      States.map (Domain.interpret_acsl_extension extension) states
+      let interpret_extension extension state =
+        let env = here_env ~pre:initial_state ~here:state in
+        Domain.interpret_acsl_extension extension env state
+      in
+      States.map (interpret_extension extension) states
 
 end
 
