@@ -367,13 +367,18 @@ let () =
 (* Registers ACSL extension "taint" (statement annotation)
    and "taints" (behavior extension). *)
 let () =
-  let typer context _loc args =
+  let typer kind context _loc args =
     let open Logic_typing in
-    let parse context = context.type_term context context.pre_state in
+    let get_state context =
+      match kind with
+      | `Pre -> context.pre_state
+      | `Post -> context.post_state [Normal]
+    in
+    let parse context = context.type_term context (get_state context) in
     Ext_terms (List.map (parse context) args)
   in
-  Acsl_extension.register_behavior "taints" typer false;
-  Acsl_extension.register_code_annot_next_stmt "taint" typer false
+  Acsl_extension.register_behavior "taints" (typer `Post) false;
+  Acsl_extension.register_code_annot_next_stmt "taint" (typer `Pre) false
 
 (* Interpretation of logic by the taint domain, using the cvalue domain. *)
 module TaintLogic = struct
