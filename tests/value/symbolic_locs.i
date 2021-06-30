@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-eva-msg-key d-symblocs"
+   STDOPT: +"-eva-domains symbolic-locations -eva-msg-key d-symblocs"
 */
 
 volatile v;
