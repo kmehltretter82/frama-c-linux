@@ -5,6 +5,7 @@
 /* Tests for the equality domain. */
 
 #include <__fc_builtin.h>
+#include <math.h>
 
 volatile int rand;
 
@@ -43,7 +44,22 @@ void assign_by_copy () {
   int z = x + 1; // x may still be not initialized: alarm
 }
 
+
+/* A pattern found in a case study that can be solved with both the
+   equality domain and the symbolic locations domain. */
+void symbolic () {
+  float f, g, tmp, res;
+  f = Frama_C_float_interval(0.f, 10.f);
+  g = Frama_C_float_interval(0.f, 10.f);
+  tmp = f - g;
+  if (tmp > 0.) {
+    tmp = 0.;
+    res = sqrtf(f-g); // requires f-g positive
+  }
+}
+
 void main () {
   replace_lvalue ();
   assign_by_copy ();
+  symbolic ();
 }
