@@ -419,13 +419,13 @@ module TaintLogic = struct
     | false, Por (p1, p2) ->
       let state = reduce_by_predicate cvalue_env state p1 positive in
       reduce_by_predicate cvalue_env state p2 positive
-    | true,Por (p1,p2 )
-    | false,Pand (p1, p2) ->
+    | true, Por (p1, p2)
+    | false, Pand (p1, p2) ->
       let state1 = reduce_by_predicate cvalue_env state p1 positive in
       let state2 = reduce_by_predicate cvalue_env state p2 positive in
       join state1 state2
     | _, Pnot p -> reduce_by_predicate cvalue_env state p (not positive)
-    | _, Papp ( {l_var_info = {lv_name = "\\tainted"}}, _labels, [arg]) ->
+    | _, Papp ({l_var_info = {lv_name = "\\tainted"}}, _labels, [arg]) ->
       reduce_by_taint_predicate cvalue_env state arg positive
     | _ -> state
 
@@ -440,7 +440,7 @@ module TaintLogic = struct
   let evaluate_predicate cvalue_env state predicate =
     let rec evaluate predicate =
       match predicate.pred_content with
-      | Papp ( {l_var_info = {lv_name = "\\tainted"}}, _labels, [arg]) ->
+      | Papp ({l_var_info = {lv_name = "\\tainted"}}, _labels, [arg]) ->
         evaluate_taint_predicate cvalue_env state arg
       | Ptrue -> True
       | Pfalse -> False
@@ -489,7 +489,8 @@ module TaintLogic = struct
     List.fold_left taint_term taint terms
 end
 
-let interpret_taint_logic (module Abstract: Abstractions.S) : (module Abstractions.S) =
+let interpret_taint_logic
+    (module Abstract: Abstractions.S) : (module Abstractions.S) =
   match Abstract.Dom.get Cvalue_domain.State.key, Abstract.Dom.get key with
   | None, _
   | _, None -> (module Abstract)
