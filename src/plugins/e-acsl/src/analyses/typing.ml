@@ -531,8 +531,9 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
              let ty = ty_of_interv (Interval.infer t) in
              ignore (type_term ~use_gmp_opt:true ?ctx lambda);
              dup ty
-           | _ -> Options.fatal "extended quantifier %a is not well formed"
-                    Printer.pp_logic_var li.l_var_info)
+           | [ ] | [ _ ] | [ _; _ ] | _ :: _ :: _ :: _ ->
+             Options.fatal "extended quantifier %a is not well formed"
+               Printer.pp_logic_var li.l_var_info)
         | LBreads _ ->
           Error.not_yet "logic functions performing read accesses"
         | LBinductive _ ->

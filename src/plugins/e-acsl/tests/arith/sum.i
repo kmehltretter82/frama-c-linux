@@ -3,7 +3,7 @@
 */
 
 int main(void) {
-  unsigned long x = 4294967295;
+  unsigned long x = 4294967295UL;
   int y = 10;
 
   /*@ assert \sum(2,10,\lambda integer k; 2*k) == 108; */; 

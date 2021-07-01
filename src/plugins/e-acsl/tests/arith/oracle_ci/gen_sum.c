@@ -4,7 +4,7 @@
 int main(void)
 {
   int __retres;
-  unsigned long x = (unsigned long)4294967295;
+  unsigned long x = 4294967295UL;
   int y = 10;
   {
     int __gen_e_acsl_k;

@@ -237,11 +237,11 @@ let rec interv_of_typ ty = match Cil.unrollType ty with
    quantifier and [name]  is the identifier of the extended quantifier (\sum,
    \product or \numof). The returned ival is the interval of the extended
    quantifier *)
-let interv_of_extended_quantifier lbd_ival i_ival j_ival name =
-  match lbd_ival, i_ival, j_ival, name.lv_name with
-  | Ival lbd_Ival, Ival i_ival, Ival j_ival, "\\sum" ->
+let interv_of_extended_quantifier lambda i j name =
+  match lambda, i, j, name.lv_name with
+  | Ival lbd_ival, Ival i_ival, Ival j_ival, "\\sum" ->
     (try
-       let min_lambda, max_lambda = Ival.min_and_max lbd_Ival in
+       let min_lambda, max_lambda = Ival.min_and_max lbd_ival in
        let i_inf, i_sup = Ival.min_and_max i_ival in
        let j_inf, j_sup = Ival.min_and_max j_ival in
        let compute_bound bound_lambda is_inf_bound =
@@ -269,7 +269,7 @@ let interv_of_extended_quantifier lbd_ival i_ival j_ival name =
             (compute_bound min_lambda true)
             (compute_bound max_lambda false))
      with Error_Bottom ->
-       Ival Ival.bottom)
+       bottom)
   | _, _, _, "\\product" ->  Error.not_yet "product"
   | _, _, _, "\\numof" ->  Error.not_yet "numof"
   | _, _, _, _ -> Options.fatal  "%a is not a valid extended quantifier"
@@ -574,13 +574,15 @@ let rec infer t =
            fixpoint i
        in
        fixpoint bottom
-     | LBnone when li.l_var_info.lv_name="\\sum" ->
+     | LBnone when li.l_var_info.lv_name = "\\sum" ->
        (match args with
         | [ t1; t2; {term_node = Tlambda([ k ], _)} as lambda ] ->
           let i_ival = infer t1 in
           let j_ival = infer t2 in
           let k_ival = join i_ival j_ival in
           Env.add k k_ival;
+          (*k is removed during code generation, it is needed for generating the
+            code of the lambda term*)
           let lambda_ival = infer lambda in
           interv_of_extended_quantifier
             lambda_ival i_ival j_ival li.l_var_info
