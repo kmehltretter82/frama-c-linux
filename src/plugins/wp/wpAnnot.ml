@@ -165,7 +165,6 @@ type strategy_info = {
   cfg : Cil2cfg.t;
   reachability : WpReached.reachability option ;
   cur_bhv : asked_bhv;
-  asked_bhvs : asked_bhv list;
   asked_prop : asked_prop;
   assigns_filter : asked_assigns;
   def_annots_info : HdefAnnotBhv.t;
@@ -1288,7 +1287,6 @@ let build_configs assigns kf model behaviors ki property =
     kf; reachability; cfg;
     cur_bhv = bhv;
     asked_prop = property;
-    asked_bhvs = bhvs;
     assigns_filter = assigns;
     def_annots_info = def_annot_bhv;
   } in List.map mk_bhv_config bhvs

@@ -32,7 +32,6 @@ open Sigs
 type label = {
   id : int ; (* index in the sequent, unique *)
   name : string ; (* (almost) unique *)
-  stmt : Cil_types.stmt option ; (* if defined in the sequent *)
   state : Mstate.state ;
   mutable flag : bool ;
   mutable prev : label list ;
@@ -63,7 +62,7 @@ let label env ~id ?stmt ?descr state =
     | None , Some { labels = Label(lbl,_,_) :: _ } -> lbl
     | _ -> env.kid <- succ env.kid ; Printf.sprintf "L%d" env.kid
   in
-  { id ; stmt ; name ; state ; flag = false ; prev = [] ; next = [] }
+  { id ; name ; state ; flag = false ; prev = [] ; next = [] }
 
 let insert env label =
   begin

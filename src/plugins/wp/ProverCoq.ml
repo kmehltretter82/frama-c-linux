@@ -499,8 +499,7 @@ let shared includes source =
         let server = ProverTask.server () in
         Task.on_server_stop server (fun () -> Hashtbl.clear shared_headers) ;
       end ;
-    let descr = Printf.sprintf "Coqc '%s'" source in
-    let shared = Task.shared ~descr ~retry:true
+    let shared = Task.shared ~retry:true
         (fun () -> (new runcoq includes source)#compile)
     in Hashtbl.add shared_headers source shared ; shared
 

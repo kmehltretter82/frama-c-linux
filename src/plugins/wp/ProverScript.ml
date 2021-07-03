@@ -117,7 +117,7 @@ struct
     width : int ;
     auto : Strategy.heuristic list ;
     mutable signaled : bool ;
-    mutable backtrack : int ;
+    backtrack : int ;
     mutable backtracking : backtracking option ;
   }
 
