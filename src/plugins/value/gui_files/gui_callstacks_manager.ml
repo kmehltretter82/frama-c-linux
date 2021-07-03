@@ -153,7 +153,7 @@ type 'value model = {
   mutable loc: gui_loc option (* model: loc which is being visualized *);
   mutable all_exprs: gui_selection list (* G expressions that are currently
                                            being displayed *);
-  mutable columns_type: (column_type * (filtered:bool -> unit)) HColumns.t
+  columns_type: (column_type * (filtered:bool -> unit)) HColumns.t
 (* mapping from GTK columns to the data they display, plus a function
    whose argument indicates whether the column is filtered *);
   mutable rows: 'value rows (* model: rows to display. Sorted, unfiltered

@@ -98,9 +98,9 @@ type worklist = {
                                          been found. The impact on upward calls to those callees
                                          will have to be computed again. *);
 
-  mutable skip: Locations.Zone.t (** Locations for which the impact is
-                                     dismissed. Nodes that involve only those zones are skipped. Constant
-                                     after initialization *);
+  skip: Locations.Zone.t (** Locations for which the impact is
+                             dismissed. Nodes that involve only those zones
+                             are skipped. Constant after initialization *);
 
   mutable initial_nodes: nodes KFM.t
 (** Nodes that are part of the initial impact query, or directly
