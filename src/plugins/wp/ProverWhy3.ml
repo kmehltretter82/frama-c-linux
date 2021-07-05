@@ -67,7 +67,6 @@ type convert = {
   subst: Why3.Term.term Lang.F.Tmap.t;
   pool: Lang.F.pool;
   polarity: Cvalues.polarity;
-  in_goal: bool;
   incomplete_types: (string, Why3.Ty.tysymbol) Hashtbl.t;
   incomplete_symbols: (string, Why3.Term.lsymbol) Hashtbl.t;
   mutable convert_for_export: Lang.F.term Lang.F.Tmap.t;
@@ -124,13 +123,12 @@ let empty_context name : context = {
   env = get_why3_env ();
 }
 
-let empty_cnv ?(polarity=`NoPolarity) ?(in_goal=false) (ctx:context) : convert = {
+let empty_cnv ?(polarity=`NoPolarity) (ctx:context) : convert = {
   th = ctx.th;
   subst = Lang.F.Tmap.empty;
   pool = Lang.F.pool ();
   env = ctx.env;
   polarity;
-  in_goal;
   incomplete_symbols = Hashtbl.create 3;
   incomplete_types = Hashtbl.create 3;
   convert_for_export = Lang.F.Tmap.empty;
@@ -1077,7 +1075,7 @@ let prove_goal ~id ~title ~name ?axioms t =
     end ;
   v#add_builtin_lib;
   v#vgoal axioms t;
-  let cnv = empty_cnv ~in_goal:true ~polarity:`Positive ctx in
+  let cnv = empty_cnv ~polarity:`Positive ctx in
   let t = convert cnv Prop (Lang.F.e_prop t) in
   let decl = Why3.Decl.create_prop_decl Pgoal goal_id t in
   let th = Why3.Theory.close_theory ctx.th in

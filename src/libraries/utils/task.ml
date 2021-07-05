@@ -293,15 +293,14 @@ let command ?(timeout=0) ?time ?stdout ?stderr cmd args = todo
 (* ------------------------------------------------------------------------ *)
 
 type 'a shared =
-  { descr : string ;
-    retry : bool ;
-    mutable builder : (unit -> 'a task) ;
+  { retry : bool ;
+    builder : (unit -> 'a task) ;
     mutable shared : 'a task ;
     mutable clients : int ;
   }
 
-let shared ~descr ~retry builder =
-  { descr ; retry ; builder ; shared = todo builder ; clients = 0 }
+let shared ~retry builder =
+  { retry ; builder ; shared = todo builder ; clients = 0 }
 
 let retry_shared sh = function
   | Failed _ -> sh.retry

@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 type tab = {
-  tab_name : string ;
   tab_file : Datatype.Filepath.t ;
   tab_page : int ;
   tab_select : line:int -> unit ;
@@ -184,7 +183,6 @@ let load_file w ?title ~(filename : Datatype.Filepath.t) ?(line=(-1)) ~click_cb 
                     ));
         let tab = {
           tab_file = filename ;
-          tab_name = name ;
           tab_select = select_line ;
           tab_page = page_num ;
           tab_source_view = original_source_view;

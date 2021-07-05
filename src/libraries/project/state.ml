@@ -33,11 +33,11 @@ type state_on_disk =
     on_disk_digest: Digest.t }
 
 type private_ops =
-  { mutable descr: Structural_descr.pack;
+  { descr: Structural_descr.pack;
     create: t -> unit;
     remove: t -> unit;
-    mutable clear: t -> unit;
-    mutable clear_some_projects: (t -> bool) -> t -> bool;
+    clear: t -> unit;
+    clear_some_projects: (t -> bool) -> t -> bool;
     copy: t -> t -> unit;
     commit: t -> unit;
     update: t -> unit;

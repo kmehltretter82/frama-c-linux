@@ -37,14 +37,13 @@ module Dmap = Qed.Listmap.Make(Offset)
 module Dset = Qed.Listset.Make(Deref)
 module Acs = Qed.Listset.Make(Lvalue)
 module Class = Qed.Listset.Make(Datatype.String)
-module Ranks = Qed.Listset.Make(Datatype.Int)
 
 type region = {
   id : int ;
   mutable garbled : bool ;
-  mutable rw : bool ;
-  mutable pack : bool ;
-  mutable flat : bool ;
+  rw : bool ;
+  pack : bool ;
+  flat : bool ;
   mutable names : Class.t ;
   mutable alias : alias ;
   mutable delta : int Dmap.t ;
@@ -69,8 +68,6 @@ type map = {
   mutable cluster : region cluster Rmap.t ;
   mutable roots : root Rmap.t ;
   mutable froms : region from list Rmap.t ;
-  mutable mranks : Ranks.t Rmap.t ; (* set of sizeof(ds) accessed by shifting *)
-  mutable mdims : int list Rmap.t ; (* common dim prefix accessed from cluster *)
   mutable domain : Rset.t ; (* reachable regions via clusters *)
   mutable chunk : region chunk Rmap.t ; (* memory chunks *)
 }
@@ -88,8 +85,6 @@ let create () = {
   cluster = Rmap.empty ;
   roots = Rmap.empty ;
   froms = Rmap.empty ;
-  mranks = Rmap.empty ;
-  mdims = Rmap.empty ;
   domain = Rset.empty ;
   chunk = Rmap.empty ;
 }

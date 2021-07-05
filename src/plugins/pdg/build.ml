@@ -68,7 +68,6 @@ type arg_nodes = Node.t list
 (** type of the whole PDG representation during its building process *)
 type pdg_build = {
   fct : kernel_function;
-  mutable topinput : PdgTypes.Node.t option;
   mutable other_inputs :
     (PdgTypes.Node.t * Dpd.td * Locations.Zone.t) list;
   graph : G.t;
@@ -92,7 +91,7 @@ let create_pdg_build kf =
   let states = Stmt.Hashtbl.create nb_stmts in
   let graph = G.create () in
   { fct = kf; graph = graph; states = states; index = index;
-    topinput = None; other_inputs = [];
+    other_inputs = [];
     ctrl_dpds  = Stmt.Hashtbl.create nb_stmts ;
     decl_nodes = Varinfo.Hashtbl.create 10 ;
   }

@@ -104,7 +104,7 @@ struct
   type custom_tree =
     {finfo: TREE.t;
      mutable sons: custom_tree array;
-     mutable parent: custom_tree option;
+     parent: custom_tree option;
      fidx: int (* invariant: parent.(fidx)==myself *) }
 
   let inbound i a = i>=0 && i<Array.length a
@@ -236,7 +236,7 @@ end
 
 module MYTREE = struct
   type storage = { mutable name : string;
-                   mutable globals: global array;
+                   globals: global array;
                    mutable strikethrough: bool}
 
 
