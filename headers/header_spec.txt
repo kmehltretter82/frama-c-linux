@@ -219,6 +219,8 @@ share/libc/__fc_runtime.c: CEA_LGPL
 share/libc/__fc_select.h: CEA_LGPL
 share/libc/__fc_string_axiomatic.h: CEA_LGPL
 share/libc/alloca.h: CEA_LGPL
+share/libc/argz.c: CEA_LGPL
+share/libc/argz.h: CEA_LGPL
 share/libc/arpa/inet.h: CEA_LGPL
 share/libc/assert.c: CEA_LGPL
 share/libc/assert.h: CEA_LGPL

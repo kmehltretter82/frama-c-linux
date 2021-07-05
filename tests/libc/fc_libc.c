@@ -26,6 +26,7 @@
 #include "__fc_runtime.c"
 
 #include "alloca.h"
+#include "argz.h"
 #include "arpa/inet.h"
 #include "assert.h"
 #include "byteswap.h"
