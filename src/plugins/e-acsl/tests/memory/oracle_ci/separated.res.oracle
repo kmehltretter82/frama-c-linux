@@ -35,11 +35,17 @@
 [eva:alarm] tests/memory/separated.c:51: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status invalid.
 [eva:alarm] tests/memory/separated.c:52: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status invalid.
+[eva:alarm] tests/memory/separated.c:60: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status invalid.
 [eva:alarm] tests/memory/separated.c:60: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] tests/memory/separated.c:61: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status invalid.
+[eva:alarm] tests/memory/separated.c:61: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] tests/memory/separated.c:62: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status invalid.
 [eva:alarm] tests/memory/separated.c:62: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] tests/memory/separated.c:62: Warning: assertion got status unknown.
