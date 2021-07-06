@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 open Cil_types
-exception Error_Bottom
 
 (* Implements Figure 3 of J. Signoles' JFLA'15 paper "Rester statique pour
    devenir plus rapide, plus précis et plus mince".
@@ -268,7 +267,7 @@ let interv_of_extended_quantifier lambda i j name =
          (Ival.inject_range
             (compute_bound min_lambda true)
             (compute_bound max_lambda false))
-     with Error_Bottom ->
+     with Abstract_interp.Error_Bottom ->
        bottom)
   | _, _, _, "\\product" ->  Error.not_yet "product"
   | _, _, _, "\\numof" ->  Error.not_yet "numof"
