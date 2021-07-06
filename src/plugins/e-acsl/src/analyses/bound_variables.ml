@@ -22,8 +22,8 @@
 
 (** Module for preprocessing the quantified predicates. Predicates with
     quantifiers are hard to translate, so we delegate some of the work to
-    a preprocessing phase. At the end of this phase, all the quantified predicates
-    should have an associated preprocessed form [vars * goal] where
+    a preprocessing phase. At the end of this phase, all the quantified
+    predicates should have an associated preprocessed form [vars * goal] where
     - [vars] is a list of guarded variables in the right order
     - [goal] is the predicate under the quantifications
       The guarded variables in the list [vars] are of

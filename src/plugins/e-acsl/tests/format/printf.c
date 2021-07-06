@@ -1,5 +1,6 @@
 /* run.config,run.config_dev
    COMMENT: Check detection of format-string vulnerabilities via printf
+   DONTRUN:
    MACRO: ROOT_EACSL_GCC_OPTS_EXT @ROOT_EACSL_GCC_OPTS_EXT@ -e "-Wno-maybe-uninitialized"
 */
 
