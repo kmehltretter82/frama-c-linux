@@ -26,7 +26,6 @@ int main(void)
     __e_acsl_temporal_reset_parameters();
     __e_acsl_temporal_reset_return();
     *(p + i) = (int *)malloc(sizeof(int));
-    /*@ assert Eva: initialization: \initialized(p + i); */
     __e_acsl_temporal_store_nblock((void *)(p + i),(void *)*(p + i));
     {
       int __gen_e_acsl_initialized;
@@ -43,7 +42,6 @@ int main(void)
         __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","main",
                         "mem_access: \\valid_read(p + i)",
                         "tests/temporal/t_dpointer.c",14);
-        /*@ assert Eva: initialization: \initialized(p + i); */
         __gen_e_acsl_valid_2 = __e_acsl_valid((void *)*(p + i),sizeof(int),
                                               (void *)*(p + i),
                                               (void *)(p + i));
@@ -59,7 +57,6 @@ int main(void)
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
   __e_acsl_temporal_save_nreferent_parameter((void *)(p + 2),0U);
-  /*@ assert Eva: initialization: \initialized(p + 2); */
   free((void *)*(p + 2));
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();

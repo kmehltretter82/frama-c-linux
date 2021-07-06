@@ -54,10 +54,6 @@ void g(void)
         __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","g",
                         "mem_access: \\valid_read(__gen_e_acsl_at + (int)(__gen_e_acsl_w - 3))",
                         "tests/arith/at_on-purely-logic-variables.c",16);
-        /*@ assert
-            Eva: initialization:
-              \initialized(__gen_e_acsl_at + (int)(__gen_e_acsl_w - 3));
-        */
         if (! *(__gen_e_acsl_at + (__gen_e_acsl_w - 3))) ;
         else {
           __gen_e_acsl_exists = 1;
@@ -238,10 +234,6 @@ int main(void)
         __e_acsl_assert(__gen_e_acsl_valid_read_2,1,"RTE","main",
                         "mem_access: \\valid_read(__gen_e_acsl_at_2 + (int)(__gen_e_acsl_j - 2))",
                         "tests/arith/at_on-purely-logic-variables.c",29);
-        /*@ assert
-            Eva: initialization:
-              \initialized(__gen_e_acsl_at_2 + (int)(__gen_e_acsl_j - 2));
-        */
         if (! *(__gen_e_acsl_at_2 + (__gen_e_acsl_j - 2))) ;
         else {
           __gen_e_acsl_exists = 1;
@@ -286,12 +278,6 @@ int main(void)
             __e_acsl_assert(__gen_e_acsl_valid_read_3,1,"RTE","main",
                             "mem_access:\n  \\valid_read(__gen_e_acsl_at_3 +\n              (int)((int)((int)(__gen_e_acsl_u - 9) * 11) +\n                    (int)((int)(__gen_e_acsl_v - -5) - 1)))",
                             "tests/arith/at_on-purely-logic-variables.c",34);
-            /*@ assert
-                Eva: initialization:
-                  \initialized(__gen_e_acsl_at_3 +
-                               (int)((int)((int)(__gen_e_acsl_u - 9) * 11) +
-                                     (int)((int)(__gen_e_acsl_v - -5) - 1)));
-            */
             if (*(__gen_e_acsl_at_3 + ((__gen_e_acsl_u - 9) * 11 + ((
                                                                     __gen_e_acsl_v - -5) - 1)))) 
               ;
@@ -372,11 +358,6 @@ int main(void)
         __e_acsl_assert(__gen_e_acsl_valid_read_5,1,"RTE","main",
                         "mem_access:\n  \\valid_read(__gen_e_acsl_at_5 + (int)((int)(__gen_e_acsl_k_3 - -9) - 1))",
                         "tests/arith/at_on-purely-logic-variables.c",41);
-        /*@ assert
-            Eva: initialization:
-              \initialized(__gen_e_acsl_at_5 +
-                           (int)((int)(__gen_e_acsl_k_3 - -9) - 1));
-        */
         if (! (*(__gen_e_acsl_at_5 + ((__gen_e_acsl_k_3 - -9) - 1)) == 0L)) 
           ;
         else {
@@ -513,21 +494,6 @@ int main(void)
                                 "mem_access:\n  \\valid_read(__gen_e_acsl_at_7 +\n              (int)((int)((int)(__gen_e_acsl_u_5 - 10) * 300) +\n                    (int)((int)((int)((int)(__gen_e_acsl_v_5 - -10) - 1) *\n                                100)\n                          + (int)((int)(__gen_e_acsl_w - 100) - 1))))",
                                 "tests/arith/at_on-purely-logic-variables.c",
                                 57);
-                /*@ assert
-                    Eva: initialization:
-                      \initialized(__gen_e_acsl_at_7 +
-                                   (int)((int)((int)(__gen_e_acsl_u_5 - 10) *
-                                               300)
-                                         +
-                                         (int)((int)((int)((int)(__gen_e_acsl_v_5
-                                                                 - -10)
-                                                           - 1)
-                                                     * 100)
-                                               +
-                                               (int)((int)(__gen_e_acsl_w -
-                                                           100)
-                                                     - 1))));
-                */
                 if (! *(__gen_e_acsl_at_7 + ((__gen_e_acsl_u_5 - 10) * 300 + (
                                              ((__gen_e_acsl_v_5 - -10) - 1) * 100 + (
                                              (__gen_e_acsl_w - 100) - 1))))) 
@@ -698,11 +664,6 @@ void __gen_e_acsl_f(int *t)
         __e_acsl_assert(__gen_e_acsl_valid_read_2,1,"RTE","f",
                         "mem_access:\n  \\valid_read(__gen_e_acsl_at + (int)((int)(__gen_e_acsl_n - 1) - 1))",
                         "tests/arith/at_on-purely-logic-variables.c",7);
-        /*@ assert
-            Eva: initialization:
-              \initialized(__gen_e_acsl_at +
-                           (int)((int)(__gen_e_acsl_n - 1) - 1));
-        */
         if (*(__gen_e_acsl_at + ((__gen_e_acsl_n - 1) - 1))) {
           int __gen_e_acsl_valid_read_4;
           __gen_e_acsl_valid_read_4 = __e_acsl_valid_read((void *)(__gen_e_acsl_at_2 + (int)(
@@ -714,11 +675,6 @@ void __gen_e_acsl_f(int *t)
           __e_acsl_assert(__gen_e_acsl_valid_read_4,1,"RTE","f",
                           "mem_access:\n  \\valid_read(__gen_e_acsl_at_2 + (int)((int)(__gen_e_acsl_n - 1) - 1))",
                           "tests/arith/at_on-purely-logic-variables.c",7);
-          /*@ assert
-              Eva: initialization:
-                \initialized(__gen_e_acsl_at_2 +
-                             (int)((int)(__gen_e_acsl_n - 1) - 1));
-          */
           __gen_e_acsl_and = *(__gen_e_acsl_at_2 + ((__gen_e_acsl_n - 1) - 1));
         }
         else __gen_e_acsl_and = 0;

@@ -103,7 +103,6 @@ int main(void)
   while (1) {
     int tmp;
     tmp = i;
-    /*@ assert Eva: signed_overflow: -2147483648 ≤ i - 1; */
     i --;
     ;
     if (! tmp) break;

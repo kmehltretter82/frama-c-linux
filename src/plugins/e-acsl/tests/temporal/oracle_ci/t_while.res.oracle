@@ -1,8 +1,2 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] tests/temporal/t_while.c:28: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] tests/temporal/t_while.c:28: Warning: assertion got status unknown.
-[eva:alarm] tests/temporal/t_while.c:36: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] tests/temporal/t_while.c:36: Warning: assertion got status unknown.

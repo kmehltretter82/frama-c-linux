@@ -1,11 +1,11 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] tests/memory/stdout.c:8: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status invalid.
 [eva:alarm] tests/memory/stdout.c:8: Warning: assertion got status unknown.
 [eva:alarm] tests/memory/stdout.c:9: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status invalid.
 [eva:alarm] tests/memory/stdout.c:9: Warning: assertion got status unknown.
 [eva:alarm] tests/memory/stdout.c:10: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+  function __e_acsl_assert, behavior blocking: precondition got status invalid.
 [eva:alarm] tests/memory/stdout.c:10: Warning: assertion got status unknown.
