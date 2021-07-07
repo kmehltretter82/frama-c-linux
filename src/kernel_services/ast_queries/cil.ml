@@ -125,11 +125,9 @@ type theMachine =
     mutable kindOfSizeOf: ikind;
   }
 
-let default_machdep = Machdeps.x86_32
-
 let createMachine () = (* Contain dummy values *)
   { useLogicalOperators = false;
-    theMachine = default_machdep;
+    theMachine = Machdeps.x86_64;
     lowerConstants = false(*true*);
     insertImplicitCasts = true;
     underscore_name = true;

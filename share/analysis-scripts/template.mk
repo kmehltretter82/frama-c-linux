@@ -12,7 +12,7 @@ include $(shell $(FRAMAC)-config -print-share-path)/analysis-scripts/prologue.mk
 
 # Edit below as needed. Suggested flags are optional.
 
-MACHDEP = x86_32
+MACHDEP = x86_64
 
 ## Preprocessing flags (for -cpp-extra-args)
 CPPFLAGS    += \
