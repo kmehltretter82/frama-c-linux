@@ -1,4 +1,4 @@
-/* run.config_ci
+/* run.config
    COMMENT: invariant
    STDOPT: +"-eva-slevel 11"
 */

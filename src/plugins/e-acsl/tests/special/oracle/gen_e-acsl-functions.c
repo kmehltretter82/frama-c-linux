@@ -19,7 +19,7 @@ int f(int *p)
       int __gen_e_acsl_and;
       if (0 <= i) __gen_e_acsl_and = i <= 1; else __gen_e_acsl_and = 0;
       __e_acsl_assert(__gen_e_acsl_and,1,"Invariant","f","0 <= i <= 1",
-                      "tests/special/e-acsl-functions.c",11);
+                      "tests/special/e-acsl-functions.c",13);
     }
     /*@ loop invariant 0 ≤ i ≤ 1; */
     while (i < 1) {
@@ -27,7 +27,7 @@ int f(int *p)
       i ++;
       if (0 <= i) __gen_e_acsl_and_2 = i <= 1; else __gen_e_acsl_and_2 = 0;
       __e_acsl_assert(__gen_e_acsl_and_2,1,"Invariant","f","0 <= i <= 1",
-                      "tests/special/e-acsl-functions.c",11);
+                      "tests/special/e-acsl-functions.c",13);
     }
   }
   __retres = 0;
@@ -81,14 +81,14 @@ int __gen_e_acsl_f(int *p)
     __e_acsl_store_block((void *)(& p),(size_t)8);
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)p,sizeof(int));
     __e_acsl_assert(__gen_e_acsl_initialized,1,"Precondition","f",
-                    "\\initialized(p)","tests/special/e-acsl-functions.c",7);
+                    "\\initialized(p)","tests/special/e-acsl-functions.c",9);
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)p,sizeof(int),
                                                   (void *)p,(void *)(& p));
     __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","f",
                     "mem_access: \\valid_read(p)",
-                    "tests/special/e-acsl-functions.c",8);
+                    "tests/special/e-acsl-functions.c",10);
     __e_acsl_assert(*p == 0,1,"Precondition","f","*p == 0",
-                    "tests/special/e-acsl-functions.c",8);
+                    "tests/special/e-acsl-functions.c",10);
   }
   {
     int __gen_e_acsl_valid_read_2;
@@ -96,13 +96,13 @@ int __gen_e_acsl_f(int *p)
                                                     (void *)p,(void *)(& p));
     __e_acsl_assert(__gen_e_acsl_valid_read_2,1,"RTE","f",
                     "mem_access: \\valid_read(p)",
-                    "tests/special/e-acsl-functions.c",9);
+                    "tests/special/e-acsl-functions.c",11);
     __gen_e_acsl_at = *p;
   }
   __retres = f(p);
   __e_acsl_assert(__retres == __gen_e_acsl_at,1,"Postcondition","f",
                   "\\result == \\old(*p)","tests/special/e-acsl-functions.c",
-                  9);
+                  11);
   __e_acsl_delete_block((void *)(& p));
   return __retres;
 }

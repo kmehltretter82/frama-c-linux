@@ -57,6 +57,7 @@
 /tests/test_config_ci
 /tests/test_config_dev
 /tests/*/result*/*
+/tests/*/oracle_ci/*
 /tests/check/obj/*
 .frama-c
 tests/ptests_config

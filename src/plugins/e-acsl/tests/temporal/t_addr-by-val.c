@@ -1,4 +1,4 @@
-/* run.config_ci, run.config_dev
+/* run.config
   COMMENT: Case when a pointer is taking address by value.
 */
 

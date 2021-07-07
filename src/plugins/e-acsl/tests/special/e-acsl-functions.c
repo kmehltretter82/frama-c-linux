@@ -1,6 +1,8 @@
-/* run.config_ci, run.config_dev
+/* run.config
    COMMENT: test option -e-acsl-functions
    STDOPT: #"-e-acsl-functions f"
+*/
+/* run.config_dev
    MACRO: ROOT_EACSL_GCC_FC_EXTRA_EXT -e-acsl-functions f
 */
 

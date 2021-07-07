@@ -1,4 +1,4 @@
-/* run.config_ci, run.config_dev
+/* run.config
    COMMENT: Check that when small blocks (such as char) are used the
    COMMENT: instrumentation adds alignment sufficient for tracking
    COMMENT: block origin number via shadowing

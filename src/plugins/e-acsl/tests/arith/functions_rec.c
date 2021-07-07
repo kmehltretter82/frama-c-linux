@@ -1,4 +1,4 @@
-/* run.config_ci
+/* run.config
    COMMENT: recursive logic functions
    STDOPT: +"-eva-unroll-recursive-calls 100"
 */

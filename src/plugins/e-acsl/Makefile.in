@@ -184,17 +184,18 @@ PLUGIN_TESTS_LIB := $(EACSL_PLUGIN_DIR)/tests/print.ml
 DEV?=
 ifeq ("$(DEV)","yes")
   EACSL_TEST_CONFIG:=dev
-else
-  EACSL_TEST_CONFIG:=ci
 endif
-# Prepend PTESTS_OPTS with the test config to use. If the user-provided
-# PTESTS_OPTS variable contains another -config instruction, then it will be
-# prioritized over the one selected by the Makefile.
-E_ACSL_TESTS E_ACSL_DEFAULT_TESTS: override PTESTS_OPTS:=-config $(EACSL_TEST_CONFIG) $(PTESTS_OPTS)
+
+ifdef EACSL_TEST_CONFIG
+  # Prepend PTESTS_OPTS with the test config to use. If the user-provided
+  # PTESTS_OPTS variable contains another -config instruction, then it will be
+  # prioritized over the one selected by the Makefile.
+  E_ACSL_TESTS E_ACSL_DEFAULT_TESTS: override PTESTS_OPTS:=-config $(EACSL_TEST_CONFIG) $(PTESTS_OPTS)
+endif
 
 TEST_DEPENDENCIES:= \
 	$(EACSL_PLUGIN_DIR)/tests/ptests_config \
-	$(EACSL_PLUGIN_DIR)/tests/test_config_ci \
+	$(EACSL_PLUGIN_DIR)/tests/test_config \
 	$(EACSL_PLUGIN_DIR)/tests/test_config_dev \
 	$(EACSL_PLUGIN_DIR)/tests/print.cmo
 
@@ -209,8 +210,8 @@ plugins_ptests_config: $(TEST_DEPENDENCIES)
 E_ACSL_TESTS E_ACSL_DEFAULT_TESTS: $(TEST_DEPENDENCIES)
 tests:: $(TEST_DEPENDENCIES)
 
-$(EACSL_PLUGIN_DIR)/tests/test_config_ci: \
-		$(EACSL_PLUGIN_DIR)/tests/test_config_ci.in \
+$(EACSL_PLUGIN_DIR)/tests/test_config: \
+		$(EACSL_PLUGIN_DIR)/tests/test_config.in \
 		$(EACSL_PLUGIN_DIR)/Makefile
 	$(PRINT_MAKING) $@
 	$(SED) -e "s|@SEDCMD@|`which sed `|g" $< > $@
@@ -227,7 +228,7 @@ clean::
 	done
 	$(PRINT_RM) cleaning generated test files
 	$(RM) $(E_ACSL_DIR)/tests/*.cm* $(E_ACSL_DIR)/tests/*.o
-	$(RM) $(E_ACSL_DIR)/tests/test_config_ci \
+	$(RM) $(E_ACSL_DIR)/tests/test_config \
 		$(E_ACSL_DIR)/tests/test_config_dev
 	$(RM) $(foreach dir, $(PLUGIN_TESTS_DIRS), tests/$(dir)/result/*)
 
@@ -323,16 +324,16 @@ EACSL_DOC_FILES = \
 
 EACSL_TEST_FILES = \
 	tests/test_config_dev.in \
-	tests/test_config_ci.in \
-	tests/gmp-only/test_config_ci \
+	tests/test_config.in \
+	tests/gmp-only/test_config \
 	tests/gmp-only/test_config_dev \
-	tests/full-mtracking/test_config_ci \
+	tests/full-mtracking/test_config \
 	tests/full-mtracking/test_config_dev \
-	tests/builtin/test_config_ci \
+	tests/builtin/test_config \
 	tests/builtin/test_config_dev \
-	tests/temporal/test_config_ci \
+	tests/temporal/test_config \
 	tests/temporal/test_config_dev \
-	tests/format/test_config_ci \
+	tests/format/test_config \
 	tests/format/test_config_dev \
 	tests/print.ml
 
@@ -340,9 +341,9 @@ EACSL_TEST_FILES = \
 EACSL_DISTRIB_TESTS = \
   $(foreach dir, $(addprefix tests/,$(PLUGIN_TESTS_DIRS)), \
       $(dir)/*.[ich] \
-      $(dir)/test_config_ci \
+      $(dir)/test_config \
       $(dir)/test_config_dev \
-      $(dir)/oracle_ci/* \
+      $(dir)/oracle/* \
       $(dir)/oracle_dev/* \
   )
 

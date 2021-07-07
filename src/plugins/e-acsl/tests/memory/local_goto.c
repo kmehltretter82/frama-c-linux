@@ -1,4 +1,4 @@
-/* run.config_ci
+/* run.config
    COMMENT: Check that deleting statements before goto jumps takes into
    COMMENT: account variable declarations given via local inits
 */

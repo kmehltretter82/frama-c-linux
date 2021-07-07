@@ -1,4 +1,4 @@
-/* run.config_ci, run.config_dev
+/* run.config
    COMMENT: Check temporal validity of environment string (via getenv function)
 */
 

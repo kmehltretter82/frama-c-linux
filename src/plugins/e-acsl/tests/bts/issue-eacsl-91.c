@@ -1,4 +1,4 @@
-/* run.config_ci
+/* run.config
    COMMENT: frama-c/e-acsl#91, test for misplaced delete_block of local variable
    in switch.
    STDOPT: #"-e-acsl-full-mtracking"

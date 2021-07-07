@@ -1,6 +1,8 @@
-/* run.config_ci, run.config_dev
+/* run.config
    COMMENT: test option -e-acsl-instrument; cannot run Eva on this example
    STDOPT:#"-e-acsl-instrument='@all,-uninstrument1,-uninstrument2'"
+*/
+/* run.config_dev
    MACRO: ROOT_EACSL_GCC_FC_EXTRA_EXT -e-acsl-instrument @all,-uninstrument1,-uninstrument2
 */
 

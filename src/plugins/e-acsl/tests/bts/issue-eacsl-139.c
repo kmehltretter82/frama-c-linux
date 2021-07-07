@@ -1,4 +1,4 @@
-/* run.config_ci, run.config_dev
+/* run.config
    COMMENT: While unsupported, struct comparison should fail gracefully instead
    COMMENT: of crashing Frama-C (issue frama-c/e-acsl#139).
  */

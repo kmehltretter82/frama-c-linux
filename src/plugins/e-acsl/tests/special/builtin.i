@@ -1,6 +1,8 @@
-/* run.config_ci, run.config_dev
+/* run.config
   COMMENT: -e-acsl-builtins
   STDOPT: #"-e-acsl-builtins incr"
+*/
+/* run.config_dev
   MACRO: ROOT_EACSL_GCC_FC_EXTRA_EXT -e-acsl-builtins incr
 */
 

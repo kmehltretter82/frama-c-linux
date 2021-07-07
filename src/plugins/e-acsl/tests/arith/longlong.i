@@ -1,4 +1,4 @@
-/* run.config_ci
+/* run.config
    COMMENT: upgrading longlong to GMP
    STDOPT: +"-eva-unroll-recursive-calls 8"
 */
