@@ -53,11 +53,11 @@ Assume {
   (* Heap *)
   Type: (region(p.base) <= 0) /\ framed(Mptr_0) /\ sconst(Mchar_0).
 }
-Prove: EqS1_S(Load_S1_S(p, a_4, a, a_8, a_5, a_1, a_6, a_2, a_7, a_3,
+Prove: EqS1_S(Load_S1_S(p, a, a_8, a_4, a_5, a_1, a_6, a_2, a_7, a_3,
                 havoc(Mf32_undef_0, Mf32_0, p, Length_of_S1_S),
                 havoc(Mf64_undef_0, Mf64_0, p, Length_of_S1_S),
                 havoc(Mptr_undef_0, Mptr_0, p, Length_of_S1_S)),
-         Load_S1_S(p, Mchar_0, Mint_0, Mint_1, Mint_2, Mint_3, Mint_4,
+         Load_S1_S(p, Mint_0, Mint_1, Mchar_0, Mint_2, Mint_3, Mint_4,
            Mint_5, Mint_6, Mint_7, Mf32_0, Mf64_0, Mptr_0)).
 
 ------------------------------------------------------------

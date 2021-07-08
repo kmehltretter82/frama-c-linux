@@ -118,7 +118,6 @@ let pointer = Context.create "MemTyped.pointer"
 
 type chunk =
   | M_int of Ctypes.c_int
-  | M_char
   | M_f32
   | M_f64
   | M_pointer
@@ -141,7 +140,6 @@ struct
     | SInt64 -> 8
 
   let rank = function
-    | M_char -> -1
     | M_int i -> int_rank i
     | M_f32 -> 9
     | M_f64 -> 10
@@ -150,8 +148,8 @@ struct
     | T_init -> 13
   let hash = rank
   let name = function
+    | M_int i when Ctypes.is_char i -> "Mchar"
     | M_int _ -> "Mint"
-    | M_char -> "Mchar"
     | M_f32 -> "Mf32"
     | M_f64 -> "Mf64"
     | M_pointer -> "Mptr"
@@ -164,14 +162,14 @@ struct
     | M_int i -> Format.fprintf fmt "M%a" Ctypes.pp_int i
     | m -> Format.pp_print_string fmt (name m)
   let val_of_chunk = function
-    | M_int _ | M_char -> L.Int
+    | M_int _ -> L.Int
     | M_f32 -> Cfloat.tau_of_float Ctypes.Float32
     | M_f64 -> Cfloat.tau_of_float Ctypes.Float64
     | M_pointer -> t_addr
     | T_alloc -> L.Int
     | T_init -> L.Bool
   let tau_of_chunk = function
-    | M_int _ | M_char -> L.Array(t_addr,L.Int)
+    | M_int _ -> L.Array(t_addr,L.Int)
     | M_pointer -> L.Array(t_addr,t_addr)
     | M_f32 -> L.Array(t_addr,Cfloat.tau_of_float Ctypes.Float32)
     | M_f64 -> L.Array(t_addr,Cfloat.tau_of_float Ctypes.Float64)
@@ -190,11 +188,10 @@ type loc = term (* of type addr *)
 (* --- Utilities on locations                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-let m_int i = if Ctypes.is_char i then M_char else M_int i
 let m_float = function Float32 -> M_f32 | Float64 -> M_f64
 
 let rec footprint = function
-  | C_int i -> Heap.Set.singleton (m_int i)
+  | C_int i -> Heap.Set.singleton (M_int i)
   | C_float f -> Heap.Set.singleton (m_float f)
   | C_pointer _ -> Heap.Set.singleton M_pointer
   | C_array a -> footprint (object_of a.arr_element)
@@ -211,11 +208,11 @@ and footprint_comp { cfields } =
 
 and all_value_chunks () =
   let ints =
-    List.fold_left (fun l i -> m_int i :: l) []
+    List.fold_left (fun l i -> M_int i :: l) []
       [ Ctypes.CBool ;
         SInt8 ; UInt8 ; SInt16 ; UInt16 ; SInt32 ; UInt32 ; SInt64 ; UInt64 ]
   in
-  Heap.Set.of_list (M_pointer :: M_char :: M_f32 :: M_f64 :: ints)
+  Heap.Set.of_list (M_pointer :: M_f32 :: M_f64 :: ints)
 
 let init_footprint _ _ = Heap.Set.singleton T_init
 let value_footprint obj _l = footprint obj
@@ -482,8 +479,10 @@ module STRING = WpContext.Generator(LITERAL)
         let name = prefix ^ "_literal" in
         let i = Lang.freshvar ~basename:"i" L.Int in
         let c = Cstring.char_at cst (e_var i) in
-        let addr = shift (a_global base) (C_int (Ctypes.c_char ())) (e_var i) in
-        let m = Lang.freshvar ~basename:"mchar" (Chunk.tau_of_chunk M_char) in
+        let ikind = Ctypes.c_char () in
+        let addr = shift (a_global base) (C_int ikind) (e_var i) in
+        let m =
+          Lang.freshvar ~basename:"mchar" (Chunk.tau_of_chunk (M_int ikind)) in
         let m_sconst = F.p_call p_sconst [e_var m] in
         let v = F.e_get (e_var m) addr in
         let read = F.p_equal c v in
@@ -980,7 +979,6 @@ module ChunkContent = WpContext.Generator(Chunk)
       type data = lfun
 
       let int_kind = function
-        | M_char -> Ctypes.c_char ()
         | M_int k -> k
         | _ -> failwith "MemTyped asked constraint for non int type"
 
@@ -1005,7 +1003,7 @@ module ChunkContent = WpContext.Generator(Chunk)
     end)
 
 let is_chunk sigma = function
-  | M_int _ | M_char as m ->
+  | M_int _ as m ->
       F.p_call (ChunkContent.get m) [ Sigma.value sigma m ]
   | _ ->
       p_true
@@ -1034,7 +1032,7 @@ struct
   let to_region_pointer l = 0,l
   let of_region_pointer _ _ l = l
 
-  let load_int sigma i l = F.e_get (Sigma.value sigma (m_int i)) l
+  let load_int sigma i l = F.e_get (Sigma.value sigma (M_int i)) l
   let load_float sigma f l = F.e_get (Sigma.value sigma (m_float f)) l
   let load_pointer sigma _t l = F.e_get (Sigma.value sigma M_pointer) l
 
@@ -1061,7 +1059,7 @@ struct
 
   let updated sigma c l v = c , F.e_set (Sigma.value sigma c) l v
 
-  let store_int sigma i l v = updated sigma (m_int i) l v
+  let store_int sigma i l v = updated sigma (M_int i) l v
   let store_float sigma f l v = updated sigma (m_float f) l v
   let store_pointer sigma _ty l v = updated sigma M_pointer l v
 
@@ -1156,7 +1154,7 @@ let frame sigma =
   in
   wellformed_frame p_linked T_alloc @
   wellformed_frame p_cinits T_init @
-  wellformed_frame p_sconst M_char @
+  wellformed_frame p_sconst (M_int (Ctypes.c_char ())) @
   wellformed_frame p_framed M_pointer
 
 let alloc sigma xs =
