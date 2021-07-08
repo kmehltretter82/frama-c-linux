@@ -23,6 +23,11 @@
 let stat_hits = Statistics.register_function_stat "memexec-hits"
 let stat_misses = Statistics.register_function_stat "memexec-misses"
 
+let proxy = State_builder.Proxy.(create "Mem_exec.proxy" Forward [])
+let add_cache_dependency state = State_builder.Proxy.extend [state] proxy
+let cache_dependencies = [ Ast.self; State_builder.Proxy.get proxy ]
+
+
 module SaveCounter =
   State_builder.SharedCounter(struct let name = "Mem_exec.save_counter" end)
 
@@ -84,8 +89,8 @@ module Make
       (ArgsToStoredCalls)
       (struct
         let size = 17
-        let dependencies = [Self.state]
-        let name = "Mem_exec.PreviousCalls(" ^ string_of_int !counter ^ ")"
+        let dependencies = cache_dependencies
+        let name = "Mem_exec.PreviousCalls(" ^ Value.name ^ ", " ^ Domain.name ^")"
       end)
 
   let cleanup = !cleanup_ref

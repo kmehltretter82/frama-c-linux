@@ -23,6 +23,8 @@
 open Cil_types
 open Eval
 
+val add_cache_dependency: State.t -> unit
+
 (** Counter that must be used each time a new call is analyzed, in order
     to refer to it later *)
 val new_counter : unit -> int

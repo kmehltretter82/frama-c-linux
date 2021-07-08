@@ -206,6 +206,22 @@ let () =
     ~user_only:true (fun _ -> reset_analyzer ());
   Project.register_after_global_load_hook reset_analyzer
 
+module Reload =
+  State_builder.Ref (Datatype.Unit)
+    (struct
+      let name = "Analysis.Reload"
+      let dependencies = [ Parameters.Domains.self;
+                           Parameters.DomainsFunction.self; ]
+      let default () = ()
+    end)
+
+let () =
+  let marshal t = t
+  and unmarshal t = reset_analyzer (); t in
+  Reload.howto_marshal marshal unmarshal
+
+let () = Mem_exec.add_cache_dependency Reload.self
+
 (* Builds the analyzer if needed, and run the analysis. *)
 let force_compute () =
   Ast.compute ();
