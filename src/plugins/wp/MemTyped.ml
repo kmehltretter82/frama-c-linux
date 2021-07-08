@@ -211,7 +211,7 @@ and footprint_comp { cfields } =
 
 and all_value_chunks () =
   let ints =
-    List.fold_left (fun l i -> M_int i :: l) []
+    List.fold_left (fun l i -> m_int i :: l) []
       [ Ctypes.CBool ;
         SInt8 ; UInt8 ; SInt16 ; UInt16 ; SInt32 ; UInt32 ; SInt64 ; UInt64 ]
   in
