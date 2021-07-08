@@ -448,6 +448,10 @@ function add_downloads {
     # Source distribution:
     run "cp $OUT_DIR/$TARGZ_FILENAME $DOWNLOAD_DIR"
     run "git -C $WEBSITE_DIR add $DOWNLOAD_PATH/$TARGZ_FILENAME"
+    if test "$FINAL_RELEASE" = "yes"; then
+        run "cp $OUT_DIR/$TARGZ_FILENAME $DOWNLOAD_DIR/frama-c-source-dist.tar.gz"
+        run "git -C $WEBSITE_DIR add $DOWNLOAD_PATH/frama-c-source-dist.tar.gz"
+    fi
 
     # API
     run "cp $OUT_DIR/frama-c-api.tar.gz $DOWNLOAD_DIR/frama-c-$FRAMAC_VERSION_AND_CODENAME-api.tar.gz"
