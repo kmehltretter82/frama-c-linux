@@ -450,8 +450,8 @@ function add_downloads {
     run "git -C $WEBSITE_DIR add $DOWNLOAD_PATH/$TARGZ_FILENAME"
 
     # API
-    run "cp $OUT_DIR/frama-c-api.tar.gz $DOWNLOAD_DIR/frama-c-api-$FRAMAC_VERSION_AND_CODENAME.tar.gz"
-    run "git -C $WEBSITE_DIR add $DOWNLOAD_PATH/frama-c-api-$FRAMAC_VERSION_AND_CODENAME.tar.gz"
+    run "cp $OUT_DIR/frama-c-api.tar.gz $DOWNLOAD_DIR/frama-c-$FRAMAC_VERSION_AND_CODENAME-api.tar.gz"
+    run "git -C $WEBSITE_DIR add $DOWNLOAD_PATH/frama-c-$FRAMAC_VERSION_AND_CODENAME-api.tar.gz"
 }
 
 function fill_website {
