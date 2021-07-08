@@ -100,7 +100,7 @@ module MemExec =
     (Eva.Assigns)
     (struct
       let size = 17
-      let dependencies = [Tbl.self]
+      let dependencies = [Ast.self]
       let name = "From.Callwise.MemExec"
     end)
 
@@ -142,7 +142,11 @@ let record_for_individual_froms callstack kf pre_state value_res =
         MemExec.replace memexec_counter froms;
         pop_local_table kf;
         froms
-      | `Reuse counter -> MemExec.find counter
+      | `Reuse counter ->
+        begin
+          try MemExec.find counter
+          with Not_found -> Eva.Assigns.top (* TODO *)
+        end
       | `Builtin (_states, Some (result,_)) -> result
       | `Builtin (_states, None)
       | `Spec _states ->

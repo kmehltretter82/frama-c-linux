@@ -603,7 +603,7 @@ module Callwise = struct
       (Inout_type)
       (struct
         let size = 17
-        let dependencies = [Internals.self]
+        let dependencies = [Ast.self]
         let name = "Operational_inputs.MemExec"
       end)
 
@@ -660,7 +660,11 @@ module Callwise = struct
         MemExec.replace memexec_counter inout;
         pop_local_table kf;
         inout
-      | `Reuse counter -> MemExec.find counter
+      | `Reuse counter ->
+        begin
+          try MemExec.find counter
+          with Not_found -> top (* big TODO *)
+        end
       | `Spec _states
       | `Builtin (_states, None) -> compute_using_spec pre_state kf
       | `Builtin (_states, Some (froms,sure_out)) ->
