@@ -2,7 +2,7 @@
 [kernel] Parsing tests/wp_acsl/bitwise.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
-[wp] 29 goals scheduled
+[wp] 35 goals scheduled
 [wp] [Qed] Goal typed_band_ensures : Valid
 [wp] [Qed] Goal typed_band_ensures_band0 : Valid
 [wp] [Qed] Goal typed_band_bit0_ensures_band1 : Valid
@@ -19,6 +19,7 @@
 [wp] [Qed] Goal typed_bxor_ensures : Valid
 [wp] [Qed] Goal typed_bxor_bit1_ensures : Valid
 [wp] [Qed] Goal typed_bxor_bit2_ensures : Valid
+[wp] [Qed] Goal typed_bxor_bit3_ensures : Valid
 [wp] [Qed] Goal typed_bnot_ensures : Valid
 [wp] [Qed] Goal typed_lshift_ensures : Valid
 [wp] [Qed] Goal typed_lshift_shift1_ensures_lsl1 : Valid
@@ -32,18 +33,24 @@
 [wp] [Alt-Ergo] Goal typed_band_bool_false_ensures : Valid
 [wp] [Qed] Goal typed_bxor_bool_true_ensures : Valid
 [wp] [Alt-Ergo] Goal typed_bxor_bool_false_ensures : Valid
-[wp] Proved goals:   29 / 29
-  Qed:            25 
+[wp] [Qed] Goal typed_lemma_check : Valid
+[wp] [Qed] Goal typed_lemma_check_2 : Valid
+[wp] [Qed] Goal typed_lemma_check_3 : Valid
+[wp] [Qed] Goal typed_lemma_check_4 : Valid
+[wp] [Qed] Goal typed_lemma_check_5 : Valid
+[wp] Proved goals:   35 / 35
+  Qed:            31 
   Alt-Ergo:        4
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   band                      8        -        8       100%
   bor                       5        -        5       100%
-  bxor                      3        -        3       100%
+  bxor                      4        -        4       100%
   bnot                      1        -        1       100%
   lshift                    4        -        4       100%
   rshift                    2        -        2       100%
   bor_bool                  -        2        2       100%
   band_bool                 1        1        2       100%
   bxor_bool                 1        1        2       100%
+  lemma                     5        -        5       100%
 ------------------------------------------------------------

@@ -590,6 +590,15 @@ let smp_shift zf = (* f(e1,0)~>e1, c2>0==>f(c1,c2)~>zf(c1,c2), c2>0==>f(0,c2)~>0
     end
   | _ -> raise Not_found
 
+let smp_lnot = function
+  | ([e] as args) -> begin match F.repr e with
+      | Logic.Fun( f , [e] ) when Fun.equal f f_lnot ->
+          (* ~~e ~> e *)
+          e
+      | _ -> smp1 Integer.lognot args
+    end
+  | _ -> raise Not_found
+
 (* -------------------------------------------------------------------------- *)
 (* --- Comparision with L-AND / L-OR / L-NOT                              --- *)
 (* -------------------------------------------------------------------------- *)
@@ -647,11 +656,15 @@ let smp_eq_with_lxor a b = (* b1==(a2^e) <==> (b1^a2)==e *)
           | e1::((_::_) as e22) -> e_eq e1 (e_fun f_lnot [e_fun f_lxor e22])
           | _ -> raise Not_found)
 
-let smp_eq_with_lnot a b = (* b1==~e <==> ~b1==e *)
-  let b1 = match_integer b in
+let smp_eq_with_lnot a b =
   let e = match_ufun f_lnot a in
-  let k1 = Integer.lognot b1 in
-  e_eq (e_zint k1) e
+  try (* b1==~e <==> ~b1==e *)
+    let b1 = match_integer b in
+    let k1 = Integer.lognot b1 in
+    e_eq (e_zint k1) e
+  with Not_found ->(* ~b==~e <==> b==e *)
+    let b = match_ufun f_lnot b in
+    e_eq e b
 
 (* -------------------------------------------------------------------------- *)
 (* --- Comparision with LSL / LSR                                         --- *)
@@ -807,8 +820,7 @@ let () =
            no creation of [e_fun f_bit_stdlib args] *)
         let bi_lbit_stdlib = mk_builtin "f_bit_stdlib" f_bit_stdlib smp_mk_bit_stdlib in
         let bi_lbit = mk_builtin "f_bit" f_bit_positive smp_bitk_positive in
-        let bi_lnot = mk_builtin "f_lnot" f_lnot ~eq:smp_eq_with_lnot
-            (smp1 Integer.lognot) in
+        let bi_lnot = mk_builtin "f_lnot" f_lnot ~eq:smp_eq_with_lnot smp_lnot in
         let bi_lxor = mk_builtin "f_lxor" f_lxor ~eq:smp_eq_with_lxor
             (smp2 f_lxor Integer.logxor) in
         let bi_lor  = mk_builtin "f_lor" f_lor  ~eq:smp_eq_with_lor

@@ -189,10 +189,8 @@ Prove: true.
   Function bxor with behavior bit3
 ------------------------------------------------------------
 
-Goal Post-condition for 'bit3' 'zbit' in 'bxor':
-Let x = lnot(b).
-Assume { Type: is_sint32(b) /\ is_sint32(x) /\ is_sint32(lxor(b, x)). }
-Prove: lnot(x) = b.
+Goal Post-condition for 'bit3' (file tests/wp_acsl/bitwise.i, line 51) in 'bxor':
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -219,6 +217,52 @@ Assume {
   Have: ((a = 0) /\ (b = 1)) \/ ((a = 1) /\ (b = 0)).
 }
 Prove: b != a.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function lemma
+------------------------------------------------------------
+
+Goal Check 'zbit,a1' (file tests/wp_acsl/bitwise.i, line 105):
+Assume { Type: is_uint32(a). }
+Prove: (a + lnot(a)) = (-1).
+
+------------------------------------------------------------
+
+Goal Check 'zbit,a2' (file tests/wp_acsl/bitwise.i, line 106):
+Assume { Type: is_uint32(a). }
+Prove: lor(a, lnot(a)) = (-1).
+
+------------------------------------------------------------
+
+Goal Check 'zbit,a3' (file tests/wp_acsl/bitwise.i, line 107):
+Assume { Type: is_uint32(a). }
+Prove: land(a, lnot(a)) = 0.
+
+------------------------------------------------------------
+
+Goal Check (file tests/wp_acsl/bitwise.i, line 108):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check (file tests/wp_acsl/bitwise.i, line 109):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check (file tests/wp_acsl/bitwise.i, line 110):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check (file tests/wp_acsl/bitwise.i, line 111):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check (file tests/wp_acsl/bitwise.i, line 112):
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------

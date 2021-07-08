@@ -48,7 +48,7 @@ int bor(int a,int b, int c) { return a | b | c ; }
   @   ensures \result == 0;
   @ behavior bit3:
   @   assumes a == ~b;
-  @   ensures zbit: \result == -1;
+  @   ensures \result == -1;
  */ 
 int bxor(int a,int b) { return a ^ b ; }
 
@@ -100,3 +100,14 @@ _Bool band_bool(_Bool a, _Bool b) { return (_Bool)(((int)a & (int)b) != 0); }
   @   ensures \result == 0;
  */
 _Bool bxor_bool(_Bool a, _Bool b) { return (_Bool)(((int)a ^ (int)b) != 0); }
+
+void lemma(unsigned a, unsigned b) {
+  //@ check zbit: a1: ~(a + ~a)  == 0;
+  //@ check zbit: a2: ~(a | ~a)  == 0;
+  //@ check zbit: a3:  (a & ~a)  == 0;
+  //@ check           ~(a ^ ~a)  == 0;
+  //@ check            (a ^  a)  == 0;
+  //@ check           (~a --> a) == a;
+  //@ check           (a --> ~a) == ~a;
+  //@ check           (~a == ~b) ==> (a == b);
+}
