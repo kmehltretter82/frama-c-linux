@@ -1,8 +1,0 @@
-27c27
-< [eva] tests/float/dr.i:26: Frama_C_show_each: {0; 1}, {0; 1}
----
-> [eva] tests/float/dr.i:26: Frama_C_show_each: {1}, {0; 1}
-32c32
-<   e1 ∈ {0; 1}
----
->   e1 ∈ {1}

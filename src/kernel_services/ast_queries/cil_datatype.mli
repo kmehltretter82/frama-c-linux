@@ -124,10 +124,21 @@ module Enumitem: S_with_collections_pretty with type t = enumitem
 *)
 module Wide_string: S_with_collections with type t = int64 list
 
+
 (**
    @since Oxygen-20120901
 *)
-module Constant: S_with_collections_pretty with type t = constant
+module Constant: sig
+  include S_with_collections with type t = constant
+  val pretty_ref: (Format.formatter -> t -> unit) ref
+end
+
+(**
+   Same as {!Constant}, but comparison is strict, in the sense that it will take
+   into account textual representation if provided.
+   @since Frama-C+dev
+*)
+module ConstantStrict: S_with_collections with type t = constant
 
 (** Note that the equality is based on eid. For structural equality, use
     {!ExpStructEq} *)
@@ -137,6 +148,12 @@ module Exp: sig
 end
 
 module ExpStructEq: S_with_collections with type t = exp
+
+(**
+   structural equality, with strict constant comparison as in {!ConstantStrict}
+   @since Frama-C+dev
+*)
+module ExpStructEqStrict: S_with_collections with type t = exp
 
 module Fieldinfo: S_with_collections_pretty with type t = fieldinfo
 
@@ -175,12 +192,24 @@ module Lval: S_with_collections_pretty with type t = lval
 *)
 module LvalStructEq: S_with_collections with type t = lval
 
+(**
+   structural equality, with strict constant comparison as in {!ConstantStrict}
+   @since Frama-C+dev
+*)
+module LvalStructEqStrict: S_with_collections with type t = lval
+
 (** Same remark as for Lval.
     For structural equality, use {!OffsetStructEq}. *)
 module Offset: S_with_collections_pretty with type t = offset
 
 (** @since Oxygen-20120901 *)
 module OffsetStructEq: S_with_collections with type t = offset
+
+(**
+   structural equality, with strict constant comparison as in {!ConstantStrict}
+   @since Frama-C+dev
+*)
+module OffsetStructEqStrict: S_with_collections with type t = offset
 
 module Stmt_Id:  Hptmap.Id_Datatype with type t = stmt
 module Stmt: sig
