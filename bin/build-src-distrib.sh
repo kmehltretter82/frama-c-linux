@@ -299,7 +299,7 @@ function add_event_page {
     echo >> $EVENT_WEBPAGE_PATH
     echo "Main changes with respect to $TEXTUAL_PREVIOUS include:" >> $EVENT_WEBPAGE_PATH
     echo >> $EVENT_WEBPAGE_PATH
-    sed 's/\(\#.*\)/###\1/' $CHANGES >> $EVENT_WEBPAGE_PATH
+    sed 's/\(\#.*\)/#\1/' $CHANGES >> $EVENT_WEBPAGE_PATH
 
     run "git -C $WEBSITE_DIR add $EVENT_WEBPAGE"
 }
