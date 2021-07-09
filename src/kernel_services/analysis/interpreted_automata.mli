@@ -294,49 +294,58 @@ sig
   val transfer : vertex transition ->  t -> t option
 end
 
-(** Builds a simple dataflow analysis over an input domain. *)
-module Dataflow (D : Domain) :
+(** Simple dataflow analysis *)
+module type DataflowAnalysis =
 sig
-  type result = automaton * wto * D.t Vertex.Hashtbl.t
+  type state
+  type result
 
-  val fixpoint : ?wto:wto -> Cil_types.kernel_function ->  D.t -> result
-  val backward_fixpoint : ?wto:wto -> Cil_types.kernel_function ->  D.t -> result
+  val fixpoint : Cil_types.kernel_function ->  state -> result
 
   module Result :
   sig
     (** Extract the result at the entry point of the analysed function *)
-    val at_entry : result -> D.t option
+    val at_entry : result -> state option
 
     (** Extract the result at the return point of the analysed function (just
         after the return transfer function) *)
-    val at_return : result -> D.t option
+    val at_return : result -> state option
 
     (** Extract the result obtained for the control point immediately before the
         given statement *)
-    val before : result -> Cil_types.stmt -> D.t option
+    val before : result -> Cil_types.stmt -> state option
 
     (** Extract the result obtained for the control point immediately after the
         given statement *)
-    val after : result -> Cil_types.stmt -> D.t option
+    val after : result -> Cil_types.stmt -> state option
 
     (** Iter on the results obtained at each vertex of the graph.
         Do nothing  when the vertex is not reachable (for instance if transfer
         returned None) *)
-    val iter_vertex : (vertex -> D.t -> unit) -> result -> unit
+    val iter_vertex : (vertex -> state -> unit) -> result -> unit
 
     (** Iter on the results obtained before each statements of the function.
         Do nothing  when the vertex is not reachable (for instance if transfer
         returned None) *)
-    val iter_stmt : (Cil_types.stmt -> D.t -> unit) -> result -> unit
+    val iter_stmt : (Cil_types.stmt -> state -> unit) -> result -> unit
 
     (** Output result to the given channel. Must be supplied with a pretty
         printer for abstract values *)
-    val to_dot_output : (Format.formatter -> D.t -> unit) ->
+    val to_dot_output : (Format.formatter -> state -> unit) ->
       result -> out_channel -> unit
 
     (** Output result to a file with the given path. Must be supplied with
         pretty printer for abstract values *)
-    val to_dot_file : (Format.formatter -> D.t -> unit) ->
+    val to_dot_file : (Format.formatter -> state -> unit) ->
       result -> Filepath.Normalized.t -> unit
+
+    (** Extract the result as a table from control points to states *)
+    val as_table : result -> state Vertex.Hashtbl.t
   end
 end
+
+module ForwardAnalysis (D : Domain) : DataflowAnalysis
+  with type state = D.t
+
+module BackwardAnalysis (D : Domain) : DataflowAnalysis
+  with type state = D.t

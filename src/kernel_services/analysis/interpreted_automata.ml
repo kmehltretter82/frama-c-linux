@@ -1157,9 +1157,33 @@ sig
   val transfer : vertex transition ->  t -> t option
 end
 
+module type DataflowAnalysis =
+sig
+  type state
+  type result
 
-module Dataflow (D : Domain) =
+  val fixpoint : Cil_types.kernel_function ->  state -> result
+
+  module Result :
+  sig
+    val at_entry : result -> state option
+    val at_return : result -> state option
+    val before : result -> Cil_types.stmt -> state option
+    val after : result -> Cil_types.stmt -> state option
+    val iter_vertex : (vertex -> state -> unit) -> result -> unit
+    val iter_stmt : (Cil_types.stmt -> state -> unit) -> result -> unit
+    val to_dot_output : (Format.formatter -> state -> unit) ->
+      result -> out_channel -> unit
+    val to_dot_file : (Format.formatter -> state -> unit) ->
+      result -> Filepath.Normalized.t -> unit
+    val as_table : result -> state Vertex.Hashtbl.t
+  end
+end
+
+
+module DataflowAnalysis (D : Domain) =
 struct
+  type state = D.t
   type result = automaton * wto * D.t Vertex.Hashtbl.t
 
   module States = Vertex.Hashtbl
@@ -1173,11 +1197,7 @@ struct
        acc *)
     let process_edge (v1,e,v2) acc =
       (* Retrieve origin value *)
-      let value =
-        if forward
-        then States.find_opt results v1
-        else States.find_opt results v2
-      in
+      let value = States.find_opt results (if forward then v1 else v2) in
       let result = Option.bind value (D.transfer e.edge_transition) in
       Option.to_list result @ acc
     in
@@ -1241,13 +1261,6 @@ struct
     iterate_list wto;
     automaton, wto, results
 
-  let fixpoint ?wto kf initial_value =
-    compute ~forward:true kf ?wto initial_value
-
-  let backward_fixpoint ?wto kf initial_value =
-    compute ~forward:false kf ?wto initial_value
-
-
   module Result =
   struct
     module Stmts = Cil_datatype.Stmt.Hashtbl
@@ -1287,5 +1300,24 @@ struct
     let to_dot_file pp_value result filepath =
       let out = open_out (filepath : Filepath.Normalized.t :> string) in
       to_dot_output pp_value result out
+
+    let as_table (_automaton,_wto,states) =
+      states
   end
+end
+
+module ForwardAnalysis (D : Domain) =
+struct
+  include DataflowAnalysis (D)
+
+  let fixpoint kf initial_value =
+    compute ~forward:true kf initial_value
+end
+
+module BackwardAnalysis (D : Domain) =
+struct
+  include DataflowAnalysis (D)
+
+  let fixpoint kf initial_value =
+    compute ~forward:false kf initial_value
 end

@@ -99,7 +99,7 @@ struct
 end
 
 
-module Dataflow = Interpreted_automata.Dataflow (ConstantsDomain)
+module Dataflow = Interpreted_automata.ForwardAnalysis (ConstantsDomain)
 
 let run () =
   let main_kf, _ = Globals.entry_point () in
