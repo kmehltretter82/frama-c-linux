@@ -640,7 +640,7 @@ module Scheduler = Wto.Make (Vertex)
 
 let build_wto ~pref {graph; entry_point} =
   let init = entry_point
-  and succs = fun stmt -> G.succ graph stmt
+  and succs = fun v -> G.succ graph v
   in
   Scheduler.partition ~pref ~init ~succs
 
@@ -1162,7 +1162,7 @@ sig
   type state
   type result
 
-  val fixpoint : Cil_types.kernel_function ->  state -> result
+  val fixpoint : ?wto:wto -> Cil_types.kernel_function -> state -> result
 
   module Result :
   sig
@@ -1188,10 +1188,15 @@ struct
 
   module States = Vertex.Hashtbl
 
-  let compute ~forward kf ?(wto=get_wto kf) initial_value =
-    let automaton = get_automaton kf in
+  let compute ~forward automaton wto initial_value  =
     let graph = automaton.graph in
     let results = States.create (G.nb_vertex graph) in
+
+    let initial_values =
+      match Wto.head wto with
+      | None -> fun _ -> [] (* should not happen *)
+      | Some v -> fun u -> if v == u then [ initial_value ] else []
+    in
 
     (* Compute the transfer function for the given edge and add the result to
        acc *)
@@ -1209,13 +1214,8 @@ struct
         if forward
         then G.fold_pred_e process_edge graph v []
         else G.fold_succ_e process_edge graph v []
-      and initial =
-        if forward && v == automaton.entry_point ||
-           not forward && v == automaton.return_point
-        then [initial_value]
-        else []
       in
-      match initial @ incoming with
+      match initial_values v @ incoming with
       | [] -> (* Zero incoming values -> Bottom *)
         States.remove results v
       | v1 :: vl ->
@@ -1239,9 +1239,7 @@ struct
     in
 
     let rec iterate_list l =
-      if forward
-      then List.iter iterate_element l
-      else List.iter iterate_element (List.rev l)
+      List.iter iterate_element l
     and iterate_element = function
       | Wto.Node v ->
         ignore (process_vertex v)
@@ -1310,14 +1308,36 @@ module ForwardAnalysis (D : Domain) =
 struct
   include DataflowAnalysis (D)
 
-  let fixpoint kf initial_value =
-    compute ~forward:true kf initial_value
+  let build_wto automaton =
+    let init = automaton.entry_point
+    and succs = fun v -> G.succ automaton.graph v
+    and pref = fun _ _ -> 0 in
+    Scheduler.partition ~pref ~init ~succs
+
+  let fixpoint ?wto kf initial_value =
+    let automaton = get_automaton kf in
+    let wto = match wto with
+      | Some wto -> wto
+      | None -> build_wto automaton
+    in
+    compute ~forward:true automaton wto initial_value
 end
 
 module BackwardAnalysis (D : Domain) =
 struct
   include DataflowAnalysis (D)
 
-  let fixpoint kf initial_value =
-    compute ~forward:false kf initial_value
+  let build_wto automaton =
+    let init = automaton.return_point
+    and succs = fun v -> G.pred automaton.graph v
+    and pref = fun _ _ -> 0 in
+    Scheduler.partition ~pref ~init ~succs
+
+  let fixpoint ?wto kf initial_value =
+    let automaton = get_automaton kf in
+    let wto = match wto with
+      | Some wto -> wto
+      | None -> build_wto automaton
+    in
+    compute ~forward:false automaton wto initial_value
 end

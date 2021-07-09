@@ -34,6 +34,11 @@ type 'n component =
 (** A list of strongly connected components, sorted topologically *)
 and 'n partition = 'n component list
 
+let head = function
+  | [] -> None
+  | Component (n,_) :: _ -> Some n
+  | Node n :: _ -> Some n
+
 let fold_heads f acc l =
   let rec partition acc l =
     List.fold_left component acc l
@@ -43,7 +48,6 @@ let fold_heads f acc l =
       partition (f acc h) l
   in
   partition acc l
-
 
 let flatten wto =
   let rec f acc = function

@@ -300,7 +300,7 @@ sig
   type state
   type result
 
-  val fixpoint : Cil_types.kernel_function ->  state -> result
+  val fixpoint : ?wto:wto -> Cil_types.kernel_function ->  state -> result
 
   module Result :
   sig

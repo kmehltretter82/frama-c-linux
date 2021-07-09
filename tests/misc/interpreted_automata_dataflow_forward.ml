@@ -9,10 +9,8 @@ struct
   let top = Map.empty
 
   let pretty fmt v =
-    let pp_entry vi x =
-      Format.fprintf fmt "%s -> %d@." vi.vorig_name x
-    in
-    Map.iter pp_entry v
+    Pretty_utils.pp_iter2 ~sep:"@." ~between:": "
+      Map.iter Cil_datatype.Varinfo.pretty Format.pp_print_int fmt v
 
   let join v1 v2 =
     let merge_entry _vi o1 o2 =
