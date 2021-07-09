@@ -276,6 +276,19 @@ void test_strstr()
   //@assert p == s;
 }
 
+void test_mempcpy()
+{
+  char dest[6], src[6] = "hello";
+  char *p = mempcpy(dest, src, 6);
+  //@assert p == dest + 6;
+  //@assert dest[5] == '\0';
+  char src2[5] = "a\0b\0";
+  p = mempcpy(dest, src2, 3);
+  //@assert p == dest + 3;
+  p = mempcpy(dest, "", 0);
+  //@assert p == dest;
+}
+
 int main(int argc, char **argv)
 {
   test_memcpy();
@@ -298,5 +311,6 @@ int main(int argc, char **argv)
   // strerror not tested
   // strdup not tested (uses malloc)
   // strndup not tested (uses malloc)
+  test_mempcpy();
   return 0;
 }

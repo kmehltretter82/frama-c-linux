@@ -10,7 +10,7 @@
   function strstr: precondition 'valid_string_haystack' got status valid.
 [eva] tests/libc/string_c_strstr.c:52: 
   function strstr: precondition 'valid_string_needle' got status valid.
-[eva] share/libc/string.h:228: 
+[eva] share/libc/string.h:241: 
   function strstr: postcondition 'result_null_or_in_haystack' got status valid.
 [eva] Recording results for strstr
 [eva] Done for function strstr
@@ -68,7 +68,7 @@
   function strstr: precondition 'valid_string_haystack' got status valid.
 [eva] tests/libc/string_c_strstr.c:59: 
   function strstr: precondition 'valid_string_needle' got status valid.
-[eva] share/libc/string.c:266: starting to merge loop iterations
+[eva] share/libc/string.c:292: starting to merge loop iterations
 [eva] Recording results for strstr
 [eva] Done for function strstr
 [eva] computing for function strstr <- main.
@@ -101,9 +101,9 @@
   function strstr: precondition 'valid_string_haystack' got status valid.
 [eva] tests/libc/string_c_strstr.c:64: 
   function strstr: precondition 'valid_string_needle' got status valid.
-[eva] share/libc/string.h:230: 
+[eva] share/libc/string.h:243: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
-[eva:alarm] share/libc/string.h:228: Warning: 
+[eva:alarm] share/libc/string.h:241: Warning: 
   function strstr: postcondition 'result_null_or_in_haystack' got status unknown.
 [eva] Recording results for strstr
 [eva] Done for function strstr

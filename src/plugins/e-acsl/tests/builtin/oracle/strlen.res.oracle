@@ -14,30 +14,30 @@
 [e-acsl] Warning: annotating undefined function `strdup':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-[e-acsl] FRAMAC_SHARE/libc/string.h:471: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:484: Warning: 
   E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:475: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:488: Warning: 
   E-ACSL construct `predicate performing read accesses' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:482: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:495: Warning: 
   E-ACSL construct `predicate performing read accesses' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:471: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:484: Warning: 
   E-ACSL construct `logic functions with labels' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:471: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:484: Warning: 
   Some assumes clauses could not be translated.
   Ignoring complete and disjoint behaviors annotations.
-[e-acsl] FRAMAC_SHARE/libc/string.h:471: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:484: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:478: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:491: Warning: 
   E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:480: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:493: Warning: 
   E-ACSL construct `logic functions performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:480: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:493: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/unistd.h:857: Warning: 

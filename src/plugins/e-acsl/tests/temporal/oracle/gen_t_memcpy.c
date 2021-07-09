@@ -408,7 +408,7 @@ void *__gen_e_acsl_memset(void *s, int c, size_t n)
   __retres = memset(s,c,n);
   __e_acsl_assert(__retres == __gen_e_acsl_at,1,"Postcondition","memset",
                   "result_ptr: \\result == \\old(s)",
-                  "FRAMAC_SHARE/libc/string.h",122);
+                  "FRAMAC_SHARE/libc/string.h",135);
   __e_acsl_delete_block((void *)(& s));
   return __retres;
 }

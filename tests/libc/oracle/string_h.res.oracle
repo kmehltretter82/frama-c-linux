@@ -13,7 +13,7 @@
   function strcmp: precondition 'valid_string_s1' got status valid.
 [eva] tests/libc/string_h.c:5: 
   function strcmp: precondition 'valid_string_s2' got status valid.
-[eva] share/libc/string.h:143: 
+[eva] share/libc/string.h:156: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
 [eva] Done for function strcmp
 [eva:alarm] tests/libc/string_h.c:6: Warning: assertion got status unknown.
@@ -51,7 +51,7 @@
   function strstr: precondition 'valid_string_haystack' got status valid.
 [eva] tests/libc/string_h.c:24: 
   function strstr: precondition 'valid_string_needle' got status valid.
-[eva] share/libc/string.h:230: 
+[eva] share/libc/string.h:243: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva] Done for function strstr
 [eva:alarm] tests/libc/string_h.c:25: Warning: assertion got status unknown.
@@ -325,7 +325,7 @@
 [eva] tests/libc/string_h.c:154: Call to builtin strchr
 [eva] tests/libc/string_h.c:154: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] share/libc/string.h:168: 
+[eva] share/libc/string.h:181: 
   cannot evaluate ACSL term, unsupported logic var p
 [eva] computing for function strchrnul <- main.
   Called from tests/libc/string_h.c:155.
@@ -341,6 +341,21 @@
 [eva] tests/libc/string_h.c:158: 
   function strchrnul: precondition 'valid_string_s' got status valid.
 [eva] Done for function strchrnul
+[eva] computing for function mempcpy <- main.
+  Called from tests/libc/string_h.c:160.
+[eva] using specification for function mempcpy
+[eva] tests/libc/string_h.c:160: 
+  function mempcpy: precondition 'valid_dest' got status valid.
+[eva] tests/libc/string_h.c:160: 
+  function mempcpy: precondition 'valid_src' got status valid.
+[eva] tests/libc/string_h.c:160: 
+  function mempcpy: precondition 'separation' got status valid.
+[eva] share/libc/string.h:114: 
+  cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
+[kernel] tests/libc/string_h.c:160: Warning: using size of 'void'
+[eva] Done for function mempcpy
+[eva:alarm] tests/libc/string_h.c:161: Warning: 
+  assertion 'imprecise' got status unknown.
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -412,4 +427,7 @@
   nul1 ∈ {{ "haystack" + [0..8] }}
   chr2 ∈ {{ NULL ; "haystack" + {1} }}
   nul2 ∈ {{ "haystack" + [0..8] }}
+  pdest[0..8] ∈ [--..--] or UNINITIALIZED
+       [9] ∈ UNINITIALIZED
+  pend ∈ {{ &pdest[9] }}
   __retres ∈ {0}

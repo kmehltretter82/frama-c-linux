@@ -4096,6 +4096,8 @@ void *memrchr(void const *s, int c, size_t n);
 
 void *memcpy(void * restrict dest, void const * restrict src, size_t n);
 
+void *mempcpy(void * restrict dest, void const * restrict src, size_t n);
+
 void *memmove(void *dest, void const *src, size_t n);
 
 void *memset(void *s, int c, size_t n);
@@ -4337,19 +4339,7 @@ char *strncpy(char *dest, char const *src, size_t n);
  */
 size_t strlcpy(char * restrict dest, char const * restrict src, size_t n);
 
-/*@ requires valid_string_src: valid_read_string(src);
-    requires room_string: \valid(dest + (0 .. strlen(src)));
-    requires
-      separation:
-        \separated(dest + (0 .. strlen(src)), src + (0 .. strlen(src)));
-    ensures equal_contents: strcmp(\old(dest), \old(src)) ≡ 0;
-    ensures points_to_end: \result ≡ \old(dest) + strlen(\old(dest));
-    assigns *(dest + (0 .. strlen{Old}(src))), \result;
-    assigns *(dest + (0 .. strlen{Old}(src)))
-      \from *(src + (0 .. strlen{Old}(src)));
-    assigns \result \from dest;
- */
-extern char *stpcpy(char * restrict dest, char const * restrict src);
+char *stpcpy(char *dest, char const *src);
 
 char *strcat(char *dest, char const *src);
 
@@ -5667,6 +5657,42 @@ void *memcpy(void * restrict dest, void const * restrict src, size_t n)
   return dest;
 }
 
+/*@ requires valid_dest: valid_or_empty(dest, n);
+    requires valid_src: valid_read_or_empty(src, n);
+    requires
+      separation:
+        \separated((char *)dest + (0 .. n - 1), (char *)src + (0 .. n - 1));
+    ensures
+      copied_contents:
+        memcmp{Post, Pre}((char *)\old(dest), (char *)\old(src), \old(n)) ≡
+        0;
+    ensures result_next_byte: \result ≡ \old(dest) + \old(n);
+    assigns *((char *)dest + (0 .. n - 1)), \result;
+    assigns *((char *)dest + (0 .. n - 1))
+      \from *((char *)src + (0 .. n - 1));
+    assigns \result \from dest, n;
+ */
+void *mempcpy(void * restrict dest, void const * restrict src, size_t n)
+{
+  void *__retres;
+  size_t i;
+  i = (unsigned int)0;
+  /*@ loop invariant no_eva: 0 ≤ i ≤ n;
+      loop invariant
+        no_eva:
+          ∀ ℤ k;
+            0 ≤ k < i ⇒ *((char *)dest + k) ≡ *((char *)src + k);
+      loop assigns i, *((char *)dest + (0 .. n - 1));
+      loop variant n - i;
+  */
+  while (i < n) {
+    *((char *)dest + i) = *((char *)src + i);
+    i += (size_t)1;
+  }
+  __retres = (void *)((char *)dest + i);
+  return __retres;
+}
+
 /*@ assigns \result;
     assigns \result \from (indirect: p), (indirect: q), (indirect: n);
     
@@ -6111,6 +6137,32 @@ char *strcpy(char *dest, char const *src)
   }
   *(dest + i) = (char)0;
   return dest;
+}
+
+/*@ requires valid_string_src: valid_read_string(src);
+    requires room_string: \valid(dest + (0 .. strlen(src)));
+    requires
+      separation:
+        \separated(dest + (0 .. strlen(src)), src + (0 .. strlen(src)));
+    ensures equal_contents: strcmp(\old(dest), \old(src)) ≡ 0;
+    ensures points_to_end: \result ≡ \old(dest) + strlen(\old(dest));
+    assigns *(dest + (0 .. strlen{Old}(src))), \result;
+    assigns *(dest + (0 .. strlen{Old}(src)))
+      \from *(src + (0 .. strlen{Old}(src)));
+    assigns \result \from dest;
+ */
+char *stpcpy(char *dest, char const *src)
+{
+  char *__retres;
+  size_t i;
+  i = (unsigned int)0;
+  while ((int)*(src + i) != 0) {
+    *(dest + i) = *(src + i);
+    i += (size_t)1;
+  }
+  *(dest + i) = (char)0;
+  __retres = dest + i;
+  return __retres;
 }
 
 /*@ requires valid_nstring_src: valid_read_nstring(src, n);

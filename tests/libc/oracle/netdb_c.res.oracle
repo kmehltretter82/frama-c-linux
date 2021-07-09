@@ -18,6 +18,7 @@
   \return(ttyname) == 0 (auto)
   \return(memchr) == 0 (auto)
   \return(memcpy) == 0 (auto)
+  \return(mempcpy) == 0 (auto)
   \return(memmove) == 0 (auto)
   \return(memset) == 0 (auto)
   \return(strchr) == 0 (auto)
@@ -57,7 +58,7 @@
 [eva] tests/libc/netdb_c.c:25: Call to builtin memset
 [eva] tests/libc/netdb_c.c:25: 
   function memset: precondition 'valid_s' got status valid.
-[eva] share/libc/string.h:121: 
+[eva] share/libc/string.h:134: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] computing for function getaddrinfo <- main.
   Called from tests/libc/netdb_c.c:34.
@@ -136,7 +137,7 @@
   function strcpy: precondition 'room_string' got status valid.
 [eva] share/libc/netdb.c:74: 
   function strcpy: precondition 'separation' got status valid.
-[eva] share/libc/string.h:360: 
+[eva] share/libc/string.h:373: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
 [eva] Done for function strcpy
 [eva] Recording results for getaddrinfo
@@ -263,7 +264,7 @@
   function strncpy: precondition 'room_nstring' got status valid.
 [eva] share/libc/netdb.c:149: 
   function strncpy: precondition 'separation' got status valid.
-[eva] share/libc/string.h:376: 
+[eva] share/libc/string.h:389: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
 [eva] Done for function strncpy
 [eva] Recording results for gethostbyname
