@@ -555,9 +555,8 @@ and compare_type config t1 t2 =
 and compare_arg_list  config l1 l2 =
   Option.compare
     (compare_list
-       (fun (_n1, t1, l1) (_n2, t2, l2) ->
-          (compare_chain (compare_type config) t1 t2
-             (compare_attributes config)) l1 l2
+       (fun (_n1, t1, _l1) (_n2, t2, _l2) ->
+          compare_type config t1 t2
        )) l1 l2
 
 let hash_attribute _config = function
