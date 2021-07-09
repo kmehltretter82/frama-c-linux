@@ -299,7 +299,7 @@ function add_event_page {
     echo >> $EVENT_WEBPAGE_PATH
     echo "Main changes with respect to $TEXTUAL_PREVIOUS include:" >> $EVENT_WEBPAGE_PATH
     echo >> $EVENT_WEBPAGE_PATH
-    sed 's/\(\#.*\)/###\1/' $CHANGES >> $EVENT_WEBPAGE_PATH
+    sed 's/\(\#.*\)/#\1/' $CHANGES >> $EVENT_WEBPAGE_PATH
 
     run "git -C $WEBSITE_DIR add $EVENT_WEBPAGE"
 }
@@ -448,10 +448,14 @@ function add_downloads {
     # Source distribution:
     run "cp $OUT_DIR/$TARGZ_FILENAME $DOWNLOAD_DIR"
     run "git -C $WEBSITE_DIR add $DOWNLOAD_PATH/$TARGZ_FILENAME"
+    if test "$FINAL_RELEASE" = "yes"; then
+        run "cp $OUT_DIR/$TARGZ_FILENAME $DOWNLOAD_DIR/frama-c-source-dist.tar.gz"
+        run "git -C $WEBSITE_DIR add $DOWNLOAD_PATH/frama-c-source-dist.tar.gz"
+    fi
 
     # API
-    run "cp $OUT_DIR/frama-c-api.tar.gz $DOWNLOAD_DIR/frama-c-api-$FRAMAC_VERSION_AND_CODENAME.tar.gz"
-    run "git -C $WEBSITE_DIR add $DOWNLOAD_PATH/frama-c-api-$FRAMAC_VERSION_AND_CODENAME.tar.gz"
+    run "cp $OUT_DIR/frama-c-api.tar.gz $DOWNLOAD_DIR/frama-c-$FRAMAC_VERSION_AND_CODENAME-api.tar.gz"
+    run "git -C $WEBSITE_DIR add $DOWNLOAD_PATH/frama-c-$FRAMAC_VERSION_AND_CODENAME-api.tar.gz"
 }
 
 function fill_website {
@@ -787,7 +791,7 @@ case "${STEP}" in
     9)
         step 9 "GENERATE OPAM FILE"
         assert_out_dir
-        run "cp opam/opam $OUT_DIR/opam"
+        cat opam/opam | grep -v "^version\:" | grep -v "^name\:" > $OUT_DIR/opam
         echo >> "$OUT_DIR/opam"
         echo "url {" >> "$OUT_DIR/opam"
         echo "  src: \"https://git.frama-c.com/pub/frama-c/-/wikis/downloads/$TARGZ_FILENAME\"" >> "$OUT_DIR/opam"
