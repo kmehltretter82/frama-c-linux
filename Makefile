@@ -904,11 +904,10 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode value_parameters \
 	partitioning/partitioning_index partitioning/trace_partitioning \
 	engine/mem_exec engine/iterator engine/initialization \
 	engine/compute_functions engine/analysis register \
-	api/general_requests \
-	utils/unit_tests \
-	api/values_request \
 	domains/taint_domain \
-	$(APRON_CMO) $(NUMERORS_CMO)
+	$(APRON_CMO) $(NUMERORS_CMO) \
+	api/general_requests api/values_request \
+	utils/unit_tests
 PLUGIN_CMI:= values/abstract_value values/abstract_location \
 	domains/abstract_domain domains/simpler_domains
 PLUGIN_DEPENDENCIES:=Callgraph LoopAnalysis RteGen Server

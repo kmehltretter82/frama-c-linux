@@ -94,6 +94,24 @@ let add_red_property ki ip =
       add_red_ap Kglobal (Prop ip')
     | _ -> add_red_ap ki (Prop ip)
 
+let is_red ip =
+  let kinstr = Property.get_kinstr ip in
+  let ap =
+    match ip with
+    | Property.IPCodeAnnot ica ->
+      begin
+        match Alarms.find ica.ica_ca with
+        | Some a -> Alarm a
+        | None -> Prop ip
+      end
+    | _ -> Prop ip
+  in
+  try
+    let map = RedStatusesTable.find kinstr in
+    let callstacks = AlarmOrProp.Map.find ap map in
+    not (Callstacks.is_empty callstacks)
+  with Not_found -> false
+
 let is_red_in_callstack kinstr ap callstack =
   try
     let map = RedStatusesTable.find kinstr in
