@@ -1180,17 +1180,22 @@ sig
   end
 end
 
+module type DataflowAutomaton =
+sig
+  val nb_vertex : graph -> int
+  val fold_pred : (vertex -> vertex edge -> 'a -> 'a) ->
+    graph -> vertex -> 'a -> 'a
+end
 
-module DataflowAnalysis (D : Domain) =
+module DataflowAnalysis (A : DataflowAutomaton) (D : Domain) =
 struct
   type state = D.t
   type result = automaton * wto * D.t Vertex.Hashtbl.t
 
   module States = Vertex.Hashtbl
 
-  let compute ~forward automaton wto initial_value  =
-    let graph = automaton.graph in
-    let results = States.create (G.nb_vertex graph) in
+  let compute automaton wto initial_value  =
+    let results = States.create (A.nb_vertex automaton.graph) in
 
     let initial_values =
       match Wto.head wto with
@@ -1200,9 +1205,9 @@ struct
 
     (* Compute the transfer function for the given edge and add the result to
        acc *)
-    let process_edge (v1,e,v2) acc =
+    let process_edge v e acc =
       (* Retrieve origin value *)
-      let value = States.find_opt results (if forward then v1 else v2) in
+      let value = States.find_opt results v in
       let result = Option.bind value (D.transfer e.edge_transition) in
       Option.to_list result @ acc
     in
@@ -1210,11 +1215,7 @@ struct
     (* Compute the abstract value for the given control point ; compute all
        incoming transfer functions *)
     let process_vertex v =
-      let incoming =
-        if forward
-        then G.fold_pred_e process_edge graph v []
-        else G.fold_succ_e process_edge graph v []
-      in
+      let incoming = A.fold_pred process_edge automaton.graph v [] in
       match initial_values v @ incoming with
       | [] -> (* Zero incoming values -> Bottom *)
         States.remove results v
@@ -1306,7 +1307,15 @@ end
 
 module ForwardAnalysis (D : Domain) =
 struct
-  include DataflowAnalysis (D)
+  module A =
+  struct
+    let nb_vertex = G.nb_vertex
+    let fold_pred f =
+      let f' (v,t,_) = f v t in
+      G.fold_pred_e f'
+  end
+
+  include DataflowAnalysis (A) (D)
 
   let build_wto automaton =
     let init = automaton.entry_point
@@ -1320,12 +1329,20 @@ struct
       | Some wto -> wto
       | None -> build_wto automaton
     in
-    compute ~forward:true automaton wto initial_value
+    compute automaton wto initial_value
 end
 
 module BackwardAnalysis (D : Domain) =
 struct
-  include DataflowAnalysis (D)
+  module A =
+  struct
+    let nb_vertex = G.nb_vertex
+    let fold_pred f =
+      let f' (_,t,v) = f v t in
+      G.fold_succ_e f'
+  end
+
+  include DataflowAnalysis (A) (D)
 
   let build_wto automaton =
     let init = automaton.return_point
@@ -1339,5 +1356,5 @@ struct
       | Some wto -> wto
       | None -> build_wto automaton
     in
-    compute ~forward:false automaton wto initial_value
+    compute automaton wto initial_value
 end
