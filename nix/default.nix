@@ -254,7 +254,7 @@ pkgs.lib.makeExtensible
         installPhase = ''
                true
         '';
-  };
+  } // { other-opam-selection = "main"; };
 
   e-acsl-tests-dev = mk_deriv {
         name = "frama-c-e-acsl-tests-dev";
