@@ -1180,22 +1180,15 @@ sig
   end
 end
 
-module type DataflowAutomaton =
-sig
-  val nb_vertex : graph -> int
-  val fold_pred : (vertex -> vertex edge -> 'a -> 'a) ->
-    graph -> vertex -> 'a -> 'a
-end
-
-module DataflowAnalysis (A : DataflowAutomaton) (D : Domain) =
+module DataflowAnalysis (D : Domain) =
 struct
   type state = D.t
   type result = automaton * wto * D.t Vertex.Hashtbl.t
 
   module States = Vertex.Hashtbl
 
-  let compute automaton wto initial_value  =
-    let results = States.create (A.nb_vertex automaton.graph) in
+  let compute ~fold_pred automaton wto initial_value  =
+    let results = States.create (G.nb_vertex automaton.graph) in
 
     let initial_values =
       match Wto.head wto with
@@ -1215,7 +1208,7 @@ struct
     (* Compute the abstract value for the given control point ; compute all
        incoming transfer functions *)
     let process_vertex v =
-      let incoming = A.fold_pred process_edge automaton.graph v [] in
+      let incoming = fold_pred process_edge automaton.graph v [] in
       match initial_values v @ incoming with
       | [] -> (* Zero incoming values -> Bottom *)
         States.remove results v
@@ -1307,15 +1300,7 @@ end
 
 module ForwardAnalysis (D : Domain) =
 struct
-  module A =
-  struct
-    let nb_vertex = G.nb_vertex
-    let fold_pred f =
-      let f' (v,t,_) = f v t in
-      G.fold_pred_e f'
-  end
-
-  include DataflowAnalysis (A) (D)
+  include DataflowAnalysis (D)
 
   let build_wto automaton =
     let init = automaton.entry_point
@@ -1324,25 +1309,21 @@ struct
     Scheduler.partition ~pref ~init ~succs
 
   let fixpoint ?wto kf initial_value =
+    let fold_pred f =
+      let f' (v,t,_) = f v t in
+      G.fold_pred_e f'
+    in
     let automaton = get_automaton kf in
     let wto = match wto with
       | Some wto -> wto
       | None -> build_wto automaton
     in
-    compute automaton wto initial_value
+    compute ~fold_pred automaton wto initial_value
 end
 
 module BackwardAnalysis (D : Domain) =
 struct
-  module A =
-  struct
-    let nb_vertex = G.nb_vertex
-    let fold_pred f =
-      let f' (_,t,v) = f v t in
-      G.fold_succ_e f'
-  end
-
-  include DataflowAnalysis (A) (D)
+  include DataflowAnalysis (D)
 
   let build_wto automaton =
     let init = automaton.return_point
@@ -1351,10 +1332,14 @@ struct
     Scheduler.partition ~pref ~init ~succs
 
   let fixpoint ?wto kf initial_value =
+    let fold_pred f =
+      let f' (_,t,v) = f v t in
+      G.fold_succ_e f'
+    in
     let automaton = get_automaton kf in
     let wto = match wto with
       | Some wto -> wto
       | None -> build_wto automaton
     in
-    compute automaton wto initial_value
+    compute ~fold_pred automaton wto initial_value
 end
