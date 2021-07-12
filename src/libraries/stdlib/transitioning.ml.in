@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* Generated file. The file to update is [transitioning.ml.in] *)
+
 module List = struct
 
   let concat_map f l =
@@ -29,5 +31,8 @@ module List = struct
         let xs = f x in
         aux f (List.rev_append xs acc) l
     in aux f [] l
+
+  let equal f l1 l2 =
+    l1 == l2 || try List.for_all2 f l1 l2 with Invalid_argument _ -> false
 
 end

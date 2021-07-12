@@ -20,10 +20,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** This file contains functions that uses features that are deprecated in
-    current OCaml version, but whose replacing feature is not available in
-    the oldest OCaml version officially supported by Frama-C. Be sure to
-    update it when support for a given version is dropped.
+(** This file contains functions available in recent OCaml releases but
+    unavailable in the oldest OCaml version officially supported by Frama-C. Be
+    sure to update it when support for a given version is dropped.
 
     Functions are grouped according to the module of the stdlib they
     emulate. The mentioned OCaml version indicate when the function was
@@ -36,4 +35,7 @@
 module List: sig
   (** since 4.10.0 *)
   val concat_map: ('a -> 'b list) -> 'a list -> 'b list
+
+  (** since 4.12.0 *)
+  val equal: ('a -> 'a -> bool) -> 'a list -> 'a list -> bool
 end
