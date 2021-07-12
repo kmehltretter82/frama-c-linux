@@ -299,8 +299,8 @@ LONGOPTIONS="help,compile,compile-only,debug:,ocode:,oexec:,verbose:,
   frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:,
   print-mmodels,rt-debug,rte-select:,then,e-acsl-extra:,check,fail-with-code:,
   temporal,weak-validity,stack-size:,heap-size:,rt-verbose,free-valid-address,
-  external-assert:,validate-format-strings,no-trace,libc-replacements,
-  with-dlmalloc:,dlmalloc-from-sources,dlmalloc-compile-only,
+  external-assert:,assert-print-data,validate-format-strings,no-trace,
+  libc-replacements,with-dlmalloc:,dlmalloc-from-sources,dlmalloc-compile-only,
   dlmalloc-compile-flags:,odlmalloc:,ar:,ranlib:,mbits:"
 SHORTOPTIONS="h,c,C,d:,D,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,I:,G:,X,a:,T,k,V"
 # Prefix for an error message due to wrong arguments
@@ -348,6 +348,7 @@ OPTION_STACK_SIZE=32      # Size of a heap shadow space (in MB)
 OPTION_HEAP_SIZE=128      # Size of a stack shadow space (in MB)
 OPTION_KEEP_GOING=        # Report failing assertions but do not abort execution
 OPTION_EXTERNAL_ASSERT="" # Use custom definition of assert function
+OPTION_ASSERT_PRINT_DATA= # Print data contributing to a failed runtime assertion
 OPTION_WITH_DLMALLOC=""                  # Use provided dlmalloc library
 OPTION_DLMALLOC_FROM_SOURCES=            # Compile dlmalloc from sources
 OPTION_DLMALLOC_COMPILE_ONLY=            # Only compile dlmalloc
@@ -656,6 +657,11 @@ do
       OPTION_EXTERNAL_ASSERT="$1"
       shift;
     ;;
+    # Print data contributing to a failed runtime assertion
+    --assert-print-data)
+      shift;
+      OPTION_ASSERT_PRINT_DATA="-e-acsl-assert-print-data"
+    ;;
     # Check output format functions
     --validate-format-strings)
       shift;
@@ -955,6 +961,7 @@ if [ -n "$OPTION_EACSL" ]; then
     $OPTION_VERBOSE
     $OPTION_DEBUG
     $OPTION_VALIDATE_FORMAT_STRINGS
+    $OPTION_ASSERT_PRINT_DATA
     -e-acsl-share="$EACSL_SHARE"
     -then-last"
 fi
