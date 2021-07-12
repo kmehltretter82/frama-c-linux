@@ -94,29 +94,42 @@ val register_pred:
     [register]. *)
 
 val runtime_check:
+  adata:t ->
   pred_kind:predicate_kind ->
   Smart_stmt.annotation_kind ->
   kernel_function ->
+  Env.t ->
   exp ->
   predicate ->
-  stmt
-(** [runtime_check ~pred_kind kind kf e p] generates a runtime check for
-    predicate [p] by building a call to [__e_acsl_assert]. [e] (or [!e] if
-    [reverse] is set to [true]) is the C translation of [p], [kf] is the current
-    kernel_function, [kind] is the annotation kind of [p] and [pred_kind]
-    indicates if the assert should be blocking or not. *)
+  stmt * Env.t
+(** [runtime_check ~adata ~pred_kind kind kf env e p] generates a runtime check
+    for predicate [p] by building a call to [__e_acsl_assert]. [e] (or [!e] if
+    [reverse] is set to [true]) is the C translation of [p].
+    [adata] is the assertion context holding the data contributing to the
+    assertion.
+    [pred_kind] indicates if the assert should be blocking or not.
+    [kind] is the annotation kind of [p].
+    [kf] is the current kernel_function.
+    [env] is the current environment. *)
 
 val runtime_check_with_msg:
+  adata:t ->
   loc:location ->
   string ->
   pred_kind:predicate_kind ->
   Smart_stmt.annotation_kind ->
   kernel_function ->
+  Env.t ->
   exp ->
-  stmt
-(** [runtime_check_with_msg ~loc msg ~pred_kind kind kf e] generates a runtime
-    check for [e] (or [!e] if [reverse] is [true]) by building a call to
-    [__e_acsl_assert]. [msg] is the message printed if the runtime check fails.
+  stmt * Env.t
+(** [runtime_check_with_msg ~adata ~loc msg ~pred_kind kind kf env e] generates
+    a runtime check for [e] (or [!e] if [reverse] is [true]) by building a call
+    to [__e_acsl_assert].
+    [adata] is the assertion context holding the data contributing to the
+    assertion.
     [loc] is the location printed in the message if the runtime check fails.
-    [kf] is the current kernel_function, [kind] is the annotation kind of [p]
-    and [pred_kind] indicates if the assert should be blocking or not. *)
+    [msg] is the message printed if the runtime check fails.
+    [pred_kind] indicates if the assert should be blocking or not.
+    [kind] is the annotation kind of [p].
+    [kf] is the current kernel_function.
+    [env] is the current environment. *)
