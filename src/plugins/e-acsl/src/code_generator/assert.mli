@@ -1,0 +1,94 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
+(*                                                                        *)
+(*  Copyright (C) 2012-2020                                               *)
+(*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
+(*         alternatives)                                                  *)
+(*                                                                        *)
+(*  you can redistribute it and/or modify it under the terms of the GNU   *)
+(*  Lesser General Public License as published by the Free Software       *)
+(*  Foundation, version 2.1.                                              *)
+(*                                                                        *)
+(*  It is distributed in the hope that it will be useful,                 *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *)
+(*  GNU Lesser General Public License for more details.                   *)
+(*                                                                        *)
+(*  See the GNU Lesser General Public License version 2.1                 *)
+(*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
+(*                                                                        *)
+(**************************************************************************)
+
+(** Module with the context to hold the data contributing to an assertion and
+    general functions to create assertion statements. *)
+
+open Cil_types
+
+type t
+(** Type to hold the data contributing to an assertion. *)
+
+val empty: loc:location -> kernel_function -> Env.t -> t * Env.t
+(** Empty assertion context. *)
+
+val no_data: t
+(** No data assertion context.
+
+    Contrary to an empty assertion context, a "no data" assertion context will
+    always have no data in it, even when calling [register] on it. The goal is
+    to have a context to pass to functions that need one even if we do not need
+    it afterwards. For instance there is no following assertion statement. *)
+
+
+val with_data_from: loc:location -> kernel_function -> Env.t -> t -> t * Env.t
+(** [with_data_from ~loc kf env from] creates a new assertion context with the
+    same data than the [from] assertion context.
+    If [from] is a "no data" assertion context, then the new context is also a
+    "no data" assertion context. *)
+
+val merge_right: loc:location -> kernel_function -> Env.t -> t -> t -> t * Env.t
+(** [merge_right ~loc kf env adata1 adata2] merges the assertion data of
+    [adata1] into [adata2] if [adata2] is not a "no data" assertion context. *)
+
+val register:
+  loc:location ->
+  kernel_function ->
+  Env.t ->
+  ?force:bool ->
+  string ->
+  exp ->
+  t ->
+  t * Env.t
+(** [register ~loc kf env ?force name e adata] registers the data [e]
+    corresponding to the name [name] to the assertion context [adata].
+    If [force] is false (default), the data is not registered if the expression
+    is a constant. If [force] is true, the data is registered even if the
+    expression is a constant. *)
+
+val register_term:
+  loc:location ->
+  kernel_function ->
+  Env.t ->
+  ?force:bool ->
+  term ->
+  exp ->
+  t ->
+  t * Env.t
+(** [register_term ~loc kf env ?force t e adata] registers the data [e]
+    corresponding to the term [t] to the assertion context [adata]. The
+    parameter [force] has the same signification than for the function
+    [register]. *)
+
+val register_pred:
+  loc:location ->
+  kernel_function ->
+  Env.t ->
+  ?force:bool ->
+  predicate ->
+  exp ->
+  t ->
+  t * Env.t
+(** [register_pred ~loc kf env ?force p e adata] registers the data [e]
+    corresponding to the predicate [p] to the assertion context [adata]. The
+    parameter [force] has the same signification than for the function
+    [register]. *)
