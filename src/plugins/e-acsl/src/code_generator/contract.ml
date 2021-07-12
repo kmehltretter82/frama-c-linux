@@ -108,8 +108,12 @@ end = struct
 
   let set_assumes ~loc env kf contract idx assumes =
     let idx_e = Cil.integer ~loc idx in
-    let assumes_e, env =
-      Translate.generalized_untyped_predicate_to_exp kf env assumes
+    let assumes_e, _, env =
+      Translate.generalized_untyped_predicate_to_exp
+        ~adata:Assert.no_data
+        kf
+        env
+        assumes
     in
     Env.add_stmt
       env
@@ -357,17 +361,21 @@ let check_requires kf kinstr env contract =
                    { requires with pred_name = b.b_name :: requires.pred_name }
                  in
                  (* Create runtime check *)
-                 let requires_e, env =
+                 let adata, env = Assert.empty ~loc kf env in
+                 let requires_e, adata, env =
                    Translate.generalized_untyped_predicate_to_exp
+                     ~adata
                      kf
                      env
                      requires
                  in
-                 let stmt =
+                 let stmt, env =
                    Assert.runtime_check
+                     ~adata
                      ~pred_kind
                      Smart_stmt.Precondition
                      kf
+                     env
                      requires_e
                      requires
                  in
@@ -497,17 +505,29 @@ let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf kinstr env co
       in
 
       (* Create assertions for complete and disjoint behaviors checks *)
-      let create_assert_stmt bop msg =
+      let create_assert_stmt env bop msg =
+        let adata, env = Assert.empty ~loc kf env in
+        let adata, env =
+          Assert.register
+            ~loc
+            kf
+            env
+            "number of active behaviors"
+            active_bhvrs_e
+            adata
+        in
         Assert.runtime_check_with_msg
+          ~adata
           ~loc
           msg
           ~pred_kind:Assert
           (Env.annotation_kind env)
           kf
+          env
           (Cil.mkBinOp ~loc bop active_bhvrs_e (Cil.one ~loc))
       in
-      let assert_complete_stmt = create_assert_stmt Ge complete_msg in
-      let assert_disjoint_stmt = create_assert_stmt Le disjoint_msg in
+      let assert_complete_stmt, env = create_assert_stmt env Ge complete_msg in
+      let assert_disjoint_stmt, env = create_assert_stmt env Le disjoint_msg in
 
       if must_translate_complete && must_translate_disjoint then
         (* Build an enclosing [if] if both complete and disjoint must be checked
@@ -662,17 +682,21 @@ let check_post_conds kf kinstr env contract =
                          pred_name = b.b_name :: post_cond.pred_name }
                      in
                      (* Create runtime check *)
-                     let post_cond_e, env =
+                     let adata, env = Assert.empty ~loc kf env in
+                     let post_cond_e, adata, env =
                        Translate.generalized_untyped_predicate_to_exp
+                         ~adata
                          kf
                          env
                          post_cond
                      in
-                     let stmt =
+                     let stmt, env =
                        Assert.runtime_check
+                         ~adata
                          ~pred_kind
                          Smart_stmt.Postcondition
                          kf
+                         env
                          post_cond_e
                          post_cond
                      in

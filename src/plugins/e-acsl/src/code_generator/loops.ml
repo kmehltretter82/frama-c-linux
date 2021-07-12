@@ -32,12 +32,23 @@ let translate_predicate_ref
   = Extlib.mk_fun "translate_predicate_ref"
 
 let predicate_to_exp_ref
-  : (kernel_function -> Env.t -> predicate -> exp * Env.t) ref
-  = Extlib.mk_fun "predicate_to_exp_ref"
+  : (adata:Assert.t ->
+     kernel_function ->
+     Env.t ->
+     predicate ->
+     exp * Assert.t * Env.t) ref
+  =
+  ref (fun ~adata:_ _kf _env _p ->
+      Extlib.mk_labeled_fun "predicate_to_exp_ref")
 
 let term_to_exp_ref
-  : (kernel_function -> Env.t -> term -> exp * Env.t) ref
-  = Extlib.mk_fun "term_to_exp_ref"
+  : (adata:Assert.t ->
+     kernel_function ->
+     Env.t ->
+     term ->
+     exp * Assert.t * Env.t) ref
+  =
+  ref (fun ~adata:_ _kf _env _t -> Extlib.mk_labeled_fun "term_to_exp_ref")
 
 (**************************************************************************)
 (************************* Loop annotations *******************************)
@@ -57,7 +68,7 @@ let handle_annotations env kf stmt =
              Typing.type_term ~use_gmp_opt:true t;
              let ty = Typing.get_typ t in
              if Gmp_types.is_t ty then Error.not_yet "loop variant using GMP";
-             let e, env = !term_to_exp_ref kf env t in
+             let e, _, env = !term_to_exp_ref ~adata:Assert.no_data kf env t in
              let vi_old, e_old, env =
                Env.new_var
                  ~loc
@@ -96,9 +107,14 @@ let handle_annotations env kf stmt =
                 term_type = Linteger;}
             in
             Typing.type_term ~use_gmp_opt:true tapp;
-            let e, env = !term_to_exp_ref kf env t in
-            let e_tapp, env =
-              Logic_functions.tapp_to_exp kf env ~eargs:[e_old; e] tapp
+            let e, _, env = !term_to_exp_ref ~adata:Assert.no_data kf env t in
+            let e_tapp, _, env =
+              Logic_functions.tapp_to_exp
+                ~adata:Assert.no_data
+                kf
+                env
+                ~eargs:[e_old; e]
+                tapp
             in
             let msg =
               Format.asprintf
@@ -107,13 +123,34 @@ let handle_annotations env kf stmt =
                 Printer.pp_term t_old
                 Printer.pp_term t
             in
-            let stmt =
+            let adata, env = Assert.empty ~loc kf env in
+            let adata, env =
+              Assert.register
+                ~loc
+                kf
+                env
+                (Format.asprintf "old %a" Printer.pp_term t_old)
+                e_old
+                adata
+            in
+            let adata, env =
+              Assert.register
+                ~loc
+                kf
+                env
+                (Format.asprintf "current %a" Printer.pp_term t)
+                e
+                adata
+            in
+            let stmt, env =
               Assert.runtime_check_with_msg
+                ~adata
                 ~loc
                 msg
                 ~pred_kind:Assert
                 Smart_stmt.Variant
                 kf
+                env
                 e_tapp
             in
             let blk, env =
@@ -128,41 +165,83 @@ let handle_annotations env kf stmt =
               Logic_const.prel ~loc (Rge, t_old, Logic_const.tinteger ~loc 0)
             in
             Typing.type_named_predicate ~must_clear:true variant_pos;
-            let variant_pos_e, env = !predicate_to_exp_ref kf env variant_pos in
+            let variant_pos_e, _, env =
+              !predicate_to_exp_ref ~adata:Assert.no_data kf env variant_pos
+            in
             let msg1 =
               Format.asprintf
                 "(old %a) %a 0"
                 Printer.pp_term t
                 Printer.pp_relation Rge
             in
+            let adata1, env = Assert.empty ~loc kf env in
+            let adata1, env =
+              Assert.register
+                ~loc
+                kf
+                env
+                (Format.asprintf "old %a" Printer.pp_term t)
+                e_old
+                adata1
+            in
+            let e_old_ge_zero_stmt, env =
+              Assert.runtime_check_with_msg
+                ~adata:adata1
+                ~loc
+                msg1
+                ~pred_kind:Assert
+                Smart_stmt.Variant
+                kf
+                env
+                variant_pos_e
+            in
             let variant_dec =
               Logic_const.prel ~loc (Rgt, t_old, t)
             in
             Typing.type_named_predicate ~must_clear:true variant_dec;
-            let variant_dec_e, env = !predicate_to_exp_ref kf env variant_dec in
+            let variant_dec_e, _, env =
+              !predicate_to_exp_ref ~adata:Assert.no_data kf env variant_dec
+            in
             let msg2 =
               Format.asprintf
                 "(old %a) > %a"
                 Printer.pp_term t
                 Printer.pp_term t
             in
+            let adata2, env = Assert.with_data_from ~loc kf env adata1 in
+            let adata2, env =
+              if Options.Assert_print_data.get () then
+                (* To be able to display to the user a meaningful message for
+                   the old value and the current value, we need to retrieve the
+                   expression for the term [t]. *)
+                let e, _, env =
+                  !term_to_exp_ref ~adata:Assert.no_data kf env t
+                in
+                Assert.register
+                  ~loc
+                  kf
+                  env
+                  (Format.asprintf "current %a" Printer.pp_term t)
+                  e
+                  adata2
+              else
+                adata2, env
+            in
+            let e_old_gt_e_stmt, env =
+              Assert.runtime_check_with_msg
+                ~adata:adata2
+                ~loc
+                msg2
+                ~pred_kind:Assert
+                Smart_stmt.Variant
+                kf
+                env
+                variant_dec_e
+            in
             let stmt =
-              Smart_stmt.block_from_stmts [
-                Assert.runtime_check_with_msg
-                  ~loc
-                  msg1
-                  ~pred_kind:Assert
-                  Smart_stmt.Variant
-                  kf
-                  variant_pos_e;
-                Assert.runtime_check_with_msg
-                  ~loc
-                  msg2
-                  ~pred_kind:Assert
-                  Smart_stmt.Variant
-                  kf
-                  variant_dec_e
-              ]
+              Smart_stmt.block_from_stmts
+                [ e_old_ge_zero_stmt;
+                  e_old_gt_e_stmt ]
             in
             let blk, env =
               Env.pop_and_get env stmt ~global_clear:false Env.Middle
@@ -201,7 +280,7 @@ let handle_annotations env kf stmt =
 (**************************** Nested loops ********************************)
 (**************************************************************************)
 let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
-  let term_to_exp = !term_to_exp_ref in
+  let term_to_exp = !term_to_exp_ref ~adata:Assert.no_data in
   match lscope_vars with
   | [] ->
     mk_innermost_block env
@@ -243,7 +322,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       mk_nested_loops ~loc mk_innermost_block kf env lscope_vars'
     in
     (* initialize the loop counter to [t1] *)
-    let e1, env = term_to_exp kf (Env.push env) t1 in
+    let e1, _, env = term_to_exp kf (Env.push env) t1 in
     let init_blk, env = Env.pop_and_get
         env
         (Gmp.affect ~loc:e1.eloc lv_x x e1)
@@ -268,7 +347,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
           Linteger
     in
     Typing.type_term ~use_gmp_opt:false ~ctx:Typing.c_int guard;
-    let guard_exp, env = term_to_exp kf (Env.push env) guard in
+    let guard_exp, _, env = term_to_exp kf (Env.push env) guard in
     let break_stmt = Smart_stmt.break ~loc:guard_exp.eloc in
     let guard_blk, env = Env.pop_and_get
         env
@@ -284,7 +363,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     (* increment the loop counter [x++];
        previous typing ensures that [x++] fits type [ty] *)
     let tlv_one = t_plus_one ~ty:ctx tlv in
-    let incr, env = term_to_exp kf (Env.push env) tlv_one in
+    let incr, _, env = term_to_exp kf (Env.push env) tlv_one in
     let next_blk, env = Env.pop_and_get
         env
         (Gmp.affect ~loc:incr.eloc lv_x x incr)
@@ -298,9 +377,19 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       | None ->
         guard :: body @ [ next ], env
       | Some p ->
-        let e, env = !predicate_to_exp_ref kf (Env.push env) p in
+        let adata, env = Assert.empty ~loc kf env in
+        let e, adata, env =
+          !predicate_to_exp_ref ~adata kf (Env.push env) p
+        in
         let stmt, env =
-          Assert.runtime_check ~pred_kind:Assert Smart_stmt.RTE kf e p, env
+          Assert.runtime_check
+            ~adata
+            ~pred_kind:Assert
+            Smart_stmt.RTE
+            kf
+            env
+            e
+            p
         in
         let b, env = Env.pop_and_get env stmt ~global_clear:false Env.After in
         let guard_for_small_type = Smart_stmt.block_stmt b in
@@ -322,7 +411,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
   | Lscope.Lvs_let(lv, t) :: lscope_vars' ->
     let ty = Typing.get_typ t in
     let vi_of_lv, exp_of_lv, env = Env.Logic_binding.add ~ty env kf lv in
-    let e, env = term_to_exp kf env t in
+    let e, _, env = term_to_exp kf env t in
     let ty = Cil.typeOf e in
     let init_set =
       if Gmp_types.Q.is_t ty then Rational.init_set else Gmp.init_set

@@ -190,10 +190,20 @@ let term_to_sizet_exp ~loc ~name ?(check_lower_bound=true) kf env t =
   Typing.type_term ~use_gmp_opt:false t;
   match Typing.get_number_ty t with
   | Typing.Gmpz ->
-    Translate.gmp_to_sizet ~loc ~name ~check_lower_bound kf env t
+    let e, _, env =
+      Translate.gmp_to_sizet
+        ~adata:Assert.no_data
+        ~loc
+        ~name
+        ~check_lower_bound
+        kf
+        env
+        t
+    in
+    e, env
   | Typing.(C_integer _ | C_float _) as nty ->
     (* We know that [t] can be translated to a C type, so we start with that *)
-    let e, env = Translate.term_to_exp kf env t in
+    let e, _, env = Translate.term_to_exp ~adata:Assert.no_data kf env t in
     (* Then we can check if the expression will fit in a [size_t] *)
     let sizet = Cil.(theMachine.typeOfSizeOf) in
     let sizet_kind = Cil.(theMachine.kindOfSizeOf) in
@@ -213,11 +223,15 @@ let term_to_sizet_exp ~loc ~name ?(check_lower_bound=true) kf env t =
         let lower_guard_pp =
           Logic_const.prel ~loc (Rge, t, Cil.lzero ~loc ())
         in
-        let assertion =
-          Smart_stmt.runtime_check
+        let adata, env = Assert.empty ~loc kf env in
+        let adata, env = Assert.register_term ~loc kf env t e adata in
+        let assertion, env =
+          Assert.runtime_check
+            ~adata
             ~pred_kind:Assert
             Smart_stmt.RTE
             kf
+            env
             lower_guard
             lower_guard_pp
         in
@@ -233,11 +247,18 @@ let term_to_sizet_exp ~loc ~name ?(check_lower_bound=true) kf env t =
         in
         let upper_guard_pp = Logic_const.prel ~loc (Rle, t, sizet_max_t) in
         let upper_guard = Cil.mkBinOp ~loc Le e sizet_max_e in
-        let assertion =
-          Smart_stmt.runtime_check
+        let adata, env = Assert.empty ~loc kf env in
+        let adata, env = Assert.register_term ~loc kf env t e adata in
+        let adata, env =
+          Assert.register ~loc kf env "SIZE_MAX" sizet_max_e adata
+        in
+        let assertion, env =
+          Assert.runtime_check
+            ~adata
             ~pred_kind:Assert
             Smart_stmt.RTE
             kf
+            env
             upper_guard
             upper_guard_pp
         in

@@ -26,16 +26,29 @@ open Cil_types
    Partial support for ranges is provided. *)
 
 val call:
-  loc:location -> kernel_function -> string -> typ -> Env.t -> term ->
-  exp * Env.t
+  adata:Assert.t ->
+  loc:location ->
+  kernel_function ->
+  string ->
+  typ ->
+  Env.t ->
+  term ->
+  exp * Assert.t * Env.t
 (* [call ~loc kf name ctx env t] creates a call to the E-ACSL memory built-in
    identified by [name] which only requires a single argument, namely the
    pointer under study. The supported built-ins are:
    [base_addr], [block_length], [offset] and [freeable]. *)
 
 val call_with_size:
-  loc:location -> kernel_function -> string -> typ -> Env.t -> term list ->
-  predicate -> exp * Env.t
+  adata:Assert.t ->
+  loc:location ->
+  kernel_function ->
+  string ->
+  typ ->
+  Env.t ->
+  term list ->
+  predicate ->
+  exp * Assert.t * Env.t
 (* [call_with_size ~loc kf name ctx env tlist p] creates a call to the E-ACSL
    memory built-in identified by [name] which requires two arguments per term,
    namely the pointer under study and a size in bytes.
@@ -44,8 +57,15 @@ val call_with_size:
    [p] is the predicate under testing. *)
 
 val call_valid:
-  loc:location -> kernel_function -> string -> typ -> Env.t -> term ->
-  predicate -> exp * Env.t
+  adata:Assert.t ->
+  loc:location ->
+  kernel_function ->
+  string ->
+  typ ->
+  Env.t ->
+  term ->
+  predicate ->
+  exp * Assert.t * Env.t
 (* [call_valid ~loc kf name ctx env t p] creates a call to the E-ACSL memory
    built-in [valid] or [valid_read] according to [name].
    [t] can denote ranges of memory locations.
@@ -56,17 +76,26 @@ val call_valid:
 (**************************************************************************)
 
 val predicate_to_exp_ref:
-  (kernel_function -> Env.t -> predicate -> exp * Env.t) ref
+  (adata:Assert.t ->
+   kernel_function ->
+   Env.t ->
+   predicate ->
+   exp * Assert.t * Env.t) ref
 
 val term_to_exp_ref:
-  (kernel_function -> Env.t -> term -> exp * Env.t) ref
+  (adata:Assert.t ->
+   kernel_function ->
+   Env.t ->
+   term ->
+   exp * Assert.t * Env.t) ref
 
 val gmp_to_sizet_ref:
-  (loc:location ->
+  (adata:Assert.t ->
+   loc:location ->
    name:string ->
    ?check_lower_bound:bool ->
    ?pp:term ->
    kernel_function ->
    Env.t ->
    term ->
-   exp * Env.t) ref
+   exp * Assert.t * Env.t) ref

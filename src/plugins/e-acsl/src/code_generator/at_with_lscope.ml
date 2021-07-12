@@ -27,12 +27,23 @@ open Cil_types
 (**************************************************************************)
 
 let predicate_to_exp_ref
-  : (kernel_function -> Env.t -> predicate -> exp * Env.t) ref
-  = Extlib.mk_fun "named_predicate_to_exp_ref"
+  : (adata:Assert.t ->
+     kernel_function ->
+     Env.t ->
+     predicate ->
+     exp * Assert.t * Env.t) ref
+  =
+  ref (fun ~adata:_ _kf _env _p ->
+      Extlib.mk_labeled_fun "predicate_to_exp_ref")
 
 let term_to_exp_ref
-  : (kernel_function -> Env.t -> term -> exp * Env.t) ref
-  = Extlib.mk_fun "term_to_exp_ref"
+  : (adata:Assert.t ->
+     kernel_function ->
+     Env.t ->
+     term ->
+     exp * Assert.t * Env.t) ref
+  =
+  ref (fun ~adata:_ _kf _env _t -> Extlib.mk_labeled_fun "term_to_exp_ref")
 
 (*****************************************************************************)
 (**************************** Handling memory ********************************)
@@ -162,7 +173,7 @@ let size_from_sizes_and_shifts ~loc = function
 let lval_at_index ~loc kf env (e_at, vi_at, t_index) =
   Typing.type_term ~use_gmp_opt:false ~ctx:Typing.c_int t_index;
   let term_to_exp = !term_to_exp_ref in
-  let e_index, env = term_to_exp kf env t_index in
+  let e_index, _, env = term_to_exp ~adata:Assert.no_data kf env t_index in
   let e_index = Cil.constFold false e_index in
   let e_addr =
     Cil.new_exp ~loc (BinOp(PlusPI, e_at, e_index, vi_at.vtype))
@@ -257,7 +268,9 @@ let to_exp ~loc kf env pot label =
          Typing.type_term ~use_gmp_opt:false t_size;
          let malloc_stmt = match Typing.get_number_ty t_size with
            | Typing.C_integer IInt ->
-             let e_size, _ = term_to_exp kf env t_size in
+             let e_size, _, _ =
+               term_to_exp ~adata:Assert.no_data kf env t_size
+             in
              let e_size = Cil.constFold false e_size in
              let malloc_stmt =
                Smart_stmt.call ~loc
@@ -287,13 +300,13 @@ let to_exp ~loc kf env pot label =
   let t_index = index_from_sizes_and_shifts ~loc sizes_and_shifts in
   (* Innermost block *)
   let mk_innermost_block env =
-    let term_to_exp = !term_to_exp_ref in
-    let named_predicate_to_exp = !predicate_to_exp_ref in
+    let term_to_exp = !term_to_exp_ref ~adata:Assert.no_data in
+    let named_predicate_to_exp = !predicate_to_exp_ref ~adata:Assert.no_data in
     match pot with
     | Lscope.PoT_pred p ->
       let env = Env.push env in
       let lval, env = lval_at_index ~loc kf env (e_at, vi_at, t_index) in
-      let e, env = named_predicate_to_exp kf env p in
+      let e, _, env = named_predicate_to_exp kf env p in
       let e = Cil.constFold false e in
       let storing_stmt =
         Smart_stmt.assigns ~loc ~result:lval e
@@ -309,7 +322,7 @@ let to_exp ~loc kf env pot label =
         | Typing.(C_integer _ | C_float _ | Nan) ->
           let env = Env.push env in
           let lval, env = lval_at_index ~loc kf env (e_at, vi_at, t_index) in
-          let e, env = term_to_exp kf env t in
+          let e, _, env = term_to_exp kf env t in
           let e = Cil.constFold false e in
           let storing_stmt =
             Smart_stmt.assigns ~loc ~result:lval e

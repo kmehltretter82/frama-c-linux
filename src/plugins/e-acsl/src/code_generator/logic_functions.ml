@@ -28,12 +28,23 @@ open Cil_datatype
 (**************************************************************************)
 
 let predicate_to_exp_ref
-  : (kernel_function -> Env.t -> predicate -> exp * Env.t) ref
-  = Extlib.mk_fun "predicate_to_exp_ref"
+  : (adata:Assert.t ->
+     kernel_function ->
+     Env.t ->
+     predicate ->
+     exp * Assert.t * Env.t) ref
+  =
+  ref (fun ~adata:_ _kf _env _p ->
+      Extlib.mk_labeled_fun "predicate_to_exp_ref")
 
 let term_to_exp_ref
-  : (kernel_function -> Env.t -> term -> exp * Env.t) ref
-  = Extlib.mk_fun "term_to_exp_ref"
+  : (adata:Assert.t ->
+     kernel_function ->
+     Env.t ->
+     term ->
+     exp * Assert.t * Env.t) ref
+  =
+  ref (fun ~adata:_ _kf _env _t -> Extlib.mk_labeled_fun "term_to_exp_ref")
 
 (*****************************************************************************)
 (************************** Auxiliary  functions* ****************************)
@@ -81,7 +92,7 @@ let generate_return_block ~loc env ret_vi e = match e.enode with
 (* Generate the function's body for predicates. *)
 let pred_to_block ~loc kf env ret_vi p =
   Typing.type_named_predicate ~must_clear:false p;
-  let e, env = !predicate_to_exp_ref kf env p in
+  let e, _, env = !predicate_to_exp_ref ~adata:Assert.no_data kf env p in
   (* for predicate, since the result is either 0 or 1, return it directly (it
      cannot be provided as extra argument *)
   generate_return_block ~loc env ret_vi e
@@ -92,7 +103,7 @@ let term_to_block ~loc kf env ret_ty ret_vi t =
     ~use_gmp_opt:false
     ~ctx:(Typing.number_ty_of_typ ~post:false ret_ty)
     t;
-  let e, env = !term_to_exp_ref kf env t in
+  let e, _, env = !term_to_exp_ref ~adata:Assert.no_data kf env t in
   if Cil.isVoidType ret_ty then
     (* if the function's result is a GMP, it is the first parameter of the
        function (by reference). *)
@@ -344,67 +355,70 @@ let function_to_exp ~loc fname env kf t li params_ty args =
     ret_ty
     (fun vi _ -> [ Cil.mkStmtOneInstr ~valid_sid:true (mkcall vi) ])
 
-let tapp_to_exp kf env ?eargs tapp =
+let tapp_to_exp ~adata kf env ?eargs tapp =
   match tapp.term_node with
   | Tapp(li, [], targs) ->
     let loc = tapp.term_loc in
     let fname = li.l_var_info.lv_name in
     (* build the varinfo (as an expression) which stores the result of the
        function call. *)
-    let _, e, env =
+    let _, e, adata, env =
       if Builtins.mem li.l_var_info.lv_name then
         (* E-ACSL built-in function call *)
-        let args, env =
+        let args, adata, env =
           match eargs with
           | None ->
             List.fold_right
-              (fun targ (l, env) ->
-                 let e, env = !term_to_exp_ref kf env targ in
-                 e :: l, env)
+              (fun targ (l, adata, env) ->
+                 let e, adata, env = !term_to_exp_ref ~adata kf env targ in
+                 e :: l, adata, env)
               targs
-              ([], env)
+              ([], adata, env)
           | Some eargs ->
             if List.compare_lengths targs eargs != 0 then
               Options.fatal
                 "[Tapp] unexpected number of arguments when calling %s"
                 fname;
-            eargs, env
+            eargs, adata, env
         in
-        Env.new_var
-          ~loc
-          ~name:(fname ^ "_app")
-          env
-          kf
-          (Some tapp)
-          (Misc.cty (Option.get li.l_type))
-          (fun vi _ ->
-             [ Smart_stmt.rtl_call ~loc
-                 ~result:(Cil.var vi)
-                 ~prefix:""
-                 fname
-                 args ])
+        let vi, e, env =
+          Env.new_var
+            ~loc
+            ~name:(fname ^ "_app")
+            env
+            kf
+            (Some tapp)
+            (Misc.cty (Option.get li.l_type))
+            (fun vi _ ->
+               [ Smart_stmt.rtl_call ~loc
+                   ~result:(Cil.var vi)
+                   ~prefix:""
+                   fname
+                   args ])
+        in
+        vi, e, adata, env
       else
         (* build the arguments and compute the integer_ty of the parameters *)
-        let params_ty, args, env =
-          let eargs, env =
+        let params_ty, args, adata, env =
+          let eargs, adata, env =
             match eargs with
             | None ->
               List.fold_right
-                (fun targ (eargs, env) ->
-                   let e, env = !term_to_exp_ref kf env targ in
-                   e :: eargs, env)
+                (fun targ (eargs, adata, env) ->
+                   let e, adata, env = !term_to_exp_ref ~adata kf env targ in
+                   e :: eargs, adata, env)
                 targs
-                ([], env)
+                ([], adata, env)
             | Some eargs ->
               if List.compare_lengths targs eargs != 0 then
                 Options.fatal
                   "[Tapp] unexpected number of arguments when calling %s"
                   fname;
-              eargs, env
+              eargs, adata, env
           in
           try
             List.fold_right2
-              (fun targ earg (params_ty, args, env) ->
+              (fun targ earg (params_ty, args, adata, env) ->
                  let param_ty = Typing.get_number_ty targ in
                  let e, env =
                    try
@@ -420,9 +434,9 @@ let tapp_to_exp kf env ?eargs tapp =
                    with Typing.Not_a_number ->
                      earg, env
                  in
-                 param_ty :: params_ty, e :: args, env)
+                 param_ty :: params_ty, e :: args, adata, env)
               targs eargs
-              ([], [], env)
+              ([], [], adata, env)
           with Invalid_argument _ ->
             Options.fatal
               "[Tapp] unexpected number of arguments when calling %s"
@@ -431,9 +445,12 @@ let tapp_to_exp kf env ?eargs tapp =
         let gen_fname =
           Varname.get ~scope:Varname.Global (Functions.RTL.mk_gen_name fname)
         in
-        function_to_exp ~loc gen_fname env kf tapp li params_ty args
+        let vi, e, env =
+          function_to_exp ~loc gen_fname env kf tapp li params_ty args
+        in
+        vi, e, adata, env
     in
-    e, env
+    e, adata, env
   | _ ->
     Options.fatal
       "tapp_to_exp called with '%a' instead of Tapp term"
