@@ -25,6 +25,9 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-* E-ACSL       [2021-07-13] Fix crash when encountering a GMP value in a loop
+                variant (frama-c/e-acsl#169).
+
 #############################
 Plugin E-ACSL 23.0 (Vanadium)
 #############################
