@@ -82,8 +82,7 @@ let pre_analysis () =
      degeneration states *)
   Value_util.DegenerationPoints.clear ();
   Cvalue.V.clear_garbled_mix ();
-  Value_util.clear_call_stack ();
-  Db.Value.mark_as_computed ()
+  Value_util.clear_call_stack ()
 
 let post_analysis_cleanup ~aborted =
   Value_util.clear_call_stack ();
@@ -341,11 +340,13 @@ module Make (Abstract: Abstractions.Eva) = struct
       let final_state = PowersetDomain.(final_states >>-: of_list >>- join) in
       Value_util.pop_call_stack ();
       Value_parameters.feedback "done for function %a" Kernel_function.pretty kf;
+      Abstract.Dom.Store.mark_as_computed ();
       post_analysis ();
       Abstract.Dom.post_analysis final_state;
       Value_results.print_summary ();
     with
     | Db.Value.Aborted ->
+      Abstract.Dom.Store.mark_as_computed ();
       post_analysis_cleanup ~aborted:true;
       (* Signal that a degeneration occurred *)
       if Value_util.DegenerationPoints.length () > 0 then
