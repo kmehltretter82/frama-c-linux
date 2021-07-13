@@ -499,6 +499,8 @@ module State = struct
         | None -> `Bottom
       else `Top
 
+    let mark_as_computed = Db.Value.mark_as_computed
+    let is_computed = Db.Value.is_computed
   end
 
   let display ?fmt kf =

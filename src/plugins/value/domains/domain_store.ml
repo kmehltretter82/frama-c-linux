@@ -46,6 +46,9 @@ module type S = sig
   val get_stmt_state: after:bool -> stmt -> t or_bottom
   val get_stmt_state_by_callstack:
     after:bool -> stmt -> t Value_types.Callstack.Hashtbl.t or_top_or_bottom
+
+  val mark_as_computed: unit -> unit
+  val is_computed: unit -> bool
 end
 
 module Make (Domain: InputDomain) = struct
@@ -267,4 +270,6 @@ module Make (Domain: InputDomain) = struct
     if Storage.get ()
     then update_callstack_table ~after:true stmt callstack state
 
+  let mark_as_computed () = Table_By_Callstack.mark_as_computed ()
+  let is_computed () = Storage.get () && Table_By_Callstack.is_computed ()
 end

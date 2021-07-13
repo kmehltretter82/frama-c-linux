@@ -629,5 +629,7 @@ module Restrict
     let get_stmt_state_by_callstack ~after stmt =
       inject_table (Domain.Store.get_stmt_state_by_callstack ~after stmt)
 
+    let mark_as_computed = Domain.Store.mark_as_computed
+    let is_computed = Domain.Store.is_computed
   end
 end
