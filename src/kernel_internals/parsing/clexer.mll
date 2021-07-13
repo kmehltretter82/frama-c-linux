@@ -924,6 +924,7 @@ and annot_one_line = parse
   | "" { annot_one_line_logic lexbuf }
 and annot_one_line_logic = parse
   | '\n' { make_annot ~one_line:true initial lexbuf (Buffer.contents buf) }
+  | eof { E.parse_error "Invalid C file: should end with a newline" }
   | _ as c { Buffer.add_char buf c; annot_one_line_logic lexbuf }
 
 {
