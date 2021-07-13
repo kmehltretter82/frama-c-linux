@@ -48,32 +48,37 @@ let handle_annotations env kf stmt =
   | Loop(_, ({ bstmts = stmts } as blk), loc, cont, break) ->
     (* Loop variant, save the current value of the variant *)
     let stmts, env, variant =
-      match Env.top_loop_variant env with
-      | Some (t, measure_opt) ->
-        let env = Env.set_annotation_kind env Smart_stmt.Variant in
-        let env = Env.push env in
-        Typing.type_term ~use_gmp_opt:true t;
-        let ty = Typing.get_typ t in
-        let e, env = !term_to_exp_ref kf env t in
-        let vi_old, e_old, env =
-          Env.new_var
-            ~loc
-            ~scope:Varname.Function
-            ~name:"old_variant"
-            env
-            kf
-            (Some t)
-            ty
-            (fun _ _ -> [])
-        in
-        let stmt =
-          Smart_stmt.assigns ~loc ~result:(Cil.var vi_old) e
-        in
-        let blk, env =
-          Env.pop_and_get env stmt ~global_clear:false Env.Middle
-        in
-        Smart_stmt.block_stmt blk :: stmts, env, Some (t, e_old, measure_opt)
-      | None -> stmts, env, None
+      Error.handle
+        (fun (stmts, env, _) ->
+           match Env.top_loop_variant env with
+           | Some (t, measure_opt) ->
+             let env = Env.set_annotation_kind env Smart_stmt.Variant in
+             let env = Env.push env in
+             Typing.type_term ~use_gmp_opt:true t;
+             let ty = Typing.get_typ t in
+             if Gmp_types.is_t ty then Error.not_yet "loop variant using GMP";
+             let e, env = !term_to_exp_ref kf env t in
+             let vi_old, e_old, env =
+               Env.new_var
+                 ~loc
+                 ~scope:Varname.Function
+                 ~name:"old_variant"
+                 env
+                 kf
+                 (Some t)
+                 ty
+                 (fun _ _ -> [])
+             in
+             let stmt =
+               Smart_stmt.assigns ~loc ~result:(Cil.var vi_old) e
+             in
+             let blk, env =
+               Env.pop_and_get env stmt ~global_clear:false Env.Middle
+             in
+             let stmts = Smart_stmt.block_stmt blk :: stmts in
+             stmts, env, Some (t, e_old, measure_opt)
+           | None -> stmts, env, None)
+        (stmts, env, None)
     in
     (* Auxiliary function to generate variant and invariant checks *)
     let rec aux (stmts, env) = function
