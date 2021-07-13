@@ -387,11 +387,14 @@ module Shape(Key: Id_Datatype) = struct
     let equal : t -> t -> bool = (==)
   end
 
-  type (_,_) equality = Eq : ('a,'a) equality
-  type ('a, 'b) eq = ('a, 'b) equality option
+  type ('v1, 'v2, 'result) cache_type =
+    | Any: ('v1, 'v2, 'result) cache_type
+    | Predicate: ('v1, 'v2, bool) cache_type
+    | Symmetric: ('v, 'v, 'result) cache_type
+    | SymmetricPredicate: ('v, 'v, bool) cache_type
 
   let make_binary_cache (type v1 v2 result)
-      ?(symmetric:(v1, v2) eq) ?(predicate:(result, bool) eq) empty name cache =
+      ?(kind: (v1, v2, result) cache_type = Any) empty name cache =
     match cache with
     | Hptmap_sig.NoCache -> (fun f x y -> f x y)
     | Hptmap_sig.TemporaryCache cache_name
@@ -405,17 +408,17 @@ module Shape(Key: Id_Datatype) = struct
         let sentinel : t = empty
       end in
       let clear_cache, merge_cache =
-        match predicate, symmetric with
-        | None, None ->
+        match kind with
+        | Any ->
           let module Cache = Binary_cache.Arity_Two (Arg1) (Arg2) (R) in
           Cache.clear, Cache.merge
-        | None, Some Eq ->
+        | Symmetric ->
           let module Cache = Binary_cache.Symmetric_Binary (Arg1) (R) in
           Cache.clear, Cache.merge
-        | Some Eq, None ->
+        | Predicate ->
           let module Cache = Binary_cache.Binary_Predicate (Arg1) (Arg2) in
           Cache.clear, Cache.merge
-        | Some Eq, Some Eq ->
+        | SymmetricPredicate ->
           let module Cache = Binary_cache.Symmetric_Binary_Predicate (Arg1) in
           Cache.clear, Cache.merge
       in
@@ -563,14 +566,14 @@ module Shape(Key: Id_Datatype) = struct
 
   let binary_predicate ct pt ~decide_fast ~decide_fst ~decide_snd ~decide_both =
     let cache_merge =
-      make_binary_cache ~predicate:Eq true "binary_predicate" ct
+      make_binary_cache ~kind:Predicate true "binary_predicate" ct
     in
     make_binary_predicate cache_merge pt
       ~decide_fast ~decide_fst ~decide_snd ~decide_both
 
   let symmetric_binary_predicate ct pt ~decide_fast ~decide_one ~decide_both =
     let cache_merge =
-      make_binary_cache ~symmetric:Eq ~predicate:Eq true
+      make_binary_cache ~kind:SymmetricPredicate true
         "symmetric_binary_predicate" ct
     in
     make_binary_predicate cache_merge pt
@@ -1027,8 +1030,8 @@ struct
       ~(decide_right: t -> t)
     =
     (* Cache of the merges, depending on [cache] and [symmetric].*)
-    let sym = if symmetric then Some Eq else None in
-    let cache_merge = make_binary_cache ?symmetric:sym Empty "merge" cache in
+    let kind = if symmetric then Symmetric else Any in
+    let cache_merge = make_binary_cache ~kind Empty "merge" cache in
     (* Rewrap of branches.
        The initials branches and tree are provided in order to avoid the wrapping
        if the two branches have not been modified.
