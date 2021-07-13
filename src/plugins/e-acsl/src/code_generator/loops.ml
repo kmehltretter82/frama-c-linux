@@ -118,14 +118,23 @@ let handle_annotations env kf stmt =
             stmts, env
           | Some (t, e_old, None) ->
             let env = Env.push env in
-            Typing.type_term ~use_gmp_opt:true t;
-            let e, env = !term_to_exp_ref kf env t in
+            let t_old = Logic_utils.expr_to_term e_old in
+            let variant_pos =
+              Logic_const.prel ~loc (Rge, t_old, Logic_const.tinteger ~loc 0)
+            in
+            Typing.type_named_predicate ~must_clear:true variant_pos;
+            let variant_pos_e, env = !predicate_to_exp_ref kf env variant_pos in
             let msg1 =
               Format.asprintf
                 "(old %a) %a 0"
                 Printer.pp_term t
                 Printer.pp_relation Rge
             in
+            let variant_dec =
+              Logic_const.prel ~loc (Rgt, t_old, t)
+            in
+            Typing.type_named_predicate ~must_clear:true variant_dec;
+            let variant_dec_e, env = !predicate_to_exp_ref kf env variant_dec in
             let msg2 =
               Format.asprintf
                 "(old %a) > %a"
@@ -140,14 +149,14 @@ let handle_annotations env kf stmt =
                   ~pred_kind:Assert
                   Smart_stmt.Variant
                   kf
-                  (Cil.mkBinOp ~loc Ge e_old (Cil.zero ~loc));
+                  variant_pos_e;
                 Smart_stmt.runtime_check_with_msg
                   ~loc
                   msg2
                   ~pred_kind:Assert
                   Smart_stmt.Variant
                   kf
-                  (Cil.mkBinOp ~loc Gt e_old e)
+                  variant_dec_e
               ]
             in
             let blk, env =
