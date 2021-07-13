@@ -462,18 +462,27 @@ let build_specialized_fun env vf format_fun tvparams =
   Build.add_stdlib_generated ();
 
   (* Add parameters *)
+  let fresh_param_name =
+    let counter = ref 0 in
+    fun () ->
+      let p = "param" ^ string_of_int !counter in
+      incr counter;
+      p
+  in
   let add_static_param (name,typ,attributes) =
+    (* create a new name for parameters which does not have one *)
+    let name = if name = "" then fresh_param_name () else name in
     Build.parameter ~attributes typ name
-  and add_variadic_param i (typ,_dir) =
+  and add_variadic_param (typ,_dir) =
     let typ = if Cil.isIntegralType typ then
         Cil.integralPromotion typ
       else
         typ
     in
-    Build.parameter typ ("param" ^ string_of_int i)
+    Build.parameter typ (fresh_param_name ())
   in
   let sformals = List.map add_static_param (Option.get params)
-  and vformals = List.mapi add_variadic_param tvparams
+  and vformals = List.map add_variadic_param tvparams
   in
 
 
