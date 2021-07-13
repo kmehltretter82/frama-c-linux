@@ -1,8 +1,8 @@
-[variadic] tests/declared/redfine_anonymous_parameters.i:1: 
+[variadic] tests/declared/redefine_anonymous_parameters.i:1: 
   Declaration of variadic function printf.
 [variadic] Warning: Unable to locate ACSL predicate valid_read_string which should be in the Frama-C LibC. Correct specifications can't be generated.
 [variadic] Warning: Unable to locate global __fc_stdout which should be in the Frama-C LibC. Correct specifications can't be generated.
-[variadic] tests/declared/redfine_anonymous_parameters.i:4: 
+[variadic] tests/declared/redefine_anonymous_parameters.i:4: 
   Translating call to printf to a call to the specialized version printf_va_1.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
