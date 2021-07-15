@@ -654,7 +654,7 @@ and context_insensitive_term_to_exp kf env t =
         e
     in
     e, env, Typed_number.C_number, ""
-  | TLogic_coerce _ -> assert false (* handle in [term_to_exp] *)
+  | TLogic_coerce (_, t) -> context_insensitive_term_to_exp kf env t
   | TAddrOf lv ->
     let lv, env, _ = tlval_to_lval kf env lv in
     Cil.mkAddrOf ~loc lv, env, Typed_number.C_number, "addrof"
@@ -741,7 +741,6 @@ and term_to_exp kf env t =
     Printer.pp_term t generate_rte;
   Env.with_rte_and_result env false
     ~f:(fun env ->
-        let t = match t.term_node with TLogic_coerce(_, t) -> t | _ -> t in
         let e, env, sty, name = context_insensitive_term_to_exp kf env t in
         let env = if generate_rte then translate_rte kf env e else env in
         let cast = Typing.get_cast t in
