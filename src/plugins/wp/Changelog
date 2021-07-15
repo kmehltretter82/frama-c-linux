@@ -24,6 +24,8 @@
 Plugin WP <next-release>
 #########################
 
+- WP          [2021-07-15] Fix a crash related to opaque structures memory typing
+
 #########################
 Plugin WP 23.0 (Vanadium)
 #########################
