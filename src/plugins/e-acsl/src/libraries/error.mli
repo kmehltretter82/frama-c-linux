@@ -45,12 +45,8 @@ val nb_untypable: unit -> int
 val nb_not_yet: unit -> int
 (** Number of not-yet-supported annotations. *)
 
-val process_error: exn -> unit
-(** Process the given error.
-
-    Print a warning message and update the number of not-yet-supported and
-    untypable annotations. Print a fatal message and abort in case of unknown
-    errors. *)
+val print_not_yet: string -> unit
+(** Print the "not yet" message without raising an exception. *)
 
 (*
 Local Variables:

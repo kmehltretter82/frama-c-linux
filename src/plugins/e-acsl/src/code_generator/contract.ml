@@ -631,8 +631,7 @@ let check_post_conds kf kinstr env contract =
                   predicate *)
                Translate.translate_predicate kf env tp_post_cond
              | Exits | Breaks | Continues | Returns ->
-               Error.process_error
-                 (Error.not_yet "abnormal termination case in behavior");
+               Error.print_not_yet "abnormal termination case in behavior";
                env
            else
              env)
@@ -679,8 +678,8 @@ let check_post_conds kf kinstr env contract =
                      in
                      env, stmt :: stmts
                    | Exits | Breaks | Continues | Returns ->
-                     Error.process_error
-                       (Error.not_yet "abnormal termination case in behavior");
+                     Error.print_not_yet
+                       "abnormal termination case in behavior";
                      env, stmts
                  end
                | Admit -> env, stmts
