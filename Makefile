@@ -2151,14 +2151,43 @@ else
 	$(OCAMLC) unix.cma $< -o $@
 endif
 
+check-newlines-clean:
+	$(RM) $(CHECK_NEWLINES) bin/check_newlines.cm* bin/check_newlines.o
+
+clean:: check-newlines-clean
+
+ISUTF8:=./bin/isutf8$(EXE)
+
+$(ISUTF8): bin/isutf8.ml
+	$(PRINT_MAKING)	$@
+ifeq ($(OCAMLBEST),opt)
+	$(OCAMLOPT) $< -o $@
+else
+	$(OCAMLC) $< -o $@
+endif
+
+isutf8-clean:
+	$(RM) $(ISUTF8) bin/isutf8.cm* bin/isutf8.o
+
+clean:: isutf8-clean
+
 FILES_WITHOUT_NEWLINE := \
   VERSION \
-  VERSION_CODENAME \
+  VERSION_CODENAME
+
+BINARY_DISTRIB_FILES := \
   $(sort $(wildcard ivette/src/dome/doc/template/static/fonts/*)) \
   $(sort $(wildcard share/*.ico share/*.png share/theme/*/*.png))
 
 TESTS_WITHOUT_NEWLINE := \
   tests/spec/unfinished-oneline-acsl-comment.i \
+  tests/verisec/suite/programs/apps/SpamAssassin/BID-6679/message_write/test \
+  tests/verisec/suite/programs/apps/sendmail/CVE-1999-0047/mime7to8/array_vs_pointer.ods \
+  tests/verisec/suite/programs/apps/sendmail/CVE-1999-0047/mime7to8/data_testing.ods \
+
+BINARY_DISTRIB_TESTS := \
+  tests/misc/oracle/interpreted_automata_dataflow_backward.dot \
+  tests/misc/oracle/interpreted_automata_dataflow_forward.dot \
   tests/verisec/suite/programs/apps/SpamAssassin/BID-6679/message_write/test \
   tests/verisec/suite/programs/apps/sendmail/CVE-1999-0047/mime7to8/array_vs_pointer.ods \
   tests/verisec/suite/programs/apps/sendmail/CVE-1999-0047/mime7to8/data_testing.ods \
@@ -2175,7 +2204,7 @@ TESTS_WITHOUT_NEWLINE := \
 # because identical headers but with different encodings are not exactly
 # easy to distinguish
 .PHONY: check-headers
-check-headers: $(HDRCK) $(CHECK_NEWLINES)
+check-headers: $(HDRCK) $(CHECK_NEWLINES) $(ISUTF8)
 	$(PRINT) "Checking $(DISTRIB_HEADERS) headers (OPEN_SOURCE=$(OPEN_SOURCE), CURRENT_HEADERS=$(CURRENT_HEADERS))..."
 	$(PRINT) "- HEADER_SPEC_FILE=$(HEADER_SPEC_FILE)"
 	$(PRINT) "- CURRENT_HEADER_DIRS=$(CURRENT_HEADER_DIRS)"
@@ -2185,16 +2214,12 @@ check-headers: $(HDRCK) $(CHECK_NEWLINES)
 	$(file >distrib_tests.tmp) $(foreach O,$(DISTRIB_TESTS),$(file >>distrib_tests.tmp,$O))
 	$(file >header_exceptions.tmp) $(foreach O,$(HEADER_EXCEPTIONS),$(file >>header_exceptions.tmp,$O))
 	echo "Checking that distributed files terminate with a newline..."
-	$(CHECK_NEWLINES) distrib_files.tmp $(FILES_WITHOUT_NEWLINE)
-	$(CHECK_NEWLINES) distrib_tests.tmp $(TESTS_WITHOUT_NEWLINE)
-	@if command -v file >/dev/null 2>/dev/null; then \
-		echo "Checking that distributed files do not use iso-8859..."; \
-		file --mime-encoding -f distrib_files.tmp -f distrib_tests.tmp | \
-			grep "iso-8859" \
-			| $(SED) "s/^/error: invalid encoding in /" \
-			| ( ! grep "error: invalid encoding" ); \
-	else echo "command 'file' not found, skipping encoding checks"; \
-	fi
+	$(CHECK_NEWLINES) distrib_files.tmp $(FILES_WITHOUT_NEWLINE) $(BINARY_DISTRIB_FILES)
+	$(CHECK_NEWLINES) distrib_tests.tmp $(TESTS_WITHOUT_NEWLINE) $(BINARY_DISTRIB_TESTS)
+	echo "Checking that distributed files do not use iso-8859..."
+	$(ISUTF8) distrib_files.tmp $(BINARY_DISTRIB_FILES)
+	$(ISUTF8) distrib_tests.tmp $(BINARY_DISTRIB_TESTS)
+	echo "Checking headers..."
 	$(HDRCK) \
 		$(HDRCK_EXTRA) \
 		$(addprefix -header-dirs ,$(CURRENT_HEADER_DIRS)) \
