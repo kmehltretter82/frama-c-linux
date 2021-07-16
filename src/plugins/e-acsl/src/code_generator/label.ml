@@ -68,11 +68,14 @@ let get_stmt kf llabel =
     | BuiltinLabel Here -> Error.not_yet "Label 'Here'"
     | BuiltinLabel(Old | Pre) ->
       (try Kernel_function.find_first_stmt kf
-       with Kernel_function.No_Statement -> assert false)
+       with Kernel_function.No_Statement -> assert false (* Frama-C invariant*))
     | BuiltinLabel(Post) ->
       (try Kernel_function.find_return kf
-       with Kernel_function.No_Statement -> assert false)
-    | BuiltinLabel _ | FormalLabel _ -> assert false
+       with Kernel_function.No_Statement -> assert false (* Frama-C invariant*))
+    | BuiltinLabel _ ->
+      Error.not_yet (Format.asprintf "Label '%a'" Printer.pp_logic_label llabel)
+    | FormalLabel _ ->
+      Error.not_yet "FormalLabel"
   in
   (* the pointed statement has been visited and modified by the injector:
      get its new version. *)
