@@ -2158,18 +2158,10 @@ check-headers: $(HDRCK)
 	$(PRINT) "- HEADER_SPEC_FILE=$(HEADER_SPEC_FILE)"
 	$(PRINT) "- CURRENT_HEADER_DIRS=$(CURRENT_HEADER_DIRS)"
 	$(PRINT) "- FORBIDDEN_HEADERS=$(DISTRIB_PROPRIETARY_HEADERS)"
-	 # Workaround to avoid "argument list too long" in make 3.82+ without
-	 # using 'file' built-in, only available on make 4.0+
-	 # for make 4.0+, using the 'file' function could be a better solution,
-	 # although it seems to segfault in 4.0 (but not in 4.1)
-	$(RM) distrib_files.tmp distrib_tests.tmp header_exceptions.tmp
-	@$(foreach file,$(DISTRIB_FILES),\
-			echo $(file) >> distrib_files.tmp$(NEWLINE))
-	@$(foreach file,$(DISTRIB_TESTS),\
-			echo $(file) >> distrib_tests.tmp$(NEWLINE))
-	@$(foreach file,$(HEADER_EXCEPTIONS),\
-			echo $(file) >> header_exceptions.tmp$(NEWLINE))
-
+	# Workaround to avoid "argument list too long" in Cygwin
+	$(file >distrib_files.tmp) $(foreach O,$(DISTRIB_FILES),$(file >>distrib_files.tmp,$O))
+	$(file >distrib_tests.tmp) $(foreach O,$(DISTRIB_TESTS),$(file >>distrib_tests.tmp,$O))
+	$(file >header_exceptions.tmp) $(foreach O,$(HEADER_EXCEPTIONS),$(file >>header_exceptions.tmp,$O))
 	echo "Checking that distributed files terminate with a newline..."
 	bin/check_newline.sh distrib_files.tmp
 	bin/check_newline.sh distrib_tests.tmp
