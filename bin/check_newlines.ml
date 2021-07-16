@@ -1,5 +1,17 @@
 module StringSet = Set.Make(String)
 
+let unquote_filename filename =
+  let n = String.length filename in
+  let r =
+    if n > 1 && String.get filename 0 = '"' &&
+       String.get filename (n - 1) = '"'
+    then
+      String.sub filename 1 (n-2)
+    else
+      filename
+  in
+  Str.global_replace (Str.regexp "\\\\") "" r
+
 (* returns true for empty files *)
 let is_last_byte_newline filename =
   try
@@ -17,9 +29,10 @@ let is_last_byte_newline filename =
       close_in ic;
       true
   with
-  | Sys_error _ ->
+  | Sys_error msg ->
     (* possibly a non-existing file (e.g. with spaces); ignoring *)
-    Format.printf "could not open, ignoring file: %s" filename;
+    Format.printf "check_newlines: cannot open, ignoring file: %s (%s)@."
+      filename msg;
     true
 
 (* usage: first argument is a file name containing a list of files
@@ -38,6 +51,13 @@ let () =
     try
       while true; do
         let filename = input_line file_list_ic in
+        let filename =
+          (* assume no empty filenames *)
+          if String.get filename 0 = '"' then
+            unquote_filename filename
+          else
+            filename
+        in
         if not (StringSet.mem filename to_ignore) &&
            not (is_last_byte_newline filename) then begin
           incr errors;

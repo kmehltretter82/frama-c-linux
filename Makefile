@@ -2146,9 +2146,9 @@ CHECK_NEWLINES:=./bin/check_newlines$(EXE)
 $(CHECK_NEWLINES): bin/check_newlines.ml
 	$(PRINT_MAKING)	$@
 ifeq ($(OCAMLBEST),opt)
-	$(OCAMLOPT) unix.cmxa $< -o $@
+	$(OCAMLOPT) str.cmxa unix.cmxa $< -o $@
 else
-	$(OCAMLC) unix.cma $< -o $@
+	$(OCAMLC) str.cma unix.cma $< -o $@
 endif
 
 check-newlines-clean:
@@ -2161,9 +2161,9 @@ ISUTF8:=./bin/isutf8$(EXE)
 $(ISUTF8): bin/isutf8.ml
 	$(PRINT_MAKING)	$@
 ifeq ($(OCAMLBEST),opt)
-	$(OCAMLOPT) $< -o $@
+	$(OCAMLOPT) str.cmxa $< -o $@
 else
-	$(OCAMLC) $< -o $@
+	$(OCAMLC) str.cma $< -o $@
 endif
 
 isutf8-clean:

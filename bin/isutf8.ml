@@ -1,5 +1,17 @@
 module StringSet = Set.Make(String)
 
+let unquote_filename filename =
+  let n = String.length filename in
+  let r =
+    if n > 1 && String.get filename 0 = '"' &&
+       String.get filename (n - 1) = '"'
+    then
+      String.sub filename 1 (n-2)
+    else
+      filename
+  in
+  Str.global_replace (Str.regexp "\\\\") "" r
+
 exception False
 
 let is_valid_utf8 filename =
@@ -32,14 +44,16 @@ let is_valid_utf8 filename =
       !extra = 0
     with
     | End_of_file ->
+      close_in ic;
       !extra = 0
     | False ->
       close_in ic;
       false
   with
-  | Sys_error _ ->
+  | Sys_error msg ->
     (* possibly a non-existing file (e.g. with spaces); ignoring *)
-    Format.printf "could not open, ignoring file: %s" filename;
+    Format.printf "isutf8: cannot open, ignoring file: %s (%s)@."
+      filename msg;
     true
 
 (* usage: first argument is a file name containing a list of files
@@ -57,6 +71,13 @@ let () =
     try
       while true; do
         let filename = input_line file_list_ic in
+        let filename =
+          (* assume no empty filenames *)
+          if String.get filename 0 = '"' then
+            unquote_filename filename
+          else
+            filename
+        in
         if not (StringSet.mem filename to_ignore)
         && not (is_valid_utf8 filename) then begin
           incr errors;
