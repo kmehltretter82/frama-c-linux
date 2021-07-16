@@ -243,7 +243,7 @@ DISTRIB_FILES:=\
       $(THEME_ICONS_FLAT)                                               \
       man/frama-c.1 doc/README						\
       doc/code/docgen.ml                                                \
-      doc/code/*.css doc/code/intro_plugin.txt				\
+      $(wildcard doc/code/*.css) doc/code/intro_plugin.txt              \
       doc/code/intro_plugin_D_and_S.txt                                 \
       doc/code/intro_plugin_default.txt                                 \
       doc/code/intro_kernel_plugin.txt					\
