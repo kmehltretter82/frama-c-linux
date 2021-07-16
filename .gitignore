@@ -64,6 +64,7 @@ autom4te.cache
 /devel_tools/fc-time
 /devel_tools/fc-memuse
 /bin/ocamldep_transitive_closure
+/bin/check_newlines
 
 #share
 /share/Makefile.config

@@ -2141,6 +2141,28 @@ clean:: hdrck-clean
 CURRENT_HEADERS?=open-source
 CURRENT_HEADER_DIRS?=$(addsuffix /$(CURRENT_HEADERS),$(HEADER_DIRS))
 
+CHECK_NEWLINES:=./bin/check_newlines$(EXE)
+
+$(CHECK_NEWLINES): bin/check_newlines.ml
+	$(PRINT_MAKING)	$@
+ifeq ($(OCAMLBEST),opt)
+	$(OCAMLOPT) unix.cmxa $< -o $@
+else
+	$(OCAMLC) unix.cma $< -o $@
+endif
+
+FILES_WITHOUT_NEWLINE := \
+  VERSION \
+  VERSION_CODENAME \
+  $(sort $(wildcard ivette/src/dome/doc/template/static/fonts/*)) \
+  $(sort $(wildcard share/*.ico share/*.png share/theme/*/*.png))
+
+TESTS_WITHOUT_NEWLINE := \
+  tests/spec/unfinished-oneline-acsl-comment.i \
+  tests/verisec/suite/programs/apps/SpamAssassin/BID-6679/message_write/test \
+  tests/verisec/suite/programs/apps/sendmail/CVE-1999-0047/mime7to8/array_vs_pointer.ods \
+  tests/verisec/suite/programs/apps/sendmail/CVE-1999-0047/mime7to8/data_testing.ods \
+
 # OPEN_SOURCE: set it to 'yes' if you want to check open source headers
 # STRICT_HEADERS: set it to 'yes' if you want to consider warnings as errors
 # The target check-headers does the following checks:
@@ -2153,7 +2175,7 @@ CURRENT_HEADER_DIRS?=$(addsuffix /$(CURRENT_HEADERS),$(HEADER_DIRS))
 # because identical headers but with different encodings are not exactly
 # easy to distinguish
 .PHONY: check-headers
-check-headers: $(HDRCK)
+check-headers: $(HDRCK) $(CHECK_NEWLINES)
 	$(PRINT) "Checking $(DISTRIB_HEADERS) headers (OPEN_SOURCE=$(OPEN_SOURCE), CURRENT_HEADERS=$(CURRENT_HEADERS))..."
 	$(PRINT) "- HEADER_SPEC_FILE=$(HEADER_SPEC_FILE)"
 	$(PRINT) "- CURRENT_HEADER_DIRS=$(CURRENT_HEADER_DIRS)"
@@ -2163,8 +2185,8 @@ check-headers: $(HDRCK)
 	$(file >distrib_tests.tmp) $(foreach O,$(DISTRIB_TESTS),$(file >>distrib_tests.tmp,$O))
 	$(file >header_exceptions.tmp) $(foreach O,$(HEADER_EXCEPTIONS),$(file >>header_exceptions.tmp,$O))
 	echo "Checking that distributed files terminate with a newline..."
-	bin/check_newline.sh distrib_files.tmp
-	bin/check_newline.sh distrib_tests.tmp
+	$(CHECK_NEWLINES) distrib_files.tmp $(FILES_WITHOUT_NEWLINE)
+	$(CHECK_NEWLINES) distrib_tests.tmp $(TESTS_WITHOUT_NEWLINE)
 	@if command -v file >/dev/null 2>/dev/null; then \
 		echo "Checking that distributed files do not use iso-8859..."; \
 		file --mime-encoding -f distrib_files.tmp -f distrib_tests.tmp | \
