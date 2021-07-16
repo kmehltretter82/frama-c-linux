@@ -2133,7 +2133,7 @@ else
 endif
 
 hdrck-clean:
-	$(RM) headers/hdrck headers/hdrck.o
+	$(RM) $(HDRCK) headers/hdrck.o
 	$(RM) headers/hdrck.cmx headers/hdrck.cmi headers/hdrck.cmp
 
 clean:: hdrck-clean
