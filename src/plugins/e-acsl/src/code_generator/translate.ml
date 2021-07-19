@@ -39,14 +39,14 @@ let relation_to_binop = function
   | Req -> Eq
   | Rneq -> Ne
 
-let constant_to_exp ~loc t c =
+let constant_to_exp ~loc t c env =
   let mk_real s =
     let s = Rational.normalize_str s in
     Cil.mkString ~loc s, Typed_number.Str_R
   in
   match c with
   | Integer(n, _repr) ->
-    let ity = Typing.get_number_ty t in
+    let ity = Typing.get_number_ty t (Env.Local_vars.get env) in
     (match ity with
      | Typing.Nan -> assert false
      | Typing.Real -> Error.not_yet "real number constant"
@@ -57,7 +57,7 @@ let constant_to_exp ~loc t c =
      | Typing.C_float fkind ->
        Cil.kfloat ~loc fkind (Int64.to_float (Integer.to_int64 n)), C_number
      | Typing.C_integer kind ->
-       let cast = Typing.get_cast t in
+       let cast = Typing.get_cast t (Env.Local_vars.get env) in
        match cast, kind with
        | Some ty, (ILongLong | IULongLong) when Gmp_types.Z.is_t ty ->
          (* too large integer *)
@@ -91,7 +91,7 @@ let conditional_to_exp ?(name="if") loc kf t_opt e1 (e2, env2) (e3, env3) =
   | _ ->
     let ty = match t_opt with
       | None (* predicate *) -> Cil.intType
-      | Some t -> Typing.get_typ t
+      | Some t -> Typing.get_typ t (Env.Local_vars.get env)
     in
     let _, e, env =
       Env.new_var
@@ -198,8 +198,8 @@ and extended_quantifier_to_exp ~adata ~loc kf env t t_min t_max lambda name =
   let e, adata, env =
     match name.lv_name,lambda.term_node with
     | "\\sum", Tlambda([ k ] ,lt) ->
-      let ty_sum = Typing.get_typ t in
-      let ty_k = match Typing.get_cast t_min with
+      let ty_sum = Typing.get_typ t (Env.Local_vars.get env) in
+      let ty_k = match Typing.get_cast t_min (Env.Local_vars.get env) with
         |Some e ->e
         | _ -> Options.fatal "unexpected error in \\sum translation"
       in
@@ -299,7 +299,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
   let loc = t.term_loc in
   match t.term_node with
   | TConst c ->
-    let c, strnum = constant_to_exp ~loc t c in
+    let c, strnum = constant_to_exp ~loc t c env in
     c, adata, env, strnum, ""
   | TLval lv ->
     let lv, env, name = tlval_to_lval kf env lv in
@@ -329,7 +329,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
     let adata, env = Assert.register_term ~loc kf env t e adata in
     e, adata, env, Typed_number.C_number, "alignof"
   | TUnOp(Neg | BNot as op, t') ->
-    let ty = Typing.get_typ t in
+    let ty = Typing.get_typ t (Env.Local_vars.get env) in
     let e, adata, env = term_to_exp ~adata kf env t' in
     if Gmp_types.Z.is_t ty then
       let name, vname = match op with
@@ -352,12 +352,12 @@ and context_insensitive_term_to_exp ~adata kf env t =
     else
       Cil.new_exp ~loc (UnOp(op, e, ty)), adata, env, Typed_number.C_number, ""
   | TUnOp(LNot, t) ->
-    let ty = Typing.get_op t in
+    let ty = Typing.get_op t (Env.Local_vars.get env) in
     if Gmp_types.Z.is_t ty then
       (* [!t] is converted into [t == 0] *)
       let zero = Logic_const.tinteger 0 in
-      let ctx = Typing.get_number_ty t in
-      Typing.type_term ~use_gmp_opt:true ~ctx zero;
+      let ctx = Typing.get_number_ty t (Env.Local_vars.get env) in
+      Typing.type_term ~use_gmp_opt:true ~ctx (Env.Local_vars.get env) zero;
       let e, adata, env =
         comparison_to_exp
           ~adata
@@ -379,7 +379,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
       e, adata, env, Typed_number.C_number, ""
     end
   | TBinOp(PlusA | MinusA | Mult as bop, t1, t2) ->
-    let ty = Typing.get_typ t in
+    let ty = Typing.get_typ t (Env.Local_vars.get env) in
     let e1, adata, env = term_to_exp ~adata kf env t1 in
     let e2, adata, env = term_to_exp ~adata kf env t2 in
     if Gmp_types.Z.is_t ty then
@@ -402,7 +402,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
       e, adata, env, Typed_number.C_number, ""
     end
   | TBinOp(Div | Mod as bop, t1, t2) ->
-    let ty = Typing.get_typ t in
+    let ty = Typing.get_typ t (Env.Local_vars.get env) in
     let e1, adata, env = term_to_exp ~adata kf env t1 in
     (* Creating a second assertion context that will hold the data contributing
        to the guard of the denominator. The context will be merged to [adata]
@@ -413,14 +413,14 @@ and context_insensitive_term_to_exp ~adata kf env t =
     if Gmp_types.Z.is_t ty then
       (* TODO: preventing division by zero should not be required anymore.
          RTE should do this automatically. *)
-      let ctx = Typing.get_number_ty t in
+      let ctx = Typing.get_number_ty t (Env.Local_vars.get env) in
       let t = Some t in
       let name = Gmp.name_of_mpz_arith_bop bop in
       (* [TODO] can now do better since the type system got some info about
          possible values of [t2] *)
       (* guarding divisions and modulos *)
       let zero = Logic_const.tinteger 0 in
-      Typing.type_term ~use_gmp_opt:true ~ctx zero;
+      Typing.type_term ~use_gmp_opt:true ~ctx ~lenv:(Env.Local_vars.get env) zero;
       (* do not generate [e2] from [t2] twice *)
       let guard, _, env =
         let name = Misc.name_of_binop bop ^ "_guard" in
@@ -458,14 +458,14 @@ and context_insensitive_term_to_exp ~adata kf env t =
     end
   | TBinOp(Lt | Gt | Le | Ge | Eq | Ne as bop, t1, t2) ->
     (* comparison operators *)
-    let ity = Typing.get_integer_op t in
+    let ity = Typing.get_integer_op t (Env.Local_vars.get env)  in
     let e, adata, env =
       comparison_to_exp ~adata ~loc kf env ity bop t1 t2 (Some t)
     in
     e, adata, env, Typed_number.C_number, ""
   | TBinOp((Shiftlt | Shiftrt) as bop, t1, t2) ->
     (* left/right shift *)
-    let ty = Typing.get_typ t in
+    let ty = Typing.get_typ t (Env.Local_vars.get env) in
     (* Creating secondary assertion contexts [adata1] and [adata2] to hold the
        data contributing to the guards of [t1] and [t2].
        Both secondary contexts will be merged to [adata] afterward so that the
@@ -488,12 +488,12 @@ and context_insensitive_term_to_exp ~adata kf env t =
         | TLogic_coerce (_, t) -> term_to_name t
         | _ -> ""
       in
-      let ctx = Typing.get_number_ty t in
+      let ctx = Typing.get_number_ty t (Env.Local_vars.get env) in
       let bop_name = Misc.name_of_binop bop in
       let e1_name = term_to_name t1 in
       let e2_name = term_to_name t2 in
       let zero = Logic_const.tinteger 0 in
-      Typing.type_term ~use_gmp_opt:true ~ctx zero;
+      Typing.type_term ~use_gmp_opt:true ~ctx ~lenv:(Env.Local_vars.get env) zero;
 
       (* Check that e2 is representable in mp_bitcnt_t *)
       let coerce_guard, env =
@@ -668,7 +668,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
     e, adata, env, Typed_number.C_number, ""
   | TBinOp((BOr | BXor | BAnd) as bop, t1, t2) ->
     (* other logic/arith operators  *)
-    let ty = Typing.get_typ t in
+    let ty = Typing.get_typ t (Env.Local_vars.get env) in
     let e1, adata, env = term_to_exp ~adata kf env t1 in
     let e2, adata, env = term_to_exp ~adata kf env t2 in
     if Gmp_types.Z.is_t ty then
@@ -703,11 +703,11 @@ and context_insensitive_term_to_exp ~adata kf env t =
     let e = Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)) in
     e, adata, env, Typed_number.C_number, ""
   | TBinOp(MinusPP, t1, t2) ->
-    begin match Typing.get_number_ty t with
+    begin match Typing.get_number_ty t (Env.Local_vars.get env) with
       | Typing.C_integer _ ->
         let e1, adata, env = term_to_exp ~adata kf env t1 in
         let e2, adata, env = term_to_exp ~adata kf env t2 in
-        let ty = Typing.get_typ t in
+        let ty = Typing.get_typ t (Env.Local_vars.get env) in
         let e = Cil.new_exp ~loc (BinOp(MinusPP, e1, e2, ty)) in
         e, adata, env, Typed_number.C_number, ""
       | Typing.Gmpz ->
@@ -844,8 +844,10 @@ and context_insensitive_term_to_exp ~adata kf env t =
    constructs. *)
 and term_to_exp ~adata kf env t =
   let generate_rte = Env.generate_rte env in
-  Options.feedback ~dkey ~level:4 "translating term %a (rte? %b)"
-    Printer.pp_term t generate_rte;
+  Options.feedback ~dkey ~level:4 "translating term %a (rte? %b)in local \
+                                   environment '%a'"
+  Printer.pp_term t generate_rte Typing.Params_ty.pretty
+  (Env.Local_vars.get env);
   Extlib.flatten
     (Env.with_rte_and_result env false
        ~f:(fun env ->
@@ -853,7 +855,7 @@ and term_to_exp ~adata kf env t =
              context_insensitive_term_to_exp ~adata kf env t
            in
            let env = if generate_rte then translate_rte kf env e else env in
-           let cast = Typing.get_cast t in
+           let cast = Typing.get_cast t (Env.Local_vars.get env) in
            let name = if name = "" then None else Some name in
            Extlib.nest
              adata
@@ -987,10 +989,10 @@ and at_to_exp_no_lscope env kf t_opt label e =
 
 and env_of_li ~adata li kf env loc =
   let t = Misc.term_of_li li in
-  let ty = Typing.get_typ t in
+  let ty = Typing.get_typ t (Env.Local_vars.get env) in
   let vi, vi_e, env = Env.Logic_binding.add ~ty env kf li.l_var_info in
   let e, adata, env = term_to_exp ~adata kf env t in
-  let stmt = match Typing.get_number_ty t with
+  let stmt = match Typing.get_number_ty t (Env.Local_vars.get env) with
     | Typing.(C_integer _ | C_float _ | Nan) ->
       Smart_stmt.assigns ~loc ~result:(Cil.var vi) e
     | Typing.Gmpz ->
@@ -1028,7 +1030,7 @@ and predicate_content_to_exp ~adata ?name kf env p =
   | Pobject_pointer _ -> Env.not_yet env "\\object_pointer"
   | Pvalid_function _ -> Env.not_yet env "\\valid_function"
   | Prel(rel, t1, t2) ->
-    let ity = Typing.get_integer_op_of_predicate p in
+    let ity = Typing.get_integer_op_of_predicate p (Env.Local_vars.get env) in
     comparison_to_exp ~adata ~loc kf env ity (relation_to_binop rel) t1 t2 None
   | Pand(p1, p2) ->
     (* p1 && p2 <==> if p1 then p2 else false *)

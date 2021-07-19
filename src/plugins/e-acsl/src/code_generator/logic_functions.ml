@@ -202,13 +202,20 @@ let generate_kf ~loc fname env ret_ty params_ty li =
     let env = Env.push env in
     (* fill the typing environment with the function's parameters
        before generating the code (code generation invokes typing) *)
+    let env = Env.Local_vars.create env in
     let env =
-      let add env lvi vi =
+      let add ty env =
+        Env.Local_vars.add env ty
+      in
+      List.fold_right add params_ty env
+    in
+    let env =
+      let add lvi vi env =
         let i = Interval.interv_of_typ vi.vtype in
         Interval.Env.add lvi i;
-        Env.Logic_binding.add_binding env lvi vi
+        Env.Logic_binding.add_binding env lvi vi;
       in
-      List.fold_left2 add env li.l_profile params
+      List.fold_right2 add li.l_profile params env
     in
     let b, env = generate_body ~loc kf env ret_ty ret_vi li.l_body in
     fundec.sbody <- b;
@@ -244,15 +251,15 @@ let generate_kf ~loc fname env ret_ty params_ty li =
 (***************************** Memoization ********************************)
 (**************************************************************************)
 
-module Params_ty =
-  Datatype.List_with_collections
-    (Typing.Datatype)
-    (struct let module_name = "E_ACSL.Logic_functions.Params_ty" end)
+(* module Params_ty =
+ *   Datatype.List_with_collections
+ *     (Typing.Datatype)
+ *     (struct let module_name = "E_ACSL.Logic_functions.Params_ty" end) *)
 
 (* for each logic_info, associate its possible profiles, i.e. the types of its
    parameters + the generated varinfo for the function *)
 let memo_tbl:
-  kernel_function Params_ty.Hashtbl.t Logic_info.Hashtbl.t
+  kernel_function Typing.Params_ty.Hashtbl.t Logic_info.Hashtbl.t
   = Logic_info.Hashtbl.create 7
 
 let reset () = Logic_info.Hashtbl.clear memo_tbl
@@ -271,7 +278,7 @@ let add_generated_functions globals =
            GFunDecl(Cil.empty_funspec (), Kernel_function.get_vi kf, loc)
            :: acc
          in
-         aux (Params_ty.Hashtbl.fold_sorted (fun _ -> add_fundecl) params acc) l
+         aux (Typing.Params_ty.Hashtbl.fold_sorted (fun _ -> add_fundecl) params acc) l
        with Not_found ->
          aux acc l)
     | g :: l ->
@@ -288,7 +295,7 @@ let add_generated_functions globals =
   in
   let rev_globals =
     Logic_info.Hashtbl.fold_sorted
-      (fun _ -> Params_ty.Hashtbl.fold_sorted (fun _ -> add_fundec))
+      (fun _ -> Typing.Params_ty.Hashtbl.fold_sorted (fun _ -> add_fundec))
       memo_tbl
       rev_globals
   in
@@ -297,10 +304,10 @@ let add_generated_functions globals =
 (* Generate (and memoize) the function body and create the call to the
    generated function. *)
 let function_to_exp ~loc fname env kf t li params_ty args =
-  let ret_ty = Typing.get_typ t in
+ let ret_ty = Typing.get_typ t (Env.Local_vars.get env) in
   let gen tbl =
     let vi, kf, gen_body = generate_kf fname ~loc env ret_ty params_ty li in
-    Params_ty.Hashtbl.add tbl params_ty kf;
+    Typing.Params_ty.Hashtbl.add tbl params_ty kf;
     vi, gen_body
   in
   (* memoise the function's varinfo *)
@@ -308,12 +315,12 @@ let function_to_exp ~loc fname env kf t li params_ty args =
     try
       let h = Logic_info.Hashtbl.find memo_tbl li in
       try
-        let kf = Params_ty.Hashtbl.find h params_ty in
+        let kf = Typing.Params_ty.Hashtbl.find h params_ty in
         Kernel_function.get_vi kf,
         (fun () -> ()) (* body generation already planified *)
       with Not_found -> gen h
     with Not_found ->
-      let h = Params_ty.Hashtbl.create 7 in
+      let h = Typing.Params_ty.Hashtbl.create 7 in
       Logic_info.Hashtbl.add memo_tbl li h;
       gen h
   in
@@ -419,7 +426,7 @@ let tapp_to_exp ~adata kf env ?eargs tapp =
           try
             List.fold_right2
               (fun targ earg (params_ty, args, adata, env) ->
-                 let param_ty = Typing.get_number_ty targ in
+                 let param_ty = Typing.get_number_ty targ (Env.Local_vars.get env) in
                  let e, env =
                    try
                      let ty = Typing.typ_of_number_ty param_ty in

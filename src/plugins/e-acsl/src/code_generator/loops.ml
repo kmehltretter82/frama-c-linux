@@ -66,7 +66,7 @@ let handle_annotations env kf stmt =
              let env = Env.set_annotation_kind env Smart_stmt.Variant in
              let env = Env.push env in
              Typing.type_term ~use_gmp_opt:true t;
-             let ty = Typing.get_typ t in
+             let ty = Typing.get_typ t (Env.Local_vars.get env) in
              if Gmp_types.is_t ty then Error.not_yet "loop variant using GMP";
              let e, _, env = !term_to_exp_ref ~adata:Assert.no_data kf env t in
              let vi_old, e_old, env =
@@ -289,8 +289,8 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     Typing.type_term ~use_gmp_opt:false t1;
     Typing.type_term ~use_gmp_opt:false t2;
     let ctx =
-      let ty1 = Typing.get_number_ty t1 in
-      let ty2 = Typing.get_number_ty t2 in
+      let ty1 = Typing.get_number_ty t1 (Env.Local_vars.get env) in
+      let ty2 = Typing.get_number_ty t2 (Env.Local_vars.get env) in
       Typing.join ty1 ty2
     in
     let t_plus_one ?ty t =
@@ -409,7 +409,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     Env.Logic_binding.remove env logic_x;
     [ start ;  stmt ], env
   | Lscope.Lvs_let(lv, t) :: lscope_vars' ->
-    let ty = Typing.get_typ t in
+    let ty = Typing.get_typ t (Env.Local_vars.get env) in
     let vi_of_lv, exp_of_lv, env = Env.Logic_binding.add ~ty env kf lv in
     let e, _, env = term_to_exp kf env t in
     let ty = Cil.typeOf e in

@@ -76,6 +76,8 @@ type t = {
   (* list of loop environment for each currently visited loops *)
   cpt: int;
   (* counter used when generating variables *)
+  local_vars: Typing.Params_ty.t list
+  (* type of variables used in calls to logic functions and predicates *)
 }
 
 let empty_block =
@@ -106,7 +108,8 @@ let empty =
     contract_stack = [];
     var_mapping = Logic_var.Map.empty;
     loop_envs = [];
-    cpt = 0 }
+    cpt = 0;
+    local_vars = [] }
 
 let top env = match env.env_stack with
   | [] -> Options.fatal "Empty environment. That is unexpected."
@@ -542,6 +545,31 @@ module Context = struct
     end else
       env
 
+end
+
+module Local_vars = struct
+
+  let create env =
+    {env with local_vars = [] :: env.local_vars}
+
+  let add env ty =
+   match env.local_vars with
+   | curr::stacked -> {env with local_vars = (ty :: curr) :: stacked}
+   | [] -> Options.fatal "Trying to add local variable in a non-existing environment"
+
+  let get env =
+    try List.hd env.local_vars
+    with Failure _ -> []
+
+  (* let clear env =
+   *   Options.feedback "clearing environment '%a'" Typing.Params_ty.pretty (get env);
+   *   let tl =
+   *     try List.tl env.local_vars
+   *     with Failure s when String.equal s "tl" -> Options.fatal "Trying to clear an non-existing environment of local variables"
+   *   in
+   *   let env =
+   *   {env with local_vars = tl}
+   *   in Options.feedback "new local environment is '%a'" Typing.Params_ty.pretty (get env); env *)
 end
 
 let handle_error f env =

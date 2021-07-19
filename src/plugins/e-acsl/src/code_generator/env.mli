@@ -190,6 +190,14 @@ val with_rte_and_result: f:(t -> 'a * t) -> t -> bool -> 'a * t
     This function does not handle exceptions at all. The user must handle them
     either directly in the [f] closure or around the call to the function. *)
 
+module Local_vars: sig
+  val create: t -> t
+  val add: t -> Typing.number_ty -> t
+  val get: t -> Typing.Params_ty.t
+  (* val clear: t -> t *)
+end
+
+
 (* ************************************************************************** *)
 (** {2 Context for error handling} *)
 (* ************************************************************************** *)
