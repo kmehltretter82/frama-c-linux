@@ -311,7 +311,7 @@ let check_spec_discrepancies
     (specs: (string, string) Hashtbl.t)
     (headers: (string, string) Hashtbl.t) : unit =
   let eq_header orig_file template_hdr =
-    let cmd = Format.sprintf "headache -c %s -e %s | diff -q - %s > /dev/null"
+    let cmd = Format.sprintf "headache -c %s -e %s | diff --strip-trailing-cr -q - %s > /dev/null"
         !headache_config_file orig_file template_hdr
     in
     let ret = Sys.command cmd in
