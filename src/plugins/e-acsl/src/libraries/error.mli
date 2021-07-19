@@ -22,14 +22,19 @@
 
 (** Handling errors. *)
 
+exception Ignored
 exception Typing_error of string
 exception Not_yet of string
+
 
 val untypable: string -> 'a
 (** Type error built from the given argument. *)
 
 val not_yet: string -> 'a
 (** Not_yet_implemented error built from the given argument. *)
+
+val ignored: unit -> 'a
+(** Statement already signaled and marked as ignored *)
 
 val handle: ('a -> 'a) -> 'a -> 'a
 (** Run the closure with the given argument and handle potential errors.

@@ -20,6 +20,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
+exception Ignored
+let ignored () = raise Ignored
+
 exception Typing_error of string
 let untypable s = raise (Typing_error s)
 
@@ -67,6 +70,7 @@ let generic_handle f res x =
   | Not_yet s ->
     print_not_yet s;
     res
+  | Ignored -> res
 
 let handle f x = generic_handle f x x
 

@@ -66,7 +66,9 @@ module Label_ids =
 
 let convert kf env loc ~is_forall quantif =
   (* guarded quantification over integers (or a subtype of integer) *)
-  let bound_vars, goal = Bound_variables.get_preprocessed_quantifier quantif in
+  match Bound_variables.get_preprocessed_quantifier quantif with
+  | None -> Error.ignored ()
+  | Some (bound_vars, goal) ->
   match has_empty_quantif_with_false_negative bound_vars, is_forall with
   | true, true ->
     Cil.one ~loc, env
@@ -150,14 +152,10 @@ let convert kf env loc ~is_forall quantif =
 let quantif_to_exp kf env p =
   let loc = p.pred_loc in
   match p.pred_content with
-  | Pforall(bounded_vars, ({pred_content = Pimplies(_, _) } as p')) ->
-    Bound_variables.compute_guards loc ~is_forall:true p bounded_vars p';
+  | Pforall _ ->
     convert kf env loc ~is_forall:true p
-  | Pforall _ -> Error.not_yet "unguarded \\forall quantification"
-  | Pexists(bounded_vars, ({ pred_content = Pand(_, _) } as p')) ->
-    Bound_variables.compute_guards loc ~is_forall:false p bounded_vars p';
+  | Pexists _ ->
     convert kf env loc ~is_forall:false p
-  | Pexists _ -> Error.not_yet "unguarded \\exists quantification"
   | _ -> assert false
 
 (*

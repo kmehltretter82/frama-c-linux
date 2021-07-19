@@ -81,7 +81,7 @@ module Quantified_predicate =
 (* Memoization module to store the preprocessed form of a quantified predicate *)
 module Quantifier: sig
   val add: predicate -> (term * logic_var * term) list -> predicate -> unit
-  val get: predicate -> (term * logic_var * term) list * predicate
+  val get: predicate -> ((term * logic_var * term) list * predicate) option
   (** getter and setter for the additional guard that intersects with the type
       of the variable *)
   val get_guard_for_small_type : logic_var -> predicate option
@@ -95,11 +95,7 @@ end = struct
   let guard_tbl = Cil_datatype.Logic_var.Hashtbl.create 97
 
   let get p =
-    try Quantified_predicate.Hashtbl.find tbl p
-    with Not_found ->
-      Options.fatal
-        "The preprocessed form of predicate %a was not found."
-        Printer.pp_predicate p
+    Quantified_predicate.Hashtbl.find_opt tbl p
 
   let add p guarded_vars goal =
     Quantified_predicate.Hashtbl.add tbl p (guarded_vars, goal)
@@ -125,7 +121,6 @@ let get_guard_for_small_type = Quantifier.get_guard_for_small_type
 let add_guard_for_small_type = Quantifier.add_guard_for_small_type
 let replace = Quantifier.replace
 let clear_guards = Quantifier.clear
-
 
 (** Helper module to process the constraints in the quantification and extract
     guards for the quantified variables. *)

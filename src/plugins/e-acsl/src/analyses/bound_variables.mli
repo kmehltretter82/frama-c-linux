@@ -21,17 +21,13 @@
 (**************************************************************************)
 
 open Cil_types
-open Cil_datatype
 
-
-val compute_guards: location -> is_forall:bool -> predicate -> Logic_var.t list -> predicate -> unit
-(** Take a predicate starting with a quantifier and store the scope of its variable *)
-
-val get_preprocessed_quantifier: predicate -> (term * logic_var * term) list * predicate
+val get_preprocessed_quantifier: predicate -> ((term * logic_var * term) list * predicate) option
 (** @return the preprocessed of a quantified predicate
     the [(term * logic_var * term) list] is the list of all the quantified variables
     along with their syntactic guards, and the [predicate] is the goal: the original
     predicate with all the quantifiers removed *)
+
 
 val add_guard_for_small_type : logic_var -> predicate -> unit
 (** Adds an optional additional guard condition that comes from the typing *)
