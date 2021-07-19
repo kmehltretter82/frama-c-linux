@@ -166,8 +166,8 @@ end = struct
 end
 
 (** Convert the given assumes clauses list to a single [predicate] *)
-let assumes_predicate assumes =
-  List.fold_left
+let assumes_predicate env assumes =
+  let p = List.fold_left
     (fun acc p ->
        let pred = p.ip_content.tp_statement in
        let loc = pred.pred_loc in
@@ -176,6 +176,7 @@ let assumes_predicate assumes =
           Logic_const.unamed ~loc pred.pred_content))
     Logic_const.ptrue
     assumes
+  in Preprocess_typing.preprocess_predicate (Env.Local_vars.get env) p; p
 
 let create ~loc spec =
   (* Create a hashtable to associate a behavior name with an index *)
@@ -253,7 +254,7 @@ let setup_assumes kf env contract =
           if Cil.is_default_behavior b then
             env
           else
-            let assumes = assumes_predicate b.b_assumes in
+            let assumes = assumes_predicate env b.b_assumes in
             let loc = assumes.pred_loc in
             Cil.CurrentLoc.set loc;
             let idx = get_bhvr_idx contract b.b_name in
@@ -341,7 +342,7 @@ let check_requires kf kinstr env contract =
         b.b_requires
     else
       (* Compute the assumes predicate for pretty-printing *)
-      let assumes = assumes_predicate b.b_assumes in
+      let assumes = assumes_predicate env b.b_assumes in
       (* Push a new env and check the requires of the behavior *)
       let env = Env.push env in
       let env, stmts =
@@ -360,6 +361,7 @@ let check_requires kf kinstr env contract =
                  let requires =
                    { requires with pred_name = b.b_name :: requires.pred_name }
                  in
+                 Preprocess_typing.preprocess_predicate (Env.Local_vars.get env) requires;
                  (* Create runtime check *)
                  let adata, env = Assert.empty ~loc kf env in
                  let requires_e, adata, env =
@@ -659,7 +661,7 @@ let check_post_conds kf kinstr env contract =
         b.b_post_cond
     else
       (* Compute the assumes predicate for pretty printing *)
-      let assumes = assumes_predicate b.b_assumes in
+      let assumes = assumes_predicate env b.b_assumes in
       (* Push a new env and check the ensures of the behavior *)
       let env = Env.push env in
       let env, stmts =
@@ -681,6 +683,7 @@ let check_post_conds kf kinstr env contract =
                        { post_cond with
                          pred_name = b.b_name :: post_cond.pred_name }
                      in
+                     Preprocess_typing.preprocess_predicate (Env.Local_vars.get env) post_cond;
                      (* Create runtime check *)
                      let adata, env = Assert.empty ~loc kf env in
                      let post_cond_e, adata, env =

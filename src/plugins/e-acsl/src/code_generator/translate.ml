@@ -528,6 +528,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
         in
         let pname = bop_name ^ "_rhs_fits_in_mp_bitcnt_t" in
         let pred = { pred with pred_name = pname :: pred.pred_name } in
+        Preprocess_typing.preprocess_predicate (Env.Local_vars.get env) pred;
         let cond, env =
           Assert.runtime_check
             ~adata:adata2
@@ -597,6 +598,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
           in
           let e1_guard_cond, env =
             let pred = Logic_const.prel ~loc (Rge, t1, zero) in
+            Preprocess_typing.preprocess_predicate (Env.Local_vars.get env) pred;
             let cond, env =
               Assert.runtime_check
                 ~adata:adata1
@@ -1171,6 +1173,7 @@ and predicate_content_to_exp ~adata ?name kf env p =
            let p = { p with pred_name = name :: p.pred_name } in
            let tp = Logic_const.toplevel_predicate ~kind:Assert p in
            let annot = Logic_const.new_code_annotation (AAssert ([],tp)) in
+           Preprocess_typing.preprocess_rte (Env.Local_vars.get env) annot;
            translate_rte_annots Printer.pp_code_annotation annot kf env [annot]
         )
         env
@@ -1311,6 +1314,7 @@ and translate_rte ?filter kf env e =
     | Some f -> List.filter f l
     | None -> l
   in
+  List.iter (Preprocess_typing.preprocess_rte ~lenv:(Env.Local_vars.get env)) l;
   translate_rte_annots Printer.pp_exp e kf env l
 
 and translate_predicate ?pred_to_print kf env p =

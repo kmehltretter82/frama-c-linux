@@ -379,6 +379,8 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       | Some p ->
         let adata, env = Assert.empty ~loc kf env in
         let e, adata, env =
+          (* Even though p is considered a RTE, it was generated while
+             typing the loop was already typed at this moment *)
           !predicate_to_exp_ref ~adata kf (Env.push env) p
         in
         let stmt, env =

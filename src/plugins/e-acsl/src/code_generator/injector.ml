@@ -212,6 +212,9 @@ let add_new_block_in_stmt env kf stmt =
           stmt.ghost <- false;
           (* translate potential RTEs of ghost code *)
           let rtes = Rte.stmt ~warn:false kf stmt in
+          List.iter
+            (Preprocess_typing.preprocess_rte ~lenv:(Env.Local_vars.get env))
+            rtes;
           Translate.translate_rte_annots Printer.pp_stmt stmt kf env rtes
         end else
           env
