@@ -47,7 +47,7 @@ import { statusData } from 'frama-c/api/kernel/properties';
 import * as Properties from 'frama-c/api/kernel/properties';
 import * as Eva from 'frama-c/api/plugins/eva/general';
 
-type Property = statusData & Eva.propertiesData
+type Property = statusData & Eva.propertiesData;
 
 // --------------------------------------------------------------------------
 // --- Filters
@@ -230,21 +230,19 @@ const renderFile: Renderer<SourceLoc> =
   );
 
 const renderPriority: Renderer<boolean> =
-  (prio: boolean) => {
-    return (prio ? <Icon id="ATTENTION"/> : null)
-  };
+  (prio: boolean) => (prio ? <Icon id="ATTENTION" /> : null);
 
 const renderTaint: Renderer<any> =
   (taint: States.Tag) => {
     let id = null;
-    let color = "black";
+    let color = 'black';
     switch (taint.name) {
-      case 'not_tainted': id="DROP.EMPTY"; color="#00B900"; break;
-      case 'tainted': id="DROP.FILLED"; color="#FF8300"; break;
-      case 'error': id="HELP"; break;
-      default: ;
+      case 'not_tainted': id = 'DROP.EMPTY'; color = '#00B900'; break;
+      case 'tainted': id = 'DROP.FILLED'; color = '#FF8300'; break;
+      case 'error': id = 'HELP'; break;
+      default:
     }
-    return (id ? <Icon id={id} fill={color} title={taint.descr}/> : null)
+    return (id ? <Icon id={id} fill={color} title={taint.descr} /> : null);
   };
 
 function ColumnCode<Row>(props: ColumnProps<Row, string>) {
@@ -455,7 +453,7 @@ const PropertyColumns = () => {
   );
 
   const getTaint = React.useCallback(
-    ({ taint }: Eva.propertiesData) => (taintDict.get(taint) ?? { name: taint }),
+    ({ taint }: Property) => (taintDict.get(taint) ?? { name: taint }),
     [taintDict],
   );
 
@@ -496,7 +494,7 @@ const PropertyColumns = () => {
         width={30}
         visible={false}
         align="center"
-        getter={(prop: Eva.propertiesData) => prop?.priority }
+        getter={(prop: Eva.propertiesData) => prop?.priority}
         render={renderPriority}
       />
       <ColumnTag
@@ -545,17 +543,17 @@ export default function RenderProperties() {
 
   // Hooks
   const model = React.useMemo(() => new PropertyModel(), []);
-  const kernel_data = States.useSyncArray(Properties.status).getArray();
-  const eva_data = States.useSyncArray(Eva.properties).getArray();
+  const kernelData = States.useSyncArray(Properties.status).getArray();
+  const evaData = States.useSyncArray(Eva.properties).getArray();
   useEffect(() => {
     model.removeAllData();
-    var data = new Array(kernel_data.length);
-    for (let i = 0; i < kernel_data.length; i++) {
-      data[i] = { ...kernel_data[i], ...eva_data[i] };
+    const data = new Array(kernelData.length);
+    for (let i = 0; i < kernelData.length; i++) {
+      data[i] = { ...kernelData[i], ...evaData[i] };
     }
     model.updateData(data);
     model.reload();
-  }, [model, kernel_data, eva_data]);
+  }, [model, kernelData, evaData]);
 
   const [selection, updateSelection] = States.useSelection();
 
