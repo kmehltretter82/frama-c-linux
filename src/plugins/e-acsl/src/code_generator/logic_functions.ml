@@ -123,7 +123,7 @@ let generate_body ~loc kf env ret_ty ret_vi = function
 (* Generate a kernel function from a given logic info [li] *)
 let generate_kf ~loc fname env ret_ty params_ty li =
   (* build the formal parameters *)
-  let params, params_ty =
+  let params, params_ty_vi =
     List.fold_right2
       (fun lvi pty (params, params_ty) ->
          let ty = match pty with
@@ -153,9 +153,9 @@ let generate_kf ~loc fname env ret_ty params_ty li =
       let ret_ty_ptr = TPtr(ret_ty, []) (* call by reference *) in
       let vname = vname ^ "_arg" in
       let vi = Cil.makeVarinfo false true vname ret_ty_ptr in
-      vi, Cil.voidType, vi :: params, (vname, ret_ty_ptr, []) :: params_ty
+      vi, Cil.voidType, vi :: params, (vname, ret_ty_ptr, []) :: params_ty_vi
     else
-      Cil.makeVarinfo false false vname ret_ty, ret_ty, params, params_ty
+      Cil.makeVarinfo false false vname ret_ty, ret_ty, params, params_ty_vi
   in
   (* build the function's varinfo *)
   let vi =

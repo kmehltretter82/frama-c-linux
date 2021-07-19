@@ -673,6 +673,10 @@ and infer_term_host thost =
         Printer.pp_typ ty
         Printer.pp_term t
 
+let infer t =
+  let i = infer t in
+  Logic_function_env.clear(); i
+
 include D
 
 (*
