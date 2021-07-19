@@ -98,6 +98,8 @@ const DEFAULTS: { [key: string]: boolean } = {
   'alarms.function_pointer': true,
   'alarms.union_initialization': true,
   'alarms.bool_value': true,
+  'eva.priority_only': false,
+  'eva.tainted_only': false,
 };
 
 function filter(path: string) {
@@ -197,10 +199,21 @@ function filterAlarm(alarm: string | undefined) {
   return filter('alarms.others');
 }
 
+function filterEva(p: Property) {
+  let b = true;
+  if (p.priority === false && filter('eva.priority_only'))
+    b = false;
+  if ((p.taint === 'not_tainted' || p.taint === 'not_applicable')
+      && filter('eva.tainted_only'))
+    b = false;
+  return b;
+}
+
 function filterProperty(p: Property) {
   return filterStatus(p.status)
-    && filterKind(p.kind)
-    && filterAlarm(p.alarm);
+      && filterKind(p.kind)
+      && filterAlarm(p.alarm)
+      && filterEva(p);
 }
 
 // --------------------------------------------------------------------------
@@ -345,6 +358,8 @@ function Section(props: SectionProps) {
 
 interface CheckFieldProps {
   label: string;
+  title?: string;
+  highligh?: boolean; // Highlights the label when the value is [highligh]
   path: string;
 }
 
@@ -353,8 +368,12 @@ function CheckField(props: CheckFieldProps) {
   const onChange = () => { setValue(); Reload.emit(); };
   return (
     <Checkbox
-      style={{ display: 'block' }}
+      style={{
+        display: 'block',
+        color: (props.highligh === value) ? 'red' : '',
+      }}
       label={props.label}
+      title={props.title}
       value={value}
       onChange={onChange}
     />
@@ -417,6 +436,20 @@ function PropertyFilter() {
         <CheckField label="Separations" path="alarms.separation" />
         <CheckField label="Overlaps" path="alarms.overlap" />
         <CheckField label="Initialization of unions" path="alarms.union_initialization" />
+      </Section>
+      <Section label="Eva">
+        <CheckField
+          label="High-priority only"
+          path="eva.priority_only"
+          highligh
+          title="Show only high-priority properties for the Eva analysis"
+        />
+        <CheckField
+          label="Tainted only"
+          path="eva.tainted_only"
+          highligh
+          title="Show only tainted properties according to the Eva taint domain"
+        />
       </Section>
     </Scroll>
   );
