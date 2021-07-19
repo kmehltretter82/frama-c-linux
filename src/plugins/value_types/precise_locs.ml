@@ -270,12 +270,12 @@ let replace_base substitution po =
     let modified, loc = Location_Bits.replace_base substitution loc in
     if modified then { po with loc = PLLoc loc } else po
   | PLVarOffset (base, offset) ->
-    let set = Base.Hptset.singleton base in
-    let modified, set = Base.Hptset.replace substitution set in
-    if modified then
-      let base = Option.get (Base.Hptset.contains_single_elt set) in
-      { po with loc = PLVarOffset (base, offset) }
-    else po
+    begin
+      try
+        let base = Base.Hptshape.find_check_missing base substitution in
+        { po with loc = PLVarOffset (base, offset) }
+      with Not_found -> po
+    end
   | PLLocOffset (loc, offset) ->
     let modified, loc = Location_Bits.replace_base substitution loc in
     if modified

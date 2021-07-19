@@ -65,7 +65,7 @@ end
 
 (** Hashconsed sets of symbolic expressions. *)
 module HCESet: Hptset.S with type elt = HCE.t
-                         and type 'a shape = 'a Hptmap.Shape(HCE).t
+                         and type 'a map = 'a Hptmap.Shape(HCE).t
 
 (* Sets of lvalues that appear in an expression. The [addr] field gathers the
    lvalues [lv] appearing as addresses &lv, while the [read] field gathers the
@@ -92,7 +92,7 @@ val syntactic_lvalues: Cil_types.exp -> lvalues
 module HCEToZone: sig
   include Hptmap_sig.S with type key = HCE.t
                         and type v = Locations.Zone.t
-                        and type 'a shape = 'a Hptmap.Shape(HCE).t
+                        and type 'a map = 'a Hptmap.Shape(HCE).map
 
   val is_included: t -> t -> bool
   val union: t -> t -> t
@@ -105,7 +105,7 @@ end
 module BaseToHCESet: sig
   include Hptmap_sig.S with type key = Base.t
                         and type v = HCESet.t
-                        and type 'a shape = 'a Hptmap.Shape(Base.Base).t
+                        and type 'a map = 'a Hptmap.Shape(Base.Base).map
 
   val union: t -> t -> t
   val inter: t -> t -> t

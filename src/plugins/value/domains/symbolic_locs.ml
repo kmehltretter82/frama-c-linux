@@ -421,8 +421,7 @@ module Memory = struct
         ~empty:K.HCESet.empty
     in
     fun bases t ->
-      let shape = Base.Hptset.shape bases in
-      K.HCESet.union (fold2 t.syntactic_deps shape) (fold2 t.deps shape)
+      K.HCESet.union (fold2 t.syntactic_deps bases) (fold2 t.deps bases)
 
   (* Projects a state [t] onto the set of bases [bases]; used by MemExec to
      efficiently compare different entry states for a function analysis.
@@ -432,9 +431,8 @@ module Memory = struct
      [reuse] if needed. *)
   let filter bases t =
     let keys = gather_keys bases t in
-    let key_shape = K.HCESet.shape keys in
-    let zones = K2Z.inter_with_shape key_shape t.zones in
-    let values = K2V.inter_with_shape key_shape t.values in
+    let zones = K2Z.inter_with_shape keys t.zones in
+    let values = K2V.inter_with_shape keys t.values in
     { values; zones; deps = B2K.empty; syntactic_deps = B2K.empty }
 
   (* Removes from [t] all information about keys whose dependencies intersect
@@ -442,12 +440,10 @@ module Memory = struct
      result. *)
   let diff bases t =
     let keys = gather_keys bases t in
-    let key_shape = K.HCESet.shape keys in
-    let values = K2V.diff_with_shape key_shape t.values in
-    let zones = K2Z.diff_with_shape key_shape t.zones in
-    let base_shape = Base.Hptset.shape bases in
-    let deps = B2K.diff_with_shape base_shape t.deps in
-    let syntactic_deps = B2K.diff_with_shape base_shape t.syntactic_deps in
+    let values = K2V.diff_with_shape keys t.values in
+    let zones = K2Z.diff_with_shape keys t.zones in
+    let deps = B2K.diff_with_shape bases t.deps in
+    let syntactic_deps = B2K.diff_with_shape bases t.syntactic_deps in
     { values; zones; deps; syntactic_deps }
 
   (* Merges all properties from [t] into [into]. *)

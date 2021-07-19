@@ -459,6 +459,8 @@ end
 
 include Base
 
+module Hptshape = Hptmap.Shape (Base)
+
 module Hptset = Hptset.Make
     (Base)
     (struct let v = [ [ ]; [Null] ] end)
@@ -557,12 +559,11 @@ module BMap =
     (struct let v = [ [] ] end)
     (struct let l = [ Ast.self ] end)
 
-type substitution = base Hptmap.Shape(Base).t
+type substitution = base Hptshape.map
 
 let substitution_from_list list =
   let add map (key, elt) = BMap.add key elt map in
-  let bmap = List.fold_left add BMap.empty list in
-  BMap.shape bmap
+  List.fold_left add BMap.empty list
 
 (*
 Local Variables:

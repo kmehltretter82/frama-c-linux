@@ -690,7 +690,7 @@ module Traces = struct
       | edge :: tl ->
         match edge.edge_trans with
         | Loop (stmt',s,last) when Stmt.equal stmt' stmt ->
-          s, Graph.from_shape_id last
+          s, last
         | _ -> find_same_loop tl
     in
     let s,last = find_same_loop succs in
@@ -772,7 +772,7 @@ module GraphDot = OCamlGraph.Graphviz.Dot(struct
       and iter_vertex l g =
         GraphShape.iter (fun k e -> f {node=k;loops=l}; List.iter (iter_edge k l) e) g
       in
-      iter_vertex [] (Graph.shape g)
+      iter_vertex [] g
     let iter_edges_e f g =
       let rec iter_edge k l e =
         f (Usual(k,e,l));
@@ -788,7 +788,7 @@ module GraphDot = OCamlGraph.Graphviz.Dot(struct
             | [], Some back -> f (Back(back,l,k))
             | e, _ -> List.iter (iter_edge k l) e) g
       in
-      iter_vertex None [] (Graph.shape g)
+      iter_vertex None [] g
 
     let graph_attributes _ = []
     let default_vertex_attributes :
@@ -834,7 +834,7 @@ let rec complete_graph (graph:Graph.t) =
               | Msg _ -> e
               | Loop (stmt,s,g) ->
                 let n = e.edge_dst in
-                let g = Graph.shape (complete_graph (Graph.from_shape_id g)) in
+                let g = complete_graph g in
                 { edge_dst = n; edge_trans = Loop(stmt,s,g) }
             in
             Graph.join graph m, e)
@@ -990,7 +990,7 @@ module Internal = struct
         else last
       in
       let state = if Graph.is_empty last then state
-        else Traces.add_trans state (Loop(stmt,s,Graph.shape last)) in
+        else Traces.add_trans state (Loop(stmt,s,last)) in
       let state = Traces.copy_edges s old_current_node g state in
       Traces.add_trans state (Msg "leave_loop")
 

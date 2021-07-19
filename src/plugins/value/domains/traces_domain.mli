@@ -49,7 +49,7 @@ module Edge : Datatype.S with type t = edge
 module Graph : sig
   include Hptmap_sig.S with type key = Node.t
                         and type v = edge list
-                        and type 'a shape = 'a GraphShape.t
+                        and type 'a map = 'a GraphShape.t
 
   val join : t -> t -> t
 end

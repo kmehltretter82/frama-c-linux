@@ -167,16 +167,19 @@ struct
   module Prototype (
       FieldMap :
       sig
-        type t
+        type 'a map
+        type v = t memory
+        and t = v map
         include Hptmap_sig.S
-          with type t := t
+          with type 'a map := 'a map
            and type key = Cil_types.fieldinfo
-           and type v = t memory
+           and type v := v
+           and type t := v map
       end) =
   struct
     type t = FieldMap.t memory
 
-    let rec pretty fmt =
+    let rec pretty fmt : t -> 'a =
       let rec leading_indexes acc = function
         | Array a -> leading_indexes (a.array_range :: acc) a.array_value
         | (Raw _ | Scalar _ | Struct _ | Union _) as m -> List.rev acc, m

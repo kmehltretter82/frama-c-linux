@@ -55,7 +55,8 @@ sig
 end
 
 module type S = sig
-  include Datatype.S_with_collections
+  type 'a map
+  include Datatype.S_with_collections with type t = unit map
   include S_Basic_Compare with type t := t
 
   val contains_single_elt: t -> elt option
@@ -72,23 +73,19 @@ module type S = sig
     decide_right:action ->
     t -> t -> t
 
-  type 'a shape
-  val shape: t -> unit shape
-  val from_shape: 'a shape -> t
-
-  val partition_with_shape: 'a shape -> t -> t * t
+  val from_map: 'a map -> t
 
   val fold2_join_heterogeneous:
     cache:Hptmap_sig.cache_type ->
-    empty_left:('a shape -> 'b) ->
+    empty_left:('a map -> 'b) ->
     empty_right:(t -> 'b) ->
     both:(elt -> 'a -> 'b) ->
     join:('b -> 'b -> 'b) ->
     empty:'b ->
-    t -> 'a shape ->
+    t -> 'a map ->
     'b
 
-  val replace: elt shape -> t -> bool * t
+  val replace: elt map -> t -> bool * t
 
   val clear_caches: unit -> unit
 
@@ -99,7 +96,7 @@ module Make(X: Hptmap.Id_Datatype)
     (Initial_Values : sig val v : X.t list list end)
     (Datatype_deps: sig val l : State.t list end) :   sig
   include S with type elt = X.t
-             and type 'a shape = 'a Hptmap.Shape(X).t
+             and type 'a map = 'a Hptmap.Shape(X).t
   val self : State.t
 end
 = struct
@@ -218,7 +215,7 @@ end
       ~decide_left:Neutral
       ~decide_right:Absorbing
 
-  let from_shape m = from_shape (fun _ _ -> ()) m
+  let from_map m = from_shape (fun _ _ -> ()) m
 
   (* Partial application is needed because of caches *)
   let fold2_join_heterogeneous ~cache ~empty_left ~empty_right ~both ~join ~empty =

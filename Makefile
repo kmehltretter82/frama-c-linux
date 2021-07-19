@@ -675,6 +675,9 @@ check-logic-parser-wildcard:
 
 NON_OPAQUE_DEPS+= src/kernel_services/plugin_entry_points/dynamic
 
+src/kernel_services/abstract_interp/abstract_memory.cmo: BFLAGS += -rectypes
+src/kernel_services/abstract_interp/abstract_memory.cmx: OFLAGS += -rectypes
+
 # C Bindings
 ############
 

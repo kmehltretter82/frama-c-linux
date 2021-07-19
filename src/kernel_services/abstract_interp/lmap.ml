@@ -521,7 +521,7 @@ struct
   end
 
   type map = M.t
-  let shape = M.shape
+  let shape x = x
   let clear_caches = M.clear_caches
 
   exception Found_prefix = M.Found_prefix

@@ -283,8 +283,7 @@ module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
     `Value state
 
   let finalize_recursive_call ~pre recursion state =
-    let shape = Base.Hptset.shape recursion.base_withdrawal in
-    let inter = inter_with_shape shape pre in
+    let inter = inter_with_shape recursion.base_withdrawal pre in
     let state = disjoint_union state inter in
     (* No collision should occur in the substitution. *)
     let decide _key _v1 _v2 = assert false in

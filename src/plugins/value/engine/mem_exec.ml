@@ -47,7 +47,7 @@ exception TooImprecise
 let bases = function
   | Locations.Zone.Top (Base.SetLattice.Top, _) -> raise TooImprecise
   | Locations.Zone.Top (Base.SetLattice.Set s, _) -> s
-  | Locations.Zone.Map m -> Base.Hptset.from_shape (Locations.Zone.shape m)
+  | Locations.Zone.Map m -> Base.Hptset.from_map (Locations.Zone.shape m)
 
 
 let counter = ref 0

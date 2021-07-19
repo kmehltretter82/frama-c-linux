@@ -276,7 +276,7 @@ module Make_Table(Data: Datatype.S)(Info: State_builder.Info_with_size):
 (** Set of kernel functions. *)
 module Hptset : Hptset.S
   with type elt = kernel_function
-   and type 'a shape = 'a Hptmap.Shape(Cil_datatype.Kf).t
+   and type 'a map = 'a Hptmap.Shape(Cil_datatype.Kf).t
 
 
 (* ************************************************************************* *)

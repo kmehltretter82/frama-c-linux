@@ -263,8 +263,7 @@ module State = struct
     let state = Model.replace_base substitution state in
     let clob = if direct then clob else Locals_scoping.top () in
     let state = Locals_scoping.substitute substitution clob state in
-    let shape = Base.Hptset.shape recursion.base_withdrawal in
-    let inter = Cvalue.Model.filter_by_shape shape pre in
+    let inter = Cvalue.Model.filter_by_shape recursion.base_withdrawal pre in
     Cvalue.Model.merge ~into:state inter
 
   let finalize_call stmt call recursion ~pre ~post =
@@ -290,7 +289,7 @@ module State = struct
 
   (* Auxiliary function that keeps only some bases inside a memory state *)
   let filter _kf _kind bases (state, clob) =
-    Cvalue.Model.filter_by_shape (Base.Hptset.shape bases) state, clob
+    Cvalue.Model.filter_by_shape bases state, clob
 
   let reuse _ _ ~current_input:(state, _) ~previous_output:(output, clob) =
     Cvalue.Model.merge ~into:state output, clob

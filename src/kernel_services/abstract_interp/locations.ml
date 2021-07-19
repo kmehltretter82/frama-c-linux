@@ -60,10 +60,12 @@ end
 
 module Location_Bytes = struct
 
-  module M =
-    Hptmap.Make
-      (Base.Base) (Ival) (Comp_exact) (Initial_Values)
-      (struct let l = [ Ast.self ] end)
+  module M = struct
+    include Hptmap.Make
+        (Base.Base) (Ival) (Comp_exact) (Initial_Values)
+        (struct let l = [ Ast.self ] end)
+    let shape x = x
+  end
   let () = Ast.add_monotonic_state M.self
   let clear_caches = M.clear_caches
 
@@ -138,7 +140,7 @@ module Location_Bytes = struct
       ~both:(fun _b i1 i2 -> Ival.add_int i1 (Ival.scale_int_base factor i2))
       ~join:Ival.join
       ~empty:Ival.bottom
-      m1 (M.shape m2)
+      m1 m2
 
   let sub_pointwise ?factor l1 l2 =
     match l1, l2 with
@@ -465,7 +467,7 @@ module Zone = struct
       Base.SetLattice.mem b top_param
     | Map m -> M.mem b m
 
-  let shape = M.shape
+  let shape x = x
 
   let fold2_join_heterogeneous ~cache ~empty_left ~empty_right ~both ~join ~empty =
     let f_top =
