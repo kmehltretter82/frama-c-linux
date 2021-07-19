@@ -36,31 +36,38 @@ int eacsl_runtime_sound_verdict = 1;
 
 #ifndef E_ACSL_EXTERNAL_ASSERT
 /*! \brief Default implementation of E-ACSL runtime assertions */
-void eacsl_runtime_assert(int predicate, int blocking, const char *kind,
-                          const char *fct, const char *pred_txt,
-                          const char *file, int line) {
+void eacsl_runtime_assert(int predicate, eacsl_assert_data_t *data) {
   if (eacsl_runtime_sound_verdict) {
     if (!predicate) {
+      // clang-format off
       STDERR("%s: In function '%s'\n"
              "%s:%d: Error: %s failed:\n"
              "\tThe failing predicate is:\n"
              "\t%s.\n",
-             file, fct, file, line, kind, pred_txt);
-      if (blocking) {
+             data->file, data->fct,
+             data->file, data->line, data->kind,
+             data->pred_txt);
+      // clang-format on
+      if (data->blocking) {
 #  ifndef E_ACSL_NO_ASSERT_FAIL /* Do fail on assertions */
 #    ifdef E_ACSL_FAIL_EXITCODE /* Fail by exit with a given code */
         exit(E_ACSL_FAIL_EXITCODE);
 #    else
-        raise_abort(file, line); /* Raise abort signal */
+        raise_abort(data->file, data->line); /* Raise abort signal */
 #    endif
 #  endif
       }
     }
-  } else
+  } else {
+    // clang-format off
     STDERR("%s: In function '%s'\n"
            "%s:%d: Warning: no sound verdict for %s (guess: %s).\n"
            "\tthe considered predicate is:\n"
            "\t%s\n",
-           file, fct, file, line, kind, predicate ? "ok" : "FAIL", pred_txt);
+           data->file, data->fct,
+           data->file, data->line, data->kind, predicate ? "ok" : "FAIL",
+           data->pred_txt);
+    // clang-format on
+  }
 }
 #endif
