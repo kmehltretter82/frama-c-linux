@@ -25,6 +25,8 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-* E-ACSL       [2021-07-19] Fix crash when raising some user errors
+                (frama-c/e-acsl#170).
 -* E-ACSL       [2021-07-16] Fix crash when using some built-in labels
                 (frama-c/e-acsl#173).
 -  E-ACSL       [2021-07-06] Add support for the extended quantifier \sum.
