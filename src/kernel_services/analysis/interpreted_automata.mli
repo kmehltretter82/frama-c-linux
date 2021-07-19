@@ -344,8 +344,12 @@ sig
   end
 end
 
+(** Forward dataflow analysis. The domain must provide a forward [transfer]
+    function that computes the state after a transition from the state before. *)
 module ForwardAnalysis (D : Domain) : DataflowAnalysis
   with type state = D.t
 
+(** Backward dataflow analysis. The domain must provide a backward [transfer]
+    function that computes the state before a transition from the state after. *)
 module BackwardAnalysis (D : Domain) : DataflowAnalysis
   with type state = D.t
