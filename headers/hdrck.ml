@@ -238,7 +238,11 @@ let get_header_files ?directories:(dirs=(get_header_dirs ())) () :
                  let cmd = Format.sprintf "diff -q %s %s > /dev/null" filepath previous_entry in
                  let ret = Sys.command cmd in (* files must still be present *)
                  if ret <> 0 then
-                   warn "%s: duplicated license name (same contents as file: %s)@." filepath previous_entry
+                   if ret = 255 then
+                     (* Ctrl+C pressed; abort execution *)
+                     exit 255
+                   else
+                     warn "%s: duplicated license name (same contents as file: %s)@." filepath previous_entry
                  else
                    error ~exit_value:7
                       "%s: duplicated license name (contents differs to file: %s)@." filepath previous_entry
@@ -279,7 +283,11 @@ let extract_header filename template_hdr =
       !headache_config_file filename hdr_filename in
   let ret = Sys.command cmd in
   if ret <> 0 then
-    debug "%s : error during header template generations@." filename
+    if ret = 255 then
+      (* Ctrl+C pressed; abort execution *)
+      exit 255
+    else
+      debug "%s : error during header template generations@." filename
 
 (* Check, for each file, if its license header specification corresponds to what
  * exists at the beginning of the file. If any discrepancy between the
@@ -299,6 +307,10 @@ let check_spec_discrepancies
         !headache_config_file orig_file template_hdr
     in
     let ret = Sys.command cmd in
+    if ret = 255 then
+      (* Ctrl+C pressed, abort execution *)
+      exit 255
+    else
     if ret <> 0 && !debug_flag then extract_header orig_file template_hdr ;
     ret = 0
   in
@@ -431,7 +443,11 @@ let update_headers header_specifications =
         !headache_config_file header filename in
     let ret = Sys.command cmd in
     if ret <> 0 then
-      debug "%s : error updating header" filename
+      if ret = 255 then
+        (* Ctrl+C pressed; abort execution *)
+        exit 255
+      else
+        debug "%s : error updating header" filename
   in
   job_head "Updating header files ... @?";
   Hashtbl.iter
