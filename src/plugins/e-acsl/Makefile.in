@@ -58,14 +58,15 @@ SRC_PROJECT_INITIALIZER:=\
 # analyses
 SRC_ANALYSES:= \
 	rte \
-	bound_variables \
+  lscope \
+  preprocess_predicates \
+  bound_variables \
 	interval \
 	typing \
 	preprocess_typing \
 	literal_strings \
 	memory_tracking \
-	exit_points \
-	lscope
+	exit_points
 SRC_ANALYSES:=$(addprefix src/analyses/, $(SRC_ANALYSES))
 
 # code generator

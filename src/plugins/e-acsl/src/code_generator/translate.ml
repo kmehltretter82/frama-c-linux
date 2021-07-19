@@ -27,11 +27,6 @@ open Cil_types
 open Cil_datatype
 let dkey = Options.dkey_translation
 
-(* internal to [predicate_to_exp] but put it outside in order to not add
-   extra tedious parameter.
-   It is [true] iff we are currently visiting \valid. *)
-let is_visiting_valid = ref false
-
 (* ************************************************************************** *)
 (* Transforming terms and predicates into C expressions (if any) *)
 (* ************************************************************************** *)
@@ -1160,26 +1155,9 @@ and predicate_content_to_exp ~adata ?name kf env p =
       let adata, env = Assert.register_pred ~loc kf env p e adata in
       e, adata, env
     in
-    if !is_visiting_valid then begin
       (* we already transformed \valid(t) into \initialized(&t) && \valid(t):
          now convert this right-most valid. *)
-      is_visiting_valid := false;
       call_valid ~adata t p
-    end else begin
-      match t.term_node, t.term_type with
-      | TLval tlv, lty ->
-        let init =
-          Logic_const.pinitialized
-            ~loc
-            (llabel, Logic_utils.mk_logic_AddrOf ~loc tlv lty)
-        in
-        Typing.type_named_predicate ~must_clear:false init;
-        let p = Logic_const.pand ~loc (init, p) in
-        is_visiting_valid := true;
-        predicate_to_exp ~adata kf env p
-      | _ ->
-        call_valid ~adata t p
-    end
   | Pvalid _ -> Env.not_yet env "labeled \\valid"
   | Pvalid_read _ -> Env.not_yet env "labeled \\valid_read"
   | Pseparated tlist ->
@@ -1294,7 +1272,6 @@ and translate_rte_annots:
   'a. (Format.formatter -> 'a -> unit) -> 'a ->
   kernel_function -> Env.t -> code_annotation list -> Env.t =
   fun pp elt kf env l ->
-  let old_valid = !is_visiting_valid in
   let old_kind = Env.annotation_kind env in
   let env = Env.set_annotation_kind env Smart_stmt.RTE in
   let env =
@@ -1320,7 +1297,6 @@ and translate_rte_annots:
       env
       l
   in
-  is_visiting_valid := old_valid;
   Env.set_annotation_kind env old_kind
 
 and translate_rte ?filter kf env e =
