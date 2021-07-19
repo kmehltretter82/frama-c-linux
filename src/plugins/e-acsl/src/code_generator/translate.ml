@@ -1254,22 +1254,13 @@ and predicate_to_exp ~adata ?name kf ?rte env p =
                   e)
            ))
 
-and generalized_untyped_predicate_to_exp
-    ~adata
-    ?name
-    kf
-    ?rte
-    ?must_clear_typing
-    env
-    p
-  =
+and generalized_untyped_predicate_to_exp ~adata ?name kf ?rte env p =
   (* If [rte] is true, it means we're translating the root predicate of an
      assertion and we need to generate the RTE for it. The typing environment
      must be cleared. Otherwise, if [rte] is false, it means we're already
      translating RTE predicates as part of the translation of another root
      predicate, and the typing environment must be kept. *)
   let rte = match rte with None -> Env.generate_rte env | Some b -> b in
-  let must_clear = match must_clear_typing with None -> rte | Some b -> b in
   let e, adata, env = predicate_to_exp ~adata ?name kf ~rte env p in
   assert (Typ.equal (Cil.typeOf e) Cil.intType);
   let env = Env.Logic_scope.reset env in
@@ -1461,7 +1452,6 @@ let untyped_predicate_to_exp p =
   let e, _, env =
     try generalized_untyped_predicate_to_exp
           ~adata:Assert.no_data
-          ~must_clear_typing:false
           (Kernel_function.dummy ())
           env
           p

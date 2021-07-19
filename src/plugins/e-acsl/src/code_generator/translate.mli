@@ -39,7 +39,6 @@ val generalized_untyped_predicate_to_exp:
   ?name:string ->
   kernel_function ->
   ?rte:bool ->
-  ?must_clear_typing:bool ->
   Env.t ->
   predicate ->
   exp * Assert.t * Env.t
