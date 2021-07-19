@@ -78,10 +78,18 @@ let error ~exit_value =
   in
   if !exit_on_error then exit_fmt ~exit_value else error_fmt
 
+(* We deliberately do _not_ use Filename.concat, since it has issues on Cygwin;
+   due to the possibility of mixing directory separators (e.g., '\' coming from
+   Windows-style paths, and '/' from Unix-style paths, such as the ones written
+   in the header_spec.txt files.
+*)
+let path_concat p1 p2 =
+  p1 ^ "/" ^ p2
+
 (* Temporary directory management (cont.) *)
 let get_tmp_dirname () = match !tmp_dirname with
   | None ->
-    let dirname = Filename.concat (Filename.get_temp_dir_name ()) ".hdck" in
+    let dirname = path_concat (Filename.get_temp_dir_name ()) ".hdck" in
     debug "Using temporary directory: %s@." dirname;
     if not (Sys.file_exists dirname) then Unix.mkdir dirname 0o740;
     tmp_dirname := Some dirname;
@@ -185,9 +193,9 @@ let read_specs (ignored_files: StringSet.t ref) (spec_tab: (string, string) Hash
        | filename :: [license_name] ->
          let filename = String.trim filename in
          let filename =
-           if sub_dir <> "" then Filename.concat sub_dir filename else filename
+           if sub_dir <> "" then path_concat sub_dir filename else filename
          in
-         let filename = Filename.concat !root_dir filename in
+         let filename = path_concat !root_dir filename in
          let license_name = String.trim license_name in
          add_spec_entry ignored_files spec_tab i filename license_name
        | _ ->
@@ -231,7 +239,7 @@ let get_header_files ?directories:(dirs=(get_header_dirs ())) () :
          Array.iter
            (fun filename ->
               let license_name = filename in
-              let filepath = Filename.concat dir filename in
+              let filepath = path_concat dir filename in
               (try (* Checks that the license name is a new entry
                       or else that their related files have the same content. *)
                  let previous_entry = Hashtbl.find license_path_tbl license_name in
@@ -275,7 +283,7 @@ let check_declared_headers specification headers =
 (*  extract_header function is used in debug mode when there are discrepancies *)
 let extract_header filename template_hdr =
   let dirname = get_tmp_dirname () in
-  let hdr_filename = Filename.concat dirname (Filename.basename filename) in
+  let hdr_filename = path_concat dirname (Filename.basename filename) in
   debug "%s: %s does not conform to %s@." filename hdr_filename template_hdr;
   let create_file filename = let oc = open_out filename in close_out oc in
   create_file hdr_filename;
@@ -551,7 +559,7 @@ let _ =
           | Some file ->
             let lines = read_lines file in
             List.fold_left
-              (fun s l -> StringSet.add (Filename.concat !root_dir l) s)
+              (fun s l -> StringSet.add (path_concat !root_dir l) s)
               StringSet.empty lines
         in
         let distributed_files = stringset_from_opt_file distrib_file_opt in
