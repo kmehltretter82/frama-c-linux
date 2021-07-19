@@ -409,7 +409,7 @@ class TableState<Key, Row> {
     const cwr = colws.get(rcol);
     const wl = cwl ? cwl + offset : 0;
     const wr = cwr ? cwr - offset : 0;
-    if (wl > 40 && wr > 40) {
+    if (wl > 25 && wr > 25) {
       const { resize } = this;
       resize.set(lcol, wl);
       resize.set(rcol, wr);
