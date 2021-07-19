@@ -40,6 +40,10 @@ type 'n component =
 (** A list of strongly connected components, sorted topologically *)
 and 'n partition = 'n component list
 
+(** Return the first node of a partition or None if the partition is empty *)
+val head:  'n partition -> 'n option
+
+(** Transform the partition into a list *)
 val flatten: 'n partition -> 'n list
 
 val fold_heads: ('a -> 'n -> 'a) -> 'a -> 'n partition -> 'a

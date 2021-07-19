@@ -640,7 +640,7 @@ module Scheduler = Wto.Make (Vertex)
 
 let build_wto ~pref {graph; entry_point} =
   let init = entry_point
-  and succs = fun stmt -> G.succ graph stmt
+  and succs = fun v -> G.succ graph v
   in
   Scheduler.partition ~pref ~init ~succs
 
@@ -695,6 +695,13 @@ let exit_strategy graph component =
 (* --- Output to dot                                                  --- *)
 (* ---------------------------------------------------------------------- *)
 
+type 'a labeling =
+  [ `Stmt
+  | `Vertex
+  | `Both
+  | `Custom of Format.formatter -> 'a -> unit
+  ]
+
 let pretty_kind fmt = function
   | Invariant -> Format.pp_print_string fmt "Invariant"
   | Assert -> Format.pp_print_string fmt "Assert"
@@ -735,9 +742,41 @@ module MakeDot
 = struct
 
   let htmllabel fmt =
-    Pretty_utils.ksfprintf (fun s -> `HtmlLabel (Extlib.html_escape s) ) fmt
+    let string_to_label s =
+      (* Escape for html embedding *)
+      let substitution s =
+        match Str.matched_string s with
+        | "<" -> "&lt;"
+        | ">" -> "&gt;"
+        | "&" -> "&amp;"
+        | "\n" -> "<br />"
+        | s -> s (* should not happen *)
+      and regexp = Str.regexp "<\\|>\\|&\\|\n" in
+      let s = Str.global_substitute regexp substitution s in
+      let s = if s = "" then " " else s in (* graph viewers don't like empty labels *)
+      `HtmlLabel s
+    in
+    Pretty_utils.ksfprintf string_to_label fmt
 
-  let output_to_dot out_channel ?(number=`Stmt) ?wto g =
+  let output_to_dot out_channel ?(labeling:V.t labeling=`Both) ?wto g =
+    (* Vertex labeling *)
+    let vertex_label v =
+      match labeling with
+      | `Stmt ->
+        begin match V.start_of v with
+          | None -> htmllabel "~"
+          | Some stmt -> htmllabel "%d" stmt.sid
+        end
+      | `Vertex ->
+        htmllabel "%a" V.pretty v
+      | `Both ->
+        begin match V.start_of v with
+          | None -> htmllabel "%a" V.pretty v
+          | Some stmt -> htmllabel "%a@s%d" V.pretty v stmt.sid
+        end
+      | `Custom f ->
+        htmllabel "%a" f v
+    in
     (* Build vertex attributes and subgraphs from wto if present *)
     let open Graph.Graphviz.DotAttributes in
     let module Table = V.Hashtbl in
@@ -749,15 +788,7 @@ module MakeDot
     in
     let component_count = ref 0 in
     let donode subgraph head v =
-      let label =
-        match number with
-        | `Stmt -> begin
-            match (V.start_of v) with
-            | Some stmt -> htmllabel "%i" stmt.sid
-            | None -> htmllabel "~"
-          end
-        | `Vertex -> htmllabel "%a" V.pretty v
-      in
+      let label = vertex_label v in
       let vertex_attributes =
         if head && Option.is_some subgraph
         then [`Shape `Invtriangle ; label]
@@ -792,13 +823,7 @@ module MakeDot
         let vertex_attributes v =
           try let (x,_,_,_) = Table.find subgraphs v in x
           with Not_found ->
-            let l = if wto = None then [] else [`Style `Dashed] in
-            let pretty fmt v =
-              V.pretty fmt v ;
-              match V.start_of v with
-              | None -> ()
-              | Some s -> Format.fprintf fmt "@s%d" s.sid
-            in (htmllabel "%a" pretty v)::l
+            vertex_label v :: if wto = None then [] else [`Style `Dashed]
         let get_subgraph v =
           try let (_,x,_,_) = Table.find subgraphs v in x
           with Not_found -> None
@@ -819,8 +844,8 @@ end
 module GDot =
   MakeDot(struct include Vertex let start_of v = v.vertex_start_of end)(G)
 
-let output_to_dot out_channel ?number ?wto g =
-  GDot.output_to_dot  out_channel ?number ?wto g.graph
+let output_to_dot out_channel ?labeling ?wto g =
+  GDot.output_to_dot  out_channel ?labeling ?wto g.graph
 
 (* ---------------------------------------------------------------------- *)
 (* --- WTO Indexes                                                    --- *)
@@ -1035,8 +1060,8 @@ module UnrollUnnatural  = struct
       let start_of (v,_) = v.vertex_start_of
     end)(G)
 
-  let output_to_dot out_channel ?number ?wto g =
-    GDot.output_to_dot  out_channel ?number ?wto g
+  let output_to_dot out_channel ?labeling ?wto g =
+    GDot.output_to_dot  out_channel ?labeling ?wto g
 
   let unroll_unnatural_loop
       (g:automaton) (wto:wto) (index:Compute.wto_index_table) : G.t =
@@ -1132,47 +1157,70 @@ sig
   val transfer : vertex transition ->  t -> t option
 end
 
+module type DataflowAnalysis =
+sig
+  type state
+  type result
 
-module Dataflow (D : Domain) =
+  val fixpoint : ?wto:wto -> Cil_types.kernel_function -> state -> result
+
+  module Result :
+  sig
+    val at_entry : result -> state option
+    val at_return : result -> state option
+    val before : result -> Cil_types.stmt -> state option
+    val after : result -> Cil_types.stmt -> state option
+    val iter_vertex : (vertex -> state -> unit) -> result -> unit
+    val iter_stmt : (Cil_types.stmt -> state -> unit) -> result -> unit
+    val to_dot_output : (Format.formatter -> state -> unit) ->
+      result -> out_channel -> unit
+    val to_dot_file : (Format.formatter -> state -> unit) ->
+      result -> Filepath.Normalized.t -> unit
+    val as_table : result -> state Vertex.Hashtbl.t
+  end
+end
+
+module DataflowAnalysis (D : Domain) =
 struct
-  module Results = Vertex.Hashtbl
+  type state = D.t
+  type result = automaton * wto * D.t Vertex.Hashtbl.t
 
-  let fixpoint kf initial_value =
-    let automaton = get_automaton kf in
-    let graph = automaton.graph in
-    let wto = get_wto kf in
-    let results = Results.create (G.nb_vertex graph) in
+  module States = Vertex.Hashtbl
+
+  let compute ~fold_pred automaton wto initial_value  =
+    let results = States.create (G.nb_vertex automaton.graph) in
+
+    let initial_values =
+      match Wto.head wto with
+      | None -> fun _ -> [] (* should not happen *)
+      | Some v -> fun u -> if v == u then [ initial_value ] else []
+    in
 
     (* Compute the transfer function for the given edge and add the result to
        acc *)
-    let process_edge (v1,e,_v2) acc =
+    let process_edge v e acc =
       (* Retrieve origin value *)
-      match Results.find_opt results v1 with
-      | None -> acc (* No previous value *)
-      | Some value ->
-        match D.transfer e.edge_transition value with
-        | None -> acc
-        | Some new_value -> new_value :: acc
+      let value = States.find_opt results v in
+      let result = Option.bind value (D.transfer e.edge_transition) in
+      Option.to_list result @ acc
     in
 
     (* Compute the abstract value for the given control point ; compute all
        incoming transfer functions *)
     let process_vertex v =
-      let incomming = G.fold_pred_e process_edge graph v []
-      and initial = if v == automaton.entry_point then [initial_value] else []
-      in
-      match initial @ incomming with
-      | [] -> (* Zero incomming values -> Bottom *)
-        Results.remove results v
+      let incoming = fold_pred process_edge automaton.graph v [] in
+      match initial_values v @ incoming with
+      | [] -> (* Zero incoming values -> Bottom *)
+        States.remove results v
       | v1 :: vl ->
-        (* Join incomming values *)
+        (* Join incoming values *)
         let result = List.fold_left D.join v1 vl in
-        Results.add results v result
+        States.replace results v result
     in
 
     (* widen returns whether it is necessary to continue to iterate or not *)
     let widen v previous =
-      let current = Results.find_opt results v in
+      let current = States.find_opt results v in
       match previous, current with
       | _, None -> false (* Current is bottom, let's quit *)
       | None, _ -> true (* Previous was bottom *)
@@ -1180,7 +1228,7 @@ struct
         match D.widen v1 v2 with
         | None -> false (* End of iteration *)
         | Some value -> (* new value *)
-          Results.add results v value;
+          States.replace results v value;
           true
     in
 
@@ -1190,8 +1238,12 @@ struct
       | Wto.Node v ->
         ignore (process_vertex v)
       | Wto.Component (v, w) ->
+        (* Do at least one iteration *)
+        process_vertex v;
+        iterate_list w;
+        (* Then reach a fixpoint *)
         while
-          let previous = Results.find_opt results v in
+          let previous = States.find_opt results v in
           process_vertex v;
           widen v previous
         do
@@ -1199,5 +1251,95 @@ struct
         done;
     in
     iterate_list wto;
-    results
+    automaton, wto, results
+
+  module Result =
+  struct
+    module Stmts = Cil_datatype.Stmt.Hashtbl
+
+    let (>>) o f = Option.map f o
+    let (>>:) = Option.bind
+
+    let at_entry (automaton,_wto,states) =
+      States.find_opt states automaton.entry_point
+
+    let at_return (automaton,_wto,states) =
+      States.find_opt states automaton.return_point
+
+    let before (automaton,_wto,states) stmt =
+      Stmts.find_opt automaton.stmt_table stmt >> fst >>: States.find_opt states
+
+    let after (automaton,_wto,states) stmt =
+      Stmts.find_opt automaton.stmt_table stmt >> snd >>: States.find_opt states
+
+    let iter_vertex f (_automaton,_wto,states) =
+      States.iter f states
+
+    let iter_stmt f (_automaton,_wto,states) =
+      let f' v s =
+        Option.iter (fun stmt -> f stmt s) v.vertex_start_of
+      in
+      States.iter f' states
+
+    let to_dot_output pp_value (automaton,wto,states) out =
+      let pp_vertex fmt v =
+        match States.find_opt states v with
+        | None -> Format.fprintf fmt "⊥"
+        | Some v -> pp_value fmt v
+      in
+      output_to_dot out ~labeling:(`Custom pp_vertex) ~wto automaton
+
+    let to_dot_file pp_value result filepath =
+      let out = open_out (filepath : Filepath.Normalized.t :> string) in
+      to_dot_output pp_value result out
+
+    let as_table (_automaton,_wto,states) =
+      states
+  end
+end
+
+module ForwardAnalysis (D : Domain) =
+struct
+  include DataflowAnalysis (D)
+
+  let build_wto automaton =
+    let init = automaton.entry_point
+    and succs = fun v -> G.succ automaton.graph v
+    and pref = fun _ _ -> 0 in
+    Scheduler.partition ~pref ~init ~succs
+
+  let fixpoint ?wto kf initial_value =
+    let fold_pred f =
+      let f' (v,t,_) = f v t in
+      G.fold_pred_e f'
+    in
+    let automaton = get_automaton kf in
+    let wto = match wto with
+      | Some wto -> wto
+      | None -> build_wto automaton
+    in
+    compute ~fold_pred automaton wto initial_value
+end
+
+module BackwardAnalysis (D : Domain) =
+struct
+  include DataflowAnalysis (D)
+
+  let build_wto automaton =
+    let init = automaton.return_point
+    and succs = fun v -> G.pred automaton.graph v
+    and pref = fun _ _ -> 0 in
+    Scheduler.partition ~pref ~init ~succs
+
+  let fixpoint ?wto kf initial_value =
+    let fold_pred f =
+      let f' (_,t,v) = f v t in
+      G.fold_succ_e f'
+    in
+    let automaton = get_automaton kf in
+    let wto = match wto with
+      | Some wto -> wto
+      | None -> build_wto automaton
+    in
+    compute ~fold_pred automaton wto initial_value
 end

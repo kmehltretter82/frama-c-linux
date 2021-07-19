@@ -153,8 +153,16 @@ val get_wto : Cil_types.kernel_function -> wto
 (** Extract an exit strategy from a component, i.e. a sub-wto where all
     vertices lead outside the wto without passing through the head. *)
 val exit_strategy : graph -> vertex Wto.component -> wto
+
+type 'a labeling =
+  [ `Stmt
+  | `Vertex
+  | `Both
+  | `Custom of Format.formatter -> 'a -> unit
+  ]
+
 (** Output the automaton in dot format *)
-val output_to_dot : out_channel -> ?number:[`Stmt|`Vertex] -> ?wto:wto ->
+val output_to_dot : out_channel -> ?labeling:vertex labeling -> ?wto:wto ->
   automaton -> unit
 
 (** the position of a statement in a wto given as the list of
@@ -199,7 +207,7 @@ module Compute: sig
       vertices lead outside the wto without passing through the head. *)
   val exit_strategy : graph -> vertex Wto.component -> wto
   (** Output the automaton in dot format *)
-  val output_to_dot : out_channel -> ?number:[`Stmt|`Vertex] -> ?wto:wto ->
+  val output_to_dot : out_channel -> ?labeling:vertex labeling  -> ?wto:wto ->
     automaton -> unit
 
 
@@ -252,7 +260,8 @@ module UnrollUnnatural : sig
     include Datatype.S with type t = Version.t Wto.partition
   end
 
-  val output_to_dot : out_channel -> ?number:[`Stmt|`Vertex] -> ?wto:WTO.t -> G.t -> unit
+  val output_to_dot : out_channel -> ?labeling:Version.t labeling ->
+    ?wto:WTO.t -> G.t -> unit
 
   val unroll_unnatural_loop :
     automaton -> wto -> Compute.wto_index_table -> G.t
@@ -261,9 +270,8 @@ end
 
 
 (** Dataflow computation: simple data-flow analysis using interpreted automata.
-    This is mostly intended as an example for using interpreted automata;
-    see also tests/misc/interpreted_automata_dataflow.ml for a complete example
-    using this dataflow. *)
+    See tests/misc/interpreted_automata_dataflow.ml for a complete example
+    using this dataflow computation. *)
 
 (** Input domain for a simple dataflow analysis. *)
 module type Domain =
@@ -286,8 +294,62 @@ sig
   val transfer : vertex transition ->  t -> t option
 end
 
-(** Builds a simple dataflow analysis over an input domain. *)
-module Dataflow (D : Domain) :
+(** Simple dataflow analysis *)
+module type DataflowAnalysis =
 sig
-  val fixpoint : Cil_types.kernel_function -> D.t -> D.t Vertex.Hashtbl.t
+  type state
+  type result
+
+  val fixpoint : ?wto:wto -> Cil_types.kernel_function ->  state -> result
+
+  module Result :
+  sig
+    (** Extract the result at the entry point of the analysed function *)
+    val at_entry : result -> state option
+
+    (** Extract the result at the return point of the analysed function (just
+        after the return transfer function) *)
+    val at_return : result -> state option
+
+    (** Extract the result obtained for the control point immediately before the
+        given statement *)
+    val before : result -> Cil_types.stmt -> state option
+
+    (** Extract the result obtained for the control point immediately after the
+        given statement *)
+    val after : result -> Cil_types.stmt -> state option
+
+    (** Iter on the results obtained at each vertex of the graph.
+        Do nothing  when the vertex is not reachable (for instance if transfer
+        returned None) *)
+    val iter_vertex : (vertex -> state -> unit) -> result -> unit
+
+    (** Iter on the results obtained before each statements of the function.
+        Do nothing  when the vertex is not reachable (for instance if transfer
+        returned None) *)
+    val iter_stmt : (Cil_types.stmt -> state -> unit) -> result -> unit
+
+    (** Output result to the given channel. Must be supplied with a pretty
+        printer for abstract values *)
+    val to_dot_output : (Format.formatter -> state -> unit) ->
+      result -> out_channel -> unit
+
+    (** Output result to a file with the given path. Must be supplied with
+        pretty printer for abstract values *)
+    val to_dot_file : (Format.formatter -> state -> unit) ->
+      result -> Filepath.Normalized.t -> unit
+
+    (** Extract the result as a table from control points to states *)
+    val as_table : result -> state Vertex.Hashtbl.t
+  end
 end
+
+(** Forward dataflow analysis. The domain must provide a forward [transfer]
+    function that computes the state after a transition from the state before. *)
+module ForwardAnalysis (D : Domain) : DataflowAnalysis
+  with type state = D.t
+
+(** Backward dataflow analysis. The domain must provide a backward [transfer]
+    function that computes the state before a transition from the state after. *)
+module BackwardAnalysis (D : Domain) : DataflowAnalysis
+  with type state = D.t

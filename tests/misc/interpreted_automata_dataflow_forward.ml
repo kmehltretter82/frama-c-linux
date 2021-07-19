@@ -9,10 +9,8 @@ struct
   let top = Map.empty
 
   let pretty fmt v =
-    let pp_entry vi x =
-      Format.fprintf fmt "%s -> %d@." vi.vorig_name x
-    in
-    Map.iter pp_entry v
+    Pretty_utils.pp_iter2 ~sep:"@." ~between:": "
+      Map.iter Cil_datatype.Varinfo.pretty Format.pp_print_int fmt v
 
   let join v1 v2 =
     let merge_entry _vi o1 o2 =
@@ -99,17 +97,28 @@ struct
 end
 
 
-module Dataflow = Interpreted_automata.Dataflow (ConstantsDomain)
+module Dataflow = Interpreted_automata.ForwardAnalysis (ConstantsDomain)
 
 let run () =
   let main_kf, _ = Globals.entry_point () in
+  let main_name = Kernel_function.get_name main_kf in
+  (* Run the analysis *)
   let results = Dataflow.fixpoint main_kf ConstantsDomain.top in
-  let result = Interpreted_automata.(
-      Vertex.Hashtbl.find results (get_automaton main_kf).return_point)
+  (* Output to dot *)
+  let filepath =
+    let open Filename in
+    let (/) = concat in
+    dirname __FILE__ / "result" / remove_extension (basename __FILE__) ^ ".dot"
   in
-  Kernel.result "Results at the end of function %s:@.%a"
-    (Kernel_function.get_name main_kf)
-    ConstantsDomain.pretty result
+  let filepath = Filepath.Normalized.of_string filepath in
+  Dataflow.Result.to_dot_file ConstantsDomain.pretty results filepath;
+  (* Output result to stdout *)
+  match Dataflow.Result.at_return results with
+  | None -> 
+    Kernel.result "No result at the end of function %s." main_name
+  | Some result ->
+    Kernel.result "Results at the end of function %s:@.%a" main_name
+      ConstantsDomain.pretty result
 
 let () =
   Db.Main.extend run
