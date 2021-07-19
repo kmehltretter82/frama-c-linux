@@ -27,6 +27,9 @@ open Cil_types
 
 let dkey = Options.dkey_typing
 
+let type_subterms : (unit -> unit) Stack.t = Stack.create ()
+
+
 (******************************************************************************)
 (** Datatype and constructor *)
 (******************************************************************************)
@@ -533,25 +536,38 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx ?(lenv=[]) t =
         (* TODO: what if the type of the parameter is smaller than the infered
            type of the argument? For now, it is silently ignored (both
            statically and at runtime)... *)
-        List.iter (fun arg -> ignore (type_term ~use_gmp_opt:true ~dep ~lenv arg)) args;
         (* TODO: recursive call in arguments of function call *)
         match li.l_body with
-        | LBpred _ ->
-          List.iter (fun arg -> ignore (type_term ~use_gmp_opt:true arg)) args;
-
+        | LBpred p ->
           (* possible to have an [LBpred] here because we transformed
              [Papp] into [Tapp] *)
-          dup c_int
-        | LBterm t ->
+            Stack.push
+              (fun _ ->
+                let typed_params = type_params ~use_gmp_opt ~lenv li.l_profile args in
+                ignore (type_predicate ~lenv:typed_params p);
+                List.iter Interval.Env.remove li.l_profile)
+              type_subterms;
+            dup c_int
+        | LBterm t_body ->
           begin match li.l_type with
             | None ->
               assert false
             | Some lty ->
               (* TODO: what if the function returns a real? *)
-              let typed_params = type_params ~use_gmp_opt ~dep ~lenv li.l_profile args in
-              ignore (type_term ~use_gmp_opt ~dep:true ~lenv:(List.append typed_params lenv) t);
-              List.iter Interval.Env.remove li.l_profile;
               let ty = ty_of_logic_ty ~term:t lty in
+              let type_subterm = fun () ->
+                  let typed_params = type_params ~use_gmp_opt ~lenv li.l_profile args in
+                  ignore (type_term ~use_gmp_opt ~lenv:typed_params t_body)
+              in
+              let clear_env = fun () ->
+                  List.iter Interval.Env.remove li.l_profile
+              in
+              Stack.push
+                clear_env
+                type_subterms;
+              Stack.push
+                type_subterm
+                type_subterms;
               dup ty
           end
         | LBnone ->
@@ -577,7 +593,7 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx ?(lenv=[]) t =
              Options.fatal "extended quantifier %a is not well formed"
                Printer.pp_logic_var li.l_var_info)
         | LBreads _ ->
-          Error.not_yet "logic functions performing read accesses"
+          Error.not_yet "logic functions or predicates performing read accesses"
         | LBinductive _ ->
           Error.not_yet "inductive logic functions"
       end
@@ -830,7 +846,10 @@ and type_predicate ?(lenv=[]) p =
 let type_term ~use_gmp_opt ?ctx ?(lenv=[]) t =
   Options.feedback ~dkey ~level:4 "typing term '%a' in ctx '%a'."
     Printer.pp_term t (Pretty_utils.pp_opt D.pretty) ctx;
-  ignore (type_term ~use_gmp_opt ?ctx t)
+  ignore (type_term ~use_gmp_opt ?ctx ~lenv t);
+  while not (Stack.is_empty type_subterms) do
+    Stack.pop type_subterms ()
+  done
 
 let type_named_predicate ?(lenv=[]) p =
   Options.feedback ~dkey ~level:3 "typing predicate '%a'."
