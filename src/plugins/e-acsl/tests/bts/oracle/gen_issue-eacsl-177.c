@@ -22,12 +22,18 @@ int main(void)
     __e_acsl_mpz_t __gen_e_acsl_f_8;
     __e_acsl_mpz_t __gen_e_acsl__10;
     int __gen_e_acsl_eq;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_f(& __gen_e_acsl_f_8,0);
     __gmpz_init_set_si(__gen_e_acsl__10,0L);
     __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_f_8),
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__10));
-    __e_acsl_assert(__gen_e_acsl_eq == 0,1,"Assertion","main","f(0) == 0",
-                    "tests/bts/issue-eacsl-177.c",12);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "f(0) == 0";
+    __gen_e_acsl_assert_data.file = "tests/bts/issue-eacsl-177.c";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 12;
+    __e_acsl_assert(__gen_e_acsl_eq == 0,& __gen_e_acsl_assert_data);
     __gmpz_clear(__gen_e_acsl_f_8);
     __gmpz_clear(__gen_e_acsl__10);
   }
@@ -37,14 +43,20 @@ int main(void)
     __e_acsl_mpz_t __gen_e_acsl_f_10;
     __e_acsl_mpz_t __gen_e_acsl__11;
     int __gen_e_acsl_ne;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
     __gen_e_acsl_n_5 = 9223372036854775807L;
     __gen_e_acsl_f_2(& __gen_e_acsl_f_10,__gen_e_acsl_n_5);
     __gmpz_init_set_si(__gen_e_acsl__11,0L);
     __gen_e_acsl_ne = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_f_10),
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__11));
-    __e_acsl_assert(__gen_e_acsl_ne != 0,1,"Assertion","main",
-                    "\\let n = 0 == 0? 9223372036854775807L: -1; f(n) != 0",
-                    "tests/bts/issue-eacsl-177.c",14);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Assertion";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\let n = 0 == 0? 9223372036854775807L: -1; f(n) != 0";
+    __gen_e_acsl_assert_data_2.file = "tests/bts/issue-eacsl-177.c";
+    __gen_e_acsl_assert_data_2.fct = "main";
+    __gen_e_acsl_assert_data_2.line = 14;
+    __e_acsl_assert(__gen_e_acsl_ne != 0,& __gen_e_acsl_assert_data_2);
     __gmpz_clear(__gen_e_acsl_f_10);
     __gmpz_clear(__gen_e_acsl__11);
   }

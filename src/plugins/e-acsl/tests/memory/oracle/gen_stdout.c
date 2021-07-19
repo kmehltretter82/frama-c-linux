@@ -33,26 +33,46 @@ int main(void)
   __e_acsl_globals_init();
   {
     int __gen_e_acsl_valid;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_valid = __e_acsl_valid((void *)stderr,sizeof(FILE),
                                         (void *)stderr,(void *)(& stderr));
-    __e_acsl_assert(__gen_e_acsl_valid,1,"Assertion","main",
-                    "\\valid(__fc_stderr)","tests/memory/stdout.c",8);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "\\valid(__fc_stderr)";
+    __gen_e_acsl_assert_data.file = "tests/memory/stdout.c";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 8;
+    __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
   }
   /*@ assert \valid(__fc_stderr); */ ;
   {
     int __gen_e_acsl_valid_2;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
     __gen_e_acsl_valid_2 = __e_acsl_valid((void *)stdin,sizeof(FILE),
                                           (void *)stdin,(void *)(& stdin));
-    __e_acsl_assert(__gen_e_acsl_valid_2,1,"Assertion","main",
-                    "\\valid(__fc_stdin)","tests/memory/stdout.c",9);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Assertion";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\valid(__fc_stdin)";
+    __gen_e_acsl_assert_data_2.file = "tests/memory/stdout.c";
+    __gen_e_acsl_assert_data_2.fct = "main";
+    __gen_e_acsl_assert_data_2.line = 9;
+    __e_acsl_assert(__gen_e_acsl_valid_2,& __gen_e_acsl_assert_data_2);
   }
   /*@ assert \valid(__fc_stdin); */ ;
   {
     int __gen_e_acsl_valid_3;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
     __gen_e_acsl_valid_3 = __e_acsl_valid((void *)stdout,sizeof(FILE),
                                           (void *)stdout,(void *)(& stdout));
-    __e_acsl_assert(__gen_e_acsl_valid_3,1,"Assertion","main",
-                    "\\valid(__fc_stdout)","tests/memory/stdout.c",10);
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "Assertion";
+    __gen_e_acsl_assert_data_3.pred_txt = "\\valid(__fc_stdout)";
+    __gen_e_acsl_assert_data_3.file = "tests/memory/stdout.c";
+    __gen_e_acsl_assert_data_3.fct = "main";
+    __gen_e_acsl_assert_data_3.line = 10;
+    __e_acsl_assert(__gen_e_acsl_valid_3,& __gen_e_acsl_assert_data_3);
   }
   /*@ assert \valid(__fc_stdout); */ ;
   __retres = 0;

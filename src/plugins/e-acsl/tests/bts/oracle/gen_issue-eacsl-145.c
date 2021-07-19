@@ -29,10 +29,16 @@ int main(void)
   __e_acsl_globals_init();
   {
     int __gen_e_acsl_valid;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_valid = __e_acsl_valid((void *)(& G),sizeof(int),
                                         (void *)(& G),(void *)0);
-    __e_acsl_assert(__gen_e_acsl_valid,1,"Assertion","main","\\valid(&G)",
-                    "tests/bts/issue-eacsl-145.c",9);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "\\valid(&G)";
+    __gen_e_acsl_assert_data.file = "tests/bts/issue-eacsl-145.c";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 9;
+    __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
   }
   /*@ assert \valid(&G); */ ;
   int a = G;

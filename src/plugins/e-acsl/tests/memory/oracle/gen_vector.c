@@ -14,6 +14,7 @@ int *new_inversed(int len, int *v)
     int __gen_e_acsl_valid;
     int __gen_e_acsl_and;
     __e_acsl_store_block((void *)(& v),(size_t)8);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_valid = __e_acsl_valid((void *)v,sizeof(int),(void *)v,
                                         (void *)(& v));
     if (__gen_e_acsl_valid) {
@@ -43,9 +44,13 @@ int *new_inversed(int len, int *v)
       __gmpz_clear(__gen_e_acsl_block_length_2);
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","new_inversed",
-                    "\\valid(v) && \\offset(v) + len * sizeof(int) <= \\block_length(v)",
-                    "tests/memory/vector.c",12);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "\\valid(v) && \\offset(v) + len * sizeof(int) <= \\block_length(v)";
+    __gen_e_acsl_assert_data.file = "tests/memory/vector.c";
+    __gen_e_acsl_assert_data.fct = "new_inversed";
+    __gen_e_acsl_assert_data.line = 12;
+    __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
   }
   /*@ assert \valid(v) && \offset(v) + len * sizeof(int) <= \block_length(v);
    */
@@ -75,19 +80,32 @@ int main(void)
   __e_acsl_full_init((void *)(& v1));
   {
     int __gen_e_acsl_valid;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_valid = __e_acsl_valid((void *)(& v1[2]),sizeof(int),
                                         (void *)(v1),(void *)0);
-    __e_acsl_assert(__gen_e_acsl_valid,1,"Assertion","main",
-                    "\\valid(&v1[2])","tests/memory/vector.c",22);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "\\valid(&v1[2])";
+    __gen_e_acsl_assert_data.file = "tests/memory/vector.c";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 22;
+    __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
   }
   /*@ assert \valid(&v1[2]); */ ;
   LAST = v1[2];
   {
     int __gen_e_acsl_initialized;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& v1[2]),
                                                     sizeof(int));
-    __e_acsl_assert(__gen_e_acsl_initialized,1,"Assertion","main",
-                    "\\initialized(&v1[2])","tests/memory/vector.c",24);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Assertion";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\initialized(&v1[2])";
+    __gen_e_acsl_assert_data_2.file = "tests/memory/vector.c";
+    __gen_e_acsl_assert_data_2.fct = "main";
+    __gen_e_acsl_assert_data_2.line = 24;
+    __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_2);
   }
   /*@ assert \initialized(&v1[2]); */ ;
   __e_acsl_full_init((void *)(& v2));
@@ -95,14 +113,30 @@ int main(void)
   LAST = *(v2 + 2);
   {
     int __gen_e_acsl_initialized_2;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
     __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(v2 + 2),
                                                       sizeof(int));
-    __e_acsl_assert(__gen_e_acsl_initialized_2,1,"Assertion","main",
-                    "\\initialized(v2 + 2)","tests/memory/vector.c",27);
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "Assertion";
+    __gen_e_acsl_assert_data_3.pred_txt = "\\initialized(v2 + 2)";
+    __gen_e_acsl_assert_data_3.file = "tests/memory/vector.c";
+    __gen_e_acsl_assert_data_3.fct = "main";
+    __gen_e_acsl_assert_data_3.line = 27;
+    __e_acsl_assert(__gen_e_acsl_initialized_2,& __gen_e_acsl_assert_data_3);
   }
   /*@ assert \initialized(v2 + 2); */ ;
-  __e_acsl_assert(LAST == 1,1,"Assertion","main","LAST == 1",
-                  "tests/memory/vector.c",28);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_4.blocking = 1;
+    __gen_e_acsl_assert_data_4.kind = "Assertion";
+    __gen_e_acsl_assert_data_4.pred_txt = "LAST == 1";
+    __gen_e_acsl_assert_data_4.file = "tests/memory/vector.c";
+    __gen_e_acsl_assert_data_4.fct = "main";
+    __gen_e_acsl_assert_data_4.line = 28;
+    __e_acsl_assert(LAST == 1,& __gen_e_acsl_assert_data_4);
+  }
   /*@ assert LAST == 1; */ ;
   free((void *)v2);
   __retres = 0;

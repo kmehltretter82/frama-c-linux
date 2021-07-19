@@ -20,9 +20,15 @@ void f(void)
   m = 123;
   {
     int __gen_e_acsl_initialized;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)p,sizeof(int));
-    __e_acsl_assert(__gen_e_acsl_initialized,1,"Assertion","f",
-                    "\\initialized(p)","tests/memory/addrOf.i",10);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "\\initialized(p)";
+    __gen_e_acsl_assert_data.file = "tests/memory/addrOf.i";
+    __gen_e_acsl_assert_data.fct = "f";
+    __gen_e_acsl_assert_data.line = 10;
+    __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data);
   }
   /*@ assert \initialized(p); */ ;
   __e_acsl_delete_block((void *)(& p));
@@ -37,8 +43,16 @@ int main(void)
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   int x = 0;
   f();
-  __e_acsl_assert(& x == & x,1,"Assertion","main","&x == &x",
-                  "tests/memory/addrOf.i",16);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "&x == &x";
+    __gen_e_acsl_assert_data.file = "tests/memory/addrOf.i";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 16;
+    __e_acsl_assert(& x == & x,& __gen_e_acsl_assert_data);
+  }
   /*@ assert &x == &x; */ ;
   __retres = 0;
   __e_acsl_memory_clean();

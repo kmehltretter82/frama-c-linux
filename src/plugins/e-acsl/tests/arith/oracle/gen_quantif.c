@@ -34,6 +34,7 @@ int main(void)
   {
     int __gen_e_acsl_forall;
     int __gen_e_acsl_x;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_forall = 1;
     __gen_e_acsl_x = 0;
     while (1) {
@@ -51,14 +52,20 @@ int main(void)
       __gen_e_acsl_x ++;
     }
     e_acsl_end_loop1: ;
-    __e_acsl_assert(__gen_e_acsl_forall,1,"Assertion","main",
-                    "\\forall integer x; 0 <= x <= 1 ==> x == 0 || x == 1",
-                    "tests/arith/quantif.i",16);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "\\forall integer x; 0 <= x <= 1 ==> x == 0 || x == 1";
+    __gen_e_acsl_assert_data.file = "tests/arith/quantif.i";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 16;
+    __e_acsl_assert(__gen_e_acsl_forall,& __gen_e_acsl_assert_data);
   }
   /*@ assert \forall integer x; 0 <= x <= 1 ==> x == 0 || x == 1; */ ;
   {
     int __gen_e_acsl_forall_2;
     int __gen_e_acsl_x_2;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
     __gen_e_acsl_forall_2 = 1;
     __gen_e_acsl_x_2 = 0 + 1;
     while (1) {
@@ -71,14 +78,20 @@ int main(void)
       __gen_e_acsl_x_2 ++;
     }
     e_acsl_end_loop2: ;
-    __e_acsl_assert(__gen_e_acsl_forall_2,1,"Assertion","main",
-                    "\\forall integer x; 0 < x <= 1 ==> x == 1",
-                    "tests/arith/quantif.i",17);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Assertion";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\forall integer x; 0 < x <= 1 ==> x == 1";
+    __gen_e_acsl_assert_data_2.file = "tests/arith/quantif.i";
+    __gen_e_acsl_assert_data_2.fct = "main";
+    __gen_e_acsl_assert_data_2.line = 17;
+    __e_acsl_assert(__gen_e_acsl_forall_2,& __gen_e_acsl_assert_data_2);
   }
   /*@ assert \forall integer x; 0 < x <= 1 ==> x == 1; */ ;
   {
     int __gen_e_acsl_forall_3;
     int __gen_e_acsl_x_3;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
     __gen_e_acsl_forall_3 = 1;
     __gen_e_acsl_x_3 = 0;
     while (1) {
@@ -91,9 +104,13 @@ int main(void)
       __gen_e_acsl_x_3 ++;
     }
     e_acsl_end_loop3: ;
-    __e_acsl_assert(__gen_e_acsl_forall_3,1,"Assertion","main",
-                    "\\forall integer x; 0 <= x < 1 ==> x == 0",
-                    "tests/arith/quantif.i",18);
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "Assertion";
+    __gen_e_acsl_assert_data_3.pred_txt = "\\forall integer x; 0 <= x < 1 ==> x == 0";
+    __gen_e_acsl_assert_data_3.file = "tests/arith/quantif.i";
+    __gen_e_acsl_assert_data_3.fct = "main";
+    __gen_e_acsl_assert_data_3.line = 18;
+    __e_acsl_assert(__gen_e_acsl_forall_3,& __gen_e_acsl_assert_data_3);
   }
   /*@ assert \forall integer x; 0 <= x < 1 ==> x == 0; */ ;
   {
@@ -101,6 +118,8 @@ int main(void)
     int __gen_e_acsl_x_4;
     int __gen_e_acsl_y;
     int __gen_e_acsl_z;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+      {.values = (void *)0};
     __gen_e_acsl_forall_4 = 1;
     __gen_e_acsl_x_4 = 0;
     while (1) {
@@ -124,9 +143,13 @@ int main(void)
       __gen_e_acsl_x_4 ++;
     }
     e_acsl_end_loop4: ;
-    __e_acsl_assert(__gen_e_acsl_forall_4,1,"Assertion","main",
-                    "\\forall integer x, integer y, integer z;\n  0 <= x < 2 && 0 <= y < 5 && 0 <= z <= y ==> x + z <= y + 1",
-                    "tests/arith/quantif.i",22);
+    __gen_e_acsl_assert_data_4.blocking = 1;
+    __gen_e_acsl_assert_data_4.kind = "Assertion";
+    __gen_e_acsl_assert_data_4.pred_txt = "\\forall integer x, integer y, integer z;\n  0 <= x < 2 && 0 <= y < 5 && 0 <= z <= y ==> x + z <= y + 1";
+    __gen_e_acsl_assert_data_4.file = "tests/arith/quantif.i";
+    __gen_e_acsl_assert_data_4.fct = "main";
+    __gen_e_acsl_assert_data_4.line = 22;
+    __e_acsl_assert(__gen_e_acsl_forall_4,& __gen_e_acsl_assert_data_4);
   }
   /*@
   assert
@@ -137,6 +160,8 @@ int main(void)
   {
     int __gen_e_acsl_exists;
     int __gen_e_acsl_x_5;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+      {.values = (void *)0};
     __gen_e_acsl_exists = 0;
     __gen_e_acsl_x_5 = 0;
     while (1) {
@@ -149,20 +174,28 @@ int main(void)
       __gen_e_acsl_x_5 ++;
     }
     e_acsl_end_loop5: ;
-    __e_acsl_assert(__gen_e_acsl_exists,1,"Assertion","main",
-                    "\\exists int x; 0 <= x < 10 && x == 5",
-                    "tests/arith/quantif.i",27);
+    __gen_e_acsl_assert_data_5.blocking = 1;
+    __gen_e_acsl_assert_data_5.kind = "Assertion";
+    __gen_e_acsl_assert_data_5.pred_txt = "\\exists int x; 0 <= x < 10 && x == 5";
+    __gen_e_acsl_assert_data_5.file = "tests/arith/quantif.i";
+    __gen_e_acsl_assert_data_5.fct = "main";
+    __gen_e_acsl_assert_data_5.line = 27;
+    __e_acsl_assert(__gen_e_acsl_exists,& __gen_e_acsl_assert_data_5);
   }
   /*@ assert \exists int x; 0 <= x < 10 && x == 5; */ ;
   {
     int __gen_e_acsl_forall_5;
     int __gen_e_acsl_x_6;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+      {.values = (void *)0};
     __gen_e_acsl_forall_5 = 1;
     __gen_e_acsl_x_6 = 0;
     while (1) {
       if (__gen_e_acsl_x_6 < 10) ; else break;
       {
         int __gen_e_acsl_implies;
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
+          {.values = (void *)0};
         if (! (__gen_e_acsl_x_6 % 2 == 0)) __gen_e_acsl_implies = 1;
         else {
           int __gen_e_acsl_exists_2;
@@ -170,7 +203,11 @@ int main(void)
           __gen_e_acsl_exists_2 = 0;
           __gen_e_acsl_y_2 = 0;
           while (1) {
-            if (__gen_e_acsl_y_2 <= __gen_e_acsl_x_6 / 2) ; else break;
+            {
+              __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+                {.values = (void *)0};
+              if (__gen_e_acsl_y_2 <= __gen_e_acsl_x_6 / 2) ; else break;
+            }
             if (! (__gen_e_acsl_x_6 == 2 * __gen_e_acsl_y_2)) ;
             else {
               __gen_e_acsl_exists_2 = 1;
@@ -190,9 +227,13 @@ int main(void)
       __gen_e_acsl_x_6 ++;
     }
     e_acsl_end_loop7: ;
-    __e_acsl_assert(__gen_e_acsl_forall_5,1,"Assertion","main",
-                    "\\forall int x;\n  0 <= x < 10 ==>\n  x % 2 == 0 ==> (\\exists integer y; 0 <= y <= x / 2 && x == 2 * y)",
-                    "tests/arith/quantif.i",31);
+    __gen_e_acsl_assert_data_6.blocking = 1;
+    __gen_e_acsl_assert_data_6.kind = "Assertion";
+    __gen_e_acsl_assert_data_6.pred_txt = "\\forall int x;\n  0 <= x < 10 ==>\n  x % 2 == 0 ==> (\\exists integer y; 0 <= y <= x / 2 && x == 2 * y)";
+    __gen_e_acsl_assert_data_6.file = "tests/arith/quantif.i";
+    __gen_e_acsl_assert_data_6.fct = "main";
+    __gen_e_acsl_assert_data_6.line = 31;
+    __e_acsl_assert(__gen_e_acsl_forall_5,& __gen_e_acsl_assert_data_6);
   }
   /*@
   assert
@@ -208,6 +249,8 @@ int main(void)
     {
       int __gen_e_acsl_forall_6;
       int __gen_e_acsl_i;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
+        {.values = (void *)0};
       __gen_e_acsl_forall_6 = 1;
       __gen_e_acsl_i = 0;
       while (1) {
@@ -226,14 +269,20 @@ int main(void)
         __gen_e_acsl_i ++;
       }
       e_acsl_end_loop8: ;
-      __e_acsl_assert(__gen_e_acsl_forall_6,1,"Assertion","main",
-                      "\\forall integer i; 0 <= i < 10 ==> \\valid(&buf[i])",
-                      "tests/arith/quantif.i",37);
+      __gen_e_acsl_assert_data_9.blocking = 1;
+      __gen_e_acsl_assert_data_9.kind = "Assertion";
+      __gen_e_acsl_assert_data_9.pred_txt = "\\forall integer i; 0 <= i < 10 ==> \\valid(&buf[i])";
+      __gen_e_acsl_assert_data_9.file = "tests/arith/quantif.i";
+      __gen_e_acsl_assert_data_9.fct = "main";
+      __gen_e_acsl_assert_data_9.line = 37;
+      __e_acsl_assert(__gen_e_acsl_forall_6,& __gen_e_acsl_assert_data_9);
     }
     /*@ assert \forall integer i; 0 <= i < 10 ==> \valid(&buf[i]); */ ;
     {
       int __gen_e_acsl_forall_7;
       int __gen_e_acsl_i_2;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
+        {.values = (void *)0};
       __gen_e_acsl_forall_7 = 1;
       __gen_e_acsl_i_2 = (char)0;
       while (1) {
@@ -252,14 +301,20 @@ int main(void)
         __gen_e_acsl_i_2 ++;
       }
       e_acsl_end_loop9: ;
-      __e_acsl_assert(__gen_e_acsl_forall_7,1,"Assertion","main",
-                      "\\forall char i; 0 <= i < 10 ==> \\valid(&buf[i])",
-                      "tests/arith/quantif.i",38);
+      __gen_e_acsl_assert_data_10.blocking = 1;
+      __gen_e_acsl_assert_data_10.kind = "Assertion";
+      __gen_e_acsl_assert_data_10.pred_txt = "\\forall char i; 0 <= i < 10 ==> \\valid(&buf[i])";
+      __gen_e_acsl_assert_data_10.file = "tests/arith/quantif.i";
+      __gen_e_acsl_assert_data_10.fct = "main";
+      __gen_e_acsl_assert_data_10.line = 38;
+      __e_acsl_assert(__gen_e_acsl_forall_7,& __gen_e_acsl_assert_data_10);
     }
     /*@ assert \forall char i; 0 <= i < 10 ==> \valid(&buf[i]); */ ;
     {
       int __gen_e_acsl_forall_8;
       unsigned long __gen_e_acsl_i_3;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
+        {.values = (void *)0};
       __gen_e_acsl_forall_8 = 1;
       __gen_e_acsl_i_3 = 0UL;
       while (1) {
@@ -278,14 +333,20 @@ int main(void)
         __gen_e_acsl_i_3 ++;
       }
       e_acsl_end_loop10: ;
-      __e_acsl_assert(__gen_e_acsl_forall_8,1,"Assertion","main",
-                      "\\forall integer i; 0 <= i < len ==> \\valid(&buf[i])",
-                      "tests/arith/quantif.i",39);
+      __gen_e_acsl_assert_data_11.blocking = 1;
+      __gen_e_acsl_assert_data_11.kind = "Assertion";
+      __gen_e_acsl_assert_data_11.pred_txt = "\\forall integer i; 0 <= i < len ==> \\valid(&buf[i])";
+      __gen_e_acsl_assert_data_11.file = "tests/arith/quantif.i";
+      __gen_e_acsl_assert_data_11.fct = "main";
+      __gen_e_acsl_assert_data_11.line = 39;
+      __e_acsl_assert(__gen_e_acsl_forall_8,& __gen_e_acsl_assert_data_11);
     }
     /*@ assert \forall integer i; 0 <= i < len ==> \valid(&buf[i]); */ ;
     {
       int __gen_e_acsl_forall_9;
       __e_acsl_mpz_t __gen_e_acsl_i_4;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_12 =
+        {.values = (void *)0};
       __gen_e_acsl_forall_9 = 1;
       __gmpz_init(__gen_e_acsl_i_4);
       {
@@ -333,28 +394,54 @@ int main(void)
         }
       }
       e_acsl_end_loop11: ;
-      __e_acsl_assert(__gen_e_acsl_forall_9,1,"Assertion","main",
-                      "\\forall integer i; 0 <= i <= len ==> \\valid(&buf[i])",
-                      "tests/arith/quantif.i",40);
+      __gen_e_acsl_assert_data_12.blocking = 1;
+      __gen_e_acsl_assert_data_12.kind = "Assertion";
+      __gen_e_acsl_assert_data_12.pred_txt = "\\forall integer i; 0 <= i <= len ==> \\valid(&buf[i])";
+      __gen_e_acsl_assert_data_12.file = "tests/arith/quantif.i";
+      __gen_e_acsl_assert_data_12.fct = "main";
+      __gen_e_acsl_assert_data_12.line = 40;
+      __e_acsl_assert(__gen_e_acsl_forall_9,& __gen_e_acsl_assert_data_12);
       __gmpz_clear(__gen_e_acsl_i_4);
     }
     /*@ assert \forall integer i; 0 <= i <= len ==> \valid(&buf[i]); */ ;
     __e_acsl_delete_block((void *)(buf));
   }
-  __e_acsl_assert(1,1,"Assertion","main",
-                  "\\forall integer x; 0 < x < 1 ==> \\false",
-                  "tests/arith/quantif.i",44);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_13 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_13.blocking = 1;
+    __gen_e_acsl_assert_data_13.kind = "Assertion";
+    __gen_e_acsl_assert_data_13.pred_txt = "\\forall integer x; 0 < x < 1 ==> \\false";
+    __gen_e_acsl_assert_data_13.file = "tests/arith/quantif.i";
+    __gen_e_acsl_assert_data_13.fct = "main";
+    __gen_e_acsl_assert_data_13.line = 44;
+    __e_acsl_assert(1,& __gen_e_acsl_assert_data_13);
+  }
   /*@ assert \forall integer x; 0 < x < 1 ==> \false; */ ;
-  __e_acsl_assert(! 0,1,"Assertion","main",
-                  "!(\\exists char c; 10 <= c < 10 && c == 10)",
-                  "tests/arith/quantif.i",45);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_14 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_14.blocking = 1;
+    __gen_e_acsl_assert_data_14.kind = "Assertion";
+    __gen_e_acsl_assert_data_14.pred_txt = "!(\\exists char c; 10 <= c < 10 && c == 10)";
+    __gen_e_acsl_assert_data_14.file = "tests/arith/quantif.i";
+    __gen_e_acsl_assert_data_14.fct = "main";
+    __gen_e_acsl_assert_data_14.line = 45;
+    __e_acsl_assert(! 0,& __gen_e_acsl_assert_data_14);
+  }
   /*@ assert !(\exists char c; 10 <= c < 10 && c == 10); */ ;
   {
     int __gen_e_acsl_u;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_15 =
+      {.values = (void *)0};
     __gen_e_acsl_u = 5;
-    __e_acsl_assert(1,1,"Assertion","main",
-                    "\\let u = 5;\n\\forall integer x, integer y; 0 <= x < 2 && 4 < y < u ==> \\false",
-                    "tests/arith/quantif.i",47);
+    __gen_e_acsl_assert_data_15.blocking = 1;
+    __gen_e_acsl_assert_data_15.kind = "Assertion";
+    __gen_e_acsl_assert_data_15.pred_txt = "\\let u = 5;\n\\forall integer x, integer y; 0 <= x < 2 && 4 < y < u ==> \\false";
+    __gen_e_acsl_assert_data_15.file = "tests/arith/quantif.i";
+    __gen_e_acsl_assert_data_15.fct = "main";
+    __gen_e_acsl_assert_data_15.line = 47;
+    __e_acsl_assert(1,& __gen_e_acsl_assert_data_15);
   }
   /*@
   assert \let u = 5;
@@ -365,6 +452,8 @@ int main(void)
     int __gen_e_acsl_i_6;
     int __gen_e_acsl_j;
     int __gen_e_acsl_k;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_16 =
+      {.values = (void *)0};
     __gen_e_acsl_forall_10 = 1;
     __gen_e_acsl_i_6 = 0;
     while (1) {
@@ -393,9 +482,13 @@ int main(void)
       __gen_e_acsl_i_6 ++;
     }
     e_acsl_end_loop12: ;
-    __e_acsl_assert(__gen_e_acsl_forall_10,1,"Assertion","main",
-                    "forall_multiple_binders_1:\n  \\forall integer i, integer j, integer k;\n    0 <= i < 10 && 1 < j <= 11 && 2 <= k <= 12 ==> p1(i, j, k)",
-                    "tests/arith/quantif.i",53);
+    __gen_e_acsl_assert_data_16.blocking = 1;
+    __gen_e_acsl_assert_data_16.kind = "Assertion";
+    __gen_e_acsl_assert_data_16.pred_txt = "forall_multiple_binders_1:\n  \\forall integer i, integer j, integer k;\n    0 <= i < 10 && 1 < j <= 11 && 2 <= k <= 12 ==> p1(i, j, k)";
+    __gen_e_acsl_assert_data_16.file = "tests/arith/quantif.i";
+    __gen_e_acsl_assert_data_16.fct = "main";
+    __gen_e_acsl_assert_data_16.line = 53;
+    __e_acsl_assert(__gen_e_acsl_forall_10,& __gen_e_acsl_assert_data_16);
   }
   /*@
   assert
@@ -409,6 +502,8 @@ int main(void)
     int __gen_e_acsl_i_7;
     int __gen_e_acsl_j_2;
     int __gen_e_acsl_k_2;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_17 =
+      {.values = (void *)0};
     __gen_e_acsl_forall_11 = 1;
     __gen_e_acsl_i_7 = 0;
     while (1) {
@@ -437,9 +532,13 @@ int main(void)
       __gen_e_acsl_i_7 ++;
     }
     e_acsl_end_loop13: ;
-    __e_acsl_assert(__gen_e_acsl_forall_11,1,"Assertion","main",
-                    "forall_multiple_binders_2:\n  \\forall integer i, integer j, integer k;\n    0 <= i <= j < k <= 10 ==> p2(i, j, k)",
-                    "tests/arith/quantif.i",56);
+    __gen_e_acsl_assert_data_17.blocking = 1;
+    __gen_e_acsl_assert_data_17.kind = "Assertion";
+    __gen_e_acsl_assert_data_17.pred_txt = "forall_multiple_binders_2:\n  \\forall integer i, integer j, integer k;\n    0 <= i <= j < k <= 10 ==> p2(i, j, k)";
+    __gen_e_acsl_assert_data_17.file = "tests/arith/quantif.i";
+    __gen_e_acsl_assert_data_17.fct = "main";
+    __gen_e_acsl_assert_data_17.line = 56;
+    __e_acsl_assert(__gen_e_acsl_forall_11,& __gen_e_acsl_assert_data_17);
   }
   /*@
   assert
@@ -453,6 +552,8 @@ int main(void)
     int __gen_e_acsl_i_8;
     int __gen_e_acsl_j_3;
     int __gen_e_acsl_k_3;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_18 =
+      {.values = (void *)0};
     __gen_e_acsl_forall_12 = 1;
     __gen_e_acsl_i_8 = 0;
     while (1) {
@@ -481,9 +582,13 @@ int main(void)
       __gen_e_acsl_i_8 ++;
     }
     e_acsl_end_loop14: ;
-    __e_acsl_assert(__gen_e_acsl_forall_12,1,"Assertion","main",
-                    "forall_multiple_binders_3:\n  \\forall integer i, integer j, integer k;\n    0 <= i < j <= 10 && 1 < k < 11 ==> p3(i, j, k)",
-                    "tests/arith/quantif.i",59);
+    __gen_e_acsl_assert_data_18.blocking = 1;
+    __gen_e_acsl_assert_data_18.kind = "Assertion";
+    __gen_e_acsl_assert_data_18.pred_txt = "forall_multiple_binders_3:\n  \\forall integer i, integer j, integer k;\n    0 <= i < j <= 10 && 1 < k < 11 ==> p3(i, j, k)";
+    __gen_e_acsl_assert_data_18.file = "tests/arith/quantif.i";
+    __gen_e_acsl_assert_data_18.fct = "main";
+    __gen_e_acsl_assert_data_18.line = 59;
+    __e_acsl_assert(__gen_e_acsl_forall_12,& __gen_e_acsl_assert_data_18);
   }
   /*@
   assert
@@ -497,6 +602,8 @@ int main(void)
     int __gen_e_acsl_i_9;
     int __gen_e_acsl_j_4;
     int __gen_e_acsl_k_4;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_19 =
+      {.values = (void *)0};
     __gen_e_acsl_forall_13 = 1;
     __gen_e_acsl_i_9 = 0;
     while (1) {
@@ -525,9 +632,13 @@ int main(void)
       __gen_e_acsl_i_9 ++;
     }
     e_acsl_end_loop15: ;
-    __e_acsl_assert(__gen_e_acsl_forall_13,1,"Assertion","main",
-                    "forall_multiple_binders_4:\n  \\forall integer i, integer j, integer k;\n    0 <= i < 10 ==> 1 < j <= 11 ==> 2 <= k <= 12 ==> p1(i, j, k)",
-                    "tests/arith/quantif.i",62);
+    __gen_e_acsl_assert_data_19.blocking = 1;
+    __gen_e_acsl_assert_data_19.kind = "Assertion";
+    __gen_e_acsl_assert_data_19.pred_txt = "forall_multiple_binders_4:\n  \\forall integer i, integer j, integer k;\n    0 <= i < 10 ==> 1 < j <= 11 ==> 2 <= k <= 12 ==> p1(i, j, k)";
+    __gen_e_acsl_assert_data_19.file = "tests/arith/quantif.i";
+    __gen_e_acsl_assert_data_19.fct = "main";
+    __gen_e_acsl_assert_data_19.line = 62;
+    __e_acsl_assert(__gen_e_acsl_forall_13,& __gen_e_acsl_assert_data_19);
   }
   /*@
   assert
@@ -541,6 +652,8 @@ int main(void)
     int __gen_e_acsl_i_10;
     int __gen_e_acsl_k_5;
     int __gen_e_acsl_j_5;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_20 =
+      {.values = (void *)0};
     __gen_e_acsl_forall_14 = 1;
     __gen_e_acsl_i_10 = 0;
     while (1) {
@@ -569,9 +682,13 @@ int main(void)
       __gen_e_acsl_i_10 ++;
     }
     e_acsl_end_loop16: ;
-    __e_acsl_assert(__gen_e_acsl_forall_14,1,"Assertion","main",
-                    "forall_unordered_binders:\n  \\forall integer i, integer j, integer k;\n    0 <= i <= k <= 10 && 1 <= j < k ==> p4(i, j, k)",
-                    "tests/arith/quantif.i",65);
+    __gen_e_acsl_assert_data_20.blocking = 1;
+    __gen_e_acsl_assert_data_20.kind = "Assertion";
+    __gen_e_acsl_assert_data_20.pred_txt = "forall_unordered_binders:\n  \\forall integer i, integer j, integer k;\n    0 <= i <= k <= 10 && 1 <= j < k ==> p4(i, j, k)";
+    __gen_e_acsl_assert_data_20.file = "tests/arith/quantif.i";
+    __gen_e_acsl_assert_data_20.fct = "main";
+    __gen_e_acsl_assert_data_20.line = 65;
+    __e_acsl_assert(__gen_e_acsl_forall_14,& __gen_e_acsl_assert_data_20);
   }
   /*@
   assert
@@ -585,6 +702,8 @@ int main(void)
     int __gen_e_acsl_i_11;
     int __gen_e_acsl_j_6;
     int __gen_e_acsl_k_6;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_21 =
+      {.values = (void *)0};
     __gen_e_acsl_exists_3 = 0;
     __gen_e_acsl_i_11 = 0;
     while (1) {
@@ -613,9 +732,13 @@ int main(void)
       __gen_e_acsl_i_11 ++;
     }
     e_acsl_end_loop17: ;
-    __e_acsl_assert(__gen_e_acsl_exists_3,1,"Assertion","main",
-                    "exists_multiple_binders_1:\n  \\exists integer i, integer j, integer k;\n    0 <= i < 10 && 1 < j <= 11 && 2 <= k <= 12 && p1(i, j, k)",
-                    "tests/arith/quantif.i",68);
+    __gen_e_acsl_assert_data_21.blocking = 1;
+    __gen_e_acsl_assert_data_21.kind = "Assertion";
+    __gen_e_acsl_assert_data_21.pred_txt = "exists_multiple_binders_1:\n  \\exists integer i, integer j, integer k;\n    0 <= i < 10 && 1 < j <= 11 && 2 <= k <= 12 && p1(i, j, k)";
+    __gen_e_acsl_assert_data_21.file = "tests/arith/quantif.i";
+    __gen_e_acsl_assert_data_21.fct = "main";
+    __gen_e_acsl_assert_data_21.line = 68;
+    __e_acsl_assert(__gen_e_acsl_exists_3,& __gen_e_acsl_assert_data_21);
   }
   /*@
   assert
@@ -629,6 +752,8 @@ int main(void)
     int __gen_e_acsl_i_12;
     int __gen_e_acsl_j_7;
     int __gen_e_acsl_k_7;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_22 =
+      {.values = (void *)0};
     __gen_e_acsl_exists_4 = 0;
     __gen_e_acsl_i_12 = 0;
     while (1) {
@@ -657,9 +782,13 @@ int main(void)
       __gen_e_acsl_i_12 ++;
     }
     e_acsl_end_loop18: ;
-    __e_acsl_assert(__gen_e_acsl_exists_4,1,"Assertion","main",
-                    "exists_multiple_binders_2:\n  \\exists integer i, integer j, integer k;\n    0 <= i <= j < k <= 10 && p2(i, j, k)",
-                    "tests/arith/quantif.i",71);
+    __gen_e_acsl_assert_data_22.blocking = 1;
+    __gen_e_acsl_assert_data_22.kind = "Assertion";
+    __gen_e_acsl_assert_data_22.pred_txt = "exists_multiple_binders_2:\n  \\exists integer i, integer j, integer k;\n    0 <= i <= j < k <= 10 && p2(i, j, k)";
+    __gen_e_acsl_assert_data_22.file = "tests/arith/quantif.i";
+    __gen_e_acsl_assert_data_22.fct = "main";
+    __gen_e_acsl_assert_data_22.line = 71;
+    __e_acsl_assert(__gen_e_acsl_exists_4,& __gen_e_acsl_assert_data_22);
   }
   /*@
   assert
@@ -673,6 +802,8 @@ int main(void)
     int __gen_e_acsl_i_13;
     int __gen_e_acsl_j_8;
     int __gen_e_acsl_k_8;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_23 =
+      {.values = (void *)0};
     __gen_e_acsl_exists_5 = 0;
     __gen_e_acsl_i_13 = 0;
     while (1) {
@@ -701,9 +832,13 @@ int main(void)
       __gen_e_acsl_i_13 ++;
     }
     e_acsl_end_loop19: ;
-    __e_acsl_assert(__gen_e_acsl_exists_5,1,"Assertion","main",
-                    "exists_multiple_binders_3:\n  \\exists integer i, integer j, integer k;\n    0 <= i < j <= 10 && 1 < k < 11 && p3(i, j, k)",
-                    "tests/arith/quantif.i",74);
+    __gen_e_acsl_assert_data_23.blocking = 1;
+    __gen_e_acsl_assert_data_23.kind = "Assertion";
+    __gen_e_acsl_assert_data_23.pred_txt = "exists_multiple_binders_3:\n  \\exists integer i, integer j, integer k;\n    0 <= i < j <= 10 && 1 < k < 11 && p3(i, j, k)";
+    __gen_e_acsl_assert_data_23.file = "tests/arith/quantif.i";
+    __gen_e_acsl_assert_data_23.fct = "main";
+    __gen_e_acsl_assert_data_23.line = 74;
+    __e_acsl_assert(__gen_e_acsl_exists_5,& __gen_e_acsl_assert_data_23);
   }
   /*@
   assert
@@ -717,6 +852,8 @@ int main(void)
     int __gen_e_acsl_i_14;
     int __gen_e_acsl_k_9;
     int __gen_e_acsl_j_9;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_24 =
+      {.values = (void *)0};
     __gen_e_acsl_exists_6 = 0;
     __gen_e_acsl_i_14 = 0;
     while (1) {
@@ -745,9 +882,13 @@ int main(void)
       __gen_e_acsl_i_14 ++;
     }
     e_acsl_end_loop20: ;
-    __e_acsl_assert(__gen_e_acsl_exists_6,1,"Assertion","main",
-                    "exists_unordered_binders:\n  \\exists integer i, integer j, integer k;\n    0 <= i <= k <= 10 && 1 <= j < k && p4(i, j, k)",
-                    "tests/arith/quantif.i",77);
+    __gen_e_acsl_assert_data_24.blocking = 1;
+    __gen_e_acsl_assert_data_24.kind = "Assertion";
+    __gen_e_acsl_assert_data_24.pred_txt = "exists_unordered_binders:\n  \\exists integer i, integer j, integer k;\n    0 <= i <= k <= 10 && 1 <= j < k && p4(i, j, k)";
+    __gen_e_acsl_assert_data_24.file = "tests/arith/quantif.i";
+    __gen_e_acsl_assert_data_24.fct = "main";
+    __gen_e_acsl_assert_data_24.line = 77;
+    __e_acsl_assert(__gen_e_acsl_exists_6,& __gen_e_acsl_assert_data_24);
   }
   /*@
   assert

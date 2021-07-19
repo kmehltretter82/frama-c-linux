@@ -48,9 +48,17 @@ int __gen_e_acsl_h(void)
 {
   int __retres;
   __retres = h();
-  __e_acsl_assert(__retres == 0,1,"Postcondition","h","\\result == 0",
-                  "tests/constructs/result.i",19);
-  return __retres;
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Postcondition";
+    __gen_e_acsl_assert_data.pred_txt = "\\result == 0";
+    __gen_e_acsl_assert_data.file = "tests/constructs/result.i";
+    __gen_e_acsl_assert_data.fct = "h";
+    __gen_e_acsl_assert_data.line = 19;
+    __e_acsl_assert(__retres == 0,& __gen_e_acsl_assert_data);
+    return __retres;
+  }
 }
 
 /*@ ensures \result == \old(x);
@@ -61,11 +69,26 @@ int __gen_e_acsl_g(int x)
   int __retres;
   __gen_e_acsl_at = x;
   __retres = g(x);
-  __e_acsl_assert(__retres == __gen_e_acsl_at,1,"Postcondition","g",
-                  "\\result == \\old(x)","tests/constructs/result.i",13);
-  __e_acsl_assert(__retres == Y,1,"Postcondition","g","\\result == Y",
-                  "tests/constructs/result.i",14);
-  return __retres;
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Postcondition";
+    __gen_e_acsl_assert_data.pred_txt = "\\result == \\old(x)";
+    __gen_e_acsl_assert_data.file = "tests/constructs/result.i";
+    __gen_e_acsl_assert_data.fct = "g";
+    __gen_e_acsl_assert_data.line = 13;
+    __e_acsl_assert(__retres == __gen_e_acsl_at,& __gen_e_acsl_assert_data);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Postcondition";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\result == Y";
+    __gen_e_acsl_assert_data_2.file = "tests/constructs/result.i";
+    __gen_e_acsl_assert_data_2.fct = "g";
+    __gen_e_acsl_assert_data_2.line = 14;
+    __e_acsl_assert(__retres == Y,& __gen_e_acsl_assert_data_2);
+    return __retres;
+  }
 }
 
 /*@ ensures \result == (int)(\old(x) - \old(x)); */
@@ -77,11 +100,18 @@ int __gen_e_acsl_f(int x)
   __gen_e_acsl_at_2 = x;
   __gen_e_acsl_at = (long)x;
   __retres = f(x);
-  __e_acsl_assert(__retres == (int)(__gen_e_acsl_at - __gen_e_acsl_at_2),1,
-                  "Postcondition","f",
-                  "\\result == (int)(\\old(x) - \\old(x))",
-                  "tests/constructs/result.i",5);
-  return __retres;
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Postcondition";
+    __gen_e_acsl_assert_data.pred_txt = "\\result == (int)(\\old(x) - \\old(x))";
+    __gen_e_acsl_assert_data.file = "tests/constructs/result.i";
+    __gen_e_acsl_assert_data.fct = "f";
+    __gen_e_acsl_assert_data.line = 5;
+    __e_acsl_assert(__retres == (int)(__gen_e_acsl_at - __gen_e_acsl_at_2),
+                    & __gen_e_acsl_assert_data);
+    return __retres;
+  }
 }
 
 

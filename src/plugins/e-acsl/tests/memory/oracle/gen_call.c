@@ -53,11 +53,17 @@ int *__gen_e_acsl_f(int *x, int *y)
   __retres = f(x,y);
   {
     int __gen_e_acsl_valid;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_valid = __e_acsl_valid((void *)__retres,sizeof(int),
                                         (void *)__retres,
                                         (void *)(& __retres));
-    __e_acsl_assert(__gen_e_acsl_valid,1,"Postcondition","f",
-                    "\\valid(\\result)","tests/memory/call.c",7);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Postcondition";
+    __gen_e_acsl_assert_data.pred_txt = "\\valid(\\result)";
+    __gen_e_acsl_assert_data.file = "tests/memory/call.c";
+    __gen_e_acsl_assert_data.fct = "f";
+    __gen_e_acsl_assert_data.line = 7;
+    __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
     __e_acsl_delete_block((void *)(& y));
     __e_acsl_delete_block((void *)(& x));
     __e_acsl_delete_block((void *)(& __retres));

@@ -18,10 +18,17 @@ int main(void)
   while (i < 3) {
     {
       int __gen_e_acsl_valid;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data =
+        {.values = (void *)0};
       __gen_e_acsl_valid = __e_acsl_valid((void *)(p + i),sizeof(int *),
                                           (void *)p,(void *)(& p));
-      __e_acsl_assert(__gen_e_acsl_valid,1,"Assertion","main",
-                      "\\valid(p + i)","tests/temporal/t_dpointer.c",13);
+      __gen_e_acsl_assert_data.blocking = 1;
+      __gen_e_acsl_assert_data.kind = "Assertion";
+      __gen_e_acsl_assert_data.pred_txt = "\\valid(p + i)";
+      __gen_e_acsl_assert_data.file = "tests/temporal/t_dpointer.c";
+      __gen_e_acsl_assert_data.fct = "main";
+      __gen_e_acsl_assert_data.line = 13;
+      __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
     }
     /*@ assert \valid(p + i); */ ;
     __e_acsl_initialize((void *)(p + i),sizeof(int *));
@@ -32,26 +39,39 @@ int main(void)
     {
       int __gen_e_acsl_initialized;
       int __gen_e_acsl_and;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+        {.values = (void *)0};
       __gen_e_acsl_initialized = __e_acsl_initialized((void *)(p + i),
                                                       sizeof(int *));
       if (__gen_e_acsl_initialized) {
         int __gen_e_acsl_valid_read;
         int __gen_e_acsl_valid_2;
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+          {.values = (void *)0};
         __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(p + i),
                                                       sizeof(int *),
                                                       (void *)p,
                                                       (void *)(& p));
-        __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","main",
-                        "mem_access: \\valid_read(p + i)",
-                        "tests/temporal/t_dpointer.c",15);
+        __gen_e_acsl_assert_data_3.blocking = 1;
+        __gen_e_acsl_assert_data_3.kind = "RTE";
+        __gen_e_acsl_assert_data_3.pred_txt = "mem_access: \\valid_read(p + i)";
+        __gen_e_acsl_assert_data_3.file = "tests/temporal/t_dpointer.c";
+        __gen_e_acsl_assert_data_3.fct = "main";
+        __gen_e_acsl_assert_data_3.line = 15;
+        __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_3);
         __gen_e_acsl_valid_2 = __e_acsl_valid((void *)*(p + i),sizeof(int),
                                               (void *)*(p + i),
                                               (void *)(p + i));
         __gen_e_acsl_and = __gen_e_acsl_valid_2;
       }
       else __gen_e_acsl_and = 0;
-      __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","main",
-                      "\\valid(*(p + i))","tests/temporal/t_dpointer.c",15);
+      __gen_e_acsl_assert_data_2.blocking = 1;
+      __gen_e_acsl_assert_data_2.kind = "Assertion";
+      __gen_e_acsl_assert_data_2.pred_txt = "\\valid(*(p + i))";
+      __gen_e_acsl_assert_data_2.file = "tests/temporal/t_dpointer.c";
+      __gen_e_acsl_assert_data_2.fct = "main";
+      __gen_e_acsl_assert_data_2.line = 15;
+      __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data_2);
     }
     /*@ assert \valid(*(p + i)); */ ;
     i ++;
@@ -66,18 +86,26 @@ int main(void)
   {
     int __gen_e_acsl_initialized_2;
     int __gen_e_acsl_and_2;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+      {.values = (void *)0};
     __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(p + 2),
                                                       sizeof(int *));
     if (__gen_e_acsl_initialized_2) {
       int __gen_e_acsl_valid_read_2;
       int __gen_e_acsl_valid_3;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+        {.values = (void *)0};
       __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(p + 2),
                                                       sizeof(int *),
                                                       (void *)p,
                                                       (void *)(& p));
-      __e_acsl_assert(__gen_e_acsl_valid_read_2,1,"RTE","main",
-                      "mem_access: \\valid_read(p + 2)",
-                      "tests/temporal/t_dpointer.c",21);
+      __gen_e_acsl_assert_data_5.blocking = 1;
+      __gen_e_acsl_assert_data_5.kind = "RTE";
+      __gen_e_acsl_assert_data_5.pred_txt = "mem_access: \\valid_read(p + 2)";
+      __gen_e_acsl_assert_data_5.file = "tests/temporal/t_dpointer.c";
+      __gen_e_acsl_assert_data_5.fct = "main";
+      __gen_e_acsl_assert_data_5.line = 21;
+      __e_acsl_assert(__gen_e_acsl_valid_read_2,& __gen_e_acsl_assert_data_5);
       /*@ assert Eva: dangling_pointer: !\dangling(p + 2); */
       __gen_e_acsl_valid_3 = __e_acsl_valid((void *)*(p + 2),sizeof(int),
                                             (void *)*(p + 2),(void *)(
@@ -85,8 +113,13 @@ int main(void)
       __gen_e_acsl_and_2 = __gen_e_acsl_valid_3;
     }
     else __gen_e_acsl_and_2 = 0;
-    __e_acsl_assert(! __gen_e_acsl_and_2,1,"Assertion","main",
-                    "!\\valid(*(p + 2))","tests/temporal/t_dpointer.c",21);
+    __gen_e_acsl_assert_data_4.blocking = 1;
+    __gen_e_acsl_assert_data_4.kind = "Assertion";
+    __gen_e_acsl_assert_data_4.pred_txt = "!\\valid(*(p + 2))";
+    __gen_e_acsl_assert_data_4.file = "tests/temporal/t_dpointer.c";
+    __gen_e_acsl_assert_data_4.fct = "main";
+    __gen_e_acsl_assert_data_4.line = 21;
+    __e_acsl_assert(! __gen_e_acsl_and_2,& __gen_e_acsl_assert_data_4);
   }
   /*@ assert !\valid(*(p + 2)); */ ;
   __retres = 0;

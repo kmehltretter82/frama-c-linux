@@ -15,10 +15,16 @@ int f(void)
   /*@ assert \valid(&a); */
   {
     int __gen_e_acsl_valid;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_valid = __e_acsl_valid((void *)(& a),sizeof(int),
                                         (void *)(& a),(void *)0);
-    __e_acsl_assert(__gen_e_acsl_valid,1,"Assertion","f","\\valid(&a)",
-                    "tests/bts/issue-eacsl-105.c",11);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "\\valid(&a)";
+    __gen_e_acsl_assert_data.file = "tests/bts/issue-eacsl-105.c";
+    __gen_e_acsl_assert_data.fct = "f";
+    __gen_e_acsl_assert_data.line = 11;
+    __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
   }
   __retres = 0;
   goto return_label;

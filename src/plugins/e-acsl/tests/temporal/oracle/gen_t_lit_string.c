@@ -41,6 +41,7 @@ int main(void)
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
     int __gen_e_acsl_and_3;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& f),
                                                     sizeof(char *));
     if (__gen_e_acsl_initialized) {
@@ -65,9 +66,13 @@ int main(void)
       __gen_e_acsl_and_3 = ! __gen_e_acsl_and_2;
     }
     else __gen_e_acsl_and_3 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_3,1,"Assertion","main",
-                    "\\valid_read(f) && !\\valid(f)",
-                    "tests/temporal/t_lit_string.c",9);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "\\valid_read(f) && !\\valid(f)";
+    __gen_e_acsl_assert_data.file = "tests/temporal/t_lit_string.c";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 9;
+    __e_acsl_assert(__gen_e_acsl_and_3,& __gen_e_acsl_assert_data);
   }
   /*@ assert \valid_read(f) && !\valid(f); */ ;
   __e_acsl_full_init((void *)(& g));
@@ -78,6 +83,8 @@ int main(void)
     int __gen_e_acsl_initialized_3;
     int __gen_e_acsl_and_4;
     int __gen_e_acsl_and_6;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
     __gen_e_acsl_initialized_3 = __e_acsl_initialized((void *)(& g),
                                                       sizeof(char *));
     if (__gen_e_acsl_initialized_3) {
@@ -103,9 +110,13 @@ int main(void)
       __gen_e_acsl_and_6 = ! __gen_e_acsl_and_5;
     }
     else __gen_e_acsl_and_6 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_6,1,"Assertion","main",
-                    "\\valid_read(g) && !\\valid(g)",
-                    "tests/temporal/t_lit_string.c",12);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Assertion";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read(g) && !\\valid(g)";
+    __gen_e_acsl_assert_data_2.file = "tests/temporal/t_lit_string.c";
+    __gen_e_acsl_assert_data_2.fct = "main";
+    __gen_e_acsl_assert_data_2.line = 12;
+    __e_acsl_assert(__gen_e_acsl_and_6,& __gen_e_acsl_assert_data_2);
   }
   /*@ assert \valid_read(g) && !\valid(g); */ ;
   char *p = f;
@@ -116,6 +127,8 @@ int main(void)
     int __gen_e_acsl_initialized_5;
     int __gen_e_acsl_and_7;
     int __gen_e_acsl_and_9;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
     __gen_e_acsl_initialized_5 = __e_acsl_initialized((void *)(& p),
                                                       sizeof(char *));
     if (__gen_e_acsl_initialized_5) {
@@ -141,9 +154,13 @@ int main(void)
       __gen_e_acsl_and_9 = ! __gen_e_acsl_and_8;
     }
     else __gen_e_acsl_and_9 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_9,1,"Assertion","main",
-                    "\\valid_read(p) && !\\valid(p)",
-                    "tests/temporal/t_lit_string.c",15);
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "Assertion";
+    __gen_e_acsl_assert_data_3.pred_txt = "\\valid_read(p) && !\\valid(p)";
+    __gen_e_acsl_assert_data_3.file = "tests/temporal/t_lit_string.c";
+    __gen_e_acsl_assert_data_3.fct = "main";
+    __gen_e_acsl_assert_data_3.line = 15;
+    __e_acsl_assert(__gen_e_acsl_and_9,& __gen_e_acsl_assert_data_3);
   }
   /*@ assert \valid_read(p) && !\valid(p); */ ;
   __e_acsl_full_init((void *)(& q));
@@ -153,6 +170,8 @@ int main(void)
     int __gen_e_acsl_initialized_7;
     int __gen_e_acsl_and_10;
     int __gen_e_acsl_and_12;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+      {.values = (void *)0};
     __gen_e_acsl_initialized_7 = __e_acsl_initialized((void *)(& q),
                                                       sizeof(char *));
     if (__gen_e_acsl_initialized_7) {
@@ -178,9 +197,13 @@ int main(void)
       __gen_e_acsl_and_12 = ! __gen_e_acsl_and_11;
     }
     else __gen_e_acsl_and_12 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_12,1,"Assertion","main",
-                    "\\valid_read(q) && !\\valid(q)",
-                    "tests/temporal/t_lit_string.c",18);
+    __gen_e_acsl_assert_data_4.blocking = 1;
+    __gen_e_acsl_assert_data_4.kind = "Assertion";
+    __gen_e_acsl_assert_data_4.pred_txt = "\\valid_read(q) && !\\valid(q)";
+    __gen_e_acsl_assert_data_4.file = "tests/temporal/t_lit_string.c";
+    __gen_e_acsl_assert_data_4.fct = "main";
+    __gen_e_acsl_assert_data_4.line = 18;
+    __e_acsl_assert(__gen_e_acsl_and_12,& __gen_e_acsl_assert_data_4);
   }
   /*@ assert \valid_read(q) && !\valid(q); */ ;
   __retres = 0;

@@ -37,9 +37,15 @@ int main(void)
   if (a) goto _LOR;
   {
     int __gen_e_acsl_initialized;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)b,sizeof(char));
-    __e_acsl_assert(__gen_e_acsl_initialized,1,"Assertion","main",
-                    "\\initialized(b)","tests/memory/goto.c",17);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "\\initialized(b)";
+    __gen_e_acsl_assert_data.file = "tests/memory/goto.c";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 17;
+    __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data);
   }
   /*@ assert \initialized(b); */ ;
   __retres = 0;

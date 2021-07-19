@@ -41,20 +41,27 @@ void g(void)
   {
     int __gen_e_acsl_exists;
     int __gen_e_acsl_w;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_exists = 0;
     __gen_e_acsl_w = 3;
     while (1) {
       if (__gen_e_acsl_w < 6) ; else break;
       {
         int __gen_e_acsl_valid_read;
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+          {.values = (void *)0};
         __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(__gen_e_acsl_at + (int)(
                                                                __gen_e_acsl_w - 3L)),
                                                       sizeof(int),
                                                       (void *)__gen_e_acsl_at,
                                                       (void *)(& __gen_e_acsl_at));
-        __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","g",
-                        "mem_access: \\valid_read(__gen_e_acsl_at + (int)(__gen_e_acsl_w - 3))",
-                        "tests/arith/at_on-purely-logic-variables.c",16);
+        __gen_e_acsl_assert_data_2.blocking = 1;
+        __gen_e_acsl_assert_data_2.kind = "RTE";
+        __gen_e_acsl_assert_data_2.pred_txt = "mem_access: \\valid_read(__gen_e_acsl_at + (int)(__gen_e_acsl_w - 3))";
+        __gen_e_acsl_assert_data_2.file = "tests/arith/at_on-purely-logic-variables.c";
+        __gen_e_acsl_assert_data_2.fct = "g";
+        __gen_e_acsl_assert_data_2.line = 16;
+        __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_2);
         if (! *(__gen_e_acsl_at + (__gen_e_acsl_w - 3))) ;
         else {
           __gen_e_acsl_exists = 1;
@@ -64,9 +71,13 @@ void g(void)
       __gen_e_acsl_w ++;
     }
     e_acsl_end_loop1: ;
-    __e_acsl_assert(__gen_e_acsl_exists,1,"Assertion","g",
-                    "\\exists integer w; 3 <= w < 6 && \\at(m + w == 12,Q)",
-                    "tests/arith/at_on-purely-logic-variables.c",16);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "\\exists integer w; 3 <= w < 6 && \\at(m + w == 12,Q)";
+    __gen_e_acsl_assert_data.file = "tests/arith/at_on-purely-logic-variables.c";
+    __gen_e_acsl_assert_data.fct = "g";
+    __gen_e_acsl_assert_data.line = 16;
+    __e_acsl_assert(__gen_e_acsl_exists,& __gen_e_acsl_assert_data);
   }
   /*@ assert \exists integer w; 3 <= w < 6 && \at(m + w == 12,Q); */ ;
   free((void *)__gen_e_acsl_at);
@@ -205,36 +216,56 @@ int main(void)
   {
     int __gen_e_acsl_i;
     int __gen_e_acsl_valid_read;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_i = 3;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(__gen_e_acsl_at + 0),
                                                   sizeof(int),
                                                   (void *)__gen_e_acsl_at,
                                                   (void *)(& __gen_e_acsl_at));
-    __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","main",
-                    "mem_access: \\valid_read(__gen_e_acsl_at + 0)",
-                    "tests/arith/at_on-purely-logic-variables.c",28);
-    __e_acsl_assert(*(__gen_e_acsl_at + 0),1,"Assertion","main",
-                    "\\let i = 3; \\at(n + i == 10,L)",
-                    "tests/arith/at_on-purely-logic-variables.c",28);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "RTE";
+    __gen_e_acsl_assert_data_2.pred_txt = "mem_access: \\valid_read(__gen_e_acsl_at + 0)";
+    __gen_e_acsl_assert_data_2.file = "tests/arith/at_on-purely-logic-variables.c";
+    __gen_e_acsl_assert_data_2.fct = "main";
+    __gen_e_acsl_assert_data_2.line = 28;
+    __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_2);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "\\let i = 3; \\at(n + i == 10,L)";
+    __gen_e_acsl_assert_data.file = "tests/arith/at_on-purely-logic-variables.c";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 28;
+    __e_acsl_assert(*(__gen_e_acsl_at + 0),& __gen_e_acsl_assert_data);
   }
   /*@ assert \let i = 3; \at(n + i == 10,L); */ ;
   {
     int __gen_e_acsl_exists;
     int __gen_e_acsl_j;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
     __gen_e_acsl_exists = 0;
     __gen_e_acsl_j = 2;
     while (1) {
       if (__gen_e_acsl_j < 5) ; else break;
       {
         int __gen_e_acsl_valid_read_2;
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+          {.values = (void *)0};
         __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(__gen_e_acsl_at_2 + (int)(
                                                                  __gen_e_acsl_j - 2L)),
                                                         sizeof(int),
                                                         (void *)__gen_e_acsl_at_2,
                                                         (void *)(& __gen_e_acsl_at_2));
-        __e_acsl_assert(__gen_e_acsl_valid_read_2,1,"RTE","main",
-                        "mem_access: \\valid_read(__gen_e_acsl_at_2 + (int)(__gen_e_acsl_j - 2))",
-                        "tests/arith/at_on-purely-logic-variables.c",29);
+        __gen_e_acsl_assert_data_4.blocking = 1;
+        __gen_e_acsl_assert_data_4.kind = "RTE";
+        __gen_e_acsl_assert_data_4.pred_txt = "mem_access: \\valid_read(__gen_e_acsl_at_2 + (int)(__gen_e_acsl_j - 2))";
+        __gen_e_acsl_assert_data_4.file = "tests/arith/at_on-purely-logic-variables.c";
+        __gen_e_acsl_assert_data_4.fct = "main";
+        __gen_e_acsl_assert_data_4.line = 29;
+        __e_acsl_assert(__gen_e_acsl_valid_read_2,
+                        & __gen_e_acsl_assert_data_4);
         if (! *(__gen_e_acsl_at_2 + (__gen_e_acsl_j - 2))) ;
         else {
           __gen_e_acsl_exists = 1;
@@ -244,15 +275,21 @@ int main(void)
       __gen_e_acsl_j ++;
     }
     e_acsl_end_loop2: ;
-    __e_acsl_assert(__gen_e_acsl_exists,1,"Assertion","main",
-                    "\\exists integer j; 2 <= j < 5 && \\at(n + j == 11,L)",
-                    "tests/arith/at_on-purely-logic-variables.c",29);
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "Assertion";
+    __gen_e_acsl_assert_data_3.pred_txt = "\\exists integer j; 2 <= j < 5 && \\at(n + j == 11,L)";
+    __gen_e_acsl_assert_data_3.file = "tests/arith/at_on-purely-logic-variables.c";
+    __gen_e_acsl_assert_data_3.fct = "main";
+    __gen_e_acsl_assert_data_3.line = 29;
+    __e_acsl_assert(__gen_e_acsl_exists,& __gen_e_acsl_assert_data_3);
   }
   /*@ assert \exists integer j; 2 <= j < 5 && \at(n + j == 11,L); */ ;
   {
     int __gen_e_acsl_k;
     int __gen_e_acsl_exists_2;
     int __gen_e_acsl_u;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+      {.values = (void *)0};
     __gen_e_acsl_k = -7;
     __gen_e_acsl_exists_2 = 0;
     __gen_e_acsl_u = 9;
@@ -267,6 +304,8 @@ int main(void)
           if (__gen_e_acsl_v <= 6) ; else break;
           {
             int __gen_e_acsl_valid_read_3;
+            __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+              {.values = (void *)0};
             __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)(
                                                             __gen_e_acsl_at_3 + (int)(
                                                             (long)((int)(
@@ -276,9 +315,14 @@ int main(void)
                                                             sizeof(int),
                                                             (void *)__gen_e_acsl_at_3,
                                                             (void *)(& __gen_e_acsl_at_3));
-            __e_acsl_assert(__gen_e_acsl_valid_read_3,1,"RTE","main",
-                            "mem_access:\n  \\valid_read(__gen_e_acsl_at_3 +\n              (int)((int)((int)(__gen_e_acsl_u - 9) * 11) +\n                    (int)(__gen_e_acsl_v - -4)))",
-                            "tests/arith/at_on-purely-logic-variables.c",34);
+            __gen_e_acsl_assert_data_6.blocking = 1;
+            __gen_e_acsl_assert_data_6.kind = "RTE";
+            __gen_e_acsl_assert_data_6.pred_txt = "mem_access:\n  \\valid_read(__gen_e_acsl_at_3 +\n              (int)((int)((int)(__gen_e_acsl_u - 9) * 11) +\n                    (int)(__gen_e_acsl_v - -4)))";
+            __gen_e_acsl_assert_data_6.file = "tests/arith/at_on-purely-logic-variables.c";
+            __gen_e_acsl_assert_data_6.fct = "main";
+            __gen_e_acsl_assert_data_6.line = 34;
+            __e_acsl_assert(__gen_e_acsl_valid_read_3,
+                            & __gen_e_acsl_assert_data_6);
             if (*(__gen_e_acsl_at_3 + ((__gen_e_acsl_u - 9) * 11 + (__gen_e_acsl_v - -4)))) 
               ;
             else {
@@ -298,9 +342,13 @@ int main(void)
       __gen_e_acsl_u ++;
     }
     e_acsl_end_loop4: ;
-    __e_acsl_assert(__gen_e_acsl_exists_2,1,"Assertion","main",
-                    "\\let k = -7;\n\\exists integer u;\n  9 <= u < 21 &&\n  (\\forall integer v; -5 < v <= 6 ==> \\at((u > 0? n + k: u + v) > 0,K))",
-                    "tests/arith/at_on-purely-logic-variables.c",31);
+    __gen_e_acsl_assert_data_5.blocking = 1;
+    __gen_e_acsl_assert_data_5.kind = "Assertion";
+    __gen_e_acsl_assert_data_5.pred_txt = "\\let k = -7;\n\\exists integer u;\n  9 <= u < 21 &&\n  (\\forall integer v; -5 < v <= 6 ==> \\at((u > 0? n + k: u + v) > 0,K))";
+    __gen_e_acsl_assert_data_5.file = "tests/arith/at_on-purely-logic-variables.c";
+    __gen_e_acsl_assert_data_5.fct = "main";
+    __gen_e_acsl_assert_data_5.line = 31;
+    __e_acsl_assert(__gen_e_acsl_exists_2,& __gen_e_acsl_assert_data_5);
   }
   /*@
   assert \let k = -7;
@@ -312,17 +360,30 @@ int main(void)
   {
     int __gen_e_acsl_i_3;
     int __gen_e_acsl_valid_read_4;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
+      {.values = (void *)0};
     __gen_e_acsl_i_3 = 3;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+      {.values = (void *)0};
     __gen_e_acsl_valid_read_4 = __e_acsl_valid_read((void *)(__gen_e_acsl_at_4 + 0),
                                                     sizeof(long),
                                                     (void *)__gen_e_acsl_at_4,
                                                     (void *)(& __gen_e_acsl_at_4));
-    __e_acsl_assert(__gen_e_acsl_valid_read_4,1,"RTE","main",
-                    "mem_access: \\valid_read(__gen_e_acsl_at_4 + 0)",
-                    "tests/arith/at_on-purely-logic-variables.c",38);
-    __e_acsl_assert(*(__gen_e_acsl_at_4 + 0) == 10L,1,"Assertion","main",
-                    "\\let i = 3; \\at(n + i,L) == 10",
-                    "tests/arith/at_on-purely-logic-variables.c",38);
+    __gen_e_acsl_assert_data_8.blocking = 1;
+    __gen_e_acsl_assert_data_8.kind = "RTE";
+    __gen_e_acsl_assert_data_8.pred_txt = "mem_access: \\valid_read(__gen_e_acsl_at_4 + 0)";
+    __gen_e_acsl_assert_data_8.file = "tests/arith/at_on-purely-logic-variables.c";
+    __gen_e_acsl_assert_data_8.fct = "main";
+    __gen_e_acsl_assert_data_8.line = 38;
+    __e_acsl_assert(__gen_e_acsl_valid_read_4,& __gen_e_acsl_assert_data_8);
+    __gen_e_acsl_assert_data_7.blocking = 1;
+    __gen_e_acsl_assert_data_7.kind = "Assertion";
+    __gen_e_acsl_assert_data_7.pred_txt = "\\let i = 3; \\at(n + i,L) == 10";
+    __gen_e_acsl_assert_data_7.file = "tests/arith/at_on-purely-logic-variables.c";
+    __gen_e_acsl_assert_data_7.fct = "main";
+    __gen_e_acsl_assert_data_7.line = 38;
+    __e_acsl_assert(*(__gen_e_acsl_at_4 + 0) == 10L,
+                    & __gen_e_acsl_assert_data_7);
   }
   /*@ assert \let i = 3; \at(n + i,L) == 10; */ ;
   unsigned int m = (unsigned int)3;
@@ -343,20 +404,29 @@ int main(void)
   {
     int __gen_e_acsl_exists_3;
     int __gen_e_acsl_k_3;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
+      {.values = (void *)0};
     __gen_e_acsl_exists_3 = 0;
     __gen_e_acsl_k_3 = -9 + 1;
     while (1) {
       if (__gen_e_acsl_k_3 < 0) ; else break;
       {
         int __gen_e_acsl_valid_read_5;
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
+          {.values = (void *)0};
         __gen_e_acsl_valid_read_5 = __e_acsl_valid_read((void *)(__gen_e_acsl_at_5 + (int)(
                                                                  __gen_e_acsl_k_3 - -8L)),
                                                         sizeof(long),
                                                         (void *)__gen_e_acsl_at_5,
                                                         (void *)(& __gen_e_acsl_at_5));
-        __e_acsl_assert(__gen_e_acsl_valid_read_5,1,"RTE","main",
-                        "mem_access: \\valid_read(__gen_e_acsl_at_5 + (int)(__gen_e_acsl_k_3 - -8))",
-                        "tests/arith/at_on-purely-logic-variables.c",42);
+        __gen_e_acsl_assert_data_10.blocking = 1;
+        __gen_e_acsl_assert_data_10.kind = "RTE";
+        __gen_e_acsl_assert_data_10.pred_txt = "mem_access: \\valid_read(__gen_e_acsl_at_5 + (int)(__gen_e_acsl_k_3 - -8))";
+        __gen_e_acsl_assert_data_10.file = "tests/arith/at_on-purely-logic-variables.c";
+        __gen_e_acsl_assert_data_10.fct = "main";
+        __gen_e_acsl_assert_data_10.line = 42;
+        __e_acsl_assert(__gen_e_acsl_valid_read_5,
+                        & __gen_e_acsl_assert_data_10);
         if (! (*(__gen_e_acsl_at_5 + (__gen_e_acsl_k_3 - -8)) == 0L)) 
           ;
         else {
@@ -367,14 +437,20 @@ int main(void)
       __gen_e_acsl_k_3 ++;
     }
     e_acsl_end_loop5: ;
-    __e_acsl_assert(__gen_e_acsl_exists_3,1,"Assertion","main",
-                    "\\exists integer k; -9 < k < 0 && \\at(m + k,G) == 0",
-                    "tests/arith/at_on-purely-logic-variables.c",42);
+    __gen_e_acsl_assert_data_9.blocking = 1;
+    __gen_e_acsl_assert_data_9.kind = "Assertion";
+    __gen_e_acsl_assert_data_9.pred_txt = "\\exists integer k; -9 < k < 0 && \\at(m + k,G) == 0";
+    __gen_e_acsl_assert_data_9.file = "tests/arith/at_on-purely-logic-variables.c";
+    __gen_e_acsl_assert_data_9.fct = "main";
+    __gen_e_acsl_assert_data_9.line = 42;
+    __e_acsl_assert(__gen_e_acsl_exists_3,& __gen_e_acsl_assert_data_9);
   }
   /*@ assert \exists integer k; -9 < k < 0 && \at(m + k,G) == 0; */ ;
   {
     int __gen_e_acsl_exists_4;
     int __gen_e_acsl_u_3;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
+      {.values = (void *)0};
     __gen_e_acsl_exists_4 = 0;
     __gen_e_acsl_u_3 = 9;
     while (1) {
@@ -393,6 +469,8 @@ int main(void)
           }
           {
             int __gen_e_acsl_valid_read_6;
+            __e_acsl_assert_data_t __gen_e_acsl_assert_data_12 =
+              {.values = (void *)0};
             __gen_e_acsl_valid_read_6 = __e_acsl_valid_read((void *)(
                                                             __gen_e_acsl_at_6 + (int)(
                                                             (long)((int)(
@@ -402,9 +480,14 @@ int main(void)
                                                             sizeof(int),
                                                             (void *)__gen_e_acsl_at_6,
                                                             (void *)(& __gen_e_acsl_at_6));
-            __e_acsl_assert(__gen_e_acsl_valid_read_6,1,"RTE","main",
-                            "mem_access:\n  \\valid_read(__gen_e_acsl_at_6 +\n              (int)((int)((int)(__gen_e_acsl_u_3 - 9) * 32) +\n                    (int)(__gen_e_acsl_v_3 - -4)))",
-                            "tests/arith/at_on-purely-logic-variables.c",46);
+            __gen_e_acsl_assert_data_12.blocking = 1;
+            __gen_e_acsl_assert_data_12.kind = "RTE";
+            __gen_e_acsl_assert_data_12.pred_txt = "mem_access:\n  \\valid_read(__gen_e_acsl_at_6 +\n              (int)((int)((int)(__gen_e_acsl_u_3 - 9) * 32) +\n                    (int)(__gen_e_acsl_v_3 - -4)))";
+            __gen_e_acsl_assert_data_12.file = "tests/arith/at_on-purely-logic-variables.c";
+            __gen_e_acsl_assert_data_12.fct = "main";
+            __gen_e_acsl_assert_data_12.line = 46;
+            __e_acsl_assert(__gen_e_acsl_valid_read_6,
+                            & __gen_e_acsl_assert_data_12);
             /*@ assert
                 Eva: initialization:
                   \initialized(__gen_e_acsl_at_6 +
@@ -430,9 +513,13 @@ int main(void)
       __gen_e_acsl_u_3 ++;
     }
     e_acsl_end_loop7: ;
-    __e_acsl_assert(__gen_e_acsl_exists_4,1,"Assertion","main",
-                    "\\exists integer u;\n  9 <= u < 21 &&\n  (\\forall integer v; -5 < v <= (u < 15? u + 6: 3) ==> \\at((n + u) + v > 0,K))",
-                    "tests/arith/at_on-purely-logic-variables.c",44);
+    __gen_e_acsl_assert_data_11.blocking = 1;
+    __gen_e_acsl_assert_data_11.kind = "Assertion";
+    __gen_e_acsl_assert_data_11.pred_txt = "\\exists integer u;\n  9 <= u < 21 &&\n  (\\forall integer v; -5 < v <= (u < 15? u + 6: 3) ==> \\at((n + u) + v > 0,K))";
+    __gen_e_acsl_assert_data_11.file = "tests/arith/at_on-purely-logic-variables.c";
+    __gen_e_acsl_assert_data_11.fct = "main";
+    __gen_e_acsl_assert_data_11.line = 44;
+    __e_acsl_assert(__gen_e_acsl_exists_4,& __gen_e_acsl_assert_data_11);
   }
   /*@
   assert
@@ -450,6 +537,8 @@ int main(void)
   {
     int __gen_e_acsl_exists_5;
     int __gen_e_acsl_u_5;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_13 =
+      {.values = (void *)0};
     __gen_e_acsl_exists_5 = 0;
     __gen_e_acsl_u_5 = 10;
     while (1) {
@@ -474,6 +563,8 @@ int main(void)
               if (__gen_e_acsl_w <= 200) ; else break;
               {
                 int __gen_e_acsl_valid_read_7;
+                __e_acsl_assert_data_t __gen_e_acsl_assert_data_14 =
+                  {.values = (void *)0};
                 __gen_e_acsl_valid_read_7 = __e_acsl_valid_read((void *)(
                                                                 __gen_e_acsl_at_7 + (int)(
                                                                 (long)((int)(
@@ -486,10 +577,14 @@ int main(void)
                                                                 sizeof(int),
                                                                 (void *)__gen_e_acsl_at_7,
                                                                 (void *)(& __gen_e_acsl_at_7));
-                __e_acsl_assert(__gen_e_acsl_valid_read_7,1,"RTE","main",
-                                "mem_access:\n  \\valid_read(__gen_e_acsl_at_7 +\n              (int)((int)((int)(__gen_e_acsl_u_5 - 10) * 300) +\n                    (int)((int)((int)(__gen_e_acsl_v_5 - -9) * 100) +\n                          (int)(__gen_e_acsl_w - 101))))",
-                                "tests/arith/at_on-purely-logic-variables.c",
-                                59);
+                __gen_e_acsl_assert_data_14.blocking = 1;
+                __gen_e_acsl_assert_data_14.kind = "RTE";
+                __gen_e_acsl_assert_data_14.pred_txt = "mem_access:\n  \\valid_read(__gen_e_acsl_at_7 +\n              (int)((int)((int)(__gen_e_acsl_u_5 - 10) * 300) +\n                    (int)((int)((int)(__gen_e_acsl_v_5 - -9) * 100) +\n                          (int)(__gen_e_acsl_w - 101))))";
+                __gen_e_acsl_assert_data_14.file = "tests/arith/at_on-purely-logic-variables.c";
+                __gen_e_acsl_assert_data_14.fct = "main";
+                __gen_e_acsl_assert_data_14.line = 59;
+                __e_acsl_assert(__gen_e_acsl_valid_read_7,
+                                & __gen_e_acsl_assert_data_14);
                 if (! *(__gen_e_acsl_at_7 + ((__gen_e_acsl_u_5 - 10) * 300 + (
                                              (__gen_e_acsl_v_5 - -9) * 100 + (
                                              __gen_e_acsl_w - 101))))) 
@@ -520,9 +615,13 @@ int main(void)
       __gen_e_acsl_u_5 ++;
     }
     e_acsl_end_loop10: ;
-    __e_acsl_assert(__gen_e_acsl_exists_5,1,"Assertion","main",
-                    "\\exists integer u;\n  10 <= u < 20 &&\n  (\\exists integer v;\n     -10 < v <= -5 + (\\let u = -2; u) &&\n     (\\exists integer w;\n        100 < w <= 200 && \\at((((n - u) + (\\let u = 42; u)) + v) + w > 0,K)))",
-                    "tests/arith/at_on-purely-logic-variables.c",56);
+    __gen_e_acsl_assert_data_13.blocking = 1;
+    __gen_e_acsl_assert_data_13.kind = "Assertion";
+    __gen_e_acsl_assert_data_13.pred_txt = "\\exists integer u;\n  10 <= u < 20 &&\n  (\\exists integer v;\n     -10 < v <= -5 + (\\let u = -2; u) &&\n     (\\exists integer w;\n        100 < w <= 200 && \\at((((n - u) + (\\let u = 42; u)) + v) + w > 0,K)))";
+    __gen_e_acsl_assert_data_13.file = "tests/arith/at_on-purely-logic-variables.c";
+    __gen_e_acsl_assert_data_13.fct = "main";
+    __gen_e_acsl_assert_data_13.line = 56;
+    __e_acsl_assert(__gen_e_acsl_exists_5,& __gen_e_acsl_assert_data_13);
   }
   /*@
   assert
@@ -574,13 +673,19 @@ void __gen_e_acsl_f(int *t)
     __gen_e_acsl_m_3 = 4;
     {
       int __gen_e_acsl_valid_read_7;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
+        {.values = (void *)0};
       __gen_e_acsl_valid_read_7 = __e_acsl_valid_read((void *)(t + (int)(
                                                                __gen_e_acsl_m_3 - 4L)),
                                                       sizeof(int),(void *)t,
                                                       (void *)(& t));
-      __e_acsl_assert(__gen_e_acsl_valid_read_7,1,"RTE","f",
-                      "mem_access: \\valid_read(t + (int)(__gen_e_acsl_m_3 - 4))",
-                      "tests/arith/at_on-purely-logic-variables.c",8);
+      __gen_e_acsl_assert_data_9.blocking = 1;
+      __gen_e_acsl_assert_data_9.kind = "RTE";
+      __gen_e_acsl_assert_data_9.pred_txt = "mem_access: \\valid_read(t + (int)(__gen_e_acsl_m_3 - 4))";
+      __gen_e_acsl_assert_data_9.file = "tests/arith/at_on-purely-logic-variables.c";
+      __gen_e_acsl_assert_data_9.fct = "f";
+      __gen_e_acsl_assert_data_9.line = 8;
+      __e_acsl_assert(__gen_e_acsl_valid_read_7,& __gen_e_acsl_assert_data_9);
       *(__gen_e_acsl_at_4 + 0) = *(t + (__gen_e_acsl_m_3 - 4));
     }
   }
@@ -589,12 +694,18 @@ void __gen_e_acsl_f(int *t)
     __gen_e_acsl_m_2 = 4;
     {
       int __gen_e_acsl_valid_read_5;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
+        {.values = (void *)0};
       __gen_e_acsl_valid_read_5 = __e_acsl_valid_read((void *)(t + __gen_e_acsl_m_2),
                                                       sizeof(int),(void *)t,
                                                       (void *)(& t));
-      __e_acsl_assert(__gen_e_acsl_valid_read_5,1,"RTE","f",
-                      "mem_access: \\valid_read(t + __gen_e_acsl_m_2)",
-                      "tests/arith/at_on-purely-logic-variables.c",8);
+      __gen_e_acsl_assert_data_7.blocking = 1;
+      __gen_e_acsl_assert_data_7.kind = "RTE";
+      __gen_e_acsl_assert_data_7.pred_txt = "mem_access: \\valid_read(t + __gen_e_acsl_m_2)";
+      __gen_e_acsl_assert_data_7.file = "tests/arith/at_on-purely-logic-variables.c";
+      __gen_e_acsl_assert_data_7.fct = "f";
+      __gen_e_acsl_assert_data_7.line = 8;
+      __e_acsl_assert(__gen_e_acsl_valid_read_5,& __gen_e_acsl_assert_data_7);
       *(__gen_e_acsl_at_3 + 0) = *(t + __gen_e_acsl_m_2) == -4;
     }
   }
@@ -605,14 +716,21 @@ void __gen_e_acsl_f(int *t)
       if (__gen_e_acsl_n_3 <= 3) ; else break;
       {
         int __gen_e_acsl_valid_read_3;
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+          {.values = (void *)0};
         __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)(t + (int)(
                                                                  __gen_e_acsl_n_3 - 1L)),
                                                         sizeof(int),
                                                         (void *)t,
                                                         (void *)(& t));
-        __e_acsl_assert(__gen_e_acsl_valid_read_3,1,"RTE","f",
-                        "mem_access: \\valid_read(t + (int)(__gen_e_acsl_n_3 - 1))",
-                        "tests/arith/at_on-purely-logic-variables.c",7);
+        __gen_e_acsl_assert_data_4.blocking = 1;
+        __gen_e_acsl_assert_data_4.kind = "RTE";
+        __gen_e_acsl_assert_data_4.pred_txt = "mem_access: \\valid_read(t + (int)(__gen_e_acsl_n_3 - 1))";
+        __gen_e_acsl_assert_data_4.file = "tests/arith/at_on-purely-logic-variables.c";
+        __gen_e_acsl_assert_data_4.fct = "f";
+        __gen_e_acsl_assert_data_4.line = 7;
+        __e_acsl_assert(__gen_e_acsl_valid_read_3,
+                        & __gen_e_acsl_assert_data_4);
         *(__gen_e_acsl_at_2 + (__gen_e_acsl_n_3 - 2)) = *(t + (__gen_e_acsl_n_3 - 1)) > 5;
       }
       __gen_e_acsl_n_3 ++;
@@ -625,12 +743,18 @@ void __gen_e_acsl_f(int *t)
       if (__gen_e_acsl_n_2 <= 3) ; else break;
       {
         int __gen_e_acsl_valid_read;
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+          {.values = (void *)0};
         __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(t + __gen_e_acsl_n_2),
                                                       sizeof(int),(void *)t,
                                                       (void *)(& t));
-        __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","f",
-                        "mem_access: \\valid_read(t + __gen_e_acsl_n_2)",
-                        "tests/arith/at_on-purely-logic-variables.c",7);
+        __gen_e_acsl_assert_data_2.blocking = 1;
+        __gen_e_acsl_assert_data_2.kind = "RTE";
+        __gen_e_acsl_assert_data_2.pred_txt = "mem_access: \\valid_read(t + __gen_e_acsl_n_2)";
+        __gen_e_acsl_assert_data_2.file = "tests/arith/at_on-purely-logic-variables.c";
+        __gen_e_acsl_assert_data_2.fct = "f";
+        __gen_e_acsl_assert_data_2.line = 7;
+        __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_2);
         *(__gen_e_acsl_at + (__gen_e_acsl_n_2 - 2)) = *(t + __gen_e_acsl_n_2) == 12;
       }
       __gen_e_acsl_n_2 ++;
@@ -643,6 +767,7 @@ void __gen_e_acsl_f(int *t)
     int __gen_e_acsl_m;
     int __gen_e_acsl_valid_read_6;
     int __gen_e_acsl_and_2;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_forall = 1;
     __gen_e_acsl_n = 1 + 1;
     while (1) {
@@ -650,24 +775,38 @@ void __gen_e_acsl_f(int *t)
       {
         int __gen_e_acsl_valid_read_2;
         int __gen_e_acsl_and;
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+          {.values = (void *)0};
         __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(__gen_e_acsl_at + (int)(
                                                                  __gen_e_acsl_n - 2L)),
                                                         sizeof(int),
                                                         (void *)__gen_e_acsl_at,
                                                         (void *)(& __gen_e_acsl_at));
-        __e_acsl_assert(__gen_e_acsl_valid_read_2,1,"RTE","f",
-                        "mem_access: \\valid_read(__gen_e_acsl_at + (int)(__gen_e_acsl_n - 2))",
-                        "tests/arith/at_on-purely-logic-variables.c",7);
+        __gen_e_acsl_assert_data_3.blocking = 1;
+        __gen_e_acsl_assert_data_3.kind = "RTE";
+        __gen_e_acsl_assert_data_3.pred_txt = "mem_access: \\valid_read(__gen_e_acsl_at + (int)(__gen_e_acsl_n - 2))";
+        __gen_e_acsl_assert_data_3.file = "tests/arith/at_on-purely-logic-variables.c";
+        __gen_e_acsl_assert_data_3.fct = "f";
+        __gen_e_acsl_assert_data_3.line = 7;
+        __e_acsl_assert(__gen_e_acsl_valid_read_2,
+                        & __gen_e_acsl_assert_data_3);
         if (*(__gen_e_acsl_at + (__gen_e_acsl_n - 2))) {
           int __gen_e_acsl_valid_read_4;
+          __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+            {.values = (void *)0};
           __gen_e_acsl_valid_read_4 = __e_acsl_valid_read((void *)(__gen_e_acsl_at_2 + (int)(
                                                                    __gen_e_acsl_n - 2L)),
                                                           sizeof(int),
                                                           (void *)__gen_e_acsl_at_2,
                                                           (void *)(& __gen_e_acsl_at_2));
-          __e_acsl_assert(__gen_e_acsl_valid_read_4,1,"RTE","f",
-                          "mem_access: \\valid_read(__gen_e_acsl_at_2 + (int)(__gen_e_acsl_n - 2))",
-                          "tests/arith/at_on-purely-logic-variables.c",7);
+          __gen_e_acsl_assert_data_5.blocking = 1;
+          __gen_e_acsl_assert_data_5.kind = "RTE";
+          __gen_e_acsl_assert_data_5.pred_txt = "mem_access: \\valid_read(__gen_e_acsl_at_2 + (int)(__gen_e_acsl_n - 2))";
+          __gen_e_acsl_assert_data_5.file = "tests/arith/at_on-purely-logic-variables.c";
+          __gen_e_acsl_assert_data_5.fct = "f";
+          __gen_e_acsl_assert_data_5.line = 7;
+          __e_acsl_assert(__gen_e_acsl_valid_read_4,
+                          & __gen_e_acsl_assert_data_5);
           __gen_e_acsl_and = *(__gen_e_acsl_at_2 + (__gen_e_acsl_n - 2));
         }
         else __gen_e_acsl_and = 0;
@@ -680,32 +819,55 @@ void __gen_e_acsl_f(int *t)
       __gen_e_acsl_n ++;
     }
     e_acsl_end_loop11: ;
-    __e_acsl_assert(__gen_e_acsl_forall,1,"Postcondition","f",
-                    "\\forall integer n;\n  1 < n <= 3 ==> \\old(*(t + n) == 12) && \\old(*(t + (n - 1)) > 5)",
-                    "tests/arith/at_on-purely-logic-variables.c",6);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Postcondition";
+    __gen_e_acsl_assert_data.pred_txt = "\\forall integer n;\n  1 < n <= 3 ==> \\old(*(t + n) == 12) && \\old(*(t + (n - 1)) > 5)";
+    __gen_e_acsl_assert_data.file = "tests/arith/at_on-purely-logic-variables.c";
+    __gen_e_acsl_assert_data.fct = "f";
+    __gen_e_acsl_assert_data.line = 6;
+    __e_acsl_assert(__gen_e_acsl_forall,& __gen_e_acsl_assert_data);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+      {.values = (void *)0};
     __gen_e_acsl_m = 4;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+      {.values = (void *)0};
     __gen_e_acsl_valid_read_6 = __e_acsl_valid_read((void *)(__gen_e_acsl_at_3 + 0),
                                                     sizeof(int),
                                                     (void *)__gen_e_acsl_at_3,
                                                     (void *)(& __gen_e_acsl_at_3));
-    __e_acsl_assert(__gen_e_acsl_valid_read_6,1,"RTE","f",
-                    "mem_access: \\valid_read(__gen_e_acsl_at_3 + 0)",
-                    "tests/arith/at_on-purely-logic-variables.c",8);
+    __gen_e_acsl_assert_data_8.blocking = 1;
+    __gen_e_acsl_assert_data_8.kind = "RTE";
+    __gen_e_acsl_assert_data_8.pred_txt = "mem_access: \\valid_read(__gen_e_acsl_at_3 + 0)";
+    __gen_e_acsl_assert_data_8.file = "tests/arith/at_on-purely-logic-variables.c";
+    __gen_e_acsl_assert_data_8.fct = "f";
+    __gen_e_acsl_assert_data_8.line = 8;
+    __e_acsl_assert(__gen_e_acsl_valid_read_6,& __gen_e_acsl_assert_data_8);
     if (*(__gen_e_acsl_at_3 + 0)) {
       int __gen_e_acsl_valid_read_8;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
+        {.values = (void *)0};
       __gen_e_acsl_valid_read_8 = __e_acsl_valid_read((void *)(__gen_e_acsl_at_4 + 0),
                                                       sizeof(int),
                                                       (void *)__gen_e_acsl_at_4,
                                                       (void *)(& __gen_e_acsl_at_4));
-      __e_acsl_assert(__gen_e_acsl_valid_read_8,1,"RTE","f",
-                      "mem_access: \\valid_read(__gen_e_acsl_at_4 + 0)",
-                      "tests/arith/at_on-purely-logic-variables.c",8);
+      __gen_e_acsl_assert_data_10.blocking = 1;
+      __gen_e_acsl_assert_data_10.kind = "RTE";
+      __gen_e_acsl_assert_data_10.pred_txt = "mem_access: \\valid_read(__gen_e_acsl_at_4 + 0)";
+      __gen_e_acsl_assert_data_10.file = "tests/arith/at_on-purely-logic-variables.c";
+      __gen_e_acsl_assert_data_10.fct = "f";
+      __gen_e_acsl_assert_data_10.line = 8;
+      __e_acsl_assert(__gen_e_acsl_valid_read_8,
+                      & __gen_e_acsl_assert_data_10);
       __gen_e_acsl_and_2 = *(__gen_e_acsl_at_4 + 0) == 9;
     }
     else __gen_e_acsl_and_2 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_2,1,"Postcondition","f",
-                    "\\let m = 4; \\old(*(t + m) == -4) && \\old(*(t + (m - 4))) == 9",
-                    "tests/arith/at_on-purely-logic-variables.c",8);
+    __gen_e_acsl_assert_data_6.blocking = 1;
+    __gen_e_acsl_assert_data_6.kind = "Postcondition";
+    __gen_e_acsl_assert_data_6.pred_txt = "\\let m = 4; \\old(*(t + m) == -4) && \\old(*(t + (m - 4))) == 9";
+    __gen_e_acsl_assert_data_6.file = "tests/arith/at_on-purely-logic-variables.c";
+    __gen_e_acsl_assert_data_6.fct = "f";
+    __gen_e_acsl_assert_data_6.line = 8;
+    __e_acsl_assert(__gen_e_acsl_and_2,& __gen_e_acsl_assert_data_6);
     __e_acsl_delete_block((void *)(& t));
     free((void *)__gen_e_acsl_at);
     free((void *)__gen_e_acsl_at_2);

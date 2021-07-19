@@ -14,9 +14,17 @@ void f(void)
 
 void g(int *C, int *D)
 {
-  __e_acsl_store_block((void *)(& C),(size_t)8);
-  __e_acsl_assert(1,1,"Assertion","g","\\initialized(&C)",
-                  "tests/memory/ptr_init.c",16);
+  {
+    __e_acsl_store_block((void *)(& C),(size_t)8);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "\\initialized(&C)";
+    __gen_e_acsl_assert_data.file = "tests/memory/ptr_init.c";
+    __gen_e_acsl_assert_data.fct = "g";
+    __gen_e_acsl_assert_data.line = 16;
+    __e_acsl_assert(1,& __gen_e_acsl_assert_data);
+  }
   /*@ assert \initialized(&C); */ ;
   __e_acsl_delete_block((void *)(& C));
   return;
@@ -57,15 +65,30 @@ int main(void)
   __e_acsl_full_init((void *)(& x));
   x = y;
   f();
-  __e_acsl_assert(1,1,"Assertion","main","\\initialized(&A)",
-                  "tests/memory/ptr_init.c",25);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "\\initialized(&A)";
+    __gen_e_acsl_assert_data.file = "tests/memory/ptr_init.c";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 25;
+    __e_acsl_assert(1,& __gen_e_acsl_assert_data);
+  }
   /*@ assert \initialized(&A); */ ;
   {
     int __gen_e_acsl_initialized;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& x),
                                                     sizeof(int *));
-    __e_acsl_assert(__gen_e_acsl_initialized,1,"Assertion","main",
-                    "\\initialized(&x)","tests/memory/ptr_init.c",26);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Assertion";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\initialized(&x)";
+    __gen_e_acsl_assert_data_2.file = "tests/memory/ptr_init.c";
+    __gen_e_acsl_assert_data_2.fct = "main";
+    __gen_e_acsl_assert_data_2.line = 26;
+    __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_2);
   }
   /*@ assert \initialized(&x); */ ;
   g(x,y);

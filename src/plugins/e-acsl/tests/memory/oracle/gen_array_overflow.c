@@ -30,10 +30,16 @@ int main(void)
   int b[4] = {5, 6, 7, 8};
   {
     int __gen_e_acsl_valid;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_valid = __e_acsl_valid((void *)(& a[4]),sizeof(int),
                                         (void *)(a),(void *)0);
-    __e_acsl_assert(! __gen_e_acsl_valid,1,"Assertion","main",
-                    "!\\valid(&a[4])","tests/memory/array_overflow.c",31);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "!\\valid(&a[4])";
+    __gen_e_acsl_assert_data.file = "tests/memory/array_overflow.c";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 31;
+    __e_acsl_assert(! __gen_e_acsl_valid,& __gen_e_acsl_assert_data);
   }
   /*@ assert !\valid(&a[4]); */ ;
   int *ap = a;
@@ -42,13 +48,19 @@ int main(void)
   int *bp = b;
   {
     int __gen_e_acsl_valid_2;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
     __gen_e_acsl_valid_2 = __e_acsl_valid((void *)(& (*((int (*)[])ap))[4]),
                                           sizeof(int),
                                           (void *)(*((int (*)[])ap)),
                                           (void *)0);
-    __e_acsl_assert(! __gen_e_acsl_valid_2,1,"Assertion","main",
-                    "!\\valid(&(*((int (*)[])ap))[4])",
-                    "tests/memory/array_overflow.c",36);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Assertion";
+    __gen_e_acsl_assert_data_2.pred_txt = "!\\valid(&(*((int (*)[])ap))[4])";
+    __gen_e_acsl_assert_data_2.file = "tests/memory/array_overflow.c";
+    __gen_e_acsl_assert_data_2.fct = "main";
+    __gen_e_acsl_assert_data_2.line = 36;
+    __e_acsl_assert(! __gen_e_acsl_valid_2,& __gen_e_acsl_assert_data_2);
   }
   /*@ assert !\valid(&(*((int (*)[])ap))[4]); */ ;
   struct dat d = {.arr = {4, 5, 6, 7}};
@@ -62,21 +74,34 @@ int main(void)
   __e_acsl_full_init((void *)(& d2));
   {
     int __gen_e_acsl_valid_3;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
     __gen_e_acsl_valid_3 = __e_acsl_valid((void *)(& d.arr[4]),sizeof(int),
                                           (void *)(& d.arr[0]),(void *)0);
-    __e_acsl_assert(! __gen_e_acsl_valid_3,1,"Assertion","main",
-                    "!\\valid(&d.arr[4])","tests/memory/array_overflow.c",42);
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "Assertion";
+    __gen_e_acsl_assert_data_3.pred_txt = "!\\valid(&d.arr[4])";
+    __gen_e_acsl_assert_data_3.file = "tests/memory/array_overflow.c";
+    __gen_e_acsl_assert_data_3.fct = "main";
+    __gen_e_acsl_assert_data_3.line = 42;
+    __e_acsl_assert(! __gen_e_acsl_valid_3,& __gen_e_acsl_assert_data_3);
   }
   /*@ assert !\valid(&d.arr[4]); */ ;
   {
     int __gen_e_acsl_valid_4;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+      {.values = (void *)0};
     __gen_e_acsl_valid_4 = __e_acsl_valid((void *)(& (d2.p[1])->arr[2]),
                                           sizeof(int),
                                           (void *)(& (d2.p[1])->arr[0]),
                                           (void *)0);
-    __e_acsl_assert(__gen_e_acsl_valid_4,1,"Assertion","main",
-                    "\\valid(&(d2.p[1])->arr[2])",
-                    "tests/memory/array_overflow.c",43);
+    __gen_e_acsl_assert_data_4.blocking = 1;
+    __gen_e_acsl_assert_data_4.kind = "Assertion";
+    __gen_e_acsl_assert_data_4.pred_txt = "\\valid(&(d2.p[1])->arr[2])";
+    __gen_e_acsl_assert_data_4.file = "tests/memory/array_overflow.c";
+    __gen_e_acsl_assert_data_4.fct = "main";
+    __gen_e_acsl_assert_data_4.line = 43;
+    __e_acsl_assert(__gen_e_acsl_valid_4,& __gen_e_acsl_assert_data_4);
   }
   /*@ assert \valid(&(d2.p[1])->arr[2]); */ ;
   __retres = 0;

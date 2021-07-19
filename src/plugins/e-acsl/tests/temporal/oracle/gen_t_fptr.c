@@ -55,6 +55,8 @@ int main(int argc, char const **argv)
   {
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& q),
                                                     sizeof(int *));
     if (__gen_e_acsl_initialized) {
@@ -64,8 +66,13 @@ int main(int argc, char const **argv)
       __gen_e_acsl_and = __gen_e_acsl_valid;
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","main","\\valid(q)",
-                    "tests/temporal/t_fptr.c",19);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Assertion";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\valid(q)";
+    __gen_e_acsl_assert_data_2.file = "tests/temporal/t_fptr.c";
+    __gen_e_acsl_assert_data_2.fct = "main";
+    __gen_e_acsl_assert_data_2.line = 19;
+    __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data_2);
   }
   /*@ assert \valid(q); */ ;
   __retres = 0;

@@ -33,6 +33,7 @@ int main(int argc, char const **argv)
   {
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& p),
                                                     sizeof(int *));
     if (__gen_e_acsl_initialized) {
@@ -42,8 +43,13 @@ int main(int argc, char const **argv)
       __gen_e_acsl_and = __gen_e_acsl_valid;
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","main","\\valid(p)",
-                    "tests/memory/errno.c",11);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "\\valid(p)";
+    __gen_e_acsl_assert_data.file = "tests/memory/errno.c";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 11;
+    __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
   }
   /*@ assert \valid(p); */ ;
   __retres = 0;

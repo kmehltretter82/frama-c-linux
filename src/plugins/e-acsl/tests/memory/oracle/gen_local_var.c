@@ -18,6 +18,7 @@ struct list *add(struct list *l, int i)
   {
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& new),
                                                     sizeof(struct list *));
     if (__gen_e_acsl_initialized) {
@@ -27,8 +28,13 @@ struct list *add(struct list *l, int i)
       __gen_e_acsl_and = __gen_e_acsl_valid;
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","add","\\valid(new)",
-                    "tests/memory/local_var.c",15);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "\\valid(new)";
+    __gen_e_acsl_assert_data.file = "tests/memory/local_var.c";
+    __gen_e_acsl_assert_data.fct = "add";
+    __gen_e_acsl_assert_data.line = 15;
+    __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
   }
   /*@ assert \valid(new); */ ;
   __e_acsl_initialize((void *)(& new->element),sizeof(int));

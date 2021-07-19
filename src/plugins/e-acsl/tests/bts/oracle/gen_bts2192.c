@@ -23,13 +23,18 @@ int __gen_e_acsl_atoi(char const *nptr)
   {
     int __gen_e_acsl_valid_read;
     __e_acsl_store_block((void *)(& nptr),(size_t)8);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)nptr,
                                                   sizeof(char const),
                                                   (void *)nptr,
                                                   (void *)(& nptr));
-    __e_acsl_assert(__gen_e_acsl_valid_read,1,"Precondition","atoi",
-                    "valid_nptr: \\valid_read(nptr)",
-                    "FRAMAC_SHARE/libc/stdlib.h",78);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Precondition";
+    __gen_e_acsl_assert_data.pred_txt = "valid_nptr: \\valid_read(nptr)";
+    __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdlib.h";
+    __gen_e_acsl_assert_data.fct = "atoi";
+    __gen_e_acsl_assert_data.line = 78;
+    __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data);
   }
   __retres = atoi(nptr);
   __e_acsl_delete_block((void *)(& nptr));

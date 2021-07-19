@@ -14,19 +14,43 @@ int __gen_e_acsl_main(void)
   goto L1;
   L1:
   /*@ assert X == 0; */
-  __e_acsl_assert(X == 0,1,"Assertion","main","X == 0",
-                  "tests/constructs/labeled_stmt.i",10);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "X == 0";
+    __gen_e_acsl_assert_data.file = "tests/constructs/labeled_stmt.i";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 10;
+    __e_acsl_assert(X == 0,& __gen_e_acsl_assert_data);
+  }
   X = 1;
   goto L2;
   L2:
   /*@ requires X == 1;
       ensures X == 2; */
   {
-    __e_acsl_assert(X == 1,1,"Precondition","main","X == 1",
-                    "tests/constructs/labeled_stmt.i",13);
-    X = 2;
-    __e_acsl_assert(X == 2,1,"Postcondition","main","X == 2",
-                    "tests/constructs/labeled_stmt.i",13);
+    {
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+        {.values = (void *)0};
+      __gen_e_acsl_assert_data_2.blocking = 1;
+      __gen_e_acsl_assert_data_2.kind = "Precondition";
+      __gen_e_acsl_assert_data_2.pred_txt = "X == 1";
+      __gen_e_acsl_assert_data_2.file = "tests/constructs/labeled_stmt.i";
+      __gen_e_acsl_assert_data_2.fct = "main";
+      __gen_e_acsl_assert_data_2.line = 13;
+      __e_acsl_assert(X == 1,& __gen_e_acsl_assert_data_2);
+      X = 2;
+    }
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "Postcondition";
+    __gen_e_acsl_assert_data_3.pred_txt = "X == 2";
+    __gen_e_acsl_assert_data_3.file = "tests/constructs/labeled_stmt.i";
+    __gen_e_acsl_assert_data_3.fct = "main";
+    __gen_e_acsl_assert_data_3.line = 13;
+    __e_acsl_assert(X == 2,& __gen_e_acsl_assert_data_3);
   }
   if (X) {
     X = 3;
@@ -42,9 +66,17 @@ int main(void)
 {
   int __retres;
   __retres = __gen_e_acsl_main();
-  __e_acsl_assert(X == 3,1,"Postcondition","main","X == 3",
-                  "tests/constructs/labeled_stmt.i",7);
-  return __retres;
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Postcondition";
+    __gen_e_acsl_assert_data.pred_txt = "X == 3";
+    __gen_e_acsl_assert_data.file = "tests/constructs/labeled_stmt.i";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 7;
+    __e_acsl_assert(X == 3,& __gen_e_acsl_assert_data);
+    return __retres;
+  }
 }
 
 

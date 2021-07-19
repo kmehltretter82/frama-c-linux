@@ -19,6 +19,8 @@ int main(void)
     {
       int __gen_e_acsl_initialized;
       int __gen_e_acsl_and;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data =
+        {.values = (void *)0};
       __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& p),
                                                       sizeof(int *));
       if (__gen_e_acsl_initialized) {
@@ -28,8 +30,13 @@ int main(void)
         __gen_e_acsl_and = __gen_e_acsl_valid;
       }
       else __gen_e_acsl_and = 0;
-      __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","main","\\valid(p)",
-                      "tests/bts/bts1740.i",11);
+      __gen_e_acsl_assert_data.blocking = 1;
+      __gen_e_acsl_assert_data.kind = "Assertion";
+      __gen_e_acsl_assert_data.pred_txt = "\\valid(p)";
+      __gen_e_acsl_assert_data.file = "tests/bts/bts1740.i";
+      __gen_e_acsl_assert_data.fct = "main";
+      __gen_e_acsl_assert_data.line = 11;
+      __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
     }
     /*@ assert \valid(p); */ ;
     __e_acsl_delete_block((void *)(& a));
@@ -41,6 +48,8 @@ int main(void)
   {
     int __gen_e_acsl_initialized_2;
     int __gen_e_acsl_and_2;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
     __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& p),
                                                       sizeof(int *));
     if (__gen_e_acsl_initialized_2) {
@@ -51,8 +60,13 @@ int main(void)
       __gen_e_acsl_and_2 = __gen_e_acsl_valid_2;
     }
     else __gen_e_acsl_and_2 = 0;
-    __e_acsl_assert(! __gen_e_acsl_and_2,1,"Assertion","main","!\\valid(p)",
-                    "tests/bts/bts1740.i",16);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Assertion";
+    __gen_e_acsl_assert_data_2.pred_txt = "!\\valid(p)";
+    __gen_e_acsl_assert_data_2.file = "tests/bts/bts1740.i";
+    __gen_e_acsl_assert_data_2.fct = "main";
+    __gen_e_acsl_assert_data_2.line = 16;
+    __e_acsl_assert(! __gen_e_acsl_and_2,& __gen_e_acsl_assert_data_2);
   }
   __retres = 0;
   __e_acsl_delete_block((void *)(& p));

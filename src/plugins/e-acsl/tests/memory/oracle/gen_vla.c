@@ -13,6 +13,7 @@ int main(int argc, char **argv)
   __e_acsl_memory_init(& argc,& argv,(size_t)8);
   {
     int __gen_e_acsl_and;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     if (0L < 4L * LEN) {
       __e_acsl_mpz_t __gen_e_acsl_;
       __e_acsl_mpz_t __gen_e_acsl__2;
@@ -26,9 +27,13 @@ int main(int argc, char **argv)
       __gmpz_clear(__gen_e_acsl__2);
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","main",
-                    "alloca_bounds: 0 < sizeof(int) * LEN <= 18446744073709551615",
-                    "tests/memory/vla.c",9);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "alloca_bounds: 0 < sizeof(int) * LEN <= 18446744073709551615";
+    __gen_e_acsl_assert_data.file = "tests/memory/vla.c";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 9;
+    __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
   }
   /*@ assert alloca_bounds: 0 < sizeof(int) * LEN <= 18446744073709551615; */
   ;
@@ -42,20 +47,34 @@ int main(int argc, char **argv)
     if (i < LEN) {
       {
         int __gen_e_acsl_valid;
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+          {.values = (void *)0};
         __gen_e_acsl_valid = __e_acsl_valid((void *)(arr + i),sizeof(int),
                                             (void *)arr,(void *)(& arr));
-        __e_acsl_assert(__gen_e_acsl_valid,1,"Assertion","main",
-                        "\\valid(arr + i)","tests/memory/vla.c",13);
+        __gen_e_acsl_assert_data_2.blocking = 1;
+        __gen_e_acsl_assert_data_2.kind = "Assertion";
+        __gen_e_acsl_assert_data_2.pred_txt = "\\valid(arr + i)";
+        __gen_e_acsl_assert_data_2.file = "tests/memory/vla.c";
+        __gen_e_acsl_assert_data_2.fct = "main";
+        __gen_e_acsl_assert_data_2.line = 13;
+        __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data_2);
       }
       /*@ assert \valid(arr + i); */ ;
     }
     else {
       {
         int __gen_e_acsl_valid_2;
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+          {.values = (void *)0};
         __gen_e_acsl_valid_2 = __e_acsl_valid((void *)(arr + i),sizeof(int),
                                               (void *)arr,(void *)(& arr));
-        __e_acsl_assert(! __gen_e_acsl_valid_2,1,"Assertion","main",
-                        "!\\valid(arr + i)","tests/memory/vla.c",15);
+        __gen_e_acsl_assert_data_3.blocking = 1;
+        __gen_e_acsl_assert_data_3.kind = "Assertion";
+        __gen_e_acsl_assert_data_3.pred_txt = "!\\valid(arr + i)";
+        __gen_e_acsl_assert_data_3.file = "tests/memory/vla.c";
+        __gen_e_acsl_assert_data_3.fct = "main";
+        __gen_e_acsl_assert_data_3.line = 15;
+        __e_acsl_assert(! __gen_e_acsl_valid_2,& __gen_e_acsl_assert_data_3);
       }
       /*@ assert !\valid(arr + i); */ ;
     }

@@ -39,13 +39,19 @@ void __gen_e_acsl_f(struct X *item)
   __e_acsl_store_block((void *)(& item),(size_t)8);
   {
     int __gen_e_acsl_valid_read;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)item,
                                                   sizeof(struct X),
                                                   (void *)item,
                                                   (void *)(& item));
-    __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","f",
-                    "mem_access: \\valid_read(item)",
-                    "tests/bts/issue-eacsl-139.c",9);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "RTE";
+    __gen_e_acsl_assert_data_2.pred_txt = "mem_access: \\valid_read(item)";
+    __gen_e_acsl_assert_data_2.file = "tests/bts/issue-eacsl-139.c";
+    __gen_e_acsl_assert_data_2.fct = "f";
+    __gen_e_acsl_assert_data_2.line = 9;
+    __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_2);
     __gen_e_acsl_at_2 = *item;
   }
   __gen_e_acsl_at = item;

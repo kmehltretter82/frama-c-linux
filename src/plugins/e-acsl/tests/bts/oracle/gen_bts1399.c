@@ -22,20 +22,33 @@ int main(void)
   {
     int __gen_e_acsl_valid_read;
     int __gen_e_acsl_initialized;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(& state->bitsInQueue),
                                                   sizeof(unsigned int),
                                                   (void *)(& state->bitsInQueue),
                                                   (void *)0);
-    __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","main",
-                    "mem_access: \\valid_read(&state->bitsInQueue)",
-                    "tests/bts/bts1399.c",19);
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "RTE";
+    __gen_e_acsl_assert_data_3.pred_txt = "mem_access: \\valid_read(&state->bitsInQueue)";
+    __gen_e_acsl_assert_data_3.file = "tests/bts/bts1399.c";
+    __gen_e_acsl_assert_data_3.fct = "main";
+    __gen_e_acsl_assert_data_3.line = 19;
+    __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_3);
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& state->dataQueue[
                                                     state->bitsInQueue / 8U]),
                                                     sizeof(unsigned char __attribute__((
                                                     __aligned__(32)))));
-    __e_acsl_assert(! __gen_e_acsl_initialized,1,"Assertion","main",
-                    "!\\initialized(&state->dataQueue[state->bitsInQueue / 8])",
-                    "tests/bts/bts1399.c",19);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "!\\initialized(&state->dataQueue[state->bitsInQueue / 8])";
+    __gen_e_acsl_assert_data.file = "tests/bts/bts1399.c";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 19;
+    __e_acsl_assert(! __gen_e_acsl_initialized,& __gen_e_acsl_assert_data);
   }
   /*@ assert !\initialized(&state->dataQueue[state->bitsInQueue / 8]); */ ;
   free((void *)state);

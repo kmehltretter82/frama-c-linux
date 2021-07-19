@@ -9,42 +9,68 @@ int main(int argc, char const **argv)
   __e_acsl_memory_init(& argc,(char ***)(& argv),(size_t)8);
   {
     int __gen_e_acsl_valid;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_valid = __e_acsl_valid((void *)(& argc),sizeof(int),
                                         (void *)(& argc),(void *)0);
-    __e_acsl_assert(__gen_e_acsl_valid,1,"Assertion","main","\\valid(&argc)",
-                    "tests/temporal/t_args.c",8);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "\\valid(&argc)";
+    __gen_e_acsl_assert_data.file = "tests/temporal/t_args.c";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 8;
+    __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
   }
   /*@ assert \valid(&argc); */ ;
   {
     int __gen_e_acsl_valid_2;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
     __gen_e_acsl_valid_2 = __e_acsl_valid((void *)argv,sizeof(char const *),
                                           (void *)argv,(void *)(& argv));
-    __e_acsl_assert(__gen_e_acsl_valid_2,1,"Assertion","main",
-                    "\\valid(argv)","tests/temporal/t_args.c",9);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Assertion";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\valid(argv)";
+    __gen_e_acsl_assert_data_2.file = "tests/temporal/t_args.c";
+    __gen_e_acsl_assert_data_2.fct = "main";
+    __gen_e_acsl_assert_data_2.line = 9;
+    __e_acsl_assert(__gen_e_acsl_valid_2,& __gen_e_acsl_assert_data_2);
   }
   /*@ assert \valid(argv); */ ;
   {
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)argv,
                                                     sizeof(char const *));
     if (__gen_e_acsl_initialized) {
       int __gen_e_acsl_valid_read;
       int __gen_e_acsl_valid_3;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+        {.values = (void *)0};
       __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)argv,
                                                     sizeof(char const *),
                                                     (void *)argv,
                                                     (void *)(& argv));
-      __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","main",
-                      "mem_access: \\valid_read(argv)",
-                      "tests/temporal/t_args.c",10);
+      __gen_e_acsl_assert_data_4.blocking = 1;
+      __gen_e_acsl_assert_data_4.kind = "RTE";
+      __gen_e_acsl_assert_data_4.pred_txt = "mem_access: \\valid_read(argv)";
+      __gen_e_acsl_assert_data_4.file = "tests/temporal/t_args.c";
+      __gen_e_acsl_assert_data_4.fct = "main";
+      __gen_e_acsl_assert_data_4.line = 10;
+      __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_4);
       __gen_e_acsl_valid_3 = __e_acsl_valid((void *)*argv,sizeof(char const),
                                             (void *)*argv,(void *)argv);
       __gen_e_acsl_and = __gen_e_acsl_valid_3;
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","main","\\valid(*argv)",
-                    "tests/temporal/t_args.c",10);
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "Assertion";
+    __gen_e_acsl_assert_data_3.pred_txt = "\\valid(*argv)";
+    __gen_e_acsl_assert_data_3.file = "tests/temporal/t_args.c";
+    __gen_e_acsl_assert_data_3.fct = "main";
+    __gen_e_acsl_assert_data_3.line = 10;
+    __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data_3);
   }
   /*@ assert \valid(*argv); */ ;
   __retres = 0;

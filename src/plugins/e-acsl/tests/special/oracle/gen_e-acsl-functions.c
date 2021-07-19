@@ -17,17 +17,31 @@ int f(int *p)
     int i = 0;
     {
       int __gen_e_acsl_and;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data =
+        {.values = (void *)0};
       if (0 <= i) __gen_e_acsl_and = i <= 1; else __gen_e_acsl_and = 0;
-      __e_acsl_assert(__gen_e_acsl_and,1,"Invariant","f","0 <= i <= 1",
-                      "tests/special/e-acsl-functions.c",13);
+      __gen_e_acsl_assert_data.blocking = 1;
+      __gen_e_acsl_assert_data.kind = "Invariant";
+      __gen_e_acsl_assert_data.pred_txt = "0 <= i <= 1";
+      __gen_e_acsl_assert_data.file = "tests/special/e-acsl-functions.c";
+      __gen_e_acsl_assert_data.fct = "f";
+      __gen_e_acsl_assert_data.line = 13;
+      __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
     }
     /*@ loop invariant 0 <= i <= 1; */
     while (i < 1) {
       int __gen_e_acsl_and_2;
       i ++;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+        {.values = (void *)0};
       if (0 <= i) __gen_e_acsl_and_2 = i <= 1; else __gen_e_acsl_and_2 = 0;
-      __e_acsl_assert(__gen_e_acsl_and_2,1,"Invariant","f","0 <= i <= 1",
-                      "tests/special/e-acsl-functions.c",13);
+      __gen_e_acsl_assert_data_2.blocking = 1;
+      __gen_e_acsl_assert_data_2.kind = "Invariant";
+      __gen_e_acsl_assert_data_2.pred_txt = "0 <= i <= 1";
+      __gen_e_acsl_assert_data_2.file = "tests/special/e-acsl-functions.c";
+      __gen_e_acsl_assert_data_2.fct = "f";
+      __gen_e_acsl_assert_data_2.line = 13;
+      __e_acsl_assert(__gen_e_acsl_and_2,& __gen_e_acsl_assert_data_2);
     }
   }
   __retres = 0;
@@ -77,32 +91,65 @@ int __gen_e_acsl_f(int *p)
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_valid_read;
     __e_acsl_store_block((void *)(& p),(size_t)8);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)p,sizeof(int));
-    __e_acsl_assert(__gen_e_acsl_initialized,1,"Precondition","f",
-                    "\\initialized(p)","tests/special/e-acsl-functions.c",9);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Precondition";
+    __gen_e_acsl_assert_data.pred_txt = "\\initialized(p)";
+    __gen_e_acsl_assert_data.file = "tests/special/e-acsl-functions.c";
+    __gen_e_acsl_assert_data.fct = "f";
+    __gen_e_acsl_assert_data.line = 9;
+    __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)p,sizeof(int),
                                                   (void *)p,(void *)(& p));
-    __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","f",
-                    "mem_access: \\valid_read(p)",
-                    "tests/special/e-acsl-functions.c",10);
-    __e_acsl_assert(*p == 0,1,"Precondition","f","*p == 0",
-                    "tests/special/e-acsl-functions.c",10);
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "RTE";
+    __gen_e_acsl_assert_data_3.pred_txt = "mem_access: \\valid_read(p)";
+    __gen_e_acsl_assert_data_3.file = "tests/special/e-acsl-functions.c";
+    __gen_e_acsl_assert_data_3.fct = "f";
+    __gen_e_acsl_assert_data_3.line = 10;
+    __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_3);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Precondition";
+    __gen_e_acsl_assert_data_2.pred_txt = "*p == 0";
+    __gen_e_acsl_assert_data_2.file = "tests/special/e-acsl-functions.c";
+    __gen_e_acsl_assert_data_2.fct = "f";
+    __gen_e_acsl_assert_data_2.line = 10;
+    __e_acsl_assert(*p == 0,& __gen_e_acsl_assert_data_2);
   }
   {
     int __gen_e_acsl_valid_read_2;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+      {.values = (void *)0};
     __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)p,sizeof(int),
                                                     (void *)p,(void *)(& p));
-    __e_acsl_assert(__gen_e_acsl_valid_read_2,1,"RTE","f",
-                    "mem_access: \\valid_read(p)",
-                    "tests/special/e-acsl-functions.c",11);
+    __gen_e_acsl_assert_data_5.blocking = 1;
+    __gen_e_acsl_assert_data_5.kind = "RTE";
+    __gen_e_acsl_assert_data_5.pred_txt = "mem_access: \\valid_read(p)";
+    __gen_e_acsl_assert_data_5.file = "tests/special/e-acsl-functions.c";
+    __gen_e_acsl_assert_data_5.fct = "f";
+    __gen_e_acsl_assert_data_5.line = 11;
+    __e_acsl_assert(__gen_e_acsl_valid_read_2,& __gen_e_acsl_assert_data_5);
     __gen_e_acsl_at = *p;
   }
   __retres = f(p);
-  __e_acsl_assert(__retres == __gen_e_acsl_at,1,"Postcondition","f",
-                  "\\result == \\old(*p)","tests/special/e-acsl-functions.c",
-                  11);
-  __e_acsl_delete_block((void *)(& p));
-  return __retres;
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_4.blocking = 1;
+    __gen_e_acsl_assert_data_4.kind = "Postcondition";
+    __gen_e_acsl_assert_data_4.pred_txt = "\\result == \\old(*p)";
+    __gen_e_acsl_assert_data_4.file = "tests/special/e-acsl-functions.c";
+    __gen_e_acsl_assert_data_4.fct = "f";
+    __gen_e_acsl_assert_data_4.line = 11;
+    __e_acsl_assert(__retres == __gen_e_acsl_at,& __gen_e_acsl_assert_data_4);
+    __e_acsl_delete_block((void *)(& p));
+    return __retres;
+  }
 }
 
 

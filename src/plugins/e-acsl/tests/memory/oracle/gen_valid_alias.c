@@ -17,6 +17,7 @@ int main(void)
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
     int __gen_e_acsl_and_3;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& a),
                                                     sizeof(int *));
     if (__gen_e_acsl_initialized) {
@@ -41,9 +42,13 @@ int main(void)
       __gen_e_acsl_and_3 = ! __gen_e_acsl_and_2;
     }
     else __gen_e_acsl_and_3 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_3,1,"Assertion","main",
-                    "!\\valid(a) && !\\valid(b)",
-                    "tests/memory/valid_alias.c",9);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "!\\valid(a) && !\\valid(b)";
+    __gen_e_acsl_assert_data.file = "tests/memory/valid_alias.c";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 9;
+    __e_acsl_assert(__gen_e_acsl_and_3,& __gen_e_acsl_assert_data);
   }
   /*@ assert !\valid(a) && !\valid(b); */ ;
   __e_acsl_full_init((void *)(& a));
@@ -56,6 +61,8 @@ int main(void)
     int __gen_e_acsl_initialized_3;
     int __gen_e_acsl_and_4;
     int __gen_e_acsl_and_6;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
     __gen_e_acsl_initialized_3 = __e_acsl_initialized((void *)(& a),
                                                       sizeof(int *));
     if (__gen_e_acsl_initialized_3) {
@@ -80,14 +87,22 @@ int main(void)
       __gen_e_acsl_and_6 = __gen_e_acsl_and_5;
     }
     else __gen_e_acsl_and_6 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_6,1,"Assertion","main",
-                    "\\valid(a) && \\valid(b)","tests/memory/valid_alias.c",
-                    13);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Assertion";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\valid(a) && \\valid(b)";
+    __gen_e_acsl_assert_data_2.file = "tests/memory/valid_alias.c";
+    __gen_e_acsl_assert_data_2.fct = "main";
+    __gen_e_acsl_assert_data_2.line = 13;
+    __e_acsl_assert(__gen_e_acsl_and_6,& __gen_e_acsl_assert_data_2);
   }
   /*@ assert \valid(a) && \valid(b); */ ;
   {
     int __gen_e_acsl_initialized_5;
     int __gen_e_acsl_and_7;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+      {.values = (void *)0};
     __gen_e_acsl_initialized_5 = __e_acsl_initialized((void *)(& b),
                                                       sizeof(int *));
     if (__gen_e_acsl_initialized_5) {
@@ -97,11 +112,20 @@ int main(void)
       __gen_e_acsl_and_7 = __gen_e_acsl_valid_read;
     }
     else __gen_e_acsl_and_7 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_7,1,"RTE","main",
-                    "mem_access: \\valid_read(b)",
-                    "tests/memory/valid_alias.c",14);
-    __e_acsl_assert(*b == n,1,"Assertion","main","*b == n",
-                    "tests/memory/valid_alias.c",14);
+    __gen_e_acsl_assert_data_4.blocking = 1;
+    __gen_e_acsl_assert_data_4.kind = "RTE";
+    __gen_e_acsl_assert_data_4.pred_txt = "mem_access: \\valid_read(b)";
+    __gen_e_acsl_assert_data_4.file = "tests/memory/valid_alias.c";
+    __gen_e_acsl_assert_data_4.fct = "main";
+    __gen_e_acsl_assert_data_4.line = 14;
+    __e_acsl_assert(__gen_e_acsl_and_7,& __gen_e_acsl_assert_data_4);
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "Assertion";
+    __gen_e_acsl_assert_data_3.pred_txt = "*b == n";
+    __gen_e_acsl_assert_data_3.file = "tests/memory/valid_alias.c";
+    __gen_e_acsl_assert_data_3.fct = "main";
+    __gen_e_acsl_assert_data_3.line = 14;
+    __e_acsl_assert(*b == n,& __gen_e_acsl_assert_data_3);
   }
   /*@ assert *b == n; */ ;
   free((void *)b);
@@ -109,6 +133,8 @@ int main(void)
     int __gen_e_acsl_initialized_6;
     int __gen_e_acsl_and_8;
     int __gen_e_acsl_and_10;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+      {.values = (void *)0};
     __gen_e_acsl_initialized_6 = __e_acsl_initialized((void *)(& a),
                                                       sizeof(int *));
     if (__gen_e_acsl_initialized_6) {
@@ -134,9 +160,13 @@ int main(void)
       __gen_e_acsl_and_10 = ! __gen_e_acsl_and_9;
     }
     else __gen_e_acsl_and_10 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_10,1,"Assertion","main",
-                    "!\\valid(a) && !\\valid(b)",
-                    "tests/memory/valid_alias.c",16);
+    __gen_e_acsl_assert_data_5.blocking = 1;
+    __gen_e_acsl_assert_data_5.kind = "Assertion";
+    __gen_e_acsl_assert_data_5.pred_txt = "!\\valid(a) && !\\valid(b)";
+    __gen_e_acsl_assert_data_5.file = "tests/memory/valid_alias.c";
+    __gen_e_acsl_assert_data_5.fct = "main";
+    __gen_e_acsl_assert_data_5.line = 16;
+    __e_acsl_assert(__gen_e_acsl_and_10,& __gen_e_acsl_assert_data_5);
   }
   /*@ assert !\valid(a) && !\valid(b); */ ;
   __retres = 0;

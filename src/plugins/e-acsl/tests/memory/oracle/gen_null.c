@@ -7,8 +7,16 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 int main(void)
 {
   int __retres;
-  __e_acsl_assert((void *)0 == (void *)0,1,"Assertion","main",
-                  "\\null == (void *)0","tests/memory/null.i",6);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "\\null == (void *)0";
+    __gen_e_acsl_assert_data.file = "tests/memory/null.i";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 6;
+    __e_acsl_assert((void *)0 == (void *)0,& __gen_e_acsl_assert_data);
+  }
   /*@ assert \null == (void *)0; */ ;
   __retres = 0;
   return __retres;

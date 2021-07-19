@@ -54,10 +54,17 @@ int main(int argc, char const **argv)
     a = 1;
     {
       int __gen_e_acsl_valid;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data =
+        {.values = (void *)0};
       __gen_e_acsl_valid = __e_acsl_valid((void *)(& a),sizeof(int),
                                           (void *)(& a),(void *)0);
-      __e_acsl_assert(__gen_e_acsl_valid,1,"Assertion","main","\\valid(&a)",
-                      "tests/memory/local_goto.c",23);
+      __gen_e_acsl_assert_data.blocking = 1;
+      __gen_e_acsl_assert_data.kind = "Assertion";
+      __gen_e_acsl_assert_data.pred_txt = "\\valid(&a)";
+      __gen_e_acsl_assert_data.file = "tests/memory/local_goto.c";
+      __gen_e_acsl_assert_data.fct = "main";
+      __gen_e_acsl_assert_data.line = 23;
+      __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
     }
     /*@ assert \valid(&a); */ ;
     if (t == 2) {
@@ -72,10 +79,17 @@ int main(int argc, char const **argv)
     __e_acsl_full_init((void *)(& b));
     {
       int __gen_e_acsl_valid_2;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+        {.values = (void *)0};
       __gen_e_acsl_valid_2 = __e_acsl_valid((void *)(& b),sizeof(int),
                                             (void *)(& b),(void *)0);
-      __e_acsl_assert(__gen_e_acsl_valid_2,1,"Assertion","main",
-                      "\\valid(&b)","tests/memory/local_goto.c",34);
+      __gen_e_acsl_assert_data_2.blocking = 1;
+      __gen_e_acsl_assert_data_2.kind = "Assertion";
+      __gen_e_acsl_assert_data_2.pred_txt = "\\valid(&b)";
+      __gen_e_acsl_assert_data_2.file = "tests/memory/local_goto.c";
+      __gen_e_acsl_assert_data_2.fct = "main";
+      __gen_e_acsl_assert_data_2.line = 34;
+      __e_acsl_assert(__gen_e_acsl_valid_2,& __gen_e_acsl_assert_data_2);
     }
     /*@ assert \valid(&b); */ ;
     printf(__gen_e_acsl_literal_string_2,t,

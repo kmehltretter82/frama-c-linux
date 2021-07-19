@@ -12,10 +12,28 @@ int f(int x)
     __gen_e_acsl_old_variant = x;
     if (! (x >= 0)) break;
     x -= 2;
-    __e_acsl_assert(__gen_e_acsl_old_variant >= 0,1,"Variant","f",
-                    "(old x) >= 0","tests/constructs/decrease.c",10);
-    __e_acsl_assert(__gen_e_acsl_old_variant > x,1,"Variant","f",
-                    "(old x) > x","tests/constructs/decrease.c",10);
+    {
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data =
+        {.values = (void *)0};
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+        {.values = (void *)0};
+      __gen_e_acsl_assert_data.blocking = 1;
+      __gen_e_acsl_assert_data.kind = "Variant";
+      __gen_e_acsl_assert_data.pred_txt = "(old x) >= 0";
+      __gen_e_acsl_assert_data.file = "tests/constructs/decrease.c";
+      __gen_e_acsl_assert_data.fct = "f";
+      __gen_e_acsl_assert_data.line = 10;
+      __e_acsl_assert(__gen_e_acsl_old_variant >= 0,
+                      & __gen_e_acsl_assert_data);
+      __gen_e_acsl_assert_data_2.blocking = 1;
+      __gen_e_acsl_assert_data_2.kind = "Variant";
+      __gen_e_acsl_assert_data_2.pred_txt = "(old x) > x";
+      __gen_e_acsl_assert_data_2.file = "tests/constructs/decrease.c";
+      __gen_e_acsl_assert_data_2.fct = "f";
+      __gen_e_acsl_assert_data_2.line = 10;
+      __e_acsl_assert(__gen_e_acsl_old_variant > x,
+                      & __gen_e_acsl_assert_data_2);
+    }
   }
   return x;
 }
@@ -36,8 +54,15 @@ int g(int x)
     {
       int __gen_e_acsl_lexico_2;
       __gen_e_acsl_lexico_2 = __gen_e_acsl_lexico(__gen_e_acsl_old_variant,x);
-      __e_acsl_assert(__gen_e_acsl_lexico_2,1,"Variant","g",
-                      "lexico(old x, x)","tests/constructs/decrease.c",21);
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data =
+        {.values = (void *)0};
+      __gen_e_acsl_assert_data.blocking = 1;
+      __gen_e_acsl_assert_data.kind = "Variant";
+      __gen_e_acsl_assert_data.pred_txt = "lexico(old x, x)";
+      __gen_e_acsl_assert_data.file = "tests/constructs/decrease.c";
+      __gen_e_acsl_assert_data.fct = "g";
+      __gen_e_acsl_assert_data.line = 21;
+      __e_acsl_assert(__gen_e_acsl_lexico_2,& __gen_e_acsl_assert_data);
     }
   }
   return x;
@@ -50,21 +75,56 @@ int fact(int n)
 {
   int __gen_e_acsl_old_variant;
   int result = n;
-  __e_acsl_assert(n >= 1,1,"Invariant","fact","n >= 1",
-                  "tests/constructs/decrease.c",31);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Invariant";
+    __gen_e_acsl_assert_data.pred_txt = "n >= 1";
+    __gen_e_acsl_assert_data.file = "tests/constructs/decrease.c";
+    __gen_e_acsl_assert_data.fct = "fact";
+    __gen_e_acsl_assert_data.line = 31;
+    __e_acsl_assert(n >= 1,& __gen_e_acsl_assert_data);
+  }
   /*@ loop invariant n >= 1;
       loop variant n; */
   while (1) {
     __gen_e_acsl_old_variant = n;
     if (! (n > 1)) break;
-    result *= n - 1;
-    n --;
-    __e_acsl_assert(n >= 1,1,"Invariant","fact","n >= 1",
-                    "tests/constructs/decrease.c",31);
-    __e_acsl_assert(__gen_e_acsl_old_variant >= 0,1,"Variant","fact",
-                    "(old n) >= 0","tests/constructs/decrease.c",33);
-    __e_acsl_assert(__gen_e_acsl_old_variant > n,1,"Variant","fact",
-                    "(old n) > n","tests/constructs/decrease.c",33);
+    {
+      result *= n - 1;
+      n --;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+        {.values = (void *)0};
+      __gen_e_acsl_assert_data_2.blocking = 1;
+      __gen_e_acsl_assert_data_2.kind = "Invariant";
+      __gen_e_acsl_assert_data_2.pred_txt = "n >= 1";
+      __gen_e_acsl_assert_data_2.file = "tests/constructs/decrease.c";
+      __gen_e_acsl_assert_data_2.fct = "fact";
+      __gen_e_acsl_assert_data_2.line = 31;
+      __e_acsl_assert(n >= 1,& __gen_e_acsl_assert_data_2);
+    }
+    {
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+        {.values = (void *)0};
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+        {.values = (void *)0};
+      __gen_e_acsl_assert_data_3.blocking = 1;
+      __gen_e_acsl_assert_data_3.kind = "Variant";
+      __gen_e_acsl_assert_data_3.pred_txt = "(old n) >= 0";
+      __gen_e_acsl_assert_data_3.file = "tests/constructs/decrease.c";
+      __gen_e_acsl_assert_data_3.fct = "fact";
+      __gen_e_acsl_assert_data_3.line = 33;
+      __e_acsl_assert(__gen_e_acsl_old_variant >= 0,
+                      & __gen_e_acsl_assert_data_3);
+      __gen_e_acsl_assert_data_4.blocking = 1;
+      __gen_e_acsl_assert_data_4.kind = "Variant";
+      __gen_e_acsl_assert_data_4.pred_txt = "(old n) > n";
+      __gen_e_acsl_assert_data_4.file = "tests/constructs/decrease.c";
+      __gen_e_acsl_assert_data_4.fct = "fact";
+      __gen_e_acsl_assert_data_4.line = 33;
+      __e_acsl_assert(__gen_e_acsl_old_variant > n,
+                      & __gen_e_acsl_assert_data_4);
+    }
   }
   return result;
 }
@@ -79,9 +139,16 @@ size_t fact2(size_t n)
     size_t i = 1UL;
     {
       int __gen_e_acsl_and;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data =
+        {.values = (void *)0};
       if (1UL <= i) __gen_e_acsl_and = i < n; else __gen_e_acsl_and = 0;
-      __e_acsl_assert(__gen_e_acsl_and,1,"Invariant","fact2","1 <= i < n",
-                      "tests/constructs/decrease.c",44);
+      __gen_e_acsl_assert_data.blocking = 1;
+      __gen_e_acsl_assert_data.kind = "Invariant";
+      __gen_e_acsl_assert_data.pred_txt = "1 <= i < n";
+      __gen_e_acsl_assert_data.file = "tests/constructs/decrease.c";
+      __gen_e_acsl_assert_data.fct = "fact2";
+      __gen_e_acsl_assert_data.line = 44;
+      __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
     }
     /*@ loop invariant 1 <= i < n;
         loop variant n - i; */
@@ -90,10 +157,17 @@ size_t fact2(size_t n)
       {
         int __gen_e_acsl_and_2;
         i += (size_t)1;
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+          {.values = (void *)0};
         if (1UL <= i) __gen_e_acsl_and_2 = i < n;
         else __gen_e_acsl_and_2 = 0;
-        __e_acsl_assert(__gen_e_acsl_and_2,1,"Invariant","fact2",
-                        "1 <= i < n","tests/constructs/decrease.c",44);
+        __gen_e_acsl_assert_data_2.blocking = 1;
+        __gen_e_acsl_assert_data_2.kind = "Invariant";
+        __gen_e_acsl_assert_data_2.pred_txt = "1 <= i < n";
+        __gen_e_acsl_assert_data_2.file = "tests/constructs/decrease.c";
+        __gen_e_acsl_assert_data_2.fct = "fact2";
+        __gen_e_acsl_assert_data_2.line = 44;
+        __e_acsl_assert(__gen_e_acsl_and_2,& __gen_e_acsl_assert_data_2);
       }
     }
   }
@@ -162,49 +236,147 @@ int main(void)
 {
   int __retres;
   int f10 = f(10);
-  __e_acsl_assert(f10 == -2,1,"Assertion","main","f10 == -2",
-                  "tests/constructs/decrease.c",81);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "f10 == -2";
+    __gen_e_acsl_assert_data.file = "tests/constructs/decrease.c";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 81;
+    __e_acsl_assert(f10 == -2,& __gen_e_acsl_assert_data);
+  }
   /*@ assert f10 == -2; */ ;
   int f7 = f(7);
-  __e_acsl_assert(f7 == -1,1,"Assertion","main","f7 == -1",
-                  "tests/constructs/decrease.c",83);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Assertion";
+    __gen_e_acsl_assert_data_2.pred_txt = "f7 == -1";
+    __gen_e_acsl_assert_data_2.file = "tests/constructs/decrease.c";
+    __gen_e_acsl_assert_data_2.fct = "main";
+    __gen_e_acsl_assert_data_2.line = 83;
+    __e_acsl_assert(f7 == -1,& __gen_e_acsl_assert_data_2);
+  }
   /*@ assert f7 == -1; */ ;
   int g10 = g(10);
-  __e_acsl_assert(g10 == -2,1,"Assertion","main","g10 == -2",
-                  "tests/constructs/decrease.c",85);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "Assertion";
+    __gen_e_acsl_assert_data_3.pred_txt = "g10 == -2";
+    __gen_e_acsl_assert_data_3.file = "tests/constructs/decrease.c";
+    __gen_e_acsl_assert_data_3.fct = "main";
+    __gen_e_acsl_assert_data_3.line = 85;
+    __e_acsl_assert(g10 == -2,& __gen_e_acsl_assert_data_3);
+  }
   /*@ assert g10 == -2; */ ;
   int g7 = g(7);
-  __e_acsl_assert(g7 == -1,1,"Assertion","main","g7 == -1",
-                  "tests/constructs/decrease.c",87);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_4.blocking = 1;
+    __gen_e_acsl_assert_data_4.kind = "Assertion";
+    __gen_e_acsl_assert_data_4.pred_txt = "g7 == -1";
+    __gen_e_acsl_assert_data_4.file = "tests/constructs/decrease.c";
+    __gen_e_acsl_assert_data_4.fct = "main";
+    __gen_e_acsl_assert_data_4.line = 87;
+    __e_acsl_assert(g7 == -1,& __gen_e_acsl_assert_data_4);
+  }
   /*@ assert g7 == -1; */ ;
   int fact7 = __gen_e_acsl_fact(7);
-  __e_acsl_assert(fact7 == 5040,1,"Assertion","main","fact7 == 5040",
-                  "tests/constructs/decrease.c",90);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_5.blocking = 1;
+    __gen_e_acsl_assert_data_5.kind = "Assertion";
+    __gen_e_acsl_assert_data_5.pred_txt = "fact7 == 5040";
+    __gen_e_acsl_assert_data_5.file = "tests/constructs/decrease.c";
+    __gen_e_acsl_assert_data_5.fct = "main";
+    __gen_e_acsl_assert_data_5.line = 90;
+    __e_acsl_assert(fact7 == 5040,& __gen_e_acsl_assert_data_5);
+  }
   /*@ assert fact7 == 5040; */ ;
   size_t fact18 = __gen_e_acsl_fact2((unsigned long)18);
-  __e_acsl_assert(fact18 == 6402373705728000UL,1,"Assertion","main",
-                  "fact18 == 6402373705728000UL",
-                  "tests/constructs/decrease.c",93);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_6.blocking = 1;
+    __gen_e_acsl_assert_data_6.kind = "Assertion";
+    __gen_e_acsl_assert_data_6.pred_txt = "fact18 == 6402373705728000UL";
+    __gen_e_acsl_assert_data_6.file = "tests/constructs/decrease.c";
+    __gen_e_acsl_assert_data_6.fct = "main";
+    __gen_e_acsl_assert_data_6.line = 93;
+    __e_acsl_assert(fact18 == 6402373705728000UL,
+                    & __gen_e_acsl_assert_data_6);
+  }
   /*@ assert fact18 == 6402373705728000UL; */ ;
   int fib7 = __gen_e_acsl_fib(7);
-  __e_acsl_assert(fib7 == 13,1,"Assertion","main","fib7 == 13",
-                  "tests/constructs/decrease.c",96);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_7.blocking = 1;
+    __gen_e_acsl_assert_data_7.kind = "Assertion";
+    __gen_e_acsl_assert_data_7.pred_txt = "fib7 == 13";
+    __gen_e_acsl_assert_data_7.file = "tests/constructs/decrease.c";
+    __gen_e_acsl_assert_data_7.fct = "main";
+    __gen_e_acsl_assert_data_7.line = 96;
+    __e_acsl_assert(fib7 == 13,& __gen_e_acsl_assert_data_7);
+  }
   /*@ assert fib7 == 13; */ ;
   int even7 = __gen_e_acsl_even(7);
-  __e_acsl_assert(even7 == 0,1,"Assertion","main","even7 == 0",
-                  "tests/constructs/decrease.c",99);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_8.blocking = 1;
+    __gen_e_acsl_assert_data_8.kind = "Assertion";
+    __gen_e_acsl_assert_data_8.pred_txt = "even7 == 0";
+    __gen_e_acsl_assert_data_8.file = "tests/constructs/decrease.c";
+    __gen_e_acsl_assert_data_8.fct = "main";
+    __gen_e_acsl_assert_data_8.line = 99;
+    __e_acsl_assert(even7 == 0,& __gen_e_acsl_assert_data_8);
+  }
   /*@ assert even7 == 0; */ ;
   int even10 = __gen_e_acsl_even(10);
-  __e_acsl_assert(even10 == 1,1,"Assertion","main","even10 == 1",
-                  "tests/constructs/decrease.c",101);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_9.blocking = 1;
+    __gen_e_acsl_assert_data_9.kind = "Assertion";
+    __gen_e_acsl_assert_data_9.pred_txt = "even10 == 1";
+    __gen_e_acsl_assert_data_9.file = "tests/constructs/decrease.c";
+    __gen_e_acsl_assert_data_9.fct = "main";
+    __gen_e_acsl_assert_data_9.line = 101;
+    __e_acsl_assert(even10 == 1,& __gen_e_acsl_assert_data_9);
+  }
   /*@ assert even10 == 1; */ ;
   int odd7 = __gen_e_acsl_odd(7);
-  __e_acsl_assert(odd7 == 1,1,"Assertion","main","odd7 == 1",
-                  "tests/constructs/decrease.c",103);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_10.blocking = 1;
+    __gen_e_acsl_assert_data_10.kind = "Assertion";
+    __gen_e_acsl_assert_data_10.pred_txt = "odd7 == 1";
+    __gen_e_acsl_assert_data_10.file = "tests/constructs/decrease.c";
+    __gen_e_acsl_assert_data_10.fct = "main";
+    __gen_e_acsl_assert_data_10.line = 103;
+    __e_acsl_assert(odd7 == 1,& __gen_e_acsl_assert_data_10);
+  }
   /*@ assert odd7 == 1; */ ;
   int odd10 = __gen_e_acsl_odd(10);
-  __e_acsl_assert(odd10 == 0,1,"Assertion","main","odd10 == 0",
-                  "tests/constructs/decrease.c",105);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_11.blocking = 1;
+    __gen_e_acsl_assert_data_11.kind = "Assertion";
+    __gen_e_acsl_assert_data_11.pred_txt = "odd10 == 0";
+    __gen_e_acsl_assert_data_11.file = "tests/constructs/decrease.c";
+    __gen_e_acsl_assert_data_11.fct = "main";
+    __gen_e_acsl_assert_data_11.line = 105;
+    __e_acsl_assert(odd10 == 0,& __gen_e_acsl_assert_data_11);
+  }
   /*@ assert odd10 == 0; */ ;
   __retres = 0;
   return __retres;
@@ -215,8 +387,16 @@ int main(void)
 int __gen_e_acsl_even(int n)
 {
   int __retres;
-  __e_acsl_assert(n >= 0,1,"Precondition","even","n >= 0",
-                  "tests/constructs/decrease.c",64);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Precondition";
+    __gen_e_acsl_assert_data.pred_txt = "n >= 0";
+    __gen_e_acsl_assert_data.file = "tests/constructs/decrease.c";
+    __gen_e_acsl_assert_data.fct = "even";
+    __gen_e_acsl_assert_data.line = 64;
+    __e_acsl_assert(n >= 0,& __gen_e_acsl_assert_data);
+  }
   __retres = even(n);
   return __retres;
 }
@@ -226,8 +406,16 @@ int __gen_e_acsl_even(int n)
 int __gen_e_acsl_odd(int n)
 {
   int __retres;
-  __e_acsl_assert(n >= 0,1,"Precondition","odd","n >= 0",
-                  "tests/constructs/decrease.c",71);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Precondition";
+    __gen_e_acsl_assert_data.pred_txt = "n >= 0";
+    __gen_e_acsl_assert_data.file = "tests/constructs/decrease.c";
+    __gen_e_acsl_assert_data.fct = "odd";
+    __gen_e_acsl_assert_data.line = 71;
+    __e_acsl_assert(n >= 0,& __gen_e_acsl_assert_data);
+  }
   __retres = odd(n);
   return __retres;
 }
@@ -244,8 +432,16 @@ int __gen_e_acsl_fib(int n)
 size_t __gen_e_acsl_fact2(size_t n)
 {
   size_t __retres;
-  __e_acsl_assert(n <= 20UL,1,"Precondition","fact2","n <= 20",
-                  "tests/constructs/decrease.c",41);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Precondition";
+    __gen_e_acsl_assert_data.pred_txt = "n <= 20";
+    __gen_e_acsl_assert_data.file = "tests/constructs/decrease.c";
+    __gen_e_acsl_assert_data.fct = "fact2";
+    __gen_e_acsl_assert_data.line = 41;
+    __e_acsl_assert(n <= 20UL,& __gen_e_acsl_assert_data);
+  }
   __retres = fact2(n);
   return __retres;
 }
@@ -254,8 +450,16 @@ size_t __gen_e_acsl_fact2(size_t n)
 int __gen_e_acsl_fact(int n)
 {
   int __retres;
-  __e_acsl_assert(n <= 12,1,"Precondition","fact","n <= 12",
-                  "tests/constructs/decrease.c",28);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Precondition";
+    __gen_e_acsl_assert_data.pred_txt = "n <= 12";
+    __gen_e_acsl_assert_data.file = "tests/constructs/decrease.c";
+    __gen_e_acsl_assert_data.fct = "fact";
+    __gen_e_acsl_assert_data.line = 28;
+    __e_acsl_assert(n <= 12,& __gen_e_acsl_assert_data);
+  }
   __retres = fact(n);
   return __retres;
 }

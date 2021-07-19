@@ -18,17 +18,37 @@ void g(int a, int *b)
   {
     int __gen_e_acsl_valid_read;
     __e_acsl_store_block((void *)(& b),(size_t)8);
-    __e_acsl_assert((long)*(b + 1) != 0L,1,"RTE","g",
-                    "division_by_zero: (long)*(b + 1) != 0",
-                    "tests/constructs/acsl_check.c",15);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "RTE";
+    __gen_e_acsl_assert_data_3.pred_txt = "division_by_zero: (long)*(b + 1) != 0";
+    __gen_e_acsl_assert_data_3.file = "tests/constructs/acsl_check.c";
+    __gen_e_acsl_assert_data_3.fct = "g";
+    __gen_e_acsl_assert_data_3.line = 15;
+    __e_acsl_assert((long)*(b + 1) != 0L,& __gen_e_acsl_assert_data_3);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+      {.values = (void *)0};
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(b + 1),
                                                   sizeof(int),(void *)b,
                                                   (void *)(& b));
-    __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","g",
-                    "mem_access: \\valid_read(b + 1)",
-                    "tests/constructs/acsl_check.c",15);
-    __e_acsl_assert(a / (long)*(b + 1) == 0L,0,"Assertion","g",
-                    "a / *(b + 1) == 0","tests/constructs/acsl_check.c",15);
+    __gen_e_acsl_assert_data_4.blocking = 1;
+    __gen_e_acsl_assert_data_4.kind = "RTE";
+    __gen_e_acsl_assert_data_4.pred_txt = "mem_access: \\valid_read(b + 1)";
+    __gen_e_acsl_assert_data_4.file = "tests/constructs/acsl_check.c";
+    __gen_e_acsl_assert_data_4.fct = "g";
+    __gen_e_acsl_assert_data_4.line = 15;
+    __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_4);
+    __gen_e_acsl_assert_data.blocking = 0;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "a / *(b + 1) == 0";
+    __gen_e_acsl_assert_data.file = "tests/constructs/acsl_check.c";
+    __gen_e_acsl_assert_data.fct = "g";
+    __gen_e_acsl_assert_data.line = 15;
+    __e_acsl_assert(a / (long)*(b + 1) == 0L,& __gen_e_acsl_assert_data);
   }
   /*@ check a / *(b + 1) == 0; */ ;
   __e_acsl_delete_block((void *)(& b));
@@ -40,12 +60,29 @@ void g(int a, int *b)
 int __gen_e_acsl_f(int a)
 {
   int __retres;
-  __e_acsl_assert(a != 0,0,"Precondition","f","a != 0",
-                  "tests/constructs/acsl_check.c",7);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_assert_data.blocking = 0;
+    __gen_e_acsl_assert_data.kind = "Precondition";
+    __gen_e_acsl_assert_data.pred_txt = "a != 0";
+    __gen_e_acsl_assert_data.file = "tests/constructs/acsl_check.c";
+    __gen_e_acsl_assert_data.fct = "f";
+    __gen_e_acsl_assert_data.line = 7;
+    __e_acsl_assert(a != 0,& __gen_e_acsl_assert_data);
+  }
   __retres = f(a);
-  __e_acsl_assert(__retres != 0,0,"Postcondition","f","\\result != 0",
-                  "tests/constructs/acsl_check.c",8);
-  return __retres;
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_2.blocking = 0;
+    __gen_e_acsl_assert_data_2.kind = "Postcondition";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\result != 0";
+    __gen_e_acsl_assert_data_2.file = "tests/constructs/acsl_check.c";
+    __gen_e_acsl_assert_data_2.fct = "f";
+    __gen_e_acsl_assert_data_2.line = 8;
+    __e_acsl_assert(__retres != 0,& __gen_e_acsl_assert_data_2);
+    return __retres;
+  }
 }
 
 void __e_acsl_globals_init(void)
@@ -70,8 +107,16 @@ int main(void)
   int b[3] = {1, 2, 3};
   __e_acsl_store_block((void *)(b),(size_t)12);
   __e_acsl_full_init((void *)(& b));
-  __e_acsl_assert(a == 1,0,"Assertion","main","a == 1",
-                  "tests/constructs/acsl_check.c",21);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_assert_data.blocking = 0;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "a == 1";
+    __gen_e_acsl_assert_data.file = "tests/constructs/acsl_check.c";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 21;
+    __e_acsl_assert(a == 1,& __gen_e_acsl_assert_data);
+  }
   /*@ check a == 1; */ ;
   a = __gen_e_acsl_f(a);
   fprintf(stderr,__gen_e_acsl_literal_string); /* fprintf_va_1 */

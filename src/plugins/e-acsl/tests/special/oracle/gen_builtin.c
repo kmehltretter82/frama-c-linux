@@ -39,10 +39,16 @@ int __gen_e_acsl_f(int i)
   __retres = f(i);
   {
     int __gen_e_acsl_incr_app;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_incr_app = incr(__gen_e_acsl_at);
-    __e_acsl_assert(__retres == __gen_e_acsl_incr_app,1,"Postcondition","f",
-                    "\\result == incr(\\old(i))","tests/special/builtin.i",
-                    11);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Postcondition";
+    __gen_e_acsl_assert_data.pred_txt = "\\result == incr(\\old(i))";
+    __gen_e_acsl_assert_data.file = "tests/special/builtin.i";
+    __gen_e_acsl_assert_data.fct = "f";
+    __gen_e_acsl_assert_data.line = 11;
+    __e_acsl_assert(__retres == __gen_e_acsl_incr_app,
+                    & __gen_e_acsl_assert_data);
     return __retres;
   }
 }

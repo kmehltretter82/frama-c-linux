@@ -9,8 +9,16 @@ int main(void)
   int __retres;
   int x = 0;
   x ++;
-  __e_acsl_assert(1,1,"Assertion","main","\\true","tests/constructs/true.i",
-                  8);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "\\true";
+    __gen_e_acsl_assert_data.file = "tests/constructs/true.i";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 8;
+    __e_acsl_assert(1,& __gen_e_acsl_assert_data);
+  }
   /*@ assert \true; */ ;
   __retres = 0;
   return __retres;

@@ -25,8 +25,16 @@ int main(void)
 {
   int __retres;
   int x = __gen_e_acsl_fact(5);
-  __e_acsl_assert(x == 120,1,"Assertion","main","x == 120",
-                  "tests/bts/bts1395.i",15);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "x == 120";
+    __gen_e_acsl_assert_data.file = "tests/bts/bts1395.i";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 15;
+    __e_acsl_assert(x == 120,& __gen_e_acsl_assert_data);
+  }
   /*@ assert x == 120; */ ;
   __retres = 0;
   return __retres;
@@ -36,8 +44,16 @@ int main(void)
 int __gen_e_acsl_fact(int n)
 {
   int __retres;
-  __e_acsl_assert(n > 0,1,"Precondition","fact","n > 0",
-                  "tests/bts/bts1395.i",6);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Precondition";
+    __gen_e_acsl_assert_data.pred_txt = "n > 0";
+    __gen_e_acsl_assert_data.file = "tests/bts/bts1395.i";
+    __gen_e_acsl_assert_data.fct = "fact";
+    __gen_e_acsl_assert_data.line = 6;
+    __e_acsl_assert(n > 0,& __gen_e_acsl_assert_data);
+  }
   __retres = fact(n);
   return __retres;
 }

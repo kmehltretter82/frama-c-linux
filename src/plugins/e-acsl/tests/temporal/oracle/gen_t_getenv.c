@@ -29,6 +29,8 @@ char *__gen_e_acsl_getenv(char const *name)
   {
     int __gen_e_acsl_or;
     __e_acsl_temporal_save_return((void *)(& __retres));
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
     if (__retres == (char *)0) __gen_e_acsl_or = 1;
     else {
       int __gen_e_acsl_valid;
@@ -37,9 +39,13 @@ char *__gen_e_acsl_getenv(char const *name)
                                           (void *)(& __retres));
       __gen_e_acsl_or = __gen_e_acsl_valid;
     }
-    __e_acsl_assert(__gen_e_acsl_or,1,"Postcondition","getenv",
-                    "null_or_valid_result: \\result == \\null || \\valid(\\result)",
-                    "FRAMAC_SHARE/libc/stdlib.h",488);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Postcondition";
+    __gen_e_acsl_assert_data_2.pred_txt = "null_or_valid_result: \\result == \\null || \\valid(\\result)";
+    __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/stdlib.h";
+    __gen_e_acsl_assert_data_2.fct = "getenv";
+    __gen_e_acsl_assert_data_2.line = 488;
+    __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_2);
     __e_acsl_delete_block((void *)(& __retres));
     return __retres;
   }
@@ -85,6 +91,7 @@ int main(int argc, char const **argv)
   __e_acsl_full_init((void *)(& g2));
   {
     int __gen_e_acsl_or;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     if (g1 == (char *)0) __gen_e_acsl_or = 1;
     else {
       int __gen_e_acsl_initialized;
@@ -100,13 +107,19 @@ int main(int argc, char const **argv)
       else __gen_e_acsl_and = 0;
       __gen_e_acsl_or = __gen_e_acsl_and;
     }
-    __e_acsl_assert(__gen_e_acsl_or,1,"Assertion","main",
-                    "g1 == \\null || \\valid(g1)",
-                    "tests/temporal/t_getenv.c",13);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "g1 == \\null || \\valid(g1)";
+    __gen_e_acsl_assert_data.file = "tests/temporal/t_getenv.c";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 13;
+    __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data);
   }
   /*@ assert g1 == \null || \valid(g1); */ ;
   {
     int __gen_e_acsl_or_2;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
     if (g2 == (char *)0) __gen_e_acsl_or_2 = 1;
     else {
       int __gen_e_acsl_initialized_2;
@@ -122,9 +135,13 @@ int main(int argc, char const **argv)
       else __gen_e_acsl_and_2 = 0;
       __gen_e_acsl_or_2 = __gen_e_acsl_and_2;
     }
-    __e_acsl_assert(__gen_e_acsl_or_2,1,"Assertion","main",
-                    "g2 == \\null || \\valid(g2)",
-                    "tests/temporal/t_getenv.c",14);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Assertion";
+    __gen_e_acsl_assert_data_2.pred_txt = "g2 == \\null || \\valid(g2)";
+    __gen_e_acsl_assert_data_2.file = "tests/temporal/t_getenv.c";
+    __gen_e_acsl_assert_data_2.fct = "main";
+    __gen_e_acsl_assert_data_2.line = 14;
+    __e_acsl_assert(__gen_e_acsl_or_2,& __gen_e_acsl_assert_data_2);
   }
   /*@ assert g2 == \null || \valid(g2); */ ;
   __retres = 0;

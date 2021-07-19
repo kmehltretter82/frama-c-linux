@@ -38,6 +38,7 @@ int main(void)
     int __gen_e_acsl_mod_guard;
     __e_acsl_mpz_t __gen_e_acsl_mod;
     long __gen_e_acsl__4;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gmpz_init_set_si(__gen_e_acsl_,2L);
     __gmpz_init(__gen_e_acsl_x);
     __gmpz_import(__gen_e_acsl_x,(size_t)1,1,(size_t)8,0,(size_t)0,
@@ -50,19 +51,34 @@ int main(void)
     __gmpz_add(__gen_e_acsl_add,
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_mul),
                (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
     __gmpz_init_set_si(__gen_e_acsl__3,0L);
     __gen_e_acsl_mod_guard = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_),
                                         (__e_acsl_mpz_struct const *)(__gen_e_acsl__3));
     __gmpz_init(__gen_e_acsl_mod);
     /*@ assert E_ACSL: 2 != 0; */
-    __e_acsl_assert(__gen_e_acsl_mod_guard != 0,1,"Assertion","main",
-                    "2 != 0","tests/arith/longlong.i",19);
+    {
+      __gen_e_acsl_assert_data_2.blocking = 1;
+      __gen_e_acsl_assert_data_2.kind = "Assertion";
+      __gen_e_acsl_assert_data_2.pred_txt = "2 != 0";
+      __gen_e_acsl_assert_data_2.file = "tests/arith/longlong.i";
+      __gen_e_acsl_assert_data_2.fct = "main";
+      __gen_e_acsl_assert_data_2.line = 19;
+      __e_acsl_assert(__gen_e_acsl_mod_guard != 0,
+                      & __gen_e_acsl_assert_data_2);
+    }
     __gmpz_tdiv_r(__gen_e_acsl_mod,
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_add),
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
     __gen_e_acsl__4 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_mod));
-    __e_acsl_assert(__gen_e_acsl__4 == 1L,1,"Assertion","main",
-                    "(2 * x + 1) % 2 == 1","tests/arith/longlong.i",19);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "(2 * x + 1) % 2 == 1";
+    __gen_e_acsl_assert_data.file = "tests/arith/longlong.i";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 19;
+    __e_acsl_assert(__gen_e_acsl__4 == 1L,& __gen_e_acsl_assert_data);
     __gmpz_clear(__gen_e_acsl_);
     __gmpz_clear(__gen_e_acsl_x);
     __gmpz_clear(__gen_e_acsl_mul);

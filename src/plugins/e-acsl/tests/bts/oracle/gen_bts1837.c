@@ -19,15 +19,23 @@ int f(void)
   __e_acsl_full_init((void *)(& s2));
   {
     int __gen_e_acsl_valid_read;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)S,sizeof(char),
                                                   (void *)S,(void *)(& S));
-    __e_acsl_assert(__gen_e_acsl_valid_read,1,"Assertion","f",
-                    "\\valid_read(S)","tests/bts/bts1837.i",11);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "\\valid_read(S)";
+    __gen_e_acsl_assert_data.file = "tests/bts/bts1837.i";
+    __gen_e_acsl_assert_data.fct = "f";
+    __gen_e_acsl_assert_data.line = 11;
+    __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data);
   }
   /*@ assert \valid_read(S); */ ;
   {
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& s1),
                                                     sizeof(char *));
     if (__gen_e_acsl_initialized) {
@@ -39,13 +47,20 @@ int f(void)
       __gen_e_acsl_and = __gen_e_acsl_valid_read_2;
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","f","\\valid_read(s1)",
-                    "tests/bts/bts1837.i",12);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Assertion";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read(s1)";
+    __gen_e_acsl_assert_data_2.file = "tests/bts/bts1837.i";
+    __gen_e_acsl_assert_data_2.fct = "f";
+    __gen_e_acsl_assert_data_2.line = 12;
+    __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data_2);
   }
   /*@ assert \valid_read(s1); */ ;
   {
     int __gen_e_acsl_initialized_2;
     int __gen_e_acsl_and_2;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
     __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& s2),
                                                       sizeof(char *));
     if (__gen_e_acsl_initialized_2) {
@@ -57,8 +72,13 @@ int f(void)
       __gen_e_acsl_and_2 = __gen_e_acsl_valid_read_3;
     }
     else __gen_e_acsl_and_2 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_2,1,"Assertion","f","\\valid_read(s2)",
-                    "tests/bts/bts1837.i",13);
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "Assertion";
+    __gen_e_acsl_assert_data_3.pred_txt = "\\valid_read(s2)";
+    __gen_e_acsl_assert_data_3.file = "tests/bts/bts1837.i";
+    __gen_e_acsl_assert_data_3.fct = "f";
+    __gen_e_acsl_assert_data_3.line = 13;
+    __e_acsl_assert(__gen_e_acsl_and_2,& __gen_e_acsl_assert_data_3);
   }
   /*@ assert \valid_read(s2); */ ;
   __retres = 0;
@@ -116,6 +136,8 @@ int main(void)
       {
         int __gen_e_acsl_initialized;
         int __gen_e_acsl_and;
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data =
+          {.values = (void *)0};
         __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& s),
                                                         sizeof(char *));
         if (__gen_e_acsl_initialized) {
@@ -127,13 +149,20 @@ int main(void)
           __gen_e_acsl_and = __gen_e_acsl_valid_read;
         }
         else __gen_e_acsl_and = 0;
-        __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","main",
-                        "\\valid_read(s)","tests/bts/bts1837.i",21);
+        __gen_e_acsl_assert_data.blocking = 1;
+        __gen_e_acsl_assert_data.kind = "Assertion";
+        __gen_e_acsl_assert_data.pred_txt = "\\valid_read(s)";
+        __gen_e_acsl_assert_data.file = "tests/bts/bts1837.i";
+        __gen_e_acsl_assert_data.fct = "main";
+        __gen_e_acsl_assert_data.line = 21;
+        __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
       }
       /*@ assert \valid_read(s); */ ;
       {
         int __gen_e_acsl_initialized_2;
         int __gen_e_acsl_and_2;
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+          {.values = (void *)0};
         __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& s),
                                                           sizeof(char *));
         if (__gen_e_acsl_initialized_2) {
@@ -143,8 +172,13 @@ int main(void)
           __gen_e_acsl_and_2 = __gen_e_acsl_valid;
         }
         else __gen_e_acsl_and_2 = 0;
-        __e_acsl_assert(! __gen_e_acsl_and_2,1,"Assertion","main",
-                        "!\\valid(s)","tests/bts/bts1837.i",22);
+        __gen_e_acsl_assert_data_2.blocking = 1;
+        __gen_e_acsl_assert_data_2.kind = "Assertion";
+        __gen_e_acsl_assert_data_2.pred_txt = "!\\valid(s)";
+        __gen_e_acsl_assert_data_2.file = "tests/bts/bts1837.i";
+        __gen_e_acsl_assert_data_2.fct = "main";
+        __gen_e_acsl_assert_data_2.line = 22;
+        __e_acsl_assert(! __gen_e_acsl_and_2,& __gen_e_acsl_assert_data_2);
       }
       /*@ assert !\valid(s); */ ;
       __e_acsl_delete_block((void *)(& s));

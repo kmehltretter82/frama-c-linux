@@ -17,6 +17,7 @@ int main(void)
     __e_acsl_mpz_t __gen_e_acsl_add;
     __e_acsl_mpz_t __gen_e_acsl__4;
     int __gen_e_acsl_eq;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gmpz_init_set_si(__gen_e_acsl_A,A);
     __gmpz_init_set_si(__gen_e_acsl_,3L);
     __gmpz_init(__gen_e_acsl_mul);
@@ -34,9 +35,13 @@ int main(void)
     __gmpz_init_set_si(__gen_e_acsl__4,(long)(-1));
     __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_add),
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__4));
-    __e_acsl_assert(__gen_e_acsl_eq == 0,1,"Assertion","main",
-                    "A + (long)((long)(3 * A) - 1) == -1",
-                    "tests/bts/bts2231.i",8);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "A + (long)((long)(3 * A) - 1) == -1";
+    __gen_e_acsl_assert_data.file = "tests/bts/bts2231.i";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 8;
+    __e_acsl_assert(__gen_e_acsl_eq == 0,& __gen_e_acsl_assert_data);
     __gmpz_clear(__gen_e_acsl_A);
     __gmpz_clear(__gen_e_acsl_);
     __gmpz_clear(__gen_e_acsl_mul);

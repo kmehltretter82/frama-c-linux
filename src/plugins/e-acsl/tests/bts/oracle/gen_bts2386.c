@@ -16,6 +16,7 @@ void f(void const *s, int c, unsigned long n)
     __e_acsl_mpz_t __gen_e_acsl_n;
     __e_acsl_mpz_t __gen_e_acsl_sub;
     int __gen_e_acsl_eq;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gmpz_init_set_ui(__gen_e_acsl_,p - (unsigned char const *)s);
     __gmpz_init_set_ui(__gen_e_acsl_n,n);
     __gmpz_init(__gen_e_acsl_sub);
@@ -24,17 +25,30 @@ void f(void const *s, int c, unsigned long n)
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_n));
     __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_),
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_sub));
-    __e_acsl_assert(__gen_e_acsl_eq == 0,1,"Assertion","f",
-                    "p - (unsigned char const *)s == n - n",
-                    "tests/bts/bts2386.c",7);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "p - (unsigned char const *)s == n - n";
+    __gen_e_acsl_assert_data.file = "tests/bts/bts2386.c";
+    __gen_e_acsl_assert_data.fct = "f";
+    __gen_e_acsl_assert_data.line = 7;
+    __e_acsl_assert(__gen_e_acsl_eq == 0,& __gen_e_acsl_assert_data);
     __gmpz_clear(__gen_e_acsl_);
     __gmpz_clear(__gen_e_acsl_n);
     __gmpz_clear(__gen_e_acsl_sub);
   }
   /*@ assert p - (unsigned char const *)s == n - n; */ ;
-  __e_acsl_assert(p - (unsigned char const *)s == 0UL,1,"Assertion","f",
-                  "p - (unsigned char const *)s == 0","tests/bts/bts2386.c",
-                  8);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Assertion";
+    __gen_e_acsl_assert_data_2.pred_txt = "p - (unsigned char const *)s == 0";
+    __gen_e_acsl_assert_data_2.file = "tests/bts/bts2386.c";
+    __gen_e_acsl_assert_data_2.fct = "f";
+    __gen_e_acsl_assert_data_2.line = 8;
+    __e_acsl_assert(p - (unsigned char const *)s == 0UL,
+                    & __gen_e_acsl_assert_data_2);
+  }
   /*@ assert p - (unsigned char const *)s == 0; */ ;
   __e_acsl_delete_block((void *)(& s));
   __e_acsl_delete_block((void *)(& p));

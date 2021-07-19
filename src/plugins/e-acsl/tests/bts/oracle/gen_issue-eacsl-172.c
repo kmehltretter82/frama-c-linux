@@ -8,14 +8,34 @@ double d2 = 11.;
 int main(void)
 {
   int __retres;
-  __e_acsl_assert(-2147483649. < d2,1,"RTE","main",
-                  "float_to_int: -2147483649 < d2",
-                  "tests/bts/issue-eacsl-172.c",7);
-  __e_acsl_assert(d2 < 2147483648.,1,"RTE","main",
-                  "float_to_int: d2 < 2147483648",
-                  "tests/bts/issue-eacsl-172.c",7);
-  __e_acsl_assert((int)d2 > 10,1,"Assertion","main","(int)d2 > 10",
-                  "tests/bts/issue-eacsl-172.c",7);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "RTE";
+    __gen_e_acsl_assert_data_2.pred_txt = "float_to_int: -2147483649 < d2";
+    __gen_e_acsl_assert_data_2.file = "tests/bts/issue-eacsl-172.c";
+    __gen_e_acsl_assert_data_2.fct = "main";
+    __gen_e_acsl_assert_data_2.line = 7;
+    __e_acsl_assert(-2147483649. < d2,& __gen_e_acsl_assert_data_2);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "RTE";
+    __gen_e_acsl_assert_data_3.pred_txt = "float_to_int: d2 < 2147483648";
+    __gen_e_acsl_assert_data_3.file = "tests/bts/issue-eacsl-172.c";
+    __gen_e_acsl_assert_data_3.fct = "main";
+    __gen_e_acsl_assert_data_3.line = 7;
+    __e_acsl_assert(d2 < 2147483648.,& __gen_e_acsl_assert_data_3);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "(int)d2 > 10";
+    __gen_e_acsl_assert_data.file = "tests/bts/issue-eacsl-172.c";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 7;
+    __e_acsl_assert((int)d2 > 10,& __gen_e_acsl_assert_data);
+  }
   /*@ assert (int)d2 > 10; */ ;
   __retres = 0;
   return __retres;

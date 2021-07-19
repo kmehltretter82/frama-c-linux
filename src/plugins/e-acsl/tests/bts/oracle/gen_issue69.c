@@ -10,6 +10,7 @@ int main(void)
   {
     int __gen_e_acsl_forall;
     int __gen_e_acsl_c;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_forall = 1;
     __gen_e_acsl_c = (unsigned char)4;
     while (1) {
@@ -27,9 +28,13 @@ int main(void)
       __gen_e_acsl_c ++;
     }
     e_acsl_end_loop1: ;
-    __e_acsl_assert(__gen_e_acsl_forall,1,"Assertion","main",
-                    "\\forall unsigned char c; 4 <= c <= 300 ==> 0 <= c <= 255",
-                    "tests/bts/issue69.c",6);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "\\forall unsigned char c; 4 <= c <= 300 ==> 0 <= c <= 255";
+    __gen_e_acsl_assert_data.file = "tests/bts/issue69.c";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 6;
+    __e_acsl_assert(__gen_e_acsl_forall,& __gen_e_acsl_assert_data);
   }
   /*@ assert \forall unsigned char c; 4 <= c <= 300 ==> 0 <= c <= 255; */ ;
   int n = 5;
@@ -38,17 +43,26 @@ int main(void)
     int __gen_e_acsl_if;
     int __gen_e_acsl_forall_2;
     int __gen_e_acsl_u;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
     if (n > 0) __gen_e_acsl_if = 4; else __gen_e_acsl_if = 341;
     __gen_e_acsl_m = __gen_e_acsl_if;
     __gen_e_acsl_forall_2 = 1;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
     __gen_e_acsl_u = (char)(1 + 1);
     while (1) {
       {
         int __gen_e_acsl_and_2;
         if (-128 <= __gen_e_acsl_u) __gen_e_acsl_and_2 = __gen_e_acsl_u < 128;
         else __gen_e_acsl_and_2 = 0;
-        __e_acsl_assert(__gen_e_acsl_and_2,1,"RTE","main","-128 <= u < 128",
-                        "tests/bts/issue69.c",11);
+        __gen_e_acsl_assert_data_3.blocking = 1;
+        __gen_e_acsl_assert_data_3.kind = "RTE";
+        __gen_e_acsl_assert_data_3.pred_txt = "-128 <= u < 128";
+        __gen_e_acsl_assert_data_3.file = "tests/bts/issue69.c";
+        __gen_e_acsl_assert_data_3.fct = "main";
+        __gen_e_acsl_assert_data_3.line = 11;
+        __e_acsl_assert(__gen_e_acsl_and_2,& __gen_e_acsl_assert_data_3);
       }
       if (__gen_e_acsl_u < __gen_e_acsl_m) ; else break;
       if (__gen_e_acsl_u > 0) ;
@@ -59,9 +73,13 @@ int main(void)
       __gen_e_acsl_u ++;
     }
     e_acsl_end_loop2: ;
-    __e_acsl_assert(__gen_e_acsl_forall_2,1,"Assertion","main",
-                    "\\let m = n > 0? 4: 341;\n\\forall char u; 1 < u < m ==> u > 0",
-                    "tests/bts/issue69.c",10);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Assertion";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\let m = n > 0? 4: 341;\n\\forall char u; 1 < u < m ==> u > 0";
+    __gen_e_acsl_assert_data_2.file = "tests/bts/issue69.c";
+    __gen_e_acsl_assert_data_2.fct = "main";
+    __gen_e_acsl_assert_data_2.line = 10;
+    __e_acsl_assert(__gen_e_acsl_forall_2,& __gen_e_acsl_assert_data_2);
   }
   /*@ assert \let m = n > 0? 4: 341; \forall char u; 1 < u < m ==> u > 0; */
   ;

@@ -66,6 +66,7 @@ int main(int argc, char const **argv)
   {
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& p),
                                                     sizeof(char *));
     if (__gen_e_acsl_initialized) {
@@ -75,28 +76,50 @@ int main(int argc, char const **argv)
       __gen_e_acsl_and = __gen_e_acsl_valid;
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","main","\\valid(p)",
-                    "tests/memory/memalign.c",15);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "\\valid(p)";
+    __gen_e_acsl_assert_data.file = "tests/memory/memalign.c";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 15;
+    __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
   }
   /*@ assert \valid(p); */ ;
   {
     unsigned long __gen_e_acsl_block_length;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
     __gen_e_acsl_block_length = __e_acsl_block_length((void *)p);
-    __e_acsl_assert(__gen_e_acsl_block_length == 15UL,1,"Assertion","main",
-                    "\\block_length(p) == 15","tests/memory/memalign.c",16);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Assertion";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\block_length(p) == 15";
+    __gen_e_acsl_assert_data_2.file = "tests/memory/memalign.c";
+    __gen_e_acsl_assert_data_2.fct = "main";
+    __gen_e_acsl_assert_data_2.line = 16;
+    __e_acsl_assert(__gen_e_acsl_block_length == 15UL,
+                    & __gen_e_acsl_assert_data_2);
   }
   /*@ assert \block_length(p) == 15; */ ;
   {
     int __gen_e_acsl_freeable;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
     __gen_e_acsl_freeable = __e_acsl_freeable((void *)p);
-    __e_acsl_assert(__gen_e_acsl_freeable,1,"Assertion","main",
-                    "\\freeable(p)","tests/memory/memalign.c",17);
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "Assertion";
+    __gen_e_acsl_assert_data_3.pred_txt = "\\freeable(p)";
+    __gen_e_acsl_assert_data_3.file = "tests/memory/memalign.c";
+    __gen_e_acsl_assert_data_3.fct = "main";
+    __gen_e_acsl_assert_data_3.line = 17;
+    __e_acsl_assert(__gen_e_acsl_freeable,& __gen_e_acsl_assert_data_3);
   }
   /*@ assert \freeable(p); */ ;
   free((void *)p);
   {
     int __gen_e_acsl_initialized_2;
     int __gen_e_acsl_and_2;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+      {.values = (void *)0};
     __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& p),
                                                       sizeof(char *));
     if (__gen_e_acsl_initialized_2) {
@@ -106,33 +129,76 @@ int main(int argc, char const **argv)
       __gen_e_acsl_and_2 = __gen_e_acsl_valid_2;
     }
     else __gen_e_acsl_and_2 = 0;
-    __e_acsl_assert(! __gen_e_acsl_and_2,1,"Assertion","main","!\\valid(p)",
-                    "tests/memory/memalign.c",19);
+    __gen_e_acsl_assert_data_4.blocking = 1;
+    __gen_e_acsl_assert_data_4.kind = "Assertion";
+    __gen_e_acsl_assert_data_4.pred_txt = "!\\valid(p)";
+    __gen_e_acsl_assert_data_4.file = "tests/memory/memalign.c";
+    __gen_e_acsl_assert_data_4.fct = "main";
+    __gen_e_acsl_assert_data_4.line = 19;
+    __e_acsl_assert(! __gen_e_acsl_and_2,& __gen_e_acsl_assert_data_4);
   }
   /*@ assert !\valid(p); */ ;
   __e_acsl_full_init((void *)(& a));
   a = (char *)aligned_alloc((unsigned long)256,(unsigned long)12);
-  __e_acsl_assert(a == (char *)0,1,"Assertion","main","a == \\null",
-                  "tests/memory/memalign.c",23);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_5.blocking = 1;
+    __gen_e_acsl_assert_data_5.kind = "Assertion";
+    __gen_e_acsl_assert_data_5.pred_txt = "a == \\null";
+    __gen_e_acsl_assert_data_5.file = "tests/memory/memalign.c";
+    __gen_e_acsl_assert_data_5.fct = "main";
+    __gen_e_acsl_assert_data_5.line = 23;
+    __e_acsl_assert(a == (char *)0,& __gen_e_acsl_assert_data_5);
+  }
   /*@ assert a == \null; */ ;
   __e_acsl_full_init((void *)(& a));
   a = (char *)aligned_alloc((unsigned long)255,(unsigned long)512);
-  __e_acsl_assert(a == (char *)0,1,"Assertion","main","a == \\null",
-                  "tests/memory/memalign.c",26);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_6.blocking = 1;
+    __gen_e_acsl_assert_data_6.kind = "Assertion";
+    __gen_e_acsl_assert_data_6.pred_txt = "a == \\null";
+    __gen_e_acsl_assert_data_6.file = "tests/memory/memalign.c";
+    __gen_e_acsl_assert_data_6.fct = "main";
+    __gen_e_acsl_assert_data_6.line = 26;
+    __e_acsl_assert(a == (char *)0,& __gen_e_acsl_assert_data_6);
+  }
   /*@ assert a == \null; */ ;
   __e_acsl_full_init((void *)(& a));
   a = (char *)aligned_alloc((unsigned long)0,(unsigned long)512);
-  __e_acsl_assert(a == (char *)0,1,"Assertion","main","a == \\null",
-                  "tests/memory/memalign.c",29);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_7.blocking = 1;
+    __gen_e_acsl_assert_data_7.kind = "Assertion";
+    __gen_e_acsl_assert_data_7.pred_txt = "a == \\null";
+    __gen_e_acsl_assert_data_7.file = "tests/memory/memalign.c";
+    __gen_e_acsl_assert_data_7.fct = "main";
+    __gen_e_acsl_assert_data_7.line = 29;
+    __e_acsl_assert(a == (char *)0,& __gen_e_acsl_assert_data_7);
+  }
   /*@ assert a == \null; */ ;
   __e_acsl_full_init((void *)(& a));
   a = (char *)aligned_alloc((unsigned long)256,(unsigned long)512);
-  __e_acsl_assert(a != (char *)0,1,"Assertion","main","a != \\null",
-                  "tests/memory/memalign.c",32);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_8.blocking = 1;
+    __gen_e_acsl_assert_data_8.kind = "Assertion";
+    __gen_e_acsl_assert_data_8.pred_txt = "a != \\null";
+    __gen_e_acsl_assert_data_8.file = "tests/memory/memalign.c";
+    __gen_e_acsl_assert_data_8.fct = "main";
+    __gen_e_acsl_assert_data_8.line = 32;
+    __e_acsl_assert(a != (char *)0,& __gen_e_acsl_assert_data_8);
+  }
   /*@ assert a != \null; */ ;
   {
     int __gen_e_acsl_initialized_3;
     int __gen_e_acsl_and_3;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
+      {.values = (void *)0};
     __gen_e_acsl_initialized_3 = __e_acsl_initialized((void *)(& a),
                                                       sizeof(char *));
     if (__gen_e_acsl_initialized_3) {
@@ -142,29 +208,50 @@ int main(int argc, char const **argv)
       __gen_e_acsl_and_3 = __gen_e_acsl_valid_3;
     }
     else __gen_e_acsl_and_3 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_3,1,"Assertion","main","\\valid(a)",
-                    "tests/memory/memalign.c",33);
+    __gen_e_acsl_assert_data_9.blocking = 1;
+    __gen_e_acsl_assert_data_9.kind = "Assertion";
+    __gen_e_acsl_assert_data_9.pred_txt = "\\valid(a)";
+    __gen_e_acsl_assert_data_9.file = "tests/memory/memalign.c";
+    __gen_e_acsl_assert_data_9.fct = "main";
+    __gen_e_acsl_assert_data_9.line = 33;
+    __e_acsl_assert(__gen_e_acsl_and_3,& __gen_e_acsl_assert_data_9);
   }
   /*@ assert \valid(a); */ ;
   {
     unsigned long __gen_e_acsl_block_length_2;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
+      {.values = (void *)0};
     __gen_e_acsl_block_length_2 = __e_acsl_block_length((void *)a);
-    __e_acsl_assert(__gen_e_acsl_block_length_2 == 512UL,1,"Assertion",
-                    "main","\\block_length(a) == 512",
-                    "tests/memory/memalign.c",34);
+    __gen_e_acsl_assert_data_10.blocking = 1;
+    __gen_e_acsl_assert_data_10.kind = "Assertion";
+    __gen_e_acsl_assert_data_10.pred_txt = "\\block_length(a) == 512";
+    __gen_e_acsl_assert_data_10.file = "tests/memory/memalign.c";
+    __gen_e_acsl_assert_data_10.fct = "main";
+    __gen_e_acsl_assert_data_10.line = 34;
+    __e_acsl_assert(__gen_e_acsl_block_length_2 == 512UL,
+                    & __gen_e_acsl_assert_data_10);
   }
   /*@ assert \block_length(a) == 512; */ ;
   {
     int __gen_e_acsl_freeable_2;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
+      {.values = (void *)0};
     __gen_e_acsl_freeable_2 = __e_acsl_freeable((void *)a);
-    __e_acsl_assert(__gen_e_acsl_freeable_2,1,"Assertion","main",
-                    "\\freeable(a)","tests/memory/memalign.c",35);
+    __gen_e_acsl_assert_data_11.blocking = 1;
+    __gen_e_acsl_assert_data_11.kind = "Assertion";
+    __gen_e_acsl_assert_data_11.pred_txt = "\\freeable(a)";
+    __gen_e_acsl_assert_data_11.file = "tests/memory/memalign.c";
+    __gen_e_acsl_assert_data_11.fct = "main";
+    __gen_e_acsl_assert_data_11.line = 35;
+    __e_acsl_assert(__gen_e_acsl_freeable_2,& __gen_e_acsl_assert_data_11);
   }
   /*@ assert \freeable(a); */ ;
   free((void *)a);
   {
     int __gen_e_acsl_initialized_4;
     int __gen_e_acsl_and_4;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_12 =
+      {.values = (void *)0};
     __gen_e_acsl_initialized_4 = __e_acsl_initialized((void *)(& a),
                                                       sizeof(char *));
     if (__gen_e_acsl_initialized_4) {
@@ -174,8 +261,13 @@ int main(int argc, char const **argv)
       __gen_e_acsl_and_4 = __gen_e_acsl_valid_4;
     }
     else __gen_e_acsl_and_4 = 0;
-    __e_acsl_assert(! __gen_e_acsl_and_4,1,"Assertion","main","!\\valid(a)",
-                    "tests/memory/memalign.c",38);
+    __gen_e_acsl_assert_data_12.blocking = 1;
+    __gen_e_acsl_assert_data_12.kind = "Assertion";
+    __gen_e_acsl_assert_data_12.pred_txt = "!\\valid(a)";
+    __gen_e_acsl_assert_data_12.file = "tests/memory/memalign.c";
+    __gen_e_acsl_assert_data_12.fct = "main";
+    __gen_e_acsl_assert_data_12.line = 38;
+    __e_acsl_assert(! __gen_e_acsl_and_4,& __gen_e_acsl_assert_data_12);
   }
   /*@ assert !\valid(a); */ ;
   __retres = 0;
@@ -229,11 +321,18 @@ int __gen_e_acsl_posix_memalign(void **memptr, size_t alignment, size_t size)
     int __gen_e_acsl_and;
     __e_acsl_store_block((void *)(& memptr),(size_t)8);
     __gen_e_acsl_contract = __e_acsl_contract_init((size_t)2);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_valid = __e_acsl_valid((void *)memptr,sizeof(void *),
                                         (void *)memptr,(void *)(& memptr));
-    __e_acsl_assert(__gen_e_acsl_valid,1,"Precondition","posix_memalign",
-                    "valid_memptr: \\valid(memptr)",
-                    "FRAMAC_SHARE/libc/stdlib.h",666);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Precondition";
+    __gen_e_acsl_assert_data.pred_txt = "valid_memptr: \\valid(memptr)";
+    __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdlib.h";
+    __gen_e_acsl_assert_data.fct = "posix_memalign";
+    __gen_e_acsl_assert_data.line = 666;
+    __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
     if (alignment >= 8UL) {
       __e_acsl_mpz_t __gen_e_acsl_;
       __e_acsl_mpz_t __gen_e_acsl__2;
@@ -258,30 +357,45 @@ int __gen_e_acsl_posix_memalign(void **memptr, size_t alignment, size_t size)
       __gmpz_clear(__gen_e_acsl_band);
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,1,"Precondition","posix_memalign",
-                    "alignment_is_a_suitable_power_of_two:\n  alignment >= sizeof(void *) &&\n  ((size_t)alignment & ((size_t)alignment - 1)) == 0",
-                    "FRAMAC_SHARE/libc/stdlib.h",668);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Precondition";
+    __gen_e_acsl_assert_data_2.pred_txt = "alignment_is_a_suitable_power_of_two:\n  alignment >= sizeof(void *) &&\n  ((size_t)alignment & ((size_t)alignment - 1)) == 0";
+    __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/stdlib.h";
+    __gen_e_acsl_assert_data_2.fct = "posix_memalign";
+    __gen_e_acsl_assert_data_2.line = 668;
+    __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data_2);
   }
   __retres = posix_memalign(memptr,alignment,size);
   {
     int __gen_e_acsl_assumes_value;
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)0);
-    if (__gen_e_acsl_assumes_value) __e_acsl_assert(__retres == 0,1,
-                                                    "Postcondition",
-                                                    "posix_memalign",
-                                                    "allocation: result_zero: \\result == 0",
-                                                    "FRAMAC_SHARE/libc/stdlib.h",
-                                                    680);
+    if (__gen_e_acsl_assumes_value) {
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+        {.values = (void *)0};
+      __gen_e_acsl_assert_data_4.blocking = 1;
+      __gen_e_acsl_assert_data_4.kind = "Postcondition";
+      __gen_e_acsl_assert_data_4.pred_txt = "allocation: result_zero: \\result == 0";
+      __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/stdlib.h";
+      __gen_e_acsl_assert_data_4.fct = "posix_memalign";
+      __gen_e_acsl_assert_data_4.line = 680;
+      __e_acsl_assert(__retres == 0,& __gen_e_acsl_assert_data_4);
+    }
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)1);
     if (__gen_e_acsl_assumes_value) {
       int __gen_e_acsl_or;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+        {.values = (void *)0};
       if (__retres < 0) __gen_e_acsl_or = 1;
       else __gen_e_acsl_or = __retres > 0;
-      __e_acsl_assert(__gen_e_acsl_or,1,"Postcondition","posix_memalign",
-                      "no_allocation: result_non_zero: \\result < 0 || \\result > 0",
-                      "FRAMAC_SHARE/libc/stdlib.h",685);
+      __gen_e_acsl_assert_data_5.blocking = 1;
+      __gen_e_acsl_assert_data_5.kind = "Postcondition";
+      __gen_e_acsl_assert_data_5.pred_txt = "no_allocation: result_non_zero: \\result < 0 || \\result > 0";
+      __gen_e_acsl_assert_data_5.file = "FRAMAC_SHARE/libc/stdlib.h";
+      __gen_e_acsl_assert_data_5.fct = "posix_memalign";
+      __gen_e_acsl_assert_data_5.line = 685;
+      __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_5);
     }
     __e_acsl_contract_clean(__gen_e_acsl_contract);
     __e_acsl_delete_block((void *)(& memptr));

@@ -17,10 +17,17 @@ int main(int argc, char const **argv)
     p = & argc;
     {
       int __gen_e_acsl_valid;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data =
+        {.values = (void *)0};
       __gen_e_acsl_valid = __e_acsl_valid((void *)(& p),sizeof(int *),
                                           (void *)(& p),(void *)0);
-      __e_acsl_assert(__gen_e_acsl_valid,1,"Assertion","main","\\valid(&p)",
-                      "tests/memory/bypassed_var.c",13);
+      __gen_e_acsl_assert_data.blocking = 1;
+      __gen_e_acsl_assert_data.kind = "Assertion";
+      __gen_e_acsl_assert_data.pred_txt = "\\valid(&p)";
+      __gen_e_acsl_assert_data.file = "tests/memory/bypassed_var.c";
+      __gen_e_acsl_assert_data.fct = "main";
+      __gen_e_acsl_assert_data.line = 13;
+      __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
     }
     /*@ assert \valid(&p); */ ;
     __e_acsl_delete_block((void *)(& p));

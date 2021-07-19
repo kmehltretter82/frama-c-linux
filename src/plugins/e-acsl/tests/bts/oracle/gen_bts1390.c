@@ -86,13 +86,19 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
       else break;
       {
         int __gen_e_acsl_valid_read;
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data =
+          {.values = (void *)0};
         __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)((char *)buf + __gen_e_acsl_i),
                                                       sizeof(char),
                                                       (void *)buf,
                                                       (void *)(& buf));
-        __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","memchr",
-                        "mem_access: \\valid_read((char *)buf + __gen_e_acsl_i)",
-                        "tests/bts/bts1390.c",8);
+        __gen_e_acsl_assert_data.blocking = 1;
+        __gen_e_acsl_assert_data.kind = "RTE";
+        __gen_e_acsl_assert_data.pred_txt = "mem_access: \\valid_read((char *)buf + __gen_e_acsl_i)";
+        __gen_e_acsl_assert_data.file = "tests/bts/bts1390.c";
+        __gen_e_acsl_assert_data.fct = "memchr";
+        __gen_e_acsl_assert_data.line = 8;
+        __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data);
         if (! ((int)*((char *)buf + __gen_e_acsl_i) == c)) ;
         else {
           __gen_e_acsl_exists = 1;
@@ -111,13 +117,20 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
       else break;
       {
         int __gen_e_acsl_valid_read_2;
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+          {.values = (void *)0};
         __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)((char *)buf + __gen_e_acsl_k),
                                                         sizeof(char),
                                                         (void *)buf,
                                                         (void *)(& buf));
-        __e_acsl_assert(__gen_e_acsl_valid_read_2,1,"RTE","memchr",
-                        "mem_access: \\valid_read((char *)buf + __gen_e_acsl_k)",
-                        "tests/bts/bts1390.c",11);
+        __gen_e_acsl_assert_data_2.blocking = 1;
+        __gen_e_acsl_assert_data_2.kind = "RTE";
+        __gen_e_acsl_assert_data_2.pred_txt = "mem_access: \\valid_read((char *)buf + __gen_e_acsl_k)";
+        __gen_e_acsl_assert_data_2.file = "tests/bts/bts1390.c";
+        __gen_e_acsl_assert_data_2.fct = "memchr";
+        __gen_e_acsl_assert_data_2.line = 11;
+        __e_acsl_assert(__gen_e_acsl_valid_read_2,
+                        & __gen_e_acsl_assert_data_2);
         if ((int)*((char *)buf + __gen_e_acsl_k) != c) ;
         else {
           __gen_e_acsl_forall = 0;
@@ -140,6 +153,8 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
     if (__gen_e_acsl_assumes_value) {
       int __gen_e_acsl_forall_2;
       unsigned int __gen_e_acsl_j;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+        {.values = (void *)0};
       __gen_e_acsl_forall_2 = 1;
       __gen_e_acsl_j = 0;
       while (1) {
@@ -152,13 +167,20 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
         }
         {
           int __gen_e_acsl_valid_read_3;
+          __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+            {.values = (void *)0};
           __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)((char *)__gen_e_acsl_at + __gen_e_acsl_j),
                                                           sizeof(char),
                                                           (void *)__gen_e_acsl_at,
                                                           (void *)(& __gen_e_acsl_at));
-          __e_acsl_assert(__gen_e_acsl_valid_read_3,1,"RTE","memchr",
-                          "mem_access: \\valid_read((char *)__gen_e_acsl_at + __gen_e_acsl_j)",
-                          "tests/bts/bts1390.c",9);
+          __gen_e_acsl_assert_data_4.blocking = 1;
+          __gen_e_acsl_assert_data_4.kind = "RTE";
+          __gen_e_acsl_assert_data_4.pred_txt = "mem_access: \\valid_read((char *)__gen_e_acsl_at + __gen_e_acsl_j)";
+          __gen_e_acsl_assert_data_4.file = "tests/bts/bts1390.c";
+          __gen_e_acsl_assert_data_4.fct = "memchr";
+          __gen_e_acsl_assert_data_4.line = 9;
+          __e_acsl_assert(__gen_e_acsl_valid_read_3,
+                          & __gen_e_acsl_assert_data_4);
           if ((int)*((char *)__gen_e_acsl_at + __gen_e_acsl_j) != __gen_e_acsl_at_2) 
             ;
           else {
@@ -169,16 +191,27 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
         __gen_e_acsl_j ++;
       }
       e_acsl_end_loop3: ;
-      __e_acsl_assert(__gen_e_acsl_forall_2,1,"Postcondition","memchr",
-                      "exists:\n  \\forall int j;\n    0 <= j < (int)\\offset((char *)\\result) ==>\n    (int)*((char *)\\old(buf) + j) != \\old(c)",
-                      "tests/bts/bts1390.c",9);
+      __gen_e_acsl_assert_data_3.blocking = 1;
+      __gen_e_acsl_assert_data_3.kind = "Postcondition";
+      __gen_e_acsl_assert_data_3.pred_txt = "exists:\n  \\forall int j;\n    0 <= j < (int)\\offset((char *)\\result) ==>\n    (int)*((char *)\\old(buf) + j) != \\old(c)";
+      __gen_e_acsl_assert_data_3.file = "tests/bts/bts1390.c";
+      __gen_e_acsl_assert_data_3.fct = "memchr";
+      __gen_e_acsl_assert_data_3.line = 9;
+      __e_acsl_assert(__gen_e_acsl_forall_2,& __gen_e_acsl_assert_data_3);
     }
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)1);
-    if (__gen_e_acsl_assumes_value) __e_acsl_assert(__retres == (void *)0,1,
-                                                    "Postcondition","memchr",
-                                                    "not_exists: \\result == (void *)0",
-                                                    "tests/bts/bts1390.c",12);
+    if (__gen_e_acsl_assumes_value) {
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+        {.values = (void *)0};
+      __gen_e_acsl_assert_data_5.blocking = 1;
+      __gen_e_acsl_assert_data_5.kind = "Postcondition";
+      __gen_e_acsl_assert_data_5.pred_txt = "not_exists: \\result == (void *)0";
+      __gen_e_acsl_assert_data_5.file = "tests/bts/bts1390.c";
+      __gen_e_acsl_assert_data_5.fct = "memchr";
+      __gen_e_acsl_assert_data_5.line = 12;
+      __e_acsl_assert(__retres == (void *)0,& __gen_e_acsl_assert_data_5);
+    }
     __e_acsl_contract_clean(__gen_e_acsl_contract);
     __e_acsl_delete_block((void *)(& buf));
     __e_acsl_delete_block((void *)(& __retres));

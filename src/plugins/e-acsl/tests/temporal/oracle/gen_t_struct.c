@@ -46,6 +46,7 @@ int main(void)
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
     int __gen_e_acsl_and_3;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& t1.p),
                                                     sizeof(char *));
     if (__gen_e_acsl_initialized) {
@@ -70,15 +71,21 @@ int main(void)
       __gen_e_acsl_and_3 = __gen_e_acsl_and_2;
     }
     else __gen_e_acsl_and_3 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_3,1,"Assertion","main",
-                    "\\valid(t1.p) && \\valid(t1.q)",
-                    "tests/temporal/t_struct.c",30);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "\\valid(t1.p) && \\valid(t1.q)";
+    __gen_e_acsl_assert_data.file = "tests/temporal/t_struct.c";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 30;
+    __e_acsl_assert(__gen_e_acsl_and_3,& __gen_e_acsl_assert_data);
   }
   /*@ assert \valid(t1.p) && \valid(t1.q); */ ;
   {
     int __gen_e_acsl_initialized_3;
     int __gen_e_acsl_and_4;
     int __gen_e_acsl_and_6;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
     __gen_e_acsl_initialized_3 = __e_acsl_initialized((void *)(& t2.p),
                                                       sizeof(char *));
     if (__gen_e_acsl_initialized_3) {
@@ -103,9 +110,13 @@ int main(void)
       __gen_e_acsl_and_6 = ! __gen_e_acsl_and_5;
     }
     else __gen_e_acsl_and_6 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_6,1,"Assertion","main",
-                    "!\\valid(t2.p) && !\\valid(t2.q)",
-                    "tests/temporal/t_struct.c",31);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Assertion";
+    __gen_e_acsl_assert_data_2.pred_txt = "!\\valid(t2.p) && !\\valid(t2.q)";
+    __gen_e_acsl_assert_data_2.file = "tests/temporal/t_struct.c";
+    __gen_e_acsl_assert_data_2.fct = "main";
+    __gen_e_acsl_assert_data_2.line = 31;
+    __e_acsl_assert(__gen_e_acsl_and_6,& __gen_e_acsl_assert_data_2);
   }
   /*@ assert !\valid(t2.p) && !\valid(t2.q); */ ;
   __e_acsl_full_init((void *)(& t2));
@@ -115,6 +126,8 @@ int main(void)
     int __gen_e_acsl_initialized_5;
     int __gen_e_acsl_and_7;
     int __gen_e_acsl_and_9;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
     __gen_e_acsl_initialized_5 = __e_acsl_initialized((void *)(& t2.p),
                                                       sizeof(char *));
     if (__gen_e_acsl_initialized_5) {
@@ -139,9 +152,13 @@ int main(void)
       __gen_e_acsl_and_9 = __gen_e_acsl_and_8;
     }
     else __gen_e_acsl_and_9 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_9,1,"Assertion","main",
-                    "\\valid(t2.p) && \\valid(t2.q)",
-                    "tests/temporal/t_struct.c",34);
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "Assertion";
+    __gen_e_acsl_assert_data_3.pred_txt = "\\valid(t2.p) && \\valid(t2.q)";
+    __gen_e_acsl_assert_data_3.file = "tests/temporal/t_struct.c";
+    __gen_e_acsl_assert_data_3.fct = "main";
+    __gen_e_acsl_assert_data_3.line = 34;
+    __e_acsl_assert(__gen_e_acsl_and_9,& __gen_e_acsl_assert_data_3);
   }
   /*@ assert \valid(t2.p) && \valid(t2.q); */ ;
   __e_acsl_initialize((void *)(& t2.p),sizeof(char *));
@@ -156,6 +173,8 @@ int main(void)
     int __gen_e_acsl_initialized_7;
     int __gen_e_acsl_and_10;
     int __gen_e_acsl_and_12;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+      {.values = (void *)0};
     __gen_e_acsl_initialized_7 = __e_acsl_initialized((void *)(& t2.p),
                                                       sizeof(char *));
     if (__gen_e_acsl_initialized_7) {
@@ -180,9 +199,13 @@ int main(void)
       __gen_e_acsl_and_12 = __gen_e_acsl_and_11;
     }
     else __gen_e_acsl_and_12 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_12,1,"Assertion","main",
-                    "!\\valid(t2.p) && \\valid(t2.q)",
-                    "tests/temporal/t_struct.c",38);
+    __gen_e_acsl_assert_data_4.blocking = 1;
+    __gen_e_acsl_assert_data_4.kind = "Assertion";
+    __gen_e_acsl_assert_data_4.pred_txt = "!\\valid(t2.p) && \\valid(t2.q)";
+    __gen_e_acsl_assert_data_4.file = "tests/temporal/t_struct.c";
+    __gen_e_acsl_assert_data_4.fct = "main";
+    __gen_e_acsl_assert_data_4.line = 38;
+    __e_acsl_assert(__gen_e_acsl_and_12,& __gen_e_acsl_assert_data_4);
   }
   /*@ assert !\valid(t2.p) && \valid(t2.q); */ ;
   __e_acsl_initialize((void *)(& l.t),sizeof(struct temporal_t));
@@ -192,6 +215,8 @@ int main(void)
     int __gen_e_acsl_initialized_9;
     int __gen_e_acsl_and_13;
     int __gen_e_acsl_and_15;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+      {.values = (void *)0};
     __gen_e_acsl_initialized_9 = __e_acsl_initialized((void *)(& l.t.p),
                                                       sizeof(char *));
     if (__gen_e_acsl_initialized_9) {
@@ -217,9 +242,13 @@ int main(void)
       __gen_e_acsl_and_15 = __gen_e_acsl_and_14;
     }
     else __gen_e_acsl_and_15 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_15,1,"Assertion","main",
-                    "!\\valid(l.t.p) && \\valid(l.t.q)",
-                    "tests/temporal/t_struct.c",41);
+    __gen_e_acsl_assert_data_5.blocking = 1;
+    __gen_e_acsl_assert_data_5.kind = "Assertion";
+    __gen_e_acsl_assert_data_5.pred_txt = "!\\valid(l.t.p) && \\valid(l.t.q)";
+    __gen_e_acsl_assert_data_5.file = "tests/temporal/t_struct.c";
+    __gen_e_acsl_assert_data_5.fct = "main";
+    __gen_e_acsl_assert_data_5.line = 41;
+    __e_acsl_assert(__gen_e_acsl_and_15,& __gen_e_acsl_assert_data_5);
   }
   /*@ assert !\valid(l.t.p) && \valid(l.t.q); */ ;
   __e_acsl_full_init((void *)(& lp));
@@ -228,26 +257,39 @@ int main(void)
   {
     int __gen_e_acsl_initialized_11;
     int __gen_e_acsl_and_16;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+      {.values = (void *)0};
     __gen_e_acsl_initialized_11 = __e_acsl_initialized((void *)(& lp->t.p),
                                                        sizeof(char *));
     if (__gen_e_acsl_initialized_11) {
       int __gen_e_acsl_valid_read;
       int __gen_e_acsl_valid_11;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
+        {.values = (void *)0};
       __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(& lp->t.p),
                                                     sizeof(char *),
                                                     (void *)(& lp->t.p),
                                                     (void *)0);
-      __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","main",
-                      "mem_access: \\valid_read(&lp->t.p)",
-                      "tests/temporal/t_struct.c",44);
+      __gen_e_acsl_assert_data_7.blocking = 1;
+      __gen_e_acsl_assert_data_7.kind = "RTE";
+      __gen_e_acsl_assert_data_7.pred_txt = "mem_access: \\valid_read(&lp->t.p)";
+      __gen_e_acsl_assert_data_7.file = "tests/temporal/t_struct.c";
+      __gen_e_acsl_assert_data_7.fct = "main";
+      __gen_e_acsl_assert_data_7.line = 44;
+      __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_7);
       __gen_e_acsl_valid_11 = __e_acsl_valid((void *)lp->t.p,sizeof(char),
                                              (void *)lp->t.p,
                                              (void *)(& lp->t.p));
       __gen_e_acsl_and_16 = __gen_e_acsl_valid_11;
     }
     else __gen_e_acsl_and_16 = 0;
-    __e_acsl_assert(! __gen_e_acsl_and_16,1,"Assertion","main",
-                    "!\\valid(lp->t.p)","tests/temporal/t_struct.c",44);
+    __gen_e_acsl_assert_data_6.blocking = 1;
+    __gen_e_acsl_assert_data_6.kind = "Assertion";
+    __gen_e_acsl_assert_data_6.pred_txt = "!\\valid(lp->t.p)";
+    __gen_e_acsl_assert_data_6.file = "tests/temporal/t_struct.c";
+    __gen_e_acsl_assert_data_6.fct = "main";
+    __gen_e_acsl_assert_data_6.line = 44;
+    __e_acsl_assert(! __gen_e_acsl_and_16,& __gen_e_acsl_assert_data_6);
   }
   /*@ assert !\valid(lp->t.p); */ ;
   __e_acsl_initialize((void *)(tarr),sizeof(temporal));
@@ -257,6 +299,8 @@ int main(void)
     int __gen_e_acsl_initialized_12;
     int __gen_e_acsl_and_17;
     int __gen_e_acsl_and_19;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+      {.values = (void *)0};
     __gen_e_acsl_initialized_12 = __e_acsl_initialized((void *)(& tarr[0].p),
                                                        sizeof(char *));
     if (__gen_e_acsl_initialized_12) {
@@ -284,9 +328,13 @@ int main(void)
       __gen_e_acsl_and_19 = __gen_e_acsl_and_18;
     }
     else __gen_e_acsl_and_19 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_19,1,"Assertion","main",
-                    "!\\valid(tarr[0].p) && \\valid(tarr[0].q)",
-                    "tests/temporal/t_struct.c",47);
+    __gen_e_acsl_assert_data_8.blocking = 1;
+    __gen_e_acsl_assert_data_8.kind = "Assertion";
+    __gen_e_acsl_assert_data_8.pred_txt = "!\\valid(tarr[0].p) && \\valid(tarr[0].q)";
+    __gen_e_acsl_assert_data_8.file = "tests/temporal/t_struct.c";
+    __gen_e_acsl_assert_data_8.fct = "main";
+    __gen_e_acsl_assert_data_8.line = 47;
+    __e_acsl_assert(__gen_e_acsl_and_19,& __gen_e_acsl_assert_data_8);
   }
   /*@ assert !\valid(tarr[0].p) && \valid(tarr[0].q); */ ;
   __e_acsl_initialize((void *)(larr),sizeof(larger));
@@ -296,6 +344,8 @@ int main(void)
     int __gen_e_acsl_initialized_14;
     int __gen_e_acsl_and_20;
     int __gen_e_acsl_and_22;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
+      {.values = (void *)0};
     __gen_e_acsl_initialized_14 = __e_acsl_initialized((void *)(& larr[0].t.p),
                                                        sizeof(char *));
     if (__gen_e_acsl_initialized_14) {
@@ -324,9 +374,13 @@ int main(void)
       __gen_e_acsl_and_22 = __gen_e_acsl_and_21;
     }
     else __gen_e_acsl_and_22 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_22,1,"Assertion","main",
-                    "!\\valid(larr[0].t.p) && \\valid(larr[0].t.q)",
-                    "tests/temporal/t_struct.c",50);
+    __gen_e_acsl_assert_data_9.blocking = 1;
+    __gen_e_acsl_assert_data_9.kind = "Assertion";
+    __gen_e_acsl_assert_data_9.pred_txt = "!\\valid(larr[0].t.p) && \\valid(larr[0].t.q)";
+    __gen_e_acsl_assert_data_9.file = "tests/temporal/t_struct.c";
+    __gen_e_acsl_assert_data_9.fct = "main";
+    __gen_e_acsl_assert_data_9.line = 50;
+    __e_acsl_assert(__gen_e_acsl_and_22,& __gen_e_acsl_assert_data_9);
   }
   /*@ assert !\valid(larr[0].t.p) && \valid(larr[0].t.q); */ ;
   __retres = 0;

@@ -35,28 +35,41 @@ int main(void)
     int __gen_e_acsl_size;
     int __gen_e_acsl_if;
     int __gen_e_acsl_valid;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_size = 1 * ((9 - 0) + 1);
     if (__gen_e_acsl_size <= 0) __gen_e_acsl_if = 0;
     else __gen_e_acsl_if = __gen_e_acsl_size;
     __gen_e_acsl_valid = __e_acsl_valid((void *)(p + 1 * 0),
                                         (size_t)__gen_e_acsl_if,(void *)p,
                                         (void *)(& p));
-    __e_acsl_assert(! __gen_e_acsl_valid,1,"Assertion","main",
-                    "!\\valid(p + (0 .. 9))","tests/bts/bts2406.c",10);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "!\\valid(p + (0 .. 9))";
+    __gen_e_acsl_assert_data.file = "tests/bts/bts2406.c";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 10;
+    __e_acsl_assert(! __gen_e_acsl_valid,& __gen_e_acsl_assert_data);
   }
   /*@ assert !\valid(p + (0 .. 9)); */ ;
   {
     int __gen_e_acsl_size_2;
     int __gen_e_acsl_if_2;
     int __gen_e_acsl_valid_2;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
     __gen_e_acsl_size_2 = 1 * ((9 - 0) + 1);
     if (__gen_e_acsl_size_2 <= 0) __gen_e_acsl_if_2 = 0;
     else __gen_e_acsl_if_2 = __gen_e_acsl_size_2;
     __gen_e_acsl_valid_2 = __e_acsl_valid((void *)(t + 1 * 0),
                                           (size_t)__gen_e_acsl_if_2,
                                           (void *)(t),(void *)0);
-    __e_acsl_assert(__gen_e_acsl_valid_2,1,"Assertion","main",
-                    "\\valid(&t[0 .. 9])","tests/bts/bts2406.c",11);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Assertion";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\valid(&t[0 .. 9])";
+    __gen_e_acsl_assert_data_2.file = "tests/bts/bts2406.c";
+    __gen_e_acsl_assert_data_2.fct = "main";
+    __gen_e_acsl_assert_data_2.line = 11;
+    __e_acsl_assert(__gen_e_acsl_valid_2,& __gen_e_acsl_assert_data_2);
   }
   /*@ assert \valid(&t[0 .. 9]); */ ;
   __retres = 0;

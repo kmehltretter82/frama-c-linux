@@ -43,11 +43,16 @@ int main(void)
   }
   {
     int __gen_e_acsl_initialized;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(buf),
                                                     sizeof(union msg));
-    __e_acsl_assert(__gen_e_acsl_initialized,1,"Assertion","main",
-                    "\\initialized((union msg *)((unsigned char *)buf))",
-                    "tests/bts/bts1304.i",32);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "\\initialized((union msg *)((unsigned char *)buf))";
+    __gen_e_acsl_assert_data.file = "tests/bts/bts1304.i";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 32;
+    __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data);
   }
   /*@ assert \initialized((union msg *)((unsigned char *)buf)); */ ;
   __retres = 0;

@@ -27,15 +27,35 @@ void __gen_e_acsl_loop(void)
 {
   {
     int __gen_e_acsl_valid;
-    __e_acsl_assert(global_i == 0,1,"Precondition","loop","global_i == 0",
-                    "tests/bts/bts1478.c",9);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Precondition";
+    __gen_e_acsl_assert_data.pred_txt = "global_i == 0";
+    __gen_e_acsl_assert_data.file = "tests/bts/bts1478.c";
+    __gen_e_acsl_assert_data.fct = "loop";
+    __gen_e_acsl_assert_data.line = 9;
+    __e_acsl_assert(global_i == 0,& __gen_e_acsl_assert_data);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
     __gen_e_acsl_valid = __e_acsl_valid((void *)global_i_ptr,sizeof(int),
                                         (void *)global_i_ptr,
                                         (void *)(& global_i_ptr));
-    __e_acsl_assert(__gen_e_acsl_valid,1,"Precondition","loop",
-                    "\\valid(global_i_ptr)","tests/bts/bts1478.c",10);
-    __e_acsl_assert(global_i_ptr == & global_i,1,"Precondition","loop",
-                    "global_i_ptr == &global_i","tests/bts/bts1478.c",11);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Precondition";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\valid(global_i_ptr)";
+    __gen_e_acsl_assert_data_2.file = "tests/bts/bts1478.c";
+    __gen_e_acsl_assert_data_2.fct = "loop";
+    __gen_e_acsl_assert_data_2.line = 10;
+    __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data_2);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "Precondition";
+    __gen_e_acsl_assert_data_3.pred_txt = "global_i_ptr == &global_i";
+    __gen_e_acsl_assert_data_3.file = "tests/bts/bts1478.c";
+    __gen_e_acsl_assert_data_3.fct = "loop";
+    __gen_e_acsl_assert_data_3.line = 11;
+    __e_acsl_assert(global_i_ptr == & global_i,& __gen_e_acsl_assert_data_3);
   }
   loop();
   return;

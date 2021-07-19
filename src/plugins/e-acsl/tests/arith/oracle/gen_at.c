@@ -22,17 +22,52 @@ void f(void)
        __gen_e_acsl_at_2 = A;
        A = 2;
      }
-  __e_acsl_assert(__gen_e_acsl_at == 0,1,"Assertion","f","\\at(A,Pre) == 0",
-                  "tests/arith/at.i",12);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "\\at(A,Pre) == 0";
+    __gen_e_acsl_assert_data.file = "tests/arith/at.i";
+    __gen_e_acsl_assert_data.fct = "f";
+    __gen_e_acsl_assert_data.line = 12;
+    __e_acsl_assert(__gen_e_acsl_at == 0,& __gen_e_acsl_assert_data);
+  }
   /*@ assert \at(A,Pre) == 0; */ ;
-  __e_acsl_assert(__gen_e_acsl_at_2 == 1,1,"Assertion","f","\\at(A,F) == 1",
-                  "tests/arith/at.i",13);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Assertion";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\at(A,F) == 1";
+    __gen_e_acsl_assert_data_2.file = "tests/arith/at.i";
+    __gen_e_acsl_assert_data_2.fct = "f";
+    __gen_e_acsl_assert_data_2.line = 13;
+    __e_acsl_assert(__gen_e_acsl_at_2 == 1,& __gen_e_acsl_assert_data_2);
+  }
   /*@ assert \at(A,F) == 1; */ ;
-  __e_acsl_assert(A == 2,1,"Assertion","f","\\at(A,Here) == 2",
-                  "tests/arith/at.i",14);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "Assertion";
+    __gen_e_acsl_assert_data_3.pred_txt = "\\at(A,Here) == 2";
+    __gen_e_acsl_assert_data_3.file = "tests/arith/at.i";
+    __gen_e_acsl_assert_data_3.fct = "f";
+    __gen_e_acsl_assert_data_3.line = 14;
+    __e_acsl_assert(A == 2,& __gen_e_acsl_assert_data_3);
+  }
   /*@ assert \at(A,Here) == 2; */ ;
-  __e_acsl_assert(__gen_e_acsl_at_4 == 0,1,"Assertion","f",
-                  "\\at(\\at(A,Pre),F) == 0","tests/arith/at.i",15);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_4.blocking = 1;
+    __gen_e_acsl_assert_data_4.kind = "Assertion";
+    __gen_e_acsl_assert_data_4.pred_txt = "\\at(\\at(A,Pre),F) == 0";
+    __gen_e_acsl_assert_data_4.file = "tests/arith/at.i";
+    __gen_e_acsl_assert_data_4.fct = "f";
+    __gen_e_acsl_assert_data_4.line = 15;
+    __e_acsl_assert(__gen_e_acsl_at_4 == 0,& __gen_e_acsl_assert_data_4);
+  }
   /*@ assert \at(\at(A,Pre),F) == 0; */ ;
   A = 3;
   return;
@@ -55,19 +90,33 @@ void g(int *p, int *q)
   {
     {
       int __gen_e_acsl_valid_read_3;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+        {.values = (void *)0};
       __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)q,sizeof(int),
                                                       (void *)q,
                                                       (void *)(& q));
-      __e_acsl_assert(__gen_e_acsl_valid_read_3,1,"RTE","g",
-                      "mem_access: \\valid_read(q)","tests/arith/at.i",31);
+      __gen_e_acsl_assert_data_5.blocking = 1;
+      __gen_e_acsl_assert_data_5.kind = "RTE";
+      __gen_e_acsl_assert_data_5.pred_txt = "mem_access: \\valid_read(q)";
+      __gen_e_acsl_assert_data_5.file = "tests/arith/at.i";
+      __gen_e_acsl_assert_data_5.fct = "g";
+      __gen_e_acsl_assert_data_5.line = 31;
+      __e_acsl_assert(__gen_e_acsl_valid_read_3,& __gen_e_acsl_assert_data_5);
       __gen_e_acsl_at_3 = *q;
     }
     {
       int __gen_e_acsl_valid_read;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+        {.values = (void *)0};
       __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)q,sizeof(int),
                                                     (void *)q,(void *)(& q));
-      __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","g",
-                      "mem_access: \\valid_read(q)","tests/arith/at.i",29);
+      __gen_e_acsl_assert_data_2.blocking = 1;
+      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.pred_txt = "mem_access: \\valid_read(q)";
+      __gen_e_acsl_assert_data_2.file = "tests/arith/at.i";
+      __gen_e_acsl_assert_data_2.fct = "g";
+      __gen_e_acsl_assert_data_2.line = 29;
+      __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_2);
       __gen_e_acsl_at = *q;
     }
     __e_acsl_initialize((void *)p,sizeof(int));
@@ -81,33 +130,59 @@ void g(int *p, int *q)
   {
     {
       int __gen_e_acsl_valid_read_2;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+        {.values = (void *)0};
       __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(p + __gen_e_acsl_at),
                                                       sizeof(int),(void *)p,
                                                       (void *)(& p));
-      __e_acsl_assert(__gen_e_acsl_valid_read_2,1,"RTE","g",
-                      "mem_access: \\valid_read(p + __gen_e_acsl_at)",
-                      "tests/arith/at.i",29);
+      __gen_e_acsl_assert_data_3.blocking = 1;
+      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.pred_txt = "mem_access: \\valid_read(p + __gen_e_acsl_at)";
+      __gen_e_acsl_assert_data_3.file = "tests/arith/at.i";
+      __gen_e_acsl_assert_data_3.fct = "g";
+      __gen_e_acsl_assert_data_3.line = 29;
+      __e_acsl_assert(__gen_e_acsl_valid_read_2,& __gen_e_acsl_assert_data_3);
       __gen_e_acsl_at_2 = *(p + __gen_e_acsl_at);
     }
     A = 4;
   }
-  __e_acsl_assert(__gen_e_acsl_at_2 == 2,1,"Assertion","g",
-                  "\\at(*(p + \\at(*q,__invalid_label)),L2) == 2",
-                  "tests/arith/at.i",29);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "\\at(*(p + \\at(*q,__invalid_label)),L2) == 2";
+    __gen_e_acsl_assert_data.file = "tests/arith/at.i";
+    __gen_e_acsl_assert_data.fct = "g";
+    __gen_e_acsl_assert_data.line = 29;
+    __e_acsl_assert(__gen_e_acsl_at_2 == 2,& __gen_e_acsl_assert_data);
+  }
   /*@ assert \at(*(p + \at(*q,__invalid_label)),L2) == 2; */ ;
   L3:
   /*@ assert \at(*(p + \at(*q,__invalid_label)),Here) == 2; */
   {
     int __gen_e_acsl_valid_read_4;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+      {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+      {.values = (void *)0};
     __gen_e_acsl_valid_read_4 = __e_acsl_valid_read((void *)(p + __gen_e_acsl_at_3),
                                                     sizeof(int),(void *)p,
                                                     (void *)(& p));
-    __e_acsl_assert(__gen_e_acsl_valid_read_4,1,"RTE","g",
-                    "mem_access: \\valid_read(p + __gen_e_acsl_at_3)",
-                    "tests/arith/at.i",31);
-    __e_acsl_assert(*(p + __gen_e_acsl_at_3) == 2,1,"Assertion","g",
-                    "\\at(*(p + \\at(*q,__invalid_label)),Here) == 2",
-                    "tests/arith/at.i",31);
+    __gen_e_acsl_assert_data_6.blocking = 1;
+    __gen_e_acsl_assert_data_6.kind = "RTE";
+    __gen_e_acsl_assert_data_6.pred_txt = "mem_access: \\valid_read(p + __gen_e_acsl_at_3)";
+    __gen_e_acsl_assert_data_6.file = "tests/arith/at.i";
+    __gen_e_acsl_assert_data_6.fct = "g";
+    __gen_e_acsl_assert_data_6.line = 31;
+    __e_acsl_assert(__gen_e_acsl_valid_read_4,& __gen_e_acsl_assert_data_6);
+    __gen_e_acsl_assert_data_4.blocking = 1;
+    __gen_e_acsl_assert_data_4.kind = "Assertion";
+    __gen_e_acsl_assert_data_4.pred_txt = "\\at(*(p + \\at(*q,__invalid_label)),Here) == 2";
+    __gen_e_acsl_assert_data_4.file = "tests/arith/at.i";
+    __gen_e_acsl_assert_data_4.fct = "g";
+    __gen_e_acsl_assert_data_4.line = 31;
+    __e_acsl_assert(*(p + __gen_e_acsl_at_3) == 2,
+                    & __gen_e_acsl_assert_data_4);
   }
   __e_acsl_delete_block((void *)(& q));
   __e_acsl_delete_block((void *)(& p));
@@ -143,22 +218,59 @@ int main(void)
     __gen_e_acsl_at_3 = (long)x;
     __gen_e_acsl_at_2 = x + 1L;
     __gen_e_acsl_at = x;
-    __e_acsl_assert(x == 0,1,"Assertion","main","x == 0","tests/arith/at.i",
-                    48);
+    {
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data =
+        {.values = (void *)0};
+      __gen_e_acsl_assert_data.blocking = 1;
+      __gen_e_acsl_assert_data.kind = "Assertion";
+      __gen_e_acsl_assert_data.pred_txt = "x == 0";
+      __gen_e_acsl_assert_data.file = "tests/arith/at.i";
+      __gen_e_acsl_assert_data.fct = "main";
+      __gen_e_acsl_assert_data.line = 48;
+      __e_acsl_assert(x == 0,& __gen_e_acsl_assert_data);
+    }
   }
   __e_acsl_full_init((void *)(& x));
   x = 1;
   __e_acsl_full_init((void *)(& x));
   x = 2;
   __gen_e_acsl_f();
-  __e_acsl_assert(__gen_e_acsl_at == 0,1,"Assertion","main",
-                  "\\at(x,__invalid_label) == 0","tests/arith/at.i",54);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Assertion";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\at(x,__invalid_label) == 0";
+    __gen_e_acsl_assert_data_2.file = "tests/arith/at.i";
+    __gen_e_acsl_assert_data_2.fct = "main";
+    __gen_e_acsl_assert_data_2.line = 54;
+    __e_acsl_assert(__gen_e_acsl_at == 0,& __gen_e_acsl_assert_data_2);
+  }
   /*@ assert \at(x,__invalid_label) == 0; */ ;
-  __e_acsl_assert(__gen_e_acsl_at_2 == 1L,1,"Assertion","main",
-                  "\\at(x + 1,__invalid_label) == 1","tests/arith/at.i",55);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "Assertion";
+    __gen_e_acsl_assert_data_3.pred_txt = "\\at(x + 1,__invalid_label) == 1";
+    __gen_e_acsl_assert_data_3.file = "tests/arith/at.i";
+    __gen_e_acsl_assert_data_3.fct = "main";
+    __gen_e_acsl_assert_data_3.line = 55;
+    __e_acsl_assert(__gen_e_acsl_at_2 == 1L,& __gen_e_acsl_assert_data_3);
+  }
   /*@ assert \at(x + 1,__invalid_label) == 1; */ ;
-  __e_acsl_assert(__gen_e_acsl_at_3 + 1L == 1L,1,"Assertion","main",
-                  "\\at(x,__invalid_label) + 1 == 1","tests/arith/at.i",56);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+      {.values = (void *)0};
+    __gen_e_acsl_assert_data_4.blocking = 1;
+    __gen_e_acsl_assert_data_4.kind = "Assertion";
+    __gen_e_acsl_assert_data_4.pred_txt = "\\at(x,__invalid_label) + 1 == 1";
+    __gen_e_acsl_assert_data_4.file = "tests/arith/at.i";
+    __gen_e_acsl_assert_data_4.fct = "main";
+    __gen_e_acsl_assert_data_4.line = 56;
+    __e_acsl_assert(__gen_e_acsl_at_3 + 1L == 1L,
+                    & __gen_e_acsl_assert_data_4);
+  }
   /*@ assert \at(x,__invalid_label) + 1 == 1; */ ;
   g(t,& x);
   __retres = 0;
@@ -177,11 +289,19 @@ int __gen_e_acsl_h(int x)
   __e_acsl_store_block((void *)(& x),(size_t)4);
   __gen_e_acsl_at = x;
   __retres = h(x);
-  __e_acsl_assert(__retres == __gen_e_acsl_at,1,"Postcondition","h",
-                  "\\result == \\old(x)","tests/arith/at.i",38);
-  __e_acsl_delete_block((void *)(& x));
-  __e_acsl_delete_block((void *)(& __retres));
-  return __retres;
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Postcondition";
+    __gen_e_acsl_assert_data.pred_txt = "\\result == \\old(x)";
+    __gen_e_acsl_assert_data.file = "tests/arith/at.i";
+    __gen_e_acsl_assert_data.fct = "h";
+    __gen_e_acsl_assert_data.line = 38;
+    __e_acsl_assert(__retres == __gen_e_acsl_at,& __gen_e_acsl_assert_data);
+    __e_acsl_delete_block((void *)(& x));
+    __e_acsl_delete_block((void *)(& __retres));
+    return __retres;
+  }
 }
 
 /*@ ensures \at(A,Post) == 3; */
@@ -189,10 +309,18 @@ void __gen_e_acsl_f(void)
 {
   int __gen_e_acsl_at;
   f();
-  __gen_e_acsl_at = A;
-  __e_acsl_assert(__gen_e_acsl_at == 3,1,"Postcondition","f",
-                  "\\at(A,Post) == 3","tests/arith/at.i",7);
-  return;
+  {
+    __gen_e_acsl_at = A;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Postcondition";
+    __gen_e_acsl_assert_data.pred_txt = "\\at(A,Post) == 3";
+    __gen_e_acsl_assert_data.file = "tests/arith/at.i";
+    __gen_e_acsl_assert_data.fct = "f";
+    __gen_e_acsl_assert_data.line = 7;
+    __e_acsl_assert(__gen_e_acsl_at == 3,& __gen_e_acsl_assert_data);
+    return;
+  }
 }
 
 

@@ -20,46 +20,77 @@ int main(void)
   int n = -2;
   {
     long __gen_e_acsl_u;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_u = n * (long)n;
-    __e_acsl_assert(__gen_e_acsl_u >= 0L,1,"Assertion","main",
-                    "\\let u = n * n; u >= 0","tests/arith/let.c",7);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "\\let u = n * n; u >= 0";
+    __gen_e_acsl_assert_data.file = "tests/arith/let.c";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 7;
+    __e_acsl_assert(__gen_e_acsl_u >= 0L,& __gen_e_acsl_assert_data);
   }
   /*@ assert \let u = n * n; u >= 0; */ ;
   {
     long __gen_e_acsl_u_2;
     long __gen_e_acsl_v;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
     __gen_e_acsl_u_2 = n * (long)n;
     __gen_e_acsl_v = __gen_e_acsl_u_2 + 1L;
-    __e_acsl_assert(__gen_e_acsl_u_2 > 0L,1,"Assertion","main",
-                    "\\let u = n * n;\n\\let v = u + 1; u > 0",
-                    "tests/arith/let.c",9);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Assertion";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\let u = n * n;\n\\let v = u + 1; u > 0";
+    __gen_e_acsl_assert_data_2.file = "tests/arith/let.c";
+    __gen_e_acsl_assert_data_2.fct = "main";
+    __gen_e_acsl_assert_data_2.line = 9;
+    __e_acsl_assert(__gen_e_acsl_u_2 > 0L,& __gen_e_acsl_assert_data_2);
   }
   /*@ assert \let u = n * n; \let v = u + 1; u > 0; */ ;
   {
     int __gen_e_acsl_u_3;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
     __gen_e_acsl_u_3 = 1;
-    __e_acsl_assert(__gen_e_acsl_u_3 + 1 == 2,1,"Assertion","main",
-                    "(\\let u = 1; u) + 1 == 2","tests/arith/let.c",13);
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "Assertion";
+    __gen_e_acsl_assert_data_3.pred_txt = "(\\let u = 1; u) + 1 == 2";
+    __gen_e_acsl_assert_data_3.file = "tests/arith/let.c";
+    __gen_e_acsl_assert_data_3.fct = "main";
+    __gen_e_acsl_assert_data_3.line = 13;
+    __e_acsl_assert(__gen_e_acsl_u_3 + 1 == 2,& __gen_e_acsl_assert_data_3);
   }
   /*@ assert (\let u = 1; u) + 1 == 2; */ ;
   {
     int __gen_e_acsl_u_4;
     int __gen_e_acsl_v_2;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+      {.values = (void *)0};
     __gen_e_acsl_u_4 = 1;
     __gen_e_acsl_v_2 = __gen_e_acsl_u_4 + 1;
-    __e_acsl_assert(__gen_e_acsl_v_2 == 2,1,"Assertion","main",
-                    "\\let u = 1; (\\let v = u + 1; v) == 2",
-                    "tests/arith/let.c",15);
+    __gen_e_acsl_assert_data_4.blocking = 1;
+    __gen_e_acsl_assert_data_4.kind = "Assertion";
+    __gen_e_acsl_assert_data_4.pred_txt = "\\let u = 1; (\\let v = u + 1; v) == 2";
+    __gen_e_acsl_assert_data_4.file = "tests/arith/let.c";
+    __gen_e_acsl_assert_data_4.fct = "main";
+    __gen_e_acsl_assert_data_4.line = 15;
+    __e_acsl_assert(__gen_e_acsl_v_2 == 2,& __gen_e_acsl_assert_data_4);
   }
   /*@ assert \let u = 1; (\let v = u + 1; v) == 2; */ ;
   {
     int __gen_e_acsl_u_5;
     int __gen_e_acsl_u_6;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+      {.values = (void *)0};
     __gen_e_acsl_u_5 = 1;
     __gen_e_acsl_u_6 = __gen_e_acsl_u_5 + 1;
-    __e_acsl_assert(__gen_e_acsl_u_6 == 2,1,"Assertion","main",
-                    "\\let u = 1; (\\let u = u + 1; u) == 2",
-                    "tests/arith/let.c",19);
+    __gen_e_acsl_assert_data_5.blocking = 1;
+    __gen_e_acsl_assert_data_5.kind = "Assertion";
+    __gen_e_acsl_assert_data_5.pred_txt = "\\let u = 1; (\\let u = u + 1; u) == 2";
+    __gen_e_acsl_assert_data_5.file = "tests/arith/let.c";
+    __gen_e_acsl_assert_data_5.fct = "main";
+    __gen_e_acsl_assert_data_5.line = 19;
+    __e_acsl_assert(__gen_e_acsl_u_6 == 2,& __gen_e_acsl_assert_data_5);
   }
   /*@ assert \let u = 1; (\let u = u + 1; u) == 2; */ ;
   long m = 0x7fffffffffffffffL;
@@ -69,6 +100,8 @@ int main(void)
     __e_acsl_mpz_t __gen_e_acsl_mul;
     __e_acsl_mpz_t __gen_e_acsl_m;
     int __gen_e_acsl_gt;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+      {.values = (void *)0};
     __gen_e_acsl_u_7 = m;
     __gmpz_init_set_si(__gen_e_acsl_u_8,__gen_e_acsl_u_7);
     __gmpz_init(__gen_e_acsl_mul);
@@ -78,8 +111,13 @@ int main(void)
     __gmpz_init_set_si(__gen_e_acsl_m,m);
     __gen_e_acsl_gt = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_mul),
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_m));
-    __e_acsl_assert(__gen_e_acsl_gt > 0,1,"Assertion","main",
-                    "(\\let u = m; u * u) > m","tests/arith/let.c",24);
+    __gen_e_acsl_assert_data_6.blocking = 1;
+    __gen_e_acsl_assert_data_6.kind = "Assertion";
+    __gen_e_acsl_assert_data_6.pred_txt = "(\\let u = m; u * u) > m";
+    __gen_e_acsl_assert_data_6.file = "tests/arith/let.c";
+    __gen_e_acsl_assert_data_6.fct = "main";
+    __gen_e_acsl_assert_data_6.line = 24;
+    __e_acsl_assert(__gen_e_acsl_gt > 0,& __gen_e_acsl_assert_data_6);
     __gmpz_clear(__gen_e_acsl_u_8);
     __gmpz_clear(__gen_e_acsl_mul);
     __gmpz_clear(__gen_e_acsl_m);
@@ -88,9 +126,16 @@ int main(void)
   char c = (char)'a';
   {
     int __gen_e_acsl_u_9;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
+      {.values = (void *)0};
     __gen_e_acsl_u_9 = 'b';
-    __e_acsl_assert((int)c < __gen_e_acsl_u_9,1,"Assertion","main",
-                    "\\let u = \'b\'; c < u","tests/arith/let.c",27);
+    __gen_e_acsl_assert_data_7.blocking = 1;
+    __gen_e_acsl_assert_data_7.kind = "Assertion";
+    __gen_e_acsl_assert_data_7.pred_txt = "\\let u = \'b\'; c < u";
+    __gen_e_acsl_assert_data_7.file = "tests/arith/let.c";
+    __gen_e_acsl_assert_data_7.fct = "main";
+    __gen_e_acsl_assert_data_7.line = 27;
+    __e_acsl_assert((int)c < __gen_e_acsl_u_9,& __gen_e_acsl_assert_data_7);
   }
   /*@ assert \let u = 'b'; c < u; */ ;
   float f = 1.0f;
@@ -98,24 +143,45 @@ int main(void)
   __e_acsl_full_init((void *)(& f));
   {
     float __gen_e_acsl_u_10;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+      {.values = (void *)0};
     __gen_e_acsl_u_10 = f;
-    __e_acsl_assert(__gen_e_acsl_u_10 == f,1,"Assertion","main",
-                    "\\let u = f; u == f","tests/arith/let.c",30);
+    __gen_e_acsl_assert_data_8.blocking = 1;
+    __gen_e_acsl_assert_data_8.kind = "Assertion";
+    __gen_e_acsl_assert_data_8.pred_txt = "\\let u = f; u == f";
+    __gen_e_acsl_assert_data_8.file = "tests/arith/let.c";
+    __gen_e_acsl_assert_data_8.fct = "main";
+    __gen_e_acsl_assert_data_8.line = 30;
+    __e_acsl_assert(__gen_e_acsl_u_10 == f,& __gen_e_acsl_assert_data_8);
   }
   /*@ assert \let u = f; u == f; */ ;
   int t[4] = {1, 2, 3, 4};
   {
     int * /*[4]*/ __gen_e_acsl_u_11;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
+      {.values = (void *)0};
     __gen_e_acsl_u_11 = & t[1];
-    __e_acsl_assert(1,1,"Assertion","main","\\let u = &t[1]; 1 == 1",
-                    "tests/arith/let.c",34);
+    __gen_e_acsl_assert_data_9.blocking = 1;
+    __gen_e_acsl_assert_data_9.kind = "Assertion";
+    __gen_e_acsl_assert_data_9.pred_txt = "\\let u = &t[1]; 1 == 1";
+    __gen_e_acsl_assert_data_9.file = "tests/arith/let.c";
+    __gen_e_acsl_assert_data_9.fct = "main";
+    __gen_e_acsl_assert_data_9.line = 34;
+    __e_acsl_assert(1,& __gen_e_acsl_assert_data_9);
   }
   /*@ assert \let u = &t[1]; 1 == 1; */ ;
   {
     int * /*[4]*/ __gen_e_acsl_u_12;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
+      {.values = (void *)0};
     __gen_e_acsl_u_12 = & t[1];
-    __e_acsl_assert(1,1,"Assertion","main","(\\let u = &t[1]; 1) == 1",
-                    "tests/arith/let.c",36);
+    __gen_e_acsl_assert_data_10.blocking = 1;
+    __gen_e_acsl_assert_data_10.kind = "Assertion";
+    __gen_e_acsl_assert_data_10.pred_txt = "(\\let u = &t[1]; 1) == 1";
+    __gen_e_acsl_assert_data_10.file = "tests/arith/let.c";
+    __gen_e_acsl_assert_data_10.fct = "main";
+    __gen_e_acsl_assert_data_10.line = 36;
+    __e_acsl_assert(1,& __gen_e_acsl_assert_data_10);
   }
   /*@ assert (\let u = &t[1]; 1) == 1; */ ;
   struct __anonstruct_r_1 r = {.x = 1, .y = 2};
@@ -123,18 +189,32 @@ int main(void)
   __e_acsl_full_init((void *)(& r));
   {
     struct __anonstruct_r_1 __gen_e_acsl_u_13;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
+      {.values = (void *)0};
     __gen_e_acsl_u_13 = r;
-    __e_acsl_assert(__gen_e_acsl_u_13.x + (long)__gen_e_acsl_u_13.y == 3L,1,
-                    "Assertion","main","\\let u = r; u.x + u.y == 3",
-                    "tests/arith/let.c",41);
+    __gen_e_acsl_assert_data_11.blocking = 1;
+    __gen_e_acsl_assert_data_11.kind = "Assertion";
+    __gen_e_acsl_assert_data_11.pred_txt = "\\let u = r; u.x + u.y == 3";
+    __gen_e_acsl_assert_data_11.file = "tests/arith/let.c";
+    __gen_e_acsl_assert_data_11.fct = "main";
+    __gen_e_acsl_assert_data_11.line = 41;
+    __e_acsl_assert(__gen_e_acsl_u_13.x + (long)__gen_e_acsl_u_13.y == 3L,
+                    & __gen_e_acsl_assert_data_11);
   }
   /*@ assert \let u = r; u.x + u.y == 3; */ ;
   s.x = 5;
   {
     union __anonunion_s_2 __gen_e_acsl_u_14;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_12 =
+      {.values = (void *)0};
     __gen_e_acsl_u_14 = s;
-    __e_acsl_assert(__gen_e_acsl_u_14.x > 0,1,"Assertion","main",
-                    "(\\let u = s; u.x) > 0","tests/arith/let.c",48);
+    __gen_e_acsl_assert_data_12.blocking = 1;
+    __gen_e_acsl_assert_data_12.kind = "Assertion";
+    __gen_e_acsl_assert_data_12.pred_txt = "(\\let u = s; u.x) > 0";
+    __gen_e_acsl_assert_data_12.file = "tests/arith/let.c";
+    __gen_e_acsl_assert_data_12.fct = "main";
+    __gen_e_acsl_assert_data_12.line = 48;
+    __e_acsl_assert(__gen_e_acsl_u_14.x > 0,& __gen_e_acsl_assert_data_12);
   }
   /*@ assert (\let u = s; u.x) > 0; */ ;
   __retres = 0;
