@@ -237,13 +237,14 @@ const renderPriority: Renderer<boolean> =
 const renderTaint: Renderer<any> =
   (taint: States.Tag) => {
     let id = null;
+    let color = "black";
     switch (taint.name) {
-      case 'not_tainted': id="CHECK"; break;
-      case 'tainted': id="CROSS"; break;
+      case 'not_tainted': id="DROP.EMPTY"; color="#00B900"; break;
+      case 'tainted': id="DROP.FILLED"; color="#FF8300"; break;
       case 'error': id="HELP"; break;
       default: ;
     }
-    return (id ? <Icon id={id} title={taint.descr}/> : null)
+    return (id ? <Icon id={id} fill={color} title={taint.descr}/> : null)
   };
 
 function ColumnCode<Row>(props: ColumnProps<Row, string>) {
