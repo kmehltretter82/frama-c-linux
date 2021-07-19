@@ -1267,7 +1267,6 @@ and generalized_untyped_predicate_to_exp
      predicate, and the typing environment must be kept. *)
   let rte = match rte with None -> Env.generate_rte env | Some b -> b in
   let must_clear = match must_clear_typing with None -> rte | Some b -> b in
-  Typing.type_named_predicate ~must_clear p;
   let e, adata, env = predicate_to_exp ~adata ?name kf ~rte env p in
   assert (Typ.equal (Cil.typeOf e) Cil.intType);
   let env = Env.Logic_scope.reset env in
