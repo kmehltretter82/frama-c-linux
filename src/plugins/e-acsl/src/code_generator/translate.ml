@@ -1008,22 +1008,22 @@ and env_of_li ~adata li kf env loc =
 and predicate_content_to_exp ~adata ?name kf env p =
   let loc = p.pred_loc in
   match p.pred_content with
-  | Pfalse -> Cil.zero ~loc, adata, env
-  | Ptrue -> Cil.one ~loc, adata, env
-  | Papp(li, labels, args) ->
-    (* Simply use the implementation of Tapp(li, labels, args).
-       To achieve this, we create a clone of [li] for which the type is
-       transformed from [None] (type of predicates) to
-       [Some int] (type as a term). *)
-    let prj = Project.current () in
-    let o = object inherit Visitor.frama_c_copy prj end in
-    let li = Visitor.visitFramacLogicInfo o li in
-    let lty = Ctype Cil.intType in
-    li.l_type <- Some lty;
-    let tapp = Logic_const.term ~loc (Tapp(li, labels, args)) lty in
-    Typing.type_term ~use_gmp_opt:false ~ctx:Typing.c_int tapp;
-    let e, adata, env = term_to_exp ~adata kf env tapp in
-    e, adata, env
+  | Pfalse -> Cil.zero ~loc, env
+  | Ptrue -> Cil.one ~loc, env
+  | Papp _ -> Options.fatal "Reached applied predicate: %a" Printer.pp_predicate p;
+    (* (\* Simply use the implementation of Tapp(li, labels, args).
+     *    To achieve this, we create a clone of [li] for which the type is
+     *    transformed from [None] (type of predicates) to
+     *    [Some int] (type as a term). *\)
+     * let prj = Project.current () in
+     * let o = object inherit Visitor.frama_c_copy prj end in
+     * let li = Visitor.visitFramacLogicInfo o li in
+     * let lty = Ctype Cil.intType in
+     * li.l_type <- Some lty;
+     * let tapp = Logic_const.term ~loc (Tapp(li, labels, args)) lty in
+     * (\* Typing.type_term ~use_gmp_opt:false ~ctx:Typing.c_int tapp; *\)
+     * let e, env = term_to_exp kf env tapp in
+     * e, env *)
   | Pdangling _ -> Env.not_yet env "\\dangling"
   | Pobject_pointer _ -> Env.not_yet env "\\object_pointer"
   | Pvalid_function _ -> Env.not_yet env "\\valid_function"
@@ -1224,27 +1224,30 @@ and predicate_content_to_exp ~adata ?name kf env p =
   | Pfresh _ -> Env.not_yet env "\\fresh"
 
 and predicate_to_exp ~adata ?name kf ?rte env p =
-  let rte = match rte with None -> Env.generate_rte env | Some b -> b in
-  Extlib.flatten
-    (Env.with_rte_and_result env false
-       ~f:(fun env ->
-           let e, adata, env =
-             predicate_content_to_exp ~adata ?name kf env p
-           in
-           let env = if rte then translate_rte kf env e else env in
-           let cast = Typing.get_cast_of_predicate p in
-           Extlib.nest
-             adata
-             (Typed_number.add_cast
-                ~loc:p.pred_loc
-                ?name
-                env
-                kf
-                cast
-                Typed_number.C_number
-                None
-                e)
-         ))
+  match Preprocess_predicates.get_preprocessed_form p with
+  | PoT_term t -> term_to_exp kf env t
+  | PoT_pred p ->
+    let rte = match rte with None -> Env.generate_rte env | Some b -> b in
+    Extlib.flatten
+      (Env.with_rte_and_result env false
+         ~f:(fun env ->
+             let e, adata, env =
+               predicate_content_to_exp ~adata ?name kf env p
+             in
+             let env = if rte then translate_rte kf env e else env in
+             let cast = Typing.get_cast_of_predicate p in
+             Extlib.nest
+               adata
+               (Typed_number.add_cast
+                  ~loc:p.pred_loc
+                  ?name
+                  env
+                  kf
+                  cast
+                  Typed_number.C_number
+                  None
+                  e)
+           ))
 
 and generalized_untyped_predicate_to_exp
     ~adata
