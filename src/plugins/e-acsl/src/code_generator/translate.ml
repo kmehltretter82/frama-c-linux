@@ -1011,6 +1011,7 @@ and env_of_li ~adata li kf env loc =
    constructs. *)
 and predicate_content_to_exp ~adata ?name kf env p =
   let loc = p.pred_loc in
+  Cil.CurrentLoc.set loc;
   match p.pred_content with
   | Pfalse -> Cil.zero ~loc, env
   | Ptrue -> Cil.one ~loc, env

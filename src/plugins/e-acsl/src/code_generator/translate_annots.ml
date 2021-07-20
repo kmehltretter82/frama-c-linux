@@ -49,7 +49,10 @@ let must_translate_opt = function
 
 let () =
   Contract.must_translate_ppt_ref := must_translate;
-  Contract.must_translate_ppt_opt_ref := must_translate_opt
+  Contract.must_translate_ppt_opt_ref := must_translate_opt;
+  Preprocess_typing.must_translate_ref := must_translate;
+  Preprocess_typing.must_translate_opt_ref := must_translate_opt
+
 
 let pre_funspec kf kinstr env funspec =
   let unsupported f x = ignore (Env.handle_error (fun env -> f x; env) env) in
