@@ -116,13 +116,9 @@ let term_to_block ~loc kf env ret_ty ret_vi t =
     generate_return_block ~loc env ret_vi e
 
 let generate_body ~loc kf env ret_ty ret_vi = function
-  | LBnone | LBreads _ ->
-    Options.abort
-      "logic function or predicate without explicit definition are not part of \
-       E-ACSL"
   | LBterm t -> term_to_block ~loc kf env ret_ty ret_vi t
   | LBpred p -> pred_to_block ~loc kf env ret_vi p
-  | LBinductive _ -> Error.not_yet "inductive definition"
+  | LBnone |LBreads _ | LBinductive _ -> assert false
 
 (* Generate a kernel function from a given logic info [li] *)
 let generate_kf ~loc fname env ret_ty params_ty li =
@@ -357,15 +353,30 @@ let function_to_exp ~loc fname env kf t li params_ty args =
     ret_ty
     (fun vi _ -> [ Cil.mkStmtOneInstr ~valid_sid:true (mkcall vi) ])
 
+let raise_errors l = function
+  | LBnone -> Error.not_yet "logic functions or predicates \
+                             with no definition nor reads clause"
+  | LBreads _ ->
+    Error.not_yet "logic functions or predicates performing read accesses"
+  | LBinductive _ -> Error.not_yet "inductive logic functions"
+  | LBterm _
+  | LBpred _ ->
+    match l with
+    | [] -> ()
+    | _::_ -> Error.not_yet "logic functions or predicates with labels"
+
 let tapp_to_exp ~adata kf env ?eargs tapp =
   match tapp.term_node with
-  | Tapp(li, [], targs) ->
+  | Tapp(li, l, targs) ->
     let loc = tapp.term_loc in
     let fname = li.l_var_info.lv_name in
     (* build the varinfo (as an expression) which stores the result of the
        function call. *)
     let _, e, adata, env =
       if Builtins.mem li.l_var_info.lv_name then
+        match l with
+        | _::_ -> Error.not_yet "e-acsl builtin functions with labels"
+        | [] ->
         (* E-ACSL built-in function call *)
         let args, adata, env =
           match eargs with
@@ -400,6 +411,7 @@ let tapp_to_exp ~adata kf env ?eargs tapp =
         in
         vi, e, adata, env
       else
+        let () = raise_errors l li.l_body in
         (* build the arguments and compute the integer_ty of the parameters *)
         let params_ty, args, adata, env =
           let eargs, adata, env =
