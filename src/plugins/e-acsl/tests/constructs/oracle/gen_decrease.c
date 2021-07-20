@@ -261,6 +261,8 @@ int __gen_e_acsl_fact(int n)
   return __retres;
 }
 
+/*@ assigns \result;
+    assigns \result \from x, y; */
 int __gen_e_acsl_lexico(int x, int y)
 {
   int __gen_e_acsl_and;
