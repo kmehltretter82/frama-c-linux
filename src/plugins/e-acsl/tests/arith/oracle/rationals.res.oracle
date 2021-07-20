@@ -4,7 +4,8 @@
 [e-acsl] beginning translation.
 [e-acsl] Warning: R to float: double rounding might cause unsoundness
 [e-acsl] tests/arith/rationals.c:16: Warning: 
-  E-ACSL construct `predicate with no definition nor reads clause'
+  E-ACSL construct
+  `logic functions or predicates with no definition nor reads clause'
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
