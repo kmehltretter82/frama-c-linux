@@ -218,13 +218,13 @@ let generate_kf ~loc fname env ret_ty params_ty li =
            *__retres_arg[0] *)
         let vi_res = List.hd params_with_ret in
         Logic_const.new_identified_term
-        (Smart_term.array_at0 ~loc (Smart_term.deref ~loc (Logic_const.tvar (Cil.cvar_to_lvar vi_res))))
+          (Smart_term.array_at0 ~loc (Smart_term.deref ~loc (Logic_const.tvar (Cil.cvar_to_lvar vi_res))))
       else
         Logic_const.new_identified_term (Logic_const.tresult fundec.svar.vtype)
-      in
+    in
     let rec deref_all tm cty deps =
       if Smart_term.is_pointer_type cty then
-         deref_all (Smart_term.deref ~loc ~cty tm) (Smart_term.deref_cty cty) ((Logic_const.new_identified_term tm)::deps)
+        deref_all (Smart_term.deref ~loc ~cty tm) (Smart_term.deref_cty cty) ((Logic_const.new_identified_term tm)::deps)
       else
         (Logic_const.new_identified_term tm)::deps
     in
@@ -312,7 +312,7 @@ let add_generated_functions globals =
 (* Generate (and memoize) the function body and create the call to the
    generated function. *)
 let function_to_exp ~loc fname env kf t li params_ty args =
- let ret_ty = Typing.get_typ t (Env.Local_vars.get env) in
+  let ret_ty = Typing.get_typ t (Env.Local_vars.get env) in
   let gen tbl =
     let vi, kf, gen_body = generate_kf fname ~loc env ret_ty params_ty li in
     Typing.Params_ty.Hashtbl.add tbl params_ty kf;

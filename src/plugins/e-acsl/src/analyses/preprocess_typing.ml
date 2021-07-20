@@ -7,52 +7,52 @@ let must_translate_opt_ref : (Property.t option -> bool) ref =
 
 let type_requires v kf kinstr bhvr =
   if Cil.is_default_behavior bhvr then
-     List.iter
-     (fun ip_requires ->
-       if !must_translate_ref (Property.ip_of_requires kf kinstr bhvr ip_requires) then
-         let tp_requires = ip_requires.ip_content.tp_statement in
-         ignore (Visitor.visitFramacPredicate v tp_requires))
-     bhvr.b_requires
+    List.iter
+      (fun ip_requires ->
+         if !must_translate_ref (Property.ip_of_requires kf kinstr bhvr ip_requires) then
+           let tp_requires = ip_requires.ip_content.tp_statement in
+           ignore (Visitor.visitFramacPredicate v tp_requires))
+      bhvr.b_requires
   else
     List.iter
-    (fun ip_requires ->
-      if !must_translate_ref (Property.ip_of_requires kf kinstr bhvr ip_requires) then
-        let tp_requires = ip_requires.ip_content in
-        let pred_kind = tp_requires.tp_kind in
-        match pred_kind with
-        | Assert | Check ->
-        let requires = tp_requires.tp_statement in
-        ignore (Visitor.visitFramacPredicate v requires)
-        | Admit -> ())
+      (fun ip_requires ->
+         if !must_translate_ref (Property.ip_of_requires kf kinstr bhvr ip_requires) then
+           let tp_requires = ip_requires.ip_content in
+           let pred_kind = tp_requires.tp_kind in
+           match pred_kind with
+           | Assert | Check ->
+             let requires = tp_requires.tp_statement in
+             ignore (Visitor.visitFramacPredicate v requires)
+           | Admit -> ())
       bhvr.b_requires
 
 
 let type_post_conditions v kf kinstr bhvr =
   if Cil.is_default_behavior bhvr then
     List.iter
-    (fun ((termination, ip_post_cond) as tp) ->
-      if !must_translate_ref (Property.ip_of_ensures kf kinstr bhvr tp) then
-        let post_cond = ip_post_cond.ip_content.tp_statement in
-        match termination with
-        | Normal -> ignore (Visitor.visitFramacPredicate v post_cond)
-        | Exits | Breaks | Continues | Returns -> ())
-        bhvr.b_post_cond
+      (fun ((termination, ip_post_cond) as tp) ->
+         if !must_translate_ref (Property.ip_of_ensures kf kinstr bhvr tp) then
+           let post_cond = ip_post_cond.ip_content.tp_statement in
+           match termination with
+           | Normal -> ignore (Visitor.visitFramacPredicate v post_cond)
+           | Exits | Breaks | Continues | Returns -> ())
+      bhvr.b_post_cond
   else
     List.iter
-    (fun ((termination, ip_post_cond) as tp) ->
-      if !must_translate_ref (Property.ip_of_ensures kf kinstr bhvr tp) then
-        let tp_post_cond = ip_post_cond.ip_content in
-        let pred_kind = tp_post_cond.tp_kind in
-        match pred_kind with
-        | Assert | Check -> begin
-          let post_cond = tp_post_cond.tp_statement in
-          match termination with
-          | Normal ->
-          ignore (Visitor.visitFramacPredicate v post_cond)
-          | Exits | Breaks | Continues | Returns -> ()
-          end
-        | Admit -> ())
-        bhvr.b_post_cond
+      (fun ((termination, ip_post_cond) as tp) ->
+         if !must_translate_ref (Property.ip_of_ensures kf kinstr bhvr tp) then
+           let tp_post_cond = ip_post_cond.ip_content in
+           let pred_kind = tp_post_cond.tp_kind in
+           match pred_kind with
+           | Assert | Check -> begin
+               let post_cond = tp_post_cond.tp_statement in
+               match termination with
+               | Normal ->
+                 ignore (Visitor.visitFramacPredicate v post_cond)
+               | Exits | Breaks | Continues | Returns -> ()
+             end
+           | Admit -> ())
+      bhvr.b_post_cond
 
 
 let typer_visitor (lenv : Typing.Params_ty.t) = object (self)
@@ -120,13 +120,13 @@ let typer_visitor (lenv : Typing.Params_ty.t) = object (self)
     match annot.annot_content with
     | AAssert(_, _) | AVariant(_, _) ->
       let translate = try
-        !must_translate_ref (Property.ip_of_code_annot_single (Option.get self#current_kf) (Option.get self#current_stmt) annot)
+          !must_translate_ref (Property.ip_of_code_annot_single (Option.get self#current_kf) (Option.get self#current_stmt) annot)
         with Invalid_argument _ -> true
       in
-        if translate then
-          Cil.DoChildren
-        else
-          Cil.SkipChildren
+      if translate then
+        Cil.DoChildren
+      else
+        Cil.SkipChildren
     | AStmtSpec(l, _) ->
       if l <> [] then Cil.SkipChildren
       else Cil.DoChildren
@@ -135,7 +135,7 @@ let typer_visitor (lenv : Typing.Params_ty.t) = object (self)
         try !must_translate_ref (Property.ip_of_code_annot_single (Option.get self#current_kf) (Option.get self#current_stmt) annot)
         with Invalid_argument _ -> true
       in if translate then
-         if l <> [] then
+        if l <> [] then
           Cil.SkipChildren
         else Cil.DoChildren
       else Cil.SkipChildren

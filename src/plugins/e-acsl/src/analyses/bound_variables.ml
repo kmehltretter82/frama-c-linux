@@ -690,43 +690,43 @@ end
       | Dfun_or_pred _ -> Cil.DoChildren
       | _ -> Cil.SkipChildren
 
-   (* Ignore the annotations attached to statements from the RTL *)
-   method !vglob_aux =
-    function
-    (* library functions and built-ins *)
-    | GVarDecl(vi, _) | GVar(vi, _, _)
-    | GFunDecl(_, vi, _) | GFun({ svar = vi }, _) when Builtins.mem vi.vname ->
-      Cil.SkipChildren
+    (* Ignore the annotations attached to statements from the RTL *)
+    method !vglob_aux =
+      function
+      (* library functions and built-ins *)
+      | GVarDecl(vi, _) | GVar(vi, _, _)
+      | GFunDecl(_, vi, _) | GFun({ svar = vi }, _) when Builtins.mem vi.vname ->
+        Cil.SkipChildren
 
-    | GVarDecl(vi, _) | GVar(vi, _, _) | GFun({ svar = vi }, _)
-      when Misc.is_fc_or_compiler_builtin vi ->
-      Cil.SkipChildren
-    | g when Rtl.Symbols.mem_global g ->
-      Cil.SkipChildren
+      | GVarDecl(vi, _) | GVar(vi, _, _) | GFun({ svar = vi }, _)
+        when Misc.is_fc_or_compiler_builtin vi ->
+        Cil.SkipChildren
+      | g when Rtl.Symbols.mem_global g ->
+        Cil.SkipChildren
 
       (* generated function declaration: nothing to do *)
-    | GFunDecl(_, vi, _) when Misc.is_fc_stdlib_generated vi ->
-      Cil.SkipChildren
+      | GFunDecl(_, vi, _) when Misc.is_fc_stdlib_generated vi ->
+        Cil.SkipChildren
 
-    | GFun({svar = vi}, _) ->
-      let kf = try Globals.Functions.get vi with Not_found -> assert false in
-      if Functions.check kf then Cil.DoChildren else Cil.SkipChildren
+      | GFun({svar = vi}, _) ->
+        let kf = try Globals.Functions.get vi with Not_found -> assert false in
+        if Functions.check kf then Cil.DoChildren else Cil.SkipChildren
 
-    | GAnnot _ -> Cil.DoChildren
+      | GAnnot _ -> Cil.DoChildren
 
-    (* other globals: nothing to do *)
-    | GFunDecl _
-    | GVarDecl _
-    | GVar _
-    | GType _
-    | GCompTag _
-    | GCompTagDecl _
-    | GEnumTag _
-    | GEnumTagDecl _
-    | GAsm _
-    | GPragma _
-    | GText _
-      -> Cil.SkipChildren
+      (* other globals: nothing to do *)
+      | GFunDecl _
+      | GVarDecl _
+      | GVar _
+      | GType _
+      | GCompTag _
+      | GCompTagDecl _
+      | GEnumTag _
+      | GEnumTagDecl _
+      | GAsm _
+      | GPragma _
+      | GText _
+        -> Cil.SkipChildren
 
     method !vpredicate  p =
       let loc = p.pred_loc in

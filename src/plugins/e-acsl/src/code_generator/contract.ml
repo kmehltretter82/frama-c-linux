@@ -168,14 +168,14 @@ end
 (** Convert the given assumes clauses list to a single [predicate] *)
 let assumes_predicate env assumes =
   let p = List.fold_left
-    (fun acc p ->
-       let pred = p.ip_content.tp_statement in
-       let loc = pred.pred_loc in
-       Logic_const.pand ~loc
-         (acc,
-          Logic_const.unamed ~loc pred.pred_content))
-    Logic_const.ptrue
-    assumes
+      (fun acc p ->
+         let pred = p.ip_content.tp_statement in
+         let loc = pred.pred_loc in
+         Logic_const.pand ~loc
+           (acc,
+            Logic_const.unamed ~loc pred.pred_content))
+      Logic_const.ptrue
+      assumes
   in Preprocess_typing.preprocess_predicate (Env.Local_vars.get env) p; p
 
 let create ~loc spec =

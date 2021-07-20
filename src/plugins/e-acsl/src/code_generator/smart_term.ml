@@ -11,7 +11,7 @@ let is_pointer_type cty =
   | TComp (_,_,_)
   | TNamed (_,_)
   | TEnum (_,_)
-  -> false
+    -> false
   | TPtr(_,_)
   | TArray(_,_,_,_) -> true
 
@@ -27,8 +27,8 @@ let deref_cty cty =
   | TComp (_,_,_)
   | TNamed (_,_)
   | TEnum (_,_)
-  -> Options.fatal "recieved the type %a when a pointer type was expected"
-     Printer.pp_typ cty
+    -> Options.fatal "recieved the type %a when a pointer type was expected"
+         Printer.pp_typ cty
   | TPtr(cty,_) -> cty
   | TArray(cty,_,_,_) -> cty
 
@@ -36,13 +36,13 @@ let deref_cty cty =
 let deref_lty ?cty lty = match lty with
   | Lreal | Lvar _ | Larrow (_ , _) | Ltype (_ , _)->
     Options.fatal "recieved the type %a when a pointer type was expected"
-    Printer.pp_logic_type lty
+      Printer.pp_logic_type lty
   | Ctype cty -> Ctype (deref_cty cty)
   | Linteger ->
-   match cty with
-   | None -> Options.fatal "recieved the type %a when a pointer type was expected"
-             Printer.pp_logic_type lty
-   | Some cty -> Ctype (deref_cty cty)
+    match cty with
+    | None -> Options.fatal "recieved the type %a when a pointer type was expected"
+                Printer.pp_logic_type lty
+    | Some cty -> Ctype (deref_cty cty)
 
 
 let logic_type ?cty = function

@@ -42,24 +42,24 @@ end
 
 let preprocess ~loc p =
   match p.pred_content with
-    | Pvalid_read(BuiltinLabel Here as llabel, t)
-    | Pvalid(BuiltinLabel Here as llabel, t) -> begin
-        match t.term_node, t.term_type with
-        | TLval tlv, lty ->
-          let init =
-            Logic_const.pinitialized ~loc (llabel, Logic_utils.mk_logic_AddrOf ~loc tlv lty)
-          in
-          (* need to store a copy, to avoid p to appear in its own preprocessed form (otherwise it loops) *)
-          let p_copy =
-            match p.pred_content with
-            | Pvalid_read _ -> Logic_const.pvalid_read ~loc (llabel, t)
-            | Pvalid _ -> Logic_const.pvalid ~loc (llabel, t)
-            | _ -> assert false
-          in
-          Some (PoT_pred (Logic_const.pand ~loc (init, p_copy)))
-        | _ -> None
+  | Pvalid_read(BuiltinLabel Here as llabel, t)
+  | Pvalid(BuiltinLabel Here as llabel, t) -> begin
+      match t.term_node, t.term_type with
+      | TLval tlv, lty ->
+        let init =
+          Logic_const.pinitialized ~loc (llabel, Logic_utils.mk_logic_AddrOf ~loc tlv lty)
+        in
+        (* need to store a copy, to avoid p to appear in its own preprocessed form (otherwise it loops) *)
+        let p_copy =
+          match p.pred_content with
+          | Pvalid_read _ -> Logic_const.pvalid_read ~loc (llabel, t)
+          | Pvalid _ -> Logic_const.pvalid ~loc (llabel, t)
+          | _ -> assert false
+        in
+        Some (PoT_pred (Logic_const.pand ~loc (init, p_copy)))
+      | _ -> None
     end
-    | Papp(li, labels, args) ->
+  | Papp(li, labels, args) ->
     (* Simply use the implementation of Tapp(li, labels, args).
        To achieve this, we create a clone of [li] for which the type is
        transformed from [None] (type of predicates) to
@@ -71,7 +71,7 @@ let preprocess ~loc p =
     li.l_type <- Some lty;
     let tapp = Logic_const.term ~loc (Tapp(li, labels, args)) lty in
     Some (PoT_term tapp)
-    | _ -> None
+  | _ -> None
 
 let preprocessor = object
   inherit Visitor.frama_c_inplace
@@ -83,38 +83,38 @@ let preprocessor = object
     | Dfun_or_pred _ -> Cil.DoChildren
     | _ -> Cil.SkipChildren
 
- (* Ignore the annotations attached to statements from the RTL *)
- method !vglob_aux =
-  function
-  | g when Rtl.Symbols.mem_global g ->
-    Cil.SkipChildren
+  (* Ignore the annotations attached to statements from the RTL *)
+  method !vglob_aux =
+    function
+    | g when Rtl.Symbols.mem_global g ->
+      Cil.SkipChildren
 
-  | GFun({ svar = vi }, _) when Builtins.mem vi.vname ->
-    Cil.SkipChildren
+    | GFun({ svar = vi }, _) when Builtins.mem vi.vname ->
+      Cil.SkipChildren
 
-  | GFun({ svar = vi }, _)
-    when Misc.is_fc_or_compiler_builtin vi ->
-    Cil.SkipChildren
+    | GFun({ svar = vi }, _)
+      when Misc.is_fc_or_compiler_builtin vi ->
+      Cil.SkipChildren
 
-  | GFun({svar = vi}, _) ->
-    let kf = try Globals.Functions.get vi with Not_found -> assert false in
-    if Functions.check kf then Cil.DoChildren else Cil.SkipChildren
+    | GFun({svar = vi}, _) ->
+      let kf = try Globals.Functions.get vi with Not_found -> assert false in
+      if Functions.check kf then Cil.DoChildren else Cil.SkipChildren
 
-  | GAnnot _ -> Cil.DoChildren
+    | GAnnot _ -> Cil.DoChildren
 
-  (* other globals: nothing to do *)
-  | GFunDecl _
-  | GVarDecl _
-  | GVar _
-  | GType _
-  | GCompTag _
-  | GCompTagDecl _
-  | GEnumTag _
-  | GEnumTagDecl _
-  | GAsm _
-  | GPragma _
-  | GText _
-    -> Cil.SkipChildren
+    (* other globals: nothing to do *)
+    | GFunDecl _
+    | GVarDecl _
+    | GVar _
+    | GType _
+    | GCompTag _
+    | GCompTagDecl _
+    | GEnumTag _
+    | GEnumTagDecl _
+    | GAsm _
+    | GPragma _
+    | GText _
+      -> Cil.SkipChildren
 
   method !vpredicate  p =
     let loc = p.pred_loc in
