@@ -7,6 +7,14 @@
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:389: Warning: 
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:392: Warning: 
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:379: Warning: 
   E-ACSL construct `logic functions or predicates with labels'
   is not yet supported.
@@ -16,14 +24,6 @@
   Ignoring complete and disjoint behaviors annotations.
 [e-acsl] FRAMAC_SHARE/libc/string.h:378: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:389: Warning: 
-  E-ACSL construct `logic functions performing read accesses'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:392: Warning: 
-  E-ACSL construct `logic functions performing read accesses'
-  is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] tests/bts/bts2252.c:18: Warning: 
