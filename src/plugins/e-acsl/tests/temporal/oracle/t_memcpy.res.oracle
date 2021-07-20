@@ -5,14 +5,14 @@
 [e-acsl] Warning: annotating undefined function `memset':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-[e-acsl] FRAMAC_SHARE/libc/string.h:121: Warning:
+[e-acsl] FRAMAC_SHARE/libc/string.h:134: Warning:
   E-ACSL construct `user-defined logic type' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:101: Warning:
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:118: Warning:
+[e-acsl] FRAMAC_SHARE/libc/string.h:131: Warning:
   E-ACSL construct `logic functions or predicates with labels'
   is not yet supported.
   Ignoring annotation.

@@ -10,10 +10,7 @@ int main(int argc, char **argv)
     int __gen_e_acsl_exists;
     int __gen_e_acsl_x;
     __gen_e_acsl_exists = 0;
-    /*@ assert
-        Eva: signed_overflow: (unsigned int)((int)(-1)) + 1 ≤ 2147483647;
-    */
-    __gen_e_acsl_x = (unsigned int)(-1) + 1;
+    __gen_e_acsl_x = (unsigned int)(-1 + 1);
     while (1) {
       if (__gen_e_acsl_x < 5) ; else break;
       if (! (__gen_e_acsl_x == 0)) ;
@@ -33,7 +30,7 @@ int main(int argc, char **argv)
     int __gen_e_acsl_forall;
     int __gen_e_acsl_x_2;
     __gen_e_acsl_forall = 1;
-    __gen_e_acsl_x_2 = (unsigned int)(-1) + 1;
+    __gen_e_acsl_x_2 = (unsigned int)(-1 + 1);
     while (1) {
       if (__gen_e_acsl_x_2 < 5) ; else break;
       if (__gen_e_acsl_x_2 != 0) ;

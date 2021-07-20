@@ -40,7 +40,7 @@ int main(void)
     if (n > 0) __gen_e_acsl_if = 4; else __gen_e_acsl_if = 341;
     __gen_e_acsl_m = __gen_e_acsl_if;
     __gen_e_acsl_forall_2 = 1;
-    __gen_e_acsl_u = (char)1 + 1;
+    __gen_e_acsl_u = (char)(1 + 1);
     while (1) {
       {
         int __gen_e_acsl_and_2;

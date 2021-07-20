@@ -26,7 +26,7 @@ int search(int elt)
     int __gen_e_acsl_i;
     int __gen_e_acsl_and;
     __gen_e_acsl_forall = 1;
-    __gen_e_acsl_i = 0;
+    __gen_e_acsl_i = 0U;
     while (1) {
       if (__gen_e_acsl_i < k) ; else break;
       __e_acsl_assert(__gen_e_acsl_i < 10,1,"RTE","search",
@@ -72,7 +72,7 @@ int search(int elt)
       __e_acsl_assert(__gen_e_acsl_and_2,1,"Invariant","search",
                       "0 <= k <= 10","tests/examples/linear_search.i",17);
       __gen_e_acsl_forall_2 = 1;
-      __gen_e_acsl_i_2 = 0;
+      __gen_e_acsl_i_2 = 0U;
       while (1) {
         if (__gen_e_acsl_i_2 < k) ; else break;
         __e_acsl_assert(__gen_e_acsl_i_2 < 10,1,"RTE","search",
