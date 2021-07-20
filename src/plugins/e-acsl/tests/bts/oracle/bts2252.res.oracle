@@ -7,6 +7,10 @@
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:281: Warning: 
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:389: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
