@@ -385,7 +385,7 @@ end
 let emitter =
   Emitter.create
     "E_ACSL"
-    [ Emitter.Code_annot ]
+    [ Emitter.Code_annot ; Emitter.Funspec ]
     ~correctness:[ Options.Gmp_only.parameter ]
     ~tuning:[]
 

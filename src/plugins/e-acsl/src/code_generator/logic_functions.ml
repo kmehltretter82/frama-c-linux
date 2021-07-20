@@ -147,15 +147,15 @@ let generate_kf ~loc fname env ret_ty params_ty li =
       ([], [])
   in
   (* build the varinfo storing the result *)
-  let ret_vi, ret_ty, params_with_ret, params_ty_with_ret =
+  let ret_vi, ret_ty, params_with_ret, params_ty_with_ret, extra_arg =
     let vname = "__retres" in
     if result_as_extra_argument ret_ty then
       let ret_ty_ptr = TPtr(ret_ty, []) (* call by reference *) in
       let vname = vname ^ "_arg" in
       let vi = Cil.makeVarinfo false true vname ret_ty_ptr in
-      vi, Cil.voidType, vi :: params, (vname, ret_ty_ptr, []) :: params_ty_vi
+      vi, Cil.voidType, vi :: params, (vname, ret_ty_ptr, []) :: params_ty_vi, true
     else
-      Cil.makeVarinfo false false vname ret_ty, ret_ty, params, params_ty_vi
+      Cil.makeVarinfo false false vname ret_ty, ret_ty, params, params_ty_vi, false
   in
   (* build the function's varinfo *)
   let vi =
@@ -185,7 +185,8 @@ let generate_kf ~loc fname env ret_ty params_ty li =
   (* register the definition *)
   Globals.Functions.replace_by_definition spec fundec loc;
   (* create the kernel function itself *)
-  let kf = { fundec = Definition(fundec, loc); spec } in
+  let kf = Globals.Functions.get fundec.svar in
+  Annotations.register_funspec ~emitter:Env.emitter kf;
   (* closure generating the function's body.
      Delay its generation after filling the memoisation table (for termination
      of recursive function calls) *)
@@ -208,6 +209,27 @@ let generate_kf ~loc fname env ret_ty params_ty li =
       in
       List.fold_right2 add li.l_profile params env
     in
+    let assigned_var =
+      let loc = Location.unknown in
+      if extra_arg
+      then
+        (* If the result is passed as argument, it is of type __e_acsl_mpz_t
+           accessing the left value which is assigned is then done by
+           *__retres_arg[0] *)
+        let vi_res = List.hd params_with_ret in
+        Logic_const.new_identified_term
+        (Smart_term.array_at0 ~loc (Smart_term.deref ~loc (Logic_const.tvar (Cil.cvar_to_lvar vi_res))))
+      else
+        Logic_const.new_identified_term (Logic_const.tresult fundec.svar.vtype)
+      in
+    let rec deref_all tm cty deps =
+      if Smart_term.is_pointer_type cty then
+         deref_all (Smart_term.deref ~loc ~cty tm) (Smart_term.deref_cty cty) ((Logic_const.new_identified_term tm)::deps)
+      else
+        (Logic_const.new_identified_term tm)::deps
+    in
+    let deps = List.fold_right2 (fun lv (_,cty,_) -> deref_all (Logic_const.tvar lv) cty) li.l_profile params_ty_vi [] in
+    Annotations.add_assigns ~keep_empty:false Env.emitter ~behavior:Cil.default_behavior_name kf (Writes [ assigned_var , From deps]);
     let b, env = generate_body ~loc kf env ret_ty ret_vi li.l_body in
     fundec.sbody <- b;
     (* add the generated variables in the necessary lists *)
@@ -242,11 +264,6 @@ let generate_kf ~loc fname env ret_ty params_ty li =
 (***************************** Memoization ********************************)
 (**************************************************************************)
 
-(* module Params_ty =
- *   Datatype.List_with_collections
- *     (Typing.Datatype)
- *     (struct let module_name = "E_ACSL.Logic_functions.Params_ty" end) *)
-
 (* for each logic_info, associate its possible profiles, i.e. the types of its
    parameters + the generated varinfo for the function *)
 let memo_tbl:
@@ -266,7 +283,7 @@ let add_generated_functions globals =
             predicate *)
          let params = Logic_info.Hashtbl.find memo_tbl li in
          let add_fundecl kf acc =
-           GFunDecl(Cil.empty_funspec (), Kernel_function.get_vi kf, loc)
+           GFunDecl(Cil.empty_funspec() , Kernel_function.get_vi kf, loc)
            :: acc
          in
          aux (Typing.Params_ty.Hashtbl.fold_sorted (fun _ -> add_fundecl) params acc) l
