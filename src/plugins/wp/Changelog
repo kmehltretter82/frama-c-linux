@@ -21,7 +21,7 @@
 ###############################################################################
 
 #########################
-Plugin WP <next-release>
+Plugin WP 23.1 (Vanadium)
 #########################
 
 - WP          [2021-07-15] Fix a crash related to opaque structures memory typing

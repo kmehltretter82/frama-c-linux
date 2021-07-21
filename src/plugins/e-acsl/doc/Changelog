@@ -21,9 +21,9 @@
 #   configure   configure
 ###############################################################################
 
-############################
-Plugin E-ACSL <next-release>
-############################
+#############################
+Plugin E-ACSL 23.1 (Vanadium)
+#############################
 
 -* E-ACSL       [2021-07-19] Fix crash occurring when two or more successive
                 logic coercions were done in a term (frama-c/e-acsl#172).
