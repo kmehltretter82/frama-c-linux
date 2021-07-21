@@ -1,7 +1,7 @@
 opam-version: "2.0"
 name: "frama-c"
 synopsis: "Platform dedicated to the analysis of source code written in C"
-version: "23.0"
+version: "23.1"
 description:"""
 Frama-C gathers several analysis techniques in a single collaborative
 framework, based on analyzers (called "plug-ins") that can build upon the
@@ -99,7 +99,7 @@ install: [
 ]
 
 run-test: [
-  [make "-j%{jobs}%" "PTESTS_OPTS=-error-code" "tests"] { arch != "ppc64" }
+  [make "-j%{jobs}%" "PTESTS_OPTS=-error-code" "tests"] { arch != "ppc64" & arch != "x86_32" & arch != "arm32" }
   # tests are disabled on PPC64 due to floating-point oracle differences
   # (some ULPs in libc trigonometric functions) and due to the lack of
   # available hardware to test them locally
@@ -115,12 +115,12 @@ depends: [
   ( "alt-ergo-free" | "alt-ergo" )
   "conf-graphviz" { post }
   "conf-time" { with-test }
-  "ocaml" { >= "4.08.1" }
+  "ocaml" { >= "4.08.1" & < "4.13.0" }
   "ocamlfind" # needed beyond build stage, used by -load-module
   "ocamlgraph" { >= "1.8.8" }
   "why3" { >= "1.4.0" & < "1.5~" }
-  "yojson"
-  "zarith"
+  "yojson" {>= "1.6.0"}
+  "zarith" {>= "1.5"}
 ]
 
 depopts: [
