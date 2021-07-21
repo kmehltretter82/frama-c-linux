@@ -81,6 +81,7 @@
 /************************************************************************/
 
 #include "instrumentation_model/e_acsl_assert.h"
+#include "instrumentation_model/e_acsl_assert_data.h"
 #include "observation_model/e_acsl_heap.h"
 
 /* }}} */
