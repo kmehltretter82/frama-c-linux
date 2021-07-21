@@ -590,8 +590,14 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx ?(lenv=[]) t =
              ignore (type_term ~use_gmp_opt:true ?ctx ~lenv lambda);
              dup ty
            | [ ] | [ _ ] | [ _; _ ] | _ :: _ :: _ :: _ ->
-             Options.fatal "extended quantifier %a is not well formed"
-               Printer.pp_logic_var li.l_var_info)
+             (* Options.fatal "extended quantifier %a is not well formed"
+              *   Printer.pp_logic_var li.l_var_info *)
+             Error.not_yet "logic functions or predicates with no definition \
+                            nor reads clause"
+          )
+        (* TODO : improve error message to distinguish error messages
+           corresponding to unsupported primitives and wrong application of
+           supported primitive (one is a fatal and the other is a not_yet) *)
         | LBreads _ ->
           Error.not_yet "logic functions or predicates performing read accesses"
         | LBinductive _ ->
