@@ -24,11 +24,6 @@
 Plugin WP <next-release>
 #########################
 
-
-#########################
-Plugin WP 23.1 (Vanadium)
-#########################
-
 - WP          [2021-06-11] Adds an experimental support of "terminates" clauses.
                            Adds the options -wp-declaration-terminate and
                           -wp-frama-c-stdlib to claims that external functions
@@ -41,6 +36,10 @@ Plugin WP 23.1 (Vanadium)
                            requires are specified, can be disabled with new
                            option -wp-smoke-dead-assumes
 - TIP         [2021-05-31] Generalized Overflow tactic
+
+#########################
+Plugin WP 23.1 (Vanadium)
+#########################
 
 - WP          [2021-07-15] Fix a crash related to opaque structures memory typing
 
