@@ -49,7 +49,7 @@ struct eacsl_mpz_struct {
 };
 
 typedef struct eacsl_mpz_struct eacsl_mpz_struct;
-typedef eacsl_mpz_struct(__attribute__((__FC_BUILTIN__)) eacsl_mpz_t)[1];
+typedef eacsl_mpz_struct(__attribute__((FC_BUILTIN)) eacsl_mpz_t)[1];
 
 struct eacsl_mpq_struct {
   eacsl_mpz_struct _mp_num;
@@ -57,7 +57,7 @@ struct eacsl_mpq_struct {
 };
 
 typedef struct eacsl_mpq_struct eacsl_mpq_struct;
-typedef eacsl_mpq_struct(__attribute__((__FC_BUILTIN__)) eacsl_mpq_t)[1];
+typedef eacsl_mpq_struct(__attribute__((FC_BUILTIN)) eacsl_mpq_t)[1];
 
 /**
  * Counts of bits of a multi-precision number are represented in the C type

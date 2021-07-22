@@ -52,7 +52,7 @@
 
 /*! \brief Structure to hold pieces of information about function and statement
  * contracts at runtime. */
-typedef struct contract_t __attribute__((__FC_BUILTIN__)) contract_t;
+typedef struct contract_t __attribute__((FC_BUILTIN)) contract_t;
 
 /*! \brief Allocate and initialize a structure to hold pieces of information
  * about `size` behaviors.
