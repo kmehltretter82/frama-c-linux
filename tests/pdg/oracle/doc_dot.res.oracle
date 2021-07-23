@@ -16,7 +16,7 @@
 [from] Computing for function f
 [from] Done for function f
 [pdg] done for function g
-[pdg] dot file generated in tests/pdg/doc.g.dot
+[pdg] dot file generated in tests/pdg/result/doc.g.dot
 [pdg] PDG for g
  {n1}: InCtrl
  {n2}: VarDecl : x
