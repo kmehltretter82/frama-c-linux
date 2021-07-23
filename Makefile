@@ -2531,7 +2531,7 @@ endif
 	@#although it seems to segfault in 4.0 (but not in 4.1)
 	$(RM) file_list_to_archive.tmp
 	@$(foreach file,$(DISTRIB_FILES) $(DISTRIB_TESTS),\
-			echo $(file) | $(SED) 's/@/ /g' >> file_list_to_archive.tmp$(NEWLINE))
+			echo '$(file)' | $(SED) 's/@/ /g' >> file_list_to_archive.tmp$(NEWLINE))
 	$(TAR) -cf - --files-from file_list_to_archive.tmp | $(TAR) -C $(CLIENT_DIR) -xf -
 	$(RM) file_list_to_archive.tmp
 	$(PRINT_MAKING) files
