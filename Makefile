@@ -329,12 +329,17 @@ DISTRIB_FILES:=\
 
 # Test files to be included in the distribution (without header checking).
 # Plug-ins should use PLUGIN_DISTRIB_TESTS to export their test files.
-DISTRIB_TESTS=$(shell git ls-files \
+DISTRIB_TESTS=$(shell find \
                   tests \
                   src/plugins/aorai/tests \
                   src/plugins/report/tests \
-                  src/plugins/wp/tests | $(SED) 's/ /@/g')
-
+                  src/plugins/wp/tests \
+                  -type d -name result -prune -false \
+                  -o -type d -name 'result_*' -prune -false \
+                  -o -path 'tests/crowbar/*' -type d \! -name input -prune -false \
+                  -o -type f \! -name "*\.log" \! -name "*\.o" \
+                    \! -name '*~' \! -name "*\.cm*"  \! -name "*.sav" \
+                    -perm /u+w | sed -e 's/ /@/g')
 
 # files that are needed to compile API documentation of external plugins
 DOC_GEN_FILES:=$(addprefix doc/code/,\
@@ -2211,7 +2216,7 @@ check-headers: $(HDRCK) $(CHECK_NEWLINES) $(ISUTF8)
 	$(PRINT) "- FORBIDDEN_HEADERS=$(DISTRIB_PROPRIETARY_HEADERS)"
 	# Workaround to avoid "argument list too long" in Cygwin
 	$(file >distrib_files.tmp) $(foreach O,$(DISTRIB_FILES),$(file >>distrib_files.tmp,$O))
-	$(file >distrib_tests.tmp) $(foreach O,$(DISTRIB_TESTS),$(file >>distrib_tests.tmp,$O))
+	$(file >distrib_tests.tmp) $(foreach O,$(DISTRIB_TESTS),$(file >>distrib_tests.tmp,$(subst @, ,$(O))))
 	$(file >header_exceptions.tmp) $(foreach O,$(HEADER_EXCEPTIONS),$(file >>header_exceptions.tmp,$O))
 	echo "Checking that distributed files terminate with a newline..."
 	$(CHECK_NEWLINES) distrib_files.tmp $(FILES_WITHOUT_NEWLINE) $(BINARY_DISTRIB_FILES)
