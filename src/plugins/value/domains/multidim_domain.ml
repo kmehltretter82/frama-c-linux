@@ -231,7 +231,7 @@ struct
 end
 
 
-module DomainPrototype =
+module DomainLattice =
 struct
   (* The domain is essentially a map from bases to individual memory abstractions *)
   module Initial_Values = struct let v = [[]] end
@@ -241,17 +241,6 @@ struct
       (Base.Base) (Memory)
       (Hptmap.Comp_unused) (Initial_Values) (Deps)
 
-  type state = t
-  type value = Value.t
-  type base = Base.t
-  type offset = Location.offset
-  type memory = Memory.t
-  type location = Precise_locs.precise_location
-  type mdlocation = Location.t (* should be = to location *)
-  type origin
-
-
-  let name = "Multidim domain"
   let log_category = dkey
 
   let cache_name s =
@@ -294,6 +283,23 @@ struct
       if Memory.(is_top r) then None else Some r
     in
     inter ~cache:Hptmap_sig.NoCache ~symmetric:false ~idempotent:true ~decide
+
+end
+
+module Domain =
+struct
+
+  include DomainLattice
+  include Domain_builder.Complete (DomainLattice)
+
+  type state = t
+  type value = Value.t
+  type base = Base.t
+  type offset = Location.offset
+  type memory = Memory.t
+  type location = Precise_locs.precise_location
+  type mdlocation = Location.t (* should be = to location *)
+  type origin
 
 
   (* Bases handling *)
@@ -384,13 +390,6 @@ struct
       | Abstract_interp.Error_Bottom -> `Bottom
     in
     v, Alarmset.all
-
-  (* do nothing for now *)
-  let backward_location _state _lval _typ loc value =
-    `Value (loc, value)
-
-  (* do nothing for now *)
-  let reduce_further _state _expr _value = []
 
 
   (* Eva Transfer *)
@@ -493,10 +492,6 @@ struct
   let leave_scope _kf vars state =
     remove_vars state vars
 
-  let enter_loop _ state = state
-  let incr_loop_counter _ state = state
-  let leave_loop _ state = state
-
   let logic_assign assign location state =
     match assign with
     | None -> remove state location
@@ -508,8 +503,6 @@ struct
         erase state dst Abstract_memory.Bit.numerical
       | _ ->
         remove state location
-
-  let evaluate_predicate _ _ _ = Alarmset.Unknown
 
   let reduce_by_papp env li _labels args positive state =
     try
@@ -556,7 +549,7 @@ struct
   let relate _kf _bases _state = Base.SetLattice.empty
 
   let filter _kf _kind bases state =
-    filter (fun elt -> Base.Hptset.mem elt bases) state
+    DomainLattice.filter (fun elt -> Base.Hptset.mem elt bases) state
 
   let reuse _kf bases ~current_input ~previous_output =
     let cache = Hptmap_sig.NoCache in
@@ -567,9 +560,6 @@ struct
     merge ~cache ~symmetric:false ~idempotent:true
       ~decide_both ~decide_left:(Traversing decide_left) ~decide_right:Neutral
       current_input previous_output
-
-  let storage () = true
 end
 
-
-include Domain_builder.Complete (DomainPrototype)
+include Domain

@@ -352,7 +352,6 @@ let ival_to_interval = function
 module type Input = sig
   type t
   val manager: t Manager.t
-  val name: string
 end
 
 module Make (Man : Input) = struct
@@ -370,7 +369,7 @@ module Make (Man : Input) = struct
   let top = Abstract1.top man empty_env
   let make_top env = Abstract1.top man env
 
-  include Datatype.Make_with_collections (
+  module D = Datatype.Make_with_collections (
     struct
       include Datatype.Undefined
       type t = state
@@ -402,8 +401,7 @@ module Make (Man : Input) = struct
 
       let mem_project = Datatype.never_any_project
     end )
-
-  let name = Man.name
+  include D
 
   let is_included = Abstract1.is_leq man
 
@@ -427,6 +425,13 @@ module Make (Man : Input) = struct
   let narrow s1 s2 =
     let s = Abstract1.meet man s1 s2 in
     if Abstract1.is_bottom man s then `Bottom else `Value s
+
+  include Domain_builder.Complete
+      (struct
+        include D
+        let top = top
+        let join = join
+      end)
 
   let make_eval state =
     let env = Abstract1.env state in
@@ -494,10 +499,6 @@ module Make (Man : Input) = struct
     let expr = Value_util.lval_to_exp lval in
     compute state expr typ
 
-  let reduce_further _ _ _ = []
-
-  let backward_location _state _lv _typ loc value = `Value (loc, value)
-
   let maybe_bottom state =
     if Abstract1.is_bottom man state
     then `Bottom
@@ -549,10 +550,6 @@ module Make (Man : Input) = struct
 
   let leave_scope _kf vars state =
     forget_varinfo_list ~remove:true vars state
-
-  let enter_loop _ state = state
-  let incr_loop_counter _ state = state
-  let leave_loop _ state = state
 
   (* make an oracle for the translation Cil->Apron, using the valuation.
      Translate integer expressions that have been evaluated (which should
@@ -675,11 +672,7 @@ module Make (Man : Input) = struct
 
   let finalize_call _stmt _call _recursion ~pre:_ ~post = `Value post
 
-  let show_expr _valuation _state _fmt _expr = ()
-
   let logic_assign _assigns location state = kill_bases location state
-  let evaluate_predicate _ _ _ = Alarmset.Unknown
-  let reduce_by_predicate _ state _ _ = `Value state
 
   let empty () = top
 
@@ -691,47 +684,37 @@ module Make (Man : Input) = struct
   let initialize_variable_using_type _kind _varinfo state = state
 
   let relate _ _ _ = Base.SetLattice.top
-  let filter _ _ _ state = state
-  let reuse _ _ ~current_input:_ ~previous_output = previous_output
-
-  let storage = Value_parameters.ApronStorage.get
-
 end
 
 
 module Apron_Octagon = struct
   type t = Oct.t
   let manager = Oct.manager_alloc ()
-  let name = "Apron octagon domain"
 end
 
 module Apron_Box = struct
   type t = Box.t
   let manager = Box.manager_alloc ()
-  let name = "Apron box domain"
 end
 
 module Apron_Polka_Loose = struct
   type t = Polka.loose Polka.t
   let manager = Polka.manager_alloc_loose ()
-  let name = "Polka loose polyhedra domain"
 end
 module Apron_Polka_Strict = struct
   type t = Polka.strict Polka.t
   let manager = Polka.manager_alloc_strict ()
-  let name = "Polka strict polyhedra domain"
 end
 module Apron_Polka_Equalities = struct
   type t = Polka.equalities Polka.t
   let manager = Polka.manager_alloc_equalities ()
-  let name = "Polka linear equalities domain"
 end
 
 (** Apron manager allocation changes the rounding mode. *)
 let () = Floating_point.set_round_nearest_even ()
 
 let make name (module Man: Input) =
-  let module Domain = Domain_builder.Complete (Make (Man)) in
+  let module Domain = Make (Man) in
   let descr =
     "Binding to the " ^ name ^ " domain of the Apron library. " ^
     "See http://apron.cri.ensmp.fr/library for more details."

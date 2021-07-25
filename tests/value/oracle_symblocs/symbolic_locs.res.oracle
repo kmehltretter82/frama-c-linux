@@ -1,31 +1,31 @@
 20a21,26
->   # Symbolic locations domain:
+>   # symbolic-locations:
 >   V: {[ t[i] -> {4} ]}
 >   Z: {[ t[i] -> t[0..8]; i ]}
 >   I: {[ t -> {t[i]}
 >         i -> {t[i]} ]}
 >   S: {[ i -> {t[i]} ]}
 31a38,42
->   # Symbolic locations domain:
+>   # symbolic-locations:
 >   V: {[  ]}
 >   Z: {[  ]}
 >   I: {[  ]}
 >   S: {[  ]}
 48a60,65
->   # Symbolic locations domain:
+>   # symbolic-locations:
 >   V: {[ t[i] -> {4} ]}
 >   Z: {[ t[i] -> t[0..8]; i ]}
 >   I: {[ t -> {t[i]}
 >         i -> {t[i]} ]}
 >   S: {[ i -> {t[i]} ]}
 59a77,81
->   # Symbolic locations domain:
+>   # symbolic-locations:
 >   V: {[  ]}
 >   Z: {[  ]}
 >   I: {[  ]}
 >   S: {[  ]}
 79a102,108
->   # Symbolic locations domain:
+>   # symbolic-locations:
 >   V: {[ t[i] -> {{ &x }} ]}
 >   Z: {[ t[i] -> t[0..8]; i ]}
 >   I: {[ t -> {t[i]}
@@ -33,26 +33,26 @@
 >   S: {[ i -> {t[i]}
 >         x -> {t[i]} ]}
 92a122,126
->   # Symbolic locations domain:
+>   # symbolic-locations:
 >   V: {[  ]}
 >   Z: {[  ]}
 >   I: {[  ]}
 >   S: {[  ]}
 108a143,148
->   # Symbolic locations domain:
+>   # symbolic-locations:
 >   V: {[ t[i] -> {1} ]}
 >   Z: {[ t[i] -> t[0..8]; i ]}
 >   I: {[ t -> {t[i]}
 >         i -> {t[i]} ]}
 >   S: {[ i -> {t[i]} ]}
 117a158,162
->   # Symbolic locations domain:
+>   # symbolic-locations:
 >   V: {[  ]}
 >   Z: {[  ]}
 >   I: {[  ]}
 >   S: {[  ]}
 134a180,184
->   # Symbolic locations domain:
+>   # symbolic-locations:
 >   V: {[  ]}
 >   Z: {[  ]}
 >   I: {[  ]}
@@ -64,7 +64,7 @@
 ---
 > [eva] tests/value/symbolic_locs.i:113: Frama_C_show_each: [10001..2147483647]
 152a201,205
->   # Symbolic locations domain:
+>   # symbolic-locations:
 >   V: {[  ]}
 >   Z: {[  ]}
 >   I: {[  ]}

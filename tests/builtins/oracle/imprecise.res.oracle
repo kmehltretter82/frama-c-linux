@@ -57,7 +57,7 @@
   out of bounds write. assert \valid(p);
 [eva] tests/builtins/imprecise.c:21: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   NULL[rbits 800 to 1607] ∈ [--..--]
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {0}
@@ -146,7 +146,7 @@
 [eva] Done for function gm_f1
 [eva] tests/builtins/imprecise.c:76: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {0}
@@ -184,7 +184,7 @@
 [eva] Done for function gm_f2
 [eva] tests/builtins/imprecise.c:78: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {0}
@@ -630,7 +630,7 @@
   out of bounds write. assert \valid(p);
 [eva] tests/builtins/imprecise.c:21: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   NULL[rbits 800 to 1607] ∈ [--..--]
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {{ NULL ; &S___fc_strtok_ptr[0] }}
@@ -716,7 +716,7 @@
 [eva] Done for function gm_f1
 [eva] tests/builtins/imprecise.c:76: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {{ NULL ; &S___fc_strtok_ptr[0] }}
@@ -757,7 +757,7 @@
 [eva] Done for function gm_f2
 [eva] tests/builtins/imprecise.c:78: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {{ NULL ; &S___fc_strtok_ptr[0] }}

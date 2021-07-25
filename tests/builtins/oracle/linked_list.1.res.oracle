@@ -7,7 +7,7 @@
   malloc_next_free ∈ {0}
 [eva] tests/builtins/linked_list.c:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[0..0x3FF] ∈ {0}
   __fc_errno ∈ [--..--]
   __fc_stderr ∈ {{ &__fc_initial_stderr }}
@@ -49,7 +49,7 @@
 [eva] Done for function malloc
 [eva] tests/builtins/linked_list.c:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[0..0x3FF] ∈ {0}
   __fc_errno ∈ [--..--]
   __fc_stderr ∈ {{ &__fc_initial_stderr }}
@@ -86,7 +86,7 @@
 [eva] tests/builtins/linked_list.c:39: starting to merge loop iterations
 [eva] tests/builtins/linked_list.c:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {0; 1}
         [4..0x3FF] ∈ {0}
   __fc_errno ∈ [--..--]
@@ -127,7 +127,7 @@
 [eva] Done for function malloc
 [eva] tests/builtins/linked_list.c:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {0; 1}
         [4..0x3FF] ∈ {0}
   __fc_errno ∈ [--..--]
@@ -164,7 +164,7 @@
   ==END OF DUMP==
 [eva] tests/builtins/linked_list.c:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {0; 1; 2}
         [bits 32 to 63] ∈ {{ NULL ; (? *)&MEMORY }}
         [bits 64 to 95] ∈ {0; 1; 2}
@@ -208,7 +208,7 @@
 [eva] Done for function malloc
 [eva] tests/builtins/linked_list.c:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {0; 1; 2}
         [bits 32 to 63] ∈ {{ NULL ; (? *)&MEMORY }}
         [bits 64 to 95] ∈ {0; 1; 2}
@@ -248,7 +248,7 @@
   ==END OF DUMP==
 [eva] tests/builtins/linked_list.c:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {0; 1; 2; 3}
         [bits 32 to 63] ∈ {{ NULL ; (? *)&MEMORY{[0], [8]} }}
         [bits 64 to 95] ∈ {0; 1; 2; 3}
@@ -294,7 +294,7 @@
 [eva] Done for function malloc
 [eva] tests/builtins/linked_list.c:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ {0; 1; 2; 3}
         [bits 32 to 63] ∈ {{ NULL ; (? *)&MEMORY{[0], [8]} }}
         [bits 64 to 95] ∈ {0; 1; 2; 3}
@@ -336,7 +336,7 @@
   ==END OF DUMP==
 [eva] tests/builtins/linked_list.c:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ [0..10]
         [bits 32 to 63] ∈ {{ NULL ; (? *)&MEMORY{[0], [8], [16]} }}
         [bits 64 to 95] ∈ [0..10]
@@ -384,7 +384,7 @@
 [eva] Done for function malloc
 [eva] tests/builtins/linked_list.c:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ [0..10]
         [bits 32 to 63] ∈ {{ NULL ; (? *)&MEMORY{[0], [8], [16]} }}
         [bits 64 to 95] ∈ [0..10]
@@ -428,7 +428,7 @@
   ==END OF DUMP==
 [eva] tests/builtins/linked_list.c:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ [0..10]
         [bits 32 to 63] ∈ {{ NULL ; &MEMORY + [0..0x3F8],0%8 }}
         [bits 64 to 95] ∈ [0..10]
@@ -479,7 +479,7 @@
 [eva] Done for function malloc
 [eva] tests/builtins/linked_list.c:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ [0..10]
         [bits 32 to 63] ∈ {{ NULL ; &MEMORY + [0..0x3F8],0%8 }}
         [bits 64 to 95] ∈ [0..10]
@@ -532,7 +532,7 @@
   more than 100(127) locations to update in array. Approximating.
 [eva] tests/builtins/linked_list.c:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ [0..10]
         [bits 32 to 0x1F9F]# ∈
         {{ NULL + [0..10] ; &MEMORY + [0..0x3F8],0%8 }} repeated %32 
@@ -576,7 +576,7 @@
 [eva] Done for function malloc
 [eva] tests/builtins/linked_list.c:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ [0..10]
         [bits 32 to 0x1F9F]# ∈
         {{ NULL + [0..10] ; &MEMORY + [0..0x3F8],0%8 }} repeated %32 
@@ -616,7 +616,7 @@
   ==END OF DUMP==
 [eva] tests/builtins/linked_list.c:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ [0..10]
         [bits 32 to 0x1F9F]# ∈
         {{ NULL + [0..10] ; &MEMORY + [0..0x3F8],0%8 }} repeated %32 
@@ -660,7 +660,7 @@
 [eva] Done for function malloc
 [eva] tests/builtins/linked_list.c:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ [0..10]
         [bits 32 to 0x1F9F]# ∈
         {{ NULL + [0..10] ; &MEMORY + [0..0x3F8],0%8 }} repeated %32 
@@ -704,7 +704,7 @@
   more than 100(128) locations to update in array. Approximating.
 [eva] tests/builtins/linked_list.c:40: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ [0..10]
         [bits 32 to 0x1FDF]# ∈
         {{ NULL + [0..10] ; &MEMORY + [0..0x3F8],0%8 }} repeated %32 
@@ -747,7 +747,7 @@
 [eva] Done for function malloc
 [eva] tests/builtins/linked_list.c:42: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   MEMORY[bits 0 to 31] ∈ [0..10]
         [bits 32 to 0x1FDF]# ∈
         {{ NULL + [0..10] ; &MEMORY + [0..0x3F8],0%8 }} repeated %32 

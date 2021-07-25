@@ -9,7 +9,7 @@
   G[0..4] ∈ {0}
 [eva] tests/value/offset_neg.i:8: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   mem[0] ∈ {0}
   addr ∈ {{ &mem + {18446744073709551616} }}
   off ∈ {18446744073709551615}

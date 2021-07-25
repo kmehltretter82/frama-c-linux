@@ -753,6 +753,8 @@ module State = struct
           Format.fprintf fmt "@[%a@]" Octagons.pretty octagons
       end)
 
+  let log_category = Value_parameters.register_category "d-octagon"
+
   let pretty_debug fmt { octagons; intervals; relations } =
     Format.fprintf fmt "@[<v> Octagons: %a@; Intervals: %a@; Relations: %a@]"
       Octagons.pretty octagons Intervals.pretty intervals
@@ -1034,6 +1036,7 @@ end
 module Domain = struct
 
   include State
+  include Domain_builder.Complete (State)
 
   type value = Cvalue.V.t
   type location = Precise_locs.precise_location
@@ -1060,8 +1063,6 @@ module Domain = struct
     else `Value (Cvalue.V.inject_ival ival, None), alarms
 
   let extract_lval ~oracle:_ _context _t _lval _typ _loc = top_value
-
-  let backward_location _t _lval _typ loc value = `Value (loc, value)
 
   let reduce_further state expr value =
     match expr.enode with
@@ -1245,25 +1246,16 @@ module Domain = struct
       let modified = Locations.Zone.join post.modified pre.modified in
       `Value { post with modified }
 
-  let show_expr _valuation _state _fmt _expr = ()
-
   let logic_assign _logic_assign location state =
     let loc = Precise_locs.imprecise_location location in
     let zone = Locations.(enumerate_valid_bits Write loc) in
     let state = kill zone state in
     check "logic_assign" state
 
-  let evaluate_predicate _env _state _pred = Alarmset.Unknown
-  let reduce_by_predicate _env state _pred _positive = `Value state
-
   let enter_scope _kind _varinfos state = state
   let leave_scope _kf varinfos state =
     let state = List.fold_left State.remove state varinfos in
     check "leave_scope" state
-
-  let enter_loop _stmt state = state
-  let incr_loop_counter _stmt state = state
-  let leave_loop _stmt state = state
 
   let initialize_variable _lval _location ~initialized:_ _value state = state
   let initialize_variable_using_type _kind _varinfo state = state
@@ -1320,10 +1312,6 @@ module Domain = struct
             relations = join_rel prev_output.relations current_input.relations;
             modified = current_input.modified }
 
-  let name = "Octagon domain"
-  let log_category = Value_parameters.register_category "d-octagon"
-
-  let storage () = true
 end
 
-include Domain_builder.Complete (Domain)
+include Domain

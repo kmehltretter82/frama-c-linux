@@ -21,7 +21,7 @@
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva] tests/builtins/memcpy2.c:12: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   Frama_C_entropy_source ∈ [--..--]
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {0}

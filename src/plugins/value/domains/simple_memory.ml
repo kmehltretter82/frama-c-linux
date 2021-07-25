@@ -176,7 +176,7 @@ module Make_Memory (Value: Value) = struct
 
 end
 
-module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
+module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
 
   let table = Hashtbl.create 17
   let () =
@@ -186,9 +186,10 @@ module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
     try Some (Hashtbl.find table name)
     with Not_found -> None
 
-  include Make_Memory (Value)
+  module M = Make_Memory (Value)
+  include M
 
-  let name = Info.name
+  include Domain_builder.Complete (M)
 
   type state = t
   type value = Value.t
@@ -212,8 +213,6 @@ module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
   let backward_location state _lval typ loc _value =
     let new_value = find loc typ state in
     `Value (loc, new_value)
-
-  let reduce_further _state _expr _value = []
 
   (* This function binds [loc] to [v], of type [typ], in [state].
      [v] can be [`Bottom], which means that its contents are guaranteed
@@ -318,13 +317,7 @@ module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
   let enter_scope _kind _vars state = state
   let leave_scope _kf vars state = remove_variables vars state
 
-  let enter_loop _ state = state
-  let incr_loop_counter _ state = state
-  let leave_loop _ state = state
-
   let logic_assign _assign location state = remove location state
-  let evaluate_predicate _ _ _ = Alarmset.Unknown
-  let reduce_by_predicate _ state _ _ = `Value state
 
   let empty () = top
   let initialize_variable _lval _location ~initialized:_ _value state = state
@@ -333,7 +326,7 @@ module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
   let relate _kf _bases _state = Base.SetLattice.empty
 
   let filter _kf _kind bases state =
-    filter (fun elt -> Base.Hptset.mem elt bases) state
+    M.filter (fun elt -> Base.Hptset.mem elt bases) state
 
   let reuse _kf bases ~current_input ~previous_output =
     let cache = Hptmap_sig.NoCache in
@@ -345,14 +338,6 @@ module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
       ~decide_both ~decide_left:(Traversing decide_left) ~decide_right:Neutral
       current_input previous_output
 
-  let storage () = true
-end
-
-
-module Make_Domain (Info: sig val name: string end) (Value: Value) =
-struct
-  module M = Make_Internal (Info) (Value)
-  include Domain_builder.Complete (M)
   let add = M.add
   let find = M.find
   let remove = M.remove

@@ -65,24 +65,15 @@
       logical predicates, to the initialization of an initial state, and to the
       {!Mem_exec} cache.
 
-    The module type {!S_with_Structure} is {!S}, plus a special OCaml value
-    describing the internal structure of the domain and identifying it.
-    This structure enables automatic accessors to the domain when
-    combined to others. See {!Structure} for details.
-    {!S_with_Structure} is the interface to implement in order to introduce
-    a now domain in Eva.
+    The functor {!Domain_builder.Complete} automatically builds some of the
+    functions required by the {!S} signature. However, these functions can
+    also be redefined in the domain to achieve better precision or performance.
 
-    The module type {!Internal} contains some other functionalities needed by
-    the analyzer, but that can be automatically generated from the previous
-    one. The functor {!Domain_builder.Complete} produces an {!Internal} module
-    from a {!S_with_Structure} one.
+    Domains can then be lifted on more general values and locations through
+    {!Domain_lift.Make}, and be combined through {!Domain_product.Make}.
 
-    {!Internal} modules can then be lifted on more general values and locations
-    through {!Domain_lift.Make}, and be combined through {!Domain_product.Make}.
-
-    Finally, {!External} is the type of the final modules built and used by Eva.
-    It contains the generic accessors to specific domains, described in
-    {!Interface}.
+    Finally, a new domain can be registered in the Eva engine via
+    {!Abstractions.register}. See abstractions.mli for more details.
 *)
 
 (* The types of the Cil AST. *)
@@ -178,12 +169,14 @@ module type Queries = sig
       [v] are kept.
       The returned location must be included in [loc], but it is always sound
       to return [loc] itself.
-      Also returns the value that may have the returned location, if not bottom. *)
+      Also returns the value that may have the returned location, if not bottom.
+      Defined by {!Domain_builder.Complete} with no reduction. *)
   val backward_location :
     state -> lval -> typ -> location -> value -> (location * value) or_bottom
 
   (** Given a reduction [expr] = [value], provides more reductions that may
-      be performed. *)
+      be performed.
+      Defined by {!Domain_builder.Complete} with no reduction. *)
   val reduce_further : state -> exp -> value -> (exp * value) list
 
 end
@@ -290,7 +283,8 @@ module type Transfer = sig
   (** Called on the Frama_C_domain_show_each directive. Prints the internal
       properties inferred by the domain in the [state] about the expression
       [exp]. Can use the [valuation] resulting from the cooperative evaluation of
-      the expression. *)
+      the expression.
+      Defined by {!Domain_builder.Complete} but prints nothing. *)
   val show_expr:
     (value, location, origin) valuation ->
     state -> Format.formatter -> exp -> unit
@@ -359,7 +353,8 @@ module type Reuse = sig
     kernel_function -> Base.Hptset.t ->
     current_input:t -> previous_output:t -> t
 
-  (** The simplest implementation of [filter] and [reuse] is:
+  (** {!Domain_builtin.Complete} provides the simplest implementation of
+      [filter] and [reuse], which is:
         let filter _ _ _ state = state
         let reuse _ _ ~current_input:_ ~previous_output = previous_output
       This is correct as the cache will be triggered only for an initial state
@@ -403,13 +398,15 @@ module type S = sig
 
   (** Evaluates a [predicate] to a logical status in the current [state].
       The [logic_environment] contains the states at some labels and the
-      potential variable for \result. *)
+      potential variable for \result.
+      Defined by {!Domain_builder.Complete}: all predicates are Unknown. *)
   val evaluate_predicate:
     state logic_environment -> state -> predicate -> Alarmset.status
 
   (** [reduce_by_predicate env state pred b] reduces the current [state] by
       assuming that the predicate [pred] evaluates to [b]. [env] contains the
-      states at some labels and the potential variable for \result. *)
+      states at some labels and the potential variable for \result.
+      Defined by {!Domain_builder.Complete} with no reduction. *)
   val reduce_by_predicate:
     state logic_environment -> state -> predicate -> bool -> state or_bottom
 
@@ -455,6 +452,9 @@ module type S = sig
 
   (** {3 Miscellaneous } *)
 
+  (** Transfer functions called when entering/leaving a loop, and at each
+      loop iteration. Defined as identity by {!Domain_builder.Complete}. *)
+
   val enter_loop: stmt -> state -> state
   val incr_loop_counter: stmt -> state -> state
   val leave_loop: stmt -> state -> state
@@ -464,47 +464,24 @@ module type S = sig
   (** Category for the messages about the domain.
       Must be created through {!Value_parameters.register_category}. *)
   val log_category : Value_parameters.category
-end
-
-
-(** Automatic storage of the states computed during the analysis. *)
-module type Store = sig
-  type state
-  val register_global_state: state or_bottom -> unit
-  val register_initial_state: Value_types.callstack -> state -> unit
-  val register_state_before_stmt: Value_types.callstack -> stmt -> state -> unit
-  val register_state_after_stmt: Value_types.callstack -> stmt -> state -> unit
-
-  (** Allows accessing the states inferred by an Eva analysis after it has
-      been computed with the domain enabled. *)
-  val get_global_state: unit -> state or_bottom
-  val get_initial_state: kernel_function -> state or_bottom
-  val get_initial_state_by_callstack:
-    kernel_function -> state Value_types.Callstack.Hashtbl.t or_top_or_bottom
-
-  val get_stmt_state: after:bool -> stmt -> state or_bottom
-  val get_stmt_state_by_callstack:
-    after:bool -> stmt -> state Value_types.Callstack.Hashtbl.t or_top_or_bottom
-end
-
-(** Full implementation of domains. Automatically built by
-    {!Domain_builder.Complete} from an {!S_with_Structure} domain. *)
-module type Internal = sig
-  include S
-  module Store: Store with type state := state
 
   (** This function is called after the analysis. The argument is the state
       computed at the return statement of the main function. The function can
       also access all states stored in the Store module during the analysis.
-      If the analysis aborted, this function is not called. *)
+      If the analysis aborted, this function is not called.
+      Defined by {!Domain_builder.Complete} as doing nothing. *)
   val post_analysis: t or_bottom -> unit
+
+  (** Storage of the states computed by the analysis.
+      Automatically built by {!Domain_builder.Complete}. *)
+  module Store: Domain_store.S with type t := t
 end
 
 type 't key = 't Structure.Key_Domain.key
 
 (** Signature for a leaf module of a domain. *)
 module type Leaf = sig
-  include Internal
+  include S
 
   (** The key identifies the domain and the type [t] of its states. *)
   val key: t key

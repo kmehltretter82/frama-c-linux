@@ -312,24 +312,10 @@ module QueriesTaint = struct
   let extract_expr ~oracle:_ _context _state _expr = top_query
   let extract_lval ~oracle:_ _context _state _lv _typ _locs = top_query
 
-  let backward_location _state _lval _typ loc value = `Value (loc, value)
-
-  let reduce_further _state _expr _value =
-    [] (* Nothing intelligent to suggest *)
-
 end
 
 
-module ReuseTaint = struct
-
-  let relate _kf _bases _state = Base.SetLattice.empty
-  let filter _kf _kind _bases state = state
-  let reuse _kf _bases ~current_input:_ ~previous_output = previous_output
-
-end
-
-
-module InternalTaint = struct
+module TaintDomain = struct
   type state = taint
   type value = Cvalue.V.t
   type location = Precise_locs.precise_location
@@ -340,11 +326,9 @@ module InternalTaint = struct
              include Abstract_domain.Lattice with type state := state
            end)
 
-  include (QueriesTaint: Abstract_domain.Queries
-           with type state := state
-            and type value := value
-            and type location := location
-            and type origin := origin)
+  include Domain_builder.Complete (LatticeTaint)
+
+  include QueriesTaint
 
   include (TransferTaint: Abstract_domain.Transfer
            with type state := state
@@ -352,9 +336,6 @@ module InternalTaint = struct
             and type location := location
             and type origin := origin)
 
-  include (ReuseTaint: Abstract_domain.Reuse with type t := state)
-
-  let name = "taint"
   let log_category = dkey
 
 
@@ -384,9 +365,6 @@ module InternalTaint = struct
       else
         state
 
-  let evaluate_predicate _ _ _ = Alarmset.Unknown
-  let reduce_by_predicate _ state _ _ = `Value state
-
 
   (* Scoping and Initialization. *)
 
@@ -409,14 +387,7 @@ module InternalTaint = struct
 
 
   (* Misc. *)
-
-  let enter_loop _ state = state
-  let incr_loop_counter _ state = state
-  let leave_loop _ state = state
-
-  let storage () = true
-
+  let relate _kf _bases _state = Base.SetLattice.empty
 end
 
-
-include Domain_builder.Complete (InternalTaint)
+include TaintDomain

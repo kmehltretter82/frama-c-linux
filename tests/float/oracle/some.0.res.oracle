@@ -13,7 +13,7 @@
 [eva] tests/float/some.c:11: Trace partitioning superposing up to 50 states
 [eva] tests/float/some.c:16: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   t[0] ∈ {1.0000000000000000}
    [1] ∈ {1.5000000000000000}
    [2] ∈ {1.7500000000000000}

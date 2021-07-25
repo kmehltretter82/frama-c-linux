@@ -13,7 +13,7 @@
 [eva] tests/float/sqrt.c:14: assertion got status valid.
 [eva] tests/float/sqrt.c:19: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_errno ∈ [--..--]
   k ∈ UNINITIALIZED
   i ∈ {-0.}
@@ -24,7 +24,7 @@
   ==END OF DUMP==
 [eva] tests/float/sqrt.c:23: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_errno ∈ [--..--]
   k ∈ UNINITIALIZED
   i ∈ {-0.}

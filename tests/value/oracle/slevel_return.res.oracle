@@ -15,7 +15,7 @@
   Called from tests/value/slevel_return.i:45.
 [eva] tests/value/slevel_return.i:38: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   x ∈ {-3}
   y ∈ {0; 1; 6}
   c ∈ [--..--]

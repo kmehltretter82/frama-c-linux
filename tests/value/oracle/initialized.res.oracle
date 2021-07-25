@@ -80,7 +80,7 @@
   The imprecision originates from Arithmetic {tests/value/initialized.c:50}
 [eva] tests/value/initialized.c:63: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   Frama_C_entropy_source ∈ [--..--]
   b1 ∈ [--..--]
   b2 ∈ [--..--]
@@ -110,7 +110,7 @@
 [eva:alarm] tests/value/initialized.c:66: Warning: assertion got status unknown.
 [eva] tests/value/initialized.c:68: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   Frama_C_entropy_source ∈ [--..--]
   b1 ∈ [--..--]
   b2 ∈ [--..--]

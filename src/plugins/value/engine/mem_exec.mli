@@ -23,11 +23,6 @@
 open Cil_types
 open Eval
 
-module type Domain = sig
-  include Datatype.S_with_collections
-  include Abstract_domain.Reuse with type t := t
-end
-
 (** Counter that must be used each time a new call is analyzed, in order
     to refer to it later *)
 val new_counter : unit -> int
@@ -37,7 +32,7 @@ val cleanup_results: unit -> unit
 
 module Make
     (Value : Datatype.S)
-    (Domain : Domain)
+    (Domain : Abstract_domain.S)
   : sig
 
     (** [store_computed_call kf init_state args call_results] memoizes the fact

@@ -170,6 +170,16 @@ let create_domain_option name =
          option_name (if _new then "" else "-") name;
        if _new then Domains.add name else remove_domain name)
 
+let () = Parameter_customize.set_group performance
+module NoResultsDomains =
+  String_set
+    (struct
+      let option_name = "-eva-no-results-domain"
+      let arg_name = "domains"
+      let help = "Do not record the states of some domains during the analysis."
+    end)
+let () = add_dep NoResultsDomains.parameter
+
 (* List (name, descr) of available domains. *)
 let domains_ref = ref []
 
@@ -202,25 +212,28 @@ let register_domain ~name ~descr =
     Domains.option_name "eva" domains (domains_help ())
 
 (* Checks that a domain has been registered. *)
-let check_domain domain =
+let check_domain option_name domain =
   if domain = "help" || domain = "list"
   then domains_list ()
   else if not (List.exists (fun (name, _) -> name = domain) !domains_ref)
   then
     let pp_str_list = Pretty_utils.pp_list ~sep:",@ " Format.pp_print_string in
-    abort "invalid domain %S for option -eva-domains.@.Possible domains are: %a"
-      domain pp_str_list (List.rev_map fst !domains_ref)
+    abort "invalid domain %S for option %s.@.Possible domains are: %a"
+      domain option_name pp_str_list (List.rev_map fst !domains_ref)
 
 let () =
-  Domains.add_set_hook
-    (fun _old domains -> Datatype.String.Set.iter check_domain domains)
+  let hook option_name = fun _old domains ->
+    Datatype.String.Set.iter (check_domain option_name) domains
+  in
+  Domains.add_set_hook (hook Domains.name);
+  NoResultsDomains.add_set_hook (hook NoResultsDomains.name)
 
 let () = Parameter_customize.set_group domains
 module DomainsFunction =
   Make_multiple_map
     (struct
       include Datatype.String
-      let of_string str = check_domain str; str
+      let of_string str = check_domain "-eva-domains-function" str; str
       let of_singleton_string = no_element_of_string
       let to_string str = str
     end)
@@ -402,60 +415,6 @@ module JoinResults =
       let help = "Precompute consolidated states once Eva is computed"
       let default = true
     end)
-
-let () = Parameter_customize.set_group performance
-module EqualityStorage =
-  Bool
-    (struct
-      let option_name = "-eva-equality-storage"
-      let help = "Store the states of the equality domain during \
-                  the analysis."
-      let default = true
-    end)
-let () = add_precision_dep EqualityStorage.parameter
-
-let () = Parameter_customize.set_group performance
-module SymbolicLocsStorage =
-  Bool
-    (struct
-      let option_name = "-eva-symbolic-locations-storage"
-      let help = "Store the states of the symbolic locations domain during \
-                  the analysis."
-      let default = true
-    end)
-let () = add_precision_dep SymbolicLocsStorage.parameter
-
-let () = Parameter_customize.set_group performance
-module GaugesStorage =
-  Bool
-    (struct
-      let option_name = "-eva-gauges-storage"
-      let help = "Store the states of the gauges domain during the analysis."
-      let default = true
-    end)
-let () = add_precision_dep GaugesStorage.parameter
-
-let () = Parameter_customize.set_group performance
-module ApronStorage =
-  Bool
-    (struct
-      let option_name = "-eva-apron-storage"
-      let help = "Store the states of the apron domains during the \
-                  analysis."
-      let default = false
-    end)
-let () = add_precision_dep ApronStorage.parameter
-
-let () = Parameter_customize.set_group performance
-module BitwiseOffsmStorage =
-  Bool
-    (struct
-      let option_name = "-eva-bitwise-storage"
-      let help = "Store the states of the bitwise domain during the \
-                  analysis."
-      let default = true
-    end)
-let () = add_precision_dep BitwiseOffsmStorage.parameter
 
 (* ------------------------------------------------------------------------- *)
 (* --- Non-standard alarms                                               --- *)

@@ -23,16 +23,48 @@
 (** Automatic builders to complete abstract domains from different
     simplified interfaces. *)
 
+open Cil_types
+open Eval
+
 module type InputDomain = sig
-  include Abstract_domain.S
-  val storage: unit -> bool
+  include Datatype.S
+  val top: t
+  val join: t -> t -> t
 end
 
-module Complete
-    (Domain: InputDomain)
-  : Abstract_domain.Leaf with type state = Domain.state
-                          and type value = Domain.value
-                          and type location = Domain.location
+(** Part of an abstract domain signature automatically built by the
+    {!Complete} functor. These functions can be redefined to achieve
+    better precision or performance. See {!Abstract_domain} for more details. *)
+module type LeafDomain = sig
+  type t
+
+  val backward_location: t -> lval -> typ -> 'loc -> 'v -> ('loc * 'v) or_bottom
+  val reduce_further: t -> exp -> 'v -> (exp * 'v) list
+
+  val evaluate_predicate:
+    t Abstract_domain.logic_environment -> t -> predicate -> Alarmset.status
+  val reduce_by_predicate:
+    t Abstract_domain.logic_environment -> t -> predicate -> bool -> t or_bottom
+
+  val enter_loop: stmt -> t -> t
+  val incr_loop_counter: stmt -> t -> t
+  val leave_loop: stmt -> t -> t
+
+  val filter: kernel_function -> [`Pre | `Post] -> Base.Hptset.t -> t -> t
+  val reuse:
+    kernel_function -> Base.Hptset.t ->
+    current_input:t -> previous_output:t -> t
+
+  val show_expr: 'a -> t -> Format.formatter -> exp -> unit
+  val post_analysis: t Bottom.or_bottom -> unit
+
+  module Store: Domain_store.S with type t := t
+
+  val key: t Abstract_domain.key
+end
+
+(** Automatically builds some functions of an abstract domain. *)
+module Complete (Domain: InputDomain) : LeafDomain with type t := Domain.t
 
 module Complete_Minimal
     (Value: Abstract_value.S)

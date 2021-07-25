@@ -204,7 +204,7 @@ module Transfer = struct
 
 end
 
-module Internal
+module D
   (*: Domain_builder.InputDomain
     with type state = inout
     and type value = Cvalue.V.t
@@ -220,7 +220,8 @@ module Internal
              include Abstract_domain.Lattice with type state := state
            end)
 
-  let name = "inout"
+  include Domain_builder.Complete (LatticeInout)
+
   let log_category = Value_parameters.register_category "d-inout"
 
   let enter_scope _kind _vars state = state
@@ -249,12 +250,8 @@ module Internal
 
   let update _valuation state = `Value state
 
-  let show_expr _valuation _state _fmt _expr = ()
-
   (* Memexec *)
   let relate _kf _bases _state = Base.SetLattice.empty
-  let filter _kf _kind _bases state = state
-  let reuse _kf _bases ~current_input:_ ~previous_output = previous_output
 
   (* Initial state. Initializers are singletons, so we store nothing. *)
   let empty () = LatticeInout.empty
@@ -264,30 +261,11 @@ module Internal
   (* TODO *)
   let logic_assign _assign _location _state = top
 
-  (* Logic *)
-  let evaluate_predicate _ _ _ = Alarmset.Unknown
-  let reduce_by_predicate _ state _ _ = `Value state
-
-  let storage () = true
-
   let top_query = `Value (Cvalue.V.top, None), Alarmset.all
 
   let extract_expr ~oracle:_ _context _state _expr = top_query
   let extract_lval ~oracle:_ _context _state _lv _typ _locs = top_query
-
-  let backward_location _state _lval _typ loc value =
-    `Value (loc, value)
-
-  let enter_loop _ state = state
-  let incr_loop_counter _ state = state
-  let leave_loop _ state = state
-
-  let reduce_further _state _expr _value = [] (*Nothing intelligent to suggest*)
-
 end
-
-module D = Domain_builder.Complete (Internal)
-
 
 (*
 Local Variables:

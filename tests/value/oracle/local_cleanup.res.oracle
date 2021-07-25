@@ -22,7 +22,7 @@
 [eva] Done for function h
 [eva] tests/value/local_cleanup.c:23: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   lmain[0] ∈ UNINITIALIZED
        [1] ∈ {12}
   ==END OF DUMP==

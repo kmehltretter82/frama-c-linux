@@ -18,7 +18,7 @@
 [eva] Done for function main2
 [eva] tests/value/reduce_formals.i:72: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   g ∈ [--..--]
   v ∈ [--..--]
   w ∈ [6..2147483647]

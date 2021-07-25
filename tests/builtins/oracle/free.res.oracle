@@ -12,7 +12,7 @@
 [eva] tests/builtins/free.c:10: allocating variable __malloc_main1_l10
 [eva] tests/builtins/free.c:13: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}

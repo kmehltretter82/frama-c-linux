@@ -375,7 +375,8 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   let compute_from_init_state kf init_state =
     pre_analysis ();
-    Abstract.Dom.Store.register_global_state (`Value init_state);
+    let b = Value_parameters.ResultsAll.get () in
+    Abstract.Dom.Store.register_global_state b (`Value init_state);
     compute kf init_state
 end
 

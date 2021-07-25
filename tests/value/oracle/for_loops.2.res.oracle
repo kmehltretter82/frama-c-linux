@@ -12,7 +12,7 @@
 [eva] Done for function Frama_C_interval
 [eva] tests/value/for_loops.c:39: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   Frama_C_entropy_source ∈ [--..--]
   x ∈ {0}
   j ∈ UNINITIALIZED
@@ -23,7 +23,7 @@
 [eva] tests/value/for_loops.c:40: starting to merge loop iterations
 [eva] tests/value/for_loops.c:41: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   Frama_C_entropy_source ∈ [--..--]
   x ∈ {0}
   j ∈ [0..1000]

@@ -403,7 +403,7 @@
   locals {y} escaping the scope of a block of main_local through p
 [eva] tests/builtins/memcpy.c:212: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   NULL[rbits 800000 to 800015] ∈ [--..--]
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {0}

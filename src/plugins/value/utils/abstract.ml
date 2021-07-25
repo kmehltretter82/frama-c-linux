@@ -72,13 +72,13 @@ end
 module Domain = struct
 
   module D = struct
-    type 'a t = (module Abstract_domain.Internal with type state = 'a)
+    type 'a t = (module Abstract_domain.S with type state = 'a)
   end
 
   include Structure.Shape (Structure.Key_Domain) (D)
 
   module type Internal = sig
-    include Abstract_domain.Internal
+    include Abstract_domain.S
     val structure: t structure
   end
 

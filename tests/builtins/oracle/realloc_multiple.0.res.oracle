@@ -19,7 +19,7 @@
 [eva] Done for function Frama_C_interval
 [eva] tests/builtins/realloc_multiple.c:21: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -56,7 +56,7 @@
   weak free on bases: {__malloc_main1_l9, __malloc_main1_l12}
 [eva] tests/builtins/realloc_multiple.c:25: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -107,7 +107,7 @@
 [eva] Done for function Frama_C_interval
 [eva] tests/builtins/realloc_multiple.c:43: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -147,7 +147,7 @@
   weak free on bases: {__malloc_main2_l30, __malloc_main2_l33}
 [eva] tests/builtins/realloc_multiple.c:47: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -203,7 +203,7 @@
 [eva] Done for function Frama_C_interval
 [eva] tests/builtins/realloc_multiple.c:64: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -248,7 +248,7 @@
   accessing uninitialized left-value. assert \initialized(s);
 [eva] tests/builtins/realloc_multiple.c:67: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
@@ -290,7 +290,7 @@
   locals {x} escaping the scope of a block of main3 through __realloc_main3_l65_0
 [eva] tests/builtins/realloc_multiple.c:69: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}

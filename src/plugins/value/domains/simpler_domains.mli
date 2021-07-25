@@ -78,7 +78,6 @@ module type Minimal = sig
   (** Pretty printers. *)
 
   val pretty: Format.formatter -> t -> unit
-  val show_expr: t -> Format.formatter -> exp -> unit
 end
 
 (** The simplest interface of domains, equipped with a frama-c datatype. *)
@@ -141,7 +140,4 @@ module type Simple_Cvalue = sig
 
   val enter_scope: Abstract_domain.variable_kind -> varinfo list -> t -> t
   val leave_scope: kernel_function -> varinfo list -> t -> t
-
-  (** Pretty printer. *)
-  val show_expr: t -> Format.formatter -> exp -> unit
 end

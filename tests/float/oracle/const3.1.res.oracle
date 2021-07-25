@@ -13,7 +13,7 @@
   d0 ∈ [0x1.16c262777579cp-133 .. 0x1.16c262777579dp-133]
 [eva] tests/float/const3.i:11: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   f1 ∈ [0x1.16c2000000000p-133 .. 0x1.16c3000000000p-133]
   d0 ∈ [0x1.16c262777579cp-133 .. 0x1.16c262777579dp-133]
   __retres ∈ UNINITIALIZED

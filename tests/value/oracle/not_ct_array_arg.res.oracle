@@ -13,7 +13,7 @@
   out of bounds write. assert \valid((int *)tb);
 [eva] tests/value/not_ct_array_arg.i:11: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   a ∈ [--..--]
   tb ∈ {{ (int (*)[a])&S_tb }}
@@ -28,7 +28,7 @@
   pointer downcast. assert (unsigned int)(&tb) ≤ 2147483647;
 [eva] tests/value/not_ct_array_arg.i:13: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   a ∈ [--..--]
   tb ∈ {{ (int (*)[a])&S_tb }}

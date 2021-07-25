@@ -20,12 +20,39 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cil_types
+open Eval
+
 module type InputDomain = sig
-  include Abstract_domain.Lattice
-  include Datatype.S with type t = state
-  val storage: unit -> bool
+  include Datatype.S
+  val top: t
+  val join: t -> t -> t
 end
 
-module Make
-    (Domain : InputDomain)
-  : Abstract_domain.Store with type state := Domain.state
+(** Automatic storage of the states computed during the analysis. *)
+module type S = sig
+  type t
+
+  (** Called once at the analysis beginning for the entry state of the main
+      function. The boolean indicates whether the states of this domain must be
+      saved during the analysis, according to options -eva-no-results. If it is
+      false, register functions do nothing, and get functions return Top. *)
+  val register_global_state: bool -> t or_bottom -> unit
+
+  val register_initial_state: Value_types.callstack -> t -> unit
+  val register_state_before_stmt: Value_types.callstack -> stmt -> t -> unit
+  val register_state_after_stmt: Value_types.callstack -> stmt -> t -> unit
+
+  (** Allows accessing the states inferred by an Eva analysis after it has
+      been computed with the domain enabled. *)
+  val get_global_state: unit -> t or_bottom
+  val get_initial_state: kernel_function -> t or_bottom
+  val get_initial_state_by_callstack:
+    kernel_function -> t Value_types.Callstack.Hashtbl.t or_top_or_bottom
+
+  val get_stmt_state: after:bool -> stmt -> t or_bottom
+  val get_stmt_state_by_callstack:
+    after:bool -> stmt -> t Value_types.Callstack.Hashtbl.t or_top_or_bottom
+end
+
+module Make (Domain : InputDomain) : S with type t := Domain.t

@@ -45,17 +45,12 @@ module TracesUnifyLoop: Parameter_sig.Bool
 module TracesDot: Parameter_sig.Filepath
 module TracesProject: Parameter_sig.Bool
 
-module EqualityStorage: Parameter_sig.Bool
-module SymbolicLocsStorage: Parameter_sig.Bool
-module GaugesStorage: Parameter_sig.Bool
-module ApronStorage: Parameter_sig.Bool
-module BitwiseOffsmStorage: Parameter_sig.Bool
-
 module AutomaticContextMaxDepth: Parameter_sig.Int
 module AutomaticContextMaxWidth: Parameter_sig.Int
 
 module AllRoundingModesConstants: Parameter_sig.Bool
 
+module NoResultsDomains: Parameter_sig.String_set
 module NoResultsFunctions: Parameter_sig.Fundec_set
 module ResultsAll: Parameter_sig.Bool
 

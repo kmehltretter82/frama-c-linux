@@ -118,33 +118,33 @@
 ---
 >   Frama_C_show_each: {-593; -592; -591; -590; -589; -588}, [99..119]
 422a374,377
->   # Gauges domain:
+>   # gauges:
 >   V: [{[ p -> {{ &x }}
 >          i -> {1} ]}]
 >   s398: λ(0)
 482a438,441
->   # Gauges domain:
+>   # gauges:
 >   V: [{[ i -> {1} ]}]
 >   s398: λ([0 .. 1])
 >         {[ i -> {1} ]}
 541a501,504
->   # Gauges domain:
+>   # gauges:
 >   V: [{[ i -> {1} ]}]
 >   s398: λ([0 .. 2])
 >         {[ i -> {1} ]}
 600a564,567
->   # Gauges domain:
+>   # gauges:
 >   V: [{[ i -> {1} ]}]
 >   s398: λ([0 .. 10])
 >         {[ i -> {1} ]}
 665a633,637
->   # Gauges domain:
+>   # gauges:
 >   V: [{[ p -> {{ &a }}
 >          i -> {2} ]}]
 >   s412: λ(0)
 >   s411: λ(0)
 726a699,703
->   # Gauges domain:
+>   # gauges:
 >   V: [{[ i -> {2} ]}]
 >   s412: λ(0)
 >   s411: λ([0 .. 1])
@@ -152,7 +152,7 @@
 728a706,833
 > [eva] tests/value/gauges.c:325: 
 >   Frama_C_dump_each:
->   # Cvalue domain:
+>   # cvalue:
 >   __fc_heap_status ∈ [--..--]
 >   __fc_random_counter ∈ [--..--]
 >   __fc_rand_max ∈ {32767}
@@ -208,7 +208,7 @@
 >   i ∈ {2}
 >   S_0___fc_env[0..1] ∈ [--..--]
 >   S_1___fc_env[0..1] ∈ [--..--]
->   # Gauges domain:
+>   # gauges:
 >   V: [{[ i -> {2} ]}]
 >   s412: λ(0)
 >   s411: λ([0 .. 2])
@@ -216,7 +216,7 @@
 >   ==END OF DUMP==
 > [eva] tests/value/gauges.c:325: 
 >   Frama_C_dump_each:
->   # Cvalue domain:
+>   # cvalue:
 >   __fc_heap_status ∈ [--..--]
 >   __fc_random_counter ∈ [--..--]
 >   __fc_rand_max ∈ {32767}
@@ -272,7 +272,7 @@
 >   i ∈ {2}
 >   S_0___fc_env[0..1] ∈ [--..--]
 >   S_1___fc_env[0..1] ∈ [--..--]
->   # Gauges domain:
+>   # gauges:
 >   V: [{[ i -> {2} ]}]
 >   s412: λ(0)
 >   s411: λ([0 .. +oo])

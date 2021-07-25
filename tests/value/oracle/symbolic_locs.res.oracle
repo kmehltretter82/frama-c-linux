@@ -12,7 +12,7 @@
   assertion got status unknown.
 [eva] tests/value/symbolic_locs.i:32: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   t[0..8] ∈ {0; 4}
    [9] ∈ {0}
@@ -21,7 +21,7 @@
   ==END OF DUMP==
 [eva] tests/value/symbolic_locs.i:34: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   t[0..1] ∈ {0; 4}
    [2] ∈ {1}
@@ -38,7 +38,7 @@
   assertion got status unknown.
 [eva] tests/value/symbolic_locs.i:44: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   t[0..1] ∈ {0; 4}
    [2] ∈ {0; 1; 4}
@@ -49,7 +49,7 @@
   ==END OF DUMP==
 [eva] tests/value/symbolic_locs.i:46: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   t[0..1] ∈ {0; 4}
    [2] ∈ {0; 1; 4}
@@ -68,7 +68,7 @@
   pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
 [eva] tests/value/symbolic_locs.i:55: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   t[0..1] ∈ {{ NULL + {0; 4} ; (int)&x }}
    [2] ∈ {{ NULL + {0; 1; 4} ; (int)&x }}
@@ -82,7 +82,7 @@
   locals {x} escaping the scope of a block of main4_scope_right through t
 [eva] tests/value/symbolic_locs.i:57: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   t[0..1] ∈ {0; 4} or ESCAPINGADDR
    [2] ∈ {0; 1; 4} or ESCAPINGADDR
@@ -99,7 +99,7 @@
   assertion got status unknown.
 [eva] tests/value/symbolic_locs.i:65: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   t[0..8] ∈ {0; 1; 4} or ESCAPINGADDR
    [9] ∈ {0}
@@ -109,7 +109,7 @@
   ==END OF DUMP==
 [eva] tests/value/symbolic_locs.i:67: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   t[0..8] ∈ {0; 1; 4} or ESCAPINGADDR
    [9] ∈ {0}
@@ -126,7 +126,7 @@
   assertion got status unknown.
 [eva] tests/value/symbolic_locs.i:98: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   t[0..8] ∈ {0; 1; 4} or ESCAPINGADDR
    [9] ∈ {0}
@@ -145,7 +145,7 @@
 [eva] Done for function main7_widening
 [eva] tests/value/symbolic_locs.i:125: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   v ∈ [--..--]
   t[0..8] ∈ {0; 1; 4} or ESCAPINGADDR
    [9] ∈ {0}

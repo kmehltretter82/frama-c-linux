@@ -20,12 +20,32 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cil_types
 open Eval
 
 module type InputDomain = sig
-  include Abstract_domain.Lattice
-  include Datatype.S with type t = state
-  val storage: unit -> bool
+  include Datatype.S
+  val top: t
+  val join: t -> t -> t
+end
+
+module type S = sig
+  type t
+  val register_global_state: bool -> t or_bottom -> unit
+  val register_initial_state: Value_types.callstack -> t -> unit
+  val register_state_before_stmt: Value_types.callstack -> stmt -> t -> unit
+  val register_state_after_stmt: Value_types.callstack -> stmt -> t -> unit
+
+  (** Allows accessing the states inferred by an Eva analysis after it has
+      been computed with the domain enabled. *)
+  val get_global_state: unit -> t or_bottom
+  val get_initial_state: kernel_function -> t or_bottom
+  val get_initial_state_by_callstack:
+    kernel_function -> t Value_types.Callstack.Hashtbl.t or_top_or_bottom
+
+  val get_stmt_state: after:bool -> stmt -> t or_bottom
+  val get_stmt_state_by_callstack:
+    after:bool -> stmt -> t Value_types.Callstack.Hashtbl.t or_top_or_bottom
 end
 
 module Make (Domain: InputDomain) = struct
@@ -152,8 +172,7 @@ module Make (Domain: InputDomain) = struct
       Callstack.Hashtbl.add r callstack v;
       add stmt r
 
-  let register_global_state state =
-    let storage = Domain.storage () in
+  let register_global_state storage state =
     Storage.set storage;
     if storage then
       match state with

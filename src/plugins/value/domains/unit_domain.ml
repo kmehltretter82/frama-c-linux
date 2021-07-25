@@ -36,12 +36,15 @@ module Static = struct
     let join _ _ = ()
     let widen _ _ _ _ = ()
     let narrow _ _ = `Value ()
-
-    let storage () = false
   end
 
   include D
-  module Store = Domain_store.Make (D)
+  include Domain_builder.Complete
+      (struct
+        include D
+        let top = top
+        let join = join
+      end)
 end
 
 module Make
@@ -57,8 +60,6 @@ module Make
   let eval_top = `Value (Value.top, None), Alarmset.all
   let extract_expr ~oracle:_ _ _ _ = eval_top
   let extract_lval ~oracle:_ _ _ _ _ _ = eval_top
-  let backward_location _ _ _ loc value = `Value (loc, value)
-  let reduce_further _ _ _  = []
 
   let update _ _ = `Value ()
   let assign _ _ _ _ _ _ = `Value ()
@@ -68,25 +69,15 @@ module Make
   let show_expr _ _ _ _ = ()
 
   let logic_assign _ _ _ = ()
-  let evaluate_predicate _ _ _ = Alarmset.Unknown
-  let reduce_by_predicate _ _ _ _ = `Value ()
 
   let enter_scope _ _ _ = ()
   let leave_scope _ _ _ = ()
-
-  let enter_loop _ _ = ()
-  let incr_loop_counter _ _ = ()
-  let leave_loop _ _ = ()
 
   let empty () = ()
   let initialize_variable _ _ ~initialized:_ _ _ = ()
   let initialize_variable_using_type _ _ _  = ()
 
   let relate _ _ () = Base.SetLattice.empty
-  let filter _ _ _ () = ()
-  let reuse _ _ ~current_input:() ~previous_output:() = ()
-
-  let post_analysis _ = ()
 end
 
 

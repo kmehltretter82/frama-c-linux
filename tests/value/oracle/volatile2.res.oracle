@@ -65,7 +65,7 @@
   signed overflow. assert i + j ≤ 32767;
 [eva] tests/value/volatile2.i:80: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   t[0..9] ∈ [--..--]
   u ∈ [--..--]
   pu ∈ {{ &u }}

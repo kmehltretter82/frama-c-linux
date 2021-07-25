@@ -89,7 +89,7 @@ module Memory = struct
 end
 
 
-module Internal  : Domain_builder.InputDomain
+module D : Abstract_domain.Leaf
   with type state = Memory.t
    and type value = offsm_or_top
    and type location = Precise_locs.precise_location
@@ -104,7 +104,8 @@ module Internal  : Domain_builder.InputDomain
              include Abstract_domain.Lattice with type state := state
            end)
 
-  let name = "Bitwise domain"
+  include Domain_builder.Complete (Memory)
+
   let log_category = dkey
 
   let empty _ = Memory.empty_map
@@ -112,10 +113,6 @@ module Internal  : Domain_builder.InputDomain
   let enter_scope _kind _vars state = state (* default is Top, nothing to do *)
   let leave_scope _kf vars state =
     Memory.remove_variables vars state
-
-  let enter_loop _ state = state
-  let incr_loop_counter _ state = state
-  let leave_loop _ state = state
 
   let kill loc state =
     Memory.add_binding ~exact:true state loc V_Or_Uninitialized.top
@@ -167,8 +164,6 @@ module Internal  : Domain_builder.InputDomain
     update valuation state >>-: fun state ->
     Extlib.opt_fold start_recursive_call recursion state
 
-  let show_expr _valuation _state _fmt _expr = ()
-
   let extract_expr ~oracle:_ _context _state _exp =
     `Value (Offsm_value.Offsm.top, None), Alarmset.all
 
@@ -200,10 +195,6 @@ module Internal  : Domain_builder.InputDomain
     in
     o, Alarmset.all
 
-  let backward_location _state _lval _typ loc value = `Value (loc, value)
-
-  let reduce_further _state _expr _value = []
-
   (* Memexec *)
   let relate _kf _bases _state = Base.SetLattice.empty
   let filter _kf _kind bases state =
@@ -229,13 +220,4 @@ module Internal  : Domain_builder.InputDomain
   let logic_assign _assign location state =
     let loc = Precise_locs.imprecise_location location in
     kill loc state
-
-  let evaluate_predicate _ _ _ = Alarmset.Unknown
-  let reduce_by_predicate _ state _ _ = `Value state
-
-  let storage = Value_parameters.BitwiseOffsmStorage.get
-
 end
-
-
-module D = Domain_builder.Complete (Internal)
