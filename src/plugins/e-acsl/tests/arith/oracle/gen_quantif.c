@@ -314,7 +314,7 @@ int main(void)
         {
           __e_acsl_mpz_t __gen_e_acsl__2;
           __e_acsl_mpz_t __gen_e_acsl_add;
-          __gmpz_init_set_ui(__gen_e_acsl__2,1UL);
+          __gmpz_init_set_str(__gen_e_acsl__2,"1",10);
           __gmpz_init(__gen_e_acsl_add);
           __gmpz_add(__gen_e_acsl_add,
                      (__e_acsl_mpz_struct const *)(__gen_e_acsl_i_4),
