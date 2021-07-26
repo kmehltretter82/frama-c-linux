@@ -200,66 +200,6 @@ let handle_annotations env kf stmt =
 (**************************************************************************)
 (**************************** Nested loops ********************************)
 (**************************************************************************)
-
-(* It could happen that the bounds provided for a quantifier [lv] are bigger
-   than its type. [bounds_for_small_type] handles such cases
-   and provides smaller bounds whenever possible.
-   Let B be the inferred interval and R the range of [lv.typ]
-   - Case 1: B \subseteq R
-     Example: [\forall unsigned char c; 4 <= c <= 100 ==> 0 <= c <= 255]
-     Return: B
-   - Case 2: B \not\subseteq R and the bounds of B are inferred exactly
-     Example: [\forall unsigned char c; 4 <= c <= 300 ==> 0 <= c <= 255]
-     Return: B \intersect R
-   - Case 3: B \not\subseteq R and the bounds of B are NOT inferred exactly
-     Example: [\let m = n > 0 ? 4 : 341; \forall char u; 1 < u < m ==> u > 0]
-     Return: R with a guard guaranteeing that [lv] does not overflow *)
-let bounds_for_small_type ~loc (t1, lv, t2) =
-  match lv.lv_type with
-  | Ltype _ | Lvar _ | Lreal | Larrow _ ->
-    Options.abort "quantification over non-integer type is not part of E-ACSL"
-
-  | Linteger ->
-    t1, t2, None
-
-  | Ctype ty ->
-    let iv1 = Interval.(extract_ival (infer t1)) in
-    let iv2 = Interval.(extract_ival (infer t2)) in
-    (* Ival.join is NOT correct here:
-       Eg: (Ival.join [-3..-3] [300..300]) gives {-3, 300}
-       but NOT [-3..300] *)
-    let iv = Ival.inject_range (Ival.min_int iv1) (Ival.max_int iv2) in
-    let ity = Interval.extract_ival (Interval.interv_of_typ ty) in
-    if Ival.is_included iv ity then
-      (* case 1 *)
-      t1, t2, None
-    else if Ival.is_singleton_int iv1 && Ival.is_singleton_int iv2 then begin
-      (* case 2 *)
-      let i = Ival.meet iv ity in
-      (* now we potentially have a better interval for [lv]
-         ==> update the binding *)
-      Interval.Env.replace lv (Interval.Ival i);
-      (* the smaller bounds *)
-      let min, max = Misc.finite_min_and_max i in
-      let t1 = Logic_const.tint ~loc min in
-      let t2 = Logic_const.tint ~loc max in
-      let ctx = Typing.number_ty_of_typ ~post:false ty in
-      (* we are assured that we will not have a GMP,
-         once again because we intersected with [ity] *)
-      Typing.type_term ~use_gmp_opt:false ~ctx t1;
-      Typing.type_term ~use_gmp_opt:false ~ctx t2;
-      t1, t2, None
-    end else
-      (* case 3 *)
-      let min, max = Misc.finite_min_and_max ity in
-      let guard_lower = Logic_const.tint ~loc min in
-      let guard_upper = Logic_const.tint ~loc max in
-      let lv_term = Logic_const.tvar ~loc lv in
-      let guard_lower = Logic_const.prel ~loc (Rle, guard_lower, lv_term) in
-      let guard_upper = Logic_const.prel ~loc (Rle, lv_term, guard_upper) in
-      let guard = Logic_const.pand ~loc (guard_lower, guard_upper) in
-      t1, t2, Some guard
-
 let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
   let term_to_exp = !term_to_exp_ref in
   match lscope_vars with
