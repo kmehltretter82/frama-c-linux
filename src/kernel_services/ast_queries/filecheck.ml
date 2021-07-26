@@ -125,6 +125,9 @@ module Base_checker = struct
       method! vvdec v =
         Kernel.debug
           ~dkey:Kernel.dkey_check "Declaration of %s(%d)" v.vname v.vid;
+        if v.vname = "" then
+          check_abort "variable of id %d and type %a has an empty name"
+            v.vid Cil_datatype.Typ.pretty v.vtype;
         if Varinfo.Hashtbl.mem known_vars v then
           (let v' = Varinfo.Hashtbl.find known_vars v in
            if v != v' then (* we can see the declaration twice
@@ -193,6 +196,8 @@ module Base_checker = struct
         Cil.DoChildren
 
       method! vlogic_var_decl lv =
+        if lv.lv_name = "" then
+          check_abort "logic variable of id %d has an empty name" lv.lv_id;
         Logic_var.Hashtbl.add known_logic_vars lv lv;
         match lv.lv_origin with
         (* lvkind for purely logical variables is checked at the parent level. *)
