@@ -79,6 +79,13 @@ val interv_of_typ: Cil_types.typ -> t
     @raise Is_a_real if the given type is a float type.
     @raise Not_a_number if the given type does not represent any number. *)
 
+val extended_interv_of_typ: Cil_types.typ -> t
+(** @return the interval [n..m+1] when interv_of_typ returns [n..m].
+    It is in particular useful for computing bounds of quantified variables.
+    @raise Is_a_real if the given type is a float type.
+    @raise Not_a_number if the given type does not represent any number. *)
+
+
 (* ************************************************************************** *)
 (** {3 Environment for interval computations} *)
 (* ************************************************************************** *)

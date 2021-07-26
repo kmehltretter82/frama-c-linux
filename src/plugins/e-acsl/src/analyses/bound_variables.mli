@@ -20,3 +20,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cil_types
+open Cil_datatype
+
+
+val compute_guards: location -> is_forall:bool -> predicate -> Logic_var.t list -> predicate -> unit
+(** Takes a predicate starting with a quantifier and store the scope of its variable *)
+
+val get_preprocessed_quantifier: predicate -> (term * logic_var * term) list * predicate
+(** Returns the preprocessed form of a quantifier *)
+
+val get_guard_for_small_type : logic_var -> predicate option

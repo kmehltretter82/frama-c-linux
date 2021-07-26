@@ -46,6 +46,77 @@ let error_msg quantif msg pp x =
   in
   msg1 ^ msg2
 
+
+(** A module to work with quantifiers at preprocessing time. We create
+    a datatype to hash quantified predicates by simply giving the hash
+    of their first variable.
+*)
+module Quantified_predicate =
+  Datatype.Make_with_collections
+    (struct
+      include Cil_datatype.Predicate
+      let name = "E_ACSL.Quantified_predicate"
+      let hash (p:predicate) = match p.pred_content with
+        | Pforall(lvs,_)
+        | Pexists(lvs,_) ->
+          begin match lvs with
+            |[] -> 0
+            |lv::_ -> Cil_datatype.Logic_var.hash lv
+          end
+        | _ -> assert false
+      let compare (p1:predicate) p2 =
+        if p1 == p2 then 0 else 1
+      let equal (p1:predicate) p2 = p1 == p2
+      let structural_descr = Structural_descr.t_abstract
+      let rehash = Datatype.identity
+      let mem_project = Datatype.never_any_project
+    end)
+
+(******************************************************************************)
+(** Storing the preprocessed quantifiers *)
+(******************************************************************************)
+
+(** In order to retrieve the preprocessed form of a quantified predicate
+ *   we store it in a hash table. *)
+module Quantifier: sig
+  val add: predicate -> (term * logic_var * term) list -> predicate -> unit
+  val get: predicate -> (term * logic_var * term) list * predicate
+  (** getter and setter for the additional guard that intersects with the type
+      of the variable *)
+  val get_guard_for_small_type : logic_var -> predicate option
+  val add_guard_for_small_type : logic_var -> predicate option -> unit
+end = struct
+
+  let tbl = Quantified_predicate.Hashtbl.create 97
+
+  let guard_tbl = Cil_datatype.Logic_var.Hashtbl.create 97
+
+  let get p =
+    (* Options.feedback "Get preprocessed form of predicate %a" Printer.pp_predicate p; *)
+    try Quantified_predicate.Hashtbl.find tbl p
+    with Not_found ->
+      Options.fatal
+        "The preprocessed form of predicate %a was not found."
+        Printer.pp_predicate p
+
+  let add p guarded_vars goal =
+    (* Options.feedback "Adding preprocessed form of predicate %a" Printer.pp_predicate p; *)
+    Quantified_predicate.Hashtbl.add tbl p (guarded_vars, goal)
+
+  let get_guard_for_small_type x =
+    try Cil_datatype.Logic_var.Hashtbl.find guard_tbl x
+    with Not_found ->
+      Options.fatal
+        "The typing guard for the variable %a was not found."
+        Printer.pp_logic_var x
+
+  let add_guard_for_small_type lv p =
+    Cil_datatype.Logic_var.Hashtbl.add guard_tbl lv p
+end
+
+let get_preprocessed_quantifier = Quantifier.get
+let get_guard_for_small_type = Quantifier.get_guard_for_small_type
+
 (** Helper module to process the constraints in the quantification and extract
     guards for the quantified variables. *)
 module Constraints: sig
@@ -561,14 +632,12 @@ let compute_quantif_guards ~is_forall quantif bounded_vars p =
    - Case 3: B \not\subseteq R and the bounds of B are NOT inferred exactly
      Example: [\let m = n > 0 ? 4 : 341; \forall char u; 1 < u < m ==> u > 0]
      Return: R with a guard guaranteeing that [lv] does not overflow *)
-let bounds_for_small_type ~loc (t1, lv, t2) =
+let bounds_for_small_types ~loc (t1, lv, t2) =
   match lv.lv_type with
   | Ltype _ | Lvar _ | Lreal | Larrow _ ->
-    Options.abort "quantification over non-integer type is not part of E-ACSL"
-
+    Error.not_yet "quantification over non-integer type"
   | Linteger ->
     t1, t2, None
-
   | Ctype ty ->
     let iv1 = Interval.(extract_ival (infer t1)) in
     let iv2 = Interval.(extract_ival (infer t2)) in
@@ -576,7 +645,7 @@ let bounds_for_small_type ~loc (t1, lv, t2) =
        Eg: (Ival.join [-3..-3] [300..300]) gives {-3, 300}
        but NOT [-3..300] *)
     let iv = Ival.inject_range (Ival.min_int iv1) (Ival.max_int iv2) in
-    let ity = Interval.extract_ival (Interval.interv_of_typ ty) in
+    let ity = Interval.extract_ival (Interval.extended_interv_of_typ ty) in
     if Ival.is_included iv ity then
       (* case 1 *)
       t1, t2, None
@@ -603,8 +672,45 @@ let bounds_for_small_type ~loc (t1, lv, t2) =
       let guard_upper = Logic_const.tint ~loc max in
       let lv_term = Logic_const.tvar ~loc lv in
       let guard_lower = Logic_const.prel ~loc (Rle, guard_lower, lv_term) in
-      let guard_upper = Logic_const.prel ~loc (Rle, lv_term, guard_upper) in
+      let guard_upper = Logic_const.prel ~loc (Rlt, lv_term, guard_upper) in
       let guard = Logic_const.pand ~loc (guard_lower, guard_upper) in
       t1, t2, Some guard
 
 let () = Typing.compute_quantif_guards_ref := compute_quantif_guards
+
+(** Take a guard and put it in normal form
+    [t1 <= x < t2] so that [t1] is the first value
+     taken by [x] and [t2] is the last one.
+    This step also adds the extra guard if the type
+    of the quantified variable is small *)
+let normalize_guard ~loc (t1, rel1, lv, rel2, t2) =
+  let t_plus_one t =
+    let tone = Cil.lone ~loc () in
+    Logic_const.term ~loc (TBinOp(PlusA, t, tone)) Linteger
+  in
+  (* this function only manipulate guards that were already
+  processed by compute_quantif_guards, which only outputs
+  guards with the constructors Rlt and Rle*)
+  let t1 = match rel1 with
+    | Rlt ->
+      t_plus_one t1
+    | Rle ->
+      t1
+    | Rgt | Rge | Req | Rneq ->
+      assert false  in
+  let t2 = match rel2 with
+    | Rlt ->
+      t2
+    | Rle ->
+      t_plus_one t2
+    | Rgt | Rge | Req | Rneq ->
+      assert false in
+  let t1, t2, guard_for_small_type = bounds_for_small_types ~loc (t1, lv, t2) in
+  Quantifier.add_guard_for_small_type lv guard_for_small_type;
+  t1, lv, t2
+
+let compute_guards loc ~is_forall p bounded_vars hyps =
+  let guards,goal = compute_quantif_guards p ~is_forall bounded_vars hyps in
+  (* transform [guards] into [lscope_var list] *)
+  let normalized_guards = List.map (normalize_guard ~loc) guards
+  in Quantifier.add p normalized_guards goal

@@ -231,6 +231,17 @@ let rec interv_of_typ ty = match Cil.unrollType ty with
   | TNamed _ ->
     assert false
 
+let rec extended_interv_of_typ ty = match interv_of_typ ty with
+  | Ival iv ->
+    let l,u = Ival.min_int iv, Ival.max_int iv in
+    let u = match u with
+      | Some u -> Some (Integer.add u Integer.one)
+      | None -> None
+    in
+    Ival (Ival.inject_range l u);
+  | Rational | Real | Nan | Float (_,_) as i
+    -> i
+
 (* Compute the interval of the extended quantifier \sum, \product and \numof.
    [lbd_ival] is the interval of the lambda term, [k_ival] is the interval of the
    quantifier and [name]  is the identifier of the extended quantifier (\sum,
