@@ -30,7 +30,7 @@ val flag: Abstractions.flag
 
 type taint_error =
   | NotComputed (** The Eva analysis has not been run, or the taint domain
-                    were not enabled. *)
+                    was not enabled. *)
   | Irrelevant  (** Properties other than assertions, invariants and
                     preconditions are irrelevant here. *)
   | LogicError  (** The memory zone on which the property depends could not

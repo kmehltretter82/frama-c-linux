@@ -149,12 +149,12 @@ module Taint = struct
   let tag_tainted =
     tag (Ok true) "tainted" "yes"
       "Tainted property: this property is related to a memory zone that \
-       can be affected by an attacker, according to the Eva taint domain."
+       can be affected by an attacker, according to the Eva taint domain"
 
   let tag_not_tainted =
     tag (Ok false) "not_tainted" "no"
       "Untainted property: this property is safe, \
-       according to the Eva taint domain."
+       according to the Eva taint domain"
 
   let () = Enum.set_lookup dictionary
       begin function
@@ -166,7 +166,7 @@ module Taint = struct
       end
 
   let data = Request.dictionary ~package ~name:"taintStatus"
-      ~descr:(Markdown.plain "TODO") dictionary
+      ~descr:(Markdown.plain "Taint status of logical properties") dictionary
 
   include (val data : S with type t = (bool, taint_error) result)
 end
