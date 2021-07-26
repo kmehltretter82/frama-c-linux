@@ -831,6 +831,11 @@ end = struct
              Cil.update_var_type new_var mytype;
              List.iter2
                (fun x y ->
+                  if y.vname = "" then begin
+                    y.vname <- x.vname;
+                    if hasAttribute anonymous_attribute_name x.vattr then
+                      y.vattr <- addAttribute anonymous_attribute y.vattr;
+                  end;
                   Visitor_behavior.Set.varinfo self#behavior x y;
                   Visitor_behavior.Set_orig.varinfo self#behavior y x;
                   match x.vlogic_var_assoc with
