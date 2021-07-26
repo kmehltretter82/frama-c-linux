@@ -495,6 +495,10 @@ end = struct
     Error.untypable msg
 end
 
+(******************************************************************************)
+(** Syntactical analysis *)
+(******************************************************************************)
+
 (** [extract_constraint ctxt t1 r t2] populates the quantification context
     [ctxt] with the constraint [t1 r t2], either adding a lower bound if [t2] is
     a bounded variable or adding an upper bound if [t1] is a bounded variable.
