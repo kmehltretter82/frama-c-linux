@@ -1424,6 +1424,17 @@ val bitfield_attribute_name: string
 (** Name of the attribute that is automatically inserted (with an [AINT size]
     argument when querying the type of a field that is a bitfield *)
 
+val anonymous_attribute_name: string
+(** Name of the attribute that is inserted when generating a name for a varinfo
+    representing an anonymous function parameter.
+    @since Frama-C+dev
+*)
+
+val anonymous_attribute: attribute
+(** attribute identifying anonymous function parameters
+    @since Frama-C+dev
+*)
+
 (** Convert an expression into an attrparam, if possible. Otherwise raise
     NotAnAttrParam with the offending subexpression *)
 val expToAttrParam: exp -> attrparam

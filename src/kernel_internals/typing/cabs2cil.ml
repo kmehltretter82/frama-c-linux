@@ -3217,7 +3217,9 @@ let setupBuiltin ?(force_keep=false) name ?spec (resTyp, args_or_argtypes, isva)
       Some (List.map (fun vi -> (vi.vname, vi.vtype, vi.vattr)) args), args
     | ArgTypes argTypes ->
       let funargs =
-        List.mapi (fun i at -> ("__x" ^ string_of_int i, at, [])) argTypes
+        List.mapi
+          (fun i at ->
+             ("__x" ^ string_of_int i, at, [Cil.anonymous_attribute])) argTypes
       in
       Some funargs, List.map makeFormalsVarDecl funargs
   in
