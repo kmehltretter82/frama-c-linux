@@ -22,7 +22,6 @@
 
 open Cil_types
 open Cil
-open Cil_datatype
 
 (** Forward reference for [Translate.predicate_to_exp]. *)
 let predicate_to_exp_ref
@@ -31,7 +30,7 @@ let predicate_to_exp_ref
 
 
 (* It could happen that the bounds provided for a quantified [lv] are empty
-   in the sense that [min <= lv <= max] but [min > max]. In such cases, \true
+   in the sense that [min <= lv < max] but [min > max + 1]. In such cases, \true
    (or \false depending on the quantification) should be generated instead of
    nested loops.
    [has_empty_quantif_with_false_negative] partially detects such cases:
@@ -41,31 +40,28 @@ let rec has_empty_quantif_with_false_negative = function
   | [] ->
     (* case 2 *)
     false
-  | (t1, rel1, _, rel2, t2) :: guards ->
+  | (t1, _, t2) :: guards ->
     let iv1 = Interval.(extract_ival (infer t1)) in
     let iv2 = Interval.(extract_ival (infer t2)) in
     let lower_bound, _ = Ival.min_and_max iv1 in
     let _, upper_bound = Ival.min_and_max iv2 in
-    match lower_bound, upper_bound with
-    | Some lower_bound, Some upper_bound ->
-      let res =
-        match rel1, rel2 with
-        | Rle, Rle -> Integer.gt lower_bound upper_bound
-        | Rle, Rlt | Rlt, Rle -> Integer.ge lower_bound upper_bound
-        | Rlt, Rlt -> Integer.ge lower_bound (Z.sub upper_bound Z.one)
-        | _ -> assert false
-      in
-      res (* case 1 *) || has_empty_quantif_with_false_negative guards
-    | None, _ | _, None ->
-      has_empty_quantif_with_false_negative guards
+    begin
+      match lower_bound, upper_bound with
+      | Some lower_bound, Some upper_bound ->
+        let res  = lower_bound >= upper_bound in
+        res (* case 1 *) || has_empty_quantif_with_false_negative guards
+      | None, _ | _, None ->
+        has_empty_quantif_with_false_negative guards
+    end
+
 
 module Label_ids =
   State_builder.Counter(struct let name = "E_ACSL.Label_ids" end)
 
-let convert kf env loc ~is_forall quantif bounded_vars p =
+let convert kf env loc ~is_forall quantif =
   (* guarded quantification over integers (or a subtype of integer) *)
-  let guards, goal = compute_quantif_guards ~is_forall quantif bounded_vars p in
-  match has_empty_quantif_with_false_negative guards, is_forall with
+  let bound_vars, goal = Bound_variables.get_preprocessed_quantifier quantif in
+  match has_empty_quantif_with_false_negative bound_vars, is_forall with
   | true, true ->
     Cil.one ~loc, env
   | true, false ->
@@ -80,14 +76,14 @@ let convert kf env loc ~is_forall quantif bounded_vars p =
         if is_forall then o, z, fun x -> x
         else z, o, fun e -> new_exp ~loc:e.eloc (UnOp(LNot, e, intType))
       in
-      (* transform [guards] into [lscope_var list],
+      (* transform [bound_vars] into [lscope_var list],
          and update logic scope in the process *)
       let lvs_guards, env = List.fold_right
-          (fun (t1, rel1, lv, rel2, t2) (lvs_guards, env) ->
-             let lvs = Lscope.Lvs_quantif(t1, rel1, lv, rel2, t2) in
+          (fun (t1, lv, t2) (lvs_guards, env) ->
+             let lvs = Lscope.Lvs_quantif (t1, Rle, lv, Rlt, t2) in
              let env = Env.Logic_scope.extend env lvs in
              lvs :: lvs_guards, env)
-          guards
+          bound_vars
           ([], env)
       in
       let var_res, res, env =
@@ -148,11 +144,13 @@ let convert kf env loc ~is_forall quantif bounded_vars p =
 let quantif_to_exp kf env p =
   let loc = p.pred_loc in
   match p.pred_content with
-  | Pforall(bounded_vars, ({ pred_content = Pimplies(_, _) } as p')) ->
-    convert kf env loc ~is_forall:true p bounded_vars p'
+  | Pforall(bounded_vars, ({pred_content = Pimplies(_, _) } as p')) ->
+    Bound_variables.compute_guards loc ~is_forall:true p bounded_vars p';
+    convert kf env loc ~is_forall:true p
   | Pforall _ -> Error.not_yet "unguarded \\forall quantification"
   | Pexists(bounded_vars, ({ pred_content = Pand(_, _) } as p')) ->
-    convert kf env loc ~is_forall:false p bounded_vars p'
+    Bound_variables.compute_guards loc ~is_forall:false p bounded_vars p';
+    convert kf env loc ~is_forall:false p
   | Pexists _ -> Error.not_yet "unguarded \\exists quantification"
   | _ -> assert false
 

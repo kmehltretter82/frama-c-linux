@@ -689,8 +689,8 @@ let normalize_guard ~loc (t1, rel1, lv, rel2, t2) =
     Logic_const.term ~loc (TBinOp(PlusA, t, tone)) Linteger
   in
   (* this function only manipulate guards that were already
-  processed by compute_quantif_guards, which only outputs
-  guards with the constructors Rlt and Rle*)
+     processed by compute_quantif_guards, which only outputs
+     guards with the constructors Rlt and Rle*)
   let t1 = match rel1 with
     | Rlt ->
       t_plus_one t1
