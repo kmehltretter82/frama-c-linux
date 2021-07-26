@@ -39,7 +39,8 @@
       "enabled": [
         "*", "alarm", "builtins", "builtins:missing-spec",
         "builtins:override", "experimental", "libc", "libc:unsupported-spec",
-        "locals-escaping", "malloc", "malloc:imprecise", "signed-overflow"
+        "locals-escaping", "malloc", "malloc:imprecise", "signed-overflow",
+        "taint"
       ],
       "disabled": [
         "garbled-mix", "invalid-assigns", "loop-unroll", "malloc:weak",

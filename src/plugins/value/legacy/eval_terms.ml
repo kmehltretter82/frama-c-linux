@@ -754,6 +754,7 @@ let known_predicates = [
   "\\gt_double", ACSL;
   "\\ge_double", ACSL;
   "\\subset", ACSL;
+  "\\tainted", ACSL;
   "valid_read_string", Libc;
   "valid_string", Libc;
   "valid_read_wstring", Libc;
@@ -2608,6 +2609,7 @@ and eval_predicate env pred =
                     an element of [l] not in [r]. (Here, [l] is not bottom,
                     as [V.is_included bottom r.eunder] holds. *)
       else Unknown
+    | "\\tainted", [_] -> Unknown
     | "valid_read_string", [arg] ->
       let r = eval_term ~alarm_mode env arg in
       eval_valid_read_str ~wide:false env r.eover

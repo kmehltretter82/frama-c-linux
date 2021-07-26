@@ -263,6 +263,11 @@ module Make
     Right.reduce_by_predicate right_env right pred positive >>-: fun right ->
     left, right
 
+  let interpret_acsl_extension extension env (left, right) =
+    let left_env, right_env = split_logic_env env in
+    Left.interpret_acsl_extension extension left_env left,
+    Right.interpret_acsl_extension extension right_env right
+
   let enter_scope kind vars (left, right) =
     Left.enter_scope kind vars left, Right.enter_scope kind vars right
   let leave_scope kf vars (left, right) =

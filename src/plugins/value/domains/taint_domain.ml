@@ -44,6 +44,7 @@ let dkey = Value_parameters.register_category "d-taint"
    Frama_C_domain_show_each directive. *)
 let dkey_debug = Value_parameters.register_category "d-taint-debug"
 
+let wkey = Value_parameters.register_warn_category "taint"
 
 module LatticeTaint = struct
 
@@ -152,28 +153,6 @@ end
 
 module TransferTaint = struct
 
-  let zone_of_taint_annot stmt =
-    let zone_of_term t =
-      match t.term_node with
-      | TLval (TVar { lv_origin = Some vi }, TNoOffset) ->
-        Locations.zone_of_varinfo vi
-      | _ ->
-        (* TODO: Better message. *)
-        Value_parameters.not_yet_implemented ~current:true
-          "@[The taint domain currently supports only variables.@]"
-    in
-    match Eva_annotations.get_taint_annot stmt with
-    | [] ->
-      Zone.bottom
-    | [ tt ] ->
-      List.fold_left
-        (fun zones t -> Zone.join zones (zone_of_term t))
-        Zone.bottom
-        tt
-    | _ ->
-      (* No more than one annotation at time. *)
-      assert false
-
   let loc_of_lval valuation lv =
     match valuation.Abstract_domain.find_loc lv with
     | `Value loc -> loc.Eval.loc
@@ -209,12 +188,6 @@ module TransferTaint = struct
           let loc = Precise_locs.imprecise_location ploc in
           Locations.enumerate_valid_bits Write loc
         in
-        (* Update [state] by considering as tainted the left-values appearing in
-           taint annotation, and by keeping only the active tainted assumes. *)
-        let annot_zone = zone_of_taint_annot stmt in
-        let state =
-          { state with locs_data = Zone.join state.locs_data annot_zone }
-        in
         let state = filter_active_tainted_assumes stmt state in
         (* Control-dependency: taint the left-value of an assign statement whose
            execution depends on the value of a tainted assume statement. *)
@@ -227,40 +200,27 @@ module TransferTaint = struct
           else
             { state with locs_control = Zone.join state.locs_control lv_zone }
         in
-        (* Data-dependecy: taint the left-value of an assign statement if
-           tainted locations are involved in either the offset part of the
-           left-value or the assigned expression. As a special case, a
-           left-value is tainted as soon as it appears in a taint annotation. *)
-        let is_taint_annotated = Zone.is_included lv_zone annot_zone in
-        if is_taint_annotated
-        then
-          state
-        else
-          (* Compute data-dependency with [state]: whenever [exp] (or its
-             sub-expressions) is tainted, or [lv] is indexed by a tainted memory
-             location. *)
-          let exp_zone = Value_util.zone_of_expr to_loc exp in
-          let lv_indirect_zone =
-            Value_util.indirect_zone_of_lval to_loc lv.Eval.lval
-          in
-          let intersect_state =
-            LatticeTaint.intersects state exp_zone ||
-            LatticeTaint.intersects state lv_indirect_zone
-          in
-          if intersect_state
-          then { state with locs_data = Zone.join state.locs_data lv_zone }
-          else if Precise_locs.cardinal_zero_or_one ploc
-          then { state with locs_data = Zone.diff state.locs_data lv_zone }
-          else state
+        (* Compute data-dependency with [state]: whenever [exp] (or its
+           sub-expressions) is tainted, or [lv] is indexed by a tainted memory
+           location. *)
+        let exp_zone = Value_util.zone_of_expr to_loc exp in
+        let lv_indirect_zone =
+          Value_util.indirect_zone_of_lval to_loc lv.Eval.lval
+        in
+        let intersect_state =
+          LatticeTaint.intersects state exp_zone ||
+          LatticeTaint.intersects state lv_indirect_zone
+        in
+        if intersect_state
+        then { state with locs_data = Zone.join state.locs_data lv_zone }
+        else if Precise_locs.cardinal_zero_or_one ploc
+        then { state with locs_data = Zone.diff state.locs_data lv_zone }
+        else state
     in
     `Value state
 
   let assume stmt exp _b valuation state =
     let state = filter_active_tainted_assumes stmt state in
-    let state =
-      let annot_zone = zone_of_taint_annot stmt in
-      { state with locs_data = Zone.join state.locs_data annot_zone }
-    in
     (* Add [stmt] as assume statement in [state] as soon as [exp] is tainted. *)
     let to_loc = loc_of_lval valuation in
     let exp_zone = Value_util.zone_of_expr to_loc exp in
@@ -273,10 +233,6 @@ module TransferTaint = struct
 
   let start_call stmt call _recursion valuation state =
     let state = filter_active_tainted_assumes stmt state in
-    let state =
-      let annot_zone = zone_of_taint_annot stmt in
-      { state with locs_data = Zone.join state.locs_data annot_zone }
-    in
     let state =
       (* Add tainted actual parameters in [state]. *)
       let to_loc = loc_of_lval valuation in
@@ -391,3 +347,215 @@ module TaintDomain = struct
 end
 
 include TaintDomain
+
+
+(* Registers ACSL builtin predicate \tainted. *)
+let () =
+  let a_name = "tainted" in
+  let a_type = Lvar a_name in
+  let builtin_logic_info =
+    { bl_name = "\\tainted";
+      bl_labels = [];
+      bl_params = [ a_name ];
+      bl_type = None;
+      bl_profile = ["p", a_type];
+    }
+  in
+  Logic_env.add_builtin_logic_function_gen
+    Logic_utils.is_same_builtin_profile builtin_logic_info
+
+(* Registers ACSL extension "taint" (statement annotation)
+   and "taints" (behavior extension). *)
+let () =
+  let typer kind context _loc args =
+    let open Logic_typing in
+    let get_state context =
+      match kind with
+      | `Pre -> context.pre_state
+      | `Post -> context.post_state [Normal]
+    in
+    let parse context = context.type_term context (get_state context) in
+    Ext_terms (List.map (parse context) args)
+  in
+  Acsl_extension.register_behavior "taints" (typer `Post) false;
+  Acsl_extension.register_code_annot_next_stmt "taint" (typer `Pre) false
+
+(* Interpretation of logic by the taint domain, using the cvalue domain. *)
+module TaintLogic = struct
+
+  let eval_tlval_zone cvalue_env term =
+    let alarm_mode = Eval_terms.Fail in
+    try
+      let access = Locations.Read in
+      Some (Eval_terms.eval_tlval_as_zone_under_over
+              ~alarm_mode access cvalue_env term)
+    with Eval_terms.LogicEvalError _ -> None
+
+  let eval_term_deps cvalue_env term =
+    let alarm_mode = Eval_terms.Fail in
+    try
+      let result = Eval_terms.eval_term ~alarm_mode cvalue_env term in
+      match Logic_label.Map.bindings result.ldeps with
+      | [ BuiltinLabel Here, zone ] -> Some (Zone.bottom, zone)
+      | _ -> None
+    with Eval_terms.LogicEvalError _ -> None
+
+  let eval_term_zone cvalue_env term =
+    match eval_tlval_zone cvalue_env term with
+    | Some _ as x -> x
+    | None -> eval_term_deps cvalue_env term
+
+  let reduce_by_taint_predicate cvalue_env state term positive =
+    match eval_term_zone cvalue_env term with
+    | None -> state
+    | Some (under, _over) ->
+      if positive
+      then { state with locs_data = Zone.join state.locs_data under }
+      else { state with locs_data = Zone.diff state.locs_data under }
+
+  let rec reduce_by_predicate cvalue_env state predicate positive =
+    match positive, predicate.pred_content with
+    | true, Pand (p1, p2)
+    | false, Por (p1, p2) ->
+      let state = reduce_by_predicate cvalue_env state p1 positive in
+      reduce_by_predicate cvalue_env state p2 positive
+    | true, Por (p1, p2)
+    | false, Pand (p1, p2) ->
+      let state1 = reduce_by_predicate cvalue_env state p1 positive in
+      let state2 = reduce_by_predicate cvalue_env state p2 positive in
+      join state1 state2
+    | _, Pnot p -> reduce_by_predicate cvalue_env state p (not positive)
+    | _, Papp ({l_var_info = {lv_name = "\\tainted"}}, _labels, [arg]) ->
+      reduce_by_taint_predicate cvalue_env state arg positive
+    | _ -> state
+
+  let evaluate_taint_predicate cvalue_env state term =
+    match eval_term_zone cvalue_env term with
+    | None -> Alarmset.Unknown
+    | Some (_under, over) ->
+      if Zone.intersects over state.locs_data
+      then Alarmset.Unknown
+      else Alarmset.False
+
+  let evaluate_predicate cvalue_env state predicate =
+    let rec evaluate predicate =
+      match predicate.pred_content with
+      | Papp ({l_var_info = {lv_name = "\\tainted"}}, _labels, [arg]) ->
+        evaluate_taint_predicate cvalue_env state arg
+      | Ptrue -> True
+      | Pfalse -> False
+      | Pand (p1, p2) ->
+        begin
+          match evaluate p1, evaluate p2 with
+          | True, True -> True
+          | False, _ | _, False -> False
+          | _ -> Unknown
+        end
+      | Por (p1, p2) ->
+        begin
+          match evaluate p1, evaluate p2 with
+          | True, _ | _, True -> True
+          | False, False -> False
+          | _ -> Unknown
+        end
+      | Pnot p ->
+        begin
+          match evaluate p with
+          | True -> False
+          | False -> True
+          | Unknown -> Unknown
+        end
+      | _ -> Unknown
+    in
+    evaluate predicate
+
+  let interpret_taint_extension cvalue_env taint terms =
+    let taint_term taint term =
+      match eval_tlval_zone cvalue_env term with
+      | None ->
+        Value_parameters.warning ~wkey ~current:true ~once:true
+          "Cannot evaluate term %a in taint annotation; ignoring."
+          Printer.pp_term term;
+        taint
+      | Some (under, over) ->
+        if not (Zone.equal under over)
+        then
+          Value_parameters.warning ~wkey ~current:true ~once:true
+            "Cannot precisely evaluate term %a in taint annotation; \
+             over-approximating."
+            Printer.pp_term term;
+        { taint with locs_data = Zone.join taint.locs_data over }
+    in
+    List.fold_left taint_term taint terms
+end
+
+let interpret_taint_logic
+    (module Abstract: Abstractions.S) : (module Abstractions.S) =
+  match Abstract.Dom.get Cvalue_domain.State.key, Abstract.Dom.get key with
+  | None, _
+  | _, None -> (module Abstract)
+  | Some get_cvalue_state, Some get_taint_state ->
+    let module Dom = struct
+      include Abstract.Dom
+
+      let get_states env state =
+        let taint = get_taint_state state in
+        let get_cvalue state = fst (get_cvalue_state state) in
+        let states label = get_cvalue (env.Abstract_domain.states label) in
+        let cvalue_env = Abstract_domain.{ env with states = states } in
+        Eval_terms.make_env cvalue_env (get_cvalue state), taint
+
+      let evaluate_predicate env state predicate =
+        match evaluate_predicate env state predicate with
+        | Unknown ->
+          let cvalue_env, taint = get_states env state in
+          TaintLogic.evaluate_predicate cvalue_env taint predicate
+        | x -> x
+
+      let reduce_by_predicate env state predicate positive =
+        match reduce_by_predicate env state predicate positive with
+        | `Bottom -> `Bottom
+        | `Value state ->
+          let cvalue_env, taint = get_states env state in
+          let taint =
+            TaintLogic.reduce_by_predicate cvalue_env taint predicate positive
+          in
+          `Value (Abstract.Dom.set key taint state)
+
+      let interpret_acsl_extension extension env state =
+        if String.equal extension.ext_name "taint"
+        || String.equal extension.ext_name "taints"
+        then
+          match extension.ext_kind with
+          | Ext_terms terms ->
+            let cvalue_env, taint = get_states env state in
+            let taint =
+              TaintLogic.interpret_taint_extension cvalue_env taint terms
+            in
+            Abstract.Dom.set key taint state
+          | _ ->
+            Value_parameters.warning ~wkey ~current:true ~once:true
+              "Invalid taint annotation %a; ignoring."
+              Printer.pp_extended extension;
+            state
+        else state
+    end
+    in
+    (module struct
+      module Val = Abstract.Val
+      module Loc = Abstract.Loc
+      module Dom = Dom
+    end)
+
+(* Registers the domain. *)
+let flag =
+  let name = "taint"
+  and descr = "Taint analysis"
+  and experimental = true
+  and abstraction =
+    Abstractions.{ values = Single (module Main_values.CVal);
+                   domain = Domain (module TaintDomain); }
+  in
+  Abstractions.register ~name ~descr ~experimental abstraction
+
+let () = Abstractions.register_hook interpret_taint_logic

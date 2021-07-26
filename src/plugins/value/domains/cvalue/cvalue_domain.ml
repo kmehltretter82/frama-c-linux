@@ -316,6 +316,8 @@ module State = struct
     then `Value (state, clob)
     else `Bottom
 
+  let interpret_acsl_extension _extension _env state = state
+
   let evaluate_from_clause state deps =
     (* Evaluates the contents of one element of the from clause, topify them,
        and add them to the current state of the evaluation in acc. *)

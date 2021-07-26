@@ -48,15 +48,12 @@ type flow_annotation =
   | FlowSplit of split_term * split_kind
   | FlowMerge of split_term
 
-type taint_annotation = Cil_types.term list
-
 type allocation_kind = By_stack | Fresh | Fresh_weak | Imprecise
 
 val get_slevel_annot : Cil_types.stmt -> slevel_annotation option
 val get_unroll_annot : Cil_types.stmt -> unroll_annotation list
 val get_flow_annot : Cil_types.stmt -> flow_annotation list
 val get_subdivision_annot : Cil_types.stmt -> int list
-val get_taint_annot : Cil_types.stmt -> taint_annotation list
 val get_allocation: Cil_types.stmt -> allocation_kind
 
 val add_slevel_annot : emitter:Emitter.t -> loc:Cil_types.location ->
@@ -67,5 +64,3 @@ val add_flow_annot : emitter:Emitter.t -> loc:Cil_types.location ->
   Cil_types.stmt -> flow_annotation -> unit
 val add_subdivision_annot : emitter:Emitter.t -> loc:Cil_types.location ->
   Cil_types.stmt -> int -> unit
-val add_taint_annot : emitter:Emitter.t -> loc:Cil_types.location ->
-  Cil_types.stmt -> taint_annotation -> unit

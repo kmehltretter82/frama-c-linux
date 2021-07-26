@@ -139,6 +139,7 @@ module Make
 
   let evaluate_predicate = Domain.evaluate_predicate
   let reduce_by_predicate = Domain.reduce_by_predicate
+  let interpret_acsl_extension = Domain.interpret_acsl_extension
 
   let enter_scope = Domain.enter_scope
   let leave_scope = Domain.leave_scope
