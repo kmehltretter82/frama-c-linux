@@ -63,7 +63,8 @@ SRC_ANALYSES:= \
 	exit_points \
 	lscope \
 	interval \
-	typing
+	typing \
+	bound_variables
 SRC_ANALYSES:=$(addprefix src/analyses/, $(SRC_ANALYSES))
 
 # code generator
