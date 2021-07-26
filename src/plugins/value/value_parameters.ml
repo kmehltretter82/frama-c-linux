@@ -844,16 +844,16 @@ module ILevel =
   Int
     (struct
       let option_name = "-eva-ilevel"
-      let default = 8
+      let default = 8 (* Must be synchronized with Int_set.small_cardinal. *)
       let arg_name = "n"
       let help =
         "Sets of integers are represented as sets up to <n> elements. \
          Above, intervals with congruence information are used \
-         (defaults to 8, must be between 4 and 128)"
+         (defaults to 8, must be above 2)"
     end)
 let () = add_precision_dep ILevel.parameter
 let () = ILevel.add_update_hook (fun _ i -> Int_set.set_small_cardinal i)
-let () = ILevel.set_range 4 256
+let () = ILevel.set_range 2 max_int
 
 let builtins = ref Datatype.String.Set.empty
 let register_builtin name = builtins := Datatype.String.Set.add name !builtins
