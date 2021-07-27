@@ -7,7 +7,9 @@
                  # an optional include, unnecessary if frama-c is in the PATH.
 FRAMAC ?= frama-c # FRAMAC is defined in path.mk when it is included, but the
                   # user can override it in the command-line.
-FRAMAC_SHARE ?= $(shell $(FRAMAC)-config -print-share-path)
+ifeq ($(FRAMAC_SHARE),)
+  FRAMAC_SHARE := $(shell $(FRAMAC)-config -print-share-path)
+endif
 include $(FRAMAC_SHARE)/analysis-scripts/prologue.mk
 ###############################################################################
 
@@ -46,5 +48,5 @@ fc_script_main.parse: \
   ../main3.c \
 
 ### Epilogue. Do not modify this block. #######################################
-include $(FRAMAC_SHARE)/analysis-scripts/prologue.mk
+include $(FRAMAC_SHARE)/analysis-scripts/epilogue.mk
 ###############################################################################
