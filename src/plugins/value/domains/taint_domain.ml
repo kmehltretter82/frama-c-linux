@@ -599,6 +599,8 @@ let () = Abstractions.register_hook interpret_taint_logic
 
 
 type taint_error = NotComputed | Irrelevant | LogicError
+type taint_ok = Data | Control | None
+type taint_result = (taint_ok, taint_error) result
 
 let zone_of_predicate env predicate =
   let logic_deps = Eval_terms.predicate_deps env predicate in
@@ -631,10 +633,13 @@ let is_tainted_property ip =
     let+ stmt = get_stmt ip in
     let+ predicate = get_predicate ip in
     match Store.get_stmt_state ~after:false stmt with
-    | `Bottom -> Ok false
+    | `Bottom -> Ok None
     | `Value state ->
       let cvalue = Db.Value.get_stmt_state ~after:false stmt in
       let env = Eval_terms.env_only_here cvalue in
       let+ zone = zone_of_predicate env predicate in
-      let tainted = Zone.intersects zone state.locs_data in
-      Ok tainted
+      if Zone.intersects zone state.locs_data
+      then Ok Data
+      else if Zone.intersects zone state.locs_control
+      then Ok Control
+      else Ok None

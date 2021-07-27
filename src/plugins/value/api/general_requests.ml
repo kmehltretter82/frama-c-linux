@@ -129,46 +129,56 @@ module Taint = struct
 
   let dictionary = Enum.dictionary ()
 
-  let tag value name label descr =
+  let tag value name label short_descr long_descr =
     Enum.tag ~name
       ~label:(Markdown.plain label)
-      ~descr:(Markdown.plain descr) ~value dictionary
+      ~descr:(Markdown.bold (short_descr ^ ": ") @ Markdown.plain long_descr)
+      ~value dictionary
 
   let tag_not_computed =
     tag (Error NotComputed) "not_computed" ""
-      "The Eva taint analysis has not been computed"
+      "Not computed" "the Eva taint domain has not been enabled, \
+                      or the Eva analysis has not been run"
 
   let tag_error =
     tag (Error LogicError) "error" "Error"
-      "Error: the memory zone on which this property depends could not be computed"
+      "Error" "the memory zone on which this property depends \
+               could not be computed"
 
   let tag_not_applicable =
     tag (Error Irrelevant) "not_applicable" "—"
-      "No taint for this kind of property"
+      "Not applicable" "no taint for this kind of property"
 
-  let tag_tainted =
-    tag (Ok true) "tainted" "yes"
-      "Tainted property: this property is related to a memory zone that \
-       can be affected by an attacker, according to the Eva taint domain"
+  let tag_data_tainted =
+    tag (Ok Data) "data_tainted" "Tainted (data)"
+      "Data tainted"
+      "this property is related to a memory location that can be affected \
+       by an attacker"
 
-  let tag_not_tainted =
-    tag (Ok false) "not_tainted" "no"
-      "Untainted property: this property is safe, \
-       according to the Eva taint domain"
+  let tag_control_tainted =
+    tag (Ok Control) "control_tainted" "Tainted (control)"
+      "Control tainted"
+      "this property is related to a memory location whose assignment depends \
+       on path conditions that can be affected by an attacker"
+
+  let tag_untainted =
+    tag (Ok None) "not_tainted" "Untainted"
+      "Untainted property" "this property is safe"
 
   let () = Enum.set_lookup dictionary
       begin function
         | Error Taint_domain.NotComputed -> tag_not_computed
         | Error Taint_domain.Irrelevant -> tag_not_applicable
         | Error Taint_domain.LogicError -> tag_error
-        | Ok true -> tag_tainted
-        | Ok false -> tag_not_tainted
+        | Ok Data -> tag_data_tainted
+        | Ok Control -> tag_control_tainted
+        | Ok None -> tag_untainted
       end
 
   let data = Request.dictionary ~package ~name:"taintStatus"
       ~descr:(Markdown.plain "Taint status of logical properties") dictionary
 
-  include (val data : S with type t = (bool, taint_error) result)
+  include (val data : S with type t = taint_result)
 end
 
 

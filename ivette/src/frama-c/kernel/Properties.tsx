@@ -251,7 +251,8 @@ const renderTaint: Renderer<any> =
     let color = 'black';
     switch (taint.name) {
       case 'not_tainted': id = 'DROP.EMPTY'; color = '#00B900'; break;
-      case 'tainted': id = 'DROP.FILLED'; color = '#FF8300'; break;
+      case 'data_tainted': id = 'DROP.FILLED'; color = '#FF8300'; break;
+      case 'control_tainted': id = 'DROP.FILLED'; color = '#73BBBB'; break;
       case 'error': id = 'HELP'; break;
       default:
     }
