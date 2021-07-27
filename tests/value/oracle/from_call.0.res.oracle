@@ -233,7 +233,7 @@
 [from] call to g at tests/value/from_call.i:20 (by f):
   \result FROM t; w
 [from] call to h at tests/value/from_call.i:20 (by f):
-  \result FROM \nothing
+  \result FROM __x0
 [from] call to return_A1 at tests/value/from_call.i:44 (by dispatcher2):
   \result FROM A1
 [from] call to return_A2 at tests/value/from_call.i:44 (by dispatcher2):
@@ -247,15 +247,15 @@
 [from] call to f at tests/value/from_call.i:81 (by main):
   b FROM a; p; f_previous
   f_previous FROM p
-  \result FROM a; t; p; f_previous
+  \result FROM a; x; t; p; f_previous
 [from] call to f at tests/value/from_call.i:82 (by main):
   c FROM b; p; f_previous
   f_previous FROM p
-  \result FROM b; t; p; f_previous
+  \result FROM b; x; t; p; f_previous
 [from] call to f at tests/value/from_call.i:82 (by main):
   d FROM c; p; f_previous
   f_previous FROM p
-  \result FROM c; t; p; f_previous
+  \result FROM c; x; t; p; f_previous
 [from] call to dispatcher at tests/value/from_call.i:83 (by main):
   \result FROM c_0; y_0
 [from] call to dispatcher at tests/value/from_call.i:84 (by main):
@@ -281,8 +281,8 @@
   b FROM a; f_previous
   c FROM a; f_previous
   d FROM a; f_previous
-  y FROM a; t; f_previous
-  z FROM a; t; f_previous
+  y FROM a; x; t; f_previous
+  z FROM a; x; t; f_previous
   R1 FROM A1
   R2 FROM A4
   R3 FROM A4; A5; r

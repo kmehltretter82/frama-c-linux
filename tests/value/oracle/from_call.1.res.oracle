@@ -179,13 +179,13 @@
 [from] Function g:
   \result FROM direct: t; w
 [from] Function h:
-  \result FROM \nothing
+  \result FROM direct: __x0
 [from] Function f:
   b FROM indirect: p; f_previous; direct: a; b; c (and SELF)
   c FROM indirect: p; f_previous; direct: a; b; c (and SELF)
   d FROM indirect: p; f_previous; direct: a; b; c (and SELF)
   f_previous FROM direct: p
-  \result FROM indirect: p; f_previous; direct: a; b; c; d; t
+  \result FROM indirect: p; f_previous; direct: a; b; c; d; x; t
 [from] Function return_A1:
   \result FROM direct: A1
 [from] Function return_A2:
@@ -205,8 +205,8 @@
   b FROM indirect: f_previous; direct: a; b; c (and SELF)
   c FROM indirect: f_previous; direct: a; b; c (and SELF)
   d FROM indirect: f_previous; direct: a; b; c (and SELF)
-  y FROM indirect: f_previous; direct: a; b; c; d; t
-  z FROM indirect: f_previous; direct: a; b; c; d; t
+  y FROM indirect: f_previous; direct: a; b; c; d; x; t
+  z FROM indirect: f_previous; direct: a; b; c; d; x; t
   R1 FROM direct: A1; A2
   R2 FROM direct: A3; A4
   R3 FROM indirect: r; direct: A4; A5
