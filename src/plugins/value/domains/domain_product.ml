@@ -364,6 +364,11 @@ module Make
       and right_tbl = Right.Store.get_stmt_state_by_callstack ~after stmt in
       merge_callstack_tbl left_tbl right_tbl
 
+    let mark_as_computed () =
+      Left.Store.mark_as_computed ();
+      Right.Store.mark_as_computed ()
+
+    let is_computed () = Left.Store.is_computed () && Right.Store.is_computed ()
   end
 
   let post_analysis = function

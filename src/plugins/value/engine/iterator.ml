@@ -782,7 +782,6 @@ module Computer
     with Db.Value.Aborted as e ->
       (* analysis was aborted: pop the call stack and inform the caller *)
       Dataflow.mark_degeneration ();
-      Db.Value.mark_as_computed ();
       Dataflow.merge_results ();
       raise e
 end

@@ -119,4 +119,81 @@ let () = Request.register ~package
     ~output:(module DeadCode)
     dead_code
 
+
+(* ----- Red and tainted alarms --------------------------------------------- *)
+
+
+module Taint = struct
+  open Server.Data
+  open Taint_domain
+
+  let dictionary = Enum.dictionary ()
+
+  let tag value name label descr =
+    Enum.tag ~name
+      ~label:(Markdown.plain label)
+      ~descr:(Markdown.plain descr) ~value dictionary
+
+  let tag_not_computed =
+    tag (Error NotComputed) "not_computed" ""
+      "The Eva taint analysis has not been computed"
+
+  let tag_error =
+    tag (Error LogicError) "error" "Error"
+      "Error: the memory zone on which this property depends could not be computed"
+
+  let tag_not_applicable =
+    tag (Error Irrelevant) "not_applicable" "—"
+      "No taint for this kind of property"
+
+  let tag_tainted =
+    tag (Ok true) "tainted" "yes"
+      "Tainted property: this property is related to a memory zone that \
+       can be affected by an attacker, according to the Eva taint domain"
+
+  let tag_not_tainted =
+    tag (Ok false) "not_tainted" "no"
+      "Untainted property: this property is safe, \
+       according to the Eva taint domain"
+
+  let () = Enum.set_lookup dictionary
+      begin function
+        | Error Taint_domain.NotComputed -> tag_not_computed
+        | Error Taint_domain.Irrelevant -> tag_not_applicable
+        | Error Taint_domain.LogicError -> tag_error
+        | Ok true -> tag_tainted
+        | Ok false -> tag_not_tainted
+      end
+
+  let data = Request.dictionary ~package ~name:"taintStatus"
+      ~descr:(Markdown.plain "Taint status of logical properties") dictionary
+
+  include (val data : S with type t = (bool, taint_error) result)
+end
+
+
+let model = States.model ()
+
+let () = States.column model ~name:"priority"
+    ~descr:(Markdown.plain "Is the property invalid in some context \
+                            of the analysis?")
+    ~data:(module Data.Jbool)
+    ~get:(fun ip -> Red_statuses.is_red ip)
+
+let () = States.column model ~name:"taint"
+    ~descr:(Markdown.plain "Is the property tainted according to \
+                            the Eva taint domain?")
+    ~data:(module Taint)
+    ~get:(fun ip -> Taint_domain.is_tainted_property ip)
+
+let _array =
+  States.register_array
+    ~package
+    ~name:"properties"
+    ~descr:(Markdown.plain "Status of Registered Properties")
+    ~key:(fun ip -> Kernel_ast.Marker.create (PIP ip))
+    ~keyType:Kernel_ast.Marker.jproperty
+    ~iter:Property_status.iter
+    model
+
 (**************************************************************************)

@@ -34,6 +34,9 @@ type alarm_or_property = Alarm of Alarms.t | Prop of Property.t
 
 module AlarmOrProp : Datatype.S with type t := alarm_or_property
 
+(* Whether a red status has been emitted for a property in any callstack. *)
+val is_red: Property.t -> bool
+
 (* Whether a red status has been emitted for an alarm or a property at the given
    kinstr in the given callstack. *)
 val is_red_in_callstack:

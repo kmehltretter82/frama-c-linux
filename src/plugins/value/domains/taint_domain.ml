@@ -559,3 +559,45 @@ let flag =
   Abstractions.register ~name ~descr ~experimental abstraction
 
 let () = Abstractions.register_hook interpret_taint_logic
+
+
+type taint_error = NotComputed | Irrelevant | LogicError
+
+let zone_of_predicate env predicate =
+  let logic_deps = Eval_terms.predicate_deps env predicate in
+  let deps_list = Option.map Logic_label.Map.bindings logic_deps in
+  match deps_list with
+  | Some [ BuiltinLabel Here, zone ] -> Ok zone
+  | _ -> Error LogicError
+
+let get_predicate = function
+  | Property.IPCodeAnnot ica ->
+    begin
+      match ica.ica_ca.annot_content with
+      | AAssert (_, predicate) | AInvariant (_, _, predicate) ->
+        Ok predicate.tp_statement
+      | _ -> Error Irrelevant
+    end
+  | IPPropertyInstance { ii_pred = None } -> Error LogicError
+  | IPPropertyInstance { ii_pred = Some pred } -> Ok pred.ip_content.tp_statement
+  | _ -> Error Irrelevant
+
+let get_stmt ip =
+  let kinstr = Property.get_kinstr ip in
+  match kinstr with
+  | Kglobal -> Error Irrelevant
+  | Kstmt stmt -> Ok stmt
+
+let is_tainted_property ip =
+  let (let+) = Result.bind in
+  if not (Store.is_computed ()) then Error NotComputed else
+    let+ stmt = get_stmt ip in
+    let+ predicate = get_predicate ip in
+    match Store.get_stmt_state ~after:false stmt with
+    | `Bottom -> Ok false
+    | `Value state ->
+      let cvalue = Db.Value.get_stmt_state ~after:false stmt in
+      let env = Eval_terms.env_only_here cvalue in
+      let+ zone = zone_of_predicate env predicate in
+      let tainted = Zone.intersects zone state.locs_data in
+      Ok tainted

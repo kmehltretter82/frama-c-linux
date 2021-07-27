@@ -27,3 +27,13 @@ include Abstract_domain.Leaf
    and type location = Precise_locs.precise_location
 
 val flag: Abstractions.flag
+
+type taint_error =
+  | NotComputed (** The Eva analysis has not been run, or the taint domain
+                    was not enabled. *)
+  | Irrelevant  (** Properties other than assertions, invariants and
+                    preconditions are irrelevant here. *)
+  | LogicError  (** The memory zone on which the property depends could not
+                    be computed. *)
+
+val is_tainted_property: Property.t -> (bool, taint_error) result

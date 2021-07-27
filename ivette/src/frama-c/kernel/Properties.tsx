@@ -32,6 +32,7 @@ import * as States from 'frama-c/states';
 import * as Compare from 'dome/data/compare';
 import * as Settings from 'dome/data/settings';
 import { Label, Code } from 'dome/controls/labels';
+import { Icon } from 'dome/controls/icons';
 import { IconButton, Checkbox } from 'dome/controls/buttons';
 import * as Models from 'dome/table/models';
 import * as Arrays from 'dome/table/arrays';
@@ -42,8 +43,11 @@ import { Scroll, Folder } from 'dome/layout/boxes';
 import { RSplit } from 'dome/layout/splitters';
 
 import { source as SourceLoc } from 'frama-c/api/kernel/services';
-import { statusData as Property } from 'frama-c/api/kernel/properties';
+import { statusData } from 'frama-c/api/kernel/properties';
 import * as Properties from 'frama-c/api/kernel/properties';
+import * as Eva from 'frama-c/api/plugins/eva/general';
+
+type Property = statusData & Eva.propertiesData;
 
 // --------------------------------------------------------------------------
 // --- Filters
@@ -94,6 +98,8 @@ const DEFAULTS: { [key: string]: boolean } = {
   'alarms.function_pointer': true,
   'alarms.union_initialization': true,
   'alarms.bool_value': true,
+  'eva.priority_only': false,
+  'eva.tainted_only': false,
 };
 
 function filter(path: string) {
@@ -193,10 +199,21 @@ function filterAlarm(alarm: string | undefined) {
   return filter('alarms.others');
 }
 
+function filterEva(p: Property) {
+  let b = true;
+  if (p.priority === false && filter('eva.priority_only'))
+    b = false;
+  if ((p.taint === 'not_tainted' || p.taint === 'not_applicable')
+      && filter('eva.tainted_only'))
+    b = false;
+  return b;
+}
+
 function filterProperty(p: Property) {
   return filterStatus(p.status)
-    && filterKind(p.kind)
-    && filterAlarm(p.alarm);
+      && filterKind(p.kind)
+      && filterAlarm(p.alarm)
+      && filterEva(p);
 }
 
 // --------------------------------------------------------------------------
@@ -224,6 +241,22 @@ const renderFile: Renderer<SourceLoc> =
   (loc: SourceLoc) => (
     <Code className="code-column" label={loc.base} title={loc.file} />
   );
+
+const renderPriority: Renderer<boolean> =
+  (prio: boolean) => (prio ? <Icon id="ATTENTION" /> : null);
+
+const renderTaint: Renderer<any> =
+  (taint: States.Tag) => {
+    let id = null;
+    let color = 'black';
+    switch (taint.name) {
+      case 'not_tainted': id = 'DROP.EMPTY'; color = '#00B900'; break;
+      case 'tainted': id = 'DROP.FILLED'; color = '#FF8300'; break;
+      case 'error': id = 'HELP'; break;
+      default:
+    }
+    return (id ? <Icon id={id} fill={color} title={taint.descr} /> : null);
+  };
 
 function ColumnCode<Row>(props: ColumnProps<Row, string>) {
   return <Column render={renderCode} {...props} />;
@@ -265,6 +298,8 @@ const byProperty: Compare.ByFields<Property> = {
   predicate: Compare.defined(Compare.alpha),
   key: Compare.string,
   kinstr: Compare.structural,
+  priority: Compare.structural,
+  taint: Compare.structural,
 };
 
 const byDir = Compare.byFields<SourceLoc>({ dir: Compare.alpha });
@@ -323,6 +358,8 @@ function Section(props: SectionProps) {
 
 interface CheckFieldProps {
   label: string;
+  title?: string;
+  highligh?: boolean; // Highlights the label when the value is [highligh]
   path: string;
 }
 
@@ -331,8 +368,12 @@ function CheckField(props: CheckFieldProps) {
   const onChange = () => { setValue(); Reload.emit(); };
   return (
     <Checkbox
-      style={{ display: 'block' }}
+      style={{
+        display: 'block',
+        color: (props.highligh === value) ? 'red' : '',
+      }}
       label={props.label}
+      title={props.title}
       value={value}
       onChange={onChange}
     />
@@ -396,6 +437,18 @@ function PropertyFilter() {
         <CheckField label="Overlaps" path="alarms.overlap" />
         <CheckField label="Initialization of unions" path="alarms.union_initialization" />
       </Section>
+      <Section label="Eva">
+        <CheckField
+          label="High-priority only"
+          path="eva.priority_only"
+          title="Show only high-priority properties for the Eva analysis"
+        />
+        <CheckField
+          label="Tainted only"
+          path="eva.tainted_only"
+          title="Show only tainted properties according to the Eva taint domain"
+        />
+      </Section>
     </Scroll>
   );
 }
@@ -411,6 +464,7 @@ const PropertyColumns = () => {
   const statusDict = States.useTags(Properties.propStatusTags);
   const kindDict = States.useTags(Properties.propKindTags);
   const alarmDict = States.useTags(Properties.alarmsTags);
+  const taintDict = States.useTags(Eva.taintStatusTags);
 
   const getStatus = React.useCallback(
     ({ status: st }: Property) => (statusDict.get(st) ?? { name: st }),
@@ -427,6 +481,11 @@ const PropertyColumns = () => {
       alarm === undefined ? alarm : (alarmDict.get(alarm) ?? { name: alarm })
     ),
     [alarmDict],
+  );
+
+  const getTaint = React.useCallback(
+    ({ taint }: Property) => (taintDict.get(taint) ?? { name: taint }),
+    [taintDict],
   );
 
   return (
@@ -458,6 +517,28 @@ const PropertyColumns = () => {
       />
       <ColumnCode id="predicate" label="Predicate" fill />
       <ColumnCode id="descr" label="Property" fill visible={false} />
+      <Column
+        id="priority"
+        label="Priority"
+        title="Properties invalid in some context of the Eva analysis"
+        icon="ATTENTION"
+        width={30}
+        visible={false}
+        align="center"
+        getter={(prop: Eva.propertiesData) => prop?.priority}
+        render={renderPriority}
+      />
+      <ColumnTag
+        id="taint"
+        label="Taint"
+        title="Properties tainted according to the Eva taint domain"
+        icon="PAINTBRUSH"
+        width={30}
+        visible={false}
+        align="center"
+        getter={getTaint}
+        render={renderTaint}
+      />
       <ColumnTag
         id="status"
         label="Status"
@@ -493,12 +574,17 @@ export default function RenderProperties() {
 
   // Hooks
   const model = React.useMemo(() => new PropertyModel(), []);
-  const data = States.useSyncArray(Properties.status).getArray();
+  const kernelData = States.useSyncArray(Properties.status).getArray();
+  const evaData = States.useSyncArray(Eva.properties).getArray();
   useEffect(() => {
     model.removeAllData();
+    const data = new Array(kernelData.length);
+    for (let i = 0; i < kernelData.length; i++) {
+      data[i] = { ...kernelData[i], ...evaData[i] };
+    }
     model.updateData(data);
     model.reload();
-  }, [model, data]);
+  }, [model, kernelData, evaData]);
 
   const [selection, updateSelection] = States.useSelection();
 

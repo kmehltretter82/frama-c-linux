@@ -502,7 +502,7 @@ module Value = struct
       Callstack.Hashtbl.add by_callstack cs state
 
   let get_initial_state kf =
-    assert (is_computed ()); (* this assertion fails during value analysis *)
+    assert (is_computed ()); (* this assertion fails during Eva analysis *)
     try Called_Functions_Memo.find kf
     with Not_found ->
       let state =
@@ -517,8 +517,9 @@ module Value = struct
       Called_Functions_Memo.add kf state;
       state
 
+  (* This function is used by the Inout plugin during Eva analysis, so it
+     should not fail during Eva analysis, even if results are incomplete. *)
   let get_initial_state_callstack kf =
-    assert (is_computed ()); (* this assertion fails during value analysis *)
     try Some (Called_Functions_By_Callstack.find kf)
     with Not_found -> None
 
@@ -568,28 +569,28 @@ module Value = struct
       noassert_get_stmt_state ~after s
 
   let get_stmt_state ?(after=false) s =
-    assert (is_computed ()); (* this assertion fails during value analysis *)
+    assert (is_computed ()); (* this assertion fails during Eva analysis *)
     noassert_get_stmt_state ~after s
 
   let get_state ?(after=false) k =
-    assert (is_computed ()); (* this assertion fails during value analysis *)
+    assert (is_computed ()); (* this assertion fails during Eva analysis *)
     noassert_get_state ~after k
 
   let get_stmt_state_callstack ~after stmt =
-    assert (is_computed ()); (* this assertion fails during value analysis *)
+    assert (is_computed ()); (* this assertion fails during Eva analysis *)
     try
       Some (if after then AfterTable_By_Callstack.find stmt else
               Table_By_Callstack.find stmt)
     with Not_found -> None
 
   let fold_stmt_state_callstack f acc ~after stmt =
-    assert (is_computed ()); (* this assertion fails during value analysis *)
+    assert (is_computed ()); (* this assertion fails during Eva analysis *)
     match get_stmt_state_callstack ~after stmt with
     | None -> acc
     | Some h -> Value_types.Callstack.Hashtbl.fold (fun _ -> f) h acc
 
   let fold_state_callstack f acc ~after ki =
-    assert (is_computed ()); (* this assertion fails during value analysis *)
+    assert (is_computed ()); (* this assertion fails during Eva analysis *)
     match ki with
     | Kglobal -> f (globals_state ()) acc
     | Kstmt stmt -> fold_stmt_state_callstack f acc ~after stmt

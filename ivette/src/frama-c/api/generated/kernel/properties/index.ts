@@ -122,6 +122,8 @@ export enum propKind {
   lemma = 'lemma',
   /** Logical check lemma */
   check_lemma = 'check_lemma',
+  /** ACSL extension */
+  extension = 'extension',
 }
 
 /** Loose decoder for `propKind` */

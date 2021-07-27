@@ -84,6 +84,8 @@ struct
   let t_lemma = t_kind "lemma" "Logical lemma"
   let t_check_lemma = t_kind "check_lemma" "Logical check lemma"
 
+  let t_ext = t_kind "extension" "ACSL extension"
+
   let p_ext = Enum.prefix kinds ~name:"ext" ~var:"<clause>"
       ~descr:(Md.plain "ACSL extension `<clause>`")
 
@@ -107,7 +109,7 @@ struct
         | PKEnsures(_,Returns) -> t_returns
         | PKTerminates -> t_terminates
       end
-    | IPExtended { ie_ext={ ext_name } } -> Enum.instance p_ext ext_name
+    | IPExtended { ie_ext={ ext_name=_ } } -> t_ext
     | IPAxiomatic _ -> t_axiomatic
     | IPLemma { il_pred = { tp_kind = Admit } } -> t_axiom
     | IPLemma { il_pred = { tp_kind = Assert } } -> t_lemma
@@ -127,7 +129,7 @@ struct
         | AAssigns _ -> t_loop_assigns
         | AAllocation _ -> t_loop_allocates
         | APragma _ -> t_loop_pragma
-        | AExtended(_,_,{ext_name}) -> Enum.instance p_loop_ext ext_name
+        | AExtended(_,_,{ext_name=_}) -> t_ext
       end
     | IPAllocation _ -> t_allocates
     | IPAssigns _ -> t_assigns
