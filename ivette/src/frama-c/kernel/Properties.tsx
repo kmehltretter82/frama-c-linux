@@ -441,13 +441,11 @@ function PropertyFilter() {
         <CheckField
           label="High-priority only"
           path="eva.priority_only"
-          highligh
           title="Show only high-priority properties for the Eva analysis"
         />
         <CheckField
           label="Tainted only"
           path="eva.tainted_only"
-          highligh
           title="Show only tainted properties according to the Eva taint domain"
         />
       </Section>
