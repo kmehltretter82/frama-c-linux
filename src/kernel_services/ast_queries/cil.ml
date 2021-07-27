@@ -6245,7 +6245,9 @@ let uniqueVarNames (f: file) : unit =
           let processLocal (v: varinfo) =
             (* start from original name to avoid putting another _0 in case
                of conflicts. *)
-            let lookupname = v.vorig_name in
+            let lookupname =
+              if v.vorig_name = "" then v.vname else v.vorig_name
+            in
             let data = CurrentLoc.get () in
             let newname, oldloc =
               Alpha.newAlphaName
