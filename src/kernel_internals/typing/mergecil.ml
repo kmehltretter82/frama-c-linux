@@ -2614,15 +2614,6 @@ let equalInitOpts (x: init option) (y: init option) : bool =
     | _,_ -> false
   end
 
-let merge_arg_names merged_args curr_args =
-  let do_one_arg merged_arg curr_arg =
-    (* if curr_arg is also anonymous, this doesn't do much,
-       but at least doesn't worsen things. *)
-    if merged_arg.vname = "" then merged_arg.vname <- curr_arg.vname
-  in
-  (* if both list have different lengths, merge should have failed earlier. *)
-  List.iter2 do_one_arg merged_args curr_args
-
 let update_formals_names merged_vi curr_vi =
   (* if the reference varinfo already has formals, everything
      is renamed accordingly. However, if the old prototype contains
@@ -2631,7 +2622,7 @@ let update_formals_names merged_vi curr_vi =
   match Cil.getFormalsDecl curr_vi with
   | curr_args ->
     (match Cil.getFormalsDecl merged_vi with
-     | merged_args -> merge_arg_names merged_args curr_args
+     | _ -> ()
      | exception Not_found ->
        (*existing prototype does not have formals list. Just use current one*)
        Cil.unsafeSetFormalsDecl merged_vi curr_args)
