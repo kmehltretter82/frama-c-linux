@@ -64,8 +64,9 @@ module Quantified_predicate =
             |lv::_ -> Cil_datatype.Logic_var.hash lv
           end
         | _ -> assert false
-      let compare (p1:predicate) p2 =
-        if p1 == p2 then 0 else 1
+      (* The function compare should never be used since we only use this
+         datatype for hashtables *)
+      let compare _ _ = assert false
       let equal (p1:predicate) p2 = p1 == p2
       let structural_descr = Structural_descr.t_abstract
       let rehash = Datatype.identity
@@ -85,6 +86,7 @@ module Quantifier: sig
       of the variable *)
   val get_guard_for_small_type : logic_var -> predicate option
   val add_guard_for_small_type : logic_var -> predicate option -> unit
+  val clear : unit -> unit
 end = struct
 
   let tbl = Quantified_predicate.Hashtbl.create 97
@@ -112,10 +114,15 @@ end = struct
 
   let add_guard_for_small_type lv p =
     Cil_datatype.Logic_var.Hashtbl.add guard_tbl lv p
+
+  let clear () =
+    Cil_datatype.Logic_var.Hashtbl.clear guard_tbl;
+    Quantified_predicate.Hashtbl.clear tbl
 end
 
 let get_preprocessed_quantifier = Quantifier.get
 let get_guard_for_small_type = Quantifier.get_guard_for_small_type
+let clear_guards = Quantifier.clear
 
 (** Helper module to process the constraints in the quantification and extract
     guards for the quantified variables. *)
@@ -701,16 +708,18 @@ let normalize_guard ~loc (t1, rel1, lv, rel2, t2) =
     | Rle ->
       t1
     | Rgt | Rge | Req | Rneq ->
-      assert false  in
+      assert false
+  in
   let t2 = match rel2 with
     | Rlt ->
       t2
     | Rle ->
       t_plus_one t2
     | Rgt | Rge | Req | Rneq ->
-      assert false in
-  let t1, t2, guard_for_small_type = bounds_for_small_types ~loc (t1, lv, t2) in
-  Quantifier.add_guard_for_small_type lv guard_for_small_type;
+      assert false
+  in
+  let t1, t2, guard_for_small_type = bounds_for_small_types ~loc (t1, lv, t2)
+  in Quantifier.add_guard_for_small_type lv guard_for_small_type;
   t1, lv, t2
 
 let compute_guards loc ~is_forall p bounded_vars hyps =
