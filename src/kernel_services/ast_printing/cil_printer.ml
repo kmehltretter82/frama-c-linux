@@ -120,6 +120,7 @@ let () = register_shallow_attribute Cil.frama_c_ghost_formal
 let () = register_shallow_attribute Cil.frama_c_mutable
 let () = register_shallow_attribute Cil.frama_c_init_obj
 let () = register_shallow_attribute Cil.frama_c_inlined
+let () = register_shallow_attribute Cil.anonymous_attribute_name
 
 let keep_attr = function
   | Attr _ as a -> not (List.mem (Cil.attributeName a) !reserved_attributes)
@@ -729,14 +730,20 @@ class cil_printer () = object (self)
       end
       else v
     in
+    let name =
+      if Cil.hasAttribute Cil.anonymous_attribute_name v.vattr
+      && not v.vreferenced && not state.print_cil_as_is
+      then
+        None
+      else Some (fun fmt -> self#varinfo fmt v)
+    in
     (* First the storage modifiers *)
     fprintf fmt "%s%a%a%s%a%a"
       (if v.vinline then "__inline " else "")
       self#storage v.vstorage
       self#attributes stom
       (if stom = [] then "" else " ")
-      (self#typ ?fundecl
-         (if v.vname = "" then None else Some (fun fmt -> self#varinfo fmt v)))
+      (self#typ ?fundecl name)
       v.vtype
       self#attributes rest
 

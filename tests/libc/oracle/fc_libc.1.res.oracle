@@ -1565,7 +1565,7 @@ extern int execvp(char const *path, char * const *argv);
 
 /*@ ensures never_terminates: \false;
     assigns \nothing; */
-extern  __attribute__((__noreturn__)) void _exit(int);
+extern  __attribute__((__noreturn__)) void _exit(int __x0);
 
 /*@ ensures
       result_ok_child_or_error:
@@ -1635,7 +1635,7 @@ extern pid_t getppid(void);
 
 /*@ assigns \result;
     assigns \result \from \nothing; */
-extern pid_t getsid(pid_t);
+extern pid_t getsid(pid_t __x0);
 
 /*@ assigns \result;
     assigns \result \from \nothing; */
@@ -7988,7 +7988,7 @@ extern size_t iconv(iconv_t cd, char ** restrict inbuf,
 /*@ ensures result_zero_or_neg: \result ≡ 0 ∨ \result ≡ -1;
     assigns __fc_errno;
  */
-extern int iconv_close(iconv_t);
+extern int iconv_close(iconv_t __x0);
 
 /*@ assigns \result, __fc_errno;
     assigns \result \from *(tocode + (..)), *(fromcode + (..));
@@ -8293,16 +8293,16 @@ CODE prioritynames[13] =
 extern void closelog(void);
 
 /*@ assigns \nothing; */
-extern void openlog(char const *, int, int);
+extern void openlog(char const *__x0, int __x1, int __x2);
 
 /*@ assigns \nothing; */
-extern int setlogmask(int);
+extern int setlogmask(int __x0);
 
 /*@ assigns \nothing; */
-extern void syslog(int, char const *, void * const *__va_params);
+extern void syslog(int __x0, char const *__x1, void * const *__va_params);
 
 /*@ assigns \nothing; */
-extern void vsyslog(int, char const *, va_list);
+extern void vsyslog(int __x0, char const *__x1, va_list __x2);
 
 /*@ assigns \result;
     assigns \result \from which, who; */

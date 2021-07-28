@@ -1,8 +1,8 @@
 [kernel] Parsing tests/syntax/vdescr_bts1387.i (no preprocessing)
 [kernel] Variable f has vdescr ''
-[kernel] Variable  has vdescr ''
+[kernel] Variable __x0 has vdescr ''
 [kernel] Variable g has vdescr ''
-[kernel] Variable  has vdescr ''
+[kernel] Variable __x0 has vdescr ''
 [kernel] Variable fptr has vdescr ''
 [kernel] Variable main has vdescr ''
 [kernel] Variable j has vdescr ''

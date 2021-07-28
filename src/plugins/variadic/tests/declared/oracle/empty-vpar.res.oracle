@@ -17,7 +17,7 @@
     behavior bhv:
       requires c > 0;
       requires a ≤ 42; */
-void f(int const a, int, int c, void * const *__va_params);
+void f(int const a, int __x1, int c, void * const *__va_params);
 
 int main(void)
 {

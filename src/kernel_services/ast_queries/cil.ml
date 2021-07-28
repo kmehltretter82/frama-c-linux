@@ -300,6 +300,9 @@ let stmt_of_instr_list ?(loc=Location.unknown) = function
 
 let bitfield_attribute_name = "FRAMA_C_BITFIELD_SIZE"
 
+let anonymous_attribute_name = "__fc_anonymous"
+let anonymous_attribute = Attr(anonymous_attribute_name, [])
+
 (** Construct sorted lists of attributes ***)
 let attributeName =
   function Attr(a, _) | AttrAnnot a -> Extlib.strip_underscore a
@@ -725,8 +728,16 @@ let setFormalsDecl vi typ =
   match unrollType typ with
   | TFun(_, Some args, _, _) ->
     let is_ghost d = vi.vghost || isGhostFormalVarDecl d in
-    let makeFormalsVarDecl x = makeFormalsVarDecl ~ghost:(is_ghost x) x in
-    FormalsDecl.replace vi (List.map makeFormalsVarDecl args)
+    let makeFormalsVarDecl i (n,t,a as x) =
+      let x = if n = "" then begin
+          let a  = addAttribute anonymous_attribute a in
+          "__x" ^ string_of_int i,t,a
+        end
+        else x
+      in
+      makeFormalsVarDecl ~ghost:(is_ghost x) x
+    in
+    FormalsDecl.replace vi (List.mapi makeFormalsVarDecl args)
   | TFun(_,None,_,_) -> ()
   | _ ->
     Kernel.error ~current:true
@@ -6234,7 +6245,9 @@ let uniqueVarNames (f: file) : unit =
           let processLocal (v: varinfo) =
             (* start from original name to avoid putting another _0 in case
                of conflicts. *)
-            let lookupname = v.vorig_name in
+            let lookupname =
+              if v.vorig_name = "" then v.vname else v.vorig_name
+            in
             let data = CurrentLoc.get () in
             let newname, oldloc =
               Alpha.newAlphaName
@@ -6745,6 +6758,12 @@ let create_alpha_renaming old_args new_args =
   List.iter2
     (fun old_vi new_vi ->
        Hashtbl.add conversion old_vi.vid new_vi;
+       if hasAttribute anonymous_attribute_name new_vi.vattr &&
+          not (hasAttribute anonymous_attribute_name old_vi.vattr)
+       then begin
+         new_vi.vname <- old_vi.vname;
+         new_vi.vattr <- dropAttribute anonymous_attribute_name new_vi.vattr;
+       end;
        match old_vi.vlogic_var_assoc, new_vi.vlogic_var_assoc with
        | None, _ -> () (* nothing to convert in logic spec. *)
        | Some old_lv, Some new_lv ->
