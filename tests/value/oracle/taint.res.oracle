@@ -12,9 +12,9 @@
   Frama_C_dump_each:
   # taint:
   Locations (data):
-    tainted; t; u; x; buf[0]
+    tainted; t; u; x
   Locations (control):
-    w
+    w; buf[0]
   ==END OF DUMP==
 [eva] Recording results for taint_basic
 [eva] Done for function taint_basic
@@ -49,7 +49,7 @@
   Frama_C_dump_each:
   # taint:
   Locations (data):
-    x; y
+    x
   Locations (control):
     y
   ==END OF DUMP==
@@ -57,7 +57,7 @@
   Frama_C_dump_each:
   # taint:
   Locations (data):
-    x; y
+    x
   Locations (control):
     x; y
   ==END OF DUMP==
@@ -65,7 +65,7 @@
   Frama_C_dump_each:
   # taint:
   Locations (data):
-    x; y
+    x
   Locations (control):
     x; y
   ==END OF DUMP==
@@ -73,7 +73,7 @@
   Frama_C_dump_each:
   # taint:
   Locations (data):
-    x; y
+    x
   Locations (control):
     x; y
   ==END OF DUMP==
@@ -85,7 +85,7 @@
   Frama_C_dump_each:
   # taint:
   Locations (data):
-    x; y
+    x
   Locations (control):
     x; y
   ==END OF DUMP==
@@ -142,9 +142,9 @@
   Frama_C_dump_each:
   # taint:
   Locations (data):
-    tainted; t; u; x; buf[0]; t
+    tainted; t; u; x; t
   Locations (control):
-    u; w; x; y; buf[0..1]
+    t; u; w; x; y; buf[0..1]
   ==END OF DUMP==
 [eva] Recording results for taint_basic
 [eva] Done for function taint_basic
