@@ -99,7 +99,8 @@ const DEFAULTS: { [key: string]: boolean } = {
   'alarms.union_initialization': true,
   'alarms.bool_value': true,
   'eva.priority_only': false,
-  'eva.tainted_only': false,
+  'eva.data_tainted_only': false,
+  'eva.ctrl_tainted_only': false,
 };
 
 function filter(path: string) {
@@ -203,9 +204,21 @@ function filterEva(p: Property) {
   let b = true;
   if (p.priority === false && filter('eva.priority_only'))
     b = false;
-  if ((p.taint === 'not_tainted' || p.taint === 'not_applicable')
-      && filter('eva.tainted_only'))
-    b = false;
+  switch (p.taint) {
+    case 'not_tainted':
+    case 'not_applicable':
+      if (filter('eva.data_tainted_only') || filter('eva.ctrl_tainted_only'))
+        b = false;
+      break;
+    case 'data_tainted':
+      if (filter('eva.ctrl_tainted_only'))
+        b = false;
+      break;
+    case 'control_tainted':
+      if (filter('eva.data_tainted_only'))
+        b = false;
+      break;
+  }
   return b;
 }
 
@@ -254,6 +267,7 @@ const renderTaint: Renderer<any> =
       case 'data_tainted': id = 'DROP.FILLED'; color = '#FF8300'; break;
       case 'control_tainted': id = 'DROP.FILLED'; color = '#73BBBB'; break;
       case 'error': id = 'HELP'; break;
+      case 'not_applicable': id = 'MINUS'; break;
       default:
     }
     return (id ? <Icon id={id} fill={color} title={taint.descr} /> : null);
@@ -289,6 +303,16 @@ const byStatus =
     'considered_valid',
   );
 
+const byTaint =
+  Compare.byRank(
+    'data_tainted',
+    'control_tainted',
+    'not_tainted',
+    'error',
+    'not_applicable',
+    'not_computed',
+  );
+
 const byProperty: Compare.ByFields<Property> = {
   status: byStatus,
   fct: Compare.defined(Compare.alpha),
@@ -300,7 +324,7 @@ const byProperty: Compare.ByFields<Property> = {
   key: Compare.string,
   kinstr: Compare.structural,
   priority: Compare.structural,
-  taint: Compare.structural,
+  taint: byTaint,
 };
 
 const byDir = Compare.byFields<SourceLoc>({ dir: Compare.alpha });
@@ -445,9 +469,14 @@ function PropertyFilter() {
           title="Show only high-priority properties for the Eva analysis"
         />
         <CheckField
-          label="Tainted only"
-          path="eva.tainted_only"
-          title="Show only tainted properties according to the Eva taint domain"
+          label="Data-tainted only"
+          path="eva.data_tainted_only"
+          title="Show only data-tainted properties according to the Eva taint domain"
+        />
+        <CheckField
+          label="Control-tainted only"
+          path="eva.ctrl_tainted_only"
+          title="Show only control-tainted properties according to the Eva taint domain"
         />
       </Section>
     </Scroll>
