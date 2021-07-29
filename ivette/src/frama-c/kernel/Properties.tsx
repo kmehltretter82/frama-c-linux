@@ -606,11 +606,15 @@ export default function RenderProperties() {
   const model = React.useMemo(() => new PropertyModel(), []);
   const kernelData = States.useSyncArray(Properties.status).getArray();
   const evaData = States.useSyncArray(Eva.properties).getArray();
+
   useEffect(() => {
     model.removeAllData();
     const data = new Array(kernelData.length);
     for (let i = 0; i < kernelData.length; i++) {
-      data[i] = { ...kernelData[i], ...evaData[i] };
+      const kernel = kernelData[i];
+      const { key } = kernel;
+      const eva = evaData.find((elt) => elt.key === key);
+      data[i] = { ...kernel, ...eva };
     }
     model.updateData(data);
     model.reload();
