@@ -17,12 +17,35 @@
 Open Source Release <next-release>
 ##################################
 
+-   Eva       [2021-07-26] Removes the maximum limit of option -eva-ilevel.
+-   Eva       [2021-07-26] New \tainted predicate to evaluate if the value of an
+              expression is tainted according to the taint domain.
+-o  Eva       [2021-07-25] Changes the Domain_builder.Complete functor to
+              automatically build more abstract domain functions.
+-*  Eva       [2021-06-24] Fixes a soundness bug of the bitwise domain with the
+              memexec cache.
 -*  Variadic  [2021-06-23] Create a fallback specialisation if there is an error
               while translating a variadic call so that no variadic call are
               left in the AST after Variadic.
+-   Eva       [2021-06-22] Reduction of "garbled mix" values by \valid and
+              \valid_read ACSL predicates.
+-   Eva       [2021-06-15] New experimental multidim domain to improve analysis
+              precision on arrays of structures and multidimensional arrays.
+-*  Eva       [2021-06-10] Fixes a crash in the octagon domain.
 o   Kernel    [2021-06-10] New module Cil_builder, simplifies C and ACSL code
                            generation.
 o   Ptests    [2021-06-03] Add new PLUGIN directive and new predefined macros.
+-   Eva       [2021-06-01] Annotations split and dynamic_split can be applied
+              to logic predicates (in addition to terms).
+-   Eva       [2021-06-01] New annotation dynamic_split, similar to split, but
+              separates the analysis w.r.t. the current value of an expression
+              instead of the value it had at the annotation point: the partition
+              can be changed at an assignment to ensure that the expression
+              always evaluates to a singleton in each analysis state.
+-   Eva       [2021-05-20] New taint analysis via an experimental taint domain.
+              New annotations //@ taint … (for statements) and //@ taints … (in
+              function contracts) to initiate taint on lvalues.
+              Tainted properties can then be seen in the future GUI Ivette.
 -   Eva       [2021-05-11] Support for ACSL predicate \is_infinite.
 
 ###################################
