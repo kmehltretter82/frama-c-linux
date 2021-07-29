@@ -2523,13 +2523,10 @@ else
 endif
 	$(RM) -r $(CLIENT_DIR)
 	$(MKDIR) -p $(CLIENT_DIR)
-	@#Workaround to avoid "argument list too long" in make 3.82+ without
-	@#using 'file' built-in, only available on make 4.0+
-	@#for make 4.0+, using the 'file' function could be a better solution,
-	@#although it seems to segfault in 4.0 (but not in 4.1)
-	$(RM) file_list_to_archive.tmp
-	@$(foreach file,$(DISTRIB_FILES) $(DISTRIB_TESTS),\
-			echo '$(file)' | $(SED) 's/@/ /g' >> file_list_to_archive.tmp$(NEWLINE))
+	#Workaround to avoid "argument list too long" in Cygwin
+	$(file >file_list_to_archive.tmp)
+	$(foreach f,$(DISTRIB_FILES), \
+             $(file >>file_list_to_archive.tmp,$(subst @, ,$(f))))
 	$(TAR) -cf - --files-from file_list_to_archive.tmp | $(TAR) -C $(CLIENT_DIR) -xf -
 	$(RM) file_list_to_archive.tmp
 	$(PRINT_MAKING) files
