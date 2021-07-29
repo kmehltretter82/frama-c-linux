@@ -94,7 +94,7 @@ RESULT for main:
    -[--d]-> 13
  {n16}: OutRet
    -[--d]-> 15
-[pdg] dot file generated in tests/pdg/dyn_dpds_0.dot
+[pdg] dot file generated in tests/pdg/result/dyn_dpds_0.dot
 Warning : cannot select G in this function...
 RESULT for main:
  {n1}: InCtrl
@@ -142,4 +142,4 @@ RESULT for main:
    -[--d]-> 13
  {n16}: OutRet
    -[--d]-> 15
-[pdg] dot file generated in tests/pdg/dyn_dpds_1.dot
+[pdg] dot file generated in tests/pdg/result/dyn_dpds_1.dot

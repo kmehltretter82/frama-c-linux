@@ -81,7 +81,7 @@ update-distrib-files:
 	@rm -f $(SRC_HEADERS)
 	@for f in `git ls-files .` ;\
 	 do \
-		echo "DISTRIB_FILES += \"ivette/$$f\"" >> $(SRC_DISTRIB) ;\
+		echo "DISTRIB_FILES += ivette/$$f" >> $(SRC_DISTRIB) ;\
 		headers/register.sh "$$f" >> $(SRC_HEADERS) ; \
 	 done
 	@chmod a-w $(SRC_DISTRIB)

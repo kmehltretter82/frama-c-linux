@@ -243,7 +243,7 @@ DISTRIB_FILES:=\
       $(THEME_ICONS_FLAT)                                               \
       man/frama-c.1 doc/README						\
       doc/code/docgen.ml                                                \
-      doc/code/*.css doc/code/intro_plugin.txt				\
+      $(wildcard doc/code/*.css) doc/code/intro_plugin.txt              \
       doc/code/intro_plugin_D_and_S.txt                                 \
       doc/code/intro_plugin_default.txt                                 \
       doc/code/intro_kernel_plugin.txt					\
@@ -329,12 +329,17 @@ DISTRIB_FILES:=\
 
 # Test files to be included in the distribution (without header checking).
 # Plug-ins should use PLUGIN_DISTRIB_TESTS to export their test files.
-DISTRIB_TESTS=$(shell git ls-files \
+DISTRIB_TESTS=$(shell find \
                   tests \
                   src/plugins/aorai/tests \
                   src/plugins/report/tests \
-                  src/plugins/wp/tests | $(SED) 's/ /@/g')
-
+                  src/plugins/wp/tests \
+                  -type d -name result -prune -false \
+                  -o -type d -name 'result_*' -prune -false \
+                  -o -path 'tests/crowbar/*' -type d \! -name input -prune -false \
+                  -o -type f \! -name "*\.log" \! -name "*\.o" \
+                    \! -name '*~' \! -name "*\.cm*"  \! -name "*.sav" \
+                    -perm /u+w | sed -e 's/ /@/g')
 
 # files that are needed to compile API documentation of external plugins
 DOC_GEN_FILES:=$(addprefix doc/code/,\
@@ -2133,13 +2138,62 @@ else
 endif
 
 hdrck-clean:
-	$(RM) headers/hdrck headers/hdrck.o
+	$(RM) $(HDRCK) headers/hdrck.o
 	$(RM) headers/hdrck.cmx headers/hdrck.cmi headers/hdrck.cmp
 
 clean:: hdrck-clean
 
 CURRENT_HEADERS?=open-source
 CURRENT_HEADER_DIRS?=$(addsuffix /$(CURRENT_HEADERS),$(HEADER_DIRS))
+
+CHECK_NEWLINES:=./bin/check_newlines$(EXE)
+
+$(CHECK_NEWLINES): bin/check_newlines.ml
+	$(PRINT_MAKING)	$@
+ifeq ($(OCAMLBEST),opt)
+	$(OCAMLOPT) unix.cmxa $< -o $@
+else
+	$(OCAMLC) unix.cma $< -o $@
+endif
+
+check-newlines-clean:
+	$(RM) $(CHECK_NEWLINES) bin/check_newlines.cm* bin/check_newlines.o
+
+clean:: check-newlines-clean
+
+ISUTF8:=./bin/isutf8$(EXE)
+
+$(ISUTF8): bin/isutf8.ml
+	$(PRINT_MAKING)	$@
+ifeq ($(OCAMLBEST),opt)
+	$(OCAMLOPT) $< -o $@
+else
+	$(OCAMLC) $< -o $@
+endif
+
+isutf8-clean:
+	$(RM) $(ISUTF8) bin/isutf8.cm* bin/isutf8.o
+
+clean:: isutf8-clean
+
+FILES_WITHOUT_NEWLINE := \
+  VERSION \
+  VERSION_CODENAME
+
+BINARY_DISTRIB_FILES := \
+  $(sort $(wildcard ivette/src/dome/doc/template/static/fonts/*)) \
+  $(sort $(wildcard share/*.ico share/*.png share/theme/*/*.png))
+
+BINARY_DISTRIB_TESTS := \
+  tests/misc/oracle/interpreted_automata_dataflow_backward.dot \
+  tests/misc/oracle/interpreted_automata_dataflow_forward.dot \
+  tests/verisec/suite/programs/apps/SpamAssassin/BID-6679/message_write/test \
+  tests/verisec/suite/programs/apps/sendmail/CVE-1999-0047/mime7to8/array_vs_pointer.ods \
+  tests/verisec/suite/programs/apps/sendmail/CVE-1999-0047/mime7to8/data_testing.ods \
+
+TESTS_WITHOUT_NEWLINE := \
+  $(BINARY_DISTRIB_TESTS) \
+  tests/spec/unfinished-oneline-acsl-comment.i \
 
 # OPEN_SOURCE: set it to 'yes' if you want to check open source headers
 # STRICT_HEADERS: set it to 'yes' if you want to consider warnings as errors
@@ -2153,34 +2207,22 @@ CURRENT_HEADER_DIRS?=$(addsuffix /$(CURRENT_HEADERS),$(HEADER_DIRS))
 # because identical headers but with different encodings are not exactly
 # easy to distinguish
 .PHONY: check-headers
-check-headers: $(HDRCK)
+check-headers: $(HDRCK) $(CHECK_NEWLINES) $(ISUTF8)
 	$(PRINT) "Checking $(DISTRIB_HEADERS) headers (OPEN_SOURCE=$(OPEN_SOURCE), CURRENT_HEADERS=$(CURRENT_HEADERS))..."
 	$(PRINT) "- HEADER_SPEC_FILE=$(HEADER_SPEC_FILE)"
 	$(PRINT) "- CURRENT_HEADER_DIRS=$(CURRENT_HEADER_DIRS)"
 	$(PRINT) "- FORBIDDEN_HEADERS=$(DISTRIB_PROPRIETARY_HEADERS)"
-	 # Workaround to avoid "argument list too long" in make 3.82+ without
-	 # using 'file' built-in, only available on make 4.0+
-	 # for make 4.0+, using the 'file' function could be a better solution,
-	 # although it seems to segfault in 4.0 (but not in 4.1)
-	$(RM) distrib_files.tmp distrib_tests.tmp header_exceptions.tmp
-	@$(foreach file,$(DISTRIB_FILES),\
-			echo $(file) >> distrib_files.tmp$(NEWLINE))
-	@$(foreach file,$(DISTRIB_TESTS),\
-			echo $(file) >> distrib_tests.tmp$(NEWLINE))
-	@$(foreach file,$(HEADER_EXCEPTIONS),\
-			echo $(file) >> header_exceptions.tmp$(NEWLINE))
-
+	# Workaround to avoid "argument list too long" in Cygwin
+	$(file >distrib_files.tmp) $(foreach O,$(DISTRIB_FILES),$(file >>distrib_files.tmp,$O))
+	$(file >distrib_tests.tmp) $(foreach O,$(DISTRIB_TESTS),$(file >>distrib_tests.tmp,$(subst @, ,$(O))))
+	$(file >header_exceptions.tmp) $(foreach O,$(HEADER_EXCEPTIONS),$(file >>header_exceptions.tmp,$O))
 	echo "Checking that distributed files terminate with a newline..."
-	bin/check_newline.sh distrib_files.tmp
-	bin/check_newline.sh distrib_tests.tmp
-	@if command -v file >/dev/null 2>/dev/null; then \
-		echo "Checking that distributed files do not use iso-8859..."; \
-		file --mime-encoding -f distrib_files.tmp -f distrib_tests.tmp | \
-			grep "iso-8859" \
-			| $(SED) "s/^/error: invalid encoding in /" \
-			| ( ! grep "error: invalid encoding" ); \
-	else echo "command 'file' not found, skipping encoding checks"; \
-	fi
+	$(CHECK_NEWLINES) distrib_files.tmp $(FILES_WITHOUT_NEWLINE) $(BINARY_DISTRIB_FILES)
+	$(CHECK_NEWLINES) distrib_tests.tmp $(TESTS_WITHOUT_NEWLINE) $(BINARY_DISTRIB_TESTS)
+	echo "Checking that distributed files do not use iso-8859..."
+	$(ISUTF8) distrib_files.tmp $(BINARY_DISTRIB_FILES)
+	$(ISUTF8) distrib_tests.tmp $(BINARY_DISTRIB_TESTS)
+	echo "Checking headers..."
 	$(HDRCK) \
 		$(HDRCK_EXTRA) \
 		$(addprefix -header-dirs ,$(CURRENT_HEADER_DIRS)) \
@@ -2481,13 +2523,10 @@ else
 endif
 	$(RM) -r $(CLIENT_DIR)
 	$(MKDIR) -p $(CLIENT_DIR)
-	@#Workaround to avoid "argument list too long" in make 3.82+ without
-	@#using 'file' built-in, only available on make 4.0+
-	@#for make 4.0+, using the 'file' function could be a better solution,
-	@#although it seems to segfault in 4.0 (but not in 4.1)
-	$(RM) file_list_to_archive.tmp
-	@$(foreach file,$(DISTRIB_FILES) $(DISTRIB_TESTS),\
-			echo $(file) | $(SED) 's/@/ /g' >> file_list_to_archive.tmp$(NEWLINE))
+	#Workaround to avoid "argument list too long" in Cygwin
+	$(file >file_list_to_archive.tmp)
+	$(foreach f,$(DISTRIB_FILES), \
+             $(file >>file_list_to_archive.tmp,$(subst @, ,$(f))))
 	$(TAR) -cf - --files-from file_list_to_archive.tmp | $(TAR) -C $(CLIENT_DIR) -xf -
 	$(RM) file_list_to_archive.tmp
 	$(PRINT_MAKING) files

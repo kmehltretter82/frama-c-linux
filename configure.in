@@ -63,10 +63,9 @@ MAKE_DISTRIB=`sh -c "$MAKE -v | sed -n -e 's/\(.*\) Make.*$/\1/p'"`
 MAKE_MAJOR=`sh -c "$MAKE -v | sed -n  -f bin/sed_get_make_major"`
 MAKE_MINOR=`sh -c "$MAKE -v | sed -n -f bin/sed_get_make_minor"`
 AC_MSG_RESULT($MAKE_MAJOR.$MAKE_MINOR)
-if test "$MAKE_DISTRIB" != GNU -o "$MAKE_MAJOR" -lt 3 \
-   -o "$MAKE_MAJOR" = 3 -a "$MAKE_MINOR" -lt 81
+if test "$MAKE_DISTRIB" != GNU -o "$MAKE_MAJOR" -lt 4
 then
-   AC_MSG_ERROR([unsupported version; GNU Make version 3.81
+   AC_MSG_ERROR([unsupported version; GNU Make version 4.0
                  or higher is required.]);
 fi
 
