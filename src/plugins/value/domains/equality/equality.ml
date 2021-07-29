@@ -415,9 +415,7 @@ module Set = struct
     let both _ _ _ = Empty in
     let join t1 t2 = Node (t1, t2) in
     let empty = Empty in
-    let f = fold2_join_heterogeneous
-        ~cache ~empty_left ~empty_right ~both ~join ~empty
-    in
-    fun eqs1 eqs2 -> f eqs1 eqs2
+    fold2_join_heterogeneous
+      ~cache ~empty_left ~empty_right ~both ~join ~empty
 
 end
