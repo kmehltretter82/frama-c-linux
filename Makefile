@@ -2184,18 +2184,16 @@ BINARY_DISTRIB_FILES := \
   $(sort $(wildcard ivette/src/dome/doc/template/static/fonts/*)) \
   $(sort $(wildcard share/*.ico share/*.png share/theme/*/*.png))
 
-TESTS_WITHOUT_NEWLINE := \
-  tests/spec/unfinished-oneline-acsl-comment.i \
-  tests/verisec/suite/programs/apps/SpamAssassin/BID-6679/message_write/test \
-  tests/verisec/suite/programs/apps/sendmail/CVE-1999-0047/mime7to8/array_vs_pointer.ods \
-  tests/verisec/suite/programs/apps/sendmail/CVE-1999-0047/mime7to8/data_testing.ods \
-
 BINARY_DISTRIB_TESTS := \
   tests/misc/oracle/interpreted_automata_dataflow_backward.dot \
   tests/misc/oracle/interpreted_automata_dataflow_forward.dot \
   tests/verisec/suite/programs/apps/SpamAssassin/BID-6679/message_write/test \
   tests/verisec/suite/programs/apps/sendmail/CVE-1999-0047/mime7to8/array_vs_pointer.ods \
   tests/verisec/suite/programs/apps/sendmail/CVE-1999-0047/mime7to8/data_testing.ods \
+
+TESTS_WITHOUT_NEWLINE := \
+  $(BINARY_DISTRIB_TESTS) \
+  tests/spec/unfinished-oneline-acsl-comment.i \
 
 # OPEN_SOURCE: set it to 'yes' if you want to check open source headers
 # STRICT_HEADERS: set it to 'yes' if you want to consider warnings as errors
