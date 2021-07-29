@@ -8,6 +8,8 @@
         "makedev": {"header":"sys/types.h"},
         "option": {"header":"getopt.h"},
         "prioritynames": {"header":"syslog.h"},
+        "pthread_getname_np": {"header":"pthread.h"},
+        "pthread_setname_np": {"header":"pthread.h"},
         "sendfile": {"header":"sys/sendfile.h"},
         "setresgid": {"header":"unistd.h"},
         "setresuid": {"header":"unistd.h"},
