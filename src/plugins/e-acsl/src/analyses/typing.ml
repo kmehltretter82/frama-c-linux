@@ -595,8 +595,10 @@ and type_term_offset = function
     let ctx = type_offset t in
     ignore (type_term ~use_gmp_opt:false ~ctx t);
     type_term_offset toff
-(* It could happen that the bounds provided for a quantifier [lv] are bigger
-   than its type. [bounds_for_small_type] handles such cases
+(* [type_bound_variables] infers an interval associated with each of
+   the provided bounds of a quantified variable, and provides a term
+   accordingly. It could happen that the bounds provided for a quantifier
+   [lv] are bigger than its type. [type_bound_variables] handles such cases
    and provides smaller bounds whenever possible.
    Let B be the inferred interval and R the range of [lv.typ]
    - Case 1: B \subseteq R
@@ -608,49 +610,79 @@ and type_term_offset = function
    - Case 3: B \not\subseteq R and the bounds of B are NOT inferred exactly
      Example: [\let m = n > 0 ? 4 : 341; \forall char u; 1 < u < m ==> u > 0]
      Return: R with a guard guaranteeing that [lv] does not overflow *)
-let bounds_for_small_types ~loc (t1, lv, t2) =
-  match lv.lv_type with
-  | Ltype _ | Lvar _ | Lreal | Larrow _ ->
-    Error.not_yet "quantification over non-integer type"
-  | Linteger ->
-    t1, t2, None
-  | Ctype ty ->
-    let iv1 = Interval.(extract_ival (infer t1)) in
-    let iv2 = Interval.(extract_ival (infer t2)) in
-    (* Ival.join is NOT correct here:
-       Eg: (Ival.join [-3..-3] [300..300]) gives {-3, 300}
-       but NOT [-3..300] *)
-    let iv = Ival.inject_range (Ival.min_int iv1) (Ival.max_int iv2) in
-    let ity = Interval.extract_ival (Interval.extended_interv_of_typ ty) in
-    if Ival.is_included iv ity then
-      (* case 1 *)
-      t1, t2, None
-    else if Ival.is_singleton_int iv1 && Ival.is_singleton_int iv2 then begin
-      (* case 2 *)
-      let i = Ival.meet iv ity in
-      (* now we potentially have a better interval for [lv]
-         ==> update the binding *)
-      Interval.Env.replace lv (Interval.Ival i);
-      (* the smaller bounds *)
-      let min, max = Misc.finite_min_and_max i in
-      let t1 = Logic_const.tint ~loc min in
-      let t2 = Logic_const.tint ~loc max in
-      let ctx = Typing.number_ty_of_typ ~post:false ty in
-      (* we are assured that we will not have a GMP,
-         once again because we intersected with [ity] *)
-      Typing.type_term ~use_gmp_opt:false ~ctx t1;
-      Typing.type_term ~use_gmp_opt:false ~ctx t2;
-      t1, t2, None
-    end else
-      (* case 3 *)
-      let min, max = Misc.finite_min_and_max ity in
-      let guard_lower = Logic_const.tint ~loc min in
-      let guard_upper = Logic_const.tint ~loc max in
-      let lv_term = Logic_const.tvar ~loc lv in
-      let guard_lower = Logic_const.prel ~loc (Rle, guard_lower, lv_term) in
-      let guard_upper = Logic_const.prel ~loc (Rlt, lv_term, guard_upper) in
-      let guard = Logic_const.pand ~loc (guard_lower, guard_upper) in
-      t1, t2, Some guard
+let type_bound_variables ~loc ~dep ~lenv (t1, lv, t2) =
+  let i1 = Interval.(extract_ival (infer t1)) in
+  let i2 = Interval.(extract_ival (infer t2)) in
+  (* Ival.join is NOT correct here:
+     Eg: (Ival.join [-3..-3] [300..300]) gives {-3, 300}
+     but NOT [-3..300] *)
+  let i = Ival.inject_range (Ival.min_int i1) (Ival.max_int i2) in
+  (* let i = Interval.join i1 i2 in *)
+  let ctx = match lv.lv_type with
+       | Linteger -> mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:Gmpz (Interval.Ival i))
+       | Ctype ty ->
+       (match Cil.unrollType ty with
+           | TInt(ik, _) -> mk_ctx ~use_gmp_opt:true (C_integer ik)
+           | ty ->
+             Options.fatal "unexpected type %a for quantified variable %a"
+               Printer.pp_typ ty
+               Printer.pp_logic_var lv)
+       | lty ->
+         Options.fatal "unexpected type %a for quantified variable %a"
+           Printer.pp_logic_type lty
+           Printer.pp_logic_var lv
+  in
+  let t1, t2, i =
+    match lv.lv_type with
+    | Ltype _ | Lvar _ | Lreal | Larrow _ ->
+      Error.not_yet "quantification over non-integer type"
+    | Linteger -> t1, t2, i
+    | Ctype ty ->
+      (* let iv1 = Interval.(extract_ival (infer t1)) in
+       * let iv2 = Interval.(extract_ival (infer t2)) in
+       * (\* Ival.join is NOT correct here:
+       *    Eg: (Ival.join [-3..-3] [300..300]) gives {-3, 300}
+       *    but NOT [-3..300] *\)
+       * let iv = Ival.inject_range (Ival.min_int iv1) (Ival.max_int iv2) in *)
+      let ity = Interval.extract_ival (Interval.extended_interv_of_typ ty) in
+      if Ival.is_included i ity then
+        (* case 1 *)
+        t1, t2, i
+      else if Ival.is_singleton_int i1 && Ival.is_singleton_int i2 then begin
+        (* case 2 *)
+        let i = Ival.meet i ity in
+        (* We can now update the bounds in the preprocessed form
+           that come from the meet of the two intervals *)
+        let min, max = Misc.finite_min_and_max i in
+        let t1 = Logic_const.tint ~loc min in
+        let t2 = Logic_const.tint ~loc max in
+        t1, t2, i
+      end else
+        (* case 3 *)
+        let min, max = Misc.finite_min_and_max ity in
+        let guard_lower = Logic_const.tint ~loc min in
+        let guard_upper = Logic_const.tint ~loc max in
+        let lv_term = Logic_const.tvar ~loc lv in
+        let guard_lower = Logic_const.prel ~loc (Rle, guard_lower, lv_term) in
+        let guard_upper = Logic_const.prel ~loc (Rlt, lv_term, guard_upper) in
+        let guard = Logic_const.pand ~loc (guard_lower, guard_upper) in
+        Bound_variables.add_guard_for_small_type lv guard;
+        t1, t2, i
+  in
+  (* forcing when typing bounds prevents to generate an extra useless
+     GMP variable when --e-acsl-gmp-only *)
+  ignore (type_term ~use_gmp_opt:false ~ctx ~dep ~lenv t1);
+  ignore (type_term ~use_gmp_opt:false ~ctx ~dep ~lenv t2);
+  (* if we must generate GMP code, degrade the interval in order to
+     guarantee that [x] will be a GMP when typing the goal *)
+  let i = match ctx with
+      | C_integer _ -> i
+      | Gmpz -> Ival.inject_range None None (* [ -\infty; +\infty ] *)
+      | C_float _ | Rational | Real | Nan ->
+               Options.fatal "unexpected quantification over %a" D.pretty ctx
+  in
+  Interval.Env.add lv (Interval.Ival i);
+  (t1, lv, t2)
 
 let rec type_predicate p =
   Cil.CurrentLoc.set p.pred_loc;
@@ -709,66 +741,18 @@ let rec type_predicate p =
       ignore (type_term ~use_gmp_opt:true li_t);
       (type_predicate p).ty
 
-    | Pforall(bounded_vars, ({ pred_content = Pimplies(_, _) } as p'))
-    | Pexists(bounded_vars, ({ pred_content = Pand(_, _) } as p')) ->
-      let is_forall =
-        match p.pred_content with
-        | Pforall _ -> true
-        | Pexists _ -> false
-        | _ -> assert false
-      in
+
+    | Pforall(_, { pred_content = Pimplies(_, _) })
+    | Pexists(_, { pred_content = Pand(_, _) }) ->
       let guards, goal =
-        !compute_quantif_guards_ref ~is_forall p bounded_vars p'
+        Bound_variables.get_preprocessed_quantifier p
       in
-      let iv_plus_one iv =
-        Interval.Ival (Ival.add_singleton_int Integer.one iv)
-      in
-      List.iter
-        (fun (t1, r1, x, r2, t2) ->
-           let i1 = Interval.infer t1 in
-           let i1 = match r1, i1 with
-             | Rlt, Interval.Ival iv -> iv_plus_one iv
-             | Rle, _ -> i1
-             | _ -> assert false
-           in
-           let i2 = Interval.infer t2 in
-           (* add one to [i2], since we increment the loop counter one more
-              time before going outside the loop. *)
-           let i2 = match r2, i2 with
-             | Rlt, _ -> i2
-             | Rle, Interval.Ival iv -> iv_plus_one iv
-             | _ -> assert false
-           in
-           let i = Interval.join i1 i2 in
-           let ctx = match x.lv_type with
-             | Linteger -> mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:Gmpz i)
-             | Ctype ty ->
-               (match Cil.unrollType ty with
-                | TInt(ik, _) -> mk_ctx ~use_gmp_opt:true (C_integer ik)
-                | ty ->
-                  Options.fatal "unexpected type %a for quantified variable %a"
-                    Printer.pp_typ ty
-                    Printer.pp_logic_var x)
-             | lty ->
-               Options.fatal "unexpected type %a for quantified variable %a"
-                 Printer.pp_logic_type lty
-                 Printer.pp_logic_var x
-           in
-           (* forcing when typing bounds prevents to generate an extra useless
-              GMP variable when --e-acsl-gmp-only *)
-           ignore (type_term ~use_gmp_opt:false ~ctx t1);
-           ignore (type_term ~use_gmp_opt:false ~ctx t2);
-           (* if we must generate GMP code, degrade the interval in order to
-              guarantee that [x] will be a GMP when typing the goal *)
-           let i = match ctx with
-             | C_integer _ -> i
-             | Gmpz -> Interval.top_ival (* [ -\infty; +\infty ] *)
-             | C_float _ | Rational | Real | Nan ->
-               Options.fatal "unexpected quantification over %a" D.pretty ctx
-           in
-           Interval.Env.add x i)
-        guards;
-      (type_predicate goal).ty
+      let guards =
+      List.map
+        (fun (t1, x, t2) ->
+             type_bound_variables ~loc:p.pred_loc ~dep ~lenv (t1, x, t2))
+        guards
+      in Bound_variables.replace p guards goal;
 
     | Pseparated tlist ->
       List.iter

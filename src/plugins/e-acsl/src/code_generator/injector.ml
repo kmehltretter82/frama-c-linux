@@ -864,6 +864,7 @@ let inject () =
     Project.pretty (Project.current ());
   Gmp_types.init ();
   let ast = Ast.get () in
+  Bound_variables.preprocess ast;
   Preprocess_typing.type_program ast;
   inject_in_file ast;
   reset_all ast;

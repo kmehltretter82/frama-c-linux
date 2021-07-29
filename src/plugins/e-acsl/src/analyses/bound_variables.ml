@@ -79,13 +79,14 @@ module Quantified_predicate =
 (******************************************************************************)
 
 (* Memoization module to store the preprocessed form of a quantified predicate *)
-module Preprocessed_quantifier: sig
+module Quantifier: sig
   val add: predicate -> (term * logic_var * term) list -> predicate -> unit
   val get: predicate -> (term * logic_var * term) list * predicate
   (** getter and setter for the additional guard that intersects with the type
       of the variable *)
   val get_guard_for_small_type : logic_var -> predicate option
-  val add_guard_for_small_type : logic_var -> predicate option -> unit
+  val add_guard_for_small_type : logic_var -> predicate -> unit
+  val replace : predicate -> (term * logic_var * term) list -> predicate -> unit
   val clear : unit -> unit
 end = struct
 
@@ -94,7 +95,6 @@ end = struct
   let guard_tbl = Cil_datatype.Logic_var.Hashtbl.create 97
 
   let get p =
-    (* Options.feedback "Get preprocessed form of predicate %a" Printer.pp_predicate p; *)
     try Quantified_predicate.Hashtbl.find tbl p
     with Not_found ->
       Options.fatal
@@ -102,27 +102,30 @@ end = struct
         Printer.pp_predicate p
 
   let add p guarded_vars goal =
-    (* Options.feedback "Adding preprocessed form of predicate %a" Printer.pp_predicate p; *)
     Quantified_predicate.Hashtbl.add tbl p (guarded_vars, goal)
 
   let get_guard_for_small_type x =
-    try Cil_datatype.Logic_var.Hashtbl.find guard_tbl x
-    with Not_found ->
-      Options.fatal
-        "The typing guard for the variable %a was not found."
-        Printer.pp_logic_var x
+    try Some (Cil_datatype.Logic_var.Hashtbl.find guard_tbl x)
+    with Not_found -> None
 
   let add_guard_for_small_type lv p =
     Cil_datatype.Logic_var.Hashtbl.add guard_tbl lv p
+
+  let replace p guarded_vars goal =
+    Quantified_predicate.Hashtbl.replace tbl p (guarded_vars, goal)
 
   let clear () =
     Cil_datatype.Logic_var.Hashtbl.clear guard_tbl;
     Quantified_predicate.Hashtbl.clear tbl
 end
 
+(** Getters and setters *)
 let get_preprocessed_quantifier = Quantifier.get
 let get_guard_for_small_type = Quantifier.get_guard_for_small_type
+let add_guard_for_small_type = Quantifier.add_guard_for_small_type
+let replace = Quantifier.replace
 let clear_guards = Quantifier.clear
+
 
 (** Helper module to process the constraints in the quantification and extract
     guards for the quantified variables. *)
@@ -628,13 +631,9 @@ let compute_quantif_guards ~is_forall quantif bounded_vars p =
     guards, goal
 
 
-let () = Typing.compute_quantif_guards_ref := compute_quantif_guards
-
-(** Take a guard and put it in normal form
+(** Takes a guard and put it in normal form
     [t1 <= x < t2] so that [t1] is the first value
-     taken by [x] and [t2] is the last one.
-    This step also adds the extra guard if the type
-    of the quantified variable is small *)
+     taken by [x] and [t2] is the last one. *)
 let normalize_guard ~loc (t1, rel1, lv, rel2, t2) =
   let t_plus_one t =
     let tone = Cil.lone ~loc () in
@@ -659,12 +658,100 @@ let normalize_guard ~loc (t1, rel1, lv, rel2, t2) =
     | Rgt | Rge | Req | Rneq ->
       assert false
   in
-  let t1, t2, guard_for_small_type = bounds_for_small_types ~loc (t1, lv, t2) in
-  Quantifier.add_guard_for_small_type lv guard_for_small_type;
   t1, lv, t2
+
 
 let compute_guards loc ~is_forall p bounded_vars hyps =
   let guards,goal = compute_quantif_guards p ~is_forall bounded_vars hyps in
   (* transform [guards] into [lscope_var list] *)
   let normalized_guards = List.map (normalize_guard ~loc) guards
   in Quantifier.add p normalized_guards goal
+
+module Preprocessor : sig
+  val compute : file -> unit
+  val compute_annot : code_annotation -> unit
+  val compute_predicate : predicate -> unit
+end
+= struct
+
+  let process_quantif ~loc p =
+    Cil.CurrentLoc.set loc;
+    match p.pred_content with
+    | Pforall(bound_vars, ({ pred_content = Pimplies(_, _) } as goal)) ->
+      compute_guards loc ~is_forall:true p bound_vars goal
+    | Pexists(bound_vars, ({ pred_content = Pand(_, _) } as goal)) ->
+      compute_guards loc ~is_forall:false p bound_vars goal
+    | Pforall _ -> Error.not_yet "unguarded \\forall quantification"
+    | Pexists _ -> Error.not_yet "unguarded \\exists quantification"
+    | _ -> ()
+
+  let preprocessor = object
+    inherit Visitor.frama_c_inplace
+
+    (* Only logic functions and logic predicates are handled.
+       E-acsl simply ignores all the other global annotations *)
+    method !vannotation annot =
+      match annot with
+      | Dfun_or_pred _ -> Cil.DoChildren
+      | _ -> Cil.SkipChildren
+
+   (* Ignore the annotations attached to statements from the RTL *)
+   method !vglob_aux =
+    function
+    (* library functions and built-ins *)
+    | GVarDecl(vi, _) | GVar(vi, _, _)
+    | GFunDecl(_, vi, _) | GFun({ svar = vi }, _) when Builtins.mem vi.vname ->
+      Cil.SkipChildren
+
+    | GVarDecl(vi, _) | GVar(vi, _, _) | GFun({ svar = vi }, _)
+      when Misc.is_fc_or_compiler_builtin vi ->
+      Cil.SkipChildren
+    | g when Rtl.Symbols.mem_global g ->
+      Cil.SkipChildren
+
+      (* generated function declaration: nothing to do *)
+    | GFunDecl(_, vi, _) when Misc.is_fc_stdlib_generated vi ->
+      Cil.SkipChildren
+
+    | GFun({svar = vi}, _) ->
+      let kf = try Globals.Functions.get vi with Not_found -> assert false in
+      if Functions.check kf then Cil.DoChildren else Cil.SkipChildren
+
+    | GAnnot _ -> Cil.DoChildren
+
+    (* other globals: nothing to do *)
+    | GFunDecl _
+    | GVarDecl _
+    | GVar _
+    | GType _
+    | GCompTag _
+    | GCompTagDecl _
+    | GEnumTag _
+    | GEnumTagDecl _
+    | GAsm _
+    | GPragma _
+    | GText _
+      -> Cil.SkipChildren
+
+    method !vpredicate  p =
+      let loc = p.pred_loc in
+      match Preprocess_predicates.get_preprocessed_form p with
+      | PoT_pred p -> Error.generic_handle (process_quantif ~loc) () p;
+        Cil.DoChildren
+      | PoT_term _ -> Cil.DoChildren
+
+  end
+
+  let compute ast =
+    Visitor.visitFramacFileSameGlobals preprocessor ast
+
+  let compute_annot annot =
+    ignore (Visitor.visitFramacCodeAnnotation preprocessor annot)
+
+  let compute_predicate p =
+    ignore (Visitor.visitFramacPredicate preprocessor p)
+end
+
+let preprocess = Preprocessor.compute
+let preprocess_annot = Preprocessor.compute_annot
+let preprocess_predicate = Preprocessor.compute_predicate
