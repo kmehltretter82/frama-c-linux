@@ -404,11 +404,8 @@ struct
     let empty_left _ = empty (* zone over which to fold is empty *) in
     let empty_right z = empty_map z in
     let both b itvs map_b = conv b (both itvs map_b) in
-    let fmap =
-      Zone.fold2_join_heterogeneous
-        ~cache ~empty_left ~empty_right ~both ~join ~empty
-    in
-    fun z m -> fmap z m
+    Zone.fold2_join_heterogeneous
+      ~cache ~empty_left ~empty_right ~both ~join ~empty
 
 
   let shape x = x

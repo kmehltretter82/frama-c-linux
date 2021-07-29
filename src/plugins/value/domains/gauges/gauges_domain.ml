@@ -388,11 +388,8 @@ module G = struct
       | Some i -> MC.singleton b i
     in
     let join = MC.merge_disjoint in
-    let f =
-      MV.fold2_join_heterogeneous
-        ~cache ~empty_left ~empty_right ~both ~join ~empty
-    in
-    fun mv1 mv2 -> f mv1 mv2
+    MV.fold2_join_heterogeneous
+      ~cache ~empty_left ~empty_right ~both ~join ~empty
 
   (* compute pointwise [mv - mc] *)
   let mv_minus_mc =
@@ -411,11 +408,8 @@ module G = struct
       MV.singleton b v'
     in
     let join = MV.merge_disjoint in
-    let f =
-      MV.fold2_join_heterogeneous
-        ~cache ~empty_left ~empty_right ~both ~join ~empty
-    in
-    fun mv mc -> f mv mc
+    MV.fold2_join_heterogeneous
+      ~cache ~empty_left ~empty_right ~both ~join ~empty
 
   (* Implementation of the 'forget' operation. [nb] loop iterations have
      elapsed, and during one iteration, variables are incremented by [coeffs].
