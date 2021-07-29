@@ -12,7 +12,7 @@
   Frama_C_dump_each:
   # taint:
   Locations (data):
-    tainted; t; u; x
+    tainted; t; u; x; buf[0]
   Locations (control):
     w; buf[0]
   ==END OF DUMP==
@@ -142,7 +142,7 @@
   Frama_C_dump_each:
   # taint:
   Locations (data):
-    tainted; t; u; x; t
+    tainted; t; u; x; buf[0]; t
   Locations (control):
     t; u; w; x; y; buf[0..1]
   ==END OF DUMP==
