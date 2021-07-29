@@ -44,6 +44,30 @@ let ptr_sizeof ~loc typ =
   | TPtr (t', _) -> Cil.new_exp ~loc (SizeOf t')
   | _ -> assert false
 
+let lnot ~loc e =
+  let ty = Cil.typeOf e in
+  if not (Cil.isScalarType ty) then
+    Options.fatal
+      ~current:true
+      "Trying to create a logical not on an expression that is not scalar: %a"
+      Printer.pp_exp e;
+  match Cil.isInteger e with
+  | None -> begin
+      (* The expression is not an integer constant. Simplify the case where a
+         logical not is already present, but otherwise return a new expression
+         with the [LNot] operator. *)
+      match e.enode with
+      | UnOp (LNot, e, _) -> e
+      | _ -> Cil.new_exp ~loc (UnOp (LNot, e, Cil.intType))
+    end
+  | Some i when Integer.equal i Integer.zero ->
+    (* The expression is an integer equal to zero, directly return one. *)
+    Cil.one ~loc
+  | _ ->
+    (* The expression is an integer that is not equal to zero, directly return
+       zero. *)
+    Cil.zero ~loc
+
 let null ~loc =
   Cil.mkCast (TPtr (TVoid [], [])) (Cil.zero ~loc)
 

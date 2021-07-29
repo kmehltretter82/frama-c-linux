@@ -461,7 +461,7 @@ int main(void)
     __gen_e_acsl_assert_data_12.file = "tests/arith/quantif.i";
     __gen_e_acsl_assert_data_12.fct = "main";
     __gen_e_acsl_assert_data_12.line = 45;
-    __e_acsl_assert(! 0,& __gen_e_acsl_assert_data_12);
+    __e_acsl_assert(1,& __gen_e_acsl_assert_data_12);
   }
   /*@ assert !(\exists char c; 10 <= c < 10 && c == 10); */ ;
   {

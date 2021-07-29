@@ -82,7 +82,7 @@ let convert kf env loc ~is_forall quantif =
           let z = zero ~loc in
           let o = one ~loc in
           if is_forall then o, z, fun x -> x
-          else z, o, fun e -> new_exp ~loc:e.eloc (UnOp(LNot, e, intType))
+          else z, o, fun e -> Smart_exp.lnot ~loc:e.eloc e
         in
         (* transform [bound_vars] into [lscope_var list],
            and update logic scope in the process *)

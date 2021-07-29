@@ -373,7 +373,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
     else begin
       assert (Cil.isIntegralType ty);
       let e, adata, env = term_to_exp ~adata kf env t in
-      let e = Cil.new_exp ~loc (UnOp(LNot, e, Cil.intType)) in
+      let e = Smart_exp.lnot ~loc e in
       e, adata, env, Typed_number.C_number, ""
     end
   | TBinOp(PlusA | MinusA | Mult as bop, t1, t2) ->
@@ -1116,7 +1116,7 @@ and predicate_content_to_exp ~adata ?name kf env p =
           Logic_const.pimplies ~loc (p2, p1)))
   | Pnot p ->
     let e, adata, env = predicate_to_exp ~adata kf env p in
-    Cil.new_exp ~loc (UnOp(LNot, e, Cil.intType)), adata, env
+    Smart_exp.lnot ~loc e, adata, env
   | Pif(t, p2, p3) ->
     Extlib.flatten
       (Env.with_rte_and_result env true
