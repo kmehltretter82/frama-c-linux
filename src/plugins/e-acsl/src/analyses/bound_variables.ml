@@ -21,16 +21,17 @@
 (**************************************************************************)
 
 (** Module for preprocessing the quantified predicates. Predicates with
-    quantifiers are hard to translate, so we delegate some of the work to a
-    preprocessing phase. At the end of this phase, all the quantified predicates
-    should have an associated preprocessed form [vars * goal] where - [vars] is a
-    list of guarded variables in the right order - [goal] is the predicate under
-    the quantifications The guarded variables in the list [vars] are of type
-    [term * logic_var * term * predicate option], where a tuple [(t1,v,t2,p)]
-    indicates that v is a logic variable with the two guards t1 <= x < t2 and p
-    is an additional optional guard to intersect the first guard with the
-    provided type for the variable v *)
-
+    quantifiers are hard to translate, so we delegate some of the work to
+    a preprocessing phase. At the end of this phase, all the quantified predicates
+    should have an associated preprocessed form [vars * goal] where
+    - [vars] is a list of guarded variables in the right order
+    - [goal] is the predicate under the quantifications
+      The guarded variables in the list [vars] are of
+      type [term * logic_var * term * predicate option], where a tuple
+      [(t1,v,t2,p)] indicates that v is a logic variable with the two
+      guards t1 <= x < t2 and p is an additional optional guard to
+      intersect the first guard with the provided type for the variable v
+*)
 open Cil_types
 open Cil
 open Cil_datatype
@@ -77,9 +78,8 @@ module Quantified_predicate =
 (** Storing the preprocessed quantifiers *)
 (******************************************************************************)
 
-(** In order to retrieve the preprocessed form of a quantified predicate
- *   we store it in a hash table. *)
-module Quantifier: sig
+(* Memoization module to store the preprocessed form of a quantified predicate *)
+module Preprocessed_quantifier: sig
   val add: predicate -> (term * logic_var * term) list -> predicate -> unit
   val get: predicate -> (term * logic_var * term) list * predicate
   (** getter and setter for the additional guard that intersects with the type
