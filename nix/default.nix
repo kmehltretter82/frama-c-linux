@@ -160,6 +160,7 @@ pkgs.lib.makeExtensible
 
   build-from-distrib-tarball = mk_deriv {
         name = "frama-c-build-from-distrib-tarball";
+        doCheck = true;
         buildInputs = self.buildInputs;
         opamPackages = self.build-distrib-tarball.opamPackages;
         src = self.build-distrib-tarball.out ;
