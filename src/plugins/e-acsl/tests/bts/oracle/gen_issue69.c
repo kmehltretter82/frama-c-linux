@@ -10,7 +10,7 @@ int main(void)
     __gen_e_acsl_forall = 1;
     __gen_e_acsl_c = (unsigned char)4;
     while (1) {
-      if (__gen_e_acsl_c <= 255) ; else break;
+      if (__gen_e_acsl_c < 256) ; else break;
       {
         int __gen_e_acsl_and;
         if (0 <= __gen_e_acsl_c) __gen_e_acsl_and = __gen_e_acsl_c <= 255;
@@ -42,9 +42,9 @@ int main(void)
     while (1) {
       {
         int __gen_e_acsl_and_2;
-        if (-128 <= __gen_e_acsl_u) __gen_e_acsl_and_2 = __gen_e_acsl_u <= 127;
+        if (-128 <= __gen_e_acsl_u) __gen_e_acsl_and_2 = __gen_e_acsl_u < 128;
         else __gen_e_acsl_and_2 = 0;
-        __e_acsl_assert(__gen_e_acsl_and_2,1,"RTE","main","-128 <= u <= 127",
+        __e_acsl_assert(__gen_e_acsl_and_2,1,"RTE","main","-128 <= u < 128",
                         "tests/bts/issue69.c",11);
       }
       if (__gen_e_acsl_u < __gen_e_acsl_m) ; else break;

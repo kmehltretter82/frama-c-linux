@@ -831,6 +831,7 @@ let reset_all ast =
   Logic_functions.reset ();
   Literal_strings.reset ();
   Global_observer.reset ();
+  Bound_variables.clear_guards ();
   Typing.clear ();
   (* reset some kernel states: *)
   (* reset the CFG that has been heavily modified by the code generation step *)

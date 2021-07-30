@@ -24,7 +24,7 @@
   assert
   \initialized(__gen_e_acsl_at_6 +
                (int)((int)((int)(__gen_e_acsl_u_3 - 9) * 32) +
-                     (int)((int)(__gen_e_acsl_v_3 - -5) - 1)));
+                     (int)(__gen_e_acsl_v_3 - -4)));
 [eva:alarm] tests/arith/at_on-purely-logic-variables.c:45: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] tests/arith/at_on-purely-logic-variables.c:43: Warning: 

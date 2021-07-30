@@ -200,75 +200,15 @@ let handle_annotations env kf stmt =
 (**************************************************************************)
 (**************************** Nested loops ********************************)
 (**************************************************************************)
-
-(* It could happen that the bounds provided for a quantifier [lv] are bigger
-   than its type. [bounds_for_small_type] handles such cases
-   and provides smaller bounds whenever possible.
-   Let B be the inferred interval and R the range of [lv.typ]
-   - Case 1: B \subseteq R
-     Example: [\forall unsigned char c; 4 <= c <= 100 ==> 0 <= c <= 255]
-     Return: B
-   - Case 2: B \not\subseteq R and the bounds of B are inferred exactly
-     Example: [\forall unsigned char c; 4 <= c <= 300 ==> 0 <= c <= 255]
-     Return: B \intersect R
-   - Case 3: B \not\subseteq R and the bounds of B are NOT inferred exactly
-     Example: [\let m = n > 0 ? 4 : 341; \forall char u; 1 < u < m ==> u > 0]
-     Return: R with a guard guaranteeing that [lv] does not overflow *)
-let bounds_for_small_type ~loc (t1, lv, t2) =
-  match lv.lv_type with
-  | Ltype _ | Lvar _ | Lreal | Larrow _ ->
-    Options.abort "quantification over non-integer type is not part of E-ACSL"
-
-  | Linteger ->
-    t1, t2, None
-
-  | Ctype ty ->
-    let iv1 = Interval.(extract_ival (infer t1)) in
-    let iv2 = Interval.(extract_ival (infer t2)) in
-    (* Ival.join is NOT correct here:
-       Eg: (Ival.join [-3..-3] [300..300]) gives {-3, 300}
-       but NOT [-3..300] *)
-    let iv = Ival.inject_range (Ival.min_int iv1) (Ival.max_int iv2) in
-    let ity = Interval.extract_ival (Interval.interv_of_typ ty) in
-    if Ival.is_included iv ity then
-      (* case 1 *)
-      t1, t2, None
-    else if Ival.is_singleton_int iv1 && Ival.is_singleton_int iv2 then begin
-      (* case 2 *)
-      let i = Ival.meet iv ity in
-      (* now we potentially have a better interval for [lv]
-         ==> update the binding *)
-      Interval.Env.replace lv (Interval.Ival i);
-      (* the smaller bounds *)
-      let min, max = Misc.finite_min_and_max i in
-      let t1 = Logic_const.tint ~loc min in
-      let t2 = Logic_const.tint ~loc max in
-      let ctx = Typing.number_ty_of_typ ~post:false ty in
-      (* we are assured that we will not have a GMP,
-         once again because we intersected with [ity] *)
-      Typing.type_term ~use_gmp_opt:false ~ctx t1;
-      Typing.type_term ~use_gmp_opt:false ~ctx t2;
-      t1, t2, None
-    end else
-      (* case 3 *)
-      let min, max = Misc.finite_min_and_max ity in
-      let guard_lower = Logic_const.tint ~loc min in
-      let guard_upper = Logic_const.tint ~loc max in
-      let lv_term = Logic_const.tvar ~loc lv in
-      let guard_lower = Logic_const.prel ~loc (Rle, guard_lower, lv_term) in
-      let guard_upper = Logic_const.prel ~loc (Rle, lv_term, guard_upper) in
-      let guard = Logic_const.pand ~loc (guard_lower, guard_upper) in
-      t1, t2, Some guard
-
 let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
   let term_to_exp = !term_to_exp_ref in
   match lscope_vars with
   | [] ->
     mk_innermost_block env
   | Lscope.Lvs_quantif(t1, rel1, logic_x, rel2, t2) :: lscope_vars' ->
-    let t1, t2, guard_for_small_type_opt =
-      bounds_for_small_type ~loc (t1, logic_x, t2)
-    in
+    assert (rel1 == Rle && rel2 == Rlt);
+    Typing.type_term ~use_gmp_opt:false t1;
+    Typing.type_term ~use_gmp_opt:false t2;
     let ctx =
       let ty1 = Typing.get_number_ty t1 in
       let ty2 = Typing.get_number_ty t2 in
@@ -286,41 +226,14 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
         ty;
       res
     in
-    let t1 = match rel1 with
-      | Rlt ->
-        let t = t_plus_one t1 in
-        Typing.type_term ~use_gmp_opt:false ~ctx t;
-        t
-      | Rle ->
-        t1
-      | Rgt | Rge | Req | Rneq ->
-        assert false
-    in
-    let t2_one, bop2 = match rel2 with
-      | Rlt ->
-        t2, Lt
-      | Rle ->
-        (* we increment the loop counter one more time (at the end of the
-           loop). Thus to prevent overflow, check the type of [t2+1]
-           instead of [t2]. *)
-        t_plus_one t2, Le
-      | Rgt | Rge | Req | Rneq ->
-        assert false
-    in
-    Typing.type_term ~use_gmp_opt:false ~ctx t2_one;
-    let ctx_one =
-      let ty1 = Typing.get_number_ty t1 in
-      let ty2 = Typing.get_number_ty t2_one in
-      Typing.join ty1 ty2
-    in
     let ty =
-      try Typing.typ_of_number_ty ctx_one
+      try Typing.typ_of_number_ty ctx
       with Typing.Not_a_number -> assert false
     in
     (* loop counter corresponding to the quantified variable *)
     let var_x, x, env = Env.Logic_binding.add ~ty env kf logic_x in
     let lv_x = var var_x in
-    let env = match ctx_one with
+    let env = match ctx with
       | Typing.C_integer _ -> env
       | Typing.Gmpz -> Env.add_stmt env kf (Gmp.init ~loc x)
       | Typing.(C_float _ | Rational | Real | Nan) -> assert false
@@ -337,13 +250,22 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
         ~global_clear:false
         Env.Middle
     in
-    (* generate the guard [x bop t2] *)
+    (* generate the guard [x < t2] *)
     let block_to_stmt b = Smart_stmt.block_stmt b in
     let tlv = Logic_const.tvar ~loc logic_x in
+    (* if [t2] is of the form [t2'+1], generate the guard [x <= t2']
+       to avoid the extra addition (relevant when computing with GMP) *)
     let guard =
-      (* must copy [t2] to force being typed again *)
-      Logic_const.term ~loc
-        (TBinOp(bop2, tlv, { t2 with term_node = t2.term_node } )) Linteger
+      match t2.term_node with
+      | TBinOp (PlusA, t2_minus_one, {term_node = TConst(Integer (n, _))}) when Integer.is_one n ->
+        Logic_const.term ~loc
+          (TBinOp(Le, tlv, { t2_minus_one with term_node = t2_minus_one.term_node }))
+          Linteger
+      | _ ->
+        (* must copy [t2] to force it being typed again *)
+        Logic_const.term ~loc
+          (TBinOp(Lt, tlv, { t2 with term_node = t2.term_node } ))
+          Linteger
     in
     Typing.type_term ~use_gmp_opt:false ~ctx:Typing.c_int guard;
     let guard_exp, env = term_to_exp kf (Env.push env) guard in
@@ -361,7 +283,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     let guard = block_to_stmt guard_blk in
     (* increment the loop counter [x++];
        previous typing ensures that [x++] fits type [ty] *)
-    let tlv_one = t_plus_one ~ty:ctx_one tlv in
+    let tlv_one = t_plus_one ~ty:ctx tlv in
     let incr, env = term_to_exp kf (Env.push env) tlv_one in
     let next_blk, env = Env.pop_and_get
         env
@@ -371,6 +293,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     in
     (* generate the whole loop *)
     let next = block_to_stmt next_blk in
+    let guard_for_small_type_opt = Bound_variables.get_guard_for_small_type logic_x in
     let stmts, env = match guard_for_small_type_opt with
       | None ->
         guard :: body @ [ next ], env

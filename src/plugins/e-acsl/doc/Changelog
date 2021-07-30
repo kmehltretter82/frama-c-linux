@@ -25,6 +25,9 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-* E-ACSL       [2021-07-30] Fix incorrect evaluation of quantified
+	        predicates when a strict guard overlaps with the type of the
+	        bound variable (unlikely in practice) (frama-c/e-acsl#149).
 -  E-ACSL       [2021-07-06] Add support for the extended quantifier \sum.
 -* E-ACSL       [2021-06-22] Fix a crash that occured when using certain
                 combinations of nested blocks and annotations.

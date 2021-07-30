@@ -445,7 +445,7 @@ let transfer ~from env = match from.env_stack, env.env_stack with
 type where = Before | Middle | After
 let pop_and_get ?(split=false) env stmt ~global_clear where =
   let split = split && stmt.labels = [] in
-  (*  Options.feedback "pop_and_get from %a (%b)" Printer.pp_stmt stmt split;*)
+  (* Options.feedback "pop_and_get from %a (%b)" Printer.pp_stmt stmt split; *)
   let local_env, tl = top env in
   let clear =
     if global_clear then begin
