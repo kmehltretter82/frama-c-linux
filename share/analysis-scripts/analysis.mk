@@ -84,9 +84,10 @@ define time_with_output
 endef
 endif
 else
-ifneq (,$(wildcard /usr/bin/time))
+TIMEBIN:=$(shell which -a time | grep '^/')
+ifneq (,$(TIMEBIN))
 define time_with_output
-  /usr/bin/time -f 'user_time=%U\nmemory=%M' -o "$(1)"
+  $(TIMEBIN) -f 'user_time=%U\nmemory=%M' -o "$(1)"
 endef
 else
 define time_with_output

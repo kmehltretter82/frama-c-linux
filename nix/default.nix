@@ -140,9 +140,6 @@ pkgs.lib.makeExtensible
         buildInputs = self.buildInputs;
         opamPackages = [ "headache=1.05" ];
         outputs = [ "out" ];
-        postPatch = ''
-               patchShebangs .
-        '';
         configurePhase = ''
                unset CC
                autoconf
@@ -165,6 +162,9 @@ pkgs.lib.makeExtensible
         opamPackages = self.build-distrib-tarball.opamPackages;
         src = self.build-distrib-tarball.out ;
         outputs = [ "out" ];
+        postPatch = ''
+               patchShebangs .
+        '';
         configurePhase = ''
                unset CC
                autoconf
