@@ -338,8 +338,7 @@ EACSL_TEST_FILES = \
 	tests/temporal/test_config_dev \
 	tests/format/test_config \
 	tests/format/test_config_dev \
-	tests/utils/signalled.h \
-	tests/print.ml
+	tests/print.ml \
 
 # Test files without header management
 EACSL_DISTRIB_TESTS = \
@@ -349,7 +348,9 @@ EACSL_DISTRIB_TESTS = \
       $(dir)/test_config_dev \
       $(dir)/oracle/* \
       $(dir)/oracle_dev/* \
-  )
+  ) \
+  tests/utils/signalled.h \
+
 
 EACSL_RTL_FILES = $(EACSL_RTL_SRC)
 
