@@ -524,9 +524,9 @@ void __e_acsl_globals_init(void)
                          sizeof("tests/builtin/strcat.c:70"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_11);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_11);
-    __gen_e_acsl_literal_string_10 = "tests/builtin/strcat.c:68";
+    __gen_e_acsl_literal_string_10 = "tests/builtin/strcat.c:69";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_10,
-                         sizeof("tests/builtin/strcat.c:68"));
+                         sizeof("tests/builtin/strcat.c:69"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_10);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_10);
     __gen_e_acsl_literal_string_9 = "tests/builtin/strcat.c:67";
