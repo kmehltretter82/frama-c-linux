@@ -172,6 +172,9 @@ pkgs.lib.makeExtensible
         buildPhase = ''
                 make -j 4
         '';
+        checkPhase = ''
+                make tests
+        '';
         installPhase = ''
                true
         '';
