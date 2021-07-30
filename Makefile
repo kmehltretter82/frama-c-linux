@@ -2525,7 +2525,7 @@ endif
 	$(MKDIR) -p $(CLIENT_DIR)
 	#Workaround to avoid "argument list too long" in Cygwin
 	$(file >file_list_to_archive.tmp)
-	$(foreach f,$(DISTRIB_FILES), \
+	$(foreach f,$(DISTRIB_FILES) $(DISTRIB_TESTS), \
              $(file >>file_list_to_archive.tmp,$(subst @, ,$(f))))
 	$(TAR) -cf - --files-from file_list_to_archive.tmp | $(TAR) -C $(CLIENT_DIR) -xf -
 	$(RM) file_list_to_archive.tmp
