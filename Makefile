@@ -2339,7 +2339,7 @@ dist-clean distclean: clean clean-doc \
 	$(RM) src/dummy/*/*.cm* src/dummy/*/*.o src/dummy/*/*.a \
 		src/dummy/*/*.annot src/dummy/*/*~ src/dummy/*/*.output \
 		src/dummy/*/*.annot src/dummy/*/\#*
-
+	$(RM) $(CHECK_NEWLINES) $(ISUTF8)
 
 ifeq ($(OCAMLWIN32),yes)
 # Use Win32 typical resources
