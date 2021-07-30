@@ -22,9 +22,10 @@
 
 open Cil_types
 
-let must_translate_ref : (Property.t -> bool) ref =
+let must_translate_ref: (Property.t -> bool) ref =
   Extlib.mk_fun "must_translate_ref"
-let must_translate_opt_ref : (Property.t option -> bool) ref =
+
+let must_translate_opt_ref: (Property.t option -> bool) ref =
   Extlib.mk_fun "must_translate_opt_ref"
 
 let type_requires v kf kinstr bhvr =
@@ -48,7 +49,6 @@ let type_requires v kf kinstr bhvr =
            | Admit -> ())
       bhvr.b_requires
 
-
 let type_post_conditions v kf kinstr bhvr =
   if Cil.is_default_behavior bhvr then
     List.iter
@@ -69,15 +69,13 @@ let type_post_conditions v kf kinstr bhvr =
            | Assert | Check -> begin
                let post_cond = tp_post_cond.tp_statement in
                match termination with
-               | Normal ->
-                 ignore (Visitor.visitFramacPredicate v post_cond)
+               | Normal -> ignore (Visitor.visitFramacPredicate v post_cond)
                | Exits | Breaks | Continues | Returns -> ()
              end
            | Admit -> ())
       bhvr.b_post_cond
 
-
-let typer_visitor (lenv : Typing.Params_ty.t) = object (self)
+let typer_visitor lenv = object (self)
   inherit Visitor.frama_c_inplace
 
   (* Only type the globals that do not come from the Rtl *)
@@ -122,9 +120,15 @@ let typer_visitor (lenv : Typing.Params_ty.t) = object (self)
     Cil.SkipChildren
 
   method !vspec spec =
-    List.iter (fun b -> (List.iter (fun p -> ignore (Visitor.visitFramacIdPredicate self p)) b.b_assumes)) spec.spec_behavior;
-    List.iter (type_requires self (Option.get self#current_kf) (self#current_kinstr)) spec.spec_behavior;
-    List.iter (type_post_conditions self (Option.get self#current_kf) self#current_kinstr) spec.spec_behavior;
+    List.iter
+      (fun b -> (List.iter (fun p -> ignore (Visitor.visitFramacIdPredicate self p)) b.b_assumes))
+      spec.spec_behavior;
+    List.iter
+      (type_requires self (Option.get self#current_kf) (self#current_kinstr))
+      spec.spec_behavior;
+    List.iter
+      (type_post_conditions self (Option.get self#current_kf) self#current_kinstr)
+      spec.spec_behavior;
     Cil.SkipChildren
 ======= end
 =======
@@ -142,7 +146,11 @@ let typer_visitor (lenv : Typing.Params_ty.t) = object (self)
     match annot.annot_content with
     | AAssert(_, _) | AVariant(_, _) ->
       let translate = try
-          !must_translate_ref (Property.ip_of_code_annot_single (Option.get self#current_kf) (Option.get self#current_stmt) annot)
+          !must_translate_ref
+            (Property.ip_of_code_annot_single
+               (Option.get self#current_kf)
+               (Option.get self#current_stmt)
+               annot)
         with Invalid_argument _ -> true
       in
       if translate then
@@ -154,7 +162,11 @@ let typer_visitor (lenv : Typing.Params_ty.t) = object (self)
       else Cil.DoChildren
     | AInvariant(l, _, _) ->
       let translate =
-        try !must_translate_ref (Property.ip_of_code_annot_single (Option.get self#current_kf) (Option.get self#current_stmt) annot)
+        try !must_translate_ref
+              (Property.ip_of_code_annot_single
+                 (Option.get self#current_kf)
+                 (Option.get self#current_stmt)
+                 annot)
         with Invalid_argument _ -> true
       in if translate then
         if l <> [] then

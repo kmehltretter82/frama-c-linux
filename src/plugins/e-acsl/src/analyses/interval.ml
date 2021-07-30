@@ -675,7 +675,8 @@ and infer_term_host thost =
 
 let infer t =
   let i = infer t in
-  Logic_function_env.clear(); i
+  Logic_function_env.clear();
+  i
 
 include D
 

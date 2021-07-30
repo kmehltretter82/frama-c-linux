@@ -27,8 +27,7 @@ open Cil_types
 
 let dkey = Options.dkey_typing
 
-let type_subterms : (unit -> unit) Stack.t = Stack.create ()
-
+let stack_type_subterms : (unit -> unit) Stack.t = Stack.create ()
 
 (******************************************************************************)
 (** Datatype and constructor *)
@@ -173,16 +172,16 @@ type computed_info =
   }
 
 (* Local environement = list of typed variables *)
-module Params_ty =
+module Function_params_ty =
   Datatype.List_with_collections
     (D)
-    (struct let module_name = "E_ACSL.Logic_functions.Params_ty" end)
+    (struct let module_name = "E_ACSL.typing.Function_params_ty" end)
 
 (* Memoization module which retrieves the computed info of some terms. If the
    info is already computed for a term, it is never recomputed *)
 module Memo: sig
-  val memo: ?lenv:Params_ty.t -> (term -> computed_info) -> term  -> computed_info
-  val get: ?lenv:Params_ty.t -> term -> computed_info
+  val memo: ?lenv:Function_params_ty.t -> (term -> computed_info) -> term -> computed_info
+  val get: ?lenv:Function_params_ty.t -> term -> computed_info
   val clear: unit -> unit
 end = struct
 
@@ -206,18 +205,19 @@ end = struct
      \\@ logic integer f (integer x) = x + 1;
      depends on the type of x. But our type system does not handle dependent types,
      which could let us express this dependency natively. Instead, we use the following
-     trick to simulate the depedency: We type the corresponding definition (in the example x+1)
+     trick to simulate the dependency: we type the corresponding definition (in the example x+1)
      several times, corresponding to the various calls to the function f in the program.
-     We distinguish the calls to the function by storing the assocated callstack. *)
-  let dep_tbl : computed_info Params_ty.Hashtbl.t Misc.Id_term.Hashtbl.t
+     We distinguish the calls to the function by storing the associated callstack. *)
+  let dep_tbl : computed_info Function_params_ty.Hashtbl.t Misc.Id_term.Hashtbl.t
     = Misc.Id_term.Hashtbl.create 97
 
   let get_dep lenv t =
-    try let types = Misc.Id_term.Hashtbl.find dep_tbl t in
-      Params_ty.Hashtbl.find types lenv
+    try
+      let types = Misc.Id_term.Hashtbl.find dep_tbl t in
+      Function_params_ty.Hashtbl.find types lenv
     with Not_found ->
-      Options.fatal "[typing] type of term '%a' was never computed with parameters '%a'."
-        Printer.pp_term t Params_ty.pretty lenv
+      Options.fatal "[typing] type of term '%a' was never computed with arguments '%a'."
+        Printer.pp_term t Function_params_ty.pretty lenv
 
   let get_nondep t =
     try Misc.Id_term.Hashtbl.find tbl t
@@ -227,8 +227,9 @@ end = struct
         Printer.pp_term t
 
   let get ?(lenv=[]) t =
-    if (List.compare_length_with lenv 0)==0 then get_nondep t
-    else get_dep lenv t
+    match lenv with
+    | [] -> get_nondep t
+    | _::_ -> get_dep lenv t
 
   let memo_nondep f t =
     try Misc.Id_term.Hashtbl.find tbl t
@@ -238,23 +239,29 @@ end = struct
       x
 
   let memo_dep f t lenv =
-    try let types = Misc.Id_term.Hashtbl.find dep_tbl t in
-      try Params_ty.Hashtbl.find types lenv
+    try
+      let types = Misc.Id_term.Hashtbl.find dep_tbl t in
+      try Function_params_ty.Hashtbl.find types lenv
       with Not_found ->
         let ty = f t in
-        Params_ty.Hashtbl.add types lenv ty; ty
+        Function_params_ty.Hashtbl.add types lenv ty;
+        ty
     with Not_found ->
-      let types = Params_ty.Hashtbl.create 97 in
+      let types = Function_params_ty.Hashtbl.create 97 in
       let ty = f t in
-      Params_ty.Hashtbl.add types lenv ty;
+      Function_params_ty.Hashtbl.add types lenv ty;
       Misc.Id_term.Hashtbl.add dep_tbl t types;
       ty
 
   let memo ?(lenv=[]) f t =
-    if (List.compare_length_with lenv 0)==0 then memo_nondep f t
-    else memo_dep f t lenv
+    match lenv with
+    | [] -> memo_nondep f t
+    | _::_ -> memo_dep f t lenv
 
-  let clear () = Options.feedback ~dkey ~level:4 "clearing the table"; Misc.Id_term.Hashtbl.clear tbl
+  let clear () =
+    Options.feedback ~dkey ~level:4 "clearing the typing tables";
+    Misc.Id_term.Hashtbl.clear tbl;
+    Misc.Id_term.Hashtbl.clear dep_tbl
 
 end
 
@@ -315,7 +322,6 @@ let number_ty_of_typ ~post ty =
     | TVoid _ | TPtr _ | TArray _ | TFun _ | TComp _ | TBuiltin_va_list _ -> Nan
     | TNamed _ -> assert false
 
-
 let ty_of_logic_ty ?term lty =
   let get_ty = function
     | Linteger -> Gmpz
@@ -364,8 +370,6 @@ let type_letin li li_t =
 (* type the term [t] in a context [ctx] by taking --e-acsl-gmp-only into account
    iff [use_gmp_opt] is true. *)
 let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx ?(lenv=[]) t =
-  Options.feedback ~dkey ~level:4 "typing term '%a' in ctx '%a'."
-    Printer.pp_term t (Pretty_utils.pp_opt D.pretty) ctx;
   let ctx = Option.map (mk_ctx ~use_gmp_opt) ctx in
   let dup ty = ty, ty in
   let compute_ctx ?ctx i =
@@ -542,11 +546,11 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx ?(lenv=[]) t =
           (* possible to have an [LBpred] here because we transformed
              [Papp] into [Tapp] *)
           Stack.push
-            (fun _ ->
-               let typed_params = type_params ~use_gmp_opt ~lenv li.l_profile args in
+            (fun () ->
+               let typed_params = type_params ~use_gmp_opt ~lenv li.l_profile args li.l_var_info.lv_name in
                ignore (type_predicate ~lenv:typed_params p);
                List.iter Interval.Env.remove li.l_profile)
-            type_subterms;
+            stack_type_subterms;
           dup c_int
         | LBterm t_body ->
           begin match li.l_type with
@@ -555,19 +559,17 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx ?(lenv=[]) t =
             | Some lty ->
               (* TODO: what if the function returns a real? *)
               let ty = ty_of_logic_ty ~term:t lty in
-              let type_subterm = fun () ->
-                let typed_params = type_params ~use_gmp_opt ~lenv li.l_profile args in
+              let type_subterm () =
+                let typed_params = type_params ~use_gmp_opt ~lenv li.l_profile args li.l_var_info.lv_name in
                 ignore (type_term ~use_gmp_opt ~lenv:typed_params t_body)
               in
-              let clear_env = fun () ->
-                List.iter Interval.Env.remove li.l_profile
-              in
+              let clear_env () = List.iter Interval.Env.remove li.l_profile in
               Stack.push
                 clear_env
-                type_subterms;
+                stack_type_subterms;
               Stack.push
                 type_subterm
-                type_subterms;
+                stack_type_subterms;
               dup ty
           end
         | LBnone ->
@@ -590,14 +592,12 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx ?(lenv=[]) t =
              ignore (type_term ~use_gmp_opt:true ?ctx ~lenv lambda);
              dup ty
            | [ ] | [ _ ] | [ _; _ ] | _ :: _ :: _ :: _ ->
-             (* Options.fatal "extended quantifier %a is not well formed"
-              *   Printer.pp_logic_var li.l_var_info *)
              Error.not_yet "logic functions or predicates with no definition \
                             nor reads clause"
+             (* TODO : improve error message to distinguish error messages
+                corresponding to unsupported primitives and wrong application of
+                supported primitive (one is a fatal and the other is a not_yet) *)
           )
-        (* TODO : improve error message to distinguish error messages
-           corresponding to unsupported primitives and wrong application of
-           supported primitive (one is a fatal and the other is a not_yet) *)
         | LBreads _ ->
           Error.not_yet "logic functions or predicates performing read accesses"
         | LBinductive _ ->
@@ -625,7 +625,7 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx ?(lenv=[]) t =
     | Tlambda ([ _ ],lt) ->
       dup (type_term ~use_gmp_opt:true ?ctx lt).ty;
     | Tlambda (_,_) -> Error.not_yet "lambda"
-    | TDataCons (_,_) ->Error.not_yet "datacons"
+    | TDataCons (_,_) -> Error.not_yet "datacons"
     | TUpdate (_,_,_) -> Error.not_yet "update"
 
     | Tnull
@@ -660,20 +660,22 @@ and type_term_offset ~lenv t = match t with
     ignore (type_term ~use_gmp_opt:false ~ctx ~lenv t);
     type_term_offset ~lenv toff
 
-and type_params params args ~use_gmp_opt ~lenv =
-  try List.fold_right2
-        (fun lv t (typed_params : Params_ty.t) ->
-           let ty_arg = (type_term ~use_gmp_opt ~lenv t).ty in
-           begin
-             try
-               let typ_arg = typ_of_number_ty ty_arg
-               in Interval.Env.add lv (Interval.interv_of_typ typ_arg)
-             with Not_a_number -> ()
-           end;
-           ty_arg :: typed_params)
-        params args []
-  with Invalid_argument _ -> assert false
-(* TODO : error msg Options.fatal "[Tapp] unexpected number of arguments when calling %s" fname *)
+and type_params params ~use_gmp_opt ~lenv args fname =
+  try
+    List.fold_right2
+      (fun lv t (typed_params : Function_params_ty.t) ->
+         let ty_arg = (type_term ~use_gmp_opt ~lenv t).ty in
+         begin
+           try
+             let typ_arg = typ_of_number_ty ty_arg in
+             Interval.Env.add lv (Interval.interv_of_typ typ_arg)
+           with Not_a_number -> ()
+         end;
+         ty_arg :: typed_params)
+      params
+      args
+      []
+  with Invalid_argument _ -> Options.fatal "[Tapp] unexpected number of arguments when calling %s" fname
 
 (* [type_bound_variables] infers an interval associated with each of
    the provided bounds of a quantified variable, and provides a term
@@ -739,7 +741,7 @@ and type_bound_variables ~loc ~lenv (t1, lv, t2) =
         let guard_lower = Logic_const.prel ~loc (Rle, guard_lower, lv_term) in
         let guard_upper = Logic_const.prel ~loc (Rlt, lv_term, guard_upper) in
         let guard = Logic_const.pand ~loc (guard_lower, guard_upper) in
-        ignore(type_predicate ~lenv guard);
+        ignore (type_predicate ~lenv guard);
         Bound_variables.add_guard_for_small_type lv guard;
         t1, t2, i
   in
@@ -772,8 +774,8 @@ and type_predicate ?(lenv=[]) p =
         begin
           match li.l_body with
           | LBpred p ->
-            let typed_params = type_params ~use_gmp_opt:true ~lenv li.l_profile args in
-            ignore(type_predicate ~lenv:typed_params p);
+            let typed_params = type_params ~use_gmp_opt:true ~lenv li.l_profile args li.l_var_info.lv_name in
+            ignore (type_predicate ~lenv:typed_params p);
             List.iter Interval.Env.remove li.l_profile
           | LBnone -> ()
           | LBreads _ -> ()
@@ -819,6 +821,9 @@ and type_predicate ?(lenv=[]) p =
       | Pforall _
       | Pexists _ -> begin
           match Bound_variables.get_preprocessed_quantifier p with
+          (* If there is no  preprocessed form for the quantifier, it means that the preprocessing phase
+             raised an error. It is costly to analyze again and determine what was the error, so instead
+             we raise the exception [Ignored] which signifies that no error message should be displayed *)
           | None -> Error.ignored ()
           | Some (guards, goal) ->
             let guards =
@@ -852,19 +857,17 @@ let type_term ~use_gmp_opt ?ctx ?(lenv=[]) t =
   Options.feedback ~dkey ~level:4 "typing term '%a' in ctx '%a'."
     Printer.pp_term t (Pretty_utils.pp_opt D.pretty) ctx;
   ignore (type_term ~use_gmp_opt ?ctx ~lenv t);
-  while not (Stack.is_empty type_subterms) do
-    Stack.pop type_subterms ()
+  while not (Stack.is_empty stack_type_subterms) do
+    Stack.pop stack_type_subterms ()
   done
 
 let type_named_predicate ?(lenv=[]) p =
   Options.feedback ~dkey ~level:3 "typing predicate '%a'."
     Printer.pp_predicate p;
   ignore (type_predicate ~lenv p);
-  while not (Stack.is_empty type_subterms) do
-    Stack.pop type_subterms ()
+  while not (Stack.is_empty stack_type_subterms) do
+    Stack.pop stack_type_subterms ()
   done
-
-
 
 let unsafe_set t ?ctx ty =
   let ctx = match ctx with None -> ty | Some ctx -> ctx in
@@ -875,10 +878,9 @@ let unsafe_set t ?ctx ty =
 (** {2 Getters} *)
 (******************************************************************************)
 
-let get_number_ty t lenv =
-  (Memo.get ~lenv t).ty
-let get_integer_op t lenv = (Memo.get ~lenv t).op
-let get_integer_op_of_predicate p lenv = (type_predicate ~lenv p).op
+let get_number_ty ~lenv t = (Memo.get ~lenv t).ty
+let get_integer_op ~lenv t = (Memo.get ~lenv t).op
+let get_integer_op_of_predicate ~lenv p = (type_predicate ~lenv p).op
 
 (* {!typ_of_integer}, but handle the not-integer cases. *)
 let extract_typ t ty =
@@ -892,15 +894,15 @@ let extract_typ t ty =
   | Lvar _ -> Error.not_yet "unsupported logic type: type variable"
   | Larrow _ -> Error.not_yet "unsupported logic type: type arrow"
 
-let get_typ t lenv =
+let get_typ ~lenv t =
   let info = Memo.get ~lenv t in
   extract_typ t info.ty
 
-let get_op t lenv =
+let get_op ~lenv t =
   let info = Memo.get ~lenv t in
   extract_typ t info.op
 
-let get_cast t lenv =
+let get_cast ~lenv t =
   let info = Memo.get ~lenv t in
   try Option.map typ_of_number_ty info.cast
   with Not_a_number -> None

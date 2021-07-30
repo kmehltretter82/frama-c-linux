@@ -37,7 +37,6 @@ let is_pointer_type cty =
   | TPtr(_,_)
   | TArray(_,_,_,_) -> true
 
-
 let deref_cty cty =
   let cty = Cil.unrollType cty in
   match cty with
@@ -51,9 +50,9 @@ let deref_cty cty =
   | TEnum (_,_)
     -> Options.fatal "recieved the type %a when a pointer type was expected"
          Printer.pp_typ cty
-  | TPtr(cty,_) -> cty
-  | TArray(cty,_,_,_) -> cty
-
+  | TPtr(cty,_)
+  | TArray(cty,_,_,_)
+    -> cty
 
 let deref_lty ?cty lty = match lty with
   | Lreal | Lvar _ | Larrow (_ , _) | Ltype (_ , _)->
@@ -66,14 +65,13 @@ let deref_lty ?cty lty = match lty with
                 Printer.pp_logic_type lty
     | Some cty -> Ctype (deref_cty cty)
 
-
 let logic_type ?cty = function
   | TVar vi -> vi.lv_type
   | TResult ty -> Ctype ty
   | TMem tm -> deref_lty ?cty tm.term_type
 
-let lval ?cty ~loc tlv =
-  Logic_const.term ~loc (TLval tlv) (logic_type ?cty (fst tlv))
+let lval ?cty ~loc (thost,_ as tlv) =
+  Logic_const.term ~loc (TLval tlv) (logic_type ?cty thost)
 
 let deref ?cty ~loc tlv = lval ?cty ~loc (TMem tlv, TNoOffset)
 

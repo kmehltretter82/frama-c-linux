@@ -60,9 +60,7 @@ type number_ty = private
   | Real
   | Nan
 
-(* module Datatype: Datatype.S_with_collections with type t = number_ty *)
-
-module Params_ty: Datatype.S_with_collections with type t = number_ty list
+module Function_params_ty: Datatype.S_with_collections with type t = number_ty list
 
 (** {3 Smart constructors} *)
 
@@ -98,12 +96,12 @@ val join: number_ty -> number_ty -> number_ty
 (** {2 Typing} *)
 (******************************************************************************)
 
-val type_term: use_gmp_opt:bool -> ?ctx:number_ty -> ?lenv:Params_ty.t -> term -> unit
+val type_term: use_gmp_opt:bool -> ?ctx:number_ty -> ?lenv:Function_params_ty.t -> term -> unit
 (** Compute the type of each subterm of the given term in the given context. If
     [use_gmp_opt] is false, then the conversion to the given context is done
     even if -e-acsl-gmp-only is set. *)
 
-val type_named_predicate: ?lenv:Params_ty.t -> predicate -> unit
+val type_named_predicate: ?lenv:Function_params_ty.t -> predicate -> unit
 (** Compute the type of each term of the given predicate.
 
     If {!must_clear} is true, the typing environment is reset before translating
@@ -119,25 +117,25 @@ val clear: unit -> unit
     {!type_named_predicate} has been previously computed for the given term or
     predicate. *)
 
-val get_number_ty: term -> Params_ty.t -> number_ty
+val get_number_ty: lenv:Function_params_ty.t -> term -> number_ty
 (** @return the infered type for the given term. *)
 
-val get_integer_op: term -> Params_ty.t -> number_ty
+val get_integer_op: lenv:Function_params_ty.t -> term -> number_ty
 (** @return the infered type for the top operation of the given term.
     It is meaningless to call this function over a non-arithmetical/logical
     operator. *)
 
-val get_integer_op_of_predicate: predicate -> Params_ty.t -> number_ty
+val get_integer_op_of_predicate: lenv:Function_params_ty.t -> predicate -> number_ty
 (** @return the infered type for the top operation of the given predicate. *)
 
-val get_typ: term -> Params_ty.t -> typ
+val get_typ: lenv:Function_params_ty.t -> term -> typ
 (** Get the type which the given term must be generated to. *)
 
-val get_op: term -> Params_ty.t -> typ
+val get_op: lenv:Function_params_ty.t -> term -> typ
 (** Get the type which the operation on top of the given term must be generated
     to. *)
 
-val get_cast: term -> Params_ty.t -> typ option
+val get_cast: lenv:Function_params_ty.t -> term -> typ option
 (** Get the type which the given term must be converted to (if any). *)
 
 val get_cast_of_predicate: predicate -> typ option

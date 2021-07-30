@@ -71,7 +71,7 @@ int main(void)
     __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_f1_8),
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__7));
     __e_acsl_assert(__gen_e_acsl_eq == 0,1,"Assertion","main","f1(0) == 0",
-                    "tests/arith/functions_rec.c",30);
+                    "tests/arith/functions_rec.c",28);
     __gmpz_clear(__gen_e_acsl_f1_8);
     __gmpz_clear(__gen_e_acsl__7);
   }
@@ -85,7 +85,7 @@ int main(void)
     __gen_e_acsl_eq_2 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_f1_10),
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__8));
     __e_acsl_assert(__gen_e_acsl_eq_2 == 0,1,"Assertion","main","f1(1) == 1",
-                    "tests/arith/functions_rec.c",31);
+                    "tests/arith/functions_rec.c",29);
     __gmpz_clear(__gen_e_acsl_f1_10);
     __gmpz_clear(__gen_e_acsl__8);
   }
@@ -99,7 +99,7 @@ int main(void)
     __gen_e_acsl_eq_3 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_f1_12),
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__9));
     __e_acsl_assert(__gen_e_acsl_eq_3 == 0,1,"Assertion","main",
-                    "f1(100) == 5050","tests/arith/functions_rec.c",32);
+                    "f1(100) == 5050","tests/arith/functions_rec.c",30);
     __gmpz_clear(__gen_e_acsl_f1_12);
     __gmpz_clear(__gen_e_acsl__9);
   }
@@ -109,7 +109,7 @@ int main(void)
     __gen_e_acsl_f2_20 = __gen_e_acsl_f2(7);
     /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_f2_20); */
     __e_acsl_assert(__gen_e_acsl_f2_20 == 1,1,"Assertion","main",
-                    "f2(7) == 1","tests/arith/functions_rec.c",34);
+                    "f2(7) == 1","tests/arith/functions_rec.c",32);
   }
   /*@ assert f2(7) ≡ 1; */ ;
   {
@@ -117,7 +117,7 @@ int main(void)
     __gen_e_acsl_f3_8 = __gen_e_acsl_f3(6);
     /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_f3_8); */
     __e_acsl_assert(__gen_e_acsl_f3_8 == -5,1,"Assertion","main",
-                    "f3(6) == -5","tests/arith/functions_rec.c",36);
+                    "f3(6) == -5","tests/arith/functions_rec.c",34);
   }
   /*@ assert f3(6) ≡ -5; */ ;
   {
@@ -125,7 +125,7 @@ int main(void)
     __gen_e_acsl_f4_8 = __gen_e_acsl_f4(9);
     /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_f4_8); */
     __e_acsl_assert(__gen_e_acsl_f4_8 > 0UL,1,"Assertion","main","f4(9) > 0",
-                    "tests/arith/functions_rec.c",38);
+                    "tests/arith/functions_rec.c",36);
   }
   /*@ assert f4(9) > 0; */ ;
   {
@@ -137,7 +137,7 @@ int main(void)
     __gen_e_acsl_eq_4 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_f5_8),
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__32));
     __e_acsl_assert(__gen_e_acsl_eq_4 == 0,1,"Assertion","main","f5(0) == 0",
-                    "tests/arith/functions_rec.c",40);
+                    "tests/arith/functions_rec.c",38);
     __gmpz_clear(__gen_e_acsl_f5_8);
     __gmpz_clear(__gen_e_acsl__32);
   }
@@ -154,7 +154,7 @@ int main(void)
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__33));
     __e_acsl_assert(__gen_e_acsl_eq_5 == 0,1,"Assertion","main",
                     "\\let n = 0 == 0? 0x7fffffffffffffffL: -1; f5(n) == 0",
-                    "tests/arith/functions_rec.c",42);
+                    "tests/arith/functions_rec.c",40);
     __gmpz_clear(__gen_e_acsl_f5_10);
     __gmpz_clear(__gen_e_acsl__33);
   }

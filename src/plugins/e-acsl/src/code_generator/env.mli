@@ -195,10 +195,8 @@ val emitter : Emitter.t
 module Local_vars: sig
   val create: t -> t
   val add: t -> Typing.number_ty -> t
-  val get: t -> Typing.Params_ty.t
-  (* val clear: t -> t *)
+  val get: t -> Typing.Function_params_ty.t
 end
-
 
 (* ************************************************************************** *)
 (** {2 Context for error handling} *)

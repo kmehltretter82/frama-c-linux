@@ -239,9 +239,9 @@ let to_exp ~loc kf env pot label =
     | Lscope.PoT_pred _ ->
       Cil.intType
     | Lscope.PoT_term t ->
-      begin match Typing.get_number_ty t (Env.Local_vars.get env) with
+      begin match Typing.get_number_ty ~lenv:(Env.Local_vars.get env) t with
         | Typing.(C_integer _ | C_float _ | Nan) ->
-          Typing.get_typ t (Env.Local_vars.get env)
+          Typing.get_typ ~lenv:(Env.Local_vars.get env) t
         | Typing.(Rational | Real) ->
           Error.not_yet "\\at on purely logic variables and over real type"
         | Typing.Gmpz ->
@@ -266,7 +266,7 @@ let to_exp ~loc kf env pot label =
            Logic_const.term ~loc (TBinOp(Mult, t_sizeof, t_size)) lty_sizeof
          in
          Typing.type_term ~use_gmp_opt:false t_size;
-         let malloc_stmt = match Typing.get_number_ty t_size (Env.Local_vars.get env) with
+         let malloc_stmt = match Typing.get_number_ty ~lenv:(Env.Local_vars.get env) t_size with
            | Typing.C_integer IInt ->
              let e_size, _, _ =
                term_to_exp ~adata:Assert.no_data kf env t_size
@@ -318,7 +318,7 @@ let to_exp ~loc kf env pot label =
          variable declarations. *)
       [ Smart_stmt.block_stmt block ], env
     | Lscope.PoT_term t ->
-      begin match Typing.get_number_ty t (Env.Local_vars.get env) with
+      begin match Typing.get_number_ty ~lenv:(Env.Local_vars.get env) t with
         | Typing.(C_integer _ | C_float _ | Nan) ->
           let env = Env.push env in
           let lval, env = lval_at_index ~loc kf env (e_at, vi_at, t_index) in

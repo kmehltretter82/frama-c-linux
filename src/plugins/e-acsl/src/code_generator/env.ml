@@ -76,7 +76,7 @@ type t = {
   (* list of loop environment for each currently visited loops *)
   cpt: int;
   (* counter used when generating variables *)
-  local_vars: Typing.Params_ty.t list
+  local_vars: Typing.Function_params_ty.t list
   (* type of variables used in calls to logic functions and predicates *)
 }
 
@@ -385,7 +385,7 @@ end
 let emitter =
   Emitter.create
     "E_ACSL"
-    [ Emitter.Code_annot ; Emitter.Funspec ]
+    [ Emitter.Code_annot; Emitter.Funspec ]
     ~correctness:[ Options.Gmp_only.parameter ]
     ~tuning:[]
 
@@ -561,15 +561,6 @@ module Local_vars = struct
     try List.hd env.local_vars
     with Failure _ -> []
 
-  (* let clear env =
-   *   Options.feedback "clearing environment '%a'" Typing.Params_ty.pretty (get env);
-   *   let tl =
-   *     try List.tl env.local_vars
-   *     with Failure s when String.equal s "tl" -> Options.fatal "Trying to clear an non-existing environment of local variables"
-   *   in
-   *   let env =
-   *   {env with local_vars = tl}
-   *   in Options.feedback "new local environment is '%a'" Typing.Params_ty.pretty (get env); env *)
 end
 
 let handle_error f env =

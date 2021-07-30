@@ -22,14 +22,15 @@
 
 open Cil_types
 
+val type_program : file -> unit
+(** compute and store the type of all the terms that will be translated
+    in a program *)
+
+val preprocess_predicate : Typing.Function_params_ty.t -> predicate -> unit
+(** compute and store the types of all the terms in a given predicate  *)
+
+val preprocess_rte : lenv:Typing.Function_params_ty.t -> code_annotation -> unit
+(** compute and store the type of all the terms in a code annotation *)
+
 val must_translate_ref : (Property.t -> bool) ref
 val must_translate_opt_ref : (Property.t option -> bool) ref
-
-
-val type_program : file -> unit
-
-(* val type_code_annot : Typing.Params_ty.t -> code_annotation -> unit *)
-
-val preprocess_predicate : Typing.Params_ty.t -> predicate -> unit
-
-val preprocess_rte : lenv:Typing.Params_ty.t -> code_annotation -> unit

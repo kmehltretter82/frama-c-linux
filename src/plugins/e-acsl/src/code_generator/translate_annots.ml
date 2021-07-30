@@ -53,7 +53,6 @@ let () =
   Preprocess_typing.must_translate_ref := must_translate;
   Preprocess_typing.must_translate_opt_ref := must_translate_opt
 
-
 let pre_funspec kf kinstr env funspec =
   let unsupported f x = ignore (Env.handle_error (fun env -> f x; env) env) in
   let convert_unsupported_clauses env =

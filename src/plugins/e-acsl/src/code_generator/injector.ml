@@ -864,21 +864,22 @@ let reset_all ast =
 let inject () =
   Gmp_types.init ();
   let ast = Ast.get () in
+  let current_project = Project.current() in
   Options.feedback ~level:2
     "preprocessing annotations in project %a"
-    Project.pretty (Project.current ());
+    Project.pretty current_project;
   Preprocess_predicates.preprocess ast;
   Options.feedback ~level:2
     "normalizing quantifiers in project %a"
-    Project.pretty (Project.current ());
+    Project.pretty current_project;
   Bound_variables.preprocess ast;
   Options.feedback ~level:2
     "typing annotations in project %a"
-    Project.pretty (Project.current ());
+    Project.pretty current_project;
   Preprocess_typing.type_program ast;
   Options.feedback ~level:2
     "injecting annotations as code in project %a"
-    Project.pretty (Project.current ());
+    Project.pretty current_project;
   inject_in_file ast;
   reset_all ast;
 

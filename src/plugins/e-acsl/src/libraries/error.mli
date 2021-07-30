@@ -26,7 +26,6 @@ exception Ignored
 exception Typing_error of string
 exception Not_yet of string
 
-
 val untypable: string -> 'a
 (** Type error built from the given argument. *)
 

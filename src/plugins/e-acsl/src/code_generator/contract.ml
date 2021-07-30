@@ -167,7 +167,8 @@ end
 
 (** Convert the given assumes clauses list to a single [predicate] *)
 let assumes_predicate env assumes =
-  let p = List.fold_left
+  let p =
+    List.fold_left
       (fun acc p ->
          let pred = p.ip_content.tp_statement in
          let loc = pred.pred_loc in
@@ -176,7 +177,9 @@ let assumes_predicate env assumes =
             Logic_const.unamed ~loc pred.pred_content))
       Logic_const.ptrue
       assumes
-  in Preprocess_typing.preprocess_predicate (Env.Local_vars.get env) p; p
+  in
+  Preprocess_typing.preprocess_predicate (Env.Local_vars.get env) p;
+  p
 
 let create ~loc spec =
   (* Create a hashtable to associate a behavior name with an index *)

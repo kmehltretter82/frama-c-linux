@@ -22,10 +22,24 @@
 
 open Cil_types
 
+(** This module is dedicated to some preprocessing on the predicates
+    - It guards all the [Pvalid] and [Pvalid_read] clauses with
+      an adequate [Pinitialized] clause
+    - It replaces all the applications [Papp] by a corresponding
+      term obtained as an application [Tapp]
+      The predicates that have undergone these changed are
+      called the preprocessed predicates.
+*)
+
 val preprocess : file -> unit
+(** Preprocess all the predicates of the ast and store the results *)
 
 val preprocess_annot : code_annotation -> unit
+(** Preprocess of the predicate of a single code annotation and store
+    the results *)
 
 val preprocess_predicate : predicate -> unit
+(** Preprocess a predicate and its children and store the results  *)
 
 val get_preprocessed_form : predicate -> Lscope.pred_or_term
+(** Retrieve the preprocessed form of a predicate *)

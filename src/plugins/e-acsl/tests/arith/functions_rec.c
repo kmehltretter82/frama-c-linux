@@ -21,10 +21,8 @@
     n < 0x7fffffffffffffffL ? 0x7fffffffffffffffL :
     6; */
 
-
 /*@ logic integer f5(integer n) =
   n >= 0 ? 0 : f5(n + 1) + n; */
-
 
 int main (void) {
    /*@ assert f1(0) == 0; */ ;

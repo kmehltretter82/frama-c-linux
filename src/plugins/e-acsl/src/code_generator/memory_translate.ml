@@ -262,7 +262,7 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
   in
   Typing.type_term ~use_gmp_opt:false size_term;
   let size, adata, env =
-    match Typing.get_number_ty size_term (Env.Local_vars.get env) with
+    match Typing.get_number_ty size_term  ~lenv:(Env.Local_vars.get env) with
     | Typing.Gmpz ->
       (* Start by translating [size_term] to an expression so that the full term
          with [\let] is not passed around. *)
@@ -330,7 +330,6 @@ let fname_to_pred ?loc name args =
       (List.length args)
   | _ ->
     Options.fatal "Unsupported function '%s'" name
-
 
 (* [extract_quantifiers ~loc args] iterates over each argument in [args] and if
    that argument contains a non-explicit range, tries to extract a universal
