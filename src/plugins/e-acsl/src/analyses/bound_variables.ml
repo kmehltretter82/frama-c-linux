@@ -500,6 +500,7 @@ end = struct
                Printer.pp_relation Rlt Printer.pp_relation Rle)
     in
     Error.untypable msg
+
 end
 
 (******************************************************************************)
@@ -718,8 +719,8 @@ let normalize_guard ~loc (t1, rel1, lv, rel2, t2) =
     | Rgt | Rge | Req | Rneq ->
       assert false
   in
-  let t1, t2, guard_for_small_type = bounds_for_small_types ~loc (t1, lv, t2)
-  in Quantifier.add_guard_for_small_type lv guard_for_small_type;
+  let t1, t2, guard_for_small_type = bounds_for_small_types ~loc (t1, lv, t2) in
+  Quantifier.add_guard_for_small_type lv guard_for_small_type;
   t1, lv, t2
 
 let compute_guards loc ~is_forall p bounded_vars hyps =
