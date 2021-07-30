@@ -338,6 +338,7 @@ EACSL_TEST_FILES = \
 	tests/temporal/test_config_dev \
 	tests/format/test_config \
 	tests/format/test_config_dev \
+	tests/utils/signalled.h \
 	tests/print.ml
 
 # Test files without header management
