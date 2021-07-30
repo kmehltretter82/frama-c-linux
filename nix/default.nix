@@ -174,7 +174,9 @@ pkgs.lib.makeExtensible
                 make -j 4
         '';
         checkPhase = ''
-                make tests
+               make clean_share_link
+               make create_share_link
+               make tests -j4 PTESTS_OPTS="-error-code -j 4"
         '';
         installPhase = ''
                true
