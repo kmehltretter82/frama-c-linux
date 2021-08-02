@@ -703,11 +703,40 @@ pid_t __gen_e_acsl_fork(void)
 char *__gen_e_acsl_strcpy(char * restrict dest, char const * restrict src)
 {
   char *__gen_e_acsl_at;
+  unsigned long __gen_e_acsl_strcpy_src_size;
   char *__retres;
   __e_acsl_store_block((void *)(& src),(size_t)8);
   __e_acsl_store_block((void *)(& dest),(size_t)8);
+  __gen_e_acsl_strcpy_src_size = __e_acsl_builtin_strlen(src);
   __gen_e_acsl_at = dest;
   __retres = strcpy(dest,src);
+  {
+    __e_acsl_mpz_t __gen_e_acsl___gen_e_acsl_strcpy_src_size;
+    __e_acsl_mpz_t __gen_e_acsl_;
+    __e_acsl_mpz_t __gen_e_acsl_add;
+    __e_acsl_mpz_t __gen_e_acsl__2;
+    int __gen_e_acsl_le;
+    unsigned long __gen_e_acsl_size;
+    __gmpz_init_set_ui(__gen_e_acsl___gen_e_acsl_strcpy_src_size,
+                       __gen_e_acsl_strcpy_src_size);
+    __gmpz_init_set_si(__gen_e_acsl_,1L);
+    __gmpz_init(__gen_e_acsl_add);
+    __gmpz_add(__gen_e_acsl_add,
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl___gen_e_acsl_strcpy_src_size),
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
+    __gmpz_init_set_ui(__gen_e_acsl__2,18446744073709551615UL);
+    __gen_e_acsl_le = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_add),
+                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
+    __e_acsl_assert(__gen_e_acsl_le <= 0,1,"RTE","strcpy",
+                    "size_lesser_or_eq_than_SIZE_MAX:\n  __gen_e_acsl_strcpy_src_size + 1 <= 18446744073709551615",
+                    "FRAMAC_SHARE/libc/string.h",367);
+    __gen_e_acsl_size = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_add));
+    __e_acsl_initialize((void *)dest,__gen_e_acsl_size);
+    __gmpz_clear(__gen_e_acsl___gen_e_acsl_strcpy_src_size);
+    __gmpz_clear(__gen_e_acsl_);
+    __gmpz_clear(__gen_e_acsl_add);
+    __gmpz_clear(__gen_e_acsl__2);
+  }
   __e_acsl_assert(__retres == __gen_e_acsl_at,1,"Postcondition","strcpy",
                   "result_ptr: \\result == \\old(dest)",
                   "FRAMAC_SHARE/libc/string.h",374);

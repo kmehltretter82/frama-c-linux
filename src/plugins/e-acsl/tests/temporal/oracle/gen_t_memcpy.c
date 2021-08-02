@@ -406,6 +406,7 @@ void *__gen_e_acsl_memset(void *s, int c, size_t n)
   __e_acsl_temporal_memset(s,c,n);
   __gen_e_acsl_at = s;
   __retres = memset(s,c,n);
+  __e_acsl_initialize(s,n);
   __e_acsl_assert(__retres == __gen_e_acsl_at,1,"Postcondition","memset",
                   "result_ptr: \\result == \\old(s)",
                   "FRAMAC_SHARE/libc/string.h",135);
@@ -527,6 +528,7 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
   }
   __gen_e_acsl_at = dest;
   __retres = memcpy(dest,src,n);
+  __e_acsl_initialize(dest,n);
   __e_acsl_assert(__retres == __gen_e_acsl_at,1,"Postcondition","memcpy",
                   "result_ptr: \\result == \\old(dest)",
                   "FRAMAC_SHARE/libc/string.h",102);

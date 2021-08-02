@@ -6,6 +6,45 @@
 #include <string.h>
 #include <stdlib.h>
 
+void test_memory_tracking() {
+  {
+    char dest[4];
+    strcpy(dest, "a");
+    char src[] = "b";
+    //@ assert \initialized(&dest[0..1]);
+    //@ assert !\initialized(&dest[2..3]);
+    //@ assert \initialized(&src[0..1]);
+
+    strcat(dest, src);
+    //@ assert \initialized(&dest[0..2]);
+    //@ assert !\initialized(&dest[3]);
+  }
+  { // strncat with n < strlen(src)
+    char dest[4];
+    strcpy(dest, "a");
+    char src[] = "bc";
+    //@ assert \initialized(&dest[0..1]);
+    //@ assert !\initialized(&dest[2..3]);
+    //@ assert \initialized(&src[0..2]);
+
+    strncat(dest, src, 1);
+    //@ assert \initialized(&dest[0..2]);
+    //@ assert !\initialized(&dest[3]);
+  }
+  { // strncat with n >= strlen(src)
+    char dest[4];
+    strcpy(dest, "a");
+    char src[] = "b";
+    //@ assert \initialized(&dest[0..1]);
+    //@ assert !\initialized(&dest[2..3]);
+    //@ assert \initialized(&src[0..1]);
+
+    strncat(dest, src, 2);
+    //@ assert \initialized(&dest[0..2]);
+    //@ assert !\initialized(&dest[3]);
+  }
+}
+
 int main(int argc, const char **argv) {
   char *const_str = "abcd";
   char *unalloc_str = malloc(5);
@@ -60,6 +99,7 @@ int main(int argc, const char **argv) {
   ABRT(strncat(pd1 + 3, pd1, 5)); // overlapping spaces [abort]
   ABRT(strncat(pd4 + 4, pd4, 5)); // overlapping spaces [abort]
   }
+  test_memory_tracking();
   return 0;
 }
 

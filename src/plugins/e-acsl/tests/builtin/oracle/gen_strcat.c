@@ -30,14 +30,15 @@ char *__gen_e_acsl_literal_string_12;
 char *__gen_e_acsl_literal_string_11;
 char *__gen_e_acsl_literal_string_10;
 char *__gen_e_acsl_literal_string_9;
-char *__gen_e_acsl_literal_string_8;
+char *__gen_e_acsl_literal_string_30;
+char *__gen_e_acsl_literal_string_7;
 char *__gen_e_acsl_literal_string_6;
 char *__gen_e_acsl_literal_string;
 char *__gen_e_acsl_literal_string_2;
 char *__gen_e_acsl_literal_string_3;
 char *__gen_e_acsl_literal_string_5;
 char *__gen_e_acsl_literal_string_4;
-char *__gen_e_acsl_literal_string_7;
+char *__gen_e_acsl_literal_string_8;
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@ exits status: \exit_status ≡ \old(status);
@@ -74,6 +75,253 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options);
     assigns \result \from \nothing;
  */
 pid_t __gen_e_acsl_fork(void);
+
+void test_memory_tracking(void)
+{
+  {
+    char dest[4];
+    __e_acsl_store_block((void *)(dest),(size_t)4);
+    __e_acsl_builtin_strcpy(dest,__gen_e_acsl_literal_string_6);
+    char src[2] = {(char)'b', (char)'\000'};
+    __e_acsl_store_block((void *)(src),(size_t)2);
+    __e_acsl_full_init((void *)(& src));
+    {
+      int __gen_e_acsl_size;
+      int __gen_e_acsl_if;
+      int __gen_e_acsl_initialized;
+      __gen_e_acsl_size = 1 * ((1 - 0) + 1);
+      if (__gen_e_acsl_size <= 0) __gen_e_acsl_if = 0;
+      else __gen_e_acsl_if = __gen_e_acsl_size;
+      __gen_e_acsl_initialized = __e_acsl_initialized((void *)(dest + 1 * 0),
+                                                      (size_t)__gen_e_acsl_if);
+      __e_acsl_assert(__gen_e_acsl_initialized,1,"Assertion",
+                      "test_memory_tracking","\\initialized(&dest[0 .. 1])",
+                      "tests/builtin/strcat.c",14);
+    }
+    /*@ assert \initialized(&dest[0 .. 1]); */ ;
+    {
+      int __gen_e_acsl_size_2;
+      int __gen_e_acsl_if_2;
+      int __gen_e_acsl_initialized_2;
+      __gen_e_acsl_size_2 = 1 * ((3 - 2) + 1);
+      if (__gen_e_acsl_size_2 <= 0) __gen_e_acsl_if_2 = 0;
+      else __gen_e_acsl_if_2 = __gen_e_acsl_size_2;
+      __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(dest + 1 * 2),
+                                                        (size_t)__gen_e_acsl_if_2);
+      __e_acsl_assert(! __gen_e_acsl_initialized_2,1,"Assertion",
+                      "test_memory_tracking","!\\initialized(&dest[2 .. 3])",
+                      "tests/builtin/strcat.c",15);
+    }
+    /*@ assert ¬\initialized(&dest[2 .. 3]); */ ;
+    {
+      int __gen_e_acsl_size_3;
+      int __gen_e_acsl_if_3;
+      int __gen_e_acsl_initialized_3;
+      __gen_e_acsl_size_3 = 1 * ((1 - 0) + 1);
+      if (__gen_e_acsl_size_3 <= 0) __gen_e_acsl_if_3 = 0;
+      else __gen_e_acsl_if_3 = __gen_e_acsl_size_3;
+      __gen_e_acsl_initialized_3 = __e_acsl_initialized((void *)(src + 1 * 0),
+                                                        (size_t)__gen_e_acsl_if_3);
+      __e_acsl_assert(__gen_e_acsl_initialized_3,1,"Assertion",
+                      "test_memory_tracking","\\initialized(&src[0 .. 1])",
+                      "tests/builtin/strcat.c",16);
+    }
+    /*@ assert \initialized(&src[0 .. 1]); */ ;
+    __e_acsl_builtin_strcat(dest,(char const *)(src));
+    {
+      int __gen_e_acsl_size_4;
+      int __gen_e_acsl_if_4;
+      int __gen_e_acsl_initialized_4;
+      __gen_e_acsl_size_4 = 1 * ((2 - 0) + 1);
+      if (__gen_e_acsl_size_4 <= 0) __gen_e_acsl_if_4 = 0;
+      else __gen_e_acsl_if_4 = __gen_e_acsl_size_4;
+      __gen_e_acsl_initialized_4 = __e_acsl_initialized((void *)(dest + 1 * 0),
+                                                        (size_t)__gen_e_acsl_if_4);
+      __e_acsl_assert(__gen_e_acsl_initialized_4,1,"Assertion",
+                      "test_memory_tracking","\\initialized(&dest[0 .. 2])",
+                      "tests/builtin/strcat.c",19);
+    }
+    /*@ assert \initialized(&dest[0 .. 2]); */ ;
+    {
+      int __gen_e_acsl_initialized_5;
+      __gen_e_acsl_initialized_5 = __e_acsl_initialized((void *)(& dest[3]),
+                                                        sizeof(char));
+      __e_acsl_assert(! __gen_e_acsl_initialized_5,1,"Assertion",
+                      "test_memory_tracking","!\\initialized(&dest[3])",
+                      "tests/builtin/strcat.c",20);
+    }
+    /*@ assert ¬\initialized(&dest[3]); */ ;
+    __e_acsl_delete_block((void *)(src));
+    __e_acsl_delete_block((void *)(dest));
+  }
+  {
+    char dest_0[4];
+    __e_acsl_store_block((void *)(dest_0),(size_t)4);
+    __e_acsl_builtin_strcpy(dest_0,__gen_e_acsl_literal_string_6);
+    char src_0[3] = {(char)'b', (char)'c', (char)'\000'};
+    __e_acsl_store_block((void *)(src_0),(size_t)3);
+    __e_acsl_full_init((void *)(& src_0));
+    {
+      int __gen_e_acsl_size_5;
+      int __gen_e_acsl_if_5;
+      int __gen_e_acsl_initialized_6;
+      __gen_e_acsl_size_5 = 1 * ((1 - 0) + 1);
+      if (__gen_e_acsl_size_5 <= 0) __gen_e_acsl_if_5 = 0;
+      else __gen_e_acsl_if_5 = __gen_e_acsl_size_5;
+      __gen_e_acsl_initialized_6 = __e_acsl_initialized((void *)(dest_0 + 
+                                                                 1 * 0),
+                                                        (size_t)__gen_e_acsl_if_5);
+      __e_acsl_assert(__gen_e_acsl_initialized_6,1,"Assertion",
+                      "test_memory_tracking",
+                      "\\initialized(&dest_0[0 .. 1])",
+                      "tests/builtin/strcat.c",26);
+    }
+    /*@ assert \initialized(&dest_0[0 .. 1]); */ ;
+    {
+      int __gen_e_acsl_size_6;
+      int __gen_e_acsl_if_6;
+      int __gen_e_acsl_initialized_7;
+      __gen_e_acsl_size_6 = 1 * ((3 - 2) + 1);
+      if (__gen_e_acsl_size_6 <= 0) __gen_e_acsl_if_6 = 0;
+      else __gen_e_acsl_if_6 = __gen_e_acsl_size_6;
+      __gen_e_acsl_initialized_7 = __e_acsl_initialized((void *)(dest_0 + 
+                                                                 1 * 2),
+                                                        (size_t)__gen_e_acsl_if_6);
+      __e_acsl_assert(! __gen_e_acsl_initialized_7,1,"Assertion",
+                      "test_memory_tracking",
+                      "!\\initialized(&dest_0[2 .. 3])",
+                      "tests/builtin/strcat.c",27);
+    }
+    /*@ assert ¬\initialized(&dest_0[2 .. 3]); */ ;
+    {
+      int __gen_e_acsl_size_7;
+      int __gen_e_acsl_if_7;
+      int __gen_e_acsl_initialized_8;
+      __gen_e_acsl_size_7 = 1 * ((2 - 0) + 1);
+      if (__gen_e_acsl_size_7 <= 0) __gen_e_acsl_if_7 = 0;
+      else __gen_e_acsl_if_7 = __gen_e_acsl_size_7;
+      __gen_e_acsl_initialized_8 = __e_acsl_initialized((void *)(src_0 + 
+                                                                 1 * 0),
+                                                        (size_t)__gen_e_acsl_if_7);
+      __e_acsl_assert(__gen_e_acsl_initialized_8,1,"Assertion",
+                      "test_memory_tracking","\\initialized(&src_0[0 .. 2])",
+                      "tests/builtin/strcat.c",28);
+    }
+    /*@ assert \initialized(&src_0[0 .. 2]); */ ;
+    __e_acsl_builtin_strncat(dest_0,(char const *)(src_0),(unsigned long)1);
+    {
+      int __gen_e_acsl_size_8;
+      int __gen_e_acsl_if_8;
+      int __gen_e_acsl_initialized_9;
+      __gen_e_acsl_size_8 = 1 * ((2 - 0) + 1);
+      if (__gen_e_acsl_size_8 <= 0) __gen_e_acsl_if_8 = 0;
+      else __gen_e_acsl_if_8 = __gen_e_acsl_size_8;
+      __gen_e_acsl_initialized_9 = __e_acsl_initialized((void *)(dest_0 + 
+                                                                 1 * 0),
+                                                        (size_t)__gen_e_acsl_if_8);
+      __e_acsl_assert(__gen_e_acsl_initialized_9,1,"Assertion",
+                      "test_memory_tracking",
+                      "\\initialized(&dest_0[0 .. 2])",
+                      "tests/builtin/strcat.c",31);
+    }
+    /*@ assert \initialized(&dest_0[0 .. 2]); */ ;
+    {
+      int __gen_e_acsl_initialized_10;
+      __gen_e_acsl_initialized_10 = __e_acsl_initialized((void *)(& dest_0[3]),
+                                                         sizeof(char));
+      __e_acsl_assert(! __gen_e_acsl_initialized_10,1,"Assertion",
+                      "test_memory_tracking","!\\initialized(&dest_0[3])",
+                      "tests/builtin/strcat.c",32);
+    }
+    /*@ assert ¬\initialized(&dest_0[3]); */ ;
+    __e_acsl_delete_block((void *)(src_0));
+    __e_acsl_delete_block((void *)(dest_0));
+  }
+  {
+    char dest_1[4];
+    __e_acsl_store_block((void *)(dest_1),(size_t)4);
+    __e_acsl_builtin_strcpy(dest_1,__gen_e_acsl_literal_string_6);
+    char src_1[2] = {(char)'b', (char)'\000'};
+    __e_acsl_store_block((void *)(src_1),(size_t)2);
+    __e_acsl_full_init((void *)(& src_1));
+    {
+      int __gen_e_acsl_size_9;
+      int __gen_e_acsl_if_9;
+      int __gen_e_acsl_initialized_11;
+      __gen_e_acsl_size_9 = 1 * ((1 - 0) + 1);
+      if (__gen_e_acsl_size_9 <= 0) __gen_e_acsl_if_9 = 0;
+      else __gen_e_acsl_if_9 = __gen_e_acsl_size_9;
+      __gen_e_acsl_initialized_11 = __e_acsl_initialized((void *)(dest_1 + 
+                                                                  1 * 0),
+                                                         (size_t)__gen_e_acsl_if_9);
+      __e_acsl_assert(__gen_e_acsl_initialized_11,1,"Assertion",
+                      "test_memory_tracking",
+                      "\\initialized(&dest_1[0 .. 1])",
+                      "tests/builtin/strcat.c",38);
+    }
+    /*@ assert \initialized(&dest_1[0 .. 1]); */ ;
+    {
+      int __gen_e_acsl_size_10;
+      int __gen_e_acsl_if_10;
+      int __gen_e_acsl_initialized_12;
+      __gen_e_acsl_size_10 = 1 * ((3 - 2) + 1);
+      if (__gen_e_acsl_size_10 <= 0) __gen_e_acsl_if_10 = 0;
+      else __gen_e_acsl_if_10 = __gen_e_acsl_size_10;
+      __gen_e_acsl_initialized_12 = __e_acsl_initialized((void *)(dest_1 + 
+                                                                  1 * 2),
+                                                         (size_t)__gen_e_acsl_if_10);
+      __e_acsl_assert(! __gen_e_acsl_initialized_12,1,"Assertion",
+                      "test_memory_tracking",
+                      "!\\initialized(&dest_1[2 .. 3])",
+                      "tests/builtin/strcat.c",39);
+    }
+    /*@ assert ¬\initialized(&dest_1[2 .. 3]); */ ;
+    {
+      int __gen_e_acsl_size_11;
+      int __gen_e_acsl_if_11;
+      int __gen_e_acsl_initialized_13;
+      __gen_e_acsl_size_11 = 1 * ((1 - 0) + 1);
+      if (__gen_e_acsl_size_11 <= 0) __gen_e_acsl_if_11 = 0;
+      else __gen_e_acsl_if_11 = __gen_e_acsl_size_11;
+      __gen_e_acsl_initialized_13 = __e_acsl_initialized((void *)(src_1 + 
+                                                                  1 * 0),
+                                                         (size_t)__gen_e_acsl_if_11);
+      __e_acsl_assert(__gen_e_acsl_initialized_13,1,"Assertion",
+                      "test_memory_tracking","\\initialized(&src_1[0 .. 1])",
+                      "tests/builtin/strcat.c",40);
+    }
+    /*@ assert \initialized(&src_1[0 .. 1]); */ ;
+    __e_acsl_builtin_strncat(dest_1,(char const *)(src_1),(unsigned long)2);
+    {
+      int __gen_e_acsl_size_12;
+      int __gen_e_acsl_if_12;
+      int __gen_e_acsl_initialized_14;
+      __gen_e_acsl_size_12 = 1 * ((2 - 0) + 1);
+      if (__gen_e_acsl_size_12 <= 0) __gen_e_acsl_if_12 = 0;
+      else __gen_e_acsl_if_12 = __gen_e_acsl_size_12;
+      __gen_e_acsl_initialized_14 = __e_acsl_initialized((void *)(dest_1 + 
+                                                                  1 * 0),
+                                                         (size_t)__gen_e_acsl_if_12);
+      __e_acsl_assert(__gen_e_acsl_initialized_14,1,"Assertion",
+                      "test_memory_tracking",
+                      "\\initialized(&dest_1[0 .. 2])",
+                      "tests/builtin/strcat.c",43);
+    }
+    /*@ assert \initialized(&dest_1[0 .. 2]); */ ;
+    {
+      int __gen_e_acsl_initialized_15;
+      __gen_e_acsl_initialized_15 = __e_acsl_initialized((void *)(& dest_1[3]),
+                                                         sizeof(char));
+      __e_acsl_assert(! __gen_e_acsl_initialized_15,1,"Assertion",
+                      "test_memory_tracking","!\\initialized(&dest_1[3])",
+                      "tests/builtin/strcat.c",44);
+    }
+    /*@ assert ¬\initialized(&dest_1[3]); */ ;
+    __e_acsl_delete_block((void *)(src_1));
+    __e_acsl_delete_block((void *)(dest_1));
+  }
+  return;
+}
 
 /*@ ensures
       result_ok_child_or_error:
@@ -191,119 +439,123 @@ void __e_acsl_globals_init(void)
   static char __e_acsl_already_run = 0;
   if (! __e_acsl_already_run) {
     __e_acsl_already_run = 1;
-    __gen_e_acsl_literal_string_29 = "tests/builtin/strcat.c:61";
+    __gen_e_acsl_literal_string_29 = "tests/builtin/strcat.c:99";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_29,
-                         sizeof("tests/builtin/strcat.c:61"));
+                         sizeof("tests/builtin/strcat.c:99"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_29);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_29);
-    __gen_e_acsl_literal_string_28 = "tests/builtin/strcat.c:60";
+    __gen_e_acsl_literal_string_28 = "tests/builtin/strcat.c:98";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_28,
-                         sizeof("tests/builtin/strcat.c:60"));
+                         sizeof("tests/builtin/strcat.c:98"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_28);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_28);
-    __gen_e_acsl_literal_string_27 = "tests/builtin/strcat.c:59";
+    __gen_e_acsl_literal_string_27 = "tests/builtin/strcat.c:96";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_27,
-                         sizeof("tests/builtin/strcat.c:59"));
+                         sizeof("tests/builtin/strcat.c:96"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_27);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_27);
-    __gen_e_acsl_literal_string_26 = "tests/builtin/strcat.c:57";
+    __gen_e_acsl_literal_string_26 = "tests/builtin/strcat.c:95";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_26,
-                         sizeof("tests/builtin/strcat.c:57"));
+                         sizeof("tests/builtin/strcat.c:95"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_26);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_26);
-    __gen_e_acsl_literal_string_25 = "tests/builtin/strcat.c:56";
+    __gen_e_acsl_literal_string_25 = "tests/builtin/strcat.c:94";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_25,
-                         sizeof("tests/builtin/strcat.c:56"));
+                         sizeof("tests/builtin/strcat.c:94"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_25);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_25);
-    __gen_e_acsl_literal_string_24 = "tests/builtin/strcat.c:55";
+    __gen_e_acsl_literal_string_24 = "tests/builtin/strcat.c:93";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_24,
-                         sizeof("tests/builtin/strcat.c:55"));
+                         sizeof("tests/builtin/strcat.c:93"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_24);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_24);
-    __gen_e_acsl_literal_string_23 = "tests/builtin/strcat.c:54";
+    __gen_e_acsl_literal_string_23 = "tests/builtin/strcat.c:92";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_23,
-                         sizeof("tests/builtin/strcat.c:54"));
+                         sizeof("tests/builtin/strcat.c:92"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_23);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_23);
-    __gen_e_acsl_literal_string_22 = "tests/builtin/strcat.c:53";
+    __gen_e_acsl_literal_string_22 = "tests/builtin/strcat.c:91";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_22,
-                         sizeof("tests/builtin/strcat.c:53"));
+                         sizeof("tests/builtin/strcat.c:91"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_22);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_22);
-    __gen_e_acsl_literal_string_21 = "tests/builtin/strcat.c:52";
+    __gen_e_acsl_literal_string_21 = "tests/builtin/strcat.c:90";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_21,
-                         sizeof("tests/builtin/strcat.c:52"));
+                         sizeof("tests/builtin/strcat.c:90"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_21);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_21);
-    __gen_e_acsl_literal_string_20 = "tests/builtin/strcat.c:51";
+    __gen_e_acsl_literal_string_20 = "tests/builtin/strcat.c:77";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_20,
-                         sizeof("tests/builtin/strcat.c:51"));
+                         sizeof("tests/builtin/strcat.c:77"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_20);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_20);
-    __gen_e_acsl_literal_string_19 = "tests/builtin/strcat.c:38";
+    __gen_e_acsl_literal_string_19 = "tests/builtin/strcat.c:76";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_19,
-                         sizeof("tests/builtin/strcat.c:38"));
+                         sizeof("tests/builtin/strcat.c:76"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_19);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_19);
-    __gen_e_acsl_literal_string_18 = "tests/builtin/strcat.c:37";
+    __gen_e_acsl_literal_string_18 = "tests/builtin/strcat.c:75";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_18,
-                         sizeof("tests/builtin/strcat.c:37"));
+                         sizeof("tests/builtin/strcat.c:75"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_18);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_18);
-    __gen_e_acsl_literal_string_17 = "tests/builtin/strcat.c:36";
+    __gen_e_acsl_literal_string_17 = "tests/builtin/strcat.c:74";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_17,
-                         sizeof("tests/builtin/strcat.c:36"));
+                         sizeof("tests/builtin/strcat.c:74"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_17);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_17);
-    __gen_e_acsl_literal_string_16 = "tests/builtin/strcat.c:35";
+    __gen_e_acsl_literal_string_16 = "tests/builtin/strcat.c:73";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_16,
-                         sizeof("tests/builtin/strcat.c:35"));
+                         sizeof("tests/builtin/strcat.c:73"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_16);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_16);
-    __gen_e_acsl_literal_string_15 = "tests/builtin/strcat.c:34";
+    __gen_e_acsl_literal_string_15 = "tests/builtin/strcat.c:72";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_15,
-                         sizeof("tests/builtin/strcat.c:34"));
+                         sizeof("tests/builtin/strcat.c:72"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_15);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_15);
-    __gen_e_acsl_literal_string_14 = "tests/builtin/strcat.c:33";
+    __gen_e_acsl_literal_string_14 = "tests/builtin/strcat.c:71";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_14,
-                         sizeof("tests/builtin/strcat.c:33"));
+                         sizeof("tests/builtin/strcat.c:71"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_14);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_14);
-    __gen_e_acsl_literal_string_13 = "tests/builtin/strcat.c:32";
+    __gen_e_acsl_literal_string_13 = "tests/builtin/strcat.c:70";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_13,
-                         sizeof("tests/builtin/strcat.c:32"));
+                         sizeof("tests/builtin/strcat.c:70"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_13);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_13);
-    __gen_e_acsl_literal_string_12 = "tests/builtin/strcat.c:31";
+    __gen_e_acsl_literal_string_12 = "tests/builtin/strcat.c:69";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_12,
-                         sizeof("tests/builtin/strcat.c:31"));
+                         sizeof("tests/builtin/strcat.c:69"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_12);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_12);
-    __gen_e_acsl_literal_string_11 = "tests/builtin/strcat.c:30";
+    __gen_e_acsl_literal_string_11 = "tests/builtin/strcat.c:68";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_11,
-                         sizeof("tests/builtin/strcat.c:30"));
+                         sizeof("tests/builtin/strcat.c:68"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_11);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_11);
-    __gen_e_acsl_literal_string_10 = "tests/builtin/strcat.c:29";
+    __gen_e_acsl_literal_string_10 = "tests/builtin/strcat.c:67";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_10,
-                         sizeof("tests/builtin/strcat.c:29"));
+                         sizeof("tests/builtin/strcat.c:67"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_10);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_10);
-    __gen_e_acsl_literal_string_9 = "tests/builtin/strcat.c:28";
+    __gen_e_acsl_literal_string_9 = "tests/builtin/strcat.c:66";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_9,
-                         sizeof("tests/builtin/strcat.c:28"));
+                         sizeof("tests/builtin/strcat.c:66"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_9);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_9);
-    __gen_e_acsl_literal_string_8 = "tests/builtin/strcat.c:27";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string_8,
-                         sizeof("tests/builtin/strcat.c:27"));
-    __e_acsl_full_init((void *)__gen_e_acsl_literal_string_8);
-    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_8);
-    __gen_e_acsl_literal_string_6 = "abcd";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string_6,
+    __gen_e_acsl_literal_string_30 = "tests/builtin/strcat.c:100";
+    __e_acsl_store_block((void *)__gen_e_acsl_literal_string_30,
+                         sizeof("tests/builtin/strcat.c:100"));
+    __e_acsl_full_init((void *)__gen_e_acsl_literal_string_30);
+    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_30);
+    __gen_e_acsl_literal_string_7 = "abcd";
+    __e_acsl_store_block((void *)__gen_e_acsl_literal_string_7,
                          sizeof("abcd"));
+    __e_acsl_full_init((void *)__gen_e_acsl_literal_string_7);
+    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_7);
+    __gen_e_acsl_literal_string_6 = "a";
+    __e_acsl_store_block((void *)__gen_e_acsl_literal_string_6,sizeof("a"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_6);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_6);
     __gen_e_acsl_literal_string = "TEST %d: ";
@@ -331,10 +583,10 @@ void __e_acsl_globals_init(void)
                          sizeof("FAIL: Unexpected execution at %s\n"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_4);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_4);
-    __gen_e_acsl_literal_string_7 = "";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string_7,sizeof(""));
-    __e_acsl_full_init((void *)__gen_e_acsl_literal_string_7);
-    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_7);
+    __gen_e_acsl_literal_string_8 = "";
+    __e_acsl_store_block((void *)__gen_e_acsl_literal_string_8,sizeof(""));
+    __e_acsl_full_init((void *)__gen_e_acsl_literal_string_8);
+    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_8);
   }
   return;
 }
@@ -344,10 +596,10 @@ int main(int argc, char const **argv)
   int __retres;
   __e_acsl_memory_init(& argc,(char ***)(& argv),(size_t)8);
   __e_acsl_globals_init();
-  char *const_str = (char *)__gen_e_acsl_literal_string_6;
+  char *const_str = (char *)__gen_e_acsl_literal_string_7;
   char *unalloc_str = malloc((unsigned long)5);
   char *_barrier = malloc((unsigned long)1);
-  char *empty_str = (char *)__gen_e_acsl_literal_string_7;
+  char *empty_str = (char *)__gen_e_acsl_literal_string_8;
   free((void *)unalloc_str);
   {
     char dest1[9] =
@@ -388,7 +640,7 @@ int main(int argc, char const **argv)
         int process_status;
         __e_acsl_store_block((void *)(& process_status),(size_t)4);
         __gen_e_acsl_waitpid(pid,& process_status,0);
-        signal_eval(process_status,0,__gen_e_acsl_literal_string_8);
+        signal_eval(process_status,0,__gen_e_acsl_literal_string_9);
         __e_acsl_delete_block((void *)(& process_status));
       }
     }
@@ -402,7 +654,7 @@ int main(int argc, char const **argv)
         int process_status_0;
         __e_acsl_store_block((void *)(& process_status_0),(size_t)4);
         __gen_e_acsl_waitpid(pid_0,& process_status_0,0);
-        signal_eval(process_status_0,0,__gen_e_acsl_literal_string_9);
+        signal_eval(process_status_0,0,__gen_e_acsl_literal_string_10);
         __e_acsl_delete_block((void *)(& process_status_0));
       }
     }
@@ -416,7 +668,7 @@ int main(int argc, char const **argv)
         int process_status_1;
         __e_acsl_store_block((void *)(& process_status_1),(size_t)4);
         __gen_e_acsl_waitpid(pid_1,& process_status_1,0);
-        signal_eval(process_status_1,1,__gen_e_acsl_literal_string_10);
+        signal_eval(process_status_1,1,__gen_e_acsl_literal_string_11);
         __e_acsl_delete_block((void *)(& process_status_1));
       }
     }
@@ -430,7 +682,7 @@ int main(int argc, char const **argv)
         int process_status_2;
         __e_acsl_store_block((void *)(& process_status_2),(size_t)4);
         __gen_e_acsl_waitpid(pid_2,& process_status_2,0);
-        signal_eval(process_status_2,1,__gen_e_acsl_literal_string_11);
+        signal_eval(process_status_2,1,__gen_e_acsl_literal_string_12);
         __e_acsl_delete_block((void *)(& process_status_2));
       }
     }
@@ -444,21 +696,21 @@ int main(int argc, char const **argv)
         int process_status_3;
         __e_acsl_store_block((void *)(& process_status_3),(size_t)4);
         __gen_e_acsl_waitpid(pid_3,& process_status_3,0);
-        signal_eval(process_status_3,1,__gen_e_acsl_literal_string_12);
+        signal_eval(process_status_3,1,__gen_e_acsl_literal_string_13);
         __e_acsl_delete_block((void *)(& process_status_3));
       }
     }
     {
       pid_t pid_4 = __gen_e_acsl_fork();
       if (! pid_4) {
-        __e_acsl_builtin_strcat((char *)0,__gen_e_acsl_literal_string_7);
+        __e_acsl_builtin_strcat((char *)0,__gen_e_acsl_literal_string_8);
         __gen_e_acsl_exit(0);
       }
       else {
         int process_status_4;
         __e_acsl_store_block((void *)(& process_status_4),(size_t)4);
         __gen_e_acsl_waitpid(pid_4,& process_status_4,0);
-        signal_eval(process_status_4,1,__gen_e_acsl_literal_string_13);
+        signal_eval(process_status_4,1,__gen_e_acsl_literal_string_14);
         __e_acsl_delete_block((void *)(& process_status_4));
       }
     }
@@ -472,7 +724,7 @@ int main(int argc, char const **argv)
         int process_status_5;
         __e_acsl_store_block((void *)(& process_status_5),(size_t)4);
         __gen_e_acsl_waitpid(pid_5,& process_status_5,0);
-        signal_eval(process_status_5,1,__gen_e_acsl_literal_string_14);
+        signal_eval(process_status_5,1,__gen_e_acsl_literal_string_15);
         __e_acsl_delete_block((void *)(& process_status_5));
       }
     }
@@ -486,7 +738,7 @@ int main(int argc, char const **argv)
         int process_status_6;
         __e_acsl_store_block((void *)(& process_status_6),(size_t)4);
         __gen_e_acsl_waitpid(pid_6,& process_status_6,0);
-        signal_eval(process_status_6,1,__gen_e_acsl_literal_string_15);
+        signal_eval(process_status_6,1,__gen_e_acsl_literal_string_16);
         __e_acsl_delete_block((void *)(& process_status_6));
       }
     }
@@ -500,7 +752,7 @@ int main(int argc, char const **argv)
         int process_status_7;
         __e_acsl_store_block((void *)(& process_status_7),(size_t)4);
         __gen_e_acsl_waitpid(pid_7,& process_status_7,0);
-        signal_eval(process_status_7,1,__gen_e_acsl_literal_string_16);
+        signal_eval(process_status_7,1,__gen_e_acsl_literal_string_17);
         __e_acsl_delete_block((void *)(& process_status_7));
       }
     }
@@ -514,7 +766,7 @@ int main(int argc, char const **argv)
         int process_status_8;
         __e_acsl_store_block((void *)(& process_status_8),(size_t)4);
         __gen_e_acsl_waitpid(pid_8,& process_status_8,0);
-        signal_eval(process_status_8,1,__gen_e_acsl_literal_string_17);
+        signal_eval(process_status_8,1,__gen_e_acsl_literal_string_18);
         __e_acsl_delete_block((void *)(& process_status_8));
       }
     }
@@ -528,7 +780,7 @@ int main(int argc, char const **argv)
         int process_status_9;
         __e_acsl_store_block((void *)(& process_status_9),(size_t)4);
         __gen_e_acsl_waitpid(pid_9,& process_status_9,0);
-        signal_eval(process_status_9,1,__gen_e_acsl_literal_string_18);
+        signal_eval(process_status_9,1,__gen_e_acsl_literal_string_19);
         __e_acsl_delete_block((void *)(& process_status_9));
       }
     }
@@ -544,7 +796,7 @@ int main(int argc, char const **argv)
         int process_status_10;
         __e_acsl_store_block((void *)(& process_status_10),(size_t)4);
         __gen_e_acsl_waitpid(pid_10,& process_status_10,0);
-        signal_eval(process_status_10,0,__gen_e_acsl_literal_string_19);
+        signal_eval(process_status_10,0,__gen_e_acsl_literal_string_20);
         __e_acsl_delete_block((void *)(& process_status_10));
       }
       __e_acsl_delete_block((void *)(& pd4));
@@ -597,7 +849,7 @@ int main(int argc, char const **argv)
         int process_status_11;
         __e_acsl_store_block((void *)(& process_status_11),(size_t)4);
         __gen_e_acsl_waitpid(pid_11,& process_status_11,0);
-        signal_eval(process_status_11,0,__gen_e_acsl_literal_string_20);
+        signal_eval(process_status_11,0,__gen_e_acsl_literal_string_21);
         __e_acsl_delete_block((void *)(& process_status_11));
       }
     }
@@ -612,7 +864,7 @@ int main(int argc, char const **argv)
         int process_status_12;
         __e_acsl_store_block((void *)(& process_status_12),(size_t)4);
         __gen_e_acsl_waitpid(pid_12,& process_status_12,0);
-        signal_eval(process_status_12,1,__gen_e_acsl_literal_string_21);
+        signal_eval(process_status_12,1,__gen_e_acsl_literal_string_22);
         __e_acsl_delete_block((void *)(& process_status_12));
       }
     }
@@ -627,7 +879,7 @@ int main(int argc, char const **argv)
         int process_status_13;
         __e_acsl_store_block((void *)(& process_status_13),(size_t)4);
         __gen_e_acsl_waitpid(pid_13,& process_status_13,0);
-        signal_eval(process_status_13,1,__gen_e_acsl_literal_string_22);
+        signal_eval(process_status_13,1,__gen_e_acsl_literal_string_23);
         __e_acsl_delete_block((void *)(& process_status_13));
       }
     }
@@ -642,7 +894,7 @@ int main(int argc, char const **argv)
         int process_status_14;
         __e_acsl_store_block((void *)(& process_status_14),(size_t)4);
         __gen_e_acsl_waitpid(pid_14,& process_status_14,0);
-        signal_eval(process_status_14,1,__gen_e_acsl_literal_string_23);
+        signal_eval(process_status_14,1,__gen_e_acsl_literal_string_24);
         __e_acsl_delete_block((void *)(& process_status_14));
       }
     }
@@ -657,7 +909,7 @@ int main(int argc, char const **argv)
         int process_status_15;
         __e_acsl_store_block((void *)(& process_status_15),(size_t)4);
         __gen_e_acsl_waitpid(pid_15,& process_status_15,0);
-        signal_eval(process_status_15,1,__gen_e_acsl_literal_string_24);
+        signal_eval(process_status_15,1,__gen_e_acsl_literal_string_25);
         __e_acsl_delete_block((void *)(& process_status_15));
       }
     }
@@ -671,7 +923,7 @@ int main(int argc, char const **argv)
         int process_status_16;
         __e_acsl_store_block((void *)(& process_status_16),(size_t)4);
         __gen_e_acsl_waitpid(pid_16,& process_status_16,0);
-        signal_eval(process_status_16,1,__gen_e_acsl_literal_string_25);
+        signal_eval(process_status_16,1,__gen_e_acsl_literal_string_26);
         __e_acsl_delete_block((void *)(& process_status_16));
       }
     }
@@ -686,7 +938,7 @@ int main(int argc, char const **argv)
         int process_status_17;
         __e_acsl_store_block((void *)(& process_status_17),(size_t)4);
         __gen_e_acsl_waitpid(pid_17,& process_status_17,0);
-        signal_eval(process_status_17,1,__gen_e_acsl_literal_string_26);
+        signal_eval(process_status_17,1,__gen_e_acsl_literal_string_27);
         __e_acsl_delete_block((void *)(& process_status_17));
       }
     }
@@ -700,7 +952,7 @@ int main(int argc, char const **argv)
         int process_status_18;
         __e_acsl_store_block((void *)(& process_status_18),(size_t)4);
         __gen_e_acsl_waitpid(pid_18,& process_status_18,0);
-        signal_eval(process_status_18,1,__gen_e_acsl_literal_string_27);
+        signal_eval(process_status_18,1,__gen_e_acsl_literal_string_28);
         __e_acsl_delete_block((void *)(& process_status_18));
       }
     }
@@ -715,7 +967,7 @@ int main(int argc, char const **argv)
         int process_status_19;
         __e_acsl_store_block((void *)(& process_status_19),(size_t)4);
         __gen_e_acsl_waitpid(pid_19,& process_status_19,0);
-        signal_eval(process_status_19,1,__gen_e_acsl_literal_string_28);
+        signal_eval(process_status_19,1,__gen_e_acsl_literal_string_29);
         __e_acsl_delete_block((void *)(& process_status_19));
       }
     }
@@ -730,7 +982,7 @@ int main(int argc, char const **argv)
         int process_status_20;
         __e_acsl_store_block((void *)(& process_status_20),(size_t)4);
         __gen_e_acsl_waitpid(pid_20,& process_status_20,0);
-        signal_eval(process_status_20,1,__gen_e_acsl_literal_string_29);
+        signal_eval(process_status_20,1,__gen_e_acsl_literal_string_30);
         __e_acsl_delete_block((void *)(& process_status_20));
       }
       __e_acsl_delete_block((void *)(& pd4_0));
@@ -743,6 +995,7 @@ int main(int argc, char const **argv)
       __e_acsl_delete_block((void *)(dest1_0));
     }
   }
+  test_memory_tracking();
   __retres = 0;
   __e_acsl_memory_clean();
   return __retres;

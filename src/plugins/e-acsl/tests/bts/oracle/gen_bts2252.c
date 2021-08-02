@@ -163,6 +163,7 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
   __gen_e_acsl_at_2 = dest;
   __gen_e_acsl_at = dest;
   __retres = strncpy(dest,src,n);
+  __e_acsl_initialize((void *)dest,n);
   {
     unsigned long __gen_e_acsl_size_6;
     __e_acsl_mpz_t __gen_e_acsl__8;

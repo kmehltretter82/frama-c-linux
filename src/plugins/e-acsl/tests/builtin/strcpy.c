@@ -6,6 +6,39 @@
 #include <string.h>
 #include <stdlib.h>
 
+void test_memory_tracking() {
+  {
+    char dest[4];
+    char src[] = "b";
+    //@ assert !\initialized(&dest[0..3]);
+    //@ assert \initialized(&src[0..1]);
+
+    strcpy(dest, src);
+    //@ assert \initialized(&dest[0..1]);
+    //@ assert !\initialized(&dest[2..3]);
+  }
+  { // strncpy with n < strlen(src)
+    char dest[4];
+    char src[4] = "ab";
+    //@ assert !\initialized(&dest[0..3]);
+    //@ assert \initialized(&src[0..3]);
+
+    strncpy(dest, src, 1);
+    //@ assert \initialized(&dest[0]);
+    //@ assert !\initialized(&dest[1..3]);
+  }
+  { // strncpy with n >= strlen(src)
+    char dest[4];
+    char src[4] = "b";
+    //@ assert !\initialized(&dest[0..3]);
+    //@ assert \initialized(&src[0..3]);
+
+    strncpy(dest, src, 3);
+    //@ assert \initialized(&dest[0..2]);
+    //@ assert !\initialized(&dest[3]);
+  }
+}
+
 int main(int argc, const char **argv) {
   char empty_str[1] = "";
   char *const_str = "abcd";
@@ -41,5 +74,7 @@ int main(int argc, const char **argv) {
   free(src);
   free(dest1);
   free(dest2);
+
+  test_memory_tracking();
   return 0;
 }
