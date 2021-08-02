@@ -4998,6 +4998,8 @@ let cvar_to_lvar vi = match vi.vlogic_var_assoc with
     vi.vlogic_var_assoc <- Some lv; lv
   | Some lv -> lv
 
+let cvar_to_term ~loc vi = tvar ~loc (cvar_to_lvar vi)
+
 let copyVarinfo (vi: varinfo) (newname: string) : varinfo =
   let vi' = Cil_const.copy_with_new_vid vi in
   vi'.vname <- newname;
