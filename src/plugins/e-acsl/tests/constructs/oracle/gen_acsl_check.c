@@ -2,7 +2,7 @@
 #include "stddef.h"
 #include "stdio.h"
 char *__gen_e_acsl_literal_string;
-extern int __e_acsl_sound_verdict;
+extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@ check requires a ≢ 0;
     check ensures \result ≢ 0; */

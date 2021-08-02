@@ -2,7 +2,7 @@
 #include "ctype.h"
 #include "stddef.h"
 #include "stdio.h"
-extern int __e_acsl_sound_verdict;
+extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@ requires c_uchar_or_eof: (0 ≤ c ≤ 255) ∨ c ≡ -1;
     assigns \result;

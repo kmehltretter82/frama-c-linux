@@ -2,6 +2,8 @@
 #include "stddef.h"
 #include "stdio.h"
 #include "stdlib.h"
+extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
+
 struct list {
    struct list *next ;
    int value ;

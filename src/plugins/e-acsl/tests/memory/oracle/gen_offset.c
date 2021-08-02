@@ -2,6 +2,8 @@
 #include "stddef.h"
 #include "stdio.h"
 #include "stdlib.h"
+extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
+
 int A[4] = {1, 2, 3, 4};
 int *PA;
 void __e_acsl_globals_init(void)

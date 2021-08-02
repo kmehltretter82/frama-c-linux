@@ -3,7 +3,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
-extern int __e_acsl_sound_verdict;
+extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@ requires valid_dest: valid_or_empty(dest, n);
     requires valid_src: valid_read_or_empty(src, n);

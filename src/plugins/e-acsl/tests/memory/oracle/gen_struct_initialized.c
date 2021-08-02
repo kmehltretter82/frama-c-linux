@@ -3,6 +3,8 @@
 #include "stdint.h"
 #include "stdio.h"
 #include "stdlib.h"
+extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
+
 struct __anonstruct_int32_pair_t_1 {
    int32_t a ;
    int32_t b ;

@@ -8,6 +8,8 @@ char *__gen_e_acsl_literal_string_2;
 char *__gen_e_acsl_literal_string_5;
 char *__gen_e_acsl_literal_string_7;
 char *__gen_e_acsl_literal_string_6;
+extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
+
 struct tree_desc {
    int *extra_bits ;
 };

@@ -7,6 +7,8 @@ char *__gen_e_acsl_literal_string;
 char *__gen_e_acsl_literal_string_4;
 char *__gen_e_acsl_literal_string_3;
 char *__gen_e_acsl_literal_string_2;
+extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
+
 int main(void);
 
 char *T = (char *)"bar";

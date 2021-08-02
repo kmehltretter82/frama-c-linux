@@ -4,6 +4,8 @@
 #include "stdlib.h"
 char *__gen_e_acsl_literal_string_2;
 char *__gen_e_acsl_literal_string;
+extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
+
 void f(void) __attribute__((__constructor__));
 void f(void)
 {

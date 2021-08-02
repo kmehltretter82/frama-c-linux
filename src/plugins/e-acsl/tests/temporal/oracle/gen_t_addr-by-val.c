@@ -2,6 +2,8 @@
 #include "stddef.h"
 #include "stdint.h"
 #include "stdio.h"
+extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
+
 int main(int argc, char **argv)
 {
   int __retres;

@@ -357,7 +357,10 @@ let sound_verdict_vi =
      let vi = Cil.makeGlobalVar name Cil.intType in
      vi.vstorage <- Extern;
      vi.vreferenced <- true;
+     vi.vattr <- Cil.addAttribute (Attr ("FC_BUILTIN", [])) vi.vattr;
      vi)
+
+let sound_verdict () = Lazy.force sound_verdict_vi
 
 let is_variadic_function vi = match Cil.unrollType vi.vtype with
   | TFun(_, _, variadic, _) -> variadic
@@ -460,14 +463,11 @@ let prepare_file file =
   let rev_globals, new_defs =
     List.fold_left prepare_global ([], []) file.globals
   in
-  match new_defs with
-  | [] -> ()
-  | _ :: _ ->
-    (* insert the new_definitions at the end and reverse back the globals *)
-    let globals = List.fold_left (fun acc g -> g :: acc) new_defs rev_globals in
-    (* insert [__e_acsl_sound_verdict] at the beginning *)
-    let sg = GVarDecl(Lazy.force sound_verdict_vi, Location.unknown) in
-    file.globals <- sg :: globals
+  (* insert the new_definitions at the end and reverse back the globals *)
+  let globals = List.fold_left (fun acc g -> g :: acc) new_defs rev_globals in
+  (* insert [__e_acsl_sound_verdict] at the beginning *)
+  let sg = GVarDecl(Lazy.force sound_verdict_vi, Location.unknown) in
+  file.globals <- sg :: globals
 
 let prepare () =
   Options.feedback ~level:2 "prepare AST for E-ACSL transformations";

@@ -2,6 +2,8 @@
 #include "stddef.h"
 #include "stdio.h"
 char *__gen_e_acsl_literal_string;
+extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
+
 void f(void const *s, int c, unsigned long n)
 {
   __e_acsl_store_block((void *)(& s),(size_t)8);

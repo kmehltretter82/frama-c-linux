@@ -41,7 +41,7 @@ char *__gen_e_acsl_literal_string_2;
 char *__gen_e_acsl_literal_string_3;
 char *__gen_e_acsl_literal_string_5;
 char *__gen_e_acsl_literal_string_4;
-extern int __e_acsl_sound_verdict;
+extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@ exits status: \exit_status ≢ 0;
     ensures never_terminates: \false;

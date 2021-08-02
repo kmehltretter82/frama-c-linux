@@ -2,7 +2,7 @@
 #include "stdarg.h"
 #include "stddef.h"
 #include "stdio.h"
-extern int __e_acsl_sound_verdict;
+extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 int __gen_e_acsl_uninstrument1(int *p);
 

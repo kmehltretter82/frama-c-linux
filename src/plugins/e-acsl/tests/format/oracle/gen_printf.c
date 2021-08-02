@@ -350,7 +350,7 @@ char *__gen_e_acsl_literal_string_317;
 char *__gen_e_acsl_literal_string_321;
 char *__gen_e_acsl_literal_string_34;
 char *__gen_e_acsl_literal_string_323;
-extern int __e_acsl_sound_verdict;
+extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@ exits status: \exit_status ≢ 0;
     ensures never_terminates: \false;
