@@ -193,7 +193,7 @@ and tlval_to_lval kf env (host, offset) =
 (* Compute the expression which corresponds to an extended_quantifier term in a
    given environment. [t] is the extended_quantifier term, [t_min] the lower bound,
    [t max] the upper bound, [lambda] the lambda term and [name] is the identifier of
-   the extended quantifier ("\sum", "\product" or "\numof") *)
+   the extended quantifier ("\sum" or "\product") *)
 and extended_quantifier_to_exp ~adata ~loc kf env t t_min t_max lambda name =
   match lambda.term_node with
   | Tlambda([ k ] ,lt) when name.lv_name="\\product" || name.lv_name="\\sum" ->
@@ -208,7 +208,9 @@ and extended_quantifier_to_exp ~adata ~loc kf env t t_min t_max lambda name =
     let init_k_stmt = Gmp.init_set ~loc (Cil.var k_as_varinfo) k_as_exp e_min in
     (*variable initialization*)
     (*one = 1;*)
-    let _, one_as_exp, env = create_and_init_var ~loc kf ty_k "one" (Cil.one ~loc) env in
+    let _, one_as_exp, env =
+      create_and_init_var ~loc kf ty_k "one" (Cil.one ~loc) env
+    in
     (*cond = 0;*)
     let cond_as_varinfo, cond_as_exp, env =
       create_and_init_var ~loc kf Cil.intType "cond" (Cil.zero ~loc) env
@@ -238,7 +240,7 @@ and extended_quantifier_to_exp ~adata ~loc kf env t t_min t_max lambda name =
       affect_binop ~loc cond_as_varinfo None Gt ty_k k_as_exp e_max
     in
     (*acc = acc op lbda; or __gmpz_op(acc,acc,lbda);*)
-    let acc_plus_lbd_stmt = if name.lv_name="\\sum" then
+    let acc_plus_lbd_stmt = if name.lv_name = "\\sum" then
         affect_binop
           ~loc acc_as_varinfo (Some acc_as_exp) PlusA ty_op acc_as_exp lbd_as_exp
       else
@@ -279,8 +281,8 @@ and extended_quantifier_to_exp ~adata ~loc kf env t t_min t_max lambda name =
     let env = Env.add_stmt env kf (Smart_stmt.block_stmt final_stmt) in
     let adata, env = Assert.register_term ~loc kf env t acc_as_exp adata in
     acc_as_exp, adata, env, Typed_number.C_number, ""
-  | _ -> Options.fatal  "%a is not a valid extended quantifier"
-           Printer.pp_logic_var name
+  | _ ->
+    assert false (* unreachable branch *)
 
 and context_insensitive_term_to_exp ~adata kf env t =
   let loc = t.term_loc in
@@ -729,24 +731,31 @@ and context_insensitive_term_to_exp ~adata kf env t =
     let e = Cil.mkAddrOrStartOf ~loc lv in
     let adata, env = Assert.register_term ~loc kf env t e adata in
     e, adata, env, Typed_number.C_number, "startof"
-  | Tapp(li, _, [ t1; t2; lambda ]) when li.l_body = LBnone && (li.l_var_info.lv_name="\\sum" || li.l_var_info.lv_name="\\product")->
+  | Tapp(li, _, [ t1; t2; {term_node = Tlambda([ _ ], _)} as lambda ])
+    when li.l_body = LBnone && (li.l_var_info.lv_name = "\\sum" ||
+                                li.l_var_info.lv_name = "\\product")->
     extended_quantifier_to_exp ~adata ~loc kf env t t1 t2 lambda li.l_var_info
-  | Tapp(li, lst, [ t1; t2; lambda ]) when li.l_body = LBnone && li.l_var_info.lv_name="\\numof" ->
-    (match lambda with
-     | {term_node = Tlambda([ k ], predicate)} ->
-       let logic_info = Cil_const.make_logic_info "\\sum" in
-       logic_info.l_type <- li.l_type;
-       logic_info.l_tparams <- li.l_tparams;
-       logic_info.l_labels <- li.l_labels;
-       logic_info.l_profile <- li.l_profile;
-       logic_info.l_body <- li.l_body;
-       let anonymous =
-         (Logic_const.term (Tapp(logic_info, lst, [t1;t2;Logic_const.term (Tlambda([k],Logic_const.term (Tif(predicate, Cil.lone (), Cil.lzero ())) Linteger)) Linteger])) Linteger)
-       in
-       Typing.type_term ~use_gmp_opt:false anonymous;
-       context_insensitive_term_to_exp ~adata kf env anonymous
-     | _ -> Options.fatal "unexpected input for an extended quantifier \\numof"
-    )
+  | Tapp(li, lst, [ t1; t2; {term_node = Tlambda([ k ], predicate)}])
+    when li.l_body = LBnone && li.l_var_info.lv_name = "\\numof" ->
+    let logic_info = Cil_const.make_logic_info "\\sum" in
+    logic_info.l_type <- li.l_type;
+    logic_info.l_tparams <- li.l_tparams;
+    logic_info.l_labels <- li.l_labels;
+    logic_info.l_profile <- li.l_profile;
+    logic_info.l_body <- li.l_body;
+    let numof_as_sum =
+      let conditional_term =
+        Logic_const.term
+          (Tif(predicate, Cil.lone (), Cil.lzero ())) Linteger
+      in
+      let lambda_term =
+        Logic_const.term (Tlambda([ k ], conditional_term)) Linteger
+      in
+      (Logic_const.term
+         (Tapp(logic_info, lst, [ t1; t2; lambda_term ])) Linteger)
+    in
+    Typing.type_term ~use_gmp_opt:true numof_as_sum;
+    context_insensitive_term_to_exp ~adata kf env numof_as_sum
   | Tapp(_, [], _) ->
     let e, adata, env = Logic_functions.tapp_to_exp ~adata kf env t in
     let adata, env = Assert.register_term ~loc kf env t e adata in

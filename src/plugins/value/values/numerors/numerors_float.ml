@@ -75,8 +75,8 @@ let change_prec ?(rnd = Mpfr.Near) prec (p, x) =
    calling the unary function f on an input of type t *)
 let unary_mpfrf f =
   fun ?(rnd = Rounding.Near) ?(prec = P.Real) x ->
-    prec >>- fun () ->
-    f (change_prec prec x) (rounding rnd)
+  prec >>- fun () ->
+  f (change_prec prec x) (rounding rnd)
 
 (* Returns a function which apply the rounding of its optionnal parameter rnd
    and change the precision according to its optionnal parameter prec before
