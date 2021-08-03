@@ -9,7 +9,7 @@
 int main(int argc, char **argv) {
   int i;
 
-  /*@ assert \forall int k; 0 <= k && k < argc ==> \valid(argv + k) ; */
+  /*@ assert \forall int k; 0 <= k && k <= argc ==> \valid(argv + k) ; */
   /*@ assert \block_length(argv) == (argc+1)*sizeof(char*) ; */
 
   /*@ assert argv[argc] == \null ; */
