@@ -34,7 +34,7 @@ int main(void)
       }
       else __gen_e_acsl_and = 0;
       __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","main","\\valid(q)",
-                      "tests/temporal/t_while.c",28);
+                      "tests/temporal/t_while.c",29);
     }
     /*@ assert \valid(q); */ ;
     __e_acsl_initialize((void *)q,sizeof(int));
@@ -57,7 +57,7 @@ int main(void)
     }
     else __gen_e_acsl_and_2 = 0;
     __e_acsl_assert(! __gen_e_acsl_and_2,1,"Assertion","main","!\\valid(q)",
-                    "tests/temporal/t_while.c",36);
+                    "tests/temporal/t_while.c",37);
   }
   /*@ assert ¬\valid(q); */ ;
   __retres = 0;

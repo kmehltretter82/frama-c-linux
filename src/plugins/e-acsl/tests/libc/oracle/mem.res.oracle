@@ -43,7 +43,7 @@
 [eva:alarm] FRAMAC_SHARE/libc/string.h:134: Warning: 
   function __gen_e_acsl_memset: postcondition 'acsl_c_equiv' got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/string.h:98: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status invalid.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/string.h:101: Warning: 
   function __gen_e_acsl_memcpy: postcondition 'copied_contents' got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/string.h:124: Warning: 

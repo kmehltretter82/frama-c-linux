@@ -48,7 +48,7 @@ int main(void)
     e_acsl_end_loop1: ;
     __e_acsl_assert(__gen_e_acsl_forall,1,"Assertion","main",
                     "\\forall integer x; 0 <= x <= 1 ==> x == 0 || x == 1",
-                    "tests/arith/quantif.i",15);
+                    "tests/arith/quantif.i",16);
   }
   /*@ assert ∀ ℤ x; 0 ≤ x ≤ 1 ⇒ x ≡ 0 ∨ x ≡ 1; */ ;
   {
@@ -68,7 +68,7 @@ int main(void)
     e_acsl_end_loop2: ;
     __e_acsl_assert(__gen_e_acsl_forall_2,1,"Assertion","main",
                     "\\forall integer x; 0 < x <= 1 ==> x == 1",
-                    "tests/arith/quantif.i",16);
+                    "tests/arith/quantif.i",17);
   }
   /*@ assert ∀ ℤ x; 0 < x ≤ 1 ⇒ x ≡ 1; */ ;
   {
@@ -88,7 +88,7 @@ int main(void)
     e_acsl_end_loop3: ;
     __e_acsl_assert(__gen_e_acsl_forall_3,1,"Assertion","main",
                     "\\forall integer x; 0 <= x < 1 ==> x == 0",
-                    "tests/arith/quantif.i",17);
+                    "tests/arith/quantif.i",18);
   }
   /*@ assert ∀ ℤ x; 0 ≤ x < 1 ⇒ x ≡ 0; */ ;
   {
@@ -121,7 +121,7 @@ int main(void)
     e_acsl_end_loop4: ;
     __e_acsl_assert(__gen_e_acsl_forall_4,1,"Assertion","main",
                     "\\forall integer x, integer y, integer z;\n  0 <= x < 2 && 0 <= y < 5 && 0 <= z <= y ==> x + z <= y + 1",
-                    "tests/arith/quantif.i",21);
+                    "tests/arith/quantif.i",22);
   }
   /*@
   assert
@@ -146,7 +146,7 @@ int main(void)
     e_acsl_end_loop5: ;
     __e_acsl_assert(__gen_e_acsl_exists,1,"Assertion","main",
                     "\\exists int x; 0 <= x < 10 && x == 5",
-                    "tests/arith/quantif.i",26);
+                    "tests/arith/quantif.i",27);
   }
   /*@ assert ∃ int x; 0 ≤ x < 10 ∧ x ≡ 5; */ ;
   {
@@ -187,7 +187,7 @@ int main(void)
     e_acsl_end_loop7: ;
     __e_acsl_assert(__gen_e_acsl_forall_5,1,"Assertion","main",
                     "\\forall int x;\n  0 <= x < 10 ==>\n  x % 2 == 0 ==> (\\exists integer y; 0 <= y <= x / 2 && x == 2 * y)",
-                    "tests/arith/quantif.i",30);
+                    "tests/arith/quantif.i",31);
   }
   /*@
   assert
@@ -223,7 +223,7 @@ int main(void)
       e_acsl_end_loop8: ;
       __e_acsl_assert(__gen_e_acsl_forall_6,1,"Assertion","main",
                       "\\forall integer i; 0 <= i < 10 ==> \\valid(&buf[i])",
-                      "tests/arith/quantif.i",36);
+                      "tests/arith/quantif.i",37);
     }
     /*@ assert ∀ ℤ i; 0 ≤ i < 10 ⇒ \valid(&buf[i]); */ ;
     {
@@ -249,7 +249,7 @@ int main(void)
       e_acsl_end_loop9: ;
       __e_acsl_assert(__gen_e_acsl_forall_7,1,"Assertion","main",
                       "\\forall char i; 0 <= i < 10 ==> \\valid(&buf[i])",
-                      "tests/arith/quantif.i",37);
+                      "tests/arith/quantif.i",38);
     }
     /*@ assert ∀ char i; 0 ≤ i < 10 ⇒ \valid(&buf[i]); */ ;
     {
@@ -275,7 +275,7 @@ int main(void)
       e_acsl_end_loop10: ;
       __e_acsl_assert(__gen_e_acsl_forall_8,1,"Assertion","main",
                       "\\forall integer i; 0 <= i < len ==> \\valid(&buf[i])",
-                      "tests/arith/quantif.i",38);
+                      "tests/arith/quantif.i",39);
     }
     /*@ assert ∀ ℤ i; 0 ≤ i < len ⇒ \valid(&buf[i]); */ ;
     {
@@ -330,7 +330,7 @@ int main(void)
       e_acsl_end_loop11: ;
       __e_acsl_assert(__gen_e_acsl_forall_9,1,"Assertion","main",
                       "\\forall integer i; 0 <= i <= len ==> \\valid(&buf[i])",
-                      "tests/arith/quantif.i",39);
+                      "tests/arith/quantif.i",40);
       __gmpz_clear(__gen_e_acsl_i_4);
     }
     /*@ assert ∀ ℤ i; 0 ≤ i ≤ len ⇒ \valid(&buf[i]); */ ;
@@ -338,18 +338,18 @@ int main(void)
   }
   __e_acsl_assert(1,1,"Assertion","main",
                   "\\forall integer x; 0 < x < 1 ==> \\false",
-                  "tests/arith/quantif.i",43);
+                  "tests/arith/quantif.i",44);
   /*@ assert ∀ ℤ x; 0 < x < 1 ⇒ \false; */ ;
   __e_acsl_assert(! 0,1,"Assertion","main",
                   "!(\\exists char c; 10 <= c < 10 && c == 10)",
-                  "tests/arith/quantif.i",44);
+                  "tests/arith/quantif.i",45);
   /*@ assert ¬(∃ char c; 10 ≤ c < 10 ∧ c ≡ 10); */ ;
   {
     int __gen_e_acsl_u;
     __gen_e_acsl_u = 5;
     __e_acsl_assert(1,1,"Assertion","main",
                     "\\let u = 5;\n\\forall integer x, integer y; 0 <= x < 2 && 4 < y < u ==> \\false",
-                    "tests/arith/quantif.i",46);
+                    "tests/arith/quantif.i",47);
   }
   /*@
   assert \let u = 5; ∀ ℤ x, ℤ y; 0 ≤ x < 2 ∧ 4 < y < u ⇒ \false;
@@ -390,7 +390,7 @@ int main(void)
     e_acsl_end_loop12: ;
     __e_acsl_assert(__gen_e_acsl_forall_10,1,"Assertion","main",
                     "forall_multiple_binders_1:\n  \\forall integer i, integer j, integer k;\n    0 <= i < 10 && 1 < j <= 11 && 2 <= k <= 12 ==> p1(i, j, k)",
-                    "tests/arith/quantif.i",51);
+                    "tests/arith/quantif.i",52);
   }
   /*@
   assert
@@ -434,7 +434,7 @@ int main(void)
     e_acsl_end_loop13: ;
     __e_acsl_assert(__gen_e_acsl_forall_11,1,"Assertion","main",
                     "forall_multiple_binders_2:\n  \\forall integer i, integer j, integer k;\n    0 <= i <= j < k <= 10 ==> p2(i, j, k)",
-                    "tests/arith/quantif.i",54);
+                    "tests/arith/quantif.i",55);
   }
   /*@
   assert
@@ -477,7 +477,7 @@ int main(void)
     e_acsl_end_loop14: ;
     __e_acsl_assert(__gen_e_acsl_forall_12,1,"Assertion","main",
                     "forall_multiple_binders_3:\n  \\forall integer i, integer j, integer k;\n    0 <= i < j <= 10 && 1 < k < 11 ==> p3(i, j, k)",
-                    "tests/arith/quantif.i",57);
+                    "tests/arith/quantif.i",58);
   }
   /*@
   assert
@@ -521,7 +521,7 @@ int main(void)
     e_acsl_end_loop15: ;
     __e_acsl_assert(__gen_e_acsl_forall_13,1,"Assertion","main",
                     "forall_multiple_binders_4:\n  \\forall integer i, integer j, integer k;\n    0 <= i < 10 ==> 1 < j <= 11 ==> 2 <= k <= 12 ==> p1(i, j, k)",
-                    "tests/arith/quantif.i",60);
+                    "tests/arith/quantif.i",61);
   }
   /*@
   assert
@@ -565,7 +565,7 @@ int main(void)
     e_acsl_end_loop16: ;
     __e_acsl_assert(__gen_e_acsl_forall_14,1,"Assertion","main",
                     "forall_unordered_binders:\n  \\forall integer i, integer j, integer k;\n    0 <= i <= k <= 10 && 1 <= j < k ==> p4(i, j, k)",
-                    "tests/arith/quantif.i",63);
+                    "tests/arith/quantif.i",64);
   }
   /*@
   assert
@@ -609,7 +609,7 @@ int main(void)
     e_acsl_end_loop17: ;
     __e_acsl_assert(__gen_e_acsl_exists_3,1,"Assertion","main",
                     "exists_multiple_binders_1:\n  \\exists integer i, integer j, integer k;\n    0 <= i < 10 && 1 < j <= 11 && 2 <= k <= 12 && p1(i, j, k)",
-                    "tests/arith/quantif.i",66);
+                    "tests/arith/quantif.i",67);
   }
   /*@
   assert
@@ -653,7 +653,7 @@ int main(void)
     e_acsl_end_loop18: ;
     __e_acsl_assert(__gen_e_acsl_exists_4,1,"Assertion","main",
                     "exists_multiple_binders_2:\n  \\exists integer i, integer j, integer k;\n    0 <= i <= j < k <= 10 && p2(i, j, k)",
-                    "tests/arith/quantif.i",69);
+                    "tests/arith/quantif.i",70);
   }
   /*@
   assert
@@ -696,7 +696,7 @@ int main(void)
     e_acsl_end_loop19: ;
     __e_acsl_assert(__gen_e_acsl_exists_5,1,"Assertion","main",
                     "exists_multiple_binders_3:\n  \\exists integer i, integer j, integer k;\n    0 <= i < j <= 10 && 1 < k < 11 && p3(i, j, k)",
-                    "tests/arith/quantif.i",72);
+                    "tests/arith/quantif.i",73);
   }
   /*@
   assert
@@ -740,7 +740,7 @@ int main(void)
     e_acsl_end_loop20: ;
     __e_acsl_assert(__gen_e_acsl_exists_6,1,"Assertion","main",
                     "exists_unordered_binders:\n  \\exists integer i, integer j, integer k;\n    0 <= i <= k <= 10 && 1 <= j < k && p4(i, j, k)",
-                    "tests/arith/quantif.i",75);
+                    "tests/arith/quantif.i",76);
   }
   /*@
   assert

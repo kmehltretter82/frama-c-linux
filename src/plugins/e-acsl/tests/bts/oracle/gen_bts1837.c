@@ -21,7 +21,7 @@ int f(void)
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)S,sizeof(char),
                                                   (void *)S,(void *)(& S));
     __e_acsl_assert(__gen_e_acsl_valid_read,1,"Assertion","f",
-                    "\\valid_read(S)","tests/bts/bts1837.i",10);
+                    "\\valid_read(S)","tests/bts/bts1837.i",11);
   }
   /*@ assert \valid_read(S); */ ;
   {
@@ -39,7 +39,7 @@ int f(void)
     }
     else __gen_e_acsl_and = 0;
     __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","f","\\valid_read(s1)",
-                    "tests/bts/bts1837.i",11);
+                    "tests/bts/bts1837.i",12);
   }
   /*@ assert \valid_read(s1); */ ;
   {
@@ -57,7 +57,7 @@ int f(void)
     }
     else __gen_e_acsl_and_2 = 0;
     __e_acsl_assert(__gen_e_acsl_and_2,1,"Assertion","f","\\valid_read(s2)",
-                    "tests/bts/bts1837.i",12);
+                    "tests/bts/bts1837.i",13);
   }
   /*@ assert \valid_read(s2); */ ;
   __retres = 0;
@@ -127,7 +127,7 @@ int main(void)
         }
         else __gen_e_acsl_and = 0;
         __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","main",
-                        "\\valid_read(s)","tests/bts/bts1837.i",20);
+                        "\\valid_read(s)","tests/bts/bts1837.i",21);
       }
       /*@ assert \valid_read(s); */ ;
       {
@@ -143,7 +143,7 @@ int main(void)
         }
         else __gen_e_acsl_and_2 = 0;
         __e_acsl_assert(! __gen_e_acsl_and_2,1,"Assertion","main",
-                        "!\\valid(s)","tests/bts/bts1837.i",21);
+                        "!\\valid(s)","tests/bts/bts1837.i",22);
       }
       /*@ assert ¬\valid(s); */ ;
       __e_acsl_delete_block((void *)(& s));

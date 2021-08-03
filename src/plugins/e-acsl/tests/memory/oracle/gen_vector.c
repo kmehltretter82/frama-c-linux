@@ -45,7 +45,7 @@ int *new_inversed(int len, int *v)
     else __gen_e_acsl_and = 0;
     __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","new_inversed",
                     "\\valid(v) && \\offset(v) + len * sizeof(int) <= \\block_length(v)",
-                    "tests/memory/vector.c",11);
+                    "tests/memory/vector.c",12);
   }
   /*@
   assert \valid(v) ∧ \offset(v) + len * sizeof(int) ≤ \block_length(v);
@@ -79,7 +79,7 @@ int main(void)
     __gen_e_acsl_valid = __e_acsl_valid((void *)(& v1[2]),sizeof(int),
                                         (void *)(v1),(void *)0);
     __e_acsl_assert(__gen_e_acsl_valid,1,"Assertion","main",
-                    "\\valid(&v1[2])","tests/memory/vector.c",21);
+                    "\\valid(&v1[2])","tests/memory/vector.c",22);
   }
   /*@ assert \valid(&v1[2]); */ ;
   LAST = v1[2];
@@ -88,7 +88,7 @@ int main(void)
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& v1[2]),
                                                     sizeof(int));
     __e_acsl_assert(__gen_e_acsl_initialized,1,"Assertion","main",
-                    "\\initialized(&v1[2])","tests/memory/vector.c",23);
+                    "\\initialized(&v1[2])","tests/memory/vector.c",24);
   }
   /*@ assert \initialized(&v1[2]); */ ;
   __e_acsl_full_init((void *)(& v2));
@@ -99,11 +99,11 @@ int main(void)
     __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(v2 + 2),
                                                       sizeof(int));
     __e_acsl_assert(__gen_e_acsl_initialized_2,1,"Assertion","main",
-                    "\\initialized(v2 + 2)","tests/memory/vector.c",26);
+                    "\\initialized(v2 + 2)","tests/memory/vector.c",27);
   }
   /*@ assert \initialized(v2 + 2); */ ;
   __e_acsl_assert(LAST == 1,1,"Assertion","main","LAST == 1",
-                  "tests/memory/vector.c",27);
+                  "tests/memory/vector.c",28);
   /*@ assert LAST ≡ 1; */ ;
   free((void *)v2);
   __retres = 0;

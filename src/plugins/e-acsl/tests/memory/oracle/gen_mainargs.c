@@ -21,12 +21,12 @@ int __gen_e_acsl_main(int argc, char **argv)
   int i;
   {
     int __gen_e_acsl_forall;
-    int __gen_e_acsl_k;
+    long __gen_e_acsl_k;
     __e_acsl_store_block((void *)(& argv),(size_t)8);
     __gen_e_acsl_forall = 1;
     __gen_e_acsl_k = 0;
     while (1) {
-      if (__gen_e_acsl_k < argc) ; else break;
+      if (__gen_e_acsl_k <= (long)argc) ; else break;
       {
         int __gen_e_acsl_valid;
         __gen_e_acsl_valid = __e_acsl_valid((void *)(argv + __gen_e_acsl_k),
@@ -42,10 +42,10 @@ int __gen_e_acsl_main(int argc, char **argv)
     }
     e_acsl_end_loop1: ;
     __e_acsl_assert(__gen_e_acsl_forall,1,"Assertion","main",
-                    "\\forall int k; 0 <= k < argc ==> \\valid(argv + k)",
+                    "\\forall int k; 0 <= k <= argc ==> \\valid(argv + k)",
                     "tests/memory/mainargs.c",12);
   }
-  /*@ assert ∀ int k; 0 ≤ k < argc ⇒ \valid(argv + k); */ ;
+  /*@ assert ∀ int k; 0 ≤ k ≤ argc ⇒ \valid(argv + k); */ ;
   {
     unsigned long __gen_e_acsl_block_length;
     __e_acsl_mpz_t __gen_e_acsl_block_length_2;
