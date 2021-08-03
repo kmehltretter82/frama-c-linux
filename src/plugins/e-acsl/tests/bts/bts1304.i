@@ -1,5 +1,6 @@
 /* run.config
    COMMENT: argument of functions must be kept, so keep its parameter
+   STDOPT: +"-eva-precision=1"
 */
 
 struct msgA { int type; int a[2]; };

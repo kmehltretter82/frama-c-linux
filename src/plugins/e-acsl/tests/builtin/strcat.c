@@ -1,5 +1,6 @@
 /* run.config
    COMMENT: Test `strcat` and `strncat` E-ACSL built-ins
+   STDOPT: +"-eva-precision=1"
 */
 
 #include "../utils/signalled.h"

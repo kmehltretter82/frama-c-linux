@@ -1,5 +1,6 @@
 /* run.config
    COMMENT: quantifiers
+   STDOPT: +"-eva-min-loop-unroll=15"
 */
 
 // Support predicates for some tests

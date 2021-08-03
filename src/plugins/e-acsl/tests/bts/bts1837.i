@@ -1,5 +1,6 @@
 /* run.config
    COMMENT: bts #1837, about initialization of literal strings
+   STDOPT: +"-eva-precision=1"
 */
 
 char *S = "foo";

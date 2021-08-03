@@ -1,5 +1,6 @@
 /* run.config
    COMMENT: ranges in a few builtins
+   STDOPT: +"-eva-min-loop-unroll=10"
 */
 #include "stdlib.h"
 /*@ requires !\valid(s + (3..n+1000)); */

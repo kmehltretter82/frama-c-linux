@@ -1,5 +1,6 @@
 /* run.config
    COMMENT: Simple case of double pointer dereference
+   STDOPT: +"-eva-min-loop-unroll=3"
 */
 
 #include <stdlib.h>

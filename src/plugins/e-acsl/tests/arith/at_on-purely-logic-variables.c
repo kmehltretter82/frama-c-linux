@@ -1,6 +1,6 @@
 /* run.config
   COMMENT: \at on purely logic variables
-  COMMENT:
+  STDOPT: +"-eva-precision=1"
 */
 
 /*@ ensures \forall integer n; 1 < n <= 3 ==>
