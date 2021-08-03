@@ -25,6 +25,9 @@
 exception Ignored
 exception Typing_error of string
 exception Not_yet of string
+exception Unmemoized
+
+type 'a or_error = Res of 'a | Err of exn
 
 val untypable: string -> 'a
 (** Type error built from the given argument. *)
@@ -34,6 +37,10 @@ val not_yet: string -> 'a
 
 val ignored: unit -> 'a
 (** Statement already signaled and marked as ignored *)
+
+val unmemoized : unit -> 'a
+(** Error thrown when asking the preprocessed form of something that
+    was not preprocessed*)
 
 val handle: ('a -> 'a) -> 'a -> 'a
 (** Run the closure with the given argument and handle potential errors.
@@ -51,6 +58,11 @@ val nb_not_yet: unit -> int
 
 val print_not_yet: string -> unit
 (** Print the "not yet" message without raising an exception. *)
+
+val retrieve_preprocessing: string -> ('a -> ('b or_error)) -> 'a -> 'b
+(** Retreive the result of a preprocessing phase, which possibly failed.
+    The [string] argument is used to display a message in case the preprocessing
+    phase did not compute the required result. *)
 
 (*
 Local Variables:

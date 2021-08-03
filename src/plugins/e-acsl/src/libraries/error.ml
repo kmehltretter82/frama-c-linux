@@ -29,6 +29,9 @@ let untypable s = raise (Typing_error s)
 exception Not_yet of string
 let not_yet s = raise (Not_yet s)
 
+exception Unmemoized
+let unmemoized () = raise Unmemoized
+
 module Nb_typing =
   State_builder.Ref
     (Datatype.Int)
@@ -73,6 +76,16 @@ let generic_handle f res x =
   | Ignored -> res
 
 let handle f x = generic_handle f x x
+
+type 'a or_error = Res of 'a | Err of exn
+
+let retrieve_preprocessing analyse_name getter parameter =
+  try
+    match getter parameter with
+    | Res res -> res
+    | Err exn -> raise exn
+  with Unmemoized ->
+    Options.fatal "%s was not performed on construct" analyse_name
 
 (*
 Local Variables:
