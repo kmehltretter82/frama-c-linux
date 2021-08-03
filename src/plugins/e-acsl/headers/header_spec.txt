@@ -98,6 +98,8 @@ src/code_generator/injector.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/injector.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/label.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/label.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/code_generator/libc.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/code_generator/libc.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/literal_observer.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/literal_observer.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/logic_array.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL

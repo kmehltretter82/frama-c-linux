@@ -37,7 +37,7 @@
     becomes unsound.
     TODO: may only happen for annotations containing memory-related properties.
     For arithmetic properties, the verdict is always sound (?). */
-extern int eacsl_runtime_sound_verdict;
+extern int __attribute__((FC_BUILTIN)) eacsl_runtime_sound_verdict;
 
 /*! \brief Runtime assertion verifying a given predicate
  *  \param pred  integer code of a predicate

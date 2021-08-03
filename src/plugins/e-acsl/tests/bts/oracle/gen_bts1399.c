@@ -2,6 +2,8 @@
 #include "stddef.h"
 #include "stdio.h"
 #include "stdlib.h"
+extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
+
 struct spongeStateStruct {
    unsigned char __attribute__((__aligned__(32))) state[1600 / 8] ;
    unsigned char __attribute__((__aligned__(32))) dataQueue[1536 / 8] ;

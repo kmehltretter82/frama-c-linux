@@ -1149,6 +1149,78 @@ and translate_predicate ?pred_to_print kf env p =
 let predicate_to_exp_without_rte ?name kf env p =
   predicate_to_exp ?name kf env p (* forget optional argument ?rte *)
 
+let gmp_to_sizet ~loc ~name ?(check_lower_bound=true) ?pp kf env t =
+  let pp = match pp with Some size_pp -> size_pp | None -> t in
+  let sizet = Cil.(theMachine.typeOfSizeOf) in
+  let stmts = [] in
+  (* Lower guard *)
+  let stmts, env =
+    if check_lower_bound then begin
+      let zero_term = Cil.lzero ~loc () in
+      let pred_name = Format.sprintf "%s_greater_or_eq_than_0" name in
+      let lower_guard_pp = Logic_const.prel ~loc (Rge, pp, zero_term) in
+      let lower_guard_pp =
+        { lower_guard_pp with
+          pred_name = pred_name :: lower_guard_pp.pred_name }
+      in
+      let lower_guard = Logic_const.prel ~loc (Rge, t, zero_term) in
+      Typing.type_named_predicate ~must_clear:false lower_guard;
+      let lower_guard, env = predicate_to_exp kf env lower_guard in
+      let assertion =
+        Smart_stmt.runtime_check
+          ~pred_kind:Assert
+          Smart_stmt.RTE
+          kf
+          lower_guard
+          lower_guard_pp
+      in
+      assertion :: stmts, env
+    end
+    else stmts, env
+  in
+  (* Upper guard *)
+  let sizet_max =
+    Logic_const.tint ~loc (Cil.max_unsigned_number (Cil.bitsSizeOf sizet))
+  in
+  let pred_name = Format.sprintf "%s_lesser_or_eq_than_SIZE_MAX" name in
+  let upper_guard_pp = Logic_const.prel ~loc (Rle, pp, sizet_max) in
+  let upper_guard_pp =
+    { upper_guard_pp with
+      pred_name = pred_name :: upper_guard_pp.pred_name }
+  in
+  let upper_guard = Logic_const.prel ~loc (Rle, t, sizet_max) in
+  Typing.type_named_predicate ~must_clear:false upper_guard;
+  let upper_guard, env = predicate_to_exp kf env upper_guard in
+  let assertion =
+    Smart_stmt.runtime_check
+      ~pred_kind:Assert
+      Smart_stmt.RTE
+      kf
+      upper_guard
+      upper_guard_pp
+  in
+  let stmts = assertion :: stmts in
+  (* Translate term [t] into an exp of type [size_t] *)
+  let gmp_e, env = term_to_exp kf env t in
+  let  _, e, env = Env.new_var
+      ~loc
+      ~name:"size"
+      env
+      kf
+      None
+      sizet
+      (fun vi _ ->
+         let rtl_call =
+           Smart_stmt.rtl_call ~loc
+             ~result:(Cil.var vi)
+             ~prefix:""
+             "__gmpz_get_ui"
+             [ gmp_e ]
+         in
+         List.rev (rtl_call :: stmts))
+  in
+  e, env
+
 let () =
   Loops.term_to_exp_ref := term_to_exp;
   Loops.translate_predicate_ref := translate_predicate;
@@ -1158,6 +1230,7 @@ let () =
   At_with_lscope.predicate_to_exp_ref := predicate_to_exp_without_rte;
   Memory_translate.term_to_exp_ref := term_to_exp;
   Memory_translate.predicate_to_exp_ref := predicate_to_exp_without_rte;
+  Memory_translate.gmp_to_sizet_ref := gmp_to_sizet;
   Logic_functions.term_to_exp_ref := term_to_exp;
   Logic_functions.predicate_to_exp_ref := predicate_to_exp_without_rte;
   Logic_array.translate_rte_ref := translate_rte

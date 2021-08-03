@@ -2,6 +2,8 @@
 #include "stddef.h"
 #include "stdio.h"
 #include "stdlib.h"
+extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
+
 int LAST;
 int *new_inversed(int len, int *v)
 {

@@ -5,6 +5,8 @@ char *__gen_e_acsl_literal_string_2;
 char *__gen_e_acsl_literal_string_3;
 char *__gen_e_acsl_literal_string;
 char *__gen_e_acsl_literal_string_4;
+extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
+
 void __e_acsl_globals_init(void)
 {
   static char __e_acsl_already_run = 0;

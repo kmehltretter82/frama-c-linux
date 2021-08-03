@@ -3,6 +3,8 @@
 #include "stdio.h"
 #include "stdlib.h"
 char *__gen_e_acsl_literal_string;
+extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
+
 void __e_acsl_globals_init(void)
 {
   static char __e_acsl_already_run = 0;

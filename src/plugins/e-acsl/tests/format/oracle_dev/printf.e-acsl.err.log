@@ -29,19 +29,19 @@ TEST 20: OK: Expected execution at tests/format/printf.c:209
 TEST 21: OK: Expected execution at tests/format/printf.c:209
 TEST 22: OK: Expected execution at tests/format/printf.c:209
 TEST 23: OK: Expected execution at tests/format/printf.c:209
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of precision [.] to format specifier [c]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of precision [.] to format specifier [c]
 TEST 24: OK: Expected signal at tests/format/printf.c:209
 TEST 25: OK: Expected execution at tests/format/printf.c:209
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of precision [.] to format specifier [p]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of precision [.] to format specifier [p]
 TEST 26: OK: Expected signal at tests/format/printf.c:209
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of precision [.] to format specifier [n]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of precision [.] to format specifier [n]
 TEST 27: OK: Expected signal at tests/format/printf.c:209
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of flag [#] to format specifier [d]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of flag [#] to format specifier [d]
 TEST 28: OK: Expected signal at tests/format/printf.c:215
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of flag [#] to format specifier [i]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of flag [#] to format specifier [i]
 TEST 29: OK: Expected signal at tests/format/printf.c:215
 TEST 30: OK: Expected execution at tests/format/printf.c:215
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of flag [#] to format specifier [u]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of flag [#] to format specifier [u]
 TEST 31: OK: Expected signal at tests/format/printf.c:215
 TEST 32: OK: Expected execution at tests/format/printf.c:215
 TEST 33: OK: Expected execution at tests/format/printf.c:215
@@ -52,13 +52,13 @@ TEST 37: OK: Expected execution at tests/format/printf.c:215
 TEST 38: OK: Expected execution at tests/format/printf.c:215
 TEST 39: OK: Expected execution at tests/format/printf.c:215
 TEST 40: OK: Expected execution at tests/format/printf.c:215
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of flag [#] to format specifier [c]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of flag [#] to format specifier [c]
 TEST 41: OK: Expected signal at tests/format/printf.c:215
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of flag [#] to format specifier [s]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of flag [#] to format specifier [s]
 TEST 42: OK: Expected signal at tests/format/printf.c:215
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of flag [#] to format specifier [p]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of flag [#] to format specifier [p]
 TEST 43: OK: Expected signal at tests/format/printf.c:215
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of flag [#] to format specifier [n]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of flag [#] to format specifier [n]
 TEST 44: OK: Expected signal at tests/format/printf.c:215
 TEST 45: OK: Expected execution at tests/format/printf.c:218
 TEST 46: OK: Expected execution at tests/format/printf.c:218
@@ -73,39 +73,39 @@ TEST 54: OK: Expected execution at tests/format/printf.c:218
 TEST 55: OK: Expected execution at tests/format/printf.c:218
 TEST 56: OK: Expected execution at tests/format/printf.c:218
 TEST 57: OK: Expected execution at tests/format/printf.c:218
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of flag [0] to format specifier [c]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of flag [0] to format specifier [c]
 TEST 58: OK: Expected signal at tests/format/printf.c:218
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of flag [0] to format specifier [s]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of flag [0] to format specifier [s]
 TEST 59: OK: Expected signal at tests/format/printf.c:218
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of flag [0] to format specifier [p]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of flag [0] to format specifier [p]
 TEST 60: OK: Expected signal at tests/format/printf.c:218
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of flag [0] to format specifier [n]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of flag [0] to format specifier [n]
 TEST 61: OK: Expected signal at tests/format/printf.c:218
 TEST 62: OK: Expected execution at tests/format/printf.c:224
 TEST 63: OK: Expected execution at tests/format/printf.c:225
 Format error: illegal format specifier 'l'
 TEST 64: OK: Expected signal at tests/format/printf.c:226
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [hh] to format specifier [f]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [hh] to format specifier [f]
 TEST 65: OK: Expected signal at tests/format/printf.c:232
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [hh] to format specifier [F]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [hh] to format specifier [F]
 TEST 66: OK: Expected signal at tests/format/printf.c:232
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [hh] to format specifier [e]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [hh] to format specifier [e]
 TEST 67: OK: Expected signal at tests/format/printf.c:232
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [hh] to format specifier [E]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [hh] to format specifier [E]
 TEST 68: OK: Expected signal at tests/format/printf.c:232
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [hh] to format specifier [g]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [hh] to format specifier [g]
 TEST 69: OK: Expected signal at tests/format/printf.c:232
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [hh] to format specifier [G]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [hh] to format specifier [G]
 TEST 70: OK: Expected signal at tests/format/printf.c:232
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [hh] to format specifier [a]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [hh] to format specifier [a]
 TEST 71: OK: Expected signal at tests/format/printf.c:232
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [hh] to format specifier [A]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [hh] to format specifier [A]
 TEST 72: OK: Expected signal at tests/format/printf.c:232
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [hh] to format specifier [c]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [hh] to format specifier [c]
 TEST 73: OK: Expected signal at tests/format/printf.c:232
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [hh] to format specifier [s]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [hh] to format specifier [s]
 TEST 74: OK: Expected signal at tests/format/printf.c:232
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [hh] to format specifier [p]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [hh] to format specifier [p]
 TEST 75: OK: Expected signal at tests/format/printf.c:232
 TEST 76: OK: Expected execution at tests/format/printf.c:233
 TEST 77: OK: Expected execution at tests/format/printf.c:233
@@ -114,27 +114,27 @@ TEST 79: OK: Expected execution at tests/format/printf.c:234
 TEST 80: OK: Expected execution at tests/format/printf.c:235
 TEST 81: OK: Expected execution at tests/format/printf.c:235
 TEST 82: OK: Expected execution at tests/format/printf.c:235
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [h] to format specifier [f]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [h] to format specifier [f]
 TEST 83: OK: Expected signal at tests/format/printf.c:238
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [h] to format specifier [F]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [h] to format specifier [F]
 TEST 84: OK: Expected signal at tests/format/printf.c:238
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [h] to format specifier [e]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [h] to format specifier [e]
 TEST 85: OK: Expected signal at tests/format/printf.c:238
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [h] to format specifier [E]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [h] to format specifier [E]
 TEST 86: OK: Expected signal at tests/format/printf.c:238
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [h] to format specifier [g]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [h] to format specifier [g]
 TEST 87: OK: Expected signal at tests/format/printf.c:238
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [h] to format specifier [G]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [h] to format specifier [G]
 TEST 88: OK: Expected signal at tests/format/printf.c:238
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [h] to format specifier [a]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [h] to format specifier [a]
 TEST 89: OK: Expected signal at tests/format/printf.c:238
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [h] to format specifier [A]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [h] to format specifier [A]
 TEST 90: OK: Expected signal at tests/format/printf.c:238
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [h] to format specifier [c]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [h] to format specifier [c]
 TEST 91: OK: Expected signal at tests/format/printf.c:238
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [h] to format specifier [s]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [h] to format specifier [s]
 TEST 92: OK: Expected signal at tests/format/printf.c:238
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [h] to format specifier [p]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [h] to format specifier [p]
 TEST 93: OK: Expected signal at tests/format/printf.c:238
 TEST 94: OK: Expected execution at tests/format/printf.c:239
 TEST 95: OK: Expected execution at tests/format/printf.c:239
@@ -143,7 +143,7 @@ TEST 97: OK: Expected execution at tests/format/printf.c:240
 TEST 98: OK: Expected execution at tests/format/printf.c:241
 TEST 99: OK: Expected execution at tests/format/printf.c:241
 TEST 100: OK: Expected execution at tests/format/printf.c:241
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [l] to format specifier [p]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [l] to format specifier [p]
 TEST 101: OK: Expected signal at tests/format/printf.c:244
 TEST 102: OK: Expected execution at tests/format/printf.c:245
 TEST 103: OK: Expected execution at tests/format/printf.c:245
@@ -168,27 +168,27 @@ TEST 121: OK: Expected execution at tests/format/printf.c:262
 TEST 122: OK: Expected execution at tests/format/printf.c:263
 TEST 123: OK: Expected execution at tests/format/printf.c:263
 TEST 124: OK: Expected execution at tests/format/printf.c:263
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [j] to format specifier [f]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [j] to format specifier [f]
 TEST 125: OK: Expected signal at tests/format/printf.c:266
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [j] to format specifier [F]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [j] to format specifier [F]
 TEST 126: OK: Expected signal at tests/format/printf.c:266
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [j] to format specifier [e]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [j] to format specifier [e]
 TEST 127: OK: Expected signal at tests/format/printf.c:266
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [j] to format specifier [E]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [j] to format specifier [E]
 TEST 128: OK: Expected signal at tests/format/printf.c:266
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [j] to format specifier [g]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [j] to format specifier [g]
 TEST 129: OK: Expected signal at tests/format/printf.c:266
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [j] to format specifier [G]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [j] to format specifier [G]
 TEST 130: OK: Expected signal at tests/format/printf.c:266
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [j] to format specifier [a]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [j] to format specifier [a]
 TEST 131: OK: Expected signal at tests/format/printf.c:266
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [j] to format specifier [A]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [j] to format specifier [A]
 TEST 132: OK: Expected signal at tests/format/printf.c:266
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [j] to format specifier [c]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [j] to format specifier [c]
 TEST 133: OK: Expected signal at tests/format/printf.c:266
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [j] to format specifier [s]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [j] to format specifier [s]
 TEST 134: OK: Expected signal at tests/format/printf.c:266
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [j] to format specifier [p]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [j] to format specifier [p]
 TEST 135: OK: Expected signal at tests/format/printf.c:266
 TEST 136: OK: Expected execution at tests/format/printf.c:267
 TEST 137: OK: Expected execution at tests/format/printf.c:267
@@ -197,27 +197,27 @@ TEST 139: OK: Expected execution at tests/format/printf.c:268
 TEST 140: OK: Expected execution at tests/format/printf.c:269
 TEST 141: OK: Expected execution at tests/format/printf.c:269
 TEST 142: OK: Expected execution at tests/format/printf.c:269
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [z] to format specifier [f]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [z] to format specifier [f]
 TEST 143: OK: Expected signal at tests/format/printf.c:272
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [z] to format specifier [F]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [z] to format specifier [F]
 TEST 144: OK: Expected signal at tests/format/printf.c:272
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [z] to format specifier [e]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [z] to format specifier [e]
 TEST 145: OK: Expected signal at tests/format/printf.c:272
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [z] to format specifier [E]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [z] to format specifier [E]
 TEST 146: OK: Expected signal at tests/format/printf.c:272
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [z] to format specifier [g]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [z] to format specifier [g]
 TEST 147: OK: Expected signal at tests/format/printf.c:272
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [z] to format specifier [G]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [z] to format specifier [G]
 TEST 148: OK: Expected signal at tests/format/printf.c:272
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [z] to format specifier [a]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [z] to format specifier [a]
 TEST 149: OK: Expected signal at tests/format/printf.c:272
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [z] to format specifier [A]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [z] to format specifier [A]
 TEST 150: OK: Expected signal at tests/format/printf.c:272
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [z] to format specifier [c]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [z] to format specifier [c]
 TEST 151: OK: Expected signal at tests/format/printf.c:272
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [z] to format specifier [s]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [z] to format specifier [s]
 TEST 152: OK: Expected signal at tests/format/printf.c:272
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [z] to format specifier [p]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [z] to format specifier [p]
 TEST 153: OK: Expected signal at tests/format/printf.c:272
 TEST 154: OK: Expected execution at tests/format/printf.c:277
 TEST 155: OK: Expected execution at tests/format/printf.c:277
@@ -226,27 +226,27 @@ TEST 157: OK: Expected execution at tests/format/printf.c:281
 TEST 158: OK: Expected execution at tests/format/printf.c:282
 TEST 159: OK: Expected execution at tests/format/printf.c:282
 TEST 160: OK: Expected execution at tests/format/printf.c:282
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [t] to format specifier [f]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [t] to format specifier [f]
 TEST 161: OK: Expected signal at tests/format/printf.c:287
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [t] to format specifier [F]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [t] to format specifier [F]
 TEST 162: OK: Expected signal at tests/format/printf.c:287
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [t] to format specifier [e]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [t] to format specifier [e]
 TEST 163: OK: Expected signal at tests/format/printf.c:287
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [t] to format specifier [E]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [t] to format specifier [E]
 TEST 164: OK: Expected signal at tests/format/printf.c:287
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [t] to format specifier [g]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [t] to format specifier [g]
 TEST 165: OK: Expected signal at tests/format/printf.c:287
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [t] to format specifier [G]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [t] to format specifier [G]
 TEST 166: OK: Expected signal at tests/format/printf.c:287
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [t] to format specifier [a]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [t] to format specifier [a]
 TEST 167: OK: Expected signal at tests/format/printf.c:287
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [t] to format specifier [A]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [t] to format specifier [A]
 TEST 168: OK: Expected signal at tests/format/printf.c:287
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [t] to format specifier [c]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [t] to format specifier [c]
 TEST 169: OK: Expected signal at tests/format/printf.c:287
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [t] to format specifier [s]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [t] to format specifier [s]
 TEST 170: OK: Expected signal at tests/format/printf.c:287
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [t] to format specifier [p]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [t] to format specifier [p]
 TEST 171: OK: Expected signal at tests/format/printf.c:287
 TEST 172: OK: Expected execution at tests/format/printf.c:289
 TEST 173: OK: Expected execution at tests/format/printf.c:289
@@ -255,23 +255,23 @@ TEST 175: OK: Expected execution at tests/format/printf.c:290
 TEST 176: OK: Expected execution at tests/format/printf.c:295
 TEST 177: OK: Expected execution at tests/format/printf.c:295
 TEST 178: OK: Expected execution at tests/format/printf.c:296
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [L] to format specifier [d]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [L] to format specifier [d]
 TEST 179: OK: Expected signal at tests/format/printf.c:299
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [L] to format specifier [i]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [L] to format specifier [i]
 TEST 180: OK: Expected signal at tests/format/printf.c:299
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [L] to format specifier [o]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [L] to format specifier [o]
 TEST 181: OK: Expected signal at tests/format/printf.c:299
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [L] to format specifier [u]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [L] to format specifier [u]
 TEST 182: OK: Expected signal at tests/format/printf.c:299
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [L] to format specifier [x]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [L] to format specifier [x]
 TEST 183: OK: Expected signal at tests/format/printf.c:299
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [L] to format specifier [c]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [L] to format specifier [c]
 TEST 184: OK: Expected signal at tests/format/printf.c:299
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [L] to format specifier [s]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [L] to format specifier [s]
 TEST 185: OK: Expected signal at tests/format/printf.c:299
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [L] to format specifier [p]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [L] to format specifier [p]
 TEST 186: OK: Expected signal at tests/format/printf.c:299
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of length modifier [L] to format specifier [n]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of length modifier [L] to format specifier [n]
 TEST 187: OK: Expected signal at tests/format/printf.c:299
 TEST 188: OK: Expected execution at tests/format/printf.c:300
 TEST 189: OK: Expected execution at tests/format/printf.c:300
@@ -550,11 +550,11 @@ printf: directive 1 ('%n') expects argument of type 'int*' but the corresponding
 TEST 368: OK: Expected signal at tests/format/printf.c:460
 printf: argument 0 of directive %n not allocated or writeable
 TEST 369: OK: Expected signal at tests/format/printf.c:461
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of flag ['] to format specifier [n]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of flag ['] to format specifier [n]
 TEST 370: OK: Expected signal at tests/format/printf.c:464
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of flag [0] to format specifier [n]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of flag [0] to format specifier [n]
 TEST 371: OK: Expected signal at tests/format/printf.c:465
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of flag [#] to format specifier [n]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of flag [#] to format specifier [n]
 TEST 372: OK: Expected signal at tests/format/printf.c:466
 Format error: one of more flags with [n] specifier
 TEST 373: OK: Expected signal at tests/format/printf.c:467
@@ -562,11 +562,11 @@ Format error: one of more flags with [n] specifier
 TEST 374: OK: Expected signal at tests/format/printf.c:468
 Format error: one of more flags with [n] specifier
 TEST 375: OK: Expected signal at tests/format/printf.c:469
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of precision [.] to format specifier [n]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of precision [.] to format specifier [n]
 TEST 376: OK: Expected signal at tests/format/printf.c:470
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of precision [.] to format specifier [n]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of precision [.] to format specifier [n]
 TEST 377: OK: Expected signal at tests/format/printf.c:471
-FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:541: Format error: wrong application of precision [.] to format specifier [n]
+FRAMAC_SHARE/e-acsl/libc_replacements/e_acsl_stdio.c:542: Format error: wrong application of precision [.] to format specifier [n]
 TEST 378: OK: Expected signal at tests/format/printf.c:472
 Format error: field width used with [n] specifier
 TEST 379: OK: Expected signal at tests/format/printf.c:473

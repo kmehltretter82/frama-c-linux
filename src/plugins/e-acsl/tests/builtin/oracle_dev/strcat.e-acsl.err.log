@@ -1,40 +1,40 @@
-TEST 1: OK: Expected execution at tests/builtin/strcat.c:27
-TEST 2: OK: Expected execution at tests/builtin/strcat.c:28
+TEST 1: OK: Expected execution at tests/builtin/strcat.c:66
+TEST 2: OK: Expected execution at tests/builtin/strcat.c:67
 strcat: insufficient space in destination string, available: 8 bytes, requires at least 9 bytes
-TEST 3: OK: Expected signal at tests/builtin/strcat.c:29
+TEST 3: OK: Expected signal at tests/builtin/strcat.c:68
 strcat: destination string string unallocated
-TEST 4: OK: Expected signal at tests/builtin/strcat.c:30
+TEST 4: OK: Expected signal at tests/builtin/strcat.c:69
 strcat: source string string unallocated
-TEST 5: OK: Expected signal at tests/builtin/strcat.c:31
+TEST 5: OK: Expected signal at tests/builtin/strcat.c:70
 strcat: destination string string unallocated
-TEST 6: OK: Expected signal at tests/builtin/strcat.c:32
+TEST 6: OK: Expected signal at tests/builtin/strcat.c:71
 strcat: source string string unallocated
-TEST 7: OK: Expected signal at tests/builtin/strcat.c:33
+TEST 7: OK: Expected signal at tests/builtin/strcat.c:72
 strcat: destination string string is not writable
-TEST 8: OK: Expected signal at tests/builtin/strcat.c:34
+TEST 8: OK: Expected signal at tests/builtin/strcat.c:73
 strcat: overlapping memory areas
-TEST 9: OK: Expected signal at tests/builtin/strcat.c:35
+TEST 9: OK: Expected signal at tests/builtin/strcat.c:74
 strcat: overlapping memory areas
-TEST 10: OK: Expected signal at tests/builtin/strcat.c:36
+TEST 10: OK: Expected signal at tests/builtin/strcat.c:75
 strcat: overlapping memory areas
-TEST 11: OK: Expected signal at tests/builtin/strcat.c:37
-TEST 12: OK: Expected execution at tests/builtin/strcat.c:38
-TEST 13: OK: Expected execution at tests/builtin/strcat.c:51
+TEST 11: OK: Expected signal at tests/builtin/strcat.c:76
+TEST 12: OK: Expected execution at tests/builtin/strcat.c:77
+TEST 13: OK: Expected execution at tests/builtin/strcat.c:90
 strncat: insufficient space in destination string, available: 8 bytes, requires at least 9 bytes
-TEST 14: OK: Expected signal at tests/builtin/strcat.c:52
+TEST 14: OK: Expected signal at tests/builtin/strcat.c:91
 strcat: destination string string unallocated
-TEST 15: OK: Expected signal at tests/builtin/strcat.c:53
+TEST 15: OK: Expected signal at tests/builtin/strcat.c:92
 strncat: source string string unallocated
-TEST 16: OK: Expected signal at tests/builtin/strcat.c:54
+TEST 16: OK: Expected signal at tests/builtin/strcat.c:93
 strcat: destination string string unallocated
-TEST 17: OK: Expected signal at tests/builtin/strcat.c:55
+TEST 17: OK: Expected signal at tests/builtin/strcat.c:94
 strncat: source string string unallocated
-TEST 18: OK: Expected signal at tests/builtin/strcat.c:56
+TEST 18: OK: Expected signal at tests/builtin/strcat.c:95
 strcat: destination string string is not writable
-TEST 19: OK: Expected signal at tests/builtin/strcat.c:57
+TEST 19: OK: Expected signal at tests/builtin/strcat.c:96
 strcat: overlapping memory areas
-TEST 20: OK: Expected signal at tests/builtin/strcat.c:59
+TEST 20: OK: Expected signal at tests/builtin/strcat.c:98
 strncat: insufficient space in destination string, available: 6 bytes, requires at least 7 bytes
-TEST 21: OK: Expected signal at tests/builtin/strcat.c:60
+TEST 21: OK: Expected signal at tests/builtin/strcat.c:99
 strcat: overlapping memory areas
-TEST 22: OK: Expected signal at tests/builtin/strcat.c:61
+TEST 22: OK: Expected signal at tests/builtin/strcat.c:100

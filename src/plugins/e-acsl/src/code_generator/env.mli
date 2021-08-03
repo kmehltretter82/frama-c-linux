@@ -93,7 +93,8 @@ val add_stmt: ?post:bool -> ?before:stmt -> t -> kernel_function -> stmt -> t
 (** [add_stmt env s] extends [env] with the new statement [s].
     [before] may define which stmt the new one is included before. This is to
     say that any labels attached to [before] are moved to [stmt]. [post]
-    indicates that [stmt] should be added after the target statement. *)
+    indicates that [stmt] should be added after the target statement.
+    [before] and [post] are mutually exclusive. *)
 
 val extend_stmt_in_place: t -> stmt -> label:logic_label -> block -> t
 (** [extend_stmt_in_place env stmt ~label b] modifies [stmt] in place in

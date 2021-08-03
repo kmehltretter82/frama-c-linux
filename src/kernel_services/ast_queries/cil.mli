@@ -2281,6 +2281,10 @@ val stmt_of_instr_list : ?loc:location -> instr list -> stmtkind
     The returned logic variable is unique for a given C variable. *)
 val cvar_to_lvar : varinfo -> logic_var
 
+(** Convert a C variable into a logic term.
+    @since Frama-C+dev *)
+val cvar_to_term: loc:location -> varinfo -> term
+
 (** Make a temporary variable to use in annotations *)
 val make_temp_logic_var: logic_type -> logic_var
 

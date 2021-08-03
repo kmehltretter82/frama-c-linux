@@ -2,7 +2,7 @@
 #include "stddef.h"
 #include "stdio.h"
 #include "string.h"
-extern int __e_acsl_sound_verdict;
+extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@ requires valid_string_s: valid_read_string(s);
     ensures acsl_c_equiv: \result ≡ strlen(\old(s));

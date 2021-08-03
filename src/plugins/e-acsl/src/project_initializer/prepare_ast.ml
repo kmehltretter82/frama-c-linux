@@ -25,6 +25,13 @@ open Cil_datatype
 
 let dkey = Options.dkey_prepare
 
+(**************************************************************************)
+(********************** Forward references ********************************)
+(**************************************************************************)
+
+let is_libc_writing_memory_ref: (varinfo -> bool) ref =
+  Extlib.mk_fun "is_libc_writing_memory_ref"
+
 (* ********************************************************************** *)
 (* Environment *)
 (* ********************************************************************** *)
@@ -357,7 +364,10 @@ let sound_verdict_vi =
      let vi = Cil.makeGlobalVar name Cil.intType in
      vi.vstorage <- Extern;
      vi.vreferenced <- true;
+     vi.vattr <- Cil.addAttribute (Attr ("FC_BUILTIN", [])) vi.vattr;
      vi)
+
+let sound_verdict () = Lazy.force sound_verdict_vi
 
 let is_variadic_function vi = match Cil.unrollType vi.vtype with
   | TFun(_, _, variadic, _) -> variadic
@@ -411,7 +421,9 @@ let prepare_global (globals, new_defs) = function
       let new_vi = Dup_functions.generate_vi vi in
       if Kernel_function.is_definition kf then
         prepare_fundec kf
-      else
+      else if not (!is_libc_writing_memory_ref vi) then
+        (* Only display the warning for functions where E-ACSL does not
+           explicitely update its memory model. *)
         (* TODO: this warning could be more precise if emitted during code
            generation; see also E-ACSL issue #85 about partial verdicts *)
         Options.warning
@@ -460,14 +472,11 @@ let prepare_file file =
   let rev_globals, new_defs =
     List.fold_left prepare_global ([], []) file.globals
   in
-  match new_defs with
-  | [] -> ()
-  | _ :: _ ->
-    (* insert the new_definitions at the end and reverse back the globals *)
-    let globals = List.fold_left (fun acc g -> g :: acc) new_defs rev_globals in
-    (* insert [__e_acsl_sound_verdict] at the beginning *)
-    let sg = GVarDecl(Lazy.force sound_verdict_vi, Location.unknown) in
-    file.globals <- sg :: globals
+  (* insert the new_definitions at the end and reverse back the globals *)
+  let globals = List.fold_left (fun acc g -> g :: acc) new_defs rev_globals in
+  (* insert [__e_acsl_sound_verdict] at the beginning *)
+  let sg = GVarDecl(Lazy.force sound_verdict_vi, Location.unknown) in
+  file.globals <- sg :: globals
 
 let prepare () =
   Options.feedback ~level:2 "prepare AST for E-ACSL transformations";

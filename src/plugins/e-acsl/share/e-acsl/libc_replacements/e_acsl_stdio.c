@@ -31,6 +31,7 @@
 #include "../internals/e_acsl_private_assert.h"
 #include "../internals/e_acsl_rtl_io.h"
 #include "../internals/e_acsl_rtl_string.h"
+#include "../observation_model/e_acsl_observation_model.h"
 #include "e_acsl_string.h"
 
 #include "e_acsl_stdio.h"
@@ -942,7 +943,11 @@ int eacsl_builtin_sprintf(const char *fmtdesc, char *buffer, const char *fmt, ..
   va_start(ap, fmt);
   validate_format(fmtdesc, fmt, ap, "sprintf", buffer, len + 1);
   va_start(ap, fmt);
-  return vsprintf(buffer, fmt, ap);
+  int res = vsprintf(buffer, fmt, ap);
+  if (res >= 0) {
+    eacsl_initialize(buffer, res + 1);
+  }
+  return res;
 }
 
 int eacsl_builtin_snprintf(const char *fmtdesc, char *buffer, size_t size,
@@ -956,7 +961,11 @@ int eacsl_builtin_snprintf(const char *fmtdesc, char *buffer, size_t size,
     private_abort("sprintf: output buffer is unallocated or has insufficient length "
       "to store %d characters and \\0 terminator or not writeable\n", size);
   va_start(ap, fmt);
-  return vsnprintf(buffer, size, fmt, ap);
+  int res = vsnprintf(buffer, size, fmt, ap);
+  if (res >= 0 && size > 0) {
+    eacsl_initialize(buffer, size <= res ? size : res + 1);
+  }
+  return res;
 }
 
 int eacsl_builtin_syslog(const char *fmtdesc, int priority, const char *fmt, ...) {

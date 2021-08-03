@@ -3,6 +3,8 @@
 #include "stdio.h"
 char *__gen_e_acsl_literal_string;
 char *__gen_e_acsl_literal_string_2;
+extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
+
 struct ST {
    char *str ;
    int num ;

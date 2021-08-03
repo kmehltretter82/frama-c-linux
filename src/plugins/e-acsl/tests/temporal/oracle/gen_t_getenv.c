@@ -4,7 +4,7 @@
 #include "stdlib.h"
 char *__gen_e_acsl_literal_string_2;
 char *__gen_e_acsl_literal_string;
-extern int __e_acsl_sound_verdict;
+extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@ requires valid_name: valid_read_string(name);
     ensures null_or_valid_result: \result ≡ \null ∨ \valid(\result);

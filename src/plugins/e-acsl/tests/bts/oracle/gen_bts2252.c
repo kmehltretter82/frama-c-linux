@@ -4,7 +4,7 @@
 #include "stdlib.h"
 #include "string.h"
 char *__gen_e_acsl_literal_string;
-extern int __e_acsl_sound_verdict;
+extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@ requires valid_nstring_src: valid_read_nstring(src, n);
     requires room_nstring: \valid(dest + (0 .. n - 1));
@@ -163,6 +163,7 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
   __gen_e_acsl_at_2 = dest;
   __gen_e_acsl_at = dest;
   __retres = strncpy(dest,src,n);
+  __e_acsl_initialize((void *)dest,n);
   {
     unsigned long __gen_e_acsl_size_6;
     __e_acsl_mpz_t __gen_e_acsl__8;

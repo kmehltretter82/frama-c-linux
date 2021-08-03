@@ -93,6 +93,7 @@ SRC_CODE_GENERATOR:= \
 	memory_observer \
 	literal_observer \
 	global_observer \
+	libc \
 	injector
 SRC_CODE_GENERATOR:=$(addprefix src/code_generator/, $(SRC_CODE_GENERATOR))
 
@@ -178,7 +179,8 @@ PLUGIN_TESTS_DIRS := \
 	format \
 	temporal \
 	special \
-	builtin
+	builtin \
+	libc
 
 PLUGIN_TESTS_LIB := $(EACSL_PLUGIN_DIR)/tests/print.ml
 

@@ -2,7 +2,7 @@
 #include "stddef.h"
 #include "stdio.h"
 #include "stdlib.h"
-extern int __e_acsl_sound_verdict;
+extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@ ensures \valid(\result); */
 int *__gen_e_acsl_f(int *x, int *y);

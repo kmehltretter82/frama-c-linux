@@ -14,9 +14,6 @@
 [e-acsl] Warning: annotating undefined function `strchr':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-[e-acsl] Warning: annotating undefined function `strcpy':
-  the generated program may miss memory instrumentation
-  if there are memory-related annotations.
 [e-acsl] Warning: annotating undefined function `fork':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.

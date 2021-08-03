@@ -3,6 +3,8 @@
 #include "stdint.h"
 #include "stdio.h"
 #include "stdlib.h"
+extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
+
 int *pfun(char c, int *p, int *p2, int *p3, int *p4, int i)
 {
   __e_acsl_store_block((void *)(& p),(size_t)8);

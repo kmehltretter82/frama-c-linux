@@ -49,20 +49,22 @@ let replace_literal_strings_in_args env kf_opt (* None for globals *) args =
    RTL. *)
 let rename_caller ~loc caller args =
   if Options.Replace_libc_functions.get ()
-  && Functions.RTL.has_rtl_replacement caller.vname then begin
+  && Functions.RTL.has_rtl_replacement caller.vorig_name then begin
     (* rewrite names of functions for which we have alternative definitions in
        the RTL. *)
     let fvi = Rtl.Symbols.libc_replacement caller in
     fvi, args
   end
   else if Options.Validate_format_strings.get ()
-       && Functions.Libc.is_printf_name caller.vname then
+       && Functions.Libc.is_printf_name caller.vorig_name then
     (* rewrite names of format functions (such as printf). This case differs
        from the above because argument list of format functions is extended with
        an argument describing actual variadic arguments *)
     (* replacement name, e.g., [printf] -> [__e_acsl_builtin_printf] *)
     let fvi = Rtl.Symbols.libc_replacement caller in
-    let fmt = Functions.Libc.get_printf_argument_str ~loc caller.vname args in
+    let fmt =
+      Functions.Libc.get_printf_argument_str ~loc caller.vorig_name args
+    in
     fvi, fmt :: args
   else
     caller, args
@@ -86,7 +88,7 @@ let rec inject_in_init env kf_opt vi off = function
     in
     CompoundInit(typ, List.rev l), env
 
-let inject_in_local_init loc env kf vi = function
+let inject_in_local_init ~loc ~stmt env kf vi = function
   | ConsInit (fvi, sz :: _, _) as init
     when Functions.Libc.is_vla_alloc_name fvi.vname ->
     (* add a store statement when creating a variable length array *)
@@ -97,6 +99,13 @@ let inject_in_local_init loc env kf vi = function
   | ConsInit (caller, args, kind) ->
     let args, env = replace_literal_strings_in_args env (Some kf) args in
     let caller, args = rename_caller ~loc caller args in
+    let _, env =
+      if Libc.is_writing_memory caller then begin
+        let result = Var vi, NoOffset in
+        Libc.update_memory_model ~loc ~stmt env kf ~result caller args
+      end else
+        None, env
+    in
     ConsInit(caller, args, kind), env
 
   | AssignInit init ->
@@ -151,6 +160,14 @@ let inject_in_instr env kf stmt = function
         Cil.evar fvi, args
       | _ -> caller, args
     in
+    (* if this is a call to a libc function that writes into a memory block then
+       manually update the memory model *)
+    let result, env =
+      match caller.enode with
+      | Lval (Var cvi, _) when Libc.is_writing_memory cvi ->
+        Libc.update_memory_model ~loc ~stmt env kf ?result cvi args
+      | _ -> result, env
+    in
     (* add statement tracking initialization of return values *)
     let env =
       match result with
@@ -175,7 +192,7 @@ let inject_in_instr env kf stmt = function
   | Local_init(vi, linit, loc) ->
     let lv = Var vi, NoOffset in
     let env = add_initializer loc ~vi lv ~post:true stmt env kf in
-    let linit, env = inject_in_local_init loc env kf vi linit in
+    let linit, env = inject_in_local_init ~loc ~stmt env kf vi linit in
     Local_init(vi, linit, loc), env
 
   (* nothing to do: *)

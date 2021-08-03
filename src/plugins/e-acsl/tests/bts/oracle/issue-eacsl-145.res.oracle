@@ -7,6 +7,8 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G ∈ {0}
+  __e_acsl_sound_verdict ∈ [--..--]
+  __e_acsl_sound_verdict ∈ [--..--]
   __e_acsl_heap_allocation_size ∈ [--..--]
   __e_acsl_heap_allocated_blocks ∈ [--..--]
   __fc_heap_status ∈ [--..--]
