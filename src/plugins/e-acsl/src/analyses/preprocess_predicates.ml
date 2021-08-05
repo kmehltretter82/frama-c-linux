@@ -69,7 +69,9 @@ let preprocess ~loc p =
       match t.term_node, t.term_type with
       | TLval tlv, lty ->
         let init =
-          Logic_const.pinitialized ~loc (llabel, Logic_utils.mk_logic_AddrOf ~loc tlv lty)
+          Logic_const.pinitialized
+            ~loc
+            (llabel, Logic_utils.mk_logic_AddrOf ~loc tlv lty)
         in
         (* need to store a copy, to avoid p to appear in its own preprocessed form (otherwise it loops) *)
         let p_copy =

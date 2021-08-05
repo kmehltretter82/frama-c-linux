@@ -153,9 +153,16 @@ let generate_kf ~loc fname env ret_ty params_ty li =
       let ret_ty_ptr = TPtr(ret_ty, []) (* call by reference *) in
       let vname = vname ^ "_arg" in
       let vi = Cil.makeVarinfo false true vname ret_ty_ptr in
-      vi, Cil.voidType, vi :: params, (vname, ret_ty_ptr, []) :: params_ty_vi, true
+      vi,
+      Cil.voidType,
+      vi :: params, (vname, ret_ty_ptr, []) :: params_ty_vi,
+      true
     else
-      Cil.makeVarinfo false false vname ret_ty, ret_ty, params, params_ty_vi, false
+      Cil.makeVarinfo false false vname ret_ty,
+      ret_ty,
+      params,
+      params_ty_vi,
+      false
   in
   (* build the function's varinfo *)
   let vi =
@@ -218,18 +225,33 @@ let generate_kf ~loc fname env ret_ty params_ty li =
            *__retres_arg[0] *)
         let vi_res = List.hd params_with_ret in
         Logic_const.new_identified_term
-          (Smart_term.array_at0 ~loc (Smart_term.deref ~loc (Logic_const.tvar (Cil.cvar_to_lvar vi_res))))
+          (Smart_term.array_at0 ~loc
+             (Smart_term.deref ~
+                loc
+                (Logic_const.tvar (Cil.cvar_to_lvar vi_res))))
       else
         Logic_const.new_identified_term (Logic_const.tresult fundec.svar.vtype)
     in
     let rec deref_all tm cty deps =
       if Smart_term.is_pointer_type cty then
-        deref_all (Smart_term.deref ~loc ~cty tm) (Smart_term.deref_cty cty) ((Logic_const.new_identified_term tm)::deps)
+        deref_all
+          (Smart_term.deref ~loc ~cty tm)
+          (Smart_term.deref_cty cty)
+          ((Logic_const.new_identified_term tm)::deps)
       else
         (Logic_const.new_identified_term tm)::deps
     in
-    let deps = List.fold_right2 (fun lv (_,cty,_) -> deref_all (Logic_const.tvar lv) cty) li.l_profile params_ty_vi [] in
-    Annotations.add_assigns ~keep_empty:false Env.emitter ~behavior:Cil.default_behavior_name kf (Writes [ assigned_var , From deps]);
+    let deps = List.fold_right2
+        (fun lv (_,cty,_) -> deref_all (Logic_const.tvar lv) cty)
+        li.l_profile params_ty_vi
+        []
+    in
+    Annotations.add_assigns
+      ~keep_empty:false
+      Env.emitter
+      ~behavior:Cil.default_behavior_name
+      kf
+      (Writes [ assigned_var , From deps]);
     let b, env = generate_body ~loc kf env ret_ty ret_vi li.l_body in
     fundec.sbody <- b;
     (* add the generated variables in the necessary lists *)
@@ -371,8 +393,9 @@ let function_to_exp ~loc fname env kf t li params_ty args =
     (fun vi _ -> [ Cil.mkStmtOneInstr ~valid_sid:true (mkcall vi) ])
 
 let raise_errors l = function
-  | LBnone -> Error.not_yet "logic functions or predicates \
-                             with no definition nor reads clause"
+  | LBnone ->
+    Error.not_yet
+      "logic functions or predicates with no definition nor reads clause"
   | LBreads _ ->
     Error.not_yet "logic functions or predicates performing read accesses"
   | LBinductive _ -> Error.not_yet "inductive logic functions"
@@ -428,7 +451,8 @@ let tapp_to_exp ~adata kf env ?eargs tapp =
         in
         vi, e, adata, env
       else
-        let () = raise_errors l li.l_body in
+        begin
+          raise_errors l li.l_body;
         (* build the arguments and compute the integer_ty of the parameters *)
         let params_ty, args, adata, env =
           let eargs, adata, env =
@@ -446,37 +470,42 @@ let tapp_to_exp ~adata kf env ?eargs tapp =
                   "[Tapp] unexpected number of arguments when calling %s"
                   fname;
               eargs, adata, env
-              in
-              try
-                List.fold_right2
-                  (fun targ earg (params_ty, args, env) ->
-                     let param_ty = Typing.get_number_ty ~lenv:(Env.Local_vars.get env) targ in
-                     let e, env =
-                       try
-                         let ty = Typing.typ_of_number_ty param_ty in
-                         Typed_number.add_cast
-                           ~loc
-                           env
-                           kf
-                           (Some ty)
-                           Typed_number.C_number
-                           (Some targ)
-                           earg
-                       with Typing.Not_a_number ->
-                         earg, env
-                     in
-                     param_ty :: params_ty, e :: args, env)
-                  targs eargs
-                  ([], [], env)
-              with Invalid_argument _ ->
-                Options.fatal
-                  "[Tapp] unexpected number of arguments when calling %s"
-                  fname
           in
-          let gen_fname =
-            Varname.get ~scope:Varname.Global (Functions.RTL.mk_gen_name fname)
-          in
-          function_to_exp ~loc gen_fname env kf tapp li params_ty args;
+          try
+            List.fold_right2
+              (fun targ earg (params_ty, args, env) ->
+                 let param_ty =
+                   Typing.get_number_ty
+                     ~lenv:(Env.Local_vars.get env)
+                     targ
+                 in
+                 let e, env =
+                   try
+                     let ty = Typing.typ_of_number_ty param_ty in
+                     Typed_number.add_cast
+                       ~loc
+                       env
+                       kf
+                       (Some ty)
+                       Typed_number.C_number
+                       (Some targ)
+                       earg
+                   with Typing.Not_a_number ->
+                     earg, env
+                 in
+                 param_ty :: params_ty, e :: args, env)
+              targs eargs
+              ([], [], env)
+          with Invalid_argument _ ->
+            Options.fatal
+              "[Tapp] unexpected number of arguments when calling %s"
+              fname
+        in
+        let gen_fname =
+          Varname.get ~scope:Varname.Global (Functions.RTL.mk_gen_name fname)
+        in
+        function_to_exp ~loc gen_fname env kf tapp li params_ty args;
+      end
     in
     e, adata, env
   | _ ->

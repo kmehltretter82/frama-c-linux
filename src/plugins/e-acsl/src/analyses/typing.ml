@@ -180,7 +180,11 @@ module Function_params_ty =
 (* Memoization module which retrieves the computed info of some terms. If the
    info is already computed for a term, it is never recomputed *)
 module Memo: sig
-  val memo: ?lenv:Function_params_ty.t -> (term -> computed_info) -> term -> computed_info
+  val memo:
+    ?lenv:Function_params_ty.t ->
+    (term -> computed_info) ->
+    term ->
+    computed_info
   val get: ?lenv:Function_params_ty.t -> term -> computed_info
   val clear: unit -> unit
 end = struct
@@ -195,19 +199,22 @@ end = struct
      - type info of many terms are accessed several times
      - the translation of E-ACSL guarded quantifications generates
        new terms (see module {!Quantif}) which must be typed. The term
-       corresponding to the bound variable [x] is actually used twice: once in the
-       guard and once for encoding [x+1] when incrementing it. The memoization is
-       only useful here and indeed prevent the generation of one extra variable in
-       some cases. *)
+       corresponding to the bound variable [x] is actually used twice: once in
+       the guard and once for encoding [x+1] when incrementing it. The
+       memoization is only useful here and indeed prevent the generation of one
+       extra variable in some cases. *)
   let tbl = Misc.Id_term.Hashtbl.create 97
 
   (* The type of the logic function
      \\@ logic integer f (integer x) = x + 1;
-     depends on the type of x. But our type system does not handle dependent types,
-     which could let us express this dependency natively. Instead, we use the following
-     trick to simulate the dependency: we type the corresponding definition (in the example x+1)
-     several times, corresponding to the various calls to the function f in the program.
-     We distinguish the calls to the function by storing the associated callstack. *)
+     depends on the type of [x]. But our type system does not handle dependent
+     types, which could let us express this dependency natively. Instead,
+     we use the following trick to simulate the dependency: we type the
+     corresponding definition (in the example [x+1]) several times,
+     corresponding to the various calls to the function [f] in the program.
+     We distinguish the calls to the function by storing the type of the
+     arguments corresponding to each call, and we weaken the typing so that it
+     is invariant when the arguments have the same type. *)
   let dep_tbl : computed_info Function_params_ty.Hashtbl.t Misc.Id_term.Hashtbl.t
     = Misc.Id_term.Hashtbl.create 97
 
@@ -216,7 +223,8 @@ end = struct
       let types = Misc.Id_term.Hashtbl.find dep_tbl t in
       Function_params_ty.Hashtbl.find types lenv
     with Not_found ->
-      Options.fatal "[typing] type of term '%a' was never computed with arguments '%a'."
+      Options.fatal
+        "[typing] type of term '%a' was never computed with arguments '%a'."
         Printer.pp_term t Function_params_ty.pretty lenv
 
   let get_nondep t =
@@ -547,7 +555,14 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx ?(lenv=[]) t =
              [Papp] into [Tapp] *)
           Stack.push
             (fun () ->
-               let typed_params = type_params ~use_gmp_opt ~lenv li.l_profile args li.l_var_info.lv_name in
+               let typed_params =
+                 type_params
+                   ~use_gmp_opt
+                   ~lenv
+                   li.l_profile
+                   args
+                   li.l_var_info.lv_name
+               in
                ignore (type_predicate ~lenv:typed_params p);
                List.iter Interval.Env.remove li.l_profile)
             stack_type_subterms;
@@ -560,7 +575,18 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx ?(lenv=[]) t =
               (* TODO: what if the function returns a real? *)
               let ty = ty_of_logic_ty ~term:t lty in
               let type_subterm () =
-                let typed_params = type_params ~use_gmp_opt ~lenv li.l_profile args li.l_var_info.lv_name in
+                let typed_params =
+                  type_params
+                    ~use_gmp_opt
+                    ~lenv
+                    li.l_profile
+                    args
+                    li.l_var_info.lv_name
+                in
+                (* Since there are no global logic variables, the typing of the
+                   inner block of the function only depends on the function's
+                   own arguments, so the [~lenv] parameter gets replaced with
+                   the type of the parameters in the current function calls *)
                 ignore (type_term ~use_gmp_opt ~lenv:typed_params t_body)
               in
               let clear_env () = List.iter Interval.Env.remove li.l_profile in
@@ -574,29 +600,30 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx ?(lenv=[]) t =
           end
         | LBnone ->
           (match args with
-           | [ t1; t2; lambda ] ->
-             let anonymous =
-               Logic_const.term (TBinOp(PlusA, t2, Cil.lone ())) Linteger
-             in
-             let ty_bound = Interval.infer anonymous in
-             let ty_bound =
-               ty_of_interv (Interval.join ty_bound (Interval.infer t1))
-             in
-             ignore
-               (type_term
-                  ~use_gmp_opt:true ~arith_operand:true ~ctx:ty_bound ~lenv t1);
-             ignore
-               (type_term
-                  ~use_gmp_opt:true ~arith_operand:true ~ctx:ty_bound ~lenv t2);
-             let ty = ty_of_interv (Interval.infer t) in
-             ignore (type_term ~use_gmp_opt:true ?ctx ~lenv lambda);
-             dup ty
-           | [ ] | [ _ ] | [ _; _ ] | _ :: _ :: _ :: _ ->
-             Error.not_yet "logic functions or predicates with no definition \
+            | [ t1; t2; lambda ] ->
+              let anonymous =
+                Logic_const.term (TBinOp(PlusA, t2, Cil.lone ())) Linteger
+              in
+              let ty_bound = Interval.infer anonymous in
+              let ty_bound =
+                ty_of_interv (Interval.join ty_bound (Interval.infer t1))
+              in
+              ignore
+                (type_term
+                   ~use_gmp_opt:true ~arith_operand:true ~ctx:ty_bound ~lenv t1);
+              ignore
+                (type_term
+                   ~use_gmp_opt:true ~arith_operand:true ~ctx:ty_bound ~lenv t2);
+              let ty = ty_of_interv (Interval.infer t) in
+              ignore (type_term ~use_gmp_opt:true ?ctx ~lenv lambda);
+              dup ty
+            | [ ] | [ _ ] | [ _; _ ] | _ :: _ :: _ :: _ ->
+              Error.not_yet "logic functions or predicates with no definition \
                             nor reads clause"
-             (* TODO : improve error message to distinguish error messages
-                corresponding to unsupported primitives and wrong application of
-                supported primitive (one is a fatal and the other is a not_yet) *)
+              (* TODO : improve error message to distinguish error messages
+                 corresponding to unsupported primitives and wrong application
+                 of supported primitive
+                 (one is a fatal and the other is a not_yet) *)
           )
         | LBreads _ ->
           Error.not_yet "logic functions or predicates performing read accesses"
@@ -675,7 +702,8 @@ and type_params params ~use_gmp_opt ~lenv args fname =
       params
       args
       []
-  with Invalid_argument _ -> Options.fatal "[Tapp] unexpected number of arguments when calling %s" fname
+  with Invalid_argument _ ->
+    Options.fatal "[Tapp] unexpected number of arguments when calling %s" fname
 
 (* [type_bound_variables] infers an interval associated with each of
    the provided bounds of a quantified variable, and provides a term
@@ -774,7 +802,14 @@ and type_predicate ?(lenv=[]) p =
         begin
           match li.l_body with
           | LBpred p ->
-            let typed_params = type_params ~use_gmp_opt:true ~lenv li.l_profile args li.l_var_info.lv_name in
+            let typed_params =
+              type_params
+                ~use_gmp_opt:true
+                ~lenv
+                li.l_profile
+                args
+                li.l_var_info.lv_name
+            in
             ignore (type_predicate ~lenv:typed_params p);
             List.iter Interval.Env.remove li.l_profile
           | LBnone -> ()
@@ -821,9 +856,11 @@ and type_predicate ?(lenv=[]) p =
       | Pforall _
       | Pexists _ -> begin
           match Bound_variables.get_preprocessed_quantifier p with
-          (* If there is no  preprocessed form for the quantifier, it means that the preprocessing phase
-             raised an error. It is costly to analyze again and determine what was the error, so instead
-             we raise the exception [Ignored] which signifies that no error message should be displayed *)
+          (* If there is no  preprocessed form for the quantifier, it means that
+             the preprocessing phase raised an error. It is costly to analyze
+             again and determine what was the error, so instead we raise the
+             exception [Ignored] which signifies that no error message should
+             be displayed *)
           | None -> Error.ignored ()
           | Some (guards, goal) ->
             let guards =

@@ -47,7 +47,6 @@ let error_msg quantif msg pp x =
   in
   msg1 ^ msg2
 
-
 (** A module to work with quantifiers at preprocessing time. We create
     a datatype to hash quantified predicates by simply giving the hash
     of their first variable.
@@ -74,11 +73,12 @@ module Quantified_predicate =
       let mem_project = Datatype.never_any_project
     end)
 
-(******************************************************************************)
+(****************************************************************************)
 (** Storing the preprocessed quantifiers *)
-(******************************************************************************)
+(****************************************************************************)
 
-(* Memoization module to store the preprocessed form of a quantified predicate *)
+(* Memoization module to store the preprocessed form of a quantified predicate
+   *)
 module Quantifier: sig
   val add: predicate -> (term * logic_var * term) list -> predicate -> unit
   val get: predicate -> ((term * logic_var * term) list * predicate) option
@@ -695,7 +695,8 @@ end
       function
       (* library functions and built-ins *)
       | GVarDecl(vi, _) | GVar(vi, _, _)
-      | GFunDecl(_, vi, _) | GFun({ svar = vi }, _) when Builtins.mem vi.vname ->
+      | GFunDecl(_, vi, _)
+      | GFun({ svar = vi }, _) when Builtins.mem vi.vname ->
         Cil.SkipChildren
 
       | GVarDecl(vi, _) | GVar(vi, _, _) | GFun({ svar = vi }, _)
