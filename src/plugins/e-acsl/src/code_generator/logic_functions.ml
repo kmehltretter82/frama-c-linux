@@ -201,20 +201,23 @@ let generate_kf ~loc fname env ret_ty params_ty li =
     let env = Env.push env in
     (* fill the typing environment with the function's parameters
        before generating the code (code generation invokes typing) *)
-    let env = Env.Local_vars.create env in
+    let env = Env.Local_vars.push_new env in
     let env =
       let add ty env =
         Env.Local_vars.add env ty
       in
+      (* The list of parameters has to respect the order of the parameters to
+         keep consistency with the typing. Hence the folding is on the right.
+         This is acceptable since in practice functions have few parameters *)
       List.fold_right add params_ty env
     in
     let env =
-      let add lvi vi env =
+      let add env lvi vi =
         let i = Interval.interv_of_typ vi.vtype in
         Interval.Env.add lvi i;
-        Env.Logic_binding.add_binding env lvi vi;
+        Env.Logic_binding.add_binding env lvi vi
       in
-      List.fold_right2 add li.l_profile params env
+      List.fold_left2 add env li.l_profile params
     in
     let assigned_var =
       let loc = Location.unknown in
@@ -223,7 +226,10 @@ let generate_kf ~loc fname env ret_ty params_ty li =
         (* If the result is passed as argument, it is of type __e_acsl_mpz_t
            accessing the left value which is assigned is then done by
            *__retres_arg[0] *)
-        let vi_res = List.hd params_with_ret in
+        let vi_res = match params_with_ret with
+          | vi :: _ -> vi
+          | [] -> assert false
+        in
         Logic_const.new_identified_term
           (Smart_term.array_at0 ~loc
              (Smart_term.deref ~

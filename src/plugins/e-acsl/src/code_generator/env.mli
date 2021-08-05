@@ -193,7 +193,7 @@ val with_rte_and_result: f:(t -> 'a * t) -> t -> bool -> 'a * t
 val emitter : Emitter.t
 
 module Local_vars: sig
-  val create: t -> t
+  val push_new: t -> t
   val add: t -> Typing.number_ty -> t
   val get: t -> Typing.Function_params_ty.t
 end

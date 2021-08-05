@@ -27,7 +27,14 @@ open Cil_types
 
 let dkey = Options.dkey_typing
 
-let stack_type_subterms : (unit -> unit) Stack.t = Stack.create ()
+(* In order to properly handle recursive functions the typing method has to
+   store the result of the fixpoint algorithm on intervals before typing
+   the inner block of the function. To this end we stop the recursive
+   depth-first descent of the AST at the level of function calls, and perform a
+   breadth-first descent from the functions calls. We achieve this with
+   a stack [pending_typing] which stores the roots of the functions calls from
+   which a new descent is starting *)
+let pending_typing : (unit -> unit) Stack.t = Stack.create ()
 
 (******************************************************************************)
 (** Datatype and constructor *)
@@ -175,7 +182,13 @@ type computed_info =
 module Function_params_ty =
   Datatype.List_with_collections
     (D)
-    (struct let module_name = "E_ACSL.typing.Function_params_ty" end)
+    (struct let module_name = "E_ACSL.Typing.Function_params_ty" end)
+
+module Id_term_with_lenv =
+  Datatype.Pair_with_collections
+    (Misc.Id_term)
+    (Function_params_ty)
+    (struct let module_name = "E_ACSL.Typing.Id_term_with_lenv" end)
 
 (* Memoization module which retrieves the computed info of some terms. If the
    info is already computed for a term, it is never recomputed *)
@@ -215,13 +228,12 @@ end = struct
      We distinguish the calls to the function by storing the type of the
      arguments corresponding to each call, and we weaken the typing so that it
      is invariant when the arguments have the same type. *)
-  let dep_tbl : computed_info Function_params_ty.Hashtbl.t Misc.Id_term.Hashtbl.t
-    = Misc.Id_term.Hashtbl.create 97
+  let dep_tbl : computed_info Id_term_with_lenv.Hashtbl.t
+    = Id_term_with_lenv.Hashtbl.create 97
 
   let get_dep lenv t =
     try
-      let types = Misc.Id_term.Hashtbl.find dep_tbl t in
-      Function_params_ty.Hashtbl.find types lenv
+      Id_term_with_lenv.Hashtbl.find dep_tbl (t,lenv)
     with Not_found ->
       Options.fatal
         "[typing] type of term '%a' was never computed with arguments '%a'."
@@ -248,17 +260,10 @@ end = struct
 
   let memo_dep f t lenv =
     try
-      let types = Misc.Id_term.Hashtbl.find dep_tbl t in
-      try Function_params_ty.Hashtbl.find types lenv
-      with Not_found ->
-        let ty = f t in
-        Function_params_ty.Hashtbl.add types lenv ty;
-        ty
+      Id_term_with_lenv.Hashtbl.find dep_tbl (t, lenv)
     with Not_found ->
-      let types = Function_params_ty.Hashtbl.create 97 in
       let ty = f t in
-      Function_params_ty.Hashtbl.add types lenv ty;
-      Misc.Id_term.Hashtbl.add dep_tbl t types;
+      Id_term_with_lenv.Hashtbl.add dep_tbl (t, lenv) ty;
       ty
 
   let memo ?(lenv=[]) f t =
@@ -269,7 +274,7 @@ end = struct
   let clear () =
     Options.feedback ~dkey ~level:4 "clearing the typing tables";
     Misc.Id_term.Hashtbl.clear tbl;
-    Misc.Id_term.Hashtbl.clear dep_tbl
+    Id_term_with_lenv.Hashtbl.clear dep_tbl
 
 end
 
@@ -555,17 +560,17 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx ?(lenv=[]) t =
              [Papp] into [Tapp] *)
           Stack.push
             (fun () ->
-               let typed_params =
-                 type_params
+               let typed_args =
+                 type_args
                    ~use_gmp_opt
                    ~lenv
                    li.l_profile
                    args
                    li.l_var_info.lv_name
                in
-               ignore (type_predicate ~lenv:typed_params p);
+               ignore (type_predicate ~lenv:typed_args p);
                List.iter Interval.Env.remove li.l_profile)
-            stack_type_subterms;
+            pending_typing;
           dup c_int
         | LBterm t_body ->
           begin match li.l_type with
@@ -574,9 +579,9 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx ?(lenv=[]) t =
             | Some lty ->
               (* TODO: what if the function returns a real? *)
               let ty = ty_of_logic_ty ~term:t lty in
-              let type_subterm () =
-                let typed_params =
-                  type_params
+              let type_args_and_body () =
+                let typed_args =
+                  type_args
                     ~use_gmp_opt
                     ~lenv
                     li.l_profile
@@ -587,15 +592,15 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx ?(lenv=[]) t =
                    inner block of the function only depends on the function's
                    own arguments, so the [~lenv] parameter gets replaced with
                    the type of the parameters in the current function calls *)
-                ignore (type_term ~use_gmp_opt ~lenv:typed_params t_body)
+                ignore (type_term ~use_gmp_opt ~lenv:typed_args t_body)
               in
               let clear_env () = List.iter Interval.Env.remove li.l_profile in
               Stack.push
                 clear_env
-                stack_type_subterms;
+                pending_typing;
               Stack.push
-                type_subterm
-                stack_type_subterms;
+                type_args_and_body
+                pending_typing;
               dup ty
           end
         | LBnone ->
@@ -687,10 +692,10 @@ and type_term_offset ~lenv t = match t with
     ignore (type_term ~use_gmp_opt:false ~ctx ~lenv t);
     type_term_offset ~lenv toff
 
-and type_params params ~use_gmp_opt ~lenv args fname =
+and type_args params ~use_gmp_opt ~lenv args fname =
   try
     List.fold_right2
-      (fun lv t (typed_params : Function_params_ty.t) ->
+      (fun lv t (typed_args : Function_params_ty.t) ->
          let ty_arg = (type_term ~use_gmp_opt ~lenv t).ty in
          begin
            try
@@ -698,7 +703,7 @@ and type_params params ~use_gmp_opt ~lenv args fname =
              Interval.Env.add lv (Interval.interv_of_typ typ_arg)
            with Not_a_number -> ()
          end;
-         ty_arg :: typed_params)
+         ty_arg :: typed_args)
       params
       args
       []
@@ -733,11 +738,11 @@ and type_bound_variables ~loc ~lenv (t1, lv, t2) =
       (match Cil.unrollType ty with
        | TInt(ik, _) -> mk_ctx ~use_gmp_opt:true (C_integer ik)
        | ty ->
-         Options.fatal "unexpected type %a for quantified variable %a"
+         Options.fatal "unexpected C type %a for quantified variable %a"
            Printer.pp_typ ty
            Printer.pp_logic_var lv)
     | lty ->
-      Options.fatal "unexpected type %a for quantified variable %a"
+      Options.fatal "unexpected logic type %a for quantified variable %a"
         Printer.pp_logic_type lty
         Printer.pp_logic_var lv
   in
@@ -802,15 +807,15 @@ and type_predicate ?(lenv=[]) p =
         begin
           match li.l_body with
           | LBpred p ->
-            let typed_params =
-              type_params
+            let typed_args =
+              type_args
                 ~use_gmp_opt:true
                 ~lenv
                 li.l_profile
                 args
                 li.l_var_info.lv_name
             in
-            ignore (type_predicate ~lenv:typed_params p);
+            ignore (type_predicate ~lenv:typed_args p);
             List.iter Interval.Env.remove li.l_profile
           | LBnone -> ()
           | LBreads _ -> ()
@@ -894,16 +899,16 @@ let type_term ~use_gmp_opt ?ctx ?(lenv=[]) t =
   Options.feedback ~dkey ~level:4 "typing term '%a' in ctx '%a'."
     Printer.pp_term t (Pretty_utils.pp_opt D.pretty) ctx;
   ignore (type_term ~use_gmp_opt ?ctx ~lenv t);
-  while not (Stack.is_empty stack_type_subterms) do
-    Stack.pop stack_type_subterms ()
+  while not (Stack.is_empty pending_typing) do
+    Stack.pop pending_typing ()
   done
 
 let type_named_predicate ?(lenv=[]) p =
   Options.feedback ~dkey ~level:3 "typing predicate '%a'."
     Printer.pp_predicate p;
   ignore (type_predicate ~lenv p);
-  while not (Stack.is_empty stack_type_subterms) do
-    Stack.pop stack_type_subterms ()
+  while not (Stack.is_empty pending_typing) do
+    Stack.pop pending_typing ()
   done
 
 let unsafe_set t ?ctx ty =

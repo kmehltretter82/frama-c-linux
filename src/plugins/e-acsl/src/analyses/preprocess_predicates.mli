@@ -20,16 +20,16 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
-
-(** This module is dedicated to some preprocessing on the predicates
+(** This module is dedicated to some preprocessing on the predicates:
     - It guards all the [Pvalid] and [Pvalid_read] clauses with
-      an adequate [Pinitialized] clause
+      an adequate [Pinitialized] clause;
     - It replaces all the applications [Papp] by a corresponding
       term obtained as an application [Tapp]
       The predicates that have undergone these changed are
       called the preprocessed predicates.
 *)
+
+open Cil_types
 
 val preprocess : file -> unit
 (** Preprocess all the predicates of the ast and store the results *)

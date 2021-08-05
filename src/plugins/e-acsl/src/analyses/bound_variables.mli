@@ -50,7 +50,7 @@ val preprocess : file -> unit
     in an hashtable *)
 
 val preprocess_annot : code_annotation -> unit
-(** Preprocess the quantified in a given code annotation *)
+(** Preprocess the quantified predicate in a given code annotation *)
 
 val preprocess_predicate : predicate -> unit
 (** Preprocess the quantified predicate in a given predicate *)

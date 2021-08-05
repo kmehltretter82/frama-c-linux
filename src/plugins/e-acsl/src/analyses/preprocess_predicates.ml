@@ -21,7 +21,8 @@
 (**************************************************************************)
 
 open Cil_types
-open Lscope
+
+type pred_or_term = Lscope.pred_or_term
 
 module Id_predicate =
   Datatype.Make_with_collections
@@ -49,7 +50,7 @@ end = struct
 
   let get p =
     try Id_predicate.Hashtbl.find tbl p
-    with Not_found -> PoT_pred p
+    with Not_found -> Lscope.PoT_pred p
 
   let memo process p =
     try ignore (Id_predicate.Hashtbl.find tbl p) with
@@ -80,21 +81,20 @@ let preprocess ~loc p =
           | Pvalid _ -> Logic_const.pvalid ~loc (llabel, t)
           | _ -> assert false
         in
-        Some (PoT_pred (Logic_const.pand ~loc (init, p_copy)))
+        Some (Lscope.PoT_pred (Logic_const.pand ~loc (init, p_copy)))
       | _ -> None
     end
   | Papp(li, labels, args) ->
-    (* Simply use the implementation of Tapp(li, labels, args).
-       To achieve this, we create a clone of [li] for which the type is
-       transformed from [None] (type of predicates) to
-       [Some int] (type as a term). *)
+    (* Simply use the implementation of Tapp(li, labels, args). To achieve this,
+       we create a clone of [li] for which the type is transformed from [None]
+       (type of predicates) to [Some boolean] (typed as a term). *)
     let prj = Project.current () in
     let o = object inherit Visitor.frama_c_copy prj end in
     let li = Visitor.visitFramacLogicInfo o li in
-    let lty = Ctype Cil.intType in
+    let lty = Logic_const.boolean_type in
     li.l_type <- Some lty;
     let tapp = Logic_const.term ~loc (Tapp(li, labels, args)) lty in
-    Some (PoT_term tapp)
+    Some (Lscope.PoT_term tapp)
   | _ -> None
 
 let preprocessor = object
