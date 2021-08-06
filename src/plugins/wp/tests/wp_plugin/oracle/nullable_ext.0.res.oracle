@@ -3,21 +3,46 @@
 [wp] Running WP plugin...
 [wp] Warning: In caveat model with nullable arguments, -wp-(no)-rte shall be explicitly positioned.
 [wp] Warning: Missing RTE guards
-[wp] 6 goals scheduled
-[wp] [Alt-Ergo] Goal typed_caveat_nullable_coherence_check_must_fail : Unsuccess
-[wp] [Qed] Goal typed_caveat_nullable_coherence_check : Valid
-[wp] [Qed] Goal typed_caveat_nullable_coherence_assigns : Valid
-[wp] [Qed] Goal typed_caveat_nullable_in_context_assigns_part1 : Valid
-[wp] [Qed] Goal typed_caveat_nullable_in_context_assigns_part2 : Valid
-[wp] [Qed] Goal typed_caveat_with_declaration_assigns : Valid
-[wp] Proved goals:    5 / 6
-  Qed:             5 
-  Alt-Ergo:        0  (unsuccess: 1)
 ------------------------------------------------------------
- Functions                 WP     Alt-Ergo  Total   Success
-  nullable_coherence        2        -        3      66.7%
-  nullable_in_context       2        -        2       100%
-  with_declaration          1        -        1       100%
+  Function nullable_coherence
+------------------------------------------------------------
+
+Goal Check 'must_fail' (file tests/wp_plugin/nullable_ext.c, line 24):
+Assume { (* Then *) Have: null = pointer_p. }
+Prove: false.
+
+------------------------------------------------------------
+
+Goal Check (file tests/wp_plugin/nullable_ext.c, line 27):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_plugin/nullable_ext.c, line 19) in 'nullable_coherence':
+Prove: true.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function nullable_in_context
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_plugin/nullable_ext.c, line 33) in 'nullable_in_context' (1/2):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_plugin/nullable_ext.c, line 33) in 'nullable_in_context' (2/2):
+Effect at line 40
+Prove: true.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function with_declaration
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_plugin/nullable_ext.c, line 43) in 'with_declaration':
+Prove: true.
+
 ------------------------------------------------------------
 [wp] tests/wp_plugin/nullable_ext.c:22: Warning: 
   Memory model hypotheses for function 'nullable_coherence':

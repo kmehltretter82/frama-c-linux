@@ -843,23 +843,15 @@ struct
 
   module Nullable_extension =
   struct
-    let type_term typing_context loc e =
-      match e.Logic_ptree.lexpr_node with
-      | Logic_ptree.PLvar s ->
-          let lv = typing_context.Logic_typing.find_var s in
-          begin match lv.lv_origin with
-            | Some vi when Cil.isPointerType vi.vtype && vi.vformal ->
-                make_nullable vi ;
-                Logic_const.tvar ~loc lv
-            | _ ->
-                typing_context.error loc "No pointer: %s" s
-          end
-      | _  ->
-          typing_context.error loc "Illegal expression %a"
-            Logic_print.print_lexpr e
+    let type_term ctxt loc e =
+      match ctxt.Logic_typing.type_term ctxt ctxt.pre_state e with
+      | { term_node = TLval (TVar { lv_origin = Some vi }, TNoOffset) } as term
+        when Cil.isPointerType vi.vtype && vi.vformal ->
+          make_nullable vi ; term
+      | t -> ctxt.error loc "Not a formal pointer: %a" Cil_printer.pp_term t
 
-    let typer typing_context loc l =
-      Ext_terms (List.map (type_term typing_context loc) l)
+    let typer ctxt loc l =
+      Ext_terms (List.map (type_term ctxt loc) l)
   end
 
   let () =
