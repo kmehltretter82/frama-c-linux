@@ -2,6 +2,7 @@
 [kernel] Parsing tests/wp_acsl/terminates_formulae.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
+[wp] [CFG] Goal variant_terminates : Valid (Trivial)
 [wp] 10 goals scheduled
 [wp] [Alt-Ergo] Goal typed_base_call_terminates : Unsuccess
 [wp] [Qed] Goal typed_call_same_terminates : Valid
@@ -13,7 +14,7 @@
 [wp] [Qed] Goal typed_variant_loop_variant_positive : Valid
 [wp] [Alt-Ergo] Goal typed_no_variant_terminates : Unsuccess
 [wp] [Qed] Goal typed_no_variant_loop_assigns : Valid
-[wp] Proved goals:    6 / 10
+[wp] Proved goals:    7 / 11
   Qed:             5 
   Alt-Ergo:        1  (unsuccess: 4)
 ------------------------------------------------------------

@@ -182,6 +182,7 @@ let clear_scheduled () =
     exercised := 0 ;
     session := GOALS.empty ;
     provers := PM.empty ;
+    WpAnnot.trivial_terminates := 0 ;
     WpAnnot.unreachable_proved := 0 ;
     WpAnnot.unreachable_failed := 0 ;
   end
@@ -462,13 +463,19 @@ let do_report_scheduled () =
     Wp_parameters.result "%d goal%s generated" !exercised plural
   else
     let total =
-      !scheduled + !WpAnnot.unreachable_failed + !WpAnnot.unreachable_proved in
+      !scheduled +
+      !WpAnnot.unreachable_failed +
+      !WpAnnot.unreachable_proved +
+      !WpAnnot.trivial_terminates in
     if total > 0 then
       begin
+        let passed =
+          !WpAnnot.unreachable_proved + !WpAnnot.trivial_terminates
+        in
         let passed = GOALS.fold
             (fun g n ->
                if Wpo.is_passed g then succ n else n
-            ) !session !WpAnnot.unreachable_proved in
+            ) !session passed in
         let mode = Cache.get_mode () in
         if mode <> Cache.NoCache then do_report_cache_usage mode ;
         Wp_parameters.result "%t"
