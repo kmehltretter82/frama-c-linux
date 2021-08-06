@@ -390,7 +390,7 @@ and context_insensitive_term_to_exp kf env t =
       let mk_stmts _v e =
         assert (Gmp_types.Z.is_t ty);
         let cond =
-          Smart_stmt.runtime_check
+          Assert.runtime_check
             ~pred_kind:Assert
             (Env.annotation_kind env)
             kf
@@ -475,7 +475,8 @@ and context_insensitive_term_to_exp kf env t =
           in
           let pname = bop_name ^ "_rhs_fits_in_mp_bitcnt_t" in
           let pred = { pred with pred_name = pname :: pred.pred_name } in
-          let cond = Smart_stmt.runtime_check
+          let cond =
+            Assert.runtime_check
               ~pred_kind:Assert
               Smart_stmt.RTE
               kf
@@ -540,7 +541,8 @@ and context_insensitive_term_to_exp kf env t =
           in
           let e1_guard_cond =
             let pred = Logic_const.prel ~loc (Rge, t1, zero) in
-            let cond = Smart_stmt.runtime_check
+            let cond =
+              Assert.runtime_check
                 ~pred_kind:Assert
                 Smart_stmt.RTE
                 kf
@@ -1138,7 +1140,7 @@ and translate_predicate ?pred_to_print kf env p =
     Env.add_stmt
       env
       kf
-      (Smart_stmt.runtime_check
+      (Assert.runtime_check
          ~pred_kind:p.tp_kind
          (Env.annotation_kind env)
          kf
@@ -1167,7 +1169,7 @@ let gmp_to_sizet ~loc ~name ?(check_lower_bound=true) ?pp kf env t =
       Typing.type_named_predicate ~must_clear:false lower_guard;
       let lower_guard, env = predicate_to_exp kf env lower_guard in
       let assertion =
-        Smart_stmt.runtime_check
+        Assert.runtime_check
           ~pred_kind:Assert
           Smart_stmt.RTE
           kf
@@ -1192,7 +1194,7 @@ let gmp_to_sizet ~loc ~name ?(check_lower_bound=true) ?pp kf env t =
   Typing.type_named_predicate ~must_clear:false upper_guard;
   let upper_guard, env = predicate_to_exp kf env upper_guard in
   let assertion =
-    Smart_stmt.runtime_check
+    Assert.runtime_check
       ~pred_kind:Assert
       Smart_stmt.RTE
       kf

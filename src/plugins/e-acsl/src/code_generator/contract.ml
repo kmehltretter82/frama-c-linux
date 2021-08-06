@@ -364,7 +364,7 @@ let check_requires kf kinstr env contract =
                      requires
                  in
                  let stmt =
-                   Smart_stmt.runtime_check
+                   Assert.runtime_check
                      ~pred_kind
                      Smart_stmt.Precondition
                      kf
@@ -498,7 +498,7 @@ let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf kinstr env co
 
       (* Create assertions for complete and disjoint behaviors checks *)
       let create_assert_stmt bop msg =
-        Smart_stmt.runtime_check_with_msg
+        Assert.runtime_check_with_msg
           ~loc
           msg
           ~pred_kind:Assert
@@ -669,7 +669,7 @@ let check_post_conds kf kinstr env contract =
                          post_cond
                      in
                      let stmt =
-                       Smart_stmt.runtime_check
+                       Assert.runtime_check
                          ~pred_kind
                          Smart_stmt.Postcondition
                          kf

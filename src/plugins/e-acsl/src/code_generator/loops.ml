@@ -108,7 +108,7 @@ let handle_annotations env kf stmt =
                 Printer.pp_term t
             in
             let stmt =
-              Smart_stmt.runtime_check_with_msg
+              Assert.runtime_check_with_msg
                 ~loc
                 msg
                 ~pred_kind:Assert
@@ -148,14 +148,14 @@ let handle_annotations env kf stmt =
             in
             let stmt =
               Smart_stmt.block_from_stmts [
-                Smart_stmt.runtime_check_with_msg
+                Assert.runtime_check_with_msg
                   ~loc
                   msg1
                   ~pred_kind:Assert
                   Smart_stmt.Variant
                   kf
                   variant_pos_e;
-                Smart_stmt.runtime_check_with_msg
+                Assert.runtime_check_with_msg
                   ~loc
                   msg2
                   ~pred_kind:Assert
@@ -300,7 +300,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       | Some p ->
         let e, env = !predicate_to_exp_ref kf (Env.push env) p in
         let stmt, env =
-          Smart_stmt.runtime_check ~pred_kind:Assert Smart_stmt.RTE kf e p, env
+          Assert.runtime_check ~pred_kind:Assert Smart_stmt.RTE kf e p, env
         in
         let b, env = Env.pop_and_get env stmt ~global_clear:false Env.After in
         let guard_for_small_type = Smart_stmt.block_stmt b in

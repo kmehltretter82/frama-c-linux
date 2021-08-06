@@ -90,3 +90,42 @@ let register_term ~loc kf env ?force t e adata =
 let register_pred ~loc kf env ?force p e adata =
   let name = Format.asprintf "@[%a@]" Printer.pp_predicate p in
   register ~loc kf env name ?force e adata
+
+let kind_to_string loc k =
+  Cil.mkString
+    ~loc
+    (match k with
+     | Smart_stmt.Assertion -> "Assertion"
+     | Smart_stmt.Precondition -> "Precondition"
+     | Smart_stmt.Postcondition -> "Postcondition"
+     | Smart_stmt.Invariant -> "Invariant"
+     | Smart_stmt.Variant -> "Variant"
+     | Smart_stmt.RTE -> "RTE")
+
+let runtime_check_with_msg ~loc msg ~pred_kind kind kf e =
+  let blocking =
+    match pred_kind with
+    | Assert -> Cil.one ~loc
+    | Check -> Cil.zero ~loc
+    | Admit ->
+      Options.fatal "No runtime check should be generated for 'admit' clauses"
+  in
+  let file = (fst loc).Filepath.pos_path in
+  let line = (fst loc).Filepath.pos_lnum in
+  Smart_stmt.rtl_call ~loc
+    "assert"
+    [ e;
+      blocking;
+      kind_to_string loc kind;
+      Cil.mkString ~loc (Functions.RTL.get_original_name kf);
+      Cil.mkString ~loc msg;
+      Cil.mkString ~loc (Filepath.Normalized.to_pretty_string file);
+      Cil.integer loc line ]
+
+let runtime_check ~pred_kind kind kf e p =
+  let loc = p.pred_loc in
+  let msg =
+    Kernel.Unicode.without_unicode
+      (Format.asprintf "%a@?" Printer.pp_predicate) p
+  in
+  runtime_check_with_msg ~loc msg ~pred_kind kind kf e

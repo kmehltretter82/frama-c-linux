@@ -74,11 +74,11 @@ CODE_GENERATOR_CMI:=$(addprefix src/code_generator/, $(CODE_GENERATOR_CMI))
 
 SRC_CODE_GENERATOR:= \
 	smart_exp \
-	assert \
 	smart_stmt \
 	gmp \
 	label \
 	env \
+	assert \
 	rational \
 	typed_number \
 	logic_functions \
