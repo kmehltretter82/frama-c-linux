@@ -283,7 +283,7 @@ function add_event_page {
     echo "---" > $EVENT_WEBPAGE_PATH
     echo "layout: default" >> $EVENT_WEBPAGE_PATH
     echo "date: $(date +\"%d-%m-%Y\")" >> $EVENT_WEBPAGE_PATH
-    echo "event: $TEXTUAL_VERSION" >> $EVENT_WEBPAGE_PATH
+    echo "short_title: $TEXTUAL_VERSION" >> $EVENT_WEBPAGE_PATH
     echo -n "title: " >> $EVENT_WEBPAGE_PATH
     if [ "$FINAL_RELEASE" = "no" ]; then
         echo -n "Beta release " >> $EVENT_WEBPAGE_PATH
