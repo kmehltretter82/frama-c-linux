@@ -16,5 +16,4 @@
 [eva:alarm] tests/arith/sum.c:15: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] tests/arith/sum.c:15: Warning: assertion got status unknown.
-[eva:alarm] tests/arith/sum.c:16: Warning: 
-  signed overflow. assert __gen_e_acsl_sum_6 + 1 ≤ 2147483647;
+[eva:alarm] tests/arith/sum.c:16: Warning: assertion got status unknown.

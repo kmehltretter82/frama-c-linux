@@ -360,7 +360,7 @@ let interv_of_extended_quantifier lambda lb up name =
        let max_lb, max_ub = Ival.min_and_max ub_iv in
        (* the number of iterations is the distance between the upper bound and
           the lower bound, or 0 if it is negative. *)
-       let delta a b = Z.max Z.zero (Z.sub a b) in
+       let delta a b = Z.max Z.zero (Z.add Z.one (Z.sub a b)) in
        let min_iteration_number =
          (* the minimum number of iterations is the distance between the
             smallest upper bound and the biggest lower bound. *)
