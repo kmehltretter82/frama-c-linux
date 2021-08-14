@@ -13,6 +13,7 @@ int main(void) {
   /*@ assert \sum(10, 2, \lambda integer k; k) == 0; */;
   /*@ assert \sum(x * x, 2, \lambda integer k; k) == 0; */;
   /*@ assert \sum(ULLONG_MAX - 5, ULLONG_MAX, \lambda integer k; 1) == 6; */;
+  /*@ assert \sum(INT_MAX, INT_MAX, \lambda integer k; k) + 1 > INT_MAX; */
 
   return 0;
 }

@@ -204,6 +204,36 @@ int main(void)
       \lambda ℤ k; 1)
   ≡ 6; */
   ;
+  {
+    unsigned int __gen_e_acsl_k_6;
+    unsigned int __gen_e_acsl_one_6;
+    int __gen_e_acsl_cond_6;
+    int __gen_e_acsl_lambda_6;
+    int __gen_e_acsl_sum_6;
+    __gen_e_acsl_one_6 = 1;
+    __gen_e_acsl_cond_6 = 0;
+    __gen_e_acsl_lambda_6 = 0;
+    __gen_e_acsl_sum_6 = 0;
+    __gen_e_acsl_k_6 = 2147483647U;
+    while (1) {
+      __gen_e_acsl_cond_6 = __gen_e_acsl_k_6 > 2147483647U;
+      if (__gen_e_acsl_cond_6) break;
+      else {
+        __gen_e_acsl_lambda_6 = (int)__gen_e_acsl_k_6;
+        __gen_e_acsl_sum_6 += __gen_e_acsl_lambda_6;
+        __gen_e_acsl_k_6 += __gen_e_acsl_one_6;
+      }
+    }
+    /*@ assert Eva: signed_overflow: __gen_e_acsl_sum_6 + 1 ≤ 2147483647;
+    */
+    __e_acsl_assert((unsigned int)(__gen_e_acsl_sum_6 + 1) > 2147483647U,1,
+                    "Assertion","main",
+                    "\\sum(2147483647, 2147483647, \\lambda integer k; k) + 1 > 2147483647",
+                    "tests/arith/sum.c",16);
+  }
+  /*@ assert \sum(2147483647, 2147483647, \lambda ℤ k; k) + 1 > 2147483647;
+   */
+  ;
   __retres = 0;
   return __retres;
 }
