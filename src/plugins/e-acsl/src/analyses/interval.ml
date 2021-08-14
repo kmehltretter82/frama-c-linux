@@ -351,36 +351,41 @@ let extended_interv_of_typ ty = match interv_of_typ ty with
    of the lower (resp. upper) bound and [name] is the identifier of the extended
    quantifier (\sum, \product or \numof). The returned ival is the interval of
    the extended quantifier. *)
-let interv_of_extended_quantifier lambda i j name =
-  match lambda, i, j, name.lv_name with
-  | Ival lbd_iv, Ival i_iv, Ival j_iv, "\\sum" ->
+let interv_of_extended_quantifier lambda lb up name =
+  match lambda, lb, up, name.lv_name with
+  | Ival lbd_iv, Ival lb_iv, Ival ub_iv, "\\sum" ->
     (try
        let min_lambda, max_lambda = Ival.min_and_max lbd_iv in
-       let i_lb, i_ub = Ival.min_and_max i_iv in
-       let j_lb, j_ub = Ival.min_and_max j_iv in
-       let compute_bound bound_lambda is_lower_bound =
-         let cond = match bound_lambda with
-           | Some lambda ->
-             (is_lower_bound && Z.compare lambda Z.zero = 1) ||
-             (not is_lower_bound && Z.compare lambda Z.zero = -1)
-           | None -> false
-         in
-         match bound_lambda, i_lb, i_ub, j_lb, j_ub with
-         | Some lambda, _, Some i_ub, Some j_lb, _  when cond->
-           Some (Z.mul lambda (Z.max (Z.sub j_lb i_ub) Z.zero))
-         | _, _, _, _, _ when cond -> Some Z.zero
-         | Some lambda,  Some i_lb, _, _, Some j_ub ->
-           Some (Z.mul lambda (Z.max (Z.sub j_ub i_lb) Z.zero))
-         | Some lambda, _, _ , _, _ when Z.compare lambda Z.zero = 0 ->
-           Some Z.zero
-         | None, Some i_lb, _, _, Some j_ub when Z.compare j_ub i_lb = 0 ->
-           Some Z.zero
-         |  _, _, _, _, _ -> None
+       let min_lb, min_ub = Ival.min_and_max lb_iv in
+       let max_lb, max_ub = Ival.min_and_max ub_iv in
+       (* the number of iterations is the distance between the upper bound and
+          the lower bound, or 0 if it is negative. *)
+       let delta a b = Z.max Z.zero (Z.sub a b) in
+       let min_iteration_number =
+         (* the minimum number of iterations is the distance between the
+            smallest upper bound and the biggest lower bound. *)
+         match min_ub, max_lb with
+         | Some mub, Some mlb -> delta mub mlb
+         | _, None | None, _ -> Z.zero
        in
-       Ival
-         (Ival.inject_range
-            (compute_bound min_lambda true)
-            (compute_bound max_lambda false))
+       let max_iteration_number =
+         (* the maximum number of iterations is the distance between the
+              biggest upper bound and the smallest lower bound. *)
+         match max_ub, min_lb with
+         | Some mub, Some mlb -> Some (delta mub mlb)
+         | _, None | None, _ -> None
+       in
+       (* the lower (resp. upper) bound is the min (resp. max) value of
+          the lambda term times the min (resp. max) number of iterations *)
+       let lower_bound = match min_lambda with
+         | None -> None
+         | Some z -> Some (Z.mul z min_iteration_number)
+         in
+         let upper_bound = match max_lambda, max_iteration_number with
+           | None, _ | _, None -> None
+           | Some z, Some n -> Some (Z.mul z n)
+         in
+         Ival (Ival.inject_range lower_bound upper_bound)
      with Abstract_interp.Error_Bottom ->
        bottom)
   | _, _, _, "\\product" ->  Error.not_yet "product"
