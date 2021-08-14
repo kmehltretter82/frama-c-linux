@@ -117,6 +117,6 @@ val infer: Cil_types.term -> t
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)

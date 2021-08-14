@@ -347,34 +347,33 @@ let extended_interv_of_typ ty = match interv_of_typ ty with
     -> i
 
 (* Compute the interval of the extended quantifier \sum, \product and \numof.
-   [lbd_ival] is the interval of the lambda term, [k_ival] is the interval of the
-   quantifier and [name]  is the identifier of the extended quantifier (\sum,
-   \product or \numof). The returned ival is the interval of the extended
-   quantifier *)
+   [lambda] is the interval of the lambda term, [i] (resp. [j]) is the interval
+   of the lower (resp. upper) bound and [name] is the identifier of the extended
+   quantifier (\sum, \product or \numof). The returned ival is the interval of
+   the extended quantifier. *)
 let interv_of_extended_quantifier lambda i j name =
   match lambda, i, j, name.lv_name with
-  | Ival lbd_ival, Ival i_ival, Ival j_ival, "\\sum" ->
+  | Ival lbd_iv, Ival i_iv, Ival j_iv, "\\sum" ->
     (try
-       let min_lambda, max_lambda = Ival.min_and_max lbd_ival in
-       let i_inf, i_sup = Ival.min_and_max i_ival in
-       let j_inf, j_sup = Ival.min_and_max j_ival in
-       let compute_bound bound_lambda is_inf_bound =
-         let cond =
-           match bound_lambda with
+       let min_lambda, max_lambda = Ival.min_and_max lbd_iv in
+       let i_lb, i_ub = Ival.min_and_max i_iv in
+       let j_lb, j_ub = Ival.min_and_max j_iv in
+       let compute_bound bound_lambda is_lower_bound =
+         let cond = match bound_lambda with
            | Some lambda ->
-             (is_inf_bound && ((Z.compare lambda Z.zero)==1)) ||
-             ((not is_inf_bound) && ((Z.compare lambda Z.zero)=(-1)))
+             (is_lower_bound && Z.compare lambda Z.zero = 1) ||
+             (not is_lower_bound && Z.compare lambda Z.zero = -1)
            | None -> false
          in
-         match bound_lambda, i_inf, i_sup, j_inf, j_sup with
-         | Some lambda, _,Some i_sup, Some j_inf, _  when cond->
-           Some (Z.mul lambda (Z.max (Z.sub j_inf i_sup) Z.zero))
+         match bound_lambda, i_lb, i_ub, j_lb, j_ub with
+         | Some lambda, _, Some i_ub, Some j_lb, _  when cond->
+           Some (Z.mul lambda (Z.max (Z.sub j_lb i_ub) Z.zero))
          | _, _, _, _, _ when cond -> Some Z.zero
-         | Some lambda,  Some i_inf, _, _, Some j_sup ->
-           Some (Z.mul lambda (Z.max (Z.sub j_sup i_inf) Z.zero))
-         | Some lambda, _, _ , _, _ when (Z.compare lambda Z.zero) = 0 ->
+         | Some lambda,  Some i_lb, _, _, Some j_ub ->
+           Some (Z.mul lambda (Z.max (Z.sub j_ub i_lb) Z.zero))
+         | Some lambda, _, _ , _, _ when Z.compare lambda Z.zero = 0 ->
            Some Z.zero
-         | None, Some i_inf, _, _, Some j_sup when (Z.compare j_sup i_inf) = 0 ->
+         | None, Some i_lb, _, _, Some j_ub when Z.compare j_ub i_lb = 0 ->
            Some Z.zero
          |  _, _, _, _, _ -> None
        in
@@ -690,13 +689,13 @@ let rec infer t =
        fixpoint bottom
      | LBnone when li.l_var_info.lv_name = "\\sum" ->
        (match args with
-        | [ t1; t2; {term_node = Tlambda([ k ], _)} as lambda ] ->
+        | [ t1; t2; { term_node = Tlambda([ k ], _) } as lambda ] ->
           let i_ival = infer t1 in
           let j_ival = infer t2 in
           let k_ival = join i_ival j_ival in
           Env.add k k_ival;
-          (*k is removed during code generation, it is needed for generating the
-            code of the lambda term*)
+          (* [k] is only removed during code generation, since it is needed for
+             generating the code of the lambda term *)
           let lambda_ival = infer lambda in
           interv_of_extended_quantifier
             lambda_ival i_ival j_ival li.l_var_info
@@ -786,6 +785,6 @@ include D
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
  *)
