@@ -6,31 +6,31 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 int main(void)
 {
   int __retres;
-  unsigned long x = 4294967295UL;
+  unsigned long x = (unsigned long)4294967295U;
   int y = 10;
   {
     int __gen_e_acsl_k;
     int __gen_e_acsl_one;
     int __gen_e_acsl_cond;
     int __gen_e_acsl_lambda;
-    int __gen_e_acsl_sum;
+    int __gen_e_acsl_accumulator;
     __gen_e_acsl_one = 1;
     __gen_e_acsl_cond = 0;
     __gen_e_acsl_lambda = 0;
-    __gen_e_acsl_sum = 0;
+    __gen_e_acsl_accumulator = 0;
     __gen_e_acsl_k = 2;
     while (1) {
       __gen_e_acsl_cond = __gen_e_acsl_k > 10;
       if (__gen_e_acsl_cond) break;
       else {
         __gen_e_acsl_lambda = 2 * __gen_e_acsl_k;
-        __gen_e_acsl_sum += __gen_e_acsl_lambda;
+        __gen_e_acsl_accumulator += __gen_e_acsl_lambda;
         __gen_e_acsl_k += __gen_e_acsl_one;
       }
     }
-    __e_acsl_assert(__gen_e_acsl_sum == 108,1,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_accumulator == 108,1,"Assertion","main",
                     "\\sum(2, 10, \\lambda integer k; 2 * k) == 108",
-                    "tests/arith/sum.i",10);
+                    "tests/arith/sum.c",11);
   }
   /*@ assert \sum(2, 10, \lambda ℤ k; 2 * k) ≡ 108; */ ;
   {
@@ -38,13 +38,13 @@ int main(void)
     int __gen_e_acsl_one_2;
     int __gen_e_acsl_cond_2;
     __e_acsl_mpz_t __gen_e_acsl_lambda_2;
-    __e_acsl_mpz_t __gen_e_acsl_sum_2;
+    __e_acsl_mpz_t __gen_e_acsl_accumulator_2;
     __e_acsl_mpz_t __gen_e_acsl__2;
     int __gen_e_acsl_ne;
     __gen_e_acsl_one_2 = 1;
     __gen_e_acsl_cond_2 = 0;
     __gmpz_init_set_si(__gen_e_acsl_lambda_2,0L);
-    __gmpz_init_set_si(__gen_e_acsl_sum_2,0L);
+    __gmpz_init_set_si(__gen_e_acsl_accumulator_2,0L);
     __gen_e_acsl_k_2 = 2;
     while (1) {
       __gen_e_acsl_cond_2 = __gen_e_acsl_k_2 > 35;
@@ -57,46 +57,50 @@ int main(void)
                      (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
           __gmpz_clear(__gen_e_acsl_);
         }
-        __gmpz_add(__gen_e_acsl_sum_2,
-                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_sum_2),
+        __gmpz_add(__gen_e_acsl_accumulator_2,
+                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_accumulator_2),
                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_lambda_2));
+        /*@ assert
+            Eva: signed_overflow:
+              __gen_e_acsl_k_2 + __gen_e_acsl_one_2 ≤ 2147483647;
+        */
         __gen_e_acsl_k_2 += __gen_e_acsl_one_2;
       }
     }
     __gmpz_init_set_si(__gen_e_acsl__2,0L);
-    __gen_e_acsl_ne = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_sum_2),
+    __gen_e_acsl_ne = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_accumulator_2),
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
     __e_acsl_assert(__gen_e_acsl_ne != 0,1,"Assertion","main",
-                    "\\sum(2, 35, \\lambda integer k; 18446744073709551615) != 0",
-                    "tests/arith/sum.i",12);
+                    "\\sum(2, 35, \\lambda integer k; 18446744073709551615ULL) != 0",
+                    "tests/arith/sum.c",12);
     __gmpz_clear(__gen_e_acsl_lambda_2);
-    __gmpz_clear(__gen_e_acsl_sum_2);
+    __gmpz_clear(__gen_e_acsl_accumulator_2);
     __gmpz_clear(__gen_e_acsl__2);
   }
-  /*@ assert \sum(2, 35, \lambda ℤ k; 18446744073709551615) ≢ 0; */ ;
+  /*@ assert \sum(2, 35, \lambda ℤ k; 18446744073709551615ULL) ≢ 0; */ ;
   {
     int __gen_e_acsl_k_3;
     int __gen_e_acsl_one_3;
     int __gen_e_acsl_cond_3;
     int __gen_e_acsl_lambda_3;
-    int __gen_e_acsl_sum_3;
+    int __gen_e_acsl_accumulator_3;
     __gen_e_acsl_one_3 = 1;
     __gen_e_acsl_cond_3 = 0;
     __gen_e_acsl_lambda_3 = 0;
-    __gen_e_acsl_sum_3 = 0;
+    __gen_e_acsl_accumulator_3 = 0;
     __gen_e_acsl_k_3 = 10;
     while (1) {
       __gen_e_acsl_cond_3 = __gen_e_acsl_k_3 > 2;
       if (__gen_e_acsl_cond_3) break;
       else {
         __gen_e_acsl_lambda_3 = __gen_e_acsl_k_3;
-        __gen_e_acsl_sum_3 += __gen_e_acsl_lambda_3;
+        __gen_e_acsl_accumulator_3 += __gen_e_acsl_lambda_3;
         __gen_e_acsl_k_3 += __gen_e_acsl_one_3;
       }
     }
-    __e_acsl_assert(__gen_e_acsl_sum_3 == 0,1,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_accumulator_3 == 0,1,"Assertion","main",
                     "\\sum(10, 2, \\lambda integer k; k) == 0",
-                    "tests/arith/sum.i",14);
+                    "tests/arith/sum.c",13);
   }
   /*@ assert \sum(10, 2, \lambda ℤ k; k) ≡ 0; */ ;
   {
@@ -107,7 +111,7 @@ int main(void)
     __e_acsl_mpz_t __gen_e_acsl_one_4;
     int __gen_e_acsl_cond_4;
     __e_acsl_mpz_t __gen_e_acsl_lambda_4;
-    __e_acsl_mpz_t __gen_e_acsl_sum_4;
+    __e_acsl_mpz_t __gen_e_acsl_accumulator_4;
     __e_acsl_mpz_t __gen_e_acsl__4;
     int __gen_e_acsl_eq;
     __gmpz_init_set_ui(__gen_e_acsl_x,x);
@@ -119,7 +123,7 @@ int main(void)
     __gmpz_init_set_si(__gen_e_acsl_one_4,1L);
     __gen_e_acsl_cond_4 = 0;
     __gmpz_init_set_si(__gen_e_acsl_lambda_4,0L);
-    __gmpz_init_set_si(__gen_e_acsl_sum_4,0L);
+    __gmpz_init_set_si(__gen_e_acsl_accumulator_4,0L);
     __gmpz_init_set(__gen_e_acsl_k_4,
                     (__e_acsl_mpz_struct const *)(__gen_e_acsl_mul));
     while (1) {
@@ -129,8 +133,8 @@ int main(void)
       else {
         __gmpz_set(__gen_e_acsl_lambda_4,
                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_k_4));
-        __gmpz_add(__gen_e_acsl_sum_4,
-                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_sum_4),
+        __gmpz_add(__gen_e_acsl_accumulator_4,
+                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_accumulator_4),
                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_lambda_4));
         __gmpz_add(__gen_e_acsl_k_4,
                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_k_4),
@@ -138,18 +142,18 @@ int main(void)
       }
     }
     __gmpz_init_set_si(__gen_e_acsl__4,0L);
-    __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_sum_4),
+    __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_accumulator_4),
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__4));
     __e_acsl_assert(__gen_e_acsl_eq == 0,1,"Assertion","main",
                     "\\sum(x * x, 2, \\lambda integer k; k) == 0",
-                    "tests/arith/sum.i",16);
+                    "tests/arith/sum.c",14);
     __gmpz_clear(__gen_e_acsl_x);
     __gmpz_clear(__gen_e_acsl_mul);
     __gmpz_clear(__gen_e_acsl__3);
     __gmpz_clear(__gen_e_acsl_k_4);
     __gmpz_clear(__gen_e_acsl_one_4);
     __gmpz_clear(__gen_e_acsl_lambda_4);
-    __gmpz_clear(__gen_e_acsl_sum_4);
+    __gmpz_clear(__gen_e_acsl_accumulator_4);
     __gmpz_clear(__gen_e_acsl__4);
   }
   /*@ assert \sum(x * x, 2, \lambda ℤ k; k) ≡ 0; */ ;
@@ -160,13 +164,13 @@ int main(void)
     __e_acsl_mpz_t __gen_e_acsl_one_5;
     int __gen_e_acsl_cond_5;
     int __gen_e_acsl_lambda_5;
-    int __gen_e_acsl_sum_5;
-    __gmpz_init_set_ui(__gen_e_acsl__5,18446744073709551610UL);
+    int __gen_e_acsl_accumulator_5;
+    __gmpz_init_set_ui(__gen_e_acsl__5,18446744073709551615UL - 5UL);
     __gmpz_init_set_ui(__gen_e_acsl__6,18446744073709551615UL);
     __gmpz_init_set_si(__gen_e_acsl_one_5,1L);
     __gen_e_acsl_cond_5 = 0;
     __gen_e_acsl_lambda_5 = 0;
-    __gen_e_acsl_sum_5 = 0;
+    __gen_e_acsl_accumulator_5 = 0;
     __gmpz_init_set(__gen_e_acsl_k_5,
                     (__e_acsl_mpz_struct const *)(__gen_e_acsl__5));
     while (1) {
@@ -177,17 +181,18 @@ int main(void)
         __gen_e_acsl_lambda_5 = 1;
         /*@ assert
             Eva: signed_overflow:
-              __gen_e_acsl_sum_5 + __gen_e_acsl_lambda_5 ≤ 2147483647;
+              __gen_e_acsl_accumulator_5 + __gen_e_acsl_lambda_5 ≤
+              2147483647;
         */
-        __gen_e_acsl_sum_5 += __gen_e_acsl_lambda_5;
+        __gen_e_acsl_accumulator_5 += __gen_e_acsl_lambda_5;
         __gmpz_add(__gen_e_acsl_k_5,
                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_k_5),
                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_one_5));
       }
     }
-    __e_acsl_assert(__gen_e_acsl_sum_5 == 6,1,"Assertion","main",
-                    "\\sum(18446744073709551610, 18446744073709551615, \\lambda integer k; 1) == 6",
-                    "tests/arith/sum.i",18);
+    __e_acsl_assert(__gen_e_acsl_accumulator_5 == 6,1,"Assertion","main",
+                    "\\sum(18446744073709551615ULL - 5, 18446744073709551615ULL,\n    \\lambda integer k; 1)\n== 6",
+                    "tests/arith/sum.c",15);
     __gmpz_clear(__gen_e_acsl__5);
     __gmpz_clear(__gen_e_acsl__6);
     __gmpz_clear(__gen_e_acsl_k_5);
@@ -195,8 +200,9 @@ int main(void)
   }
   /*@
   assert
-  \sum(18446744073709551610, 18446744073709551615, \lambda ℤ k; 1) ≡ 6;
-   */
+  \sum(18446744073709551615ULL - 5, 18446744073709551615ULL,
+      \lambda ℤ k; 1)
+  ≡ 6; */
   ;
   __retres = 0;
   return __retres;
