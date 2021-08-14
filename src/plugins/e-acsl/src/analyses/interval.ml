@@ -380,12 +380,12 @@ let interv_of_extended_quantifier lambda lb up name =
        let lower_bound = match min_lambda with
          | None -> None
          | Some z -> Some (Z.mul z min_iteration_number)
-         in
-         let upper_bound = match max_lambda, max_iteration_number with
-           | None, _ | _, None -> None
-           | Some z, Some n -> Some (Z.mul z n)
-         in
-         Ival (Ival.inject_range lower_bound upper_bound)
+       in
+       let upper_bound = match max_lambda, max_iteration_number with
+         | None, _ | _, None -> None
+         | Some z, Some n -> Some (Z.mul z n)
+       in
+       Ival (Ival.inject_range lower_bound upper_bound)
      with Abstract_interp.Error_Bottom ->
        bottom)
   | _, _, _, "\\product" ->  Error.not_yet "product"
