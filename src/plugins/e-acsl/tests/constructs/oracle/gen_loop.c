@@ -50,10 +50,10 @@ void nested_loops(void)
         int __gen_e_acsl_l;
         int __gen_e_acsl_and_2;
         __gen_e_acsl_forall = 1;
-        __gen_e_acsl_k = 0U;
+        __gen_e_acsl_k = 0;
         while (1) {
           if (__gen_e_acsl_k < i) ; else break;
-          __gen_e_acsl_l = 0U;
+          __gen_e_acsl_l = 0;
           while (1) {
             if (__gen_e_acsl_l < j) ; else break;
             __e_acsl_assert(__gen_e_acsl_l < 15,1,"RTE","nested_loops",
@@ -68,7 +68,7 @@ void nested_loops(void)
             __e_acsl_assert(0 <= __gen_e_acsl_k,1,"RTE","nested_loops",
                             "index_bound: 0 <= __gen_e_acsl_k",
                             "tests/constructs/loop.i",19);
-            if ((long)t[__gen_e_acsl_k][__gen_e_acsl_l] == (long)(__gen_e_acsl_k * (unsigned long)__gen_e_acsl_l)) 
+            if ((long)t[__gen_e_acsl_k][__gen_e_acsl_l] == __gen_e_acsl_k * (long)__gen_e_acsl_l) 
               ;
             else {
               __gen_e_acsl_forall = 0;
@@ -105,10 +105,10 @@ void nested_loops(void)
           __e_acsl_assert(__gen_e_acsl_and_3,1,"Invariant","nested_loops",
                           "0 <= j <= 15","tests/constructs/loop.i",17);
           __gen_e_acsl_forall_2 = 1;
-          __gen_e_acsl_k_2 = 0U;
+          __gen_e_acsl_k_2 = 0;
           while (1) {
             if (__gen_e_acsl_k_2 < i) ; else break;
-            __gen_e_acsl_l_2 = 0U;
+            __gen_e_acsl_l_2 = 0;
             while (1) {
               if (__gen_e_acsl_l_2 < j) ; else break;
               __e_acsl_assert(__gen_e_acsl_l_2 < 15,1,"RTE","nested_loops",
@@ -127,8 +127,7 @@ void nested_loops(void)
                   Eva: initialization:
                     \initialized(&t[__gen_e_acsl_k_2][__gen_e_acsl_l_2]);
               */
-              if ((long)t[__gen_e_acsl_k_2][__gen_e_acsl_l_2] == (long)(
-                  __gen_e_acsl_k_2 * (unsigned long)__gen_e_acsl_l_2)) 
+              if ((long)t[__gen_e_acsl_k_2][__gen_e_acsl_l_2] == __gen_e_acsl_k_2 * (long)__gen_e_acsl_l_2) 
                 ;
               else {
                 __gen_e_acsl_forall_2 = 0;

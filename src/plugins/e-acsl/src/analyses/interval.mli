@@ -62,6 +62,12 @@ include Datatype.S_with_collections with type t = ival
 
 val is_included: t -> t -> bool
 val join: t -> t -> t
+val meet: t -> t -> t
+
+val widen: t -> t
+(** @return the minimal interval containing a disjoint union of intervals *)
+
+val is_singleton_int: t -> bool
 
 val top_ival: t
 val ival: Integer.t -> Integer.t -> t

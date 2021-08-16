@@ -72,15 +72,15 @@ int __gen_e_acsl_sorted(int *t, int n)
         __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","sorted",
                         "mem_access: \\valid_read(t + __gen_e_acsl_i)",
                         "tests/bts/bts1324.i",6);
-        __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(t + (unsigned int)(
+        __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(t + (
                                                                  __gen_e_acsl_i - 1L)),
                                                         sizeof(int),
                                                         (void *)t,
                                                         (void *)(& t));
         __e_acsl_assert(__gen_e_acsl_valid_read_2,1,"RTE","sorted",
-                        "mem_access: \\valid_read(t + (unsigned int)(__gen_e_acsl_i - 1))",
+                        "mem_access: \\valid_read(t + (long)(__gen_e_acsl_i - 1))",
                         "tests/bts/bts1324.i",6);
-        if (*(t + (__gen_e_acsl_i - 1U)) <= *(t + __gen_e_acsl_i)) ;
+        if (*(t + (__gen_e_acsl_i - 1L)) <= *(t + __gen_e_acsl_i)) ;
         else {
           __gen_e_acsl_forall = 0;
           goto e_acsl_end_loop1;

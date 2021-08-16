@@ -95,13 +95,12 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
       __e_acsl_assert(j != 0,1,"RTE","test","division_by_zero: j != 0",
                       "tests/constructs/rte.i",15);
       __gen_e_acsl_forall = 1;
-      __gen_e_acsl_var_2 = 0U;
+      __gen_e_acsl_var_2 = 0;
       while (1) {
         if (__gen_e_acsl_var_2 < k) ; else break;
         __e_acsl_assert(k != 0,1,"RTE","test","division_by_zero: k != 0",
                         "tests/constructs/rte.i",16);
-        if ((unsigned int)(__gen_e_acsl_var_2 % k) == (unsigned int)__gen_e_acsl_var_2) 
-          ;
+        if (__gen_e_acsl_var_2 % k == __gen_e_acsl_var_2) ;
         else {
           __gen_e_acsl_forall = 0;
           goto e_acsl_end_loop1;
@@ -110,13 +109,12 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
       }
       e_acsl_end_loop1: ;
       __gen_e_acsl_exists = 0;
-      __gen_e_acsl_var_3 = 0U;
+      __gen_e_acsl_var_3 = 0;
       while (1) {
         if (__gen_e_acsl_var_3 < l) ; else break;
         __e_acsl_assert(l != 0,1,"RTE","test","division_by_zero: l != 0",
                         "tests/constructs/rte.i",17);
-        if (! ((unsigned int)(__gen_e_acsl_var_3 % l) == (unsigned int)__gen_e_acsl_var_3)) 
-          ;
+        if (! (__gen_e_acsl_var_3 % l == __gen_e_acsl_var_3)) ;
         else {
           __gen_e_acsl_exists = 1;
           goto e_acsl_end_loop2;

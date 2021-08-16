@@ -726,21 +726,18 @@ and type_args params ~use_gmp_opt ~lenv args fname =
      Example: [\let m = n > 0 ? 4 : 341; \forall char u; 1 < u < m ==> u > 0]
      Return: R with a guard guaranteeing that [lv] does not overflow *)
 and type_bound_variables ~loc ~lenv (t1, lv, t2) =
-  let i1 = Interval.(extract_ival (infer t1)) in
-  let i2 = Interval.(extract_ival (infer t2)) in
-  (* Ival.join is NOT correct here:
-     Eg: (Ival.join [-3..-3] [300..300]) gives {-3, 300}
-     but NOT [-3..300] *)
-  let i = Ival.inject_range (Ival.min_int i1) (Ival.max_int i2) in
+  let i1 = Interval.infer t1 in
+  let i2 = Interval.infer t2 in
+  let i = Interval.(widen (join i1 i2)) in
   let ctx = match lv.lv_type with
-    | Linteger -> mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:Gmpz (Interval.Ival i))
+    | Linteger -> mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:Gmpz i)
     | Ctype ty ->
       (match Cil.unrollType ty with
-       | TInt(ik, _) -> mk_ctx ~use_gmp_opt:true (C_integer ik)
-       | ty ->
-         Options.fatal "unexpected C type %a for quantified variable %a"
-           Printer.pp_typ ty
-           Printer.pp_logic_var lv)
+        | TInt(ik, _) -> mk_ctx ~use_gmp_opt:true (C_integer ik)
+        | ty ->
+          Options.fatal "unexpected C type %a for quantified variable %a"
+            Printer.pp_typ ty
+            Printer.pp_logic_var lv)
     | lty ->
       Options.fatal "unexpected logic type %a for quantified variable %a"
         Printer.pp_logic_type lty
@@ -752,22 +749,24 @@ and type_bound_variables ~loc ~lenv (t1, lv, t2) =
       Error.not_yet "quantification over non-integer type"
     | Linteger -> t1, t2, i
     | Ctype ty ->
-      let ity = Interval.extract_ival (Interval.extended_interv_of_typ ty) in
-      if Ival.is_included i ity then
+      let ity = Interval.extended_interv_of_typ ty in
+      if Interval.is_included i ity then
         (* case 1 *)
         t1, t2, i
-      else if Ival.is_singleton_int i1 && Ival.is_singleton_int i2 then begin
+      else if Interval.is_singleton_int i1 &&
+              Interval.is_singleton_int i2 then
+        begin
         (* case 2 *)
-        let i = Ival.meet i ity in
+        let i = Interval.meet i ity in
         (* We can now update the bounds in the preprocessed form
            that come from the meet of the two intervals *)
-        let min, max = Misc.finite_min_and_max i in
+        let min, max = Misc.finite_min_and_max (Interval.extract_ival i) in
         let t1 = Logic_const.tint ~loc min in
         let t2 = Logic_const.tint ~loc max in
         t1, t2, i
       end else
         (* case 3 *)
-        let min, max = Misc.finite_min_and_max ity in
+        let min, max = Misc.finite_min_and_max (Interval.extract_ival ity) in
         let guard_lower = Logic_const.tint ~loc min in
         let guard_upper = Logic_const.tint ~loc max in
         let lv_term = Logic_const.tvar ~loc lv in
@@ -786,11 +785,12 @@ and type_bound_variables ~loc ~lenv (t1, lv, t2) =
      guarantee that [x] will be a GMP when typing the goal *)
   let i = match ctx with
     | C_integer _ -> i
-    | Gmpz -> Ival.inject_range None None (* [ -\infty; +\infty ] *)
+    (* [ -\infty; +\infty ] *)
+    | Gmpz -> Interval.Ival (Ival.inject_range None None)
     | C_float _ | Rational | Real | Nan ->
       Options.fatal "unexpected quantification over %a" D.pretty ctx
   in
-  Interval.Env.add lv (Interval.Ival i);
+  Interval.Env.add lv i;
   (t1, lv, t2)
 
 
