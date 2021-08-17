@@ -10,6 +10,8 @@
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:679: Warning: 
+  E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:665: Warning: 
   E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:665: Warning: 
@@ -18,8 +20,6 @@
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:665: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:679: Warning: 
-  E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:680: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.

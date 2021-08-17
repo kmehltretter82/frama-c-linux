@@ -23,6 +23,8 @@
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:491: Warning: 
+  E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:493: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
@@ -43,8 +45,6 @@
 [e-acsl] FRAMAC_SHARE/libc/string.h:484: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:491: Warning: 
-  E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:493: Warning: 
   E-ACSL construct `logic functions or predicates with labels'
   is not yet supported.

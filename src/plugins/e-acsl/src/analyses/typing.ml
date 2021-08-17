@@ -891,7 +891,7 @@ and type_predicate ?(lenv=[]) p =
         ignore (type_term ~use_gmp_opt:false ~ctx:Nan t);
         c_int
       | Pat(p, _) -> (type_predicate ~lenv p).ty
-      | Pfresh _ -> c_int
+      | Pfresh _ -> Error.not_yet "\\fresh"
     in
     coerce ~arith_operand:false ~ctx:c_int ~op c_int
 
