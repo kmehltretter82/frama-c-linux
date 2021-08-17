@@ -190,8 +190,6 @@ val with_rte_and_result: f:(t -> 'a * t) -> t -> bool -> 'a * t
     This function does not handle exceptions at all. The user must handle them
     either directly in the [f] closure or around the call to the function. *)
 
-val emitter : Emitter.t
-
 module Local_vars: sig
   val push_new: t -> t
   val add: t -> Typing.number_ty -> t

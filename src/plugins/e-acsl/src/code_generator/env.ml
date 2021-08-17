@@ -382,15 +382,8 @@ module Logic_scope = struct
     else env
 end
 
-let emitter =
-  Emitter.create
-    "E_ACSL"
-    [ Emitter.Code_annot; Emitter.Funspec ]
-    ~correctness:[ Options.Gmp_only.parameter ]
-    ~tuning:[]
-
 let add_assert kf stmt annot =
-  Annotations.add_assert emitter ~kf stmt annot
+  Annotations.add_assert Options.emitter ~kf stmt annot
 
 let add_stmt ?(post=false) ?before env kf stmt =
   if not post then

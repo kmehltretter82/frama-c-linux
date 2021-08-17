@@ -193,7 +193,7 @@ let generate_kf ~loc fname env ret_ty params_ty li =
   Globals.Functions.replace_by_definition spec fundec loc;
   (* create the kernel function itself *)
   let kf = Globals.Functions.get fundec.svar in
-  Annotations.register_funspec ~emitter:Env.emitter kf;
+  Annotations.register_funspec ~emitter:Options.emitter kf;
   (* closure generating the function's body.
      Delay its generation after filling the memoisation table (for termination
      of recursive function calls) *)
@@ -254,7 +254,7 @@ let generate_kf ~loc fname env ret_ty params_ty li =
     in
     Annotations.add_assigns
       ~keep_empty:false
-      Env.emitter
+      Options.emitter
       ~behavior:Cil.default_behavior_name
       kf
       (Writes [ assigned_var , From deps]);
