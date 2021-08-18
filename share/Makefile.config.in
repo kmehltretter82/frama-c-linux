@@ -200,7 +200,7 @@ LIBRARY_NAMES := \
   findlib ocamlgraph unix str dynlink bytes zarith yojson bigarray
 
 ifeq ($(HAS_LANDMARKS),yes)
-LIBRARY_NAMES += landmarks landmarks.ppx
+LIBRARY_NAMES += landmarks landmarks-ppx
 endif
 
 ifneq ($(ENABLE_GUI),no)
