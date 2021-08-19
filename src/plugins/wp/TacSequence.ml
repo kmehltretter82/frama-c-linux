@@ -59,7 +59,7 @@ class sequence =
       | Fun(f,[a;n]) when f == Vlist.f_repeat ->
           let result = F.typeof value in
           let at = Tactical.at s in
-          Applicable
+          Tactical.Applicable
             begin
               match self#get_field vmode with
               | `Sum ->
