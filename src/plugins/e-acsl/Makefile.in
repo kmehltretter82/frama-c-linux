@@ -58,9 +58,9 @@ SRC_PROJECT_INITIALIZER:=\
 # analyses
 SRC_ANALYSES:= \
 	rte \
-  lscope \
-  preprocess_predicates \
-  bound_variables \
+	lscope \
+	predicate_normalizer \
+	bound_variables \
 	interval \
 	typing \
 	preprocess_typing \

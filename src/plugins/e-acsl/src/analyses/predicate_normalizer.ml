@@ -156,4 +156,4 @@ let preprocess_annot annot =
 let preprocess_predicate p =
   ignore (Visitor.visitFramacPredicate preprocessor p)
 
-let get_preprocessed_form p = Memo.get p
+let get p = Memo.get p

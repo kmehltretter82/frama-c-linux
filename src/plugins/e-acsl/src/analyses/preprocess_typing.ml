@@ -187,11 +187,11 @@ let type_code_annot lenv annot =
   ignore (Visitor.visitFramacCodeAnnotation (typer_visitor lenv) annot)
 
 let preprocess_predicate lenv p =
-  Preprocess_predicates.preprocess_predicate p;
+  Predicate_normalizer.preprocess_predicate p;
   Bound_variables.preprocess_predicate p;
   ignore (Visitor.visitFramacPredicate (typer_visitor lenv) p)
 
 let preprocess_rte ~lenv rte =
-  Preprocess_predicates.preprocess_annot rte;
+  Predicate_normalizer.preprocess_annot rte;
   Bound_variables.preprocess_annot rte;
   type_code_annot lenv rte

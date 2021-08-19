@@ -1223,7 +1223,7 @@ and predicate_content_to_exp ~adata ?name kf env p =
   | Pfresh _ -> Env.not_yet env "\\fresh"
 
 and predicate_to_exp ~adata ?name kf ?rte env p =
-  match Preprocess_predicates.get_preprocessed_form p with
+  match Predicate_normalizer.get p with
   | PoT_term t -> term_to_exp kf env t
   | PoT_pred p ->
     let rte = match rte with None -> Env.generate_rte env | Some b -> b in

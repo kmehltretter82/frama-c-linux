@@ -41,5 +41,5 @@ val preprocess_annot : code_annotation -> unit
 val preprocess_predicate : predicate -> unit
 (** Preprocess a predicate and its children and store the results  *)
 
-val get_preprocessed_form : predicate -> Lscope.pred_or_term
+val get : predicate -> Lscope.pred_or_term
 (** Retrieve the preprocessed form of a predicate *)

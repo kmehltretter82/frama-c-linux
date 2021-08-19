@@ -868,7 +868,7 @@ let inject () =
   Options.feedback ~level:2
     "preprocessing annotations in project %a"
     Project.pretty current_project;
-  Preprocess_predicates.preprocess ast;
+  Predicate_normalizer.preprocess ast;
   Options.feedback ~level:2
     "normalizing quantifiers in project %a"
     Project.pretty current_project;

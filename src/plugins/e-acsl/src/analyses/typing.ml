@@ -795,7 +795,7 @@ and type_bound_variables ~loc ~lenv (t1, lv, t2) =
 
 
 and type_predicate ?(lenv=[]) p =
-  match Preprocess_predicates.get_preprocessed_form p with
+  match Predicate_normalizer.get p with
   | PoT_term t -> type_term ~use_gmp_opt:true ~lenv t
   | PoT_pred p ->
     Cil.CurrentLoc.set p.pred_loc;
