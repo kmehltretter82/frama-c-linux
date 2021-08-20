@@ -1234,7 +1234,11 @@ and predicate_to_exp ~adata ?name kf ?rte env p =
                predicate_content_to_exp ~adata ?name kf env p
              in
              let env = if rte then translate_rte kf env e else env in
-             let cast = Typing.get_cast_of_predicate p in
+             let cast =
+               Typing.get_cast_of_predicate
+                 ~lenv:(Env.Local_vars.get env)
+                 p
+             in
              Extlib.nest
                adata
                (Typed_number.add_cast

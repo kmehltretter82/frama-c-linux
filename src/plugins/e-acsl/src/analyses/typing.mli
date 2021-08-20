@@ -138,7 +138,7 @@ val get_op: lenv:Function_params_ty.t -> term -> typ
 val get_cast: lenv:Function_params_ty.t -> term -> typ option
 (** Get the type which the given term must be converted to (if any). *)
 
-val get_cast_of_predicate: predicate -> typ option
+val get_cast_of_predicate: lenv:Function_params_ty.t -> predicate -> typ option
 (** Like {!get_cast}, but for predicates. *)
 
 val unsafe_set: term -> ?ctx:number_ty -> number_ty -> unit

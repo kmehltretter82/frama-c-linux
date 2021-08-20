@@ -949,8 +949,8 @@ let get_cast ~lenv t =
   try Option.map typ_of_number_ty info.cast
   with Not_a_number -> None
 
-let get_cast_of_predicate p =
-  let info = type_predicate p in
+let get_cast_of_predicate ~lenv p =
+  let info = type_predicate ~lenv p in
   try Option.map typ_of_number_ty info.cast
   with Not_a_number -> assert false
 
