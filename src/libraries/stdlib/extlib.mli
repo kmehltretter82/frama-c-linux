@@ -229,6 +229,11 @@ val the: exn:exn -> 'a option -> 'a
 val opt_hash: ('a -> int) -> 'a option -> int
 (** @since Sodium-20150201 *)
 
+val opt_map2: ('a -> 'b -> 'c) -> 'a option -> 'b option -> 'c option
+(** @return [f a b] if arguments are [Some a] and [Some b], orelse return
+    [None].
+    @since Frama-C+dev *)
+
 (* ************************************************************************* *)
 (** {2 Booleans} *)
 (* ************************************************************************* *)
