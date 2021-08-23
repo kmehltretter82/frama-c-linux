@@ -2,9 +2,15 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2021                                               */
+/*  Copyright (C) 1995-2021                                               */
+/*    Free Software Foundation, Inc.                                      */
+/*  Copyright (C) 2021                                                    */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
+/*                                                                        */
+/*  This file is derived from the GNU C Library. You can redistribute it  */
+/*  and/or modify it under the terms of the GNU Lesser General Public     */
+/*  License as published by the Free Software Foundation, version 2.1.    */
 /*                                                                        */
 /*  you can redistribute it and/or modify it under the terms of the GNU   */
 /*  Lesser General Public License as published by the Free Software       */

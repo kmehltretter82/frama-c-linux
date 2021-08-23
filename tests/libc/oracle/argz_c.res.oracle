@@ -59,23 +59,23 @@
   
 [eva] computing for function argz_create <- main.
   Called from tests/libc/argz_c.c:20.
-[eva] share/libc/argz.c:234: Call to builtin strlen
-[eva] share/libc/argz.c:234: 
+[eva] share/libc/argz.c:240: Call to builtin strlen
+[eva] share/libc/argz.c:240: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] share/libc/argz.c:234: Call to builtin strlen
-[eva] share/libc/argz.c:234: Call to builtin strlen
-[eva] share/libc/argz.c:239: Call to builtin malloc
-[eva] share/libc/argz.c:239: allocating variable __malloc_argz_create_l239
+[eva] share/libc/argz.c:240: Call to builtin strlen
+[eva] share/libc/argz.c:240: Call to builtin strlen
+[eva] share/libc/argz.c:245: Call to builtin malloc
+[eva] share/libc/argz.c:245: allocating variable __malloc_argz_create_l245
 [eva] computing for function stpcpy <- argz_create <- main.
-  Called from share/libc/argz.c:244.
+  Called from share/libc/argz.c:250.
 [eva] Recording results for stpcpy
 [eva] Done for function stpcpy
 [eva] computing for function stpcpy <- argz_create <- main.
-  Called from share/libc/argz.c:244.
+  Called from share/libc/argz.c:250.
 [eva] Recording results for stpcpy
 [eva] Done for function stpcpy
 [eva] computing for function stpcpy <- argz_create <- main.
-  Called from share/libc/argz.c:244.
+  Called from share/libc/argz.c:250.
 [eva] Recording results for stpcpy
 [eva] Done for function stpcpy
 [eva] Recording results for argz_create
@@ -90,11 +90,11 @@
   function free: precondition 'freeable' got status valid.
 [eva] computing for function argz_create_sep <- main.
   Called from tests/libc/argz_c.c:25.
-[eva] share/libc/argz.c:190: Call to builtin strlen
-[eva] share/libc/argz.c:190: 
+[eva] share/libc/argz.c:196: Call to builtin strlen
+[eva] share/libc/argz.c:196: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] share/libc/argz.c:196: Call to builtin malloc
-[eva] share/libc/argz.c:196: allocating variable __malloc_argz_create_sep_l196
+[eva] share/libc/argz.c:202: Call to builtin malloc
+[eva] share/libc/argz.c:202: allocating variable __malloc_argz_create_sep_l202
 [eva] Recording results for argz_create_sep
 [eva] Done for function argz_create_sep
 [eva] computing for function exit <- main.
@@ -108,11 +108,11 @@
 [eva] Done for function __FC_assert
 [eva] computing for function argz_count <- main.
   Called from tests/libc/argz_c.c:28.
-[eva] share/libc/argz.c:254: Call to builtin strlen
-[eva] share/libc/argz.c:254: 
+[eva] share/libc/argz.c:260: Call to builtin strlen
+[eva] share/libc/argz.c:260: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] share/libc/argz.c:254: Call to builtin strlen
-[eva] share/libc/argz.c:254: Call to builtin strlen
+[eva] share/libc/argz.c:260: Call to builtin strlen
+[eva] share/libc/argz.c:260: Call to builtin strlen
 [eva] Recording results for argz_count
 [eva] Done for function argz_count
 [eva] computing for function __FC_assert <- main.
@@ -122,21 +122,21 @@
 [eva] Done for function __FC_assert
 [eva] computing for function argz_add <- main.
   Called from tests/libc/argz_c.c:30.
-[eva] share/libc/argz.c:276: Call to builtin strlen
-[eva] share/libc/argz.c:276: 
+[eva] share/libc/argz.c:282: Call to builtin strlen
+[eva] share/libc/argz.c:282: 
   function strlen: precondition 'valid_string_s' got status valid.
 [eva] computing for function argz_append <- argz_add <- main.
-  Called from share/libc/argz.c:276.
-[eva] share/libc/argz.c:265: Call to builtin realloc
-[eva] share/libc/argz.c:265: 
+  Called from share/libc/argz.c:282.
+[eva] share/libc/argz.c:271: Call to builtin realloc
+[eva] share/libc/argz.c:271: 
   function realloc: precondition 'freeable' got status valid.
-[eva] share/libc/argz.c:265: allocating variable __realloc_argz_append_l265
-[eva] share/libc/argz.c:267: Call to builtin memcpy
-[eva] share/libc/argz.c:267: 
+[eva] share/libc/argz.c:271: allocating variable __realloc_argz_append_l271
+[eva] share/libc/argz.c:273: Call to builtin memcpy
+[eva] share/libc/argz.c:273: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] share/libc/argz.c:267: 
+[eva] share/libc/argz.c:273: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] share/libc/argz.c:267: 
+[eva] share/libc/argz.c:273: 
   function memcpy: precondition 'separation' got status valid.
 [eva] share/libc/string.h:101: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
@@ -154,13 +154,13 @@
 [eva] Done for function __FC_assert
 [eva] computing for function argz_add_sep <- main.
   Called from tests/libc/argz_c.c:33.
-[eva] share/libc/argz.c:281: Call to builtin strlen
-[eva] share/libc/argz.c:281: 
-  function strlen: precondition 'valid_string_s' got status valid.
-[eva] share/libc/argz.c:287: Call to builtin realloc
+[eva] share/libc/argz.c:287: Call to builtin strlen
 [eva] share/libc/argz.c:287: 
+  function strlen: precondition 'valid_string_s' got status valid.
+[eva] share/libc/argz.c:293: Call to builtin realloc
+[eva] share/libc/argz.c:293: 
   function realloc: precondition 'freeable' got status valid.
-[eva] share/libc/argz.c:287: allocating variable __realloc_argz_add_sep_l287
+[eva] share/libc/argz.c:293: allocating variable __realloc_argz_add_sep_l293
 [eva] Recording results for argz_add_sep
 [eva] Done for function argz_add_sep
 [eva] computing for function exit <- main.
@@ -173,12 +173,12 @@
 [eva] Done for function __FC_assert
 [eva] computing for function argz_count <- main.
   Called from tests/libc/argz_c.c:36.
-[eva] share/libc/argz.c:254: Call to builtin strlen
-[eva] share/libc/argz.c:254: Call to builtin strlen
-[eva] share/libc/argz.c:254: Call to builtin strlen
-[eva] share/libc/argz.c:254: Call to builtin strlen
-[eva] share/libc/argz.c:254: Call to builtin strlen
-[eva] share/libc/argz.c:254: Call to builtin strlen
+[eva] share/libc/argz.c:260: Call to builtin strlen
+[eva] share/libc/argz.c:260: Call to builtin strlen
+[eva] share/libc/argz.c:260: Call to builtin strlen
+[eva] share/libc/argz.c:260: Call to builtin strlen
+[eva] share/libc/argz.c:260: Call to builtin strlen
+[eva] share/libc/argz.c:260: Call to builtin strlen
 [eva] Recording results for argz_count
 [eva] Done for function argz_count
 [eva] computing for function __FC_assert <- main.
@@ -188,9 +188,9 @@
 [eva] Done for function __FC_assert
 [eva] computing for function argz_append <- main.
   Called from tests/libc/argz_c.c:38.
-[eva] share/libc/argz.c:265: Call to builtin realloc
-[eva] share/libc/argz.c:265: allocating variable __realloc_argz_append_l265_0
-[eva] share/libc/argz.c:267: Call to builtin memcpy
+[eva] share/libc/argz.c:271: Call to builtin realloc
+[eva] share/libc/argz.c:271: allocating variable __realloc_argz_append_l271_0
+[eva] share/libc/argz.c:273: Call to builtin memcpy
 [eva] Recording results for argz_append
 [eva] Done for function argz_append
 [eva] computing for function exit <- main.
@@ -203,12 +203,12 @@
 [eva] Done for function __FC_assert
 [eva] computing for function argz_add <- main.
   Called from tests/libc/argz_c.c:41.
-[eva] share/libc/argz.c:276: Call to builtin strlen
+[eva] share/libc/argz.c:282: Call to builtin strlen
 [eva] computing for function argz_append <- argz_add <- main.
-  Called from share/libc/argz.c:276.
-[eva] share/libc/argz.c:265: Call to builtin realloc
-[eva] share/libc/argz.c:265: allocating variable __realloc_argz_append_l265_1
-[eva] share/libc/argz.c:267: Call to builtin memcpy
+  Called from share/libc/argz.c:282.
+[eva] share/libc/argz.c:271: Call to builtin realloc
+[eva] share/libc/argz.c:271: allocating variable __realloc_argz_append_l271_1
+[eva] share/libc/argz.c:273: Call to builtin memcpy
 [eva] Recording results for argz_append
 [eva] Done for function argz_append
 [eva] Recording results for argz_add
@@ -223,53 +223,53 @@
 [eva] Done for function __FC_assert
 [eva] computing for function argz_replace <- main.
   Called from tests/libc/argz_c.c:45.
-[eva] share/libc/argz.c:66: Call to builtin strlen
-[eva] share/libc/argz.c:66: 
+[eva] share/libc/argz.c:72: Call to builtin strlen
+[eva] share/libc/argz.c:72: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] share/libc/argz.c:66: Call to builtin strlen
-[eva] share/libc/argz.c:66: 
+[eva] share/libc/argz.c:72: Call to builtin strlen
+[eva] share/libc/argz.c:72: 
   function strlen: precondition 'valid_string_s' got status valid.
 [eva] computing for function argz_next <- argz_replace <- main.
-  Called from share/libc/argz.c:68.
+  Called from share/libc/argz.c:74.
 [eva] Recording results for argz_next
 [eva] Done for function argz_next
 [eva] computing for function strstr <- argz_replace <- main.
-  Called from share/libc/argz.c:69.
+  Called from share/libc/argz.c:75.
 [eva] Recording results for strstr
 [eva] Done for function strstr
 [eva] computing for function argz_next <- argz_replace <- main.
-  Called from share/libc/argz.c:68.
-[eva] share/libc/argz.c:123: Call to builtin strchr
-[eva] share/libc/argz.c:123: 
+  Called from share/libc/argz.c:74.
+[eva] share/libc/argz.c:129: Call to builtin strchr
+[eva] share/libc/argz.c:129: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva] share/libc/string.h:181: 
   cannot evaluate ACSL term, unsupported logic var p
 [eva] Recording results for argz_next
 [eva] Done for function argz_next
 [eva] computing for function strstr <- argz_replace <- main.
-  Called from share/libc/argz.c:69.
+  Called from share/libc/argz.c:75.
 [eva] Recording results for strstr
 [eva] Done for function strstr
 [eva] computing for function argz_next <- argz_replace <- main.
-  Called from share/libc/argz.c:68.
-[eva] share/libc/argz.c:123: Call to builtin strchr
+  Called from share/libc/argz.c:74.
+[eva] share/libc/argz.c:129: Call to builtin strchr
 [eva] Recording results for argz_next
 [eva] Done for function argz_next
 [eva] computing for function strstr <- argz_replace <- main.
-  Called from share/libc/argz.c:69.
+  Called from share/libc/argz.c:75.
 [eva] Recording results for strstr
 [eva] Done for function strstr
 [eva] computing for function argz_next <- argz_replace <- main.
-  Called from share/libc/argz.c:68.
-[eva] share/libc/argz.c:123: Call to builtin strchr
+  Called from share/libc/argz.c:74.
+[eva] share/libc/argz.c:129: Call to builtin strchr
 [eva] Recording results for argz_next
 [eva] Done for function argz_next
 [eva] computing for function strstr <- argz_replace <- main.
-  Called from share/libc/argz.c:69.
+  Called from share/libc/argz.c:75.
 [eva] Recording results for strstr
 [eva] Done for function strstr
 [eva] computing for function strndup <- argz_replace <- main.
-  Called from share/libc/argz.c:73.
+  Called from share/libc/argz.c:79.
 [eva] share/libc/string.c:336: Call to builtin malloc
 [eva] share/libc/string.c:336: allocating variable __malloc_strndup_l336
 [eva] share/libc/string.c:341: Call to builtin memcpy
@@ -282,198 +282,198 @@
 [eva] Recording results for strndup
 [eva] Done for function strndup
 [eva] computing for function str_append <- argz_replace <- main.
-  Called from share/libc/argz.c:76.
-[eva] share/libc/argz.c:43: Call to builtin realloc
-[eva] share/libc/argz.c:43: 
+  Called from share/libc/argz.c:82.
+[eva] share/libc/argz.c:49: Call to builtin realloc
+[eva] share/libc/argz.c:49: 
   function realloc: precondition 'freeable' got status valid.
-[eva] share/libc/argz.c:43: allocating variable __realloc_str_append_l43
+[eva] share/libc/argz.c:49: allocating variable __realloc_str_append_l49
 [eva] computing for function mempcpy <- str_append <- argz_replace <- main.
-  Called from share/libc/argz.c:46.
+  Called from share/libc/argz.c:52.
 [eva] Recording results for mempcpy
 [eva] Done for function mempcpy
-[eva] share/libc/argz.c:50: Call to builtin free
-[eva] share/libc/argz.c:50: 
+[eva] share/libc/argz.c:56: Call to builtin free
+[eva] share/libc/argz.c:56: 
   function free: precondition 'freeable' got status valid.
 [eva] Recording results for str_append
 [eva] Done for function str_append
 [eva] computing for function strstr <- argz_replace <- main.
-  Called from share/libc/argz.c:78.
+  Called from share/libc/argz.c:84.
 [eva] Recording results for strstr
 [eva] Done for function strstr
-[eva] share/libc/argz.c:83: Call to builtin strlen
-[eva] share/libc/argz.c:83: 
+[eva] share/libc/argz.c:89: Call to builtin strlen
+[eva] share/libc/argz.c:89: 
   function strlen: precondition 'valid_string_s' got status valid.
 [eva] computing for function str_append <- argz_replace <- main.
-  Called from share/libc/argz.c:83.
-[eva] share/libc/argz.c:43: Call to builtin realloc
-[eva] share/libc/argz.c:43: allocating variable __realloc_str_append_l43_0
+  Called from share/libc/argz.c:89.
+[eva] share/libc/argz.c:49: Call to builtin realloc
+[eva] share/libc/argz.c:49: allocating variable __realloc_str_append_l49_0
 [eva] computing for function mempcpy <- str_append <- argz_replace <- main.
-  Called from share/libc/argz.c:46.
+  Called from share/libc/argz.c:52.
 [eva] Recording results for mempcpy
 [eva] Done for function mempcpy
-[eva] share/libc/argz.c:50: Call to builtin free
+[eva] share/libc/argz.c:56: Call to builtin free
 [eva] Recording results for str_append
 [eva] Done for function str_append
 [eva] computing for function argz_append <- argz_replace <- main.
-  Called from share/libc/argz.c:92.
-[eva] share/libc/argz.c:265: Call to builtin realloc
-[eva] share/libc/argz.c:265: allocating variable __realloc_argz_append_l265_2
-[eva] share/libc/argz.c:267: Call to builtin memcpy
+  Called from share/libc/argz.c:98.
+[eva] share/libc/argz.c:271: Call to builtin realloc
+[eva] share/libc/argz.c:271: allocating variable __realloc_argz_append_l271_2
+[eva] share/libc/argz.c:273: Call to builtin memcpy
 [eva] Recording results for argz_append
 [eva] Done for function argz_append
 [eva] computing for function argz_add <- argz_replace <- main.
-  Called from share/libc/argz.c:96.
-[eva] share/libc/argz.c:276: Call to builtin strlen
+  Called from share/libc/argz.c:102.
+[eva] share/libc/argz.c:282: Call to builtin strlen
 [eva] computing for function argz_append <- argz_add <- argz_replace <- main.
-  Called from share/libc/argz.c:276.
-[eva] share/libc/argz.c:265: Call to builtin realloc
-[eva] share/libc/argz.c:265: allocating variable __realloc_argz_append_l265_3
-[eva] share/libc/argz.c:267: Call to builtin memcpy
+  Called from share/libc/argz.c:282.
+[eva] share/libc/argz.c:271: Call to builtin realloc
+[eva] share/libc/argz.c:271: allocating variable __realloc_argz_append_l271_3
+[eva] share/libc/argz.c:273: Call to builtin memcpy
 [eva] Recording results for argz_append
 [eva] Done for function argz_append
 [eva] Recording results for argz_add
 [eva] Done for function argz_add
-[eva] share/libc/argz.c:97: Call to builtin free
-[eva] share/libc/argz.c:97: 
+[eva] share/libc/argz.c:103: Call to builtin free
+[eva] share/libc/argz.c:103: 
   function free: precondition 'freeable' got status valid.
-[eva] share/libc/argz.c:97: Call to builtin free
-[eva] share/libc/argz.c:97: Call to builtin free
+[eva] share/libc/argz.c:103: Call to builtin free
+[eva] share/libc/argz.c:103: Call to builtin free
 [eva] computing for function argz_next <- argz_replace <- main.
-  Called from share/libc/argz.c:68.
-[eva] share/libc/argz.c:123: Call to builtin strchr
+  Called from share/libc/argz.c:74.
+[eva] share/libc/argz.c:129: Call to builtin strchr
 [eva] Recording results for argz_next
 [eva] Done for function argz_next
 [eva] computing for function strstr <- argz_replace <- main.
-  Called from share/libc/argz.c:69.
+  Called from share/libc/argz.c:75.
 [eva] Recording results for strstr
 [eva] Done for function strstr
 [eva] computing for function argz_add <- argz_replace <- main.
-  Called from share/libc/argz.c:104.
-[eva] share/libc/argz.c:276: Call to builtin strlen
+  Called from share/libc/argz.c:110.
+[eva] share/libc/argz.c:282: Call to builtin strlen
 [eva] computing for function argz_append <- argz_add <- argz_replace <- main.
-  Called from share/libc/argz.c:276.
-[eva] share/libc/argz.c:265: Call to builtin realloc
-[eva] share/libc/argz.c:265: allocating variable __realloc_argz_append_l265_4
-[eva] share/libc/argz.c:267: Call to builtin memcpy
+  Called from share/libc/argz.c:282.
+[eva] share/libc/argz.c:271: Call to builtin realloc
+[eva] share/libc/argz.c:271: allocating variable __realloc_argz_append_l271_4
+[eva] share/libc/argz.c:273: Call to builtin memcpy
 [eva] Recording results for argz_append
 [eva] Done for function argz_append
 [eva] Recording results for argz_add
 [eva] Done for function argz_add
 [eva] computing for function argz_next <- argz_replace <- main.
-  Called from share/libc/argz.c:68.
-[eva] share/libc/argz.c:123: Call to builtin strchr
+  Called from share/libc/argz.c:74.
+[eva] share/libc/argz.c:129: Call to builtin strchr
 [eva] Recording results for argz_next
 [eva] Done for function argz_next
 [eva] computing for function strstr <- argz_replace <- main.
-  Called from share/libc/argz.c:69.
+  Called from share/libc/argz.c:75.
 [eva] Recording results for strstr
 [eva] Done for function strstr
 [eva] computing for function argz_add <- argz_replace <- main.
-  Called from share/libc/argz.c:104.
-[eva] share/libc/argz.c:276: Call to builtin strlen
+  Called from share/libc/argz.c:110.
+[eva] share/libc/argz.c:282: Call to builtin strlen
 [eva] computing for function argz_append <- argz_add <- argz_replace <- main.
-  Called from share/libc/argz.c:276.
-[eva] share/libc/argz.c:265: Call to builtin realloc
-[eva] share/libc/argz.c:265: allocating variable __realloc_argz_append_l265_5
-[eva] share/libc/argz.c:267: Call to builtin memcpy
+  Called from share/libc/argz.c:282.
+[eva] share/libc/argz.c:271: Call to builtin realloc
+[eva] share/libc/argz.c:271: allocating variable __realloc_argz_append_l271_5
+[eva] share/libc/argz.c:273: Call to builtin memcpy
 [eva] Recording results for argz_append
 [eva] Done for function argz_append
 [eva] Recording results for argz_add
 [eva] Done for function argz_add
 [eva] computing for function argz_next <- argz_replace <- main.
-  Called from share/libc/argz.c:68.
-[eva] share/libc/argz.c:123: Call to builtin strchr
+  Called from share/libc/argz.c:74.
+[eva] share/libc/argz.c:129: Call to builtin strchr
 [eva] Recording results for argz_next
 [eva] Done for function argz_next
 [eva] computing for function strstr <- argz_replace <- main.
-  Called from share/libc/argz.c:69.
+  Called from share/libc/argz.c:75.
 [eva] Recording results for strstr
 [eva] Done for function strstr
 [eva] computing for function argz_add <- argz_replace <- main.
-  Called from share/libc/argz.c:104.
-[eva] share/libc/argz.c:276: Call to builtin strlen
+  Called from share/libc/argz.c:110.
+[eva] share/libc/argz.c:282: Call to builtin strlen
 [eva] computing for function argz_append <- argz_add <- argz_replace <- main.
-  Called from share/libc/argz.c:276.
-[eva] share/libc/argz.c:265: Call to builtin realloc
-[eva] share/libc/argz.c:265: allocating variable __realloc_argz_append_l265_6
-[eva] share/libc/argz.c:267: Call to builtin memcpy
+  Called from share/libc/argz.c:282.
+[eva] share/libc/argz.c:271: Call to builtin realloc
+[eva] share/libc/argz.c:271: allocating variable __realloc_argz_append_l271_6
+[eva] share/libc/argz.c:273: Call to builtin memcpy
 [eva] Recording results for argz_append
 [eva] Done for function argz_append
 [eva] Recording results for argz_add
 [eva] Done for function argz_add
 [eva] computing for function argz_next <- argz_replace <- main.
-  Called from share/libc/argz.c:68.
-[eva] share/libc/argz.c:123: Call to builtin strchr
+  Called from share/libc/argz.c:74.
+[eva] share/libc/argz.c:129: Call to builtin strchr
 [eva] Recording results for argz_next
 [eva] Done for function argz_next
 [eva] computing for function strstr <- argz_replace <- main.
-  Called from share/libc/argz.c:69.
+  Called from share/libc/argz.c:75.
 [eva] Recording results for strstr
 [eva] Done for function strstr
 [eva] computing for function strndup <- argz_replace <- main.
-  Called from share/libc/argz.c:73.
+  Called from share/libc/argz.c:79.
 [eva] share/libc/string.c:336: Call to builtin malloc
 [eva] share/libc/string.c:336: allocating variable __malloc_strndup_l336_0
 [eva] share/libc/string.c:341: Call to builtin memcpy
 [eva] Recording results for strndup
 [eva] Done for function strndup
 [eva] computing for function str_append <- argz_replace <- main.
-  Called from share/libc/argz.c:76.
-[eva] share/libc/argz.c:43: Call to builtin realloc
-[eva] share/libc/argz.c:43: allocating variable __realloc_str_append_l43_1
+  Called from share/libc/argz.c:82.
+[eva] share/libc/argz.c:49: Call to builtin realloc
+[eva] share/libc/argz.c:49: allocating variable __realloc_str_append_l49_1
 [eva] computing for function mempcpy <- str_append <- argz_replace <- main.
-  Called from share/libc/argz.c:46.
+  Called from share/libc/argz.c:52.
 [eva] Recording results for mempcpy
 [eva] Done for function mempcpy
-[eva] share/libc/argz.c:50: Call to builtin free
+[eva] share/libc/argz.c:56: Call to builtin free
 [eva] Recording results for str_append
 [eva] Done for function str_append
 [eva] computing for function strstr <- argz_replace <- main.
-  Called from share/libc/argz.c:78.
+  Called from share/libc/argz.c:84.
 [eva] Recording results for strstr
 [eva] Done for function strstr
-[eva] share/libc/argz.c:83: Call to builtin strlen
+[eva] share/libc/argz.c:89: Call to builtin strlen
 [eva] computing for function str_append <- argz_replace <- main.
-  Called from share/libc/argz.c:83.
-[eva] share/libc/argz.c:43: Call to builtin realloc
-[eva] share/libc/argz.c:43: allocating variable __realloc_str_append_l43_2
+  Called from share/libc/argz.c:89.
+[eva] share/libc/argz.c:49: Call to builtin realloc
+[eva] share/libc/argz.c:49: allocating variable __realloc_str_append_l49_2
 [eva] computing for function mempcpy <- str_append <- argz_replace <- main.
-  Called from share/libc/argz.c:46.
+  Called from share/libc/argz.c:52.
 [eva] Recording results for mempcpy
 [eva] Done for function mempcpy
-[eva] share/libc/argz.c:50: Call to builtin free
+[eva] share/libc/argz.c:56: Call to builtin free
 [eva] Recording results for str_append
 [eva] Done for function str_append
 [eva] computing for function argz_add <- argz_replace <- main.
-  Called from share/libc/argz.c:96.
-[eva] share/libc/argz.c:276: Call to builtin strlen
+  Called from share/libc/argz.c:102.
+[eva] share/libc/argz.c:282: Call to builtin strlen
 [eva] computing for function argz_append <- argz_add <- argz_replace <- main.
-  Called from share/libc/argz.c:276.
-[eva] share/libc/argz.c:265: Call to builtin realloc
-[eva] share/libc/argz.c:265: allocating variable __realloc_argz_append_l265_7
-[eva] share/libc/argz.c:267: Call to builtin memcpy
+  Called from share/libc/argz.c:282.
+[eva] share/libc/argz.c:271: Call to builtin realloc
+[eva] share/libc/argz.c:271: allocating variable __realloc_argz_append_l271_7
+[eva] share/libc/argz.c:273: Call to builtin memcpy
 [eva] Recording results for argz_append
 [eva] Done for function argz_append
 [eva] Recording results for argz_add
 [eva] Done for function argz_add
-[eva] share/libc/argz.c:97: Call to builtin free
-[eva] share/libc/argz.c:97: Call to builtin free
+[eva] share/libc/argz.c:103: Call to builtin free
+[eva] share/libc/argz.c:103: Call to builtin free
 [eva] computing for function argz_next <- argz_replace <- main.
-  Called from share/libc/argz.c:68.
-[eva] share/libc/argz.c:123: Call to builtin strchr
+  Called from share/libc/argz.c:74.
+[eva] share/libc/argz.c:129: Call to builtin strchr
 [eva] Recording results for argz_next
 [eva] Done for function argz_next
-[eva] share/libc/argz.c:109: Call to builtin free
-[eva] share/libc/argz.c:109: 
+[eva] share/libc/argz.c:115: Call to builtin free
+[eva] share/libc/argz.c:115: 
   function free: precondition 'freeable' got status valid.
-[eva] share/libc/argz.c:114: Call to builtin free
-[eva] share/libc/argz.c:114: 
+[eva] share/libc/argz.c:120: Call to builtin free
+[eva] share/libc/argz.c:120: 
   function free: precondition 'freeable' got status valid.
-[eva] share/libc/argz.c:114: Call to builtin free
-[eva] share/libc/argz.c:114: Call to builtin free
-[eva] share/libc/argz.c:114: Call to builtin free
-[eva] share/libc/argz.c:114: Call to builtin free
-[eva] share/libc/argz.c:114: Call to builtin free
+[eva] share/libc/argz.c:120: Call to builtin free
+[eva] share/libc/argz.c:120: Call to builtin free
+[eva] share/libc/argz.c:120: Call to builtin free
+[eva] share/libc/argz.c:120: Call to builtin free
+[eva] share/libc/argz.c:120: Call to builtin free
 [eva] Recording results for argz_replace
 [eva] Done for function argz_replace
 [eva] computing for function exit <- main.
@@ -500,18 +500,18 @@
 [eva] Done for function __FC_assert
 [eva] computing for function argz_next <- main.
   Called from tests/libc/argz_c.c:52.
-[eva] share/libc/argz.c:123: Call to builtin strchr
+[eva] share/libc/argz.c:129: Call to builtin strchr
 [eva] Recording results for argz_next
 [eva] Done for function argz_next
 [eva] computing for function argz_delete <- main.
   Called from tests/libc/argz_c.c:54.
-[eva] share/libc/argz.c:178: Call to builtin strlen
-[eva] share/libc/argz.c:178: 
+[eva] share/libc/argz.c:184: Call to builtin strlen
+[eva] share/libc/argz.c:184: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] share/libc/argz.c:180: Call to builtin memmove
-[eva] share/libc/argz.c:180: 
+[eva] share/libc/argz.c:186: Call to builtin memmove
+[eva] share/libc/argz.c:186: 
   function memmove: precondition 'valid_dest' got status valid.
-[eva] share/libc/argz.c:180: 
+[eva] share/libc/argz.c:186: 
   function memmove: precondition 'valid_src' got status valid.
 [eva] share/libc/string.h:124: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
@@ -528,12 +528,12 @@
 [eva] Done for function argz_next
 [eva] computing for function argz_next <- main.
   Called from tests/libc/argz_c.c:58.
-[eva] share/libc/argz.c:123: Call to builtin strchr
+[eva] share/libc/argz.c:129: Call to builtin strchr
 [eva] Recording results for argz_next
 [eva] Done for function argz_next
 [eva] computing for function argz_next <- main.
   Called from tests/libc/argz_c.c:58.
-[eva] share/libc/argz.c:123: Call to builtin strchr
+[eva] share/libc/argz.c:129: Call to builtin strchr
 [eva] Recording results for argz_next
 [eva] Done for function argz_next
 [eva] computing for function __FC_assert <- main.
@@ -543,8 +543,8 @@
 [eva] Done for function __FC_assert
 [eva] computing for function argz_delete <- main.
   Called from tests/libc/argz_c.c:61.
-[eva] share/libc/argz.c:178: Call to builtin strlen
-[eva] share/libc/argz.c:180: Call to builtin memmove
+[eva] share/libc/argz.c:184: Call to builtin strlen
+[eva] share/libc/argz.c:186: Call to builtin memmove
 [eva] Recording results for argz_delete
 [eva] Done for function argz_delete
 [eva] computing for function __FC_assert <- main.
@@ -558,22 +558,22 @@
 [eva] Done for function argz_next
 [eva] computing for function argz_insert <- main.
   Called from tests/libc/argz_c.c:64.
-[eva] share/libc/argz.c:147: Call to builtin strlen
-[eva] share/libc/argz.c:147: 
+[eva] share/libc/argz.c:153: Call to builtin strlen
+[eva] share/libc/argz.c:153: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] share/libc/argz.c:151: Call to builtin realloc
-[eva] share/libc/argz.c:151: 
+[eva] share/libc/argz.c:157: Call to builtin realloc
+[eva] share/libc/argz.c:157: 
   function realloc: precondition 'freeable' got status valid.
-[eva] share/libc/argz.c:151: allocating variable __realloc_argz_insert_l151
-[eva] share/libc/argz.c:155: Call to builtin memmove
-[eva] share/libc/argz.c:155: 
+[eva] share/libc/argz.c:157: allocating variable __realloc_argz_insert_l157
+[eva] share/libc/argz.c:161: Call to builtin memmove
+[eva] share/libc/argz.c:161: 
   function memmove: precondition 'valid_dest' got status valid.
-[eva] share/libc/argz.c:155: 
+[eva] share/libc/argz.c:161: 
   function memmove: precondition 'valid_src' got status valid.
-[eva] share/libc/argz.c:156: Call to builtin memmove
-[eva] share/libc/argz.c:156: 
+[eva] share/libc/argz.c:162: Call to builtin memmove
+[eva] share/libc/argz.c:162: 
   function memmove: precondition 'valid_dest' got status valid.
-[eva] share/libc/argz.c:156: 
+[eva] share/libc/argz.c:162: 
   function memmove: precondition 'valid_src' got status valid.
 [eva] Recording results for argz_insert
 [eva] Done for function argz_insert
@@ -588,13 +588,13 @@
 [eva] computing for function argz_insert <- main.
   Called from tests/libc/argz_c.c:67.
 [eva] computing for function argz_add <- argz_insert <- main.
-  Called from share/libc/argz.c:136.
-[eva] share/libc/argz.c:276: Call to builtin strlen
+  Called from share/libc/argz.c:142.
+[eva] share/libc/argz.c:282: Call to builtin strlen
 [eva] computing for function argz_append <- argz_add <- argz_insert <- main.
-  Called from share/libc/argz.c:276.
-[eva] share/libc/argz.c:265: Call to builtin realloc
-[eva] share/libc/argz.c:265: allocating variable __realloc_argz_append_l265_8
-[eva] share/libc/argz.c:267: Call to builtin memcpy
+  Called from share/libc/argz.c:282.
+[eva] share/libc/argz.c:271: Call to builtin realloc
+[eva] share/libc/argz.c:271: allocating variable __realloc_argz_append_l271_8
+[eva] share/libc/argz.c:273: Call to builtin memcpy
 [eva] Recording results for argz_append
 [eva] Done for function argz_append
 [eva] Recording results for argz_add
@@ -618,45 +618,45 @@
 [eva:final-states] Values at end of function mempcpy:
   i ∈ {0; 3}
   __retres ∈
-          {{ (void *)&__realloc_str_append_l43[3] ;
-             (void *)&__realloc_str_append_l43_0[3] ;
-             (void *)&__realloc_str_append_l43_1[3] ;
-             (void *)&__realloc_str_append_l43_2[3] }}
-  __realloc_str_append_l43[0] ∈ {98}
+          {{ (void *)&__realloc_str_append_l49[3] ;
+             (void *)&__realloc_str_append_l49_0[3] ;
+             (void *)&__realloc_str_append_l49_1[3] ;
+             (void *)&__realloc_str_append_l49_2[3] }}
+  __realloc_str_append_l49[0] ∈ {98}
                           [1] ∈ {108}
                           [2] ∈ {97}
                           [3] ∈ UNINITIALIZED
-  __realloc_str_append_l43_1[0] ∈ {98}
+  __realloc_str_append_l49_1[0] ∈ {98}
                             [1] ∈ {108}
                             [2] ∈ {97}
                             [3] ∈ UNINITIALIZED
 [eva:final-states] Values at end of function argz_append:
   dst ∈
-     {{ NULL ; &__realloc_argz_append_l265_2[0] ;
-        &__realloc_argz_append_l265_3[0] ; &__realloc_argz_append_l265_4[0] ;
-        &__realloc_argz_append_l265_5[0] ; &__realloc_argz_append_l265_6[0] ;
-        &__realloc_argz_append_l265_7[0] }}
+     {{ NULL ; &__realloc_argz_append_l271_2[0] ;
+        &__realloc_argz_append_l271_3[0] ; &__realloc_argz_append_l271_4[0] ;
+        &__realloc_argz_append_l271_5[0] ; &__realloc_argz_append_l271_6[0] ;
+        &__realloc_argz_append_l271_7[0] }}
   dst_len ∈ {0; 7; 11; 14; 17; 19; 23}
   new_argz_len ∈ {7; 10; 11; 14; 17; 18; 19; 21; 23; 24}
   new_argz ∈
-          {{ NULL ; &__realloc_argz_append_l265[0] ;
-             &__realloc_argz_append_l265_0[0] ;
-             &__realloc_argz_append_l265_1[0] ;
-             &__realloc_argz_append_l265_2[0] ;
-             &__realloc_argz_append_l265_3[0] ;
-             &__realloc_argz_append_l265_4[0] ;
-             &__realloc_argz_append_l265_5[0] ;
-             &__realloc_argz_append_l265_6[0] ;
-             &__realloc_argz_append_l265_7[0] ;
-             &__realloc_argz_append_l265_8[0] }}
+          {{ NULL ; &__realloc_argz_append_l271[0] ;
+             &__realloc_argz_append_l271_0[0] ;
+             &__realloc_argz_append_l271_1[0] ;
+             &__realloc_argz_append_l271_2[0] ;
+             &__realloc_argz_append_l271_3[0] ;
+             &__realloc_argz_append_l271_4[0] ;
+             &__realloc_argz_append_l271_5[0] ;
+             &__realloc_argz_append_l271_6[0] ;
+             &__realloc_argz_append_l271_7[0] ;
+             &__realloc_argz_append_l271_8[0] }}
   argz ∈
-      {{ &__malloc_argz_create_sep_l196[0] ; &__realloc_argz_append_l265[0] ;
-         &__realloc_argz_add_sep_l287[0] ; &__realloc_argz_append_l265_0[0] ;
-         &__realloc_argz_append_l265_1[0] ; &__realloc_argz_insert_l151[0] ;
-         &__realloc_argz_append_l265_8[0] }}
+      {{ &__malloc_argz_create_sep_l202[0] ; &__realloc_argz_append_l271[0] ;
+         &__realloc_argz_add_sep_l293[0] ; &__realloc_argz_append_l271_0[0] ;
+         &__realloc_argz_append_l271_1[0] ; &__realloc_argz_insert_l157[0] ;
+         &__realloc_argz_append_l271_8[0] }}
   len ∈ {7; 10; 16; 18; 21; 24}
   __retres ∈ {0; 12}
-  __realloc_argz_append_l265[0] ∈ {97}
+  __realloc_argz_append_l271[0] ∈ {97}
                             [1] ∈ {0}
                             [2] ∈ {98}
                             [3] ∈ {0}
@@ -666,7 +666,7 @@
                             [7] ∈ {101}
                             [8] ∈ {102}
                             [9] ∈ {0}
-  __realloc_argz_append_l265_0[0] ∈ {97}
+  __realloc_argz_append_l271_0[0] ∈ {97}
                               [1] ∈ {0}
                               [2] ∈ {98}
                               [3] ∈ {0}
@@ -684,7 +684,7 @@
                               [15] ∈ {0}
                               [16] ∈ {107}
                               [17] ∈ {0}
-  __realloc_argz_append_l265_1[0] ∈ {97}
+  __realloc_argz_append_l271_1[0] ∈ {97}
                               [1] ∈ {0}
                               [2] ∈ {98}
                               [3] ∈ {0}
@@ -705,14 +705,14 @@
                               [18] ∈ {101}
                               [19] ∈ {102}
                               [20] ∈ {0}
-  __realloc_argz_append_l265_2[0] ∈ {97}
+  __realloc_argz_append_l271_2[0] ∈ {97}
                               [1] ∈ {0}
                               [2] ∈ {98}
                               [3] ∈ {0}
                               [4] ∈ {99}
                               [5] ∈ {100}
                               [6] ∈ {0}
-  __realloc_argz_append_l265_3[0] ∈ {97}
+  __realloc_argz_append_l271_3[0] ∈ {97}
                               [1] ∈ {0}
                               [2] ∈ {98}
                               [3] ∈ {0}
@@ -723,7 +723,7 @@
                               [8] ∈ {108}
                               [9] ∈ {97}
                               [10] ∈ {0}
-  __realloc_argz_append_l265_4[0] ∈ {97}
+  __realloc_argz_append_l271_4[0] ∈ {97}
                               [1] ∈ {0}
                               [2] ∈ {98}
                               [3] ∈ {0}
@@ -737,7 +737,7 @@
                               [11] ∈ {103}
                               [12] ∈ {104}
                               [13] ∈ {0}
-  __realloc_argz_append_l265_5[0] ∈ {97}
+  __realloc_argz_append_l271_5[0] ∈ {97}
                               [1] ∈ {0}
                               [2] ∈ {98}
                               [3] ∈ {0}
@@ -754,7 +754,7 @@
                               [14] ∈ {105}
                               [15] ∈ {106}
                               [16] ∈ {0}
-  __realloc_argz_append_l265_6[0] ∈ {97}
+  __realloc_argz_append_l271_6[0] ∈ {97}
                               [1] ∈ {0}
                               [2] ∈ {98}
                               [3] ∈ {0}
@@ -773,7 +773,7 @@
                               [16] ∈ {0}
                               [17] ∈ {107}
                               [18] ∈ {0}
-  __realloc_argz_append_l265_7[0] ∈ {97}
+  __realloc_argz_append_l271_7[0] ∈ {97}
                               [1] ∈ {0}
                               [2] ∈ {98}
                               [3] ∈ {0}
@@ -796,7 +796,7 @@
                               [20] ∈ {108}
                               [21] ∈ {97}
                               [22] ∈ {0}
-  __realloc_argz_append_l265_8[0] ∈ {109}
+  __realloc_argz_append_l271_8[0] ∈ {109}
                               [1] ∈ {110}
                               [2] ∈ {111}
                               [3] ∈ {0}
@@ -821,8 +821,8 @@
                               [23] ∈ {0}
 [eva:final-states] Values at end of function stpcpy:
   i ∈ {2; 4}
-  __retres ∈ {{ &__malloc_argz_create_l239{[4], [7], [12]} }}
-  __malloc_argz_create_l239[0] ∈ {116}
+  __retres ∈ {{ &__malloc_argz_create_l245{[4], [7], [12]} }}
+  __malloc_argz_create_l245[0] ∈ {116}
                            [1] ∈ {104}
                            [2] ∈ {105}
                            [3] ∈ {115}
@@ -838,54 +838,54 @@
 [eva:final-states] Values at end of function str_append:
   new_len ∈ {3}
   new_to ∈
-        {{ NULL ; &__realloc_str_append_l43[0] ;
-           &__realloc_str_append_l43_0[0] ; &__realloc_str_append_l43_1[0] ;
-           &__realloc_str_append_l43_2[0] }}
+        {{ NULL ; &__realloc_str_append_l49[0] ;
+           &__realloc_str_append_l49_0[0] ; &__realloc_str_append_l49_1[0] ;
+           &__realloc_str_append_l49_2[0] }}
   to_len ∈ {0; 3}
   to ∈
-    {{ NULL ; &__realloc_str_append_l43[0] ; &__realloc_str_append_l43_0[0] ;
-       &__realloc_str_append_l43_1[0] ; &__realloc_str_append_l43_2[0] }}
-  __realloc_str_append_l43[0] ∈ {98}
+    {{ NULL ; &__realloc_str_append_l49[0] ; &__realloc_str_append_l49_0[0] ;
+       &__realloc_str_append_l49_1[0] ; &__realloc_str_append_l49_2[0] }}
+  __realloc_str_append_l49[0] ∈ {98}
                           [1] ∈ {108}
                           [2] ∈ {97}
                           [3] ∈ {0}
-  __realloc_str_append_l43_0[0] ∈ {98}
+  __realloc_str_append_l49_0[0] ∈ {98}
                             [1] ∈ {108}
                             [2] ∈ {97}
                             [3] ∈ {0}
-  __realloc_str_append_l43_1[0] ∈ {98}
+  __realloc_str_append_l49_1[0] ∈ {98}
                             [1] ∈ {108}
                             [2] ∈ {97}
                             [3] ∈ {0}
-  __realloc_str_append_l43_2[0] ∈ {98}
+  __realloc_str_append_l49_2[0] ∈ {98}
                             [1] ∈ {108}
                             [2] ∈ {97}
                             [3] ∈ {0}
 [eva:final-states] Values at end of function argz_next:
   entry ∈
        {{ NULL ;
-          &__realloc_argz_append_l265_1{[2], [4], [7], [10], [13], [16],
+          &__realloc_argz_append_l271_1{[2], [4], [7], [10], [13], [16],
                                         [18], [21]} ;
-          &__realloc_argz_append_l265_7{[2], [5]} }}
+          &__realloc_argz_append_l271_7{[2], [5]} }}
   __retres ∈
           {{ NULL ;
-             &__realloc_argz_append_l265_1{[0], [2], [4], [7], [10], [13],
+             &__realloc_argz_append_l271_1{[0], [2], [4], [7], [10], [13],
                                            [16], [18]} ;
-             &__realloc_argz_append_l265_7{[0], [2], [5]} }}
+             &__realloc_argz_append_l271_7{[0], [2], [5]} }}
 [eva:final-states] Values at end of function argz_add:
   dst ∈
-     {{ &__realloc_argz_append_l265_2[0] ; &__realloc_argz_append_l265_3[0] ;
-        &__realloc_argz_append_l265_4[0] ; &__realloc_argz_append_l265_5[0] ;
-        &__realloc_argz_append_l265_6[0] ;
-        &__realloc_argz_append_l265_7[0] }}
+     {{ &__realloc_argz_append_l271_2[0] ; &__realloc_argz_append_l271_3[0] ;
+        &__realloc_argz_append_l271_4[0] ; &__realloc_argz_append_l271_5[0] ;
+        &__realloc_argz_append_l271_6[0] ;
+        &__realloc_argz_append_l271_7[0] }}
   dst_len ∈ {7; 11; 14; 17; 19; 23}
   argz ∈
-      {{ &__malloc_argz_create_sep_l196[0] ; &__realloc_argz_append_l265[0] ;
-         &__realloc_argz_append_l265_0[0] ;
-         &__realloc_argz_append_l265_1[0] ; &__realloc_argz_insert_l151[0] ;
-         &__realloc_argz_append_l265_8[0] }}
+      {{ &__malloc_argz_create_sep_l202[0] ; &__realloc_argz_append_l271[0] ;
+         &__realloc_argz_append_l271_0[0] ;
+         &__realloc_argz_append_l271_1[0] ; &__realloc_argz_insert_l157[0] ;
+         &__realloc_argz_append_l271_8[0] }}
   len ∈ {7; 10; 18; 21; 24}
-  __realloc_argz_append_l265[0] ∈ {97}
+  __realloc_argz_append_l271[0] ∈ {97}
                             [1] ∈ {0}
                             [2] ∈ {98}
                             [3] ∈ {0}
@@ -895,7 +895,7 @@
                             [7] ∈ {101}
                             [8] ∈ {102}
                             [9] ∈ {0}
-  __realloc_argz_append_l265_1[0] ∈ {97}
+  __realloc_argz_append_l271_1[0] ∈ {97}
                               [1] ∈ {0}
                               [2] ∈ {98}
                               [3] ∈ {0}
@@ -916,7 +916,7 @@
                               [18] ∈ {101}
                               [19] ∈ {102}
                               [20] ∈ {0}
-  __realloc_argz_append_l265_3[0] ∈ {97}
+  __realloc_argz_append_l271_3[0] ∈ {97}
                               [1] ∈ {0}
                               [2] ∈ {98}
                               [3] ∈ {0}
@@ -927,7 +927,7 @@
                               [8] ∈ {108}
                               [9] ∈ {97}
                               [10] ∈ {0}
-  __realloc_argz_append_l265_4[0] ∈ {97}
+  __realloc_argz_append_l271_4[0] ∈ {97}
                               [1] ∈ {0}
                               [2] ∈ {98}
                               [3] ∈ {0}
@@ -941,7 +941,7 @@
                               [11] ∈ {103}
                               [12] ∈ {104}
                               [13] ∈ {0}
-  __realloc_argz_append_l265_5[0] ∈ {97}
+  __realloc_argz_append_l271_5[0] ∈ {97}
                               [1] ∈ {0}
                               [2] ∈ {98}
                               [3] ∈ {0}
@@ -958,7 +958,7 @@
                               [14] ∈ {105}
                               [15] ∈ {106}
                               [16] ∈ {0}
-  __realloc_argz_append_l265_6[0] ∈ {97}
+  __realloc_argz_append_l271_6[0] ∈ {97}
                               [1] ∈ {0}
                               [2] ∈ {98}
                               [3] ∈ {0}
@@ -977,7 +977,7 @@
                               [16] ∈ {0}
                               [17] ∈ {107}
                               [18] ∈ {0}
-  __realloc_argz_append_l265_7[0] ∈ {97}
+  __realloc_argz_append_l271_7[0] ∈ {97}
                               [1] ∈ {0}
                               [2] ∈ {98}
                               [3] ∈ {0}
@@ -1000,7 +1000,7 @@
                               [20] ∈ {108}
                               [21] ∈ {97}
                               [22] ∈ {0}
-  __realloc_argz_append_l265_8[0] ∈ {109}
+  __realloc_argz_append_l271_8[0] ∈ {109}
                               [1] ∈ {110}
                               [2] ∈ {111}
                               [3] ∈ {0}
@@ -1025,10 +1025,10 @@
                               [23] ∈ {0}
 [eva:final-states] Values at end of function argz_add_sep:
   nlen ∈ {6}
-  argz ∈ {{ NULL ; &__realloc_argz_add_sep_l287[0] }}
+  argz ∈ {{ NULL ; &__realloc_argz_add_sep_l293[0] }}
   len ∈ {10; 16}
   __retres ∈ {0; 12}
-  __realloc_argz_add_sep_l287[0] ∈ {97}
+  __realloc_argz_add_sep_l293[0] ∈ {97}
                              [1] ∈ {0}
                              [2] ∈ {98}
                              [3] ∈ {0}
@@ -1046,8 +1046,8 @@
                              [15] ∈ {0}
 [eva:final-states] Values at end of function argz_count:
   argz ∈
-      {{ &__malloc_argz_create_sep_l196[7] ;
-         &__realloc_argz_add_sep_l287[16] }}
+      {{ &__malloc_argz_create_sep_l202[7] ;
+         &__realloc_argz_add_sep_l293[16] }}
   len ∈ {0}
   count ∈ {3; 6}
 [eva:final-states] Values at end of function argz_create:
@@ -1055,11 +1055,11 @@
   argc ∈ {3}
   tlen ∈ {13}
   ap ∈ {{ &argv[3] }} or UNINITIALIZED
-  p ∈ {{ &__malloc_argz_create_l239[13] }} or UNINITIALIZED
-  argz ∈ {{ NULL ; &__malloc_argz_create_l239[0] }}
+  p ∈ {{ &__malloc_argz_create_l245[13] }} or UNINITIALIZED
+  argz ∈ {{ NULL ; &__malloc_argz_create_l245[0] }}
   len ∈ {13} or UNINITIALIZED
   __retres ∈ {0; 12}
-  __malloc_argz_create_l239[0] ∈ {116}
+  __malloc_argz_create_l245[0] ∈ {116}
                            [1] ∈ {104}
                            [2] ∈ {105}
                            [3] ∈ {115}
@@ -1075,10 +1075,10 @@
 [eva:final-states] Values at end of function argz_create_sep:
   __fc_heap_status ∈ [--..--]
   nlen ∈ {7; 8}
-  argz ∈ {{ NULL ; &__malloc_argz_create_sep_l196[0] }}
+  argz ∈ {{ NULL ; &__malloc_argz_create_sep_l202[0] }}
   len ∈ {7; 13}
   __retres ∈ {0; 12}
-  __malloc_argz_create_sep_l196[0] ∈ {97}
+  __malloc_argz_create_sep_l202[0] ∈ {97}
                                [1] ∈ {0}
                                [2] ∈ {98}
                                [3] ∈ {0}
@@ -1088,7 +1088,7 @@
                                [7] ∈ UNINITIALIZED
 [eva:final-states] Values at end of function argz_delete:
   len ∈ {17; 21}
-  __realloc_argz_append_l265_7[0] ∈ {97}
+  __realloc_argz_append_l271_7[0] ∈ {97}
                               [1] ∈ {0}
                               [2] ∈ {99}
                               [3] ∈ {100}
@@ -1113,15 +1113,15 @@
                               [22] ∈ {0}
 [eva:final-states] Values at end of function argz_insert:
   before ∈
-        {{ NULL ; &__realloc_argz_append_l265_7[0] ;
-           &__realloc_argz_insert_l151[0] }}
+        {{ NULL ; &__realloc_argz_append_l271_7[0] ;
+           &__realloc_argz_insert_l157[0] }}
   argz ∈
-      {{ &__realloc_argz_append_l265_7[0] ; &__realloc_argz_insert_l151[0] ;
-         &__realloc_argz_append_l265_8[0] }}
+      {{ &__realloc_argz_append_l271_7[0] ; &__realloc_argz_insert_l157[0] ;
+         &__realloc_argz_append_l271_8[0] }}
   len ∈ {17; 21; 24}
-  p ∈ {{ &__realloc_argz_append_l265_7[0] }} or ESCAPINGADDR
+  p ∈ {{ &__realloc_argz_append_l271_7[0] }} or ESCAPINGADDR
   __retres ∈ {0; 12}
-  __realloc_argz_insert_l151[0] ∈ {109}
+  __realloc_argz_insert_l157[0] ∈ {109}
                             [1] ∈ {110}
                             [2] ∈ {111}
                             [3] ∈ {0}
@@ -1142,7 +1142,7 @@
                             [18] ∈ {108}
                             [19] ∈ {97}
                             [20] ∈ {0}
-  __realloc_argz_append_l265_8[0] ∈ {109}
+  __realloc_argz_append_l271_8[0] ∈ {109}
                               [1] ∈ {110}
                               [2] ∈ {111}
                               [3] ∈ {0}
@@ -1174,17 +1174,17 @@
   __malloc_strndup_l336 ∈ {0}
   __malloc_strndup_l336_0 ∈ {0}
 [eva:final-states] Values at end of function strstr:
-  __retres ∈ {{ NULL ; &__realloc_argz_append_l265_1{[7], [18]} }}
+  __retres ∈ {{ NULL ; &__realloc_argz_append_l271_1{[7], [18]} }}
 [eva:final-states] Values at end of function argz_replace:
   __fc_errno ∈ [--..--]
   __fc_heap_status ∈ [--..--]
   err ∈ {0; 12}
   argz ∈
-      {{ &__realloc_argz_append_l265_1[0] ;
-         &__realloc_argz_append_l265_7[0] }}
+      {{ &__realloc_argz_append_l271_1[0] ;
+         &__realloc_argz_append_l271_7[0] }}
   len ∈ {21; 23}
   replace_count ∈ {2; 3}
-  __realloc_argz_append_l265_7[0] ∈ {97}
+  __realloc_argz_append_l271_7[0] ∈ {97}
                               [1] ∈ {0}
                               [2] ∈ {98}
                               [3] ∈ {0}
