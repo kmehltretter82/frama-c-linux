@@ -70,12 +70,12 @@ endif
 SED_UNBUFFERED:=sed$(shell sed --unbuffered //p /dev/null 2>/dev/null && echo " --unbuffered" || true)
 
 # If there is a GNU time in the PATH, which contains the desired options
-# (-f and -o, whose presence is tested using the --help message),
-# use them; otherwise, use any time (be it a shell builtin or a command).
-# Note: usage of 'env' is necessary to avoid invoking a shell builtin.
-ifneq (1,$(shell env time --help | grep -C100 '\-f' | grep '\-o' -q; echo $$?))
+# (-f and -o), use them; otherwise, use any time (be it a shell builtin
+# or a command). 'env' allows bypassing shell builtins (if they exist),
+# since they usually don't have the required options.
+ifeq (OK,$(shell env time -f 'test' -o '/dev/null' echo OK || echo KO))
 define time_with_output
-  $(shell which time) -f 'user_time=%U\nmemory=%M' -o "$(1)"
+  env time -f 'user_time=%U\nmemory=%M' -o "$(1)"
 endef
 else
 define time_with_output
