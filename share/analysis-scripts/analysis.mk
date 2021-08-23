@@ -69,31 +69,18 @@ endif
 # nor Busybox' have it, in which case we ignore it)
 SED_UNBUFFERED:=sed$(shell sed --unbuffered //p /dev/null 2>/dev/null && echo " --unbuffered" || true)
 
-# Test if on a Mac;
-# test if /usr/bin/time is available, otherwise use the shell builtin
-# (which has less options)
-UNAME := $(shell uname -s)
-ifeq ($(UNAME),Darwin)
-ifneq (,$(wildcard /usr/bin/time))
+# If there is a GNU time in the PATH, which contains the desired options
+# (-f and -o, whose presence is tested using the --help message),
+# use them; otherwise, use any time (be it a shell builtin or a command).
+# Note: usage of 'env' is necessary to avoid invoking a shell builtin.
+ifneq (1,$(shell env time --help | grep -C100 '\-f' | grep '\-o' -q; echo $$?))
 define time_with_output
-  /usr/bin/time -p
+  $(shell which time) -f 'user_time=%U\nmemory=%M' -o "$(1)"
 endef
 else
 define time_with_output
   time
 endef
-endif
-else
-TIMEBIN:=$(shell which -a time | grep '^/')
-ifneq (,$(TIMEBIN))
-define time_with_output
-  $(TIMEBIN) -f 'user_time=%U\nmemory=%M' -o "$(1)"
-endef
-else
-define time_with_output
-  time
-endef
-endif
 endif
 
 # --- Utilities ---
