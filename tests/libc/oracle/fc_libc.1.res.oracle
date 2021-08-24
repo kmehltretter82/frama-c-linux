@@ -8621,7 +8621,9 @@ extern int pthread_mutexattr_settype(pthread_mutexattr_t *attr, int type);
 
 /*@ requires valid_name: valid_read_string(name);
     assigns \result;
-    assigns \result \from thread, *(name + (..));
+    assigns \result
+      \from (indirect: thread),
+            (indirect: *(name + (0 .. strlen{Old}(name))));
     
     behavior ko:
       assumes name_too_long: strlen(name) > 15;

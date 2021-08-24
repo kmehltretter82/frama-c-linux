@@ -388,8 +388,9 @@ extern int pthread_spin_unlock(pthread_spinlock_t *);
 extern void pthread_testcancel(void);
 
 // GNU extensions
+
 /*@ requires valid_name: valid_read_string(name);
-    assigns \result \from thread, name[..];
+    assigns \result \from indirect:thread, indirect:name[0 .. strlen(name)];
     //FIXME: it should assign thread, but our current
     // definition of the type does not allow this.
     behavior ko:
