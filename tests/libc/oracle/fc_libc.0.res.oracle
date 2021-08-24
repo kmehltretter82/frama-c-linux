@@ -4,10 +4,10 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] tests/libc/fc_libc.c:161: assertion got status valid.
-[eva] tests/libc/fc_libc.c:162: assertion got status valid.
-[eva] tests/libc/fc_libc.c:163: assertion got status valid.
 [eva] tests/libc/fc_libc.c:164: assertion got status valid.
+[eva] tests/libc/fc_libc.c:165: assertion got status valid.
+[eva] tests/libc/fc_libc.c:166: assertion got status valid.
+[eva] tests/libc/fc_libc.c:167: assertion got status valid.
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -212,6 +212,7 @@
 #include "__fc_builtin.h"
 #include "__fc_define_fd_set_t.h"
 #include "__fc_gcc_builtins.h"
+#include "__fc_integer.h"
 #include "__fc_select.h"
 #include "alloca.h"
 #include "argz.c"

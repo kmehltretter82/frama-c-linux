@@ -8033,6 +8033,9 @@ int __builtin_popcountl(unsigned long x);
  */
 int __builtin_popcountll(unsigned long long x);
 
+/*@ logic 𝔹 bit_test(ℤ x, ℤ pos) = (x & (1 << pos)) ≢ 0;
+
+*/
 /*@ requires valid_filename: valid_read_string(filename);
     assigns \result;
     assigns \result \from (indirect: *(filename + (0 ..))), (indirect: mode);

@@ -52,6 +52,7 @@
 #include "__fc_define_intptr_t.h"
 #include "__fc_define_iovec.h"
 #include "__fc_define_key_t.h"
+#include "__fc_define_max_open_files.h"
 #include "__fc_define_mode_t.h"
 #include "__fc_define_nlink_t.h"
 #include "__fc_define_null.h"
@@ -75,8 +76,10 @@
 #include "__fc_define_wint_t.h"
 #include "__fc_gcc_builtins.h"
 #include "__fc_inet.h"
+#include "__fc_integer.h"
+//#include "__fc_libc.h" //keep this; used by check_full_libc.sh
 #include "__fc_machdep.h"
-//#include "__fc_machdep_linux_shared.h"
+//#include "__fc_machdep_linux_shared.h" //keep this; used by check_full_libc.sh
 #include "fcntl.h"
 #include "__fc_select.h"
 #include "__fc_string_axiomatic.h"
