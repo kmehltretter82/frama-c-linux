@@ -343,6 +343,9 @@ struct tcp_cookie_transactions
 
 #endif /* Misc.  */
 
+// The definition below appears on macOS, but it is neither POSIX nor in glibc
+#define TCP_KEEPALIVE 0x10
+
 __END_DECLS
 __POP_FC_STDLIB
 
