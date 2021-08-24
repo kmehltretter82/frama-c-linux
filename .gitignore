@@ -16,7 +16,6 @@ TAGS
 .\#*
 .DS_Store
 *.tmp
-*.s
 
 #artifacts from execution
 frama_c_journal.ml
@@ -60,7 +59,6 @@ autom4te.cache
 /tests/misc/my_visitor.sav
 /tests/spec/preprocess_dos.c
 /tests/*/*.opt
-/tests/pdg/*.dot
 
 /devel_tools/fc-time
 /devel_tools/fc-memuse
