@@ -390,7 +390,7 @@ extern void pthread_testcancel(void);
 // GNU extensions
 /*@ requires valid_name: valid_read_string(name);
     assigns \result \from thread, name[..];
-    //FIXME: it should assigns thread, but our current
+    //FIXME: it should assign thread, but our current
     // definition of the type does not allow this.
     behavior ko:
       assumes name_too_long: strlen(name) > 15;
@@ -407,7 +407,7 @@ int pthread_setname_np(pthread_t thread, const char* name);
       assumes buffer_size_ok: len >= 16;
       // same remark as above: if we fail to open
       // the appropriate /proc/* file, \result might
-      // not be 0 (and the name won't be written
+      // not be 0 (and the name won't be written)
       ensures name_written: initialization:
         \result == 0 ==>
            valid_string(name) &&
