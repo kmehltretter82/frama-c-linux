@@ -73,20 +73,94 @@ let empty ~loc kf env =
 
 let with_data_from ~loc kf env from =
   match from with
-  | Some _from ->
+  | Some from ->
     let adata, env = empty ~loc kf env in
-    (* FIXME: values copied from [from] to [adata] in MR !3288 *)
-    adata, env
+    let adata = Option.get adata in
+    let env =
+      if from.data_registered then
+        let stmt =
+          Smart_stmt.rtl_call
+            ~loc
+            "assert_copy_values"
+            [ adata.data_ptr; from.data_ptr ]
+        in
+        Env.add_stmt env kf stmt
+      else env
+    in
+    Some { adata with data_registered = from.data_registered }, env
   | None -> None, env
 
 let merge_right ~loc kf env adata1 adata2 =
   match adata1, adata2 with
-  | Some _adata1, Some adata2 ->
-    (* FIXME: values copied from [adata1] to [adata2] in MR !3288 *)
-    ignore (loc, kf);
+  | Some adata1, Some adata2 when adata1.data_registered ->
+    let stmt =
+      Smart_stmt.rtl_call
+        ~loc
+        "assert_copy_values"
+        [ adata2.data_ptr; adata1.data_ptr ]
+    in
+    let adata2 =
+      { adata2 with
+        data_registered = true }
+    in
+    let env = Env.add_stmt env kf stmt in
     Some adata2, env
-  | None, Some adata -> Some adata, env
+  | Some _, Some adata | None, Some adata -> Some adata, env
   | Some _, None | None, None -> None, env
+
+let clean ~loc kf env adata =
+  match adata with
+  | Some { data_registered; data_ptr } when data_registered->
+    let clean_stmt = Smart_stmt.rtl_call ~loc "assert_clean" [ data_ptr ] in
+    Env.add_stmt env kf clean_stmt
+  | Some _ | None ->
+    env
+
+let ikind_to_string = function
+  | IBool -> "bool"
+  | IChar -> "char"
+  | ISChar -> "schar"
+  | IUChar -> "uchar"
+  | IInt -> "int"
+  | IUInt -> "uint"
+  | IShort -> "short"
+  | IUShort -> "ushort"
+  | ILong -> "long"
+  | IULong -> "ulong"
+  | ILongLong -> "longlong"
+  | IULongLong -> "ulonglong"
+
+let do_register_data ~loc kf env { data_ptr } name e =
+  let ty = Cil.typeOf e in
+  let fct, args =
+    if Gmp_types.Z.is_t ty then
+      "mpz", [ Cil.zero ~loc; e ]
+    else if Gmp_types.Q.is_t ty then
+      "mpq", [ e ]
+    else
+      match Cil.unrollType ty with
+      | TInt (ikind, _) -> ikind_to_string ikind, [ Cil.zero ~loc; e ]
+      | TFloat (FFloat, _) -> "float", [ e ]
+      | TFloat (FDouble, _) -> "double", [ e ]
+      | TFloat (FLongDouble, _) -> "longdouble", [ e ]
+      | TPtr _ -> "ptr", [ e ]
+      | TArray _ -> "array", [ e ]
+      | TFun _ -> "fun", []
+      | TComp ({ cstruct = true }, _, _) -> "struct", []
+      | TComp ({ cstruct = false }, _, _) -> "union", []
+      | TEnum ({ ekind }, _) -> ikind_to_string ekind, [ Cil.one ~loc; e ]
+      | TVoid _
+      | TBuiltin_va_list _ -> "other", []
+      | TNamed _ ->
+        Options.fatal
+          "named types in '%a' should have been unrolled"
+          Printer.pp_typ ty
+  in
+  let fct = "assert_register_" ^ fct in
+  let name = Cil.mkString ~loc name in
+  let args = data_ptr :: name :: args in
+  let stmt = Smart_stmt.rtl_call ~loc fct args in
+  Env.add_stmt env kf stmt
 
 let register ~loc kf env ?(force=false) name e adata =
   if Options.Assert_print_data.get () then
@@ -102,9 +176,7 @@ let register ~loc kf env ?(force=false) name e adata =
       Some adata, env
     | Some adata, _ ->
       let adata = { adata with data_registered = true } in
-      (* FIXME: value registered to [adata] in MR !3288 *)
-      ignore (loc, kf, env, name);
-      Some adata, env
+      Some adata, do_register_data ~loc kf env adata name e
     | None, _ -> None, env
   else
     adata, env
@@ -135,14 +207,14 @@ let kind_to_string loc k =
 
 let runtime_check_with_msg ~adata ~loc msg ~pred_kind kind kf env predicate_e =
   let env = Env.push env in
-  let data_ptr, data_vi, env =
+  let data_registered, data_ptr, data_vi, env =
     match adata with
-    | Some { data_ptr; data_vi } ->
-      data_ptr, data_vi, env
+    | Some { data_registered; data_ptr; data_vi } ->
+      data_registered, data_ptr, data_vi, env
     | None ->
       let adata, env = empty ~loc kf env in
       let adata = Option.get adata in
-      adata.data_ptr, adata.data_vi, env
+      false, adata.data_ptr, adata.data_vi, env
   in
   let blocking =
     match pred_kind with
@@ -169,6 +241,12 @@ let runtime_check_with_msg ~adata ~loc msg ~pred_kind kind kf env predicate_e =
       Smart_stmt.assigns_field ~loc data_vi "pred_txt" pred_txt;
       Smart_stmt.assigns_field ~loc data_vi "kind" kind;
       Smart_stmt.assigns_field ~loc data_vi "blocking" blocking ]
+  in
+  let stmts=
+    if data_registered then
+      Smart_stmt.rtl_call ~loc "assert_clean" [ data_ptr ] :: stmts
+    else
+      stmts
   in
   let block, env =
     Env.pop_and_get

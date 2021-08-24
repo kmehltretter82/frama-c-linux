@@ -402,13 +402,14 @@ and context_insensitive_term_to_exp ~adata kf env t =
   | TBinOp(Div | Mod as bop, t1, t2) ->
     let ty = Typing.get_typ ~lenv:(Env.Local_vars.get env) t in
     let e1, adata, env = term_to_exp ~adata kf env t1 in
-    (* Creating a second assertion context that will hold the data contributing
-       to the guard of the denominator. The context will be merged to [adata]
-       afterward so that the calling assertion context holds all data. *)
-    let adata2, env = Assert.empty ~loc kf env in
-    let e2, adata2, env = term_to_exp ~adata:adata2 kf env t2 in
-    let adata, env = Assert.merge_right ~loc kf env adata2 adata in
+    let t2_to_exp adata env = term_to_exp ~adata kf env t2 in
     if Gmp_types.Z.is_t ty then
+      (* Creating a second assertion context that will hold the data contributing
+         to the guard of the denominator. The context will be merged to [adata]
+         afterward so that the calling assertion context holds all data. *)
+      let adata2, env = Assert.empty ~loc kf env in
+      let e2, adata2, env = t2_to_exp adata2 env in
+      let adata, env = Assert.merge_right ~loc kf env adata2 adata in
       (* TODO: preventing division by zero should not be required anymore.
          RTE should do this automatically. *)
       let ctx = Typing.get_number_ty ~lenv:(Env.Local_vars.get env) t in
@@ -446,11 +447,13 @@ and context_insensitive_term_to_exp ~adata kf env t =
       let _, e, env = Env.new_var_and_mpz_init ~loc ~name env kf t mk_stmts in
       e, adata, env, Typed_number.C_number, ""
     else if Gmp_types.Q.is_t ty then
+      let e2, adata, env = t2_to_exp adata env in
       let e, env = Rational.binop ~loc bop e1 e2 env kf (Some t) in
       e, adata, env, Typed_number.C_number, ""
     else begin
       assert (Logic_typing.is_integral_type t.term_type);
       (* no guard required since RTEs are generated separately *)
+      let e2, adata, env = t2_to_exp adata env in
       let e = Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)) in
       e, adata, env, Typed_number.C_number, ""
     end
@@ -464,17 +467,19 @@ and context_insensitive_term_to_exp ~adata kf env t =
   | TBinOp((Shiftlt | Shiftrt) as bop, t1, t2) ->
     (* left/right shift *)
     let ty = Typing.get_typ ~lenv:(Env.Local_vars.get env) t in
-    (* Creating secondary assertion contexts [adata1] and [adata2] to hold the
-       data contributing to the guards of [t1] and [t2].
-       Both secondary contexts will be merged to [adata] afterward so that the
-       calling assertion context holds all data. *)
-    let adata1, env = Assert.empty ~loc kf env in
-    let adata2, env = Assert.empty ~loc kf env in
-    let e1, adata1, env = term_to_exp ~adata:adata1 kf env t1 in
-    let e2, adata2, env = term_to_exp ~adata:adata2 kf env t2 in
-    let adata, env = Assert.merge_right ~loc kf env adata1 adata in
-    let adata, env = Assert.merge_right ~loc kf env adata2 adata in
+    let t1_to_exp adata env = term_to_exp ~adata kf env t1 in
+    let t2_to_exp adata env = term_to_exp ~adata kf env t2 in
     if Gmp_types.Z.is_t ty then
+      (* Creating secondary assertion contexts [adata1] and [adata2] to hold the
+         data contributing to the guards of [t1] and [t2].
+         Both secondary contexts will be merged to [adata] afterward so that the
+         calling assertion context holds all data. *)
+      let adata1, env = Assert.empty ~loc kf env in
+      let adata2, env = Assert.empty ~loc kf env in
+      let e1, adata1, env = t1_to_exp adata1 env in
+      let e2, adata2, env = t2_to_exp adata2 env in
+      let adata, env = Assert.merge_right ~loc kf env adata1 adata in
+      let adata, env = Assert.merge_right ~loc kf env adata2 adata in
       (* If the given term is an lvalue variable or a cast from an lvalue
          variable, retrieve the name of this variable. Otherwise return
          default *)
@@ -592,7 +597,17 @@ and context_insensitive_term_to_exp ~adata kf env t =
           let e1_guard, _, env =
             let name = e1_name ^ bop_name ^ "_guard" in
             comparison_to_exp
-              ~adata:Assert.no_data ~loc kf env Typing.gmpz ~e1 ~name Ge t1 zero t
+              ~adata:Assert.no_data
+              ~loc
+              kf
+              env
+              Typing.gmpz
+              ~e1
+              ~name
+              Ge
+              t1
+              zero
+              t
           in
           let e1_guard_cond, env =
             let pred = Logic_const.prel ~loc (Rge, t1, zero) in
@@ -612,6 +627,9 @@ and context_insensitive_term_to_exp ~adata kf env t =
           in
           Some e1_guard_cond, env
         else
+          (* Manual clean because [runtime_check] has not been called on
+             [adata1]. *)
+          let env = Assert.clean ~loc kf env adata1 in
           None, env
       in
       let mk_stmts _ e =
@@ -625,6 +643,8 @@ and context_insensitive_term_to_exp ~adata kf env t =
       e, adata, env, Typed_number.C_number, ""
     else begin
       assert (Logic_typing.is_integral_type t.term_type);
+      let e1, adata, env = t1_to_exp adata env in
+      let e2, adata, env = t2_to_exp adata env in
       let e = Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)) in
       e, adata, env, Typed_number.C_number, ""
     end

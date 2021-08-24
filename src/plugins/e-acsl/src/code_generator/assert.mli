@@ -50,6 +50,12 @@ val merge_right: loc:location -> kernel_function -> Env.t -> t -> t -> t * Env.t
 (** [merge_right ~loc kf env adata1 adata2] merges the assertion data of
     [adata1] into [adata2] if [adata2] is not a "no data" assertion context. *)
 
+val clean: loc:location -> kernel_function -> Env.t -> t -> Env.t
+(** [clean ~loc kf env adata] generates a call to the C cleanup function for the
+    assertion context. This function *must* be used if the assertion context is
+    not given to [runtime_check] or [runtime_check_with_msg], otherwise the
+    memory allocated in the C structure will not be freed. *)
+
 val register:
   loc:location ->
   kernel_function ->
