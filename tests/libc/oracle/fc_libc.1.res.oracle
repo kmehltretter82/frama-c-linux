@@ -8624,32 +8624,18 @@ extern int pthread_mutexattr_settype(pthread_mutexattr_t *attr, int type);
     assigns \result
       \from (indirect: thread),
             (indirect: *(name + (0 .. strlen{Old}(name))));
-    
-    behavior ko:
-      assumes name_too_long: strlen(name) > 15;
-      ensures error: \result ≡ 34;
  */
 int pthread_setname_np(pthread_t thread, char const *name);
 
 /*@ requires valid_name: \valid(name + (0 .. len - 1));
+    ensures
+      name_written: initialization:
+        \result ≡ 0 ⇒
+        valid_string(\old(name)) ∧
+        \initialized(\old(name) + (0 .. strlen(\old(name))));
     assigns \result, *(name + (0 .. len - 1));
     assigns \result \from thread;
     assigns *(name + (0 .. len - 1)) \from thread;
-    
-    behavior ok:
-      assumes buffer_size_ok: len ≥ 16;
-      ensures
-        name_written: initialization:
-          \result ≡ 0 ⇒
-          valid_string(\old(name)) ∧
-          \initialized(\old(name) + (0 .. strlen(\old(name))));
-    
-    behavior ko:
-      assumes buffer_too_short: len < 16;
-      ensures error: \result ≡ 34;
-    
-    complete behaviors ko, ok;
-    disjoint behaviors ko, ok;
  */
 int pthread_getname_np(pthread_t thread, char *name, size_t len);
 

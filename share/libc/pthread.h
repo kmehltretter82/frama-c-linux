@@ -391,32 +391,15 @@ extern void pthread_testcancel(void);
 
 /*@ requires valid_name: valid_read_string(name);
     assigns \result \from indirect:thread, indirect:name[0 .. strlen(name)];
-    //FIXME: it should assign thread, but our current
-    // definition of the type does not allow this.
-    behavior ko:
-      assumes name_too_long: strlen(name) > 15;
-      ensures error: \result == ERANGE;
-    // Even if the name is OK, the result might fail
-    // as the call will try to open /proc/self/task/thread_id/comm
-    // hence, we don't make the spec more precise as of now
 */
 int pthread_setname_np(pthread_t thread, const char* name);
 
 /*@ requires valid_name: \valid(name + (0 .. len - 1));
     assigns \result, name[0 .. len - 1] \from thread;
-    behavior ok:
-      assumes buffer_size_ok: len >= 16;
-      // same remark as above: if we fail to open
-      // the appropriate /proc/* file, \result might
-      // not be 0 (and the name won't be written)
-      ensures name_written: initialization:
+    ensures name_written: initialization:
         \result == 0 ==>
            valid_string(name) &&
            \initialized(name + (0 .. strlen(name)));
-    behavior ko:
-      assumes buffer_too_short: len < 16;
-      ensures error: \result == ERANGE;
-    complete behaviors; disjoint behaviors;
 */
 int pthread_getname_np(pthread_t thread, char* name, size_t len);
 
