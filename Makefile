@@ -2339,7 +2339,7 @@ dist-clean distclean: clean clean-doc \
 	$(RM) src/dummy/*/*.cm* src/dummy/*/*.o src/dummy/*/*.a \
 		src/dummy/*/*.annot src/dummy/*/*~ src/dummy/*/*.output \
 		src/dummy/*/*.annot src/dummy/*/\#*
-
+	$(RM) $(CHECK_NEWLINES) $(ISUTF8)
 
 ifeq ($(OCAMLWIN32),yes)
 # Use Win32 typical resources
@@ -2525,7 +2525,7 @@ endif
 	$(MKDIR) -p $(CLIENT_DIR)
 	#Workaround to avoid "argument list too long" in Cygwin
 	$(file >file_list_to_archive.tmp)
-	$(foreach f,$(DISTRIB_FILES), \
+	$(foreach f,$(DISTRIB_FILES) $(DISTRIB_TESTS), \
              $(file >>file_list_to_archive.tmp,$(subst @, ,$(f))))
 	$(TAR) -cf - --files-from file_list_to_archive.tmp | $(TAR) -C $(CLIENT_DIR) -xf -
 	$(RM) file_list_to_archive.tmp
