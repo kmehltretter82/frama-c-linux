@@ -618,6 +618,83 @@ let build_specialized_fun env vf format_fun tvparams =
 
 (* --- Call translation --- *)
 
+let format_of_ikind = function
+  | IBool -> Some `hh, `u
+  | IChar -> None, `c
+  | ISChar -> Some `hh, `d
+  | IUChar -> Some `hh, `u
+  | IInt -> None, `d
+  | IUInt -> None, `u
+  | IShort -> Some `h, `d
+  | IUShort -> Some `h, `u
+  | ILong -> Some `l, `d
+  | IULong -> Some `l, `u
+  | ILongLong -> Some `ll, `d
+  | IULongLong -> Some `ll, `u
+
+let format_of_fkind = function
+  | FFloat -> None, `f
+  | FDouble -> None, `f
+  | FLongDouble -> Some `L, `f
+
+let infer_format_from_args vf format_fun args =
+  let args = List.drop (format_fun.f_format_pos + 1) args in
+  let f_format (l,s) =
+    Format_types.(
+      Specification
+        { f_flags = [];
+          f_field_width = None;
+          f_precision = None;
+          f_length_modifier = l;
+          f_conversion_specifier = s;
+          f_capitalize = false;
+        })
+  in
+  let s_format (l,s) =
+    Format_types.(
+      Specification
+        { s_assignment_suppression = false;
+          s_field_width = None;
+          s_length_modifier = l;
+          s_conversion_specifier = s;
+        }
+    )
+  in
+  let treat_one_arg arg =
+    let t = Cil.typeOf arg in
+    let t =
+      match format_fun.f_kind with
+      | PrintfLike -> t
+      | ScanfLike ->
+        if not (Cil.isPointerType t) then
+          raise (Translate_call_exn vf.vf_decl);
+        Cil.typeOf_pointed t
+    in
+    (* TODO: do not unroll and preserve size_t, (u)intmax_t and ptrdiff_t that
+       have a specific length modifier. *)
+    match Cil.unrollType t with
+    | TInt (ikind,_) | TEnum ({ekind = ikind},_) -> format_of_ikind ikind
+    | TFloat (fkind,_) -> format_of_fkind fkind
+    | TPtr(_,_) -> None, `p
+    | TNamed _ -> assert false
+    (* in the case of a scanf-like function, it might happen
+       that we pass a void* whose actual type is coherent with
+       the format string itself, but this can't really be checked
+       here.
+    *)
+    | TVoid _ -> raise (Translate_call_exn vf.vf_decl)
+
+    (* these cases should not happen anyway *)
+    | TComp _
+    | TFun _
+    | TArray _
+    | TBuiltin_va_list _ -> raise (Translate_call_exn vf.vf_decl)
+  in
+  let format = List.map treat_one_arg args in
+  match format_fun.f_kind with
+  | PrintfLike -> Format_types.FFormat (List.map f_format format)
+  | ScanfLike -> Format_types.SFormat (List.map s_format format)
+
 let format_fun_call ~fundec env format_fun scope loc mk_call vf args =
   (* Extract the format if possible *)
   let format =
@@ -627,8 +704,9 @@ let format_fun_call ~fundec env format_fun scope loc mk_call vf args =
       | None ->
         Self.warning ~current:true
           "Call to function %s with non-static format argument:@ \
-           no specification will be generated." vf.vf_decl.vorig_name;
-        raise (Translate_call_exn vf.vf_decl) (* No syntactic hint *)
+           Assuming that parameters are coherent with the format"
+          vf.vf_decl.vorig_name;
+        infer_format_from_args vf format_fun args
       | Some s -> Format_parser.parse_format format_fun.f_kind s
     with
     | Format_parser.Invalid_format -> raise (Translate_call_exn vf.vf_decl)
