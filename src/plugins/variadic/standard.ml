@@ -644,7 +644,13 @@ let rec format_of_type vf k t =
   match t with
   | TInt (ikind,_) | TEnum ({ekind = ikind},_) -> format_of_ikind ikind
   | TFloat (fkind,_) -> format_of_fkind k fkind
-  | TPtr(_,_) -> None, `p
+  | TPtr(_,_) ->
+    (* technically, we might still want to write/read the actual pointer,
+       but this is not the most likely possibility. *)
+    if Cil.isCharPtrType t then
+      None, `s
+    else
+      None, `p
   | TNamed ({tname;ttype},_) ->
     (match tname with
      | "size_t" -> Some `z, `u
