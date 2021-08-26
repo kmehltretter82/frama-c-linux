@@ -635,7 +635,7 @@ let format_of_ikind = function
 let format_of_fkind k = function
   | FFloat -> None, `f
   | FDouble ->
-    (match k with 
+    (match k with
      | Format_types.PrintfLike -> None, `f
      | ScanfLike -> Some `l, `f)
   | FLongDouble -> Some `L, `f
