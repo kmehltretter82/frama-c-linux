@@ -100,7 +100,6 @@ module Builtins =
       let help = "C functions which can be used in the E-ACSL specifications"
     end)
 
-let () = Parameter_customize.is_invisible ()
 module Assert_print_data =
   True
     (struct
