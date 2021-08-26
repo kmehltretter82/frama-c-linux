@@ -632,10 +632,41 @@ let format_of_ikind = function
   | ILongLong -> Some `ll, `d
   | IULongLong -> Some `ll, `u
 
-let format_of_fkind = function
+let format_of_fkind k = function
   | FFloat -> None, `f
-  | FDouble -> None, `f
+  | FDouble ->
+    (match k with 
+     | Format_types.PrintfLike -> None, `f
+     | ScanfLike -> Some `l, `f)
   | FLongDouble -> Some `L, `f
+
+let rec format_of_type vf k t =
+  match t with
+  | TInt (ikind,_) | TEnum ({ekind = ikind},_) -> format_of_ikind ikind
+  | TFloat (fkind,_) -> format_of_fkind k fkind
+  | TPtr(_,_) -> None, `p
+  | TNamed ({tname;ttype},_) ->
+    (match tname with
+     | "size_t" -> Some `z, `u
+     | "ptrdiff_t" -> Some `t, `d
+     | "intmax_t" -> Some `j, `d
+     | "uintmax_t" -> Some `j, `u
+     (* not really standard, but that's what glibc does. *)
+     | "ssize_t" -> Some `z, `d
+     | _ -> format_of_type vf k ttype
+    )
+  (* in the case of a scanf-like function, it might happen
+     that we pass a void* whose actual type is coherent with
+     the format string itself, but this can't really be checked
+     here.
+  *)
+  | TVoid _ -> raise (Translate_call_exn vf.vf_decl)
+
+  (* these cases should not happen anyway *)
+  | TComp _
+  | TFun _
+  | TArray _
+  | TBuiltin_va_list _ -> raise (Translate_call_exn vf.vf_decl)
 
 let infer_format_from_args vf format_fun args =
   let args = List.drop (format_fun.f_format_pos + 1) args in
@@ -670,25 +701,7 @@ let infer_format_from_args vf format_fun args =
           raise (Translate_call_exn vf.vf_decl);
         Cil.typeOf_pointed t
     in
-    (* TODO: do not unroll and preserve size_t, (u)intmax_t and ptrdiff_t that
-       have a specific length modifier. *)
-    match Cil.unrollType t with
-    | TInt (ikind,_) | TEnum ({ekind = ikind},_) -> format_of_ikind ikind
-    | TFloat (fkind,_) -> format_of_fkind fkind
-    | TPtr(_,_) -> None, `p
-    | TNamed _ -> assert false
-    (* in the case of a scanf-like function, it might happen
-       that we pass a void* whose actual type is coherent with
-       the format string itself, but this can't really be checked
-       here.
-    *)
-    | TVoid _ -> raise (Translate_call_exn vf.vf_decl)
-
-    (* these cases should not happen anyway *)
-    | TComp _
-    | TFun _
-    | TArray _
-    | TBuiltin_va_list _ -> raise (Translate_call_exn vf.vf_decl)
+    format_of_type vf format_fun.f_kind t
   in
   let format = List.map treat_one_arg args in
   match format_fun.f_kind with
