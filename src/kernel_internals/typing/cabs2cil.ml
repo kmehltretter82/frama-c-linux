@@ -262,9 +262,6 @@ let cabslu s =
  * hold the result of function calls *)
 let callTempVars: unit IH.t = IH.create 13
 
-(* Keep a list of functions that were called without a prototype. *)
-let noProtoFunctions : bool IH.t = IH.create 13
-
 (* Check that s starts with the prefix p *)
 let prefix p s =
   let lp = String.length p in
@@ -6688,7 +6685,6 @@ and doExp local_env
                     (makeGlobalVar ~temp:false n ftype) in
                 (* Make it EXTERN *)
                 proto.vstorage <- Extern;
-                IH.add noProtoFunctions proto.vid true;
                 proto.vdecl <- f.expr_loc;
                 ImplicitPrototypeHook.apply proto;
                 (* Add it to the file as well *)
@@ -10446,7 +10442,6 @@ let convFile (path, f) =
   (* Clean up the global types *)
   initGlobals();
   startFile ();
-  IH.clear noProtoFunctions;
   H.clear compInfoNameEnv;
   H.clear enumInfoNameEnv;
   IH.clear mustTurnIntoDef;
@@ -10477,7 +10472,6 @@ let convFile (path, f) =
   let globals = List.rev globals in
   List.iter rename_spec globals;
   Logic_env.prepare_tables ();
-  IH.clear noProtoFunctions;
   IH.clear mustTurnIntoDef;
   H.clear alreadyDefined;
   H.clear compInfoNameEnv;
