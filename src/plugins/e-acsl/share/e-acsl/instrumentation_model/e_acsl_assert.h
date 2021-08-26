@@ -33,6 +33,7 @@
 
 #define eacsl_runtime_sound_verdict export_alias(sound_verdict)
 #define eacsl_runtime_assert        export_alias(assert)
+#define eacsl_print_value           export_alias(print_value)
 
 /*! E-ACSL instrumentation automatically sets this global to 0 if its verdict
     becomes unsound.
@@ -54,6 +55,11 @@ extern int __attribute__((FC_BUILTIN)) eacsl_runtime_sound_verdict;
   @ complete behaviors;
   @ disjoint behaviors; */
 void eacsl_runtime_assert(int predicate, eacsl_assert_data_t *data)
+    __attribute__((FC_BUILTIN));
+
+/*@ requires \valid_read(value) && \initialized(value);
+  @ assigns \nothing; */
+void eacsl_print_value(eacsl_assert_data_value_t *value)
     __attribute__((FC_BUILTIN));
 
 #endif // E_ACSL_ASSERT_H

@@ -35,6 +35,7 @@
 
 #include "../internals/e_acsl_alias.h"
 #include <stddef.h>
+#include <stdio.h>
 
 #define eacsl_mpz_struct  export_alias(mpz_struct)
 #define eacsl_mpz_t       export_alias(mpz_t)
@@ -363,6 +364,13 @@ extern double __gmpq_get_d(const eacsl_mpq_t q) __attribute__((FC_BUILTIN));
 /*@ requires \valid_read(z);
   @ assigns \result \from *z; */
 extern unsigned long __gmpz_get_ui(const eacsl_mpz_t z)
+    __attribute__((FC_BUILTIN));
+
+/************************/
+/* Output functions     */
+/************************/
+
+extern int __gmp_fprintf(FILE *fp, const char *fmt, ...)
     __attribute__((FC_BUILTIN));
 
 #endif
