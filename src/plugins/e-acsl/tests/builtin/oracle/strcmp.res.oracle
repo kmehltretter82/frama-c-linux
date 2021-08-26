@@ -1,6 +1,6 @@
 [variadic] tests/builtin/strcmp.c:11: Warning: 
   Call to function fprintf with non-static format argument:
-  no specification will be generated.
+  assuming that parameters are coherent with the format
 [e-acsl] beginning translation.
 [e-acsl] Warning: annotating undefined function `abort':
   the generated program may miss memory instrumentation

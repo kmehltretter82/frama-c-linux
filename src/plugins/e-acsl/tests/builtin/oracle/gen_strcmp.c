@@ -116,7 +116,7 @@ char *__gen_e_acsl_strdup(char const *s);
 __inline static void fail_ncomp(int cond, char *fmt, int l, int r)
 {
   if (cond) {
-    fprintf(stderr,(char const *)fmt,l,r); /* fprintf_fallback_1 */
+    fprintf(stderr,(char const *)fmt,l,r); /* fprintf_va_6 */
     __gen_e_acsl_abort();
   }
   return;

@@ -723,7 +723,7 @@ let format_fun_call ~fundec env format_fun scope loc mk_call vf args =
       | None ->
         Self.warning ~current:true
           "Call to function %s with non-static format argument:@ \
-           Assuming that parameters are coherent with the format"
+           assuming that parameters are coherent with the format"
           vf.vf_decl.vorig_name;
         infer_format_from_args vf format_fun args
       | Some s -> Format_parser.parse_format format_fun.f_kind s
