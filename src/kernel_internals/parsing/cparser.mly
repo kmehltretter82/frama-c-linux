@@ -1080,13 +1080,19 @@ declaration:                                /* ISO 6.7.*/
           { doDeclaration (Some $1) ((snd $2)) (fst $2) $3 }
 |   SPEC decl_spec_list SEMICOLON
       { doDeclaration (Some $1) ((snd $2)) (fst $2) [] }
+|   static_assert_declaration
+      { let (e, m, loc) = $1 in STATIC_ASSERT (e, m, loc) }
+;
+
+static_assert_declaration:
+
 |   STATIC_ASSERT LPAREN expression RPAREN
       {
-        STATIC_ASSERT ($3, "", $1)
+        ($3, "", $1)
       }
 |   STATIC_ASSERT LPAREN expression COMMA string_constant RPAREN
       {
-        STATIC_ASSERT ($3, fst $5, $1)
+        ($3, fst $5, $1)
       }
 ;
 
@@ -1217,6 +1223,17 @@ struct_decl_list: /* (* ISO 6.7.2. Except that we allow empty structs. We
                                             :: $4 }
 /*(* MSVC allows pragmas in strange places *)*/
 |  pragma struct_decl_list                { $2 }
+
+/*(* C11 allows static_assert-declaration *)*/
+|  static_assert_declaration             {
+       let (e, m, loc) = $1 in
+       [ STATIC_ASSERT_FG (e, m, loc) ]
+   }
+
+|  static_assert_declaration      SEMICOLON struct_decl_list  {
+       let (e, m, loc) = $1 in
+       STATIC_ASSERT_FG (e, m, loc) :: $3
+   }
 
 ;
 field_decl_list: /* (* ISO 6.7.2 *) */

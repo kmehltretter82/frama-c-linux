@@ -1,10 +1,10 @@
 [kernel] Parsing tests/syntax/static_assert.c (with preprocessing)
 [kernel] tests/syntax/static_assert.c:12: User Error: 
   static assertion failed: fail
-[kernel] tests/syntax/static_assert.c:22: User Error: 
+[kernel] tests/syntax/static_assert.c:25: User Error: 
   failed to evaluate constant expression in static assertion:
   a == 42
-[kernel] tests/syntax/static_assert.c:35: User Error: static assertion failed
+[kernel] tests/syntax/static_assert.c:38: User Error: static assertion failed
 [kernel] User Error: stopping on file "tests/syntax/static_assert.c" that has errors. Add
   '-kernel-msg-key pp' for preprocessing command.
 [kernel] Frama-C aborted: invalid user input.

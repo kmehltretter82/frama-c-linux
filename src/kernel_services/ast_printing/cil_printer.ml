@@ -1896,24 +1896,31 @@ class cil_printer () = object (self)
           fprintf fmt "%s@\n" s
 
   method fieldinfo fmt fi =
-    fprintf fmt "%a %s%a;"
-      (self#typ
-         (Some (fun fmt ->
-              if fi.fname <> Cil.missingFieldName then
-                self#varname fmt fi.fname)))
-      fi.ftype
-      (match fi.fbitfield with
-       | None -> ""
-       | Some i -> ": " ^ string_of_int i ^ " ")
-      self#attributes fi.fattr;
-    if Kernel.(is_debug_key_enabled dkey_print_field_offsets) then
-      try
-        let (offset, size) = Cil.fieldBitsOffset fi in
-        let first = offset in
-        let last = if size > 0 then Some (offset + size - 1) else None in
-        let pp_opt fmt = Pretty_utils.pp_opt ~none:"" Format.pp_print_int fmt in
-        fprintf fmt " /* bits %d .. %a */" first pp_opt last
-      with Cil.SizeOfError _ -> ()
+    (* Hijack pretty-printer for a field-based _Static_assert *)
+    if Cil.hasAttribute "STATIC_ASSERT" fi.fattr then
+      let attrparam = List.hd (Cil.findAttribute "STATIC_ASSERT" fi.fattr) in
+      fprintf fmt "_Static_assert(%a, %s);"
+        self#attrparam attrparam fi.fname
+    else begin
+      fprintf fmt "%a %s%a;"
+        (self#typ
+           (Some (fun fmt ->
+                if fi.fname <> Cil.missingFieldName then
+                  self#varname fmt fi.fname)))
+        fi.ftype
+        (match fi.fbitfield with
+         | None -> ""
+         | Some i -> ": " ^ string_of_int i ^ " ")
+        self#attributes fi.fattr;
+      if Kernel.(is_debug_key_enabled dkey_print_field_offsets) then
+        try
+          let (offset, size) = Cil.fieldBitsOffset fi in
+          let first = offset in
+          let last = if size > 0 then Some (offset + size - 1) else None in
+          let pp_opt fmt = Pretty_utils.pp_opt ~none:"" Format.pp_print_int fmt in
+          fprintf fmt " /* bits %d .. %a */" first pp_opt last
+        with Cil.SizeOfError _ -> ()
+    end
 
   method private opt_funspec fmt funspec =
     if logic_printer_enabled && not (Cil.is_empty_funspec funspec) then

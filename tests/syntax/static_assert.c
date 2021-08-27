@@ -14,6 +14,9 @@ static_assert(0, "fail");
 
 _Static_assert(2); // without message string
 
+// _Static_assert can also appear inside struct declarations
+struct st { _Static_assert (sizeof(char) == 1, "inside struct"); int a; };
+
 int main() {
   static_assert(sizeof(int) > sizeof(char), "int must be greater than char");
 

@@ -5600,6 +5600,11 @@ and makeCompType ghost (isstruct: bool)
   (* Do regular fields first. *)
   let to_field = function
     | TYPE_ANNOT _ -> None
+    | STATIC_ASSERT_FG (e, s, loc) ->
+      (* Create a special field to be pretty-printed later *)
+      let attr = ("STATIC_ASSERT", [e]) in
+      let name = ("\"" ^ s ^ "\"", JUSTBASE, [attr], loc) in
+      Some ([], [name, Some e])
     | FIELD (f,g) -> Some (f,g) in
   let flds = Extlib.filter_map_opt to_field nglist in
   let flds = List.rev (fold addFieldGroup [] flds) in

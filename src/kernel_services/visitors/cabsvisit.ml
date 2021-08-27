@@ -125,7 +125,7 @@ and childrenTypeSpecifier vis ts =
       in
       let nel' = mapNoCopy doOneField nel in
       if s' != s || nel' != nel then FIELD (s', nel') else input
-    | TYPE_ANNOT _ -> input
+    | TYPE_ANNOT _ | STATIC_ASSERT_FG _ -> input
   in
   match ts with
     Tstruct (n, Some fg, extraAttrs) ->

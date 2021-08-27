@@ -140,6 +140,8 @@ and pp_field_group fmt = function
       l;
     fprintf fmt "}@]"
   | TYPE_ANNOT _ -> fprintf fmt "TYPE_ANNOT"
+  | STATIC_ASSERT_FG (exp, s, loc) ->
+    fprintf  fmt "@[<hov 2>STATIC_ASSERT_FG exp(%a, %s, loc(%a))@]" pp_exp exp s pp_cabsloc loc
 
 and pp_field_groups fmt l =
   fprintf fmt "{";

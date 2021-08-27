@@ -289,6 +289,9 @@ and print_field_group fmt fld = match fld with
   | TYPE_ANNOT annot ->
     fprintf fmt "@\n/*@@@[@ %a@]@ */@\n"
       Logic_print.print_type_annot annot
+  | STATIC_ASSERT_FG (e, s, _) ->
+    fprintf fmt "@[_Static_assert (%a, %s)@]@\n" print_expression e s
+
 
 and print_field fmt (name, widtho) =
   match widtho with
