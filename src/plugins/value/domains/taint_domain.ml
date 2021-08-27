@@ -83,9 +83,6 @@ module LatticeTaint = struct
             assume_stmts = Stmt.Set.empty;
             dependent_call = false; } ]
 
-      let structural_descr =
-        Structural_descr.t_abstract (* TODO *)
-
       let compare t1 t2 =
         let (<?>) c (cmp,x,y) = if c = 0 then cmp x y else c in
         Zone.compare t1.locs_data t2.locs_data
