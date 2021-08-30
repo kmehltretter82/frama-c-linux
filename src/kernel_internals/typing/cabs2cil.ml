@@ -8806,7 +8806,13 @@ and createLocal ghost ((_, sto, _, _) as specs)
       "createGlobal (local static): %s" n;
     (* Now alpha convert it to make sure that it does not conflict with
      * existing globals or locals from this function. *)
-    let full_name = !currentFunctionFDEC.svar.vname ^ "_" ^ n in
+    let full_name =
+      (* Mangled symbols (that is, starting with '_Z') are unique by
+         construction. No need to add current function name as prefix. *)
+      if Extlib.string_prefix ~strict:true "_Z" n
+      then n
+      else !currentFunctionFDEC.svar.vname ^ "_" ^ n
+    in
     let newname, _  = newAlphaName ghost true "" full_name in
     (* Make it global  *)
     let vi = makeVarInfoCabs ~ghost ~isformal:false
