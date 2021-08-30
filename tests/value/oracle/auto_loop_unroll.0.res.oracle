@@ -123,7 +123,8 @@
 [eva] Recording results for incr
 [eva] Done for function incr
 [eva] tests/value/auto_loop_unroll.c:103: Frama_C_show_each_25: [0..2147483647]
-[eva:loop-unroll] tests/value/auto_loop_unroll.c:108: Automatic loop unrolling.
+[eva:loop-unroll:auto] tests/value/auto_loop_unroll.c:108: 
+  Automatic loop unrolling.
 [eva] tests/value/auto_loop_unroll.c:107: starting to merge loop iterations
 [eva] tests/value/auto_loop_unroll.c:108: starting to merge loop iterations
 [eva:alarm] tests/value/auto_loop_unroll.c:109: Warning: 

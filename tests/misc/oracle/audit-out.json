@@ -43,8 +43,8 @@
         "taint"
       ],
       "disabled": [
-        "garbled-mix", "invalid-assigns", "loop-unroll", "malloc:weak",
-        "missing-loop-unroll", "missing-loop-unroll:for"
+        "garbled-mix", "invalid-assigns", "loop-unroll", "loop-unroll:auto",
+        "malloc:weak", "missing-loop-unroll", "missing-loop-unroll:for"
       ]
     }
   },
