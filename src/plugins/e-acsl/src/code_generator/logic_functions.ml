@@ -61,6 +61,9 @@ let result_as_extra_argument = Gmp_types.Z.is_t
 (*****************************************************************************)
 (****************** Generation of function assigns ***************************)
 (*****************************************************************************)
+
+(* If an argument contains a pointer type, then it is undecidable which assigns
+   clause should be generated, so skip the assigns generation in this case *)
 let rec ptr_free typ = match Cil.unrollType typ with
   | TVoid _
   | TInt (_, _)
@@ -82,6 +85,8 @@ let rec ptr_free typ = match Cil.unrollType typ with
                        (fun fi -> (fi.fbitfield != None)||(ptr_free fi.ftype))
                        fields
 
+(* For a GMP argument of a function, we generate an assigns from its address,
+   since these are the only semantically valid operations on integers *)
 let deref_gmp_arg ~loc var =
   Smart_exp.lval ~loc
     (Mem (Cil.mkAddrOrStartOf ~loc (Var var , NoOffset)), NoOffset)
@@ -94,6 +99,8 @@ let rec get_assigns_from ~loc env lprofile =
     if ptr_free var.vtype then
       (Smart_exp.lval ~loc (Cil.var var)) :: (get_assigns_from ~loc env lvars)
     else if lvar.lv_type == Linteger then
+      (* If the argument contains a pointer, but is an integer, then it is a
+      GMP type *)
         (deref_gmp_arg ~loc var) :: (get_assigns_from ~loc env lvars)
       else begin
         Options.warning ~current:true "Generating assigns clause for arguments \
@@ -102,6 +109,8 @@ let rec get_assigns_from ~loc env lprofile =
         raise NoAssigns
     end
 
+(* Special case in case of a function that takes an extra argument as its
+   result *)
 let get_gmp_integer ~loc vi =
   Smart_exp.lval
     ~loc
