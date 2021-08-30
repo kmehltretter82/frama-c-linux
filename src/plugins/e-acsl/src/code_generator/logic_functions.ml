@@ -23,6 +23,8 @@
 open Cil_types
 open Cil_datatype
 
+exception NoAssigns
+
 (**************************************************************************)
 (********************** Forward references ********************************)
 (**************************************************************************)
@@ -55,6 +57,59 @@ let term_to_exp_ref
 let result_as_extra_argument = Gmp_types.Z.is_t
 (* TODO: to be extended to any compound type? E.g. returning a struct is not
    good practice... *)
+
+(*****************************************************************************)
+(****************** Generation of function assigns ***************************)
+(*****************************************************************************)
+let rec ptr_free typ = match Cil.unrollType typ with
+  | TVoid _
+  | TInt (_, _)
+  | TFloat (_, _) -> true
+  | TPtr (_, _) -> false
+  | TArray (ty, _, _, _) -> ptr_free ty
+  | TFun (_, _, _, _) ->
+    (* a fucntion cannot be an argument of a function *)
+    assert false
+  | TNamed (_, _) ->
+    (* The named types are unfolded with [Cil.unrolltype] *)
+    assert false
+  | TEnum (_, _)
+  | TBuiltin_va_list _ -> true
+  | TComp (cinfo, _, _) ->
+    match cinfo.cfields with
+    | None -> assert false
+    | Some fields -> List.for_all
+                       (fun fi -> (fi.fbitfield != None)||(ptr_free fi.ftype))
+                       fields
+
+let deref_gmp_arg ~loc var =
+  Smart_exp.lval ~loc
+    (Mem (Cil.mkAddrOrStartOf ~loc (Var var , NoOffset)), NoOffset)
+
+let rec get_assigns_from ~loc env lprofile =
+  match lprofile with
+  | [] -> []
+  | lvar :: lvars ->
+    let var = Env.Logic_binding.get env lvar  in
+    if ptr_free var.vtype then
+      (Smart_exp.lval ~loc (Cil.var var)) :: (get_assigns_from ~loc env lvars)
+    else if lvar.lv_type == Linteger then
+        (deref_gmp_arg ~loc var) :: (get_assigns_from ~loc env lvars)
+      else begin
+        Options.warning ~current:true "Generating assigns clause for arguments \
+                                       with pointers is not supported, skipping \
+                                       assigns clause";
+        raise NoAssigns
+    end
+
+let get_gmp_integer ~loc vi =
+  Smart_exp.lval
+    ~loc
+    (Mem
+       (Smart_exp.lval
+          ~loc
+          (Var vi, NoOffset)),
+     (Index (Cil.zero ~loc, NoOffset)))
 
 (*****************************************************************************)
 (****************** Generation of function bodies ****************************)
@@ -147,22 +202,16 @@ let generate_kf ~loc fname env ret_ty params_ty li =
       ([], [])
   in
   (* build the varinfo storing the result *)
-  let ret_vi, ret_ty, params_with_ret, params_ty_with_ret, extra_arg =
+  let res_as_extra_arg = result_as_extra_argument ret_ty in
+  let ret_vi, ret_ty, params_with_ret, params_ty_with_ret =
     let vname = "__retres" in
-    if result_as_extra_argument ret_ty then
+    if res_as_extra_arg then
       let ret_ty_ptr = TPtr(ret_ty, []) (* call by reference *) in
       let vname = vname ^ "_arg" in
       let vi = Cil.makeVarinfo false true vname ret_ty_ptr in
-      vi,
-      Cil.voidType,
-      vi :: params, (vname, ret_ty_ptr, []) :: params_ty_vi,
-      true
+      vi, Cil.voidType, vi :: params, (vname, ret_ty_ptr, []) :: params_ty_vi
     else
-      Cil.makeVarinfo false false vname ret_ty,
-      ret_ty,
-      params,
-      params_ty_vi,
-      false
+      Cil.makeVarinfo false false vname ret_ty, ret_ty, params, params_ty_vi
   in
   (* build the function's varinfo *)
   let vi =
@@ -219,45 +268,35 @@ let generate_kf ~loc fname env ret_ty params_ty li =
       in
       List.fold_left2 add env li.l_profile params
     in
+    let assigns_from =
+      try Some (get_assigns_from Location.unknown env li.l_profile)
+      with NoAssigns -> None
+    in
     let assigned_var =
-      let loc = Location.unknown in
-      if extra_arg
-      then
-        (* If the result is passed as argument, it is of type __e_acsl_mpz_t
-           accessing the left value which is assigned is then done by
-           *__retres_arg[0] *)
-        let vi_res = match params_with_ret with
-          | vi :: _ -> vi
-          | [] -> assert false
-        in
-        Logic_const.new_identified_term
-          (Smart_term.array_at0 ~loc
-             (Smart_term.deref ~
-                loc
-                (Logic_const.tvar (Cil.cvar_to_lvar vi_res))))
-      else
-        Logic_const.new_identified_term (Logic_const.tresult fundec.svar.vtype)
+        if res_as_extra_arg then
+          Logic_const.new_identified_term
+            (Logic_utils.expr_to_term (get_gmp_integer Location.unknown ret_vi))
+        else
+          Logic_const.new_identified_term (Logic_const.tresult fundec.svar.vtype)
     in
-    let rec deref_all tm cty deps =
-      if Smart_term.is_pointer_type cty then
-        deref_all
-          (Smart_term.deref ~loc ~cty tm)
-          (Smart_term.deref_cty cty)
-          ((Logic_const.new_identified_term tm)::deps)
-      else
-        (Logic_const.new_identified_term tm)::deps
-    in
-    let deps = List.fold_right2
-        (fun lv (_,cty,_) -> deref_all (Logic_const.tvar lv) cty)
-        li.l_profile params_ty_vi
-        []
-    in
-    Annotations.add_assigns
-      ~keep_empty:false
-      Options.emitter
-      ~behavior:Cil.default_behavior_name
-      kf
-      (Writes [ assigned_var , From deps]);
+    begin
+        match assigns_from with
+        | None -> ()
+        | Some assigns_from ->
+          let assigns_from =
+            List.map
+              (fun e ->
+                 Logic_const.new_identified_term
+                  (Logic_utils.expr_to_term e))
+              assigns_from
+          in
+          Annotations.add_assigns
+            ~keep_empty:false
+            Options.emitter
+            ~behavior:Cil.default_behavior_name
+            kf
+            (Writes [ assigned_var , From assigns_from]);
+      end;
     let b, env = generate_body ~loc kf env ret_ty ret_vi li.l_body in
     fundec.sbody <- b;
     (* add the generated variables in the necessary lists *)
@@ -265,7 +304,10 @@ let generate_kf ~loc fname env ret_ty params_ty li =
        [add_generated_variables_in_function] in the main visitor *)
     let vars =
       let l = Env.get_generated_variables env in
-      if ret_vi.vdefined then (ret_vi, Env.LFunction kf) :: l else l
+      if ret_vi.vdefined then
+        (ret_vi, Env.LFunction kf) :: l
+      else
+        l
     in
     let locals, blocks =
       List.fold_left

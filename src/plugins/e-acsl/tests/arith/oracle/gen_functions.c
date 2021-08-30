@@ -275,7 +275,7 @@ int __gen_e_acsl_p2_5(int x, long y)
 }
 
 /*@ assigns \result;
-    assigns \result \from x, *y, y; */
+    assigns \result \from x, *((__e_acsl_mpz_struct *)y); */
 int __gen_e_acsl_p2_3(int x, __e_acsl_mpz_struct * y)
 {
   __e_acsl_mpz_t __gen_e_acsl_x;
@@ -304,8 +304,8 @@ long __gen_e_acsl_f1(int x, int y)
   return __retres;
 }
 
-/*@ assigns *((__e_acsl_mpz_struct *)*__retres_arg);
-    assigns *((__e_acsl_mpz_struct *)*__retres_arg) \from x, *y, y;
+/*@ assigns (*__retres_arg)[0];
+    assigns (*__retres_arg)[0] \from x, *((__e_acsl_mpz_struct *)y);
  */
 void __gen_e_acsl_f1_5(__e_acsl_mpz_t *__retres_arg, int x,
                        __e_acsl_mpz_struct * y)
@@ -324,8 +324,9 @@ void __gen_e_acsl_f1_5(__e_acsl_mpz_t *__retres_arg, int x,
   return;
 }
 
-/*@ assigns *((__e_acsl_mpz_struct *)*__retres_arg);
-    assigns *((__e_acsl_mpz_struct *)*__retres_arg) \from *x, x, *y, y;
+/*@ assigns (*__retres_arg)[0];
+    assigns (*__retres_arg)[0]
+      \from *((__e_acsl_mpz_struct *)x), *((__e_acsl_mpz_struct *)y);
  */
 void __gen_e_acsl_f1_7(__e_acsl_mpz_t *__retres_arg, __e_acsl_mpz_struct * x,
                        __e_acsl_mpz_struct * y)

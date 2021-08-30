@@ -107,7 +107,6 @@ int main(void)
   {
     int __gen_e_acsl_f2_20;
     __gen_e_acsl_f2_20 = __gen_e_acsl_f2(7);
-    /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_f2_20); */
     __e_acsl_assert(__gen_e_acsl_f2_20 == 1,1,"Assertion","main",
                     "f2(7) == 1","tests/arith/functions_rec.c",32);
   }
@@ -115,7 +114,6 @@ int main(void)
   {
     int __gen_e_acsl_f3_8;
     __gen_e_acsl_f3_8 = __gen_e_acsl_f3(6);
-    /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_f3_8); */
     __e_acsl_assert(__gen_e_acsl_f3_8 == -5,1,"Assertion","main",
                     "f3(6) == -5","tests/arith/functions_rec.c",34);
   }
@@ -123,7 +121,6 @@ int main(void)
   {
     unsigned long __gen_e_acsl_f4_8;
     __gen_e_acsl_f4_8 = __gen_e_acsl_f4(9);
-    /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_f4_8); */
     __e_acsl_assert(__gen_e_acsl_f4_8 > 0UL,1,"Assertion","main","f4(9) > 0",
                     "tests/arith/functions_rec.c",36);
   }
@@ -163,9 +160,8 @@ int main(void)
   return __retres;
 }
 
-/*@ assigns *((__e_acsl_mpz_struct *)*__retres_arg);
-    assigns *((__e_acsl_mpz_struct *)*__retres_arg) \from n;
- */
+/*@ assigns (*__retres_arg)[0];
+    assigns (*__retres_arg)[0] \from n; */
 void __gen_e_acsl_f1(__e_acsl_mpz_t *__retres_arg, int n)
 {
   __e_acsl_mpz_t __gen_e_acsl_if_3;
@@ -198,9 +194,8 @@ void __gen_e_acsl_f1(__e_acsl_mpz_t *__retres_arg, int n)
   return;
 }
 
-/*@ assigns *((__e_acsl_mpz_struct *)*__retres_arg);
-    assigns *((__e_acsl_mpz_struct *)*__retres_arg) \from n;
- */
+/*@ assigns (*__retres_arg)[0];
+    assigns (*__retres_arg)[0] \from n; */
 void __gen_e_acsl_f1_2(__e_acsl_mpz_t *__retres_arg, long n)
 {
   __e_acsl_mpz_t __gen_e_acsl_if_2;
@@ -247,8 +242,8 @@ void __gen_e_acsl_f1_2(__e_acsl_mpz_t *__retres_arg, long n)
   return;
 }
 
-/*@ assigns *((__e_acsl_mpz_struct *)*__retres_arg);
-    assigns *((__e_acsl_mpz_struct *)*__retres_arg) \from *n, n;
+/*@ assigns (*__retres_arg)[0];
+    assigns (*__retres_arg)[0] \from *((__e_acsl_mpz_struct *)n);
  */
 void __gen_e_acsl_f1_3(__e_acsl_mpz_t *__retres_arg, __e_acsl_mpz_struct * n)
 {
@@ -311,12 +306,9 @@ int __gen_e_acsl_f2(int n)
     __gen_e_acsl_f2_15 = __gen_e_acsl_f2_2(n - 1L);
     __gen_e_acsl_f2_17 = __gen_e_acsl_f2_2(n - 2L);
     __gen_e_acsl_f2_19 = __gen_e_acsl_f2_2(n - 3L);
-    /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_f2_19); */
     __e_acsl_assert(__gen_e_acsl_f2_19 != 0,1,"RTE","f2",
                     "division_by_zero: __gen_e_acsl_f2_19 != 0",
                     "tests/arith/functions_rec.c",13);
-    /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_f2_15); */
-    /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_f2_17); */
     /*@ assert Eva: division_by_zero: __gen_e_acsl_f2_19 ≢ 0; */
     /*@ assert
         Eva: signed_overflow:
@@ -328,17 +320,11 @@ int __gen_e_acsl_f2(int n)
     */
     /*@ assert
         Eva: signed_overflow:
-          -2147483648 ≤
-          (int)(__gen_e_acsl_f2_15 * __gen_e_acsl_f2_17) / __gen_e_acsl_f2_19;
-    */
-    /*@ assert
-        Eva: signed_overflow:
           (int)(__gen_e_acsl_f2_15 * __gen_e_acsl_f2_17) / __gen_e_acsl_f2_19
           ≤ 2147483647;
     */
     __gen_e_acsl_if_6 = (__gen_e_acsl_f2_15 * __gen_e_acsl_f2_17) / __gen_e_acsl_f2_19;
   }
-  /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_if_6); */
   return __gen_e_acsl_if_6;
 }
 
@@ -390,12 +376,9 @@ int __gen_e_acsl_f2_2(long n)
           \initialized((__e_acsl_mpz_struct *)__gen_e_acsl_sub_8);
     */
     __gen_e_acsl_f2_14 = __gen_e_acsl_f2_3((__e_acsl_mpz_struct *)__gen_e_acsl_sub_8);
-    /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_f2_14); */
     __e_acsl_assert(__gen_e_acsl_f2_14 != 0,1,"RTE","f2_2",
                     "division_by_zero: __gen_e_acsl_f2_14 != 0",
                     "tests/arith/functions_rec.c",13);
-    /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_f2_10); */
-    /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_f2_12); */
     /*@ assert Eva: division_by_zero: __gen_e_acsl_f2_14 ≢ 0; */
     /*@ assert
         Eva: signed_overflow:
@@ -404,11 +387,6 @@ int __gen_e_acsl_f2_2(long n)
     /*@ assert
         Eva: signed_overflow:
           __gen_e_acsl_f2_10 * __gen_e_acsl_f2_12 ≤ 2147483647;
-    */
-    /*@ assert
-        Eva: signed_overflow:
-          -2147483648 ≤
-          (int)(__gen_e_acsl_f2_10 * __gen_e_acsl_f2_12) / __gen_e_acsl_f2_14;
     */
     /*@ assert
         Eva: signed_overflow:
@@ -424,12 +402,11 @@ int __gen_e_acsl_f2_2(long n)
     __gmpz_clear(__gen_e_acsl__16);
     __gmpz_clear(__gen_e_acsl_sub_8);
   }
-  /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_if_5); */
   return __gen_e_acsl_if_5;
 }
 
 /*@ assigns \result;
-    assigns \result \from *n, n; */
+    assigns \result \from *((__e_acsl_mpz_struct *)n); */
 int __gen_e_acsl_f2_3(__e_acsl_mpz_struct * n)
 {
   __e_acsl_mpz_t __gen_e_acsl__11;
@@ -476,12 +453,9 @@ int __gen_e_acsl_f2_3(__e_acsl_mpz_struct * n)
           \initialized((__e_acsl_mpz_struct *)__gen_e_acsl_sub_6);
     */
     __gen_e_acsl_f2_9 = __gen_e_acsl_f2_3((__e_acsl_mpz_struct *)__gen_e_acsl_sub_6);
-    /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_f2_9); */
     __e_acsl_assert(__gen_e_acsl_f2_9 != 0,1,"RTE","f2_3",
                     "division_by_zero: __gen_e_acsl_f2_9 != 0",
                     "tests/arith/functions_rec.c",13);
-    /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_f2_5); */
-    /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_f2_7); */
     /*@ assert Eva: division_by_zero: __gen_e_acsl_f2_9 ≢ 0; */
     /*@ assert
         Eva: signed_overflow:
@@ -490,11 +464,6 @@ int __gen_e_acsl_f2_3(__e_acsl_mpz_struct * n)
     /*@ assert
         Eva: signed_overflow:
           __gen_e_acsl_f2_5 * __gen_e_acsl_f2_7 ≤ 2147483647;
-    */
-    /*@ assert
-        Eva: signed_overflow:
-          -2147483648 ≤
-          (int)(__gen_e_acsl_f2_5 * __gen_e_acsl_f2_7) / __gen_e_acsl_f2_9;
     */
     /*@ assert
         Eva: signed_overflow:
@@ -510,7 +479,6 @@ int __gen_e_acsl_f2_3(__e_acsl_mpz_struct * n)
     __gmpz_clear(__gen_e_acsl_sub_6);
   }
   __gmpz_clear(__gen_e_acsl__11);
-  /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_if_4); */
   return __gen_e_acsl_if_4;
 }
 
@@ -531,7 +499,7 @@ int __gen_e_acsl_g_3(long n)
 }
 
 /*@ assigns \result;
-    assigns \result \from *n, n; */
+    assigns \result \from *((__e_acsl_mpz_struct *)n); */
 int __gen_e_acsl_g_5(__e_acsl_mpz_struct * n)
 {
   int __retres = 0;
@@ -548,23 +516,6 @@ int __gen_e_acsl_f3(int n)
     int __gen_e_acsl_f3_7;
     __gen_e_acsl_g_2 = __gen_e_acsl_g(n);
     __gen_e_acsl_f3_7 = __gen_e_acsl_f3_2(n - 1L);
-    /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_f3_7); */
-    /*@ assert
-        Eva: signed_overflow:
-          -2147483648 ≤ __gen_e_acsl_g_2 * __gen_e_acsl_f3_7;
-    */
-    /*@ assert
-        Eva: signed_overflow:
-          __gen_e_acsl_g_2 * __gen_e_acsl_f3_7 ≤ 2147483647;
-    */
-    /*@ assert
-        Eva: signed_overflow:
-          -2147483648 ≤ (int)(__gen_e_acsl_g_2 * __gen_e_acsl_f3_7) - 5;
-    */
-    /*@ assert
-        Eva: signed_overflow:
-          (int)(__gen_e_acsl_g_2 * __gen_e_acsl_f3_7) - 5 ≤ 2147483647;
-    */
     __gen_e_acsl_if_9 = __gen_e_acsl_g_2 * __gen_e_acsl_f3_7 - 5;
   }
   else {
@@ -572,7 +523,6 @@ int __gen_e_acsl_f3(int n)
     __gen_e_acsl_g_12 = __gen_e_acsl_g_3(n + 1L);
     __gen_e_acsl_if_9 = __gen_e_acsl_g_12;
   }
-  /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_if_9); */
   return __gen_e_acsl_if_9;
 }
 
@@ -599,23 +549,6 @@ int __gen_e_acsl_f3_2(long n)
           \initialized((__e_acsl_mpz_struct *)__gen_e_acsl_sub_9);
     */
     __gen_e_acsl_f3_6 = __gen_e_acsl_f3_3((__e_acsl_mpz_struct *)__gen_e_acsl_sub_9);
-    /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_f3_6); */
-    /*@ assert
-        Eva: signed_overflow:
-          -2147483648 ≤ __gen_e_acsl_g_4 * __gen_e_acsl_f3_6;
-    */
-    /*@ assert
-        Eva: signed_overflow:
-          __gen_e_acsl_g_4 * __gen_e_acsl_f3_6 ≤ 2147483647;
-    */
-    /*@ assert
-        Eva: signed_overflow:
-          -2147483648 ≤ (int)(__gen_e_acsl_g_4 * __gen_e_acsl_f3_6) - 5;
-    */
-    /*@ assert
-        Eva: signed_overflow:
-          (int)(__gen_e_acsl_g_4 * __gen_e_acsl_f3_6) - 5 ≤ 2147483647;
-    */
     __gen_e_acsl_if_8 = __gen_e_acsl_g_4 * __gen_e_acsl_f3_6 - 5;
     __gmpz_clear(__gen_e_acsl_n_4);
     __gmpz_clear(__gen_e_acsl__17);
@@ -638,12 +571,11 @@ int __gen_e_acsl_f3_2(long n)
     __gmpz_clear(__gen_e_acsl__21);
     __gmpz_clear(__gen_e_acsl_add_5);
   }
-  /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_if_8); */
   return __gen_e_acsl_if_8;
 }
 
 /*@ assigns \result;
-    assigns \result \from *n, n; */
+    assigns \result \from *((__e_acsl_mpz_struct *)n); */
 int __gen_e_acsl_f3_3(__e_acsl_mpz_struct * n)
 {
   __e_acsl_mpz_t __gen_e_acsl__18;
@@ -667,23 +599,6 @@ int __gen_e_acsl_f3_3(__e_acsl_mpz_struct * n)
           \initialized((__e_acsl_mpz_struct *)__gen_e_acsl_sub_10);
     */
     __gen_e_acsl_f3_5 = __gen_e_acsl_f3_3((__e_acsl_mpz_struct *)__gen_e_acsl_sub_10);
-    /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_f3_5); */
-    /*@ assert
-        Eva: signed_overflow:
-          -2147483648 ≤ __gen_e_acsl_g_6 * __gen_e_acsl_f3_5;
-    */
-    /*@ assert
-        Eva: signed_overflow:
-          __gen_e_acsl_g_6 * __gen_e_acsl_f3_5 ≤ 2147483647;
-    */
-    /*@ assert
-        Eva: signed_overflow:
-          -2147483648 ≤ (int)(__gen_e_acsl_g_6 * __gen_e_acsl_f3_5) - 5;
-    */
-    /*@ assert
-        Eva: signed_overflow:
-          (int)(__gen_e_acsl_g_6 * __gen_e_acsl_f3_5) - 5 ≤ 2147483647;
-    */
     __gen_e_acsl_if_7 = __gen_e_acsl_g_6 * __gen_e_acsl_f3_5 - 5;
     __gmpz_clear(__gen_e_acsl__19);
     __gmpz_clear(__gen_e_acsl_sub_10);
@@ -706,7 +621,6 @@ int __gen_e_acsl_f3_3(__e_acsl_mpz_struct * n)
     __gmpz_clear(__gen_e_acsl_add_4);
   }
   __gmpz_clear(__gen_e_acsl__18);
-  /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_if_7); */
   return __gen_e_acsl_if_7;
 }
 
@@ -718,7 +632,6 @@ unsigned long __gen_e_acsl_f4(int n)
   if (n < 100) {
     unsigned long __gen_e_acsl_f4_7;
     __gen_e_acsl_f4_7 = __gen_e_acsl_f4_2(n + 1L);
-    /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_f4_7); */
     __gen_e_acsl_if_15 = __gen_e_acsl_f4_7;
   }
   else {
@@ -727,7 +640,6 @@ unsigned long __gen_e_acsl_f4(int n)
     else __gen_e_acsl_if_14 = 6UL;
     __gen_e_acsl_if_15 = __gen_e_acsl_if_14;
   }
-  /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_if_15); */
   return __gen_e_acsl_if_15;
 }
 
@@ -752,7 +664,6 @@ unsigned long __gen_e_acsl_f4_2(long n)
           \initialized((__e_acsl_mpz_struct *)__gen_e_acsl_add_6);
     */
     __gen_e_acsl_f4_6 = __gen_e_acsl_f4_3((__e_acsl_mpz_struct *)__gen_e_acsl_add_6);
-    /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_f4_6); */
     __gen_e_acsl_if_13 = __gen_e_acsl_f4_6;
     __gmpz_clear(__gen_e_acsl_n_6);
     __gmpz_clear(__gen_e_acsl__22);
@@ -764,12 +675,11 @@ unsigned long __gen_e_acsl_f4_2(long n)
     else __gen_e_acsl_if_12 = 6UL;
     __gen_e_acsl_if_13 = __gen_e_acsl_if_12;
   }
-  /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_if_13); */
   return __gen_e_acsl_if_13;
 }
 
 /*@ assigns \result;
-    assigns \result \from *n, n; */
+    assigns \result \from *((__e_acsl_mpz_struct *)n); */
 unsigned long __gen_e_acsl_f4_3(__e_acsl_mpz_struct * n)
 {
   __e_acsl_mpz_t __gen_e_acsl__23;
@@ -791,7 +701,6 @@ unsigned long __gen_e_acsl_f4_3(__e_acsl_mpz_struct * n)
           \initialized((__e_acsl_mpz_struct *)__gen_e_acsl_add_7);
     */
     __gen_e_acsl_f4_5 = __gen_e_acsl_f4_3((__e_acsl_mpz_struct *)__gen_e_acsl_add_7);
-    /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_f4_5); */
     __gen_e_acsl_if_11 = __gen_e_acsl_f4_5;
     __gmpz_clear(__gen_e_acsl__24);
     __gmpz_clear(__gen_e_acsl_add_7);
@@ -809,13 +718,11 @@ unsigned long __gen_e_acsl_f4_3(__e_acsl_mpz_struct * n)
     __gmpz_clear(__gen_e_acsl__25);
   }
   __gmpz_clear(__gen_e_acsl__23);
-  /*@ assert Eva: dangling_pointer: ¬\dangling(&__gen_e_acsl_if_11); */
   return __gen_e_acsl_if_11;
 }
 
-/*@ assigns *((__e_acsl_mpz_struct *)*__retres_arg);
-    assigns *((__e_acsl_mpz_struct *)*__retres_arg) \from n;
- */
+/*@ assigns (*__retres_arg)[0];
+    assigns (*__retres_arg)[0] \from n; */
 void __gen_e_acsl_f5(__e_acsl_mpz_t *__retres_arg, int n)
 {
   __e_acsl_mpz_t __gen_e_acsl_if_18;
@@ -848,9 +755,8 @@ void __gen_e_acsl_f5(__e_acsl_mpz_t *__retres_arg, int n)
   return;
 }
 
-/*@ assigns *((__e_acsl_mpz_struct *)*__retres_arg);
-    assigns *((__e_acsl_mpz_struct *)*__retres_arg) \from n;
- */
+/*@ assigns (*__retres_arg)[0];
+    assigns (*__retres_arg)[0] \from n; */
 void __gen_e_acsl_f5_2(__e_acsl_mpz_t *__retres_arg, long n)
 {
   __e_acsl_mpz_t __gen_e_acsl_if_17;
@@ -893,8 +799,8 @@ void __gen_e_acsl_f5_2(__e_acsl_mpz_t *__retres_arg, long n)
   return;
 }
 
-/*@ assigns *((__e_acsl_mpz_struct *)*__retres_arg);
-    assigns *((__e_acsl_mpz_struct *)*__retres_arg) \from *n, n;
+/*@ assigns (*__retres_arg)[0];
+    assigns (*__retres_arg)[0] \from *((__e_acsl_mpz_struct *)n);
  */
 void __gen_e_acsl_f5_3(__e_acsl_mpz_t *__retres_arg, __e_acsl_mpz_struct * n)
 {

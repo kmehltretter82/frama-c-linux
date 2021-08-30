@@ -77,7 +77,6 @@ CODE_GENERATOR_CMI:=$(addprefix src/code_generator/, $(CODE_GENERATOR_CMI))
 SRC_CODE_GENERATOR:= \
 	smart_exp \
 	smart_stmt \
-	smart_term \
 	gmp \
 	label \
 	env \
