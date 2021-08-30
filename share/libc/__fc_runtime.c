@@ -21,6 +21,7 @@
 /**************************************************************************/
 
 #include "__fc_builtin.c"
+#include "argz.c"
 #include "assert.c"
 #include "ctype.c"
 #include "errno.c"

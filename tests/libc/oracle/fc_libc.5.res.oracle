@@ -1,3 +1,0 @@
-#include "__fc_define_max_open_files.h"
-#include "__fc_integer.h"
-#include "__fc_libc.h"
