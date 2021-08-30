@@ -174,6 +174,9 @@ val wkey_builtins_override: warn_category
     is currently unsupported. *)
 val wkey_libc_unsupported_spec : warn_category
 
+(** Warning category used for "Automatic loop unrolling" *)
+val wkey_loop_unroll_auto : warn_category
+
 (** Warning category used for "loop not completely unrolled" *)
 val wkey_loop_unroll : warn_category
 
