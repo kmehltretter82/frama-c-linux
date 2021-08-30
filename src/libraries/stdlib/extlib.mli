@@ -232,7 +232,7 @@ val xor: bool -> bool -> bool
 val string_prefix: ?strict:bool -> string -> string -> bool
 (** [string_prefix ~strict p s] returns [true] if and only if [p] is a
     prefix of the string [s]. If [strict] is true, the prefix must be strict
-    (that is, [s] must moreover be strictly longer than [p]. [strict]
+    (that is, [s] must moreover be strictly longer than [p]). [strict]
     is false by default.
     @since Boron-20100401 *)
 
