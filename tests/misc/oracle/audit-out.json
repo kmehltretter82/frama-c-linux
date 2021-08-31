@@ -44,8 +44,8 @@
       ],
       "disabled": [
         "garbled-mix", "invalid-assigns", "loop-unroll:auto",
-        "loop-unroll:partial", "malloc:weak", "missing-loop-unroll",
-        "missing-loop-unroll:for"
+        "loop-unroll:missing", "loop-unroll:missing:for",
+        "loop-unroll:partial", "malloc:weak"
       ]
     }
   },
