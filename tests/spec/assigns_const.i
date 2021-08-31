@@ -42,3 +42,14 @@ void accept_partial_const_struct(void)
 {
     z.y = 1;
 }
+
+struct T {
+  const struct Z z ;
+};
+struct T t ;
+
+
+//@ assigns t.z.y ; // y is not const but z is
+void refuse_const_path(void){
+
+}

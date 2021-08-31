@@ -2317,6 +2317,13 @@ struct
          - host is memory access -> check if it is a const field access
       *)
       | TLval (lhost,loff) ->
+        let rec offsets = function
+          | TNoOffset -> true
+          | TIndex (_, n) -> offsets n
+          | TModel (_, n) -> m.accept_models && offsets n
+          | TField (f, n) ->
+            (not (Cil.isConstType f.ftype) || m.accept_const) && offsets n
+        in
         (not (isLogicArrayType t.term_type) || m.accept_array) &&
         (match lhost with
          | TVar v -> begin
@@ -2334,10 +2341,7 @@ struct
            end
          | TResult _ -> m.accept_models
          | _ -> true) &&
-        (match snd (Logic_utils.remove_term_offset loff) with
-         | TModel _ -> m.accept_models
-         | TField(f, _) -> not (Cil.isConstType f.ftype) || m.accept_const
-         | _ -> true)
+        offsets loff
       | TAddrOf lv when is_fct_ptr lv -> m.accept_func_ptr
       | TAddrOf lv | TStartOf lv ->
         m.accept_addrs &&
