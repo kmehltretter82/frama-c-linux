@@ -16,6 +16,10 @@ struct X {
 struct Y {
    struct X a[10] ;
 };
+struct Z {
+   int const x ;
+   int y ;
+};
 int i;
 int const c;
 /*@ assigns i; */
@@ -25,5 +29,13 @@ int const a[2];
 struct Y y;
 /*@ assigns *ptr; */
 void accept_const_via_pointer(int const *ptr);
+
+static struct Z z;
+/*@ assigns z.y; */
+void accept_partial_const_struct(void)
+{
+  z.y = 1;
+  return;
+}
 
 

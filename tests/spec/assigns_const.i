@@ -29,3 +29,16 @@ void refuse_field_via_pointer(struct Y * ptr);
 
 //@ assigns *ptr ;
 void accept_const_via_pointer(int const * ptr);
+
+struct Z {
+  const int x;
+  int y;
+};
+
+static struct Z z;
+
+//@ assigns z.y;
+void accept_partial_const_struct(void)
+{
+    z.y = 1;
+}

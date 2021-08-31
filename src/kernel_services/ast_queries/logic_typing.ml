@@ -2312,6 +2312,10 @@ struct
   let check_lval_kind m t =
     let rec aux t = match t.term_node with
       | Tempty_set -> m.accept_empty
+      (* Be careful with const lval, cases are:
+         - *host* is variable -> the assigned *lval* must not be const
+         - host is memory access -> check if it is a const field access
+      *)
       | TLval (lhost,loff) ->
         (not (isLogicArrayType t.term_type) || m.accept_array) &&
         (match lhost with
@@ -2326,7 +2330,7 @@ struct
                           model variables are not supported. *)
              | Some v ->
                (not v.vformal || m.accept_formal) &&
-               (not (Cil.isConstType v.vtype) || m.accept_const)
+               (not (isConstType @@ logicCType t.term_type) || m.accept_const)
            end
          | TResult _ -> m.accept_models
          | _ -> true) &&
