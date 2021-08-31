@@ -32,6 +32,9 @@ FCFLAGS     += \
 EVAFLAGS    += \
   -eva-warn-key builtins:missing-spec=abort \
 
+## WP-specific flags
+WPFLAGS    += \
+
 ## GUI-only flags
 FCGUIFLAGS += \
 
