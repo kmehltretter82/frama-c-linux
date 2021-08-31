@@ -39,12 +39,13 @@
       "enabled": [
         "*", "alarm", "builtins", "builtins:missing-spec",
         "builtins:override", "experimental", "libc", "libc:unsupported-spec",
-        "locals-escaping", "malloc", "malloc:imprecise", "signed-overflow",
-        "taint"
+        "locals-escaping", "loop-unroll", "malloc", "malloc:imprecise",
+        "signed-overflow", "taint"
       ],
       "disabled": [
-        "garbled-mix", "invalid-assigns", "loop-unroll", "loop-unroll:auto",
-        "malloc:weak", "missing-loop-unroll", "missing-loop-unroll:for"
+        "garbled-mix", "invalid-assigns", "loop-unroll:auto",
+        "loop-unroll:partial", "malloc:weak", "missing-loop-unroll",
+        "missing-loop-unroll:for"
       ]
     }
   },

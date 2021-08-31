@@ -13,17 +13,17 @@
 [eva] Done for function test_slevel
 [eva] computing for function test_unroll <- main.
   Called from tests/value/partitioning-annots.c:206.
-[eva:loop-unroll] tests/value/partitioning-annots.c:26: 
+[eva:loop-unroll:partial] tests/value/partitioning-annots.c:26: 
   loop not completely unrolled
 [eva] tests/value/partitioning-annots.c:26: starting to merge loop iterations
-[eva:loop-unroll] tests/value/partitioning-annots.c:34: 
+[eva:loop-unroll:partial] tests/value/partitioning-annots.c:34: 
   loop not completely unrolled
 [eva] tests/value/partitioning-annots.c:34: starting to merge loop iterations
 [eva] tests/value/partitioning-annots.c:36: starting to merge loop iterations
-[eva:loop-unroll] tests/value/partitioning-annots.c:49: 
+[eva:loop-unroll:partial] tests/value/partitioning-annots.c:49: 
   loop not completely unrolled
 [eva] tests/value/partitioning-annots.c:49: starting to merge loop iterations
-[eva:loop-unroll] tests/value/partitioning-annots.c:54: 
+[eva:loop-unroll:partial] tests/value/partitioning-annots.c:54: 
   loop not completely unrolled
 [eva] tests/value/partitioning-annots.c:54: starting to merge loop iterations
 [eva] Recording results for test_unroll
