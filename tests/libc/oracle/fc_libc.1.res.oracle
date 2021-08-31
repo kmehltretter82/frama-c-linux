@@ -6698,10 +6698,6 @@ ssize_t getline(char **lineptr, size_t *n, FILE *stream);
 
 int asprintf(char **strp, char const *fmt, void * const *__va_params);
 
-/*@ assigns \result;
-    assigns \result \from maj, min; */
-extern dev_t makedev(int maj, int min);
-
 FILE __fc_initial_stdout =
   {.__fc_FILE_id = (unsigned int)1, .__fc_FILE_data = 0U};
 FILE *__fc_stdout = & __fc_initial_stdout;

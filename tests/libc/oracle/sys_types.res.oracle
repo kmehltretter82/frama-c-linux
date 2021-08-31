@@ -4,13 +4,9 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] computing for function makedev <- main.
-  Called from sys_types.c:4.
-[eva] using specification for function makedev
-[eva] Done for function makedev
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
-  dev ∈ [--..--]
+  dev ∈ {298}
   __retres ∈ {0}
