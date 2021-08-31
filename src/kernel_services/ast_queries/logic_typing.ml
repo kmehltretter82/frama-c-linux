@@ -2312,7 +2312,18 @@ struct
   let check_lval_kind m t =
     let rec aux t = match t.term_node with
       | Tempty_set -> m.accept_empty
+      (* Be careful with const lval, cases are:
+         - *host* is variable -> the assigned *lval* must not be const
+         - host is memory access -> check if it is a const field access
+      *)
       | TLval (lhost,loff) ->
+        let rec offsets = function
+          | TNoOffset -> true
+          | TIndex (_, n) -> offsets n
+          | TModel (_, n) -> m.accept_models && offsets n
+          | TField (f, n) ->
+            (not (Cil.isConstType f.ftype) || m.accept_const) && offsets n
+        in
         (not (isLogicArrayType t.term_type) || m.accept_array) &&
         (match lhost with
          | TVar v -> begin
@@ -2326,14 +2337,11 @@ struct
                           model variables are not supported. *)
              | Some v ->
                (not v.vformal || m.accept_formal) &&
-               (not (Cil.isConstType v.vtype) || m.accept_const)
+               (not (isConstType @@ logicCType t.term_type) || m.accept_const)
            end
          | TResult _ -> m.accept_models
          | _ -> true) &&
-        (match snd (Logic_utils.remove_term_offset loff) with
-         | TModel _ -> m.accept_models
-         | TField(f, _) -> not (Cil.isConstType f.ftype) || m.accept_const
-         | _ -> true)
+        offsets loff
       | TAddrOf lv when is_fct_ptr lv -> m.accept_func_ptr
       | TAddrOf lv | TStartOf lv ->
         m.accept_addrs &&
