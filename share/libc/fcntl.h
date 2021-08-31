@@ -63,6 +63,9 @@ __PUSH_FC_STDLIB
 #define O_TRUNC 0x200
 //#define O_TTY_INIT
 
+// Non-POSIX
+#define O_DIRECT 0x4000
+
 #define O_APPEND 0x400
 #define O_DSYNC 0x1000
 #define O_NONBLOCK 0x800

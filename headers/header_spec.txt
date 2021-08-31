@@ -190,6 +190,7 @@ share/libc/__fc_define_ino_t.h: CEA_LGPL
 share/libc/__fc_define_intptr_t.h: CEA_LGPL
 share/libc/__fc_define_iovec.h: CEA_LGPL
 share/libc/__fc_define_key_t.h: CEA_LGPL
+share/libc/__fc_define_locale_t.h: CEA_LGPL
 share/libc/__fc_define_max_open_files.h: CEA_LGPL
 share/libc/__fc_define_mode_t.h: CEA_LGPL
 share/libc/__fc_define_nlink_t.h: CEA_LGPL
@@ -254,6 +255,7 @@ share/libc/ifaddrs.h: CEA_LGPL
 share/libc/inttypes.c: CEA_LGPL
 share/libc/inttypes.h: CEA_LGPL
 share/libc/iso646.h: CEA_LGPL
+share/libc/langinfo.h: CEA_LGPL
 share/libc/libgen.h: CEA_LGPL
 share/libc/limits.h: CEA_LGPL
 share/libc/locale.c: CEA_LGPL

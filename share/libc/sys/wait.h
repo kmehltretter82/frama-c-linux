@@ -45,6 +45,9 @@ __BEGIN_DECLS
 #define WNOWAIT 0x01000000
 #define WSTOPPED 2
 
+// Non-POSIX
+#define WCOREDUMP(status) ((status) & 0x80)
+
 #include "../__fc_define_id_t.h"
 #include "../__fc_define_pid_t.h"
 #include "../__fc_define_uid_and_gid.h"
