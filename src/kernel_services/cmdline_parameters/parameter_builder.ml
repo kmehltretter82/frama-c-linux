@@ -174,19 +174,18 @@ struct
     let add_negative_option name =
       let neg_name = negative_option_name name in
       let mk_help s =
-        if is_visible then
-          if X.default then s else s ^ default_message empty_string
-        else empty_string
+        if X.default then s else s ^ default_message empty_string
       in
-      let neg_help, neg_visible =
-        match
-          !Parameter_customize.negative_option_name_ref,
-          !Parameter_customize.negative_option_help_ref
-        with
-        | None, "" -> (* no user-specific config: no help *) empty_string, false
-        | Some _, "" ->
-          mk_help ("opposite of option \"" ^ name ^ "\""), is_visible
-        | _, s -> assert (s <> empty_string); mk_help s, is_visible
+      (* Add help messages even for invisible negative options, since
+         these messages are useful for option '-explain' *)
+      let s = !Parameter_customize.negative_option_help_ref in
+      let neg_visible, neg_help =
+        if s = empty_string then
+          !Parameter_customize.negative_option_name_ref <> None,
+          (if not X.default then "(set by default) " else "") ^
+          "opposite of option " ^ name ^ ", whose help message is:\n" ^ X.help
+        else
+          is_visible, mk_help s
       in
       generic_add_option neg_name neg_help neg_visible false;
       neg_name
