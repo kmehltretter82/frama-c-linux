@@ -1,10 +1,4 @@
 [kernel] Parsing tests/value/fam_sizeof.i (no preprocessing)
-[kernel] tests/value/fam_sizeof.i:22: Warning: 
-  field `s3' declared with a type containing a flexible array member only allowed for GCC/MSVC.
-[kernel] tests/value/fam_sizeof.i:23: Warning: 
-  field `s2' declared with a type containing a flexible array member only allowed for GCC/MSVC.
-[kernel] tests/value/fam_sizeof.i:24: Warning: 
-  field `s1' declared with a type containing a flexible array member only allowed for GCC/MSVC.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

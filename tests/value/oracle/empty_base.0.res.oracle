@@ -3,12 +3,8 @@
   variable `c' has initializer but incomplete type
 [kernel] tests/value/empty_base.c:67: Warning: 
   Too many initializers for structure
-[kernel] tests/value/empty_base.c:75: Warning: 
-  field `z' declared with a type containing a flexible array member only allowed for GCC/MSVC.
 [kernel] tests/value/empty_base.c:81: User Error: 
   field `f1' declared with a type containing a flexible array member.
-[kernel] tests/value/empty_base.c:83: Warning: 
-  field `f' declared with a type containing a flexible array member only allowed for GCC/MSVC.
 [kernel] User Error: stopping on file "tests/value/empty_base.c" that has errors. Add
   '-kernel-msg-key pp' for preprocessing command.
 [kernel] Frama-C aborted: invalid user input.
