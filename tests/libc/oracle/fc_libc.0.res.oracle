@@ -202,7 +202,7 @@
   Goto = 112
   Assignment = 618
   Exit point = 99
-  Function = 521
+  Function = 523
   Function call = 141
   Pointer dereferencing = 249
   Cyclomatic complexity = 369
