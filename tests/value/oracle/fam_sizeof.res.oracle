@@ -1,4 +1,10 @@
 [kernel] Parsing tests/value/fam_sizeof.i (no preprocessing)
+[kernel] tests/value/fam_sizeof.i:22: Warning: 
+  field `s3' declared with a type containing a flexible array member only allowed for GCC/MSVC.
+[kernel] tests/value/fam_sizeof.i:23: Warning: 
+  field `s2' declared with a type containing a flexible array member only allowed for GCC/MSVC.
+[kernel] tests/value/fam_sizeof.i:24: Warning: 
+  field `s1' declared with a type containing a flexible array member only allowed for GCC/MSVC.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -7,15 +13,17 @@
   nested ∈ {0}
   fam2 ∈ {0}
   gcc_fam ∈ {0}
-[eva] tests/value/fam_sizeof.i:48: assertion got status valid.
-[eva] tests/value/fam_sizeof.i:52: assertion got status valid.
+[eva] tests/value/fam_sizeof.i:51: assertion got status valid.
 [eva] tests/value/fam_sizeof.i:54: assertion got status valid.
+[eva] tests/value/fam_sizeof.i:57: assertion got status valid.
+[eva] tests/value/fam_sizeof.i:59: assertion got status valid.
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   z1 ∈ {4}
   z2 ∈ {20}
+  z2p ∈ {20}
   z3 ∈ {12}
   z4 ∈ {16}
   z5 ∈ {0}
@@ -28,6 +36,6 @@
   \result FROM \nothing
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function main:
-    z1; z2; z3; z4; z5; __retres
+    z1; z2; z2p; z3; z4; z5; __retres
 [inout] Inputs for function main:
     \nothing
