@@ -538,7 +538,6 @@ KERNEL_CMO=\
 	src/kernel_internals/parsing/errorloc.cmo                      \
 	src/kernel_services/ast_printing/cil_printer.cmo                \
 	src/kernel_services/ast_printing/cil_descriptive_printer.cmo    \
-	src/kernel_services/parsetree/cabs.cmo                               \
 	src/kernel_services/parsetree/cabshelper.cmo                         \
 	src/kernel_services/ast_queries/logic_utils.cmo              \
 	src/kernel_services/ast_printing/logic_print.cmo                \
@@ -640,7 +639,8 @@ MLI_ONLY+=\
 	src/libraries/utils/hptmap_sig.mli                                   \
 	src/kernel_services/cmdline_parameters/parameter_sig.mli             \
 	src/kernel_services/ast_data/cil_types.mli                           \
-	src/kernel_services/parsetree/logic_ptree.mli                             \
+	src/kernel_services/parsetree/cabs.mli                               \
+	src/kernel_services/parsetree/logic_ptree.mli                        \
 	src/kernel_services/ast_printing/printer_api.mli                     \
 	src/kernel_services/abstract_interp/float_sig.mli                    \
 	src/kernel_services/abstract_interp/float_interval_sig.mli           \
@@ -652,8 +652,7 @@ MLI_ONLY+=\
 	src/kernel_services/abstract_interp/lmap_sig.mli                     \
 	src/kernel_services/abstract_interp/offsetmap_bitwise_sig.mli
 
-NO_MLI+= src/kernel_services/parsetree/cabs.mli                \
-	src/kernel_internals/runtime/machdep_ppc_32.mli         \
+NO_MLI+= src/kernel_internals/runtime/machdep_ppc_32.mli         \
 	src/kernel_internals/runtime/machdep_x86_16.mli         \
 	src/kernel_internals/runtime/machdep_x86_32.mli         \
 	src/kernel_internals/runtime/machdep_x86_64.mli         \
