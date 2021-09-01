@@ -20,7 +20,7 @@
 [eva] Done for function taint_basic
 [eva] computing for function taint_assume_1 <- main.
   Called from tests/value/taint.c:146.
-[eva:loop-unroll] tests/value/taint.c:47: Automatic loop unrolling.
+[eva:loop-unroll:auto] tests/value/taint.c:47: Automatic loop unrolling.
 [eva] tests/value/taint.c:48: 
   Frama_C_dump_each:
   # taint:

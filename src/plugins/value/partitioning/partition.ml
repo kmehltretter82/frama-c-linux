@@ -450,7 +450,7 @@ struct
               | Some i ->
                 let source = fst (Cil_datatype.Stmt.loc stmt) in
                 Value_parameters.warning ~once:true ~current:true ~source
-                  ~wkey:Value_parameters.wkey_loop_unroll
+                  ~wkey:Value_parameters.wkey_loop_unroll_auto
                   "Automatic loop unrolling.";
                 i
             with
@@ -471,7 +471,7 @@ struct
               if h >= limit then begin
                 if limit > 0 then
                   Value_parameters.warning ~once:true ~current:true
-                    ~wkey:Value_parameters.wkey_loop_unroll
+                    ~wkey:Value_parameters.wkey_loop_unroll_partial
                     "loop not completely unrolled";
                 k
               end

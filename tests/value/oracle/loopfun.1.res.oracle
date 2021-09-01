@@ -5,11 +5,11 @@
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
   a ∈ {7}
-[eva:missing-loop-unroll] tests/value/loopfun.i:23: 
+[eva:loop-unroll:missing] tests/value/loopfun.i:23: 
   while loop without unroll annotation
-[eva:missing-loop-unroll:for] tests/value/loopfun.i:26: Warning: 
+[eva:loop-unroll:missing:for] tests/value/loopfun.i:26: Warning: 
   for loop without unroll annotation
-[eva:missing-loop-unroll] tests/value/loopfun.i:27: 
+[eva:loop-unroll:missing] tests/value/loopfun.i:27: 
   dowhile loop without unroll annotation
 [eva] Recording results for main2
 [eva] done for function main2
