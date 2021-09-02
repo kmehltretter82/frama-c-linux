@@ -82,9 +82,10 @@ module States_operations = struct
     current_selection := selection;
     iter (fun s -> f s x) selection
 
-  let fold_on_selection ?(selection=State_selection.full) f x =
+  let fold_on_selection
+      ?(fold=State_selection.fold) ?(selection=State_selection.full) f x =
     current_selection := selection;
-    State_selection.fold (fun s -> f s x) selection
+    fold (fun s -> f s x) selection
 
   let create = iter (fun s -> (private_ops s).create)
   let remove = iter (fun s -> (private_ops s).remove)
@@ -144,11 +145,12 @@ module States_operations = struct
   let serialize ?selection p =
     fold_on_selection
       ?selection
+      ~fold:State_selection.fold_in_order
       (fun s p acc -> (get_unique_name s, (private_ops s).serialize p) :: acc)
       p
       []
 
-  let unserialize ?selection dst loaded_states =
+  let unserialize ?(selection=State_selection.full) dst loaded_states =
     let pp_err fmt n msg_sing msg_plural =
       if n > 0 then begin
         warning ~once:true
@@ -158,59 +160,53 @@ module States_operations = struct
           (if n = 1 then msg_sing else msg_plural)
       end
     in
-    let tbl = Hashtbl.create 97 in
-    List.iter (fun (k, v) -> Hashtbl.add tbl k v) loaded_states;
-    let invalid_on_disk = State.Hashtbl.create 7 in
-    iter_on_selection
-      ?selection
-      (fun s () ->
-         try
-           let n = get_unique_name s in
-           let d = Hashtbl.find tbl n in
-           (try
-              (private_ops s).unserialize dst d;
-              (* do not remove if [State.Incompatible_datatype] occurs *)
-              Hashtbl.remove tbl n
-            with
-            | Not_found ->
-              fatal "unexpected 'Not_found' when unserializing; \
-                     possibly an issue with a hook"
-            | State.Incompatible_datatype _ ->
-              (* datatype of [s] on disk is incompatible with the one in RAM: as
-                 [dst] is a new project, [s] is already equal to its default
-                 value. However must clear the dependencies for consistency, but
-                 it is doable only when all states are loaded. *)
-              State.Hashtbl.add invalid_on_disk s ())
-         with Not_found ->
-           (* [s] is in RAM but not on disk: silently ignore it!  Furthermore,
-              all the dependencies of [s] are consistent with this default
-              value. So no need to clear them. Whenever the value of [s] in
-              [dst] changes, the dependencies will be cleared (if required by
-              the user). *)
-           ())
-      ();
+    let ignored_states = Hashtbl.create 7 in
+    let unserialize_state (name, on_disk) =
+      if on_disk.on_disk_saved then
+        try
+          let state = State.get name in
+          if State_selection.mem selection state
+          then (private_ops state).unserialize dst on_disk
+          else Hashtbl.add ignored_states name false
+        with
+        | Not_found ->
+          fatal "unexpected 'Not_found' when unserializing; \
+                 possibly an issue with a hook"
+        | State.Incompatible_datatype _ ->
+          (* datatype of [state] on disk is incompatible with the one in RAM: as
+             [dst] is a new project, [state] is already equal to its default
+             value. However must clear the dependencies for consistency, but
+             it is doable only when all states are loaded. *)
+          Hashtbl.add ignored_states name true
+        | State.Unknown ->
+          Hashtbl.add ignored_states name false
+    in
+    (* Silently ignore states in RAM but not on disk: all their dependencies are
+       consistent with their default value. So no need to clear them. Whenever
+       their value in [dst] changes, the dependencies will be cleared (if
+       required by the user). *)
+    List.iter unserialize_state (List.rev loaded_states);
     (* warns for the saved states that cannot be loaded
        (either they are not in RAM or they are incompatible). *)
-    let nb_ignored =
-      Hashtbl.fold (fun _ s n -> if s.on_disk_saved then succ n else n) tbl 0
-    in
     pp_err
       "%d state%s in saved file ignored. \
        %s this Frama-C configuration."
-      nb_ignored
+      (Hashtbl.length ignored_states)
       "It is invalid in"
       "They are invalid in";
     if debug_atleast 1 then
       Hashtbl.iter
-        (fun k s -> if s.on_disk_saved then debug ~dkey "ignoring state %s" k)
-        tbl;
+        (fun name _b -> debug ~dkey "ignoring state %s" name)
+        ignored_states;
     (* after loading, reset dependencies of incompatible states *)
     let to_be_cleared =
-      State.Hashtbl.fold
-        (fun s () ->
-           State_selection.union
-             (State_selection.only_dependencies s))
-        invalid_on_disk
+      Hashtbl.fold
+        (fun name invalid acc ->
+           if invalid then
+             let state = State.get name in
+             State_selection.union acc (State_selection.only_dependencies state)
+           else acc)
+        ignored_states
         State_selection.empty
     in
     let nb_cleared = State_selection.cardinal to_be_cleared in
