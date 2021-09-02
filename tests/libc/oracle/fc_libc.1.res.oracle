@@ -8619,6 +8619,26 @@ extern int pthread_mutexattr_init(pthread_mutexattr_t *attr);
  */
 extern int pthread_mutexattr_settype(pthread_mutexattr_t *attr, int type);
 
+/*@ requires valid_name: valid_read_string(name);
+    assigns \result;
+    assigns \result
+      \from (indirect: thread),
+            (indirect: *(name + (0 .. strlen{Old}(name))));
+ */
+int pthread_setname_np(pthread_t thread, char const *name);
+
+/*@ requires valid_name: \valid(name + (0 .. len - 1));
+    ensures
+      name_written: initialization:
+        \result ≡ 0 ⇒
+        valid_string(\old(name)) ∧
+        \initialized(\old(name) + (0 .. strlen(\old(name))));
+    assigns \result, *(name + (0 .. len - 1));
+    assigns \result \from thread;
+    assigns *(name + (0 .. len - 1)) \from thread;
+ */
+int pthread_getname_np(pthread_t thread, char *name, size_t len);
+
 extern char __fc_getpwuid_pw_name[64];
 
 extern char __fc_getpwuid_pw_passwd[64];

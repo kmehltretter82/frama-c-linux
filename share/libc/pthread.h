@@ -28,7 +28,7 @@ __PUSH_FC_STDLIB
 __BEGIN_DECLS
 
 #include "errno.h"
-
+#include "__fc_string_axiomatic.h"
 // The values for the constants below are based on an x86 Linux,
 // declared in the order given by POSIX.1-2008.
 
@@ -386,6 +386,22 @@ extern int pthread_spin_lock(pthread_spinlock_t *);
 extern int pthread_spin_trylock(pthread_spinlock_t *);
 extern int pthread_spin_unlock(pthread_spinlock_t *);
 extern void pthread_testcancel(void);
+
+// GNU extensions
+
+/*@ requires valid_name: valid_read_string(name);
+    assigns \result \from indirect:thread, indirect:name[0 .. strlen(name)];
+*/
+int pthread_setname_np(pthread_t thread, const char* name);
+
+/*@ requires valid_name: \valid(name + (0 .. len - 1));
+    assigns \result, name[0 .. len - 1] \from thread;
+    ensures name_written: initialization:
+        \result == 0 ==>
+           valid_string(name) &&
+           \initialized(name + (0 .. strlen(name)));
+*/
+int pthread_getname_np(pthread_t thread, char* name, size_t len);
 
 // From POSIX: "Inclusion of the <pthread.h> header shall make symbols defined
 //              in the headers <sched.h> and <time.h> visible."

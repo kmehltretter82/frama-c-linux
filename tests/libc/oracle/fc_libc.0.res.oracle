@@ -46,7 +46,7 @@
    wcslen (3 calls); wcsncat (0 call); wcsncpy (0 call); wmemcpy (1 call);
    wmemset (0 call); 
   
-  Specified-only functions (421)
+  Specified-only functions (423)
   ==============================
    FD_CLR (0 call); FD_ISSET (0 call); FD_SET (0 call); FD_ZERO (0 call);
    Frama_C_int_interval (0 call); Frama_C_long_interval (0 call);
@@ -131,12 +131,14 @@
    perror (0 call); pipe (0 call); poll (0 call); popen (0 call); pow (0 call);
    powf (0 call); pthread_cond_broadcast (0 call);
    pthread_cond_destroy (0 call); pthread_cond_init (0 call);
-   pthread_cond_wait (0 call); pthread_create (0 call); pthread_join (0 call);
+   pthread_cond_wait (0 call); pthread_create (0 call);
+   pthread_getname_np (0 call); pthread_join (0 call);
    pthread_mutex_destroy (0 call); pthread_mutex_init (0 call);
    pthread_mutex_lock (0 call); pthread_mutex_unlock (0 call);
    pthread_mutexattr_destroy (0 call); pthread_mutexattr_init (0 call);
-   pthread_mutexattr_settype (0 call); putc (0 call); putc_unlocked (0 call);
-   putchar (0 call); putchar_unlocked (0 call); puts (0 call); qsort (0 call);
+   pthread_mutexattr_settype (0 call); pthread_setname_np (0 call);
+   putc (0 call); putc_unlocked (0 call); putchar (0 call);
+   putchar_unlocked (0 call); puts (0 call); qsort (0 call);
    quick_exit (0 call); raise (0 call); rand (0 call); random (0 call);
    read (0 call); readdir (0 call); readv (0 call); realloc (7 calls);
    recv (0 call); recvfrom (0 call); recvmsg (0 call); remove (0 call);
@@ -200,7 +202,7 @@
   Goto = 112
   Assignment = 618
   Exit point = 99
-  Function = 521
+  Function = 523
   Function call = 141
   Pointer dereferencing = 249
   Cyclomatic complexity = 369
