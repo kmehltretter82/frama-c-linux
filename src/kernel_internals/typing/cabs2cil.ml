@@ -5441,11 +5441,15 @@ and makeCompType ghost (isstruct: bool)
         Kernel.error ~source
           "field `%s' declared as a function" n
       else if Cil.has_flexible_array_member ftype && isstruct then begin
-        if not (last_group && last_field && (Cil.gccMode() || Cil.msvcMode ()))
-        then
+        if not (last_group && last_field) then
+          Kernel.error ~source
+            "non-final field `%s' declared with a type containing a flexible \
+             array member."
+            n
+        else if not (Cil.gccMode() || Cil.msvcMode ()) then
           Kernel.error ~source
             "field `%s' declared with a type containing a flexible array \
-             member."
+             member only allowed in GCC/MSVC mode."
             n
       end
       else if not (Cil.isCompleteType ~allowZeroSizeArrays ftype)
