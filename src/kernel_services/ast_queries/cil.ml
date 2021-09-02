@@ -6122,27 +6122,24 @@ let foldLeftCompound
 
   | _ -> Kernel.fatal ~current:true "Type of Compound is not array or struct or union"
 
-let has_flexible_array_member t =
+let rec has_flexible_array_member t =
   let is_flexible_array t =
     match unrollType t with
     | TArray (_, None, _, _) -> true
-    | TArray (_, Some z, _, _) -> gccMode() && isZero z
+    | TArray (_, Some z, _, _) -> (msvcMode() || gccMode()) && isZero z
     | _ -> false
   in
   match unrollType t with
   | TComp ({ cfields = Some ((_::_) as l) },_,_) ->
-    is_flexible_array (Extlib.last l).ftype
+    let last = (Extlib.last l).ftype in
+    is_flexible_array last ||
+    ((gccMode() || msvcMode()) && has_flexible_array_member last)
   | _ -> false
 
 (* last_field is [true] if the given type is the type of the last field of
    a struct (which could be a FAM, making the whole struct complete even if
    the array type isn't. *)
-let rec isCompleteType ?allowZeroSizeArrays ?(last_field=false) t =
-  let allowZeroSizeArrays =
-    match allowZeroSizeArrays with
-    | None -> gccMode()
-    | Some flag -> flag
-  in
+let rec isCompleteType ?(allowZeroSizeArrays=gccMode()) ?(last_field=false) t =
   match unrollType t with
   | TVoid _ -> false (* void is an incomplete type by definition (6.2.5§19) *)
   | TArray(t, None, _, _) ->
@@ -6161,20 +6158,21 @@ let rec isCompleteType ?allowZeroSizeArrays ?(last_field=false) t =
   | TFun _ -> true (* only object types can be incomplete (6.2.5§1) *)
   | TNamed _ -> assert false (* unroll should have removed it. *)
 
-and complete_type_fields ?allowZeroSizeArrays is_struct fields =
+and complete_type_fields ~allowZeroSizeArrays is_struct fields =
   let rec aux is_first l =
     let last_field = is_struct && not is_first in
     match l with
     | [] -> true
-    | [ f ] -> is_complete_agg_member ?allowZeroSizeArrays ~last_field f.ftype
+    | [ f ] ->
+      is_complete_agg_member ~allowZeroSizeArrays ~last_field f.ftype
     | f :: tl ->
-      is_complete_agg_member ?allowZeroSizeArrays f.ftype && aux false tl
+      is_complete_agg_member ~allowZeroSizeArrays f.ftype && aux false tl
   in
   aux true fields
 
-and is_complete_agg_member ?allowZeroSizeArrays ?last_field t =
-  isCompleteType ?allowZeroSizeArrays ?last_field t &&
-  not (has_flexible_array_member t)
+and is_complete_agg_member ~allowZeroSizeArrays ?last_field t =
+  isCompleteType ~allowZeroSizeArrays ?last_field t &&
+  (allowZeroSizeArrays || not (has_flexible_array_member t))
 
 (* last_field optional argument can only be used internally. Do not allow
    callers to mess with it. *)
