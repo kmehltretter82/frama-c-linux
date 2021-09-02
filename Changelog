@@ -17,6 +17,8 @@
 Open Source Release <next-release>
 ##################################
 
+-   Kernel    [2021-09-02] 0-sized flexible array members only available in
+              gcc_* machdeps, that now also support FAM in nested struct.
 -   Eva       [2021-07-26] Removes the maximum limit of option -eva-ilevel.
 -   Eva       [2021-07-26] New \tainted predicate to evaluate if the value of an
               expression is tainted according to the taint domain.
