@@ -105,7 +105,7 @@ pkgs.lib.makeExtensible
         buildPhase = ''
                make lint
                make stats-lint
-               make check-headers
+               STRICT_HEADERS=yes make check-headers
         '';
         installPhase = ''
                true
