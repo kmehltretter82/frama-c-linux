@@ -100,6 +100,15 @@ module Builtins =
       let help = "C functions which can be used in the E-ACSL specifications"
     end)
 
+let () = Parameter_customize.is_invisible ()
+module Assert_print_data =
+  False
+    (struct
+      let option_name = "-e-acsl-assert-print-data"
+      let help = "print data contributing to the failed assertion along with \
+                  the runtime error message"
+    end)
+
 module Functions =
   Kernel_function_set
     (struct

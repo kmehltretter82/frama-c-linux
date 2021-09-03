@@ -78,6 +78,7 @@ SRC_CODE_GENERATOR:= \
 	gmp \
 	label \
 	env \
+	assert \
 	rational \
 	typed_number \
 	logic_functions \

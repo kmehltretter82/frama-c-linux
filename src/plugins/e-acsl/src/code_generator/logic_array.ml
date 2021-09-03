@@ -240,8 +240,15 @@ let comparison_to_exp ~loc kf env ~name bop array1 array2 =
           (Rle, Logic_utils.expr_to_term len, Logic_utils.expr_to_term len_orig)
       in
       let p = { p with pred_name = "array_coercion" :: p.pred_name } in
-      let stmt =
-        Smart_stmt.runtime_check ~pred_kind:Assert Smart_stmt.RTE kf e p
+      let adata, env = Assert.empty ~loc kf env in
+      let adata, env =
+        Assert.register ~loc kf env "destination length" len adata
+      in
+      let adata, env =
+        Assert.register ~loc kf env "current length" len_orig adata
+      in
+      let stmt, env =
+        Assert.runtime_check ~adata ~pred_kind:Assert Smart_stmt.RTE kf env e p
       in
       stmt :: stmts, env
   in

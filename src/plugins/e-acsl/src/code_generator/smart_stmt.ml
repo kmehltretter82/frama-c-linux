@@ -39,25 +39,6 @@ let if_stmt ~loc ~cond ?(else_blk=Cil.mkBlock []) then_blk =
 
 let break ~loc = stmt (Break loc)
 
-type annotation_kind =
-  | Assertion
-  | Precondition
-  | Postcondition
-  | Invariant
-  | Variant
-  | RTE
-
-let kind_to_string loc k =
-  Cil.mkString
-    ~loc
-    (match k with
-     | Assertion -> "Assertion"
-     | Precondition -> "Precondition"
-     | Postcondition -> "Postcondition"
-     | Invariant -> "Invariant"
-     | Variant -> "Variant"
-     | RTE -> "RTE")
-
 let block stmt b = match b.bstmts with
   | [] ->
     (match stmt.skind with
@@ -179,33 +160,13 @@ let mark_readonly vi =
   let loc = vi.vdecl in
   rtl_call ~loc "mark_readonly" [ Cil.evar ~loc vi ]
 
-let runtime_check_with_msg ~loc msg ~pred_kind kind kf e =
-  let blocking =
-    match pred_kind with
-    | Assert -> Cil.one ~loc
-    | Check -> Cil.zero ~loc
-    | Admit ->
-      Options.fatal "No runtime check should be generated for 'admit' clauses"
-  in
-  let file = (fst loc).Filepath.pos_path in
-  let line = (fst loc).Filepath.pos_lnum in
-  rtl_call ~loc
-    "assert"
-    [ e;
-      blocking;
-      kind_to_string loc kind;
-      Cil.mkString ~loc (Functions.RTL.get_original_name kf);
-      Cil.mkString ~loc msg;
-      Cil.mkString ~loc (Filepath.Normalized.to_pretty_string file);
-      Cil.integer loc line ]
-
-let runtime_check ~pred_kind kind kf e p =
-  let loc = p.pred_loc in
-  let msg =
-    Kernel.Unicode.without_unicode
-      (Format.asprintf "%a@?" Printer.pp_predicate) p
-  in
-  runtime_check_with_msg ~loc msg ~pred_kind kind kf e
+type annotation_kind =
+  | Assertion
+  | Precondition
+  | Postcondition
+  | Invariant
+  | Variant
+  | RTE
 
 (*
 Local Variables:

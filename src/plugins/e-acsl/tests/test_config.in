@@ -2,7 +2,7 @@ MACRO: DEST @PTEST_RESULT@/gen_@PTEST_NAME@
 MACRO: MACHDEP -machdep gcc_x86_64
 MACRO: GLOBAL @MACHDEP@ -remove-unused-specified-functions -verbose 0
 
-MACRO: EACSL -e-acsl -e-acsl-share ./share/e-acsl -e-acsl-verbose 1
+MACRO: EACSL -e-acsl -e-acsl-share ./share/e-acsl -e-acsl-verbose 1 -e-acsl-assert-print-data
 MACRO: EVA -eva -eva-no-alloc-returns-null -eva-no-results -eva-slevel=12 -eva-no-print -eva-warn-key libc:unsupported-spec=inactive
 
 MACRO: EVENTUALLY -print -ocode @DEST@.c -load-script ./tests/print.cmxs

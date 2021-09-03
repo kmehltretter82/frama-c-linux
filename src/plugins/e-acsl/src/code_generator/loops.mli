@@ -56,10 +56,18 @@ val translate_predicate_ref:
   (kernel_function -> Env.t -> toplevel_predicate -> Env.t) ref
 
 val predicate_to_exp_ref:
-  (kernel_function -> Env.t -> predicate -> exp * Env.t) ref
+  (adata:Assert.t ->
+   kernel_function ->
+   Env.t ->
+   predicate ->
+   exp * Assert.t * Env.t) ref
 
 val term_to_exp_ref:
-  (kernel_function -> Env.t -> term -> exp * Env.t) ref
+  (adata:Assert.t ->
+   kernel_function ->
+   Env.t ->
+   term ->
+   exp * Assert.t * Env.t) ref
 
 (*
 Local Variables:

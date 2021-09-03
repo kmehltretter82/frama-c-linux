@@ -25,8 +25,14 @@ open Cil
 
 (** Forward reference for [Translate.predicate_to_exp]. *)
 let predicate_to_exp_ref
-  : (kernel_function -> Env.t -> predicate -> exp * Env.t) ref
-  = Extlib.mk_fun "predicate_to_exp_ref"
+  : (adata:Assert.t ->
+     kernel_function ->
+     Env.t ->
+     predicate ->
+     exp * Assert.t * Env.t) ref
+  =
+  ref (fun ~adata:_ _kf _env _p ->
+      Extlib.mk_labeled_fun "predicate_to_exp_ref")
 
 
 (* It could happen that the bounds provided for a quantified [lv] are empty
@@ -105,8 +111,8 @@ let convert kf env loc ~is_forall quantif =
       let mk_innermost_block env =
         (* innermost loop body: store the result in [res] and go out according
            to evaluation of the goal *)
-        let named_predicate_to_exp = !predicate_to_exp_ref in
-        let test, env = named_predicate_to_exp kf (Env.push env) goal in
+        let predicate_to_exp = !predicate_to_exp_ref ~adata:Assert.no_data in
+        let test, _, env = predicate_to_exp kf (Env.push env) goal in
         let then_blk = mkBlock [ mkEmptyStmt ~loc () ] in
         let else_blk =
           (* use a 'goto', not a simple 'break' in order to handle 'forall' with

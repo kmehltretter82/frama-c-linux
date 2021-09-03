@@ -27,24 +27,36 @@ open Cil_types
 (**************************************************************************)
 
 let predicate_to_exp_ref
-  : (kernel_function -> Env.t -> predicate -> exp * Env.t) ref
-  = Extlib.mk_fun "named_predicate_to_exp_ref"
+  : (adata:Assert.t ->
+     kernel_function ->
+     Env.t ->
+     predicate ->
+     exp * Assert.t * Env.t) ref
+  =
+  ref (fun ~adata:_ _kf _env _p ->
+      Extlib.mk_labeled_fun "predicate_to_exp_ref")
 
 let term_to_exp_ref
-  : (kernel_function -> Env.t -> term -> exp * Env.t) ref
-  = Extlib.mk_fun "term_to_exp_ref"
+  : (adata:Assert.t ->
+     kernel_function ->
+     Env.t ->
+     term ->
+     exp * Assert.t * Env.t) ref
+  =
+  ref (fun ~adata:_ _kf _env _t -> Extlib.mk_labeled_fun "term_to_exp_ref")
 
 let gmp_to_sizet_ref
-  : (loc:location ->
+  : (adata:Assert.t ->
+     loc:location ->
      name:string ->
      ?check_lower_bound:bool ->
      ?pp:term ->
      kernel_function ->
      Env.t ->
      term ->
-     exp * Env.t) ref
+     exp * Assert.t * Env.t) ref
   =
-  let func ~loc:_ ~name:_ ?check_lower_bound:_ ?pp:_ _kf _env _t =
+  let func ~adata:_ ~loc:_ ~name:_ ?check_lower_bound:_ ?pp:_ _kf _env _t =
     Extlib.mk_labeled_fun "gmp_to_sizet_ref"
   in
   ref func
@@ -127,22 +139,27 @@ let rec eliminate_ranges_from_index_of_toffset ~loc toffset quantifiers =
 (*****************************************************************************)
 
 (* \base_addr, \block_length, \offset and \freeable *)
-let call ~loc kf name ctx env t =
+let call ~adata ~loc kf name ctx env t =
   assert (name = "base_addr" || name = "block_length"
           || name = "offset" || name ="freeable");
-  let e, env =
+  let (e, adata), env =
     Env.with_rte_and_result env true
-      ~f:(fun env -> !term_to_exp_ref kf env t)
+      ~f:(fun env ->
+          let e, adata, env = !term_to_exp_ref ~adata kf env t in
+          (e, adata), env)
   in
-  Env.rtl_call_to_new_var
-    ~loc
-    ~name
-    env
-    kf
-    None
-    ctx
-    name
-    [ e ]
+  let e, env =
+    Env.rtl_call_to_new_var
+      ~loc
+      ~name
+      env
+      kf
+      None
+      ctx
+      name
+      [ e ]
+  in
+  e, adata, env
 
 (*****************************************************************************)
 (************************* Calls with Range Elimination **********************)
@@ -154,15 +171,23 @@ let call ~loc kf name ctx env t =
    The case where [!(0 <= size <= SIZE_MAX)] is an UB ==> guard against it.
    Since the case [0 <= size] is already checked before calling this function,
    only [size <= SIZE_MAX] is added as a guard. *)
-let gmp_to_sizet ~loc ?pp kf env size _p =
-  !gmp_to_sizet_ref ~loc ~name:"offset" ~check_lower_bound:false ?pp kf env size
+let gmp_to_sizet ~adata ~loc ?pp kf env size _p =
+  !gmp_to_sizet_ref
+    ~adata
+    ~loc
+    ~name:"offset"
+    ~check_lower_bound:false
+    ?pp
+    kf
+    env
+    size
 
 (* Take a term of the form [ptr + r] where [ptr] is an address and [r] a range
    offset, and return a tuple [(ptr, size, env)] where [ptr] is the address of
    the start of the range, [size] is the size of the range in bytes and [env] is
    the current environment.
    [p] is the predicate under test. *)
-let range_to_ptr_and_size ~loc kf env ptr r p =
+let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
   let n1, n2 = match r.term_node with
     | Trange(Some n1, Some n2) ->
       n1, n2
@@ -188,9 +213,11 @@ let range_to_ptr_and_size ~loc kf env ptr r p =
       (Ctype typ_charptr)
   in
   Typing.type_term ~use_gmp_opt:false ~ctx:Typing.nan ptr;
-  let ptr, env =
+  let (ptr, adata), env =
     Env.with_rte_and_result env true
-      ~f:(fun env -> !term_to_exp_ref kf env ptr)
+      ~f:(fun env ->
+          let e, adata, env = !term_to_exp_ref ~adata kf env ptr in
+          (e, adata), env)
   in
   (* size *)
   let size_term =
@@ -234,11 +261,12 @@ let range_to_ptr_and_size ~loc kf env ptr r p =
     Logic_const.term ~loc (Tlet (size_term_info, size_term_if)) Linteger
   in
   Typing.type_term ~use_gmp_opt:false size_term;
-  let size, env = match Typing.get_number_ty size_term with
+  let size, adata, env =
+    match Typing.get_number_ty size_term with
     | Typing.Gmpz ->
       (* Start by translating [size_term] to an expression so that the full term
          with [\let] is not passed around. *)
-      let size_e, env = !term_to_exp_ref kf env size_term in
+      let size_e, adata, env = !term_to_exp_ref ~adata kf env size_term in
       (* Since translating a GMP code should always produce a C variable, we
          can reuse it as a term for the function [gmp_to_sizet]. *)
       let cvar_term =
@@ -248,26 +276,37 @@ let range_to_ptr_and_size ~loc kf env ptr r p =
           Options.fatal
             "translation to GMP code should always return a C variable"
       in
-      gmp_to_sizet ~loc ~pp:size_term kf env cvar_term p
+      gmp_to_sizet ~adata ~loc ~pp:size_term kf env cvar_term p
     | Typing.(C_integer _ | C_float _) ->
-      !term_to_exp_ref kf env size_term
+      !term_to_exp_ref ~adata kf env size_term
     | Typing.(Rational | Real | Nan) ->
       assert false
   in
-  ptr, size, env
+  ptr, size, adata, env
 
 (* Take a term without range [t] and return a tuple [(ptr, size, env)] where
    [ptr] is an expression representing the term, [size] is the size of the
    expression in bytes and [env] is the current environment.
    [p] is the predicate under test. *)
-let term_to_ptr_and_size ~loc kf env t =
-  let e, env =
+let term_to_ptr_and_size ~adata ~loc kf env t =
+  let (e, adata), env =
     Env.with_rte_and_result env true
-      ~f:(fun env -> !term_to_exp_ref kf env t)
+      ~f:(fun env ->
+          let e, adata, env = !term_to_exp_ref ~adata kf env t in
+          (e, adata), env)
   in
   let ty = Misc.cty t.term_type in
   let sizeof = Smart_exp.ptr_sizeof ~loc ty in
-  e, sizeof, env
+  let adata, env =
+    Assert.register
+      ~loc:t.term_loc
+      kf
+      env
+      (Format.asprintf "%a" Printer.pp_exp sizeof)
+      sizeof
+      adata
+  in
+  e, sizeof, adata, env
 
 (* [fname_to_pred name args] returns the memory predicate corresponding to
    [name] with the given [args]. *)
@@ -395,7 +434,19 @@ let extract_quantifiers ~loc args =
     Contiguous locations -> a single call to [__e_acsl_valid]
    B: [\valid(&t[4][3..5][2])]
     NON-contiguous locations -> multiple calls (3) to [__e_acsl_valid] *)
-let call_with_tset ~loc ~arg_from_range ~arg_from_term ?(prepend_n_args=false) kf name ctx env args p =
+let call_with_tset
+    ~adata
+    ~loc
+    ~arg_from_range
+    ~arg_from_term
+    ?(prepend_n_args=false)
+    kf
+    name
+    ctx
+    env
+    args
+    p
+  =
   let args, quantifiers = extract_quantifiers ~loc args in
   match quantifiers with
   | _ :: _ ->
@@ -419,14 +470,14 @@ let call_with_tset ~loc ~arg_from_range ~arg_from_term ?(prepend_n_args=false) k
     (* There's no more quantifiers in the arguments now, we can call back
        [prediate_to_exp] to translate the predicate as usual *)
     Typing.type_named_predicate ~must_clear:false p_quantified;
-    !predicate_to_exp_ref kf env p_quantified
+    !predicate_to_exp_ref ~adata kf env p_quantified
   | [] ->
     (* No arguments require quantifiers, so we can directly translate the
        predicate *)
-    let n_args, rev_args, env =
+    let n_args, rev_args, adata, env =
       List.fold_left
-        (fun (n_args, rev_args, env) t ->
-           let rev_args, env =
+        (fun (n_args, rev_args, adata, env) t ->
+           let rev_args, adata, env =
              if Misc.is_bitfield_pointers t.term_type then
                Error.not_yet "bitfield pointer";
              match t.term_node with
@@ -438,7 +489,7 @@ let call_with_tset ~loc ~arg_from_range ~arg_from_term ?(prepend_n_args=false) k
                    "arithmetic over set of pointers or arrays"
                else
                  (* Case A *)
-                 arg_from_range ~loc kf env rev_args ptr r p
+                 arg_from_range ~adata ~loc kf env rev_args ptr r p
              | TAddrOf(TVar lv, TIndex({ term_node = Trange _ } as r, TNoOffset)) ->
                (* Case A *)
                assert (Logic_const.is_set_type t.term_type);
@@ -446,15 +497,15 @@ let call_with_tset ~loc ~arg_from_range ~arg_from_term ?(prepend_n_args=false) k
                let ptr =
                  Logic_const.term ~loc (TStartOf (TVar lv, TNoOffset)) lty_noset
                in
-               arg_from_range ~loc kf env rev_args ptr r p
+               arg_from_range ~adata ~loc kf env rev_args ptr r p
              | _ ->
                (* Case A, B with failed range elimination or C *)
-               arg_from_term ~loc kf env rev_args t p
+               arg_from_term ~adata ~loc kf env rev_args t p
            in
            let n_args = n_args + 1 in
-           n_args, rev_args, env
+           n_args, rev_args, adata, env
         )
-        (0, [], env)
+        (0, [], adata, env)
         args
     in
     (* The arguments were built in reverse, reorder them *)
@@ -477,21 +528,24 @@ let call_with_tset ~loc ~arg_from_range ~arg_from_term ?(prepend_n_args=false) k
              Smart_stmt.rtl_call ~loc ~result:(Cil.var v) name args
            ])
     in
-    e, env
+    e, adata, env
 
 (* \initialized and \separated *)
-let call_with_size ~loc kf name ctx env args p =
+let call_with_size ~adata ~loc kf name ctx env args p =
   assert (name = "initialized" || name = "separated");
-  let arg_from_term ~loc kf env rev_args t _p =
-    let ptr, size, env = term_to_ptr_and_size ~loc kf env t in
-    size :: ptr :: rev_args, env
+  let arg_from_term ~adata ~loc kf env rev_args t _p =
+    let ptr, size, adata, env = term_to_ptr_and_size ~adata ~loc kf env t in
+    size :: ptr :: rev_args, adata, env
   in
-  let arg_from_range ~loc kf env rev_args ptr r p =
-    let ptr, size, env = range_to_ptr_and_size ~loc kf env ptr r p in
-    size :: ptr :: rev_args, env
+  let arg_from_range ~adata ~loc kf env rev_args ptr r p =
+    let ptr, size, adata, env =
+      range_to_ptr_and_size ~adata ~loc kf env ptr r p
+    in
+    size :: ptr :: rev_args, adata, env
   in
   let prepend_n_args = Datatype.String.equal name "separated" in
   call_with_tset
+    ~adata
     ~loc
     ~arg_from_term
     ~arg_from_range
@@ -504,20 +558,23 @@ let call_with_size ~loc kf name ctx env args p =
     p
 
 (* \valid and \valid_read *)
-let call_valid ~loc kf name ctx env t p =
+let call_valid ~adata ~loc kf name ctx env t p =
   assert (name = "valid" || name = "valid_read");
-  let arg_from_term ~loc kf env rev_args t _p =
-    let ptr, size, env = term_to_ptr_and_size ~loc kf env t in
+  let arg_from_term ~adata ~loc kf env rev_args t _p =
+    let ptr, size, adata, env = term_to_ptr_and_size ~adata ~loc kf env t in
     let base, base_addr = Misc.ptr_base_and_base_addr ~loc ptr in
-    base_addr :: base :: size :: ptr :: rev_args, env
+    base_addr :: base :: size :: ptr :: rev_args, adata, env
   in
-  let arg_from_range ~loc kf env rev_args ptr r p =
-    let ptr, size, env = range_to_ptr_and_size ~loc kf env ptr r p in
+  let arg_from_range ~adata ~loc kf env rev_args ptr r p =
+    let ptr, size, adata, env =
+      range_to_ptr_and_size ~adata ~loc kf env ptr r p
+    in
     let base, base_addr = Misc.ptr_base_and_base_addr ~loc ptr in
-    base_addr :: base :: size :: ptr :: rev_args, env
+    base_addr :: base :: size :: ptr :: rev_args, adata, env
   in
   let prepend_n_args = false in
   call_with_tset
+    ~adata
     ~loc
     ~arg_from_term
     ~arg_from_range

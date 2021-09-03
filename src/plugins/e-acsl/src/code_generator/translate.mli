@@ -22,25 +22,27 @@
 
 open Cil_types
 
-(** Generate C implementations of expressions. *)
+(** Generate C implementations of E-ACSL predicates and terms. *)
 
 val predicate_to_exp:
+  adata:Assert.t ->
   ?name:string ->
   kernel_function ->
   ?rte:bool ->
   Env.t ->
   predicate ->
-  exp * Env.t
+  exp * Assert.t * Env.t
 (** Convert an ACSL predicate into a corresponding C expression. *)
 
 val generalized_untyped_predicate_to_exp:
+  adata:Assert.t ->
   ?name:string ->
   kernel_function ->
   ?rte:bool ->
   ?must_clear_typing:bool ->
   Env.t ->
   predicate ->
-  exp * Env.t
+  exp * Assert.t * Env.t
 (** Convert an untyped ACSL predicate into a corresponding C expression. *)
 
 val translate_predicate:
@@ -53,7 +55,12 @@ val translate_predicate:
     If [pred_to_print] is set, then the runtime check will use this predicate as
     message. *)
 
-val term_to_exp: kernel_function -> Env.t -> term -> exp * Env.t
+val term_to_exp:
+  adata:Assert.t ->
+  kernel_function ->
+  Env.t ->
+  term ->
+  exp * Assert.t * Env.t
 (** Convert an ACSL term into a corresponding C expression. *)
 
 val translate_rte_annots:
@@ -67,6 +74,7 @@ val translate_rte_annots:
     environment. *)
 
 val gmp_to_sizet:
+  adata:Assert.t ->
   loc:location ->
   name:string ->
   ?check_lower_bound:bool ->
@@ -74,7 +82,7 @@ val gmp_to_sizet:
   kernel_function ->
   Env.t ->
   term ->
-  exp * Env.t
+  exp * Assert.t * Env.t
 (** Translate the given GMP integer to an expression of type [size_t]. RTE
     checks are generated to ensure that the GMP value holds in this type.
     The parameter [name] is used to generate relevant predicate names.
