@@ -238,8 +238,31 @@ let init_lexicon _ =
           let l =
             Seq.fold_left (fun acc c -> convert_char c :: acc) [] seq
           in
-          CST_STRING (List.rev l,loc)))
-    ]
+          CST_STRING (List.rev l,loc)));
+      (* The following C11 tokens are not yet supported, so we provide some
+         helpful error messages. Usage of 'fatal' instead of 'error' below
+         prevents duplicate error messages due to parsing errors. *)
+      ("_Alignas",
+       fun loc ->
+         Kernel.fatal ~source:(fst loc)
+           "_Alignas is currently unsupported by Frama-C.");
+      ("_Alignof",
+       fun loc ->
+         Kernel.fatal ~source:(fst loc)
+           "_Alignof is currently unsupported by Frama-C.");
+      ("_Complex",
+       fun loc ->
+         Kernel.fatal ~source:(fst loc)
+           "_Complex is currently unsupported by Frama-C.");
+      ("_Generic",
+       fun loc ->
+         Kernel.fatal ~source:(fst loc)
+           "_Generic is currently unsupported by Frama-C.");
+      ("_Imaginary",
+       fun loc ->
+         Kernel.fatal ~source:(fst loc)
+           "_Imaginary is currently unsupported by Frama-C.");
+     ]
 
 
 let is_c_keyword s = Hashtbl.mem lexicon s
