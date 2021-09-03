@@ -208,10 +208,7 @@ module TransferTaint = struct
     let exp_zone = Value_util.zone_of_expr to_loc exp in
     (* [lv] becomes data-tainted if a memory location on which the value of
        [exp] or the location of [lval] depends on is data-tainted. *)
-    let data_tainted =
-      Zone.intersects state.locs_data exp_zone
-      || Zone.intersects state.locs_data lv_indirect_zone
-    in
+    let data_tainted = Zone.intersects state.locs_data exp_zone in
     (* [lv] becomes control-tainted if:
        - the current call depends on a tainted assume statements of a caller;
        - the execution of the assignment depends on a tainted assume statement;

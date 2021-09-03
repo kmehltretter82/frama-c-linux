@@ -11,13 +11,8 @@ void taint_basic(int t) {
   int u, w, x, y = 0;
   int buf[2] = { 0, 1 };
 
-  /* Basic data-dependency: since 't' is tainted, 'x' becomes (data-)tainted but 'y'
-     must stay untainted. */
+  /* Basic direct dependency: since 't' is tainted, 'x' becomes (data-)tainted. */
   x = t + y + 1;
-
-  /* Indirect data-dependency: since 't' is tainted, buf[t] becomes (data- and
-   * control-)tainted. */
-  buf[t] = buf[1] + 1;
 
   /* Data-dependency overapprox: since 'u' may take 't' in else-branch, then 'u'
      becomes (data-)tainted. */
@@ -32,6 +27,11 @@ void taint_basic(int t) {
     w = 1;
   else
     w = 2;
+
+  /* Indirect dependency: since 't' is tainted, buf[t] becomes
+     (control-)tainted. */
+  buf[t] = buf[1] + 1;
+
   Frama_C_dump_each();
 }
 
@@ -120,7 +120,7 @@ void taint_goto_2() {
       x = 1;
       goto L;
     }
-    /* As 'x' is untainted, 'z' must remain untainted. */
+    /* As 'x' is untainted here, 'z' must remain untainted. */
     z = 1;
   }
   return;
