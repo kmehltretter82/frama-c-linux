@@ -141,6 +141,20 @@ void taint_call(int t) {
   Frama_C_domain_show_each(x);
 }
 
+void taint_infinite_while(int t) {
+  int x, y;
+  if (t)
+    while (1) ;
+  else {
+    y = t + 1;
+    /* Even thouth 't' is tainted and the assume is active on 'x', 'x'
+       postdominate 't' because the only terminating path in this function is
+       the else-branch: hence, 'x' must not be (control-)tainted. */
+    x = 2;
+  }
+  Frama_C_dump_each();
+}
+
 int main(void) {
   //@ taint tainted;
   taint_basic(tainted);
@@ -163,6 +177,8 @@ int main(void) {
 
   //@ taint tainted;
   taint_call(tainted);
+
+  taint_infinite_while(tainted);
 
   return 0;
 }
