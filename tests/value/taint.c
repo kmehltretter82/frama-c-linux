@@ -155,8 +155,14 @@ void taint_infinite_while(int t) {
   Frama_C_dump_each();
 }
 
-int main(void) {
+// Taints global variable [tainted].
+void taints (void) {
+  tainted = Frama_C_interval(0, 10);
   //@ taint tainted;
+}
+
+int main(void) {
+  taints();
   taint_basic(tainted);
 
   tainted = 0;
@@ -166,7 +172,7 @@ int main(void) {
   taint_undet_locs();
 
   int l;
-  //@ taint tainted;
+  taints();
   taint_spec_assigns(&l, tainted);
   /* Here 'l' must be tainted. */
   Frama_C_domain_show_each(l);
@@ -175,9 +181,10 @@ int main(void) {
   taint_goto_1();
   taint_goto_2();
 
-  //@ taint tainted;
+  taints();
   taint_call(tainted);
 
+  taints();
   taint_infinite_while(tainted);
 
   return 0;

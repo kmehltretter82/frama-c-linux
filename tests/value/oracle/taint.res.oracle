@@ -6,20 +6,32 @@
 [eva:initial-state] Values of globals at initialization
   undet ∈ [--..--]
   tainted ∈ {0}
-[eva] computing for function taint_basic <- main.
+[eva] computing for function taints <- main.
+  Called from tests/value/taint.c:165.
+[eva] computing for function Frama_C_interval <- taints <- main.
   Called from tests/value/taint.c:160.
+[eva] using specification for function Frama_C_interval
+[eva] tests/value/taint.c:160: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] Recording results for taints
+[eva] Done for function taints
+[eva] computing for function taint_basic <- main.
+  Called from tests/value/taint.c:166.
+[eva:alarm] tests/value/taint.c:33: Warning: 
+  accessing out of bounds index. assert t < 2;
 [eva] tests/value/taint.c:35: 
   Frama_C_dump_each:
   # taint:
   Locations (data):
     tainted; t; u; x
   Locations (control):
-    w; buf[0]
+    w; buf[0..1]
   ==END OF DUMP==
 [eva] Recording results for taint_basic
 [eva] Done for function taint_basic
 [eva] computing for function taint_assume_1 <- main.
-  Called from tests/value/taint.c:163.
+  Called from tests/value/taint.c:169.
 [eva:loop-unroll:auto] tests/value/taint.c:49: Automatic loop unrolling.
 [eva] tests/value/taint.c:50: 
   Frama_C_dump_each:
@@ -80,7 +92,7 @@
 [eva] Recording results for taint_assume_1
 [eva] Done for function taint_assume_1
 [eva] computing for function taint_assume_2 <- main.
-  Called from tests/value/taint.c:164.
+  Called from tests/value/taint.c:170.
 [eva] tests/value/taint.c:79: 
   Frama_C_dump_each:
   # taint:
@@ -92,7 +104,7 @@
 [eva] Recording results for taint_assume_2
 [eva] Done for function taint_assume_2
 [eva] computing for function taint_undet_locs <- main.
-  Called from tests/value/taint.c:166.
+  Called from tests/value/taint.c:172.
 [eva] tests/value/taint.c:91: 
   Frama_C_dump_each:
   # taint:
@@ -103,15 +115,16 @@
   ==END OF DUMP==
 [eva] Recording results for taint_undet_locs
 [eva] Done for function taint_undet_locs
+[eva] tests/value/taint.c:175: Reusing old results for call to taints
 [eva] computing for function taint_spec_assigns <- main.
-  Called from tests/value/taint.c:170.
+  Called from tests/value/taint.c:176.
 [eva] using specification for function taint_spec_assigns
 [eva] Done for function taint_spec_assigns
-[eva] tests/value/taint.c:172: 
+[eva] tests/value/taint.c:178: 
   Frama_C_domain_show_each:
   l : # taint: true
 [eva] computing for function taint_goto_1 <- main.
-  Called from tests/value/taint.c:175.
+  Called from tests/value/taint.c:181.
 [eva] tests/value/taint.c:110: 
   Frama_C_dump_each:
   # taint:
@@ -123,7 +136,7 @@
 [eva] Recording results for taint_goto_1
 [eva] Done for function taint_goto_1
 [eva] computing for function taint_goto_2 <- main.
-  Called from tests/value/taint.c:176.
+  Called from tests/value/taint.c:182.
 [eva] tests/value/taint.c:130: 
   Frama_C_dump_each:
   # taint:
@@ -134,8 +147,9 @@
   ==END OF DUMP==
 [eva] Recording results for taint_goto_2
 [eva] Done for function taint_goto_2
+[eva] tests/value/taint.c:184: Reusing old results for call to taints
 [eva] computing for function taint_call <- main.
-  Called from tests/value/taint.c:179.
+  Called from tests/value/taint.c:185.
 [eva] computing for function taint_basic <- taint_call <- main.
   Called from tests/value/taint.c:138.
 [eva] tests/value/taint.c:35: 
@@ -153,8 +167,9 @@
   x : # taint: false
 [eva] Recording results for taint_call
 [eva] Done for function taint_call
+[eva] tests/value/taint.c:187: Reusing old results for call to taints
 [eva] computing for function taint_infinite_while <- main.
-  Called from tests/value/taint.c:181.
+  Called from tests/value/taint.c:188.
 [eva] tests/value/taint.c:155: 
   Frama_C_dump_each:
   # taint:
@@ -176,12 +191,12 @@
   x ∈ {11}
   y ∈ {10}
 [eva:final-states] Values at end of function taint_basic:
-  u ∈ {0; 1}
-  w ∈ {2}
-  x ∈ {1}
+  u ∈ [0..10]
+  w ∈ {1; 2}
+  x ∈ [1..11]
   y ∈ {0}
-  buf[0] ∈ {2}
-     [1] ∈ {1}
+  buf[0] ∈ {0; 2}
+     [1] ∈ {1; 2}
 [eva:final-states] Values at end of function taint_call:
   x ∈ {0}
 [eva:final-states] Values at end of function taint_goto_1:
@@ -202,7 +217,11 @@
   y ∈ {0}
   t ∈ {0}
   p ∈ {{ &x ; &y }}
+[eva:final-states] Values at end of function taints:
+  Frama_C_entropy_source ∈ [--..--]
+  tainted ∈ [0..10]
 [eva:final-states] Values at end of function main:
+  Frama_C_entropy_source ∈ [--..--]
   tainted ∈ {0}
   l ∈ {0}
   __retres ∈ {0}
@@ -222,12 +241,19 @@
 [from] Done for function taint_infinite_while
 [from] Computing for function taint_undet_locs
 [from] Done for function taint_undet_locs
+[from] Computing for function taints
+[from] Computing for function Frama_C_interval <-taints
+[from] Done for function Frama_C_interval
+[from] Done for function taints
 [from] Computing for function main
 [from] Computing for function taint_spec_assigns <-main
 [from] Done for function taint_spec_assigns
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
   These dependencies hold at termination for the executions that terminate:
+[from] Function Frama_C_interval:
+  Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
+  \result FROM Frama_C_entropy_source; min; max
 [from] Function taint_assume_1:
   NO EFFECTS
 [from] Function taint_assume_2:
@@ -246,8 +272,12 @@
   l FROM t
 [from] Function taint_undet_locs:
   NO EFFECTS
+[from] Function taints:
+  Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
+  tainted FROM Frama_C_entropy_source
 [from] Function main:
-  tainted FROM \nothing
+  Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
+  tainted FROM Frama_C_entropy_source
   \result FROM \nothing
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function taint_assume_1:
@@ -282,7 +312,11 @@
     x; y; t; p; tmp
 [inout] Inputs for function taint_undet_locs:
     undet
+[inout] Out (internal) for function taints:
+    Frama_C_entropy_source; tainted
+[inout] Inputs for function taints:
+    Frama_C_entropy_source
 [inout] Out (internal) for function main:
-    tainted; l; __retres
+    Frama_C_entropy_source; tainted; l; __retres
 [inout] Inputs for function main:
-    undet; tainted
+    Frama_C_entropy_source; undet; tainted
