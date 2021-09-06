@@ -256,14 +256,15 @@ let merge_behaviors fresh old =
 
 let merge_variant fresh old = match fresh.spec_variant, old.spec_variant with
   | _, None -> ()
-  | Some _, Some _ -> assert false
-  | None, (Some _ as v) -> fresh.spec_variant <- v
+  | Some f, Some o when not @@ Logic_utils.is_same_variant f o -> assert false
+  | _, (Some _ as v) -> fresh.spec_variant <- v
 
 let merge_terminates fresh old =
   match fresh.spec_terminates, old.spec_terminates with
   | _, None -> ()
-  | Some _, Some _ -> assert false
-  | None, (Some _ as v) -> fresh.spec_terminates <- v
+  | Some f, Some o when not @@ Logic_utils.is_same_identified_predicate f o ->
+    assert false
+  | _, (Some _ as v) -> fresh.spec_terminates <- v
 
 let merge_complete fresh old =
   fresh.spec_complete_behaviors <-
@@ -289,6 +290,8 @@ module Behavior_set_map = Stdlib.Map.Make(Datatype.String.Set)
 
 let is_same_behavior_set l1 l2 =
   Datatype.String.Set.(equal (of_list l1) (of_list l2))
+
+let is_same_behavior b1 b2 = b1.b_name = b2.b_name
 
 let merge_annots_emitters extract merge make annots =
   let merge_same_bhvs bhvs (ca,a,e) acc =
@@ -758,6 +761,215 @@ let remove_code_annot_internal e ?(remove_statuses=true) ?kf stmt ca =
     (* annotation not registered *)
     ()
 
+
+(**************************************************************************)
+(** {2 Removing annotations} *)
+(**************************************************************************)
+
+(* If this function gets exported, please turn e into an Emitter.t *)
+let remove_model_field (e:Usable_emitter.t) m =
+  try
+    let ty = m.mi_base_type in
+    let h = Model_fields.find ty in
+    let l = Usable_emitter.Hashtbl.find h e in
+    let l' =
+      List.filter (fun x -> not (Cil_datatype.Model_info.equal x m)) l
+    in
+    Usable_emitter.Hashtbl.replace h e l';
+    Model_fields.apply_hooks_on_remove e ty l'
+  with Not_found ->
+    ()
+
+let remove_global e a =
+  try
+    let e = Emitter.get e in
+    let h = Globals.find a in
+    Usable_emitter.Hashtbl.iter
+      (fun e' () ->
+         if Emitter.Usable_emitter.equal e e' then begin
+           Globals.remove a;
+           (match a with
+            | Dmodel_annot (m,_) -> remove_model_field e m
+            | _ -> ());
+           let file = Ast.get () in
+           file.globals <-
+             List.filter
+               (fun a' ->
+                  not (Global.equal (GAnnot(a, Global_annotation.loc a)) a'))
+               file.globals;
+           Globals.apply_hooks_on_remove e a ()
+         end)
+      h;
+  with Not_found ->
+    ()
+
+let remove_in_funspec e kf set_spec =
+  try
+    let tbl = Funspecs.find kf in
+    let e = Emitter.get e in
+    try
+      let spec = Emitter.Usable_emitter.Hashtbl.find tbl e in
+      (* Format.printf "Known specs for %a@." Kf.pretty kf;*)
+      (* Emitter.Usable_emitter.Hashtbl.iter
+         (fun e spec ->
+          Format.printf "For emitter %a: %a@."
+            Emitter.Usable_emitter.pretty e
+            Cil_printer.pp_funspec spec) tbl; *)
+      set_spec spec tbl
+    with Not_found -> ()
+  with Not_found ->
+    assert false
+
+let remove_behavior ?(force=false) e kf bhv =
+  let set_spec spec tbl =
+    (* Kernel.feedback "Current spec is %a@." Cil_printer.pp_funspec spec; *)
+    (* do not use physical equality since the behaviors are almost always copied
+       at some points *)
+    spec.spec_behavior <- filterq ~eq:is_same_behavior bhv spec.spec_behavior;
+    let name = bhv.b_name in
+    let check get =
+      if not force &&
+         exists_in_funspec
+           (fun s -> List.exists (List.exists ((=) name)) (get s))
+           tbl
+      then
+        Kernel.fatal
+          "trying to remove a behavior used in a complete or disjoint clause"
+    in
+    check (fun s -> s.spec_complete_behaviors);
+    check (fun s -> s.spec_disjoint_behaviors);
+    (* Kernel.feedback "Removing behavior %s@." bhv.b_name; *)
+    (* Kernel.feedback "New spec is %a@." Cil_printer.pp_funspec spec; *)
+    List.iter Property_status.remove
+      (Property.ip_all_of_behavior kf Kglobal ~active:[] bhv)
+  in
+  remove_in_funspec e kf set_spec
+
+let remove_decreases e kf =
+  let set_spec spec _tbl =
+    match spec.spec_variant with
+    | None -> ()
+    | Some d ->
+      Property_status.remove (Property.ip_of_decreases kf Kglobal d);
+      spec.spec_variant <- None
+  in
+  remove_in_funspec e kf set_spec
+
+let remove_terminates e kf =
+  let set_spec spec _tbl =
+    match spec.spec_terminates with
+    | None -> ()
+    | Some t ->
+      Property_status.remove (Property.ip_of_terminates kf Kglobal t);
+      spec.spec_terminates <- None
+  in
+  remove_in_funspec e kf set_spec
+
+let remove_complete e kf l =
+  let set_spec spec _tbl =
+    spec.spec_complete_behaviors <- filterq l spec.spec_complete_behaviors
+  in
+  remove_in_funspec e kf set_spec;
+  Property_status.remove (Property.ip_of_complete kf Kglobal ~active:[] l)
+
+let remove_disjoint e kf l =
+  let set_spec spec _tbl =
+    spec.spec_disjoint_behaviors <- filterq l spec.spec_disjoint_behaviors
+  in
+  remove_in_funspec e kf set_spec;
+  Property_status.remove (Property.ip_of_disjoint kf Kglobal ~active:[] l)
+
+let remove_requires e kf p =
+  let set_spec spec _tbl =
+    List.iter
+      (fun b ->
+         if List.memq p b.b_requires then begin
+           b.b_requires <- filterq p b.b_requires;
+           Property_status.remove (Property.ip_of_requires kf Kglobal b p)
+         end)
+      spec.spec_behavior
+  in
+  remove_in_funspec e kf set_spec
+
+let remove_assumes e kf p =
+  let set_spec spec _tbl =
+    List.iter
+      (fun b ->
+         if List.memq p b.b_assumes then begin
+           b.b_assumes <- filterq p b.b_assumes;
+           Property_status.remove (Property.ip_of_assumes kf Kglobal b p)
+         end)
+      spec.spec_behavior
+  in
+  remove_in_funspec e kf set_spec
+
+let remove_ensures e kf p =
+  let set_spec spec _tbl =
+    List.iter
+      (fun b ->
+         if List.memq p b.b_post_cond then begin
+           b.b_post_cond <- filterq p b.b_post_cond;
+           Property_status.remove (Property.ip_of_ensures kf Kglobal b p)
+         end)
+      spec.spec_behavior
+  in
+  remove_in_funspec e kf set_spec
+
+let remove_allocates e kf p =
+  let set_spec spec _tbl =
+    List.iter
+      (fun b ->
+         if b.b_allocation == p then begin
+           b.b_allocation <- FreeAllocAny;
+           let info = Id_contract (Datatype.String.Set.empty,b) in
+           Option.iter Property_status.remove
+             (Property.ip_of_allocation kf Kglobal info p)
+         end)
+      spec.spec_behavior
+  in
+  remove_in_funspec e kf set_spec
+
+let remove_extended e kf ext =
+  let set_spec spec _tbl =
+    List.iter
+      (fun b ->
+         b.b_extended <- List.filter ((!=) ext) b.b_extended;
+         Property_status.remove
+           (Property.(ip_of_extended (ELContract kf) ext)))
+      spec.spec_behavior
+  in
+  remove_in_funspec e kf set_spec
+
+
+let remove_assigns e kf p =
+  let set_spec spec _tbl =
+    List.iter
+      (fun b ->
+         if b.b_assigns == p then begin
+           b.b_assigns <- WritesAny;
+           let info = Id_contract(Datatype.String.Set.empty, b) in
+           Option.iter Property_status.remove
+             (Property.ip_of_assigns kf Kglobal info p);
+           (match p with
+            | WritesAny -> ()
+            | Writes l ->
+              List.iter
+                (fun f ->
+                   Option.iter
+                     Property_status.remove
+                     (Property.ip_of_from kf Kglobal info f)) l)
+         end)
+      spec.spec_behavior
+  in
+  remove_in_funspec e kf set_spec
+
+let remove_behavior_components e kf b =
+  List.iter (remove_requires e kf) b.b_requires;
+  List.iter (remove_assumes e kf) b.b_assumes;
+  List.iter (remove_ensures e kf) b.b_post_cond;
+  remove_assigns e kf b.b_assigns;
+  remove_allocates e kf b.b_allocation
+
 (**************************************************************************)
 (** {2 Adding annotations} *)
 (**************************************************************************)
@@ -860,7 +1072,6 @@ let kinstr stmt =
   | None -> Kglobal
   | Some s -> Kstmt s
 
-let is_same_behavior b1 b2 = b1.b_name = b2.b_name
 
 let mk_spec bhv variant terminates complete disjoint =
   { spec_behavior = bhv;
@@ -936,21 +1147,26 @@ let add_behaviors ?(register_children=true) e kf ?stmt ?active bhvs =
       bhvs
   end
 
-let add_decreases e kf v =
+exception AlreadySpecified of string list
+
+let add_decreases ?(force=false) e kf v =
+  if force then remove_decreases e kf ;
   let full_spec = get_spec_all kf () in
   let emit_spec = get_spec_e e kf () in
   (match full_spec.spec_variant with
-   | Some _ -> Kernel.fatal "already a variant for function %a" Kf.pretty kf
-   | None -> emit_spec.spec_variant <- Some v);
+   | Some old when not @@ Logic_utils.is_same_variant old v ->
+     raise (AlreadySpecified ["decreases"])
+   | _ -> emit_spec.spec_variant <- Some v);
   Property_status.register (Property.ip_of_decreases kf Kglobal v)
 
-let add_terminates e kf ?stmt ?active t =
+let add_terminates ?(force=false) e kf ?stmt ?active t =
+  if force then remove_terminates e kf ;
   let full_spec = get_spec_all kf ?stmt ?active () in
   let emit_spec = get_spec_e e kf ?stmt ?active () in
   (match full_spec.spec_terminates with
-   | Some _ ->
-     Kernel.fatal "already a terminates clause for function %a" Kf.pretty kf
-   | None -> emit_spec.spec_terminates <- Some t);
+   | Some old when not @@ Logic_utils.is_same_identified_predicate old t ->
+     raise (AlreadySpecified ["terminates"])
+   | _ -> emit_spec.spec_terminates <- Some t);
   Property_status.register (Property.ip_of_terminates kf (kinstr stmt) t)
 
 let check_bhv_name spec name =
@@ -997,11 +1213,27 @@ let add_disjoint e kf ?stmt ?active l =
     Property_status.register (Property.ip_of_disjoint kf (kinstr stmt) ~active l)
   end
 
-let add_spec ?register_children e kf ?stmt ?active spec =
+let add_spec ?register_children ?(force=false) e kf ?stmt ?active spec =
+  let full_spec = get_spec_all kf ?stmt ?active () in
+  let conflicts =
+    (match full_spec.spec_terminates, spec.spec_terminates with
+     | Some old_t, Some new_t
+       when not @@ Logic_utils.is_same_identified_predicate old_t new_t ->
+       ["terminates"]
+     | _ -> []) @
+    (match full_spec.spec_variant, spec.spec_variant with
+     | Some old_t, Some new_t
+       when not @@ Logic_utils.is_same_variant old_t new_t ->
+       ["decreases"]
+     | _ -> [])
+  in
+  if not force && conflicts <> [] then raise (AlreadySpecified conflicts) ;
   add_behaviors ?register_children e kf ?stmt ?active spec.spec_behavior;
-  Option.iter (fun variant -> add_decreases e kf variant) spec.spec_variant;
   Option.iter
-    (fun terminates -> add_terminates e kf ?stmt ?active terminates)
+    (fun variant -> add_decreases ~force e kf variant)
+    spec.spec_variant;
+  Option.iter
+    (fun terminates -> add_terminates ~force e kf ?stmt ?active terminates)
     spec.spec_terminates;
   List.iter
     (fun complete -> add_complete e kf ?stmt ?active complete)
@@ -1438,214 +1670,6 @@ let unsafe_add_global e a =
 let add_global e a =
   unsafe_add_global e a;
   if Ast.is_computed() then insert_global_in_ast a
-
-(**************************************************************************)
-(** {2 Removing annotations} *)
-(**************************************************************************)
-
-(* If this function gets exported, please turn e into an Emitter.t *)
-let remove_model_field (e:Usable_emitter.t) m =
-  try
-    let ty = m.mi_base_type in
-    let h = Model_fields.find ty in
-    let l = Usable_emitter.Hashtbl.find h e in
-    let l' =
-      List.filter (fun x -> not (Cil_datatype.Model_info.equal x m)) l
-    in
-    Usable_emitter.Hashtbl.replace h e l';
-    Model_fields.apply_hooks_on_remove e ty l'
-  with Not_found ->
-    ()
-
-let remove_global e a =
-  try
-    let e = Emitter.get e in
-    let h = Globals.find a in
-    Usable_emitter.Hashtbl.iter
-      (fun e' () ->
-         if Emitter.Usable_emitter.equal e e' then begin
-           Globals.remove a;
-           (match a with
-            | Dmodel_annot (m,_) -> remove_model_field e m
-            | _ -> ());
-           let file = Ast.get () in
-           file.globals <-
-             List.filter
-               (fun a' ->
-                  not (Global.equal (GAnnot(a, Global_annotation.loc a)) a'))
-               file.globals;
-           Globals.apply_hooks_on_remove e a ()
-         end)
-      h;
-  with Not_found ->
-    ()
-
-let remove_in_funspec e kf set_spec =
-  try
-    let tbl = Funspecs.find kf in
-    let e = Emitter.get e in
-    try
-      let spec = Emitter.Usable_emitter.Hashtbl.find tbl e in
-      (* Format.printf "Known specs for %a@." Kf.pretty kf;*)
-      (* Emitter.Usable_emitter.Hashtbl.iter
-         (fun e spec ->
-          Format.printf "For emitter %a: %a@."
-            Emitter.Usable_emitter.pretty e
-            Cil_printer.pp_funspec spec) tbl; *)
-      set_spec spec tbl
-    with Not_found -> ()
-  with Not_found ->
-    assert false
-
-let remove_behavior ?(force=false) e kf bhv =
-  let set_spec spec tbl =
-    (* Kernel.feedback "Current spec is %a@." Cil_printer.pp_funspec spec; *)
-    (* do not use physical equality since the behaviors are almost always copied
-       at some points *)
-    spec.spec_behavior <- filterq ~eq:is_same_behavior bhv spec.spec_behavior;
-    let name = bhv.b_name in
-    let check get =
-      if not force &&
-         exists_in_funspec
-           (fun s -> List.exists (List.exists ((=) name)) (get s))
-           tbl
-      then
-        Kernel.fatal
-          "trying to remove a behavior used in a complete or disjoint clause"
-    in
-    check (fun s -> s.spec_complete_behaviors);
-    check (fun s -> s.spec_disjoint_behaviors);
-    (* Kernel.feedback "Removing behavior %s@." bhv.b_name; *)
-    (* Kernel.feedback "New spec is %a@." Cil_printer.pp_funspec spec; *)
-    List.iter Property_status.remove
-      (Property.ip_all_of_behavior kf Kglobal ~active:[] bhv)
-  in
-  remove_in_funspec e kf set_spec
-
-let remove_decreases e kf =
-  let set_spec spec _tbl =
-    match spec.spec_variant with
-    | None -> ()
-    | Some d ->
-      Property_status.remove (Property.ip_of_decreases kf Kglobal d);
-      spec.spec_variant <- None
-  in
-  remove_in_funspec e kf set_spec
-
-let remove_terminates e kf =
-  let set_spec spec _tbl =
-    match spec.spec_terminates with
-    | None -> ()
-    | Some t ->
-      Property_status.remove (Property.ip_of_terminates kf Kglobal t);
-      spec.spec_terminates <- None
-  in
-  remove_in_funspec e kf set_spec
-
-let remove_complete e kf l =
-  let set_spec spec _tbl =
-    spec.spec_complete_behaviors <- filterq l spec.spec_complete_behaviors
-  in
-  remove_in_funspec e kf set_spec;
-  Property_status.remove (Property.ip_of_complete kf Kglobal ~active:[] l)
-
-let remove_disjoint e kf l =
-  let set_spec spec _tbl =
-    spec.spec_disjoint_behaviors <- filterq l spec.spec_disjoint_behaviors
-  in
-  remove_in_funspec e kf set_spec;
-  Property_status.remove (Property.ip_of_disjoint kf Kglobal ~active:[] l)
-
-let remove_requires e kf p =
-  let set_spec spec _tbl =
-    List.iter
-      (fun b ->
-         if List.memq p b.b_requires then begin
-           b.b_requires <- filterq p b.b_requires;
-           Property_status.remove (Property.ip_of_requires kf Kglobal b p)
-         end)
-      spec.spec_behavior
-  in
-  remove_in_funspec e kf set_spec
-
-let remove_assumes e kf p =
-  let set_spec spec _tbl =
-    List.iter
-      (fun b ->
-         if List.memq p b.b_assumes then begin
-           b.b_assumes <- filterq p b.b_assumes;
-           Property_status.remove (Property.ip_of_assumes kf Kglobal b p)
-         end)
-      spec.spec_behavior
-  in
-  remove_in_funspec e kf set_spec
-
-let remove_ensures e kf p =
-  let set_spec spec _tbl =
-    List.iter
-      (fun b ->
-         if List.memq p b.b_post_cond then begin
-           b.b_post_cond <- filterq p b.b_post_cond;
-           Property_status.remove (Property.ip_of_ensures kf Kglobal b p)
-         end)
-      spec.spec_behavior
-  in
-  remove_in_funspec e kf set_spec
-
-let remove_allocates e kf p =
-  let set_spec spec _tbl =
-    List.iter
-      (fun b ->
-         if b.b_allocation == p then begin
-           b.b_allocation <- FreeAllocAny;
-           let info = Id_contract (Datatype.String.Set.empty,b) in
-           Option.iter Property_status.remove
-             (Property.ip_of_allocation kf Kglobal info p)
-         end)
-      spec.spec_behavior
-  in
-  remove_in_funspec e kf set_spec
-
-let remove_extended e kf ext =
-  let set_spec spec _tbl =
-    List.iter
-      (fun b ->
-         b.b_extended <- List.filter ((!=) ext) b.b_extended;
-         Property_status.remove
-           (Property.(ip_of_extended (ELContract kf) ext)))
-      spec.spec_behavior
-  in
-  remove_in_funspec e kf set_spec
-
-
-let remove_assigns e kf p =
-  let set_spec spec _tbl =
-    List.iter
-      (fun b ->
-         if b.b_assigns == p then begin
-           b.b_assigns <- WritesAny;
-           let info = Id_contract(Datatype.String.Set.empty, b) in
-           Option.iter Property_status.remove
-             (Property.ip_of_assigns kf Kglobal info p);
-           (match p with
-            | WritesAny -> ()
-            | Writes l ->
-              List.iter
-                (fun f ->
-                   Option.iter
-                     Property_status.remove
-                     (Property.ip_of_from kf Kglobal info f)) l)
-         end)
-      spec.spec_behavior
-  in
-  remove_in_funspec e kf set_spec
-
-let remove_behavior_components e kf b =
-  List.iter (remove_requires e kf) b.b_requires;
-  List.iter (remove_assumes e kf) b.b_assumes;
-  List.iter (remove_ensures e kf) b.b_post_cond;
-  remove_assigns e kf b.b_assigns;
-  remove_allocates e kf b.b_allocation
 
 (**************************************************************************)
 (** {2 Other useful functions} *)

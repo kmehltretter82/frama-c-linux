@@ -331,12 +331,31 @@ type 'a behavior_component_addition =
     @since Aluminium-20160501
 *)
 
-val add_spec: ?register_children:bool -> spec contract_component_addition
-(** Add new spec into the given contract.
+exception AlreadySpecified of string list
+(** raised when a specification can't be added since there is already one, the
+    list contains the clause kind that can't be addeed (e.g: "decreases"). *)
+
+val add_spec:
+  ?register_children:bool -> ?force:bool -> spec contract_component_addition
+(** Add new spec into the given contract. The [force] (which defaults to
+    [false]) parameter is used to determine whether [decreases] and [terminates]
+    clauses mùst be relaced if they already exists and a new one is provided.
+
+    More precisely, if [force] is [true] *and* the new contract has
+    [Some terminates], the old one is removed and the new clause is used
+    (the same applies for [decreases]). *But* if the new clause is [None], the
+    old one is kept. If you really want to remove some of these clauses, use
+    {!remove_decreases} and {!remove_terminates}.
+
+    If [force] is [false] and the contract has [Some terminates] (or decreases)
+    and the old contract already has such specification, an exception
+    [AlreadySpecified] is raised. Note that in this case, the function does not
+    perform any modification to the spec.
 
     [register_children] is directly given to the function [add_behaviors].
 
     @since 23.0-Vanadium
+    @modify Frama-C+dev: adds the [force] parameter
 *)
 
 val add_behaviors:
@@ -346,14 +365,28 @@ val add_behaviors:
     behavior will also be registered by the function.
 *)
 
-val add_decreases: Emitter.t -> kernel_function -> variant -> unit
+val add_decreases:
+  ?force:bool -> Emitter.t -> kernel_function -> variant -> unit
 (** Add a decrease clause into the contract of the given function.
-    No decrease clause must previously be attached to this function.
+
+    If [force] is [false] (default), if a clause is already attached to the
+    function, an exception [AlreadySpecified] is raised. If [force] is [true]
+    the old specification is dropped and the new one replaces it.
+
+    @modify Aluminium-20160501 restructuration of annotations management
+    @modify Frama-C+dev: adds the [force] parameter
 *)
 
-val add_terminates: identified_predicate contract_component_addition
-(** Add a terminates clause into a contract.
-    No terminates clause must previously be attached to this contract.
+val add_terminates:
+  ?force:bool -> identified_predicate contract_component_addition
+(** Add a terminates clause into the contract of the given function.
+
+    If [force] is [false] (default), if a clause is already attached to the
+    function, an exception [AlreadySpecified] is raised. If [force] is [true]
+    the old specification is dropped and the new one replaces it.
+
+    @modify Aluminium-20160501 restructuration of annotations management
+    @modify Frama-C+dev: adds the [force] parameter
 *)
 
 val add_complete: string list contract_component_addition
