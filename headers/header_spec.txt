@@ -380,6 +380,7 @@ src/kernel_internals/parsing/cparser.mly: CIL
 src/kernel_internals/parsing/errorloc.ml: CIL
 src/kernel_internals/parsing/errorloc.mli: CIL
 src/kernel_internals/parsing/lexerhack.ml: CIL
+src/kernel_internals/parsing/lexerhack.mli: CIL
 src/kernel_internals/parsing/logic_lexer.mli: CEA_INRIA_LGPL
 src/kernel_internals/parsing/logic_lexer.mll: CEA_INRIA_LGPL
 src/kernel_internals/parsing/logic_parser.mly: CEA_INRIA_LGPL
@@ -615,7 +616,7 @@ src/kernel_services/cmdline_parameters/parameter_state.mli: CEA_LGPL
 src/kernel_services/cmdline_parameters/typed_parameter.ml: CEA_LGPL
 src/kernel_services/cmdline_parameters/typed_parameter.mli: CEA_LGPL
 src/kernel_services/parsetree/README.md: .ignore
-src/kernel_services/parsetree/cabs.ml: CIL
+src/kernel_services/parsetree/cabs.mli: CIL
 src/kernel_services/parsetree/cabshelper.ml: CIL
 src/kernel_services/parsetree/cabshelper.mli: CIL
 src/kernel_services/parsetree/logic_ptree.mli: CEA_INRIA_LGPL
@@ -1426,6 +1427,7 @@ src/plugins/value/utils/red_statuses.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/library_functions.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/library_functions.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/mark_noresults.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/utils/mark_noresults.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/eva_annotations.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/eva_annotations.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/eva_audit.ml: CEA_LGPL_OR_PROPRIETARY
