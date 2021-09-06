@@ -7,17 +7,17 @@
   undet ∈ [--..--]
   tainted ∈ {0}
 [eva] computing for function taints <- main.
-  Called from tests/value/taint.c:165.
+  Called from tests/value/taint.c:175.
 [eva] computing for function Frama_C_interval <- taints <- main.
-  Called from tests/value/taint.c:160.
+  Called from tests/value/taint.c:170.
 [eva] using specification for function Frama_C_interval
-[eva] tests/value/taint.c:160: 
+[eva] tests/value/taint.c:170: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] Recording results for taints
 [eva] Done for function taints
 [eva] computing for function taint_basic <- main.
-  Called from tests/value/taint.c:166.
+  Called from tests/value/taint.c:176.
 [eva:alarm] tests/value/taint.c:33: Warning: 
   accessing out of bounds index. assert t < 2;
 [eva] tests/value/taint.c:35: 
@@ -31,7 +31,7 @@
 [eva] Recording results for taint_basic
 [eva] Done for function taint_basic
 [eva] computing for function taint_assume_1 <- main.
-  Called from tests/value/taint.c:169.
+  Called from tests/value/taint.c:179.
 [eva:loop-unroll:auto] tests/value/taint.c:49: Automatic loop unrolling.
 [eva] tests/value/taint.c:50: 
   Frama_C_dump_each:
@@ -92,7 +92,7 @@
 [eva] Recording results for taint_assume_1
 [eva] Done for function taint_assume_1
 [eva] computing for function taint_assume_2 <- main.
-  Called from tests/value/taint.c:170.
+  Called from tests/value/taint.c:180.
 [eva] tests/value/taint.c:79: 
   Frama_C_dump_each:
   # taint:
@@ -104,7 +104,7 @@
 [eva] Recording results for taint_assume_2
 [eva] Done for function taint_assume_2
 [eva] computing for function taint_undet_locs <- main.
-  Called from tests/value/taint.c:172.
+  Called from tests/value/taint.c:182.
 [eva] tests/value/taint.c:91: 
   Frama_C_dump_each:
   # taint:
@@ -115,16 +115,16 @@
   ==END OF DUMP==
 [eva] Recording results for taint_undet_locs
 [eva] Done for function taint_undet_locs
-[eva] tests/value/taint.c:175: Reusing old results for call to taints
+[eva] tests/value/taint.c:185: Reusing old results for call to taints
 [eva] computing for function taint_spec_assigns <- main.
-  Called from tests/value/taint.c:176.
+  Called from tests/value/taint.c:186.
 [eva] using specification for function taint_spec_assigns
 [eva] Done for function taint_spec_assigns
-[eva] tests/value/taint.c:178: 
+[eva] tests/value/taint.c:188: 
   Frama_C_domain_show_each:
   l : # taint: true
 [eva] computing for function taint_goto_1 <- main.
-  Called from tests/value/taint.c:181.
+  Called from tests/value/taint.c:191.
 [eva] tests/value/taint.c:110: 
   Frama_C_dump_each:
   # taint:
@@ -136,7 +136,7 @@
 [eva] Recording results for taint_goto_1
 [eva] Done for function taint_goto_1
 [eva] computing for function taint_goto_2 <- main.
-  Called from tests/value/taint.c:182.
+  Called from tests/value/taint.c:192.
 [eva] tests/value/taint.c:130: 
   Frama_C_dump_each:
   # taint:
@@ -147,9 +147,9 @@
   ==END OF DUMP==
 [eva] Recording results for taint_goto_2
 [eva] Done for function taint_goto_2
-[eva] tests/value/taint.c:184: Reusing old results for call to taints
+[eva] tests/value/taint.c:194: Reusing old results for call to taints
 [eva] computing for function taint_call <- main.
-  Called from tests/value/taint.c:185.
+  Called from tests/value/taint.c:195.
 [eva] computing for function taint_basic <- taint_call <- main.
   Called from tests/value/taint.c:138.
 [eva] tests/value/taint.c:35: 
@@ -167,16 +167,21 @@
   x : # taint: false
 [eva] Recording results for taint_call
 [eva] Done for function taint_call
-[eva] tests/value/taint.c:187: Reusing old results for call to taints
+[eva] tests/value/taint.c:197: Reusing old results for call to taints
 [eva] computing for function taint_infinite_while <- main.
-  Called from tests/value/taint.c:188.
-[eva] tests/value/taint.c:155: 
+  Called from tests/value/taint.c:198.
+[eva:loop-unroll:auto] tests/value/taint.c:157: Automatic loop unrolling.
+[eva:loop-unroll:partial] tests/value/taint.c:157: loop not completely unrolled
+[eva] tests/value/taint.c:157: starting to merge loop iterations
+[eva:alarm] tests/value/taint.c:157: Warning: 
+  signed overflow. assert i + 1 ≤ 2147483647;
+[eva] tests/value/taint.c:165: 
   Frama_C_dump_each:
   # taint:
   Locations (data):
     tainted; t; y
   Locations (control):
-    \nothing
+    w
   ==END OF DUMP==
 [eva] Recording results for taint_infinite_while
 [eva] Done for function taint_infinite_while
@@ -210,8 +215,10 @@
   z ∈ {1} or UNINITIALIZED
   t ∈ [--..--]
 [eva:final-states] Values at end of function taint_infinite_while:
+  i ∈ UNINITIALIZED
+  w ∈ {3}
   x ∈ {2}
-  y ∈ {1}
+  y ∈ [2..11]
 [eva:final-states] Values at end of function taint_undet_locs:
   x ∈ {0}
   y ∈ {0}
@@ -222,7 +229,7 @@
   tainted ∈ [0..10]
 [eva:final-states] Values at end of function main:
   Frama_C_entropy_source ∈ [--..--]
-  tainted ∈ {0}
+  tainted ∈ {2; 4; 6; 8; 10}
   l ∈ {0}
   __retres ∈ {0}
 [from] Computing for function taint_assume_1
@@ -305,7 +312,7 @@
 [inout] Inputs for function taint_goto_2:
     undet
 [inout] Out (internal) for function taint_infinite_while:
-    x; y
+    i; w; x; y
 [inout] Inputs for function taint_infinite_while:
     \nothing
 [inout] Out (internal) for function taint_undet_locs:

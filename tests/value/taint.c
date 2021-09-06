@@ -142,8 +142,8 @@ void taint_call(int t) {
 }
 
 void taint_infinite_while(int t) {
-  int x, y;
-  if (t)
+  int i, w, x, y;
+  if (!t)
     while (1) ;
   else {
     y = t + 1;
@@ -151,6 +151,16 @@ void taint_infinite_while(int t) {
        postdominate 't' because the only terminating path in this function is
        the else-branch: hence, 'x' must not be (control-)tainted. */
     x = 2;
+  }
+  if (t%2) {
+    i = 0;
+    while (++i) ;
+  }
+  else {
+    /* However, the postdominators computation used by the domain is syntactic,
+       so here `w` is imprecisely tainted, even though this is the only
+       terminating path of the function according to Eva. */
+    w = 3;
   }
   Frama_C_dump_each();
 }
