@@ -28,7 +28,7 @@ void taint_basic(int t) {
   else
     w = 2;
 
-  /* Indirect dependency: since 't' is tainted, buf[t] becomes
+  /* Indirect dependency: since 't' is tainted, 'buf[t]' becomes
      (control-)tainted. */
   buf[t] = buf[1] + 1;
 
@@ -147,9 +147,9 @@ void taint_infinite_while(int t) {
     while (1) ;
   else {
     y = t + 1;
-    /* Even thouth 't' is tainted and the assume is active on 'x', 'x'
-       postdominate 't' because the only terminating path in this function is
-       the else-branch: hence, 'x' must not be (control-)tainted. */
+    /* Even though 't' is tainted and the assume is active on 'x', 'x'
+       postdominates 't' because this is the only terminating path in this
+       function: hence, 'x' must remain untainted. */
     x = 2;
   }
   if (t%2) {
@@ -158,14 +158,14 @@ void taint_infinite_while(int t) {
   }
   else {
     /* However, the postdominators computation used by the domain is syntactic,
-       so here `w` is imprecisely tainted, even though this is the only
-       terminating path of the function according to Eva. */
+       so here 'w' is imprecisely (control-)tainted, even though this is the
+       only terminating path of the function according to Eva. */
     w = 3;
   }
   Frama_C_dump_each();
 }
 
-// Taints global variable [tainted].
+// Taints global variable 'tainted'.
 void taints (void) {
   tainted = Frama_C_interval(0, 10);
   //@ taint tainted;
