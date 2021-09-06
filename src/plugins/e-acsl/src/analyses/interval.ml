@@ -231,7 +231,7 @@ let rec interv_of_typ ty = match Cil.unrollType ty with
   | TNamed _ ->
     assert false
 
-let rec extended_interv_of_typ ty = match interv_of_typ ty with
+let extended_interv_of_typ ty = match interv_of_typ ty with
   | Ival iv ->
     let l,u = Ival.min_int iv, Ival.max_int iv in
     let u = match u with
