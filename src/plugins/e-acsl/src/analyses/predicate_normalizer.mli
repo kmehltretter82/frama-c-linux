@@ -43,3 +43,5 @@ val preprocess_predicate : predicate -> unit
 
 val get : predicate -> Lscope.pred_or_term
 (** Retrieve the preprocessed form of a predicate *)
+val clear: unit -> unit
+(** clear the table of normalized predicates *)

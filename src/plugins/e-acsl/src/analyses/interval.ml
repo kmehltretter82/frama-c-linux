@@ -147,7 +147,7 @@ let join i1 i2 = match i1, i2 with
   | Ival i1, Ival i2 ->
     Ival (Ival.join i1 i2)
   | Float(k1, _), Float(k2, _) ->
-    let k = if Stdlib.compare k1 k2 >= 0 then k1 else k2 in
+    let k = if Cil.frank k1 >= Cil.frank k2 then k1 else k2 in
     Float(k, None (* lost value, if any before *))
   | Ival iv, Float(k, _)
   | Float(k, _), Ival iv ->
@@ -188,23 +188,46 @@ let join i1 i2 = match i1, i2 with
   | Nan, (Ival _ | Float _ | Rational | Real) ->
     Nan
 
-(* lift a decreasing binary operation on the type [Ival.t] to a binary
- operation on the type [t] *)
 let meet i1 i2 = match i1, i2 with
   | Ival iv, _ when Ival.is_bottom iv -> Ival iv
   | _, Ival iv when Ival.is_bottom iv -> Ival iv
   | Ival i1, Ival i2 ->
     Ival (Ival.meet i1 i2)
-  | Float(k1, _), Float(k2, _) ->
-    let k = if Stdlib.compare k1 k2 >= 0 then k2 else k1 in
-    Float(k, None (* lost value, if any before *))
-  | Ival iv, Float(k, _)
+  | Float(k1, Some f1), Float(k2, Some f2) ->
+    let k = if Cil.frank k1 >= Cil.frank k2 then k2 else k1 in
+    if Float.equal f1 f2 then Float (k, Some f1) else Ival Ival.bottom
+  | Float(k, Some f), Float(_, _)
+  | Float(_,_), Float(k, Some f) ->
+    Float(k, Some f)
+  | Float(k1, None), Float(k2, None) ->
+    let k = if Cil.frank k1 >= Cil.frank k2 then k2 else k1 in
+    Float(k, None)
+  | Float(k, Some f), Ival iv
+  | Ival iv, Float(k, Some f) ->
+    begin
+      match Ival.min_and_max iv with
+      | None, None ->
+        (* unbounded integers *)
+        Float(k, Some f)
+      | Some min, Some max ->
+        (* if the float type fits into the interval of integers, then return
+           this float type; otherwise return Rational *)
+        (try
+           let to_float n = Int64.to_float (Integer.to_int64 n) in
+           let mini, maxi = to_float min, to_float max in
+           if mini <= f && maxi >= f then Float(k, Some f) else Ival Ival.bottom
+         with Z.Overflow | Exit ->
+           Rational)
+      | None, Some _ | Some _, None ->
+        assert false
+    end
+  | Ival iv, Float(k, None)
   | Float(k, _), Ival iv ->
     begin
       match Ival.min_and_max iv with
       | None, None ->
         (* unbounded integers *)
-        Rational
+        Float(k, None)
       | Some min, Some max ->
         (* if the float type fits into the interval of integers, then return
            this float type; otherwise return Rational *)

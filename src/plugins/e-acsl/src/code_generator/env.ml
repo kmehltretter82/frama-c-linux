@@ -548,11 +548,12 @@ module Local_vars = struct
   let add env ty =
     match env.local_vars with
     | curr::stacked -> {env with local_vars = (ty :: curr) :: stacked}
-    | [] -> Options.fatal "Trying to add local variable in a non-existing environment"
+    | [] -> Options.fatal
+              "Trying to add local variable in a non-existing environment"
 
   let get env =
     match env.local_vars with
-    | (lenv :: _) -> lenv
+    | lenv :: _ -> lenv
     | [] -> []
 
 end

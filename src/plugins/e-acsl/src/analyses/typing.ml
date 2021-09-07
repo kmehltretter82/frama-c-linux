@@ -29,7 +29,7 @@ let dkey = Options.dkey_typing
 
 (* In order to properly handle recursive functions the typing method has to
    store the result of the fixpoint algorithm on intervals before typing
-   the inner block of the function. To this end we stop the recursive
+   the inner block of the function. To this end, we stop the recursive
    depth-first descent of the AST at the level of function calls, and perform a
    breadth-first descent from the functions calls. We achieve this with
    a stack [pending_typing] which stores the roots of the functions calls from

@@ -65,7 +65,7 @@ val join: t -> t -> t
 val meet: t -> t -> t
 
 val widen: t -> t
-(** @return the minimal interval containing a disjoint union of intervals *)
+(** @return the smallest interval containing a disjoint union of intervals *)
 
 val is_singleton_int: t -> bool
 

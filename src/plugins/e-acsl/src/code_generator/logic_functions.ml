@@ -64,14 +64,14 @@ let result_as_extra_argument = Gmp_types.Z.is_t
 
 (* If an argument contains a pointer type, then it is undecidable which assigns
    clause should be generated, so skip the assigns generation in this case *)
-let rec ptr_free typ = match Cil.unrollType typ with
+let rec is_ptr_free typ = match Cil.unrollType typ with
   | TVoid _
   | TInt (_, _)
   | TFloat (_, _) -> true
   | TPtr (_, _) -> false
-  | TArray (ty, _, _, _) -> ptr_free ty
+  | TArray (ty, _, _, _) -> is_ptr_free ty
   | TFun (_, _, _, _) ->
-    (* a fucntion cannot be an argument of a function *)
+    (* a function cannot be an argument of a function *)
     assert false
   | TNamed (_, _) ->
     (* The named types are unfolded with [Cil.unrolltype] *)
@@ -80,44 +80,47 @@ let rec ptr_free typ = match Cil.unrollType typ with
   | TBuiltin_va_list _ -> true
   | TComp (cinfo, _, _) ->
     match cinfo.cfields with
-    | None -> assert false
-    | Some fields -> List.for_all
-                       (fun fi -> (fi.fbitfield != None)||(ptr_free fi.ftype))
-                       fields
+    | None -> raise NoAssigns
+    | Some fields ->
+      List.for_all
+        (fun fi -> fi.fbitfield <> None || is_ptr_free fi.ftype)
+        fields
 
 (* For a GMP argument of a function, we generate an assigns from its address,
-   since these are the only semantically valid operations on integers *)
+   since these are the only semantically valid operations on integers.
+   For the argument [__e_acsl_mpz_struct * x], this function generates the
+   expression [*(( __e_acsl_mpz_struct * )x)] *)
 let deref_gmp_arg ~loc var =
   Smart_exp.lval ~loc
     (Mem (Cil.mkAddrOrStartOf ~loc (Var var , NoOffset)), NoOffset)
 
-let rec get_assigns_from ~loc env lprofile =
+let rec get_assigns_from ~loc env lprofile lv =
   match lprofile with
   | [] -> []
   | lvar :: lvars ->
     let var = Env.Logic_binding.get env lvar  in
-    if ptr_free var.vtype then
-      (Smart_exp.lval ~loc (Cil.var var)) :: (get_assigns_from ~loc env lvars)
-    else if lvar.lv_type == Linteger then
-      (* If the argument contains a pointer, but is an integer, then it is a
-      GMP type *)
-        (deref_gmp_arg ~loc var) :: (get_assigns_from ~loc env lvars)
+    if is_ptr_free var.vtype then
+      Smart_exp.lval ~loc (Cil.var var) :: get_assigns_from ~loc env lvars lv
+    (* If the argument contains a pointer, but is an integer, then it is
+       necessarily a GMP type *)
+    else if lvar.lv_type = Linteger then
+        (deref_gmp_arg ~loc var) :: (get_assigns_from ~loc env lvars lv)
       else begin
-        Options.warning ~current:true "Generating assigns clause for arguments \
-                                       with pointers is not supported, skipping \
-                                       assigns clause";
+        Options.warning ~current:true "skipping function %a when generating\
+                                       assigns because pointers as arguments\
+                                       is not yet supported"
+        Printer.pp_logic_var lv;
         raise NoAssigns
     end
 
-(* Special case in case of a function that takes an extra argument as its
-   result *)
+(* Special case when the function takes an extra argument as its result:
+   For the argument [__e_acsl_mpz_t *__retres_arg], this function generates the
+   expression [( *__retres_arg )[0]] *)
 let get_gmp_integer ~loc vi =
   Smart_exp.lval
     ~loc
     (Mem
-       (Smart_exp.lval
-          ~loc
-          (Var vi, NoOffset)),
+       (Smart_exp.lval  ~loc (Var vi, NoOffset)),
      (Index (Cil.zero ~loc, NoOffset)))
 
 (*****************************************************************************)
@@ -278,15 +281,15 @@ let generate_kf ~loc fname env ret_ty params_ty li =
       List.fold_left2 add env li.l_profile params
     in
     let assigns_from =
-      try Some (get_assigns_from Location.unknown env li.l_profile)
+      try Some (get_assigns_from ~loc env li.l_profile li.l_var_info)
       with NoAssigns -> None
     in
     let assigned_var =
-        if res_as_extra_arg then
-          Logic_const.new_identified_term
-            (Logic_utils.expr_to_term (get_gmp_integer Location.unknown ret_vi))
+      Logic_const.new_identified_term
+        (if res_as_extra_arg then
+            Logic_utils.expr_to_term (get_gmp_integer ~loc ret_vi)
         else
-          Logic_const.new_identified_term (Logic_const.tresult fundec.svar.vtype)
+          Logic_const.tresult fundec.svar.vtype)
     in
     begin
         match assigns_from with
@@ -365,7 +368,12 @@ let add_generated_functions globals =
            GFunDecl(Cil.empty_funspec (), Kernel_function.get_vi kf, loc)
            :: acc
          in
-         aux (Typing.Function_params_ty.Hashtbl.fold_sorted (fun _ -> add_fundecl) params acc) l
+         aux
+           (Typing.Function_params_ty.Hashtbl.fold_sorted
+              (fun _ -> add_fundecl)
+              params
+              acc)
+           l
        with Not_found ->
          aux acc l)
     | g :: l ->
@@ -382,7 +390,8 @@ let add_generated_functions globals =
   in
   let rev_globals =
     Logic_info.Hashtbl.fold_sorted
-      (fun _ -> Typing.Function_params_ty.Hashtbl.fold_sorted (fun _ -> add_fundec))
+      (fun _ -> Typing.Function_params_ty.Hashtbl.fold_sorted
+          (fun _ -> add_fundec))
       memo_tbl
       rev_globals
   in

@@ -164,10 +164,12 @@ let emitter =
     [ Emitter.Code_annot; Emitter.Funspec ]
     ~correctness:[ Functions.parameter;
                    Instrument.parameter;
-                   Validate_format_strings.parameter ]
+                   Validate_format_strings.parameter;
+                   Temporal_validity.parameter ]
     ~tuning:[ Gmp_only.parameter;
               Valid.parameter;
-              Replace_libc_functions.parameter ]
+              Replace_libc_functions.parameter;
+              Full_mtracking.parameter ]
 
 let must_visit () = Run.get ()
 
