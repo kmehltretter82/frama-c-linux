@@ -476,9 +476,8 @@ extern long double sinl(long double x);
     ensures no_error: errno == \old(errno);
   behavior finite_non_zero:
     assumes finite_arg: \is_finite(x) && x != 0.;
-    assigns \result \from x;
     ensures result_not_nan: !\is_NaN(\result);
-    ensures maybe_error: errno == \old(errno);
+    ensures maybe_error: errno == \old(errno) || errno == ERANGE;
   behavior infinity:
     assumes infinite_arg: \is_infinite(x);
     ensures nan_result: \is_NaN(\result);
@@ -502,9 +501,8 @@ extern double tan(double x);
     ensures no_error: errno == \old(errno);
   behavior finite_non_zero:
     assumes finite_arg: \is_finite(x) && x != 0.;
-    assigns \result \from x;
     ensures result_not_nan: !\is_NaN(\result);
-    ensures maybe_error: errno == \old(errno);
+    ensures maybe_error: errno == \old(errno) || errno == ERANGE;
   behavior infinity:
     assumes infinite_arg: \is_infinite(x);
     ensures nan_result: \is_NaN(\result);
@@ -528,9 +526,8 @@ extern float tanf(float x);
     ensures no_error: errno == \old(errno);
   behavior finite_non_zero:
     assumes finite_arg: \is_finite(x) && x != 0.;
-    assigns \result \from x;
     ensures result_not_nan: !\is_NaN(\result);
-    ensures maybe_error: errno == \old(errno);
+    ensures maybe_error: errno == \old(errno) || errno == ERANGE;
   behavior infinity:
     assumes infinite_arg: \is_infinite(x);
     ensures nan_result: \is_NaN(\result);

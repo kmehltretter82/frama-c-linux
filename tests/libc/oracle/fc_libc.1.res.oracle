@@ -3774,9 +3774,8 @@ extern long double sinl(long double x);
     behavior finite_non_zero:
       assumes finite_arg: \is_finite(x) ∧ x ≢ 0.;
       ensures result_not_nan: ¬\is_NaN(\result);
-      ensures maybe_error: __fc_errno ≡ \old(__fc_errno);
-      assigns \result;
-      assigns \result \from x;
+      ensures
+        maybe_error: __fc_errno ≡ \old(__fc_errno) ∨ __fc_errno ≡ 34;
     
     complete behaviors finite_non_zero, zero;
     disjoint behaviors finite_non_zero, zero;
@@ -3799,9 +3798,8 @@ extern double tan(double x);
     behavior finite_non_zero:
       assumes finite_arg: \is_finite(x) ∧ x ≢ 0.;
       ensures result_not_nan: ¬\is_NaN(\result);
-      ensures maybe_error: __fc_errno ≡ \old(__fc_errno);
-      assigns \result;
-      assigns \result \from x;
+      ensures
+        maybe_error: __fc_errno ≡ \old(__fc_errno) ∨ __fc_errno ≡ 34;
     
     complete behaviors finite_non_zero, zero;
     disjoint behaviors finite_non_zero, zero;
@@ -3824,9 +3822,8 @@ extern float tanf(float x);
     behavior finite_non_zero:
       assumes finite_arg: \is_finite(x) ∧ x ≢ 0.;
       ensures result_not_nan: ¬\is_NaN(\result);
-      ensures maybe_error: __fc_errno ≡ \old(__fc_errno);
-      assigns \result;
-      assigns \result \from x;
+      ensures
+        maybe_error: __fc_errno ≡ \old(__fc_errno) ∨ __fc_errno ≡ 34;
     
     complete behaviors finite_non_zero, zero;
     disjoint behaviors finite_non_zero, zero;
