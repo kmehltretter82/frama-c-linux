@@ -368,6 +368,7 @@ module Make (Abstract: Abstractions.Eva) = struct
     in
     match initial_state with
     | `Bottom ->
+      Abstract.Dom.Store.mark_as_computed ();
       Value_parameters.result "Eva not started because globals \
                                initialization is not computable.";
       Eval_annots.mark_invalid_initializers ()
