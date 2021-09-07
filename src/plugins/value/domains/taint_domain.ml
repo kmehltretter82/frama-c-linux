@@ -34,8 +34,11 @@ type taint = {
   (* Set of assume statements over a tainted expression. This set is needed to
      implement control-dependency: all left-values appearing in statements whose
      evaluation depends on at least one of the assume expressions is to be
-     tainted. *)
+     tainted. This set is restricted to statements of the current function. *)
   assume_stmts: Stmt.Set.t;
+  (* Whether the current call depends on a tainted assume statement: if true,
+     all assignments in the current call should be control tainted. *)
+  dependent_call: bool;
 }
 
 let dkey = Value_parameters.register_category "d-taint"
@@ -59,10 +62,12 @@ module LatticeTaint = struct
     Format.fprintf fmt
       "@[<v 2>Locations (data):@ @[<hov>%a@]@]@\n\
        @[<v 2>Locations (control):@ @[<hov>%a@]@]@\n\
-       @[<v 2>Assume statements:@ @[<hov>%a@]@]"
+       @[<v 2>Assume statements:@ @[<hov>%a@]@\n\
+       @[<v 2>Dependent call:@ %b@]"
       Zone.pretty t.locs_data
       Zone.pretty t.locs_control
       Stmt.Set.pretty t.assume_stmts
+      t.dependent_call
 
   (* Frama-C "datatype" for type [taint]. *)
   include Datatype.Make_with_collections(struct
@@ -75,20 +80,15 @@ module LatticeTaint = struct
       let reprs =
         [ { locs_data = List.hd Zone.reprs;
             locs_control = List.hd Zone.reprs;
-            assume_stmts = Stmt.Set.empty; } ]
-
-      let structural_descr =
-        Structural_descr.t_abstract (* TODO *)
+            assume_stmts = Stmt.Set.empty;
+            dependent_call = false; } ]
 
       let compare t1 t2 =
-        let c = Zone.compare t1.locs_data t2.locs_data in
-        if c <> 0
-        then c
-        else
-          let c = Zone.compare t1.locs_data t2.locs_data in
-          if c <> 0
-          then c
-          else Stmt.Set.compare t1.assume_stmts t2.assume_stmts
+        let (<?>) c (cmp,x,y) = if c = 0 then cmp x y else c in
+        Zone.compare t1.locs_data t2.locs_data
+        <?> (Zone.compare, t1.locs_control, t2.locs_control)
+        <?> (Stmt.Set.compare, t1.assume_stmts, t2.assume_stmts)
+        <?> (Datatype.Bool.compare, t1.dependent_call, t2.dependent_call)
 
       let equal = Datatype.from_compare
 
@@ -101,7 +101,8 @@ module LatticeTaint = struct
         Hashtbl.hash
           (Zone.hash t.locs_data,
            Zone.hash t.locs_control,
-           Stmt.Set.hash t.assume_stmts)
+           Stmt.Set.hash t.assume_stmts,
+           t.dependent_call)
 
       let copy c = c
 
@@ -112,6 +113,7 @@ module LatticeTaint = struct
     locs_data = Zone.bottom;
     locs_control = Zone.bottom;
     assume_stmts = Stmt.Set.empty;
+    dependent_call = false;
   }
 
   (* Top state: everything is tainted. *)
@@ -119,13 +121,15 @@ module LatticeTaint = struct
     locs_data = Zone.top;
     locs_control = Zone.top;
     assume_stmts = Stmt.Set.empty;
+    dependent_call = false;
   }
 
   (* Join: keep pointwise over-approximation. *)
   let join t1 t2 =
     { locs_data = Zone.join t1.locs_data t2.locs_data;
       locs_control = Zone.join t1.locs_control t2.locs_control;
-      assume_stmts = Stmt.Set.union t1.assume_stmts t2.assume_stmts; }
+      assume_stmts = Stmt.Set.union t1.assume_stmts t2.assume_stmts;
+      dependent_call = t1.dependent_call || t2.dependent_call; }
 
   (* The memory locations are finite, so the ascending chain property is
      already verified. We simply use a join. *)
@@ -136,6 +140,7 @@ module LatticeTaint = struct
       locs_data = Zone.narrow t1.locs_data t2.locs_data;
       locs_control = Zone.narrow t1.locs_control t2.locs_control;
       assume_stmts = Stmt.Set.inter t1.assume_stmts t2.assume_stmts;
+      dependent_call = t1.dependent_call && t2.dependent_call;
     }
 
   (* Inclusion testing: pointwise, on locs only. *)
@@ -176,46 +181,64 @@ module TransferTaint = struct
   (* No update about taint wrt information provided by the other domains. *)
   let update _valuation state = `Value state
 
+  (* Given a lvalue, returns:
+     - its memory location (as a zone);
+     - its indirect dependencies, i.e. the memory zone its location depends on;
+     - whether its location is a singleton. *)
+  let compute_zones lval to_loc =
+    match lval with
+    | Var vi, NoOffset ->
+      (* Special case for direct access to variable: do not use [to_loc] here,
+         as it will fail for the formal parameters of calls. *)
+      let zone = Locations.zone_of_varinfo vi in
+      zone, Zone.bottom, true
+    | _ ->
+      let ploc = to_loc lval in
+      let singleton = Precise_locs.cardinal_zero_or_one ploc in
+      let lv_zone =
+        let loc = Precise_locs.imprecise_location ploc in
+        Locations.enumerate_valid_bits Write loc
+      in
+      let lv_indirect_zone = Value_util.indirect_zone_of_lval to_loc lval in
+      lv_zone, lv_indirect_zone, singleton
+
+  (* Propagates data- and control-taints for an assignement [lval = exp]. *)
+  let assign_aux lval exp to_loc state =
+    let lv_zone, lv_indirect_zone, singleton = compute_zones lval to_loc in
+    let exp_zone = Value_util.zone_of_expr to_loc exp in
+    (* [lv] becomes data-tainted if a memory location on which the value of
+       [exp] is data-tainted. *)
+    let data_tainted = Zone.intersects state.locs_data exp_zone in
+    (* [lv] becomes control-tainted if:
+       - the current call depends on a tainted assume statements of a caller;
+       - the execution of the assignment depends on a tainted assume statement;
+       - the value of [exp] is control-tainted;
+       - the assigned location depends on tainted values. *)
+    let ctrl_tainted =
+      state.dependent_call
+      || not (Stmt.Set.is_empty state.assume_stmts)
+      || Zone.intersects state.locs_control exp_zone
+      || LatticeTaint.intersects state lv_indirect_zone
+    in
+    let update tainted locs =
+      if tainted
+      then Zone.join locs lv_zone
+      else if singleton
+      then Zone.diff locs lv_zone
+      else locs
+    in
+    { state with locs_data = update data_tainted state.locs_data;
+                 locs_control = update ctrl_tainted state.locs_control; }
+
   let assign ki lv exp _v valuation state =
     let state =
       match ki with
       | Kglobal ->
         state
       | Kstmt stmt ->
-        let to_loc = loc_of_lval valuation in
-        let ploc = to_loc lv.Eval.lval in
-        let lv_zone =
-          let loc = Precise_locs.imprecise_location ploc in
-          Locations.enumerate_valid_bits Write loc
-        in
         let state = filter_active_tainted_assumes stmt state in
-        (* Control-dependency: taint the left-value of an assign statement whose
-           execution depends on the value of a tainted assume statement. *)
-        let state =
-          if Stmt.Set.is_empty state.assume_stmts
-          then
-            (* No active tainted assume statement means that there is no
-               control-dependecy that applies on [lv]. *)
-            state
-          else
-            { state with locs_control = Zone.join state.locs_control lv_zone }
-        in
-        (* Compute data-dependency with [state]: whenever [exp] (or its
-           sub-expressions) is tainted, or [lv] is indexed by a tainted memory
-           location. *)
-        let exp_zone = Value_util.zone_of_expr to_loc exp in
-        let lv_indirect_zone =
-          Value_util.indirect_zone_of_lval to_loc lv.Eval.lval
-        in
-        let intersect_state =
-          LatticeTaint.intersects state exp_zone ||
-          LatticeTaint.intersects state lv_indirect_zone
-        in
-        if intersect_state
-        then { state with locs_data = Zone.join state.locs_data lv_zone }
-        else if Precise_locs.cardinal_zero_or_one ploc
-        then { state with locs_data = Zone.diff state.locs_data lv_zone }
-        else state
+        let to_loc = loc_of_lval valuation in
+        assign_aux lv.Eval.lval exp to_loc state
     in
     `Value state
 
@@ -225,7 +248,7 @@ module TransferTaint = struct
     let to_loc = loc_of_lval valuation in
     let exp_zone = Value_util.zone_of_expr to_loc exp in
     let state =
-      if LatticeTaint.intersects state exp_zone
+      if not state.dependent_call && LatticeTaint.intersects state exp_zone
       then { state with assume_stmts = Stmt.Set.add stmt state.assume_stmts; }
       else state
     in
@@ -233,16 +256,16 @@ module TransferTaint = struct
 
   let start_call stmt call _recursion valuation state =
     let state = filter_active_tainted_assumes stmt state in
+    let dependent_call =
+      state.dependent_call || not (Stmt.Set.is_empty state.assume_stmts)
+    in
+    let state = { state with assume_stmts = Stmt.Set.empty; dependent_call } in
     let state =
       (* Add tainted actual parameters in [state]. *)
       let to_loc = loc_of_lval valuation in
       List.fold_left
         (fun s { Eval.concrete; formal; _ } ->
-           let concrete_zone = Value_util.zone_of_expr to_loc concrete in
-           let formal_zone = Locations.zone_of_varinfo formal in
-           if LatticeTaint.intersects state concrete_zone
-           then { s with locs_data = Zone.join s.locs_data formal_zone }
-           else s)
+           assign_aux (Cil.var formal) concrete to_loc s)
         state
         call.Eval.arguments
     in
@@ -251,7 +274,8 @@ module TransferTaint = struct
   let finalize_call _stmt _call _recursion ~pre ~post =
     (* Recover assume statements from the [pre] abstract state: we assume the
        control-dependency does not extended beyond the function scope. *)
-    `Value { post with assume_stmts = pre.assume_stmts; }
+    `Value { post with assume_stmts = pre.assume_stmts;
+                       dependent_call = pre.dependent_call; }
 
   let show_expr valuation state fmt exp =
     let to_loc = loc_of_lval valuation in
@@ -326,14 +350,14 @@ module TaintDomain = struct
 
   let enter_scope _kind _vars state = state
 
+  let remove_bases bases state =
+    let remove = Zone.filter_base (fun b -> not (Base.Hptset.mem b bases)) in
+    { state with locs_data = remove state.locs_data;
+                 locs_control = remove state.locs_control; }
+
   let leave_scope _kf vars state =
-    let remove_unscoped_bases =
-      let bases = Base.Set.of_list (List.map Base.of_varinfo vars) in
-      Zone.filter_base (fun b -> not (Base.Set.mem b bases))
-    in
-    { state with
-      locs_data = remove_unscoped_bases state.locs_data;
-      locs_control = remove_unscoped_bases state.locs_control; }
+    let bases = Base.Hptset.of_list (List.map Base.of_varinfo vars) in
+    remove_bases bases state
 
 
   (* Initial state: initializers are singletons, so we store nothing. *)
@@ -342,8 +366,18 @@ module TaintDomain = struct
   let initialize_variable_using_type _ _ state  = state
 
 
-  (* Misc. *)
+  (* MemExec cache. *)
   let relate _kf _bases _state = Base.SetLattice.empty
+
+  let filter _kf _kind bases state =
+    let filter_base = Zone.filter_base (fun b -> Base.Hptset.mem b bases) in
+    { state with locs_data = filter_base state.locs_data;
+                 locs_control = filter_base state.locs_control;
+                 assume_stmts = Stmt.Set.empty; }
+
+  let reuse _kf bases ~current_input ~previous_output =
+    let state = remove_bases bases current_input in
+    join state previous_output
 end
 
 include TaintDomain
@@ -562,6 +596,8 @@ let () = Abstractions.register_hook interpret_taint_logic
 
 
 type taint_error = NotComputed | Irrelevant | LogicError
+type taint_ok = Data | Control | None
+type taint_result = (taint_ok, taint_error) result
 
 let zone_of_predicate env predicate =
   let logic_deps = Eval_terms.predicate_deps env predicate in
@@ -594,10 +630,13 @@ let is_tainted_property ip =
     let+ stmt = get_stmt ip in
     let+ predicate = get_predicate ip in
     match Store.get_stmt_state ~after:false stmt with
-    | `Bottom -> Ok false
+    | `Bottom -> Ok None
     | `Value state ->
       let cvalue = Db.Value.get_stmt_state ~after:false stmt in
       let env = Eval_terms.env_only_here cvalue in
       let+ zone = zone_of_predicate env predicate in
-      let tainted = Zone.intersects zone state.locs_data in
-      Ok tainted
+      if Zone.intersects zone state.locs_data
+      then Ok Data
+      else if Zone.intersects zone state.locs_control
+      then Ok Control
+      else Ok None

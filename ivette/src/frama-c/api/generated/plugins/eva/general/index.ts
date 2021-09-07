@@ -119,17 +119,23 @@ const getDeadCode_internal: Server.GetRequest<Json.key<'#fct'>,deadCode> = {
 /** Get the lists of unreachable and of non terminating statements in a function */
 export const getDeadCode: Server.GetRequest<Json.key<'#fct'>,deadCode>= getDeadCode_internal;
 
-/** TODO */
+/** Taint status of logical properties */
 export enum taintStatus {
-  /** The Eva taint analysis has not been computed */
+  /** **Not computed:**
+      the Eva taint domain has not been enabled, or the Eva analysis has not been run */
   not_computed = 'not_computed',
-  /** Error: the memory zone on which this property depends could not be computed */
+  /** **Error:**
+      the memory zone on which this property depends could not be computed */
   error = 'error',
-  /** No taint for this kind of property */
+  /** **Not applicable:** no taint for this kind of property */
   not_applicable = 'not_applicable',
-  /** Tainted property: this property is related to a memory zone that can be affected by an attacker, according to the Eva taint domain. */
-  tainted = 'tainted',
-  /** Untainted property: this property is safe, according to the Eva taint domain. */
+  /** **Data tainted:**
+      this property is related to a memory location that can be affected by an attacker */
+  data_tainted = 'data_tainted',
+  /** **Control tainted:**
+      this property is related to a memory location whose assignment depends on path conditions that can be affected by an attacker */
+  control_tainted = 'control_tainted',
+  /** **Untainted property:** this property is safe */
   not_tainted = 'not_tainted',
 }
 

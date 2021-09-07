@@ -11,12 +11,8 @@ void taint_basic(int t) {
   int u, w, x, y = 0;
   int buf[2] = { 0, 1 };
 
-  /* Basic data-dependency: since 't' is tainted, 'x' becomes (data-)tainted but 'y'
-     must stay untainted. */
+  /* Basic direct dependency: since 't' is tainted, 'x' becomes (data-)tainted. */
   x = t + y + 1;
-
-  /* Indirect data-dependency: since 't' is tainted, buf[t] becomes (data-)tainted. */
-  buf[t] = buf[1] + 1;
 
   /* Data-dependency overapprox: since 'u' may take 't' in else-branch, then 'u'
      becomes (data-)tainted. */
@@ -31,6 +27,11 @@ void taint_basic(int t) {
     w = 1;
   else
     w = 2;
+
+  /* Indirect dependency: since 't' is tainted, 'buf[t]' becomes
+     (control-)tainted. */
+  buf[t] = buf[1] + 1;
+
   Frama_C_dump_each();
 }
 
@@ -41,9 +42,10 @@ void taint_assume_1() {
   /* 'x' becomes (data-)tainted at the end of first iteration, so the first two
      call to Frama_C_dump_each must report no taint. On second iteration, the
      first call to Frama_C_dump_each must report only 'x' as (data-)tainted,
-     while the second call must report 'y' as (control-)tainted, hence
-     (data-)tainted too because of add-assign. On the third iteration, the two
-     calls must report both 'x' and 'y' as data- and control-tainted. */
+     while the second call must report 'y' as (control-)tainted only as
+     control-tainted only values do not impact data-tainteness. On the third
+     iteration, the two calls must report both 'x' and 'y' as
+     control-tainted. */
   while (x < 3) {
     Frama_C_dump_each();
     if (y % 2 == 0) {
@@ -64,7 +66,8 @@ void taint_assume_1() {
 void taint_assume_2() {
   int x, y = 0;
   /* As 'x' becomes (data-)tainted at some point, it will make 'y' tainted via a
-     control-dependency. At the end, both must be data- and control-tainted. */
+     control-dependency. At the end, both must be control-tainted, but only 'x'
+     is data-tainted. */
   for (x = 0; x < 8 || y <= 9; x++) {
     //@ split x;
     if (x == 5) {
@@ -117,7 +120,7 @@ void taint_goto_2() {
       x = 1;
       goto L;
     }
-    /* As 'x' is untainted, 'z' must remain untainted. */
+    /* As 'x' is untainted here, 'z' must remain untainted. */
     z = 1;
   }
   return;
@@ -138,8 +141,38 @@ void taint_call(int t) {
   Frama_C_domain_show_each(x);
 }
 
-int main(void) {
+void taint_infinite_while(int t) {
+  int i, w, x, y;
+  if (!t)
+    while (1) ;
+  else {
+    y = t + 1;
+    /* Even though 't' is tainted and the assume is active on 'x', 'x'
+       postdominates 't' because this is the only terminating path in this
+       function: hence, 'x' must remain untainted. */
+    x = 2;
+  }
+  if (t%2) {
+    i = 0;
+    while (++i) ;
+  }
+  else {
+    /* However, the postdominators computation used by the domain is syntactic,
+       so here 'w' is imprecisely (control-)tainted, even though this is the
+       only terminating path of the function according to Eva. */
+    w = 3;
+  }
+  Frama_C_dump_each();
+}
+
+// Taints global variable 'tainted'.
+void taints (void) {
+  tainted = Frama_C_interval(0, 10);
   //@ taint tainted;
+}
+
+int main(void) {
+  taints();
   taint_basic(tainted);
 
   tainted = 0;
@@ -149,15 +182,20 @@ int main(void) {
   taint_undet_locs();
 
   int l;
+  taints();
   taint_spec_assigns(&l, tainted);
   /* Here 'l' must be tainted. */
   Frama_C_domain_show_each(l);
 
+  tainted = l = 0;
   taint_goto_1();
   taint_goto_2();
 
-  //@ taint tainted;
+  taints();
   taint_call(tainted);
+
+  taints();
+  taint_infinite_while(tainted);
 
   return 0;
 }
