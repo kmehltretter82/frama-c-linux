@@ -467,6 +467,14 @@ extern float sinf(float x);
 */
 extern long double sinl(long double x);
 
+/* Note: the specs of tan/tanf/tanl below assume that, for a finite x,
+ *       the result is always finite. This is _not_ guaranteed by the standard,
+ *       but testing with the GNU libc, plus some mathematical arguments
+ *       (see https://stackoverflow.com/questions/67482420) indicate that,
+ *       in practice, the result is _never_ infinite.
+ *       If you know of any implementations in which a finite argument
+ *       produces an infinite result, please inform us.
+ */
 /*@
   assigns errno, \result \from x;
   behavior zero:
@@ -476,7 +484,7 @@ extern long double sinl(long double x);
     ensures no_error: errno == \old(errno);
   behavior finite_non_zero:
     assumes finite_arg: \is_finite(x) && x != 0.;
-    ensures result_not_nan: !\is_NaN(\result);
+    ensures finite_result: \is_finite(\result);
     ensures maybe_error: errno == \old(errno) || errno == ERANGE;
   behavior infinity:
     assumes infinite_arg: \is_infinite(x);
@@ -501,7 +509,7 @@ extern double tan(double x);
     ensures no_error: errno == \old(errno);
   behavior finite_non_zero:
     assumes finite_arg: \is_finite(x) && x != 0.;
-    ensures result_not_nan: !\is_NaN(\result);
+    ensures finite_result: \is_finite(\result);
     ensures maybe_error: errno == \old(errno) || errno == ERANGE;
   behavior infinity:
     assumes infinite_arg: \is_infinite(x);
@@ -526,7 +534,7 @@ extern float tanf(float x);
     ensures no_error: errno == \old(errno);
   behavior finite_non_zero:
     assumes finite_arg: \is_finite(x) && x != 0.;
-    ensures result_not_nan: !\is_NaN(\result);
+    ensures finite_result: \is_finite(\result);
     ensures maybe_error: errno == \old(errno) || errno == ERANGE;
   behavior infinity:
     assumes infinite_arg: \is_infinite(x);
