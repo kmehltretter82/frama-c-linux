@@ -22,60 +22,7 @@
 
 open Cil_types
 
-let must_translate_ref: (Property.t -> bool) ref =
-  Extlib.mk_fun "must_translate_ref"
-
-let must_translate_opt_ref: (Property.t option -> bool) ref =
-  Extlib.mk_fun "must_translate_opt_ref"
-
-let type_requires v kf kinstr bhvr =
-  if Cil.is_default_behavior bhvr then
-    List.iter
-      (fun ip_requires ->
-         if !must_translate_ref (Property.ip_of_requires kf kinstr bhvr ip_requires) then
-           let tp_requires = ip_requires.ip_content.tp_statement in
-           ignore (Visitor.visitFramacPredicate v tp_requires))
-      bhvr.b_requires
-  else
-    List.iter
-      (fun ip_requires ->
-         if !must_translate_ref (Property.ip_of_requires kf kinstr bhvr ip_requires) then
-           let tp_requires = ip_requires.ip_content in
-           let pred_kind = tp_requires.tp_kind in
-           match pred_kind with
-           | Assert | Check ->
-             let requires = tp_requires.tp_statement in
-             ignore (Visitor.visitFramacPredicate v requires)
-           | Admit -> ())
-      bhvr.b_requires
-
-let type_post_conditions v kf kinstr bhvr =
-  if Cil.is_default_behavior bhvr then
-    List.iter
-      (fun ((termination, ip_post_cond) as tp) ->
-         if !must_translate_ref (Property.ip_of_ensures kf kinstr bhvr tp) then
-           let post_cond = ip_post_cond.ip_content.tp_statement in
-           match termination with
-           | Normal -> ignore (Visitor.visitFramacPredicate v post_cond)
-           | Exits | Breaks | Continues | Returns -> ())
-      bhvr.b_post_cond
-  else
-    List.iter
-      (fun ((termination, ip_post_cond) as tp) ->
-         if !must_translate_ref (Property.ip_of_ensures kf kinstr bhvr tp) then
-           let tp_post_cond = ip_post_cond.ip_content in
-           let pred_kind = tp_post_cond.tp_kind in
-           match pred_kind with
-           | Assert | Check -> begin
-               let post_cond = tp_post_cond.tp_statement in
-               match termination with
-               | Normal -> ignore (Visitor.visitFramacPredicate v post_cond)
-               | Exits | Breaks | Continues | Returns -> ()
-             end
-           | Admit -> ())
-      bhvr.b_post_cond
-
-let typer_visitor lenv = object (self)
+let typer_visitor lenv = object
   inherit Visitor.frama_c_inplace
 
   (* Only type the globals that do not come from the Rtl *)
@@ -118,23 +65,8 @@ let typer_visitor lenv = object (self)
   method !vpredicate p =
     Error.generic_handle (Typing.type_named_predicate ~lenv) () p;
     Cil.SkipChildren
-
-  method !vspec spec =
-    List.iter
-      (fun b -> (List.iter (fun p -> ignore (Visitor.visitFramacIdPredicate self p)) b.b_assumes))
-      spec.spec_behavior;
-    List.iter
-      (type_requires self (Option.get self#current_kf) (self#current_kinstr))
-      spec.spec_behavior;
-    List.iter
-      (type_post_conditions self (Option.get self#current_kf) self#current_kinstr)
-      spec.spec_behavior;
-    Cil.SkipChildren
-======= end
-=======
   method !vpredicate p =
     Error.generic_handle (Typing.type_named_predicate ~lenv) () p; Cil.SkipChildren
->>>>>>> 32bad40483e... [e-acsl] improve preprocessing phase for typing
 
   method !vspec spec =
     List.iter (fun b -> (List.iter (fun p -> ignore (Visitor.visitFramacIdPredicate self p)) b.b_assumes)) spec.spec_behavior;
@@ -178,6 +110,8 @@ let typer_visitor lenv = object (self)
     | APragma _ -> Cil.SkipChildren
     | AExtended _ -> Cil.SkipChildren
 
+=======
+>>>>>>> e54ebd15af9... [e-acsl] simplify typing visitor
 end
 
 let type_program ast =

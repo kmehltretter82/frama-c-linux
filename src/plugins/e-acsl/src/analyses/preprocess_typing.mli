@@ -31,10 +31,3 @@ val preprocess_predicate : Typing.Function_params_ty.t -> predicate -> unit
 
 val preprocess_rte : lenv:Typing.Function_params_ty.t -> code_annotation -> unit
 (** compute and store the type of all the terms in a code annotation *)
-
-(**************************************************************************)
-(********************** Forward references ********************************)
-(**************************************************************************)
-
-val must_translate_ref : (Property.t -> bool) ref
-val must_translate_opt_ref : (Property.t option -> bool) ref
