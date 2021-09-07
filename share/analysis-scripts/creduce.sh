@@ -25,6 +25,9 @@ usage="
 Script to run C-Reduce (https://embed.cs.utah.edu/creduce) when debugging
 Frama-C, or when minimizing test cases resulting in a Frama-C error.
 
+NOTE: some distributions now use 'cvise' (a Python port of creduce)
+      instead of 'creduce', but it is backwards-compatible.
+
 # Requirements
 
 - C-Reduce installed in the PATH, or its path in environment variable CREDUCE;
@@ -102,11 +105,17 @@ dir_for_reduction="creducing"
 script_for_creduce="./script_for_creduce.sh"
 
 if [ -z "$CREDUCE" ]; then
-    CREDUCE="creduce"
+    # Now some distributions have 'cvise' instead of 'creduce', so try it
+    # if found in PATH
+    if command -v cvise 2>&1 >/dev/null; then
+        CREDUCE="cvise"
+    else
+        CREDUCE="creduce"
+    fi
 fi
 
 if ! command -v "$CREDUCE" 2>&1 >/dev/null; then
-    echo "creduce not found; install it in the PATH or"
+    echo "cvise/creduce not found; install it in the PATH or"
     echo "put it in environment variable CREDUCE."
     exit 1
 fi
