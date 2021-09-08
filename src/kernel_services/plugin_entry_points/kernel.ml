@@ -670,7 +670,8 @@ module PrintAsIs =
     (struct
       let module_name = "PrintAsIs"
       let option_name = "-print-as-is"
-      let help = "print original code as given by the internal representation"
+      let help = "when pretty-printing C code, try to print it as close as \
+                  possible to the internal (Cil) representation"
     end)
 
 let () = Parameter_customize.set_group inout_source
