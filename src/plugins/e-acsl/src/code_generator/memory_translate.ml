@@ -469,7 +469,7 @@ let call_with_tset
     in
     (* There's no more quantifiers in the arguments now, we can call back
        [predicate_to_exp] to translate the predicate as usual *)
-    Preprocess_typing.preprocess_predicate (Env.Local_vars.get env) p_quantified;
+    Typing.preprocess_predicate (Env.Local_vars.get env) p_quantified;
     !predicate_to_exp_ref ~adata kf env p_quantified
   | [] ->
     (* No arguments require quantifiers, so we can directly translate the

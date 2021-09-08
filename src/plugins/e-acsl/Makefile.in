@@ -63,7 +63,6 @@ SRC_ANALYSES:= \
 	bound_variables \
 	interval \
 	typing \
-	preprocess_typing \
 	literal_strings \
 	memory_tracking \
 	exit_points

@@ -213,7 +213,7 @@ let add_new_block_in_stmt env kf stmt =
           (* translate potential RTEs of ghost code *)
           let rtes = Rte.stmt ~warn:false kf stmt in
           List.iter
-            (Preprocess_typing.preprocess_rte ~lenv:(Env.Local_vars.get env))
+            (Typing.preprocess_rte ~lenv:(Env.Local_vars.get env))
             rtes;
           Translate.translate_rte_annots Printer.pp_stmt stmt kf env rtes
         end else
@@ -877,7 +877,7 @@ let inject () =
   Options.feedback ~level:2
     "typing annotations in project %a"
     Project.pretty current_project;
-  Preprocess_typing.type_program ast;
+  Typing.type_program ast;
   Options.feedback ~level:2
     "injecting annotations as code in project %a"
     Project.pretty current_project;
