@@ -108,34 +108,35 @@ module K2V = struct
 end
 
 (* Whether the value of an expression should be retained by the domain:
-   - if the expression is an lvalue with an imprecise location;
+   - if the expression is an lvalue with a non-singleton location;
    - if the expression is a binop between two expressions, each containing an
-     lvalue with an imprecise (non singleton) value.
+     lvalue with a non-singleton value.
 
    In both cases, the value will not be infered by the cvalue domain.
-   Otherwise, the value should be infered by the cvalue domain (or can be
-   precisely computed from values infered by the cvalue domain). *)
+   Otherwise, the value should be inferred by the cvalue domain, or can be
+   precisely computed from values inferred by the cvalue domain. *)
 let interesting_exp get_locs get_val e =
-  let rec has_lvalue ?(root=false) e =
+  let is_comp = function Eq | Ne | Le | Ge | Lt | Gt -> true | _ -> false in
+  let rec has_lvalue e =
     match e.enode with
+    | Lval _ ->
+      not (Cvalue.V.cardinal_zero_or_one (get_val e))
+    | CastE (_, e) | UnOp (_, e, _) | Info (e, _) ->
+      has_lvalue e
+    | BinOp (op, e1, e2,_) ->
+      not (is_comp op) && (has_lvalue e1 || has_lvalue e2)
     | Const _ | SizeOf _ | SizeOfStr _ | SizeOfE _ | AlignOf _ | AlignOfE _
     | StartOf _ | AddrOf _ ->
       false
-    | Lval lv ->
-      if root
-      then not (Precise_locs.cardinal_zero_or_one (get_locs lv))
-      else not (Cvalue.V.cardinal_zero_or_one (get_val e))
-    | CastE (_, e) | UnOp (_, e, _) | Info (e, _) ->
-      not root && has_lvalue e
-    | BinOp (op, e1, e2,_) ->
-      match op with
-      | Eq | Ne | Le | Ge | Lt | Gt -> false
-      | _ ->
-        if root
-        then has_lvalue e1 && has_lvalue e2
-        else has_lvalue e1 || has_lvalue e2
   in
-  has_lvalue ~root:true e
+  match e.enode with
+  | Lval lv ->
+    not (Precise_locs.cardinal_zero_or_one (get_locs lv))
+  | BinOp (op, e1, e2,_) ->
+    not (is_comp op) && has_lvalue e1 && has_lvalue e2
+  | CastE _ | UnOp _ | Info _ | Const _ | SizeOf _ | SizeOfStr _ | SizeOfE _
+  | AlignOf _ | AlignOfE _ | StartOf _ | AddrOf _ ->
+    false
 
 (* Locals and formals syntactically present in an expression or lvalue *)
 let rec vars_lv (h, o) = Base.Set.union (vars_host h) (vars_offset o)
