@@ -9951,18 +9951,15 @@ and doStatement local_env (s : Cabs.statement) : chunk =
       let s'' = consLabContinue ~ghost se3 in
       let break_cond = breakChunk ~ghost loc' in
       exitLoop ();
-      let res =
+      let c = (s' @@ (s'', ghost)) in
+      let c =
         match e2.expr_node with
         | Cabs.NOTHING -> (* This means true *)
-          let c = (s' @@ (s'', ghost)) in
-          se1 @@ (loopChunk ~sattr:[Attr("for",[])] ~ghost a c, ghost)
+          c
         | _ ->
-          let c = (s' @@ (s'', ghost)) in
-          let c =
-            doCondition local_env CNoConst e2 skipChunk break_cond @@ (c, ghost)
-          in
-          se1 @@ (loopChunk ~sattr:[Attr("for",[])] ~ghost a c, ghost)
+          doCondition local_env CNoConst e2 skipChunk break_cond @@ (c, ghost)
       in
+      let res = se1 @@ (loopChunk ~sattr:[Attr("for",[])] ~ghost a c, ghost) in
       exitScope ();
       if has_decl then begin
         let chunk = s2c (mkStmt ~ghost ~valid_sid (Block (c2block ~ghost res)))
