@@ -9954,13 +9954,14 @@ and doStatement local_env (s : Cabs.statement) : chunk =
       let res =
         match e2.expr_node with
         | Cabs.NOTHING -> (* This means true *)
-          se1 @@ (loopChunk ~sattr:[Attr("for",[])] ~ghost a (s' @@ (s'', ghost)), ghost)
+          let c = (s' @@ (s'', ghost)) in
+          se1 @@ (loopChunk ~sattr:[Attr("for",[])] ~ghost a c, ghost)
         | _ ->
-          se1 @@
-          (loopChunk ~sattr:[Attr("for",[])] ~ghost a
-             (((doCondition
-                  local_env CNoConst e2 skipChunk break_cond)
-               @@ (s', ghost)) @@ (s'', ghost)), ghost)
+          let c = (s' @@ (s'', ghost)) in
+          let c =
+            doCondition local_env CNoConst e2 skipChunk break_cond @@ (c, ghost)
+          in
+          se1 @@ (loopChunk ~sattr:[Attr("for",[])] ~ghost a c, ghost)
       in
       exitScope ();
       if has_decl then begin
