@@ -299,9 +299,10 @@ LONGOPTIONS="help,compile,compile-only,debug:,ocode:,oexec:,verbose:,
   frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:,
   print-mmodels,rt-debug,rte-select:,then,e-acsl-extra:,check,fail-with-code:,
   temporal,weak-validity,stack-size:,heap-size:,rt-verbose,free-valid-address,
-  external-assert:,assert-print-data,validate-format-strings,no-trace,
-  libc-replacements,with-dlmalloc:,dlmalloc-from-sources,dlmalloc-compile-only,
-  dlmalloc-compile-flags:,odlmalloc:,ar:,ranlib:,mbits:"
+  external-assert:,assert-print-data,no-assert-print-data,
+  validate-format-strings,no-trace,libc-replacements,with-dlmalloc:,
+  dlmalloc-from-sources,dlmalloc-compile-only,dlmalloc-compile-flags:,
+  odlmalloc:,ar:,ranlib:,mbits:"
 SHORTOPTIONS="h,c,C,d:,D,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,I:,G:,X,a:,T,k,V"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
@@ -661,6 +662,10 @@ do
     --assert-print-data)
       shift;
       OPTION_ASSERT_PRINT_DATA="-e-acsl-assert-print-data"
+    ;;
+    --no-assert-print-data)
+      shift;
+      OPTION_ASSERT_PRINT_DATA="-e-acsl-no-assert-print-data"
     ;;
     # Check output format functions
     --validate-format-strings)

@@ -102,7 +102,7 @@ module Builtins =
 
 let () = Parameter_customize.is_invisible ()
 module Assert_print_data =
-  False
+  True
     (struct
       let option_name = "-e-acsl-assert-print-data"
       let help = "print data contributing to the failed assertion along with \
