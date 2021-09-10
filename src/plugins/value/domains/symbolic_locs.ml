@@ -107,36 +107,36 @@ module K2V = struct
 
 end
 
-(* (* not used for now: too costly *)
-   let rec interesting_exp (e: exp) = match e.enode with
-   | Const _ | SizeOf _ | SizeOfStr _ | SizeOfE _ | AlignOf _ | AlignOfE _
-   | StartOf _ | AddrOf _ ->
-    false
-   | Lval lv -> true
-   | CastE (_,e) | UnOp (_,e,_) | Info (e,_) ->
-    interesting_exp e
-   | BinOp (op,e1,e2,_) ->
-    match op with
-    | Eq | Ne | Le | Ge | Lt | Gt -> false
-    | _ -> interesting_exp e1 || interesting_exp e2
-*)
+(* Whether the value of an expression should be retained by the domain:
+   - if the expression is an lvalue with a non-singleton location;
+   - if the expression is a binop between two expressions, each containing an
+     lvalue with a non-singleton value.
 
-(* computes whether an expression depends on a location with an imprecise
-   location *)
-let rec multiple_loc_exp get_locs (e: exp) = match e.enode with
-  | Const _ | SizeOf _ | SizeOfStr _ | SizeOfE _ | AlignOf _ | AlignOfE _
-  | StartOf _ | AddrOf _ ->
-    false
+   In both cases, the value will not be infered by the cvalue domain.
+   Otherwise, the value should be inferred by the cvalue domain, or can be
+   precisely computed from values inferred by the cvalue domain. *)
+let interesting_exp get_locs get_val e =
+  let is_comp = function Eq | Ne | Le | Ge | Lt | Gt -> true | _ -> false in
+  let rec has_lvalue e =
+    match e.enode with
+    | Lval _ ->
+      not (Cvalue.V.cardinal_zero_or_one (get_val e))
+    | CastE (_, e) | UnOp (_, e, _) | Info (e, _) ->
+      has_lvalue e
+    | BinOp (op, e1, e2,_) ->
+      not (is_comp op) && (has_lvalue e1 || has_lvalue e2)
+    | Const _ | SizeOf _ | SizeOfStr _ | SizeOfE _ | AlignOf _ | AlignOfE _
+    | StartOf _ | AddrOf _ ->
+      false
+  in
+  match e.enode with
   | Lval lv ->
     not (Precise_locs.cardinal_zero_or_one (get_locs lv))
-  | CastE (_,e) | UnOp (_,e,_) | Info (e,_) ->
-    multiple_loc_exp get_locs e
-  | BinOp (_,e1,e2,_) ->
-    multiple_loc_exp get_locs e1 || multiple_loc_exp get_locs e2
-
-let is_cond exp = match exp.enode with
-  | BinOp ((Eq | Ne | Le | Ge | Lt | Gt), _, _, _) -> true
-  | _ -> false
+  | BinOp (op, e1, e2,_) ->
+    not (is_comp op) && has_lvalue e1 && has_lvalue e2
+  | CastE _ | UnOp _ | Info _ | Const _ | SizeOf _ | SizeOfStr _ | SizeOfE _
+  | AlignOf _ | AlignOfE _ | StartOf _ | AddrOf _ ->
+    false
 
 (* Locals and formals syntactically present in an expression or lvalue *)
 let rec vars_lv (h, o) = Base.Set.union (vars_host h) (vars_offset o)
@@ -492,6 +492,14 @@ module D : Abstract_domain.Leaf
       Value_parameters.fatal "Unknown location for %a" Printer.pp_lval lv
     else r
 
+  let get_val valuation = fun lv ->
+    match valuation.Abstract_domain.find lv with
+    | `Top -> Cvalue.V.top_int
+    | `Value v ->
+      match v.Eval.value.Eval.v with
+      | `Bottom -> Cvalue.V.bottom
+      | `Value v -> v
+
   (* update the state according to the information known in the valuation.
      Important, because on statements such as [if (t[i] + j <= 3)], the
      interesting information on [t[i]] is only in the valuation. *)
@@ -503,7 +511,7 @@ module D : Abstract_domain.Leaf
          time. *)
       match r.reductness, v.v, v.initialized, v.escaping with
       | (Created | Reduced), `Value v, true, false ->
-        if not (is_cond e) && multiple_loc_exp (get_locs valuation) e then
+        if interesting_exp (get_locs valuation) (get_val valuation) e then
           begin
             let k = K.HCE.of_exp e in
             (* remove the existing binding: the key may already be in
