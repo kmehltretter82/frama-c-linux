@@ -500,6 +500,7 @@ function showSettingsWindow() {
       maximizable: false,
       minimizable: false,
     });
+  PreferenceWindow.setMenuBarVisibility(false);
   PreferenceWindow.show();
   PreferenceWindow.on('closed', () => { PreferenceWindow = undefined; });
 }
