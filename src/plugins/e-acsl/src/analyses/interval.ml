@@ -194,11 +194,22 @@ let meet i1 i2 = match i1, i2 with
   | Ival i1, Ival i2 ->
     Ival (Ival.meet i1 i2)
   | Float(k1, Some f1), Float(k2, Some f2) ->
-    let k = if Cil.frank k1 >= Cil.frank k2 then k2 else k1 in
-    if Float.equal f1 f2 then Float (k, Some f1) else Ival Ival.bottom
-  | Float(k, Some f), Float(_, _)
-  | Float(_,_), Float(k, Some f) ->
-    Float(k, Some f)
+    if Float.equal f1 f2 then
+      let k = if Cil.frank k1 >= Cil.frank k2 then k2 else k1 in
+      Float (k, Some f1)
+    else Ival Ival.bottom
+  | Float(k, Some f), Float(k', None)
+  | Float(k',None), Float(k, Some f) ->
+    let f_in_k' = match k' with
+      | FFloat ->
+        let minf,maxf =
+          Floating_point.most_negative_single_precision_float,
+          Floating_point.max_single_precision_float
+        in minf <= f && f <= maxf
+      | FDouble
+      | FLongDouble ->
+        true
+    in if f_in_k' then Float(k, Some f) else Ival Ival.bottom
   | Float(k1, None), Float(k2, None) ->
     let k = if Cil.frank k1 >= Cil.frank k2 then k2 else k1 in
     Float(k, None)
@@ -222,7 +233,7 @@ let meet i1 i2 = match i1, i2 with
         assert false
     end
   | Ival iv, Float(k, None)
-  | Float(k, _), Ival iv ->
+  | Float(k, None), Ival iv ->
     begin
       match Ival.min_and_max iv with
       | None, None ->
