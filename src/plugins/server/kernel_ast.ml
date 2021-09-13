@@ -37,6 +37,10 @@ let () = Request.register ~package
     ~descr:(Md.plain "Ensures that AST is computed")
     ~input:(module Junit) ~output:(module Junit) Ast.compute
 
+let ast_update_hook f =
+  Ast.add_hook_on_update f;
+  Ast.apply_after_computed (fun _ -> f ())
+
 (* -------------------------------------------------------------------------- *)
 (* ---  Printers                                                          --- *)
 (* -------------------------------------------------------------------------- *)
@@ -459,7 +463,7 @@ struct
         ~name:"functions"
         ~descr:(Md.plain "AST Functions")
         ~iter
-        ~add_reload_hook:Ast.add_hook_on_update ;
+        ~add_reload_hook:ast_update_hook
     end
 
 end

@@ -37,6 +37,10 @@ import Properties from 'frama-c/kernel/Properties';
 
 import 'frama-c/kernel/style.css';
 
+import * as Menu from 'frama-c/menu';
+
+Menu.init();
+
 /* --------------------------------------------------------------------------*/
 /* --- Frama-C Kernel Groups                                              ---*/
 /* --------------------------------------------------------------------------*/
