@@ -67,16 +67,16 @@ let rec get_assigns_from ~loc env lprofile lv =
     let var = Env.Logic_binding.get env lvar  in
     if is_ptr_free var.vtype then
       Smart_exp.lval ~loc (Cil.var var) :: get_assigns_from ~loc env lvars lv
-    (* If the argument contains a pointer, but is an integer, then it is
-       necessarily a GMP type *)
+      (* If the argument contains a pointer, but is an integer, then it is
+         necessarily a GMP type *)
     else if lvar.lv_type = Linteger then
-        (deref_gmp_arg ~loc var) :: (get_assigns_from ~loc env lvars lv)
-      else begin
-        Options.warning ~current:true "skipping function %a when generating\
-                                       assigns because pointers as arguments\
-                                       is not yet supported"
+      (deref_gmp_arg ~loc var) :: (get_assigns_from ~loc env lvars lv)
+    else begin
+      Options.warning ~current:true "skipping function %a when generating\
+                                     assigns because pointers as arguments\
+                                     is not yet supported"
         Printer.pp_logic_var lv;
-        raise NoAssigns
+      raise NoAssigns
     end
 
 (* Special case when the function takes an extra argument as its result:

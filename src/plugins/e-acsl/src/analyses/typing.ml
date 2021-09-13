@@ -605,30 +605,30 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx ?(lenv=[]) t =
           end
         | LBnone ->
           (match args with
-            | [ t1; t2; lambda ] ->
-              let anonymous =
-                Logic_const.term (TBinOp(PlusA, t2, Cil.lone ())) Linteger
-              in
-              let ty_bound = Interval.infer anonymous in
-              let ty_bound =
-                ty_of_interv (Interval.join ty_bound (Interval.infer t1))
-              in
-              ignore
-                (type_term
-                   ~use_gmp_opt:true ~arith_operand:true ~ctx:ty_bound ~lenv t1);
-              ignore
-                (type_term
-                   ~use_gmp_opt:true ~arith_operand:true ~ctx:ty_bound ~lenv t2);
-              let ty = ty_of_interv (Interval.infer t) in
-              ignore (type_term ~use_gmp_opt:true ?ctx ~lenv lambda);
-              dup ty
-            | [ ] | [ _ ] | [ _; _ ] | _ :: _ :: _ :: _ ->
-              Error.not_yet "logic functions or predicates with no definition \
+           | [ t1; t2; lambda ] ->
+             let anonymous =
+               Logic_const.term (TBinOp(PlusA, t2, Cil.lone ())) Linteger
+             in
+             let ty_bound = Interval.infer anonymous in
+             let ty_bound =
+               ty_of_interv (Interval.join ty_bound (Interval.infer t1))
+             in
+             ignore
+               (type_term
+                  ~use_gmp_opt:true ~arith_operand:true ~ctx:ty_bound ~lenv t1);
+             ignore
+               (type_term
+                  ~use_gmp_opt:true ~arith_operand:true ~ctx:ty_bound ~lenv t2);
+             let ty = ty_of_interv (Interval.infer t) in
+             ignore (type_term ~use_gmp_opt:true ?ctx ~lenv lambda);
+             dup ty
+           | [ ] | [ _ ] | [ _; _ ] | _ :: _ :: _ :: _ ->
+             Error.not_yet "logic functions or predicates with no definition \
                             nor reads clause"
-              (* TODO : improve error message to distinguish error messages
-                 corresponding to unsupported primitives and wrong application
-                 of supported primitive
-                 (one is a fatal and the other is a not_yet) *)
+             (* TODO : improve error message to distinguish error messages
+                corresponding to unsupported primitives and wrong application
+                of supported primitive
+                (one is a fatal and the other is a not_yet) *)
           )
         | LBreads _ ->
           Error.not_yet "logic functions or predicates performing read accesses"
@@ -733,11 +733,11 @@ and type_bound_variables ~loc ~lenv (t1, lv, t2) =
     | Linteger -> mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:Gmpz i)
     | Ctype ty ->
       (match Cil.unrollType ty with
-        | TInt(ik, _) -> mk_ctx ~use_gmp_opt:true (C_integer ik)
-        | ty ->
-          Options.fatal "unexpected C type %a for quantified variable %a"
-            Printer.pp_typ ty
-            Printer.pp_logic_var lv)
+       | TInt(ik, _) -> mk_ctx ~use_gmp_opt:true (C_integer ik)
+       | ty ->
+         Options.fatal "unexpected C type %a for quantified variable %a"
+           Printer.pp_typ ty
+           Printer.pp_logic_var lv)
     | lty ->
       Options.fatal "unexpected logic type %a for quantified variable %a"
         Printer.pp_logic_type lty
@@ -756,15 +756,15 @@ and type_bound_variables ~loc ~lenv (t1, lv, t2) =
       else if Interval.is_singleton_int i1 &&
               Interval.is_singleton_int i2 then
         begin
-        (* case 2 *)
-        let i = Interval.meet i ity in
-        (* We can now update the bounds in the preprocessed form
-           that come from the meet of the two intervals *)
-        let min, max = Misc.finite_min_and_max (Interval.extract_ival i) in
-        let t1 = Logic_const.tint ~loc min in
-        let t2 = Logic_const.tint ~loc max in
-        t1, t2, i
-      end else
+          (* case 2 *)
+          let i = Interval.meet i ity in
+          (* We can now update the bounds in the preprocessed form
+             that come from the meet of the two intervals *)
+          let min, max = Misc.finite_min_and_max (Interval.extract_ival i) in
+          let t1 = Logic_const.tint ~loc min in
+          let t2 = Logic_const.tint ~loc max in
+          t1, t2, i
+        end else
         (* case 3 *)
         let min, max = Misc.finite_min_and_max (Interval.extract_ival ity) in
         let guard_lower = Logic_const.tint ~loc min in

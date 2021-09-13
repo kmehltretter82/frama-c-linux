@@ -78,10 +78,8 @@ src/analyses/literal_strings.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/lscope.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/lscope.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/memory_tracking.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-src/analyses/preprocess_predicates.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-src/analyses/preprocess_predicates.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-src/analyses/preprocess_typing.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-src/analyses/preprocess_typing.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/analyses/predicate_normalizer.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/analyses/predicate_normalizer.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/memory_tracking.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/rte.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/rte.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
@@ -96,6 +94,8 @@ src/code_generator/contract.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/contract_types.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/env.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/env.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/code_generator/genassigns.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/code_generator/genassigns.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/global_observer.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/global_observer.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/gmp.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
@@ -126,8 +126,6 @@ src/code_generator/smart_exp.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/smart_exp.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/smart_stmt.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/smart_stmt.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-src/code_generator/smart_term.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-src/code_generator/smart_term.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/temporal.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/temporal.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/translate.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL

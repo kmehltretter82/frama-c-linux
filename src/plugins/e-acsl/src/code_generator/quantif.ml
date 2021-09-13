@@ -69,59 +69,30 @@ let convert kf env loc ~is_forall quantif =
   match Bound_variables.get_preprocessed_quantifier quantif with
   | None -> Error.ignored ()
   | Some (bound_vars, goal) ->
-  match has_empty_quantif_with_false_negative bound_vars, is_forall with
-  | true, true ->
-    Cil.one ~loc, env
-  | true, false ->
-    Cil.zero ~loc, env
-  | false, _ ->
-    begin
-      (* create different "initial value", "found value" and guard expression
-         for the predicate depending on the type of quantification *)
-      let init_val, found_val, mk_guard =
-        let z = zero ~loc in
-        let o = one ~loc in
-        if is_forall then o, z, fun x -> x
-        else z, o, fun e -> new_exp ~loc:e.eloc (UnOp(LNot, e, intType))
-      in
-      (* transform [bound_vars] into [lscope_var list],
-         and update logic scope in the process *)
-      let lvs_guards, env = List.fold_right
-          (fun (t1, lv, t2) (lvs_guards, env) ->
-             let lvs = Lscope.Lvs_quantif (t1, Rle, lv, Rlt, t2) in
-             let env = Env.Logic_scope.extend env lvs in
-             lvs :: lvs_guards, env)
-          bound_vars
-          ([], env)
-      in
-      let var_res, res, env =
-        (* variable storing the result of the quantifier *)
-        let name = if is_forall then "forall" else "exists" in
-        Env.new_var
-          ~loc
-          ~name
-          env
-          kf
-          None
-          intType
-          (fun v _ ->
-             let lv = var v in
-             [ Smart_stmt.assigns ~loc ~result:lv init_val ])
-      in
-      let end_loop_ref = ref dummyStmt in
-      (* innermost block *)
-      let mk_innermost_block env =
-        (* innermost loop body: store the result in [res] and go out according
-           to evaluation of the goal *)
-        let predicate_to_exp = !predicate_to_exp_ref ~adata:Assert.no_data in
-        let test, _, env = predicate_to_exp kf (Env.push env) goal in
-        let then_blk = mkBlock [ mkEmptyStmt ~loc () ] in
-        let else_blk =
-          (* use a 'goto', not a simple 'break' in order to handle 'forall' with
-             multiple binders (leading to imbricated loops) *)
-          mkBlock
-            [ Smart_stmt.assigns ~loc ~result:(var var_res) found_val;
-              mkStmt ~valid_sid:true (Goto(end_loop_ref, loc)) ]
+    match has_empty_quantif_with_false_negative bound_vars, is_forall with
+    | true, true ->
+      Cil.one ~loc, env
+    | true, false ->
+      Cil.zero ~loc, env
+    | false, _ ->
+      begin
+        (* create different "initial value", "found value" and guard expression
+           for the predicate depending on the type of quantification *)
+        let init_val, found_val, mk_guard =
+          let z = zero ~loc in
+          let o = one ~loc in
+          if is_forall then o, z, fun x -> x
+          else z, o, fun e -> new_exp ~loc:e.eloc (UnOp(LNot, e, intType))
+        in
+        (* transform [bound_vars] into [lscope_var list],
+           and update logic scope in the process *)
+        let lvs_guards, env = List.fold_right
+            (fun (t1, lv, t2) (lvs_guards, env) ->
+               let lvs = Lscope.Lvs_quantif (t1, Rle, lv, Rlt, t2) in
+               let env = Env.Logic_scope.extend env lvs in
+               lvs :: lvs_guards, env)
+            bound_vars
+            ([], env)
         in
         let var_res, res, env =
           (* variable storing the result of the quantifier *)
@@ -142,8 +113,8 @@ let convert kf env loc ~is_forall quantif =
         let mk_innermost_block env =
           (* innermost loop body: store the result in [res] and go out according
              to evaluation of the goal *)
-          let named_predicate_to_exp = !predicate_to_exp_ref in
-          let test, env = named_predicate_to_exp kf (Env.push env) goal in
+          let predicate_to_exp = !predicate_to_exp_ref ~adata:Assert.no_data in
+          let test, _, env = predicate_to_exp kf (Env.push env) goal in
           let then_blk = mkBlock [ mkEmptyStmt ~loc () ] in
           let else_blk =
             (* use a 'goto', not a simple 'break' in order to handle 'forall' with
@@ -176,7 +147,7 @@ let convert kf env loc ~is_forall quantif =
         end_loop_ref := end_loop;
         let env = Env.add_stmt env kf end_loop in
         res, env
-    end
+      end
 
 let quantif_to_exp kf env p =
   let loc = p.pred_loc in

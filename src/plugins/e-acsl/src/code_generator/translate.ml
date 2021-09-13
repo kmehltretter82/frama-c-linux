@@ -846,8 +846,8 @@ and term_to_exp ~adata kf env t =
   let generate_rte = Env.generate_rte env in
   Options.feedback ~dkey ~level:4 "translating term %a (rte? %b)in local \
                                    environment '%a'"
-  Printer.pp_term t generate_rte Typing.Functions_params_ty.pretty
-  (Env.Local_vars.get env);
+    Printer.pp_term t generate_rte Typing.Function_params_ty.pretty
+    (Env.Local_vars.get env);
   Extlib.flatten
     (Env.with_rte_and_result env false
        ~f:(fun env ->
@@ -1149,9 +1149,9 @@ and predicate_content_to_exp ~adata ?name kf env p =
       let adata, env = Assert.register_pred ~loc kf env p e adata in
       e, adata, env
     in
-      (* we already transformed \valid(t) into \initialized(&t) && \valid(t):
-         now convert this right-most valid. *)
-      call_valid ~adata t p
+    (* we already transformed \valid(t) into \initialized(&t) && \valid(t):
+       now convert this right-most valid. *)
+    call_valid ~adata t p
   | Pvalid _ -> Env.not_yet env "labeled \\valid"
   | Pvalid_read _ -> Env.not_yet env "labeled \\valid_read"
   | Pseparated tlist ->

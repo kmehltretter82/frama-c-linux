@@ -78,7 +78,7 @@ module Quantified_predicate =
 (****************************************************************************)
 
 (* Memoization module to store the preprocessed form of a quantified predicate
-   *)
+*)
 module Quantifier: sig
   val add: predicate -> (term * logic_var * term) list -> predicate -> unit
   val get: predicate -> ((term * logic_var * term) list * predicate) option
