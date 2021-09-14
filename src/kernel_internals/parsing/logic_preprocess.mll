@@ -43,7 +43,7 @@
     "__STDC_UTF_16__"; "__STDC_UTF_32__";
     (* 6.10.8.3 conditional feature macros *)
     "__STDC_ANALYZABLE__"; "__STDC_IEC_559__"; "__STDC_IEC_559_COMPLEX__";
-    "__STDC_LIB_EXT1__"; "__STD_NO_ATOMICS__"; "__STD_NO_COMPLEX__";
+    "__STDC_LIB_EXT1__"; "__STDC_NO_ATOMICS__"; "__STDC_NO_COMPLEX__";
     "__STDC_NO_THREADS__"; "__STDC_NO_VLA__";
     (* expanding assert, an ACSL keyword, is not a good idea. *)
     "assert";
