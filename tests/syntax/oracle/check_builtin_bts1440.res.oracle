@@ -973,9 +973,15 @@
   
   int max(int i, int j)
   {
+    /* Locals: tmp */
     int tmp;
-    
-    if (i >= j) tmp = i; else tmp = j;
+    ;
+    if (i >= j) {
+      tmp = i;
+    }
+    else {
+      tmp = j;
+    }
     return tmp;
   }
 [kernel:file:annotation] Marking properties

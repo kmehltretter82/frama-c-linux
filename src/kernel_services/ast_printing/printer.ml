@@ -96,7 +96,6 @@ class printer_with_annot () = object (self)
 
   method! reset () =
     super#reset ();
-    verbose <- Kernel.debug_atleast 1;
     declared_globs <- Cil_datatype.Varinfo.Set.empty;
     print_spec <- false
 

@@ -59,7 +59,6 @@ let () = Db.Main.play := play_analysis
 
 (* Main: let's go! *)
 let () =
-  Cil_printer.state.Printer_api.print_cil_as_is <- Kernel.debug_atleast 1;
   Sys.catch_break true;
   let f () =
     ignore (Project.create "default");
