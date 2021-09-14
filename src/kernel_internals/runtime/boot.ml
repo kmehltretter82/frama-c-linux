@@ -36,13 +36,7 @@ let play_analysis () =
     Db.Main.apply ();
     Log.treat_deferred_error ();
     (* Printing code, if required, have to be done at end. *)
-    if Kernel.PrintCode.get ()
-    then begin
-      (* Consider user's request, if any, to print code as given by Cil. *)
-      Cil_printer.state.Printer_api.print_cil_as_is <-
-        Cil_printer.state.Printer_api.print_cil_as_is || Kernel.PrintAsIs.get ();
-      File.pretty_ast ();
-    end;
+    if Kernel.PrintCode.get () then File.pretty_ast ();
     (* Easier to handle option -set-project-as-default at the last moment:
        no need to worry about nested [Project.on] *)
     Project.set_keep_current (Kernel.Set_project_as_default.get ());
