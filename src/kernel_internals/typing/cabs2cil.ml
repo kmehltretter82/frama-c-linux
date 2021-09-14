@@ -1838,9 +1838,19 @@ struct
              { c1 with
                locals = c1.locals @ ll ;
                statics = c1.statics @ ls })
-        | [{skind = UnspecifiedSequence l},_,_,_,_]
+        | [{skind = UnspecifiedSequence l} as s,_,_,_,_]
           when c1.unspecified_order ->
-          { stmts = List.rev_append l c1.stmts;
+          let stmts =
+            match l, s.labels with
+            | [],[] -> []
+            | [], _ ->
+              let s' = mkStmtOneInstr (Skip (Cil_datatype.Stmt.loc s)) in
+              s'.labels <- s.labels;
+              [s,[],[],[],[]]
+            | (h,_,_,_,_)::_, _ ->
+              h.labels <- h.labels @ s.labels; l
+          in
+          { stmts = List.rev_append stmts c1.stmts;
             cases = c1.cases @ c2.cases;
             locals = c1.locals @ c2.locals;
             statics = c1.statics @ c2.statics;
