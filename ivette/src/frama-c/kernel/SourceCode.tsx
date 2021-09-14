@@ -33,14 +33,13 @@ import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 import { TitleBar } from 'ivette';
 import * as Preferences from 'ivette/prefs';
-import { functions, markerInfo, source } from 'frama-c/api/kernel/ast';
+import { functions, markerInfo } from 'frama-c/api/kernel/ast';
+import { Code } from 'dome/controls/labels';
+import { Hfill } from 'dome/layout/boxes';
 
 import 'codemirror/addon/selection/active-line';
 import 'codemirror/addon/dialog/dialog.css';
-import 'codemirror/addon/dialog/dialog';
 import 'codemirror/addon/search/searchcursor';
-import 'codemirror/addon/search/search';
-import 'codemirror/addon/search/jump-to-line';
 
 // --------------------------------------------------------------------------
 // --- Pretty Printing (Browser Console)
@@ -52,13 +51,28 @@ const D = new Dome.Debug('Source Code');
 // --- Source Code Printer
 // --------------------------------------------------------------------------
 
+// The SourceCode component, producing the GUI part showing the source code
+// corresponding to the selected function. It should be async, as reading a file
+// returns a Promise, but we cannot do that.
 export default function SourceCode() {
 
   // Hooks
-  const buffer = React.useMemo(() => new RichTextBuffer(), []);
+  const [buffer] = React.useState(new RichTextBuffer());
   const [selection] = States.useSelection();
   const theFunction = selection?.current?.fct;
   const theMarker = selection?.current?.marker;
+  const markersInfo = States.useSyncArray(markerInfo);
+  const functionsData = States.useSyncArray(functions).getArray();
+
+  // Retrieving the file name and the line number from the selection and the
+  // synchronized tables.
+  const sloc =
+    (theMarker && markersInfo.getData(theMarker)?.sloc) ??
+    (theFunction && functionsData.find((e) => e.name === theFunction)?.sloc);
+  const path = sloc ? sloc.file : '';
+  const line = sloc ? sloc.line : 0;
+
+  // Title bar buttons, along with the parameters for our text.
   const { buttons: themeButtons, theme, fontSize, wrapText } =
     Preferences.useThemeButtons({
       target: 'Source Code',
@@ -68,46 +82,19 @@ export default function SourceCode() {
       disabled: !theFunction,
     });
 
-  const markersInfo = States.useSyncArray(markerInfo);
-  const functionsData = States.useSyncArray(functions).getArray();
+  // Updating the buffer content.
+  const errorMsg = () => { D.error(`Fail to load source code file ${path}`); };
+  const onError = () => { if (path) errorMsg(); };
+  const setValue = (text: string) => buffer.setValue(text);
+  const setCursor = () => buffer.forEach((cm) => cm.setCursor(line - 1));
+  Dome.usePromise(readFile(path).then(setValue).then(setCursor).catch(onError));
 
-  const currentFile = React.useRef<string>();
-
-  React.useEffect(() => {
-    // Async source file loading and jump to line/location.
-    async function loadSourceCode(sloc?: source) {
-      if (sloc) {
-        const { file, line } = sloc;
-        try {
-          if (file !== currentFile.current) {
-            currentFile.current = file;
-            const content = await readFile(file);
-            buffer.setValue(content);
-          }
-          buffer.forEach((cm) => { cm.setCursor(line - 1); });
-        } catch (err) {
-          D.error(`Fail to load source code file ${file}.`);
-        }
-      }
-    }
-    // Actual source code loading upon function or marker update.
-    const sloc =
-      /* markers have more precise source location */
-      (theMarker && markersInfo.getData(theMarker)?.sloc)
-      ??
-      (theFunction && functionsData.find((e) => e.name === theFunction)?.sloc);
-    if (sloc) {
-      loadSourceCode(sloc);
-    } else {
-      currentFile.current = undefined;
-      buffer.clear();
-    }
-  }, [buffer, functionsData, markersInfo, theFunction, theMarker]);
-
-  // Component
+  // Building the React component.
   return (
     <>
       <TitleBar>
+        <Code title={path}>{path}</Code>
+        <Hfill />
         {themeButtons}
       </TitleBar>
       <Text
