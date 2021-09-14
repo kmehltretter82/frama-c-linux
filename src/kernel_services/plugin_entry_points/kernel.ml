@@ -665,6 +665,17 @@ module PrintCode =
 
 let () = Parameter_customize.set_group inout_source
 let () = Parameter_customize.do_not_projectify ()
+module PrintAsIs =
+  False
+    (struct
+      let module_name = "PrintAsIs"
+      let option_name = "-print-as-is"
+      let help = "when pretty-printing C code, try to print it as close as \
+                  possible to the internal (Cil) representation"
+    end)
+
+let () = Parameter_customize.set_group inout_source
+let () = Parameter_customize.do_not_projectify ()
 module PrintComments =
   False
     (struct

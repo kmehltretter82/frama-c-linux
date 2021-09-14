@@ -35,7 +35,7 @@ let play_analysis () =
   try
     Db.Main.apply ();
     Log.treat_deferred_error ();
-    (* Printing code if required, have to be done at end *)
+    (* Printing code, if required, have to be done at end. *)
     if Kernel.PrintCode.get () then File.pretty_ast ();
     (* Easier to handle option -set-project-as-default at the last moment:
        no need to worry about nested [Project.on] *)
@@ -59,7 +59,6 @@ let () = Db.Main.play := play_analysis
 
 (* Main: let's go! *)
 let () =
-  Cil_printer.state.Printer_api.print_cil_as_is <- Kernel.debug_atleast 1;
   Sys.catch_break true;
   let f () =
     ignore (Project.create "default");

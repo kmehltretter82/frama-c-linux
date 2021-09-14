@@ -290,6 +290,10 @@ module Time: Parameter_sig.String
 module PrintCode : Parameter_sig.Bool
 (** Behavior of option "-print" *)
 
+module PrintAsIs : Parameter_sig.Bool
+(** Behavior of option "-print-as-is"
+    @since Frama-C+dev *)
+
 module PrintMachdep : Parameter_sig.Bool
 (** Behavior of option "-print-machdep"
     @since Phosphorus-20170501-beta1 *)

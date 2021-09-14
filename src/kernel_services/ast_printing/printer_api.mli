@@ -369,7 +369,7 @@ type state =
     (** Whether to print the CIL as they are, without trying to be smart and
         print nicer code. Normally this is false, in which case the pretty
         printer will turn the while(1) loops of CIL into nicer loops, will not
-        print empty "else" blocks, etc. These is one case however in which if
+        print empty "else" blocks, etc. There is one case however in which if
         you turn this on you will get code that does not compile: if you use
         varargs the __builtin_va_arg function will be printed in its internal
         form. *)

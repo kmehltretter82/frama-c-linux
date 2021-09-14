@@ -522,7 +522,15 @@ class cil_printer () = object (self)
 
   val mutable logic_printer_enabled = true
 
-  method reset () = ()
+  val mutable verbose = false
+  (* Do not add a value that depends on a
+     non-constant variable of the kernel here (e.g. [Kernel.Debug.get ()]). Due
+     to the way the pretty-printing class is instantiated, this value would be
+     evaluated too soon. Override the [reset] method instead. *)
+
+  method reset () =
+    verbose <- Kernel.debug_atleast 1;
+    state.print_cil_as_is <- Kernel.debug_atleast 1 || Kernel.PrintAsIs.get()
 
   method pp_keyword fmt s = pp_print_string fmt s
   method pp_acsl_keyword = self#pp_keyword
@@ -545,12 +553,6 @@ class cil_printer () = object (self)
     in
     (if block then Pretty_utils.pp_close_block else Format.fprintf)
       fmt "%(%)" suf
-
-  val mutable verbose = false
-  (* Do not add a value that depends on a
-     non-constant variable of the kernel here (e.g. [Kernel.Debug.get ()]). Due
-     to the way the pretty-printing class is instantiated, this value would be
-     evaluated too soon. Override the [reset] method instead. *)
 
   (* indicates whether we are printing ghost elements *)
   val mutable is_ghost = false
