@@ -518,6 +518,27 @@ export function useUpdate(...events: Event<any>[]) {
   });
 }
 
+/**
+   Hook to re-render when a Promise returns.
+   The promise will be typically created by using `React.useMemo()`.
+   The hook returns three informations:
+   - result: the promise result if it succeeds, undefined otherwise;
+   - error: the promise error if it fails, undefined otherwise;
+   - loading: the promise status, true if the promise is still running.
+*/
+export function usePromise<T>(job: Promise<T>) {
+  const [result, setResult] = React.useState<T | undefined>();
+  const [error, setError] = React.useState<Error | undefined>();
+  const [loading, setLoading] = React.useState(true);
+  React.useEffect(() => {
+    let cancel = false;
+    const term = (a: any) => { if (!cancel) { setLoading(false); return a; } };
+    job.then(term(setResult), term(setError));
+    return () => { cancel = true; };
+  }, [job]);
+  return { result, error, loading };
+}
+
 // --------------------------------------------------------------------------
 // --- Timer Hooks
 // --------------------------------------------------------------------------
