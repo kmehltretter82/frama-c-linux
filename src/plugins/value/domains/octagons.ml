@@ -176,20 +176,32 @@ let _pretty_octagon fmt octagon =
    Use Ival.t to evaluate expressions. *)
 module Rewriting = struct
 
+  let overflow_alarm range =
+    if range.Eval_typ.i_signed
+    then Kernel.SignedOverflow.get ()
+    else Kernel.UnsignedOverflow.get ()
+
+  let downcast_alarm range =
+    if range.Eval_typ.i_signed
+    then Kernel.SignedDowncast.get ()
+    else Kernel.UnsignedDowncast.get ()
+
   (* Checks if the interval [ival] fits in the C type [typ].
      This is used to ensure that an expression cannot overflow: this module
      uses the mathematical semantics of arithmetic operations, and cannot
      soundly translate overflows in the C semantics.  *)
-  let may_overflow typ ival =
+  let may_overflow ?(cast=false) typ ival =
     let open Eval_typ in
     match classify_as_scalar typ with
     | None -> assert false (* This should not happen here. *)
     | Some (TSFloat _) -> false
     | Some (TSInt range | TSPtr range) ->
-      not
-        ((range.i_signed && Kernel.SignedOverflow.get ()) ||
-         (not range.i_signed && Kernel.UnsignedOverflow.get ()) ||
-         Ival.is_included ival (Arith.make_range range))
+      let alarm =
+        if cast
+        then downcast_alarm range
+        else overflow_alarm range
+      in
+      not (alarm || Ival.is_included ival (Arith.make_range range))
 
   (* Simplified form [±X-coeff] for expressions,
      where X is a variable and coeff an interval. *)
@@ -264,7 +276,7 @@ module Rewriting = struct
     | CastE (typ, e) ->
       if Cil.(isIntegralType typ && isIntegralType (typeOf e)) then
         evaluate e >> fun v ->
-        if may_overflow typ v then [] else rewrite evaluate e
+        if may_overflow ~cast:true typ v then [] else rewrite evaluate e
       else []
 
     | Info (e, _) -> rewrite evaluate e
