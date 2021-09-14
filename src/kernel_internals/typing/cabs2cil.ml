@@ -9951,7 +9951,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
       let s'' = consLabContinue ~ghost se3 in
       let break_cond = breakChunk ~ghost loc' in
       exitLoop ();
-      let c = (s' @@ (s'', ghost)) in
+      let c = s' @@ (s'', ghost) in
       let c =
         match e2.expr_node with
         | Cabs.NOTHING -> (* This means true *)
