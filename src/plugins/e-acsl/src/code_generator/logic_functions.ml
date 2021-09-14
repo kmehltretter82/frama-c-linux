@@ -91,7 +91,6 @@ let generate_return_block ~loc env ret_vi e = match e.enode with
 
 (* Generate the function's body for predicates. *)
 let pred_to_block ~loc kf env ret_vi p =
-  Typing.type_named_predicate ~must_clear:false p;
   let e, _, env = !predicate_to_exp_ref ~adata:Assert.no_data kf env p in
   (* for predicate, since the result is either 0 or 1, return it directly (it
      cannot be provided as extra argument *)
@@ -99,10 +98,6 @@ let pred_to_block ~loc kf env ret_vi p =
 
 (* Generate the function's body for terms. *)
 let term_to_block ~loc kf env ret_ty ret_vi t =
-  Typing.type_term
-    ~use_gmp_opt:false
-    ~ctx:(Typing.number_ty_of_typ ~post:false ret_ty)
-    t;
   let e, _, env = !term_to_exp_ref ~adata:Assert.no_data kf env t in
   if Cil.isVoidType ret_ty then
     (* if the function's result is a GMP, it is the first parameter of the
@@ -121,18 +116,14 @@ let term_to_block ~loc kf env ret_ty ret_vi t =
     generate_return_block ~loc env ret_vi e
 
 let generate_body ~loc kf env ret_ty ret_vi = function
-  | LBnone | LBreads _ ->
-    Options.abort
-      "logic function or predicate without explicit definition are not part of \
-       E-ACSL"
   | LBterm t -> term_to_block ~loc kf env ret_ty ret_vi t
   | LBpred p -> pred_to_block ~loc kf env ret_vi p
-  | LBinductive _ -> Error.not_yet "inductive definition"
+  | LBnone |LBreads _ | LBinductive _ -> assert false
 
 (* Generate a kernel function from a given logic info [li] *)
 let generate_kf ~loc fname env ret_ty params_ty li =
   (* build the formal parameters *)
-  let params, params_ty =
+  let params, params_ty_vi =
     List.fold_right2
       (fun lvi pty (params, params_ty) ->
          let ty = match pty with
@@ -156,15 +147,16 @@ let generate_kf ~loc fname env ret_ty params_ty li =
       ([], [])
   in
   (* build the varinfo storing the result *)
+  let res_as_extra_arg = result_as_extra_argument ret_ty in
   let ret_vi, ret_ty, params_with_ret, params_ty_with_ret =
     let vname = "__retres" in
-    if result_as_extra_argument ret_ty then
+    if res_as_extra_arg then
       let ret_ty_ptr = TPtr(ret_ty, []) (* call by reference *) in
       let vname = vname ^ "_arg" in
       let vi = Cil.makeVarinfo false true vname ret_ty_ptr in
-      vi, Cil.voidType, vi :: params, (vname, ret_ty_ptr, []) :: params_ty
+      vi, Cil.voidType, vi :: params, (vname, ret_ty_ptr, []) :: params_ty_vi
     else
-      Cil.makeVarinfo false false vname ret_ty, ret_ty, params, params_ty
+      Cil.makeVarinfo false false vname ret_ty, ret_ty, params, params_ty_vi
   in
   (* build the function's varinfo *)
   let vi =
@@ -194,7 +186,8 @@ let generate_kf ~loc fname env ret_ty params_ty li =
   (* register the definition *)
   Globals.Functions.replace_by_definition spec fundec loc;
   (* create the kernel function itself *)
-  let kf = { fundec = Definition(fundec, loc); spec } in
+  let kf = Globals.Functions.get fundec.svar in
+  Annotations.register_funspec ~emitter:Options.emitter kf;
   (* closure generating the function's body.
      Delay its generation after filling the memoisation table (for termination
      of recursive function calls) *)
@@ -202,6 +195,16 @@ let generate_kf ~loc fname env ret_ty params_ty li =
     let env = Env.push env in
     (* fill the typing environment with the function's parameters
        before generating the code (code generation invokes typing) *)
+    let env = Env.Local_vars.push_new env in
+    let env =
+      let add ty env =
+        Env.Local_vars.add env ty
+      in
+      (* The list of parameters has to respect the order of the parameters to
+         keep consistency with the typing. Hence the folding is on the right.
+         This is acceptable since in practice functions have few parameters *)
+      List.fold_right add params_ty env
+    in
     let env =
       let add env lvi vi =
         let i = Interval.interv_of_typ vi.vtype in
@@ -210,6 +213,35 @@ let generate_kf ~loc fname env ret_ty params_ty li =
       in
       List.fold_left2 add env li.l_profile params
     in
+    let assigns_from =
+      try Some (Genassigns.get_assigns_from ~loc env li.l_profile li.l_var_info)
+      with Genassigns.NoAssigns -> None
+    in
+    let assigned_var =
+      Logic_const.new_identified_term
+        (if res_as_extra_arg then
+           Logic_utils.expr_to_term (Genassigns.get_gmp_integer ~loc ret_vi)
+         else
+           Logic_const.tresult fundec.svar.vtype)
+    in
+    begin
+      match assigns_from with
+      | None -> ()
+      | Some assigns_from ->
+        let assigns_from =
+          List.map
+            (fun e ->
+               Logic_const.new_identified_term
+                 (Logic_utils.expr_to_term e))
+            assigns_from
+        in
+        Annotations.add_assigns
+          ~keep_empty:false
+          Options.emitter
+          ~behavior:Cil.default_behavior_name
+          kf
+          (Writes [ assigned_var , From assigns_from]);
+    end;
     let b, env = generate_body ~loc kf env ret_ty ret_vi li.l_body in
     fundec.sbody <- b;
     (* add the generated variables in the necessary lists *)
@@ -217,7 +249,10 @@ let generate_kf ~loc fname env ret_ty params_ty li =
        [add_generated_variables_in_function] in the main visitor *)
     let vars =
       let l = Env.get_generated_variables env in
-      if ret_vi.vdefined then (ret_vi, Env.LFunction kf) :: l else l
+      if ret_vi.vdefined then
+        (ret_vi, Env.LFunction kf) :: l
+      else
+        l
     in
     let locals, blocks =
       List.fold_left
@@ -244,15 +279,10 @@ let generate_kf ~loc fname env ret_ty params_ty li =
 (***************************** Memoization ********************************)
 (**************************************************************************)
 
-module Params_ty =
-  Datatype.List_with_collections
-    (Typing.Datatype)
-    (struct let module_name = "E_ACSL.Logic_functions.Params_ty" end)
-
 (* for each logic_info, associate its possible profiles, i.e. the types of its
    parameters + the generated varinfo for the function *)
 let memo_tbl:
-  kernel_function Params_ty.Hashtbl.t Logic_info.Hashtbl.t
+  kernel_function Typing.Function_params_ty.Hashtbl.t Logic_info.Hashtbl.t
   = Logic_info.Hashtbl.create 7
 
 let reset () = Logic_info.Hashtbl.clear memo_tbl
@@ -271,7 +301,12 @@ let add_generated_functions globals =
            GFunDecl(Cil.empty_funspec (), Kernel_function.get_vi kf, loc)
            :: acc
          in
-         aux (Params_ty.Hashtbl.fold_sorted (fun _ -> add_fundecl) params acc) l
+         aux
+           (Typing.Function_params_ty.Hashtbl.fold_sorted
+              (fun _ -> add_fundecl)
+              params
+              acc)
+           l
        with Not_found ->
          aux acc l)
     | g :: l ->
@@ -288,7 +323,8 @@ let add_generated_functions globals =
   in
   let rev_globals =
     Logic_info.Hashtbl.fold_sorted
-      (fun _ -> Params_ty.Hashtbl.fold_sorted (fun _ -> add_fundec))
+      (fun _ -> Typing.Function_params_ty.Hashtbl.fold_sorted
+          (fun _ -> add_fundec))
       memo_tbl
       rev_globals
   in
@@ -297,10 +333,10 @@ let add_generated_functions globals =
 (* Generate (and memoize) the function body and create the call to the
    generated function. *)
 let function_to_exp ~loc fname env kf t li params_ty args =
-  let ret_ty = Typing.get_typ t in
+  let ret_ty = Typing.get_typ ~lenv:(Env.Local_vars.get env) t in
   let gen tbl =
     let vi, kf, gen_body = generate_kf fname ~loc env ret_ty params_ty li in
-    Params_ty.Hashtbl.add tbl params_ty kf;
+    Typing.Function_params_ty.Hashtbl.add tbl params_ty kf;
     vi, gen_body
   in
   (* memoise the function's varinfo *)
@@ -308,12 +344,12 @@ let function_to_exp ~loc fname env kf t li params_ty args =
     try
       let h = Logic_info.Hashtbl.find memo_tbl li in
       try
-        let kf = Params_ty.Hashtbl.find h params_ty in
+        let kf = Typing.Function_params_ty.Hashtbl.find h params_ty in
         Kernel_function.get_vi kf,
         (fun () -> ()) (* body generation already planified *)
       with Not_found -> gen h
     with Not_found ->
-      let h = Params_ty.Hashtbl.create 7 in
+      let h = Typing.Function_params_ty.Hashtbl.create 7 in
       Logic_info.Hashtbl.add memo_tbl li h;
       gen h
   in
@@ -355,58 +391,39 @@ let function_to_exp ~loc fname env kf t li params_ty args =
     ret_ty
     (fun vi _ -> [ Cil.mkStmtOneInstr ~valid_sid:true (mkcall vi) ])
 
+let raise_errors l = function
+  | LBnone ->
+    Error.not_yet
+      "logic functions or predicates with no definition nor reads clause"
+  | LBreads _ ->
+    Error.not_yet "logic functions or predicates performing read accesses"
+  | LBinductive _ -> Error.not_yet "inductive logic functions"
+  | LBterm _
+  | LBpred _ ->
+    match l with
+    | [] -> ()
+    | _::_ -> Error.not_yet "logic functions or predicates with labels"
+
 let tapp_to_exp ~adata kf env ?eargs tapp =
   match tapp.term_node with
-  | Tapp(li, [], targs) ->
+  | Tapp(li, l, targs) ->
     let loc = tapp.term_loc in
     let fname = li.l_var_info.lv_name in
     (* build the varinfo (as an expression) which stores the result of the
        function call. *)
     let _, e, adata, env =
       if Builtins.mem li.l_var_info.lv_name then
-        (* E-ACSL built-in function call *)
-        let args, adata, env =
-          match eargs with
-          | None ->
-            List.fold_right
-              (fun targ (l, adata, env) ->
-                 let e, adata, env = !term_to_exp_ref ~adata kf env targ in
-                 e :: l, adata, env)
-              targs
-              ([], adata, env)
-          | Some eargs ->
-            if List.compare_lengths targs eargs != 0 then
-              Options.fatal
-                "[Tapp] unexpected number of arguments when calling %s"
-                fname;
-            eargs, adata, env
-        in
-        let vi, e, env =
-          Env.new_var
-            ~loc
-            ~name:(fname ^ "_app")
-            env
-            kf
-            (Some tapp)
-            (Misc.cty (Option.get li.l_type))
-            (fun vi _ ->
-               [ Smart_stmt.rtl_call ~loc
-                   ~result:(Cil.var vi)
-                   ~prefix:""
-                   fname
-                   args ])
-        in
-        vi, e, adata, env
-      else
-        (* build the arguments and compute the integer_ty of the parameters *)
-        let params_ty, args, adata, env =
-          let eargs, adata, env =
+        match l with
+        | _::_ -> Error.not_yet "E-ACSL built-in functions with labels"
+        | [] ->
+          (* E-ACSL built-in function call *)
+          let args, adata, env =
             match eargs with
             | None ->
               List.fold_right
-                (fun targ (eargs, adata, env) ->
+                (fun targ (l, adata, env) ->
                    let e, adata, env = !term_to_exp_ref ~adata kf env targ in
-                   e :: eargs, adata, env)
+                   e :: l, adata, env)
                 targs
                 ([], adata, env)
             | Some eargs ->
@@ -416,39 +433,81 @@ let tapp_to_exp ~adata kf env ?eargs tapp =
                   fname;
               eargs, adata, env
           in
-          try
-            List.fold_right2
-              (fun targ earg (params_ty, args, adata, env) ->
-                 let param_ty = Typing.get_number_ty targ in
-                 let e, env =
-                   try
-                     let ty = Typing.typ_of_number_ty param_ty in
-                     Typed_number.add_cast
-                       ~loc
-                       env
-                       kf
-                       (Some ty)
-                       Typed_number.C_number
-                       (Some targ)
-                       earg
-                   with Typing.Not_a_number ->
-                     earg, env
-                 in
-                 param_ty :: params_ty, e :: args, adata, env)
-              targs eargs
-              ([], [], adata, env)
-          with Invalid_argument _ ->
-            Options.fatal
-              "[Tapp] unexpected number of arguments when calling %s"
-              fname
-        in
-        let gen_fname =
-          Varname.get ~scope:Varname.Global (Functions.RTL.mk_gen_name fname)
-        in
-        let vi, e, env =
-          function_to_exp ~loc gen_fname env kf tapp li params_ty args
-        in
-        vi, e, adata, env
+          let vi, e, env =
+            Env.new_var
+              ~loc
+              ~name:(fname ^ "_app")
+              env
+              kf
+              (Some tapp)
+              (Misc.cty (Option.get li.l_type))
+              (fun vi _ ->
+                 [ Smart_stmt.rtl_call ~loc
+                     ~result:(Cil.var vi)
+                     ~prefix:""
+                     fname
+                     args ])
+          in
+          vi, e, adata, env
+      else
+        begin
+          raise_errors l li.l_body;
+          (* build the arguments and compute the integer_ty of the parameters *)
+          let params_ty, args, adata, env =
+            let eargs, adata, env =
+              match eargs with
+              | None ->
+                List.fold_right
+                  (fun targ (eargs, adata, env) ->
+                     let e, adata, env = !term_to_exp_ref ~adata kf env targ in
+                     e :: eargs, adata, env)
+                  targs
+                  ([], adata, env)
+              | Some eargs ->
+                if List.compare_lengths targs eargs != 0 then
+                  Options.fatal
+                    "[Tapp] unexpected number of arguments when calling %s"
+                    fname;
+                eargs, adata, env
+            in
+            try
+              List.fold_right2
+                (fun targ earg (params_ty, args, adata, env) ->
+                   let param_ty =
+                     Typing.get_number_ty
+                       ~lenv:(Env.Local_vars.get env)
+                       targ
+                   in
+                   let e, env =
+                     try
+                       let ty = Typing.typ_of_number_ty param_ty in
+                       Typed_number.add_cast
+                         ~loc
+                         env
+                         kf
+                         (Some ty)
+                         Typed_number.C_number
+                         (Some targ)
+                         earg
+                     with Typing.Not_a_number ->
+                       earg, env
+                   in
+                   param_ty :: params_ty, e :: args, adata, env)
+                targs eargs
+                ([], [], adata ,env)
+            with Invalid_argument _ ->
+              Options.fatal
+                "[Tapp] unexpected number of arguments when calling %s"
+                fname
+          in
+          let gen_fname =
+            Varname.get ~scope:Varname.Global (Functions.RTL.mk_gen_name fname)
+          in
+          let vi, e, env =
+            function_to_exp ~loc gen_fname env kf tapp li params_ty args
+          in
+          vi, e, adata, env
+        end
     in
     e, adata, env
   | _ ->

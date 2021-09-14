@@ -25,11 +25,19 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-* E-ACSL       [2021-09-13] Fix unsound reuse of previously typed recursive
+		functions (frama-c/e-acsl#177)
 -  E-ACSL       [2021-08-03] Correct monitoring of code depending on libc
                 function calls that write memory locations (frama-c/e-acsl#157).
 -* E-ACSL       [2021-07-30] Fix incorrect evaluation of quantified
                 predicates when a strict guard overlaps with the type of the
                 bound variable (unlikely in practice) (frama-c/e-acsl#149).
+-* E-ACSL       [2021-07-19] Fix crash occurring when two or more successive
+                logic coercions were done in a term (frama-c/e-acsl#172).
+-* E-ACSL       [2021-07-19] Fix crash when raising some user errors
+                (frama-c/e-acsl#170).
+-* E-ACSL       [2021-07-16] Fix crash when using some built-in labels
+                (frama-c/e-acsl#173).
 -  E-ACSL       [2021-07-06] Add support for the extended quantifier \sum.
 -* E-ACSL       [2021-06-22] Fix a crash that occured when using certain
                 combinations of nested blocks and annotations.

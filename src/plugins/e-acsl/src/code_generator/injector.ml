@@ -212,6 +212,9 @@ let add_new_block_in_stmt env kf stmt =
           stmt.ghost <- false;
           (* translate potential RTEs of ghost code *)
           let rtes = Rte.stmt ~warn:false kf stmt in
+          List.iter
+            (Typing.preprocess_rte ~lenv:(Env.Local_vars.get env))
+            rtes;
           Translate.translate_rte_annots Printer.pp_stmt stmt kf env rtes
         end else
           env
@@ -849,6 +852,7 @@ let reset_all ast =
   Literal_strings.reset ();
   Global_observer.reset ();
   Bound_variables.clear_guards ();
+  Predicate_normalizer.clear ();
   Typing.clear ();
   (* reset some kernel states: *)
   (* reset the CFG that has been heavily modified by the code generation step *)
@@ -859,11 +863,24 @@ let reset_all ast =
   Ast.mark_as_grown ()
 
 let inject () =
-  Options.feedback ~level:2
-    "injecting annotations as code in project %a"
-    Project.pretty (Project.current ());
   Gmp_types.init ();
   let ast = Ast.get () in
+  let current_project = Project.current() in
+  Options.feedback ~level:2
+    "preprocessing annotations in project %a"
+    Project.pretty current_project;
+  Predicate_normalizer.preprocess ast;
+  Options.feedback ~level:2
+    "normalizing quantifiers in project %a"
+    Project.pretty current_project;
+  Bound_variables.preprocess ast;
+  Options.feedback ~level:2
+    "typing annotations in project %a"
+    Project.pretty current_project;
+  Typing.type_program ast;
+  Options.feedback ~level:2
+    "injecting annotations as code in project %a"
+    Project.pretty current_project;
   inject_in_file ast;
   reset_all ast;
 

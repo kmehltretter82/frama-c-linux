@@ -1,4 +1,2 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] tests/bts/issue-eacsl-149.c:4: Warning: 
-  signed overflow. assert (unsigned int)((int)(-1)) + 1 ≤ 2147483647;

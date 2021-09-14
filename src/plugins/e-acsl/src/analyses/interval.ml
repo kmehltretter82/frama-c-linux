@@ -111,6 +111,12 @@ let is_included i1 i2 = match i1, i2 with
   | Rational, (Ival _ | Float _) ->
     false
 
+let widen = function
+  | Ival iv ->
+    let min, max = Ival.min_and_max iv in
+    Ival (Ival.inject_range min max)
+  | Float _ | Rational | Real | Nan as i -> i
+
 let lift_unop f = function
   | Ival iv -> Ival (f iv)
   | Float _ ->
@@ -120,18 +126,32 @@ let lift_unop f = function
   | Rational | Real | Nan as i ->
     i
 
-let lift_binop ~safe_float f i1 i2 = match i1, i2 with
+let lift_arith_binop f i1 i2 = match i1, i2 with
+  | Ival i1, Ival i2 ->
+    Ival (f i1 i2)
+  | (Ival _ | Float _), Float _
+  | Float _, Ival _
+  | (Ival _ | Float _ | Rational), Rational
+  | Rational, (Ival _ | Float _) ->
+    Rational
+  | (Ival _ | Float _ | Rational | Real), Real
+  | Real, (Ival _ | Float _ | Rational) ->
+    Real
+  | (Ival _ | Float _ | Rational | Real | Nan), Nan
+  | Nan, (Ival _ | Float _ | Rational | Real) ->
+    Nan
+
+let join i1 i2 = match i1, i2 with
   | Ival iv, i when Ival.is_bottom iv -> i
   | i, Ival iv when Ival.is_bottom iv -> i
   | Ival i1, Ival i2 ->
-    Ival (f i1 i2)
-  | Float(k1, _), Float(k2, _) when safe_float ->
-    let k = if Stdlib.compare k1 k2 >= 0 then k1 else k2 in
+    Ival (Ival.join i1 i2)
+  | Float(k1, _), Float(k2, _) ->
+    let k = if Cil.frank k1 >= Cil.frank k2 then k1 else k2 in
     Float(k, None (* lost value, if any before *))
   | Ival iv, Float(k, _)
   | Float(k, _), Ival iv ->
-    if safe_float
-    then
+    begin
       match Ival.min_and_max iv with
       | None, None ->
         (* unbounded integers *)
@@ -157,8 +177,7 @@ let lift_binop ~safe_float f i1 i2 = match i1, i2 with
            Rational)
       | None, Some _ | Some _, None ->
         assert false
-    else
-      Rational (* sound over-approximation *)
+    end
   | (Ival _ | Float _ | Rational), (Float _ | Rational)
   | Rational, Ival _ ->
     Rational
@@ -169,7 +188,92 @@ let lift_binop ~safe_float f i1 i2 = match i1, i2 with
   | Nan, (Ival _ | Float _ | Rational | Real) ->
     Nan
 
-let join = lift_binop ~safe_float:true Ival.join
+let meet i1 i2 = match i1, i2 with
+  | Ival iv, _ when Ival.is_bottom iv -> Ival iv
+  | _, Ival iv when Ival.is_bottom iv -> Ival iv
+  | Ival i1, Ival i2 ->
+    Ival (Ival.meet i1 i2)
+  | Float(k1, Some f1), Float(k2, Some f2) ->
+    if Float.equal f1 f2 then
+      let k = if Cil.frank k1 >= Cil.frank k2 then k2 else k1 in
+      Float (k, Some f1)
+    else Ival Ival.bottom
+  | Float(k, Some f), Float(k', None)
+  | Float(k',None), Float(k, Some f) ->
+    let f_in_k' = match k' with
+      | FFloat ->
+        let minf,maxf =
+          Floating_point.most_negative_single_precision_float,
+          Floating_point.max_single_precision_float
+        in minf <= f && f <= maxf
+      | FDouble
+      | FLongDouble ->
+        true
+    in if f_in_k' then Float(k, Some f) else Ival Ival.bottom
+  | Float(k1, None), Float(k2, None) ->
+    let k = if Cil.frank k1 >= Cil.frank k2 then k2 else k1 in
+    Float(k, None)
+  | Float(k, Some f), Ival iv
+  | Ival iv, Float(k, Some f) ->
+    begin
+      match Ival.min_and_max iv with
+      | None, None ->
+        (* unbounded integers *)
+        Float(k, Some f)
+      | Some min, Some max ->
+        (* if the float type fits into the interval of integers, then return
+           this float type; otherwise return Rational *)
+        (try
+           let to_float n = Int64.to_float (Integer.to_int64 n) in
+           let mini, maxi = to_float min, to_float max in
+           if mini <= f && maxi >= f then Float(k, Some f) else Ival Ival.bottom
+         with Z.Overflow | Exit ->
+           Rational)
+      | None, Some _ | Some _, None ->
+        assert false
+    end
+  | Ival iv, Float(k, None)
+  | Float(k, None), Ival iv ->
+    begin
+      match Ival.min_and_max iv with
+      | None, None ->
+        (* unbounded integers *)
+        Float(k, None)
+      | Some min, Some max ->
+        (* if the float type fits into the interval of integers, then return
+           this float type; otherwise return Rational *)
+        (try
+           let to_float n = Int64.to_float (Integer.to_int64 n) in
+           let mini, maxi = to_float min, to_float max in
+           let minf, maxf = match k with
+             | FFloat ->
+               Floating_point.most_negative_single_precision_float,
+               Floating_point.max_single_precision_float
+             | FDouble ->
+               -. Float.max_float,
+               Float.max_float
+             | FLongDouble ->
+               raise Exit
+           in
+           if mini <= minf && maxi >= maxf then Float(k, None) else Rational
+         with Z.Overflow | Exit ->
+           Rational)
+      | None, Some _ | Some _, None ->
+        assert false
+    end
+  | (Ival _ | Float _ | Rational), (Float _ | Rational)
+  | Rational, Ival _ ->
+    Rational
+  | (Ival _ | Float _ | Rational | Real), Real
+  | Real, (Ival _ | Float _ | Rational) ->
+    Real
+  | (Ival _ | Float _ | Rational | Real | Nan), Nan
+  | Nan, (Ival _ | Float _ | Rational | Real) ->
+    Nan
+
+let is_singleton_int = function
+  | Ival iv -> Ival.is_singleton_int iv
+  | Float _ | Rational | Real | Nan -> false
 
 (* TODO: soundness of any downcast is not checked *)
 let cast ~src ~dst = match src, dst with
@@ -498,43 +602,43 @@ let rec infer t =
   | TBinOp (PlusA, t1, t2) ->
     let i1 = infer t1 in
     let i2 = infer t2 in
-    lift_binop ~safe_float:false Ival.add_int i1 i2
+    lift_arith_binop Ival.add_int i1 i2
   | TBinOp (MinusA, t1, t2) ->
     let i1 = infer t1 in
     let i2 = infer t2 in
-    lift_binop ~safe_float:false Ival.sub_int i1 i2
+    lift_arith_binop Ival.sub_int i1 i2
   | TBinOp (Mult, t1, t2) ->
     let i1 = infer t1 in
     let i2 = infer t2 in
-    lift_binop ~safe_float:false Ival.mul i1 i2
+    lift_arith_binop Ival.mul i1 i2
   | TBinOp (Div, t1, t2) ->
     let i1 = infer t1 in
     let i2 = infer t2 in
-    lift_binop ~safe_float:false Ival.div i1 i2
+    lift_arith_binop Ival.div i1 i2
   | TBinOp (Mod, t1, t2) ->
     let i1 = infer t1 in
     let i2 = infer t2 in
-    lift_binop ~safe_float:false Ival.c_rem i1 i2
+    lift_arith_binop Ival.c_rem i1 i2
   | TBinOp (Shiftlt, t1, t2) ->
     let i1 = infer t1 in
     let i2 = infer t2 in
-    lift_binop ~safe_float:false Ival.shift_left i1 i2
+    lift_arith_binop Ival.shift_left i1 i2
   | TBinOp (Shiftrt, t1, t2) ->
     let i1 = infer t1 in
     let i2 = infer t2 in
-    lift_binop ~safe_float:false Ival.shift_right i1 i2
+    lift_arith_binop Ival.shift_right i1 i2
   | TBinOp (BAnd, t1, t2) ->
     let i1 = infer t1 in
     let i2 = infer t2 in
-    lift_binop ~safe_float:false Ival.bitwise_and i1 i2
+    lift_arith_binop Ival.bitwise_and i1 i2
   | TBinOp (BXor, t1, t2) ->
     let i1 = infer t1 in
     let i2 = infer t2 in
-    lift_binop ~safe_float:false Ival.bitwise_xor i1 i2
+    lift_arith_binop Ival.bitwise_xor i1 i2
   | TBinOp (BOr, t1, t2) ->
     let i1 = infer t1 in
     let i2 = infer t2 in
-    lift_binop ~safe_float:false Ival.bitwise_or i1 i2
+    lift_arith_binop Ival.bitwise_or i1 i2
   | TCastE (ty, t) ->
     let src = infer t in
     let dst = interv_of_typ ty in
@@ -672,6 +776,11 @@ and infer_term_host thost =
       Options.fatal "unexpected type %a for term %a"
         Printer.pp_typ ty
         Printer.pp_term t
+
+let infer t =
+  let i = infer t in
+  Logic_function_env.clear();
+  i
 
 include D
 

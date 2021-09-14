@@ -224,13 +224,14 @@ char *__gen_e_acsl_strncat(char * restrict dest, char const * restrict src,
  */
 char *__gen_e_acsl_strcat(char * restrict dest, char const * restrict src)
 {
-  char *__gen_e_acsl_at;
+  char *__gen_e_acsl_at_2;
   unsigned long __gen_e_acsl_strcat_dest_size;
   unsigned long __gen_e_acsl_strcat_src_size;
   char *__retres;
   __e_acsl_store_block((void *)(& dest),(size_t)8);
   __gen_e_acsl_strcat_src_size = __e_acsl_builtin_strlen(src);
   __gen_e_acsl_strcat_dest_size = __e_acsl_builtin_strlen((char const *)dest);
+  __gen_e_acsl_at_2 = dest;
   __gen_e_acsl_at = dest;
   __retres = strcat(dest,src);
   {
@@ -270,7 +271,7 @@ char *__gen_e_acsl_strcat(char * restrict dest, char const * restrict src)
     __gmpz_clear(__gen_e_acsl_add_2);
     __gmpz_clear(__gen_e_acsl__2);
   }
-  __e_acsl_assert(__retres == __gen_e_acsl_at,1,"Postcondition","strcat",
+  __e_acsl_assert(__retres == __gen_e_acsl_at_2,1,"Postcondition","strcat",
                   "result_ptr: \\result == \\old(dest)",
                   "FRAMAC_SHARE/libc/string.h",434);
   __e_acsl_delete_block((void *)(& dest));

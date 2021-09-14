@@ -810,6 +810,8 @@ int main(void)
   return __retres;
 }
 
+/*@ assigns \result;
+    assigns \result \from i, j, k; */
 int __gen_e_acsl_p1(int i, int j, int k)
 {
   int __gen_e_acsl_and;
@@ -829,6 +831,8 @@ int __gen_e_acsl_p1(int i, int j, int k)
   return __gen_e_acsl_and_5;
 }
 
+/*@ assigns \result;
+    assigns \result \from i, j, k; */
 int __gen_e_acsl_p2(int i, int j, int k)
 {
   int __gen_e_acsl_and_6;
@@ -842,6 +846,8 @@ int __gen_e_acsl_p2(int i, int j, int k)
   return __gen_e_acsl_and_8;
 }
 
+/*@ assigns \result;
+    assigns \result \from i, j, k; */
 int __gen_e_acsl_p3(int i, int j, int k)
 {
   int __gen_e_acsl_and_9;
@@ -858,6 +864,8 @@ int __gen_e_acsl_p3(int i, int j, int k)
   return __gen_e_acsl_and_12;
 }
 
+/*@ assigns \result;
+    assigns \result \from i, j, k; */
 int __gen_e_acsl_p4(int i, int j, int k)
 {
   int __gen_e_acsl_and_13;

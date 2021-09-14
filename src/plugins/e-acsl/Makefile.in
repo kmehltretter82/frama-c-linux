@@ -58,13 +58,14 @@ SRC_PROJECT_INITIALIZER:=\
 # analyses
 SRC_ANALYSES:= \
 	rte \
-	literal_strings \
-	memory_tracking \
-	exit_points \
 	lscope \
+	predicate_normalizer \
+	bound_variables \
 	interval \
 	typing \
-	bound_variables
+	literal_strings \
+	memory_tracking \
+	exit_points
 SRC_ANALYSES:=$(addprefix src/analyses/, $(SRC_ANALYSES))
 
 # code generator
@@ -81,6 +82,7 @@ SRC_CODE_GENERATOR:= \
 	assert \
 	rational \
 	typed_number \
+	genassigns \
 	logic_functions \
 	loops \
 	quantif \

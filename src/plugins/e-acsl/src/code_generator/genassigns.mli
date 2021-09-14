@@ -20,62 +20,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
-exception Ignored
-let ignored () = raise Ignored
+exception NoAssigns
 
-exception Typing_error of string
-let untypable s = raise (Typing_error s)
+val get_assigns_from :
+  loc:Cil_types.location ->
+  Env.t ->
+  Cil_types.logic_var list ->
+  Cil_types.logic_var ->
+  Cil_types.exp list
+(* @returns the list of expressions that are allowed to be used to assign the
+   the result of a logic function *)
 
-exception Not_yet of string
-let not_yet s = raise (Not_yet s)
-
-module Nb_typing =
-  State_builder.Ref
-    (Datatype.Int)
-    (struct
-      let name = "E_ACSL.Error.Nb_typing"
-      let default () = 0
-      let dependencies = [ Ast.self ]
-    end)
-
-let nb_untypable = Nb_typing.get
-
-module Nb_not_yet =
-  State_builder.Ref
-    (Datatype.Int)
-    (struct
-      let name = "E_ACSL.Error.Nb_not_yet"
-      let default () = 0
-      let dependencies = [ Ast.self ]
-    end)
-
-let nb_not_yet = Nb_not_yet.get
-
-let print_not_yet msg =
-  let msg =
-    Format.sprintf "@[E-ACSL construct@ `%s'@ is not yet supported.@]" msg
-  in
-  Options.warning ~once:true ~current:true "@[%s@ Ignoring annotation.@]" msg;
-  Nb_not_yet.set (Nb_not_yet.get () + 1)
-
-let generic_handle f res x =
-  try
-    f x
-  with
-  | Typing_error s ->
-    let msg = Format.sprintf "@[invalid E-ACSL construct@ `%s'.@]" s in
-    Options.warning ~once:true ~current:true "@[%s@ Ignoring annotation.@]" msg;
-    Nb_typing.set (Nb_typing.get () + 1);
-    res
-  | Not_yet s ->
-    print_not_yet s;
-    res
-  | Ignored -> res
-
-let handle f x = generic_handle f x x
-
-(*
-Local Variables:
-compile-command: "make"
-End:
-*)
+val get_gmp_integer :
+  loc:Cil_types.location -> Cil_types.varinfo -> Cil_types.exp
+(* @returns the expression that gets assigned when the result of the function is
+   a pointer on a GMP type *)

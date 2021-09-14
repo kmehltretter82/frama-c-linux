@@ -2,8 +2,13 @@
 [e-acsl] Warning: annotating undefined function `getenv':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
+[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:281: Warning: 
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:486: Warning: 
-  E-ACSL construct `logic functions with labels' is not yet supported.
+  E-ACSL construct `logic functions or predicates with labels'
+  is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:485: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.

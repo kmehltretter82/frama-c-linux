@@ -76,6 +76,8 @@ type t = {
   (* list of loop environment for each currently visited loops *)
   cpt: int;
   (* counter used when generating variables *)
+  local_vars: Typing.Function_params_ty.t list
+  (* type of variables used in calls to logic functions and predicates *)
 }
 
 let empty_block =
@@ -106,7 +108,8 @@ let empty =
     contract_stack = [];
     var_mapping = Logic_var.Map.empty;
     loop_envs = [];
-    cpt = 0 }
+    cpt = 0;
+    local_vars = [] }
 
 let top env = match env.env_stack with
   | [] -> Options.fatal "Empty environment. That is unexpected."
@@ -379,15 +382,8 @@ module Logic_scope = struct
     else env
 end
 
-let emitter =
-  Emitter.create
-    "E_ACSL"
-    [ Emitter.Code_annot ]
-    ~correctness:[ Options.Gmp_only.parameter ]
-    ~tuning:[]
-
 let add_assert kf stmt annot =
-  Annotations.add_assert emitter ~kf stmt annot
+  Annotations.add_assert Options.emitter ~kf stmt annot
 
 let add_stmt ?(post=false) ?before env kf stmt =
   if not post then
@@ -541,6 +537,24 @@ module Context = struct
       env
     end else
       env
+
+end
+
+module Local_vars = struct
+
+  let push_new env =
+    {env with local_vars = [] :: env.local_vars}
+
+  let add env ty =
+    match env.local_vars with
+    | curr::stacked -> {env with local_vars = (ty :: curr) :: stacked}
+    | [] -> Options.fatal
+              "Trying to add local variable in a non-existing environment"
+
+  let get env =
+    match env.local_vars with
+    | lenv :: _ -> lenv
+    | [] -> []
 
 end
 

@@ -21,16 +21,17 @@
 (**************************************************************************)
 
 (** Module for preprocessing the quantified predicates. Predicates with
-    quantifiers are hard to translate, so we delegate some of the work to a
-    preprocessing phase. At the end of this phase, all the quantified predicates
-    should have an associated preprocessed form [vars * goal] where - [vars] is a
-    list of guarded variables in the right order - [goal] is the predicate under
-    the quantifications The guarded variables in the list [vars] are of type
-    [term * logic_var * term * predicate option], where a tuple [(t1,v,t2,p)]
-    indicates that v is a logic variable with the two guards t1 <= x < t2 and p
-    is an additional optional guard to intersect the first guard with the
-    provided type for the variable v *)
-
+    quantifiers are hard to translate, so we delegate some of the work to
+    a preprocessing phase. At the end of this phase, all the quantified
+    predicates should have an associated preprocessed form [vars * goal] where
+    - [vars] is a list of guarded variables in the right order
+    - [goal] is the predicate under the quantifications
+      The guarded variables in the list [vars] are of
+      type [term * logic_var * term * predicate option], where a tuple
+      [(t1,v,t2,p)] indicates that v is a logic variable with the two
+      guards t1 <= x < t2 and p is an additional optional guard to
+      intersect the first guard with the provided type for the variable v
+*)
 open Cil_types
 open Cil
 open Cil_datatype
@@ -45,7 +46,6 @@ let error_msg quantif msg pp x =
       Printer.pp_predicate quantif
   in
   msg1 ^ msg2
-
 
 (** A module to work with quantifiers at preprocessing time. We create
     a datatype to hash quantified predicates by simply giving the hash
@@ -73,19 +73,20 @@ module Quantified_predicate =
       let mem_project = Datatype.never_any_project
     end)
 
-(******************************************************************************)
+(****************************************************************************)
 (** Storing the preprocessed quantifiers *)
-(******************************************************************************)
+(****************************************************************************)
 
-(** In order to retrieve the preprocessed form of a quantified predicate
- *   we store it in a hash table. *)
+(* Memoization module to store the preprocessed form of a quantified predicate
+*)
 module Quantifier: sig
   val add: predicate -> (term * logic_var * term) list -> predicate -> unit
-  val get: predicate -> (term * logic_var * term) list * predicate
+  val get: predicate -> ((term * logic_var * term) list * predicate) option
   (** getter and setter for the additional guard that intersects with the type
       of the variable *)
   val get_guard_for_small_type : logic_var -> predicate option
-  val add_guard_for_small_type : logic_var -> predicate option -> unit
+  val add_guard_for_small_type : logic_var -> predicate -> unit
+  val replace : predicate -> (term * logic_var * term) list -> predicate -> unit
   val clear : unit -> unit
 end = struct
 
@@ -94,34 +95,31 @@ end = struct
   let guard_tbl = Cil_datatype.Logic_var.Hashtbl.create 97
 
   let get p =
-    (* Options.feedback "Get preprocessed form of predicate %a" Printer.pp_predicate p; *)
-    try Quantified_predicate.Hashtbl.find tbl p
-    with Not_found ->
-      Options.fatal
-        "The preprocessed form of predicate %a was not found."
-        Printer.pp_predicate p
+    Quantified_predicate.Hashtbl.find_opt tbl p
 
   let add p guarded_vars goal =
-    (* Options.feedback "Adding preprocessed form of predicate %a" Printer.pp_predicate p; *)
     Quantified_predicate.Hashtbl.add tbl p (guarded_vars, goal)
 
   let get_guard_for_small_type x =
-    try Cil_datatype.Logic_var.Hashtbl.find guard_tbl x
-    with Not_found ->
-      Options.fatal
-        "The typing guard for the variable %a was not found."
-        Printer.pp_logic_var x
+    try Some (Cil_datatype.Logic_var.Hashtbl.find guard_tbl x)
+    with Not_found -> None
 
   let add_guard_for_small_type lv p =
     Cil_datatype.Logic_var.Hashtbl.add guard_tbl lv p
+
+  let replace p guarded_vars goal =
+    Quantified_predicate.Hashtbl.replace tbl p (guarded_vars, goal)
 
   let clear () =
     Cil_datatype.Logic_var.Hashtbl.clear guard_tbl;
     Quantified_predicate.Hashtbl.clear tbl
 end
 
+(** Getters and setters *)
 let get_preprocessed_quantifier = Quantifier.get
 let get_guard_for_small_type = Quantifier.get_guard_for_small_type
+let add_guard_for_small_type = Quantifier.add_guard_for_small_type
+let replace = Quantifier.replace
 let clear_guards = Quantifier.clear
 
 (** Helper module to process the constraints in the quantification and extract
@@ -627,74 +625,10 @@ let compute_quantif_guards ~is_forall quantif bounded_vars p =
     let goal = Option.get goal in
     guards, goal
 
-(******************************************************************************)
-(** Type intersection *)
-(******************************************************************************)
 
-(* It could happen that the bounds provided for a quantifier [lv] are bigger
-   than its type. [bounds_for_small_type] handles such cases
-   and provides smaller bounds whenever possible.
-   Let B be the inferred interval and R the range of [lv.typ]
-   - Case 1: B \subseteq R
-     Example: [\forall unsigned char c; 4 <= c <= 100 ==> 0 <= c <= 255]
-     Return: B
-   - Case 2: B \not\subseteq R and the bounds of B are inferred exactly
-     Example: [\forall unsigned char c; 4 <= c <= 300 ==> 0 <= c <= 255]
-     Return: B \intersect R
-   - Case 3: B \not\subseteq R and the bounds of B are NOT inferred exactly
-     Example: [\let m = n > 0 ? 4 : 341; \forall char u; 1 < u < m ==> u > 0]
-     Return: R with a guard guaranteeing that [lv] does not overflow *)
-let bounds_for_small_types ~loc (t1, lv, t2) =
-  match lv.lv_type with
-  | Ltype _ | Lvar _ | Lreal | Larrow _ ->
-    Error.not_yet "quantification over non-integer type"
-  | Linteger ->
-    t1, t2, None
-  | Ctype ty ->
-    let iv1 = Interval.(extract_ival (infer t1)) in
-    let iv2 = Interval.(extract_ival (infer t2)) in
-    (* Ival.join is NOT correct here:
-       Eg: (Ival.join [-3..-3] [300..300]) gives {-3, 300}
-       but NOT [-3..300] *)
-    let iv = Ival.inject_range (Ival.min_int iv1) (Ival.max_int iv2) in
-    let ity = Interval.extract_ival (Interval.extended_interv_of_typ ty) in
-    if Ival.is_included iv ity then
-      (* case 1 *)
-      t1, t2, None
-    else if Ival.is_singleton_int iv1 && Ival.is_singleton_int iv2 then begin
-      (* case 2 *)
-      let i = Ival.meet iv ity in
-      (* now we potentially have a better interval for [lv]
-         ==> update the binding *)
-      Interval.Env.replace lv (Interval.Ival i);
-      (* the smaller bounds *)
-      let min, max = Misc.finite_min_and_max i in
-      let t1 = Logic_const.tint ~loc min in
-      let t2 = Logic_const.tint ~loc max in
-      let ctx = Typing.number_ty_of_typ ~post:false ty in
-      (* we are assured that we will not have a GMP,
-         once again because we intersected with [ity] *)
-      Typing.type_term ~use_gmp_opt:false ~ctx t1;
-      Typing.type_term ~use_gmp_opt:false ~ctx t2;
-      t1, t2, None
-    end else
-      (* case 3 *)
-      let min, max = Misc.finite_min_and_max ity in
-      let guard_lower = Logic_const.tint ~loc min in
-      let guard_upper = Logic_const.tint ~loc max in
-      let lv_term = Logic_const.tvar ~loc lv in
-      let guard_lower = Logic_const.prel ~loc (Rle, guard_lower, lv_term) in
-      let guard_upper = Logic_const.prel ~loc (Rlt, lv_term, guard_upper) in
-      let guard = Logic_const.pand ~loc (guard_lower, guard_upper) in
-      t1, t2, Some guard
-
-let () = Typing.compute_quantif_guards_ref := compute_quantif_guards
-
-(** Take a guard and put it in normal form
+(** Takes a guard and put it in normal form
     [t1 <= x < t2] so that [t1] is the first value
-     taken by [x] and [t2] is the last one.
-    This step also adds the extra guard if the type
-    of the quantified variable is small *)
+     taken by [x] and [t2] is the last one. *)
 let normalize_guard ~loc (t1, rel1, lv, rel2, t2) =
   let t_plus_one t =
     let tone = Cil.lone ~loc () in
@@ -719,12 +653,101 @@ let normalize_guard ~loc (t1, rel1, lv, rel2, t2) =
     | Rgt | Rge | Req | Rneq ->
       assert false
   in
-  let t1, t2, guard_for_small_type = bounds_for_small_types ~loc (t1, lv, t2) in
-  Quantifier.add_guard_for_small_type lv guard_for_small_type;
   t1, lv, t2
+
 
 let compute_guards loc ~is_forall p bounded_vars hyps =
   let guards,goal = compute_quantif_guards p ~is_forall bounded_vars hyps in
   (* transform [guards] into [lscope_var list] *)
   let normalized_guards = List.map (normalize_guard ~loc) guards
   in Quantifier.add p normalized_guards goal
+
+module Preprocessor : sig
+  val compute : file -> unit
+  val compute_annot : code_annotation -> unit
+  val compute_predicate : predicate -> unit
+end
+= struct
+
+  let process_quantif ~loc p =
+    Cil.CurrentLoc.set loc;
+    match p.pred_content with
+    | Pforall(bound_vars, ({ pred_content = Pimplies(_, _) } as goal)) ->
+      compute_guards loc ~is_forall:true p bound_vars goal
+    | Pexists(bound_vars, ({ pred_content = Pand(_, _) } as goal)) ->
+      compute_guards loc ~is_forall:false p bound_vars goal
+    | Pforall _ -> Error.not_yet "unguarded \\forall quantification"
+    | Pexists _ -> Error.not_yet "unguarded \\exists quantification"
+    | _ -> ()
+
+  let preprocessor = object
+    inherit Visitor.frama_c_inplace
+
+    (* Only logic functions and logic predicates are handled.
+       E-acsl simply ignores all the other global annotations *)
+    method !vannotation annot =
+      match annot with
+      | Dfun_or_pred _ -> Cil.DoChildren
+      | _ -> Cil.SkipChildren
+
+    (* Ignore the annotations attached to statements from the RTL *)
+    method !vglob_aux =
+      function
+      (* library functions and built-ins *)
+      | GVarDecl(vi, _) | GVar(vi, _, _)
+      | GFunDecl(_, vi, _)
+      | GFun({ svar = vi }, _) when Builtins.mem vi.vname ->
+        Cil.SkipChildren
+
+      | GVarDecl(vi, _) | GVar(vi, _, _) | GFun({ svar = vi }, _)
+        when Misc.is_fc_or_compiler_builtin vi ->
+        Cil.SkipChildren
+      | g when Rtl.Symbols.mem_global g ->
+        Cil.SkipChildren
+
+      (* generated function declaration: nothing to do *)
+      | GFunDecl(_, vi, _) when Misc.is_fc_stdlib_generated vi ->
+        Cil.SkipChildren
+
+      | GFun({svar = vi}, _) ->
+        let kf = try Globals.Functions.get vi with Not_found -> assert false in
+        if Functions.check kf then Cil.DoChildren else Cil.SkipChildren
+
+      | GAnnot _ -> Cil.DoChildren
+
+      (* other globals: nothing to do *)
+      | GFunDecl _
+      | GVarDecl _
+      | GVar _
+      | GType _
+      | GCompTag _
+      | GCompTagDecl _
+      | GEnumTag _
+      | GEnumTagDecl _
+      | GAsm _
+      | GPragma _
+      | GText _
+        -> Cil.SkipChildren
+
+    method !vpredicate  p =
+      let loc = p.pred_loc in
+      match Predicate_normalizer.get p with
+      | PoT_pred p -> Error.generic_handle (process_quantif ~loc) () p;
+        Cil.DoChildren
+      | PoT_term _ -> Cil.DoChildren
+
+  end
+
+  let compute ast =
+    Visitor.visitFramacFileSameGlobals preprocessor ast
+
+  let compute_annot annot =
+    ignore (Visitor.visitFramacCodeAnnotation preprocessor annot)
+
+  let compute_predicate p =
+    ignore (Visitor.visitFramacPredicate preprocessor p)
+end
+
+let preprocess = Preprocessor.compute
+let preprocess_annot = Preprocessor.compute_annot
+let preprocess_predicate = Preprocessor.compute_predicate

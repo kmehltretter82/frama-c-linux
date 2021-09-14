@@ -491,6 +491,7 @@ module rec Transfer
              in
              if stmt.ghost then
                let rtes = Rte.stmt kf stmt in
+               List.iter (Typing.preprocess_rte ~lenv:[]) rtes;
                List.fold_left
                  (fun state a -> register_code_annot kf a state) state rtes
              else

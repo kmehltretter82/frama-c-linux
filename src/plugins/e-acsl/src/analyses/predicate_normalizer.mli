@@ -20,62 +20,28 @@
 (*                                                                        *)
 (**************************************************************************)
 
-exception Ignored
-let ignored () = raise Ignored
-
-exception Typing_error of string
-let untypable s = raise (Typing_error s)
-
-exception Not_yet of string
-let not_yet s = raise (Not_yet s)
-
-module Nb_typing =
-  State_builder.Ref
-    (Datatype.Int)
-    (struct
-      let name = "E_ACSL.Error.Nb_typing"
-      let default () = 0
-      let dependencies = [ Ast.self ]
-    end)
-
-let nb_untypable = Nb_typing.get
-
-module Nb_not_yet =
-  State_builder.Ref
-    (Datatype.Int)
-    (struct
-      let name = "E_ACSL.Error.Nb_not_yet"
-      let default () = 0
-      let dependencies = [ Ast.self ]
-    end)
-
-let nb_not_yet = Nb_not_yet.get
-
-let print_not_yet msg =
-  let msg =
-    Format.sprintf "@[E-ACSL construct@ `%s'@ is not yet supported.@]" msg
-  in
-  Options.warning ~once:true ~current:true "@[%s@ Ignoring annotation.@]" msg;
-  Nb_not_yet.set (Nb_not_yet.get () + 1)
-
-let generic_handle f res x =
-  try
-    f x
-  with
-  | Typing_error s ->
-    let msg = Format.sprintf "@[invalid E-ACSL construct@ `%s'.@]" s in
-    Options.warning ~once:true ~current:true "@[%s@ Ignoring annotation.@]" msg;
-    Nb_typing.set (Nb_typing.get () + 1);
-    res
-  | Not_yet s ->
-    print_not_yet s;
-    res
-  | Ignored -> res
-
-let handle f x = generic_handle f x x
-
-(*
-Local Variables:
-compile-command: "make"
-End:
+(** This module is dedicated to some preprocessing on the predicates:
+    - It guards all the [Pvalid] and [Pvalid_read] clauses with
+      an adequate [Pinitialized] clause;
+    - It replaces all the applications [Papp] by a corresponding
+      term obtained as an application [Tapp]
+      The predicates that have undergone these changed are
+      called the preprocessed predicates.
 *)
+
+open Cil_types
+
+val preprocess : file -> unit
+(** Preprocess all the predicates of the ast and store the results *)
+
+val preprocess_annot : code_annotation -> unit
+(** Preprocess of the predicate of a single code annotation and store
+    the results *)
+
+val preprocess_predicate : predicate -> unit
+(** Preprocess a predicate and its children and store the results  *)
+
+val get : predicate -> Lscope.pred_or_term
+(** Retrieve the preprocessed form of a predicate *)
+val clear: unit -> unit
+(** clear the table of normalized predicates *)

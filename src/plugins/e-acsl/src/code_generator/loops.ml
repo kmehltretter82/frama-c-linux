@@ -66,7 +66,7 @@ let handle_annotations env kf stmt =
              let env = Env.set_annotation_kind env Smart_stmt.Variant in
              let env = Env.push env in
              Typing.type_term ~use_gmp_opt:true t;
-             let ty = Typing.get_typ t in
+             let ty = Typing.get_typ ~lenv:(Env.Local_vars.get env) t in
              if Gmp_types.is_t ty then Error.not_yet "loop variant using GMP";
              let e, _, env = !term_to_exp_ref ~adata:Assert.no_data kf env t in
              let vi_old, e_old, env =
@@ -164,7 +164,7 @@ let handle_annotations env kf stmt =
             let variant_pos =
               Logic_const.prel ~loc (Rge, t_old, Logic_const.tinteger ~loc 0)
             in
-            Typing.type_named_predicate ~must_clear:true variant_pos;
+            Typing.type_named_predicate variant_pos;
             let variant_pos_e, _, env =
               !predicate_to_exp_ref ~adata:Assert.no_data kf env variant_pos
             in
@@ -198,7 +198,7 @@ let handle_annotations env kf stmt =
             let variant_dec =
               Logic_const.prel ~loc (Rgt, t_old, t)
             in
-            Typing.type_named_predicate ~must_clear:true variant_dec;
+            Typing.type_named_predicate variant_dec;
             let variant_dec_e, _, env =
               !predicate_to_exp_ref ~adata:Assert.no_data kf env variant_dec
             in
@@ -289,8 +289,8 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     Typing.type_term ~use_gmp_opt:false t1;
     Typing.type_term ~use_gmp_opt:false t2;
     let ctx =
-      let ty1 = Typing.get_number_ty t1 in
-      let ty2 = Typing.get_number_ty t2 in
+      let ty1 = Typing.get_number_ty ~lenv:(Env.Local_vars.get env) t1 in
+      let ty2 = Typing.get_number_ty ~lenv:(Env.Local_vars.get env) t2 in
       Typing.join ty1 ty2
     in
     let t_plus_one ?ty t =
@@ -379,7 +379,10 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       | Some p ->
         let adata, env = Assert.empty ~loc kf env in
         let e, adata, env =
-          !predicate_to_exp_ref ~adata kf (Env.push env) p
+          (* Even though p is considered a RTE, it was generated while
+             typing the loop, and was already typed at this moment. Thus
+             there is no need to type it again *)
+          !predicate_to_exp_ref adata kf (Env.push env) p
         in
         let stmt, env =
           Assert.runtime_check
@@ -409,7 +412,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     Env.Logic_binding.remove env logic_x;
     [ start ;  stmt ], env
   | Lscope.Lvs_let(lv, t) :: lscope_vars' ->
-    let ty = Typing.get_typ t in
+    let ty = Typing.get_typ ~lenv:(Env.Local_vars.get env) t in
     let vi_of_lv, exp_of_lv, env = Env.Logic_binding.add ~ty env kf lv in
     let e, _, env = term_to_exp kf env t in
     let ty = Cil.typeOf e in

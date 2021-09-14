@@ -27,11 +27,6 @@ open Cil_types
 open Cil_datatype
 let dkey = Options.dkey_translation
 
-(* internal to [predicate_to_exp] but put it outside in order to not add
-   extra tedious parameter.
-   It is [true] iff we are currently visiting \valid. *)
-let is_visiting_valid = ref false
-
 (* ************************************************************************** *)
 (* Transforming terms and predicates into C expressions (if any) *)
 (* ************************************************************************** *)
@@ -44,14 +39,14 @@ let relation_to_binop = function
   | Req -> Eq
   | Rneq -> Ne
 
-let constant_to_exp ~loc t c =
+let constant_to_exp ~loc env t c =
   let mk_real s =
     let s = Rational.normalize_str s in
     Cil.mkString ~loc s, Typed_number.Str_R
   in
   match c with
   | Integer(n, _repr) ->
-    let ity = Typing.get_number_ty t in
+    let ity = Typing.get_number_ty ~lenv:(Env.Local_vars.get env) t in
     (match ity with
      | Typing.Nan -> assert false
      | Typing.Real -> Error.not_yet "real number constant"
@@ -62,7 +57,7 @@ let constant_to_exp ~loc t c =
      | Typing.C_float fkind ->
        Cil.kfloat ~loc fkind (Int64.to_float (Integer.to_int64 n)), C_number
      | Typing.C_integer kind ->
-       let cast = Typing.get_cast t in
+       let cast = Typing.get_cast ~lenv:(Env.Local_vars.get env) t in
        match cast, kind with
        | Some ty, (ILongLong | IULongLong) when Gmp_types.Z.is_t ty ->
          (* too large integer *)
@@ -96,7 +91,7 @@ let conditional_to_exp ?(name="if") loc kf t_opt e1 (e2, env2) (e3, env3) =
   | _ ->
     let ty = match t_opt with
       | None (* predicate *) -> Cil.intType
-      | Some t -> Typing.get_typ t
+      | Some t -> Typing.get_typ ~lenv:(Env.Local_vars.get env) t
     in
     let _, e, env =
       Env.new_var
@@ -203,8 +198,8 @@ and extended_quantifier_to_exp ~adata ~loc kf env t t_min t_max lambda name =
   let e, adata, env =
     match name.lv_name,lambda.term_node with
     | "\\sum", Tlambda([ k ] ,lt) ->
-      let ty_sum = Typing.get_typ t in
-      let ty_k = match Typing.get_cast t_min with
+      let ty_sum = Typing.get_typ ~lenv:(Env.Local_vars.get env) t in
+      let ty_k = match Typing.get_cast ~lenv:(Env.Local_vars.get env) t_min with
         |Some e ->e
         | _ -> Options.fatal "unexpected error in \\sum translation"
       in
@@ -304,7 +299,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
   let loc = t.term_loc in
   match t.term_node with
   | TConst c ->
-    let c, strnum = constant_to_exp ~loc t c in
+    let c, strnum = constant_to_exp ~loc env t c in
     c, adata, env, strnum, ""
   | TLval lv ->
     let lv, env, name = tlval_to_lval kf env lv in
@@ -334,7 +329,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
     let adata, env = Assert.register_term ~loc kf env t e adata in
     e, adata, env, Typed_number.C_number, "alignof"
   | TUnOp(Neg | BNot as op, t') ->
-    let ty = Typing.get_typ t in
+    let ty = Typing.get_typ ~lenv:(Env.Local_vars.get env) t in
     let e, adata, env = term_to_exp ~adata kf env t' in
     if Gmp_types.Z.is_t ty then
       let name, vname = match op with
@@ -357,12 +352,12 @@ and context_insensitive_term_to_exp ~adata kf env t =
     else
       Cil.new_exp ~loc (UnOp(op, e, ty)), adata, env, Typed_number.C_number, ""
   | TUnOp(LNot, t) ->
-    let ty = Typing.get_op t in
+    let ty = Typing.get_op ~lenv:(Env.Local_vars.get env) t in
     if Gmp_types.Z.is_t ty then
       (* [!t] is converted into [t == 0] *)
       let zero = Logic_const.tinteger 0 in
-      let ctx = Typing.get_number_ty t in
-      Typing.type_term ~use_gmp_opt:true ~ctx zero;
+      let ctx = Typing.get_number_ty ~lenv:(Env.Local_vars.get env) t in
+      Typing.type_term ~use_gmp_opt:true ~ctx ~lenv:(Env.Local_vars.get env) zero;
       let e, adata, env =
         comparison_to_exp
           ~adata
@@ -384,7 +379,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
       e, adata, env, Typed_number.C_number, ""
     end
   | TBinOp(PlusA | MinusA | Mult as bop, t1, t2) ->
-    let ty = Typing.get_typ t in
+    let ty = Typing.get_typ ~lenv:(Env.Local_vars.get env) t in
     let e1, adata, env = term_to_exp ~adata kf env t1 in
     let e2, adata, env = term_to_exp ~adata kf env t2 in
     if Gmp_types.Z.is_t ty then
@@ -407,7 +402,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
       e, adata, env, Typed_number.C_number, ""
     end
   | TBinOp(Div | Mod as bop, t1, t2) ->
-    let ty = Typing.get_typ t in
+    let ty = Typing.get_typ ~lenv:(Env.Local_vars.get env) t in
     let e1, adata, env = term_to_exp ~adata kf env t1 in
     (* Creating a second assertion context that will hold the data contributing
        to the guard of the denominator. The context will be merged to [adata]
@@ -418,14 +413,14 @@ and context_insensitive_term_to_exp ~adata kf env t =
     if Gmp_types.Z.is_t ty then
       (* TODO: preventing division by zero should not be required anymore.
          RTE should do this automatically. *)
-      let ctx = Typing.get_number_ty t in
+      let ctx = Typing.get_number_ty ~lenv:(Env.Local_vars.get env) t in
       let t = Some t in
       let name = Gmp.name_of_mpz_arith_bop bop in
       (* [TODO] can now do better since the type system got some info about
          possible values of [t2] *)
       (* guarding divisions and modulos *)
       let zero = Logic_const.tinteger 0 in
-      Typing.type_term ~use_gmp_opt:true ~ctx zero;
+      Typing.type_term ~use_gmp_opt:true ~ctx ~lenv:(Env.Local_vars.get env) zero;
       (* do not generate [e2] from [t2] twice *)
       let guard, _, env =
         let name = Misc.name_of_binop bop ^ "_guard" in
@@ -463,14 +458,14 @@ and context_insensitive_term_to_exp ~adata kf env t =
     end
   | TBinOp(Lt | Gt | Le | Ge | Eq | Ne as bop, t1, t2) ->
     (* comparison operators *)
-    let ity = Typing.get_integer_op t in
+    let ity = Typing.get_integer_op ~lenv:(Env.Local_vars.get env) t in
     let e, adata, env =
       comparison_to_exp ~adata ~loc kf env ity bop t1 t2 (Some t)
     in
     e, adata, env, Typed_number.C_number, ""
   | TBinOp((Shiftlt | Shiftrt) as bop, t1, t2) ->
     (* left/right shift *)
-    let ty = Typing.get_typ t in
+    let ty = Typing.get_typ ~lenv:(Env.Local_vars.get env) t in
     (* Creating secondary assertion contexts [adata1] and [adata2] to hold the
        data contributing to the guards of [t1] and [t2].
        Both secondary contexts will be merged to [adata] afterward so that the
@@ -493,12 +488,12 @@ and context_insensitive_term_to_exp ~adata kf env t =
         | TLogic_coerce (_, t) -> term_to_name t
         | _ -> ""
       in
-      let ctx = Typing.get_number_ty t in
+      let ctx = Typing.get_number_ty ~lenv:(Env.Local_vars.get env) t in
       let bop_name = Misc.name_of_binop bop in
       let e1_name = term_to_name t1 in
       let e2_name = term_to_name t2 in
       let zero = Logic_const.tinteger 0 in
-      Typing.type_term ~use_gmp_opt:true ~ctx zero;
+      Typing.type_term ~use_gmp_opt:true ~ctx ~lenv:(Env.Local_vars.get env) zero;
 
       (* Check that e2 is representable in mp_bitcnt_t *)
       let coerce_guard, env =
@@ -533,6 +528,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
         in
         let pname = bop_name ^ "_rhs_fits_in_mp_bitcnt_t" in
         let pred = { pred with pred_name = pname :: pred.pred_name } in
+        Typing.preprocess_predicate (Env.Local_vars.get env) pred;
         let cond, env =
           Assert.runtime_check
             ~adata:adata2
@@ -602,6 +598,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
           in
           let e1_guard_cond, env =
             let pred = Logic_const.prel ~loc (Rge, t1, zero) in
+            Typing.preprocess_predicate (Env.Local_vars.get env) pred;
             let cond, env =
               Assert.runtime_check
                 ~adata:adata1
@@ -673,7 +670,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
     e, adata, env, Typed_number.C_number, ""
   | TBinOp((BOr | BXor | BAnd) as bop, t1, t2) ->
     (* other logic/arith operators  *)
-    let ty = Typing.get_typ t in
+    let ty = Typing.get_typ ~lenv:(Env.Local_vars.get env) t in
     let e1, adata, env = term_to_exp ~adata kf env t1 in
     let e2, adata, env = term_to_exp ~adata kf env t2 in
     if Gmp_types.Z.is_t ty then
@@ -708,11 +705,11 @@ and context_insensitive_term_to_exp ~adata kf env t =
     let e = Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)) in
     e, adata, env, Typed_number.C_number, ""
   | TBinOp(MinusPP, t1, t2) ->
-    begin match Typing.get_number_ty t with
+    begin match Typing.get_number_ty ~lenv:(Env.Local_vars.get env) t with
       | Typing.C_integer _ ->
         let e1, adata, env = term_to_exp ~adata kf env t1 in
         let e2, adata, env = term_to_exp ~adata kf env t2 in
-        let ty = Typing.get_typ t in
+        let ty = Typing.get_typ ~lenv:(Env.Local_vars.get env) t in
         let e = Cil.new_exp ~loc (BinOp(MinusPP, e1, e2, ty)) in
         e, adata, env, Typed_number.C_number, ""
       | Typing.Gmpz ->
@@ -747,12 +744,10 @@ and context_insensitive_term_to_exp ~adata kf env t =
     e, adata, env, Typed_number.C_number, "startof"
   | Tapp(li, _, [ t1; t2; lambda ]) when li.l_body = LBnone ->
     extended_quantifier_to_exp ~adata ~loc kf env t t1 t2 lambda li.l_var_info
-  | Tapp(_, [], _) ->
+  | Tapp(_, _, _) ->
     let e, adata, env = Logic_functions.tapp_to_exp ~adata kf env t in
     let adata, env = Assert.register_term ~loc kf env t e adata in
     e, adata, env, Typed_number.C_number, "app"
-  | Tapp(_, _ :: _, _) ->
-    Env.not_yet env "logic functions with labels"
   | Tlambda(_, lt) ->
     let exp, adata, env = term_to_exp ~adata kf env lt in
     exp, adata, env, Typed_number.C_number, ""
@@ -849,8 +844,10 @@ and context_insensitive_term_to_exp ~adata kf env t =
    constructs. *)
 and term_to_exp ~adata kf env t =
   let generate_rte = Env.generate_rte env in
-  Options.feedback ~dkey ~level:4 "translating term %a (rte? %b)"
-    Printer.pp_term t generate_rte;
+  Options.feedback ~dkey ~level:4 "translating term %a (rte? %b)in local \
+                                   environment '%a'"
+    Printer.pp_term t generate_rte Typing.Function_params_ty.pretty
+    (Env.Local_vars.get env);
   Extlib.flatten
     (Env.with_rte_and_result env false
        ~f:(fun env ->
@@ -858,7 +855,7 @@ and term_to_exp ~adata kf env t =
              context_insensitive_term_to_exp ~adata kf env t
            in
            let env = if generate_rte then translate_rte kf env e else env in
-           let cast = Typing.get_cast t in
+           let cast = Typing.get_cast ~lenv:(Env.Local_vars.get env) t in
            let name = if name = "" then None else Some name in
            Extlib.nest
              adata
@@ -992,10 +989,10 @@ and at_to_exp_no_lscope env kf t_opt label e =
 
 and env_of_li ~adata li kf env loc =
   let t = Misc.term_of_li li in
-  let ty = Typing.get_typ t in
+  let ty = Typing.get_typ ~lenv:(Env.Local_vars.get env) t in
   let vi, vi_e, env = Env.Logic_binding.add ~ty env kf li.l_var_info in
   let e, adata, env = term_to_exp ~adata kf env t in
-  let stmt = match Typing.get_number_ty t with
+  let stmt = match Typing.get_number_ty ~lenv:(Env.Local_vars.get env) t with
     | Typing.(C_integer _ | C_float _ | Nan) ->
       Smart_stmt.assigns ~loc ~result:(Cil.var vi) e
     | Typing.Gmpz ->
@@ -1012,28 +1009,20 @@ and env_of_li ~adata li kf env loc =
    constructs. *)
 and predicate_content_to_exp ~adata ?name kf env p =
   let loc = p.pred_loc in
+  Cil.CurrentLoc.set loc;
   match p.pred_content with
   | Pfalse -> Cil.zero ~loc, adata, env
   | Ptrue -> Cil.one ~loc, adata, env
-  | Papp(li, labels, args) ->
-    (* Simply use the implementation of Tapp(li, labels, args).
-       To achieve this, we create a clone of [li] for which the type is
-       transformed from [None] (type of predicates) to
-       [Some int] (type as a term). *)
-    let prj = Project.current () in
-    let o = object inherit Visitor.frama_c_copy prj end in
-    let li = Visitor.visitFramacLogicInfo o li in
-    let lty = Ctype Cil.intType in
-    li.l_type <- Some lty;
-    let tapp = Logic_const.term ~loc (Tapp(li, labels, args)) lty in
-    Typing.type_term ~use_gmp_opt:false ~ctx:Typing.c_int tapp;
-    let e, adata, env = term_to_exp ~adata kf env tapp in
-    e, adata, env
+  | Papp _ -> Options.fatal "Reached applied predicate: %a" Printer.pp_predicate p;
   | Pdangling _ -> Env.not_yet env "\\dangling"
   | Pobject_pointer _ -> Env.not_yet env "\\object_pointer"
   | Pvalid_function _ -> Env.not_yet env "\\valid_function"
   | Prel(rel, t1, t2) ->
-    let ity = Typing.get_integer_op_of_predicate p in
+    let ity =
+      Typing.get_integer_op_of_predicate
+        ~lenv:(Env.Local_vars.get env)
+        p
+    in
     comparison_to_exp ~adata ~loc kf env ity (relation_to_binop rel) t1 t2 None
   | Pand(p1, p2) ->
     (* p1 && p2 <==> if p1 then p2 else false *)
@@ -1146,8 +1135,8 @@ and predicate_content_to_exp ~adata ?name kf env p =
       let adata, env = Assert.register_pred ~loc kf env p e adata in
       e, adata, env
     end
-  | Pvalid_read(BuiltinLabel Here as llabel, t) as pc
-  | (Pvalid(BuiltinLabel Here as llabel, t) as pc) ->
+  | Pvalid_read(BuiltinLabel Here, t) as pc
+  | (Pvalid(BuiltinLabel Here, t) as pc) ->
     let call_valid ~adata t p =
       let name = match pc with
         | Pvalid _ -> "valid"
@@ -1160,26 +1149,9 @@ and predicate_content_to_exp ~adata ?name kf env p =
       let adata, env = Assert.register_pred ~loc kf env p e adata in
       e, adata, env
     in
-    if !is_visiting_valid then begin
-      (* we already transformed \valid(t) into \initialized(&t) && \valid(t):
-         now convert this right-most valid. *)
-      is_visiting_valid := false;
-      call_valid ~adata t p
-    end else begin
-      match t.term_node, t.term_type with
-      | TLval tlv, lty ->
-        let init =
-          Logic_const.pinitialized
-            ~loc
-            (llabel, Logic_utils.mk_logic_AddrOf ~loc tlv lty)
-        in
-        Typing.type_named_predicate ~must_clear:false init;
-        let p = Logic_const.pand ~loc (init, p) in
-        is_visiting_valid := true;
-        predicate_to_exp ~adata kf env p
-      | _ ->
-        call_valid ~adata t p
-    end
+    (* we already transformed \valid(t) into \initialized(&t) && \valid(t):
+       now convert this right-most valid. *)
+    call_valid ~adata t p
   | Pvalid _ -> Env.not_yet env "labeled \\valid"
   | Pvalid_read _ -> Env.not_yet env "labeled \\valid_read"
   | Pseparated tlist ->
@@ -1191,6 +1163,7 @@ and predicate_content_to_exp ~adata ?name kf env p =
            let p = { p with pred_name = name :: p.pred_name } in
            let tp = Logic_const.toplevel_predicate ~kind:Assert p in
            let annot = Logic_const.new_code_annotation (AAssert ([],tp)) in
+           Typing.preprocess_rte (Env.Local_vars.get env) annot;
            translate_rte_annots Printer.pp_code_annotation annot kf env [annot]
         )
         env
@@ -1246,45 +1219,42 @@ and predicate_content_to_exp ~adata ?name kf env p =
   | Pfresh _ -> Env.not_yet env "\\fresh"
 
 and predicate_to_exp ~adata ?name kf ?rte env p =
-  let rte = match rte with None -> Env.generate_rte env | Some b -> b in
-  Extlib.flatten
-    (Env.with_rte_and_result env false
-       ~f:(fun env ->
-           let e, adata, env =
-             predicate_content_to_exp ~adata ?name kf env p
-           in
-           let env = if rte then translate_rte kf env e else env in
-           let cast = Typing.get_cast_of_predicate p in
-           Extlib.nest
-             adata
-             (Typed_number.add_cast
-                ~loc:p.pred_loc
-                ?name
-                env
-                kf
-                cast
-                Typed_number.C_number
-                None
-                e)
-         ))
+  match Predicate_normalizer.get p with
+  | PoT_term t -> term_to_exp ~adata kf env t
+  | PoT_pred p ->
+    let rte = match rte with None -> Env.generate_rte env | Some b -> b in
+    Extlib.flatten
+      (Env.with_rte_and_result env false
+         ~f:(fun env ->
+             let e, adata, env =
+               predicate_content_to_exp ~adata ?name kf env p
+             in
+             let env = if rte then translate_rte kf env e else env in
+             let cast =
+               Typing.get_cast_of_predicate
+                 ~lenv:(Env.Local_vars.get env)
+                 p
+             in
+             Extlib.nest
+               adata
+               (Typed_number.add_cast
+                  ~loc:p.pred_loc
+                  ?name
+                  env
+                  kf
+                  cast
+                  Typed_number.C_number
+                  None
+                  e)
+           ))
 
-and generalized_untyped_predicate_to_exp
-    ~adata
-    ?name
-    kf
-    ?rte
-    ?must_clear_typing
-    env
-    p
-  =
+and generalized_untyped_predicate_to_exp ~adata ?name kf ?rte env p =
   (* If [rte] is true, it means we're translating the root predicate of an
      assertion and we need to generate the RTE for it. The typing environment
      must be cleared. Otherwise, if [rte] is false, it means we're already
      translating RTE predicates as part of the translation of another root
      predicate, and the typing environment must be kept. *)
   let rte = match rte with None -> Env.generate_rte env | Some b -> b in
-  let must_clear = match must_clear_typing with None -> rte | Some b -> b in
-  Typing.type_named_predicate ~must_clear p;
   let e, adata, env = predicate_to_exp ~adata ?name kf ~rte env p in
   assert (Typ.equal (Cil.typeOf e) Cil.intType);
   let env = Env.Logic_scope.reset env in
@@ -1294,7 +1264,6 @@ and translate_rte_annots:
   'a. (Format.formatter -> 'a -> unit) -> 'a ->
   kernel_function -> Env.t -> code_annotation list -> Env.t =
   fun pp elt kf env l ->
-  let old_valid = !is_visiting_valid in
   let old_kind = Env.annotation_kind env in
   let env = Env.set_annotation_kind env Smart_stmt.RTE in
   let env =
@@ -1320,7 +1289,6 @@ and translate_rte_annots:
       env
       l
   in
-  is_visiting_valid := old_valid;
   Env.set_annotation_kind env old_kind
 
 and translate_rte ?filter kf env e =
@@ -1331,6 +1299,7 @@ and translate_rte ?filter kf env e =
     | Some f -> List.filter f l
     | None -> l
   in
+  List.iter (Typing.preprocess_rte ~lenv:(Env.Local_vars.get env)) l;
   translate_rte_annots Printer.pp_exp e kf env l
 
 and translate_predicate ?pred_to_print kf env p =
@@ -1385,7 +1354,7 @@ let gmp_to_sizet ~adata ~loc ~name ?(check_lower_bound=true) ?pp kf env t =
           pred_name = pred_name :: lower_guard_pp.pred_name }
       in
       let lower_guard = Logic_const.prel ~loc (Rge, t, zero_term) in
-      Typing.type_named_predicate ~must_clear:false lower_guard;
+      Typing.type_named_predicate lower_guard;
       let adata_lower_guard, env = Assert.empty ~loc kf env in
       let lower_guard, adata_lower_guard, env =
         predicate_to_exp ~adata:adata_lower_guard kf env lower_guard
@@ -1415,7 +1384,7 @@ let gmp_to_sizet ~adata ~loc ~name ?(check_lower_bound=true) ?pp kf env t =
       pred_name = pred_name :: upper_guard_pp.pred_name }
   in
   let upper_guard = Logic_const.prel ~loc (Rle, t, sizet_max) in
-  Typing.type_named_predicate ~must_clear:false upper_guard;
+  Typing.type_named_predicate upper_guard;
   let adata_upper_guard, env = Assert.empty ~loc kf env in
   let upper_guard, adata_upper_guard, env =
     predicate_to_exp ~adata:adata_upper_guard kf env upper_guard
@@ -1477,7 +1446,6 @@ let untyped_predicate_to_exp p =
   let e, _, env =
     try generalized_untyped_predicate_to_exp
           ~adata:Assert.no_data
-          ~must_clear_typing:false
           (Kernel_function.dummy ())
           env
           p
