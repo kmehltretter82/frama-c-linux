@@ -770,7 +770,7 @@ struct
   let clayout (c: Cil_types.compinfo) : layout =
     match c.cfields with
     | None ->
-        rlayout [] (C_comp c)
+        [Garbled]
     | Some fields ->
         let flayout w f = rlayout w (Ctypes.object_of f.ftype) in
         List.fold_left flayout [] (List.rev fields)
