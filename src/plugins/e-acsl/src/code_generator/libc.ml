@@ -188,7 +188,7 @@ let check_integer_bounds ~from target =
     performed. *)
 let term_to_sizet_exp ~loc ~name ?(check_lower_bound=true) kf env t =
   Typing.type_term ~use_gmp_opt:false t;
-  match Typing.get_number_ty t with
+  match Typing.get_number_ty ~lenv:(Env.Local_vars.get env) t with
   | Typing.Gmpz ->
     let e, _, env =
       Translate.gmp_to_sizet

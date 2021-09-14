@@ -379,15 +379,9 @@ and context_insensitive_term_to_exp ~adata kf env t =
       e, adata, env, Typed_number.C_number, ""
     end
   | TBinOp(PlusA | MinusA | Mult as bop, t1, t2) ->
-<<<<<<< variant A
     let ty = Typing.get_typ ~lenv:(Env.Local_vars.get env) t in
     let e1, adata, env = term_to_exp ~adata kf env t1 in
     let e2, adata, env = term_to_exp ~adata kf env t2 in
->>>>>>> variant B
-    let ty = Typing.get_typ ~lenv:(Env.Local_vars.get env) t in
-    let e1, env = term_to_exp kf env t1 in
-    let e2, env = term_to_exp kf env t2 in
-======= end
     if Gmp_types.Z.is_t ty then
       let name = Gmp.name_of_mpz_arith_bop bop in
       let mk_stmts _ e = [ Smart_stmt.rtl_call ~loc
@@ -534,7 +528,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
         in
         let pname = bop_name ^ "_rhs_fits_in_mp_bitcnt_t" in
         let pred = { pred with pred_name = pname :: pred.pred_name } in
-        Preprocess_typing.preprocess_predicate (Env.Local_vars.get env) pred;
+        Typing.preprocess_predicate (Env.Local_vars.get env) pred;
         let cond, env =
           Assert.runtime_check
             ~adata:adata2
@@ -750,12 +744,10 @@ and context_insensitive_term_to_exp ~adata kf env t =
     e, adata, env, Typed_number.C_number, "startof"
   | Tapp(li, _, [ t1; t2; lambda ]) when li.l_body = LBnone ->
     extended_quantifier_to_exp ~adata ~loc kf env t t1 t2 lambda li.l_var_info
-  | Tapp(_, [], _) ->
+  | Tapp(_, _, _) ->
     let e, adata, env = Logic_functions.tapp_to_exp ~adata kf env t in
     let adata, env = Assert.register_term ~loc kf env t e adata in
     e, adata, env, Typed_number.C_number, "app"
-  | Tapp(_, _ :: _, _) ->
-    Env.not_yet env "logic functions with labels"
   | Tlambda(_, lt) ->
     let exp, adata, env = term_to_exp ~adata kf env lt in
     exp, adata, env, Typed_number.C_number, ""
@@ -1019,14 +1011,18 @@ and predicate_content_to_exp ~adata ?name kf env p =
   let loc = p.pred_loc in
   Cil.CurrentLoc.set loc;
   match p.pred_content with
-  | Pfalse -> Cil.zero ~loc, env
-  | Ptrue -> Cil.one ~loc, env
+  | Pfalse -> Cil.zero ~loc, adata, env
+  | Ptrue -> Cil.one ~loc, adata, env
   | Papp _ -> Options.fatal "Reached applied predicate: %a" Printer.pp_predicate p;
   | Pdangling _ -> Env.not_yet env "\\dangling"
   | Pobject_pointer _ -> Env.not_yet env "\\object_pointer"
   | Pvalid_function _ -> Env.not_yet env "\\valid_function"
   | Prel(rel, t1, t2) ->
-    let ity = Typing.get_integer_op_of_predicate ~lenv:(Env.Local_vars.get env) p in
+    let ity =
+      Typing.get_integer_op_of_predicate
+        ~lenv:(Env.Local_vars.get env)
+        p
+    in
     comparison_to_exp ~adata ~loc kf env ity (relation_to_binop rel) t1 t2 None
   | Pand(p1, p2) ->
     (* p1 && p2 <==> if p1 then p2 else false *)
@@ -1139,8 +1135,8 @@ and predicate_content_to_exp ~adata ?name kf env p =
       let adata, env = Assert.register_pred ~loc kf env p e adata in
       e, adata, env
     end
-  | Pvalid_read(BuiltinLabel Here as llabel, t) as pc
-  | (Pvalid(BuiltinLabel Here as llabel, t) as pc) ->
+  | Pvalid_read(BuiltinLabel Here, t) as pc
+  | (Pvalid(BuiltinLabel Here, t) as pc) ->
     let call_valid ~adata t p =
       let name = match pc with
         | Pvalid _ -> "valid"
@@ -1224,7 +1220,7 @@ and predicate_content_to_exp ~adata ?name kf env p =
 
 and predicate_to_exp ~adata ?name kf ?rte env p =
   match Predicate_normalizer.get p with
-  | PoT_term t -> term_to_exp kf env t
+  | PoT_term t -> term_to_exp ~adata kf env t
   | PoT_pred p ->
     let rte = match rte with None -> Env.generate_rte env | Some b -> b in
     Extlib.flatten
@@ -1358,7 +1354,7 @@ let gmp_to_sizet ~adata ~loc ~name ?(check_lower_bound=true) ?pp kf env t =
           pred_name = pred_name :: lower_guard_pp.pred_name }
       in
       let lower_guard = Logic_const.prel ~loc (Rge, t, zero_term) in
-      Typing.type_named_predicate ~must_clear:false lower_guard;
+      Typing.type_named_predicate lower_guard;
       let adata_lower_guard, env = Assert.empty ~loc kf env in
       let lower_guard, adata_lower_guard, env =
         predicate_to_exp ~adata:adata_lower_guard kf env lower_guard
@@ -1388,7 +1384,7 @@ let gmp_to_sizet ~adata ~loc ~name ?(check_lower_bound=true) ?pp kf env t =
       pred_name = pred_name :: upper_guard_pp.pred_name }
   in
   let upper_guard = Logic_const.prel ~loc (Rle, t, sizet_max) in
-  Typing.type_named_predicate ~must_clear:false upper_guard;
+  Typing.type_named_predicate upper_guard;
   let adata_upper_guard, env = Assert.empty ~loc kf env in
   let upper_guard, adata_upper_guard, env =
     predicate_to_exp ~adata:adata_upper_guard kf env upper_guard

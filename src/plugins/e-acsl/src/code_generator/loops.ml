@@ -164,7 +164,7 @@ let handle_annotations env kf stmt =
             let variant_pos =
               Logic_const.prel ~loc (Rge, t_old, Logic_const.tinteger ~loc 0)
             in
-            Typing.type_named_predicate ~must_clear:true variant_pos;
+            Typing.type_named_predicate variant_pos;
             let variant_pos_e, _, env =
               !predicate_to_exp_ref ~adata:Assert.no_data kf env variant_pos
             in
@@ -198,7 +198,7 @@ let handle_annotations env kf stmt =
             let variant_dec =
               Logic_const.prel ~loc (Rgt, t_old, t)
             in
-            Typing.type_named_predicate ~must_clear:true variant_dec;
+            Typing.type_named_predicate variant_dec;
             let variant_dec_e, _, env =
               !predicate_to_exp_ref ~adata:Assert.no_data kf env variant_dec
             in
@@ -382,7 +382,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
           (* Even though p is considered a RTE, it was generated while
              typing the loop, and was already typed at this moment. Thus
              there is no need to type it again *)
-          !predicate_to_exp_ref kf (Env.push env) p
+          !predicate_to_exp_ref adata kf (Env.push env) p
         in
         let stmt, env =
           Assert.runtime_check

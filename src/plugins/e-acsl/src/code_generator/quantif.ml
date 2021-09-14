@@ -176,7 +176,7 @@ let convert kf env loc ~is_forall quantif =
         end_loop_ref := end_loop;
         let env = Env.add_stmt env kf end_loop in
         res, env
-      end
+    end
 
 let quantif_to_exp kf env p =
   let loc = p.pred_loc in

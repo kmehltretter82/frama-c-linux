@@ -34,6 +34,11 @@
 [e-acsl] FRAMAC_SHARE/libc/stdio.h:94: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/stdio.h:97: Warning: 
+  E-ACSL construct
+  `logic functions or predicates with no definition nor reads clause'
+  is not yet supported.
+  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:470: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.

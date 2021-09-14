@@ -2,20 +2,32 @@
 [e-acsl] Warning: annotating undefined function `fopen':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
+[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:281: Warning: 
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/stdio.h:155: Warning: 
+  E-ACSL construct
+  `logic functions or predicates with no definition nor reads clause'
+  is not yet supported.
+  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdio.h:350: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdio.h:150: Warning: 
-  E-ACSL construct `logic functions with labels' is not yet supported.
+  E-ACSL construct `logic functions or predicates with labels'
+  is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdio.h:151: Warning: 
-  E-ACSL construct `logic functions with labels' is not yet supported.
+  E-ACSL construct `logic functions or predicates with labels'
+  is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdio.h:149: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdio.h:155: Warning: 
-  E-ACSL construct `predicate with no definition nor reads clause'
+  E-ACSL construct
+  `logic functions or predicates with no definition nor reads clause'
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
