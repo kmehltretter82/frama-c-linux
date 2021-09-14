@@ -244,4 +244,207 @@ const properties_internal: State.Array<Json.key<'#property'>,propertiesData> = {
 /** Status of Registered Properties */
 export const properties: State.Array<Json.key<'#property'>,propertiesData> = properties_internal;
 
+/** The alarms are counted after being grouped by these categories */
+export enum alarmCategory {
+  /** Integer division by zero */
+  division_by_zero = 'division_by_zero',
+  /** Invalid pointer dereferencing */
+  mem_access = 'mem_access',
+  /** Array access out of bounds */
+  index_bound = 'index_bound',
+  /** Invalid shift */
+  shift = 'shift',
+  /** Integer overflow or downcast */
+  overflow = 'overflow',
+  /** Uninitialized memory read */
+  initialization = 'initialization',
+  /** Read of a dangling pointer */
+  dangling_pointer = 'dangling_pointer',
+  /** Non-finite (nan or infinite) floating-point value */
+  is_nan_or_infinite = 'is_nan_or_infinite',
+  /** Overflow in float to int conversion */
+  float_to_int = 'float_to_int',
+  /** Any other alarm */
+  other = 'other',
+}
+
+/** Loose decoder for `alarmCategory` */
+export const jAlarmCategory: Json.Loose<alarmCategory> =
+  Json.jEnum(alarmCategory);
+
+/** Safe decoder for `alarmCategory` */
+export const jAlarmCategorySafe: Json.Safe<alarmCategory> =
+  Json.jFail(Json.jEnum(alarmCategory),
+    'plugins.eva.general.alarmCategory expected');
+
+/** Natural order for `alarmCategory` */
+export const byAlarmCategory: Compare.Order<alarmCategory> =
+  Compare.byEnum(alarmCategory);
+
+const alarmCategoryTags_internal: Server.GetRequest<null,tag[]> = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.eva.general.alarmCategoryTags',
+  input:  Json.jNull,
+  output: Json.jList(jTag),
+};
+/** Registered tags for the above type. */
+export const alarmCategoryTags: Server.GetRequest<null,tag[]>= alarmCategoryTags_internal;
+
+/** Statuses count.œ */
+export type statusesEntry =
+  { valid: number, unknown: number, invalid: number };
+
+/** Loose decoder for `statusesEntry` */
+export const jStatusesEntry: Json.Loose<statusesEntry> =
+  Json.jObject({
+    valid: Json.jFail(Json.jNumber,'Number expected'),
+    unknown: Json.jFail(Json.jNumber,'Number expected'),
+    invalid: Json.jFail(Json.jNumber,'Number expected'),
+  });
+
+/** Safe decoder for `statusesEntry` */
+export const jStatusesEntrySafe: Json.Safe<statusesEntry> =
+  Json.jFail(jStatusesEntry,'StatusesEntry expected');
+
+/** Natural order for `statusesEntry` */
+export const byStatusesEntry: Compare.Order<statusesEntry> =
+  Compare.byFields
+    <{ valid: number, unknown: number, invalid: number }>({
+    valid: Compare.number,
+    unknown: Compare.number,
+    invalid: Compare.number,
+  });
+
+/** Statistics about an Eva analysis. */
+export type statistics =
+  { coverage:
+        { functions: { reachable: number, dead: number },
+          statements: { reachable: number, dead: number } },
+    eva_events: { errors: number, warnings: number },
+    kernel_events: { errors: number, warnings: number },
+    statuses:
+        { alarms: statusesEntry, assertions: statusesEntry,
+          preconds: statusesEntry },
+    alarms: { category: alarmCategory, count: number }[] };
+
+/** Loose decoder for `statistics` */
+export const jStatistics: Json.Loose<statistics> =
+  Json.jObject({
+    coverage: Json.jFail(
+                Json.jObject({
+                  functions: Json.jFail(
+                               Json.jObject({
+                                 reachable: Json.jFail(Json.jNumber,
+                                              'Number expected'),
+                                 dead: Json.jFail(Json.jNumber,
+                                         'Number expected'),
+                               }),'Record expected'),
+                  statements: Json.jFail(
+                                Json.jObject({
+                                  reachable: Json.jFail(Json.jNumber,
+                                               'Number expected'),
+                                  dead: Json.jFail(Json.jNumber,
+                                          'Number expected'),
+                                }),'Record expected'),
+                }),'Record expected'),
+    eva_events: Json.jFail(
+                  Json.jObject({
+                    errors: Json.jFail(Json.jNumber,'Number expected'),
+                    warnings: Json.jFail(Json.jNumber,'Number expected'),
+                  }),'Record expected'),
+    kernel_events: Json.jFail(
+                     Json.jObject({
+                       errors: Json.jFail(Json.jNumber,'Number expected'),
+                       warnings: Json.jFail(Json.jNumber,'Number expected'),
+                     }),'Record expected'),
+    statuses: Json.jFail(
+                Json.jObject({
+                  alarms: jStatusesEntrySafe,
+                  assertions: jStatusesEntrySafe,
+                  preconds: jStatusesEntrySafe,
+                }),'Record expected'),
+    alarms: Json.jList(
+              Json.jObject({
+                category: jAlarmCategorySafe,
+                count: Json.jFail(Json.jNumber,'Number expected'),
+              })),
+  });
+
+/** Safe decoder for `statistics` */
+export const jStatisticsSafe: Json.Safe<statistics> =
+  Json.jFail(jStatistics,'Statistics expected');
+
+/** Natural order for `statistics` */
+export const byStatistics: Compare.Order<statistics> =
+  Compare.byFields
+    <{ coverage:
+           { functions: { reachable: number, dead: number },
+             statements: { reachable: number, dead: number } },
+       eva_events: { errors: number, warnings: number },
+       kernel_events: { errors: number, warnings: number },
+       statuses:
+           { alarms: statusesEntry, assertions: statusesEntry,
+             preconds: statusesEntry },
+       alarms: { category: alarmCategory, count: number }[] }>({
+    coverage: Compare.byFields
+                <{ functions: { reachable: number, dead: number },
+                   statements: { reachable: number, dead: number } }>({
+                functions: Compare.byFields
+                             <{ reachable: number, dead: number }>({
+                             reachable: Compare.number,
+                             dead: Compare.number,
+                           }),
+                statements: Compare.byFields
+                              <{ reachable: number, dead: number }>({
+                              reachable: Compare.number,
+                              dead: Compare.number,
+                            }),
+              }),
+    eva_events: Compare.byFields
+                  <{ errors: number, warnings: number }>({
+                  errors: Compare.number,
+                  warnings: Compare.number,
+                }),
+    kernel_events: Compare.byFields
+                     <{ errors: number, warnings: number }>({
+                     errors: Compare.number,
+                     warnings: Compare.number,
+                   }),
+    statuses: Compare.byFields
+                <{ alarms: statusesEntry, assertions: statusesEntry,
+                   preconds: statusesEntry }>({
+                alarms: byStatusesEntry,
+                assertions: byStatusesEntry,
+                preconds: byStatusesEntry,
+              }),
+    alarms: Compare.array(
+              Compare.byFields
+                <{ category: alarmCategory, count: number }>({
+                category: byAlarmCategory,
+                count: Compare.number,
+              })),
+  });
+
+/** Signal for state [`stats`](#stats)  */
+export const signalStats: Server.Signal = {
+  name: 'plugins.eva.general.signalStats',
+};
+
+const getStats_internal: Server.GetRequest<null,statistics> = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.eva.general.getStats',
+  input:  Json.jNull,
+  output: jStatistics,
+};
+/** Getter for state [`stats`](#stats)  */
+export const getStats: Server.GetRequest<null,statistics>= getStats_internal;
+
+const stats_internal: State.Value<statistics> = {
+  name: 'plugins.eva.general.stats',
+  signal: signalStats,
+  getter: getStats,
+};
+/** Statistics about the last Eva analysis */
+export const stats: State.Value<statistics> = stats_internal;
+
 /* ------------------------------------- */

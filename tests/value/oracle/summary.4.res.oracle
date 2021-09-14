@@ -117,8 +117,8 @@
        1 division by zero
        3 invalid memory accesses
        2 accesses out of bounds index
-       3 integer overflows
        2 invalid shifts
+       3 integer overflows
        1 escaping address
        2 nan or infinite floating-point values
        2 illegal conversions from floating-point to integer

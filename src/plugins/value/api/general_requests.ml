@@ -206,4 +206,189 @@ let _array =
     ~iter:Property_status.iter
     model
 
+
+(* ----- Analysis statistics -------------------------------------------- *)
+
+module AlarmCategory = struct
+  open Server.Data
+
+  module Tags =
+  struct
+    let dictionary = Enum.dictionary ()
+
+    (* Give a normal representation of the category *)
+    let repr =
+      let e = List.hd Cil_datatype.Exp.reprs in
+      let lv = List.hd Cil_datatype.Lval.reprs in
+      function
+      | Value_results.Division_by_zero -> Alarms.Division_by_zero e
+      | Memory_access -> Memory_access (lv, For_reading)
+      | Index_out_of_bound-> Index_out_of_bound (e, None)
+      | Invalid_shift -> Invalid_shift (e, None)
+      | Overflow -> Overflow (Signed, e, Integer.one, Lower_bound)
+      | Uninitialized -> Uninitialized lv
+      | Dangling -> Dangling lv
+      | Nan_or_infinite -> Is_nan_or_infinite (e, FFloat)
+      | Float_to_int -> Float_to_int (e, Integer.one, Lower_bound)
+      | Other -> assert false
+
+    let register alarm_category =
+      let name, descr = match alarm_category with
+        | Value_results.Other -> "other", "Any other alarm"
+        | alarm_category ->
+          let alarm = repr alarm_category in
+          Alarms.(get_short_name alarm, get_description alarm)
+      in
+      Enum.tag dictionary
+        ~name
+        ~label:(Markdown.plain name)
+        ~descr:(Markdown.plain descr)
+
+    let division_by_zero = register Division_by_zero
+    let memory_access = register Memory_access
+    let index_out_of_bound = register Index_out_of_bound
+    let invalid_shift = register Invalid_shift
+    let overflow = register Overflow
+    let uninitialized = register Uninitialized
+    let dangling = register Dangling
+    let nan_or_infinite = register Nan_or_infinite
+    let float_to_int = register Float_to_int
+    let other = register Other
+
+    let () = Enum.set_lookup dictionary
+        begin function
+          | Value_results.Division_by_zero -> division_by_zero
+          | Memory_access -> memory_access
+          | Index_out_of_bound -> index_out_of_bound
+          | Invalid_shift -> invalid_shift
+          | Overflow -> overflow
+          | Uninitialized -> uninitialized
+          | Dangling -> dangling
+          | Nan_or_infinite -> nan_or_infinite
+          | Float_to_int -> float_to_int
+          | Other -> other
+        end
+  end
+
+  let name = "alarmCategory"
+  let descr = Markdown.plain
+      "The alarms are counted after being grouped by these categories"
+  let data = Request.dictionary ~package ~name ~descr Tags.dictionary
+
+  include (val data : S with type t = Value_results.alarm_category)
+end
+
+module CoverageEntry =
+struct
+  open Value_results
+  let jtype = Package.(
+      Jrecord [
+        "reachable",Jnumber ;
+        "dead",Jnumber ;
+      ])
+  let to_json x = `Assoc [
+      "reachable", `Int x.reachable ;
+      "dead", `Int x.dead ;
+    ]
+end
+
+module Coverage =
+struct
+  open Value_results
+  let jtype = Package.(
+      Jrecord [
+        "functions",CoverageEntry.jtype ;
+        "statements",CoverageEntry.jtype ;
+      ])
+  let to_json x = `Assoc [
+      "functions", CoverageEntry.to_json x.functions ;
+      "statements", CoverageEntry.to_json x.statements ;
+    ]
+end
+
+module EventCount =
+struct
+  open Value_results
+  let jtype = Package.(
+      Jrecord [
+        "errors",Jnumber ;
+        "warnings",Jnumber ;
+      ])
+  let to_json x = `Assoc [
+      "errors", `Int x.errors ;
+      "warnings", `Int x.warnings ;
+    ]
+end
+
+module StatusesEntry =
+struct
+  open Value_results
+  let jtype =
+    Data.declare ~package
+      ~name:"statusesEntry"
+      ~descr:(Markdown.plain "Statuses count.œ")
+      Package.(Jrecord [
+          "valid",Jnumber ;
+          "unknown",Jnumber ;
+          "invalid",Jnumber ;
+        ])
+  let to_json x = `Assoc [
+      "valid", `Int x.valid ;
+      "unknown", `Int x.unknown ;
+      "invalid", `Int x.invalid ;
+    ]
+end
+
+module Statuses =
+struct
+  open Value_results
+  let jtype = Package.(
+      Jrecord [
+        "alarms",StatusesEntry.jtype ;
+        "assertions",StatusesEntry.jtype ;
+        "preconds",StatusesEntry.jtype ;
+      ])
+  let to_json (x : statuses) = `Assoc [
+      "alarms", StatusesEntry.to_json x.alarms ;
+      "assertions", StatusesEntry.to_json x.assertions ;
+      "preconds", StatusesEntry.to_json x.preconds ;
+    ]
+end
+
+module Statistics = struct
+  open Value_results
+  type t = stats
+  let jtype =
+    Data.declare ~package
+      ~name:"statistics"
+      ~descr:(Markdown.plain "Statistics about an Eva analysis.")
+      Package.(Jrecord [
+          "coverage",Coverage.jtype ;
+          "eva_events",EventCount.jtype ;
+          "kernel_events",EventCount.jtype ;
+          "statuses",Statuses.jtype ;
+          "alarms",Jlist (Jrecord [
+              "category", AlarmCategory.jtype ;
+              "count", Jnumber ])])
+  let to_json x = `Assoc [
+      "coverage", Coverage.to_json x.coverage ;
+      "eva_events", EventCount.to_json x.eva_events ;
+      "kernel_events", EventCount.to_json x.kernel_events ;
+      "statuses", Statuses.to_json x.statuses ;
+      "alarms", `List (List.map (fun (a,c) -> `Assoc [
+          "category", AlarmCategory.to_json a ;
+          "count", `Int c ]) (AlarmsStats.bindings x.alarms))]
+end
+
+let () =
+  let signal = States.register_value ~package
+      ~name:"stats"
+      ~descr:(Markdown.plain "Statistics about the last Eva analysis")
+      ~output:(module Statistics)
+      ~get:Value_results.compute_stats
+      ()
+  in
+  Analysis.register_computed_hook (fun () -> Request.emit signal)
+
+
 (**************************************************************************)
