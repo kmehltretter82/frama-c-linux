@@ -162,7 +162,7 @@ VERSION_FILE=$(FRAMAC_ROOT_SRCDIR)/VERSION
 
 EACSL_VERSION:=$(shell sed -e 's/\\(.*\\)/\\1/' $(VERSION_FILE))
 
-$(EACSL_PLUGIN_DIR)/src/local_config.ml: $(EACSL_PLUGIN_DIR)/Makefile.in $(VERSION_FILE)
+$(EACSL_PLUGIN_DIR)/src/local_config.ml: $(EACSL_PLUGIN_DIR)/Makefile $(VERSION_FILE)
 	$(PRINT_MAKING) $@
 	$(RM) $@
 	$(ECHO) "(* This file was automatically generated from $<. Don't edit it. *)" >> $@
@@ -272,9 +272,11 @@ EACSL_DLMALLOC_FLAGS = \
   -DMSPACES=1 \
   -DONLY_MSPACES \
   -DMALLOC_ALIGNMENT=32 \
-  -DMSPACE_PREFIX="__e_acsl_"
+  -DMSPACE_PREFIX="__e_acsl_" \
+  -DUSE_LOCKS=1 \
+  -DUSE_SPIN_LOCKS=1
 
-$(EACSL_DLMALLOC_LIB): $(EACSL_DLMALLOC_SRC)
+$(EACSL_DLMALLOC_LIB): $(EACSL_DLMALLOC_SRC) $(EACSL_PLUGIN_DIR)/Makefile
 	$(MKDIR) $(EACSL_LIBDIR)
 	echo 'CC           $<'
 	$(CC) $< -c -O2 -g3 -o$(EACSL_DLMALLOC_OBJ) $(EACSL_DLMALLOC_FLAGS)

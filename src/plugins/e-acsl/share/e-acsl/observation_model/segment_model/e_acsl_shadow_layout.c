@@ -675,7 +675,7 @@ void set_shadow_segment(memory_segment *seg, memory_segment *parent,
   seg->name = name;
   seg->shadow_ratio = ratio;
   seg->size = parent->size / seg->shadow_ratio;
-  seg->mspace = eacsl_create_mspace(seg->size + SHADOW_SEGMENT_PADDING, 0);
+  seg->mspace = eacsl_create_locked_mspace(seg->size + SHADOW_SEGMENT_PADDING);
   seg->start = (uintptr_t)eacsl_mspace_malloc(seg->mspace, 1);
   seg->end = seg->start + seg->size - 1;
   seg->shadow_offset = parent->start - seg->start;

@@ -28,7 +28,7 @@
  * is split into two mspaces (memory spaces). Memory allocation itself is
  * delegated to a slightly customised version of dlmalloc shipped with the
  * RTL. The overall pattern is as follows:
- *    mspace space = eacsl_create_mspace(capacity, locks);
+ *    mspace space = eacsl_create_locked_mspace(capacity);
  *    char *p = eacsl_mspace_malloc(space, size);
  **************************************************************************/
 
@@ -70,7 +70,7 @@ void eacsl_destroy_memory_spaces();
 /*** Mspace allocators (from dlmalloc) {{{ ***/
 /************************************************************************/
 
-#define eacsl_create_mspace         export_alias(create_mspace)
+#define eacsl_create_locked_mspace  export_alias(create_locked_mspace)
 #define eacsl_destroy_mspace        export_alias(destroy_mspace)
 #define eacsl_mspace_least_addr     export_alias(mspace_least_addr)
 #define eacsl_mspace_malloc         export_alias(mspace_malloc)
@@ -93,7 +93,7 @@ struct memory_spaces {
 };
 extern struct memory_spaces mem_spaces;
 
-extern mspace eacsl_create_mspace(size_t, int);
+/* Original functions from dlmalloc */
 extern size_t eacsl_destroy_mspace(mspace);
 extern void *eacsl_mspace_malloc(mspace, size_t);
 extern void eacsl_mspace_free(mspace, void *);
@@ -102,6 +102,10 @@ extern void *eacsl_mspace_realloc(mspace msp, void *, size_t);
 extern void *eacsl_mspace_aligned_alloc(mspace, size_t, size_t);
 extern int eacsl_mspace_posix_memalign(mspace, void **, size_t, size_t);
 extern void *eacsl_mspace_least_addr(mspace);
+
+/*! \brief Wrapper around `eacsl_create_mspace` to always create a thread-safe
+ *  mspace. */
+mspace eacsl_create_locked_mspace(size_t size);
 
 /* }}} */
 
