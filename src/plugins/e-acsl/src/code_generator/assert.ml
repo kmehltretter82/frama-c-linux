@@ -27,6 +27,7 @@ open Cil_types
 
 (** Type holding information about the C variable representing the assertion
     data. *)
+[@@@ warning "-69"]
 type data = {
   (** Indicates if some data have been registered in the context or not. *)
   data_registered: bool;
