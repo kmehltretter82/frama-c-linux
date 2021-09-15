@@ -23,7 +23,7 @@
 open Cil_types
 open Cil_datatype
 
-module DomKernel =
+include
   Plugin.Register
     (struct
       let name = "dominators"
@@ -252,16 +252,15 @@ let output, _ = State_builder.apply_once "Postdominators.Compute.output"
 let () = Db.Main.extend output
 
 
-module PostDomVal =
-  PostDomDb(
-  struct
-    let is_accessible = Db.Value.is_reachable_stmt
-    let dependencies = [ Db.Value.self ]
-    let name = "value"
-    let eval_cond stmt _e =
-      Db.Value.condition_truth_value stmt
-
-  end)
+include
+  PostDomDb
+    (struct
+      let is_accessible = Db.Value.is_reachable_stmt
+      let dependencies = [ Db.Value.self ]
+      let name = "value"
+      let eval_cond stmt _e =
+        Db.Value.condition_truth_value stmt
+    end)
     (Db.PostdominatorsValue)
 
 (*

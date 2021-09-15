@@ -38,8 +38,6 @@ module Occurrences: sig
       (Cil_types.lhost * Cil_types.offset))
        list * Cil_types.varinfo)
       option
-  val iter:
-    (varinfo -> (kernel_function option * kinstr * lval) list -> unit) -> unit
   val iter_sorted:
     (varinfo -> (kernel_function option * kinstr * lval) list -> unit) -> unit
 end = struct
@@ -96,7 +94,6 @@ end = struct
     let map = IState.fold Varinfo.Map.add Varinfo.Map.empty in
     Varinfo.Map.fold f map init
 
-  let iter = iter_aux IState.fold
   let iter_sorted = iter_aux fold_sorted
 
   let self = IState.self

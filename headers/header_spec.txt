@@ -756,6 +756,7 @@ src/plugins/aorai/aorai_metavariables.mli: AORAI_LGPL
 src/plugins/aorai/aorai_option.ml: AORAI_LGPL
 src/plugins/aorai/aorai_option.mli: AORAI_LGPL
 src/plugins/aorai/aorai_register.ml: AORAI_LGPL
+src/plugins/aorai/aorai_register.mli: AORAI_LGPL
 src/plugins/aorai/aorai_utils.ml: AORAI_LGPL
 src/plugins/aorai/aorai_utils.mli: AORAI_LGPL
 src/plugins/aorai/aorai_visitors.ml: AORAI_LGPL
@@ -792,6 +793,7 @@ src/plugins/callgraph/journalize.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/options.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/options.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/register.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/callgraph/register.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/services.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/services.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/subgraph.ml: CEA_LGPL_OR_PROPRIETARY
@@ -815,6 +817,7 @@ src/plugins/dive/dive_graph.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/dive/dive_types.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/dive/Dive.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/dive/main.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/dive/main.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/dive/Makefile.in: CEA_LGPL_OR_PROPRIETARY
 src/plugins/dive/node_kind.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/dive/node_kind.mli: CEA_LGPL_OR_PROPRIETARY
@@ -914,6 +917,7 @@ src/plugins/impact/pdg_aux.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/impact/pdg_aux.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/impact/reason_graph.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/impact/register.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/impact/register.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/impact/register_gui.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/impact/register_gui.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/inout/Inout.mli: CEA_LGPL_OR_PROPRIETARY
@@ -930,6 +934,7 @@ src/plugins/inout/operational_inputs.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/inout/outputs.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/inout/outputs.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/inout/register.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/inout/register.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/loop_analysis/.gitignore: .ignore
 src/plugins/loop_analysis/Makefile.in: CEA_LGPL_OR_PROPRIETARY
 src/plugins/loop_analysis/LoopAnalysis.mli: CEA_LGPL_OR_PROPRIETARY
@@ -945,6 +950,7 @@ src/plugins/loop_analysis/region_analysis_sig.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/loop_analysis/region_analysis_stmt.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/loop_analysis/region_analysis_stmt.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/loop_analysis/register.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/loop_analysis/register.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/markdown-report/configure.ac: CEA_LGPL
 src/plugins/markdown-report/eva_info.ml: CEA_LGPL
 src/plugins/markdown-report/eva_info.mli: CEA_LGPL
@@ -979,13 +985,16 @@ src/plugins/metrics/metrics_gui.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/metrics/metrics_parameters.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/metrics/metrics_parameters.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/metrics/register.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/metrics/register.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/metrics/register_gui.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/metrics/register_gui.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/nonterm/.gitignore: .ignore
 src/plugins/nonterm/Makefile.in: CEA_LGPL_OR_PROPRIETARY
 src/plugins/nonterm/Nonterm.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/nonterm/README.md: .ignore
 src/plugins/nonterm/configure.ac: CEA_LGPL_OR_PROPRIETARY
 src/plugins/nonterm/nonterm_run.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/nonterm/nonterm_run.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/obfuscator/.gitignore: .ignore
 src/plugins/obfuscator/Makefile.in: CEA_LGPL_OR_PROPRIETARY
 src/plugins/obfuscator/Obfuscator.mli: CEA_LGPL_OR_PROPRIETARY
@@ -997,12 +1006,14 @@ src/plugins/obfuscator/obfuscate.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/obfuscator/obfuscator_kind.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/obfuscator/obfuscator_kind.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/obfuscator/obfuscator_register.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/obfuscator/obfuscator_register.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/obfuscator/options.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/obfuscator/options.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/occurrence/Occurrence.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/occurrence/options.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/occurrence/options.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/occurrence/register.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/occurrence/register.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/occurrence/register_gui.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/occurrence/register_gui.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/basic_blocks.ml: CEA_LGPL_OR_PROPRIETARY
@@ -1035,6 +1046,7 @@ src/plugins/instantiate/string/memset.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/options.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/options.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/register.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/instantiate/register.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/transform.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/transform.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/pdg/Pdg.mli: CEA_LGPL_OR_PROPRIETARY
@@ -1051,6 +1063,7 @@ src/plugins/pdg/pdg_parameters.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/pdg/pdg_state.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/pdg/pdg_state.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/pdg/register.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/pdg/register.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/pdg/sets.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/pdg/sets.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/pdg_types/pdgIndex.ml: CEA_LGPL_OR_PROPRIETARY
@@ -1061,6 +1074,7 @@ src/plugins/pdg_types/pdgTypes.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/pdg_types/pdgTypes.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/postdominators/Postdominators.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/postdominators/compute.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/postdominators/compute.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/postdominators/postdominators_parameters.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/postdominators/postdominators_parameters.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/postdominators/print.ml: CEA_LGPL_OR_PROPRIETARY
@@ -1131,6 +1145,7 @@ src/plugins/reduc/misc.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/reduc/reduc_options.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/reduc/reduc_options.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/reduc/register.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/reduc/register.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/reduc/value2acsl.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/reduc/value2acsl.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/report/.gitignore: .ignore
@@ -1157,6 +1172,7 @@ src/plugins/rte/generator.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/rte/options.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/rte/options.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/rte/register.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/rte/register.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/rte/rte.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/rte/rte.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/rte/visit.ml: CEA_LGPL_OR_PROPRIETARY
@@ -1188,7 +1204,9 @@ src/plugins/server/server_doc.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/server_parameters.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/server_parameters.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/server_batch.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/server/server_batch.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/server_zmq.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/server/server_zmq.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/states.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/states.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/scope/Scope.mli: CEA_LGPL_OR_PROPRIETARY
@@ -1197,6 +1215,7 @@ src/plugins/scope/datascope.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/scope/defs.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/scope/defs.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/scope/dpds_gui.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/scope/dpds_gui.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/scope/zones.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/scope/zones.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/security_slicing/.gitignore: .ignore
@@ -1217,6 +1236,7 @@ src/plugins/slicing/fct_slice.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/slicing/printSlice.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/slicing/printSlice.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/slicing/register.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/slicing/register.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/slicing/register_gui.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/slicing/register_gui.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/slicing/slicingActions.ml: CEA_LGPL_OR_PROPRIETARY
@@ -1241,6 +1261,7 @@ src/plugins/slicing/slicingTypes.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/sparecode/Sparecode.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/sparecode/globs.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/sparecode/register.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/sparecode/register.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/sparecode/spare_marks.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/sparecode/spare_marks.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/sparecode/sparecode_params.ml: CEA_LGPL_OR_PROPRIETARY
@@ -1261,6 +1282,7 @@ src/plugins/studia/writes.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/studia/writes.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/users/Users.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/users/users_register.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/users/users_register.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/Changelog_non_free: .ignore
 src/plugins/value/Eva.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/alarmset.ml: CEA_LGPL_OR_PROPRIETARY
@@ -1509,6 +1531,7 @@ src/plugins/variadic/generic.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/options.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/options.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/register.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/variadic/register.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/replacements.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/replacements.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/standard.ml: CEA_LGPL_OR_PROPRIETARY

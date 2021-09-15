@@ -151,6 +151,7 @@ src/libraries/varname.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/varname.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/local_config.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/main.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/main.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/options.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/options.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/project_initializer/rtl.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL

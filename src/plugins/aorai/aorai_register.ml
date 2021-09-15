@@ -29,7 +29,6 @@ open Promelaast
 (* [VP] Need to get rid of those global references at some point. *)
 let promela_file = ref Filepath.Normalized.empty
 let c_file = ref Filepath.Normalized.empty
-let output_c_file = ref Filepath.Normalized.empty
 let ltl_tmp_file = ref Filepath.Normalized.empty
 let ltl_file = ref Filepath.Normalized.empty
 let dot_file = ref Filepath.Normalized.empty

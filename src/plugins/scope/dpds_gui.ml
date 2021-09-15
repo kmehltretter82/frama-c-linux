@@ -162,7 +162,7 @@ end
 module type DpdCmdSig = sig
   type t_in
   val help : string
-  val get_info : (Kernel_function.t * Cil_types.stmt) option -> string
+  val _get_info : (Kernel_function.t * Cil_types.stmt) option -> string
   val compute : Kernel_function.t -> Cil_types.stmt -> t_in -> string
   val tag_stmt : Cil_types.stmt -> (string * GText.tag_property list)
   val clear: unit -> unit
@@ -191,7 +191,7 @@ module DataScope : (DpdCmdSig with type t_in = lval)  = struct
               ^"than at its value at L.\n\t"
               ^"For more information, please look at the Scope plugin documentation.")
 
-  let get_info _kf_stmt_opt =
+  let _get_info _kf_stmt_opt =
     if Stmt.Hptset.is_empty (Fscope.get ())
     && Stmt.Hptset.is_empty (FBscope.get ())
     && Stmt.Hptset.is_empty (Bscope.get ())
@@ -213,8 +213,6 @@ end
 
 module Pscope (* : (DpdCmdSig with type t_in = code_annotation) *) = struct
 
-  type t_in = code_annotation
-
   module Pscope =
     Make_StmtSetState
       (struct let name = "Dpds_gui.Highlighter.Pscope" end)
@@ -233,7 +231,7 @@ module Pscope (* : (DpdCmdSig with type t_in = code_annotation) *) = struct
               ^"highlight the statements where the value of the assertion is also ok\n\t"
               ^"For more information, please look at the Scope plugin documentation.")
 
-  let get_info _kf_stmt_opt =
+  let _get_info _kf_stmt_opt =
     if Stmt.Hptset.is_empty (Pscope.get ())
     then ""
     else "[prop_scope] selected"
@@ -271,7 +269,7 @@ module ShowDef : (DpdCmdSig with type t_in = lval) = struct
               ^"not defined on some path from the beginning of the function.")
 
 
-  let get_info _kf_stmt_opt =
+  let _get_info _kf_stmt_opt =
     if Stmt.Map.is_empty (ShowDefState.get()) then  ""
     else "[show_def] selected"
 
@@ -345,7 +343,7 @@ module Zones : (DpdCmdSig with type t_in = lval)  = struct
      ^"\tAfter this computation, the result Di will be printed in the "
      ^" information window each time a statement Li is selected.")
 
-  let get_info kf_stmt_opt =
+  let _get_info kf_stmt_opt =
     try
       let zones, _ = ZonesState.get () in
       match kf_stmt_opt with
