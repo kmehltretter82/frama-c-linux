@@ -214,13 +214,13 @@ let generate_kf ~loc fname env ret_ty params_ty li =
       List.fold_left2 add env li.l_profile params
     in
     let assigns_from =
-      try Some (Genassigns.get_assigns_from ~loc env li.l_profile li.l_var_info)
-      with Genassigns.NoAssigns -> None
+      try Some (Assigns.get_assigns_from ~loc env li.l_profile li.l_var_info)
+      with Assigns.NoAssigns -> None
     in
     let assigned_var =
       Logic_const.new_identified_term
         (if res_as_extra_arg then
-           Logic_utils.expr_to_term (Genassigns.get_gmp_integer ~loc ret_vi)
+           Logic_utils.expr_to_term (Assigns.get_gmp_integer ~loc ret_vi)
          else
            Logic_const.tresult fundec.svar.vtype)
     in

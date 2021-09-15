@@ -82,7 +82,7 @@ SRC_CODE_GENERATOR:= \
 	assert \
 	rational \
 	typed_number \
-	genassigns \
+	assigns \
 	logic_functions \
 	loops \
 	quantif \
