@@ -388,6 +388,7 @@ src/kernel_internals/parsing/logic_preprocess.mli: CEA_INRIA_LGPL
 src/kernel_internals/parsing/logic_preprocess.mll: CEA_INRIA_LGPL
 src/kernel_internals/runtime/README.md: .ignore
 src/kernel_internals/runtime/boot.ml: CEA_LGPL
+src/kernel_internals/runtime/boot.mli: CEA_LGPL
 src/kernel_internals/runtime/dump_config.ml: CEA_LGPL
 src/kernel_internals/runtime/dump_config.mli: CEA_LGPL
 src/kernel_internals/runtime/fc_config.ml.in: CEA_LGPL
@@ -931,6 +932,7 @@ src/plugins/inout/inout_parameters.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/inout/inputs.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/inout/inputs.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/inout/operational_inputs.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/inout/operational_inputs.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/inout/outputs.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/inout/outputs.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/inout/register.ml: CEA_LGPL_OR_PROPRIETARY
@@ -970,6 +972,7 @@ src/plugins/markdown-report/sarif.ml: CEA_LGPL
 src/plugins/markdown-report/share/acsl.xml: CEA_LGPL
 src/plugins/metrics/Metrics.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/metrics/css_html.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/metrics/css_html.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/metrics/metrics_acsl.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/metrics/metrics_acsl.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/metrics/metrics_base.ml: CEA_LGPL_OR_PROPRIETARY
@@ -1078,12 +1081,15 @@ src/plugins/postdominators/compute.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/postdominators/postdominators_parameters.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/postdominators/postdominators_parameters.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/postdominators/print.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/postdominators/print.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/print_api/.gitignore: .ignore
 src/plugins/print_api/Makefile: CEA_LGPL
 src/plugins/print_api/Print_api.mli: CEA_LGPL
 src/plugins/print_api/grammar.mly: CEA_LGPL
 src/plugins/print_api/lexer.mll: CEA_LGPL
+src/plugins/print_api/lexer.mli: CEA_LGPL
 src/plugins/print_api/print_interface.ml: CEA_LGPL
+src/plugins/print_api/print_interface.mli: CEA_LGPL
 src/plugins/qed/.gitignore: .ignore
 src/plugins/qed/.ocp-indent: .ignore
 src/plugins/qed/Makefile: CEA_WP
@@ -1260,6 +1266,7 @@ src/plugins/slicing/slicingTransform.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/slicing/slicingTypes.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/sparecode/Sparecode.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/sparecode/globs.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/sparecode/globs.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/sparecode/register.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/sparecode/register.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/sparecode/spare_marks.ml: CEA_LGPL_OR_PROPRIETARY
@@ -1267,6 +1274,7 @@ src/plugins/sparecode/spare_marks.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/sparecode/sparecode_params.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/sparecode/sparecode_params.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/sparecode/transform.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/sparecode/transform.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/studia/Makefile.in: CEA_LGPL_OR_PROPRIETARY
 src/plugins/studia/configure.ac: CEA_LGPL_OR_PROPRIETARY
 src/plugins/studia/options.ml: CEA_LGPL_OR_PROPRIETARY
