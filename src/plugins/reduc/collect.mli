@@ -29,10 +29,9 @@ type 'a alarm_component = Emitter.t ->
 
 type env
 
-type varh = VarAll
 type annoth = AnnotAll | AnnotInout
 
-val empty_env: varh -> annoth -> env
+val empty_env: annoth -> env
 
 val get_relevant: env alarm_component (* Set(loc) * Set(exp) ? *)
 

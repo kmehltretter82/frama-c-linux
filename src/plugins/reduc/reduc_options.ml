@@ -43,12 +43,4 @@ module GenAnnot =
       let help = "Heuristic to generate annotations from Value"
       let default = "inout"
     end)
-
-module GenVars =
-  String
-    (struct
-      let option_name = "-reduc-gen-vars"
-      let arg_name = "gen-vars-heuristic"
-      let help = "Heuristic to generate annotations for variables"
-      let default = "all"
-    end)
+let () = GenAnnot.set_possible_values ["inout"; "all"]

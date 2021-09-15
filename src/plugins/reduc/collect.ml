@@ -35,18 +35,15 @@ type 'a alarm_component = Emitter.t ->
   stmt ->
   rank:int -> Alarms.alarm -> code_annotation -> 'a -> 'a
 
-type varh = VarAll
 type annoth = AnnotAll | AnnotInout
 
 type env = {
-  rel_varh: varh;
   rel_annoth: annoth;
   rel_stmts: Stmt.Set.t;
   rel_vars: LvalStructEq.Set.t Stmt.Map.t;
 }
 
-let empty_env varh annoth = {
-  rel_varh = varh;
+let empty_env annoth = {
   rel_annoth = annoth;
   rel_stmts = Stmt.Set.empty;
   rel_vars = Stmt.Map.empty;
