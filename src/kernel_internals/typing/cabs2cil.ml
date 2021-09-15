@@ -1838,9 +1838,19 @@ struct
              { c1 with
                locals = c1.locals @ ll ;
                statics = c1.statics @ ls })
-        | [{skind = UnspecifiedSequence l},_,_,_,_]
+        | [{skind = UnspecifiedSequence l} as s,_,_,_,_]
           when c1.unspecified_order ->
-          { stmts = List.rev_append l c1.stmts;
+          let stmts =
+            match l, s.labels with
+            | [],[] -> []
+            | [], _ ->
+              let s' = mkStmtOneInstr (Skip (Cil_datatype.Stmt.loc s)) in
+              s'.labels <- s.labels;
+              [s,[],[],[],[]]
+            | (h,_,_,_,_)::_, _ ->
+              h.labels <- h.labels @ s.labels; l
+          in
+          { stmts = List.rev_append stmts c1.stmts;
             cases = c1.cases @ c2.cases;
             locals = c1.locals @ c2.locals;
             statics = c1.statics @ c2.statics;
@@ -9951,17 +9961,15 @@ and doStatement local_env (s : Cabs.statement) : chunk =
       let s'' = consLabContinue ~ghost se3 in
       let break_cond = breakChunk ~ghost loc' in
       exitLoop ();
-      let res =
+      let c = s' @@ (s'', ghost) in
+      let c =
         match e2.expr_node with
         | Cabs.NOTHING -> (* This means true *)
-          se1 @@ (loopChunk ~sattr:[Attr("for",[])] ~ghost a (s' @@ (s'', ghost)), ghost)
+          c
         | _ ->
-          se1 @@
-          (loopChunk ~sattr:[Attr("for",[])] ~ghost a
-             (((doCondition
-                  local_env CNoConst e2 skipChunk break_cond)
-               @@ (s', ghost)) @@ (s'', ghost)), ghost)
+          doCondition local_env CNoConst e2 skipChunk break_cond @@ (c, ghost)
       in
+      let res = se1 @@ (loopChunk ~sattr:[Attr("for",[])] ~ghost a c, ghost) in
       exitScope ();
       if has_decl then begin
         let chunk = s2c (mkStmt ~ghost ~valid_sid (Block (c2block ~ghost res)))
