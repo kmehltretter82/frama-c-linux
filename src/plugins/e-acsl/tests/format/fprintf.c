@@ -1,5 +1,6 @@
-/* run.config,run.config_dev
+/* run.config
    COMMENT: Check behaviours of format functions
+   STDOPT: +"-eva-precision=1"
 */
 
 #include <stdlib.h>

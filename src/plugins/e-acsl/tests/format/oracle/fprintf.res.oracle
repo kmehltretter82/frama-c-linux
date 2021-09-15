@@ -47,5 +47,5 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[kernel:annot:missing-spec] tests/format/fprintf.c:15: Warning: 
+[kernel:annot:missing-spec] tests/format/fprintf.c:16: Warning: 
   Neither code nor specification for function __e_acsl_builtin_fprintf, generating default assigns from the prototype

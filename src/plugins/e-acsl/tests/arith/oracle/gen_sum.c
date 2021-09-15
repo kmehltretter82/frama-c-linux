@@ -30,7 +30,7 @@ int main(void)
     }
     __e_acsl_assert(__gen_e_acsl_sum == 108,1,"Assertion","main",
                     "\\sum(2, 10, \\lambda integer k; 2 * k) == 108",
-                    "tests/arith/sum.i",9);
+                    "tests/arith/sum.i",10);
   }
   /*@ assert \sum(2, 10, \lambda ℤ k; 2 * k) ≡ 108; */ ;
   {
@@ -60,10 +60,6 @@ int main(void)
         __gmpz_add(__gen_e_acsl_sum_2,
                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_sum_2),
                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_lambda_2));
-        /*@ assert
-            Eva: signed_overflow:
-              __gen_e_acsl_k_2 + __gen_e_acsl_one_2 ≤ 2147483647;
-        */
         __gen_e_acsl_k_2 += __gen_e_acsl_one_2;
       }
     }
@@ -72,7 +68,7 @@ int main(void)
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
     __e_acsl_assert(__gen_e_acsl_ne != 0,1,"Assertion","main",
                     "\\sum(2, 35, \\lambda integer k; 18446744073709551615) != 0",
-                    "tests/arith/sum.i",11);
+                    "tests/arith/sum.i",12);
     __gmpz_clear(__gen_e_acsl_lambda_2);
     __gmpz_clear(__gen_e_acsl_sum_2);
     __gmpz_clear(__gen_e_acsl__2);
@@ -100,7 +96,7 @@ int main(void)
     }
     __e_acsl_assert(__gen_e_acsl_sum_3 == 0,1,"Assertion","main",
                     "\\sum(10, 2, \\lambda integer k; k) == 0",
-                    "tests/arith/sum.i",13);
+                    "tests/arith/sum.i",14);
   }
   /*@ assert \sum(10, 2, \lambda ℤ k; k) ≡ 0; */ ;
   {
@@ -146,7 +142,7 @@ int main(void)
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__4));
     __e_acsl_assert(__gen_e_acsl_eq == 0,1,"Assertion","main",
                     "\\sum(x * x, 2, \\lambda integer k; k) == 0",
-                    "tests/arith/sum.i",15);
+                    "tests/arith/sum.i",16);
     __gmpz_clear(__gen_e_acsl_x);
     __gmpz_clear(__gen_e_acsl_mul);
     __gmpz_clear(__gen_e_acsl__3);
@@ -191,7 +187,7 @@ int main(void)
     }
     __e_acsl_assert(__gen_e_acsl_sum_5 == 6,1,"Assertion","main",
                     "\\sum(18446744073709551610, 18446744073709551615, \\lambda integer k; 1) == 6",
-                    "tests/arith/sum.i",17);
+                    "tests/arith/sum.i",18);
     __gmpz_clear(__gen_e_acsl__5);
     __gmpz_clear(__gen_e_acsl__6);
     __gmpz_clear(__gen_e_acsl_k_5);

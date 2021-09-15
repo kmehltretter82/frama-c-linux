@@ -1,5 +1,6 @@
 /* run.config
    COMMENT: function call + initialized
+   STDOPT: +"-eva-precision=1"
 */
 
 #include<stdlib.h>

@@ -21,7 +21,7 @@ int main(void)
       __gen_e_acsl_valid = __e_acsl_valid((void *)(p + i),sizeof(int *),
                                           (void *)p,(void *)(& p));
       __e_acsl_assert(__gen_e_acsl_valid,1,"Assertion","main",
-                      "\\valid(p + i)","tests/temporal/t_dpointer.c",12);
+                      "\\valid(p + i)","tests/temporal/t_dpointer.c",13);
     }
     /*@ assert \valid(p + i); */ ;
     __e_acsl_initialize((void *)(p + i),sizeof(int *));
@@ -43,7 +43,7 @@ int main(void)
                                                       (void *)(& p));
         __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","main",
                         "mem_access: \\valid_read(p + i)",
-                        "tests/temporal/t_dpointer.c",14);
+                        "tests/temporal/t_dpointer.c",15);
         __gen_e_acsl_valid_2 = __e_acsl_valid((void *)*(p + i),sizeof(int),
                                               (void *)*(p + i),
                                               (void *)(p + i));
@@ -51,7 +51,7 @@ int main(void)
       }
       else __gen_e_acsl_and = 0;
       __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","main",
-                      "\\valid(*(p + i))","tests/temporal/t_dpointer.c",14);
+                      "\\valid(*(p + i))","tests/temporal/t_dpointer.c",15);
     }
     /*@ assert \valid(*(p + i)); */ ;
     i ++;
@@ -77,7 +77,7 @@ int main(void)
                                                       (void *)(& p));
       __e_acsl_assert(__gen_e_acsl_valid_read_2,1,"RTE","main",
                       "mem_access: \\valid_read(p + 2)",
-                      "tests/temporal/t_dpointer.c",20);
+                      "tests/temporal/t_dpointer.c",21);
       /*@ assert Eva: dangling_pointer: ¬\dangling(p + 2); */
       __gen_e_acsl_valid_3 = __e_acsl_valid((void *)*(p + 2),sizeof(int),
                                             (void *)*(p + 2),(void *)(
@@ -86,7 +86,7 @@ int main(void)
     }
     else __gen_e_acsl_and_2 = 0;
     __e_acsl_assert(! __gen_e_acsl_and_2,1,"Assertion","main",
-                    "!\\valid(*(p + 2))","tests/temporal/t_dpointer.c",20);
+                    "!\\valid(*(p + 2))","tests/temporal/t_dpointer.c",21);
   }
   /*@ assert ¬\valid(*(p + 2)); */ ;
   __retres = 0;

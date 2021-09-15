@@ -28,5 +28,10 @@ int main(void) {
   int x = 0;
   int y = 0;
   f(&x);
+  // Here we test that E-ACSL only checks function f() at runtime, so the
+  // precondition *p == 1 of g() is invalid on purpose. If the option is not
+  // working correctly, the runtime test will fail.
+  // Eva correctly identifies the property as invalid and displays a message in
+  // the test oracle.
   g(&y);
 }

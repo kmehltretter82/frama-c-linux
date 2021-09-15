@@ -1,28 +1,28 @@
-TEST 1: OK: Expected execution at tests/format/fprintf.c:15
+TEST 1: OK: Expected execution at tests/format/fprintf.c:16
 fprintf: attempt to write to an invalid stream
-TEST 2: OK: Expected signal at tests/format/fprintf.c:16
-TEST 3: OK: Expected execution at tests/format/fprintf.c:19
+TEST 2: OK: Expected signal at tests/format/fprintf.c:17
+TEST 3: OK: Expected execution at tests/format/fprintf.c:20
 fprintf: attempt to write to an invalid stream
-TEST 4: OK: Expected signal at tests/format/fprintf.c:21
+TEST 4: OK: Expected signal at tests/format/fprintf.c:22
 fprintf: attempt to write to an invalid stream
-TEST 5: OK: Expected signal at tests/format/fprintf.c:22
-TEST 6: OK: Expected execution at tests/format/fprintf.c:27
+TEST 5: OK: Expected signal at tests/format/fprintf.c:23
+TEST 6: OK: Expected execution at tests/format/fprintf.c:28
 dprintf: attempt to write to a closed file descriptor 3
-TEST 7: OK: Expected signal at tests/format/fprintf.c:28
-TEST 8: OK: Expected execution at tests/format/fprintf.c:34
-TEST 9: OK: Expected execution at tests/format/fprintf.c:35
+TEST 7: OK: Expected signal at tests/format/fprintf.c:29
+TEST 8: OK: Expected execution at tests/format/fprintf.c:35
+TEST 9: OK: Expected execution at tests/format/fprintf.c:36
 sprintf: output buffer is unallocated or has insufficient length to store 6 characters or not writeable
-TEST 10: OK: Expected signal at tests/format/fprintf.c:36
+TEST 10: OK: Expected signal at tests/format/fprintf.c:37
 sprintf: output buffer is unallocated or has insufficient length to store 6 characters or not writeable
-TEST 11: OK: Expected signal at tests/format/fprintf.c:37
+TEST 11: OK: Expected signal at tests/format/fprintf.c:38
 sprintf: output buffer is unallocated or has insufficient length to store 6 characters or not writeable
-TEST 12: OK: Expected signal at tests/format/fprintf.c:38
-TEST 13: OK: Expected execution at tests/format/fprintf.c:41
-TEST 14: OK: Expected execution at tests/format/fprintf.c:42
+TEST 12: OK: Expected signal at tests/format/fprintf.c:39
+TEST 13: OK: Expected execution at tests/format/fprintf.c:42
+TEST 14: OK: Expected execution at tests/format/fprintf.c:43
 sprintf: output buffer is unallocated or has insufficient length to store 6 characters and \0 terminator or not writeable
-TEST 15: OK: Expected signal at tests/format/fprintf.c:43
+TEST 15: OK: Expected signal at tests/format/fprintf.c:44
 sprintf: output buffer is unallocated or has insufficient length to store 6 characters and \0 terminator or not writeable
-TEST 16: OK: Expected signal at tests/format/fprintf.c:44
+TEST 16: OK: Expected signal at tests/format/fprintf.c:45
 sprintf: output buffer is unallocated or has insufficient length to store 6 characters and \0 terminator or not writeable
-TEST 17: OK: Expected signal at tests/format/fprintf.c:45
-TEST 18: OK: Expected execution at tests/format/fprintf.c:46
+TEST 17: OK: Expected signal at tests/format/fprintf.c:46
+TEST 18: OK: Expected execution at tests/format/fprintf.c:47

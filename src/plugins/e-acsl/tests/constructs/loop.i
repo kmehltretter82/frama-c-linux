@@ -1,6 +1,6 @@
 /* run.config
    COMMENT: loop invariants
-   STDOPT: +"-eva-slevel 160"
+   STDOPT: +"-eva-precision=1"
 */
 
 void simple_loop() {
@@ -11,13 +11,13 @@ void simple_loop() {
 }
 
 void nested_loops() {
-  int t[10][15];
-  /*@ loop invariant 0 <= i <= 10; */
-  for(int i = 0; i < 10; i++)
-    /*@ loop invariant 0 <= j <= 15;
+  int t[4][8];
+  /*@ loop invariant 0 <= i <= 4; */
+  for(int i = 0; i < 4; i++)
+    /*@ loop invariant 0 <= j <= 8;
       @ loop invariant
       @   \forall integer k,l; 0 <= k < i && 0 <= l < j ==> t[k][l] == k * l; */
-    for(int j = 0; j < 15; j++)
+    for(int j = 0; j < 8; j++)
       t[i][j] = i * j;
 }
 

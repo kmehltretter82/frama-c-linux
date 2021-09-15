@@ -1,5 +1,6 @@
 /* run.config
    COMMENT: pointers and pointer arithmetic
+   STDOPT: +"-eva-precision=1"
 */
 
 int main(void) {

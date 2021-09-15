@@ -35,30 +35,31 @@
   function __gen_e_acsl_fread: precondition 'valid_stream' got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/stdio.h:351: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/stdio.h:351: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status invalid.
 [eva:alarm] FRAMAC_SHARE/libc/stdio.h:352: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status invalid.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/stdio.h:350: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/stdio.h:357: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/stdio.h:357: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status invalid.
-[eva:alarm] FRAMAC_SHARE/libc/stdio.h:357: Warning: 
   function __gen_e_acsl_fread: postcondition 'initialization' got status unknown.
 [eva:alarm] tests/libc/file.c:15: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status invalid.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] tests/libc/file.c:15: Warning: assertion got status unknown.
 [eva:alarm] tests/libc/file.c:18: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status invalid.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] tests/libc/file.c:18: Warning: assertion got status unknown.
 [eva:alarm] tests/libc/file.c:21: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status invalid.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] tests/libc/file.c:21: Warning: assertion got status unknown.
 [eva:alarm] tests/libc/file.c:24: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status invalid.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] tests/libc/file.c:24: Warning: assertion got status unknown.
 [eva:alarm] tests/libc/file.c:27: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status invalid.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] tests/libc/file.c:27: Warning: assertion got status unknown.
 [eva:alarm] tests/libc/file.c:35: Warning: 
   function __gen_e_acsl_fread: precondition 'valid_stream' got status unknown.
 [eva:alarm] tests/libc/file.c:37: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status invalid.
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] tests/libc/file.c:37: Warning: assertion got status unknown.

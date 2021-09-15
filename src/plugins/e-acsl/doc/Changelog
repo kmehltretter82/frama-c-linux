@@ -26,7 +26,7 @@ Plugin E-ACSL <next-release>
 ############################
 
 -* E-ACSL       [2021-09-13] Fix unsound reuse of previously typed recursive
-		functions (frama-c/e-acsl#177)
+                functions (frama-c/e-acsl#177)
 -  E-ACSL       [2021-08-03] Correct monitoring of code depending on libc
                 function calls that write memory locations (frama-c/e-acsl#157).
 -* E-ACSL       [2021-07-30] Fix incorrect evaluation of quantified
