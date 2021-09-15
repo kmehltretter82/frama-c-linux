@@ -58,8 +58,6 @@ PLUGIN_CMO:= \
 	export_why3 \
 	export_coq \
 
-PLUGIN_GUI_CMO:= QedGui
-
 PLUGIN_DEPENDENCIES:=
 PLUGIN_TESTS_DIRS:=
 PLUGIN_BFLAGS:=

@@ -1073,7 +1073,6 @@ src/plugins/print_api/print_interface.ml: CEA_LGPL
 src/plugins/qed/.gitignore: .ignore
 src/plugins/qed/.ocp-indent: .ignore
 src/plugins/qed/Makefile: CEA_WP
-src/plugins/qed/QedGui.ml: CEA_WP
 src/plugins/qed/bvars.ml: CEA_WP
 src/plugins/qed/bvars.mli: CEA_WP
 src/plugins/qed/cache.ml: CEA_WP
