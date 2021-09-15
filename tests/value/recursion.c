@@ -257,7 +257,8 @@ int alarm (int i) {
 }
 
 /* The precondition should become invalid if enough recursive calls are made. */
-/*@ requires x != 16; */
+/*@ requires x != 16;
+    assigns \nothing; */
 void precond (int x) {
   int y = 100 / (x - 16);
   if (nondet)
