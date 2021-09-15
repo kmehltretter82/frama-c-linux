@@ -11,7 +11,7 @@
 Consider patching, stubbing or adding an ACSL specification to the recursive call, then re-run the analysis.
 
 *** recommendation #2 ***
-2. Found function with missing spec: large_name_to_force_line_break_in_stack_msg
+2. Found function with missing specification: large_name_to_force_line_break_in_stack_msg
    Looking for files defining it...
 Add the following file to the list of sources to be parsed:
   make-wrapper.c

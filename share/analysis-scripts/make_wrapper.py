@@ -87,7 +87,7 @@ with subprocess.Popen(cmd_list, stdout=subprocess.PIPE, stderr=subprocess.PIPE) 
         else:
             break
 
-re_missing_spec = re.compile("Neither code nor specification for function ([^,]+),")
+re_missing_spec = re.compile("Neither code nor (specification|[^ ]+ assigns clause) for function ([^,]+),")
 re_recursive_call_start = re.compile("detected recursive call")
 re_recursive_call_stack_start = re.compile(r"^\s+stack:")
 re_recursive_call_stack_end = re.compile(r"^\[")
@@ -134,7 +134,8 @@ for line in lines:
                 assert False
     match = re_missing_spec.search(line)
     if match:
-        fname = match.group(1)
+        spec_kind = match.group(1)
+        fname = match.group(2)
 
         def _action(fname):
             out = subprocess.Popen(
@@ -174,7 +175,9 @@ for line in lines:
             print("Find the sources defining it and add them, " + "or provide a stub.")
 
         tip = {
-            "message": "Found function with missing spec: "
+            "message": "Found function with missing "
+            + spec_kind
+            + ": "
             + fname
             + "\n"
             + "   Looking for files defining it...",
