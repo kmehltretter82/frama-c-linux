@@ -31,9 +31,8 @@
    reached.
 
    TODO: The algorithm does not handle non-natural loops for now. *)
-include module type of Region_analysis_sig;;
 
-module Make(N:Node):sig
+module Make(N:Region_analysis_sig.Node):sig
   (* Function computing from an entry abstract value the "after"
      state, which is a map from each outgoing edge to its respective
      value. *)

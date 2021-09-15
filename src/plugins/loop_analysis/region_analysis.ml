@@ -48,9 +48,7 @@
    of Nodes". It is maybe also possible to use the wto ordering of
    bourdoncle for this purpose. *)
 
-include Region_analysis_sig;;
-
-module Make(N:Node):sig
+module Make(N:Region_analysis_sig.Node):sig
   (* Function computing from an entry abstract value the "after"
      state, which is a map from each outgoing edge to its respective
      value. *)
@@ -192,7 +190,7 @@ struct
 
       (* Compute for previous node if result not yet available. *)
       and get_edge pred n =
-        let edge = Edge(pred, n) in
+        let edge = Region_analysis_sig.Edge(pred, n) in
         try N.Edge_Dict.get edge_term edge
         with Not_found -> do_node pred; N.Edge_Dict.get edge_term edge
       in
@@ -215,7 +213,7 @@ struct
         N.Graph.iter_preds header (fun pred ->
             if (N.Set.mem pred tset) && (is_back_edge pred header)
             then
-              let edge = Edge(pred,header) in
+              let edge = Region_analysis_sig.Edge(pred,header) in
               let input = N.Edge_Dict.get edge_term edge in
               inputs := input::!inputs );
         N.join !inputs

@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Region_analysis
+open Region_analysis_sig
 open Cil_types
 
 module type M = sig
