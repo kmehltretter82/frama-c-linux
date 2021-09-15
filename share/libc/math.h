@@ -467,7 +467,7 @@ extern float sinf(float x);
 */
 extern long double sinl(long double x);
 
-/* Note: the specs of tan/tanf/tanl below assume that, for a finite x,
+/* Note: the specs of tan/tanf below assume that, for a finite x,
  *       the result is always finite. This is _not_ guaranteed by the standard,
  *       but testing with the GNU libc, plus some mathematical arguments
  *       (see https://stackoverflow.com/questions/67482420) indicate that,
@@ -527,26 +527,7 @@ extern float tanf(float x);
 
 /*@
   assigns errno, \result \from x;
-  behavior zero:
-    assumes zero_arg: \is_finite(x) && x == 0.;
-    assigns \result \from x;
-    ensures zero_res: \is_finite(\result) && \result == x;
-    ensures no_error: errno == \old(errno);
-  behavior finite_non_zero:
-    assumes finite_arg: \is_finite(x) && x != 0.;
-    ensures finite_result: \is_finite(\result);
-    ensures maybe_error: errno == \old(errno) || errno == ERANGE;
-  behavior infinity:
-    assumes infinite_arg: \is_infinite(x);
-    ensures nan_result: \is_NaN(\result);
-    ensures errno_set: errno == EDOM;
-  behavior nan:
-    assumes nan_arg: \is_NaN(x);
-    assigns \result \from x;
-    ensures nan_result: \is_NaN(\result);
-    ensures no_error: errno == \old(errno);
-  complete behaviors;
-  disjoint behaviors;
+  ensures maybe_error: errno == \old(errno) || errno == EDOM || errno == ERANGE;
 */
 extern long double tanl(long double x);
 

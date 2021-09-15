@@ -408,68 +408,32 @@
 [eva] computing for function tanl <- main.
   Called from tests/libc/math_h.c:88.
 [eva] using specification for function tanl
-[eva] tests/libc/math_h.c:88: 
-  function tanl: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
-[eva] tests/libc/math_h.c:88: 
-  function tanl: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
 [eva] Done for function tanl
 [eva] computing for function tanl <- main.
   Called from tests/libc/math_h.c:88.
-[eva] tests/libc/math_h.c:88: 
-  function tanl: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
-[eva] tests/libc/math_h.c:88: 
-  function tanl: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
 [eva] Done for function tanl
 [eva] computing for function tanl <- main.
   Called from tests/libc/math_h.c:88.
-[eva] tests/libc/math_h.c:88: 
-  function tanl: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
-[eva] tests/libc/math_h.c:88: 
-  function tanl: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
 [eva] Done for function tanl
 [eva] computing for function tanl <- main.
   Called from tests/libc/math_h.c:88.
-[eva] tests/libc/math_h.c:88: 
-  function tanl: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
-[eva] tests/libc/math_h.c:88: 
-  function tanl: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
 [eva] Done for function tanl
 [eva] computing for function tanl <- main.
   Called from tests/libc/math_h.c:88.
-[eva] tests/libc/math_h.c:88: 
-  function tanl: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
-[eva] tests/libc/math_h.c:88: 
-  function tanl: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
 [eva] Done for function tanl
 [eva] computing for function tanl <- main.
   Called from tests/libc/math_h.c:88.
-[eva] tests/libc/math_h.c:88: 
-  function tanl: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
-[eva] tests/libc/math_h.c:88: 
-  function tanl: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
 [eva] Done for function tanl
 [eva] computing for function tanl <- main.
   Called from tests/libc/math_h.c:88.
-[eva] tests/libc/math_h.c:88: 
-  function tanl: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
-[eva] tests/libc/math_h.c:88: 
-  function tanl: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
 [eva] Done for function tanl
 [eva] computing for function tanl <- main.
   Called from tests/libc/math_h.c:88.
-[eva] tests/libc/math_h.c:88: 
-  function tanl: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
-[eva] tests/libc/math_h.c:88: 
-  function tanl: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
 [eva] Done for function tanl
 [eva:alarm] tests/libc/math_h.c:88: Warning: 
   non-finite long double value. assert \is_finite(ld_top);
 [eva] computing for function tanl <- main.
   Called from tests/libc/math_h.c:88.
-[eva:alarm] tests/libc/math_h.c:88: Warning: 
-  function tanl: precondition ¬(infinite_arg: \is_infinite(x)) got status unknown.
-[eva] tests/libc/math_h.c:88: 
-  function tanl: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
 [eva] Done for function tanl
 [eva] computing for function frexp <- main.
   Called from tests/libc/math_h.c:90.
