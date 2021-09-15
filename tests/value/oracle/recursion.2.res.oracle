@@ -5,20 +5,20 @@
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
   p ∈ {0}
-[eva:recursion] tests/value/recursion.c:425: 
+[eva:recursion] tests/value/recursion.c:426: 
   detected recursive call of function sum_nospec.
-[eva] tests/value/recursion.c:432: Frama_C_show_each_10: {10}
-[eva] tests/value/recursion.c:437: Frama_C_show_each_36: {36}
+[eva] tests/value/recursion.c:433: Frama_C_show_each_10: {10}
+[eva] tests/value/recursion.c:438: Frama_C_show_each_36: {36}
 [eva] using specification for function Frama_C_interval
-[eva] tests/value/recursion.c:425: User Error: 
+[eva] tests/value/recursion.c:426: User Error: 
   Recursive call to sum_nospec without a specification.
   Generating probably incomplete assigns to interpret the call. Try to increase
   the -eva-unroll-recursive-calls parameter or write a correct specification
   for function sum_nospec.
-[kernel:annot:missing-spec] tests/value/recursion.c:422: Warning: 
+[kernel:annot:missing-spec] tests/value/recursion.c:423: Warning: 
   Neither code nor specification for function sum_nospec, generating default assigns from the prototype
 [eva] using specification for function sum_nospec
-[eva] tests/value/recursion.c:441: 
+[eva] tests/value/recursion.c:442: 
   Frama_C_show_each_unreachable: [-2147483648..2147483647]
 [eva] done for function main_fail
 [eva] ====== VALUES COMPUTED ======
