@@ -354,6 +354,12 @@ end
 (* -------------------------------------------------------------------------- *)
 
 let () = Request.register ~package
+    ~kind:`GET ~name:"getMainFunction"
+    ~descr:(Md.plain "Get the current 'main' function.")
+    ~input:(module Junit) ~output:(module Kf)
+    (fun () -> fst (Globals.entry_point ()))
+
+let () = Request.register ~package
     ~kind:`GET ~name:"getFunctions"
     ~descr:(Md.plain "Collect all functions in the AST")
     ~input:(module Junit) ~output:(module Jlist(Kf))
