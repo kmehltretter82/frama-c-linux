@@ -123,19 +123,27 @@ export async function setProject(project: string) {
 // --- Cached GET Requests
 // --------------------------------------------------------------------------
 
+/** Options to tweak the behavior of `useReques()`. Null values means
+    keeping the last result. */
 export interface UseRequestOptions<A> {
+  /** Returned value in case where the server goes offline. */
   offline?: A | null;
+  /** Temporary returned value when the request is pending. */
   pending?: A | null;
+  /** Returned value when the request fails. */
   onError?: A | null;
+  /** Re-send the request when any of the signals are sent. */
+  onSignals?: Server.Signal[];
 }
 
 /**
- * Cached GET request (Custom React Hook).
- *
- * Sends the specified GET request and returns its result. The request is send
- * asynchronously and cached until any change.
- *
- * Null values in options mean that the last obtained value is kept.
+  Cached GET request (Custom React Hook).
+
+  Sends the specified GET request and returns its result. The request is send
+  asynchronously and cached until any change in the request parameters or
+  server state.
+
+  Options can be used to tune more precisely the behavior of the hook.
  */
 export function useRequest<In, Out>(
   rq: Server.GetRequest<In, Out>,
@@ -173,6 +181,14 @@ export function useRequest<In, Out>(
       state.current = footprint;
       trigger();
     }
+  });
+
+  const signals = options.onSignals ?? [];
+  React.useEffect(() => {
+    signals.forEach((s) => Server.onSignal(s, trigger));
+    return () => {
+      signals.forEach((s) => Server.offSignal(s, trigger));
+    };
   });
 
   return response;
