@@ -71,6 +71,11 @@ const compute_internal: Server.ExecRequest<null,null> = {
 /** Ensures that AST is computed */
 export const compute: Server.ExecRequest<null,null>= compute_internal;
 
+/** Emitted when the AST has been computed */
+export const computed: Server.Signal = {
+  name: 'kernel.ast.computed',
+};
+
 /** Marker kind */
 export enum markerKind {
   /** Expression */

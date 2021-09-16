@@ -201,13 +201,19 @@ export default function ASTview() {
     return () => { buffer.off('change', setBullets); };
   }, [buffer, setBullets]);
 
+  async function reload() {
+    printed.current = theFunction;
+    loadAST(buffer, theFunction, theMarker);
+  }
+
   // Hook: async loading
   React.useEffect(() => {
-    if (printed.current !== theFunction) {
-      printed.current = theFunction;
-      loadAST(buffer, theFunction, theMarker);
-    }
+    if (printed.current !== theFunction)
+      reload();
   });
+
+  // Also reload the buffer when the AST is recomputed.
+  Server.onSignal(Ast.computed, reload);
 
   React.useEffect(() => {
     const decorator = (marker: string) => {

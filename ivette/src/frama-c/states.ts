@@ -772,4 +772,21 @@ export function useSelection(): [Selection, (a: SelectionActions) => void] {
   return [current, (action) => setCurrent(reducer(current, action))];
 }
 
+/* Select the main function when the AST is recomputed, or when the current
+   project changes and the selection is still empty. */
+async function selectMainFunction() {
+  const main = await Server.send(Ast.getMainFunction, { });
+  const selection = {
+    ...emptySelection,
+    current: { fct: main },
+  };
+  GlobalSelection.setValue(selection);
+}
+Server.onSignal(Ast.computed, selectMainFunction);
+PROJECT.on(async () => {
+  const selection = GlobalSelection.getValue();
+  if (selection === emptySelection)
+    selectMainFunction();
+});
+
 // --------------------------------------------------------------------------

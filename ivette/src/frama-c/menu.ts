@@ -28,7 +28,6 @@ import * as Dome from 'dome';
 import * as Dialogs from 'dome/dialogs';
 import * as Server from 'frama-c/server';
 import * as Ast from 'frama-c/api/kernel/ast';
-import * as States from 'frama-c/states';
 
 const cFilter = {
   name: 'C source files',
@@ -46,8 +45,6 @@ async function setFiles(): Promise<void> {
   });
   await Server.send(Ast.setFiles, files);
   await Server.send(Ast.compute, { });
-  const main = await Server.send(Ast.getMainFunction, { });
-  States.setSelection({ fct: main });
   return;
 }
 

@@ -37,6 +37,11 @@ let () = Request.register ~package
     ~descr:(Md.plain "Ensures that AST is computed")
     ~input:(module Junit) ~output:(module Junit) Ast.compute
 
+let computed_signal = Request.signal ~package ~name:"computed"
+    ~descr:(Md.plain "Emitted when the AST has been computed")
+
+let () = Ast.apply_after_computed (fun _ -> Request.emit computed_signal)
+
 let ast_update_hook f =
   Ast.add_hook_on_update f;
   Ast.apply_after_computed (fun _ -> f ())
