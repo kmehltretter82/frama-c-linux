@@ -53,8 +53,7 @@ const D = new Dome.Debug('Source Code');
 // --------------------------------------------------------------------------
 
 // The SourceCode component, producing the GUI part showing the source code
-// corresponding to the selected function. It should be async, as reading a file
-// returns a Promise, but we cannot do that.
+// corresponding to the selected function.
 export default function SourceCode() {
 
   // Hooks
@@ -89,7 +88,8 @@ export default function SourceCode() {
   const onError = () => { if (file) errorMsg(); };
   const setValue = (text: string) => buffer.setValue(text);
   const setCursor = () => buffer.forEach((cm) => cm.setCursor(line - 1));
-  Dome.usePromise(readFile(file).then(setValue).then(setCursor).catch(onError));
+  const text = React.useMemo(() => readFile(file), [file]);
+  Dome.usePromise(text.then(setValue).then(setCursor).catch(onError));
 
   // Building the React component.
   return (
