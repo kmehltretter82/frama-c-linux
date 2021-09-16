@@ -73,38 +73,11 @@ let dijkstra (adj: 'a -> ('a * int) list) (v1:'a) (v2:'a) =
   in
   loop (add (0,(v1,[])) (empty()))
 
-
-
-
-let existing_path (stl,_ as auto)  stn1 stn2 =
-  let st1 = ref (List.hd stl) in
-  let st2 = ref (List.hd stl) in
-  List.iter
-    (fun st ->
-       if st.nums=stn1 then st1:=st;
-       if st.nums=stn2 then st2:=st;
-    )
-    stl;
-
-  try
-    let _ = dijkstra (voisins auto) !st1 !st2 in
-    true
-  with
-  | Not_found -> false
-;;
-
-
 (** since Nitrogen-20111001 *)
 let get_transitions_of_state st (_,tr) =
   List.fold_left
     (fun acc tr ->
        if tr.start.nums = st.nums then tr::acc else acc)
-    [] tr
-
-let get_transitions_to_state st (_,tr) =
-  List.fold_left
-    (fun acc tr ->
-       if tr.stop.nums = st.nums then tr::acc else acc)
     [] tr
 
 let get_edges st1 st2 (_,tr) =
@@ -130,16 +103,6 @@ let at_most_one_path (states,transitions as auto) st1 st2 =
       ignore (dijkstra (voisins auto) st1 st2);
       false
   with Not_found -> true
-
-let test (stl,_ as auto) =
-  let st2 = List.hd stl in
-  let st1 = List.hd (List.tl stl) in
-  Aorai_option.feedback "test : Etats choisis (%d,%d)" st1.nums st2.nums;
-  let (res,_) = dijkstra (voisins auto) st1 st2 in
-  Aorai_option.feedback "Fini.@\n%a"
-    (Pretty_utils.pp_list ~pre:"@[[" ~sep:",@ " ~suf:"@]]"
-       (fun fmt st -> Format.fprintf fmt "%d" st.nums))
-    res
 
 (*
 Local Variables:
