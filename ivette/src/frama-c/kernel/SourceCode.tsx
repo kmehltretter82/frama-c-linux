@@ -28,7 +28,7 @@ import React from 'react';
 import * as States from 'frama-c/states';
 
 import * as Dome from 'dome';
-import { readFile } from 'dome/system';
+import * as System from 'dome/system';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 import { TitleBar } from 'ivette';
@@ -37,6 +37,7 @@ import { functions, markerInfo } from 'frama-c/api/kernel/ast';
 import { Code } from 'dome/controls/labels';
 import { Hfill } from 'dome/layout/boxes';
 import * as Path from 'path';
+import * as Settings from 'dome/data/settings';
 
 import 'codemirror/addon/selection/active-line';
 import 'codemirror/addon/dialog/dialog.css';
@@ -86,11 +87,19 @@ export default function SourceCode() {
   // Updating the buffer content.
   const errorMsg = () => { D.error(`Fail to load source code file ${file}`); };
   const onError = () => { if (file) errorMsg(); return ''; };
-  const read = () => readFile(file).catch(onError);
+  const read = () => System.readFile(file).catch(onError);
   const text = React.useMemo(read, [file, onError]);
   const { result } = Dome.usePromise(text);
   React.useEffect(() => buffer.setValue(result), [buffer, result]);
   React.useEffect(() => buffer.setCursorOnTop(line), [buffer, line, result]);
+
+  const [command] = Settings.useGlobalSettings(Preferences.EditorCommand);
+  const launchEditor = () => {
+    const cmd = command.replace('\%s', file).replace('\%d', line.toString());
+    const args = cmd.split(' ');
+    const prog = args.shift();
+    if (prog) System.spawn(prog, args);
+  };
 
   // Building the React component.
   return (
@@ -109,7 +118,7 @@ export default function SourceCode() {
         selection={theMarker}
         lineNumbers={!!theFunction}
         styleActiveLine={!!theFunction}
-        extraKeys={{ 'Alt-F': 'findPersistent' }}
+        extraKeys={{ 'Ctrl-LeftClick': launchEditor }}
         readOnly
       />
     </>

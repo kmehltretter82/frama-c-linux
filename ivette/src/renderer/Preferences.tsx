@@ -84,6 +84,16 @@ function ThemeFields(props: P.ThemeProps) {
 }
 
 // --------------------------------------------------------------------------
+// --- Editor Command Forms
+// --------------------------------------------------------------------------
+function EditorCommandFields(props : P.EditorCommandProps) {
+  const command = Forms.useDefined(
+    Forms.useValid(Settings.useGlobalSettings(props.command)
+  ));
+  return (<Forms.TextCodeField state={command} label="Command"/>);
+}
+
+// --------------------------------------------------------------------------
 // --- Export Components
 // --------------------------------------------------------------------------
 
@@ -104,6 +114,9 @@ export default (() => (
         fontSize={P.SourceFontSize}
         wrapText={P.SourceWrapText}
       />
+    </Forms.Section>
+    <Forms.Section label="Editor Command" unfold>
+      <EditorCommandFields command={P.EditorCommand}/>
     </Forms.Section>
   </Forms.Page>
 ));
