@@ -224,7 +224,7 @@ void eacsl_memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
     /* Initialize report file with debug logs (only in debug mode). */
     initialize_report_file(argc_ref, argv_ref);
     /* Lift stack limit to account for extra stack memory overhead.  */
-    increase_stack_limit(get_stack_size() * 2);
+    increase_stack_limit(E_ACSL_STACK_SIZE * MB);
     /* Allocate and log shadow memory layout of the execution. Case of the
        segments available after main. */
     init_shadow_layout_main(argc_ref, argv_ref);
