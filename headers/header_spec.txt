@@ -976,6 +976,7 @@ src/plugins/markdown-report/parse_remarks.mli: CEA_LGPL
 src/plugins/markdown-report/sarif_gen.ml: CEA_LGPL
 src/plugins/markdown-report/sarif_gen.mli: CEA_LGPL
 src/plugins/markdown-report/sarif.ml: CEA_LGPL
+src/plugins/markdown-report/sarif.mli: CEA_LGPL
 src/plugins/markdown-report/share/acsl.xml: CEA_LGPL
 src/plugins/metrics/Metrics.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/metrics/css_html.ml: CEA_LGPL_OR_PROPRIETARY
