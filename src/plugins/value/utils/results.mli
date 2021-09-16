@@ -23,12 +23,12 @@
 
 (* Usage sketch :
 
-  Eva.Results.(before stmt |> in_callstack cs |> eval_var vi |> as_int)
+   Eva.Results.(before stmt |> in_callstack cs |> eval_var vi |> as_int)
 
-  or, if you prefer
+   or, if you prefer
 
-  Eva.Results.(as_int (eval_var vi (in_callstack cs (before stmt))))
-*) 
+   Eva.Results.(as_int (eval_var vi (in_callstack cs (before stmt))))
+*)
 
 type callstack = (Cil_types.kernel_function * Cil_types.kinstr) list
 type 'a by_callstack = (callstack*'a) list

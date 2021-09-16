@@ -20,14 +20,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Bottom.Type
-
 type 'a or_top_bottom = 'a Bottom.Top.or_top_bottom
 
 let (>>>-) t f = match t with
-| `Top -> `Top
-| `Bottom  -> `Bottom
-| `Value t -> f t
+  | `Top -> `Top
+  | `Bottom  -> `Bottom
+  | `Value t -> f t
 
 exception Not_implemented
 
@@ -81,18 +79,18 @@ let in_callstacks l req =
   {
     req with
     selector = Some (Option.fold
-      ~none:set
-      ~some:(Callstack.Set.inter set)
-      req.selector)
+                       ~none:set
+                       ~some:(Callstack.Set.inter set)
+                       req.selector)
   }
 
 let in_callstack cs req =
   in_callstacks [cs] req
 
 let filter_callstack f req = {
-    req with
-    filter = Some (Option.fold ~none:f ~some:(fun g x -> g x && f x) req.filter)
-  }
+  req with
+  filter = Some (Option.fold ~none:f ~some:(fun g x -> g x && f x) req.filter)
+}
 
 
 (* Manipulating request results *)
@@ -130,33 +128,33 @@ struct
     [< `Bottom | `Top | `Value of 'a Value_types.Callstack.Hashtbl.t ] ->
     ('a, restricted_to_callstack) t =
     fun req table ->
-      match table with
-      | `Top -> Top
-      | `Bottom -> Bottom
-      | `Value table ->
-        (* Selection *)
-        let l =
-          match req.selector with
-          | None ->
-            let add cs state acc =
-              (cs,state) :: acc
-            in
-            Callstack.Hashtbl.fold add table []
-          | Some selector ->
-            let add cs acc =
-              match Callstack.Hashtbl.find_opt table cs with
-              | Some state -> (cs,state) :: acc
-              | None -> acc
-            in
-            Callstack.Set.fold add selector []
-        in
-        (* Filter *)
-        let l =
-          match req.filter with
-          | None -> l
-          | Some filter -> List.filter (fun (cs,_) -> filter cs) l
-        in
-        ByCallstack l
+    match table with
+    | `Top -> Top
+    | `Bottom -> Bottom
+    | `Value table ->
+      (* Selection *)
+      let l =
+        match req.selector with
+        | None ->
+          let add cs state acc =
+            (cs,state) :: acc
+          in
+          Callstack.Hashtbl.fold add table []
+        | Some selector ->
+          let add cs acc =
+            match Callstack.Hashtbl.find_opt table cs with
+            | Some state -> (cs,state) :: acc
+            | None -> acc
+          in
+          Callstack.Set.fold add selector []
+      in
+      (* Filter *)
+      let l =
+        match req.filter with
+        | None -> l
+        | Some filter -> List.filter (fun (cs,_) -> filter cs) l
+      in
+      ByCallstack l
 
   (* Accessors *)
 
@@ -186,22 +184,22 @@ struct
   let map_join : type c.
     ('a -> 'b) -> ('b -> 'b -> 'b) -> ('a, c) t -> 'b or_top_bottom =
     fun map join ->
-      let default = function
-        | `Bottom -> `Bottom
-        | `Top -> `Top
-      and map' x =
-        `Value (map x)
-      in
-      map_reduce default map' (Bottom.Top.join join)
+    let default = function
+      | `Bottom -> `Bottom
+      | `Top -> `Top
+    and map' x =
+      `Value (map x)
+    in
+    map_reduce default map' (Bottom.Top.join join)
 
   let map_join' : type c. ('a -> 'b or_top_bottom) -> ('b -> 'b -> 'b) ->
     ('a, c) t -> 'b or_top_bottom =
     fun map join ->
-      let default = function
-        | `Bottom -> `Bottom
-        | `Top -> `Top
-      and map' = (map :> 'a -> 'b or_top_bottom) in
-      map_reduce default map' (Bottom.Top.join join)
+    let default = function
+      | `Bottom -> `Bottom
+      | `Top -> `Top
+    and map' = (map :> 'a -> 'b or_top_bottom) in
+    map_reduce default map' (Bottom.Top.join join)
 end
 
 
@@ -215,25 +213,25 @@ struct
   type valuation = A.Eval.Valuation.t
 
   type 'callstack evaluation =
-  [ `LValue of Cil_types.lval *
-      ((valuation * value Eval.flagged_value) Eval.evaluated, 'callstack) Response.t
-  | `Value of ((valuation * value) Eval.evaluated, 'callstack) Response.t
-  ]
+    [ `LValue of Cil_types.lval *
+                 ((valuation * value Eval.flagged_value) Eval.evaluated, 'callstack) Response.t
+    | `Value of ((valuation * value) Eval.evaluated, 'callstack) Response.t
+    ]
 
   let get_by_callstack : request -> (_, restricted_to_callstack) Response.t =
     fun req ->
-      let open Response in
-      match req.control_point with
-      | Before stmt ->
-        A.get_stmt_state_by_callstack ~after:false stmt |> by_callstack req
-      | After stmt ->
-        A.get_stmt_state_by_callstack ~after:true stmt |> by_callstack req
-      | Initial ->
-        A.get_kinstr_state ~after:false Kglobal |> singleton []
-      | Start kf ->
-        A.get_initial_state_by_callstack kf |> by_callstack req
-      | Final | End _ ->
-        raise Not_implemented
+    let open Response in
+    match req.control_point with
+    | Before stmt ->
+      A.get_stmt_state_by_callstack ~after:false stmt |> by_callstack req
+    | After stmt ->
+      A.get_stmt_state_by_callstack ~after:true stmt |> by_callstack req
+    | Initial ->
+      A.get_kinstr_state ~after:false Kglobal |> singleton []
+    | Start kf ->
+      A.get_initial_state_by_callstack kf |> by_callstack req
+    | Final | End _ ->
+      raise Not_implemented
 
   let get : request -> (_, unrestricted_response) Response.t = fun req ->
     if Option.is_some req.filter || Option.is_some req.selector then
@@ -298,24 +296,24 @@ struct
 
   let as_cvalue : type c. c evaluation -> Locations.Location_Bytes.t result =
     fun res ->
-      match A.Val.get Main_values.CVal.key with
-      | None ->
-        Result.error DisabledDomain
-      | Some get ->
-        let join = Main_values.CVal.join in
-        let extract value =
-          (value >>-: get :> 'a or_top_bottom)
-        in
-        extract_value res |> Response.map_join' extract join |> convert
-
-  let as_functions : type c. c evaluation ->
-      Cil_types.kernel_function list result =
-    fun res ->
-      let join = (@)
-      and extract value =
-        value >>>- fun v -> (fst (A.Val.resolve_functions v) :> 'a or_top_bottom)
+    match A.Val.get Main_values.CVal.key with
+    | None ->
+      Result.error DisabledDomain
+    | Some get ->
+      let join = Main_values.CVal.join in
+      let extract value =
+        (value >>-: get :> 'a or_top_bottom)
       in
       extract_value res |> Response.map_join' extract join |> convert
+
+  let as_functions : type c. c evaluation ->
+    Cil_types.kernel_function list result =
+    fun res ->
+    let join = (@)
+    and extract value =
+      value >>>- fun v -> (fst (A.Val.resolve_functions v) :> 'a or_top_bottom)
+    in
+    extract_value res |> Response.map_join' extract join |> convert
 end
 
 
@@ -342,7 +340,7 @@ sig
   val v : restriction evaluation
   val as_cvalue : 'callstack evaluation -> Main_values.CVal.t result
   val as_functions : 'callstack evaluation ->
-      Cil_types.kernel_function list result
+    Cil_types.kernel_function list result
 end
 
 type evaluation = (module Evaluation)
@@ -424,9 +422,6 @@ let as_int evaluation =
     Result.map Integer.to_int (as_integer evaluation)
   with Z.Overflow ->
     Result.error Top
-
-let as_kf _evaluation =
-  raise Not_implemented
 
 let as_location _lvaluation =
   raise Not_implemented
