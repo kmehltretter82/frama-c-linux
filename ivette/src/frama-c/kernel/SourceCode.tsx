@@ -95,10 +95,10 @@ export default function SourceCode() {
 
   const [command] = Settings.useGlobalSettings(Preferences.EditorCommand);
   const launchEditor = () => {
-    const cmd = command.replace('\%s', file).replace('\%d', line.toString());
+    const cmd = command.replace('%s', file).replace('%d', line.toString());
     const args = cmd.split(' ');
     const prog = args.shift();
-    if (prog) System.spawn(prog, args);
+    if (prog) System.spawn(prog, args).catch(/* TODO */);
   };
 
   // Building the React component.

@@ -86,11 +86,11 @@ function ThemeFields(props: P.ThemeProps) {
 // --------------------------------------------------------------------------
 // --- Editor Command Forms
 // --------------------------------------------------------------------------
-function EditorCommandFields(props : P.EditorCommandProps) {
-  const command = Forms.useDefined(
-    Forms.useValid(Settings.useGlobalSettings(props.command)
+function EditorCommandFields(props: P.EditorCommandProps) {
+  const command = Forms.useDefined(Forms.useValid(
+    Settings.useGlobalSettings(props.command),
   ));
-  return (<Forms.TextCodeField state={command} label="Command"/>);
+  return (<Forms.TextCodeField state={command} label="Command" />);
 }
 
 // --------------------------------------------------------------------------
@@ -116,7 +116,7 @@ export default (() => (
       />
     </Forms.Section>
     <Forms.Section label="Editor Command" unfold>
-      <EditorCommandFields command={P.EditorCommand}/>
+      <EditorCommandFields command={P.EditorCommand} />
     </Forms.Section>
   </Forms.Page>
 ));
