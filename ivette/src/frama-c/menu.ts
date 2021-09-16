@@ -46,6 +46,7 @@ async function setFiles(): Promise<void> {
   });
   await Server.send(Ast.setFiles, files);
   await Server.send(Ast.compute, { });
+  States.setSelection({fct: undefined});
   return;
 }
 
