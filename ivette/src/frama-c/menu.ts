@@ -30,7 +30,7 @@ import * as Server from 'frama-c/server';
 import * as Ast from 'frama-c/api/kernel/ast';
 
 async function setFiles(): Promise<void> {
-  const files = await Dialogs.showOpenFiles({ message: 'Open files' });
+  const files = await Dialogs.showOpenFiles({ title: 'Open files' });
   await Server.send(Ast.setFiles, files);
   await Server.send(Ast.compute, { });
   return;
