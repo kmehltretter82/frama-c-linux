@@ -22,29 +22,10 @@
 
 let dkey_main = Wp_parameters.register_category "main"
 let dkey_raised = Wp_parameters.register_category "raised"
-let wkey_smoke = Wp_parameters.register_warn_category "smoke"
 
 (* ------------------------------------------------------------------------ *)
 (* --- Memory Model Hypotheses                                          --- *)
 (* ------------------------------------------------------------------------ *)
-
-module Models = Set.Make(WpContext.MODEL)
-module Fmap = Kernel_function.Map
-
-let wp_iter_model ?ip ?index job =
-  begin
-    let pool : Models.t Fmap.t ref = ref Fmap.empty in
-    Wpo.iter ?ip ?index ~on_goal:(fun wpo ->
-        match Wpo.get_index wpo with
-        | Wpo.Axiomatic _ -> ()
-        | Wpo.Function(kf,_) ->
-            let m = Wpo.get_model wpo in
-            let ms = try Fmap.find kf !pool with Not_found -> Models.empty in
-            if not (Models.mem m ms) then
-              pool := Fmap.add kf (Models.add m ms) !pool ;
-      ) () ;
-    Fmap.iter (fun kf ms -> Models.iter (fun m -> job kf m) ms) !pool
-  end
 
 let wp_compute_memory_context model =
   let hypotheses_computer = WpContext.compute_hypotheses model in
@@ -135,12 +116,6 @@ let pp_warnings fmt wpo =
       | false , 1 -> Format.fprintf fmt " (Stronger)"
       | false , _ -> Format.fprintf fmt " (Stronger, %d warnings)" n
     end
-
-let launch task =
-  let server = ProverTask.server () in
-  (** Do on_server_stop save why3 session *)
-  Task.spawn server (Task.thread task) ;
-  Task.launch server
 
 (* ------------------------------------------------------------------------ *)
 (* ---  Prover Stats                                                    --- *)
@@ -754,21 +729,6 @@ let cmdline_run () =
         do_wp_report model ;
       end
   end
-
-(* ------------------------------------------------------------------------ *)
-(* ---  Register external functions                                     --- *)
-(* ------------------------------------------------------------------------ *)
-
-let deprecated name =
-  Wp_parameters.warning ~once:true ~current:false
-    "Dynamic '%s' now is deprecated. Use `Wp.VC` api instead." name
-
-let register name ty code =
-  let _ignore =
-    Dynamic.register ~plugin:"Wp" name ty
-      ~journalize:false (*LC: Because of Property is not journalizable. *)
-      (fun x -> deprecated name ; code x)
-  in ()
 
 (* ------------------------------------------------------------------------ *)
 (* ---  Tracing WP Invocation                                           --- *)

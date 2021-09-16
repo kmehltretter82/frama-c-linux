@@ -68,12 +68,12 @@ PLUGIN_CMO:= \
 	LogicUsage RefUsage \
 	Layout Region \
 	RegionAnnot RegionAccess RegionDump RegionAnalysis \
-	cil2cfg normAtLabels wpPropId wpStrategy mcfg \
+	cil2cfg normAtLabels wpPropId wpStrategy \
 	Lang Repr Matrix Passive Splitter \
 	LogicBuiltins Definitions \
 	Cmath Cint Cfloat Vset Vlist Cstring Cvalues \
 	Letify Cleaning \
-	Sigs Mstate Conditions \
+	Mstate Conditions \
 	Filtering \
 	Plang Pcfg Pcond \
 	CodeSemantics \
@@ -103,7 +103,8 @@ PLUGIN_CMO:= \
 	wpGenerator cfgGenerator \
 	Generator register VC
 
-PLUGIN_CMI:=
+PLUGIN_CMI:= \
+  Sigs mcfg
 
 PLUGIN_GENERATED:= \
    $(PLUGIN_DIR)/script.ml \
@@ -237,12 +238,12 @@ WP_API_BASE= \
 	MemoryContext.mli \
 	LogicUsage.mli RefUsage.mli \
 	normAtLabels.mli \
-	wpPropId.mli mcfg.ml \
+	wpPropId.mli mcfg.mli \
 	Context.mli Warning.mli AssignsCompleteness.mli wpContext.mli \
 	Lang.mli Repr.mli Passive.mli Splitter.mli \
 	LogicBuiltins.mli Definitions.mli \
 	Cint.mli Cfloat.mli Vset.mli Cstring.mli \
-	Sigs.ml Mstate.mli Conditions.mli Filtering.mli \
+	Sigs.mli Mstate.mli Conditions.mli Filtering.mli \
 	Plang.mli Pcfg.mli Pcond.mli \
 	CodeSemantics.mli \
 	LogicCompiler.mli LogicSemantics.mli \
@@ -323,7 +324,7 @@ clean::
 	rm -f $(Wp_DIR)/share/install.cm*
 
 $(Wp_DIR)/share/instwp: $(Wp_DIR)/share/install.ml
-	$(OCAMLC) $(WARNINGS) -o $@ unix.cma $^
+	$(OCAMLC) $(WARNINGS) -w -70 -o $@ unix.cma $^
 
 # --------------------------------------------------------------------------
 # --- Pre-Compiled Coq Libraries                                         ---
