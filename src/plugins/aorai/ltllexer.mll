@@ -28,46 +28,9 @@
 (* from http://www.ltl2dstar.de/down/ltl2dstar-0.4.2.zip *)
 
 {
-
-  open Ltlparser
-  open Lexing
-
-  let loc lexbuf = (lexeme_start_p lexbuf, lexeme_end_p lexbuf)
-
-  (*let lex_error lexbuf s = ()*)
-  (*  Creport.raise_located (loc lexbuf) (AnyMessage ("lexical error: " ^ s))
-  *)
-
-  let buf = Buffer.create 1024
-
-  let newline lexbuf =
-    let pos = lexbuf.lex_curr_p in
-    lexbuf.lex_curr_p <-
-      { pos with pos_lnum = pos.pos_lnum + 1; pos_bol = pos.pos_cnum }
-
-  (* Update the current location with file name and line number. *)
-
-(*  let update_loc lexbuf file line absolute chars =
-    let pos = lexbuf.lex_curr_p in
-    let new_file = match file with
-      | None -> pos.pos_fname
-      | Some s -> s
-    in
-    lexbuf.lex_curr_p <-
-      { pos with
-          pos_fname = new_file;
-          pos_lnum = if absolute then line else pos.pos_lnum + line;
-          pos_bol = pos.pos_cnum - chars;
-      }
-*)
-  exception Error of (Lexing.position * Lexing.position) * string
-
-  let raise_located loc e = raise (Error (loc, e))
-
+open Ltlparser
+open Lexing
 }
-
-
-
 
 let rD =        ['0'-'9']
 let rL = ['a'-'z' 'A'-'Z' '_']
@@ -119,11 +82,11 @@ rule token = parse
 
 (* Comments *)
   | "/*"                    { comment lexbuf; token lexbuf }
-  | "//" [^ '\n']* '\n'     { newline lexbuf; token lexbuf }
+  | "//" [^ '\n']* '\n'     { Utils_parser.newline lexbuf; token lexbuf }
 
 (* Spaces *)
   | [' ' '\t' '\012' '\r']+ { token lexbuf }
-  | '\n'                    { newline lexbuf; token lexbuf }
+  | '\n'                    { Utils_parser.newline lexbuf; token lexbuf }
 
 (* Variables and constants *)
   | rD+ | '-' rD+           { LTL_INT (lexeme lexbuf) }
@@ -131,15 +94,12 @@ rule token = parse
 
 (* Others *)
   | eof                     { EOF }
-  | _                       {
-      raise_located (loc lexbuf)
-        (Format.sprintf "Illegal_character %s\n" (lexeme lexbuf))
-    }
+  | _                       { Utils_parser.unknown_token lexbuf }
 
 and comment = parse
   | "*/" { () }
-  | eof  {  raise_located (loc lexbuf) "Unterminated_comment\n" }
-  | '\n' { newline lexbuf; comment lexbuf }
+  | eof  { Utils_parser.abort_current lexbuf "Unterminated_comment" }
+  | '\n' { Utils_parser.newline lexbuf; comment lexbuf }
   | _    { comment lexbuf }
 
 
@@ -149,6 +109,5 @@ and comment = parse
     try
       Ltlparser.ltl token lb
     with
-        Parsing.Parse_error
-      | Invalid_argument _  -> raise_located (loc lb) "Syntax error"
+        Parsing.Parse_error -> Utils_parser.abort_current lb "Syntax error"
 }

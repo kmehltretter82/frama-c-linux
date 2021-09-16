@@ -68,16 +68,6 @@ let convert_ltl_exprs t =
 
 (* Promela file *)
 
-let syntax_error loc msg =
-  Aorai_option.abort
-    "File %S, line %d, characters %d-%d:@\nSyntax error: %s"
-    (Filepath.Normalized.to_pretty_string
-       (Datatype.Filepath.of_string (fst loc).Lexing.pos_fname))
-    (fst loc).Lexing.pos_lnum
-    ((fst loc).Lexing.pos_cnum - (fst loc).Lexing.pos_bol)
-    ((snd loc).Lexing.pos_cnum - (fst loc).Lexing.pos_bol)
-    msg
-
 (* Performs some checks before calling [open_in f], reporting ["errmsg: <f>"]
    in case of error. *)
 let check_and_open_in (f : Filepath.Normalized.t) errmsg =
@@ -86,30 +76,11 @@ let check_and_open_in (f : Filepath.Normalized.t) errmsg =
   open_in (f :> string)
 
 let ltl_to_ltlLight f_ltl (f_out : Filepath.Normalized.t) =
-  try
-    let c = check_and_open_in f_ltl "invalid LTL file" in
-    let (ltl_form,exprs) = Ltllexer.parse c in
-    close_in c;
-    Ltl_output.output ltl_form (f_out :> string);
-    set_ltl_correspondence exprs
-  with
-  | Ltllexer.Error (loc,msg) -> syntax_error loc msg
-
-let parse_error' lexbuf msg =
-  let open Lexing in
-  let start_p = Cil_datatype.Position.of_lexing_pos (lexeme_start_p lexbuf)
-  and end_p = Cil_datatype.Position.of_lexing_pos (lexeme_end_p lexbuf)
-  and lexeme = Lexing.lexeme lexbuf in
-  let start_line = start_p.Filepath.pos_lnum in
-  let abort str =
-    Aorai_option.feedback ~source:start_p "%s@.%a, before or at token: %s\n%a@."
-      str
-      Errorloc.pp_location (start_p, end_p)
-      lexeme
-      (Errorloc.pp_context_from_file ~start_line ~ctx:2) start_p;
-    raise (Log.AbortError "aorai")
-  in
-  Pretty_utils.ksfprintf abort msg
+  let c = check_and_open_in f_ltl "invalid LTL file" in
+  let (ltl_form,exprs) = Ltllexer.parse c in
+  close_in c;
+  Ltl_output.output ltl_form (f_out :> string);
+  set_ltl_correspondence exprs
 
 let load_ya_file filename  =
   let channel = check_and_open_in filename "invalid Ya file" in
@@ -121,30 +92,21 @@ let load_ya_file filename  =
     close_in channel;
     Data_for_aorai.setAutomata automata
   with
-  | Parsing.Parse_error | Invalid_argument _ ->
-    parse_error' lexbuf "syntax error"
-  | Yalexer.Lexing_error msg ->
-    parse_error' lexbuf "%s" msg
-
+  | Parsing.Parse_error ->
+    Utils_parser.abort_current lexbuf "syntax error"
 
 let load_promela_file f  =
-  try
-    let c = check_and_open_in f "invalid Promela file" in
-    let auto = Promelalexer.parse c  in
-    let trans = convert_ltl_exprs auto.trans in
-    close_in c;
-    Data_for_aorai.setAutomata { auto with trans };
-  with
-  | Promelalexer.Error(loc,msg) -> syntax_error loc msg
+  let c = check_and_open_in f "invalid Promela file" in
+  let auto = Promelalexer.parse c  in
+  let trans = convert_ltl_exprs auto.trans in
+  close_in c;
+  Data_for_aorai.setAutomata { auto with trans }
 
 let load_promela_file_withexps f =
-  try
-    let c = check_and_open_in f "invalid Promela file" in
-    let automata = Promelalexer_withexps.parse c  in
-    close_in c;
-    Data_for_aorai.setAutomata automata;
-  with
-  | Promelalexer_withexps.Error(loc,msg) -> syntax_error loc msg
+  let c = check_and_open_in f "invalid Promela file" in
+  let automata = Promelalexer_withexps.parse c  in
+  close_in c;
+  Data_for_aorai.setAutomata automata
 
 let display_status () =
   if Aorai_option.verbose_atleast 2 then begin
@@ -265,9 +227,6 @@ let work () =
       else
         load_promela_file !promela_file;
       printverb "Loading promela        : done\n";
-      (* Computing the list of ignored functions *)
-      (*      Aorai_visitors.compute_ignored_functions file; *)
-
 
       (* Promelaoutput.print_raw_automata (Data_for_aorai.getAutomata());  *)
       (* Data_for_aorai.debug_ltl_expressions (); *)

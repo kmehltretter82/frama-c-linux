@@ -23,6 +23,27 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Lexing
+
+let current_loc lex = Cil_datatype.Position.of_lexing_pos (lexeme_start_p lex)
+
+let abort_current lex fmt =
+  let source = current_loc lex in
+  let start_line = source.Filepath.pos_lnum in
+  let fmt = "before or at token %s@\n%a@\n" ^^ fmt in
+  Aorai_option.abort ~source fmt
+    (Lexing.lexeme lex)
+    (Errorloc.pp_context_from_file ~start_line ~ctx:2) source
+
+let unknown_token lex =
+  abort_current lex
+    "Unexpected character: '%c'" (lexeme_char lex (lexeme_start lex))
+
+let newline lexbuf =
+  let pos = lexbuf.lex_curr_p in
+  lexbuf.lex_curr_p <-
+    { pos with pos_lnum = pos.pos_lnum + 1; pos_bol = pos.pos_cnum }
+
 let rec get_last_field  my_field my_offset =
   match my_offset with
   | Cil_types.NoOffset -> my_field

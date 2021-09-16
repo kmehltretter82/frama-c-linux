@@ -24,56 +24,6 @@
 (**************************************************************************)
 
 open Promelaast
-(*open Graph.Pack.Digraph
-
-  let st_array = ref (Array.make 1 (V.create 0)) ;;
-
-  let auto2digraph (stl,trl) =
-  Aorai_option.feedback "auto2digraph:"  ;
-  let digraph = create ()  in
-  st_array:= Array.make (List.length stl) (V.create 0);
-  Aorai_option.feedback "   array : ok\n"  ;
-
-  let _ = List.iter
-    (fun st ->
-       (!st_array).(st.nums)<-(V.create st.nums);
-       add_vertex digraph (!st_array).(st.nums)
-       )
-    stl
-  in
-  Aorai_option.feedback "   array remplissage : ok\n"  ;
-  List.iter
-    (fun tr -> add_edge digraph (V.create tr.start.nums) (V.create tr.stop.nums))
-    trl;
-  digraph
-  ;;
-
-
-  let existing_path auto st1 st2 =
-  Aorai_option.feedback "existing path ..\n"  ;
-  let digraph = auto2digraph auto in
-  let start = (!st_array).(st1.nums) in
-  let stop = (!st_array).(st2.nums) in
-  Aorai_option.feedback "%s" ("test : Etats choisis ("^(string_of_int (V.label start))^","^(string_of_int (V.label stop))^")\n") ;
-
-  display_with_gv digraph;
-  Aorai_option.feedback "   affichage : ok\n"  ;
-  Aorai_option.feedback "shortest path : "  ;
-
-  let path=shortest_path digraph start stop in
-  Aorai_option.feedback "done.\n"  ;
-  path
-  ;;
-
-  let test (stl,trl) =
-  let st2 = List.hd stl in
-  let st1 = List.hd (List.tl stl) in
-
-  let _ = existing_path (stl,trl) st1 st2 in
-  Aorai_option.feedback "Fini.\n"  ;
-  ()
-  ;;
-*)
 
 let voisins (_,trans_l) st =
   List.fold_left

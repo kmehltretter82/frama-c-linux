@@ -31,19 +31,6 @@
   open Promelaparser_withexps
   open Lexing
 
-  exception Error of (Lexing.position * Lexing.position) * string
-
-  let loc lexbuf = (lexeme_start_p lexbuf, lexeme_end_p lexbuf)
-
-  let raise_located loc e = raise (Error (loc, e))
-
-  let buf = Buffer.create 1024
-
-  let newline lexbuf =
-    let pos = lexbuf.lex_curr_p in
-    lexbuf.lex_curr_p <-
-      { pos with pos_lnum = pos.pos_lnum + 1; pos_bol = pos.pos_cnum }
-
 }
 
 
@@ -74,9 +61,9 @@ rule token = parse
   | "&&"                    { PROMELA_AND }
   | '!'                     { PROMELA_NOT }
   | [' ' '\t' '\012' '\r']+ { token lexbuf }
-  | '\n'                    { newline lexbuf; token lexbuf }
+  | '\n'                    { Utils_parser.newline lexbuf; token lexbuf }
   | "/*"                    { comment lexbuf; token lexbuf }
-  | "//" [^ '\n']* '\n'     { newline lexbuf; token lexbuf }
+  | "//" [^ '\n']* '\n'     { Utils_parser.newline lexbuf; token lexbuf }
 
   | "callof_" rL* (rL | rD)*
                             { let s=(lexeme lexbuf) in
@@ -92,9 +79,12 @@ rule token = parse
                               PROMELA_CALLORRETURNOF s }
 
 
-  | "callof_"               { raise_located (loc lexbuf) "Illegal function name in Promela file." }
-  | "returnof_"             { raise_located (loc lexbuf) "Illegal function name in Promela file." }
-  | "callorreturnof_"       { raise_located (loc lexbuf) "Illegal function name in Promela file." }
+  | "callof_"               { Utils_parser.abort_current lexbuf
+                                "Illegal function name in Promela file." }
+  | "returnof_"             { Utils_parser.abort_current lexbuf
+                                "Illegal function name in Promela file." }
+  | "callorreturnof_"       { Utils_parser.abort_current lexbuf
+                                "Illegal function name in Promela file." }
 
 
   | rD+ | '-' rD+           { PROMELA_INT (lexeme lexbuf) }
@@ -130,16 +120,12 @@ rule token = parse
   | eof                     { EOF }
 
   | "1"                     { PROMELA_TRUE }
-  | _                       { Aorai_option.error "Illegal_character : '%s'\n" (lexeme lexbuf);
-                              raise Parsing.Parse_error}
-
-
-
+  | _                       { Utils_parser.unknown_token lexbuf }
 
 and comment = parse
   | "*/" { () }
-  | eof  {  Aorai_option.warning "Unterminated_comment\n"  (*lex_error lexbuf "Unterminated_comment"*) }
-  | '\n' { newline lexbuf; comment lexbuf }
+  | eof  { Aorai_option.abort "Unterminated_comment\n" }
+  | '\n' { Utils_parser.newline lexbuf; comment lexbuf }
   | _    { comment lexbuf }
 
 
@@ -149,22 +135,5 @@ and comment = parse
     try
       Promelaparser_withexps.promela token lb
     with
-        Parsing.Parse_error
-      | Invalid_argument _ ->
-          let (a,b)=(loc lb) in
-                  Aorai_option.error "Syntax error (l%d c%d -> l%dc%d)" a.pos_lnum (a.pos_cnum-a.pos_bol) b.pos_lnum (b.pos_cnum-b.pos_bol);
-(*          Format.print_string "Syntax error (" ;   *)
-(*          Format.print_string "l" ;                *)
-(*          Format.print_int a.pos_lnum ;            *)
-(*          Format.print_string "c" ;                *)
-(*          Format.print_int (a.pos_cnum-a.pos_bol) ;*)
-(*          Format.print_string " -> l" ;            *)
-(*          Format.print_int b.pos_lnum ;            *)
-(*          Format.print_string "c" ;                *)
-(*          Format.print_int (b.pos_cnum-b.pos_bol) ;*)
-(*          Format.print_string ")\n" ;              *)
-            raise_located (loc lb) "Syntax error"
-
-
-
+        Parsing.Parse_error -> Utils_parser.abort_current lb "Syntax error"
 }

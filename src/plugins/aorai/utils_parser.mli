@@ -23,62 +23,19 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* File yalexer.mll *)
-{
-    open Yaparser
-}
+(** utilities for parsing automata and LTL formulas *)
 
-let num    = ['0'-'9']
-let alpha  = ['a'-'z' 'A'-'Z']
-let ident  = alpha (num | alpha | '_')*
-let string = ([^ '"' '\\']|'\\'_)*
+(** returns the position corresponding to the
+    current character in the lexbuf. *)
+val current_loc: Lexing.lexbuf -> Cil_datatype.Position.t
 
+(** aborts the execution using current lexbuf position as source. *)
+val abort_current:
+  Lexing.lexbuf -> ('a, Format.formatter, unit, 'b) format4 -> 'a
 
-rule token = parse
-    [' ' '\t' ]       { token lexbuf }     (* skip blanks *)
-  | '\n'              { Utils_parser.newline lexbuf; token lexbuf }
-  | ['0'-'9']+ as lxm { INT(lxm) }
-  | "CALL"            { CALL_OF }
-  | "RETURN"          { RETURN_OF }
-  | "COR"             { CALLORRETURN_OF }
-  | "other"           { OTHERWISE }
-  | "true"            { TRUE }
-  | "false"           { FALSE }
-  | "\\result" as lxm { IDENTIFIER(lxm) }
-  | ident as lxm      { IDENTIFIER(lxm) }
-  | '$' (ident as lxm){ METAVAR(lxm) }
-  | ','               { COMMA }
-  | '+'               { PLUS }
-  | '-'               { MINUS }
-  | '*'               { STAR }
-  | '/'               { SLASH }
-  | '%'               { PERCENT }
-  | '('               { LPAREN }
-  | ')'               { RPAREN }
-  | '['               { LSQUARE }
-  | ']'               { RSQUARE }
-  | '{'               { LCURLY }
-  | '}'               { RCURLY }
-  | "{{"              { LBRACELBRACE }
-  | "}}"              { RBRACERBRACE }
-  | '.'               { DOT }
-  | "->"              { RARROW }
-  | '&'               { AMP }
-  | '|'               { PIPE }
-  | "&&"              { AND }
-  | "||"              { OR }
-  | '!'               { NOT }
-  | "<"               { LT }
-  | ">"               { GT }
-  | "<="              { LE }
-  | ">="              { GE }
-  | "=="              { EQ }
-  | "!="              { NEQ }
-  | ';'               { SEMI_COLON }
-  | ':'               { COLON }
-  | "::"              { COLUMNCOLUMN }
-  | '^'               { CARET }
-  | '?'               { QUESTION }
-  | eof               { EOF }
-  | ":="              { AFF }
-  | _                 { Utils_parser.unknown_token lexbuf }
+(** aborts in case the current character
+    is not the beginning of a valid token. *)
+val unknown_token: Lexing.lexbuf -> 'a
+
+(** initiate a new line in the lexbuf *)
+val newline: Lexing.lexbuf -> unit

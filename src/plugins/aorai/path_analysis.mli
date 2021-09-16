@@ -23,62 +23,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* File yalexer.mll *)
-{
-    open Yaparser
-}
+(** [get_edges s1 s2 g] retrieves all edges in [g] between [s1] and [s2]. *)
+val get_edges:
+  Promelaast.state -> Promelaast.state -> ('c,'a) Promelaast.graph
+  -> ('c, 'a) Promelaast.trans list
 
-let num    = ['0'-'9']
-let alpha  = ['a'-'z' 'A'-'Z']
-let ident  = alpha (num | alpha | '_')*
-let string = ([^ '"' '\\']|'\\'_)*
+(** retrieve all edges starting at the given node. *)
+val get_transitions_of_state:
+  Promelaast.state -> ('c,'a) Promelaast.graph -> ('c,'a) Promelaast.trans list
 
+(** return the initial states of the graph. *)
+val get_init_states: ('c, 'a) Promelaast.graph -> Promelaast.state list
 
-rule token = parse
-    [' ' '\t' ]       { token lexbuf }     (* skip blanks *)
-  | '\n'              { Utils_parser.newline lexbuf; token lexbuf }
-  | ['0'-'9']+ as lxm { INT(lxm) }
-  | "CALL"            { CALL_OF }
-  | "RETURN"          { RETURN_OF }
-  | "COR"             { CALLORRETURN_OF }
-  | "other"           { OTHERWISE }
-  | "true"            { TRUE }
-  | "false"           { FALSE }
-  | "\\result" as lxm { IDENTIFIER(lxm) }
-  | ident as lxm      { IDENTIFIER(lxm) }
-  | '$' (ident as lxm){ METAVAR(lxm) }
-  | ','               { COMMA }
-  | '+'               { PLUS }
-  | '-'               { MINUS }
-  | '*'               { STAR }
-  | '/'               { SLASH }
-  | '%'               { PERCENT }
-  | '('               { LPAREN }
-  | ')'               { RPAREN }
-  | '['               { LSQUARE }
-  | ']'               { RSQUARE }
-  | '{'               { LCURLY }
-  | '}'               { RCURLY }
-  | "{{"              { LBRACELBRACE }
-  | "}}"              { RBRACERBRACE }
-  | '.'               { DOT }
-  | "->"              { RARROW }
-  | '&'               { AMP }
-  | '|'               { PIPE }
-  | "&&"              { AND }
-  | "||"              { OR }
-  | '!'               { NOT }
-  | "<"               { LT }
-  | ">"               { GT }
-  | "<="              { LE }
-  | ">="              { GE }
-  | "=="              { EQ }
-  | "!="              { NEQ }
-  | ';'               { SEMI_COLON }
-  | ':'               { COLON }
-  | "::"              { COLUMNCOLUMN }
-  | '^'               { CARET }
-  | '?'               { QUESTION }
-  | eof               { EOF }
-  | ":="              { AFF }
-  | _                 { Utils_parser.unknown_token lexbuf }
+(** [true] iff there's at most one path between the two states in the graph. *)
+val at_most_one_path:
+  ('c, 'a) Promelaast.graph -> Promelaast.state -> Promelaast.state -> bool
