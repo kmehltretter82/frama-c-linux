@@ -736,6 +736,11 @@ export enum RqKind {
   EXEC = 'EXEC'
 }
 
+/** Server signal. */
+export interface Signal {
+  name: string;
+}
+
 /** Server request. */
 export interface Request<Kd extends RqKind, In, Out> {
   kind: Kd;
@@ -745,11 +750,8 @@ export interface Request<Kd extends RqKind, In, Out> {
   input: Json.Loose<In>;
   /** Decoder of output parameters. */
   output: Json.Loose<Out>;
-}
-
-/** Server signal. */
-export interface Signal {
-  name: string;
+  /** Signals the request depends on */
+  signals: Array<Signal>;
 }
 
 export type GetRequest<In, Out> = Request<RqKind.GET, In, Out>;

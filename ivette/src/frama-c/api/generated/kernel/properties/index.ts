@@ -141,6 +141,7 @@ const propKindTags_internal: Server.GetRequest<null,tag[]> = {
   name:   'kernel.properties.propKindTags',
   input:  Json.jNull,
   output: Json.jList(jTag),
+  signals: [],
 };
 /** Registered tags for the above type. */
 export const propKindTags: Server.GetRequest<null,tag[]>= propKindTags_internal;
@@ -187,6 +188,7 @@ const propStatusTags_internal: Server.GetRequest<null,tag[]> = {
   name:   'kernel.properties.propStatusTags',
   input:  Json.jNull,
   output: Json.jList(jTag),
+  signals: [],
 };
 /** Registered tags for the above type. */
 export const propStatusTags: Server.GetRequest<null,tag[]>= propStatusTags_internal;
@@ -246,6 +248,7 @@ const alarmsTags_internal: Server.GetRequest<null,tag[]> = {
   name:   'kernel.properties.alarmsTags',
   input:  Json.jNull,
   output: Json.jList(jTag),
+  signals: [],
 };
 /** Registered tags for the above type. */
 export const alarmsTags: Server.GetRequest<null,tag[]>= alarmsTags_internal;
@@ -326,6 +329,7 @@ const reloadStatus_internal: Server.GetRequest<null,null> = {
   name:   'kernel.properties.reloadStatus',
   input:  Json.jNull,
   output: Json.jNull,
+  signals: [],
 };
 /** Force full reload for array [`status`](#status)  */
 export const reloadStatus: Server.GetRequest<null,null>= reloadStatus_internal;
@@ -344,6 +348,7 @@ const fetchStatus_internal: Server.GetRequest<
             removed: Json.jList(Json.jKey<'#property'>('#property')),
             reload: Json.jFail(Json.jBoolean,'Boolean expected'),
           }),
+  signals: [],
 };
 /** Data fetcher for array [`status`](#status)  */
 export const fetchStatus: Server.GetRequest<

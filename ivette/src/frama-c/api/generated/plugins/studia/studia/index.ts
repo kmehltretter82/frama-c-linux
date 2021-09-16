@@ -89,6 +89,7 @@ const getReadsLval_internal: Server.GetRequest<Json.key<'#lval'>,effects> = {
   name:   'plugins.studia.studia.getReadsLval',
   input:  Json.jKey<'#lval'>('#lval'),
   output: jEffects,
+  signals: [],
 };
 /** Get the list of statements that read a lval. */
 export const getReadsLval: Server.GetRequest<Json.key<'#lval'>,effects>= getReadsLval_internal;
@@ -98,6 +99,7 @@ const getWritesLval_internal: Server.GetRequest<Json.key<'#lval'>,effects> = {
   name:   'plugins.studia.studia.getWritesLval',
   input:  Json.jKey<'#lval'>('#lval'),
   output: jEffects,
+  signals: [],
 };
 /** Get the list of statements that write a lval. */
 export const getWritesLval: Server.GetRequest<Json.key<'#lval'>,effects>= getWritesLval_internal;
