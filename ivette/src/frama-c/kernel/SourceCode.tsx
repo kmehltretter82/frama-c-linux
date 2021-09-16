@@ -36,6 +36,7 @@ import * as Preferences from 'ivette/prefs';
 import { functions, markerInfo } from 'frama-c/api/kernel/ast';
 import { Code } from 'dome/controls/labels';
 import { Hfill } from 'dome/layout/boxes';
+import * as Path from 'path';
 
 import 'codemirror/addon/selection/active-line';
 import 'codemirror/addon/dialog/dialog.css';
@@ -69,8 +70,9 @@ export default function SourceCode() {
   const sloc =
     (theMarker && markersInfo.getData(theMarker)?.sloc) ??
     (theFunction && functionsData.find((e) => e.name === theFunction)?.sloc);
-  const path = sloc ? sloc.file : '';
+  const file = sloc ? sloc.file : '';
   const line = sloc ? sloc.line : 0;
+  const filename = Path.parse(file).base;
 
   // Title bar buttons, along with the parameters for our text.
   const { buttons: themeButtons, theme, fontSize, wrapText } =
@@ -83,17 +85,17 @@ export default function SourceCode() {
     });
 
   // Updating the buffer content.
-  const errorMsg = () => { D.error(`Fail to load source code file ${path}`); };
-  const onError = () => { if (path) errorMsg(); };
+  const errorMsg = () => { D.error(`Fail to load source code file ${file}`); };
+  const onError = () => { if (file) errorMsg(); };
   const setValue = (text: string) => buffer.setValue(text);
   const setCursor = () => buffer.forEach((cm) => cm.setCursor(line - 1));
-  Dome.usePromise(readFile(path).then(setValue).then(setCursor).catch(onError));
+  Dome.usePromise(readFile(file).then(setValue).then(setCursor).catch(onError));
 
   // Building the React component.
   return (
     <>
       <TitleBar>
-        <Code title={path}>{path}</Code>
+        <Code title={file}>{filename}</Code>
         <Hfill />
         {themeButtons}
       </TitleBar>
