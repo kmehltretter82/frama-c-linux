@@ -28,9 +28,22 @@ import * as Dome from 'dome';
 import * as Dialogs from 'dome/dialogs';
 import * as Server from 'frama-c/server';
 import * as Ast from 'frama-c/api/kernel/ast';
+import * as States from 'frama-c/states';
+
+const cFilter = {
+  name: 'C source files',
+  extensions: ['c', 'i', 'h'],
+};
+const allFilter = {
+  name: 'all',
+  extensions: ['*'],
+};
 
 async function setFiles(): Promise<void> {
-  const files = await Dialogs.showOpenFiles({ title: 'Open files' });
+  const files = await Dialogs.showOpenFiles({
+    title: 'Select C source files',
+    filters: [cFilter, allFilter],
+  });
   await Server.send(Ast.setFiles, files);
   await Server.send(Ast.compute, { });
   return;
@@ -39,7 +52,7 @@ async function setFiles(): Promise<void> {
 export function init() {
   Dome.addMenuItem({
     menu: 'File',
-    label: 'Set files',
+    label: 'Set source files',
     id: 'file_add',
     onClick: setFiles,
     type: 'normal',
