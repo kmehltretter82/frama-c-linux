@@ -29,7 +29,7 @@ import * as Dome from 'dome';
 import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
 
-import { Button as ToolButton, ButtonGroup, Space } from 'dome/frame/toolbars';
+import * as Toolbars from 'dome/frame/toolbars';
 import { LED, LEDstatus, IconButton } from 'dome/controls/buttons';
 import { Label, Code } from 'dome/controls/labels';
 import { RichTextBuffer } from 'dome/text/buffers';
@@ -163,26 +163,26 @@ export const Control = () => {
   }
 
   return (
-    <ButtonGroup>
-      <ToolButton
+    <Toolbars.ButtonGroup>
+      <Toolbars.Button
         icon="MEDIA.PLAY"
         enabled={play.enabled}
         onClick={play.onClick}
         title="Start the server"
       />
-      <ToolButton
+      <Toolbars.Button
         icon="RELOAD"
         enabled={reload.enabled}
         onClick={reload.onClick}
         title="Re-start the server"
       />
-      <ToolButton
+      <Toolbars.Button
         icon="MEDIA.STOP"
         enabled={stop.enabled}
         onClick={stop.onClick}
         title="Shut down the server"
       />
-    </ButtonGroup>
+    </Toolbars.ButtonGroup>
   );
 };
 
@@ -281,7 +281,7 @@ const RenderConsole = () => {
           onClick={doRemove}
           title="Discard command from history (irreversible)"
         />
-        <Space />
+        <Toolbars.Space />
         <IconButton
           icon="RELOAD"
           display={edited}
@@ -300,7 +300,7 @@ const RenderConsole = () => {
           onClick={doNext}
           title="Next command"
         />
-        <Space />
+        <Toolbars.Space />
         <Label
           className="component-info"
           title="History (last command first)"
@@ -308,7 +308,7 @@ const RenderConsole = () => {
         >
           {1 + cursor} / {n}
         </Label>
-        <Space />
+        <Toolbars.Space />
         <IconButton
           icon="MEDIA.PLAY"
           display={edited}
@@ -395,6 +395,7 @@ export const Status = () => {
       <LED status={led} blink={blink} />
       <Code label={status.stage} />
       {error && <Label icon="WARNING" label={error} />}
+      <Toolbars.Separator />
     </>
   );
 };
