@@ -71,6 +71,11 @@ const compute_internal: Server.ExecRequest<null,null> = {
 /** Ensures that AST is computed */
 export const compute: Server.ExecRequest<null,null>= compute_internal;
 
+/** Emitted when the AST has been changed */
+export const changed: Server.Signal = {
+  name: 'kernel.ast.changed',
+};
+
 /** Marker kind */
 export enum markerKind {
   /** Expression */
@@ -283,6 +288,15 @@ export const byLocation: Compare.Order<location> =
     fct: Compare.string,
     marker: byMarker,
   });
+
+const getMainFunction_internal: Server.GetRequest<null,Json.key<'#fct'>> = {
+  kind: Server.RqKind.GET,
+  name:   'kernel.ast.getMainFunction',
+  input:  Json.jNull,
+  output: Json.jKey<'#fct'>('#fct'),
+};
+/** Get the current 'main' function. */
+export const getMainFunction: Server.GetRequest<null,Json.key<'#fct'>>= getMainFunction_internal;
 
 const getFunctions_internal: Server.GetRequest<null,Json.key<'#fct'>[]> = {
   kind: Server.RqKind.GET,

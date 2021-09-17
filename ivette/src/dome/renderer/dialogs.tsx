@@ -157,7 +157,7 @@ export interface FileFilter {
 
 export interface FileDialogProps {
   /** Prompt message. */
-  message?: string;
+  title?: string;
   /** Open button label (default is « Open »). */
   label?: string;
   /** Initially selected path. */
@@ -196,11 +196,11 @@ export interface OpenDirProps extends FileDialogProps {
 export async function showOpenFile(
   props: OpenFileProps,
 ): Promise<string | undefined> {
-  const { message, label, path, hidden = false, filters } = props;
+  const { title, label, path, hidden = false, filters } = props;
   return remote.dialog.showOpenDialog(
     remote.getCurrentWindow(),
     {
-      message,
+      title,
       buttonLabel: label,
       defaultPath: path && defaultPath(path),
       properties: (hidden ? ['openFile', 'showHiddenFiles'] : ['openFile']),
@@ -219,12 +219,12 @@ export async function showOpenFile(
 export async function showOpenFiles(
   props: OpenFileProps,
 ): Promise<string[] | undefined> {
-  const { message, label, path, hidden, filters } = props;
+  const { title, label, path, hidden, filters } = props;
 
   return remote.dialog.showOpenDialog(
     remote.getCurrentWindow(),
     {
-      message,
+      title,
       buttonLabel: label,
       defaultPath: path && defaultPath(path),
       properties: (
@@ -257,11 +257,11 @@ export async function showOpenFiles(
 export async function showSaveFile(
   props: SaveFileProps,
 ): Promise<string | undefined> {
-  const { message, label, path, filters } = props;
+  const { title, label, path, filters } = props;
   return remote.dialog.showSaveDialog(
     remote.getCurrentWindow(),
     {
-      message,
+      title,
       buttonLabel: label,
       defaultPath: path,
       filters,
@@ -282,7 +282,7 @@ type openDirProperty =
 export async function showOpenDir(
   props: OpenDirProps,
 ): Promise<string | undefined> {
-  const { message, label, path, hidden } = props;
+  const { title, label, path, hidden } = props;
   const properties: openDirProperty[] = ['openDirectory'];
   if (hidden) properties.push('showHiddenFiles');
 
@@ -295,7 +295,7 @@ export async function showOpenDir(
   return remote.dialog.showOpenDialog(
     remote.getCurrentWindow(),
     {
-      message,
+      title,
       buttonLabel: label,
       defaultPath: path,
       properties,

@@ -37,6 +37,15 @@ let () = Request.register ~package
     ~descr:(Md.plain "Ensures that AST is computed")
     ~input:(module Junit) ~output:(module Junit) Ast.compute
 
+let changed_signal = Request.signal ~package ~name:"changed"
+    ~descr:(Md.plain "Emitted when the AST has been changed")
+
+let ast_update_hook f =
+  Ast.add_hook_on_update f;
+  Ast.apply_after_computed (fun _ -> f ())
+
+let () = ast_update_hook (fun _ -> Request.emit changed_signal)
+
 (* -------------------------------------------------------------------------- *)
 (* ---  Printers                                                          --- *)
 (* -------------------------------------------------------------------------- *)
@@ -350,6 +359,12 @@ end
 (* -------------------------------------------------------------------------- *)
 
 let () = Request.register ~package
+    ~kind:`GET ~name:"getMainFunction"
+    ~descr:(Md.plain "Get the current 'main' function.")
+    ~input:(module Junit) ~output:(module Kf)
+    (fun () -> fst (Globals.entry_point ()))
+
+let () = Request.register ~package
     ~kind:`GET ~name:"getFunctions"
     ~descr:(Md.plain "Collect all functions in the AST")
     ~input:(module Junit) ~output:(module Jlist(Kf))
@@ -459,7 +474,7 @@ struct
         ~name:"functions"
         ~descr:(Md.plain "AST Functions")
         ~iter
-        ~add_reload_hook:Ast.add_hook_on_update ;
+        ~add_reload_hook:ast_update_hook
     end
 
 end
