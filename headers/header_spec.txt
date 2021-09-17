@@ -1651,7 +1651,7 @@ src/plugins/wp/MemVar.ml: CEA_WP
 src/plugins/wp/MemVar.mli: CEA_WP
 src/plugins/wp/MemZeroAlias.ml: CEA_WP
 src/plugins/wp/MemZeroAlias.mli: CEA_WP
-src/plugins/wp/Sigs.ml: CEA_WP
+src/plugins/wp/Sigs.mli: CEA_WP
 src/plugins/wp/Mstate.ml: CEA_WP
 src/plugins/wp/Mstate.mli: CEA_WP
 src/plugins/wp/Passive.ml: CEA_WP
@@ -1826,7 +1826,7 @@ src/plugins/wp/driver.mll: CEA_WP
 src/plugins/wp/dyncall.ml: CEA_WP
 src/plugins/wp/dyncall.mli: CEA_WP
 src/plugins/wp/intro_wp.txt: CEA_WP
-src/plugins/wp/mcfg.ml: CEA_WP
+src/plugins/wp/mcfg.mli: CEA_WP
 src/plugins/wp/normAtLabels.ml: CEA_WP
 src/plugins/wp/normAtLabels.mli: CEA_WP
 src/plugins/wp/proof.ml: CEA_WP
@@ -1834,6 +1834,7 @@ src/plugins/wp/proof.mli: CEA_WP
 src/plugins/wp/prover.ml: CEA_WP
 src/plugins/wp/prover.mli: CEA_WP
 src/plugins/wp/register.ml: CEA_WP
+src/plugins/wp/register.mli: CEA_WP
 src/plugins/wp/rformat.mli: CEA_WP
 src/plugins/wp/rformat.mll: CEA_WP
 src/plugins/wp/script.mli: CEA_WP
