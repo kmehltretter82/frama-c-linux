@@ -57,7 +57,7 @@ val filter_callstack : (callstack -> bool) -> request -> request
 
 (* State requests *)
 val callstacks : request -> callstack list
-val equality_class : Cil_types.exp -> request -> Cil_types.exp list option
+val equality_class : Cil_types.exp -> request -> Cil_types.exp list result
 val as_cvalue_model : request -> Cvalue.Model.t result
 
 (* Evaluation *)

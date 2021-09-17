@@ -254,8 +254,29 @@ struct
   let callstacks req =
     Response.callstacks (get_by_callstack req)
 
-  let equality_class _exp _req =
-    raise Not_implemented (* Where is the key for Equality_domain ? *)
+  let equality_class exp req =
+    let open Equality in
+    match A.Dom.get Equality_domain.key with
+    | None ->
+      Result.error DisabledDomain
+    | Some extract ->
+      let hce = Hcexprs.HCE.of_exp exp in
+      let extract' state =
+        let equalities = Equality_domain.project (extract state) in
+        NonTrivial (Set.find hce equalities)
+      and reduce e1 e2 =
+        match e1, e2 with
+        | Trivial, _ | _, Trivial -> Trivial
+        | NonTrivial e1, NonTrivial e2 -> Equality.inter e1 e2
+      in
+      let r = match Response.map_join extract' reduce (get req) with
+        | (`Top | `Bottom) as r -> r
+        | `Value Trivial -> `Top
+        | `Value (NonTrivial e) ->
+          let l = Equality.elements e in
+          `Value (List.map Hcexprs.HCE.to_exp l)
+      in
+      convert r
 
   let as_cvalue_model req =
     match A.Dom.get Cvalue_domain.State.key with
