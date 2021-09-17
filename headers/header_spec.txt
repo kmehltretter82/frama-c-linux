@@ -1532,7 +1532,9 @@ src/plugins/variadic/Makefile.in: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/configure.ac: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/Variadic.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/classify.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/variadic/classify.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/environment.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/variadic/environment.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/extends.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/extends.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/format_parser.ml: CEA_LGPL_OR_PROPRIETARY
@@ -1540,10 +1542,12 @@ src/plugins/variadic/format_parser.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/format_pprint.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/format_pprint.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/format_string.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/variadic/format_string.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/format_typer.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/format_typer.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/format_types.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/generic.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/variadic/generic.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/options.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/options.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/register.ml: CEA_LGPL_OR_PROPRIETARY
@@ -1551,7 +1555,9 @@ src/plugins/variadic/register.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/replacements.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/replacements.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/standard.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/variadic/standard.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/translate.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/variadic/translate.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/va_types.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/wp/.gitignore: .ignore
 src/plugins/wp/.ocp-indent: .ignore

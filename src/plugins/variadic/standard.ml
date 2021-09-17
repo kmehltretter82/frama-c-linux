@@ -26,6 +26,8 @@ open Options
 module List = Extends.List
 module Typ = Extends.Typ
 
+type call_builder  = Cil_types.exp -> Cil_types.exp list -> Cil_types.instr
+
 let pp_prototype name fmt tparams =
   Format.fprintf fmt "%s(%a)"
     name
