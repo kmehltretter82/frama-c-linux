@@ -74,6 +74,16 @@ let () =
        try Project.load_all (Filepath.Normalized.of_string file); None
        with Project.IOError err -> Some err)
 
+
+let () =
+  Request.register ~package ~kind:`SET ~name:"save"
+    ~descr:(Md.plain "Save the current session. Returns an error, if not successfull.")
+    ~input:(module Jstring)
+    ~output:(module Joption(Jstring))
+    (fun file ->
+       try Project.save_all (Filepath.Normalized.of_string file); None
+       with Project.IOError err -> Some err)
+
 (* -------------------------------------------------------------------------- *)
 (* --- File Positions                                                     --- *)
 (* -------------------------------------------------------------------------- *)
