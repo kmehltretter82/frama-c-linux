@@ -772,7 +772,7 @@ char *__gen_e_acsl_strcpy(char * restrict dest, char const * restrict src)
  */
 char *__gen_e_acsl_strchr(char const *s, int c)
 {
-  char const *__gen_e_acsl_at_3;
+  char const *__gen_e_acsl_at_4;
   char const *__gen_e_acsl_at_2;
   int __gen_e_acsl_at;
   __e_acsl_contract_t *__gen_e_acsl_contract;
@@ -781,6 +781,7 @@ char *__gen_e_acsl_strchr(char const *s, int c)
   __e_acsl_store_block((void *)(& s),(size_t)8);
   __gen_e_acsl_contract = __e_acsl_contract_init((size_t)3);
   __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)2,1);
+  __gen_e_acsl_at_4 = s;
   __gen_e_acsl_at_3 = s;
   __gen_e_acsl_at_2 = s;
   __gen_e_acsl_at = c;
@@ -835,7 +836,7 @@ char *__gen_e_acsl_strchr(char const *s, int c)
         void *__gen_e_acsl_base_addr_3;
         void *__gen_e_acsl_base_addr_4;
         __gen_e_acsl_base_addr_3 = __e_acsl_base_addr((void *)__retres);
-        __gen_e_acsl_base_addr_4 = __e_acsl_base_addr((void *)__gen_e_acsl_at_3);
+        __gen_e_acsl_base_addr_4 = __e_acsl_base_addr((void *)__gen_e_acsl_at_4);
         __gen_e_acsl_or = __gen_e_acsl_base_addr_3 == __gen_e_acsl_base_addr_4;
       }
       __e_acsl_assert(__gen_e_acsl_or,1,"Postcondition","strchr",
