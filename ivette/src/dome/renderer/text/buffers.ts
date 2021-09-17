@@ -478,6 +478,19 @@ export class RichTextBuffer extends Emitter {
     }
   }
 
+  /**
+     Requires all connected views to select the specified line and to place it
+     at the top of their displays.
+
+     @param line - the line number to select
+  */
+  setCursorOnTop(line: number): void {
+    this.forEach((cm) => {
+      cm.setCursor(cm.lastLine());
+      cm.setCursor(line - 1);
+    });
+  }
+
   // --------------------------------------------------------------------------
   // --- Document Linking
   // --------------------------------------------------------------------------
