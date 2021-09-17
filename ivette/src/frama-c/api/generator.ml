@@ -432,6 +432,19 @@ let depends d =
   match d.Pkg.d_kind with
   | D_loose(id,t) when makeLooseNeedSafe t -> [Pkg.Derived.safe id]
   | D_safe(id,t) when not (makeLooseNeedSafe t) -> [Pkg.Derived.loose id]
+  | D_value _ ->
+    let id = d.d_ident in
+    [
+      Pkg.Derived.signal id;
+      Pkg.Derived.getter id
+    ]
+  | D_state _ ->
+    let id = d.d_ident in
+    [
+      Pkg.Derived.signal id;
+      Pkg.Derived.getter id;
+      Pkg.Derived.setter id
+    ]
   | D_array _ ->
     let id = d.d_ident in
     let data = Pkg.Derived.data id in
