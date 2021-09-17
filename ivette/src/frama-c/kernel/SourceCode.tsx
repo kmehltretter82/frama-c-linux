@@ -87,7 +87,7 @@ export default function SourceCode() {
   const errorMsg = () => { D.error(`Fail to load source code file ${file}`); };
   const onError = () => { if (file) errorMsg(); };
   const setValue = (text: string) => buffer.setValue(text);
-  const setCursor = () => buffer.forEach((cm) => cm.setCursor(line - 1));
+  const setCursor = () => buffer.setCursorOnTop(line);
   const text = React.useMemo(() => readFile(file), [file]);
   Dome.usePromise(text.then(setValue).then(setCursor).catch(onError));
 
