@@ -2505,7 +2505,6 @@ void __FC_assert(int c, char const *file, int line, char const *expr);
 extern void Frama_C_show_each_warning();
 
 /*@ requires nonnull_c: c ≢ 0;
-    terminates c ≢ 0;
     assigns \nothing; */
 void __FC_assert(int c, char const *file, int line, char const *expr)
 {

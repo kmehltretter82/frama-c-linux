@@ -29,7 +29,6 @@ __BEGIN_DECLS
 
 /*@
   requires nonnull_c: c != 0;
-  terminates c != 0;
   assigns \nothing;
 */
 extern void __FC_assert(int c, const char* file, int line, const char*expr);
@@ -42,7 +41,7 @@ __POP_FC_STDLIB
 #endif
 
 #undef assert
-#ifdef NDEBUG 
+#ifdef NDEBUG
 #define assert(ignore) ((void)0)
 #else
 #ifndef __FRAMAC__
