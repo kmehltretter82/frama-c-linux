@@ -289,14 +289,22 @@ export const byLocation: Compare.Order<location> =
     marker: byMarker,
   });
 
-const getMainFunction_internal: Server.GetRequest<null,Json.key<'#fct'>> = {
+const getMainFunction_internal: Server.GetRequest<
+  null,
+  Json.key<'#fct'> |
+  undefined
+  > = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.getMainFunction',
   input:  Json.jNull,
   output: Json.jKey<'#fct'>('#fct'),
 };
 /** Get the current 'main' function. */
-export const getMainFunction: Server.GetRequest<null,Json.key<'#fct'>>= getMainFunction_internal;
+export const getMainFunction: Server.GetRequest<
+  null,
+  Json.key<'#fct'> |
+  undefined
+  >= getMainFunction_internal;
 
 const getFunctions_internal: Server.GetRequest<null,Json.key<'#fct'>[]> = {
   kind: Server.RqKind.GET,

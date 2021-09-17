@@ -41,11 +41,12 @@ const allFilter = {
   extensions: ['*'],
 };
 
-async function parseFiles(files: string[]) {
+async function parseFiles(files: string[]): Promise<void> {
   Status.setMessage({ text: 'Parsing source files…', kind: 'progress' });
   await Server.send(Ast.setFiles, files);
   await Server.send(Ast.compute, { });
   Status.setMessage({ text: 'Source files parsed.', kind: 'success' });
+  return;
 }
 
 async function setFiles(): Promise<void> {
@@ -54,7 +55,7 @@ async function setFiles(): Promise<void> {
     filters: [cFilter, allFilter],
   });
   if (files) {
-    parseFiles(files);
+    await parseFiles(files);
     States.resetSelection();
   }
   return;
