@@ -123,9 +123,6 @@ module Internal = struct
 
   let log_category = dkey
 
-  type equalities = Equality.Set.t
-  let project (t, _, _) = t
-
   let pretty fmt (eqs, _, _) = Equality.Set.pretty fmt eqs
 
   let pretty_debug fmt (eqs, deps, modified) =
@@ -169,6 +166,10 @@ module Internal = struct
 end
 
 module Store = Domain_builder.Complete (Internal)
+
+type t = Internal.t
+let key = Store.key
+let project (t, _, _) = t
 
 
 (* ------------------------- Abstract Domain -------------------------------- *)
