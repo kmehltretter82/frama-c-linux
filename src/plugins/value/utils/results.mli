@@ -30,7 +30,6 @@
 *)
 
 type callstack = (Cil_types.kernel_function * Cil_types.kinstr) list
-type 'a by_callstack = (callstack*'a) list
 
 type request
 type evaluation
@@ -70,7 +69,7 @@ val eval_address : Cil_types.lval -> request -> lvaluation
 val as_int : evaluation -> int result
 val as_integer : evaluation -> Integer.t result
 val as_float : evaluation -> float result
-val as_functions : evaluation -> Cil_types.kernel_function list result
+val as_functions : evaluation -> Cil_types.kernel_function list result (* Ignores non-function values *)
 val as_ival : evaluation -> Ival.t result
 val as_fval : evaluation -> Fval.t result
 val as_cvalue : evaluation -> Cvalue.V.t result
@@ -80,10 +79,9 @@ val as_zone : lvaluation -> Locations.Zone.t result
 
 (* Evaluation properties *)
 val is_initialized : evaluation -> bool
-val deps : evaluation -> Locations.Zone.t
 val alarms : evaluation -> Alarms.t list
 
 (* Bottomness *)
 val is_bottom : evaluation -> bool
-val is_called : Cil_types.kernel_function -> bool
-val is_reachable : Cil_types.stmt -> bool
+val is_called : Cil_types.kernel_function -> bool (* called during the analysis, not by the actual program *)
+val is_reachable : Cil_types.stmt -> bool (* reachable by the analysis, not by the actual program *)
