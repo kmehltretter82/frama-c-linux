@@ -1450,6 +1450,8 @@ src/plugins/value/legacy/function_args.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/legacy/function_args.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/register.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/register.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/utils/results.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/utils/results.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/partitioning/auto_loop_unroll.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/partitioning/auto_loop_unroll.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/partitioning/partition.ml: CEA_LGPL_OR_PROPRIETARY

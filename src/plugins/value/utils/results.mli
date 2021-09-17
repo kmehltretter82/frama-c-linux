@@ -1,6 +1,6 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  This fil2e is part of Frama-C.                                         *)
+(*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
 (*  Copyright (C) 2007-2021                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
@@ -19,7 +19,6 @@
 (*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
 (*                                                                        *)
 (**************************************************************************)
-
 
 (* Usage sketch :
 
