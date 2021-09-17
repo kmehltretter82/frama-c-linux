@@ -28,6 +28,7 @@ import * as Dome from 'dome';
 import * as Dialogs from 'dome/dialogs';
 import * as Server from 'frama-c/server';
 import * as Ast from 'frama-c/api/kernel/ast';
+import * as States from 'frama-c/states';
 
 const cFilter = {
   name: 'C source files',
@@ -43,8 +44,11 @@ async function setFiles(): Promise<void> {
     title: 'Select C source files',
     filters: [cFilter, allFilter],
   });
-  await Server.send(Ast.setFiles, files);
-  await Server.send(Ast.compute, { });
+  if (files) {
+    await Server.send(Ast.setFiles, files);
+    await Server.send(Ast.compute, { });
+    States.resetSelection();
+  }
   return;
 }
 
@@ -52,7 +56,7 @@ export function init() {
   Dome.addMenuItem({
     menu: 'File',
     label: 'Set source files',
-    id: 'file_add',
+    id: 'file_set',
     onClick: setFiles,
     type: 'normal',
   });

@@ -213,7 +213,7 @@ export default function ASTview() {
   });
 
   // Also reload the buffer when the AST is recomputed.
-  Server.onSignal(Ast.computed, reload);
+  Server.onSignal(Ast.changed, reload);
 
   React.useEffect(() => {
     const decorator = (marker: string) => {
