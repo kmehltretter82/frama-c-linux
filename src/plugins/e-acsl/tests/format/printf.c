@@ -1,6 +1,5 @@
 /* run.config
    COMMENT: Check detection of format-string vulnerabilities via printf
-   DONTRUN:
    STDOPT: +"-eva-precision=1"
 */
 /* run.config_dev
