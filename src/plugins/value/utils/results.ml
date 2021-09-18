@@ -27,8 +27,6 @@ let (>>>-) t f = match t with
   | `Bottom  -> `Bottom
   | `Value t -> f t
 
-exception Not_implemented
-
 module Callstack = Value_types.Callstack
 
 type callstack = Callstack.t
@@ -229,8 +227,8 @@ struct
     | `Value of ((valuation * value) Eval.evaluated, 'callstack) Response.t
     ]
 
-  let get_by_callstack : request -> (_, restricted_to_callstack) Response.t =
-    fun req ->
+  let rec get_by_callstack (req : request) :
+    (_, restricted_to_callstack) Response.t =
     let open Response in
     match req.control_point with
     | Before stmt ->
@@ -241,10 +239,14 @@ struct
       A.get_kinstr_state ~after:false Kglobal |> singleton []
     | Start kf ->
       A.get_initial_state_by_callstack kf |> by_callstack req
-    | Final | End _ ->
-      raise Not_implemented
+    | End kf ->
+      let stmt = Kernel_function.find_return kf in
+      { req with control_point=After stmt } |> get_by_callstack
+    | Final ->
+      let main, _lib_entry = Globals.entry_point () in
+      { req with control_point=End main } |> get_by_callstack
 
-  let get : request -> (_, unrestricted_response) Response.t = fun req ->
+  let rec get (req : request) : (_, unrestricted_response) Response.t =
     if Option.is_some req.filter || Option.is_some req.selector then
       Response.coercion @@ get_by_callstack req
     else
@@ -254,6 +256,12 @@ struct
         A.get_stmt_state ~after:false stmt |> consolidated
       | After stmt ->
         A.get_stmt_state ~after:true stmt |> consolidated
+      | End kf ->
+        let stmt = Kernel_function.find_return kf in
+        { req with control_point=After stmt } |> get
+      | Final ->
+        let main, _lib_entry = Globals.entry_point () in
+        { req with control_point=End main } |> get
       | _ ->
         Response.coercion @@ get_by_callstack req
 
