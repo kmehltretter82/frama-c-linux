@@ -20,6 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+[@@@ api_start]
 (* Usage sketch :
 
    Eva.Results.(before stmt |> in_callstack cs |> eval_var vi |> as_int)
@@ -89,3 +90,5 @@ val alarms : evaluation -> Alarms.t list
 val is_bottom : evaluation -> bool
 val is_called : Cil_types.kernel_function -> bool (* called during the analysis, not by the actual program *)
 val is_reachable : Cil_types.stmt -> bool (* reachable by the analysis, not by the actual program *)
+
+[@@@ api_end]

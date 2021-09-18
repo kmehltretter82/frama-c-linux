@@ -20,7 +20,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Registers Eva annotations:
+[@@@ api_start]
+(** Register special annotations to locally guide the partitioning of states
+    performed by an Eva analysis:
+
     - slevel annotations: "slevel default", "slevel merge" and "slevel i"
     - loop unroll annotations: "loop unroll term"
     - value partitioning annotations: "split term" and "merge term"
@@ -28,15 +31,17 @@
 
     Widen hints annotations are still registered in !{widen_hints_ext.ml}. *)
 
+(** Annotations tweaking the behavior of the -eva-slevel paramter. *)
 type slevel_annotation =
-  | SlevelMerge
-  | SlevelDefault
-  | SlevelLocal of int
-  | SlevelFull
+  | SlevelMerge        (** Join all states separated by slevel. *)
+  | SlevelDefault      (** Use the limit defined by -eva-slevel. *)
+  | SlevelLocal of int (** Use the given limit instead of -eva-slevel. *)
+  | SlevelFull         (** Remove the limit of number of separated states. *)
 
+(** Loop unroll annotations. *)
 type unroll_annotation =
-  | UnrollAmount of Cil_types.term
-  | UnrollFull
+  | UnrollAmount of Cil_types.term (** Unroll the n first iterations. *)
+  | UnrollFull (** Unroll amount defined by -eva-default-loop-unroll. *)
 
 type split_kind = Static | Dynamic
 
@@ -44,9 +49,12 @@ type split_term =
   | Expression of Cil_types.exp
   | Predicate of Cil_types.predicate
 
+(** Split/merge annotations for value partitioning.  *)
 type flow_annotation =
   | FlowSplit of split_term * split_kind
+  (** Split states according to a term. *)
   | FlowMerge of split_term
+  (** Merge states separated by a previous split. *)
 
 type allocation_kind = By_stack | Fresh | Fresh_weak | Imprecise
 
@@ -64,3 +72,4 @@ val add_flow_annot : emitter:Emitter.t ->
   Cil_types.stmt -> flow_annotation -> unit
 val add_subdivision_annot : emitter:Emitter.t ->
   Cil_types.stmt -> int -> unit
+[@@@ api_end]

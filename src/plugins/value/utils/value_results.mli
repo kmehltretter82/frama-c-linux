@@ -20,10 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** This file will ultimately contain all the results computed by Value
-    (which must be moved out of Db.Value), both per stack and globally. *)
-
-
 open Cil_types
 
 val is_called: kernel_function -> bool
@@ -36,6 +32,7 @@ val is_non_terminating_instr: stmt -> bool
     statements that are instructions. *)
 
 (** {2 Results} *)
+[@@@ api_start]
 type results
 
 val get_results: unit -> results
@@ -46,6 +43,7 @@ val change_callstacks:
 (** Change the callstacks for the results for which this is meaningful.
     For technical reasons, the top of the callstack must currently
     be preserved. *)
+[@@@ api_end]
 
 (*
 Local Variables:

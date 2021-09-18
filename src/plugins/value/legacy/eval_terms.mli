@@ -49,17 +49,22 @@ val pretty_logic_evaluation_error :
 
 exception LogicEvalError of logic_evaluation_error
 
+[@@@ api_start]
 type labels_states = Cvalue.Model.t Cil_datatype.Logic_label.Map.t
 
 (** Evaluation environment. Currently available are function Pre and Post, or
     the environment to evaluate an annotation *)
 type eval_env
+[@@@ api_end]
 
 val make_env: Model.t Abstract_domain.logic_environment -> Model.t -> eval_env
 
 val env_pre_f : pre:Model.t -> unit -> eval_env
+[@@@ api_start]
 val env_annot :
-  ?c_labels:labels_states -> pre:Model.t -> here:Model.t -> unit -> eval_env
+  ?c_labels:labels_states -> pre:Cvalue.Model.t -> here:Cvalue.Model.t ->
+  unit -> eval_env
+[@@@ api_end]
 val env_post_f :
   ?c_labels:labels_states -> pre:Model.t -> post:Model.t ->
   result:varinfo option -> unit -> eval_env
@@ -70,8 +75,10 @@ val env_only_here: Model.t -> eval_env
 
 val env_current_state: eval_env -> Model.t
 
+[@@@ api_start]
 (** Dependencies needed to evaluate a term or a predicate *)
-type logic_deps = Zone.t Cil_datatype.Logic_label.Map.t
+type logic_deps = Locations.Zone.t Cil_datatype.Logic_label.Map.t
+[@@@ api_end]
 
 (** Three modes to handle the alarms when evaluating a logical term. *)
 type alarm_mode =
@@ -110,7 +117,12 @@ val eval_tlval_as_zone :
 val eval_predicate :
   eval_env -> predicate -> predicate_status
 
-val predicate_deps: eval_env -> predicate -> logic_deps option
+[@@@ api_start]
+(** [predicate_deps env p] computes the logic dependencies needed to evaluate
+    [p] in the given evaluation environment [env].
+    @return None on either an evaluation error or on unsupported construct. *)
+val predicate_deps: eval_env -> Cil_types.predicate -> logic_deps option
+[@@@ api_end]
 
 val reduce_by_predicate :
   eval_env -> bool -> predicate -> eval_env
