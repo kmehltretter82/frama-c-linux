@@ -159,8 +159,16 @@ struct
   (* Accessors *)
 
   let callstacks : ('a, restricted_to_callstack) t -> callstack list = function
-    | ByCallstack l -> List.map fst l
     | Top | Bottom -> [] (* What else to do when Top is given ? *)
+    | ByCallstack l -> List.map fst l
+
+  (* Fold *)
+
+  let fold (f  : callstack -> 'a -> 'b -> 'b) (acc : 'b) :
+    ('a, restricted_to_callstack) t -> 'b =
+    function
+    | Top | Bottom -> acc (* What else to do when Top is given ? *)
+    | ByCallstack l -> List.fold_left (fun acc (cs,x) -> f cs x acc) acc l
 
   (* Map *)
 
@@ -255,7 +263,19 @@ struct
     | `Value v -> Result.ok v
 
   let callstacks req =
-    Response.callstacks (get_by_callstack req)
+    get_by_callstack req |> Response.callstacks
+
+  let fold_callstacks f acc req =
+    let f' cs _res acc =
+      f cs (in_callstack cs req) acc
+    in
+    get_by_callstack req |> Response.fold f' acc
+
+  let by_callstack req =
+    let f cs _res acc =
+      (cs, in_callstack cs req) :: acc
+    in
+    get_by_callstack req |> Response.fold f []
 
   let is_reachable req =
     match get req with
@@ -428,11 +448,22 @@ struct
 end
 
 
-(* State requests *)
+(* Working with callstacks *)
 
 let callstacks req =
   let module E = Make () in
   E.callstacks req
+
+let fold_callstacks f acc req =
+  let module E = Make () in
+  E.fold_callstacks f acc req
+
+let by_callstack req =
+  let module E = Make () in
+  E.by_callstack req
+
+
+(* State requests *)
 
 let equality_class exp req =
   let module E = Make () in
@@ -441,6 +472,7 @@ let equality_class exp req =
 let as_cvalue_model req =
   let module E = Make () in
   E.as_cvalue_model req
+
 
 (* Evaluation *)
 

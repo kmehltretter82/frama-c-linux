@@ -53,8 +53,12 @@ val in_callstack : callstack -> request -> request
 val in_callstacks : callstack list -> request -> request
 val filter_callstack : (callstack -> bool) -> request -> request
 
-(* State requests *)
+(* Working with callstacks *)
 val callstacks : request -> callstack list
+val fold_callstacks : (callstack -> request -> 'a -> 'a) -> 'a -> request -> 'a
+val by_callstack : request -> (callstack * request) list
+
+(* State requests *)
 val equality_class : Cil_types.exp -> request -> Cil_types.exp list result
 val as_cvalue_model : request -> Cvalue.Model.t result
 
