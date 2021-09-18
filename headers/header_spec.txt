@@ -924,6 +924,7 @@ src/plugins/impact/options.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/impact/pdg_aux.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/impact/pdg_aux.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/impact/reason_graph.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/impact/reason_graph.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/impact/register.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/impact/register.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/impact/register_gui.ml: CEA_LGPL_OR_PROPRIETARY

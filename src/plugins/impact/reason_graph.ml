@@ -58,8 +58,6 @@ module Reason =
 
 type reason_graph = Reason.Set.t
 
-(** Map from a node to the kernel_function it belongs to *)
-
 type nodes_origin = Cil_types.kernel_function PdgTypes.Node.Map.t
 
 type reason = {
@@ -217,7 +215,7 @@ let print_dot_graph reason =
       (Printexc.to_string exn)
 
 (* Very basic textual debugging function *)
-let print_reason reason =
+let _print_reason reason =
   let pp_node = !Db.Pdg.pretty_node false in
   let pp fmt (nsrc, ndst, reason) =
     Format.fprintf fmt "@[<v 2>%a -> %a (%s)@]"
