@@ -1108,7 +1108,7 @@ src/plugins/qed/cache.ml: CEA_WP
 src/plugins/qed/cache.mli: CEA_WP
 src/plugins/qed/collection.ml: CEA_WP
 src/plugins/qed/collection.mli: CEA_WP
-src/plugins/qed/engine.ml: CEA_WP
+src/plugins/qed/engine.mli: CEA_WP
 src/plugins/qed/export.ml: CEA_WP
 src/plugins/qed/export.mli: CEA_WP
 src/plugins/qed/export_altergo.ml: CEA_WP
@@ -1135,7 +1135,7 @@ src/plugins/qed/listmap.ml: CEA_WP
 src/plugins/qed/listmap.mli: CEA_WP
 src/plugins/qed/listset.ml: CEA_WP
 src/plugins/qed/listset.mli: CEA_WP
-src/plugins/qed/logic.ml: CEA_WP
+src/plugins/qed/logic.mli: CEA_WP
 src/plugins/qed/mergemap.ml: CEA_WP
 src/plugins/qed/mergemap.mli: CEA_WP
 src/plugins/qed/mergeset.ml: CEA_WP
