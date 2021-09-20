@@ -48,8 +48,8 @@ let generate_code =
              Options.abort
                "The variadic translation is incompatible with E-ACSL option \
                 '%s'.@ Please use option '-variadic-no-translation'."
-               Options.Validate_format_strings.option_name
-               Options.warning "deactivating variadic translation";
+               Options.Validate_format_strings.option_name;
+           Options.warning "deactivating variadic translation";
            Dynamic.Parameter.Bool.off opt_name ();
          end
        end;
