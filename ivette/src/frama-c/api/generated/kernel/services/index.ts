@@ -77,6 +77,15 @@ const load_internal: Server.SetRequest<string,string | undefined> = {
 /** Load a save file. Returns an error, if not successfull. */
 export const load: Server.SetRequest<string,string | undefined>= load_internal;
 
+const save_internal: Server.SetRequest<string,string | undefined> = {
+  kind: Server.RqKind.SET,
+  name:   'kernel.services.save',
+  input:  Json.jString,
+  output: Json.jString,
+};
+/** Save the current session. Returns an error, if not successfull. */
+export const save: Server.SetRequest<string,string | undefined>= save_internal;
+
 /** Source file positions. */
 export type source =
   { dir: string, base: string, file: string, line: number };

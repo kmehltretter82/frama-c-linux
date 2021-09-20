@@ -361,8 +361,11 @@ end
 let () = Request.register ~package
     ~kind:`GET ~name:"getMainFunction"
     ~descr:(Md.plain "Get the current 'main' function.")
-    ~input:(module Junit) ~output:(module Kf)
-    (fun () -> fst (Globals.entry_point ()))
+    ~input:(module Junit) ~output:(module Joption (Kf))
+    begin fun () ->
+      try Some (fst (Globals.entry_point ()))
+      with Globals.No_such_entry_point _ -> None
+    end
 
 let () = Request.register ~package
     ~kind:`GET ~name:"getFunctions"

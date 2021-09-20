@@ -779,13 +779,10 @@ export function useSelection(): [Selection, (a: SelectionActions) => void] {
 export async function resetSelection() {
   GlobalSelection.setValue(emptySelection);
   const main = await Server.send(Ast.getMainFunction, { });
-  const selection = {
-    ...emptySelection,
-    current: { fct: main },
-  };
   // If the selection has already been modified, do not change it.
-  if (GlobalSelection.getValue() === emptySelection)
-    GlobalSelection.setValue(selection);
+  if (main && GlobalSelection.getValue() === emptySelection) {
+    GlobalSelection.setValue({ ...emptySelection, current: { fct: main } });
+  }
 }
 /* Select the main function when the current project changes and the selection
    is still empty (which happens at the start of the GUI). */

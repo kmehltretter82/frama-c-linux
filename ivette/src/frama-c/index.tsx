@@ -29,6 +29,7 @@ import * as Ivette from 'ivette';
 
 import History from 'frama-c/kernel/History';
 import Globals from 'frama-c/kernel/Globals';
+import Status from 'frama-c/kernel/Status';
 import ASTview from 'frama-c/kernel/ASTview';
 import ASTinfo from 'frama-c/kernel/ASTinfo';
 import SourceCode from 'frama-c/kernel/SourceCode';
@@ -51,6 +52,7 @@ Ivette.registerGroup({
 }, () => {
   Ivette.registerSidebar({ id: 'frama-c.globals', children: <Globals /> });
   Ivette.registerToolbar({ id: 'frama-c.history', children: <History /> });
+  Ivette.registerStatusbar({ id: 'frama-c.message', children: <Status /> });
   Ivette.registerComponent({
     id: 'frama-c.astview',
     label: 'AST',
