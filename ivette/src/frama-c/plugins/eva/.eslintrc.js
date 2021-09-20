@@ -3,11 +3,11 @@ module.exports = {
   overrides: [
     {
       files: ['*.js', '*.jsx', '*.ts', '*.tsx'],
-      excludedFiles: 'summary.tsx',
+      excludedFiles: 'Summary.tsx',
       extends: ["../../../../.eslintrc.js"]
     },
     {
-      files: ['summary.tsx'],
+      files: ['Summary.tsx'],
       extends: [
         'eslint:recommended',
         'plugin:react/recommended',

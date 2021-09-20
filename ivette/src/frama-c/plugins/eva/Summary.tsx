@@ -27,7 +27,7 @@ import { Vfill } from 'dome/layout/boxes';
 import * as States from 'frama-c/states';
 import * as Eva from 'frama-c/api/plugins/eva/general';
 
-import './summary.css'
+import './summary.css';
 
 function percent(reachable: number, total: number): string {
   return (reachable * 100 / total).toFixed(1) + '%';

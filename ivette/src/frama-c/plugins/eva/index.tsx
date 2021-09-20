@@ -36,7 +36,7 @@ import { AutoSizer } from 'react-virtualized';
 import { ProbeInfos } from './probeinfos';
 import { Dimension, ValuesPanel } from './valuetable';
 import { AlarmsInfos, StackInfos } from './valueinfos';
-import { } from './summary';
+import { } from './Summary';
 import './style.css';
 
 // --------------------------------------------------------------------------
