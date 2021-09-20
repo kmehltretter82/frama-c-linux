@@ -38,7 +38,7 @@ let get_context =
     match !context with
     | Some c -> c
     | None ->
-      if Db.Value.is_computed () then
+      if Eva.Analysis.is_computed () then
         let c = Context.create () in
         context := Some c;
         c

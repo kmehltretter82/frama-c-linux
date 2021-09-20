@@ -27,7 +27,6 @@ module Graph = Dive_graph
 
 let dkey = Self.register_category "build"
 
-
 (* --- Utility function --- *)
 
 (* Breaks a list at n-th element into two sublists *)
@@ -76,29 +75,26 @@ end
 
 module Eval =
 struct
-  let to_kf_list kinstr expr =
-    let _,set = !Db.Value.expr_to_kernel_function kinstr ~deps:None expr in
-    Kernel_function.Hptset.fold (fun kf acc -> kf :: acc) set []
+  open Eva.Results
+
+  let to_kf_list kinstr callee =
+    before_kinstr kinstr |> eval_callee callee |>
+    Result.value ~default:[]
 
   let to_cvalue kinstr lval =
-    let state = Db.Value.get_state kinstr in
-    let _,cvalue = !Db.Value.eval_lval None state lval in
-    cvalue
+    before_kinstr kinstr |> eval_lval lval |> as_cvalue |>
+    Result.value ~default:Cvalue.V.bottom
 
   let to_location kinstr lval =
-    let state = Db.Value.get_state kinstr in
-    !Db.Value.lval_to_loc_state state lval
+    before_kinstr kinstr |> eval_address lval |> as_location |>
+    Result.value ~default:Locations.loc_bottom
 
   let to_zone kinstr lval =
-    !Db.Value.lval_to_zone kinstr lval
+    before_kinstr kinstr |> eval_address lval |> as_zone |>
+    Result.value ~default:Locations.Zone.bottom
 
   let to_callstacks stmt =
-    let states = Db.Value.get_stmt_state_callstack ~after:false stmt in
-    match states with
-    | None -> assert false
-    | Some table ->
-      let module Table = Value_types.Callstack.Hashtbl in
-      Table.fold (fun cs _ acc -> cs :: acc) table []
+    before stmt |> callstacks
 
   let studia_is_direct (_,{Studia.Writes.direct}) = direct
 
