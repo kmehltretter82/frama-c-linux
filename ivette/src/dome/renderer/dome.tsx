@@ -532,9 +532,9 @@ export function usePromise<T>(job: Promise<T>) {
   const [loading, setLoading] = React.useState(true);
   React.useEffect(() => {
     let cancel = false;
-    const doCancel = () => { if (!cancel) setLoading(false); return cancel};
+    const doCancel = () => { if (!cancel) setLoading(false); return cancel; };
     const onResult = (x: T) => { if (!doCancel()) setResult(x); };
-    const onError = (e: Error) => {if (!doCancel()) setError(e); };
+    const onError = (e: Error) => { if (!doCancel()) setError(e); };
     job.then(onResult, onError);
     return () => { cancel = true; };
   }, [job]);
