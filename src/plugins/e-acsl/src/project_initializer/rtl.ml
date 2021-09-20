@@ -31,11 +31,7 @@ let create_rtl_ast prj =
     prj
     (fun () ->
        (* compute the RTL AST in the standard E-ACSL setting *)
-       if Plugin.is_present "variadic" then
-         Dynamic.Parameter.Bool.off "-variadic-translation" ();
-       Kernel.Keep_unused_specified_functions.off ();
-       Kernel.CppExtraArgs.add
-         (Format.asprintf " -DE_ACSL_MACHDEP=%s" (Kernel.Machdep.get ()));
+       Options.setup ~rtl:true ();
        Kernel.Files.set [ rtl_file () ];
        Ast.get ())
     ()
