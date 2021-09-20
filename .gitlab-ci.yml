@@ -191,10 +191,17 @@ frama-c-ocaml-4.09:
   only:
   - schedules
 
-frama-c-ocaml-4.10:
+frama-c-ocaml-4.12:
   variables:
-    OCAML: "4_10"
+    OCAML: "4_12"
   <<: *frama-c-ocaml
+
+# check compatibility with future OCaml version
+frama-c-ocaml-4.13:
+  variables:
+    OCAML: "4_13"
+  <<: *frama-c-ocaml
+  allow_failure: true
 
 
 caveat-importer:
