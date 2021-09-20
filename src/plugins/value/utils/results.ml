@@ -20,12 +20,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Bottom.Type
+
 type 'a or_top_bottom = 'a Bottom.Top.or_top_bottom
 
-let (>>>-) t f = match t with
+let (>>>-:) t f = match t with
   | `Top -> `Top
   | `Bottom  -> `Bottom
-  | `Value t -> f t
+  | `Value t -> `Value (f t)
 
 module Callstack = Value_types.Callstack
 
@@ -48,6 +50,17 @@ type request = {
 
 type error = Bottom | Top | DisabledDomain
 type 'a result = ('a,error) Result.t
+
+let string_of_error = function
+  | Bottom -> "The computed state is bottom"
+  | Top -> "The computed state is Top"
+  | DisabledDomain -> "The required domain is disabled"
+
+let pretty_error fmt error =
+  Format.pp_print_string fmt (string_of_error error)
+let pretty_result f fmt r =
+  Result.fold ~ok:(f fmt) ~error:(pretty_error fmt) r
+
 
 (* Building requests *)
 
@@ -338,9 +351,15 @@ struct
     let eval state = A.Eval.lvaluate ~for_writing:false state lval in
     Response.map eval (get req)
 
-  (* Conversion *)
+  let eval_callee exp req =
+    let join = (@)
+    and extract state =
+      let r,_alarms = A.Eval.eval_function_exp exp state in
+      r >>>-: List.map fst
+    in
+    get req |> Response.map_join' extract join |> convert
 
-  open Bottom.Type
+  (* Conversion *)
 
   let extract_value : type c. c evaluation -> (value or_bottom, c) Response.t =
     function
@@ -359,18 +378,9 @@ struct
     | Some get ->
       let join = Main_values.CVal.join in
       let extract value =
-        (value >>-: get :> 'a or_top_bottom)
+        value >>>-: get
       in
       extract_value res |> Response.map_join' extract join |> convert
-
-  let as_functions : type c. c evaluation ->
-    Cil_types.kernel_function list result =
-    fun res ->
-    let join = (@)
-    and extract value =
-      value >>>- fun v -> (fst (A.Val.resolve_functions v) :> 'a or_top_bottom)
-    in
-    extract_value res |> Response.map_join' extract join |> convert
 
   let extract_loc : type c. c lvaluation -> (location or_bottom, c) Response.t =
     fun r ->
@@ -390,7 +400,7 @@ struct
         assert (Int_Base.equal loc2.size size);
         make_loc loc size
       and extract loc =
-        (loc  >>-: get >>-: Precise_locs.imprecise_location :> 'a or_top_bottom)
+        loc  >>>-: get >>>-: Precise_locs.imprecise_location
       in
       extract_loc res |> Response.map_join' extract join |> convert
 
@@ -402,7 +412,7 @@ struct
     | Some get ->
       let join = Locations.Zone.join
       and extract loc =
-        (loc  >>-: get >>-: Precise_locs.enumerate_valid_bits Read :> 'a or_top_bottom)
+        loc  >>>-: get >>>-: Precise_locs.enumerate_valid_bits Read
       in
       extract_loc res |> Response.map_join' extract join |> convert
 
@@ -411,7 +421,7 @@ struct
     | `LValue r ->
       let join = (&&)
       and extract (x, _alarms) =
-        (x >>-: (fun (_valuation,fv) -> fv.Eval.initialized) :> 'a or_top_bottom)
+        x >>>-: (fun (_valuation,fv) -> fv.Eval.initialized)
       in
       begin match Response.map_join' extract join r with
         | `Bottom | `Top -> false
@@ -442,7 +452,7 @@ struct
 
   let is_bottom : type c. c evaluation -> bool =
     fun res ->
-    let extract (x,_) = (x >>-: fun _ -> () :> unit or_top_bottom) in
+    let extract (x,_) = x >>>-: fun _ -> () in
     let join () () = () in
     let r = match res with
       | `LValue r ->
@@ -490,8 +500,6 @@ sig
   type 'a evaluation
   type restriction
   val as_cvalue : 'callstack evaluation -> Main_values.CVal.t result
-  val as_functions : 'callstack evaluation ->
-    Cil_types.kernel_function list result
   val as_location : 'callstack lvaluation -> Locations.location result
   val as_zone : 'callstack lvaluation -> Locations.Zone.t result
   val is_initialized : 'callstack evaluation -> bool
@@ -561,6 +569,10 @@ let eval_address lval req =
       let v = lval
     end : Lvaluation)
 
+let eval_callee exp req =
+  let module M = Make () in
+  M.eval_callee exp req
+
 (* Value conversion *)
 
 let as_cvalue evaluation =
@@ -588,10 +600,6 @@ let as_float evaluation =
     Result.map Fval.F.to_float
   with Fval.Not_Singleton_Float ->
     Result.error Top
-
-let as_functions evaluation =
-  let module E = (val evaluation : Evaluation) in
-  E.as_functions E.v
 
 let as_integer evaluation =
   try

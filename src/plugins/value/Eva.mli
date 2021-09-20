@@ -41,6 +41,11 @@ module Results: sig
   type error = Bottom | Top | DisabledDomain
   type 'a result = ('a,error) Result.t
   
+  val string_of_error : error -> string
+  val pretty_error : Format.formatter -> error -> unit
+  val pretty_result : (Format.formatter -> 'a -> unit) ->
+    Format.formatter -> 'a result -> unit
+  
   (* Control point selection *)
   val at_start : request
   val at_end : request
@@ -72,11 +77,12 @@ module Results: sig
   
   val eval_address : Cil_types.lval -> request -> lvaluation
   
+  val eval_callee : Cil_types.exp -> request -> Cil_types.kernel_function list result (* Ignores non-function values; exp must come from Cil Call constructor and are restricted to lvalues with no offset *)
+  
   (* Value conversion *)
   val as_int : evaluation -> int result
   val as_integer : evaluation -> Integer.t result
   val as_float : evaluation -> float result
-  val as_functions : evaluation -> Cil_types.kernel_function list result (* Ignores non-function values *)
   val as_ival : evaluation -> Ival.t result
   val as_fval : evaluation -> Fval.t result
   val as_cvalue : evaluation -> Cvalue.V.t result
