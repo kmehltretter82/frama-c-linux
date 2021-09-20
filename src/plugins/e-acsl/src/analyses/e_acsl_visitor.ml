@@ -33,37 +33,37 @@ let case_globals
     ?(var_def = fun _ -> fun _ -> default ())
     ~fun_def
   = function
-      (* library functions and built-ins *)
-  | GVarDecl(vi, _) | GVar(vi, _, _)
-  | GFunDecl(_, vi, _) | GFun({ svar = vi }, _) when Builtins.mem vi.vname ->
-    builtin vi
+    (* library functions and built-ins *)
+    | GVarDecl(vi, _) | GVar(vi, _, _)
+    | GFunDecl(_, vi, _) | GFun({ svar = vi }, _) when Builtins.mem vi.vname ->
+      builtin vi
 
-  (* Cil built-ins and other library globals*)
-  | GVarDecl(vi, _) | GVar(vi, _, _) | GFun({ svar = vi }, _)
-    when Misc.is_fc_or_compiler_builtin vi ->
-    fc_compiler_builtin vi
+    (* Cil built-ins and other library globals*)
+    | GVarDecl(vi, _) | GVar(vi, _, _) | GFun({ svar = vi }, _)
+      when Misc.is_fc_or_compiler_builtin vi ->
+      fc_compiler_builtin vi
 
-  | g when Rtl.Symbols.mem_global g ->
-    rtl_symbol g
+    | g when Rtl.Symbols.mem_global g ->
+      rtl_symbol g
 
     (* generated function declaration *)
-  | GFunDecl(_, vi, _) when Misc.is_fc_stdlib_generated vi ->
-    fc_stdlib_generated vi
+    | GFunDecl(_, vi, _) when Misc.is_fc_stdlib_generated vi ->
+      fc_stdlib_generated vi
 
-  (* variable declarations *)
-  | GVarDecl(vi, _) | GFunDecl(_, vi, _) ->
-    var_fun_decl vi
+    (* variable declarations *)
+    | GVarDecl(vi, _) | GFunDecl(_, vi, _) ->
+      var_fun_decl vi
 
-  (* variable definition *)
-  | GVar(vi, { init = None }, _) ->
-    var_init vi
+    (* variable definition *)
+    | GVar(vi, { init = None }, _) ->
+      var_init vi
 
-  | GVar(vi, { init = Some init }, _) ->
-    var_def vi init
+    | GVar(vi, { init = Some init }, _) ->
+      var_def vi init
 
-  (* function definition *)
-  | GFun(fundec, _) ->
-    fun_def fundec
+    (* function definition *)
+    | GFun(fundec, _) ->
+      fun_def fundec
 
     (* other globals: nothing to do *)
     | GType _

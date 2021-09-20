@@ -881,13 +881,13 @@ and type_predicate ?(lenv=[]) p =
               Bound_variables.get_preprocessed_quantifier
               p
           in
-            let guards =
-              List.map
-                (fun (t1, x, t2) ->
-                   type_bound_variables ~loc:p.pred_loc ~lenv (t1, x, t2))
-                guards
-            in Bound_variables.replace p guards goal;
-            (type_predicate ~lenv goal).ty
+          let guards =
+            List.map
+              (fun (t1, x, t2) ->
+                 type_bound_variables ~loc:p.pred_loc ~lenv (t1, x, t2))
+              guards
+          in Bound_variables.replace p guards goal;
+          (type_predicate ~lenv goal).ty
         end
       | Pseparated tlist ->
         List.iter
