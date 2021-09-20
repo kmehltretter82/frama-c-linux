@@ -76,7 +76,8 @@ val on_signal : signal -> (bool -> unit) -> unit
 
 (** {2 Simple Requests Registration} *)
 
-(** Register a simple request of type [(a -> b)].
+(** Register a simple request of type [(a -> b)] which depends on the given
+    signals
 
     Name, page and kind must be consistent with each others:
     - No publication on [`Protocol] pages
@@ -92,6 +93,7 @@ val register :
   kind:kind ->
   name:string ->
   descr:Markdown.text ->
+  ?signals:signal list ->
   input:'a input ->
   output:'b output ->
   ('a -> 'b) -> unit
@@ -154,6 +156,7 @@ val register_sig :
   kind:kind ->
   name:string ->
   descr:Markdown.text ->
+  ?signals:signal list ->
   ('a,'b) signature -> (rq -> 'a -> 'b) -> unit
 
 (** {2 Named Parameters and Results}

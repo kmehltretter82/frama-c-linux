@@ -262,7 +262,7 @@ let mk_output (type b) name required (output : b rq_output) : (rq -> b -> json) 
        fmap_to_json rq.result)
 
 let register_sig (type a b)
-    ~package ~kind ~name ~descr
+    ~package ~kind ~name ~descr ?(signals=[])
     (s : (a,b) signature) (process : rq -> a -> b) =
   if s.defined then
     Senv.fatal "Request '%s' is defined twice" name ;
@@ -276,6 +276,7 @@ let register_sig (type a b)
       rq_kind = kind ;
       rq_input = rq_input s.input ;
       rq_output = rq_output s.output ;
+      rq_signals = List.map Main.signal_name signals ;
     } in
   let id = declare_id ~package ~name ~descr request in
   Main.register kind (name_of_ident id) processor ;
@@ -285,8 +286,8 @@ let register_sig (type a b)
 (* --- Request Registration                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-let register ~package ~kind ~name ~descr ~input ~output process =
-  register_sig  ~package ~kind ~name ~descr
+let register ~package ~kind ~name ~descr ?signals ~input ~output process =
+  register_sig  ~package ~kind ~name ~descr ?signals
     (signature ~input ~output ())
     (fun _rq v -> process v)
 

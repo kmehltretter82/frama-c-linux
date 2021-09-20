@@ -67,6 +67,7 @@ const compute_internal: Server.ExecRequest<null,null> = {
   name:   'kernel.ast.compute',
   input:  Json.jNull,
   output: Json.jNull,
+  signals: [],
 };
 /** Ensures that AST is computed */
 export const compute: Server.ExecRequest<null,null>= compute_internal;
@@ -110,6 +111,7 @@ const markerKindTags_internal: Server.GetRequest<null,tag[]> = {
   name:   'kernel.ast.markerKindTags',
   input:  Json.jNull,
   output: Json.jList(jTag),
+  signals: [],
 };
 /** Registered tags for the above type. */
 export const markerKindTags: Server.GetRequest<null,tag[]>= markerKindTags_internal;
@@ -140,6 +142,7 @@ const markerVarTags_internal: Server.GetRequest<null,tag[]> = {
   name:   'kernel.ast.markerVarTags',
   input:  Json.jNull,
   output: Json.jList(jTag),
+  signals: [],
 };
 /** Registered tags for the above type. */
 export const markerVarTags: Server.GetRequest<null,tag[]>= markerVarTags_internal;
@@ -198,6 +201,7 @@ const reloadMarkerInfo_internal: Server.GetRequest<null,null> = {
   name:   'kernel.ast.reloadMarkerInfo',
   input:  Json.jNull,
   output: Json.jNull,
+  signals: [],
 };
 /** Force full reload for array [`markerInfo`](#markerinfo)  */
 export const reloadMarkerInfo: Server.GetRequest<null,null>= reloadMarkerInfo_internal;
@@ -216,6 +220,7 @@ const fetchMarkerInfo_internal: Server.GetRequest<
             removed: Json.jList(Json.jString),
             reload: Json.jFail(Json.jBoolean,'Boolean expected'),
           }),
+  signals: [],
 };
 /** Data fetcher for array [`markerInfo`](#markerinfo)  */
 export const fetchMarkerInfo: Server.GetRequest<
@@ -303,6 +308,7 @@ const getFunctions_internal: Server.GetRequest<null,Json.key<'#fct'>[]> = {
   name:   'kernel.ast.getFunctions',
   input:  Json.jNull,
   output: Json.jList(Json.jKey<'#fct'>('#fct')),
+  signals: [],
 };
 /** Collect all functions in the AST */
 export const getFunctions: Server.GetRequest<null,Json.key<'#fct'>[]>= getFunctions_internal;
@@ -312,6 +318,7 @@ const printFunction_internal: Server.GetRequest<Json.key<'#fct'>,text> = {
   name:   'kernel.ast.printFunction',
   input:  Json.jKey<'#fct'>('#fct'),
   output: jText,
+  signals: [],
 };
 /** Print the AST of a function */
 export const printFunction: Server.GetRequest<Json.key<'#fct'>,text>= printFunction_internal;
@@ -384,6 +391,7 @@ const reloadFunctions_internal: Server.GetRequest<null,null> = {
   name:   'kernel.ast.reloadFunctions',
   input:  Json.jNull,
   output: Json.jNull,
+  signals: [],
 };
 /** Force full reload for array [`functions`](#functions)  */
 export const reloadFunctions: Server.GetRequest<null,null>= reloadFunctions_internal;
@@ -402,6 +410,7 @@ const fetchFunctions_internal: Server.GetRequest<
             removed: Json.jList(Json.jKey<'#functions'>('#functions')),
             reload: Json.jFail(Json.jBoolean,'Boolean expected'),
           }),
+  signals: [],
 };
 /** Data fetcher for array [`functions`](#functions)  */
 export const fetchFunctions: Server.GetRequest<
@@ -426,6 +435,7 @@ const getInfo_internal: Server.GetRequest<marker,text> = {
   name:   'kernel.ast.getInfo',
   input:  jMarker,
   output: jText,
+  signals: [],
 };
 /** Get textual information about a marker */
 export const getInfo: Server.GetRequest<marker,text>= getInfo_internal;
@@ -435,6 +445,7 @@ const getFiles_internal: Server.GetRequest<null,string[]> = {
   name:   'kernel.ast.getFiles',
   input:  Json.jNull,
   output: Json.jList(Json.jString),
+  signals: [],
 };
 /** Get the currently analyzed source file names */
 export const getFiles: Server.GetRequest<null,string[]>= getFiles_internal;
@@ -444,6 +455,7 @@ const setFiles_internal: Server.SetRequest<string[],null> = {
   name:   'kernel.ast.setFiles',
   input:  Json.jList(Json.jString),
   output: Json.jNull,
+  signals: [],
 };
 /** Set the source file names to analyze. */
 export const setFiles: Server.SetRequest<string[],null>= setFiles_internal;

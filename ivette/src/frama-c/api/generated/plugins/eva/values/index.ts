@@ -70,6 +70,7 @@ const getCallstacks_internal: Server.GetRequest<marker[],callstack[]> = {
   name:   'plugins.eva.values.getCallstacks',
   input:  Json.jList(jMarker),
   output: Json.jList(jCallstack),
+  signals: [],
 };
 /** Callstacks for markers */
 export const getCallstacks: Server.GetRequest<marker[],callstack[]>= getCallstacks_internal;
@@ -89,6 +90,7 @@ const getCallstackInfo_internal: Server.GetRequest<
               stmt: Json.jKey<'#stmt'>('#stmt'),
               rank: Json.jNumber,
             })),
+  signals: [],
 };
 /** Callstack Description */
 export const getCallstackInfo: Server.GetRequest<
@@ -108,6 +110,7 @@ const getStmtInfo_internal: Server.GetRequest<
             rank: Json.jFail(Json.jNumber,'Number expected'),
             fct: Json.jFail(Json.jKey<'#fct'>('#fct'),'#fct expected'),
           }),
+  signals: [],
 };
 /** Stmt Information */
 export const getStmtInfo: Server.GetRequest<
@@ -130,6 +133,7 @@ const getProbeInfo_internal: Server.GetRequest<
             stmt: Json.jKey<'#stmt'>('#stmt'),
             code: Json.jString,
           }),
+  signals: [],
 };
 /** Probe informations */
 export const getProbeInfo: Server.GetRequest<
@@ -163,6 +167,7 @@ const getValues_internal: Server.GetRequest<
                           Json.jFail(Json.jString,'String expected'),
                         ))),
           }),
+  signals: [],
 };
 /** Abstract values for the given marker */
 export const getValues: Server.GetRequest<

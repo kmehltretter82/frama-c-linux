@@ -59,6 +59,7 @@ const getConfig_internal: Server.GetRequest<
             datadir: Json.jFail(Json.jString,'String expected'),
             version: Json.jFail(Json.jString,'String expected'),
           }),
+  signals: [],
 };
 /** Frama-C Kernel configuration */
 export const getConfig: Server.GetRequest<
@@ -71,6 +72,7 @@ const load_internal: Server.SetRequest<string,string | undefined> = {
   name:   'kernel.services.load',
   input:  Json.jString,
   output: Json.jString,
+  signals: [],
 };
 /** Load a save file. Returns an error, if not successfull. */
 export const load: Server.SetRequest<string,string | undefined>= load_internal;
@@ -133,6 +135,7 @@ const logkindTags_internal: Server.GetRequest<null,tag[]> = {
   name:   'kernel.services.logkindTags',
   input:  Json.jNull,
   output: Json.jList(jTag),
+  signals: [],
 };
 /** Registered tags for the above type. */
 export const logkindTags: Server.GetRequest<null,tag[]>= logkindTags_internal;
@@ -181,6 +184,7 @@ const setLogs_internal: Server.SetRequest<boolean,null> = {
   name:   'kernel.services.setLogs',
   input:  Json.jBoolean,
   output: Json.jNull,
+  signals: [],
 };
 /** Turn logs monitoring on/off */
 export const setLogs: Server.SetRequest<boolean,null>= setLogs_internal;
@@ -190,6 +194,7 @@ const getLogs_internal: Server.GetRequest<null,log[]> = {
   name:   'kernel.services.getLogs',
   input:  Json.jNull,
   output: Json.jList(jLog),
+  signals: [],
 };
 /** Flush the last emitted logs since last call (max 100) */
 export const getLogs: Server.GetRequest<null,log[]>= getLogs_internal;

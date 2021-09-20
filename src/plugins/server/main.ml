@@ -177,6 +177,7 @@ let execute server ?yield proc =
 (* -------------------------------------------------------------------------- *)
 
 type signal = string
+let signal_name s = s
 let signals = Hashtbl.create 32
 let signal s =
   if Hashtbl.mem signals s then

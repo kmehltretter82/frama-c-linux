@@ -315,6 +315,7 @@ const window_internal: Server.SetRequest<explorationWindow,null> = {
   name:   'plugins.dive.window',
   input:  jExplorationWindow,
   output: Json.jNull,
+  signals: [],
 };
 /** Set the exploration window */
 export const window: Server.SetRequest<explorationWindow,null>= window_internal;
@@ -324,6 +325,7 @@ const graph_internal: Server.GetRequest<null,graphData> = {
   name:   'plugins.dive.graph',
   input:  Json.jNull,
   output: jGraphData,
+  signals: [],
 };
 /** Retrieve the whole graph */
 export const graph: Server.GetRequest<null,graphData>= graph_internal;
@@ -333,6 +335,7 @@ const clear_internal: Server.ExecRequest<null,null> = {
   name:   'plugins.dive.clear',
   input:  Json.jNull,
   output: Json.jNull,
+  signals: [],
 };
 /** Erase the graph and start over with an empty one */
 export const clear: Server.ExecRequest<null,null>= clear_internal;
@@ -342,6 +345,7 @@ const add_internal: Server.ExecRequest<marker,diffData> = {
   name:   'plugins.dive.add',
   input:  jMarker,
   output: jDiffData,
+  signals: [],
 };
 /** Add a node to the graph */
 export const add: Server.ExecRequest<marker,diffData>= add_internal;
@@ -351,6 +355,7 @@ const explore_internal: Server.ExecRequest<nodeId,diffData> = {
   name:   'plugins.dive.explore',
   input:  jNodeId,
   output: jDiffData,
+  signals: [],
 };
 /** Explore the graph starting from an existing vertex */
 export const explore: Server.ExecRequest<nodeId,diffData>= explore_internal;
@@ -360,6 +365,7 @@ const show_internal: Server.ExecRequest<nodeId,diffData> = {
   name:   'plugins.dive.show',
   input:  jNodeId,
   output: jDiffData,
+  signals: [],
 };
 /** Show the dependencies of an existing vertex */
 export const show: Server.ExecRequest<nodeId,diffData>= show_internal;
@@ -369,6 +375,7 @@ const hide_internal: Server.ExecRequest<nodeId,diffData> = {
   name:   'plugins.dive.hide',
   input:  jNodeId,
   output: jDiffData,
+  signals: [],
 };
 /** Hide the dependencies of an existing vertex */
 export const hide: Server.ExecRequest<nodeId,diffData>= hide_internal;

@@ -43,6 +43,7 @@ val exec : string -> json -> json (** @raises Not_found if not registered. *)
 
 type signal
 val signal : string -> signal
+val signal_name : signal -> string
 
 (* -------------------------------------------------------------------------- *)
 (** {2 Server Main Process} *)

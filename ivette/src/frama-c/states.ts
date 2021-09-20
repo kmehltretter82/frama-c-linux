@@ -66,6 +66,7 @@ Server.onReady(async () => {
       name: 'kernel.project.getCurrent',
       input: Json.jNull,
       output: Json.jObject({ id: Json.jString }),
+      signals: [],
     };
     const current: { id?: string } = await Server.send(sr, null);
     currentProject = current.id;
@@ -109,6 +110,7 @@ export async function setProject(project: string) {
         name: 'kernel.project.setCurrent',
         input: Json.jString,
         output: Json.jNull,
+        signals: [],
       };
       await Server.send(sr, project);
       currentProject = project;
@@ -140,8 +142,9 @@ export interface UseRequestOptions<A> {
   Cached GET request (Custom React Hook).
 
   Sends the specified GET request and returns its result. The request is send
-  asynchronously and cached until any change in the request parameters or
-  server state.
+  asynchronously and cached until any change in the request parameters or server
+  state. The change in the server state are tracked by the signals specified
+  when registering the request or by the one in options.onSignals if specified.
 
   Options can be used to tune more precisely the behavior of the hook.
  */
@@ -183,7 +186,7 @@ export function useRequest<In, Out>(
     }
   });
 
-  const signals = options.onSignals ?? [];
+  const signals = options.onSignals ?? rq.signals;
   React.useEffect(() => {
     signals.forEach((s) => Server.onSignal(s, trigger));
     return () => {

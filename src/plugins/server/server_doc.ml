@@ -180,7 +180,10 @@ let descr_of_decl names decl =
     Md.quote (md_param ~kind:"input" pp rq.rq_input) @
     Md.quote (md_param ~kind:"output" pp rq.rq_output) @
     md_named ~kind:"input" pp rq.rq_input @
-    md_named ~kind:"output" pp rq.rq_output
+    md_named ~kind:"output" pp rq.rq_output @
+    Md.quote (Md.emph "signals") @
+    Md.block Md.(list (List.map (fun x -> text (code x))
+                         rq.rq_signals))
 
 let declaration page names decl =
   match decl.d_kind with

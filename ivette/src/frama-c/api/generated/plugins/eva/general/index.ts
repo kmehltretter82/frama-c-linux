@@ -59,6 +59,7 @@ const isComputed_internal: Server.GetRequest<null,boolean> = {
   name:   'plugins.eva.general.isComputed',
   input:  Json.jNull,
   output: Json.jBoolean,
+  signals: [],
 };
 /** True if the Eva analysis has been done */
 export const isComputed: Server.GetRequest<null,boolean>= isComputed_internal;
@@ -76,6 +77,7 @@ const getCallers_internal: Server.GetRequest<
                 Json.jFail(Json.jKey<'#fct'>('#fct'),'#fct expected'),
                 Json.jFail(Json.jKey<'#stmt'>('#stmt'),'#stmt expected'),
               ))),
+  signals: [],
 };
 /** Get the list of call site of a function */
 export const getCallers: Server.GetRequest<
@@ -115,6 +117,7 @@ const getDeadCode_internal: Server.GetRequest<Json.key<'#fct'>,deadCode> = {
   name:   'plugins.eva.general.getDeadCode',
   input:  Json.jKey<'#fct'>('#fct'),
   output: jDeadCode,
+  signals: [],
 };
 /** Get the lists of unreachable and of non terminating statements in a function */
 export const getDeadCode: Server.GetRequest<Json.key<'#fct'>,deadCode>= getDeadCode_internal;
@@ -156,6 +159,7 @@ const taintStatusTags_internal: Server.GetRequest<null,tag[]> = {
   name:   'plugins.eva.general.taintStatusTags',
   input:  Json.jNull,
   output: Json.jList(jTag),
+  signals: [],
 };
 /** Registered tags for the above type. */
 export const taintStatusTags: Server.GetRequest<null,tag[]>= taintStatusTags_internal;
@@ -201,6 +205,7 @@ const reloadProperties_internal: Server.GetRequest<null,null> = {
   name:   'plugins.eva.general.reloadProperties',
   input:  Json.jNull,
   output: Json.jNull,
+  signals: [],
 };
 /** Force full reload for array [`properties`](#properties)  */
 export const reloadProperties: Server.GetRequest<null,null>= reloadProperties_internal;
@@ -219,6 +224,7 @@ const fetchProperties_internal: Server.GetRequest<
             removed: Json.jList(Json.jKey<'#property'>('#property')),
             reload: Json.jFail(Json.jBoolean,'Boolean expected'),
           }),
+  signals: [],
 };
 /** Data fetcher for array [`properties`](#properties)  */
 export const fetchProperties: Server.GetRequest<
