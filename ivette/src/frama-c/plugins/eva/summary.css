@@ -3,6 +3,11 @@
     background-color: white;
     height: 100%;
     overflow: auto;
+    user-select: text;
+}
+
+.eva-summary * {
+    user-select: auto;
 }
 
 .eva-summary span {
