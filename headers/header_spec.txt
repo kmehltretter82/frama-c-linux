@@ -1245,6 +1245,7 @@ src/plugins/security_slicing/security_slicing_parameters.ml: CEA_LGPL_OR_PROPRIE
 src/plugins/security_slicing/security_slicing_parameters.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/slicing/Slicing.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/slicing/api.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/slicing/api.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/slicing/bts336.c: .ignore
 src/plugins/slicing/fct_slice.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/slicing/fct_slice.mli: CEA_LGPL_OR_PROPRIETARY
@@ -1259,6 +1260,7 @@ src/plugins/slicing/slicingActions.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/slicing/slicingCmds.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/slicing/slicingCmds.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/slicing/slicingInternals.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/slicing/slicingInternals.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/slicing/slicingMacros.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/slicing/slicingMacros.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/slicing/slicingMarks.ml: CEA_LGPL_OR_PROPRIETARY
@@ -1268,11 +1270,13 @@ src/plugins/slicing/slicingParameters.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/slicing/slicingProject.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/slicing/slicingProject.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/slicing/slicingSelect.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/slicing/slicingSelect.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/slicing/slicingState.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/slicing/slicingState.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/slicing/slicingTransform.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/slicing/slicingTransform.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/slicing/slicingTypes.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/slicing/slicingTypes.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/sparecode/Sparecode.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/sparecode/globs.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/sparecode/globs.mli: CEA_LGPL_OR_PROPRIETARY

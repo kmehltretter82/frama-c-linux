@@ -164,8 +164,8 @@ module Select = struct
   let dyn_t = SlicingTypes.Sl_select.ty
   type set = SlicingCmds.set
   module S = Cil_datatype.Varinfo.Map.Make(SlicingTypes.Fct_user_crit)
+  type selections = S.t
   let dyn_set = S.ty
-
   (** {2 Journalized selectors } *)
 
   let empty_selects = Journal.register
