@@ -82,6 +82,7 @@ const save_internal: Server.SetRequest<string,string | undefined> = {
   name:   'kernel.services.save',
   input:  Json.jString,
   output: Json.jString,
+  signals: [],
 };
 /** Save the current session. Returns an error, if not successfull. */
 export const save: Server.SetRequest<string,string | undefined>= save_internal;
