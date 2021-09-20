@@ -299,6 +299,7 @@ const getMainFunction_internal: Server.GetRequest<null,Json.key<'#fct'>> = {
   name:   'kernel.ast.getMainFunction',
   input:  Json.jNull,
   output: Json.jKey<'#fct'>('#fct'),
+  signals: [],
 };
 /** Get the current 'main' function. */
 export const getMainFunction: Server.GetRequest<null,Json.key<'#fct'>>= getMainFunction_internal;
