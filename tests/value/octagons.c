@@ -20,21 +20,48 @@ void demo () {
 /* Same example as [demo] but with other integer types. */
 void integer_types () {
   unsigned int k, x, y, r, t;
-  y = undet;
+  y = Frama_C_interval(0, 65536);
+  k = Frama_C_interval(0, 10);
+  x = y + k;        // An octagon should be inferred despite unsigned types.
+  r = x + 3 - y;
+  if (y < 300) {
+    t = x;
+    Frama_C_show_each_reduced_unsigned(r, t);
+  }
+  y = Frama_C_interval(0, 65536);
   k = Frama_C_interval(0, 10);
   x = y - k;        // No octagon inferred as [y - k] may overflow.
   r = x + 3 - y;
-  if (y > 15)
+  if (y < 300) {
     t = x;
-  Frama_C_show_each_unreduced_unsigned(r, t);
+    Frama_C_show_each_unreduced_unsigned(r, t);
+  }
   char ck, cx, cy, cr, ct;
-  cy = undet;
+  cy = Frama_C_interval(-100, 100);
   ck = Frama_C_interval(0, 10);
   cx = cy - ck;    // An octagon should be inferred despite the casts to int.
   cr = cx + 3 - cy;
-  if (cy > 15)
+  if (cy > 15) {
     ct = cx;
-  Frama_C_show_each_reduced_char(cr, ct);
+    Frama_C_show_each_reduced_char(cr, ct);
+  }
+  cy = undet;
+  ck = Frama_C_interval(0, 10);
+  cx = cy - ck;    // No octagon should be inferred as the downcast may wrap.
+  cr = cx + 3 - cy;
+  if (cy > 15) {
+    ct = cx;
+    Frama_C_show_each_unreduced_char(cr, ct);
+  }
+  int ix, ir, it;
+  cy = undet;
+  ck = Frama_C_interval(0, 10);
+  ix = cy - ck;    // An octagon should be inferred as there is no downcast.
+  ir = ix + 3 - cy;
+  if (cy > 15) {
+    it = ix;
+    Frama_C_show_each_reduced_int(ir, it);
+  }
 }
 
 /* A test with multiple mathematical operations to complicate the inference
@@ -177,9 +204,9 @@ void interprocedural () {
 /* Prints the octagons state. */
 void dump () {
   char k = Frama_C_interval(0, 8);
-  char a = undet;
-  char b = a + k;
-  char c = b - k;
+  int a = Frama_C_interval(-128, 128);
+  int b = a + k;
+  int c = b - k;
   Frama_C_dump_each();
 }
 
