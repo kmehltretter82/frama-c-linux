@@ -826,7 +826,7 @@ PLUGIN_EXTRA_DIRS:=engine values domains api domains/cvalue domains/apron \
 	api values/numerors domains/numerors
 PLUGIN_TESTS_DIRS+=value/traces
 PLUGIN_GENERATED:=$(PLUGIN_DIR)/Eva.mli
-PLUGIN_DISTRIB_EXTERNAL+=$(PLUGIN_DIR)/eva-api.sh
+PLUGIN_DISTRIB_EXTERNAL+=gen-api.sh
 
 # Files for the binding to Apron domains. Only available if Apron is available.
 ifeq ($(HAS_APRON),yes)
@@ -936,7 +936,7 @@ API_MLI := $(addprefix $(PLUGIN_DIR)/, \
   legacy/eval_terms.mli utils/unit_tests.mli utils/eva_annotations.mli \
   eval.mli domains/cvalue/builtins.mli)
 
-$(PLUGIN_DIR)/Eva.mli: $(PLUGIN_DIR)/eva-api.sh Makefile $(API_HEADER) $(API_MLI)
+$(PLUGIN_DIR)/Eva.mli: $(PLUGIN_DIR)/gen-api.sh Makefile $(API_HEADER) $(API_MLI)
 	$(PRINT_MAKING) $@
 	$(RM) $@ $@.tmp
 	$< $(API_HEADER) $(API_MLI) > $@.tmp

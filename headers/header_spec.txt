@@ -1428,6 +1428,7 @@ src/plugins/value/engine/transfer_stmt.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/engine/transfer_stmt.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/eval.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/eval.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/gen-api.sh: .ignore
 src/plugins/value/gui_files/gui_callstacks_filters.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/gui_files/gui_callstacks_filters.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/gui_files/gui_callstacks_manager.ml: CEA_LGPL_OR_PROPRIETARY
