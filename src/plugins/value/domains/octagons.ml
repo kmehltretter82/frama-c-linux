@@ -91,7 +91,7 @@ type operation = Add | Sub
 module Arith = struct
   open Ival
 
-  let top_float = Ival.inject_float Fval.top
+  let is_top ival = Ival.(equal top ival || equal top_float ival)
 
   let narrow x y =
     let r = narrow x y in
@@ -133,25 +133,6 @@ module Arith = struct
     let min = Eval_typ.range_lower_bound range in
     let max = Eval_typ.range_upper_bound range in
     Ival.inject_range (Some min) (Some max)
-
-  (* Does an ival represent all values of a C type [typ]? *)
-  let is_top_for_typ typ ival =
-    let open Eval_typ in
-    Ival.(equal top ival) ||
-    match classify_as_scalar typ with
-    | None -> assert false
-    | Some (TSFloat _) -> Ival.equal top_float ival
-    | Some (TSInt range | TSPtr range) ->
-      (* TODO: this could be more efficient. *)
-      let range = make_range range in
-      Ival.is_included range ival || Ival.is_included range (neg_int ival)
-
-  (* Does an ival represent all possible values of a pair of variables? *)
-  let is_top_for_pair pair =
-    let x, y = Pair.get pair in
-    if Cil_datatype.Typ.equal x.vtype y.vtype
-    then is_top_for_typ x.vtype
-    else fun ival -> is_top_for_typ x.vtype ival && is_top_for_typ y.vtype ival
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -300,11 +281,7 @@ module Rewriting = struct
         in
         let value = Arith.add (Cil.typeOf e1) var1.coeff var2.coeff in
         let value = if sign then value else Arith.neg value in
-        (* Do not include this rewriting if the [value] exceeds all possible
-           values for the type of [var1] and [var2]. *)
-        if Arith.is_top_for_pair variables value
-        then acc
-        else (sign, { variables; operation; value }) :: acc
+        (sign, { variables; operation; value }) :: acc
     in
     Extlib.product_fold aux [] vars1 vars2
 
@@ -468,6 +445,8 @@ module Diamond = struct
 
   let top = { add = Ival.top; sub = Ival.top }
 
+  let is_top diamond = Arith.is_top diamond.add && Arith.is_top diamond.sub
+
   let is_included x y =
     Ival.is_included x.add y.add && Ival.is_included x.sub y.sub
 
@@ -485,16 +464,6 @@ module Diamond = struct
      about (Y, X). *)
   let reverse_variables swap t =
     if swap then { t with sub = Arith.neg t.sub } else t
-
-  (* Normalizes a diamond for the pair of variables [pair]: replaces too large
-     ivals by Ival.top. Returns None if both ivals are meaningless. *)
-  let trim pair t =
-    let is_top = Arith.is_top_for_pair pair in
-    match is_top t.add, is_top t.sub with
-    | true, true -> None
-    | true, false -> Some { t with add = Ival.top }
-    | false, true -> Some { t with sub = Ival.top }
-    | false, false -> Some t
 end
 
 
@@ -550,31 +519,31 @@ module Octagons = struct
 
   let narrow x y = try `Value (narrow_exc x y) with EBottom -> `Bottom
 
+  let decide join = fun _pair x y ->
+    let d = join x y in
+    if Diamond.is_top d then None else Some d
+
   let simple_join =
     let cache = Hptmap_sig.PersistentCache "Octagons.Octagons.join" in
-    let decide pair x y = Diamond.trim pair (Diamond.join x y) in
-    inter ~cache ~symmetric:true ~idempotent:true ~decide
+    inter ~cache ~symmetric:true ~idempotent:true ~decide:(decide Diamond.join)
 
   let join ~decide_left ~decide_right =
     let cache = Hptmap_sig.NoCache in
     let decide_left = Traversing decide_left
     and decide_right = Traversing decide_right in
-    let decide_both pair x y = Diamond.trim pair (Diamond.join x y) in
     merge ~cache ~symmetric:false ~idempotent:true
-      ~decide_left ~decide_right ~decide_both
+      ~decide_left ~decide_right ~decide_both:(decide Diamond.join)
 
   let simple_widen =
     let cache = Hptmap_sig.PersistentCache "Octagons.Octagons.widen" in
-    let decide pair x y = Diamond.trim pair (Diamond.widen x y) in
-    inter ~cache ~symmetric:false ~idempotent:true ~decide
+    inter ~cache ~symmetric:false ~idempotent:true ~decide:(decide Diamond.widen)
 
   let widen ~decide_left ~decide_right =
     let cache = Hptmap_sig.NoCache in
     let decide_left = Traversing decide_left
     and decide_right = Traversing decide_right in
-    let decide_both pair x y = Diamond.trim pair (Diamond.widen x y) in
     merge ~cache ~symmetric:false ~idempotent:true
-      ~decide_left ~decide_right ~decide_both
+      ~decide_left ~decide_right ~decide_both:(decide Diamond.widen)
 
   let unsafe_add = add
 
@@ -795,6 +764,24 @@ module State = struct
           "Incorrect octagon state computed by function %s:@ %a"
           msg pretty_debug t
 
+  (* Is an octagon no more precise than the intervals inferred for the related
+     variables? If so, do not save the octagon in the domain. *)
+  let is_redundant intervals { variables; operation; value; } =
+    if infer_intervals
+    then
+      try
+        let v1, v2 = Pair.get variables in
+        let i1 = Intervals.find v1 intervals
+        and i2 = Intervals.find v2 intervals in
+        let i = Arith.apply operation v1.vtype i1 i2 in
+        Ival.is_included i value
+      with Not_found -> false
+    else false
+
+  let is_redundant_diamond intervals variables diamond =
+    is_redundant intervals {variables; operation = Add; value = diamond.add} &&
+    is_redundant intervals {variables; operation = Sub; value = diamond.sub}
+
   (* ------------------------------ Lattice --------------------------------- *)
 
   let top =
@@ -827,7 +814,7 @@ module State = struct
             let add = Arith.add v1.vtype i1 i2
             and sub = Arith.sub v1.vtype i1 i2 in
             let diamond = Diamond.join diamond { add; sub } in
-            Diamond.trim pair diamond
+            if Diamond.is_top diamond then None else Some diamond
           with Not_found -> None
         in
         let decide_left = decide_empty t2.intervals
@@ -863,7 +850,7 @@ module State = struct
               then Diamond.widen { add; sub } diamond
               else Diamond.widen diamond { add; sub }
             in
-            Diamond.trim pair diamond
+            if Diamond.is_top diamond then None else Some diamond
           with Not_found -> None
         in
         let decide_left = decide_empty false t2.intervals
@@ -895,12 +882,12 @@ module State = struct
     { vars: varinfo * varinfo;
       diamond: diamond; }
 
-  let add_diamond state pair diamond =
-    match Diamond.trim pair diamond with
-    | None -> `Value state
-    | Some diamond ->
-      Octagons.add pair diamond state.octagons >>-: fun octagons ->
-      let relations = Relations.relate pair state.relations in
+  let add_diamond state variables diamond =
+    if is_redundant_diamond state.intervals variables diamond
+    then `Value state
+    else
+      Octagons.add variables diamond state.octagons >>-: fun octagons ->
+      let relations = Relations.relate variables state.relations in
       { state with octagons; relations }
 
   let inverse { vars; diamond } =
@@ -950,7 +937,7 @@ module State = struct
     with Not_found -> `Value state
 
   let add_octagon state octagon =
-    if Arith.is_top_for_pair octagon.variables octagon.value
+    if is_redundant state.intervals octagon
     then `Value state
     else
       let state =
