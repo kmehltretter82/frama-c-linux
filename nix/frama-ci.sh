@@ -8,5 +8,5 @@ export FRAMA_CI=$(nix-instantiate --eval -E "((import <nixos-20.03> {}).callPack
 FRAMA_CI=${FRAMA_CI#\"}
 FRAMA_CI=${FRAMA_CI%\"}
 
-export NIXPKGS=$(eval echo $(nix-instantiate --eval -E "with import $FRAMA_CI/pkgs-ref.nix; url))
+export NIXPKGS=$(eval echo $(nix-instantiate --eval -E "with import $FRAMA_CI/pkgs-ref.nix; url"))
 $FRAMA_CI/compile.sh $@
