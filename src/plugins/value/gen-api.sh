@@ -1,20 +1,5 @@
 #!/bin/bash -eu
 
-header=$1
-shift
-
-IFS='' # for read to keep spaces
-
-printf '('
-printf '%0.1s' '*'{1..74}
-printf ')\n'
-while read -r line
-do
-    printf '(*  %-68s  *)\n' $line
-done < $header
-printf '('
-printf '%0.1s' '*'{1..74}
-printf ')\n\n'
 printf '(* This file is generated. Do not edit. *)\n\n'
 
 for i in "$@"

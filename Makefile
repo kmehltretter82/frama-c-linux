@@ -930,16 +930,15 @@ PLUGIN_TYPES_CMO:=$(VALUE_TYPES)
 PLUGIN_TYPES_TODOC:=$(addsuffix .mli,$(VALUE_TYPES))
 
 # Eva API
-API_HEADER := headers/open-source/CEA_LGPL_OR_PROPRIETARY
 API_MLI := $(addprefix $(PLUGIN_DIR)/, \
   utils/results.mli utils/value_results.mli value_parameters.mli \
   legacy/eval_terms.mli utils/unit_tests.mli utils/eva_annotations.mli \
   eval.mli domains/cvalue/builtins.mli)
 
-$(PLUGIN_DIR)/Eva.mli: $(PLUGIN_DIR)/gen-api.sh Makefile $(API_HEADER) $(API_MLI)
+$(PLUGIN_DIR)/Eva.mli: $(PLUGIN_DIR)/gen-api.sh Makefile $(API_MLI)
 	$(PRINT_MAKING) $@
 	$(RM) $@ $@.tmp
-	$< $(API_HEADER) $(API_MLI) > $@.tmp
+	$< $(API_MLI) > $@.tmp
 	$(CHMOD_RO) $@.tmp
 	$(MV) $@.tmp $@
 

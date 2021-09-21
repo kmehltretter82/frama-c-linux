@@ -1315,7 +1315,7 @@ src/plugins/users/users_register.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/users/users_register.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/.merlin: .ignore
 src/plugins/value/Changelog_non_free: .ignore
-src/plugins/value/Eva.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/Eva.mli: .ignore
 src/plugins/value/alarmset.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/alarmset.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/api/general_requests.ml: CEA_LGPL_OR_PROPRIETARY
