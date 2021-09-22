@@ -119,7 +119,7 @@ module Ref
        include Info
        val default: unit -> Data.t
      end)
-  : Ref with type data = Data.t
+  : Ref with type data = Data.t and type Datatype.t = Data.t ref
 
 (** Output signature of [Option_ref]. Note that [get] will raise [Not_found]
     if the stored data is [None]. Use [get_option] if you want to have
