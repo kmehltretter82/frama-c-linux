@@ -37,7 +37,7 @@ let install signal hook = function
     in Request.on_signal signal install
 
 let install_emit signal add_hook =
-  install signal (fun () -> Request.emit signal) add_hook
+  install signal (fun _ -> Request.emit signal) add_hook
 
 (* -------------------------------------------------------------------------- *)
 (* --- Values                                                             --- *)
@@ -45,7 +45,7 @@ let install_emit signal add_hook =
 
 let register_value (type a) ~package ~name ~descr
     ~(output : a Request.output) ~get
-    ?(add_hook : unit callback option) ()
+    ?(add_hook : 'b callback option) ()
   =
   let open Markdown in
   let href = link ~name () in
@@ -68,7 +68,7 @@ let register_value (type a) ~package ~name ~descr
 
 let register_state (type a) ~package ~name ~descr
     ~(data : a data) ~get ~set
-    ?(add_hook : unit callback option) () =
+    ?(add_hook : 'b callback option) () =
   let open Markdown in
   let module D = (val data) in
   let href = link ~name () in
