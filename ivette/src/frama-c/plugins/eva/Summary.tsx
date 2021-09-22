@@ -27,6 +27,8 @@ import { Vfill } from 'dome/layout/boxes';
 import * as States from 'frama-c/states';
 import * as Eva from 'frama-c/api/plugins/eva/general';
 
+import { LED } from 'dome/controls/buttons';
+
 import './summary.css';
 
 function percent(reachable: number, total: number): string {
@@ -200,22 +202,36 @@ function Statuses(data: Eva.statistics): JSX.Element {
 export function EvaSummary(): JSX.Element {
   const alarmCategories = States.useTags(Eva.alarmCategoryTags);
   const data = States.useSyncValue(Eva.stats);
+  const state = States.useSyncValue(Eva.computationState);
 
-  return (data && alarmCategories ? (
-    <div className="eva-summary">
-      <h1>Analysis Summary</h1>
-      <h2>Coverage</h2>
-      {CoverageTable(data)}
-      <h2>Errors</h2>
-      {Errors(data)}
-      <h2>Alarms</h2>
-      {Alarms(data, alarmCategories)}
-      <h2>Statuses</h2>
-      {Statuses(data)}
-    </div>
-  ) :
-    <></>
-  );
+  if (state === 'not_computed')
+    return (
+      <div className="eva-summary-status">
+        Eva analysis not run yet.
+      </div>);
+
+  if (state === 'computing')
+    return (
+      <div className="eva-summary-status">
+        Eva analysis running.
+        <LED status="active" blink />
+      </div>);
+
+  if (state === 'computed' && data && alarmCategories)
+    return (
+      <div className="eva-summary computed">
+        <h1>Analysis Summary</h1>
+        <h2>Coverage</h2>
+        {CoverageTable(data)}
+        <h2>Errors</h2>
+        {Errors(data)}
+        <h2>Alarms</h2>
+        {Alarms(data, alarmCategories)}
+        <h2>Statuses</h2>
+        {Statuses(data)}
+      </div>);
+
+  return (<></>);
 }
 
 function EvaSummaryComponent(): JSX.Element {

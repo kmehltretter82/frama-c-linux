@@ -54,15 +54,53 @@ import { jTagSafe } from 'frama-c/api/kernel/data';
 //@ts-ignore
 import { tag } from 'frama-c/api/kernel/data';
 
-const isComputed_internal: Server.GetRequest<null,boolean> = {
+/** State of the computation of Eva Analysis. */
+export type computationStateType = "not_computed" | "computing" | "computed";
+
+/** Loose decoder for `computationStateType` */
+export const jComputationStateType: Json.Loose<computationStateType> =
+  Json.jUnion<"not_computed" | "computing" | "computed">(
+    Json.jTag("not_computed"),
+    Json.jTag("computing"),
+    Json.jTag("computed"),
+  );
+
+/** Safe decoder for `computationStateType` */
+export const jComputationStateTypeSafe: Json.Safe<computationStateType> =
+  Json.jFail(jComputationStateType,'ComputationStateType expected');
+
+/** Natural order for `computationStateType` */
+export const byComputationStateType: Compare.Order<computationStateType> =
+  Compare.structural;
+
+/** Signal for state [`computationState`](#computationstate)  */
+export const signalComputationState: Server.Signal = {
+  name: 'plugins.eva.general.signalComputationState',
+};
+
+const getComputationState_internal: Server.GetRequest<
+  null,
+  computationStateType
+  > = {
   kind: Server.RqKind.GET,
-  name:   'plugins.eva.general.isComputed',
+  name:   'plugins.eva.general.getComputationState',
   input:  Json.jNull,
-  output: Json.jBoolean,
+  output: jComputationStateType,
   signals: [],
 };
-/** True if the Eva analysis has been done */
-export const isComputed: Server.GetRequest<null,boolean>= isComputed_internal;
+/** Getter for state [`computationState`](#computationstate)  */
+export const getComputationState: Server.GetRequest<
+  null,
+  computationStateType
+  >= getComputationState_internal;
+
+const computationState_internal: State.Value<computationStateType> = {
+  name: 'plugins.eva.general.computationState',
+  signal: signalComputationState,
+  getter: getComputationState,
+};
+/** The current computation state of the analysis. */
+export const computationState: State.Value<computationStateType> = computationState_internal;
 
 const getCallers_internal: Server.GetRequest<
   Json.key<'#fct'>,
@@ -286,6 +324,7 @@ const alarmCategoryTags_internal: Server.GetRequest<null,tag[]> = {
   name:   'plugins.eva.general.alarmCategoryTags',
   input:  Json.jNull,
   output: Json.jList(jTag),
+  signals: [],
 };
 /** Registered tags for the above type. */
 export const alarmCategoryTags: Server.GetRequest<null,tag[]>= alarmCategoryTags_internal;
@@ -435,6 +474,7 @@ const getStats_internal: Server.GetRequest<null,statistics> = {
   name:   'plugins.eva.general.getStats',
   input:  Json.jNull,
   output: jStatistics,
+  signals: [],
 };
 /** Getter for state [`stats`](#stats)  */
 export const getStats: Server.GetRequest<null,statistics>= getStats_internal;

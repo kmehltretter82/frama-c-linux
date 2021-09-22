@@ -31,11 +31,31 @@ let package =
     ~readme:"eva.md"
     ()
 
-let () = Request.register ~package
-    ~kind:`GET ~name:"isComputed"
-    ~descr:(Markdown.plain "True if the Eva analysis has been done")
-    ~input:(module Data.Junit) ~output:(module Data.Jbool)
-    Db.Value.is_computed
+module ComputationState = struct
+  open Analysis
+  type t = computation_state
+  let jtype =
+    Data.declare ~package
+      ~name:"computationStateType"
+      ~descr:(Markdown.plain "State of the computation of Eva Analysis.")
+      Package.(Junion [
+          Jtag "not_computed" ;
+          Jtag "computing" ;
+          Jtag "computed"])
+  let to_json = function
+    | Analysis.NotComputed -> `String "not_computed"
+    | Computing -> `String "computing"
+    | Computed -> `String "computed"
+end
+
+let _computation_signal =
+  States.register_value ~package
+    ~name:"computationState"
+    ~descr:(Markdown.plain "The current computation state of the analysis.")
+    ~output:(module ComputationState)
+    ~get:Analysis.current_computation_state
+    ~add_hook:Analysis.register_computation_hook
+    ()
 
 let is_computed kf =
   Db.Value.is_computed () &&
@@ -380,15 +400,14 @@ module Statistics = struct
           "count", `Int c ]) (AlarmsStats.bindings x.alarms))]
 end
 
-let () =
-  let signal = States.register_value ~package
-      ~name:"stats"
-      ~descr:(Markdown.plain "Statistics about the last Eva analysis")
-      ~output:(module Statistics)
-      ~get:Value_results.compute_stats
-      ()
-  in
-  Analysis.register_computed_hook (fun () -> Request.emit signal)
+let _computed_signal =
+  States.register_value ~package
+    ~name:"stats"
+    ~descr:(Markdown.plain "Statistics about the last Eva analysis")
+    ~output:(module Statistics)
+    ~get:Value_results.compute_stats
+    ~add_hook:(Analysis.register_computation_hook ~on:Computed)
+    ()
 
 
 (**************************************************************************)

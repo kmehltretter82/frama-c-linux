@@ -1,3 +1,12 @@
+.eva-summary-status {
+    margin: 6px;
+}
+
+.eva-summary-status .dome-xButton-led {
+    display: inline-block;
+    vertical-align: baseline;
+}
+
 .eva-summary {
     padding: 10px;
     background-color: white;
