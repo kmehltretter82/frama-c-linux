@@ -11,6 +11,8 @@ Let a = global(G_v_20).
 Let a_1 = Load_S1_St(a, Mint_0).
 Assume {
   Type: IsS1_St(w) /\ IsS1_St(a_1).
+  (* Heap *)
+  Type: region(G_v_20) <= 0.
   (* Initializer *)
   Init: (w.F1_St_a) = 1.
   (* Initializer *)
@@ -29,6 +31,8 @@ Let a = global(G_v_20).
 Let a_1 = Load_S1_St(a, Mint_0).
 Assume {
   Type: IsS1_St(w) /\ IsS1_St(a_1).
+  (* Heap *)
+  Type: region(G_v_20) <= 0.
   (* Initializer *)
   Init: (w.F1_St_a) = 1.
   (* Initializer *)

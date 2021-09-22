@@ -83,16 +83,16 @@ and sequence = {
   seq_vars : Vars.t ;
   seq_core : Pset.t ;
   seq_catg : category ;
-  seq_list : step list ;
+  seq_list : step list ; (* forall i . 0 <= i < n ==> Step_i *)
 }
 and condition =
-  | Type of pred
+  | Type of pred (* related to Type *)
   | Have of pred
-  | When of pred
+  | When of pred (* related to Condition *)
   | Core of pred
   | Init of pred
-  | Branch of pred * sequence * sequence
-  | Either of sequence list
+  | Branch of pred * sequence * sequence (* if Pred then Seq_1 else Seq_2 *)
+  | Either of sequence list (* exist i . 0 <= i < n && Sequence_i *)
   | State of Mstate.state
 
 (* -------------------------------------------------------------------------- *)
@@ -318,15 +318,19 @@ let pretty = ref (fun _fmt _seq -> ())
 
 let is_true = function { seq_catg = TRUE | EMPTY } -> true | _ -> false
 let is_empty = function { seq_catg = EMPTY } -> true | _ -> false
+let is_false = function { seq_catg = FALSE } -> true | _ -> false
 
 let is_absurd_h h = match h.condition with
-  | (Core p | When p | Have p) -> p == F.p_false
-  | _ -> false
+  | (Type p | Core p | When p | Have p | Init p) -> p == F.p_false
+  | Branch(_,p,q) -> is_false p && is_false q
+  | Either w -> List.for_all is_false w (* note: an empty w is an absurd hyp *)
+  | State _ -> false
 
 let is_trivial_h h = match h.condition with
   | State _ -> false
   | (Type p | Core p | When p | Have p | Init p) -> p == F.p_true
   | Branch(_,a,b) -> is_true a && is_true b
+  | Either [] -> false
   | Either w -> List.for_all is_true w
 
 let is_trivial_hs_p hs p = p == F.p_true || List.exists is_absurd_h hs
@@ -613,6 +617,7 @@ let core_branch step p a b =
   let condition =
     match a.seq_catg , b.seq_catg with
     | (TRUE | EMPTY) , (TRUE|EMPTY) -> Have p_true
+    | FALSE , FALSE -> Have p_false
     | _ -> Branch(p,a,b)
   in update_cond step condition
 
@@ -691,8 +696,9 @@ and map_steplist f = function
   | [] -> []
   | h::hs ->
       let h = map_step f h in
-      let hs = map_steplist f hs in
-      if is_trivial_h h then hs else h :: hs
+      if is_absurd_h h then [h] else
+        let hs = map_steplist f hs in
+        if is_trivial_h h then hs else h :: hs
 
 and map_sequence f s =
   sequence (map_steplist f s.seq_list)
@@ -736,8 +742,9 @@ and ground_flowdir ~fwd env = function
   | [] -> []
   | h::hs ->
       let h = ground_flow ~fwd env h in
-      let hs = ground_flowdir ~fwd env hs in
-      if is_trivial_h h then hs else h :: hs
+      if is_absurd_h h then [h] else
+        let hs = ground_flowdir ~fwd env hs in
+        if is_trivial_h h then hs else h :: hs
 
 let ground (hs,g) =
   let hs = ground_flowlist ~fwd:true (Ground.top ()) hs in
@@ -787,13 +794,12 @@ let letify_assume sref (_,step) =
           sref := Sigma.assume current p
   end ; current
 
-[@@@ warning "-32"]
 let rec letify_type sigma used p = match F.p_expr p with
   | And ps -> p_all (letify_type sigma used) ps
   | _ ->
       let p = Sigma.p_apply sigma p in
-      if Vars.intersect used (F.varsp p) then p else F.p_true
-[@@@ warning "+32"]
+      let vs = F.varsp p in
+      if Vars.intersect used vs || Vars.is_empty vs then p else F.p_true
 
 let rec letify_seq sigma0 ~target ~export (seq : step list) =
   let dseq = Array.map (dseq_of_step sigma0) (Array.of_list seq) in

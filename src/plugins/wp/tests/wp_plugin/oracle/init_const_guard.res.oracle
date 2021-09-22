@@ -12,7 +12,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Post-condition 'Pointed_Valid' in 'f':
-Assume { (* Heap *) Type: linked(Malloc_0). }
+Assume { (* Heap *) Type: (region(G_x_20) <= 0) /\ linked(Malloc_0). }
 Prove: valid_rw(Malloc_0, global(G_x_20), 1).
 
 ------------------------------------------------------------

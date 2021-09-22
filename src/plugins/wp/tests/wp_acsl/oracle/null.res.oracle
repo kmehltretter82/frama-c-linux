@@ -43,14 +43,14 @@ Prove: true.
 
 Goal Assigns nothing in 'prover':
 Call Effect at line 32
-Assume { (* Heap *) Type: linked(Malloc_0). }
+Assume { (* Heap *) Type: (region(L_GET.base) <= 0) /\ linked(Malloc_0). }
 Prove: invalid(Malloc_0, L_GET, 1).
 
 ------------------------------------------------------------
 
 Goal Assigns nothing in 'prover':
 Call Effect at line 32
-Assume { (* Heap *) Type: linked(Malloc_0). }
+Assume { (* Heap *) Type: (region(L_GET.base) <= 0) /\ linked(Malloc_0). }
 Prove: invalid(Malloc_0, L_GET, 1).
 
 ------------------------------------------------------------
