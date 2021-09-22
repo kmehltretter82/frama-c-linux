@@ -112,20 +112,20 @@
 #ifdef E_ACSL_DEBUG
 #  define DVALIDATE_ALIGNMENT(_addr)                                           \
     DVASSERT(((uintptr_t)_addr) % HEAP_SEGMENT == 0,                           \
-             "Heap base address %a is unaligned", _addr)
+             "Heap base address %a is unaligned\n", _addr)
 
 #  define DVALIDATE_MEMORY_PRE_MAIN_INIT                                       \
     DVASSERT(mem_layout.is_initialized_pre_main != 0,                          \
-             "Un-initialized pre-main shadow layout", NULL)
+             "Un-initialized pre-main shadow layout\n", NULL)
 
 #  define DVALIDATE_MEMORY_MAIN_INIT                                           \
     DVASSERT(mem_layout.is_initialized_main != 0,                              \
-             "Un-initialized main shadow layout", NULL)
+             "Un-initialized main shadow layout\n", NULL)
 
 #  define DVALIDATE_MEMORY_INIT                                                \
     DVASSERT(mem_layout.is_initialized_pre_main != 0                           \
                  && mem_layout.is_initialized_main != 0,                       \
-             "Un-initialized shadow layout", NULL)
+             "Un-initialized shadow layout\n", NULL)
 
 /* Debug function making sure that the order of program segments is as expected
  * and that the program and the shadow segments used do not overlap. */
@@ -138,9 +138,9 @@ void validate_shadow_layout();
 /* Assert that boundaries of a block [_addr, _addr+_size] are within a segment
  * given by `_s`. `_s` is either HEAP, STACK, TLS, GLOBAL or STATIC. */
 #  define DVALIDATE_IS_ON(_addr, _size, _s)                                    \
-    DVASSERT(IS_ON_##_s(_addr), "Address %a not on %s", _addr, #_s);           \
-    DVASSERT(IS_ON_##_s(_addr + _size), "Address %a not on %s", _addr + _size, \
-             #_s)
+    DVASSERT(IS_ON_##_s(_addr), "Address %a not on %s\n", _addr, #_s);         \
+    DVASSERT(IS_ON_##_s(_addr + _size), "Address %a not on %s\n",              \
+             _addr + _size, #_s)
 
 /* Assert that [_addr, _addr+_size] are within heap segment */
 #  define DVALIDATE_IS_ON_HEAP(_addr, _size) DVALIDATE_IS_ON(_addr, _size, HEAP)
