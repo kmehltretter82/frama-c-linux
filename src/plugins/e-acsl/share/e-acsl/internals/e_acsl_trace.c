@@ -85,7 +85,7 @@ void trace() {
   char executable[PATH_MAX];
   rtl_sprintf(executable, "/proc/%d/exe", getpid());
 
-  STDOUT("/** Backtrace **************************/\n");
+  STDERR("/** Backtrace **************************/\n");
   int counter = 0;
   while (*bb) {
     char *addr = (char *)private_malloc(21);
@@ -99,18 +99,18 @@ void trace() {
       if (outs) {
         outs[strlen(outs) - 1] = '\0';
         if (strlen(outs) && endswith(outs, "??:0") && endswith(outs, "??:?")) {
-          STDOUT("%s%s\n", prefix, outs);
+          STDERR("%s%s\n", prefix, outs);
         }
       } else {
         char *errs = (char *)ipr->stderrs;
         if (errs) {
-          STDOUT("%s\n", errs);
+          STDERR("%s\n", errs);
         }
       }
     }
     bb++;
     counter++;
   }
-  STDOUT("/***************************************/\n");
+  STDERR("/***************************************/\n");
 #endif /* E_ACSL_OS_IS_LINUX */
 }
