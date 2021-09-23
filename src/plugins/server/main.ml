@@ -209,7 +209,7 @@ let kill_exec e = e.killed <- true
 let kill_request eq id e = if eq id e.id then e.killed <- true
 
 let process_request (server : 'a server) (request : 'a request) : unit =
-  if Senv.debug_atleast 1 then
+  if Senv.debug_atleast 1 && (Senv.debug_atleast 3 || request <> `Poll) then
     Senv.debug "%a" (pp_request server.pretty) request ;
   match request with
   | `Poll -> ()
