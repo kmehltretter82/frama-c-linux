@@ -2,16 +2,40 @@
 { pkgs, stdenv, src ? ../., opam2nix, ocaml ? pkgs.ocaml-ng.ocamlPackages_4_08.ocaml, plugins ? { } }:
 
 let mydir = builtins.getEnv("PWD");
-    mk-opam-selection = { name, opamSrc?null, ... }: {
+    why3 = 
+       pkgs.fetchgit {
+           url = "https://gitlab.inria.fr/why3/why3";
+           # commit that has updated why3-coq.opam to make it
+           # compatible with Coq>8.12 (so that we can compile on OCaml 4.12)
+           rev = "a41e40f88987a26a7ac35f62e7637a2f6fcf1c07";
+           sha256 = "138ymjf1pg00yp2biw3qrx8yir8grfwjmfx81amddpx3p0c1zzhl";
+       };
+   mk-opam-selection = { name, opamSrc?{}, ... }: {
       inherit ocaml;
-      src = opamSrc;
+      src = { why3 = why3; why3-coq = why3; } // opamSrc;
+      override = { pkgs, selection}:
+        { why3 = super: super.overrideAttrs (attrs:
+        { prePatch = "ln -s opam/why3.opam why3.opam; " + attrs.prePatch;
+          configurePhase = "autoconf; ";
+          buildInputs = [ pkgs.autoconf ];
+        });
+          why3-coq = super: super.overrideAttrs (attrs: 
+              {
+                prePatch = "ln -s opam/why3-coq.opam why3-coq.opam; " + attrs.prePatch;
+                buildPhase = "autoconf; " + attrs.buildPhase;
+                buildInputs = [ pkgs.autoconf ];
+              }  
+          );
+        }
+      ;
       selection = "${mydir}/${name}-${ocaml.version}-opam-selection.nix";
     };
-    opamPackages =
+     opamPackages =
       [ "ocamlfind" "zarith" "ocamlgraph" "yojson" "zmq"
         "ppx_deriving" "ppx_deriving_yojson"
-        "coq=8.12.0" "alt-ergo=2.2.0" "why3=1.4.0" "why3-coq=1.4.0" ];
-
+        "coq=8.13.0" "alt-ergo=2.2.0"
+        "${why3}/opam/why3.opam" "${why3}/opam/why3-coq.opam"
+      ];
     # only pure nix packages. See mk_deriv below for adding opam2nix packages
     mk_buildInputs = { nixPackages ? [] } :
     [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl pkgs.file pkgs.which pkgs.dos2unix] ++ nixPackages;
