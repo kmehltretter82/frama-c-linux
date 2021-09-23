@@ -181,7 +181,7 @@ function MessageFilter(props: {filter: Forms.FieldState<Filter>}) {
 
   return (
     <Scroll>
-      <Forms.Page>
+      <Forms.Page className="message-search">
         <Forms.Section label="Search" unfold>
           <Forms.TextField
             label="Category"
