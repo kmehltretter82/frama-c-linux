@@ -150,6 +150,99 @@ const logkindTags_internal: Server.GetRequest<null,tag[]> = {
 /** Registered tags for the above type. */
 export const logkindTags: Server.GetRequest<null,tag[]>= logkindTags_internal;
 
+/** Data for array rows [`message`](#message)  */
+export interface messageData {
+  /** Entry identifier. */
+  key: Json.key<'#message'>;
+  /** Message kind */
+  kind: logkind;
+  /** Emitter plugin */
+  plugin: string;
+  /** Message text */
+  message: string;
+  /** Message category (only for debug or warning messages) */
+  category?: string;
+  /** Source file position */
+  source?: source;
+}
+
+/** Loose decoder for `messageData` */
+export const jMessageData: Json.Loose<messageData> =
+  Json.jObject({
+    key: Json.jFail(Json.jKey<'#message'>('#message'),'#message expected'),
+    kind: jLogkindSafe,
+    plugin: Json.jFail(Json.jString,'String expected'),
+    message: Json.jFail(Json.jString,'String expected'),
+    category: Json.jString,
+    source: jSource,
+  });
+
+/** Safe decoder for `messageData` */
+export const jMessageDataSafe: Json.Safe<messageData> =
+  Json.jFail(jMessageData,'MessageData expected');
+
+/** Natural order for `messageData` */
+export const byMessageData: Compare.Order<messageData> =
+  Compare.byFields
+    <{ key: Json.key<'#message'>, kind: logkind, plugin: string,
+       message: string, category?: string, source?: source }>({
+    key: Compare.string,
+    kind: byLogkind,
+    plugin: Compare.alpha,
+    message: Compare.string,
+    category: Compare.defined(Compare.string),
+    source: Compare.defined(bySource),
+  });
+
+/** Signal for array [`message`](#message)  */
+export const signalMessage: Server.Signal = {
+  name: 'kernel.services.signalMessage',
+};
+
+const reloadMessage_internal: Server.GetRequest<null,null> = {
+  kind: Server.RqKind.GET,
+  name:   'kernel.services.reloadMessage',
+  input:  Json.jNull,
+  output: Json.jNull,
+  signals: [],
+};
+/** Force full reload for array [`message`](#message)  */
+export const reloadMessage: Server.GetRequest<null,null>= reloadMessage_internal;
+
+const fetchMessage_internal: Server.GetRequest<
+  number,
+  { pending: number, updated: messageData[], removed: Json.key<'#message'>[],
+    reload: boolean }
+  > = {
+  kind: Server.RqKind.GET,
+  name:   'kernel.services.fetchMessage',
+  input:  Json.jNumber,
+  output: Json.jObject({
+            pending: Json.jFail(Json.jNumber,'Number expected'),
+            updated: Json.jList(jMessageData),
+            removed: Json.jList(Json.jKey<'#message'>('#message')),
+            reload: Json.jFail(Json.jBoolean,'Boolean expected'),
+          }),
+  signals: [],
+};
+/** Data fetcher for array [`message`](#message)  */
+export const fetchMessage: Server.GetRequest<
+  number,
+  { pending: number, updated: messageData[], removed: Json.key<'#message'>[],
+    reload: boolean }
+  >= fetchMessage_internal;
+
+const message_internal: State.Array<Json.key<'#message'>,messageData> = {
+  name: 'kernel.services.message',
+  getkey: ((d:messageData) => d.key),
+  signal: signalMessage,
+  fetch: fetchMessage,
+  reload: reloadMessage,
+  order: byMessageData,
+};
+/** Log messages */
+export const message: State.Array<Json.key<'#message'>,messageData> = message_internal;
+
 /** Message event record. */
 export interface log {
   /** Message kind */

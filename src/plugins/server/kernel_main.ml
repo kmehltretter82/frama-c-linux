@@ -167,6 +167,49 @@ struct
 end
 
 (* -------------------------------------------------------------------------- *)
+(* --- Synchronized array of log events                                   --- *)
+(* -------------------------------------------------------------------------- *)
+
+let model = States.model ()
+
+let () = States.column model ~name:"kind"
+    ~descr:(Md.plain "Message kind")
+    ~data:(module LogKind)
+    ~get:(fun (evt, _) -> evt.Log.evt_kind)
+
+let () = States.column model ~name:"plugin"
+    ~descr:(Md.plain "Emitter plugin")
+    ~data:(module Jalpha)
+    ~get:(fun (evt, _) -> evt.Log.evt_plugin)
+
+let () = States.column model ~name:"message"
+    ~descr:(Md.plain "Message text")
+    ~data:(module Jstring)
+    ~get:(fun (evt, _) -> evt.Log.evt_message)
+
+let () = States.option model ~name:"category"
+    ~descr:(Md.plain "Message category (only for debug or warning messages)")
+    ~data:(module Jstring)
+    ~get:(fun (evt, _) -> evt.Log.evt_category)
+
+let () = States.option model ~name:"source"
+    ~descr:(Md.plain "Source file position")
+    ~data:(module LogSource)
+    ~get:(fun (evt, _) -> evt.Log.evt_source)
+
+let iter f = ignore (Messages.fold (fun i evt -> f (evt, i); succ i) 0)
+
+let _array =
+  States.register_array
+    ~package
+    ~name:"message"
+    ~descr:(Md.plain "Log messages")
+    ~key:(fun (_evt, i) -> string_of_int i)
+    ~iter:iter
+    ~add_reload_hook:Messages.add_global_hook
+    model
+
+(* -------------------------------------------------------------------------- *)
 (* --- Log Events                                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
