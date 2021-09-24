@@ -35,6 +35,7 @@ import { Table, Column, Renderer } from 'dome/table/views';
 import * as Compare from 'dome/data/compare';
 
 import * as States from 'frama-c/states';
+import * as Ast from 'frama-c/api/kernel/ast';
 import * as Kernel from 'frama-c/api/kernel/services';
 
 type Message = Kernel.messageData;
@@ -254,6 +255,14 @@ const renderCell: Renderer<string> =
 const renderMessage: Renderer<string> =
   (text: string) => (<Data title={text}> {text} </Data>);
 
+const renderDir: Renderer<Ast.source> =
+  (loc: Ast.source) => (<Cell label={loc.dir} title={loc.file} />);
+
+const renderFile: Renderer<Ast.source> =
+  (loc: Ast.source) => (
+    <Cell label={`${loc.base}:${loc.line}`} title={loc.file} />
+  );
+
 const MessageColumns = () => (
   <>
     <Column
@@ -285,6 +294,27 @@ const MessageColumns = () => (
       render={renderMessage}
     />
     <Column
+      id="fct"
+      label="Function"
+      width={120}
+      render={renderCell}
+    />
+    <Column
+      id="dir"
+      label="Directory"
+      width={240}
+      visible={false}
+      getter={(msg: Message) => msg?.source}
+      render={renderDir}
+    />
+    <Column
+      id="file"
+      label="File"
+      width={150}
+      getter={(msg: Message) => msg?.source}
+      render={renderFile}
+    />
+    <Column
       id="key"
       label="Id"
       title="Message emission order"
@@ -298,11 +328,16 @@ const MessageColumns = () => (
 // --- Mesages Table
 // -------------------------------------------------------------------------
 
+const bySource =
+  Compare.byFields<Ast.source>({ file: Compare.alpha, line: Compare.number });
+
 const byMessage: Compare.ByFields<Message> = {
   key: Compare.lift(parseInt, Compare.bignum),
   kind: Compare.structural,
   plugin: Compare.string,
   category: Compare.defined(Compare.string),
+  fct: Compare.defined(Compare.alpha),
+  source: Compare.defined(bySource),
 };
 
 export default function RenderMessages() {
@@ -326,6 +361,17 @@ export default function RenderMessages() {
     model.setFilter((msg: Message) => filterMessage(filter, msg));
   }, [model, filterState]);
 
+  const [, updateSelection] = States.useSelection();
+
+  const onMessageSelection = React.useCallback(
+    ({ fct, marker }: Message) => {
+      if (fct && marker) {
+        const location = { fct, marker };
+        updateSelection({ location });
+      }
+    }, [updateSelection],
+  );
+
   const [showFilter, flipFilter] =
     Dome.useFlipSettings('ivette.messages.showFilter', true);
 
@@ -347,6 +393,7 @@ export default function RenderMessages() {
         <Table<string, Message>
           model={model}
           sorting={model}
+          onSelection={onMessageSelection}
           settings="ivette.messages.table"
         >
           <MessageColumns />
