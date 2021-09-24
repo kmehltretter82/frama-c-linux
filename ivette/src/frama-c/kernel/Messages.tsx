@@ -68,12 +68,14 @@ interface PluginFilter {
 }
 
 interface Filter {
+  currentFct: boolean;
   search: Search;
   kind: KindFilter;
   plugin: PluginFilter;
 }
 
 const defaultFilter: Filter = {
+  currentFct: false,
   search: {},
   kind: {
     result: false,
@@ -154,8 +156,15 @@ function filterSearched(search: Search, msg: Message) {
           searchCategory(search.category, msg.category));
 }
 
-function filterMessage(filter: Filter, msg: Message) {
-  return (filterSearched(filter.search, msg) &&
+function filterFunction(filter: Filter, kf: string | undefined, msg: Message) {
+  if (filter.currentFct)
+    return (kf === msg.fct);
+  return true;
+}
+
+function filterMessage(filter: Filter, kf: string | undefined, msg: Message) {
+  return (filterFunction(filter, kf, msg) &&
+          filterSearched(filter.search, msg) &&
           filterKind(filter.kind, msg) &&
           filterPlugin(filter.plugin, msg));
 }
@@ -183,6 +192,11 @@ function MessageFilter(props: {filter: Forms.FieldState<Filter>}) {
   return (
     <Scroll>
       <Forms.Page className="message-search">
+        <Forms.CheckboxField
+          label="Current function"
+          title="Only show messages emitted at the current function"
+          state={Forms.useProperty(state, 'currentFct')}
+        />
         <Forms.Section label="Search" unfold>
           <Forms.TextField
             label="Category"
@@ -355,13 +369,13 @@ export default function RenderMessages() {
   }, [model, data]);
 
   const filterState = Forms.useState<Filter>(defaultFilter);
+  const [selection, updateSelection] = States.useSelection();
+  const selectedFct = selection?.current?.fct;
 
   React.useEffect(() => {
     const [filter] = filterState;
-    model.setFilter((msg: Message) => filterMessage(filter, msg));
-  }, [model, filterState]);
-
-  const [, updateSelection] = States.useSelection();
+    model.setFilter((msg: Message) => filterMessage(filter, selectedFct, msg));
+  }, [model, filterState, selectedFct]);
 
   const onMessageSelection = React.useCallback(
     ({ fct, marker }: Message) => {
