@@ -893,11 +893,11 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode value_parameters \
 	domains/cvalue/cvalue_transfer domains/cvalue/cvalue_init \
 	domains/cvalue/cvalue_specification \
 	domains/cvalue/cvalue_domain \
-	engine/subdivided_evaluation engine/evaluation engine/abstractions \
-	engine/recursion engine/transfer_stmt engine/transfer_specification \
 	partitioning/auto_loop_unroll \
 	partitioning/partition partitioning/partitioning_parameters \
 	partitioning/partitioning_index partitioning/trace_partitioning \
+	engine/subdivided_evaluation engine/evaluation engine/abstractions \
+	engine/recursion engine/transfer_stmt engine/transfer_specification \
 	engine/mem_exec engine/iterator engine/initialization \
 	engine/compute_functions engine/analysis register \
 	domains/taint_domain \

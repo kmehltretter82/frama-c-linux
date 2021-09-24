@@ -37,7 +37,7 @@ module type S = sig
   val assume: state -> stmt -> exp -> bool -> state or_bottom
 
   val call:
-    stmt -> lval option -> exp -> exp list -> pkey -> state ->
+    stmt -> lval option -> exp -> exp list -> state ->
     (pkey*state) list * Eval.cacheable
 
   val check_unspecified_sequence:
@@ -56,7 +56,7 @@ module type S = sig
   }
 
   val compute_call_ref:
-    (stmt -> (loc, value) call -> recursion option -> pkey -> state -> call_result) ref
+    (stmt -> (loc, value) call -> recursion option -> state -> call_result) ref
 end
 
 module Make (Abstract: Abstractions.Eva)

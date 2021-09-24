@@ -164,7 +164,7 @@ module Make (Abstract: Abstractions.Eva) = struct
      is the instruction at which the call takes place, and is used to update
      the statuses of the preconditions of [kf]. If [show_progress] is true,
      the callstack and additional information are printed. *)
-  let compute_using_spec_or_body call_kinstr call recursion pkey state =
+  let compute_using_spec_or_body call_kinstr call recursion state =
     let kf = call.kf in
     Value_results.mark_kf_as_called kf;
     let global = match call_kinstr with Kglobal -> true | _ -> false in
@@ -199,8 +199,7 @@ module Make (Abstract: Abstractions.Eva) = struct
         let vi = Kernel_function.get_vi kf in
         if Cil.is_in_libc vi.vattr then
           Library_functions.warn_unsupported_spec vi.vorig_name;
-        Spec.compute_using_specification ~warn:true
-          call_kinstr call spec (pkey,state),
+        Spec.compute_using_specification ~warn:true call_kinstr call spec state,
         Eval.Cacheable
       | `Def _fundec ->
         Db.Value.Call_Type_Value_Callbacks.apply (`Def, cvalue_state, call_stack);
@@ -216,9 +215,9 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   module MemExec = Mem_exec.Make (Abstract.Val) (Abstract.Dom)
 
-  let compute_and_cache_call stmt call recursion pkey init_state =
+  let compute_and_cache_call stmt call recursion init_state =
     let default () =
-      compute_using_spec_or_body (Kstmt stmt) call recursion pkey init_state
+      compute_using_spec_or_body (Kstmt stmt) call recursion init_state
     in
     if Value_parameters.MemExecAll.get () then
       let args =
@@ -275,14 +274,14 @@ module Make (Abstract: Abstractions.Eva) = struct
     let rest = List.map (fun (e, assgn) -> e, lift_assigned assgn) call.rest in
     { call with arguments; rest }
 
-  let join_states default_key = function
+  let join_states = function
     | [] -> `Bottom
     | (_k,s) :: l  ->
-      `Value (default_key, List.fold_left Abstract.Dom.join s (List.map snd l))
+      `Value (List.fold_left Abstract.Dom.join s (List.map snd l))
 
-  let compute_call_or_builtin stmt call recursion pkey state =
+  let compute_call_or_builtin stmt call recursion state =
     match Builtins.find_builtin_override call.kf with
-    | None -> compute_and_cache_call stmt call recursion pkey state
+    | None -> compute_and_cache_call stmt call recursion state
     | Some (name, builtin, cacheable, spec) ->
       Value_results.mark_kf_as_called call.kf;
       let kinstr = Kstmt stmt in
@@ -295,9 +294,9 @@ module Make (Abstract: Abstractions.Eva) = struct
          as the result of the cvalue builtin will overwrite them. *)
       Locations.Location_Bytes.do_track_garbled_mix false;
       let states = Spec.compute_using_specification
-          ~warn:false kinstr call spec (pkey,state) in
+          ~warn:false kinstr call spec state in
       Locations.Location_Bytes.do_track_garbled_mix true;
-      let final_state = join_states pkey states in
+      let final_state = join_states states in
       let cvalue_state = Abstract.Dom.get_cvalue_or_top state in
       match final_state with
       | `Bottom ->
@@ -305,32 +304,25 @@ module Make (Abstract: Abstractions.Eva) = struct
         Db.Value.Call_Type_Value_Callbacks.apply (`Spec spec, cvalue_state, cs);
         let cacheable = Eval.Cacheable in
         Transfer.{states; cacheable; builtin=true}
-      | `Value (pkey,final_state) ->
+      | `Value final_state ->
         let cvalue_call = get_cvalue_call call in
         let post = Abstract.Dom.get_cvalue_or_top final_state in
         let cvalue_states =
           Builtins.apply_builtin builtin cvalue_call ~pre:cvalue_state ~post
         in
         let insert cvalue_state =
-          pkey,Abstract.Dom.set Cvalue_domain.State.key cvalue_state final_state
+          Partition.Key.zero,
+          Abstract.Dom.set Cvalue_domain.State.key cvalue_state final_state
         in
         let states = List.map insert cvalue_states in
         Transfer.{states; cacheable; builtin=true}
-
-  let recombine_keys compute =
-    fun stmt call recursion pkey state ->
-    let result = compute stmt call recursion Partition.Key.zero state in
-    let recombine (pkey',state') =
-      Partition.Key.recombine pkey pkey', state'
-    in
-    Transfer.{ result with states = List.map recombine result.states }
 
   let compute_call =
     if Abstract.Dom.mem Cvalue_domain.State.key
     && Abstract.Val.mem Main_values.CVal.key
     && Abstract.Loc.mem Main_locations.PLoc.key
-    then recombine_keys compute_call_or_builtin
-    else recombine_keys compute_and_cache_call
+    then compute_call_or_builtin
+    else compute_and_cache_call
 
   let () = Transfer.compute_call_ref := compute_call
 
@@ -347,9 +339,8 @@ module Make (Abstract: Abstractions.Eva) = struct
       let call =
         { kf; callstack = []; arguments = []; rest = []; return = None; }
       in
-      let pkey = Partition.Key.zero in
       let final_result =
-        compute_using_spec_or_body Kglobal call None pkey init_state
+        compute_using_spec_or_body Kglobal call None init_state
       in
       let final_states = List.map snd (final_result.Transfer.states) in
       let final_state = PowersetDomain.(final_states |> of_list |> join) in

@@ -32,7 +32,7 @@ module type S = sig
   val assign: state -> kinstr -> lval -> exp -> state or_bottom
   val assume: state -> stmt -> exp -> bool -> state or_bottom
   val call:
-    stmt -> lval option -> exp -> exp list -> pkey -> state ->
+    stmt -> lval option -> exp -> exp list -> state ->
     (pkey*state) list * Eval.cacheable
   val check_unspecified_sequence:
     stmt ->
@@ -45,7 +45,7 @@ module type S = sig
     builtin: bool;
   }
   val compute_call_ref:
-    (stmt -> (loc, value) call -> recursion option -> pkey -> state ->
+    (stmt -> (loc, value) call -> recursion option -> state ->
      call_result) ref
 end
 
@@ -306,13 +306,13 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   (* Forward reference to [Eval_funs.compute_call] *)
   let compute_call_ref :
-    (stmt -> (loc, value) call -> recursion option -> pkey -> state ->
+    (stmt -> (loc, value) call -> recursion option -> state ->
      call_result) ref
     = ref (fun _ -> assert false)
 
   (* Returns the result of a call, and a boolean that indicates whether a
      builtin has been used to interpret the call. *)
-  let process_call stmt call recursion valuation pkey state =
+  let process_call stmt call recursion valuation state =
     Value_util.push_call_stack call.kf (Kstmt stmt);
     let cleanup () =
       Value_util.pop_call_stack ();
@@ -326,7 +326,7 @@ module Make (Abstract: Abstractions.Eva) = struct
         match Domain.start_call stmt call recursion domain_valuation state with
         | `Value state ->
           Domain.Store.register_initial_state (Value_util.call_stack ()) state;
-          !compute_call_ref stmt call recursion pkey state
+          !compute_call_ref stmt call recursion state
         | `Bottom ->
           { states = []; cacheable = Cacheable; builtin=false }
       in
@@ -459,11 +459,11 @@ module Make (Abstract: Abstractions.Eva) = struct
     Kernel_function.get_formals kf @ locals
 
   (* Do the call to one function. *)
-  let do_one_call valuation stmt lv call recursion key state =
+  let do_one_call valuation stmt lv call recursion state =
     let kf_callee = call.kf in
     let pre = state in
     (* Process the call according to the domain decision. *)
-    let call_result = process_call stmt call recursion valuation key state in
+    let call_result = process_call stmt call recursion valuation state in
     let leaving_vars = leaving_vars kf_callee in
     (* Do not try to reduce concrete arguments if a builtin was used. *)
     let gather_reduced_arguments =
@@ -739,7 +739,7 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   (* --------------------- Process the call statement ---------------------- *)
 
-  let call stmt lval_option funcexp args pkey state =
+  let call stmt lval_option funcexp args state =
     let ki_call = Kstmt stmt in
     let subdivnb = subdivide_stmt stmt in
     (* Resolve [funcexp] into the called kernel functions. *)
@@ -756,7 +756,7 @@ module Make (Abstract: Abstractions.Eva) = struct
         if apply_special_directives ~subdivnb kf args state
         then
           let () = apply_cvalue_callback kf ki_call state in
-          [(pkey,state)]
+          [(Partition.Key.zero,state)]
         else
           (* Create the call. *)
           let eval, alarms = make_call ~subdivnb kf args valuation state in
@@ -766,7 +766,7 @@ module Make (Abstract: Abstractions.Eva) = struct
             Value_results.add_kf_caller call.kf ~caller:(current_kf, stmt);
             (* Do the call. *)
             let c, states =
-              do_one_call valuation stmt lval_option call recursion pkey state
+              do_one_call valuation stmt lval_option call recursion state
             in
             (* If needed, propagate that callers cannot be cached. *)
             if c = NoCacheCallers then
