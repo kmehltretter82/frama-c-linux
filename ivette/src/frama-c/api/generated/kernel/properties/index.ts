@@ -38,6 +38,14 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
+import { bySource } from 'frama-c/api/kernel/ast';
+//@ts-ignore
+import { jSource } from 'frama-c/api/kernel/ast';
+//@ts-ignore
+import { jSourceSafe } from 'frama-c/api/kernel/ast';
+//@ts-ignore
+import { source } from 'frama-c/api/kernel/ast';
+//@ts-ignore
 import { byTag } from 'frama-c/api/kernel/data';
 //@ts-ignore
 import { jTag } from 'frama-c/api/kernel/data';
@@ -45,14 +53,6 @@ import { jTag } from 'frama-c/api/kernel/data';
 import { jTagSafe } from 'frama-c/api/kernel/data';
 //@ts-ignore
 import { tag } from 'frama-c/api/kernel/data';
-//@ts-ignore
-import { bySource } from 'frama-c/api/kernel/services';
-//@ts-ignore
-import { jSource } from 'frama-c/api/kernel/services';
-//@ts-ignore
-import { jSourceSafe } from 'frama-c/api/kernel/services';
-//@ts-ignore
-import { source } from 'frama-c/api/kernel/services';
 
 /** Property Kinds */
 export enum propKind {

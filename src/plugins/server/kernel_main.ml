@@ -84,51 +84,6 @@ let () =
        try Project.save_all (Filepath.Normalized.of_string file); None
        with Project.IOError err -> Some err)
 
-(* -------------------------------------------------------------------------- *)
-(* --- File Positions                                                     --- *)
-(* -------------------------------------------------------------------------- *)
-
-module LogSource =
-struct
-  type t = Filepath.position
-
-  let jtype = Data.declare ~package ~name:"source"
-      ~descr:(Md.plain "Source file positions.")
-      (Jrecord [
-          "dir", Jstring;
-          "base", Jstring;
-          "file", Jstring;
-          "line", Jnumber;
-        ])
-
-  let to_json p =
-    let path = Filepath.(Normalized.to_pretty_string p.pos_path) in
-    let file =
-      if Server_parameters.has_relative_filepath ()
-      then path
-      else (p.Filepath.pos_path :> string)
-    in
-    `Assoc [
-      "dir"  , `String (Filename.dirname path) ;
-      "base" , `String (Filename.basename path) ;
-      "file" , `String file ;
-      "line" , `Int p.Filepath.pos_lnum ;
-    ]
-
-  let of_json js =
-    let fail () = failure_from_type_error "Invalid source format" js in
-    match js with
-    | `Assoc assoc ->
-      begin
-        match List.assoc "file" assoc, List.assoc "line" assoc with
-        | `String path, `Int line ->
-          Log.source ~file:(Filepath.Normalized.of_string path) ~line
-        | _, _ -> fail ()
-        | exception Not_found -> fail ()
-      end
-    | _ -> fail ()
-
-end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Log Lind                                                           --- *)
@@ -194,8 +149,24 @@ let () = States.option model ~name:"category"
 
 let () = States.option model ~name:"source"
     ~descr:(Md.plain "Source file position")
-    ~data:(module LogSource)
+    ~data:(module Kernel_ast.Position)
     ~get:(fun (evt, _) -> evt.Log.evt_source)
+
+let getMarker (evt, _id) =
+  Option.bind evt.Log.evt_source Printer_tag.loc_to_localizable
+
+let getFunction t =
+  Option.bind (getMarker t) Printer_tag.kf_of_localizable
+
+let () = States.option model ~name:"marker"
+    ~descr:(Md.plain "Marker at the message position (if any)")
+    ~data:(module Kernel_ast.Marker)
+    ~get:getMarker
+
+let () = States.option model ~name:"fct"
+    ~descr:(Md.plain "Function containing the message position (if any)")
+    ~data:(module Kernel_ast.Kf)
+    ~get:getFunction
 
 let iter f = ignore (Messages.fold (fun i evt -> f (evt, i); succ i) 0)
 
@@ -229,7 +200,7 @@ struct
   let category = Record.option jlog ~name:"category"
       ~descr:(Md.plain "Message category (DEBUG or WARNING)") (module Jstring)
   let source = Record.option jlog ~name:"source"
-      ~descr:(Md.plain "Source file position") (module LogSource)
+      ~descr:(Md.plain "Source file position") (module Kernel_ast.Position)
 
   let data = Record.publish ~package ~name:"log"
       ~descr:(Md.plain "Message event record.") jlog

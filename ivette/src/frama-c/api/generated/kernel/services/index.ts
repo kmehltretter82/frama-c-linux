@@ -38,6 +38,22 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
+import { byMarker } from 'frama-c/api/kernel/ast';
+//@ts-ignore
+import { bySource } from 'frama-c/api/kernel/ast';
+//@ts-ignore
+import { jMarker } from 'frama-c/api/kernel/ast';
+//@ts-ignore
+import { jMarkerSafe } from 'frama-c/api/kernel/ast';
+//@ts-ignore
+import { jSource } from 'frama-c/api/kernel/ast';
+//@ts-ignore
+import { jSourceSafe } from 'frama-c/api/kernel/ast';
+//@ts-ignore
+import { marker } from 'frama-c/api/kernel/ast';
+//@ts-ignore
+import { source } from 'frama-c/api/kernel/ast';
+//@ts-ignore
 import { byTag } from 'frama-c/api/kernel/data';
 //@ts-ignore
 import { jTag } from 'frama-c/api/kernel/data';
@@ -86,33 +102,6 @@ const save_internal: Server.SetRequest<string,string | undefined> = {
 };
 /** Save the current session. Returns an error, if not successfull. */
 export const save: Server.SetRequest<string,string | undefined>= save_internal;
-
-/** Source file positions. */
-export type source =
-  { dir: string, base: string, file: string, line: number };
-
-/** Loose decoder for `source` */
-export const jSource: Json.Loose<source> =
-  Json.jObject({
-    dir: Json.jFail(Json.jString,'String expected'),
-    base: Json.jFail(Json.jString,'String expected'),
-    file: Json.jFail(Json.jString,'String expected'),
-    line: Json.jFail(Json.jNumber,'Number expected'),
-  });
-
-/** Safe decoder for `source` */
-export const jSourceSafe: Json.Safe<source> =
-  Json.jFail(jSource,'Source expected');
-
-/** Natural order for `source` */
-export const bySource: Compare.Order<source> =
-  Compare.byFields
-    <{ dir: string, base: string, file: string, line: number }>({
-    dir: Compare.string,
-    base: Compare.string,
-    file: Compare.string,
-    line: Compare.number,
-  });
 
 /** Log messages categories. */
 export enum logkind {
@@ -164,6 +153,10 @@ export interface messageData {
   category?: string;
   /** Source file position */
   source?: source;
+  /** Marker at the message position (if any) */
+  marker?: marker;
+  /** Function containing the message position (if any) */
+  fct?: Json.key<'#fct'>;
 }
 
 /** Loose decoder for `messageData` */
@@ -175,6 +168,8 @@ export const jMessageData: Json.Loose<messageData> =
     message: Json.jFail(Json.jString,'String expected'),
     category: Json.jString,
     source: jSource,
+    marker: jMarker,
+    fct: Json.jKey<'#fct'>('#fct'),
   });
 
 /** Safe decoder for `messageData` */
@@ -185,13 +180,16 @@ export const jMessageDataSafe: Json.Safe<messageData> =
 export const byMessageData: Compare.Order<messageData> =
   Compare.byFields
     <{ key: Json.key<'#message'>, kind: logkind, plugin: string,
-       message: string, category?: string, source?: source }>({
+       message: string, category?: string, source?: source, marker?: marker,
+       fct?: Json.key<'#fct'> }>({
     key: Compare.string,
     kind: byLogkind,
     plugin: Compare.alpha,
     message: Compare.string,
     category: Compare.defined(Compare.string),
     source: Compare.defined(bySource),
+    marker: Compare.defined(byMarker),
+    fct: Compare.defined(Compare.string),
   });
 
 /** Signal for array [`message`](#message)  */

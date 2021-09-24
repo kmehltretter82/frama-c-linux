@@ -42,7 +42,7 @@ import { Scroll, Folder } from 'dome/layout/boxes';
 
 import { RSplit } from 'dome/layout/splitters';
 
-import { source as SourceLoc } from 'frama-c/api/kernel/services';
+import * as Ast from 'frama-c/api/kernel/ast';
 import { statusData } from 'frama-c/api/kernel/properties';
 import * as Properties from 'frama-c/api/kernel/properties';
 import * as Eva from 'frama-c/api/plugins/eva/general';
@@ -245,13 +245,13 @@ const renderNames: Renderer<string[]> =
     return (label ? <Label label={label} /> : null);
   };
 
-const renderDir: Renderer<SourceLoc> =
-  (loc: SourceLoc) => (
+const renderDir: Renderer<Ast.source> =
+  (loc: Ast.source) => (
     <Code className="code-column" label={loc.dir} title={loc.file} />
   );
 
-const renderFile: Renderer<SourceLoc> =
-  (loc: SourceLoc) => (
+const renderFile: Renderer<Ast.source> =
+  (loc: Ast.source) => (
     <Code className="code-column" label={loc.base} title={loc.file} />
   );
 
@@ -286,7 +286,7 @@ function ColumnTag<Row>(props: ColumnProps<Row, States.Tag>) {
 // -------------------------------------------------------------------------
 
 const bySource =
-  Compare.byFields<SourceLoc>({ file: Compare.alpha, line: Compare.number });
+  Compare.byFields<Ast.source>({ file: Compare.alpha, line: Compare.number });
 
 const byStatus =
   Compare.byRank(
@@ -327,8 +327,8 @@ const byProperty: Compare.ByFields<Property> = {
   taint: byTaint,
 };
 
-const byDir = Compare.byFields<SourceLoc>({ dir: Compare.alpha });
-const byFile = Compare.byFields<SourceLoc>({ base: Compare.alpha });
+const byDir = Compare.byFields<Ast.source>({ dir: Compare.alpha });
+const byFile = Compare.byFields<Ast.source>({ base: Compare.alpha });
 
 const byColumn: Arrays.ByColumns<Property> = {
   dir: Compare.byFields<Property>({ source: byDir }),
