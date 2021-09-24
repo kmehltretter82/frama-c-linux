@@ -56,7 +56,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Check 'FAILS' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 126):
-Assume { (* Heap *) Type: cinits(Init_0). }
+Assume { (* Heap *) Type: (region(G_glob_82) <= 0) /\ cinits(Init_0). }
 Prove: IsInit_S1_S(global(G_glob_82), Init_0).
 
 ------------------------------------------------------------
@@ -68,7 +68,8 @@ Let a_1 = havoc(Init_undef_0, Init_0[shiftfield_F1_S_i(pg_0) <- true],
 Assume {
   Type: is_sint32(i) /\ is_sint32(1 + i).
   (* Heap *)
-  Type: (region(pg_0.base) <= 0) /\ cinits(Init_0).
+  Type: (region(G_glob_82) <= 0) /\ (region(pg_0.base) <= 0) /\
+      cinits(Init_0).
   (* Loop assigns 'CHECK' *)
   Have: cinits(a_1).
   (* Invariant 'CHECK' *)
@@ -97,7 +98,8 @@ Let a_2 = havoc(Init_undef_1, m, shift_sint32(a_1, 0), 10).
 Assume {
   Type: is_sint32(i) /\ is_sint32(i_1).
   (* Heap *)
-  Type: (region(pg_0.base) <= 0) /\ cinits(Init_0).
+  Type: (region(G_glob_82) <= 0) /\ (region(pg_0.base) <= 0) /\
+      cinits(Init_0).
   (* Loop assigns 'CHECK' *)
   Have: cinits(a_2).
   (* Invariant 'CHECK' *)
@@ -125,7 +127,8 @@ Let a_2 = havoc(Init_undef_1, m, shift_sint32(a_1, 0), 10).
 Assume {
   Type: is_sint32(i) /\ is_sint32(i_1).
   (* Heap *)
-  Type: (region(pg_0.base) <= 0) /\ cinits(Init_0).
+  Type: (region(G_glob_82) <= 0) /\ (region(pg_0.base) <= 0) /\
+      cinits(Init_0).
   (* Loop assigns 'CHECK' *)
   Have: cinits(a_2).
   (* Invariant 'CHECK' *)
@@ -178,7 +181,8 @@ Effect at line 139
 Assume {
   Type: is_sint32(i_1) /\ is_sint32(i).
   (* Heap *)
-  Type: (region(pg_0.base) <= 0) /\ linked(Malloc_0).
+  Type: (region(G_glob_82) <= 0) /\ (region(pg_0.base) <= 0) /\
+      linked(Malloc_0).
   (* Goal *)
   When: !invalid(Malloc_0, shift_sint32(shiftfield_F1_S_a(pg_0), i), 1).
   (* Invariant 'CHECK' *)

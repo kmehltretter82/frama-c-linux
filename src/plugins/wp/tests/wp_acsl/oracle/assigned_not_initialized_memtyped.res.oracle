@@ -31,7 +31,8 @@ Let a_1 = havoc(Init_undef_0, a, shift_sint32(pg_array_0, 0), 10).
 Assume {
   Type: is_sint32(i).
   (* Heap *)
-  Type: (region(pg_array_0.base) <= 0) /\ cinits(Init_0).
+  Type: (region(G_glob_array_51) <= 0) /\ (region(pg_array_0.base) <= 0) /\
+      cinits(Init_0).
   (* Loop assigns ... *)
   Have: cinits(a) /\ cinits(a_1).
   (* Else *)
@@ -48,7 +49,8 @@ Let a_2 = havoc(Init_undef_0, a_1, shift_sint32(pg_array_0, 0), 10).
 Assume {
   Type: is_sint32(i).
   (* Heap *)
-  Type: (region(pg_array_0.base) <= 0) /\ cinits(Init_0).
+  Type: (region(G_glob_array_51) <= 0) /\ (region(pg_array_0.base) <= 0) /\
+      cinits(Init_0).
   (* Loop assigns ... *)
   Have: cinits(a_1) /\ cinits(a_2).
   (* Else *)
@@ -62,7 +64,13 @@ Prove: IsInitArray_sint32(a, 10, a_2).
 ------------------------------------------------------------
 
 Goal Check 'FAIL' (file tests/wp_acsl/assigned_not_initialized_memtyped.i, line 38):
-Assume { Type: is_sint32(i_1). (* Else *) Have: 10 <= i_1. }
+Assume {
+  Type: is_sint32(i_1).
+  (* Heap *)
+  Type: region(G_glob_atomic_39) <= 0.
+  (* Else *)
+  Have: 10 <= i_1.
+}
 Prove: (i=true).
 
 ------------------------------------------------------------
@@ -74,7 +82,8 @@ Let m_1 = m[pg_atomic_0 <- i_1].
 Assume {
   Type: is_sint32(i_2).
   (* Heap *)
-  Type: (region(pg_atomic_0.base) <= 0) /\ cinits(Init_0).
+  Type: (region(G_glob_atomic_39) <= 0) /\ (region(pg_atomic_0.base) <= 0) /\
+      cinits(Init_0).
   (* Loop assigns ... *)
   Have: cinits(m) /\ cinits(m_1).
   (* Else *)
@@ -93,7 +102,8 @@ Let a_1 = havoc(Init_undef_0, a, pg_comp_0, 11).
 Assume {
   Type: is_sint32(i).
   (* Heap *)
-  Type: (region(pg_comp_0.base) <= 0) /\ cinits(Init_0).
+  Type: (region(G_glob_comp_45) <= 0) /\ (region(pg_comp_0.base) <= 0) /\
+      cinits(Init_0).
   (* Loop assigns ... *)
   Have: cinits(a) /\ cinits(a_1).
   (* Else *)
@@ -110,7 +120,8 @@ Let a_2 = havoc(Init_undef_0, a_1, pg_comp_0, 11).
 Assume {
   Type: is_sint32(i).
   (* Heap *)
-  Type: (region(pg_comp_0.base) <= 0) /\ cinits(Init_0).
+  Type: (region(G_glob_comp_45) <= 0) /\ (region(pg_comp_0.base) <= 0) /\
+      cinits(Init_0).
   (* Loop assigns ... *)
   Have: cinits(a_1) /\ cinits(a_2).
   (* Else *)

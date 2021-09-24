@@ -17,6 +17,11 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Pre-condition 'r_is_q1_ko' in 'main':
-Prove: shift_sint32(addr_of_int(26352), 1) = addr_of_int(26360).
+Let a = addr_of_int(26352).
+Assume {
+  (* Heap *)
+  Type: (region(addr_of_int(13311).base) <= 0) /\ (region(a.base) <= 0).
+}
+Prove: shift_sint32(a, 1) = addr_of_int(26360).
 
 ------------------------------------------------------------
