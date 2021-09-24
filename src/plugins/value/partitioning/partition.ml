@@ -243,15 +243,15 @@ struct
 
   let exceed_rationing key = key.ration_stamp = None
 
-  let recombine k1 k2 =
+  let recombine ~history_size k1 k2 =
     let merge_split _ v1 v2 =
       match v1, v2 with
       | None, None -> None
       | Some v, None | None, Some v -> Some v
       | Some _v1, Some v2 -> Some v2 (* Keep the newest split value *)
     in {
-      ration_stamp = k2.ration_stamp;
-      branches = k2.branches @ k1.branches;
+      ration_stamp = None;
+      branches = Extlib.list_first_n history_size (k2.branches @ k1.branches);
       loops = k1.loops;
       splits = SplitMap.merge merge_split k1.splits k2.splits;
       dynamic_splits =

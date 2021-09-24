@@ -23,7 +23,6 @@
 [eva] Recording results for cassign
 [eva] Done for function cassign
 [eva] tests/value/partitioning-interproc.c:32: Frama_C_show_each: {1}
-[eva] tests/value/partitioning-interproc.c:32: Frama_C_show_each: {1}
 [eva] Recording results for cassign_test
 [eva] done for function cassign_test
 [eva] ====== VALUES COMPUTED ======

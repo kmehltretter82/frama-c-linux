@@ -45,7 +45,8 @@ module Key : sig
   include Datatype.S_with_collections with type t = key
   val zero : t (** Initial key: no partitioning. *)
   val exceed_rationing: t -> bool
-  val recombine : t -> t -> t (** Recombinaison of keys after a call *)
+  val recombine : history_size:int ->
+    t -> t -> t (** Recombinaison of keys after a call *)
 end
 
 (** Collection of states, each identified by a unique key. *)

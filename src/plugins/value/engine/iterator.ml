@@ -88,9 +88,10 @@ module Make_Dataflow
 
   (* Ideally, the slevel parameter should not be used anymore in this file
      but it is still required for logic interpretation *)
-  let slevel =
+  let slevel, history_size =
     let module P = Partitioning_parameters.Make (AnalysisParam) in
-    P.slevel
+    P.slevel,
+    P.history_size
 
 
   (* --- Abstract values storage --- *)
@@ -281,7 +282,8 @@ module Make_Dataflow
       (* Propagate info that the current call cannot be cached either *)
       cacheable := Eval.NoCacheCallers;
     (* Recombine callee partitioning keys with caller key *)
-    List.map (fun (k,s) -> Partition.Key.recombine key k, s) result
+    let recombine = Partition.Key.recombine ~history_size in
+    List.map (fun (k,s) -> recombine key k, s) result
 
   let transfer_instr (stmt : stmt) (instr : instr) : transfer_function =
     match instr with
