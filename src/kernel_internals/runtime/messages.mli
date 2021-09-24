@@ -20,12 +20,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Stored messages for persistence between sessions.
-    Currently, only warning and error messages are stored. *)
+(** Stored messages for persistence between sessions. *)
 
 val iter: (Log.event -> unit) -> unit
 (** Iter over all stored messages. The messages are passed in emission order.
     @modify Nitrogen-20111001  Messages are now passed in emission order. *)
+
+val fold: ('a -> Log.event -> 'a) -> 'a -> 'a
+(** Fold over all stored messages. The messages are passed in emission order. *)
 
 val dump_messages: unit -> unit
 (** Dump stored messages to standard channels *)

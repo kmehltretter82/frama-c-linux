@@ -880,7 +880,9 @@ module type Queue = sig
   val self: State.t
   val add: elt -> unit
   val iter: (elt -> unit) -> unit
+  val fold: ('a -> elt -> 'a) -> 'a -> 'a
   val is_empty: unit -> bool
+  val length: unit -> int
 end
 
 module Queue(Data: Datatype.S)(Info: Info) = struct
@@ -913,7 +915,9 @@ module Queue(Data: Datatype.S)(Info: Info) = struct
 
   let add x = Queue.add x !state
   let iter f = Queue.iter f !state
+  let fold f acc = Queue.fold f acc !state
   let is_empty () = Queue.is_empty !state
+  let length () = Queue.length !state
 
 end
 
