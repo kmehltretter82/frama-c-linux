@@ -1697,7 +1697,7 @@ class main_window () : main_window_extension_points =
         let callback e _column =
           Option.iter
             (fun pos ->
-               Option.iter self#scroll (Pretty_source.loc_to_localizable pos);
+               Option.iter self#scroll (Printer_tag.loc_to_localizable pos);
                (* Note: the code below generates double scrolling:
                   the previous call to self#scroll causes the original source
                   viewer to scroll to the beginning of the function, and then

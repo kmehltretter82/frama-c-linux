@@ -276,7 +276,7 @@ let translate_history_elt old_helt =
                        Filepath.pos_cnum = old_loc.Filepath.pos_cnum;
                       }
         in
-        match Pretty_source.loc_to_localizable new_loc with
+        match Printer_tag.loc_to_localizable new_loc with
         | None -> (** the line is unknown *)
           Some (Global g)
         | Some locali ->
