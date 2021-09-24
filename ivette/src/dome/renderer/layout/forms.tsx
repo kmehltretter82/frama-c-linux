@@ -598,7 +598,7 @@ export function Field(props: GenericFieldProps) {
       >
         {label}
       </label>
-      <div className={cssField}>
+      <div className={cssField} title={title}>
         {children}
         {WARNING}
       </div>
