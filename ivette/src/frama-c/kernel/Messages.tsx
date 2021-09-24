@@ -139,7 +139,6 @@ function searchString(search: string | undefined, msg: string) {
     const exact = search.slice(1, -1);
     return msg.includes(exact);
   }
-
   const message = msg.toLowerCase();
   const array = search.toLowerCase().split(' ');
   let show = true;
@@ -148,7 +147,6 @@ function searchString(search: string | undefined, msg: string) {
       show = false;
   });
   return show;
-
 }
 
 function filterSearched(search: Search, msg: Message) {
@@ -197,7 +195,11 @@ function MessageFilter(props: {filter: Forms.FieldState<Filter>}) {
           title="Only show messages emitted at the current function"
           state={Forms.useProperty(state, 'currentFct')}
         />
-        <Forms.Section label="Search" unfold>
+        <Forms.Section
+          label="Search"
+          unfold
+          settings="ivette.messages.search"
+        >
           <Forms.TextField
             label="Category"
             state={categoryState}
@@ -214,7 +216,11 @@ function MessageFilter(props: {filter: Forms.FieldState<Filter>}) {
                  + 'Use "text" for an exact case-sensitive search.'}
           />
         </Forms.Section>
-        <Forms.Section label="Kind" unfold>
+        <Forms.Section
+          label="Kind"
+          unfold
+          settings="ivette.messages.filterKind"
+        >
           <Forms.CheckboxField label="Result" state={kindState('result')} />
           <Forms.CheckboxField label="Feedback" state={kindState('feedback')} />
           <Forms.CheckboxField label="Debug" state={kindState('debug')} />
@@ -222,7 +228,11 @@ function MessageFilter(props: {filter: Forms.FieldState<Filter>}) {
           <Forms.CheckboxField label="Error" state={kindState('error')} />
           <Forms.CheckboxField label="Failure" state={kindState('failure')} />
         </Forms.Section>
-        <Forms.Section label="Emitter" unfold>
+        <Forms.Section
+          label="Emitter"
+          unfold
+          settings="ivette.messages.filterEmitter"
+        >
           <Forms.CheckboxField label="Kernel" state={pluginState('kernel')} />
           <Forms.CheckboxField label="Server" state={pluginState('server')} />
           <Forms.CheckboxField label="Eva" state={pluginState('eva')} />
