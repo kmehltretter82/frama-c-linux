@@ -482,15 +482,6 @@ type loop_contract = {
   loop_assigns: WpPropId.assigns_full_info list;
 }
 
-let reverse_loop_contract l = {
-  loop_terminates = l.loop_terminates ;
-  loop_established = List.rev l.loop_established ;
-  loop_invariants = List.rev l.loop_invariants ;
-  loop_preserved = List.rev l.loop_preserved ;
-  loop_assigns = List.rev l.loop_assigns ;
-  loop_smoke = List.rev l.loop_smoke ;
-}
-
 let default_assigns stmt l =
   { l with
     loop_assigns =
@@ -508,7 +499,6 @@ module LoopContract = WpContext.StaticGenerator(CodeKey)
         let normalize_annot (i,p) = i, normalize_pred p in
         let normalize_assigns w = NormAtLabels.preproc_assigns labels w in
         default_assigns stmt @@
-        reverse_loop_contract @@
         Annotations.fold_code_annot
           begin fun _emitter ca l ->
             match ca.annot_content with
