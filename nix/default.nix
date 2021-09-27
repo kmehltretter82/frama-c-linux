@@ -12,29 +12,14 @@ let mydir = builtins.getEnv("PWD");
        };
    mk-opam-selection = { name, opamSrc?{}, ... }: {
       inherit ocaml;
-      src = { why3 = why3; why3-coq = why3; } // opamSrc;
-      override = { pkgs, selection}:
-        { why3 = super: super.overrideAttrs (attrs:
-        { prePatch = "ln -s opam/why3.opam why3.opam; " + attrs.prePatch;
-          configurePhase = "autoconf; ";
-          buildInputs = [ pkgs.autoconf ];
-        });
-          why3-coq = super: super.overrideAttrs (attrs: 
-              {
-                prePatch = "ln -s opam/why3-coq.opam why3-coq.opam; " + attrs.prePatch;
-                buildPhase = "autoconf; " + attrs.buildPhase;
-                buildInputs = [ pkgs.autoconf ];
-              }  
-          );
-        }
-      ;
+      src = opamSrc;
       selection = "${mydir}/${name}-${ocaml.version}-opam-selection.nix";
     };
      opamPackages =
       [ "ocamlfind" "zarith" "ocamlgraph" "yojson" "zmq"
         "ppx_deriving" "ppx_deriving_yojson"
         "coq=8.13.0" "alt-ergo=2.2.0"
-        "${why3}/opam/why3.opam" "${why3}/opam/why3-coq.opam"
+        "why3=1.4.0" "why3-coq=1.4.0"
       ];
     # only pure nix packages. See mk_deriv below for adding opam2nix packages
     mk_buildInputs = { nixPackages ? [] } :
