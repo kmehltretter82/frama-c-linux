@@ -5,7 +5,7 @@ let
     src = builtins.fetchGit {
             "url" = "https://bobot:${password}@git.frama-c.com/frama-c/Frama-CI.git";
             "name" = "Frama-CI";
-            "rev" = "738ec3236ef5217ee68fabad869f217b37410430";
+            "rev" = "bb2c9632abbb651363f2070d1cd89bc25cff5249";
             "ref" = "fix/interface-files";
     };
     pkgs = import "${src}/pkgs.nix" {};
