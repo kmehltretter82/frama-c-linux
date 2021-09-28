@@ -216,7 +216,8 @@ struct
       ~name:"markerInfo"
       ~descr:(Md.plain "Marker informations")
       ~key:snd ~keyType:Jstring
-      ~iter model
+      ~iter ~add_reload_hook:ast_update_hook
+      model
 
   let create_tag = function
     | PStmt(_,s) -> Printf.sprintf "#s%d" s.sid
