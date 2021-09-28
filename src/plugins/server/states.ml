@@ -209,18 +209,14 @@ let reload array =
 let update array k =
   let m = content array in
   if not m.cleared then
-    begin
-      m.updates <- Kmap.add (array.key k) (Add k) m.updates ;
-      Request.emit array.signal ;
-    end
+    m.updates <- Kmap.add (array.key k) (Add k) m.updates ;
+  Request.emit array.signal
 
 let remove array k =
   let m = content array in
   if not m.cleared then
-    begin
-      m.updates <- Kmap.add (array.key k) Remove m.updates ;
-      Request.emit array.signal ;
-    end
+    m.updates <- Kmap.add (array.key k) Remove m.updates ;
+  Request.emit array.signal
 
 let signal array = array.signal
 
