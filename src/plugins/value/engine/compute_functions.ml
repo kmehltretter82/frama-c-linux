@@ -203,7 +203,9 @@ module Make (Abstract: Abstractions.Eva) = struct
         Eval.Cacheable
       | `Def _fundec ->
         Db.Value.Call_Type_Value_Callbacks.apply (`Def, cvalue_state, call_stack);
-        Computer.compute kf call_kinstr state
+        let result = Computer.compute kf call_kinstr state in
+        Summary.FunctionStats.recompute kf;
+        result
     in
     if pp then
       Value_parameters.feedback
@@ -349,7 +351,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       Abstract.Dom.Store.mark_as_computed ();
       post_analysis ();
       Abstract.Dom.post_analysis final_state;
-      Value_results.print_summary ();
+      Summary.print_summary ();
       restore_signals ()
     in
     let cleanup () =

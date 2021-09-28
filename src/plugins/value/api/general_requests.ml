@@ -241,7 +241,7 @@ module AlarmCategory = struct
       let e = List.hd Cil_datatype.Exp.reprs in
       let lv = List.hd Cil_datatype.Lval.reprs in
       function
-      | Value_results.Division_by_zero -> Alarms.Division_by_zero e
+      | Summary.Division_by_zero -> Alarms.Division_by_zero e
       | Memory_access -> Memory_access (lv, For_reading)
       | Index_out_of_bound-> Index_out_of_bound (e, None)
       | Invalid_shift -> Invalid_shift (e, None)
@@ -254,7 +254,7 @@ module AlarmCategory = struct
 
     let register alarm_category =
       let name, descr = match alarm_category with
-        | Value_results.Other -> "other", "Any other alarm"
+        | Summary.Other -> "other", "Any other alarm"
         | alarm_category ->
           let alarm = repr alarm_category in
           Alarms.(get_short_name alarm, get_description alarm)
@@ -277,7 +277,7 @@ module AlarmCategory = struct
 
     let () = Enum.set_lookup dictionary
         begin function
-          | Value_results.Division_by_zero -> division_by_zero
+          | Summary.Division_by_zero -> division_by_zero
           | Memory_access -> memory_access
           | Index_out_of_bound -> index_out_of_bound
           | Invalid_shift -> invalid_shift
@@ -295,12 +295,13 @@ module AlarmCategory = struct
       "The alarms are counted after being grouped by these categories"
   let data = Request.dictionary ~package ~name ~descr Tags.dictionary
 
-  include (val data : S with type t = Value_results.alarm_category)
+  include (val data : S with type t = Summary.alarm_category)
 end
 
-module CoverageEntry =
+module Coverage =
 struct
-  open Value_results
+  open Summary
+  type t = coverage
   let jtype = Package.(
       Jrecord [
         "reachable",Jnumber ;
@@ -312,23 +313,9 @@ struct
     ]
 end
 
-module Coverage =
+module Events =
 struct
-  open Value_results
-  let jtype = Package.(
-      Jrecord [
-        "functions",CoverageEntry.jtype ;
-        "statements",CoverageEntry.jtype ;
-      ])
-  let to_json x = `Assoc [
-      "functions", CoverageEntry.to_json x.functions ;
-      "statements", CoverageEntry.to_json x.statements ;
-    ]
-end
-
-module EventCount =
-struct
-  open Value_results
+  open Summary
   let jtype = Package.(
       Jrecord [
         "errors",Jnumber ;
@@ -340,9 +327,9 @@ struct
     ]
 end
 
-module StatusesEntry =
+module Statuses =
 struct
-  open Value_results
+  open Summary
   let jtype =
     Data.declare ~package
       ~name:"statusesEntry"
@@ -359,55 +346,88 @@ struct
     ]
 end
 
-module Statuses =
+module AlarmEntry =
 struct
-  open Value_results
-  let jtype = Package.(
-      Jrecord [
-        "alarms",StatusesEntry.jtype ;
-        "assertions",StatusesEntry.jtype ;
-        "preconds",StatusesEntry.jtype ;
-      ])
-  let to_json (x : statuses) = `Assoc [
-      "alarms", StatusesEntry.to_json x.alarms ;
-      "assertions", StatusesEntry.to_json x.assertions ;
-      "preconds", StatusesEntry.to_json x.preconds ;
-    ]
+  let jtype =
+    Data.declare ~package
+      ~name:"alarmEntry"
+      ~descr:(Markdown.plain "Alarm count for each alarm category.")
+      Package.(Jrecord [
+          "category", AlarmCategory.jtype ;
+          "count", Jnumber ])
+  let to_json (a,c) =  `Assoc [
+      "category", AlarmCategory.to_json a ;
+      "count", `Int c ]
+end
+
+module Alarms =
+struct
+  type t = (AlarmCategory.t * int) list
+  let jtype = Package.Jlist AlarmEntry.jtype
+  let to_json x = `List (List.map AlarmEntry.to_json x)
 end
 
 module Statistics = struct
-  open Value_results
-  type t = stats
+  open Summary
+  type t = program_stats
   let jtype =
     Data.declare ~package
-      ~name:"statistics"
+      ~name:"programStatsType"
       ~descr:(Markdown.plain "Statistics about an Eva analysis.")
       Package.(Jrecord [
-          "coverage",Coverage.jtype ;
-          "eva_events",EventCount.jtype ;
-          "kernel_events",EventCount.jtype ;
-          "statuses",Statuses.jtype ;
-          "alarms",Jlist (Jrecord [
-              "category", AlarmCategory.jtype ;
-              "count", Jnumber ])])
+          "progFunCoverage",Coverage.jtype ;
+          "progStmtCoverage",Coverage.jtype ;
+          "progAlarms", Alarms.jtype ;
+          "evaEvents",Events.jtype ;
+          "kernelEvents",Events.jtype ;
+          "alarmsStatuses",Statuses.jtype ;
+          "assertionsStatuses",Statuses.jtype ;
+          "precondsStatuses",Statuses.jtype ])
   let to_json x = `Assoc [
-      "coverage", Coverage.to_json x.coverage ;
-      "eva_events", EventCount.to_json x.eva_events ;
-      "kernel_events", EventCount.to_json x.kernel_events ;
-      "statuses", Statuses.to_json x.statuses ;
-      "alarms", `List (List.map (fun (a,c) -> `Assoc [
-          "category", AlarmCategory.to_json a ;
-          "count", `Int c ]) (AlarmsStats.bindings x.alarms))]
+      "progFunCoverage", Coverage.to_json x.prog_fun_coverage ;
+      "progStmtCoverage", Coverage.to_json x.prog_stmt_coverage ;
+      "progAlarms", Alarms.to_json x.prog_alarms ;
+      "evaEvents", Events.to_json x.eva_events ;
+      "kernelEvents", Events.to_json x.kernel_events ;
+      "alarmsStatuses", Statuses.to_json x.alarms_statuses ;
+      "assertionsStatuses", Statuses.to_json x.assertions_statuses ;
+      "precondsStatuses", Statuses.to_json x.preconds_statuses ]
 end
 
 let _computed_signal =
   States.register_value ~package
-    ~name:"stats"
-    ~descr:(Markdown.plain "Statistics about the last Eva analysis")
+    ~name:"programStats"
+    ~descr:(Markdown.plain
+              "Statistics about the last Eva analysis for the whole program")
     ~output:(module Statistics)
-    ~get:Value_results.compute_stats
+    ~get:Summary.compute_stats
     ~add_hook:(Analysis.register_computation_hook ~on:Computed)
     ()
+
+let _array =
+  let open Summary in
+  let model = States.model () in
+
+  States.column model ~name:"coverage"
+    ~descr:(Markdown.plain "Coverage of the Eva analysis")
+    ~data:(module Coverage)
+    ~get:(fun (_kf,stats) -> stats.fun_coverage);
+
+  States.column model ~name:"alarms"
+    ~descr:(Markdown.plain "Alarms raised by the Eva analysis")
+    ~data:(module Alarms)
+    ~get:(fun (_kf,stats) -> stats.fun_alarms);
+
+  States.register_array
+    ~package
+    ~name:"functionStats"
+    ~descr:(Markdown.plain
+              "Statistics about the last Eva analysis for each function")
+    ~key:(fun (kf,_stats) -> Kernel_function.get_name kf)
+    ~keyType:Kernel_ast.Kf.jtype
+    ~iter:(fun f -> FunctionStats.iter (fun kf s -> f (kf,s)))
+    ~add_update_hook:FunctionStats.register_hook
+    model
 
 
 (**************************************************************************)
