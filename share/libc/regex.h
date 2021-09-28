@@ -28,7 +28,13 @@ __PUSH_FC_STDLIB
 #include "__fc_define_ssize_t.h"
 __BEGIN_DECLS
 
-struct re_pattern_buffer { size_t re_nsub;  };
+struct re_pattern_buffer {
+  struct re_dfa_t *buffer; // Non-POSIX
+  size_t allocated; // Non-POSIX
+  char *fastmap; // Non-POSIX
+  unsigned char *translate; // Non-POSIX
+  size_t re_nsub;
+};
 
 typedef struct re_pattern_buffer regex_t;
 

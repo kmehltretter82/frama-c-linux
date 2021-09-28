@@ -1630,6 +1630,8 @@ extern int mkstemp(char *templat);
 
 char *realpath(char const * restrict file_name, char * restrict resolved_name);
 
+char *canonicalize_file_name(char const *path);
+
 /*@
 predicate non_escaping{L}(void *s, ℤ n) =
   ∀ ℤ i; 0 ≤ i < n ⇒ ¬\dangling((char *)s + i);
@@ -7216,6 +7218,13 @@ char *realpath(char const * restrict file_name, char * restrict resolved_name)
   *(resolved_name + (realpath_len - 1)) = (char)'\000';
   __retres = resolved_name;
   return_label: return __retres;
+}
+
+char *canonicalize_file_name(char const *path)
+{
+  char *tmp;
+  tmp = realpath(path,(char *)0);
+  return tmp;
 }
 
 /*@ requires valid_dest: valid_or_empty(dest, n);
