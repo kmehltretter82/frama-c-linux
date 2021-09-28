@@ -47,7 +47,7 @@ struct
   let visitor f =
     object
       inherit Visitor.frama_c_inplace
-      method! vlval lval = f lval; SkipChildren
+      method! vlval lval = f lval; Cil.SkipChildren
     end
 
   let from_exp f exp =

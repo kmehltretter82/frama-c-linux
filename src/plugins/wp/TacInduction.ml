@@ -108,7 +108,7 @@ class induction =
       let value = Tactical.selected s in
       if F.is_int value then
         match self#get_base () with
-        | Some base -> Applicable(process value base)
+        | Some base -> Tactical.Applicable(process value base)
         | None -> Not_configured
       else Not_applicable
 

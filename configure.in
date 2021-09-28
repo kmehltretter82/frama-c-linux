@@ -396,9 +396,9 @@ AC_ARG_ENABLE(
   ENABLE_LANDMARKS=yes)
 
 if test "$ENABLE_LANDMARKS" = yes ; then
-  AC_MSG_CHECKING(for Landmarks)
+  AC_MSG_CHECKING(for Landmarks and Landmarks-ppx)
   LANDMARKS_PATH=$($OCAMLFIND query landmarks 2>/dev/null | tr -d '\r\n')
-  LANDMARKS_PPX_PATH=$($OCAMLFIND query landmarks.ppx 2>/dev/null | tr -d '\r\n')
+  LANDMARKS_PPX_PATH=$($OCAMLFIND query landmarks-ppx 2>/dev/null | tr -d '\r\n')
   if test -f "$LANDMARKS_PATH/landmark.$DYN_SUFFIX" -a -f "$LANDMARKS_PPX_PATH/ppx_landmarks.$DYN_SUFFIX"; then
     HAS_LANDMARKS="yes";
     AC_MSG_RESULT(found)
