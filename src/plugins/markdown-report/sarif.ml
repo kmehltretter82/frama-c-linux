@@ -74,7 +74,7 @@ end
 struct
   type t = string[@@deriving yojson]
   let sarif_github =
-    "https://github.com/oasis-tcs/sarif-spec/blob/master/Documents/CommitteeSpecificationDrafts/v2.1.0-CSD.1/sarif-schema-2.1.0.json"
+    "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json"
 end
 
 module Version: sig
