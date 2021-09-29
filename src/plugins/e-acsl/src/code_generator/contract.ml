@@ -322,27 +322,37 @@ let fold_left_handle_error_with_args f (env, acc) l =
     (env, acc)
     l
 
-(** Insert requires check for the given contract in the environment *)
-let check_requires kf kinstr env contract =
+(** Insert requires check for the default behavior of the given contract in the
+    environment. *)
+let check_default_requires kf kinstr env contract =
+  let default_behavior =
+    Cil.find_default_behavior contract.spec
+  in
+  match default_behavior with
+  | Some b ->
+    fold_left_handle_error
+      (fun env ip_requires ->
+         if !must_translate_ppt_ref
+             (Property.ip_of_requires kf kinstr b ip_requires) then
+           let tp_requires = ip_requires.ip_content in
+           let loc = tp_requires.tp_statement.pred_loc in
+           Cil.CurrentLoc.set loc;
+           Translate.translate_predicate kf env tp_requires
+         else
+           env)
+      env
+      b.b_requires
+  | None -> env
+
+(** Insert requires check for the behaviors other than the default behavior of
+    the given contract in the environment *)
+let check_other_requires kf kinstr env contract =
   let get_or_create_assumes_var =
     mk_get_or_create_var kf Cil.intType "assumes_value"
   in
   let do_behavior env b =
     if Cil.is_default_behavior b then
-      fold_left_handle_error
-        (fun env ip_requires ->
-           if !must_translate_ppt_ref
-               (Property.ip_of_requires kf kinstr b ip_requires) then
-             (* If translating the default behavior, directly translate the
-                predicate *)
-             let tp_requires = ip_requires.ip_content in
-             let loc = tp_requires.tp_statement.pred_loc in
-             Cil.CurrentLoc.set loc;
-             Translate.translate_predicate kf env tp_requires
-           else
-             env)
-        env
-        b.b_requires
+      env
     else
       (* Compute the assumes predicate for pretty-printing *)
       let assumes = assumes_predicate env b.b_assumes in
@@ -763,9 +773,18 @@ let translate_preconditions kf kinstr env contract =
   let env = Env.set_annotation_kind env Smart_stmt.Precondition in
   let env = Env.push_contract env contract in
   let env = init kf env contract in
+  (* Start with translating the requires predicate of the default behavior. *)
+  let env =
+    Env.handle_error
+      (fun env -> check_default_requires kf kinstr env contract)
+      env
+  in
+  (* Then setup the assumes clauses of the contract. *)
   let env = setup_assumes kf env contract in
+  (* And finally translate the requires predicates of the rest of the behaviors,
+     skipping over the default behavior. *)
   let do_it env =
-    let env = check_requires kf kinstr env contract in
+    let env = check_other_requires kf kinstr env contract in
     let env = check_complete_and_disjoint kf kinstr env contract in
     env
   in
