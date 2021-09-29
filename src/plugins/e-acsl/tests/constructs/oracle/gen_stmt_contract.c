@@ -144,12 +144,12 @@ int main(void)
     {
       int __gen_e_acsl_active_bhvrs;
       __gen_e_acsl_contract_3 = __e_acsl_contract_init((size_t)2);
+      __e_acsl_assert(x > -1000,1,"Precondition","main","x > -1000",
+                      "tests/constructs/stmt_contract.i",49);
       __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract_3,
                                              (size_t)0,x >= 0);
       __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract_3,
                                              (size_t)1,x < 0);
-      __e_acsl_assert(x > -1000,1,"Precondition","main","x > -1000",
-                      "tests/constructs/stmt_contract.i",49);
       __gen_e_acsl_active_bhvrs = __e_acsl_contract_partial_count_all_behaviors
       ((__e_acsl_contract_t const *)__gen_e_acsl_contract_3);
       if (__gen_e_acsl_active_bhvrs != 1) {

@@ -55,14 +55,14 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
   {
     int __gen_e_acsl_assumes_value;
     __gen_e_acsl_contract = __e_acsl_contract_init((size_t)1);
-    __e_acsl_assert(c != 0,1,"RTE","test","division_by_zero: c != 0",
-                    "tests/constructs/rte.i",11);
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
-                                           1 % c == 1);
     __e_acsl_assert(a != 0,1,"RTE","test","division_by_zero: a != 0",
                     "tests/constructs/rte.i",7);
     __e_acsl_assert(1 % a == 1,1,"Precondition","test","1 % a == 1",
                     "tests/constructs/rte.i",7);
+    __e_acsl_assert(c != 0,1,"RTE","test","division_by_zero: c != 0",
+                    "tests/constructs/rte.i",11);
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
+                                           1 % c == 1);
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)0);
     if (__gen_e_acsl_assumes_value) {

@@ -136,54 +136,14 @@ int __gen_e_acsl_search(int elt)
   __e_acsl_contract_t *__gen_e_acsl_contract;
   int __retres;
   {
+    int __gen_e_acsl_forall;
+    int __gen_e_acsl_i;
     int __gen_e_acsl_exists;
     int __gen_e_acsl_j;
-    int __gen_e_acsl_forall;
-    int __gen_e_acsl_j_2;
     int __gen_e_acsl_forall_2;
-    int __gen_e_acsl_i;
+    int __gen_e_acsl_j_2;
     __gen_e_acsl_contract = __e_acsl_contract_init((size_t)2);
-    __gen_e_acsl_exists = 0;
-    __gen_e_acsl_j = 0;
-    while (1) {
-      if (__gen_e_acsl_j < 10) ; else break;
-      __e_acsl_assert(__gen_e_acsl_j < 10,1,"RTE","search",
-                      "index_bound: __gen_e_acsl_j < 10",
-                      "tests/examples/linear_search.i",9);
-      __e_acsl_assert(0 <= __gen_e_acsl_j,1,"RTE","search",
-                      "index_bound: 0 <= __gen_e_acsl_j",
-                      "tests/examples/linear_search.i",9);
-      if (! (A[__gen_e_acsl_j] == elt)) ;
-      else {
-        __gen_e_acsl_exists = 1;
-        goto e_acsl_end_loop3;
-      }
-      __gen_e_acsl_j ++;
-    }
-    e_acsl_end_loop3: ;
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
-                                           __gen_e_acsl_exists);
     __gen_e_acsl_forall = 1;
-    __gen_e_acsl_j_2 = 0;
-    while (1) {
-      if (__gen_e_acsl_j_2 < 10) ; else break;
-      __e_acsl_assert(__gen_e_acsl_j_2 < 10,1,"RTE","search",
-                      "index_bound: __gen_e_acsl_j_2 < 10",
-                      "tests/examples/linear_search.i",12);
-      __e_acsl_assert(0 <= __gen_e_acsl_j_2,1,"RTE","search",
-                      "index_bound: 0 <= __gen_e_acsl_j_2",
-                      "tests/examples/linear_search.i",12);
-      if (A[__gen_e_acsl_j_2] != elt) ;
-      else {
-        __gen_e_acsl_forall = 0;
-        goto e_acsl_end_loop4;
-      }
-      __gen_e_acsl_j_2 ++;
-    }
-    e_acsl_end_loop4: ;
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)1,
-                                           __gen_e_acsl_forall);
-    __gen_e_acsl_forall_2 = 1;
     __gen_e_acsl_i = 0;
     while (1) {
       if (__gen_e_acsl_i < 9) ; else break;
@@ -201,15 +161,55 @@ int __gen_e_acsl_search(int elt)
                       "tests/examples/linear_search.i",7);
       if (A[__gen_e_acsl_i] <= A[__gen_e_acsl_i + 1]) ;
       else {
-        __gen_e_acsl_forall_2 = 0;
-        goto e_acsl_end_loop5;
+        __gen_e_acsl_forall = 0;
+        goto e_acsl_end_loop3;
       }
       __gen_e_acsl_i ++;
     }
-    e_acsl_end_loop5: ;
-    __e_acsl_assert(__gen_e_acsl_forall_2,1,"Precondition","search",
+    e_acsl_end_loop3: ;
+    __e_acsl_assert(__gen_e_acsl_forall,1,"Precondition","search",
                     "\\forall integer i; 0 <= i < 9 ==> A[i] <= A[i + 1]",
                     "tests/examples/linear_search.i",7);
+    __gen_e_acsl_exists = 0;
+    __gen_e_acsl_j = 0;
+    while (1) {
+      if (__gen_e_acsl_j < 10) ; else break;
+      __e_acsl_assert(__gen_e_acsl_j < 10,1,"RTE","search",
+                      "index_bound: __gen_e_acsl_j < 10",
+                      "tests/examples/linear_search.i",9);
+      __e_acsl_assert(0 <= __gen_e_acsl_j,1,"RTE","search",
+                      "index_bound: 0 <= __gen_e_acsl_j",
+                      "tests/examples/linear_search.i",9);
+      if (! (A[__gen_e_acsl_j] == elt)) ;
+      else {
+        __gen_e_acsl_exists = 1;
+        goto e_acsl_end_loop4;
+      }
+      __gen_e_acsl_j ++;
+    }
+    e_acsl_end_loop4: ;
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
+                                           __gen_e_acsl_exists);
+    __gen_e_acsl_forall_2 = 1;
+    __gen_e_acsl_j_2 = 0;
+    while (1) {
+      if (__gen_e_acsl_j_2 < 10) ; else break;
+      __e_acsl_assert(__gen_e_acsl_j_2 < 10,1,"RTE","search",
+                      "index_bound: __gen_e_acsl_j_2 < 10",
+                      "tests/examples/linear_search.i",12);
+      __e_acsl_assert(0 <= __gen_e_acsl_j_2,1,"RTE","search",
+                      "index_bound: 0 <= __gen_e_acsl_j_2",
+                      "tests/examples/linear_search.i",12);
+      if (A[__gen_e_acsl_j_2] != elt) ;
+      else {
+        __gen_e_acsl_forall_2 = 0;
+        goto e_acsl_end_loop5;
+      }
+      __gen_e_acsl_j_2 ++;
+    }
+    e_acsl_end_loop5: ;
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)1,
+                                           __gen_e_acsl_forall_2);
   }
   __retres = search(elt);
   {

@@ -78,34 +78,34 @@ int __gen_e_acsl_isupper(int c)
   {
     int __gen_e_acsl_and;
     int __gen_e_acsl_or;
+    int __gen_e_acsl_and_2;
     int __gen_e_acsl_or_2;
-    int __gen_e_acsl_and_4;
     int __gen_e_acsl_or_3;
     int __gen_e_acsl_active_bhvrs;
     __gen_e_acsl_contract = __e_acsl_contract_init((size_t)2);
-    if (65 <= c) __gen_e_acsl_and = c <= 90; else __gen_e_acsl_and = 0;
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
-                                           __gen_e_acsl_and);
-    if (c == -1) __gen_e_acsl_or = 1;
-    else {
-      int __gen_e_acsl_and_2;
-      if (0 <= c) __gen_e_acsl_and_2 = c < 65; else __gen_e_acsl_and_2 = 0;
-      __gen_e_acsl_or = __gen_e_acsl_and_2;
-    }
-    if (__gen_e_acsl_or) __gen_e_acsl_or_2 = 1;
-    else {
-      int __gen_e_acsl_and_3;
-      if (90 < c) __gen_e_acsl_and_3 = c <= 127; else __gen_e_acsl_and_3 = 0;
-      __gen_e_acsl_or_2 = __gen_e_acsl_and_3;
-    }
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)1,
-                                           __gen_e_acsl_or_2);
-    if (0 <= c) __gen_e_acsl_and_4 = c <= 255; else __gen_e_acsl_and_4 = 0;
-    if (__gen_e_acsl_and_4) __gen_e_acsl_or_3 = 1;
-    else __gen_e_acsl_or_3 = c == -1;
-    __e_acsl_assert(__gen_e_acsl_or_3,1,"Precondition","isupper",
+    if (0 <= c) __gen_e_acsl_and = c <= 255; else __gen_e_acsl_and = 0;
+    if (__gen_e_acsl_and) __gen_e_acsl_or = 1;
+    else __gen_e_acsl_or = c == -1;
+    __e_acsl_assert(__gen_e_acsl_or,1,"Precondition","isupper",
                     "c_uchar_or_eof: (0 <= c <= 255) || c == -1",
                     "FRAMAC_SHARE/libc/ctype.h",174);
+    if (65 <= c) __gen_e_acsl_and_2 = c <= 90; else __gen_e_acsl_and_2 = 0;
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
+                                           __gen_e_acsl_and_2);
+    if (c == -1) __gen_e_acsl_or_2 = 1;
+    else {
+      int __gen_e_acsl_and_3;
+      if (0 <= c) __gen_e_acsl_and_3 = c < 65; else __gen_e_acsl_and_3 = 0;
+      __gen_e_acsl_or_2 = __gen_e_acsl_and_3;
+    }
+    if (__gen_e_acsl_or_2) __gen_e_acsl_or_3 = 1;
+    else {
+      int __gen_e_acsl_and_4;
+      if (90 < c) __gen_e_acsl_and_4 = c <= 127; else __gen_e_acsl_and_4 = 0;
+      __gen_e_acsl_or_3 = __gen_e_acsl_and_4;
+    }
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)1,
+                                           __gen_e_acsl_or_3);
     __gen_e_acsl_active_bhvrs = __e_acsl_contract_partial_count_all_behaviors
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract);
     __e_acsl_assert(__gen_e_acsl_active_bhvrs <= 1,1,"Precondition",

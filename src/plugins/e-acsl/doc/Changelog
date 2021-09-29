@@ -25,6 +25,9 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-* E-ACSL       [2021-09-29] Fix translation order of the default behavior's
+                requires clauses. They are now translated before the evaluation
+                of the assumes clauses of the other behaviors.
 -* E-ACSL       [2021-09-13] Fix unsound reuse of previously typed recursive
                 functions (frama-c/e-acsl#177)
 -  E-ACSL       [2021-08-03] Correct monitoring of code depending on libc
