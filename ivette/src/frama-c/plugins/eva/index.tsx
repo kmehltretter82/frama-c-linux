@@ -37,6 +37,7 @@ import { ProbeInfos } from './probeinfos';
 import { Dimension, ValuesPanel } from './valuetable';
 import { AlarmsInfos, StackInfos } from './valueinfos';
 import { } from './Summary';
+import { } from './Coverage';
 import './style.css';
 
 // --------------------------------------------------------------------------
