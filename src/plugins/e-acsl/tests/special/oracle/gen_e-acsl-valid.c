@@ -111,13 +111,17 @@ void __gen_e_acsl_f(int *x, int *y)
 {
   __e_acsl_contract_t *__gen_e_acsl_contract;
   {
+    int __gen_e_acsl_valid;
     int __gen_e_acsl_valid_read;
     int __gen_e_acsl_valid_read_2;
-    int __gen_e_acsl_valid;
     int __gen_e_acsl_active_bhvrs;
     __e_acsl_store_block((void *)(& y),(size_t)8);
     __e_acsl_store_block((void *)(& x),(size_t)8);
     __gen_e_acsl_contract = __e_acsl_contract_init((size_t)2);
+    __gen_e_acsl_valid = __e_acsl_valid((void *)y,sizeof(int),(void *)y,
+                                        (void *)(& y));
+    __e_acsl_assert(__gen_e_acsl_valid,1,"Precondition","f","\\valid(y)",
+                    "tests/special/e-acsl-valid.c",12);
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)x,sizeof(int),
                                                   (void *)x,(void *)(& x));
     __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","f",
@@ -132,10 +136,6 @@ void __gen_e_acsl_f(int *x, int *y)
                     "tests/special/e-acsl-valid.c",21);
     __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)1,
                                            *x == 0);
-    __gen_e_acsl_valid = __e_acsl_valid((void *)y,sizeof(int),(void *)y,
-                                        (void *)(& y));
-    __e_acsl_assert(__gen_e_acsl_valid,1,"Precondition","f","\\valid(y)",
-                    "tests/special/e-acsl-valid.c",12);
     __gen_e_acsl_active_bhvrs = __e_acsl_contract_partial_count_all_behaviors
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract);
     __e_acsl_assert(__gen_e_acsl_active_bhvrs >= 1,1,"Precondition","f",

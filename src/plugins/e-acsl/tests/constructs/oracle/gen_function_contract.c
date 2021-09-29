@@ -221,6 +221,8 @@ void __gen_e_acsl_o(void)
     int __gen_e_acsl_assumes_value;
     int __gen_e_acsl_active_bhvrs;
     __gen_e_acsl_contract = __e_acsl_contract_init((size_t)4);
+    __e_acsl_assert(X > -1000,1,"Precondition","o","X > -1000",
+                    "tests/constructs/function_contract.i",77);
     __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
                                            Y < 0);
     __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)1,
@@ -229,8 +231,6 @@ void __gen_e_acsl_o(void)
                                            Y % 2 == 1);
     __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)3,
                                            Y % 2 == 0);
-    __e_acsl_assert(X > -1000,1,"Precondition","o","X > -1000",
-                    "tests/constructs/function_contract.i",77);
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)0);
     if (__gen_e_acsl_assumes_value) __e_acsl_assert(Y < 1,1,"Precondition",
@@ -342,14 +342,14 @@ void __gen_e_acsl_n(void)
 {
   __e_acsl_contract_t *__gen_e_acsl_contract;
   __gen_e_acsl_contract = __e_acsl_contract_init((size_t)2);
-  __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
-                                         X == 7);
-  __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)1,
-                                         X == 5);
   __e_acsl_assert(X > 0,1,"Precondition","n","X > 0",
                   "tests/constructs/function_contract.i",65);
   __e_acsl_assert(X < 10,1,"Precondition","n","X < 10",
                   "tests/constructs/function_contract.i",66);
+  __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
+                                         X == 7);
+  __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)1,
+                                         X == 5);
   n();
   {
     int __gen_e_acsl_assumes_value;
