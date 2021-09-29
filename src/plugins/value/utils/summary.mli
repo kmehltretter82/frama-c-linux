@@ -51,7 +51,8 @@ type alarms = (alarm_category * int) list (* Alarm count for each category *)
 
 type fun_stats =
   { fun_coverage: coverage;
-    fun_alarms: alarms; }
+    fun_alarm_count: alarms;
+    fun_alarm_statuses: statuses; }
 
 type program_stats =
   { prog_fun_coverage: coverage;

@@ -85,7 +85,8 @@ type alarms = (alarm_category * int) list (* Alarm count for each category *)
 
 type fun_stats =
   { fun_coverage: coverage;
-    fun_alarms: alarms; }
+    fun_alarm_count: alarms;
+    fun_alarm_statuses: statuses; }
 
 type program_stats =
   { prog_fun_coverage: coverage;
@@ -172,7 +173,8 @@ module FunctionStats_Type = Datatype.Make (struct
       let name = "Eva.Value_results.FunctionStats_Type"
       let reprs = [{
           fun_coverage = Coverage.make ();
-          fun_alarms = [];
+          fun_alarm_count = [];
+          fun_alarm_statuses = Statuses.make ();
         }]
     end
     include  (Prototype)
@@ -194,11 +196,16 @@ let get_status ip =
 let compute_fun_stats kf =
   let alarms = AlarmsStats.create 13
   and coverage = Coverage.make ()
+  and statuses = Statuses.make ()
   in
   let do_status alarm ip =
     match get_status ip with
-    | None | Some Property_status.True -> ()
-    | _ -> AlarmsStats.incr alarms (AlarmCategory.of_alarm alarm)
+    | None -> ()
+    | Some status ->
+      Statuses.incr statuses status;
+      match status with
+      | Property_status.True -> ()
+      | _ -> AlarmsStats.incr alarms (AlarmCategory.of_alarm alarm)
   in
   let do_annot stmt _emmiter annotation =
     match Alarms.find annotation with
@@ -218,7 +225,8 @@ let compute_fun_stats kf =
       List.iter do_stmt fundec.Cil_types.sallstmts
   end;
   { fun_coverage = coverage;
-    fun_alarms = AlarmsStats.to_list alarms; }
+    fun_alarm_count = AlarmsStats.to_list alarms;
+    fun_alarm_statuses = statuses; }
 
 module FunctionStats = struct
   include Kernel_function.Make_Table
@@ -313,7 +321,7 @@ let compute_stats () =
         let fun_stats = FunctionStats.get kf in
         (* Add function stats to program stats *)
         Coverage.add prog_stmt_coverage fun_stats.fun_coverage;
-        AlarmsStats.add_list prog_alarms fun_stats.fun_alarms;
+        AlarmsStats.add_list prog_alarms fun_stats.fun_alarm_count;
       end
   in
   Globals.Functions.iter do_fun;

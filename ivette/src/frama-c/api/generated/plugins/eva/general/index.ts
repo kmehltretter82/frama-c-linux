@@ -486,8 +486,10 @@ export interface functionStatsData {
   key: Json.key<'#fct'>;
   /** Coverage of the Eva analysis */
   coverage: { reachable: number, dead: number };
-  /** Alarms raised by the Eva analysis */
-  alarms: alarmEntry[];
+  /** Alarms raised by the Eva analysis by category */
+  alarmCount: alarmEntry[];
+  /** Alarms statuses emitted by the Eva analysis */
+  alarmStatuses: statusesEntry;
 }
 
 /** Loose decoder for `functionStatsData` */
@@ -499,7 +501,8 @@ export const jFunctionStatsData: Json.Loose<functionStatsData> =
                   reachable: Json.jFail(Json.jNumber,'Number expected'),
                   dead: Json.jFail(Json.jNumber,'Number expected'),
                 }),'Record expected'),
-    alarms: Json.jList(jAlarmEntry),
+    alarmCount: Json.jList(jAlarmEntry),
+    alarmStatuses: jStatusesEntrySafe,
   });
 
 /** Safe decoder for `functionStatsData` */
@@ -510,14 +513,15 @@ export const jFunctionStatsDataSafe: Json.Safe<functionStatsData> =
 export const byFunctionStatsData: Compare.Order<functionStatsData> =
   Compare.byFields
     <{ key: Json.key<'#fct'>, coverage: { reachable: number, dead: number },
-       alarms: alarmEntry[] }>({
+       alarmCount: alarmEntry[], alarmStatuses: statusesEntry }>({
     key: Compare.string,
     coverage: Compare.byFields
                 <{ reachable: number, dead: number }>({
                 reachable: Compare.number,
                 dead: Compare.number,
               }),
-    alarms: Compare.array(byAlarmEntry),
+    alarmCount: Compare.array(byAlarmEntry),
+    alarmStatuses: byStatusesEntry,
   });
 
 /** Signal for array [`functionStats`](#functionstats)  */

@@ -330,6 +330,7 @@ end
 module Statuses =
 struct
   open Summary
+  type t = statuses
   let jtype =
     Data.declare ~package
       ~name:"statusesEntry"
@@ -413,10 +414,15 @@ let _array =
     ~data:(module Coverage)
     ~get:(fun (_kf,stats) -> stats.fun_coverage);
 
-  States.column model ~name:"alarms"
-    ~descr:(Markdown.plain "Alarms raised by the Eva analysis")
+  States.column model ~name:"alarmCount"
+    ~descr:(Markdown.plain "Alarms raised by the Eva analysis by category")
     ~data:(module Alarms)
-    ~get:(fun (_kf,stats) -> stats.fun_alarms);
+    ~get:(fun (_kf,stats) -> stats.fun_alarm_count);
+
+  States.column model ~name:"alarmStatuses"
+    ~descr:(Markdown.plain "Alarms statuses emitted by the Eva analysis")
+    ~data:(module Statuses)
+    ~get:(fun (_kf,stats) -> stats.fun_alarm_statuses);
 
   States.register_array
     ~package
