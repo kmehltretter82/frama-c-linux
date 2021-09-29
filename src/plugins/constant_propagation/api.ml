@@ -131,11 +131,12 @@ class propagate project fnames ~cast_intro = object(self)
           | TEnum _) -> ()
         | _ -> raise Cannot_expand
       end;
-      let ki = match self#current_stmt with
+      let stmt = match self#current_stmt with
         | None -> raise Cannot_change
-        | Some s -> Kstmt s
+        | Some s -> s
       in
-      let evaled = !Db.Value.access_expr ki expr in
+      let evaled = Eva.Results.(
+          before stmt |> eval_exp expr |> as_cvalue |> default Cvalue.V.top) in
       let b, m = Cvalue.V.find_lonely_binding evaled in
       let can_replace vi =
         (* can replace the current expr by [vi] iff (1) it is a source var, or
@@ -340,7 +341,7 @@ module Result =
       let size = 7
       let name = "Semantical constant propagation"
       let dependencies =
-        [ Db.Value.self;
+        [ Eva.Analysis.self;
           PropagationParameters.CastIntro.self;
           PropagationParameters.Project_name.self ]
     end)
@@ -352,7 +353,7 @@ let journalized_get =
   let get fnames cast_intro =
     Result.memo
       (fun _ ->
-         !Db.Value.compute ();
+         Eva.Analysis.compute ();
          let fresh_project =
            FC_file.create_project_from_visitor
              (PropagationParameters.Project_name.get ())
