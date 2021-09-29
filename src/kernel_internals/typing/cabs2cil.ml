@@ -5601,10 +5601,21 @@ and makeCompType ghost (isstruct: bool)
   let to_field = function
     | TYPE_ANNOT _ -> None
     | STATIC_ASSERT_FG (e, s, loc) ->
-      (* Create a special field to be pretty-printed later *)
-      let attr = ("STATIC_ASSERT", [e]) in
-      let name = ("\"" ^ s ^ "\"", JUSTBASE, [attr], loc) in
-      Some ([], [name, Some e])
+      let (_, _, cond_exp, _) = doExp empty_local_env CConst e ADrop in
+      begin
+        match Cil.constFoldToInt ~machdep:true cond_exp with
+        | Some i ->
+          if Integer.(equal i zero) then
+            Kernel.error ~source:(fst loc) "static assertion failed%s%s@."
+              (if s <> "" then ": " else "") s
+        | None ->
+          Kernel.error ~source:(fst loc)
+            "failed to evaluate constant expression in static assertion:@ \
+             @[%a@]"
+            Cprint.print_expression e
+      end;
+      (* _Static_assert is not stored in the Cil AST *)
+      None
     | FIELD (f,g) -> Some (f,g) in
   let flds = Extlib.filter_map_opt to_field nglist in
   let flds = List.rev (fold addFieldGroup [] flds) in
@@ -9194,28 +9205,6 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
     end
 
   | Cabs.STATIC_ASSERT (e, s, loc) -> begin
-      let make_static_assert_vi_and_init ~global cond_exp =
-        (* pick a different name per call, to avoid typing issues;
-           the actual name is never used anyway *)
-        let vname, _ = newAlphaName false global "" "_Static_assert" in
-        let vi =
-          if global then
-            makeGlobalVar ~temp:false ~referenced:true vname intType
-          else
-            makeVarinfo ~source:false ~referenced:true false false vname intType
-        in
-        let attr name = Attr (name, []) in
-        vi.vattr <-
-          Cil.addAttributes [attr "FC_BUILTIN"; attr "_STATIC_ASSERT"] vi.vattr;
-        let exp =
-          (* create an arbitrary expression using a binary operator and
-             SizeOfStr for typing purposes only; the pretty-printer in
-             Cil_printer will desugar it as intended. *)
-          new_exp ~loc
-            (BinOp (PlusA, cond_exp, new_exp ~loc (SizeOfStr s), voidType))
-        in
-        vi, SingleInit exp
-      in
       CurrentLoc.set (convLoc loc);
       let (_, _, cond_exp, _) = doExp local_env CConst e ADrop in
       begin
@@ -9230,17 +9219,8 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
              @[%a@]"
             Cprint.print_expression e
       end;
-      if isglobal then begin
-        let vi, init = make_static_assert_vi_and_init true cond_exp in
-        cabsPushGlobal
-          (GVar (vi, { init = Some init}, loc));
-        empty
-      end
-      else
-        let vi, init = make_static_assert_vi_and_init false cond_exp in
-        let instr = mkStmtOneInstr (Local_init (vi, AssignInit init, loc)) in
-        !currentFunctionFDEC.slocals <- !currentFunctionFDEC.slocals @ [vi];
-        local_var_chunk (i2c (instr,[],[],[])) vi
+      (* _Static_assert is not stored in the Cil AST *)
+      empty
     end
 
   | Cabs.FUNDEF (spec,((specs,(n,dt,a, _)) : Cabs.single_name),
