@@ -10,11 +10,9 @@
   Called from tests/float/contract_special_float.c:92.
 [eva] using specification for function fun
 [eva:alarm] tests/float/contract_special_float.c:92: Warning: 
-  function fun: precondition ¬(negative_arg:
-                                  \is_minus_infinity(x) ∨
-                                  (\is_finite(x) ∧ x < 0.)) got status unknown.
+  function fun: precondition 'not_negative' got status unknown.
 [eva] tests/float/contract_special_float.c:92: 
-  function fun: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function fun: precondition 'not_nan' got status valid.
 [eva] Done for function fun
 [eva:alarm] tests/float/contract_special_float.c:93: Warning: 
   NaN double value. assert ¬\is_NaN(v);
@@ -24,11 +22,9 @@
   No code nor explicit assigns clause for function fun_no_default, generating default assigns from the specification
 [eva] using specification for function fun_no_default
 [eva:alarm] tests/float/contract_special_float.c:94: Warning: 
-  function fun_no_default: precondition ¬(negative_arg:
-                                             \is_minus_infinity(x) ∨
-                                             (\is_finite(x) ∧ x < 0.)) got status unknown.
+  function fun_no_default: precondition 'not_negative' got status unknown.
 [eva] tests/float/contract_special_float.c:94: 
-  function fun_no_default: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function fun_no_default: precondition 'not_nan' got status valid.
 [eva] Done for function fun_no_default
 [eva:alarm] tests/float/contract_special_float.c:95: Warning: 
   NaN double value. assert ¬\is_NaN(v);
@@ -36,11 +32,9 @@
   Called from tests/float/contract_special_float.c:96.
 [eva] using specification for function fun_no_disjoint
 [eva:alarm] tests/float/contract_special_float.c:96: Warning: 
-  function fun_no_disjoint: precondition ¬(negative_arg:
-                                              \is_minus_infinity(x) ∨
-                                              (\is_finite(x) ∧ x < 0.)) got status unknown.
+  function fun_no_disjoint: precondition 'not_negative' got status unknown.
 [eva] tests/float/contract_special_float.c:96: 
-  function fun_no_disjoint: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function fun_no_disjoint: precondition 'not_nan' got status valid.
 [eva] Done for function fun_no_disjoint
 [eva:alarm] tests/float/contract_special_float.c:97: Warning: 
   NaN double value. assert ¬\is_NaN(v);
@@ -48,11 +42,9 @@
   Called from tests/float/contract_special_float.c:98.
 [eva] using specification for function fun_no_complete
 [eva:alarm] tests/float/contract_special_float.c:98: Warning: 
-  function fun_no_complete: precondition ¬(negative_arg:
-                                              \is_minus_infinity(x) ∨
-                                              (\is_finite(x) ∧ x < 0.)) got status unknown.
+  function fun_no_complete: precondition 'not_negative' got status unknown.
 [eva] tests/float/contract_special_float.c:98: 
-  function fun_no_complete: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function fun_no_complete: precondition 'not_nan' got status valid.
 [eva] Done for function fun_no_complete
 [eva] Recording results for main
 [eva] done for function main
