@@ -72,10 +72,14 @@ module Results: sig
   val is_initialized : evaluation -> bool
   val alarms : evaluation -> Alarms.t list
   
-  (* Bottomness *)
+  (* Reachability *)
   val is_bottom : evaluation -> bool
   val is_called : Cil_types.kernel_function -> bool (* called during the analysis, not by the actual program *)
   val is_reachable : Cil_types.stmt -> bool (* reachable by the analysis, not by the actual program *)
+  
+  (* Callers / callsites *)
+  val callers : Cil_types.kernel_function -> Cil_types.kernel_function list
+  val callsites : Cil_types.kernel_function -> Cil_types.stmt list
   
 end
 

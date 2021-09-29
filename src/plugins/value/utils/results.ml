@@ -631,7 +631,7 @@ let alarms evaluation =
   let module E = (val evaluation : Evaluation) in
   E.alarms E.v
 
-(* Bottomness *)
+(* Reachability *)
 
 let is_bottom evaluation =
   let module E = (val evaluation : Evaluation) in
@@ -644,3 +644,21 @@ let is_called kf =
 let is_reachable stmt =
   let module M = Make () in
   M.is_reachable (before stmt)
+
+(* Callers / callsites *)
+
+let callers kf =
+  let f = function
+    | [] | [_] -> None
+    | _ :: (kf,_) :: _-> Some kf
+  in
+  at_start_of kf |> callstacks |>
+  List.filter_map f |> List.sort_uniq Kernel_function.compare
+
+let callsites kf =
+  let f = function
+    | [] | (_,Cil_types.Kglobal) :: _ -> None
+    | (_,Kstmt stmt) :: _-> Some stmt
+  in
+  at_start_of kf |> callstacks |>
+  List.filter_map f |> List.sort_uniq Cil_datatype.Stmt.compare
