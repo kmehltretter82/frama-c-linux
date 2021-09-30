@@ -161,6 +161,13 @@ type key = {
   dynamic_splits : split_monitor SplitMap.t; (* term -> monitor *)
 }
 
+type call_return_policy = {
+  policy_keep_callee_splits: bool;
+  policy_keep_callee_history: bool;
+  policy_keep_caller_history: bool;
+  policy_history_size: int;
+}
+
 module Key =
 struct
   open Datatype
@@ -243,19 +250,27 @@ struct
 
   let exceed_rationing key = key.ration_stamp = None
 
-  let recombine ~history_size k1 k2 =
-    let merge_split _ v1 v2 =
+  let recombine ~policy ~caller ~callee =
+    let keep_second _ v1 v2 =
       match v1, v2 with
       | None, None -> None
-      | Some v, None | None, Some v -> Some v
-      | Some _v1, Some v2 -> Some v2 (* Keep the newest split value *)
+      | Some x, None | (Some _ | None), Some x -> Some x
     in {
       ration_stamp = None;
-      branches = Extlib.list_first_n history_size (k2.branches @ k1.branches);
-      loops = k1.loops;
-      splits = SplitMap.merge merge_split k1.splits k2.splits;
+      branches =
+        Extlib.list_first_n policy.policy_history_size (
+          (if policy.policy_keep_callee_history then callee.branches else []) @
+          (if policy.policy_keep_caller_history then caller.branches else [])
+        );
+      loops = caller.loops;
+      splits =
+        if policy.policy_keep_callee_splits
+        then SplitMap.merge keep_second caller.splits callee.splits
+        else caller.splits;
       dynamic_splits =
-        SplitMap.merge merge_split k1.dynamic_splits k2.dynamic_splits;
+        if policy.policy_keep_callee_splits
+        then SplitMap.merge keep_second caller.dynamic_splits callee.dynamic_splits
+        else caller.dynamic_splits;
     }
 end
 

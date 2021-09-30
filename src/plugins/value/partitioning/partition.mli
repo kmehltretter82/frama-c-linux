@@ -41,12 +41,19 @@
 (** Partitioning keys attached to states. *)
 type key
 
+type call_return_policy = {
+  policy_keep_callee_splits: bool;
+  policy_keep_callee_history: bool;
+  policy_keep_caller_history: bool;
+  policy_history_size: int;
+}
+
 module Key : sig
   include Datatype.S_with_collections with type t = key
   val zero : t (** Initial key: no partitioning. *)
   val exceed_rationing: t -> bool
-  val recombine : history_size:int ->
-    t -> t -> t (** Recombinaison of keys after a call *)
+  val recombine : policy:call_return_policy ->
+    caller:t -> callee:t -> t (** Recombinaison of keys after a call *)
 end
 
 (** Collection of states, each identified by a unique key. *)

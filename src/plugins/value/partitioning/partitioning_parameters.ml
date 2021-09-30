@@ -139,4 +139,13 @@ struct
         acc (* Impossible to convert term to lval *)
     in
     List.fold_left map_annot [] (get_flow_annot stmt)
+
+  let call_return_policy = {
+    Partition.policy_keep_callee_splits =
+      Value_parameters.InterproceduralPartitioningKeepSplits.get ();
+    policy_keep_callee_history =
+      Value_parameters.InterproceduralPartitioningKeepHistory.get ();
+    policy_keep_caller_history = true;
+    policy_history_size = history_size;
+  }
 end
