@@ -2955,6 +2955,12 @@ let startsWith prefix s =
   let prefixLen = String.length prefix in
   String.length s >= prefixLen && String.sub s 0 prefixLen = prefix
 
+let onlyOnGccMsvc msvc =
+  Format.asprintf "only allowed for %s machdeps;@ \
+                   see option -machdep or@ \
+                   run '-machdep help' for the list of available machdeps"
+    (if msvc then "GCC/MSVC" else "GCC")
+
 let bytesSizeOfInt (ik: ikind): int =
   match ik with
   | IChar | ISChar | IUChar | IBool -> 1

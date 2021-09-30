@@ -2246,6 +2246,13 @@ val mapNoCopyList: ('a -> 'a list) -> 'a list -> 'a list
 (** sm: return true if the first is a prefix of the second string *)
 val startsWith: string -> string -> bool
 
+(** Append the "only allowed on GCC/MSVC machdeps" error message.
+    The bool parameter tells whether MSVC should be included in the message
+    (otherwise, print just GCC).
+    @since Frama-C+dev
+*)
+val onlyOnGccMsvc: bool -> string
+
 (* ************************************************************************* *)
 (** {2 An Interpreter for constructing CIL constructs} *)
 (* ************************************************************************* *)
