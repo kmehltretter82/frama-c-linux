@@ -190,12 +190,11 @@ static uintptr_t get_tls_start() {
      init_shadow_layout_heap_global_tls (for reasons related to memory
      initialization in presence of things like GCC constructors).
      We must leave sufficient space for them. */
-  max_shadow = max_shadow +
-    2*get_stack_size() + /* One for primary, one for secondary.
-                            If ratio is changed in init_shadow_layout_stack
-                            then update required here.
-                            TODO: if stack too big ==> problem */
-    1;
+  max_shadow = max_shadow + 1 +
+               /* One for primary, one for secondary. If ratio is changed in
+                  init_shadow_layout_stack then update required here.
+                  TODO: if stack too big ==> problem */
+               2 * get_stack_size();
   return tls_start_half > max_shadow ? tls_start_half : max_shadow;
 }
 

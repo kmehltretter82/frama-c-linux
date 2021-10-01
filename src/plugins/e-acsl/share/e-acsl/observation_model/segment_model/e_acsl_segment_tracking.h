@@ -23,7 +23,7 @@
 /*! ***********************************************************************
  * \file  e_acsl_segment_tracking.h
  * \brief Core functionality of the segment-based memory model
-***************************************************************************/
+ **************************************************************************/
 
 #ifndef E_ACSL_SEGMENT_TRACKING_H
 #define E_ACSL_SEGMENT_TRACKING_H

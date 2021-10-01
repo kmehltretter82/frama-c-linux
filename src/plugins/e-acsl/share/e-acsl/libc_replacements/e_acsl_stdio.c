@@ -61,6 +61,7 @@
    It is therefore important that the types as they are used by this file
    and by `functions.ml` are in sync */
 
+// clang-format off
 #define abbreviated_types \
   typedef_abbreviated('c', char, IChar) \
   typedef_abbreviated('C', unsigned char, IUChar) \
@@ -86,6 +87,7 @@
   typedef_abbreviated('w', long long*, PLongLong) \
   typedef_abbreviated('W', unsigned long long*, PULongLong) \
   typedef_abbreviated('p', void*, PVoid)
+// clang-format on
 
 /* Define abbreviated types as enum so they can be referred to as aliases */
 typedef enum {

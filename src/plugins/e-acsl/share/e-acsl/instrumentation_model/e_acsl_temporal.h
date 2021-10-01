@@ -23,7 +23,7 @@
 /*! ***********************************************************************
  * \file  e_acsl_temporal.h
  * \brief Implementation of the tenporal API shared by all models
-***************************************************************************/
+ **************************************************************************/
 #ifndef E_ACSL_TEMPORAL_H
 #define E_ACSL_TEMPORAL_H
 
@@ -33,6 +33,7 @@
 
 /* No need to encapsulate via ifdef: using these extra definitions does
    not hurt, otherwise need to pass additional parameters to frama-c */
+// clang-format off
 #define eacsl_temporal_store_nblock             export_alias(temporal_store_nblock)
 #define eacsl_temporal_store_nreferent          export_alias(temporal_store_nreferent)
 #define eacsl_temporal_save_nblock_parameter    export_alias(temporal_save_nblock_parameter)
@@ -45,6 +46,7 @@
 #define eacsl_temporal_reset_return             export_alias(temporal_reset_return)
 #define eacsl_temporal_memcpy                   export_alias(temporal_memcpy)
 #define eacsl_temporal_memset                   export_alias(temporal_memset)
+// clang-format on
 
 /* Temporal store {{{ */
 

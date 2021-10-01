@@ -23,13 +23,14 @@
 /*! ***********************************************************************
  * \file  e_acsl_shadow_layout.h
  * \brief Setup for memory tracking using shadowing
-***************************************************************************/
+ **************************************************************************/
 
 #ifndef E_ACSL_SHADOW_LAYOUT
 #define E_ACSL_SHADOW_LAYOUT
 
 #include <stddef.h>
 #include <stdint.h>
+
 #include "../../internals/e_acsl_config.h"
 #include "../../internals/e_acsl_malloc.h"
 
@@ -400,38 +401,50 @@ void clean_shadow_layout();
   SHADOW_ACCESS(_addr, rdata_secondary_offset)
 
 /*! \brief Convert a global address into its primary shadow counterpart */
-# define PRIMARY_GLOBAL_SHADOW(_addr) \
-    (IS_ON_TEXT(_addr) ? PRIMARY_TEXT_SHADOW(_addr) : \
-     IS_ON_BSS(_addr) ? PRIMARY_BSS_SHADOW(_addr) : \
-     IS_ON_DATA(_addr) ? PRIMARY_DATA_SHADOW(_addr) : \
-     IS_ON_IDATA(_addr) ? PRIMARY_IDATA_SHADOW(_addr) : \
-     IS_ON_RDATA(_addr) ? PRIMARY_RDATA_SHADOW(_addr) : (intptr_t)0)
+// clang-format off
+#  define PRIMARY_GLOBAL_SHADOW(_addr)                                         \
+    (IS_ON_TEXT(_addr)    ? PRIMARY_TEXT_SHADOW(_addr)                         \
+     : IS_ON_BSS(_addr)   ? PRIMARY_BSS_SHADOW(_addr)                          \
+     : IS_ON_DATA(_addr)  ? PRIMARY_DATA_SHADOW(_addr)                         \
+     : IS_ON_IDATA(_addr) ? PRIMARY_IDATA_SHADOW(_addr)                        \
+     : IS_ON_RDATA(_addr) ? PRIMARY_RDATA_SHADOW(_addr)                        \
+                          : (intptr_t)0)
+// clang-format on
 
 /*! \brief Convert a global address into its secondary shadow counterpart */
-# define SECONDARY_GLOBAL_SHADOW(_addr) \
-    (IS_ON_TEXT(_addr) ? SECONDARY_TEXT_SHADOW(_addr) : \
-     IS_ON_BSS(_addr) ? SECONDARY_BSS_SHADOW(_addr) : \
-     IS_ON_DATA(_addr) ? SECONDARY_DATA_SHADOW(_addr) : \
-     IS_ON_IDATA(_addr) ? SECONDARY_IDATA_SHADOW(_addr) : \
-     IS_ON_RDATA(_addr) ? SECONDARY_RDATA_SHADOW(_addr) : (intptr_t)0)
+// clang-format off
+#  define SECONDARY_GLOBAL_SHADOW(_addr)                                       \
+    (IS_ON_TEXT(_addr)    ? SECONDARY_TEXT_SHADOW(_addr)                       \
+     : IS_ON_BSS(_addr)   ? SECONDARY_BSS_SHADOW(_addr)                        \
+     : IS_ON_DATA(_addr)  ? SECONDARY_DATA_SHADOW(_addr)                       \
+     : IS_ON_IDATA(_addr) ? SECONDARY_IDATA_SHADOW(_addr)                      \
+     : IS_ON_RDATA(_addr) ? SECONDARY_RDATA_SHADOW(_addr)                      \
+                          : (intptr_t)0)
+// clang-format on
 #endif
 
 /* \brief Compute a primary or a secondary shadow address (based on the value of
  * parameter `_region`) of an address tracked via an offset-based encoding.
  * For an untracked address `0` is returned. */
 #if E_ACSL_OS_IS_LINUX
-# define SHADOW_REGION_ADDRESS(_addr, _region) \
-    (IS_ON_STACK(_addr) ? _region##_STACK_SHADOW(_addr) : \
-     IS_ON_GLOBAL(_addr) ? _region##_GLOBAL_SHADOW(_addr) : \
-     IS_ON_TLS(_addr) ? _region##_TLS_SHADOW(_addr) : (intptr_t)0)
+// clang-format off
+#  define SHADOW_REGION_ADDRESS(_addr, _region)                                \
+    (IS_ON_STACK(_addr)    ? _region##_STACK_SHADOW(_addr)                     \
+     : IS_ON_GLOBAL(_addr) ? _region##_GLOBAL_SHADOW(_addr)                    \
+     : IS_ON_TLS(_addr)    ? _region##_TLS_SHADOW(_addr)                       \
+                           : (intptr_t)0)
+// clang-format on
 #elif E_ACSL_OS_IS_WINDOWS
-# define SHADOW_REGION_ADDRESS(_addr, _region) \
-    (IS_ON_STACK(_addr) ? _region##_STACK_SHADOW(_addr) : \
-     IS_ON_TEXT(_addr) ? _region##_TEXT_SHADOW(_addr) : \
-     IS_ON_BSS(_addr) ? _region##_BSS_SHADOW(_addr) : \
-     IS_ON_DATA(_addr) ? _region##_DATA_SHADOW(_addr) : \
-     IS_ON_IDATA(_addr) ? _region##_IDATA_SHADOW(_addr) : \
-     IS_ON_RDATA(_addr) ? _region##_RDATA_SHADOW(_addr) : (intptr_t)0)
+// clang-format off
+#  define SHADOW_REGION_ADDRESS(_addr, _region)                                \
+    (IS_ON_STACK(_addr)   ? _region##_STACK_SHADOW(_addr)                      \
+     : IS_ON_TEXT(_addr)  ? _region##_TEXT_SHADOW(_addr)                       \
+     : IS_ON_BSS(_addr)   ? _region##_BSS_SHADOW(_addr)                        \
+     : IS_ON_DATA(_addr)  ? _region##_DATA_SHADOW(_addr)                       \
+     : IS_ON_IDATA(_addr) ? _region##_IDATA_SHADOW(_addr)                      \
+     : IS_ON_RDATA(_addr) ? _region##_RDATA_SHADOW(_addr)                      \
+                          : (intptr_t)0)
+// clang-format on
 #endif
 
 /*! \brief Primary shadow address of a non-dynamic region */
@@ -575,21 +588,27 @@ void clean_shadow_layout();
     SHADOW_ACCESS(_addr, mem_layout.rdata.temporal_secondary.shadow_offset)
 
 /*! \brief Convert a global address into its primary temporal shadow counterpart */
-# define TEMPORAL_PRIMARY_GLOBAL_SHADOW(_addr) \
-    (IS_ON_TEXT(_addr) ? TEMPORAL_PRIMARY_TEXT_SHADOW(_addr) : \
-     IS_ON_BSS(_addr) ? TEMPORAL_PRIMARY_BSS_SHADOW(_addr) : \
-     IS_ON_DATA(_addr) ? TEMPORAL_PRIMARY_DATA_SHADOW(_addr) : \
-     IS_ON_IDATA(_addr) ? TEMPORAL_PRIMARY_IDATA_SHADOW(_addr) : \
-     IS_ON_RDATA(_addr) ? TEMPORAL_PRIMARY_RDATA_SHADOW(_addr) : (intptr_t)0)
+// clang-format off
+#    define TEMPORAL_PRIMARY_GLOBAL_SHADOW(_addr)                              \
+      (IS_ON_TEXT(_addr)    ? TEMPORAL_PRIMARY_TEXT_SHADOW(_addr)              \
+       : IS_ON_BSS(_addr)   ? TEMPORAL_PRIMARY_BSS_SHADOW(_addr)               \
+       : IS_ON_DATA(_addr)  ? TEMPORAL_PRIMARY_DATA_SHADOW(_addr)              \
+       : IS_ON_IDATA(_addr) ? TEMPORAL_PRIMARY_IDATA_SHADOW(_addr)             \
+       : IS_ON_RDATA(_addr) ? TEMPORAL_PRIMARY_RDATA_SHADOW(_addr)             \
+                            : (intptr_t)0)
+// clang-format on
 
 /*! \brief Convert a global address into its primary temporal shadow counterpart */
-# define TEMPORAL_SECONDARY_GLOBAL_SHADOW(_addr) \
-    (IS_ON_TEXT(_addr) ? TEMPORAL_SECONDARY_TEXT_SHADOW(_addr) : \
-     IS_ON_BSS(_addr) ? TEMPORAL_SECONDARY_BSS_SHADOW(_addr) : \
-     IS_ON_DATA(_addr) ? TEMPORAL_SECONDARY_DATA_SHADOW(_addr) : \
-     IS_ON_IDATA(_addr) ? TEMPORAL_SECONDARY_IDATA_SHADOW(_addr) : \
-     IS_ON_RDATA(_addr) ? TEMPORAL_SECONDARY_RDATA_SHADOW(_addr) : (intptr_t)0)
-#endif
+// clang-format off
+#    define TEMPORAL_SECONDARY_GLOBAL_SHADOW(_addr)                            \
+      (IS_ON_TEXT(_addr)    ? TEMPORAL_SECONDARY_TEXT_SHADOW(_addr)            \
+       : IS_ON_BSS(_addr)   ? TEMPORAL_SECONDARY_BSS_SHADOW(_addr)             \
+       : IS_ON_DATA(_addr)  ? TEMPORAL_SECONDARY_DATA_SHADOW(_addr)            \
+       : IS_ON_IDATA(_addr) ? TEMPORAL_SECONDARY_IDATA_SHADOW(_addr)           \
+       : IS_ON_RDATA(_addr) ? TEMPORAL_SECONDARY_RDATA_SHADOW(_addr)           \
+                            : (intptr_t)0)
+// clang-format on
+#  endif
 
 /*! \brief Temporal primary shadow address of a non-dynamic region */
 #define TEMPORAL_PRIMARY_STATIC_SHADOW(_addr) \

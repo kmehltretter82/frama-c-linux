@@ -23,17 +23,19 @@
 /*! ***********************************************************************
  * \file
  * \brief  Debug-level functions and macros
-***************************************************************************/
+ **************************************************************************/
 
 #ifndef E_ACSL_DEBUG_H
 #define E_ACSL_DEBUG_H
 
 /* Stringification macros {{{ */
 #ifndef E_ACSL_STRINGIFICATION
-#define E_ACSL_STRINGIFICATION
+// clang-format off
+#  define E_ACSL_STRINGIFICATION
 #  define STRINGIFY(x) #x
-#  define TOSTRING(x) STRINGIFY(x)
-#  define __AT__ __FILE__ ":" TOSTRING(__LINE__)
+#  define TOSTRING(x)  STRINGIFY(x)
+#  define __AT__       __FILE__ ":" TOSTRING(__LINE__)
+// clang-format on
 #endif
 /* }}} */
 

@@ -23,7 +23,7 @@
 /*! ***********************************************************************
  * \file  e_acsl_temporal_timestamp.h
  * \brief Generating temporal timestamps
-***************************************************************************/
+ **************************************************************************/
 
 #ifndef E_ACSL_TEMPORAL_TIMESTAMP_H /*{{{*/
 #define E_ACSL_TEMPORAL_TIMESTAMP_H

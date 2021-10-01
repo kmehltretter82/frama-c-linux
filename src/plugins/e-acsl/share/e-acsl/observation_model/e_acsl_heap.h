@@ -23,12 +23,13 @@
 /*! ***********************************************************************
  * \file
  * \brief  User API to query E-ACSL about the state of heap allocation.
-***************************************************************************/
+ **************************************************************************/
 
 #ifndef E_ACSL_HEAP
 #define E_ACSL_HEAP
 
 #include <stddef.h>
+
 #include "../internals/e_acsl_alias.h"
 
 #define eacsl_heap_allocation_size      export_alias(heap_allocation_size)

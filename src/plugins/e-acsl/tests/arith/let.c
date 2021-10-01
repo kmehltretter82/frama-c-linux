@@ -27,9 +27,10 @@ int main(void) {
   /*@ assert \let u = f; u == f; */ ;
 
   int t[4] = {1,2,3,4};
-  /*@ assert \let u = t + 1; 1 == 1; */ ; // testing warnings when using
-                                          // let on pointers/arrays
-  /*@ assert (\let u = t + 1; 1) == 1; */ ; // same but for terms
+  // testing warnings when using let on pointers/arrays
+  /*@ assert \let u = t + 1; 1 == 1; */;
+  // same but for terms
+  /*@ assert (\let u = t + 1; 1) == 1; */;
 
   struct {int x, y;} r = {1, 2};
   /*@ assert \let u = r; u.x + u.y == 3; */ ;

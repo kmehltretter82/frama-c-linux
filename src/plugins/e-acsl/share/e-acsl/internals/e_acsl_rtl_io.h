@@ -67,7 +67,7 @@
  *     - v, V    - print first field width bits of a memory region given by a
  *      void pointer left-to-right (v) or right-to-left (V). Unless specified
  *      field-width of 8 is used.
-***************************************************************************/
+ **************************************************************************/
 
 #ifndef E_ACSL_RTL_IO_H
 #define E_ACSL_RTL_IO_H

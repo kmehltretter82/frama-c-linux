@@ -26,7 +26,7 @@
  * Declaration of memory locations considered safe before a program starts.
  * Most of these should be declared somewhere in start procedures of c
  * and gcc libraries. One example of a safe location is errno.
-***************************************************************************/
+ **************************************************************************/
 
 #ifndef E_ACSL_SAFE_LOCATIONS_H
 #define E_ACSL_SAFE_LOCATIONS_H

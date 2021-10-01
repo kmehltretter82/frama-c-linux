@@ -69,6 +69,7 @@ static const size_t max_allocated = ALIGN_LEFT(SIZE_MAX,HEAP_SEGMENT);
  * Given x is a number from [1, 36] range:
  *   - short_lengths[x] -> length of a block
  *   - short_offsets[x] -> offset within a block */
+// clang-format off
 static const char short_lengths[] = {
   0,
   1,
@@ -92,6 +93,7 @@ static const char short_offsets[] = {
   0,1,2,3,4,5,6,
   0,1,2,3,4,5,6,7
 };
+// clang-format on
 
 /*! \brief Mask for marking a heap segment as initialized.
  * For instance, let `uintptr_t *p' point to the start of a heap segment

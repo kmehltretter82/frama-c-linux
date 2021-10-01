@@ -24,7 +24,7 @@
  * \file
  * \brief Implementation of E-ACSL public API using a memory model based
  * on Patricia Trie. See e_acsl.h for details.
-***************************************************************************/
+ **************************************************************************/
 
 #include "../../internals/e_acsl_debug.h"
 #include "../../internals/e_acsl_malloc.h"
@@ -462,7 +462,8 @@ void* realloc(void *ptr, size_t size) {
     bt_insert(tmp);
   }
   /* uninitialized, do nothing */
-  if(tmp->init_bytes == 0) ;
+  if(tmp->init_bytes == 0) {
+  }
   /* already fully initialized block */
   else if (tmp->init_bytes == tmp->size) {
     /* realloc smaller block */

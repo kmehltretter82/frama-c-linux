@@ -23,7 +23,7 @@
 /*! ***********************************************************************
  * \file
  * \brief  Functionality related to processing of floating point values
-***************************************************************************/
+ **************************************************************************/
 
 #ifndef E_ACSL_FLOATING_POINT_H
 #define E_ACSL_FLOATING_POINT_H

@@ -24,7 +24,7 @@
  * \file
  * \brief  Implementation of E-ACSL public API for a segment (shadow) memory
  *   model. See e_acsl.h for details.
-***************************************************************************/
+ **************************************************************************/
 
 #include <stddef.h>
 #include <stdint.h>

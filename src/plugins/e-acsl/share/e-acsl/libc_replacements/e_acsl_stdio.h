@@ -70,7 +70,7 @@
  * additionally check that
  *  - memory buffers designated for writing are allocated, writable and provide
  *    sufficient space for storing the results
-***************************************************************************/
+ **************************************************************************/
 
 #ifndef E_ACSL_STDIO_H
 #define E_ACSL_STDIO_H

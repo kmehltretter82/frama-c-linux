@@ -25,7 +25,7 @@
  * \brief  Public C API of E-ACSL Runtime Library
  *
  * Functions and variables with non-static linkage used for instrumentation.
-***************************************************************************/
+ **************************************************************************/
 
 /* Memory model settings
  *    Memory model:

@@ -33,7 +33,7 @@
  *
  * CAUTION: As per above FIXME notice, all examples, macros and functions
  * assume little-endian byte order.
-***************************************************************************/
+ **************************************************************************/
 
 #ifndef E_ACSL_BITS_H
 #define E_ACSL_BITS_H

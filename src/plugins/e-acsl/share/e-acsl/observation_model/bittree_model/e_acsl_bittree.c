@@ -23,7 +23,7 @@
 /*! ***********************************************************************
  * \file
  * \brief Patricia Trie API Implementation
-***************************************************************************/
+ **************************************************************************/
 
 #include "../../internals/e_acsl_config.h"
 #include "../../internals/e_acsl_malloc.h"
@@ -74,6 +74,7 @@ static const int Tneq[] =
 
 #else /* WORDBITS == 64 */
 
+// clang-format off
 static const size_t Tmasks[] = {
 0x0,0x8000000000000000,0xc000000000000000,0xe000000000000000,0xf000000000000000,
 0xf800000000000000,0xfc00000000000000,0xfe00000000000000,0xff00000000000000,
@@ -91,6 +92,7 @@ static const size_t Tmasks[] = {
 0xfffffffffffff800,0xfffffffffffffc00,0xfffffffffffffe00,0xffffffffffffff00,
 0xffffffffffffff80,0xffffffffffffffc0,0xffffffffffffffe0,0xfffffffffffffff0,
 0xfffffffffffffff8,0xfffffffffffffffc,0xfffffffffffffffe,0xffffffffffffffff};
+// clang-format on
 
 static const int Teq[] =
   { 0,-1,3,-3,6,-5,7,-7,12,-9,11,-11,14,-13,15,-15,24,-17,19,-19,22,-21,23,-23,

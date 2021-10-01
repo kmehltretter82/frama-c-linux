@@ -24,7 +24,7 @@
  * \file
  * \brief Prototypes of functions belonging to GNU Multiple
  * Precision Arithmetic Library (GMP) used within E-ACSL
-***************************************************************************/
+ **************************************************************************/
 
 /******************/
 /* GMP prototypes */

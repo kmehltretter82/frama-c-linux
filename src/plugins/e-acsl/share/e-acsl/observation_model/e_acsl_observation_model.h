@@ -26,13 +26,14 @@
  *
  * Functions and variables with non-static linkage used for memory
  * observation.
-***************************************************************************/
+ **************************************************************************/
 
 #ifndef E_ACSL_OBSERVATION_MODEL_H
 #define E_ACSL_OBSERVATION_MODEL_H
 
 #include <stddef.h>
 #include <stdint.h>
+
 #include "../internals/e_acsl_alias.h"
 #include "e_acsl_heap.h"
 

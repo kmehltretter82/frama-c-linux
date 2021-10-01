@@ -34,7 +34,7 @@
  *    at compile-time.
  *  - For the case when the analysed program contains customised definitions
  *    of string.h functions use GLIBC-based implementations.
-***************************************************************************/
+ **************************************************************************/
 
 #ifndef E_ACSL_RTL_STRING_H
 #define E_ACSL_RTL_STRING_H

@@ -30,7 +30,7 @@
  * RTL. The overall pattern is as follows:
  *    mspace space = eacsl_create_mspace(capacity, locks);
  *    char *p = eacsl_mspace_malloc(space, size);
-***************************************************************************/
+ **************************************************************************/
 
 #ifndef E_ACSL_MALLOC_H
 #define E_ACSL_MALLOC_H

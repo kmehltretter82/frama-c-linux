@@ -23,7 +23,7 @@
 /*! ***********************************************************************
  * \file
  * \brief Functionality to report/track memory leaks. Shared between models
-***************************************************************************/
+ **************************************************************************/
 
 #ifndef E_ACSL_HEAP_TRACKING
 #define E_ACSL_HEAP_TRACKING
