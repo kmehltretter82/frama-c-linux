@@ -2,7 +2,7 @@
    COMMENT: addrOf
 */
 
-void f(){
+void f() {
   int m, *u, *p;
   u = &m;
   p = u;
@@ -13,6 +13,6 @@ void f(){
 int main(void) {
   int x = 0;
   f();
-  /*@ assert &x == &x; */ ;
+  /*@ assert &x == &x; */;
   return 0;
 }

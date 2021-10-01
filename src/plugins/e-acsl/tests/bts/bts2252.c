@@ -6,10 +6,10 @@
 #include <string.h>
 
 int main() {
-  char* srcbuf = "Test Code";
+  char *srcbuf = "Test Code";
   int i, loc = 1;
 
-  char * destbuf = (char*)malloc(10*sizeof(char));
+  char *destbuf = (char *)malloc(10 * sizeof(char));
   char ch = 'o';
 
   if (destbuf != NULL) {
@@ -20,7 +20,7 @@ int main() {
       }
     }
 
-    strncpy (&destbuf[loc], &srcbuf[loc], 1);
+    strncpy(&destbuf[loc], &srcbuf[loc], 1);
     free(destbuf);
   }
 }

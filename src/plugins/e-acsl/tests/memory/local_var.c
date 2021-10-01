@@ -6,11 +6,11 @@
 
 struct list {
   int element;
-  struct list * next;
+  struct list *next;
 };
 
-struct list * add(struct list * l, int i) {
-  struct list * new;
+struct list *add(struct list *l, int i) {
+  struct list *new;
   new = malloc(sizeof(struct list));
   /*@ assert \valid(new); */
   new->element = i;
@@ -19,7 +19,7 @@ struct list * add(struct list * l, int i) {
 }
 
 int main() {
-  struct list * l = NULL;
+  struct list *l = NULL;
   l = add(l, 4);
   l = add(l, 7);
   return 0;

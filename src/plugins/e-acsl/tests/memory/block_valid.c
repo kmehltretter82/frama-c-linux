@@ -3,22 +3,17 @@
   COMMENT: through a pointer to another block
 */
 
-#include <stdlib.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #define ADDROF(_a) ((uintptr_t)_a)
 
-int A = 1,
-    B = 2,
-    C = 3;
+int A = 1, B = 2, C = 3;
 
 int main(int argc, char **argv) {
-  int *p = NULL,
-      *q = NULL;
+  int *p = NULL, *q = NULL;
 
-  int a = 1,
-      b = 2,
-      c = 3;
+  int a = 1, b = 2, c = 3;
 
   p = &b;
   /*@assert \valid(p); */
@@ -30,8 +25,8 @@ int main(int argc, char **argv) {
   /* `p` points to `B`, `p+1` accesses either `A` or `C` */
   /*@assert ! \valid(p+1); */
 
-  char *pmin = (char*)malloc(sizeof(int));
-  char *pmax = (char*)malloc(sizeof(int));
+  char *pmin = (char *)malloc(sizeof(int));
+  char *pmax = (char *)malloc(sizeof(int));
 
   /* Since `pmin` is allocated before `pmax` it is likely that the start
    * address of `pmin` is less than the start address of `pmax`, still,

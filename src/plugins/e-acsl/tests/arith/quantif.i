@@ -42,10 +42,11 @@ int main(void) {
 
   // Empty quantifications
   /*@ assert \forall integer x; 0 < x < 1 ==> \false; */
-  /*@ assert ! \exists char c; 10 <= c < 10 && c == 10; */ ;
+  /*@ assert ! \exists char c; 10 <= c < 10 && c == 10; */;
   /*@ assert
         \let u = 5;
-        \forall integer x,y; 0 <= x < 2 && 4 < y < u ==> \false; */ ;
+        \forall integer x,y; 0 <= x < 2 && 4 < y < u ==> \false; */
+  ;
 
   // Quantification with multiple binders (frama-c/e-acsl#127)
   /*@ assert forall_multiple_binders_1:

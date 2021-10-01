@@ -82,7 +82,7 @@ int rtl_printf(char *fmt, ...);
 int rtl_vprintf(char *fmt, va_list vlist);
 
 /* Same as printf but write to a string buffer */
-int rtl_sprintf(char* s, char *fmt, ...);
+int rtl_sprintf(char *s, char *fmt, ...);
 int rtl_vsprintf(char *s, char *fmt, va_list vlist);
 
 /* Same as printf but write to the error stream. */

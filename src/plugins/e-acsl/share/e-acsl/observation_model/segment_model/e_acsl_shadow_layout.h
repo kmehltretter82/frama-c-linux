@@ -36,19 +36,19 @@
 
 /* Default size of a program's heap tracked via shadow memory */
 #ifndef E_ACSL_HEAP_SIZE
-#define E_ACSL_HEAP_SIZE 512
+#  define E_ACSL_HEAP_SIZE 512
 #endif
 
 /* Default size of a program's stack tracked via shadow memory */
 #ifndef E_ACSL_STACK_SIZE
-#define E_ACSL_STACK_SIZE 64
+#  define E_ACSL_STACK_SIZE 64
 #endif
 
 /* MAP_ANONYMOUS is a mmap flag indicating that the contents of allocated blocks
  * should be nullified. Set value from <bits/mman-linux.h>, if MAP_ANONYMOUS is
  * undefined */
 #ifndef MAP_ANONYMOUS
-#define MAP_ANONYMOUS 0x20
+#  define MAP_ANONYMOUS 0x20
 #endif
 /* \endcond */
 
@@ -72,14 +72,14 @@
   it may occur that the given size is not enough,
   in which case it MUST be increased. */
 #ifndef PGM_TLS_SIZE
-#define PGM_TLS_SIZE (64 * MB)
+#  define PGM_TLS_SIZE (64 * MB)
 #endif
 
 /*! \brief Mspace padding used by shadow segments. This is to make sure that
  * some allocation which exceeds the size of an initial memspace does not
  * move the mspace somewhere else. 512KB is a bit of an overkill, but should
  * not hurt too much in general unless memory space is really a constraint */
-#define SHADOW_SEGMENT_PADDING (512*KB)
+#define SHADOW_SEGMENT_PADDING (512 * KB)
 /* }}} */
 
 /** Program stack information {{{ */
@@ -151,13 +151,13 @@ NOTE: Above memory layout scheme generally applies to Linux Kernel/gcc/glibc.
  * used to track them. */
 struct memory_segment {
   const char *name; //!< Symbolic name
-  size_t    size; //!< Byte-size
-  uintptr_t start; //!< Least address
-  uintptr_t end; //!< Greatest address
-  mspace    mspace; // !< Mspace used for the partition
+  size_t size;      //!< Byte-size
+  uintptr_t start;  //!< Least address
+  uintptr_t end;    //!< Greatest address
+  mspace mspace;    // !< Mspace used for the partition
   /* The following are only set if the segment is a shadow segment */
   struct memory_segment *parent; //!< Pointer to the tracked segment
-  size_t shadow_ratio; //!< Ratio of shadow to application memory
+  size_t shadow_ratio;           //!< Ratio of shadow to application memory
   /*!< Offset between the start of the tracked segment and the start of this
      segment */
   intptr_t shadow_offset;
@@ -169,10 +169,10 @@ typedef struct memory_segment memory_segment;
  * shadow spaces. */
 struct memory_partition {
   memory_segment application; /* Application memory segment */
-  memory_segment primary; /* Primary shadow segment */
-  memory_segment secondary; /* Secondary shadow segment */
+  memory_segment primary;     /* Primary shadow segment */
+  memory_segment secondary;   /* Secondary shadow segment */
 #ifdef E_ACSL_TEMPORAL
-  memory_segment temporal_primary; /* Primary temporal shadow segment */
+  memory_segment temporal_primary;   /* Primary temporal shadow segment */
   memory_segment temporal_secondary; /* Secondary temporal shadow segment */
 #endif
 };
@@ -208,23 +208,20 @@ struct memory_layout {
 
 /*! \brief Full program memory layout. */
 struct memory_layout mem_layout = {
-  .is_initialized_pre_main = 0,
-  .is_initialized_main = 0,
+    .is_initialized_pre_main = 0,
+    .is_initialized_main = 0,
 };
 
 /*! \brief Array of used partitions */
-memory_partition *mem_partitions [] = {
-  &mem_layout.heap,
-  &mem_layout.stack,
+memory_partition *mem_partitions[] = {
+    &mem_layout.heap,
+    &mem_layout.stack,
 #if E_ACSL_OS_IS_LINUX
-  &mem_layout.global,
-  &mem_layout.tls,
+    &mem_layout.global,
+    &mem_layout.tls,
 #elif E_ACSL_OS_IS_WINDOWS
-  &mem_layout.text,
-  &mem_layout.bss,
-  &mem_layout.data,
-  &mem_layout.idata,
-  &mem_layout.rdata,
+    &mem_layout.text,  &mem_layout.bss,   &mem_layout.data,
+    &mem_layout.idata, &mem_layout.rdata,
 #endif
 };
 
@@ -235,8 +232,8 @@ memory_partition *mem_partitions [] = {
  * \param size - size in bytes
  * \param name - segment name
  * \param msp - mspace used for this segment (defined only for heap) */
-void set_application_segment(memory_segment *seg, uintptr_t start,
-    size_t size, const char *name, mspace msp);
+void set_application_segment(memory_segment *seg, uintptr_t start, size_t size,
+                             const char *name, mspace msp);
 
 /*! \brief Set a shadow memory segment
  *
@@ -246,7 +243,7 @@ void set_application_segment(memory_segment *seg, uintptr_t start,
  * \param name - symbolic name of the segment
  */
 void set_shadow_segment(memory_segment *seg, memory_segment *parent,
-    size_t ratio, const char *name);
+                        size_t ratio, const char *name);
 
 /*! \brief Initialize memory layout, i.e., determine bounds of program segments,
  * allocate shadow memory spaces and compute offsets. This function populates
@@ -285,32 +282,32 @@ void clean_shadow_layout();
  * are given by following macros.
 */
 
-#define heap_primary_offset     mem_layout.heap.primary.shadow_offset
-#define heap_secondary_offset   mem_layout.heap.secondary.shadow_offset
-#define stack_primary_offset    mem_layout.stack.primary.shadow_offset
-#define stack_secondary_offset  mem_layout.stack.secondary.shadow_offset
+#define heap_primary_offset    mem_layout.heap.primary.shadow_offset
+#define heap_secondary_offset  mem_layout.heap.secondary.shadow_offset
+#define stack_primary_offset   mem_layout.stack.primary.shadow_offset
+#define stack_secondary_offset mem_layout.stack.secondary.shadow_offset
 #if E_ACSL_OS_IS_LINUX
-# define global_primary_offset   mem_layout.global.primary.shadow_offset
-# define global_secondary_offset mem_layout.global.secondary.shadow_offset
-# define tls_primary_offset      mem_layout.tls.primary.shadow_offset
-# define tls_secondary_offset    mem_layout.tls.secondary.shadow_offset
+#  define global_primary_offset   mem_layout.global.primary.shadow_offset
+#  define global_secondary_offset mem_layout.global.secondary.shadow_offset
+#  define tls_primary_offset      mem_layout.tls.primary.shadow_offset
+#  define tls_secondary_offset    mem_layout.tls.secondary.shadow_offset
 #elif E_ACSL_OS_IS_WINDOWS
-# define text_primary_offset mem_layout.text.primary.shadow_offset
-# define text_secondary_offset mem_layout.text.secondary.shadow_offset
-# define bss_primary_offset mem_layout.bss.primary.shadow_offset
-# define bss_secondary_offset mem_layout.bss.secondary.shadow_offset
-# define data_primary_offset mem_layout.data.primary.shadow_offset
-# define data_secondary_offset mem_layout.data.secondary.shadow_offset
-# define idata_primary_offset mem_layout.idata.primary.shadow_offset
-# define idata_secondary_offset mem_layout.idata.secondary.shadow_offset
-# define rdata_primary_offset mem_layout.rdata.primary.shadow_offset
-# define rdata_secondary_offset mem_layout.rdata.secondary.shadow_offset
+#  define text_primary_offset    mem_layout.text.primary.shadow_offset
+#  define text_secondary_offset  mem_layout.text.secondary.shadow_offset
+#  define bss_primary_offset     mem_layout.bss.primary.shadow_offset
+#  define bss_secondary_offset   mem_layout.bss.secondary.shadow_offset
+#  define data_primary_offset    mem_layout.data.primary.shadow_offset
+#  define data_secondary_offset  mem_layout.data.secondary.shadow_offset
+#  define idata_primary_offset   mem_layout.idata.primary.shadow_offset
+#  define idata_secondary_offset mem_layout.idata.secondary.shadow_offset
+#  define rdata_primary_offset   mem_layout.rdata.primary.shadow_offset
+#  define rdata_secondary_offset mem_layout.rdata.secondary.shadow_offset
 #endif
 
 /*! \brief Compute a shadow address using displacement offset
  * @param _addr - an application space address
  * @param _offset - a shadow displacement offset */
-#define SHADOW_ACCESS(_addr,_offset)  \
+#define SHADOW_ACCESS(_addr, _offset)                                          \
   ((intptr_t)((intptr_t)_addr - (intptr_t)_offset))
 
 /*! \brief Same as SHADOW_ACCESS but with an additional scale factor given via
@@ -318,87 +315,76 @@ void clean_shadow_layout();
  * for instance if one bit shadow memory is used to track one byte of
  * application memory then the scale factor is 8.
  * Here, scale factor is the ration of application to shadow memory. */
-#define SCALED_SHADOW_ACCESS(_addr, _start, _offset, _scale)  \
-  (((uintptr_t)_start - _offset) + \
-   ((uintptr_t)_addr - (uintptr_t)_start)/_scale)
+#define SCALED_SHADOW_ACCESS(_addr, _start, _offset, _scale)                   \
+  (((uintptr_t)_start - _offset)                                               \
+   + ((uintptr_t)_addr - (uintptr_t)_start) / _scale)
 
 /*! \brief Convert a heap address into its shadow counterpart */
-#define HEAP_SHADOW(_addr) \
-  SHADOW_ACCESS(_addr, heap_primary_offset)
+#define HEAP_SHADOW(_addr) SHADOW_ACCESS(_addr, heap_primary_offset)
 
 /*! \brief Convert a heap address into its init shadow counterpart */
-#define HEAP_INIT_SHADOW(_addr) \
-  SCALED_SHADOW_ACCESS(_addr, \
-      mem_layout.heap.application.start, \
-      mem_layout.heap.secondary.shadow_offset, \
-      mem_layout.heap.secondary.shadow_ratio)
+#define HEAP_INIT_SHADOW(_addr)                                                \
+  SCALED_SHADOW_ACCESS(_addr, mem_layout.heap.application.start,               \
+                       mem_layout.heap.secondary.shadow_offset,                \
+                       mem_layout.heap.secondary.shadow_ratio)
 
 #define HEAP_START mem_layout.heap.application.start
 
 /*! \brief Convert a stack address into its primary shadow counterpart */
-#define PRIMARY_STACK_SHADOW(_addr) \
-  SHADOW_ACCESS(_addr, stack_primary_offset)
+#define PRIMARY_STACK_SHADOW(_addr) SHADOW_ACCESS(_addr, stack_primary_offset)
 
 /*! \brief Convert a stack address into its secondary shadow counterpart */
-#define SECONDARY_STACK_SHADOW(_addr) \
+#define SECONDARY_STACK_SHADOW(_addr)                                          \
   SHADOW_ACCESS(_addr, stack_secondary_offset)
 
 #if E_ACSL_OS_IS_LINUX
 /*! \brief Convert a global address into its primary shadow counterpart */
-# define PRIMARY_GLOBAL_SHADOW(_addr)  \
-  SHADOW_ACCESS(_addr, global_primary_offset)
+#  define PRIMARY_GLOBAL_SHADOW(_addr)                                         \
+    SHADOW_ACCESS(_addr, global_primary_offset)
 
 /*! \brief Convert a global address into its secondary shadow counterpart */
-# define SECONDARY_GLOBAL_SHADOW(_addr) \
-  SHADOW_ACCESS(_addr, global_secondary_offset)
+#  define SECONDARY_GLOBAL_SHADOW(_addr)                                       \
+    SHADOW_ACCESS(_addr, global_secondary_offset)
 
 /*! \brief Convert a TLS address into its primary shadow counterpart */
-# define PRIMARY_TLS_SHADOW(_addr)  \
-  SHADOW_ACCESS(_addr, tls_primary_offset)
+#  define PRIMARY_TLS_SHADOW(_addr) SHADOW_ACCESS(_addr, tls_primary_offset)
 
 /*! \brief Convert a TLS address into its secondary shadow counterpart */
-# define SECONDARY_TLS_SHADOW(_addr) \
-  SHADOW_ACCESS(_addr, tls_secondary_offset)
+#  define SECONDARY_TLS_SHADOW(_addr) SHADOW_ACCESS(_addr, tls_secondary_offset)
 #elif E_ACSL_OS_IS_WINDOWS
 /*! \brief Convert a text address into its primary shadow counterpart */
-# define PRIMARY_TEXT_SHADOW(_addr)  \
-  SHADOW_ACCESS(_addr, text_primary_offset)
+#  define PRIMARY_TEXT_SHADOW(_addr) SHADOW_ACCESS(_addr, text_primary_offset)
 
 /*! \brief Convert a text address into its secondary shadow counterpart */
-# define SECONDARY_TEXT_SHADOW(_addr) \
-  SHADOW_ACCESS(_addr, text_secondary_offset)
+#  define SECONDARY_TEXT_SHADOW(_addr)                                         \
+    SHADOW_ACCESS(_addr, text_secondary_offset)
 
 /*! \brief Convert a bss address into its primary shadow counterpart */
-# define PRIMARY_BSS_SHADOW(_addr)  \
-  SHADOW_ACCESS(_addr, bss_primary_offset)
+#  define PRIMARY_BSS_SHADOW(_addr)   SHADOW_ACCESS(_addr, bss_primary_offset)
 
 /*! \brief Convert a bss address into its secondary shadow counterpart */
-# define SECONDARY_BSS_SHADOW(_addr) \
-  SHADOW_ACCESS(_addr, bss_secondary_offset)
+#  define SECONDARY_BSS_SHADOW(_addr) SHADOW_ACCESS(_addr, bss_secondary_offset)
 
 /*! \brief Convert an data address into its primary shadow counterpart */
-# define PRIMARY_DATA_SHADOW(_addr)  \
-  SHADOW_ACCESS(_addr, data_primary_offset)
+#  define PRIMARY_DATA_SHADOW(_addr)  SHADOW_ACCESS(_addr, data_primary_offset)
 
 /*! \brief Convert an data address into its secondary shadow counterpart */
-# define SECONDARY_DATA_SHADOW(_addr) \
-  SHADOW_ACCESS(_addr, data_secondary_offset)
+#  define SECONDARY_DATA_SHADOW(_addr)                                         \
+    SHADOW_ACCESS(_addr, data_secondary_offset)
 
 /*! \brief Convert an idata address into its primary shadow counterpart */
-# define PRIMARY_IDATA_SHADOW(_addr)  \
-  SHADOW_ACCESS(_addr, idata_primary_offset)
+#  define PRIMARY_IDATA_SHADOW(_addr) SHADOW_ACCESS(_addr, idata_primary_offset)
 
 /*! \brief Convert an idata address into its secondary shadow counterpart */
-# define SECONDARY_IDATA_SHADOW(_addr) \
-  SHADOW_ACCESS(_addr, idata_secondary_offset)
+#  define SECONDARY_IDATA_SHADOW(_addr)                                        \
+    SHADOW_ACCESS(_addr, idata_secondary_offset)
 
 /*! \brief Convert an rdata address into its primary shadow counterpart */
-# define PRIMARY_RDATA_SHADOW(_addr)  \
-  SHADOW_ACCESS(_addr, rdata_primary_offset)
+#  define PRIMARY_RDATA_SHADOW(_addr) SHADOW_ACCESS(_addr, rdata_primary_offset)
 
 /*! \brief Convert an rdata address into its secondary shadow counterpart */
-# define SECONDARY_RDATA_SHADOW(_addr) \
-  SHADOW_ACCESS(_addr, rdata_secondary_offset)
+#  define SECONDARY_RDATA_SHADOW(_addr)                                        \
+    SHADOW_ACCESS(_addr, rdata_secondary_offset)
 
 /*! \brief Convert a global address into its primary shadow counterpart */
 // clang-format off
@@ -460,10 +446,8 @@ void clean_shadow_layout();
  * \param _addr - a memory address
  * \param _seg - a memory segment (one of the structs within ::mem_layout)
 */
-#define IS_ON(_addr,_seg) ( \
-  ((uintptr_t)_addr) >= _seg.start && \
-  ((uintptr_t)_addr) <= _seg.end \
-)
+#define IS_ON(_addr, _seg)                                                     \
+  (((uintptr_t)_addr) >= _seg.start && ((uintptr_t)_addr) <= _seg.end)
 
 /*! \brief Evaluate to true if `_addr` is a heap address */
 #define IS_ON_HEAP(_addr) IS_ON(_addr, mem_layout.heap.application)
@@ -473,119 +457,118 @@ void clean_shadow_layout();
 
 #if E_ACSL_OS_IS_LINUX
 /*! \brief Evaluate to true if `_addr` is a global address */
-# define IS_ON_GLOBAL(_addr) IS_ON(_addr, mem_layout.global.application)
+#  define IS_ON_GLOBAL(_addr) IS_ON(_addr, mem_layout.global.application)
 
 /*! \brief Evaluate to true if _addr is a TLS address */
-# define IS_ON_TLS(_addr) IS_ON(_addr, mem_layout.tls.application)
+#  define IS_ON_TLS(_addr) IS_ON(_addr, mem_layout.tls.application)
 
 /*! \brief Shortcut for evaluating an address via ::IS_ON_STACK,
  * ::IS_ON_GLOBAL or ::IS_ON_TLS  */
-# define IS_ON_STATIC(_addr) \
+#  define IS_ON_STATIC(_addr)                                                  \
     (IS_ON_STACK(_addr) || IS_ON_GLOBAL(_addr) || IS_ON_TLS(_addr))
 #elif E_ACSL_OS_IS_WINDOWS
 /*! \brief Evaluate to true if `_addr` is a text address */
-# define IS_ON_TEXT(_addr) IS_ON(_addr, mem_layout.text.application)
+#  define IS_ON_TEXT(_addr)  IS_ON(_addr, mem_layout.text.application)
 
 /*! \brief Evaluate to true if `_addr` is a bss address */
-# define IS_ON_BSS(_addr) IS_ON(_addr, mem_layout.bss.application)
+#  define IS_ON_BSS(_addr)   IS_ON(_addr, mem_layout.bss.application)
 
 /*! \brief Evaluate to true if `_addr` is an idata address */
-# define IS_ON_DATA(_addr) IS_ON(_addr, mem_layout.data.application)
+#  define IS_ON_DATA(_addr)  IS_ON(_addr, mem_layout.data.application)
 
 /*! \brief Evaluate to true if `_addr` is an idata address */
-# define IS_ON_IDATA(_addr) IS_ON(_addr, mem_layout.idata.application)
+#  define IS_ON_IDATA(_addr) IS_ON(_addr, mem_layout.idata.application)
 
 /*! \brief Evaluate to true if `_addr` is an rdata address */
-# define IS_ON_RDATA(_addr) IS_ON(_addr, mem_layout.rdata.application)
+#  define IS_ON_RDATA(_addr) IS_ON(_addr, mem_layout.rdata.application)
 
 /*! \brief Evaluate to true if `_addr` is a global address */
-# define IS_ON_GLOBAL(_addr) \
-    (IS_ON_TEXT(_addr) || IS_ON_BSS(_addr) || IS_ON_DATA(_addr) || \
-     IS_ON_IDATA(_addr) || IS_ON_RDATA(_addr))
+#  define IS_ON_GLOBAL(_addr)                                                  \
+    (IS_ON_TEXT(_addr) || IS_ON_BSS(_addr) || IS_ON_DATA(_addr)                \
+     || IS_ON_IDATA(_addr) || IS_ON_RDATA(_addr))
 
 /*! \brief Shortcut for evaluating an address via ::IS_ON_STACK,
  * ::IS_ON_TEXT, :: IS_ON_BSS, ::IS_ON_IDATA, or ::IS_ON_RDATA  */
-# define IS_ON_STATIC(_addr) \
-    (IS_ON_STACK(_addr) || IS_ON_TEXT(_addr) || IS_ON_BSS(_addr) || \
-     IS_ON_DATA(_addr) || IS_ON_IDATA(_addr) || IS_ON_RDATA(_addr))
+#  define IS_ON_STATIC(_addr)                                                  \
+    (IS_ON_STACK(_addr) || IS_ON_TEXT(_addr) || IS_ON_BSS(_addr)               \
+     || IS_ON_DATA(_addr) || IS_ON_IDATA(_addr) || IS_ON_RDATA(_addr))
 #endif
 
 /*! \brief Evaluate to a true value if a given address belongs to tracked
  * allocation (i.e., found within static or dynamic allocation) */
-#define IS_ON_VALID(_addr) \
-  (IS_ON_STATIC(_addr) || IS_ON_HEAP(_addr))
+#define IS_ON_VALID(_addr) (IS_ON_STATIC(_addr) || IS_ON_HEAP(_addr))
 
 /* }}} */
 
 #ifdef E_ACSL_TEMPORAL /* {{{ */
 /*! \brief Convert a heap address into its shadow counterpart */
-#define TEMPORAL_HEAP_SHADOW(_addr) \
-  SHADOW_ACCESS(_addr, mem_layout.heap.temporal_primary.shadow_offset)
+#  define TEMPORAL_HEAP_SHADOW(_addr)                                          \
+    SHADOW_ACCESS(_addr, mem_layout.heap.temporal_primary.shadow_offset)
 
 /*! \brief Convert a stack address into its primary temporal shadow counterpart */
-#define TEMPORAL_PRIMARY_STACK_SHADOW(_addr) \
-  SHADOW_ACCESS(_addr, mem_layout.stack.temporal_primary.shadow_offset)
+#  define TEMPORAL_PRIMARY_STACK_SHADOW(_addr)                                 \
+    SHADOW_ACCESS(_addr, mem_layout.stack.temporal_primary.shadow_offset)
 
 /*! \brief Convert a stack address into its secondary temporal shadow counterpart */
-#define TEMPORAL_SECONDARY_STACK_SHADOW(_addr) \
-  SHADOW_ACCESS(_addr, mem_layout.stack.temporal_secondary.shadow_offset)
+#  define TEMPORAL_SECONDARY_STACK_SHADOW(_addr)                               \
+    SHADOW_ACCESS(_addr, mem_layout.stack.temporal_secondary.shadow_offset)
 
-#if E_ACSL_OS_IS_LINUX
+#  if E_ACSL_OS_IS_LINUX
 /*! \brief Convert a global address into its primary temporal shadow counterpart */
-# define TEMPORAL_PRIMARY_GLOBAL_SHADOW(_addr)  \
-    SHADOW_ACCESS(_addr, mem_layout.global.temporal_primary.shadow_offset)
+#    define TEMPORAL_PRIMARY_GLOBAL_SHADOW(_addr)                              \
+      SHADOW_ACCESS(_addr, mem_layout.global.temporal_primary.shadow_offset)
 
 /*! \brief Convert a global address into its primary temporal shadow counterpart */
-# define TEMPORAL_SECONDARY_GLOBAL_SHADOW(_addr)  \
-    SHADOW_ACCESS(_addr, mem_layout.global.temporal_secondary.shadow_offset)
+#    define TEMPORAL_SECONDARY_GLOBAL_SHADOW(_addr)                            \
+      SHADOW_ACCESS(_addr, mem_layout.global.temporal_secondary.shadow_offset)
 
 /*! \brief Convert a TLS address into its primary temporal shadow counterpart */
-# define TEMPORAL_PRIMARY_TLS_SHADOW(_addr)  \
-    SHADOW_ACCESS(_addr, mem_layout.tls.temporal_primary.shadow_offset)
+#    define TEMPORAL_PRIMARY_TLS_SHADOW(_addr)                                 \
+      SHADOW_ACCESS(_addr, mem_layout.tls.temporal_primary.shadow_offset)
 
 /*! \brief Convert a TLS address into its secondary temporal shadow counterpart */
-# define TEMPORAL_SECONDARY_TLS_SHADOW(_addr)  \
-    SHADOW_ACCESS(_addr, mem_layout.tls.temporal_secondary.shadow_offset)
-#elif E_ACSL_OS_IS_WINDOWS
+#    define TEMPORAL_SECONDARY_TLS_SHADOW(_addr)                               \
+      SHADOW_ACCESS(_addr, mem_layout.tls.temporal_secondary.shadow_offset)
+#  elif E_ACSL_OS_IS_WINDOWS
 /*! \brief Convert a text address into its primary temporal shadow counterpart */
-# define TEMPORAL_PRIMARY_TEXT_SHADOW(_addr)  \
-    SHADOW_ACCESS(_addr, mem_layout.text.temporal_primary.shadow_offset)
+#    define TEMPORAL_PRIMARY_TEXT_SHADOW(_addr)                                \
+      SHADOW_ACCESS(_addr, mem_layout.text.temporal_primary.shadow_offset)
 
 /*! \brief Convert a text address into its primary temporal shadow counterpart */
-# define TEMPORAL_SECONDARY_TEXT_SHADOW(_addr)  \
-    SHADOW_ACCESS(_addr, mem_layout.text.temporal_secondary.shadow_offset)
+#    define TEMPORAL_SECONDARY_TEXT_SHADOW(_addr)                              \
+      SHADOW_ACCESS(_addr, mem_layout.text.temporal_secondary.shadow_offset)
 
 /*! \brief Convert a bss address into its primary temporal shadow counterpart */
-# define TEMPORAL_PRIMARY_BSS_SHADOW(_addr)  \
-    SHADOW_ACCESS(_addr, mem_layout.bss.temporal_primary.shadow_offset)
+#    define TEMPORAL_PRIMARY_BSS_SHADOW(_addr)                                 \
+      SHADOW_ACCESS(_addr, mem_layout.bss.temporal_primary.shadow_offset)
 
 /*! \brief Convert a bss address into its primary temporal shadow counterpart */
-# define TEMPORAL_SECONDARY_BSS_SHADOW(_addr)  \
-    SHADOW_ACCESS(_addr, mem_layout.bss.temporal_secondary.shadow_offset)
+#    define TEMPORAL_SECONDARY_BSS_SHADOW(_addr)                               \
+      SHADOW_ACCESS(_addr, mem_layout.bss.temporal_secondary.shadow_offset)
 
 /*! \brief Convert an data address into its primary temporal shadow counterpart */
-# define TEMPORAL_PRIMARY_DATA_SHADOW(_addr)  \
-    SHADOW_ACCESS(_addr, mem_layout.data.temporal_primary.shadow_offset)
+#    define TEMPORAL_PRIMARY_DATA_SHADOW(_addr)                                \
+      SHADOW_ACCESS(_addr, mem_layout.data.temporal_primary.shadow_offset)
 
 /*! \brief Convert an data address into its primary temporal shadow counterpart */
-# define TEMPORAL_SECONDARY_DATA_SHADOW(_addr)  \
-    SHADOW_ACCESS(_addr, mem_layout.data.temporal_secondary.shadow_offset)
+#    define TEMPORAL_SECONDARY_DATA_SHADOW(_addr)                              \
+      SHADOW_ACCESS(_addr, mem_layout.data.temporal_secondary.shadow_offset)
 
 /*! \brief Convert an idata address into its primary temporal shadow counterpart */
-# define TEMPORAL_PRIMARY_IDATA_SHADOW(_addr)  \
-    SHADOW_ACCESS(_addr, mem_layout.idata.temporal_primary.shadow_offset)
+#    define TEMPORAL_PRIMARY_IDATA_SHADOW(_addr)                               \
+      SHADOW_ACCESS(_addr, mem_layout.idata.temporal_primary.shadow_offset)
 
 /*! \brief Convert an idata address into its primary temporal shadow counterpart */
-# define TEMPORAL_SECONDARY_IDATA_SHADOW(_addr)  \
-    SHADOW_ACCESS(_addr, mem_layout.idata.temporal_secondary.shadow_offset)
+#    define TEMPORAL_SECONDARY_IDATA_SHADOW(_addr)                             \
+      SHADOW_ACCESS(_addr, mem_layout.idata.temporal_secondary.shadow_offset)
 
 /*! \brief Convert an rdata address into its primary temporal shadow counterpart */
-# define TEMPORAL_PRIMARY_RDATA_SHADOW(_addr)  \
-    SHADOW_ACCESS(_addr, mem_layout.rdata.temporal_primary.shadow_offset)
+#    define TEMPORAL_PRIMARY_RDATA_SHADOW(_addr)                               \
+      SHADOW_ACCESS(_addr, mem_layout.rdata.temporal_primary.shadow_offset)
 
 /*! \brief Convert an rdata address into its primary temporal shadow counterpart */
-# define TEMPORAL_SECONDARY_RDATA_SHADOW(_addr)  \
-    SHADOW_ACCESS(_addr, mem_layout.rdata.temporal_secondary.shadow_offset)
+#    define TEMPORAL_SECONDARY_RDATA_SHADOW(_addr)                             \
+      SHADOW_ACCESS(_addr, mem_layout.rdata.temporal_secondary.shadow_offset)
 
 /*! \brief Convert a global address into its primary temporal shadow counterpart */
 // clang-format off
@@ -611,12 +594,12 @@ void clean_shadow_layout();
 #  endif
 
 /*! \brief Temporal primary shadow address of a non-dynamic region */
-#define TEMPORAL_PRIMARY_STATIC_SHADOW(_addr) \
-  SHADOW_REGION_ADDRESS(_addr, TEMPORAL_PRIMARY)
+#  define TEMPORAL_PRIMARY_STATIC_SHADOW(_addr)                                \
+    SHADOW_REGION_ADDRESS(_addr, TEMPORAL_PRIMARY)
 
 /*! \brief Temporal secondary shadow address of a non-dynamic region */
-#define TEMPORAL_SECONDARY_STATIC_SHADOW(_addr) \
-  SHADOW_REGION_ADDRESS(_addr, TEMPORAL_SECONDARY)
+#  define TEMPORAL_SECONDARY_STATIC_SHADOW(_addr)                              \
+    SHADOW_REGION_ADDRESS(_addr, TEMPORAL_SECONDARY)
 #endif /* }}} */
 
 #endif // E_ACSL_SHADOW_LAYOUT

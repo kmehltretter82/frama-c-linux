@@ -5,13 +5,11 @@
 */
 
 int main(int argc, const char **argv) {
-  char a = '1',
-       b = '2';
+  char a = '1', b = '2';
   /* Should fail here in debug mode due to overlapping shadow spaces
      of [a] and [b]*/
 
-  char *p = &a,
-       *q = &b;
+  char *p = &a, *q = &b;
 
   p = q;
   /*@assert \valid(p); */

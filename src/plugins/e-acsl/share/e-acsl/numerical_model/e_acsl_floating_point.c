@@ -30,14 +30,14 @@
 
 // Initialization
 double eacsl_math_HUGE_VAL = 0.0;
-float  eacsl_math_HUGE_VALF = 0.0;
+float eacsl_math_HUGE_VALF = 0.0;
 double eacsl_math_INFINITY = 0.0;
 
 void init_infinity_values() {
   /* Initialize E-ACSL infinity values */
-  eacsl_math_HUGE_VAL  = HUGE_VAL;
+  eacsl_math_HUGE_VAL = HUGE_VAL;
   eacsl_math_HUGE_VALF = HUGE_VALF;
-  eacsl_math_INFINITY  = INFINITY;
+  eacsl_math_INFINITY = INFINITY;
   /* Clear exceptions buffers */
   feclearexcept(FE_ALL_EXCEPT);
 }
@@ -49,7 +49,8 @@ void eacsl_floating_point_exception(const char *exp) {
     if (fetestexcept(FE_DIVBYZERO))
       resp = "Division by zero";
     else if (fetestexcept(FE_INEXACT))
-      resp = "Rounded result of an operation is not equal to the infinite precision result";
+      resp = "Rounded result of an operation is not equal to the infinite "
+             "precision result";
     else if (fetestexcept(FE_INVALID))
       resp = "Result of a floating-point operation is not well-defined";
     else if (fetestexcept(FE_OVERFLOW))
@@ -58,7 +59,9 @@ void eacsl_floating_point_exception(const char *exp) {
       resp = "Floating-point underflow";
   }
   if (resp) {
-    rtl_printf("Execution of the statement `%s` leads to a floating point exception\n", exp);
+    rtl_printf(
+        "Execution of the statement `%s` leads to a floating point exception\n",
+        exp);
     rtl_printf("Exception:  %s\n", resp);
   }
   feclearexcept(FE_ALL_EXCEPT);

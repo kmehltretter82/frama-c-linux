@@ -15,8 +15,8 @@ int main(void) {
 
   /*@ assert \sum(x*x,2,\lambda integer k; k) == 0; */;
 
-  /*@ assert \sum(18446744073709551610,18446744073709551615,\lambda integer k; 1) == 6; */;
-
+  /*@ assert \sum(18446744073709551610,18446744073709551615,\lambda integer k; 1) == 6; */
+  ;
 
   return 0;
 }

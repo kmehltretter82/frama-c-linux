@@ -33,17 +33,17 @@
 
 #include "../internals/e_acsl_alias.h"
 
-#define eacsl_builtin_strlen   export_alias(builtin_strlen)
-#define eacsl_builtin_strcpy   export_alias(builtin_strcpy)
-#define eacsl_builtin_strncpy  export_alias(builtin_strncpy)
-#define eacsl_builtin_strcat   export_alias(builtin_strcat)
-#define eacsl_builtin_strncat  export_alias(builtin_strncat)
-#define eacsl_builtin_strcmp   export_alias(builtin_strcmp)
-#define eacsl_builtin_strncmp  export_alias(builtin_strncmp)
-#define eacsl_builtin_memcpy   export_alias(builtin_memcpy)
-#define eacsl_builtin_memset   export_alias(builtin_memset)
-#define eacsl_builtin_memcmp   export_alias(builtin_memcmp)
-#define eacsl_builtin_memmove  export_alias(builtin_memmove)
+#define eacsl_builtin_strlen  export_alias(builtin_strlen)
+#define eacsl_builtin_strcpy  export_alias(builtin_strcpy)
+#define eacsl_builtin_strncpy export_alias(builtin_strncpy)
+#define eacsl_builtin_strcat  export_alias(builtin_strcat)
+#define eacsl_builtin_strncat export_alias(builtin_strncat)
+#define eacsl_builtin_strcmp  export_alias(builtin_strcmp)
+#define eacsl_builtin_strncmp export_alias(builtin_strncmp)
+#define eacsl_builtin_memcpy  export_alias(builtin_memcpy)
+#define eacsl_builtin_memset  export_alias(builtin_memset)
+#define eacsl_builtin_memcmp  export_alias(builtin_memcmp)
+#define eacsl_builtin_memmove export_alias(builtin_memmove)
 
 /************************************************************************/
 /*** Support functionality {{{ ***/
@@ -100,46 +100,45 @@ int disjoint_spaces(uintptr_t s1, size_t s1_sz, uintptr_t s2, size_t s2_sz);
 
 /* drop-in replacement for `strlen` */
 /*@ assigns \result \from s[0..]; */
-size_t eacsl_builtin_strlen(const char *s)
-  __attribute__((FC_BUILTIN));
+size_t eacsl_builtin_strlen(const char *s) __attribute__((FC_BUILTIN));
 
 /* drop-in replacement for `strcpy` */
 /*@ assigns dest[0..] \from src[0..];
   @ assigns \result \from dest;
   @ ensures \result == dest; */
 char *eacsl_builtin_strcpy(char *dest, const char *src)
-  __attribute__((FC_BUILTIN));
+    __attribute__((FC_BUILTIN));
 
 /* drop-in replacement for `strncpy` */
 /*@ assigns dest[0..n - 1] \from src[0..n-1];
   @ assigns \result \from dest;
   @ ensures \result == dest; */
 char *eacsl_builtin_strncpy(char *dest, const char *src, size_t n)
-  __attribute__((FC_BUILTIN));
+    __attribute__((FC_BUILTIN));
 
 /* drop-in replacement for `strcmp` */
 /*@ assigns \result \from s1[0..], s2[0..]; */
 int eacsl_builtin_strcmp(const char *s1, const char *s2)
-  __attribute__((FC_BUILTIN));
+    __attribute__((FC_BUILTIN));
 
 /* drop-in replacement for `strncmp` */
 /*@ assigns \result \from s1[0..n-1], s2[0..n-1]; */
 int eacsl_builtin_strncmp(const char *s1, const char *s2, size_t n)
-  __attribute__((FC_BUILTIN));
+    __attribute__((FC_BUILTIN));
 
 /* drop-in replacement for `strcat` */
 /*@ assigns dest[..] \from src[0..];
   @ assigns \result \from dest;
   @ ensures \result == dest; */
 char *eacsl_builtin_strcat(char *dest, const char *src)
-  __attribute__((FC_BUILTIN));
+    __attribute__((FC_BUILTIN));
 
 /* drop-in replacement for `strncat` */
 /*@ assigns dest[..] \from src[0..n];
   @ assigns \result \from dest;
   @ ensures \result == dest; */
 char *eacsl_builtin_strncat(char *dest, const char *src, size_t n)
-  __attribute__((FC_BUILTIN));
+    __attribute__((FC_BUILTIN));
 /* }}} */
 
 /************************************************************************/
@@ -151,26 +150,26 @@ char *eacsl_builtin_strncat(char *dest, const char *src, size_t n)
   @ assigns \result \from dest;
   @ ensures \result == dest; */
 void *eacsl_builtin_memcpy(void *dest, const void *src, size_t n)
-  __attribute__((FC_BUILTIN));
+    __attribute__((FC_BUILTIN));
 
 /* drop-in replacement for `memset` */
 /*@ assigns ((char*)s)[0..n-1] \from c;
   @ assigns \result \from s;
   @ ensures \result == s; */
 void *eacsl_builtin_memset(void *s, int c, size_t n)
-  __attribute__((FC_BUILTIN));
+    __attribute__((FC_BUILTIN));
 
 /* drop-in replacement for `memcmp` */
 /*@ assigns \result \from ((char*)s1)[0..n-1], ((char*)s2)[0..n-1]; */
 int eacsl_builtin_memcmp(const void *s1, const void *s2, size_t n)
-  __attribute__((FC_BUILTIN));
+    __attribute__((FC_BUILTIN));
 
 /* drop-in replacement for `memmove` */
 /*@ assigns ((char*)dest)[0..n-1] \from ((char*)src)[0..n-1];
   @ assigns \result \from dest;
   @ ensures \result == dest; */
 void *eacsl_builtin_memmove(void *dest, const void *src, size_t n)
-  __attribute__((FC_BUILTIN));
+    __attribute__((FC_BUILTIN));
 
 /* }}} */
 

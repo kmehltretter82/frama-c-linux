@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#include <stdio.h>
 #include <errno.h>
+#include <stdio.h>
 
 #include "../../internals/e_acsl_config.h"
 #include "e_acsl_safe_locations.h"
@@ -29,16 +29,17 @@
 /* An array storing safe locations up to `safe_location_counter` position.
  * This array should be initialized via a below function called
  * `collect_safe_locations`. */
-static memory_location safe_locations [16];
+static memory_location safe_locations[16];
 static int safe_location_counter = 0;
 
-#define add_safe_location(_addr,_len,_init,_on_static) do { \
-  safe_locations[safe_location_counter].address = _addr; \
-  safe_locations[safe_location_counter].length = _len; \
-  safe_locations[safe_location_counter].is_initialized = _init; \
-  safe_locations[safe_location_counter].is_on_static = _on_static; \
-  safe_location_counter++; \
-} while (0)
+#define add_safe_location(_addr, _len, _init, _on_static)                      \
+  do {                                                                         \
+    safe_locations[safe_location_counter].address = _addr;                     \
+    safe_locations[safe_location_counter].length = _len;                       \
+    safe_locations[safe_location_counter].is_initialized = _init;              \
+    safe_locations[safe_location_counter].is_on_static = _on_static;           \
+    safe_location_counter++;                                                   \
+  } while (0)
 
 void collect_safe_locations() {
   /* Tracking of errno and standard streams */
@@ -52,6 +53,6 @@ size_t get_safe_locations_count() {
   return safe_location_counter;
 }
 
-memory_location * get_safe_location(size_t i) {
+memory_location *get_safe_location(size_t i) {
   return &safe_locations[i];
 }

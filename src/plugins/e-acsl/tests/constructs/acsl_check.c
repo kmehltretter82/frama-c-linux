@@ -8,7 +8,7 @@ int f(int a) {
   return a;
 }
 
-void g(int a, int * b) {
+void g(int a, int *b) {
   //@ check a / b[1] == 0;
 }
 

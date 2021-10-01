@@ -57,7 +57,8 @@ extern int __attribute__((FC_BUILTIN)) eacsl_runtime_sound_verdict;
   @ complete behaviors;
   @ disjoint behaviors; */
 void eacsl_runtime_assert(int pred, int blocking, const char *kind,
-    const char *fct, const char *pred_txt, const char * file, int line)
-  __attribute__((FC_BUILTIN));
+                          const char *fct, const char *pred_txt,
+                          const char *file, int line)
+    __attribute__((FC_BUILTIN));
 
 #endif // E_ACSL_ASSERT_H

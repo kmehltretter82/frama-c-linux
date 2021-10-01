@@ -6,19 +6,19 @@
    MACRO: ROOT_EACSL_GCC_OPTS_EXT @ROOT_EACSL_GCC_OPTS_EXT@ -e "-Wno-maybe-uninitialized"
 */
 
-#include <stddef.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <signal.h>
-#include <unistd.h>
-#include <stdint.h>
-#include <limits.h>
-#include <wchar.h>
 #include "../utils/signalled.h"
+#include <limits.h>
+#include <signal.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <wchar.h>
 
-#define ABRT_AT(code,at) SIGNALLED_AT(code, 1, at)
-#define OK_AT(code,at) SIGNALLED_AT(code, 0, at)
+#define ABRT_AT(code, at) SIGNALLED_AT(code, 1, at)
+#define OK_AT(code, at)   SIGNALLED_AT(code, 0, at)
 
 /* All valid format specifiers */
 const char *valid_specifiers = "diouxfFeEgGaAcspn";
@@ -49,7 +49,8 @@ void apply_specifier(char *format, int spec) {
    run positive tests for all specifiers from `allowed` and negative ones
    for the remaining one. If `only_negative` is true then only negative tests
    are run */
-void test_specifier_application(const char *allowed, const char *fmt, int only_negative, char *at) {
+void test_specifier_application(const char *allowed, const char *fmt,
+                                int only_negative, char *at) {
   int len = strlen(fmt);
   char format[len + 1];
   strcpy(format, fmt);
@@ -59,10 +60,10 @@ void test_specifier_application(const char *allowed, const char *fmt, int only_n
     format[len - 1] = c;
     if (strchr(allowed, c)) {
       if (!only_negative) {
-        OK_AT(apply_specifier(format,c),at);
+        OK_AT(apply_specifier(format, c), at);
       }
     } else {
-      ABRT_AT(apply_specifier(format,c),at);
+      ABRT_AT(apply_specifier(format, c), at);
     }
   }
 }
@@ -72,7 +73,7 @@ int main(int argc, const char **argv) {
   char *pstr = "Hello world!";
   char astr[] = "Hello world!";
   signed char *sastr = astr;
-  void *vptr = (void*)&argc;
+  void *vptr = (void *)&argc;
   // char
   char chr = 'T';
   unsigned char uchr = 'U';
@@ -225,7 +226,7 @@ int main(int argc, const char **argv) {
 
   // Undef 9. there are more than one LM per one CS
   OK(printf("%ld\n", 1L));
-  OK(printf("%lld\n",1LL));
+  OK(printf("%lld\n", 1LL));
   ABRT(printf("%llld\n", 1LL));
 
   // FIXME: an issue with positive tests here. This is because length modifiers
@@ -233,26 +234,41 @@ int main(int argc, const char **argv) {
 
   // Undef 10. 'hh' used with a CS other than [diouxXn]
   test_specifier_application("diouxXn", "%hhX", 1, AT);
-  OK(printf("%hhd", 1)); OK(printf("%hhi", 1));
-  OK(printf("%hhu", 1)); OK(printf("%hho", 1));
-  OK(printf("%hhx", 1)); OK(printf("%hhX", 1)); OK(printf("%hhn", &chr));
+  OK(printf("%hhd", 1));
+  OK(printf("%hhi", 1));
+  OK(printf("%hhu", 1));
+  OK(printf("%hho", 1));
+  OK(printf("%hhx", 1));
+  OK(printf("%hhX", 1));
+  OK(printf("%hhn", &chr));
 
   // Undef 11. 'h'  used with a CS other than [diouxXn]
   test_specifier_application("diouxXn", "%hX", 1, AT);
-  OK(printf("%hd", 1)); OK(printf("%hi", 1));
-  OK(printf("%hu", 1)); OK(printf("%ho", 1));
-  OK(printf("%hx", 1)); OK(printf("%hX", 1)); OK(printf("%hn", &shrt));
+  OK(printf("%hd", 1));
+  OK(printf("%hi", 1));
+  OK(printf("%hu", 1));
+  OK(printf("%ho", 1));
+  OK(printf("%hx", 1));
+  OK(printf("%hX", 1));
+  OK(printf("%hn", &shrt));
 
   // Undef 12. 'l'  used with a CS other than [diouxXncsaAeEfFgG]
   test_specifier_application("diouxXncsaAeEfFgG", "%lX", 1, AT);
-  OK(printf("%ld", 1L));  OK(printf("%li", 1L));
-  OK(printf("%lu", 1UL)); OK(printf("%lo", 1UL));
-  OK(printf("%lx", 1UL)); OK(printf("%lX", 1UL));
+  OK(printf("%ld", 1L));
+  OK(printf("%li", 1L));
+  OK(printf("%lu", 1UL));
+  OK(printf("%lo", 1UL));
+  OK(printf("%lx", 1UL));
+  OK(printf("%lX", 1UL));
   // No effect on [aAeEfFgG]
-  OK(printf("%f", dbl)); OK(printf("%F", dbl));
-  OK(printf("%e", dbl)); OK(printf("%E", dbl));
-  OK(printf("%a", dbl)); OK(printf("%A", dbl));
-  OK(printf("%g", dbl)); OK(printf("%G", dbl));
+  OK(printf("%f", dbl));
+  OK(printf("%F", dbl));
+  OK(printf("%e", dbl));
+  OK(printf("%E", dbl));
+  OK(printf("%a", dbl));
+  OK(printf("%A", dbl));
+  OK(printf("%g", dbl));
+  OK(printf("%G", dbl));
   // Pointer to long int for [n]
   OK(printf("%ln", &li));
   // wint_t for [c], since wint_t is essentially short then it is the subject
@@ -261,15 +277,23 @@ int main(int argc, const char **argv) {
 
   // Undef 13. 'll' used with a CS other than [diouxXn]
   //test_specifier_application("diouxXn", "%llX", 1, AT);
-  OK(printf("%lld", 1LL)); OK(printf("%lli", 1LL));
-  OK(printf("%llu", 1ULL)); OK(printf("%llo", 1ULL));
-  OK(printf("%llx", 1ULL)); OK(printf("%llX", 1ULL)); OK(printf("%lln", &lli));
+  OK(printf("%lld", 1LL));
+  OK(printf("%lli", 1LL));
+  OK(printf("%llu", 1ULL));
+  OK(printf("%llo", 1ULL));
+  OK(printf("%llx", 1ULL));
+  OK(printf("%llX", 1ULL));
+  OK(printf("%lln", &lli));
 
   // Undef 14. 'j'  used with a CS other than [diouxXn]
   test_specifier_application("diouxXn", "%jX", 1, AT);
-  OK(printf("%jd", imax));  OK(printf("%ji", imax));
-  OK(printf("%ju", uimax)); OK(printf("%jo", uimax));
-  OK(printf("%jx", uimax)); OK(printf("%jX", uimax)); OK(printf("%jn", &imax));
+  OK(printf("%jd", imax));
+  OK(printf("%ji", imax));
+  OK(printf("%ju", uimax));
+  OK(printf("%jo", uimax));
+  OK(printf("%jx", uimax));
+  OK(printf("%jX", uimax));
+  OK(printf("%jn", &imax));
 
   // Undef 15. 'z'  used with a CS other than [diouxXn]
   test_specifier_application("diouxXn", "%zX", 1, AT);
@@ -277,117 +301,216 @@ int main(int argc, const char **argv) {
   // For simplicity the below assumes that in a 32-bit system it is `int` and
   // `long` in 64 bit. This may fail though, so use with caution.
 #if __WORDSIZE == 64
-  OK(printf("%zd", li));  OK(printf("%zi", li));
-#elif  __WORDSIZE == 32
-  OK(printf("%zd", i));  OK(printf("%zi", i));
+  OK(printf("%zd", li));
+  OK(printf("%zi", li));
+#elif __WORDSIZE == 32
+  OK(printf("%zd", i));
+  OK(printf("%zi", i));
 #endif
-  OK(printf("%zu", szt)); OK(printf("%zo", szt));
-  OK(printf("%zx", szt)); OK(printf("%zX", szt)); OK(printf("%zn", &szt));
+  OK(printf("%zu", szt));
+  OK(printf("%zo", szt));
+  OK(printf("%zx", szt));
+  OK(printf("%zX", szt));
+  OK(printf("%zn", &szt));
 
   // Undef 16. 't'  used with a CS other than [diouxXn]
   // Same as above but since ptrdiff_t is sizned we have to tweak types for
   // [uoxX]
   test_specifier_application("diouxXn", "%tX", 1, AT);
 #if __WORDSIZE == 64
-  OK(printf("%tu", lu)); OK(printf("%to", lu));
-  OK(printf("%tx", lu)); OK(printf("%tX", lu));
-#elif  __WORDSIZE == 32
-  OK(printf("%tu", ui)); OK(printf("%to", ui));
-  OK(printf("%tx", ui)); OK(printf("%tX", ui));
+  OK(printf("%tu", lu));
+  OK(printf("%to", lu));
+  OK(printf("%tx", lu));
+  OK(printf("%tX", lu));
+#elif __WORDSIZE == 32
+  OK(printf("%tu", ui));
+  OK(printf("%to", ui));
+  OK(printf("%tx", ui));
+  OK(printf("%tX", ui));
 #endif
-  OK(printf("%td", ptrdf));  OK(printf("%ti", ptrdf));
+  OK(printf("%td", ptrdf));
+  OK(printf("%ti", ptrdf));
   OK(printf("%tn", &ptrdf));
 
   // Undef 17. 'L'  used with a CS other than [aAeEfFgG]
   test_specifier_application("aAeEfFgG", "%LX", 1, AT);
-  OK(printf("%Lf", ldbl)); OK(printf("%LF", ldbl));
-  OK(printf("%Le", ldbl)); OK(printf("%LE", ldbl));
-  OK(printf("%La", ldbl)); OK(printf("%LA", ldbl));
-  OK(printf("%Lg", ldbl)); OK(printf("%LG", ldbl));
+  OK(printf("%Lf", ldbl));
+  OK(printf("%LF", ldbl));
+  OK(printf("%Le", ldbl));
+  OK(printf("%LE", ldbl));
+  OK(printf("%La", ldbl));
+  OK(printf("%LA", ldbl));
+  OK(printf("%Lg", ldbl));
+  OK(printf("%LG", ldbl));
 
   // Undef 18. CS is not one of [diouxfFeEgGaAcspnCS%]
   // Try some of specifiers supported by GLIBC printf but not in C99
-  ABRT(printf("%C\n",1));
-  ABRT(printf("%S\n",1));
-  ABRT(printf("%m\n",1));
+  ABRT(printf("%C\n", 1));
+  ABRT(printf("%S\n", 1));
+  ABRT(printf("%m\n", 1));
 
   // Undef 19. [di]: no LM is present and the argument is not of type 'int'
-  OK(printf("%i\n", i));        OK(printf("%d\n", i));
-  OK(printf("%i\n", chr));      OK(printf("%d\n", chr)); // promoted to int
-  OK(printf("%i\n", shrt));     OK(printf("%d\n", shrt)); // promoted to int
-  ABRT(printf("%i\n", li));    ABRT(printf("%d\n", li));
-  ABRT(printf("%i\n", ui));    ABRT(printf("%d\n", ui));
-  ABRT(printf("%i\n", vptr));  ABRT(printf("%d\n", vptr));
-  ABRT(printf("%i\n", flt));   ABRT(printf("%d\n", flt));
+  OK(printf("%i\n", i));
+  OK(printf("%d\n", i));
+  OK(printf("%i\n", chr));
+  OK(printf("%d\n", chr)); // promoted to int
+  OK(printf("%i\n", shrt));
+  OK(printf("%d\n", shrt)); // promoted to int
+  ABRT(printf("%i\n", li));
+  ABRT(printf("%d\n", li));
+  ABRT(printf("%i\n", ui));
+  ABRT(printf("%d\n", ui));
+  ABRT(printf("%i\n", vptr));
+  ABRT(printf("%d\n", vptr));
+  ABRT(printf("%i\n", flt));
+  ABRT(printf("%d\n", flt));
 
   // Undef 20. [di]: LM is present and the argument is not of type given by LM
-  OK(printf("%li\n",  li));       OK(printf("%ld\n",  li));
-  OK(printf("%lli\n", lli));      OK(printf("%lld\n", lli));
-  OK(printf("%hi\n",  shrt));     OK(printf("%hd\n",  shrt));
-  OK(printf("%hhi\n", chr));      OK(printf("%hhd\n", chr));
+  OK(printf("%li\n", li));
+  OK(printf("%ld\n", li));
+  OK(printf("%lli\n", lli));
+  OK(printf("%lld\n", lli));
+  OK(printf("%hi\n", shrt));
+  OK(printf("%hd\n", shrt));
+  OK(printf("%hhi\n", chr));
+  OK(printf("%hhd\n", chr));
 #if __WORDSIZE == 64
-  OK(printf("%ji\n",  li));       OK(printf("%jd\n",  li));
+  OK(printf("%ji\n", li));
+  OK(printf("%jd\n", li));
 #elif __WORDSIZE == 32
-  OK(printf("%zi\n",  i));        OK(printf("%zd\n",  i));
+  OK(printf("%zi\n", i));
+  OK(printf("%zd\n", i));
 #endif
-  OK(printf("%ti\n",  ptrdf));    OK(printf("%td\n",  ptrdf));
+  OK(printf("%ti\n", ptrdf));
+  OK(printf("%td\n", ptrdf));
 
   // Undef 21. [ouxX]: no LM is present and the argument is not 'unsigned int'
-  OK(printf("%u\n", ui));       OK(printf("%o\n", ui));       OK(printf("%x\n", ui));       OK(printf("%X\n", ui));
-  ABRT(printf("%u\n", li));    ABRT(printf("%o\n", li));    ABRT(printf("%x\n", li));    ABRT(printf("%X\n", li));
-  ABRT(printf("%u\n", lu));    ABRT(printf("%o\n", lu));    ABRT(printf("%x\n", lu));    ABRT(printf("%X\n", lu));
-  ABRT(printf("%u\n", flt));   ABRT(printf("%o\n", flt));   ABRT(printf("%x\n", flt));   ABRT(printf("%X\n", flt));
-  ABRT(printf("%u\n", vptr));  ABRT(printf("%o\n", vptr));  ABRT(printf("%x\n", vptr));  ABRT(printf("%X\n", vptr));
-  ABRT(printf("%u\n", astr));  ABRT(printf("%o\n", astr));  ABRT(printf("%x\n", astr));  ABRT(printf("%X\n", astr));
+  OK(printf("%u\n", ui));
+  OK(printf("%o\n", ui));
+  OK(printf("%x\n", ui));
+  OK(printf("%X\n", ui));
+  ABRT(printf("%u\n", li));
+  ABRT(printf("%o\n", li));
+  ABRT(printf("%x\n", li));
+  ABRT(printf("%X\n", li));
+  ABRT(printf("%u\n", lu));
+  ABRT(printf("%o\n", lu));
+  ABRT(printf("%x\n", lu));
+  ABRT(printf("%X\n", lu));
+  ABRT(printf("%u\n", flt));
+  ABRT(printf("%o\n", flt));
+  ABRT(printf("%x\n", flt));
+  ABRT(printf("%X\n", flt));
+  ABRT(printf("%u\n", vptr));
+  ABRT(printf("%o\n", vptr));
+  ABRT(printf("%x\n", vptr));
+  ABRT(printf("%X\n", vptr));
+  ABRT(printf("%u\n", astr));
+  ABRT(printf("%o\n", astr));
+  ABRT(printf("%x\n", astr));
+  ABRT(printf("%X\n", astr));
 
   // Undef 22. [ouxX]: LM is present and the argument is not of type given by the LM
-  OK(printf("%lu\n", lu));    OK(printf("%lo\n", lu));    OK(printf("%lx\n", lu));    OK(printf("%lX\n", lu));
-  OK(printf("%llu\n", llu));  OK(printf("%llo\n", llu));  OK(printf("%llx\n", llu));  OK(printf("%llX\n", llu));
+  OK(printf("%lu\n", lu));
+  OK(printf("%lo\n", lu));
+  OK(printf("%lx\n", lu));
+  OK(printf("%lX\n", lu));
+  OK(printf("%llu\n", llu));
+  OK(printf("%llo\n", llu));
+  OK(printf("%llx\n", llu));
+  OK(printf("%llX\n", llu));
   // subject to promotion so expects int
-  OK(printf("%hu\n", i));     OK(printf("%ho\n", i));     OK(printf("%hx\n", i));     OK(printf("%hX\n", i));
+  OK(printf("%hu\n", i));
+  OK(printf("%ho\n", i));
+  OK(printf("%hx\n", i));
+  OK(printf("%hX\n", i));
   // subject to promotion so expects int
-  OK(printf("%hhu\n", i));    OK(printf("%hho\n", i));    OK(printf("%hhx\n", i));    OK(printf("%hhX\n", i));
-  OK(printf("%ju\n", uimax)); OK(printf("%jo\n", uimax)); OK(printf("%jx\n", uimax)); OK(printf("%jX\n", uimax));
-  OK(printf("%zu\n", szt));   OK(printf("%zo\n", szt));   OK(printf("%zx\n", szt));   OK(printf("%zX\n", szt));
+  OK(printf("%hhu\n", i));
+  OK(printf("%hho\n", i));
+  OK(printf("%hhx\n", i));
+  OK(printf("%hhX\n", i));
+  OK(printf("%ju\n", uimax));
+  OK(printf("%jo\n", uimax));
+  OK(printf("%jx\n", uimax));
+  OK(printf("%jX\n", uimax));
+  OK(printf("%zu\n", szt));
+  OK(printf("%zo\n", szt));
+  OK(printf("%zx\n", szt));
+  OK(printf("%zX\n", szt));
 #if __WORDSIZE == 64
-  OK(printf("%tu\n", lu));    OK(printf("%to\n", lu));    OK(printf("%tx\n", lu));    OK(printf("%tX\n", lu));
+  OK(printf("%tu\n", lu));
+  OK(printf("%to\n", lu));
+  OK(printf("%tx\n", lu));
+  OK(printf("%tX\n", lu));
 #endif
 
   // Undef 23. [aAgGfFeE]: no LM is present and the argument is not of type 'double'
-     OK(printf("%f\n",dbl));       OK(printf("%F\n",dbl));
-  ABRT(printf("%f\n",ldbl));   ABRT(printf("%F\n",ldbl));
-  ABRT(printf("%f\n",i));      ABRT(printf("%F\n",i));
-  ABRT(printf("%f\n",lu));     ABRT(printf("%F\n",lu));
-     OK(printf("%a\n",dbl));       OK(printf("%A\n",dbl));
-  ABRT(printf("%a\n",ldbl));   ABRT(printf("%A\n",ldbl));
-  ABRT(printf("%a\n",i));      ABRT(printf("%A\n",i));
-  ABRT(printf("%a\n",lu));     ABRT(printf("%A\n",lu));
-     OK(printf("%e\n",dbl));       OK(printf("%E\n",dbl));
-  ABRT(printf("%e\n",ldbl));   ABRT(printf("%E\n",ldbl));
-  ABRT(printf("%e\n",i));      ABRT(printf("%E\n",i));
-  ABRT(printf("%e\n",lu));     ABRT(printf("%E\n",lu));
-     OK(printf("%g\n",dbl));       OK(printf("%G\n",dbl));
-  ABRT(printf("%g\n",ldbl));   ABRT(printf("%G\n",ldbl));
-  ABRT(printf("%g\n",i));      ABRT(printf("%G\n",i));
-  ABRT(printf("%g\n",lu));     ABRT(printf("%G\n",lu));
+  OK(printf("%f\n", dbl));
+  OK(printf("%F\n", dbl));
+  ABRT(printf("%f\n", ldbl));
+  ABRT(printf("%F\n", ldbl));
+  ABRT(printf("%f\n", i));
+  ABRT(printf("%F\n", i));
+  ABRT(printf("%f\n", lu));
+  ABRT(printf("%F\n", lu));
+  OK(printf("%a\n", dbl));
+  OK(printf("%A\n", dbl));
+  ABRT(printf("%a\n", ldbl));
+  ABRT(printf("%A\n", ldbl));
+  ABRT(printf("%a\n", i));
+  ABRT(printf("%A\n", i));
+  ABRT(printf("%a\n", lu));
+  ABRT(printf("%A\n", lu));
+  OK(printf("%e\n", dbl));
+  OK(printf("%E\n", dbl));
+  ABRT(printf("%e\n", ldbl));
+  ABRT(printf("%E\n", ldbl));
+  ABRT(printf("%e\n", i));
+  ABRT(printf("%E\n", i));
+  ABRT(printf("%e\n", lu));
+  ABRT(printf("%E\n", lu));
+  OK(printf("%g\n", dbl));
+  OK(printf("%G\n", dbl));
+  ABRT(printf("%g\n", ldbl));
+  ABRT(printf("%G\n", ldbl));
+  ABRT(printf("%g\n", i));
+  ABRT(printf("%G\n", i));
+  ABRT(printf("%g\n", lu));
+  ABRT(printf("%G\n", lu));
 
   // 24. [aAgGfFeE]: 'L' LM is present and the argument is not of type 'long double'
-  ABRT(printf("%Lf\n",dbl));    ABRT(printf("%LF\n",dbl));
-     OK(printf("%Lf\n",ldbl));      OK(printf("%LF\n",ldbl));
-  ABRT(printf("%Lf\n",i));      ABRT(printf("%LF\n",i));
-  ABRT(printf("%Lf\n",lu));     ABRT(printf("%LF\n",lu));
-  ABRT(printf("%La\n",dbl));    ABRT(printf("%LA\n",dbl));
-     OK(printf("%La\n",ldbl));      OK(printf("%LA\n",ldbl));
-  ABRT(printf("%La\n",i));      ABRT(printf("%LA\n",i));
-  ABRT(printf("%La\n",lu));     ABRT(printf("%LA\n",lu));
-  ABRT(printf("%Le\n",dbl));    ABRT(printf("%LE\n",dbl));
-     OK(printf("%Le\n",ldbl));      OK(printf("%LE\n",ldbl));
-  ABRT(printf("%Le\n",i));      ABRT(printf("%LE\n",i));
-  ABRT(printf("%Le\n",lu));     ABRT(printf("%LE\n",lu));
-  ABRT(printf("%Lg\n",dbl));    ABRT(printf("%LG\n",dbl));
-     OK(printf("%Lg\n",ldbl));      OK(printf("%LG\n",ldbl));
-  ABRT(printf("%Lg\n",i));      ABRT(printf("%LG\n",i));
-  ABRT(printf("%Lg\n",lu));     ABRT(printf("%LG\n",lu));
+  ABRT(printf("%Lf\n", dbl));
+  ABRT(printf("%LF\n", dbl));
+  OK(printf("%Lf\n", ldbl));
+  OK(printf("%LF\n", ldbl));
+  ABRT(printf("%Lf\n", i));
+  ABRT(printf("%LF\n", i));
+  ABRT(printf("%Lf\n", lu));
+  ABRT(printf("%LF\n", lu));
+  ABRT(printf("%La\n", dbl));
+  ABRT(printf("%LA\n", dbl));
+  OK(printf("%La\n", ldbl));
+  OK(printf("%LA\n", ldbl));
+  ABRT(printf("%La\n", i));
+  ABRT(printf("%LA\n", i));
+  ABRT(printf("%La\n", lu));
+  ABRT(printf("%LA\n", lu));
+  ABRT(printf("%Le\n", dbl));
+  ABRT(printf("%LE\n", dbl));
+  OK(printf("%Le\n", ldbl));
+  OK(printf("%LE\n", ldbl));
+  ABRT(printf("%Le\n", i));
+  ABRT(printf("%LE\n", i));
+  ABRT(printf("%Le\n", lu));
+  ABRT(printf("%LE\n", lu));
+  ABRT(printf("%Lg\n", dbl));
+  ABRT(printf("%LG\n", dbl));
+  OK(printf("%Lg\n", ldbl));
+  OK(printf("%LG\n", ldbl));
+  ABRT(printf("%Lg\n", i));
+  ABRT(printf("%LG\n", i));
+  ABRT(printf("%Lg\n", lu));
+  ABRT(printf("%LG\n", lu));
 
   // Undef 25. [c] no LM is present and the argument is not of type 'int'
   OK(printf("%c\n", i));
@@ -424,10 +547,10 @@ int main(int argc, const char **argv) {
   ABRT(printf("%s\n", s4)); // Not NUL-terminated
 
   // Precision
-  OK(printf("%.s\n", s1));  // The precision is zero, so print nothing
-  OK(printf("%.0s\n", s1)); // The precision is zero, so print nothing
-  OK(printf("%.3s\n", s4)); // Within allocated limits even though no NUL
-  OK(printf("%.4s\n", s4)); // Within allocated limits even though no NUL
+  OK(printf("%.s\n", s1));    // The precision is zero, so print nothing
+  OK(printf("%.0s\n", s1));   // The precision is zero, so print nothing
+  OK(printf("%.3s\n", s4));   // Within allocated limits even though no NUL
+  OK(printf("%.4s\n", s4));   // Within allocated limits even though no NUL
   ABRT(printf("%.5s\n", s4)); // Precision goes over limits
 
   // Undef 29/30. Same as 27/28 but for '%ls' and wchar_t*
@@ -445,10 +568,10 @@ int main(int argc, const char **argv) {
   OK(printf("%ls\n", ls4));
 
   // Precision
-  OK(printf("%.ls\n", ls1));  // The precision is zero, so print nothing
-  OK(printf("%.0ls\n", ls1)); // The precision is zero, so print nothing
-  OK(printf("%.3ls\n", ls4)); // Within allocated limits even though no NUL
-  OK(printf("%.4ls\n", ls4)); // Within allocated limits even though no NUL
+  OK(printf("%.ls\n", ls1));    // The precision is zero, so print nothing
+  OK(printf("%.0ls\n", ls1));   // The precision is zero, so print nothing
+  OK(printf("%.3ls\n", ls4));   // Within allocated limits even though no NUL
+  OK(printf("%.4ls\n", ls4));   // Within allocated limits even though no NUL
   ABRT(printf("%.5ls\n", ls4)); // Precision goes over limits
 #endif
 
@@ -459,9 +582,9 @@ int main(int argc, const char **argv) {
 
   // Undef 32. [n]: the argument is not a valid pointer of signed int type
   OK(printf("%n", &i));
-  ABRT(printf("%n", &ui)); // pointer to unsigned type
-  ABRT(printf("%n", NULL)); // NULL
-  ABRT(printf("%n", (int*)pstr)); // cast of read-only string
+  ABRT(printf("%n", &ui));         // pointer to unsigned type
+  ABRT(printf("%n", NULL));        // NULL
+  ABRT(printf("%n", (int *)pstr)); // cast of read-only string
 
   // Undef 33. [n]: directive using [n] contains flags or field width or precision
   ABRT(printf("%'n", &i));

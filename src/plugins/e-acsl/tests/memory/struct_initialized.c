@@ -22,7 +22,7 @@ int main() {
 
   // Dynamic alloc
   {
-    int32_pair_t * heap_pair = malloc(sizeof(int32_pair_t));
+    int32_pair_t *heap_pair = malloc(sizeof(int32_pair_t));
     //@ assert !\initialized(&heap_pair->a);
     //@ assert !\initialized(&heap_pair->b);
     heap_pair->a = 3;

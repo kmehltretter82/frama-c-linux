@@ -18,9 +18,9 @@ int *f(int *x) {
 
 void g(void) {
   int m, *u, **p;
-  p=&u;
-  u=&m;
-  m=123;
+  p = &u;
+  u = &m;
+  m = 123;
   //@ assert \valid(*p);
 }
 

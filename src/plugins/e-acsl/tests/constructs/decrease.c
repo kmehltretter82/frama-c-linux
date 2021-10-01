@@ -43,8 +43,8 @@ size_t fact2(size_t n) {
   size_t result = n;
   /*@ loop invariant 1 <= i < n;
       loop variant n - i; */
-  for (size_t i = 1UL ; i < (n - 1UL) ; i++) {
-      result *= (n - i);
+  for (size_t i = 1UL; i < (n - 1UL); i++) {
+    result *= (n - i);
   }
   return result;
 }
@@ -52,8 +52,10 @@ size_t fact2(size_t n) {
 // Test decreases on recursive function
 /*@ decreases n; */
 int fib(int n) {
-  if (n == 1) return 1;
-  if (n <= 0) return 0;
+  if (n == 1)
+    return 1;
+  if (n <= 0)
+    return 0;
   return fib(n - 1) + fib(n - 2);
 }
 
@@ -62,13 +64,15 @@ int odd(int);
 /*@ requires n >= 0;
     decreases n; */
 int even(int n) {
-  if (n == 0) return 1;
+  if (n == 0)
+    return 1;
   return odd(n - 1);
 }
 /*@ requires n >= 0;
     decreases n; */
 int odd(int n) {
-  if (n == 0) return 0;
+  if (n == 0)
+    return 0;
   return even(n - 1);
 }
 

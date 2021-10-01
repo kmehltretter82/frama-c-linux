@@ -43,11 +43,9 @@ extern size_t eacsl_heap_allocation_size;
 extern size_t eacsl_heap_allocated_blocks;
 
 /*! Return the number of bytes in heap application allocation. */
-size_t eacsl_get_heap_allocation_size()
-  __attribute__((FC_BUILTIN));
+size_t eacsl_get_heap_allocation_size() __attribute__((FC_BUILTIN));
 
 /*! Return the number of blocks in heap application allocation. */
-size_t eacsl_get_heap_allocated_blocks()
-  __attribute__((FC_BUILTIN));
+size_t eacsl_get_heap_allocated_blocks() __attribute__((FC_BUILTIN));
 
 #endif // E_ACSL_HEAP

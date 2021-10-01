@@ -4,13 +4,10 @@
 */
 
 /// Simple declaration in switch
-void decl_in_switch(int value)
-{
-  switch (value)
-  {
+void decl_in_switch(int value) {
+  switch (value) {
     int *p;
-  default:
-  {
+  default: {
     p = &value;
     /*! assert \valid(p); */
     break;
@@ -20,13 +17,11 @@ void decl_in_switch(int value)
 
 /// Declaration and initialization in a single statement
 /// (local initializer)
-void compound_decl_and_init(int value)
-{
+void compound_decl_and_init(int value) {
   int a = 0;
   /*@ assert \valid(&a); */
 
-  switch (value)
-  {
+  switch (value) {
     int b = 2;
     /*@ assert \valid(&b); */
 
@@ -44,14 +39,12 @@ void compound_decl_and_init(int value)
 
 /// Separate statements for declaration and initialization
 /// (no local initializer)
-void separate_decl_and_init(int value)
-{
+void separate_decl_and_init(int value) {
   int a;
   a = 1;
   /*@ assert \valid(&a); */
 
-  switch (value)
-  {
+  switch (value) {
     int b;
     b = 2;
     /*@ assert \valid(&b); */
@@ -71,12 +64,10 @@ void separate_decl_and_init(int value)
 }
 
 /// Check label in switch
-void label_in_switch(int value)
-{
+void label_in_switch(int value) {
   int done = 0;
 
-  switch (value)
-  {
+  switch (value) {
   /* standalone label */
   K:;
     int d = 0;
@@ -94,22 +85,17 @@ void label_in_switch(int value)
     break;
   }
 
-  if (!done)
-  {
+  if (!done) {
     done = 1;
-    if (value < 10)
-    {
+    if (value < 10) {
       goto L;
-    }
-    else
-    {
+    } else {
       goto K;
     }
   }
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
   decl_in_switch(argc);
   compound_decl_and_init(argc);
   separate_decl_and_init(argc);

@@ -21,8 +21,7 @@ typedef struct larger_t larger;
 /* }}} */
 
 int main(void) {
-  int  a = 1,
-       b = 2;
+  int a = 1, b = 2;
   temporal t1, t2, *tp, tarr[2];
   larger l, *lp, larr[2];
 

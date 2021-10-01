@@ -11,17 +11,15 @@ void foo(int *a, int *b) {
 }
 
 int *Q;
-int* bar() {
+int *bar() {
 RET:
   return Q;
 }
 
 int main(int argc, const char **argv) {
-  int a = 11,
-      b = 12;
+  int a = 11, b = 12;
 
-  int *p = &a,
-      *q = &b;
+  int *p = &a, *q = &b;
 
 LAB:
   foo(p, q);

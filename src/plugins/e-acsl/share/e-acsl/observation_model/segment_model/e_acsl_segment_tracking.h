@@ -90,7 +90,7 @@
  * the block are shadowed (storing block offset and size) and bytes 8-10 are
  * not. This is because 3 bytes are not sufficient to store size and offset.
  * These remaining bytes reuse the shadow of [0,7]. */
-#define LONG_BLOCK_BOUNDARY(_size) (_size - _size%LONG_BLOCK)
+#define LONG_BLOCK_BOUNDARY(_size) (_size - _size % LONG_BLOCK)
 
 /*! \brief Primary shadow of a long block consists of a 8-byte segment + a
  * remainder. For instance, a 18-byte block is represented by two 8-byte
@@ -110,22 +110,22 @@
 
 /* Runtime assertions (debug mode) {{{ */
 #ifdef E_ACSL_DEBUG
-#define DVALIDATE_ALIGNMENT(_addr) \
-  DVASSERT(((uintptr_t)_addr) % HEAP_SEGMENT == 0,  \
-      "Heap base address %a is unaligned", _addr)
+#  define DVALIDATE_ALIGNMENT(_addr)                                           \
+    DVASSERT(((uintptr_t)_addr) % HEAP_SEGMENT == 0,                           \
+             "Heap base address %a is unaligned", _addr)
 
-#define DVALIDATE_MEMORY_PRE_MAIN_INIT \
-  DVASSERT(mem_layout.is_initialized_pre_main != 0, \
-           "Un-initialized pre-main shadow layout", NULL)
+#  define DVALIDATE_MEMORY_PRE_MAIN_INIT                                       \
+    DVASSERT(mem_layout.is_initialized_pre_main != 0,                          \
+             "Un-initialized pre-main shadow layout", NULL)
 
-#define DVALIDATE_MEMORY_MAIN_INIT \
-  DVASSERT(mem_layout.is_initialized_main != 0, \
-           "Un-initialized main shadow layout", NULL)
+#  define DVALIDATE_MEMORY_MAIN_INIT                                           \
+    DVASSERT(mem_layout.is_initialized_main != 0,                              \
+             "Un-initialized main shadow layout", NULL)
 
-#define DVALIDATE_MEMORY_INIT \
-  DVASSERT(mem_layout.is_initialized_pre_main != 0 && \
-           mem_layout.is_initialized_main != 0, \
-           "Un-initialized shadow layout", NULL)
+#  define DVALIDATE_MEMORY_INIT                                                \
+    DVASSERT(mem_layout.is_initialized_pre_main != 0                           \
+                 && mem_layout.is_initialized_main != 0,                       \
+             "Un-initialized shadow layout", NULL)
 
 /* Debug function making sure that the order of program segments is as expected
  * and that the program and the shadow segments used do not overlap. */
@@ -133,114 +133,122 @@ void validate_shadow_layout();
 
 /* Assert that memory layout has been initialized and all segments appear
  * in the expected order */
-# define DVALIDATE_SHADOW_LAYOUT validate_shadow_layout()
+#  define DVALIDATE_SHADOW_LAYOUT validate_shadow_layout()
 
 /* Assert that boundaries of a block [_addr, _addr+_size] are within a segment
  * given by `_s`. `_s` is either HEAP, STACK, TLS, GLOBAL or STATIC. */
-#define DVALIDATE_IS_ON(_addr, _size, _s) \
-  DVASSERT(IS_ON_##_s(_addr), "Address %a not on %s", _addr, #_s); \
-  DVASSERT(IS_ON_##_s(_addr+_size), "Address %a not on %s", _addr+_size, #_s)
+#  define DVALIDATE_IS_ON(_addr, _size, _s)                                    \
+    DVASSERT(IS_ON_##_s(_addr), "Address %a not on %s", _addr, #_s);           \
+    DVASSERT(IS_ON_##_s(_addr + _size), "Address %a not on %s", _addr + _size, \
+             #_s)
 
 /* Assert that [_addr, _addr+_size] are within heap segment */
-#define DVALIDATE_IS_ON_HEAP(_addr, _size) \
-  DVALIDATE_IS_ON(_addr, _size, HEAP)
+#  define DVALIDATE_IS_ON_HEAP(_addr, _size) DVALIDATE_IS_ON(_addr, _size, HEAP)
 /* Assert that [_addr, _addr+_size] are within stack segment */
-#define DVALIDATE_IS_ON_STACK(_addr, _size) \
-  DVALIDATE_IS_ON(_addr, _size, STACK)
-#if E_ACSL_OS_IS_LINUX
+#  define DVALIDATE_IS_ON_STACK(_addr, _size)                                  \
+    DVALIDATE_IS_ON(_addr, _size, STACK)
+#  if E_ACSL_OS_IS_LINUX
 /* Assert that [_addr, _addr+_size] are within global segment */
-# define DVALIDATE_IS_ON_GLOBAL(_addr, _size) \
-  DVALIDATE_IS_ON(_addr, _size, GLOBAL)
+#    define DVALIDATE_IS_ON_GLOBAL(_addr, _size)                               \
+      DVALIDATE_IS_ON(_addr, _size, GLOBAL)
 /* Assert that [_addr, _addr+_size] are within TLS segment */
-# define DVALIDATE_IS_ON_TLS(_addr, _size) \
-  DVALIDATE_IS_ON(_addr, _size, TLS)
-#elif E_ACSL_OS_IS_WINDOWS
+#    define DVALIDATE_IS_ON_TLS(_addr, _size) DVALIDATE_IS_ON(_addr, _size, TLS)
+#  elif E_ACSL_OS_IS_WINDOWS
 /* Assert that [_addr, _addr+_size] are within text segment */
-# define DVALIDATE_IS_ON_TEXT(_addr, _size) \
-  DVALIDATE_IS_ON(_addr, _size, TEXT)
+#    define DVALIDATE_IS_ON_TEXT(_addr, _size)                                 \
+      DVALIDATE_IS_ON(_addr, _size, TEXT)
 /* Assert that [_addr, _addr+_size] are within bss segment */
-# define DVALIDATE_IS_ON_BSS(_addr, _size) \
-  DVALIDATE_IS_ON(_addr, _size, BSS)
+#    define DVALIDATE_IS_ON_BSS(_addr, _size) DVALIDATE_IS_ON(_addr, _size, BSS)
 /* Assert that [_addr, _addr+_size] are within idata segment */
-# define DVALIDATE_IS_ON_IDATA(_addr, _size) \
-  DVALIDATE_IS_ON(_addr, _size, IDATA)
-#endif
+#    define DVALIDATE_IS_ON_IDATA(_addr, _size)                                \
+      DVALIDATE_IS_ON(_addr, _size, IDATA)
+#  endif
 /* Assert that [_addr, _addr+_size] are within stack, global or TLS segments */
-#define DVALIDATE_IS_ON_STATIC(_addr, _size) \
-  DVALIDATE_IS_ON(_addr, _size, STATIC)
+#  define DVALIDATE_IS_ON_STATIC(_addr, _size)                                 \
+    DVALIDATE_IS_ON(_addr, _size, STATIC)
 
 /* Assert that `_addr` is on heap and it is the base address of an allocated
  * heap memory block */
-#define DVALIDATE_FREEABLE(_addr) \
-  DVASSERT(IS_ON_HEAP(_addr), "Expected heap location: %a\n", _addr); \
-  DVASSERT(_addr == _base_addr(_addr), \
-      "Expected base address, i.e., %a, not %a\n", _base_addr(_addr), _addr);
+#  define DVALIDATE_FREEABLE(_addr)                                            \
+    DVASSERT(IS_ON_HEAP(_addr), "Expected heap location: %a\n", _addr);        \
+    DVASSERT(_addr == _base_addr(_addr),                                       \
+             "Expected base address, i.e., %a, not %a\n", _base_addr(_addr),   \
+             _addr);
 
 /* Assert that a memory block [_addr, _addr + _size] is allocated on a
  * program's heap */
-# define DVALIDATE_HEAP_ACCESS(_addr, _size) \
-    DVASSERT(IS_ON_HEAP(_addr), "Expected heap location: %a\n", _addr); \
-    DVASSERT(heap_allocated((uintptr_t)_addr, _size, (uintptr_t)_addr), \
-       "Operation on unallocated heap block [%a + %lu]\n",  _addr, _size)
+#  define DVALIDATE_HEAP_ACCESS(_addr, _size)                                  \
+    DVASSERT(IS_ON_HEAP(_addr), "Expected heap location: %a\n", _addr);        \
+    DVASSERT(heap_allocated((uintptr_t)_addr, _size, (uintptr_t)_addr),        \
+             "Operation on unallocated heap block [%a + %lu]\n", _addr, _size)
 
 /* Assert that every location belonging to the range [_addr, _addr + _size] is
  * - belongs to a tracked static region (i.e., stack, TLS or global)
  * - not allocated */
-# define DVALIDATE_HEAP_FREE(_addr, _size) { \
-  uintptr_t i, a = (uintptr_t)_addr; \
-  for (i = 0; i < _size; i++) { \
-    DVASSERT(IS_ON_HEAP(a + i), "Expected heap location: %a\n", a + i); \
-    DVASSERT(!heap_allocated(a + i, 1, a + i), \
-      "Expected heap unallocated location: [%a + %lu]\n", a, i); \
-  } \
-}
+#  define DVALIDATE_HEAP_FREE(_addr, _size)                                    \
+    {                                                                          \
+      uintptr_t i, a = (uintptr_t)_addr;                                       \
+      for (i = 0; i < _size; i++) {                                            \
+        DVASSERT(IS_ON_HEAP(a + i), "Expected heap location: %a\n", a + i);    \
+        DVASSERT(!heap_allocated(a + i, 1, a + i),                             \
+                 "Expected heap unallocated location: [%a + %lu]\n", a, i);    \
+      }                                                                        \
+    }
 
 /* Assert that memory block [_addr, _addr + _size] is allocated on stack, TLS
  * or globally */
-# define DVALIDATE_STATIC_ACCESS(_addr, _size) \
-    DVASSERT(IS_ON_STATIC(_addr), \
-        "Expected static location: [%a + %lu], \n", _addr, _size); \
-    DVASSERT(static_allocated((uintptr_t)_addr, _size,(uintptr_t)_addr), \
-       "Operation on unallocated static block [%a + %lu]\n", _addr, _size)
+#  define DVALIDATE_STATIC_ACCESS(_addr, _size)                                \
+    DVASSERT(IS_ON_STATIC(_addr), "Expected static location: [%a + %lu], \n",  \
+             _addr, _size);                                                    \
+    DVASSERT(static_allocated((uintptr_t)_addr, _size, (uintptr_t)_addr),      \
+             "Operation on unallocated static block [%a + %lu]\n", _addr,      \
+             _size)
 
 /* Same as ::DVALIDATE_STATIC_LOCATION but for a single memory location */
-# define DVALIDATE_STATIC_LOCATION(_addr) \
-    DVASSERT(IS_ON_STATIC(_addr), \
-      "Expected static location: %a\n", _addr); \
-    DVASSERT(static_allocated_one((uintptr_t)_addr), \
-      "Operation on unallocated static block [%a]\n", _addr)
+#  define DVALIDATE_STATIC_LOCATION(_addr)                                     \
+    DVASSERT(IS_ON_STATIC(_addr), "Expected static location: %a\n", _addr);    \
+    DVASSERT(static_allocated_one((uintptr_t)_addr),                           \
+             "Operation on unallocated static block [%a]\n", _addr)
 
 /* Assert that every location belonging to the range [_addr, _addr + _size] is
  * - belongs to a tracked static region (i.e., stack, TLS or global)
  * - not allocated */
-# define DVALIDATE_STATIC_FREE(_addr, _size) { \
-  uintptr_t i, a = (uintptr_t)_addr; \
-  for (i = 0; i < _size; i++) { \
-    DVASSERT(IS_ON_STATIC(a + i), \
-      "Expected static location in freea: %a\n", a + i); \
-    DVASSERT(!static_allocated_one(a + i), \
-      "Expected static unallocated location in freea: [%a + %lu]\n", a, i); \
-  } \
-}
+#  define DVALIDATE_STATIC_FREE(_addr, _size)                                  \
+    {                                                                          \
+      uintptr_t i, a = (uintptr_t)_addr;                                       \
+      for (i = 0; i < _size; i++) {                                            \
+        DVASSERT(IS_ON_STATIC(a + i),                                          \
+                 "Expected static location in freea: %a\n", a + i);            \
+        DVASSERT(                                                              \
+            !static_allocated_one(a + i),                                      \
+            "Expected static unallocated location in freea: [%a + %lu]\n", a,  \
+            i);                                                                \
+      }                                                                        \
+    }
 
 /* Assert that neither of `_len - 1` addresses immediately preceding `_addr`
  * are base addresses of some other block and that `_len` addresses past
  * `_addr` are free */
-#define DVALIDATE_STATIC_SUFFICIENTLY_ALIGNED(_addr, _len) { \
-  int _i; \
-  for (_i = 0; _i < _len; _i++) { \
-    uintptr_t _prev = _addr - _i; \
-    if (static_allocated_one(_prev)) { \
-      private_assert(_base_addr(_prev) != _prev, \
-        "Potential backward overlap of: \n  previous block [%a]\n" \
-        "  with allocated block [%a]\n", _prev, _addr); \
-    } \
-    uintptr_t _next = _addr + _i; \
-    private_assert(!static_allocated_one(_next), \
-      "Potential forward overlap of:\n  following block location [%a]\n" \
-      "  with allocated block [%a]\n", _next, _addr); \
-  } \
-}
+#  define DVALIDATE_STATIC_SUFFICIENTLY_ALIGNED(_addr, _len)                   \
+    {                                                                          \
+      int _i;                                                                  \
+      for (_i = 0; _i < _len; _i++) {                                          \
+        uintptr_t _prev = _addr - _i;                                          \
+        if (static_allocated_one(_prev)) {                                     \
+          private_assert(                                                      \
+              _base_addr(_prev) != _prev,                                      \
+              "Potential backward overlap of: \n  previous block [%a]\n"       \
+              "  with allocated block [%a]\n",                                 \
+              _prev, _addr);                                                   \
+        }                                                                      \
+        uintptr_t _next = _addr + _i;                                          \
+        private_assert(                                                        \
+            !static_allocated_one(_next),                                      \
+            "Potential forward overlap of:\n  following block location [%a]\n" \
+            "  with allocated block [%a]\n",                                   \
+            _next, _addr);                                                     \
+      }                                                                        \
+    }
 
 #else
 /*! \cond exclude from doxygen */
@@ -256,8 +264,8 @@ void validate_shadow_layout();
 #  define DVALIDATE_IS_ON_HEAP
 #  define DVALIDATE_IS_ON_STACK
 #  if E_ACSL_OS_IS_LINUX
-#  define DVALIDATE_IS_ON_GLOBAL
-#  define DVALIDATE_IS_ON_TLS
+#    define DVALIDATE_IS_ON_GLOBAL
+#    define DVALIDATE_IS_ON_TLS
 #  elif E_ACSL_OS_IS_WINDOWS
 #    define DVALIDATE_IS_ON_TEXT
 #    define DVALIDATE_IS_ON_BSS
@@ -277,19 +285,18 @@ void validate_shadow_layout();
 /*! \brief Quick test to check if a static location belongs to allocation.
  * This macro really belongs where static_allocated is defined, but
  * since it is used across this whole file it needs to be defined here. */
-#define static_allocated_one(_addr) \
-  (*((unsigned char*)PRIMARY_SHADOW(_addr)))
+#define static_allocated_one(_addr) (*((unsigned char *)PRIMARY_SHADOW(_addr)))
 
 /*! \brief Shortcut for executing statements based on the segment a given
  * address belongs to.
  * \param intptr_t _addr - a memory address
  * \param code_block _heap_stmt - code executed if `_addr` is a heap address
  * \param code_block _static_stmt - code executed if `_addr` is a static address */
-#define TRY_SEGMENT_WEAK(_addr, _heap_stmt, _static_stmt)  \
-  if (IS_ON_HEAP(_addr)) { \
-    _heap_stmt; \
-  } else if (IS_ON_STATIC(_addr)) { \
-    _static_stmt; \
+#define TRY_SEGMENT_WEAK(_addr, _heap_stmt, _static_stmt)                      \
+  if (IS_ON_HEAP(_addr)) {                                                     \
+    _heap_stmt;                                                                \
+  } else if (IS_ON_STATIC(_addr)) {                                            \
+    _static_stmt;                                                              \
   }
 
 /*! \brief Same as TRY_SEGMENT but performs additional checks aborting the
@@ -299,12 +306,13 @@ void validate_shadow_layout();
  *
  * The \b WEAK notion refers to the behaviour where no action is performed if
  * the given address does not belong to any of the known segments. */
-#define TRY_SEGMENT(_addr, _heap_stmt, _static_stmt) { \
-  TRY_SEGMENT_WEAK(_addr, _heap_stmt, _static_stmt) \
-  else { \
-    private_assert(0, "Use of invalid address %a in %s\n", _addr, __func__); \
-  } \
-}
+#define TRY_SEGMENT(_addr, _heap_stmt, _static_stmt)                           \
+  {                                                                            \
+    TRY_SEGMENT_WEAK(_addr, _heap_stmt, _static_stmt)                          \
+    else {                                                                     \
+      private_assert(0, "Use of invalid address %a in %s\n", _addr, __func__); \
+    }                                                                          \
+  }
 
 /*! \brief Wrapper around ::heap_info and ::static_info functions that
  * dispatches one of the above functions based on the type of supplied memory
@@ -344,8 +352,8 @@ void shadow_freea(void *ptr);
  * relies on the fact that a single block cannot contain read/write and
  * read-only parts, that is to check whether the block has read-only access it
  * is sufficient to check any of its bytes. */
-#define global_readonly(_addr) \
-  checkbit(READONLY_BIT, (*(char*)PRIMARY_GLOBAL_SHADOW(_addr)))
+#define global_readonly(_addr)                                                 \
+  checkbit(READONLY_BIT, (*(char *)PRIMARY_GLOBAL_SHADOW(_addr)))
 
 /*! \brief Return a non-zero value if a memory region of length `size`
  * starting at address `addr` belongs to a tracked stack, tls or
@@ -382,13 +390,15 @@ uintptr_t static_info(uintptr_t addr, char type);
  *  associated with a static address `addr` */
 uint32_t static_temporal_info(uintptr_t addr, int origin);
 
-#define static_origin_timestamp(_ptr) static_temporal_info((uintptr_t)(_ptr),1)
-#define static_referent_timestamp(_ptr) static_temporal_info((uintptr_t)(_ptr),0)
+#  define static_origin_timestamp(_ptr)                                        \
+    static_temporal_info((uintptr_t)(_ptr), 1)
+#  define static_referent_timestamp(_ptr)                                      \
+    static_temporal_info((uintptr_t)(_ptr), 0)
 
 /*! Store a referent time stamp associated with a static pointer.
  *  Origin timestamps are generated via `shadow_alloca` */
 void static_store_temporal_referent(uintptr_t addr, uint32_t ref);
-#endif/*}}} E_ACSL_TEMPORAL*/
+#endif /*}}} E_ACSL_TEMPORAL*/
 /* }}} */
 
 /* Static initialization {{{ */
@@ -404,7 +414,7 @@ void initialize_static_region(uintptr_t addr, long size);
  * The functionality, however is preferred to be kept separate
  * because the ::eacsl_mark_readonly should operate only on the global shadow.
  */
-void mark_readonly_region (uintptr_t addr, long size);
+void mark_readonly_region(uintptr_t addr, long size);
 /* }}} */
 
 /* Heap allocation {{{ (malloc/calloc) */
@@ -458,11 +468,11 @@ int heap_initialized(uintptr_t addr, long len);
 #ifdef E_ACSL_TEMPORAL
 uint32_t heap_temporal_info(uintptr_t addr, int origin);
 
-#define heap_origin_timestamp(_ptr)   heap_temporal_info((uintptr_t)(_ptr),1)
-#define heap_referent_timestamp(_ptr) heap_temporal_info((uintptr_t)(_ptr),0)
+#  define heap_origin_timestamp(_ptr)   heap_temporal_info((uintptr_t)(_ptr), 1)
+#  define heap_referent_timestamp(_ptr) heap_temporal_info((uintptr_t)(_ptr), 0)
 
 void heap_store_temporal_referent(uintptr_t addr, uint32_t ref);
-#endif/*}}} E_ACSL_TEMPORAL*/
+#endif /*}}} E_ACSL_TEMPORAL*/
 
 /* Heap initialization {{{ */
 /*! \brief Mark n bytes on the heap starting from address addr as initialized */
@@ -493,7 +503,7 @@ void print_memory_partition(struct memory_partition *p);
 void print_shadow_layout();
 
 /*! \brief Output the shadow segment the address belongs to */
-const char* which_segment(uintptr_t addr);
+const char *which_segment(uintptr_t addr);
 
 /* NOTE: Above functions are designed to be used only through the following
  * macros or debug functions included/defined based on the value of the
@@ -502,28 +512,32 @@ const char* which_segment(uintptr_t addr);
 /*! \brief Print program layout. This function outputs start/end addresses of
  * various program segments, their shadow counterparts and sizes of shadow
  * regions used. */
-#define DEBUG_PRINT_LAYOUT print_shadow_layout()
-void ___e_acsl_debug_print_layout() { DEBUG_PRINT_LAYOUT; }
+#  define DEBUG_PRINT_LAYOUT print_shadow_layout()
+void ___e_acsl_debug_print_layout() {
+  DEBUG_PRINT_LAYOUT;
+}
 
 /*! \brief Print the shadow segment address addr belongs to */
-#define DEBUG_PRINT_SEGMENT(_addr) which_segment(_addr)
-void ___e_acsl_debug_print_segment(uintptr_t addr) { DEBUG_PRINT_SEGMENT(addr); }
+#  define DEBUG_PRINT_SEGMENT(_addr) which_segment(_addr)
+void ___e_acsl_debug_print_segment(uintptr_t addr) {
+  DEBUG_PRINT_SEGMENT(addr);
+}
 
 /*! \brief Print human-readable representation of a shadow region corresponding
  * to a memory address addr. The second argument (size) if the size of the
  * shadow region to be printed. Normally addr argument is a base address of a
  * memory block and size is its length. */
-#define DEBUG_PRINT_SHADOW(addr, size) \
-  print_shadows((uintptr_t)addr, (size_t)size)
+#  define DEBUG_PRINT_SHADOW(addr, size)                                       \
+    print_shadows((uintptr_t)addr, (size_t)size)
 void ___e_acsl_debug_print_shadow(uintptr_t addr, size_t size) {
   DEBUG_PRINT_SHADOW(addr, size);
 }
 
 #else
 /* \cond exclude from doxygen */
-#define DEBUG_PRINT_SHADOW(addr, size)
-#define DEBUG_PRINT_LAYOUT
-#define DEBUG_PRINT_SEGMENT(addr)
+#  define DEBUG_PRINT_SHADOW(addr, size)
+#  define DEBUG_PRINT_LAYOUT
+#  define DEBUG_PRINT_SEGMENT(addr)
 /* \endcond */
 #endif
 /* }}} */

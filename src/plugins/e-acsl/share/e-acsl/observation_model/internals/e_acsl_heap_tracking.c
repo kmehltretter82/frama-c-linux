@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#include "../../internals/e_acsl_rtl_io.h"
 #include "e_acsl_heap_tracking.h"
+#include "../../internals/e_acsl_rtl_io.h"
 
 /* Variable tracking byte-count of user-allocated heap memory. */
 static size_t heap_internal_allocation_size = 0;
@@ -61,7 +61,7 @@ void report_heap_leaks() {
   size_t blocks = eacsl_get_heap_allocated_blocks();
   if (size) {
     rtl_printf(" *** WARNING: Leaked %lu bytes of heap memory in %ld block%s\n",
-      size, blocks, (blocks == 1) ? "" : "s");
+               size, blocks, (blocks == 1) ? "" : "s");
   }
 #endif
 }

@@ -3,15 +3,23 @@
    STDOPT: +"-eva-precision=1"
 */
 
-struct msgA { int type; int a[2]; };
-struct msgB { int type; double x; };
+struct msgA {
+  int type;
+  int a[2];
+};
+struct msgB {
+  int type;
+  double x;
+};
 union msg {
-  struct { int type; } T;
+  struct {
+    int type;
+  } T;
   struct msgA A;
   struct msgB B;
 };
 
-void read_sensor_4(unsigned* m) {
+void read_sensor_4(unsigned *m) {
   /* put 4 bytes from sensors into m */
   *m = 0;
 }
@@ -19,8 +27,8 @@ void read_sensor_4(unsigned* m) {
 int main(void) {
   unsigned char buf[sizeof(union msg)];
   int i;
-  for(i = 0; i < sizeof(buf)/4; i++)
-    read_sensor_4((unsigned*)buf+i);
+  for (i = 0; i < sizeof(buf) / 4; i++)
+    read_sensor_4((unsigned *)buf + i);
   /*@ assert \initialized((union msg*)buf); */
   return 0;
 }

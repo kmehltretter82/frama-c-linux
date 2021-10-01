@@ -4,7 +4,7 @@
 int main(void) {
   int x = 0;
   if (x) {
-    /*@ assert \false; */ ;
+    /*@ assert \false; */;
   }
   return 0;
 }

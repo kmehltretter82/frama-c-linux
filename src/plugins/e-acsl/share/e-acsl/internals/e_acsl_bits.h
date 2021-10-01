@@ -38,8 +38,8 @@
 #ifndef E_ACSL_BITS_H
 #define E_ACSL_BITS_H
 
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 /* Bit-level manipulations {{{ */
 
@@ -54,7 +54,7 @@
  *  int x = 0;    // x => 0000 0000 ...
  *  bitset(0, x)  // x => 1000 0000 ...
  *  bitset(7, x)  // x => 1000 0001 ... */
-#define setbit(_bit,_number) (_number |= 1 << _bit)
+#define setbit(_bit, _number) (_number |= 1 << _bit)
 
 /** Same as bitset but the `_bit` bit is cleared (i.e., set of zero) */
 #define clearbit(_bit, _number) (_number &= ~(1 << _bit))
@@ -73,7 +73,7 @@
 #define togglebit(_bit, _number) (_number ^= 1 << _bit)
 
 /** Set a given bit to a specified value (e.g., 0 or 1). */
-#define changebit(_bit, _val, _number) \
+#define changebit(_bit, _val, _number)                                         \
   (_number ^= (-_val ^ _number) & (1 << _bit))
 
 /** Set up to 64 bits from left to right to ones.
@@ -81,14 +81,14 @@
  *  int x = 0;        // x => 00000000 00000000 ...
  *  setbits64(11, x)  //   => 11111111 11100000 ...
  *  setbits64(64, x)  //   => behaviour undefined */
-#define setbits64(_bits, _number)   (_number |= ~(ONE << _bits))
+#define setbits64(_bits, _number) (_number |= ~(ONE << _bits))
 
 /** Set up to 64 bits from left to right to ones skiping `_skip` leftmost bits
  * Example:
  *  int x = 0;          // x => 00000000 00000000 ...
  *  setbits64(11, x, 2) //   => 00111111 11111000 ...
  *  setbits64(64, x, 2) //   => behaviour undefined */
-#define setbits64_skip(_bits, _number, _skip) \
+#define setbits64_skip(_bits, _number, _skip)                                  \
   (_number |= ~(ONE << _bits) << _skip)
 
 /** Evaluate to 1 if up to 64 bits from left to right in `_number` are set:
@@ -98,8 +98,8 @@
  *  checkbits64(5, x)   //   => 1
  *  checkbits64(6, x)   //   => 0
  *  checkbits64(64, x)  //   => behaviour undefined */
-#define checkbits64(_bits, _number) \
-  ((_number & ~(ONE << _bits)) ==  (~(ONE << _bits)))
+#define checkbits64(_bits, _number)                                            \
+  ((_number & ~(ONE << _bits)) == (~(ONE << _bits)))
 
 /** Same as checkbits64 but with skipping `_skip` leftmost bits
  * Example:
@@ -109,7 +109,7 @@
  *  checkbits64_skip(5,  x, 2) // => 0
  *  checkbits64_skip(3,  x, 1) // => 0
  *  checkbits64_skip(64, x, 0) // => behaviour undefined */
-#define checkbits64_skip(_bits, _number, _skip) \
+#define checkbits64_skip(_bits, _number, _skip)                                \
   ((_number & ~(ONE << _bits) << _skip) == (~(ONE << _bits) << _skip))
 
 /** Same as `setbits64' but clear the bits (set to zeroes). */
@@ -119,7 +119,7 @@
  * Example:
  *  long x = 0;            // x => ... 00000000 00000000 00000000 00000000
  *  setbits64_right(10, x) // x => ... 00000000 00000000 00000011 11111111 */
-#define setbits64_right(_bits, _number)   (_number |= ~(ONE >> _bits))
+#define setbits64_right(_bits, _number) (_number |= ~(ONE >> _bits))
 
 /** Same as setbits64_right but clears bits (sets to zeroes) */
 #define clearbits64_right(_bits, _number) (_number &= ONE >> _bits)
@@ -131,30 +131,30 @@
  *  setbits(&a, 11);  // => 11111111 11100000 00000000 00000000 */
 static inline void setbits(size_t size, void *ptr) {
   size_t i;
-  int64_t *lp = (int64_t*)ptr;
-  for (i = 0; i < size/64; i++)
-    *(lp+i) |= ONE;
-  setbits64(size%64, *(lp+i));
+  int64_t *lp = (int64_t *)ptr;
+  for (i = 0; i < size / 64; i++)
+    *(lp + i) |= ONE;
+  setbits64(size % 64, *(lp + i));
 }
 
 /** Same as `setbits' but clear the bits (set to zeroes). */
 static inline void clearbits(size_t size, void *ptr) {
   size_t i;
-  int64_t *lp = (int64_t*)ptr;
-  for (i = 0; i < size/64; i++)
-    *(lp+i) &= ZERO;
-  clearbits64(size%64, *(lp+i));
+  int64_t *lp = (int64_t *)ptr;
+  for (i = 0; i < size / 64; i++)
+    *(lp + i) &= ZERO;
+  clearbits64(size % 64, *(lp + i));
 }
 
 /** Same as `setbits' but clear the bits (set to zeroes). */
 static inline int checkbits(size_t size, void *ptr) {
   size_t i;
-  int64_t *lp = (int64_t*)ptr;
-  for (i = 0; i < size/64; i++) {
-    if (*(lp+i) != ONE)
+  int64_t *lp = (int64_t *)ptr;
+  for (i = 0; i < size / 64; i++) {
+    if (*(lp + i) != ONE)
       return 0;
   }
-  return checkbits64(size%64, *(lp+i));
+  return checkbits64(size % 64, *(lp + i));
 }
 
 /** Same as `setbits' but set the bits from right to left
@@ -164,19 +164,19 @@ static inline int checkbits(size_t size, void *ptr) {
  *  setbits_right(&a, 11); // => 00000000 00000000 00000111 11111111 */
 static inline void setbits_right(size_t size, void *ptr) {
   size_t i = 0;
-  int64_t *lp = (int64_t*)ptr - 1;
-  for (i = 0; i < size/64; i++)
-    *(lp-i) |= ONE;
-  setbits64_right(size%64, *(lp-i));
+  int64_t *lp = (int64_t *)ptr - 1;
+  for (i = 0; i < size / 64; i++)
+    *(lp - i) |= ONE;
+  setbits64_right(size % 64, *(lp - i));
 }
 
 /** Same as `setbits_right' but clear the bits (set to zeroes). */
 static inline void clearbits_right(size_t size, void *ptr) {
   size_t i = 0;
-  int64_t *lp = (int64_t*)ptr - 1;
-  for (i = 0; i < size/64; i++)
-    *(lp-i) &= ZERO;
-  clearbits64_right(size%64, *(lp-i));
+  int64_t *lp = (int64_t *)ptr - 1;
+  for (i = 0; i < size / 64; i++)
+    *(lp - i) &= ZERO;
+  clearbits64_right(size % 64, *(lp - i));
 }
 
 #endif // E_ACSL_BITS_H

@@ -30,7 +30,7 @@
 
 #ifdef E_ACSL_TEMPORAL
 
-#include <stdint.h>
+#  include <stdint.h>
 
 /*! \brief Return origin time stamp associated with a memory block containing
  * address given by `ptr`. `0` indicates an invalid timestamp, i.e., timestamp

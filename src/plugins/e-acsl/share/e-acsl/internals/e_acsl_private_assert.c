@@ -31,49 +31,49 @@
 
 #include "e_acsl_private_assert.h"
 
-#define prepend_file_line(file, line, fmt) \
-  do { \
-    char * afmt = "%s:%d: %s\n"; \
-    char buf[strlen(fmt) + strlen(afmt) + PATH_MAX + 11]; \
-    rtl_sprintf(buf, afmt, file, line, fmt); \
-    fmt = buf; \
+#define prepend_file_line(file, line, fmt)                                     \
+  do {                                                                         \
+    char *afmt = "%s:%d: %s\n";                                                \
+    char buf[strlen(fmt) + strlen(afmt) + PATH_MAX + 11];                      \
+    rtl_sprintf(buf, afmt, file, line, fmt);                                   \
+    fmt = buf;                                                                 \
   } while (0)
 
 void raise_abort(const char *file, int line) {
 #ifdef E_ACSL_DEBUG
-#ifndef E_ACSL_NO_TRACE
+#  ifndef E_ACSL_NO_TRACE
   trace();
-#endif
+#  endif
 #endif
   raise(SIGABRT);
 }
 
-void private_abort_fail(const char * file, int line, char *fmt, ...) {
+void private_abort_fail(const char *file, int line, char *fmt, ...) {
   va_list va;
 #if E_ACSL_OS_IS_LINUX
   sigset_t defer_abrt;
   sigemptyset(&defer_abrt);
-  sigaddset(&defer_abrt,SIGABRT);
-  sigprocmask(SIG_BLOCK,&defer_abrt,NULL);
+  sigaddset(&defer_abrt, SIGABRT);
+  sigprocmask(SIG_BLOCK, &defer_abrt, NULL);
 #endif // E_ACSL_OS_IS_LINUX
-  va_start(va,fmt);
+  va_start(va, fmt);
   rtl_veprintf(fmt, va);
   va_end(va);
 #if E_ACSL_OS_IS_LINUX
-  sigprocmask(SIG_UNBLOCK,&defer_abrt,NULL);
+  sigprocmask(SIG_UNBLOCK, &defer_abrt, NULL);
 #endif // E_ACSL_OS_IS_LINUX
   raise_abort(file, line);
 }
 
-void private_assert_fail(int expr, const char *file, int line, char *fmt,  ...) {
+void private_assert_fail(int expr, const char *file, int line, char *fmt, ...) {
   if (!expr) {
-    char * afmt = "%s:%d: %s";
+    char *afmt = "%s:%d: %s";
     char buf[strlen(fmt) + strlen(afmt) + PATH_MAX + 11];
     rtl_sprintf(buf, afmt, file, line, fmt);
     fmt = buf;
 
     va_list va;
-    va_start(va,fmt);
+    va_start(va, fmt);
     rtl_veprintf(fmt, va);
     va_end(va);
     raise_abort(file, line);
