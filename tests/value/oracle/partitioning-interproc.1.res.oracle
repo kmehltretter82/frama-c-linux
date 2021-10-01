@@ -14,7 +14,7 @@
 [eva:final-states] Values at end of function fabs:
   __retres ∈ [-0. .. 1.79769313486e+308]
 [eva:final-states] Values at end of function fabs_test:
-  x ∈ [-1. .. 1.]
+  x ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
 [from] Computing for function fabs
 [from] Done for function fabs
 [from] Computing for function fabs_test

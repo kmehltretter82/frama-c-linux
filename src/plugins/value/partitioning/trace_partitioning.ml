@@ -240,7 +240,7 @@ struct
     (* Get every source flow *)
     let sources_states =
       (* Is there more than one non-empty incomming flow ? *)
-      match List.filter (fun (_b,f) -> not (Flow.is_empty f)) sources with
+      match sources with
       | [(_,flow)] -> [flow]
       | sources ->
         (* Several branches -> partition according to the incoming branch *)
