@@ -472,8 +472,8 @@
   Called from tests/value/split_return.i:51.
 [eva] Recording results for f2
 [eva] Done for function f2
-[eva] tests/value/split_return.i:52: Frama_C_show_each_f2: {5; 7}, {5}
 [eva] tests/value/split_return.i:52: Frama_C_show_each_f2: {0}, {0}
+[eva] tests/value/split_return.i:52: Frama_C_show_each_f2: {5; 7}, {5}
 [eva] tests/value/split_return.i:56: Frama_C_show_each_f2_2: {5; 7}, {5}
 [eva] Recording results for main2
 [eva] Done for function main2

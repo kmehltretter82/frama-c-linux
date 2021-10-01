@@ -210,7 +210,7 @@ struct
         let (<?>) c (cmp,x,y) =
           if c = 0 then cmp x y else c
         in
-        Stamp.compare k1.ration_stamp k2.ration_stamp
+        Stdlib.Option.compare IntPair.compare k1.ration_stamp k2.ration_stamp
         <?> (LoopList.compare, k1.loops, k2.loops)
         <?> (Splits.compare, k1.splits, k2.splits)
         (* Ignore monitors in comparison *)
