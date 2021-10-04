@@ -6,7 +6,7 @@
   v ∈ [--..--]
 [eva:initial-state] 
   creating variable S_tb with imprecise size (type int [10][a])
-[eva] tests/value/not_ct_array_arg.i:9: Warning: 
+[eva:unknown-size] tests/value/not_ct_array_arg.i:9: Warning: 
   during initialization of variable 'tb', size of type 'int [a]' cannot be
   computed (Array with non-constant length.)
 [eva:alarm] tests/value/not_ct_array_arg.i:10: Warning: 

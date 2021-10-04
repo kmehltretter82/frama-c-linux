@@ -63,6 +63,7 @@ let warn_unknown_size vi =
   with Cil.SizeOfError (s, t)->
     let pp fmt v = Format.fprintf fmt "variable '%a'" Printer.pp_varinfo v in
     Value_parameters.warning ~once:true ~current:true
+      ~wkey:Value_parameters.wkey_unknown_size
       "@[during initialization@ of %a,@ size of@ type '%a'@ cannot be@ \
        computed@ (%s)@]" pp vi Printer.pp_typ t s;
     true

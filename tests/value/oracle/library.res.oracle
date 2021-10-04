@@ -3,7 +3,7 @@
 [eva] Computing initial state
 [eva:initial-state] 
   creating variable S_0_p_ss with imprecise size (type struct ss [2])
-[eva] tests/value/library.i:57: Warning: 
+[eva:unknown-size] tests/value/library.i:57: Warning: 
   during initialization of variable 'ss', size of type 'struct ss' cannot be
   computed (abstract type 'struct ss')
 [eva:initial-state] 

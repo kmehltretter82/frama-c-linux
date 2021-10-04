@@ -1,10 +1,10 @@
 [kernel] Parsing tests/value/extern.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
-[eva] tests/value/extern.i:6: Warning: 
+[eva:unknown-size] tests/value/extern.i:6: Warning: 
   during initialization of variable 'T3', size of type 'int []' cannot be
   computed (Size of array without number of elements.)
-[eva] tests/value/extern.i:7: Warning: 
+[eva:unknown-size] tests/value/extern.i:7: Warning: 
   during initialization of variable 'T4', size of type 'int const []' cannot be
   computed (Size of array without number of elements.)
 [eva] tests/value/extern.i:16: no size specified for array, assuming 0

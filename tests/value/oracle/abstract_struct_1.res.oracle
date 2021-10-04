@@ -4,7 +4,7 @@
 [eva] Computing initial state
 [eva:initial-state] 
   creating variable S_data_0_S_repositories with imprecise size (type struct abstracttype [2])
-[eva] tests/value/abstract_struct_1.c:10: Warning: 
+[eva:unknown-size] tests/value/abstract_struct_1.c:10: Warning: 
   during initialization of variable 'repositories', size of
   type 'struct abstracttype' cannot be computed
   (abstract type 'struct abstracttype')
