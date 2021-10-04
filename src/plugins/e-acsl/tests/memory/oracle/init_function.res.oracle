@@ -1,2 +1,12 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
+[eva:alarm] tests/memory/init_function.c:16: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] tests/memory/init_function.c:16: Warning: 
+  assertion got status unknown.
+[eva] tests/memory/init_function.c:17: Warning: 
+  ignoring unsupported \allocates clause
+[eva:alarm] tests/memory/init_function.c:18: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] tests/memory/init_function.c:18: Warning: 
+  assertion got status unknown.
