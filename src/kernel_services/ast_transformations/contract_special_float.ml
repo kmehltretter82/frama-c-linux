@@ -53,6 +53,17 @@ let ensures_special_float = function
   | Normal, ip -> is_special_float_pred ip.ip_content.tp_statement
   | _ -> false
 
+let negate_behavior_preconds bhv =
+  let neg_preconds =
+    List.map
+      (fun e -> (Logic_const.pnot (e.ip_content.tp_statement)))
+      (bhv.b_requires @ bhv.b_assumes)
+  in
+  let pred = Logic_const.pors neg_preconds in
+  let name = "not_" ^ bhv.b_name in
+  let pred = { pred with pred_name = name :: pred.pred_name } in
+  Logic_const.new_predicate pred
+
 let are_complete_disjoint spec behaviors =
   match spec.spec_complete_behaviors, spec.spec_disjoint_behaviors with
   | [complete], [disjoint] ->
@@ -96,17 +107,7 @@ let update_spec spec =
       spec.spec_complete_behaviors <- [];
       spec.spec_disjoint_behaviors <- [];
     | _ ->
-      let requires =
-        List.map
-          (fun bhv ->
-             let neg_assumes =
-               List.map
-                 (fun e -> (Logic_const.pnot (e.ip_content.tp_statement)))
-                 (bhv.b_requires @ bhv.b_assumes)
-             in
-             Logic_const.(new_predicate (pors neg_assumes)))
-          disabled
-      in
+      let requires = List.map negate_behavior_preconds disabled in
       let default =
         match default with
         | None -> Cil.mk_behavior ~requires ()

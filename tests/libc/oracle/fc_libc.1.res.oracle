@@ -3782,9 +3782,11 @@ extern float acoshf(float x);
  */
 extern long double acoshl(long double x);
 
-/*@ requires ¬(overflow_arg: \is_finite(x) ∧ x > 0x1.62e42fefa39efp+9);
-    requires ¬(plus_infinity_arg: \is_plus_infinity(x));
-    requires ¬(nan_arg: \is_NaN(x));
+/*@ requires
+      not_overflow:
+        ¬(overflow_arg: \is_finite(x) ∧ x > 0x1.62e42fefa39efp+9);
+    requires not_plus_infinity: ¬(plus_infinity_arg: \is_plus_infinity(x));
+    requires not_nan: ¬(nan_arg: \is_NaN(x));
     assigns __fc_errno, \result;
     assigns __fc_errno \from x;
     assigns \result \from x;
@@ -3816,9 +3818,10 @@ extern long double acoshl(long double x);
  */
 extern double exp(double x);
 
-/*@ requires ¬(overflow_arg: \is_finite(x) ∧ x > 0x1.62e42ep+6);
-    requires ¬(plus_infinity_arg: \is_plus_infinity(x));
-    requires ¬(nan_arg: \is_NaN(x));
+/*@ requires
+      not_overflow: ¬(overflow_arg: \is_finite(x) ∧ x > 0x1.62e42ep+6);
+    requires not_plus_infinity: ¬(plus_infinity_arg: \is_plus_infinity(x));
+    requires not_nan: ¬(nan_arg: \is_NaN(x));
     assigns __fc_errno, \result;
     assigns __fc_errno \from x;
     assigns \result \from x;
@@ -3851,8 +3854,9 @@ extern float expf(float x);
 
 /*@ requires valid_exp: \valid(exp);
     requires
-      ¬(infinite_arg: \is_plus_infinity(x) ∨ \is_minus_infinity(x));
-    requires ¬(nan_arg: \is_NaN(x));
+      not_infinite:
+        ¬(infinite_arg: \is_plus_infinity(x) ∨ \is_minus_infinity(x));
+    requires not_nan: ¬(nan_arg: \is_NaN(x));
     assigns \result, *exp;
     assigns \result \from x;
     assigns *exp \from x;
@@ -3878,8 +3882,9 @@ extern double frexp(double x, int *exp);
 
 /*@ requires valid_exp: \valid(exp);
     requires
-      ¬(infinite_arg: \is_plus_infinity(x) ∨ \is_minus_infinity(x));
-    requires ¬(nan_arg: \is_NaN(x));
+      not_infinite:
+        ¬(infinite_arg: \is_plus_infinity(x) ∨ \is_minus_infinity(x));
+    requires not_nan: ¬(nan_arg: \is_NaN(x));
     assigns \result, *exp;
     assigns \result \from x;
     assigns *exp \from x;
@@ -3905,8 +3910,9 @@ extern float frexpf(float x, int *exp);
 
 /*@ requires valid_exp: \valid(exp);
     requires
-      ¬(infinite_arg: \is_plus_infinity(x) ∨ \is_minus_infinity(x));
-    requires ¬(nan_arg: \is_NaN(x));
+      not_infinite:
+        ¬(infinite_arg: \is_plus_infinity(x) ∨ \is_minus_infinity(x));
+    requires not_nan: ¬(nan_arg: \is_NaN(x));
     assigns \result, *exp;
     assigns \result \from x;
     assigns *exp \from x;
