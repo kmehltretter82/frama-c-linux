@@ -92,7 +92,7 @@ pkgs.lib.makeExtensible
         src = self.src;
         opamPackages = [ "ocp-indent=1.7.0" "headache=1.05"];
         buildInputs =
-          self.mk_buildInputs { nixPackages = [ pkgs.bc ]; };
+          self.mk_buildInputs { nixPackages = [ pkgs.bc pkgs.clang_10 ]; };
         outputs = [ "out" ];
         postPatch = ''
                patchShebangs .

@@ -343,16 +343,21 @@ EACSL_TEST_FILES = \
 	tests/format/test_config_dev \
 	tests/print.ml \
 
-# Test files without header management
-EACSL_DISTRIB_TESTS = \
+EACSL_TESTS_C_FILES = \
   $(foreach dir, $(addprefix tests/,$(PLUGIN_TESTS_DIRS)), \
       $(dir)/*.[ich] \
+  ) \
+  tests/utils/signalled.h
+
+# Test files without header management
+EACSL_DISTRIB_TESTS = \
+  $(EACSL_TESTS_C_FILES) \
+  $(foreach dir, $(addprefix tests/,$(PLUGIN_TESTS_DIRS)), \
       $(dir)/test_config \
       $(dir)/test_config_dev \
       $(dir)/oracle/* \
       $(dir)/oracle_dev/* \
-  ) \
-  tests/utils/signalled.h \
+  )
 
 
 EACSL_RTL_FILES = $(EACSL_RTL_SRC)
@@ -364,7 +369,7 @@ EACSL_LICENSE_FILES = \
   license/headache_config.txt license/LGPLv2.1
 
 EACSL_MISC_FILES = \
-  configure.ac Makefile.in README
+  configure.ac Makefile.in README tab-in-changelog.sh
 
 EACSL_SHARE_FILES = \
 	$(addprefix share/,$(addsuffix /*.[ch],$(EACSL_C_DIRECTORIES)))
@@ -396,6 +401,37 @@ PLUGIN_DISTRIB_TESTS:= $(EACSL_DISTRIB_TESTS)
 wc:
 	ocamlwc -p $(EACSL_OCAML_FILES)
 
+# Files to format with clang-format
+EACSL_CLANG_FORMAT_SRC:=\
+	$(addprefix $(EACSL_PLUGIN_DIR)/,$(EACSL_TESTS_C_FILES)) \
+	$(addprefix $(EACSL_PLUGIN_DIR)/,$(EACSL_SHARE_FILES))
+
+# Format C files
+eacsl-clang-format:
+	if command -v clang-format >/dev/null; then \
+		echo "Formatting E-ACSL C files with clang-format..."; \
+		clang-format -i $(EACSL_CLANG_FORMAT_SRC); \
+	else \
+		echo "clang-format should be installed to check the formatting of E-ACSL C files"; \
+	fi;
+
+# Check if C files are correctly formatted
+eacsl-lint-c:
+	if command -v clang-format >/dev/null; then \
+		echo "Checking formatting of E-ACSL C files..."; \
+		clang-format --dry-run -Werror $(EACSL_CLANG_FORMAT_SRC); \
+	else \
+		echo "clang-format should be installed to check the formatting of E-ACSL C files"; \
+	fi;
+
+# Check for the absence of <TAB> characters in the changelog
+eacsl-lint-changelog:
+	echo "Checking changelog of E-ACSL for the absence of <TAB> characters..."
+	$(EACSL_PLUGIN_DIR)/tab-in-changelog.sh
+
+# Extend lint step with E-ACSL specific lint
+lint:: eacsl-lint-changelog eacsl-lint-c
+
 ##########
 # Header #
 ##########
@@ -413,7 +449,7 @@ EACSL_CEA_SHARE=$(filter-out $(EACSL_SPARETIMELABS), $(wildcard $(EACSL_SHARE)))
 
 EACSL_CEA_LGPL_BARE= src/*.ml src/*/*.ml src/*.mli src/*/*.mli \
 	E_ACSL.mli \
-	Makefile.in configure.ac \
+	Makefile.in configure.ac tab-in-changelog.sh \
 	scripts/*.sh \
 	tests/print.ml \
 	man/e-acsl-gcc.sh.1
