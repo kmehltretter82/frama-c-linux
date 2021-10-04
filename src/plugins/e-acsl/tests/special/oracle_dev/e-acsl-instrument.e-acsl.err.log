@@ -1,5 +1,5 @@
 tests/special/e-acsl-instrument.c: In function 'instrument2'
-tests/special/e-acsl-instrument.c:31: Warning: no sound verdict for Precondition (guess: ok).
+tests/special/e-acsl-instrument.c:32: Warning: no sound verdict for Precondition (guess: ok).
 	the considered predicate is:
 	\valid(p)
 tests/special/e-acsl-instrument.c: In function 'uninstrument2'
@@ -7,10 +7,10 @@ tests/special/e-acsl-instrument.c:16: Warning: no sound verdict for Precondition
 	the considered predicate is:
 	\valid(p)
 tests/special/e-acsl-instrument.c: In function 'main'
-tests/special/e-acsl-instrument.c:58: Warning: no sound verdict for Assertion (guess: ok).
+tests/special/e-acsl-instrument.c:60: Warning: no sound verdict for Assertion (guess: ok).
 	the considered predicate is:
 	\initialized(&x)
 tests/special/e-acsl-instrument.c: In function 'main'
-tests/special/e-acsl-instrument.c:59: Warning: no sound verdict for Assertion (guess: ok).
+tests/special/e-acsl-instrument.c:61: Warning: no sound verdict for Assertion (guess: ok).
 	the considered predicate is:
 	\initialized(&y)

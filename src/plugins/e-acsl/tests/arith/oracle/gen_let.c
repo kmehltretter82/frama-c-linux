@@ -38,7 +38,7 @@ int main(void)
     int __gen_e_acsl_u_3;
     __gen_e_acsl_u_3 = 1;
     __e_acsl_assert(__gen_e_acsl_u_3 + 1 == 2,1,"Assertion","main",
-                    "(\\let u = 1; u) + 1 == 2","tests/arith/let.c",12);
+                    "(\\let u = 1; u) + 1 == 2","tests/arith/let.c",13);
   }
   /*@ assert (\let u = 1; u) + 1 ≡ 2; */ ;
   {
@@ -48,7 +48,7 @@ int main(void)
     __gen_e_acsl_v_2 = __gen_e_acsl_u_4 + 1;
     __e_acsl_assert(__gen_e_acsl_v_2 == 2,1,"Assertion","main",
                     "\\let u = 1; (\\let v = u + 1; v) == 2",
-                    "tests/arith/let.c",14);
+                    "tests/arith/let.c",15);
   }
   /*@ assert \let u = 1; (\let v = u + 1; v) ≡ 2; */ ;
   {
@@ -58,7 +58,7 @@ int main(void)
     __gen_e_acsl_u_6 = __gen_e_acsl_u_5 + 1;
     __e_acsl_assert(__gen_e_acsl_u_6 == 2,1,"Assertion","main",
                     "\\let u = 1; (\\let u = u + 1; u) == 2",
-                    "tests/arith/let.c",17);
+                    "tests/arith/let.c",19);
   }
   /*@ assert \let u = 1; (\let u = u + 1; u) ≡ 2; */ ;
   long m = 0x7fffffffffffffffL;
@@ -78,7 +78,7 @@ int main(void)
     __gen_e_acsl_gt = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_mul),
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_m));
     __e_acsl_assert(__gen_e_acsl_gt > 0,1,"Assertion","main",
-                    "(\\let u = m; u * u) > m","tests/arith/let.c",21);
+                    "(\\let u = m; u * u) > m","tests/arith/let.c",24);
     __gmpz_clear(__gen_e_acsl_u_8);
     __gmpz_clear(__gen_e_acsl_mul);
     __gmpz_clear(__gen_e_acsl_m);
@@ -89,7 +89,7 @@ int main(void)
     int __gen_e_acsl_u_9;
     __gen_e_acsl_u_9 = 'b';
     __e_acsl_assert((int)c < __gen_e_acsl_u_9,1,"Assertion","main",
-                    "\\let u = \'b\'; c < u","tests/arith/let.c",24);
+                    "\\let u = \'b\'; c < u","tests/arith/let.c",27);
   }
   /*@ assert \let u = 'b'; c < u; */ ;
   float f = 1.0f;
@@ -99,7 +99,7 @@ int main(void)
     float __gen_e_acsl_u_10;
     __gen_e_acsl_u_10 = f;
     __e_acsl_assert(__gen_e_acsl_u_10 == f,1,"Assertion","main",
-                    "\\let u = f; u == f","tests/arith/let.c",27);
+                    "\\let u = f; u == f","tests/arith/let.c",30);
   }
   /*@ assert \let u = f; u ≡ f; */ ;
   int t[4] = {1, 2, 3, 4};
@@ -107,14 +107,14 @@ int main(void)
     int * /*[4]*/ __gen_e_acsl_u_11;
     __gen_e_acsl_u_11 = & t[1];
     __e_acsl_assert(1,1,"Assertion","main","\\let u = &t[1]; 1 == 1",
-                    "tests/arith/let.c",30);
+                    "tests/arith/let.c",34);
   }
   /*@ assert \let u = &t[1]; 1 ≡ 1; */ ;
   {
     int * /*[4]*/ __gen_e_acsl_u_12;
     __gen_e_acsl_u_12 = & t[1];
     __e_acsl_assert(1,1,"Assertion","main","(\\let u = &t[1]; 1) == 1",
-                    "tests/arith/let.c",32);
+                    "tests/arith/let.c",36);
   }
   /*@ assert (\let u = &t[1]; 1) ≡ 1; */ ;
   struct __anonstruct_r_1 r = {.x = 1, .y = 2};
@@ -125,7 +125,7 @@ int main(void)
     __gen_e_acsl_u_13 = r;
     __e_acsl_assert(__gen_e_acsl_u_13.x + (long)__gen_e_acsl_u_13.y == 3L,1,
                     "Assertion","main","\\let u = r; u.x + u.y == 3",
-                    "tests/arith/let.c",35);
+                    "tests/arith/let.c",41);
   }
   /*@ assert \let u = r; u.x + u.y ≡ 3; */ ;
   s.x = 5;
@@ -133,7 +133,7 @@ int main(void)
     union __anonunion_s_2 __gen_e_acsl_u_14;
     __gen_e_acsl_u_14 = s;
     __e_acsl_assert(__gen_e_acsl_u_14.x > 0,1,"Assertion","main",
-                    "(\\let u = s; u.x) > 0","tests/arith/let.c",39);
+                    "(\\let u = s; u.x) > 0","tests/arith/let.c",48);
   }
   /*@ assert (\let u = s; u.x) > 0; */ ;
   __retres = 0;

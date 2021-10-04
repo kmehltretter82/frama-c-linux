@@ -69,7 +69,7 @@ int main(void)
     else __gen_e_acsl_and_3 = 0;
     __e_acsl_assert(__gen_e_acsl_and_3,1,"Assertion","main",
                     "\\valid(q) && \\valid(p)","tests/temporal/t_fun_lib.c",
-                    16);
+                    15);
   }
   /*@ assert \valid(q) ∧ \valid(p); */ ;
   __e_acsl_temporal_reset_parameters();
@@ -98,7 +98,7 @@ int main(void)
     }
     else __gen_e_acsl_and_4 = 0;
     __e_acsl_assert(__gen_e_acsl_and_4,1,"Assertion","main","\\valid(path)",
-                    "tests/temporal/t_fun_lib.c",23);
+                    "tests/temporal/t_fun_lib.c",22);
   }
   /*@ assert \valid(path); */ ;
   __e_acsl_temporal_reset_parameters();
@@ -139,7 +139,7 @@ int main(void)
     else __gen_e_acsl_and_7 = 0;
     __e_acsl_assert(__gen_e_acsl_and_7,1,"Assertion","main",
                     "!\\valid(p) && !\\valid(path)",
-                    "tests/temporal/t_fun_lib.c",30);
+                    "tests/temporal/t_fun_lib.c",29);
   }
   /*@ assert ¬\valid(p) ∧ ¬\valid(path); */ ;
   __retres = 0;

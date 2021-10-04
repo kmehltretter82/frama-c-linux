@@ -9,7 +9,7 @@ int main(void)
   int x = 0;
   if (x) {
     __e_acsl_assert(0,1,"Assertion","main","\\false",
-                    "tests/constructs/false.i",6);
+                    "tests/constructs/false.i",7);
     /*@ assert \false; */ ;
   }
   __retres = 0;

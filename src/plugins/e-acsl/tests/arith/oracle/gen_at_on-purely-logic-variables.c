@@ -318,10 +318,10 @@ int main(void)
                                                     (void *)(& __gen_e_acsl_at_4));
     __e_acsl_assert(__gen_e_acsl_valid_read_4,1,"RTE","main",
                     "mem_access: \\valid_read(__gen_e_acsl_at_4 + 0)",
-                    "tests/arith/at_on-purely-logic-variables.c",37);
+                    "tests/arith/at_on-purely-logic-variables.c",38);
     __e_acsl_assert(*(__gen_e_acsl_at_4 + 0) == 10L,1,"Assertion","main",
                     "\\let i = 3; \\at(n + i,L) == 10",
-                    "tests/arith/at_on-purely-logic-variables.c",37);
+                    "tests/arith/at_on-purely-logic-variables.c",38);
   }
   /*@ assert \let i = 3; \at(n + i,L) ≡ 10; */ ;
   unsigned int m = (unsigned int)3;
@@ -355,7 +355,7 @@ int main(void)
                                                         (void *)(& __gen_e_acsl_at_5));
         __e_acsl_assert(__gen_e_acsl_valid_read_5,1,"RTE","main",
                         "mem_access: \\valid_read(__gen_e_acsl_at_5 + (int)(__gen_e_acsl_k_3 - -8))",
-                        "tests/arith/at_on-purely-logic-variables.c",41);
+                        "tests/arith/at_on-purely-logic-variables.c",42);
         if (! (*(__gen_e_acsl_at_5 + (__gen_e_acsl_k_3 - -8)) == 0L)) 
           ;
         else {
@@ -368,7 +368,7 @@ int main(void)
     e_acsl_end_loop5: ;
     __e_acsl_assert(__gen_e_acsl_exists_3,1,"Assertion","main",
                     "\\exists integer k; -9 < k < 0 && \\at(m + k,G) == 0",
-                    "tests/arith/at_on-purely-logic-variables.c",41);
+                    "tests/arith/at_on-purely-logic-variables.c",42);
   }
   /*@ assert ∃ ℤ k; -9 < k < 0 ∧ \at(m + k,G) ≡ 0; */ ;
   {
@@ -403,7 +403,7 @@ int main(void)
                                                             (void *)(& __gen_e_acsl_at_6));
             __e_acsl_assert(__gen_e_acsl_valid_read_6,1,"RTE","main",
                             "mem_access:\n  \\valid_read(__gen_e_acsl_at_6 +\n              (int)((int)((int)(__gen_e_acsl_u_3 - 9) * 32) +\n                    (int)(__gen_e_acsl_v_3 - -4)))",
-                            "tests/arith/at_on-purely-logic-variables.c",45);
+                            "tests/arith/at_on-purely-logic-variables.c",46);
             /*@ assert
                 Eva: initialization:
                   \initialized(__gen_e_acsl_at_6 +
@@ -431,7 +431,7 @@ int main(void)
     e_acsl_end_loop7: ;
     __e_acsl_assert(__gen_e_acsl_exists_4,1,"Assertion","main",
                     "\\exists integer u;\n  9 <= u < 21 &&\n  (\\forall integer v; -5 < v <= (u < 15? u + 6: 3) ==> \\at((n + u) + v > 0,K))",
-                    "tests/arith/at_on-purely-logic-variables.c",43);
+                    "tests/arith/at_on-purely-logic-variables.c",44);
   }
   /*@
   assert
@@ -487,7 +487,7 @@ int main(void)
                 __e_acsl_assert(__gen_e_acsl_valid_read_7,1,"RTE","main",
                                 "mem_access:\n  \\valid_read(__gen_e_acsl_at_7 +\n              (int)((int)((int)(__gen_e_acsl_u_5 - 10) * 300) +\n                    (int)((int)((int)(__gen_e_acsl_v_5 - -9) * 100) +\n                          (int)(__gen_e_acsl_w - 101))))",
                                 "tests/arith/at_on-purely-logic-variables.c",
-                                57);
+                                59);
                 if (! *(__gen_e_acsl_at_7 + ((__gen_e_acsl_u_5 - 10) * 300 + (
                                              (__gen_e_acsl_v_5 - -9) * 100 + (
                                              __gen_e_acsl_w - 101))))) 
@@ -520,7 +520,7 @@ int main(void)
     e_acsl_end_loop10: ;
     __e_acsl_assert(__gen_e_acsl_exists_5,1,"Assertion","main",
                     "\\exists integer u;\n  10 <= u < 20 &&\n  (\\exists integer v;\n     -10 < v <= -5 + (\\let u = -2; u) &&\n     (\\exists integer w;\n        100 < w <= 200 && \\at((((n - u) + (\\let u = 42; u)) + v) + w > 0,K)))",
-                    "tests/arith/at_on-purely-logic-variables.c",54);
+                    "tests/arith/at_on-purely-logic-variables.c",56);
   }
   /*@
   assert

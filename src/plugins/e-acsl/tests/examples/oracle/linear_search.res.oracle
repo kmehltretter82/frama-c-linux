@@ -1,4 +1,4 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] tests/examples/linear_search.i:30: Warning: 
+[eva:alarm] tests/examples/linear_search.i:33: Warning: 
   function __gen_e_acsl_search: precondition got status unknown.

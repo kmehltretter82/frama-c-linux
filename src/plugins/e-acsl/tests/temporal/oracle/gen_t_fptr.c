@@ -64,7 +64,7 @@ int main(int argc, char const **argv)
     }
     else __gen_e_acsl_and = 0;
     __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","main","\\valid(q)",
-                    "tests/temporal/t_fptr.c",20);
+                    "tests/temporal/t_fptr.c",19);
   }
   /*@ assert \valid(q); */ ;
   __retres = 0;

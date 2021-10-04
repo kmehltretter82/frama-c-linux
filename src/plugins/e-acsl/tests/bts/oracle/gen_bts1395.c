@@ -25,7 +25,7 @@ int main(void)
   int __retres;
   int x = __gen_e_acsl_fact(5);
   __e_acsl_assert(x == 120,1,"Assertion","main","x == 120",
-                  "tests/bts/bts1395.i",14);
+                  "tests/bts/bts1395.i",15);
   /*@ assert x ≡ 120; */ ;
   __retres = 0;
   return __retres;

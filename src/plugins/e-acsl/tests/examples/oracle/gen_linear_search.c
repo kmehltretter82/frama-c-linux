@@ -111,11 +111,11 @@ int main(void)
   }
   found = __gen_e_acsl_search(36);
   __e_acsl_assert(found == 1,1,"Assertion","main","found == 1",
-                  "tests/examples/linear_search.i",31);
+                  "tests/examples/linear_search.i",34);
   /*@ assert found ≡ 1; */ ;
   found = __gen_e_acsl_search(5);
   __e_acsl_assert(found == 0,1,"Assertion","main","found == 0",
-                  "tests/examples/linear_search.i",34);
+                  "tests/examples/linear_search.i",37);
   /*@ assert found ≡ 0; */ ;
   __retres = 0;
   return __retres;

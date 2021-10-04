@@ -100,7 +100,7 @@ int main(void)
                                                     sizeof(int));
     __e_acsl_assert(__gen_e_acsl_initialized,1,"Assertion","main",
                     "\\initialized(&x)","tests/special/e-acsl-instrument.c",
-                    58);
+                    60);
   }
   /*@ assert \initialized(&x); */ ;
   {
@@ -109,7 +109,7 @@ int main(void)
                                                       sizeof(int));
     __e_acsl_assert(__gen_e_acsl_initialized_2,1,"Assertion","main",
                     "\\initialized(&y)","tests/special/e-acsl-instrument.c",
-                    59);
+                    61);
   }
   /*@ assert \initialized(&y); */ ;
   {
@@ -139,7 +139,7 @@ int __gen_e_acsl_instrument2(int *p)
     __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int),(void *)p,
                                         (void *)(& p));
     __e_acsl_assert(__gen_e_acsl_valid,1,"Precondition","instrument2",
-                    "\\valid(p)","tests/special/e-acsl-instrument.c",31);
+                    "\\valid(p)","tests/special/e-acsl-instrument.c",32);
   }
   __retres = instrument2(p);
   __e_acsl_delete_block((void *)(& p));

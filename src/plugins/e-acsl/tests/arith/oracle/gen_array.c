@@ -549,10 +549,10 @@ int main(void)
     }
   }
   __e_acsl_assert(T1[0] == T2[0],1,"Assertion","main","T1[0] == T2[0]",
-                  "tests/arith/array.i",109);
+                  "tests/arith/array.i",110);
   /*@ assert T1[0] ≡ T2[0]; */ ;
   __e_acsl_assert(T1[1] != T2[1],1,"Assertion","main","T1[1] != T2[1]",
-                  "tests/arith/array.i",110);
+                  "tests/arith/array.i",111);
   /*@ assert T1[1] ≢ T2[1]; */ ;
   arrays();
   vlas(3);

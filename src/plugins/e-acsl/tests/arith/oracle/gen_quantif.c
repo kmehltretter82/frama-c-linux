@@ -390,7 +390,7 @@ int main(void)
     e_acsl_end_loop12: ;
     __e_acsl_assert(__gen_e_acsl_forall_10,1,"Assertion","main",
                     "forall_multiple_binders_1:\n  \\forall integer i, integer j, integer k;\n    0 <= i < 10 && 1 < j <= 11 && 2 <= k <= 12 ==> p1(i, j, k)",
-                    "tests/arith/quantif.i",52);
+                    "tests/arith/quantif.i",53);
   }
   /*@
   assert
@@ -434,7 +434,7 @@ int main(void)
     e_acsl_end_loop13: ;
     __e_acsl_assert(__gen_e_acsl_forall_11,1,"Assertion","main",
                     "forall_multiple_binders_2:\n  \\forall integer i, integer j, integer k;\n    0 <= i <= j < k <= 10 ==> p2(i, j, k)",
-                    "tests/arith/quantif.i",55);
+                    "tests/arith/quantif.i",56);
   }
   /*@
   assert
@@ -477,7 +477,7 @@ int main(void)
     e_acsl_end_loop14: ;
     __e_acsl_assert(__gen_e_acsl_forall_12,1,"Assertion","main",
                     "forall_multiple_binders_3:\n  \\forall integer i, integer j, integer k;\n    0 <= i < j <= 10 && 1 < k < 11 ==> p3(i, j, k)",
-                    "tests/arith/quantif.i",58);
+                    "tests/arith/quantif.i",59);
   }
   /*@
   assert
@@ -521,7 +521,7 @@ int main(void)
     e_acsl_end_loop15: ;
     __e_acsl_assert(__gen_e_acsl_forall_13,1,"Assertion","main",
                     "forall_multiple_binders_4:\n  \\forall integer i, integer j, integer k;\n    0 <= i < 10 ==> 1 < j <= 11 ==> 2 <= k <= 12 ==> p1(i, j, k)",
-                    "tests/arith/quantif.i",61);
+                    "tests/arith/quantif.i",62);
   }
   /*@
   assert
@@ -565,7 +565,7 @@ int main(void)
     e_acsl_end_loop16: ;
     __e_acsl_assert(__gen_e_acsl_forall_14,1,"Assertion","main",
                     "forall_unordered_binders:\n  \\forall integer i, integer j, integer k;\n    0 <= i <= k <= 10 && 1 <= j < k ==> p4(i, j, k)",
-                    "tests/arith/quantif.i",64);
+                    "tests/arith/quantif.i",65);
   }
   /*@
   assert
@@ -609,7 +609,7 @@ int main(void)
     e_acsl_end_loop17: ;
     __e_acsl_assert(__gen_e_acsl_exists_3,1,"Assertion","main",
                     "exists_multiple_binders_1:\n  \\exists integer i, integer j, integer k;\n    0 <= i < 10 && 1 < j <= 11 && 2 <= k <= 12 && p1(i, j, k)",
-                    "tests/arith/quantif.i",67);
+                    "tests/arith/quantif.i",68);
   }
   /*@
   assert
@@ -653,7 +653,7 @@ int main(void)
     e_acsl_end_loop18: ;
     __e_acsl_assert(__gen_e_acsl_exists_4,1,"Assertion","main",
                     "exists_multiple_binders_2:\n  \\exists integer i, integer j, integer k;\n    0 <= i <= j < k <= 10 && p2(i, j, k)",
-                    "tests/arith/quantif.i",70);
+                    "tests/arith/quantif.i",71);
   }
   /*@
   assert
@@ -696,7 +696,7 @@ int main(void)
     e_acsl_end_loop19: ;
     __e_acsl_assert(__gen_e_acsl_exists_5,1,"Assertion","main",
                     "exists_multiple_binders_3:\n  \\exists integer i, integer j, integer k;\n    0 <= i < j <= 10 && 1 < k < 11 && p3(i, j, k)",
-                    "tests/arith/quantif.i",73);
+                    "tests/arith/quantif.i",74);
   }
   /*@
   assert
@@ -740,7 +740,7 @@ int main(void)
     e_acsl_end_loop20: ;
     __e_acsl_assert(__gen_e_acsl_exists_6,1,"Assertion","main",
                     "exists_unordered_binders:\n  \\exists integer i, integer j, integer k;\n    0 <= i <= k <= 10 && 1 <= j < k && p4(i, j, k)",
-                    "tests/arith/quantif.i",76);
+                    "tests/arith/quantif.i",77);
   }
   /*@
   assert
