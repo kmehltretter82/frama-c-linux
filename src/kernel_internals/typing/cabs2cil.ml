@@ -4964,11 +4964,12 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
         end
       | Cabs.CONSTANT (Cabs.CONST_STRING s) -> AStr s
       | Cabs.CONSTANT (Cabs.CONST_INT str) -> begin
-          match (parseIntExp ~loc str).enode with
-          | Const (CInt64 (v64,_,_)) ->
+          match parseIntExp_opt ~loc str with
+          | Some {enode = Const (CInt64 (v64,_,_)) } ->
             AInt v64
           | _ ->
-            Kernel.fatal ~current:true "Invalid attribute constant: %s" str
+            Kernel.error ~current:true "Invalid attribute constant: %s" str;
+            AInt Integer.one
         end
       | Cabs.CONSTANT (Cabs.CONST_FLOAT str) ->
         ACons ("__fc_float", [AStr str])
