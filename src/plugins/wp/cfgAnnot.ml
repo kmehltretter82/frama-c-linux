@@ -468,16 +468,18 @@ let mk_variant_properties kf s ca v =
   let vdecr = Logic_const.prel ~loc (Rlt, v, vcurr) in
   (vpos_id, vpos), (vdecr_id, vdecr)
 
+type loop_invariant = {
+  loop_hyp : WpPropId.prop_id option ;
+  loop_est : WpPropId.prop_id option ;
+  loop_ind : WpPropId.prop_id option ;
+  loop_pred : Cil_types.predicate ;
+}
+
 type loop_contract = {
   loop_terminates: predicate option;
-  (* to be verified at loop entry *)
-  loop_established: WpPropId.pred_info list;
-  (* to be assumed for loop current *)
-  loop_invariants: WpPropId.pred_info list;
+  loop_invariants : loop_invariant list ;
   (* to be proved after loop invariants *)
   loop_smoke: WpPropId.pred_info list;
-  (* to be verified after loop body *)
-  loop_preserved: WpPropId.pred_info list;
   (* assigned by loop body *)
   loop_assigns: WpPropId.assigns_full_info list;
 }
@@ -503,17 +505,19 @@ module LoopContract = WpContext.StaticGenerator(CodeKey)
           begin fun _emitter ca l ->
             match ca.annot_content with
             | AInvariant(_,true,inv) ->
-                let p = normalize_pred inv.tp_statement in
                 let g_hyp = WpPropId.mk_inv_hyp_id kf stmt ca in
                 let g_est, g_ind = WpPropId.mk_loop_inv kf stmt ca in
                 let admit = Logic_utils.use_predicate inv.tp_kind in
                 let verif = Logic_utils.verify_predicate inv.tp_kind in
-                let use flag id p ps = if flag then (id,p) :: ps else ps in
+                let use flag id = if flag then Some id else None in
+                let inv =
+                  { loop_pred = normalize_pred inv.tp_statement ;
+                    loop_hyp = use admit g_hyp ;
+                    loop_est = use verif g_est ;
+                    loop_ind = use verif g_ind ; }
+                in
                 { l with
-                  loop_established = use verif g_est p l.loop_established ;
-                  loop_invariants  = use admit g_hyp p l.loop_invariants ;
-                  loop_preserved   = use verif g_ind p l.loop_preserved ;
-                }
+                  loop_invariants  = inv :: l.loop_invariants ; }
             | AVariant(term, None) ->
                 let vpos , vdec =
                   mk_variant_properties kf stmt ca term in
@@ -529,11 +533,14 @@ module LoopContract = WpContext.StaticGenerator(CodeKey)
                     Logic_const.pimplies (t, v)
                   end else v
                 in
+                let mk_inv (i, p) =
+                  let i, p = intro_terminates @@ normalize_annot (i, p) in
+                  { loop_pred = p ;
+                    loop_hyp = None ; loop_est = None ; loop_ind = Some i }
+                in
                 { l with loop_terminates = None ;
-                         loop_preserved =
-                           intro_terminates (normalize_annot vdec) ::
-                           intro_terminates (normalize_annot vpos) ::
-                           l.loop_preserved }
+                         loop_invariants =
+                           mk_inv vdec :: mk_inv vpos :: l.loop_invariants }
             | AAssigns(_,WritesAny) ->
                 let asgn = WpPropId.mk_loop_any_assigns_info stmt in
                 { l with loop_assigns = asgn :: l.loop_assigns }
@@ -549,9 +556,7 @@ module LoopContract = WpContext.StaticGenerator(CodeKey)
             | _ -> l
           end stmt {
           loop_terminates = Some Logic_const.pfalse ;
-          loop_established = [] ;
           loop_invariants = [] ;
-          loop_preserved = [] ;
           loop_smoke = [] ;
           loop_assigns = [] ;
         }

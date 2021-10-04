@@ -259,14 +259,27 @@ struct
       | None, _ | _, None -> w (* no terminates goal or nothing to prove *)
       | Some t, Some prop -> prove_subproperty env t prop s FromCode w
     in
+    let if_some_id op env id p w =
+      match id with None -> w | Some id -> op env (id, p) w in
+    let loop_current_hyp env CfgAnnot.{ loop_hyp ; loop_pred } =
+      if_some_id use_property env loop_hyp loop_pred
+    in
+    let established env CfgAnnot.{ loop_hyp ; loop_est ; loop_pred } w =
+      if_some_id prove_property env loop_est loop_pred @@
+      if_some_id use_property env loop_hyp loop_pred w
+    in
+    let preserved env CfgAnnot.{ loop_hyp ; loop_ind ; loop_pred } w =
+      if_some_id prove_property env loop_ind loop_pred @@
+      if_some_id use_property env loop_hyp loop_pred w
+    in
     insert_terminates @@
-    List.fold_right (prove_property env) lc.loop_established @@
+    List.fold_right (established env) lc.loop_invariants @@
     List.fold_right (use_assigns env) lc.loop_assigns @@
     W.label env.we None (Clabels.loop_current s) @@
-    List.fold_right (use_property env) lc.loop_invariants @@
+    List.fold_right (loop_current_hyp env) lc.loop_invariants @@
     List.fold_right (prove_property env) lc.loop_smoke @@
     let q =
-      List.fold_right (prove_property env) lc.loop_preserved @@
+      List.fold_right (preserved env) lc.loop_invariants @@
       List.fold_right (prove_assigns env) lc.loop_assigns @@
       W.empty in
     ( Vhash.replace env.wp a (Some q) ; successors env a )
