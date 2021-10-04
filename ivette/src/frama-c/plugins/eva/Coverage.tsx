@@ -50,6 +50,19 @@ const ordering: Arrays.ByColumns<stats> = {
   sureAlarms: Compare.byFields(
     { alarmStatuses: Compare.byFields({ invalid: Compare.number }) },
   ),
+  deadStatements: Compare.byFields({
+    coverage: Compare.byFields(
+      { dead: Compare.number },
+    ),
+  }),
+  reachableStatements: Compare.byFields({
+    coverage: Compare.byFields(
+      { reachable: Compare.number },
+    ),
+  }),
+  totalStatements: Compare.byFields(
+    { coverage: map((x) => x.reachable + x.dead, Compare.number) },
+  ),
   coverage: Compare.byFields(
     {
       coverage: map(
@@ -110,6 +123,39 @@ export function CoverageTable(): JSX.Element {
         align="center"
         width={80}
         getter={({ alarmStatuses }: stats) => alarmStatuses.invalid}
+      />
+      <Column
+        id="deadStatements"
+        label="Dead statements"
+        title="Dead statements"
+        align="center"
+        visible={false}
+        width={80}
+        getter={({ coverage }: stats) => (
+          coverage.dead
+        )}
+      />
+      <Column
+        id="reachableStatements"
+        label="Reachable statements"
+        title="Reachable statements"
+        align="center"
+        visible={false}
+        width={80}
+        getter={({ coverage }: stats) => (
+          coverage.reachable
+        )}
+      />
+      <Column
+        id="totalStatements"
+        label="Total statements"
+        title="Total statements"
+        align="center"
+        visible={false}
+        width={80}
+        getter={({ coverage }: stats) => (
+          coverage.dead + coverage.reachable
+        )}
       />
       <Column
         id="coverage"
