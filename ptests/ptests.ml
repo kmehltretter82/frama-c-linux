@@ -819,7 +819,10 @@ end = struct
       dc_timeout = "";
     }
 
-  let scan_execnow ~once dir ex_macros ex_timeout (s:string) =
+  let scan_execnow ~warn ~once ~file dir ex_macros ex_timeout (s:string) =
+    if once=false then
+      lock_eprintf "%s: using EXEC directive (DEPRECATED): %s@."
+        file s;
     let rec aux (s:execnow) =
       try
         Scanf.sscanf s.ex_cmd "%_[ ]LOG%_[ ]%[-A-Za-z0-9_',+=:.\\@@]%_[ ]%s@\n"
@@ -834,21 +837,31 @@ end = struct
       try
         Scanf.sscanf s.ex_cmd "%_[ ]make%_[ ]%s@\n"
           (fun cmd ->
+             (* It should be better to use a specific macro into the command (such as @MAKE@) for that. *)
              let s = aux ({ s with ex_cmd = cmd; }) in
-             { s with ex_cmd = !do_make^" "^cmd; } )
+             let r = { s with ex_cmd = !do_make^" "^cmd; } in
+             if warn then
+               Format.eprintf "%s: EXEC%s directive with a make command (DEPRECATED): %s@."
+                 file (if once then "NOW" else "") r.ex_cmd;
+             r)
       with Scanf.Scan_failure _ ->
         s
     in
-    aux
-      { ex_cmd = s;
-        ex_macros;
-        ex_log = [];
-        ex_bin = [];
-        ex_dir = dir;
-        ex_once = once;
-        ex_done = ref false;
-        ex_timeout;
-      }
+    let execnow = aux
+        { ex_cmd = s;
+          ex_macros;
+          ex_log = [];
+          ex_bin = [];
+          ex_dir = dir;
+          ex_once = once;
+          ex_done = ref false;
+          ex_timeout;
+        }
+    in
+    if warn && execnow.ex_log = [] && execnow.ex_bin = [] then
+      Format.eprintf "%s: EXEC%s without LOG nor BIN target (DEPRECATED): %s@."
+        file (if once then "NOW" else "") s;
+    execnow
 
   type parsing_env = {
     current_default_toplevel: string;
@@ -899,10 +912,10 @@ end = struct
       List.fold_right (fun x s -> s ^ " " ^ x) opts ""
 
   (* how to process options *)
-  let config_exec ~once ~file:_ dir s current =
+  let config_exec ~warn ~once ~file dir s current =
     { current with
       dc_execnow =
-        scan_execnow ~once dir current.dc_macros current.dc_timeout s :: current.dc_execnow }
+        scan_execnow ~warn ~once ~file dir current.dc_macros current.dc_timeout s :: current.dc_execnow }
 
   let config_macro ~file _dir s current =
     let regex = Str.regexp "[ \t]*\\([^ \t@]+\\)\\([ \t]+\\(.*\\)\\|$\\)" in
@@ -937,7 +950,7 @@ end = struct
     if String.(deps = "") then current
     else begin
       let make_cmd = Macros.expand current.dc_macros "@PTEST_MAKE_MODULE@" in
-      config_exec ~once:true ~file dir (make_cmd ^ deps) current
+      config_exec ~warn:false ~once:true ~file dir (make_cmd ^ deps) current
     end
 
   let update_module_macros modules macros =
@@ -1036,8 +1049,8 @@ end = struct
       "DONTRUN",
       (fun ~file:_ _ s current -> { current with dc_dont_run = true });
 
-      "EXECNOW", config_exec ~once:true;
-      "EXEC", config_exec ~once:false;
+      "EXECNOW", config_exec ~warn:true ~once:true;
+      "EXEC", config_exec ~warn:true ~once:false;
 
       "MACRO", config_macro;
 
