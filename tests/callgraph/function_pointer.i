@@ -1,10 +1,11 @@
 /* run.config
    COMMENT: Test option -cg-function-pointers
-   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-   OPT: -cg-function-pointers -no-autoload-plugins -load-module eva,@PTEST_DIR@/@PTEST_NAME@.cmxs
-   OPT: -cg-no-services -cg-function-pointers -no-autoload-plugins -load-module eva,@PTEST_DIR@/@PTEST_NAME@.cmxs
-   OPT: -cg-no-function-pointers -no-autoload-plugins -load-module eva,@PTEST_DIR@/@PTEST_NAME@.cmxs
-   OPT: -cg-no-services -cg-no-function-pointers -no-autoload-plugins -load-module eva,@PTEST_DIR@/@PTEST_NAME@.cmxs
+   MODULE: @PTEST_NAME@
+   PLUGIN: @PTEST_PLUGIN@,eva
+   OPT: -cg-function-pointers
+   OPT: -cg-no-services -cg-function-pointers
+   OPT: -cg-no-function-pointers
+   OPT: -cg-no-services -cg-no-function-pointers
 */
 
 int (*fptr)(int);
