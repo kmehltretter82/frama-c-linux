@@ -1,8 +1,8 @@
 /* run.config
    OPT: -region-annot -print
    EXECNOW: @frama-c@ -region-annot -print @PTEST_DIR@/@PTEST_NAME@.i -ocode @PTEST_DIR@/@PTEST_NAME@/a.i
-   EXECNOW: @frama-c@ -region-annot -print @PTEST_DIR@/@PTEST_NAME@/a.i -ocode @PTEST_DIR@/@PTEST_NAME@/b.i > /dev/null
-   EXECNOW: diff @PTEST_DIR@/@PTEST_NAME@/a.i @PTEST_DIR@/@PTEST_NAME@/b.i > /dev/null
+   EXECNOW: @frama-c@ -region-annot -print @PTEST_DIR@/@PTEST_NAME@/a.i -ocode @PTEST_DIR@/@PTEST_NAME@/b.i > @DEV_NULL@
+   EXECNOW: diff @PTEST_DIR@/@PTEST_NAME@/a.i @PTEST_DIR@/@PTEST_NAME@/b.i > @DEV_NULL@
  */
 
 /* run.config_qualif
