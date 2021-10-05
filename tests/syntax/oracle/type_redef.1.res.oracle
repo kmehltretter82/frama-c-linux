@@ -17,8 +17,16 @@
 [kernel] tests/syntax/type_redef.i:26: User Error: 
   redefinition of type 'st1' in the same scope with incompatible type.
   Previous declaration was at tests/syntax/type_redef.i:15
+[kernel:parser:unsupported] tests/syntax/type_redef.i:30: Warning: 
+  block-level typedefs currently unsupported;
+  trying to convert it to a global-level typedef.
+  Note that this may lead to incoherent error messages.
 [kernel] tests/syntax/type_redef.i:30: Failure: 
   redefinition of a typedef in a non-global scope is currently unsupported
+[kernel:parser:unsupported] tests/syntax/type_redef.i:31: Warning: 
+  block-level typedefs currently unsupported;
+  trying to convert it to a global-level typedef.
+  Note that this may lead to incoherent error messages.
 [kernel] tests/syntax/type_redef.i:31: Failure: 
   redefinition of a typedef in a non-global scope is currently unsupported
 [kernel] tests/syntax/type_redef.i:35: User Error: 
@@ -33,12 +41,28 @@
 [kernel] tests/syntax/type_redef.i:49: User Error: 
   redefinition of type 'stt' in the same scope with incompatible type.
   Previous declaration was at tests/syntax/type_redef.i:47
+[kernel:parser:unsupported] tests/syntax/type_redef.i:53: Warning: 
+  block-level typedefs currently unsupported;
+  trying to convert it to a global-level typedef.
+  Note that this may lead to incoherent error messages.
 [kernel] tests/syntax/type_redef.i:53: Failure: 
   redefinition of a typedef in a non-global scope is currently unsupported
+[kernel:parser:unsupported] tests/syntax/type_redef.i:57: Warning: 
+  block-level typedefs currently unsupported;
+  trying to convert it to a global-level typedef.
+  Note that this may lead to incoherent error messages.
 [kernel] tests/syntax/type_redef.i:57: Failure: 
   redefinition of a typedef in a non-global scope is currently unsupported
+[kernel:parser:unsupported] tests/syntax/type_redef.i:62: Warning: 
+  block-level typedefs currently unsupported;
+  trying to convert it to a global-level typedef.
+  Note that this may lead to incoherent error messages.
 [kernel] tests/syntax/type_redef.i:62: Failure: 
   redefinition of a typedef in a non-global scope is currently unsupported
+[kernel:parser:unsupported] tests/syntax/type_redef.i:63: Warning: 
+  block-level typedefs currently unsupported;
+  trying to convert it to a global-level typedef.
+  Note that this may lead to incoherent error messages.
 [kernel] tests/syntax/type_redef.i:63: Failure: 
   redefinition of a typedef in a non-global scope is currently unsupported
 [kernel] User Error: stopping on file "tests/syntax/type_redef.i" that has errors.

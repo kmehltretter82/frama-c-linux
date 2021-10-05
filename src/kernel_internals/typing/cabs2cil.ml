@@ -9590,6 +9590,12 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
 
 and doTypedef ghost ((specs, nl): Cabs.name_group) =
   (* Do the specifiers exactly once *)
+  if !scopes <> [] then
+    Kernel.warning
+      ~once:true ~current:true ~wkey:Kernel.wkey_parser_unsupported
+      "block-level typedefs currently unsupported;@ \
+       trying to convert it to a global-level typedef.@ \
+       Note that this may lead to incoherent error messages.";
   let bt, sto, inl, attrs = doSpecList ghost (suggestAnonName nl) specs in
   if sto <> NoStorage || inl then
     Kernel.error ~once:true ~current:true
