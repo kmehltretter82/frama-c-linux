@@ -2,8 +2,8 @@
    GCC:
    STDOPT: #"-main cassign_test -eva-partition-history 1 -eva-interprocedural-partitioning-keep-history"
    STDOPT: #"-main fabs_test -eva-partition-history 1 -eva-domains equality -eva-interprocedural-partitioning-keep-history"
+   STDOPT: #"-main fabs_splits_test -eva-partition-history 1 -eva-domains equality -eva-interprocedural-partitioning-keep-splits"
    */
-
 #include "__fc_builtin.h"
 
 int cassign(int *p)
@@ -48,6 +48,27 @@ double fabs(double x)
 void fabs_test(double x)
 {
   if (fabs(x) > 1.0) {
+    x = x < 0 ? -1.0 : 1.0;
+  }
+}
+
+
+double fabs_splits(double x)
+{
+  //@ split x > 0.0;
+  //@ split x < 0.0;
+  if (x == 0.0) {
+    return 0.0;
+  } else if (x > 0.0) {
+    return x;
+  } else {
+    return -x;
+  } 
+}
+
+void fabs_splits_test(double x)
+{
+  if (fabs_splits(x) > 1.0) {
     x = x < 0 ? -1.0 : 1.0;
   }
 }
