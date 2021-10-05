@@ -29,7 +29,7 @@ let check_signals, signal_abort =
   (fun () ->
      if !signal_emitted then begin
        signal_emitted := false;
-       raise (Log.AbortError "eva")
+       raise Sys.Break
      end),
   (fun () -> signal_emitted := true)
 
@@ -765,7 +765,7 @@ module Computer
         end)
         ()
     in
-    try
+    let compute () =
       let results = Dataflow.compute () in
       if Value_parameters.ValShowProgress.get () then
         Value_parameters.feedback "Recording results for %a"
@@ -779,11 +779,12 @@ module Computer
            Kernel_function.pretty kf;
        | _ -> ());
       results, !Dataflow.cacheable
-    with Log.AbortError _ | Log.AbortFatal _ | Log.FeatureRequest _ as e ->
-      (* analysis was aborted: pop the call stack and inform the caller *)
+    in
+    let cleanup () =
       Dataflow.mark_degeneration ();
-      Dataflow.merge_results ();
-      raise e
+      Dataflow.merge_results ()
+    in
+    Value_util.protect compute ~cleanup
 end
 
 
