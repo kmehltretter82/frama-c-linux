@@ -158,14 +158,14 @@ let save_binary error_extension =
 let () =
   (* implement a refinement of the behavior described in BTS #1388:
      - on normal exit: save
-     - on Sys.break, system error or feature request: do not save
+     - on Sys.break (Ctrl-C interruption): save, but add ".break" suffix
      - on user error: save, but add ".error" suffix
      - on fatal error or unexpected error: save, but add ".crash" suffix *)
   Cmdline.at_normal_exit (fun () -> save_binary None);
   Cmdline.at_error_exit
     (function
-      | Sys.Break | Sys_error _ | Log.FeatureRequest _ -> ()
-      | Log.AbortError _ -> save_binary (Some ".error")
+      | Sys.Break -> save_binary (Some ".break")
+      | Log.AbortError _ | Log.FeatureRequest _ -> save_binary (Some ".error")
       | _ -> save_binary (Some ".crash"))
 
 (* Write JSON files to disk if required *)
