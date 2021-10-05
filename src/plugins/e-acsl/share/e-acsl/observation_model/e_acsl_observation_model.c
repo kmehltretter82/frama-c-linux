@@ -93,6 +93,7 @@ int eacsl_separated(size_t count, ...) {
 /************************************************************************/
 
 #include "internals/e_acsl_heap_tracking.c"
+#include "internals/e_acsl_patricia_trie.c"
 #include "internals/e_acsl_safe_locations.c"
 
 /* Select memory model, either segment-based or bittree-based model should
