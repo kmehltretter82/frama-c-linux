@@ -4506,7 +4506,7 @@ and bitsOffset (baset: typ) (off: offset) : int * int =
     | Index(e, off) -> begin
         let ei =
           match constFoldToInt e with
-          | Some i -> Integer.to_int i
+          | Some i -> Integer.to_int_exn i
           | None -> raise (SizeOfError ("Index is not constant", baset))
         in
         let bt = typeOf_array_elem baset in
@@ -4862,7 +4862,7 @@ let bitsSizeOfBitfield typlv =
   match unrollType typlv with
   | TInt (_, attrs) | TEnum (_, attrs) as t ->
     (match findAttribute bitfield_attribute_name attrs with
-     | [AInt i] -> Integer.to_int i
+     | [AInt i] -> Integer.to_int_exn i
      | _ -> bitsSizeOf t)
   | t -> bitsSizeOf t
 
@@ -5689,7 +5689,7 @@ let rec integralPromotion t = (* c.f. ISO 6.3.1.1 *)
     begin match findAttribute bitfield_attribute_name a with
       | [AInt size] ->
         (* This attribute always fits in int. *)
-        let size = Integer.to_int size in
+        let size = Integer.to_int_exn size in
         let sizeofint = bitsSizeOf intType in
         let attrs = remove_attributes_for_integral_promotion a in
         let kind =
@@ -6054,7 +6054,7 @@ let rec makeZeroInit ~loc (t: typ) : init =
   | TArray(bt, Some len, _, _) as t' ->
     let n =
       match constFoldToInt len with
-      | Some n -> Integer.to_int n
+      | Some n -> Integer.to_int_exn n
       | _ -> Kernel.fatal ~current:true "Cannot understand length of array"
     in
     let initbt = makeZeroInit ~loc bt in
@@ -6100,7 +6100,7 @@ let foldLeftCompound
         | Some lene -> begin
             match constFoldToInt lene with
             | Some i ->
-              let len_array = Integer.to_int i in
+              let len_array = Integer.to_int_exn i in
               let len_init = List.length initl in
               if len_array <= len_init then
                 default () (* enough elements in the initializers list *)

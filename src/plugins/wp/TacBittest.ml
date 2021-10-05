@@ -32,7 +32,7 @@ let power k = F.e_bigint (Integer.two_power_of_int k)
 let lookup_int e =
   let open Qed.Logic in
   match F.repr e with
-  | Kint z -> (try Some (Integer.to_int z) with Z.Overflow -> None)
+  | Kint z -> (try Some (Integer.to_int_exn z) with Z.Overflow -> None)
   | _ -> None
 
 let rec lookup_bittest e =

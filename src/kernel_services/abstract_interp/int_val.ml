@@ -279,7 +279,7 @@ let cardinal_less_than v n =
     | Itv i -> Extlib.the ~exn:Not_less_than (Int_interval.cardinal i)
   in
   if Int.le c (Int.of_int n)
-  then Int.to_int c (* This is smaller than the original [n] *)
+  then Int.to_int_exn c (* This is smaller than the original [n] *)
   else raise Not_less_than
 
 let cardinal_is_less_than v n =
@@ -556,14 +556,14 @@ let create_all_values ~signed ~size =
 
 let cast_int_to_int ~size ~signed value =
   if equal top value
-  then create_all_values ~size:(Int.to_int size) ~signed
+  then create_all_values ~size:(Int.to_int_exn size) ~signed
   else
     let result =
       match value with
       | Itv i -> inject_itv (Int_interval.cast ~size ~signed i)
       | Set s ->
         let all =
-          create_all_values ~size:(Int.to_int size) ~signed
+          create_all_values ~size:(Int.to_int_exn size) ~signed
         in
         if is_included value all
         then value
@@ -587,7 +587,7 @@ let all_values ~size = function
           (Int.length mn mx)
     end
   | Set s as v ->
-    let siz = Int.to_int size in
+    let siz = Int.to_int_exn size in
     Int_set.cardinal s >= 1 lsl siz &&
     equal
       (cast_int_to_int ~size ~signed:false v)

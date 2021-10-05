@@ -233,13 +233,13 @@ let f_name = f_memo (Pretty_utils.to_string pp_float)
 (* --- Array Info                                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-let char c = Integer.to_int64 (Cil.charConstToInt c)
+let char c = Integer.to_int64_exn (Cil.charConstToInt c)
 
 let constant e =
   match (Cil.constFold true e).enode with
   | Const(CInt64(k,_,_)) ->
       begin
-        try Integer.to_int64 k
+        try Integer.to_int64_exn k
         with Z.Overflow ->
           Warning.error "Array size too large (%a)" (Integer.pretty ~hexa:true) k
       end
@@ -247,12 +247,12 @@ let constant e =
 
 let get_int e =
   match (Cil.constFold true e).enode with
-  | Const(CInt64(k,_,_)) -> Some (Integer.to_int k)
+  | Const(CInt64(k,_,_)) -> Some (Integer.to_int_exn k)
   | _ -> None
 
 let get_int64 e =
   match (Cil.constFold true e).enode with
-  | Const(CInt64(k,_,_)) -> Some (Integer.to_int64 k)
+  | Const(CInt64(k,_,_)) -> Some (Integer.to_int64_exn k)
   | _ -> None
 
 let dimension t =

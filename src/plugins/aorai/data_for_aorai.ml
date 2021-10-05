@@ -1840,7 +1840,7 @@ let absolute_range loc min =
   let max = find_max_value loc in
   match max with
   | Some { term_node = TConst(Integer (t,_)) } ->
-    Interval(min,Integer.to_int t)
+    Interval(min,Integer.to_int_exn t)
   | Some x ->
     Bounded (min, Logic_const.term x.term_node x.term_type)
   | None -> Unbounded min

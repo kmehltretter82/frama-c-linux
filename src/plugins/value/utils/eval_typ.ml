@@ -186,7 +186,7 @@ let ik_attrs_range ik attrs =
   let i_bits =
     match bitfield_size_attributes attrs with
     | None -> Cil.bitsSizeOfInt ik
-    | Some size -> Integer.to_int size
+    | Some size -> Integer.to_int_exn size
   in
   { i_bits; i_signed = Cil.isSigned ik }
 

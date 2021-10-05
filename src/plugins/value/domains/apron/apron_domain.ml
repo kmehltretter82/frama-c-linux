@@ -243,7 +243,7 @@ let translate_lval = function
 
 let translate_constant = function
   | CInt64 (i, _, _) -> begin
-      try Coeff.s_of_int (Integer.to_int i) (* TODO: skip OCaml int type *)
+      try Coeff.s_of_int (Integer.to_int_exn i) (* TODO: skip OCaml int type *)
       with Z.Overflow | Failure _ -> raise (Out_of_Scope "translate_constant big int")
     end
   | _ -> raise (Out_of_Scope "translate_constant not integer")
@@ -272,7 +272,7 @@ let rec translate_expr eval oracle expr = match expr.enode with
   | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _  | AlignOfE _ ->
     match Cil.constFoldToInt expr with
     | None -> raise (Out_of_Scope "translate_expr sizeof alignof")
-    | Some i -> Texpr1.Cst (Coeff.s_of_int (Integer.to_int i))
+    | Some i -> Texpr1.Cst (Coeff.s_of_int (Integer.to_int_exn i))
 (* Expressions that cannot be translated by [translate_expr] are replaced
    using an oracle. Of course, this oracle must be sound!. If the oracle
    cannot find a suitable replacement, it can re-raise the expresssion. *)

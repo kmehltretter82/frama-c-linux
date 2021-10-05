@@ -134,12 +134,12 @@ let reduce_cast (module Abstract: Abstractions.S) =
                 let ival = Cvalue.V.project_ival cvalue in
                 match Ival.min_and_max ival with
                 | Some min, Some max ->
-                  let min, max = Integer.to_int min, Integer.to_int max in
+                  let min, max = Integer.to_int_exn min, Integer.to_int_exn max in
                   let prec = Numerors_utils.Precisions.of_fkind fkind in
                   let num = Numerors_value.of_ints ~prec min max in
                   set Numerors_value.key num result
                 | _, _ -> result
-              (* Integer.to_int may fail for too big integers. *)
+              (* Integer.to_int_exn may fail for too big integers. *)
               with Cvalue.V.Not_based_on_null | Z.Overflow -> result
             end
           | _, _ -> result

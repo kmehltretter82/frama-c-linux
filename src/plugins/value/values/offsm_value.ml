@@ -129,7 +129,7 @@ let explode_range o (b, e) =
 let explode o =
   let r = ref o in
   let aux (e, b) _ =
-    r := explode_range !r (Integer.to_int e, Integer.to_int b)
+    r := explode_range !r (Integer.to_int_exn e, Integer.to_int_exn b)
   in
   V_Offsetmap.iter aux o;
   List.rev (V_Offsetmap.fold (fun r v acc -> (r, v) :: acc) !r [])

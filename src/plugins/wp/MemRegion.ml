@@ -242,7 +242,7 @@ struct
       match F.repr a with
       | L.Add es -> List.fold_left walk s es
       | L.Kint z ->
-          (try s + Integer.to_int z
+          (try s + Integer.to_int_exn z
            with Z.Overflow -> s)
       | _ -> s
     in walk 0 k
@@ -345,10 +345,10 @@ struct
     match F.repr a with
     | L.Add es -> List.fold_left get_linear poly es
     | L.Kint z ->
-        (try (Integer.to_int z,F.e_one)::poly
+        (try (Integer.to_int_exn z,F.e_one)::poly
          with Z.Overflow -> (1,a)::poly)
     | L.Times(c,e) ->
-        (try (Integer.to_int c,e)::poly
+        (try (Integer.to_int_exn c,e)::poly
          with Z.Overflow -> (1,a)::poly)
     | _ -> (1,a)::poly
 

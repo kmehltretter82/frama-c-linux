@@ -160,7 +160,7 @@ let join i1 i2 = match i1, i2 with
         (* if the interval of integers fits into the float types, then return
            this float type; otherwise return Rational *)
         (try
-           let to_float n = Int64.to_float (Integer.to_int64 n) in
+           let to_float n = Int64.to_float (Integer.to_int64_exn n) in
            let mini, maxi = to_float min, to_float max in
            let minf, maxf = match k with
              | FFloat ->
@@ -224,7 +224,7 @@ let meet i1 i2 = match i1, i2 with
         (* if the float type fits into the interval of integers, then return
            this float type; otherwise return Rational *)
         (try
-           let to_float n = Int64.to_float (Integer.to_int64 n) in
+           let to_float n = Int64.to_float (Integer.to_int64_exn n) in
            let mini, maxi = to_float min, to_float max in
            if mini <= f && maxi >= f then Float(k, Some f) else Ival Ival.bottom
          with Z.Overflow | Exit ->
@@ -243,7 +243,7 @@ let meet i1 i2 = match i1, i2 with
         (* if the float type fits into the interval of integers, then return
            this float type; otherwise return Rational *)
         (try
-           let to_float n = Int64.to_float (Integer.to_int64 n) in
+           let to_float n = Int64.to_float (Integer.to_int64_exn n) in
            let mini, maxi = to_float min, to_float max in
            let minf, maxf = match k with
              | FFloat ->

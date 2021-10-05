@@ -84,9 +84,9 @@ let make_watch_value target_value = Value target_value
 let make_watch_cardinal target_value =
   try
     let target_value = Cvalue.V.project_ival target_value in
-    Cardinal (Integer.to_int (Ival.project_int target_value))
+    Cardinal (Integer.to_int_exn (Ival.project_int target_value))
   with V.Not_based_on_null | Ival.Not_Singleton_Int
-     | Z.Overflow (* from Integer.to_int *) ->
+     | Z.Overflow (* from Integer.to_int_exn *) ->
     raise Builtins.Outside_builtin_possibilities
 
 let () =

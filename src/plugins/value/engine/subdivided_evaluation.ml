@@ -770,7 +770,7 @@ module Make
               if nb > 3
               then
                 let pow = Integer.power_int_positive_int in
-                (subdivnb * nb) / (Integer.to_int (pow 2 (nb - 1)))
+                (subdivnb * nb) / (Integer.to_int_exn (pow 2 (nb - 1)))
               else subdivnb
             in
             Value_parameters.result ~current:true ~once:true ~dkey

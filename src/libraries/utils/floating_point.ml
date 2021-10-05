@@ -101,7 +101,7 @@ let make_float ~num ~den ~exp ~man_size ~min_exp ~max_exp =
     let rem2 = (* twice the remainder *)
       Integer.shift_left rem Integer.one
     in
-    let man = Integer.to_int64 man in
+    let man = Integer.to_int64_exn man in
     (* Format.printf "pre-round: num den man rem:@\n%a@\n@\n%a@\n@\n%Ld@\n@\n%a@."
             Datatype.Integer.pretty num Datatype.Integer.pretty den
             man Datatype.Integer.pretty rem; *)

@@ -177,8 +177,8 @@ let match_power2, _match_power2_minus1 =
     in let hsb p =
          let n = Integer.shift_right p Integer.sixteen in
          Integer.of_int (if Integer.is_zero n
-                         then hsb (Integer.to_int p)
-                         else 16 + hsb (Integer.to_int n))
+                         then hsb (Integer.to_int_exn p)
+                         else 16 + hsb (Integer.to_int_exn n))
     in let rec hsb_aux p =
          let n = Integer.shift_right p Integer.thirtytwo in
          if Integer.is_zero n then hsb p

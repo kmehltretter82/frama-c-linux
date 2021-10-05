@@ -97,9 +97,15 @@ let of_int = Z.of_int
 let of_int64 = Z.of_int64
 let of_int32 = Z.of_int32
 
-let to_int = Z.to_int
-let to_int64 = Z.to_int64
-let to_int32 = Z.to_int32
+let to_int_exn = Z.to_int
+let to_int64_exn = Z.to_int64
+let to_int32_exn = Z.to_int32
+
+(* These functions are deprecated (renamed to *_exn) and will be removed
+   in a future version. *)
+let to_int = to_int_exn
+let to_int64 = to_int64_exn
+let to_int32 = to_int32_exn
 
 let wrap to_int i = try Some (to_int i) with Z.Overflow -> None
 let to_int_opt = wrap Z.to_int

@@ -55,7 +55,7 @@ let constant_to_exp ~loc env t c =
        (* too large integer *)
        Cil.mkString ~loc (Integer.to_string n), Typed_number.Str_Z
      | Typing.C_float fkind ->
-       Cil.kfloat ~loc fkind (Int64.to_float (Integer.to_int64 n)), C_number
+       Cil.kfloat ~loc fkind (Int64.to_float (Integer.to_int64_exn n)), C_number
      | Typing.C_integer kind ->
        let cast = Typing.get_cast ~lenv:(Env.Local_vars.get env) t in
        match cast, kind with
