@@ -30,7 +30,8 @@ void f(int *x, int *y) {
   { (*x)++; }
   /*@ loop invariant 0 <= i <= 1;
     @ loop variant 2 - i; */
-  for(int i = 0; i < 1; i++) /*@ assert 1 == 1; */ /*@ assert \valid(y); */ ;
+  for (int i = 0; i < 1; i++) /*@ assert 1 == 1; */ /*@ assert \valid(y); */
+    ;
 }
 
 int main(void) {

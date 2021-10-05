@@ -24,12 +24,12 @@
  * \file
  * \brief Implementation of E-ACSL public API using a memory model based
  * on Patricia Trie. See e_acsl.h for details.
-***************************************************************************/
+ **************************************************************************/
 
+#include "../../instrumentation_model/e_acsl_temporal.h"
 #include "../../internals/e_acsl_debug.h"
 #include "../../internals/e_acsl_malloc.h"
 #include "../../internals/e_acsl_private_assert.h"
-#include "../../instrumentation_model/e_acsl_temporal.h"
 #include "../../numerical_model/e_acsl_floating_point.h"
 #include "../internals/e_acsl_safe_locations.h"
 #include "e_acsl_bittree.h"
@@ -39,11 +39,11 @@
 /* Public API {{{ */
 /* Debug */
 #ifdef E_ACSL_DEBUG
-# define eacsl_bt_print_block     export_alias(bt_print_block)
-# define eacsl_bt_print_tree      export_alias(bt_print_tree)
-# define eacsl_block_info         export_alias(block_info)
-# define eacsl_store_block_debug  export_alias(store_block_debug)
-# define eacsl_delete_block_debug export_alias(delete_block_debug)
+#  define eacsl_bt_print_block     export_alias(bt_print_block)
+#  define eacsl_bt_print_tree      export_alias(bt_print_tree)
+#  define eacsl_block_info         export_alias(block_info)
+#  define eacsl_store_block_debug  export_alias(store_block_debug)
+#  define eacsl_delete_block_debug export_alias(delete_block_debug)
 #endif
 /* }}} */
 
@@ -51,19 +51,21 @@
 /* SUPPORT            {{{ */
 /**************************/
 static const int nbr_bits_to_1[256] = {
-  0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,4,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,1,2,2,3,2,3,
-  3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,1,2,2,3,2,3,3,4,2,3,3,4,
-  3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,
-  4,5,4,5,5,6,4,5,5,6,5,6,6,7,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,
-  3,4,4,5,4,5,5,6,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,
-  6,7,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,3,4,4,5,
-  4,5,5,6,4,5,5,6,5,6,6,7,4,5,5,6,5,6,6,7,5,6,6,7,6,7,7,8
-};
+    0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4,
+    2, 3, 3, 4, 3, 4, 4, 5, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+    2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 1, 2, 2, 3, 2, 3, 3, 4,
+    2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+    2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6,
+    4, 5, 5, 6, 5, 6, 6, 7, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+    2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 2, 3, 3, 4, 3, 4, 4, 5,
+    3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+    2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6,
+    4, 5, 5, 6, 5, 6, 6, 7, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+    4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8};
 
 /* given the size of the memory block (_size) return (or rather evaluate to)
  * size in bytes required to represent its partial initialization */
-#define needed_bytes(_size) \
-  ((_size % 8) == 0 ? (_size/8) : (_size/8 + 1))
+#define needed_bytes(_size) ((_size % 8) == 0 ? (_size / 8) : (_size / 8 + 1))
 /* }}} */
 
 /**************************/
@@ -74,9 +76,13 @@ static const int nbr_bits_to_1[256] = {
 static struct current_location {
   int line;
   char *file;
-} cloc = { 0, "undefined" };
+} cloc = {0, "undefined"};
 
-#define update_cloc(_file, _line) { cloc.line = _line; cloc.file = _file; }
+#  define update_cloc(_file, _line)                                            \
+    {                                                                          \
+      cloc.line = _line;                                                       \
+      cloc.file = _file;                                                       \
+    }
 #endif
 /* }}} */
 
@@ -85,21 +91,21 @@ static struct current_location {
 /**************************/
 
 /* mark the size bytes of ptr as initialized */
-void eacsl_initialize (void * ptr, size_t size) {
-  bt_block * tmp;
-  if(!ptr)
+void eacsl_initialize(void *ptr, size_t size) {
+  bt_block *tmp;
+  if (!ptr)
     return;
 
   tmp = bt_find(ptr);
-  if(tmp == NULL)
+  if (tmp == NULL)
     return;
 
   /* already fully initialized, do nothing */
-  if(tmp->init_bytes == tmp->size)
+  if (tmp->init_bytes == tmp->size)
     return;
 
   /* fully uninitialized */
-  if(tmp->init_bytes == 0) {
+  if (tmp->init_bytes == 0) {
     int nb = needed_bytes(tmp->size);
     tmp->init_ptr = private_malloc(nb);
     memset(tmp->init_ptr, 0, nb);
@@ -112,31 +118,31 @@ void eacsl_initialize (void * ptr, size_t size) {
    * The following sets individual bits in tmp->init_ptr that track
    * initialization of `size' bytes starting from `ptr'. */
   unsigned i;
-  for(i = 0; i < size; i++) {
+  for (i = 0; i < size; i++) {
     /* byte-offset within the block, i.e., mark `offset' byte as initialized */
     size_t offset = (uintptr_t)ptr - tmp->ptr + i;
     /* byte offset within tmp->init_ptr, i.e., a byte containing the bit to
        be toggled */
-    int byte = offset/8;
+    int byte = offset / 8;
     /* bit-offset within the above byte, i.e., bit to be toggled */
-    int bit = offset%8;
+    int bit = offset % 8;
 
     if (!checkbit(bit, tmp->init_ptr[byte])) { /* if bit is unset ... */
-      setbit(bit, tmp->init_ptr[byte]); /* ... set the bit ... */
+      setbit(bit, tmp->init_ptr[byte]);        /* ... set the bit ... */
       tmp->init_bytes++; /* ... and increment initialized bytes count */
     }
   }
 
   /* now fully initialized */
-  if(tmp->init_bytes == tmp->size) {
+  if (tmp->init_bytes == tmp->size) {
     private_free(tmp->init_ptr);
     tmp->init_ptr = NULL;
   }
 }
 
 /* mark all bytes of ptr as initialized */
-void eacsl_full_init (void * ptr) {
-  bt_block * tmp;
+void eacsl_full_init(void *ptr) {
+  bt_block *tmp;
   if (ptr == NULL)
     return;
 
@@ -152,8 +158,8 @@ void eacsl_full_init (void * ptr) {
 }
 
 /* mark a block as read-only */
-void eacsl_mark_readonly(void * ptr) {
-  bt_block * tmp;
+void eacsl_mark_readonly(void *ptr) {
+  bt_block *tmp;
   if (ptr == NULL)
     return;
   tmp = bt_lookup(ptr);
@@ -167,35 +173,35 @@ void eacsl_mark_readonly(void * ptr) {
 /* PREDICATES        {{{  */
 /**************************/
 
-int eacsl_freeable(void* ptr) {
-  bt_block * tmp;
-  if(ptr == NULL)
+int eacsl_freeable(void *ptr) {
+  bt_block *tmp;
+  if (ptr == NULL)
     return 0;
   tmp = bt_lookup(ptr);
-  if(tmp == NULL)
+  if (tmp == NULL)
     return 0;
   return tmp->is_freeable;
 }
 
 /* return whether the size bytes of ptr are initialized */
-int eacsl_initialized(void * ptr, size_t size) {
+int eacsl_initialized(void *ptr, size_t size) {
   unsigned i;
-  bt_block * tmp = bt_find(ptr);
-  if(tmp == NULL)
+  bt_block *tmp = bt_find(ptr);
+  if (tmp == NULL)
     return 0;
 
   /* fully uninitialized */
-  if(tmp->init_bytes == 0)
+  if (tmp->init_bytes == 0)
     return 0;
   /* fully initialized */
-  if(tmp->init_bytes == tmp->size)
+  if (tmp->init_bytes == tmp->size)
     return 1;
 
   /* see implementation of function `eacsl_initialize` for details */
-  for(i = 0; i < size; i++) {
+  for (i = 0; i < size; i++) {
     size_t offset = (uintptr_t)ptr - tmp->ptr + i;
-    int byte = offset/8;
-    int bit = offset%8;
+    int byte = offset / 8;
+    int bit = offset % 8;
     if (!checkbit(bit, tmp->init_ptr[byte]))
       return 0;
   }
@@ -203,8 +209,8 @@ int eacsl_initialized(void * ptr, size_t size) {
 }
 
 /** \brief \return the length (in bytes) of the block containing ptr */
-size_t eacsl_block_length(void* ptr) {
-  bt_block * blk = bt_find(ptr);
+size_t eacsl_block_length(void *ptr) {
+  bt_block *blk = bt_find(ptr);
   /* Hard failure when un-allocated memory is used */
   private_assert(blk != NULL, "\\block_length of unallocated memory", NULL);
   return blk->size;
@@ -214,12 +220,12 @@ size_t eacsl_block_length(void* ptr) {
     of length `size` and with base address `ptr_base` belongs to tracked
     allocation and return corresponding `bt_block` if so. Return NULL
     otherwise. */
-static bt_block* lookup_allocated(void* ptr, size_t size, void *ptr_base) {
-  bt_block * blk = bt_find(ptr);
+static bt_block *lookup_allocated(void *ptr, size_t size, void *ptr_base) {
+  bt_block *blk = bt_find(ptr);
   if (blk == NULL)
     return NULL;
 #ifndef E_ACSL_WEAK_VALIDITY
-  bt_block * blk_base = bt_find(ptr_base);
+  bt_block *blk_base = bt_find(ptr_base);
   if (blk_base == NULL || blk->ptr != blk_base->ptr)
     return NULL;
 #endif
@@ -227,41 +233,38 @@ static bt_block* lookup_allocated(void* ptr, size_t size, void *ptr_base) {
 }
 
 /* return whether the size bytes of ptr are readable/writable */
-int eacsl_valid(void* ptr, size_t size, void *ptr_base, void *addrof_base) {
-  bt_block * blk = lookup_allocated(ptr, size, ptr_base);
-  return
-    size == 0
-    || (
-    blk != NULL && !blk->is_readonly
+int eacsl_valid(void *ptr, size_t size, void *ptr_base, void *addrof_base) {
+  bt_block *blk = lookup_allocated(ptr, size, ptr_base);
+  return size == 0
+         || (blk != NULL && !blk->is_readonly
 #ifdef E_ACSL_TEMPORAL
-    && temporal_valid(ptr_base, addrof_base)
+             && temporal_valid(ptr_base, addrof_base)
 #endif
-    );
+         );
 }
 
 /* return whether the size bytes of ptr are readable */
-int eacsl_valid_read(void* ptr, size_t size, void *ptr_base, void *addrof_base) {
-  bt_block * blk = lookup_allocated(ptr, size, ptr_base);
-  return
-    size == 0
-    || (
-    blk != NULL
+int eacsl_valid_read(void *ptr, size_t size, void *ptr_base,
+                     void *addrof_base) {
+  bt_block *blk = lookup_allocated(ptr, size, ptr_base);
+  return size == 0
+         || (blk != NULL
 #ifdef E_ACSL_TEMPORAL
-    && temporal_valid(ptr_base, addrof_base)
+             && temporal_valid(ptr_base, addrof_base)
 #endif
-    );
+         );
 }
 
 /* return the base address of the block containing ptr */
-void* eacsl_base_addr(void* ptr) {
-  bt_block * tmp = bt_find(ptr);
+void *eacsl_base_addr(void *ptr) {
+  bt_block *tmp = bt_find(ptr);
   private_assert(tmp != NULL, "\\base_addr of unallocated memory", NULL);
-  return (void*)tmp->ptr;
+  return (void *)tmp->ptr;
 }
 
 /* return the offset of `ptr` within its block */
-size_t eacsl_offset(void* ptr) {
-  bt_block * tmp = bt_find(ptr);
+size_t eacsl_offset(void *ptr) {
+  bt_block *tmp = bt_find(ptr);
   private_assert(tmp != NULL, "\\offset of unallocated memory", NULL);
   return ((uintptr_t)ptr - tmp->ptr);
 }
@@ -274,26 +277,28 @@ size_t eacsl_offset(void* ptr) {
 /* STACK ALLOCATION {{{ */
 /* store the block of size bytes starting at ptr, the new block is returned.
  * Warning: the return type is implicitly (bt_block*). */
-void* eacsl_store_block(void *ptr, size_t size) {
+void *eacsl_store_block(void *ptr, size_t size) {
 #ifdef E_ACSL_DEBUG
   if (ptr == NULL)
     private_abort("Attempt to record NULL block");
   else {
-    char *check = (char*)ptr;
+    char *check = (char *)ptr;
     bt_block *exitsing_block = bt_find(ptr);
     if (exitsing_block) {
       private_abort("\nRecording %a [%lu] at %s:%d failed."
-        " Overlapping block %a [%lu] found at %s:%d\n",
-        ptr, size, cloc.file, cloc.line, eacsl_base_addr(check),
-        eacsl_block_length(check), exitsing_block->file, exitsing_block->line);
+                    " Overlapping block %a [%lu] found at %s:%d\n",
+                    ptr, size, cloc.file, cloc.line, eacsl_base_addr(check),
+                    eacsl_block_length(check), exitsing_block->file,
+                    exitsing_block->line);
     }
     check += size - 1;
     exitsing_block = bt_find(check);
     if (exitsing_block) {
       private_abort("\nRecording %a [%lu] at %d failed."
-        " Overlapping block %a [%lu] found at %s:%d\n",
-        ptr, size, cloc.file, cloc.line, eacsl_base_addr(check),
-        eacsl_block_length(check), exitsing_block->file, exitsing_block->line);
+                    " Overlapping block %a [%lu] found at %s:%d\n",
+                    ptr, size, cloc.file, cloc.line, eacsl_base_addr(check),
+                    eacsl_block_length(check), exitsing_block->file,
+                    exitsing_block->line);
     }
   }
 #endif
@@ -313,8 +318,8 @@ void* eacsl_store_block(void *ptr, size_t size) {
 #endif
 #ifdef E_ACSL_TEMPORAL
     tmp->timestamp = NEW_TEMPORAL_TIMESTAMP();
-    tmp->temporal_shadow = (size >= sizeof(void*)) ?
-      private_malloc(size) : NULL;
+    tmp->temporal_shadow =
+        (size >= sizeof(void *)) ? private_malloc(size) : NULL;
 #endif
   }
   return tmp;
@@ -360,15 +365,15 @@ void eacsl_delete_block(void *ptr) {
   }
 }
 
-void* eacsl_store_block_duplicate(void* ptr, size_t size) {
-  bt_block * tmp = NULL;
+void *eacsl_store_block_duplicate(void *ptr, size_t size) {
+  bt_block *tmp = NULL;
   if (ptr != NULL) {
-    bt_block * tmp = bt_lookup(ptr);
+    bt_block *tmp = bt_lookup(ptr);
     if (tmp) {
 #ifdef E_ACSL_DEBUG
-    /* Make sure that duplicate block, if so is of the same length */
-    if (tmp->size != size)
-      private_abort("Attempt to store duplicate block of different length");
+      /* Make sure that duplicate block, if so is of the same length */
+      if (tmp->size != size)
+        private_abort("Attempt to store duplicate block of different length");
 #endif
       eacsl_delete_block(ptr);
     }
@@ -381,7 +386,7 @@ void* eacsl_store_block_duplicate(void* ptr, size_t size) {
 
 /* HEAP ALLOCATION {{{ */
 /*! \brief Replacement for `malloc` with memory tracking */
-void* malloc(size_t size) {
+void *malloc(size_t size) {
   if (size == 0)
     return NULL;
 
@@ -391,7 +396,7 @@ void* malloc(size_t size) {
 }
 
 /*! \brief Replacement for `calloc` with memory tracking */
-void* calloc(size_t nbr_block, size_t size_block) {
+void *calloc(size_t nbr_block, size_t size_block) {
   /* FIXME: Need an integer overflow check here */
   size_t size = nbr_block * size_block;
   if (size == 0)
@@ -408,7 +413,7 @@ void *aligned_alloc(size_t alignment, size_t size) {
      - size and alignment are greater than zero
      - alignment is a power of 2
      - size is a multiple of alignment */
-  if (!size || !alignment || !is_pow_of_2(alignment) || (size%alignment))
+  if (!size || !alignment || !is_pow_of_2(alignment) || (size % alignment))
     return NULL;
 
   void *res = public_aligned_alloc(alignment, size);
@@ -418,14 +423,15 @@ void *aligned_alloc(size_t alignment, size_t size) {
 
 /*! \brief Replacement for `posix_memalign` with memory tracking */
 int posix_memalign(void **memptr, size_t alignment, size_t size) {
- /* Check if:
+  /* Check if:
    *  - size and alignment are greater than zero
    *  - alignment is a power of 2 and a multiple of sizeof(void*) */
-  if (!size || !alignment || !is_pow_of_2(alignment) || alignment%sizeof(void*))
+  if (!size || !alignment || !is_pow_of_2(alignment)
+      || alignment % sizeof(void *))
     return -1;
 
   /* Make sure that the first argument to posix memalign is indeed allocated */
-  DVALIDATE_WRITEABLE(memptr, sizeof(void*), memptr);
+  DVALIDATE_WRITEABLE(memptr, sizeof(void *), memptr);
 
   int res = public_posix_memalign(memptr, alignment, size);
   if (!res)
@@ -434,20 +440,20 @@ int posix_memalign(void **memptr, size_t alignment, size_t size) {
 }
 
 /*! \brief Replacement for `realloc` with memory tracking */
-void* realloc(void *ptr, size_t size) {
-  bt_block * tmp;
-  void * new_ptr;
+void *realloc(void *ptr, size_t size) {
+  bt_block *tmp;
+  void *new_ptr;
   /* ptr is NULL - malloc */
-  if(ptr == NULL)
+  if (ptr == NULL)
     return malloc(size);
   /* size is zero - free */
-  if(size == 0) {
+  if (size == 0) {
     free(ptr);
     return NULL;
   }
   tmp = bt_lookup(ptr);
   DASSERT(tmp != NULL);
-  new_ptr = public_realloc((void*)tmp->ptr, size);
+  new_ptr = public_realloc((void *)tmp->ptr, size);
   if (new_ptr == NULL)
     return NULL;
 
@@ -462,14 +468,15 @@ void* realloc(void *ptr, size_t size) {
     bt_insert(tmp);
   }
   /* uninitialized, do nothing */
-  if(tmp->init_bytes == 0) ;
+  if (tmp->init_bytes == 0) {
+  }
   /* already fully initialized block */
   else if (tmp->init_bytes == tmp->size) {
     /* realloc smaller block */
     if (size <= tmp->size) {
       /* adjust new size, allocation not necessary */
       tmp->init_bytes = size;
-    /* realloc larger block */
+      /* realloc larger block */
     } else {
       /* size of tmp->init_ptr in the new block */
       int nb = needed_bytes(size);
@@ -498,7 +505,7 @@ void* realloc(void *ptr, size_t size) {
   }
   tmp->size = size;
   tmp->is_freeable = 1;
-  return (void*)tmp->ptr;
+  return (void *)tmp->ptr;
 }
 
 /*! \brief Replacement for `free` with memory tracking */
@@ -537,17 +544,17 @@ void eacsl_memory_clean() {
 extern char **environ;
 
 /* add `argv` to the memory model */
-static void argv_alloca(int *argc_ref,  char *** argv_ref) {
+static void argv_alloca(int *argc_ref, char ***argv_ref) {
   /* Track a top-level containers */
-  eacsl_store_block((void*)argc_ref, sizeof(int));
-  eacsl_store_block((void*)argv_ref, sizeof(char**));
+  eacsl_store_block((void *)argc_ref, sizeof(int));
+  eacsl_store_block((void *)argv_ref, sizeof(char **));
   int argc = *argc_ref;
-  char** argv = *argv_ref;
+  char **argv = *argv_ref;
   /* Track argv */
 
-  size_t argvlen = (argc + 1)*sizeof(char*);
+  size_t argvlen = (argc + 1) * sizeof(char *);
   eacsl_store_block(argv, argvlen);
-  eacsl_initialize(argv, (argc + 1)*sizeof(char*));
+  eacsl_initialize(argv, (argc + 1) * sizeof(char *));
 
   while (*argv) {
     size_t arglen = strlen(*argv) + 1;
@@ -561,7 +568,7 @@ static void argv_alloca(int *argc_ref,  char *** argv_ref) {
   argv = *argv_ref;
   eacsl_temporal_store_nblock(argv_ref, *argv_ref);
   for (i = 0; i < argc; i++)
-    eacsl_temporal_store_nblock(argv + i, *(argv+i));
+    eacsl_temporal_store_nblock(argv + i, *(argv + i));
 #endif
 
   while (*environ) {
@@ -586,9 +593,9 @@ void eacsl_memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
   collect_safe_locations();
   int i;
   for (i = 0; i < get_safe_locations_count(); i++) {
-    memory_location * loc = get_safe_location(i);
+    memory_location *loc = get_safe_location(i);
     if (loc->is_on_static) {
-      void *addr = (void*)loc->address;
+      void *addr = (void *)loc->address;
       uintptr_t len = loc->length;
       eacsl_store_block(addr, len);
       if (loc->is_initialized)
@@ -615,9 +622,9 @@ void eacsl_memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
  * The above macros with rewrite of instances of __e_acsl_store_block generating
  * origin information of tracked memory blocks.
 */
-void* eacsl_store_block_debug(char *file, int line, void* ptr, size_t size) {
+void *eacsl_store_block_debug(char *file, int line, void *ptr, size_t size) {
   update_cloc(file, line);
-  bt_block * res = eacsl_store_block(ptr, size);
+  bt_block *res = eacsl_store_block(ptr, size);
   if (res) {
     res->line = line;
     res->file = file;
@@ -625,9 +632,9 @@ void* eacsl_store_block_debug(char *file, int line, void* ptr, size_t size) {
   return res;
 }
 
-void eacsl_delete_block_debug(char *file, int line, void* ptr) {
+void eacsl_delete_block_debug(char *file, int line, void *ptr) {
   update_cloc(file, line);
-  bt_block * tmp = bt_lookup(ptr);
+  bt_block *tmp = bt_lookup(ptr);
   if (!tmp) {
     private_abort(
         "Block with base address %a not found in the memory model at %s:%d",
@@ -638,10 +645,10 @@ void eacsl_delete_block_debug(char *file, int line, void* ptr) {
 
 /* Debug print of block information */
 void eacsl_block_info(char *p) {
-  bt_block * res = bt_find(p);
+  bt_block *res = bt_find(p);
   if (res) {
-    DLOG(" << %a >> %a [%lu] => %lu \n",
-      p, eacsl_base_addr(p), eacsl_offset(p), eacsl_block_length(p));
+    DLOG(" << %a >> %a [%lu] => %lu \n", p, eacsl_base_addr(p), eacsl_offset(p),
+         eacsl_block_length(p));
   } else {
     DLOG(" << %a >> not allocated\n", p);
   }

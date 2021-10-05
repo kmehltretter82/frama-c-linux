@@ -6,21 +6,29 @@ int X = 0, Y = 2;
 
 // one ensures
 /*@ ensures X == 1; */
-void f(void) { X = 1; }
+void f(void) {
+  X = 1;
+}
 
 // several ensures
 /*@ ensures X == 2;
   @ ensures Y == 2; */
-void g(void) { X = 2; }
+void g(void) {
+  X = 2;
+}
 
 // one requires
 /*@ requires X == 2; */
-void h(void) { X += 1; }
+void h(void) {
+  X += 1;
+}
 
 // several requires
 /*@ requires X == 3;
   @ requires Y == 2; */
-void i(void) { X += Y; }
+void i(void) {
+  X += Y;
+}
 
 // several behaviors
 /*@ behavior b1:
@@ -30,7 +38,9 @@ void i(void) { X += Y; }
   @   requires X == 3 + Y;
   @   requires Y == 2;
   @   ensures X == Y + 1; */
-void j(void) { X = 3; }
+void j(void) {
+  X = 3;
+}
 
 // mix requires and assumes
 /*@ behavior b1:
@@ -41,7 +51,9 @@ void j(void) { X = 3; }
   @   assumes Y == 2;
   @   requires X == 3;
   @   requires X + Y == 5; */
-void k(void) { X += Y; }
+void k(void) {
+  X += Y;
+}
 
 // mix ensures + contract on return
 /*@ ensures X == 5; */
@@ -59,7 +71,9 @@ int l() {
   @   assumes Y == 2;
   @   ensures X == 7;
   @   ensures X == \old(X) + Y; */
-void m(void) { X += Y; }
+void m(void) {
+  X += Y;
+}
 
 // mix requires, ensures and assumes
 /*@ requires X > 0;
@@ -70,7 +84,9 @@ void m(void) { X += Y; }
   @ behavior b2:
   @   assumes X == 5;
   @   ensures X == 98; */
-void n(void) { X ++; }
+void n(void) {
+  X++;
+}
 
 // several complete and disjoint clauses
 /*@
@@ -104,7 +120,9 @@ void n(void) { X ++; }
     disjoint behaviors neg, pos;
     disjoint behaviors odd, even;
 */
-void o(void) { X = Y; }
+void o(void) {
+  X = Y;
+}
 
 int main(void) {
   f();

@@ -26,18 +26,19 @@
  *
  * Functions and variables with non-static linkage used for memory
  * observation.
-***************************************************************************/
+ **************************************************************************/
 
 #ifndef E_ACSL_OBSERVATION_MODEL_H
 #define E_ACSL_OBSERVATION_MODEL_H
 
 #include <stddef.h>
 #include <stdint.h>
+
 #include "../internals/e_acsl_alias.h"
 #include "e_acsl_heap.h"
 
 #ifdef __FC_STDLIB
-#include <__fc_alloc_axiomatic.h>
+#  include <__fc_alloc_axiomatic.h>
 #else
 /*@ ghost extern int __fc_heap_status; */
 
@@ -58,8 +59,8 @@
 /************************************************************************/
 
 /* Memory state initialization */
-#define eacsl_memory_init           export_alias(memory_init)
-#define eacsl_memory_clean          export_alias(memory_clean)
+#define eacsl_memory_init  export_alias(memory_init)
+#define eacsl_memory_clean export_alias(memory_clean)
 
 /* Tracking */
 #define eacsl_store_block           export_alias(store_block)
@@ -67,19 +68,19 @@
 #define eacsl_delete_block          export_alias(delete_block)
 
 /* Predicates */
-#define eacsl_offset                export_alias(offset)
-#define eacsl_base_addr             export_alias(base_addr)
-#define eacsl_block_length          export_alias(block_length)
-#define eacsl_valid_read            export_alias(valid_read)
-#define eacsl_valid                 export_alias(valid)
-#define eacsl_initialized           export_alias(initialized)
-#define eacsl_freeable              export_alias(freeable)
-#define eacsl_separated             export_alias(separated)
+#define eacsl_offset       export_alias(offset)
+#define eacsl_base_addr    export_alias(base_addr)
+#define eacsl_block_length export_alias(block_length)
+#define eacsl_valid_read   export_alias(valid_read)
+#define eacsl_valid        export_alias(valid)
+#define eacsl_initialized  export_alias(initialized)
+#define eacsl_freeable     export_alias(freeable)
+#define eacsl_separated    export_alias(separated)
 
 /* Block initialization  */
-#define eacsl_mark_readonly         export_alias(mark_readonly)
-#define eacsl_initialize            export_alias(initialize)
-#define eacsl_full_init             export_alias(full_init)
+#define eacsl_mark_readonly export_alias(mark_readonly)
+#define eacsl_initialize    export_alias(initialize)
+#define eacsl_full_init     export_alias(full_init)
 
 /* }}} */
 
@@ -111,8 +112,7 @@
     assigns __e_acsl_heap_allocation_size \from indirect:size, __e_acsl_heap_allocation_size;
     assigns __e_acsl_heap_allocated_blocks \from size, __e_acsl_heap_allocated_blocks;
  */
-void * malloc(size_t size)
-  __attribute__((FC_BUILTIN));
+void *malloc(size_t size) __attribute__((FC_BUILTIN));
 
 /*! \brief Drop-in replacement for \p calloc with memory tracking enabled.
  * For further information, see \p calloc(3). */
@@ -128,8 +128,7 @@ void * malloc(size_t size)
     assigns __e_acsl_heap_allocation_size \from indirect:nbr_elt, indirect:size_elt, __e_acsl_heap_allocation_size;
     assigns __e_acsl_heap_allocated_blocks \from indirect:nbr_elt, indirect:size_elt, __e_acsl_heap_allocated_blocks;
  */
-void * calloc(size_t nbr_elt, size_t size_elt)
-  __attribute__((FC_BUILTIN));
+void *calloc(size_t nbr_elt, size_t size_elt) __attribute__((FC_BUILTIN));
 
 /*! \brief Drop-in replacement for \p realloc with memory tracking enabled.
  * For further information, see realloc(3) */
@@ -150,8 +149,7 @@ void * calloc(size_t nbr_elt, size_t size_elt)
     assigns __e_acsl_heap_allocation_size \from __e_acsl_heap_allocation_size;
     assigns __e_acsl_heap_allocated_blocks \from __e_acsl_heap_allocated_blocks;
  */
-void * realloc(void * ptr, size_t size)
-  __attribute__((FC_BUILTIN));
+void *realloc(void *ptr, size_t size) __attribute__((FC_BUILTIN));
 
 /*! \brief Drop-in replacement for \p free with memory tracking enabled.
  * For further information, see \p free(3). */
@@ -167,8 +165,7 @@ void * realloc(void * ptr, size_t size)
     assigns __e_acsl_heap_allocation_size \from __e_acsl_heap_allocation_size;
     assigns __e_acsl_heap_allocated_blocks \from __e_acsl_heap_allocated_blocks;
  */
-void free(void * ptr)
-  __attribute__((FC_BUILTIN));
+void free(void *ptr) __attribute__((FC_BUILTIN));
 
 /*! \brief Allocate `size` bytes of memory such that the allocation's base
  * address is an even multiple of alignment.
@@ -181,8 +178,7 @@ void free(void * ptr)
   assigns __e_acsl_heap_allocation_size \from indirect:alignment, size, __e_acsl_heap_allocation_size;
   assigns __e_acsl_heap_allocated_blocks \from indirect:alignment, size, __e_acsl_heap_allocated_blocks;
  */
-void *aligned_alloc(size_t alignment, size_t size)
-  __attribute__((FC_BUILTIN));
+void *aligned_alloc(size_t alignment, size_t size) __attribute__((FC_BUILTIN));
 
 /*! \brief Allocate size bytes and place the address of the allocated memory in
  * `*memptr`.  The address of the allocated memory will be a multiple of
@@ -201,7 +197,7 @@ void *aligned_alloc(size_t alignment, size_t size)
     assigns __e_acsl_heap_allocated_blocks \from indirect:alignment, size, __e_acsl_heap_allocated_blocks;
  */
 int posix_memalign(void **memptr, size_t alignment, size_t size)
-  __attribute__((FC_BUILTIN));
+    __attribute__((FC_BUILTIN));
 /* }}} */
 
 /************************************************************************/
@@ -212,12 +208,11 @@ int posix_memalign(void **memptr, size_t alignment, size_t size)
  * Called before any other statement in \p main */
 /*@ assigns \nothing; */
 void eacsl_memory_init(int *argc_ref, char ***argv, size_t ptr_size)
-  __attribute__((FC_BUILTIN));
+    __attribute__((FC_BUILTIN));
 
 /*! \brief Clean-up memory tracking state before a program's termination. */
 /*@ assigns \nothing; */
-void eacsl_memory_clean(void)
-  __attribute__((FC_BUILTIN));
+void eacsl_memory_clean(void) __attribute__((FC_BUILTIN));
 
 /*! \brief Store stack or globally-allocated memory block
  * starting at an address given by \p ptr.
@@ -226,8 +221,7 @@ void eacsl_memory_clean(void)
  * \param size size of the tracked block in bytes */
 /*@ ensures \result == ptr;
   @ assigns \result \from *(((char*)ptr)+(0..size-1)), ptr, size; */
-void * eacsl_store_block(void * ptr, size_t size)
-  __attribute__((FC_BUILTIN));
+void *eacsl_store_block(void *ptr, size_t size) __attribute__((FC_BUILTIN));
 
 /*! \brief Same as `eacsl_store_block`, but first check
  * checks whether a block with a base address given by `ptr` exists in the
@@ -237,31 +231,27 @@ void * eacsl_store_block(void * ptr, size_t size)
  * \param size size of the tracked block in bytes */
 /*@ ensures \result == ptr;
   @ assigns \result \from *(((char*)ptr)+(0..size-1)), ptr, size; */
-void * eacsl_store_block_duplicate(void * ptr, size_t size)
-  __attribute__((FC_BUILTIN));
+void *eacsl_store_block_duplicate(void *ptr, size_t size)
+    __attribute__((FC_BUILTIN));
 
 /*! \brief Remove a memory block which base address is \p ptr from tracking. */
 /*@ assigns \nothing; */
-void eacsl_delete_block(void * ptr)
-  __attribute__((FC_BUILTIN));
+void eacsl_delete_block(void *ptr) __attribute__((FC_BUILTIN));
 
 /*! \brief Mark the \p size bytes starting at an address given by \p ptr as
  * initialized. */
 /*@ assigns \nothing; */
-void eacsl_initialize(void * ptr, size_t size)
-  __attribute__((FC_BUILTIN));
+void eacsl_initialize(void *ptr, size_t size) __attribute__((FC_BUILTIN));
 
 /*! \brief Mark all bytes belonging to a memory block which start address is
  * given by \p ptr as initialized. */
 /*@ assigns \nothing; */
-void eacsl_full_init(void * ptr)
-  __attribute__((FC_BUILTIN));
+void eacsl_full_init(void *ptr) __attribute__((FC_BUILTIN));
 
 /*! \brief Mark a memory block which start address is given by \p ptr as
  * read-only. */
 /*@ assigns \nothing; */
-void eacsl_mark_readonly(void * ptr)
-  __attribute__((FC_BUILTIN));
+void eacsl_mark_readonly(void *ptr) __attribute__((FC_BUILTIN));
 
 /* }}} */
 
@@ -274,8 +264,7 @@ void eacsl_mark_readonly(void * ptr)
  * Evaluate to a non-zero value if \p ptr points to a start address of
  * a block allocated via \p malloc, \p calloc or \p realloc. */
 /*@ assigns \result \from ptr; */
-int eacsl_freeable(void * ptr)
-  __attribute__((FC_BUILTIN));
+int eacsl_freeable(void *ptr) __attribute__((FC_BUILTIN));
 
 /*! \brief Implementation of the \b \\valid predicate of E-ACSL.
  *
@@ -319,8 +308,8 @@ int eacsl_freeable(void * ptr)
   @ complete behaviors;
   @ disjoint behaviors;
   @ */
-int eacsl_valid(void * ptr, size_t size, void *base, void *addrof_base)
-  __attribute__((FC_BUILTIN));
+int eacsl_valid(void *ptr, size_t size, void *base, void *addrof_base)
+    __attribute__((FC_BUILTIN));
 
 /*! \brief Implementation of the \b \\valid_read predicate of E-ACSL.
  *
@@ -345,32 +334,29 @@ int eacsl_valid(void * ptr, size_t size, void *base, void *addrof_base)
   @ complete behaviors;
   @ disjoint behaviors;
   @ */
-int eacsl_valid_read(void * ptr, size_t size, void *base, void *addrof_base)
-  __attribute__((FC_BUILTIN));
+int eacsl_valid_read(void *ptr, size_t size, void *base, void *addrof_base)
+    __attribute__((FC_BUILTIN));
 
 /*! \brief Implementation of the \b \\base_addr predicate of E-ACSL.
  * Return the base address of the memory block containing an address given
  * by \p ptr */
 /*@ ensures \result == \base_addr(ptr);
   @ assigns \result \from ptr; */
-void * eacsl_base_addr(void * ptr)
-  __attribute__((FC_BUILTIN));
+void *eacsl_base_addr(void *ptr) __attribute__((FC_BUILTIN));
 
 /*! \brief Implementation of the \b \\block_length predicate of E-ACSL.
  * Return the byte length of the memory block of the block containing a memory
  * address given by \p ptr */
 /*@ ensures \result == \block_length(ptr);
   @ assigns \result \from ptr; */
-size_t eacsl_block_length(void * ptr)
-  __attribute__((FC_BUILTIN));
+size_t eacsl_block_length(void *ptr) __attribute__((FC_BUILTIN));
 
 /*! \brief Implementation of the \b \\offset predicate of E-ACSL.
  * Return the byte offset of address given by \p ptr within a memory blocks
  * it belongs to */
 /*@ ensures \result == \offset(ptr);
   @ assigns \result \from ptr; */
-size_t eacsl_offset(void * ptr)
-  __attribute__((FC_BUILTIN));
+size_t eacsl_offset(void *ptr) __attribute__((FC_BUILTIN));
 
 /*! \brief Implementation of the \b \\initialized predicate of E-ACSL.
  * Return a non-zero value if \p size bytes starting from an address given by
@@ -385,8 +371,7 @@ size_t eacsl_offset(void * ptr)
   @ complete behaviors;
   @ disjoint behaviors;
   @ */
-int eacsl_initialized(void * ptr, size_t size)
-  __attribute__((FC_BUILTIN));
+int eacsl_initialized(void *ptr, size_t size) __attribute__((FC_BUILTIN));
 
 /*! \brief Implementation of the \b \\separated predicate of E-ACSL.
  *
@@ -406,8 +391,7 @@ int eacsl_initialized(void * ptr, size_t size)
  */
 /*@ assigns \result \from indirect:count;
   @ ensures \result == 0 || \result == 1; */
-int eacsl_separated(size_t count, ...)
-  __attribute__((FC_BUILTIN));
+int eacsl_separated(size_t count, ...) __attribute__((FC_BUILTIN));
 
 /* }}} */
 

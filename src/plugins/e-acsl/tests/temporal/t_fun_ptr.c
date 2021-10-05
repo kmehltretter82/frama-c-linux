@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-int* pfun(char c, int *p, int *p2, int *p3, int *p4, int i) {
+int *pfun(char c, int *p, int *p2, int *p3, int *p4, int i) {
   int *q = p;
   return q;
 }
@@ -23,10 +23,8 @@ int main(int argc, const char **argv) {
         + call via value - save block number
      - store return referent in return handler
      - take referent number of the return value (via return handler) */
-  p = pfun('a', p, &a, NULL, (int*)addr, 2);
+  p = pfun('a', p, &a, NULL, (int *)addr, 2);
 
   /*@assert \valid(p); */
   return 0;
 }
-
-

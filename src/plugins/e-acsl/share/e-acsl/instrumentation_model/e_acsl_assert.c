@@ -23,7 +23,7 @@
 /*! ***********************************************************************
  * \file
  * \brief E-ACSL assertions and abort statements implementation.
-***************************************************************************/
+ **************************************************************************/
 
 #include <stdlib.h>
 
@@ -37,22 +37,23 @@ int eacsl_runtime_sound_verdict = 1;
 #ifndef E_ACSL_EXTERNAL_ASSERT
 /*! \brief Default implementation of E-ACSL runtime assertions */
 void eacsl_runtime_assert(int predicate, int blocking, const char *kind,
-    const char *fct, const char *pred_txt, const char * file, int line) {
+                          const char *fct, const char *pred_txt,
+                          const char *file, int line) {
   if (eacsl_runtime_sound_verdict) {
-    if (! predicate) {
+    if (!predicate) {
       STDERR("%s: In function '%s'\n"
              "%s:%d: Error: %s failed:\n"
              "\tThe failing predicate is:\n"
              "\t%s.\n",
              file, fct, file, line, kind, pred_txt);
       if (blocking) {
-#ifndef E_ACSL_NO_ASSERT_FAIL /* Do fail on assertions */
-#ifdef E_ACSL_FAIL_EXITCODE /* Fail by exit with a given code */
+#  ifndef E_ACSL_NO_ASSERT_FAIL /* Do fail on assertions */
+#    ifdef E_ACSL_FAIL_EXITCODE /* Fail by exit with a given code */
         exit(E_ACSL_FAIL_EXITCODE);
-#else
+#    else
         raise_abort(file, line); /* Raise abort signal */
-#endif
-#endif
+#    endif
+#  endif
       }
     }
   } else
@@ -60,6 +61,6 @@ void eacsl_runtime_assert(int predicate, int blocking, const char *kind,
            "%s:%d: Warning: no sound verdict for %s (guess: %s).\n"
            "\tthe considered predicate is:\n"
            "\t%s\n",
-           file, fct, file, line, kind, predicate ? "ok": "FAIL", pred_txt);
+           file, fct, file, line, kind, predicate ? "ok" : "FAIL", pred_txt);
 }
 #endif

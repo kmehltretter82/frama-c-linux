@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#include <sys/stat.h>
 #include <fcntl.h>
+#include <sys/stat.h>
 
 #include "../observation_model/internals/e_acsl_omodel_debug.h"
 #include "e_acsl_config.h"
@@ -46,13 +46,14 @@ void initialize_report_file(int *argc, char ***argv) {
   if (!strcmp(dlog_name, "-") || !strcmp(dlog_name, "1")) {
     dlog_fd = 2;
   } else {
-#if E_ACSL_OS_IS_LINUX
-    dlog_fd = open(dlog_name, O_WRONLY | O_CREAT | O_TRUNC | O_NONBLOCK
-      | O_NOCTTY, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
-#elif E_ACSL_OS_IS_WINDOWS
-    dlog_fd = _open(dlog_name, _O_WRONLY | _O_CREAT | _O_TRUNC,
-      _S_IREAD | _S_IWRITE);
-#endif
+#  if E_ACSL_OS_IS_LINUX
+    dlog_fd =
+        open(dlog_name, O_WRONLY | O_CREAT | O_TRUNC | O_NONBLOCK | O_NOCTTY,
+             S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+#  elif E_ACSL_OS_IS_WINDOWS
+    dlog_fd =
+        _open(dlog_name, _O_WRONLY | _O_CREAT | _O_TRUNC, _S_IREAD | _S_IWRITE);
+#  endif
   }
   if (dlog_fd == -1)
     private_abort("Cannot open file descriptor for %s\n", dlog_name);
@@ -62,39 +63,41 @@ void initialize_report_file(int *argc, char ***argv) {
 // }}}
 
 #ifdef E_ACSL_WEAK_VALIDITY
-# define E_ACSL_VALIDITY_DESC "weak"
+#  define E_ACSL_VALIDITY_DESC "weak"
 #else
-# define E_ACSL_VALIDITY_DESC "strong"
+#  define E_ACSL_VALIDITY_DESC "strong"
 #endif
 
 #ifdef E_ACSL_NO_ASSERT_FAIL
-# define E_ACSL_ASSERT_NO_FAIL_DESC "pass through"
+#  define E_ACSL_ASSERT_NO_FAIL_DESC "pass through"
 #else
-# define E_ACSL_ASSERT_NO_FAIL_DESC "abort"
+#  define E_ACSL_ASSERT_NO_FAIL_DESC "abort"
 #endif
 
 #ifdef E_ACSL_TEMPORAL
-#define E_ACSL_TEMPORAL_DESC "enabled"
+#  define E_ACSL_TEMPORAL_DESC "enabled"
 #else
-# define E_ACSL_TEMPORAL_DESC "disabled"
+#  define E_ACSL_TEMPORAL_DESC "disabled"
 #endif // E_ACSL_TEMPORAL
 
 #ifndef E_ACSL_VALIDATE_FORMAT_STRINGS
-# define E_ACSL_FORMAT_VALIDITY_DESC "disabled"
+#  define E_ACSL_FORMAT_VALIDITY_DESC "disabled"
 #else
-# define E_ACSL_FORMAT_VALIDITY_DESC "enabled"
+#  define E_ACSL_FORMAT_VALIDITY_DESC "enabled"
 #endif // E_ACSL_VALIDATE_FORMAT_STRINGS
 
 void describe_run() {
 #if defined(E_ACSL_VERBOSE)
-  rtl_printf("/* ========================================================= */\n");
-  rtl_printf(" * E-ACSL instrumented run\n" );
+  rtl_printf(
+      "/* ========================================================= */\n");
+  rtl_printf(" * E-ACSL instrumented run\n");
   rtl_printf(" * Execution mode:  %s\n", E_ACSL_DEBUG_DESC);
   describe_observation_model();
   rtl_printf(" * Assertions mode: %s\n", E_ACSL_ASSERT_NO_FAIL_DESC);
   rtl_printf(" * Validity notion: %s\n", E_ACSL_VALIDITY_DESC);
   rtl_printf(" * Temporal checks: %s\n", E_ACSL_TEMPORAL_DESC);
   rtl_printf(" * Format Checks:   %s\n", E_ACSL_FORMAT_VALIDITY_DESC);
-  rtl_printf("/* ========================================================= */\n");
+  rtl_printf(
+      "/* ========================================================= */\n");
 #endif
 }

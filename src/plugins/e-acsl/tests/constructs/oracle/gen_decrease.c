@@ -164,48 +164,48 @@ int main(void)
   int __retres;
   int f10 = f(10);
   __e_acsl_assert(f10 == -2,1,"Assertion","main","f10 == -2",
-                  "tests/constructs/decrease.c",77);
+                  "tests/constructs/decrease.c",81);
   /*@ assert f10 ≡ -2; */ ;
   int f7 = f(7);
   __e_acsl_assert(f7 == -1,1,"Assertion","main","f7 == -1",
-                  "tests/constructs/decrease.c",79);
+                  "tests/constructs/decrease.c",83);
   /*@ assert f7 ≡ -1; */ ;
   int g10 = g(10);
   __e_acsl_assert(g10 == -2,1,"Assertion","main","g10 == -2",
-                  "tests/constructs/decrease.c",81);
+                  "tests/constructs/decrease.c",85);
   /*@ assert g10 ≡ -2; */ ;
   int g7 = g(7);
   __e_acsl_assert(g7 == -1,1,"Assertion","main","g7 == -1",
-                  "tests/constructs/decrease.c",83);
+                  "tests/constructs/decrease.c",87);
   /*@ assert g7 ≡ -1; */ ;
   int fact7 = __gen_e_acsl_fact(7);
   __e_acsl_assert(fact7 == 5040,1,"Assertion","main","fact7 == 5040",
-                  "tests/constructs/decrease.c",86);
+                  "tests/constructs/decrease.c",90);
   /*@ assert fact7 ≡ 5040; */ ;
   size_t fact18 = __gen_e_acsl_fact2((unsigned long)18);
   __e_acsl_assert(fact18 == 6402373705728000UL,1,"Assertion","main",
                   "fact18 == 6402373705728000UL",
-                  "tests/constructs/decrease.c",89);
+                  "tests/constructs/decrease.c",93);
   /*@ assert fact18 ≡ 6402373705728000UL; */ ;
   int fib7 = __gen_e_acsl_fib(7);
   __e_acsl_assert(fib7 == 13,1,"Assertion","main","fib7 == 13",
-                  "tests/constructs/decrease.c",92);
+                  "tests/constructs/decrease.c",96);
   /*@ assert fib7 ≡ 13; */ ;
   int even7 = __gen_e_acsl_even(7);
   __e_acsl_assert(even7 == 0,1,"Assertion","main","even7 == 0",
-                  "tests/constructs/decrease.c",95);
+                  "tests/constructs/decrease.c",99);
   /*@ assert even7 ≡ 0; */ ;
   int even10 = __gen_e_acsl_even(10);
   __e_acsl_assert(even10 == 1,1,"Assertion","main","even10 == 1",
-                  "tests/constructs/decrease.c",97);
+                  "tests/constructs/decrease.c",101);
   /*@ assert even10 ≡ 1; */ ;
   int odd7 = __gen_e_acsl_odd(7);
   __e_acsl_assert(odd7 == 1,1,"Assertion","main","odd7 == 1",
-                  "tests/constructs/decrease.c",99);
+                  "tests/constructs/decrease.c",103);
   /*@ assert odd7 ≡ 1; */ ;
   int odd10 = __gen_e_acsl_odd(10);
   __e_acsl_assert(odd10 == 0,1,"Assertion","main","odd10 == 0",
-                  "tests/constructs/decrease.c",101);
+                  "tests/constructs/decrease.c",105);
   /*@ assert odd10 ≡ 0; */ ;
   __retres = 0;
   return __retres;
@@ -217,7 +217,7 @@ int __gen_e_acsl_even(int n)
 {
   int __retres;
   __e_acsl_assert(n >= 0,1,"Precondition","even","n >= 0",
-                  "tests/constructs/decrease.c",62);
+                  "tests/constructs/decrease.c",64);
   __retres = even(n);
   return __retres;
 }
@@ -228,7 +228,7 @@ int __gen_e_acsl_odd(int n)
 {
   int __retres;
   __e_acsl_assert(n >= 0,1,"Precondition","odd","n >= 0",
-                  "tests/constructs/decrease.c",68);
+                  "tests/constructs/decrease.c",71);
   __retres = odd(n);
   return __retres;
 }

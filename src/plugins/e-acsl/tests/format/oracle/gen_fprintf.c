@@ -41,13 +41,6 @@ char *__gen_e_acsl_literal_string_17;
 char *__gen_e_acsl_literal_string_18;
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
-/*@ exits status: \exit_status ≡ \old(status);
-    ensures never_terminates: \false;
-    
-    assigns \exit_status \from status;
- */
-void __gen_e_acsl_exit(int status);
-
 /*@ ensures
       result_null_or_valid_fd:
         \result ≡ \null ∨ \subset(\result, &__fc_fopen[0 .. 16 - 1]);
@@ -62,6 +55,13 @@ FILE *__gen_e_acsl_tmpfile(void);
     assigns \result \from (indirect: stream), (indirect: *stream);
  */
 int __gen_e_acsl_fclose(FILE *stream);
+
+/*@ exits status: \exit_status ≡ \old(status);
+    ensures never_terminates: \false;
+    
+    assigns \exit_status \from status;
+ */
+void __gen_e_acsl_exit(int status);
 
 /*@ ensures result_ok_or_error: \result ≡ -1 ∨ \result ≥ 0;
     ensures
@@ -189,6 +189,19 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
   }
 }
 
+/*@ exits status: \exit_status ≡ \old(status);
+    ensures never_terminates: \false;
+    
+    assigns \exit_status \from status;
+ */
+void __gen_e_acsl_exit(int status)
+{
+  exit(status);
+  __e_acsl_assert(0,1,"Postcondition","exit","never_terminates: \\false",
+                  "FRAMAC_SHARE/libc/stdlib.h",473);
+  return;
+}
+
 /*@ requires valid_stream: \valid(stream);
     ensures result_zero_or_EOF: \result ≡ 0 ∨ \result ≡ -1;
     assigns \result;
@@ -232,19 +245,6 @@ FILE *__gen_e_acsl_tmpfile(void)
   __retres = tmpfile();
   __e_acsl_delete_block((void *)(& __retres));
   return __retres;
-}
-
-/*@ exits status: \exit_status ≡ \old(status);
-    ensures never_terminates: \false;
-    
-    assigns \exit_status \from status;
- */
-void __gen_e_acsl_exit(int status)
-{
-  exit(status);
-  __e_acsl_assert(0,1,"Postcondition","exit","never_terminates: \\false",
-                  "FRAMAC_SHARE/libc/stdlib.h",473);
-  return;
 }
 
 void __e_acsl_globals_init(void)

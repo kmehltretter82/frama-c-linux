@@ -23,34 +23,34 @@
 #ifndef E_ACSL_OMODEL_DEBUG_H
 #define E_ACSL_OMODEL_DEBUG_H
 
-#include <stdint.h>
 #include "../../internals/e_acsl_rtl_string.h"
+#include <stdint.h>
 
 /* Assertions in debug mode */
 #ifdef E_ACSL_DEBUG
 
 /* Assert that a memory block [_addr, _addr + _size] is nullified */
-# define DVALIDATE_NULLIFIED(_addr, _size) \
-  DVASSERT(zeroed_out((void *)_addr, _size), \
-    "Block [%a, %a+%lu] not nullified", _addr, _addr, _size)
+#  define DVALIDATE_NULLIFIED(_addr, _size)                                    \
+    DVASSERT(zeroed_out((void *)_addr, _size),                                 \
+             "Block [%a, %a+%lu] not nullified", _addr, _addr, _size)
 
 /* Assert that memory block [_addr, _addr + _size] is allocated */
-# define DVALIDATE_ALLOCATED(_addr, _size, _base) \
-  private_assert(allocated((uintptr_t)_addr, _size, (uintptr_t)_base), \
-    "Operation on unallocated block [%a + %lu] with base %a\n", \
-    _addr, _size, _base);
+#  define DVALIDATE_ALLOCATED(_addr, _size, _base)                             \
+    private_assert(allocated((uintptr_t)_addr, _size, (uintptr_t)_base),       \
+                   "Operation on unallocated block [%a + %lu] with base %a\n", \
+                   _addr, _size, _base);
 
 /* Assert that memory block [_addr, _addr + _size] is allocated
  * and can be written to */
-# define DVALIDATE_WRITEABLE(_addr, _size, _base) \
-  private_assert(writeable((uintptr_t)_addr, _size, (uintptr_t)_base), \
-    "Operation on unallocated block [%a + %lu] with base %a\n", \
-    _addr, _size, _base);
+#  define DVALIDATE_WRITEABLE(_addr, _size, _base)                             \
+    private_assert(writeable((uintptr_t)_addr, _size, (uintptr_t)_base),       \
+                   "Operation on unallocated block [%a + %lu] with base %a\n", \
+                   _addr, _size, _base);
 
 #else
-# define DVALIDATE_NULLIFIED(_addr, _size)
-# define DVALIDATE_ALLOCATED(_ptr, _size, _base)
-# define DVALIDATE_WRITEABLE(_ptr, _size, _base)
+#  define DVALIDATE_NULLIFIED(_addr, _size)
+#  define DVALIDATE_ALLOCATED(_ptr, _size, _base)
+#  define DVALIDATE_WRITEABLE(_ptr, _size, _base)
 #endif
 
 /*! Print to stdout the parameters of the model */
@@ -66,7 +66,7 @@ void describe_observation_model();
 int allocated(uintptr_t addr, long size, uintptr_t base_ptr);
 
 /** \brief Return 1 if a given memory location is read-only and 0 otherwise */
-int readonly (void *ptr);
+int readonly(void *ptr);
 
 /** \brief Return 1 if a given memory location is writable and 0 otherwise */
 int writeable(uintptr_t addr, long size, uintptr_t base_ptr);

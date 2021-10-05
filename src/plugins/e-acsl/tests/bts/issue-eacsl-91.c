@@ -4,10 +4,8 @@
    STDOPT: #"-e-acsl-full-mtracking"
 */
 short a;
-char b()
-{
-  switch (a)
-  {
+char b() {
+  switch (a) {
     int c = 0;
   case 0:
     goto d;
@@ -19,8 +17,7 @@ d:
   return 2;
 }
 
-int main()
-{
+int main() {
   b();
   return 0;
 }

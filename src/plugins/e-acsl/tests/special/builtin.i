@@ -9,9 +9,14 @@
 int incr(int);
 
 /*@ ensures \result == incr(i); */
-int f(int i) { int j = i + 1; return j; }
+int f(int i) {
+  int j = i + 1;
+  return j;
+}
 
-int incr(int x) { return x + 1; }
+int incr(int x) {
+  return x + 1;
+}
 
 int main() {
   int i = f(2);

@@ -34,9 +34,9 @@
 
 // OS detection
 //  - Assign values to specific OSes
-#define E_ACSL_OS_LINUX_VALUE 1
+#define E_ACSL_OS_LINUX_VALUE   1
 #define E_ACSL_OS_WINDOWS_VALUE 2
-#define E_ACSL_OS_OTHER_VALUE 999
+#define E_ACSL_OS_OTHER_VALUE   999
 //  - Declare defines to test for a specific OS
 /*!
  * \brief True if the target OS is linux, false otherwise
@@ -53,14 +53,14 @@
 //  - Check current OS
 #ifdef __linux__
 // Linux compilation
-# define E_ACSL_OS E_ACSL_OS_LINUX_VALUE
+#  define E_ACSL_OS E_ACSL_OS_LINUX_VALUE
 #elif defined(WIN32) || defined(_WIN32) || defined(__WIN32)
 // Windows compilation
-# define E_ACSL_OS E_ACSL_OS_WINDOWS_VALUE
+#  define E_ACSL_OS E_ACSL_OS_WINDOWS_VALUE
 #else
 // Other
-# define E_ACSL_OS E_ACSL_OS_OTHER_VALUE
-# error "Unsupported OS for E-ACSL RTL"
+#  define E_ACSL_OS E_ACSL_OS_OTHER_VALUE
+#  error "Unsupported OS for E-ACSL RTL"
 #endif
 
 #endif // E_ACSL_CONFIG_H

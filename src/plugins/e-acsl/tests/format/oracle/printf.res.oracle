@@ -1,4 +1,4 @@
-[kernel:parser:decimal-float] tests/format/printf.c:92: Warning: 
+[kernel:parser:decimal-float] tests/format/printf.c:93: Warning: 
   Floating-point constant 0.2 is not represented exactly. Will use 0x1.999999999999ap-3.
   (warn-once: no further messages from category 'parser:decimal-float' will be emitted)
 [e-acsl] beginning translation.
@@ -8,16 +8,16 @@
 [e-acsl] Warning: annotating undefined function `exit':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-[e-acsl] Warning: annotating undefined function `strlen':
-  the generated program may miss memory instrumentation
-  if there are memory-related annotations.
-[e-acsl] Warning: annotating undefined function `strchr':
+[e-acsl] Warning: annotating undefined function `waitpid':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
 [e-acsl] Warning: annotating undefined function `fork':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-[e-acsl] Warning: annotating undefined function `waitpid':
+[e-acsl] Warning: annotating undefined function `strlen':
+  the generated program may miss memory instrumentation
+  if there are memory-related annotations.
+[e-acsl] Warning: annotating undefined function `strchr':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
 [e-acsl] FRAMAC_SHARE/libc/string.h:181: Warning: 
@@ -56,15 +56,6 @@
 [e-acsl] FRAMAC_SHARE/libc/string.h:143: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/sys/wait.h:79: Warning: 
-  E-ACSL construct `assigns clause in behavior' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/sys/wait.h:86: Warning: 
-  E-ACSL construct `assigns clause in behavior' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/unistd.h:857: Warning: 
-  E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:367: Warning: 
   E-ACSL construct `logic functions or predicates with labels'
@@ -105,6 +96,15 @@
 [e-acsl] FRAMAC_SHARE/libc/string.h:141: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/unistd.h:857: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/sys/wait.h:79: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/sys/wait.h:86: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:470: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
@@ -120,5 +120,5 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[kernel:annot:missing-spec] tests/format/printf.c:183: Warning: 
+[kernel:annot:missing-spec] tests/format/printf.c:184: Warning: 
   Neither code nor specification for function __e_acsl_builtin_printf, generating default assigns from the prototype

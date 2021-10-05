@@ -9,7 +9,7 @@ int main() {
   FILE *f = fopen("/dev/urandom", "r");
   // we assume this fopen will always succeed,
   // to ensure the code below is always tested
-  int res = fread(buf+1, sizeof(int), 4, f);
+  int res = fread(buf + 1, sizeof(int), 4, f);
   //@ assert !\initialized(&buf[0]);
   if (res == 0) {
     //@ assert !\initialized(&buf[1]);
@@ -32,7 +32,7 @@ int main() {
   // but we suppose in this test that it will always succeed
   // and read 4 elements
   int buf2[6];
-  fread(buf2+1, sizeof(int), 4, f);
+  fread(buf2 + 1, sizeof(int), 4, f);
   //@ assert !\initialized(&buf2[0]);
   //@ assert \initialized(&buf2[1..4]);
   //@ assert !\initialized(&buf2[5]);

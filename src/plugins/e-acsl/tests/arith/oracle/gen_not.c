@@ -11,7 +11,7 @@ int main(void)
   /*@ assert x ≡ 0; */ ;
   if (x) {
     __e_acsl_assert(x != 0,1,"Assertion","main","x != 0","tests/arith/not.i",
-                    7);
+                    8);
     /*@ assert x ≢ 0; */ ;
   }
   __retres = 0;

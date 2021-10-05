@@ -2,6 +2,7 @@ E_ACSL.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 Makefile.in: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 README: .ignore
 configure.ac: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+tab-in-changelog.sh: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 contrib/libdlmalloc/dlmalloc.c: MODIFIED_DLMALLOC
 doc/Changelog: .ignore
 doc/doxygen/doxygen.cfg.in: .ignore

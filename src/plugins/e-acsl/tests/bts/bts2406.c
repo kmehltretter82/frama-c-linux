@@ -3,7 +3,7 @@
 */
 
 const char tab[]; /* not monitored */
-char t[10]; /* monitored */
+char t[10];       /* monitored */
 
 int main(void) {
   char *p = tab; /* monitored */

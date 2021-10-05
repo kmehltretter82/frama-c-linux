@@ -22,26 +22,26 @@
 
 #ifdef E_ACSL_VALIDATE_FORMAT_STRINGS
 
-#include <fcntl.h>
-#include <limits.h>
-#include <stdint.h>
-#include <wctype.h>
+#  include <fcntl.h>
+#  include <limits.h>
+#  include <stdint.h>
+#  include <wctype.h>
 
-#include "../internals/e_acsl_malloc.h"
-#include "../internals/e_acsl_private_assert.h"
-#include "../internals/e_acsl_rtl_io.h"
-#include "../internals/e_acsl_rtl_string.h"
-#include "../observation_model/e_acsl_observation_model.h"
-#include "e_acsl_string.h"
+#  include "../internals/e_acsl_malloc.h"
+#  include "../internals/e_acsl_private_assert.h"
+#  include "../internals/e_acsl_rtl_io.h"
+#  include "../internals/e_acsl_rtl_string.h"
+#  include "../observation_model/e_acsl_observation_model.h"
+#  include "e_acsl_string.h"
 
-#include "e_acsl_stdio.h"
+#  include "e_acsl_stdio.h"
 
-#define FMT_ERROR "Format error: "
-#define INT_ERROR "Internal error: "
+#  define FMT_ERROR "Format error: "
+#  define INT_ERROR "Internal error: "
 
 /* Check whether a value is unsigned or not.
    Watch out for integer promotions. */
-#define UNSIGNED(n) (n >= 0 && ~n >= 0)
+#  define UNSIGNED(n) (n >= 0 && ~n >= 0)
 
 /* Abbreviated types {{{ */
 
@@ -61,6 +61,7 @@
    It is therefore important that the types as they are used by this file
    and by `functions.ml` are in sync */
 
+// clang-format off
 #define abbreviated_types \
   typedef_abbreviated('c', char, IChar) \
   typedef_abbreviated('C', unsigned char, IUChar) \
@@ -86,30 +87,35 @@
   typedef_abbreviated('w', long long*, PLongLong) \
   typedef_abbreviated('W', unsigned long long*, PULongLong) \
   typedef_abbreviated('p', void*, PVoid)
+// clang-format on
 
 /* Define abbreviated types as enum so they can be referred to as aliases */
 typedef enum {
-#define typedef_abbreviated(type,val,alias) alias = type,
+#  define typedef_abbreviated(type, val, alias) alias = type,
   abbreviated_types
-#undef typedef_abbreviated
+#  undef typedef_abbreviated
 } abbrev_t;
 
 /** \brief Return a C-string representation of a given abbreviated type */
-static const char* abbr2str(abbrev_t type) {
-  switch(type) {
-#define typedef_abbreviated(type,val,alias) case type: return #val;
-  abbreviated_types
-#undef typedef_abbreviated
+static const char *abbr2str(abbrev_t type) {
+  switch (type) {
+#  define typedef_abbreviated(type, val, alias)                                \
+  case type:                                                                   \
+    return #val;
+    abbreviated_types
+#  undef typedef_abbreviated
   }
   return '\0';
 }
 
 /** \brief Return a byte-size of a given abbreviated type */
 static int abbr2size(abbrev_t type) {
-  switch(type) {
-#define typedef_abbreviated(type,val,alias) case type: return sizeof(val);
-  abbreviated_types
-#undef typedef_abbreviated
+  switch (type) {
+#  define typedef_abbreviated(type, val, alias)                                \
+  case type:                                                                   \
+    return sizeof(val);
+    abbreviated_types
+#  undef typedef_abbreviated
   }
   return 0;
 }
@@ -128,7 +134,8 @@ static abbrev_t size2abbri(int size, int sign) {
     return sign ? ILong : IULong;
   else if (size == sizeof(long long int))
     return sign ? ILongLong : IULongLong;
-  private_abort(INT_ERROR "integral type corresponding to size %d unknown\n", size);
+  private_abort(INT_ERROR "integral type corresponding to size %d unknown\n",
+                size);
   return '\0';
 }
 
@@ -140,23 +147,29 @@ static abbrev_t size2abbrf(int size) {
     return FDouble;
   else if (size == sizeof(long double))
     return FLongDouble;
-  vabort
-    (INT_ERROR "floating point type corresponding to size %d unknown\n", size);
+  vabort(INT_ERROR "floating point type corresponding to size %d unknown\n",
+         size);
   return '\0';
 }
 
 /* Partial mapping of primitive abreviated type to a pointer of the same type,
    e.g., 'd' (int) -> 's' (*) */
 static char abbr2ptr(char c) {
-  switch(c) {
-    case IInt: return PInt;
-    case IUInt: return PUInt;
-    case ILong: return PLong;
-    case IULong: return PULong;
-    case ILongLong: return PLongLong;
-    case IULongLong: return PULongLong;
-    default:
-      private_abort(INT_ERROR "Unexpected abbreviated type %c\n", c);
+  switch (c) {
+  case IInt:
+    return PInt;
+  case IUInt:
+    return PUInt;
+  case ILong:
+    return PLong;
+  case IULong:
+    return PULong;
+  case ILongLong:
+    return PLongLong;
+  case IULongLong:
+    return PULongLong;
+  default:
+    private_abort(INT_ERROR "Unexpected abbreviated type %c\n", c);
   }
   return '\0';
 }
@@ -180,15 +193,15 @@ const char *period_chars = ".";
    Do not use this map directly, use one of the below macros. */
 char format_char_map[256];
 
-#define specifier_id  's'
-#define length_id     'l'
-#define flag_id       'f'
-#define period_id     'r'
+#  define specifier_id 's'
+#  define length_id    'l'
+#  define flag_id      'f'
+#  define period_id    'r'
 
-#define is_specifier_char(_c) (format_char_map[(int)_c] == specifier_id)
-#define is_flag_char(_c) (format_char_map[(int)_c] == flag_id)
-#define is_length_char(_c) (format_char_map[(int)_c] == length_id)
-#define is_period_char(_c) (format_char_map[(int)_c] == period_id)
+#  define is_specifier_char(_c) (format_char_map[(int)_c] == specifier_id)
+#  define is_flag_char(_c)      (format_char_map[(int)_c] == flag_id)
+#  define is_length_char(_c)    (format_char_map[(int)_c] == length_id)
+#  define is_period_char(_c)    (format_char_map[(int)_c] == period_id)
 
 static void set_format_char_map() {
   int init_idx = (int)'\0';
@@ -196,13 +209,13 @@ static void set_format_char_map() {
   if (format_char_map[init_idx] != init_char) {
     memset(format_char_map, 0, 256);
     int i;
-    for(i = 0; i < strlen(specifier_chars); i++)
+    for (i = 0; i < strlen(specifier_chars); i++)
       format_char_map[(int)specifier_chars[i]] = specifier_id;
-    for(i = 0; i < strlen(length_chars); i++)
+    for (i = 0; i < strlen(length_chars); i++)
       format_char_map[(int)length_chars[i]] = length_id;
-    for(i = 0; i < strlen(flag_chars); i++)
+    for (i = 0; i < strlen(flag_chars); i++)
       format_char_map[(int)flag_chars[i]] = flag_id;
-    for(i = 0; i < strlen(period_chars); i++)
+    for (i = 0; i < strlen(period_chars); i++)
       format_char_map[(int)period_chars[i]] = period_id;
     format_char_map[init_idx] = init_char;
   }
@@ -211,26 +224,26 @@ static void set_format_char_map() {
 
 /* Argument specification {{{ */
 typedef struct {
-  char *format; /* Pointer to the complete format string */
-  char directive [16]; /* Directive string */
+  char *format;       /* Pointer to the complete format string */
+  char directive[16]; /* Directive string */
   struct arg {
     int index;  /* Argument index this specification refers to */
     _Bool expl; /* Set to 1 if the argument has been numbered via $ */
   } arg;
-  struct flags { /* Flags */
+  struct flags {     /* Flags */
     _Bool specified; /* set if any of the below flags are set */
-    _Bool minus;  /* - */
-    _Bool plus;   /* + */
-    _Bool space;  /* ' ' */
-    _Bool hash;   /* # */
-    _Bool zero;   /* 0 */
+    _Bool minus;     /* - */
+    _Bool plus;      /* + */
+    _Bool space;     /* ' ' */
+    _Bool hash;      /* # */
+    _Bool zero;      /* 0 */
     _Bool apostroph; /* ' */
   } flags;
-  int field_width; /* Field width, INT_MIN if not given, -1 if '*' */
-  int precision; /* Format precision, INT_MIN if not given, -1 if '*' */
-  struct length { /* Length Modifier */
-    int bytes; /* Number of bytes inferred from length modifier */
-    char mod;  /* Modifier character (such as 'l' or 'h') */
+  int field_width;  /* Field width, INT_MIN if not given, -1 if '*' */
+  int precision;    /* Format precision, INT_MIN if not given, -1 if '*' */
+  struct length {   /* Length Modifier */
+    int bytes;      /* Number of bytes inferred from length modifier */
+    char mod;       /* Modifier character (such as 'l' or 'h') */
     _Bool extended; /* Set if modifier is repeated (e.g., 'll' or 'hh') */
   } length;
   char specifier; /* Format specifier character */
@@ -251,14 +264,16 @@ static void print_directive(format_directive *dir, char *rem) {
   rtl_printf("    Bytes:    %d \n", dir->length.bytes);
   rtl_printf("    Extended: %d \n", dir->length.extended);
   rtl_printf("  Flags:       <");
-#define print_format_flag(_f,_s) if (dir->flags._f) rtl_printf(_s)
-  print_format_flag(plus,"+");
+#  define print_format_flag(_f, _s)                                            \
+    if (dir->flags._f)                                                         \
+    rtl_printf(_s)
+  print_format_flag(plus, "+");
   print_format_flag(minus, "-");
   print_format_flag(space, " ");
-  print_format_flag(hash,"#");
-  print_format_flag(apostroph,"'");
-  print_format_flag(zero,"0");
-#undef print_format_flag
+  print_format_flag(hash, "#");
+  print_format_flag(apostroph, "'");
+  print_format_flag(zero, "0");
+#  undef print_format_flag
   rtl_printf(">\n");
   rtl_printf("  Remainder: \"%s\"\n", rem);
 }
@@ -273,7 +288,7 @@ static void print_directive(format_directive *dir, char *rem) {
 
    This function assumes that *(fmt-1) is '%' */
 static char *fetch_format_argno(char *fmt, format_directive *dir,
-    format_directive *prev, int ind) {
+                                format_directive *prev, int ind) {
   int argno = 0;
   char *ret = fmt;
 
@@ -294,7 +309,7 @@ static char *fetch_format_argno(char *fmt, format_directive *dir,
     dir->arg.index = argno - 1;
     dir->arg.expl = 1;
     ret++;
-  /* ... do nothing otherwise but revert back to original format as some
+    /* ... do nothing otherwise but revert back to original format as some
      characters may have been fetched */
   } else {
     dir->arg.index = ind;
@@ -304,9 +319,10 @@ static char *fetch_format_argno(char *fmt, format_directive *dir,
 
   /* make sure that numbered and non-numbered directives are not mixed */
   if (prev && prev->arg.expl != dir->arg.expl)
-    private_abort(FMT_ERROR
-      "\"%s\":  numbered and non-numbered directives cannot be mixed\n",
-      dir->format);
+    private_abort(
+        FMT_ERROR
+        "\"%s\":  numbered and non-numbered directives cannot be mixed\n",
+        dir->format);
 
   return ret;
 }
@@ -315,37 +331,38 @@ static char *fetch_format_argno(char *fmt, format_directive *dir,
 /* Fetch format flags {{{ */
 /* Assumes that `fmt` is a format string returned by ::fetch_format_argno */
 static char *fetch_format_flags(char *fmt, format_directive *dir) {
-#define set_format_flag(_f) \
-  if (!dir->flags._f) \
-    { dir->flags._f = 1; } \
-  else  \
-    { private_abort(FMT_ERROR "flag %s has already been set\n", #_f); }
+#  define set_format_flag(_f)                                                  \
+    if (!dir->flags._f) {                                                      \
+      dir->flags._f = 1;                                                       \
+    } else {                                                                   \
+      private_abort(FMT_ERROR "flag %s has already been set\n", #_f);          \
+    }
 
   while (is_flag_char(*fmt)) {
     dir->flags.specified = 1;
-    switch(*fmt) {
-      case '#':
-        set_format_flag(hash);
-        break;
-      case '-':
-        set_format_flag(minus);
-        break;
-      case '+':
-        set_format_flag(plus);
-        break;
-      case ' ':
-        set_format_flag(space);
-        break;
-      case '\'':
-        set_format_flag(apostroph);
-        break;
-      case '0':
-        set_format_flag(zero);
-        break;
+    switch (*fmt) {
+    case '#':
+      set_format_flag(hash);
+      break;
+    case '-':
+      set_format_flag(minus);
+      break;
+    case '+':
+      set_format_flag(plus);
+      break;
+    case ' ':
+      set_format_flag(space);
+      break;
+    case '\'':
+      set_format_flag(apostroph);
+      break;
+    case '0':
+      set_format_flag(zero);
+      break;
     }
     fmt++;
   }
-#undef set_format_flag
+#  undef set_format_flag
   return fmt;
 }
 /* }}} */
@@ -363,7 +380,8 @@ static char *fetch_format_field_width(char *fmt, format_directive *dir) {
     if (isdigit(*fmt)) {
       if (*fmt == '0') {
         private_abort(FMT_ERROR
-          "field width in format cannot start with zero (%s)\n", dir->format);
+                      "field width in format cannot start with zero (%s)\n",
+                      dir->format);
       };
       while (isdigit(*fmt)) {
         len = len * 10 + (*fmt - '0');
@@ -405,43 +423,43 @@ static char *fetch_format_length(char *fmt, format_directive *dir) {
   dir->length.mod = '\0';
   dir->length.extended = 0;
 
-  switch(*fmt) {
-    case 'h': {
-      if (*(fmt + 1) == 'h') {
-        dir->length.bytes = sizeof(char);
-        dir->length.extended = 1;
-        fmt++;
-      } else
-        dir->length.bytes = sizeof(short);
-      break;
-    }
-    case 'l': {
-      if (*(fmt + 1) == 'l') {
-        dir->length.bytes = sizeof(long long);
-        dir->length.extended = 1;
-        fmt++;
-      } else
-        dir->length.bytes = sizeof(long);
-      break;
-    }
-    case 'j':
-      dir->length.bytes = sizeof(intmax_t);
-      break;
-    case 'z':
-      dir->length.bytes = sizeof(size_t);
-      break;
-    case 't':
-      dir->length.bytes = sizeof(ptrdiff_t);
-      break;
-    case 'L':
-      dir->length.bytes = sizeof(long double);
-      break;
+  switch (*fmt) {
+  case 'h': {
+    if (*(fmt + 1) == 'h') {
+      dir->length.bytes = sizeof(char);
+      dir->length.extended = 1;
+      fmt++;
+    } else
+      dir->length.bytes = sizeof(short);
+    break;
+  }
+  case 'l': {
+    if (*(fmt + 1) == 'l') {
+      dir->length.bytes = sizeof(long long);
+      dir->length.extended = 1;
+      fmt++;
+    } else
+      dir->length.bytes = sizeof(long);
+    break;
+  }
+  case 'j':
+    dir->length.bytes = sizeof(intmax_t);
+    break;
+  case 'z':
+    dir->length.bytes = sizeof(size_t);
+    break;
+  case 't':
+    dir->length.bytes = sizeof(ptrdiff_t);
+    break;
+  case 'L':
+    dir->length.bytes = sizeof(long double);
+    break;
   }
 
   /* Make sure that the length modifier (if there is one) belongs
      to a right character class */
   private_assert(dir->length.mod == '\0' || is_length_char(dir->length.mod),
-    INT_ERROR "Bad length modifier: '%c'\n", dir->length.mod);
+                 INT_ERROR "Bad length modifier: '%c'\n", dir->length.mod);
 
   if (dir->length.bytes) {
     dir->length.mod = *fmt;
@@ -454,23 +472,26 @@ static char *fetch_format_length(char *fmt, format_directive *dir) {
   /* Detect specifying length modifiers twice. This is purely for better error
      reporting. Even if there is no this check, the one below detects it,
      but with a different error message. */
-  if ( dir->specifier )
+  if (dir->specifier)
 
-  /* which has been fetched at the start matches the one we have arrived at */
-  if (!is_specifier_char(dir->specifier)) {
-    if (dir->specifier == '%')
-      private_abort(FMT_ERROR "in directive '%s'."
-          "the complete conversion specification for '%%' is '%%%%'\n",
-          dir->format);
-    else
-      private_abort(FMT_ERROR "illegal format specifier '%c'\n", dir->specifier);
-  }
+    /* which has been fetched at the start matches the one we have arrived at */
+    if (!is_specifier_char(dir->specifier)) {
+      if (dir->specifier == '%')
+        private_abort(
+            FMT_ERROR
+            "in directive '%s'."
+            "the complete conversion specification for '%%' is '%%%%'\n",
+            dir->format);
+      else
+        private_abort(FMT_ERROR "illegal format specifier '%c'\n",
+                      dir->specifier);
+    }
   return ++fmt;
 } /* }}} */
 
 /* Parse format string {{{ */
 /* Parse format string into a NULL-terminated array of directives */
-static format_directive ** get_format_directives(char *fmt) {
+static format_directive **get_format_directives(char *fmt) {
   /* Count the number of formatting directives in the format string
      by counting '%' occurrences. Yes, it may give more specifications than
      needed (e.g., "%%") but allocating space for a few extra pointers does not
@@ -478,8 +499,8 @@ static format_directive ** get_format_directives(char *fmt) {
      string twice. */
 
   int sz = charcount(fmt, '%') + 1;
-  format_directive ** directives =
-    private_malloc(sizeof(format_directive *) * sz);
+  format_directive **directives =
+      private_malloc(sizeof(format_directive *) * sz);
   char *format_string = fmt;
 
   /* Nullify all pointers to make sure there is no leftover rubbish */
@@ -504,7 +525,7 @@ static format_directive ** get_format_directives(char *fmt) {
       format_directive *dir = private_calloc(1, sizeof(format_directive));
       /* Parse format string */
       dir->format = format_string;
-      char *fmt_start  = fmt - 1;
+      char *fmt_start = fmt - 1;
       fmt = fetch_format_argno(fmt, dir, prev, i);
       fmt = fetch_format_flags(fmt, dir);
       fmt = fetch_format_field_width(fmt, dir);
@@ -517,7 +538,7 @@ static format_directive ** get_format_directives(char *fmt) {
       ptrdiff_t max_len = sizeof(dir->directive) - 1;
       int len = max_len > fmt_len ? fmt_len : max_len;
       strncpy(dir->directive, fmt_start, len);
-      dir->directive[len+1] = '\0';
+      dir->directive[len + 1] = '\0';
       /* Save the directive */
       directives[i++] = dir;
       prev = dir;
@@ -527,7 +548,7 @@ static format_directive ** get_format_directives(char *fmt) {
   return directives;
 }
 
-static void release_directives(const char *fmt, format_directive ** dirs) {
+static void release_directives(const char *fmt, format_directive **dirs) {
   int formats = charcount(fmt, '%') + 1;
   int i;
   for (i = 0; i < formats; i++)
@@ -538,10 +559,11 @@ static void release_directives(const char *fmt, format_directive ** dirs) {
 
 /* Format string validation (well-formedness) {{{ */
 static inline void validate_application(format_directive *dir, char *allowed,
-  char* kind, char *desc) {
-  private_assert(strchr(allowed, dir->specifier) != NULL, FMT_ERROR
-    "wrong application of %s [%s] to format specifier [%c]\n",
-    desc, kind, dir->specifier);
+                                        char *kind, char *desc) {
+  private_assert(strchr(allowed, dir->specifier) != NULL,
+                 FMT_ERROR
+                 "wrong application of %s [%s] to format specifier [%c]\n",
+                 desc, kind, dir->specifier);
 }
 
 /** \brief Check that a given format specifier are used with right flags,
@@ -596,7 +618,7 @@ static void validate_applications(format_directive *dir) {
   if (dir->length.mod != '\0') {
     /* Make sure the length specifier is one of the allowed ones */
     private_assert(is_length_char(dir->length.mod),
-      FMT_ERROR "bad length specifier [%c]\n", dir->length.mod);
+                   FMT_ERROR "bad length specifier [%c]\n", dir->length.mod);
 
     /* Conver length modifier to a string */
     char lm_kind[3];
@@ -607,24 +629,24 @@ static void validate_applications(format_directive *dir) {
     lm_kind[i++] = '\0';
 
     switch (dir->length.mod) {
-      case 'l':
-        if (!dir->length.extended) {
-          validate_application(dir, "diouxXncsfFeEgGaA", lm_kind, desc);
-          break;
-        }
-      /* No need to look whether 'h' is extended, both 'h' and 'hh' are only
+    case 'l':
+      if (!dir->length.extended) {
+        validate_application(dir, "diouxXncsfFeEgGaA", lm_kind, desc);
+        break;
+      }
+    /* No need to look whether 'h' is extended, both 'h' and 'hh' are only
         applicable to [diouxXn] */
-      case 'h':
-      case 'j':
-      case 'z':
-      case 't':
-        validate_application(dir, "diouxXn", lm_kind, desc);
-        break;
-      case 'L':
-        validate_application(dir, "aAeEfFgG", lm_kind, desc);
-        break;
-      default:
-        private_abort(INT_ERROR "unexpected length modifier %c\n", lm_kind);
+    case 'h':
+    case 'j':
+    case 'z':
+    case 't':
+      validate_application(dir, "diouxXn", lm_kind, desc);
+      break;
+    case 'L':
+      validate_application(dir, "aAeEfFgG", lm_kind, desc);
+      break;
+    default:
+      private_abort(INT_ERROR "unexpected length modifier %c\n", lm_kind);
     }
   }
 }
@@ -638,46 +660,48 @@ static void validate_applications(format_directive *dir) {
    computes an integer type that a format expects using length modifiers and
    format specifiers. */
 static abbrev_t infer_integral_abbr(format_directive *dir, int sgn) {
-  switch(dir->length.mod) {
-    case 'l': /* expects long long or long */
-      return (dir->length.extended) ?
-        (sgn ? ILongLong : IULongLong) : (sgn ? ILong : IULong);
-    case 'h': /* short/char: promoted to int */
-      return IInt;
-    case 'j': /* intmax_t */
-      return size2abbri(sizeof(intmax_t), sgn);
-    case 'z': /* size_t */
-      return size2abbri(sizeof(size_t), sgn);
-    case 't': /* ptrdiff_t */
-      return size2abbri(sizeof(ptrdiff_t), sgn);
-    case '\0':
-      return (sgn ? IInt : IUInt);
+  switch (dir->length.mod) {
+  case 'l': /* expects long long or long */
+    return (dir->length.extended) ? (sgn ? ILongLong : IULongLong)
+                                  : (sgn ? ILong : IULong);
+  case 'h': /* short/char: promoted to int */
+    return IInt;
+  case 'j': /* intmax_t */
+    return size2abbri(sizeof(intmax_t), sgn);
+  case 'z': /* size_t */
+    return size2abbri(sizeof(size_t), sgn);
+  case 't': /* ptrdiff_t */
+    return size2abbri(sizeof(ptrdiff_t), sgn);
+  case '\0':
+    return (sgn ? IInt : IUInt);
   }
-  private_abort(INT_ERROR "unexpected length modifier: '%c'\n", dir->length.mod);
+  private_abort(INT_ERROR "unexpected length modifier: '%c'\n",
+                dir->length.mod);
   return '\0';
 }
 
 /** \brief Same as above but for 'n' conversion specifier. */
 static abbrev_t infer_n_abbr(format_directive *dir) {
   char c;
-  switch(dir->length.mod) {
-    case 'h':
-      return dir->length.extended ? PChar : PShort;
-    case 'l':
-      return dir->length.extended ? PLongLong : PLong;
-    case 'j': /* intmax_t: signed type */
-      c = size2abbri(sizeof(intmax_t), 1);
-      return abbr2ptr(c);
-    case 'z': /* size_t: unsigned type */
-      c = size2abbri(sizeof(size_t), 0);
-      return abbr2ptr(c);
-    case 't': /* ptrdiff_t: signed type */
-      c = size2abbri(sizeof(ptrdiff_t), 1);
-      return abbr2ptr(c);
-    case '\0':
-      return PInt;
-    default:
-      private_abort(INT_ERROR "unexpected length modifier '%c'\n", dir->length.mod);
+  switch (dir->length.mod) {
+  case 'h':
+    return dir->length.extended ? PChar : PShort;
+  case 'l':
+    return dir->length.extended ? PLongLong : PLong;
+  case 'j': /* intmax_t: signed type */
+    c = size2abbri(sizeof(intmax_t), 1);
+    return abbr2ptr(c);
+  case 'z': /* size_t: unsigned type */
+    c = size2abbri(sizeof(size_t), 0);
+    return abbr2ptr(c);
+  case 't': /* ptrdiff_t: signed type */
+    c = size2abbri(sizeof(ptrdiff_t), 1);
+    return abbr2ptr(c);
+  case '\0':
+    return PInt;
+  default:
+    private_abort(INT_ERROR "unexpected length modifier '%c'\n",
+                  dir->length.mod);
   }
   return '\0';
 }
@@ -689,16 +713,14 @@ static abbrev_t infer_n_abbr(format_directive *dir) {
    This function expects that the index given via the format directive
    `dir` is less than or equal to the length of `fmtdesc`, i.e., there is an
    actual argument that corresponds to `dir`. */
-static void validate_format_type
-  (abbrev_t expected_t, const char *fmtdesc,
-   format_directive *dir, const char *func)
-{
+static void validate_format_type(abbrev_t expected_t, const char *fmtdesc,
+                                 format_directive *dir, const char *func) {
   abbrev_t actual_t = fmtdesc[dir->arg.index];
   if (actual_t != expected_t) {
     private_abort("%s: directive %d ('%s') expects argument of type '%s'"
-      " but the corresponding argument has type '%s'\n",
-      func, dir->arg.index + 1, dir->directive,
-      abbr2str(expected_t), abbr2str(actual_t));
+                  " but the corresponding argument has type '%s'\n",
+                  func, dir->arg.index + 1, dir->directive,
+                  abbr2str(expected_t), abbr2str(actual_t));
   }
 }
 
@@ -710,28 +732,28 @@ static void validate_format_type
    @param func - name of the function (e.g., printf)
    @param wide - if set to a true value then the string should be treated as
     a wide string (wchar_t*)  */
-static long validate_format_string_argument
-  (char *s, format_directive *dir, const char *func, int wide)
-{
+static long validate_format_string_argument(char *s, format_directive *dir,
+                                            const char *func, int wide) {
   int limit = (dir->precision >= 0) ? dir->precision : -1;
-  long size =
-    (wide) ? valid_nwstring((wchar_t*)s, limit, 0) : valid_nstring(s, limit, 0);
-  switch(size) {
-    case -1:
-      private_abort
-        ("%s: attempt to access unallocated memory via directive %d ('%s')\n",
+  long size = (wide) ? valid_nwstring((wchar_t *)s, limit, 0)
+                     : valid_nstring(s, limit, 0);
+  switch (size) {
+  case -1:
+    private_abort(
+        "%s: attempt to access unallocated memory via directive %d ('%s')\n",
         func, dir->arg.index + 1, dir->directive);
-    case -2:
-      private_abort(INT_ERROR
+  case -2:
+    private_abort(
+        INT_ERROR
         "%s: writeable check unexpectedly failed in directive %d ('%s')\n",
         func, dir->arg.index + 1, dir->directive);
-    case -3:
-      private_abort("%s: attempt to access partially unallocated memory "
-        "via directive %d ('%s')\n",
-        func, dir->arg.index + 1, dir->directive);
-    case -4:
-      private_abort("%s: unterminated string in directive %d ('%s')\n",
-        func, dir->arg.index + 1, dir->directive);
+  case -3:
+    private_abort("%s: attempt to access partially unallocated memory "
+                  "via directive %d ('%s')\n",
+                  func, dir->arg.index + 1, dir->directive);
+  case -4:
+    private_abort("%s: unterminated string in directive %d ('%s')\n", func,
+                  dir->arg.index + 1, dir->directive);
   }
   return size;
 }
@@ -739,11 +761,12 @@ static long validate_format_string_argument
 /** \brief Check that a buffer of a given length overlaps with the memory space
      of a formatting directive argument. */
 static void validate_overlapping_buffer(char *buffer, size_t buf_sz, void *arg,
-    size_t arg_sz, const char *func, format_directive *dir) {
+                                        size_t arg_sz, const char *func,
+                                        format_directive *dir) {
   if (buffer) {
     if (!disjoint_spaces((uintptr_t)buffer, buf_sz, (uintptr_t)arg, arg_sz))
-      private_abort("%s: output buffer overlaps with argument %d (%s)\n",
-          func, dir->arg.index + 1, dir->directive);
+      private_abort("%s: output buffer overlaps with argument %d (%s)\n", func,
+                    dir->arg.index + 1, dir->directive);
   }
 }
 
@@ -759,25 +782,24 @@ static void validate_overlapping_buffer(char *buffer, size_t buf_sz, void *arg,
    @param func - symbolic name of a formatting function used
    @param buffer - buffer to write (in case of sprintf/snprintf, NULL otherwise)
    @param buffer - buffer limit */
-static void validate_format
-  (const char *fmtdesc, const char *fmt,
-  va_list ap, const char *func, char *buffer, size_t buf_size)
-{
+static void validate_format(const char *fmtdesc, const char *fmt, va_list ap,
+                            const char *func, char *buffer, size_t buf_size) {
 
   /* Check that format string is valid first */
-  if (valid_string((char*)fmt, 0) < 0)
-    private_abort("%s: invalid format string (unallocated or unterminated)\n", func);
+  if (valid_string((char *)fmt, 0) < 0)
+    private_abort("%s: invalid format string (unallocated or unterminated)\n",
+                  func);
 
   /* Parse format string and generate format directives */
-  format_directive ** dirs = get_format_directives((char*)fmt);
-  format_directive ** dirs_c = dirs; /* extra alias for passing it to `free` */
+  format_directive **dirs = get_format_directives((char *)fmt);
+  format_directive **dirs_c = dirs; /* extra alias for passing it to `free` */
 
   /* Track addresses of variadic arguments */
   int arglen = strlen(fmtdesc); /* number of variadic arguments */
   void *args[arglen];
   int i;
   for (int i = 0; i < arglen; i++)
-    args[i] = va_arg(ap, void*);
+    args[i] = va_arg(ap, void *);
   va_end(ap);
 
   /* Validate each generated directive */
@@ -791,94 +813,100 @@ static void validate_format
        argument except for literal directive `%%` */
     if (argno >= arglen)
       private_abort("%s: directive %d (%s) in format \"%s\" has no argument\n",
-        func, dir->arg.index + 1, dir->directive, dir->format);
+                    func, dir->arg.index + 1, dir->directive, dir->format);
 
 /* Shortcut for `validate_format_type` function */
-#define validate_type(_t) validate_format_type(_t, fmtdesc, dir, func)
+#  define validate_type(_t) validate_format_type(_t, fmtdesc, dir, func)
 
     uintptr_t addr = (uintptr_t)args[argno]; /* Address of the argument */
     char expected_t; /* Placeholder for the type expected by the directive */
 
-    switch(dir->specifier) {
-      case 'd': /* signed integer */
-      case 'i':
-        expected_t = infer_integral_abbr(dir, 1);
-        validate_type(expected_t);
-        break;
-      case 'o': /* unsigned integer */
-      case 'u':
-      case 'x': case 'X':
-        expected_t = infer_integral_abbr(dir, 0);
-        validate_type(expected_t);
-        break;
-      case 'f': case 'F': /* double */
-      case 'e': case 'E':
-      case 'g': case 'G':
-      case 'a': case 'A':
-        /* All floating point modifiers (aAeEfFgG) expect doubles except for
+    switch (dir->specifier) {
+    case 'd': /* signed integer */
+    case 'i':
+      expected_t = infer_integral_abbr(dir, 1);
+      validate_type(expected_t);
+      break;
+    case 'o': /* unsigned integer */
+    case 'u':
+    case 'x':
+    case 'X':
+      expected_t = infer_integral_abbr(dir, 0);
+      validate_type(expected_t);
+      break;
+    case 'f':
+    case 'F': /* double */
+    case 'e':
+    case 'E':
+    case 'g':
+    case 'G':
+    case 'a':
+    case 'A':
+      /* All floating point modifiers (aAeEfFgG) expect doubles except for
            the case when 'L' length modifier is given in which case it expects
            long double. Any other length modifier leads to an undefined
             behaviour. Checking that does not happen is done in
            ::validate_applications */
-        expected_t = (dir->length.mod == 'L') ? FLongDouble : FDouble;
-        validate_type(expected_t);
-        break;
-      case 'c': /* character */
-        /* On all occasions 'c' expects an `int`. This is because `char` is
+      expected_t = (dir->length.mod == 'L') ? FLongDouble : FDouble;
+      validate_type(expected_t);
+      break;
+    case 'c': /* character */
+      /* On all occasions 'c' expects an `int`. This is because `char` is
            always promoted. However, in case `l` length modifier is specified
            (i.e., "%lc") then it expects an argument be of type `wint_t` and
            can either be signed or unsigned. So let's compute it! */
-        if (dir->length.mod == 'l') {
-          wint_t wi = 1;
-          int sign = UNSIGNED(wi);
-          expected_t = size2abbri(sizeof(wint_t), !sign);
-        } else
-          expected_t = IInt;
-        validate_type(expected_t);
-        break;
-      case 's': { /* character string */
-        int wide = (dir->length.mod == 'l');
-        if (wide) { /* same as with %lc, compute sign of wchar_t */
-          wchar_t wi = 1;
-          int sign = UNSIGNED(wi);
-          expected_t = size2abbri(sizeof(wint_t), !sign);
-          expected_t = abbr2ptr(expected_t);
-        } else
-          expected_t = PChar;
-        validate_type(expected_t);
-        /* Check that a string is valid */
-        int asz = validate_format_string_argument((char*)addr, dir, func, wide);
-        validate_overlapping_buffer
-          (buffer, buf_size, (void*)addr, asz, func, dir);
-        break;
-      }
-      case 'p':
-        validate_type(PVoid);
-        if (!allocated(addr, 1, addr))
-          private_abort("%s: argument %d of directive %s not allocated\n", func,
-            argno + 1, dir->directive);
-        validate_overlapping_buffer
-          (buffer, buf_size, (void*)addr, 1, func, dir);
-        break;
-      case 'n': {
-        expected_t = infer_n_abbr(dir);
-        validate_type(expected_t);
-        /* 'n' modifier writes the number of bytes corresponding to characters
+      if (dir->length.mod == 'l') {
+        wint_t wi = 1;
+        int sign = UNSIGNED(wi);
+        expected_t = size2abbri(sizeof(wint_t), !sign);
+      } else
+        expected_t = IInt;
+      validate_type(expected_t);
+      break;
+    case 's': { /* character string */
+      int wide = (dir->length.mod == 'l');
+      if (wide) { /* same as with %lc, compute sign of wchar_t */
+        wchar_t wi = 1;
+        int sign = UNSIGNED(wi);
+        expected_t = size2abbri(sizeof(wint_t), !sign);
+        expected_t = abbr2ptr(expected_t);
+      } else
+        expected_t = PChar;
+      validate_type(expected_t);
+      /* Check that a string is valid */
+      int asz = validate_format_string_argument((char *)addr, dir, func, wide);
+      validate_overlapping_buffer(buffer, buf_size, (void *)addr, asz, func,
+                                  dir);
+      break;
+    }
+    case 'p':
+      validate_type(PVoid);
+      if (!allocated(addr, 1, addr))
+        private_abort("%s: argument %d of directive %s not allocated\n", func,
+                      argno + 1, dir->directive);
+      validate_overlapping_buffer(buffer, buf_size, (void *)addr, 1, func, dir);
+      break;
+    case 'n': {
+      expected_t = infer_n_abbr(dir);
+      validate_type(expected_t);
+      /* 'n' modifier writes the number of bytes corresponding to characters
            written by a function so far to a pointer of an integral type. Make
            sure that the provided pointer corresponds to writeable memory. */
-        int size = dir->length.bytes == 0 ?  sizeof(int) : dir->length.bytes;
-        if (!writeable(addr, size, addr))
-          private_abort("%s: argument %d of directive %s not allocated or writeable\n",
+      int size = dir->length.bytes == 0 ? sizeof(int) : dir->length.bytes;
+      if (!writeable(addr, size, addr))
+        private_abort(
+            "%s: argument %d of directive %s not allocated or writeable\n",
             func, argno, dir->directive);
-        validate_overlapping_buffer
-          (buffer, buf_size, (void*)addr, size, func, dir);
-        break;
-      }
-      default:
-        private_abort(INT_ERROR "Unexpected format specifier '%c'\n", dir->specifier);
+      validate_overlapping_buffer(buffer, buf_size, (void *)addr, size, func,
+                                  dir);
+      break;
+    }
+    default:
+      private_abort(INT_ERROR "Unexpected format specifier '%c'\n",
+                    dir->specifier);
     }
     dirs++;
-#undef validate_type
+#  undef validate_type
   }
   release_directives(fmt, dirs_c);
 }
@@ -893,7 +921,8 @@ int eacsl_builtin_printf(const char *fmtdesc, const char *fmt, ...) {
   return vprintf(fmt, ap);
 }
 
-int eacsl_builtin_fprintf(const char *fmtdesc, FILE *stream, const char *fmt, ...) {
+int eacsl_builtin_fprintf(const char *fmtdesc, FILE *stream, const char *fmt,
+                          ...) {
   va_list ap;
   va_start(ap, fmt);
   /* First check that stream belongs to allocated space */
@@ -921,13 +950,15 @@ int eacsl_builtin_dprintf(const char *fmtdesc, int fd, const char *fmt, ...) {
   va_start(ap, fmt);
   /* Make sure that the designated file descriptor is open */
   if (fcntl(fd, F_GETFD) == -1)
-    private_abort("dprintf: attempt to write to a closed file descriptor %d\n", fd);
+    private_abort("dprintf: attempt to write to a closed file descriptor %d\n",
+                  fd);
   validate_format(fmtdesc, fmt, ap, "dprintf", NULL, 0);
   va_start(ap, fmt);
   return vdprintf(fd, fmt, ap);
 }
 
-int eacsl_builtin_sprintf(const char *fmtdesc, char *buffer, const char *fmt, ...) {
+int eacsl_builtin_sprintf(const char *fmtdesc, char *buffer, const char *fmt,
+                          ...) {
   va_list ap;
   /* Make sure that the buffer has sufficient space to store the result of the
      function. Luckily this can be accomplished via `snprintf(buf, n, mfmt,...)`
@@ -938,8 +969,10 @@ int eacsl_builtin_sprintf(const char *fmtdesc, char *buffer, const char *fmt, ..
   va_start(ap, fmt);
   int len = vsnprintf(NULL, 0, fmt, ap);
   if (!writeable((uintptr_t)buffer, len + 1, (uintptr_t)buffer))
-    private_abort("sprintf: output buffer is unallocated or has insufficient length "
-      "to store %d characters or not writeable\n", len + 1);
+    private_abort(
+        "sprintf: output buffer is unallocated or has insufficient length "
+        "to store %d characters or not writeable\n",
+        len + 1);
   va_start(ap, fmt);
   validate_format(fmtdesc, fmt, ap, "sprintf", buffer, len + 1);
   va_start(ap, fmt);
@@ -951,15 +984,17 @@ int eacsl_builtin_sprintf(const char *fmtdesc, char *buffer, const char *fmt, ..
 }
 
 int eacsl_builtin_snprintf(const char *fmtdesc, char *buffer, size_t size,
-    const char *fmt, ...) {
+                           const char *fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
   validate_format(fmtdesc, fmt, ap, "snprintf", buffer, size);
   /* Check that the input buffer is large enough. However, if there are zero
      characters to write, it does not matter */
   if (size > 0 && !writeable((uintptr_t)buffer, size, (uintptr_t)buffer))
-    private_abort("sprintf: output buffer is unallocated or has insufficient length "
-      "to store %d characters and \\0 terminator or not writeable\n", size);
+    private_abort(
+        "sprintf: output buffer is unallocated or has insufficient length "
+        "to store %d characters and \\0 terminator or not writeable\n",
+        size);
   va_start(ap, fmt);
   int res = vsnprintf(buffer, size, fmt, ap);
   if (res >= 0 && size > 0) {
@@ -968,7 +1003,8 @@ int eacsl_builtin_snprintf(const char *fmtdesc, char *buffer, size_t size,
   return res;
 }
 
-int eacsl_builtin_syslog(const char *fmtdesc, int priority, const char *fmt, ...) {
+int eacsl_builtin_syslog(const char *fmtdesc, int priority, const char *fmt,
+                         ...) {
   va_list ap;
   va_start(ap, fmt);
   validate_format(fmtdesc, fmt, ap, "syslog", NULL, 0);

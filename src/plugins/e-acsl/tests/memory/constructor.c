@@ -5,10 +5,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-__attribute__((constructor))
-void f() {
+__attribute__((constructor)) void f() {
   printf("f\n");
-  char *buf = (char*)malloc(10*sizeof(char));
+  char *buf = (char *)malloc(10 * sizeof(char));
   free(buf);
 }
 

@@ -7,7 +7,7 @@
 int A = 0;
 int B;
 
-#define ODD(_n) (_n%2 != 0)
+#define ODD(_n) (_n % 2 != 0)
 
 int main(void) {
   /* All globals are initialized, even if the initializer is not given */
@@ -22,7 +22,7 @@ int main(void) {
   int a = 0;
   int b;
   long *r;
-  long c[2] = { 1, 1 };
+  long c[2] = {1, 1};
   long d[2];
   p = &a;
   q = &b;
@@ -61,16 +61,16 @@ int main(void) {
   /*@assert \initialized(r+1); */
 
   /* Malloc allocates un-initialized memory */
-  p = (int*)malloc(sizeof(int*));
+  p = (int *)malloc(sizeof(int *));
   /*@assert ! \initialized(p); */
 
   /* Calloc allocates initialized memory */
-  q = (int*)calloc(1, sizeof(int));
+  q = (int *)calloc(1, sizeof(int));
   /*@ assert \initialized(q); */
 
   /* Block reallocared using `realloc' carries initialization of the
    * existing fragment but does not initialize the newly allocated one */
-  q = (int*)realloc(q, 2*sizeof(int));
+  q = (int *)realloc(q, 2 * sizeof(int));
   /*@assert \initialized(q); */
   q++;
   /*@assert ! \initialized(q); */
@@ -131,11 +131,11 @@ int main(void) {
   free(q);
 
   /* Spoofing access to a non-existing stack address */
-  q = (int*)(&q - 1024*5);
+  q = (int *)(&q - 1024 * 5);
   /*assert ! \initialized(q); */
 
   /* Spoofing access to a non-existing global address */
-  q = (int*)128;
+  q = (int *)128;
   /*@assert ! \initialized(q); */
 
   p = NULL;
@@ -143,8 +143,8 @@ int main(void) {
 
   /* Partial initialization */
   int size = 100;
-  char *partsc = (char*)malloc(size*sizeof(char));
-  char *partsi = (char*)malloc(size*sizeof(int));
+  char *partsc = (char *)malloc(size * sizeof(char));
+  char *partsi = (char *)malloc(size * sizeof(int));
 
   for (int i = 0; i < size; i++) {
     if (ODD(i))
@@ -165,7 +165,7 @@ int main(void) {
 
   /* Check duplicate initialization does not affect correct count of
    * initialized bits (relevant for bittree model). */
-  int dup [2];
+  int dup[2];
   dup[0] = 1;
   dup[0] = 1;
   /* @assert ! \initialized(&dup); */

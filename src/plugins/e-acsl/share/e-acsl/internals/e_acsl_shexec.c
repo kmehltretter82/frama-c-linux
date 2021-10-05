@@ -23,23 +23,23 @@
 /*! ***********************************************************************
  * \file
  * \brief Implementation for running shell commands
-***************************************************************************/
+ **************************************************************************/
 
 #include "e_acsl_config.h"
 
 // Only available on linux
 #if E_ACSL_OS_IS_LINUX
 
-#include <errno.h>
-#include <stddef.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
+#  include <errno.h>
+#  include <stddef.h>
+#  include <sys/types.h>
+#  include <sys/wait.h>
+#  include <unistd.h>
 
-#include "e_acsl_malloc.h"
-#include "e_acsl_rtl_string.h"
+#  include "e_acsl_malloc.h"
+#  include "e_acsl_rtl_string.h"
 
-#include "e_acsl_shexec.h"
+#  include "e_acsl_shexec.h"
 
 /* \brief Read characters from a buffer associated with a file descriptor into
  * a C string
@@ -54,13 +54,13 @@
  *
  * \return NUL-terminated C string on success
  * \return NULL on failure */
-static char* fd_read (int fd, short bufsize) {
+static char *fd_read(int fd, short bufsize) {
   /* Read `buffer_size` chars at a time */
-  short buffer_size = bufsize*sizeof(char);
+  short buffer_size = bufsize * sizeof(char);
   /* Size of the fetched string */
   int size = buffer_size;
   /* Buffer where for read data */
-  char *buffer = (char*)private_malloc(size);
+  char *buffer = (char *)private_malloc(size);
   /* The number of read bytes  */
   short fetched = 0;
   int rd = 0; /* Count of fetched characters */
@@ -70,7 +70,7 @@ static char* fd_read (int fd, short bufsize) {
   while ((fetched = read(fd, buffer + size - buffer_size, buffer_size))) {
     rd += fetched;
     if (fetched != -1) {
-      size += fetched*sizeof(char);
+      size += fetched * sizeof(char);
       buffer = private_realloc(buffer, size + 1);
     } else {
       return NULL;
@@ -81,15 +81,15 @@ static char* fd_read (int fd, short bufsize) {
 }
 
 /* Execute a command in the shell and place results to data */
-static ipr_t* __shexec (ipr_t *data) {
+static ipr_t *__shexec(ipr_t *data) {
   int outfd[2], errfd[2], infd[2];
   int oldstdout, oldstderr, oldstdin;
 
-  if (pipe(infd))  /* From where parent is going to read */
+  if (pipe(infd)) /* From where parent is going to read */
     data->error = nstrdup("Can not create a pipe for STDIN");
-  if (pipe(outfd))  /* From where parent is going to read */
+  if (pipe(outfd)) /* From where parent is going to read */
     data->error = nstrdup("Can not create a pipe for STDOUT");
-  if (pipe(errfd))  /* From where parent is going to read */
+  if (pipe(errfd)) /* From where parent is going to read */
     data->error = nstrdup("Can not create a pipe for STDERR");
 
   /* Immediately return if reading from one of the STD pipes failed */
@@ -97,7 +97,7 @@ static ipr_t* __shexec (ipr_t *data) {
     return data;
 
   /* Save stdin, stdout and stderr */
-  oldstdin  = dup(0);
+  oldstdin = dup(0);
   oldstdout = dup(1);
   oldstderr = dup(2);
 
@@ -107,21 +107,25 @@ static ipr_t* __shexec (ipr_t *data) {
   close(2);
 
   dup2(infd[0], 0);  /* Make the read end of infd as STDIN */
-  dup2(outfd[1],1);  /* Make the write end of outfd as STDOUT */
-  dup2(errfd[1],2);  /* Make the write end of outfd as STDERR */
+  dup2(outfd[1], 1); /* Make the write end of outfd as STDOUT */
+  dup2(errfd[1], 2); /* Make the write end of outfd as STDERR */
 
   pid_t pid = fork();
 
-  if(!pid) {
+  if (!pid) {
     /* Close the streams as they are not required for a child */
-    close(infd[0]); close(outfd[0]); close(errfd[0]);
-    close(infd[1]); close(outfd[1]); close(errfd[1]);
+    close(infd[0]);
+    close(outfd[0]);
+    close(errfd[0]);
+    close(infd[1]);
+    close(outfd[1]);
+    close(errfd[1]);
 
-    execvp(data->argv[0],data->argv);
+    execvp(data->argv[0], data->argv);
     if (errno) {
       data->error = nstrdup("Failed to execute:\n  ");
       char **arg = data->argv - 1;
-      while(*++arg)
+      while (*++arg)
         data->error = sappend(*arg, data->error, " ");
     }
   } else {
@@ -129,15 +133,15 @@ static ipr_t* __shexec (ipr_t *data) {
     close(1);
     close(2);
     dup2(oldstdin, 0);
-    dup2(oldstdout,1);
-    dup2(oldstderr,2);
+    dup2(oldstdout, 1);
+    dup2(oldstderr, 2);
     close(outfd[1]);
     close(errfd[1]);
     close(infd[0]);
 
     /* If data->stdin string is supplied, write that string to the child's
        stdin first */
-    if (data->stdins)  /* Return NULL if write fails */
+    if (data->stdins) /* Return NULL if write fails */
       if (write(infd[1], data->stdins, strlen(data->stdins)) == -1)
         return NULL;
 
@@ -167,7 +171,7 @@ static ipr_t* __shexec (ipr_t *data) {
 }
 
 /* \brief Deallocate an `ipr_t` structure returned by `shexec` */
-static void free_ipr (ipr_t* ipr) {
+static void free_ipr(ipr_t *ipr) {
   if (ipr) {
     if (ipr->stdouts)
       private_free(ipr->stdouts);
@@ -192,10 +196,10 @@ static void free_ipr (ipr_t* ipr) {
  * \return - heap-allocated struct `ipr_t` which describes the output of the
  *  executed command. Deallocation of this struct must be performed via the
  *  `free_ipr` function. */
-ipr_t* shexec (char **data, const char *sin) {
+ipr_t *shexec(char **data, const char *sin) {
   /* Allocate and initialise the `ipr_t` struct to store the results
    * of the command execution */
-  ipr_t  *ipr = (ipr_t*)private_malloc(sizeof(ipr_t));
+  ipr_t *ipr = (ipr_t *)private_malloc(sizeof(ipr_t));
   ipr->stderrs = NULL;
   ipr->stdouts = NULL;
   ipr->stdins = nstrdup(sin);

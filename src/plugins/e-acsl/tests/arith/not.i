@@ -4,6 +4,8 @@
 int main(void) {
   int x = 0;
   /*@ assert ! x; */
-  if (x) /*@ assert x; */ ;
+  if (x) {
+    /*@ assert x; */;
+  }
   return 0;
 }

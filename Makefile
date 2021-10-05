@@ -1792,7 +1792,7 @@ FIX_SYNTAX_TARGET=$(patsubst %,%.fix-syntax,$(ML_LINT_CHECK))
 
 indent: $(INDENT_TARGET)
 
-lint: $(LINT_TARGET)
+lint:: $(LINT_TARGET)
 
 check-ocp-indent-version:
 	if command -v ocp-indent >/dev/null; then \

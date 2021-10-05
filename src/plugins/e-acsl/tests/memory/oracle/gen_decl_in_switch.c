@@ -31,7 +31,7 @@ void compound_decl_and_init(int value)
                                         (void *)(& a),(void *)0);
     __e_acsl_assert(__gen_e_acsl_valid,1,"Assertion",
                     "compound_decl_and_init","\\valid(&a)",
-                    "tests/memory/decl_in_switch.c",26);
+                    "tests/memory/decl_in_switch.c",22);
   }
   /*@ assert \valid(&a); */ ;
   switch (value) {
@@ -42,7 +42,7 @@ void compound_decl_and_init(int value)
                                             (void *)(& b),(void *)0);
       __e_acsl_assert(__gen_e_acsl_valid_2,1,"Assertion",
                       "compound_decl_and_init","\\valid(&b)",
-                      "tests/memory/decl_in_switch.c",31);
+                      "tests/memory/decl_in_switch.c",26);
     }
     /*@ assert \valid(&b); */ ;
     case 0: ;
@@ -55,7 +55,7 @@ void compound_decl_and_init(int value)
                                             (void *)(& c),(void *)0);
       __e_acsl_assert(__gen_e_acsl_valid_3,1,"Assertion",
                       "compound_decl_and_init","\\valid(&c)",
-                      "tests/memory/decl_in_switch.c",35);
+                      "tests/memory/decl_in_switch.c",30);
     }
     /*@ assert \valid(&c); */ ;
     __e_acsl_delete_block((void *)(& c));
@@ -71,7 +71,7 @@ void compound_decl_and_init(int value)
                                             (void *)(& d),(void *)0);
       __e_acsl_assert(__gen_e_acsl_valid_4,1,"Assertion",
                       "compound_decl_and_init","\\valid(&d)",
-                      "tests/memory/decl_in_switch.c",40);
+                      "tests/memory/decl_in_switch.c",35);
     }
     /*@ assert \valid(&d); */ ;
     __e_acsl_delete_block((void *)(& c));
@@ -96,7 +96,7 @@ void separate_decl_and_init(int value)
                                         (void *)(& a),(void *)0);
     __e_acsl_assert(__gen_e_acsl_valid,1,"Assertion",
                     "separate_decl_and_init","\\valid(&a)",
-                    "tests/memory/decl_in_switch.c",51);
+                    "tests/memory/decl_in_switch.c",45);
   }
   /*@ assert \valid(&a); */ ;
   switch (value) {
@@ -112,7 +112,7 @@ void separate_decl_and_init(int value)
                                             (void *)(& b),(void *)0);
       __e_acsl_assert(__gen_e_acsl_valid_2,1,"Assertion",
                       "separate_decl_and_init","\\valid(&b)",
-                      "tests/memory/decl_in_switch.c",57);
+                      "tests/memory/decl_in_switch.c",50);
     }
     /*@ assert \valid(&b); */ ;
     case 0: __e_acsl_store_block_duplicate((void *)(& c),(size_t)4);
@@ -126,7 +126,7 @@ void separate_decl_and_init(int value)
                                             (void *)(& c),(void *)0);
       __e_acsl_assert(__gen_e_acsl_valid_3,1,"Assertion",
                       "separate_decl_and_init","\\valid(&c)",
-                      "tests/memory/decl_in_switch.c",62);
+                      "tests/memory/decl_in_switch.c",55);
     }
     /*@ assert \valid(&c); */ ;
     __e_acsl_delete_block((void *)(& c));
@@ -143,7 +143,7 @@ void separate_decl_and_init(int value)
                                             (void *)(& d),(void *)0);
       __e_acsl_assert(__gen_e_acsl_valid_4,1,"Assertion",
                       "separate_decl_and_init","\\valid(&d)",
-                      "tests/memory/decl_in_switch.c",68);
+                      "tests/memory/decl_in_switch.c",61);
     }
     /*@ assert \valid(&d); */ ;
     __e_acsl_delete_block((void *)(& c));
@@ -169,7 +169,7 @@ void label_in_switch(int value)
       __gen_e_acsl_valid = __e_acsl_valid((void *)(& d),sizeof(int),
                                           (void *)(& d),(void *)0);
       __e_acsl_assert(__gen_e_acsl_valid,1,"Assertion","label_in_switch",
-                      "\\valid(&d)","tests/memory/decl_in_switch.c",83);
+                      "\\valid(&d)","tests/memory/decl_in_switch.c",74);
     }
     /*@ assert \valid(&d); */ ;
     L: case 0: __e_acsl_store_block_duplicate((void *)(& d),(size_t)4);
@@ -182,7 +182,7 @@ void label_in_switch(int value)
       __gen_e_acsl_valid_2 = __e_acsl_valid((void *)(& e),sizeof(int),
                                             (void *)(& e),(void *)0);
       __e_acsl_assert(__gen_e_acsl_valid_2,1,"Assertion","label_in_switch",
-                      "\\valid(&e)","tests/memory/decl_in_switch.c",89);
+                      "\\valid(&e)","tests/memory/decl_in_switch.c",80);
     }
     /*@ assert \valid(&e); */ ;
     __e_acsl_delete_block((void *)(& d));
@@ -199,7 +199,7 @@ void label_in_switch(int value)
       __gen_e_acsl_valid_3 = __e_acsl_valid((void *)(& ff),sizeof(int),
                                             (void *)(& ff),(void *)0);
       __e_acsl_assert(__gen_e_acsl_valid_3,1,"Assertion","label_in_switch",
-                      "\\valid(&ff)","tests/memory/decl_in_switch.c",93);
+                      "\\valid(&ff)","tests/memory/decl_in_switch.c",84);
     }
     /*@ assert \valid(&ff); */ ;
     __e_acsl_delete_block((void *)(& d));

@@ -48,7 +48,7 @@ int __gen_e_acsl_h(void)
   int __retres;
   __retres = h();
   __e_acsl_assert(__retres == 0,1,"Postcondition","h","\\result == 0",
-                  "tests/constructs/result.i",18);
+                  "tests/constructs/result.i",19);
   return __retres;
 }
 
@@ -61,9 +61,9 @@ int __gen_e_acsl_g(int x)
   __gen_e_acsl_at = x;
   __retres = g(x);
   __e_acsl_assert(__retres == __gen_e_acsl_at,1,"Postcondition","g",
-                  "\\result == \\old(x)","tests/constructs/result.i",12);
+                  "\\result == \\old(x)","tests/constructs/result.i",13);
   __e_acsl_assert(__retres == Y,1,"Postcondition","g","\\result == Y",
-                  "tests/constructs/result.i",13);
+                  "tests/constructs/result.i",14);
   return __retres;
 }
 

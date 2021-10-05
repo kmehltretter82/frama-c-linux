@@ -34,26 +34,26 @@
  *    at compile-time.
  *  - For the case when the analysed program contains customised definitions
  *    of string.h functions use GLIBC-based implementations.
-***************************************************************************/
+ **************************************************************************/
 
 #ifndef E_ACSL_RTL_STRING_H
 #define E_ACSL_RTL_STRING_H
 
 #ifndef E_ACSL_NO_COMPILER_BUILTINS
-# define memset   __builtin_memset
-# define memcmp   __builtin_memcmp
-# define memcpy   __builtin_memcpy
-# define memmove  __builtin_memmove
-# define strncat  __builtin_strncat
-# define strcat   __builtin_strcat
-# define strlen   __builtin_strlen
-# define strcmp   __builtin_strcmp
-# define strncmp  __builtin_strncmp
-# define strcpy   __builtin_strcpy
-# define strncpy  __builtin_strncpy
-# define strchr   __builtin_strchr
+#  define memset  __builtin_memset
+#  define memcmp  __builtin_memcmp
+#  define memcpy  __builtin_memcpy
+#  define memmove __builtin_memmove
+#  define strncat __builtin_strncat
+#  define strcat  __builtin_strcat
+#  define strlen  __builtin_strlen
+#  define strcmp  __builtin_strcmp
+#  define strncmp __builtin_strncmp
+#  define strcpy  __builtin_strcpy
+#  define strncpy __builtin_strncpy
+#  define strchr  __builtin_strchr
 #else
-# include <string.h>
+#  include <string.h>
 #endif
 
 #include <stddef.h>

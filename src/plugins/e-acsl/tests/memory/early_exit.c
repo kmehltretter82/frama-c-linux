@@ -36,11 +36,11 @@ int goto_valid() {
 
         goto FIRST;
         /* Dead code */
-        p = (void*)0;
+        p = (void *)0;
         r = q = &a;
       }
     }
-FIRST:
+  FIRST:
     /* at this point 'a1' is still in scope, while 'a2' and 'a3 are not,
        thus 'q' and 'r' become invalid, whereas 'p' is still valid. */
     /*@ assert   \valid(p); */
@@ -66,22 +66,22 @@ int switch_valid() {
   int *p, *q, *s;
   {
     s = &i;
-    switch(i) {
-      default: {
-        int a1 = 0;
-        p = &a1;
-        {
-          int a2 = 0;
-          q = &a2;
-          /*@ assert \valid(p); */
-          /*@ assert \valid(q); */
-          /*@ assert \valid(s); */
-          break;
-        }
-        /* dead code */
-        p = q = &i;
-        s = (void*)0;
+    switch (i) {
+    default: {
+      int a1 = 0;
+      p = &a1;
+      {
+        int a2 = 0;
+        q = &a2;
+        /*@ assert \valid(p); */
+        /*@ assert \valid(q); */
+        /*@ assert \valid(s); */
+        break;
       }
+      /* dead code */
+      p = q = &i;
+      s = (void *)0;
+    }
     }
     /* [break] invalidates 'p' and 'q' but 's' is still in scope. */
     /*@ assert ! \valid(q); */

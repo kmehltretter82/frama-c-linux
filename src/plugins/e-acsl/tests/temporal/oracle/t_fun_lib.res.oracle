@@ -1,6 +1,6 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
-[kernel:annot:missing-spec] tests/temporal/t_fun_lib.c:20: Warning: 
+[kernel:annot:missing-spec] tests/temporal/t_fun_lib.c:19: Warning: 
   Neither code nor specification for function realpath, generating default assigns from the prototype
-[eva:alarm] tests/temporal/t_fun_lib.c:23: Warning: 
+[eva:alarm] tests/temporal/t_fun_lib.c:22: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status invalid.

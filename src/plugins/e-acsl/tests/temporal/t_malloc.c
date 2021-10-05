@@ -11,7 +11,7 @@ int main(void) {
   /*@assert ! \valid(p); */
   /*@assert ! \valid(q); */
 
-  p = (int*)malloc(sizeof(int));
+  p = (int *)malloc(sizeof(int));
   q = p;
 
   /*@assert \valid(p); */
@@ -22,7 +22,7 @@ int main(void) {
   /*@assert ! \valid(p); */
   /*@assert ! \valid(q); */
 
-  p = (int*)malloc(sizeof(int));
+  p = (int *)malloc(sizeof(int));
   /* q is temporally invalid: points to the block allocated by the first malloc
      call which has been deallocated, while p is valid */
   /*@assert \valid(p); */
@@ -31,11 +31,11 @@ int main(void) {
   *p = 2;
 
   /* ... and for calloc .. */
-  q = (char*)calloc(4096,1);
+  q = (char *)calloc(4096, 1);
   /*@assert \valid(q); */
 
   /* ... and and realloc  */
-  q = (char*)realloc(q, 8192);
+  q = (char *)realloc(q, 8192);
   /*@assert \valid(q); */
   return 0;
 }

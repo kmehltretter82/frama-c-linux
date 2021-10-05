@@ -11,7 +11,8 @@
   @ ensures \result == \old(*p); */
 int f(int *p) {
   /*@ loop invariant 0 <= i <= 1; */
-  for(int i = 0; i < 1; i++) ;
+  for (int i = 0; i < 1; i++)
+    ;
   return 0;
 }
 
@@ -20,7 +21,8 @@ int f(int *p) {
   @ ensures \result == \old(*p); */
 int g(int *p) {
   /*@ loop invariant 0 <= i <= 1; */
-  for(int i = 0; i < 1; i++) ;
+  for (int i = 0; i < 1; i++)
+    ;
   return 0;
 }
 

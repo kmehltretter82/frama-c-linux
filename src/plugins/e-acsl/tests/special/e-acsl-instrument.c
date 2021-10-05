@@ -15,11 +15,12 @@ int uninstrument1(int *p) {
 
 /*@ requires \valid(p); */
 int uninstrument2(int *p) {
-  { int *q = p;
+  {
+    int *q = p;
     *p = 0;
     goto L;
   }
- L:
+L:
   return 0;
 }
 
@@ -30,11 +31,12 @@ int instrument1(int *p) {
 
 /*@ requires \valid(p); */
 int instrument2(int *p) {
-  { int *q = p;
+  {
+    int *q = p;
     *p = 0;
     goto L;
   }
- L:
+L:
   return 0;
 }
 

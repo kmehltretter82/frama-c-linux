@@ -22,10 +22,10 @@ int __gen_e_acsl_main(void)
       ensures X ≡ 2; */
   {
     __e_acsl_assert(X == 1,1,"Precondition","main","X == 1",
-                    "tests/constructs/labeled_stmt.i",12);
+                    "tests/constructs/labeled_stmt.i",13);
     X = 2;
     __e_acsl_assert(X == 2,1,"Postcondition","main","X == 2",
-                    "tests/constructs/labeled_stmt.i",12);
+                    "tests/constructs/labeled_stmt.i",13);
   }
   if (X) {
     X = 3;

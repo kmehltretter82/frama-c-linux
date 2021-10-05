@@ -22,14 +22,14 @@
 
 #ifdef E_ACSL_TEMPORAL
 
-#include <stddef.h>
+#  include <stddef.h>
 
-#include "../internals/e_acsl_private_assert.h"
-#include "../observation_model/internals/e_acsl_omodel_debug.h"
-#include "../observation_model/internals/e_acsl_timestamp_retrieval.h"
-#include "e_acsl_temporal_timestamp.h"
+#  include "../internals/e_acsl_private_assert.h"
+#  include "../observation_model/internals/e_acsl_omodel_debug.h"
+#  include "../observation_model/internals/e_acsl_timestamp_retrieval.h"
+#  include "e_acsl_temporal_timestamp.h"
 
-#include "e_acsl_temporal.h"
+#  include "e_acsl_temporal.h"
 
 /* Temporal store {{{ */
 void eacsl_temporal_store_nblock(void *lhs, void *rhs) {
@@ -45,7 +45,7 @@ void eacsl_temporal_store_nreferent(void *lhs, void *rhs) {
 void eacsl_temporal_memcpy(void *dest, void *src, size_t size) {
   /* Memcpy is only relevant for pointers here, so if there is a
    * copy under a pointer's size then there no point in copying memory*/
-  if (size >= sizeof(void*)) {
+  if (size >= sizeof(void *)) {
     DVALIDATE_ALLOCATED(src, size, src);
     DVALIDATE_WRITEABLE(dest, size, dest);
     void *dest_shadow = (void *)temporal_referent_shadow(dest);
@@ -79,18 +79,18 @@ void eacsl_temporal_save_copy_parameter(void *ptr, unsigned int param) {
 
 void eacsl_temporal_pull_parameter(void *ptr, unsigned int param, size_t size) {
   struct temporal_parameter *tpar = &parameter_referents[param];
-  switch(tpar->temporal_flow) {
-    case TBlockN:
-      store_temporal_referent(ptr, origin_timestamp(tpar->ptr));
-      break;
-    case TReferentN:
-      store_temporal_referent(ptr, referent_timestamp(tpar->ptr));
-      break;
-    case TCopy:
-      eacsl_temporal_memcpy(ptr, tpar->ptr, size);
-      break;
-    default:
-      private_assert(0, "Unreachable", NULL);
+  switch (tpar->temporal_flow) {
+  case TBlockN:
+    store_temporal_referent(ptr, origin_timestamp(tpar->ptr));
+    break;
+  case TReferentN:
+    store_temporal_referent(ptr, referent_timestamp(tpar->ptr));
+    break;
+  case TCopy:
+    eacsl_temporal_memcpy(ptr, tpar->ptr, size);
+    break;
+  default:
+    private_assert(0, "Unreachable", NULL);
   }
 }
 
@@ -101,7 +101,7 @@ void eacsl_temporal_reset_parameters() {
 
 /* Return values {{{ */
 void eacsl_temporal_save_return(void *ptr) {
-  return_referent = (ptr, sizeof(void*)) ? referent_timestamp(ptr) : 0;
+  return_referent = (ptr, sizeof(void *)) ? referent_timestamp(ptr) : 0;
 }
 
 void eacsl_temporal_pull_return(void *ptr) {

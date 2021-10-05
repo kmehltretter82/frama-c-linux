@@ -46,7 +46,7 @@ int main(void)
                                                     sizeof(union msg));
     __e_acsl_assert(__gen_e_acsl_initialized,1,"Assertion","main",
                     "\\initialized((union msg *)((unsigned char *)buf))",
-                    "tests/bts/bts1304.i",24);
+                    "tests/bts/bts1304.i",32);
   }
   /*@ assert \initialized((union msg *)((unsigned char *)buf)); */ ;
   __retres = 0;

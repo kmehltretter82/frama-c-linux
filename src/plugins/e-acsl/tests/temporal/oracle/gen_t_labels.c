@@ -79,7 +79,7 @@ int main(int argc, char const **argv)
     else __gen_e_acsl_and_3 = 0;
     __e_acsl_assert(__gen_e_acsl_and_3,1,"Assertion","main",
                     "\\valid(p) && \\valid(q)","tests/temporal/t_labels.c",
-                    28);
+                    26);
   }
   /*@ assert \valid(p) ∧ \valid(q); */ ;
   __e_acsl_full_init((void *)(& q));
@@ -98,7 +98,7 @@ int main(int argc, char const **argv)
     }
     else __gen_e_acsl_and_4 = 0;
     __e_acsl_assert(__gen_e_acsl_and_4,1,"Assertion","main","\\valid(p)",
-                    "tests/temporal/t_labels.c",32);
+                    "tests/temporal/t_labels.c",30);
   }
   /*@ assert \valid(p); */ ;
   __retres = 0;

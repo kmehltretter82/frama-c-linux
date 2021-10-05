@@ -17,25 +17,25 @@ int main(void)
       ensures x ≥ 1; */
   if (x) {
     __e_acsl_assert(0,1,"Assertion","main","\\false",
-                    "tests/constructs/nested_code_annot.i",11);
+                    "tests/constructs/nested_code_annot.i",12);
     /*@ assert \false; */ ;
   }
   else {
     __e_acsl_assert(x == 0,1,"Precondition","main","x == 0",
-                    "tests/constructs/nested_code_annot.i",13);
+                    "tests/constructs/nested_code_annot.i",14);
     /*@ requires x ≡ 0;
         ensures x ≡ 1; */
     x ++;
     __e_acsl_assert(x == 1,1,"Postcondition","main","x == 1",
-                    "tests/constructs/nested_code_annot.i",14);
+                    "tests/constructs/nested_code_annot.i",15);
     if (x) {
       __e_acsl_assert(x == 1,1,"Precondition","main","x == 1",
-                      "tests/constructs/nested_code_annot.i",17);
+                      "tests/constructs/nested_code_annot.i",18);
       /*@ requires x ≡ 1;
           ensures x ≡ 2; */
       x ++;
       __e_acsl_assert(x == 2,1,"Postcondition","main","x == 2",
-                      "tests/constructs/nested_code_annot.i",18);
+                      "tests/constructs/nested_code_annot.i",19);
     }
     else {
       __e_acsl_assert(0,1,"Assertion","main","\\false",

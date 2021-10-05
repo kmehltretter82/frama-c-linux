@@ -152,7 +152,7 @@ int main(int argc, char const **argv)
     }
     else __gen_e_acsl_and = 0;
     __e_acsl_assert(__gen_e_acsl_and,1,"Assertion","main","\\valid_read(p)",
-                    "tests/temporal/t_local_init.c",41);
+                    "tests/temporal/t_local_init.c",35);
   }
   /*@ assert \valid_read(p); */ ;
   {
@@ -177,7 +177,7 @@ int main(int argc, char const **argv)
       else __gen_e_acsl_and_2 = 0;
       __e_acsl_assert(__gen_e_acsl_and_2,1,"RTE","main",
                       "mem_access: \\valid_read(p)",
-                      "tests/temporal/t_local_init.c",42);
+                      "tests/temporal/t_local_init.c",36);
       __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)*p,
                                                       sizeof(char),
                                                       (void *)*p,(void *)p);
@@ -185,7 +185,7 @@ int main(int argc, char const **argv)
     }
     else __gen_e_acsl_and_3 = 0;
     __e_acsl_assert(__gen_e_acsl_and_3,1,"Assertion","main",
-                    "\\valid_read(*p)","tests/temporal/t_local_init.c",42);
+                    "\\valid_read(*p)","tests/temporal/t_local_init.c",36);
   }
   /*@ assert \valid_read(*p); */ ;
   char *str[4] =
@@ -220,7 +220,7 @@ int main(int argc, char const **argv)
     }
     else __gen_e_acsl_and_4 = 0;
     __e_acsl_assert(__gen_e_acsl_and_4,1,"Assertion","main",
-                    "\\valid_read(p)","tests/temporal/t_local_init.c",48);
+                    "\\valid_read(p)","tests/temporal/t_local_init.c",42);
   }
   /*@ assert \valid_read(p); */ ;
   {
@@ -245,7 +245,7 @@ int main(int argc, char const **argv)
       else __gen_e_acsl_and_5 = 0;
       __e_acsl_assert(__gen_e_acsl_and_5,1,"RTE","main",
                       "mem_access: \\valid_read(p)",
-                      "tests/temporal/t_local_init.c",49);
+                      "tests/temporal/t_local_init.c",43);
       __gen_e_acsl_valid_read_6 = __e_acsl_valid_read((void *)*p,
                                                       sizeof(char),
                                                       (void *)*p,(void *)p);
@@ -253,7 +253,7 @@ int main(int argc, char const **argv)
     }
     else __gen_e_acsl_and_6 = 0;
     __e_acsl_assert(__gen_e_acsl_and_6,1,"Assertion","main",
-                    "\\valid_read(*p)","tests/temporal/t_local_init.c",49);
+                    "\\valid_read(*p)","tests/temporal/t_local_init.c",43);
   }
   /*@ assert \valid_read(*p); */ ;
   char **P = (char **)(Strings);
@@ -275,7 +275,7 @@ int main(int argc, char const **argv)
     }
     else __gen_e_acsl_and_7 = 0;
     __e_acsl_assert(__gen_e_acsl_and_7,1,"Assertion","main",
-                    "\\valid_read(P)","tests/temporal/t_local_init.c",53);
+                    "\\valid_read(P)","tests/temporal/t_local_init.c",47);
   }
   /*@ assert \valid_read(P); */ ;
   {
@@ -300,7 +300,7 @@ int main(int argc, char const **argv)
       else __gen_e_acsl_and_8 = 0;
       __e_acsl_assert(__gen_e_acsl_and_8,1,"RTE","main",
                       "mem_access: \\valid_read(P)",
-                      "tests/temporal/t_local_init.c",54);
+                      "tests/temporal/t_local_init.c",48);
       __gen_e_acsl_valid_read_9 = __e_acsl_valid_read((void *)*P,
                                                       sizeof(char),
                                                       (void *)*P,(void *)P);
@@ -308,7 +308,7 @@ int main(int argc, char const **argv)
     }
     else __gen_e_acsl_and_9 = 0;
     __e_acsl_assert(__gen_e_acsl_and_9,1,"Assertion","main",
-                    "\\valid_read(*P)","tests/temporal/t_local_init.c",54);
+                    "\\valid_read(*P)","tests/temporal/t_local_init.c",48);
   }
   /*@ assert \valid_read(*P); */ ;
   __e_acsl_full_init((void *)(& P));
@@ -329,7 +329,7 @@ int main(int argc, char const **argv)
     }
     else __gen_e_acsl_and_10 = 0;
     __e_acsl_assert(__gen_e_acsl_and_10,1,"Assertion","main",
-                    "\\valid_read(P)","tests/temporal/t_local_init.c",58);
+                    "\\valid_read(P)","tests/temporal/t_local_init.c",52);
   }
   /*@ assert \valid_read(P); */ ;
   {
@@ -354,7 +354,7 @@ int main(int argc, char const **argv)
       else __gen_e_acsl_and_11 = 0;
       __e_acsl_assert(__gen_e_acsl_and_11,1,"RTE","main",
                       "mem_access: \\valid_read(P)",
-                      "tests/temporal/t_local_init.c",59);
+                      "tests/temporal/t_local_init.c",53);
       __gen_e_acsl_valid_read_12 = __e_acsl_valid_read((void *)*P,
                                                        sizeof(char),
                                                        (void *)*P,(void *)P);
@@ -362,7 +362,7 @@ int main(int argc, char const **argv)
     }
     else __gen_e_acsl_and_12 = 0;
     __e_acsl_assert(__gen_e_acsl_and_12,1,"Assertion","main",
-                    "\\valid_read(*P)","tests/temporal/t_local_init.c",59);
+                    "\\valid_read(*P)","tests/temporal/t_local_init.c",53);
   }
   /*@ assert \valid_read(*P); */ ;
   int extra_lbits[1] = {0};

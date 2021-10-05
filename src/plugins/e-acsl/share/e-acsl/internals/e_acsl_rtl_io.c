@@ -39,7 +39,7 @@
 /*! ***********************************************************************
  * \file
  * \brief Malloc and stdio free implementation printf.
-***************************************************************************/
+ **************************************************************************/
 
 #include <stdarg.h>
 #include <stdint.h>
@@ -47,314 +47,322 @@
 
 #include "e_acsl_rtl_io.h"
 
-typedef void (*putcf) (void*,char);
+typedef void (*putcf)(void *, char);
 
 /* Unsigned long integers to string conversion (%u) */
-static void uli2a(unsigned long int num, unsigned int base, int uc,char * bf) {
-  int n=0;
-  unsigned long int d=1;
-  while (num/d >= base)
-    d*=base;
-  while (d!=0) {
+static void uli2a(unsigned long int num, unsigned int base, int uc, char *bf) {
+  int n = 0;
+  unsigned long int d = 1;
+  while (num / d >= base)
+    d *= base;
+  while (d != 0) {
     int dgt = num / d;
-    num%=d;
-    d/=base;
-    if (n || dgt>0|| d==0) {
-      *bf++ = dgt+(dgt<10 ? '0' : (uc ? 'A' : 'a')-10);
+    num %= d;
+    d /= base;
+    if (n || dgt > 0 || d == 0) {
+      *bf++ = dgt + (dgt < 10 ? '0' : (uc ? 'A' : 'a') - 10);
       ++n;
     }
   }
-  *bf=0;
+  *bf = 0;
 }
 
 /* Unsigned pointer-wide integers to memory address conversion (%a) */
-static void addr2a(uintptr_t addr, char * bf) {
+static void addr2a(uintptr_t addr, char *bf) {
   *bf++ = '0';
   *bf++ = 'x';
 
   unsigned int digits = 1;
-  int n=0;
-  unsigned long int d=1;
-  while (addr/d >= 10) {
-    d*=10;
+  int n = 0;
+  unsigned long int d = 1;
+  while (addr / d >= 10) {
+    d *= 10;
     digits++;
   }
 
   unsigned int ctr = 0;
-  while (d!=0) {
+  while (d != 0) {
     ctr++;
     int dgt = addr / d;
-    addr%=d;
-    d/=10;
-    if (n || dgt>0|| d==0) {
-      *bf++ = dgt+(dgt<10 ? '0' : 'a' - 10);
+    addr %= d;
+    d /= 10;
+    if (n || dgt > 0 || d == 0) {
+      *bf++ = dgt + (dgt < 10 ? '0' : 'a' - 10);
       ++n;
     }
-    if (--digits%5 == 0 && d != 0)
-        *bf++ = '-';
+    if (--digits % 5 == 0 && d != 0)
+      *bf++ = '-';
   }
-  *bf=0;
+  *bf = 0;
 }
 
 /* Pointer to string conversion (%p) */
 static void ptr2a(void *p, char *bf) {
-    *bf++ = '0';
-    *bf++ = 'x';
-    uli2a((intptr_t)p,16,0,bf);
+  *bf++ = '0';
+  *bf++ = 'x';
+  uli2a((intptr_t)p, 16, 0, bf);
 }
 
 /* Signed long integer to string conversion (%ld) */
-static void li2a (long num, char * bf) {
-  if (num<0) {
-    num=-num;
+static void li2a(long num, char *bf) {
+  if (num < 0) {
+    num = -num;
     *bf++ = '-';
   }
-  uli2a(num,10,0,bf);
+  uli2a(num, 10, 0, bf);
 }
 
 /* Signed integer to string conversion (%d) */
-static void ui2a(unsigned int num, unsigned int base, int uc,char * bf) {
-  int n=0;
-  unsigned int d=1;
-  while (num/d >= base)
-    d*=base;
-  while (d!=0) {
+static void ui2a(unsigned int num, unsigned int base, int uc, char *bf) {
+  int n = 0;
+  unsigned int d = 1;
+  while (num / d >= base)
+    d *= base;
+  while (d != 0) {
     int dgt = num / d;
-    num%= d;
-    d/=base;
-    if (n || dgt>0 || d==0) {
-      *bf++ = dgt+(dgt<10 ? '0' : (uc ? 'A' : 'a')-10);
+    num %= d;
+    d /= base;
+    if (n || dgt > 0 || d == 0) {
+      *bf++ = dgt + (dgt < 10 ? '0' : (uc ? 'A' : 'a') - 10);
       ++n;
     }
   }
-  *bf=0;
+  *bf = 0;
 }
 
 /* Integer bit-fields to string conversion (%b, %B) */
 static void bits2a(long int v, int size, char *bf, int l2r) {
   int i;
   if (l2r) {
-    for(i = 0; i < size; i++) {
+    for (i = 0; i < size; i++) {
       *bf++ = '0' + ((v >> i) & 1);
-      if (i && i+1 < size && (i+1)%8 == 0)
-        *bf++  = ' ';
+      if (i && i + 1 < size && (i + 1) % 8 == 0)
+        *bf++ = ' ';
     }
   } else {
-    for(i = size - 1; i >= 0; i--) {
+    for (i = size - 1; i >= 0; i--) {
       *bf++ = '0' + ((v >> i) & 1);
-      if (i && i+1 < size && i%4 == 0)
-        *bf++  = ' ';
+      if (i && i + 1 < size && i % 4 == 0)
+        *bf++ = ' ';
     }
   }
-  *bf=0;
+  *bf = 0;
 }
 
 /* Pointer bit-fields to string conversion (%v, %V) */
 static void pbits2a(void *p, int size, char *bf, int l2r) {
-  char *v = (char*)p;
+  char *v = (char *)p;
   int i;
   if (l2r) {
-    for(i = 0; i < size; i++) {
-      *bf++ = '0' + ((v[i/8] >> i%8) & 1);
-      if (i && i+1 < size && (i+1)%4 == 0)
-        *bf++  = ' ';
+    for (i = 0; i < size; i++) {
+      *bf++ = '0' + ((v[i / 8] >> i % 8) & 1);
+      if (i && i + 1 < size && (i + 1) % 4 == 0)
+        *bf++ = ' ';
     }
   } else {
-    for(i = size - 1; i >= 0; i--) {
-      *bf++ = '0' + ((v[i/8] >> i%8) & 1);
-      if (i && i+1 < size && i%4 == 0)
-        *bf++  = ' ';
+    for (i = size - 1; i >= 0; i--) {
+      *bf++ = '0' + ((v[i / 8] >> i % 8) & 1);
+      if (i && i + 1 < size && i % 4 == 0)
+        *bf++ = ' ';
     }
   }
-  *bf=0;
+  *bf = 0;
 }
 
 /* Signed integer to string (%d) */
-static void i2a (int num, char * bf) {
-  if (num<0) {
-    num=-num;
+static void i2a(int num, char *bf) {
+  if (num < 0) {
+    num = -num;
     *bf++ = '-';
   }
-  ui2a(num,10,0,bf);
+  ui2a(num, 10, 0, bf);
 }
 
 /* Char to int conversion  */
 static int a2d(char ch) {
-  if (ch>='0' && ch<='9')
-    return ch-'0';
-  else if (ch>='a' && ch<='f')
-    return ch-'a'+10;
-  else if (ch>='A' && ch<='F')
-    return ch-'A'+10;
-  else return -1;
+  if (ch >= '0' && ch <= '9')
+    return ch - '0';
+  else if (ch >= 'a' && ch <= 'f')
+    return ch - 'a' + 10;
+  else if (ch >= 'A' && ch <= 'F')
+    return ch - 'A' + 10;
+  else
+    return -1;
 }
 
-static char a2i(char ch, char** src, int base, int* nump) {
-  char* p= *src;
-  int num=0;
+static char a2i(char ch, char **src, int base, int *nump) {
+  char *p = *src;
+  int num = 0;
   int digit;
-  while ((digit=a2d(ch))>=0) {
-    if (digit>base) break;
-    num=num*base+digit;
-    ch=*p++;
+  while ((digit = a2d(ch)) >= 0) {
+    if (digit > base)
+      break;
+    num = num * base + digit;
+    ch = *p++;
   }
-  *src=p;
-  *nump=num;
+  *src = p;
+  *nump = num;
   return ch;
 }
 
-static void putchw(void* putp, putcf putf, int n, char z, char* bf) {
-  char fc=z? '0' : ' ';
+static void putchw(void *putp, putcf putf, int n, char z, char *bf) {
+  char fc = z ? '0' : ' ';
   char ch;
-  char* p=bf;
+  char *p = bf;
   while (*p++ && n > 0)
     n--;
   while (n-- > 0)
-    putf(putp,fc);
-  while ((ch= *bf++))
-    putf(putp,ch);
+    putf(putp, fc);
+  while ((ch = *bf++))
+    putf(putp, ch);
 }
 
-static void putcp(void* p,char c) {
-  *(*((char**)p))++ = c;
+static void putcp(void *p, char c) {
+  *(*((char **)p))++ = c;
 }
 
-static void _format(void* putp, putcf putf, char *fmt, va_list va) {
+static void _format(void *putp, putcf putf, char *fmt, va_list va) {
   char bf[256];
   char ch;
-  while ((ch=*(fmt++))) {
-    if (ch!='%') // if not '%' print character as is
-      putf(putp,ch);
+  while ((ch = *(fmt++))) {
+    if (ch != '%') // if not '%' print character as is
+      putf(putp, ch);
     else { // otherwise do the print based on the format following '%'
-      char lz=0;
-      char lng=0; // long (i.e., 'l' specifier)
-      int w=0;
-      ch=*(fmt++);
-      if (ch=='0') { // '0' specifier - padding with zeroes
-        ch=*(fmt++);
-        lz=1;
+      char lz = 0;
+      char lng = 0; // long (i.e., 'l' specifier)
+      int w = 0;
+      ch = *(fmt++);
+      if (ch == '0') { // '0' specifier - padding with zeroes
+        ch = *(fmt++);
+        lz = 1;
       }
-      if (ch>='0' && ch<='9') {
-        ch=a2i(ch,&fmt,10,&w);
+      if (ch >= '0' && ch <= '9') {
+        ch = a2i(ch, &fmt, 10, &w);
       }
-      if (ch=='l') {
-        ch=*(fmt++);
-        lng=1;
+      if (ch == 'l') {
+        ch = *(fmt++);
+        lng = 1;
       }
       switch (ch) {
-        case 0:
-          break;
-        case 'u': {
-          if (lng)
-            uli2a(va_arg(va, unsigned long int),10,0,bf);
-          else
-            ui2a(va_arg(va, unsigned int),10,0,bf);
-          putchw(putp,putf,w,lz,bf);
-          break;
-        }
-        case 'd': {
-          if (lng)
-            li2a(va_arg(va, unsigned long int),bf);
-          else
-            i2a(va_arg(va, int),bf);
-          putchw(putp,putf,w,lz,bf);
-          break;
-        }
-        case 'p':
-          ptr2a(va_arg(va, void*), bf);
-          putchw(putp,putf,w,lz,bf);
-          break;
-        case 'a':
-          addr2a(va_arg(va, uintptr_t), bf);
-          putchw(putp,putf,w,lz,bf);
-          break;
-        case 'b':
-          bits2a(va_arg(va, long), w > 64 ? 64 : w ? w : 8, bf, 1);
-          putchw(putp,putf,0,0,bf);
-          break;
-        case 'B':
-          bits2a(va_arg(va, long), w > 64 ? 64 : w ? w : 8, bf, 0);
-          putchw(putp,putf,0,0,bf);
-          break;
-        case 'v':
-          pbits2a(va_arg(va, void*), w ? w : 8, bf, 1);
-          putchw(putp,putf,0,0,bf);
-          break;
-        case 'V':
-          pbits2a(va_arg(va, void*), w ? w : 8, bf, 0);
-          putchw(putp,putf,0,0,bf);
-          break;
-        case 'x':
-        case 'X':
-          if (lng)
-            uli2a(va_arg(va, unsigned long int),16,(ch=='X'),bf);
-          else
-            ui2a(va_arg(va, unsigned int),16,(ch=='X'),bf);
-          putchw(putp,putf,w,lz,bf);
-          break;
-        case 'f' : {
-          double num = va_arg(va, double);
-          int ord = (int)num;
-          i2a(ord,bf);
-          putchw(putp,putf,w,lz,bf);
-          putf(putp,'.');
-          num = num - ord;
-          num *= 1000;
-          ord = (int)num;
-          i2a(ord,bf);
-          putchw(putp,putf,w,lz,bf);
-          break;
-        }
-        case 'c' :
-          putf(putp,(char)(va_arg(va, int)));
-          break;
-        case 's' :
-          putchw(putp,putf,w,0,va_arg(va, char*));
-          break;
-        case '%' :
-          putf(putp,ch);
-        default:
-          break;
+      case 0:
+        break;
+      case 'u': {
+        if (lng)
+          uli2a(va_arg(va, unsigned long int), 10, 0, bf);
+        else
+          ui2a(va_arg(va, unsigned int), 10, 0, bf);
+        putchw(putp, putf, w, lz, bf);
+        break;
+      }
+      case 'd': {
+        if (lng)
+          li2a(va_arg(va, unsigned long int), bf);
+        else
+          i2a(va_arg(va, int), bf);
+        putchw(putp, putf, w, lz, bf);
+        break;
+      }
+      case 'p':
+        ptr2a(va_arg(va, void *), bf);
+        putchw(putp, putf, w, lz, bf);
+        break;
+      case 'a':
+        addr2a(va_arg(va, uintptr_t), bf);
+        putchw(putp, putf, w, lz, bf);
+        break;
+      case 'b':
+        bits2a(va_arg(va, long), w > 64 ? 64 : w ? w : 8, bf, 1);
+        putchw(putp, putf, 0, 0, bf);
+        break;
+      case 'B':
+        bits2a(va_arg(va, long), w > 64 ? 64 : w ? w : 8, bf, 0);
+        putchw(putp, putf, 0, 0, bf);
+        break;
+      case 'v':
+        pbits2a(va_arg(va, void *), w ? w : 8, bf, 1);
+        putchw(putp, putf, 0, 0, bf);
+        break;
+      case 'V':
+        pbits2a(va_arg(va, void *), w ? w : 8, bf, 0);
+        putchw(putp, putf, 0, 0, bf);
+        break;
+      case 'x':
+      case 'X':
+        if (lng)
+          uli2a(va_arg(va, unsigned long int), 16, (ch == 'X'), bf);
+        else
+          ui2a(va_arg(va, unsigned int), 16, (ch == 'X'), bf);
+        putchw(putp, putf, w, lz, bf);
+        break;
+      case 'f': {
+        double num = va_arg(va, double);
+        int ord = (int)num;
+        i2a(ord, bf);
+        putchw(putp, putf, w, lz, bf);
+        putf(putp, '.');
+        num = num - ord;
+        num *= 1000;
+        ord = (int)num;
+        i2a(ord, bf);
+        putchw(putp, putf, w, lz, bf);
+        break;
+      }
+      case 'c':
+        putf(putp, (char)(va_arg(va, int)));
+        break;
+      case 's':
+        putchw(putp, putf, w, 0, va_arg(va, char *));
+        break;
+      case '%':
+        putf(putp, ch);
+      default:
+        break;
       }
     }
   }
 }
 
-static void _charc_stdout (void* p, char c) { write(STDOUT_FILENO,&c,1); }
-static void _charc_stderr (void* p, char c) { write(STDERR_FILENO,&c,1); }
-static void _charc_file (void* p, char c) { write((size_t)p,&c,1); }
+static void _charc_stdout(void *p, char c) {
+  write(STDOUT_FILENO, &c, 1);
+}
+static void _charc_stderr(void *p, char c) {
+  write(STDERR_FILENO, &c, 1);
+}
+static void _charc_file(void *p, char c) {
+  write((size_t)p, &c, 1);
+}
 
-static void _charc_literal  (void* p, char c) {
-  switch(c) {
-    case '\r':
-      write((size_t)p,"\\r",2);
-      break;
-    case '\f':
-      write((size_t)p,"\\f",2);
-      break;
-    case '\b':
-      write((size_t)p,"\\b",2);
-      break;
-    case '\a':
-      write((size_t)p,"\\a",2);
-      break;
-    case '\n':
-      write((size_t)p,"\\n",2);
-      break;
-    case '\t':
-      write((size_t)p,"\\t",2);
-      break;
-    case '\0':
-      write((size_t)p,"\\0",2);
-      break;
-    default:
-      write((size_t)p,&c,1);
+static void _charc_literal(void *p, char c) {
+  switch (c) {
+  case '\r':
+    write((size_t)p, "\\r", 2);
+    break;
+  case '\f':
+    write((size_t)p, "\\f", 2);
+    break;
+  case '\b':
+    write((size_t)p, "\\b", 2);
+    break;
+  case '\a':
+    write((size_t)p, "\\a", 2);
+    break;
+  case '\n':
+    write((size_t)p, "\\n", 2);
+    break;
+  case '\t':
+    write((size_t)p, "\\t", 2);
+    break;
+  case '\0':
+    write((size_t)p, "\\0", 2);
+    break;
+  default:
+    write((size_t)p, &c, 1);
   }
 }
 
 int rtl_printf(char *fmt, ...) {
   va_list va;
-  va_start(va,fmt);
+  va_start(va, fmt);
   int result = rtl_vprintf(fmt, va);
   va_end(va);
   return result;
@@ -367,7 +375,7 @@ int rtl_vprintf(char *fmt, va_list vlist) {
 
 int rtl_eprintf(char *fmt, ...) {
   va_list va;
-  va_start(va,fmt);
+  va_start(va, fmt);
   int result = rtl_veprintf(fmt, va);
   va_end(va);
   return result;
@@ -380,7 +388,7 @@ int rtl_veprintf(char *fmt, va_list vlist) {
 
 int rtl_dprintf(int fd, char *fmt, ...) {
   va_list va;
-  va_start(va,fmt);
+  va_start(va, fmt);
   int result = rtl_vdprintf(fd, fmt, va);
   va_end(va);
   return result;
@@ -388,13 +396,13 @@ int rtl_dprintf(int fd, char *fmt, ...) {
 
 int rtl_vdprintf(int fd, char *fmt, va_list vlist) {
   intptr_t fd_long = fd;
-  _format((void*)fd_long, _charc_file, fmt, vlist);
+  _format((void *)fd_long, _charc_file, fmt, vlist);
   return 1;
 }
 
-int rtl_sprintf(char* s, char *fmt, ...) {
+int rtl_sprintf(char *s, char *fmt, ...) {
   va_list va;
-  va_start(va,fmt);
+  va_start(va, fmt);
   int result = rtl_vsprintf(s, fmt, va);
   va_end(va);
   return result;
@@ -402,6 +410,6 @@ int rtl_sprintf(char* s, char *fmt, ...) {
 
 int rtl_vsprintf(char *s, char *fmt, va_list vlist) {
   _format(&s, putcp, fmt, vlist);
-  putcp(&s,0);
+  putcp(&s, 0);
   return 1;
 }

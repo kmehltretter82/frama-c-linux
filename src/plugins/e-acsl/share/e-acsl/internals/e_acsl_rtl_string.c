@@ -33,7 +33,7 @@ char *nstrdup(const char *s) {
   if (s) {
     size_t len = strlen(s) + 1;
     void *n = private_malloc(len);
-    return (n == NULL) ? NULL : (char*)memcpy(n, s, len);
+    return (n == NULL) ? NULL : (char *)memcpy(n, s, len);
   }
   return NULL;
 }
@@ -67,11 +67,10 @@ int endswith(char *str, char *pat) {
 }
 
 #define ZERO_BLOCK_SIZE 1024
-static unsigned char zeroblock [ZERO_BLOCK_SIZE];
+static unsigned char zeroblock[ZERO_BLOCK_SIZE];
 
 int zeroed_out(const void *p, size_t size) {
-  size_t lim = size/ZERO_BLOCK_SIZE,
-         rem = size%ZERO_BLOCK_SIZE;
+  size_t lim = size / ZERO_BLOCK_SIZE, rem = size % ZERO_BLOCK_SIZE;
   unsigned char *pc = (unsigned char *)p;
 
   size_t i;
@@ -85,7 +84,7 @@ int zeroed_out(const void *p, size_t size) {
 
 int charcount(const char *s, char c) {
   int count = 0;
-  while ((s = strchr(s,c)) != NULL) {
+  while ((s = strchr(s, c)) != NULL) {
     count++;
     s++;
   }

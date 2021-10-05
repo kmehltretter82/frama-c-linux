@@ -4,12 +4,12 @@
 
 #include <stdlib.h>
 
-int A[] = { 1, 2, 3, 4};
+int A[] = {1, 2, 3, 4};
 int *PA;
 
 int main(void) {
   /* Global memory */
-  PA = (int*)&A;
+  PA = (int *)&A;
   /*@ assert \block_length(&A[0]) == sizeof(A); */
   /*@ assert \block_length(A+3) == sizeof(A); */
   /*@ assert \block_length(PA) == sizeof(A); */
@@ -17,8 +17,8 @@ int main(void) {
   /*@ assert \block_length(PA+1) == \block_length(A+1); */
 
   /* Stack memory [long blocks] */
-  int a[] = { 1, 2, 3, 4};
-  int *pa = (int*)&a;
+  int a[] = {1, 2, 3, 4};
+  int *pa = (int *)&a;
   /*@ assert \block_length(&a[0]) == sizeof(a); */
   /*@ assert \block_length(a+3) == sizeof(a); */
   /*@ assert \block_length(pa) == sizeof(a); */
@@ -28,11 +28,11 @@ int main(void) {
   /* Stack memory [Short blocks] */
 
   long l = 4;
-  char *pl = (char*)&l;
+  char *pl = (char *)&l;
   /*@ assert \block_length(&l) == sizeof(long); */
   /*@ assert \block_length(pl) == sizeof(long); */
-    /*@ assert \block_length(pl+7) == sizeof(long); */
-  int *pi = (int*)&l;
+  /*@ assert \block_length(pl+7) == sizeof(long); */
+  int *pi = (int *)&l;
   /*@ assert \block_length(pi) == \block_length(&l); */
   pi++;
   /*@ assert \block_length(pi) == \block_length(&l); */
@@ -46,7 +46,7 @@ int main(void) {
   /*@ assert \block_length(p+5) == \block_length(p-5); */
 
   /* Heap memory [multiple segments] */
-  size = 30*sizeof(long);
+  size = 30 * sizeof(long);
   long *q = malloc(size);
 
   /*@ assert \block_length(q) == size; */

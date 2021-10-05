@@ -70,7 +70,7 @@
  * additionally check that
  *  - memory buffers designated for writing are allocated, writable and provide
  *    sufficient space for storing the results
-***************************************************************************/
+ **************************************************************************/
 
 #ifndef E_ACSL_STDIO_H
 #define E_ACSL_STDIO_H
@@ -93,28 +93,27 @@
 
 /** \brief `printf` with error checking. */
 int eacsl_builtin_printf(const char *fmtdesc, const char *fmt, ...)
-  __attribute__((FC_BUILTIN));
+    __attribute__((FC_BUILTIN));
 
 /** \brief `fprintf` with error checking. */
-int eacsl_builtin_fprintf(const char *fmtdesc, FILE *stream, const char *fmt, ...)
-  __attribute__((FC_BUILTIN));
+int eacsl_builtin_fprintf(const char *fmtdesc, FILE *stream, const char *fmt,
+                          ...) __attribute__((FC_BUILTIN));
 
 /** \brief `dprintf` with error checking. */
 int eacsl_builtin_dprintf(const char *fmtdesc, int fd, const char *fmt, ...)
-  __attribute__((FC_BUILTIN));
+    __attribute__((FC_BUILTIN));
 
 /** \brief `sprintf` with error checking. */
-int eacsl_builtin_sprintf(const char *fmtdesc, char *buffer, const char *fmt, ...)
-  __attribute__((FC_BUILTIN));
+int eacsl_builtin_sprintf(const char *fmtdesc, char *buffer, const char *fmt,
+                          ...) __attribute__((FC_BUILTIN));
 
 /** \brief `snprintf` with error checking. */
 int eacsl_builtin_snprintf(const char *fmtdesc, char *buffer, size_t size,
-    const char *fmt, ...)
-  __attribute__((FC_BUILTIN));
+                           const char *fmt, ...) __attribute__((FC_BUILTIN));
 
 /** \brief `syslog` with error checking. */
-int eacsl_builtin_syslog(const char *fmtdesc, int priority, const char *fmt, ...)
-  __attribute__((FC_BUILTIN));
+int eacsl_builtin_syslog(const char *fmtdesc, int priority, const char *fmt,
+                         ...) __attribute__((FC_BUILTIN));
 
 /* }}} */
 

@@ -26,13 +26,13 @@
  * Declaration of memory locations considered safe before a program starts.
  * Most of these should be declared somewhere in start procedures of c
  * and gcc libraries. One example of a safe location is errno.
-***************************************************************************/
+ **************************************************************************/
 
 #ifndef E_ACSL_SAFE_LOCATIONS_H
 #define E_ACSL_SAFE_LOCATIONS_H
 
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 /*! Simple representation of a safe location */
 struct memory_location {
@@ -55,6 +55,6 @@ void collect_safe_locations();
 size_t get_safe_locations_count();
 
 /*! \return The i-th safe location collected */
-memory_location * get_safe_location(size_t i);
+memory_location *get_safe_location(size_t i);
 
 #endif // E_ACSL_SAFE_LOCATIONS_H

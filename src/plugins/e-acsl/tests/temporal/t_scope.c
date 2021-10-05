@@ -5,8 +5,7 @@
 #include <stddef.h>
 
 int main() {
-  int *p = NULL,
-      *q = NULL;
+  int *p = NULL, *q = NULL;
   {
     int i = 9;
     p = &i;
@@ -28,8 +27,7 @@ int main() {
 
   /* Example from Arvid's report (Listing 3.12) */
   int len = 3;
-  p = NULL,
-  q = NULL;
+  p = NULL, q = NULL;
   while (len) {
     int a;
     /*@assert ! \valid(p); */

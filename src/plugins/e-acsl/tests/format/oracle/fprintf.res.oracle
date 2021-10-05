@@ -1,11 +1,11 @@
 [e-acsl] beginning translation.
-[e-acsl] Warning: annotating undefined function `exit':
-  the generated program may miss memory instrumentation
-  if there are memory-related annotations.
 [e-acsl] Warning: annotating undefined function `tmpfile':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
 [e-acsl] Warning: annotating undefined function `fclose':
+  the generated program may miss memory instrumentation
+  if there are memory-related annotations.
+[e-acsl] Warning: annotating undefined function `exit':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
 [e-acsl] Warning: annotating undefined function `waitpid':
@@ -28,6 +28,13 @@
 [e-acsl] FRAMAC_SHARE/libc/sys/wait.h:86: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:470: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:472: Warning: 
+  E-ACSL construct `abnormal termination case in behavior'
+  is not yet supported.
+  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdio.h:118: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
@@ -37,13 +44,6 @@
 [e-acsl] FRAMAC_SHARE/libc/stdio.h:97: Warning: 
   E-ACSL construct
   `logic functions or predicates with no definition nor reads clause'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:470: Warning: 
-  E-ACSL construct `assigns clause in behavior' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:472: Warning: 
-  E-ACSL construct `abnormal termination case in behavior'
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
