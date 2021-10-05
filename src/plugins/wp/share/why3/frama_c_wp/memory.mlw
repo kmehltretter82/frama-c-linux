@@ -111,7 +111,7 @@ theory Memory
   predicate linked (map int int)
   predicate sconst (map addr int)
   predicate framed (m : map addr addr) =
-    forall p:addr [m[p]]. region(m[p].base) <= 0
+    forall p:addr [m[p]]. region(p.base) <= 0 -> region(m[p].base) <= 0
 
   (* Properties *)
 
