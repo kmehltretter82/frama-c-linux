@@ -1,8 +1,11 @@
 /* run.config
+   PLUGIN: wp
    OPT: -region-annot -print
-   EXECNOW: @frama-c@ -region-annot -print @PTEST_DIR@/@PTEST_NAME@.i -ocode @PTEST_DIR@/@PTEST_NAME@/a.i
-   EXECNOW: @frama-c@ -region-annot -print @PTEST_DIR@/@PTEST_NAME@/a.i -ocode @PTEST_DIR@/@PTEST_NAME@/b.i > @DEV_NULL@
-   EXECNOW: diff @PTEST_DIR@/@PTEST_NAME@/a.i @PTEST_DIR@/@PTEST_NAME@/b.i > @DEV_NULL@
+   EXECNOW: BIN ocode_@PTEST_NAME@_1.i @frama-c@ @PTEST_DIR@/@PTEST_NAME@.i            -region-annot -print -ocode @PTEST_RESULT@/ocode_@PTEST_NAME@_1.i > @DEV_NULL@ 2> @DEV_NULL@
+   EXECNOW: BIN ocode_@PTEST_NAME@_2.i @frama-c@ @PTEST_RESULT@/ocode_@PTEST_NAME@_1.i -region-annot -print -ocode @PTEST_RESULT@/ocode_@PTEST_NAME@_2.i > @DEV_NULL@ 2> @DEV_NULL@
+   EXECNOW: LOG  diff_@PTEST_NAME@.txt diff @PTEST_RESULT@/ocode_@PTEST_NAME@_1.i @PTEST_RESULT@/ocode_@PTEST_NAME@_2.i &> @PTEST_RESULT@/diff_@PTEST_NAME@.txt
+COMMENT: The file diff_@PTEST_NAME@.txt must be empty.
+COMMENT: So, that file has not to be present into the oracle directory since absent files are considered such as empty files.
  */
 
 /* run.config_qualif
