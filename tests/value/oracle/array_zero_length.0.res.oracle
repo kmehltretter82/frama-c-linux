@@ -7,13 +7,13 @@
   zero-length arrays are a compiler extension
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
-[eva] tests/value/array_zero_length.i:8: Warning: 
+[eva:unknown-size] tests/value/array_zero_length.i:8: Warning: 
   during initialization of variable 'T', size of type 'char []' cannot be
   computed (Size of array without number of elements.)
-[eva] tests/value/array_zero_length.i:10: Warning: 
+[eva:unknown-size] tests/value/array_zero_length.i:10: Warning: 
   during initialization of variable 'V', size of type 'char [][2]' cannot be
   computed (Size of array without number of elements.)
-[eva] tests/value/array_zero_length.i:11: Warning: 
+[eva:unknown-size] tests/value/array_zero_length.i:11: Warning: 
   during initialization of variable 'W', size of type 'char [][0]' cannot be
   computed (Size of array without number of elements.)
 [eva] Initial state computed

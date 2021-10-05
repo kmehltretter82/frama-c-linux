@@ -195,6 +195,9 @@ val wkey_invalid_assigns : warn_category
 (** Warning category for experimental domains or features. *)
 val wkey_experimental : warn_category
 
+(** Warning category for 'size of type T cannot be computed'. *)
+val wkey_unknown_size : warn_category
+
 (** Debug category used to print information about invalid pointer comparisons*)
 val dkey_pointer_comparison: category
 

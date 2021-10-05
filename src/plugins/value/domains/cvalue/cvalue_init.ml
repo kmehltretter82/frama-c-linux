@@ -46,6 +46,7 @@ let make_well hidden_base state loc =
 
 let warn_unknown_size_aux pp v (messt, t) =
   Value_parameters.warning ~once:true ~current:true
+    ~wkey:Value_parameters.wkey_unknown_size
     "@[during initialization@ of %a,@ size of@ type '%a'@ cannot be@ computed@ \
      (%s)@]" pp v Printer.pp_typ t messt
 
