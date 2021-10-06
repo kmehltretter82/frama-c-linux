@@ -10,8 +10,7 @@ DEFAULT_SUITES= saveload scope slicing sparecode spec syntax test value value/tr
 # todo: fixes fc_script
 IGNORE= DEFAULT_SUITES= fc_script
 
-# todo: fixes test dependencies
-IGNORE= DEFAULT_SUITES= compliance
+DEFAULT_SUITES= compliance
 
 # todo: adds make_run_script?
 IGNORE= DEFAULT_SUITES= make_run_script
