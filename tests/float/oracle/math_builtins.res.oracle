@@ -10,7 +10,7 @@
   any_double ∈ [--..--]
   any_float ∈ [--..--]
 [eva] computing for function test_cos_det <- main.
-  Called from tests/float/math_builtins.c:726.
+  Called from tests/float/math_builtins.c:740.
 [eva] tests/float/math_builtins.c:19: 
   Call to builtin Frama_C_cos for function cos
 [eva] tests/float/math_builtins.c:19: 
@@ -26,7 +26,7 @@
 [eva] Recording results for test_cos_det
 [eva] Done for function test_cos_det
 [eva] computing for function test_sin_det <- main.
-  Called from tests/float/math_builtins.c:727.
+  Called from tests/float/math_builtins.c:741.
 [eva] tests/float/math_builtins.c:25: 
   Call to builtin Frama_C_sin for function sin
 [eva] tests/float/math_builtins.c:25: 
@@ -42,7 +42,7 @@
 [eva] Recording results for test_sin_det
 [eva] Done for function test_sin_det
 [eva] computing for function test_acos <- main.
-  Called from tests/float/math_builtins.c:728.
+  Called from tests/float/math_builtins.c:742.
 [eva] tests/float/math_builtins.c:31: Call to builtin acos
 [eva] tests/float/math_builtins.c:31: 
   function acos: precondition 'in_domain' got status valid.
@@ -96,7 +96,7 @@
 [eva] Recording results for test_acos
 [eva] Done for function test_acos
 [eva] computing for function test_asin <- main.
-  Called from tests/float/math_builtins.c:729.
+  Called from tests/float/math_builtins.c:743.
 [eva] tests/float/math_builtins.c:59: Call to builtin asin
 [eva] tests/float/math_builtins.c:59: 
   function asin: precondition 'in_domain' got status valid.
@@ -150,7 +150,7 @@
 [eva] Recording results for test_asin
 [eva] Done for function test_asin
 [eva] computing for function test_atan <- main.
-  Called from tests/float/math_builtins.c:730.
+  Called from tests/float/math_builtins.c:744.
 [eva] tests/float/math_builtins.c:87: Call to builtin atan
 [eva] tests/float/math_builtins.c:87: 
   function atan: precondition 'number_arg' got status valid.
@@ -183,7 +183,7 @@
 [eva] Recording results for test_atan
 [eva] Done for function test_atan
 [eva] computing for function test_atan2_det <- main.
-  Called from tests/float/math_builtins.c:731.
+  Called from tests/float/math_builtins.c:745.
 [eva] tests/float/math_builtins.c:99: 
   Call to builtin Frama_C_atan2 for function atan2
 [eva] tests/float/math_builtins.c:99: 
@@ -239,7 +239,7 @@
 [eva] Recording results for test_atan2_det
 [eva] Done for function test_atan2_det
 [eva] computing for function test_atan2 <- main.
-  Called from tests/float/math_builtins.c:732.
+  Called from tests/float/math_builtins.c:746.
 [eva] computing for function double_interval <- test_atan2 <- main.
   Called from tests/float/math_builtins.c:116.
 [eva] Recording results for double_interval
@@ -347,7 +347,7 @@
 [eva] Recording results for test_atan2
 [eva] Done for function test_atan2
 [eva] computing for function test_pow_det <- main.
-  Called from tests/float/math_builtins.c:733.
+  Called from tests/float/math_builtins.c:747.
 [eva] tests/float/math_builtins.c:145: 
   Call to builtin Frama_C_pow for function pow
 [eva] tests/float/math_builtins.c:145: 
@@ -383,7 +383,7 @@
 [eva] Recording results for test_pow_det
 [eva] Done for function test_pow_det
 [eva] computing for function test_pow_singleton_exp <- main.
-  Called from tests/float/math_builtins.c:734.
+  Called from tests/float/math_builtins.c:748.
 [eva] computing for function double_interval <- test_pow_singleton_exp <- main.
   Called from tests/float/math_builtins.c:168.
 [eva] Recording results for double_interval
@@ -500,7 +500,7 @@
 [eva] Recording results for test_pow_singleton_exp
 [eva] Done for function test_pow_singleton_exp
 [eva] computing for function test_pow <- main.
-  Called from tests/float/math_builtins.c:735.
+  Called from tests/float/math_builtins.c:749.
 [eva] computing for function double_interval <- test_pow <- main.
   Called from tests/float/math_builtins.c:217.
 [eva] Recording results for double_interval
@@ -721,7 +721,7 @@
 [eva] Recording results for test_pow
 [eva] Done for function test_pow
 [eva] computing for function test_fmod_det <- main.
-  Called from tests/float/math_builtins.c:736.
+  Called from tests/float/math_builtins.c:750.
 [eva] tests/float/math_builtins.c:405: 
   Call to builtin Frama_C_fmod for function fmod
 [eva] tests/float/math_builtins.c:405: 
@@ -753,7 +753,7 @@
 [eva] Recording results for test_fmod_det
 [eva] Done for function test_fmod_det
 [eva] computing for function test_fmod <- main.
-  Called from tests/float/math_builtins.c:737.
+  Called from tests/float/math_builtins.c:751.
 [eva] computing for function double_interval <- test_fmod <- main.
   Called from tests/float/math_builtins.c:416.
 [eva] Recording results for double_interval
@@ -993,7 +993,7 @@
 [eva] Recording results for test_fmod
 [eva] Done for function test_fmod
 [eva] computing for function test_sqrt_det <- main.
-  Called from tests/float/math_builtins.c:738.
+  Called from tests/float/math_builtins.c:752.
 [eva] tests/float/math_builtins.c:478: 
   Call to builtin Frama_C_sqrt for function sqrt
 [eva] tests/float/math_builtins.c:478: 
@@ -1027,7 +1027,7 @@
 [eva] Recording results for test_sqrt_det
 [eva] Done for function test_sqrt_det
 [eva] computing for function test_sqrt <- main.
-  Called from tests/float/math_builtins.c:739.
+  Called from tests/float/math_builtins.c:753.
 [eva] computing for function double_interval <- test_sqrt <- main.
   Called from tests/float/math_builtins.c:486.
 [eva] Recording results for double_interval
@@ -1071,7 +1071,7 @@
 [eva] Recording results for test_sqrt
 [eva] Done for function test_sqrt
 [eva] computing for function test_exp_det <- main.
-  Called from tests/float/math_builtins.c:740.
+  Called from tests/float/math_builtins.c:754.
 [eva] tests/float/math_builtins.c:516: 
   Call to builtin Frama_C_exp for function exp
 [eva] tests/float/math_builtins.c:516: 
@@ -1123,7 +1123,7 @@
 [eva] Recording results for test_exp_det
 [eva] Done for function test_exp_det
 [eva] computing for function test_log_det <- main.
-  Called from tests/float/math_builtins.c:741.
+  Called from tests/float/math_builtins.c:755.
 [eva] tests/float/math_builtins.c:533: 
   Call to builtin Frama_C_log for function log
 [eva] tests/float/math_builtins.c:533: 
@@ -1163,7 +1163,7 @@
 [eva] Recording results for test_log_det
 [eva] Done for function test_log_det
 [eva] computing for function test_log10_det <- main.
-  Called from tests/float/math_builtins.c:742.
+  Called from tests/float/math_builtins.c:756.
 [eva] tests/float/math_builtins.c:551: 
   Call to builtin Frama_C_log10 for function log10
 [eva] tests/float/math_builtins.c:551: 
@@ -1203,7 +1203,7 @@
 [eva] Recording results for test_log10_det
 [eva] Done for function test_log10_det
 [eva] computing for function test_powf_det <- main.
-  Called from tests/float/math_builtins.c:744.
+  Called from tests/float/math_builtins.c:758.
 [eva] tests/float/math_builtins.c:156: 
   Call to builtin Frama_C_powf for function powf
 [eva] tests/float/math_builtins.c:156: 
@@ -1239,7 +1239,7 @@
 [eva] Recording results for test_powf_det
 [eva] Done for function test_powf_det
 [eva] computing for function test_powf_singleton_exp <- main.
-  Called from tests/float/math_builtins.c:745.
+  Called from tests/float/math_builtins.c:759.
 [eva] computing for function double_interval <- test_powf_singleton_exp <- main.
   Called from tests/float/math_builtins.c:301.
 [eva] Recording results for double_interval
@@ -1354,7 +1354,7 @@
 [eva] Recording results for test_powf_singleton_exp
 [eva] Done for function test_powf_singleton_exp
 [eva] computing for function test_powf <- main.
-  Called from tests/float/math_builtins.c:746.
+  Called from tests/float/math_builtins.c:760.
 [eva] computing for function double_interval <- test_powf <- main.
   Called from tests/float/math_builtins.c:350.
 [eva] Recording results for double_interval
@@ -1494,7 +1494,7 @@
 [eva] Recording results for test_powf
 [eva] Done for function test_powf
 [eva] computing for function test_sqrtf_det <- main.
-  Called from tests/float/math_builtins.c:747.
+  Called from tests/float/math_builtins.c:761.
 [eva] tests/float/math_builtins.c:497: 
   Call to builtin Frama_C_sqrtf for function sqrtf
 [eva] tests/float/math_builtins.c:497: 
@@ -1528,7 +1528,7 @@
 [eva] Recording results for test_sqrtf_det
 [eva] Done for function test_sqrtf_det
 [eva] computing for function test_sqrtf <- main.
-  Called from tests/float/math_builtins.c:748.
+  Called from tests/float/math_builtins.c:762.
 [eva] computing for function double_interval <- test_sqrtf <- main.
   Called from tests/float/math_builtins.c:505.
 [eva] Recording results for double_interval
@@ -1572,7 +1572,7 @@
 [eva] Recording results for test_sqrtf
 [eva] Done for function test_sqrtf
 [eva] computing for function test_expf_det <- main.
-  Called from tests/float/math_builtins.c:749.
+  Called from tests/float/math_builtins.c:763.
 [eva] tests/float/math_builtins.c:525: 
   Call to builtin Frama_C_expf for function expf
 [eva] tests/float/math_builtins.c:525: 
@@ -1616,7 +1616,7 @@
 [eva] Recording results for test_expf_det
 [eva] Done for function test_expf_det
 [eva] computing for function test_logf_det <- main.
-  Called from tests/float/math_builtins.c:750.
+  Called from tests/float/math_builtins.c:764.
 [eva] tests/float/math_builtins.c:542: 
   Call to builtin Frama_C_logf for function logf
 [eva] tests/float/math_builtins.c:542: 
@@ -1656,7 +1656,7 @@
 [eva] Recording results for test_logf_det
 [eva] Done for function test_logf_det
 [eva] computing for function test_log10f_det <- main.
-  Called from tests/float/math_builtins.c:751.
+  Called from tests/float/math_builtins.c:765.
 [eva] tests/float/math_builtins.c:560: 
   Call to builtin Frama_C_log10f for function log10f
 [eva] tests/float/math_builtins.c:560: 
@@ -1696,7 +1696,7 @@
 [eva] Recording results for test_log10f_det
 [eva] Done for function test_log10f_det
 [eva] computing for function test_diff_pow_powf <- main.
-  Called from tests/float/math_builtins.c:753.
+  Called from tests/float/math_builtins.c:767.
 [eva] tests/float/math_builtins.c:569: 
   Call to builtin Frama_C_pow for function pow
 [eva] tests/float/math_builtins.c:569: 
@@ -1708,7 +1708,7 @@
 [eva] Recording results for test_diff_pow_powf
 [eva] Done for function test_diff_pow_powf
 [eva] computing for function test_floor_det <- main.
-  Called from tests/float/math_builtins.c:755.
+  Called from tests/float/math_builtins.c:769.
 [eva] tests/float/math_builtins.c:574: 
   Call to builtin Frama_C_floor for function floor
 [eva] tests/float/math_builtins.c:574: 
@@ -1736,7 +1736,7 @@
 [eva] Recording results for test_floor_det
 [eva] Done for function test_floor_det
 [eva] computing for function test_ceil_det <- main.
-  Called from tests/float/math_builtins.c:756.
+  Called from tests/float/math_builtins.c:770.
 [eva] tests/float/math_builtins.c:583: 
   Call to builtin Frama_C_ceil for function ceil
 [eva] tests/float/math_builtins.c:583: 
@@ -1764,7 +1764,7 @@
 [eva] Recording results for test_ceil_det
 [eva] Done for function test_ceil_det
 [eva] computing for function test_trunc_det <- main.
-  Called from tests/float/math_builtins.c:757.
+  Called from tests/float/math_builtins.c:771.
 [eva] tests/float/math_builtins.c:592: 
   Call to builtin Frama_C_trunc for function trunc
 [eva] tests/float/math_builtins.c:592: 
@@ -1792,7 +1792,7 @@
 [eva] Recording results for test_trunc_det
 [eva] Done for function test_trunc_det
 [eva] computing for function test_round_det <- main.
-  Called from tests/float/math_builtins.c:758.
+  Called from tests/float/math_builtins.c:772.
 [eva] tests/float/math_builtins.c:601: 
   Call to builtin Frama_C_round for function round
 [eva] tests/float/math_builtins.c:601: 
@@ -1820,7 +1820,7 @@
 [eva] Recording results for test_round_det
 [eva] Done for function test_round_det
 [eva] computing for function test_floor <- main.
-  Called from tests/float/math_builtins.c:759.
+  Called from tests/float/math_builtins.c:773.
 [eva] computing for function double_interval <- test_floor <- main.
   Called from tests/float/math_builtins.c:611.
 [eva] Recording results for double_interval
@@ -1848,7 +1848,7 @@
 [eva] Recording results for test_floor
 [eva] Done for function test_floor
 [eva] computing for function test_ceil <- main.
-  Called from tests/float/math_builtins.c:760.
+  Called from tests/float/math_builtins.c:774.
 [eva] computing for function double_interval <- test_ceil <- main.
   Called from tests/float/math_builtins.c:621.
 [eva] Recording results for double_interval
@@ -1876,7 +1876,7 @@
 [eva] Recording results for test_ceil
 [eva] Done for function test_ceil
 [eva] computing for function test_trunc <- main.
-  Called from tests/float/math_builtins.c:761.
+  Called from tests/float/math_builtins.c:775.
 [eva] computing for function double_interval <- test_trunc <- main.
   Called from tests/float/math_builtins.c:631.
 [eva] Recording results for double_interval
@@ -1904,7 +1904,7 @@
 [eva] Recording results for test_trunc
 [eva] Done for function test_trunc
 [eva] computing for function test_round <- main.
-  Called from tests/float/math_builtins.c:762.
+  Called from tests/float/math_builtins.c:776.
 [eva] computing for function double_interval <- test_round <- main.
   Called from tests/float/math_builtins.c:641.
 [eva] Recording results for double_interval
@@ -1932,7 +1932,7 @@
 [eva] Recording results for test_round
 [eva] Done for function test_round
 [eva] computing for function test_floorf_det <- main.
-  Called from tests/float/math_builtins.c:764.
+  Called from tests/float/math_builtins.c:778.
 [eva] tests/float/math_builtins.c:650: 
   Call to builtin Frama_C_floorf for function floorf
 [eva] tests/float/math_builtins.c:650: 
@@ -1960,7 +1960,7 @@
 [eva] Recording results for test_floorf_det
 [eva] Done for function test_floorf_det
 [eva] computing for function test_ceilf_det <- main.
-  Called from tests/float/math_builtins.c:765.
+  Called from tests/float/math_builtins.c:779.
 [eva] tests/float/math_builtins.c:659: 
   Call to builtin Frama_C_ceilf for function ceilf
 [eva] tests/float/math_builtins.c:659: 
@@ -1988,7 +1988,7 @@
 [eva] Recording results for test_ceilf_det
 [eva] Done for function test_ceilf_det
 [eva] computing for function test_truncf_det <- main.
-  Called from tests/float/math_builtins.c:766.
+  Called from tests/float/math_builtins.c:780.
 [eva] tests/float/math_builtins.c:668: 
   Call to builtin Frama_C_truncf for function truncf
 [eva] tests/float/math_builtins.c:668: 
@@ -2016,7 +2016,7 @@
 [eva] Recording results for test_truncf_det
 [eva] Done for function test_truncf_det
 [eva] computing for function test_roundf_det <- main.
-  Called from tests/float/math_builtins.c:767.
+  Called from tests/float/math_builtins.c:781.
 [eva] tests/float/math_builtins.c:677: 
   Call to builtin Frama_C_roundf for function roundf
 [eva] tests/float/math_builtins.c:677: 
@@ -2044,7 +2044,7 @@
 [eva] Recording results for test_roundf_det
 [eva] Done for function test_roundf_det
 [eva] computing for function test_floorf <- main.
-  Called from tests/float/math_builtins.c:768.
+  Called from tests/float/math_builtins.c:782.
 [eva] computing for function double_interval <- test_floorf <- main.
   Called from tests/float/math_builtins.c:687.
 [eva] Recording results for double_interval
@@ -2072,7 +2072,7 @@
 [eva] Recording results for test_floorf
 [eva] Done for function test_floorf
 [eva] computing for function test_ceilf <- main.
-  Called from tests/float/math_builtins.c:769.
+  Called from tests/float/math_builtins.c:783.
 [eva] computing for function double_interval <- test_ceilf <- main.
   Called from tests/float/math_builtins.c:697.
 [eva] Recording results for double_interval
@@ -2100,7 +2100,7 @@
 [eva] Recording results for test_ceilf
 [eva] Done for function test_ceilf
 [eva] computing for function test_truncf <- main.
-  Called from tests/float/math_builtins.c:770.
+  Called from tests/float/math_builtins.c:784.
 [eva] computing for function double_interval <- test_truncf <- main.
   Called from tests/float/math_builtins.c:707.
 [eva] Recording results for double_interval
@@ -2128,7 +2128,7 @@
 [eva] Recording results for test_truncf
 [eva] Done for function test_truncf
 [eva] computing for function test_roundf <- main.
-  Called from tests/float/math_builtins.c:771.
+  Called from tests/float/math_builtins.c:785.
 [eva] computing for function double_interval <- test_roundf <- main.
   Called from tests/float/math_builtins.c:717.
 [eva] Recording results for double_interval
@@ -2155,8 +2155,34 @@
   function roundf: precondition 'finite_arg' got status valid.
 [eva] Recording results for test_roundf
 [eva] Done for function test_roundf
+[eva] computing for function test_uninit <- main.
+  Called from tests/float/math_builtins.c:787.
+[eva:alarm] tests/float/math_builtins.c:728: Warning: 
+  accessing uninitialized left-value. assert \initialized(&a);
+[eva] computing for function double_interval <- test_uninit <- main.
+  Called from tests/float/math_builtins.c:733.
+[eva] Recording results for double_interval
+[eva] Done for function double_interval
+[eva:alarm] tests/float/math_builtins.c:735: Warning: 
+  accessing uninitialized left-value. assert \initialized(&a);
+[eva] tests/float/math_builtins.c:735: 
+  Call to builtin Frama_C_sqrt for function sqrt
+[eva] tests/float/math_builtins.c:735: 
+  function sqrt: precondition 'finite_arg' got status valid.
+[eva] tests/float/math_builtins.c:735: 
+  function sqrt: precondition 'arg_positive' got status valid.
+[eva:alarm] tests/float/math_builtins.c:736: Warning: 
+  accessing uninitialized left-value. assert \initialized(&b);
+[eva] tests/float/math_builtins.c:736: 
+  Call to builtin Frama_C_pow for function pow
+[eva] tests/float/math_builtins.c:736: 
+  function pow: precondition 'finite_logic_res' got status valid.
+[eva] Recording results for test_uninit
+[eva] Done for function test_uninit
 [eva] Recording results for main
 [eva] done for function main
+[eva] tests/float/math_builtins.c:728: 
+  assertion 'Eva,initialization' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function double_interval:
   __retres ∈ [-1.2237906221789607*2^1023 .. 1.2237906221789607*2^1023]
@@ -2490,6 +2516,11 @@
   f32__b ∈ {1.414213*2^-2}
   f32__c ∈ {0}
   f32__d ∈ {-0.000000}
+[eva:final-states] Values at end of function test_uninit:
+  __fc_errno ∈ [--..--]
+  a ∈ {1.0000000000000000*2^-1}
+  b ∈ [1.0000000000000000*2^-2 .. 8.5000000000000000]
+  r ∈ [1.0000000000000000*2^-1 .. 2.9154759474226503]
 [eva:final-states] Values at end of function test_trunc:
   x ∈ [-2.5000000000000000 .. -1.0000000000000000*2^-1]
   a ∈ [-0.0000000000000000 .. 1.0000000000000000]
@@ -2647,6 +2678,8 @@
 [from] Done for function test_sqrtf
 [from] Computing for function test_sqrtf_det
 [from] Done for function test_sqrtf_det
+[from] Computing for function test_uninit
+[from] Done for function test_uninit
 [from] Computing for function test_trunc
 [from] Computing for function trunc <-test_trunc
 [from] Done for function trunc
@@ -2797,6 +2830,8 @@
   NO EFFECTS
 [from] Function test_sqrtf_det:
   NO EFFECTS
+[from] Function test_uninit:
+  __fc_errno FROM nondet
 [from] Function trunc:
   \result FROM x
 [from] Function test_trunc:
@@ -2810,7 +2845,7 @@
 [from] Function test_truncf_det:
   NO EFFECTS
 [from] Function main:
-  __fc_errno FROM \nothing
+  __fc_errno FROM nondet
   \result FROM \nothing
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function double_interval:
@@ -2978,6 +3013,10 @@
 [inout] Out (internal) for function test_sqrtf_det:
     f32__a; f32__b; f32__c; f32__d
 [inout] Inputs for function test_sqrtf_det:
+    nondet
+[inout] Out (internal) for function test_uninit:
+    __fc_errno; a; b; r
+[inout] Inputs for function test_uninit:
     nondet
 [inout] Out (internal) for function test_trunc:
     x; a; b; c
@@ -3937,6 +3976,27 @@ void test_roundf(void)
   return;
 }
 
+void test_uninit(void)
+{
+  double a;
+  double b;
+  double r;
+  if (nondet) {
+    /*@ assert Eva: initialization: \initialized(&a); */
+    r = sqrt(a);
+    Frama_C_show_each_unreachable(r);
+  }
+  if (nondet) {
+    a = 0.5;
+    b = double_interval(0.25,8.5);
+  }
+  /*@ assert Eva: initialization: \initialized(&a); */
+  r = sqrt(a);
+  /*@ assert Eva: initialization: \initialized(&b); */
+  r = pow(b,a);
+  return;
+}
+
 int main(void)
 {
   int __retres;
@@ -3982,6 +4042,7 @@ int main(void)
   test_ceilf();
   test_truncf();
   test_roundf();
+  test_uninit();
   __retres = 0;
   return __retres;
 }
