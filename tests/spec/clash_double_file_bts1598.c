@@ -1,9 +1,9 @@
 /* run.config
 COMMENT: checks that linking string.h and its FC-pretty-printed version
 COMMENT: does not get rejected by name clash in the logic. See bts 1598
-OPT: -cpp-extra-args " -Ishare/libc -nostdinc" -print -then -ocode ocode_@PTEST_NUMBER@_@PTEST_NAME@.c -print -then @PTEST_FILE@ ocode_@PTEST_NUMBER@_@PTEST_NAME@.c -ocode="" -print
+ MACRO: LIBC @FRAMAC_SHARE@/libc
+  OPT: -cpp-extra-args " -I@LIBC@ -nostdinc" -print -then -ocode ocode_@PTEST_NUMBER@_@PTEST_NAME@.c -print -then @PTEST_FILE@ ocode_@PTEST_NUMBER@_@PTEST_NAME@.c -ocode="" -print
 */
-
 #include "__fc_builtin.h"
 #include "assert.h"
 //#include "complex.h"

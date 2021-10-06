@@ -1,7 +1,7 @@
 /* run.config
-   OPT: -pp-annot -cpp-extra-args="-I./share/libc" -pp-annot -eva @EVA_OPTIONS@
+ MACRO: LIBC @FRAMAC_SHARE@/LIBC
+   OPT: -pp-annot -cpp-extra-args="-I@LIBC@" -pp-annot -eva @EVA_OPTIONS@
 */
-
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>

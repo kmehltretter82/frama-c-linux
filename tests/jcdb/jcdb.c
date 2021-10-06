@@ -6,7 +6,7 @@ DEPS: jcdb2.c with_arguments.json compile_commands.json file_without_main.c
 MODULE: @PTEST_NAME@
   OPT: -json-compilation-database with_arguments.json
 MODULE:
-  EXECNOW: LOG list_files.res LOG list_files.err ../../../../install/default/share/frama-c/share/analysis-scripts/list_files.py %{dep:compile_commands_working.json} > list_files.res 2> list_files.err
+  EXECNOW: LOG list_files.res LOG list_files.err @FRAMAC_SHARE@/analysis-scripts/list_files.py %{dep:compile_commands_working.json} > list_files.res 2> list_files.err
 */
 
 

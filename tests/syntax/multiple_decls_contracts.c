@@ -1,13 +1,13 @@
 /* run.config
-CMD: @frama-c-cmd@ @PTEST_OPTIONS@
-OPT: ../../../../install/default/share/frama-c/share/libc/string.h @PTEST_FILE@ @PTEST_FILE@ -print
-OPT: @PTEST_FILE@ ../../../../install/default/share/frama-c/share/libc/string.h @PTEST_FILE@ -print
-OPT: @PTEST_FILE@ @PTEST_FILE@ ../../../../install/default/share/frama-c/share/libc/string.h -print
+ COMMENT: dependency to FRAMA-C share directory is implicit
+ MACRO: LIBC @FRAMAC_SHARE@/libc
+ CMD: @frama-c-cmd@ @PTEST_OPTIONS@
+  OPT: @LIBC@/string.h @PTEST_FILE@ @PTEST_FILE@ -print
+  OPT: @PTEST_FILE@ @LIBC@/string.h @PTEST_FILE@ -print
+  OPT: @PTEST_FILE@ @PTEST_FILE@ @LIBC@/string.h -print
 */
-
 #include "string.h"
 #include "stdlib.h"
-
 char *
 strdup(const char *str)
 {
