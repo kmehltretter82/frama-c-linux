@@ -20,6 +20,8 @@
   t12[0..99] ∈ {0}
   ts[0..4] ∈ {0}
   vol ∈ [--..--]
+[eva] computing for function test <- main.
+  Called from tests/builtins/memset.c:88.
 [eva] tests/builtins/memset.c:33: Call to builtin memset
 [eva] tests/builtins/memset.c:33: 
   function memset: precondition 'valid_s' got status valid.
@@ -88,12 +90,31 @@
   function memset: precondition 'valid_s' got status valid.
 [eva:imprecision] tests/builtins/memset.c:72: 
   Call to builtin precise_memset(({{ &t12 + [0..384],0%32 }},{1},{4})) failed; destination is not exact
+[eva] Recording results for test
+[from] Computing for function test
+[from] Done for function test
+[eva] Done for function test
+[eva] computing for function uninit <- main.
+  Called from tests/builtins/memset.c:89.
+[eva:alarm] tests/builtins/memset.c:80: Warning: 
+  accessing uninitialized left-value. assert \initialized(&x);
+[eva:alarm] tests/builtins/memset.c:84: Warning: 
+  accessing uninitialized left-value. assert \initialized(&x);
+[eva] tests/builtins/memset.c:84: Call to builtin memset
+[eva] tests/builtins/memset.c:84: 
+  function memset: precondition 'valid_s' got status valid.
+[eva] Recording results for uninit
+[from] Computing for function uninit
+[from] Done for function uninit
+[eva] Done for function uninit
 [eva] Recording results for main
 [from] Computing for function main
 [from] Done for function main
 [eva] done for function main
+[eva] tests/builtins/memset.c:80: 
+  assertion 'Eva,initialization' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
-[eva:final-states] Values at end of function main:
+[eva:final-states] Values at end of function test:
   t1[0..99] ∈ {286331153}
   t2[0..99] ∈ [--..--]
   t3[0..9] ∈ {0}
@@ -147,46 +168,119 @@
   s ∈ {12; 36}
   s1 ∈ {8; 16}
   k ∈ [0..12]
+[eva:final-states] Values at end of function uninit:
+  x ∈ {{ (void *)&a }}
+  a ∈ {0}
+[eva:final-states] Values at end of function main:
+  t1[0..99] ∈ {286331153}
+  t2[0..99] ∈ [--..--]
+  t3[0..9] ∈ {0}
+    [10..99]# ∈ {0; 17} repeated %8 
+  t4[0..99] ∈ {0}
+  t5[0..99] ∈
+    {{ garbled mix of &{t1}
+     (origin: Misaligned {tests/builtins/memset.c:41}) }}
+  t6[0..9] ∈ {0}
+    [10..13]# ∈ {0; 34} repeated %8 
+    [14..99] ∈ {0}
+  t7[0..3]# ∈ {0; 34} repeated %8 
+    [4..99] ∈ {0}
+  t8[0..3]# ∈ {0; 34} repeated %8 
+    [4..99] ∈ {0}
+  t9[0..19] ∈ {0}
+    [20..99]# ∈ {0; 254} repeated %8 
+  t10[0..3] ∈ {0}
+     [4..6]# ∈ {136} repeated %8 
+     [7..12]# ∈ {0; 136} repeated %8 
+     [13..99] ∈ {0}
+  t11[0..1] ∈ {0}
+     [2]# ∈ {0; 153} repeated %8 
+     [3]# ∈ {153} repeated %8 
+     [4..6]# ∈ {0; 153} repeated %8 
+     [7..99] ∈ {0}
+  t12[0..96]# ∈ {0; 1} repeated %8 
+     [97..99] ∈ {0}
+  ts[0].f1 ∈ {-2; 0}
+    [0].[bits 8 to 15] ∈ {0; 254}
+    [0].f2 ∈ {-258; 0}
+    [0]{.f3; .f4[0..2]} ∈ {-16843010; 0}
+    [1].f1 ∈ {-2; 0}
+    [1].[bits 8 to 15] ∈ {0; 254}
+    [1].f2 ∈ {-258; 0}
+    [1]{.f3; .f4[0..2]} ∈ {-16843010; 0}
+    [2].f1 ∈ {-2; 0}
+    [2].[bits 8 to 15] ∈ {0; 254}
+    [2].f2 ∈ {-258; 0}
+    [2]{.f3; .f4[0..2]} ∈ {-16843010; 0}
+    [3].f1 ∈ {-2; 0}
+    [3].[bits 8 to 15] ∈ {0; 254}
+    [3].f2 ∈ {-258; 0}
+    [3]{.f3; .f4[0..2]} ∈ {-16843010; 0}
+    [4].f1 ∈ {-2; 0}
+    [4].[bits 8 to 15] ∈ {0; 254}
+    [4].f2 ∈ {-258; 0}
+    [4]{.f3; .f4[0..2]} ∈ {-16843010; 0}
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to memset at tests/builtins/memset.c:33 (by main):
+[from] call to memset at tests/builtins/memset.c:33 (by test):
   t1[0..99] FROM c
   \result FROM s
-[from] call to memset at tests/builtins/memset.c:34 (by main):
+[from] call to memset at tests/builtins/memset.c:34 (by test):
   t2[0..99] FROM c (and SELF)
   \result FROM s
-[from] call to memset at tests/builtins/memset.c:35 (by main):
+[from] call to memset at tests/builtins/memset.c:35 (by test):
   t3[10..99] FROM c (and SELF)
   \result FROM s
-[from] call to memset at tests/builtins/memset.c:38 (by main):
+[from] call to memset at tests/builtins/memset.c:38 (by test):
   t4[1..99] FROM c
   \result FROM s
-[from] call to memset at tests/builtins/memset.c:41 (by main):
+[from] call to memset at tests/builtins/memset.c:41 (by test):
   t5[0..99] FROM c
   \result FROM s
-[from] call to memset at tests/builtins/memset.c:44 (by main):
+[from] call to memset at tests/builtins/memset.c:44 (by test):
   t6[10..13] FROM c (and SELF)
   t7[0..3] FROM c (and SELF)
   \result FROM s
-[from] call to memset at tests/builtins/memset.c:47 (by main):
+[from] call to memset at tests/builtins/memset.c:47 (by test):
   t8[0..3] FROM c (and SELF)
   \result FROM s
-[from] call to memset at tests/builtins/memset.c:54 (by main):
+[from] call to memset at tests/builtins/memset.c:54 (by test):
   t9[20..99] FROM c (and SELF)
   \result FROM s
-[from] call to memset at tests/builtins/memset.c:58 (by main):
+[from] call to memset at tests/builtins/memset.c:58 (by test):
   t10[4..6] FROM c
      [7..12] FROM c (and SELF)
   \result FROM s
-[from] call to memset at tests/builtins/memset.c:65 (by main):
+[from] call to memset at tests/builtins/memset.c:65 (by test):
   t11{[2]; [4..6]} FROM c (and SELF)
      [3] FROM c
   \result FROM s
-[from] call to memset at tests/builtins/memset.c:68 (by main):
+[from] call to memset at tests/builtins/memset.c:68 (by test):
   ts[0..4] FROM c
   \result FROM s
-[from] call to memset at tests/builtins/memset.c:72 (by main):
+[from] call to memset at tests/builtins/memset.c:72 (by test):
   t12[0..96] FROM c (and SELF)
   \result FROM s
+[from] call to memset at tests/builtins/memset.c:84 (by uninit):
+  a FROM c
+  \result FROM s
+[from] call to test at tests/builtins/memset.c:88 (by main):
+  t1[0..99] FROM \nothing
+  t2[0..99] FROM \nothing (and SELF)
+  t3[10..99] FROM \nothing (and SELF)
+  t4[1..99] FROM vol (and SELF)
+  t5[0..99] FROM \nothing
+  t6[10..13] FROM \nothing (and SELF)
+  t7[0..3] FROM \nothing (and SELF)
+  t8[0..3] FROM \nothing (and SELF)
+  t9[20..99] FROM \nothing (and SELF)
+  t10[4..6] FROM \nothing
+     [7..12] FROM \nothing (and SELF)
+  t11{[2]; [4..6]} FROM \nothing (and SELF)
+     [3] FROM \nothing
+  t12[0..96] FROM \nothing (and SELF)
+  ts[0..4] FROM vol (and SELF)
+[from] call to uninit at tests/builtins/memset.c:89 (by main):
+  NO EFFECTS
 [from] entry point:
   t1[0..99] FROM \nothing
   t2[0..99] FROM \nothing (and SELF)
@@ -204,10 +298,34 @@
   t12[0..96] FROM \nothing (and SELF)
   ts[0..4] FROM vol (and SELF)
 [from] ====== END OF CALLWISE DEPENDENCIES ======
-[inout] Out (internal) for function main:
+[inout] Out (internal) for function test:
     t1[0..99]; t2[0..99]; t3[10..99]; t4[1..99]; t5[0..99]; t6[10..13];
     t7[0..3]; t8[0..3]; t9[20..99]; t10[4..12]; t11[2..6]; t12[0..96];
     ts[0..4]; dst; p; tmp_0; s; s1; k
+[inout] Inputs for function test:
+    vol
+[inout] InOut (internal) for function test:
+  Operational inputs:
+    vol
+  Operational inputs on termination:
+    vol
+  Sure outputs:
+    t1[0..99]; t5[0..99]; t10[4..6]; t11[3]; dst; p; tmp_0; s; s1; k
+[inout] Out (internal) for function uninit:
+    x; a
+[inout] Inputs for function uninit:
+    vol
+[inout] InOut (internal) for function uninit:
+  Operational inputs:
+    vol; x
+  Operational inputs on termination:
+    vol; x
+  Sure outputs:
+    a
+[inout] Out (internal) for function main:
+    t1[0..99]; t2[0..99]; t3[10..99]; t4[1..99]; t5[0..99]; t6[10..13];
+    t7[0..3]; t8[0..3]; t9[20..99]; t10[4..12]; t11[2..6]; t12[0..96]; 
+    ts[0..4]
 [inout] Inputs for function main:
     vol
 [inout] InOut (internal) for function main:
@@ -216,4 +334,4 @@
   Operational inputs on termination:
     vol
   Sure outputs:
-    t1[0..99]; t5[0..99]; t10[4..6]; t11[3]; dst; p; tmp_0; s; s1; k
+    t1[0..99]; t5[0..99]; t10[4..6]; t11[3]
