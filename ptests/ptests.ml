@@ -198,7 +198,8 @@ let example_msg =
      @@frama-c-only@@   # Shortcut defined as follow: %s@  \
      @@frama-c@@        # Shortcut defined as follow: %s@  \
      @@frama-c-cmd@@    # Shortcut defined as follow: %s@  \
-     @]@ \
+     @@DEV_NULL@@       # Set to 'NUL' for Windows platforms and to '/dev/null' otherwise.@  \
+      @]@ \
      @[<v 1>\
      Default directive values:@  \
      FILEREG: %s@  \
@@ -403,6 +404,8 @@ end = struct
   let pp_file ~dir fmt s = Format.fprintf fmt "%s/%s" dir s
 end
 
+let dev_null = if Sys.os_type = "Win32" then "NUL" else "/dev/null"
+
 module Macros = struct
 
   type t = string StringMap.t
@@ -478,6 +481,7 @@ module Macros = struct
       "frama-c-only", !macro_frama_c_only;
       "frama-c-cmd", !macro_frama_c_cmd;
       "frama-c",     !macro_frama_c;
+      "DEV_NULL",    dev_null;
     ] empty
 
 end
