@@ -4287,7 +4287,7 @@ the precision improvement provided by the octagon domain.
 \begin{lstlisting}
 void main (int y) {
   int k = Frama_C_interval(0, 10);
-  int x = y + k;               // x - y $\in$ [0..10]
+  int x = y - k;               // y - x $\in$ [0..10]
   int r = x + 3 - y;           // r $\in$ [-7..3]
   int t;
   if (y > 15)
