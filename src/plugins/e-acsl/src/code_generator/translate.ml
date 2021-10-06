@@ -190,42 +190,45 @@ and tlval_to_lval kf env (host, offset) =
   let name = match offset with NoOffset -> name | Field _ | Index _ -> "" in
   (host, offset), env, name
 
-(* Compute the expression which corresponds to an extended_quantifier term in a
-   given environment. [t] is the extended_quantifier term, [t_min] the lower bound,
-   [t max] the upper bound, [lambda] the lambda term and [name] is the identifier of
-   the extended quantifier ("\sum" or "\product") *)
+(* Translate extended_quantifier terms to expressions in a given environment.
+   [t] is the extended_quantifier term, [t_min] the lower bound, [t max] the
+   upper bound, [lambda] the lambda term and [name] is the identifier of the
+   extended quantifier ("\sum" or "\product").  Do not take care of "\numof"
+   that have already been converted to "\sum". *)
 and extended_quantifier_to_exp ~adata ~loc kf env t t_min t_max lambda name =
   match lambda.term_node with
-  | Tlambda([ k ] ,lt) when name.lv_name="\\product" || name.lv_name="\\sum" ->
+  | Tlambda([ k ] ,lt)
+    when name.lv_name = "\\product" || name.lv_name = "\\sum"
+    ->
     let ty_op = Typing.get_typ ~lenv:(Env.Local_vars.get env) t in
     let ty_k = match Typing.get_cast ~lenv:(Env.Local_vars.get env) t_min with
-      |Some e ->e
+      | Some e -> e
       | _ -> Options.fatal "unexpected error in \\sum translation"
     in
     let e_min, adata, env = term_to_exp ~adata kf env t_min in
     let e_max, adata, env = term_to_exp ~adata kf env t_max in
     let k_as_varinfo, k_as_exp, env = Env.Logic_binding.add ~ty:ty_k env kf k in
     let init_k_stmt = Gmp.init_set ~loc (Cil.var k_as_varinfo) k_as_exp e_min in
-    (*variable initialization*)
-    (*one = 1;*)
+    (* variable initialization *)
+    (* one = 1; *)
     let _, one_as_exp, env =
       create_and_init_var ~loc kf ty_k "one" (Cil.one ~loc) env
     in
-    (*cond = 0;*)
+    (* cond = 0; *)
     let cond_as_varinfo, cond_as_exp, env =
       create_and_init_var ~loc kf Cil.intType "cond" (Cil.zero ~loc) env
     in
-    (*lbda = 0;*)
+    (* lbda = 0; *)
     let lbd_as_varinfo, lbd_as_exp, env =
       create_and_init_var ~loc kf ty_op "lambda" (Cil.zero ~loc) env
     in
-    (*accumulator = neutral value;*)
+    (* accumulator = neutral value; *)
     let acc_as_varinfo, acc_as_exp, env = if name.lv_name="\\sum" then
         create_and_init_var ~loc kf ty_op "accumulator" (Cil.zero ~loc) env
       else
         create_and_init_var ~loc kf ty_op "accumulator" (Cil.one ~loc) env
     in
-    (*lambda_as_varinfo  affectation*)
+    (* lambda_as_varinfo assignment *)
     let env = Env.push env in
     let e_lbd, _, env = term_to_exp ~adata:Assert.no_data kf env lt in
     Interval.Env.remove k;
@@ -234,42 +237,48 @@ and extended_quantifier_to_exp ~adata ~loc kf env t t_min t_max lambda name =
         (Gmp.affect ~loc (Cil.var lbd_as_varinfo) lbd_as_exp e_lbd)
         false Env.Middle
     in
-    (*statement construction*)
-    (*cond = k > e_max; or cond =  __gmpz_cmp(k,e_max)*)
+    (* statement construction *)
+    (* cond = k > e_max; or cond =  __gmpz_cmp(k,e_max) *)
     let cond_stmt =
       affect_binop ~loc cond_as_varinfo None Gt ty_k k_as_exp e_max
     in
-    (*acc = acc op lbda; or __gmpz_op(acc,acc,lbda);*)
-    let acc_plus_lbd_stmt = if name.lv_name = "\\sum" then
-        affect_binop
-          ~loc acc_as_varinfo (Some acc_as_exp) PlusA ty_op acc_as_exp lbd_as_exp
-      else
-        affect_binop
-          ~loc acc_as_varinfo (Some acc_as_exp) Mult ty_op acc_as_exp lbd_as_exp
+    (* acc = acc op lbda; or __gmpz_op(acc,acc,lbda); *)
+    let op = if name.lv_name = "\\sum" then PlusA else Mult in
+    let acc_plus_lbd_stmt =
+      affect_binop
+        ~loc
+        acc_as_varinfo
+        (Some acc_as_exp)
+        op
+        ty_op
+        acc_as_exp
+        lbd_as_exp
     in
-    (*k = k + one; or __gmpz_add(k,k,one);*)
+    (* k = k + one; or __gmpz_add(k,k,one); *)
     let k_plus_one_stmt =
       affect_binop
         ~loc k_as_varinfo (Some k_as_exp) PlusA ty_k k_as_exp one_as_exp
     in
-    (*if ty_k is gmpz then the result of the comparison must be interpreted
-      as true if cond=1 and as false if cond=0 or -1 because of the semantics of
-      __gmpz_cmp. That differs from the conventional interpretation*)
+    (* if [ty_k] is gmpz, then the result of the comparison must be interpreted
+       as [true] if [cond == 1] and as [false] if [cond == 0] or [-1] because of
+       the semantics of __gmpz_cmp. That differs from the conventional
+       interpretation. *)
     let cond_as_exp =
       if Gmp_types.Z.is_t ty_k then
         (Cil.mkBinOp ~loc Gt cond_as_exp (Cil.zero ~loc))
       else
         cond_as_exp
     in
-    (*statement combination*)
+    (* statement combination *)
     let if_stmt =
       Smart_stmt.if_stmt
         ~loc
         ~cond:cond_as_exp
         ~else_blk:
-          (Cil.mkBlock [
-              Smart_stmt.block_stmt lbd_stmt; acc_plus_lbd_stmt; k_plus_one_stmt
-            ])
+          (Cil.mkBlock
+             [ Smart_stmt.block_stmt lbd_stmt;
+               acc_plus_lbd_stmt;
+               k_plus_one_stmt ])
         (Cil.mkBlock [ Smart_stmt.break ~loc ])
     in
     let for_stmt =
@@ -282,7 +291,7 @@ and extended_quantifier_to_exp ~adata ~loc kf env t t_min t_max lambda name =
     let adata, env = Assert.register_term ~loc kf env t acc_as_exp adata in
     acc_as_exp, adata, env, Typed_number.C_number, ""
   | _ ->
-    assert false (* unreachable branch *)
+    assert false
 
 and context_insensitive_term_to_exp ~adata kf env t =
   let loc = t.term_loc in

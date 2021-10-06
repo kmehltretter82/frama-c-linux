@@ -218,8 +218,8 @@ int main(void)
     unsigned int __gen_e_acsl_k_6;
     unsigned int __gen_e_acsl_one_6;
     int __gen_e_acsl_cond_6;
-    int __gen_e_acsl_lambda_6;
-    int __gen_e_acsl_accumulator_6;
+    unsigned int __gen_e_acsl_lambda_6;
+    unsigned int __gen_e_acsl_accumulator_6;
     __gen_e_acsl_one_6 = 1;
     __gen_e_acsl_cond_6 = 0;
     __gen_e_acsl_lambda_6 = 0;
@@ -229,26 +229,13 @@ int main(void)
       __gen_e_acsl_cond_6 = __gen_e_acsl_k_6 > 2147483647U;
       if (__gen_e_acsl_cond_6) break;
       else {
-        __gen_e_acsl_lambda_6 = (int)__gen_e_acsl_k_6;
-        /*@ assert
-            Eva: signed_overflow:
-              __gen_e_acsl_accumulator_6 + __gen_e_acsl_lambda_6 ≤
-              2147483647;
-        */
-        /*@ assert
-            Eva: signed_overflow:
-              -2147483648 ≤
-              __gen_e_acsl_accumulator_6 + __gen_e_acsl_lambda_6;
-        */
+        __gen_e_acsl_lambda_6 = __gen_e_acsl_k_6;
         __gen_e_acsl_accumulator_6 += __gen_e_acsl_lambda_6;
         __gen_e_acsl_k_6 += __gen_e_acsl_one_6;
       }
     }
-    /*@ assert
-        Eva: signed_overflow: __gen_e_acsl_accumulator_6 + 1 ≤ 2147483647;
-    */
-    __e_acsl_assert((unsigned int)(__gen_e_acsl_accumulator_6 + 1) > 2147483647U,
-                    1,"Assertion","main",
+    __e_acsl_assert(__gen_e_acsl_accumulator_6 + 1U > 2147483647U,1,
+                    "Assertion","main",
                     "\\sum(2147483647, 2147483647, \\lambda integer k; k) + 1 > 2147483647",
                     "tests/arith/extended_quantifiers.c",16);
   }
@@ -381,8 +368,8 @@ int main(void)
     int __gen_e_acsl_k_11;
     int __gen_e_acsl_one_10;
     int __gen_e_acsl_cond_10;
-    unsigned int __gen_e_acsl_lambda_10;
-    unsigned int __gen_e_acsl_accumulator_10;
+    unsigned long __gen_e_acsl_lambda_10;
+    unsigned long __gen_e_acsl_accumulator_10;
     __gen_e_acsl_one_10 = 1;
     __gen_e_acsl_cond_10 = 0;
     __gen_e_acsl_lambda_10 = 0;
@@ -392,7 +379,7 @@ int main(void)
       __gen_e_acsl_cond_10 = __gen_e_acsl_k_11 > 10;
       if (__gen_e_acsl_cond_10) break;
       else {
-        __gen_e_acsl_lambda_10 = (unsigned int)__gen_e_acsl_k_11;
+        __gen_e_acsl_lambda_10 = (unsigned long)__gen_e_acsl_k_11;
         __gen_e_acsl_accumulator_10 *= __gen_e_acsl_lambda_10;
         /*@ assert
             Eva: signed_overflow:
@@ -401,7 +388,7 @@ int main(void)
         __gen_e_acsl_k_11 += __gen_e_acsl_one_10;
       }
     }
-    __e_acsl_assert(__gen_e_acsl_accumulator_10 == 3628800U,1,"Assertion",
+    __e_acsl_assert(__gen_e_acsl_accumulator_10 == 3628800UL,1,"Assertion",
                     "main",
                     "\\product(1, 10, \\lambda integer k; k) == 3628800",
                     "tests/arith/extended_quantifiers.c",23);
