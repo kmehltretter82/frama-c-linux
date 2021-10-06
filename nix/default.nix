@@ -2,14 +2,6 @@
 { pkgs, stdenv, src ? ../., opam2nix, ocaml ? pkgs.ocaml-ng.ocamlPackages_4_08.ocaml, plugins ? { } }:
 
 let mydir = builtins.getEnv("PWD");
-    why3 = 
-       pkgs.fetchgit {
-           url = "https://gitlab.inria.fr/why3/why3";
-           # commit that has updated why3-coq.opam to make it
-           # compatible with Coq>8.12 (so that we can compile on OCaml 4.12)
-           rev = "a41e40f88987a26a7ac35f62e7637a2f6fcf1c07";
-           sha256 = "138ymjf1pg00yp2biw3qrx8yir8grfwjmfx81amddpx3p0c1zzhl";
-       };
    mk-opam-selection = { name, opamSrc?{}, ... }: {
       inherit ocaml;
       src = opamSrc;
