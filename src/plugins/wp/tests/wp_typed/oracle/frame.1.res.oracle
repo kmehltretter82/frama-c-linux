@@ -38,3 +38,61 @@ Assume {
 Prove: x = 1.
 
 ------------------------------------------------------------
+------------------------------------------------------------
+  Function formal_region
+------------------------------------------------------------
+
+Goal Assertion 'A,X' (file tests/wp_typed/frame.i, line 34):
+Let a = Mptr_0[global(L_x_37)].
+Assume {
+  (* Heap *)
+  Type: framed(Mptr_0) /\ linked(Malloc_0).
+  (* Initializer *)
+  Init: a = shiftfield_F2_S_b(global(P_s_36)).
+}
+Prove: valid_rd(Malloc_0[P_s_36 <- 1][L_x_37 <- 1], a, 1).
+
+------------------------------------------------------------
+
+Goal Assertion 'A,Y' (file tests/wp_typed/frame.i, line 35):
+Let a = Mptr_0[global(L_x_37)].
+Assume {
+  (* Heap *)
+  Type: framed(Mptr_0) /\ linked(Malloc_0).
+  (* Initializer *)
+  Init: a = shiftfield_F2_S_b(global(P_s_36)).
+  (* Assertion 'A,X' *)
+  Have: valid_rd(Malloc_0[P_s_36 <- 1][L_x_37 <- 1], a, 1).
+}
+Prove: false.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function local_region
+------------------------------------------------------------
+
+Goal Assertion 'A,X' (file tests/wp_typed/frame.i, line 25):
+Let a = Mptr_0[global(L_x_32)].
+Assume {
+  (* Heap *)
+  Type: framed(Mptr_0) /\ linked(Malloc_0).
+  (* Initializer *)
+  Init: a = shift_sint8(global(L_b_31), 0).
+}
+Prove: valid_rd(Malloc_0[L_b_31 <- 4][L_x_32 <- 1], a, 4).
+
+------------------------------------------------------------
+
+Goal Assertion 'A,Y' (file tests/wp_typed/frame.i, line 26):
+Let a = Mptr_0[global(L_x_32)].
+Assume {
+  (* Heap *)
+  Type: framed(Mptr_0) /\ linked(Malloc_0).
+  (* Initializer *)
+  Init: a = shift_sint8(global(L_b_31), 0).
+  (* Assertion 'A,X' *)
+  Have: valid_rd(Malloc_0[L_b_31 <- 4][L_x_32 <- 1], a, 4).
+}
+Prove: false.
+
+------------------------------------------------------------
