@@ -35,6 +35,7 @@ import ASTinfo from 'frama-c/kernel/ASTinfo';
 import SourceCode from 'frama-c/kernel/SourceCode';
 import Locations from 'frama-c/kernel/Locations';
 import Properties from 'frama-c/kernel/Properties';
+import Messages from 'frama-c/kernel/Messages';
 
 import 'frama-c/kernel/style.css';
 
@@ -82,6 +83,12 @@ Ivette.registerGroup({
     label: 'Properties',
     title: 'Status of ASCL Properties',
     children: <Properties />,
+  });
+  Ivette.registerComponent({
+    id: 'frama-c.messages',
+    label: 'Messages',
+    title: 'Messages emitted by Frama-C',
+    children: <Messages />,
   });
 });
 

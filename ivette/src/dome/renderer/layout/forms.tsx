@@ -417,7 +417,7 @@ export interface PageProps extends FilterProps, Children {
 export function Page(props: PageProps) {
   const { className, style, children, ...filter } = props;
   const { hidden, disabled } = useContext(filter);
-  const css = Utils.classes('dome-xForm-grid', className);
+  const css = Utils.classes(className ?? 'dome-xForm-grid');
   if (hidden) return null;
   return (
     <div className={css} style={style}>
@@ -598,7 +598,7 @@ export function Field(props: GenericFieldProps) {
       >
         {label}
       </label>
-      <div className={cssField}>
+      <div className={cssField} title={title}>
         {children}
         {WARNING}
       </div>

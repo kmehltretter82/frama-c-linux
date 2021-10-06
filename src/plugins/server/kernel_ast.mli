@@ -27,6 +27,8 @@
 open Package
 open Cil_types
 
+module Position : Data.S with type t = Filepath.position
+
 module Kf : Data.S with type t = kernel_function
 module Ki : Data.S with type t = kinstr
 module Stmt : Data.S with type t = stmt

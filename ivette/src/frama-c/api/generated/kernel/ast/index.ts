@@ -53,14 +53,6 @@ import { jTextSafe } from 'frama-c/api/kernel/data';
 import { tag } from 'frama-c/api/kernel/data';
 //@ts-ignore
 import { text } from 'frama-c/api/kernel/data';
-//@ts-ignore
-import { bySource } from 'frama-c/api/kernel/services';
-//@ts-ignore
-import { jSource } from 'frama-c/api/kernel/services';
-//@ts-ignore
-import { jSourceSafe } from 'frama-c/api/kernel/services';
-//@ts-ignore
-import { source } from 'frama-c/api/kernel/services';
 
 const compute_internal: Server.ExecRequest<null,null> = {
   kind: Server.RqKind.EXEC,
@@ -76,6 +68,33 @@ export const compute: Server.ExecRequest<null,null>= compute_internal;
 export const changed: Server.Signal = {
   name: 'kernel.ast.changed',
 };
+
+/** Source file positions. */
+export type source =
+  { dir: string, base: string, file: string, line: number };
+
+/** Loose decoder for `source` */
+export const jSource: Json.Loose<source> =
+  Json.jObject({
+    dir: Json.jFail(Json.jString,'String expected'),
+    base: Json.jFail(Json.jString,'String expected'),
+    file: Json.jFail(Json.jString,'String expected'),
+    line: Json.jFail(Json.jNumber,'Number expected'),
+  });
+
+/** Safe decoder for `source` */
+export const jSourceSafe: Json.Safe<source> =
+  Json.jFail(jSource,'Source expected');
+
+/** Natural order for `source` */
+export const bySource: Compare.Order<source> =
+  Compare.byFields
+    <{ dir: string, base: string, file: string, line: number }>({
+    dir: Compare.string,
+    base: Compare.string,
+    file: Compare.string,
+    line: Compare.number,
+  });
 
 /** Marker kind */
 export enum markerKind {

@@ -43,9 +43,9 @@ PLUGIN_CMO:= \
 	data main request states \
 	server_doc \
 	server_batch \
+	kernel_ast \
 	kernel_main \
 	kernel_project \
-	kernel_ast \
 	kernel_properties
 
 PLUGIN_DISTRIBUTED:=$(PLUGIN_ENABLE)

@@ -88,13 +88,6 @@ val localizable_from_locs :
     This function is inefficient as it iterates on all the current
     [Locs.state]. *)
 
-val loc_to_localizable: ?precise_col:bool -> Filepath.position -> localizable option
-(** return the (hopefully) most precise localizable that contains the given
-    Filepath.position. If [precise_col] is [true], takes the column number into
-    account (possibly a more precise, but costly, result).
-    @since Nitrogen-20111001 *)
-
-
 (*
 Local Variables:
 compile-command: "make -C ../../.."

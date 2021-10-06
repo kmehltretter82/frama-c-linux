@@ -50,3 +50,35 @@
 }
 
 /* -------------------------------------------------------------------------- */
+/* --- Globals                                                            --- */
+/* -------------------------------------------------------------------------- */
+
+.message-search {
+    padding: 4px 4px 4px 14px;
+}
+
+.message-search .dome-xForm-section {
+    margin-top: 6px ;
+    left: auto; /* Cancel dome left placement */
+}
+
+.message-search .dome-xForm-label {
+    display: none; /* Hide label, only use placeholder */
+}
+
+.message-search input::placeholder {
+    font-style: italic;
+}
+
+.message-search input {
+    vertical-align: middle;
+    margin: 2px 4px 2px 0px;
+}
+
+.message-search .dome-xForm-field {
+    margin: 0px 4px;
+    display: inline-block;
+    min-width: 80px;
+}
+
+/* -------------------------------------------------------------------------- */

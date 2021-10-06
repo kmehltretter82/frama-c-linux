@@ -378,7 +378,9 @@ module type Queue = sig
   val self: State.t
   val add: elt -> unit
   val iter: (elt -> unit) -> unit
+  val fold: ('a -> elt -> 'a) -> 'a -> 'a
   val is_empty: unit -> bool
+  val length: unit -> int
 end
 
 module Queue(Data: Datatype.S)(Info: Info) : Queue with type elt = Data.t

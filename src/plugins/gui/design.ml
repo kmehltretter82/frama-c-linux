@@ -1689,14 +1689,15 @@ class main_window () : main_window_extension_points =
           ignore
             (lower_notebook#insert_page ~pos:1
                ~tab_label:warnings_tab_label w);
-          let text = Format.sprintf "Messages (%d)" (Messages.nb_messages ()) in
+          let nb_messages = Messages.nb_warnings () + Messages.nb_errors () in
+          let text = Format.sprintf "Messages (%d)" nb_messages in
           let label = GtkMisc.Label.cast warnings_tab_label#as_widget in
           GtkMisc.Label.set_text label text
         in
         let callback e _column =
           Option.iter
             (fun pos ->
-               Option.iter self#scroll (Pretty_source.loc_to_localizable pos);
+               Option.iter self#scroll (Printer_tag.loc_to_localizable pos);
                (* Note: the code below generates double scrolling:
                   the previous call to self#scroll causes the original source
                   viewer to scroll to the beginning of the function, and then
@@ -1710,8 +1711,13 @@ class main_window () : main_window_extension_points =
       let display_warnings () =
         outdated_warnings := false ;
         Warning_manager.clear warning_manager;
-        Messages.iter (fun event -> Warning_manager.append warning_manager event);
-        let text = Format.sprintf "Messages (%d)" (Messages.nb_messages ()) in
+        Messages.iter
+          (fun event ->
+             match event.evt_kind with
+             | Warning | Error -> Warning_manager.append warning_manager event
+             | _ -> ());
+        let nb_messages = Messages.nb_warnings () + Messages.nb_errors () in
+        let text = Format.sprintf "Messages (%d)" nb_messages in
         let label = GtkMisc.Label.cast warnings_tab_label#as_widget in
         GtkMisc.Label.set_text label text
       in

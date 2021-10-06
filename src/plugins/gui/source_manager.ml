@@ -171,7 +171,7 @@ let load_file w ?title ~(filename : Datatype.Filepath.t) ?(line=(-1)) ~click_cb 
                                             Filepath.pos_bol = offset - col;
                                             Filepath.pos_cnum = offset;} in
                                  let localz =
-                                   Pretty_source.loc_to_localizable ~precise_col:true pos
+                                   Printer_tag.loc_to_localizable ~precise_col:true pos
                                  in
                                  click_cb localz
                                with Not_found ->

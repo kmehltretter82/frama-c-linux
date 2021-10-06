@@ -47,6 +47,52 @@ let ast_update_hook f =
 let () = ast_update_hook (fun _ -> Request.emit changed_signal)
 
 (* -------------------------------------------------------------------------- *)
+(* --- File Positions                                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
+module Position =
+struct
+  type t = Filepath.position
+
+  let jtype = Data.declare ~package ~name:"source"
+      ~descr:(Md.plain "Source file positions.")
+      (Jrecord [
+          "dir", Jstring;
+          "base", Jstring;
+          "file", Jstring;
+          "line", Jnumber;
+        ])
+
+  let to_json p =
+    let path = Filepath.(Normalized.to_pretty_string p.pos_path) in
+    let file =
+      if Server_parameters.has_relative_filepath ()
+      then path
+      else (p.Filepath.pos_path :> string)
+    in
+    `Assoc [
+      "dir"  , `String (Filename.dirname path) ;
+      "base" , `String (Filename.basename path) ;
+      "file" , `String file ;
+      "line" , `Int p.Filepath.pos_lnum ;
+    ]
+
+  let of_json js =
+    let fail () = failure_from_type_error "Invalid source format" js in
+    match js with
+    | `Assoc assoc ->
+      begin
+        match List.assoc "file" assoc, List.assoc "line" assoc with
+        | `String path, `Int line ->
+          Log.source ~file:(Filepath.Normalized.of_string path) ~line
+        | _, _ -> fail ()
+        | exception Not_found -> fail ()
+      end
+    | _ -> fail ()
+
+end
+
+(* -------------------------------------------------------------------------- *)
 (* ---  Printers                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -207,7 +253,7 @@ struct
       States.column
         ~name:"sloc"
         ~descr:(Md.plain "Source location")
-        ~data:(module Kernel_main.LogSource)
+        ~data:(module Position)
         ~get:(fun (tag, _) -> fst (Printer_tag.loc_of_localizable tag))
         model
     in
@@ -471,7 +517,7 @@ struct
       States.column model
         ~name:"sloc"
         ~descr:(Md.plain "Source location")
-        ~data:(module Kernel_main.LogSource)
+        ~data:(module Position)
         ~get:(fun kf -> fst (Kernel_function.get_location kf));
       States.register_array model
         ~package ~key

@@ -33,8 +33,7 @@ import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 import { TitleBar } from 'ivette';
 import * as Preferences from 'ivette/prefs';
-import { functions, markerInfo } from 'frama-c/api/kernel/ast';
-import { source } from 'frama-c/api/kernel/services';
+import { functions, markerInfo, source } from 'frama-c/api/kernel/ast';
 
 import 'codemirror/addon/selection/active-line';
 import 'codemirror/addon/dialog/dialog.css';

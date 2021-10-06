@@ -62,6 +62,12 @@ val typ_of_localizable: localizable -> typ option
 val loc_of_localizable : localizable -> location
 (** Might return [Location.unknown] *)
 
+val loc_to_localizable: ?precise_col:bool -> Filepath.position -> localizable option
+(** return the (hopefully) most precise localizable that contains the given
+    Filepath.position. If [precise_col] is [true], takes the column number into
+    account (possibly a more precise, but costly, result).
+    @since Frama-C+dev *)
+
 module type Tag =
 sig
   val create : localizable -> string

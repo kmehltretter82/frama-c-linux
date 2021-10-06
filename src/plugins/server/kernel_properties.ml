@@ -24,7 +24,6 @@ module Md = Markdown
 module Pkg = Package
 
 open Data
-open Kernel_main
 open Kernel_ast
 
 let package = Pkg.package ~title:"Property Services" ~name:"properties" ()
@@ -297,7 +296,7 @@ let () = States.column model ~name:"kinstr"
 
 let () = States.column model ~name:"source"
     ~descr:(Md.plain "Position")
-    ~data:(module LogSource)
+    ~data:(module Kernel_ast.Position)
     ~get:(fun ip -> Property.location ip |> fst)
 
 let () = States.column model ~name:"alarm"

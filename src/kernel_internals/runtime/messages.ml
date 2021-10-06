@@ -40,7 +40,7 @@ module DatatypeMessages =
     end)
 
 module Messages =
-  State_builder.List_ref
+  State_builder.Queue
     (DatatypeMessages)
     (struct
       let name = "Messages.message_table"
@@ -51,33 +51,33 @@ let () = Ast.add_monotonic_state Messages.self
 let hooks = ref []
 let add_message m =
   begin
-    Messages.set (m :: Messages.get ()) ;
+    Messages.add m;
     List.iter (fun fn -> fn()) !hooks ;
   end
 
 let nb_errors () =
-  Messages.fold_left
+  Messages.fold
     (fun n e ->
        match e.Log.evt_kind with
        | Log.Error -> succ n
        | _ -> n) 0
 
 let nb_warnings () =
-  Messages.fold_left
+  Messages.fold
     (fun n e ->
        match e.Log.evt_kind with
        | Log.Warning -> succ n
        | _ -> n) 0
 
-let nb_messages() = List.length (Messages.get ())
+let nb_messages = Messages.length
 
 let self = Messages.self
 
-let iter f = List.iter f (List.rev (Messages.get ()))
+let iter = Messages.iter
+let fold = Messages.fold
 let dump_messages () = iter Log.echo
 
-let () =
-  Log.add_listener ~kind:[ Log.Error; Log.Warning ] add_message
+let () = Log.add_listener add_message
 
 module OnceTable =
   State_builder.Hashtbl
