@@ -37,16 +37,14 @@ type stats = Eva.functionStatsData;
 
 // --- Coverage Table ---
 
-function map<A, B>(f: (x: B) => A, compare: Compare.Order<A>):
-Compare.Order<B> {
-  return (x: B, y: B) => compare(f(x), f(y));
-}
-
 const ordering: Arrays.ByColumns<stats> = {
   fct: Compare.byFields({ key: Compare.string }),
-  alarms: Compare.byFields(
-    { alarmStatuses: map((x) => x.unknown + x.invalid, Compare.number) },
-  ),
+  alarms: Compare.byFields({
+    alarmStatuses: Compare.lift(
+      (x) => x.unknown + x.invalid,
+      Compare.number,
+    ),
+  }),
   sureAlarms: Compare.byFields(
     { alarmStatuses: Compare.byFields({ invalid: Compare.number }) },
   ),
@@ -61,11 +59,11 @@ const ordering: Arrays.ByColumns<stats> = {
     ),
   }),
   totalStatements: Compare.byFields(
-    { coverage: map((x) => x.reachable + x.dead, Compare.number) },
+    { coverage: Compare.lift((x) => x.reachable + x.dead, Compare.number) },
   ),
   coverage: Compare.byFields(
     {
-      coverage: map(
+      coverage: Compare.lift(
         (x) => x.reachable / (x.reachable + x.dead),
         Compare.number,
       ),
