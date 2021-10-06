@@ -344,6 +344,7 @@ let example_msg =
      @@frama-c@@                # Shortcut defined as follow: %s@  \
      @@frama-c-cmd@@            # Shortcut defined as follow: %s@  \
      @@frama-c-exe@@            # set to the value of the 'TOPLEVEL_PATH' variable from './tests/ptests_config' file.@  \
+     @@DEV_NULL@@               # set to 'NUL' for Windows platforms and to '/dev/null' otherwise.@  \
      @]@ \
      @[<v 1>\
      Examples:@ \
@@ -776,6 +777,8 @@ let launch command_string =
         s command_string;
       exit 1
 
+let dev_null = if Sys.os_type = "Win32" then "NUL" else "/dev/null"
+
 module Test_config: sig
   val scan_directives: drop:bool ->
     SubDir.t -> file:string -> Scanf.Scanning.in_channel -> config -> config
@@ -788,6 +791,7 @@ end = struct
       "frama-c-exe",  !toplevel_path;
       "frama-c-cmd",  !macro_frama_c_cmd;
       "frama-c",      !macro_frama_c;
+      "DEV_NULL",     dev_null;
       "PTEST_DEFAULT_OPTIONS",  !macro_default_options;
       "PTEST_OPTIONS",          !macro_options;
       "PTEST_PRE_OPTIONS",      !macro_pre_options;
@@ -1687,10 +1691,11 @@ let do_filter =
               (Filename.basename exec_name)
       in
       let unfiltered_file = Filename.sanitize (log_prefix ^ log_ext ^ ".unfiltered-log") in
-      let filter_cmd = Format.sprintf "%s | %s%s > %s 2> /dev/null"
+      let filter_cmd = Format.sprintf "%s | %s%s > %s 2> %s"
           (* the filter command can be a diff from a [@PTEST_ORACLE@] *)
           (if Sys.file_exists unfiltered_file then "cat " ^ unfiltered_file else "echo \"\"")
           exec_name params log_file
+          dev_null
       in
       if !verbosity >= 1
       then lock_printf "%tFilter command:@\n%s@." print_default_env filter_cmd;
@@ -1712,8 +1717,8 @@ let compare_one_file cmp log_prefix oracle_prefix log_kind =
     if not (Sys.file_exists oracle_file) then
       check_file_is_empty_or_nonexisting (Command_error (cmp,log_kind)) ~log_file
     else begin
-      let cmp_string =
-        !do_cmp ^ " " ^ log_file ^ " " ^ oracle_file ^ " > /dev/null 2> /dev/null"
+      let cmp_string = Format.sprintf "%s %s %s > %s 2> %s"
+          !do_cmp log_file oracle_file dev_null dev_null
       in
       if !verbosity >= 2 then lock_printf "%% cmp%s (%d) :%s@."
           ext
@@ -1733,7 +1738,8 @@ let compare_one_log_file dir file =
   end else
     let log_file = Filename.sanitize (SubDir.make_result_file dir file) in
     let oracle_file = Filename.sanitize (SubDir.make_oracle_file dir file) in
-    let cmp_string = !do_cmp ^ " " ^ log_file ^ " " ^ oracle_file ^ " > /dev/null 2> /dev/null" in
+    let cmp_string = Format.sprintf "%s %s %s > %s 2> %s"
+        !do_cmp  log_file oracle_file dev_null dev_null in
     if !verbosity >= 2 then lock_printf "%% cmplog: %s / %s@." (SubDir.get dir) file;
     ignore (launch_and_check_compare_file (Log_error (dir,file))
               ~cmp_string ~log_file ~oracle_file)
