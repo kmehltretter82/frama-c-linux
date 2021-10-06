@@ -49,10 +49,14 @@ val case_globals :
       value
     - [fun_def] is the case for function definition. *)
 
+(** Visitor for managing the root of the AST, on the globals level, with the
+    cases that are relevant to E-ACSL. Each case is handled by a method of
+    the visitor. The cases are similar, and similarly named as the ones of
+    the function [case_globals]. *)
 class visitor :
   object
     inherit Visitor.frama_c_inplace
-    method default: unit -> global list Cil.visitAction
+    method private default: unit -> global list Cil.visitAction
     method builtin: varinfo -> global list Cil.visitAction
     method fc_compiler_builtin: varinfo -> global list Cil.visitAction
     method rtl_symbol: global -> global list Cil.visitAction
@@ -62,7 +66,3 @@ class visitor :
     method var_def: varinfo -> init -> global list Cil.visitAction
     method fun_def: fundec -> global list Cil.visitAction
   end
-(** Visitor for managing the root of the AST, on the globals level, with the
-    cases that are relevant to E-ACSL. Each case is handled by a method of
-    the visitor. The cases are similar, and similarly named as the ones of
-    the function [case_globals]. *)

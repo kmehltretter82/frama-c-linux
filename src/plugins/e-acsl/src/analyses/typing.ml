@@ -235,11 +235,11 @@ end = struct
 
   let get_dep lenv t =
     try Id_term_with_lenv.Hashtbl.find dep_tbl (t,lenv)
-    with Not_found -> Error.unmemoized ()
+    with Not_found -> Error.not_memoized ()
 
   let get_nondep t =
     try Misc.Id_term.Hashtbl.find tbl t
-    with Not_found -> Error.unmemoized ()
+    with Not_found -> Error.not_memoized ()
 
   let get ?(lenv=[]) t =
     match lenv with
@@ -251,7 +251,8 @@ end = struct
     with Not_found ->
       let x =
         try Error.Res (f t)
-        with (Error.Not_yet _ | Error.Typing_error _ as exn) -> Error.Err exn in
+        with Error.Not_yet _ | Error.Typing_error _ as exn -> Error.Err exn
+      in
       Misc.Id_term.Hashtbl.add tbl t x;
       x
 
@@ -261,7 +262,8 @@ end = struct
     with Not_found ->
       let x =
         try Error.Res (f t)
-        with (Error.Not_yet _ | Error.Typing_error _ as exn) -> Error.Err exn in
+        with Error.Not_yet _ | Error.Typing_error _ as exn -> Error.Err exn
+      in
       Id_term_with_lenv.Hashtbl.add dep_tbl (t, lenv) x;
       x
 
@@ -971,17 +973,16 @@ let get_cast_of_predicate ~lenv p =
 
 let clear = Memo.clear
 
-open Cil_types
-
 let typer_visitor lenv = object
   inherit E_acsl_visitor.visitor
-  method! fun_def ({svar = vi}) =
-    let kf = try Globals.Functions.get vi with Not_found -> assert false in
-    if Functions.check kf then Cil.DoChildren else Cil.SkipChildren
 
   method !vpredicate p =
-    ignore (try type_named_predicate ~lenv p
-            with Error.Not_yet _ | Error.Typing_error _  -> ());
+    (* Do not raise a warning for e-acsl errors at preprocessing time,
+       those errrors are stored in the table and warning is raised at translation
+       time*)
+      let _ = try type_named_predicate ~lenv p
+        with Error.Not_yet _ | Error.Typing_error _  -> ()
+      in
     Cil.SkipChildren
 end
 

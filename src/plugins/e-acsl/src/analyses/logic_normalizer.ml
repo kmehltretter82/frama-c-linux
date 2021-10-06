@@ -136,9 +136,6 @@ let preprocess_term ~loc t =
 
 let preprocessor = object
   inherit E_acsl_visitor.visitor
-  method !fun_def ({svar = vi}) =
-    let kf = try Globals.Functions.get vi with Not_found -> assert false in
-    if Functions.check kf then Cil.DoChildren else Cil.SkipChildren
 
   (* Only logic functions and logic predicates are handled.
      E-acsl simply ignores all the other global annotations *)

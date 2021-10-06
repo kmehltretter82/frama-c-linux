@@ -644,8 +644,8 @@ let inject_in_global (env, main) global =
     ~builtin:update_builtin
     ~var_fun_decl:observe_and_unghost
     ~var_init:observe_and_unghost
-    ~var_def:var_def
-    ~fun_def:fun_def
+    ~var_def
+    ~fun_def
     global
 
 (* Insert [stmt_begin] as the first statement of [fundec] and insert [stmt_end] as

@@ -29,8 +29,8 @@ let untypable s = raise (Typing_error s)
 exception Not_yet of string
 let not_yet s = raise (Not_yet s)
 
-exception Unmemoized
-let unmemoized () = raise Unmemoized
+exception Not_memoized
+let not_memoized () = raise Not_memoized
 
 module Nb_typing =
   State_builder.Ref
@@ -84,7 +84,7 @@ let retrieve_preprocessing analyse_name getter parameter =
     match getter parameter with
     | Res res -> res
     | Err exn -> raise exn
-  with Unmemoized ->
+  with Not_memoized ->
     Options.fatal "%s was not performed on construct" analyse_name
 
 (*

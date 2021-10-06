@@ -30,7 +30,7 @@ let case_globals
     ?(fc_stdlib_generated = fun _ -> default ())
     ?(var_fun_decl = fun _ -> default ())
     ?(var_init = fun _ -> default ())
-    ?(var_def = fun _ -> fun _ -> default ())
+    ?(var_def = fun _ _ -> default ())
     ~fun_def
   = function
     (* library functions and built-ins *)
@@ -82,7 +82,7 @@ class visitor
   = object(self)
     inherit Visitor.frama_c_inplace
 
-    method default : unit -> global list Cil.visitAction =
+    method private default : unit -> global list Cil.visitAction =
       fun _ -> Cil.SkipChildren
 
     method builtin : varinfo -> global list Cil.visitAction =
@@ -104,10 +104,11 @@ class visitor
       fun _ -> self#default ()
 
     method var_def : varinfo -> init -> global list Cil.visitAction =
-      fun _ -> fun _ -> self#default ()
+      fun _ _ -> self#default ()
 
-    method fun_def : fundec -> global list Cil.visitAction =
-      fun _ -> self#default ()
+    method fun_def ({svar = vi}) =
+      let kf = try Globals.Functions.get vi with Not_found -> assert false in
+      if Functions.check kf then Cil.DoChildren else Cil.SkipChildren
 
     method !vglob_aux =
       case_globals

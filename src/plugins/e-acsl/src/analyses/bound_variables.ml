@@ -100,7 +100,7 @@ end = struct
 
   let get p =
     try Quantified_predicate.Hashtbl.find tbl p
-    with Not_found -> Error.unmemoized ()
+    with Not_found -> Error.not_memoized ()
 
   let add p res_or_error =
     Quantified_predicate.Hashtbl.add tbl p res_or_error
@@ -690,10 +690,6 @@ end
 
   let preprocessor = object
     inherit E_acsl_visitor.visitor
-    method! fun_def ({svar = vi}) =
-      let kf = try Globals.Functions.get vi
-        with Not_found -> assert false in
-      if Functions.check kf then Cil.DoChildren else Cil.SkipChildren
 
     (* Only logic functions and logic predicates are handled.
        E-acsl simply ignores all the other global annotations *)
@@ -704,7 +700,7 @@ end
 
     method !vpredicate  p =
       let loc = p.pred_loc in
-      match Logic_normalizer.get p with
+      match Logic_normalizer.get_pred p with
       | PoT_pred p -> process_quantif ~loc p;
         Cil.DoChildren
       | PoT_term _ -> Cil.DoChildren
