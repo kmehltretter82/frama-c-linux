@@ -4,10 +4,9 @@
 [wp] Warning: native support for coq is deprecated, use tip instead
 [wp] 2 goals scheduled
 [wp] [Coq (native)] Goal typed_lemma_ok_because_consistent : Failed
-  Command './tests/inexistant-prover' not found
-[wp] [Coq] Goal typed_lemma_ok_because_inconsistent : Default tactic
+  Permission denied (./tests/inexistant-prover)
 [wp] [Coq (native)] Goal typed_lemma_ok_because_inconsistent : Failed
-  Command './tests/inexistant-prover' not found
+  Permission denied (./tests/inexistant-prover)
 [wp] Proved goals:    0 / 2
   Coq (native):    0  (failed: 2)
 ------------------------------------------------------------
