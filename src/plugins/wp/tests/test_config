@@ -1,3 +1,4 @@
+MACRO: FRAMAC_SHARE ../../@FRAMAC_SHARE@
 PLUGIN: rtegen,wp
 CMD: @frama-c@ -wp -wp-prover none -wp-print -wp-msg-key shell -wp-warn-key "pedantic-assigns=inactive" @PTEST_OPTIONS@
 OPT:
