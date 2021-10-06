@@ -1,7 +1,7 @@
 /* run.config
    OPT: -region-annot -print
-   EXECNOW: BIN ocode_@PTEST_NAME@.@PTEST_NUMBER@.execnow.i @frama-c-cmd@ %{dep:@PTEST_NAME@.i}                 -region-annot -print -ocode ocode_@PTEST_NAME@.@PTEST_NUMBER@.execnow.i > /dev/null 2> /dev/null
-   EXECNOW: BIN ocode_@PTEST_NAME@.@PTEST_NUMBER@.execnow.i @frama-c-cmd@ %{dep:ocode_@PTEST_NAME@.0.execnow.i} -region-annot -print -ocode ocode_@PTEST_NAME@.@PTEST_NUMBER@.execnow.i > /dev/null 2> /dev/null
+   EXECNOW: BIN ocode_@PTEST_NAME@.@PTEST_NUMBER@.execnow.i @frama-c-cmd@ %{dep:@PTEST_NAME@.i}                 -region-annot -print -ocode ocode_@PTEST_NAME@.@PTEST_NUMBER@.execnow.i > @DEV_NULL@ 2> @DEV_NULL@
+   EXECNOW: BIN ocode_@PTEST_NAME@.@PTEST_NUMBER@.execnow.i @frama-c-cmd@ %{dep:ocode_@PTEST_NAME@.0.execnow.i} -region-annot -print -ocode ocode_@PTEST_NAME@.@PTEST_NUMBER@.execnow.i > @DEV_NULL@ 2> @DEV_NULL@
 
    EXECNOW: LOG   diff_@PTEST_NAME@.@PTEST_NUMBER@.execnow.txt    diff %{dep:ocode_@PTEST_NAME@.0.execnow.i} %{dep:ocode_@PTEST_NAME@.1.execnow.i} &> diff_@PTEST_NAME@.@PTEST_NUMBER@.execnow.txt
 COMMENT: The file diff_@PTEST_NAME@.@PTEST_NUMBER@.execnow.txt must be empty. 

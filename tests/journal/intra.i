@@ -1,7 +1,7 @@
 /* run.config
  PLUGIN: sparecode @EVA_PLUGINS@
  MODULE: @PTEST_NAME@
-   EXECNOW: BIN intra_journal.ml @frama-c@ -eva-show-progress -journal-enable -journal-name intra_journal.ml > /dev/null 2> /dev/null
+   EXECNOW: BIN intra_journal.ml @frama-c@ -eva-show-progress -journal-enable -journal-name intra_journal.ml > @DEV_NULL@ 2> @DEV_NULL@
  MODULE: @PTEST_NAME@ intra_journal
    OPT:
 */
