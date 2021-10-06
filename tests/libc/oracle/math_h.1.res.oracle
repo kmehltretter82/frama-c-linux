@@ -58,36 +58,40 @@
 [eva] tests/libc/math_h.c:86: Call to builtin atan
 [eva] tests/libc/math_h.c:86: 
   function atan: precondition 'number_arg' got status valid.
+[eva:alarm] tests/libc/math_h.c:86: Warning: 
+  NaN double value. assert ¬\is_NaN(top);
 [eva] tests/libc/math_h.c:86: Call to builtin atan
+[eva] tests/libc/math_h.c:86: 
+  function atan: precondition 'number_arg' got status valid.
+[eva] tests/libc/math_h.c:86: Call to builtin atanf
+[eva] tests/libc/math_h.c:86: 
+  function atanf: precondition 'number_arg' got status valid.
+[eva] tests/libc/math_h.c:86: Call to builtin atanf
+[eva] tests/libc/math_h.c:86: 
+  function atanf: precondition 'number_arg' got status valid.
+[eva] tests/libc/math_h.c:86: Call to builtin atanf
+[eva] tests/libc/math_h.c:86: 
+  function atanf: precondition 'number_arg' got status valid.
+[eva] tests/libc/math_h.c:86: Call to builtin atanf
+[eva] tests/libc/math_h.c:86: 
+  function atanf: precondition 'number_arg' got status valid.
+[eva] tests/libc/math_h.c:86: Call to builtin atanf
+[eva] tests/libc/math_h.c:86: 
+  function atanf: precondition 'number_arg' got status valid.
+[eva] tests/libc/math_h.c:86: Call to builtin atanf
+[eva] tests/libc/math_h.c:86: 
+  function atanf: precondition 'number_arg' got status valid.
+[eva] tests/libc/math_h.c:86: Call to builtin atanf
+[eva] tests/libc/math_h.c:86: 
+  function atanf: precondition 'number_arg' got status valid.
+[eva] tests/libc/math_h.c:86: Call to builtin atanf
+[eva] tests/libc/math_h.c:86: 
+  function atanf: precondition 'number_arg' got status valid.
 [eva:alarm] tests/libc/math_h.c:86: Warning: 
-  function atan: precondition 'number_arg' got status unknown.
+  NaN float value. assert ¬\is_NaN(f_top);
 [eva] tests/libc/math_h.c:86: Call to builtin atanf
 [eva] tests/libc/math_h.c:86: 
   function atanf: precondition 'number_arg' got status valid.
-[eva] tests/libc/math_h.c:86: Call to builtin atanf
-[eva] tests/libc/math_h.c:86: 
-  function atanf: precondition 'number_arg' got status valid.
-[eva] tests/libc/math_h.c:86: Call to builtin atanf
-[eva] tests/libc/math_h.c:86: 
-  function atanf: precondition 'number_arg' got status valid.
-[eva] tests/libc/math_h.c:86: Call to builtin atanf
-[eva] tests/libc/math_h.c:86: 
-  function atanf: precondition 'number_arg' got status valid.
-[eva] tests/libc/math_h.c:86: Call to builtin atanf
-[eva] tests/libc/math_h.c:86: 
-  function atanf: precondition 'number_arg' got status valid.
-[eva] tests/libc/math_h.c:86: Call to builtin atanf
-[eva] tests/libc/math_h.c:86: 
-  function atanf: precondition 'number_arg' got status valid.
-[eva] tests/libc/math_h.c:86: Call to builtin atanf
-[eva] tests/libc/math_h.c:86: 
-  function atanf: precondition 'number_arg' got status valid.
-[eva] tests/libc/math_h.c:86: Call to builtin atanf
-[eva] tests/libc/math_h.c:86: 
-  function atanf: precondition 'number_arg' got status valid.
-[eva] tests/libc/math_h.c:86: Call to builtin atanf
-[eva:alarm] tests/libc/math_h.c:86: Warning: 
-  function atanf: precondition 'number_arg' got status unknown.
 [eva] computing for function atanl <- main.
   Called from tests/libc/math_h.c:86.
 [eva] using specification for function atanl

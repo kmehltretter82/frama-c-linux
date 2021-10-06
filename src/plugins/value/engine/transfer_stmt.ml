@@ -80,15 +80,11 @@ let do_copy_at = function
       not (warn_indeterminate kf)
     with Not_found -> assert false
 
-(* Warn for arguments that contain uninitialized/escaping if:
-   - kf is a non-special leaf function (TODO: should we keep this?)
-   - the user asked for this *)
+(* Warn for call arguments that contain uninitialized/escaping except on
+   [Frama_C_show_each] directives or if the user disables these alarms. *)
 let is_determinate kf =
   let name = Kernel_function.get_name kf in
-  warn_indeterminate kf
-  || not (Kernel_function.is_definition kf (* Should we keep this? *)
-          || (name >= "Frama_C" && name < "Frama_D")
-          || Builtins.is_builtin_overridden kf)
+  warn_indeterminate kf && not (Ast_info.is_frama_c_builtin name)
 
 let subdivide_stmt = Value_util.get_subdivision
 

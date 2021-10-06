@@ -489,7 +489,7 @@ let () =
           specification is used@ to interpret them.@]")
 
 let () = Parameter_customize.set_group alarms
-
+let () = Parameter_customize.argument_may_be_fundecl ();
 module WarnCopyIndeterminate =
   Kernel_function_set
     (struct
