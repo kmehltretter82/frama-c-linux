@@ -116,11 +116,6 @@ autom4te.cache
 /doc/code/print_api/dynamic_plugins.mli
 /doc/code/print_api/_build/
 
-/doc/code/builtin
-/doc/code/studia
-/doc/code/qed
-/doc/code/wp
-
 /doc/developer/tutorial/viewcfg/src/META.frama-c-viewcfg
 /doc/developer/tutorial/viewcfg/src/Makefile
 /doc/developer/tutorial/viewcfg/src/gui/

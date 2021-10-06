@@ -28,7 +28,7 @@
 
     or, more formally
 
-    { o + Σ dᵢ×xᵢ | ∀i 1≤i≤n ⇒ xᵢ ∊ [0, bᵢ] }
+    \{ o + Σ dᵢ×xᵢ | ∀i 1≤i≤n ⇒ xᵢ ∊ [0, bᵢ] \}
 
     This is a generalisation of integers intervals with modulo implemented in
     Ival : o + d×[0, b]

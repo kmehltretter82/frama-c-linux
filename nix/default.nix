@@ -112,6 +112,26 @@ pkgs.lib.makeExtensible
         '';
   };
 
+  doc = mk_deriv {
+        name = "frama-c-doc";
+        buildInputs = self.buildInputs;
+        build_dir = self.main.build_dir;
+        src = self.main.build_dir + "/dir.tar";
+        sourceRoot = ".";
+        postPatch = ''
+               find . \( -name "Makefile*" -or -name ".depend" -o -name "ptests_config" -o -name "config.status" \) -exec bash -c "t=\$(stat -c %y \"\$0\"); sed -i -e \"s&$(cat $build_dir/old_pwd)&$(pwd)&g\" \"\$0\"; touch -d \"\$t\" \"\$0\"" {} \;
+        '';
+        configurePhase = ''
+          true
+        '';
+        buildPhase = ''
+               make doc
+        '';
+        installPhase = ''
+               true
+        '';
+  } // { other-opam-selection = "main";};
+
   tests = mk_deriv {
         name = "frama-c-test";
         buildInputs = self.buildInputs;

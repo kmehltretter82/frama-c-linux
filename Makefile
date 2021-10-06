@@ -1211,7 +1211,7 @@ FILES_FOR_OCAMLDEP+= $(addsuffix /*.mli,$(FRAMAC_SRC_DIRS)) \
 
 MODULES_TODOC+=$(filter-out $(MODULES_NODOC),\
 	$(MLI_ONLY) \
-	$(filter-out $(PLUGIN_TYPES_CMO_LIST:.cmo=.mli),$(CMO:.cmo=.mli))))
+	$(filter-out $(PLUGIN_TYPES_CMO_LIST:.cmo=.mli),$(CMO:.cmo=.mli)))
 
 ################################
 # toplevel.{byte,opt} binaries #

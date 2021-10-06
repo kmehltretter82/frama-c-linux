@@ -149,6 +149,14 @@ build-from-distrib-tarball:
   tags:
    - nix
 
+doc:
+  stage: tests
+  script:
+   - nix/frama-ci.sh build -A frama-c.doc
+  tags:
+   - nix
+  allow_failure: true
+
 .build_template: &internal_template
   stage: distrib_and_compatibility
   tags:
