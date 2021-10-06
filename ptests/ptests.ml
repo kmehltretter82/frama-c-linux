@@ -128,6 +128,7 @@ let macro_frama_c_exe = ref "frama-c"
 let macro_frama_c_only = ref "@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@"
 let macro_frama_c_cmd = ref "@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@ @PLUGIN_OPTIONS@"
 let macro_frama_c = ref "@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@ @PLUGIN_OPTIONS@ @PTEST_FILE@"
+let macro_frama_c_share = ref "../../../../install/default/share/frama-c/share"
 
 let default_toplevel = ref "@frama-c@ @PTEST_OPTIONS@"
 
@@ -198,6 +199,7 @@ let example_msg =
      @@frama-c-only@@   # Shortcut defined as follow: %s@  \
      @@frama-c@@        # Shortcut defined as follow: %s@  \
      @@frama-c-cmd@@    # Shortcut defined as follow: %s@  \
+     @@FRAMAC_SHARE@@   # Shortcut defined as follow: %s@  \
      @@DEV_NULL@@       # Set to 'NUL' for Windows platforms and to '/dev/null' otherwise.@  \
       @]@ \
      @[<v 1>\
@@ -230,6 +232,7 @@ let example_msg =
     !macro_frama_c_only
     !macro_frama_c
     !macro_frama_c_cmd
+    !macro_frama_c_share
     test_file_regexp
     !default_toplevel
 
@@ -481,6 +484,7 @@ module Macros = struct
       "frama-c-only", !macro_frama_c_only;
       "frama-c-cmd", !macro_frama_c_cmd;
       "frama-c",     !macro_frama_c;
+      "FRAMAC_SHARE",!macro_frama_c_share;
       "DEV_NULL",    dev_null;
     ] empty
 
