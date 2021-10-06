@@ -1384,7 +1384,8 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config =
         command_string ~env ~result_fmt ~oracle_fmt
           { test_name ; file; options; toplevel; nb_files; directory; nth; timeout;
             macros; log_files;
-            filter = (match config.dc_filter with None -> None | Some s -> Some (Macros.expand macros s));
+            filter = (* from a global directive applyed to all OPT tests  *)
+              (match config.dc_filter with None -> None | Some s -> Some (Macros.expand macros s));
             exit_code = begin
               match exit_code with
               | None -> 0
@@ -1411,7 +1412,7 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config =
            exit_code = 0;
            timeout=execnow.ex_timeout;
            macros;
-           filter = config.dc_filter;
+           filter = None; (* no FILTER applied to EXECNOW LOG *)
            execnow = true;
            deps = deps_command macros execnow.ex_deps;
          }
