@@ -66,7 +66,7 @@ int main(int argc, const char **argv) {
     /* strcat */
     OK(strcat(dest1, const_str)); // enough space in dest [ok]
     // enough space in dest (concat with empty) [ok]:
-    OK(strcat(dest3, empty_str)); 
+    OK(strcat(dest3, empty_str));
     ABRT(strcat(dest2, const_str));       // insufficient space in dest [abort]
     ABRT(strcat(unalloc_str, const_str)); // unallocated in dest [abort]
     ABRT(strcat(dest2, unalloc_str));     // unallocated in src [abort]
