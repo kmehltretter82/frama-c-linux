@@ -25,6 +25,7 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-  E-ACSL       [2021-10-07] Support for \prod and \numof.
 -* E-ACSL       [2021-09-29] Fix translation order of the default behavior's
                 requires clauses. They are now translated before the evaluation
                 of the assumes clauses of the other behaviors.
@@ -41,7 +42,7 @@ Plugin E-ACSL <next-release>
                 (frama-c/e-acsl#170).
 -* E-ACSL       [2021-07-16] Fix crash when using some built-in labels
                 (frama-c/e-acsl#173).
--  E-ACSL       [2021-07-06] Add support for the extended quantifier \sum.
+-  E-ACSL       [2021-07-06] Support for \sum.
 -* E-ACSL       [2021-06-22] Fix a crash that occured when using certain
                 combinations of nested blocks and annotations.
 -* E-ACSL       [2021-06-16] Fix literal string replacements in function
@@ -109,7 +110,7 @@ Plugin E-ACSL 22.0 (Titanium)
 
 -* E-ACSL       [2020-11-16] Fix soundness bug when checking
                 initialization of a chunk of heap memory block.
--  E-ACSL       [2020-10-14] Add Support for Variadic generated functions in
+-  E-ACSL       [2020-10-14] Support for Variadic generated functions in
                 the AST (frama-c/e-acsl#128).
 -  E-ACSL       [2020-10-06] Add support for the `\separated` predicate.
                 (frama-c/e-acsl#31)

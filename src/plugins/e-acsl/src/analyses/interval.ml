@@ -290,6 +290,24 @@ let cast ~src ~dst = match src, dst with
        certainly on purpose . *)
     dst
 
+(* a-b; or 0 if negative *)
+let length a b = Z.max Z.zero (Z.add Z.one (Z.sub a b))
+
+(* minimal distance between two intervals given by their respective lower and
+   upper bounds, i.e. the length between the lower bound of the second interval
+   bound and the upper bound of the first interval. *)
+let min_delta (_, max1) (min2, _) = match max1, min2 with
+  | Some m1, Some m2 -> length m2 m1
+  | _, None | None, _ -> Z.zero
+
+(* maximal distance between between two intervals given by their respective
+   lower and upper bounds, i.e. the length between the upper bound of the second
+   interval and the lower bound of the first interval.
+   @return None for \infty *)
+let max_delta (min1, _) (_, max2) = match min1, max2 with
+  | Some m1, Some m2 -> Some (length m2 m1)
+  | _, None | None, _ -> None
+
 (* ********************************************************************* *)
 (* constructors and destructors *)
 (* ********************************************************************* *)
@@ -345,49 +363,6 @@ let extended_interv_of_typ ty = match interv_of_typ ty with
     Ival (Ival.inject_range l u);
   | Rational | Real | Nan | Float (_,_) as i
     -> i
-
-(* Compute the interval of the extended quantifier \sum, \product and \numof.
-   [lbd_ival] is the interval of the lambda term, [k_ival] is the interval of the
-   quantifier and [name]  is the identifier of the extended quantifier (\sum,
-   \product or \numof). The returned ival is the interval of the extended
-   quantifier *)
-let interv_of_extended_quantifier lambda i j name =
-  match lambda, i, j, name.lv_name with
-  | Ival lbd_ival, Ival i_ival, Ival j_ival, "\\sum" ->
-    (try
-       let min_lambda, max_lambda = Ival.min_and_max lbd_ival in
-       let i_inf, i_sup = Ival.min_and_max i_ival in
-       let j_inf, j_sup = Ival.min_and_max j_ival in
-       let compute_bound bound_lambda is_inf_bound =
-         let cond =
-           match bound_lambda with
-           | Some lambda ->
-             (is_inf_bound && ((Z.compare lambda Z.zero)==1)) ||
-             ((not is_inf_bound) && ((Z.compare lambda Z.zero)=(-1)))
-           | None -> false
-         in
-         match bound_lambda, i_inf, i_sup, j_inf, j_sup with
-         | Some lambda, _,Some i_sup, Some j_inf, _  when cond->
-           Some (Z.mul lambda (Z.max (Z.sub j_inf i_sup) Z.zero))
-         | _, _, _, _, _ when cond -> Some Z.zero
-         | Some lambda,  Some i_inf, _, _, Some j_sup ->
-           Some (Z.mul lambda (Z.max (Z.sub j_sup i_inf) Z.zero))
-         | Some lambda, _, _ , _, _ when (Z.compare lambda Z.zero) = 0 ->
-           Some Z.zero
-         | None, Some i_inf, _, _, Some j_sup when (Z.compare j_sup i_inf) = 0 ->
-           Some Z.zero
-         |  _, _, _, _, _ -> None
-       in
-       Ival
-         (Ival.inject_range
-            (compute_bound min_lambda true)
-            (compute_bound max_lambda false))
-     with Abstract_interp.Error_Bottom ->
-       bottom)
-  | _, _, _, "\\product" ->  Error.not_yet "product"
-  | _, _, _, "\\numof" ->  Error.not_yet "numof"
-  | _, _, _, _ -> Options.fatal  "%a is not a valid extended quantifier"
-                    Printer.pp_logic_var name
 
 let interv_of_logic_typ = function
   | Ctype ty -> interv_of_typ ty
@@ -557,7 +532,7 @@ end = struct
 end
 
 (* ********************************************************************* *)
-(* Main algorithm *)
+(* Main functions *)
 (* ********************************************************************* *)
 
 let infer_sizeof ty =
@@ -567,6 +542,102 @@ let infer_sizeof ty =
 let infer_alignof ty =
   try singleton_of_int (Cil.bytesAlignOf ty)
   with Cil.SizeOfError _ -> interv_of_typ Cil.theMachine.Cil.typeOfSizeOf
+
+(* Infer the interval of an extended quantifier \sum or \product.
+   [lambda] is the interval of the lambda term, [min] (resp. [max]) is the
+   interval of the minimum (resp. maximum) and [oper] is the identifier of the
+   extended quantifier (\sum, or \product). The returned ival is the interval of
+   the extended quantifier. *)
+let infer_sum_product oper lambda min max = match lambda, min, max with
+  | Ival lbd_iv, Ival lb_iv, Ival ub_iv ->
+    (try
+       let min_lambda, max_lambda = Ival.min_and_max lbd_iv in
+       let minmax_lb = Ival.min_and_max lb_iv in
+       let minmax_ub = Ival.min_and_max ub_iv in
+       let lb, ub = match oper.lv_name with
+         | "\\sum" ->
+           (* the lower (resp. upper) bound is the min (resp. max) value of the
+              lambda term, times the min (resp. max) distance between them if
+              the sign is positive, or conversely if the sign is negative *)
+           let lb = match min_lambda with
+             | None -> None
+             | Some z ->
+               if Z.sign z = -1
+               then Option.map (Z.mul z) (max_delta minmax_lb minmax_ub)
+               else Some (Z.mul z (min_delta minmax_lb minmax_ub))
+           in
+           let ub = match max_lambda with
+             | None -> None
+             | Some z ->
+               if Z.sign z = -1
+               then Some (Z.mul z (min_delta minmax_lb minmax_ub))
+               else Option.map (Z.mul z) (max_delta minmax_lb minmax_ub)
+           in
+           lb, ub
+         | "\\product" ->
+           (* the lower (resp. upper) bound is the min (resp. max) value of the
+              lambda term in absolute value, power the min (resp. max) distance
+              between them if the sign is positive, or conversely for both the
+              lambda term and the exponent if the sign is negative. If the sign
+              is negative, the minimum is also negative. *)
+           let min, max =
+             match min_lambda, max_lambda with
+             | None, None as res -> res
+             | None, Some m | Some m, None -> Some m, None
+             | Some min, Some max ->
+               let abs_min = Z.abs min in
+               let abs_max = Z.abs max in
+               Some (Z.min abs_min abs_max), Some (Z.max abs_min abs_max)
+           in
+           let lb = match min_lambda with
+             | None -> None
+             | Some z ->
+               if Z.sign z = -1 then
+                 (* the lower bound is (possibly) negative *)
+                 Extlib.opt_map2
+                   (fun m max ->
+                      match min_lambda, max_lambda with
+                      | Some mil, Some mal when Z.lt (Z.abs mil) (Z.abs mal) ->
+                        (* [lambda] contains both positive and negative values
+                           and |mil| < |mal|: instead of [-mal^m], the min is
+                           optimized to [mil * mal^(m-1)] *)
+                        Z.mul mil (Z.pow max (Z.to_int m - 1))
+                      | None, _ | _, None | Some _, Some _ ->
+                        Z.neg (Z.pow max (Z.to_int m)))
+                   (max_delta minmax_lb minmax_ub)
+                   max
+               else
+                 (* all numbers are positive:
+                    the lower bound is necessarily positive *)
+                 Option.map
+                   (fun m -> Z.pow m (Z.to_int (min_delta minmax_lb minmax_ub)))
+                   min
+           in
+           let ub =
+             Extlib.opt_map2
+               (fun m max ->
+                  match max_lambda with
+                  | Some ml when Z.lt ml Z.zero && not (Z.equal m Z.one) ->
+                    (* when [lambda] is necessarily negative with an odd number
+                       of iterations (>1), the result is necessarily negative,
+                       so smaller than the maximal (positive) value. Therefore,
+                       it is possible to reduce the number of iteration by 1. *)
+                    let exp = Z.to_int m in
+                    Z.pow max (exp - exp mod 2)
+                  | None | Some _ ->
+                    Z.pow max (Z.to_int m))
+               (max_delta minmax_lb minmax_ub)
+               max
+           in
+           lb, ub
+         | s ->
+           Options.fatal "unexpect logic function '%s'" s
+       in
+       Ival (Ival.inject_range lb ub)
+     with
+     | Abstract_interp.Error_Bottom -> bottom
+     | Z.Overflow (* if the exponent of \product is too high *) -> top_ival)
+  | _ -> Error.not_yet "extended quantifiers with non-integer parameters"
 
 let rec infer t =
   let get_cty t = match t.term_type with Ctype ty -> ty | _ -> assert false in
@@ -669,8 +740,7 @@ let rec infer t =
      | _ -> assert false)
   | Tnull  -> singleton_of_int 0
   | TLogic_coerce (_, t) -> infer t
-
-  | Tapp (li, _, args) ->
+  | Tapp (li, lst, args) ->
     (match li.l_body with
      | LBpred _ ->
        Ival Ival.zero_or_one
@@ -688,20 +758,50 @@ let rec infer t =
            fixpoint i
        in
        fixpoint bottom
-     | LBnone when li.l_var_info.lv_name = "\\sum" ->
+     | LBnone when li.l_var_info.lv_name = "\\sum" ||
+                   li.l_var_info.lv_name = "\\product" ->
        (match args with
-        | [ t1; t2; {term_node = Tlambda([ k ], _)} as lambda ] ->
-          let i_ival = infer t1 in
-          let j_ival = infer t2 in
-          let k_ival = join i_ival j_ival in
-          Env.add k k_ival;
-          (*k is removed during code generation, it is needed for generating the
-            code of the lambda term*)
-          let lambda_ival = infer lambda in
-          interv_of_extended_quantifier
-            lambda_ival i_ival j_ival li.l_var_info
-        | _ -> Options.fatal "unexpected input for an extended quantifier %a"
-                 Printer.pp_logic_var li.l_var_info)
+        | [ t1; t2; { term_node = Tlambda([ k ], _) } as lambda ] ->
+          let t1_iv = infer t1 in
+          let t2_iv = infer t2 in
+          let k_iv = join t1_iv t2_iv in
+          Env.add k k_iv;
+          let lambda_iv = infer lambda in
+          Env.remove k;
+          let t2incr =
+            Logic_const.term (TBinOp(PlusA, t2, Cil.lone ())) Linteger
+          in
+          (* it is correct and precise to use k_ival to compute lambda_ival, but
+             not during the code generation since the type used for k is the
+             greatest type between the type of t1 and the type of t2+1, that is
+             why the ival associated to k is updated *)
+          Env.add k (join t1_iv (infer t2incr));
+          (* k is removed during code generation, it is needed for generating
+             the code of the lambda term *)
+          infer_sum_product li.l_var_info lambda_iv t1_iv t2_iv
+        | _ -> Error.not_yet "extended quantifiers without lambda term")
+     | LBnone when li.l_var_info.lv_name = "\\numof" ->
+       (match args with
+        | [ t1; t2; { term_node = Tlambda([ k ], p) } ] ->
+          let logic_info = Cil_const.make_logic_info "\\sum" in
+          logic_info.l_type <- li.l_type;
+          logic_info.l_tparams <- li.l_tparams;
+          logic_info.l_labels <- li.l_labels;
+          logic_info.l_profile <- li.l_profile;
+          logic_info.l_body <- li.l_body;
+          let numof_as_sum =
+            let conditional_term =
+              Logic_const.term
+                (Tif(p, Cil.lone (), Cil.lzero ())) Linteger
+            in
+            let lambda_term =
+              Logic_const.term (Tlambda([ k ], conditional_term)) Linteger
+            in
+            (Logic_const.term
+               (Tapp(logic_info, lst, [ t1; t2; lambda_term ])) Linteger)
+          in infer numof_as_sum
+        | _ ->
+          Options.fatal "unexpected input for an extended quantifier \\numof")
      | LBnone
      | LBreads _ ->
        (match li.l_type with
@@ -786,6 +886,6 @@ include D
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
  *)

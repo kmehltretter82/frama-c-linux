@@ -286,14 +286,14 @@ void __e_acsl_globals_init(void)
                          sizeof("tests/builtin/strlen.c:33"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_15);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_15);
-    __gen_e_acsl_literal_string_14 = "tests/builtin/strlen.c:30";
+    __gen_e_acsl_literal_string_14 = "tests/builtin/strlen.c:31";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_14,
-                         sizeof("tests/builtin/strlen.c:30"));
+                         sizeof("tests/builtin/strlen.c:31"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_14);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_14);
-    __gen_e_acsl_literal_string_13 = "tests/builtin/strlen.c:28";
+    __gen_e_acsl_literal_string_13 = "tests/builtin/strlen.c:29";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_13,
-                         sizeof("tests/builtin/strlen.c:28"));
+                         sizeof("tests/builtin/strlen.c:29"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_13);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_13);
     __gen_e_acsl_literal_string_12 = "tests/builtin/strlen.c:24";
@@ -311,9 +311,9 @@ void __e_acsl_globals_init(void)
                          sizeof("tests/builtin/strlen.c:22"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_10);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_10);
-    __gen_e_acsl_literal_string_9 = "tests/builtin/strlen.c:20";
+    __gen_e_acsl_literal_string_9 = "tests/builtin/strlen.c:21";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_9,
-                         sizeof("tests/builtin/strlen.c:20"));
+                         sizeof("tests/builtin/strlen.c:21"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_9);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_9);
     __gen_e_acsl_literal_string = "TEST %d: ";

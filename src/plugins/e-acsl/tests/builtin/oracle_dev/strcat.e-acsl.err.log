@@ -1,5 +1,5 @@
 TEST 1: OK: Expected execution at tests/builtin/strcat.c:67
-TEST 2: OK: Expected execution at tests/builtin/strcat.c:68
+TEST 2: OK: Expected execution at tests/builtin/strcat.c:69
 strcat: insufficient space in destination string, available: 8 bytes, requires at least 9 bytes
 TEST 3: OK: Expected signal at tests/builtin/strcat.c:70
 strcat: destination string string unallocated

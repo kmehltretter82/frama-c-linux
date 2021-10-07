@@ -25,4 +25,4 @@ sprintf: output buffer is unallocated or has insufficient length to store 6 char
 TEST 16: OK: Expected signal at tests/format/fprintf.c:45
 sprintf: output buffer is unallocated or has insufficient length to store 6 characters and \0 terminator or not writeable
 TEST 17: OK: Expected signal at tests/format/fprintf.c:46
-TEST 18: OK: Expected execution at tests/format/fprintf.c:47
+TEST 18: OK: Expected execution at tests/format/fprintf.c:48

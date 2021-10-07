@@ -44,7 +44,7 @@ int main(int argc, const char **argv) {
   ABRT(snprintf(pstr, 6, "-%s-", "123")); // try read-only
   ABRT(snprintf(buf, 6, "-%s-", "123"));  // not enough space
   ABRT(snprintf(NULL, 6, "-%s-", "123")); // not enough space
-  OK(snprintf(NULL, 0, "-%s-",
-              "123")); // NULL should be file because of 0 chars to write
+  // NULL should be fine because of 0 chars to write:
+  OK(snprintf(NULL, 0, "-%s-", "123"));
   return 0;
 }

@@ -605,7 +605,7 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx ?(lenv=[]) t =
           end
         | LBnone ->
           (match args with
-           | [ t1; t2; lambda ] ->
+           | [ t1; t2; {term_node = Tlambda([ _ ], _)} as lambda ] ->
              let anonymous =
                Logic_const.term (TBinOp(PlusA, t2, Cil.lone ())) Linteger
              in
@@ -623,13 +623,12 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx ?(lenv=[]) t =
              ignore (type_term ~use_gmp_opt:true ?ctx ~lenv lambda);
              dup ty
            | [ ] | [ _ ] | [ _; _ ] | _ :: _ :: _ :: _ ->
-             Error.not_yet "logic functions or predicates with no definition \
-                            nor reads clause"
              (* TODO : improve error message to distinguish error messages
                 corresponding to unsupported primitives and wrong application
                 of supported primitive
                 (one is a fatal and the other is a not_yet) *)
-          )
+             Error.not_yet "logic functions or predicates with no definition \
+                            nor reads clause")
         | LBreads _ ->
           Error.not_yet "logic functions or predicates performing read accesses"
         | LBinductive _ ->

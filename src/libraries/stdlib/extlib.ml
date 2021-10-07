@@ -256,6 +256,10 @@ let opt_hash hash v = match v with
   | None -> 31179
   | Some v -> hash v
 
+let opt_map2 f x y = match x, y with
+  | None, _ | _, None -> None
+  | Some x, Some y -> Some (f x y)
+
 (* ************************************************************************* *)
 (** Booleans                                                                 *)
 (* ************************************************************************* *)
