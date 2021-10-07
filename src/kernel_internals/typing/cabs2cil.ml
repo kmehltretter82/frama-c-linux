@@ -1443,7 +1443,7 @@ let rec isCabsZeroExp e = match e.expr_node with
      | SINGLE_INIT e -> isCabsZeroExp e
      | NO_INIT | COMPOUND_INIT _ -> false)
   | CONSTANT (CONST_INT i) ->
-    Option.fold ~none:false ~some:Integer.is_zero (Cil.parseInt_opt i)
+    Result.fold ~error:(fun _ -> false) ~ok:Integer.is_zero (Cil.parseIntRes i)
   | _ -> false
 
 module BlockChunk =
@@ -4964,8 +4964,8 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
         end
       | Cabs.CONSTANT (Cabs.CONST_STRING s) -> AStr s
       | Cabs.CONSTANT (Cabs.CONST_INT str) -> begin
-          match parseIntExp_opt ~loc str with
-          | Some {enode = Const (CInt64 (v64,_,_)) } ->
+          match parseIntExpRes ~loc str with
+          | Ok {enode = Const (CInt64 (v64,_,_)) } ->
             AInt v64
           | _ ->
             Kernel.error ~current:true "Invalid attribute constant: %s" str;
@@ -6001,8 +6001,9 @@ and doExp local_env
         match ct with
         | Cabs.CONST_INT str -> begin
             let res =
-              try parseIntExp ~loc str
-              with Cil.ParseIntError msg ->
+              match parseIntExpRes ~loc str with
+              | Ok e -> e
+              | Error msg ->
                 Kernel.error ~current:true "%s" msg;
                 (* assign an arbitrary expression,
                    since we must return something *)

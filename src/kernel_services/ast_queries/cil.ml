@@ -3198,9 +3198,6 @@ let isLogicNull t =
       | _ -> false
    in aux t)
 
-exception ParseIntError of string
-
-(* Raises [ParseIntError] if cannot parse. *)
 let parseIntAux (str:string) =
   let hasSuffix str =
     let l = String.length str in
@@ -3236,22 +3233,21 @@ let parseIntAux (str:string) =
   (* Convert to integer. To prevent overflow we do the arithmetic
    * on Big_int and we take care of overflow. We work only with
    * positive integers since the lexer takes care of the sign *)
-  let rec toInt base (acc: Integer.t) (idx: int) : Integer.t =
+  let rec toInt base (acc: Integer.t) (idx: int) =
     let doAcc what =
       if Integer.ge what base
       then
-        raise (ParseIntError
-                 (Format.asprintf
-                    "Invalid digit %a in integer literal '%s' in base %a."
-                    (Integer.pretty ~hexa:false) what
-                    str
-                    (Integer.pretty ~hexa:false) base));
-      let acc' =
-        Integer.add what (Integer.mul base acc) in
-      toInt base acc' (idx + 1)
+        Error (Format.asprintf
+                 "Invalid digit %a in integer literal '%s' in base %a."
+                 (Integer.pretty ~hexa:false) what
+                 str
+                 (Integer.pretty ~hexa:false) base)
+      else
+        let acc' = Integer.add what (Integer.mul base acc) in
+        toInt base acc' (idx + 1)
     in
     if idx >= l - suffixlen then begin
-      acc
+      Ok acc
     end else
       let ch = String.get str idx in
       if ch >= '0' && ch <= '9' then
@@ -3261,9 +3257,8 @@ let parseIntAux (str:string) =
       else if  ch >= 'A' && ch <= 'F'  then
         doAcc (Integer.of_int (10 + Char.code ch - Char.code 'A'))
       else
-        raise (ParseIntError
-                 (Format.asprintf
-                    "Invalid character %c in integer literal: %s" ch str))
+        Error (Format.asprintf
+                 "Invalid character %c in integer literal: %s" ch str)
   in
   let i =
     if octalhexbin && l >= 2 then
@@ -3279,39 +3274,36 @@ let parseIntAux (str:string) =
   in
   i,kinds
 
-let parseInt s =
-  fst (parseIntAux s)
+let parseIntRes s = fst (parseIntAux s)
 
-let parseInt_opt str =
-  try Some (parseInt str)
-  with ParseIntError _ -> None
+let parseInt s =
+  match parseIntRes s with
+  | Ok i -> i
+  | Error msg -> Kernel.fatal ~current:true "%s" msg
 
 let parseIntLogic ~loc str =
-  let i,_= parseIntAux str in
+  let i = parseInt str in
   { term_node = TConst (Integer (i,Some str)) ; term_loc = loc;
     term_name = []; term_type = Linteger;}
 
-let parseIntLogic_opt ~loc str =
-  try Some (parseIntLogic ~loc str)
-  with ParseIntError _ -> None
+let parseIntExpRes ~loc repr =
+  let i, kinds = parseIntAux repr in
+  Result.bind i
+    (fun i ->
+       let rec loop = function
+         | k::rest ->
+           if fitsInInt k i then (* i fits in the current type. *)
+             Ok (kinteger64 ~loc ~repr ~kind:k i)
+           else loop rest
+         | [] ->
+           Error (Format.asprintf "Cannot represent the integer %s" repr)
+       in
+       loop kinds)
 
 let parseIntExp ~loc repr =
-  let i,kinds = parseIntAux repr in
-  let rec loop = function
-    | k::rest ->
-      if fitsInInt k i then (* i fits in the current type. *)
-        kinteger64 ~loc ~repr ~kind:k i
-      else loop rest
-    | [] ->
-      raise (ParseIntError
-               (Format.asprintf "Cannot represent the integer %s" repr))
-  in
-  loop kinds
-
-let parseIntExp_opt ~loc repr =
-  try
-    Some (parseIntExp loc repr)
-  with ParseIntError _ -> None
+  match parseIntExpRes ~loc repr with
+  | Ok e -> e
+  | Error msg -> Kernel.fatal ~current:true "%s" msg
 
 let mkStmtCfg ~before ~(new_stmtkind:stmtkind) ~(ref_stmt:stmt) : stmt =
   let new_ = { skind = new_stmtkind;
