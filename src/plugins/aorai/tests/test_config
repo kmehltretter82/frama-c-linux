@@ -1,1 +1,6 @@
 MACRO: PROVE_OPTIONS
+PLUGIN: aorai,wp
+
+COMMENT: Path to the library from the result directories
+COMMENT: Some tests do not use the library
+LIBS: ../../Aorai_test

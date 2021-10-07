@@ -1,6 +1,6 @@
 /* run.config*
-   OPT: -aorai-automata @PTEST_DIR@/@PTEST_NAME@.ya -load-module tests/Aorai_test.cmxs -aorai-test 1 -aorai-test-number @PTEST_NUMBER@ @PROVE_OPTIONS@
-   OPT: -aorai-automata @PTEST_DIR@/@PTEST_NAME@-2.ya -load-module tests/Aorai_test.cmxs -aorai-test 1 -aorai-test-number @PTEST_NUMBER@ @PROVE_OPTIONS@
+   OPT: -aorai-automata %{dep:@PTEST_NAME@.ya} -aorai-test-number @PTEST_NUMBER@ @PROVE_OPTIONS@
+   OPT: -aorai-automata %{dep:@PTEST_NAME@-2.ya} -aorai-test-number @PTEST_NUMBER@ @PROVE_OPTIONS@
  */
 
 void a(void) {}
