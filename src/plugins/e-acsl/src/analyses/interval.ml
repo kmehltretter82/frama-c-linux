@@ -614,7 +614,6 @@ let infer_sum_product oper lambda min max = match lambda, min, max with
                    min
            in
            let ub =
-             (* the upper bound is always (possibly) positive *)
              Extlib.opt_map2
                (fun m max ->
                   match max_lambda with
