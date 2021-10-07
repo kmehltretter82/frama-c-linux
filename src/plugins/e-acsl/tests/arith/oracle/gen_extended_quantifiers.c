@@ -398,7 +398,7 @@ int main(void)
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__7));
     __e_acsl_assert(__gen_e_acsl_ge >= 0,1,"Assertion","main",
                     "\\product(1, 100, \\lambda integer k; k) >= 3628800",
-                    "tests/arith/extended_quantifiers.c",24);
+                    "tests/arith/extended_quantifiers.c",25);
     __gmpz_clear(__gen_e_acsl_lambda_10);
     __gmpz_clear(__gen_e_acsl_accumulator_10);
     __gmpz_clear(__gen_e_acsl__7);
@@ -431,7 +431,7 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_accumulator_11 == 3628800UL,1,"Assertion",
                     "main",
                     "\\product(1, 10, \\lambda integer k; k) == 3628800",
-                    "tests/arith/extended_quantifiers.c",25);
+                    "tests/arith/extended_quantifiers.c",26);
   }
   /*@ assert \product(1, 10, \lambda ℤ k; k) ≡ 3628800; */ ;
   {
@@ -473,7 +473,7 @@ int main(void)
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__8));
     __e_acsl_assert(__gen_e_acsl_eq_2 == 0,1,"Assertion","main",
                     "\\product(-10, 10, \\lambda integer k; k) == 0",
-                    "tests/arith/extended_quantifiers.c",26);
+                    "tests/arith/extended_quantifiers.c",27);
     __gmpz_clear(__gen_e_acsl_lambda_12);
     __gmpz_clear(__gen_e_acsl_accumulator_12);
     __gmpz_clear(__gen_e_acsl__8);
@@ -553,7 +553,7 @@ int main(void)
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_accumulator_14));
     __e_acsl_assert(__gen_e_acsl_eq_3 == 0,1,"Assertion","main",
                     "\\product(-20, -1, \\lambda integer k; 2 * k) ==\n\\product(1, 20, \\lambda integer k; 2 * k)",
-                    "tests/arith/extended_quantifiers.c",27);
+                    "tests/arith/extended_quantifiers.c",28);
     __gmpz_clear(__gen_e_acsl_lambda_13);
     __gmpz_clear(__gen_e_acsl_accumulator_13);
     __gmpz_clear(__gen_e_acsl_lambda_14);
