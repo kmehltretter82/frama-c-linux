@@ -7122,12 +7122,13 @@ and doExp local_env
                        Kernel.error ~current:true "Using offset of bitfield";
                      let kind = Cil.theMachine.kindOfSizeOf in
                      pres := Cil.kinteger ~loc:e.eloc kind (start / 8);
-                   with SizeOfError _ ->
+                   with SizeOfError (s, _) ->
                      pres := e;
                      Kernel.error ~once:true ~current:true
-                       "Unable to compute offset %a in type %a"
+                       "Unable to compute offset %a in type %a: %s"
                        Cil_datatype.Offset.pretty offset
-                       Cil_datatype.Typ.pretty typ;
+                       Cil_datatype.Typ.pretty typ
+                       s;
                  end
                | _ ->
                  Kernel.abort ~current:true "Invalid call to builtin_offsetof"
