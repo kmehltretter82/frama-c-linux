@@ -14,6 +14,8 @@ int main(void) {
   /*@ assert \sum(x * x, 2, \lambda integer k; k) == 0; */;
   /*@ assert \sum(ULLONG_MAX - 5, ULLONG_MAX, \lambda integer k; 1) == 6; */;
   /*@ assert \sum(INT_MAX, INT_MAX, \lambda integer k; k) + 1 > INT_MAX; */
+  /*@ assert \let x = (0 == 0) ? 1 : 10;
+    @        \sum (x, 10, \lambda integer k; INT_MIN) < 0; */
 
   /*@ assert \numof(2, 10, \lambda integer k; k - 2 >= 0) == 9; */;
   /*@ assert \numof(UINT_MAX - 5, UINT_MAX, \lambda integer k; k % 2 == 1)
