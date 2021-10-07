@@ -1524,7 +1524,7 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config =
              log
          ) wtest.log
     in
-    let libs = String.concat " " config.dc_libs in
+    let libs = String.concat " " (List.map Filename.basename config.dc_libs) in
     let plugin_all = List.map (Format.sprintf "frama-c-%s.core") config.dc_plugin_all in
     List.iteri (fun n cmxs ->
         Format.fprintf result_fmt
