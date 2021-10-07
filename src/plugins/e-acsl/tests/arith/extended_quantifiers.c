@@ -14,16 +14,16 @@ int main(void) {
   /*@ assert \sum(x * x, 2, \lambda integer k; k) == 0; */;
   /*@ assert \sum(ULLONG_MAX - 5, ULLONG_MAX, \lambda integer k; 1) == 6; */;
   /*@ assert \sum(INT_MAX, INT_MAX, \lambda integer k; k) + 1 > INT_MAX; */
-  
-  /*@ assert \numof(2, 10, \lambda integer k; k - 2 >= 0) == 9; */; 
+
+  /*@ assert \numof(2, 10, \lambda integer k; k - 2 >= 0) == 9; */;
   /*@ assert \numof(UINT_MAX - 5, UINT_MAX, \lambda integer k; k % 2 == 1)
     @        == 3; */;
 
-  /*@ assert \product(1, 100, \lambda integer k; k) >= 3628800; */; 
-  /*@ assert \product(1, 10, \lambda integer k; k) == 3628800; */; 
-  /*@ assert \product(-10, 10, \lambda integer k; k) == 0; */; 
+  /*@ assert \product(1, 100, \lambda integer k; k) >= 3628800; */;
+  /*@ assert \product(1, 10, \lambda integer k; k) == 3628800; */;
+  /*@ assert \product(-10, 10, \lambda integer k; k) == 0; */;
   /*@ assert \product(-20, -1, \lambda integer k; 2 * k)
-    @     == \product(1, 20, \lambda integer k; 2 * k); */; 
-  
+    @     == \product(1, 20, \lambda integer k; 2 * k); */;
+
   return 0;
 }
