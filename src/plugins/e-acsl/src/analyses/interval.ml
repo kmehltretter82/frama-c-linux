@@ -595,7 +595,15 @@ let infer_sum_product oper lambda min max = match lambda, min, max with
                if Z.sign z = -1 then
                  (* the lower bound is (possibly) negative *)
                  Extlib.opt_map2
-                   (fun m max -> Z.neg (Z.pow max (Z.to_int m)))
+                   (fun m max ->
+                      match min_lambda, max_lambda with
+                      | Some mil, Some mal when Z.lt (Z.abs mil) (Z.abs mal) ->
+                        (* [lambda] contains both positive and negative values
+                           and |mil| < |mal|: instead of [-mal^m], the min is
+                           optimized to [mil * mal^(m-1)] *)
+                        Z.mul mil (Z.pow max (Z.to_int m - 1))
+                      | None, _ | _, None | Some _, Some _ ->
+                        Z.neg (Z.pow max (Z.to_int m)))
                    (max_delta minmax_lb minmax_ub)
                    max
                else
@@ -608,7 +616,17 @@ let infer_sum_product oper lambda min max = match lambda, min, max with
            let ub =
              (* the upper bound is always (possibly) positive *)
              Extlib.opt_map2
-               (fun m max -> Z.pow max (Z.to_int m))
+               (fun m max ->
+                  match max_lambda with
+                  | Some ml when Z.lt ml Z.zero ->
+                    (* when [lambda] is necessarily negative with an odd number
+                       of iterations (>1), the result is necessarily negative,
+                       so smaller than the maximal (positive) value. Therefore,
+                       it is possible to reduce the number of iteration by 1. *)
+                    let exp = Z.to_int m in
+                    Z.pow max (exp - exp mod 2)
+                  | None | Some _ ->
+                    Z.pow max (Z.to_int m))
                (max_delta minmax_lb minmax_ub)
                max
            in
