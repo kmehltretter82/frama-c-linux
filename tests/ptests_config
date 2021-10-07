@@ -3,14 +3,12 @@
 # todo: adds dynamic_plugin? No, will be removed from master branch.
 # todo: adds verisec?
 
-DEFAULT_SUITES= builtins callgraph cil constant_propagation dynamic float idct impact
+DEFAULT_SUITES= builtins callgraph cil constant_propagation compliance dynamic float idct impact
 DEFAULT_SUITES= jcdb journal libc metrics misc occurrence pdg pretty_printing rte rte_manual
 DEFAULT_SUITES= saveload scope slicing sparecode spec syntax test value value/traces
 
 # todo: fixes fc_script
 IGNORE= DEFAULT_SUITES= fc_script
-
-DEFAULT_SUITES= compliance
 
 # todo: adds make_run_script?
 IGNORE= DEFAULT_SUITES= make_run_script
