@@ -538,7 +538,7 @@ and print_usage () =
 
 let _ =
   (* Test if headache is in the path *)
-  if Sys.command "headache -e >/dev/null 2>/dev/null" <> 0 then
+  if Sys.command "headache -e" <> 0 then
     (Format.eprintf "error: 'headache' command not in PATH or incompatible \
                      version (option -e unsupported)@."; exit 6);
   Arg.parse (Arg.align (sort argspec)) (fun s -> spec_files := s::!spec_files) umsg;
