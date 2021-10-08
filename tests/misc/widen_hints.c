@@ -10,6 +10,7 @@ PLUGIN: @EVA_PLUGINS@
 #define N 2
 const int x = 9;
 int not_const = 42; // cannot be used as widen hint
+typedef struct { int i; } istruct;
 
 #ifdef SYNTAX_ERRORS
 int main1() {
@@ -31,7 +32,6 @@ int main() {
   /*@ widen_hints x, not_const; */ // error: not_const not a global constant
   return 0;
 }
-
 #else
 
 #ifdef ALLGLOBAL
@@ -112,7 +112,7 @@ int main() {
     }
   }
 
-  typedef struct { int i; } istruct;
+
   istruct iarray[2] = {{0}, {0}};
   istruct *piarray[2] = {&iarray[0], &iarray[1]};
   for (piarray[1]->i = 0; piarray[1]->i < n*2+1; (piarray[1]->i)++) {

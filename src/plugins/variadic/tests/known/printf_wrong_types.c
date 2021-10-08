@@ -2,7 +2,7 @@
 STDOPT: +"-then -variadic-no-translation -then -variadic-translation -variadic-no-strict"
 */
 
-
+typedef enum { OK, ERROR } RC;
 #include <stdio.h>
 
 int main(){
@@ -30,7 +30,7 @@ int main(){
   printf("%s", i); // Wrong type
   printf("%d", string); // Wrong type
 
-  typedef enum { OK, ERROR } RC;
+
   RC rc = OK;
   printf("%u", rc); // Correct type with '-enums gcc-enums'
   printf("%d", rc); // Wrong type (in strict mode)
