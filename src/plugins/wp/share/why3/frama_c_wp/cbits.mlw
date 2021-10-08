@@ -57,6 +57,7 @@ theory Cbits
 
 (** ** land identities *)
   axiom land_idemp: forall x:int [land x x]. (land x x) = x
+  axiom land_idemp_bis: forall x y : int [land x (land x y)]. land x (land x y) = land x y
   axiom land_0: forall x:int [land 0 x]. (land 0 x) = 0
   axiom land_0bis: forall x:int [land x 0]. (land x 0) = 0
   axiom land_1: forall x:int [land (-1) x]. (land (-1) x) = x
@@ -67,6 +68,7 @@ theory Cbits
 
 (** ** lor identities *)
   axiom lor_idemp: forall x:int [lor x x]. (lor x x) = x
+  axiom lor_idemp_bis: forall x y : int [lor x (lor x y)]. lor x (lor x y) = lor x y
   axiom lor_1:     forall x:int [lor (-1) x]. (lor (-1) x) = -1
   axiom lor_1bis:  forall x:int [lor x (-1)]. (lor x (-1)) = -1
   axiom lor_0:     forall x:int [lor 0 x]. (lor 0 x) = x
@@ -77,6 +79,7 @@ theory Cbits
 
 (** ** lxor identities *)
   axiom lxor_nilpotent: forall x:int [lxor x x]. (lxor x x) = 0
+  axiom lxor_nilpotent_bis: forall x y : int [lxor x (lxor x y)]. lxor x (lxor x y) = y
   axiom lxor_1:    forall x:int [lxor (-1) x]. (lxor (-1) x) = (lnot x)
   axiom lxor_1bis: forall x:int [lxor x (-1)]. (lxor x (-1)) = (lnot x)
   axiom lxor_0:    forall x:int [lxor 0 x]. (lxor 0 x) = x
@@ -481,7 +484,7 @@ theory Cbits
   lemma is_sint_land: forall n x y:int.
     is_sint n x -> is_sint n y -> to_sint n (land x y) = land x y
   lemma is_sint_lsr: forall n x y:int.
-    0<=y -> is_sint n x -> to_sint n (lsr x y) = lsr x y 
+    0<=y -> is_sint n x -> to_sint n (lsr x y) = lsr x y
   lemma is_sint_lsl1_inf : forall n y:int.
     0<=y<n -> to_sint n (lsl 1 y) = (lsl 1 y)
   lemma is_sint_lsl1_sup : forall n y:int.
@@ -508,7 +511,7 @@ theory Cbits
     is_sint8 x -> is_sint8 y -> to_sint8 (land x y) = land x y
 
   axiom is_sint8_lsr: forall x y:int [to_sint8 (lsr x y)].
-    0<=y -> is_sint8 x -> to_sint8 (lsr x y) = lsr x y 
+    0<=y -> is_sint8 x -> to_sint8 (lsr x y) = lsr x y
 
   axiom is_sint8_lsl1 :
     lsl 1 7 = Cint.max_sint8
@@ -524,7 +527,7 @@ theory Cbits
     is_sint16 x -> to_sint16 (lnot x) = lnot x
 
   axiom is_sint16_lxor : forall x y:int [to_sint16 (lxor x y)].
-    is_sint16 x -> is_sint16 y -> to_sint16 (lxor x y) = lxor x y 
+    is_sint16 x -> is_sint16 y -> to_sint16 (lxor x y) = lxor x y
 
   axiom is_sint16_lor : forall x y:int [to_sint16 (lor x y)].
     is_sint16 x -> is_sint16 y -> to_sint16 (lor x y) = lor x y
@@ -549,7 +552,7 @@ theory Cbits
     is_sint32 x -> to_sint32 (lnot x) = lnot x
 
   axiom is_sint32_lxor : forall x y:int [to_sint32 (lxor x y)].
-    is_sint32 x ->  is_sint32 y -> to_sint32 (lxor x y) = lxor x y 
+    is_sint32 x ->  is_sint32 y -> to_sint32 (lxor x y) = lxor x y
 
   axiom is_sint32_lor : forall x y:int [to_sint32(lor x y)].
     is_sint32 x -> is_sint32 y -> to_sint32 (lor x y) = lor x y
