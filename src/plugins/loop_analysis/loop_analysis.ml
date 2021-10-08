@@ -324,21 +324,21 @@ module Store(* (B:sig *)
     let value = (mem,conds) in
     let open Cil_types in
     let map_on_all_succs (mem,conds) =
-      List.map (fun x -> (Region_analysis.Edge(stmt,x),(mem,conds,x))) stmt.succs in
+      List.map (fun x -> (Region_analysis_sig.Edge(stmt,x),(mem,conds,x))) stmt.succs in
     match stmt.skind with
     | Instr(i) -> map_on_all_succs (do_instr i (mem,conds))
     | Return _ ->
-      [Region_analysis.Exit stmt, (mem,conds,Cil.dummyStmt)]
+      [Region_analysis_sig.Exit stmt, (mem,conds,Cil.dummyStmt)]
     | Loop _ | Goto _ | Break _ | Continue _ | Block _ | UnspecifiedSequence _ ->
       map_on_all_succs value
     | If _ ->
       let result = Dataflows.transfer_if_from_guard do_guard stmt value in
       List.map (fun (succ,(mem,cond)) ->
-          (Region_analysis.Edge(stmt,succ),(mem,cond,succ))) result
+          (Region_analysis_sig.Edge(stmt,succ),(mem,cond,succ))) result
     | Switch _ ->
       let result = Dataflows.transfer_switch_from_guard do_guard stmt value in
       List.map (fun (succ,(mem,cond)) ->
-          (Region_analysis.Edge(stmt,succ),(mem,cond,succ))) result
+          (Region_analysis_sig.Edge(stmt,succ),(mem,cond,succ))) result
     | Throw _ | TryCatch _ | TryExcept _ | TryFinally _ ->
       Options.abort "unsupported exception-related statement: %a"
         Printer.pp_stmt stmt

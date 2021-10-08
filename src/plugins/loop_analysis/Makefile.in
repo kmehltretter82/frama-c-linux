@@ -31,7 +31,8 @@ PLUGIN_ENABLE:=@ENABLE_LOOP_ANALYSIS@
 PLUGIN_DISTRIBUTED:=$(PLUGIN_ENABLE)
 
 PLUGIN_NAME:= LoopAnalysis
-PLUGIN_CMO:=  options region_analysis_sig region_analysis region_analysis_stmt loop_analysis register
+PLUGIN_CMO:= options region_analysis region_analysis_stmt loop_analysis register
+PLUGIN_CMI:= region_analysis_sig
 PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure test.c test.oracle README.org
 PLUGIN_TESTS_DIRS:=loop_analysis
 

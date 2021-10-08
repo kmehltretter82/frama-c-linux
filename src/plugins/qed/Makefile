@@ -50,15 +50,15 @@ PLUGIN_CMO:= \
 	idxmap idxset \
 	mergemap mergeset collection \
 	partition cache \
-	bvars logic \
+	bvars \
 	pool kind term \
-	plib pretty engine export \
+	plib pretty export \
 	export_whycore \
 	export_altergo \
 	export_why3 \
 	export_coq \
 
-PLUGIN_GUI_CMO:= QedGui
+PLUGIN_CMI:= logic engine
 
 PLUGIN_DEPENDENCIES:=
 PLUGIN_TESTS_DIRS:=
@@ -83,9 +83,9 @@ QED_API= \
 	mergemap.mli mergeset.mli collection.mli \
 	partition.mli cache.mli \
 	bvars.mli \
-	logic.ml \
+	logic.mli \
 	pool.mli kind.mli term.mli \
-	plib.mli pretty.mli engine.ml export.mli \
+	plib.mli pretty.mli engine.mli export.mli \
 	export_whycore.mli \
 	export_altergo.mli \
 	export_why3.mli \

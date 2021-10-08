@@ -2,16 +2,17 @@
 { pkgs, stdenv, src ? ../., opam2nix, ocaml ? pkgs.ocaml-ng.ocamlPackages_4_08.ocaml, plugins ? { } }:
 
 let mydir = builtins.getEnv("PWD");
-    mk-opam-selection = { name, opamSrc?null, ... }: {
+   mk-opam-selection = { name, opamSrc?{}, ... }: {
       inherit ocaml;
       src = opamSrc;
       selection = "${mydir}/${name}-${ocaml.version}-opam-selection.nix";
     };
-    opamPackages =
+     opamPackages =
       [ "ocamlfind" "zarith" "ocamlgraph" "yojson" "zmq"
         "ppx_deriving" "ppx_deriving_yojson"
-        "coq=8.12.0" "alt-ergo=2.2.0" "why3=1.4.0" "why3-coq=1.4.0" ];
-
+        "coq=8.13.0" "alt-ergo=2.2.0"
+        "why3=1.4.0" "why3-coq=1.4.0"
+      ];
     # only pure nix packages. See mk_deriv below for adding opam2nix packages
     mk_buildInputs = { nixPackages ? [] } :
     [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl pkgs.file pkgs.which pkgs.dos2unix] ++ nixPackages;
@@ -362,7 +363,13 @@ pkgs.lib.makeExtensible
                 sed -i src/plugins/pathcrawler/extern/eclipseCLP/RUNME -e "s/chmod 2755/chmod 755/g"
                 rm src/plugins/pathcrawler/extern/eclipseCLP/lib/x86_64_linux/dbi_mysql.so
                 rm src/plugins/pathcrawler/extern/eclipseCLP/lib/x86_64_linux/ic.so
-                autoPatchelf src/plugins/pathcrawler
+                rm src/plugins/pathcrawler/extern/eclipseCLP/lib/x86_64_linux/bitmap.so
+                rm -fr src/plugins/pathcrawler/extern/eclipseCLP/lib/i386_linux
+                rm src/plugins/pathcrawler/src/generator/COLIBRI/float_util_sparc_sunos5.so
+                rm src/plugins/pathcrawler/src/generator/COLIBRI/float_util_i386_linux.so.*
+                rm src/plugins/pathcrawler/share/bin/float_util_sparc_sunos5.so
+                find src/plugins/pathcrawler -name '*_i386_*.so' -delete
+                autoPatchelf src/plugins/pathcrawler/
                 make -j 4
                 ln -sr src/plugins/pathcrawler/share share/pc
                 # Setup Why3

@@ -132,6 +132,8 @@ type ('c,'a) trans = {
   mutable numt : int         (** Numerical ID of the transition *)
 }
 
+type ('c,'a) graph = state list * ('c, 'a) trans list
+
 type parsed_trans = (guard, action) trans
 
 type typed_trans = (typed_condition, typed_action) trans
@@ -140,7 +142,7 @@ type typed_trans = (typed_condition, typed_action) trans
     of transitions.*)
 type ('c,'a) automaton = {
   states: state list;
-  trans: (('c,'a) trans) list;
+  trans: ('c,'a) trans list;
   metavariables: Cil_types.varinfo Datatype.String.Map.t;
   observables: Datatype.String.Set.t option;
 }

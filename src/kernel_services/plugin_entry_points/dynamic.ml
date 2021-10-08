@@ -246,7 +246,7 @@ let load_script base =
     else
       Format.fprintf fmt "%s -c" Fc_config.ocamlc ;
     Format.fprintf fmt
-      " -g %s -warn-error a -I %s" Fc_config.ocaml_wflags (Fc_config.libdir :> string) ;
+      " -g %s -w -70 -warn-error a -I %s" Fc_config.ocaml_wflags (Fc_config.libdir :> string) ;
     if !Fc_config.is_gui && Fc_config.lablgtk <> "" then
       Format.fprintf fmt " -package %s" Fc_config.lablgtk;
     List.iter (fun p -> Format.fprintf fmt " -I %s" p) !load_path ;

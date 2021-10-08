@@ -26,14 +26,6 @@
 (* File yalexer.mll *)
 {
     open Yaparser
-    open Lexing
-    exception Lexing_error of string
-
-    let new_line lexbuf =
-      let lcp = lexbuf.lex_curr_p in
-      lexbuf.lex_curr_p <- { lcp with pos_lnum = lcp.pos_lnum + 1;
-                                      pos_bol  = lcp.pos_cnum; }
-    ;;
 }
 
 let num    = ['0'-'9']
@@ -44,7 +36,7 @@ let string = ([^ '"' '\\']|'\\'_)*
 
 rule token = parse
     [' ' '\t' ]       { token lexbuf }     (* skip blanks *)
-  | '\n'              { new_line lexbuf; token lexbuf }
+  | '\n'              { Utils_parser.newline lexbuf; token lexbuf }
   | ['0'-'9']+ as lxm { INT(lxm) }
   | "CALL"            { CALL_OF }
   | "RETURN"          { RETURN_OF }
@@ -89,6 +81,4 @@ rule token = parse
   | '?'               { QUESTION }
   | eof               { EOF }
   | ":="              { AFF }
-  | _                 {
-    raise (Lexing_error ("unexpected character '" ^ Lexing.lexeme lexbuf ^ "'"))
-  }
+  | _                 { Utils_parser.unknown_token lexbuf }

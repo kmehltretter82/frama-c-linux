@@ -561,6 +561,7 @@ let extract_inout_from_froms froms =
   (Zone.join in_return in_), out_
 
 
+[@@@ warning "-60"]
 module Callwise = struct
 
   let merge_call_in_local_table call local_table v =
@@ -842,7 +843,6 @@ module Externals_With_Formals =
     end)
 let get_external_with_formals =
   Externals_With_Formals.memo (raw_externals ~with_formals:true)
-let compute_external_with_formals kf = ignore (get_external_with_formals kf)
 
 
 let pretty_operational_inputs_internal fmt kf =

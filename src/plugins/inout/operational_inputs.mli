@@ -1,9 +1,9 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  This file is part of WP plug-in of Frama-C.                           *)
+(*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
 (*  Copyright (C) 2007-2021                                               *)
-(*    CEA (Commissariat a l'energie atomique et aux energies              *)
+(*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
 (*  you can redistribute it and/or modify it under the terms of the GNU   *)
@@ -20,4 +20,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Fake Module for Frama-C / Gui *)
+open Cil_types
+
+val get_external: kernel_function -> Inout_type.t
+val get_external_aux: ?stmt:stmt -> kernel_function -> Inout_type.t
+
+val pretty_operational_inputs_internal:
+  Format.formatter -> kernel_function -> unit
+val pretty_operational_inputs_external:
+  Format.formatter -> kernel_function -> unit
+val pretty_operational_inputs_external_with_formals:
+  Format.formatter -> kernel_function -> unit

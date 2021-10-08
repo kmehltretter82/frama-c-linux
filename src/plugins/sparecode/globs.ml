@@ -26,7 +26,6 @@ open Cil
 let dkey = Sparecode_params.register_category "globs"
 
 let debug format = Sparecode_params.debug ~dkey ~level:2 format
-let debug' format = Sparecode_params.debug ~dkey ~level:3 format
 
 let used_variables = Hashtbl.create 257
 let var_init = Hashtbl.create 257

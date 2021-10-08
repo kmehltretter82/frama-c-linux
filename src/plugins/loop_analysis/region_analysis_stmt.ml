@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Region_analysis
+open Region_analysis_sig
 
 module type M = sig
   val kf: Kernel_function.t

@@ -22,25 +22,8 @@
 
 (** This module defines abstraction for Metrics use *)
 
-
-let mk_bi_label (parent:GPack.box) l1 =
-  let container = GPack.hbox ~packing:parent#pack () in
-  let t = GMisc.label ~text:l1 ~xalign:0.0
-      ~packing:(container#pack ~expand:false ~fill:true)
-      ()
-  in
-  Gtk_helper.old_gtk_compat t#set_width_chars 7;
-  let label = GMisc.label ~selectable:true ~xalign:0.0 ~text:""
-      ~packing:(container#pack ~expand:true)
-      ()
-  in label
-
-
-
-
 module HalsteadMetricsGUI = struct
 
-  let compute = Metrics_cabs.compute_on_cabs
   let name = "Halstead"
 
   let display_result (main_ui:Design.main_window_extension_points) (parent_win:GPack.box) =
@@ -191,8 +174,6 @@ module CyclomaticMetricsGUI = struct
     initializer
       main_ui#register_source_selector self#cyclo_selector
   end
-
-  let compute ~libc () = Metrics_cilast.compute_on_cilast ~libc
 
   let display_result ~libc (parent_win:GPack.box) =
     let padder = GBin.alignment

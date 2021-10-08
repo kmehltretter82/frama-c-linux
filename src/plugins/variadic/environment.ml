@@ -24,7 +24,7 @@ open Cil_types
 
 module Table = Datatype.String.Hashtbl
 
-type env =
+type t =
   {
     globals: varinfo Table.t;
     functions: varinfo Table.t;
@@ -34,7 +34,7 @@ type env =
     enums: enuminfo Table.t;
   }
 
-let empty () : env =
+let empty () : t =
   {
     globals = Table.create 17;
     functions = Table.create 17;
@@ -44,41 +44,41 @@ let empty () : env =
     enums = Table.create 17;
   }
 
-let add_global (env : env) (vi : varinfo) : unit  =
+let add_global (env : t) (vi : varinfo) : unit  =
   Table.add env.globals vi.vname vi
 
-let add_function (env : env) (vi : varinfo) : unit  =
+let add_function (env : t) (vi : varinfo) : unit  =
   Table.add env.functions vi.vname vi
 
-let add_typeinfo (env : env) (typeinfo : typeinfo) : unit =
+let add_typeinfo (env : t) (typeinfo : typeinfo) : unit =
   Table.add env.typedefs typeinfo.torig_name typeinfo
 
-let add_compinfo (env : env) (compinfo : compinfo) : unit  =
+let add_compinfo (env : t) (compinfo : compinfo) : unit  =
   let table = if compinfo.cstruct then env.structs else env.unions in
   Table.add table compinfo.corig_name compinfo
 
-let add_enuminfo (env : env) (enuminfo : enuminfo) : unit  =
+let add_enuminfo (env : t) (enuminfo : enuminfo) : unit  =
   Table.add env.enums enuminfo.eorig_name enuminfo
 
-let find_global (env : env) (vname : string) : varinfo  =
+let find_global (env : t) (vname : string) : varinfo  =
   Table.find env.globals vname
 
-let find_function (env : env) (vname : string) : varinfo =
+let find_function (env : t) (vname : string) : varinfo =
   Table.find env.functions vname
 
-let find_typedef (env : env) (tname : string) : typeinfo=
+let find_typedef (env : t) (tname : string) : typeinfo=
   Table.find env.typedefs tname
 
-let find_struct (env : env) (tname : string) : compinfo =
+let find_struct (env : t) (tname : string) : compinfo =
   Table.find env.structs tname
 
-let find_union (env : env) (tname : string) : compinfo =
+let find_union (env : t) (tname : string) : compinfo =
   Table.find env.unions tname
 
-let find_enum (env : env) (tname : string) : enuminfo =
+let find_enum (env : t) (tname : string) : enuminfo =
   Table.find env.enums tname
 
-let find_type (env : env) (namespace : Logic_typing.type_namespace)
+let find_type (env : t) (namespace : Logic_typing.type_namespace)
     (tname : string) : typ =
   match namespace with
   | Logic_typing.Typedef ->
@@ -90,7 +90,7 @@ let find_type (env : env) (namespace : Logic_typing.type_namespace)
   | Logic_typing.Enum ->
     TEnum (find_enum env tname, [])
 
-let from_file (file : file) : env =
+let from_file (file : file) : t =
   let env = empty () in
   let v = object inherit Cil.nopCilVisitor
     method! vglob glob =

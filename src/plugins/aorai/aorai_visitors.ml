@@ -41,14 +41,6 @@ let get_acceptance_pred () =
        | Bool3.False | Bool3.Undefined -> acc)
     Logic_const.pfalse st
 
-let get_call_name exp = match exp.enode with
-  | Const(CStr(s)) -> s
-  | Lval(Var(vi),NoOffset) -> vi.vname
-  | _ ->
-    Aorai_option.not_yet_implemented
-      ~source:(fst exp.eloc)
-      "At this time, only explicit calls are allowed by the Aorai plugin."
-
 (****************************************************************************)
 
 (* The instrumentation is done in two passes:

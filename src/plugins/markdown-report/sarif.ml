@@ -26,10 +26,17 @@
     by default: we must thus silence spurious let rec warning (39). *)
 [@@@ warning "-39"]
 
+type 'a dict = (string * 'a) list
+
 module type Json_type = sig
   type t
   val of_yojson: Yojson.Safe.t -> t Ppx_deriving_yojson_runtime.error_or
   val to_yojson: t -> Yojson.Safe.t
+end
+
+module type Json_default = sig
+  include Json_type
+  val default: t
 end
 
 module Json_string: Json_type with type t = string =
@@ -93,6 +100,8 @@ module ArtifactLocation = struct
     uriBaseId: (string [@default ""])
   }[@@deriving yojson]
 
+  type _t = t
+
   let create ~uri ?(uriBaseId = "") () = { uri; uriBaseId }
 
   let default = create ~uri:"" ()
@@ -118,6 +127,8 @@ module Properties = struct
     tags: tags;
     additional_properties: Custom_properties.t
   }
+
+  type _t = t
 
   let default = { tags = []; additional_properties = [] }
 
@@ -153,6 +164,8 @@ module Message = struct
     properties: (Properties.t [@default Properties.default]);
   }[@@deriving yojson]
 
+  type _t = t
+
   let create
       ?(text="")
       ?(id="")
@@ -182,6 +195,8 @@ module MultiformatMessageString = struct
     properties: (Properties.t [@default Properties.default])
   }[@@deriving yojson]
 
+  type _t = t
+
   let create ~text ?(markdown="") ?(properties=Properties.default) () =
     { text; markdown; properties }
 
@@ -200,6 +215,8 @@ module ArtifactContent = struct
       properties: (Properties.t [@default Properties.default])
     }
   [@@deriving yojson]
+
+  type _t = t
 
   let create ?(text="") ?(binary="")
       ?(rendered=MultiformatMessageString.default)

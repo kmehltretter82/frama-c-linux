@@ -1426,7 +1426,7 @@ else
     $(sort $(shell find $(TEST_DIRS_AS_PLUGIN:%=tests/%) -not -path '*/\.*' -name '*.ml'))
 endif
 $(foreach file,$(LONELY_TESTS_ML_FILES),\
-  $(eval $(file:%.ml=%.cmo): BFLAGS+=-I $(dir $(file))))
+  $(eval $(file:%.ml=%.cmo): BFLAGS+=-w -70 -I $(dir $(file))))
 $(foreach file,$(LONELY_TESTS_ML_FILES),\
   $(eval $(file:%.ml=%.cmx): OFLAGS+=-I $(dir $(file))))
 $(foreach file,$(LONELY_TESTS_ML_FILES),\
