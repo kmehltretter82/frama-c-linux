@@ -45,10 +45,10 @@ Assume {
   (* Assertion 'for_value' *)
   Have: (c = 1) \/ (c <= 0) \/ (2 <= c).
   Have: c != 2.
-  (* Invariant 'C' *)
-  Have: ((c = 0) -> ((i = 0) -> (x = 0))).
   (* Invariant 'A_KO' *)
   Have: ((i != 0) -> (y_1 = 0)).
+  (* Invariant 'C' *)
+  Have: ((c = 0) -> ((i = 0) -> (x = 0))).
   (* Then *)
   Have: i <= 9.
   If c = 1

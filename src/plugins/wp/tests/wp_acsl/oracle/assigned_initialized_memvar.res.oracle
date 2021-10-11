@@ -71,6 +71,8 @@ Assume {
        (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) -> (v[i_2]=true)))))).
   (* Else *)
   Have: 10 <= i.
+  (* Invariant 'CHECK' *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) -> (v[i_2]=true))).
   (* Loop assigns 'CHECK' *)
   Have: ((s.F1_S_i) = 0) /\
       (forall i_2 : Z. ((i_2 != 0) -> ((i_2 != 2) -> ((i_2 != 4) ->
@@ -153,12 +155,21 @@ Assume {
        (forall i_5 : Z. ((0 <= i_5) -> ((i_5 < i_2) -> (v[i_5]=true)))))).
   (* Else *)
   Have: 10 <= i_2.
+  (* Invariant 'CHECK' *)
+  Have: forall i_5 : Z. ((0 <= i_5) -> ((i_5 <= 9) -> (v[i_5]=true))).
   (* Loop assigns 'CHECK' *)
   Have: ((s.F1_S_i) = 0) /\
       (forall i_5 : Z. ((i_5 != 0) -> ((i_5 != 2) -> ((i_5 != 4) ->
        ((0 <= i_5) -> ((i_5 <= 9) -> ((s.F1_S_a)[i_5] = v_1[i_5]))))))).
   (* Then *)
   Have: i_3 <= 9.
+  If i_3 = 0
+  Else {
+    Have: s = s_1.
+    If i_3 = 2
+    Then { Have: s_1 = s_2. }
+    Else { Have: s_1 = s_3. }
+  }
 }
 Prove: ((i != 0) /\ (i != 2) /\ (i != 4)) \/
     (exists i_5 : Z. (i_5 <= i_1) /\ (i_1 <= i_5) /\
@@ -304,6 +315,8 @@ Assume {
        (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) -> (v[i_2]=true)))))).
   (* Else *)
   Have: 10 <= i_1.
+  (* Invariant 'CHECK' *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) -> (v[i_2]=true))).
   (* Loop assigns 'CHECK' *)
   Have: ((s.F1_S_i) = 0) /\
       (forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) ->

@@ -55,6 +55,8 @@ Assume {
   Have: ((0 <= c1_0) -> ((cpt_0 <= c1_0) /\ (0 <= cpt_0))).
   (* Else *)
   Have: 2 <= cpt_0.
+  (* Invariant *)
+  Have: ((0 <= c1_0) -> (cpt_0 <= (1 + c1_0))).
 }
 Prove: 0 <= cpt_0.
 
@@ -130,13 +132,15 @@ Prove: true.
 Goal Positivity of Loop variant at loop (file tests/wp_acsl/terminates_variant_option.i, line 19):
 Let x = Mint_0[p].
 Assume {
-  Type: is_sint32(v) /\ is_sint32(x).
+  Type: is_sint32(v) /\ is_sint32(x) /\ is_sint32(v - 1).
   (* Heap *)
   Type: region(p.base) <= 0.
   (* Invariant *)
   Have: ((0 <= x) -> ((0 <= v) /\ (v <= x))).
   (* Then *)
   Have: v != 0.
+  (* Invariant *)
+  Have: ((0 <= x) -> ((0 < v) /\ (v <= (1 + x)))).
 }
 Prove: 0 <= v.
 

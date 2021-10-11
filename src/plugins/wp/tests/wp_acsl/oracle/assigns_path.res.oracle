@@ -19,12 +19,14 @@ Assume {
   (* Goal *)
   When: (0 <= i) /\ (i < n).
   (* Pre-condition *)
-  Have: (0 <= n) /\ (n <= 3).
+  Have: n <= 3.
+  (* Invariant *)
+  Have: 0 <= n.
+  (* Invariant *)
+  Have: (0 <= i_1) /\ (i_1 <= n).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
       (Mint_0[shift_sint32(b, i_2)] = v[i_2]))).
-  (* Invariant *)
-  Have: (0 <= i_1) /\ (i_1 <= n).
   (* Else *)
   Have: n <= i_1.
 }
@@ -38,12 +40,14 @@ Assume {
   (* Heap *)
   Type: region(b.base) <= 0.
   (* Pre-condition *)
-  Have: (0 <= n) /\ (n <= 3).
+  Have: n <= 3.
+  (* Invariant *)
+  Have: 0 <= n.
+  (* Invariant *)
+  Have: (0 <= i) /\ (i <= n).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
       (Mint_0[shift_sint32(b, i_1)] = v[i_1]))).
-  (* Invariant *)
-  Have: (0 <= i) /\ (i <= n).
   (* Then *)
   Have: i < n.
 }
@@ -64,14 +68,18 @@ Assume {
   (* Goal *)
   When: (0 <= i_1) /\ (i_1 <= i).
   (* Pre-condition *)
-  Have: (0 <= n) /\ (n <= 3).
+  Have: n <= 3.
+  (* Invariant *)
+  Have: 0 <= n.
+  (* Invariant *)
+  Have: (0 <= i) /\ (i <= n).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
       (Mint_0[shift_sint32(b, i_2)] = v[i_2]))).
-  (* Invariant *)
-  Have: (0 <= i) /\ (i <= n).
   (* Then *)
   Have: i < n.
+  (* Invariant *)
+  Have: (-1) <= i.
 }
 Prove: v[i <- Mint_0[shift_sint32(b, i)]][i_1] = Mint_0[shift_sint32(b, i_1)].
 
