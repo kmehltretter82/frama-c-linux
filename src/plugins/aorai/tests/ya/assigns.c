@@ -1,10 +1,10 @@
 /* run.config*
-   OPT: -aorai-automata @PTEST_DIR@/@PTEST_NAME@.ya -load-module tests/Aorai_test.cmxs -aorai-test-number @PTEST_NUMBER@ @PROVE_OPTIONS@
-   OPT: -aorai-automata @PTEST_DIR@/assigns_det.ya -load-module tests/Aorai_test.cmxs -aorai-test-number @PTEST_NUMBER@ @PROVE_OPTIONS@
+   OPT: -aorai-automata @PTEST_DIR@/@PTEST_NAME@.ya -aorai-test-number @PTEST_NUMBER@ @PROVE_OPTIONS@
+   OPT: -aorai-automata @PTEST_DIR@/assigns_det.ya -aorai-test-number @PTEST_NUMBER@ @PROVE_OPTIONS@
  MODULE: name_projects
+ LIBS:
    OPT: -aorai-automata @PTEST_DIR@/@PTEST_NAME@.ya -then -print
 */
-
 int X;
 
 void f(void) { X++; }
