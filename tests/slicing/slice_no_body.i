@@ -1,5 +1,5 @@
 /* run.config
- LIBS: libSelect
+ LIBS: ../libSelect
  MODULE: @PTEST_NAME@
  CMD: @frama-c@ @PTEST_OPTIONS@
    OPT: @EVA_OPTIONS@ -deps -lib-entry -main h -journal-disable

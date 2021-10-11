@@ -1,14 +1,17 @@
 /* run.config
-   CMXS: @PTEST_NAME@
-   EXECNOW: LOG @PTEST_NAME@_sav.res LOG @PTEST_NAME@_sav.err BIN @PTEST_NAME@.sav @frama-c@ -load-module %{dep:@PTEST_NAME@.cmxs} -eva @EVA_OPTIONS@ -out -input -deps -save @PTEST_NAME@.sav > @PTEST_NAME@_sav.res 2> @PTEST_NAME@_sav.err
+ MODULE: @PTEST_NAME@
+   EXECNOW: LOG @PTEST_NAME@_sav.res LOG @PTEST_NAME@_sav.err BIN @PTEST_NAME@.sav @frama-c@ -eva @EVA_OPTIONS@ -out -input -deps -save @PTEST_NAME@.sav > @PTEST_NAME@_sav.res 2> @PTEST_NAME@_sav.err
+ MODULE:
    EXECNOW: LOG @PTEST_NAME@_sav.1.res LOG @PTEST_NAME@_sav.1.err BIN @PTEST_NAME@.1.sav @frama-c@ -save @PTEST_NAME@.1.sav -eva @EVA_OPTIONS@ -out -input -deps > @PTEST_NAME@_sav.1.res 2> @PTEST_NAME@_sav.1.err
    STDOPT: +"-load %{dep:@PTEST_NAME@.sav} -eva @EVA_OPTIONS@ -out -input -deps -journal-disable"
-   CMD: @frama-c@ -load-module %{dep:@PTEST_NAME@.cmxs} @PTEST_FILE@ @PTEST_OPTIONS@
+ MODULE: @PTEST_NAME@
    STDOPT: +"-load %{dep:@PTEST_NAME@.1.sav} -eva @EVA_OPTIONS@ -out -input -deps -journal-disable -print"
+ MODULE:
    STDOPT: +"-load %{dep:@PTEST_NAME@.1.sav} -eva @EVA_OPTIONS@ -out -input -deps -journal-disable"
-   CMXS: status
-   EXECNOW: LOG status_sav.res LOG status_sav.err BIN status.sav @frama-c@ -load-module %{dep:status.cmxs} -save status.sav > status_sav.res 2> status_sav.err
-   STDOPT: +"-load-module %{dep:status.cmxs} -load %{dep:status.sav}"
+ MODULE: status
+   EXECNOW: LOG status_sav.res LOG status_sav.err BIN status.sav @frama-c@ -save status.sav > status_sav.res 2> status_sav.err
+   STDOPT: +"-load %{dep:status.sav}"
+ MODULE:
    STDOPT: +"-load %{dep:status.sav}"
 */
 

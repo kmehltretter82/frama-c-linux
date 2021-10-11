@@ -1,5 +1,5 @@
 /* run.config
- LIBS: libSelect
+ LIBS: ../libSelect
  MODULE: @PTEST_NAME@
    OPT: @EVA_OPTIONS@ -deps -lib-entry -main main
  MODULE:

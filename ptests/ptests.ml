@@ -493,6 +493,7 @@ end
 module StringSet = Set.Make(String)
 type deps =  {
   load_plugin: string list;
+  load_libs: string list;
   load_module: string list;
   deps_cmd: string list;
 }
@@ -526,7 +527,6 @@ type config =
                                        the toplevel(s)
                                   *)
     dc_libs : string list; (** libraries to compile *)
-    dc_cmxs : string list; (** cmxs to compile *)
     dc_deps : string list; (** deps *)
     dc_plugin : string list; (** only plugins to load *)
     dc_module : string list; (** module to load *)
@@ -578,7 +578,6 @@ end = struct
     ptest_name,
     { config with
       dc_execnow = List.rev config.dc_execnow;
-      dc_cmxs = List.map subst config.dc_cmxs;
       dc_deps = List.map subst config.dc_deps;
       dc_plugin = List.map subst config.dc_plugin;
       dc_plugin_all = StringSet.elements (StringSet.of_list  (List.map subst config.dc_plugin_all));
@@ -598,6 +597,7 @@ end = struct
         macros=config.dc_macros;
         logs=[];
         deps={ load_plugin=[];
+               load_libs=[];
                load_module=[];
                deps_cmd=[];
              };
@@ -610,7 +610,6 @@ end = struct
       dc_macros = Macros.default_macros;
       dc_execnow = [];
       dc_libs = [];
-      dc_cmxs = [];
       dc_deps = [];
       dc_plugin = [];
       dc_plugin_all = [];
@@ -693,9 +692,10 @@ end = struct
       (* preserve options ordering *)
       List.fold_right (fun x s -> s ^ " " ^ x) opts ""
 
-  let deps_of_config ?(deps={load_module=[];load_plugin=[];deps_cmd=[]}) config =
+  let deps_of_config ?(deps={load_module=[];load_libs=[];load_plugin=[];deps_cmd=[]}) config =
     { load_module = deps.load_module @ config.dc_module;
       load_plugin = deps.load_plugin @ config.dc_plugin;
+      load_libs= deps.load_libs @ config.dc_libs;
       deps_cmd = deps.deps_cmd @ config.dc_deps
     }
 
@@ -732,15 +732,12 @@ end = struct
     let s = Macros.expand current.dc_macros s in
     { current with dc_deps = (split_list s) @ current.dc_deps }
 
-  let config_cmxs ~drop:_ ~file:_ ~dir:_ s current =
-    let s = Macros.expand current.dc_macros s in
-    let l = List.map (fun s -> Filename.remove_extension s) (split_list s) in
-    { current with dc_cmxs = l @ current.dc_cmxs }
-
   let config_libs ~drop:_ ~file:_ ~dir:_ s current =
     let s = Macros.expand current.dc_macros s in
     let l = List.map (fun s -> Filename.remove_extension s) (split_list s) in
-    { current with dc_libs = l @ current.dc_libs }
+    { current with
+      dc_libs = l;
+      dc_macros = Macros.add_list ["PTEST_LIBS", s] current.dc_macros }
 
   let config_plugin ~drop:_ ~file:_ ~dir:_ s current =
     let s = Macros.expand current.dc_macros s in
@@ -754,7 +751,6 @@ end = struct
     let l = List.map (fun s -> Filename.remove_extension s) (split_list s) in
     let deps = List.map (fun s -> s ^ ".cmxs") l in
     { current with
-      dc_cmxs = l @ current.dc_cmxs;
       dc_module = deps;
       dc_macros = Macros.add_list ["PTEST_MODULE", s] current.dc_macros }
 
@@ -878,7 +874,6 @@ end = struct
       "EXEC", config_exec ~once:false;
 
       "MACRO", config_macro;
-      "CMXS", config_cmxs;
       "LIBS", config_libs;
       "DEPS", config_deps;
       "MODULE", config_module;
@@ -1066,9 +1061,11 @@ let basic_command_string command =
   let plugins_options =
     let opt_plugin = if command.deps.load_plugin = [] then ""
       else Printf.sprintf "-load-plugin=%s" (String.concat "," command.deps.load_plugin) in
+    let opt_libs = if command.deps.load_libs = [] then ""
+      else Printf.sprintf "-load-module=%s" (String.concat "," command.deps.load_libs) in
     let opt_modules = if command.deps.load_module = [] then ""
       else Printf.sprintf "-load-module=%s" (String.concat "," command.deps.load_module) in
-    String.concat " " [opt_plugin;opt_modules]
+    String.concat " " [opt_plugin; opt_libs; opt_modules]
   in
   let macros = (* set expanded macros that can be used into CMD directives *)
     Macros.add_list [
@@ -1369,17 +1366,34 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
   ()
 
 (** process a test file *)
-let dispatcher ~env ~result_fmt ~oracle_fmt file directory config =
+let dispatcher ~env ~result_fmt ~oracle_fmt file directory config modules =
   let config = Test_config.scan_test_file ~env directory ~file config in
   if not config.dc_dont_run then
     let test_name,config,ptest_vars = Test_config.ptest_vars ~env directory ~file config  in
-    let dc_libs = List.map (fun s -> s^".cmxs") config.dc_libs in
     let deps_command macros deps =
       let subst = Macros.expand macros in
-      { load_plugin = List.map subst deps.load_plugin;
-        load_module = List.map subst (dc_libs @ deps.load_module);
-        deps_cmd = List.map subst (dc_libs @ deps.load_module @ deps.deps_cmd);
+      let load_plugin = List.map subst deps.load_plugin in
+      let load_module = List.map subst deps.load_module in
+      let load_libs = List.map (fun s -> (subst s)^".cmxs") deps.load_libs in
+      let deps_cmd = List.map subst deps.deps_cmd in
+      { load_plugin; load_module; load_libs;
+        deps_cmd = load_libs @ load_module @ deps_cmd;
       };
+    in
+    let update_modules deps =
+      if deps.load_module <> [] then begin
+        let plugin_libs = StringSet.union
+            (StringSet.of_list (List.map (Format.sprintf "frama-c-%s.core") deps.load_plugin))
+            (StringSet.of_list (List.map (fun s -> Filename.remove_extension (Filename.basename s))
+                                  deps.load_libs))
+        in
+        List.iter (fun cmxs ->
+            let cmxs = Filename.remove_extension cmxs in
+            modules := StringMap.update cmxs (function
+                | None -> Some (plugin_libs,[file])
+                | Some (set,files) -> Some ((StringSet.inter set plugin_libs),file::files)
+              ) !modules) (StringSet.elements (StringSet.of_list deps.load_module));
+      end
     in
     let nb_files = List.length config.dc_commands in
     let make_cmd =
@@ -1389,6 +1403,8 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config =
         incr i ;
         let macros = ptest_vars ~nth macros in
         let log_files = List.map (Macros.expand macros) logs in
+        let deps = deps_command macros deps in
+        update_modules deps;
         command_string ~env ~result_fmt ~oracle_fmt
           { test_name ; file; options; toplevel; nb_files; directory; nth; timeout;
             macros; log_files;
@@ -1402,7 +1418,7 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config =
                 | _ -> Format.eprintf "@[%s: integer required for directive EXIT: %s (defaults to 0)@]@." file exit_code ; 0
             end;
             execnow=false;
-            deps = deps_command macros deps;
+            deps;
           }
     in
     let nb_files_execnow = List.length config.dc_execnow in
@@ -1412,6 +1428,8 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config =
        let nth = !e in
        incr e ;
        let macros = ptest_vars ~nth Macros.empty in
+       let deps = deps_command macros execnow.ex_deps in
+       update_modules deps;
        let cmd =
          { test_name; file; nb_files = nb_files_execnow; directory; nth;
            log_files = [];
@@ -1422,7 +1440,7 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config =
            macros;
            filter = None; (* no FILTER applied to EXECNOW LOG *)
            execnow = true;
-           deps = deps_command macros execnow.ex_deps;
+           deps = deps;
          }
        in
        let wtest = {
@@ -1524,27 +1542,6 @@ let dispatcher ~env ~result_fmt ~oracle_fmt file directory config =
              log
          ) wtest.log
     in
-    let libs = String.concat " " (List.map Filename.basename config.dc_libs) in
-    let plugin_all = List.map (Format.sprintf "frama-c-%s.core") config.dc_plugin_all in
-    List.iteri (fun n cmxs ->
-        Format.fprintf result_fmt
-          "(executable ; MODULE #%d FOR TEST FILE %S\n  \
-           (name %S)\n  \
-           (modules %S)\n  \
-           (modes plugin)\n  \
-           (libraries frama-c.init.cmdline frama-c.boot frama-c.kernel %a %s)\n  \
-           (flags -open Frama_c_kernel)\n\
-           )@."
-          (* executable: *)
-          (n+1) file
-          (* name: *)
-          cmxs
-          (* module: *)
-          cmxs
-          (* libraries: *)
-          print_list plugin_all
-          libs
-      ) (StringSet.elements (StringSet.of_list config.dc_cmxs));
     if config.dc_commands <> [] || config.dc_execnow <> [] then begin
       let print_list_alias fmt l = List.iter (Format.fprintf fmt "(alias %S)") l in
       Format.fprintf result_fmt
@@ -1606,6 +1603,7 @@ let process ~env default_config (suites:Ptests_config.alias StringMap.t) =
        let oracle_fmt = Format.formatter_of_out_channel oracle_cout in
        let dir_files = Sys.readdir (SubDir.get directory) in
        let has_test = ref false in
+       let modules = ref StringMap.empty in
        if !verbosity >= 3 then Format.printf "%% - Look at %d entries of the directory...@." (Array.length dir_files);
        for i = 0 to pred (Array.length dir_files) do
          let file = dir_files.(i) in
@@ -1613,9 +1611,30 @@ let process ~env default_config (suites:Ptests_config.alias StringMap.t) =
          if test_pattern dir_config file
          then begin
            if !verbosity >= 2 then Format.printf "%% - Process test file %s ...@." file;
-           has_test := dispatcher ~env ~result_fmt ~oracle_fmt file directory dir_config || !has_test
+           has_test := dispatcher ~env ~result_fmt ~oracle_fmt file directory dir_config modules || !has_test;
          end;
        done;
+       let n = ref 0 in
+       StringMap.iter (fun cmxs (libs,files) ->
+           let files = StringSet.elements (StringSet.of_list files) in
+           incr n;
+           Format.fprintf result_fmt
+             "(executable ; MODULE #%d FOR TEST FILES: %a\n  \
+              (name %S)\n  \
+              (modules %S)\n  \
+              (modes plugin)\n  \
+              (libraries frama-c.init.cmdline frama-c.boot frama-c.kernel %a)\n  \
+              (flags -open Frama_c_kernel)\n\
+              )@."
+             (* executable: *)
+             !n print_list files
+             (* name: *)
+             cmxs
+             (* module: *)
+             cmxs
+             (* libraries: *)
+             print_list (StringSet.elements libs))
+         !modules ;
        Format.fprintf result_fmt "@.";
        Format.fprintf oracle_fmt "@.";
        close_out result_cout;

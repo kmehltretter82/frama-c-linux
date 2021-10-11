@@ -1,6 +1,6 @@
 /* run.config
    DEPS: simple_intra_slice.i
-   LIBS: libSelect
+   LIBS: ../libSelect
    MODULE: @PTEST_NAME@
    OPT: @EVA_OPTIONS@ -deps -journal-disable
 */

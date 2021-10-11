@@ -1,5 +1,5 @@
 /* run.config
- LIBS: libSelect libAnim
+ LIBS: ../libSelect ../libAnim
  MODULE: @PTEST_NAME@
    OPT: @EVA_OPTIONS@ -deps -slicing-level 3 -journal-disable
 */

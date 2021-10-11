@@ -1,6 +1,6 @@
 /* run.config
    DEPS: select_return.i
-   LIBS: libSelect
+   LIBS: ../libSelect
    MODULE: @PTEST_NAME@
    OPT: @EVA_OPTIONS@ -deps -lib-entry -main g -journal-disable -slicing-level 3
 */

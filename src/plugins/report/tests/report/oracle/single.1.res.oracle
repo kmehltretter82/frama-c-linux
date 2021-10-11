@@ -6,7 +6,7 @@
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion (file single.i, line 9)
+[    -    ] Assertion (file single.i, line 11)
             tried with Test.
 
 --------------------------------------------------------------------------------
@@ -22,7 +22,7 @@
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Assertion (file single.i, line 9)
+[  Valid  ] Assertion (file single.i, line 11)
             by Test.
 
 --------------------------------------------------------------------------------
@@ -38,9 +38,9 @@
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[  Alarm  ] Assertion (file single.i, line 9)
+[  Alarm  ] Assertion (file single.i, line 11)
             By Test, with pending:
-             - Unreachable program point (file single.i, line 9)
+             - Unreachable program point (file single.i, line 11)
 
 --------------------------------------------------------------------------------
 --- Status Report Summary
@@ -55,9 +55,9 @@
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[  Alarm  ] Assertion (file single.i, line 9)
+[  Alarm  ] Assertion (file single.i, line 11)
             By Test, with pending:
-             - Unreachable program point (file single.i, line 9)
+             - Unreachable program point (file single.i, line 11)
 
 --------------------------------------------------------------------------------
 --- Status Report Summary
@@ -72,9 +72,9 @@
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[  Alarm  ] Assertion (file single.i, line 9)
+[  Alarm  ] Assertion (file single.i, line 11)
             By Test, with pending:
-             - Unreachable program point (file single.i, line 9)
+             - Unreachable program point (file single.i, line 11)
 
 --------------------------------------------------------------------------------
 --- Status Report Summary
@@ -89,9 +89,9 @@
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[  Alarm  ] Assertion (file single.i, line 9)
+[  Alarm  ] Assertion (file single.i, line 11)
             By Test, with pending:
-             - Unreachable program point (file single.i, line 9)
+             - Unreachable program point (file single.i, line 11)
 
 --------------------------------------------------------------------------------
 --- Status Report Summary
