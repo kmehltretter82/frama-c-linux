@@ -1,6 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "__fc_builtin.h"
-
 volatile int nondet;
 int main() {
   FILE *f = fopen("/dev/urandom", "r");
@@ -47,5 +47,12 @@ int main() {
   fsetpos(f, &pos);
 
   int res_fclose = fclose(f);
+
+  char *s;
+  r = asprintf(&s, "bla %s", 42);
+  if (r == -1) return 1;
+  printf("%s", s);
+  free(s);
+
   return 0;
 }

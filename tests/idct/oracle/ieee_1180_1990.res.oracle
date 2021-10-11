@@ -1163,6 +1163,9 @@
 [  Valid  ] Axiomatic 'WcsNCmp'
             axiomatic WcsNCmp
             by Frama-C kernel.
+[  Valid  ] Axiomatic 'dynamic_allocation'
+            axiomatic dynamic_allocation
+            by Frama-C kernel.
 [  Valid  ] Axiomatic 'format_length'
             axiomatic format_length
             by Frama-C kernel.
@@ -1189,6 +1192,9 @@
             Unverifiable but considered Valid.
 [ Extern  ] Axiom 'memset_def'
             axiom memset_def
+            Unverifiable but considered Valid.
+[ Extern  ] Axiom 'never_allocable'
+            axiom never_allocable
             Unverifiable but considered Valid.
 [ Extern  ] Axiom 'strchr_def'
             axiom strchr_def
@@ -2346,6 +2352,36 @@
 [  Valid  ] Default behavior
             default behavior
             by Frama-C kernel.
+
+--------------------------------------------------------------------------------
+--- Properties of Function 'asprintf'
+--------------------------------------------------------------------------------
+
+[ Extern  ] Post-condition 'result_error_or_written_byes'
+            ensures
+            result_error_or_written_byes: \result ≡ -1 ∨ \result ≥ 0
+            Unverifiable but considered Valid.
+[ Extern  ] Assigns (file share/libc/stdio.h, line 593)
+            assigns __fc_heap_status, \result, *strp;
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file share/libc/stdio.h, line 593)
+            assigns __fc_heap_status
+              \from (indirect: *(fmt + (0 ..))), __fc_heap_status;
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file share/libc/stdio.h, line 594)
+            assigns \result
+              \from (indirect: *(fmt + (0 ..))), (indirect: __fc_heap_status);
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file share/libc/stdio.h, line 595)
+            assigns *strp
+              \from *(fmt + (0 ..)), (indirect: __fc_heap_status);
+            Unverifiable but considered Valid.
+[  Valid  ] Default behavior
+            default behavior
+            by Frama-C kernel.
+[ Extern  ] Frees/Allocates nothing/(file share/libc/stdio.h, line 598) 
+            allocates *\old(strp);
+            Unverifiable but considered Valid.
 
 --------------------------------------------------------------------------------
 --- Properties of Function '__fc_fpclassifyf'
@@ -4394,9 +4430,9 @@
 --------------------------------------------------------------------------------
 --- Status Report Summary
 --------------------------------------------------------------------------------
-   191 Completely validated
+   193 Completely validated
     16 Locally validated
-   556 Considered valid
+   563 Considered valid
     56 To be validated
-   819 Total
+   828 Total
 --------------------------------------------------------------------------------
