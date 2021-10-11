@@ -3758,6 +3758,64 @@ extern float sinf(float x);
  */
 extern long double sinl(long double x);
 
+/*@ requires not_infinity: ¬(infinite_arg: \is_infinite(x));
+    requires not_nan: ¬(nan_arg: \is_NaN(x));
+    assigns __fc_errno, \result;
+    assigns __fc_errno \from x;
+    assigns \result \from x;
+    
+    behavior zero:
+      assumes zero_arg: \is_finite(x) ∧ x ≡ 0.;
+      ensures zero_res: \is_finite(\result) ∧ \result ≡ \old(x);
+      ensures no_error: __fc_errno ≡ \old(__fc_errno);
+      assigns \result;
+      assigns \result \from x;
+    
+    behavior finite_non_zero:
+      assumes finite_arg: \is_finite(x) ∧ x ≢ 0.;
+      ensures finite_result: \is_finite(\result);
+      ensures
+        maybe_error: __fc_errno ≡ \old(__fc_errno) ∨ __fc_errno ≡ 34;
+    
+    complete behaviors finite_non_zero, zero;
+    disjoint behaviors finite_non_zero, zero;
+ */
+extern double tan(double x);
+
+/*@ requires not_infinity: ¬(infinite_arg: \is_infinite(x));
+    requires not_nan: ¬(nan_arg: \is_NaN(x));
+    assigns __fc_errno, \result;
+    assigns __fc_errno \from x;
+    assigns \result \from x;
+    
+    behavior zero:
+      assumes zero_arg: \is_finite(x) ∧ x ≡ 0.;
+      ensures zero_res: \is_finite(\result) ∧ \result ≡ \old(x);
+      ensures no_error: __fc_errno ≡ \old(__fc_errno);
+      assigns \result;
+      assigns \result \from x;
+    
+    behavior finite_non_zero:
+      assumes finite_arg: \is_finite(x) ∧ x ≢ 0.;
+      ensures finite_result: \is_finite(\result);
+      ensures
+        maybe_error: __fc_errno ≡ \old(__fc_errno) ∨ __fc_errno ≡ 34;
+    
+    complete behaviors finite_non_zero, zero;
+    disjoint behaviors finite_non_zero, zero;
+ */
+extern float tanf(float x);
+
+/*@ ensures
+      maybe_error:
+        __fc_errno ≡ \old(__fc_errno) ∨ __fc_errno ≡ 33 ∨
+        __fc_errno ≡ 34;
+    assigns __fc_errno, \result;
+    assigns __fc_errno \from x;
+    assigns \result \from x;
+ */
+extern long double tanl(long double x);
+
 /*@ requires in_domain: \is_finite(x) ∧ x ≥ 1;
     ensures positive_result: \is_finite(\result) ∧ \result ≥ 0;
     ensures no_error: __fc_errno ≡ \old(__fc_errno);
