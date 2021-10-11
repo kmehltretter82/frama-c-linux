@@ -161,275 +161,308 @@
 [eva] computing for function fabs <- main.
   Called from tests/libc/math_h.c:87.
 [eva] using specification for function fabs
-[eva] tests/libc/math_h.c:87: function fabs: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabs: precondition 'not_nan' got status valid.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabs: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabs: precondition 'not_nan' got status valid.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabs: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabs: precondition 'not_nan' got status valid.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabs: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabs: precondition 'not_nan' got status valid.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabs: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabs: precondition 'not_nan' got status valid.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabs: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabs: precondition 'not_nan' got status valid.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabs: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabs: precondition 'not_nan' got status valid.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabs: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabs: precondition 'not_nan' got status valid.
 [eva] Done for function fabs
 [eva:alarm] tests/libc/math_h.c:87: Warning: 
   NaN double value. assert ¬\is_NaN(top);
 [eva] computing for function fabs <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabs: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabs: precondition 'not_nan' got status valid.
 [eva] Done for function fabs
 [eva] computing for function fabsf <- main.
   Called from tests/libc/math_h.c:87.
 [eva] using specification for function fabsf
-[eva] tests/libc/math_h.c:87: function fabsf: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabsf: precondition 'not_nan' got status valid.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabsf: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabsf: precondition 'not_nan' got status valid.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabsf: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabsf: precondition 'not_nan' got status valid.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabsf: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabsf: precondition 'not_nan' got status valid.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabsf: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabsf: precondition 'not_nan' got status valid.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabsf: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabsf: precondition 'not_nan' got status valid.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabsf: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabsf: precondition 'not_nan' got status valid.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabsf: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabsf: precondition 'not_nan' got status valid.
 [eva] Done for function fabsf
 [eva:alarm] tests/libc/math_h.c:87: Warning: 
   NaN float value. assert ¬\is_NaN(f_top);
 [eva] computing for function fabsf <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabsf: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabsf: precondition 'not_nan' got status valid.
 [eva] Done for function fabsf
 [eva] computing for function fabsl <- main.
   Called from tests/libc/math_h.c:87.
 [eva] using specification for function fabsl
-[eva] tests/libc/math_h.c:87: function fabsl: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabsl: precondition 'not_nan' got status valid.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabsl: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabsl: precondition 'not_nan' got status valid.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabsl: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabsl: precondition 'not_nan' got status valid.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabsl: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabsl: precondition 'not_nan' got status valid.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabsl: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabsl: precondition 'not_nan' got status valid.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabsl: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabsl: precondition 'not_nan' got status valid.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabsl: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabsl: precondition 'not_nan' got status valid.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabsl: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabsl: precondition 'not_nan' got status valid.
 [eva] Done for function fabsl
 [eva:alarm] tests/libc/math_h.c:87: Warning: 
   NaN long double value. assert ¬\is_NaN(ld_top);
 [eva] computing for function fabsl <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabsl: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabsl: precondition 'not_nan' got status valid.
 [eva] Done for function fabsl
 [eva] computing for function fabs <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabs: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabs: precondition 'not_nan' got status valid.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabs: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabs: precondition 'not_nan' got status valid.
 [eva] Done for function fabs
 [eva] computing for function fabsf <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabsf: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabsf: precondition 'not_nan' got status valid.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabsf: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabsf: precondition 'not_nan' got status valid.
 [eva] Done for function fabsf
 [eva] computing for function fabsl <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabsl: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabsl: precondition 'not_nan' got status valid.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
   Called from tests/libc/math_h.c:87.
-[eva] tests/libc/math_h.c:87: function fabsl: precondition got status valid.
+[eva] tests/libc/math_h.c:87: 
+  function fabsl: precondition 'not_nan' got status valid.
 [eva] Done for function fabsl
 [eva] computing for function tan <- main.
   Called from tests/libc/math_h.c:88.
 [eva] using specification for function tan
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tan: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tan: precondition 'not_nan' got status valid.
 [eva] Done for function tan
 [eva] computing for function tan <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tan: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tan: precondition 'not_nan' got status valid.
 [eva] Done for function tan
 [eva] computing for function tan <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tan: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tan: precondition 'not_nan' got status valid.
 [eva] Done for function tan
 [eva] computing for function tan <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tan: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tan: precondition 'not_nan' got status valid.
 [eva] Done for function tan
 [eva] computing for function tan <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tan: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tan: precondition 'not_nan' got status valid.
 [eva] Done for function tan
 [eva] computing for function tan <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tan: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tan: precondition 'not_nan' got status valid.
 [eva] Done for function tan
 [eva] computing for function tan <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tan: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tan: precondition 'not_nan' got status valid.
 [eva] Done for function tan
 [eva] computing for function tan <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tan: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tan: precondition 'not_nan' got status valid.
 [eva] Done for function tan
 [eva:alarm] tests/libc/math_h.c:88: Warning: 
   NaN double value. assert ¬\is_NaN(top);
 [eva] computing for function tan <- main.
   Called from tests/libc/math_h.c:88.
 [eva:alarm] tests/libc/math_h.c:88: Warning: 
-  function tan: precondition ¬(infinite_arg: \is_infinite(x)) got status unknown.
+  function tan: precondition 'not_infinity' got status unknown.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tan: precondition 'not_nan' got status valid.
 [eva] Done for function tan
 [eva] computing for function tanf <- main.
   Called from tests/libc/math_h.c:88.
 [eva] using specification for function tanf
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tanf: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tanf: precondition 'not_nan' got status valid.
 [eva] Done for function tanf
 [eva] computing for function tanf <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tanf: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tanf: precondition 'not_nan' got status valid.
 [eva] Done for function tanf
 [eva] computing for function tanf <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tanf: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tanf: precondition 'not_nan' got status valid.
 [eva] Done for function tanf
 [eva] computing for function tanf <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tanf: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tanf: precondition 'not_nan' got status valid.
 [eva] Done for function tanf
 [eva] computing for function tanf <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tanf: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tanf: precondition 'not_nan' got status valid.
 [eva] Done for function tanf
 [eva] computing for function tanf <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tanf: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tanf: precondition 'not_nan' got status valid.
 [eva] Done for function tanf
 [eva] computing for function tanf <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tanf: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tanf: precondition 'not_nan' got status valid.
 [eva] Done for function tanf
 [eva] computing for function tanf <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tanf: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tanf: precondition 'not_nan' got status valid.
 [eva] Done for function tanf
 [eva:alarm] tests/libc/math_h.c:88: Warning: 
   NaN float value. assert ¬\is_NaN(f_top);
 [eva] computing for function tanf <- main.
   Called from tests/libc/math_h.c:88.
 [eva:alarm] tests/libc/math_h.c:88: Warning: 
-  function tanf: precondition ¬(infinite_arg: \is_infinite(x)) got status unknown.
+  function tanf: precondition 'not_infinity' got status unknown.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tanf: precondition 'not_nan' got status valid.
 [eva] Done for function tanf
 [eva] computing for function tanl <- main.
   Called from tests/libc/math_h.c:88.
@@ -464,30 +497,30 @@
 [eva] computing for function tan <- main.
   Called from tests/libc/math_h.c:88.
 [eva:alarm] tests/libc/math_h.c:88: Warning: 
-  function tan: precondition ¬(infinite_arg: \is_infinite(x)) got status invalid.
+  function tan: precondition 'not_infinity' got status invalid.
 [eva] tests/libc/math_h.c:88: 
-  function tan: no state left, precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tan: no state left, precondition 'not_nan' got status valid.
 [eva] Done for function tan
 [eva] computing for function tan <- main.
   Called from tests/libc/math_h.c:88.
 [eva:alarm] tests/libc/math_h.c:88: Warning: 
-  function tan: precondition ¬(infinite_arg: \is_infinite(x)) got status invalid.
+  function tan: precondition 'not_infinity' got status invalid.
 [eva] tests/libc/math_h.c:88: 
-  function tan: no state left, precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tan: no state left, precondition 'not_nan' got status valid.
 [eva] Done for function tan
 [eva] computing for function tanf <- main.
   Called from tests/libc/math_h.c:88.
 [eva:alarm] tests/libc/math_h.c:88: Warning: 
-  function tanf: precondition ¬(infinite_arg: \is_infinite(x)) got status invalid.
+  function tanf: precondition 'not_infinity' got status invalid.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: no state left, precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tanf: no state left, precondition 'not_nan' got status valid.
 [eva] Done for function tanf
 [eva] computing for function tanf <- main.
   Called from tests/libc/math_h.c:88.
 [eva:alarm] tests/libc/math_h.c:88: Warning: 
-  function tanf: precondition ¬(infinite_arg: \is_infinite(x)) got status invalid.
+  function tanf: precondition 'not_infinity' got status invalid.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: no state left, precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tanf: no state left, precondition 'not_nan' got status valid.
 [eva] Done for function tanf
 [eva] computing for function tanl <- main.
   Called from tests/libc/math_h.c:88.
@@ -501,24 +534,14 @@
 [eva] tests/libc/math_h.c:90: 
   function frexp: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:90: 
-  function frexp: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexp: precondition 'not_nan' got status valid.
 [eva] Done for function frexp
 [eva] computing for function frexp <- main.
   Called from tests/libc/math_h.c:90.
 [eva] tests/libc/math_h.c:90: 
   function frexp: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:90: 
-  function frexp: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
-[eva] Done for function frexp
-[eva] computing for function frexp <- main.
-  Called from tests/libc/math_h.c:90.
-[eva] Done for function frexp
-[eva] computing for function frexp <- main.
-  Called from tests/libc/math_h.c:90.
-[eva] tests/libc/math_h.c:90: 
-  function frexp: precondition 'valid_exp' got status valid.
-[eva] tests/libc/math_h.c:90: 
-  function frexp: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexp: precondition 'not_nan' got status valid.
 [eva] Done for function frexp
 [eva] computing for function frexp <- main.
   Called from tests/libc/math_h.c:90.
@@ -528,7 +551,7 @@
 [eva] tests/libc/math_h.c:90: 
   function frexp: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:90: 
-  function frexp: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexp: precondition 'not_nan' got status valid.
 [eva] Done for function frexp
 [eva] computing for function frexp <- main.
   Called from tests/libc/math_h.c:90.
@@ -538,7 +561,7 @@
 [eva] tests/libc/math_h.c:90: 
   function frexp: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:90: 
-  function frexp: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexp: precondition 'not_nan' got status valid.
 [eva] Done for function frexp
 [eva] computing for function frexp <- main.
   Called from tests/libc/math_h.c:90.
@@ -548,7 +571,7 @@
 [eva] tests/libc/math_h.c:90: 
   function frexp: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:90: 
-  function frexp: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexp: precondition 'not_nan' got status valid.
 [eva] Done for function frexp
 [eva] computing for function frexp <- main.
   Called from tests/libc/math_h.c:90.
@@ -558,7 +581,7 @@
 [eva] tests/libc/math_h.c:90: 
   function frexp: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:90: 
-  function frexp: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexp: precondition 'not_nan' got status valid.
 [eva] Done for function frexp
 [eva] computing for function frexp <- main.
   Called from tests/libc/math_h.c:90.
@@ -568,7 +591,17 @@
 [eva] tests/libc/math_h.c:90: 
   function frexp: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:90: 
-  function frexp: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexp: precondition 'not_nan' got status valid.
+[eva] Done for function frexp
+[eva] computing for function frexp <- main.
+  Called from tests/libc/math_h.c:90.
+[eva] Done for function frexp
+[eva] computing for function frexp <- main.
+  Called from tests/libc/math_h.c:90.
+[eva] tests/libc/math_h.c:90: 
+  function frexp: precondition 'valid_exp' got status valid.
+[eva] tests/libc/math_h.c:90: 
+  function frexp: precondition 'not_nan' got status valid.
 [eva] Done for function frexp
 [eva] computing for function frexp <- main.
   Called from tests/libc/math_h.c:90.
@@ -580,7 +613,7 @@
 [eva] tests/libc/math_h.c:90: 
   function frexp: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:90: 
-  function frexp: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexp: precondition 'not_nan' got status valid.
 [eva] Done for function frexp
 [eva] computing for function frexp <- main.
   Called from tests/libc/math_h.c:90.
@@ -591,56 +624,56 @@
 [eva] tests/libc/math_h.c:91: 
   function frexpf: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:91: 
-  function frexpf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpf: precondition 'not_nan' got status valid.
 [eva] Done for function frexpf
 [eva] computing for function frexpf <- main.
   Called from tests/libc/math_h.c:91.
 [eva] tests/libc/math_h.c:91: 
   function frexpf: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:91: 
-  function frexpf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpf: precondition 'not_nan' got status valid.
 [eva] Done for function frexpf
 [eva] computing for function frexpf <- main.
   Called from tests/libc/math_h.c:91.
 [eva] tests/libc/math_h.c:91: 
   function frexpf: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:91: 
-  function frexpf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpf: precondition 'not_nan' got status valid.
 [eva] Done for function frexpf
 [eva] computing for function frexpf <- main.
   Called from tests/libc/math_h.c:91.
 [eva] tests/libc/math_h.c:91: 
   function frexpf: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:91: 
-  function frexpf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpf: precondition 'not_nan' got status valid.
 [eva] Done for function frexpf
 [eva] computing for function frexpf <- main.
   Called from tests/libc/math_h.c:91.
 [eva] tests/libc/math_h.c:91: 
   function frexpf: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:91: 
-  function frexpf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpf: precondition 'not_nan' got status valid.
 [eva] Done for function frexpf
 [eva] computing for function frexpf <- main.
   Called from tests/libc/math_h.c:91.
 [eva] tests/libc/math_h.c:91: 
   function frexpf: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:91: 
-  function frexpf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpf: precondition 'not_nan' got status valid.
 [eva] Done for function frexpf
 [eva] computing for function frexpf <- main.
   Called from tests/libc/math_h.c:91.
 [eva] tests/libc/math_h.c:91: 
   function frexpf: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:91: 
-  function frexpf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpf: precondition 'not_nan' got status valid.
 [eva] Done for function frexpf
 [eva] computing for function frexpf <- main.
   Called from tests/libc/math_h.c:91.
 [eva] tests/libc/math_h.c:91: 
   function frexpf: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:91: 
-  function frexpf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpf: precondition 'not_nan' got status valid.
 [eva] Done for function frexpf
 [eva:alarm] tests/libc/math_h.c:91: Warning: 
   NaN float value. assert ¬\is_NaN(f_top);
@@ -649,7 +682,7 @@
 [eva] tests/libc/math_h.c:91: 
   function frexpf: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:91: 
-  function frexpf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpf: precondition 'not_nan' got status valid.
 [eva] Done for function frexpf
 [eva] computing for function frexpl <- main.
   Called from tests/libc/math_h.c:92.
@@ -657,56 +690,56 @@
 [eva] tests/libc/math_h.c:92: 
   function frexpl: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:92: 
-  function frexpl: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpl: precondition 'not_nan' got status valid.
 [eva] Done for function frexpl
 [eva] computing for function frexpl <- main.
   Called from tests/libc/math_h.c:92.
 [eva] tests/libc/math_h.c:92: 
   function frexpl: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:92: 
-  function frexpl: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpl: precondition 'not_nan' got status valid.
 [eva] Done for function frexpl
 [eva] computing for function frexpl <- main.
   Called from tests/libc/math_h.c:92.
 [eva] tests/libc/math_h.c:92: 
   function frexpl: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:92: 
-  function frexpl: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpl: precondition 'not_nan' got status valid.
 [eva] Done for function frexpl
 [eva] computing for function frexpl <- main.
   Called from tests/libc/math_h.c:92.
 [eva] tests/libc/math_h.c:92: 
   function frexpl: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:92: 
-  function frexpl: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpl: precondition 'not_nan' got status valid.
 [eva] Done for function frexpl
 [eva] computing for function frexpl <- main.
   Called from tests/libc/math_h.c:92.
 [eva] tests/libc/math_h.c:92: 
   function frexpl: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:92: 
-  function frexpl: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpl: precondition 'not_nan' got status valid.
 [eva] Done for function frexpl
 [eva] computing for function frexpl <- main.
   Called from tests/libc/math_h.c:92.
 [eva] tests/libc/math_h.c:92: 
   function frexpl: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:92: 
-  function frexpl: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpl: precondition 'not_nan' got status valid.
 [eva] Done for function frexpl
 [eva] computing for function frexpl <- main.
   Called from tests/libc/math_h.c:92.
 [eva] tests/libc/math_h.c:92: 
   function frexpl: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:92: 
-  function frexpl: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpl: precondition 'not_nan' got status valid.
 [eva] Done for function frexpl
 [eva] computing for function frexpl <- main.
   Called from tests/libc/math_h.c:92.
 [eva] tests/libc/math_h.c:92: 
   function frexpl: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:92: 
-  function frexpl: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpl: precondition 'not_nan' got status valid.
 [eva] Done for function frexpl
 [eva:alarm] tests/libc/math_h.c:92: Warning: 
   NaN long double value. assert ¬\is_NaN(ld_top);
@@ -715,313 +748,385 @@
 [eva] tests/libc/math_h.c:92: 
   function frexpl: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:92: 
-  function frexpl: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpl: precondition 'not_nan' got status valid.
 [eva] Done for function frexpl
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:93.
 [eva] using specification for function ldexp
-[eva] tests/libc/math_h.c:93: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:93: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:93.
-[eva] tests/libc/math_h.c:93: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:93: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:93.
-[eva] tests/libc/math_h.c:93: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:93: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:93.
-[eva] tests/libc/math_h.c:93: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:93: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:93.
-[eva] tests/libc/math_h.c:93: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:93: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:93.
-[eva] tests/libc/math_h.c:93: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:93: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:93.
-[eva] tests/libc/math_h.c:93: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:93: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:93.
-[eva] tests/libc/math_h.c:93: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:93: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva:alarm] tests/libc/math_h.c:93: Warning: 
   NaN double value. assert ¬\is_NaN(top);
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:93.
-[eva] tests/libc/math_h.c:93: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:93: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:94.
 [eva] using specification for function ldexpf
-[eva] tests/libc/math_h.c:94: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:94: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:94.
-[eva] tests/libc/math_h.c:94: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:94: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:94.
-[eva] tests/libc/math_h.c:94: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:94: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:94.
-[eva] tests/libc/math_h.c:94: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:94: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:94.
-[eva] tests/libc/math_h.c:94: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:94: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:94.
-[eva] tests/libc/math_h.c:94: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:94: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:94.
-[eva] tests/libc/math_h.c:94: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:94: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:94.
-[eva] tests/libc/math_h.c:94: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:94: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva:alarm] tests/libc/math_h.c:94: Warning: 
   NaN float value. assert ¬\is_NaN(f_top);
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:94.
-[eva] tests/libc/math_h.c:94: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:94: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:96.
-[eva] tests/libc/math_h.c:96: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:96: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:96.
-[eva] tests/libc/math_h.c:96: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:96: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:96.
-[eva] tests/libc/math_h.c:96: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:96: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:96.
-[eva] tests/libc/math_h.c:96: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:96: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:96.
-[eva] tests/libc/math_h.c:96: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:96: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:96.
-[eva] tests/libc/math_h.c:96: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:96: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:96.
-[eva] tests/libc/math_h.c:96: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:96: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:96.
-[eva] tests/libc/math_h.c:96: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:96: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva:alarm] tests/libc/math_h.c:96: Warning: 
   NaN double value. assert ¬\is_NaN(top);
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:96.
-[eva] tests/libc/math_h.c:96: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:96: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:97.
-[eva] tests/libc/math_h.c:97: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:97: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:97.
-[eva] tests/libc/math_h.c:97: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:97: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:97.
-[eva] tests/libc/math_h.c:97: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:97: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:97.
-[eva] tests/libc/math_h.c:97: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:97: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:97.
-[eva] tests/libc/math_h.c:97: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:97: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:97.
-[eva] tests/libc/math_h.c:97: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:97: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:97.
-[eva] tests/libc/math_h.c:97: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:97: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:97.
-[eva] tests/libc/math_h.c:97: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:97: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva:alarm] tests/libc/math_h.c:97: Warning: 
   NaN float value. assert ¬\is_NaN(f_top);
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:97.
-[eva] tests/libc/math_h.c:97: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:97: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:99.
-[eva] tests/libc/math_h.c:99: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:99: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:99.
-[eva] tests/libc/math_h.c:99: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:99: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:99.
-[eva] tests/libc/math_h.c:99: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:99: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:99.
-[eva] tests/libc/math_h.c:99: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:99: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:99.
-[eva] tests/libc/math_h.c:99: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:99: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:99.
-[eva] tests/libc/math_h.c:99: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:99: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:99.
-[eva] tests/libc/math_h.c:99: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:99: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:99.
-[eva] tests/libc/math_h.c:99: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:99: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva:alarm] tests/libc/math_h.c:99: Warning: 
   NaN double value. assert ¬\is_NaN(top);
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:99.
-[eva] tests/libc/math_h.c:99: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:99: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:100.
-[eva] tests/libc/math_h.c:100: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:100: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:100.
-[eva] tests/libc/math_h.c:100: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:100: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:100.
-[eva] tests/libc/math_h.c:100: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:100: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:100.
-[eva] tests/libc/math_h.c:100: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:100: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:100.
-[eva] tests/libc/math_h.c:100: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:100: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:100.
-[eva] tests/libc/math_h.c:100: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:100: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:100.
-[eva] tests/libc/math_h.c:100: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:100: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:100.
-[eva] tests/libc/math_h.c:100: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:100: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva:alarm] tests/libc/math_h.c:100: Warning: 
   NaN float value. assert ¬\is_NaN(f_top);
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:100.
-[eva] tests/libc/math_h.c:100: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:100: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:102.
-[eva] tests/libc/math_h.c:102: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:102: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:102.
-[eva] tests/libc/math_h.c:102: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:102: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:102.
-[eva] tests/libc/math_h.c:102: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:102: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:102.
-[eva] tests/libc/math_h.c:102: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:102: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:102.
-[eva] tests/libc/math_h.c:102: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:102: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:102.
-[eva] tests/libc/math_h.c:102: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:102: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:102.
-[eva] tests/libc/math_h.c:102: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:102: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:102.
-[eva] tests/libc/math_h.c:102: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:102: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva:alarm] tests/libc/math_h.c:102: Warning: 
   NaN double value. assert ¬\is_NaN(top);
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:102.
-[eva] tests/libc/math_h.c:102: function ldexp: precondition got status valid.
+[eva] tests/libc/math_h.c:102: 
+  function ldexp: precondition 'not_nan' got status valid.
 [eva] Done for function ldexp
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:103.
-[eva] tests/libc/math_h.c:103: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:103: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:103.
-[eva] tests/libc/math_h.c:103: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:103: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:103.
-[eva] tests/libc/math_h.c:103: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:103: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:103.
-[eva] tests/libc/math_h.c:103: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:103: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:103.
-[eva] tests/libc/math_h.c:103: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:103: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:103.
-[eva] tests/libc/math_h.c:103: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:103: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:103.
-[eva] tests/libc/math_h.c:103: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:103: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:103.
-[eva] tests/libc/math_h.c:103: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:103: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva:alarm] tests/libc/math_h.c:103: Warning: 
   NaN float value. assert ¬\is_NaN(f_top);
 [eva] computing for function ldexpf <- main.
   Called from tests/libc/math_h.c:103.
-[eva] tests/libc/math_h.c:103: function ldexpf: precondition got status valid.
+[eva] tests/libc/math_h.c:103: 
+  function ldexpf: precondition 'not_nan' got status valid.
 [eva] Done for function ldexpf
 [eva] computing for function __finite <- main.
   Called from tests/libc/math_h.c:108.

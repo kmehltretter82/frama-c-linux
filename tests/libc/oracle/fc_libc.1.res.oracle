@@ -3758,8 +3758,8 @@ extern float sinf(float x);
  */
 extern long double sinl(long double x);
 
-/*@ requires ¬(infinite_arg: \is_infinite(x));
-    requires ¬(nan_arg: \is_NaN(x));
+/*@ requires not_infinity: ¬(infinite_arg: \is_infinite(x));
+    requires not_nan: ¬(nan_arg: \is_NaN(x));
     assigns __fc_errno, \result;
     assigns __fc_errno \from x;
     assigns \result \from x;
@@ -3782,8 +3782,8 @@ extern long double sinl(long double x);
  */
 extern double tan(double x);
 
-/*@ requires ¬(infinite_arg: \is_infinite(x));
-    requires ¬(nan_arg: \is_NaN(x));
+/*@ requires not_infinity: ¬(infinite_arg: \is_infinite(x));
+    requires not_nan: ¬(nan_arg: \is_NaN(x));
     assigns __fc_errno, \result;
     assigns __fc_errno \from x;
     assigns \result \from x;

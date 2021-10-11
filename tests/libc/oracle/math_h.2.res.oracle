@@ -277,133 +277,133 @@
   Called from tests/libc/math_h.c:88.
 [eva] using specification for function tan
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tan: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tan: precondition 'not_nan' got status valid.
 [eva] Done for function tan
 [eva] computing for function tan <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tan: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tan: precondition 'not_nan' got status valid.
 [eva] Done for function tan
 [eva] computing for function tan <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tan: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tan: precondition 'not_nan' got status valid.
 [eva] Done for function tan
 [eva] computing for function tan <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tan: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tan: precondition 'not_nan' got status valid.
 [eva] Done for function tan
 [eva] computing for function tan <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tan: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tan: precondition 'not_nan' got status valid.
 [eva] Done for function tan
 [eva] computing for function tan <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tan: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tan: precondition 'not_nan' got status valid.
 [eva] Done for function tan
 [eva] computing for function tan <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tan: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tan: precondition 'not_nan' got status valid.
 [eva] Done for function tan
 [eva] computing for function tan <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tan: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tan: precondition 'not_nan' got status valid.
 [eva] Done for function tan
 [eva:alarm] tests/libc/math_h.c:88: Warning: 
   non-finite double value. assert \is_finite(top);
 [eva] computing for function tan <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tan: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tan: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tan: precondition 'not_nan' got status valid.
 [eva] Done for function tan
 [eva] computing for function tanf <- main.
   Called from tests/libc/math_h.c:88.
 [eva] using specification for function tanf
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tanf: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tanf: precondition 'not_nan' got status valid.
 [eva] Done for function tanf
 [eva] computing for function tanf <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tanf: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tanf: precondition 'not_nan' got status valid.
 [eva] Done for function tanf
 [eva] computing for function tanf <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tanf: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tanf: precondition 'not_nan' got status valid.
 [eva] Done for function tanf
 [eva] computing for function tanf <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tanf: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tanf: precondition 'not_nan' got status valid.
 [eva] Done for function tanf
 [eva] computing for function tanf <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tanf: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tanf: precondition 'not_nan' got status valid.
 [eva] Done for function tanf
 [eva] computing for function tanf <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tanf: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tanf: precondition 'not_nan' got status valid.
 [eva] Done for function tanf
 [eva] computing for function tanf <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tanf: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tanf: precondition 'not_nan' got status valid.
 [eva] Done for function tanf
 [eva] computing for function tanf <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tanf: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tanf: precondition 'not_nan' got status valid.
 [eva] Done for function tanf
 [eva:alarm] tests/libc/math_h.c:88: Warning: 
   non-finite float value. assert \is_finite(f_top);
 [eva] computing for function tanf <- main.
   Called from tests/libc/math_h.c:88.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(infinite_arg: \is_infinite(x)) got status valid.
+  function tanf: precondition 'not_infinity' got status valid.
 [eva] tests/libc/math_h.c:88: 
-  function tanf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function tanf: precondition 'not_nan' got status valid.
 [eva] Done for function tanf
 [eva] computing for function tanl <- main.
   Called from tests/libc/math_h.c:88.
@@ -441,22 +441,18 @@
 [eva] tests/libc/math_h.c:90: 
   function frexp: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:90: 
-  function frexp: precondition ¬(infinite_arg:
-                                    \is_plus_infinity(x) ∨
-                                    \is_minus_infinity(x)) got status valid.
+  function frexp: precondition 'not_infinite' got status valid.
 [eva] tests/libc/math_h.c:90: 
-  function frexp: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexp: precondition 'not_nan' got status valid.
 [eva] Done for function frexp
 [eva] computing for function frexp <- main.
   Called from tests/libc/math_h.c:90.
 [eva] tests/libc/math_h.c:90: 
   function frexp: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:90: 
-  function frexp: precondition ¬(infinite_arg:
-                                    \is_plus_infinity(x) ∨
-                                    \is_minus_infinity(x)) got status valid.
+  function frexp: precondition 'not_infinite' got status valid.
 [eva] tests/libc/math_h.c:90: 
-  function frexp: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexp: precondition 'not_nan' got status valid.
 [eva] Done for function frexp
 [eva] computing for function frexp <- main.
   Called from tests/libc/math_h.c:90.
@@ -466,11 +462,9 @@
 [eva] tests/libc/math_h.c:90: 
   function frexp: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:90: 
-  function frexp: precondition ¬(infinite_arg:
-                                    \is_plus_infinity(x) ∨
-                                    \is_minus_infinity(x)) got status valid.
+  function frexp: precondition 'not_infinite' got status valid.
 [eva] tests/libc/math_h.c:90: 
-  function frexp: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexp: precondition 'not_nan' got status valid.
 [eva] Done for function frexp
 [eva] computing for function frexp <- main.
   Called from tests/libc/math_h.c:90.
@@ -480,11 +474,9 @@
 [eva] tests/libc/math_h.c:90: 
   function frexp: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:90: 
-  function frexp: precondition ¬(infinite_arg:
-                                    \is_plus_infinity(x) ∨
-                                    \is_minus_infinity(x)) got status valid.
+  function frexp: precondition 'not_infinite' got status valid.
 [eva] tests/libc/math_h.c:90: 
-  function frexp: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexp: precondition 'not_nan' got status valid.
 [eva] Done for function frexp
 [eva] computing for function frexp <- main.
   Called from tests/libc/math_h.c:90.
@@ -494,11 +486,9 @@
 [eva] tests/libc/math_h.c:90: 
   function frexp: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:90: 
-  function frexp: precondition ¬(infinite_arg:
-                                    \is_plus_infinity(x) ∨
-                                    \is_minus_infinity(x)) got status valid.
+  function frexp: precondition 'not_infinite' got status valid.
 [eva] tests/libc/math_h.c:90: 
-  function frexp: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexp: precondition 'not_nan' got status valid.
 [eva] Done for function frexp
 [eva] computing for function frexp <- main.
   Called from tests/libc/math_h.c:90.
@@ -508,11 +498,9 @@
 [eva] tests/libc/math_h.c:90: 
   function frexp: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:90: 
-  function frexp: precondition ¬(infinite_arg:
-                                    \is_plus_infinity(x) ∨
-                                    \is_minus_infinity(x)) got status valid.
+  function frexp: precondition 'not_infinite' got status valid.
 [eva] tests/libc/math_h.c:90: 
-  function frexp: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexp: precondition 'not_nan' got status valid.
 [eva] Done for function frexp
 [eva] computing for function frexp <- main.
   Called from tests/libc/math_h.c:90.
@@ -522,11 +510,9 @@
 [eva] tests/libc/math_h.c:90: 
   function frexp: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:90: 
-  function frexp: precondition ¬(infinite_arg:
-                                    \is_plus_infinity(x) ∨
-                                    \is_minus_infinity(x)) got status valid.
+  function frexp: precondition 'not_infinite' got status valid.
 [eva] tests/libc/math_h.c:90: 
-  function frexp: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexp: precondition 'not_nan' got status valid.
 [eva] Done for function frexp
 [eva] computing for function frexp <- main.
   Called from tests/libc/math_h.c:90.
@@ -536,11 +522,9 @@
 [eva] tests/libc/math_h.c:90: 
   function frexp: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:90: 
-  function frexp: precondition ¬(infinite_arg:
-                                    \is_plus_infinity(x) ∨
-                                    \is_minus_infinity(x)) got status valid.
+  function frexp: precondition 'not_infinite' got status valid.
 [eva] tests/libc/math_h.c:90: 
-  function frexp: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexp: precondition 'not_nan' got status valid.
 [eva] Done for function frexp
 [eva] computing for function frexp <- main.
   Called from tests/libc/math_h.c:90.
@@ -552,11 +536,9 @@
 [eva] tests/libc/math_h.c:90: 
   function frexp: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:90: 
-  function frexp: precondition ¬(infinite_arg:
-                                    \is_plus_infinity(x) ∨
-                                    \is_minus_infinity(x)) got status valid.
+  function frexp: precondition 'not_infinite' got status valid.
 [eva] tests/libc/math_h.c:90: 
-  function frexp: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexp: precondition 'not_nan' got status valid.
 [eva] Done for function frexp
 [eva] computing for function frexp <- main.
   Called from tests/libc/math_h.c:90.
@@ -567,88 +549,72 @@
 [eva] tests/libc/math_h.c:91: 
   function frexpf: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:91: 
-  function frexpf: precondition ¬(infinite_arg:
-                                     \is_plus_infinity(x) ∨
-                                     \is_minus_infinity(x)) got status valid.
+  function frexpf: precondition 'not_infinite' got status valid.
 [eva] tests/libc/math_h.c:91: 
-  function frexpf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpf: precondition 'not_nan' got status valid.
 [eva] Done for function frexpf
 [eva] computing for function frexpf <- main.
   Called from tests/libc/math_h.c:91.
 [eva] tests/libc/math_h.c:91: 
   function frexpf: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:91: 
-  function frexpf: precondition ¬(infinite_arg:
-                                     \is_plus_infinity(x) ∨
-                                     \is_minus_infinity(x)) got status valid.
+  function frexpf: precondition 'not_infinite' got status valid.
 [eva] tests/libc/math_h.c:91: 
-  function frexpf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpf: precondition 'not_nan' got status valid.
 [eva] Done for function frexpf
 [eva] computing for function frexpf <- main.
   Called from tests/libc/math_h.c:91.
 [eva] tests/libc/math_h.c:91: 
   function frexpf: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:91: 
-  function frexpf: precondition ¬(infinite_arg:
-                                     \is_plus_infinity(x) ∨
-                                     \is_minus_infinity(x)) got status valid.
+  function frexpf: precondition 'not_infinite' got status valid.
 [eva] tests/libc/math_h.c:91: 
-  function frexpf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpf: precondition 'not_nan' got status valid.
 [eva] Done for function frexpf
 [eva] computing for function frexpf <- main.
   Called from tests/libc/math_h.c:91.
 [eva] tests/libc/math_h.c:91: 
   function frexpf: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:91: 
-  function frexpf: precondition ¬(infinite_arg:
-                                     \is_plus_infinity(x) ∨
-                                     \is_minus_infinity(x)) got status valid.
+  function frexpf: precondition 'not_infinite' got status valid.
 [eva] tests/libc/math_h.c:91: 
-  function frexpf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpf: precondition 'not_nan' got status valid.
 [eva] Done for function frexpf
 [eva] computing for function frexpf <- main.
   Called from tests/libc/math_h.c:91.
 [eva] tests/libc/math_h.c:91: 
   function frexpf: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:91: 
-  function frexpf: precondition ¬(infinite_arg:
-                                     \is_plus_infinity(x) ∨
-                                     \is_minus_infinity(x)) got status valid.
+  function frexpf: precondition 'not_infinite' got status valid.
 [eva] tests/libc/math_h.c:91: 
-  function frexpf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpf: precondition 'not_nan' got status valid.
 [eva] Done for function frexpf
 [eva] computing for function frexpf <- main.
   Called from tests/libc/math_h.c:91.
 [eva] tests/libc/math_h.c:91: 
   function frexpf: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:91: 
-  function frexpf: precondition ¬(infinite_arg:
-                                     \is_plus_infinity(x) ∨
-                                     \is_minus_infinity(x)) got status valid.
+  function frexpf: precondition 'not_infinite' got status valid.
 [eva] tests/libc/math_h.c:91: 
-  function frexpf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpf: precondition 'not_nan' got status valid.
 [eva] Done for function frexpf
 [eva] computing for function frexpf <- main.
   Called from tests/libc/math_h.c:91.
 [eva] tests/libc/math_h.c:91: 
   function frexpf: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:91: 
-  function frexpf: precondition ¬(infinite_arg:
-                                     \is_plus_infinity(x) ∨
-                                     \is_minus_infinity(x)) got status valid.
+  function frexpf: precondition 'not_infinite' got status valid.
 [eva] tests/libc/math_h.c:91: 
-  function frexpf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpf: precondition 'not_nan' got status valid.
 [eva] Done for function frexpf
 [eva] computing for function frexpf <- main.
   Called from tests/libc/math_h.c:91.
 [eva] tests/libc/math_h.c:91: 
   function frexpf: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:91: 
-  function frexpf: precondition ¬(infinite_arg:
-                                     \is_plus_infinity(x) ∨
-                                     \is_minus_infinity(x)) got status valid.
+  function frexpf: precondition 'not_infinite' got status valid.
 [eva] tests/libc/math_h.c:91: 
-  function frexpf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpf: precondition 'not_nan' got status valid.
 [eva] Done for function frexpf
 [eva:alarm] tests/libc/math_h.c:91: Warning: 
   non-finite float value. assert \is_finite(f_top);
@@ -657,11 +623,9 @@
 [eva] tests/libc/math_h.c:91: 
   function frexpf: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:91: 
-  function frexpf: precondition ¬(infinite_arg:
-                                     \is_plus_infinity(x) ∨
-                                     \is_minus_infinity(x)) got status valid.
+  function frexpf: precondition 'not_infinite' got status valid.
 [eva] tests/libc/math_h.c:91: 
-  function frexpf: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpf: precondition 'not_nan' got status valid.
 [eva] Done for function frexpf
 [eva] computing for function frexpl <- main.
   Called from tests/libc/math_h.c:92.
@@ -669,88 +633,72 @@
 [eva] tests/libc/math_h.c:92: 
   function frexpl: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:92: 
-  function frexpl: precondition ¬(infinite_arg:
-                                     \is_plus_infinity(x) ∨
-                                     \is_minus_infinity(x)) got status valid.
+  function frexpl: precondition 'not_infinite' got status valid.
 [eva] tests/libc/math_h.c:92: 
-  function frexpl: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpl: precondition 'not_nan' got status valid.
 [eva] Done for function frexpl
 [eva] computing for function frexpl <- main.
   Called from tests/libc/math_h.c:92.
 [eva] tests/libc/math_h.c:92: 
   function frexpl: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:92: 
-  function frexpl: precondition ¬(infinite_arg:
-                                     \is_plus_infinity(x) ∨
-                                     \is_minus_infinity(x)) got status valid.
+  function frexpl: precondition 'not_infinite' got status valid.
 [eva] tests/libc/math_h.c:92: 
-  function frexpl: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpl: precondition 'not_nan' got status valid.
 [eva] Done for function frexpl
 [eva] computing for function frexpl <- main.
   Called from tests/libc/math_h.c:92.
 [eva] tests/libc/math_h.c:92: 
   function frexpl: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:92: 
-  function frexpl: precondition ¬(infinite_arg:
-                                     \is_plus_infinity(x) ∨
-                                     \is_minus_infinity(x)) got status valid.
+  function frexpl: precondition 'not_infinite' got status valid.
 [eva] tests/libc/math_h.c:92: 
-  function frexpl: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpl: precondition 'not_nan' got status valid.
 [eva] Done for function frexpl
 [eva] computing for function frexpl <- main.
   Called from tests/libc/math_h.c:92.
 [eva] tests/libc/math_h.c:92: 
   function frexpl: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:92: 
-  function frexpl: precondition ¬(infinite_arg:
-                                     \is_plus_infinity(x) ∨
-                                     \is_minus_infinity(x)) got status valid.
+  function frexpl: precondition 'not_infinite' got status valid.
 [eva] tests/libc/math_h.c:92: 
-  function frexpl: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpl: precondition 'not_nan' got status valid.
 [eva] Done for function frexpl
 [eva] computing for function frexpl <- main.
   Called from tests/libc/math_h.c:92.
 [eva] tests/libc/math_h.c:92: 
   function frexpl: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:92: 
-  function frexpl: precondition ¬(infinite_arg:
-                                     \is_plus_infinity(x) ∨
-                                     \is_minus_infinity(x)) got status valid.
+  function frexpl: precondition 'not_infinite' got status valid.
 [eva] tests/libc/math_h.c:92: 
-  function frexpl: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpl: precondition 'not_nan' got status valid.
 [eva] Done for function frexpl
 [eva] computing for function frexpl <- main.
   Called from tests/libc/math_h.c:92.
 [eva] tests/libc/math_h.c:92: 
   function frexpl: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:92: 
-  function frexpl: precondition ¬(infinite_arg:
-                                     \is_plus_infinity(x) ∨
-                                     \is_minus_infinity(x)) got status valid.
+  function frexpl: precondition 'not_infinite' got status valid.
 [eva] tests/libc/math_h.c:92: 
-  function frexpl: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpl: precondition 'not_nan' got status valid.
 [eva] Done for function frexpl
 [eva] computing for function frexpl <- main.
   Called from tests/libc/math_h.c:92.
 [eva] tests/libc/math_h.c:92: 
   function frexpl: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:92: 
-  function frexpl: precondition ¬(infinite_arg:
-                                     \is_plus_infinity(x) ∨
-                                     \is_minus_infinity(x)) got status valid.
+  function frexpl: precondition 'not_infinite' got status valid.
 [eva] tests/libc/math_h.c:92: 
-  function frexpl: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpl: precondition 'not_nan' got status valid.
 [eva] Done for function frexpl
 [eva] computing for function frexpl <- main.
   Called from tests/libc/math_h.c:92.
 [eva] tests/libc/math_h.c:92: 
   function frexpl: precondition 'valid_exp' got status valid.
 [eva] tests/libc/math_h.c:92: 
-  function frexpl: precondition ¬(infinite_arg:
-                                     \is_plus_infinity(x) ∨
-                                     \is_minus_infinity(x)) got status valid.
+  function frexpl: precondition 'not_infinite' got status valid.
 [eva] tests/libc/math_h.c:92: 
-  function frexpl: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpl: precondition 'not_nan' got status valid.
 [eva] Done for function frexpl
 [eva:alarm] tests/libc/math_h.c:92: Warning: 
   non-finite long double value. assert \is_finite(ld_top);
@@ -759,11 +707,9 @@
 [eva] tests/libc/math_h.c:92: 
   function frexpl: precondition 'valid_exp' got status valid.
 [eva:alarm] tests/libc/math_h.c:92: Warning: 
-  function frexpl: precondition ¬(infinite_arg:
-                                     \is_plus_infinity(x) ∨
-                                     \is_minus_infinity(x)) got status unknown.
+  function frexpl: precondition 'not_infinite' got status unknown.
 [eva] tests/libc/math_h.c:92: 
-  function frexpl: precondition ¬(nan_arg: \is_NaN(x)) got status valid.
+  function frexpl: precondition 'not_nan' got status valid.
 [eva] Done for function frexpl
 [eva] computing for function ldexp <- main.
   Called from tests/libc/math_h.c:93.
