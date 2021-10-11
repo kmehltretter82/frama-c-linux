@@ -1200,7 +1200,7 @@ let to_integer i =
     -1
 
 let constFoldToInteger e =
-  try Option.map Integer.to_int (Cil.constFoldToInt e)
+  try Option.map Integer.to_int_exn (Cil.constFoldToInt e)
   with Z.Overflow ->
     Kernel.error ~current:true
       "integer constant too large in expression %a"
