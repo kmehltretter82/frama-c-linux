@@ -1,5 +1,6 @@
 [kernel] Parsing tests/misc/function_ptr_alignof.i (no preprocessing)
 [kernel] tests/misc/function_ptr_alignof.i:13: User Error: 
-  alignof() called on function only allowed for GCC
+  alignof() called on function only allowed for GCC machdeps; see option -machdep or
+  run '-machdep help' for the list of available machdeps
 [kernel] User Error: stopping on file "tests/misc/function_ptr_alignof.i" that has errors.
 [kernel] Frama-C aborted: invalid user input.

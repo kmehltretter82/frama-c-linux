@@ -102,7 +102,7 @@ let reject_empty_struct b offset typ =
     if ci.cfields = Some [] && not (Cil.acceptEmptyCompinfo ()) then
       Value_parameters.abort ~current:true
         "@[empty %ss@ are unsupported@ (type '%a',@ location %a%a)@ \
-         in C99 (only allowed as GCC/MSVC extension).@ Aborting.@]"
+         in C99 (only allowed on GCC/MSVC machdep).@ Aborting.@]"
         (if ci.cstruct then "struct" else "union")
         Printer.pp_typ typ Base.pretty b Printer.pp_offset offset
   | _ -> ()
