@@ -606,8 +606,9 @@ val isArrayType: typ -> bool
 (** True if the argument is a struct of union type *)
 val isStructOrUnionType: typ -> bool
 
-(** Raised when {!Cil.lenOfArray} fails either because the length is [None]
-  * or because it is a non-constant expression *)
+(** Raised when {!Cil.lenOfArray} fails either because the length is [None],
+  * because it is a non-constant expression, or because it overflows an int.
+*)
 exception LenOfArray
 
 (** Call to compute the array length as present in the array type, to an
@@ -1035,15 +1036,25 @@ val typeOf_array_elem : typ -> typ
 val is_fully_arithmetic: typ -> bool
 (** Returns [true] whenever the type contains only arithmetic types *)
 
-(** Convert a string representing a C integer literal to an expression.
-    Handles the prefixes 0x and 0 and the suffixes L, U, UL, LL, ULL.
-*)
+(** Convert a string representing a C integer literal to an Integer.
+    Handles the prefixes 0x and 0 and the suffixes L, U, UL, LL, ULL. *)
 val parseInt: string -> Integer.t
-val parseIntExp: loc:location -> string -> exp
-val parseIntLogic: loc:location -> string -> term
 
-(** Convert a string representing a C integer literal to an expression.
-    Handles the prefixes 0x and 0 and the suffixes L, U, UL, LL, ULL *)
+(** Like [parseInt], but returns [Error message] in case of failure, instead of
+    aborting Frama-C.
+    @since Frama-C+dev *)
+val parseIntRes: string -> (Integer.t, string) result
+
+(** Like [parseInt], but converts to an expression. *)
+val parseIntExp: loc:location -> string -> exp
+
+(** Like [parseIntExp], but returns [Error message] in case of failure, instead
+    of aborting Frama-C.
+    @since Frama-C+dev *)
+val parseIntExpRes: loc:location -> string -> (exp, string) result
+
+(** Like [parseInt], but converts to a logic term. *)
+val parseIntLogic: loc:location -> string -> term
 
 val appears_in_expr: varinfo -> exp -> bool
 (** @return true if the given variable appears in the expression. *)

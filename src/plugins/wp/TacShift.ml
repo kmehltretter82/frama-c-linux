@@ -45,7 +45,7 @@ let select_op f =
 let select_int n =
   match F.repr n with
   | Qed.Logic.Kint n ->
-      (try Integer.to_int n with Z.Overflow -> raise Not_found)
+      (try Integer.to_int_exn n with Z.Overflow -> raise Not_found)
   | _ -> raise Not_found
 
 class shift =

@@ -390,7 +390,7 @@ let cardinal_less_than t n =
     | Some min, Some max -> Int.succ ((Int.e_div (Int.sub max min) t.modu))
   in
   if Int.le c (Int.of_int n)
-  then Int.to_int c (* This is smaller than the original [n] *)
+  then Int.to_int_exn c (* This is smaller than the original [n] *)
   else raise Not_less_than
 
 let cardinal_zero_or_one t =

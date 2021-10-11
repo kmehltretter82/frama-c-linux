@@ -34,7 +34,7 @@ struct
   let rec eval v exp =
     match exp.enode with
     | Const (CInt64 (i,_,_)) ->
-      (try Integer.to_int i with _ -> raise Not_constant)
+      (try Integer.to_int_exn i with _ -> raise Not_constant)
     | Lval (Var vi, NoOffset) ->
       (try Map.find vi v with Not_found -> raise Not_constant)
     | SizeOf typ ->

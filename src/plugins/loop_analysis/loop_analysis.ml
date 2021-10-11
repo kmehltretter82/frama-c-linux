@@ -450,7 +450,7 @@ module Store(* (B:sig *)
             Printer.pp_varinfo vi pretty_increment increment
         else
           try
-            let value = (Integer.to_int (Integer.c_div bound_offset increment)) in
+            let value = (Integer.to_int_exn (Integer.c_div bound_offset increment)) in
             let adjusted_value =
               if (binop = Cil_types.Le && Integer.(equal remainder zero))
               || (not Integer.(equal remainder zero))
@@ -462,7 +462,7 @@ module Store(* (B:sig *)
                 success := true;
                 add_loop_bound stmt adjusted_value
               end
-          with Z.Overflow -> (* overflow in Integer.to_int *)
+          with Z.Overflow -> (* overflow in Integer.to_int_exn *)
             ()
       (* TODO: check if this is useful and does not cause false alarms
          else

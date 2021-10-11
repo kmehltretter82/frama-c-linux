@@ -261,7 +261,7 @@ let sufficiently_aligned vi algn =
       (fun acc attr ->
          match attr with
          | Attr("align", [AInt i]) ->
-           let alignment = Integer.to_int i in
+           let alignment = Integer.to_int_exn i in
            if acc <> 0 && acc <> alignment then begin
              (* multiple align attributes with different values *)
              Options.error

@@ -271,7 +271,7 @@ let rec pretty_bits_internal env bfinfo typ ~align ~start ~stop =
                if Integer.le new_start new_stop then
                  let new_bfinfo = match field.fbitfield with
                    | None -> Other
-                   | Some i -> Bitfield (Integer.to_int64 (Integer.of_int i))
+                   | Some i -> Bitfield (Int64.of_int i)
                  in
                  let new_align =
                    Integer.e_rem (Integer.sub align start_o) env.rh_size

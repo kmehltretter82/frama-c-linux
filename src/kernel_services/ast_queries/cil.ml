@@ -3233,21 +3233,21 @@ let parseIntAux (str:string) =
   (* Convert to integer. To prevent overflow we do the arithmetic
    * on Big_int and we take care of overflow. We work only with
    * positive integers since the lexer takes care of the sign *)
-  let rec toInt base (acc: Integer.t) (idx: int) : Integer.t =
+  let rec toInt base (acc: Integer.t) (idx: int) =
     let doAcc what =
       if Integer.ge what base
       then
-        Kernel.fatal ~current:true
-          "Invalid digit %a in integer constant '%s' in base %a."
-          (Integer.pretty ~hexa:false) what
-          str
-          (Integer.pretty ~hexa:false) base;
-      let acc' =
-        Integer.add what (Integer.mul base acc) in
-      toInt base acc' (idx + 1)
+        Error (Format.asprintf
+                 "Invalid digit %a in integer literal '%s' in base %a."
+                 (Integer.pretty ~hexa:false) what
+                 str
+                 (Integer.pretty ~hexa:false) base)
+      else
+        let acc' = Integer.add what (Integer.mul base acc) in
+        toInt base acc' (idx + 1)
     in
     if idx >= l - suffixlen then begin
-      acc
+      Ok acc
     end else
       let ch = String.get str idx in
       if ch >= '0' && ch <= '9' then
@@ -3257,7 +3257,8 @@ let parseIntAux (str:string) =
       else if  ch >= 'A' && ch <= 'F'  then
         doAcc (Integer.of_int (10 + Char.code ch - Char.code 'A'))
       else
-        Kernel.fatal ~current:true "Invalid integer constant: %s" str
+        Error (Format.asprintf
+                 "Invalid character %c in integer literal: %s" ch str)
   in
   let i =
     if octalhexbin && l >= 2 then
@@ -3273,24 +3274,36 @@ let parseIntAux (str:string) =
   in
   i,kinds
 
-let parseInt s = fst (parseIntAux s)
+let parseIntRes s = fst (parseIntAux s)
+
+let parseInt s =
+  match parseIntRes s with
+  | Ok i -> i
+  | Error msg -> Kernel.fatal ~current:true "%s" msg
 
 let parseIntLogic ~loc str =
-  let i,_= parseIntAux str in
+  let i = parseInt str in
   { term_node = TConst (Integer (i,Some str)) ; term_loc = loc;
     term_name = []; term_type = Linteger;}
 
+let parseIntExpRes ~loc repr =
+  let i, kinds = parseIntAux repr in
+  Result.bind i
+    (fun i ->
+       let rec loop = function
+         | k::rest ->
+           if fitsInInt k i then (* i fits in the current type. *)
+             Ok (kinteger64 ~loc ~repr ~kind:k i)
+           else loop rest
+         | [] ->
+           Error (Format.asprintf "Cannot represent the integer %s" repr)
+       in
+       loop kinds)
+
 let parseIntExp ~loc repr =
-  let i,kinds = parseIntAux repr in
-  let rec loop = function
-    | k::rest ->
-      if fitsInInt k i then (* i fits in the current type. *)
-        kinteger64 ~loc ~repr ~kind:k i
-      else loop rest
-    | [] ->
-      Kernel.fatal ~source:(fst loc) "Cannot represent the integer %s" repr
-  in
-  loop kinds
+  match parseIntExpRes ~loc repr with
+  | Ok e -> e
+  | Error msg -> Kernel.fatal ~current:true "%s" msg
 
 let mkStmtCfg ~before ~(new_stmtkind:stmtkind) ~(ref_stmt:stmt) : stmt =
   let new_ = { skind = new_stmtkind;
@@ -4102,7 +4115,9 @@ and alignOfField (fi: fieldinfo) =
 and intOfAttrparam (a:attrparam) : int option =
   let rec doit a : int =
     match a with
-    |  AInt(n) -> Integer.to_int n
+    | AInt(n) ->
+      Extlib.the ~exn:(SizeOfError ("Overflow in integer attribute.", voidType))
+        (Integer.to_int_opt n)
     | ABinOp(PlusA, a1, a2) -> doit a1 + doit a2
     | ABinOp(MinusA, a1, a2) -> doit a1 - doit a2
     | ABinOp(Mult, a1, a2) -> doit a1 * doit a2
@@ -4410,9 +4425,9 @@ and bitsSizeOf t =
              Const(CInt64(l,_,_)) ->
              let sz = Integer.mul (Integer.of_int (bitsSizeOf bt)) l in
              let sz' =
-               try
-                 Integer.to_int sz
-               with Z.Overflow ->
+               match Integer.to_int_opt sz with
+               | Some i -> i
+               | None ->
                  raise
                    (SizeOfError
                       ("Array is so long that its size can't be "
@@ -4483,7 +4498,7 @@ and bitsOffset (baset: typ) (off: offset) : int * int =
     | Index(e, off) -> begin
         let ei =
           match constFoldToInt e with
-          | Some i -> Integer.to_int i
+          | Some i -> Integer.to_int_exn i
           | None -> raise (SizeOfError ("Index is not constant", baset))
         in
         let bt = typeOf_array_elem baset in
@@ -4839,7 +4854,7 @@ let bitsSizeOfBitfield typlv =
   match unrollType typlv with
   | TInt (_, attrs) | TEnum (_, attrs) as t ->
     (match findAttribute bitfield_attribute_name attrs with
-     | [AInt i] -> Integer.to_int i
+     | [AInt i] -> Integer.to_int_exn i
      | _ -> bitsSizeOf t)
   | t -> bitsSizeOf t
 
@@ -5666,7 +5681,7 @@ let rec integralPromotion t = (* c.f. ISO 6.3.1.1 *)
     begin match findAttribute bitfield_attribute_name a with
       | [AInt size] ->
         (* This attribute always fits in int. *)
-        let size = Integer.to_int size in
+        let size = Integer.to_int_exn size in
         let sizeofint = bitsSizeOf intType in
         let attrs = remove_attributes_for_integral_promotion a in
         let kind =
@@ -5996,7 +6011,10 @@ let lenOfArray64 eo =
         ni
       | _ -> raise LenOfArray
     end
-let lenOfArray eo = Integer.to_int (lenOfArray64 eo)
+let lenOfArray eo =
+  match Integer.to_int_opt (lenOfArray64 eo) with
+  | None -> raise LenOfArray
+  | Some l -> l
 
 (*** Make an initializer for zeroing a data type ***)
 let rec makeZeroInit ~loc (t: typ) : init =
@@ -6028,7 +6046,7 @@ let rec makeZeroInit ~loc (t: typ) : init =
   | TArray(bt, Some len, _, _) as t' ->
     let n =
       match constFoldToInt len with
-      | Some n -> Integer.to_int n
+      | Some n -> Integer.to_int_exn n
       | _ -> Kernel.fatal ~current:true "Cannot understand length of array"
     in
     let initbt = makeZeroInit ~loc bt in
@@ -6074,7 +6092,7 @@ let foldLeftCompound
         | Some lene -> begin
             match constFoldToInt lene with
             | Some i ->
-              let len_array = Integer.to_int i in
+              let len_array = Integer.to_int_exn i in
               let len_init = List.length initl in
               if len_array <= len_init then
                 default () (* enough elements in the initializers list *)

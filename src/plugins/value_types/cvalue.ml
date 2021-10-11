@@ -642,7 +642,7 @@ module V = struct
     else value
 
   let shift_bits ~topify ~offset ~size v =
-    let v = restrict_topint_to_size v (Integer.to_int size) in
+    let v = restrict_topint_to_size v (Integer.to_int_exn size) in
     shift_left_by_integer ~topify offset v
 
   let merge_distinct_bits ~topify ~conflate_bottom value acc =

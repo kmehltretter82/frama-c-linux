@@ -67,7 +67,7 @@ type region_spec = {
 let get_int e =
   match Logic_utils.constFoldTermToInt e with
   | None -> None
-  | Some a -> Some (Integer.to_int a)
+  | Some a -> Some (Integer.to_int_exn a)
 
 let get_int_option = function
   | None -> None

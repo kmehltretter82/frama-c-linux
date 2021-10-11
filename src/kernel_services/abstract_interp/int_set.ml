@@ -65,7 +65,7 @@ let zero_or_one = [| Int.zero ; Int.one |]
 let inject_singleton e = [| e |]
 
 let inject_periodic ~from ~period ~number =
-  let l = Int.to_int number in
+  let l = Int.to_int_exn number in
   let s = Array.make l Int.zero in
   let v = ref from in
   let i = ref 0 in
@@ -578,7 +578,7 @@ let complement_under ~min ~max set =
   let card = Int.succ (Int.sub e b) in
   if Int.(le card zero) then `Bottom
   else if Int.le card (Int.of_int !small_cardinal)
-  then `Set (Array.init (Int.to_int card) (fun i -> Int.add b (Int.of_int i)))
+  then `Set (Array.init (Int.to_int_exn card) (fun i -> Int.add b (Int.of_int i)))
   else `Top (b, e, Int.one)
 
 (* ------------------------------ Arithmetics ------------------------------- *)

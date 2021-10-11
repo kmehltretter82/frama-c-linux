@@ -234,9 +234,9 @@ let offsetmap_pretty cas name print_ampamp fmt offsm =
       let ek = Integer.succ ek in
       if Integer.is_zero (Integer.e_rem ek Integer.eight)
       then
-        let step = if iso then 1 else (Integer.to_int modu) / 8 in
-        let start = ref ((Integer.to_int bk) / 8) in
-        let ek = Integer.to_int ek in
+        let step = if iso then 1 else (Integer.to_int_exn modu) / 8 in
+        let start = ref ((Integer.to_int_exn bk) / 8) in
+        let ek = Integer.to_int_exn ek in
         let ek = ek / 8 in
         if ek / step > 1_000_000 (* arbitrary limit *) then
           raise Too_large_to_enumerate;

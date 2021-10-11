@@ -1191,6 +1191,22 @@ end
 let constFoldType (t:typ) : typ =
   visitCilType constFoldTypeVisitor t
 
+let to_integer i =
+  match Integer.to_int_opt i with
+  | Some i -> i
+  | None ->
+    Kernel.error ~current:true "integer too large: %a"
+      (Integer.pretty ~hexa:true) i;
+    -1
+
+let constFoldToInteger e =
+  try Option.map Integer.to_int (Cil.constFoldToInt e)
+  with Z.Overflow ->
+    Kernel.error ~current:true
+      "integer constant too large in expression %a"
+      Cil_printer.pp_exp e;
+    None
+
 let get_temp_name ghost () =
   let undolist = ref [] in
   let data = CurrentLoc.get() in
@@ -1427,7 +1443,7 @@ let rec isCabsZeroExp e = match e.expr_node with
      | SINGLE_INIT e -> isCabsZeroExp e
      | NO_INIT | COMPOUND_INIT _ -> false)
   | CONSTANT (CONST_INT i) ->
-    Integer.is_zero (Cil.parseInt i)
+    Result.fold ~error:(fun _ -> false) ~ok:Integer.is_zero (Cil.parseIntRes i)
   | _ -> false
 
 module BlockChunk =
@@ -3348,7 +3364,7 @@ let rec setOneInit this o preinit =
     let idx, (* Index in the current comp *)
         restoff (* Rest offset *) =
       match o with
-      | Index({enode = Const(CInt64(i,_,_))}, off) -> Integer.to_int i, off
+      | Index({enode = Const(CInt64(i,_,_))}, off) -> to_integer i, off
       | Field (f, off) ->
         (* Find the index of the field *)
         let rec loop (idx: int) = function
@@ -3427,8 +3443,7 @@ let rec collectInitializer
         match leno with
         | Some len -> begin
             match constFoldToInt len with
-            | Some ni when Integer.ge ni Integer.zero ->
-              (Integer.to_int ni), false
+            | Some ni when Integer.ge ni Integer.zero -> to_integer ni, false
             | _ ->
               Kernel.fatal ~current:true
                 "Array length %a is not a compile-time constant: \
@@ -4949,11 +4964,12 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
         end
       | Cabs.CONSTANT (Cabs.CONST_STRING s) -> AStr s
       | Cabs.CONSTANT (Cabs.CONST_INT str) -> begin
-          match (parseIntExp ~loc str).enode with
-          | Const (CInt64 (v64,_,_)) ->
+          match parseIntExpRes ~loc str with
+          | Ok {enode = Const (CInt64 (v64,_,_)) } ->
             AInt v64
           | _ ->
-            Kernel.fatal ~current:true "Invalid attribute constant: %s" str
+            Kernel.error ~current:true "Invalid attribute constant: %s" str;
+            AInt Integer.one
         end
       | Cabs.CONSTANT (Cabs.CONST_FLOAT str) ->
         ACons ("__fc_float", [AStr str])
@@ -5295,7 +5311,7 @@ and doType (ghost:bool) isFuncArg
                 Attr("arraylen", [ la ]) :: static
               with NotAnAttrParam _ -> begin
                   Kernel.warning ~once:true ~current:true
-                    "Cannot represent the length '%a'of array as an attribute"
+                    "Cannot represent the length '%a' of array as an attribute"
                     Cil_printer.pp_exp l
                   ;
                   static (* Leave unchanged *)
@@ -5491,7 +5507,7 @@ and makeCompType ghost (isstruct: bool)
             match isIntegerConstant ghost w with
             | None ->
               Kernel.error ~source
-                "bitfield width is not an integer constant";
+                "bitfield width is not a valid integer constant";
               (* error  does not immediately stop execution.
                  Hence, we return a placeholder here.
               *)
@@ -5699,11 +5715,7 @@ and getIntConstExp ghost (aexp) : exp =
 
 and isIntegerConstant ghost (aexp) : int option =
   match doExp (ghost_local_env ghost) CMayConst aexp (AExp None) with
-  | (_, c, e, _) when isEmpty c -> begin
-      match Cil.constFoldToInt e with
-      | Some n -> (try Some (Integer.to_int n) with Z.Overflow -> None)
-      | _ -> None
-    end
+  | (_, c, e, _) when isEmpty c -> constFoldToInteger e
   | _ -> None
 
 (* Process an expression and in the process do some type checking,
@@ -5988,7 +6000,15 @@ and doExp local_env
     | Cabs.CONSTANT ct -> begin
         match ct with
         | Cabs.CONST_INT str -> begin
-            let res = parseIntExp ~loc str in
+            let res =
+              match parseIntExpRes ~loc str with
+              | Ok e -> e
+              | Error msg ->
+                Kernel.error ~current:true "%s" msg;
+                (* assign an arbitrary expression,
+                   since we must return something *)
+                Cil.one ~loc
+            in
             finishExp [] (unspecified_chunk empty) res (typeOf res)
           end
 
@@ -8467,7 +8487,13 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
 
                 let doidx = add_reads ~ghost idxe'.eloc r doidx in
                 match constFoldToInt idxe', isNotEmpty doidx with
-                | Some x, false -> Integer.to_int x, doidx
+                | Some x, false ->
+                  begin
+                    match Integer.to_int_opt x with
+                    | Some x' -> x', doidx
+                    | None -> abort_context
+                                "INDEX initialization designator overflows"
+                  end
                 | _ ->
                   abort_context
                     "INDEX initialization designator is not a constant"
@@ -8504,11 +8530,11 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
         if isNotEmpty doidxs || isNotEmpty doidxe then
           Kernel.fatal ~current:true "Range designators are not constants";
         let first, last =
-          match constFoldToInt idxs', constFoldToInt idxe' with
-          | Some s, Some e -> Integer.to_int s, Integer.to_int e
+          match constFoldToInteger idxs', constFoldToInteger idxe' with
+          | Some s, Some e -> s, e
           | _ ->
             Kernel.fatal ~current:true
-              "INDEX_RANGE initialization designator is not a constant"
+              "INDEX_RANGE initialization designator is not a valid constant"
         in
         if first < 0 || first > last then
           Kernel.error ~once:true ~current:true
@@ -10061,8 +10087,8 @@ and doStatement local_env (s : Cabs.statement) : chunk =
       Kernel.error ~once:true ~current:true
         "Case statement with a non-constant";
     let il, ih =
-      match constFoldToInt el', constFoldToInt eh' with
-      | Some il, Some ih -> Integer.to_int il, Integer.to_int ih
+      match constFoldToInteger el', constFoldToInteger eh' with
+      | Some il, Some ih -> il, ih
       | _ ->
         Kernel.fatal ~current:true
           "Cannot understand the constants in case range"

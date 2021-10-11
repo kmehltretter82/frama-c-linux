@@ -169,7 +169,7 @@ and get_nth_list k = function
 let rewrite_nth s k =
   match F.repr k with
   | L.Kint z ->
-      let k = try Integer.to_int z with Z.Overflow -> raise Not_found in
+      let k = try Integer.to_int_exn z with Z.Overflow -> raise Not_found in
       if 0 <= k then get_nth k s else raise Not_found
   | _ -> raise Not_found
 
