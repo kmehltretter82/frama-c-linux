@@ -1,4 +1,5 @@
 /* run.config
+
   OPT: -load-module @PTEST_DIR@/@PTEST_NAME@.ml
 */
 /* run.config_qualif

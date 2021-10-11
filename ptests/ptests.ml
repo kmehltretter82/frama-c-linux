@@ -298,7 +298,8 @@ let example_msg =
      EXECNOW: ([LOG|BIN] <file>)+ <command>  @[<v 0># Defines the command to execute to build a 'LOG' (textual) 'BIN' (binary) targets.@ \
      # Note: the textual targets are compared to oracles.@]@  \
      MODULE: <module>...  @[<v 0># Compile the module and set the @PTEST_MODULE@ macro@]@  \
-     PLUGIN: <plugin>... @[<v 0># Set the @PTEST_PLUGIN@ macro.@]@  \
+     LIBS: <module>...    @[<v 0># Don't compile the module but set the @PTEST_LIBS@ macro@]@  \
+     PLUGIN: <plugin>...  @[<v 0># Set the @PTEST_PLUGIN@ macro.@]@  \
      LOG: <file>...       @[<v 0># Defines targets built by the next sub-test command.@]@  \
      CMD: <command>       @[<v 0># Defines the command to execute for all tests in order to get results to be compared to oracles.@]@  \
      OPT: <options>       @[<v 0># Defines a sub-test using the 'CMD' definition: <command> <options>@]@  \
@@ -332,14 +333,16 @@ let example_msg =
      @@PTEST_CONFIG@@       # Test configuration suffix.@ \
      @@PTEST_RESULT@@       # Shorthand alias to '@@PTEST_DIR@@/result@@PTEST_CONFIG@@' (the result directory dedicated to the tested configuration).@ \
      @@PTEST_ORACLE@@       # Basename of the current oracle file (macro only usable in FILTER directives).@ \
+     @@PTEST_LIBS@@         # Current list of module defined by the LIBS directive.@ \
      @@PTEST_MODULE@@       # Current list of module defined by the MODULE directive.@ \
      @@PTEST_PLUGIN@@       # Current list of plugins defined by the PLUGIN directive.@ \
      @]@ \
      Other macros can only be used in test commands (CMD and EXECNOW directives):@  \
      @@PTEST_DEFAULT_OPTIONS@@  # The default option list: %s@  \
+     @@PTEST_LOAD_LIBS@@        # The '-load-module' option related to the LIBS directive.@  \
      @@PTEST_LOAD_MODULE@@      # The '-load-module' option related to the MODULE directive.@  \
      @@PTEST_LOAD_PLUGIN@@      # The '-load-module' option related to the PLUGIN directive.@  \
-     @@PTEST_LOAD_OPTIONS@@     # Shorthand alias to '@@PTEST_LOAD_PLUGIN@@ @@PTEST_LOAD_MODULE@@' .@  \
+     @@PTEST_LOAD_OPTIONS@@     # Shorthand alias to '@@PTEST_LOAD_PLUGIN@@ @@PTEST_LOAD_LIBS@@ @@PTEST_LOAD_MODULE@@' .@  \
      @@PTEST_OPTIONS@@          # The current list of options related to OPT and STDOPT directives (for CMD directives).@  \
      @@frama-c@@                # Shortcut defined as follow: %s@  \
      @@frama-c-cmd@@            # Shortcut defined as follow: %s@  \
@@ -735,6 +738,7 @@ type config =
     dc_execnow    : execnow list; (** command to be launched before
                                        the toplevel(s)
                                   *)
+    dc_load_libs: string; (** load libs options. *)
     dc_load_module: string; (** load module options. *)
     dc_cmxs_module: StringSet.t; (** compiled modules. *)
     dc_macros: Macros.t; (** existing macros. *)
@@ -797,6 +801,7 @@ end = struct
       "PTEST_PRE_OPTIONS",      !macro_pre_options;
       "PTEST_POST_OPTIONS",     !macro_post_options;
       "PTEST_MAKE_MODULE", "make -s";
+      "PTEST_LIBS", "";
       "PTEST_MODULE", "";
       "PTEST_PLUGIN", "";
     ]
@@ -813,6 +818,7 @@ end = struct
       dc_commands = [ { toplevel= !default_toplevel; opts=""; macros=Macros.empty; exit_code=None; logs= []; timeout= ""} ];
       dc_dont_run = false;
       dc_load_module = "";
+      dc_load_libs = "";
       dc_cmxs_module = StringSet.empty;
       dc_framac = true;
       dc_default_log = [];
@@ -935,12 +941,12 @@ end = struct
       current
     end
 
-  let update_module s =
+  let update_module_libs s =
     "@PTEST_DIR@/" ^ (Filename.remove_extension s) ^ (if !use_byte then ".cmo" else ".cmxs")
 
   let add_make_modules ~file dir deps current =
     let deps,current = List.fold_left (fun ((deps,curr) as acc) s ->
-        let s = update_module s in
+        let s = update_module_libs s in
         if StringSet.mem s curr.dc_cmxs_module then acc
         else
           (deps ^ " " ^ s),
@@ -953,19 +959,30 @@ end = struct
       config_exec ~warn:false ~once:true ~file dir (make_cmd ^ deps) current
     end
 
-  let update_module_macros modules macros =
+  let update_module_libs_macros pdef pload_def modules macros =
     let def = String.concat "," modules in
     let load_def = if String.(def = "") then "" else
-        "-load-module=" ^ (String.concat "," (List.map update_module modules))
+        "-load-module=" ^ (String.concat "," (List.map update_module_libs modules))
     in
-    Macros.add_list [ "PTEST_MODULE", def ;
-                      "PTEST_LOAD_MODULE", load_def ;
+    Macros.add_list [ pdef, def ;
+                      pload_def, load_def ;
                     ] macros
+
+  let update_module_macros =
+    update_module_libs_macros "PTEST_MODULE" "PTEST_LOAD_MODULE"
+
+  let update_libs_macros =
+    update_module_libs_macros "PTEST_LIBS" "PTEST_LOAD_LIBS"
 
   let config_module ~file dir s current =
     let deps = str_split_list (Macros.expand current.dc_macros s) in
     let current = { current with dc_macros = update_module_macros deps current.dc_macros } in
     add_make_modules ~file dir deps current
+
+  let config_libs ~file dir s current =
+    let deps = str_split_list (Macros.expand current.dc_macros s) in
+    let current = { current with dc_macros = update_libs_macros deps current.dc_macros } in
+    current
 
   let update_plugin_macros plugins macros =
     let def = String.concat "," plugins in
@@ -1055,6 +1072,8 @@ end = struct
       "MACRO", config_macro;
 
       "MODULE", config_module;
+
+      "LIBS", config_libs;
 
       "PLUGIN", config_plugins;
 
@@ -1300,6 +1319,7 @@ end = struct
     let ptest_file = Filename.sanitize ptest_file in
     let ptest_load_plugin = Macros.get "PTEST_LOAD_PLUGIN" cmd.macros in
     let ptest_load_module = Macros.get "PTEST_LOAD_MODULE" cmd.macros in
+    let ptest_load_libs = Macros.get "PTEST_LOAD_LIBS" cmd.macros in
     let macros =
       [ "PTEST_CONFIG", ptest_config;
         "PTEST_DIR", SubDir.get cmd.directory;
@@ -1311,6 +1331,7 @@ end = struct
         "PTEST_OPT", cmd.options;
         "PTEST_LOAD_OPTIONS", (String.concat " "
                                  [ ptest_load_plugin ;
+                                   ptest_load_libs ;
                                    ptest_load_module ])
       ]
     in
