@@ -1,6 +1,6 @@
 /* run.config
- MODULE: libSelect libAnim @PTEST_NAME@
-
+ LIBS: libSelect libAnim
+ MODULE: @PTEST_NAME@
    OPT: @EVA_OPTIONS@ -deps -slicing-level 3
 */
 
