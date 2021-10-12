@@ -241,7 +241,7 @@ struct
 
   and is_record c s =
     Definitions.call_pred
-      (Lang.generated_p (C.prefix ^ Lang.comp_id c))
+      (Lang.generated_p ~coloring:true (C.prefix ^ Lang.comp_id c))
       (fun lfun ->
          let basename = if c.cstruct then "S" else "U" in
          let s = Lang.freshvar ~basename (Lang.t_comp c) in
@@ -261,7 +261,7 @@ struct
 
   and is_array elt ds t =
     Definitions.call_pred
-      (Lang.generated_p (array_name elt ds))
+      (Lang.generated_p ~coloring:true (array_name elt ds))
       (fun lfun ->
          let cluster =
            match elt with

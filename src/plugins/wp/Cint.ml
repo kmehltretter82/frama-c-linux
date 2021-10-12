@@ -59,7 +59,8 @@ let library = "cint"
 let make_fun_int op i =
   Lang.extern_f ~library ~result:Logic.Int "%s_%a" op Ctypes.pp_int i
 let make_pred_int op i =
-  Lang.extern_f ~library ~result:Logic.Prop "%s_%a" op Ctypes.pp_int i
+  Lang.extern_f
+    ~library ~result:Logic.Prop ~coloring:true "%s_%a" op Ctypes.pp_int i
 
 (* let fun_int op = Ctypes.imemo (make_fun_int op) *) (* unused for now *)
 (* let pred_int op = Ctypes.imemo (make_pred_int op) *) (* unused for now *)
