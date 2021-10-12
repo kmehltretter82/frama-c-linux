@@ -11,13 +11,13 @@
    STDOPT: #"-cpp-extra-args=-DLOGIC_CONSTANT"
    STDOPT: #"-cpp-extra-args=-DLOGIC_CONSTANT_OCTAL"
    STDOPT: #"-cpp-extra-args=-DEVA_UNROLL -eva"
+   STDOPT: #"-cpp-extra-args=-DEVA_UNROLL2 -eva"
    STDOPT: #"-cpp-extra-args=-DCABS_DOWHILE"
    EXIT: 0
    STDOPT: #"-cpp-extra-args=-DUNROLL_PRAGMA"
 */
 
 volatile int nondet;
-
 #ifdef BITFIELD
 struct st {
   int bf:(999999999999999999+9999999999999999999);
@@ -75,6 +75,8 @@ int main() {
 #ifdef EVA_UNROLL
   //@ loop unroll (-9999999999999999999); // IntLimit
   while (nondet);
+#endif
+#ifdef EVA_UNROLL2
   //@ loop unroll too_large_integer; // ExpLimit
   while (nondet);
   //@ slevel 9999999999999999999;
