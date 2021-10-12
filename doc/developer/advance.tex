@@ -958,6 +958,10 @@ the configuration header of a test (or a test suite).
 & Plugins to be loaded with each subsequent run.
 & \texttt{from inout eva scope variadic} for tests under \texttt{./tests} directory
 \\
+& \texttt{LIBS}\nscodeidxdef{Test!Directive}{LIBS}
+& Libraries to be loaded with each subsequent run (their compilation is not managed by \texttt{ptests} contrary to the modules of \texttt{MODULE} directive).
+& \textit{None}
+\\
 & \texttt{CMD}\nscodeidxdef{Test!Directive}{CMD}
 & Program to run
 & \texttt{./bin/toplevel.opt}
@@ -1166,6 +1170,9 @@ or
   \texttt{@PTEST\_MAKE\_MODULE@} defaults to \texttt{make -s}. Option
   \texttt{-load-module <MODULE>} will then be appended to any subsequent Frama-C
   command triggered by the test.
+\item \texttt{LIBS}\nscodeidx{Test!Directive}{LIBS}
+ directive takes as argument the name of a \texttt{.cmxs}
+  module. The \texttt{-load-module <LIBS>} will then be appended to any subsequent Frama-C command triggered by the test. The compilation is not managed by \texttt{ptests}.
 \item The \texttt{FILEREG}\nscodeidx{Test!Directive}{FILEREG}
   directive contains a regular expression indicating which files in
   the directory containing the current test suite are actually part of
