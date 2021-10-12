@@ -8551,6 +8551,9 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
         let rec loop (i: int) =
           if i > last then restil
           else
+          if last - i > 100_000 then
+            Kernel.fatal ~current:true "INDEX_RANGE too large"
+          else
             (top (Cabs.ATINDEX_INIT(
                  { expr_node = Cabs.CONSTANT(Cabs.CONST_INT(string_of_int i));
                    expr_loc = fst idxs.expr_loc, snd idxe.expr_loc},

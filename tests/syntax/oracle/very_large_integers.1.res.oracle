@@ -1,11 +1,11 @@
 [kernel] Parsing tests/syntax/very_large_integers.c (with preprocessing)
-[kernel] tests/syntax/very_large_integers.c:30: User Error: 
+[kernel] tests/syntax/very_large_integers.c:31: User Error: 
   Cannot represent the integer 99999999999999999999U
-[kernel] tests/syntax/very_large_integers.c:30: User Error: 
+[kernel] tests/syntax/very_large_integers.c:31: User Error: 
   Cannot represent the integer 99999999999999999999U
-[kernel] tests/syntax/very_large_integers.c:67: Warning: 
+[kernel] tests/syntax/very_large_integers.c:73: Warning: 
   ignoring invalid aligned attribute: __aligned__(9223372036854775808)
-[kernel] tests/syntax/very_large_integers.c:67: Warning: 
+[kernel] tests/syntax/very_large_integers.c:73: Warning: 
   ignoring invalid aligned attribute: __aligned__((9223372036854775808)+
                                                    (9223372036854775808) )
 [kernel] User Error: stopping on file "tests/syntax/very_large_integers.c" that has errors. Add

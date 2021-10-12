@@ -1,7 +1,7 @@
 [kernel] Parsing tests/syntax/very_large_integers.c (with preprocessing)
-[kernel] tests/syntax/very_large_integers.c:37: User Error: 
+[kernel] tests/syntax/very_large_integers.c:38: User Error: 
   integer constant too large in expression 9999999999999999999U
-[kernel] tests/syntax/very_large_integers.c:37: Failure: 
+[kernel] tests/syntax/very_large_integers.c:38: Failure: 
   Cannot understand the constants in case range
 [kernel] User Error: stopping on file "tests/syntax/very_large_integers.c" that has errors. Add
   '-kernel-msg-key pp' for preprocessing command.

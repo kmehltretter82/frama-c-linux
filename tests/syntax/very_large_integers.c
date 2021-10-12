@@ -8,6 +8,7 @@
    STDOPT: #"-cpp-extra-args=-DINIT_DESIGNATOR"
    STDOPT: #"-cpp-extra-args=-DINIT_DESIGNATOR2"
    STDOPT: #"-cpp-extra-args=-DRANGE_DESIGNATOR"
+   STDOPT: #"-cpp-extra-args=-DRANGE_DESIGNATOR2"
    STDOPT: #"-cpp-extra-args=-DATTRIBUTE_CONSTANT"
    STDOPT: #"-cpp-extra-args=-DLOGIC_CONSTANT"
    STDOPT: #"-cpp-extra-args=-DLOGIC_CONSTANT_OCTAL"
@@ -40,7 +41,7 @@ void case_range() {
 #endif
 
 #ifdef CASE_RANGE2
-void case_range() {
+void case_range2() {
   switch (nondet)
   case 0 ... 10000000U:;
 }
@@ -57,6 +58,11 @@ int arr3[1] = { [9999999999999999999U] = 42 };
 #ifdef RANGE_DESIGNATOR
 int arr4[1] = { [-9999999999999999999U ... 9999999999999999999U] = 42 };
 #endif
+
+#ifdef RANGE_DESIGNATOR2
+int widths[] = { [99999999999999999 ... 999999999999999999] = 2 };
+#endif
+
 
 #ifdef ATTRIBUTE_CONSTANT
 struct acst {

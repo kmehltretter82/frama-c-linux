@@ -1,15 +1,11 @@
 [kernel] Parsing tests/syntax/very_large_integers.c (with preprocessing)
-[kernel] tests/syntax/very_large_integers.c:67: Warning: 
+[kernel] tests/syntax/very_large_integers.c:73: Warning: 
   ignoring invalid aligned attribute: __aligned__(9223372036854775808)
-[kernel] tests/syntax/very_large_integers.c:67: Warning: 
+[kernel] tests/syntax/very_large_integers.c:73: Warning: 
   ignoring invalid aligned attribute: __aligned__((9223372036854775808)+
                                                    (9223372036854775808) )
-[eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
-[eva:initial-state] Values of globals at initialization
-  nondet ∈ [--..--]
-[kernel:annot-error] tests/syntax/very_large_integers.c:86: Warning: 
-  invalid loop unrolling parameter (-9999999999999999999); ignoring
-[kernel] User Error: warning annot-error treated as fatal error.
+[kernel] tests/syntax/very_large_integers.c:86: Failure: 
+  Invalid digit 9 in integer literal '09876543210' in base 8.
+[kernel] User Error: stopping on file "tests/syntax/very_large_integers.c" that has errors. Add
+  '-kernel-msg-key pp' for preprocessing command.
 [kernel] Frama-C aborted: invalid user input.
