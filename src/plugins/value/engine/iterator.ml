@@ -239,7 +239,7 @@ module Make_Dataflow
 
   let sequence (f1 : transfer_function) (f2 : transfer_function)
     : transfer_function =
-    fun (k,x) -> List.fold_left (fun acc (k',y) -> f2 (k',y) @ acc) [] (f1 (k,x))
+    fun x -> List.fold_left (fun acc y -> f2 y @ acc) [] (f1 x)
 
 
   (* Tries to evaluate \assigns … \from … clauses for assembly code. *)
@@ -274,7 +274,7 @@ module Make_Dataflow
     if vars = [] then id else lift (Domain.leave_scope kf vars)
 
   let transfer_call (stmt : stmt) (dest : lval option) (callee : exp)
-      (args : exp list) (key,state : key * state) : (key*state) list =
+      (args : exp list) (key, state : key * state) : (key * state) list =
     let result, call_cacheable =
       Transfer.call stmt dest callee args state
     in
@@ -283,7 +283,7 @@ module Make_Dataflow
       cacheable := Eval.NoCacheCallers;
     (* Recombine callee partitioning keys with caller key *)
     let recombine = Partition.Key.recombine ~policy:call_return_policy in
-    List.map (fun (k,s) -> recombine ~caller:key ~callee:k, s) result
+    List.map (fun (k, s) -> recombine ~caller:key ~callee:k, s) result
 
   let transfer_instr (stmt : stmt) (instr : instr) : transfer_function =
     match instr with
@@ -296,13 +296,13 @@ module Make_Dataflow
       lift' transfer
     | Local_init (vi, ConsInit (f, args, k), loc) ->
       let kind = Abstract_domain.Local kf in
-      let as_func dest callee args _loc (key,state) =
+      let as_func dest callee args _loc (key, state) =
         (* This variable enters the scope too early, as it should
            be introduced after the call to [f] but before the assignment
            to [v]. This is currently not possible, at least without
            splitting Transfer.call in two. *)
         let state = Domain.enter_scope kind [vi] state in
-        transfer_call stmt dest callee args (key,state)
+        transfer_call stmt dest callee args (key, state)
       in
       Cil.treat_constructor_as_func as_func vi f args k loc
     | Set (dest, exp, _loc) ->
@@ -603,7 +603,7 @@ module Make_Dataflow
     ignore (Logic.check_fct_postconditions kf active_behaviors Normal
               ~pre_state:initial_state ~post_states:States.empty ~result:None)
 
-  let compute () : (key*state) list =
+  let compute () : (key * state) list =
     if interpreter_mode then
       simulate automaton.entry_point (get_initial_flow ())
     else begin

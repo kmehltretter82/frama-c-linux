@@ -112,13 +112,13 @@ struct
 
   (* Accessors *)
 
-  let expanded (s : store) : (key*state) list =
+  let expanded (s : store) : (key * state) list =
     Partition.to_list s.store_partition
 
   let smashed (s : store) : state or_bottom =
     match expanded s with
     | [] -> `Bottom
-    | (_k,v1) :: l -> `Value (List.fold_left Domain.join v1 (List.map snd l))
+    | (_k, v1) :: l -> `Value (List.fold_left Domain.join v1 (List.map snd l))
 
   let contents (flow : flow) : state list =
     Flow.to_list flow

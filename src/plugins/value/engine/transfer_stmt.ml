@@ -25,7 +25,6 @@ open Cil_datatype
 open Eval
 
 module type S = sig
-  type pkey = Partition.key
   type state
   type value
   type loc
@@ -33,20 +32,19 @@ module type S = sig
   val assume: state -> stmt -> exp -> bool -> state or_bottom
   val call:
     stmt -> lval option -> exp -> exp list -> state ->
-    (pkey*state) list * Eval.cacheable
+    (Partition.key * state) list * Eval.cacheable
   val check_unspecified_sequence:
     stmt ->
     state -> (stmt * lval list * lval list * lval list * stmt ref list) list ->
     unit or_bottom
   val enter_scope: kernel_function -> varinfo list -> state -> state
   type call_result = {
-    states: (pkey * state) list;
+    states: (Partition.key * state) list;
     cacheable: Eval.cacheable;
     builtin: bool;
   }
   val compute_call_ref:
-    (stmt -> (loc, value) call -> recursion option -> state ->
-     call_result) ref
+    (stmt -> (loc, value) call -> recursion option -> state -> call_result) ref
 end
 
 (* Reference filled in by the callwise-inout callback *)
@@ -121,7 +119,6 @@ module Make (Abstract: Abstractions.Eva) = struct
   module Domain = Abstract.Dom
   module Eval = Abstract.Eval
 
-  type pkey = Partition.key
   type state = Domain.t
   type value = Value.t
   type loc = Location.location
@@ -299,7 +296,7 @@ module Make (Abstract: Abstractions.Eva) = struct
   (* ------------------------------------------------------------------------ *)
 
   type call_result = {
-    states: (pkey * state) list;
+    states: (Partition.key * state) list;
     cacheable: cacheable;
     builtin: bool;
   }
@@ -761,7 +758,8 @@ module Make (Abstract: Abstractions.Eva) = struct
           (* Create the call. *)
           let eval, alarms = make_call ~subdivnb kf args valuation state in
           Alarmset.emit ki_call alarms;
-          let states = eval >>-: fun (call, recursion, valuation) ->
+          let states =
+            eval >>-: fun (call, recursion, valuation) ->
             (* Register the call. *)
             Value_results.add_kf_caller call.kf ~caller:(current_kf, stmt);
             (* Do the call. *)

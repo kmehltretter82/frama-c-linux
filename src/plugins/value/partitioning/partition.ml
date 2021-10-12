@@ -36,10 +36,8 @@ let new_monitor ~split_limit = {
 
 module SplitMonitor = Datatype.Make_with_collections (
   struct
-    open Datatype
-    include Serializable_undefined
-
-    module Values = Integer.Set
+    include Datatype.Serializable_undefined
+    module Values = Datatype.Integer.Set
 
     type t = split_monitor
 
@@ -48,19 +46,20 @@ module SplitMonitor = Datatype.Make_with_collections (
     let reprs = [ new_monitor ~split_limit:0 ]
 
     let structural_descr =
-      Structural_descr.t_record [| Int.packed_descr; Values.packed_descr |]
+      Structural_descr.t_record
+        [| Datatype.Int.packed_descr; Values.packed_descr |]
 
     let compare m1 m2 =
       let c = Int.compare m1.split_limit m2.split_limit in
       if c <> 0 then c else Values.compare m1.split_values m2.split_values
 
-    let equal = from_compare
+    let equal = Datatype.from_compare
 
     let pretty fmt m =
       Format.fprintf fmt "%d/%d" (Values.cardinal m.split_values) m.split_limit
 
     let hash m =
-      FCHashtbl.hash (Int.hash m.split_limit, Values.hash m.split_values)
+      hash (Datatype.Int.hash m.split_limit, Values.hash m.split_values)
 
     let copy m =
       { m with split_values = m.split_values }
@@ -90,8 +89,7 @@ type split_term = Eva_annotations.split_term =
   | Predicate of Cil_types.predicate
 
 module SplitTerm = Datatype.Make_with_collections (struct
-    open Datatype
-    include Serializable_undefined
+    include Datatype.Serializable_undefined
 
     module Expressions = Cil_datatype.ExpStructEq
     module Predicates = Cil_datatype.PredicateStructEq
@@ -116,7 +114,7 @@ module SplitTerm = Datatype.Make_with_collections (struct
       | Expression _, Predicate _ -> 1
       | Predicate _, Expression _ -> -1
 
-    let equal = from_compare
+    let equal = Datatype.from_compare
 
     let pretty fmt = function
       | Expression e -> Printer.pp_exp fmt e
@@ -170,13 +168,12 @@ type call_return_policy = {
 
 module Key =
 struct
-  open Datatype
 
-  module IntPair = Pair (Int) (Int)
-  module Stamp = Option (IntPair)
-  module BranchList = List (Int)
-  module LoopList = List (IntPair)
-  module Splits = SplitMap.Make (Integer)
+  module IntPair = Datatype.Pair (Datatype.Int) (Datatype.Int)
+  module Stamp = Datatype.Option (IntPair)
+  module BranchList = Datatype.List (Datatype.Int)
+  module LoopList = Datatype.List (IntPair)
+  module Splits = SplitMap.Make (Datatype.Integer)
   module DSplits = SplitMap.Make (SplitMonitor)
 
   (* Initial key, before any partitioning *)
@@ -188,8 +185,8 @@ struct
     dynamic_splits = SplitMap.empty;
   }
 
-  include Make_with_collections (struct
-      include Serializable_undefined
+  include Datatype.Make_with_collections (struct
+      include Datatype.Serializable_undefined
 
       type t = key
 
@@ -217,7 +214,7 @@ struct
         <?> (SplitMap.compare (fun _ _ -> 0), k1.dynamic_splits, k2.dynamic_splits)
         <?> (BranchList.compare, k1.branches, k2.branches)
 
-      let equal = from_compare
+      let equal = Datatype.from_compare
 
       let hash k =
         Stdlib.Hashtbl.hash (
@@ -243,7 +240,7 @@ struct
         Pretty_utils.pp_list ~pre:"{@[" ~sep:" ;@ " ~suf:"@]}"
           (fun fmt (t, i) -> Format.fprintf fmt "%a:%a"
               SplitTerm.pretty t
-              Integer.pretty i)
+              Datatype.Integer.pretty i)
           fmt
           (SplitMap.bindings key.splits)
     end)
@@ -291,8 +288,8 @@ let map = KMap.map
 let filter = KMap.filter
 let merge = KMap.merge
 
-let to_list (p : 'a partition) : (key*'a) list =
-  KMap.fold (fun k x l -> (k,x) :: l) p []
+let to_list (p : 'a partition) : (key * 'a) list =
+  KMap.fold (fun k x l -> (k, x) :: l) p []
 
 
 (* --- Partitioning actions --- *)
@@ -631,20 +628,20 @@ struct
       in
       map_keys transfer p
 
-  let transfer (f : (key * state) -> (key*state) list) (p : t) : t =
+  let transfer (f : (key * state) -> (key * state) list) (p : t) : t =
     let n = ref 0 in
-    let transfer acc (k,x) =
-      let add l (k,y) =
+    let transfer acc key_state =
+      let add l (k, y) =
         match k.ration_stamp with
         (* No ration stamp, just add the state to the list *)
-        | None -> (k,y) :: l
+        | None -> (k, y) :: l
         (* There is a ration stamp, set the second part of the stamp to a unique transfer number *)
         | Some (s,_) ->
           let k' = { k with ration_stamp = Some (s, !n) } in
           incr n;
-          (k',y) :: l
+          (k', y) :: l
       in
-      List.fold_left add acc (f (k,x))
+      List.fold_left add acc (f key_state)
     in
     List.fold_left transfer [] p
 

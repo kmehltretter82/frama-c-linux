@@ -293,8 +293,9 @@ module Make (Abstract: Abstractions.Eva) = struct
       (* Do not track garbled mixes created when interpreting the specification,
          as the result of the cvalue builtin will overwrite them. *)
       Locations.Location_Bytes.do_track_garbled_mix false;
-      let states = Spec.compute_using_specification
-          ~warn:false kinstr call spec state in
+      let states =
+        Spec.compute_using_specification ~warn:false kinstr call spec state
+      in
       Locations.Location_Bytes.do_track_garbled_mix true;
       let final_state = join_states states in
       let cvalue_state = Abstract.Dom.get_cvalue_or_top state in

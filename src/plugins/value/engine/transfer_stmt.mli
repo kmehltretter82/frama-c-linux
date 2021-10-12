@@ -27,7 +27,6 @@ val current_kf_inout: unit -> Inout_type.t option
 
 module type S = sig
 
-  type pkey = Partition.key
   type state
   type value
   type loc
@@ -38,7 +37,7 @@ module type S = sig
 
   val call:
     stmt -> lval option -> exp -> exp list -> state ->
-    (pkey*state) list * Eval.cacheable
+    (Partition.key * state) list * Eval.cacheable
 
   val check_unspecified_sequence:
     Cil_types.stmt ->
@@ -50,7 +49,7 @@ module type S = sig
   val enter_scope: kernel_function -> varinfo list -> state -> state
 
   type call_result = {
-    states: (pkey * state) list;
+    states: (Partition.key * state) list;
     cacheable: Eval.cacheable;
     builtin: bool;
   }
