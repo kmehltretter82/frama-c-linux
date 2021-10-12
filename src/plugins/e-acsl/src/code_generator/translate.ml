@@ -744,27 +744,9 @@ and context_insensitive_term_to_exp ~adata kf env t =
     when li.l_body = LBnone && (li.l_var_info.lv_name = "\\sum" ||
                                 li.l_var_info.lv_name = "\\product")->
     extended_quantifier_to_exp ~adata ~loc kf env t t1 t2 lambda li.l_var_info
-  | Tapp(li, lst, [ t1; t2; {term_node = Tlambda([ k ], predicate)}])
+  | Tapp(li, _, _)
     when li.l_body = LBnone && li.l_var_info.lv_name = "\\numof" ->
-    let logic_info = Cil_const.make_logic_info "\\sum" in
-    logic_info.l_type <- li.l_type;
-    logic_info.l_tparams <- li.l_tparams;
-    logic_info.l_labels <- li.l_labels;
-    logic_info.l_profile <- li.l_profile;
-    logic_info.l_body <- li.l_body;
-    let numof_as_sum =
-      let conditional_term =
-        Logic_const.term
-          (Tif(predicate, Cil.lone (), Cil.lzero ())) Linteger
-      in
-      let lambda_term =
-        Logic_const.term (Tlambda([ k ], conditional_term)) Linteger
-      in
-      (Logic_const.term
-         (Tapp(logic_info, lst, [ t1; t2; lambda_term ])) Linteger)
-    in
-    Typing.type_term ~use_gmp_opt:true numof_as_sum;
-    context_insensitive_term_to_exp ~adata kf env numof_as_sum
+    assert false
   | Tapp(_, [], _) ->
     let e, adata, env = Logic_functions.tapp_to_exp ~adata kf env t in
     let adata, env = Assert.register_term ~loc kf env t e adata in
@@ -871,6 +853,7 @@ and term_to_exp ~adata kf env t =
                                    environment '%a'"
     Printer.pp_term t generate_rte Typing.Function_params_ty.pretty
     (Env.Local_vars.get env);
+  let t = Predicate_normalizer.get_term t in
   Extlib.flatten
     (Env.with_rte_and_result env false
        ~f:(fun env ->
@@ -1242,7 +1225,7 @@ and predicate_content_to_exp ~adata ?name kf env p =
   | Pfresh _ -> Env.not_yet env "\\fresh"
 
 and predicate_to_exp ~adata ?name kf ?rte env p =
-  match Predicate_normalizer.get p with
+  match Predicate_normalizer.get_pred p with
   | PoT_term t -> term_to_exp ~adata kf env t
   | PoT_pred p ->
     let rte = match rte with None -> Env.generate_rte env | Some b -> b in
