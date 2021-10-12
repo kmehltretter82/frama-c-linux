@@ -4,6 +4,7 @@
    STDOPT: #"-cpp-extra-args=-DBITFIELD"
    STDOPT: #"-cpp-extra-args=-DARRAY_DECL"
    STDOPT: #"-cpp-extra-args=-DCASE_RANGE"
+   STDOPT: #"-cpp-extra-args=-DCASE_RANGE2"
    STDOPT: #"-cpp-extra-args=-DINIT_DESIGNATOR"
    STDOPT: #"-cpp-extra-args=-DINIT_DESIGNATOR2"
    STDOPT: #"-cpp-extra-args=-DRANGE_DESIGNATOR"
@@ -34,6 +35,14 @@ unsigned long nondetul;
 void case_range() {
   switch (nondetul)
   case 0 ... 9999999999999999999U:;
+  case 0 ... 199999999999999999U:;
+}
+#endif
+
+#ifdef CASE_RANGE2
+void case_range() {
+  switch (nondet)
+  case 0 ... 10000000U:;
 }
 #endif
 

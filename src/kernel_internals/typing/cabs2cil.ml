@@ -10104,7 +10104,11 @@ and doStatement local_env (s : Cabs.statement) : chunk =
     in
     if il > ih then Kernel.error ~once:true ~current:true "Empty case range";
     let rec mkAll (i: int) =
-      if i > ih then [] else integer ~loc i :: mkAll (i + 1)
+      if i > ih then [] else
+      if ih - i > 100_000 then
+        Kernel.fatal ~current:true "Case range too large"
+      else
+        integer ~loc i :: mkAll (i + 1)
     in
     (sel @@ (seh,ghost)) @@
     (caseRangeChunk ~ghost (mkAll il) loc' (doStatement local_env s),
