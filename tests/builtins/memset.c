@@ -29,7 +29,7 @@ struct s ts[5];
 
 volatile int vol;
 
-void main() {
+void test() {
   void * dst = memset(t1, 0x11, sizeof(t1)); // basic
   memset(t2+(int)t2, 0x12, sizeof(t2)); // garbled dest
   memset(t3+10, 0x11, (unsigned long)t1); // garbled size
@@ -70,4 +70,21 @@ void main() {
   unsigned k = vol;
   //@ assert Assume: k <= 12;
   memset(t12+k*8, 1, 4); // Imprecise, because of double congruences
+}
+
+/* Should not crash and emit uninitialization alarms.
+   See gitlab public issue pub/frama-c#2576. */
+void uninit() {
+  void *x;
+  if (vol)
+    memset (x, 0, 2 * 4);
+  int a;
+  if (vol)
+    x = &a;
+  memset(x, 0, 4);
+}
+
+void main() {
+  test();
+  uninit();
 }

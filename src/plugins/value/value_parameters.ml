@@ -489,16 +489,18 @@ let () =
           specification is used@ to interpret them.@]")
 
 let () = Parameter_customize.set_group alarms
-
+let () = Parameter_customize.argument_may_be_fundecl ();
 module WarnCopyIndeterminate =
   Kernel_function_set
     (struct
       let option_name = "-eva-warn-copy-indeterminate"
       let arg_name = "f | @all"
-      let help = "Warn when a statement of the specified functions copies a \
-                  value that may be indeterminate (uninitialized or containing \
-                  escaping address). Set by default; can be deactivated for \
-                  function 'f' by '=-f', or for all functions by '=-@all'."
+      let help =
+        "Warn when a statement copies a value that may be indeterminate \
+         (uninitialized, containing an escaping address, or infinite/NaN \
+         floating-point value). \
+         Set by default; can be deactivated for function 'f' by '=-f', \
+         or for all functions by '=-@all'."
     end)
 let () = add_correctness_dep WarnCopyIndeterminate.parameter
 let () = WarnCopyIndeterminate.Category.(set_default (all ()))

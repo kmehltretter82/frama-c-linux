@@ -527,7 +527,7 @@ let frama_c_memset_precise state dst v (exp_size, size) =
     let size = Ival.project_int isize in
     let size_bits = Integer.mul size_char size in
     (* Extract the location, check that it is precise. *)
-    if not (Location_Bytes.cardinal_zero_or_one dst) then
+    if Location_Bytes.(is_bottom dst || not (cardinal_zero_or_one dst)) then
       raise (ImpreciseMemset NotSingletonLoc);
     if not (Int.gt size Int.zero) then
       raise (ImpreciseMemset NegativeOrNullSize);

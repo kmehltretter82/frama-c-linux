@@ -75,8 +75,13 @@
 [eva] Recording results for f
 [eva] Done for function f
 [eva] tests/value/initialized_copy.i:130: Frama_C_show_each_unreached:
-[eva:alarm] tests/value/initialized_copy.i:135: Warning: 
-  accessing uninitialized left-value. assert \initialized(&a_6);
+[eva] computing for function g <- main.
+  Called from tests/value/initialized_copy.i:135.
+[kernel:annot:missing-spec] tests/value/initialized_copy.i:135: Warning: 
+  Neither code nor specification for function g, generating default assigns from the prototype
+[eva] using specification for function g
+[eva] Done for function g
+[eva] tests/value/initialized_copy.i:136: Frama_C_show_each_unreached:
 [eva] computing for function f <- main.
   Called from tests/value/initialized_copy.i:143.
 [eva] Recording results for f
@@ -89,26 +94,19 @@
   a_7 ∈ {1} or UNINITIALIZED
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva:alarm] tests/value/initialized_copy.i:151: Warning: 
-  accessing uninitialized left-value. assert \initialized(&a_8);
 [eva] computing for function g <- main.
   Called from tests/value/initialized_copy.i:151.
-[kernel:annot:missing-spec] tests/value/initialized_copy.i:151: Warning: 
-  Neither code nor specification for function g, generating default assigns from the prototype
-[eva] using specification for function g
 [eva] Done for function g
 [eva] tests/value/initialized_copy.i:152: 
   Frama_C_dump_each:
   # cvalue:
   w[0..9] ∈ {0; 12} or UNINITIALIZED
   v ∈ [--..--]
-  a_8 ∈ {1}
+  a_8 ∈ {1} or UNINITIALIZED
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva] Recording results for main
 [eva] done for function main
-[eva] tests/value/initialized_copy.i:135: 
-  assertion 'Eva,initialization' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   
