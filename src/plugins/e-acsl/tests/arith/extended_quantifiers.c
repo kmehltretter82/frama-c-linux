@@ -1,5 +1,5 @@
 /* run.config
-   COMMENT: sum operations
+   COMMENT: extended quantifiers (sum, product, numof)
 */
 
 #include <limits.h>

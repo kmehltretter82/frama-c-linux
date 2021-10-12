@@ -62,7 +62,7 @@ int main(void)
       else {
         {
           __e_acsl_mpz_t __gen_e_acsl_;
-          __gmpz_init_set_ui(__gen_e_acsl_,18446744073709551615UL);
+          __gmpz_init_set_str(__gen_e_acsl_,"18446744073709551615",10);
           __gmpz_set(__gen_e_acsl_lambda_2,
                      (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
           __gmpz_clear(__gen_e_acsl_);
@@ -376,13 +376,7 @@ int main(void)
       __gen_e_acsl_cond_10 = __gen_e_acsl_k_10 > 100;
       if (__gen_e_acsl_cond_10) break;
       else {
-        {
-          __e_acsl_mpz_t __gen_e_acsl_k_11;
-          __gmpz_init_set_si(__gen_e_acsl_k_11,(long)__gen_e_acsl_k_10);
-          __gmpz_set(__gen_e_acsl_lambda_10,
-                     (__e_acsl_mpz_struct const *)(__gen_e_acsl_k_11));
-          __gmpz_clear(__gen_e_acsl_k_11);
-        }
+        __gmpz_set_si(__gen_e_acsl_lambda_10,(long)__gen_e_acsl_k_10);
         __gmpz_mul(__gen_e_acsl_accumulator_10,
                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_accumulator_10),
                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_lambda_10));
@@ -405,7 +399,7 @@ int main(void)
   }
   /*@ assert \product(1, 100, \lambda ℤ k; k) ≥ 3628800; */ ;
   {
-    int __gen_e_acsl_k_12;
+    int __gen_e_acsl_k_11;
     int __gen_e_acsl_one_11;
     int __gen_e_acsl_cond_11;
     unsigned long __gen_e_acsl_lambda_11;
@@ -414,18 +408,18 @@ int main(void)
     __gen_e_acsl_cond_11 = 0;
     __gen_e_acsl_lambda_11 = 0;
     __gen_e_acsl_accumulator_11 = 1;
-    __gen_e_acsl_k_12 = 1;
+    __gen_e_acsl_k_11 = 1;
     while (1) {
-      __gen_e_acsl_cond_11 = __gen_e_acsl_k_12 > 10;
+      __gen_e_acsl_cond_11 = __gen_e_acsl_k_11 > 10;
       if (__gen_e_acsl_cond_11) break;
       else {
-        __gen_e_acsl_lambda_11 = (unsigned long)__gen_e_acsl_k_12;
+        __gen_e_acsl_lambda_11 = (unsigned long)__gen_e_acsl_k_11;
         __gen_e_acsl_accumulator_11 *= __gen_e_acsl_lambda_11;
         /*@ assert
             Eva: signed_overflow:
-              __gen_e_acsl_k_12 + __gen_e_acsl_one_11 ≤ 2147483647;
+              __gen_e_acsl_k_11 + __gen_e_acsl_one_11 ≤ 2147483647;
         */
-        __gen_e_acsl_k_12 += __gen_e_acsl_one_11;
+        __gen_e_acsl_k_11 += __gen_e_acsl_one_11;
       }
     }
     __e_acsl_assert(__gen_e_acsl_accumulator_11 == 3628800UL,1,"Assertion",
@@ -435,7 +429,7 @@ int main(void)
   }
   /*@ assert \product(1, 10, \lambda ℤ k; k) ≡ 3628800; */ ;
   {
-    int __gen_e_acsl_k_13;
+    int __gen_e_acsl_k_12;
     int __gen_e_acsl_one_12;
     int __gen_e_acsl_cond_12;
     __e_acsl_mpz_t __gen_e_acsl_lambda_12;
@@ -446,26 +440,20 @@ int main(void)
     __gen_e_acsl_cond_12 = 0;
     __gmpz_init_set_si(__gen_e_acsl_lambda_12,0L);
     __gmpz_init_set_si(__gen_e_acsl_accumulator_12,1L);
-    __gen_e_acsl_k_13 = -10;
+    __gen_e_acsl_k_12 = -10;
     while (1) {
-      __gen_e_acsl_cond_12 = __gen_e_acsl_k_13 > 10;
+      __gen_e_acsl_cond_12 = __gen_e_acsl_k_12 > 10;
       if (__gen_e_acsl_cond_12) break;
       else {
-        {
-          __e_acsl_mpz_t __gen_e_acsl_k_14;
-          __gmpz_init_set_si(__gen_e_acsl_k_14,(long)__gen_e_acsl_k_13);
-          __gmpz_set(__gen_e_acsl_lambda_12,
-                     (__e_acsl_mpz_struct const *)(__gen_e_acsl_k_14));
-          __gmpz_clear(__gen_e_acsl_k_14);
-        }
+        __gmpz_set_si(__gen_e_acsl_lambda_12,(long)__gen_e_acsl_k_12);
         __gmpz_mul(__gen_e_acsl_accumulator_12,
                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_accumulator_12),
                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_lambda_12));
         /*@ assert
             Eva: signed_overflow:
-              __gen_e_acsl_k_13 + __gen_e_acsl_one_12 ≤ 2147483647;
+              __gen_e_acsl_k_12 + __gen_e_acsl_one_12 ≤ 2147483647;
         */
-        __gen_e_acsl_k_13 += __gen_e_acsl_one_12;
+        __gen_e_acsl_k_12 += __gen_e_acsl_one_12;
       }
     }
     __gmpz_init_set_si(__gen_e_acsl__8,0L);
@@ -480,12 +468,12 @@ int main(void)
   }
   /*@ assert \product(-10, 10, \lambda ℤ k; k) ≡ 0; */ ;
   {
-    int __gen_e_acsl_k_15;
+    int __gen_e_acsl_k_13;
     int __gen_e_acsl_one_13;
     int __gen_e_acsl_cond_13;
     __e_acsl_mpz_t __gen_e_acsl_lambda_13;
     __e_acsl_mpz_t __gen_e_acsl_accumulator_13;
-    int __gen_e_acsl_k_16;
+    int __gen_e_acsl_k_14;
     int __gen_e_acsl_one_14;
     int __gen_e_acsl_cond_14;
     __e_acsl_mpz_t __gen_e_acsl_lambda_14;
@@ -495,17 +483,17 @@ int main(void)
     __gen_e_acsl_cond_13 = 0;
     __gmpz_init_set_si(__gen_e_acsl_lambda_13,0L);
     __gmpz_init_set_si(__gen_e_acsl_accumulator_13,1L);
-    __gen_e_acsl_k_15 = -20;
+    __gen_e_acsl_k_13 = -20;
     while (1) {
-      __gen_e_acsl_cond_13 = __gen_e_acsl_k_15 > -1;
+      __gen_e_acsl_cond_13 = __gen_e_acsl_k_13 > -1;
       if (__gen_e_acsl_cond_13) break;
       else {
         {
           __e_acsl_mpz_t __gen_e_acsl__9;
           /*@ assert
-              Eva: signed_overflow: 2 * __gen_e_acsl_k_15 ≤ 2147483647;
+              Eva: signed_overflow: 2 * __gen_e_acsl_k_13 ≤ 2147483647;
           */
-          __gmpz_init_set_si(__gen_e_acsl__9,(long)(2 * __gen_e_acsl_k_15));
+          __gmpz_init_set_si(__gen_e_acsl__9,(long)(2 * __gen_e_acsl_k_13));
           __gmpz_set(__gen_e_acsl_lambda_13,
                      (__e_acsl_mpz_struct const *)(__gen_e_acsl__9));
           __gmpz_clear(__gen_e_acsl__9);
@@ -515,26 +503,26 @@ int main(void)
                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_lambda_13));
         /*@ assert
             Eva: signed_overflow:
-              __gen_e_acsl_k_15 + __gen_e_acsl_one_13 ≤ 2147483647;
+              __gen_e_acsl_k_13 + __gen_e_acsl_one_13 ≤ 2147483647;
         */
-        __gen_e_acsl_k_15 += __gen_e_acsl_one_13;
+        __gen_e_acsl_k_13 += __gen_e_acsl_one_13;
       }
     }
     __gen_e_acsl_one_14 = 1;
     __gen_e_acsl_cond_14 = 0;
     __gmpz_init_set_si(__gen_e_acsl_lambda_14,0L);
     __gmpz_init_set_si(__gen_e_acsl_accumulator_14,1L);
-    __gen_e_acsl_k_16 = 1;
+    __gen_e_acsl_k_14 = 1;
     while (1) {
-      __gen_e_acsl_cond_14 = __gen_e_acsl_k_16 > 20;
+      __gen_e_acsl_cond_14 = __gen_e_acsl_k_14 > 20;
       if (__gen_e_acsl_cond_14) break;
       else {
         {
           __e_acsl_mpz_t __gen_e_acsl__10;
           /*@ assert
-              Eva: signed_overflow: 2 * __gen_e_acsl_k_16 ≤ 2147483647;
+              Eva: signed_overflow: 2 * __gen_e_acsl_k_14 ≤ 2147483647;
           */
-          __gmpz_init_set_si(__gen_e_acsl__10,(long)(2 * __gen_e_acsl_k_16));
+          __gmpz_init_set_si(__gen_e_acsl__10,(long)(2 * __gen_e_acsl_k_14));
           __gmpz_set(__gen_e_acsl_lambda_14,
                      (__e_acsl_mpz_struct const *)(__gen_e_acsl__10));
           __gmpz_clear(__gen_e_acsl__10);
@@ -544,9 +532,9 @@ int main(void)
                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_lambda_14));
         /*@ assert
             Eva: signed_overflow:
-              __gen_e_acsl_k_16 + __gen_e_acsl_one_14 ≤ 2147483647;
+              __gen_e_acsl_k_14 + __gen_e_acsl_one_14 ≤ 2147483647;
         */
-        __gen_e_acsl_k_16 += __gen_e_acsl_one_14;
+        __gen_e_acsl_k_14 += __gen_e_acsl_one_14;
       }
     }
     __gen_e_acsl_eq_3 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_accumulator_13),
