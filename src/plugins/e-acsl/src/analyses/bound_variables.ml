@@ -731,7 +731,7 @@ end
 
     method !vpredicate  p =
       let loc = p.pred_loc in
-      match Predicate_normalizer.get_pred p with
+      match Logic_normalizer.get_pred p with
       | PoT_pred p -> Error.generic_handle (process_quantif ~loc) () p;
         Cil.DoChildren
       | PoT_term _ -> Cil.DoChildren

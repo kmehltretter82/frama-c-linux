@@ -852,7 +852,7 @@ let reset_all ast =
   Literal_strings.reset ();
   Global_observer.reset ();
   Bound_variables.clear_guards ();
-  Predicate_normalizer.clear ();
+  Logic_normalizer.clear ();
   Typing.clear ();
   (* reset some kernel states: *)
   (* reset the CFG that has been heavily modified by the code generation step *)
@@ -869,7 +869,7 @@ let inject () =
   Options.feedback ~level:2
     "preprocessing annotations in project %a"
     Project.pretty current_project;
-  Predicate_normalizer.preprocess ast;
+  Logic_normalizer.preprocess ast;
   Options.feedback ~level:2
     "normalizing quantifiers in project %a"
     Project.pretty current_project;

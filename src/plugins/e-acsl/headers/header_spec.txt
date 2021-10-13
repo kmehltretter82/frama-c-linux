@@ -76,11 +76,11 @@ src/analyses/interval.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/interval.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/literal_strings.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/literal_strings.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/analyses/predicate_normalizer.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/analyses/predicate_normalizer.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/lscope.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/lscope.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/memory_tracking.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-src/analyses/predicate_normalizer.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-src/analyses/predicate_normalizer.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/memory_tracking.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/rte.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/rte.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL

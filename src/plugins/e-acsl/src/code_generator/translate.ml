@@ -853,7 +853,7 @@ and term_to_exp ~adata kf env t =
                                    environment '%a'"
     Printer.pp_term t generate_rte Typing.Function_params_ty.pretty
     (Env.Local_vars.get env);
-  let t = Predicate_normalizer.get_term t in
+  let t = Logic_normalizer.get_term t in
   Extlib.flatten
     (Env.with_rte_and_result env false
        ~f:(fun env ->
@@ -1225,7 +1225,7 @@ and predicate_content_to_exp ~adata ?name kf env p =
   | Pfresh _ -> Env.not_yet env "\\fresh"
 
 and predicate_to_exp ~adata ?name kf ?rte env p =
-  match Predicate_normalizer.get_pred p with
+  match Logic_normalizer.get_pred p with
   | PoT_term t -> term_to_exp ~adata kf env t
   | PoT_pred p ->
     let rte = match rte with None -> Env.generate_rte env | Some b -> b in

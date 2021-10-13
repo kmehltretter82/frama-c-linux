@@ -677,7 +677,7 @@ let rec type_term
     | Ttype _
     | Tempty_set  -> dup Nan
   in
-  let t = Predicate_normalizer.get_term t in
+  let t = Logic_normalizer.get_term t in
   Memo.memo ~lenv
     (fun t ->
        let ty, op = infer t in
@@ -806,7 +806,7 @@ and type_bound_variables ~loc ~lenv (t1, lv, t2) =
   (t1, lv, t2)
 
 and type_predicate ?(lenv=[]) p =
-  match Predicate_normalizer.get_pred p with
+  match Logic_normalizer.get_pred p with
   | PoT_term t -> type_term ~use_gmp_opt:true ~lenv t
   | PoT_pred p ->
     Cil.CurrentLoc.set p.pred_loc;
@@ -1016,12 +1016,12 @@ let type_code_annot lenv annot =
   ignore (Visitor.visitFramacCodeAnnotation (typer_visitor lenv) annot)
 
 let preprocess_predicate lenv p =
-  Predicate_normalizer.preprocess_predicate p;
+  Logic_normalizer.preprocess_predicate p;
   Bound_variables.preprocess_predicate p;
   ignore (Visitor.visitFramacPredicate (typer_visitor lenv) p)
 
 let preprocess_rte ~lenv rte =
-  Predicate_normalizer.preprocess_annot rte;
+  Logic_normalizer.preprocess_annot rte;
   Bound_variables.preprocess_annot rte;
   type_code_annot lenv rte
 
