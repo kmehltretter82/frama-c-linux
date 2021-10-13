@@ -59,7 +59,7 @@ SRC_PROJECT_INITIALIZER:=\
 SRC_ANALYSES:= \
 	rte \
 	lscope \
-	predicate_normalizer \
+	logic_normalizer \
 	bound_variables \
 	interval \
 	typing \

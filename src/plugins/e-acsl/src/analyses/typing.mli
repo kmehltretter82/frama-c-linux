@@ -108,11 +108,7 @@ val type_term:
     even if -e-acsl-gmp-only is set. *)
 
 val type_named_predicate: ?lenv:Function_params_ty.t -> predicate -> unit
-(** Compute the type of each term of the given predicate.
-
-    If {!must_clear} is true, the typing environment is reset before translating
-    the predicate. The environment should be reset when translating a new
-    assertion, and kept otherwise. *)
+(** Compute the type of each term of the given predicate. *)
 
 val clear: unit -> unit
 (** Remove all the previously computed types. *)
@@ -156,7 +152,7 @@ val unsafe_set: term -> ?ctx:number_ty -> number_ty -> unit
 (** {2 Typing/types-related utils} *)
 (*****************************************************************************)
 
-val ty_of_interv: ?ctx:number_ty -> Interval.t -> number_ty
+val ty_of_interv: ?ctx:number_ty -> ?use_gmp_opt:bool -> Interval.t -> number_ty
 (* Compute the smallest type (bigger than [int]) which can contain the whole
    interval. It is the \theta operator of the JFLA's paper. *)
 
