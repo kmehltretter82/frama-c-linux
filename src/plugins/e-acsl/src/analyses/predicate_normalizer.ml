@@ -134,7 +134,6 @@ let preprocess_term ~loc t =
             (Tapp(logic_info, lst, [ t1; t2; lambda_term ])) Linteger)
   | _ -> None
 
-
 let preprocessor = object
   inherit Visitor.frama_c_inplace
 

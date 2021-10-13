@@ -416,6 +416,8 @@ let rec type_term
     | TSizeOfStr _
     | TAlignOf _ ->
       let i = Interval.infer t in
+      (* a constant or an left value directly under a lambda should be a gmp
+      if the infered context for the lambda is gmp *)
       let ty = ty_of_interv ?ctx ~use_gmp_opt:under_lambda i in
       dup ty
 
