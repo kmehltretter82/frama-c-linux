@@ -1,9 +1,9 @@
 /* run.config
  PLUGIN: @EVA_PLUGINS@ sparecode
  MODULE: @PTEST_NAME@
-   EXECNOW: BIN intra_journal.ml @frama-c@ -eva-show-progress -journal-enable -journal-name tests/journal/result/intra_journal.ml @PTEST_DIR@/@PTEST_NAME@.i > @DEV_NULL@ 2> @DEV_NULL@
-   CMD: @frama-c@
-   OPT: -load-script tests/journal/result/intra_journal -journal-disable
+   EXECNOW: BIN intra_journal.ml @frama-c@ -eva-show-progress -journal-enable -journal-name @PTEST_RESULT@/intra_journal.ml @PTEST_FILE@ > @DEV_NULL@ 2> @DEV_NULL@
+ SCRIPT: result/intra_journal
+   OPT:
 */
 
 /* Waiting for results such as:
