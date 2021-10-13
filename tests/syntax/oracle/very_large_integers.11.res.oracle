@@ -10,6 +10,6 @@
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
 [kernel:annot-error] tests/syntax/very_large_integers.c:92: Warning: 
-  invalid loop unrolling parameter (-9999999999999999999); ignoring
+  invalid loop unrolling parameter; ignoring
 [kernel] User Error: warning annot-error treated as fatal error.
 [kernel] Frama-C aborted: invalid user input.
