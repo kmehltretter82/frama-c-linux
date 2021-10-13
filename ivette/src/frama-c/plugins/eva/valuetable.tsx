@@ -107,7 +107,7 @@ function TableCell(props: TableCellProps) {
   const maxWidth = CELLPADDING + WSIZER.dimension(probe.maxCols);
   const style = { width: minWidth, maxWidth };
   let contents: React.ReactNode = props.probe.marker;
-  const { transient } = probe;
+  const { transient, marker } = probe;
   const focused = model.getFocused();
   const isFocused = focused === probe;
 
@@ -118,12 +118,12 @@ function TableCell(props: TableCellProps) {
       if (transient) {
         contents = <span className="dome-text-label">« Probe »</span>;
       } else {
-        const { stmt, rank, code, label } = probe;
+        const { stmt, rank, code, label, fct } = probe;
         const textClass = label ? 'dome-text-label' : 'dome-text-cell';
         contents = (
           <>
             <span className={textClass}>{label ?? code}</span>
-            <Stmt stmt={stmt} rank={rank} />
+            <Stmt stmt={stmt} rank={rank} fct={fct} marker={marker} />
           </>
         );
       }

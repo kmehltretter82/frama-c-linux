@@ -30,6 +30,9 @@ import { classes } from 'dome/misc/utils';
 import { Hpack, Vpack } from 'dome/layout/boxes';
 import { Code, Cell } from 'dome/controls/labels';
 import * as States from 'frama-c/states';
+import * as Ast from 'frama-c/api/kernel/ast';
+import { readFile } from 'dome/system';
+import * as Dome from 'dome';
 
 // Locals
 import { EvaAlarm } from './cells';
@@ -43,15 +46,25 @@ import { useModel } from './model';
 interface StmtProps {
   stmt?: string;
   rank?: number;
+  fct: string;
+  marker: Ast.marker;
 }
 
 export function Stmt(props: StmtProps) {
-  const { rank, stmt } = props;
+  const { rank, stmt, fct, marker } = props;
+  const markersInfo = States.useSyncArray(Ast.markerInfo);
+  const line = markersInfo.getData(marker)?.sloc?.line;
+  const file = markersInfo.getData(marker)?.sloc?.file;
+  const read = () => file ? readFile(file) : Promise.reject();
+  const text = React.useMemo(read, [file]);
+  const { result } = Dome.usePromise(text);
+  const allLines = result?.split(/\r\n|\n/);
+  const title = allLines ? (line ? `Stmt: ${allLines[line - 1]}` : '') : '' ;
   if (rank === undefined || !stmt) return null;
-  const title = `Stmt at global rank ${rank} (internal id: ${stmt})`;
+  // const title = `Stmt at global rank ${rank} (internal id: ${stmt})`;
   return (
     <span className="dome-text-cell eva-stmt" title={title}>
-      @S{rank}
+      @{fct}:{line}
     </span>
   );
 }
@@ -125,7 +138,7 @@ export function StackInfos() {
         onDoubleClick={onDoubleClick}
       >
         {caller}
-        <Stmt stmt={stmt} rank={rank} />
+        <Stmt stmt={stmt} rank={rank} fct={caller} marker={stmt} />
       </Cell>
     );
   };
