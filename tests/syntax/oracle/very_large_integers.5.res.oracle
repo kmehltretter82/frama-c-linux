@@ -1,12 +1,12 @@
 [kernel] Parsing tests/syntax/very_large_integers.c (with preprocessing)
-[kernel] tests/syntax/very_large_integers.c:55: User Error: 
+[kernel] tests/syntax/very_large_integers.c:54: User Error: 
   INDEX initialization designator overflows
-  53    
-  54    #ifdef INIT_DESIGNATOR2
-  55    int arr3[1] = { [9999999999999999999U] = 42 };
+  52    
+  53    #ifdef INIT_DESIGNATOR2
+  54    int arr3[1] = { [9999999999999999999U] = 42 };
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  56    #endif
-  57
+  55    #endif
+  56
 [kernel] User Error: stopping on file "tests/syntax/very_large_integers.c" that has errors. Add
   '-kernel-msg-key pp' for preprocessing command.
 [kernel] Frama-C aborted: invalid user input.

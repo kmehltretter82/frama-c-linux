@@ -1,5 +1,5 @@
 [kernel] Parsing tests/syntax/very_large_integers.c (with preprocessing)
-[kernel] tests/syntax/very_large_integers.c:51: Failure: 
+[kernel] tests/syntax/very_large_integers.c:50: Failure: 
   Array length 9999999999999999999U is not a compile-time constant: no explicit initializer allowed.
 [kernel] User Error: stopping on file "tests/syntax/very_large_integers.c" that has errors. Add
   '-kernel-msg-key pp' for preprocessing command.
