@@ -40,6 +40,12 @@ import { Callsite } from './stacks';
 import { useModel } from './model';
 
 // --------------------------------------------------------------------------
+// --- Pretty Printing (Browser Console)
+// --------------------------------------------------------------------------
+
+const D = new Dome.Debug('Source Code');
+
+// --------------------------------------------------------------------------
 // --- Stmt Printer
 // --------------------------------------------------------------------------
 
@@ -55,11 +61,13 @@ export function Stmt(props: StmtProps) {
   const markersInfo = States.useSyncArray(Ast.markerInfo);
   const line = markersInfo.getData(marker)?.sloc?.line;
   const file = markersInfo.getData(marker)?.sloc?.file;
-  const read = () => file ? readFile(file) : Promise.reject();
-  const text = React.useMemo(read, [file]);
+  const errorMsg = () => { D.error(`Fail to load source code file ${file}`); };
+  const onError = () => { if (file) errorMsg(); return ''; };
+  const read = () => (file ? readFile(file).catch(onError) : Promise.reject());
+  const text = React.useMemo(read, [file, onError]);
   const { result } = Dome.usePromise(text);
   const allLines = result?.split(/\r\n|\n/);
-  const title = allLines ? (line ? `Stmt: ${allLines[line - 1]}` : '') : '' ;
+  const title = allLines ? (line ? `Stmt: ${allLines[line - 1]}` : '') : '';
   if (rank === undefined || !stmt) return null;
   // const title = `Stmt at global rank ${rank} (internal id: ${stmt})`;
   return (
