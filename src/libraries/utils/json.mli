@@ -162,7 +162,7 @@ exception CannotMerge of string
    the same keys, or if the root JSON element is not an object.
    @since 23.0-Vanadium
 *)
-val merge_object : Filepath.Normalized.t -> Yojson.Basic.t -> unit
+val merge_object : Filepath.Normalized.t -> t -> unit
 
 (**
    [merge_list path json_array] merges the array [json_array] into the
@@ -173,7 +173,7 @@ val merge_object : Filepath.Normalized.t -> Yojson.Basic.t -> unit
    @raise CannotMerge if the root JSON element is not an array.
    @since 23.0-Vanadium
 *)
-val merge_array : Filepath.Normalized.t -> Yojson.Basic.t -> unit
+val merge_array : Filepath.Normalized.t -> t -> unit
 
 (**
    [from_file path] opens [path] and stores its JSON object in
@@ -181,7 +181,7 @@ val merge_array : Filepath.Normalized.t -> Yojson.Basic.t -> unit
    @raise Yojson.Json_error if [path] is a malformed JSON file.
    @since 23.0-Vanadium
 *)
-val from_file: Filepath.Normalized.t -> Yojson.Basic.t
+val from_file: Filepath.Normalized.t -> t
 
 (**
    Flushes the JSON objects in the cache. Returns the names of the written
