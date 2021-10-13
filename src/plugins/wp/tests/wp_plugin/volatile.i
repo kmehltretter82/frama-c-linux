@@ -2,10 +2,11 @@
    OPT:
    OPT: -wp-no-volatile
 */
-
 /* run.config_qualif
-   DONTRUN:
+   OPT:
+   OPT: -wp-no-volatile
 */
+
 
 volatile int v ;
 
@@ -33,4 +34,14 @@ void job_struct_assigns(struct st_v *p)
 {
   *p = sv;
   /*@ assert KO_WHEN_VOLATILE: *p == sv ;  */ ;
+}
+
+int const volatile GlobalConst[16];
+
+/*@ requires 0 ≤ ClientId < 16; */
+void default_init(char const ClientId)
+{
+  int R1;
+  R1 = GlobalConst[ClientId];
+	//@ check KO_WHEN_VOLATILE: R1 == 0 ;
 }
