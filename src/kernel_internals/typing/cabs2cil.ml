@@ -8548,11 +8548,11 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
         if first < 0 || first > last then
           Kernel.error ~once:true ~current:true
             "start index larger than end index in range initializer";
+        (* Arbitrary limit to avoid building an impractical AST. *)
+        if last - first > 100_000 then
+          Kernel.fatal ~current:true "INDEX_RANGE too large";
         let rec loop (i: int) =
           if i > last then restil
-          else
-          if last - i > 100_000 then
-            Kernel.fatal ~current:true "INDEX_RANGE too large"
           else
             (top (Cabs.ATINDEX_INIT(
                  { expr_node = Cabs.CONSTANT(Cabs.CONST_INT(string_of_int i));
@@ -10106,12 +10106,10 @@ and doStatement local_env (s : Cabs.statement) : chunk =
           "Cannot understand the constants in case range"
     in
     if il > ih then Kernel.error ~once:true ~current:true "Empty case range";
+    (* Arbitrary limit to avoid building an impractical AST. *)
+    if ih - il > 100_000 then Kernel.fatal ~current:true "Case range too large";
     let rec mkAll (i: int) =
-      if i > ih then [] else
-      if ih - i > 100_000 then
-        Kernel.fatal ~current:true "Case range too large"
-      else
-        integer ~loc i :: mkAll (i + 1)
+      if i > ih then [] else integer ~loc i :: mkAll (i + 1)
     in
     (sel @@ (seh,ghost)) @@
     (caseRangeChunk ~ghost (mkAll il) loc' (doStatement local_env s),
