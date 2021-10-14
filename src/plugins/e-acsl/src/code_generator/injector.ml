@@ -50,10 +50,14 @@ let replace_literal_strings_in_args env kf_opt (* None for globals *) args =
    RTL. *)
 let rename_caller ~loc caller args =
   if Options.Replace_libc_functions.get ()
-  && Functions.RTL.has_rtl_replacement caller.vorig_name then begin
+  && Functions.Libc.has_replacement caller.vorig_name then begin
     (* rewrite names of functions for which we have alternative definitions in
        the RTL. *)
-    let fvi = Rtl.Symbols.libc_replacement caller in
+    let fvi =
+      Rtl.Symbols.replacement
+        ~get_name:Functions.Libc.replacement_name
+        caller
+    in
     fvi, args
   end
   else if Options.Validate_format_strings.get ()
@@ -62,7 +66,11 @@ let rename_caller ~loc caller args =
        from the above because argument list of format functions is extended with
        an argument describing actual variadic arguments *)
     (* replacement name, e.g., [printf] -> [__e_acsl_builtin_printf] *)
-    let fvi = Rtl.Symbols.libc_replacement caller in
+    let fvi =
+      Rtl.Symbols.replacement
+        ~get_name:Functions.Libc.replacement_name
+        caller
+    in
     let fmt =
       Functions.Libc.get_printf_argument_str ~loc caller.vorig_name args
     in

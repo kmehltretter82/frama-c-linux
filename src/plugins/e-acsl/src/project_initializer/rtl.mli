@@ -39,9 +39,10 @@ module Symbols: sig
   val find_vi: string -> varinfo
   (** @raise Unregistered if the given name is not part of the RTL. *)
 
-  val libc_replacement: varinfo -> varinfo
-  (** Given the varinfo of a C library function with an RTL replacement, return
-      the varinfo of the RTL function that replaces it. *)
+  val replacement: get_name:(string -> string) -> varinfo -> varinfo
+  (** Given the varinfo of a C function with an RTL replacement, return
+      the varinfo of the RTL function that replaces it. The function
+      [get_name] is used to find the name of the RTL replacement. *)
 end
 
 (*

@@ -36,7 +36,7 @@ let is_fc_or_compiler_builtin vi =
    Datatype.String.equal prefix "__builtin_")
   ||
   (Options.Replace_libc_functions.get ()
-   && Functions.RTL.has_rtl_replacement vi.vname)
+   && Functions.Libc.has_replacement vi.vname)
 
 let is_fc_stdlib_generated vi =
   Cil.hasAttribute "fc_stdlib_generated" vi.vattr
