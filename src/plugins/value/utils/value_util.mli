@@ -51,6 +51,11 @@ val warning_once_current : ('a, Format.formatter, unit) format -> 'a
     status associated to {!Value_parameters.wkey_alarm} *)
 val alarm_report: 'a Log.pretty_printer
 
+(** [protect f ~cleanup] runs [f]. On a user interruption or a Frama-C error,
+    if option -save is set, applies [cleanup]. This is used to clean up and
+    save partial results when the analysis is aborted. *)
+val protect: (unit -> 'a) -> cleanup:(unit -> unit) -> 'a
+
 (* Statements for which the analysis has degenerated. [true] means that this is
    the statement on which the degeneration occurred, or a statement above in
    the callstack *)

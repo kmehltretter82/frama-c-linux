@@ -25,6 +25,7 @@ Command: ../../bin/frama-c -kernel-warn-key annot:missing-spec=abort -kernel-war
 [kernel:annot:missing-spec] make-wrapper.c:13: Warning: 
   Neither code nor specification for function large_name_to_force_line_break_in_stack_msg, generating default assigns from the prototype
 [kernel] User Error: warning annot:missing-spec treated as fatal error.
+[eva] Clean up and save partial results.
 [kernel] Frama-C aborted: invalid user input.
 [kernel] Warning: attempting to save on non-zero exit code: modifying filename into `PWD/make-for-make-wrapper.eva/framac.sav.error'.
 

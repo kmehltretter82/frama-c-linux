@@ -123,7 +123,8 @@ let watch_hook (stmt, _callstack, states) =
            then ()
            else
              let current = Integer.pred current in
-             if Integer.is_zero current then raise Db.Value.Aborted;
+             if Integer.is_zero current then
+               Value_parameters.abort "Watchpoint builtin: countdown to zero";
              w.remaining_count <- current;
              w.stmts <- Cil_datatype.Stmt.Set.add stmt set;
          end)
