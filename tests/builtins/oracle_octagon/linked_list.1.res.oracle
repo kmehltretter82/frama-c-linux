@@ -1,16 +1,16 @@
-530a531,532
+542a543,544
 > [kernel] tests/builtins/linked_list.c:43: 
 >   more than 100(127) elements to enumerate. Approximating.
-532a535,536
+544a547,548
 > [kernel] tests/builtins/linked_list.c:44: 
 >   more than 100(127) elements to enumerate. Approximating.
-702a707,708
+718a723,724
 > [kernel] tests/builtins/linked_list.c:43: 
 >   more than 100(128) elements to enumerate. Approximating.
-704a711,712
+720a727,728
 > [kernel] tests/builtins/linked_list.c:44: 
 >   more than 100(128) elements to enumerate. Approximating.
-800,803d807
+818,821d825
 < [kernel] tests/builtins/linked_list.c:43: 
 <   more than 100(128) elements to enumerate. Approximating.
 < [kernel] tests/builtins/linked_list.c:44: 

@@ -25,17 +25,16 @@ function has_target() {
     return $__has_target
 }
 
-
 if has_target ${ARGS[@]}; then
-    TARGETS="${ARGS[@]}"
+    TARGETS_AND_ARGS="${ARGS[@]}"
 else
-    TARGETS="${TARGETS[@]} ${ARGS[@]}"
+    TARGETS_AND_ARGS="${TARGETS[@]} ${ARGS[@]}"
 fi
 
 echo "CONFIGS: ${CONFIGS[@]}"
-echo "Testing: ${TARGETS[@]}"
 for config in ${CONFIGS[@]}
 do
-    echo $config
-    ./bin/ptests.opt -error-code -config $config ${TARGETS[@]}
+    set -x
+    ./bin/ptests.opt -config $config ${TARGETS_AND_ARGS[@]}
+    { set +x; } 2>&-
 done
