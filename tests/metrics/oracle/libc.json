@@ -11,6 +11,7 @@
   "specified-only-functions": [
     { "_exit": { "calls": 0, "address_taken": false } },
     { "access": { "calls": 0, "address_taken": false } },
+    { "asprintf": { "calls": 0, "address_taken": false } },
     { "chdir": { "calls": 0, "address_taken": false } },
     { "chown": { "calls": 0, "address_taken": false } },
     { "chroot": { "calls": 0, "address_taken": false } },
@@ -135,8 +136,9 @@
   ],
   "undefined-functions": [],
   "extern-global-vars": [
-    "Frama_C_entropy_source", "__fc_errno", "__fc_hostname", "__fc_stdin",
-    "__fc_stdout", "__fc_ttyname", "optarg", "opterr", "optind", "optopt"
+    "Frama_C_entropy_source", "__fc_errno", "__fc_heap_status",
+    "__fc_hostname", "__fc_stdin", "__fc_stdout", "__fc_ttyname", "optarg",
+    "opterr", "optind", "optopt"
   ],
   "entry-points": [ "f", "main" ]
 }

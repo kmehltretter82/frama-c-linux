@@ -20,6 +20,7 @@
 /*                                                                        */
 /**************************************************************************/
 
+#include "__fc_builtin.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include "stdint.h" // for SIZE_MAX
@@ -91,5 +92,24 @@ ssize_t getline(char **lineptr, size_t *n, FILE *stream) {
   //TODO: set error indicator for stream
   return -1;
 }
+
+// Non-POSIX; arbitrarily allocates between 1 and 256 bytes.
+// This stub is unsound in the general case, but enough for
+// many test cases.
+int asprintf(char **strp, const char *fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+  size_t len = Frama_C_interval(1, 256);
+  *strp = malloc(len);
+  if (!*strp) {
+    va_end(args);
+    return -1;
+  }
+  // Emulate writing to the string
+  Frama_C_make_unknown(*strp, len - 1U);
+  (*strp)[len - 1U] = 0;
+  return len;
+}
+
 
 __POP_FC_STDLIB

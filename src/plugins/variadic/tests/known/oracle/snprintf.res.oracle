@@ -14,6 +14,8 @@
   Declaration of variadic function sscanf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:548: 
   Declaration of variadic function dprintf.
+[variadic] FRAMAC_SHARE/libc/stdio.h:590: 
+  Declaration of variadic function asprintf.
 [variadic] tests/known/snprintf.c:12: 
   Translating call to snprintf to a call to the specialized version snprintf_va_1.
 [variadic] tests/known/snprintf.c:15: 
