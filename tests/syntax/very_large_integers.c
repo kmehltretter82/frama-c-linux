@@ -4,20 +4,21 @@
    STDOPT: #"-cpp-extra-args=-DBITFIELD"
    STDOPT: #"-cpp-extra-args=-DARRAY_DECL"
    STDOPT: #"-cpp-extra-args=-DCASE_RANGE"
+   STDOPT: #"-cpp-extra-args=-DCASE_RANGE2"
    STDOPT: #"-cpp-extra-args=-DINIT_DESIGNATOR"
    STDOPT: #"-cpp-extra-args=-DINIT_DESIGNATOR2"
    STDOPT: #"-cpp-extra-args=-DRANGE_DESIGNATOR"
+   STDOPT: #"-cpp-extra-args=-DRANGE_DESIGNATOR2"
    STDOPT: #"-cpp-extra-args=-DATTRIBUTE_CONSTANT"
    STDOPT: #"-cpp-extra-args=-DLOGIC_CONSTANT"
    STDOPT: #"-cpp-extra-args=-DLOGIC_CONSTANT_OCTAL"
-   STDOPT: #"-cpp-extra-args=-DEVA_UNROLL -eva"
+   STDOPT: #"-cpp-extra-args=-DEVA_UNROLL -eva -kernel-warn-key annot-error=error"
    STDOPT: #"-cpp-extra-args=-DCABS_DOWHILE"
    EXIT: 0
    STDOPT: #"-cpp-extra-args=-DUNROLL_PRAGMA"
 */
 
 volatile int nondet;
-
 #ifdef BITFIELD
 struct st {
   int bf:(999999999999999999+9999999999999999999);
@@ -34,6 +35,14 @@ unsigned long nondetul;
 void case_range() {
   switch (nondetul)
   case 0 ... 9999999999999999999U:;
+  case 0 ... 199999999999999999U:;
+}
+#endif
+
+#ifdef CASE_RANGE2
+void case_range2() {
+  switch (nondet)
+  case 0 ... 10000000U:;
 }
 #endif
 
@@ -48,6 +57,11 @@ int arr3[1] = { [9999999999999999999U] = 42 };
 #ifdef RANGE_DESIGNATOR
 int arr4[1] = { [-9999999999999999999U ... 9999999999999999999U] = 42 };
 #endif
+
+#ifdef RANGE_DESIGNATOR2
+int widths[] = { [99999999999999999 ... 999999999999999999] = 2 };
+#endif
+
 
 #ifdef ATTRIBUTE_CONSTANT
 struct acst {
