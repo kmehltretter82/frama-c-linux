@@ -32,8 +32,7 @@ let package =
     ()
 
 module ComputationState = struct
-  open Analysis
-  type t = computation_state
+  type t = Analysis.computation_state
   let jtype =
     Data.declare ~package
       ~name:"computationStateType"
@@ -334,7 +333,7 @@ struct
   let jtype =
     Data.declare ~package
       ~name:"statusesEntry"
-      ~descr:(Markdown.plain "Statuses count.œ")
+      ~descr:(Markdown.plain "Statuses count.")
       Package.(Jrecord [
           "valid",Jnumber ;
           "unknown",Jnumber ;

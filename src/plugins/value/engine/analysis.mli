@@ -80,7 +80,7 @@ val current_computation_state : unit -> computation_state
 val register_computation_hook: ?on:computation_state ->
   (computation_state -> unit) -> unit
 (** Registers a hook that will be called each time the analysis starts or
-    finishes. If [on] is given, the hook will only be called when the
+    finishes. If [on] is given, the hook will only be called when the
     analysis switches to this specific state. *)
 
 val force_compute : unit -> unit
