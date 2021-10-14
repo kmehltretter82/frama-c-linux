@@ -13,8 +13,10 @@ module Results: sig
   type callstack = (Cil_types.kernel_function * Cil_types.kinstr) list
   
   type request
-  type evaluation
-  type lvaluation
+  
+  type value
+  type address
+  type 'a evaluation
   
   type error = Bottom | Top | DisabledDomain
   type 'a result = ('a,error) Result.t
@@ -49,31 +51,31 @@ module Results: sig
   val as_cvalue_model : request -> Cvalue.Model.t result
   
   (* Evaluation *)
-  val eval_var : Cil_types.varinfo -> request -> evaluation
-  val eval_lval : Cil_types.lval -> request -> evaluation
-  val eval_exp : Cil_types.exp -> request -> evaluation
+  val eval_var : Cil_types.varinfo -> request -> value evaluation
+  val eval_lval : Cil_types.lval -> request -> value evaluation
+  val eval_exp : Cil_types.exp -> request -> value evaluation
   
-  val eval_address : Cil_types.lval -> request -> lvaluation
+  val eval_address : Cil_types.lval -> request -> address evaluation
   
   val eval_callee : Cil_types.exp -> request -> Cil_types.kernel_function list result (* Ignores non-function values; exp must come from Cil Call constructor and are restricted to lvalues with no offset *)
   
   (* Value conversion *)
-  val as_int : evaluation -> int result
-  val as_integer : evaluation -> Integer.t result
-  val as_float : evaluation -> float result
-  val as_ival : evaluation -> Ival.t result
-  val as_fval : evaluation -> Fval.t result
-  val as_cvalue : evaluation -> Cvalue.V.t result
+  val as_int : value evaluation -> int result
+  val as_integer : value evaluation -> Integer.t result
+  val as_float : value evaluation -> float result
+  val as_ival : value evaluation -> Ival.t result
+  val as_fval : value evaluation -> Fval.t result
+  val as_cvalue : value evaluation -> Cvalue.V.t result
   
-  val as_location : lvaluation -> Locations.location result
-  val as_zone : lvaluation -> Locations.Zone.t result
+  val as_location : address evaluation -> Locations.location result
+  val as_zone : address evaluation -> Locations.Zone.t result
   
   (* Evaluation properties *)
-  val is_initialized : evaluation -> bool
-  val alarms : evaluation -> Alarms.t list
+  val is_initialized : value evaluation -> bool
+  val alarms : 'a evaluation -> Alarms.t list
   
   (* Reachability *)
-  val is_bottom : evaluation -> bool
+  val is_bottom : 'a evaluation -> bool
   val is_called : Cil_types.kernel_function -> bool (* called during the analysis, not by the actual program *)
   val is_reachable : Cil_types.stmt -> bool (* reachable by the analysis, not by the actual program *)
   

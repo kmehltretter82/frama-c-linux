@@ -224,21 +224,25 @@ end
 
 (* Extracting states and values *)
 
+type value
+type address
+
 module Make () =
 struct
   module A = (val Analysis.current_analyzer ())
 
-  type value = A.Val.t
-  type location = A.Loc.location
-  type valuation = A.Eval.Valuation.t
+  module EvalTypes =
+  struct
+    type valuation = A.Eval.Valuation.t
+    type exp = (valuation * A.Val.t) Eval.evaluated
+    type lval = (valuation * A.Val.t Eval.flagged_value) Eval.evaluated
+    type loc = (valuation * A.Loc.location * Cil_types.typ) Eval.evaluated
+  end
 
-  type 'callstack lvaluation =
-    ((valuation * location * Cil_types.typ) Eval.evaluated, 'callstack) Response.t
-
-  type 'callstack evaluation =
-    [ `LValue of ((valuation * value Eval.flagged_value) Eval.evaluated, 'callstack) Response.t
-    | `Value of ((valuation * value) Eval.evaluated, 'callstack) Response.t
-    ]
+  type ('a,'c) evaluation =
+    | LValue: (EvalTypes.lval, 'c) Response.t -> (value,'c) evaluation
+    | Value: (EvalTypes.exp, 'c) Response.t -> (value,'c) evaluation
+    | Address: (EvalTypes.loc, 'c) Response.t -> (address,'c) evaluation
 
   let rec get_by_callstack (req : request) :
     (_, restricted_to_callstack) Response.t =
@@ -341,15 +345,15 @@ struct
 
   let eval_lval lval req=
     let eval state = A.Eval.copy_lvalue state lval in
-    `LValue (Response.map eval (get req))
+    LValue (Response.map eval (get req))
 
   let eval_exp exp req =
     let eval state = A.Eval.evaluate state exp in
-    `Value (Response.map eval (get req))
+    Value (Response.map eval (get req))
 
   let eval_address lval req =
     let eval state = A.Eval.lvaluate ~for_writing:false state lval in
-    Response.map eval (get req)
+    Address (Response.map eval (get req))
 
   let eval_callee exp req =
     let join = (@)
@@ -361,17 +365,17 @@ struct
 
   (* Conversion *)
 
-  let extract_value : type c. c evaluation -> (value or_bottom, c) Response.t =
+  let extract_value :
+    type c. (value, c) evaluation -> (A.Val.t or_bottom, c) Response.t =
     function
-    | `LValue r ->
+    | LValue r ->
       let extract (x, _alarms) = x >>- (fun (_valuation,fv) -> fv.Eval.v) in
       Response.map extract r
-    | `Value r ->
+    | Value r ->
       let extract (x, _alarms) = x >>-: (fun (_valuation,v) -> v) in
       Response.map extract r
 
-  let as_cvalue : type c. c evaluation -> Locations.Location_Bytes.t result =
-    fun res ->
+  let as_cvalue res =
     match A.Val.get Main_values.CVal.key with
     | None ->
       Result.error DisabledDomain
@@ -382,13 +386,15 @@ struct
       in
       extract_value res |> Response.map_join' extract join |> convert
 
-  let extract_loc : type c. c lvaluation -> (location or_bottom, c) Response.t =
-    fun r ->
-    let extract (x, _alarms) = x >>-: (fun (_valuation,loc,_typ) -> loc) in
-    Response.map extract r
+  let extract_loc :
+    type c. (address, c) evaluation ->
+    (A.Loc.location or_bottom, c) Response.t =
+    function
+    | Address r ->
+      let extract (x, _alarms) = x >>-: (fun (_valuation,loc,_typ) -> loc) in
+      Response.map extract r
 
-  let as_location : type c. c lvaluation -> Locations.location result =
-    fun res ->
+  let as_location res =
     match A.Loc.get Main_locations.PLoc.key with
     | None ->
       Result.error DisabledDomain
@@ -404,8 +410,7 @@ struct
       in
       extract_loc res |> Response.map_join' extract join |> convert
 
-  let as_zone : type c. c lvaluation -> Locations.Zone.t result =
-    fun res ->
+  let as_zone res =
     match A.Loc.get Main_locations.PLoc.key with
     | None ->
       Result.error DisabledDomain
@@ -416,9 +421,9 @@ struct
       in
       extract_loc res |> Response.map_join' extract join |> convert
 
-  let is_initialized : type c. c evaluation -> bool =
+  let is_initialized : type c. (value,c) evaluation -> bool =
     function
-    | `LValue r ->
+    | LValue r ->
       let join = (&&)
       and extract (x, _alarms) =
         x >>>-: (fun (_valuation,fv) -> fv.Eval.initialized)
@@ -427,15 +432,17 @@ struct
         | `Bottom | `Top -> false
         | `Value v -> v
       end
-    | `Value _ -> true (* computed values are always initialized *)
+    | Value _ -> true (* computed values are always initialized *)
 
-  let alarms : type c. c evaluation -> Alarms.t list =
+  let alarms : type a c. (a,c) evaluation -> Alarms.t list =
     fun res ->
     let extract (_,v) = `Value v in
     let r = match res with
-      | `LValue r ->
+      | LValue r ->
         Response.map_join' extract Alarmset.union r
-      | `Value r ->
+      | Value r ->
+        Response.map_join' extract Alarmset.union r
+      | Address r ->
         Response.map_join' extract Alarmset.union r
     in
     match r with
@@ -450,14 +457,16 @@ struct
       Alarmset.iter add alarmset;
       !l
 
-  let is_bottom : type c. c evaluation -> bool =
+  let is_bottom : type a c. (a,c) evaluation -> bool =
     fun res ->
     let extract (x,_) = x >>>-: fun _ -> () in
     let join () () = () in
     let r = match res with
-      | `LValue r ->
+      | LValue r ->
         Response.map_join' extract join r
-      | `Value r ->
+      | Value r ->
+        Response.map_join' extract join r
+      | Address r ->
         Response.map_join' extract join r
     in
     match r with
@@ -494,47 +503,37 @@ let as_cvalue_model req =
 
 (* Evaluation *)
 
-module type Evaluator =
-sig
-  type 'a lvaluation
-  type 'a evaluation
-  type restriction
-  val as_cvalue : 'callstack evaluation -> Main_values.CVal.t result
-  val as_location : 'callstack lvaluation -> Locations.location result
-  val as_zone : 'callstack lvaluation -> Locations.Zone.t result
-  val is_initialized : 'callstack evaluation -> bool
-  val alarms : 'callstack evaluation -> Alarms.t list
-  val is_bottom : 'callstack evaluation -> bool
-end
-
 module type Lvaluation =
 sig
-  include Evaluator
-  val v : restriction lvaluation
+  include module type of (Make ())
+  type restriction
+  val v : (address,restriction) evaluation
 end
 
 module type Evaluation =
 sig
-  include Evaluator
-  val v : restriction evaluation
+  include module type of (Make ())
+  type restriction
+  val v : (value,restriction) evaluation
 end
 
-type lvaluation = (module Lvaluation)
-type evaluation = (module Evaluation)
+type 'a evaluation =
+  | Value: (module Evaluation) -> value evaluation
+  | Address: (module Lvaluation) -> address evaluation
 
 let build_eval_lval_and_exp () =
   let module M = Make () in
   let open Response in
   let build = function
-    | `LValue (Consolidated _)
-    | `Value (Consolidated _) as eval ->
+    | M.LValue (Consolidated _)
+    | M.Value (Consolidated _) as eval ->
       (module struct
         include M
         type restriction = unrestricted_response
         let v = eval
       end : Evaluation)
-    | `LValue (ByCallstack _ | Top | Bottom)
-    | `Value (ByCallstack _ | Top | Bottom) as eval ->
+    | M.LValue (ByCallstack _ | Top | Bottom)
+    | M.Value (ByCallstack _ | Top | Bottom) as eval ->
       (module struct
         include M
         type restriction = restricted_to_callstack
@@ -545,25 +544,24 @@ let build_eval_lval_and_exp () =
   let eval_exp exp req = build @@ M.eval_exp exp req in
   eval_lval, eval_exp
 
-let eval_lval lval req = (fst @@ build_eval_lval_and_exp ()) lval req
+let eval_lval lval req = Value ((fst @@ build_eval_lval_and_exp ()) lval req)
 
-let eval_var vi req =
-  eval_lval (Cil.var vi) req
+let eval_var vi req = eval_lval (Cil.var vi) req
 
-let eval_exp exp req = (snd @@ build_eval_lval_and_exp ()) exp req
+let eval_exp exp req = Value ((snd @@ build_eval_lval_and_exp ()) exp req)
 
 let eval_address lval req =
   let module M = Make () in
   let open Response in
   match M.eval_address lval req with
-  | Consolidated _ as lval ->
-    (module struct
+  | M.Address (Consolidated _) as lval ->
+    Address (module struct
       include M
       type restriction = unrestricted_response
       let v = lval
     end : Lvaluation)
-  | (ByCallstack _ | Top | Bottom) as lval ->
-    (module struct
+  | M.Address (ByCallstack _ | Top | Bottom) as lval ->
+    Address (module struct
       include M
       type restriction = restricted_to_callstack
       let v = lval
@@ -575,7 +573,7 @@ let eval_callee exp req =
 
 (* Value conversion *)
 
-let as_cvalue evaluation =
+let as_cvalue (Value evaluation) =
   let module E = (val evaluation : Evaluation) in
   E.as_cvalue E.v
 
@@ -609,33 +607,43 @@ let as_integer evaluation =
 
 let as_int evaluation =
   try
-    Result.map Integer.to_int (as_integer evaluation)
+    Result.map Integer.to_int_exn (as_integer evaluation)
   with Z.Overflow ->
     Result.error Top
 
-let as_location lvaluation =
+let as_location (Address lvaluation) =
   let module E = (val lvaluation : Lvaluation) in
   E.as_location E.v
 
-let as_zone lvaluation =
+let as_zone (Address lvaluation) =
   let module E = (val lvaluation : Lvaluation) in
   E.as_zone E.v
 
 (* Evaluation properties *)
 
-let is_initialized evaluation =
+let is_initialized (Value evaluation) =
   let module E = (val evaluation : Evaluation) in
   E.is_initialized E.v
 
-let alarms evaluation =
-  let module E = (val evaluation : Evaluation) in
-  E.alarms E.v
+let alarms : type a. a evaluation -> Alarms.t list =
+  function
+  | Value evaluation ->
+    let module E = (val evaluation : Evaluation) in
+    E.alarms E.v
+  | Address lvaluation ->
+    let module L = (val lvaluation : Lvaluation) in
+    L.alarms L.v
 
 (* Reachability *)
 
-let is_bottom evaluation =
-  let module E = (val evaluation : Evaluation) in
-  E.is_bottom E.v
+let is_bottom : type a. a evaluation -> bool =
+  function
+  | Value evaluation ->
+    let module E = (val evaluation : Evaluation) in
+    E.is_bottom E.v
+  | Address lvaluation ->
+    let module L = (val lvaluation : Lvaluation) in
+    L.is_bottom L.v
 
 let is_called kf =
   let module M = Make () in
