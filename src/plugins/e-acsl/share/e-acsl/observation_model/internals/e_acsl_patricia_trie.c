@@ -334,9 +334,16 @@ static pt_node_t *pt_get_leaf_node_from_leaf(const pt_struct_t *pt,
   return curr;
 }
 
-void pt_remove(pt_struct_t *pt, pt_leaf_t leaf) {
-  pt_node_t *leaf_node_to_delete = pt_get_leaf_node_from_leaf(pt, leaf);
-  DASSERT(leaf_node_to_delete->leaf == leaf);
+/** Remove the given leaf node from the patricia trie.
+ *
+ * Internal function for `pt_remove()` and `pt_remove_if()`. The function will
+ * delete the given leaf node and copy its sibling if it exists to the parent
+ * node.
+ */
+static void pt_remove_leaf_node(pt_struct_t *pt,
+                                pt_node_t *leaf_node_to_delete) {
+  DASSERT(leaf_node_to_delete != NULL);
+  DASSERT(leaf_node_to_delete->is_leaf);
 
   if (leaf_node_to_delete->parent == NULL) {
     // the leaf is the root
@@ -367,7 +374,47 @@ void pt_remove(pt_struct_t *pt, pt_leaf_t leaf) {
     }
     /* necessary ? -- end */
   }
+  pt->clean_leaf_fct(leaf_node_to_delete->leaf);
   private_free(leaf_node_to_delete);
+}
+
+void pt_remove(pt_struct_t *pt, pt_leaf_t leaf) {
+  DASSERT(pt != NULL);
+  pt_node_t *leaf_node_to_delete = pt_get_leaf_node_from_leaf(pt, leaf);
+  DASSERT(leaf_node_to_delete->leaf == leaf);
+
+  pt_remove_leaf_node(pt, leaf_node_to_delete);
+}
+
+/** Starting at `node`, remove all leaves that satisfy the given predicate from
+ * the patricia trie. Return 1 if `node` is a leaf that is removed, 0
+ * otherwise.
+ * Internal function for `pt_remove_if()`. */
+int pt_remove_node_if(pt_struct_t *pt, pt_node_t *node,
+                      pt_predicate_t predicate) {
+  DASSERT(pt != NULL);
+  if (node != NULL) {
+    if (node->is_leaf) {
+      if (predicate(node->leaf)) {
+        pt_remove_leaf_node(pt, node);
+        return 1;
+      }
+    } else {
+      // If `node->left` is a leaf that is removed, then `node->right` is
+      // copied to node and we have `node->left == \old(node->right->left)`
+      // (see `pt_remove_leaf_node()̀).
+      // We need to call `pt_remove_node_if()` on `node->left` until it is not
+      // a removed leaf.
+      while (pt_remove_node_if(pt, node->left, predicate)) {}
+      pt_remove_node_if(pt, node->right, predicate);
+    }
+  }
+  return 0;
+}
+
+void pt_remove_if(pt_struct_t *pt, pt_predicate_t predicate) {
+  DASSERT(pt != NULL);
+  pt_remove_node_if(pt, pt->root, predicate);
 }
 
 pt_leaf_t pt_lookup(const pt_struct_t *pt, void *ptr) {
@@ -449,6 +496,29 @@ pt_leaf_t pt_find(const pt_struct_t *pt, void *ptr) {
         other_choice = NULL;
       }
     }
+  }
+}
+
+static pt_leaf_t pt_find_if_rec(pt_node_t *node, pt_predicate_t predicate) {
+  DASSERT(node != NULL);
+  if (node->is_leaf) {
+    return predicate(node->leaf) ? node->leaf : NULL;
+  } else {
+    pt_node_t *result = pt_find_if_rec(node->left, predicate);
+    if (result == NULL) {
+      result = pt_find_if_rec(node->right, predicate);
+    }
+    return result;
+  }
+}
+
+pt_leaf_t pt_find_if(const pt_struct_t *pt, pt_predicate_t predicate) {
+  DASSERT(pt != NULL);
+
+  if (pt->root == NULL) {
+    return NULL;
+  } else {
+    return pt_find_if_rec(pt->root, predicate);
   }
 }
 

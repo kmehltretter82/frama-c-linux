@@ -47,6 +47,9 @@ typedef int (*contains_ptr_fct_t)(pt_leaf_t, void *);
 typedef void (*clean_leaf_fct_t)(pt_leaf_t);
 /*! \brief Function pointer to a function that prints the content of a leaf. */
 typedef void (*print_leaf_fct_t)(pt_leaf_t);
+/*! \brief Function pointer to a predicate function that returns true (!= 0) or
+    false (== 0) for a given leaf. */
+typedef int (*pt_predicate_t)(pt_leaf_t leaf);
 
 /*! \brief Opaque structure of a patricia trie. */
 typedef struct pt_struct pt_struct_t;
@@ -92,6 +95,16 @@ void pt_insert(pt_struct_t *pt, pt_leaf_t leaf);
   @ assigns *pt \from *pt, leaf, indirect:__fc_heap_status; */
 void pt_remove(pt_struct_t *pt, pt_leaf_t leaf);
 
+/*! \brief Remove all leaves that satisfy the given predicate from the patricia
+    trie.
+    \param pt Patricia trie to update.
+    \param predicate Predicate to test the leaves of the trie. */
+/*@ requires \valid(pt);
+  @ requires \valid_function(pt_predicate_t predicate);
+  @ assigns __fc_heap_status \from __fc_heap_status;
+  @ assigns *pt \from *pt, indirect:predicate, indirect:__fc_heap_status; */
+void pt_remove_if(pt_struct_t *pt, pt_predicate_t predicate);
+
 /*! \brief Look for the leaf representing exactly the given pointer.
 
     Given the function `get_fct_ptr` provided at the trie creation and a leaf
@@ -118,6 +131,15 @@ pt_leaf_t pt_lookup(const pt_struct_t *pt, void *ptr);
 /*@ requires \valid_read(pt);
   @ assigns \result \from *pt, indirect:ptr; */
 pt_leaf_t pt_find(const pt_struct_t *pt, void *ptr);
+
+/*! \brief Look for the first leaf that satisfies the given predicate.
+    \param pt Patricia trie where to look for.
+    \param predicate Predicate to test the leaves of the trie.
+    \return The first leaf satisfying the given predicate. */
+/*@ requires \valid_read(pt);
+  @ requires \valid_function(pt_predicate_t predicate);
+  @ assigns \result \from *pt, indirect:predicate; */
+pt_leaf_t pt_find_if(const pt_struct_t *pt, pt_predicate_t predicate);
 
 /*! \brief Clean the content of the given patricia trie.
 
