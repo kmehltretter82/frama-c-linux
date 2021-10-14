@@ -185,7 +185,7 @@ PLUGIN_TESTS_DIRS := \
 	builtin \
 	libc
 
-PLUGIN_TESTS_LIB := $(EACSL_PLUGIN_DIR)/tests/print.ml
+PLUGIN_TESTS_LIB := $(EACSL_PLUGIN_DIR)/tests/E_ACSL_test.ml
 
 DEV?=
 ifeq ("$(DEV)","yes")
@@ -203,11 +203,11 @@ TEST_DEPENDENCIES:= \
 	$(EACSL_PLUGIN_DIR)/tests/ptests_config \
 	$(EACSL_PLUGIN_DIR)/tests/test_config \
 	$(EACSL_PLUGIN_DIR)/tests/test_config_dev \
-	$(EACSL_PLUGIN_DIR)/tests/print.cmo
+	$(EACSL_PLUGIN_DIR)/tests/E_ACSL_test.cmo
 
 ifeq ($(OCAMLBEST),opt)
 TEST_DEPENDENCIES += \
-	$(EACSL_PLUGIN_DIR)/tests/print.cmxs
+	$(EACSL_PLUGIN_DIR)/tests/E_ACSL_test.cmxs
 endif
 
 # Add the test dependencies to the test targets, but also to
@@ -341,7 +341,7 @@ EACSL_TEST_FILES = \
 	tests/temporal/test_config_dev \
 	tests/format/test_config \
 	tests/format/test_config_dev \
-	tests/print.ml \
+	tests/E_ACSL_test.ml \
 
 EACSL_TESTS_C_FILES = \
   $(foreach dir, $(addprefix tests/,$(PLUGIN_TESTS_DIRS)), \
@@ -451,7 +451,7 @@ EACSL_CEA_LGPL_BARE= src/*.ml src/*/*.ml src/*.mli src/*/*.mli \
 	E_ACSL.mli \
 	Makefile.in configure.ac tab-in-changelog.sh \
 	scripts/*.sh \
-	tests/print.ml \
+	tests/E_ACSL_test.ml \
 	man/e-acsl-gcc.sh.1
 EACSL_CEA_LGPL=$(addprefix $(EACSL_PLUGIN_DIR)/, $(EACSL_CEA_LGPL_BARE)) \
                $(EACSL_CEA_SHARE)
