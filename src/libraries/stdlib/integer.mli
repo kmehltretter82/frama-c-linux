@@ -23,6 +23,8 @@
 (** Extension of [Big_int] compatible with [Zarith].
     @since Nitrogen-20111001 *)
 
+type 'a formatter = Format.formatter -> 'a -> unit
+
 type t = Z.t
 
 val equal : t -> t -> bool
@@ -212,9 +214,9 @@ val to_string : t -> string
 val of_string : string -> t
 (** @raise Invalid_argument when the string cannot be parsed. *)
 
-val pretty : ?hexa:bool -> t Pretty_utils.formatter
+val pretty : ?hexa:bool -> t formatter
 
-val pp_bin : ?nbits:int -> ?sep:string -> t Pretty_utils.formatter
+val pp_bin : ?nbits:int -> ?sep:string -> t formatter
 (** Print binary format. Digits are output by blocs of 4 bits
     separated by [~sep] with at least [~nbits] total bits. If [nbits] is
     non positive, it will be ignored.
@@ -222,7 +224,7 @@ val pp_bin : ?nbits:int -> ?sep:string -> t Pretty_utils.formatter
     Positive values are prefixed with ["0b"] and negative values
     are printed as their 2-complement ([lnot]) with prefix ["1b"]. *)
 
-val pp_hex : ?nbits:int -> ?sep:string -> t Pretty_utils.formatter
+val pp_hex : ?nbits:int -> ?sep:string -> t formatter
 (** Print hexadecimal format. Digits are output by blocs of 16 bits
     (4 hex digits) separated by [~sep] with at least [~nbits] total bits.
     If [nbits] is non positive, it will be ignored.

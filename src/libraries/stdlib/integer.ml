@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+type 'a formatter = Format.formatter -> 'a -> unit
+
 type t = Z.t
 
 let equal = Z.equal
