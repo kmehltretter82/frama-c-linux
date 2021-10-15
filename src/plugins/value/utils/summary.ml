@@ -290,15 +290,16 @@ let compute_stats () =
   and prog_alarms = AlarmsStats.create 131
   in
   let do_fun kf =
-    if consider_function (Kernel_function.get_vi kf) then
-      let reachable = Value_results.is_called kf in
+    let reachable = Value_results.is_called kf in
+    let consider = consider_function (Kernel_function.get_vi kf) in
+    if consider then
       Coverage.incr prog_fun_coverage ~reachable;
-      if reachable then begin
-        let fun_stats = FunctionStats.get kf in
-        (* Add function stats to program stats *)
+    if reachable then begin
+      let fun_stats = FunctionStats.get kf in
+      AlarmsStats.add_list prog_alarms fun_stats.fun_alarm_count;
+      if consider then
         Coverage.add prog_stmt_coverage fun_stats.fun_coverage;
-        AlarmsStats.add_list prog_alarms fun_stats.fun_alarm_count;
-      end
+    end
   in
   Globals.Functions.iter do_fun;
   let alarms_statuses, assertions_statuses, preconds_statuses =
