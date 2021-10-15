@@ -123,13 +123,6 @@ module Coverage = struct
   let add c1 c2 =
     c1.reachable <- c1.reachable + c2.reachable;
     c1.dead <- c1.dead + c2.dead
-
-  include Datatype.Make (struct
-      include Datatype.Serializable_undefined
-      type t = coverage
-      let name = "Eva.Summary.Coverage"
-      let reprs = [make ()]
-    end)
 end
 
 module Statuses = struct
@@ -143,13 +136,6 @@ module Statuses = struct
     | Property_status.True                -> c.valid <- c.valid + 1
     | Property_status.False_if_reachable
     | Property_status.False_and_reachable -> c.invalid <- c.invalid + 1
-
-  include Datatype.Make (struct
-      include Datatype.Serializable_undefined
-      type t = statuses
-      let name = "Eva.Summary.Statuses"
-      let reprs = [make ()]
-    end)
 end
 
 module Events = struct
@@ -157,29 +143,7 @@ module Events = struct
     { errors = 0;
       warnings = 0; }
   let total c = c.errors + c.warnings
-
-  include Datatype.Make (struct
-      include Datatype.Serializable_undefined
-      type t = events
-      let name = "Eva.Summary.Events"
-      let reprs = [make ()]
-    end)
 end
-
-module FunctionStats_Type = Datatype.Make (struct
-    module Prototype = struct
-      include Datatype.Serializable_undefined
-      type t = fun_stats
-      let name = "Eva.Value_results.FunctionStats_Type"
-      let reprs = [{
-          fun_coverage = Coverage.make ();
-          fun_alarm_count = [];
-          fun_alarm_statuses = Statuses.make ();
-        }]
-    end
-    include  (Prototype)
-  end)
-
 
 (* --- Function stats computation --- *)
 
@@ -207,7 +171,7 @@ let compute_fun_stats kf =
       | Property_status.True -> ()
       | _ -> AlarmsStats.incr alarms (AlarmCategory.of_alarm alarm)
   in
-  let do_annot stmt _emmiter annotation =
+  let do_annot stmt _emitter annotation =
     match Alarms.find annotation with
     | None -> ()
     | Some alarm ->
@@ -227,6 +191,18 @@ let compute_fun_stats kf =
   { fun_coverage = coverage;
     fun_alarm_count = AlarmsStats.to_list alarms;
     fun_alarm_statuses = statuses; }
+
+
+module FunctionStats_Type = Datatype.Make (struct
+    include Datatype.Serializable_undefined
+    type t = fun_stats
+    let name = "Eva.Value_results.FunctionStats_Type"
+    let reprs = [{
+        fun_coverage = Coverage.make ();
+        fun_alarm_count = [];
+        fun_alarm_statuses = Statuses.make ();
+      }]
+  end)
 
 module FunctionStats = struct
   include Kernel_function.Make_Table
