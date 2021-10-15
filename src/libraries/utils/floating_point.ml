@@ -452,7 +452,7 @@ let nextafter_aux ~is_f32 fincr fdecr x y =
   then y
   else if isnan x || isnan y then nan
   else if x = 0.0 (* or -0.0 *) then
-    if x < y then min_denormal_float is_f32 else -. (min_denormal_float is_f32)
+    if x < y then min_denormal_float ~is_f32 else -. (min_denormal_float ~is_f32)
     (* the following conditions might be simpler if we had unsigned ints
        (uint32/uint64) *)
   else if x = neg_infinity (* && y = neg_infinity *) then fdecr x
