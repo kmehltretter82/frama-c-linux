@@ -2166,20 +2166,18 @@ isutf8-clean:
 
 clean:: isutf8-clean
 
-FILES_WITHOUT_NEWLINE := \
-  VERSION \
-  VERSION_CODENAME
-
 BINARY_DISTRIB_FILES := \
   $(sort $(wildcard ivette/src/dome/doc/template/static/fonts/*)) \
-  $(sort $(wildcard share/*.ico share/*.png share/theme/*/*.png))
+  $(sort $(wildcard share/*.ico share/*.png share/theme/*/*.png)) \
+
+FILES_WITHOUT_NEWLINE := \
+  $(BINARY_DISTRIB_FILES) \
+  VERSION \
+  VERSION_CODENAME \
 
 BINARY_DISTRIB_TESTS := \
   tests/misc/oracle/interpreted_automata_dataflow_backward.dot \
   tests/misc/oracle/interpreted_automata_dataflow_forward.dot \
-  tests/verisec/suite/programs/apps/SpamAssassin/BID-6679/message_write/test \
-  tests/verisec/suite/programs/apps/sendmail/CVE-1999-0047/mime7to8/array_vs_pointer.ods \
-  tests/verisec/suite/programs/apps/sendmail/CVE-1999-0047/mime7to8/data_testing.ods \
 
 TESTS_WITHOUT_NEWLINE := \
   $(BINARY_DISTRIB_TESTS) \
@@ -2207,8 +2205,8 @@ check-headers: $(HDRCK) $(CHECK_NEWLINES) $(ISUTF8)
 	$(file >distrib_tests.tmp) $(foreach O,$(DISTRIB_TESTS),$(file >>distrib_tests.tmp,$(subst @, ,$(O))))
 	$(file >header_exceptions.tmp) $(foreach O,$(HEADER_EXCEPTIONS),$(file >>header_exceptions.tmp,$O))
 	echo "Checking that distributed files terminate with a newline..."
-	$(CHECK_NEWLINES) distrib_files.tmp $(FILES_WITHOUT_NEWLINE) $(BINARY_DISTRIB_FILES)
-	$(CHECK_NEWLINES) distrib_tests.tmp $(TESTS_WITHOUT_NEWLINE) $(BINARY_DISTRIB_TESTS)
+	$(CHECK_NEWLINES) distrib_files.tmp $(FILES_WITHOUT_NEWLINE)
+	$(CHECK_NEWLINES) distrib_tests.tmp $(TESTS_WITHOUT_NEWLINE)
 	echo "Checking that distributed files do not use iso-8859..."
 	$(ISUTF8) distrib_files.tmp $(BINARY_DISTRIB_FILES)
 	$(ISUTF8) distrib_tests.tmp $(BINARY_DISTRIB_TESTS)
