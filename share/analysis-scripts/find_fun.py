@@ -26,11 +26,11 @@
 # for a given function name, via heuristic syntactic matching.
 
 import argparse
-import sys
+import function_finder
 import os
 import re
-import glob
-import function_finder
+import sys
+from pathlib import Path
 
 MIN_PYTHON = (3, 5) # for glob(recursive)
 if sys.version_info < MIN_PYTHON:
@@ -65,9 +65,12 @@ if not dirs:
 else:
     dirs = set(sys.argv[2:])
 
-files = []
+files = set()
 for d in dirs:
-    files += glob.glob(d + "/**/*.[ich]", recursive=True)
+    # The usage of Path.glob here prevents symbolic links from being
+    # followed, which is desirable in some situations. However, if you
+    # need them, try using glob.glob instead.
+    files.update(Path(d).glob("**/*.[ich]"))
 
 print("Looking for '%s' inside %d file(s)..." % (fname, len(files)))
 
