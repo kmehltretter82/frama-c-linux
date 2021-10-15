@@ -93,6 +93,16 @@ Ivette.registerComponent({
 });
 
 Ivette.registerView({
+  id: 'summary',
+  rank: 1,
+  label: 'Eva Summary',
+  layout: [
+    ['frama-c.plugins.eva_summary', 'frama-c.plugins.eva_coverage'],
+    'frama-c.messages',
+  ],
+});
+
+Ivette.registerView({
   id: 'values',
   rank: 1,
   label: 'Eva Values',
