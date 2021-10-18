@@ -284,7 +284,7 @@ end
 
 (* Compute the smallest type (bigger than [int]) which can contain the whole
    interval. It is the \theta operator of the JFLA's paper. *)
-let ty_of_interv ?ctx = function
+let ty_of_interv ?ctx ?(use_gmp_opt = false) = function
   | Interval.Float(fk, _) -> C_float fk
   | Interval.Rational -> Rational
   | Interval.Real -> Real
@@ -294,8 +294,10 @@ let ty_of_interv ?ctx = function
       let kind = Interval.ikind_of_ival iv in
       (match ctx with
        | None
-       | Some (Gmpz | Nan) ->
+       | Some Nan ->
          C_integer kind
+       | Some Gmpz ->
+         if use_gmp_opt then Gmpz else C_integer kind
        | Some (C_integer ik as ctx) ->
          (* return [ctx] type for types smaller than int to prevent superfluous
             casts in the generated code *)
@@ -382,7 +384,13 @@ let type_letin li li_t =
 
 (* type the term [t] in a context [ctx] by taking --e-acsl-gmp-only into account
    iff [use_gmp_opt] is true. *)
-let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx ?(lenv=[]) t =
+let rec type_term
+    ~use_gmp_opt
+    ?(under_lambda=false)
+    ?(arith_operand=false)
+    ?ctx
+    ?(lenv=[])
+    t =
   let ctx = Option.map (mk_ctx ~use_gmp_opt) ctx in
   let dup ty = ty, ty in
   let compute_ctx ?ctx i =
@@ -408,13 +416,16 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx ?(lenv=[]) t =
     | TSizeOfStr _
     | TAlignOf _ ->
       let i = Interval.infer t in
-      let ty = ty_of_interv ?ctx i in
+      (* a constant or a left value directly under a lambda should be a gmp
+         if the infered context for the lambda is gmp *)
+      let ty = ty_of_interv ?ctx ~use_gmp_opt:under_lambda i in
       dup ty
 
     | TLval tlv ->
       let i = Interval.infer t in
-      let ty = ty_of_interv ?ctx i in
+      let ty =  ty_of_interv ?ctx ~use_gmp_opt:under_lambda i in
       type_term_lval ~lenv tlv;
+      (* Options.feedback "Type : %a" D.pretty ty; *)
       dup ty
 
     | Toffset(_, t')
@@ -619,7 +630,8 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx ?(lenv=[]) t =
              ignore
                (type_term
                   ~use_gmp_opt:true ~arith_operand:true ~ctx:ty_bound ~lenv t2);
-             let ty = ty_of_interv (Interval.infer t) in
+             let ty = ty_of_interv (Interval.infer t) ~use_gmp_opt:true ?ctx in
+             (* Options.feedback "type of extended quantifier: %a" D.pretty ty; *)
              ignore (type_term ~use_gmp_opt:true ?ctx ~lenv lambda);
              dup ty
            | [ ] | [ _ ] | [ _; _ ] | _ :: _ :: _ :: _ ->
@@ -654,7 +666,7 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx ?(lenv=[]) t =
       ignore (type_term ~use_gmp_opt:true ~lenv li_t);
       dup (type_term ~use_gmp_opt:true ?ctx ~lenv t).ty
     | Tlambda ([ _ ],lt) ->
-      dup (type_term ~use_gmp_opt:true ?ctx lt).ty;
+      dup (type_term ~use_gmp_opt:true ~under_lambda:true ?ctx lt).ty;
     | Tlambda (_,_) -> Error.not_yet "lambda"
     | TDataCons (_,_) -> Error.not_yet "datacons"
     | TUpdate (_,_,_) -> Error.not_yet "update"
@@ -665,6 +677,7 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx ?(lenv=[]) t =
     | Ttype _
     | Tempty_set  -> dup Nan
   in
+  let t = Logic_normalizer.get_term t in
   Memo.memo ~lenv
     (fun t ->
        let ty, op = infer t in
@@ -792,9 +805,8 @@ and type_bound_variables ~loc ~lenv (t1, lv, t2) =
   Interval.Env.add lv i;
   (t1, lv, t2)
 
-
 and type_predicate ?(lenv=[]) p =
-  match Predicate_normalizer.get p with
+  match Logic_normalizer.get_pred p with
   | PoT_term t -> type_term ~use_gmp_opt:true ~lenv t
   | PoT_pred p ->
     Cil.CurrentLoc.set p.pred_loc;
@@ -1004,12 +1016,12 @@ let type_code_annot lenv annot =
   ignore (Visitor.visitFramacCodeAnnotation (typer_visitor lenv) annot)
 
 let preprocess_predicate lenv p =
-  Predicate_normalizer.preprocess_predicate p;
+  Logic_normalizer.preprocess_predicate p;
   Bound_variables.preprocess_predicate p;
   ignore (Visitor.visitFramacPredicate (typer_visitor lenv) p)
 
 let preprocess_rte ~lenv rte =
-  Predicate_normalizer.preprocess_annot rte;
+  Logic_normalizer.preprocess_annot rte;
   Bound_variables.preprocess_annot rte;
   type_code_annot lenv rte
 

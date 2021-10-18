@@ -41,29 +41,45 @@ module Id_predicate =
 
 (* Memoization module which retrieves the preprocessed form of predicates *)
 module Memo: sig
-  val memo: (predicate -> pred_or_term option) -> predicate -> unit
-  val get: predicate -> pred_or_term
+  val memo_pred: (predicate -> pred_or_term option) -> predicate -> unit
+  val get_pred: predicate -> pred_or_term
+  val memo_term : (term -> term option) -> term -> unit
+  val get_term : term -> term
   val clear: unit -> unit
 end = struct
 
-  let tbl = Id_predicate.Hashtbl.create 97
+  let tbl_term = Misc.Id_term.Hashtbl.create 97
+  let tbl_pred = Id_predicate.Hashtbl.create 97
 
-  let get p =
-    try Id_predicate.Hashtbl.find tbl p
+  let get_pred p =
+    try Id_predicate.Hashtbl.find tbl_pred p
     with Not_found -> Lscope.PoT_pred p
 
-  let memo process p =
-    try ignore (Id_predicate.Hashtbl.find tbl p) with
+  let memo_pred process p =
+    try ignore (Id_predicate.Hashtbl.find tbl_pred p) with
     | Not_found ->
       match process p with
-      | Some pot -> Id_predicate.Hashtbl.add tbl p (pot)
+      | Some pot -> Id_predicate.Hashtbl.add tbl_pred p pot
       | None -> ()
 
-  let clear () = Id_predicate.Hashtbl.clear tbl
+  let get_term t =
+    try Misc.Id_term.Hashtbl.find tbl_term t
+    with Not_found -> t
+
+  let memo_term process t =
+    try ignore (Misc.Id_term.Hashtbl.find tbl_term t) with
+    | Not_found ->
+      match process t with
+      | Some term -> Misc.Id_term.Hashtbl.add tbl_term t term
+      | None -> ()
+
+  let clear () =
+    Misc.Id_term.Hashtbl.clear tbl_term;
+    Id_predicate.Hashtbl.clear tbl_pred
 
 end
 
-let preprocess ~loc p =
+let preprocess_pred ~loc p =
   match p.pred_content with
   | Pvalid_read(BuiltinLabel Here as llabel, t)
   | Pvalid(BuiltinLabel Here as llabel, t) -> begin
@@ -95,6 +111,27 @@ let preprocess ~loc p =
     li.l_type <- Some lty;
     let tapp = Logic_const.term ~loc (Tapp(li, labels, args)) lty in
     Some (Lscope.PoT_term tapp)
+  | _ -> None
+
+let preprocess_term ~loc t =
+  match t.term_node with
+  | Tapp(li, lst, [ t1; t2; {term_node = Tlambda([ k ], predicate)}])
+    when li.l_body = LBnone && li.l_var_info.lv_name = "\\numof" ->
+    let logic_info = Cil_const.make_logic_info "\\sum" in
+    logic_info.l_type <- li.l_type;
+    logic_info.l_tparams <- li.l_tparams;
+    logic_info.l_labels <- li.l_labels;
+    logic_info.l_profile <- li.l_profile;
+    logic_info.l_body <- li.l_body;
+    let conditional_term =
+      Logic_const.term ~loc
+        (Tif(predicate, Cil.lone (), Cil.lzero ())) Linteger
+    in
+    let lambda_term =
+      Logic_const.term ~loc (Tlambda([ k ], conditional_term)) Linteger
+    in
+    Some (Logic_const.term ~loc
+            (Tapp(logic_info, lst, [ t1; t2; lambda_term ])) Linteger)
   | _ -> None
 
 let preprocessor = object
@@ -140,11 +177,15 @@ let preprocessor = object
     | GText _
       -> Cil.SkipChildren
 
-  method !vpredicate  p =
+  method !vpredicate p =
     let loc = p.pred_loc in
-    Memo.memo (preprocess ~loc) p;
+    Memo.memo_pred (preprocess_pred ~loc) p;
     Cil.DoChildren
 
+  method !vterm t =
+    let loc = t.term_loc in
+    Memo.memo_term (preprocess_term ~loc) t;
+    Cil.DoChildren
 end
 
 let preprocess ast =
@@ -156,5 +197,6 @@ let preprocess_annot annot =
 let preprocess_predicate p =
   ignore (Visitor.visitFramacPredicate preprocessor p)
 
-let get = Memo.get
+let get_pred = Memo.get_pred
+let get_term = Memo.get_term
 let clear = Memo.clear
