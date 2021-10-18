@@ -310,7 +310,7 @@ check_getopt;
 LONGOPTIONS="help,compile,compile-only,debug:,ocode:,oexec:,verbose:,
   frama-c-only,extra-cpp-args:,frama-c-stdlib,full-mmodel,full-mtracking,gmp,
   quiet,logfile:,ld-flags:,cpp-flags:,frama-c-extra:,memory-model:,keep-going,
-  frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:,
+  frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:,concurrency,
   print-mmodels,rt-debug,rte-select:,then,e-acsl-extra:,check,fail-with-code:,
   temporal,weak-validity,stack-size:,heap-size:,rt-verbose,free-valid-address,
   external-assert:,assert-print-data,no-assert-print-data,external-print-value:,
@@ -342,7 +342,8 @@ OPTION_OUTPUT_EXEC="a.out"               # Generated executable name
 OPTION_EACSL_OUTPUT_EXEC=""              # Name of E-ACSL executable
 OPTION_EACSL="-e-acsl"                   # Specifies E-ACSL run
 OPTION_FRAMA_STDLIB="-no-frama-c-stdlib" # Use Frama-C stdlib
-OPTION_FULL_MTRACKING=                      # Instrument as much as possible
+OPTION_FULL_MTRACKING=                   # Instrument as much as possible
+OPTION_CONCURRENCY=                      # Activate concurrency support
 OPTION_GMP=                              # Use GMP integers everywhere
 OPTION_EACSL_MMODELS="segment"           # Memory model used
 OPTION_EACSL_SHARE=                      # Custom E-ACSL share directory
@@ -552,6 +553,11 @@ do
     -g|--gmp)
       shift;
       OPTION_GMP="-e-acsl-gmp-only"
+    ;;
+    # Concurrency support
+    --concurrency)
+      shift;
+      OPTION_CONCURRENCY="-e-acsl-concurrency"
     ;;
     # Supply Frama-C executable name
     -I|--frama-c)
@@ -844,6 +850,12 @@ else
   OPT_LDFLAGS=""
 fi
 
+# Concurrency support
+if [ -n "$OPTION_CONCURRENCY" ]; then
+  OPT_CPPFLAGS="$OPT_CPPFLAGS -DE_ACSL_CONCURRENCY_PTHREAD"
+  OPT_LDFLAGS="$OPT_LDFLAGS -pthread"
+fi
+
 # Gcc and related flags
 CC="$OPTION_CC"
 CFLAGS="$OPTION_CFLAGS
@@ -873,7 +885,8 @@ if [ "`basename $CC`" = 'clang' ]; then
     -Wno-incompatible-pointer-types-discards-qualifiers"
 fi
 
-CPPFLAGS="$OPTION_CPPFLAGS"
+CPPFLAGS="$OPTION_CPPFLAGS
+  $OPT_CPPFLAGS"
 LDFLAGS="$OPTION_LDFLAGS
   $OPT_LDFLAGS"
 
@@ -993,6 +1006,7 @@ if [ -n "$OPTION_EACSL" ]; then
     $OPTION_DEBUG
     $OPTION_VALIDATE_FORMAT_STRINGS
     $OPTION_ASSERT_PRINT_DATA
+    $OPTION_CONCURRENCY
     -e-acsl-share="$EACSL_SHARE"
     -then-last"
 fi
