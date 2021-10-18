@@ -163,7 +163,7 @@ static size_t get_global_size() {
  */
 
 /*! \brief Return byte-size of the TLS segment */
-inline static size_t get_tls_size() {
+inline size_t get_tls_size() {
   return PGM_TLS_SIZE;
 }
 
@@ -219,7 +219,7 @@ static void grow_bounds_for_size(uintptr_t *min_bound, uintptr_t *max_bound,
 }
 
 /*! \brief Return start address of a program's TLS */
-static uintptr_t get_tls_start() {
+uintptr_t get_tls_start() {
   size_t tls_size = get_tls_size();
   uintptr_t data = (uintptr_t)&id_tdata, bss = (uintptr_t)&id_tbss;
   uintptr_t min_addr = data < bss ? data : bss;

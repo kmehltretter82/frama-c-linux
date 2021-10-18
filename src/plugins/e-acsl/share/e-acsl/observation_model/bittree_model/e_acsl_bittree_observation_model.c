@@ -634,3 +634,20 @@ void eacsl_block_info(char *p) {
 }
 #endif
 /* }}} */
+
+/************************************************************************/
+/*** E-ACSL concurrency primitives {{{ ***/
+/************************************************************************/
+
+extern int pthread_create(pthread_t *restrict thread,
+                          const pthread_attr_t *restrict attr,
+                          pthread_routine_t start_routine, void *restrict arg);
+
+int eacsl_pthread_create(pthread_t *restrict thread,
+                         const pthread_attr_t *restrict original_attr,
+                         pthread_routine_t start_routine, void *restrict arg) {
+  private_abort("Concurrency is not supported for bittree model\n");
+  return EPERM;
+}
+
+/* }}} */

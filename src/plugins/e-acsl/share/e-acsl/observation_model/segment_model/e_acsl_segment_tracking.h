@@ -401,11 +401,19 @@ void static_store_temporal_referent(uintptr_t addr, uint32_t ref);
 #endif /*}}} E_ACSL_TEMPORAL*/
 /* }}} */
 
-/* Static initialization {{{ */
-/*! \brief The following function marks n bytes starting from the address
- * given by addr as initialized. `size` equating to zero indicates that the
- * whole block should be marked as initialized.  */
+/* Initialization {{{ */
+
+/*! \brief Unsafe version of `eacsl_initialize()` that does not lock the memory
+    model. */
+void unsafe_initialize(void *ptr, size_t n);
+
+/*! \brief The following function marks n bytes on a static region starting from
+ * the address given by addr as initialized. `size` equating to zero indicates
+ * that the whole block should be marked as initialized.  */
 void initialize_static_region(uintptr_t addr, long size);
+
+/*! \brief Mark n bytes on the heap starting from address addr as initialized */
+void initialize_heap_region(uintptr_t addr, long len);
 /* }}} */
 
 /* Read-only {{{ */
@@ -418,6 +426,27 @@ void mark_readonly_region(uintptr_t addr, long size);
 /* }}} */
 
 /* Heap allocation {{{ (malloc/calloc) */
+
+/*! \brief Unsafe version of `malloc()` that does not lock the memory model. */
+void *unsafe_malloc(size_t size);
+
+/*! \brief Unsafe version of `calloc()` that does not lock the memory model. */
+void *unsafe_calloc(size_t nbr_elt, size_t size_elt);
+
+/*! \brief Unsafe version of `realloc()` that does not lock the memory model. */
+void *unsafe_realloc(void *ptr, size_t size);
+
+/*! \brief Unsafe version of `free()` that does not lock the memory model. */
+void unsafe_free(void *ptr);
+
+/*! \brief Unsafe version of `aligned_alloc()` that does not lock the memory
+    model. */
+void *unsafe_aligned_alloc(size_t alignment, size_t size);
+
+/*! \brief Unsafe version of `posix_memalign()` that does not lock the memory
+    model. */
+int unsafe_posix_memalign(void **memptr, size_t alignment, size_t size);
+
 /** \brief Return shadowed copy of a memory chunk on a program's heap using.
  * If `init` parameter is set to a non-zero value the memory occupied by the
  * resulting block is set to be initialized and uninitialized otherwise. */
@@ -443,13 +472,16 @@ void *shadow_copy(const void *ptr, size_t size, int init);
  * only legal if both `p` and `p+i` point to the same block. */
 int heap_allocated(uintptr_t addr, size_t size, uintptr_t base_ptr);
 
-/*! \brief  Return a non-zero value if a given address is a base address of a
+/*! \brief Unsafe version of `eacsl_freeable()` that does not lock the memory
+ * model.
+ *
+ * Return a non-zero value if a given address is a base address of a
  * heap-allocated memory block that `addr` belongs to.
  *
  * As some of the other functions, \b \\freeable can be expressed using
  * ::IS_ON_HEAP, ::heap_allocated and ::_base_addr. Here direct
  * implementation is preferred for performance reasons. */
-int eacsl_freeable(void *ptr);
+int unsafe_freeable(void *ptr);
 
 /*! \brief Querying information about a specific heap memory address.
  * This function is similar to ::static_info except it returns data
@@ -473,11 +505,6 @@ uint32_t heap_temporal_info(uintptr_t addr, int origin);
 
 void heap_store_temporal_referent(uintptr_t addr, uint32_t ref);
 #endif /*}}} E_ACSL_TEMPORAL*/
-
-/* Heap initialization {{{ */
-/*! \brief Mark n bytes on the heap starting from address addr as initialized */
-void initialize_heap_region(uintptr_t addr, long len);
-/* }}} */
 
 /* Internal state print (debug mode) {{{ */
 #ifdef E_ACSL_DEBUG

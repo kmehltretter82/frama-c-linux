@@ -27,6 +27,7 @@
 
 #include <stdint.h>
 
+#include "../../internals/e_acsl_concurrency.h"
 #include "../../internals/e_acsl_config.h"
 #include "../../internals/e_acsl_malloc.h"
 #include "../../internals/e_acsl_private_assert.h"
@@ -133,6 +134,8 @@ typedef struct pt_struct {
   clean_leaf_fct_t clean_leaf_fct;
   /*! \brief Function to print the content of a leaf. */
   print_leaf_fct_t print_leaf_fct;
+  /*! \brief Read-write lock to concurrently access the trie. */
+  E_ACSL_RWLOCK_DECL(lock);
 } pt_struct_t;
 
 /* common prefix of two addresses */
@@ -187,12 +190,15 @@ pt_struct_t *pt_create(get_ptr_fct_t get_ptr_fct,
   pt->contains_ptr_fct = contains_ptr_fct;
   pt->clean_leaf_fct = clean_leaf_fct;
   pt->print_leaf_fct = print_leaf_fct;
+
+  E_ACSL_RWINIT(pt->lock, NULL);
   return pt;
 }
 
 void pt_destroy(pt_struct_t *pt) {
   DASSERT(pt != NULL);
   pt_clean(pt);
+  E_ACSL_RWDESTROY(pt->lock);
   private_free(pt);
 }
 
@@ -233,6 +239,8 @@ void pt_insert(pt_struct_t *pt, pt_leaf_t leaf) {
   DASSERT(pt != NULL);
   DASSERT(leaf != NULL);
   pt_node_t *new_leaf_node;
+
+  E_ACSL_WLOCK(pt->lock);
 
   uintptr_t ptr = (uintptr_t)pt->get_ptr_fct(leaf);
 
@@ -294,6 +302,8 @@ void pt_insert(pt_struct_t *pt, pt_leaf_t leaf) {
     DASSERT((parent->left == sibling && parent->right == new_leaf_node)
             || (parent->left == new_leaf_node && parent->right == sibling));
   }
+
+  E_ACSL_RWUNLOCK(pt->lock);
 }
 
 /* called from pt_remove */
@@ -380,10 +390,15 @@ static void pt_remove_leaf_node(pt_struct_t *pt,
 
 void pt_remove(pt_struct_t *pt, pt_leaf_t leaf) {
   DASSERT(pt != NULL);
+
+  E_ACSL_WLOCK(pt->lock);
+
   pt_node_t *leaf_node_to_delete = pt_get_leaf_node_from_leaf(pt, leaf);
   DASSERT(leaf_node_to_delete->leaf == leaf);
 
   pt_remove_leaf_node(pt, leaf_node_to_delete);
+
+  E_ACSL_RWUNLOCK(pt->lock);
 }
 
 /** Starting at `node`, remove all leaves that satisfy the given predicate from
@@ -414,13 +429,19 @@ int pt_remove_node_if(pt_struct_t *pt, pt_node_t *node,
 
 void pt_remove_if(pt_struct_t *pt, pt_predicate_t predicate) {
   DASSERT(pt != NULL);
+  E_ACSL_WLOCK(pt->lock);
   pt_remove_node_if(pt, pt->root, predicate);
+  E_ACSL_RWUNLOCK(pt->lock);
 }
 
 pt_leaf_t pt_lookup(const pt_struct_t *pt, void *ptr) {
   DASSERT(pt != NULL);
-  DASSERT(pt->root != NULL);
   DASSERT(ptr != NULL);
+
+  E_ACSL_RLOCK(pt->lock);
+  DASSERT(pt->root != NULL);
+
+  pt_leaf_t res;
   pt_node_t *tmp = pt->root;
 
   /*@ loop assigns tmp;
@@ -428,7 +449,8 @@ pt_leaf_t pt_lookup(const pt_struct_t *pt, void *ptr) {
   while (!tmp->is_leaf) {
     // if the ptr we are looking for does not share the prefix of tmp
     if ((tmp->addr & tmp->mask) != ((uintptr_t)ptr & tmp->mask)) {
-      return NULL;
+      res = NULL;
+      goto end;
     }
 
     // two children
@@ -441,21 +463,28 @@ pt_leaf_t pt_lookup(const pt_struct_t *pt, void *ptr) {
                == ((uintptr_t)ptr & tmp->left->mask)) {
       tmp = tmp->left;
     } else {
-      return NULL;
+      res = NULL;
+      goto end;
     }
   }
 
   if (pt->get_ptr_fct(tmp->leaf) != ptr) {
-    return NULL;
+    res = NULL;
   }
-  return tmp->leaf;
+
+end:
+  E_ACSL_RWUNLOCK(pt->lock);
+  return res;
 }
 
 pt_leaf_t pt_find(const pt_struct_t *pt, void *ptr) {
   DASSERT(pt != NULL);
+  E_ACSL_RLOCK(pt->lock);
 
+  pt_leaf_t res;
   if (pt->root == NULL || ptr == NULL) {
-    return NULL;
+    res = NULL;
+    goto end;
   }
 
   pt_node_t *tmp = pt->root;
@@ -465,16 +494,19 @@ pt_leaf_t pt_find(const pt_struct_t *pt, void *ptr) {
     if (tmp->is_leaf) {
       /* tmp cannot contain ptr because its begin addr is higher */
       if (tmp->addr > (uintptr_t)ptr) {
-        return NULL;
+        res = NULL;
+        goto end;
       }
 
       /* tmp->addr <= ptr, tmp may contain ptr */
       else if (pt->contains_ptr_fct(tmp->leaf, ptr)) {
-        return tmp->leaf;
+        res = tmp->leaf;
+        goto end;
       }
       /* tmp->addr <= ptr, but tmp does not contain ptr */
       else {
-        return NULL;
+        res = NULL;
+        goto end;
       }
     }
 
@@ -490,13 +522,18 @@ pt_leaf_t pt_find(const pt_struct_t *pt, void *ptr) {
       tmp = tmp->left;
     } else {
       if (other_choice == NULL) {
-        return NULL;
+        res = NULL;
+        goto end;
       } else {
         tmp = other_choice;
         other_choice = NULL;
       }
     }
   }
+
+end:
+  E_ACSL_RWUNLOCK(pt->lock);
+  return res;
 }
 
 static pt_leaf_t pt_find_if_rec(pt_node_t *node, pt_predicate_t predicate) {
@@ -514,12 +551,17 @@ static pt_leaf_t pt_find_if_rec(pt_node_t *node, pt_predicate_t predicate) {
 
 pt_leaf_t pt_find_if(const pt_struct_t *pt, pt_predicate_t predicate) {
   DASSERT(pt != NULL);
+  E_ACSL_RLOCK(pt->lock);
 
+  pt_leaf_t res;
   if (pt->root == NULL) {
-    return NULL;
+    res = NULL;
   } else {
-    return pt_find_if_rec(pt->root, predicate);
+    res = pt_find_if_rec(pt->root, predicate);
   }
+
+  E_ACSL_RWUNLOCK(pt->lock);
+  return res;
 }
 
 static void pt_clean_rec(const pt_struct_t *pt, pt_node_t *ptr) {
@@ -538,8 +580,10 @@ static void pt_clean_rec(const pt_struct_t *pt, pt_node_t *ptr) {
 
 void pt_clean(pt_struct_t *pt) {
   DASSERT(pt != NULL);
+  E_ACSL_WLOCK(pt->lock);
   pt_clean_rec(pt, pt->root);
   pt->root = NULL;
+  E_ACSL_RWUNLOCK(pt->lock);
 }
 
 #ifdef E_ACSL_DEBUG
@@ -564,7 +608,9 @@ static void pt_print_node(const pt_struct_t *pt, pt_node_t *node, int depth) {
 void pt_print(const pt_struct_t *pt) {
   DLOG("------------DEBUG\n");
   if (pt != NULL) {
+    E_ACSL_RLOCK(pt->lock);
     pt_print_node(pt, pt->root, 0);
+    E_ACSL_RWUNLOCK(pt->lock);
   } else {
     DLOG("Patricia trie is NULL\n");
   }

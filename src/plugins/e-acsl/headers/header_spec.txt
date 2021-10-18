@@ -69,6 +69,8 @@ share/e-acsl/observation_model/segment_model/e_acsl_segment_omodel_debug.c: CEA_
 share/e-acsl/observation_model/segment_model/e_acsl_segment_timestamp_retrieval.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/observation_model/segment_model/e_acsl_segment_tracking.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/observation_model/segment_model/e_acsl_segment_tracking.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+share/e-acsl/observation_model/segment_model/e_acsl_shadow_concurrency.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+share/e-acsl/observation_model/segment_model/e_acsl_shadow_concurrency.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/observation_model/segment_model/e_acsl_shadow_layout.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/observation_model/segment_model/e_acsl_shadow_layout.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/observation_model/e_acsl_heap.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL

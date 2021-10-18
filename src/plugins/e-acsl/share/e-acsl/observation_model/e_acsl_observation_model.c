@@ -103,6 +103,7 @@ int eacsl_separated(size_t count, ...) {
 #  include "segment_model/e_acsl_segment_omodel_debug.c"
 #  include "segment_model/e_acsl_segment_timestamp_retrieval.c"
 #  include "segment_model/e_acsl_segment_tracking.c"
+#  include "segment_model/e_acsl_shadow_concurrency.c"
 #  include "segment_model/e_acsl_shadow_layout.c"
 #elif defined E_ACSL_BITTREE_MMODEL
 #  include "bittree_model/e_acsl_bittree.c"

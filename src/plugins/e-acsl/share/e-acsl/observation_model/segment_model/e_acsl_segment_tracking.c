@@ -584,8 +584,7 @@ static void set_heap_segment(void *ptr, size_t size, size_t alloc_size,
   }
 }
 
-void *malloc(size_t size) {
-
+void *unsafe_malloc(size_t size) {
   size_t alloc_size = ALLOC_SIZE(size);
 
   /* Return NULL if the size is too large to be aligned */
@@ -604,7 +603,7 @@ void *malloc(size_t size) {
   return res;
 }
 
-void *calloc(size_t nmemb, size_t size) {
+void *unsafe_calloc(size_t nmemb, size_t size) {
   /* Since both `nmemb` and `size` are both of size `size_t` the multiplication
    * of the arguments (which gives the actual allocation size) might lead to an
    * integer overflow. The below code checks for an overflow and sets the
@@ -631,7 +630,7 @@ void *calloc(size_t nmemb, size_t size) {
 }
 
 void *shadow_copy(const void *ptr, size_t size, int init) {
-  char *ret = (init) ? calloc(1, size) : malloc(size);
+  char *ret = (init) ? unsafe_calloc(1, size) : unsafe_malloc(size);
   private_assert(ret != NULL, "Shadow copy failed\n", NULL);
   /* Shadow copy is internal, therefore heap status should not be updated.
      Since it is set via `set_heap_segment`, it needs to be reverted back. */
@@ -678,7 +677,7 @@ static void unset_heap_segment(void *ptr, int init, const char *function) {
   }
 }
 
-void free(void *ptr) {
+void unsafe_free(void *ptr) {
   if (ptr == NULL) {
 /* Fail if instructed to treat NULL input to free as invalid. */
 #ifdef E_ACSL_FREE_VALID_ADDRESS
@@ -688,7 +687,7 @@ void free(void *ptr) {
   }
 
   if (ptr != NULL) { /* NULL is a valid behaviour */
-    if (eacsl_freeable(ptr)) {
+    if (unsafe_freeable(ptr)) {
       unset_heap_segment(ptr, 1, "free");
       public_free(ptr);
     } else {
@@ -699,17 +698,17 @@ void free(void *ptr) {
 /* }}} */
 
 /* Heap reallocation (realloc) {{{ */
-void *realloc(void *ptr, size_t size) {
+void *unsafe_realloc(void *ptr, size_t size) {
   char *res = NULL; /* Resulting pointer */
   /* If the pointer is NULL then realloc is equivalent to malloc(size) */
   if (ptr == NULL)
-    return malloc(size);
+    return unsafe_malloc(size);
   /* If the pointer is not NULL and the size is zero then realloc is
    * equivalent to free(ptr) */
   else if (ptr != NULL && size == 0) {
-    free(ptr);
+    unsafe_free(ptr);
   } else {
-    if (eacsl_freeable(ptr)) { /* ... and can be used as an input to `free` */
+    if (unsafe_freeable(ptr)) { /* ... and can be used as an input to `free` */
       size_t alloc_size = ALLOC_SIZE(size);
       res = public_realloc(ptr, alloc_size);
       DVALIDATE_ALIGNMENT(res);
@@ -822,7 +821,7 @@ void *realloc(void *ptr, size_t size) {
 /* }}} */
 
 /* Heap aligned allocation (aligned_alloc) {{{ */
-void *aligned_alloc(size_t alignment, size_t size) {
+void *unsafe_aligned_alloc(size_t alignment, size_t size) {
   /* Check if:
    *  - size and alignment are greater than zero
    *  - alignment is a power of 2
@@ -841,7 +840,7 @@ void *aligned_alloc(size_t alignment, size_t size) {
 /* }}} */
 
 /* Heap aligned allocation (posix_memalign) {{{ */
-int posix_memalign(void **memptr, size_t alignment, size_t size) {
+int unsafe_posix_memalign(void **memptr, size_t alignment, size_t size) {
   /* Check if:
    *  - size and alignment are greater than zero
    *  - alignment is a power of 2 and a multiple of sizeof(void*) */
@@ -892,7 +891,7 @@ int heap_allocated(uintptr_t addr, size_t size, uintptr_t base_ptr) {
   return 0;
 }
 
-int eacsl_freeable(void *ptr) { /* + */
+int unsafe_freeable(void *ptr) { /* + */
   uintptr_t addr = (uintptr_t)ptr;
   /* Address is not on the program's heap, so cannot be freed */
   if (!IS_ON_HEAP(addr))
@@ -1016,6 +1015,13 @@ void initialize_heap_region(uintptr_t addr, long len) {
      * `shadow` */
     setbits(len, shadow);
   }
+}
+/* }}} */
+
+/* Heap or static initialization {{{ */
+void unsafe_initialize(void *ptr, size_t n) {
+  TRY_SEGMENT((uintptr_t)ptr, initialize_heap_region((uintptr_t)ptr, n),
+              initialize_static_region((uintptr_t)ptr, n))
 }
 /* }}} */
 
