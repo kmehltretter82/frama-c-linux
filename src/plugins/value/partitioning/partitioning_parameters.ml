@@ -93,15 +93,13 @@ struct
         let t =
           Cil.visitCilTerm (new Logic_utils.simplify_const_lval global_init) t
         in
-        let i = Logic_utils.constFoldTermToInt t in
-        match Option.bind i Integer.to_int_opt with
-        | Some n -> Partition.IntLimit n
-        | None ->
-          try Partition.ExpLimit (term_to_exp t)
-          with Db.Properties.Interp.No_conversion ->
-            warn "loop unrolling parameters must be valid expressions; \
-                  ignoring";
-            default
+        try
+          match Logic_utils.constFoldTermToInt t with
+          | Some n -> Partition.IntLimit (Integer.to_int_exn n)
+          | None   -> Partition.ExpLimit (term_to_exp t)
+        with Z.Overflow | Db.Properties.Interp.No_conversion ->
+          warn "invalid loop unrolling parameter; ignoring";
+          default
       end
     | _ ->
       warn "invalid unroll annotation; ignoring";

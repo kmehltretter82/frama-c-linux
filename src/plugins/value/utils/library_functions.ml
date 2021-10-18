@@ -71,7 +71,8 @@ let returned_value kf =
 
 
 let unsupported_specifications =
-  [ "glob", "glob.c";
+  [ "asprintf", "stdio.c";
+    "glob", "glob.c";
     "globfree", "glob.c";
     "getaddrinfo", "netdb.c";
     "getline", "stdio.c";

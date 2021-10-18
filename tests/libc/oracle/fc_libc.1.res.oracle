@@ -5630,6 +5630,8 @@ extern int pclose(FILE *stream);
 
 ssize_t getline(char **lineptr, size_t *n, FILE *stream);
 
+int asprintf(char **strp, char const *fmt, void * const *__va_params);
+
 /*@ assigns \result;
     assigns \result \from maj, min; */
 extern dev_t makedev(int maj, int min);
@@ -5737,6 +5739,36 @@ ssize_t getline(char **lineptr, size_t *n, FILE *stream)
     }
   }
   __retres = -1;
+  return_label: return __retres;
+}
+
+/*@ requires valid_strp: \valid(strp);
+    requires valid_fmt: valid_read_string(fmt);
+    ensures result_error_or_written_byes: \result ≡ -1 ∨ \result ≥ 0;
+    assigns __fc_heap_status, \result, *strp;
+    assigns __fc_heap_status
+      \from (indirect: *(fmt + (0 ..))), __fc_heap_status;
+    assigns \result
+      \from (indirect: *(fmt + (0 ..))), (indirect: __fc_heap_status);
+    assigns *strp \from *(fmt + (0 ..)), (indirect: __fc_heap_status);
+    allocates *\old(strp);
+ */
+int asprintf(char **strp, char const *fmt, void * const *__va_params)
+{
+  int __retres;
+  va_list args;
+  int tmp;
+  args = __va_params;
+  tmp = Frama_C_interval(1,256);
+  size_t len = (unsigned int)tmp;
+  *strp = (char *)malloc(len);
+  if (! *strp) {
+    __retres = -1;
+    goto return_label;
+  }
+  Frama_C_make_unknown(*strp,len - 1U);
+  *(*strp + (len - 1U)) = (char)0;
+  __retres = (int)len;
   return_label: return __retres;
 }
 

@@ -126,8 +126,6 @@ module Value : sig
   type t = Cvalue.V.t
   (** Internal representation of a value. *)
 
-  exception Aborted
-
   val emitter: Emitter.t ref
   (** Emitter used by Value to emit statuses *)
 

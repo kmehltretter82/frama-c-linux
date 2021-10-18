@@ -11,7 +11,6 @@
   __e_acsl_sound_verdict ∈ [--..--]
   __e_acsl_heap_allocation_size ∈ [--..--]
   __e_acsl_heap_allocated_blocks ∈ [--..--]
-  __fc_heap_status ∈ [--..--]
   __e_acsl_math_HUGE_VAL ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
   __e_acsl_math_HUGE_VALF ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
   __e_acsl_math_INFINITY ∈ [-1.79769313486e+308 .. 1.79769313486e+308]

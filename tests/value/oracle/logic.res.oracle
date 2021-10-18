@@ -14,7 +14,7 @@
   arr_ptr[0..2] ∈ {0}
   arr_ptr_arr[0..5] ∈ {0}
 [eva] computing for function eq_tsets <- main.
-  Called from tests/value/logic.c:441.
+  Called from tests/value/logic.c:507.
 [eva] tests/value/logic.c:103: 
   cannot evaluate ACSL term, unsupported ACSL construct: == operation on non-supported type set<_#8>
 [eva:alarm] tests/value/logic.c:103: Warning: assertion got status unknown.
@@ -56,20 +56,20 @@
 [eva] Recording results for eq_tsets
 [eva] Done for function eq_tsets
 [eva] computing for function eq_char <- main.
-  Called from tests/value/logic.c:442.
+  Called from tests/value/logic.c:508.
 [eva] tests/value/logic.c:149: Frama_C_show_each: {-126}
 [eva] tests/value/logic.c:150: assertion got status valid.
 [eva] tests/value/logic.c:151: assertion got status valid.
 [eva] Recording results for eq_char
 [eva] Done for function eq_char
 [eva] computing for function casts <- main.
-  Called from tests/value/logic.c:443.
+  Called from tests/value/logic.c:509.
 [eva] tests/value/logic.c:155: assertion got status valid.
 [eva] tests/value/logic.c:156: assertion got status valid.
 [eva] Recording results for casts
 [eva] Done for function casts
 [eva] computing for function empty_tset <- main.
-  Called from tests/value/logic.c:444.
+  Called from tests/value/logic.c:510.
 [eva] computing for function f_empty_tset <- empty_tset <- main.
   Called from tests/value/logic.c:166.
 [eva] using specification for function f_empty_tset
@@ -82,7 +82,7 @@
 [eva] Recording results for empty_tset
 [eva] Done for function empty_tset
 [eva] computing for function reduce_by_equal <- main.
-  Called from tests/value/logic.c:445.
+  Called from tests/value/logic.c:511.
 [eva:alarm] tests/value/logic.c:172: Warning: 
   accessing out of bounds index. assert 0 ≤ v;
 [eva:alarm] tests/value/logic.c:172: Warning: 
@@ -92,7 +92,7 @@
 [eva] Recording results for reduce_by_equal
 [eva] Done for function reduce_by_equal
 [eva] computing for function alarms <- main.
-  Called from tests/value/logic.c:446.
+  Called from tests/value/logic.c:512.
 [eva:alarm] tests/value/logic.c:182: Warning: 
   assertion 'ASSUME' got status unknown.
 [eva:alarm] tests/value/logic.c:184: Warning: 
@@ -124,7 +124,7 @@
 [eva] Recording results for alarms
 [eva] Done for function alarms
 [eva] computing for function cond_in_lval <- main.
-  Called from tests/value/logic.c:447.
+  Called from tests/value/logic.c:513.
 [eva] computing for function select_like <- cond_in_lval <- main.
   Called from tests/value/logic.c:228.
 [eva] using specification for function select_like
@@ -152,7 +152,7 @@
 [eva] Recording results for cond_in_lval
 [eva] Done for function cond_in_lval
 [eva] computing for function pred <- main.
-  Called from tests/value/logic.c:448.
+  Called from tests/value/logic.c:514.
 [eva] tests/value/logic.c:90: assertion got status valid.
 [eva] tests/value/logic.c:91: assertion got status valid.
 [eva] tests/value/logic.c:31: 
@@ -201,7 +201,7 @@
 [eva] Recording results for pred
 [eva] Done for function pred
 [eva] computing for function float_sign <- main.
-  Called from tests/value/logic.c:449.
+  Called from tests/value/logic.c:515.
 [eva] tests/value/logic.c:251: assertion got status valid.
 [eva] tests/value/logic.c:252: assertion got status valid.
 [eva] tests/value/logic.c:253: assertion got status valid.
@@ -210,7 +210,7 @@
 [eva] Recording results for float_sign
 [eva] Done for function float_sign
 [eva] computing for function min_max <- main.
-  Called from tests/value/logic.c:450.
+  Called from tests/value/logic.c:516.
 [eva] computing for function Frama_C_interval <- min_max <- main.
   Called from tests/value/logic.c:274.
 [eva] using specification for function Frama_C_interval
@@ -235,7 +235,7 @@
 [eva] Recording results for min_max
 [eva] Done for function min_max
 [eva] computing for function assign_tsets <- main.
-  Called from tests/value/logic.c:451.
+  Called from tests/value/logic.c:517.
 [eva] computing for function assign_tsets_aux <- assign_tsets <- main.
   Called from tests/value/logic.c:269.
 [eva] using specification for function assign_tsets_aux
@@ -243,7 +243,7 @@
 [eva] Recording results for assign_tsets
 [eva] Done for function assign_tsets
 [eva] computing for function check_and_assert <- main.
-  Called from tests/value/logic.c:452.
+  Called from tests/value/logic.c:518.
 [eva:alarm] tests/value/logic.c:295: Warning: assertion got status unknown.
 [eva] tests/value/logic.c:296: Frama_C_show_each_42: {42}
 [eva] tests/value/logic.c:297: check got status valid.
@@ -258,7 +258,7 @@
 [eva] Recording results for check_and_assert
 [eva] Done for function check_and_assert
 [eva] computing for function min_max_quantifier <- main.
-  Called from tests/value/logic.c:453.
+  Called from tests/value/logic.c:519.
 [eva] tests/value/logic.c:321: check 'valid' got status valid.
 [eva] tests/value/logic.c:322: check 'valid' got status valid.
 [eva] tests/value/logic.c:323: check 'valid' got status valid.
@@ -332,7 +332,7 @@
 [eva] Recording results for min_max_quantifier
 [eva] Done for function min_max_quantifier
 [eva] computing for function int_abs <- main.
-  Called from tests/value/logic.c:454.
+  Called from tests/value/logic.c:520.
 [eva] computing for function abs <- int_abs <- main.
   Called from tests/value/logic.c:365.
 [eva] using specification for function abs
@@ -455,7 +455,7 @@
 [eva] Recording results for int_abs
 [eva] Done for function int_abs
 [eva] computing for function float_abs <- main.
-  Called from tests/value/logic.c:455.
+  Called from tests/value/logic.c:521.
 [eva] computing for function fabs <- float_abs <- main.
   Called from tests/value/logic.c:421.
 [eva] using specification for function fabs
@@ -513,6 +513,51 @@
 [eva] tests/value/logic.c:437: Frama_C_show_each_0_3: [-0. .. 3.]
 [eva] Recording results for float_abs
 [eva] Done for function float_abs
+[eva] computing for function set_comprehension <- main.
+  Called from tests/value/logic.c:522.
+[eva:alarm] tests/value/logic.c:444: Warning: assertion got status unknown.
+[eva] tests/value/logic.c:445: Frama_C_show_each_10_100: [10..100]
+[eva:alarm] tests/value/logic.c:448: Warning: assertion got status unknown.
+[eva] tests/value/logic.c:449: Frama_C_show_each_10_100: [10..100]
+[eva:alarm] tests/value/logic.c:452: Warning: assertion got status unknown.
+[eva] tests/value/logic.c:453: Frama_C_show_each_31_301: [31..301],1%3
+[eva:alarm] tests/value/logic.c:456: Warning: assertion got status unknown.
+[eva] tests/value/logic.c:457: Frama_C_show_each_5_50: [-2147483648..2147483647]
+[eva:alarm] tests/value/logic.c:460: Warning: assertion got status unknown.
+[eva] tests/value/logic.c:461: Frama_C_show_each_0: [-90..90]
+[eva:alarm] tests/value/logic.c:464: Warning: assertion got status unknown.
+[eva] tests/value/logic.c:465: 
+  Frama_C_show_each_bottom: [-2147483648..2147483647]
+[eva] computing for function Frama_C_interval <- set_comprehension <- main.
+  Called from tests/value/logic.c:467.
+[eva] tests/value/logic.c:467: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- set_comprehension <- main.
+  Called from tests/value/logic.c:468.
+[eva] tests/value/logic.c:468: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva:alarm] tests/value/logic.c:470: Warning: assertion got status unknown.
+[eva] tests/value/logic.c:471: Frama_C_show_each_12_32: [12..32]
+[eva:alarm] tests/value/logic.c:474: Warning: assertion got status unknown.
+[eva] tests/value/logic.c:475: Frama_C_show_each_16_24: [16..24]
+[eva:alarm] tests/value/logic.c:478: Warning: assertion got status unknown.
+[eva] tests/value/logic.c:479: Frama_C_show_each_24_68: [24..68]
+[eva:alarm] tests/value/logic.c:483: Warning: assertion got status unknown.
+[eva] tests/value/logic.c:484: Frama_C_show_each_5_41: [5..41],1%2
+[eva:alarm] tests/value/logic.c:487: Warning: assertion got status unknown.
+[eva] tests/value/logic.c:488: Frama_C_show_each: [-2147483648..2147483647]
+[eva] Recording results for set_comprehension
+[eva] Done for function set_comprehension
+[eva] computing for function set_comprehension_assigns <- main.
+  Called from tests/value/logic.c:523.
+[eva] computing for function multi_memset <- set_comprehension_assigns <- main.
+  Called from tests/value/logic.c:503.
+[eva] using specification for function multi_memset
+[eva] Done for function multi_memset
+[eva] Recording results for set_comprehension_assigns
+[eva] Done for function set_comprehension_assigns
 [eva] Recording results for main
 [eva] done for function main
 [scope:rm_asserts] removing 5 assertion(s)
@@ -657,6 +702,36 @@
   b.i1 ∈ {6}
    .i2 ∈ {8}
   x_0 ∈ [-2147483648..0]
+[eva:final-states] Values at end of function set_comprehension:
+  Frama_C_entropy_source ∈ [--..--]
+  x_0 ∈ [--..--]
+  a ∈ [12..24]
+  b ∈ [16..32]
+  t_0[0] ∈ {2}
+     [1] ∈ {3}
+     [2] ∈ {5}
+     [3] ∈ {7}
+     [4] ∈ {11}
+     [5] ∈ {13}
+     [6] ∈ {17}
+     [7] ∈ {19}
+     [8] ∈ {23}
+     [9] ∈ {29}
+     [10] ∈ {31}
+     [11] ∈ {37}
+     [12] ∈ {41}
+     [13] ∈ {43}
+     [14] ∈ {47}
+[eva:final-states] Values at end of function set_comprehension_assigns:
+  buf0[0..9] ∈ {0}
+  buf1[0..9] ∈ [--..--]
+      [10..11] ∈ {0}
+  buf2[0..7] ∈ [--..--]
+  buf3[0..9] ∈ {0}
+  p[0] ∈ {{ &buf0[0] }}
+   [1] ∈ {{ &buf1[0] }}
+   [2] ∈ {{ &buf2[0] }}
+   [3] ∈ {{ &buf3[0] }}
 [eva:final-states] Values at end of function unsup:
   t_T{.z; .t} ∈ {21}
 [eva:final-states] Values at end of function pred:
@@ -725,6 +800,12 @@
 [from] Computing for function select_like <-cond_in_lval
 [from] Done for function select_like
 [from] Done for function cond_in_lval
+[from] Computing for function set_comprehension
+[from] Done for function set_comprehension
+[from] Computing for function set_comprehension_assigns
+[from] Computing for function multi_memset <-set_comprehension_assigns
+[from] Done for function multi_memset
+[from] Done for function set_comprehension_assigns
 [from] Computing for function unsup
 [from] Done for function unsup
 [from] Computing for function pred
@@ -778,6 +859,9 @@
   Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
 [from] Function min_max_quantifier:
   Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
+[from] Function multi_memset:
+  buf1[0..9] FROM \nothing (and SELF)
+  buf2[0..7] FROM \nothing (and SELF)
 [from] Function reduce_by_equal:
   NO EFFECTS
 [from] Function select_like:
@@ -785,6 +869,10 @@
   out FROM p; q; a; b
   b FROM p; q; a; b (and SELF)
 [from] Function cond_in_lval:
+  NO EFFECTS
+[from] Function set_comprehension:
+  Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
+[from] Function set_comprehension_assigns:
   NO EFFECTS
 [from] Function unsup:
   t_T FROM \nothing
@@ -866,6 +954,14 @@
     a; out; b; x_0
 [inout] Inputs for function cond_in_lval:
     v
+[inout] Out (internal) for function set_comprehension:
+    Frama_C_entropy_source; x_0; a; b; t_0[0..14]
+[inout] Inputs for function set_comprehension:
+    Frama_C_entropy_source; v
+[inout] Out (internal) for function set_comprehension_assigns:
+    buf0[0..9]; buf1[0..11]; buf2[0..7]; buf3[0..9]; p[0..3]
+[inout] Inputs for function set_comprehension_assigns:
+    \nothing
 [inout] Out (internal) for function unsup:
     t_T
 [inout] Inputs for function unsup:

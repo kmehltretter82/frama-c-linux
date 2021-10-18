@@ -75,6 +75,8 @@
             by Frama-C kernel.
 [  Valid  ] Axiomatic 'WcsNCmp'
             by Frama-C kernel.
+[  Valid  ] Axiomatic 'dynamic_allocation'
+            by Frama-C kernel.
 [  Valid  ] Axiomatic 'format_length'
             by Frama-C kernel.
 [  Valid  ] Axiomatic 'pipe_streams'
@@ -92,6 +94,8 @@
 [ Extern  ] Axiom 'memcmp_zero'
             Unverifiable but considered Valid.
 [ Extern  ] Axiom 'memset_def'
+            Unverifiable but considered Valid.
+[ Extern  ] Axiom 'never_allocable'
             Unverifiable but considered Valid.
 [ Extern  ] Axiom 'strchr_def'
             Unverifiable but considered Valid.
@@ -898,6 +902,25 @@
             by Frama-C kernel.
 
 --------------------------------------------------------------------------------
+--- Properties of Function 'asprintf'
+--------------------------------------------------------------------------------
+
+[ Extern  ] Post-condition 'result_error_or_written_byes'
+            Unverifiable but considered Valid.
+[ Extern  ] Assigns (file share/libc/stdio.h, line 593)
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file share/libc/stdio.h, line 593)
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file share/libc/stdio.h, line 594)
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file share/libc/stdio.h, line 595)
+            Unverifiable but considered Valid.
+[  Valid  ] Default behavior
+            by Frama-C kernel.
+[ Extern  ] Frees/Allocates nothing/(file share/libc/stdio.h, line 598) 
+            Unverifiable but considered Valid.
+
+--------------------------------------------------------------------------------
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
@@ -911,8 +934,8 @@
 --------------------------------------------------------------------------------
 --- Status Report Summary
 --------------------------------------------------------------------------------
-    74 Completely validated
-   214 Considered valid
+    76 Completely validated
+   221 Considered valid
      1 To be validated
-   289 Total
+   298 Total
 --------------------------------------------------------------------------------

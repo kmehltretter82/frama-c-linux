@@ -137,12 +137,35 @@
 [eva] tests/libc/stdio_h.c:49: 
   function fclose: precondition 'valid_stream' got status valid.
 [eva] Done for function fclose
+[eva] computing for function asprintf <- main.
+  Called from tests/libc/stdio_h.c:52.
+[eva] using specification for function asprintf
+[eva:libc:unsupported-spec] tests/libc/stdio_h.c:52: Warning: 
+  The specification of function 'asprintf' is currently not supported by Eva.
+  Consider adding 'share/libc/stdio.c' to the analyzed source files.
+[eva] tests/libc/stdio_h.c:52: Warning: ignoring unsupported \allocates clause
+[eva] tests/libc/stdio_h.c:52: 
+  function asprintf: precondition 'valid_strp' got status valid.
+[eva] tests/libc/stdio_h.c:52: 
+  function asprintf: precondition 'valid_fmt' got status valid.
+[eva] Done for function asprintf
+[eva:alarm] tests/libc/stdio_h.c:54: Warning: 
+  accessing uninitialized left-value. assert \initialized(&s);
+[eva] computing for function printf_va_2 <- main.
+  Called from tests/libc/stdio_h.c:54.
+[eva] using specification for function printf_va_2
+[eva:alarm] tests/libc/stdio_h.c:54: Warning: 
+  function printf_va_2: precondition valid_read_string(param0) got status invalid.
+[eva] tests/libc/stdio_h.c:54: 
+  function printf_va_2: no state left, precondition valid_read_string(format) got status valid.
+[eva] Done for function printf_va_2
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_errno ∈ [--..--]
   __fc_fopen[0..15] ∈ [--..--]
+  __fc_heap_status ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   f ∈ {{ NULL ; &__fc_fopen + [0..120],0%8 }}
   r ∈ [--..--]
@@ -154,5 +177,6 @@
   fgets_res ∈ {{ NULL ; &fgets_buf0[0] }}
   pos ∈ [--..--] or UNINITIALIZED
   res_fclose ∈ {-1; 0}
-  __retres ∈ {0; 1; 2; 3}
+  s ∈ [--..--] or UNINITIALIZED
+  __retres ∈ {1; 2; 3}
   S___fc_stdout[0..1] ∈ [--..--]

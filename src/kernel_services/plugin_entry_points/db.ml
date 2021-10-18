@@ -715,8 +715,6 @@ module Value = struct
          returning void (the case when the kf corresponds to a declaration *)
       raise Void_Function
 
-  exception Aborted
-
   let display = mk_fun "Value.display"
 
   let emitter = ref Emitter.dummy

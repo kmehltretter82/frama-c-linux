@@ -583,6 +583,22 @@ extern int pclose(FILE *stream);
 ssize_t getline(char **lineptr, size_t *n, FILE *stream);
 #endif
 
+// Non-POSIX; allocates memory, so requires 'stdio.c' to be included
+
+#include "__fc_alloc_axiomatic.h"
+
+/*@
+  requires valid_strp: \valid(strp);
+  requires valid_fmt: valid_read_string(fmt);
+  assigns __fc_heap_status \from indirect:fmt[0 ..], __fc_heap_status;
+  assigns \result \from indirect:fmt[0 ..], indirect:__fc_heap_status;
+  assigns *strp \from fmt[0 ..], indirect:__fc_heap_status;
+  //missing: variadic arguments
+  ensures result_error_or_written_byes: \result == -1 || \result >= 0;
+  allocates *strp;
+*/
+int asprintf(char **strp, const char *fmt, ...);
+
 __END_DECLS
 
 #define IOV_MAX 1024

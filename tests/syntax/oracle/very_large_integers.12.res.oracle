@@ -1,11 +1,11 @@
 [kernel] Parsing tests/syntax/very_large_integers.c (with preprocessing)
-[kernel] tests/syntax/very_large_integers.c:67: User Error: 
-  Invalid attribute constant: 0x80000000000000000
 [kernel] tests/syntax/very_large_integers.c:72: Warning: 
   ignoring invalid aligned attribute: __aligned__(9223372036854775808)
 [kernel] tests/syntax/very_large_integers.c:72: Warning: 
   ignoring invalid aligned attribute: __aligned__((9223372036854775808)+
                                                    (9223372036854775808) )
+[kernel] tests/syntax/very_large_integers.c:98: User Error: 
+  Invalid digit 9 in integer literal '09' in base 8.
 [kernel] User Error: stopping on file "tests/syntax/very_large_integers.c" that has errors. Add
   '-kernel-msg-key pp' for preprocessing command.
 [kernel] Frama-C aborted: invalid user input.

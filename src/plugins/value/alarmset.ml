@@ -423,10 +423,7 @@ let emit_alarms kinstr map =
   let sorted_list = List.sort cmp list in
   List.iter (fun (alarm, status) -> emit_alarm kinstr alarm status) sorted_list;
   if Alarm_cache.length () >= Value_parameters.StopAtNthAlarm.get ()
-  then begin
-    Value_parameters.log "Stopping at nth alarm" ;
-    raise Db.Value.Aborted
-  end
+  then Value_parameters.abort "Stopping at nth alarm"
 
 let emit kinstr = function
   | Just map -> if not (M.is_empty map) then emit_alarms kinstr map

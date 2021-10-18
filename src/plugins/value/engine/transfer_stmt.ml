@@ -315,7 +315,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       (* Changed by compute_call_ref, called from process_call *)
       Cil.CurrentLoc.set (Cil_datatype.Stmt.loc stmt);
     in
-    try
+    let process () =
       let domain_valuation = Eval.to_domain_valuation valuation in
       let res =
         (* Process the call according to the domain decision. *)
@@ -328,10 +328,9 @@ module Make (Abstract: Abstractions.Eva) = struct
       in
       cleanup ();
       res
-    with Db.Value.Aborted as e ->
-      InOutCallback.clear ();
-      cleanup ();
-      raise e
+    in
+    Value_util.protect process
+      ~cleanup:(fun () -> InOutCallback.clear (); cleanup ())
 
   (* ------------------- Retro propagation on formals ----------------------- *)
 

@@ -107,6 +107,22 @@ module DegenerationPoints =
       let dependencies = [ Db.Value.self ]
     end)
 
+let protect_only_once = ref true
+
+let protect f ~cleanup =
+  let catch () = !protect_only_once && not (Kernel.SaveState.is_empty ()) in
+  try f ();
+  with
+  | Log.AbortError _ | Log.AbortFatal _ | Log.FeatureRequest _
+  | Sys.Break as e when catch () ->
+    try
+      Value_parameters.feedback ~once:true "Clean up and save partial results.";
+      cleanup ();
+      raise e;
+    with e ->
+      protect_only_once := false;
+      raise e
+
 let register_new_var v typ =
   if Cil.isFunctionType typ then
     Globals.Functions.replace_by_declaration (Cil.empty_funspec()) v v.vdecl

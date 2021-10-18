@@ -24,28 +24,5 @@
 [eva] tests/builtins/watch.c:17: Watchpoint: & c [--..--]
 [eva] tests/builtins/watch.c:18: Watchpoint: & c [--..--]
 [eva] tests/builtins/watch.c:19: Watchpoint: & c [--..--]
-[eva] User Error: Degeneration occurred:
-  results are not correct for lines of code that can be reached from the degeneration point.
-[from] Computing for function main
-[from] Computing for function Frama_C_watch_value <-main
-[from] Done for function Frama_C_watch_value
-[from] Computing for function u <-main
-[from] Done for function u
-[from] Non-terminating function main (no dependencies)
-[from] Done for function main
-[from] ====== DEPENDENCIES COMPUTED ======
-  These dependencies hold at termination for the executions that terminate:
-[from] Function Frama_C_watch_value:
-  c FROM c; x_1; x_2; x_3 (and SELF)
-  \result FROM c; x_1; x_2; x_3
-[from] Function u:
-  \result FROM \nothing
-[from] Function main:
-  NON TERMINATING - NO EFFECTS
-[from] ====== END OF DEPENDENCIES ======
-[inout] Out (internal) for function main:
-    x; c
-[inout] Inputs for function main:
-    x
-[eva] User Error: Deferred error message was emitted during execution. See above messages for more information.
+[eva] User Error: Watchpoint builtin: countdown to zero
 [kernel] Plug-in eva aborted: invalid user input.

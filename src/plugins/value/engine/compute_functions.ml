@@ -113,20 +113,25 @@ let post_analysis () =
   (* Remove redundant alarms *)
   if Value_parameters.RmAssert.get () then !Db.Value.rm_asserts ()
 
-(* Register a signal handler for SIGUSR1, that will be used to abort Value *)
-let () =
-  let prev = ref (fun _ -> ()) in
-  let handler (_signal: int) =
-    !prev Sys.sigusr1; (* Call previous signal handler *)
-    Value_parameters.warning "Stopping analysis at user request@.";
-    Iterator.signal_abort ()
+(* Registers signal handlers for SIGUSR1 and SIGINT to cleanly abort the Eva
+   analysis. Returns a function that restores previous signal behaviors after
+   the analysis. *)
+let register_signal_handler () =
+  let warn () =
+    Value_parameters.warning ~once:true "Stopping analysis at user request@."
   in
-  try
-    match Sys.signal Sys.sigusr1 (Sys.Signal_handle handler) with
-    | Sys.Signal_default | Sys.Signal_ignore -> ()
-    | Sys.Signal_handle f -> prev := f
-  with Invalid_argument _ -> () (* Ignore: SIGURSR1 is not available on Windows,
-                                   and possibly on other platforms. *)
+  let stop _ = warn (); Iterator.signal_abort () in
+  let interrupt _ = warn (); raise Sys.Break in
+  let register_handler signal handler =
+    match Sys.signal signal (Sys.Signal_handle handler) with
+    | previous_behavior -> fun () -> Sys.set_signal signal previous_behavior
+    | exception Invalid_argument _ -> fun () -> ()
+    (* Ignore: SIGURSR1 is not available on Windows,
+       and possibly on other platforms. *)
+  in
+  let restore_sigusr1 = register_handler Sys.sigusr1 stop in
+  let restore_sigint = register_handler Sys.sigint interrupt in
+  fun () -> restore_sigusr1 (); restore_sigint ()
 
 module Make (Abstract: Abstractions.Eva) = struct
 
@@ -327,7 +332,8 @@ module Make (Abstract: Abstractions.Eva) = struct
     Db.Value.Call_Value_Callbacks.apply (cvalue_state, [kf, Kglobal])
 
   let compute kf init_state =
-    try
+    let restore_signals = register_signal_handler () in
+    let compute () =
       Value_util.push_call_stack kf Kglobal;
       store_initial_state kf init_state;
       let call =
@@ -344,16 +350,13 @@ module Make (Abstract: Abstractions.Eva) = struct
       post_analysis ();
       Abstract.Dom.post_analysis final_state;
       Value_results.print_summary ();
-    with
-    | Db.Value.Aborted ->
+      restore_signals ()
+    in
+    let cleanup () =
       Abstract.Dom.Store.mark_as_computed ();
-      post_analysis_cleanup ~aborted:true;
-      (* Signal that a degeneration occurred *)
-      if Value_util.DegenerationPoints.length () > 0 then
-        Value_parameters.error
-          "Degeneration occurred:@\nresults are not correct for lines of code \
-           that can be reached from the degeneration point.@."
-
+      post_analysis_cleanup ~aborted:true
+    in
+    Value_util.protect compute ~cleanup
 
   let compute_from_entry_point kf ~lib_entry =
     pre_analysis ();
@@ -361,10 +364,9 @@ module Make (Abstract: Abstractions.Eva) = struct
       (if lib_entry then "n in" else " ")
       Kernel_function.pretty kf;
     let initial_state =
-      try Init.initial_state_with_formals ~lib_entry kf
-      with Db.Value.Aborted ->
-        post_analysis_cleanup ~aborted:true;
-        Value_parameters.abort "Degeneration occurred during initialization, aborting."
+      Value_util.protect
+        (fun () -> Init.initial_state_with_formals ~lib_entry kf)
+        ~cleanup:(fun () -> post_analysis_cleanup ~aborted:true)
     in
     match initial_state with
     | `Bottom ->

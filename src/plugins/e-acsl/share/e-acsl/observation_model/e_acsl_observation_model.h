@@ -37,7 +37,7 @@
 #include "../internals/e_acsl_alias.h"
 #include "e_acsl_heap.h"
 
-#ifdef __FC_STDLIB
+#ifdef __FC_FEATURES_H
 #  include <__fc_alloc_axiomatic.h>
 #else
 /*@ ghost extern int __fc_heap_status; */
