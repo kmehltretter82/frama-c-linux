@@ -54,6 +54,30 @@ dev-stripped: Dockerfile.dev
 	docker build . -t framac/frama-c:dev-stripped --target frama-c-stripped -f $^ $(ARGS)
 TARGETS += dev-stripped
 
+release: Dockerfile.dev Dockerfile.template
+	@export archive="frama-c-$$(cat ../../VERSION)-$$(cat ../../VERSION_CODENAME).tar.gz"; \
+	if [ ! -e "$$archive" ]; then \
+		echo "error: $$archive not found; run 'make src-distrib' and put the .tar.gz in this directory."; \
+		exit 1; \
+	fi; \
+	docker build . -t framac/frama-c:release --target frama-c-slim --build-arg=from_archive="$$archive" -f $<
+	@echo "Now run: 'docker tag framac/frama-c:release framac/frama-c:<version>'"
+TARGETS += release
+
+release-gui: Dockerfile.dev
+	@echo "For 'dev' builds, consider adding ARGS=--no-cache to force"
+	@echo "Docker to rebuild all layers."
+	docker build . -t framac/frama-c-gui:release --target frama-c-gui-slim -f $^ $(ARGS)
+	@echo "Now run: 'docker tag framac/frama-c-gui:release framac/frama-c-gui:<version>'"
+TARGETS += release-gui
+
+release-stripped: Dockerfile.dev
+	@echo "For 'dev' builds, consider adding ARGS=--no-cache to force"
+	@echo "Docker to rebuild all layers."
+	docker build . -t framac/frama-c:release-stripped --target frama-c-stripped -f $^ $(ARGS)
+	@echo "Now run: 'docker tag framac/frama-c:release-stripped framac/frama-c:<version>-stripped'"
+TARGETS += release-stripped
+
 # Note: alpine-3.14 has Z3 version 4.8.11, which is not supported in some
 # versions of Why3, so we remain with alpine-3.13 for now.
 Dockerfile.dev: Makefile Dockerfile.template env.template
