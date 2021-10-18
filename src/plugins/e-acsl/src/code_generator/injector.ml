@@ -60,6 +60,18 @@ let rename_caller ~loc caller args =
     in
     fvi, args
   end
+  else if Functions.Concurrency.has_replacement caller.vorig_name then
+    if Options.Concurrency.get () then
+      let fvi =
+        Rtl.Symbols.replacement
+          ~get_name:Functions.Concurrency.replacement_name
+          caller
+      in
+      fvi, args
+    else begin
+      Memory_tracking.found_concurrent_function ~loc caller;
+      caller, args
+    end
   else if Options.Validate_format_strings.get ()
        && Functions.Libc.is_printf_name caller.vorig_name then
     (* rewrite names of format functions (such as printf). This case differs

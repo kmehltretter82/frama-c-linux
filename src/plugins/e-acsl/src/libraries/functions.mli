@@ -181,6 +181,20 @@ module Libc: sig
 
 end (* Libc *)
 
+(* ************************************************************************** *)
+(** {2 Concurrency} Operations concerning the support of concurrency *)
+(* ************************************************************************** *)
+
+module Concurrency: sig
+  val has_replacement: string -> bool
+  (** Given the name of C library function return true if there is a drop-in
+      replacement function for it in the RTL. *)
+
+  val replacement_name: string -> string
+  (** Given the name of C library function return the name of the RTL function
+      that potentially replaces it. *)
+end (* Concurrency *)
+
 (*
 Local Variables:
 compile-command: "make -C ../../../../.."

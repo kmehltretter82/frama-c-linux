@@ -212,6 +212,15 @@ module Libc = struct
 
 end
 
+module Concurrency = struct
+  let has_replacement fn =
+    match fn with
+    | "pthread_create" -> true
+    | _ -> false
+
+  let replacement_name fn = RTL.api_prefix ^ fn
+end
+
 let check kf =
   (* [kf] is monitored iff all functions must be monitored or [kf] belongs to
      the white list *)
