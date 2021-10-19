@@ -88,10 +88,9 @@ module Make_Dataflow
 
   (* Ideally, the slevel parameter should not be used anymore in this file
      but it is still required for logic interpretation *)
-  let slevel, call_return_policy =
+  let slevel =
     let module P = Partitioning_parameters.Make (AnalysisParam) in
-    P.slevel,
-    P.call_return_policy
+    P.slevel
 
 
   (* --- Abstract values storage --- *)
@@ -282,8 +281,7 @@ module Make_Dataflow
       (* Propagate info that the current call cannot be cached either *)
       cacheable := Eval.NoCacheCallers;
     (* Recombine callee partitioning keys with caller key *)
-    let recombine = Partition.Key.recombine ~policy:call_return_policy in
-    List.map (fun (k, s) -> recombine ~caller:key ~callee:k, s) result
+    Partitioning.call_return ~caller:key result
 
   let transfer_instr (stmt : stmt) (instr : instr) : transfer_function =
     match instr with

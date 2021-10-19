@@ -175,6 +175,10 @@ struct
           then apply (Restrict (return_exp, i))
           else apply (Ration empty_rationing)
 
+  let call_return ~caller result =
+    let combine = Partition.Key.combine ~policy:call_return_policy in
+    List.map (fun (k, s) -> combine ~caller ~callee:k, s) result
+
   (* Reset state (for hierchical convergence) *)
 
   let reset_store (s : store) : unit =

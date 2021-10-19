@@ -81,6 +81,12 @@ sig
   val next_loop_iteration : flow -> Cil_types.stmt -> flow
   val split_return : flow -> Cil_types.exp option -> flow
 
+  (** After the analysis of a function call, recombines callee partitioning keys
+      with the caller key. *)
+  val call_return:
+    caller:Partition.key ->
+    (Partition.key * state) list -> (Partition.key * state) list
+
   (* --- Operators --- *)
 
   (** Remove all states from the tank, leaving it empty as if it was just

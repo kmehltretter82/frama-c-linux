@@ -247,7 +247,7 @@ struct
 
   let exceed_rationing key = key.ration_stamp = None
 
-  let recombine ~policy ~caller ~callee =
+  let combine ~policy ~caller ~callee =
     let keep_second _ v1 v2 =
       match v1, v2 with
       | None, None -> None
