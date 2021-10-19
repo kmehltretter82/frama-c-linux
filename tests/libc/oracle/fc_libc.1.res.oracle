@@ -4559,6 +4559,12 @@ extern ssize_t readv(int fd, struct iovec const *iov, int iovcnt);
           \initialized(&(iov + i)->iov_base) ∧
           \initialized(&(iov + i)->iov_len);
     requires valid_read_iov: \valid_read(iov + (0 .. iovcnt - 1));
+    requires
+      valid_read_iov_bases:
+        ∀ ℤ i;
+          0 ≤ i < iovcnt ⇒
+          \valid_read((char *)(iov + i)->iov_base +
+                      (0 .. (iov + i)->iov_len - 1));
     requires bounded_iovcnt: 0 ≤ iovcnt ≤ 1024;
     requires
       bounded_lengths:

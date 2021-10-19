@@ -3,65 +3,92 @@
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
-  
+  nondet ∈ [--..--]
 [eva] computing for function __va_open_mode_t <- main.
   Called from tests/libc/sys_uio_h.c:17.
 [eva] using specification for function __va_open_mode_t
 [eva] tests/libc/sys_uio_h.c:17: 
   function __va_open_mode_t: precondition 'valid_filename' got status valid.
 [eva] Done for function __va_open_mode_t
+[eva] tests/libc/sys_uio_h.c:19: assertion got status valid.
+[eva] tests/libc/sys_uio_h.c:20: assertion got status valid.
+[eva] tests/libc/sys_uio_h.c:21: assertion got status valid.
 [eva] computing for function writev <- main.
-  Called from tests/libc/sys_uio_h.c:19.
+  Called from tests/libc/sys_uio_h.c:22.
 [eva] using specification for function writev
-[eva] tests/libc/sys_uio_h.c:19: 
+[eva] tests/libc/sys_uio_h.c:22: 
   function writev: precondition 'valid_fd' got status valid.
-[eva] tests/libc/sys_uio_h.c:19: 
+[eva] tests/libc/sys_uio_h.c:22: 
   function writev: precondition 'initialization,initialized_inputs' got status valid.
-[eva] tests/libc/sys_uio_h.c:19: 
+[eva] tests/libc/sys_uio_h.c:22: 
   function writev: precondition 'valid_read_iov' got status valid.
-[eva] tests/libc/sys_uio_h.c:19: 
+[eva:alarm] tests/libc/sys_uio_h.c:22: Warning: 
+  function writev: precondition 'valid_read_iov_bases' got status unknown.
+[eva] tests/libc/sys_uio_h.c:22: 
   function writev: precondition 'bounded_iovcnt' got status valid.
-[eva] share/libc/sys/uio.h:64: 
+[eva] share/libc/sys/uio.h:67: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function \sum
-[eva:alarm] tests/libc/sys_uio_h.c:19: Warning: 
+[eva:alarm] tests/libc/sys_uio_h.c:22: Warning: 
   function writev: precondition 'bounded_lengths' got status unknown.
-[eva] share/libc/sys/uio.h:69: 
+[eva] share/libc/sys/uio.h:72: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function \sum
 [eva] Done for function writev
 [eva] computing for function close <- main.
-  Called from tests/libc/sys_uio_h.c:20.
+  Called from tests/libc/sys_uio_h.c:23.
 [eva] using specification for function close
-[eva] tests/libc/sys_uio_h.c:20: 
+[eva] tests/libc/sys_uio_h.c:23: 
   function close: precondition 'valid_fd' got status valid.
 [eva] Done for function close
 [eva] computing for function __va_open_void <- main.
-  Called from tests/libc/sys_uio_h.c:21.
+  Called from tests/libc/sys_uio_h.c:24.
 [eva] using specification for function __va_open_void
-[eva] tests/libc/sys_uio_h.c:21: 
+[eva] tests/libc/sys_uio_h.c:24: 
   function __va_open_void: precondition 'valid_filename' got status valid.
-[eva] tests/libc/sys_uio_h.c:21: 
+[eva] tests/libc/sys_uio_h.c:24: 
   function __va_open_void: precondition 'flag_not_CREAT' got status valid.
 [eva] Done for function __va_open_void
 [eva] computing for function readv <- main.
-  Called from tests/libc/sys_uio_h.c:22.
+  Called from tests/libc/sys_uio_h.c:25.
 [eva] using specification for function readv
-[eva:alarm] tests/libc/sys_uio_h.c:22: Warning: 
+[eva:alarm] tests/libc/sys_uio_h.c:25: Warning: 
   function readv: precondition 'valid_fd' got status unknown.
-[eva] tests/libc/sys_uio_h.c:22: 
+[eva] tests/libc/sys_uio_h.c:25: 
   function readv: precondition 'initialization,initialized_inputs' got status valid.
-[eva:alarm] tests/libc/sys_uio_h.c:22: Warning: 
+[eva:alarm] tests/libc/sys_uio_h.c:25: Warning: 
   function readv: precondition 'valid_iov' got status unknown.
-[eva] tests/libc/sys_uio_h.c:22: 
+[eva] tests/libc/sys_uio_h.c:25: 
   function readv: precondition 'bounded_iovcnt' got status valid.
 [eva] share/libc/sys/uio.h:52: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function \sum
 [eva] Done for function readv
 [eva] computing for function close <- main.
-  Called from tests/libc/sys_uio_h.c:23.
-[eva] tests/libc/sys_uio_h.c:23: 
+  Called from tests/libc/sys_uio_h.c:26.
+[eva] tests/libc/sys_uio_h.c:26: 
   function close: precondition 'valid_fd' got status valid.
 [eva] Done for function close
-[eva:alarm] tests/libc/sys_uio_h.c:24: Warning: 
+[eva] computing for function __va_open_mode_t <- main.
+  Called from tests/libc/sys_uio_h.c:37.
+[eva] tests/libc/sys_uio_h.c:37: 
+  function __va_open_mode_t: precondition 'valid_filename' got status valid.
+[eva] Done for function __va_open_mode_t
+[eva] computing for function writev <- main.
+  Called from tests/libc/sys_uio_h.c:39.
+[eva] tests/libc/sys_uio_h.c:39: 
+  function writev: precondition 'valid_fd' got status valid.
+[eva] tests/libc/sys_uio_h.c:39: 
+  function writev: precondition 'initialization,initialized_inputs' got status valid.
+[eva] tests/libc/sys_uio_h.c:39: 
+  function writev: precondition 'valid_read_iov' got status valid.
+[eva:alarm] tests/libc/sys_uio_h.c:39: Warning: 
+  function writev: precondition 'valid_read_iov_bases' got status unknown.
+[eva] tests/libc/sys_uio_h.c:39: 
+  function writev: precondition 'bounded_iovcnt' got status valid.
+[eva:alarm] tests/libc/sys_uio_h.c:39: Warning: 
+  function writev: precondition 'bounded_lengths' got status unknown.
+[eva] Done for function writev
+[eva:alarm] tests/libc/sys_uio_h.c:40: Warning: 
+  assertion 'unreachable' got status invalid (stopping propagation).
+[eva:alarm] tests/libc/sys_uio_h.c:43: Warning: 
   signed overflow. assert w + r ≤ 2147483647;
 [eva] Recording results for main
 [eva] done for function main
