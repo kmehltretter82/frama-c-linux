@@ -426,10 +426,7 @@ let range i a =
 
 let ensures warn i a =
   if warn i
-  then
-    (if Lang.has_gamma () && Wp_parameters.get_overflows ()
-     then Lang.assume (range i a) ;
-     a)
+  then a
   else e_fun (f_to_int i) [a]
 
 let downcast = ensures is_downcast_an_error
