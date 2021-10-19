@@ -42,10 +42,10 @@
 type key
 
 type call_return_policy = {
-  policy_keep_callee_splits: bool;
-  policy_keep_callee_history: bool;
-  policy_keep_caller_history: bool;
-  policy_history_size: int;
+  callee_splits: bool;
+  callee_history: bool;
+  caller_history: bool;
+  history_size: int;
 }
 
 module Key : sig

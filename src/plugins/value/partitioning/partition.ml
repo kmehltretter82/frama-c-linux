@@ -160,10 +160,10 @@ type key = {
 }
 
 type call_return_policy = {
-  policy_keep_callee_splits: bool;
-  policy_keep_callee_history: bool;
-  policy_keep_caller_history: bool;
-  policy_history_size: int;
+  callee_splits: bool;
+  callee_history: bool;
+  caller_history: bool;
+  history_size: int;
 }
 
 module Key =
@@ -255,17 +255,17 @@ struct
     in {
       ration_stamp = None;
       branches =
-        Extlib.list_first_n policy.policy_history_size (
-          (if policy.policy_keep_callee_history then callee.branches else []) @
-          (if policy.policy_keep_caller_history then caller.branches else [])
+        Extlib.list_first_n policy.history_size (
+          (if policy.callee_history then callee.branches else []) @
+          (if policy.caller_history then caller.branches else [])
         );
       loops = caller.loops;
       splits =
-        if policy.policy_keep_callee_splits
+        if policy.callee_splits
         then SplitMap.merge keep_second caller.splits callee.splits
         else caller.splits;
       dynamic_splits =
-        if policy.policy_keep_callee_splits
+        if policy.callee_splits
         then SplitMap.merge keep_second caller.dynamic_splits callee.dynamic_splits
         else caller.dynamic_splits;
     }
