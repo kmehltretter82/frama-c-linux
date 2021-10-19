@@ -4538,8 +4538,12 @@ extern int killpg(pid_t pgrp, int sig);
         \result ≡ -1 ∨
         (0 ≤ \result ≤
          \sum(0, \old(iovcnt) - 1, \lambda ℤ k; (\old(iov) + k)->iov_len));
-    assigns *((char *)(iov + (0 .. iovcnt - 1))->iov_base + (0 ..)), \result;
-    assigns *((char *)(iov + (0 .. iovcnt - 1))->iov_base + (0 ..))
+    assigns {*((char *)(iov + i)->iov_base + j) |
+             ℤ i, ℤ j; 0 ≤ i < iovcnt ∧ 0 ≤ j < (iov + i)->iov_len},
+            \result;
+    assigns
+    {*((char *)(iov + i)->iov_base + j) |
+     ℤ i, ℤ j; 0 ≤ i < iovcnt ∧ 0 ≤ j < (iov + i)->iov_len}
       \from (indirect: fd), (indirect: iovcnt), (indirect: __fc_fds[fd]);
     assigns \result
       \from (indirect: fd), (indirect: __fc_fds[fd]),
