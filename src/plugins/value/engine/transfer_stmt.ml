@@ -32,19 +32,19 @@ module type S = sig
   val assume: state -> stmt -> exp -> bool -> state or_bottom
   val call:
     stmt -> lval option -> exp -> exp list -> state ->
-    state list or_bottom * Eval.cacheable
+    (Partition.key * state) list * Eval.cacheable
   val check_unspecified_sequence:
     stmt ->
     state -> (stmt * lval list * lval list * lval list * stmt ref list) list ->
     unit or_bottom
   val enter_scope: kernel_function -> varinfo list -> state -> state
   type call_result = {
-    states: state list or_bottom;
+    states: (Partition.key * state) list;
     cacheable: Eval.cacheable;
     builtin: bool;
   }
   val compute_call_ref:
-    (stmt -> (loc, value) call -> recursion option ->state -> call_result) ref
+    (stmt -> (loc, value) call -> recursion option -> state -> call_result) ref
 end
 
 (* Reference filled in by the callwise-inout callback *)
@@ -296,14 +296,15 @@ module Make (Abstract: Abstractions.Eva) = struct
   (* ------------------------------------------------------------------------ *)
 
   type call_result = {
-    states: state list or_bottom;
+    states: (Partition.key * state) list;
     cacheable: cacheable;
     builtin: bool;
   }
 
   (* Forward reference to [Eval_funs.compute_call] *)
   let compute_call_ref :
-    (stmt -> (loc, value) call -> recursion option -> state -> call_result) ref
+    (stmt -> (loc, value) call -> recursion option -> state ->
+     call_result) ref
     = ref (fun _ -> assert false)
 
   (* Returns the result of a call, and a boolean that indicates whether a
@@ -324,7 +325,7 @@ module Make (Abstract: Abstractions.Eva) = struct
           Domain.Store.register_initial_state (Value_util.call_stack ()) state;
           !compute_call_ref stmt call recursion state
         | `Bottom ->
-          { states = `Bottom; cacheable = Cacheable; builtin=false }
+          { states = []; cacheable = Cacheable; builtin=false }
       in
       cleanup ();
       res
@@ -460,8 +461,6 @@ module Make (Abstract: Abstractions.Eva) = struct
     let pre = state in
     (* Process the call according to the domain decision. *)
     let call_result = process_call stmt call recursion valuation state in
-    call_result.cacheable,
-    call_result.states >>- fun result ->
     let leaving_vars = leaving_vars kf_callee in
     (* Do not try to reduce concrete arguments if a builtin was used. *)
     let gather_reduced_arguments =
@@ -488,11 +487,11 @@ module Make (Abstract: Abstractions.Eva) = struct
     in
     let states =
       List.fold_left
-        (fun acc return -> Bottom.add_to_list (process return) acc)
-        [] result
+        (fun acc (k,x) -> Bottom.add_to_list (process x >>-: fun y -> k,y) acc)
+        [] call_result.states
     in
     InOutCallback.clear ();
-    Bottom.bot_of_list states
+    call_result.cacheable, states
 
 
   (* ------------------- Evaluation of the arguments ------------------------ *)
@@ -747,39 +746,40 @@ module Make (Abstract: Abstractions.Eva) = struct
     Alarmset.emit ki_call alarms;
     let cacheable = ref Cacheable in
     let eval =
-      functions >>- fun functions ->
+      functions >>-: fun functions ->
       let current_kf = Value_util.current_kf () in
       let process_one_function kf valuation =
         (* The special Frama_C_ functions to print states are handled here. *)
         if apply_special_directives ~subdivnb kf args state
         then
           let () = apply_cvalue_callback kf ki_call state in
-          `Value ([state])
+          [(Partition.Key.empty, state)]
         else
           (* Create the call. *)
           let eval, alarms = make_call ~subdivnb kf args valuation state in
           Alarmset.emit ki_call alarms;
-          eval >>- fun (call, recursion, valuation) ->
-          (* Register the call. *)
-          Value_results.add_kf_caller call.kf ~caller:(current_kf, stmt);
-          (* Do the call. *)
-          let c, states =
-            do_one_call valuation stmt lval_option call recursion state
+          let states =
+            eval >>-: fun (call, recursion, valuation) ->
+            (* Register the call. *)
+            Value_results.add_kf_caller call.kf ~caller:(current_kf, stmt);
+            (* Do the call. *)
+            let c, states =
+              do_one_call valuation stmt lval_option call recursion state
+            in
+            (* If needed, propagate that callers cannot be cached. *)
+            if c = NoCacheCallers then
+              cacheable := NoCacheCallers;
+            states
           in
-          (* If needed, propagate that callers cannot be cached. *)
-          if c = NoCacheCallers then
-            cacheable := NoCacheCallers;
-          states
+          Bottom.list_of_bot states
       in
       (* Process each possible function apart, and append the result list. *)
       let process acc (kf, valuation) =
-        let res = process_one_function kf valuation in
-        (Bottom.list_of_bot res) @ acc
+        process_one_function kf valuation @ acc
       in
-      let states_list = List.fold_left process [] functions in
-      Bottom.bot_of_list states_list
+      List.fold_left process [] functions
     in
-    eval, !cacheable
+    Bottom.list_of_bot eval, !cacheable
 
   (* ------------------------------------------------------------------------ *)
   (*                            Unspecified Sequence                          *)
