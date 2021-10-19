@@ -252,7 +252,12 @@ struct
       match v1, v2 with
       | None, None -> None
       | Some x, None | (Some _ | None), Some x -> Some x
-    in {
+    in
+    (* There is no need to preserve the uniqueness of ration stamps here, as
+       keys will always be given new stamps before the merge of identical keys.
+       This invariant depends on the sequence of operations performed by
+       the iterator and the trace_partitioning. *)
+    {
       ration_stamp = None;
       branches =
         Extlib.list_first_n policy.history_size (
