@@ -220,13 +220,13 @@ $(EACSL_PLUGIN_DIR)/tests/test_config: \
 		$(EACSL_PLUGIN_DIR)/tests/test_config.in \
 		$(EACSL_PLUGIN_DIR)/Makefile
 	$(PRINT_MAKING) $@
-	$(SED) -e "s|@SEDCMD@|`which sed `|g" $< > $@
+	$(SED) -e "s|@SEDCMD@|`command -v sed`|g" $< > $@
 
 $(EACSL_PLUGIN_DIR)/tests/test_config_dev: \
 		$(EACSL_PLUGIN_DIR)/tests/test_config_dev.in \
 		$(EACSL_PLUGIN_DIR)/Makefile
 	$(PRINT_MAKING) $@
-	$(SED) -e "s|@SEDCMD@|`which sed `|g" $< > $@
+	$(SED) -e "s|@SEDCMD@|`command -v sed`|g" $< > $@
 
 clean::
 	for d in $(E_ACSL_EXTRA_DIRS); do \
