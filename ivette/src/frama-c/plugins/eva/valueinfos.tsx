@@ -33,6 +33,7 @@ import * as States from 'frama-c/states';
 import * as Ast from 'frama-c/api/kernel/ast';
 import { readFile } from 'dome/system';
 import * as Dome from 'dome';
+import * as Path from 'path';
 
 // Locals
 import { EvaAlarm } from './cells';
@@ -57,22 +58,22 @@ interface StmtProps {
 }
 
 export function Stmt(props: StmtProps) {
-  const { rank, stmt, fct, marker } = props;
+  const { rank, stmt, marker } = props;
   const markersInfo = States.useSyncArray(Ast.markerInfo);
   const line = markersInfo.getData(marker)?.sloc?.line;
   const file = markersInfo.getData(marker)?.sloc?.file;
+  const filename = file ? Path.parse(file).base : '';
   const errorMsg = () => { D.error(`Fail to load source code file ${file}`); };
   const onError = () => { if (file) errorMsg(); return ''; };
   const read = () => (file ? readFile(file).catch(onError) : Promise.reject());
   const text = React.useMemo(read, [file, onError]);
   const { result } = Dome.usePromise(text);
   const allLines = result?.split(/\r\n|\n/);
-  const title = allLines ? (line ? `Stmt: ${allLines[line - 1]}` : '') : '';
+  const title = allLines ? (line ? `${allLines[line - 1]}` : '') : '';
   if (rank === undefined || !stmt) return null;
-  // const title = `Stmt at global rank ${rank} (internal id: ${stmt})`;
   return (
     <span className="dome-text-cell eva-stmt" title={title}>
-      @{fct}:{line}
+      @{filename}:{line}
     </span>
   );
 }
