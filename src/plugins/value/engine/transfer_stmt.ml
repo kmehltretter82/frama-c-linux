@@ -753,7 +753,7 @@ module Make (Abstract: Abstractions.Eva) = struct
         if apply_special_directives ~subdivnb kf args state
         then
           let () = apply_cvalue_callback kf ki_call state in
-          [(Partition.Key.zero,state)]
+          [(Partition.Key.empty, state)]
         else
           (* Create the call. *)
           let eval, alarms = make_call ~subdivnb kf args valuation state in

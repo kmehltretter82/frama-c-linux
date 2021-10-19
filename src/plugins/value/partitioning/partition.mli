@@ -50,7 +50,7 @@ type call_return_policy = {
 
 module Key : sig
   include Datatype.S_with_collections with type t = key
-  val zero : t (** Initial key: no partitioning. *)
+  val empty : t (** Initial key: no partitioning. *)
   val exceed_rationing: t -> bool
   val combine : policy:call_return_policy -> caller:t -> callee:t -> t
   (** Recombinaison of keys after a call *)

@@ -177,7 +177,7 @@ struct
   module DSplits = SplitMap.Make (SplitMonitor)
 
   (* Initial key, before any partitioning *)
-  let zero = {
+  let empty = {
     ration_stamp = None;
     branches = [];
     loops = [];
@@ -192,7 +192,7 @@ struct
 
       let name = "Partition.Key"
 
-      let reprs = [ zero ]
+      let reprs = [ empty ]
 
       let structural_descr =
         Structural_descr.t_record [|
@@ -324,7 +324,7 @@ struct
   let empty = []
 
   let initial (p : 'a list) : t =
-    List.map (fun state -> Key.zero, state) p
+    List.map (fun state -> Key.empty, state) p
 
   let to_list (f : t) : state list =
     List.map snd f

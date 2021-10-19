@@ -312,7 +312,7 @@ module Make (Abstract: Abstractions.Eva) = struct
           Builtins.apply_builtin builtin cvalue_call ~pre:cvalue_state ~post
         in
         let insert cvalue_state =
-          Partition.Key.zero,
+          Partition.Key.empty,
           Abstract.Dom.set Cvalue_domain.State.key cvalue_state final_state
         in
         let states = List.map insert cvalue_states in

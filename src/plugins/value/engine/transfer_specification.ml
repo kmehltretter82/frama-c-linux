@@ -582,6 +582,6 @@ module Make
       let states =
         compute_specification ~warn kinstr call.kf call.return spec state
       in
-      List.map (fun s -> Partition.Key.zero, s) (States.to_list states)
+      List.map (fun s -> Partition.Key.empty, s) (States.to_list states)
 
 end
