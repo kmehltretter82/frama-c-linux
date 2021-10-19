@@ -1,8 +1,8 @@
 /* run.config*
    GCC:
-   STDOPT: #"-main cassign_test -eva-partition-history 1 -eva-interprocedural-partitioning-keep-history"
-   STDOPT: #"-main fabs_test -eva-partition-history 1 -eva-domains equality -eva-interprocedural-partitioning-keep-history"
-   STDOPT: #"-main fabs_splits_test -eva-partition-history 1 -eva-domains equality -eva-interprocedural-partitioning-keep-splits"
+   STDOPT: #"-main cassign_test -eva-partition-history 1 -eva-interprocedural-history"
+   STDOPT: #"-main fabs_test -eva-partition-history 1 -eva-domains equality -eva-interprocedural-history"
+   STDOPT: #"-main fabs_splits_test -eva-partition-history 1 -eva-domains equality -eva-interprocedural-splits"
    */
 #include "__fc_builtin.h"
 

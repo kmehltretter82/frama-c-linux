@@ -140,12 +140,11 @@ struct
     in
     List.fold_left map_annot [] (get_flow_annot stmt)
 
-  let call_return_policy = {
-    Partition.callee_splits =
-      Value_parameters.InterproceduralPartitioningKeepSplits.get ();
-    callee_history =
-      Value_parameters.InterproceduralPartitioningKeepHistory.get ();
-    caller_history = true;
-    history_size = history_size;
-  }
+  let call_return_policy =
+    Partition.{
+      callee_splits = Value_parameters.InterproceduralSplits.get ();
+      callee_history = Value_parameters.InterproceduralHistory.get ();
+      caller_history = true;
+      history_size = history_size;
+    }
 end
