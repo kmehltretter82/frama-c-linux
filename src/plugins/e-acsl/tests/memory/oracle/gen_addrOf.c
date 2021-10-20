@@ -39,7 +39,7 @@ int main(void)
   f();
   __e_acsl_assert(& x == & x,1,"Assertion","main","&x == &x",
                   "tests/memory/addrOf.i",16);
-  /*@ assert &x ≡ &x; */ ;
+  /*@ assert &x == &x; */ ;
   __retres = 0;
   __e_acsl_memory_clean();
   return __retres;

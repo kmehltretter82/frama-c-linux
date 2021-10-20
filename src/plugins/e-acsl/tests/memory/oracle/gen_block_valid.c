@@ -63,7 +63,7 @@ int main(int argc, char **argv)
     __e_acsl_assert(! __gen_e_acsl_valid_2,1,"Assertion","main",
                     "!\\valid(p + 1)","tests/memory/block_valid.c",21);
   }
-  /*@ assert ¬\valid(p + 1); */ ;
+  /*@ assert !\valid(p + 1); */ ;
   __e_acsl_full_init((void *)(& p));
   p = & B;
   {
@@ -89,7 +89,7 @@ int main(int argc, char **argv)
     __e_acsl_assert(! __gen_e_acsl_valid_4,1,"Assertion","main",
                     "!\\valid(p + 1)","tests/memory/block_valid.c",26);
   }
-  /*@ assert ¬\valid(p + 1); */ ;
+  /*@ assert !\valid(p + 1); */ ;
   char *pmin = malloc(sizeof(int));
   __e_acsl_store_block((void *)(& pmin),(size_t)8);
   __e_acsl_full_init((void *)(& pmin));
@@ -150,7 +150,7 @@ int main(int argc, char **argv)
     __e_acsl_assert(! __gen_e_acsl_valid_7,1,"Assertion","main",
                     "!\\valid(pmin + diff)","tests/memory/block_valid.c",47);
   }
-  /*@ assert ¬\valid(pmin + diff); */ ;
+  /*@ assert !\valid(pmin + diff); */ ;
   {
     int __gen_e_acsl_valid_8;
     __gen_e_acsl_valid_8 = __e_acsl_valid((void *)(pmax - diff),sizeof(char),
@@ -158,7 +158,7 @@ int main(int argc, char **argv)
     __e_acsl_assert(! __gen_e_acsl_valid_8,1,"Assertion","main",
                     "!\\valid(pmax - diff)","tests/memory/block_valid.c",49);
   }
-  /*@ assert ¬\valid(pmax - diff); */ ;
+  /*@ assert !\valid(pmax - diff); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(& pmax));
   __e_acsl_delete_block((void *)(& pmin));

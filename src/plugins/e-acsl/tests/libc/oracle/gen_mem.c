@@ -11,9 +11,9 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
         \separated((char *)dest + (0 .. n - 1), (char *)src + (0 .. n - 1));
     ensures
       copied_contents:
-        memcmp{Post, Pre}((char *)\old(dest), (char *)\old(src), \old(n)) ≡
+        memcmp{Post, Pre}((char *)\old(dest), (char *)\old(src), \old(n)) ==
         0;
-    ensures result_ptr: \result ≡ \old(dest);
+    ensures result_ptr: \result == \old(dest);
     assigns *((char *)dest + (0 .. n - 1)), \result;
     assigns *((char *)dest + (0 .. n - 1))
       \from *((char *)src + (0 .. n - 1));
@@ -26,9 +26,9 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
     requires valid_src: valid_read_or_empty(src, n);
     ensures
       copied_contents:
-        memcmp{Post, Pre}((char *)\old(dest), (char *)\old(src), \old(n)) ≡
+        memcmp{Post, Pre}((char *)\old(dest), (char *)\old(src), \old(n)) ==
         0;
-    ensures result_ptr: \result ≡ \old(dest);
+    ensures result_ptr: \result == \old(dest);
     assigns *((char *)dest + (0 .. n - 1)), \result;
     assigns *((char *)dest + (0 .. n - 1))
       \from *((char *)src + (0 .. n - 1));
@@ -37,9 +37,8 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
 void *__gen_e_acsl_memmove(void *dest, void const *src, size_t n);
 
 /*@ requires valid_s: valid_or_empty(s, n);
-    ensures
-      acsl_c_equiv: memset((char *)\old(s), \old(c), \old(n)) ≡ \true;
-    ensures result_ptr: \result ≡ \old(s);
+    ensures acsl_c_equiv: memset((char *)\old(s), \old(c), \old(n)) == \true;
+    ensures result_ptr: \result == \old(s);
     assigns *((char *)s + (0 .. n - 1)), \result;
     assigns *((char *)s + (0 .. n - 1)) \from c;
     assigns \result \from s;
@@ -71,7 +70,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_initialized_2,1,"Assertion","main",
                     "!\\initialized(&a[1])","tests/libc/mem.c",11);
   }
-  /*@ assert ¬\initialized(&a[1]); */ ;
+  /*@ assert !\initialized(&a[1]); */ ;
   __gen_e_acsl_memset((void *)(& a[1]),1,(unsigned long)1);
   {
     int __gen_e_acsl_initialized_3;
@@ -89,7 +88,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_initialized_4,1,"Assertion","main",
                     "!\\initialized((int *)b)","tests/libc/mem.c",16);
   }
-  /*@ assert ¬\initialized((int *)b); */ ;
+  /*@ assert !\initialized((int *)b); */ ;
   {
     int __gen_e_acsl_initialized_5;
     __gen_e_acsl_initialized_5 = __e_acsl_initialized((void *)(& b[1]),
@@ -97,7 +96,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_initialized_5,1,"Assertion","main",
                     "!\\initialized(&b[1])","tests/libc/mem.c",17);
   }
-  /*@ assert ¬\initialized(&b[1]); */ ;
+  /*@ assert !\initialized(&b[1]); */ ;
   {
     int __gen_e_acsl_size;
     int __gen_e_acsl_if;
@@ -119,7 +118,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_initialized_7,1,"Assertion","main",
                     "!\\initialized(&b[4])","tests/libc/mem.c",19);
   }
-  /*@ assert ¬\initialized(&b[4]); */ ;
+  /*@ assert !\initialized(&b[4]); */ ;
   __gen_e_acsl_memcpy((void *)(& c[1]),(void const *)(a),(unsigned long)2);
   {
     int __gen_e_acsl_initialized_8;
@@ -128,7 +127,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_initialized_8,1,"Assertion","main",
                     "!\\initialized((char *)c)","tests/libc/mem.c",23);
   }
-  /*@ assert ¬\initialized((char *)c); */ ;
+  /*@ assert !\initialized((char *)c); */ ;
   {
     int __gen_e_acsl_size_2;
     int __gen_e_acsl_if_2;
@@ -149,7 +148,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_initialized_10,1,"Assertion","main",
                     "!\\initialized(&c[3])","tests/libc/mem.c",25);
   }
-  /*@ assert ¬\initialized(&c[3]); */ ;
+  /*@ assert !\initialized(&c[3]); */ ;
   __gen_e_acsl_memmove((void *)(c),(void const *)(& c[1]),(unsigned long)2);
   {
     int __gen_e_acsl_size_3;
@@ -171,7 +170,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_initialized_12,1,"Assertion","main",
                     "!\\initialized(&c[3])","tests/libc/mem.c",29);
   }
-  /*@ assert ¬\initialized(&c[3]); */ ;
+  /*@ assert !\initialized(&c[3]); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(c));
   __e_acsl_delete_block((void *)(b));
@@ -181,9 +180,8 @@ int main(void)
 }
 
 /*@ requires valid_s: valid_or_empty(s, n);
-    ensures
-      acsl_c_equiv: memset((char *)\old(s), \old(c), \old(n)) ≡ \true;
-    ensures result_ptr: \result ≡ \old(s);
+    ensures acsl_c_equiv: memset((char *)\old(s), \old(c), \old(n)) == \true;
+    ensures result_ptr: \result == \old(s);
     assigns *((char *)s + (0 .. n - 1)), \result;
     assigns *((char *)s + (0 .. n - 1)) \from c;
     assigns \result \from s;
@@ -207,9 +205,9 @@ void *__gen_e_acsl_memset(void *s, int c, size_t n)
     requires valid_src: valid_read_or_empty(src, n);
     ensures
       copied_contents:
-        memcmp{Post, Pre}((char *)\old(dest), (char *)\old(src), \old(n)) ≡
+        memcmp{Post, Pre}((char *)\old(dest), (char *)\old(src), \old(n)) ==
         0;
-    ensures result_ptr: \result ≡ \old(dest);
+    ensures result_ptr: \result == \old(dest);
     assigns *((char *)dest + (0 .. n - 1)), \result;
     assigns *((char *)dest + (0 .. n - 1))
       \from *((char *)src + (0 .. n - 1));
@@ -239,9 +237,9 @@ void *__gen_e_acsl_memmove(void *dest, void const *src, size_t n)
         \separated((char *)dest + (0 .. n - 1), (char *)src + (0 .. n - 1));
     ensures
       copied_contents:
-        memcmp{Post, Pre}((char *)\old(dest), (char *)\old(src), \old(n)) ≡
+        memcmp{Post, Pre}((char *)\old(dest), (char *)\old(src), \old(n)) ==
         0;
-    ensures result_ptr: \result ≡ \old(dest);
+    ensures result_ptr: \result == \old(dest);
     assigns *((char *)dest + (0 .. n - 1)), \result;
     assigns *((char *)dest + (0 .. n - 1))
       \from *((char *)src + (0 .. n - 1));

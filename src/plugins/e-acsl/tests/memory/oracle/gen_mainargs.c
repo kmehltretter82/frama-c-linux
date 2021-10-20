@@ -5,7 +5,7 @@
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@ requires valid_string_s: valid_read_string(s);
-    ensures acsl_c_equiv: \result ≡ strlen(\old(s));
+    ensures acsl_c_equiv: \result == strlen(\old(s));
     assigns \result;
     assigns \result \from (indirect: *(s + (0 ..)));
  */
@@ -45,7 +45,7 @@ int __gen_e_acsl_main(int argc, char **argv)
                     "\\forall int k; 0 <= k <= argc ==> \\valid(argv + k)",
                     "tests/memory/mainargs.c",12);
   }
-  /*@ assert ∀ int k; 0 ≤ k ≤ argc ⇒ \valid(argv + k); */ ;
+  /*@ assert \forall int k; 0 <= k <= argc ==> \valid(argv + k); */ ;
   {
     unsigned long __gen_e_acsl_block_length;
     __e_acsl_mpz_t __gen_e_acsl_block_length_2;
@@ -62,7 +62,7 @@ int __gen_e_acsl_main(int argc, char **argv)
     __gmpz_clear(__gen_e_acsl_block_length_2);
     __gmpz_clear(__gen_e_acsl_);
   }
-  /*@ assert \block_length(argv) ≡ (argc + 1) * sizeof(char *); */ ;
+  /*@ assert \block_length(argv) == (argc + 1) * sizeof(char *); */ ;
   {
     int __gen_e_acsl_valid_read;
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(argv + argc),
@@ -76,7 +76,7 @@ int __gen_e_acsl_main(int argc, char **argv)
     __e_acsl_assert(*(argv + argc) == (char *)0,1,"Assertion","main",
                     "*(argv + argc) == \\null","tests/memory/mainargs.c",15);
   }
-  /*@ assert *(argv + argc) ≡ \null; */ ;
+  /*@ assert *(argv + argc) == \null; */ ;
   {
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
@@ -103,7 +103,7 @@ int __gen_e_acsl_main(int argc, char **argv)
     __e_acsl_assert(! __gen_e_acsl_and,1,"Assertion","main",
                     "!\\valid(*(argv + argc))","tests/memory/mainargs.c",16);
   }
-  /*@ assert ¬\valid(*(argv + argc)); */ ;
+  /*@ assert !\valid(*(argv + argc)); */ ;
   i = 0;
   while (i < argc) {
     {
@@ -171,7 +171,8 @@ int __gen_e_acsl_main(int argc, char **argv)
                         "\\forall int k; 0 <= k <= len ==> \\valid(*(argv + i) + k)",
                         "tests/memory/mainargs.c",20);
       }
-      /*@ assert ∀ int k; 0 ≤ k ≤ len ⇒ \valid(*(argv + i) + k); */ ;
+      /*@ assert \forall int k; 0 <= k <= len ==> \valid(*(argv + i) + k); */
+      ;
     }
     i ++;
   }
@@ -205,7 +206,7 @@ int main(int argc, char **argv)
 }
 
 /*@ requires valid_string_s: valid_read_string(s);
-    ensures acsl_c_equiv: \result ≡ strlen(\old(s));
+    ensures acsl_c_equiv: \result == strlen(\old(s));
     assigns \result;
     assigns \result \from (indirect: *(s + (0 ..)));
  */

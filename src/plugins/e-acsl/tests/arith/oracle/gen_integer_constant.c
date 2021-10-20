@@ -10,16 +10,16 @@ int main(void)
   int x;
   __e_acsl_assert(1,1,"Assertion","main","0 == 0",
                   "tests/arith/integer_constant.i",6);
-  /*@ assert 0 ≡ 0; */ ;
+  /*@ assert 0 == 0; */ ;
   x = 0;
   x ++;
   __e_acsl_assert(1,1,"Assertion","main","0 != 1",
                   "tests/arith/integer_constant.i",8);
-  /*@ assert 0 ≢ 1; */ ;
+  /*@ assert 0 != 1; */ ;
   __e_acsl_assert(1,1,"Assertion","main",
                   "1152921504606846975 == 0xfffffffffffffff",
                   "tests/arith/integer_constant.i",9);
-  /*@ assert 1152921504606846975 ≡ 0xfffffffffffffff; */ ;
+  /*@ assert 1152921504606846975 == 0xfffffffffffffff; */ ;
   {
     __e_acsl_mpz_t __gen_e_acsl_;
     int __gen_e_acsl_eq;
@@ -34,7 +34,7 @@ int main(void)
   }
   /*@
   assert
-  0xffffffffffffffffffffffffffffffff ≡ 0xffffffffffffffffffffffffffffffff;
+  0xffffffffffffffffffffffffffffffff == 0xffffffffffffffffffffffffffffffff;
    */
   ;
   __retres = 0;

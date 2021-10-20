@@ -60,7 +60,7 @@ int main(void)
   f();
   __e_acsl_assert(& x == & x,1,"Assertion","main","&x == &x",
                   "tests/full-mtracking/addrOf.i",16);
-  /*@ assert &x ≡ &x; */ ;
+  /*@ assert &x == &x; */ ;
   __e_acsl_full_init((void *)(& __retres));
   __retres = 0;
   __e_acsl_delete_block((void *)(& x));

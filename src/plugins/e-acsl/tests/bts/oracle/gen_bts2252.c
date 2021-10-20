@@ -9,7 +9,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 /*@ requires valid_nstring_src: valid_read_nstring(src, n);
     requires room_nstring: \valid(dest + (0 .. n - 1));
     requires separation: \separated(dest + (0 .. n - 1), src + (0 .. n - 1));
-    ensures result_ptr: \result ≡ \old(dest);
+    ensures result_ptr: \result == \old(dest);
     ensures initialization: \initialized(\old(dest) + (0 .. \old(n) - 1));
     assigns *(dest + (0 .. n - 1)), \result;
     assigns *(dest + (0 .. n - 1)) \from *(src + (0 .. n - 1));
@@ -17,13 +17,12 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
     
     behavior complete:
       assumes src_fits: strlen(src) < n;
-      ensures equal_after_copy: strcmp(\old(dest), \old(src)) ≡ 0;
+      ensures equal_after_copy: strcmp(\old(dest), \old(src)) == 0;
     
     behavior partial:
-      assumes src_too_long: n ≤ strlen(src);
+      assumes src_too_long: n <= strlen(src);
       ensures
-        equal_prefix:
-          memcmp{Post, Post}(\old(dest), \old(src), \old(n)) ≡ 0;
+        equal_prefix: memcmp{Post, Post}(\old(dest), \old(src), \old(n)) == 0;
  */
 char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
                            size_t n);
@@ -31,7 +30,7 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
 /*@ requires valid_nstring_src: valid_read_nstring(src, n);
     requires room_nstring: \valid(dest + (0 .. n - 1));
     requires separation: \separated(dest + (0 .. n - 1), src + (0 .. n - 1));
-    ensures result_ptr: \result ≡ \old(dest);
+    ensures result_ptr: \result == \old(dest);
     ensures initialization: \initialized(\old(dest) + (0 .. \old(n) - 1));
     assigns *(dest + (0 .. n - 1)), \result;
     assigns *(dest + (0 .. n - 1)) \from *(src + (0 .. n - 1));
@@ -39,13 +38,12 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     
     behavior complete:
       assumes src_fits: strlen(src) < n;
-      ensures equal_after_copy: strcmp(\old(dest), \old(src)) ≡ 0;
+      ensures equal_after_copy: strcmp(\old(dest), \old(src)) == 0;
     
     behavior partial:
-      assumes src_too_long: n ≤ strlen(src);
+      assumes src_too_long: n <= strlen(src);
       ensures
-        equal_prefix:
-          memcmp{Post, Post}(\old(dest), \old(src), \old(n)) ≡ 0;
+        equal_prefix: memcmp{Post, Post}(\old(dest), \old(src), \old(n)) == 0;
  */
 char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
                            size_t n)
@@ -254,7 +252,7 @@ int main(void)
         __e_acsl_assert(! __gen_e_acsl_valid_read,1,"Assertion","main",
                         "!\\valid_read(srcbuf + i)","tests/bts/bts2252.c",17);
       }
-      /*@ assert ¬\valid_read(srcbuf + i); */ ;
+      /*@ assert !\valid_read(srcbuf + i); */ ;
       /*@ assert Eva: mem_access: \valid_read(srcbuf + i); */
       if ((int)*(srcbuf + i) == (int)ch) loc = i;
       i ++;

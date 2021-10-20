@@ -7,14 +7,14 @@ char *__gen_e_acsl_literal_string;
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@ requires valid_name: valid_read_string(name);
-    ensures null_or_valid_result: \result ≡ \null ∨ \valid(\result);
+    ensures null_or_valid_result: \result == \null || \valid(\result);
     assigns \result;
     assigns \result \from __fc_env[0 ..], (indirect: name), *(name + (0 ..));
  */
 char *__gen_e_acsl_getenv(char const *name);
 
 /*@ requires valid_name: valid_read_string(name);
-    ensures null_or_valid_result: \result ≡ \null ∨ \valid(\result);
+    ensures null_or_valid_result: \result == \null || \valid(\result);
     assigns \result;
     assigns \result \from __fc_env[0 ..], (indirect: name), *(name + (0 ..));
  */
@@ -104,7 +104,7 @@ int main(int argc, char const **argv)
                     "g1 == \\null || \\valid(g1)",
                     "tests/temporal/t_getenv.c",13);
   }
-  /*@ assert g1 ≡ \null ∨ \valid(g1); */ ;
+  /*@ assert g1 == \null || \valid(g1); */ ;
   {
     int __gen_e_acsl_or_2;
     if (g2 == (char *)0) __gen_e_acsl_or_2 = 1;
@@ -126,7 +126,7 @@ int main(int argc, char const **argv)
                     "g2 == \\null || \\valid(g2)",
                     "tests/temporal/t_getenv.c",14);
   }
-  /*@ assert g2 ≡ \null ∨ \valid(g2); */ ;
+  /*@ assert g2 == \null || \valid(g2); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(& g2));
   __e_acsl_delete_block((void *)(& g1));

@@ -7,8 +7,8 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 /*@ requires valid_memptr: \valid(memptr);
     requires
       alignment_is_a_suitable_power_of_two:
-        alignment ≥ sizeof(void *) ∧
-        ((size_t)alignment & ((size_t)alignment - 1)) ≡ 0;
+        alignment >= sizeof(void *) &&
+        ((size_t)alignment & ((size_t)alignment - 1)) == 0;
     assigns __fc_heap_status, \result;
     assigns __fc_heap_status
       \from (indirect: alignment), size, __fc_heap_status;
@@ -20,7 +20,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
     behavior allocation:
       assumes can_allocate: is_allocable(size);
       ensures allocation: \fresh{Old, Here}(*\old(memptr),\old(size));
-      ensures result_zero: \result ≡ 0;
+      ensures result_zero: \result == 0;
       assigns __fc_heap_status, \result;
       assigns __fc_heap_status
         \from (indirect: alignment), size, __fc_heap_status;
@@ -29,8 +29,8 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
               (indirect: __fc_heap_status);
     
     behavior no_allocation:
-      assumes cannot_allocate: ¬is_allocable(size);
-      ensures result_non_zero: \result < 0 ∨ \result > 0;
+      assumes cannot_allocate: !is_allocable(size);
+      ensures result_non_zero: \result < 0 || \result > 0;
       assigns \result;
       assigns \result \from (indirect: alignment);
       allocates \nothing;
@@ -85,7 +85,7 @@ int main(int argc, char const **argv)
     __e_acsl_assert(__gen_e_acsl_block_length == 15UL,1,"Assertion","main",
                     "\\block_length(p) == 15","tests/memory/memalign.c",16);
   }
-  /*@ assert \block_length(p) ≡ 15; */ ;
+  /*@ assert \block_length(p) == 15; */ ;
   {
     int __gen_e_acsl_freeable;
     __gen_e_acsl_freeable = __e_acsl_freeable((void *)p);
@@ -109,27 +109,27 @@ int main(int argc, char const **argv)
     __e_acsl_assert(! __gen_e_acsl_and_2,1,"Assertion","main","!\\valid(p)",
                     "tests/memory/memalign.c",19);
   }
-  /*@ assert ¬\valid(p); */ ;
+  /*@ assert !\valid(p); */ ;
   __e_acsl_full_init((void *)(& a));
   a = (char *)aligned_alloc((unsigned long)256,(unsigned long)12);
   __e_acsl_assert(a == (char *)0,1,"Assertion","main","a == \\null",
                   "tests/memory/memalign.c",23);
-  /*@ assert a ≡ \null; */ ;
+  /*@ assert a == \null; */ ;
   __e_acsl_full_init((void *)(& a));
   a = (char *)aligned_alloc((unsigned long)255,(unsigned long)512);
   __e_acsl_assert(a == (char *)0,1,"Assertion","main","a == \\null",
                   "tests/memory/memalign.c",26);
-  /*@ assert a ≡ \null; */ ;
+  /*@ assert a == \null; */ ;
   __e_acsl_full_init((void *)(& a));
   a = (char *)aligned_alloc((unsigned long)0,(unsigned long)512);
   __e_acsl_assert(a == (char *)0,1,"Assertion","main","a == \\null",
                   "tests/memory/memalign.c",29);
-  /*@ assert a ≡ \null; */ ;
+  /*@ assert a == \null; */ ;
   __e_acsl_full_init((void *)(& a));
   a = (char *)aligned_alloc((unsigned long)256,(unsigned long)512);
   __e_acsl_assert(a != (char *)0,1,"Assertion","main","a != \\null",
                   "tests/memory/memalign.c",32);
-  /*@ assert a ≢ \null; */ ;
+  /*@ assert a != \null; */ ;
   {
     int __gen_e_acsl_initialized_3;
     int __gen_e_acsl_and_3;
@@ -153,7 +153,7 @@ int main(int argc, char const **argv)
                     "main","\\block_length(a) == 512",
                     "tests/memory/memalign.c",34);
   }
-  /*@ assert \block_length(a) ≡ 512; */ ;
+  /*@ assert \block_length(a) == 512; */ ;
   {
     int __gen_e_acsl_freeable_2;
     __gen_e_acsl_freeable_2 = __e_acsl_freeable((void *)a);
@@ -177,7 +177,7 @@ int main(int argc, char const **argv)
     __e_acsl_assert(! __gen_e_acsl_and_4,1,"Assertion","main","!\\valid(a)",
                     "tests/memory/memalign.c",38);
   }
-  /*@ assert ¬\valid(a); */ ;
+  /*@ assert !\valid(a); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(& a));
   __e_acsl_delete_block((void *)(& p));
@@ -189,8 +189,8 @@ int main(int argc, char const **argv)
 /*@ requires valid_memptr: \valid(memptr);
     requires
       alignment_is_a_suitable_power_of_two:
-        alignment ≥ sizeof(void *) ∧
-        ((size_t)alignment & ((size_t)alignment - 1)) ≡ 0;
+        alignment >= sizeof(void *) &&
+        ((size_t)alignment & ((size_t)alignment - 1)) == 0;
     assigns __fc_heap_status, \result;
     assigns __fc_heap_status
       \from (indirect: alignment), size, __fc_heap_status;
@@ -202,7 +202,7 @@ int main(int argc, char const **argv)
     behavior allocation:
       assumes can_allocate: is_allocable(size);
       ensures allocation: \fresh{Old, Here}(*\old(memptr),\old(size));
-      ensures result_zero: \result ≡ 0;
+      ensures result_zero: \result == 0;
       assigns __fc_heap_status, \result;
       assigns __fc_heap_status
         \from (indirect: alignment), size, __fc_heap_status;
@@ -211,8 +211,8 @@ int main(int argc, char const **argv)
               (indirect: __fc_heap_status);
     
     behavior no_allocation:
-      assumes cannot_allocate: ¬is_allocable(size);
-      ensures result_non_zero: \result < 0 ∨ \result > 0;
+      assumes cannot_allocate: !is_allocable(size);
+      ensures result_non_zero: \result < 0 || \result > 0;
       assigns \result;
       assigns \result \from (indirect: alignment);
       allocates \nothing;

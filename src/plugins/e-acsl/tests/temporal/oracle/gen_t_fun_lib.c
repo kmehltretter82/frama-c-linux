@@ -71,7 +71,7 @@ int main(void)
                     "\\valid(q) && \\valid(p)","tests/temporal/t_fun_lib.c",
                     15);
   }
-  /*@ assert \valid(q) ∧ \valid(p); */ ;
+  /*@ assert \valid(q) && \valid(p); */ ;
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
   __e_acsl_temporal_save_nreferent_parameter((void *)(& q),1U);
@@ -141,7 +141,7 @@ int main(void)
                     "!\\valid(p) && !\\valid(path)",
                     "tests/temporal/t_fun_lib.c",29);
   }
-  /*@ assert ¬\valid(p) ∧ ¬\valid(path); */ ;
+  /*@ assert !\valid(p) && !\valid(path); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(& path));
   __e_acsl_delete_block((void *)(& q));

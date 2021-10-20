@@ -37,7 +37,7 @@ int main(void)
                     "!\\initialized(&state->dataQueue[state->bitsInQueue / 8])",
                     "tests/bts/bts1399.c",19);
   }
-  /*@ assert ¬\initialized(&state->dataQueue[state->bitsInQueue / 8]); */ ;
+  /*@ assert !\initialized(&state->dataQueue[state->bitsInQueue / 8]); */ ;
   free((void *)state);
   __retres = 0;
   __e_acsl_delete_block((void *)(& state));

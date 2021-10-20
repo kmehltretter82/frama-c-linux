@@ -30,8 +30,7 @@ int main(int argc, char **argv)
                     "alloca_bounds: 0 < sizeof(int) * LEN <= 18446744073709551615",
                     "tests/memory/vla.c",9);
   }
-  /*@ assert alloca_bounds: 0 < sizeof(int) * LEN ≤ 18446744073709551615;
-   */
+  /*@ assert alloca_bounds: 0 < sizeof(int) * LEN <= 18446744073709551615; */
   ;
   __lengthof_arr = (unsigned long)LEN;
   int *arr = __builtin_alloca(sizeof(int) * __lengthof_arr);
@@ -58,7 +57,7 @@ int main(int argc, char **argv)
         __e_acsl_assert(! __gen_e_acsl_valid_2,1,"Assertion","main",
                         "!\\valid(arr + i)","tests/memory/vla.c",15);
       }
-      /*@ assert ¬\valid(arr + i); */ ;
+      /*@ assert !\valid(arr + i); */ ;
     }
     i ++;
   }

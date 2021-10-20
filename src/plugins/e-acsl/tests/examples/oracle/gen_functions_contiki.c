@@ -9,13 +9,13 @@ struct list {
    int value ;
 };
 /*@
-logic ℤ length_aux{L}(struct list *l, ℤ n) =
+logic integer length_aux{L}(struct list *l, integer n) =
   \at(n < 0? -1:
-        (l ≡ (struct list *)0? n:
+        (l == (struct list *)0? n:
            (n < 2147483647? length_aux(l->next, n + 1): -1)),
       L);
  */
-/*@ logic ℤ length{L}(struct list *l) = \at(length_aux(l, 0),L);
+/*@ logic integer length{L}(struct list *l) = \at(length_aux(l, 0),L);
 
 */
 int main(void)
@@ -35,7 +35,7 @@ int main(void)
   struct list *l = & node1;
   __e_acsl_store_block((void *)(& l),(size_t)8);
   __e_acsl_full_init((void *)(& l));
-  /*@ assert length(l) ≡ 3; */ ;
+  /*@ assert length(l) == 3; */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(& l));
   __e_acsl_delete_block((void *)(& node3));

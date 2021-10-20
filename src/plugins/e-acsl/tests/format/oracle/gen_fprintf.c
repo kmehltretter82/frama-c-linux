@@ -43,57 +43,55 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@ ensures
       result_null_or_valid_fd:
-        \result ≡ \null ∨ \subset(\result, &__fc_fopen[0 .. 16 - 1]);
+        \result == \null || \subset(\result, &__fc_fopen[0 .. 16 - 1]);
     assigns \result;
     assigns \result \from __fc_p_fopen;
  */
 FILE *__gen_e_acsl_tmpfile(void);
 
 /*@ requires valid_stream: \valid(stream);
-    ensures result_zero_or_EOF: \result ≡ 0 ∨ \result ≡ -1;
+    ensures result_zero_or_EOF: \result == 0 || \result == -1;
     assigns \result;
     assigns \result \from (indirect: stream), (indirect: *stream);
  */
 int __gen_e_acsl_fclose(FILE *stream);
 
-/*@ exits status: \exit_status ≡ \old(status);
+/*@ exits status: \exit_status == \old(status);
     ensures never_terminates: \false;
     
     assigns \exit_status \from status;
  */
 void __gen_e_acsl_exit(int status);
 
-/*@ ensures result_ok_or_error: \result ≡ -1 ∨ \result ≥ 0;
+/*@ ensures result_ok_or_error: \result == -1 || \result >= 0;
     ensures
       initialization: stat_loc_init_on_success:
-        \result ≥ 0 ∧ \old(stat_loc) ≢ \null ⇒
+        \result >= 0 && \old(stat_loc) != \null ==>
         \initialized(\old(stat_loc));
     assigns \result, *stat_loc;
     assigns \result \from (indirect: options);
     assigns *stat_loc \from (indirect: options);
     
     behavior stat_loc_null:
-      assumes stat_loc_null: stat_loc ≡ \null;
+      assumes stat_loc_null: stat_loc == \null;
       assigns \result;
       assigns \result \from \nothing;
     
     behavior stat_loc_non_null:
-      assumes stat_loc_non_null: stat_loc ≢ \null;
+      assumes stat_loc_non_null: stat_loc != \null;
       requires valid_stat_loc: \valid(stat_loc);
  */
 pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options);
 
 /*@ ensures
-      result_ok_child_or_error:
-        \result ≡ 0 ∨ \result > 0 ∨ \result ≡ -1;
+      result_ok_child_or_error: \result == 0 || \result > 0 || \result == -1;
     assigns \result;
     assigns \result \from \nothing;
  */
 pid_t __gen_e_acsl_fork(void);
 
 /*@ ensures
-      result_ok_child_or_error:
-        \result ≡ 0 ∨ \result > 0 ∨ \result ≡ -1;
+      result_ok_child_or_error: \result == 0 || \result > 0 || \result == -1;
     assigns \result;
     assigns \result \from \nothing;
  */
@@ -115,22 +113,22 @@ pid_t __gen_e_acsl_fork(void)
   }
 }
 
-/*@ ensures result_ok_or_error: \result ≡ -1 ∨ \result ≥ 0;
+/*@ ensures result_ok_or_error: \result == -1 || \result >= 0;
     ensures
       initialization: stat_loc_init_on_success:
-        \result ≥ 0 ∧ \old(stat_loc) ≢ \null ⇒
+        \result >= 0 && \old(stat_loc) != \null ==>
         \initialized(\old(stat_loc));
     assigns \result, *stat_loc;
     assigns \result \from (indirect: options);
     assigns *stat_loc \from (indirect: options);
     
     behavior stat_loc_null:
-      assumes stat_loc_null: stat_loc ≡ \null;
+      assumes stat_loc_null: stat_loc == \null;
       assigns \result;
       assigns \result \from \nothing;
     
     behavior stat_loc_non_null:
-      assumes stat_loc_non_null: stat_loc ≢ \null;
+      assumes stat_loc_non_null: stat_loc != \null;
       requires valid_stat_loc: \valid(stat_loc);
  */
 pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
@@ -189,7 +187,7 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
   }
 }
 
-/*@ exits status: \exit_status ≡ \old(status);
+/*@ exits status: \exit_status == \old(status);
     ensures never_terminates: \false;
     
     assigns \exit_status \from status;
@@ -203,7 +201,7 @@ void __gen_e_acsl_exit(int status)
 }
 
 /*@ requires valid_stream: \valid(stream);
-    ensures result_zero_or_EOF: \result ≡ 0 ∨ \result ≡ -1;
+    ensures result_zero_or_EOF: \result == 0 || \result == -1;
     assigns \result;
     assigns \result \from (indirect: stream), (indirect: *stream);
  */
@@ -234,7 +232,7 @@ int __gen_e_acsl_fclose(FILE *stream)
 
 /*@ ensures
       result_null_or_valid_fd:
-        \result ≡ \null ∨ \subset(\result, &__fc_fopen[0 .. 16 - 1]);
+        \result == \null || \subset(\result, &__fc_fopen[0 .. 16 - 1]);
     assigns \result;
     assigns \result \from __fc_p_fopen;
  */

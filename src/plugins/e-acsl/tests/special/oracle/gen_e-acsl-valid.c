@@ -5,19 +5,19 @@
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@ requires \valid(y);
-    requires *x ≥ 0;
-    ensures *\old(x) ≡ \old(*x) + 1;
+    requires *x >= 0;
+    ensures *\old(x) == \old(*x) + 1;
     assigns *x;
     assigns *x \from *x, x;
     
     behavior b1:
-      assumes *x ≡ 1;
+      assumes *x == 1;
       ensures *\old(x) < 0;
       assigns \nothing;
     
     behavior b2:
-      assumes *x ≡ 0;
-      ensures *\old(x) ≡ 1;
+      assumes *x == 0;
+      ensures *\old(x) == 1;
     
     complete behaviors b2, b1;
     disjoint behaviors b1, b2;
@@ -39,8 +39,8 @@ void f(int *x, int *y)
     __e_acsl_assert(*x >= 0,1,"Precondition","f","*x >= 0",
                     "tests/special/e-acsl-valid.c",27);
   }
-  /*@ requires *x ≥ 0;
-      ensures 2 ≥ 1;
+  /*@ requires *x >= 0;
+      ensures 2 >= 1;
       assigns *x; */
   {
     __e_acsl_initialize((void *)x,sizeof(int));
@@ -50,17 +50,16 @@ void f(int *x, int *y)
                   "tests/special/e-acsl-valid.c",28);
   {
     int i = 0;
-    /*@ loop invariant 0 ≤ i ≤ 1;
+    /*@ loop invariant 0 <= i <= 1;
         loop variant 2 - i; */
     while (1) {
       __gen_e_acsl_old_variant = 2L - i;
       if (! (i < 1)) break;
-      /*@ assert 1 ≡ 1; */ ;
+      /*@ assert 1 == 1; */ ;
       /*@ assert \valid(y); */ ;
       i ++;
       __e_acsl_assert(__gen_e_acsl_old_variant >= 0L,1,"Variant","f",
-                      "(old 2 - i) \342\211\245 0",
-                      "tests/special/e-acsl-valid.c",33);
+                      "(old 2 - i) >= 0","tests/special/e-acsl-valid.c",33);
       __e_acsl_assert(__gen_e_acsl_old_variant > 2L - i,1,"Variant","f",
                       "(old 2 - i) > 2 - i","tests/special/e-acsl-valid.c",
                       33);
@@ -90,19 +89,19 @@ int main(void)
 }
 
 /*@ requires \valid(y);
-    requires *x ≥ 0;
-    ensures *\old(x) ≡ \old(*x) + 1;
+    requires *x >= 0;
+    ensures *\old(x) == \old(*x) + 1;
     assigns *x;
     assigns *x \from *x, x;
     
     behavior b1:
-      assumes *x ≡ 1;
+      assumes *x == 1;
       ensures *\old(x) < 0;
       assigns \nothing;
     
     behavior b2:
-      assumes *x ≡ 0;
-      ensures *\old(x) ≡ 1;
+      assumes *x == 0;
+      ensures *\old(x) == 1;
     
     complete behaviors b2, b1;
     disjoint behaviors b1, b2;

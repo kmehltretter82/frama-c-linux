@@ -146,7 +146,7 @@ int main(void)
         __e_acsl_assert(! __gen_e_acsl_and_2,1,"Assertion","main",
                         "!\\valid(s)","tests/bts/bts1837.i",22);
       }
-      /*@ assert ¬\valid(s); */ ;
+      /*@ assert !\valid(s); */ ;
       __e_acsl_delete_block((void *)(& s));
     }
   }

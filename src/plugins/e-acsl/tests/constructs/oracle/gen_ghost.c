@@ -69,7 +69,7 @@ int main(void)
     __e_acsl_assert(*q == G,1,"Assertion","main","*q == G",
                     "tests/constructs/ghost.i",14);
   }
-  /*@ assert *q ≡ G; */ ;
+  /*@ assert *q == G; */ ;
   int x = 1;
   if (x) x ++;
   else {

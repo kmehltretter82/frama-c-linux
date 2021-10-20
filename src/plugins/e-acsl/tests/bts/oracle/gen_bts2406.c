@@ -44,7 +44,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_valid,1,"Assertion","main",
                     "!\\valid(p + (0 .. 9))","tests/bts/bts2406.c",10);
   }
-  /*@ assert ¬\valid(p + (0 .. 9)); */ ;
+  /*@ assert !\valid(p + (0 .. 9)); */ ;
   {
     int __gen_e_acsl_size_2;
     int __gen_e_acsl_if_2;

@@ -17,11 +17,11 @@ int main(void)
         __e_acsl_assert(__gen_e_acsl_and,1,"Invariant","main","0 <= i < 10",
                         "tests/constructs/invariant.i",9);
       }
-      /*@ invariant 0 ≤ i < 10; */ ;
+      /*@ invariant 0 <= i < 10; */ ;
       x += i;
       __e_acsl_assert(i <= x,1,"Invariant","main","i <= x",
                       "tests/constructs/invariant.i",11);
-      /*@ invariant i ≤ x; */ ;
+      /*@ invariant i <= x; */ ;
       i ++;
     }
   }

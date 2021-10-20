@@ -15,7 +15,7 @@ void simple_loop(void)
       __e_acsl_assert(__gen_e_acsl_and,1,"Invariant","simple_loop",
                       "0 <= i <= 10","tests/constructs/loop.i",8);
     }
-    /*@ loop invariant 0 ≤ i ≤ 10; */
+    /*@ loop invariant 0 <= i <= 10; */
     while (i < 10) {
       sum += i;
       {
@@ -41,7 +41,7 @@ void nested_loops(void)
     __e_acsl_assert(__gen_e_acsl_and,1,"Invariant","nested_loops",
                     "0 <= i <= 4","tests/constructs/loop.i",15);
   }
-  /*@ loop invariant 0 ≤ i ≤ 4; */
+  /*@ loop invariant 0 <= i <= 4; */
   while (i < 4) {
     {
       int j = 0;
@@ -87,10 +87,10 @@ void nested_loops(void)
         __e_acsl_assert(__gen_e_acsl_and_2,1,"Invariant","nested_loops",
                         "0 <= j <= 8","tests/constructs/loop.i",17);
       }
-      /*@ loop invariant 0 ≤ j ≤ 8;
+      /*@ loop invariant 0 <= j <= 8;
           loop invariant
-            ∀ ℤ k, ℤ l;
-              0 ≤ k < i ∧ 0 ≤ l < j ⇒ t[k][l] ≡ k * l;
+            \forall integer k, integer l;
+              0 <= k < i && 0 <= l < j ==> t[k][l] == k * l;
       */
       while (j < 8) {
         t[i][j] = i * j;
@@ -162,7 +162,7 @@ void unnatural_loop(void)
       __e_acsl_assert(__gen_e_acsl_and,1,"Invariant","unnatural_loop",
                       "0 <= i <= 6","tests/constructs/loop.i",26);
     }
-    /*@ loop invariant 0 ≤ i ≤ 6; */
+    /*@ loop invariant 0 <= i <= 6; */
     while (i < 10) {
       if (x == 5) break;
       x = i;

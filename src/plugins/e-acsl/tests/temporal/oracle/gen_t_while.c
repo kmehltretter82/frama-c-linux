@@ -60,7 +60,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_and_2,1,"Assertion","main","!\\valid(q)",
                     "tests/temporal/t_while.c",37);
   }
-  /*@ assert ¬\valid(q); */ ;
+  /*@ assert !\valid(q); */ ;
   __retres = 0;
   return_label: __e_acsl_store_block_duplicate((void *)(& q),(size_t)8);
   __e_acsl_delete_block((void *)(& q));

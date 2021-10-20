@@ -13,15 +13,15 @@ int main(void)
   int z;
   int x = 0;
   int y = 2;
-  /*@ ensures x ≡ 1; */
+  /*@ ensures x == 1; */
   x = 1;
   __e_acsl_assert(x == 1,1,"Postcondition","main","x == 1",
                   "tests/constructs/stmt_contract.i",8);
   {
     int __gen_e_acsl_and;
-    /*@ ensures x ≡ 2;
-        ensures y ≡ 2;
-        ensures x ≡ 2 ∧ y ≡ 2; */
+    /*@ ensures x == 2;
+        ensures y == 2;
+        ensures x == 2 && y == 2; */
     x = 2;
     __e_acsl_assert(x == 2,1,"Postcondition","main","x == 2",
                     "tests/constructs/stmt_contract.i",11);
@@ -33,14 +33,14 @@ int main(void)
   }
   __e_acsl_assert(x == 2,1,"Precondition","main","x == 2",
                   "tests/constructs/stmt_contract.i",17);
-  /*@ requires x ≡ 2; */
+  /*@ requires x == 2; */
   x ++;
   __e_acsl_assert(x == 3,1,"Precondition","main","x == 3",
                   "tests/constructs/stmt_contract.i",20);
   __e_acsl_assert(y == 2,1,"Precondition","main","y == 2",
                   "tests/constructs/stmt_contract.i",21);
-  /*@ requires x ≡ 3;
-      requires y ≡ 2; */
+  /*@ requires x == 3;
+      requires y == 2; */
   x += y;
   {
     int __gen_e_acsl_assumes_value_2;
@@ -69,13 +69,13 @@ int main(void)
       }
     }
     /*@ behavior b1:
-          requires x ≡ 5;
-          ensures x ≡ 3;
+          requires x == 5;
+          ensures x == 3;
         
         behavior b2:
-          requires x ≡ 3 + y;
-          requires y ≡ 2;
-          ensures x ≡ y + 1;
+          requires x == 3 + y;
+          requires y == 2;
+          ensures x == y + 1;
     */
     x = 3;
     __gen_e_acsl_assumes_value_2 = __e_acsl_contract_get_behavior_assumes
@@ -120,24 +120,24 @@ int main(void)
     }
   }
   /*@ behavior b1:
-        assumes x ≡ 1;
-        requires x ≡ 0;
+        assumes x == 1;
+        requires x == 0;
       
       behavior b2:
-        assumes x ≡ 3;
-        assumes y ≡ 2;
-        requires x ≡ 3;
-        requires x + y ≡ 5;
+        assumes x == 3;
+        assumes y == 2;
+        requires x == 3;
+        requires x + y == 5;
   */
   x += y;
   __e_acsl_contract_clean(__gen_e_acsl_contract_2);
   __e_acsl_assert(x == 5,1,"Precondition","main","x == 5",
                   "tests/constructs/stmt_contract.i",43);
-  /*@ requires x ≡ 5; */
+  /*@ requires x == 5; */
   {
     __e_acsl_assert(y == 2,1,"Precondition","main","y == 2",
                     "tests/constructs/stmt_contract.i",44);
-    /*@ requires y ≡ 2; */
+    /*@ requires y == 2; */
     x += y;
   }
   {
@@ -163,16 +163,16 @@ int main(void)
       }
     }
     /*@ requires x > -1000;
-        ensures z ≥ 0;
+        ensures z >= 0;
         assigns x;
         
         behavior pos:
-          assumes x ≥ 0;
-          ensures z ≡ x;
+          assumes x >= 0;
+          ensures z == x;
         
         behavior neg:
           assumes x < 0;
-          ensures z ≡ -x;
+          ensures z == -x;
         
         complete behaviors neg, pos;
         disjoint behaviors neg, pos;
@@ -198,8 +198,8 @@ int main(void)
   }
   __e_acsl_assert(x == 7,1,"Precondition","main","x == 7",
                   "tests/constructs/stmt_contract.i",70);
-  /*@ requires x ≡ 7;
-      ensures x ≡ 7; */
+  /*@ requires x == 7;
+      ensures x == 7; */
   {
     __retres = 0;
     goto return_label;

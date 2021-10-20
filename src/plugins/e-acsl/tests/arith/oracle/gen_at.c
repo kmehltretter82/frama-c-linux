@@ -5,7 +5,7 @@
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 int A = 0;
-/*@ ensures \at(A,Post) ≡ 3; */
+/*@ ensures \at(A,Post) == 3; */
 void __gen_e_acsl_f(void);
 
 void f(void)
@@ -24,16 +24,16 @@ void f(void)
      }
   __e_acsl_assert(__gen_e_acsl_at == 0,1,"Assertion","f","\\at(A,Pre) == 0",
                   "tests/arith/at.i",12);
-  /*@ assert \at(A,Pre) ≡ 0; */ ;
+  /*@ assert \at(A,Pre) == 0; */ ;
   __e_acsl_assert(__gen_e_acsl_at_2 == 1,1,"Assertion","f","\\at(A,F) == 1",
                   "tests/arith/at.i",13);
-  /*@ assert \at(A,F) ≡ 1; */ ;
+  /*@ assert \at(A,F) == 1; */ ;
   __e_acsl_assert(A == 2,1,"Assertion","f","\\at(A,Here) == 2",
                   "tests/arith/at.i",14);
-  /*@ assert \at(A,Here) ≡ 2; */ ;
+  /*@ assert \at(A,Here) == 2; */ ;
   __e_acsl_assert(__gen_e_acsl_at_4 == 0,1,"Assertion","f",
                   "\\at(\\at(A,Pre),F) == 0","tests/arith/at.i",15);
-  /*@ assert \at(\at(A,Pre),F) ≡ 0; */ ;
+  /*@ assert \at(\at(A,Pre),F) == 0; */ ;
   A = 3;
   return;
 }
@@ -94,9 +94,9 @@ void g(int *p, int *q)
   __e_acsl_assert(__gen_e_acsl_at_2 == 2,1,"Assertion","g",
                   "\\at(*(p + \\at(*q,__invalid_label)),L2) == 2",
                   "tests/arith/at.i",29);
-  /*@ assert \at(*(p + \at(*q,__invalid_label)),L2) ≡ 2; */ ;
+  /*@ assert \at(*(p + \at(*q,__invalid_label)),L2) == 2; */ ;
   L3:
-  /*@ assert \at(*(p + \at(*q,__invalid_label)),Here) ≡ 2; */
+  /*@ assert \at(*(p + \at(*q,__invalid_label)),Here) == 2; */
   {
     int __gen_e_acsl_valid_read_4;
     __gen_e_acsl_valid_read_4 = __e_acsl_valid_read((void *)(p + __gen_e_acsl_at_3),
@@ -114,7 +114,7 @@ void g(int *p, int *q)
   return;
 }
 
-/*@ ensures \result ≡ \old(x); */
+/*@ ensures \result == \old(x); */
 int __gen_e_acsl_h(int x);
 
 int h(int x)
@@ -138,7 +138,7 @@ int main(void)
   __e_acsl_full_init((void *)(& x));
   x = __gen_e_acsl_h(0);
   L:
-  /*@ assert x ≡ 0; */
+  /*@ assert x == 0; */
   {
     __gen_e_acsl_at_3 = (long)x;
     __gen_e_acsl_at_2 = x + 1L;
@@ -153,13 +153,13 @@ int main(void)
   __gen_e_acsl_f();
   __e_acsl_assert(__gen_e_acsl_at == 0,1,"Assertion","main",
                   "\\at(x,__invalid_label) == 0","tests/arith/at.i",54);
-  /*@ assert \at(x,__invalid_label) ≡ 0; */ ;
+  /*@ assert \at(x,__invalid_label) == 0; */ ;
   __e_acsl_assert(__gen_e_acsl_at_2 == 1L,1,"Assertion","main",
                   "\\at(x + 1,__invalid_label) == 1","tests/arith/at.i",55);
-  /*@ assert \at(x + 1,__invalid_label) ≡ 1; */ ;
+  /*@ assert \at(x + 1,__invalid_label) == 1; */ ;
   __e_acsl_assert(__gen_e_acsl_at_3 + 1L == 1L,1,"Assertion","main",
                   "\\at(x,__invalid_label) + 1 == 1","tests/arith/at.i",56);
-  /*@ assert \at(x,__invalid_label) + 1 ≡ 1; */ ;
+  /*@ assert \at(x,__invalid_label) + 1 == 1; */ ;
   g(t,& x);
   __retres = 0;
   __e_acsl_delete_block((void *)(t));
@@ -168,7 +168,7 @@ int main(void)
   return __retres;
 }
 
-/*@ ensures \result ≡ \old(x); */
+/*@ ensures \result == \old(x); */
 int __gen_e_acsl_h(int x)
 {
   int __gen_e_acsl_at;
@@ -184,7 +184,7 @@ int __gen_e_acsl_h(int x)
   return __retres;
 }
 
-/*@ ensures \at(A,Post) ≡ 3; */
+/*@ ensures \at(A,Post) == 3; */
 void __gen_e_acsl_f(void)
 {
   int __gen_e_acsl_at;

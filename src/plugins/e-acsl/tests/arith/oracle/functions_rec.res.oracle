@@ -49,16 +49,15 @@
 [eva:alarm] tests/arith/functions_rec.c:13: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] tests/arith/functions_rec.c:13: Warning: 
-  division by zero. assert __gen_e_acsl_f2_9 ≢ 0;
+  division by zero. assert __gen_e_acsl_f2_9 != 0;
 [eva:alarm] tests/arith/functions_rec.c:13: Warning: 
-  signed overflow.
-  assert -2147483648 ≤ __gen_e_acsl_f2_5 * __gen_e_acsl_f2_7;
+  signed overflow. assert -2147483648 <= __gen_e_acsl_f2_5 * __gen_e_acsl_f2_7;
 [eva:alarm] tests/arith/functions_rec.c:13: Warning: 
-  signed overflow. assert __gen_e_acsl_f2_5 * __gen_e_acsl_f2_7 ≤ 2147483647;
+  signed overflow. assert __gen_e_acsl_f2_5 * __gen_e_acsl_f2_7 <= 2147483647;
 [eva:alarm] tests/arith/functions_rec.c:13: Warning: 
   signed overflow.
   assert
-  (int)(__gen_e_acsl_f2_5 * __gen_e_acsl_f2_7) / __gen_e_acsl_f2_9 ≤
+  (int)(__gen_e_acsl_f2_5 * __gen_e_acsl_f2_7) / __gen_e_acsl_f2_9 <=
   2147483647;
 [eva:alarm] tests/arith/functions_rec.c:13: Warning: 
   accessing uninitialized left-value.
@@ -67,30 +66,30 @@
   accessing uninitialized left-value.
   assert \initialized((__e_acsl_mpz_struct *)__gen_e_acsl_sub_8);
 [eva:alarm] tests/arith/functions_rec.c:13: Warning: 
-  division by zero. assert __gen_e_acsl_f2_14 ≢ 0;
+  division by zero. assert __gen_e_acsl_f2_14 != 0;
 [eva:alarm] tests/arith/functions_rec.c:13: Warning: 
   signed overflow.
-  assert -2147483648 ≤ __gen_e_acsl_f2_10 * __gen_e_acsl_f2_12;
+  assert -2147483648 <= __gen_e_acsl_f2_10 * __gen_e_acsl_f2_12;
 [eva:alarm] tests/arith/functions_rec.c:13: Warning: 
   signed overflow.
-  assert __gen_e_acsl_f2_10 * __gen_e_acsl_f2_12 ≤ 2147483647;
+  assert __gen_e_acsl_f2_10 * __gen_e_acsl_f2_12 <= 2147483647;
 [eva:alarm] tests/arith/functions_rec.c:13: Warning: 
   signed overflow.
   assert
-  (int)(__gen_e_acsl_f2_10 * __gen_e_acsl_f2_12) / __gen_e_acsl_f2_14 ≤
+  (int)(__gen_e_acsl_f2_10 * __gen_e_acsl_f2_12) / __gen_e_acsl_f2_14 <=
   2147483647;
 [eva:alarm] tests/arith/functions_rec.c:13: Warning: 
-  division by zero. assert __gen_e_acsl_f2_19 ≢ 0;
+  division by zero. assert __gen_e_acsl_f2_19 != 0;
 [eva:alarm] tests/arith/functions_rec.c:13: Warning: 
   signed overflow.
-  assert -2147483648 ≤ __gen_e_acsl_f2_15 * __gen_e_acsl_f2_17;
+  assert -2147483648 <= __gen_e_acsl_f2_15 * __gen_e_acsl_f2_17;
 [eva:alarm] tests/arith/functions_rec.c:13: Warning: 
   signed overflow.
-  assert __gen_e_acsl_f2_15 * __gen_e_acsl_f2_17 ≤ 2147483647;
+  assert __gen_e_acsl_f2_15 * __gen_e_acsl_f2_17 <= 2147483647;
 [eva:alarm] tests/arith/functions_rec.c:13: Warning: 
   signed overflow.
   assert
-  (int)(__gen_e_acsl_f2_15 * __gen_e_acsl_f2_17) / __gen_e_acsl_f2_19 ≤
+  (int)(__gen_e_acsl_f2_15 * __gen_e_acsl_f2_17) / __gen_e_acsl_f2_19 <=
   2147483647;
 [eva:alarm] tests/arith/functions_rec.c:32: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.

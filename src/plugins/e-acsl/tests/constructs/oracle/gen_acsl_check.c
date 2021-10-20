@@ -4,8 +4,8 @@
 char *__gen_e_acsl_literal_string;
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
-/*@ check requires a ≢ 0;
-    check ensures \result ≢ 0; */
+/*@ check requires a != 0;
+    check ensures \result != 0; */
 int __gen_e_acsl_f(int a);
 
 int f(int a)
@@ -20,31 +20,31 @@ void g(int a, int *b)
     __e_acsl_store_block((void *)(& b),(size_t)8);
     __e_acsl_assert((long)*(b + 1) != 0L,1,"RTE","g",
                     "division_by_zero: (long)*(b + 1) != 0",
-                    "tests/constructs/acsl_check.c",12);
+                    "tests/constructs/acsl_check.c",15);
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(b + 1),
                                                   sizeof(int),(void *)b,
                                                   (void *)(& b));
     __e_acsl_assert(__gen_e_acsl_valid_read,1,"RTE","g",
                     "mem_access: \\valid_read(b + 1)",
-                    "tests/constructs/acsl_check.c",12);
+                    "tests/constructs/acsl_check.c",15);
     __e_acsl_assert(a / (long)*(b + 1) == 0L,0,"Assertion","g",
-                    "a / *(b + 1) == 0","tests/constructs/acsl_check.c",12);
+                    "a / *(b + 1) == 0","tests/constructs/acsl_check.c",15);
   }
-  /*@ check a / *(b + 1) ≡ 0; */ ;
+  /*@ check a / *(b + 1) == 0; */ ;
   __e_acsl_delete_block((void *)(& b));
   return;
 }
 
-/*@ check requires a ≢ 0;
-    check ensures \result ≢ 0; */
+/*@ check requires a != 0;
+    check ensures \result != 0; */
 int __gen_e_acsl_f(int a)
 {
   int __retres;
   __e_acsl_assert(a != 0,0,"Precondition","f","a != 0",
-                  "tests/constructs/acsl_check.c",4);
+                  "tests/constructs/acsl_check.c",7);
   __retres = f(a);
   __e_acsl_assert(__retres != 0,0,"Postcondition","f","\\result != 0",
-                  "tests/constructs/acsl_check.c",5);
+                  "tests/constructs/acsl_check.c",8);
   return __retres;
 }
 
@@ -71,13 +71,13 @@ int main(void)
   __e_acsl_store_block((void *)(b),(size_t)12);
   __e_acsl_full_init((void *)(& b));
   __e_acsl_assert(a == 1,0,"Assertion","main","a == 1",
-                  "tests/constructs/acsl_check.c",18);
-  /*@ check a ≡ 1; */ ;
+                  "tests/constructs/acsl_check.c",21);
+  /*@ check a == 1; */ ;
   a = __gen_e_acsl_f(a);
   fprintf(stderr,__gen_e_acsl_literal_string); /* fprintf_va_1 */
   g(a,b);
-  /*@ admit a ≡ 1; */ ;
-  /*@ admit a ≡ 2; */ ;
+  /*@ admit a == 1; */ ;
+  /*@ admit a == 2; */ ;
   __e_acsl_delete_block((void *)(b));
   __e_acsl_memory_clean();
   return a;

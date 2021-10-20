@@ -27,7 +27,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_and,1,"Assertion","main","!\\valid(p)",
                     "tests/temporal/t_malloc.c",11);
   }
-  /*@ assert ¬\valid(p); */ ;
+  /*@ assert !\valid(p); */ ;
   {
     int __gen_e_acsl_initialized_2;
     int __gen_e_acsl_and_2;
@@ -43,7 +43,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_and_2,1,"Assertion","main","!\\valid(q)",
                     "tests/temporal/t_malloc.c",12);
   }
-  /*@ assert ¬\valid(q); */ ;
+  /*@ assert !\valid(q); */ ;
   __e_acsl_full_init((void *)(& p));
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
@@ -95,7 +95,7 @@ int main(void)
                                                       sizeof(int *));
     if (__gen_e_acsl_initialized_5) {
       int __gen_e_acsl_valid_5;
-      /*@ assert Eva: dangling_pointer: ¬\dangling(&p); */
+      /*@ assert Eva: dangling_pointer: !\dangling(&p); */
       __gen_e_acsl_valid_5 = __e_acsl_valid((void *)p,sizeof(int),(void *)p,
                                             (void *)(& p));
       __gen_e_acsl_and_5 = __gen_e_acsl_valid_5;
@@ -104,7 +104,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_and_5,1,"Assertion","main","!\\valid(p)",
                     "tests/temporal/t_malloc.c",22);
   }
-  /*@ assert ¬\valid(p); */ ;
+  /*@ assert !\valid(p); */ ;
   {
     int __gen_e_acsl_initialized_6;
     int __gen_e_acsl_and_6;
@@ -120,7 +120,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_and_6,1,"Assertion","main","!\\valid(q)",
                     "tests/temporal/t_malloc.c",23);
   }
-  /*@ assert ¬\valid(q); */ ;
+  /*@ assert !\valid(q); */ ;
   __e_acsl_full_init((void *)(& p));
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
@@ -157,7 +157,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_and_8,1,"Assertion","main","!\\valid(q)",
                     "tests/temporal/t_malloc.c",29);
   }
-  /*@ assert ¬\valid(q); */ ;
+  /*@ assert !\valid(q); */ ;
   __e_acsl_initialize((void *)q,sizeof(int));
   *q = 1;
   __e_acsl_initialize((void *)p,sizeof(int));

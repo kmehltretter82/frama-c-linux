@@ -49,7 +49,7 @@ int main(void)
     p = (int *)malloc((unsigned long)(1024 * 1024));
     __e_acsl_temporal_store_nblock((void *)(& p),(void *)*(& p));
     counter ++;
-    /*@ assert Eva: dangling_pointer: ¬\dangling(&q); */
+    /*@ assert Eva: dangling_pointer: !\dangling(&q); */
     if (p != q) {
       __e_acsl_temporal_reset_parameters();
       __e_acsl_temporal_reset_return();

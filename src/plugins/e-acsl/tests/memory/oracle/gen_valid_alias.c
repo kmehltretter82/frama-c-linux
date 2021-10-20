@@ -45,7 +45,7 @@ int main(void)
                     "!\\valid(a) && !\\valid(b)",
                     "tests/memory/valid_alias.c",9);
   }
-  /*@ assert ¬\valid(a) ∧ ¬\valid(b); */ ;
+  /*@ assert !\valid(a) && !\valid(b); */ ;
   __e_acsl_full_init((void *)(& a));
   a = (int *)malloc(sizeof(int));
   __e_acsl_initialize((void *)a,sizeof(int));
@@ -84,7 +84,7 @@ int main(void)
                     "\\valid(a) && \\valid(b)","tests/memory/valid_alias.c",
                     13);
   }
-  /*@ assert \valid(a) ∧ \valid(b); */ ;
+  /*@ assert \valid(a) && \valid(b); */ ;
   {
     int __gen_e_acsl_initialized_5;
     int __gen_e_acsl_and_7;
@@ -103,7 +103,7 @@ int main(void)
     __e_acsl_assert(*b == n,1,"Assertion","main","*b == n",
                     "tests/memory/valid_alias.c",14);
   }
-  /*@ assert *b ≡ n; */ ;
+  /*@ assert *b == n; */ ;
   free((void *)b);
   {
     int __gen_e_acsl_initialized_6;
@@ -113,7 +113,7 @@ int main(void)
                                                       sizeof(int *));
     if (__gen_e_acsl_initialized_6) {
       int __gen_e_acsl_valid_5;
-      /*@ assert Eva: dangling_pointer: ¬\dangling(&a); */
+      /*@ assert Eva: dangling_pointer: !\dangling(&a); */
       __gen_e_acsl_valid_5 = __e_acsl_valid((void *)a,sizeof(int),(void *)a,
                                             (void *)(& a));
       __gen_e_acsl_and_8 = __gen_e_acsl_valid_5;
@@ -138,7 +138,7 @@ int main(void)
                     "!\\valid(a) && !\\valid(b)",
                     "tests/memory/valid_alias.c",16);
   }
-  /*@ assert ¬\valid(a) ∧ ¬\valid(b); */ ;
+  /*@ assert !\valid(a) && !\valid(b); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(& b));
   __e_acsl_delete_block((void *)(& a));

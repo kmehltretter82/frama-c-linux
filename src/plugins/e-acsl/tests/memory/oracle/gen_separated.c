@@ -108,7 +108,7 @@ int main(void)
                       "!\\separated(&a, &b, &c, d)",
                       "tests/memory/separated.c",15);
     }
-    /*@ assert ¬\separated(&a, &b, &c, d); */ ;
+    /*@ assert !\separated(&a, &b, &c, d); */ ;
     __e_acsl_delete_block((void *)(& d));
     __e_acsl_delete_block((void *)(& c));
     __e_acsl_delete_block((void *)(& b));
@@ -217,7 +217,7 @@ int main(void)
                       "!\\separated(&array[0 .. 10], &array[5 .. 15])",
                       "tests/memory/separated.c",22);
     }
-    /*@ assert ¬\separated(&array[0 .. 10], &array[5 .. 15]); */ ;
+    /*@ assert !\separated(&array[0 .. 10], &array[5 .. 15]); */ ;
     {
       int __gen_e_acsl_size_9;
       int __gen_e_acsl_if_9;
@@ -267,7 +267,7 @@ int main(void)
                       "!\\separated(&array[0 .. 19], &array[5 .. 15])",
                       "tests/memory/separated.c",23);
     }
-    /*@ assert ¬\separated(&array[0 .. 19], &array[5 .. 15]); */ ;
+    /*@ assert !\separated(&array[0 .. 19], &array[5 .. 15]); */ ;
     {
       int __gen_e_acsl_valid_read_14;
       int __gen_e_acsl_valid_read_15;
@@ -344,7 +344,7 @@ int main(void)
                       "!\\separated(&array[0 .. 1], &array[1 .. 2])",
                       "tests/memory/separated.c",25);
     }
-    /*@ assert ¬\separated(&array[0 .. 1], &array[1 .. 2]); */ ;
+    /*@ assert !\separated(&array[0 .. 1], &array[1 .. 2]); */ ;
     {
       int __gen_e_acsl_size_17;
       int __gen_e_acsl_if_17;
@@ -556,7 +556,7 @@ int main(void)
                       "!\\separated(a_0, b_0, c_0)",
                       "tests/memory/separated.c",37);
     }
-    /*@ assert ¬\separated(a_0, b_0, c_0); */ ;
+    /*@ assert !\separated(a_0, b_0, c_0); */ ;
     free((void *)a_0);
     free((void *)b_0);
     __e_acsl_delete_block((void *)(& c_0));
@@ -666,7 +666,7 @@ int main(void)
                       "!\\separated(array_0 + (0 .. 10), array_0 + (5 .. 15))",
                       "tests/memory/separated.c",47);
     }
-    /*@ assert ¬\separated(array_0 + (0 .. 10), array_0 + (5 .. 15)); */ ;
+    /*@ assert !\separated(array_0 + (0 .. 10), array_0 + (5 .. 15)); */ ;
     {
       int __gen_e_acsl_size_33;
       int __gen_e_acsl_if_33;
@@ -716,7 +716,7 @@ int main(void)
                       "!\\separated(array_0 + (0 .. 19), array_0 + (5 .. 15))",
                       "tests/memory/separated.c",48);
     }
-    /*@ assert ¬\separated(array_0 + (0 .. 19), array_0 + (5 .. 15)); */ ;
+    /*@ assert !\separated(array_0 + (0 .. 19), array_0 + (5 .. 15)); */ ;
     {
       int __gen_e_acsl_valid_read_33;
       int __gen_e_acsl_valid_read_34;
@@ -793,7 +793,7 @@ int main(void)
                       "!\\separated(array_0 + (0 .. 1), array_0 + (1 .. 2))",
                       "tests/memory/separated.c",50);
     }
-    /*@ assert ¬\separated(array_0 + (0 .. 1), array_0 + (1 .. 2)); */ ;
+    /*@ assert !\separated(array_0 + (0 .. 1), array_0 + (1 .. 2)); */ ;
     {
       int __gen_e_acsl_size_41;
       int __gen_e_acsl_if_41;
@@ -1577,8 +1577,7 @@ int main(void)
     }
     /*@
     assert
-    ¬\separated(&array_1[0 .. 3][0 .. 2][0], &array_1[3 .. 5][0 .. 2][0]);
-     */
+    !\separated(&array_1[0 .. 3][0 .. 2][0], &array_1[3 .. 5][0 .. 2][0]); */
     ;
     {
       int __gen_e_acsl_forall_29;

@@ -30,7 +30,7 @@ int *f(int *x)
     __e_acsl_assert(! __gen_e_acsl_and,1,"Assertion","f","!\\valid(y)",
                     "tests/memory/valid.c",13);
   }
-  /*@ assert ¬\valid(y); */ ;
+  /*@ assert !\valid(y); */ ;
   __e_acsl_full_init((void *)(& y));
   y = x;
   {
@@ -201,7 +201,7 @@ int main(void)
                     "!\\valid(a) && !\\valid(b) && !\\valid(X)",
                     "tests/memory/valid.c",29);
   }
-  /*@ assert ¬\valid(a) ∧ ¬\valid(b) ∧ ¬\valid(X); */ ;
+  /*@ assert !\valid(a) && !\valid(b) && !\valid(X); */ ;
   __e_acsl_full_init((void *)(& a));
   a = (int *)malloc(sizeof(int));
   {
@@ -244,7 +244,7 @@ int main(void)
                     "\\valid(a) && !\\valid(b) && !\\valid(X)",
                     "tests/memory/valid.c",31);
   }
-  /*@ assert \valid(a) ∧ ¬\valid(b) ∧ ¬\valid(X); */ ;
+  /*@ assert \valid(a) && !\valid(b) && !\valid(X); */ ;
   X = a;
   {
     int __gen_e_acsl_initialized_5;
@@ -286,7 +286,7 @@ int main(void)
                     "\\valid(a) && !\\valid(b) && \\valid(X)",
                     "tests/memory/valid.c",33);
   }
-  /*@ assert \valid(a) ∧ ¬\valid(b) ∧ \valid(X); */ ;
+  /*@ assert \valid(a) && !\valid(b) && \valid(X); */ ;
   __e_acsl_full_init((void *)(& b));
   b = __gen_e_acsl_f(& n);
   {
@@ -329,7 +329,7 @@ int main(void)
                     "\\valid(a) && \\valid(b) && \\valid(X)",
                     "tests/memory/valid.c",35);
   }
-  /*@ assert \valid(a) ∧ \valid(b) ∧ \valid(X); */ ;
+  /*@ assert \valid(a) && \valid(b) && \valid(X); */ ;
   X = b;
   {
     int __gen_e_acsl_initialized_9;
@@ -371,7 +371,7 @@ int main(void)
                     "\\valid(a) && \\valid(b) && \\valid(X)",
                     "tests/memory/valid.c",37);
   }
-  /*@ assert \valid(a) ∧ \valid(b) ∧ \valid(X); */ ;
+  /*@ assert \valid(a) && \valid(b) && \valid(X); */ ;
   __e_acsl_full_init((void *)(& c));
   c = & a;
   __e_acsl_full_init((void *)(& d));
@@ -496,7 +496,7 @@ int main(void)
                                                        sizeof(int *));
     if (__gen_e_acsl_initialized_18) {
       int __gen_e_acsl_valid_18;
-      /*@ assert Eva: dangling_pointer: ¬\dangling(&a); */
+      /*@ assert Eva: dangling_pointer: !\dangling(&a); */
       __gen_e_acsl_valid_18 = __e_acsl_valid((void *)a,sizeof(int),(void *)a,
                                              (void *)(& a));
       __gen_e_acsl_and_28 = __gen_e_acsl_valid_18;
@@ -528,7 +528,7 @@ int main(void)
                     "!\\valid(a) && \\valid(b) && \\valid(X)",
                     "tests/memory/valid.c",43);
   }
-  /*@ assert ¬\valid(a) ∧ \valid(b) ∧ \valid(X); */ ;
+  /*@ assert !\valid(a) && \valid(b) && \valid(X); */ ;
   {
     int __gen_e_acsl_valid_21;
     __gen_e_acsl_valid_21 = __e_acsl_valid((void *)(& Z),sizeof(int),

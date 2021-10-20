@@ -9,7 +9,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
     requires valid_mode: valid_read_string(mode);
     ensures
       result_null_or_valid_fd:
-        \result ≡ \null ∨ \subset(\result, &__fc_fopen[0 .. 16 - 1]);
+        \result == \null || \subset(\result, &__fc_fopen[0 .. 16 - 1]);
     assigns \result;
     assigns \result
       \from (indirect: *(filename + (0 .. strlen{Old}(filename)))),
@@ -20,7 +20,7 @@ FILE *__gen_e_acsl_fopen(char const * restrict filename,
 
 /*@ requires valid_ptr_block: \valid((char *)ptr + (0 .. nmemb * size - 1));
     requires valid_stream: \valid(stream);
-    ensures size_read: \result ≤ \old(nmemb);
+    ensures size_read: \result <= \old(nmemb);
     ensures
       initialization:
         \initialized((char *)\old(ptr) + (0 .. \result * \old(size) - 1));
@@ -36,7 +36,7 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
 
 /*@ requires valid_ptr_block: \valid((char *)ptr + (0 .. nmemb * size - 1));
     requires valid_stream: \valid(stream);
-    ensures size_read: \result ≤ \old(nmemb);
+    ensures size_read: \result <= \old(nmemb);
     ensures
       initialization:
         \initialized((char *)\old(ptr) + (0 .. \result * \old(size) - 1));
@@ -274,7 +274,7 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
     requires valid_mode: valid_read_string(mode);
     ensures
       result_null_or_valid_fd:
-        \result ≡ \null ∨ \subset(\result, &__fc_fopen[0 .. 16 - 1]);
+        \result == \null || \subset(\result, &__fc_fopen[0 .. 16 - 1]);
     assigns \result;
     assigns \result
       \from (indirect: *(filename + (0 .. strlen{Old}(filename)))),

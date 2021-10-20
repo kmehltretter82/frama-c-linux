@@ -35,7 +35,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_valid,1,"Assertion","main",
                     "!\\valid(&a[4])","tests/memory/array_overflow.c",31);
   }
-  /*@ assert ¬\valid(&a[4]); */ ;
+  /*@ assert !\valid(&a[4]); */ ;
   int *ap = a;
   __e_acsl_store_block((void *)(& ap),(size_t)8);
   __e_acsl_full_init((void *)(& ap));
@@ -50,7 +50,7 @@ int main(void)
                     "!\\valid(&(*((int (*)[])ap))[4])",
                     "tests/memory/array_overflow.c",36);
   }
-  /*@ assert ¬\valid(&(*((int (*)[])ap))[4]); */ ;
+  /*@ assert !\valid(&(*((int (*)[])ap))[4]); */ ;
   struct dat d = {.arr = {4, 5, 6, 7}};
   __e_acsl_store_block((void *)(& d),(size_t)16);
   __e_acsl_full_init((void *)(& d));
@@ -67,7 +67,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_valid_3,1,"Assertion","main",
                     "!\\valid(&d.arr[4])","tests/memory/array_overflow.c",42);
   }
-  /*@ assert ¬\valid(&d.arr[4]); */ ;
+  /*@ assert !\valid(&d.arr[4]); */ ;
   {
     int __gen_e_acsl_valid_4;
     __gen_e_acsl_valid_4 = __e_acsl_valid((void *)(& (d2.p[1])->arr[2]),

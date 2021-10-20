@@ -24,7 +24,7 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_u >= 0L,1,"Assertion","main",
                     "\\let u = n * n; u >= 0","tests/arith/let.c",7);
   }
-  /*@ assert \let u = n * n; u ≥ 0; */ ;
+  /*@ assert \let u = n * n; u >= 0; */ ;
   {
     long __gen_e_acsl_u_2;
     long __gen_e_acsl_v;
@@ -41,7 +41,7 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_u_3 + 1 == 2,1,"Assertion","main",
                     "(\\let u = 1; u) + 1 == 2","tests/arith/let.c",13);
   }
-  /*@ assert (\let u = 1; u) + 1 ≡ 2; */ ;
+  /*@ assert (\let u = 1; u) + 1 == 2; */ ;
   {
     int __gen_e_acsl_u_4;
     int __gen_e_acsl_v_2;
@@ -51,7 +51,7 @@ int main(void)
                     "\\let u = 1; (\\let v = u + 1; v) == 2",
                     "tests/arith/let.c",15);
   }
-  /*@ assert \let u = 1; (\let v = u + 1; v) ≡ 2; */ ;
+  /*@ assert \let u = 1; (\let v = u + 1; v) == 2; */ ;
   {
     int __gen_e_acsl_u_5;
     int __gen_e_acsl_u_6;
@@ -61,7 +61,7 @@ int main(void)
                     "\\let u = 1; (\\let u = u + 1; u) == 2",
                     "tests/arith/let.c",19);
   }
-  /*@ assert \let u = 1; (\let u = u + 1; u) ≡ 2; */ ;
+  /*@ assert \let u = 1; (\let u = u + 1; u) == 2; */ ;
   long m = 0x7fffffffffffffffL;
   {
     long __gen_e_acsl_u_7;
@@ -102,7 +102,7 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_u_10 == f,1,"Assertion","main",
                     "\\let u = f; u == f","tests/arith/let.c",30);
   }
-  /*@ assert \let u = f; u ≡ f; */ ;
+  /*@ assert \let u = f; u == f; */ ;
   int t[4] = {1, 2, 3, 4};
   {
     int * /*[4]*/ __gen_e_acsl_u_11;
@@ -110,14 +110,14 @@ int main(void)
     __e_acsl_assert(1,1,"Assertion","main","\\let u = &t[1]; 1 == 1",
                     "tests/arith/let.c",34);
   }
-  /*@ assert \let u = &t[1]; 1 ≡ 1; */ ;
+  /*@ assert \let u = &t[1]; 1 == 1; */ ;
   {
     int * /*[4]*/ __gen_e_acsl_u_12;
     __gen_e_acsl_u_12 = & t[1];
     __e_acsl_assert(1,1,"Assertion","main","(\\let u = &t[1]; 1) == 1",
                     "tests/arith/let.c",36);
   }
-  /*@ assert (\let u = &t[1]; 1) ≡ 1; */ ;
+  /*@ assert (\let u = &t[1]; 1) == 1; */ ;
   struct __anonstruct_r_1 r = {.x = 1, .y = 2};
   __e_acsl_store_block((void *)(& r),(size_t)8);
   __e_acsl_full_init((void *)(& r));
@@ -128,7 +128,7 @@ int main(void)
                     "Assertion","main","\\let u = r; u.x + u.y == 3",
                     "tests/arith/let.c",41);
   }
-  /*@ assert \let u = r; u.x + u.y ≡ 3; */ ;
+  /*@ assert \let u = r; u.x + u.y == 3; */ ;
   s.x = 5;
   {
     union __anonunion_s_2 __gen_e_acsl_u_14;

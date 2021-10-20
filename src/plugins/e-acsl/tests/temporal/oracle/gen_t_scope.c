@@ -35,7 +35,7 @@ int main(void)
                                                     sizeof(int *));
     if (__gen_e_acsl_initialized) {
       int __gen_e_acsl_valid;
-      /*@ assert Eva: dangling_pointer: ¬\dangling(&p); */
+      /*@ assert Eva: dangling_pointer: !\dangling(&p); */
       __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int),(void *)p,
                                           (void *)(& p));
       __gen_e_acsl_and = __gen_e_acsl_valid;
@@ -44,7 +44,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_and,1,"Assertion","main","!\\valid(p)",
                     "tests/temporal/t_scope.c",15);
   }
-  /*@ assert ¬\valid(p); */ ;
+  /*@ assert !\valid(p); */ ;
   {
     int __gen_e_acsl_initialized_2;
     int __gen_e_acsl_and_2;
@@ -60,7 +60,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_and_2,1,"Assertion","main","!\\valid(q)",
                     "tests/temporal/t_scope.c",16);
   }
-  /*@ assert ¬\valid(q); */ ;
+  /*@ assert !\valid(q); */ ;
   {
     int j = 8;
     __e_acsl_store_block((void *)(& j),(size_t)4);
@@ -101,7 +101,7 @@ int main(void)
       __e_acsl_assert(! __gen_e_acsl_and_4,1,"Assertion","main",
                       "!\\valid(q)","tests/temporal/t_scope.c",24);
     }
-    /*@ assert ¬\valid(q); */ ;
+    /*@ assert !\valid(q); */ ;
     {
       int __gen_e_acsl_valid_5;
       __gen_e_acsl_valid_5 = __e_acsl_valid((void *)(& j),sizeof(int),
@@ -137,7 +137,7 @@ int main(void)
       __e_acsl_assert(! __gen_e_acsl_and_5,1,"Assertion","main",
                       "!\\valid(p)","tests/temporal/t_scope.c",33);
     }
-    /*@ assert ¬\valid(p); */ ;
+    /*@ assert !\valid(p); */ ;
     __e_acsl_full_init((void *)(& q));
     __e_acsl_temporal_store_nblock((void *)(& q),(void *)(& a));
     q = & a;

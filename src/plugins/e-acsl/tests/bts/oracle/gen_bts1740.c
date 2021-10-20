@@ -37,7 +37,7 @@ int main(void)
     __e_acsl_delete_block((void *)(& a));
   }
   L:
-  /*@ assert ¬\valid(p); */
+  /*@ assert !\valid(p); */
   {
     int __gen_e_acsl_initialized_2;
     int __gen_e_acsl_and_2;
@@ -45,7 +45,7 @@ int main(void)
                                                       sizeof(int *));
     if (__gen_e_acsl_initialized_2) {
       int __gen_e_acsl_valid_2;
-      /*@ assert Eva: dangling_pointer: ¬\dangling(&p); */
+      /*@ assert Eva: dangling_pointer: !\dangling(&p); */
       __gen_e_acsl_valid_2 = __e_acsl_valid((void *)p,sizeof(int),(void *)p,
                                             (void *)(& p));
       __gen_e_acsl_and_2 = __gen_e_acsl_valid_2;

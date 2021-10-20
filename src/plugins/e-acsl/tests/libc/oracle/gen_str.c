@@ -10,8 +10,8 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
     requires
       separation:
         \separated(dest + (0 .. strlen(src)), src + (0 .. strlen(src)));
-    ensures equal_contents: strcmp(\old(dest), \old(src)) ≡ 0;
-    ensures result_ptr: \result ≡ \old(dest);
+    ensures equal_contents: strcmp(\old(dest), \old(src)) == 0;
+    ensures result_ptr: \result == \old(dest);
     assigns *(dest + (0 .. strlen{Old}(src))), \result;
     assigns *(dest + (0 .. strlen{Old}(src)))
       \from *(src + (0 .. strlen{Old}(src)));
@@ -22,7 +22,7 @@ char *__gen_e_acsl_strcpy(char * restrict dest, char const * restrict src);
 /*@ requires valid_nstring_src: valid_read_nstring(src, n);
     requires room_nstring: \valid(dest + (0 .. n - 1));
     requires separation: \separated(dest + (0 .. n - 1), src + (0 .. n - 1));
-    ensures result_ptr: \result ≡ \old(dest);
+    ensures result_ptr: \result == \old(dest);
     ensures initialization: \initialized(\old(dest) + (0 .. \old(n) - 1));
     assigns *(dest + (0 .. n - 1)), \result;
     assigns *(dest + (0 .. n - 1)) \from *(src + (0 .. n - 1));
@@ -30,13 +30,12 @@ char *__gen_e_acsl_strcpy(char * restrict dest, char const * restrict src);
     
     behavior complete:
       assumes src_fits: strlen(src) < n;
-      ensures equal_after_copy: strcmp(\old(dest), \old(src)) ≡ 0;
+      ensures equal_after_copy: strcmp(\old(dest), \old(src)) == 0;
     
     behavior partial:
-      assumes src_too_long: n ≤ strlen(src);
+      assumes src_too_long: n <= strlen(src);
       ensures
-        equal_prefix:
-          memcmp{Post, Post}(\old(dest), \old(src), \old(n)) ≡ 0;
+        equal_prefix: memcmp{Post, Post}(\old(dest), \old(src), \old(n)) == 0;
  */
 char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
                            size_t n);
@@ -45,14 +44,14 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     requires valid_string_dest: valid_string(dest);
     requires room_string: \valid(dest + (0 .. strlen(dest) + strlen(src)));
     ensures
-      sum_of_lengths: strlen(\old(dest)) ≡ \old(strlen(dest) + strlen(src));
+      sum_of_lengths: strlen(\old(dest)) == \old(strlen(dest) + strlen(src));
     ensures
       initialization: dest:
         \initialized(\old(dest) + (0 .. \old(strlen(dest) + strlen(src))));
     ensures
       dest_null_terminated:
-        *(\old(dest) + \old(strlen(dest) + strlen(src))) ≡ 0;
-    ensures result_ptr: \result ≡ \old(dest);
+        *(\old(dest) + \old(strlen(dest) + strlen(src))) == 0;
+    ensures result_ptr: \result == \old(dest);
     assigns *(dest +
               (strlen{Old}(dest) .. strlen{Old}(dest) + strlen{Old}(src))),
             \result;
@@ -65,7 +64,7 @@ char *__gen_e_acsl_strcat(char * restrict dest, char const * restrict src);
 
 /*@ requires valid_nstring_src: valid_read_nstring(src, n);
     requires valid_string_dest: valid_string(dest);
-    ensures result_ptr: \result ≡ \old(dest);
+    ensures result_ptr: \result == \old(dest);
     assigns *(dest + (strlen{Old}(dest) .. strlen{Old}(dest) + n)), \result;
     assigns *(dest + (strlen{Old}(dest) .. strlen{Old}(dest) + n))
       \from *(src + (0 .. n));
@@ -73,12 +72,12 @@ char *__gen_e_acsl_strcat(char * restrict dest, char const * restrict src);
     
     behavior complete:
       assumes
-        valid_string_src_fits: valid_read_string(src) ∧ strlen(src) ≤ n;
+        valid_string_src_fits: valid_read_string(src) && strlen(src) <= n;
       requires
         room_string: \valid((dest + strlen(dest)) + (0 .. strlen(src)));
       ensures
         sum_of_lengths:
-          strlen(\old(dest)) ≡ \old(strlen(dest) + strlen(src));
+          strlen(\old(dest)) == \old(strlen(dest) + strlen(src));
       assigns *(dest +
                 (strlen{Old}(dest) .. strlen{Old}(dest) + strlen{Old}(src))),
               \result;
@@ -90,11 +89,11 @@ char *__gen_e_acsl_strcat(char * restrict dest, char const * restrict src);
     behavior partial:
       assumes
         valid_string_src_too_large:
-          ¬(valid_read_string(src) ∧ strlen(src) ≤ n);
+          !(valid_read_string(src) && strlen(src) <= n);
       requires room_string: \valid((dest + strlen(dest)) + (0 .. n));
       ensures
         sum_of_bounded_lengths:
-          strlen(\old(dest)) ≡ \old(strlen(dest)) + \old(n);
+          strlen(\old(dest)) == \old(strlen(dest)) + \old(n);
       assigns *(dest + (strlen{Old}(dest) .. strlen{Old}(dest) + n)),
               \result;
       assigns *(dest + (strlen{Old}(dest) .. strlen{Old}(dest) + n))
@@ -106,7 +105,7 @@ char *__gen_e_acsl_strncat(char * restrict dest, char const * restrict src,
 
 /*@ requires valid_nstring_src: valid_read_nstring(src, n);
     requires valid_string_dest: valid_string(dest);
-    ensures result_ptr: \result ≡ \old(dest);
+    ensures result_ptr: \result == \old(dest);
     assigns *(dest + (strlen{Old}(dest) .. strlen{Old}(dest) + n)), \result;
     assigns *(dest + (strlen{Old}(dest) .. strlen{Old}(dest) + n))
       \from *(src + (0 .. n));
@@ -114,12 +113,12 @@ char *__gen_e_acsl_strncat(char * restrict dest, char const * restrict src,
     
     behavior complete:
       assumes
-        valid_string_src_fits: valid_read_string(src) ∧ strlen(src) ≤ n;
+        valid_string_src_fits: valid_read_string(src) && strlen(src) <= n;
       requires
         room_string: \valid((dest + strlen(dest)) + (0 .. strlen(src)));
       ensures
         sum_of_lengths:
-          strlen(\old(dest)) ≡ \old(strlen(dest) + strlen(src));
+          strlen(\old(dest)) == \old(strlen(dest) + strlen(src));
       assigns *(dest +
                 (strlen{Old}(dest) .. strlen{Old}(dest) + strlen{Old}(src))),
               \result;
@@ -131,11 +130,11 @@ char *__gen_e_acsl_strncat(char * restrict dest, char const * restrict src,
     behavior partial:
       assumes
         valid_string_src_too_large:
-          ¬(valid_read_string(src) ∧ strlen(src) ≤ n);
+          !(valid_read_string(src) && strlen(src) <= n);
       requires room_string: \valid((dest + strlen(dest)) + (0 .. n));
       ensures
         sum_of_bounded_lengths:
-          strlen(\old(dest)) ≡ \old(strlen(dest)) + \old(n);
+          strlen(\old(dest)) == \old(strlen(dest)) + \old(n);
       assigns *(dest + (strlen{Old}(dest) .. strlen{Old}(dest) + n)),
               \result;
       assigns *(dest + (strlen{Old}(dest) .. strlen{Old}(dest) + n))
@@ -206,14 +205,14 @@ char *__gen_e_acsl_strncat(char * restrict dest, char const * restrict src,
     requires valid_string_dest: valid_string(dest);
     requires room_string: \valid(dest + (0 .. strlen(dest) + strlen(src)));
     ensures
-      sum_of_lengths: strlen(\old(dest)) ≡ \old(strlen(dest) + strlen(src));
+      sum_of_lengths: strlen(\old(dest)) == \old(strlen(dest) + strlen(src));
     ensures
       initialization: dest:
         \initialized(\old(dest) + (0 .. \old(strlen(dest) + strlen(src))));
     ensures
       dest_null_terminated:
-        *(\old(dest) + \old(strlen(dest) + strlen(src))) ≡ 0;
-    ensures result_ptr: \result ≡ \old(dest);
+        *(\old(dest) + \old(strlen(dest) + strlen(src))) == 0;
+    ensures result_ptr: \result == \old(dest);
     assigns *(dest +
               (strlen{Old}(dest) .. strlen{Old}(dest) + strlen{Old}(src))),
             \result;
@@ -281,7 +280,7 @@ char *__gen_e_acsl_strcat(char * restrict dest, char const * restrict src)
 /*@ requires valid_nstring_src: valid_read_nstring(src, n);
     requires room_nstring: \valid(dest + (0 .. n - 1));
     requires separation: \separated(dest + (0 .. n - 1), src + (0 .. n - 1));
-    ensures result_ptr: \result ≡ \old(dest);
+    ensures result_ptr: \result == \old(dest);
     ensures initialization: \initialized(\old(dest) + (0 .. \old(n) - 1));
     assigns *(dest + (0 .. n - 1)), \result;
     assigns *(dest + (0 .. n - 1)) \from *(src + (0 .. n - 1));
@@ -289,13 +288,12 @@ char *__gen_e_acsl_strcat(char * restrict dest, char const * restrict src)
     
     behavior complete:
       assumes src_fits: strlen(src) < n;
-      ensures equal_after_copy: strcmp(\old(dest), \old(src)) ≡ 0;
+      ensures equal_after_copy: strcmp(\old(dest), \old(src)) == 0;
     
     behavior partial:
-      assumes src_too_long: n ≤ strlen(src);
+      assumes src_too_long: n <= strlen(src);
       ensures
-        equal_prefix:
-          memcmp{Post, Post}(\old(dest), \old(src), \old(n)) ≡ 0;
+        equal_prefix: memcmp{Post, Post}(\old(dest), \old(src), \old(n)) == 0;
  */
 char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
                            size_t n)
@@ -469,8 +467,8 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     requires
       separation:
         \separated(dest + (0 .. strlen(src)), src + (0 .. strlen(src)));
-    ensures equal_contents: strcmp(\old(dest), \old(src)) ≡ 0;
-    ensures result_ptr: \result ≡ \old(dest);
+    ensures equal_contents: strcmp(\old(dest), \old(src)) == 0;
+    ensures result_ptr: \result == \old(dest);
     assigns *(dest + (0 .. strlen{Old}(src))), \result;
     assigns *(dest + (0 .. strlen{Old}(src)))
       \from *(src + (0 .. strlen{Old}(src)));
@@ -557,7 +555,7 @@ int main(void)
       __e_acsl_assert(! __gen_e_acsl_initialized,1,"Assertion","main",
                       "!\\initialized(&dest[0 .. 3])","tests/libc/str.c",12);
     }
-    /*@ assert ¬\initialized(&dest[0 .. 3]); */ ;
+    /*@ assert !\initialized(&dest[0 .. 3]); */ ;
     {
       int __gen_e_acsl_size_2;
       int __gen_e_acsl_if_2;
@@ -597,7 +595,7 @@ int main(void)
       __e_acsl_assert(! __gen_e_acsl_initialized_4,1,"Assertion","main",
                       "!\\initialized(&dest[2 .. 3])","tests/libc/str.c",17);
     }
-    /*@ assert ¬\initialized(&dest[2 .. 3]); */ ;
+    /*@ assert !\initialized(&dest[2 .. 3]); */ ;
     __e_acsl_delete_block((void *)(src));
     __e_acsl_delete_block((void *)(dest));
   }
@@ -621,7 +619,7 @@ int main(void)
                       "!\\initialized(&dest_0[0 .. 3])","tests/libc/str.c",
                       22);
     }
-    /*@ assert ¬\initialized(&dest_0[0 .. 3]); */ ;
+    /*@ assert !\initialized(&dest_0[0 .. 3]); */ ;
     {
       int __gen_e_acsl_size_6;
       int __gen_e_acsl_if_6;
@@ -659,7 +657,7 @@ int main(void)
                       "!\\initialized(&dest_0[1 .. 3])","tests/libc/str.c",
                       27);
     }
-    /*@ assert ¬\initialized(&dest_0[1 .. 3]); */ ;
+    /*@ assert !\initialized(&dest_0[1 .. 3]); */ ;
     __e_acsl_delete_block((void *)(src_0));
     __e_acsl_delete_block((void *)(dest_0));
   }
@@ -683,7 +681,7 @@ int main(void)
                       "!\\initialized(&dest_1[0 .. 3])","tests/libc/str.c",
                       32);
     }
-    /*@ assert ¬\initialized(&dest_1[0 .. 3]); */ ;
+    /*@ assert !\initialized(&dest_1[0 .. 3]); */ ;
     {
       int __gen_e_acsl_size_9;
       int __gen_e_acsl_if_9;
@@ -720,7 +718,7 @@ int main(void)
       __e_acsl_assert(! __gen_e_acsl_initialized_12,1,"Assertion","main",
                       "!\\initialized(&dest_1[3])","tests/libc/str.c",37);
     }
-    /*@ assert ¬\initialized(&dest_1[3]); */ ;
+    /*@ assert !\initialized(&dest_1[3]); */ ;
     __e_acsl_delete_block((void *)(src_1));
     __e_acsl_delete_block((void *)(dest_1));
   }
@@ -759,7 +757,7 @@ int main(void)
                       "!\\initialized(&dest_2[2 .. 3])","tests/libc/str.c",
                       44);
     }
-    /*@ assert ¬\initialized(&dest_2[2 .. 3]); */ ;
+    /*@ assert !\initialized(&dest_2[2 .. 3]); */ ;
     {
       int __gen_e_acsl_size_13;
       int __gen_e_acsl_if_13;
@@ -796,7 +794,7 @@ int main(void)
       __e_acsl_assert(! __gen_e_acsl_initialized_17,1,"Assertion","main",
                       "!\\initialized(&dest_2[3])","tests/libc/str.c",49);
     }
-    /*@ assert ¬\initialized(&dest_2[3]); */ ;
+    /*@ assert !\initialized(&dest_2[3]); */ ;
     __e_acsl_delete_block((void *)(src_2));
     __e_acsl_delete_block((void *)(dest_2));
   }
@@ -835,7 +833,7 @@ int main(void)
                       "!\\initialized(&dest_3[2 .. 3])","tests/libc/str.c",
                       56);
     }
-    /*@ assert ¬\initialized(&dest_3[2 .. 3]); */ ;
+    /*@ assert !\initialized(&dest_3[2 .. 3]); */ ;
     {
       int __gen_e_acsl_size_17;
       int __gen_e_acsl_if_17;
@@ -872,7 +870,7 @@ int main(void)
       __e_acsl_assert(! __gen_e_acsl_initialized_22,1,"Assertion","main",
                       "!\\initialized(&dest_3[3])","tests/libc/str.c",61);
     }
-    /*@ assert ¬\initialized(&dest_3[3]); */ ;
+    /*@ assert !\initialized(&dest_3[3]); */ ;
     __e_acsl_delete_block((void *)(src_3));
     __e_acsl_delete_block((void *)(dest_3));
   }
@@ -911,7 +909,7 @@ int main(void)
                       "!\\initialized(&dest_4[2 .. 3])","tests/libc/str.c",
                       68);
     }
-    /*@ assert ¬\initialized(&dest_4[2 .. 3]); */ ;
+    /*@ assert !\initialized(&dest_4[2 .. 3]); */ ;
     {
       int __gen_e_acsl_size_21;
       int __gen_e_acsl_if_21;
@@ -948,7 +946,7 @@ int main(void)
       __e_acsl_assert(! __gen_e_acsl_initialized_27,1,"Assertion","main",
                       "!\\initialized(&dest_4[3])","tests/libc/str.c",73);
     }
-    /*@ assert ¬\initialized(&dest_4[3]); */ ;
+    /*@ assert !\initialized(&dest_4[3]); */ ;
     __e_acsl_delete_block((void *)(src_4));
     __e_acsl_delete_block((void *)(dest_4));
   }

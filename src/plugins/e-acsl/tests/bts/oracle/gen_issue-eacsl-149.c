@@ -26,7 +26,7 @@ int main(int argc, char **argv)
                     "\\exists unsigned int x; -1 < x < 5 && x == 0",
                     "tests/bts/issue-eacsl-149.c",4);
   }
-  /*@ assert ∃ unsigned int x; -1 < x < 5 ∧ x ≡ 0; */ ;
+  /*@ assert \exists unsigned int x; -1 < x < 5 && x == 0; */ ;
   {
     int __gen_e_acsl_forall;
     int __gen_e_acsl_x_2;
@@ -46,7 +46,7 @@ int main(int argc, char **argv)
                     "!(\\forall unsigned int x; -1 < x < 5 ==> x != 0)",
                     "tests/bts/issue-eacsl-149.c",5);
   }
-  /*@ assert ¬(∀ unsigned int x; -1 < x < 5 ⇒ x ≢ 0); */ ;
+  /*@ assert !(\forall unsigned int x; -1 < x < 5 ==> x != 0); */ ;
   __retres = 0;
   return __retres;
 }

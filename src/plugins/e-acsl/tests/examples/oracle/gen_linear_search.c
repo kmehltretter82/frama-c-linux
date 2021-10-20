@@ -5,15 +5,15 @@
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 int A[10];
-/*@ requires ∀ ℤ i; 0 ≤ i < 9 ⇒ A[i] ≤ A[i + 1];
+/*@ requires \forall integer i; 0 <= i < 9 ==> A[i] <= A[i + 1];
     
     behavior exists:
-      assumes ∃ ℤ j; 0 ≤ j < 10 ∧ A[j] ≡ elt;
-      ensures \result ≡ 1;
+      assumes \exists integer j; 0 <= j < 10 && A[j] == elt;
+      ensures \result == 1;
     
     behavior not_exists:
-      assumes ∀ ℤ j; 0 ≤ j < 10 ⇒ A[j] ≢ elt;
-      ensures \result ≡ 0;
+      assumes \forall integer j; 0 <= j < 10 ==> A[j] != elt;
+      ensures \result == 0;
  */
 int __gen_e_acsl_search(int elt);
 
@@ -51,8 +51,8 @@ int search(int elt)
     __e_acsl_assert(__gen_e_acsl_and,1,"Invariant","search","0 <= k <= 10",
                     "tests/examples/linear_search.i",17);
   }
-  /*@ loop invariant 0 ≤ k ≤ 10;
-      loop invariant ∀ ℤ i; 0 ≤ i < k ⇒ A[i] < elt;
+  /*@ loop invariant 0 <= k <= 10;
+      loop invariant \forall integer i; 0 <= i < k ==> A[i] < elt;
   */
   while (k < 10) {
     if (A[k] == elt) {
@@ -113,24 +113,24 @@ int main(void)
   found = __gen_e_acsl_search(36);
   __e_acsl_assert(found == 1,1,"Assertion","main","found == 1",
                   "tests/examples/linear_search.i",34);
-  /*@ assert found ≡ 1; */ ;
+  /*@ assert found == 1; */ ;
   found = __gen_e_acsl_search(5);
   __e_acsl_assert(found == 0,1,"Assertion","main","found == 0",
                   "tests/examples/linear_search.i",37);
-  /*@ assert found ≡ 0; */ ;
+  /*@ assert found == 0; */ ;
   __retres = 0;
   return __retres;
 }
 
-/*@ requires ∀ ℤ i; 0 ≤ i < 9 ⇒ A[i] ≤ A[i + 1];
+/*@ requires \forall integer i; 0 <= i < 9 ==> A[i] <= A[i + 1];
     
     behavior exists:
-      assumes ∃ ℤ j; 0 ≤ j < 10 ∧ A[j] ≡ elt;
-      ensures \result ≡ 1;
+      assumes \exists integer j; 0 <= j < 10 && A[j] == elt;
+      ensures \result == 1;
     
     behavior not_exists:
-      assumes ∀ ℤ j; 0 ≤ j < 10 ⇒ A[j] ≢ elt;
-      ensures \result ≡ 0;
+      assumes \forall integer j; 0 <= j < 10 ==> A[j] != elt;
+      ensures \result == 0;
  */
 int __gen_e_acsl_search(int elt)
 {

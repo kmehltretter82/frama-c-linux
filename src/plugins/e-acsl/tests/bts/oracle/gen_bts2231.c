@@ -24,7 +24,7 @@ int main(void)
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_A));
     __gen_e_acsl__2 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_mul));
     /*@ assert
-        Eva: signed_overflow: -9223372036854775808 ≤ __gen_e_acsl__2 - 1;
+        Eva: signed_overflow: -9223372036854775808 <= __gen_e_acsl__2 - 1;
     */
     __gmpz_init_set_si(__gen_e_acsl__3,__gen_e_acsl__2 - 1L);
     __gmpz_init(__gen_e_acsl_add);
@@ -44,7 +44,7 @@ int main(void)
     __gmpz_clear(__gen_e_acsl_add);
     __gmpz_clear(__gen_e_acsl__4);
   }
-  /*@ assert A + (long)((long)(3 * A) - 1) ≡ -1; */ ;
+  /*@ assert A + (long)((long)(3 * A) - 1) == -1; */ ;
   __retres = 0;
   return __retres;
 }

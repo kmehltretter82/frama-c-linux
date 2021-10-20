@@ -2,12 +2,12 @@
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] tests/constructs/rte.i:24: Warning: 
   function __gen_e_acsl_test, behavior bhvr: precondition \let var = 1;
-                                                            var % j ≡ 1 got status unknown.
+                                                            var % j == 1 got status unknown.
 [eva:alarm] tests/constructs/rte.i:24: Warning: 
-  function __gen_e_acsl_test, behavior bhvr: precondition ∀ ℤ var;
-                                                            0 ≤ var < k ⇒
-                                                            var % k ≡ var got status unknown.
+  function __gen_e_acsl_test, behavior bhvr: precondition \forall integer var;
+                                                            0 <= var < k ==>
+                                                            var % k == var got status unknown.
 [eva:alarm] tests/constructs/rte.i:24: Warning: 
-  function __gen_e_acsl_test, behavior bhvr: precondition ∃ ℤ var;
-                                                            0 ≤ var < l ∧
-                                                            var % l ≡ var got status unknown.
+  function __gen_e_acsl_test, behavior bhvr: precondition \exists integer var;
+                                                            0 <= var < l &&
+                                                            var % l == var got status unknown.

@@ -54,7 +54,7 @@ int main(void)
     __gen_e_acsl_mod_guard = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_),
                                         (__e_acsl_mpz_struct const *)(__gen_e_acsl__3));
     __gmpz_init(__gen_e_acsl_mod);
-    /*@ assert E_ACSL: 2 ≢ 0; */
+    /*@ assert E_ACSL: 2 != 0; */
     __e_acsl_assert(__gen_e_acsl_mod_guard != 0,1,"Assertion","main",
                     "2 != 0","tests/arith/longlong.i",19);
     __gmpz_tdiv_r(__gen_e_acsl_mod,
@@ -71,7 +71,7 @@ int main(void)
     __gmpz_clear(__gen_e_acsl__3);
     __gmpz_clear(__gen_e_acsl_mod);
   }
-  /*@ assert (2 * x + 1) % 2 ≡ 1; */ ;
+  /*@ assert (2 * x + 1) % 2 == 1; */ ;
   __retres = 0;
   return __retres;
 }

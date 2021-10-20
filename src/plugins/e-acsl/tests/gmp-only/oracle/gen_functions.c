@@ -13,14 +13,14 @@ typedef struct mystruct mystruct;
  */
 int __gen_e_acsl_p1(int x, int y);
 
-/*@ predicate p2(ℤ x, ℤ y) = x + y > 0;
+/*@ predicate p2(integer x, integer y) = x + y > 0;
 
 */
 int __gen_e_acsl_p2(int x, int y);
 
 int __gen_e_acsl_p2_3(int x, __e_acsl_mpz_struct * y);
 
-/*@ logic ℤ f1(ℤ x, ℤ y) = x + y;
+/*@ logic integer f1(integer x, integer y) = x + y;
 
 */
 void __gen_e_acsl_f1(__e_acsl_mpz_t *__retres_arg, int x, int y);
@@ -51,11 +51,11 @@ int __gen_e_acsl_g(int x);
  */
 mystruct __gen_e_acsl_t1(mystruct m);
 
-/*@ logic ℤ t2(mystruct m) = m.k + m.l;
+/*@ logic integer t2(mystruct m) = m.k + m.l;
  */
 void __gen_e_acsl_t2(__e_acsl_mpz_t *__retres_arg, mystruct m);
 
-/*@ predicate k_pred(ℤ x) = x > 0;
+/*@ predicate k_pred(integer x) = x > 0;
 
 */
 int __gen_e_acsl_k_pred(int x);
@@ -69,15 +69,15 @@ void k(int x)
 }
 
 int glob = 5;
-/*@ predicate never_called(int x) = x ≡ x;
+/*@ predicate never_called(int x) = x == x;
  */
 /*@ logic double f2(double x) = (double)(1 / x);
  */
 double __gen_e_acsl_f2(double x);
 
-/*@ predicate p_notyet{L}(ℤ x) = x > 0;
+/*@ predicate p_notyet{L}(integer x) = x > 0;
  */
-/*@ logic ℤ f_notyet{L}(ℤ x) = x;
+/*@ logic integer f_notyet{L}(integer x) = x;
 
 */
 int main(void)
@@ -125,7 +125,7 @@ int main(void)
     __gmpz_clear(__gen_e_acsl_f1_2);
     __gmpz_clear(__gen_e_acsl__5);
   }
-  /*@ assert f1(x, y) ≡ 3; */ ;
+  /*@ assert f1(x, y) == 3; */ ;
   {
     __e_acsl_mpz_t __gen_e_acsl_f1_4;
     int __gen_e_acsl_p2_6;
@@ -181,7 +181,7 @@ int main(void)
   }
   /*@
   assert
-  f1(99999999999999999999999999999, 99999999999999999999999999999) ≡
+  f1(99999999999999999999999999999, 99999999999999999999999999999) ==
   199999999999999999999999999998; */
   ;
   {
@@ -199,7 +199,7 @@ int main(void)
     __gmpz_clear(__gen_e_acsl_app);
     __gmpz_clear(__gen_e_acsl_x_6);
   }
-  /*@ assert g(x) ≡ x; */ ;
+  /*@ assert g(x) == x; */ ;
   char c = (char)'c';
   {
     int __gen_e_acsl_h_char_2;
@@ -216,7 +216,7 @@ int main(void)
     __gmpz_clear(__gen_e_acsl_app_2);
     __gmpz_clear(__gen_e_acsl_c);
   }
-  /*@ assert h_char(c) ≡ c; */ ;
+  /*@ assert h_char(c) == c; */ ;
   short s = (short)1;
   {
     int __gen_e_acsl_h_short_2;
@@ -233,7 +233,7 @@ int main(void)
     __gmpz_clear(__gen_e_acsl_app_3);
     __gmpz_clear(__gen_e_acsl_s);
   }
-  /*@ assert h_short(s) ≡ s; */ ;
+  /*@ assert h_short(s) == s; */ ;
   m.k = 8;
   m.l = 9;
   {
@@ -251,7 +251,7 @@ int main(void)
     __gmpz_clear(__gen_e_acsl_t2_2);
     __gmpz_clear(__gen_e_acsl__12);
   }
-  /*@ assert t2(t1(m)) ≡ 17; */ ;
+  /*@ assert t2(t1(m)) == 17; */ ;
   __gen_e_acsl_k(9);
   double d = 2.0;
   {

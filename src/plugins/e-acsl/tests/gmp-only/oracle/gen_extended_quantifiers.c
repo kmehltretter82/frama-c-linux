@@ -65,7 +65,7 @@ int main(void)
     __gmpz_clear(__gen_e_acsl_accumulator);
     __gmpz_clear(__gen_e_acsl__4);
   }
-  /*@ assert \sum(2, 10, \lambda ℤ k; 2 * k) ≡ 108; */ ;
+  /*@ assert \sum(2, 10, \lambda integer k; 2 * k) == 108; */ ;
   {
     __e_acsl_mpz_t __gen_e_acsl__5;
     __e_acsl_mpz_t __gen_e_acsl__6;
@@ -115,7 +115,7 @@ int main(void)
     __gmpz_clear(__gen_e_acsl_lambda_2);
     __gmpz_clear(__gen_e_acsl_accumulator_2);
   }
-  /*@ assert \sum(1, 10, \lambda ℤ k; 1) ≡ 10; */ ;
+  /*@ assert \sum(1, 10, \lambda integer k; 1) == 10; */ ;
   {
     __e_acsl_mpz_t __gen_e_acsl__8;
     __e_acsl_mpz_t __gen_e_acsl__9;
@@ -196,7 +196,7 @@ int main(void)
     __gmpz_clear(__gen_e_acsl_accumulator_3);
     __gmpz_clear(__gen_e_acsl__14);
   }
-  /*@ assert \numof(2, 10, \lambda ℤ k; k - 2 ≥ 0) ≡ 9; */ ;
+  /*@ assert \numof(2, 10, \lambda integer k; k - 2 >= 0) == 9; */ ;
   {
     __e_acsl_mpz_t __gen_e_acsl__15;
     __e_acsl_mpz_t __gen_e_acsl__16;
@@ -244,7 +244,7 @@ int main(void)
     __gmpz_clear(__gen_e_acsl_accumulator_4);
     __gmpz_clear(__gen_e_acsl__17);
   }
-  /*@ assert \product(1, 10, \lambda ℤ k; k) ≡ 3628800; */ ;
+  /*@ assert \product(1, 10, \lambda integer k; k) == 3628800; */ ;
   {
     __e_acsl_mpz_t __gen_e_acsl__18;
     __e_acsl_mpz_t __gen_e_acsl_neg;
@@ -294,7 +294,7 @@ int main(void)
     __gmpz_clear(__gen_e_acsl_accumulator_5);
     __gmpz_clear(__gen_e_acsl__19);
   }
-  /*@ assert \product(-10, 10, \lambda ℤ k; k) ≡ 0; */ ;
+  /*@ assert \product(-10, 10, \lambda integer k; k) == 0; */ ;
   __retres = 0;
   return __retres;
 }

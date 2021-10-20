@@ -5,9 +5,9 @@
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@ ensures
-      ∀ ℤ n;
-        1 < n ≤ 3 ⇒ \old(*(t + n) ≡ 12) ∧ \old(*(t + (n - 1)) > 5);
-    ensures \let m = 4; \old(*(t + m) ≡ -4) ∧ \old(*(t + (m - 4))) ≡ 9;
+      \forall integer n;
+        1 < n <= 3 ==> \old(*(t + n) == 12) && \old(*(t + (n - 1)) > 5);
+    ensures \let m = 4; \old(*(t + m) == -4) && \old(*(t + (m - 4))) == 9;
  */
 void __gen_e_acsl_f(int *t);
 
@@ -68,7 +68,7 @@ void g(void)
                     "\\exists integer w; 3 <= w < 6 && \\at(m + w == 12,Q)",
                     "tests/arith/at_on-purely-logic-variables.c",16);
   }
-  /*@ assert ∃ ℤ w; 3 ≤ w < 6 ∧ \at(m + w ≡ 12,Q); */ ;
+  /*@ assert \exists integer w; 3 <= w < 6 && \at(m + w == 12,Q); */ ;
   free((void *)__gen_e_acsl_at);
   return;
 }
@@ -217,7 +217,7 @@ int main(void)
                     "\\let i = 3; \\at(n + i == 10,L)",
                     "tests/arith/at_on-purely-logic-variables.c",28);
   }
-  /*@ assert \let i = 3; \at(n + i ≡ 10,L); */ ;
+  /*@ assert \let i = 3; \at(n + i == 10,L); */ ;
   {
     int __gen_e_acsl_exists;
     int __gen_e_acsl_j;
@@ -248,7 +248,7 @@ int main(void)
                     "\\exists integer j; 2 <= j < 5 && \\at(n + j == 11,L)",
                     "tests/arith/at_on-purely-logic-variables.c",29);
   }
-  /*@ assert ∃ ℤ j; 2 ≤ j < 5 ∧ \at(n + j ≡ 11,L); */ ;
+  /*@ assert \exists integer j; 2 <= j < 5 && \at(n + j == 11,L); */ ;
   {
     int __gen_e_acsl_k;
     int __gen_e_acsl_exists_2;
@@ -304,9 +304,9 @@ int main(void)
   }
   /*@
   assert \let k = -7;
-  ∃ ℤ u;
-    9 ≤ u < 21 ∧
-    (∀ ℤ v; -5 < v ≤ 6 ⇒ \at((u > 0? n + k: u + v) > 0,K));
+  \exists integer u;
+    9 <= u < 21 &&
+    (\forall integer v; -5 < v <= 6 ==> \at((u > 0? n + k: u + v) > 0,K));
    */
   ;
   {
@@ -324,7 +324,7 @@ int main(void)
                     "\\let i = 3; \\at(n + i,L) == 10",
                     "tests/arith/at_on-purely-logic-variables.c",38);
   }
-  /*@ assert \let i = 3; \at(n + i,L) ≡ 10; */ ;
+  /*@ assert \let i = 3; \at(n + i,L) == 10; */ ;
   unsigned int m = (unsigned int)3;
   G:
   {
@@ -371,7 +371,7 @@ int main(void)
                     "\\exists integer k; -9 < k < 0 && \\at(m + k,G) == 0",
                     "tests/arith/at_on-purely-logic-variables.c",42);
   }
-  /*@ assert ∃ ℤ k; -9 < k < 0 ∧ \at(m + k,G) ≡ 0; */ ;
+  /*@ assert \exists integer k; -9 < k < 0 && \at(m + k,G) == 0; */ ;
   {
     int __gen_e_acsl_exists_4;
     int __gen_e_acsl_u_3;
@@ -436,9 +436,10 @@ int main(void)
   }
   /*@
   assert
-  ∃ ℤ u;
-    9 ≤ u < 21 ∧
-    (∀ ℤ v; -5 < v ≤ (u < 15? u + 6: 3) ⇒ \at((n + u) + v > 0,K));
+  \exists integer u;
+    9 <= u < 21 &&
+    (\forall integer v;
+       -5 < v <= (u < 15? u + 6: 3) ==> \at((n + u) + v > 0,K));
    */
   ;
   int t[5] = {9, 12, 12, 12, -4};
@@ -525,19 +526,19 @@ int main(void)
   }
   /*@
   assert
-  ∃ ℤ u;
-    10 ≤ u < 20 ∧
-    (∃ ℤ v;
-       -10 < v ≤ -5 + (\let u = -2; u) ∧
-       (∃ ℤ w;
-          100 < w ≤ 200 ∧
-          \at((((n - u) + (\let u = 42; u)) + v) + w > 0,K)));
+  \exists integer u;
+    10 <= u < 20 &&
+    (\exists integer v;
+       -10 < v <= -5 + (\let u = -2; u) &&
+       (\exists integer w;
+          100 < w <= 200 && \at((((n - u) + (\let u = 42; u)) + v) + w > 0,K)));
    */
   ;
-  /*@ assert ∃ ℤ j; 2 ≤ j < 10000000000000000 ∧ \at(n + j ≡ 11,L);
+  /*@
+  assert \exists integer j; 2 <= j < 10000000000000000 && \at(n + j == 11,L);
    */
   ;
-  /*@ assert \let i = n; \at(n + i ≡ 10,L); */ ;
+  /*@ assert \let i = n; \at(n + i == 10,L); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(t));
   __e_acsl_delete_block((void *)(& n));
@@ -553,9 +554,9 @@ int main(void)
 }
 
 /*@ ensures
-      ∀ ℤ n;
-        1 < n ≤ 3 ⇒ \old(*(t + n) ≡ 12) ∧ \old(*(t + (n - 1)) > 5);
-    ensures \let m = 4; \old(*(t + m) ≡ -4) ∧ \old(*(t + (m - 4))) ≡ 9;
+      \forall integer n;
+        1 < n <= 3 ==> \old(*(t + n) == 12) && \old(*(t + (n - 1)) > 5);
+    ensures \let m = 4; \old(*(t + m) == -4) && \old(*(t + (m - 4))) == 9;
  */
 void __gen_e_acsl_f(int *t)
 {

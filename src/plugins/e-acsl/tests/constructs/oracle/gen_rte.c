@@ -4,18 +4,18 @@
 #include "stdio.h"
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
-/*@ requires 1 % a ≡ 1;
-    ensures 1 % \old(b) ≡ 1;
+/*@ requires 1 % a == 1;
+    ensures 1 % \old(b) == 1;
     
     behavior bhvr:
-      assumes 1 % c ≡ 1;
-      requires 1 % d ≡ 1;
-      requires 1 % f ≡ 1 ∨ 1 % g ≡ 1;
-      requires 1 % h ≡ 1 ∧ 1 % i ≡ 1;
-      requires \let var = 1; var % j ≡ 1;
-      requires ∀ ℤ var; 0 ≤ var < k ⇒ var % k ≡ var;
-      requires ∃ ℤ var; 0 ≤ var < l ∧ var % l ≡ var;
-      ensures 1 % \old(e) ≡ 1;
+      assumes 1 % c == 1;
+      requires 1 % d == 1;
+      requires 1 % f == 1 || 1 % g == 1;
+      requires 1 % h == 1 && 1 % i == 1;
+      requires \let var = 1; var % j == 1;
+      requires \forall integer var; 0 <= var < k ==> var % k == var;
+      requires \exists integer var; 0 <= var < l && var % l == var;
+      ensures 1 % \old(e) == 1;
  */
 void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
                        int h, int i, int j, int k, int l);
@@ -34,18 +34,18 @@ int main(void)
   return __retres;
 }
 
-/*@ requires 1 % a ≡ 1;
-    ensures 1 % \old(b) ≡ 1;
+/*@ requires 1 % a == 1;
+    ensures 1 % \old(b) == 1;
     
     behavior bhvr:
-      assumes 1 % c ≡ 1;
-      requires 1 % d ≡ 1;
-      requires 1 % f ≡ 1 ∨ 1 % g ≡ 1;
-      requires 1 % h ≡ 1 ∧ 1 % i ≡ 1;
-      requires \let var = 1; var % j ≡ 1;
-      requires ∀ ℤ var; 0 ≤ var < k ⇒ var % k ≡ var;
-      requires ∃ ℤ var; 0 ≤ var < l ∧ var % l ≡ var;
-      ensures 1 % \old(e) ≡ 1;
+      assumes 1 % c == 1;
+      requires 1 % d == 1;
+      requires 1 % f == 1 || 1 % g == 1;
+      requires 1 % h == 1 && 1 % i == 1;
+      requires \let var = 1; var % j == 1;
+      requires \forall integer var; 0 <= var < k ==> var % k == var;
+      requires \exists integer var; 0 <= var < l && var % l == var;
+      ensures 1 % \old(e) == 1;
  */
 void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
                        int h, int i, int j, int k, int l)

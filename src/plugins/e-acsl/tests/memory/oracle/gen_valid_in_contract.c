@@ -9,12 +9,12 @@ struct list {
    struct list *next ;
 };
 /*@ behavior B1:
-      assumes l ≡ \null;
-      ensures \result ≡ \old(l);
+      assumes l == \null;
+      ensures \result == \old(l);
     
     behavior B2:
-      assumes ¬\valid(l) ∨ ¬\valid(l->next);
-      ensures \result ≡ \old(l);
+      assumes !\valid(l) || !\valid(l->next);
+      ensures \result == \old(l);
  */
 struct list *__gen_e_acsl_f(struct list *l);
 
@@ -54,12 +54,12 @@ int main(void)
 }
 
 /*@ behavior B1:
-      assumes l ≡ \null;
-      ensures \result ≡ \old(l);
+      assumes l == \null;
+      ensures \result == \old(l);
     
     behavior B2:
-      assumes ¬\valid(l) ∨ ¬\valid(l->next);
-      ensures \result ≡ \old(l);
+      assumes !\valid(l) || !\valid(l->next);
+      ensures \result == \old(l);
  */
 struct list *__gen_e_acsl_f(struct list *l)
 {

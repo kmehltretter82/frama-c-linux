@@ -12,9 +12,9 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
         \separated((char *)dest + (0 .. n - 1), (char *)src + (0 .. n - 1));
     ensures
       copied_contents:
-        memcmp{Post, Pre}((char *)\old(dest), (char *)\old(src), \old(n)) ≡
+        memcmp{Post, Pre}((char *)\old(dest), (char *)\old(src), \old(n)) ==
         0;
-    ensures result_ptr: \result ≡ \old(dest);
+    ensures result_ptr: \result == \old(dest);
     assigns *((char *)dest + (0 .. n - 1)), \result;
     assigns *((char *)dest + (0 .. n - 1))
       \from *((char *)src + (0 .. n - 1));
@@ -24,9 +24,8 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
                           size_t n);
 
 /*@ requires valid_s: valid_or_empty(s, n);
-    ensures
-      acsl_c_equiv: memset((char *)\old(s), \old(c), \old(n)) ≡ \true;
-    ensures result_ptr: \result ≡ \old(s);
+    ensures acsl_c_equiv: memset((char *)\old(s), \old(c), \old(n)) == \true;
+    ensures result_ptr: \result == \old(s);
     assigns *((char *)s + (0 .. n - 1)), \result;
     assigns *((char *)s + (0 .. n - 1)) \from c;
     assigns \result \from s;
@@ -153,7 +152,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_and_5,1,"Assertion","main",
                     "!\\valid(dest[0])","tests/temporal/t_memcpy.c",30);
   }
-  /*@ assert ¬\valid(dest[0]); */ ;
+  /*@ assert !\valid(dest[0]); */ ;
   {
     int __gen_e_acsl_initialized_6;
     int __gen_e_acsl_and_6;
@@ -170,7 +169,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_and_6,1,"Assertion","main",
                     "!\\valid(dest[1])","tests/temporal/t_memcpy.c",31);
   }
-  /*@ assert ¬\valid(dest[1]); */ ;
+  /*@ assert !\valid(dest[1]); */ ;
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
   int **p = malloc((unsigned long)size);
@@ -277,7 +276,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_and_11,1,"Assertion","main",
                     "!\\valid(*q)","tests/temporal/t_memcpy.c",42);
   }
-  /*@ assert ¬\valid(*q); */ ;
+  /*@ assert !\valid(*q); */ ;
   {
     int __gen_e_acsl_initialized_12;
     int __gen_e_acsl_and_12;
@@ -302,7 +301,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_and_12,1,"Assertion","main",
                     "!\\valid(*(q + 1))","tests/temporal/t_memcpy.c",43);
   }
-  /*@ assert ¬\valid(*(q + 1)); */ ;
+  /*@ assert !\valid(*(q + 1)); */ ;
   __e_acsl_full_init((void *)(& tmp_1));
   __e_acsl_temporal_store_nblock((void *)(& tmp_1),(void *)0);
   tmp_1 = (int *)0;
@@ -387,9 +386,8 @@ int main(void)
 }
 
 /*@ requires valid_s: valid_or_empty(s, n);
-    ensures
-      acsl_c_equiv: memset((char *)\old(s), \old(c), \old(n)) ≡ \true;
-    ensures result_ptr: \result ≡ \old(s);
+    ensures acsl_c_equiv: memset((char *)\old(s), \old(c), \old(n)) == \true;
+    ensures result_ptr: \result == \old(s);
     assigns *((char *)s + (0 .. n - 1)), \result;
     assigns *((char *)s + (0 .. n - 1)) \from c;
     assigns \result \from s;
@@ -421,9 +419,9 @@ void *__gen_e_acsl_memset(void *s, int c, size_t n)
         \separated((char *)dest + (0 .. n - 1), (char *)src + (0 .. n - 1));
     ensures
       copied_contents:
-        memcmp{Post, Pre}((char *)\old(dest), (char *)\old(src), \old(n)) ≡
+        memcmp{Post, Pre}((char *)\old(dest), (char *)\old(src), \old(n)) ==
         0;
-    ensures result_ptr: \result ≡ \old(dest);
+    ensures result_ptr: \result == \old(dest);
     assigns *((char *)dest + (0 .. n - 1)), \result;
     assigns *((char *)dest + (0 .. n - 1))
       \from *((char *)src + (0 .. n - 1));

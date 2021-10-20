@@ -130,8 +130,5 @@ let runtime_check_with_msg ~adata ~loc msg ~pred_kind kind kf env e =
 
 let runtime_check ~adata ~pred_kind kind kf env e p =
   let loc = p.pred_loc in
-  let msg =
-    Kernel.Unicode.without_unicode
-      (Format.asprintf "%a@?" Printer.pp_predicate) p
-  in
+  let msg = Format.asprintf "%a@?" Printer.pp_predicate p in
   runtime_check_with_msg ~adata ~loc msg ~pred_kind kind kf env e

@@ -47,8 +47,7 @@ int *new_inversed(int len, int *v)
                     "\\valid(v) && \\offset(v) + len * sizeof(int) <= \\block_length(v)",
                     "tests/memory/vector.c",12);
   }
-  /*@
-  assert \valid(v) ∧ \offset(v) + len * sizeof(int) ≤ \block_length(v);
+  /*@ assert \valid(v) && \offset(v) + len * sizeof(int) <= \block_length(v);
    */
   ;
   __e_acsl_full_init((void *)(& p));
@@ -104,7 +103,7 @@ int main(void)
   /*@ assert \initialized(v2 + 2); */ ;
   __e_acsl_assert(LAST == 1,1,"Assertion","main","LAST == 1",
                   "tests/memory/vector.c",28);
-  /*@ assert LAST ≡ 1; */ ;
+  /*@ assert LAST == 1; */ ;
   free((void *)v2);
   __retres = 0;
   __e_acsl_delete_block((void *)(& v2));

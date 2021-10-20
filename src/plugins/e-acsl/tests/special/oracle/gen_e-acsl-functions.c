@@ -5,9 +5,8 @@
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@ requires \initialized(p);
-    requires *p ≡ 0;
-    ensures \result ≡ \old(*p);
- */
+    requires *p == 0;
+    ensures \result == \old(*p); */
 int __gen_e_acsl_f(int *p);
 
 int f(int *p)
@@ -22,7 +21,7 @@ int f(int *p)
       __e_acsl_assert(__gen_e_acsl_and,1,"Invariant","f","0 <= i <= 1",
                       "tests/special/e-acsl-functions.c",13);
     }
-    /*@ loop invariant 0 ≤ i ≤ 1; */
+    /*@ loop invariant 0 <= i <= 1; */
     while (i < 1) {
       int __gen_e_acsl_and_2;
       i ++;
@@ -37,15 +36,14 @@ int f(int *p)
 }
 
 /*@ requires \initialized(p);
-    requires *p ≡ 1;
-    ensures \result ≡ \old(*p);
- */
+    requires *p == 1;
+    ensures \result == \old(*p); */
 int g(int *p)
 {
   int __retres;
   {
     int i = 0;
-    /*@ loop invariant 0 ≤ i ≤ 1; */
+    /*@ loop invariant 0 <= i <= 1; */
     while (i < 1) i ++;
   }
   __retres = 0;
@@ -69,9 +67,8 @@ int main(void)
 }
 
 /*@ requires \initialized(p);
-    requires *p ≡ 0;
-    ensures \result ≡ \old(*p);
- */
+    requires *p == 0;
+    ensures \result == \old(*p); */
 int __gen_e_acsl_f(int *p)
 {
   int __gen_e_acsl_at;

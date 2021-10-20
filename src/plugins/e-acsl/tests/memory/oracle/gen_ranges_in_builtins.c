@@ -9,7 +9,7 @@ struct S {
    float *b ;
    float *c ;
 };
-/*@ requires ¬\valid(s + (3 .. n + 1000)); */
+/*@ requires !\valid(s + (3 .. n + 1000)); */
 void __gen_e_acsl_f(char *s, long n);
 
 void f(char *s, long n)
@@ -18,7 +18,7 @@ void f(char *s, long n)
 }
 
 /*@ requires \valid(ptr + (0 .. size - 1));
-    ensures ¬\valid(\old(ptr) + (0 .. \old(size) + 1));
+    ensures !\valid(\old(ptr) + (0 .. \old(size) + 1));
  */
 void __gen_e_acsl_g(long *ptr, size_t size);
 
@@ -95,7 +95,7 @@ int main(void)
                     "!\\valid(a + (10 .. 11))",
                     "tests/memory/ranges_in_builtins.c",27);
   }
-  /*@ assert ¬\valid(a + (10 .. 11)); */ ;
+  /*@ assert !\valid(a + (10 .. 11)); */ ;
   free((void *)a);
   __e_acsl_full_init((void *)(& b));
   b = (char *)malloc((unsigned long)10 * sizeof(char));
@@ -128,7 +128,7 @@ int main(void)
                     "!\\valid(b + (10 .. 15))",
                     "tests/memory/ranges_in_builtins.c",33);
   }
-  /*@ assert ¬\valid(b + (10 .. 15)); */ ;
+  /*@ assert !\valid(b + (10 .. 15)); */ ;
   long t[3] = {7l, 8l, 9l};
   __e_acsl_store_block((void *)(t),(size_t)24);
   __e_acsl_full_init((void *)(& t));
@@ -161,7 +161,7 @@ int main(void)
                     "!\\valid(&t[3 .. 5])",
                     "tests/memory/ranges_in_builtins.c",37);
   }
-  /*@ assert ¬\valid(&t[3 .. 5]); */ ;
+  /*@ assert !\valid(&t[3 .. 5]); */ ;
   __gen_e_acsl_g(t,(unsigned long)3);
   __e_acsl_initialize((void *)(t2),sizeof(double));
   t2[0] = 0.5;
@@ -196,7 +196,7 @@ int main(void)
                     "!\\initialized(&t2[2 .. 3])",
                     "tests/memory/ranges_in_builtins.c",44);
   }
-  /*@ assert ¬\initialized(&t2[2 .. 3]); */ ;
+  /*@ assert !\initialized(&t2[2 .. 3]); */ ;
   {
     int __gen_e_acsl_size_10;
     int __gen_e_acsl_if_10;
@@ -210,7 +210,7 @@ int main(void)
                     "!\\initialized(b + (0 .. 9))",
                     "tests/memory/ranges_in_builtins.c",46);
   }
-  /*@ assert ¬\initialized(b + (0 .. 9)); */ ;
+  /*@ assert !\initialized(b + (0 .. 9)); */ ;
   free((void *)b);
   int n = 2;
   {
@@ -253,7 +253,7 @@ int main(void)
                     "!\\initialized(&t3[n - 1 .. n + 2][1][0 .. 1])",
                     "tests/memory/ranges_in_builtins.c",51);
   }
-  /*@ assert ¬\initialized(&t3[n - 1 .. n + 2][1][0 .. 1]); */ ;
+  /*@ assert !\initialized(&t3[n - 1 .. n + 2][1][0 .. 1]); */ ;
   {
     int __gen_e_acsl_size_11;
     int __gen_e_acsl_if_11;
@@ -270,7 +270,7 @@ int main(void)
                     "!\\valid_read(&t3[6][1][0] + (2 .. 10))",
                     "tests/memory/ranges_in_builtins.c",53);
   }
-  /*@ assert ¬\valid_read(&t3[6][1][0] + (2 .. 10)); */ ;
+  /*@ assert !\valid_read(&t3[6][1][0] + (2 .. 10)); */ ;
   {
     int __gen_e_acsl_forall_3;
     long __gen_e_acsl_range_3;
@@ -361,7 +361,7 @@ int main(void)
                     "!\\initialized(s.b + (0 .. 1))",
                     "tests/memory/ranges_in_builtins.c",63);
   }
-  /*@ assert ¬\initialized(s.b + (0 .. 1)); */ ;
+  /*@ assert !\initialized(s.b + (0 .. 1)); */ ;
   int size1 = 5;
   int size2 = 9;
   __e_acsl_full_init((void *)(& multi_dynamic));
@@ -443,7 +443,7 @@ int main(void)
 }
 
 /*@ requires \valid(ptr + (0 .. size - 1));
-    ensures ¬\valid(\old(ptr) + (0 .. \old(size) + 1));
+    ensures !\valid(\old(ptr) + (0 .. \old(size) + 1));
  */
 void __gen_e_acsl_g(long *ptr, size_t size)
 {
@@ -611,7 +611,7 @@ void __gen_e_acsl_g(long *ptr, size_t size)
   }
 }
 
-/*@ requires ¬\valid(s + (3 .. n + 1000)); */
+/*@ requires !\valid(s + (3 .. n + 1000)); */
 void __gen_e_acsl_f(char *s, long n)
 {
   {

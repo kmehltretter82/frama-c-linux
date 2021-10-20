@@ -6,7 +6,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 int X = 0;
 int Y = 2;
-/*@ ensures X ≡ 1; */
+/*@ ensures X == 1; */
 void __gen_e_acsl_f(void);
 
 void f(void)
@@ -15,8 +15,8 @@ void f(void)
   return;
 }
 
-/*@ ensures X ≡ 2;
-    ensures Y ≡ 2; */
+/*@ ensures X == 2;
+    ensures Y == 2; */
 void __gen_e_acsl_g(void);
 
 void g(void)
@@ -25,7 +25,7 @@ void g(void)
   return;
 }
 
-/*@ requires X ≡ 2; */
+/*@ requires X == 2; */
 void __gen_e_acsl_h(void);
 
 void h(void)
@@ -34,8 +34,8 @@ void h(void)
   return;
 }
 
-/*@ requires X ≡ 3;
-    requires Y ≡ 2; */
+/*@ requires X == 3;
+    requires Y == 2; */
 void __gen_e_acsl_i(void);
 
 void i(void)
@@ -45,13 +45,13 @@ void i(void)
 }
 
 /*@ behavior b1:
-      requires X ≡ 5;
-      ensures X ≡ 3;
+      requires X == 5;
+      ensures X == 3;
     
     behavior b2:
-      requires X ≡ 3 + Y;
-      requires Y ≡ 2;
-      ensures X ≡ Y + 1;
+      requires X == 3 + Y;
+      requires Y == 2;
+      ensures X == Y + 1;
  */
 void __gen_e_acsl_j(void);
 
@@ -62,14 +62,14 @@ void j(void)
 }
 
 /*@ behavior b1:
-      assumes X ≡ 1;
-      requires X ≡ 0;
+      assumes X == 1;
+      requires X == 0;
     
     behavior b2:
-      assumes X ≡ 3;
-      assumes Y ≡ 2;
-      requires X ≡ 3;
-      requires X + Y ≡ 5;
+      assumes X == 3;
+      assumes Y == 2;
+      requires X == 3;
+      requires X + Y == 5;
  */
 void __gen_e_acsl_k(void);
 
@@ -79,26 +79,26 @@ void k(void)
   return;
 }
 
-/*@ ensures X ≡ 5; */
+/*@ ensures X == 5; */
 int __gen_e_acsl_l(void);
 
 int l(void)
 {
   __e_acsl_assert(Y == 2,1,"Assertion","l","Y == 2",
                   "tests/constructs/function_contract.i",61);
-  /*@ assert Y ≡ 2; */ ;
+  /*@ assert Y == 2; */ ;
   return X;
 }
 
 /*@ behavior b1:
-      assumes X ≡ 7;
-      ensures X ≡ 95;
+      assumes X == 7;
+      ensures X == 95;
     
     behavior b2:
-      assumes X ≡ 5;
-      assumes Y ≡ 2;
-      ensures X ≡ 7;
-      ensures X ≡ \old(X) + Y;
+      assumes X == 5;
+      assumes Y == 2;
+      ensures X == 7;
+      ensures X == \old(X) + Y;
  */
 void __gen_e_acsl_m(void);
 
@@ -112,12 +112,12 @@ void m(void)
     requires X < 10;
     
     behavior b1:
-      assumes X ≡ 7;
-      ensures X ≡ 8;
+      assumes X == 7;
+      ensures X == 8;
     
     behavior b2:
-      assumes X ≡ 5;
-      ensures X ≡ 98;
+      assumes X == 5;
+      ensures X == 98;
  */
 void __gen_e_acsl_n(void);
 
@@ -128,27 +128,27 @@ void n(void)
 }
 
 /*@ requires X > -1000;
-    ensures X ≡ \old(Y);
+    ensures X == \old(Y);
     
     behavior neg:
       assumes Y < 0;
       requires Y < 1;
-      ensures X ≡ \old(Y);
+      ensures X == \old(Y);
     
     behavior pos:
-      assumes Y ≥ 0;
+      assumes Y >= 0;
       requires Y > -1;
-      ensures X ≡ \old(Y);
+      ensures X == \old(Y);
     
     behavior odd:
-      assumes Y % 2 ≡ 1;
-      requires Y % 2 - 1 ≡ 0;
-      ensures X ≡ \old(Y);
+      assumes Y % 2 == 1;
+      requires Y % 2 - 1 == 0;
+      ensures X == \old(Y);
     
     behavior even:
-      assumes Y % 2 ≡ 0;
-      requires Y % 2 + 1 ≡ 1;
-      ensures X ≡ \old(Y);
+      assumes Y % 2 == 0;
+      requires Y % 2 + 1 == 1;
+      ensures X == \old(Y);
     
     complete behaviors even, odd, pos, neg;
     complete behaviors odd, even;
@@ -182,27 +182,27 @@ int main(void)
 }
 
 /*@ requires X > -1000;
-    ensures X ≡ \old(Y);
+    ensures X == \old(Y);
     
     behavior neg:
       assumes Y < 0;
       requires Y < 1;
-      ensures X ≡ \old(Y);
+      ensures X == \old(Y);
     
     behavior pos:
-      assumes Y ≥ 0;
+      assumes Y >= 0;
       requires Y > -1;
-      ensures X ≡ \old(Y);
+      ensures X == \old(Y);
     
     behavior odd:
-      assumes Y % 2 ≡ 1;
-      requires Y % 2 - 1 ≡ 0;
-      ensures X ≡ \old(Y);
+      assumes Y % 2 == 1;
+      requires Y % 2 - 1 == 0;
+      ensures X == \old(Y);
     
     behavior even:
-      assumes Y % 2 ≡ 0;
-      requires Y % 2 + 1 ≡ 1;
-      ensures X ≡ \old(Y);
+      assumes Y % 2 == 0;
+      requires Y % 2 + 1 == 1;
+      ensures X == \old(Y);
     
     complete behaviors even, odd, pos, neg;
     complete behaviors odd, even;
@@ -332,12 +332,12 @@ void __gen_e_acsl_o(void)
     requires X < 10;
     
     behavior b1:
-      assumes X ≡ 7;
-      ensures X ≡ 8;
+      assumes X == 7;
+      ensures X == 8;
     
     behavior b2:
-      assumes X ≡ 5;
-      ensures X ≡ 98;
+      assumes X == 5;
+      ensures X == 98;
  */
 void __gen_e_acsl_n(void)
 {
@@ -373,14 +373,14 @@ void __gen_e_acsl_n(void)
 }
 
 /*@ behavior b1:
-      assumes X ≡ 7;
-      ensures X ≡ 95;
+      assumes X == 7;
+      ensures X == 95;
     
     behavior b2:
-      assumes X ≡ 5;
-      assumes Y ≡ 2;
-      ensures X ≡ 7;
-      ensures X ≡ \old(X) + Y;
+      assumes X == 5;
+      assumes Y == 2;
+      ensures X == 7;
+      ensures X == \old(X) + Y;
  */
 void __gen_e_acsl_m(void)
 {
@@ -420,7 +420,7 @@ void __gen_e_acsl_m(void)
   }
 }
 
-/*@ ensures X ≡ 5; */
+/*@ ensures X == 5; */
 int __gen_e_acsl_l(void)
 {
   int __retres;
@@ -431,14 +431,14 @@ int __gen_e_acsl_l(void)
 }
 
 /*@ behavior b1:
-      assumes X ≡ 1;
-      requires X ≡ 0;
+      assumes X == 1;
+      requires X == 0;
     
     behavior b2:
-      assumes X ≡ 3;
-      assumes Y ≡ 2;
-      requires X ≡ 3;
-      requires X + Y ≡ 5;
+      assumes X == 3;
+      assumes Y == 2;
+      requires X == 3;
+      requires X + Y == 5;
  */
 void __gen_e_acsl_k(void)
 {
@@ -474,13 +474,13 @@ void __gen_e_acsl_k(void)
 }
 
 /*@ behavior b1:
-      requires X ≡ 5;
-      ensures X ≡ 3;
+      requires X == 5;
+      ensures X == 3;
     
     behavior b2:
-      requires X ≡ 3 + Y;
-      requires Y ≡ 2;
-      ensures X ≡ Y + 1;
+      requires X == 3 + Y;
+      requires Y == 2;
+      ensures X == Y + 1;
  */
 void __gen_e_acsl_j(void)
 {
@@ -528,8 +528,8 @@ void __gen_e_acsl_j(void)
   }
 }
 
-/*@ requires X ≡ 3;
-    requires Y ≡ 2; */
+/*@ requires X == 3;
+    requires Y == 2; */
 void __gen_e_acsl_i(void)
 {
   __e_acsl_assert(X == 3,1,"Precondition","i","X == 3",
@@ -540,7 +540,7 @@ void __gen_e_acsl_i(void)
   return;
 }
 
-/*@ requires X ≡ 2; */
+/*@ requires X == 2; */
 void __gen_e_acsl_h(void)
 {
   __e_acsl_assert(X == 2,1,"Precondition","h","X == 2",
@@ -549,8 +549,8 @@ void __gen_e_acsl_h(void)
   return;
 }
 
-/*@ ensures X ≡ 2;
-    ensures Y ≡ 2; */
+/*@ ensures X == 2;
+    ensures Y == 2; */
 void __gen_e_acsl_g(void)
 {
   g();
@@ -561,7 +561,7 @@ void __gen_e_acsl_g(void)
   return;
 }
 
-/*@ ensures X ≡ 1; */
+/*@ ensures X == 1; */
 void __gen_e_acsl_f(void)
 {
   f();

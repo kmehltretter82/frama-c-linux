@@ -7,7 +7,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 struct X {
    int i ;
 };
-/*@ ensures *\old(item) ≡ \old(*item); */
+/*@ ensures *\old(item) == \old(*item); */
 void __gen_e_acsl_f(struct X *item);
 
 void f(struct X *item)
@@ -31,7 +31,7 @@ int main(void)
   return __retres;
 }
 
-/*@ ensures *\old(item) ≡ \old(*item); */
+/*@ ensures *\old(item) == \old(*item); */
 void __gen_e_acsl_f(struct X *item)
 {
   struct X __gen_e_acsl_at_2;

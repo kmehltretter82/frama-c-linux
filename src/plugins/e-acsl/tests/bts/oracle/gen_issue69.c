@@ -31,7 +31,7 @@ int main(void)
                     "\\forall unsigned char c; 4 <= c <= 300 ==> 0 <= c <= 255",
                     "tests/bts/issue69.c",6);
   }
-  /*@ assert ∀ unsigned char c; 4 ≤ c ≤ 300 ⇒ 0 ≤ c ≤ 255; */ ;
+  /*@ assert \forall unsigned char c; 4 <= c <= 300 ==> 0 <= c <= 255; */ ;
   int n = 5;
   {
     int __gen_e_acsl_m;
@@ -63,7 +63,8 @@ int main(void)
                     "\\let m = n > 0? 4: 341;\n\\forall char u; 1 < u < m ==> u > 0",
                     "tests/bts/issue69.c",10);
   }
-  /*@ assert \let m = n > 0? 4: 341; ∀ char u; 1 < u < m ⇒ u > 0; */ ;
+  /*@ assert \let m = n > 0? 4: 341; \forall char u; 1 < u < m ==> u > 0; */
+  ;
   __retres = 0;
   return __retres;
 }

@@ -7,15 +7,17 @@ char *__gen_e_acsl_literal_string_2;
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@ behavior exists:
-      assumes ∃ ℤ i; 0 ≤ i < (int)n ∧ (int)*((char *)buf + i) ≡ c;
+      assumes
+        \exists integer i; 0 <= i < (int)n && (int)*((char *)buf + i) == c;
       ensures
-        ∀ int j;
-          0 ≤ j < (int)\offset((char *)\result) ⇒
-          (int)*((char *)\old(buf) + j) ≢ \old(c);
+        \forall int j;
+          0 <= j < (int)\offset((char *)\result) ==>
+          (int)*((char *)\old(buf) + j) != \old(c);
     
     behavior not_exists:
-      assumes ∀ ℤ k; 0 ≤ k < (int)n ⇒ (int)*((char *)buf + k) ≢ c;
-      ensures \result ≡ (void *)0;
+      assumes
+        \forall integer k; 0 <= k < (int)n ==> (int)*((char *)buf + k) != c;
+      ensures \result == (void *)0;
  */
 void *__gen_e_acsl_memchr(void const *buf, int c, size_t n);
 
@@ -51,15 +53,17 @@ void *memchr(void const *buf, int c, size_t n)
 }
 
 /*@ behavior exists:
-      assumes ∃ ℤ i; 0 ≤ i < (int)n ∧ (int)*((char *)buf + i) ≡ c;
+      assumes
+        \exists integer i; 0 <= i < (int)n && (int)*((char *)buf + i) == c;
       ensures
-        ∀ int j;
-          0 ≤ j < (int)\offset((char *)\result) ⇒
-          (int)*((char *)\old(buf) + j) ≢ \old(c);
+        \forall int j;
+          0 <= j < (int)\offset((char *)\result) ==>
+          (int)*((char *)\old(buf) + j) != \old(c);
     
     behavior not_exists:
-      assumes ∀ ℤ k; 0 ≤ k < (int)n ⇒ (int)*((char *)buf + k) ≢ c;
-      ensures \result ≡ (void *)0;
+      assumes
+        \forall integer k; 0 <= k < (int)n ==> (int)*((char *)buf + k) != c;
+      ensures \result == (void *)0;
  */
 void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
 {

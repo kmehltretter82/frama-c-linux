@@ -82,7 +82,7 @@ int main(int argc, char const **argv)
                     "\\valid(p) && \\valid(q)","tests/temporal/t_labels.c",
                     26);
   }
-  /*@ assert \valid(p) ∧ \valid(q); */ ;
+  /*@ assert \valid(p) && \valid(q); */ ;
   __e_acsl_full_init((void *)(& q));
   LAB2: __e_acsl_temporal_store_nreferent((void *)(& q),(void *)(& p));
   q = p;

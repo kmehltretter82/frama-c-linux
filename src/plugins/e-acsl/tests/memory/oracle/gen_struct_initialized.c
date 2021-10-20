@@ -25,7 +25,7 @@ int main(void)
                       "!\\initialized(&static_pair.a)",
                       "tests/memory/struct_initialized.c",13);
     }
-    /*@ assert ¬\initialized(&static_pair.a); */ ;
+    /*@ assert !\initialized(&static_pair.a); */ ;
     {
       int __gen_e_acsl_initialized_2;
       __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& static_pair.b),
@@ -34,7 +34,7 @@ int main(void)
                       "!\\initialized(&static_pair.b)",
                       "tests/memory/struct_initialized.c",14);
     }
-    /*@ assert ¬\initialized(&static_pair.b); */ ;
+    /*@ assert !\initialized(&static_pair.b); */ ;
     __e_acsl_initialize((void *)(& static_pair.a),sizeof(int32_t));
     static_pair.a = 1;
     {
@@ -54,7 +54,7 @@ int main(void)
                       "!\\initialized(&static_pair.b)",
                       "tests/memory/struct_initialized.c",17);
     }
-    /*@ assert ¬\initialized(&static_pair.b); */ ;
+    /*@ assert !\initialized(&static_pair.b); */ ;
     __e_acsl_initialize((void *)(& static_pair.b),sizeof(int32_t));
     static_pair.b = 2;
     {
@@ -89,7 +89,7 @@ int main(void)
                       "!\\initialized(&heap_pair->a)",
                       "tests/memory/struct_initialized.c",26);
     }
-    /*@ assert ¬\initialized(&heap_pair->a); */ ;
+    /*@ assert !\initialized(&heap_pair->a); */ ;
     {
       int __gen_e_acsl_initialized_8;
       __gen_e_acsl_initialized_8 = __e_acsl_initialized((void *)(& heap_pair->b),
@@ -98,7 +98,7 @@ int main(void)
                       "!\\initialized(&heap_pair->b)",
                       "tests/memory/struct_initialized.c",27);
     }
-    /*@ assert ¬\initialized(&heap_pair->b); */ ;
+    /*@ assert !\initialized(&heap_pair->b); */ ;
     __e_acsl_initialize((void *)(& heap_pair->a),sizeof(int32_t));
     heap_pair->a = 3;
     {
@@ -118,7 +118,7 @@ int main(void)
                       "!\\initialized(&heap_pair->b)",
                       "tests/memory/struct_initialized.c",30);
     }
-    /*@ assert ¬\initialized(&heap_pair->b); */ ;
+    /*@ assert !\initialized(&heap_pair->b); */ ;
     __e_acsl_initialize((void *)(& heap_pair->b),sizeof(int32_t));
     heap_pair->b = 4;
     {

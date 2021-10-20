@@ -38,7 +38,7 @@ int main(void)
                       "!\\initialized(&buf[0 .. 3])",
                       "tests/format/sprintf.c",10);
     }
-    /*@ assert ¬\initialized(&buf[0 .. 3]); */ ;
+    /*@ assert !\initialized(&buf[0 .. 3]); */ ;
     __e_acsl_builtin_sprintf("d",buf,__gen_e_acsl_literal_string,10);
     {
       int __gen_e_acsl_size_2;
@@ -61,7 +61,7 @@ int main(void)
       __e_acsl_assert(! __gen_e_acsl_initialized_3,1,"Assertion","main",
                       "!\\initialized(&buf[3])","tests/format/sprintf.c",14);
     }
-    /*@ assert ¬\initialized(&buf[3]); */ ;
+    /*@ assert !\initialized(&buf[3]); */ ;
     __e_acsl_delete_block((void *)(buf));
   }
   {
@@ -81,7 +81,7 @@ int main(void)
                       "!\\initialized(&buf_0[0 .. 3])",
                       "tests/format/sprintf.c",18);
     }
-    /*@ assert ¬\initialized(&buf_0[0 .. 3]); */ ;
+    /*@ assert !\initialized(&buf_0[0 .. 3]); */ ;
     __e_acsl_builtin_snprintf("d",buf_0,(unsigned long)2,
                               __gen_e_acsl_literal_string,10);
     {
@@ -107,7 +107,7 @@ int main(void)
                       "!\\initialized(&buf_0[2])","tests/format/sprintf.c",
                       22);
     }
-    /*@ assert ¬\initialized(&buf_0[2]); */ ;
+    /*@ assert !\initialized(&buf_0[2]); */ ;
     {
       int __gen_e_acsl_initialized_7;
       __gen_e_acsl_initialized_7 = __e_acsl_initialized((void *)(& buf_0[3]),
@@ -116,7 +116,7 @@ int main(void)
                       "!\\initialized(&buf_0[3])","tests/format/sprintf.c",
                       23);
     }
-    /*@ assert ¬\initialized(&buf_0[3]); */ ;
+    /*@ assert !\initialized(&buf_0[3]); */ ;
     __e_acsl_delete_block((void *)(buf_0));
   }
   {
@@ -136,7 +136,7 @@ int main(void)
                       "!\\initialized(&buf_1[0 .. 3])",
                       "tests/format/sprintf.c",27);
     }
-    /*@ assert ¬\initialized(&buf_1[0 .. 3]); */ ;
+    /*@ assert !\initialized(&buf_1[0 .. 3]); */ ;
     __e_acsl_builtin_snprintf("d",buf_1,(unsigned long)4,
                               __gen_e_acsl_literal_string,10);
     {
@@ -162,7 +162,7 @@ int main(void)
                       "!\\initialized(&buf_1[3])","tests/format/sprintf.c",
                       31);
     }
-    /*@ assert ¬\initialized(&buf_1[3]); */ ;
+    /*@ assert !\initialized(&buf_1[3]); */ ;
     __e_acsl_delete_block((void *)(buf_1));
   }
   __retres = 0;

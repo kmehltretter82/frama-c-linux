@@ -11,7 +11,7 @@ int main(void)
   uint8 x = (unsigned char)0;
   __e_acsl_assert((int)x == 0,1,"Assertion","main","x == 0",
                   "tests/constructs/typedef.i",9);
-  /*@ assert x ≡ 0; */ ;
+  /*@ assert x == 0; */ ;
   __retres = 0;
   return __retres;
 }

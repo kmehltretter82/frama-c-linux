@@ -5,18 +5,17 @@
 #include "stdio.h"
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
-/*@ requires c_uchar_or_eof: (0 ≤ c ≤ 255) ∨ c ≡ -1;
+/*@ requires c_uchar_or_eof: (0 <= c <= 255) || c == -1;
     assigns \result;
     assigns \result \from c;
     
     behavior definitely_match:
-      assumes c_upper: 'A' ≤ c ≤ 'Z';
-      ensures nonzero_result: \result < 0 ∨ \result > 0;
+      assumes c_upper: 'A' <= c <= 'Z';
+      ensures nonzero_result: \result < 0 || \result > 0;
     
     behavior definitely_not_match:
-      assumes
-        c_non_upper: c ≡ -1 ∨ (0 ≤ c < 'A') ∨ ('Z' < c ≤ 127);
-      ensures zero_result: \result ≡ 0;
+      assumes c_non_upper: c == -1 || (0 <= c < 'A') || ('Z' < c <= 127);
+      ensures zero_result: \result == 0;
     
     disjoint behaviors definitely_not_match, definitely_match;
  */
@@ -57,18 +56,17 @@ int main(int argc, char const **argv)
   return __retres;
 }
 
-/*@ requires c_uchar_or_eof: (0 ≤ c ≤ 255) ∨ c ≡ -1;
+/*@ requires c_uchar_or_eof: (0 <= c <= 255) || c == -1;
     assigns \result;
     assigns \result \from c;
     
     behavior definitely_match:
-      assumes c_upper: 'A' ≤ c ≤ 'Z';
-      ensures nonzero_result: \result < 0 ∨ \result > 0;
+      assumes c_upper: 'A' <= c <= 'Z';
+      ensures nonzero_result: \result < 0 || \result > 0;
     
     behavior definitely_not_match:
-      assumes
-        c_non_upper: c ≡ -1 ∨ (0 ≤ c < 'A') ∨ ('Z' < c ≤ 127);
-      ensures zero_result: \result ≡ 0;
+      assumes c_non_upper: c == -1 || (0 <= c < 'A') || ('Z' < c <= 127);
+      ensures zero_result: \result == 0;
     
     disjoint behaviors definitely_not_match, definitely_match;
  */

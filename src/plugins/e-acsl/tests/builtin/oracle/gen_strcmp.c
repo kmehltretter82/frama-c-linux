@@ -43,43 +43,42 @@ char *__gen_e_acsl_literal_string_5;
 char *__gen_e_acsl_literal_string_4;
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
-/*@ exits status: \exit_status ≢ 0;
+/*@ exits status: \exit_status != 0;
     ensures never_terminates: \false;
     
     assigns \exit_status \from \nothing;
  */
 void __gen_e_acsl_abort(void);
 
-/*@ exits status: \exit_status ≡ \old(status);
+/*@ exits status: \exit_status == \old(status);
     ensures never_terminates: \false;
     
     assigns \exit_status \from status;
  */
 void __gen_e_acsl_exit(int status);
 
-/*@ ensures result_ok_or_error: \result ≡ -1 ∨ \result ≥ 0;
+/*@ ensures result_ok_or_error: \result == -1 || \result >= 0;
     ensures
       initialization: stat_loc_init_on_success:
-        \result ≥ 0 ∧ \old(stat_loc) ≢ \null ⇒
+        \result >= 0 && \old(stat_loc) != \null ==>
         \initialized(\old(stat_loc));
     assigns \result, *stat_loc;
     assigns \result \from (indirect: options);
     assigns *stat_loc \from (indirect: options);
     
     behavior stat_loc_null:
-      assumes stat_loc_null: stat_loc ≡ \null;
+      assumes stat_loc_null: stat_loc == \null;
       assigns \result;
       assigns \result \from \nothing;
     
     behavior stat_loc_non_null:
-      assumes stat_loc_non_null: stat_loc ≢ \null;
+      assumes stat_loc_non_null: stat_loc != \null;
       requires valid_stat_loc: \valid(stat_loc);
  */
 pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options);
 
 /*@ ensures
-      result_ok_child_or_error:
-        \result ≡ 0 ∨ \result > 0 ∨ \result ≡ -1;
+      result_ok_child_or_error: \result == 0 || \result > 0 || \result == -1;
     assigns \result;
     assigns \result \from \nothing;
  */
@@ -97,7 +96,7 @@ pid_t __gen_e_acsl_fork(void);
       ensures allocation: \fresh{Old, Here}(\result,strlen(\old(s)));
       ensures
         result_valid_string_and_same_contents:
-          valid_string(\result) ∧ strcmp(\result, \old(s)) ≡ 0;
+          valid_string(\result) && strcmp(\result, \old(s)) == 0;
       assigns __fc_heap_status, \result;
       assigns __fc_heap_status \from (indirect: s), __fc_heap_status;
       assigns \result
@@ -105,8 +104,8 @@ pid_t __gen_e_acsl_fork(void);
               (indirect: __fc_heap_status);
     
     behavior no_allocation:
-      assumes cannot_allocate: ¬is_allocable(strlen(s));
-      ensures result_null: \result ≡ \null;
+      assumes cannot_allocate: !is_allocable(strlen(s));
+      ensures result_null: \result == \null;
       assigns \result;
       assigns \result \from \nothing;
       allocates \nothing;
@@ -134,7 +133,7 @@ __inline static void fail_ncomp(int cond, char *fmt, int l, int r)
       ensures allocation: \fresh{Old, Here}(\result,strlen(\old(s)));
       ensures
         result_valid_string_and_same_contents:
-          valid_string(\result) ∧ strcmp(\result, \old(s)) ≡ 0;
+          valid_string(\result) && strcmp(\result, \old(s)) == 0;
       assigns __fc_heap_status, \result;
       assigns __fc_heap_status \from (indirect: s), __fc_heap_status;
       assigns \result
@@ -142,8 +141,8 @@ __inline static void fail_ncomp(int cond, char *fmt, int l, int r)
               (indirect: __fc_heap_status);
     
     behavior no_allocation:
-      assumes cannot_allocate: ¬is_allocable(strlen(s));
-      ensures result_null: \result ≡ \null;
+      assumes cannot_allocate: !is_allocable(strlen(s));
+      ensures result_null: \result == \null;
       assigns \result;
       assigns \result \from \nothing;
       allocates \nothing;
@@ -169,8 +168,7 @@ char *__gen_e_acsl_strdup(char const *s)
 }
 
 /*@ ensures
-      result_ok_child_or_error:
-        \result ≡ 0 ∨ \result > 0 ∨ \result ≡ -1;
+      result_ok_child_or_error: \result == 0 || \result > 0 || \result == -1;
     assigns \result;
     assigns \result \from \nothing;
  */
@@ -192,22 +190,22 @@ pid_t __gen_e_acsl_fork(void)
   }
 }
 
-/*@ ensures result_ok_or_error: \result ≡ -1 ∨ \result ≥ 0;
+/*@ ensures result_ok_or_error: \result == -1 || \result >= 0;
     ensures
       initialization: stat_loc_init_on_success:
-        \result ≥ 0 ∧ \old(stat_loc) ≢ \null ⇒
+        \result >= 0 && \old(stat_loc) != \null ==>
         \initialized(\old(stat_loc));
     assigns \result, *stat_loc;
     assigns \result \from (indirect: options);
     assigns *stat_loc \from (indirect: options);
     
     behavior stat_loc_null:
-      assumes stat_loc_null: stat_loc ≡ \null;
+      assumes stat_loc_null: stat_loc == \null;
       assigns \result;
       assigns \result \from \nothing;
     
     behavior stat_loc_non_null:
-      assumes stat_loc_non_null: stat_loc ≢ \null;
+      assumes stat_loc_non_null: stat_loc != \null;
       requires valid_stat_loc: \valid(stat_loc);
  */
 pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
@@ -266,7 +264,7 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
   }
 }
 
-/*@ exits status: \exit_status ≡ \old(status);
+/*@ exits status: \exit_status == \old(status);
     ensures never_terminates: \false;
     
     assigns \exit_status \from status;
@@ -279,7 +277,7 @@ void __gen_e_acsl_exit(int status)
   return;
 }
 
-/*@ exits status: \exit_status ≢ 0;
+/*@ exits status: \exit_status != 0;
     ensures never_terminates: \false;
     
     assigns \exit_status \from \nothing;

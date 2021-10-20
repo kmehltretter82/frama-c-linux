@@ -14,8 +14,8 @@ int main(void)
   /*@ assert x < y; */ ;
   __e_acsl_assert(x == 0,1,"Precondition","main","x == 0",
                   "tests/constructs/nested_code_annot.i",8);
-  /*@ requires x ≡ 0;
-      ensures x ≥ 1; */
+  /*@ requires x == 0;
+      ensures x >= 1; */
   if (x) {
     __e_acsl_assert(0,1,"Assertion","main","\\false",
                     "tests/constructs/nested_code_annot.i",12);
@@ -24,16 +24,16 @@ int main(void)
   else {
     __e_acsl_assert(x == 0,1,"Precondition","main","x == 0",
                     "tests/constructs/nested_code_annot.i",14);
-    /*@ requires x ≡ 0;
-        ensures x ≡ 1; */
+    /*@ requires x == 0;
+        ensures x == 1; */
     x ++;
     __e_acsl_assert(x == 1,1,"Postcondition","main","x == 1",
                     "tests/constructs/nested_code_annot.i",15);
     if (x) {
       __e_acsl_assert(x == 1,1,"Precondition","main","x == 1",
                       "tests/constructs/nested_code_annot.i",18);
-      /*@ requires x ≡ 1;
-          ensures x ≡ 2; */
+      /*@ requires x == 1;
+          ensures x == 2; */
       x ++;
       __e_acsl_assert(x == 2,1,"Postcondition","main","x == 2",
                       "tests/constructs/nested_code_annot.i",19);

@@ -69,7 +69,7 @@ int main(void)
                     "\\valid_read(f) && !\\valid(f)",
                     "tests/temporal/t_lit_string.c",9);
   }
-  /*@ assert \valid_read(f) ∧ ¬\valid(f); */ ;
+  /*@ assert \valid_read(f) && !\valid(f); */ ;
   __e_acsl_full_init((void *)(& g));
   __e_acsl_temporal_store_nblock((void *)(& g),
                                  (void *)__gen_e_acsl_literal_string_2);
@@ -107,7 +107,7 @@ int main(void)
                     "\\valid_read(g) && !\\valid(g)",
                     "tests/temporal/t_lit_string.c",12);
   }
-  /*@ assert \valid_read(g) ∧ ¬\valid(g); */ ;
+  /*@ assert \valid_read(g) && !\valid(g); */ ;
   char *p = f;
   __e_acsl_temporal_store_nreferent((void *)(& p),(void *)(& f));
   __e_acsl_store_block((void *)(& p),(size_t)8);
@@ -145,7 +145,7 @@ int main(void)
                     "\\valid_read(p) && !\\valid(p)",
                     "tests/temporal/t_lit_string.c",15);
   }
-  /*@ assert \valid_read(p) ∧ ¬\valid(p); */ ;
+  /*@ assert \valid_read(p) && !\valid(p); */ ;
   __e_acsl_full_init((void *)(& q));
   __e_acsl_temporal_store_nreferent((void *)(& q),(void *)(& f));
   q = f;
@@ -182,7 +182,7 @@ int main(void)
                     "\\valid_read(q) && !\\valid(q)",
                     "tests/temporal/t_lit_string.c",18);
   }
-  /*@ assert \valid_read(q) ∧ ¬\valid(q); */ ;
+  /*@ assert \valid_read(q) && !\valid(q); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(& q));
   __e_acsl_delete_block((void *)(& p));

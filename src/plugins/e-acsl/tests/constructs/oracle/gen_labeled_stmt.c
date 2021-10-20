@@ -5,7 +5,7 @@
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 int X = 0;
-/*@ ensures X ≡ 3; */
+/*@ ensures X == 3; */
 int main(void);
 
 int __gen_e_acsl_main(void)
@@ -13,14 +13,14 @@ int __gen_e_acsl_main(void)
   int __retres;
   goto L1;
   L1:
-  /*@ assert X ≡ 0; */
+  /*@ assert X == 0; */
   __e_acsl_assert(X == 0,1,"Assertion","main","X == 0",
                   "tests/constructs/labeled_stmt.i",10);
   X = 1;
   goto L2;
   L2:
-  /*@ requires X ≡ 1;
-      ensures X ≡ 2; */
+  /*@ requires X == 1;
+      ensures X == 2; */
   {
     __e_acsl_assert(X == 1,1,"Precondition","main","X == 1",
                     "tests/constructs/labeled_stmt.i",13);
@@ -37,7 +37,7 @@ int __gen_e_acsl_main(void)
   return_label: return __retres;
 }
 
-/*@ ensures X ≡ 3; */
+/*@ ensures X == 3; */
 int main(void)
 {
   int __retres;

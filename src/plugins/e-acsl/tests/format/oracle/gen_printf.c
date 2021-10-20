@@ -470,50 +470,49 @@ char *__gen_e_acsl_literal_string_34;
 char *__gen_e_acsl_literal_string_441;
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
-/*@ exits status: \exit_status ≢ 0;
+/*@ exits status: \exit_status != 0;
     ensures never_terminates: \false;
     
     assigns \exit_status \from \nothing;
  */
 void __gen_e_acsl_abort(void);
 
-/*@ exits status: \exit_status ≡ \old(status);
+/*@ exits status: \exit_status == \old(status);
     ensures never_terminates: \false;
     
     assigns \exit_status \from status;
  */
 void __gen_e_acsl_exit(int status);
 
-/*@ ensures result_ok_or_error: \result ≡ -1 ∨ \result ≥ 0;
+/*@ ensures result_ok_or_error: \result == -1 || \result >= 0;
     ensures
       initialization: stat_loc_init_on_success:
-        \result ≥ 0 ∧ \old(stat_loc) ≢ \null ⇒
+        \result >= 0 && \old(stat_loc) != \null ==>
         \initialized(\old(stat_loc));
     assigns \result, *stat_loc;
     assigns \result \from (indirect: options);
     assigns *stat_loc \from (indirect: options);
     
     behavior stat_loc_null:
-      assumes stat_loc_null: stat_loc ≡ \null;
+      assumes stat_loc_null: stat_loc == \null;
       assigns \result;
       assigns \result \from \nothing;
     
     behavior stat_loc_non_null:
-      assumes stat_loc_non_null: stat_loc ≢ \null;
+      assumes stat_loc_non_null: stat_loc != \null;
       requires valid_stat_loc: \valid(stat_loc);
  */
 pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options);
 
 /*@ ensures
-      result_ok_child_or_error:
-        \result ≡ 0 ∨ \result > 0 ∨ \result ≡ -1;
+      result_ok_child_or_error: \result == 0 || \result > 0 || \result == -1;
     assigns \result;
     assigns \result \from \nothing;
  */
 pid_t __gen_e_acsl_fork(void);
 
 /*@ requires valid_string_s: valid_read_string(s);
-    ensures acsl_c_equiv: \result ≡ strlen(\old(s));
+    ensures acsl_c_equiv: \result == strlen(\old(s));
     assigns \result;
     assigns \result \from (indirect: *(s + (0 ..)));
  */
@@ -525,24 +524,24 @@ size_t __gen_e_acsl_strlen(char const *s);
       \from s, (indirect: *(s + (0 .. strlen{Old}(s)))), (indirect: c);
     
     behavior found:
-      assumes char_found: strchr(s, c) ≡ \true;
-      ensures result_char: *\result ≡ (char)\old(c);
-      ensures result_same_base: \base_addr(\result) ≡ \base_addr(\old(s));
+      assumes char_found: strchr(s, c) == \true;
+      ensures result_char: *\result == (char)\old(c);
+      ensures result_same_base: \base_addr(\result) == \base_addr(\old(s));
       ensures
-        result_in_length: \old(s) ≤ \result ≤ \old(s) + strlen(\old(s));
+        result_in_length: \old(s) <= \result <= \old(s) + strlen(\old(s));
       ensures result_valid_string: valid_read_string(\result);
       ensures
         result_first_occur:
-          ∀ char *p; \old(s) ≤ p < \result ⇒ *p ≢ (char)\old(c);
+          \forall char *p; \old(s) <= p < \result ==> *p != (char)\old(c);
     
     behavior not_found:
-      assumes char_not_found: ¬(strchr(s, c) ≡ \true);
-      ensures result_null: \result ≡ \null;
+      assumes char_not_found: !(strchr(s, c) == \true);
+      ensures result_null: \result == \null;
     
     behavior default:
       ensures
         result_null_or_same_base:
-          \result ≡ \null ∨ \base_addr(\result) ≡ \base_addr(\old(s));
+          \result == \null || \base_addr(\result) == \base_addr(\old(s));
  */
 char *__gen_e_acsl_strchr(char const *s, int c);
 
@@ -551,8 +550,8 @@ char *__gen_e_acsl_strchr(char const *s, int c);
     requires
       separation:
         \separated(dest + (0 .. strlen(src)), src + (0 .. strlen(src)));
-    ensures equal_contents: strcmp(\old(dest), \old(src)) ≡ 0;
-    ensures result_ptr: \result ≡ \old(dest);
+    ensures equal_contents: strcmp(\old(dest), \old(src)) == 0;
+    ensures result_ptr: \result == \old(dest);
     assigns *(dest + (0 .. strlen{Old}(src))), \result;
     assigns *(dest + (0 .. strlen{Old}(src)))
       \from *(src + (0 .. strlen{Old}(src)));
@@ -637,7 +636,7 @@ void test_specifier_application(char const *allowed, char const *fmt,
   }
   /*@
   assert
-  alloca_bounds: 0 < sizeof(char) * (int)(len + 1) ≤ 18446744073709551615;
+  alloca_bounds: 0 < sizeof(char) * (int)(len + 1) <= 18446744073709551615;
    */
   ;
   __lengthof_format = (unsigned long)(len + 1);
@@ -713,8 +712,8 @@ void test_specifier_application(char const *allowed, char const *fmt,
     requires
       separation:
         \separated(dest + (0 .. strlen(src)), src + (0 .. strlen(src)));
-    ensures equal_contents: strcmp(\old(dest), \old(src)) ≡ 0;
-    ensures result_ptr: \result ≡ \old(dest);
+    ensures equal_contents: strcmp(\old(dest), \old(src)) == 0;
+    ensures result_ptr: \result == \old(dest);
     assigns *(dest + (0 .. strlen{Old}(src))), \result;
     assigns *(dest + (0 .. strlen{Old}(src)))
       \from *(src + (0 .. strlen{Old}(src)));
@@ -771,24 +770,24 @@ char *__gen_e_acsl_strcpy(char * restrict dest, char const * restrict src)
       \from s, (indirect: *(s + (0 .. strlen{Old}(s)))), (indirect: c);
     
     behavior found:
-      assumes char_found: strchr(s, c) ≡ \true;
-      ensures result_char: *\result ≡ (char)\old(c);
-      ensures result_same_base: \base_addr(\result) ≡ \base_addr(\old(s));
+      assumes char_found: strchr(s, c) == \true;
+      ensures result_char: *\result == (char)\old(c);
+      ensures result_same_base: \base_addr(\result) == \base_addr(\old(s));
       ensures
-        result_in_length: \old(s) ≤ \result ≤ \old(s) + strlen(\old(s));
+        result_in_length: \old(s) <= \result <= \old(s) + strlen(\old(s));
       ensures result_valid_string: valid_read_string(\result);
       ensures
         result_first_occur:
-          ∀ char *p; \old(s) ≤ p < \result ⇒ *p ≢ (char)\old(c);
+          \forall char *p; \old(s) <= p < \result ==> *p != (char)\old(c);
     
     behavior not_found:
-      assumes char_not_found: ¬(strchr(s, c) ≡ \true);
-      ensures result_null: \result ≡ \null;
+      assumes char_not_found: !(strchr(s, c) == \true);
+      ensures result_null: \result == \null;
     
     behavior default:
       ensures
         result_null_or_same_base:
-          \result ≡ \null ∨ \base_addr(\result) ≡ \base_addr(\old(s));
+          \result == \null || \base_addr(\result) == \base_addr(\old(s));
  */
 char *__gen_e_acsl_strchr(char const *s, int c)
 {
@@ -871,7 +870,7 @@ char *__gen_e_acsl_strchr(char const *s, int c)
 }
 
 /*@ requires valid_string_s: valid_read_string(s);
-    ensures acsl_c_equiv: \result ≡ strlen(\old(s));
+    ensures acsl_c_equiv: \result == strlen(\old(s));
     assigns \result;
     assigns \result \from (indirect: *(s + (0 ..)));
  */
@@ -885,8 +884,7 @@ size_t __gen_e_acsl_strlen(char const *s)
 }
 
 /*@ ensures
-      result_ok_child_or_error:
-        \result ≡ 0 ∨ \result > 0 ∨ \result ≡ -1;
+      result_ok_child_or_error: \result == 0 || \result > 0 || \result == -1;
     assigns \result;
     assigns \result \from \nothing;
  */
@@ -908,22 +906,22 @@ pid_t __gen_e_acsl_fork(void)
   }
 }
 
-/*@ ensures result_ok_or_error: \result ≡ -1 ∨ \result ≥ 0;
+/*@ ensures result_ok_or_error: \result == -1 || \result >= 0;
     ensures
       initialization: stat_loc_init_on_success:
-        \result ≥ 0 ∧ \old(stat_loc) ≢ \null ⇒
+        \result >= 0 && \old(stat_loc) != \null ==>
         \initialized(\old(stat_loc));
     assigns \result, *stat_loc;
     assigns \result \from (indirect: options);
     assigns *stat_loc \from (indirect: options);
     
     behavior stat_loc_null:
-      assumes stat_loc_null: stat_loc ≡ \null;
+      assumes stat_loc_null: stat_loc == \null;
       assigns \result;
       assigns \result \from \nothing;
     
     behavior stat_loc_non_null:
-      assumes stat_loc_non_null: stat_loc ≢ \null;
+      assumes stat_loc_non_null: stat_loc != \null;
       requires valid_stat_loc: \valid(stat_loc);
  */
 pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
@@ -982,7 +980,7 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
   }
 }
 
-/*@ exits status: \exit_status ≡ \old(status);
+/*@ exits status: \exit_status == \old(status);
     ensures never_terminates: \false;
     
     assigns \exit_status \from status;
@@ -995,7 +993,7 @@ void __gen_e_acsl_exit(int status)
   return;
 }
 
-/*@ exits status: \exit_status ≢ 0;
+/*@ exits status: \exit_status != 0;
     ensures never_terminates: \false;
     
     assigns \exit_status \from \nothing;

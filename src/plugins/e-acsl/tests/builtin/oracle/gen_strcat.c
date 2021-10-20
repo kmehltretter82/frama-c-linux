@@ -41,36 +41,35 @@ char *__gen_e_acsl_literal_string_4;
 char *__gen_e_acsl_literal_string_8;
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
-/*@ exits status: \exit_status ≡ \old(status);
+/*@ exits status: \exit_status == \old(status);
     ensures never_terminates: \false;
     
     assigns \exit_status \from status;
  */
 void __gen_e_acsl_exit(int status);
 
-/*@ ensures result_ok_or_error: \result ≡ -1 ∨ \result ≥ 0;
+/*@ ensures result_ok_or_error: \result == -1 || \result >= 0;
     ensures
       initialization: stat_loc_init_on_success:
-        \result ≥ 0 ∧ \old(stat_loc) ≢ \null ⇒
+        \result >= 0 && \old(stat_loc) != \null ==>
         \initialized(\old(stat_loc));
     assigns \result, *stat_loc;
     assigns \result \from (indirect: options);
     assigns *stat_loc \from (indirect: options);
     
     behavior stat_loc_null:
-      assumes stat_loc_null: stat_loc ≡ \null;
+      assumes stat_loc_null: stat_loc == \null;
       assigns \result;
       assigns \result \from \nothing;
     
     behavior stat_loc_non_null:
-      assumes stat_loc_non_null: stat_loc ≢ \null;
+      assumes stat_loc_non_null: stat_loc != \null;
       requires valid_stat_loc: \valid(stat_loc);
  */
 pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options);
 
 /*@ ensures
-      result_ok_child_or_error:
-        \result ≡ 0 ∨ \result > 0 ∨ \result ≡ -1;
+      result_ok_child_or_error: \result == 0 || \result > 0 || \result == -1;
     assigns \result;
     assigns \result \from \nothing;
  */
@@ -112,7 +111,7 @@ void test_memory_tracking(void)
                       "test_memory_tracking","!\\initialized(&dest[2 .. 3])",
                       "tests/builtin/strcat.c",16);
     }
-    /*@ assert ¬\initialized(&dest[2 .. 3]); */ ;
+    /*@ assert !\initialized(&dest[2 .. 3]); */ ;
     {
       int __gen_e_acsl_size_3;
       int __gen_e_acsl_if_3;
@@ -150,7 +149,7 @@ void test_memory_tracking(void)
                       "test_memory_tracking","!\\initialized(&dest[3])",
                       "tests/builtin/strcat.c",21);
     }
-    /*@ assert ¬\initialized(&dest[3]); */ ;
+    /*@ assert !\initialized(&dest[3]); */ ;
     __e_acsl_delete_block((void *)(src));
     __e_acsl_delete_block((void *)(dest));
   }
@@ -192,7 +191,7 @@ void test_memory_tracking(void)
                       "!\\initialized(&dest_0[2 .. 3])",
                       "tests/builtin/strcat.c",28);
     }
-    /*@ assert ¬\initialized(&dest_0[2 .. 3]); */ ;
+    /*@ assert !\initialized(&dest_0[2 .. 3]); */ ;
     {
       int __gen_e_acsl_size_7;
       int __gen_e_acsl_if_7;
@@ -233,7 +232,7 @@ void test_memory_tracking(void)
                       "test_memory_tracking","!\\initialized(&dest_0[3])",
                       "tests/builtin/strcat.c",33);
     }
-    /*@ assert ¬\initialized(&dest_0[3]); */ ;
+    /*@ assert !\initialized(&dest_0[3]); */ ;
     __e_acsl_delete_block((void *)(src_0));
     __e_acsl_delete_block((void *)(dest_0));
   }
@@ -275,7 +274,7 @@ void test_memory_tracking(void)
                       "!\\initialized(&dest_1[2 .. 3])",
                       "tests/builtin/strcat.c",40);
     }
-    /*@ assert ¬\initialized(&dest_1[2 .. 3]); */ ;
+    /*@ assert !\initialized(&dest_1[2 .. 3]); */ ;
     {
       int __gen_e_acsl_size_11;
       int __gen_e_acsl_if_11;
@@ -316,7 +315,7 @@ void test_memory_tracking(void)
                       "test_memory_tracking","!\\initialized(&dest_1[3])",
                       "tests/builtin/strcat.c",45);
     }
-    /*@ assert ¬\initialized(&dest_1[3]); */ ;
+    /*@ assert !\initialized(&dest_1[3]); */ ;
     __e_acsl_delete_block((void *)(src_1));
     __e_acsl_delete_block((void *)(dest_1));
   }
@@ -324,8 +323,7 @@ void test_memory_tracking(void)
 }
 
 /*@ ensures
-      result_ok_child_or_error:
-        \result ≡ 0 ∨ \result > 0 ∨ \result ≡ -1;
+      result_ok_child_or_error: \result == 0 || \result > 0 || \result == -1;
     assigns \result;
     assigns \result \from \nothing;
  */
@@ -347,22 +345,22 @@ pid_t __gen_e_acsl_fork(void)
   }
 }
 
-/*@ ensures result_ok_or_error: \result ≡ -1 ∨ \result ≥ 0;
+/*@ ensures result_ok_or_error: \result == -1 || \result >= 0;
     ensures
       initialization: stat_loc_init_on_success:
-        \result ≥ 0 ∧ \old(stat_loc) ≢ \null ⇒
+        \result >= 0 && \old(stat_loc) != \null ==>
         \initialized(\old(stat_loc));
     assigns \result, *stat_loc;
     assigns \result \from (indirect: options);
     assigns *stat_loc \from (indirect: options);
     
     behavior stat_loc_null:
-      assumes stat_loc_null: stat_loc ≡ \null;
+      assumes stat_loc_null: stat_loc == \null;
       assigns \result;
       assigns \result \from \nothing;
     
     behavior stat_loc_non_null:
-      assumes stat_loc_non_null: stat_loc ≢ \null;
+      assumes stat_loc_non_null: stat_loc != \null;
       requires valid_stat_loc: \valid(stat_loc);
  */
 pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
@@ -421,7 +419,7 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
   }
 }
 
-/*@ exits status: \exit_status ≡ \old(status);
+/*@ exits status: \exit_status == \old(status);
     ensures never_terminates: \false;
     
     assigns \exit_status \from status;

@@ -17,14 +17,14 @@ int main(void)
   /*@ assert y > x; */ ;
   __e_acsl_assert(x <= 0,1,"Assertion","main","x <= 0",
                   "tests/arith/comparison.i",9);
-  /*@ assert x ≤ 0; */ ;
+  /*@ assert x <= 0; */ ;
   __e_acsl_assert(y >= 1,1,"Assertion","main","y >= 1",
                   "tests/arith/comparison.i",10);
-  /*@ assert y ≥ 1; */ ;
+  /*@ assert y >= 1; */ ;
   char *s = (char *)"toto";
   __e_acsl_assert(s == s,1,"Assertion","main","s == s",
                   "tests/arith/comparison.i",12);
-  /*@ assert s ≡ s; */ ;
+  /*@ assert s == s; */ ;
   __e_acsl_assert(1,1,"Assertion","main","5 < 18","tests/arith/comparison.i",
                   15);
   /*@ assert 5 < 18; */ ;
@@ -33,16 +33,16 @@ int main(void)
   /*@ assert 32 > 3; */ ;
   __e_acsl_assert(1,1,"Assertion","main","12 <= 13",
                   "tests/arith/comparison.i",17);
-  /*@ assert 12 ≤ 13; */ ;
+  /*@ assert 12 <= 13; */ ;
   __e_acsl_assert(1,1,"Assertion","main","123 >= 12",
                   "tests/arith/comparison.i",18);
-  /*@ assert 123 ≥ 12; */ ;
+  /*@ assert 123 >= 12; */ ;
   __e_acsl_assert(1,1,"Assertion","main","0xff == 0xff",
                   "tests/arith/comparison.i",19);
-  /*@ assert 0xff ≡ 0xff; */ ;
+  /*@ assert 0xff == 0xff; */ ;
   __e_acsl_assert(1,1,"Assertion","main","1 != 2","tests/arith/comparison.i",
                   20);
-  /*@ assert 1 ≢ 2; */ ;
+  /*@ assert 1 != 2; */ ;
   __e_acsl_assert(1,1,"Assertion","main","-5 < 18",
                   "tests/arith/comparison.i",22);
   /*@ assert -5 < 18; */ ;
@@ -51,16 +51,16 @@ int main(void)
   /*@ assert 32 > -3; */ ;
   __e_acsl_assert(1,1,"Assertion","main","-12 <= 13",
                   "tests/arith/comparison.i",24);
-  /*@ assert -12 ≤ 13; */ ;
+  /*@ assert -12 <= 13; */ ;
   __e_acsl_assert(1,1,"Assertion","main","123 >= -12",
                   "tests/arith/comparison.i",25);
-  /*@ assert 123 ≥ -12; */ ;
+  /*@ assert 123 >= -12; */ ;
   __e_acsl_assert(1,1,"Assertion","main","-0xff == -0xff",
                   "tests/arith/comparison.i",26);
-  /*@ assert -0xff ≡ -0xff; */ ;
+  /*@ assert -0xff == -0xff; */ ;
   __e_acsl_assert(1,1,"Assertion","main","1 != -2",
                   "tests/arith/comparison.i",27);
-  /*@ assert 1 ≢ -2; */ ;
+  /*@ assert 1 != -2; */ ;
   __retres = 0;
   return __retres;
 }

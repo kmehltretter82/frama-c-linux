@@ -34,7 +34,7 @@ void arrays(void)
     __e_acsl_assert(__gen_e_acsl_ne,1,"Assertion","arrays","a != b",
                     "tests/arith/array.i",21);
   }
-  /*@ assert a ≢ b; */ ;
+  /*@ assert a != b; */ ;
   {
     int __gen_e_acsl_eq;
     __gen_e_acsl_eq = 1;
@@ -53,7 +53,7 @@ void arrays(void)
     __e_acsl_assert(__gen_e_acsl_eq,1,"Assertion","arrays","a == c",
                     "tests/arith/array.i",22);
   }
-  /*@ assert a ≡ c; */ ;
+  /*@ assert a == c; */ ;
   {
     int __gen_e_acsl_ne_2;
     __gen_e_acsl_ne_2 = 0;
@@ -72,7 +72,7 @@ void arrays(void)
     __e_acsl_assert(__gen_e_acsl_ne_2,1,"Assertion","arrays","a != d",
                     "tests/arith/array.i",23);
   }
-  /*@ assert a ≢ d; */ ;
+  /*@ assert a != d; */ ;
   int *e = a;
   int *f = b;
   __e_acsl_store_block((void *)(& f),(size_t)8);
@@ -83,19 +83,19 @@ void arrays(void)
   int *h = a;
   __e_acsl_assert(e != f,1,"Assertion","arrays","e != f",
                   "tests/arith/array.i",30);
-  /*@ assert e ≢ f; */ ;
+  /*@ assert e != f; */ ;
   __e_acsl_assert(e != g,1,"Assertion","arrays","e != g",
                   "tests/arith/array.i",31);
-  /*@ assert e ≢ g; */ ;
+  /*@ assert e != g; */ ;
   __e_acsl_assert(e == h,1,"Assertion","arrays","e == h",
                   "tests/arith/array.i",32);
-  /*@ assert e ≡ h; */ ;
+  /*@ assert e == h; */ ;
   __e_acsl_assert(e == a,1,"Assertion","arrays","e == (int *)a",
                   "tests/arith/array.i",36);
-  /*@ assert e ≡ (int *)a; */ ;
+  /*@ assert e == (int *)a; */ ;
   __e_acsl_assert(e != c,1,"Assertion","arrays","e != (int *)c",
                   "tests/arith/array.i",37);
-  /*@ assert e ≢ (int *)c; */ ;
+  /*@ assert e != (int *)c; */ ;
   {
     int __gen_e_acsl_eq_2;
     __gen_e_acsl_eq_2 = 1;
@@ -124,7 +124,7 @@ void arrays(void)
     __e_acsl_assert(__gen_e_acsl_eq_2,1,"Assertion","arrays",
                     "a == *((int (*)[3])g)","tests/arith/array.i",40);
   }
-  /*@ assert a ≡ *((int (*)[3])g); */ ;
+  /*@ assert a == *((int (*)[3])g); */ ;
   {
     int __gen_e_acsl_eq_3;
     int __gen_e_acsl_valid_read_2;
@@ -167,7 +167,7 @@ void arrays(void)
     __e_acsl_assert(__gen_e_acsl_eq_3,1,"Assertion","arrays",
                     "a == *((int (*)[])g)","tests/arith/array.i",41);
   }
-  /*@ assert a ≡ *((int (*)[])g); */ ;
+  /*@ assert a == *((int (*)[])g); */ ;
   {
     int __gen_e_acsl_ne_3;
     __gen_e_acsl_ne_3 = 0;
@@ -196,7 +196,7 @@ void arrays(void)
     __e_acsl_assert(__gen_e_acsl_ne_3,1,"Assertion","arrays",
                     "a != *((int (*)[3])f)","tests/arith/array.i",42);
   }
-  /*@ assert a ≢ *((int (*)[3])f); */ ;
+  /*@ assert a != *((int (*)[3])f); */ ;
   {
     int __gen_e_acsl_ne_4;
     int __gen_e_acsl_valid_read_5;
@@ -239,7 +239,7 @@ void arrays(void)
     __e_acsl_assert(__gen_e_acsl_ne_4,1,"Assertion","arrays",
                     "a != *((int (*)[])f)","tests/arith/array.i",43);
   }
-  /*@ assert a ≢ *((int (*)[])f); */ ;
+  /*@ assert a != *((int (*)[])f); */ ;
   int i[6] = {1, 2, 3, 4, 5, 6};
   __e_acsl_store_block((void *)(i),(size_t)24);
   __e_acsl_full_init((void *)(& i));
@@ -267,7 +267,7 @@ void arrays(void)
     __e_acsl_assert(__gen_e_acsl_ne_5,1,"Assertion","arrays","i != j",
                     "tests/arith/array.i",49);
   }
-  /*@ assert i ≢ j; */ ;
+  /*@ assert i != j; */ ;
   {
     int __gen_e_acsl_ne_6;
     __gen_e_acsl_ne_6 = 0;
@@ -286,7 +286,7 @@ void arrays(void)
     __e_acsl_assert(__gen_e_acsl_ne_6,1,"Assertion","arrays","i != k",
                     "tests/arith/array.i",50);
   }
-  /*@ assert i ≢ k; */ ;
+  /*@ assert i != k; */ ;
   {
     int __gen_e_acsl_ne_7;
     __gen_e_acsl_ne_7 = 0;
@@ -305,7 +305,7 @@ void arrays(void)
     __e_acsl_assert(__gen_e_acsl_ne_7,1,"Assertion","arrays","j != k",
                     "tests/arith/array.i",51);
   }
-  /*@ assert j ≢ k; */ ;
+  /*@ assert j != k; */ ;
   int *l = & i[3];
   __e_acsl_store_block((void *)(& l),(size_t)8);
   __e_acsl_full_init((void *)(& l));
@@ -352,7 +352,7 @@ void arrays(void)
                     "*((int (*)[3])l) != *((int (*)[3])m)",
                     "tests/arith/array.i",55);
   }
-  /*@ assert *((int (*)[3])l) ≢ *((int (*)[3])m); */ ;
+  /*@ assert *((int (*)[3])l) != *((int (*)[3])m); */ ;
   {
     int __gen_e_acsl_eq_4;
     __gen_e_acsl_eq_4 = 1;
@@ -390,7 +390,7 @@ void arrays(void)
                     "*((int (*)[3])l) == *((int (*)[3])n)",
                     "tests/arith/array.i",56);
   }
-  /*@ assert *((int (*)[3])l) ≡ *((int (*)[3])n); */ ;
+  /*@ assert *((int (*)[3])l) == *((int (*)[3])n); */ ;
   {
     int __gen_e_acsl_ne_9;
     __gen_e_acsl_ne_9 = 0;
@@ -413,7 +413,7 @@ void arrays(void)
     __e_acsl_assert(__gen_e_acsl_ne_9,1,"Assertion","arrays",
                     "(int [3])i != (int [3])k","tests/arith/array.i",59);
   }
-  /*@ assert (int [3])i ≢ (int [3])k; */ ;
+  /*@ assert (int [3])i != (int [3])k; */ ;
   {
     int __gen_e_acsl_eq_5;
     __gen_e_acsl_eq_5 = 1;
@@ -436,7 +436,7 @@ void arrays(void)
     __e_acsl_assert(__gen_e_acsl_eq_5,1,"Assertion","arrays",
                     "(int [3])j == (int [3])k","tests/arith/array.i",60);
   }
-  /*@ assert (int [3])j ≡ (int [3])k; */ ;
+  /*@ assert (int [3])j == (int [3])k; */ ;
   {
     int __gen_e_acsl_ne_10;
     __gen_e_acsl_ne_10 = 0;
@@ -474,7 +474,7 @@ void arrays(void)
                     "*((int (*)[2])l) != *((int (*)[2])m)",
                     "tests/arith/array.i",61);
   }
-  /*@ assert *((int (*)[2])l) ≢ *((int (*)[2])m); */ ;
+  /*@ assert *((int (*)[2])l) != *((int (*)[2])m); */ ;
   {
     int __gen_e_acsl_eq_6;
     __gen_e_acsl_eq_6 = 1;
@@ -512,7 +512,7 @@ void arrays(void)
                     "*((int (*)[2])l) == *((int (*)[2])n)",
                     "tests/arith/array.i",62);
   }
-  /*@ assert *((int (*)[2])l) ≡ *((int (*)[2])n); */ ;
+  /*@ assert *((int (*)[2])l) == *((int (*)[2])n); */ ;
   __e_acsl_delete_block((void *)(& n));
   __e_acsl_delete_block((void *)(& m));
   __e_acsl_delete_block((void *)(& l));
@@ -551,10 +551,10 @@ int main(void)
   }
   __e_acsl_assert(T1[0] == T2[0],1,"Assertion","main","T1[0] == T2[0]",
                   "tests/arith/array.i",110);
-  /*@ assert T1[0] ≡ T2[0]; */ ;
+  /*@ assert T1[0] == T2[0]; */ ;
   __e_acsl_assert(T1[1] != T2[1],1,"Assertion","main","T1[1] != T2[1]",
                   "tests/arith/array.i",111);
-  /*@ assert T1[1] ≢ T2[1]; */ ;
+  /*@ assert T1[1] != T2[1]; */ ;
   arrays();
   vlas(3);
   __retres = 0;

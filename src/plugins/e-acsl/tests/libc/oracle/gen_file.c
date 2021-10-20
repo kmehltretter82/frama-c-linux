@@ -9,7 +9,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
     requires valid_mode: valid_read_string(mode);
     ensures
       result_null_or_valid_fd:
-        \result ≡ \null ∨ \subset(\result, &__fc_fopen[0 .. 16 - 1]);
+        \result == \null || \subset(\result, &__fc_fopen[0 .. 16 - 1]);
     assigns \result;
     assigns \result
       \from (indirect: *(filename + (0 .. strlen{Old}(filename)))),
@@ -20,7 +20,7 @@ FILE *__gen_e_acsl_fopen(char const * restrict filename,
 
 /*@ requires valid_ptr_block: \valid((char *)ptr + (0 .. nmemb * size - 1));
     requires valid_stream: \valid(stream);
-    ensures size_read: \result ≤ \old(nmemb);
+    ensures size_read: \result <= \old(nmemb);
     ensures
       initialization:
         \initialized((char *)\old(ptr) + (0 .. \result * \old(size) - 1));
@@ -36,7 +36,7 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
 
 /*@ requires valid_ptr_block: \valid((char *)ptr + (0 .. nmemb * size - 1));
     requires valid_stream: \valid(stream);
-    ensures size_read: \result ≤ \old(nmemb);
+    ensures size_read: \result <= \old(nmemb);
     ensures
       initialization:
         \initialized((char *)\old(ptr) + (0 .. \result * \old(size) - 1));
@@ -274,7 +274,7 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
     requires valid_mode: valid_read_string(mode);
     ensures
       result_null_or_valid_fd:
-        \result ≡ \null ∨ \subset(\result, &__fc_fopen[0 .. 16 - 1]);
+        \result == \null || \subset(\result, &__fc_fopen[0 .. 16 - 1]);
     assigns \result;
     assigns \result
       \from (indirect: *(filename + (0 .. strlen{Old}(filename)))),
@@ -333,7 +333,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_initialized,1,"Assertion","main",
                     "!\\initialized((int *)buf)","tests/libc/file.c",13);
   }
-  /*@ assert ¬\initialized((int *)buf); */ ;
+  /*@ assert !\initialized((int *)buf); */ ;
   if (res == 0) {
     {
       int __gen_e_acsl_initialized_2;
@@ -342,7 +342,7 @@ int main(void)
       __e_acsl_assert(! __gen_e_acsl_initialized_2,1,"Assertion","main",
                       "!\\initialized(&buf[1])","tests/libc/file.c",15);
     }
-    /*@ assert ¬\initialized(&buf[1]); */ ;
+    /*@ assert !\initialized(&buf[1]); */ ;
   }
   if (res >= 1) {
     {
@@ -391,7 +391,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_initialized_7,1,"Assertion","main",
                     "!\\initialized(&buf[5])","tests/libc/file.c",29);
   }
-  /*@ assert ¬\initialized(&buf[5]); */ ;
+  /*@ assert !\initialized(&buf[5]); */ ;
   __gen_e_acsl_fread((void *)(& buf2[1]),sizeof(int),(unsigned long)4,f);
   {
     int __gen_e_acsl_initialized_8;
@@ -400,7 +400,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_initialized_8,1,"Assertion","main",
                     "!\\initialized((int *)buf2)","tests/libc/file.c",36);
   }
-  /*@ assert ¬\initialized((int *)buf2); */ ;
+  /*@ assert !\initialized((int *)buf2); */ ;
   {
     int __gen_e_acsl_size;
     int __gen_e_acsl_if;
@@ -422,7 +422,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_initialized_10,1,"Assertion","main",
                     "!\\initialized(&buf2[5])","tests/libc/file.c",38);
   }
-  /*@ assert ¬\initialized(&buf2[5]); */ ;
+  /*@ assert !\initialized(&buf2[5]); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(buf2));
   __e_acsl_delete_block((void *)(& f));

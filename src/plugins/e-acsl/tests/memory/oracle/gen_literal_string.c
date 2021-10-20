@@ -27,7 +27,7 @@ void f(void)
     __e_acsl_assert((int)*(T + G) == 98,1,"Assertion","f",
                     "*(T + G) == \'b\'","tests/memory/literal_string.i",11);
   }
-  /*@ assert *(T + G) ≡ 'b'; */ ;
+  /*@ assert *(T + G) == 'b'; */ ;
   G ++;
   return;
 }
@@ -114,7 +114,7 @@ int main(void)
     __e_acsl_assert((int)*(S + G2) == 111,1,"Assertion","main",
                     "*(S + G2) == \'o\'","tests/memory/literal_string.i",25);
   }
-  /*@ assert *(S + G2) ≡ 'o'; */ ;
+  /*@ assert *(S + G2) == 'o'; */ ;
   {
     int __gen_e_acsl_initialized;
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)S,sizeof(char));
@@ -146,7 +146,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_and,1,"Assertion","main","!\\valid(SS)",
                     "tests/memory/literal_string.i",28);
   }
-  /*@ assert ¬\valid(SS); */ ;
+  /*@ assert !\valid(SS); */ ;
   f();
   s_str ++;
   l_str ++;

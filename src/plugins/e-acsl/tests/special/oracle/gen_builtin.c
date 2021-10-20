@@ -6,7 +6,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 int incr(int x);
 
-/*@ ensures \result ≡ incr(\old(i)); */
+/*@ ensures \result == incr(\old(i)); */
 int __gen_e_acsl_f(int i);
 
 int f(int i)
@@ -30,7 +30,7 @@ int main(void)
   return __retres;
 }
 
-/*@ ensures \result ≡ incr(\old(i)); */
+/*@ ensures \result == incr(\old(i)); */
 int __gen_e_acsl_f(int i)
 {
   int __gen_e_acsl_at;

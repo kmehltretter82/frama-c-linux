@@ -13,15 +13,14 @@ int f(int x)
     if (! (x >= 0)) break;
     x -= 2;
     __e_acsl_assert(__gen_e_acsl_old_variant >= 0,1,"Variant","f",
-                    "(old x) \342\211\245 0","tests/constructs/decrease.c",
-                    10);
+                    "(old x) >= 0","tests/constructs/decrease.c",10);
     __e_acsl_assert(__gen_e_acsl_old_variant > x,1,"Variant","f",
                     "(old x) > x","tests/constructs/decrease.c",10);
   }
   return x;
 }
 
-/*@ predicate lexico(ℤ x, ℤ y) = x > y ∧ 0 ≤ x;
+/*@ predicate lexico(integer x, integer y) = x > y && 0 <= x;
 
 */
 int __gen_e_acsl_lexico(int x, int y);
@@ -44,7 +43,7 @@ int g(int x)
   return x;
 }
 
-/*@ requires n ≤ 12; */
+/*@ requires n <= 12; */
 int __gen_e_acsl_fact(int n);
 
 int fact(int n)
@@ -53,7 +52,7 @@ int fact(int n)
   int result = n;
   __e_acsl_assert(n >= 1,1,"Invariant","fact","n >= 1",
                   "tests/constructs/decrease.c",31);
-  /*@ loop invariant n ≥ 1;
+  /*@ loop invariant n >= 1;
       loop variant n; */
   while (1) {
     __gen_e_acsl_old_variant = n;
@@ -63,15 +62,14 @@ int fact(int n)
     __e_acsl_assert(n >= 1,1,"Invariant","fact","n >= 1",
                     "tests/constructs/decrease.c",31);
     __e_acsl_assert(__gen_e_acsl_old_variant >= 0,1,"Variant","fact",
-                    "(old n) \342\211\245 0","tests/constructs/decrease.c",
-                    33);
+                    "(old n) >= 0","tests/constructs/decrease.c",33);
     __e_acsl_assert(__gen_e_acsl_old_variant > n,1,"Variant","fact",
                     "(old n) > n","tests/constructs/decrease.c",33);
   }
   return result;
 }
 
-/*@ requires n ≤ 20; */
+/*@ requires n <= 20; */
 size_t __gen_e_acsl_fact2(size_t n);
 
 size_t fact2(size_t n)
@@ -85,7 +83,7 @@ size_t fact2(size_t n)
       __e_acsl_assert(__gen_e_acsl_and,1,"Invariant","fact2","1 <= i < n",
                       "tests/constructs/decrease.c",44);
     }
-    /*@ loop invariant 1 ≤ i < n;
+    /*@ loop invariant 1 <= i < n;
         loop variant n - i; */
     while (i < n - 1UL) {
       result *= n - i;
@@ -124,13 +122,13 @@ int fib(int n)
   return_label: return __retres;
 }
 
-/*@ requires n ≥ 0;
+/*@ requires n >= 0;
     decreases n; */
 int __gen_e_acsl_odd(int n);
 
 int odd(int n);
 
-/*@ requires n ≥ 0;
+/*@ requires n >= 0;
     decreases n; */
 int __gen_e_acsl_even(int n);
 
@@ -166,53 +164,53 @@ int main(void)
   int f10 = f(10);
   __e_acsl_assert(f10 == -2,1,"Assertion","main","f10 == -2",
                   "tests/constructs/decrease.c",81);
-  /*@ assert f10 ≡ -2; */ ;
+  /*@ assert f10 == -2; */ ;
   int f7 = f(7);
   __e_acsl_assert(f7 == -1,1,"Assertion","main","f7 == -1",
                   "tests/constructs/decrease.c",83);
-  /*@ assert f7 ≡ -1; */ ;
+  /*@ assert f7 == -1; */ ;
   int g10 = g(10);
   __e_acsl_assert(g10 == -2,1,"Assertion","main","g10 == -2",
                   "tests/constructs/decrease.c",85);
-  /*@ assert g10 ≡ -2; */ ;
+  /*@ assert g10 == -2; */ ;
   int g7 = g(7);
   __e_acsl_assert(g7 == -1,1,"Assertion","main","g7 == -1",
                   "tests/constructs/decrease.c",87);
-  /*@ assert g7 ≡ -1; */ ;
+  /*@ assert g7 == -1; */ ;
   int fact7 = __gen_e_acsl_fact(7);
   __e_acsl_assert(fact7 == 5040,1,"Assertion","main","fact7 == 5040",
                   "tests/constructs/decrease.c",90);
-  /*@ assert fact7 ≡ 5040; */ ;
+  /*@ assert fact7 == 5040; */ ;
   size_t fact18 = __gen_e_acsl_fact2((unsigned long)18);
   __e_acsl_assert(fact18 == 6402373705728000UL,1,"Assertion","main",
                   "fact18 == 6402373705728000UL",
                   "tests/constructs/decrease.c",93);
-  /*@ assert fact18 ≡ 6402373705728000UL; */ ;
+  /*@ assert fact18 == 6402373705728000UL; */ ;
   int fib7 = __gen_e_acsl_fib(7);
   __e_acsl_assert(fib7 == 13,1,"Assertion","main","fib7 == 13",
                   "tests/constructs/decrease.c",96);
-  /*@ assert fib7 ≡ 13; */ ;
+  /*@ assert fib7 == 13; */ ;
   int even7 = __gen_e_acsl_even(7);
   __e_acsl_assert(even7 == 0,1,"Assertion","main","even7 == 0",
                   "tests/constructs/decrease.c",99);
-  /*@ assert even7 ≡ 0; */ ;
+  /*@ assert even7 == 0; */ ;
   int even10 = __gen_e_acsl_even(10);
   __e_acsl_assert(even10 == 1,1,"Assertion","main","even10 == 1",
                   "tests/constructs/decrease.c",101);
-  /*@ assert even10 ≡ 1; */ ;
+  /*@ assert even10 == 1; */ ;
   int odd7 = __gen_e_acsl_odd(7);
   __e_acsl_assert(odd7 == 1,1,"Assertion","main","odd7 == 1",
                   "tests/constructs/decrease.c",103);
-  /*@ assert odd7 ≡ 1; */ ;
+  /*@ assert odd7 == 1; */ ;
   int odd10 = __gen_e_acsl_odd(10);
   __e_acsl_assert(odd10 == 0,1,"Assertion","main","odd10 == 0",
                   "tests/constructs/decrease.c",105);
-  /*@ assert odd10 ≡ 0; */ ;
+  /*@ assert odd10 == 0; */ ;
   __retres = 0;
   return __retres;
 }
 
-/*@ requires n ≥ 0;
+/*@ requires n >= 0;
     decreases n; */
 int __gen_e_acsl_even(int n)
 {
@@ -223,7 +221,7 @@ int __gen_e_acsl_even(int n)
   return __retres;
 }
 
-/*@ requires n ≥ 0;
+/*@ requires n >= 0;
     decreases n; */
 int __gen_e_acsl_odd(int n)
 {
@@ -242,7 +240,7 @@ int __gen_e_acsl_fib(int n)
   return __retres;
 }
 
-/*@ requires n ≤ 20; */
+/*@ requires n <= 20; */
 size_t __gen_e_acsl_fact2(size_t n)
 {
   size_t __retres;
@@ -252,7 +250,7 @@ size_t __gen_e_acsl_fact2(size_t n)
   return __retres;
 }
 
-/*@ requires n ≤ 12; */
+/*@ requires n <= 12; */
 int __gen_e_acsl_fact(int n)
 {
   int __retres;

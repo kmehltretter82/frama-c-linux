@@ -5,20 +5,24 @@
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@
-predicate p1(ℤ i, ℤ j, ℤ k) =
-  0 ≤ i < 10 ∧ 1 < j ≤ 11 ∧ 2 ≤ k ≤ 12;
+predicate p1(integer i, integer j, integer k) =
+  0 <= i < 10 && 1 < j <= 11 && 2 <= k <= 12;
  */
 int __gen_e_acsl_p1(int i, int j, int k);
 
-/*@ predicate p2(ℤ i, ℤ j, ℤ k) = 0 ≤ i ≤ j < k ≤ 10;
+/*@ predicate p2(integer i, integer j, integer k) = 0 <= i <= j < k <= 10;
  */
 int __gen_e_acsl_p2(int i, int j, int k);
 
-/*@ predicate p3(ℤ i, ℤ j, ℤ k) = 0 ≤ i < j ≤ 10 ∧ 1 < k < 11;
+/*@
+predicate p3(integer i, integer j, integer k) =
+  0 <= i < j <= 10 && 1 < k < 11;
  */
 int __gen_e_acsl_p3(int i, int j, int k);
 
-/*@ predicate p4(ℤ i, ℤ j, ℤ k) = 0 ≤ i ≤ k ≤ 10 ∧ 1 ≤ j < k;
+/*@
+predicate p4(integer i, integer j, integer k) =
+  0 <= i <= k <= 10 && 1 <= j < k;
 
 */
 int __gen_e_acsl_p4(int i, int j, int k);
@@ -51,7 +55,7 @@ int main(void)
                     "\\forall integer x; 0 <= x <= 1 ==> x == 0 || x == 1",
                     "tests/arith/quantif.i",16);
   }
-  /*@ assert ∀ ℤ x; 0 ≤ x ≤ 1 ⇒ x ≡ 0 ∨ x ≡ 1; */ ;
+  /*@ assert \forall integer x; 0 <= x <= 1 ==> x == 0 || x == 1; */ ;
   {
     int __gen_e_acsl_forall_2;
     int __gen_e_acsl_x_2;
@@ -71,7 +75,7 @@ int main(void)
                     "\\forall integer x; 0 < x <= 1 ==> x == 1",
                     "tests/arith/quantif.i",17);
   }
-  /*@ assert ∀ ℤ x; 0 < x ≤ 1 ⇒ x ≡ 1; */ ;
+  /*@ assert \forall integer x; 0 < x <= 1 ==> x == 1; */ ;
   {
     int __gen_e_acsl_forall_3;
     int __gen_e_acsl_x_3;
@@ -91,7 +95,7 @@ int main(void)
                     "\\forall integer x; 0 <= x < 1 ==> x == 0",
                     "tests/arith/quantif.i",18);
   }
-  /*@ assert ∀ ℤ x; 0 ≤ x < 1 ⇒ x ≡ 0; */ ;
+  /*@ assert \forall integer x; 0 <= x < 1 ==> x == 0; */ ;
   {
     int __gen_e_acsl_forall_4;
     int __gen_e_acsl_x_4;
@@ -126,8 +130,8 @@ int main(void)
   }
   /*@
   assert
-  ∀ ℤ x, ℤ y, ℤ z;
-    0 ≤ x < 2 ∧ 0 ≤ y < 5 ∧ 0 ≤ z ≤ y ⇒ x + z ≤ y + 1;
+  \forall integer x, integer y, integer z;
+    0 <= x < 2 && 0 <= y < 5 && 0 <= z <= y ==> x + z <= y + 1;
    */
   ;
   {
@@ -149,7 +153,7 @@ int main(void)
                     "\\exists int x; 0 <= x < 10 && x == 5",
                     "tests/arith/quantif.i",27);
   }
-  /*@ assert ∃ int x; 0 ≤ x < 10 ∧ x ≡ 5; */ ;
+  /*@ assert \exists int x; 0 <= x < 10 && x == 5; */ ;
   {
     int __gen_e_acsl_forall_5;
     int __gen_e_acsl_x_6;
@@ -192,9 +196,9 @@ int main(void)
   }
   /*@
   assert
-  ∀ int x;
-    0 ≤ x < 10 ⇒
-    x % 2 ≡ 0 ⇒ (∃ ℤ y; 0 ≤ y ≤ x / 2 ∧ x ≡ 2 * y);
+  \forall int x;
+    0 <= x < 10 ==>
+    x % 2 == 0 ==> (\exists integer y; 0 <= y <= x / 2 && x == 2 * y);
    */
   ;
   {
@@ -226,7 +230,7 @@ int main(void)
                       "\\forall integer i; 0 <= i < 10 ==> \\valid(&buf[i])",
                       "tests/arith/quantif.i",37);
     }
-    /*@ assert ∀ ℤ i; 0 ≤ i < 10 ⇒ \valid(&buf[i]); */ ;
+    /*@ assert \forall integer i; 0 <= i < 10 ==> \valid(&buf[i]); */ ;
     {
       int __gen_e_acsl_forall_7;
       int __gen_e_acsl_i_2;
@@ -252,7 +256,7 @@ int main(void)
                       "\\forall char i; 0 <= i < 10 ==> \\valid(&buf[i])",
                       "tests/arith/quantif.i",38);
     }
-    /*@ assert ∀ char i; 0 ≤ i < 10 ⇒ \valid(&buf[i]); */ ;
+    /*@ assert \forall char i; 0 <= i < 10 ==> \valid(&buf[i]); */ ;
     {
       int __gen_e_acsl_forall_8;
       unsigned long __gen_e_acsl_i_3;
@@ -278,7 +282,7 @@ int main(void)
                       "\\forall integer i; 0 <= i < len ==> \\valid(&buf[i])",
                       "tests/arith/quantif.i",39);
     }
-    /*@ assert ∀ ℤ i; 0 ≤ i < len ⇒ \valid(&buf[i]); */ ;
+    /*@ assert \forall integer i; 0 <= i < len ==> \valid(&buf[i]); */ ;
     {
       int __gen_e_acsl_forall_9;
       __e_acsl_mpz_t __gen_e_acsl_i_4;
@@ -334,17 +338,17 @@ int main(void)
                       "tests/arith/quantif.i",40);
       __gmpz_clear(__gen_e_acsl_i_4);
     }
-    /*@ assert ∀ ℤ i; 0 ≤ i ≤ len ⇒ \valid(&buf[i]); */ ;
+    /*@ assert \forall integer i; 0 <= i <= len ==> \valid(&buf[i]); */ ;
     __e_acsl_delete_block((void *)(buf));
   }
   __e_acsl_assert(1,1,"Assertion","main",
                   "\\forall integer x; 0 < x < 1 ==> \\false",
                   "tests/arith/quantif.i",44);
-  /*@ assert ∀ ℤ x; 0 < x < 1 ⇒ \false; */ ;
+  /*@ assert \forall integer x; 0 < x < 1 ==> \false; */ ;
   __e_acsl_assert(! 0,1,"Assertion","main",
                   "!(\\exists char c; 10 <= c < 10 && c == 10)",
                   "tests/arith/quantif.i",45);
-  /*@ assert ¬(∃ char c; 10 ≤ c < 10 ∧ c ≡ 10); */ ;
+  /*@ assert !(\exists char c; 10 <= c < 10 && c == 10); */ ;
   {
     int __gen_e_acsl_u;
     __gen_e_acsl_u = 5;
@@ -353,8 +357,8 @@ int main(void)
                     "tests/arith/quantif.i",47);
   }
   /*@
-  assert \let u = 5; ∀ ℤ x, ℤ y; 0 ≤ x < 2 ∧ 4 < y < u ⇒ \false;
-   */
+  assert \let u = 5;
+  \forall integer x, integer y; 0 <= x < 2 && 4 < y < u ==> \false; */
   ;
   {
     int __gen_e_acsl_forall_10;
@@ -396,8 +400,8 @@ int main(void)
   /*@
   assert
   forall_multiple_binders_1:
-    ∀ ℤ i, ℤ j, ℤ k;
-      0 ≤ i < 10 ∧ 1 < j ≤ 11 ∧ 2 ≤ k ≤ 12 ⇒ p1(i, j, k);
+    \forall integer i, integer j, integer k;
+      0 <= i < 10 && 1 < j <= 11 && 2 <= k <= 12 ==> p1(i, j, k);
    */
   ;
   {
@@ -440,7 +444,8 @@ int main(void)
   /*@
   assert
   forall_multiple_binders_2:
-    ∀ ℤ i, ℤ j, ℤ k; 0 ≤ i ≤ j < k ≤ 10 ⇒ p2(i, j, k);
+    \forall integer i, integer j, integer k;
+      0 <= i <= j < k <= 10 ==> p2(i, j, k);
    */
   ;
   {
@@ -483,8 +488,8 @@ int main(void)
   /*@
   assert
   forall_multiple_binders_3:
-    ∀ ℤ i, ℤ j, ℤ k;
-      0 ≤ i < j ≤ 10 ∧ 1 < k < 11 ⇒ p3(i, j, k);
+    \forall integer i, integer j, integer k;
+      0 <= i < j <= 10 && 1 < k < 11 ==> p3(i, j, k);
    */
   ;
   {
@@ -527,8 +532,8 @@ int main(void)
   /*@
   assert
   forall_multiple_binders_4:
-    ∀ ℤ i, ℤ j, ℤ k;
-      0 ≤ i < 10 ⇒ 1 < j ≤ 11 ⇒ 2 ≤ k ≤ 12 ⇒ p1(i, j, k);
+    \forall integer i, integer j, integer k;
+      0 <= i < 10 ==> 1 < j <= 11 ==> 2 <= k <= 12 ==> p1(i, j, k);
    */
   ;
   {
@@ -571,8 +576,8 @@ int main(void)
   /*@
   assert
   forall_unordered_binders:
-    ∀ ℤ i, ℤ j, ℤ k;
-      0 ≤ i ≤ k ≤ 10 ∧ 1 ≤ j < k ⇒ p4(i, j, k);
+    \forall integer i, integer j, integer k;
+      0 <= i <= k <= 10 && 1 <= j < k ==> p4(i, j, k);
    */
   ;
   {
@@ -615,8 +620,8 @@ int main(void)
   /*@
   assert
   exists_multiple_binders_1:
-    ∃ ℤ i, ℤ j, ℤ k;
-      0 ≤ i < 10 ∧ 1 < j ≤ 11 ∧ 2 ≤ k ≤ 12 ∧ p1(i, j, k);
+    \exists integer i, integer j, integer k;
+      0 <= i < 10 && 1 < j <= 11 && 2 <= k <= 12 && p1(i, j, k);
    */
   ;
   {
@@ -659,7 +664,8 @@ int main(void)
   /*@
   assert
   exists_multiple_binders_2:
-    ∃ ℤ i, ℤ j, ℤ k; 0 ≤ i ≤ j < k ≤ 10 ∧ p2(i, j, k);
+    \exists integer i, integer j, integer k;
+      0 <= i <= j < k <= 10 && p2(i, j, k);
    */
   ;
   {
@@ -702,8 +708,8 @@ int main(void)
   /*@
   assert
   exists_multiple_binders_3:
-    ∃ ℤ i, ℤ j, ℤ k;
-      0 ≤ i < j ≤ 10 ∧ 1 < k < 11 ∧ p3(i, j, k);
+    \exists integer i, integer j, integer k;
+      0 <= i < j <= 10 && 1 < k < 11 && p3(i, j, k);
    */
   ;
   {
@@ -746,64 +752,71 @@ int main(void)
   /*@
   assert
   exists_unordered_binders:
-    ∃ ℤ i, ℤ j, ℤ k;
-      0 ≤ i ≤ k ≤ 10 ∧ 1 ≤ j < k ∧ p4(i, j, k);
+    \exists integer i, integer j, integer k;
+      0 <= i <= k <= 10 && 1 <= j < k && p4(i, j, k);
    */
   ;
-  /*@ assert failed_invalid_guards: ∀ ℤ i; 10 > i ≥ 0 ⇒ p1(i, 2, 2);
-   */
+  /*@
+  assert
+  failed_invalid_guards: \forall integer i; 10 > i >= 0 ==> p1(i, 2, 2); */
   ;
   /*@
   assert
   failed_unguarded_k:
-    ∀ ℤ i, ℤ j, ℤ k; 0 ≤ i < 10 ∧ 1 < j ≤ 11 ⇒ p1(i, j, k);
+    \forall integer i, integer j, integer k;
+      0 <= i < 10 && 1 < j <= 11 ==> p1(i, j, k);
    */
   ;
   /*@
   assert
-  failed_non_integer: ∀ ℝ i; 0 ≤ i < 10 ⇒ p1(\truncate(i), 2, 2); */
-  ;
-  /*@ assert failed_missing_lower_bound: ∀ ℤ i; i < 10 ⇒ p1(i, 2, 2);
-   */
-  ;
-  /*@ assert failded_missing_upper_bound: ∀ ℤ i; 0 ≤ i ⇒ p1(i, 2, 2);
+  failed_non_integer: \forall real i; 0 <= i < 10 ==> p1(\truncate(i), 2, 2);
    */
   ;
   /*@
   assert
-  failed_invalid_upper_bound_1: ∀ ℤ i, ℤ j; 0 ≤ i < j ⇒ p1(i, j, 2);
+  failed_missing_lower_bound: \forall integer i; i < 10 ==> p1(i, 2, 2); */
+  ;
+  /*@
+  assert
+  failded_missing_upper_bound: \forall integer i; 0 <= i ==> p1(i, 2, 2); */
+  ;
+  /*@
+  assert
+  failed_invalid_upper_bound_1:
+    \forall integer i, integer j; 0 <= i < j ==> p1(i, j, 2);
    */
   ;
   /*@
   assert
   failed_invalid_upper_bound_2:
-    ∀ ℤ i, ℤ j; i < j ∧ 0 ≤ i ⇒ p1(i, 2, 2);
+    \forall integer i, integer j; i < j && 0 <= i ==> p1(i, 2, 2);
    */
   ;
   /*@
   assert
   failed_extra_constraint:
-    ∀ ℤ i, ℤ j; 0 ≤ i < j ∧ i < 10 ∧ 3 ≤ j < 5 ⇒ p1(i, j, 2);
+    \forall integer i, integer j;
+      0 <= i < j && i < 10 && 3 <= j < 5 ==> p1(i, j, 2);
    */
   ;
   /*@
   assert
   failed_multiple_upper_bounds:
-    ∀ ℤ i, ℤ j; 0 ≤ i < j < i ∧ j ≤ 10 ⇒ p1(i, j, 2);
+    \forall integer i, integer j; 0 <= i < j < i && j <= 10 ==> p1(i, j, 2);
    */
   ;
   /*@
   assert
   multiple_linked_upper:
-    ∀ ℤ i, ℤ j, ℤ k;
-      0 ≤ i < k ∧ 1 ≤ j < k ∧ 2 ≤ k < 10 ⇒ p1(i, j, k);
+    \forall integer i, integer j, integer k;
+      0 <= i < k && 1 <= j < k && 2 <= k < 10 ==> p1(i, j, k);
    */
   ;
   /*@
   assert
   multiple_guard:
-    ∀ ℤ i, ℤ j;
-      0 ≤ i < 10 ∧ 2 ≤ i < 8 ∧ 4 ≤ j < 6 ⇒ p1(i, j, 2);
+    \forall integer i, integer j;
+      0 <= i < 10 && 2 <= i < 8 && 4 <= j < 6 ==> p1(i, j, 2);
    */
   ;
   __retres = 0;

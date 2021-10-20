@@ -4,7 +4,7 @@
 #include "stdio.h"
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
-/*@ ensures \result ≡ (int)(\old(x) - \old(x)); */
+/*@ ensures \result == (int)(\old(x) - \old(x)); */
 int __gen_e_acsl_f(int x);
 
 int f(int x)
@@ -14,8 +14,8 @@ int f(int x)
 }
 
 int Y = 1;
-/*@ ensures \result ≡ \old(x);
-    ensures \result ≡ Y; */
+/*@ ensures \result == \old(x);
+    ensures \result == Y; */
 int __gen_e_acsl_g(int x);
 
 int g(int x)
@@ -23,7 +23,7 @@ int g(int x)
   return x;
 }
 
-/*@ ensures \result ≡ 0; */
+/*@ ensures \result == 0; */
 int __gen_e_acsl_h(void);
 
 int h(void)
@@ -43,7 +43,7 @@ int main(void)
   return __retres;
 }
 
-/*@ ensures \result ≡ 0; */
+/*@ ensures \result == 0; */
 int __gen_e_acsl_h(void)
 {
   int __retres;
@@ -53,8 +53,8 @@ int __gen_e_acsl_h(void)
   return __retres;
 }
 
-/*@ ensures \result ≡ \old(x);
-    ensures \result ≡ Y; */
+/*@ ensures \result == \old(x);
+    ensures \result == Y; */
 int __gen_e_acsl_g(int x)
 {
   int __gen_e_acsl_at;
@@ -68,7 +68,7 @@ int __gen_e_acsl_g(int x)
   return __retres;
 }
 
-/*@ ensures \result ≡ (int)(\old(x) - \old(x)); */
+/*@ ensures \result == (int)(\old(x) - \old(x)); */
 int __gen_e_acsl_f(int x)
 {
   int __gen_e_acsl_at_2;

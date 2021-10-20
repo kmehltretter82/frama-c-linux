@@ -5,8 +5,8 @@
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@ behavior yes:
-      assumes ∀ int i; 0 < i < n ⇒ *(t + (i - 1)) ≤ *(t + i);
-      ensures \result ≡ 1;
+      assumes \forall int i; 0 < i < n ==> *(t + (i - 1)) <= *(t + i);
+      ensures \result == 1;
  */
 int __gen_e_acsl_sorted(int *t, int n);
 
@@ -40,7 +40,7 @@ int main(void)
   int n = __gen_e_acsl_sorted(t,7);
   __e_acsl_assert(n == 1,1,"Assertion","main","n == 1","tests/bts/bts1324.i",
                   23);
-  /*@ assert n ≡ 1; */ ;
+  /*@ assert n == 1; */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(t));
   __e_acsl_memory_clean();
@@ -48,8 +48,8 @@ int main(void)
 }
 
 /*@ behavior yes:
-      assumes ∀ int i; 0 < i < n ⇒ *(t + (i - 1)) ≤ *(t + i);
-      ensures \result ≡ 1;
+      assumes \forall int i; 0 < i < n ==> *(t + (i - 1)) <= *(t + i);
+      ensures \result == 1;
  */
 int __gen_e_acsl_sorted(int *t, int n)
 {

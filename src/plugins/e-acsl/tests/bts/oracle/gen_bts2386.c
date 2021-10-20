@@ -31,11 +31,11 @@ void f(void const *s, int c, unsigned long n)
     __gmpz_clear(__gen_e_acsl_n);
     __gmpz_clear(__gen_e_acsl_sub);
   }
-  /*@ assert p - (unsigned char const *)s ≡ n - n; */ ;
+  /*@ assert p - (unsigned char const *)s == n - n; */ ;
   __e_acsl_assert(p - (unsigned char const *)s == 0UL,1,"Assertion","f",
                   "p - (unsigned char const *)s == 0","tests/bts/bts2386.c",
                   8);
-  /*@ assert p - (unsigned char const *)s ≡ 0; */ ;
+  /*@ assert p - (unsigned char const *)s == 0; */ ;
   __e_acsl_delete_block((void *)(& s));
   __e_acsl_delete_block((void *)(& p));
   return;

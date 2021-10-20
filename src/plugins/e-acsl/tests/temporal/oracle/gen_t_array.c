@@ -71,7 +71,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_and_3,1,"Assertion","main",
                     "!\\valid(src[2])","tests/temporal/t_array.c",14);
   }
-  /*@ assert ¬\valid(src[2]); */ ;
+  /*@ assert !\valid(src[2]); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(src));
   __e_acsl_delete_block((void *)(& b));

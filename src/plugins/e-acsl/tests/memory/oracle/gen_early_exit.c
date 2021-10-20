@@ -36,7 +36,7 @@ int goto_bts(void)
     __e_acsl_delete_block((void *)(& a));
   }
   L:
-  /*@ assert ¬\valid(p); */
+  /*@ assert !\valid(p); */
   {
     int __gen_e_acsl_initialized_2;
     int __gen_e_acsl_and_2;
@@ -44,7 +44,7 @@ int goto_bts(void)
                                                       sizeof(int *));
     if (__gen_e_acsl_initialized_2) {
       int __gen_e_acsl_valid_2;
-      /*@ assert Eva: dangling_pointer: ¬\dangling(&p); */
+      /*@ assert Eva: dangling_pointer: !\dangling(&p); */
       __gen_e_acsl_valid_2 = __e_acsl_valid((void *)p,sizeof(int),(void *)p,
                                             (void *)(& p));
       __gen_e_acsl_and_2 = __gen_e_acsl_valid_2;
@@ -131,7 +131,7 @@ int goto_valid(void)
       __e_acsl_assert(! __gen_e_acsl_and_2,1,"Assertion","goto_valid",
                       "!\\valid(q)","tests/memory/early_exit.c",47);
     }
-    /*@ assert ¬\valid(q); */ ;
+    /*@ assert !\valid(q); */ ;
     {
       int __gen_e_acsl_initialized_3;
       int __gen_e_acsl_and_3;
@@ -147,7 +147,7 @@ int goto_valid(void)
       __e_acsl_assert(! __gen_e_acsl_and_3,1,"Assertion","goto_valid",
                       "!\\valid(r)","tests/memory/early_exit.c",48);
     }
-    /*@ assert ¬\valid(r); */ ;
+    /*@ assert !\valid(r); */ ;
     __e_acsl_delete_block((void *)(& a1));
     goto SECOND;
     __e_acsl_full_init((void *)(& q));
@@ -159,7 +159,7 @@ int goto_valid(void)
     __e_acsl_delete_block((void *)(& a1));
   }
   SECOND:
-  /*@ assert ¬\valid(p); */
+  /*@ assert !\valid(p); */
   {
     int __gen_e_acsl_initialized_4;
     int __gen_e_acsl_and_4;
@@ -190,7 +190,7 @@ int goto_valid(void)
     __e_acsl_assert(! __gen_e_acsl_and_5,1,"Assertion","goto_valid",
                     "!\\valid(q)","tests/memory/early_exit.c",57);
   }
-  /*@ assert ¬\valid(q); */ ;
+  /*@ assert !\valid(q); */ ;
   {
     int __gen_e_acsl_initialized_6;
     int __gen_e_acsl_and_6;
@@ -206,7 +206,7 @@ int goto_valid(void)
     __e_acsl_assert(! __gen_e_acsl_and_6,1,"Assertion","goto_valid",
                     "!\\valid(r)","tests/memory/early_exit.c",58);
   }
-  /*@ assert ¬\valid(r); */ ;
+  /*@ assert !\valid(r); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(& r));
   __e_acsl_delete_block((void *)(& q));
@@ -319,7 +319,7 @@ int switch_valid(void)
     __e_acsl_assert(! __gen_e_acsl_and_4,1,"Assertion","switch_valid",
                     "!\\valid(q)","tests/memory/early_exit.c",87);
   }
-  /*@ assert ¬\valid(q); */ ;
+  /*@ assert !\valid(q); */ ;
   {
     int __gen_e_acsl_initialized_5;
     int __gen_e_acsl_and_5;
@@ -335,7 +335,7 @@ int switch_valid(void)
     __e_acsl_assert(! __gen_e_acsl_and_5,1,"Assertion","switch_valid",
                     "!\\valid(p)","tests/memory/early_exit.c",88);
   }
-  /*@ assert ¬\valid(p); */ ;
+  /*@ assert !\valid(p); */ ;
   {
     int __gen_e_acsl_initialized_6;
     int __gen_e_acsl_and_6;
@@ -464,7 +464,7 @@ int while_valid(void)
       __e_acsl_assert(! __gen_e_acsl_and_4,1,"Assertion","while_valid",
                       "!\\valid(p)","tests/memory/early_exit.c",116);
     }
-    /*@ assert ¬\valid(p); */ ;
+    /*@ assert !\valid(p); */ ;
     {
       int __gen_e_acsl_initialized_5;
       int __gen_e_acsl_and_5;
@@ -480,7 +480,7 @@ int while_valid(void)
       __e_acsl_assert(! __gen_e_acsl_and_5,1,"Assertion","while_valid",
                       "!\\valid(q)","tests/memory/early_exit.c",117);
     }
-    /*@ assert ¬\valid(q); */ ;
+    /*@ assert !\valid(q); */ ;
     {
       int __gen_e_acsl_initialized_6;
       int __gen_e_acsl_and_6;
@@ -535,7 +535,7 @@ void continue_valid(void)
         __e_acsl_assert(! __gen_e_acsl_and,1,"Assertion","continue_valid",
                         "!\\valid(p)","tests/memory/early_exit.c",130);
       }
-      /*@ assert ¬\valid(p); */ ;
+      /*@ assert !\valid(p); */ ;
       {
         int __gen_e_acsl_initialized_2;
         int __gen_e_acsl_and_2;
@@ -551,7 +551,7 @@ void continue_valid(void)
         __e_acsl_assert(! __gen_e_acsl_and_2,1,"Assertion","continue_valid",
                         "!\\valid(q)","tests/memory/early_exit.c",131);
       }
-      /*@ assert ¬\valid(q); */ ;
+      /*@ assert !\valid(q); */ ;
       int a1 = 1;
       __e_acsl_store_block((void *)(& a1),(size_t)4);
       __e_acsl_full_init((void *)(& a1));
@@ -588,7 +588,7 @@ void continue_valid(void)
         __e_acsl_assert(! __gen_e_acsl_and_4,1,"Assertion","continue_valid",
                         "!\\valid(q)","tests/memory/early_exit.c",136);
       }
-      /*@ assert ¬\valid(q); */ ;
+      /*@ assert !\valid(q); */ ;
       {
         int a2 = 1;
         __e_acsl_store_block((void *)(& a2),(size_t)4);
@@ -654,7 +654,7 @@ void continue_valid(void)
     __e_acsl_assert(! __gen_e_acsl_and_7,1,"Assertion","continue_valid",
                     "!\\valid(p)","tests/memory/early_exit.c",150);
   }
-  /*@ assert ¬\valid(p); */ ;
+  /*@ assert !\valid(p); */ ;
   {
     int __gen_e_acsl_initialized_8;
     int __gen_e_acsl_and_8;
@@ -670,7 +670,7 @@ void continue_valid(void)
     __e_acsl_assert(! __gen_e_acsl_and_8,1,"Assertion","continue_valid",
                     "!\\valid(q)","tests/memory/early_exit.c",151);
   }
-  /*@ assert ¬\valid(q); */ ;
+  /*@ assert !\valid(q); */ ;
   __e_acsl_delete_block((void *)(& q));
   __e_acsl_delete_block((void *)(& p));
   return;

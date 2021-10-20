@@ -6,7 +6,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 typedef int ArrayInt[5];
 /*@ ensures
-      *\old(AverageAccel) ≡
+      *\old(AverageAccel) ==
       (((((*\old(Accel))[4] + (*\old(Accel))[3]) + (*\old(Accel))[2]) +
         (*\old(Accel))[1])
        + (*\old(Accel))[0])
@@ -44,7 +44,7 @@ int main(void)
 }
 
 /*@ ensures
-      *\old(AverageAccel) ≡
+      *\old(AverageAccel) ==
       (((((*\old(Accel))[4] + (*\old(Accel))[3]) + (*\old(Accel))[2]) +
         (*\old(Accel))[1])
        + (*\old(Accel))[0])

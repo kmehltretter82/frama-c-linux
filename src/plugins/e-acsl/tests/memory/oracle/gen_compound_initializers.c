@@ -177,7 +177,7 @@ int main(int argc, char **argv)
   /*@ assert \valid(&_F); */ ;
   __e_acsl_assert(_E == 44,1,"Assertion","main","_E == 44",
                   "tests/memory/compound_initializers.c",31);
-  /*@ assert _E ≡ 44; */ ;
+  /*@ assert _E == 44; */ ;
   {
     int __gen_e_acsl_valid_6;
     __gen_e_acsl_valid_6 = __e_acsl_valid((void *)(& _G),
@@ -189,7 +189,7 @@ int main(int argc, char **argv)
   /*@ assert \valid(&_G); */ ;
   __e_acsl_assert(_G[0].num == 99,1,"Assertion","main","_G[0].num == 99",
                   "tests/memory/compound_initializers.c",33);
-  /*@ assert _G[0].num ≡ 99; */ ;
+  /*@ assert _G[0].num == 99; */ ;
   __retres = 0;
   __e_acsl_globals_clean();
   __e_acsl_memory_clean();

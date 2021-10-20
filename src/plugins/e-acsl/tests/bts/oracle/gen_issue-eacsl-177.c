@@ -5,8 +5,8 @@
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@
-logic ℤ f(ℤ n) =
-  n ≤ 2147483647 + 1 ∨ n ≥ 9223372036854775807L + 1? 0: f(n + 1) + n;
+logic integer f(integer n) =
+  n <= 2147483647 + 1 || n >= 9223372036854775807L + 1? 0: f(n + 1) + n;
 
 */
 void __gen_e_acsl_f(__e_acsl_mpz_t *__retres_arg, int n);
@@ -31,7 +31,7 @@ int main(void)
     __gmpz_clear(__gen_e_acsl_f_8);
     __gmpz_clear(__gen_e_acsl__10);
   }
-  /*@ assert f(0) ≡ 0; */ ;
+  /*@ assert f(0) == 0; */ ;
   {
     long __gen_e_acsl_n_5;
     __e_acsl_mpz_t __gen_e_acsl_f_10;
@@ -48,7 +48,7 @@ int main(void)
     __gmpz_clear(__gen_e_acsl_f_10);
     __gmpz_clear(__gen_e_acsl__11);
   }
-  /*@ assert \let n = 0 ≡ 0? 9223372036854775807L: -1; f(n) ≢ 0; */ ;
+  /*@ assert \let n = 0 == 0? 9223372036854775807L: -1; f(n) != 0; */ ;
   __retres = 0;
   return __retres;
 }
