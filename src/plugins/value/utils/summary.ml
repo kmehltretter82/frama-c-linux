@@ -157,11 +157,12 @@ let get_status ip =
   in
   Property_status.fold_on_statuses aux_status ip None
 
-let compute_fun_stats kf =
+let compute_fun_stats fundec =
   let alarms = AlarmsStats.create 13
   and coverage = Coverage.make ()
   and statuses = Statuses.make ()
   in
+  let kf = Globals.Functions.get fundec.Cil_types.svar in
   let do_status alarm ip =
     match get_status ip with
     | None -> ()
@@ -183,11 +184,7 @@ let compute_fun_stats kf =
     Coverage.incr coverage ~reachable;
     Annotations.iter_code_annot (do_annot stmt) stmt
   in
-  begin match kf.Cil_types.fundec with
-    | Declaration _ -> ()
-    | Definition (fundec,_loc) ->
-      List.iter do_stmt fundec.Cil_types.sallstmts
-  end;
+  List.iter do_stmt fundec.Cil_types.sallstmts;
   { fun_coverage = coverage;
     fun_alarm_count = AlarmsStats.to_list alarms;
     fun_alarm_statuses = statuses; }
@@ -196,7 +193,7 @@ let compute_fun_stats kf =
 module FunctionStats_Type = Datatype.Make (struct
     include Datatype.Serializable_undefined
     type t = fun_stats
-    let name = "Eva.Value_results.FunctionStats_Type"
+    let name = "Eva.Summary.FunctionStats_Type"
     let reprs = [{
         fun_coverage = Coverage.make ();
         fun_alarm_count = [];
@@ -205,23 +202,26 @@ module FunctionStats_Type = Datatype.Make (struct
   end)
 
 module FunctionStats = struct
-  include Kernel_function.Make_Table
+  include State_builder.Hashtbl
+      (Cil_datatype.Fundec.Hashtbl)
       (FunctionStats_Type)
       (struct
-        let name = "Eva.Value_results.FunctionStats"
+        let name = "Eva.Summary.FunctionStats"
         let dependencies = [ Db.Value.self ]
         let size = 17
       end)
 
   module Hook = Hook.Build (struct
-      type t = Cil_types.kernel_function * fun_stats
+      type t = Cil_types.fundec * fun_stats
     end)
 
   let compute kf =
     let stats = compute_fun_stats kf in
     Hook.apply (kf,stats);
     stats
-  let get = memo compute
+  let get kf =
+    try Some (find kf)
+    with Not_found -> None
   let recompute kf = replace kf (compute kf)
   let register_hook = Hook.extend
 end
@@ -289,19 +289,20 @@ let compute_stats () =
   and prog_stmt_coverage = Coverage.make ()
   and prog_alarms = AlarmsStats.create 131
   in
-  let do_fun kf =
-    let reachable = Value_results.is_called kf in
-    let consider = consider_function (Kernel_function.get_vi kf) in
-    if consider then
-      Coverage.incr prog_fun_coverage ~reachable;
-    if reachable then begin
-      let fun_stats = FunctionStats.get kf in
+  let do_fun fundec =
+    let consider = consider_function fundec.Cil_types.svar in
+    match FunctionStats.get fundec with
+    | Some fun_stats ->
       AlarmsStats.add_list prog_alarms fun_stats.fun_alarm_count;
       if consider then
-        Coverage.add prog_stmt_coverage fun_stats.fun_coverage;
-    end
+        begin
+          Coverage.incr prog_fun_coverage ~reachable:true;
+          Coverage.add prog_stmt_coverage fun_stats.fun_coverage;
+        end
+    | None ->
+      if consider then Coverage.incr prog_fun_coverage ~reachable:false;
   in
-  Globals.Functions.iter do_fun;
+  Globals.Functions.iter_on_fundecs do_fun;
   let alarms_statuses, assertions_statuses, preconds_statuses =
     compute_statuses ()
   and eva_events, kernel_events = compute_events () in

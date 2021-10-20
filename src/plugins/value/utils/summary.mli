@@ -66,16 +66,16 @@ type program_stats =
 
 module FunctionStats : sig
   (** Get the current analysis statistics for a function *)
-  val get: Cil_types.kernel_function -> fun_stats
+  val get: Cil_types.fundec -> fun_stats option
 
-  (** Iterate on every function statistices *)
-  val iter: (Cil_types.kernel_function -> fun_stats -> unit) -> unit
+  (** Iterate on every function statistics *)
+  val iter: (Cil_types.fundec -> fun_stats -> unit) -> unit
 
   (** Trigger the recomputation of function stats *)
-  val recompute: Cil_types.kernel_function -> unit
+  val recompute: Cil_types.fundec -> unit
 
   (** Set a hook on function statistics computation *)
-  val register_hook: (Cil_types.kernel_function * fun_stats -> unit) -> unit
+  val register_hook: (Cil_types.fundec * fun_stats -> unit) -> unit
 end
 
 (** Compute analysis statistics. *)

@@ -201,10 +201,10 @@ module Make (Abstract: Abstractions.Eva) = struct
           Library_functions.warn_unsupported_spec vi.vorig_name;
         Spec.compute_using_specification ~warn:true call_kinstr call spec state,
         Eval.Cacheable
-      | `Def _fundec ->
+      | `Def fundec ->
         Db.Value.Call_Type_Value_Callbacks.apply (`Def, cvalue_state, call_stack);
         let result = Computer.compute kf call_kinstr state in
-        Summary.FunctionStats.recompute kf;
+        Summary.FunctionStats.recompute fundec;
         result
     in
     if pp then

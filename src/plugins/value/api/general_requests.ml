@@ -428,9 +428,9 @@ let _array =
     ~name:"functionStats"
     ~descr:(Markdown.plain
               "Statistics about the last Eva analysis for each function")
-    ~key:(fun (kf,_stats) -> Kernel_function.get_name kf)
-    ~keyType:Kernel_ast.Kf.jtype
-    ~iter:(fun f -> FunctionStats.iter (fun kf s -> f (kf,s)))
+    ~key:(fun (fundec,_stats) -> fundec.svar.vname)
+    ~keyType:Kernel_ast.Fundec.jtype
+    ~iter:(fun f -> FunctionStats.iter (fun fundec s -> f (fundec,s)))
     ~add_update_hook:FunctionStats.register_hook
     model
 
