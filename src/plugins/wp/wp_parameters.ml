@@ -117,7 +117,7 @@ module Properties =
          to remove them from the selection. The '+' sign can be omitted.\n\
          Categories are: @lemma, @requires, @assigns, @ensures, @exits,\n\
          @assert, @invariant, @variant, @breaks, @continues, @returns,\n\
-         @complete_behaviors, @disjoint_behaviors and\n\
+         @complete_behaviors, @disjoint_behaviors, @terminates and\n\
          @check (which includes all check clauses)."
     end)
 let () = on_reset Properties.clear
