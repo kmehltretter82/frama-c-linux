@@ -195,7 +195,7 @@ Ivette.registerComponent({
   group: 'frama-c.plugins',
   rank: 10,
   label: 'Eva Coverage',
-  title: 'Detailed coverage and results of the Eva analysis',
+  title: 'Detailed coverage of the Eva analysis',
   children: <CoverageComponent />,
 });
 

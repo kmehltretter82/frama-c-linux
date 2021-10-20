@@ -211,15 +211,15 @@ export function EvaSummary(): JSX.Element {
   if (state === 'not_computed')
     return (
       <div className="eva-summary-status">
-        Eva analysis not run yet.
+        No Eva analysis has been run yet.
       </div>
     );
 
   if (state === 'computing')
     return (
       <div className="eva-summary-status">
-        Eva analysis running.
         <LED status="active" blink />
+        Eva analysis in progress…
       </div>
     );
 
