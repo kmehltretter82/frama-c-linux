@@ -23,7 +23,6 @@
 // React & Dome
 import React from 'react';
 import * as Ivette from 'ivette';
-import { Vfill } from 'dome/layout/boxes';
 import * as States from 'frama-c/states';
 import * as Eva from 'frama-c/api/plugins/eva/general';
 
@@ -225,16 +224,18 @@ export function EvaSummary(): JSX.Element {
 
   if (state === 'computed' && data && alarmCategories)
     return (
-      <div className="eva-summary computed">
-        <h1>Analysis Summary</h1>
-        <h2>Coverage</h2>
-        {CoverageTable(data)}
-        <h2>Errors</h2>
-        {Errors(data)}
-        <h2>Alarms</h2>
-        {Alarms(data, alarmCategories)}
-        <h2>Statuses</h2>
-        {Statuses(data)}
+      <div className="eva-summary-box">
+        <div className="eva-summary">
+          <h1>Analysis Summary</h1>
+          <h2>Coverage</h2>
+          {CoverageTable(data)}
+          <h2>Errors</h2>
+          {Errors(data)}
+          <h2>Alarms</h2>
+          {Alarms(data, alarmCategories)}
+          <h2>Statuses</h2>
+          {Statuses(data)}
+        </div>
       </div>
     );
 
@@ -245,9 +246,7 @@ function EvaSummaryComponent(): JSX.Element {
   return (
     <>
       <Ivette.TitleBar />
-      <Vfill>
-        <EvaSummary />
-      </Vfill>
+      <EvaSummary />
     </>
   );
 }

@@ -1,5 +1,5 @@
 .eva-summary-status {
-    margin: 6px;
+    margin: auto;
 }
 
 .eva-summary-status .dome-xButton-led {
@@ -7,11 +7,20 @@
     vertical-align: baseline;
 }
 
-.eva-summary {
-    padding: 10px;
+.eva-summary-box  {
     background-color: white;
     height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
     overflow: auto;
+}
+
+.eva-summary {
+    min-height: 0px;
     user-select: text;
 }
 
@@ -66,7 +75,7 @@
 
 .eva-summary .alarms-table tr:nth-child(2n) {
     background-color: #eee;
-}  
+}
 
 .eva-summary .alarms-table td:nth-child(1) {
     text-align: right;
