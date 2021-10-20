@@ -130,9 +130,7 @@ export function CoverageTable(): JSX.Element {
         align="center"
         visible={false}
         width={80}
-        getter={({ coverage }: stats) => (
-          coverage.dead
-        )}
+        getter={({ coverage }: stats) => coverage.dead}
       />
       <Column
         id="reachableStatements"
@@ -141,9 +139,7 @@ export function CoverageTable(): JSX.Element {
         align="center"
         visible={false}
         width={80}
-        getter={({ coverage }: stats) => (
-          coverage.reachable
-        )}
+        getter={({ coverage }: stats) => coverage.reachable}
       />
       <Column
         id="totalStatements"
@@ -152,9 +148,7 @@ export function CoverageTable(): JSX.Element {
         align="center"
         visible={false}
         width={80}
-        getter={({ coverage }: stats) => (
-          coverage.dead + coverage.reachable
-        )}
+        getter={({ coverage }: stats) => coverage.dead + coverage.reachable}
       />
       <Column
         id="coverage"
@@ -162,10 +156,8 @@ export function CoverageTable(): JSX.Element {
         title="Coverage of the Eva analysis"
         align="center"
         width={80}
-        getter={({ coverage }: stats) => (
-          coverage.reachable / (coverage.dead + coverage.reachable)
-        )}
-        render={(p) => <>{percent(p)}</>}
+        getter={({ coverage }: stats) => coverage}
+        render={(coverage) => <>{percent(coverage)}</>}
       />
       <Column
         id="coverage-meter"

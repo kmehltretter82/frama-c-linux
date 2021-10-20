@@ -52,9 +52,7 @@ function CoverageTable(data: Eva.programStatsType): JSX.Element {
           <th>Functions</th>
           <td>{functions.reachable}</td>
           <td>{functionsTotal}</td>
-          <td>
-            {percent(functions.reachable, functionsTotal)}
-          </td>
+          <td>{percent(functions)}</td>
           <td>
             <CoverageMeter coverage={functions} />
           </td>
@@ -63,9 +61,7 @@ function CoverageTable(data: Eva.programStatsType): JSX.Element {
           <th>Statements</th>
           <td>{statements.reachable}</td>
           <td>{statementsTotal}</td>
-          <td>
-            {percent(statements.reachable, statementsTotal)}
-          </td>
+          <td>{percent(statements)}</td>
           <td>
             <CoverageMeter coverage={statements} />
           </td>

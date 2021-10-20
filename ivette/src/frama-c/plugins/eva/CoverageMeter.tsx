@@ -27,8 +27,8 @@ export interface Coverage {
   dead: number;
 }
 
-export function percent(x: number, y?: number): string {
-  const q = y ? x / y : x;
+export function percent(coverage: Coverage): string {
+  const q = coverage.reachable / (coverage.reachable + coverage.dead);
   return `${(q * 100).toFixed(1)}%`;
 }
 
