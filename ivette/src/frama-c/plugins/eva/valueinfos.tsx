@@ -53,7 +53,6 @@ const D = new Dome.Debug('Source Code');
 interface StmtProps {
   stmt?: string;
   rank?: number;
-  fct: string;
   marker: Ast.marker;
 }
 
@@ -147,7 +146,7 @@ export function StackInfos() {
         onDoubleClick={onDoubleClick}
       >
         {caller}
-        <Stmt stmt={stmt} rank={rank} fct={caller} marker={stmt} />
+        <Stmt stmt={stmt} rank={rank} marker={stmt} />
       </Cell>
     );
   };

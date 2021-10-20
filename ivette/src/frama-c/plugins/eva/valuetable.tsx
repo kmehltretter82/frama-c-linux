@@ -118,12 +118,12 @@ function TableCell(props: TableCellProps) {
       if (transient) {
         contents = <span className="dome-text-label">« Probe »</span>;
       } else {
-        const { stmt, rank, code, label, fct } = probe;
+        const { stmt, rank, code, label } = probe;
         const textClass = label ? 'dome-text-label' : 'dome-text-cell';
         contents = (
           <>
             <span className={textClass}>{label ?? code}</span>
-            <Stmt stmt={stmt} rank={rank} fct={fct} marker={marker} />
+            <Stmt stmt={stmt} rank={rank} marker={marker} />
           </>
         );
       }
