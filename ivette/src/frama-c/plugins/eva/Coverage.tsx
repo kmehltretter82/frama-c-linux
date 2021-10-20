@@ -108,6 +108,7 @@ export function CoverageTable(): JSX.Element {
       <Column
         id="alarms"
         label="Alarms"
+        title="Number of alarms emitted by the Eva analysis"
         align="center"
         width={80}
         getter={({ alarmStatuses }: stats) => (
@@ -117,15 +118,15 @@ export function CoverageTable(): JSX.Element {
       <Column
         id="sureAlarms"
         label="Sure alarms"
-        title="Sure alarms"
+        title="Number of sure alarms emitted by the Eva analysis"
         align="center"
         width={80}
         getter={({ alarmStatuses }: stats) => alarmStatuses.invalid}
       />
       <Column
         id="deadStatements"
-        label="Dead statements"
-        title="Dead statements"
+        label="Dead"
+        title="Number of statements unreachable to the Eva analysis"
         align="center"
         visible={false}
         width={80}
@@ -135,8 +136,8 @@ export function CoverageTable(): JSX.Element {
       />
       <Column
         id="reachableStatements"
-        label="Reachable statements"
-        title="Reachable statements"
+        label="Reachable"
+        title="Number of statements reached by the Eva analysis"
         align="center"
         visible={false}
         width={80}
@@ -146,8 +147,8 @@ export function CoverageTable(): JSX.Element {
       />
       <Column
         id="totalStatements"
-        label="Total statements"
-        title="Total statements"
+        label="Total"
+        title="Total number of statements"
         align="center"
         visible={false}
         width={80}
@@ -158,6 +159,7 @@ export function CoverageTable(): JSX.Element {
       <Column
         id="coverage"
         label="Coverage"
+        title="Coverage of the Eva analysis"
         align="center"
         width={80}
         getter={({ coverage }: stats) => (
