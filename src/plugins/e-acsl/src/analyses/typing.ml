@@ -666,7 +666,7 @@ let rec type_term
       ignore (type_term ~use_gmp_opt:true ~lenv li_t);
       dup (type_term ~use_gmp_opt:true ?ctx ~lenv t).ty
     | Tlambda ([ _ ],lt) ->
-      dup (type_term ~use_gmp_opt:true ~under_lambda:true ?ctx lt).ty;
+      dup (type_term ~use_gmp_opt:true ~under_lambda:true ?ctx ~lenv lt).ty;
     | Tlambda (_,_) -> Error.not_yet "lambda"
     | TDataCons (_,_) -> Error.not_yet "datacons"
     | TUpdate (_,_,_) -> Error.not_yet "update"

@@ -31,6 +31,12 @@ int main(void) {
   /*@ assert \forall int x; 0 <= x < 10
     ==> x % 2 == 0 ==> \exists integer y; 0 <= y <= x/2 && x == 2 * y; */
 
+  // quantifications inside quantifications
+
+  /*@ assert \forall int x; 0 <= x < 10
+    ==> (\forall int y; 10 <= y < 20 ==> x <= y) &&
+        (\forall int y; -10 <= y < 0 ==> y <= x); */
+
   { // Gitlab issue #42
     int buf[10];
     unsigned long len = 9;

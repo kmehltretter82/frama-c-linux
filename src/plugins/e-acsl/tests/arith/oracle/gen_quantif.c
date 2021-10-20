@@ -198,13 +198,75 @@ int main(void)
    */
   ;
   {
+    int __gen_e_acsl_forall_6;
+    int __gen_e_acsl_x_7;
+    __gen_e_acsl_forall_6 = 1;
+    __gen_e_acsl_x_7 = 0;
+    while (1) {
+      if (__gen_e_acsl_x_7 < 10) ; else break;
+      {
+        int __gen_e_acsl_forall_7;
+        int __gen_e_acsl_y_3;
+        int __gen_e_acsl_and;
+        __gen_e_acsl_forall_7 = 1;
+        __gen_e_acsl_y_3 = 10;
+        while (1) {
+          if (__gen_e_acsl_y_3 < 20) ; else break;
+          if (__gen_e_acsl_x_7 <= __gen_e_acsl_y_3) ;
+          else {
+            __gen_e_acsl_forall_7 = 0;
+            goto e_acsl_end_loop8;
+          }
+          __gen_e_acsl_y_3 ++;
+        }
+        e_acsl_end_loop8: ;
+        if (__gen_e_acsl_forall_7) {
+          int __gen_e_acsl_forall_8;
+          int __gen_e_acsl_y_4;
+          __gen_e_acsl_forall_8 = 1;
+          __gen_e_acsl_y_4 = -10;
+          while (1) {
+            if (__gen_e_acsl_y_4 < 0) ; else break;
+            if (__gen_e_acsl_y_4 <= __gen_e_acsl_x_7) ;
+            else {
+              __gen_e_acsl_forall_8 = 0;
+              goto e_acsl_end_loop9;
+            }
+            __gen_e_acsl_y_4 ++;
+          }
+          e_acsl_end_loop9: ;
+          __gen_e_acsl_and = __gen_e_acsl_forall_8;
+        }
+        else __gen_e_acsl_and = 0;
+        if (__gen_e_acsl_and) ;
+        else {
+          __gen_e_acsl_forall_6 = 0;
+          goto e_acsl_end_loop10;
+        }
+      }
+      __gen_e_acsl_x_7 ++;
+    }
+    e_acsl_end_loop10: ;
+    __e_acsl_assert(__gen_e_acsl_forall_6,1,"Assertion","main",
+                    "\\forall int x;\n  0 <= x < 10 ==>\n  (\\forall int y; 10 <= y < 20 ==> x <= y) &&\n  (\\forall int y; -10 <= y < 0 ==> y <= x)",
+                    "tests/arith/quantif.i",36);
+  }
+  /*@
+  assert
+  ∀ int x;
+    0 ≤ x < 10 ⇒
+    (∀ int y; 10 ≤ y < 20 ⇒ x ≤ y) ∧
+    (∀ int y; -10 ≤ y < 0 ⇒ y ≤ x);
+   */
+  ;
+  {
     int buf[10];
     __e_acsl_store_block((void *)(buf),(size_t)40);
     unsigned long len = (unsigned long)9;
     {
-      int __gen_e_acsl_forall_6;
+      int __gen_e_acsl_forall_9;
       int __gen_e_acsl_i;
-      __gen_e_acsl_forall_6 = 1;
+      __gen_e_acsl_forall_9 = 1;
       __gen_e_acsl_i = 0;
       while (1) {
         if (__gen_e_acsl_i < 10) ; else break;
@@ -215,22 +277,22 @@ int main(void)
                                               (void *)0);
           if (__gen_e_acsl_valid) ;
           else {
-            __gen_e_acsl_forall_6 = 0;
-            goto e_acsl_end_loop8;
+            __gen_e_acsl_forall_9 = 0;
+            goto e_acsl_end_loop11;
           }
         }
         __gen_e_acsl_i ++;
       }
-      e_acsl_end_loop8: ;
-      __e_acsl_assert(__gen_e_acsl_forall_6,1,"Assertion","main",
+      e_acsl_end_loop11: ;
+      __e_acsl_assert(__gen_e_acsl_forall_9,1,"Assertion","main",
                       "\\forall integer i; 0 <= i < 10 ==> \\valid(&buf[i])",
-                      "tests/arith/quantif.i",37);
+                      "tests/arith/quantif.i",43);
     }
     /*@ assert ∀ ℤ i; 0 ≤ i < 10 ⇒ \valid(&buf[i]); */ ;
     {
-      int __gen_e_acsl_forall_7;
+      int __gen_e_acsl_forall_10;
       int __gen_e_acsl_i_2;
-      __gen_e_acsl_forall_7 = 1;
+      __gen_e_acsl_forall_10 = 1;
       __gen_e_acsl_i_2 = (char)0;
       while (1) {
         if (__gen_e_acsl_i_2 < 10) ; else break;
@@ -241,22 +303,22 @@ int main(void)
                                                 (void *)0);
           if (__gen_e_acsl_valid_2) ;
           else {
-            __gen_e_acsl_forall_7 = 0;
-            goto e_acsl_end_loop9;
+            __gen_e_acsl_forall_10 = 0;
+            goto e_acsl_end_loop12;
           }
         }
         __gen_e_acsl_i_2 ++;
       }
-      e_acsl_end_loop9: ;
-      __e_acsl_assert(__gen_e_acsl_forall_7,1,"Assertion","main",
+      e_acsl_end_loop12: ;
+      __e_acsl_assert(__gen_e_acsl_forall_10,1,"Assertion","main",
                       "\\forall char i; 0 <= i < 10 ==> \\valid(&buf[i])",
-                      "tests/arith/quantif.i",38);
+                      "tests/arith/quantif.i",44);
     }
     /*@ assert ∀ char i; 0 ≤ i < 10 ⇒ \valid(&buf[i]); */ ;
     {
-      int __gen_e_acsl_forall_8;
+      int __gen_e_acsl_forall_11;
       unsigned long __gen_e_acsl_i_3;
-      __gen_e_acsl_forall_8 = 1;
+      __gen_e_acsl_forall_11 = 1;
       __gen_e_acsl_i_3 = 0UL;
       while (1) {
         if (__gen_e_acsl_i_3 < len) ; else break;
@@ -267,22 +329,22 @@ int main(void)
                                                 (void *)0);
           if (__gen_e_acsl_valid_3) ;
           else {
-            __gen_e_acsl_forall_8 = 0;
-            goto e_acsl_end_loop10;
+            __gen_e_acsl_forall_11 = 0;
+            goto e_acsl_end_loop13;
           }
         }
         __gen_e_acsl_i_3 ++;
       }
-      e_acsl_end_loop10: ;
-      __e_acsl_assert(__gen_e_acsl_forall_8,1,"Assertion","main",
+      e_acsl_end_loop13: ;
+      __e_acsl_assert(__gen_e_acsl_forall_11,1,"Assertion","main",
                       "\\forall integer i; 0 <= i < len ==> \\valid(&buf[i])",
-                      "tests/arith/quantif.i",39);
+                      "tests/arith/quantif.i",45);
     }
     /*@ assert ∀ ℤ i; 0 ≤ i < len ⇒ \valid(&buf[i]); */ ;
     {
-      int __gen_e_acsl_forall_9;
+      int __gen_e_acsl_forall_12;
       __e_acsl_mpz_t __gen_e_acsl_i_4;
-      __gen_e_acsl_forall_9 = 1;
+      __gen_e_acsl_forall_12 = 1;
       __gmpz_init(__gen_e_acsl_i_4);
       {
         __e_acsl_mpz_t __gen_e_acsl_;
@@ -310,8 +372,8 @@ int main(void)
                                                 (void *)0);
           if (__gen_e_acsl_valid_4) ;
           else {
-            __gen_e_acsl_forall_9 = 0;
-            goto e_acsl_end_loop11;
+            __gen_e_acsl_forall_12 = 0;
+            goto e_acsl_end_loop14;
           }
         }
         {
@@ -328,10 +390,10 @@ int main(void)
           __gmpz_clear(__gen_e_acsl_add);
         }
       }
-      e_acsl_end_loop11: ;
-      __e_acsl_assert(__gen_e_acsl_forall_9,1,"Assertion","main",
+      e_acsl_end_loop14: ;
+      __e_acsl_assert(__gen_e_acsl_forall_12,1,"Assertion","main",
                       "\\forall integer i; 0 <= i <= len ==> \\valid(&buf[i])",
-                      "tests/arith/quantif.i",40);
+                      "tests/arith/quantif.i",46);
       __gmpz_clear(__gen_e_acsl_i_4);
     }
     /*@ assert ∀ ℤ i; 0 ≤ i ≤ len ⇒ \valid(&buf[i]); */ ;
@@ -339,29 +401,29 @@ int main(void)
   }
   __e_acsl_assert(1,1,"Assertion","main",
                   "\\forall integer x; 0 < x < 1 ==> \\false",
-                  "tests/arith/quantif.i",44);
+                  "tests/arith/quantif.i",50);
   /*@ assert ∀ ℤ x; 0 < x < 1 ⇒ \false; */ ;
   __e_acsl_assert(! 0,1,"Assertion","main",
                   "!(\\exists char c; 10 <= c < 10 && c == 10)",
-                  "tests/arith/quantif.i",45);
+                  "tests/arith/quantif.i",51);
   /*@ assert ¬(∃ char c; 10 ≤ c < 10 ∧ c ≡ 10); */ ;
   {
     int __gen_e_acsl_u;
     __gen_e_acsl_u = 5;
     __e_acsl_assert(1,1,"Assertion","main",
                     "\\let u = 5;\n\\forall integer x, integer y; 0 <= x < 2 && 4 < y < u ==> \\false",
-                    "tests/arith/quantif.i",47);
+                    "tests/arith/quantif.i",53);
   }
   /*@
   assert \let u = 5; ∀ ℤ x, ℤ y; 0 ≤ x < 2 ∧ 4 < y < u ⇒ \false;
    */
   ;
   {
-    int __gen_e_acsl_forall_10;
+    int __gen_e_acsl_forall_13;
     int __gen_e_acsl_i_6;
     int __gen_e_acsl_j;
     int __gen_e_acsl_k;
-    __gen_e_acsl_forall_10 = 1;
+    __gen_e_acsl_forall_13 = 1;
     __gen_e_acsl_i_6 = 0;
     while (1) {
       if (__gen_e_acsl_i_6 < 10) ; else break;
@@ -378,8 +440,8 @@ int main(void)
                                                 __gen_e_acsl_k);
             if (__gen_e_acsl_p1_2) ;
             else {
-              __gen_e_acsl_forall_10 = 0;
-              goto e_acsl_end_loop12;
+              __gen_e_acsl_forall_13 = 0;
+              goto e_acsl_end_loop15;
             }
           }
           __gen_e_acsl_k ++;
@@ -388,10 +450,10 @@ int main(void)
       }
       __gen_e_acsl_i_6 ++;
     }
-    e_acsl_end_loop12: ;
-    __e_acsl_assert(__gen_e_acsl_forall_10,1,"Assertion","main",
+    e_acsl_end_loop15: ;
+    __e_acsl_assert(__gen_e_acsl_forall_13,1,"Assertion","main",
                     "forall_multiple_binders_1:\n  \\forall integer i, integer j, integer k;\n    0 <= i < 10 && 1 < j <= 11 && 2 <= k <= 12 ==> p1(i, j, k)",
-                    "tests/arith/quantif.i",53);
+                    "tests/arith/quantif.i",59);
   }
   /*@
   assert
@@ -401,11 +463,11 @@ int main(void)
    */
   ;
   {
-    int __gen_e_acsl_forall_11;
+    int __gen_e_acsl_forall_14;
     int __gen_e_acsl_i_7;
     int __gen_e_acsl_j_2;
     int __gen_e_acsl_k_2;
-    __gen_e_acsl_forall_11 = 1;
+    __gen_e_acsl_forall_14 = 1;
     __gen_e_acsl_i_7 = 0;
     while (1) {
       if (__gen_e_acsl_i_7 < 10) ; else break;
@@ -422,8 +484,8 @@ int main(void)
                                                 __gen_e_acsl_k_2);
             if (__gen_e_acsl_p2_2) ;
             else {
-              __gen_e_acsl_forall_11 = 0;
-              goto e_acsl_end_loop13;
+              __gen_e_acsl_forall_14 = 0;
+              goto e_acsl_end_loop16;
             }
           }
           __gen_e_acsl_k_2 ++;
@@ -432,10 +494,10 @@ int main(void)
       }
       __gen_e_acsl_i_7 ++;
     }
-    e_acsl_end_loop13: ;
-    __e_acsl_assert(__gen_e_acsl_forall_11,1,"Assertion","main",
+    e_acsl_end_loop16: ;
+    __e_acsl_assert(__gen_e_acsl_forall_14,1,"Assertion","main",
                     "forall_multiple_binders_2:\n  \\forall integer i, integer j, integer k;\n    0 <= i <= j < k <= 10 ==> p2(i, j, k)",
-                    "tests/arith/quantif.i",56);
+                    "tests/arith/quantif.i",62);
   }
   /*@
   assert
@@ -444,11 +506,11 @@ int main(void)
    */
   ;
   {
-    int __gen_e_acsl_forall_12;
+    int __gen_e_acsl_forall_15;
     int __gen_e_acsl_i_8;
     int __gen_e_acsl_j_3;
     int __gen_e_acsl_k_3;
-    __gen_e_acsl_forall_12 = 1;
+    __gen_e_acsl_forall_15 = 1;
     __gen_e_acsl_i_8 = 0;
     while (1) {
       if (__gen_e_acsl_i_8 < 10) ; else break;
@@ -465,8 +527,8 @@ int main(void)
                                                 __gen_e_acsl_k_3);
             if (__gen_e_acsl_p3_2) ;
             else {
-              __gen_e_acsl_forall_12 = 0;
-              goto e_acsl_end_loop14;
+              __gen_e_acsl_forall_15 = 0;
+              goto e_acsl_end_loop17;
             }
           }
           __gen_e_acsl_k_3 ++;
@@ -475,10 +537,10 @@ int main(void)
       }
       __gen_e_acsl_i_8 ++;
     }
-    e_acsl_end_loop14: ;
-    __e_acsl_assert(__gen_e_acsl_forall_12,1,"Assertion","main",
+    e_acsl_end_loop17: ;
+    __e_acsl_assert(__gen_e_acsl_forall_15,1,"Assertion","main",
                     "forall_multiple_binders_3:\n  \\forall integer i, integer j, integer k;\n    0 <= i < j <= 10 && 1 < k < 11 ==> p3(i, j, k)",
-                    "tests/arith/quantif.i",59);
+                    "tests/arith/quantif.i",65);
   }
   /*@
   assert
@@ -488,11 +550,11 @@ int main(void)
    */
   ;
   {
-    int __gen_e_acsl_forall_13;
+    int __gen_e_acsl_forall_16;
     int __gen_e_acsl_i_9;
     int __gen_e_acsl_j_4;
     int __gen_e_acsl_k_4;
-    __gen_e_acsl_forall_13 = 1;
+    __gen_e_acsl_forall_16 = 1;
     __gen_e_acsl_i_9 = 0;
     while (1) {
       if (__gen_e_acsl_i_9 < 10) ; else break;
@@ -509,8 +571,8 @@ int main(void)
                                                 __gen_e_acsl_k_4);
             if (__gen_e_acsl_p1_4) ;
             else {
-              __gen_e_acsl_forall_13 = 0;
-              goto e_acsl_end_loop15;
+              __gen_e_acsl_forall_16 = 0;
+              goto e_acsl_end_loop18;
             }
           }
           __gen_e_acsl_k_4 ++;
@@ -519,10 +581,10 @@ int main(void)
       }
       __gen_e_acsl_i_9 ++;
     }
-    e_acsl_end_loop15: ;
-    __e_acsl_assert(__gen_e_acsl_forall_13,1,"Assertion","main",
+    e_acsl_end_loop18: ;
+    __e_acsl_assert(__gen_e_acsl_forall_16,1,"Assertion","main",
                     "forall_multiple_binders_4:\n  \\forall integer i, integer j, integer k;\n    0 <= i < 10 ==> 1 < j <= 11 ==> 2 <= k <= 12 ==> p1(i, j, k)",
-                    "tests/arith/quantif.i",62);
+                    "tests/arith/quantif.i",68);
   }
   /*@
   assert
@@ -532,11 +594,11 @@ int main(void)
    */
   ;
   {
-    int __gen_e_acsl_forall_14;
+    int __gen_e_acsl_forall_17;
     int __gen_e_acsl_i_10;
     int __gen_e_acsl_k_5;
     int __gen_e_acsl_j_5;
-    __gen_e_acsl_forall_14 = 1;
+    __gen_e_acsl_forall_17 = 1;
     __gen_e_acsl_i_10 = 0;
     while (1) {
       if (__gen_e_acsl_i_10 <= 10) ; else break;
@@ -553,8 +615,8 @@ int main(void)
                                                 __gen_e_acsl_k_5);
             if (__gen_e_acsl_p4_2) ;
             else {
-              __gen_e_acsl_forall_14 = 0;
-              goto e_acsl_end_loop16;
+              __gen_e_acsl_forall_17 = 0;
+              goto e_acsl_end_loop19;
             }
           }
           __gen_e_acsl_j_5 ++;
@@ -563,10 +625,10 @@ int main(void)
       }
       __gen_e_acsl_i_10 ++;
     }
-    e_acsl_end_loop16: ;
-    __e_acsl_assert(__gen_e_acsl_forall_14,1,"Assertion","main",
+    e_acsl_end_loop19: ;
+    __e_acsl_assert(__gen_e_acsl_forall_17,1,"Assertion","main",
                     "forall_unordered_binders:\n  \\forall integer i, integer j, integer k;\n    0 <= i <= k <= 10 && 1 <= j < k ==> p4(i, j, k)",
-                    "tests/arith/quantif.i",65);
+                    "tests/arith/quantif.i",71);
   }
   /*@
   assert
@@ -598,7 +660,7 @@ int main(void)
             if (! __gen_e_acsl_p1_6) ;
             else {
               __gen_e_acsl_exists_3 = 1;
-              goto e_acsl_end_loop17;
+              goto e_acsl_end_loop20;
             }
           }
           __gen_e_acsl_k_6 ++;
@@ -607,10 +669,10 @@ int main(void)
       }
       __gen_e_acsl_i_11 ++;
     }
-    e_acsl_end_loop17: ;
+    e_acsl_end_loop20: ;
     __e_acsl_assert(__gen_e_acsl_exists_3,1,"Assertion","main",
                     "exists_multiple_binders_1:\n  \\exists integer i, integer j, integer k;\n    0 <= i < 10 && 1 < j <= 11 && 2 <= k <= 12 && p1(i, j, k)",
-                    "tests/arith/quantif.i",68);
+                    "tests/arith/quantif.i",74);
   }
   /*@
   assert
@@ -642,7 +704,7 @@ int main(void)
             if (! __gen_e_acsl_p2_4) ;
             else {
               __gen_e_acsl_exists_4 = 1;
-              goto e_acsl_end_loop18;
+              goto e_acsl_end_loop21;
             }
           }
           __gen_e_acsl_k_7 ++;
@@ -651,10 +713,10 @@ int main(void)
       }
       __gen_e_acsl_i_12 ++;
     }
-    e_acsl_end_loop18: ;
+    e_acsl_end_loop21: ;
     __e_acsl_assert(__gen_e_acsl_exists_4,1,"Assertion","main",
                     "exists_multiple_binders_2:\n  \\exists integer i, integer j, integer k;\n    0 <= i <= j < k <= 10 && p2(i, j, k)",
-                    "tests/arith/quantif.i",71);
+                    "tests/arith/quantif.i",77);
   }
   /*@
   assert
@@ -685,7 +747,7 @@ int main(void)
             if (! __gen_e_acsl_p3_4) ;
             else {
               __gen_e_acsl_exists_5 = 1;
-              goto e_acsl_end_loop19;
+              goto e_acsl_end_loop22;
             }
           }
           __gen_e_acsl_k_8 ++;
@@ -694,10 +756,10 @@ int main(void)
       }
       __gen_e_acsl_i_13 ++;
     }
-    e_acsl_end_loop19: ;
+    e_acsl_end_loop22: ;
     __e_acsl_assert(__gen_e_acsl_exists_5,1,"Assertion","main",
                     "exists_multiple_binders_3:\n  \\exists integer i, integer j, integer k;\n    0 <= i < j <= 10 && 1 < k < 11 && p3(i, j, k)",
-                    "tests/arith/quantif.i",74);
+                    "tests/arith/quantif.i",80);
   }
   /*@
   assert
@@ -729,7 +791,7 @@ int main(void)
             if (! __gen_e_acsl_p4_4) ;
             else {
               __gen_e_acsl_exists_6 = 1;
-              goto e_acsl_end_loop20;
+              goto e_acsl_end_loop23;
             }
           }
           __gen_e_acsl_j_9 ++;
@@ -738,10 +800,10 @@ int main(void)
       }
       __gen_e_acsl_i_14 ++;
     }
-    e_acsl_end_loop20: ;
+    e_acsl_end_loop23: ;
     __e_acsl_assert(__gen_e_acsl_exists_6,1,"Assertion","main",
                     "exists_unordered_binders:\n  \\exists integer i, integer j, integer k;\n    0 <= i <= k <= 10 && 1 <= j < k && p4(i, j, k)",
-                    "tests/arith/quantif.i",77);
+                    "tests/arith/quantif.i",83);
   }
   /*@
   assert
@@ -815,72 +877,72 @@ int main(void)
     assigns \result \from i, j, k; */
 int __gen_e_acsl_p1(int i, int j, int k)
 {
-  int __gen_e_acsl_and;
   int __gen_e_acsl_and_2;
   int __gen_e_acsl_and_3;
   int __gen_e_acsl_and_4;
   int __gen_e_acsl_and_5;
-  if (0 <= i) __gen_e_acsl_and = i < 10; else __gen_e_acsl_and = 0;
-  if (__gen_e_acsl_and) __gen_e_acsl_and_2 = 1 < j;
-  else __gen_e_acsl_and_2 = 0;
-  if (__gen_e_acsl_and_2) __gen_e_acsl_and_3 = j <= 11;
+  int __gen_e_acsl_and_6;
+  if (0 <= i) __gen_e_acsl_and_2 = i < 10; else __gen_e_acsl_and_2 = 0;
+  if (__gen_e_acsl_and_2) __gen_e_acsl_and_3 = 1 < j;
   else __gen_e_acsl_and_3 = 0;
-  if (__gen_e_acsl_and_3) __gen_e_acsl_and_4 = 2 <= k;
+  if (__gen_e_acsl_and_3) __gen_e_acsl_and_4 = j <= 11;
   else __gen_e_acsl_and_4 = 0;
-  if (__gen_e_acsl_and_4) __gen_e_acsl_and_5 = k <= 12;
+  if (__gen_e_acsl_and_4) __gen_e_acsl_and_5 = 2 <= k;
   else __gen_e_acsl_and_5 = 0;
-  return __gen_e_acsl_and_5;
+  if (__gen_e_acsl_and_5) __gen_e_acsl_and_6 = k <= 12;
+  else __gen_e_acsl_and_6 = 0;
+  return __gen_e_acsl_and_6;
 }
 
 /*@ assigns \result;
     assigns \result \from i, j, k; */
 int __gen_e_acsl_p2(int i, int j, int k)
 {
-  int __gen_e_acsl_and_6;
   int __gen_e_acsl_and_7;
   int __gen_e_acsl_and_8;
-  if (0 <= i) __gen_e_acsl_and_6 = i <= j; else __gen_e_acsl_and_6 = 0;
-  if (__gen_e_acsl_and_6) __gen_e_acsl_and_7 = j < k;
-  else __gen_e_acsl_and_7 = 0;
-  if (__gen_e_acsl_and_7) __gen_e_acsl_and_8 = k <= 10;
+  int __gen_e_acsl_and_9;
+  if (0 <= i) __gen_e_acsl_and_7 = i <= j; else __gen_e_acsl_and_7 = 0;
+  if (__gen_e_acsl_and_7) __gen_e_acsl_and_8 = j < k;
   else __gen_e_acsl_and_8 = 0;
-  return __gen_e_acsl_and_8;
+  if (__gen_e_acsl_and_8) __gen_e_acsl_and_9 = k <= 10;
+  else __gen_e_acsl_and_9 = 0;
+  return __gen_e_acsl_and_9;
 }
 
 /*@ assigns \result;
     assigns \result \from i, j, k; */
 int __gen_e_acsl_p3(int i, int j, int k)
 {
-  int __gen_e_acsl_and_9;
   int __gen_e_acsl_and_10;
   int __gen_e_acsl_and_11;
   int __gen_e_acsl_and_12;
-  if (0 <= i) __gen_e_acsl_and_9 = i < j; else __gen_e_acsl_and_9 = 0;
-  if (__gen_e_acsl_and_9) __gen_e_acsl_and_10 = j <= 10;
-  else __gen_e_acsl_and_10 = 0;
-  if (__gen_e_acsl_and_10) __gen_e_acsl_and_11 = 1 < k;
+  int __gen_e_acsl_and_13;
+  if (0 <= i) __gen_e_acsl_and_10 = i < j; else __gen_e_acsl_and_10 = 0;
+  if (__gen_e_acsl_and_10) __gen_e_acsl_and_11 = j <= 10;
   else __gen_e_acsl_and_11 = 0;
-  if (__gen_e_acsl_and_11) __gen_e_acsl_and_12 = k < 11;
+  if (__gen_e_acsl_and_11) __gen_e_acsl_and_12 = 1 < k;
   else __gen_e_acsl_and_12 = 0;
-  return __gen_e_acsl_and_12;
+  if (__gen_e_acsl_and_12) __gen_e_acsl_and_13 = k < 11;
+  else __gen_e_acsl_and_13 = 0;
+  return __gen_e_acsl_and_13;
 }
 
 /*@ assigns \result;
     assigns \result \from i, j, k; */
 int __gen_e_acsl_p4(int i, int j, int k)
 {
-  int __gen_e_acsl_and_13;
   int __gen_e_acsl_and_14;
   int __gen_e_acsl_and_15;
   int __gen_e_acsl_and_16;
-  if (0 <= i) __gen_e_acsl_and_13 = i <= k; else __gen_e_acsl_and_13 = 0;
-  if (__gen_e_acsl_and_13) __gen_e_acsl_and_14 = k <= 10;
-  else __gen_e_acsl_and_14 = 0;
-  if (__gen_e_acsl_and_14) __gen_e_acsl_and_15 = 1 <= j;
+  int __gen_e_acsl_and_17;
+  if (0 <= i) __gen_e_acsl_and_14 = i <= k; else __gen_e_acsl_and_14 = 0;
+  if (__gen_e_acsl_and_14) __gen_e_acsl_and_15 = k <= 10;
   else __gen_e_acsl_and_15 = 0;
-  if (__gen_e_acsl_and_15) __gen_e_acsl_and_16 = j < k;
+  if (__gen_e_acsl_and_15) __gen_e_acsl_and_16 = 1 <= j;
   else __gen_e_acsl_and_16 = 0;
-  return __gen_e_acsl_and_16;
+  if (__gen_e_acsl_and_16) __gen_e_acsl_and_17 = j < k;
+  else __gen_e_acsl_and_17 = 0;
+  return __gen_e_acsl_and_17;
 }
 
 
