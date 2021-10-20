@@ -826,7 +826,7 @@ and context_insensitive_term_to_exp ~adata kf env t =
     e, adata, env, Typed_number.C_number, name
   | Tblock_length _ -> Env.not_yet env "labeled \\block_length"
   | Tnull ->
-    let e = Cil.mkCast (TPtr(TVoid [], [])) (Cil.zero ~loc) in
+    let e = Smart_exp.null ~loc in
     e, adata, env, Typed_number.C_number, "null"
   | TUpdate _ -> Env.not_yet env "functional update"
   | Ttypeof _ -> Env.not_yet env "typeof"

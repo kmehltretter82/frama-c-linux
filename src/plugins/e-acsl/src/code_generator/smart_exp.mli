@@ -40,6 +40,9 @@ val ptr_sizeof: loc:location -> typ -> exp
 (** [ptr_sizeof ~loc ptr_typ] takes the pointer typ [ptr_typ] that points
     to a [typ] typ and returns [sizeof(typ)]. *)
 
+val null: loc:location -> exp
+(** [null ~loc] creates an expression to represent the NULL pointer. *)
+
 (*
 Local Variables:
 compile-command: "make -C ../../../../.."

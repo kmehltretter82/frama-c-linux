@@ -801,7 +801,7 @@ let inject_mtracking_handler main =
      running *)
   if Memory_tracking.use_monitoring () then begin
     let loc = Location.unknown in
-    let nulls = [ Cil.zero loc ; Cil.zero loc ] in
+    let nulls = [ Smart_exp.null ~loc ; Smart_exp.null ~loc ] in
     let handle_main main =
       let fundec =
         try Kernel_function.get_definition main

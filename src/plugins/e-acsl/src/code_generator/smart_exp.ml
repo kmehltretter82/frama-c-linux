@@ -44,6 +44,9 @@ let ptr_sizeof ~loc typ =
   | TPtr (t', _) -> Cil.new_exp ~loc (SizeOf t')
   | _ -> assert false
 
+let null ~loc =
+  Cil.mkCast (TPtr (TVoid [], [])) (Cil.zero ~loc)
+
 (*
 Local Variables:
 compile-command: "make -C ../../../../.."
