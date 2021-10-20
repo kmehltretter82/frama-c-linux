@@ -111,8 +111,9 @@ let runtime_check_with_msg ~adata ~loc msg ~pred_kind kind kf env e =
     | Admit ->
       Options.fatal "No runtime check should be generated for 'admit' clauses"
   in
-  let file = (fst loc).Filepath.pos_path in
-  let line = (fst loc).Filepath.pos_lnum in
+  let start_pos = fst loc in
+  let file = start_pos.Filepath.pos_path in
+  let line = start_pos.Filepath.pos_lnum in
   (* FIXME: [adata] support in MR !3288 *)
   ignore adata;
   let stmt =
