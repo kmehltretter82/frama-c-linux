@@ -102,6 +102,7 @@ export function CoverageTable(): JSX.Element {
         id="fct"
         label="Function"
         align="left"
+        width={200}
         fill
         getter={({ key }: stats) => key}
       />
