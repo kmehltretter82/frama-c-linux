@@ -2,6 +2,7 @@
 #include "__fc_alloc_axiomatic.h"
 #include "stdarg.h"
 #include "stddef.h"
+#include "stdint.h"
 #include "stdio.h"
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
@@ -98,8 +99,15 @@ int main(void)
   {
     int __gen_e_acsl_initialized;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"&x",
+                                 (void *)(& x));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"sizeof(int)",
+                                   0,sizeof(int));
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& x),
                                                     sizeof(int));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
+                                 "\\initialized(&x)",0,
+                                 __gen_e_acsl_initialized);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\initialized(&x)";
@@ -107,14 +115,22 @@ int main(void)
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 60;
     __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
   /*@ assert \initialized(&x); */ ;
   {
     int __gen_e_acsl_initialized_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"&y",
+                                 (void *)(& y));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
+                                   "sizeof(int)",0,sizeof(int));
     __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& y),
                                                       sizeof(int));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
+                                 "\\initialized(&y)",0,
+                                 __gen_e_acsl_initialized_2);
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "\\initialized(&y)";
@@ -122,6 +138,7 @@ int main(void)
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 61;
     __e_acsl_assert(__gen_e_acsl_initialized_2,& __gen_e_acsl_assert_data_2);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
   }
   /*@ assert \initialized(&y); */ ;
   {
@@ -149,8 +166,13 @@ int __gen_e_acsl_instrument2(int *p)
     int __gen_e_acsl_valid;
     __e_acsl_store_block((void *)(& p),(size_t)8);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"p",(void *)p);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"sizeof(int)",
+                                   0,sizeof(int));
     __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int),(void *)p,
                                         (void *)(& p));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"\\valid(p)",0,
+                                 __gen_e_acsl_valid);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Precondition";
     __gen_e_acsl_assert_data.pred_txt = "\\valid(p)";
@@ -158,6 +180,7 @@ int __gen_e_acsl_instrument2(int *p)
     __gen_e_acsl_assert_data.fct = "instrument2";
     __gen_e_acsl_assert_data.line = 32;
     __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
   __retres = instrument2(p);
   __e_acsl_delete_block((void *)(& p));
@@ -171,8 +194,13 @@ int __gen_e_acsl_uninstrument2(int *p)
   {
     int __gen_e_acsl_valid;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"p",(void *)p);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"sizeof(int)",
+                                   0,sizeof(int));
     __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int),(void *)p,
                                         (void *)(& p));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"\\valid(p)",0,
+                                 __gen_e_acsl_valid);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Precondition";
     __gen_e_acsl_assert_data.pred_txt = "\\valid(p)";
@@ -180,6 +208,7 @@ int __gen_e_acsl_uninstrument2(int *p)
     __gen_e_acsl_assert_data.fct = "uninstrument2";
     __gen_e_acsl_assert_data.line = 16;
     __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
   __e_acsl_sound_verdict = 0;
   __retres = uninstrument2(p);

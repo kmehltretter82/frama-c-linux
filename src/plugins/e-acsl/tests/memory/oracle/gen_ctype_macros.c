@@ -2,6 +2,7 @@
 #include "__fc_alloc_axiomatic.h"
 #include "ctype.h"
 #include "stddef.h"
+#include "stdint.h"
 #include "stdio.h"
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
@@ -37,12 +38,24 @@ int main(int argc, char const **argv)
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"&d",
+                                 (void *)(& d));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
+                                   "sizeof(char *)",0,sizeof(char *));
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& d),
                                                     sizeof(char *));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
+                                 "\\initialized(&d)",0,
+                                 __gen_e_acsl_initialized);
     if (__gen_e_acsl_initialized) {
       int __gen_e_acsl_valid;
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"d",(void *)d);
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
+                                     "sizeof(char)",0,sizeof(char));
       __gen_e_acsl_valid = __e_acsl_valid((void *)d,sizeof(char),(void *)d,
                                           (void *)(& d));
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"\\valid(d)",0,
+                                   __gen_e_acsl_valid);
       __gen_e_acsl_and = __gen_e_acsl_valid;
     }
     else __gen_e_acsl_and = 0;
@@ -53,6 +66,7 @@ int main(int argc, char const **argv)
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 39;
     __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
   /*@ assert \valid(d); */ ;
   __retres = 0;
@@ -89,9 +103,17 @@ int __gen_e_acsl_isupper(int c)
     int __gen_e_acsl_active_bhvrs;
     __gen_e_acsl_contract = __e_acsl_contract_init((size_t)2);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    if (0 <= c) __gen_e_acsl_and = c <= 255; else __gen_e_acsl_and = 0;
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"c",0,c);
+    if (0 <= c) {
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"c",0,c);
+      __gen_e_acsl_and = c <= 255;
+    }
+    else __gen_e_acsl_and = 0;
     if (__gen_e_acsl_and) __gen_e_acsl_or = 1;
-    else __gen_e_acsl_or = c == -1;
+    else {
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"c",0,c);
+      __gen_e_acsl_or = c == -1;
+    }
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Precondition";
     __gen_e_acsl_assert_data.pred_txt = "c_uchar_or_eof: (0 <= c <= 255) || c == -1";
@@ -99,6 +121,7 @@ int __gen_e_acsl_isupper(int c)
     __gen_e_acsl_assert_data.fct = "isupper";
     __gen_e_acsl_assert_data.line = 174;
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     if (65 <= c) __gen_e_acsl_and_2 = c <= 90; else __gen_e_acsl_and_2 = 0;
     __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
                                            __gen_e_acsl_and_2);
@@ -120,8 +143,14 @@ int __gen_e_acsl_isupper(int c)
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
+                                 "number of active behaviors",0,
+                                 __gen_e_acsl_active_bhvrs);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
+                                 "number of active behaviors",0,
+                                 __gen_e_acsl_active_bhvrs);
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Precondition";
     __gen_e_acsl_assert_data_3.pred_txt = "all behaviors disjoint";
@@ -130,6 +159,7 @@ int __gen_e_acsl_isupper(int c)
     __gen_e_acsl_assert_data_3.line = 173;
     __e_acsl_assert(__gen_e_acsl_active_bhvrs <= 1,
                     & __gen_e_acsl_assert_data_3);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
   }
   __retres = isupper(c);
   {
@@ -140,8 +170,14 @@ int __gen_e_acsl_isupper(int c)
       int __gen_e_acsl_or_4;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
         {.values = (void *)0};
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"\\result",0,
+                                   __retres);
       if (__retres < 0) __gen_e_acsl_or_4 = 1;
-      else __gen_e_acsl_or_4 = __retres > 0;
+      else {
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"\\result",
+                                     0,__retres);
+        __gen_e_acsl_or_4 = __retres > 0;
+      }
       __gen_e_acsl_assert_data_4.blocking = 1;
       __gen_e_acsl_assert_data_4.kind = "Postcondition";
       __gen_e_acsl_assert_data_4.pred_txt = "definitely_match: nonzero_result: \\result < 0 || \\result > 0";
@@ -149,12 +185,15 @@ int __gen_e_acsl_isupper(int c)
       __gen_e_acsl_assert_data_4.fct = "isupper";
       __gen_e_acsl_assert_data_4.line = 178;
       __e_acsl_assert(__gen_e_acsl_or_4,& __gen_e_acsl_assert_data_4);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     }
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)1);
     if (__gen_e_acsl_assumes_value) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
         {.values = (void *)0};
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"\\result",0,
+                                   __retres);
       __gen_e_acsl_assert_data_5.blocking = 1;
       __gen_e_acsl_assert_data_5.kind = "Postcondition";
       __gen_e_acsl_assert_data_5.pred_txt = "definitely_not_match: zero_result: \\result == 0";
@@ -162,6 +201,7 @@ int __gen_e_acsl_isupper(int c)
       __gen_e_acsl_assert_data_5.fct = "isupper";
       __gen_e_acsl_assert_data_5.line = 181;
       __e_acsl_assert(__retres == 0,& __gen_e_acsl_assert_data_5);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
     }
     __e_acsl_contract_clean(__gen_e_acsl_contract);
     return __retres;

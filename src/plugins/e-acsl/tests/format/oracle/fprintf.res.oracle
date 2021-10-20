@@ -47,5 +47,11 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
+[eva:alarm] FRAMAC_SHARE/libc/unistd.h:846: Warning: 
+  function __e_acsl_assert_register_int: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/unistd.h:847: Warning: 
+  function __e_acsl_assert_register_int: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
 [kernel:annot:missing-spec] tests/format/fprintf.c:16: Warning: 
   Neither code nor specification for function __e_acsl_builtin_fprintf, generating default assigns from the prototype
