@@ -329,7 +329,7 @@ const alarmCategoryTags_internal: Server.GetRequest<null,tag[]> = {
 /** Registered tags for the above type. */
 export const alarmCategoryTags: Server.GetRequest<null,tag[]>= alarmCategoryTags_internal;
 
-/** Statuses count.œ */
+/** Statuses count. */
 export type statusesEntry =
   { valid: number, unknown: number, invalid: number };
 
@@ -483,7 +483,7 @@ export const programStats: State.Value<programStatsType> = programStats_internal
 /** Data for array rows [`functionStats`](#functionstats)  */
 export interface functionStatsData {
   /** Entry identifier. */
-  key: Json.key<'#fct'>;
+  key: Json.key<'#fundec'>;
   /** Coverage of the Eva analysis */
   coverage: { reachable: number, dead: number };
   /** Alarms raised by the Eva analysis by category */
@@ -495,7 +495,7 @@ export interface functionStatsData {
 /** Loose decoder for `functionStatsData` */
 export const jFunctionStatsData: Json.Loose<functionStatsData> =
   Json.jObject({
-    key: Json.jFail(Json.jKey<'#fct'>('#fct'),'#fct expected'),
+    key: Json.jFail(Json.jKey<'#fundec'>('#fundec'),'#fundec expected'),
     coverage: Json.jFail(
                 Json.jObject({
                   reachable: Json.jFail(Json.jNumber,'Number expected'),
@@ -512,7 +512,8 @@ export const jFunctionStatsDataSafe: Json.Safe<functionStatsData> =
 /** Natural order for `functionStatsData` */
 export const byFunctionStatsData: Compare.Order<functionStatsData> =
   Compare.byFields
-    <{ key: Json.key<'#fct'>, coverage: { reachable: number, dead: number },
+    <{ key: Json.key<'#fundec'>,
+       coverage: { reachable: number, dead: number },
        alarmCount: alarmEntry[], alarmStatuses: statusesEntry }>({
     key: Compare.string,
     coverage: Compare.byFields
@@ -542,7 +543,7 @@ export const reloadFunctionStats: Server.GetRequest<null,null>= reloadFunctionSt
 const fetchFunctionStats_internal: Server.GetRequest<
   number,
   { pending: number, updated: functionStatsData[],
-    removed: Json.key<'#fct'>[], reload: boolean }
+    removed: Json.key<'#fundec'>[], reload: boolean }
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.general.fetchFunctionStats',
@@ -550,7 +551,7 @@ const fetchFunctionStats_internal: Server.GetRequest<
   output: Json.jObject({
             pending: Json.jFail(Json.jNumber,'Number expected'),
             updated: Json.jList(jFunctionStatsData),
-            removed: Json.jList(Json.jKey<'#fct'>('#fct')),
+            removed: Json.jList(Json.jKey<'#fundec'>('#fundec')),
             reload: Json.jFail(Json.jBoolean,'Boolean expected'),
           }),
   signals: [],
@@ -559,10 +560,13 @@ const fetchFunctionStats_internal: Server.GetRequest<
 export const fetchFunctionStats: Server.GetRequest<
   number,
   { pending: number, updated: functionStatsData[],
-    removed: Json.key<'#fct'>[], reload: boolean }
+    removed: Json.key<'#fundec'>[], reload: boolean }
   >= fetchFunctionStats_internal;
 
-const functionStats_internal: State.Array<Json.key<'#fct'>,functionStatsData> = {
+const functionStats_internal: State.Array<
+  Json.key<'#fundec'>,
+  functionStatsData
+  > = {
   name: 'plugins.eva.general.functionStats',
   getkey: ((d:functionStatsData) => d.key),
   signal: signalFunctionStats,
@@ -571,6 +575,9 @@ const functionStats_internal: State.Array<Json.key<'#fct'>,functionStatsData> = 
   order: byFunctionStatsData,
 };
 /** Statistics about the last Eva analysis for each function */
-export const functionStats: State.Array<Json.key<'#fct'>,functionStatsData> = functionStats_internal;
+export const functionStats: State.Array<
+  Json.key<'#fundec'>,
+  functionStatsData
+  > = functionStats_internal;
 
 /* ------------------------------------- */
