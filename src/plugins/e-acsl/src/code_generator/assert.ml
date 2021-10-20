@@ -89,8 +89,13 @@ let register_term ~loc kf env ?force t e adata =
   register ~loc kf env name ?force e adata
 
 let register_pred ~loc kf env ?force p e adata =
-  let name = Format.asprintf "@[%a@]" Printer.pp_predicate p in
-  register ~loc kf env name ?force e adata
+  if Env.annotation_kind env == Smart_stmt.RTE then
+    (* When translating RTE, we do not want to print the result of the predicate
+       because they should be the only predicate in an assertion clause. *)
+    adata, env
+  else
+    let name = Format.asprintf "@[%a@]" Printer.pp_predicate p in
+    register ~loc kf env name ?force e adata
 
 let kind_to_string loc k =
   Cil.mkString
