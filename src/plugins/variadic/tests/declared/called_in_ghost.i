@@ -1,8 +1,8 @@
 /* run.config
-   OPT: -kernel-warn-key ghost:bad-use=inactive -load-script tests/declared/called_in_ghost.ml -print
+ SCRIPT: @PTEST_NAME@
+   OPT: -kernel-warn-key ghost:bad-use=inactive -print
 */
 // Note: we deactivate "ghost:bad-use" to check that printing goes right
-
 /*@ assigns \nothing ; */
 void function(int e, ...);
 

@@ -1,6 +1,6 @@
 /* run.config
- MODULE: libSelect @PTEST_NAME@
-
+ LIBS: libSelect
+ MODULE: @PTEST_NAME@
    OPT: @EVA_OPTIONS@ -deps -slicing-level 3 -no-slice-callers
 */
 int A, B, C, D;

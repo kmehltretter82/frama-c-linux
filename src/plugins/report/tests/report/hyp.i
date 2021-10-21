@@ -1,11 +1,11 @@
 /* run.config
-   OPT: -load-script tests/report/one_hyp.ml
-   OPT: -load-script tests/report/several_hyps.ml
+  SCRIPT: one_hyp
+   OPT:
+  SCRIPT: several_hyps
+   OPT:
 */
-
 void f(void);
 void f2(void);
-
 void g() {
   /*@ assert \true; */
 }

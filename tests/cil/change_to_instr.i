@@ -1,5 +1,6 @@
 /* run.config
-OPT: -load-script tests/cil/change_to_instr.ml -print
+MODULE: @PTEST_NAME@
+  OPT: -print
 */
 
 

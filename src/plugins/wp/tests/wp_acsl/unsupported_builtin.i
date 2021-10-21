@@ -1,5 +1,6 @@
 /* run.config
-  OPT: -load-module @PTEST_DIR@/@PTEST_NAME@.ml
+  SCRIPT: @PTEST_NAME@
+  OPT:
 */
 /* run.config_qualif
   DONTRUN:

@@ -1,7 +1,7 @@
 /* run.config
-OPT: -load-script tests/cil/queue_ghost_instr.ml -print
+ MODULE: @PTEST_NAME@
+   OPT: -print
 */
-
 
 int main(){
   int i = 0 ;

@@ -1,7 +1,10 @@
 /* run.config
-   OPT: -load-script tests/report/projectified_status.ml
-   OPT: -load-script tests/report/no_hyp.ml
-   OPT: -load-script tests/report/multi_emitters.ml
+ SCRIPT: projectified_status
+   OPT:
+ SCRIPT: no_hyp
+   OPT:
+ SCRIPT: multi_emitters
+   OPT:
 */
 
 void main() {
