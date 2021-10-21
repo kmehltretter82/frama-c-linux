@@ -978,11 +978,11 @@ let typer_visitor lenv = object
 
   method !vpredicate p =
     (* Do not raise a warning for e-acsl errors at preprocessing time,
-       those errrors are stored in the table and warning is raised at translation
-       time*)
-      let _ = try type_named_predicate ~lenv p
-        with Error.Not_yet _ | Error.Typing_error _  -> ()
-      in
+       those errrors are stored in the table and warnings are raised at
+       translation time*)
+    let _ = try type_named_predicate ~lenv p
+      with Error.Not_yet _ | Error.Typing_error _  -> ()
+    in
     Cil.SkipChildren
 end
 
