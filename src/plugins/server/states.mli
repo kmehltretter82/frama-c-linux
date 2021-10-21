@@ -44,7 +44,7 @@ val register_value :
   descr:Markdown.text ->
   output:'a Request.output ->
   get:(unit -> 'a) ->
-  ?add_hook:(unit callback) ->
+  ?add_hook:('b callback) ->
   unit -> Request.signal
 
 (** Register a (projectified) state and generates the associated signal and
@@ -67,7 +67,7 @@ val register_state :
   data:'a Data.data ->
   get:(unit -> 'a) ->
   set:('a -> unit) ->
-  ?add_hook:(unit callback) ->
+  ?add_hook:('b callback) ->
   unit -> Request.signal
 
 type 'a model (** Columns array model *)

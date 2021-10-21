@@ -20,35 +20,66 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** This file will ultimately contain all the results computed by Value
-    (which must be moved out of Db.Value), both per stack and globally. *)
+(** {2 Summary } *)
 
+type alarm_category =
+  | Division_by_zero
+  | Memory_access
+  | Index_out_of_bound
+  | Invalid_shift
+  | Overflow
+  | Uninitialized
+  | Dangling
+  | Nan_or_infinite
+  | Float_to_int
+  | Other
 
-open Cil_types
+type coverage =
+  { mutable reachable: int;
+    mutable dead: int; }
 
-val is_called: kernel_function -> bool
-val mark_kf_as_called: kernel_function -> unit
-val add_kf_caller: caller:kernel_function * stmt -> kernel_function -> unit
+type statuses =
+  { mutable valid: int;
+    mutable unknown: int;
+    mutable invalid: int; }
 
-val is_non_terminating_instr: stmt -> bool
-(** Returns [true] iff there exists executions of the statement that does
-    not always fail/loop (for function calls). Must be called *only* on
-    statements that are instructions. *)
+type events =
+  { mutable errors: int;
+    mutable warnings: int; }
 
-(** {2 Results} *)
-type results
+type alarms = (alarm_category * int) list (* Alarm count for each category *)
 
-val get_results: unit -> results
-val set_results: results -> unit
-val merge: results -> results -> results
-val change_callstacks:
-  (Value_types.callstack -> Value_types.callstack) -> results -> results
-(** Change the callstacks for the results for which this is meaningful.
-    For technical reasons, the top of the callstack must currently
-    be preserved. *)
+type fun_stats =
+  { fun_coverage: coverage;
+    fun_alarm_count: alarms;
+    fun_alarm_statuses: statuses; }
 
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)
+type program_stats =
+  { prog_fun_coverage: coverage;
+    prog_stmt_coverage: coverage;
+    prog_alarms: alarms;
+    eva_events: events;
+    kernel_events: events;
+    alarms_statuses: statuses;
+    assertions_statuses: statuses;
+    preconds_statuses: statuses; }
+
+module FunctionStats : sig
+  (** Get the current analysis statistics for a function *)
+  val get: Cil_types.fundec -> fun_stats option
+
+  (** Iterate on every function statistics *)
+  val iter: (Cil_types.fundec -> fun_stats -> unit) -> unit
+
+  (** Trigger the recomputation of function stats *)
+  val recompute: Cil_types.fundec -> unit
+
+  (** Set a hook on function statistics computation *)
+  val register_hook: (Cil_types.fundec * fun_stats -> unit) -> unit
+end
+
+(** Compute analysis statistics. *)
+val compute_stats: unit -> program_stats
+
+(** Prints a summary of the analysis. *)
+val print_summary: unit -> unit

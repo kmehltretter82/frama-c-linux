@@ -30,8 +30,8 @@
   __retres ∈ {0}
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
-  3 functions analyzed (out of 3): 100% coverage.
-  In these functions, 25 statements reached (out of 28): 89% coverage.
+  2 functions analyzed (out of 3): 66% coverage.
+  In these functions, 25 statements reached (out of 25): 100% coverage.
   ----------------------------------------------------------------------------
   Some errors and warnings have been raised during the analysis:
     by the Eva analyzer:      0 errors    1 warning

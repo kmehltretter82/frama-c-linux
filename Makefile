@@ -882,6 +882,7 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode value_parameters \
 	domains/cvalue/warn domains/cvalue/locals_scoping \
 	domains/cvalue/cvalue_offsetmap \
 	utils/value_results \
+	utils/summary \
 	domains/cvalue/builtins domains/cvalue/builtins_malloc \
 	domains/cvalue/builtins_string domains/cvalue/builtins_misc \
 	domains/cvalue/builtins_memory domains/cvalue/builtins_print_c \

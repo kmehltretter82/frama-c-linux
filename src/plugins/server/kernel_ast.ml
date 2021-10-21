@@ -375,6 +375,19 @@ struct
     with Not_found -> Data.failure "Undefined function '%s'" key
 end
 
+module Fundec =
+struct
+  type t = fundec
+  let jtype = Pkg.Jkey "fundec"
+  let to_json fundec =
+    `String fundec.svar.vname
+  let of_json js =
+    let key = Js.to_string js in
+    try Kernel_function.get_definition (Globals.Functions.find_by_name key)
+    with Not_found | Kernel_function.No_Definition ->
+      Data.failure "Undefined function definition '%s'" key
+end
+
 module KfMarker = struct
   type record
   let record : record Record.signature = Record.signature ()
