@@ -81,6 +81,49 @@ struct
       table
 end
 
+let ident_to_be_ignored id headers =
+  Extlib.string_prefix "__" id ||
+  Extlib.string_prefix "Frama_C" id ||
+  List.filter (fun h -> not (Extlib.string_prefix "__fc" h)) headers = []
+
+let check_ident c11 posix glibc nonstandard c11_headers id headers =
+  if ident_to_be_ignored id headers then (* nothing to check *) ()
+  else begin
+    if Hashtbl.mem c11 id then begin
+      (* Check that the header is the expected one.
+         Note that some symbols may appear in more than one header,
+         possibly due to collisions
+         e.g. 'flock' as type and function). *)
+      let h = Hashtbl.find c11 id in
+      if not (StringSet.mem h c11_headers) then
+        Kernel.warning "<%a>:%s : C11 says %s"
+          (Pretty_utils.pp_list ~sep:"," Format.pp_print_string) headers
+          id h
+    end
+    else if Hashtbl.mem posix id then begin
+      (* check that the header is the expected one *)
+      let (h, _) = Hashtbl.find posix id in
+      (* arpa/inet.h and netinet/in.h are special cases: due to mutual
+         inclusion, there are always issues with their symbols;
+         also, timezone is a special case, since it is a type in
+         sys/time.h, but a variable in time.h in POSIX. However, its
+         declaration as extern is erased by rmtmps, since it is
+         unused. *)
+      if not (List.mem h headers) &&
+         not (List.mem "arpa/inet.h" headers && h = "netinet/in.h" ||
+              List.mem "netinet/in.h" headers && h = "arpa/inet.h") &&
+         id <> "timezone"
+      then
+        Kernel.warning "<%a>:%s : POSIX says %s"
+          (Pretty_utils.pp_list ~sep:"," Format.pp_print_string) headers
+          id h
+    end
+    else if not (StringSet.(mem id glibc || mem id nonstandard)) then
+      Kernel.warning "<%a>:%s : unknown identifier"
+        (Pretty_utils.pp_list ~sep:"," Format.pp_print_string) headers
+        id
+  end
+
 let () =
   Db.Main.extend (fun () ->
       if not !run_once then begin
@@ -94,49 +137,6 @@ let () =
         and glibc_idents = Json.(to_set (parse dir "glibc_functions.json"))
         and posix_idents = Json.(to_table HeadersAndExtensions (parse dir "posix_identifiers.json"))
         and nonstandard_idents = Json.(keys (parse dir "nonstandard_identifiers.json")) in
-        Hashtbl.iter (fun id headers ->
-            if not (Extlib.string_prefix "__" id) &&
-               not (Extlib.string_prefix "Frama_C" id) &&
-               List.filter (fun h -> not (Extlib.string_prefix "__fc" h))
-                 headers <> []
-            then
-              let id_in_c11 = Hashtbl.mem c11_idents id in
-              let id_in_posix = Hashtbl.mem posix_idents id in
-              let id_in_glibc = StringSet.mem id glibc_idents in
-              let id_in_nonstd = StringSet.mem id nonstandard_idents in
-              let header_in_c11 h = StringSet.mem h c11_headers in
-              if id_in_c11 then begin
-                (* Check that the header is the expected one.
-                   Note that some symbols may appear in more than one header,
-                   possibly due to collisions
-                   (e.g. 'flock' as type and function). *)
-                let h = Hashtbl.find c11_idents id in
-                if not (header_in_c11 h) then
-                  Kernel.warning "<%a>:%s : C11 says %s"
-                    (Pretty_utils.pp_list ~sep:"," Format.pp_print_string) headers
-                    id h
-              end
-              else if id_in_posix then begin
-                (* check the header is the expected one *)
-                let (h, _) = Hashtbl.find posix_idents id in
-                (* arpa/inet.h and netinet/in.h are special cases: due to mutual
-                   inclusion, there are always issues with their symbols;
-                   also, timezone is a special case, since it is a type in
-                   sys/time.h, but a variable in time.h in POSIX. However, its
-                   declaration as extern is erased by rmtmps, since it is
-                   unused. *)
-                if not (List.mem h headers) &&
-                   not (List.mem "arpa/inet.h" headers && h = "netinet/in.h" ||
-                        List.mem "netinet/in.h" headers && h = "arpa/inet.h") &&
-                   id <> "timezone"
-                then
-                  Kernel.warning "<%a>:%s : POSIX says %s"
-                    (Pretty_utils.pp_list ~sep:"," Format.pp_print_string) headers
-                    id h
-              end
-              else if not (id_in_glibc || id_in_nonstd) then
-                Kernel.warning "<%a>:%s : unknown identifier"
-                  (Pretty_utils.pp_list ~sep:"," Format.pp_print_string) headers
-                  id
-          ) fc_stdlib_idents;
+        let check_ident_fun = check_ident c11_idents posix_idents glibc_idents nonstandard_idents c11_headers in
+        Hashtbl.iter check_ident_fun fc_stdlib_idents
       end)

@@ -567,7 +567,7 @@ module Make
   let compute_using_specification ~warn kinstr call spec state =
     let vi = Kernel_function.get_vi call.kf in
     if Cil.hasAttribute "noreturn" vi.vattr
-    then `Bottom
+    then []
     else
       (* Initializes the variable returned by the function. *)
       let state = match call.return with
@@ -582,8 +582,6 @@ module Make
       let states =
         compute_specification ~warn kinstr call.kf call.return spec state
       in
-      if States.is_empty states
-      then `Bottom
-      else `Value (States.to_list states)
+      List.map (fun s -> Partition.Key.empty, s) (States.to_list states)
 
 end

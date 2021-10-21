@@ -594,6 +594,27 @@ let build_automaton ~annotations kf =
   in
   G.iter_edges_e bind_labels g;
 
+  (* Recursively removes unreachable vertices, except those bound to a statement
+     in [table]. *)
+  let stmt_vertices =
+    let add _stmt (v1, v2) acc = Vertex.Set.(add v1 (add v2 acc)) in
+    StmtTable.fold add table Vertex.Set.empty
+  in
+  let is_unreachable vertex =
+    G.in_degree g vertex = 0
+    && not (Vertex.equal vertex entry_point)
+    && not (Vertex.Set.mem vertex stmt_vertices)
+  in
+  let rec remove_unreachable vertex =
+    let succs = G.succ g vertex in
+    G.remove_vertex g vertex;
+    List.iter remove_unreachable (List.filter is_unreachable succs)
+  in
+  let unreachables =
+    G.fold_vertex (fun v l -> if is_unreachable v then v :: l else l)  g []
+  in
+  List.iter remove_unreachable unreachables;
+
   (* Return the result *)
   {graph = g; entry_point; return_point; stmt_table = table}
 

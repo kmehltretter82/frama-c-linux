@@ -29,16 +29,16 @@ __PUSH_FC_STDLIB
 #include "__fc_define_max_open_files.h"
 #include "__fc_define_size_t.h"
 #include "__fc_define_null.h"
+#include "__fc_define_seek_macros.h"
 #include "__fc_define_ssize_t.h"
 #include "__fc_define_uid_and_gid.h"
 #include "__fc_define_off_t.h"
 #include "__fc_define_pid_t.h"
 #include "__fc_define_useconds_t.h"
 #include "__fc_define_intptr_t.h"
-
-
-
+#include "__fc_define_fds.h"
 #include "limits.h"
+__BEGIN_DECLS
 
 extern volatile int Frama_C_entropy_source;
 
@@ -54,8 +54,6 @@ extern volatile int Frama_C_entropy_source;
 #define	STDOUT_FILENO	1	/* Standard output.  */
 #define	STDERR_FILENO	2	/* Standard error output.  */
 
-#include "__fc_define_seek_macros.h"
-
 /* compatibility macros */
 
 #ifndef __FC_NO_MONOTONIC_CLOCK
@@ -65,8 +63,6 @@ extern volatile int Frama_C_entropy_source;
 */
 #define _POSIX_MONOTONIC_CLOCK 0
 #endif
-
-__BEGIN_DECLS
 
 /* Values for the NAME argument to `pathconf' and `fpathconf'.  */
 enum __fc_pathconf_name
@@ -721,16 +717,6 @@ enum __fc_confstr_name
     _CS_V7_ENV
 #define _CS_V7_ENV			_CS_V7_ENV
   };
-
-
-// arbitrary number
-#define __FC_MAX_OPEN_FILES 1024
-
-// __fc_fds represents the state of open file descriptors.
-//@ ghost int __fc_fds[__FC_MAX_OPEN_FILES];
-// TODO: Model the state of some functions more precisely.
-// TODO: define __fc_fds as volatile.
-
 
 /*@ // missing: may assign to errno: EACCES, ELOOP, ENAMETOOLONG, ENOENT,
     //                               ENOTDIR, EROFS, ETXTBSY

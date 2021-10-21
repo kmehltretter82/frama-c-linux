@@ -50,7 +50,7 @@ sig
 
   (* --- Accessors --- *)
 
-  val expanded : store -> state list
+  val expanded : store -> (Partition.key * state) list
   val smashed : store -> state or_bottom
   val contents : flow -> state list
   val is_empty_store : store -> bool
@@ -81,6 +81,12 @@ sig
   val next_loop_iteration : flow -> Cil_types.stmt -> flow
   val split_return : flow -> Cil_types.exp option -> flow
 
+  (** After the analysis of a function call, recombines callee partitioning keys
+      with the caller key. *)
+  val call_return:
+    caller:Partition.key ->
+    (Partition.key * state) list -> (Partition.key * state) list
+
   (* --- Operators --- *)
 
   (** Remove all states from the tank, leaving it empty as if it was just
@@ -91,7 +97,8 @@ sig
   val fill : into:tank -> flow -> unit
 
   (** Apply a transfer function to all the states of a propagation. *)
-  val transfer : (state -> state list) -> flow -> flow
+  val transfer : ((Partition.key * state) -> (Partition.key * state) list) ->
+    flow -> flow
 
   (** Join all incoming propagations into the given store. This function returns
       a set of states which still need to be propagated past the store.

@@ -136,7 +136,7 @@
   ],
   "undefined-functions": [],
   "extern-global-vars": [
-    "Frama_C_entropy_source", "__fc_errno", "__fc_heap_status",
+    "Frama_C_entropy_source", "__fc_errno", "__fc_fds", "__fc_heap_status",
     "__fc_hostname", "__fc_stdin", "__fc_stdout", "__fc_ttyname", "optarg",
     "opterr", "optind", "optopt"
   ],

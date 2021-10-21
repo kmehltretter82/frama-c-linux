@@ -366,7 +366,7 @@ pid_t __gen_e_acsl_fork(void)
     else __gen_e_acsl_or_2 = __retres == -1;
     __e_acsl_assert(__gen_e_acsl_or_2,1,"Postcondition","fork",
                     "result_ok_child_or_error: \\result == 0 || \\result > 0 || \\result == -1",
-                    "FRAMAC_SHARE/libc/unistd.h",860);
+                    "FRAMAC_SHARE/libc/unistd.h",846);
     return __retres;
   }
 }

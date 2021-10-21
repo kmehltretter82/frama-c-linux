@@ -4,10 +4,10 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] tests/libc/fc_libc.c:164: assertion got status valid.
-[eva] tests/libc/fc_libc.c:165: assertion got status valid.
 [eva] tests/libc/fc_libc.c:166: assertion got status valid.
 [eva] tests/libc/fc_libc.c:167: assertion got status valid.
+[eva] tests/libc/fc_libc.c:168: assertion got status valid.
+[eva] tests/libc/fc_libc.c:169: assertion got status valid.
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -47,7 +47,7 @@
    wcslen (3 calls); wcsncat (0 call); wcsncpy (0 call); wmemcpy (1 call);
    wmemset (0 call); 
   
-  Specified-only functions (426)
+  Specified-only functions (427)
   ==============================
    FD_CLR (0 call); FD_ISSET (0 call); FD_SET (0 call); FD_ZERO (0 call);
    Frama_C_int_interval (0 call); Frama_C_long_interval (0 call);
@@ -175,20 +175,20 @@
    wcscmp (0 call); wcscspn (0 call); wcslcat (0 call); wcslcpy (0 call);
    wcsncmp (0 call); wcspbrk (0 call); wcsrchr (0 call); wcsspn (0 call);
    wcsstr (0 call); wcstombs (0 call); wctomb (0 call); wmemchr (0 call);
-   wmemcmp (0 call); wmemmove (0 call); write (0 call); 
+   wmemcmp (0 call); wmemmove (0 call); write (0 call); writev (0 call); 
   
   Undefined and unspecified functions (1)
   =======================================
    __builtin_abort (1 call); 
   
-  'Extern' global variables (21)
+  'Extern' global variables (22)
   ==============================
-   __fc_basename; __fc_dirname; __fc_getpwuid_pw_dir; __fc_getpwuid_pw_name;
-   __fc_getpwuid_pw_passwd; __fc_getpwuid_pw_shell; __fc_heap_status;
-   __fc_hostname; __fc_locale; __fc_locale_names; __fc_mblen_state;
-   __fc_mbtowc_state; __fc_random_counter; __fc_socket_counter;
-   __fc_stack_status; __fc_tz; __fc_wctomb_state; optarg; opterr; optopt;
-   tzname
+   __fc_basename; __fc_dirname; __fc_fds; __fc_getpwuid_pw_dir;
+   __fc_getpwuid_pw_name; __fc_getpwuid_pw_passwd; __fc_getpwuid_pw_shell;
+   __fc_heap_status; __fc_hostname; __fc_locale; __fc_locale_names;
+   __fc_mblen_state; __fc_mbtowc_state; __fc_random_counter;
+   __fc_socket_counter; __fc_stack_status; __fc_tz; __fc_wctomb_state; optarg;
+   opterr; optopt; tzname
   
   Potential entry points (1)
   ==========================
@@ -204,7 +204,7 @@
   Goto = 113
   Assignment = 625
   Exit point = 100
-  Function = 527
+  Function = 528
   Function call = 144
   Pointer dereferencing = 254
   Cyclomatic complexity = 371
@@ -214,6 +214,7 @@
 #include "__fc_builtin.c"
 #include "__fc_builtin.h"
 #include "__fc_define_fd_set_t.h"
+#include "__fc_define_timeval.h"
 #include "__fc_gcc_builtins.h"
 #include "__fc_integer.h"
 #include "__fc_select.h"
@@ -264,6 +265,7 @@
 #include "stropts.h"
 #include "sys/file.h"
 #include "sys/resource.h"
+#include "sys/select.h"
 #include "sys/sendfile.h"
 #include "sys/socket.h"
 #include "sys/stat.h"
