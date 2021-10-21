@@ -30,7 +30,13 @@
 
 #if E_ACSL_OS_IS_LINUX
 
+#  include <fcntl.h>
+#  include <inttypes.h>
+#  include <stdio.h>
+#  include <string.h>
+#  include <sys/auxv.h>
 #  include <sys/resource.h>
+#  include <unistd.h>
 
 /** Program stack information {{{ */
 
@@ -226,6 +232,93 @@ static void init_shadow_layout_tls() {
                      "temporal_tls_primary");
   set_shadow_segment(&ptls->temporal_secondary, &ptls->application, 1,
                      "temporal_tls_secondary");
+#  endif
+}
+
+static void init_shadow_layout_vdso() {
+  // Retrieve the start address of the VDSO segment
+  uintptr_t vdso = getauxval(AT_SYSINFO_EHDR);
+  private_assert(
+      vdso != 0,
+      "Start address of VDSO segment not found in auxiliary vector.\n");
+
+  // Use /proc/self/maps to retrieve the end address of the VDSO segment
+  // (using open() instead of fopen() to avoid a dynamic allocation)
+  int maps_fd = open("/proc/self/maps", O_RDONLY);
+  private_assert(maps_fd >= 0, "Unable to open /proc/self/maps: %s\n",
+                 strerror(errno));
+
+  int result;
+  uintptr_t start, end;
+  ssize_t count;
+  off_t offset;
+  char *newline;
+  // Buffer to read /proc/self/maps. 255 should be enough to read one line.
+  char buffer[255];
+  while (1) {
+    count = read(maps_fd, buffer, sizeof(buffer) - 1);
+    if (count == 0) {
+      // If the VDSO segment has not been found, use 0 as start and end
+      // addresses
+      DVABORT("VDSO segment not found at address %a in /proc/self/maps\n",
+              vdso);
+      start = 0;
+      end = 0;
+      break;
+    } else if (count < 0) {
+      DVABORT("Reading /proc/self/maps failed: %s\n", strerror(errno));
+      break;
+    } else {
+      // Scan the start and end addresses of the segment
+      buffer[count] = '\0';
+      result = sscanf(buffer, "%" SCNxPTR "-%" SCNxPTR, &start, &end);
+      DVASSERT(result == 2,
+               "Scanning for addresses in /proc/self/maps failed, expected 2 "
+               "addresses, found: %d, error: %s\n",
+               result, strerror(errno));
+
+      if (start <= vdso && vdso < end) {
+        break;
+      }
+
+      // Set the file offset to the next line
+      do {
+        // Look for a newline character
+        buffer[count] = '\0';
+        newline = strchr(buffer, '\n');
+        if (newline != NULL) {
+          // Newline character found, set the file offset to the character
+          // after the newline
+          offset = count - (newline - buffer + 1);
+          offset = lseek(maps_fd, -offset, SEEK_CUR);
+          DVASSERT(offset != -1,
+                   "Unable to move file offset of /proc/self/maps: %s\n",
+                   strerror(errno));
+          break;
+        } else {
+          // No newline found on the current buffer, continue reading the file
+          count = read(maps_fd, buffer, sizeof(buffer) - 1);
+        }
+      } while (count > 0);
+    }
+  }
+
+  result = close(maps_fd);
+  DVASSERT(result == 0, "Unable to close /proc/self/maps: %s\n",
+           strerror(errno));
+
+  // Initialize the memory partition
+  memory_partition *pvdso = &mem_layout.vdso;
+  set_application_segment(&pvdso->application, start, end - start, "vdso",
+                          NULL);
+  set_shadow_segment(&pvdso->primary, &pvdso->application, 1, "vdso_primary");
+  set_shadow_segment(&pvdso->secondary, &pvdso->application, 1,
+                     "vdso_secondary");
+#  ifdef E_ACSL_TEMPORAL
+  set_shadow_segment(&pvdso->temporal_primary, &pvdso->application, 1,
+                     "temporal_vdso_primary");
+  set_shadow_segment(&pvdso->temporal_secondary, &pvdso->application, 1,
+                     "temporal_vdso_secondary");
 #  endif
 }
 
@@ -489,6 +582,7 @@ void init_shadow_layout_pre_main() {
 
 #if E_ACSL_OS_IS_LINUX
   init_shadow_layout_global();
+  init_shadow_layout_vdso();
   init_shadow_layout_tls();
 #elif E_ACSL_OS_IS_WINDOWS
   HANDLE module = GetModuleHandle(NULL);

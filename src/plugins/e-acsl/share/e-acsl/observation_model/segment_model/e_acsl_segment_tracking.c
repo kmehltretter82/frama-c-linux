@@ -1137,6 +1137,8 @@ void print_shadow_layout() {
   print_memory_partition(&mem_layout.global);
   DLOG(">>> TLS ----------------------\n");
   print_memory_partition(&mem_layout.tls);
+  DLOG(">>> VDSO ---------------------\n");
+  print_memory_partition(&mem_layout.vdso);
 #  elif E_ACSL_OS_IS_WINDOWS
   DLOG(">>> TEXT ---------------------\n");
   print_memory_partition(&mem_layout.text);
