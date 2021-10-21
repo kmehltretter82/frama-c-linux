@@ -974,39 +974,10 @@ let clear = Memo.clear
 open Cil_types
 
 let typer_visitor lenv = object
-  inherit Visitor.frama_c_inplace
-
-  method !vglob_aux =
-    function
-    (* library functions and built-ins *)
-    | GFun({ svar = vi }, _) when Builtins.mem vi.vname ->
-      Cil.SkipChildren
-
-    | GFun({ svar = vi }, _)
-      when Misc.is_fc_or_compiler_builtin vi ->
-      Cil.SkipChildren
-
-    | g when Rtl.Symbols.mem_global g ->
-      Cil.SkipChildren
-
-    | GFun({svar = vi}, _) ->
-      let kf = try Globals.Functions.get vi with Not_found -> assert false in
-      if Functions.check kf then Cil.DoChildren else Cil.SkipChildren
-
-    (* other globals: nothing to do *)
-    | GFunDecl _
-    | GVarDecl _
-    | GVar _
-    | GType _
-    | GCompTag _
-    | GCompTagDecl _
-    | GEnumTag _
-    | GEnumTagDecl _
-    | GAsm _
-    | GPragma _
-    | GText _
-    | GAnnot _
-      -> Cil.SkipChildren
+  inherit E_acsl_visitor.visitor
+  method! fun_def ({svar = vi}) =
+    let kf = try Globals.Functions.get vi with Not_found -> assert false in
+    if Functions.check kf then Cil.DoChildren else Cil.SkipChildren
 
   method !vpredicate p =
     ignore (try type_named_predicate ~lenv p
@@ -1015,15 +986,23 @@ let typer_visitor lenv = object
 end
 
 let type_program ast =
-  Visitor.visitFramacFileSameGlobals (typer_visitor []) ast
+  Visitor.visitFramacFileSameGlobals
+    (typer_visitor [] :> Visitor.frama_c_inplace)
+    ast
 
 let type_code_annot lenv annot =
-  ignore (Visitor.visitFramacCodeAnnotation (typer_visitor lenv) annot)
+  ignore
+    (Visitor.visitFramacCodeAnnotation
+       (typer_visitor lenv :> Visitor.frama_c_inplace)
+       annot)
 
 let preprocess_predicate lenv p =
   Logic_normalizer.preprocess_predicate p;
   Bound_variables.preprocess_predicate p;
-  ignore (Visitor.visitFramacPredicate (typer_visitor lenv) p)
+  ignore
+    (Visitor.visitFramacPredicate
+       (typer_visitor lenv :> Visitor.frama_c_inplace)
+       p)
 
 let preprocess_rte ~lenv rte =
   Logic_normalizer.preprocess_annot rte;

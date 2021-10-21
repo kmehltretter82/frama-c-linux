@@ -621,61 +621,32 @@ let unghost_vi vi =
   | _ ->
     ()
 
-let inject_in_global (env, main) = function
-  (* library functions and built-ins *)
-  | GVarDecl(vi, _) | GVar(vi, _, _)
-  | GFunDecl(_, vi, _) | GFun({ svar = vi }, _) when Builtins.mem vi.vname ->
-    Builtins.update vi.vname vi;
-    env, main
-
-  (* Cil built-ins and other library globals: nothing to do *)
-  | GVarDecl(vi, _) | GVar(vi, _, _) | GFun({ svar = vi }, _)
-    when Misc.is_fc_or_compiler_builtin vi ->
-    env, main
-  | g when Rtl.Symbols.mem_global g ->
-    env, main
-  (* generated function declaration: nothing to do *)
-  | GFunDecl(_, vi, _) when Misc.is_fc_stdlib_generated vi ->
-    env, main
-
-  (* variable declarations *)
-  | GVarDecl(vi, _) | GFunDecl(_, vi, _) ->
-    unghost_vi vi;
-    Global_observer.add vi;
-    env, main
-
-  (* variable definition *)
-  | GVar(vi, { init = None }, _) ->
-    Global_observer.add vi;
-    unghost_vi vi;
-    env, main
-
-  | GVar(vi, { init = Some init }, _) ->
+let inject_in_global (env, main) global =
+  let update_builtin vi = Builtins.update vi.vname vi; env, main in
+  let observe_and_unghost vi =
+    unghost_vi vi; Global_observer.add vi; env, main
+  in
+  let var_def vi init =
     Global_observer.add vi;
     unghost_vi vi;
     let _init, env = inject_in_init env None vi NoOffset init in
-    (* ignore the new initializer that handles literal strings since they are
-       not substituted in global initializers (see
-       [replace_literal_string_in_exp]) *)
+    (* ignore the new initializer that handles literal strings
+           since they are not substituted in global initializers
+           (see  [replace_literal_string_in_exp]) *)
     env, main
-
-  (* function definition *)
-  | GFun({ svar = vi } as fundec, _) ->
+  in
+  let fun_def ({svar = vi} as fundec) =
     unghost_vi vi;
     inject_in_fundec main fundec
-
-  (* other globals: nothing to do *)
-  | GType _
-  | GCompTag _
-  | GCompTagDecl _
-  | GEnumTag _
-  | GEnumTagDecl _
-  | GAsm _
-  | GPragma _
-  | GText _
-  | GAnnot _ (* do never read annotation from sources *)
-    ->
-    env, main
+  in
+  E_acsl_visitor.case_globals
+    ~default:(fun () -> env, main)
+    ~builtin:update_builtin
+    ~var_fun_decl:observe_and_unghost
+    ~var_init:observe_and_unghost
+    ~var_def:var_def
+    ~fun_def:fun_def
+    global
 
 (* Insert [stmt_begin] as the first statement of [fundec] and insert [stmt_end] as
    the last before [return] *)
