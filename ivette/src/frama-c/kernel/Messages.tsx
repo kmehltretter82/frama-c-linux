@@ -259,30 +259,43 @@ function MessageFilter(props: {filter: Forms.FieldState<Filter>}) {
           unfold
           settings="ivette.messages.filterEmitter"
         >
-          <Forms.CheckboxField label="Kernel" state={pluginState('kernel')} />
-          <hr />
-          <Forms.CheckboxField label="Aoraï" state={pluginState('aorai')} />
-          <Forms.CheckboxField label="Dive" state={pluginState('dive')} />
-          <Forms.CheckboxField label="E-ACSL" state={pluginState('eacsl')} />
-          <Forms.CheckboxField label="Eva" state={pluginState('eva')} />
-          <Forms.CheckboxField label="From" state={pluginState('from')} />
-          <Forms.CheckboxField label="Impact" state={pluginState('impact')} />
-          <Forms.CheckboxField label="InOut" state={pluginState('inout')} />
-          <Forms.CheckboxField label="Metrics" state={pluginState('metrics')} />
-          <Forms.CheckboxField label="NonTerm" state={pluginState('nonterm')} />
-          <Forms.CheckboxField label="Pdg" state={pluginState('pdg')} />
-          <Forms.CheckboxField label="Report" state={pluginState('report')} />
-          <Forms.CheckboxField label="RTE" state={pluginState('rte')} />
-          <Forms.CheckboxField label="Scope" state={pluginState('scope')} />
-          <Forms.CheckboxField label="Server" state={pluginState('server')} />
-          <Forms.CheckboxField label="Slicing" state={pluginState('slicing')} />
-          <Forms.CheckboxField
-            label="Variadic"
-            state={pluginState('variadic')}
-          />
-          <Forms.CheckboxField label="WP" state={pluginState('wp')} />
-          <hr />
-          <Forms.CheckboxField label="Others" state={pluginState('others')} />
+          <div className="message-emitter-category">
+            <Forms.CheckboxField label="Kernel" state={pluginState('kernel')} />
+          </div>
+          <div className="message-emitter-category">
+            <Forms.CheckboxField label="Aoraï" state={pluginState('aorai')} />
+            <Forms.CheckboxField label="Dive" state={pluginState('dive')} />
+            <Forms.CheckboxField label="E-ACSL" state={pluginState('eacsl')} />
+            <Forms.CheckboxField label="Eva" state={pluginState('eva')} />
+            <Forms.CheckboxField label="From" state={pluginState('from')} />
+            <Forms.CheckboxField label="Impact" state={pluginState('impact')} />
+            <Forms.CheckboxField label="InOut" state={pluginState('inout')} />
+            <Forms.CheckboxField
+              label="Metrics"
+              state={pluginState('metrics')}
+            />
+            <Forms.CheckboxField
+              label="NonTerm"
+              state={pluginState('nonterm')}
+            />
+            <Forms.CheckboxField label="Pdg" state={pluginState('pdg')} />
+            <Forms.CheckboxField label="Report" state={pluginState('report')} />
+            <Forms.CheckboxField label="RTE" state={pluginState('rte')} />
+            <Forms.CheckboxField label="Scope" state={pluginState('scope')} />
+            <Forms.CheckboxField label="Server" state={pluginState('server')} />
+            <Forms.CheckboxField
+              label="Slicing"
+              state={pluginState('slicing')}
+            />
+            <Forms.CheckboxField
+              label="Variadic"
+              state={pluginState('variadic')}
+            />
+            <Forms.CheckboxField label="WP" state={pluginState('wp')} />
+          </div>
+          <div className="message-emitter-category">
+            <Forms.CheckboxField label="Others" state={pluginState('others')} />
+          </div>
         </Forms.Section>
       </Forms.Page>
     </Scroll>
