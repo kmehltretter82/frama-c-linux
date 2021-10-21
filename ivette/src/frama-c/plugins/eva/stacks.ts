@@ -39,7 +39,6 @@ export interface Callsite {
   callee: string;
   caller?: string;
   stmt?: Ast.marker;
-  rank?: number;
 }
 
 function equalSite(a: Callsite, b: Callsite): boolean {

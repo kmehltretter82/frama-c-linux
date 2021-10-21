@@ -31,9 +31,6 @@ import { Hpack, Vpack } from 'dome/layout/boxes';
 import { Code, Cell } from 'dome/controls/labels';
 import * as States from 'frama-c/states';
 import * as Ast from 'frama-c/api/kernel/ast';
-import { readFile } from 'dome/system';
-import * as Dome from 'dome';
-import * as Path from 'path';
 
 // Locals
 import { EvaAlarm } from './cells';
@@ -41,38 +38,26 @@ import { Callsite } from './stacks';
 import { useModel } from './model';
 
 // --------------------------------------------------------------------------
-// --- Pretty Printing (Browser Console)
-// --------------------------------------------------------------------------
-
-const D = new Dome.Debug('Source Code');
-
-// --------------------------------------------------------------------------
 // --- Stmt Printer
 // --------------------------------------------------------------------------
 
 interface StmtProps {
-  stmt?: string;
-  rank?: number;
+  stmt?: Ast.marker;
   marker: Ast.marker;
+  short?: boolean;
 }
 
 export function Stmt(props: StmtProps) {
-  const { rank, stmt, marker } = props;
+  const { stmt, marker, short } = props;
+  if (!stmt) return null;
   const markersInfo = States.useSyncArray(Ast.markerInfo);
   const line = markersInfo.getData(marker)?.sloc?.line;
-  const file = markersInfo.getData(marker)?.sloc?.file;
-  const filename = file ? Path.parse(file).base : '';
-  const errorMsg = () => { D.error(`Fail to load source code file ${file}`); };
-  const onError = () => { if (file) errorMsg(); return ''; };
-  const read = () => (file ? readFile(file).catch(onError) : Promise.reject());
-  const text = React.useMemo(read, [file, onError]);
-  const { result } = Dome.usePromise(text);
-  const allLines = result?.split(/\r\n|\n/);
-  const title = allLines ? (line ? `${allLines[line - 1]}` : '') : '';
-  if (rank === undefined || !stmt) return null;
+  const filename = markersInfo.getData(marker)?.sloc?.base;
+  const title = markersInfo.getData(stmt)?.descr;
+  const text = short ? `@L${line}` : `@${filename}:${line}`;
   return (
     <span className="dome-text-cell eva-stmt" title={title}>
-      @{filename}:{line}
+      {text}
     </span>
   );
 }
@@ -115,7 +100,7 @@ export function StackInfos() {
   const focused = model.getFocused();
   const callstack = model.getCalls();
   if (callstack.length <= 1) return null;
-  const makeCallsite = ({ caller, stmt, rank }: Callsite) => {
+  const makeCallsite = ({ caller, stmt }: Callsite) => {
     if (!caller || !stmt) return null;
     const key = `${caller}@${stmt}`;
     const isFocused = focused?.marker === stmt;
@@ -146,7 +131,7 @@ export function StackInfos() {
         onDoubleClick={onDoubleClick}
       >
         {caller}
-        <Stmt stmt={stmt} rank={rank} marker={stmt} />
+        <Stmt stmt={stmt} marker={stmt} />
       </Cell>
     );
   };

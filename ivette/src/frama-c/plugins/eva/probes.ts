@@ -74,7 +74,7 @@ export class Probe {
   loading = true;
   label?: string;
   code?: string;
-  stmt?: string;
+  stmt?: Ast.marker;
   rank?: number;
   minCols: number = LabelSize;
   maxCols: number = LabelSize;
