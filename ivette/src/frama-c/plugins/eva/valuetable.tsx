@@ -146,9 +146,10 @@ function TableCell(props: TableCellProps) {
           else status = 'Unknown';
         }
         const alarmClass = `eva-cell-alarms eva-alarm-${status}`;
+        const title = 'At least one alarm is raised in one callstack';
         contents = (
           <>
-            <Icon className={alarmClass} size={10} id="WARNING" />
+            <Icon className={alarmClass} size={10} title={title} id="WARNING" />
             <SizedArea cols={cols} rows={rows}>
               <span className={`eva-state-${vstate}`}>
                 <Diff {...vdiffs} />
@@ -197,6 +198,8 @@ interface TableSectionProps {
   folded: boolean;
   foldable: boolean;
   onClick: () => void;
+  byCallstacks: boolean;
+  onCallstackClick: () => void;
 }
 
 function TableSection(props: TableSectionProps) {
@@ -214,6 +217,14 @@ function TableSection(props: TableSectionProps) {
         onClick={onClick}
       />
       <Cell className="eva-fct-name">{fct}</Cell>
+      <Filler/>
+      <IconButton
+        icon="ITEMS.LIST"
+        className="eva-probeinfo-button"
+        selected={props.byCallstacks}
+        title={`Details by callstack`}
+        onClick={props.onCallstackClick}
+      />
     </>
   );
 }
@@ -277,6 +288,7 @@ function TableRow(props: TableRowProps) {
     if (!fct) return null;
     const folded = model.isFolded(fct);
     const foldable = model.isFoldable(fct);
+    const byCallstacks = model.getByCallstacks();
     return (
       <Hpack className="eva-function" style={props.style}>
         <TableSection
@@ -284,6 +296,8 @@ function TableRow(props: TableRowProps) {
           folded={folded}
           foldable={foldable}
           onClick={() => model.setFolded(fct, !folded)}
+          byCallstacks = {byCallstacks}
+          onCallstackClick = {() => model.setByCallstacks(!byCallstacks)}
         />
       </Hpack>
     );

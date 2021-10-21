@@ -177,6 +177,7 @@
     overflow: hidden;
     display: flex;
     justify-content: center;
+    position: relative;
 }
 
 .eva-cell .eva-stmt {

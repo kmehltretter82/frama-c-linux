@@ -51,9 +51,6 @@ function ProbeEditor() {
   const { label } = probe;
   const { code } = probe;
   const { stmt, marker } = probe;
-  const byCS = probe.byCallstacks;
-  const stacks = model.getStacks(probe);
-  const stackable = byCS || stacks.length > 1;
   const { cols, rows } = sizeof(code);
   const { transient } = probe;
   const { zoomed } = probe;
@@ -65,14 +62,6 @@ function ProbeEditor() {
         <SizedArea cols={cols} rows={rows}>{code}</SizedArea>
       </div>
       <Code><Stmt stmt={stmt} marker={marker} /></Code>
-      <IconButton
-        icon="ITEMS.LIST"
-        className="eva-probeinfo-button"
-        display={stackable}
-        selected={byCS}
-        title={`Details by callstack (${stacks})`}
-        onClick={() => { if (probe) probe.setByCallstacks(!byCS); }}
-      />
       <IconButton
         icon="SEARCH"
         className="eva-probeinfo-button"
@@ -120,7 +109,7 @@ export function ProbeInfos() {
   const model = useModel();
   const probe = model.getFocused();
   const fct = probe?.fct;
-  const byCS = probe?.byCallstacks;
+  const byCS = model.getByCallstacks();
   const effects = probe ? probe.effects : false;
   const condition = probe ? probe.condition : false;
   const summary = fct ? model.stacks.getSummary(fct) : false;

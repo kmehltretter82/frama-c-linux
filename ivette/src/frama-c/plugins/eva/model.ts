@@ -72,6 +72,7 @@ export class Model implements ModelCallbacks {
   private remanent?: Probe; // last transient
   private probes = new Map<string, Probe>();
   private folded = new Map<string, boolean>(); // folded functions
+  private byCallstacks = false;
 
   getFocused() { return this.focused; }
   isFocused(p: Probe | undefined) { return this.focused === p; }
@@ -113,6 +114,15 @@ export class Model implements ModelCallbacks {
     this.forceLayout();
   }
 
+  getByCallstacks(): boolean {
+    return this.byCallstacks;
+  }
+
+  setByCallstacks(b: boolean) {
+    this.byCallstacks = b;
+    this.forceLayout();
+  }
+
   // --- Caches
 
   readonly stacks = new StacksCache(this);
@@ -151,7 +161,7 @@ export class Model implements ModelCallbacks {
   }
 
   isSelectedRow(row: Row): boolean {
-    if (!this.focused?.byCallstacks) return false;
+    if (!this.byCallstacks) return false;
     const cs = this.callstack;
     return cs !== undefined && cs === row.callstack;
   }
@@ -184,9 +194,7 @@ export class Model implements ModelCallbacks {
     const p = this.getProbe(location);
     if (p) {
       if (p.transient) {
-        if (this.focused?.byCallstacks)
-          p.setByCallstacks(true);
-        else
+        if (!this.byCallstacks)
           p.setPersistent();
       }
     }
@@ -228,7 +236,7 @@ export class Model implements ModelCallbacks {
       this.stacks,
       this.isFolded,
     );
-    this.rows = engine.layout(toLayout);
+    this.rows = engine.layout(toLayout, this.byCallstacks);
     this.laidout.emit();
     this.lock = false;
   }
