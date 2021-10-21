@@ -278,6 +278,10 @@ mmodel_features() {
     flags="$flags -DE_ACSL_EXTERNAL_ASSERT"
   fi
 
+  if [ -n "$OPTION_EXTERNAL_PRINT_VALUE" ]; then
+    flags="$flags -DE_ACSL_EXTERNAL_PRINT_VALUE"
+  fi
+
   if [ -n "$OPTION_NO_TRACE" ]; then
     flags="$flags -DE_ACSL_NO_TRACE"
   fi
@@ -299,9 +303,10 @@ LONGOPTIONS="help,compile,compile-only,debug:,ocode:,oexec:,verbose:,
   frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:,
   print-mmodels,rt-debug,rte-select:,then,e-acsl-extra:,check,fail-with-code:,
   temporal,weak-validity,stack-size:,heap-size:,rt-verbose,free-valid-address,
-  external-assert:,assert-print-data,validate-format-strings,no-trace,
-  libc-replacements,with-dlmalloc:,dlmalloc-from-sources,dlmalloc-compile-only,
-  dlmalloc-compile-flags:,odlmalloc:,ar:,ranlib:,mbits:"
+  external-assert:,assert-print-data,no-assert-print-data,external-print-value:,
+  validate-format-strings,no-trace,libc-replacements,with-dlmalloc:,
+  dlmalloc-from-sources,dlmalloc-compile-only,dlmalloc-compile-flags:,
+  odlmalloc:,ar:,ranlib:,mbits:"
 SHORTOPTIONS="h,c,C,d:,D,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,I:,G:,X,a:,T,k,V"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
@@ -349,6 +354,7 @@ OPTION_HEAP_SIZE=128      # Size of a stack shadow space (in MB)
 OPTION_KEEP_GOING=        # Report failing assertions but do not abort execution
 OPTION_EXTERNAL_ASSERT="" # Use custom definition of assert function
 OPTION_ASSERT_PRINT_DATA= # Print data contributing to a failed runtime assertion
+OPTION_EXTERNAL_PRINT_VALUE="" # Use custom definition of printing value function
 OPTION_WITH_DLMALLOC=""                  # Use provided dlmalloc library
 OPTION_DLMALLOC_FROM_SOURCES=            # Compile dlmalloc from sources
 OPTION_DLMALLOC_COMPILE_ONLY=            # Only compile dlmalloc
@@ -662,6 +668,16 @@ do
       shift;
       OPTION_ASSERT_PRINT_DATA="-e-acsl-assert-print-data"
     ;;
+    --no-assert-print-data)
+      shift;
+      OPTION_ASSERT_PRINT_DATA="-e-acsl-no-assert-print-data"
+    ;;
+    # Custom function for printing value
+    --external-print-value)
+      shift;
+      OPTION_EXTERNAL_PRINT_VALUE="$1"
+      shift;
+    ;;
     # Check output format functions
     --validate-format-strings)
       shift;
@@ -934,7 +950,7 @@ if [ -n "$OPTION_VALIDATE_FORMAT_STRINGS" ]; then
 fi
 
 # C, CPP and LD flags for compilation of E-ACSL-generated sources
-EACSL_CFLAGS="$OPTION_EXTERNAL_ASSERT"
+EACSL_CFLAGS="$OPTION_EXTERNAL_ASSERT $OPTION_EXTERNAL_PRINT_VALUE"
 EACSL_CPPFLAGS="-I$EACSL_SHARE"
 EACSL_LDFLAGS="$DLMALLOC_LIB_PATH -lgmp -lm"
 

@@ -652,6 +652,20 @@ following signature:
 
 \cinput{examples/assert_sign.c}
 
+With \texttt{data} a structure containing the following fields:
+\begin{itemize}
+  \item \texttt{blocking}: integer representing if the assertion is blocking or
+        not;
+  \item \texttt{kind}: C string representing a kind of annotation (e.g.,
+        "Assertion");
+  \item \texttt{pred\_txt}: stringified predicate;
+  \item \texttt{file}: un-instrumented file of predicate placement;
+  \item \texttt{fct}: function of predicate placement in the un-instrumented
+        file;
+  \item \texttt{line}: line of predicate placement in the un-instrumented file;
+  \item \texttt{values}: values contributing to the predicate.
+\end{itemize}
+
 Additionally, it may depends on the global variable
 \texttt{\_\_e\_acsl\_sound\_verdict}\codeidxdef{e\_acsl\_sound\_verdict}. This
 variable of type \texttt{int} is set to \texttt{0} as soon as the verdict
@@ -668,7 +682,7 @@ A monitored program that uses custom definition of
 \texttt{\_\_e\_acsl\_assert}\codeidxdef{e\_acsl\_assert} can then be generated
 as follows using \longopt{external-assert} option of \eacslgcc to replace the
 default implementation of \texttt{\_\_e\_acsl\_assert}\codeidxdef{e\_acsl\_assert}
-with the customized one specified in \texttt{my\_assert.c}
+with the customized one specified in \texttt{my\_assert.c}.
 
 \begin{shell}
 \$ e-acsl-gcc.sh -c -X first.i -Ofirst --external-assert=my_assert.c
@@ -677,6 +691,91 @@ Assertion in file first.i at line 3 in function main is valid (trustworthy).
 The verified predicate was: `x == 0'.
 Assertion in file first.i at line 4 in function main is invalid (trustworthy).
 The verified predicate was: `x == 1'.
+\end{shell}
+
+The default assertion function prints the values contributing to an assertion
+along with the error message.
+
+\begin{shell}
+\$ e-acsl-gcc.sh -c -X first.i -Ofirst
+\$ ./first.e-acsl
+first.i: In function 'main'
+first.i:4: Error: Assertion failed:
+        The failing predicate is:
+        x == 1.
+        With values:
+        - x: 0
+\end{shell}
+
+This behavior can be overriden by using the \longopt{no-assert-print-data}
+option of \eacslgcc.
+
+\begin{shell}
+  \$ e-acsl-gcc.sh -c -X first.i -Ofirst --no-assert-print-data
+  \$ ./first.e-acsl
+  first.i: In function 'main'
+  first.i:4: Error: Assertion failed:
+          The failing predicate is:
+          x == 1.
+\end{shell}
+
+As with the assertion function, \eacslgcc provides a way to use an alternative
+definition of
+\texttt{\_\_e\_acsl\_print\_value}\codeidxdef{e\_acsl\_print\_value}.
+
+Custom implementation of \texttt{\_\_e\_acsl\_print\_value}
+\codeidxdef{e\_acsl\_print\_value} should be provided in a separate \C
+(or object file) and respect the following signature:
+
+\cinput{examples/print_value_sign.c}
+
+The details and documentation of the structure
+\texttt{\_\_e\_acsl\_assert\_data\_value\_t} can be found in the file
+\texttt{e\_acsl\_assert\_data.h} distributed with \eacsl in the installation
+folder \texttt{share/frama-c/e-acsl/instrumentation\_model}.
+
+Below is an example which prints only the name of the variable contributing to
+an assertion.
+
+\listingname{my\_print\_value.c}
+\cinput{examples/my_print_value.c}
+
+A monitored program that uses custom definition of
+\texttt{\_\_e\_acsl\_print\_value}\codeidxdef{e\_acsl\_print\_value} can then be
+generated as follows using \longopt{external-print-value} option of \eacslgcc to
+replace the default implementation of \texttt{\_\_e\_acsl\_print\_value}
+\codeidxdef{e\_acsl\_print\_value} with the customized one specified in
+\texttt{my\_print\_value.c}.
+
+\begin{shell}
+\$ e-acsl-gcc.sh -c -X first.i -Ofirst \
+    --external-print-value=my_print_value.c
+\$ ./first.e-acsl
+first.i: In function 'main'
+first.i:4: Error: Assertion failed:
+        The failing predicate is:
+        x == 1.
+        With values:
+        - custom print for x
+\end{shell}
+
+The custom definitions of \texttt{\_\_e\_acsl\_assert}\codeidxdef{e\_acsl\_assert}
+and \texttt{\_\_e\_acsl\_print\_value}\codeidxdef{e\_acsl\_print\_value} can be
+used at the same time.
+
+\begin{shell}
+\$ e-acsl-gcc.sh -c -X first.i -Ofirst \
+    --external-assert=my_assert.c \
+    --external-print-value=my_print_value.c
+\$ ./first.e-acsl
+Assertion in file first.i at line 3 in function main is valid (trustworthy).
+The verified predicate was: `x == 0'.
+With values:
+        - custom print for x
+Assertion in file first.i at line 4 in function main is invalid (trustworthy).
+The verified predicate was: `x == 1'.
+With values:
+        - custom print for x
 \end{shell}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

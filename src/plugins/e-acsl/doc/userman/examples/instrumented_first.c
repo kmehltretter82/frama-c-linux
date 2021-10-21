@@ -8,24 +8,24 @@
 #include "stddef.h"
 #include "stdio.h"
 struct __e_acsl_contract_t;
-typedef struct __e_acsl_contract_t __attribute__((__FC_BUILTIN__)) __e_acsl_contract_t;
+typedef struct __e_acsl_contract_t __attribute__((FC_BUILTIN)) __e_acsl_contract_t;
 struct __e_acsl_mpz_struct {
    int _mp_alloc ;
    int _mp_size ;
    unsigned long *_mp_d ;
 };
 typedef struct __e_acsl_mpz_struct __e_acsl_mpz_struct;
-typedef __e_acsl_mpz_struct ( __attribute__((__FC_BUILTIN__)) __e_acsl_mpz_t)[1];
+typedef __e_acsl_mpz_struct ( __attribute__((FC_BUILTIN)) __e_acsl_mpz_t)[1];
 struct __e_acsl_mpq_struct {
    __e_acsl_mpz_struct _mp_num ;
    __e_acsl_mpz_struct _mp_den ;
 };
 typedef struct __e_acsl_mpq_struct __e_acsl_mpq_struct;
-typedef __e_acsl_mpq_struct ( __attribute__((__FC_BUILTIN__)) __e_acsl_mpq_t)[1];
+typedef __e_acsl_mpq_struct ( __attribute__((FC_BUILTIN)) __e_acsl_mpq_t)[1];
 typedef unsigned long __e_acsl_mp_bitcnt_t;
 /*@ requires pred != 0;
     assigns \nothing; */
- __attribute__((__FC_BUILTIN__)) void __e_acsl_assert(int pred,
+ __attribute__((FC_BUILTIN)) void __e_acsl_assert(int pred,
                                                       char const *kind,
                                                       char const *fct,
                                                       char const *pred_txt,

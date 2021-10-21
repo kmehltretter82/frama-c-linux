@@ -34,10 +34,60 @@ let call_instr ~loc ?result e args = instr (Call(result, e, args, loc))
 
 let assigns ~loc ~result e = instr (Set(result, e, loc))
 
+let assigns_field ~loc vi name value =
+  let ty = vi.vtype in
+  let compinfo =
+    match Cil.unrollType ty with
+    | TComp (compinfo, _, _) -> compinfo
+    | _ ->
+      Options.fatal
+        "type of %a (%a) is not a structure"
+        Printer.pp_varinfo vi
+        Printer.pp_typ ty
+  in
+  let field =
+    try
+      Cil.getCompField compinfo name
+    with Not_found ->
+      Options.fatal
+        "Unable to find field '%s' in structure '%a'"
+        name
+        Printer.pp_typ ty
+  in
+  let result = Var vi, (Field (field, NoOffset)) in
+  assigns ~loc ~result value
+
 let if_stmt ~loc ~cond ?(else_blk=Cil.mkBlock []) then_blk =
   stmt (If (cond, then_blk, else_blk, loc))
 
 let break ~loc = stmt (Break loc)
+
+let struct_local_init ~loc vi fields =
+  vi.vdefined <- true;
+  let ty = vi.vtype in
+  let compinfo =
+    match Cil.unrollType ty with
+    | TComp (compinfo, _, _) -> compinfo
+    | _ ->
+      Options.fatal
+        "type of %a (%a) is not a structure"
+        Printer.pp_varinfo vi
+        Printer.pp_typ ty
+  in
+  let fields =
+    List.map
+      (fun (name, e) ->
+         try
+           let field = Cil.getCompField compinfo name in
+           Field (field, NoOffset), SingleInit e
+         with Not_found ->
+           Options.fatal
+             "Unable to find field '%s' in structure '%a'"
+             name
+             Printer.pp_typ ty)
+      fields
+  in
+  instr (Local_init (vi, AssignInit (CompoundInit (ty, fields)), loc))
 
 let block stmt b = match b.bstmts with
   | [] ->

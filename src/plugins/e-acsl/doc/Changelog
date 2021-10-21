@@ -25,6 +25,11 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-  E-ACSL       [2021-10-20] Add option -e-acsl-assert-print-data
+                (--assert-print-data in e-acsl-gcc.sh) to print data
+                contributing to a failed assertion along with the error message.
+                Add option --external-print-value in e-acsl-gcc.sh to provide a
+                custom implementation of __e_acsl_print_value().
 -  E-ACSL       [2021-10-07] Support for \prod and \numof.
 -* E-ACSL       [2021-09-29] Fix translation order of the default behavior's
                 requires clauses. They are now translated before the evaluation
