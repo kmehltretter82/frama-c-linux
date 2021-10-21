@@ -20,15 +20,8 @@
 [e-acsl] Warning: annotating undefined function `strchr':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-[e-acsl] FRAMAC_SHARE/libc/string.h:181: Warning: 
-  E-ACSL construct
-  `non integer variable p in quantification
-  result_first_occur:
-    \forall char *p; \old(s) <= p < \result ==> *p != (char)\old(c)'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:281: Warning: 
-  E-ACSL construct `logic functions or predicates performing read accesses'
+[e-acsl] FRAMAC_SHARE/libc/string.h:367: Warning: 
+  E-ACSL construct `logic functions or predicates with labels'
   is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:368: Warning: 
@@ -39,44 +32,32 @@
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:367: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:373: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:173: Warning: 
+  E-ACSL construct `logic functions or predicates with labels'
   is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:176: Warning: 
   E-ACSL construct `user-defined logic type' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:179: Warning: 
-  E-ACSL construct `logic functions or predicates performing read accesses'
-  is not yet supported.
-  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:183: Warning: 
   E-ACSL construct `user-defined logic type' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:143: Warning: 
-  E-ACSL construct `logic functions or predicates performing read accesses'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:367: Warning: 
-  E-ACSL construct `logic functions or predicates with labels'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:370: Warning: 
-  E-ACSL construct `logic functions or predicates performing read accesses'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:367: Warning: 
-  E-ACSL construct `assigns clause in behavior' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:173: Warning: 
-  E-ACSL construct `logic functions or predicates with labels'
-  is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:173: Warning: 
   Some assumes clauses could not be translated.
   Ignoring complete and disjoint behaviors annotations.
 [e-acsl] FRAMAC_SHARE/libc/string.h:173: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:179: Warning: 
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:281: Warning: 
   E-ACSL construct `logic functions or predicates with labels'
@@ -95,6 +76,10 @@
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:141: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:143: Warning: 
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/unistd.h:843: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
