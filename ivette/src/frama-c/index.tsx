@@ -69,7 +69,7 @@ Ivette.registerGroup({
   Ivette.registerComponent({
     id: 'frama-c.sourcecode',
     label: 'Source Code',
-    title: 'C/ASCL Source Code',
+    title: 'C/ACSL Source Code',
     children: <SourceCode />,
   });
   Ivette.registerComponent({
@@ -81,7 +81,7 @@ Ivette.registerGroup({
   Ivette.registerComponent({
     id: 'frama-c.properties',
     label: 'Properties',
-    title: 'Status of ASCL Properties',
+    title: 'Status of ACSL Properties',
     children: <Properties />,
   });
   Ivette.registerComponent({
