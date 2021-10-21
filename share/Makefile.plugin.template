@@ -444,7 +444,7 @@ $(NAME_OFLAGS):=$(OFLAGS) $(INCLUDE_FLAGS) $(PLUGIN_OFLAGS)
 # DO NOT include the plugin's own directory as search path for compiling
 # ml test scripts: they will be loaded in a separate phase, and will only see
 # the plugin through its static API
-$(NAME_TEST_BFLAGS):= $(BFLAGS) -w -70 $(INCLUDE_EXT_FLAGS) $(PLUGIN_BFLAGS)
+$(NAME_TEST_BFLAGS):= $(BFLAGS) $(INCLUDE_EXT_FLAGS) $(PLUGIN_BFLAGS) -w -70
 $(NAME_TEST_OFLAGS):= $(OFLAGS) $(INCLUDE_EXT_FLAGS) $(PLUGIN_OFLAGS)
 
 $(TARGET_BFLAGS):= $(PLUGIN_LINK_BFLAGS)

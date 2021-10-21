@@ -22,7 +22,7 @@
 #                                                                        #
 ##########################################################################
 
-# This script serves as wrapper to 'make' (when using the analysis-scripts
+# This script serves as wrapper to GNU make (when using the analysis-scripts
 # GNUmakefile template): it parses the output and suggests useful commands
 # whenever it can, by calling frama-c-script itself.
 
@@ -37,6 +37,16 @@ import tempfile
 MIN_PYTHON = (3, 6) # for automatic Path conversions
 if sys.version_info < MIN_PYTHON:
     sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)
+
+# Check if GNU make is available and has the minimal required version
+# (4.0). Otherwise, this script will fail.
+# We first test with 'gmake', then 'make', then fail.
+make_cmd = "gmake"
+get_make_major_version_args = r" --version | grep 'GNU Make\s\+\([0-9]\+\)\..*$' | sed -E 's|GNU Make +([0-9]+)\..*|\1|'"
+if os.system(f"test $({make_cmd} {get_make_major_version_args}) -ge 4") != 0:
+    make_cmd = "make"
+    if os.system(f"test $({make_cmd} {get_make_major_version_args}) -ge 4") != 0:
+        sys.exit("error: could not find GNU make >= 4.0 (tried 'gmake' and 'make')")
 
 parser = argparse.ArgumentParser(description="""
 Builds the specified target, parsing the output to identify and recommend
@@ -54,7 +64,7 @@ if not framac_bin:
 framac_script = f"{framac_bin}/frama-c-script"
 
 output_lines = []
-cmd_list = ['make', "-C", make_dir] + args
+cmd_list = [make_cmd, "-C", make_dir] + args
 with subprocess.Popen(cmd_list,
                       stdout=subprocess.PIPE,
                       stderr=subprocess.PIPE) as proc:

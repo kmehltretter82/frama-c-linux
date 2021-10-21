@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Eval
 
 (** Mark the analysis as aborted. It will be stopped at the next safe point *)
 val signal_abort: unit -> unit
@@ -46,7 +45,7 @@ module Computer
 
     val compute:
       kernel_function -> kinstr -> Abstract.Dom.t ->
-      Abstract.Dom.t list or_bottom * Eval.cacheable
+      (Partition.key * Abstract.Dom.t) list * Eval.cacheable
 
   end
 

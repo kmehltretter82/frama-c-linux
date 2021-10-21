@@ -20,43 +20,19 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_GETOPT_H
-#define __FC_GETOPT_H
+#ifndef __FC_DEFINE_FDS
+#define __FC_DEFINE_FDS
 #include "features.h"
 __PUSH_FC_STDLIB
-#include "unistd.h"
 __BEGIN_DECLS
 
+// arbitrary number
+#ifndef __FC_MAX_OPEN_FILES
+#define __FC_MAX_OPEN_FILES 1024
+#endif
 
-/* GNU specific */
-struct option
-{
-  const char *name;
-  int has_arg;
-  int *flag;
-  int val;
-};
-
-# define no_argument		0
-# define required_argument	1
-# define optional_argument	2
-
-
-/*@ 
-  assigns \result, *optarg, optind, opterr, optopt, *(longopts[0..].flag)
-             \from argc, argv[0..argc-1], shortopts[0..], longopts[0..];
- */
-extern int getopt_long (int argc, char *const argv[],
-			const char *shortopts,
-			const struct option *longopts, int *longind);
-
-/*@ 
-  assigns \result, *optarg, optind, opterr, optopt, *(longopts[0..].flag)
-             \from argc, argv[0..argc-1], shortopts[0..], longopts[0..];
- */
-extern int getopt_long_only (int argc, char *const argv[],
-			     const char *shortopts,
-			     const struct option *longopts, int *longind);
+// __fc_fds represents the state of open file descriptors.
+extern volatile int __fc_fds[__FC_MAX_OPEN_FILES];
 
 __END_DECLS
 
