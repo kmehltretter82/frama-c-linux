@@ -43,9 +43,9 @@ if sys.version_info < MIN_PYTHON:
 # We first test with 'gmake', then 'make', then fail.
 make_cmd = "gmake"
 get_make_major_version_args = r" --version | grep 'GNU Make\s\+\([0-9]\+\)\..*$' | sed -E 's|GNU Make +([0-9]+)\..*|\1|'"
-if os.system(f"test $({make_cmd} {get_make_major_version_args}) -ge 4") != 0:
+if os.system(f"command -v {make_cmd} >{os.devnull} && test \"$({make_cmd} {get_make_major_version_args})\" -ge 4 2>{os.devnull}") != 0:
     make_cmd = "make"
-    if os.system(f"test $({make_cmd} {get_make_major_version_args}) -ge 4") != 0:
+    if os.system(f"command -v {make_cmd} >{os.devnull} && test \"$({make_cmd} {get_make_major_version_args})\" -ge 4 2>{os.devnull}") != 0:
         sys.exit("error: could not find GNU make >= 4.0 (tried 'gmake' and 'make')")
 
 parser = argparse.ArgumentParser(description="""

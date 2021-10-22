@@ -470,50 +470,49 @@ char *__gen_e_acsl_literal_string_34;
 char *__gen_e_acsl_literal_string_441;
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
-/*@ exits status: \exit_status ≢ 0;
+/*@ exits status: \exit_status != 0;
     ensures never_terminates: \false;
     
     assigns \exit_status \from \nothing;
  */
 void __gen_e_acsl_abort(void);
 
-/*@ exits status: \exit_status ≡ \old(status);
+/*@ exits status: \exit_status == \old(status);
     ensures never_terminates: \false;
     
     assigns \exit_status \from status;
  */
 void __gen_e_acsl_exit(int status);
 
-/*@ ensures result_ok_or_error: \result ≡ -1 ∨ \result ≥ 0;
+/*@ ensures result_ok_or_error: \result == -1 || \result >= 0;
     ensures
       initialization: stat_loc_init_on_success:
-        \result ≥ 0 ∧ \old(stat_loc) ≢ \null ⇒
+        \result >= 0 && \old(stat_loc) != \null ==>
         \initialized(\old(stat_loc));
     assigns \result, *stat_loc;
     assigns \result \from (indirect: options);
     assigns *stat_loc \from (indirect: options);
     
     behavior stat_loc_null:
-      assumes stat_loc_null: stat_loc ≡ \null;
+      assumes stat_loc_null: stat_loc == \null;
       assigns \result;
       assigns \result \from \nothing;
     
     behavior stat_loc_non_null:
-      assumes stat_loc_non_null: stat_loc ≢ \null;
+      assumes stat_loc_non_null: stat_loc != \null;
       requires valid_stat_loc: \valid(stat_loc);
  */
 pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options);
 
 /*@ ensures
-      result_ok_child_or_error:
-        \result ≡ 0 ∨ \result > 0 ∨ \result ≡ -1;
+      result_ok_child_or_error: \result == 0 || \result > 0 || \result == -1;
     assigns \result;
     assigns \result \from \nothing;
  */
 pid_t __gen_e_acsl_fork(void);
 
 /*@ requires valid_string_s: valid_read_string(s);
-    ensures acsl_c_equiv: \result ≡ strlen(\old(s));
+    ensures acsl_c_equiv: \result == strlen(\old(s));
     assigns \result;
     assigns \result \from (indirect: *(s + (0 ..)));
  */
@@ -525,24 +524,24 @@ size_t __gen_e_acsl_strlen(char const *s);
       \from s, (indirect: *(s + (0 .. strlen{Old}(s)))), (indirect: c);
     
     behavior found:
-      assumes char_found: strchr(s, c) ≡ \true;
-      ensures result_char: *\result ≡ (char)\old(c);
-      ensures result_same_base: \base_addr(\result) ≡ \base_addr(\old(s));
+      assumes char_found: strchr(s, c) == \true;
+      ensures result_char: *\result == (char)\old(c);
+      ensures result_same_base: \base_addr(\result) == \base_addr(\old(s));
       ensures
-        result_in_length: \old(s) ≤ \result ≤ \old(s) + strlen(\old(s));
+        result_in_length: \old(s) <= \result <= \old(s) + strlen(\old(s));
       ensures result_valid_string: valid_read_string(\result);
       ensures
         result_first_occur:
-          ∀ char *p; \old(s) ≤ p < \result ⇒ *p ≢ (char)\old(c);
+          \forall char *p; \old(s) <= p < \result ==> *p != (char)\old(c);
     
     behavior not_found:
-      assumes char_not_found: ¬(strchr(s, c) ≡ \true);
-      ensures result_null: \result ≡ \null;
+      assumes char_not_found: !(strchr(s, c) == \true);
+      ensures result_null: \result == \null;
     
     behavior default:
       ensures
         result_null_or_same_base:
-          \result ≡ \null ∨ \base_addr(\result) ≡ \base_addr(\old(s));
+          \result == \null || \base_addr(\result) == \base_addr(\old(s));
  */
 char *__gen_e_acsl_strchr(char const *s, int c);
 
@@ -551,8 +550,8 @@ char *__gen_e_acsl_strchr(char const *s, int c);
     requires
       separation:
         \separated(dest + (0 .. strlen(src)), src + (0 .. strlen(src)));
-    ensures equal_contents: strcmp(\old(dest), \old(src)) ≡ 0;
-    ensures result_ptr: \result ≡ \old(dest);
+    ensures equal_contents: strcmp(\old(dest), \old(src)) == 0;
+    ensures result_ptr: \result == \old(dest);
     assigns *(dest + (0 .. strlen{Old}(src))), \result;
     assigns *(dest + (0 .. strlen{Old}(src)))
       \from *(src + (0 .. strlen{Old}(src)));
@@ -617,10 +616,17 @@ void test_specifier_application(char const *allowed, char const *fmt,
   int len = (int)tmp;
   {
     int __gen_e_acsl_and;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"sizeof(char)",0,
+                                 1);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"len",0,len);
     if (0 < (int)(len + 1L)) {
       __e_acsl_mpz_t __gen_e_acsl_;
       __e_acsl_mpz_t __gen_e_acsl__2;
       int __gen_e_acsl_le;
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"sizeof(char)",
+                                   0,1);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"len",0,len);
       __gmpz_init_set_si(__gen_e_acsl_,(long)(1 * (int)(len + 1L)));
       __gmpz_init_set_ui(__gen_e_acsl__2,18446744073709551615UL);
       __gen_e_acsl_le = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_),
@@ -630,14 +636,18 @@ void test_specifier_application(char const *allowed, char const *fmt,
       __gmpz_clear(__gen_e_acsl__2);
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,1,"Assertion",
-                    "test_specifier_application",
-                    "alloca_bounds: 0 < sizeof(char) * (int)(len + 1) <= 18446744073709551615",
-                    "tests/format/printf.c",55);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "alloca_bounds: 0 < sizeof(char) * (int)(len + 1) <= 18446744073709551615";
+    __gen_e_acsl_assert_data.file = "tests/format/printf.c";
+    __gen_e_acsl_assert_data.fct = "test_specifier_application";
+    __gen_e_acsl_assert_data.line = 55;
+    __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
   /*@
   assert
-  alloca_bounds: 0 < sizeof(char) * (int)(len + 1) ≤ 18446744073709551615;
+  alloca_bounds: 0 < sizeof(char) * (int)(len + 1) <= 18446744073709551615;
    */
   ;
   __lengthof_format = (unsigned long)(len + 1);
@@ -713,8 +723,8 @@ void test_specifier_application(char const *allowed, char const *fmt,
     requires
       separation:
         \separated(dest + (0 .. strlen(src)), src + (0 .. strlen(src)));
-    ensures equal_contents: strcmp(\old(dest), \old(src)) ≡ 0;
-    ensures result_ptr: \result ≡ \old(dest);
+    ensures equal_contents: strcmp(\old(dest), \old(src)) == 0;
+    ensures result_ptr: \result == \old(dest);
     assigns *(dest + (0 .. strlen{Old}(src))), \result;
     assigns *(dest + (0 .. strlen{Old}(src)))
       \from *(src + (0 .. strlen{Old}(src)));
@@ -737,6 +747,11 @@ char *__gen_e_acsl_strcpy(char * restrict dest, char const * restrict src)
     __e_acsl_mpz_t __gen_e_acsl__2;
     int __gen_e_acsl_le;
     unsigned long __gen_e_acsl_size;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+      {.values = (void *)0};
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_6,
+                                   "__gen_e_acsl_strcpy_src_size",0,
+                                   __gen_e_acsl_strcpy_src_size);
     __gmpz_init_set_ui(__gen_e_acsl___gen_e_acsl_strcpy_src_size,
                        __gen_e_acsl_strcpy_src_size);
     __gmpz_init_set_si(__gen_e_acsl_,1L);
@@ -747,9 +762,14 @@ char *__gen_e_acsl_strcpy(char * restrict dest, char const * restrict src)
     __gmpz_init_set_ui(__gen_e_acsl__2,18446744073709551615UL);
     __gen_e_acsl_le = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_add),
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
-    __e_acsl_assert(__gen_e_acsl_le <= 0,1,"RTE","strcpy",
-                    "size_lesser_or_eq_than_SIZE_MAX:\n  __gen_e_acsl_strcpy_src_size + 1 <= 18446744073709551615",
-                    "FRAMAC_SHARE/libc/string.h",367);
+    __gen_e_acsl_assert_data_6.blocking = 1;
+    __gen_e_acsl_assert_data_6.kind = "RTE";
+    __gen_e_acsl_assert_data_6.pred_txt = "size_lesser_or_eq_than_SIZE_MAX:\n  __gen_e_acsl_strcpy_src_size + 1 <= 18446744073709551615";
+    __gen_e_acsl_assert_data_6.file = "FRAMAC_SHARE/libc/string.h";
+    __gen_e_acsl_assert_data_6.fct = "strcpy";
+    __gen_e_acsl_assert_data_6.line = 367;
+    __e_acsl_assert(__gen_e_acsl_le <= 0,& __gen_e_acsl_assert_data_6);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
     __gen_e_acsl_size = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_add));
     __e_acsl_initialize((void *)dest,__gen_e_acsl_size);
     __gmpz_clear(__gen_e_acsl___gen_e_acsl_strcpy_src_size);
@@ -757,12 +777,25 @@ char *__gen_e_acsl_strcpy(char * restrict dest, char const * restrict src)
     __gmpz_clear(__gen_e_acsl_add);
     __gmpz_clear(__gen_e_acsl__2);
   }
-  __e_acsl_assert(__retres == __gen_e_acsl_at,1,"Postcondition","strcpy",
-                  "result_ptr: \\result == \\old(dest)",
-                  "FRAMAC_SHARE/libc/string.h",374);
-  __e_acsl_delete_block((void *)(& src));
-  __e_acsl_delete_block((void *)(& dest));
-  return __retres;
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+      {.values = (void *)0};
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,"\\result",
+                                 (void *)__retres);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,"\\old(dest)",
+                                 (void *)__gen_e_acsl_at);
+    __gen_e_acsl_assert_data_8.blocking = 1;
+    __gen_e_acsl_assert_data_8.kind = "Postcondition";
+    __gen_e_acsl_assert_data_8.pred_txt = "result_ptr: \\result == \\old(dest)";
+    __gen_e_acsl_assert_data_8.file = "FRAMAC_SHARE/libc/string.h";
+    __gen_e_acsl_assert_data_8.fct = "strcpy";
+    __gen_e_acsl_assert_data_8.line = 374;
+    __e_acsl_assert(__retres == __gen_e_acsl_at,& __gen_e_acsl_assert_data_8);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
+    __e_acsl_delete_block((void *)(& src));
+    __e_acsl_delete_block((void *)(& dest));
+    return __retres;
+  }
 }
 
 /*@ requires valid_string_s: valid_read_string(s);
@@ -771,24 +804,24 @@ char *__gen_e_acsl_strcpy(char * restrict dest, char const * restrict src)
       \from s, (indirect: *(s + (0 .. strlen{Old}(s)))), (indirect: c);
     
     behavior found:
-      assumes char_found: strchr(s, c) ≡ \true;
-      ensures result_char: *\result ≡ (char)\old(c);
-      ensures result_same_base: \base_addr(\result) ≡ \base_addr(\old(s));
+      assumes char_found: strchr(s, c) == \true;
+      ensures result_char: *\result == (char)\old(c);
+      ensures result_same_base: \base_addr(\result) == \base_addr(\old(s));
       ensures
-        result_in_length: \old(s) ≤ \result ≤ \old(s) + strlen(\old(s));
+        result_in_length: \old(s) <= \result <= \old(s) + strlen(\old(s));
       ensures result_valid_string: valid_read_string(\result);
       ensures
         result_first_occur:
-          ∀ char *p; \old(s) ≤ p < \result ⇒ *p ≢ (char)\old(c);
+          \forall char *p; \old(s) <= p < \result ==> *p != (char)\old(c);
     
     behavior not_found:
-      assumes char_not_found: ¬(strchr(s, c) ≡ \true);
-      ensures result_null: \result ≡ \null;
+      assumes char_not_found: !(strchr(s, c) == \true);
+      ensures result_null: \result == \null;
     
     behavior default:
       ensures
         result_null_or_same_base:
-          \result ≡ \null ∨ \base_addr(\result) ≡ \base_addr(\old(s));
+          \result == \null || \base_addr(\result) == \base_addr(\old(s));
  */
 char *__gen_e_acsl_strchr(char const *s, int c)
 {
@@ -815,10 +848,26 @@ char *__gen_e_acsl_strchr(char const *s, int c)
       int __gen_e_acsl_and;
       void *__gen_e_acsl_base_addr;
       void *__gen_e_acsl_base_addr_2;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+        {.values = (void *)0};
+      __e_acsl_assert_register_char(& __gen_e_acsl_assert_data_2,"*\\result",
+                                    0,*__retres);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"\\old(c)",0,
+                                   __gen_e_acsl_at);
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+        {.values = (void *)0};
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"&__retres",
+                                   (void *)(& __retres));
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
+                                     "sizeof(char *)",0,sizeof(char *));
       __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& __retres),
                                                       sizeof(char *));
       if (__gen_e_acsl_initialized) {
         int __gen_e_acsl_valid_read;
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"__retres",
+                                     (void *)__retres);
+        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
+                                       "sizeof(char)",0,sizeof(char));
         __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)__retres,
                                                       sizeof(char),
                                                       (void *)__retres,
@@ -826,42 +875,89 @@ char *__gen_e_acsl_strchr(char const *s, int c)
         __gen_e_acsl_and = __gen_e_acsl_valid_read;
       }
       else __gen_e_acsl_and = 0;
-      __e_acsl_assert(__gen_e_acsl_and,1,"RTE","strchr",
-                      "mem_access: \\valid_read(__retres)",
-                      "FRAMAC_SHARE/libc/string.h",177);
+      __gen_e_acsl_assert_data_3.blocking = 1;
+      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.pred_txt = "mem_access: \\valid_read(__retres)";
+      __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/string.h";
+      __gen_e_acsl_assert_data_3.fct = "strchr";
+      __gen_e_acsl_assert_data_3.line = 177;
+      __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data_3);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+        {.values = (void *)0};
       __gen_e_acsl_base_addr = __e_acsl_base_addr((void *)__retres);
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,
+                                   "\\base_addr(\\result)",
+                                   __gen_e_acsl_base_addr);
       __gen_e_acsl_base_addr_2 = __e_acsl_base_addr((void *)__gen_e_acsl_at_2);
-      __e_acsl_assert(__gen_e_acsl_base_addr == __gen_e_acsl_base_addr_2,1,
-                      "Postcondition","strchr",
-                      "found: result_same_base: \\base_addr(\\result) == \\base_addr(\\old(s))",
-                      "FRAMAC_SHARE/libc/string.h",178);
-      __e_acsl_assert((int)*__retres == (int)((char)__gen_e_acsl_at),1,
-                      "Postcondition","strchr",
-                      "found: result_char: *\\result == (char)\\old(c)",
-                      "FRAMAC_SHARE/libc/string.h",177);
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,
+                                   "\\base_addr(\\old(s))",
+                                   __gen_e_acsl_base_addr_2);
+      __gen_e_acsl_assert_data_4.blocking = 1;
+      __gen_e_acsl_assert_data_4.kind = "Postcondition";
+      __gen_e_acsl_assert_data_4.pred_txt = "found: result_same_base: \\base_addr(\\result) == \\base_addr(\\old(s))";
+      __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/string.h";
+      __gen_e_acsl_assert_data_4.fct = "strchr";
+      __gen_e_acsl_assert_data_4.line = 178;
+      __e_acsl_assert(__gen_e_acsl_base_addr == __gen_e_acsl_base_addr_2,
+                      & __gen_e_acsl_assert_data_4);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+      __gen_e_acsl_assert_data_2.blocking = 1;
+      __gen_e_acsl_assert_data_2.kind = "Postcondition";
+      __gen_e_acsl_assert_data_2.pred_txt = "found: result_char: *\\result == (char)\\old(c)";
+      __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/string.h";
+      __gen_e_acsl_assert_data_2.fct = "strchr";
+      __gen_e_acsl_assert_data_2.line = 177;
+      __e_acsl_assert((int)*__retres == (int)((char)__gen_e_acsl_at),
+                      & __gen_e_acsl_assert_data_2);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     }
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)1);
-    if (__gen_e_acsl_assumes_value) __e_acsl_assert(__retres == (char *)0,1,
-                                                    "Postcondition","strchr",
-                                                    "not_found: result_null: \\result == \\null",
-                                                    "FRAMAC_SHARE/libc/string.h",
-                                                    184);
+    if (__gen_e_acsl_assumes_value) {
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+        {.values = (void *)0};
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,"\\result",
+                                   (void *)__retres);
+      __gen_e_acsl_assert_data_8.blocking = 1;
+      __gen_e_acsl_assert_data_8.kind = "Postcondition";
+      __gen_e_acsl_assert_data_8.pred_txt = "not_found: result_null: \\result == \\null";
+      __gen_e_acsl_assert_data_8.file = "FRAMAC_SHARE/libc/string.h";
+      __gen_e_acsl_assert_data_8.fct = "strchr";
+      __gen_e_acsl_assert_data_8.line = 184;
+      __e_acsl_assert(__retres == (char *)0,& __gen_e_acsl_assert_data_8);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
+    }
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)2);
     if (__gen_e_acsl_assumes_value) {
       int __gen_e_acsl_or;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
+        {.values = (void *)0};
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,"\\result",
+                                   (void *)__retres);
       if (__retres == (char *)0) __gen_e_acsl_or = 1;
       else {
         void *__gen_e_acsl_base_addr_3;
         void *__gen_e_acsl_base_addr_4;
         __gen_e_acsl_base_addr_3 = __e_acsl_base_addr((void *)__retres);
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,
+                                     "\\base_addr(\\result)",
+                                     __gen_e_acsl_base_addr_3);
         __gen_e_acsl_base_addr_4 = __e_acsl_base_addr((void *)__gen_e_acsl_at_4);
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,
+                                     "\\base_addr(\\old(s))",
+                                     __gen_e_acsl_base_addr_4);
         __gen_e_acsl_or = __gen_e_acsl_base_addr_3 == __gen_e_acsl_base_addr_4;
       }
-      __e_acsl_assert(__gen_e_acsl_or,1,"Postcondition","strchr",
-                      "default: result_null_or_same_base:\n  \\result == \\null || \\base_addr(\\result) == \\base_addr(\\old(s))",
-                      "FRAMAC_SHARE/libc/string.h",187);
+      __gen_e_acsl_assert_data_9.blocking = 1;
+      __gen_e_acsl_assert_data_9.kind = "Postcondition";
+      __gen_e_acsl_assert_data_9.pred_txt = "default: result_null_or_same_base:\n  \\result == \\null || \\base_addr(\\result) == \\base_addr(\\old(s))";
+      __gen_e_acsl_assert_data_9.file = "FRAMAC_SHARE/libc/string.h";
+      __gen_e_acsl_assert_data_9.fct = "strchr";
+      __gen_e_acsl_assert_data_9.line = 187;
+      __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_9);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
     }
     __e_acsl_contract_clean(__gen_e_acsl_contract);
     __e_acsl_delete_block((void *)(& s));
@@ -871,7 +967,7 @@ char *__gen_e_acsl_strchr(char const *s, int c)
 }
 
 /*@ requires valid_string_s: valid_read_string(s);
-    ensures acsl_c_equiv: \result ≡ strlen(\old(s));
+    ensures acsl_c_equiv: \result == strlen(\old(s));
     assigns \result;
     assigns \result \from (indirect: *(s + (0 ..)));
  */
@@ -885,8 +981,7 @@ size_t __gen_e_acsl_strlen(char const *s)
 }
 
 /*@ ensures
-      result_ok_child_or_error:
-        \result ≡ 0 ∨ \result > 0 ∨ \result ≡ -1;
+      result_ok_child_or_error: \result == 0 || \result > 0 || \result == -1;
     assigns \result;
     assigns \result \from \nothing;
  */
@@ -897,33 +992,49 @@ pid_t __gen_e_acsl_fork(void)
   {
     int __gen_e_acsl_or;
     int __gen_e_acsl_or_2;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"\\result",0,
+                                 __retres);
     if (__retres == 0) __gen_e_acsl_or = 1;
-    else __gen_e_acsl_or = __retres > 0;
+    else {
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"\\result",0,
+                                   __retres);
+      __gen_e_acsl_or = __retres > 0;
+    }
     if (__gen_e_acsl_or) __gen_e_acsl_or_2 = 1;
-    else __gen_e_acsl_or_2 = __retres == -1;
-    __e_acsl_assert(__gen_e_acsl_or_2,1,"Postcondition","fork",
-                    "result_ok_child_or_error: \\result == 0 || \\result > 0 || \\result == -1",
-                    "FRAMAC_SHARE/libc/unistd.h",846);
+    else {
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"\\result",0,
+                                   __retres);
+      __gen_e_acsl_or_2 = __retres == -1;
+    }
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Postcondition";
+    __gen_e_acsl_assert_data.pred_txt = "result_ok_child_or_error: \\result == 0 || \\result > 0 || \\result == -1";
+    __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/unistd.h";
+    __gen_e_acsl_assert_data.fct = "fork";
+    __gen_e_acsl_assert_data.line = 846;
+    __e_acsl_assert(__gen_e_acsl_or_2,& __gen_e_acsl_assert_data);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     return __retres;
   }
 }
 
-/*@ ensures result_ok_or_error: \result ≡ -1 ∨ \result ≥ 0;
+/*@ ensures result_ok_or_error: \result == -1 || \result >= 0;
     ensures
       initialization: stat_loc_init_on_success:
-        \result ≥ 0 ∧ \old(stat_loc) ≢ \null ⇒
+        \result >= 0 && \old(stat_loc) != \null ==>
         \initialized(\old(stat_loc));
     assigns \result, *stat_loc;
     assigns \result \from (indirect: options);
     assigns *stat_loc \from (indirect: options);
     
     behavior stat_loc_null:
-      assumes stat_loc_null: stat_loc ≡ \null;
+      assumes stat_loc_null: stat_loc == \null;
       assigns \result;
       assigns \result \from \nothing;
     
     behavior stat_loc_non_null:
-      assumes stat_loc_non_null: stat_loc ≢ \null;
+      assumes stat_loc_non_null: stat_loc != \null;
       requires valid_stat_loc: \valid(stat_loc);
  */
 pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
@@ -944,12 +1055,25 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)1);
     if (__gen_e_acsl_assumes_value) {
       int __gen_e_acsl_valid;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data =
+        {.values = (void *)0};
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"stat_loc",
+                                   (void *)stat_loc);
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
+                                     "sizeof(int)",0,sizeof(int));
       __gen_e_acsl_valid = __e_acsl_valid((void *)stat_loc,sizeof(int),
                                           (void *)stat_loc,
                                           (void *)(& stat_loc));
-      __e_acsl_assert(__gen_e_acsl_valid,1,"Precondition","waitpid",
-                      "stat_loc_non_null: valid_stat_loc: \\valid(stat_loc)",
-                      "FRAMAC_SHARE/libc/sys/wait.h",92);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
+                                   "\\valid(stat_loc)",0,__gen_e_acsl_valid);
+      __gen_e_acsl_assert_data.blocking = 1;
+      __gen_e_acsl_assert_data.kind = "Precondition";
+      __gen_e_acsl_assert_data.pred_txt = "stat_loc_non_null: valid_stat_loc: \\valid(stat_loc)";
+      __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/sys/wait.h";
+      __gen_e_acsl_assert_data.fct = "waitpid";
+      __gen_e_acsl_assert_data.line = 92;
+      __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     }
   }
   __gen_e_acsl_at_2 = stat_loc;
@@ -959,30 +1083,64 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
     int __gen_e_acsl_or;
     int __gen_e_acsl_and;
     int __gen_e_acsl_implies;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"\\result",0,
+                                 __retres);
     if (__retres == -1) __gen_e_acsl_or = 1;
-    else __gen_e_acsl_or = __retres >= 0;
-    __e_acsl_assert(__gen_e_acsl_or,1,"Postcondition","waitpid",
-                    "result_ok_or_error: \\result == -1 || \\result >= 0",
-                    "FRAMAC_SHARE/libc/sys/wait.h",84);
-    if (__retres >= 0) __gen_e_acsl_and = __gen_e_acsl_at != (int *)0;
+    else {
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"\\result",0,
+                                   __retres);
+      __gen_e_acsl_or = __retres >= 0;
+    }
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Postcondition";
+    __gen_e_acsl_assert_data_2.pred_txt = "result_ok_or_error: \\result == -1 || \\result >= 0";
+    __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/sys/wait.h";
+    __gen_e_acsl_assert_data_2.fct = "waitpid";
+    __gen_e_acsl_assert_data_2.line = 84;
+    __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_2);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"\\result",0,
+                                 __retres);
+    if (__retres >= 0) {
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,
+                                   "\\old(stat_loc)",(void *)__gen_e_acsl_at);
+      __gen_e_acsl_and = __gen_e_acsl_at != (int *)0;
+    }
     else __gen_e_acsl_and = 0;
     if (! __gen_e_acsl_and) __gen_e_acsl_implies = 1;
     else {
       int __gen_e_acsl_initialized;
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,
+                                   "\\old(stat_loc)",
+                                   (void *)__gen_e_acsl_at_2);
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
+                                     "sizeof(int)",0,sizeof(int));
       __gen_e_acsl_initialized = __e_acsl_initialized((void *)__gen_e_acsl_at_2,
                                                       sizeof(int));
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
+                                   "\\initialized(\\old(stat_loc))",0,
+                                   __gen_e_acsl_initialized);
       __gen_e_acsl_implies = __gen_e_acsl_initialized;
     }
-    __e_acsl_assert(__gen_e_acsl_implies,1,"Postcondition","waitpid",
-                    "initialization: stat_loc_init_on_success:\n  \\result >= 0 && \\old(stat_loc) != \\null ==> \\initialized(\\old(stat_loc))",
-                    "FRAMAC_SHARE/libc/sys/wait.h",86);
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "Postcondition";
+    __gen_e_acsl_assert_data_3.pred_txt = "initialization: stat_loc_init_on_success:\n  \\result >= 0 && \\old(stat_loc) != \\null ==> \\initialized(\\old(stat_loc))";
+    __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/sys/wait.h";
+    __gen_e_acsl_assert_data_3.fct = "waitpid";
+    __gen_e_acsl_assert_data_3.line = 86;
+    __e_acsl_assert(__gen_e_acsl_implies,& __gen_e_acsl_assert_data_3);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     __e_acsl_contract_clean(__gen_e_acsl_contract);
     __e_acsl_delete_block((void *)(& stat_loc));
     return __retres;
   }
 }
 
-/*@ exits status: \exit_status ≡ \old(status);
+/*@ exits status: \exit_status == \old(status);
     ensures never_terminates: \false;
     
     assigns \exit_status \from status;
@@ -990,12 +1148,20 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
 void __gen_e_acsl_exit(int status)
 {
   exit(status);
-  __e_acsl_assert(0,1,"Postcondition","exit","never_terminates: \\false",
-                  "FRAMAC_SHARE/libc/stdlib.h",473);
-  return;
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Postcondition";
+    __gen_e_acsl_assert_data.pred_txt = "never_terminates: \\false";
+    __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdlib.h";
+    __gen_e_acsl_assert_data.fct = "exit";
+    __gen_e_acsl_assert_data.line = 473;
+    __e_acsl_assert(0,& __gen_e_acsl_assert_data);
+    return;
+  }
 }
 
-/*@ exits status: \exit_status ≢ 0;
+/*@ exits status: \exit_status != 0;
     ensures never_terminates: \false;
     
     assigns \exit_status \from \nothing;
@@ -1003,9 +1169,17 @@ void __gen_e_acsl_exit(int status)
 void __gen_e_acsl_abort(void)
 {
   abort();
-  __e_acsl_assert(0,1,"Postcondition","abort","never_terminates: \\false",
-                  "FRAMAC_SHARE/libc/stdlib.h",460);
-  return;
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Postcondition";
+    __gen_e_acsl_assert_data.pred_txt = "never_terminates: \\false";
+    __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdlib.h";
+    __gen_e_acsl_assert_data.fct = "abort";
+    __gen_e_acsl_assert_data.line = 460;
+    __e_acsl_assert(0,& __gen_e_acsl_assert_data);
+    return;
+  }
 }
 
 void __e_acsl_globals_init(void)

@@ -40,17 +40,27 @@ val block_from_stmts: stmt list -> stmt
 (** Create a block statement from a statement list. *)
 
 val assigns: loc:location -> result:lval -> exp -> stmt
-(** [assigns ~loc ~result value] create a statement to assign the [value]
+(** [assigns ~loc ~result value] creates a statement to assign the [value]
     expression to the [result] lval. *)
+
+val assigns_field: loc:location -> varinfo -> string -> exp -> stmt
+(** [assigns_field ~loc vi field value] creates a statement to assign the
+    [value] expression to the [field] of the structure in the variable [vi]. *)
 
 val if_stmt:
   loc:location -> cond:exp -> ?else_blk:block -> block -> stmt
-(** [if ~loc ~cond ~then_blk ~else_blk] create an if statement with [cond]
+(** [if ~loc ~cond ~then_blk ~else_blk] creates an if statement with [cond]
     as condition and [then_blk] and [else_blk] as respectively "then" block and
     "else" block. *)
 
 val break: loc:location -> stmt
 (** Create a break statement *)
+
+val struct_local_init: loc:location -> varinfo -> (string * exp) list -> stmt
+(** [struct_local_init ~loc vi fields] creates a local initialization for the
+    structure variable [vi]. [fields] is a list of couple [(name, e)] where
+    [name] is the name of a field in the structure and [e] is the expression to
+    initialize that field. *)
 
 (* ********************************************************************** *)
 (* E-ACSL specific code: build calls to its RTL API *)

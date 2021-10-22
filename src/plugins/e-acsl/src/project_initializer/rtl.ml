@@ -56,7 +56,7 @@ module Symbols: sig
   exception Unregistered of string
   val find_vi: string -> varinfo (* may raise Unregistered *)
   val libc_replacement: varinfo -> varinfo
-  (*  val debug: unit -> unit*)
+  val _debug: unit -> unit
 end = struct
 
   let globals: unit Global.Hashtbl.t = Global.Hashtbl.create 17
@@ -88,27 +88,17 @@ end = struct
         name
         fvi.vname
 
-(*
-  let debug () =
+  let _debug () =
     Global.Hashtbl.iter
-      (fun g1 () -> Format.printf "RTL %a@." Printer.pp_global g1)
-      rtl;
-    Varinfo.Hashtbl.iter
-      (fun g1 g2 -> Format.printf "VAR %a -> %a@."
-          Printer.pp_varinfo g1
-          Printer.pp_varinfo g2)
-      vars;
-    Typ.Hashtbl.iter
-      (fun g1 g2 -> Format.printf "TYP %a -> %a@."
-          Printer.pp_typ g1
-          Printer.pp_typ g2)
-      types;
-    Global_annotation.Hashtbl.iter
-      (fun g1 g2 -> Format.printf "ANNOT %a -> %a@."
-          Printer.pp_global_annotation g1
-          Printer.pp_global_annotation g2)
-      annots
-*)
+      (fun g () -> Format.printf "GLOBAL %a@." Printer.pp_global g)
+      globals;
+    Kernel_function.Hashtbl.iter
+      (fun kf () -> Format.printf "KF %a@." Kernel_function.pretty kf)
+      kfs;
+    Datatype.String.Hashtbl.iter
+      (fun s vi -> Format.printf "VAR %s -> %a@." s Printer.pp_varinfo vi)
+      vars
+
 end
 
 (* Internal module to store the associations between symbols in the RTL project
@@ -519,7 +509,7 @@ let link rtl_prj =
   let rtl_ast = create_rtl_ast rtl_prj in
   let ast = Ast.get () in
   let rtl_globals = lookup_rtl_globals rtl_ast in
-  (*  Symbols.debug ();*)
+  (* Symbols._debug (); *)
   insert_rtl_globals rtl_prj rtl_globals ast;
   Assocs.clear ();
   Ast.mark_as_grown ()
