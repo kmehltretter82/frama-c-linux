@@ -43,6 +43,7 @@ import * as Status from 'frama-c/kernel/Status';
 import CodeMirror from 'codemirror/lib/codemirror';
 import 'codemirror/addon/selection/active-line';
 import 'codemirror/addon/dialog/dialog.css';
+import 'codemirror/addon/search/search';
 import 'codemirror/addon/search/searchcursor';
 
 // --------------------------------------------------------------------------
@@ -130,7 +131,10 @@ export default function SourceCode() {
         selection={theMarker}
         lineNumbers={!!theFunction}
         styleActiveLine={!!theFunction}
-        extraKeys={{ 'Ctrl-LeftClick': launchEditor }}
+        extraKeys={{
+          'Alt-F': 'findPersistent',
+          'Ctrl-LeftClick': launchEditor,
+        }}
         readOnly
       />
     </>
