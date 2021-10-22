@@ -613,6 +613,31 @@ let () = Request.register ~package
     Info.get_marker_info
 
 (* -------------------------------------------------------------------------- *)
+(* --- Marker at a position                                               --- *)
+(* -------------------------------------------------------------------------- *)
+
+let get_kf_marker (file, line, col) =
+  let pos_path = Filepath.Normalized.of_string file in
+  let pos =
+    Filepath.{ pos_path; pos_lnum = line; pos_cnum = col; pos_bol = 0; }
+  in
+  let tag = Printer_tag.loc_to_localizable ~precise_col:true pos in
+  let kf = Option.bind tag Printer_tag.kf_of_localizable in
+  kf, tag
+
+let () =
+  let descr =
+    Md.plain
+      "Returns the marker and function at a source file position, if any. \
+       Input: file path, line and column."
+  in
+  Request.register
+    ~package ~descr ~kind:`GET ~name:"getMarkerAt"
+    ~input:(module Jtriple (Jstring) (Jint) (Jint))
+    ~output:(module Jpair (Joption (Kf)) (Joption (Marker)))
+    get_kf_marker
+
+(* -------------------------------------------------------------------------- *)
 (* --- Files                                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
