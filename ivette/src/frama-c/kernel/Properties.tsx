@@ -656,6 +656,7 @@ export default function RenderProperties() {
       </TitleBar>
       <RSplit
         settings="ivette.properties.filterSplit"
+        defaultPosition={200}
         unfold={showFilter}
       >
         <Table<string, Property>

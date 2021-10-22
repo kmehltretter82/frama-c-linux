@@ -42,6 +42,10 @@ import { AutoSizer, Size } from 'react-virtualized';
 export interface SplitterBaseProps {
   /** Window settings to store the splitter position. */
   settings?: string;
+  /** Ratio or size depending of the splitter:
+     - for 'horizontal' or 'vertical' split, ratio between the two panels;
+     - for other splits, size of the foldable component. */
+  defaultPosition?: number;
   /** Minimal margin from container edges (minimum `32`). */
   margin?: number;
   /** Splitter children components. */
@@ -195,7 +199,9 @@ interface SplitterLayoutProps extends SplitterFoldProps { layout: Layout }
 interface SplitterEngineProps extends SplitterLayoutProps { size: Size }
 
 function SplitterEngine(props: SplitterEngineProps) {
-  const [settings, setSettings] = Dome.useNumberSettings(props.settings, 0);
+  const defaultPosition = props.defaultPosition ?? 0;
+  const [settings, setSettings] =
+    Dome.useNumberSettings(props.settings, defaultPosition);
   const [dragging, setDragging] = React.useState<Dragging>(undefined);
   const { size, margin = 32, layout } = props;
   const { hsplit } = layout;
@@ -245,7 +251,7 @@ function SplitterEngine(props: SplitterEngineProps) {
   const onStop: DraggableEventHandler =
     (evt, _data) => {
       if (evt.metaKey || evt.altKey || evt.ctrlKey) {
-        setSettings(0);
+        setSettings(defaultPosition);
       } else if (unfold && dragging) {
         const offsetPos = dragging.position + dragging.offset - dragging.anchor;
         const newPos = inRange(M, D, offsetPos);
