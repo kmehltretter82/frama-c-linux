@@ -109,7 +109,7 @@ export function ProbeInfos() {
   const model = useModel();
   const probe = model.getFocused();
   const fct = probe?.fct;
-  const byCS = model.getByCallstacks();
+  const byCS = fct ? model.isByCallstacks(fct) : false;
   const effects = probe ? probe.effects : false;
   const condition = probe ? probe.condition : false;
   const summary = fct ? model.stacks.getSummary(fct) : false;

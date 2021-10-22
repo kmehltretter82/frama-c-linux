@@ -72,7 +72,7 @@ export class Model implements ModelCallbacks {
   private remanent?: Probe; // last transient
   private probes = new Map<string, Probe>();
   private folded = new Map<string, boolean>(); // folded functions
-  private byCallstacks = false;
+  private byCallstacks = new Map<string, boolean>();
 
   getFocused() { return this.focused; }
   isFocused(p: Probe | undefined) { return this.focused === p; }
@@ -114,12 +114,12 @@ export class Model implements ModelCallbacks {
     this.forceLayout();
   }
 
-  getByCallstacks(): boolean {
-    return this.byCallstacks;
+  isByCallstacks(fct: string): boolean {
+    return this.byCallstacks.get(fct) ?? false;
   }
 
-  setByCallstacks(b: boolean) {
-    this.byCallstacks = b;
+  setByCallstacks(fct: string, b: boolean) {
+    this.byCallstacks.set(fct, b);
     this.forceLayout();
   }
 

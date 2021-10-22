@@ -288,7 +288,7 @@ function TableRow(props: TableRowProps) {
     if (!fct) return null;
     const folded = model.isFolded(fct);
     const foldable = model.isFoldable(fct);
-    const byCallstacks = model.getByCallstacks();
+    const byCallstacks = model.isByCallstacks(fct);
     return (
       <Hpack className="eva-function" style={props.style}>
         <TableSection
@@ -297,7 +297,7 @@ function TableRow(props: TableRowProps) {
           foldable={foldable}
           onClick={() => model.setFolded(fct, !folded)}
           byCallstacks = {byCallstacks}
-          onCallstackClick = {() => model.setByCallstacks(!byCallstacks)}
+          onCallstackClick = {() => model.setByCallstacks(fct, !byCallstacks)}
         />
       </Hpack>
     );

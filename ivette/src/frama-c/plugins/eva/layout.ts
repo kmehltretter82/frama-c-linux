@@ -87,7 +87,7 @@ export class LayoutEngine {
 
   // --- Probe Buffer
   private byFct?: string; // current function
-  private byStk?: boolean; // callstack probes
+  private byStk = new Map<string, boolean>(); // callstack probes
   private skip?: boolean; // skip current function
   private rowSize: Size = EMPTY;
   private buffer: Probe[] = [];
@@ -104,7 +104,7 @@ export class LayoutEngine {
     };
   }
 
-  layout(ps: Probe[], byCallstacks: boolean): Row[] {
+  layout(ps: Probe[], byCallstacks: Map<string, boolean>): Row[] {
     this.chained = undefined;
     this.byStk = byCallstacks;
     ps.sort(LayoutEngine.order).forEach(this.push);
@@ -171,7 +171,7 @@ export class LayoutEngine {
     const rs = this.rows;
     const fct = this.byFct;
     if (fct && ps.length > 0) {
-      const stk = this.byStk;
+      const stk = this.byStk.get(fct);
       const hlines = this.rowSize.rows;
       if (stk) {
         // --- by callstacks
