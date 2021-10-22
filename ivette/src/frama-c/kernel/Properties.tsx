@@ -369,13 +369,18 @@ const Reload = new Dome.Event('ivette.properties.reload');
 
 interface SectionProps {
   label: string;
+  unfold?: boolean;
   children: React.ReactNode;
 }
 
 function Section(props: SectionProps) {
   const settings = `properties-section-${props.label}`;
   return (
-    <Folder label={props.label} settings={settings}>
+    <Folder
+      label={props.label}
+      settings={settings}
+      defaultUnfold={props.unfold}
+    >
       {props.children}
     </Folder>
   );
@@ -411,7 +416,7 @@ function PropertyFilter() {
   return (
     <Scroll>
       <CheckField label="Current function" path="currentFunction" />
-      <Section label="Status">
+      <Section label="Status" unfold>
         <CheckField label="Valid" path="status.valid" />
         <CheckField label="Valid under hyp." path="status.valid_hyp" />
         <CheckField label="Unknown" path="status.unknown" />
@@ -623,7 +628,7 @@ export default function RenderProperties() {
   const [selection, updateSelection] = States.useSelection();
 
   const [showFilter, flipFilter] =
-    Dome.useFlipSettings('ivette.properties.showFilter');
+    Dome.useFlipSettings('ivette.properties.showFilter', true);
 
   // Updating the filter
   Dome.useEvent(Reload, model.reload);
