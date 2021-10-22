@@ -35,6 +35,7 @@
 
 #include "../internals/e_acsl_alias.h"
 #include <stddef.h>
+#include <stdio.h>
 
 #define eacsl_mpz_struct  export_alias(mpz_struct)
 #define eacsl_mpz_t       export_alias(mpz_t)
@@ -49,7 +50,7 @@ struct eacsl_mpz_struct {
 };
 
 typedef struct eacsl_mpz_struct eacsl_mpz_struct;
-typedef eacsl_mpz_struct(__attribute__((__FC_BUILTIN__)) eacsl_mpz_t)[1];
+typedef eacsl_mpz_struct(__attribute__((FC_BUILTIN)) eacsl_mpz_t)[1];
 
 struct eacsl_mpq_struct {
   eacsl_mpz_struct _mp_num;
@@ -57,7 +58,7 @@ struct eacsl_mpq_struct {
 };
 
 typedef struct eacsl_mpq_struct eacsl_mpq_struct;
-typedef eacsl_mpq_struct(__attribute__((__FC_BUILTIN__)) eacsl_mpq_t)[1];
+typedef eacsl_mpq_struct(__attribute__((FC_BUILTIN)) eacsl_mpq_t)[1];
 
 /**
  * Counts of bits of a multi-precision number are represented in the C type
@@ -363,6 +364,13 @@ extern double __gmpq_get_d(const eacsl_mpq_t q) __attribute__((FC_BUILTIN));
 /*@ requires \valid_read(z);
   @ assigns \result \from *z; */
 extern unsigned long __gmpz_get_ui(const eacsl_mpz_t z)
+    __attribute__((FC_BUILTIN));
+
+/************************/
+/* Output functions     */
+/************************/
+
+extern int __gmp_fprintf(FILE *fp, const char *fmt, ...)
     __attribute__((FC_BUILTIN));
 
 #endif

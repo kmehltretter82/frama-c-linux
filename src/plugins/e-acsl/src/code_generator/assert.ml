@@ -31,7 +31,10 @@ open Cil_types
 type data = {
   (** Indicates if some data have been registered in the context or not. *)
   data_registered: bool;
-  (* FIXME: fields added to hold information about the C variable in MR !3288 *)
+  (** [varinfo] representing the C variable for the assertion data. *)
+  data_vi: varinfo;
+  (** [exp] representing a pointer to the C variable for the assertion data. *)
+  data_ptr: exp;
 }
 
 (** External type representing the assertion context. Either [Some data] if we
@@ -40,28 +43,124 @@ type t = data option
 
 let no_data = None
 
+(** C type for the [assert_data_t] structure. *)
+let assert_data_ctyp_lazy =
+  lazy (Globals.Types.find_type
+          Logic_typing.Typedef (Functions.RTL.mk_api_name "assert_data_t"))
+
 let empty ~loc kf env =
-  (* FIXME: C variable created in MR !3288 *)
-  ignore (loc, kf);
-  let data = { data_registered = false } in
+  let assert_data_cty = Lazy.force assert_data_ctyp_lazy in
+  let data_vi, _, env =
+    Env.new_var
+      ~loc
+      ~name:"assert_data"
+      env
+      kf
+      None
+      assert_data_cty
+      (fun vi _ ->
+         [ Smart_stmt.struct_local_init
+             ~loc
+             vi
+             [ "values", Smart_exp.null ~loc ] ])
+  in
+  let data =
+    { data_registered = false;
+      data_vi;
+      data_ptr = Cil.mkAddrOfVi data_vi }
+  in
   Some data , env
 
 let with_data_from ~loc kf env from =
   match from with
-  | Some _from ->
+  | Some from ->
     let adata, env = empty ~loc kf env in
-    (* FIXME: values copied from [from] to [adata] in MR !3288 *)
-    adata, env
+    let adata = Option.get adata in
+    let env =
+      if from.data_registered then
+        let stmt =
+          Smart_stmt.rtl_call
+            ~loc
+            "assert_copy_values"
+            [ adata.data_ptr; from.data_ptr ]
+        in
+        Env.add_stmt env kf stmt
+      else env
+    in
+    Some { adata with data_registered = from.data_registered }, env
   | None -> None, env
 
 let merge_right ~loc kf env adata1 adata2 =
   match adata1, adata2 with
-  | Some _adata1, Some adata2 ->
-    (* FIXME: values copied from [adata1] to [adata2] in MR !3288 *)
-    ignore (loc, kf);
+  | Some adata1, Some adata2 when adata1.data_registered ->
+    let stmt =
+      Smart_stmt.rtl_call
+        ~loc
+        "assert_copy_values"
+        [ adata2.data_ptr; adata1.data_ptr ]
+    in
+    let adata2 =
+      { adata2 with
+        data_registered = true }
+    in
+    let env = Env.add_stmt env kf stmt in
     Some adata2, env
-  | None, Some adata -> Some adata, env
+  | Some _, Some adata | None, Some adata -> Some adata, env
   | Some _, None | None, None -> None, env
+
+let clean ~loc kf env adata =
+  match adata with
+  | Some { data_registered; data_ptr } when data_registered->
+    let clean_stmt = Smart_stmt.rtl_call ~loc "assert_clean" [ data_ptr ] in
+    Env.add_stmt env kf clean_stmt
+  | Some _ | None ->
+    env
+
+let ikind_to_string = function
+  | IBool -> "bool"
+  | IChar -> "char"
+  | ISChar -> "schar"
+  | IUChar -> "uchar"
+  | IInt -> "int"
+  | IUInt -> "uint"
+  | IShort -> "short"
+  | IUShort -> "ushort"
+  | ILong -> "long"
+  | IULong -> "ulong"
+  | ILongLong -> "longlong"
+  | IULongLong -> "ulonglong"
+
+let do_register_data ~loc kf env { data_ptr } name e =
+  let ty = Cil.typeOf e in
+  let fct, args =
+    if Gmp_types.Z.is_t ty then
+      "mpz", [ Cil.zero ~loc; e ]
+    else if Gmp_types.Q.is_t ty then
+      "mpq", [ e ]
+    else
+      match Cil.unrollType ty with
+      | TInt (ikind, _) -> ikind_to_string ikind, [ Cil.zero ~loc; e ]
+      | TFloat (FFloat, _) -> "float", [ e ]
+      | TFloat (FDouble, _) -> "double", [ e ]
+      | TFloat (FLongDouble, _) -> "longdouble", [ e ]
+      | TPtr _ -> "ptr", [ e ]
+      | TArray _ -> "array", [ e ]
+      | TFun _ -> "fun", []
+      | TComp ({ cstruct = true }, _, _) -> "struct", []
+      | TComp ({ cstruct = false }, _, _) -> "union", []
+      | TEnum ({ ekind }, _) -> ikind_to_string ekind, [ Cil.one ~loc; e ]
+      | TVoid _
+      | TBuiltin_va_list _ -> "other", []
+      | TNamed _ ->
+        Options.fatal
+          "named types in '%a' should have been unrolled"
+          Printer.pp_typ ty
+  in
+  let fct = "assert_register_" ^ fct in
+  let name = Cil.mkString ~loc name in
+  let args = data_ptr :: name :: args in
+  let stmt = Smart_stmt.rtl_call ~loc fct args in
+  Env.add_stmt env kf stmt
 
 let register ~loc kf env ?(force=false) name e adata =
   if Options.Assert_print_data.get () then
@@ -75,11 +174,9 @@ let register ~loc kf env ?(force=false) name e adata =
          The registration can be forced for expressions like [sizeof(int)] for
          instance that are [Const] values but not directly known. *)
       Some adata, env
-    | Some _adata, _ ->
-      let adata = { data_registered = true } in
-      (* FIXME: value registered to [adata] in MR !3288 *)
-      ignore (loc, kf, env, name);
-      Some adata, env
+    | Some adata, _ ->
+      let adata = { adata with data_registered = true } in
+      Some adata, do_register_data ~loc kf env adata name e
     | None, _ -> None, env
   else
     adata, env
@@ -89,8 +186,13 @@ let register_term ~loc kf env ?force t e adata =
   register ~loc kf env name ?force e adata
 
 let register_pred ~loc kf env ?force p e adata =
-  let name = Format.asprintf "@[%a@]" Printer.pp_predicate p in
-  register ~loc kf env name ?force e adata
+  if Env.annotation_kind env == Smart_stmt.RTE then
+    (* When translating RTE, we do not want to print the result of the predicate
+       because they should be the only predicate in an assertion clause. *)
+    adata, env
+  else
+    let name = Format.asprintf "@[%a@]" Printer.pp_predicate p in
+    register ~loc kf env name ?force e adata
 
 let kind_to_string loc k =
   Cil.mkString
@@ -103,7 +205,17 @@ let kind_to_string loc k =
      | Smart_stmt.Variant -> "Variant"
      | Smart_stmt.RTE -> "RTE")
 
-let runtime_check_with_msg ~adata ~loc msg ~pred_kind kind kf env e =
+let runtime_check_with_msg ~adata ~loc msg ~pred_kind kind kf env predicate_e =
+  let env = Env.push env in
+  let data_registered, data_ptr, data_vi, env =
+    match adata with
+    | Some { data_registered; data_ptr; data_vi } ->
+      data_registered, data_ptr, data_vi, env
+    | None ->
+      let adata, env = empty ~loc kf env in
+      let adata = Option.get adata in
+      false, adata.data_ptr, adata.data_vi, env
+  in
   let blocking =
     match pred_kind with
     | Assert -> Cil.one ~loc
@@ -111,27 +223,41 @@ let runtime_check_with_msg ~adata ~loc msg ~pred_kind kind kf env e =
     | Admit ->
       Options.fatal "No runtime check should be generated for 'admit' clauses"
   in
-  let file = (fst loc).Filepath.pos_path in
-  let line = (fst loc).Filepath.pos_lnum in
-  (* FIXME: [adata] support in MR !3288 *)
-  ignore adata;
-  let stmt =
-    Smart_stmt.rtl_call ~loc
-      "assert"
-      [ e;
-        blocking;
-        kind_to_string loc kind;
-        Cil.mkString ~loc (Functions.RTL.get_original_name kf);
-        Cil.mkString ~loc msg;
-        Cil.mkString ~loc (Filepath.Normalized.to_pretty_string file);
-        Cil.integer loc line ]
+  let kind = kind_to_string loc kind in
+  let pred_txt = Cil.mkString ~loc msg in
+  let start_pos = fst loc in
+  let file =
+    Cil.mkString
+      ~loc
+      (Filepath.Normalized.to_pretty_string start_pos.Filepath.pos_path)
   in
-  stmt, env
+  let fct = Cil.mkString ~loc (Functions.RTL.get_original_name kf) in
+  let line = Cil.integer ~loc start_pos.Filepath.pos_lnum in
+  let stmts =
+    [ Smart_stmt.rtl_call ~loc "assert" [ predicate_e; data_ptr ];
+      Smart_stmt.assigns_field ~loc data_vi "line" line;
+      Smart_stmt.assigns_field ~loc data_vi "fct" fct;
+      Smart_stmt.assigns_field ~loc data_vi "file" file;
+      Smart_stmt.assigns_field ~loc data_vi "pred_txt" pred_txt;
+      Smart_stmt.assigns_field ~loc data_vi "kind" kind;
+      Smart_stmt.assigns_field ~loc data_vi "blocking" blocking ]
+  in
+  let stmts=
+    if data_registered then
+      Smart_stmt.rtl_call ~loc "assert_clean" [ data_ptr ] :: stmts
+    else
+      stmts
+  in
+  let block, env =
+    Env.pop_and_get
+      env
+      (Smart_stmt.block_from_stmts (List.rev stmts))
+      ~global_clear:false
+      Env.Middle
+  in
+  Smart_stmt.block_stmt block, env
 
 let runtime_check ~adata ~pred_kind kind kf env e p =
   let loc = p.pred_loc in
-  let msg =
-    Kernel.Unicode.without_unicode
-      (Format.asprintf "%a@?" Printer.pp_predicate) p
-  in
+  let msg = Format.asprintf "%a@?" Printer.pp_predicate p in
   runtime_check_with_msg ~adata ~loc msg ~pred_kind kind kf env e

@@ -6,3 +6,9 @@
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
+[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:78: Warning: 
+  function __e_acsl_assert_register_ulong: precondition data->values == \null ||
+                                                        \valid(data->values) got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:78: Warning: 
+  function __e_acsl_assert_register_int: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
