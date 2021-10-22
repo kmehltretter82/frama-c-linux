@@ -87,10 +87,14 @@ function ThemeFields(props: P.ThemeProps) {
 // --- Editor Command Forms
 // --------------------------------------------------------------------------
 function EditorCommandFields(props: P.EditorCommandProps) {
-  const command = Forms.useDefined(Forms.useValid(
+  const cmd = Forms.useDefined(Forms.useValid(
     Settings.useGlobalSettings(props.command),
   ));
-  return (<Forms.TextCodeField state={command} label="Command" />);
+  const title =
+    'Command to open an external editor on Ctrl-click in the source code view.'
+    + '\nUse %s for the file name, %n for the line number'
+    + ' and %c for the selected character.';
+  return (<Forms.TextCodeField state={cmd} label="Command" title={title} />);
 }
 
 // --------------------------------------------------------------------------
