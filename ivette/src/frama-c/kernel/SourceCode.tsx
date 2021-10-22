@@ -39,6 +39,7 @@ import { Hfill } from 'dome/layout/boxes';
 import * as Path from 'path';
 import * as Settings from 'dome/data/settings';
 
+import CodeMirror from 'codemirror/lib/codemirror';
 import 'codemirror/addon/selection/active-line';
 import 'codemirror/addon/dialog/dialog.css';
 import 'codemirror/addon/search/searchcursor';
@@ -94,8 +95,13 @@ export default function SourceCode() {
   React.useEffect(() => buffer.setCursorOnTop(line), [buffer, line, result]);
 
   const [command] = Settings.useGlobalSettings(Preferences.EditorCommand);
-  const launchEditor = () => {
-    const cmd = command.replace('%s', file).replace('%d', line.toString());
+  const launchEditor = (_: CodeMirror.Editor, pos?: CodeMirror.Position) => {
+    const selectedLine = pos ? (pos.line + 1).toString() : '1';
+    const selectedChar = pos ? (pos.ch + 1).toString() : '1';
+    const cmd = command
+      .replace('%s', file)
+      .replace('%n', selectedLine)
+      .replace('%c', selectedChar);
     const args = cmd.split(' ');
     const prog = args.shift();
     if (prog) System.spawn(prog, args).catch(/* TODO */);
