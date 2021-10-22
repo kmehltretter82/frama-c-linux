@@ -25,10 +25,11 @@ import * as Dome from 'dome';
 import { TitleBar } from 'ivette';
 
 import { IconButton } from 'dome/controls/buttons';
-import { Label, Cell, Data } from 'dome/controls/labels';
+import { Label, Cell } from 'dome/controls/labels';
+import { Page } from 'dome/text/pages';
 import { Icon } from 'dome/controls/icons';
-import { Scroll } from 'dome/layout/boxes';
-import { RSplit } from 'dome/layout/splitters';
+import { Scroll, Vbox } from 'dome/layout/boxes';
+import { RSplit, BSplit } from 'dome/layout/splitters';
 import * as Forms from 'dome/layout/forms';
 import * as Arrays from 'dome/table/arrays';
 import { Table, Column, Renderer } from 'dome/table/views';
@@ -334,7 +335,7 @@ const renderCell: Renderer<string> =
   (text: string) => (<Cell title={text}>{text}</Cell>);
 
 const renderMessage: Renderer<string> =
-  (text: string) => (<Data title={text}> {text} </Data>);
+  (text: string) => (<div title={text} className="message-cell"> {text} </div>);
 
 const renderDir: Renderer<Ast.source> =
   (loc: Ast.source) => (<Cell label={loc.dir} title={loc.file} />);
@@ -365,7 +366,7 @@ const MessageColumns = () => (
       id="category"
       label="Category"
       title="Only for warning and debug messages"
-      width={120}
+      width={150}
       render={renderCell}
     />
     <Column
@@ -377,7 +378,7 @@ const MessageColumns = () => (
     <Column
       id="fct"
       label="Function"
-      width={120}
+      width={150}
       render={renderCell}
     />
     <Column
@@ -436,16 +437,18 @@ export default function RenderMessages() {
   }, [model, data]);
 
   const filterState = Forms.useState<Filter>(defaultFilter);
+  const [filter] = filterState;
   const [selection, updateSelection] = States.useSelection();
   const selectedFct = selection?.current?.fct;
+  const [message, setMessage] = React.useState('');
 
   React.useEffect(() => {
-    const [filter] = filterState;
     model.setFilter((msg: Message) => filterMessage(filter, selectedFct, msg));
-  }, [model, filterState, selectedFct]);
+  }, [model, filter, selectedFct]);
 
   const onMessageSelection = React.useCallback(
-    ({ fct, marker }: Message) => {
+    ({ fct, marker, message: msg }: Message) => {
+      setMessage(msg);
       if (fct && marker) {
         const location = { fct, marker };
         updateSelection({ location });
@@ -455,6 +458,20 @@ export default function RenderMessages() {
 
   const [showFilter, flipFilter] =
     Dome.useFlipSettings('ivette.messages.showFilter', true);
+
+  const MessagePanel = (
+    <Vbox style={{ height: '100%' }}>
+      <IconButton
+        icon="ANGLE.DOWN"
+        title="Close"
+        onClick={() => setMessage('')}
+        style={{ margin: '0 auto' }}
+      />
+      <Scroll>
+        <Page className="message-page"> {message} </Page>
+      </Scroll>
+    </Vbox>
+  );
 
   return (
     <>
@@ -472,14 +489,21 @@ export default function RenderMessages() {
         defaultPosition={225}
         unfold={showFilter}
       >
-        <Table<string, Message>
-          model={model}
-          sorting={model}
-          onSelection={onMessageSelection}
-          settings="ivette.messages.table"
+        <BSplit
+          settings="ivette.messages.messageSplit"
+          defaultPosition={90}
+          unfold={message !== ''}
         >
-          <MessageColumns />
-        </Table>
+          <Table<string, Message>
+            model={model}
+            sorting={model}
+            onSelection={onMessageSelection}
+            settings="ivette.messages.table"
+          >
+            <MessageColumns />
+          </Table>
+          {MessagePanel}
+        </BSplit>
         <MessageFilter filter={filterState} />
       </RSplit>
     </>
