@@ -26,16 +26,16 @@ You can install them with `M-x package-install`:
 M-x package-refresh-contents ;; updates your index
 M-x package-install web-mode
 M-x package-install typescript-mode
-M-x package-install tidse
+M-x package-install tide
 ```
 
 For configuring your `.emacs` accordingly,
-please look at the `share/typescript-config.el` file.
+please look at the `ivette/src/dome/template/typescript.el` file.
 It setup the Tide package to work with
 `typescript-mode` for `*.ts` files (see also `tsfmt.json` config file)
 and `web-mode` for `*.tsx` files.
 
-Usefull commands:
+Useful commands:
 
 ```
 M-. goto definition
