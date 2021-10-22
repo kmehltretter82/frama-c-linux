@@ -50,8 +50,7 @@ function ProbeEditor() {
   if (!probe || !probe.code) return null;
   const { label } = probe;
   const { code } = probe;
-  const { stmt } = probe;
-  const { rank } = probe;
+  const { stmt, marker } = probe;
   const byCS = probe.byCallstacks;
   const stacks = model.getStacks(probe);
   const stackable = byCS || stacks.length > 1;
@@ -65,7 +64,7 @@ function ProbeEditor() {
       <div className="eva-probeinfo-code">
         <SizedArea cols={cols} rows={rows}>{code}</SizedArea>
       </div>
-      <Code><Stmt stmt={stmt} rank={rank} /></Code>
+      <Code><Stmt stmt={stmt} marker={marker} /></Code>
       <IconButton
         icon="ITEMS.LIST"
         className="eva-probeinfo-button"
