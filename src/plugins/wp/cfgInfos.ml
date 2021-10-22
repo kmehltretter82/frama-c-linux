@@ -23,6 +23,7 @@
 module Cfg = Interpreted_automata
 module Fset = Kernel_function.Set
 module Sset = Cil_datatype.Stmt.Set
+module Pset = Property.Set
 module Shash = Cil_datatype.Stmt.Hashtbl
 
 (* -------------------------------------------------------------------------- *)
@@ -39,6 +40,7 @@ type t = {
   mutable doomed : WpPropId.prop_id Bag.t;
   mutable calls : Kernel_function.Set.t;
   mutable no_variant_loops : Sset.t;
+  mutable terminates_deps : Pset.t;
 }
 
 (* -------------------------------------------------------------------------- *)
@@ -60,6 +62,8 @@ let unreachable infos v =
   | Some cfg , Some checkpath ->
       not @@ CheckPath.check_path checkpath cfg.entry_point v
   | _ -> true
+
+let terminates_deps infos = infos.terminates_deps
 
 (* -------------------------------------------------------------------------- *)
 (* --- Selected Properties                                                --- *)
@@ -171,17 +175,26 @@ let collect_calls ~bhv kf stmt =
 (* --- No variant loops                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let collect_loops_no_variant stmt =
+let collect_loops_no_variant kf stmt =
   let open Cil_types in
   let fold_no_variant _ = function
-    | { annot_content = AVariant _ } -> (&&) false
-    | _ -> (&&) true
+    | { annot_content = AVariant v } as ca -> fun _ -> Some (ca, v)
+    | _ -> Extlib.id
+  in
+  let props_of_v ca v =
+    let (d, _), (p, _) = WpStrategy.mk_variant_properties kf stmt ca v in
+    Pset.union
+      (Pset.singleton @@ WpPropId.property_of_id d)
+      (Pset.singleton @@ WpPropId.property_of_id p)
   in
   match stmt.skind with
-  | Loop _ when Annotations.fold_code_annot fold_no_variant stmt true ->
-      Sset.singleton stmt
+  | Loop _ ->
+      begin match Annotations.fold_code_annot fold_no_variant stmt None with
+        | None -> Sset.singleton stmt, Pset.empty
+        | Some (ca, v) -> Sset.empty, props_of_v ca (fst v)
+      end
   | _ ->
-      Sset.empty
+      Sset.empty, Pset.empty
 
 (* -------------------------------------------------------------------------- *)
 (* --- Memoization Key                                                    --- *)
@@ -265,7 +278,8 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
     annots = false ;
     doomed = Bag.empty ;
     calls = Fset.empty ;
-    no_variant_loops = Sset.empty
+    no_variant_loops = Sset.empty ;
+    terminates_deps = Pset.empty ;
   } in
   let behaviors = Annotations.behaviors kf in
   (* Inits *)
@@ -283,7 +297,7 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
       Shash.iter
         (fun stmt (src,_) ->
            let fs = collect_calls ~bhv kf stmt in
-           let nv_loops = collect_loops_no_variant stmt in
+           let nv_loops, term_deps = collect_loops_no_variant kf stmt in
            let dead = unreachable infos src in
            let ca = CfgAnnot.get_code_assertions kf stmt in
            let ca_pids = List.map fst ca.code_verified in
@@ -306,6 +320,8 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
                infos.calls <- Fset.union fs infos.calls ;
                infos.no_variant_loops <-
                  Sset.union nv_loops infos.no_variant_loops ;
+               infos.terminates_deps <-
+                 Pset.union term_deps infos.terminates_deps
              end
         ) cfg.stmt_table ;
       (* Dead Post Conditions *)
@@ -328,15 +344,21 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
     (fun p -> if WpPropId.filter_status p then WpAnnot.set_unreachable p)
     infos.doomed ;
   (* Trivial terminates *)
-  if Kernel_function.is_definition kf then
-    begin match CfgAnnot.get_terminates_goal kf with
-      | Some (id, _t)
-        when selected_terminates ~prop kf
+  let infos =
+    if Kernel_function.is_definition kf then
+      match CfgAnnot.get_terminates_goal kf with
+      | Some (id, _)
+        when
+          selected_terminates ~prop kf
           && infos.calls = Fset.empty
           && infos.no_variant_loops = Sset.empty ->
-          WpAnnot.set_trivially_terminates id
-      | _ -> ()
-    end ;
+          WpAnnot.set_trivially_terminates id infos.terminates_deps ;
+          (* Drop dependencies for this terminates, we've used it. *)
+          { infos with terminates_deps = Pset.empty }
+      | _ ->
+          infos
+    else infos
+  in
   (* Collected Infos *)
   infos
 

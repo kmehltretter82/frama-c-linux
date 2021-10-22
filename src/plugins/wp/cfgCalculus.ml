@@ -187,9 +187,9 @@ struct
   let prove_property env (p : WpPropId.pred_info) w =
     if is_selected ~goal:true env p then W.add_goal env.we p w else w
 
-  let prove_subproperty env (p : WpPropId.pred_info) prop stmt source w =
+  let prove_subproperty env (p : WpPropId.pred_info) ?deps prop stmt source w =
     if is_selected ~goal:true env p
-    then W.add_subgoal env.we p prop stmt source w
+    then W.add_subgoal env.we ?deps p prop stmt source w
     else w
 
   (* --- Decomposition of WP Rules --- *)
@@ -355,6 +355,16 @@ struct
       List.fold_right (prove_property env) complete @@
       List.fold_right (prove_property env) disjoint w
 
+  let do_terminates env w =
+    let deps = CfgInfos.terminates_deps env.mode.infos in
+    match env.terminates with
+    | Some t
+      when is_default_bhv env.mode && is_selected ~goal:true env t &&
+           not @@ Property.Set.is_empty deps ->
+        let return = Kernel_function.find_return env.mode.kf in
+        prove_subproperty env t ~deps Logic_const.ptrue return FromReturn w
+    | _ -> w
+
   let do_global_init env w =
     I.process_global_init env.we env.mode.kf @@
     W.scope env.we [] SC_Global w
@@ -377,7 +387,6 @@ struct
     List.fold_right (use_property env) side_behaviors @@
     (* frame-in *)
     W.scope env.we formals SC_Frame_in w
-
 
   let do_post env ~formals (b : CfgAnnot.behavior) w =
     W.label env.we None Clabels.post @@
@@ -428,6 +437,7 @@ struct
     let bhv = CfgAnnot.get_behavior_goals kf ~smoking ~exits mode.bhv in
     begin
       W.close env.we @@
+      do_terminates env @@
       do_global_init env @@
       do_preconditions env ~formals bhv @@
       do_complete_disjoint env @@
