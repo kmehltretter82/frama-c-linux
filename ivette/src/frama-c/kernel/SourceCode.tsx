@@ -25,6 +25,7 @@
 // --------------------------------------------------------------------------
 
 import React from 'react';
+import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 
 import * as Dome from 'dome';
@@ -33,7 +34,7 @@ import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 import { TitleBar } from 'ivette';
 import * as Preferences from 'ivette/prefs';
-import { functions, markerInfo } from 'frama-c/api/kernel/ast';
+import { functions, markerInfo, getMarkerAt } from 'frama-c/api/kernel/ast';
 import { Code } from 'dome/controls/labels';
 import { Hfill } from 'dome/layout/boxes';
 import { IconButton } from 'dome/controls/buttons';
@@ -63,7 +64,7 @@ export default function SourceCode() {
 
   // Hooks
   const [buffer] = React.useState(new RichTextBuffer());
-  const [selection] = States.useSelection();
+  const [selection, updateSelection] = States.useSelection();
   const theFunction = selection?.current?.fct;
   const theMarker = selection?.current?.marker;
   const markersInfo = States.useSyncArray(markerInfo);
@@ -100,6 +101,14 @@ export default function SourceCode() {
   /* CodeMirror types used to bind callbacks to extraKeys. */
   type position = CodeMirror.Position;
   type editor = CodeMirror.Editor;
+
+  async function select(_: editor, pos?: position) {
+    if (file === '' || !pos) return;
+    const arg = [file, pos.line + 1, pos.ch + 1];
+    const [fct, marker] = await Server.send(getMarkerAt, arg);
+    if (fct || marker)
+      updateSelection({ location: { fct, marker } });
+  }
 
   const [command] = Settings.useGlobalSettings(Preferences.EditorCommand);
   async function launchEditor(_?: editor, pos?: position) {
@@ -162,6 +171,7 @@ export default function SourceCode() {
         lineNumbers={!!theFunction}
         styleActiveLine={!!theFunction}
         extraKeys={{
+          LeftClick: select as (_: CodeMirror.Editor) => void,
           'Alt-F': 'findPersistent',
           'Ctrl-LeftClick': launchEditor as (_: CodeMirror.Editor) => void,
           RightClick: contextMenu as (_: CodeMirror.Editor) => void,
