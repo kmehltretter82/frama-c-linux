@@ -38,6 +38,7 @@ import { Code } from 'dome/controls/labels';
 import { Hfill } from 'dome/layout/boxes';
 import * as Path from 'path';
 import * as Settings from 'dome/data/settings';
+import * as Status from 'frama-c/kernel/Status';
 
 import CodeMirror from 'codemirror/lib/codemirror';
 import 'codemirror/addon/selection/active-line';
@@ -104,7 +105,12 @@ export default function SourceCode() {
       .replace('%c', selectedChar);
     const args = cmd.split(' ');
     const prog = args.shift();
-    if (prog) System.spawn(prog, args).catch(/* TODO */);
+    if (prog) System.spawn(prog, args).catch(() => {
+      Status.setMessage({
+        text: `An error has occured when opening the external editor ${prog}`,
+        kind: 'error',
+      });
+    });
   };
 
   // Building the React component.
