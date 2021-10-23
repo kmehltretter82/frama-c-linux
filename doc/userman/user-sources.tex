@@ -113,7 +113,8 @@ is set by default). Unless a custom preprocessor is specified
 installed and uses it as preprocessor.
 If you do \emph{not} want annotations to be preprocessed, you need to pass
 option \texttt{-no-pp-annot} to \FramaC. Note that some headers in the
-standard C library provided with \FramaC (described below) use such annotations,
+standard C library provided with \FramaC (described in Section~\ref{sec:libc})
+use such annotations,
 therefore it might be necessary to disable inclusion of such headers.
 
 Also note that ACSL annotations are preprocessed separately from the C
@@ -130,20 +131,6 @@ preprocessing for ACSL annotations only. Those files may contain
 \texttt{\#define} directives and annotations are preprocessed as explained in
 the previous paragraph. This allows to have macros in ACSL annotations while
 using a non-GNU-like preprocessor.
-
-\begin{important}
-  An experimental, incomplete, C standard library is bundled with \FramaC and installed
-  in the sub-directory \texttt{libc} of the directory printed by
-  \texttt{frama-c -print-share-path}. It contains standard \C headers,
-  some \acsl specifications and definitions for some library functions.
-  By default, these headers are used instead of the standard library ones:
-  option \optiondef{-}{frama-c-stdlib} (set by default) adds
-  \texttt{-I\$FRAMAC\_SHARE/libc} to the preprocessor command, and also
-  \texttt{-nostdinc} if \optionuse{-}{cpp-frama-c-compliant} is set.
-  Note that this library is provided on a best-effort basis, but it is part
-  of the {\em trusted computing base}: the specifications must be proofread
-  for correctness.
-\end{important}
 
 \section{Merging the Source Code files}
 
@@ -426,6 +413,56 @@ indicate the option needed to allow the file to be parsed:
 [kernel] user error: redefinition of type 'a' in the same scope is only
          allowed in C11 (option -c11).
 \end{verbatim}
+
+\section{Standard library (libc)}\label{sec:libc}
+
+\FramaC bundles a C standard library in order to help parse and analyze code
+that relies on the functions specified in the ISO C standard.
+Such library is provided on a best-effort basis, and it is part of the
+{\em trusted computing base}: to ensure its correctness, the specifications
+must be ultimately proofread by the user.
+
+This library, while incomplete, is constantly being improved and extended.
+It is installed in the sub-directory \texttt{libc} of the directory printed by
+\texttt{frama-c -print-share-path}. It contains standard \C headers,
+some \acsl specifications, and definitions for a few library functions.
+
+By default, \FramaC's preprocessing will include the headers of its own standard
+library, instead of those installed in the user's machine. This avoids issues
+with non-portable, compiler-specific features.
+Option \optiondef{-}{frama-c-stdlib} (set by default)
+adds \texttt{-I\$FRAMAC\_SHARE/libc} to the preprocessor command, and also
+\texttt{-nostdinc} if \optionuse{-}{cpp-frama-c-compliant} is set.
+
+The use of \FramaC's standard library contains a few caveats:
+\begin{itemize}
+\item definitions which are not present in \FramaC's standard library may cause
+  parsing errors, e.g. missing type definitions, or missing fields in structs;
+\item if a header is included which is not available in \FramaC's library,
+  preprocessing will fail by default (due to the \texttt{-nostdinc} option);
+  if the user manually includes the system's library, e.g. by adding
+  \texttt{-cpp-extra-args='-I/usr/include'}, the preprocessor will end up
+  mixing headers from \FramaC's library with those from the system, often
+  leading to incompatible definitions and unexpected parsing errors.
+  In this case, the best approach is usually to include {\em only} the missing
+  definitions, for instance by copying them to a separate header file, included
+  manually or via the GCC-compatible option \texttt{-include <header.h>}
+  (see {\em GCC's Preprocessor Options} for more details). Alternatively,
+  consider filing an issue (see Chapter~\ref{user-errors}) to ask for the
+  inclusion of such headers and/or definitions in \FramaC's standard library.
+\end{itemize}
+
+In order to simplify parsing of code using common open-source libraries,
+\FramaC's standard library also includes some POSIX and non-POSIX headers which
+are not part of ISO C.
+
+Note that, while \FramaC's library intends to offer maximum portability, some
+definitions such as numeric constants require actual values to be defined.
+For pragmatic reasons, such definitions are most often based on the values
+defined in GNU/Linux's libc, and may differ from those in your system.
+As stated before, if you want to ensure the code analyzed by \FramaC is
+strictly equivalent to the one from the target system, you must either
+proofread the definitions, or provide your own library files.
 
 \section{Warnings during normalization}\label{sec:warnings-normalize}
 
