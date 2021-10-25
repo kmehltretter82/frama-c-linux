@@ -25,13 +25,33 @@
 // --------------------------------------------------------------------------
 
 import React from 'react';
+import * as Dome from 'dome';
 import * as States from 'frama-c/states';
 import * as Utils from 'frama-c/utils';
 
 import { Vfill } from 'dome/layout/boxes';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
-import { getInfo } from 'frama-c/api/kernel/ast';
+import * as AST from 'frama-c/api/kernel/ast';
+
+// --------------------------------------------------------------------------
+// --- Information Callback
+// --------------------------------------------------------------------------
+export interface Informations {
+  id: string;
+  label: string;
+  title: string;
+  getInfo: (m: AST.marker) => React.ReactNode;
+}
+
+const reloadASTinfo = new Dome.Event('frama-c.astinfo');
+const registry = new Map<string, Informations>();
+
+export function register(infos: Informations)
+{
+  registry.set(infos.id, infos);
+  reloadASTinfo.emit();
+}
 
 // --------------------------------------------------------------------------
 // --- Information Panel
@@ -42,7 +62,7 @@ export default function ASTinfo() {
   const buffer = React.useMemo(() => new RichTextBuffer(), []);
   const [selection, updateSelection] = States.useSelection();
   const marker = selection?.current?.marker;
-  const data = States.useRequest(getInfo, marker);
+  const data = States.useRequest(AST.getInfo, marker);
 
   React.useEffect(() => {
     buffer.clear();
