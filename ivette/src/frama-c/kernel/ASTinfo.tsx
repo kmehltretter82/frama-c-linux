@@ -27,12 +27,11 @@
 import React from 'react';
 import * as Dome from 'dome';
 import * as States from 'frama-c/states';
-import * as Utils from 'frama-c/utils';
-
-import { Vfill } from 'dome/layout/boxes';
-import { RichTextBuffer } from 'dome/text/buffers';
-import { Text } from 'dome/text/editors';
 import * as AST from 'frama-c/api/kernel/ast';
+import { Section } from 'dome/frame/sidebars';
+import { Icon } from 'dome/controls/icons';
+import { Code } from 'dome/controls/labels';
+import { IconButton } from 'dome/controls/buttons';
 
 // --------------------------------------------------------------------------
 // --- Information Callback
@@ -54,43 +53,124 @@ export function register(infos: Informations)
 }
 
 // --------------------------------------------------------------------------
+// --- Information Section
+// --------------------------------------------------------------------------
+
+interface InfoItemProps {
+  label: string;
+  title: string;
+  children?: React.ReactNode;
+}
+
+function InfoItem(props: InfoItemProps)
+{
+  return (
+    <>
+      <div
+        className="dome-text-label kernel-astinfo-kind"
+        title={props.title}
+      >
+        {props.label}
+      </div>
+      <div className="dome-text-cell kernel-astinfo-data">
+        {props.children}
+      </div>
+    </>
+  );
+}
+
+interface InfoSectionProps {
+  marker: AST.marker;
+  markerInfo: AST.markerInfoData;
+}
+
+function markerKind(kind: AST.markerKind): string
+{
+  switch (kind) {
+    case AST.markerKind.declaration: return 'D';
+    case AST.markerKind.global: return 'G';
+    case AST.markerKind.lvalue: return 'L';
+    case AST.markerKind.expression: return 'E';
+    case AST.markerKind.statement: return 'S';
+    case AST.markerKind.property: return 'P';
+    default: return '?';
+  }
+}
+
+function InfoSection(props: InfoSectionProps) {
+  Dome.useUpdate(reloadASTinfo);
+  const [unfold, setUnfold] = React.useState(true);
+  const { marker, markerInfo } = props;
+  const contents: React.ReactNode[] = [];
+  registry.forEach((info: Informations) => {
+    const data = info.getInfo(marker);
+    if (data) {
+      contents.push(
+        <InfoItem key={info.id} label={info.label} title={info.title}>
+          {info.getInfo(marker)}
+        </InfoItem>,
+      );
+    }
+  });
+  const descr = markerInfo.descr ?? markerInfo.name;
+  const kind = markerKind(markerInfo.kind);
+  return (
+    <div className="astinfo-section">
+      <div className="astinfo-markerbar" title={descr}>
+        <Icon
+          className="astinfo-folderbutton"
+          size={9}
+          offset={-2}
+          id={unfold ? 'TRIANGLE.DOWN' : 'TRIANGLE.RIGHT'}
+          onClick={() => setUnfold(!unfold)}
+        />
+        <Code className="astinfo-markercode">
+          <span className="astinfo-markerkind">{kind}</span>
+          {descr}
+        </Code>
+        <IconButton
+          className="astinfo-markerbutton"
+          size={9}
+          offset={0}
+          icon="PIN"
+          // onClick={() => console.log('PIN', marker)}
+        />
+        <IconButton
+          className="astinfo-markerbutton"
+          size={9}
+          offset={0}
+          icon="CIRC.CLOSE"
+          // onClick={() => console.log('CLOSE', marker)}
+        />
+      </div>
+      <div className="astinfo-infos">{contents}</div>
+    </div>
+  );
+}
+
+// --------------------------------------------------------------------------
 // --- Information Panel
 // --------------------------------------------------------------------------
 
 export default function ASTinfo() {
-
-  const buffer = React.useMemo(() => new RichTextBuffer(), []);
-  const [selection, updateSelection] = States.useSelection();
+  const markersInfo = States.useSyncArray(AST.markerInfo);
+  const [selection/* , updateSelection */] = States.useSelection();
   const marker = selection?.current?.marker;
-  const data = States.useRequest(AST.getInfo, marker);
 
-  React.useEffect(() => {
-    buffer.clear();
-    if (data) {
-      Utils.printTextWithTags(buffer, data, { css: 'color: blue' });
-    }
-  }, [buffer, data]);
+  // render null when no selection
+  if (!marker) return null;
+  const markerInfo = markersInfo.getData(marker);
+  if (!markerInfo) return null;
 
-  // Callbacks
-  function onTextSelection(id: string) {
-    // For now, the only markers are functions.
-    const location = { fct: id };
-    updateSelection({ location });
-  }
-
-  // Component
+  // const data = States.useRequest(AST.getInfo, marker);
   return (
-    <>
-      <Vfill>
-        <Text
-          buffer={buffer}
-          mode="text"
-          theme="default"
-          onSelection={onTextSelection}
-          readOnly
-        />
-      </Vfill>
-    </>
+    <Section
+      settings="frama-c.astinfo.informations"
+      label="Informations"
+      title="Contextual informations on current selection"
+    >
+      <InfoSection marker={marker} markerInfo={markerInfo} />
+    </Section>
   );
 }
 

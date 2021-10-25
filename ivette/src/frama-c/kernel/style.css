@@ -10,6 +10,17 @@
 }
 
 /* -------------------------------------------------------------------------- */
+/* --- Lightweight Text Markers                                           --- */
+/* -------------------------------------------------------------------------- */
+
+.kernel-text {
+  white-space: pre;
+}
+
+.kernel-text-marker:hover {
+  background: lightgreen;
+}
+/* -------------------------------------------------------------------------- */
 /* --- AST View                                                           --- */
 /* -------------------------------------------------------------------------- */
 
@@ -50,7 +61,52 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- Globals                                                            --- */
+/* --- Informations                                                       --- */
+/* -------------------------------------------------------------------------- */
+
+.astinfo-section {
+    position: relative;
+    overflow: hidden;
+}
+
+.astinfo-section:hover > .astinfo-markerbar {
+    background: lightgrey;
+}
+
+.astinfo-folderbutton {
+    position: absolute;
+    left: 2pt;
+}
+
+.astinfo-markerbar {
+    display: flex;
+    overflow: hidden;
+    margin-left: 8pt;
+}
+
+.astinfo-markercode {
+    flex: 1 1 auto;
+    text-overflow: ellipsis;
+}
+
+.astinfo-markerkind {
+    background: lightslategray;
+    position: relative;
+    top: -1px;
+    border-radius: 2px;
+    font-size: 7pt;
+    padding: 2px;
+    color: black;
+    margin-right: 3pt;
+}
+
+.astinfo-markerbutton {
+    flex: 0 1 auto;
+    position: relative;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Messages                                                           --- */
 /* -------------------------------------------------------------------------- */
 
 .message-search {
