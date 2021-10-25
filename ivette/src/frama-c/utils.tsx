@@ -29,9 +29,11 @@
  * @module frama-c/utils
 */
 
+import React from 'react';
 import * as Dome from 'dome';
 import * as DomeBuffers from 'dome/text/buffers';
 import * as KernelData from 'frama-c/api/kernel/data';
+import { classes } from 'dome/misc/utils';
 
 const D = new Dome.Debug('Utils');
 
@@ -42,33 +44,94 @@ const D = new Dome.Debug('Utils');
 /**
  * Print text containing tags into buffer.
  * @param buffer Rich text buffer to print into.
- * @param contents Actual text containing tags.
+ * @param text Actual text containing tags.
  * @param options Specify particular marker options.
  */
 export function printTextWithTags(
   buffer: DomeBuffers.RichTextBuffer,
-  contents: KernelData.text,
+  text: KernelData.text,
   options?: DomeBuffers.MarkerProps,
 ) {
-  if (Array.isArray(contents)) {
+  if (Array.isArray(text)) {
     let marker = false;
-    const tag = contents.shift();
+    const tag = text.shift();
     if (tag) {
       if (Array.isArray(tag)) {
-        contents.unshift(tag);
+        text.unshift(tag);
       } else {
         buffer.openTextMarker({ id: tag, ...options ?? {} });
         marker = true;
       }
     }
-    contents.forEach((txt) => printTextWithTags(buffer, txt, options));
+    text.forEach((txt) => printTextWithTags(buffer, txt, options));
     if (marker) {
       marker = false;
       buffer.closeTextMarker();
     }
-  } else if (typeof contents === 'string') {
-    buffer.append(contents);
+  } else if (typeof text === 'string') {
+    buffer.append(text);
   } else {
-    D.error('Unexpected text', contents);
+    D.error('Unexpected text', text);
   }
 }
+
+// --------------------------------------------------------------------------
+// --- Lightweight Text Renderer
+// --------------------------------------------------------------------------
+
+interface MarkerProps {
+  marker: string;
+  onMarker?: (marker: string) => void;
+  children?: React.ReactNode;
+}
+
+function Marker(props: MarkerProps) {
+  const { marker, onMarker, children } = props;
+  const onClick = () => { if (onMarker) onMarker(marker); };
+  return (
+    <span
+      className="kernel-text-marker"
+      onClick={onClick}
+    >
+      {children}
+    </span>
+  );
+}
+
+function makeContents(text: KernelData.text): React.ReactNode
+{
+  if (Array.isArray(text)) {
+    const tag = text.shift();
+    let marker: string | undefined;
+    if (tag) {
+      if (Array.isArray(tag)) {
+        text.unshift(tag);
+      } else if (typeof tag === 'string') {
+        marker = tag;
+      }
+      // otherwize, ignore tag
+    }
+    const contents = React.Children.map(text, makeContents);
+    if (marker)
+      return <Marker marker={marker}>{contents}</Marker>;
+    return <>{contents}</>;
+  } if (typeof text === 'string') {
+    return text;
+  }
+  D.error('Unexpected text', text);
+  return null;
+
+}
+
+export interface TextProps {
+  text: KernelData.text;
+  onMarker?: (marker: string) => void;
+  className?: string;
+}
+
+export function Text(props: TextProps): React.ReactNode {
+  const className = classes('kernel-text', 'dome-text-code', props.className);
+  return <div className={className}>{makeContents(props.text)}</div>;
+}
+
+// --------------------------------------------------------------------------
