@@ -97,7 +97,7 @@ export default function SourceCode() {
   React.useEffect(() => buffer.setCursorOnTop(line), [buffer, line, result]);
 
   const [command] = Settings.useGlobalSettings(Preferences.EditorCommand);
-  const launchEditor = (_: CodeMirror.Editor, pos?: CodeMirror.Position) => {
+  async function launchEditor(_: CodeMirror.Editor, pos?: CodeMirror.Position) {
     const selectedLine = pos ? (pos.line + 1).toString() : '1';
     const selectedChar = pos ? (pos.ch + 1).toString() : '1';
     const cmd = command
@@ -112,7 +112,21 @@ export default function SourceCode() {
         kind: 'error',
       });
     });
-  };
+  }
+
+  async function contextMenu(
+    editor: CodeMirror.Editor,
+    pos?: CodeMirror.Position,
+  )
+  {
+    const items = [
+      {
+        label: 'Open file in an external editor',
+        onClick: () => launchEditor(editor, pos),
+      },
+    ];
+    Dome.popupMenu(items);
+  }
 
   // Building the React component.
   return (
@@ -133,7 +147,8 @@ export default function SourceCode() {
         styleActiveLine={!!theFunction}
         extraKeys={{
           'Alt-F': 'findPersistent',
-          'Ctrl-LeftClick': launchEditor,
+          'Ctrl-LeftClick': launchEditor as (_: CodeMirror.Editor) => void,
+          RightClick: contextMenu as (_: CodeMirror.Editor) => void,
         }}
         readOnly
       />
