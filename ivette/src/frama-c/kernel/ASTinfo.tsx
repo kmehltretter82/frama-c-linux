@@ -102,16 +102,18 @@ function InfoSection(props: InfoSectionProps) {
   const [unfold, setUnfold] = React.useState(true);
   const { marker, markerInfo } = props;
   const contents: React.ReactNode[] = [];
-  registry.forEach((info: Informations) => {
-    const data = info.getInfo(marker);
-    if (data) {
-      contents.push(
-        <InfoItem key={info.id} label={info.label} title={info.title}>
-          {info.getInfo(marker)}
-        </InfoItem>,
-      );
-    }
-  });
+  if (unfold) {
+    registry.forEach((info: Informations) => {
+      const data = info.getInfo(marker);
+      if (data) {
+        contents.push(
+          <InfoItem key={info.id} label={info.label} title={info.title}>
+            {info.getInfo(marker)}
+          </InfoItem>,
+        );
+      }
+    });
+  }
   const descr = markerInfo.descr ?? markerInfo.name;
   const kind = markerKind(markerInfo.kind);
   return (
@@ -143,7 +145,9 @@ function InfoSection(props: InfoSectionProps) {
           // onClick={() => console.log('CLOSE', marker)}
         />
       </div>
-      <div className="astinfo-infos">{contents}</div>
+      <div className="astinfo-infos">
+        {contents}
+      </div>
     </div>
   );
 }
