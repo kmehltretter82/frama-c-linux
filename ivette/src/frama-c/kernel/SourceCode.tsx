@@ -98,20 +98,22 @@ export default function SourceCode() {
 
   const [command] = Settings.useGlobalSettings(Preferences.EditorCommand);
   async function launchEditor(_: CodeMirror.Editor, pos?: CodeMirror.Position) {
-    const selectedLine = pos ? (pos.line + 1).toString() : '1';
-    const selectedChar = pos ? (pos.ch + 1).toString() : '1';
-    const cmd = command
-      .replace('%s', file)
-      .replace('%n', selectedLine)
-      .replace('%c', selectedChar);
-    const args = cmd.split(' ');
-    const prog = args.shift();
-    if (prog) System.spawn(prog, args).catch(() => {
-      Status.setMessage({
-        text: `An error has occured when opening the external editor ${prog}`,
-        kind: 'error',
+    if (file !== '') {
+      const selectedLine = pos ? (pos.line + 1).toString() : '1';
+      const selectedChar = pos ? (pos.ch + 1).toString() : '1';
+      const cmd = command
+        .replace('%s', file)
+        .replace('%n', selectedLine)
+        .replace('%c', selectedChar);
+      const args = cmd.split(' ');
+      const prog = args.shift();
+      if (prog) System.spawn(prog, args).catch(() => {
+        Status.setMessage({
+          text: `An error has occured when opening the external editor ${prog}`,
+          kind: 'error',
+        });
       });
-    });
+    }
   }
 
   async function contextMenu(
@@ -119,13 +121,15 @@ export default function SourceCode() {
     pos?: CodeMirror.Position,
   )
   {
-    const items = [
-      {
-        label: 'Open file in an external editor',
-        onClick: () => launchEditor(editor, pos),
-      },
-    ];
-    Dome.popupMenu(items);
+    if (file !== '') {
+      const items = [
+        {
+          label: 'Open file in an external editor',
+          onClick: () => launchEditor(editor, pos),
+        },
+      ];
+      Dome.popupMenu(items);
+    }
   }
 
   // Building the React component.
