@@ -217,12 +217,12 @@ function TableSection(props: TableSectionProps) {
         onClick={onClick}
       />
       <Cell className="eva-fct-name">{fct}</Cell>
-      <Filler/>
+      <Filler />
       <IconButton
         icon="ITEMS.LIST"
         className="eva-probeinfo-button"
         selected={props.byCallstacks}
-        title={`Details by callstack`}
+        title="Details by callstack"
         onClick={props.onCallstackClick}
       />
     </>
@@ -296,8 +296,8 @@ function TableRow(props: TableRowProps) {
           folded={folded}
           foldable={foldable}
           onClick={() => model.setFolded(fct, !folded)}
-          byCallstacks = {byCallstacks}
-          onCallstackClick = {() => model.setByCallstacks(fct, !byCallstacks)}
+          byCallstacks={byCallstacks}
+          onCallstackClick={() => model.setByCallstacks(fct, !byCallstacks)}
         />
       </Hpack>
     );

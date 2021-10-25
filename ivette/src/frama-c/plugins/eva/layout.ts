@@ -141,7 +141,6 @@ export class LayoutEngine {
       this.csRowsCounter = 1;
       this.skip = this.folded(fct);
     }
-    else {}
     if (this.skip) return;
     // --- chaining
     const q = this.chained;
@@ -179,7 +178,7 @@ export class LayoutEngine {
         const stacks = this.stacks.getStacks(...markers);
         const summary = fct ? this.stacks.getSummary(fct) : false;
         const callstacks = stacks.length;
-        const csRowsCounter = this.csRowsCounter;
+        const { csRowsCounter } = this;
         rs.push({
           key: `P:${fct}:${csRowsCounter}`,
           kind: 'probes',
