@@ -86,7 +86,7 @@ src/dome/main/menubar.ts: CEA_LGPL
 src/dome/misc/devtools.js: CEA_LGPL
 src/dome/misc/register.js: CEA_LGPL
 src/dome/misc/system.ts: CEA_LGPL
-src/dome/misc/utils.ts: CEA_LGPL
+src/dome/misc/utils.tsx: CEA_LGPL
 src/dome/renderer/controls/buttons.tsx: CEA_LGPL
 src/dome/renderer/controls/gallery.json: .ignore
 src/dome/renderer/controls/icons.tsx: CEA_LGPL
