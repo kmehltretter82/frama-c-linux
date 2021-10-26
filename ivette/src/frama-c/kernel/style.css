@@ -28,6 +28,10 @@
     background-color: #FFFF66;
 }
 
+.hovered-marker {
+    background-color: lightgrey;
+}
+
 .dead-code {
     background-color: #BBB;
     border-bottom: solid 0.1em #BBB;
@@ -96,7 +100,9 @@
     cursor: default;
 }
 
-.astinfo-markercode:hover {
+.astinfo-markercode:hover,
+.astinfo-markercode.selected
+{
     background: orange;
 }
 

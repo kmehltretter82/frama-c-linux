@@ -132,10 +132,14 @@ function MarkerInfoSection(props: InfoSectionProps) {
       );
     }
   });
-  const barClass = classes(
+  const barClassName = classes(
     'astinfo-markerbar',
     props.selected && 'selected',
-    props.hovered && 'hovered',
+    !props.selected && props.hovered && 'hovered',
+  );
+  const codeClassName = classes(
+    'astinfo-markercode',
+    props.selected && props.hovered && 'selected',
   );
   const descr = markerInfo.descr ?? markerInfo.name;
   const kind = MARKERS[markerInfo.kind] ?? GMARKER;
@@ -144,20 +148,21 @@ function MarkerInfoSection(props: InfoSectionProps) {
     <div className="astinfo-section">
       <div
         key="MARKER"
-        className={barClass}
+        className={barClassName}
         title={descr}
         onMouseEnter={() => props.onHover(true)}
         onMouseLeave={() => props.onHover(false)}
       >
         <Icon
           className="astinfo-folderbutton"
+          style={{ visibility: contents.length ? 'visible' : 'hidden' }}
           size={9}
           offset={-2}
           id={unfold ? 'TRIANGLE.DOWN' : 'TRIANGLE.RIGHT'}
           onClick={foldUnfold}
         />
         <Code
-          className="astinfo-markercode"
+          className={codeClassName}
           onClick={props.onSelect}
         >
           {kind}{descr}
@@ -225,8 +230,10 @@ class InfoMarkers {
     const keep = (m: Mark) => m.marker === marker || this.isPinned(m.marker);
     const self = (m: Mark) => m.marker === marker;
     this.selection = this.selection.filter(keep);
-    if (fct && marker && !this.selection.some(self))
+    if (fct && marker && !this.selection.some(self)) {
       this.selection.push({ fct, marker });
+      if (extend) this.pinned.set(marker, true);
+    }
     reloadASTinfo.emit();
   }
 
@@ -254,7 +261,7 @@ class InfoMarkers {
     const hovered = this.hovered === marker;
     const onPin = () => this.setPinned(marker, !pinned);
     const onRemove = () => this.removeMarker(marker);
-    const onHover = (h: boolean) => this.setHovered(h ? marker : undefined);
+    const onHover = (h: boolean) => States.setHovered(h ? mark : undefined);
     const onSelect = () => States.setSelection(mark);
     return (
       <MarkerInfoSection
@@ -288,13 +295,12 @@ export default function ASTinfo() {
   const model = States.useSyncArray(AST.markerInfo, false);
   React.useEffect(() => markers.setModel(model), [markers, model]);
   const [selection] = States.useSelection();
+  const [hoveredLoc] = States.useHovered();
   const location = selection?.current;
+  const hovered = hoveredLoc?.marker;
   React.useEffect(() => markers.setSelected(location), [markers, location]);
-  const onMetaSelection = React.useCallback(
-    (loc: States.Location) => markers.setSelected(loc, true),
-    [markers],
-  );
-  Dome.useEvent(States.MetaSelection, onMetaSelection);
+  React.useEffect(() => markers.setHovered(hovered), [markers, hovered]);
+  Dome.useEvent(States.MetaSelection, (loc) => markers.setSelected(loc, true));
   return (
     <Section
       settings="frama-c.astinfo.informations"

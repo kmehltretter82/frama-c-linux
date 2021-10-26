@@ -759,9 +759,16 @@ const emptySelection = {
   },
 };
 
+export type Hovered = Location | undefined;
 export const MetaSelection = new Dome.Event<Location>('frama-c-meta-selection');
+export const GlobalHovered = new GlobalState<Hovered>(undefined);
 export const GlobalSelection = new GlobalState<Selection>(emptySelection);
 Server.onShutdown(() => GlobalSelection.setValue(emptySelection));
+
+export function setHovered(h: Hovered) { GlobalHovered.setValue(h); }
+export function useHovered(): [Hovered, (h: Hovered) => void] {
+  return useGlobalState(GlobalHovered);
+}
 
 export function setSelection(location: Location, meta = false) {
   const s = GlobalSelection.getValue();
@@ -778,7 +785,7 @@ export function useSelection(): [Selection, (a: SelectionActions) => void] {
 /** Resets the selected locations. */
 export async function resetSelection() {
   GlobalSelection.setValue(emptySelection);
-  const main = await Server.send(Ast.getMainFunction, { });
+  const main = await Server.send(Ast.getMainFunction, {});
   // If the selection has already been modified, do not change it.
   if (main && GlobalSelection.getValue() === emptySelection) {
     GlobalSelection.setValue({ ...emptySelection, current: { fct: main } });
