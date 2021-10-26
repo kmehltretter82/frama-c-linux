@@ -34,6 +34,9 @@ __BEGIN_DECLS
 */
 extern void __FC_assert(int c, const char* file, int line, const char*expr);
 
+#define static_assert _Static_assert
+
+
 __END_DECLS
 __POP_FC_STDLIB
 #endif

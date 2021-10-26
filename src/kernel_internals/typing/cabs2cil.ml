@@ -262,9 +262,6 @@ let cabslu s =
  * hold the result of function calls *)
 let callTempVars: unit IH.t = IH.create 13
 
-(* Keep a list of functions that were called without a prototype. *)
-let noProtoFunctions : bool IH.t = IH.create 13
-
 (* Check that s starts with the prefix p *)
 let prefix p s =
   let lp = String.length p in
@@ -5603,6 +5600,22 @@ and makeCompType ghost (isstruct: bool)
   (* Do regular fields first. *)
   let to_field = function
     | TYPE_ANNOT _ -> None
+    | STATIC_ASSERT_FG (e, s, loc) ->
+      let (_, _, cond_exp, _) = doExp empty_local_env CConst e ADrop in
+      begin
+        match Cil.constFoldToInt ~machdep:true cond_exp with
+        | Some i ->
+          if Integer.(equal i zero) then
+            Kernel.error ~source:(fst loc) "static assertion failed%s%s@."
+              (if s <> "" then ": " else "") s
+        | None ->
+          Kernel.error ~source:(fst loc)
+            "failed to evaluate constant expression in static assertion:@ \
+             @[%a@]"
+            Cprint.print_expression e
+      end;
+      (* _Static_assert is not stored in the Cil AST *)
+      None
     | FIELD (f,g) -> Some (f,g) in
   let flds = Extlib.filter_map_opt to_field nglist in
   let flds = List.rev (fold addFieldGroup [] flds) in
@@ -6688,7 +6701,6 @@ and doExp local_env
                     (makeGlobalVar ~temp:false n ftype) in
                 (* Make it EXTERN *)
                 proto.vstorage <- Extern;
-                IH.add noProtoFunctions proto.vid true;
                 proto.vdecl <- f.expr_loc;
                 ImplicitPrototypeHook.apply proto;
                 (* Add it to the file as well *)
@@ -9195,6 +9207,25 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
       | _ -> Kernel.fatal ~current:true "Too many attributes in pragma"
     end
 
+  | Cabs.STATIC_ASSERT (e, s, loc) -> begin
+      CurrentLoc.set (convLoc loc);
+      let (_, _, cond_exp, _) = doExp local_env CConst e ADrop in
+      begin
+        match Cil.constFoldToInt ~machdep:true cond_exp with
+        | Some i ->
+          if Integer.(equal i zero) then
+            Kernel.error ~current:true "static assertion failed%s%s@."
+              (if s <> "" then ": " else "") s
+        | None ->
+          Kernel.error ~current:true
+            "failed to evaluate constant expression in static assertion:@ \
+             @[%a@]"
+            Cprint.print_expression e
+      end;
+      (* _Static_assert is not stored in the Cil AST *)
+      empty
+    end
+
   | Cabs.FUNDEF (spec,((specs,(n,dt,a, _)) : Cabs.single_name),
                  (body : Cabs.block), loc1, loc2) when isglobal ->
     begin
@@ -10401,7 +10432,6 @@ let convFile (path, f) =
   (* Clean up the global types *)
   initGlobals();
   startFile ();
-  IH.clear noProtoFunctions;
   H.clear compInfoNameEnv;
   H.clear enumInfoNameEnv;
   IH.clear mustTurnIntoDef;
@@ -10432,7 +10462,6 @@ let convFile (path, f) =
   let globals = List.rev globals in
   List.iter rename_spec globals;
   Logic_env.prepare_tables ();
-  IH.clear noProtoFunctions;
   IH.clear mustTurnIntoDef;
   H.clear alreadyDefined;
   H.clear compInfoNameEnv;
