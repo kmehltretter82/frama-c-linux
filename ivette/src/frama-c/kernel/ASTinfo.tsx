@@ -109,8 +109,11 @@ interface InfoSectionProps {
   marker: AST.marker;
   markerInfo: AST.markerInfoData;
   selected: boolean;
+  hovered: boolean;
   pinned: boolean;
-  onPinned: () => void;
+  onPin: () => void;
+  onHover: (hover: boolean) => void;
+  onSelect: () => void;
   onRemove: () => void;
 }
 
@@ -129,22 +132,34 @@ function MarkerInfoSection(props: InfoSectionProps) {
       );
     }
   });
-  const barClass = classes('astinfo-markerbar', props.selected && 'selected');
+  const barClass = classes(
+    'astinfo-markerbar',
+    props.selected && 'selected',
+    props.hovered && 'hovered',
+  );
   const descr = markerInfo.descr ?? markerInfo.name;
   const kind = MARKERS[markerInfo.kind] ?? GMARKER;
   const foldUnfold = () => setUnfold(!unfold);
   return (
     <div className="astinfo-section">
-      <div className={barClass} title={descr}>
+      <div
+        key="MARKER"
+        className={barClass}
+        title={descr}
+        onMouseEnter={() => props.onHover(true)}
+        onMouseLeave={() => props.onHover(false)}
+      >
         <Icon
           className="astinfo-folderbutton"
-          style={{ visibility: contents.length ? 'visible' : 'hidden' }}
           size={9}
           offset={-2}
           id={unfold ? 'TRIANGLE.DOWN' : 'TRIANGLE.RIGHT'}
           onClick={foldUnfold}
         />
-        <Code className="astinfo-markercode" onClick={foldUnfold}>
+        <Code
+          className="astinfo-markercode"
+          onClick={props.onSelect}
+        >
           {kind}{descr}
         </Code>
         <IconButton
@@ -153,7 +168,7 @@ function MarkerInfoSection(props: InfoSectionProps) {
           offset={0}
           icon="PIN"
           selected={props.pinned}
-          onClick={props.onPinned}
+          onClick={props.onPin}
         />
         <IconButton
           className="astinfo-markerbutton"
@@ -164,6 +179,7 @@ function MarkerInfoSection(props: InfoSectionProps) {
         />
       </div>
       <div
+        key="INFOS"
         className="astinfo-infos"
         style={{ display: unfold && contents.length ? 'grid' : 'none' }}
       >
@@ -177,35 +193,45 @@ function MarkerInfoSection(props: InfoSectionProps) {
 // --- Information Selection State
 // --------------------------------------------------------------------------
 
+type Mark = { fct: string; marker: AST.marker };
 type MarkerInfoModel = CompactModel<string, AST.markerInfoData>;
 
 class InfoMarkers {
 
   private model: MarkerInfoModel = new CompactModel('key');
-  private selection: AST.marker[] = [];
+  private selection: Mark[] = [];
   private pinned = new Map<string, boolean>();
-  private selected: undefined | AST.marker = undefined;
+  private selected: undefined | AST.marker;
+  private hovered: undefined | AST.marker;
 
   setModel(model: MarkerInfoModel) {
     this.model = model;
     reloadASTinfo.emit();
   }
 
-  setSelected(marker?: AST.marker, extend?: boolean) {
+  setHovered(marker?: AST.marker) {
+    this.hovered = marker;
+    reloadASTinfo.emit();
+  }
+
+  setSelected(location?: States.Location, extend?: boolean) {
     if (extend) {
       const m = this.selected;
       if (m) this.pinned.set(m, true);
     }
+    const fct = location?.fct;
+    const marker = location?.marker;
     this.selected = marker;
-    const keep = (m: AST.marker) => m === marker || this.isPinned(m);
+    const keep = (m: Mark) => m.marker === marker || this.isPinned(m.marker);
+    const self = (m: Mark) => m.marker === marker;
     this.selection = this.selection.filter(keep);
-    if (marker && this.selection.indexOf(marker) < 0)
-      this.selection.push(marker);
+    if (fct && marker && !this.selection.some(self))
+      this.selection.push({ fct, marker });
     reloadASTinfo.emit();
   }
 
-  isPinned(marker: AST.marker): boolean {
-    return this.pinned.get(marker) ?? false;
+  isPinned(marker: AST.marker | undefined): boolean {
+    return (marker !== undefined) && (this.pinned.get(marker) ?? false);
   }
 
   setPinned(marker: AST.marker, pinned: boolean) {
@@ -214,18 +240,22 @@ class InfoMarkers {
   }
 
   removeMarker(marker: AST.marker) {
-    this.selection = this.selection.filter((m) => m !== marker);
+    this.selection = this.selection.filter((m) => m.marker !== marker);
     this.pinned.delete(marker);
     reloadASTinfo.emit();
   }
 
-  renderSection(marker: AST.marker) {
+  renderSection(mark: Mark) {
+    const { marker } = mark;
     const info = this.model.getData(marker);
     if (!info) return null;
     const pinned = this.isPinned(marker);
     const selected = this.selected === marker;
-    const onPinned = () => this.setPinned(marker, !pinned);
+    const hovered = this.hovered === marker;
+    const onPin = () => this.setPinned(marker, !pinned);
     const onRemove = () => this.removeMarker(marker);
+    const onHover = (h: boolean) => this.setHovered(h ? marker : undefined);
+    const onSelect = () => States.setSelection(mark);
     return (
       <MarkerInfoSection
         key={marker}
@@ -233,8 +263,11 @@ class InfoMarkers {
         markerInfo={info}
         pinned={pinned}
         selected={selected}
-        onPinned={onPinned}
+        hovered={hovered}
+        onPin={onPin}
         onRemove={onRemove}
+        onHover={onHover}
+        onSelect={onSelect}
       />
     );
   }
@@ -255,12 +288,11 @@ export default function ASTinfo() {
   const model = States.useSyncArray(AST.markerInfo, false);
   React.useEffect(() => markers.setModel(model), [markers, model]);
   const [selection] = States.useSelection();
-  const marker = selection?.current?.marker;
-  React.useEffect(() => markers.setSelected(marker), [markers, marker]);
+  const location = selection?.current;
+  React.useEffect(() => markers.setSelected(location), [markers, location]);
   const onMetaSelection = React.useCallback(
-    (loc: States.Location) => {
-      markers.setSelected(loc.marker, true);
-    }, [markers],
+    (loc: States.Location) => markers.setSelected(loc, true),
+    [markers],
   );
   Dome.useEvent(States.MetaSelection, onMetaSelection);
   return (

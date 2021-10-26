@@ -69,12 +69,6 @@
     overflow: hidden;
 }
 
-.astinfo-section:hover .astinfo-markerbar,
-.astinfo-section.selected
-{
-    background: lightgrey;
-}
-
 .astinfo-folderbutton {
     position: absolute;
     left: 2pt;
@@ -86,9 +80,24 @@
     margin-left: 8pt;
 }
 
+.astinfo-markerbar.selected
+{
+    background: #f5d69e;
+}
+
+.astinfo-markerbar.hovered
+{
+    background: lightgrey;
+}
+
 .astinfo-markercode {
     flex: 1 1 auto;
     text-overflow: ellipsis;
+    cursor: default;
+}
+
+.astinfo-markercode:hover {
+    background: orange;
 }
 
 .astinfo-markerkind {
@@ -99,7 +108,6 @@
     font-size: 7pt;
     padding: 2px;
     color: black;
-    cursor: default;
     user-select: none;
     margin-right: 3pt;
 }
