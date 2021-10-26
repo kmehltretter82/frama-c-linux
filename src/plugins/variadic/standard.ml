@@ -701,17 +701,17 @@ let infer_format_from_args vf format_fun args =
     let t = Cil.typeOf arg in
     let t =
       match format_fun.f_kind with
-        | PrintfLike -> t
-        | ScanfLike ->
-            if not (Cil.isPointerType t) then begin
-                let source = fst arg.eloc in
-                Self.warning ~source
-                  "Expecting pointer as parameter of scanf function. \
-                   Argument %a has type %a"
-                  Printer.pp_exp arg Printer.pp_typ t;
-                raise (Translate_call_exn vf.vf_decl);
-              end;
-            Cil.typeOf_pointed t
+      | PrintfLike -> t
+      | ScanfLike ->
+        if not (Cil.isPointerType t) then begin
+          let source = fst arg.eloc in
+          Self.warning ~source
+            "Expecting pointer as parameter of scanf function. \
+             Argument %a has type %a"
+            Printer.pp_exp arg Printer.pp_typ t;
+          raise (Translate_call_exn vf.vf_decl);
+        end;
+        Cil.typeOf_pointed t
     in
     format_of_type vf format_fun.f_kind t
   in
