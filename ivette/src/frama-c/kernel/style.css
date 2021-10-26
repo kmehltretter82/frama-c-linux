@@ -69,7 +69,9 @@
     overflow: hidden;
 }
 
-.astinfo-section:hover > .astinfo-markerbar {
+.astinfo-section:hover .astinfo-markerbar,
+.astinfo-section.selected
+{
     background: lightgrey;
 }
 
@@ -97,6 +99,8 @@
     font-size: 7pt;
     padding: 2px;
     color: black;
+    cursor: default;
+    user-select: none;
     margin-right: 3pt;
 }
 

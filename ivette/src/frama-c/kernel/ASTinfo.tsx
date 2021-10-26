@@ -26,6 +26,8 @@
 
 import React from 'react';
 import * as Dome from 'dome';
+import { classes } from 'dome/misc/utils';
+import { CompactModel } from 'dome/table/arrays';
 import * as States from 'frama-c/states';
 import * as AST from 'frama-c/api/kernel/ast';
 import { Section } from 'dome/frame/sidebars';
@@ -36,6 +38,7 @@ import { IconButton } from 'dome/controls/buttons';
 // --------------------------------------------------------------------------
 // --- Information Callback
 // --------------------------------------------------------------------------
+
 export interface Informations {
   id: string;
   label: string;
@@ -46,15 +49,41 @@ export interface Informations {
 const reloadASTinfo = new Dome.Event('frama-c.astinfo');
 const registry = new Map<string, Informations>();
 
-export function register(infos: Informations)
-{
+export function register(infos: Informations) {
   registry.set(infos.id, infos);
   reloadASTinfo.emit();
 }
 
 // --------------------------------------------------------------------------
-// --- Information Section
+// --- Information Details
 // --------------------------------------------------------------------------
+
+interface MarkerKindProps { label: string; title: string }
+
+const MarkerKind = (props: MarkerKindProps) => {
+  const { label, title } = props;
+  return <span className="astinfo-markerkind" title={title}>{label}</span>;
+};
+
+const GMARKER =
+  <MarkerKind label="M" title="Generic Marker" />;
+
+const MARKERS = {
+  [AST.markerKind.declaration]:
+  <MarkerKind label="D" title="Declaration" />,
+  [AST.markerKind.global]:
+  <MarkerKind label="G" title="Global" />,
+  [AST.markerKind.lvalue]:
+  <MarkerKind label="L" title="L-value" />,
+  [AST.markerKind.expression]:
+  <MarkerKind label="E" title="Expression" />,
+  [AST.markerKind.statement]:
+  <MarkerKind label="S" title="Statement" />,
+  [AST.markerKind.property]:
+  <MarkerKind label="P" title="Property" />,
+  [AST.markerKind.term]:
+  <MarkerKind label="T" title="Term" />,
+};
 
 interface InfoItemProps {
   label: string;
@@ -62,90 +91,82 @@ interface InfoItemProps {
   children?: React.ReactNode;
 }
 
-function InfoItem(props: InfoItemProps)
-{
-  return (
-    <>
-      <div
-        className="dome-text-label kernel-astinfo-kind"
-        title={props.title}
-      >
-        {props.label}
-      </div>
-      <div className="dome-text-cell kernel-astinfo-data">
-        {props.children}
-      </div>
-    </>
-  );
-}
+const InfoItem = (props: InfoItemProps) => (
+  <>
+    <div
+      className="dome-text-label kernel-astinfo-kind"
+      title={props.title}
+    >
+      {props.label}
+    </div>
+    <div className="dome-text-cell kernel-astinfo-data">
+      {props.children}
+    </div>
+  </>
+);
 
 interface InfoSectionProps {
   marker: AST.marker;
   markerInfo: AST.markerInfoData;
+  selected: boolean;
+  pinned: boolean;
+  onPinned: () => void;
+  onRemove: () => void;
 }
 
-function markerKind(kind: AST.markerKind): string
-{
-  switch (kind) {
-    case AST.markerKind.declaration: return 'D';
-    case AST.markerKind.global: return 'G';
-    case AST.markerKind.lvalue: return 'L';
-    case AST.markerKind.expression: return 'E';
-    case AST.markerKind.statement: return 'S';
-    case AST.markerKind.property: return 'P';
-    default: return '?';
-  }
-}
-
-function InfoSection(props: InfoSectionProps) {
+function MarkerInfoSection(props: InfoSectionProps) {
   Dome.useUpdate(reloadASTinfo);
   const [unfold, setUnfold] = React.useState(true);
   const { marker, markerInfo } = props;
   const contents: React.ReactNode[] = [];
-  if (unfold) {
-    registry.forEach((info: Informations) => {
-      const data = info.getInfo(marker);
-      if (data) {
-        contents.push(
-          <InfoItem key={info.id} label={info.label} title={info.title}>
-            {info.getInfo(marker)}
-          </InfoItem>,
-        );
-      }
-    });
-  }
+  registry.forEach((info: Informations) => {
+    const data = info.getInfo(marker);
+    if (data) {
+      contents.push(
+        <InfoItem key={info.id} label={info.label} title={info.title}>
+          {info.getInfo(marker)}
+        </InfoItem>,
+      );
+    }
+  });
+  const barClass = classes('astinfo-markerbar', props.selected && 'selected');
   const descr = markerInfo.descr ?? markerInfo.name;
-  const kind = markerKind(markerInfo.kind);
+  const kind = MARKERS[markerInfo.kind] ?? GMARKER;
+  const foldUnfold = () => setUnfold(!unfold);
   return (
     <div className="astinfo-section">
-      <div className="astinfo-markerbar" title={descr}>
+      <div className={barClass} title={descr}>
         <Icon
           className="astinfo-folderbutton"
+          style={{ visibility: contents.length ? 'visible' : 'hidden' }}
           size={9}
           offset={-2}
           id={unfold ? 'TRIANGLE.DOWN' : 'TRIANGLE.RIGHT'}
-          onClick={() => setUnfold(!unfold)}
+          onClick={foldUnfold}
         />
-        <Code className="astinfo-markercode">
-          <span className="astinfo-markerkind">{kind}</span>
-          {descr}
+        <Code className="astinfo-markercode" onClick={foldUnfold}>
+          {kind}{descr}
         </Code>
         <IconButton
           className="astinfo-markerbutton"
           size={9}
           offset={0}
           icon="PIN"
-          // onClick={() => console.log('PIN', marker)}
+          selected={props.pinned}
+          onClick={props.onPinned}
         />
         <IconButton
           className="astinfo-markerbutton"
           size={9}
           offset={0}
           icon="CIRC.CLOSE"
-          // onClick={() => console.log('CLOSE', marker)}
+          onClick={props.onRemove}
         />
       </div>
-      <div className="astinfo-infos">
+      <div
+        className="astinfo-infos"
+        style={{ display: unfold && contents.length ? 'grid' : 'none' }}
+      >
         {contents}
       </div>
     </div>
@@ -153,27 +174,102 @@ function InfoSection(props: InfoSectionProps) {
 }
 
 // --------------------------------------------------------------------------
+// --- Information Selection State
+// --------------------------------------------------------------------------
+
+type MarkerInfoModel = CompactModel<string, AST.markerInfoData>;
+
+class InfoMarkers {
+
+  private model: MarkerInfoModel = new CompactModel('key');
+  private selection: AST.marker[] = [];
+  private pinned = new Map<string, boolean>();
+  private selected: undefined | AST.marker = undefined;
+
+  setModel(model: MarkerInfoModel) {
+    this.model = model;
+    reloadASTinfo.emit();
+  }
+
+  setSelected(marker?: AST.marker, extend?: boolean) {
+    if (extend) {
+      const m = this.selected;
+      if (m) this.pinned.set(m, true);
+    }
+    this.selected = marker;
+    const keep = (m: AST.marker) => m === marker || this.isPinned(m);
+    this.selection = this.selection.filter(keep);
+    if (marker && this.selection.indexOf(marker) < 0)
+      this.selection.push(marker);
+    reloadASTinfo.emit();
+  }
+
+  isPinned(marker: AST.marker): boolean {
+    return this.pinned.get(marker) ?? false;
+  }
+
+  setPinned(marker: AST.marker, pinned: boolean) {
+    this.pinned.set(marker, pinned);
+    reloadASTinfo.emit();
+  }
+
+  removeMarker(marker: AST.marker) {
+    this.selection = this.selection.filter((m) => m !== marker);
+    this.pinned.delete(marker);
+    reloadASTinfo.emit();
+  }
+
+  renderSection(marker: AST.marker) {
+    const info = this.model.getData(marker);
+    if (!info) return null;
+    const pinned = this.isPinned(marker);
+    const selected = this.selected === marker;
+    const onPinned = () => this.setPinned(marker, !pinned);
+    const onRemove = () => this.removeMarker(marker);
+    return (
+      <MarkerInfoSection
+        key={marker}
+        marker={marker}
+        markerInfo={info}
+        pinned={pinned}
+        selected={selected}
+        onPinned={onPinned}
+        onRemove={onRemove}
+      />
+    );
+  }
+
+  renderSections(): React.ReactNode {
+    return this.selection.map((m) => this.renderSection(m));
+  }
+
+}
+
+// --------------------------------------------------------------------------
 // --- Information Panel
 // --------------------------------------------------------------------------
 
 export default function ASTinfo() {
-  const markersInfo = States.useSyncArray(AST.markerInfo);
-  const [selection/* , updateSelection */] = States.useSelection();
+  Dome.useUpdate(reloadASTinfo);
+  const markers = React.useMemo(() => new InfoMarkers(), []);
+  const model = States.useSyncArray(AST.markerInfo, false);
+  React.useEffect(() => markers.setModel(model), [markers, model]);
+  const [selection] = States.useSelection();
   const marker = selection?.current?.marker;
-
-  // render null when no selection
-  if (!marker) return null;
-  const markerInfo = markersInfo.getData(marker);
-  if (!markerInfo) return null;
-
-  // const data = States.useRequest(AST.getInfo, marker);
+  React.useEffect(() => markers.setSelected(marker), [markers, marker]);
+  const onMetaSelection = React.useCallback(
+    (loc: States.Location) => {
+      markers.setSelected(loc.marker, true);
+    }, [markers],
+  );
+  Dome.useEvent(States.MetaSelection, onMetaSelection);
   return (
     <Section
       settings="frama-c.astinfo.informations"
       label="Informations"
       title="Contextual informations on current selection"
     >
-      <InfoSection marker={marker} markerInfo={markerInfo} />
+      {markers.renderSections()}
     </Section>
   );
 }
