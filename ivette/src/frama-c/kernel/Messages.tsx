@@ -469,6 +469,7 @@ export default function RenderMessages() {
       </TitleBar>
       <RSplit
         settings="ivette.messages.filterSplit"
+        defaultPosition={225}
         unfold={showFilter}
       >
         <Table<string, Message>
