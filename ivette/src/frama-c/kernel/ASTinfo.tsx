@@ -68,22 +68,37 @@ const MarkerKind = (props: MarkerKindProps) => {
 const GMARKER =
   <MarkerKind label="M" title="Generic Marker" />;
 
-const MARKERS = {
-  [AST.markerKind.declaration]:
-  <MarkerKind label="D" title="Declaration" />,
-  [AST.markerKind.global]:
-  <MarkerKind label="G" title="Global" />,
-  [AST.markerKind.lvalue]:
-  <MarkerKind label="L" title="L-value" />,
-  [AST.markerKind.expression]:
-  <MarkerKind label="E" title="Expression" />,
-  [AST.markerKind.statement]:
-  <MarkerKind label="S" title="Statement" />,
-  [AST.markerKind.property]:
-  <MarkerKind label="P" title="Property" />,
-  [AST.markerKind.term]:
-  <MarkerKind label="T" title="Term" />,
-};
+const MARKERS = new Map<AST.markerKind, JSX.Element>();
+[
+  {
+    kind: AST.markerKind.declaration,
+    elt: <MarkerKind label="D" title="Declaration" />,
+  },
+  {
+    kind: AST.markerKind.global,
+    elt: <MarkerKind label="G" title="Global" />,
+  },
+  {
+    kind: AST.markerKind.lvalue,
+    elt: <MarkerKind label="L" title="L-value" />,
+  },
+  {
+    kind: AST.markerKind.expression,
+    elt: <MarkerKind label="E" title="Expression" />,
+  },
+  {
+    kind: AST.markerKind.statement,
+    elt: <MarkerKind label="S" title="Statement" />,
+  },
+  {
+    kind: AST.markerKind.property,
+    elt: <MarkerKind label="P" title="Property" />,
+  },
+  {
+    kind: AST.markerKind.term,
+    elt: <MarkerKind label="T" title="Term" />,
+  },
+].forEach(({ kind, elt }) => MARKERS.set(kind, elt));
 
 interface InfoItemProps {
   label: string;
@@ -138,7 +153,7 @@ function MarkerInfoSection(props: InfoSectionProps) {
     !props.selected && props.hovered && 'hovered',
   );
   const descr = markerInfo.descr ?? markerInfo.name;
-  const kind = MARKERS[markerInfo.kind] ?? GMARKER;
+  const kind = MARKERS.get(markerInfo.kind) ?? GMARKER;
   const foldUnfold = () => setUnfold(!unfold);
   return (
     <div className="astinfo-section">
