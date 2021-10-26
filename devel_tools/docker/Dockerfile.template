@@ -98,7 +98,12 @@ COPY --from=frama-c /bin /bin/
 COPY --from=frama-c /etc /etc/
 COPY --from=frama-c /lib /lib/
 COPY --from=frama-c /sbin /sbin/
+# RUN true cmds are a workaround against
+# obscure docker bug (https://github.com/moby/moby/issues/37965)
+# manifesting in sequences of COPY
+RUN true
 COPY --from=frama-c /usr /usr/
+RUN true
 COPY --from=frama-c --chown=opam:opam /home/opam/.opam /home/opam/.opam/
 COPY --from=frama-c /home/opam/.profile /home/opam/
 
@@ -119,7 +124,9 @@ COPY --from=frama-c-gui /bin /bin/
 COPY --from=frama-c-gui /etc /etc/
 COPY --from=frama-c-gui /lib /lib/
 COPY --from=frama-c-gui /sbin /sbin/
+RUN true
 COPY --from=frama-c-gui /usr /usr/
+RUN true
 COPY --from=frama-c-gui --chown=opam:opam /home/opam/.opam /home/opam/.opam/
 COPY --from=frama-c-gui /home/opam/.profile /home/opam/
 
@@ -193,7 +200,9 @@ COPY --from=frama-c-stripped-prepare /bin /bin/
 COPY --from=frama-c-stripped-prepare /etc /etc/
 COPY --from=frama-c-stripped-prepare /lib /lib/
 COPY --from=frama-c-stripped-prepare /sbin /sbin/
+RUN true
 COPY --from=frama-c-stripped-prepare /usr /usr/
+RUN true
 COPY --from=frama-c-stripped-prepare --chown=opam:opam /home/opam/.opam /home/opam/.opam/
 COPY --from=frama-c-stripped-prepare /home/opam/.profile /home/opam/
 
