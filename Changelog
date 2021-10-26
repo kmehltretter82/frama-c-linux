@@ -21,10 +21,10 @@ Open Source Release <next-release>
 Open Source Release 24.0 (Chromium)
 ###################################
 
--   Eva       [2021-10-19] New options to allow states partitioning to be kept
-              after function returns: -eva-interprocedural-split for splits from
-              annotations, and -eva-interprocedural-history for disjunctions
-              from the -eva-partition-history option.
+-   Eva       [2021-10-19] New options to allow states partitioning to survive
+              function returns: -eva-interprocedural-split for disjunctions
+              from split annotations, and -eva-interprocedural-history for
+              disjunctions from the -eva-partition-history option.
 -   Eva       [2021-10-14] Supports the evaluation of ACSL set comprehension.
 -   Eva       [2021-10-14] On a SIGINT signal (Ctrl-C), the analysis is stopped
               but partial results are saved if option -save is set.
@@ -36,7 +36,7 @@ Open Source Release 24.0 (Chromium)
 -   Eva       [2021-10-06] Improves the precision of the octagon domain on
               unsigned variables.
 -*  Eva       [2021-10-06] Fixes a soundness bug in the octagon domain on
-              integer downcasts.
+              integer downcasts wrapping around.
 -   Eva       [2021-09-10] Improves the symbolic-locations domain precision.
 -   Kernel    [2021-09-02] 0-sized flexible array members only available in
               gcc_* machdeps, that now also support FAM in nested struct.
