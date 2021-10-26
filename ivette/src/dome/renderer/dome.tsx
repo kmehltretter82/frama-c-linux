@@ -131,7 +131,7 @@ export function useEvent<A>(
       return () => evt.off(callback);
     }
     return undefined;
-  });
+  }, [evt, callback]);
 }
 
 // --------------------------------------------------------------------------
