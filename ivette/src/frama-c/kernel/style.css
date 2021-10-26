@@ -100,8 +100,7 @@
     cursor: default;
 }
 
-.astinfo-markercode:hover,
-.astinfo-markercode.selected
+.astinfo-markercode:hover
 {
     background: orange;
 }

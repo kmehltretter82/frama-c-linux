@@ -137,10 +137,6 @@ function MarkerInfoSection(props: InfoSectionProps) {
     props.selected && 'selected',
     !props.selected && props.hovered && 'hovered',
   );
-  const codeClassName = classes(
-    'astinfo-markercode',
-    props.selected && props.hovered && 'selected',
-  );
   const descr = markerInfo.descr ?? markerInfo.name;
   const kind = MARKERS[markerInfo.kind] ?? GMARKER;
   const foldUnfold = () => setUnfold(!unfold);
@@ -162,7 +158,7 @@ function MarkerInfoSection(props: InfoSectionProps) {
           onClick={foldUnfold}
         />
         <Code
-          className={codeClassName}
+          className="astinfo-markercode"
           onClick={props.onSelect}
         >
           {kind}{descr}
