@@ -36,6 +36,7 @@ import * as Preferences from 'ivette/prefs';
 import { functions, markerInfo } from 'frama-c/api/kernel/ast';
 import { Code } from 'dome/controls/labels';
 import { Hfill } from 'dome/layout/boxes';
+import { IconButton } from 'dome/controls/buttons';
 import * as Path from 'path';
 import * as Settings from 'dome/data/settings';
 import * as Status from 'frama-c/kernel/Status';
@@ -96,8 +97,12 @@ export default function SourceCode() {
   React.useEffect(() => buffer.setValue(result), [buffer, result]);
   React.useEffect(() => buffer.setCursorOnTop(line), [buffer, line, result]);
 
+  /* CodeMirror types used to bind callbacks to extraKeys. */
+  type position = CodeMirror.Position;
+  type editor = CodeMirror.Editor;
+
   const [command] = Settings.useGlobalSettings(Preferences.EditorCommand);
-  async function launchEditor(_: CodeMirror.Editor, pos?: CodeMirror.Position) {
+  async function launchEditor(_?: editor, pos?: position) {
     if (file !== '') {
       const selectedLine = pos ? (pos.line + 1).toString() : '1';
       const selectedChar = pos ? (pos.ch + 1).toString() : '1';
@@ -116,11 +121,7 @@ export default function SourceCode() {
     }
   }
 
-  async function contextMenu(
-    editor: CodeMirror.Editor,
-    pos?: CodeMirror.Position,
-  )
-  {
+  async function contextMenu(editor?: editor, pos?: position) {
     if (file !== '') {
       const items = [
         {
@@ -132,11 +133,22 @@ export default function SourceCode() {
     }
   }
 
+  const externalEditorTitle =
+    'Open the source file in an external editor.\nA Ctrl-click '
+    + 'in the source code opens the editor at the selected location.'
+    + '\nThe editor used can be configured in Ivette settings.';
+
   // Building the React component.
   return (
     <>
       <TitleBar>
-        <Code title={file}>{filename}</Code>
+        <IconButton
+          icon="DUPLICATE"
+          visible={file !== ''}
+          onClick={launchEditor}
+          title={externalEditorTitle}
+        />
+        <Code title={file} style={{ padding: '5px' }}>{filename}</Code>
         <Hfill />
         {themeButtons}
       </TitleBar>
