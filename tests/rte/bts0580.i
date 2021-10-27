@@ -1,5 +1,5 @@
 /* run.config 
-   OPT: -rte -warn-signed-overflow -rte-mem -print
+   STDOPT: #" -warn-signed-overflow -rte-mem -print"
 */
 struct ArrayStruct {
   int data[10];

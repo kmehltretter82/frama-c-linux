@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -rte -warn-signed-overflow -print
+   STDOPT: #" -warn-signed-overflow -print"
 */
 
 int main() {

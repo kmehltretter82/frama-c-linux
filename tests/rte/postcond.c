@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -rte -warn-signed-overflow -rte-no-mem -print
+   STDOPT: #" -warn-signed-overflow -rte-no-mem -print"
 */
 
 /*@ 

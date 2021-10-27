@@ -1,6 +1,6 @@
 /* run.config
-  OPT: -machdep x86_32 -rte -warn-signed-overflow  -warn-signed-downcast -print
-  OPT: -machdep x86_32 -rte -warn-signed-overflow  -warn-signed-downcast -no-collapse-call-cast -print
+  STDOPT: +"-machdep x86_32 -warn-signed-overflow  -warn-signed-downcast -print"
+  STDOPT: +"-machdep x86_32 -warn-signed-overflow  -warn-signed-downcast -no-collapse-call-cast -print"
 */
 
 /*@

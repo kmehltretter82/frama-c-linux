@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -rte -warn-signed-overflow -warn-signed-downcast -print -machdep x86_32
+   STDOPT: #" -warn-signed-overflow -warn-signed-downcast -print -machdep x86_32"
 */
 
 int main() {

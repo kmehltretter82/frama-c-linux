@@ -1,3 +1,8 @@
+/* run.config
+  COMMENT: does not check RTE plugin!
+  PLUGIN: @EVA_PLUGINS@
+  OPT: @EVA_TEST@
+*/
 #include <stddef.h>
 
 size_t fsize3(int n) {

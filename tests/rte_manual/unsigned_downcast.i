@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -rte -warn-unsigned-downcast -then -print
+   STDOPT: #"-warn-unsigned-downcast "
  */
 
 unsigned char f(int a, int b) {

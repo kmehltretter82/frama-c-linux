@@ -1,6 +1,6 @@
 /* run.config
-   OPT: -rte -warn-signed-overflow -print -machdep x86_32
-   OPT: -rte -warn-signed-overflow -print -machdep x86_64
+   STDOPT: #" -warn-signed-overflow -print -machdep x86_32"
+   STDOPT: #" -warn-signed-overflow -print -machdep x86_64"
 */
 
 

@@ -1,6 +1,6 @@
 /* run.config
  PLUGIN: @EVA_PLUGINS@
-   STDOPT:
+   OPT: @EVA_TEST@
 */
 
 unsigned long long f(int x) {
