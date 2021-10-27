@@ -663,11 +663,7 @@ export function useFlipSettings(
   const [state, setState] = Settings.useWindowSettings(
     key, Json.jBoolean, defaultValue,
   );
-  const flipState = React.useCallback(
-    () => setState(!state),
-    [state, setState],
-  );
-  return [state, flipState];
+  return [state, () => setState(!state)];
 }
 
 /** Number window settings helper. Default is `0` unless specified. */

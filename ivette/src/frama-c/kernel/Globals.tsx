@@ -185,6 +185,7 @@ export default () => {
       label="Functions"
       title={title}
       onContextMenu={onContextMenu}
+      settings='frama-c.sidebar.globals'
       defaultUnfold
     >
       {filtered.map((fct) => (

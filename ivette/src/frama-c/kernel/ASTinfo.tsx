@@ -132,7 +132,7 @@ interface InfoSectionProps {
   onRemove: () => void;
 }
 
-function MarkerInfoSection(props: InfoSectionProps) {
+function MarkInfos(props: InfoSectionProps) {
   Dome.useUpdate(reloadASTinfo);
   const [unfold, setUnfold] = React.useState(true);
   const { marker, markerInfo } = props;
@@ -263,7 +263,7 @@ class InfoMarkers {
     reloadASTinfo.emit();
   }
 
-  renderSection(mark: Mark) {
+  renderMark(mark: Mark) {
     const { marker } = mark;
     const info = this.model.getData(marker);
     if (!info) return null;
@@ -275,7 +275,7 @@ class InfoMarkers {
     const onHover = (h: boolean) => States.setHovered(h ? mark : undefined);
     const onSelect = () => States.setSelection(mark);
     return (
-      <MarkerInfoSection
+      <MarkInfos
         key={marker}
         marker={marker}
         markerInfo={info}
@@ -290,8 +290,8 @@ class InfoMarkers {
     );
   }
 
-  renderSections(): React.ReactNode {
-    return this.selection.map((m) => this.renderSection(m));
+  renderMarks(): React.ReactNode {
+    return this.selection.map((m) => this.renderMark(m));
   }
 
 }
@@ -314,11 +314,12 @@ export default function ASTinfo() {
   Dome.useEvent(States.MetaSelection, (loc) => markers.setSelected(loc, true));
   return (
     <Section
-      settings="frama-c.astinfo.informations"
+      defaultUnfold
+      settings="frama-c.sidebar.astinfo"
       label="Informations"
       title="Contextual informations on current selection"
     >
-      {markers.renderSections()}
+      {markers.renderMarks()}
     </Section>
   );
 }
