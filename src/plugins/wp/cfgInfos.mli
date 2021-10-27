@@ -40,4 +40,7 @@ val smoking : t -> Cil_types.stmt -> bool
 val unreachable : t -> Cfg.vertex -> bool
 val terminates_deps : t -> Property.Set.t
 
+val is_recursive : Kernel_function.t -> bool
+val get_cluster : Kernel_function.t -> Kernel_function.Set.t option
+
 (**************************************************************************)

@@ -237,6 +237,12 @@ let get_terminates_hyp kf =
   | Defined (_, p) -> false, p
   | Assumed p -> true, p
 
+let get_decreases_goal kf =
+  let defined t = WpPropId.mk_decrease_id kf Kglobal t, t in
+  match Annotations.decreases ~populate:false kf with
+  | None -> None
+  | Some v -> Some (defined v)
+
 (* -------------------------------------------------------------------------- *)
 (* --- Contracts                                                          --- *)
 (* -------------------------------------------------------------------------- *)

@@ -123,6 +123,14 @@ let selected_terminates ~prop kf =
       let tp_names = WpPropId.user_pred_names ip.Cil_types.ip_content in
       WpPropId.are_selected_names prop (tk_name :: tp_names)
 
+let selected_decreases ~prop kf =
+  match Annotations.decreases kf with
+  | None -> false
+  | Some (it, _) ->
+      let tk_name = "@decreases" in
+      let tp_names = WpPropId.ident_names it.term_name in
+      WpPropId.are_selected_names prop (tk_name :: tp_names)
+
 let selected_disjoint_complete kf ~bhv ~prop =
   selected_default ~bhv &&
   ( selected_clause ~prop "@complete_behaviors" Annotations.complete kf ||
@@ -144,7 +152,7 @@ let selected_main_bhv ~bhv ~prop (b : Cil_types.funbehavior) =
 (* --- Calls                                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
-let collect_calls ~bhv kf stmt =
+let collect_calls ~bhv ?(on_missing_calls=fun _ -> ()) kf stmt =
   let open Cil_types in
   match stmt.skind with
   | Instr(Call(_,fct,_,_)) ->
@@ -156,11 +164,16 @@ let collect_calls ~bhv kf stmt =
               if bhv = []
               then List.map (fun b -> b.b_name) (Annotations.behaviors kf)
               else bhv in
-            List.fold_left
-              (fun fs bhv -> match Dyncall.get ~bhv stmt with
-                 | None -> fs
-                 | Some(_,kfs) -> List.fold_right Fset.add kfs fs
-              ) Fset.empty bhvs
+            let calls =
+              List.fold_left
+                (fun fs bhv -> match Dyncall.get ~bhv stmt with
+                   | None -> fs
+                   | Some(_,kfs) -> List.fold_right Fset.add kfs fs
+                ) Fset.empty bhvs
+            in
+            if Fset.is_empty calls then
+              on_missing_calls stmt ;
+            calls
       end
   | Instr(Local_init(x,ConsInit(vf, args, kind), loc)) ->
       Cil.treat_constructor_as_func
@@ -170,6 +183,114 @@ let collect_calls ~bhv kf stmt =
            | None -> Fset.empty)
         x vf args kind loc
   | _ -> Fset.empty
+
+(* -------------------------------------------------------------------------- *)
+(* --- Recursion                                                          --- *)
+(* -------------------------------------------------------------------------- *)
+
+module Callees = WpContext.StaticGenerator(Kernel_function)
+    (struct
+      type key = Kernel_function.t
+      type data = Fset.t * Cil_types.stmt list
+      (** functions + unspecified function pointer calls *)
+      let name = "Wp.CfgInfos.SCallees"
+      let compile = function
+        | { Cil_types.fundec = Definition(fd, _ ) } as kf ->
+            let stmts = ref [] in
+            let on_missing_calls s = stmts := s :: !stmts in
+            let fold e s =
+              Fset.union e (collect_calls ~on_missing_calls ~bhv:[] kf s)
+            in
+            let kfs = List.fold_left fold Fset.empty fd.sallstmts in
+            kfs, !stmts
+        | _ -> Fset.empty, []
+    end)
+
+module RecursiveClusters : sig
+  val is_recursive : Kernel_function.t -> bool
+  val get_cluster : Kernel_function.t -> Kernel_function.Set.t option
+end =
+struct
+  (* Tarjan's algorithm, adapted from:
+       http://pauillac.inria.fr/~levy/why3/graph/abs/scct/2/scc.html
+     (proved in Why3)
+  *)
+  let successors kf = fst @@ Callees.get kf
+
+  module HT = Cil_datatype.Kf.Hashtbl
+
+  type env = {
+    mutable stack: Fset.elt list;
+    mutable id: int;
+    table: (Fset.elt, int) Hashtbl.t ;
+    clusters: Fset.t option HT.t ;
+  }
+
+  let rec unstack_to x ?(cluster=[]) = function
+    | [] -> cluster, []
+    | y :: s' when Kernel_function.equal y x -> x :: cluster, s'
+    | y :: s' -> unstack_to x ~cluster:(y :: cluster) s'
+
+  let rec dfs roots env =
+    try
+      let v = Fset.choose roots in
+      let vn =
+        try Hashtbl.find env.table v
+        with Not_found -> visit_node v env
+      in
+      let others_n = dfs (Fset.remove v roots) env in
+      min vn others_n
+    with Not_found -> max_int
+  and visit_node x env =
+    let n = env.id in
+    Hashtbl.replace env.table x n ;
+    env.id <- n + 1;
+    env.stack <- x :: env.stack;
+    let base = dfs (successors x) env in
+    if base < n then base
+    else begin
+      let (cluster, stack) = unstack_to x env.stack in
+      List.iter (fun v -> Hashtbl.replace env.table v max_int) cluster ;
+      env.stack <- stack;
+      begin match cluster with
+        | [ x ] when base = max_int ->
+            HT.add env.clusters x None
+        | cluster ->
+            let set = Some (Fset.of_list cluster) in
+            List.iter (fun kf -> HT.add env.clusters kf set) cluster
+      end ;
+      max_int
+    end
+
+  let make_clusters s =
+    let e = {
+      stack = []; id = 0; table = Hashtbl.create 37; clusters = HT.create 37
+    } in
+    ignore (dfs s e);
+    e.clusters
+
+  module RTable =
+    State_builder.Option_ref(HT.Make(Datatype.Option(Fset)))
+      (struct
+        let name = "Wp.CfgInfo.RecursiveClusters"
+        let dependencies = [ Ast.self ]
+      end)
+
+  let create () =
+    let kfs = ref Kernel_function.Set.empty in
+    Globals.Functions.iter(fun kf -> kfs := Fset.add kf !kfs) ;
+    make_clusters !kfs
+
+  let table () = RTable.memo create
+
+  let get_cluster kf = HT.find (table ()) kf
+  let is_recursive kf =
+    (* in a recursive cluster or contains unspecified function pointer call *)
+    None <> get_cluster kf || [] <> snd @@ Callees.get kf
+end
+
+let is_recursive = RecursiveClusters.is_recursive
+let get_cluster = RecursiveClusters.get_cluster
 
 (* -------------------------------------------------------------------------- *)
 (* --- No variant loops                                                   --- *)
@@ -289,6 +410,10 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
   Option.iter
     begin fun (cfg : Cfg.automaton) ->
       (* Spec Iteration *)
+      if selected_decreases ~prop kf then
+        Wp_parameters.warning
+          "Unsupported clause @decreases in '%a' (ignored)"
+          Kernel_function.pretty kf ;
       if selected_terminates ~prop kf ||
          selected_disjoint_complete kf ~bhv ~prop ||
          (List.exists (selected_bhv ~smoking ~bhv ~prop) behaviors)
@@ -343,20 +468,42 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
   Bag.iter
     (fun p -> if WpPropId.filter_status p then WpAnnot.set_unreachable p)
     infos.doomed ;
-  (* Trivial terminates *)
+  (* Termination *)
   let infos =
     if Kernel_function.is_definition kf then
       match CfgAnnot.get_terminates_goal kf with
-      | Some (id, _)
-        when
-          selected_terminates ~prop kf
-          && infos.calls = Fset.empty
-          && infos.no_variant_loops = Sset.empty ->
-          WpAnnot.set_trivially_terminates id infos.terminates_deps ;
-          (* Drop dependencies for this terminates, we've used it. *)
-          { infos with terminates_deps = Pset.empty }
-      | _ ->
-          infos
+      | Some (id, _) when selected_terminates ~prop kf ->
+          let warning_locs =
+            List.map Cil_datatype.Stmt.loc @@ snd @@ Callees.get kf
+          in
+          if warning_locs <> [] then
+            Wp_parameters.warning ~once:true
+              "In '%a', no 'calls' specification for statement(s) on \
+               line(s): %a, @\nAssuming that they can call '%a'"
+              Kernel_function.pretty kf
+              (Pretty_utils.pp_list ~sep:", " Cil_datatype.Location.pretty_line)
+              warning_locs
+              Kernel_function.pretty kf ;
+          if is_recursive kf then
+            (* Notes:
+               - a recursive function never trivially terminates,
+               - in absence of decreases, CfgCalculus will warn *)
+            begin match CfgAnnot.get_decreases_goal kf with
+              | None -> infos
+              | Some (id, _) ->
+                  let deps =
+                    Pset.add (WpPropId.property_of_id id) infos.terminates_deps
+                  in
+                  { infos with terminates_deps = deps }
+            end
+          else if infos.calls = Fset.empty
+               && infos.no_variant_loops = Sset.empty then begin
+            WpAnnot.set_trivially_terminates id infos.terminates_deps ;
+            (* Drop dependencies for this terminates, we've used it. *)
+            { infos with terminates_deps = Pset.empty }
+          end
+          else infos
+      | _ -> infos
     else infos
   in
   (* Collected Infos *)
