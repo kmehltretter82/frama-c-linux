@@ -896,7 +896,7 @@ end = struct
 
   let make_custom_opts =
     let space = Str.regexp " " in
-    fun stdopts s ->
+    fun ~file stdopts s ->
       let rec aux opts s =
         try
           Scanf.sscanf s "%_[ ]%1[+#\\-]%_[ ]%S%_[ ]%s@\n"
@@ -909,7 +909,7 @@ end = struct
         with
         | Scanf.Scan_failure _ ->
           if s <> "" then
-            lock_eprintf "unknown STDOPT configuration string: %s\n%!" s;
+            lock_eprintf "%s: unknown STDOPT configuration string: %s\n%!" file s;
           opts
         | End_of_file -> opts
       in
@@ -925,27 +925,30 @@ end = struct
 
   (* how to process options *)
   let config_exec ~warn ~once ~file dir s current =
+    let s = Macros.expand current.dc_macros s in
     { current with
       dc_execnow =
         scan_execnow ~warn ~once ~file dir current.dc_macros current.dc_timeout s :: current.dc_execnow }
 
-  let config_macro ~file _dir s current =
+  let config_macro =
     let regex = Str.regexp "[ \t]*\\([^ \t@]+\\)\\([ \t]+\\(.*\\)\\|$\\)" in
-    Mutex.lock str_mutex;
-    if Str.string_match regex s 0 then begin
-      let name = Str.matched_group 1 s in
-      let def =
-        try Str.matched_group 3 s with Not_found -> (* empty text *) ""
-      in
-      Mutex.unlock str_mutex;
-      if !verbosity >= 4 then
-        lock_printf "%%   - New macro %s with definition %s\n%!" name def;
-      { current with dc_macros = Macros.add_expand name def current.dc_macros }
-    end else begin
-      Mutex.unlock str_mutex;
-      lock_eprintf "%s: cannot understand MACRO definition: %s\n%!" file s;
-      current
-    end
+    fun ~file _dir s current ->
+      let s = Macros.expand current.dc_macros s in
+      Mutex.lock str_mutex;
+      if Str.string_match regex s 0 then begin
+        let name = Str.matched_group 1 s in
+        let def =
+          try Str.matched_group 3 s with Not_found -> (* empty text *) ""
+        in
+        Mutex.unlock str_mutex;
+        if !verbosity >= 4 then
+          lock_printf "%%   - New macro %s with definition %s\n%!" name def;
+        { current with dc_macros = Macros.add_expand name def current.dc_macros }
+      end else begin
+        Mutex.unlock str_mutex;
+        lock_eprintf "%s: cannot understand MACRO definition: %s\n%!" file s;
+        current
+      end
 
   let update_module_libs_name s =
     "@PTEST_DIR@/" ^ (Filename.remove_extension s) ^ (if !use_byte then ".cmo" else ".cmxs")
@@ -992,17 +995,21 @@ end = struct
     update_macros (fun name -> name) "-load-module=" "PTEST_PLUGIN" "PTEST_LOAD_PLUGIN"
 
   let config_module ~file dir s current =
-    let deps = str_split_list (Macros.expand current.dc_macros s) in
+    let s = Macros.expand current.dc_macros s in
+    let deps = str_split_list s in
     let current = update_module_macros current deps in
     add_make_modules ~file dir deps current
 
   let config_libs_script_plugin update ~file dir s current =
-    let deps = str_split_list (Macros.expand current.dc_macros s) in
+    let s = Macros.expand current.dc_macros s in
+    let deps = str_split_list s in
     update current deps
 
   let config_options =
     [ "CMD",
-      (fun ~file:_ _ s current -> { current with dc_default_toplevel = s});
+      (fun ~file:_ _ s current ->
+         let s = Macros.expand current.dc_macros s in
+         { current with dc_default_toplevel = s});
 
       "OPT",
       (fun ~file _ s current ->
@@ -1010,6 +1017,7 @@ end = struct
            lock_eprintf
              "%s: a NOFRAMAC directive has been defined before a sub-test defined by a 'OPT' directive (That NOFRAMAC directive could be misleading.).@."
              file;
+         let s = Macros.expand current.dc_macros s in
          let t =
            { toplevel= current.dc_default_toplevel;
              opts= s;
@@ -1028,11 +1036,12 @@ end = struct
            lock_eprintf
              "%s: a NOFRAMAC directive has been defined before a sub-test defined by a 'STDOPT' directive (That NOFRAMAC directive could be misleading.).@."
              file;
+         let s = Macros.expand current.dc_macros s in
          let new_top =
            List.map
              (fun command ->
                 { toplevel = current.dc_default_toplevel;
-                  opts= make_custom_opts command.opts s;
+                  opts= make_custom_opts ~file command.opts s;
                   logs= command.logs @ current.dc_default_log;
                   macros= current.dc_macros;
                   exit_code = current.dc_exit_code;
@@ -1044,10 +1053,13 @@ end = struct
                         dc_default_log = !default_parsing_env.current_default_log });
 
       "FILEREG",
-      (fun ~file:_ _ s current -> { current with dc_test_regexp = s });
+      (fun ~file:_ _ s current ->
+         let s = Macros.expand current.dc_macros s in
+         { current with dc_test_regexp = s });
 
       "FILTER",
       (fun ~file:_ _ s current ->
+         let s = Macros.expand current.dc_macros s in
          let s = trim_right s in
          match current.dc_filter with
          | None when s="" -> { current with dc_filter = None }
@@ -1055,7 +1067,9 @@ end = struct
          | Some filter    -> { current with dc_filter = Some (s ^ " | " ^ filter) });
 
       "EXIT",
-      (fun ~file:_ _ s current -> { current with dc_exit_code = Some s });
+      (fun ~file:_ _ s current ->
+         let s = Macros.expand current.dc_macros s in
+         { current with dc_exit_code = Some s });
 
       "GCC",
       (fun ~file _ _ acc ->
@@ -1080,10 +1094,14 @@ end = struct
       "PLUGIN", config_libs_script_plugin update_plugin_macros;
 
       "LOG",
-      (fun ~file:_ _ s current -> { current with dc_default_log = s :: current.dc_default_log });
+      (fun ~file:_ _ s current ->
+         let s = Macros.expand current.dc_macros s in
+         { current with dc_default_log = s :: current.dc_default_log });
 
       "TIMEOUT",
-      (fun ~file:_ _ s current -> { current with dc_timeout = s });
+      (fun ~file:_ _ s current ->
+         let s = Macros.expand current.dc_macros s in
+         { current with dc_timeout = s });
 
       "NOFRAMAC",
       (fun ~file _ _ current ->
