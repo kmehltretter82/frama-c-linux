@@ -487,7 +487,7 @@ module TerminatesDefinitions =
                 considered to terminate when called."
   end)
 
-module TerminatesFCDeclarations =
+module TerminatesStdlibDeclarations =
   False(struct
     let option_name = "-wp-frama-c-stdlib-terminate"
     let help = "Frama-C stdlib functions without terminates specification \

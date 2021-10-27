@@ -202,18 +202,25 @@ let get_terminates_clause kf =
    *      - then handled in a Some case (as user defined) and returns Defined *)
   let defined p =
     Defined (WpPropId.mk_terminates_id kf Kglobal p, normalize_terminates p) in
-  let populate_true () =
+  let populate_true ?(silence=false) () =
     let p = Logic_const.new_predicate @@ Logic_const.ptrue in
-    Wp_parameters.warning
-      ~source:(fst @@ Kernel_function.get_location kf) ~once:true
-      "Missing terminates clause for %a, populates 'terminates \\true'"
-      Kernel_function.pretty kf ;
+    if not silence then
+      Wp_parameters.warning
+        ~source:(fst @@ Kernel_function.get_location kf) ~once:true
+        "Missing terminates clause for %a, populates 'terminates \\true'"
+        Kernel_function.pretty kf ;
     Annotations.add_terminates wp_populate_terminates kf p ;
     defined p
   in
+  let kf_vi = Kernel_function.get_vi kf in
+  let kf_name = Kernel_function.get_name kf in
   match Annotations.terminates kf with
+  | None
+    when Cil_builtins.is_builtin kf_vi
+      || Cil_builtins.is_special_builtin kf_name ->
+      populate_true ~silence:true ()
   | None when Kernel_function.is_in_libc kf ->
-      if not @@ Wp_parameters.TerminatesFCDeclarations.get ()
+      if not @@ Wp_parameters.TerminatesStdlibDeclarations.get ()
       then Assumed Logic_const.pfalse
       else populate_true ()
   | None when Kernel_function.is_definition kf ->
