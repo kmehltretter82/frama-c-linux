@@ -33,6 +33,7 @@ import { Hpack, Filler } from 'dome/layout/boxes';
 import { Icon } from 'dome/controls/icons';
 import { Cell } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
+import { ModelProp, Model } from 'frama-c/plugins/eva/model';
 
 // Frama-C
 import * as States from 'frama-c/states';
@@ -44,7 +45,6 @@ import { sizeof, EvaValues, EvaState } from './cells';
 import { Probe } from './probes';
 import { Row } from './layout';
 import { Callsite } from './stacks';
-import { useModel } from './model';
 import { Stmt } from './valueinfos';
 import './style.css';
 
@@ -91,7 +91,7 @@ function computeDiffs(
 // --- Table Cell
 // --------------------------------------------------------------------------
 
-interface TableCellProps {
+interface TableCellProps extends ModelProp {
   probe: Probe;
   row: Row;
 }
@@ -99,9 +99,8 @@ interface TableCellProps {
 const CELLPADDING = 12;
 
 function TableCell(props: TableCellProps) {
-  const model = useModel();
+  const { probe, row, model } = props;
   const [, setSelection] = States.useSelection();
-  const { probe, row } = props;
   const { kind, callstack } = row;
   const minWidth = CELLPADDING + WSIZER.dimension(probe.minCols);
   const maxWidth = CELLPADDING + WSIZER.dimension(probe.maxCols);
@@ -276,10 +275,11 @@ function TableHead(props: TableHeadProps) {
 interface TableRowProps {
   style: React.CSSProperties;
   index: number;
+  data: Model;
 }
 
 function TableRow(props: TableRowProps) {
-  const model = useModel();
+  const model = props.data;
   const row = model.getRow(props.index);
   if (!row) return null;
   const { kind, probes } = row;
@@ -319,6 +319,7 @@ function TableRow(props: TableRowProps) {
       key={probe.marker}
       probe={probe}
       row={row}
+      model={model}
     />
   );
   return (
@@ -348,11 +349,11 @@ export interface Dimension {
 
 export interface ValuesPanelProps extends Dimension {
   zoom: number;
+  model: Model;
 }
 
 export function ValuesPanel(props: ValuesPanelProps) {
-  const model = useModel();
-  const { zoom, width, height } = props;
+  const { zoom, width, height, model } = props;
   // --- reset line cache
   const listRef = React.useRef<VariableSizeList>(null);
   Dome.useEvent(model.laidout, () => {

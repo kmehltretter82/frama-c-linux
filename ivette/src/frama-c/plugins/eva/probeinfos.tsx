@@ -37,15 +37,15 @@ import * as States from 'frama-c/states';
 // Locals
 import { SizedArea } from './sized';
 import { sizeof } from './cells';
-import { useModel } from './model';
+import { ModelProp } from './model';
 import { Stmt } from './valueinfos';
 
 // --------------------------------------------------------------------------
 // --- Probe Editor
 // --------------------------------------------------------------------------
 
-function ProbeEditor() {
-  const model = useModel();
+function ProbeEditor(props: ModelProp) {
+  const { model } = props;
   const probe = model.getFocused();
   if (!probe || !probe.code) return null;
   const { label } = probe;
@@ -105,8 +105,8 @@ function ProbeEditor() {
 // --- Probe Panel
 // --------------------------------------------------------------------------
 
-export function ProbeInfos() {
-  const model = useModel();
+export function ProbeInfos(props: ModelProp) {
+  const { model } = props;
   const probe = model.getFocused();
   const fct = probe?.fct;
   const byCS = fct ? model.isByCallstacks(fct) : false;
@@ -117,7 +117,7 @@ export function ProbeInfos() {
   const vstmt = model.getVstmt();
   return (
     <Hpack className="eva-probeinfo">
-      <ProbeEditor />
+      <ProbeEditor model={model} />
       <Filler />
       <ButtonGroup
         enabled={!!probe}
