@@ -54,9 +54,9 @@
       "enabled": [
         "*", "CERT", "CERT:EXP", "CERT:EXP:46", "CERT:MSC", "CERT:MSC:37",
         "CERT:MSC:38", "acsl-extension", "annot", "annot:missing-spec",
-        "annot:multi-from", "annot-error", "assembly", "audit", "check",
-        "check:volatile", "cmdline", "ghost", "ghost:bad-use", "inline",
-        "linker", "linker:drop-conflicting-unused", "parser",
+        "annot:multi-from", "annot-error", "asm", "asm:clobber", "audit",
+        "check", "check:volatile", "cmdline", "ghost", "ghost:bad-use",
+        "inline", "linker", "linker:drop-conflicting-unused", "parser",
         "parser:conditional-feature", "parser:unsupported", "pp",
         "pp:compilation-db", "typing", "typing:implicit-conv-void-ptr",
         "typing:implicit-function-declaration",

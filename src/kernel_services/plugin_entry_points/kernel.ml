@@ -201,7 +201,7 @@ let () = set_warn_status wkey_audit Log.Werror
 
 let wkey_parser_unsupported = register_warn_category "parser:unsupported"
 
-let wkey_asm = register_warn_category "assembly"
+let wkey_asm = register_warn_category "asm:clobber"
 
 (* ************************************************************************* *)
 (** {2 Specialised functors for building kernel parameters} *)
