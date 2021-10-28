@@ -1,7 +1,7 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module inout,eva -eva @EVA_CONFIG@ -lib-entry -eva-context-width 4 -eva-initialization-padding-globals no
+ PLUGIN: @EVA_MAIN_PLUGINS@
+   OPT: -eva @EVA_CONFIG@ -lib-entry -eva-context-width 4 -eva-initialization-padding-globals no
 */
-
 typedef struct {
   int f1;
   float f2;

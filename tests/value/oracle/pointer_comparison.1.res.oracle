@@ -6,52 +6,52 @@
   x ∈ {0}
   y ∈ {0}
   p ∈ {0}
-[eva] tests/value/pointer_comparison.c:8: Frama_C_show_each_1t: {{ &x + {4} }}
-[eva:pointer-comparison] tests/value/pointer_comparison.c:10: 
+[eva] tests/value/pointer_comparison.c:13: Frama_C_show_each_1t: {{ &x + {4} }}
+[eva:pointer-comparison] tests/value/pointer_comparison.c:15: 
   invalid pointer comparison: invalid pointer(s)
-[eva:pointer-comparison] tests/value/pointer_comparison.c:10: 
+[eva:pointer-comparison] tests/value/pointer_comparison.c:15: 
   evaluating condition to {0; 1} instead of {0} because of UPCPA
-[eva] tests/value/pointer_comparison.c:10: Frama_C_show_each_2: {{ &x + {8} }}
-[eva:pointer-comparison] tests/value/pointer_comparison.c:10: 
+[eva] tests/value/pointer_comparison.c:15: Frama_C_show_each_2: {{ &x + {8} }}
+[eva:pointer-comparison] tests/value/pointer_comparison.c:15: 
   evaluating condition to {0; 1} instead of {1} because of UPCPA
-[eva] tests/value/pointer_comparison.c:11: Frama_C_show_each_2e: {{ &x + {8} }}
-[eva:pointer-comparison] tests/value/pointer_comparison.c:12: 
+[eva] tests/value/pointer_comparison.c:16: Frama_C_show_each_2e: {{ &x + {8} }}
+[eva:pointer-comparison] tests/value/pointer_comparison.c:17: 
   invalid pointer comparison: invalid pointer(s)
-[eva:pointer-comparison] tests/value/pointer_comparison.c:12: 
+[eva:pointer-comparison] tests/value/pointer_comparison.c:17: 
   evaluating condition to {0; 1} instead of {0} because of UPCPA
-[eva] tests/value/pointer_comparison.c:12: Frama_C_show_each_3: {{ &x + {12} }}
-[eva:pointer-comparison] tests/value/pointer_comparison.c:12: 
+[eva] tests/value/pointer_comparison.c:17: Frama_C_show_each_3: {{ &x + {12} }}
+[eva:pointer-comparison] tests/value/pointer_comparison.c:17: 
   evaluating condition to {0; 1} instead of {1} because of UPCPA
-[eva] tests/value/pointer_comparison.c:13: Frama_C_show_each_3e: {{ &x + {12} }}
-[eva:pointer-comparison] tests/value/pointer_comparison.c:14: 
+[eva] tests/value/pointer_comparison.c:18: Frama_C_show_each_3e: {{ &x + {12} }}
+[eva:pointer-comparison] tests/value/pointer_comparison.c:19: 
   invalid pointer comparison: invalid pointer(s)
-[eva:pointer-comparison] tests/value/pointer_comparison.c:14: 
+[eva:pointer-comparison] tests/value/pointer_comparison.c:19: 
   evaluating condition to {0; 1} instead of {0} because of UPCPA
-[eva] tests/value/pointer_comparison.c:14: Frama_C_show_each_4: {{ &x + {16} }}
-[eva:pointer-comparison] tests/value/pointer_comparison.c:14: 
+[eva] tests/value/pointer_comparison.c:19: Frama_C_show_each_4: {{ &x + {16} }}
+[eva:pointer-comparison] tests/value/pointer_comparison.c:19: 
   evaluating condition to {0; 1} instead of {1} because of UPCPA
-[eva] tests/value/pointer_comparison.c:15: Frama_C_show_each_4e: {{ &x + {16} }}
-[eva:pointer-comparison] tests/value/pointer_comparison.c:16: 
+[eva] tests/value/pointer_comparison.c:20: Frama_C_show_each_4e: {{ &x + {16} }}
+[eva:pointer-comparison] tests/value/pointer_comparison.c:21: 
   invalid pointer comparison: invalid pointer(s)
-[eva:alarm] tests/value/pointer_comparison.c:16: Warning: 
+[eva:alarm] tests/value/pointer_comparison.c:21: Warning: 
   pointer downcast. assert (unsigned int)p ≤ 2147483647;
-[eva:alarm] tests/value/pointer_comparison.c:16: Warning: 
+[eva:alarm] tests/value/pointer_comparison.c:21: Warning: 
   pointer downcast. assert (unsigned int)(&y) ≤ 2147483647;
-[eva] tests/value/pointer_comparison.c:16: Frama_C_show_each_5: {{ &x + {16} }}
-[eva] tests/value/pointer_comparison.c:17: Frama_C_show_each_5e: {{ &x + {16} }}
-[eva:pointer-comparison] tests/value/pointer_comparison.c:18: 
+[eva] tests/value/pointer_comparison.c:21: Frama_C_show_each_5: {{ &x + {16} }}
+[eva] tests/value/pointer_comparison.c:22: Frama_C_show_each_5e: {{ &x + {16} }}
+[eva:pointer-comparison] tests/value/pointer_comparison.c:23: 
   invalid pointer comparison: invalid pointer(s)
-[eva:pointer-comparison] tests/value/pointer_comparison.c:18: 
+[eva:pointer-comparison] tests/value/pointer_comparison.c:23: 
   evaluating condition to {0; 1} instead of {0} because of UPCPA
-[eva] tests/value/pointer_comparison.c:18: Frama_C_show_each_6: {{ &x + {20} }}
-[eva] tests/value/pointer_comparison.c:18: starting to merge loop iterations
-[eva] tests/value/pointer_comparison.c:18: 
+[eva] tests/value/pointer_comparison.c:23: Frama_C_show_each_6: {{ &x + {20} }}
+[eva] tests/value/pointer_comparison.c:23: starting to merge loop iterations
+[eva] tests/value/pointer_comparison.c:23: 
   Frama_C_show_each_6: {{ &x + {20; 24} }}
-[eva] tests/value/pointer_comparison.c:18: 
+[eva] tests/value/pointer_comparison.c:23: 
   Frama_C_show_each_6: {{ &x + {20; 24; 28} }}
-[eva] tests/value/pointer_comparison.c:18: 
+[eva] tests/value/pointer_comparison.c:23: 
   Frama_C_show_each_6: {{ &x + [20..--],0%4 }}
-[eva:pointer-comparison] tests/value/pointer_comparison.c:18: 
+[eva:pointer-comparison] tests/value/pointer_comparison.c:23: 
   evaluating condition to {0; 1} instead of {1} because of UPCPA
 [eva] Recording results for main
 [eva] done for function main
@@ -77,10 +77,10 @@
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion 'Eva,pointer_downcast' (file tests/value/pointer_comparison.c, line 16)
+[    -    ] Assertion 'Eva,pointer_downcast' (file tests/value/pointer_comparison.c, line 21)
             assert Eva: pointer_downcast: (unsigned int)p ≤ 2147483647;
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_downcast' (file tests/value/pointer_comparison.c, line 16)
+[    -    ] Assertion 'Eva,pointer_downcast' (file tests/value/pointer_comparison.c, line 21)
             assert Eva: pointer_downcast: (unsigned int)(&y) ≤ 2147483647;
             tried with Eva.
 
@@ -97,41 +97,41 @@
   x ∈ {0}
   y ∈ {0}
   p ∈ {0}
-[eva] tests/value/pointer_comparison.c:8: Frama_C_show_each_1t: {{ &x + {4} }}
-[eva:alarm] tests/value/pointer_comparison.c:10: Warning: 
+[eva] tests/value/pointer_comparison.c:13: Frama_C_show_each_1t: {{ &x + {4} }}
+[eva:alarm] tests/value/pointer_comparison.c:15: Warning: 
   pointer comparison.
   assert \pointer_comparable((void *)tmp_0, (void *)(&y));
   (tmp_0 from p++)
-[eva] tests/value/pointer_comparison.c:10: Frama_C_show_each_2: {{ &x + {8} }}
-[eva] tests/value/pointer_comparison.c:11: Frama_C_show_each_2e: {{ &x + {8} }}
-[eva:alarm] tests/value/pointer_comparison.c:12: Warning: 
+[eva] tests/value/pointer_comparison.c:15: Frama_C_show_each_2: {{ &x + {8} }}
+[eva] tests/value/pointer_comparison.c:16: Frama_C_show_each_2e: {{ &x + {8} }}
+[eva:alarm] tests/value/pointer_comparison.c:17: Warning: 
   pointer comparison.
   assert \pointer_comparable((void *)tmp_1, (void *)(&y));
   (tmp_1 from p++)
-[eva] tests/value/pointer_comparison.c:12: Frama_C_show_each_3: {{ &x + {12} }}
-[eva] tests/value/pointer_comparison.c:13: Frama_C_show_each_3e: {{ &x + {12} }}
-[eva:alarm] tests/value/pointer_comparison.c:14: Warning: 
+[eva] tests/value/pointer_comparison.c:17: Frama_C_show_each_3: {{ &x + {12} }}
+[eva] tests/value/pointer_comparison.c:18: Frama_C_show_each_3e: {{ &x + {12} }}
+[eva:alarm] tests/value/pointer_comparison.c:19: Warning: 
   pointer comparison.
   assert \pointer_comparable((void *)tmp_2, (void *)(&y));
   (tmp_2 from p++)
-[eva] tests/value/pointer_comparison.c:14: Frama_C_show_each_4: {{ &x + {16} }}
-[eva] tests/value/pointer_comparison.c:15: Frama_C_show_each_4e: {{ &x + {16} }}
-[eva:alarm] tests/value/pointer_comparison.c:16: Warning: 
+[eva] tests/value/pointer_comparison.c:19: Frama_C_show_each_4: {{ &x + {16} }}
+[eva] tests/value/pointer_comparison.c:20: Frama_C_show_each_4e: {{ &x + {16} }}
+[eva:alarm] tests/value/pointer_comparison.c:21: Warning: 
   pointer downcast. assert (unsigned int)p ≤ 2147483647;
-[eva:alarm] tests/value/pointer_comparison.c:16: Warning: 
+[eva:alarm] tests/value/pointer_comparison.c:21: Warning: 
   pointer downcast. assert (unsigned int)(&y) ≤ 2147483647;
-[eva] tests/value/pointer_comparison.c:16: Frama_C_show_each_5: {{ &x + {16} }}
-[eva] tests/value/pointer_comparison.c:17: Frama_C_show_each_5e: {{ &x + {16} }}
-[eva:alarm] tests/value/pointer_comparison.c:18: Warning: 
+[eva] tests/value/pointer_comparison.c:21: Frama_C_show_each_5: {{ &x + {16} }}
+[eva] tests/value/pointer_comparison.c:22: Frama_C_show_each_5e: {{ &x + {16} }}
+[eva:alarm] tests/value/pointer_comparison.c:23: Warning: 
   pointer comparison.
   assert \pointer_comparable((void *)tmp_3, (void *)(&y));
   (tmp_3 from p++)
-[eva] tests/value/pointer_comparison.c:18: Frama_C_show_each_6: {{ &x + {20} }}
-[eva] tests/value/pointer_comparison.c:18: 
+[eva] tests/value/pointer_comparison.c:23: Frama_C_show_each_6: {{ &x + {20} }}
+[eva] tests/value/pointer_comparison.c:23: 
   Frama_C_show_each_6: {{ &x + {20; 24} }}
-[eva] tests/value/pointer_comparison.c:18: 
+[eva] tests/value/pointer_comparison.c:23: 
   Frama_C_show_each_6: {{ &x + {20; 24; 28} }}
-[eva] tests/value/pointer_comparison.c:18: 
+[eva] tests/value/pointer_comparison.c:23: 
   Frama_C_show_each_6: {{ &x + [20..--],0%4 }}
 [eva] Recording results for main
 [eva] done for function main
@@ -157,28 +157,28 @@
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion 'Eva,ptr_comparison' (file tests/value/pointer_comparison.c, line 10)
+[    -    ] Assertion 'Eva,ptr_comparison' (file tests/value/pointer_comparison.c, line 15)
             assert
             Eva: ptr_comparison:
               \pointer_comparable((void *)tmp_0, (void *)(&y));
             tried with Eva.
-[    -    ] Assertion 'Eva,ptr_comparison' (file tests/value/pointer_comparison.c, line 12)
+[    -    ] Assertion 'Eva,ptr_comparison' (file tests/value/pointer_comparison.c, line 17)
             assert
             Eva: ptr_comparison:
               \pointer_comparable((void *)tmp_1, (void *)(&y));
             tried with Eva.
-[    -    ] Assertion 'Eva,ptr_comparison' (file tests/value/pointer_comparison.c, line 14)
+[    -    ] Assertion 'Eva,ptr_comparison' (file tests/value/pointer_comparison.c, line 19)
             assert
             Eva: ptr_comparison:
               \pointer_comparable((void *)tmp_2, (void *)(&y));
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_downcast' (file tests/value/pointer_comparison.c, line 16)
+[    -    ] Assertion 'Eva,pointer_downcast' (file tests/value/pointer_comparison.c, line 21)
             assert Eva: pointer_downcast: (unsigned int)p ≤ 2147483647;
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_downcast' (file tests/value/pointer_comparison.c, line 16)
+[    -    ] Assertion 'Eva,pointer_downcast' (file tests/value/pointer_comparison.c, line 21)
             assert Eva: pointer_downcast: (unsigned int)(&y) ≤ 2147483647;
             tried with Eva.
-[    -    ] Assertion 'Eva,ptr_comparison' (file tests/value/pointer_comparison.c, line 18)
+[    -    ] Assertion 'Eva,ptr_comparison' (file tests/value/pointer_comparison.c, line 23)
             assert
             Eva: ptr_comparison:
               \pointer_comparable((void *)tmp_3, (void *)(&y));
@@ -197,44 +197,44 @@
   x ∈ {0}
   y ∈ {0}
   p ∈ {0}
-[eva] tests/value/pointer_comparison.c:8: Frama_C_show_each_1t: {{ &x + {4} }}
-[eva:alarm] tests/value/pointer_comparison.c:10: Warning: 
+[eva] tests/value/pointer_comparison.c:13: Frama_C_show_each_1t: {{ &x + {4} }}
+[eva:alarm] tests/value/pointer_comparison.c:15: Warning: 
   pointer comparison.
   assert \pointer_comparable((void *)tmp_0, (void *)(&y));
   (tmp_0 from p++)
-[eva] tests/value/pointer_comparison.c:10: Frama_C_show_each_2: {{ &x + {8} }}
-[eva] tests/value/pointer_comparison.c:11: Frama_C_show_each_2e: {{ &x + {8} }}
-[eva:alarm] tests/value/pointer_comparison.c:12: Warning: 
+[eva] tests/value/pointer_comparison.c:15: Frama_C_show_each_2: {{ &x + {8} }}
+[eva] tests/value/pointer_comparison.c:16: Frama_C_show_each_2e: {{ &x + {8} }}
+[eva:alarm] tests/value/pointer_comparison.c:17: Warning: 
   pointer comparison.
   assert \pointer_comparable((void *)tmp_1, (void *)(&y));
   (tmp_1 from p++)
-[eva] tests/value/pointer_comparison.c:12: Frama_C_show_each_3: {{ &x + {12} }}
-[eva] tests/value/pointer_comparison.c:13: Frama_C_show_each_3e: {{ &x + {12} }}
-[eva:alarm] tests/value/pointer_comparison.c:14: Warning: 
+[eva] tests/value/pointer_comparison.c:17: Frama_C_show_each_3: {{ &x + {12} }}
+[eva] tests/value/pointer_comparison.c:18: Frama_C_show_each_3e: {{ &x + {12} }}
+[eva:alarm] tests/value/pointer_comparison.c:19: Warning: 
   pointer comparison.
   assert \pointer_comparable((void *)tmp_2, (void *)(&y));
   (tmp_2 from p++)
-[eva] tests/value/pointer_comparison.c:14: Frama_C_show_each_4: {{ &x + {16} }}
-[eva] tests/value/pointer_comparison.c:15: Frama_C_show_each_4e: {{ &x + {16} }}
-[eva:alarm] tests/value/pointer_comparison.c:16: Warning: 
+[eva] tests/value/pointer_comparison.c:19: Frama_C_show_each_4: {{ &x + {16} }}
+[eva] tests/value/pointer_comparison.c:20: Frama_C_show_each_4e: {{ &x + {16} }}
+[eva:alarm] tests/value/pointer_comparison.c:21: Warning: 
   pointer downcast. assert (unsigned int)p ≤ 2147483647;
-[eva:alarm] tests/value/pointer_comparison.c:16: Warning: 
+[eva:alarm] tests/value/pointer_comparison.c:21: Warning: 
   pointer downcast. assert (unsigned int)(&y) ≤ 2147483647;
-[eva:alarm] tests/value/pointer_comparison.c:16: Warning: 
+[eva:alarm] tests/value/pointer_comparison.c:21: Warning: 
   pointer comparison.
   assert \pointer_comparable((void *)((int)p), (void *)((int)(&y)));
-[eva] tests/value/pointer_comparison.c:16: Frama_C_show_each_5: {{ &x + {16} }}
-[eva] tests/value/pointer_comparison.c:17: Frama_C_show_each_5e: {{ &x + {16} }}
-[eva:alarm] tests/value/pointer_comparison.c:18: Warning: 
+[eva] tests/value/pointer_comparison.c:21: Frama_C_show_each_5: {{ &x + {16} }}
+[eva] tests/value/pointer_comparison.c:22: Frama_C_show_each_5e: {{ &x + {16} }}
+[eva:alarm] tests/value/pointer_comparison.c:23: Warning: 
   pointer comparison.
   assert \pointer_comparable((void *)tmp_3, (void *)(&y));
   (tmp_3 from p++)
-[eva] tests/value/pointer_comparison.c:18: Frama_C_show_each_6: {{ &x + {20} }}
-[eva] tests/value/pointer_comparison.c:18: 
+[eva] tests/value/pointer_comparison.c:23: Frama_C_show_each_6: {{ &x + {20} }}
+[eva] tests/value/pointer_comparison.c:23: 
   Frama_C_show_each_6: {{ &x + {20; 24} }}
-[eva] tests/value/pointer_comparison.c:18: 
+[eva] tests/value/pointer_comparison.c:23: 
   Frama_C_show_each_6: {{ &x + {20; 24; 28} }}
-[eva] tests/value/pointer_comparison.c:18: 
+[eva] tests/value/pointer_comparison.c:23: 
   Frama_C_show_each_6: {{ &x + [20..--],0%4 }}
 [eva] Recording results for main
 [eva] done for function main
@@ -260,33 +260,33 @@
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion 'Eva,ptr_comparison' (file tests/value/pointer_comparison.c, line 10)
+[    -    ] Assertion 'Eva,ptr_comparison' (file tests/value/pointer_comparison.c, line 15)
             assert
             Eva: ptr_comparison:
               \pointer_comparable((void *)tmp_0, (void *)(&y));
             tried with Eva.
-[    -    ] Assertion 'Eva,ptr_comparison' (file tests/value/pointer_comparison.c, line 12)
+[    -    ] Assertion 'Eva,ptr_comparison' (file tests/value/pointer_comparison.c, line 17)
             assert
             Eva: ptr_comparison:
               \pointer_comparable((void *)tmp_1, (void *)(&y));
             tried with Eva.
-[    -    ] Assertion 'Eva,ptr_comparison' (file tests/value/pointer_comparison.c, line 14)
+[    -    ] Assertion 'Eva,ptr_comparison' (file tests/value/pointer_comparison.c, line 19)
             assert
             Eva: ptr_comparison:
               \pointer_comparable((void *)tmp_2, (void *)(&y));
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_downcast' (file tests/value/pointer_comparison.c, line 16)
+[    -    ] Assertion 'Eva,pointer_downcast' (file tests/value/pointer_comparison.c, line 21)
             assert Eva: pointer_downcast: (unsigned int)p ≤ 2147483647;
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_downcast' (file tests/value/pointer_comparison.c, line 16)
+[    -    ] Assertion 'Eva,pointer_downcast' (file tests/value/pointer_comparison.c, line 21)
             assert Eva: pointer_downcast: (unsigned int)(&y) ≤ 2147483647;
             tried with Eva.
-[    -    ] Assertion 'Eva,ptr_comparison' (file tests/value/pointer_comparison.c, line 16)
+[    -    ] Assertion 'Eva,ptr_comparison' (file tests/value/pointer_comparison.c, line 21)
             assert
             Eva: ptr_comparison:
               \pointer_comparable((void *)((int)p), (void *)((int)(&y)));
             tried with Eva.
-[    -    ] Assertion 'Eva,ptr_comparison' (file tests/value/pointer_comparison.c, line 18)
+[    -    ] Assertion 'Eva,ptr_comparison' (file tests/value/pointer_comparison.c, line 23)
             assert
             Eva: ptr_comparison:
               \pointer_comparable((void *)tmp_3, (void *)(&y));
