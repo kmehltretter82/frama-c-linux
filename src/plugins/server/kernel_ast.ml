@@ -604,6 +604,7 @@ module Info = struct
     print_localizable fmt loc;
     Format.pp_print_flush fmt ();
     Jbuffer.contents buffer
+
 end
 
 let () = Request.register ~package
