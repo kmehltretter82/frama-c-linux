@@ -1,7 +1,7 @@
 /* run.config
 PLUGIN: @CONSTANT_PROPAGATION_PLUGINS@ from inout
    OPT: -eva @EVA_OPTIONS@ -deps -out -input -scf
-   OPT: -scf @EVA_OPTIONS@ -main init -journal-disable -cast-from-constant -semantic-const-fold add3
+   OPT: -scf @EVA_OPTIONS@ -main init -cast-from-constant -semantic-const-fold add3
 */
 int x,y,z, TAB[10];
 struct st { int a, b ; } s1, s2;

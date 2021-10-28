@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -print tests/spec/multiple_decl_def_2.c -journal-disable
+   OPT: -print tests/spec/multiple_decl_def_2.c
 */
 
 /* see bug #43 && #128 */

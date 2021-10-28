@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -eva @EVA_OPTIONS@ -scf -journal-disable
+   OPT: -eva @EVA_OPTIONS@ -scf
 */
 
 void f(int *x) { (*x)++; }

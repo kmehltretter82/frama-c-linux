@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -print -journal-disable tests/misc/mergestruct3.i tests/misc/mergestruct1.i
+   OPT: -print tests/misc/mergestruct3.i tests/misc/mergestruct1.i
 */
 struct s *p;
 

@@ -1,6 +1,6 @@
 /* run.config
  MODULE: rte_get_annot
-   STDOPT: -"-rte" #"-rte-select @all -journal-disable"
+   STDOPT: -"-rte" #"-rte-select @all"
 */
 
 

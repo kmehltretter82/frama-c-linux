@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: #" -warn-signed-overflow -print -journal-disable"
+   STDOPT: #" -warn-signed-overflow -print"
 */
 
 //@ assigns \result \from min, max;

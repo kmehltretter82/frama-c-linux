@@ -1,6 +1,6 @@
 /* run.config
 PLUGIN: obfuscator
-   OPT: -obfuscate -journal-disable
+   OPT: -obfuscate
 */
 
 /*@ ensures \valid(q);  // <-- obfuscation error [bts#404]

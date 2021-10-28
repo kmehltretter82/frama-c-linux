@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: #" -warn-signed-overflow -warn-signed-downcast -print -machdep x86_32 -journal-disable"
+   STDOPT: #" -warn-signed-overflow -warn-signed-downcast -print -machdep x86_32"
 */
 
 #include "limits.h"
