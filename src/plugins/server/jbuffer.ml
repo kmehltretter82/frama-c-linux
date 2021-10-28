@@ -121,6 +121,12 @@ let to_json ?indent ?margin pp a =
   Format.pp_print_flush buffer.fmt () ;
   contents buffer
 
+let rec is_empty (js : json) = match js with
+  | `Null -> true
+  | `List js -> List.for_all is_empty js
+  | `String "" -> true
+  | _ -> false
+
 let rec fprintf fmt = function
   | `Null -> ()
   | `String text -> Format.pp_print_string fmt text

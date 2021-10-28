@@ -459,43 +459,28 @@ const functions_internal: State.Array<Json.key<'#functions'>,functionsData> = {
 export const functions: State.Array<Json.key<'#functions'>,functionsData> = functions_internal;
 
 const getInformations_internal: Server.GetRequest<
-  null,
-  { id: string, label: string, descr: string }
+  marker |
+  undefined,
+  { id: string, label: string, title: string, descr: text }[]
   > = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.getInformations',
-  input:  Json.jNull,
-  output: Json.jObject({
-            id: Json.jFail(Json.jString,'String expected'),
-            label: Json.jFail(Json.jString,'String expected'),
-            descr: Json.jFail(Json.jString,'String expected'),
-          }),
+  input:  jMarker,
+  output: Json.jList(
+            Json.jObject({
+              id: Json.jFail(Json.jString,'String expected'),
+              label: Json.jFail(Json.jString,'String expected'),
+              title: Json.jFail(Json.jString,'String expected'),
+              descr: jTextSafe,
+            })),
   signals: [],
 };
-/** Get available informations about markers */
+/** Get available informations about markers. When no marker is given, returns all kinds of informations (with empty `descr` field). */
 export const getInformations: Server.GetRequest<
-  null,
-  { id: string, label: string, descr: string }
+  marker |
+  undefined,
+  { id: string, label: string, title: string, descr: text }[]
   >= getInformations_internal;
-
-const getInformationsMarker_internal: Server.GetRequest<
-  { info: string, marker: marker },
-  text
-  > = {
-  kind: Server.RqKind.GET,
-  name:   'kernel.ast.getInformationsMarker',
-  input:  Json.jObject({
-            info: Json.jFail(Json.jString,'String expected'),
-            marker: jMarkerSafe,
-          }),
-  output: jText,
-  signals: [],
-};
-/** Get detailed informations about a given marker */
-export const getInformationsMarker: Server.GetRequest<
-  { info: string, marker: marker },
-  text
-  >= getInformationsMarker_internal;
 
 const getInfo_internal: Server.GetRequest<marker,text> = {
   kind: Server.RqKind.GET,

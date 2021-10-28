@@ -63,7 +63,7 @@ module Printer : Printer_tag.S_pp
 (** Ast Informations *)
 (* -------------------------------------------------------------------------- *)
 
-module MarkerInformations :
+module Informations :
 sig
   (**
      Registers a marker information printer.

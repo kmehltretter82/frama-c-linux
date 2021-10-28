@@ -546,7 +546,7 @@ end
 (* --- Marker Informations                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-module MarkerInformations =
+module Informations =
 struct
 
   type info = {
@@ -559,20 +559,22 @@ struct
 
   (* Info markers serialization *)
 
-  module Infos =
+  module S =
   struct
-    type t = info list
+    type t = (info * Jtext.t)
     let jtype = Package.(Jrecord[
         "id", Jstring ;
         "label", Jstring ;
-        "descr", Jstring ;
+        "title", Jstring ;
+        "descr", Jtext.jtype ;
       ])
-    let to_json (infos : info list) : json =
-      `List (List.map (fun info -> `Assoc [
-          "id", `String info.id ;
-          "label", `String info.label ;
-          "descr", `String info.descr ;
-        ]) infos)
+    let of_json _ = failwith "Informations.Info"
+    let to_json (info,text) = `Assoc [
+        "id", `String info.id ;
+        "label", `String info.label ;
+        "title", `String info.descr ;
+        "descr", text ;
+      ]
   end
 
   (* Info markers registry *)
@@ -589,44 +591,47 @@ struct
         raise (Invalid_argument msg) );
     Hashtbl.add registry id info
 
-  let get_informations () : Infos.t =
-    let infos = ref [] in
-    Hashtbl.iter (fun _ info -> infos := info :: !infos) registry ;
-    List.sort (fun a b -> Stdlib.compare a.rank b.rank) !infos
-
-  let get_marker_info marker id =
+  let jtext pp marker =
     try
-      let info = Hashtbl.find registry id in
       let buffer = Jbuffer.create () in
       let fmt = Jbuffer.formatter buffer in
-      info.pretty fmt marker;
+      pp fmt marker;
       Format.pp_print_flush fmt ();
       Jbuffer.contents buffer
     with Not_found ->
       `Null
 
+  let rank ({rank},_) = rank
+  let by_rank a b = Stdlib.compare (rank a) (rank b)
+
+  let get_informations tgt =
+    let infos = ref [] in
+    Hashtbl.iter
+      (fun _ info ->
+         match tgt with
+         | None -> infos := (info, `Null) :: !infos
+         | Some marker ->
+           let text = jtext info.pretty marker in
+           if not (Jbuffer.is_empty text) then
+             infos := (info, text) :: !infos
+      ) registry ;
+    List.sort by_rank !infos
+
 end
 
 let () = Request.register ~package
     ~kind:`GET ~name:"getInformations"
-    ~descr:(Md.plain "Get available informations about markers")
-    ~input:(module Junit) ~output:(module MarkerInformations.Infos)
-    MarkerInformations.get_informations
+    ~descr:(Md.plain
+              "Get available informations about markers. \
+               When no marker is given, returns all kinds \
+               of informations (with empty `descr` field).")
+    ~input:(module Joption(Marker))
+    ~output:(module Jlist(Informations.S))
+    Informations.get_informations
 
-let () =
-  let s_info = Request.signature ~output:(module Jtext) () in
-  let get_marker = Request.param s_info
-      ~name:"marker" ~descr:(Md.plain "Requested marker") (module Marker) in
-  let get_info = Request.param s_info
-      ~name:"info" ~descr:(Md.plain "Request marker info") (module Jstring) in
-  Request.register_sig s_info ~package
-    ~kind:`GET ~name:"getInformationsMarker"
-    ~descr:(Md.plain "Get detailed informations about a given marker")
-    begin fun rq () ->
-      let marker = get_marker rq in
-      let info = get_info rq in
-      MarkerInformations.get_marker_info marker info
-    end
+(* -------------------------------------------------------------------------- *)
+(* --- Default Kernel Informations                                        --- *)
+(* -------------------------------------------------------------------------- *)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Deprecated Informations                                            --- *)
