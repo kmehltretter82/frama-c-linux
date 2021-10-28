@@ -75,7 +75,7 @@ sig
      the localizable.
   *)
   val register :
-    id:string -> label:string -> descr:string ->
+    id:string -> label:string -> title:string ->
     (Format.formatter -> Printer_tag.localizable -> unit) -> unit
 end
 

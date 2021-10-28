@@ -553,7 +553,7 @@ struct
     id: string;
     rank: int;
     label: string;
-    descr: string;
+    title: string;
     pretty: Format.formatter -> Printer_tag.localizable -> unit
   }
 
@@ -572,7 +572,7 @@ struct
     let to_json (info,text) = `Assoc [
         "id", `String info.id ;
         "label", `String info.label ;
-        "title", `String info.descr ;
+        "title", `String info.title ;
         "descr", text ;
       ]
   end
@@ -582,9 +582,9 @@ struct
   let rankId = ref 0
   let registry : (string,info) Hashtbl.t = Hashtbl.create 0
 
-  let register ~id ~label ~descr pretty =
+  let register ~id ~label ~title pretty =
     let rank = incr rankId ; !rankId in
-    let info = { id ; rank ; label ; descr ; pretty } in
+    let info = { id ; rank ; label ; title ; pretty } in
     if Hashtbl.mem registry id then
       ( let msg = Format.sprintf
             "Server.Kernel_ast.register_info: duplicate %S" id in
@@ -632,6 +632,19 @@ let () = Request.register ~package
 (* -------------------------------------------------------------------------- *)
 (* --- Default Kernel Informations                                        --- *)
 (* -------------------------------------------------------------------------- *)
+
+let () = Informations.register
+    ~id:"kernel.ast.typeinfo"
+    ~label:"Type"
+    ~title:"Type of C/ASCL expression"
+    begin fun fmt loc ->
+      let open Printer in
+      match loc with
+      | PExp (_, _, e) -> pp_typ fmt (Cil.typeOf e)
+      | PLval (_, _, lval) -> pp_typ fmt (Cil.typeOfLval lval)
+      | PTermLval(_,_,_,lv) -> pp_logic_type fmt (Cil.typeOfTermLval lv)
+      | _ -> raise Not_found
+    end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Deprecated Informations                                            --- *)
