@@ -173,7 +173,7 @@ val mk_disj_bhv_id :
 val mk_compl_bhv_id :
   kernel_function * kinstr * string list * string list -> prop_id
 
-val mk_decrease_id : kernel_function * kinstr * variant -> prop_id
+val mk_decrease_id : kernel_function -> kinstr -> variant -> prop_id
 
 (** axiom identification *)
 val mk_lemma_id : logic_lemma -> prop_id
@@ -265,7 +265,8 @@ type axiom_info = prop_id * LogicUsage.logic_lemma
 val mk_axiom_info : LogicUsage.logic_lemma -> axiom_info
 val pp_axiom_info : Format.formatter -> axiom_info -> unit
 
-type pred_info = (prop_id * Cil_types.predicate)
+type pred_info = prop_id * Cil_types.predicate
+type variant_info = prop_id * Cil_types.variant
 
 val mk_pred_info : prop_id -> Cil_types.predicate -> pred_info
 val pred_info_id : pred_info -> prop_id

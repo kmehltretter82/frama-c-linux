@@ -89,11 +89,12 @@ let wp_trivially_terminates =
     ~correctness:[] (* TBC *)
     ~tuning:[] (* TBC *)
 
-let set_trivially_terminates p =
+let set_trivially_terminates p hyps =
   incr trivial_terminates ;
   Wp_parameters.result "[CFG] Goal %a : Valid (Trivial)" WpPropId.pp_propid p ;
   let pid = WpPropId.property_of_id p in
-  Property_status.emit wp_trivially_terminates ~hyps:[] pid Property_status.True
+  let hyps = Property.Set.elements hyps in
+  Property_status.emit wp_trivially_terminates ~hyps pid Property_status.True
 
 (* -------------------------------------------------------------------------- *)
 (* --- Preconditions at Callsites                                         --- *)

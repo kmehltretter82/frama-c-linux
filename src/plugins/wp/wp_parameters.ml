@@ -113,12 +113,12 @@ module Properties =
       let arg_name = "p,..."
       let help =
         "Select properties based names and category.\n\
-         Use +name or +category to select properties and -name or -category\n\
+         Use +name or +category to select properties and -name or -category \
          to remove them from the selection. The '+' sign can be omitted.\n\
-         Categories are: @lemma, @requires, @assigns, @ensures, @exits,\n\
-         @assert, @invariant, @variant, @breaks, @continues, @returns,\n\
-         @complete_behaviors, @disjoint_behaviors and\n\
-         @check (which includes all check clauses)."
+         Categories are: @lemma, @requires, @assigns, @ensures, @exits, \
+         @assert, @invariant, @variant, @breaks, @continues, @returns, \
+         @complete_behaviors, @disjoint_behaviors, @terminates, \
+         @decreases and @check (which includes all check clauses)."
     end)
 let () = on_reset Properties.clear
 
@@ -487,7 +487,7 @@ module TerminatesDefinitions =
                 considered to terminate when called."
   end)
 
-module TerminatesFCDeclarations =
+module TerminatesStdlibDeclarations =
   False(struct
     let option_name = "-wp-frama-c-stdlib-terminate"
     let help = "Frama-C stdlib functions without terminates specification \

@@ -36,7 +36,7 @@ val unreachable_proved : int ref
 val unreachable_failed : int ref
 val trivial_terminates : int ref
 val set_unreachable : WpPropId.prop_id -> unit
-val set_trivially_terminates : WpPropId.prop_id -> unit
+val set_trivially_terminates : WpPropId.prop_id -> Property.Set.t -> unit
 
 type asked_assigns = NoAssigns | OnlyAssigns | WithAssigns
 

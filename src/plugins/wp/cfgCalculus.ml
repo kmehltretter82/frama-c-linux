@@ -140,6 +140,7 @@ struct
     succ: Cfg.vertex -> Cfg.G.edge list;
     dead: stmt -> bool ;
     terminates: WpPropId.pred_info option ;
+    decreases: WpPropId.variant_info option ;
     we: W.t_env;
     wp: W.t_prop option Vhash.t; (* None is used for non-dag detection *)
     mutable wk: W.t_prop; (* end point *)
@@ -187,10 +188,17 @@ struct
   let prove_property env (p : WpPropId.pred_info) w =
     if is_selected ~goal:true env p then W.add_goal env.we p w else w
 
-  let prove_subproperty env (p : WpPropId.pred_info) prop stmt source w =
+  let prove_subproperty env (p : WpPropId.pred_info) ?deps prop stmt source w =
     if is_selected ~goal:true env p
-    then W.add_subgoal env.we p prop stmt source w
+    then W.add_subgoal env.we ?deps p prop stmt source w
     else w
+
+  let on_selected_terminates env f =
+    match env.terminates with
+    | Some t when is_default_bhv env.mode && is_selected ~goal:true env t ->
+        f env t
+    | _ ->
+        Extlib.id
 
   (* --- Decomposition of WP Rules --- *)
 
@@ -355,6 +363,33 @@ struct
       List.fold_right (prove_property env) complete @@
       List.fold_right (prove_property env) disjoint w
 
+  let do_terminates_deps env w =
+    match env.body with
+    | None -> w
+    | Some _ ->
+        let deps = CfgInfos.terminates_deps env.mode.infos in
+        let return = Kernel_function.find_return env.mode.kf in
+        let prove goal env t w =
+          prove_subproperty env t ~deps goal return FromReturn w
+        in
+        if CfgInfos.is_recursive env.mode.kf then
+          (* there is a dependency on terminates or decreases is missing *)
+          let goal =
+            if None <> env.decreases then Logic_const.ptrue
+            else begin
+              WpLog.warning ~once:true
+                "No 'decreases' clause on recursive function '%a', \
+                 cannot prove termination"
+                Kernel_function.pretty env.mode.kf ;
+              Logic_const.pfalse
+            end
+          in
+          on_selected_terminates env (prove goal) w
+        else
+        if not @@ Property.Set.is_empty deps then
+          on_selected_terminates env (prove Logic_const.ptrue) w
+        else w
+
   let do_global_init env w =
     I.process_global_init env.we env.mode.kf @@
     W.scope env.we [] SC_Global w
@@ -377,7 +412,6 @@ struct
     List.fold_right (use_property env) side_behaviors @@
     (* frame-in *)
     W.scope env.we formals SC_Frame_in w
-
 
   let do_post env ~formals (b : CfgAnnot.behavior) w =
     W.label env.we None Clabels.post @@
@@ -415,9 +449,10 @@ struct
          WpLog.SmokeDeadcode.get ()
       then CfgInfos.smoking infos else (fun _ -> false) in
     let terminates = CfgAnnot.get_terminates_goal kf in
+    let decreases = CfgAnnot.get_decreases_goal kf in
     let env = {
       mode ; props ; body ;
-      succ ; dead ; terminates ;
+      succ ; dead ; terminates ; decreases ;
       we = W.new_env kf ;
       wp = Vhash.create 32 ;
       wk = W.empty ;
@@ -428,6 +463,7 @@ struct
     let bhv = CfgAnnot.get_behavior_goals kf ~smoking ~exits mode.bhv in
     begin
       W.close env.we @@
+      do_terminates_deps env @@
       do_global_init env @@
       do_preconditions env ~formals bhv @@
       do_complete_disjoint env @@
