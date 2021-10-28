@@ -673,22 +673,36 @@ struct
         in
         String.concat "" (List.map expand_macro (Str.full_split macro_regex s))
       in
-      try
-        Mutex.lock str_mutex;
-        let r = aux s in
-        Mutex.unlock str_mutex;
-        if !verbosity >= 4 then lock_printf "%% Expansion result: %s@." r;
-        { has_ptest_file= !has_ptest_file;
-          has_ptest_opt= !has_ptest_opt;
-          has_frama_c_exe= !has_frama_c_exe;
-        }, r
-      with e ->
-        lock_eprintf "Uncaught exception %s\n%!" (Printexc.to_string e);
-        Mutex.unlock str_mutex;
-        raise e
+      Mutex.lock str_mutex;
+      let r = try aux s
+        with e ->
+          Mutex.unlock str_mutex;
+          lock_eprintf "Uncaught exception %s\n%!" (Printexc.to_string e);
+          raise e
+      in
+      Mutex.unlock str_mutex;
+      if !verbosity >= 4 then lock_printf "%% Expansion result: %s@." r;
+      { has_ptest_file= !has_ptest_file;
+        has_ptest_opt= !has_ptest_opt;
+        has_frama_c_exe= !has_frama_c_exe;
+      }, r
 
   let expand macros s =
     snd (does_expand macros s)
+
+  let expand_directive =
+    let deprecated_opts = "(-load-module|-load-script)" in
+    let re = Str.regexp "\\(-load-module\\|-load-script\\)" in
+    fun ~file macros s ->
+      Mutex.lock str_mutex;
+      let contains =
+        try ignore (Str.search_forward re s 0); true
+        with Not_found -> false
+      in
+      Mutex.unlock str_mutex;
+      if contains then lock_eprintf "%s: DEPRECATED direct use of %s option: %s@.Please use PLUGIN, MODULE, SCRIPT or LIBS directive instead of the deprecated option.@." file deprecated_opts s;
+      expand macros s
+
 
   let get ?(default="") name macros =
     try find name macros with Not_found -> default
@@ -925,7 +939,7 @@ end = struct
 
   (* how to process options *)
   let config_exec ~warn ~once ~file dir s current =
-    let s = Macros.expand current.dc_macros s in
+    let s = Macros.expand_directive ~file current.dc_macros s in
     { current with
       dc_execnow =
         scan_execnow ~warn ~once ~file dir current.dc_macros current.dc_timeout s :: current.dc_execnow }
@@ -933,7 +947,7 @@ end = struct
   let config_macro =
     let regex = Str.regexp "[ \t]*\\([^ \t@]+\\)\\([ \t]+\\(.*\\)\\|$\\)" in
     fun ~file _dir s current ->
-      let s = Macros.expand current.dc_macros s in
+      let s = Macros.expand_directive ~file current.dc_macros s in
       Mutex.lock str_mutex;
       if Str.string_match regex s 0 then begin
         let name = Str.matched_group 1 s in
@@ -995,20 +1009,20 @@ end = struct
     update_macros (fun name -> name) "-load-module=" "PTEST_PLUGIN" "PTEST_LOAD_PLUGIN"
 
   let config_module ~file dir s current =
-    let s = Macros.expand current.dc_macros s in
+    let s = Macros.expand_directive ~file current.dc_macros s in
     let deps = str_split_list s in
     let current = update_module_macros current deps in
     add_make_modules ~file dir deps current
 
   let config_libs_script_plugin update ~file dir s current =
-    let s = Macros.expand current.dc_macros s in
+    let s = Macros.expand_directive ~file current.dc_macros s in
     let deps = str_split_list s in
     update current deps
 
   let config_options =
     [ "CMD",
-      (fun ~file:_ _ s current ->
-         let s = Macros.expand current.dc_macros s in
+      (fun ~file _ s current ->
+         let s = Macros.expand_directive ~file current.dc_macros s in
          { current with dc_default_toplevel = s});
 
       "OPT",
@@ -1017,7 +1031,7 @@ end = struct
            lock_eprintf
              "%s: a NOFRAMAC directive has been defined before a sub-test defined by a 'OPT' directive (That NOFRAMAC directive could be misleading.).@."
              file;
-         let s = Macros.expand current.dc_macros s in
+         let s = Macros.expand_directive ~file current.dc_macros s in
          let t =
            { toplevel= current.dc_default_toplevel;
              opts= s;
@@ -1036,7 +1050,7 @@ end = struct
            lock_eprintf
              "%s: a NOFRAMAC directive has been defined before a sub-test defined by a 'STDOPT' directive (That NOFRAMAC directive could be misleading.).@."
              file;
-         let s = Macros.expand current.dc_macros s in
+         let s = Macros.expand_directive ~file current.dc_macros s in
          let new_top =
            List.map
              (fun command ->
@@ -1053,13 +1067,13 @@ end = struct
                         dc_default_log = !default_parsing_env.current_default_log });
 
       "FILEREG",
-      (fun ~file:_ _ s current ->
-         let s = Macros.expand current.dc_macros s in
+      (fun ~file _ s current ->
+         let s = Macros.expand_directive ~file current.dc_macros s in
          { current with dc_test_regexp = s });
 
       "FILTER",
-      (fun ~file:_ _ s current ->
-         let s = Macros.expand current.dc_macros s in
+      (fun ~file _ s current ->
+         let s = Macros.expand_directive ~file current.dc_macros s in
          let s = trim_right s in
          match current.dc_filter with
          | None when s="" -> { current with dc_filter = None }
@@ -1067,8 +1081,8 @@ end = struct
          | Some filter    -> { current with dc_filter = Some (s ^ " | " ^ filter) });
 
       "EXIT",
-      (fun ~file:_ _ s current ->
-         let s = Macros.expand current.dc_macros s in
+      (fun ~file _ s current ->
+         let s = Macros.expand_directive ~file current.dc_macros s in
          { current with dc_exit_code = Some s });
 
       "GCC",
@@ -1094,13 +1108,13 @@ end = struct
       "PLUGIN", config_libs_script_plugin update_plugin_macros;
 
       "LOG",
-      (fun ~file:_ _ s current ->
-         let s = Macros.expand current.dc_macros s in
+      (fun ~file _ s current ->
+         let s = Macros.expand_directive ~file current.dc_macros s in
          { current with dc_default_log = s :: current.dc_default_log });
 
       "TIMEOUT",
-      (fun ~file:_ _ s current ->
-         let s = Macros.expand current.dc_macros s in
+      (fun ~file _ s current ->
+         let s = Macros.expand_directive ~file current.dc_macros s in
          { current with dc_timeout = s });
 
       "NOFRAMAC",
