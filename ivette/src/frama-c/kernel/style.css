@@ -29,7 +29,7 @@
 }
 
 .hovered-marker {
-    background-color: lightgrey;
+    background-color: lightblue;
 }
 
 .dead-code {
@@ -71,38 +71,26 @@
 .astinfo-section {
     position: relative;
     overflow: hidden;
+    padding-top: 1px;
+    padding-bottom: 2px;
+}
+
+.astinfo-section.hovered {
+    background: #ddd;
+}
+
+.astinfo-section.transient {
+    background: #f5d69e;
 }
 
 .astinfo-folderbutton {
-    position: absolute;
-    left: 2pt;
+    flex: 0 0 auto;
 }
 
 .astinfo-markerbar {
     display: flex;
     overflow: hidden;
-    margin-left: 8pt;
-}
-
-.astinfo-markerbar.selected
-{
-    background: #f5d69e;
-}
-
-.astinfo-markerbar.hovered
-{
-    background: lightgrey;
-}
-
-.astinfo-markercode {
-    flex: 1 1 auto;
-    text-overflow: ellipsis;
-    cursor: default;
-}
-
-.astinfo-markercode:hover
-{
-    background: orange;
+    padding-left: 4px;
 }
 
 .astinfo-markerkind {
@@ -117,9 +105,30 @@
     margin-right: 3pt;
 }
 
+.astinfo-markercode {
+    flex: 1 1 auto;
+    text-overflow: ellipsis;
+    cursor: default;
+}
+
 .astinfo-markerbutton {
     flex: 0 1 auto;
     position: relative;
+}
+
+.astinfo-infos {
+    display: flex ;
+    margin-top: 1px ;
+    margin-bottom: 1px ;
+}
+
+.astinfo-kind {
+    flex: 0 0 50px;
+    text-align: right;
+    margin-top: 1px;
+    margin-right: 8px;
+    color: #999;
+    font-size: smaller;
 }
 
 /* -------------------------------------------------------------------------- */

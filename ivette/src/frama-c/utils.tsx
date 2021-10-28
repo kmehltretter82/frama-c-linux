@@ -98,8 +98,7 @@ function Marker(props: MarkerProps) {
   );
 }
 
-function makeContents(text: KernelData.text): React.ReactNode
-{
+function makeContents(text: KernelData.text): React.ReactNode {
   if (Array.isArray(text)) {
     const tag = text.shift();
     let marker: string | undefined;
@@ -129,7 +128,7 @@ export interface TextProps {
   className?: string;
 }
 
-export function Text(props: TextProps): React.ReactNode {
+export function Text(props: TextProps) {
   const className = classes('kernel-text', 'dome-text-code', props.className);
   return <div className={className}>{makeContents(props.text)}</div>;
 }

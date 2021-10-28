@@ -28,14 +28,16 @@ import React from 'react';
 import * as Dome from 'dome';
 import { classes } from 'dome/misc/utils';
 import * as States from 'frama-c/states';
+import * as DATA from 'frama-c/api/kernel/data';
 import * as AST from 'frama-c/api/kernel/ast';
+import { Text } from 'frama-c/utils';
 import { Section } from 'dome/frame/sidebars';
 import { Icon } from 'dome/controls/icons';
 import { Code } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
 
 // --------------------------------------------------------------------------
-// --- Information Details
+// --- Marker Kinds
 // --------------------------------------------------------------------------
 
 interface MarkerKindProps { label: string; title: string }
@@ -80,26 +82,32 @@ const MARKERS = new Map<AST.markerKind, JSX.Element>();
   },
 ].forEach(({ kind, elt }) => MARKERS.set(kind, elt));
 
-/* interface InfoItemProps {
- *   label: string;
- *   title: string;
- *   children?: React.ReactNode;
- * }
- *
- * const InfoItem = (props: InfoItemProps) => (
- *   <>
- *     <div
- *       className="dome-text-label kernel-astinfo-kind"
- *       title={props.title}
- *     >
- *       {props.label}
- *     </div>
- *     <div className="dome-text-cell kernel-astinfo-data">
- *       {props.children}
- *     </div>
- *   </>
- * );
- *  */
+// --------------------------------------------------------------------------
+// --- Information Details
+// --------------------------------------------------------------------------
+
+interface InfoItemProps {
+  id: string;
+  label: string;
+  title: string;
+  descr: DATA.text;
+}
+
+function InfoItem(props: InfoItemProps) {
+  return (
+    <>
+      <div
+        className="dome-text-label astinfo-kind"
+        title={props.title}
+      >
+        {props.label}
+      </div>
+      <div className="dome-text-cell astinfo-data">
+        <Text text={props.descr} />
+      </div>
+    </>
+  );
+}
 
 interface InfoSectionProps {
   marker: AST.marker;
@@ -116,49 +124,37 @@ interface InfoSectionProps {
 function MarkInfos(props: InfoSectionProps) {
   const [unfold, setUnfold] = React.useState(true);
   const { marker, markerInfo } = props;
-  const contents: React.ReactNode[] = [];
-  if (marker !== markerInfo.key) return null;
-  /*
-    registry.forEach((info: Informations) => {
-      const data = info.getInfo(marker);
-      if (data) {
-        contents.push(
-          <InfoItem key={info.id} label={info.label} title={info.title}>
-            {info.getInfo(marker)}
-          </InfoItem>,
-        );
-      }
-    });
-  */
-  const barClassName = classes(
-    'astinfo-markerbar',
-    props.selected && 'selected',
-    !props.selected && props.hovered && 'hovered',
+  const infos: InfoItemProps[] =
+    States.useRequest(AST.getInformations, marker) ?? [];
+  console.log('INFOS', infos);
+  const highlight = classes(
+    props.selected && !props.pinned && 'transient',
+    props.hovered && 'hovered',
   );
   const descr = markerInfo.descr ?? markerInfo.name;
   const kind = MARKERS.get(markerInfo.kind) ?? GMARKER;
   const foldUnfold = () => setUnfold(!unfold);
   return (
-    <div className="astinfo-section">
+    <div
+      className={`astinfo-section ${highlight}`}
+      onMouseEnter={() => props.onHover(true)}
+      onMouseLeave={() => props.onHover(false)}
+      onDoubleClick={props.onSelect}
+    >
       <div
         key="MARKER"
-        className={barClassName}
+        className={`astinfo-markerbar ${highlight}`}
         title={descr}
-        onMouseEnter={() => props.onHover(true)}
-        onMouseLeave={() => props.onHover(false)}
       >
         <Icon
           className="astinfo-folderbutton"
-          style={{ visibility: contents.length ? 'visible' : 'hidden' }}
+          style={{ visibility: infos.length ? 'visible' : 'hidden' }}
           size={9}
           offset={-2}
           id={unfold ? 'TRIANGLE.DOWN' : 'TRIANGLE.RIGHT'}
           onClick={foldUnfold}
         />
-        <Code
-          className="astinfo-markercode"
-          onClick={props.onSelect}
-        >
+        <Code className="astinfo-markercode">
           {kind}{descr}
         </Code>
         <IconButton
@@ -180,9 +176,9 @@ function MarkInfos(props: InfoSectionProps) {
       <div
         key="INFOS"
         className="astinfo-infos"
-        style={{ display: unfold && contents.length ? 'grid' : 'none' }}
+        style={{ display: unfold && infos.length ? undefined : 'none' }}
       >
-        {contents}
+        {infos.map((info) => (<InfoItem key={info.id} {...info} />))}
       </div>
     </div>
   );
