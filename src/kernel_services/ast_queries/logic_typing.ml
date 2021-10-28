@@ -4228,7 +4228,7 @@ struct
             in
             if not (Logic_const.plain_or_set check t.term_type) then
               C.error t.term_loc
-                "@[<hov 0>can not use '%s' to %s volatile @[<hov 2>'%a'@]"
+                "@[cannot use '%s' to %s volatile '%a'@]"
                 fct (if reads then "read" else "write")
                 Cil_printer.pp_term t
           end tsets
