@@ -1021,8 +1021,8 @@ site: one must prove that \verb+fp+ is either \verb+f1+ or \verb+f2+.
 
 \subsubsection{Proof of \texttt{@terminates}}
 
-In ACSL, a function can be specified to terminate some condition \verb+P+ holds
-in precondition.
+In ACSL, a function can be specified to terminate when some condition \verb+P+ holds
+in pre-condition.
 
 \begin{lstlisting}[language=c, alsolanguage=acsl]
 /*@ terminates P ; */
@@ -1031,14 +1031,13 @@ void function(void){
 }
 \end{lstlisting}
 
-If terminates verification is active, WP collects all function calls and loops
-and generate different VCs.
+If terminates verification is active (depending on \verb+-wp+ options) WP collects all function calls and loops
+and generate verification conditions (VCs) to prove them, as detailed below.
 
 \paragraph{Loop variants.} When a loop has a variant, no particular verification
 is generated for termination. However, if \verb+-wp-variant-with-terminates+ is
-active, the variant is verified only if \verb+P+ holds at this program point.
-Basically, "the variant has to hold only if the function has to terminate". For
-example:
+active, the variant is verified only when \verb+P+ holds in pre-condition.
+Intuitively, this option means that variant has to decrease only if the function has to terminate. For example:
 
 \begin{lstlisting}[language=c, alsolanguage=acsl]
 //@ terminates i >= 0 ;
@@ -1051,12 +1050,12 @@ void positive(int i){
 }
 \end{lstlisting}
 
-Note that it means that when one specifies \verb+terminates \false+ any loop
-variant trivially holds.
+Note that when \verb+terminates \false+ is specified, any loop
+variant would trivially holds.
 
 When a loop does not have a variant, WP checks that the loop is unreachable
-when \verb+P+ holds in precondition, which means "a loop is allowed not
-terminating when the function does not have to". For example:
+when \verb+P+ holds in precondition, which means that a loop is allowed to not
+terminate when the function does not have to terminate. For example:
 
 \begin{lstlisting}[language=c, alsolanguage=acsl]
 //@ terminates i >= 0 ;
@@ -1068,12 +1067,12 @@ void function(int i){
 }
 \end{lstlisting}
 
-\paragraph{Function call.} When a function \verb+f+ that terminates when
-\verb+P+, calls a function \verb+g+ that terminates when \verb+Q+, WP tries to
-prove that \verb+P@pre ==> Q@call-point+, "when \verb+f+ terminates, we must
-call \verb+g+ in a way that guarantees that it also terminates". Note that it
-means that if the function under verification must terminate, any call to a
-non terminating function must be unreachable. For example:
+\paragraph{Function call.} When a function \verb+f+ is required to terminate on
+\verb+P+, and calling function \verb+g+ only terminates when \verb+Q+, WP tries to
+prove that \verb+P@pre ==> Q@call-point+. Indeed, for \verb+f+ to terminates while calling
+\verb+g+, then \verb+g+ shall terminate. Note that it
+means that if the function under verification shall terminate, any call to a
+non-terminating function shall be unreachable. For example:
 
 \begin{lstlisting}[language=c, alsolanguage=acsl]
 //@ terminates i <= 0 ;
@@ -1099,18 +1098,18 @@ as specified by the options:
 \item \verb+-wp-definitions-terminate+.
 \end{itemize}
 
-\paragraph{(Mutually) recursive function.} When a function is in a recursive
-cluster (as defined in the ACSL manual) and must terminate, WP checks that a
+\paragraph{(Mutually) recursive function.} When a function is involved in a
+recursive cluster (as defined in the ACSL manual) and shall terminate, WP checks that a
 \verb+decreases+ clause is available for the function. Proving that existing
 recursive calls might be unreachable is delegated to the proof of the
-\verb+decreases+ clause. Note however that currenlty the proof of such a clause
-is not supported.
+\verb+decreases+ clause. Note however that, currenlty, the proof of \verb+decreases+
+clauses is not supported yet.
 
 \paragraph{Function pointers. } On a call via a function pointer, WP checks that
-a \verb+@calls+ is specified for this function pointer. If so, WP just behave
-as explained before for function calls. If this specification is not available,
+a \verb+@calls+ is specified for this function pointer. If so, WP just behaves
+as explained before for function calls. If such a specification is not available,
 WP considers that the pointed function might call the function under
-verification and thus that it is part of a recursive cluster and must provide
+verification and thus that it is part of a recursive cluster and shall provide
 a \verb+decreases+ clause.
 
 \subsection{Smoke Tests}
