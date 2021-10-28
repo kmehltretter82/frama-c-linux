@@ -21,6 +21,13 @@ Open Source Release <next-release>
 Open Source Release 24.0 (Chromium)
 ###################################
 
+-   ACSL      [2021-10-28] better type checks for volatile clauses
+-   Variadic  [2021-10-26] translates printf/scanf calls even if formatting
+              string is not constant, warning that it will assume arguments
+              match the format.
+-   Kernel    [2021-10-26] Support for C11's  _Static_assert
+-   Libc      [2021-10-26] Frama-C's libc #define _STDC_NO_COMPLEX as mandated by
+              ISO C11 for libraries without support for complex numbers
 -   Eva       [2021-10-19] New options to allow states partitioning to survive
               function returns: -eva-interprocedural-split for disjunctions
               from split annotations, and -eva-interprocedural-history for
