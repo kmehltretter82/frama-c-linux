@@ -543,10 +543,96 @@ struct
 end
 
 (* -------------------------------------------------------------------------- *)
-(* --- Information                                                        --- *)
+(* --- Marker Informations                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Info = struct
+module MarkerInformations =
+struct
+
+  type info = {
+    id: string;
+    rank: int;
+    label: string;
+    descr: string;
+    pretty: Format.formatter -> Printer_tag.localizable -> unit
+  }
+
+  (* Info markers serialization *)
+
+  module Infos =
+  struct
+    type t = info list
+    let jtype = Package.(Jrecord[
+        "id", Jstring ;
+        "label", Jstring ;
+        "descr", Jstring ;
+      ])
+    let to_json (infos : info list) : json =
+      `List (List.map (fun info -> `Assoc [
+          "id", `String info.id ;
+          "label", `String info.label ;
+          "descr", `String info.descr ;
+        ]) infos)
+  end
+
+  (* Info markers registry *)
+
+  let rankId = ref 0
+  let registry : (string,info) Hashtbl.t = Hashtbl.create 0
+
+  let register ~id ~label ~descr pretty =
+    let rank = incr rankId ; !rankId in
+    let info = { id ; rank ; label ; descr ; pretty } in
+    if Hashtbl.mem registry id then
+      ( let msg = Format.sprintf
+            "Server.Kernel_ast.register_info: duplicate %S" id in
+        raise (Invalid_argument msg) );
+    Hashtbl.add registry id info
+
+  let get_informations () : Infos.t =
+    let infos = ref [] in
+    Hashtbl.iter (fun _ info -> infos := info :: !infos) registry ;
+    List.sort (fun a b -> Stdlib.compare a.rank b.rank) !infos
+
+  let get_marker_info marker id =
+    try
+      let info = Hashtbl.find registry id in
+      let buffer = Jbuffer.create () in
+      let fmt = Jbuffer.formatter buffer in
+      info.pretty fmt marker;
+      Format.pp_print_flush fmt ();
+      Jbuffer.contents buffer
+    with Not_found ->
+      `Null
+
+end
+
+let () = Request.register ~package
+    ~kind:`GET ~name:"getInformations"
+    ~descr:(Md.plain "Get available informations about markers")
+    ~input:(module Junit) ~output:(module MarkerInformations.Infos)
+    MarkerInformations.get_informations
+
+let () =
+  let s_info = Request.signature ~output:(module Jtext) () in
+  let get_marker = Request.param s_info
+      ~name:"marker" ~descr:(Md.plain "Requested marker") (module Marker) in
+  let get_info = Request.param s_info
+      ~name:"info" ~descr:(Md.plain "Request marker info") (module Jstring) in
+  Request.register_sig s_info ~package
+    ~kind:`GET ~name:"getInformationsMarker"
+    ~descr:(Md.plain "Get detailed informations about a given marker")
+    begin fun rq () ->
+      let marker = get_marker rq in
+      let info = get_info rq in
+      MarkerInformations.get_marker_info marker info
+    end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Deprecated Informations                                            --- *)
+(* -------------------------------------------------------------------------- *)
+
+module DeprecatedInfo = struct
   open Printer_tag
 
   let print_function fmt name =
@@ -611,7 +697,7 @@ let () = Request.register ~package
     ~kind:`GET ~name:"getInfo"
     ~descr:(Md.plain "Get textual information about a marker")
     ~input:(module Marker) ~output:(module Jtext)
-    Info.get_marker_info
+    DeprecatedInfo.get_marker_info
 
 (* -------------------------------------------------------------------------- *)
 (* --- Files                                                              --- *)
