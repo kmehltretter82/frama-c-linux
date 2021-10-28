@@ -114,12 +114,12 @@ val register :
     {[
       (* ---- Exemple of Request Registration --- *)
       let () =
-        let s = Request.signature ~page ~kind ~name ~descr () in
+        let s = Request.signature () in
         let get_a = Request.param s ~name:"a" ~descr:"..." (module A) in
         let get_b = Request.param s ~name:"b" ~descr:"..." (module B) in
         let set_c = Request.result s ~name:"c" ~descr:"..." (module C) in
         let set_d = Request.result s ~name:"d" ~descr:"..." (module D) in
-        Request.register_sig s
+        Request.register_sig s ~package ~kind ~name ~descr
           (fun rq () ->
              let (c,d) = some_job (get_a rq) (get_b rq) in
              set_c rq c ; set_d rq d)

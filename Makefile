@@ -1543,8 +1543,8 @@ server-doc-html: server-doc-md
 			--lua-filter doc/pandoc/href.lua \
 			{} -o {}.html \;
 	@cp -f doc/pandoc/style.css doc/server/
-	$(PRINT) 'HTML server documentation ready:'
-	$(PRINT) '  open doc/server/readme.md.html'
+	$(PRINT) 'HTML server documentation generated'
+	$(PRINT) 'HTML file://$(PWD)/doc/server/readme.md.html'
 
 server-doc: server-doc-html
 
