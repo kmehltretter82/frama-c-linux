@@ -114,6 +114,7 @@ class metricsCabsVisitor = object(self)
     | ONLYTYPEDEF _
     | GLOBASM _
     | PRAGMA _
+    | STATIC_ASSERT _
     | LINKAGE _
     | CUSTOM _
     | GLOBANNOT _ -> Cil.DoChildren;

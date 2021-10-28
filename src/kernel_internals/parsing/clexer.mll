@@ -161,6 +161,16 @@ let init_lexicon _ =
                "_Noreturn is a C11 keyword, use -c11 option to enable it");
            IDENT "_Noreturn"
          end);
+      ("_Static_assert",
+       fun loc ->
+         if Kernel.C11.get () then STATIC_ASSERT loc
+         else begin
+           Kernel.(
+             warning
+               ~wkey:wkey_conditional_feature
+               "_Static_assert is a C11 keyword, use -c11 option to enable it");
+           IDENT "_Static_assert"
+         end);
       ("__attribute__", fun loc -> ATTRIBUTE loc);
       ("__attribute", fun loc -> ATTRIBUTE loc);
       ("__blockattribute__", fun _ -> BLOCKATTRIBUTE);

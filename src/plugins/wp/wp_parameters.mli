@@ -171,7 +171,6 @@ val get_session_dir : force:bool -> string -> Datatype.Filepath.t
 val get_output : unit -> Datatype.Filepath.t
 val get_output_dir : string -> Datatype.Filepath.t
 val make_output_dir : string -> unit
-val get_overflows : unit -> bool
 
 (** {2 Debugging Categories} *)
 val has_print_generated: unit -> bool

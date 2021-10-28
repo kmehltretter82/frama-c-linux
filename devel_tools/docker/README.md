@@ -1,29 +1,60 @@
-Docker images for Frama-C
-=========================
+# Frama-C Docker images
 
-- To build a new image (slim, without Frama-C sources nor tests):
+Frama-C Docker images are currently based on Alpine Linux,
+using opam's Docker images
+(from https://hub.docker.com/r/ocaml/opam/).
 
-        cd <tag>
-        docker build . --target base -t framac/frama-c:<tag>
+The user is `opam` and it has sudo rights.
+To add packages, run `sudo apk add <package>`.
 
-- To run an interactive shell:
+## Using the Makefile
 
-        docker run -it framac/frama-c:<tag>
+The `Makefile` contains several targets and templates to build most
+Frama-C versions. For each version, there are three images: one
+for the command-line version `frama-c`; a stripped-down version of the former,
+for a slimmer image, but which does not allow recompilation of Frama-C
+or of any external plugin; and a third image including the graphical
+interface (`frama-c-gui`), to be used with Singularity or other tools enabling
+graphical interfaces from within a Docker image.
 
-- To push to Docker Hub (requires access to the `framac/frama-c` repository):
+Run `make` to get a list of targets.
 
-        docker push framac/frama-c:<tag>
+If you have access to the Frama-C Docker Hub, you can also run a
+`push-<version>` target to upload images related to that version to
+the Docker Hub.
 
-- To build an image containing Frama-C sources (downloaded from the .tar.gz, in
-  directory `/root`):
+## Commands to generate images
 
-        cd <tag>
-        docker build . --build-arg with_source=yes \
-          -t framac/frama-c:<tag>-with-source
+Some commands in this section are those used by the above Makefile;
+others allow creating different images (e.g. with the Frama-C sources)
+which are not directly available as Makefile targets.
 
-- To run Frama-C tests (and remove unnecessary image later):
+- Build slim development image (from public Git master branch):
 
-        cd <tag>
-        docker build . --build-arg with_source=yes --build-arg with_test=yes \
-          -t framac/frama-c:<tag>-with-test
-        docker image rm framac/frama-c:<tag>-with-test
+        docker build . -t framac/frama-c:dev --target frama-c-slim
+
+- Build slim development image with GUI:
+
+        docker build . -t framac/frama-c-gui:dev --target frama-c-gui-slim
+
+- Build stripped (minimal) version:
+
+        docker build . -t framac/frama-c:dev-stripped --target frama-c-stripped
+
+- Build image from archive (note: it _must_ be named `frama-c-<something>.tar.gz`, where
+  `<something>` may be a version number, codename, etc:
+
+        docker build . -t framac/frama-c:dev --target frama-c-slim --build-arg=from_archive=frama-c-<version>.tar.gz
+
+- Build image containing Frama-C's source code in `/frama-c` (without and with GUI):
+
+        docker build . -t framac/frama-c-source:dev --target frama-c
+        docker build . -t framac/frama-c-gui-source:dev --target frama-c-gui
+
+- Start Singularity instance
+
+        singularity instance start docker-daemon:framac/frama-c-gui:dev <instance name>
+
+- Run command with Singularity instance
+
+        singularity exec instance://<instance name> <command with args>

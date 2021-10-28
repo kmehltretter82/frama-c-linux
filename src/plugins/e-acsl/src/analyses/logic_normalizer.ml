@@ -135,7 +135,7 @@ let preprocess_term ~loc t =
   | _ -> None
 
 let preprocessor = object
-  inherit Visitor.frama_c_inplace
+  inherit E_acsl_visitor.visitor
 
   (* Only logic functions and logic predicates are handled.
      E-acsl simply ignores all the other global annotations *)
@@ -144,40 +144,7 @@ let preprocessor = object
     | Dfun_or_pred _ -> Cil.DoChildren
     | _ -> Cil.SkipChildren
 
-  (* Ignore the annotations attached to statements from the RTL *)
-  method !vglob_aux =
-    function
-    | g when Rtl.Symbols.mem_global g ->
-      Cil.SkipChildren
-
-    | GFun({ svar = vi }, _) when Builtins.mem vi.vname ->
-      Cil.SkipChildren
-
-    | GFun({ svar = vi }, _)
-      when Misc.is_fc_or_compiler_builtin vi ->
-      Cil.SkipChildren
-
-    | GFun({svar = vi}, _) ->
-      let kf = try Globals.Functions.get vi with Not_found -> assert false in
-      if Functions.check kf then Cil.DoChildren else Cil.SkipChildren
-
-    | GAnnot _ -> Cil.DoChildren
-
-    (* other globals: nothing to do *)
-    | GFunDecl _
-    | GVarDecl _
-    | GVar _
-    | GType _
-    | GCompTag _
-    | GCompTagDecl _
-    | GEnumTag _
-    | GEnumTagDecl _
-    | GAsm _
-    | GPragma _
-    | GText _
-      -> Cil.SkipChildren
-
-  method !vpredicate p =
+  method !vpredicate  p =
     let loc = p.pred_loc in
     Memo.memo_pred (preprocess_pred ~loc) p;
     Cil.DoChildren
@@ -189,13 +156,19 @@ let preprocessor = object
 end
 
 let preprocess ast =
-  Visitor.visitFramacFileSameGlobals preprocessor ast
+  Visitor.visitFramacFileSameGlobals
+    (preprocessor :> Visitor.frama_c_inplace)
+    ast
 
 let preprocess_annot annot =
-  ignore (Visitor.visitFramacCodeAnnotation preprocessor annot)
+  ignore
+    (Visitor.visitFramacCodeAnnotation
+       (preprocessor :> Visitor.frama_c_inplace)
+       annot)
 
 let preprocess_predicate p =
-  ignore (Visitor.visitFramacPredicate preprocessor p)
+  ignore
+    (Visitor.visitFramacPredicate (preprocessor :> Visitor.frama_c_inplace) p)
 
 let get_pred = Memo.get_pred
 let get_term = Memo.get_term

@@ -309,15 +309,16 @@ void eacsl_assert_register_mpq(eacsl_assert_data_t *data, const char *name,
 
 void eacsl_assert_register_ptr(eacsl_assert_data_t *data, const char *name,
                                void *ptr) {
-  eacsl_assert_register_data(data, name, E_ACSL_PTR,
-                             (eacsl_assert_data_content_t){.value_ptr = ptr});
+  eacsl_assert_register_data(
+      data, name, E_ACSL_PTR,
+      (eacsl_assert_data_content_t){.value_ptr = (uintptr_t)ptr});
 }
 
 void eacsl_assert_register_array(eacsl_assert_data_t *data, const char *name,
                                  void *array) {
   eacsl_assert_register_data(
       data, name, E_ACSL_ARRAY,
-      (eacsl_assert_data_content_t){.value_array = array});
+      (eacsl_assert_data_content_t){.value_array = (uintptr_t)array});
 }
 
 void eacsl_assert_register_fun(eacsl_assert_data_t *data, const char *name) {
@@ -395,12 +396,13 @@ void eacsl_assert_copy_value(eacsl_assert_data_t *dest,
       break;
     }
     case E_ACSL_PTR: {
-      eacsl_assert_register_ptr(dest, value->name, value->content.value_ptr);
+      eacsl_assert_register_ptr(dest, value->name,
+                                (void *)value->content.value_ptr);
       break;
     }
     case E_ACSL_ARRAY: {
       eacsl_assert_register_array(dest, value->name,
-                                  value->content.value_array);
+                                  (void *)value->content.value_array);
       break;
     }
     case E_ACSL_FUN: {

@@ -134,6 +134,7 @@ and name_group = specifier * name list
 and field_group =
   | FIELD of specifier * (name * expression option) list
   | TYPE_ANNOT of Logic_ptree.type_annot
+  | STATIC_ASSERT_FG of expression * string * cabsloc
 
 (* like name_group, except the declared variables are allowed to have initializers *)
 (* e.g.: int x=1, y=2; *)
@@ -169,6 +170,7 @@ and definition =
   | ONLYTYPEDEF of specifier * cabsloc
   | GLOBASM of string * cabsloc
   | PRAGMA of expression * cabsloc
+  | STATIC_ASSERT of expression * string * cabsloc
   | LINKAGE of string * cabsloc * definition list (* extern "C" { ... } *)
   | GLOBANNOT of Logic_ptree.decl list
   (** Logical declaration (axiom, logic, etc.)*)

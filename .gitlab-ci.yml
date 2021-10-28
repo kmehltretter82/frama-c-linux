@@ -234,7 +234,7 @@ e-acsl-tests-dev:
 
 ivette:
   stage: build
-  image: node
+  image: node:lts-gallium
   cache:
     paths:
     - ivette/node_modules/

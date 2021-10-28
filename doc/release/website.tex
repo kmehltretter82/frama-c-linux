@@ -195,43 +195,44 @@ Just update the \texttt{VERSION} file in \texttt{master}, by adding
 
 \textbf{Note:} you need access to the \texttt{framac} Docker Hub account to be able to upload the image.
 
-Make sure:
+Make sure that \texttt{devel\_tools/docker/Makefile} is up-to-date:
+
 \begin{itemize}
-  \item \texttt{devel\_tools/docker/frama-c.dev/Dockerfile}
-  \item \texttt{devel\_tools/docker/frama-c.custom/Dockerfile}
+\item changes to \texttt{reference-configuration.md} must have been ported
+  to the corresponding \texttt{Dockerfile.dev} entry inside the
+  \texttt{Makefile}.
 \end{itemize}
-are up-to-date; to do so, you can do the following:
 
-\begin{lstlisting}
-cd devel_tools/docker/frama-c.custom
-<edit Dockerfile to change the base image, from debian:sid (unstable) to the
- latest stable release>
-<copy release .tar.gz to this directory, extract and rename the directory
- `frama-c`>
-docker build . -t fc-with-test --build-arg=with_source=yes\
-  --build-arg=with_test=yes
-\end{lstlisting}
+Copy the \texttt{.tar.gz} archive to the \texttt{devel\_tools/docker} directory.
 
-This should copy the contents of \texttt{frama-c} into the Docker image and try
-to compile Frama-C with it, then run the tests.
+Run \texttt{make release}. It should decompress the archive, build and test
+the Frama-C Docker image.
 
 If the local tests do not work, check that the OCaml version and package
-dependencies are all up-to-date. Remember that there are several differences
-between Debian unstable (`sid`) and stable, which may require changes to the
-\texttt{Dockerfile}.
+dependencies are all up-to-date.
 
-If the local tests work, then re-run Docker \textit{without} the source/tests,
-to make the image leaner:
+If the image is built succesfully, you can also try building the GUI image
+(\texttt{make release-gui}) and the stripped image
+(\texttt{make release-stripped}).
+
+If you want to upload these images to the Docker Hub, you can re-tag them, e.g.
 
 \begin{lstlisting}
-docker build . -t framac/frama-c:<VERSION>
+docker tag framac/frama-c:release framac/frama-c:<VERSION>
 \end{lstlisting}
 
-Replacing \texttt{<VERSION>} with the release number, e.g. \texttt{23.0}.
+Where \texttt{<VERSION>} is the release number, possibly with a suffix, but
+{\em without} characters such as \texttt{+}. For instance, you can use
+\texttt{23.1-beta} for a beta release.
 
-After building the image, upload it with \texttt{docker push framac/frama-c:<VERSION>}.
+Then upload the renamed image(s) with:
+
+\begin{lstlisting}
+docker push framac/frama-c:<VERSION>
+docker push framac/frama-c-gui:<VERSION>
+docker push framac/frama-c:<VERSION>-stripped
+\end{lstlisting}
 You will need to have setup your \texttt{framac} Docker Hub account for this to work.
-
 
 %%% Local Variables:
 %%% mode: latex

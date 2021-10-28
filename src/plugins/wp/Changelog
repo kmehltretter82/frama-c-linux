@@ -24,6 +24,7 @@
 Plugin WP <next-release>
 #########################
 
+- WP          [2021-10-25] Removes -wp-overflows option (unsound)
 - WP          [2021-06-11] Adds an experimental support of "terminates" clauses.
                            Adds the options -wp-declaration-terminate and
                           -wp-frama-c-stdlib to claims that external functions

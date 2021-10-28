@@ -525,7 +525,7 @@ module Base_checker = struct
           local_vars <- Varinfo.Set.remove v local_vars;
         end else begin
           check_abort
-            "%t is present in a block's blocals but in the function's slocals"
+            "%t is present in a block's blocals but not in the function's slocals"
             prefix
         end
 
