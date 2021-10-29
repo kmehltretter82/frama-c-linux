@@ -2437,7 +2437,7 @@ GENERATED+=ptests/ptests_config.ml tests/ptests_config $(GENERATED_TESTS)
 # Source distribution #
 #######################
 
-.PHONY: src-distrib
+.PHONY: src-distrib ivette-src-distrib
 
 STANDALONE_PLUGINS_FILES = \
 	$(addprefix src/dummy/hello_world/,hello_world.ml Makefile) \
@@ -2448,6 +2448,10 @@ DISTRIB_FILES += $(wildcard $(PLUGIN_DISTRIBUTED_LIST)                   \
                     $(PLUGIN_DIST_DOC_LIST) $(STANDALONE_PLUGINS_FILES))
 DISTRIB_FILES:=$(filter-out $(GENERATED) $(PLUGIN_GENERATED_LIST),\
                   $(DISTRIB_FILES))
+
+src-distrib: ivette-src-distrib
+ivette-src-distrib:
+	make -C ivette update-distrib-files
 
 sinclude ivette/Makefile.distrib
 

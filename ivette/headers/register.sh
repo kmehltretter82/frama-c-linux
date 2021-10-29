@@ -1,6 +1,6 @@
 #!/bin/sh
 case "$1" in
-    Makefile.distrib | *.json | src/dome/doc/* )
+    Makefile.distrib | *.json | src/dome/doc/* | */.eslintrc.js | */sandbox.tsx)
         echo "$1: .ignore"
         ;;
     *Make* | src/*/*.js* | src/*/*.ts* )
