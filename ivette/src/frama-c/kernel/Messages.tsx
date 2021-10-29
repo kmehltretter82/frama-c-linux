@@ -35,6 +35,7 @@ import * as Arrays from 'dome/table/arrays';
 import { Table, Column, Renderer } from 'dome/table/views';
 import * as Compare from 'dome/data/compare';
 
+import { State, GlobalState, useGlobalState } from 'dome/data/states';
 import * as States from 'frama-c/states';
 import * as Ast from 'frama-c/api/kernel/ast';
 import * as Kernel from 'frama-c/api/kernel/services';
@@ -201,8 +202,8 @@ function Section(p: Forms.SectionProps) {
   );
 }
 
-function MessageFilter(props: {filter: Forms.FieldState<Filter>}) {
-  const state = props.filter;
+function MessageFilter(props: {filter: State<Filter>}) {
+  const state = Forms.useValid(props.filter);
   const search = Forms.useProperty(state, 'search');
   const categoryState = Forms.useProperty(search, 'category');
   const messageState = Forms.useProperty(search, 'message');
@@ -386,6 +387,8 @@ const byMessage: Compare.ByFields<Message> = {
   source: Compare.defined(bySource),
 };
 
+const globalFilterState = new GlobalState(defaultFilter);
+
 export default function RenderMessages() {
 
   const [model] = React.useState(() => {
@@ -403,7 +406,7 @@ export default function RenderMessages() {
     model.reload();
   }, [model, data]);
 
-  const filterState = Forms.useState<Filter>(defaultFilter);
+  const filterState = useGlobalState(globalFilterState);
   const [filter] = filterState;
   const [selection, updateSelection] = States.useSelection();
   const selectedFct = selection?.current?.fct;
