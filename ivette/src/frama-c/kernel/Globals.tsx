@@ -140,7 +140,7 @@ export default () => {
     updateSelection({ location: { fct: name } });
   }
 
-  async function onContextMenu() {
+  function onContextMenu() {
     const items: Dome.PopupMenuItem[] = [
       {
         label: 'Show Frama-C builtins',
@@ -184,9 +184,9 @@ export default () => {
     <Section
       label="Functions"
       title={title}
-      onContextMenu={onContextMenu}
-      settings="frama-c.sidebar.globals"
       defaultUnfold
+      settings="frama-c.sidebar.globals"
+      onContextMenu={onContextMenu}
     >
       {filtered.map((fct) => (
         <FctItem

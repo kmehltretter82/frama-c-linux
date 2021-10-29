@@ -113,6 +113,7 @@
 
 .astinfo-markerbutton {
     flex: 0 1 auto;
+    margin: 0px;
     position: relative;
 }
 

@@ -118,6 +118,7 @@ interface ASTinfos {
 interface InfoSectionProps {
   marker: AST.marker;
   markerInfo: AST.markerInfoData;
+  filter: string;
   selected: boolean;
   hovered: boolean;
   pinned: boolean;
@@ -129,8 +130,9 @@ interface InfoSectionProps {
 
 function MarkInfos(props: InfoSectionProps) {
   const [unfold, setUnfold] = React.useState(true);
+  const [more, setMore] = React.useState(false);
   const { marker, markerInfo } = props;
-  const infos: ASTinfos[] =
+  const allInfos: ASTinfos[] =
     States.useRequest(AST.getInformations, marker) ?? [];
   const highlight = classes(
     props.selected && !props.pinned && 'transient',
@@ -138,7 +140,10 @@ function MarkInfos(props: InfoSectionProps) {
   );
   const descr = markerInfo.descr ?? markerInfo.name;
   const kind = MARKERS.get(markerInfo.kind) ?? GMARKER;
-  const foldUnfold = () => setUnfold(!unfold);
+  const fs = props.filter.split(':');
+  const filtered = allInfos.filter((info) => !fs.some((m) => m === info.id));
+  const infos = more ? allInfos : filtered;
+  const hasMore = filtered.length < allInfos.length;
   return (
     <div
       className={`astinfo-section ${highlight}`}
@@ -157,13 +162,14 @@ function MarkInfos(props: InfoSectionProps) {
           size={9}
           offset={-2}
           id={unfold ? 'TRIANGLE.DOWN' : 'TRIANGLE.RIGHT'}
-          onClick={foldUnfold}
+          onClick={() => setUnfold(!unfold)}
         />
         <Code className="astinfo-markercode">
           {kind}{descr}
         </Code>
         <IconButton
           className="astinfo-markerbutton"
+          title="Pin/unpin information in sidebar"
           size={9}
           offset={0}
           icon="PIN"
@@ -171,7 +177,18 @@ function MarkInfos(props: InfoSectionProps) {
           onClick={props.onPin}
         />
         <IconButton
+          style={{ display: hasMore ? undefined : 'none' }}
           className="astinfo-markerbutton"
+          title="Show all available informations"
+          size={9}
+          offset={0}
+          icon="CIRC.PLUS"
+          selected={more}
+          onClick={() => setMore(!more)}
+        />
+        <IconButton
+          className="astinfo-markerbutton"
+          title="Remove informations"
           size={9}
           offset={0}
           icon="CIRC.CLOSE"
@@ -229,15 +246,49 @@ class InfoMarkers {
 }
 
 // --------------------------------------------------------------------------
+// --- Context Menu Filter
+// --------------------------------------------------------------------------
+
+function openFilter(
+  infos: ASTinfos[],
+  filter: string,
+  onChange: (f: string) => void,
+): void {
+  const menuItems = infos.map((info) => {
+    const fs = filter.split(':');
+    const checked = !fs.some((m) => m === info.id);
+    const onClick = () => {
+      const newFs =
+        checked
+          ? fs.concat(info.id)
+          : fs.filter((m) => m !== info.id);
+      onChange(newFs.join(':'));
+    };
+    return {
+      id: info.id,
+      label: `${info.title} (${info.label})`,
+      checked,
+      onClick,
+    };
+  });
+  Dome.popupMenu(menuItems);
+  return;
+}
+
+// --------------------------------------------------------------------------
 // --- Information Panel
 // --------------------------------------------------------------------------
 
 export default function ASTinfo() {
+  // Hooks
   Dome.useUpdate(reload);
   const markers = React.useMemo(() => new InfoMarkers(), []);
   const markerInfos = States.useSyncArray(AST.markerInfo, false);
   const [selection] = States.useSelection();
   const [hoveredLoc] = States.useHovered();
+  const informations = States.useRequest(AST.getInformations, null) ?? [];
+  const [filter, setFilter] =
+    Dome.useStringSettings('frama-c.sidebar.astinfo.filter', '');
   const location = selection?.current;
   const selected = location?.marker;
   const hovered = hoveredLoc?.marker;
@@ -246,6 +297,7 @@ export default function ASTinfo() {
     if (selected) markers.setPinned(selected, true);
     markers.setSelected(loc, true);
   });
+  // Rendering
   const renderMark = (mark: Mark) => {
     const { marker } = mark;
     const markerInfo = markerInfos.getData(marker);
@@ -264,6 +316,7 @@ export default function ASTinfo() {
         markerInfo={markerInfo}
         pinned={pinned}
         selected={isSelected}
+        filter={filter}
         hovered={isHovered}
         onPin={onPin}
         onRemove={onRemove}
@@ -274,10 +327,11 @@ export default function ASTinfo() {
   };
   return (
     <Section
-      defaultUnfold
-      settings="frama-c.sidebar.astinfo"
       label="Informations"
       title="Contextual informations on current selection"
+      defaultUnfold
+      settings="frama-c.sidebar.astinfo"
+      onContextMenu={() => openFilter(informations, filter, setFilter)}
     >
       {markers.getSelected().map(renderMark)}
     </Section>
