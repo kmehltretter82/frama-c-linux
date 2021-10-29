@@ -1,7 +1,7 @@
 /* run.config
  EXIT: 1
 
-   OPT: -kernel-warn-key=annot-error=active -print tests/spec/multiple_include_1.c -journal-disable
+   OPT: -kernel-warn-key=annot-error=active -print tests/spec/multiple_include_1.c
 */
 
 #include "multiple_include.h"

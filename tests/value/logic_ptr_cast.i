@@ -1,9 +1,9 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module eva -eva @EVA_CONFIG@ -print -journal-disable -eva-no-results
+ PLUGIN: @EVA_MAIN_PLUGINS@
+   OPT: -eva @EVA_CONFIG@ -print -eva-no-results
 */
 int *p;
 int t[90];
-
 int main(){
   p = (int*) (((unsigned long)t + 7) & ~7UL);
   /*@ assert p == (int*)t || p == (int*)((char*)t+1) || 

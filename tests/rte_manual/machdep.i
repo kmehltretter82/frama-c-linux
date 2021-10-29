@@ -1,6 +1,6 @@
 /* run.config
-   OPT: -machdep x86_32 -rte -then -print
-   OPT: -machdep x86_64 -rte -then -print
+   STDOPT: #"-machdep x86_32 "
+   STDOPT: #"-machdep x86_64 "
  */
 
 int main(void) {

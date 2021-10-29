@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -keep-switch -print -journal-disable
+   OPT: -keep-switch -print
 */
 
 int foo18(int a) {

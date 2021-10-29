@@ -1,11 +1,11 @@
 /* run.config*
  PLUGIN: @EVA_PLUGINS@ report
-   OPT: @EVA_OPTIONS@ -print -journal-disable -eva -report
+   OPT: @EVA_OPTIONS@ -print -eva -report
  MODULE: big_local_array_script
    OPT: @EVA_OPTIONS@ -then-on prj -print -report
  PLUGIN: @EVA_PLUGINS@
  MODULE:
-   OPT: @EVA_OPTIONS@ -print -journal-disable -no-initialized-padding-locals -eva
+   OPT: @EVA_OPTIONS@ -print -no-initialized-padding-locals -eva
 */
 
 struct S {

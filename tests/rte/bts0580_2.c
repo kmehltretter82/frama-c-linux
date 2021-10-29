@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -rte -warn-signed-overflow -rte-mem -rte-no-pointer-call -print
+   STDOPT: #" -warn-signed-overflow -rte-mem -rte-no-pointer-call -print"
 */
 
 typedef int (*fptr)(int);

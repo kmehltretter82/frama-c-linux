@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -rte -print
+   STDOPT: #" -print"
 */
 
 typedef int (*fptr)(int);

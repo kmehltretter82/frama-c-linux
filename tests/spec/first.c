@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -print tests/spec/third.c tests/spec/second.c -journal-disable
+   OPT: -print tests/spec/third.c tests/spec/second.c
 */
 /*@ behavior b:
   requires \valid(first);

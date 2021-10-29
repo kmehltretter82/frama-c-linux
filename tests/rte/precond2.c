@@ -1,6 +1,6 @@
 /* run.config
  MODULE: compute_annot
-   OPT: -warn-special-float none -journal-disable
+   OPT: -warn-special-float none
 */
 
 int global = 15;

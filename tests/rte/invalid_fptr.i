@@ -1,5 +1,5 @@
 /* run.config
-OPT: -c11 -rte -warn-invalid-pointer -print
+STDOPT: +"-c11 -warn-invalid-pointer -print"
 */
 
 struct S { void (*f)(void); } s;

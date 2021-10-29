@@ -1,7 +1,7 @@
 /* run.config
-   OPT: -eva @EVA_CONFIG@ -main f -journal-disable
-   OPT: -eva @EVA_CONFIG@ -main f2 -journal-disable
-   OPT: -eva @EVA_CONFIG@ -main loop -journal-disable
+   OPT: -eva @EVA_CONFIG@ -main f
+   OPT: -eva @EVA_CONFIG@ -main f2
+   OPT: -eva @EVA_CONFIG@ -main loop
 */
 /*
  * bin/viewer.byte -main f tests/scope/scope.c -eva

@@ -1,7 +1,7 @@
 /* run.config 
 PLUGIN: eva,from,inout,scope
-  OPT: -eva @EVA_CONFIG@ -deps -out -input -journal-disable -lib-entry
-  OPT: -eva @EVA_CONFIG@ -deps -out -input -journal-disable
+  OPT: -eva @EVA_CONFIG@ -deps -out -input -lib-entry
+  OPT: -eva @EVA_CONFIG@ -deps -out -input
 */
 int e;
 

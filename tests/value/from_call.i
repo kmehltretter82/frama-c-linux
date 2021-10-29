@@ -1,10 +1,10 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module from,inout,users,eva -calldeps -eva @EVA_CONFIG@ -journal-disable -users -then -input
-   OPT: -no-autoload-plugins -load-module from,eva @EVA_CONFIG@ -deps -show-indirect-deps -journal-disable
+  PLUGIN: @EVA_MAIN_PLUGINS@ from,users
+   OPT: -calldeps -eva @EVA_CONFIG@ -users -then -input
+  PLUGIN: @EVA_MAIN_PLUGINS@ from
+   OPT: @EVA_CONFIG@ -deps -show-indirect-deps
 */
-int a,b,c,d;
-int x,y,z,t;
-
+int a,b,c,d, x,y,z,t;
 int g(int w)
 {
   return w + t;

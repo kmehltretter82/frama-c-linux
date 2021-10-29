@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -cpp-extra-args="-Itests/spec" -cpp-extra-args="-include lib.h" -print -journal-disable
+   OPT: -cpp-extra-args="-Itests/spec" -cpp-extra-args="-include lib.h" -print
 */
 
 /*@ ensures f((int)0) == (int)0; */

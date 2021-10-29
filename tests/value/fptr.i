@@ -1,7 +1,7 @@
 /* run.config*
-   
-   OPT: -no-autoload-plugins -load-module from,inout,eva -eva @EVA_CONFIG@ -journal-disable -then -deps -out
-   OPT: -no-autoload-plugins -load-module from,inout,eva -eva @EVA_CONFIG@ -main main_uninit -journal-disable -then -deps -out
+ PLUGIN: @EVA_MAIN_PLUGINS@ from,inout
+   OPT: -eva @EVA_CONFIG@ -then -deps -out
+   OPT: -eva @EVA_CONFIG@ -main main_uninit -then -deps -out
 */
 int R=77; volatile int v; int n;
 

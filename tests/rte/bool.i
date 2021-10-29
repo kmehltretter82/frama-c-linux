@@ -1,5 +1,5 @@
 /* run.config
-OPT: -warn-invalid-bool -rte -print -then -rte-trivial-annotations -rte -print
+OPT: -warn-invalid-bool @RTE_TEST@ -print -then -rte-trivial-annotations @RTE_TEST@ -print
 */
 
 /* The test asks for two executions of RTE plug-in:

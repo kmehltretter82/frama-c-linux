@@ -1,7 +1,7 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module inout,eva -eva @EVA_CONFIG@ -absolute-valid-range 32-36
+ PLUGIN: @EVA_MAIN_PLUGINS@
+   OPT: -eva @EVA_CONFIG@ -absolute-valid-range 32-36
 */
-
 char t[5];
 int *p;
 int x;

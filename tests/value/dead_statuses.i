@@ -1,7 +1,7 @@
 /* run.config*
-   STDOPT: +"-load-module report -then -report"
+ PLUGIN: @PTEST_PLUGIN@ report
+   STDOPT: +"-then -report"
 */
-
 //@ requires \true; assigns \nothing;
 void f(void);
 

@@ -1,7 +1,7 @@
 /* run.config
  LIBS: libSelect
  MODULE: @PTEST_NAME@
-   OPT: @EVA_OPTIONS@ -deps -slicing-level 0 -journal-disable
+   OPT: @EVA_OPTIONS@ -deps -slicing-level 0
 */
 
 /* bin/toplevel.opt -deps -eva @PTEST_DIR@/@PTEST_NAME@.c */

@@ -1,7 +1,7 @@
 /* run.config*
-   STDOPT: +"-load-module report -report -then -eva-slevel 10"
+ PLUGIN: @PTEST_PLUGIN@ report
+   STDOPT: +"-report -then -eva-slevel 10"
 */
-
 
 int S=0;
 int T[5];

@@ -5,8 +5,8 @@
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function g <- main.
-  Called from tests/value/bts1306.i:9.
-[eva:alarm] tests/value/bts1306.i:5: Warning: 
+  Called from tests/value/bts1306.i:10.
+[eva:alarm] tests/value/bts1306.i:6: Warning: 
   non-finite double value. assert \is_finite(\mul_double(x, x));
 [eva] Recording results for g
 [eva] Done for function g
@@ -40,8 +40,8 @@ int main(double x)
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function g <- main.
-  Called from tests/value/bts1306.i:9.
-[eva:alarm] tests/value/bts1306.i:5: Warning: 
+  Called from tests/value/bts1306.i:10.
+[eva:alarm] tests/value/bts1306.i:6: Warning: 
   non-finite double value. assert \is_finite(\mul_double(x, x));
 [eva] Recording results for g
 [eva] Done for function g

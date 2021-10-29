@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -print -journal-disable
+   OPT: -print
    STDOPT:
    STDOPT: +"-scf-allow-cast"
 */

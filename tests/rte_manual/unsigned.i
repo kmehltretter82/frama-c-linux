@@ -1,6 +1,6 @@
 /* run.config
-   OPT: -rte -then -print
-   OPT: -warn-unsigned-overflow -rte -then -print
+   STDOPT:
+   STDOPT: #"-warn-unsigned-overflow "
  */
 
 unsigned int f(unsigned int a, unsigned int b) {
