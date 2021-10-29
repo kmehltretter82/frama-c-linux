@@ -194,6 +194,9 @@ val wkey_audit: warn_category
 val wkey_parser_unsupported: warn_category
 (** Warning related to unsupported parsing-related features. *)
 
+val wkey_asm: warn_category
+(** Warnings related to assembly code. *)
+
 (* ************************************************************************* *)
 (** {2 Functors for late option registration}                                *)
 (** Kernel_function-related options cannot be registered in this module:
