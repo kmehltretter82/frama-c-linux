@@ -176,4 +176,20 @@ export const getValues: Server.GetRequest<
     alarms: [ "True" | "False" | "Unknown", string ][] }
   >= getValues_internal;
 
+const getPointedLvalues_internal: Server.GetRequest<
+  { callstack?: callstack, pointer: marker },
+  { lvalues?: string[] }
+  > = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.eva.values.getPointedLvalues',
+  input:  Json.jObject({ callstack: jCallstack, pointer: jMarkerSafe,}),
+  output: Json.jObject({ lvalues: Json.jList(Json.jString),}),
+  signals: [],
+};
+/**  */
+export const getPointedLvalues: Server.GetRequest<
+  { callstack?: callstack, pointer: marker },
+  { lvalues?: string[] }
+  >= getPointedLvalues_internal;
+
 /* ------------------------------------- */

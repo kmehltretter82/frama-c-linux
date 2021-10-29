@@ -27,6 +27,8 @@
 // React & Dome
 import React from 'react';
 import * as Dome from 'dome';
+import * as Server from 'frama-c/server';
+import * as Values from 'frama-c/api/plugins/eva/values';
 import { classes } from 'dome/misc/utils';
 import { VariableSizeList } from 'react-window';
 import { Hpack, Filler } from 'dome/layout/boxes';
@@ -177,12 +179,29 @@ function TableCell(props: TableCellProps) {
     probe.setPersistent();
     if (probe.zoomable) probe.setZoomed(!probe.zoomed);
   };
+
+  async function onContextMenu() {
+    Server
+      .send(Values.getPointedLvalues, { pointer: marker, callstack })
+      .then((r) => {
+        const lvalues = r.lvalues ?? [];
+        const items: Dome.PopupMenuItem[] = lvalues.map((lval) => {
+          const label = `Display values for ${lval}`;
+          const onClick = () => {};
+          return { label, onClick };
+        });
+        if (items !== []) Dome.popupMenu(items);
+      })
+      .catch((err) => console.log(err));
+  };
+
   return (
     <div
       className={className}
       style={style}
       onClick={onClick}
       onDoubleClick={onDoubleClick}
+      onContextMenu={onContextMenu}
     >
       {contents}
     </div>

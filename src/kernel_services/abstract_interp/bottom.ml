@@ -39,6 +39,11 @@ end
 
 include Type
 
+let default or_bottom ~default =
+  match or_bottom with
+  | `Bottom -> default
+  | `Value res -> res
+
 let is_bottom = function
   | `Bottom -> true
   | `Value _ -> false
@@ -139,6 +144,10 @@ module Bound_Lattice
   let join = join Lattice.join
   let is_included = is_included Lattice.is_included
 end
+
+let to_option = function
+  | `Bottom -> None
+  | `Value v -> Some v
 
 let to_list = function
   | `Bottom  -> []

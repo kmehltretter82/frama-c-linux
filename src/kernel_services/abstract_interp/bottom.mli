@@ -39,6 +39,7 @@ include module type of Type
 
 val is_bottom: 'a or_bottom -> bool
 val non_bottom: 'a or_bottom -> 'a
+val default : 'a or_bottom -> default:'a -> 'a
 
 val equal:       ('a -> 'a -> bool) -> 'a or_bottom -> 'a or_bottom -> bool
 val compare:     ('a -> 'a -> int)  -> 'a or_bottom -> 'a or_bottom -> int
@@ -70,6 +71,7 @@ module Bound_Lattice
     the empty list is the bottom case. *)
 
 (** Conversion functions. *)
+val to_option : 'a or_bottom -> 'a option
 val to_list: 'a or_bottom -> 'a list
 val bot_of_list: 'a list -> 'a list or_bottom
 val list_of_bot: 'a list or_bottom -> 'a list

@@ -188,6 +188,10 @@ let iter f = function
   | Just m -> M.iter f m
   | AllBut _ -> assert false
 
+let fold f acc = function
+  | Just m -> M.fold f m acc
+  | AllBut _ -> assert false
+
 let exists test ~default = function
   | Just m -> M.exists test m || default True
   | AllBut m -> M.exists test m || default Unknown
