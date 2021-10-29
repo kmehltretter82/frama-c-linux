@@ -582,15 +582,6 @@ struct
   let rankId = ref 0
   let registry : (string,info) Hashtbl.t = Hashtbl.create 0
 
-  let register ~id ~label ~title pretty =
-    let rank = incr rankId ; !rankId in
-    let info = { id ; rank ; label ; title ; pretty } in
-    if Hashtbl.mem registry id then
-      ( let msg = Format.sprintf
-            "Server.Kernel_ast.register_info: duplicate %S" id in
-        raise (Invalid_argument msg) );
-    Hashtbl.add registry id info
-
   let jtext pp marker =
     try
       let buffer = Jbuffer.create () in
@@ -617,6 +608,21 @@ struct
       ) registry ;
     List.sort by_rank !infos
 
+  let signal = Request.signal ~package
+      ~name:"getInformationsUpdate"
+      ~descr:(Md.plain "Updated AST informations")
+
+  let update () = Request.emit signal
+
+  let register ~id ~label ~title pretty =
+    let rank = incr rankId ; !rankId in
+    let info = { id ; rank ; label ; title ; pretty } in
+    if Hashtbl.mem registry id then
+      ( let msg = Format.sprintf
+            "Server.Kernel_ast.register_info: duplicate %S" id in
+        raise (Invalid_argument msg) );
+    Hashtbl.add registry id info
+
 end
 
 let () = Request.register ~package
@@ -627,6 +633,7 @@ let () = Request.register ~package
                of informations (with empty `descr` field).")
     ~input:(module Joption(Marker))
     ~output:(module Jlist(Informations.S))
+    ~signals:[Informations.signal]
     Informations.get_informations
 
 (* -------------------------------------------------------------------------- *)
