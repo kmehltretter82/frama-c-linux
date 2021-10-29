@@ -482,16 +482,6 @@ export const getInformations: Server.GetRequest<
   { id: string, label: string, title: string, descr: text }[]
   >= getInformations_internal;
 
-const getInfo_internal: Server.GetRequest<marker,text> = {
-  kind: Server.RqKind.GET,
-  name:   'kernel.ast.getInfo',
-  input:  jMarker,
-  output: jText,
-  signals: [],
-};
-/** Get textual information about a marker */
-export const getInfo: Server.GetRequest<marker,text>= getInfo_internal;
-
 const getFiles_internal: Server.GetRequest<null,string[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.getFiles',

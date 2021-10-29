@@ -634,6 +634,30 @@ let () = Request.register ~package
 (* -------------------------------------------------------------------------- *)
 
 let () = Informations.register
+    ~id:"kernel.ast.varinfo"
+    ~label:"Var"
+    ~title:"Variable Informations"
+    begin fun fmt loc ->
+      match loc with
+      | PLval (_ , _, (Var x,NoOffset)) | PVDecl(_,_,x) ->
+        if not x.vreferenced then Format.pp_print_string fmt "unused " ;
+        begin
+          match x.vstorage with
+          | NoStorage -> ()
+          | Extern -> Format.pp_print_string fmt "extern "
+          | Static -> Format.pp_print_string fmt "static "
+          | Register -> Format.pp_print_string fmt "register "
+        end ;
+        if x.vghost then Format.pp_print_string fmt "ghost " ;
+        if x.vaddrof then Format.pp_print_string fmt "aliased " ;
+        if x.vformal then Format.pp_print_string fmt "formal" else
+        if x.vglob then Format.pp_print_string fmt "global" else
+        if x.vtemp then Format.pp_print_string fmt "temporary" else
+          Format.pp_print_string fmt "local" ;
+      | _ -> raise Not_found
+    end
+
+let () = Informations.register
     ~id:"kernel.ast.typeinfo"
     ~label:"Type"
     ~title:"Type of C/ASCL expression"
@@ -645,77 +669,6 @@ let () = Informations.register
       | PTermLval(_,_,_,lv) -> pp_logic_type fmt (Cil.typeOfTermLval lv)
       | _ -> raise Not_found
     end
-
-(* -------------------------------------------------------------------------- *)
-(* --- Deprecated Informations                                            --- *)
-(* -------------------------------------------------------------------------- *)
-
-module DeprecatedInfo = struct
-  open Printer_tag
-
-  let print_function fmt name =
-    let stag = Format.String_tag name in
-    Format.pp_open_stag fmt stag;
-    Format.pp_print_string fmt name;
-    Format.pp_close_stag fmt ()
-
-  let print_kf fmt kf = print_function fmt (Kernel_function.get_name kf)
-
-  let print_variable fmt vi =
-    Format.fprintf fmt "Variable %s has type %a.@."
-      vi.vname Printer.pp_typ vi.vtype;
-    let kf = Kernel_function.find_defining_kf vi in
-    let pp_kf fmt kf = Format.fprintf fmt " of function %a" print_kf kf in
-    Format.fprintf fmt "It is a %s variable%a.@."
-      (if vi.vglob then "global" else if vi.vformal then "formal" else "local")
-      (Format.pp_print_option pp_kf) kf;
-    if vi.vtemp then
-      Format.fprintf fmt "This is a temporary variable%s.@."
-        (match vi.vdescr with None -> "" | Some descr -> " for " ^ descr);
-    Format.fprintf fmt "It is %sreferenced and its address is %staken."
-      (if vi.vreferenced then "" else "not ")
-      (if vi.vaddrof then "" else "not ")
-
-  let print_varinfo fmt vi =
-    if Cil.isFunctionType vi.vtype
-    then
-      Format.fprintf fmt "%a is a C function of type '%a'."
-        print_function vi.vname Printer.pp_typ vi.vtype
-    else print_variable fmt vi
-
-  let print_lvalue fmt _loc = function
-    | Var vi, NoOffset -> print_varinfo fmt vi
-    | lval ->
-      Format.fprintf fmt "This is an lvalue of type %a."
-        Printer.pp_typ (Cil.typeOfLval lval)
-
-  let print_localizable fmt = function
-    | PExp (_, _, e) ->
-      Format.fprintf fmt "This is a pure C expression of type %a."
-        Printer.pp_typ (Cil.typeOf e)
-    | PLval (_, _, lval) as loc -> print_lvalue fmt loc lval
-    | PVDecl (_, _, vi) ->
-      Format.fprintf fmt "This is the declaration of variable %a.@.@."
-        Printer.pp_varinfo vi;
-      print_varinfo fmt vi
-    | PStmt (kf, _) | PStmtStart (kf, _) ->
-      Format.fprintf fmt "This is a statement of function %a." print_kf kf
-    | _ -> ()
-
-  let get_marker_info loc =
-    let buffer = Jbuffer.create () in
-    let fmt = Jbuffer.formatter buffer in
-    print_localizable fmt loc;
-    Format.pp_print_flush fmt ();
-    Jbuffer.contents buffer
-
-end
-
-let () = Request.register ~package
-    ~kind:`GET ~name:"getInfo"
-    ~descr:(Md.plain "Get textual information about a marker")
-    ~input:(module Marker) ~output:(module Jtext)
-    DeprecatedInfo.get_marker_info
 
 (* -------------------------------------------------------------------------- *)
 (* --- Files                                                              --- *)
