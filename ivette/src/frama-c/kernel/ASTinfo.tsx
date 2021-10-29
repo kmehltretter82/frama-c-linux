@@ -94,7 +94,7 @@ interface InfoItemProps {
 
 function InfoItem(props: InfoItemProps) {
   return (
-    <>
+    <div className="astinfo-infos">
       <div
         className="dome-text-label astinfo-kind"
         title={props.title}
@@ -104,7 +104,7 @@ function InfoItem(props: InfoItemProps) {
       <div className="dome-text-cell astinfo-data">
         <Text text={props.descr} />
       </div>
-    </>
+    </div>
   );
 }
 
@@ -178,13 +178,7 @@ function MarkInfos(props: InfoSectionProps) {
           onClick={props.onRemove}
         />
       </div>
-      <div
-        key="INFOS"
-        className="astinfo-infos"
-        style={{ display: unfold && infos.length ? undefined : 'none' }}
-      >
-        {infos.map((info) => <InfoItem key={info.id} {...info} />)}
-      </div>
+      {unfold && infos.map((info) => <InfoItem key={info.id} {...info} />)}
     </div>
   );
 }
