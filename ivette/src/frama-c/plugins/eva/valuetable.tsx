@@ -190,7 +190,7 @@ function TableCell(props: TableCellProps) {
           const onClick = () => {};
           return { label, onClick };
         });
-        if (items !== []) Dome.popupMenu(items);
+        if (items.length > 0) Dome.popupMenu(items);
       })
       .catch((err) => console.log(err));
   };
