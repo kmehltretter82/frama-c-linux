@@ -87,7 +87,6 @@ const MARKERS = new Map<AST.markerKind, JSX.Element>();
 // --------------------------------------------------------------------------
 
 interface InfoItemProps {
-  id: string;
   label: string;
   title: string;
   descr: DATA.text;
@@ -109,6 +108,13 @@ function InfoItem(props: InfoItemProps) {
   );
 }
 
+interface ASTinfos {
+  id: string;
+  label: string;
+  title: string;
+  descr: DATA.text;
+}
+
 interface InfoSectionProps {
   marker: AST.marker;
   markerInfo: AST.markerInfoData;
@@ -124,9 +130,8 @@ interface InfoSectionProps {
 function MarkInfos(props: InfoSectionProps) {
   const [unfold, setUnfold] = React.useState(true);
   const { marker, markerInfo } = props;
-  const infos: InfoItemProps[] =
+  const infos: ASTinfos[] =
     States.useRequest(AST.getInformations, marker) ?? [];
-  console.log('INFOS', infos);
   const highlight = classes(
     props.selected && !props.pinned && 'transient',
     props.hovered && 'hovered',
@@ -178,7 +183,7 @@ function MarkInfos(props: InfoSectionProps) {
         className="astinfo-infos"
         style={{ display: unfold && infos.length ? undefined : 'none' }}
       >
-        {infos.map((info) => (<InfoItem key={info.id} {...info} />))}
+        {infos.map((info) => <InfoItem key={info.id} {...info} />)}
       </div>
     </div>
   );
