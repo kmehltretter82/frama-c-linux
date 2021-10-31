@@ -35,7 +35,7 @@ end
 
 type typed_offset =
   | NoOffset of Cil_types.typ
-  | Index of Int_val.t * Cil_types.typ * typed_offset
+  | Index of Cil_types.exp option * Int_val.t * Cil_types.typ * typed_offset
   | Field of Cil_types.fieldinfo * typed_offset
 
 
@@ -46,22 +46,38 @@ struct
   let rec pretty fmt = function
     | NoOffset _t -> ()
     | Field (fi, s) -> Format.fprintf fmt ".%s%a" fi.fname pretty s
-    | Index (i, _t, s) -> Format.fprintf fmt "[%a]%a" Int_val.pretty i pretty s
+    | Index (None, i, _t, s) ->
+      Format.fprintf fmt "[%a]%a"
+        Int_val.pretty i
+        pretty s
+    | Index (Some e, i, _t, s) ->
+      Format.fprintf fmt "[%a∈%a]%a"
+        Cil_printer.pp_exp e
+        Int_val.pretty i
+        pretty s
 
   let rec append o1 o2 =
     match o1 with
     | NoOffset _t -> o2
     | Field (fi, s) -> Field (fi, append s o2)
-    | Index (i, t, s) -> Index (i, t, append s o2)
+    | Index (e, i, t, s) -> Index (e, i, t, append s o2)
 
   let rec join o1 o2 =
     match o1, o2 with
-    | NoOffset t, NoOffset t' when Bit_utils.type_compatible t t' ->
+    | NoOffset t, NoOffset t'
+      when Bit_utils.type_compatible t t' ->
       NoOffset t
-    | Field (fi, s1), Field (fi', s2) when Cil_datatype.Fieldinfo.equal fi fi' ->
+    | Field (fi, s1), Field (fi', s2)
+      when Cil_datatype.Fieldinfo.equal fi fi' ->
       Field (fi, join s1 s2)
-    | Index (i1, t, s1), Index (i2, t', s2) when Bit_utils.type_compatible t t' ->
-      Index (Int_val.join i1 i2, t, join s1 s2)
+    | Index (e1, i1, t, s1), Index (e2, i2, t', s2)
+      when Bit_utils.type_compatible t t' ->
+      let e = match e1, e2 with
+        | Some e1, Some e2 when Cil_datatype.ExpStructEq.equal e1 e2 ->
+          Some e1 (* keep expression only when equivalent from both offsets *)
+        | _ -> None
+      in
+      Index (e, Int_val.join i1 i2, t, join s1 s2)
     | _ -> raise Abstract_interp.Error_Top
 
   let array_bounds array_size =
@@ -89,7 +105,7 @@ struct
       | TArray (elem_typ, array_size, _) ->
         let idx = oracle exp in
         assert_valid_index idx array_size;
-        Index (idx, elem_typ, of_cil_offset oracle elem_typ sub)
+        Index (Some exp, idx, elem_typ, of_cil_offset oracle elem_typ sub)
       | _ -> assert false
 
   let rec of_int_val ~base_typ ~typ ival =
@@ -119,7 +135,7 @@ struct
         in
         assert_valid_index range array_size;
         let sub = of_int_val ~base_typ:elem_typ ~typ rem in
-        Index (range, elem_typ, sub)
+        Index (None, range, elem_typ, sub)
 
       | TComp (ci, _) ->
         if not ci.cstruct then
@@ -171,7 +187,7 @@ struct
         | TArray (elem_typ, array_size, _) ->
           let idx = index_of_term array_size index in
           assert_valid_index idx array_size;
-          Index (idx, elem_typ, of_term_offset elem_typ sub)
+          Index (None, idx, elem_typ, of_term_offset elem_typ sub)
         | _ -> assert false
       end
     | _ -> raise Abstract_interp.Error_Top
@@ -179,8 +195,8 @@ struct
   let rec is_singleton = function
     | NoOffset _ -> true
     | Field (_fi, sub) -> is_singleton sub
-    | Index (ival, _elem_typ, sub) ->
-      Int_val.is_singleton ival && is_singleton sub
+    | Index (e, ival, _elem_typ, sub) ->
+      (Option.is_some e || Int_val.is_singleton ival) && is_singleton sub
 end
 
 module TypedOffsetOrTop =

@@ -62,10 +62,16 @@ sig
   val deps : State.t list
 end
 
-module type T =
+
+type side = Left | Right
+type oracle = Cil_types.exp -> Ival.t
+type bioracle = side -> oracle
+type strength = Strong | Weak | Reinforce (* update strength *)
+
+module TypedMemory (Config : Config) (Value : Value) :
 sig
-  type location
-  type value
+  type location = Abstract_offset.typed_offset
+  type value = Value.t
   type t
 
   (* Datatype *)
@@ -83,37 +89,38 @@ sig
   val is_top : t -> bool
 
   (* Get a value from a set of locations *)
-  val get : t -> location -> value
+  val get : oracle:oracle -> t -> location -> value
 
   (* Extract a sub map from a set of locations *)
-  val extract : t -> location -> t
+  val extract : oracle:oracle -> t -> location -> t
 
   (* Erase / initialize the memory on a set of locations. *)
-  val erase : weak:bool -> t -> location -> bit -> t
+  val erase : oracle:oracle -> weak:bool -> t -> location -> bit -> t
 
   (* Set a value on a set of locations *)
-  val set : weak:bool -> t -> location -> value -> t
+  val set : oracle:oracle -> weak:bool -> t -> location -> value -> t
 
   (* Copy a whole map over another *)
-  val overwrite : weak:bool -> t -> location -> t -> t
+  val overwrite : oracle:oracle -> weak:bool -> t -> location -> t -> t
 
   (* Reinforce values on a set of locations when the locations match the
      memory structure ; does nothing on locations that cannot be matched *)
-  val reinforce : (value -> value) ->  t -> location -> t
-
+  val reinforce : oracle:oracle -> (value -> value) ->  t -> location -> t
 
   (* Test inclusion of one memory map into another *)
   val is_included : t -> t -> bool
 
   (* Finest partition that is coarcer than both *)
-  val join : t -> t -> t
+  val join : oracle:bioracle -> t -> t -> t
 
   (* Partition widening *)
-  val widen : (size:size -> value -> value -> value) -> t -> t -> t
+  val widen : oracle:bioracle -> (size:size -> value -> value -> value) ->
+    t -> t -> t
 
+  (* Bounds update for array segmentations *)
+  val incr_bound : oracle:oracle -> Cil_types.varinfo -> Integer.t option ->
+    t -> t
+
+  (* Pretty prints memory *)
   val pretty : Format.formatter -> t -> unit
 end
-
-module Make (Config : Config) (Value : Value) : T
-  with type value = Value.t
-   and type location = Abstract_offset.typed_offset

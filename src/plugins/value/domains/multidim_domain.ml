@@ -69,6 +69,11 @@ let no_oracle exp =
   | None -> raise Abstract_interp.Error_Top
   | Some i -> Value.of_integer i
 
+let convert_oracle oracle =
+  fun exp ->
+  match Ival.project_int_val (Value.project_ival (oracle exp)) with
+  | Some int_val -> int_val
+  | None | exception Value.Not_based_on_null -> Int_val.top
 
 type assigned = (Precise_locs.precise_location,Value.t) Eval.assigned
 type builtin = assigned list -> assigned or_bottom
@@ -114,11 +119,7 @@ struct
 
   (* Raises Abstract_domain.{Error_top,Error_bottom} *)
   let of_lval oracle ((host,offset) : Cil_types.lval) : t =
-    let oracle' exp =
-      match Ival.project_int_val (Value.project_ival (oracle exp)) with
-      | Some int_val -> int_val
-      | None | exception Value.Not_based_on_null -> Int_val.top
-    in
+    let oracle' = convert_oracle oracle in
     let base_typ = Cil.typeOfLhost host in
     let offset = Offset.of_cil_offset oracle' base_typ offset in
     match host with
@@ -169,7 +170,7 @@ end
 module Memory =
 struct
   module Config = struct let deps = [Ast.self] end
-  module Memory = Abstract_memory.Make (Config) (Value)
+  module Memory = Abstract_memory.TypedMemory (Config) (Value)
 
   module Prototype =
   (* Datatype *)
@@ -189,30 +190,32 @@ struct
   let is_included = Memory.is_included
   let narrow = fun m1 _m2 -> m1
   let join = Memory.join
+  let smash ~oracle = Memory.join ~oracle:(fun _ -> oracle)
   let widen h = Memory.widen (fun ~size v1 v2 -> Value.widen (size,h) v1 v2)
+  let incr_bound = Memory.incr_bound
 
-  let get m loc =
+  let get ~oracle m loc =
     match loc with
     | `Top -> Value.top
-    | `Value loc -> Memory.get m loc
+    | `Value loc -> Memory.get ~oracle m loc
 
-  let extract m loc =
+  let extract ~oracle m loc =
     match loc with
     | `Top -> Memory.top
-    | `Value loc -> Memory.extract m loc
+    | `Value loc -> Memory.extract ~oracle m loc
 
-  let erase ~weak m loc bit_value =
+  let erase ~oracle ~weak m loc bit_value =
     match loc with
     | `Top -> Memory.top
-    | `Value loc -> Memory.erase ~weak m loc bit_value
+    | `Value loc -> Memory.erase ~oracle ~weak m loc bit_value
 
-  let set ~weak new_v m loc =
+  let set ~oracle ~weak new_v m loc =
     match loc with
     | `Top -> Memory.top
     | `Value loc ->
-      Memory.set ~weak m loc new_v
+      Memory.set ~oracle ~weak m loc new_v
 
-  let reinforce f m loc =
+  let reinforce ~oracle f m loc =
     match loc with
     | `Top -> m
     | `Value loc ->
@@ -221,13 +224,13 @@ struct
         | `Value v -> v
         | `Bottom -> raise Abstract_interp.Error_Bottom
       in
-      Memory.reinforce f' m loc
+      Memory.reinforce ~oracle f' m loc
 
-  let overwrite ~weak dst loc src =
+  let overwrite ~oracle ~weak dst loc src =
     match loc with
     | `Top -> Memory.top
     | `Value loc ->
-      Memory.overwrite ~weak dst loc src
+      Memory.overwrite ~oracle ~weak dst loc src
 end
 
 
@@ -241,57 +244,6 @@ struct
       (Base.Base) (Memory)
       (Hptmap.Comp_unused) (Initial_Values) (Deps)
 
-  let log_category = dkey
-
-  let cache_name s =
-    Hptmap_sig.PersistentCache ("Multidim_domain." ^ s)
-
-
-  (* Lattice *)
-
-  let top = empty
-
-  let is_included =
-    let cache = cache_name "is_included" in
-    let decide_fst _b _v1 = true (* v2 is top *) in
-    let decide_snd _b _v2 = false (* v1 is top, v2 is not *) in
-    let decide_both _ v1 v2 = Memory.is_included v1 v2 in
-    let decide_fast s t = if s == t then PTrue else PUnknown in
-    binary_predicate cache UniversalPredicate
-      ~decide_fast ~decide_fst ~decide_snd ~decide_both
-
-  let narrow =
-    let cache = cache_name "narrow" in
-    let decide _ v1 v2 =
-      Memory.narrow v1 v2
-    in
-    let narrow = join ~cache ~symmetric:false ~idempotent:true ~decide in
-    fun a b -> `Value (narrow a b)
-
-  let join =
-    let cache = cache_name "join" in
-    let decide _ v1 v2 =
-      let r = Memory.join v1 v2 in
-      if Memory.(is_top r) then None else Some r
-    in
-    inter ~cache ~symmetric:true ~idempotent:true ~decide
-
-  let widen kf stmt =
-    let _,get_hints = Widen.getWidenHints kf stmt in
-    let decide base b1 b2 =
-      let r = Memory.widen (get_hints base) b1 b2 in
-      if Memory.(is_top r) then None else Some r
-    in
-    inter ~cache:Hptmap_sig.NoCache ~symmetric:false ~idempotent:true ~decide
-
-end
-
-module Domain =
-struct
-
-  include DomainLattice
-  include Domain_builder.Complete (DomainLattice)
-
   type state = t
   type value = Value.t
   type base = Base.t
@@ -301,6 +253,10 @@ struct
   type mdlocation = Location.t (* should be = to location *)
   type origin
 
+  let log_category = dkey
+
+  let cache_name s =
+    Hptmap_sig.PersistentCache ("Multidim_domain." ^ s)
 
   (* Bases handling *)
 
@@ -326,13 +282,34 @@ struct
 
   (* Accesses *)
 
-  let read (map : memory -> offset -> 'a) (reduce : 'a -> 'a -> 'a)
-      (state : state) (loc : mdlocation) : 'a or_bottom =
+  let rec read :
+    type a .
+    (memory -> offset -> a) -> (a -> a -> a) ->
+    state -> mdlocation -> a or_bottom =
+    fun map reduce state loc ->
     let f base off acc =
       let v = map (find_or_top state base) off in
       Bottom.join reduce (`Value v) acc
     in
     Location.fold f loc `Bottom
+
+  and get (state : state) (src : mdlocation) : value or_bottom =
+    let oracle = mk_oracle state in
+    read (Memory.get ~oracle) Value.join state src
+
+  and mk_oracle (state : state) : Abstract_memory.oracle =
+    let rec oracle exp =
+      match exp.enode with
+      | Lval lval ->
+        let ival = get state (Location.of_lval oracle lval) in
+        Bottom.non_bottom ival (* TODO: handle exception *)
+      | _ -> Value.top
+    in
+    fun exp -> Value.project_ival (oracle exp) (* TODO: handle exception *)
+
+  let extract (state : state) (src : mdlocation) : Memory.t or_bottom =
+    let oracle = mk_oracle state in
+    read (Memory.extract ~oracle) (Memory.smash ~oracle) state src
 
   let write (update : memory -> offset -> memory)
       (state : state) (loc : mdlocation) : state =
@@ -344,30 +321,79 @@ struct
     in
     Location.fold f loc state
 
-  let get (state : state) (src : mdlocation) : value or_bottom =
-    read Memory.get Value.join state src
-
-  let extract (state : state) (src : mdlocation) : Memory.t or_bottom =
-    read Memory.extract Memory.join state src
-
   let set (state : state) (dst : mdlocation) (v : value) : state =
-    let weak = not (Location.is_singleton dst) in
-    write (Memory.set ~weak v) state dst
+    let weak = not (Location.is_singleton dst)
+    and oracle = mk_oracle state in
+    write (Memory.set ~oracle ~weak v) state dst
 
   let overwrite (state : state) (dst : mdlocation) (src : mdlocation) : state =
-    let weak = not (Location.is_singleton dst) in
+    let weak = not (Location.is_singleton dst)
+    and oracle = mk_oracle state in
     match extract state src with
     | `Bottom -> state (* no source *)
     | `Value value ->
-      write (fun m off -> Memory.overwrite ~weak m off value) state dst
+      write (fun m off -> Memory.overwrite ~oracle ~weak m off value) state dst
 
   let erase (state : state) (dst : mdlocation) (b : Abstract_memory.bit): state =
-    let weak = not (Location.is_singleton dst) in
-    write (fun m off -> Memory.erase ~weak m off b) state dst
+    let weak = not (Location.is_singleton dst)
+    and oracle = mk_oracle state in
+    write (fun m off -> Memory.erase ~oracle ~weak m off b) state dst
 
   let reinforce (f : value -> value or_bottom)
       (state : state) (dst : mdlocation) : state =
-    write (fun m off -> Memory.reinforce f m off) state dst
+    let oracle = mk_oracle state in
+    write (fun m off -> Memory.reinforce ~oracle f m off) state dst
+
+  (* Lattice *)
+
+  let top = empty
+
+  let is_included =
+    let cache = cache_name "is_included" in
+    let decide_fst _b _v1 = true (* v2 is top *) in
+    let decide_snd _b _v2 = false (* v1 is top, v2 is not *) in
+    let decide_both _ v1 v2 = Memory.is_included v1 v2 in
+    let decide_fast s t = if s == t then PTrue else PUnknown in
+    binary_predicate cache UniversalPredicate
+      ~decide_fast ~decide_fst ~decide_snd ~decide_both
+
+  let narrow =
+    let cache = cache_name "narrow" in
+    let decide _ v1 v2 =
+      Memory.narrow v1 v2
+    in
+    let narrow = join ~cache ~symmetric:false ~idempotent:true ~decide in
+    fun a b -> `Value (narrow a b)
+
+  let join s1 s2 =
+    let oracle = function
+      | Abstract_memory.Left -> mk_oracle s1
+      | Right -> mk_oracle s2
+    in
+    let cache = Hptmap_sig.NoCache
+    and decide _ v1 v2 =
+      let r = Memory.join ~oracle v1 v2 in
+      if Memory.(is_top r) then None else Some r
+    in
+    inter ~cache ~symmetric:true ~idempotent:true ~decide s1 s2
+
+  let widen kf stmt s1 s2 =
+    let oracle = function
+      | Abstract_memory.Left -> mk_oracle s1
+      | Right -> mk_oracle s2
+    and _,get_hints = Widen.getWidenHints kf stmt in
+    let cache = Hptmap_sig.NoCache
+    and decide base b1 b2 =
+      let r = Memory.widen ~oracle (get_hints base) b1 b2 in
+      if Memory.(is_top r) then None else Some r
+    in
+    inter ~cache ~symmetric:false ~idempotent:true ~decide s1 s2
+end
+
+module Domain =
+struct
+  include DomainLattice
+  include Domain_builder.Complete (DomainLattice)
 
   (* Eva Queries *)
 
@@ -424,6 +450,32 @@ struct
   let update valuation state =
     `Value (assume_valuation valuation state)
 
+  let update_array_segmentation lval expr state =
+    (* TODO: more general transfer function *)
+    (* TODO: only update memory models where the lval is present in the
+       segmentation *)
+    let increment expr =
+      match expr.Cil_types.enode with
+      | BinOp ((PlusA|PlusPI), { enode=Lval lval' }, exp, _typ)
+        when Cil_datatype.LvalStructEq.equal lval lval' ->
+        Cil.constFoldToInt exp
+      | BinOp ((PlusA|PlusPI), exp, { enode=Lval lval'}, _typ)
+        when Cil_datatype.LvalStructEq.equal lval lval' ->
+        Cil.constFoldToInt exp
+      | BinOp ((MinusA|MinusPI), { enode=Lval lval' }, exp, _typ)
+        when Cil_datatype.LvalStructEq.equal lval lval' ->
+        Option.map Integer.neg (Cil.constFoldToInt exp)
+      | _ -> None
+    in
+    match lval with
+    | Mem _, _ -> state (* Do nothing *)
+    | Var vi, offset ->
+      let incr = match offset with
+        | NoOffset -> increment expr
+        | _ -> None
+      in
+      map (Memory.incr_bound ~oracle:(mk_oracle state) vi incr) state
+
   let assign_lval lval assigned_value oracle state =
     try
       let dst = Location.of_lval oracle lval in
@@ -440,7 +492,8 @@ struct
       (* Failed to evaluate the left location *)
       `Value top
 
-  let assign _kinstr left _expr assigned_value valuation state =
+  let assign _kinstr left expr assigned_value valuation state =
+    let state = update_array_segmentation left.lval expr state in
     let state = assume_valuation valuation state in
     let oracle = make_oracle valuation in
     assign_lval left.lval assigned_value oracle state

@@ -35,7 +35,7 @@ end
 
 type typed_offset =
   | NoOffset of Cil_types.typ
-  | Index of Int_val.t * Cil_types.typ * typed_offset
+  | Index of Cil_types.exp option * Int_val.t * Cil_types.typ * typed_offset
   | Field of Cil_types.fieldinfo * typed_offset
 
 module TypedOffset : T with type t = typed_offset

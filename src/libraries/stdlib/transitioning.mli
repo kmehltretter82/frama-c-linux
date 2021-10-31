@@ -38,4 +38,7 @@ module List: sig
 
   (** since 4.12.0 *)
   val equal: ('a -> 'a -> bool) -> 'a list -> 'a list -> bool
+
+  (** since 4.12.0 *)
+  val compare: ('a -> 'a -> int) -> 'a list -> 'a list -> int
 end
