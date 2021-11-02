@@ -300,9 +300,9 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
   let domain_step eval ((values, alarms) as acc) step =
     let to_string = Pretty_utils.to_string (Bottom.pretty A.Val.pretty) in
     handle_top_or_bottom ~top:acc ~bottom:acc @@ fun state ->
-      let step_value, step_alarms = eval state in
-      let alarms = match step with `Here -> step_alarms | _ -> alarms in
-      (step, to_string step_value) :: values, alarms
+    let step_value, step_alarms = eval state in
+    let alarms = match step with `Here -> step_alarms | _ -> alarms in
+    (step, to_string step_value) :: values, alarms
 
   let domain_eval eval stmt callstack =
     let fold = fold_steps (domain_step eval) stmt callstack in
@@ -323,12 +323,12 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
 
   let compute_pointed_lvalues eval_lval stmt callstack =
     Option.(bind (A.Val.get Main_values.CVal.key)) @@ fun get ->
-      let loc state = eval_lval state |> fst >>-: get in
-      let bases value = Cvalue.V.fold_bases var_of_base value [] in
-      let lvalues state = loc state >>-: bases >>-: List.map Cil.var in
-      let compute state = lvalues state |> Bottom.to_option in
-      handle_top_or_bottom ~top:None ~bottom:None compute @@
-      dstate ~after:true stmt callstack
+    let loc state = eval_lval state |> fst >>-: get in
+    let bases value = Cvalue.V.fold_bases var_of_base value [] in
+    let lvalues state = loc state >>-: bases >>-: List.map Cil.var in
+    let compute state = lvalues state |> Bottom.to_option in
+    handle_top_or_bottom ~top:None ~bottom:None compute @@
+    dstate ~after:true stmt callstack
 
   let pointed_lvalues p callstack =
     match p with
@@ -510,16 +510,16 @@ let () =
   let getPointedLvalues = Request.signature () in
   (* Inputs of the request *)
   let get_tgt = Request.param getPointedLvalues ~name:"pointer"
-    ~descr:(Md.plain "")
-    (module Jmarker)
+      ~descr:(Md.plain "")
+      (module Jmarker)
   and get_cs = Request.param_opt getPointedLvalues ~name:"callstack"
-    ~descr:(Md.plain "Callstack to collect (defaults to none)")
-    (module Jcallstack)
+      ~descr:(Md.plain "Callstack to collect (defaults to none)")
+      (module Jcallstack)
   in
   (* Outputs of the request *)
   let set_lvalues = Request.result_opt getPointedLvalues ~name:"lvalues"
-    ~descr:(Md.plain "")
-    (module Jlist(Jpair(Jstring)(Jmarker)))
+      ~descr:(Md.plain "")
+      (module Jlist(Jpair(Jstring)(Jmarker)))
   in
   (* Register and request computation *)
   Request.register_sig ~package getPointedLvalues
@@ -537,4 +537,3 @@ let () =
     end
 
 (* -------------------------------------------------------------------------- *)
-
