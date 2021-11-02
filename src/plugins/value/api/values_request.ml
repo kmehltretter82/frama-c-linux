@@ -24,6 +24,8 @@ open Server
 open Data
 open Cil_types
 
+
+
 module Kmap = Kernel_function.Hashtbl
 module Smap = Cil_datatype.Stmt.Hashtbl
 module CS = Value_types.Callstack
@@ -63,6 +65,13 @@ let signal = Request.signal ~package ~name:"changed"
 let () = Analysis.register_computation_hook ~on:Computed
     (fun _ -> Request.emit signal)
 
+let handle_top_or_bottom ~top ~bottom compute = function
+  | `Bottom -> bottom
+  | `Top -> top
+  | `Value v -> compute v
+
+
+
 (* -------------------------------------------------------------------------- *)
 (* --- Marker Utilities                                                   --- *)
 (* -------------------------------------------------------------------------- *)
@@ -92,73 +101,71 @@ let probe marker =
   | PVDecl(_,Kstmt s,v) -> Plval((Var v,NoOffset),s)
   | _ -> Pnone
 
+
+
 (* -------------------------------------------------------------------------- *)
 (* --- Stmt Ranking                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Ranking :
-sig
+module type Ranking_sig = sig
   val stmt : stmt -> int
   val sort : callstack list -> callstack list
-end =
-struct
+end
 
-  class ranker =
-    object(self)
-      inherit Visitor.frama_c_inplace
-      (* ranks really starts at 1 *)
-      (* rank < 0 means not computed yet *)
-      val mutable rank = (-1)
-      val rmap = Smap.create 0
-      val fmark = Kmap.create 0
-      val fqueue = Queue.create ()
+module Ranking : Ranking_sig = struct
 
-      method private call kf =
-        if not (Kmap.mem fmark kf) then
-          begin
-            Kmap.add fmark kf () ;
-            Queue.push kf fqueue ;
-          end
+  class ranker = object(self)
+    inherit Visitor.frama_c_inplace
+    (* ranks really starts at 1 *)
+    (* rank < 0 means not computed yet *)
+    val mutable rank = (-1)
+    val rmap = Smap.create 0
+    val fmark = Kmap.create 0
+    val fqueue = Queue.create ()
 
-      method private newrank s =
-        let r = succ rank in
-        Smap.add rmap s r ;
-        rank <- r ; r
+    method private call kf =
+      if not (Kmap.mem fmark kf) then
+        ( Kmap.add fmark kf () ; Queue.push kf fqueue )
 
-      method! vlval lv =
-        begin
-          try match fst lv with
-            | Var vi -> self#call (Globals.Functions.get vi)
-            | _ -> ()
-          with Not_found -> ()
-        end ; Cil.DoChildren
+    method private newrank s =
+      let r = succ rank in
+      Smap.add rmap s r ;
+      rank <- r ; r
 
-      method! vstmt_aux s =
-        ignore (self#newrank s) ;
-        Cil.DoChildren
+    method! vlval lv =
+      begin
+        try match fst lv with
+          | Var vi -> self#call (Globals.Functions.get vi)
+          | _ -> ()
+        with Not_found -> ()
+      end ; Cil.DoChildren
 
-      method flush =
-        while not (Queue.is_empty fqueue) do
-          let kf = Queue.pop fqueue in
-          ignore (Visitor.(visitFramacKf (self :> frama_c_visitor) kf))
-        done
+    method! vstmt_aux s =
+      ignore (self#newrank s) ;
+      Cil.DoChildren
 
-      method compute =
-        match Globals.entry_point () with
-        | kf , _ -> self#call kf ; self#flush
-        | exception Globals.No_such_entry_point _ -> ()
+    method flush =
+      while not (Queue.is_empty fqueue) do
+        let kf = Queue.pop fqueue in
+        ignore (Visitor.(visitFramacKf (self :> frama_c_visitor) kf))
+      done
 
-      method rank s =
-        if rank < 0 then (rank <- 0 ; self#compute) ;
+    method compute =
+      match Globals.entry_point () with
+      | kf , _ -> self#call kf ; self#flush
+      | exception Globals.No_such_entry_point _ -> ()
+
+    method rank s =
+      if rank < 0 then (rank <- 0 ; self#compute) ;
+      try Smap.find rmap s
+      with Not_found ->
+        let kf = Kernel_function.find_englobing_kf s in
+        self#call kf ;
+        self#flush ;
         try Smap.find rmap s
-        with Not_found ->
-          let kf = Kernel_function.find_englobing_kf s in
-          self#call kf ;
-          self#flush ;
-          try Smap.find rmap s
-          with Not_found -> self#newrank s
+        with Not_found -> self#newrank s
 
-    end
+  end
 
   let stmt = let rk = new ranker in rk#rank
 
@@ -177,12 +184,13 @@ struct
 
 end
 
+
+
 (* -------------------------------------------------------------------------- *)
 (* --- Domain Utilities                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Jcallstack : S with type t = callstack =
-struct
+module Jcallstack : S with type t = callstack = struct
   module I = Data.Index
       (Value_types.Callstack.Map)
       (struct let name = "eva-callstack-id" end)
@@ -192,10 +200,10 @@ struct
   let of_json = I.of_json
 end
 
-module Jcalls : Request.Output with type t = callstack =
-struct
+module Jcalls : Request.Output with type t = callstack = struct
 
   type t = callstack
+
   let jtype = Package.(Jlist (Jrecord [
       "callee" , Jkf.jtype ;
       "caller" , Joption Jkf.jtype ;
@@ -205,9 +213,7 @@ struct
 
   let rec jcallstack jcallee ki cs : json list =
     match ki , cs with
-    | Kglobal , _ | _ , [] -> [
-        `Assoc [ "callee", jcallee ]
-      ]
+    | Kglobal , _ | _ , [] -> [ `Assoc [ "callee", jcallee ] ]
     | Kstmt stmt , (called,ki) :: cs ->
       let jcaller = Jkf.to_json called in
       let callsite = `Assoc [
@@ -215,8 +221,8 @@ struct
           "caller", jcaller ;
           "stmt", Jstmt.to_json stmt ;
           "rank", Jint.to_json (Ranking.stmt stmt) ;
-        ] in
-      callsite :: jcallstack jcaller ki cs
+        ]
+      in callsite :: jcallstack jcaller ki cs
 
   let to_json = function
     | [] -> `List []
@@ -224,13 +230,9 @@ struct
 
 end
 
-
-
-module Jtruth : Data.S with type t = truth =
-struct
+module Jtruth : Data.S with type t = truth = struct
   type t = truth
-  let jtype =
-    Package.(Junion [ Jtag "True" ; Jtag "False" ; Jtag "Unknown" ])
+  let jtype = Package.(Junion [ Jtag "True" ; Jtag "False" ; Jtag "Unknown" ])
   let to_json = function
     | Abstract_interp.Unknown -> `String "Unknown"
     | True -> `String "True"
@@ -241,19 +243,19 @@ struct
     | _ -> Abstract_interp.Unknown
 end
 
+
+
 (* -------------------------------------------------------------------------- *)
 (* --- EVA Proxy                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-module type EvaProxy =
-sig
+module type EvaProxy = sig
   val callstacks : stmt -> callstack list
   val domain : probe -> callstack option -> domain
   val pointed_lvalues : probe -> callstack option -> lval list option
 end
 
-module Proxy(A : Analysis.S) : EvaProxy =
-struct
+module Proxy(A : Analysis.S) : EvaProxy = struct
 
   open Eval
   type dstate = A.Dom.state or_top_or_bottom
@@ -274,6 +276,13 @@ struct
       | (`Top | `Bottom) as res -> res
       | `Value cmap -> try `Value (CSmap.find cmap cs) with Not_found -> `Bottom
 
+  let eval_lval lval state =
+    let value, alarms = A.copy_lvalue state lval in
+    let default = Eval.Flagged_Value.bottom in
+    (Bottom.default ~default value).v, alarms
+
+  let eval_expr expr state = A.eval_expr state expr
+
   let dalarms alarms =
     let descr = Format.asprintf "@[<hov 2>%a@]" Alarms.pretty in
     let f alarm status pool = (status, descr alarm) :: pool in
@@ -288,16 +297,12 @@ struct
       | `Else cond -> (A.assume_cond stmt state cond false :> dstate)
     in List.fold_left (fun acc step -> f acc step @@ add_state step) acc steps
 
-  let handle_top_or_bottom ~top ~bottom compute = function
-    | `Bottom -> bottom
-    | `Top -> top
-    | `Value v -> compute v
-
   let domain_step eval ((values, alarms) as acc) step =
+    let to_string = Pretty_utils.to_string (Bottom.pretty A.Val.pretty) in
     handle_top_or_bottom ~top:acc ~bottom:acc @@ fun state ->
       let step_value, step_alarms = eval state in
       let alarms = match step with `Here -> step_alarms | _ -> alarms in
-      (step, step_value) :: values, alarms
+      (step, to_string step_value) :: values, alarms
 
   let domain_eval eval stmt callstack =
     let fold = fold_steps (domain_step eval) stmt callstack in
@@ -306,75 +311,29 @@ struct
     handle_top_or_bottom ~top:dtop ~bottom:dbottom compute_domain @@
     dstate ~after:false stmt callstack
 
-  let e_expr expr state =
-    let value, alarms = A.eval_expr state expr in
-    let res = Pretty_utils.to_string (Bottom.pretty A.Val.pretty) value in
-    (res, alarms)
-
-  let e_lval lval state =
-    let value, alarms = A.copy_lvalue state lval in
-    let flagged = Bottom.default value ~default:Eval.Flagged_Value.bottom in
-    let pp_flagged_val = Eval.Flagged_Value.pretty A.Val.pretty in
-    let res = Pretty_utils.to_string pp_flagged_val flagged in
-    (res, alarms)
-
   let domain p callstack =
     match p with
-    | Plval (lval, stmt) -> domain_eval (e_lval lval) stmt callstack
-    | Pexpr (expr, stmt) -> domain_eval (e_expr expr) stmt callstack
+    | Plval (lval, stmt) -> domain_eval (eval_lval lval) stmt callstack
+    | Pexpr (expr, stmt) -> domain_eval (eval_expr expr) stmt callstack
     | Pnone -> dnone
 
-  let lvalues_of_zone zone =
-    let var_of_base base acc =
-      let add vi acc = if Cil.isFunctionType vi.vtype then acc else vi :: acc in
-      try add (Base.to_varinfo base) acc
-      with Base.Not_a_C_variable -> acc
-    in Locations.Zone.fold_bases var_of_base zone [] |> List.map Cil.var
+  let var_of_base base acc =
+    let add vi acc = if Cil.isFunctionType vi.vtype then acc else vi :: acc in
+    try add (Base.to_varinfo base) acc with Base.Not_a_C_variable -> acc
 
   let compute_pointed_lvalues eval_lval stmt callstack =
-    let enumerate = Precise_locs.enumerate_valid_bits Read in
-    let f get = fun loc -> get loc |> enumerate in
-    Option.(bind (A.Loc.get Main_locations.PLoc.key |> map f)) @@ fun get ->
-      let loc (value, typ) = A.Loc.forward_pointer typ value A.Loc.no_offset in
-      let lvalues data = loc data >>-: get >>-: lvalues_of_zone in
-      let compute state = eval_lval state >>- lvalues |> Bottom.to_option in
+    Option.(bind (A.Val.get Main_values.CVal.key)) @@ fun get ->
+      let loc state = eval_lval state |> fst >>-: get in
+      let bases value = Cvalue.V.fold_bases var_of_base value [] in
+      let lvalues state = loc state >>-: bases >>-: List.map Cil.var in
+      let compute state = lvalues state |> Bottom.to_option in
       handle_top_or_bottom ~top:None ~bottom:None compute @@
       dstate ~after:true stmt callstack
-
-  let lval_value_and_type lval state =
-    let value, _ = A.copy_lvalue state lval in
-    let flagged = Bottom.default value ~default:Eval.Flagged_Value.bottom in
-    flagged.v >>-: fun v -> (v, Cil.typeOfLval lval)
-
-  let expr_value_and_type expr state =
-    fst @@ A.eval_expr state expr >>-: fun v -> (v, Cil.typeOf expr)
 
   let pointed_lvalues p callstack =
     match p with
-    | Plval (lval, stmt) ->
-      compute_pointed_lvalues (lval_value_and_type lval) stmt callstack
-    | Pexpr (expr, stmt) ->
-      compute_pointed_lvalues (expr_value_and_type expr) stmt callstack
-    | Pnone -> None
-
-  let compute_pointed_domains eval_lval stmt callstack =
-    let enumerate = Precise_locs.enumerate_valid_bits Read in
-    let f get = fun loc -> get loc |> enumerate in
-    let eval lval = (lval, domain_eval (e_lval lval) stmt callstack) in
-    Option.(bind (A.Loc.get Main_locations.PLoc.key |> map f)) @@ fun get ->
-      let loc value typ = A.Loc.forward_pointer typ value A.Loc.no_offset in
-      let lvalues value typ = loc value typ >>-: get >>-: lvalues_of_zone in
-      let domains (value, typ) = lvalues value typ >>-: List.map eval in
-      let compute state = eval_lval state >>- domains |> Bottom.to_option in
-      handle_top_or_bottom ~top:None ~bottom:None compute @@
-      dstate ~after:true stmt callstack
-
-  let pointed_domains p callstack =
-    match p with
-    | Plval (lval, stmt) ->
-      compute_pointed_domains (lval_value_and_type lval) stmt callstack
-    | Pexpr (expr, stmt) ->
-      compute_pointed_domains (expr_value_and_type expr) stmt callstack
+    | Plval (l, stmt) -> compute_pointed_lvalues (eval_lval l) stmt callstack
+    | Pexpr (e, stmt) -> compute_pointed_lvalues (eval_expr e) stmt callstack
     | Pnone -> None
 
 end
@@ -382,12 +341,10 @@ end
 let proxy =
   let make (a : (module Analysis.S)) = (module Proxy(val a) : EvaProxy) in
   let current = ref (make @@ Analysis.current_analyzer ()) in
-  let () = Analysis.register_hook
-      begin fun a ->
-        current := make a ;
-        Request.emit signal ;
-      end
-  in current
+  let hook a = current := make a ; Request.emit signal in
+  Analysis.register_hook hook ; current
+
+
 
 (* -------------------------------------------------------------------------- *)
 (* --- Request getCallstacks                                              --- *)
@@ -410,6 +367,8 @@ let () = Request.register ~package
       Ranking.sort (CSet.elements cset)
     end
 
+
+
 (* -------------------------------------------------------------------------- *)
 (* --- Request getCallstackInfo                                           --- *)
 (* -------------------------------------------------------------------------- *)
@@ -421,6 +380,8 @@ let () =
     ~input:(module Jcallstack)
     ~output:(module Jcalls)
     begin fun cs -> cs end
+
+
 
 (* -------------------------------------------------------------------------- *)
 (* --- Request getStmtInfo                                                --- *)
@@ -441,6 +402,8 @@ let () =
       set_fct rq (Kernel_function.find_englobing_kf s) ;
       set_rank rq (Ranking.stmt s) ;
     end
+
+
 
 (* -------------------------------------------------------------------------- *)
 (* --- Request getProbeInfo                                               --- *)
@@ -486,6 +449,8 @@ let () =
         set_probe rq Printer.pp_exp e s ;
       | Pnone -> ()
     end
+
+
 
 (* -------------------------------------------------------------------------- *)
 (* --- Request getValues                                                  --- *)
@@ -535,23 +500,11 @@ let () =
         ) domain.values ;
     end
 
+
+
 (* -------------------------------------------------------------------------- *)
 (* --- Request getPointedLvalues                                          --- *)
 (* -------------------------------------------------------------------------- *)
-
-module Jlvalue = struct
-  type t = lval
-  let jtype = Package.Jstring
-  let to_json, of_json =
-    let tab = Hashtbl.create 10 in
-    let pp = Pretty_utils.to_string Printer.pp_lval in
-    let to_json lv = let s = pp lv in Hashtbl.add tab s lv ; `String s in
-    let of_json (json : Server.Data.json) =
-      match json with
-      | `String s -> (try Hashtbl.find tab s with Not_found -> assert false)
-      | _ -> assert false
-    in to_json, of_json
-end
 
 let () =
   let getPointedLvalues = Request.signature () in
@@ -566,7 +519,7 @@ let () =
   (* Outputs of the request *)
   let set_lvalues = Request.result_opt getPointedLvalues ~name:"lvalues"
     ~descr:(Md.plain "")
-    (module Jlist (Jlvalue))
+    (module Jlist(Jpair(Jstring)(Jmarker)))
   in
   (* Register and request computation *)
   Request.register_sig ~package getPointedLvalues
@@ -575,7 +528,13 @@ let () =
     begin fun rq () ->
       let module A : EvaProxy = (val !proxy) in
       let marker = get_tgt rq and callstack = get_cs rq in
-      A.pointed_lvalues (probe marker) callstack |> set_lvalues rq
+      let kf = Printer_tag.kf_of_localizable marker in
+      let ki = Printer_tag.ki_of_localizable marker in
+      let pp = Pretty_utils.to_string Printer.pp_lval in
+      let to_marker lval = pp lval, Printer_tag.PLval (kf, ki, lval) in
+      let lvalues = A.pointed_lvalues (probe marker) callstack in
+      Option.map (List.map to_marker) lvalues |> set_lvalues rq
     end
 
 (* -------------------------------------------------------------------------- *)
+

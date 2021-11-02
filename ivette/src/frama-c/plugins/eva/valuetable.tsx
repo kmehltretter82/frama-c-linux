@@ -51,6 +51,8 @@ import { Callsite } from './stacks';
 import { Stmt } from './valueinfos';
 import './style.css';
 
+const D = new Dome.Debug('Source Code');
+
 // --------------------------------------------------------------------------
 // --- Cell Diffs
 // --------------------------------------------------------------------------
@@ -186,14 +188,16 @@ function TableCell(props: TableCellProps) {
       .then((r) => {
         const lvalues = r.lvalues ?? [];
         const items: Dome.PopupMenuItem[] = lvalues.map((lval) => {
-          const label = `Display values for ${lval}`;
-          const onClick = () => {};
-          return { label, onClick };
+          const [text, lvalMarker] = lval;
+          const label = `Display values for ${text}`;
+          const location = { fct: probe.fct, marker: lvalMarker };
+          const onItemClick = () => model.addProbe(location);
+          return { label, onClick: onItemClick };
         });
         if (items.length > 0) Dome.popupMenu(items);
       })
-      .catch((err) => console.log(err));
-  };
+      .catch((err) => D.error(`Fail to recover pointed lvalues: ${err}`));
+  }
 
   return (
     <div

@@ -92,6 +92,17 @@ export class Model implements ModelCallbacks {
     return undefined;
   }
 
+  addProbe(location: States.Location) {
+    const { fct, marker } = location;
+    if (fct && marker) {
+      const probe = new Probe(this, fct, marker);
+      probe.setPersistent();
+      probe.requestProbeInfo();
+      this.probes.set(marker, probe);
+      this.forceLayout();
+    }
+  }
+
   getStacks(p: Probe | undefined): Values.callstack[] {
     return p ? this.stacks.getStacks(p.marker) : [];
   }
