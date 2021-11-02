@@ -34,6 +34,7 @@
 #include "netdb.c"
 #include "netinet/in.c"
 #include "signal.c"
+#include "stdatomic.c"
 #include "stdio.c"
 #include "stdlib.c"
 #include "string.c"

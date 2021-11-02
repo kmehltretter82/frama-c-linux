@@ -92,6 +92,7 @@ skipping share/libc/complex.h
 [kernel] Parsing share/libc/setjmp.h (with preprocessing)
 [kernel] Parsing share/libc/signal.h (with preprocessing)
 [kernel] Parsing share/libc/stdarg.h (with preprocessing)
+[kernel] Parsing share/libc/stdatomic.h (with preprocessing)
 [kernel] Parsing share/libc/stdbool.h (with preprocessing)
 [kernel] Parsing share/libc/stddef.h (with preprocessing)
 [kernel] Parsing share/libc/stdint.h (with preprocessing)
