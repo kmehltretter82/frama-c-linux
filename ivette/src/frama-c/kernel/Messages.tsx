@@ -462,7 +462,7 @@ export default function RenderMessages() {
   const MessagePanel = (
     <Vbox style={{ height: '100%' }}>
       <IconButton
-        icon="ANGLE.DOWN"
+        icon="CROSS"
         title="Close"
         onClick={() => setMessage('')}
         style={{ margin: '0 auto' }}

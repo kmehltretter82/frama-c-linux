@@ -91,6 +91,7 @@
 
 .message-cell {
     user-select: text;
+    cursor: default;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
