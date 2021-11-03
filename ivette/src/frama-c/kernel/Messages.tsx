@@ -424,11 +424,14 @@ const byMessage: Compare.ByFields<Message> = {
 
 export default function RenderMessages() {
 
-  const model = React.useMemo(() => (
-    new Arrays.CompactModel<string, Message>((msg: Message) => msg.key)
-  ), []);
+  const [model] = React.useState(() => {
+    const f = (msg: Message) => msg.key;
+    const model = new Arrays.CompactModel<string, Message>(f);
+    model.setOrderingByFields(byMessage);
+    return model;
+  });
+
   const data = States.useSyncArray(Kernel.message).getArray();
-  model.setOrderingByFields(byMessage);
 
   React.useEffect(() => {
     model.removeAllData();
