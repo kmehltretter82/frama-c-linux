@@ -25,6 +25,14 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-  E-ACSL       [2021-11-03] Improve runtime debug logs: the %a modifier now
+                outputs in hexadecimal, the debug logs now all end in new lines,
+                the trace now outputs to stderr.
+-* E-ACSL       [2021-11-03] Fix default stack size: E_ACSL_STACK_SIZE
+                is now correctly used by the runtime, the default values
+                have been adjusted to what was effectively used.
+-* E-ACSL       [2021-11-03] Now the same Frama-C options are used when parsing
+                the user sources and the E-ACSL's RTL.
 -  E-ACSL       [2021-10-20] Add option -e-acsl-assert-print-data
                 (--assert-print-data in e-acsl-gcc.sh) to print data
                 contributing to a failed assertion along with the error message.
