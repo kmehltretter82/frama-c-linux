@@ -192,12 +192,8 @@ export class Model implements ModelCallbacks {
 
   metaSelection(location: States.Location) {
     const p = this.getProbe(location);
-    if (p) {
-      if (p.transient) {
-        if (!this.byCallstacks)
-          p.setPersistent();
-      }
-    }
+    if (p && p.transient)
+      p.setPersistent();
   }
 
   clearSelection() {
