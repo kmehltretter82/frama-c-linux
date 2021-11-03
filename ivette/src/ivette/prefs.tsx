@@ -127,3 +127,14 @@ export function useThemeButtons(props: ThemeProps): ThemeControls {
 }
 
 // --------------------------------------------------------------------------
+// --- Editor configuration
+// --------------------------------------------------------------------------
+
+export const EditorCommand =
+  new Settings.GString('Editor.Command', 'emacs +%n:%c %s');
+
+export interface EditorCommandProps {
+  command: Settings.GlobalSettings<string>;
+}
+
+// --------------------------------------------------------------------------

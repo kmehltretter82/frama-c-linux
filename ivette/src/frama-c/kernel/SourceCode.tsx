@@ -28,7 +28,7 @@ import React from 'react';
 import * as States from 'frama-c/states';
 
 import * as Dome from 'dome';
-import { readFile } from 'dome/system';
+import * as System from 'dome/system';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 import { TitleBar } from 'ivette';
@@ -36,10 +36,15 @@ import * as Preferences from 'ivette/prefs';
 import { functions, markerInfo } from 'frama-c/api/kernel/ast';
 import { Code } from 'dome/controls/labels';
 import { Hfill } from 'dome/layout/boxes';
+import { IconButton } from 'dome/controls/buttons';
 import * as Path from 'path';
+import * as Settings from 'dome/data/settings';
+import * as Status from 'frama-c/kernel/Status';
 
+import CodeMirror from 'codemirror/lib/codemirror';
 import 'codemirror/addon/selection/active-line';
 import 'codemirror/addon/dialog/dialog.css';
+import 'codemirror/addon/search/search';
 import 'codemirror/addon/search/searchcursor';
 
 // --------------------------------------------------------------------------
@@ -86,17 +91,64 @@ export default function SourceCode() {
   // Updating the buffer content.
   const errorMsg = () => { D.error(`Fail to load source code file ${file}`); };
   const onError = () => { if (file) errorMsg(); return ''; };
-  const read = () => readFile(file).catch(onError);
+  const read = () => System.readFile(file).catch(onError);
   const text = React.useMemo(read, [file, onError]);
   const { result } = Dome.usePromise(text);
   React.useEffect(() => buffer.setValue(result), [buffer, result]);
   React.useEffect(() => buffer.setCursorOnTop(line), [buffer, line, result]);
 
+  /* CodeMirror types used to bind callbacks to extraKeys. */
+  type position = CodeMirror.Position;
+  type editor = CodeMirror.Editor;
+
+  const [command] = Settings.useGlobalSettings(Preferences.EditorCommand);
+  async function launchEditor(_?: editor, pos?: position) {
+    if (file !== '') {
+      const selectedLine = pos ? (pos.line + 1).toString() : '1';
+      const selectedChar = pos ? (pos.ch + 1).toString() : '1';
+      const cmd = command
+        .replace('%s', file)
+        .replace('%n', selectedLine)
+        .replace('%c', selectedChar);
+      const args = cmd.split(' ');
+      const prog = args.shift();
+      if (prog) System.spawn(prog, args).catch(() => {
+        Status.setMessage({
+          text: `An error has occured when opening the external editor ${prog}`,
+          kind: 'error',
+        });
+      });
+    }
+  }
+
+  async function contextMenu(editor?: editor, pos?: position) {
+    if (file !== '') {
+      const items = [
+        {
+          label: 'Open file in an external editor',
+          onClick: () => launchEditor(editor, pos),
+        },
+      ];
+      Dome.popupMenu(items);
+    }
+  }
+
+  const externalEditorTitle =
+    'Open the source file in an external editor.\nA Ctrl-click '
+    + 'in the source code opens the editor at the selected location.'
+    + '\nThe editor used can be configured in Ivette settings.';
+
   // Building the React component.
   return (
     <>
       <TitleBar>
-        <Code title={file}>{filename}</Code>
+        <IconButton
+          icon="DUPLICATE"
+          visible={file !== ''}
+          onClick={launchEditor}
+          title={externalEditorTitle}
+        />
+        <Code title={file} style={{ padding: '5px' }}>{filename}</Code>
         <Hfill />
         {themeButtons}
       </TitleBar>
@@ -109,7 +161,11 @@ export default function SourceCode() {
         selection={theMarker}
         lineNumbers={!!theFunction}
         styleActiveLine={!!theFunction}
-        extraKeys={{ 'Alt-F': 'findPersistent' }}
+        extraKeys={{
+          'Alt-F': 'findPersistent',
+          'Ctrl-LeftClick': launchEditor as (_: CodeMirror.Editor) => void,
+          RightClick: contextMenu as (_: CodeMirror.Editor) => void,
+        }}
         readOnly
       />
     </>

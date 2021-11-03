@@ -84,6 +84,20 @@ function ThemeFields(props: P.ThemeProps) {
 }
 
 // --------------------------------------------------------------------------
+// --- Editor Command Forms
+// --------------------------------------------------------------------------
+function EditorCommandFields(props: P.EditorCommandProps) {
+  const cmd = Forms.useDefined(Forms.useValid(
+    Settings.useGlobalSettings(props.command),
+  ));
+  const title =
+    'Command to open an external editor on Ctrl-click in the source code view.'
+    + '\nUse %s for the file name, %n for the line number'
+    + ' and %c for the selected character.';
+  return (<Forms.TextCodeField state={cmd} label="Command" title={title} />);
+}
+
+// --------------------------------------------------------------------------
 // --- Export Components
 // --------------------------------------------------------------------------
 
@@ -104,6 +118,9 @@ export default (() => (
         fontSize={P.SourceFontSize}
         wrapText={P.SourceWrapText}
       />
+    </Forms.Section>
+    <Forms.Section label="Editor Command" unfold>
+      <EditorCommandFields command={P.EditorCommand} />
     </Forms.Section>
   </Forms.Page>
 ));
