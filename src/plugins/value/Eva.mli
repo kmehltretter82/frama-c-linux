@@ -43,8 +43,9 @@ module Results: sig
   
   (* Working with callstacks *)
   val callstacks : request -> callstack list
-  val fold_callstacks : (callstack -> request -> 'a -> 'a) -> 'a -> request -> 'a
   val by_callstack : request -> (callstack * request) list
+  val iter_callstacks : (callstack -> request -> unit) -> request -> unit
+  val fold_callstacks : (callstack -> request -> 'a -> 'a) -> 'a -> request -> 'a
   
   (* State requests *)
   val equality_class : Cil_types.exp -> request -> Cil_types.exp list result
@@ -75,6 +76,7 @@ module Results: sig
   val alarms : 'a evaluation -> Alarms.t list
   
   (* Reachability *)
+  val is_empty : request -> bool
   val is_bottom : 'a evaluation -> bool
   val is_called : Cil_types.kernel_function -> bool (* called during the analysis, not by the actual program *)
   val is_reachable : Cil_types.stmt -> bool (* reachable by the analysis, not by the actual program *)
