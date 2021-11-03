@@ -433,6 +433,10 @@
   with_value.i:26: 5
   with_value.i:30: 5
   with_value.i:34: 4
+  with_value.i:38: 2147483648
+  with_value.i:42: 2147483649
+  with_value.i:46: 2147483649
+  with_value.i:50: 2147483648
   with_value.i:54: 2147483646
   with_value.i:58: 2147483647
   with_value.i:62: 2147483647
