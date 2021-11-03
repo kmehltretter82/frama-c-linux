@@ -204,7 +204,8 @@ TEST_DEPENDENCIES:= \
 	$(EACSL_PLUGIN_DIR)/tests/ptests_config \
 	$(EACSL_PLUGIN_DIR)/tests/test_config \
 	$(EACSL_PLUGIN_DIR)/tests/test_config_dev \
-	$(EACSL_PLUGIN_DIR)/tests/E_ACSL_test.cmo
+	$(EACSL_PLUGIN_DIR)/tests/E_ACSL_test.cmo \
+	$(EACSL_PLUGIN_DIR)/tests/wrapper.sh
 
 ifeq ($(OCAMLBEST),opt)
 TEST_DEPENDENCIES += \
@@ -332,6 +333,7 @@ EACSL_DOC_FILES = \
 EACSL_TEST_FILES = \
 	tests/test_config_dev.in \
 	tests/test_config.in \
+	tests/wrapper.sh \
 	tests/gmp-only/test_config \
 	tests/gmp-only/test_config_dev \
 	tests/full-mtracking/test_config \
@@ -453,6 +455,7 @@ EACSL_CEA_LGPL_BARE= src/*.ml src/*/*.ml src/*.mli src/*/*.mli \
 	Makefile.in configure.ac tab-in-changelog.sh \
 	scripts/*.sh \
 	tests/E_ACSL_test.ml \
+	tests/wrapper.sh \
 	man/e-acsl-gcc.sh.1
 EACSL_CEA_LGPL=$(addprefix $(EACSL_PLUGIN_DIR)/, $(EACSL_CEA_LGPL_BARE)) \
                $(EACSL_CEA_SHARE)
