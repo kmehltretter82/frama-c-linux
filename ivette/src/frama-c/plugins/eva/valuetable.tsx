@@ -33,7 +33,7 @@ import { Hpack, Filler } from 'dome/layout/boxes';
 import { Icon } from 'dome/controls/icons';
 import { Cell } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
-import { ModelProp, Model } from 'frama-c/plugins/eva/model';
+import { ModelProp } from 'frama-c/plugins/eva/model';
 
 // Frama-C
 import * as States from 'frama-c/states';
@@ -275,11 +275,11 @@ function TableHead(props: TableHeadProps) {
 interface TableRowProps {
   style: React.CSSProperties;
   index: number;
-  data: Model;
+  data: ModelProp;
 }
 
 function TableRow(props: TableRowProps) {
-  const model = props.data;
+  const { model } = props.data;
   const row = model.getRow(props.index);
   if (!row) return null;
   const { kind, probes } = row;
@@ -347,9 +347,8 @@ export interface Dimension {
   height: number;
 }
 
-export interface ValuesPanelProps extends Dimension {
+export interface ValuesPanelProps extends Dimension, ModelProp {
   zoom: number;
-  model: Model;
 }
 
 export function ValuesPanel(props: ValuesPanelProps) {
@@ -385,7 +384,7 @@ export function ValuesPanel(props: ValuesPanelProps) {
       estimatedItemSize={estimatedHeight}
       width={width}
       height={height}
-      itemData={model}
+      itemData={{ model }}
     >
       {TableRow}
     </VariableSizeList>
