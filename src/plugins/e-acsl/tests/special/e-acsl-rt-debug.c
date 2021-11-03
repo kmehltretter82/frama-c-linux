@@ -5,7 +5,7 @@
 /* run.config_dev
   MACRO: ROOT_EACSL_GCC_OPTS_EXT --rt-debug --rt-verbose --full-mtracking
   COMMENT: Filter the addresses of the output so that the test is deterministic.
-  MACRO: ROOT_EACSL_EXEC_FILTER @SEDCMD@ -e "s|0x[0-9-]*|0x00000-00000-00000|g" | @SEDCMD@ -e "s|Offset: [0-9-]*|Offset: xxxx|g"
+  MACRO: ROOT_EACSL_EXEC_FILTER @SEDCMD@ -e "s|0x[0-9a-f-]*|0x0000-0000-0000|g" | @SEDCMD@ -e "s|Offset: [0-9-]*|Offset: xxxx|g"
  */
 int main() {
   return 0;

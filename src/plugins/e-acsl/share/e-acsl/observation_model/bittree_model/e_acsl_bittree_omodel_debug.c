@@ -41,7 +41,7 @@ int allocated(uintptr_t addr, long size, uintptr_t base) {
 
 int readonly(void *ptr) {
   bt_block *blk = bt_find(ptr);
-  private_assert(blk != NULL, "Readonly on unallocated memory", NULL);
+  private_assert(blk != NULL, "Readonly on unallocated memory\n", NULL);
   return blk->is_readonly;
 }
 

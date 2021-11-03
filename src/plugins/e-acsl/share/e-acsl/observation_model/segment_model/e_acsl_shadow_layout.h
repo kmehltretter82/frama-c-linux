@@ -36,12 +36,12 @@
 
 /* Default size of a program's heap tracked via shadow memory */
 #ifndef E_ACSL_HEAP_SIZE
-#  define E_ACSL_HEAP_SIZE 512
+#  define E_ACSL_HEAP_SIZE 128
 #endif
 
 /* Default size of a program's stack tracked via shadow memory */
 #ifndef E_ACSL_STACK_SIZE
-#  define E_ACSL_STACK_SIZE 64
+#  define E_ACSL_STACK_SIZE 16
 #endif
 
 /* MAP_ANONYMOUS is a mmap flag indicating that the contents of allocated blocks

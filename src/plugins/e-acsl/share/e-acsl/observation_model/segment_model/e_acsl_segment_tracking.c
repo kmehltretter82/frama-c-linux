@@ -222,7 +222,7 @@ void validate_shadow_layout() {
         uintptr_t *dest = segments[j];
         const char *dest_name = segment_names[j];
         DVASSERT(src[1] < dest[0] || src[0] > dest[1],
-                 "Segment %s [%a, %a] overlaps with segment %s [%a, %a]",
+                 "Segment %s [%a, %a] overlaps with segment %s [%a, %a]\n",
                  src_name, src[0], src[1], dest_name, dest[0], dest[1]);
       }
     }
@@ -413,7 +413,7 @@ uintptr_t static_info(uintptr_t addr, char type) {
       case 'L': /* Length */
         return sec_shadow[0];
       default:
-        DASSERT(0 && "Unknown static query type");
+        DVABORT("Unknown static query type\n");
       }
     } else {
       switch (type) {
@@ -424,7 +424,7 @@ uintptr_t static_info(uintptr_t addr, char type) {
       case 'L': /* Length */
         return short_lengths[code];
       default:
-        DASSERT(0 && "Unknown static query type");
+        DVABORT("Unknown static query type\n");
       }
     }
   }
@@ -767,7 +767,8 @@ void *realloc(void *ptr, size_t size) {
           DVASSERT(
               keep_bytes <= alloc_size / 8 && keep_bytes < old_alloc_size / 8,
               "Attempt to access out of bound init shadow. Accessing %lu bytes, \
-            old init shadow size: %lu bytes, new init shadow size: %lu bytes.",
+            old init shadow size: %lu bytes, new init shadow size: %lu \
+            bytes.\n",
               keep_bytes, old_alloc_size / 8, alloc_size / 8);
           memcpy(new_init_shadow, old_init_shadow, keep_bytes);
           memset(old_init_shadow, 0, old_alloc_size / 8);
@@ -784,7 +785,7 @@ void *realloc(void *ptr, size_t size) {
             DVASSERT(
                 idx < alloc_size / 8,
                 "Attempt to access out of bound init shadow. Accessing index %lu \
-              with init shadow of size %lu bytes.",
+              with init shadow of size %lu bytes.\n",
                 idx, alloc_size / 8);
             unsigned char mask = 0;
             setbits64(rem_keep_bits, mask);
@@ -805,7 +806,7 @@ void *realloc(void *ptr, size_t size) {
             DVASSERT(
                 (idx + count) <= alloc_size / 8,
                 "Attempt to access out of bound init shadow. Accessing %lu bytes \
-              from index %lu with init shadow of size %lu bytes.",
+              from index %lu with init shadow of size %lu bytes.\n",
                 count, idx, alloc_size / 8);
             memset(new_init_shadow + idx, 0, count);
           }
@@ -850,7 +851,7 @@ int posix_memalign(void **memptr, size_t alignment, size_t size) {
   /* Make sure that the first argument to posix memalign is indeed allocated */
   private_assert(
       allocated((uintptr_t)memptr, sizeof(void *), (uintptr_t)memptr),
-      "\\invalid memptr in  posix_memalign", NULL);
+      "\\invalid memptr in  posix_memalign\n", NULL);
 
   int res = public_posix_memalign(memptr, alignment, size);
   if (!res) {
@@ -930,7 +931,7 @@ uintptr_t heap_info(uintptr_t addr, char type) {
        * between the input address and the base address of the block. */
     return addr - *aligned_shadow;
   default:
-    DASSERT(0 && "Unknown heap query type");
+    DVABORT("Unknown heap query type\n");
   }
   return 0;
 }

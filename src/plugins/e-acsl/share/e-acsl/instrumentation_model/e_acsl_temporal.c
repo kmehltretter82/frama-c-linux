@@ -90,7 +90,7 @@ void eacsl_temporal_pull_parameter(void *ptr, unsigned int param, size_t size) {
     eacsl_temporal_memcpy(ptr, tpar->ptr, size);
     break;
   default:
-    private_assert(0, "Unreachable", NULL);
+    private_abort("Unreachable\n");
   }
 }
 

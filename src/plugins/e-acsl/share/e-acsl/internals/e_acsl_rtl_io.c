@@ -72,11 +72,15 @@ static void addr2a(uintptr_t addr, char *bf) {
   *bf++ = '0';
   *bf++ = 'x';
 
+  int base = 16;
+  int group = 4;
+  char sep = '-';
+
   unsigned int digits = 1;
   int n = 0;
   unsigned long int d = 1;
-  while (addr / d >= 10) {
-    d *= 10;
+  while (addr / d >= base) {
+    d *= base;
     digits++;
   }
 
@@ -85,13 +89,13 @@ static void addr2a(uintptr_t addr, char *bf) {
     ctr++;
     int dgt = addr / d;
     addr %= d;
-    d /= 10;
+    d /= base;
     if (n || dgt > 0 || d == 0) {
       *bf++ = dgt + (dgt < 10 ? '0' : 'a' - 10);
       ++n;
     }
-    if (--digits % 5 == 0 && d != 0)
-      *bf++ = '-';
+    if (--digits % group == 0 && d != 0)
+      *bf++ = sep;
   }
   *bf = 0;
 }
@@ -100,7 +104,7 @@ static void addr2a(uintptr_t addr, char *bf) {
 static void ptr2a(void *p, char *bf) {
   *bf++ = '0';
   *bf++ = 'x';
-  uli2a((intptr_t)p, 16, 0, bf);
+  uli2a((uintptr_t)p, 16, 0, bf);
 }
 
 /* Signed long integer to string conversion (%ld) */

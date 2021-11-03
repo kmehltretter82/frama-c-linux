@@ -70,7 +70,7 @@ size_t increase_stack_limit(const size_t size) {
 size_t get_stack_size() {
   struct rlimit rlim;
   private_assert(!getrlimit(RLIMIT_STACK, &rlim),
-                 "Cannot detect program's stack size", NULL);
+                 "Cannot detect program's stack size\n", NULL);
   return rlim.rlim_cur;
 }
 

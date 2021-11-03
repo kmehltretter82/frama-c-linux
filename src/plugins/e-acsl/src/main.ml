@@ -40,19 +40,7 @@ let generate_code =
     (fun name ->
        Options.feedback "beginning translation.";
        Temporal.enable (Options.Temporal_validity.get ());
-       if Plugin.is_present "variadic" then begin
-         let opt_name = "-variadic-translation" in
-         if Dynamic.Parameter.Bool.get opt_name () &&
-            Options.Validate_format_strings.get () then begin
-           if Ast.is_computed () then
-             Options.abort
-               "The variadic translation is incompatible with E-ACSL option \
-                '%s'.@ Please use option '-variadic-no-translation'."
-               Options.Validate_format_strings.option_name
-               Options.warning "deactivating variadic translation";
-           Dynamic.Parameter.Bool.off opt_name ();
-         end
-       end;
+       Options.setup ();
        (* slightly more efficient to copy the project before computing the AST
           if it is not yet computed *)
        let rtl_prj_name = Options.Project_name.get () ^ " RTL" in
