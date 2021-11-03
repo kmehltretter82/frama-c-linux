@@ -1,17 +1,17 @@
 >>> HEAP ---------------------
    Application: 128 MB [0x0000-0000-0000, 0x0000-0000-0000]
-   Primary    : 128 MB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset: xxxx }
-   Secondary  : 16 MB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset: xxxx }
+   Primary    : 128 MB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
+   Secondary  : 16 MB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
 >>> STACK --------------------
    Application: 16 MB [0x0000-0000-0000, 0x0000-0000-0000]
-   Primary    : 16 MB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset: xxxx }
-   Secondary  : 16 MB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset: xxxx }
+   Primary    : 16 MB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
+   Secondary  : 16 MB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
 >>> GLOBAL -------------------
    Application: 0 MB [0x0000-0000-0000, 0x0000-0000-0000]
-   Primary    : 0 MB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset: xxxx }
-   Secondary  : 0 MB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset: xxxx }
+   Primary    : 0 MB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
+   Secondary  : 0 MB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
 >>> TLS ----------------------
    Application: 64 MB [0x0000-0000-0000, 0x0000-0000-0000]
-   Primary    : 64 MB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset: xxxx }
-   Secondary  : 64 MB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset: xxxx }
+   Primary    : 64 MB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
+   Secondary  : 64 MB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
 >>> --------------------------
