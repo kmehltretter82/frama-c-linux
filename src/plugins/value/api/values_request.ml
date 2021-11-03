@@ -342,7 +342,8 @@ let proxy =
   let make (a : (module Analysis.S)) = (module Proxy(val a) : EvaProxy) in
   let current = ref (make @@ Analysis.current_analyzer ()) in
   let hook a = current := make a ; Request.emit signal in
-  Analysis.register_hook hook ; current
+  Analysis.register_hook hook ;
+  fun () -> !current
 
 
 
@@ -350,20 +351,21 @@ let proxy =
 (* --- Request getCallstacks                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
-let () = Request.register ~package
+let () =
+  Request.register ~package
     ~kind:`GET ~name:"getCallstacks"
     ~descr:(Md.plain "Callstacks for markers")
     ~input:(module Jlist(Jmarker))
     ~output:(module Jlist(Jcallstack))
     begin fun markers ->
-      let module A = (val !proxy) in
-      let cset = List.fold_left
-          (fun cset marker ->
-             match probe marker with
-             | Pexpr(_,stmt) | Plval(_,stmt) ->
-               List.fold_right CSet.add (A.callstacks stmt) cset
-             | Pnone -> cset
-          ) CSet.empty markers in
+      let module A : EvaProxy = (val proxy ()) in
+      let add stmt = List.fold_right CSet.add (A.callstacks stmt) in
+      let gather_callstacks cset marker =
+        match probe marker with
+        | Pexpr (_, stmt) | Plval (_, stmt) -> add stmt cset
+        | Pnone -> cset
+      in
+      let cset = List.fold_left gather_callstacks CSet.empty markers in
       Ranking.sort (CSet.elements cset)
     end
 
@@ -391,10 +393,11 @@ let () =
   let getStmtInfo = Request.signature ~input:(module Jstmt) () in
   let set_fct = Request.result getStmtInfo ~name:"fct"
       ~descr:(Md.plain "Englobing function")
-      (module Jkf) in
-  let set_rank = Request.result getStmtInfo ~name:"rank"
+      (module Jkf)
+  and set_rank = Request.result getStmtInfo ~name:"rank"
       ~descr:(Md.plain "Global stmt order")
-      (module Jint) in
+      (module Jint)
+  in
   Request.register_sig ~package getStmtInfo
     ~kind:`GET ~name:"getStmtInfo"
     ~descr:(Md.plain "Stmt Information")
@@ -413,40 +416,37 @@ let () =
   let getProbeInfo = Request.signature ~input:(module Jmarker) () in
   let set_code = Request.result_opt getProbeInfo
       ~name:"code" ~descr:(Md.plain "Probe source code")
-      (module Jstring) in
-  let set_stmt = Request.result_opt getProbeInfo
+      (module Jstring)
+  and set_stmt = Request.result_opt getProbeInfo
       ~name:"stmt" ~descr:(Md.plain "Probe statement")
-      (module Jstmt) in
-  let set_rank = Request.result getProbeInfo
+      (module Jstmt)
+  and set_rank = Request.result getProbeInfo
       ~name:"rank" ~descr:(Md.plain "Probe statement rank")
-      ~default:0 (module Jint) in
-  let set_effects = Request.result getProbeInfo
+      ~default:0 (module Jint)
+  and set_effects = Request.result getProbeInfo
       ~name:"effects" ~descr:(Md.plain "Effectfull statement")
-      ~default:false (module Jbool) in
-  let set_condition = Request.result getProbeInfo
+      ~default:false (module Jbool)
+  and set_condition = Request.result getProbeInfo
       ~name:"condition" ~descr:(Md.plain "Conditional statement")
-      ~default:false (module Jbool) in
+      ~default:false (module Jbool)
+  in
   let set_probe rq pp p s =
-    begin
-      set_code rq (Some (Pretty_utils.to_string pp p)) ;
-      set_stmt rq (Some s) ;
-      set_rank rq (Ranking.stmt s) ;
-      List.iter
-        (function
-          | `Here -> ()
-          | `Then _ | `Else _ -> set_condition rq true
-          | `After -> set_effects rq true
-        )
-        (next_steps s)
-    end
-  in Request.register_sig ~package ~kind:`GET getProbeInfo
-    ~name:"getProbeInfo" ~descr:(Md.plain "Probe informations")
+    set_code rq (Some (Pretty_utils.to_string pp p)) ;
+    set_stmt rq (Some s) ;
+    set_rank rq (Ranking.stmt s) ;
+    let on_steps = function
+      | `Here -> ()
+      | `Then _ | `Else _ -> set_condition rq true
+      | `After -> set_effects rq true
+    in List.iter on_steps (next_steps s)
+  in
+  Request.register_sig ~package getProbeInfo
+    ~kind:`GET ~name:"getProbeInfo"
+    ~descr:(Md.plain "Probe informations")
     begin fun rq marker ->
       match probe marker with
-      | Plval(l,s) ->
-        set_probe rq Printer.pp_lval l s ;
-      | Pexpr(e,s) ->
-        set_probe rq Printer.pp_exp e s ;
+      | Plval (l, s) -> set_probe rq Printer.pp_lval l s
+      | Pexpr (e, s) -> set_probe rq Printer.pp_exp  e s
       | Pnone -> ()
     end
 
@@ -460,44 +460,40 @@ let () =
   let getValues = Request.signature () in
   let get_tgt = Request.param getValues ~name:"target"
       ~descr:(Md.plain "Works with all markers containing an expression")
-      (module Jmarker) in
-  let get_cs = Request.param_opt getValues ~name:"callstack"
+      (module Jmarker)
+  and get_cs = Request.param_opt getValues ~name:"callstack"
       ~descr:(Md.plain "Callstack to collect (defaults to none)")
-      (module Jcallstack) in
-  let set_alarms = Request.result getValues ~name:"alarms"
+      (module Jcallstack)
+  and set_alarms = Request.result getValues ~name:"alarms"
       ~descr:(Md.plain "Alarms raised during evaluation")
-      (module Jlist(Jpair(Jtruth)(Jstring))) in
-  let set_domain = Request.result_opt getValues ~name:"values"
+      (module Jlist(Jpair(Jtruth)(Jstring)))
+  and set_domain = Request.result_opt getValues ~name:"values"
       ~descr:(Md.plain "Domain values")
-      (module Jstring) in
-  let set_after = Request.result_opt getValues ~name:"v_after"
+      (module Jstring)
+  and set_after = Request.result_opt getValues ~name:"v_after"
       ~descr:(Md.plain "Domain values after execution")
-      (module Jstring) in
-  let set_then = Request.result_opt getValues ~name:"v_then"
+      (module Jstring)
+  and set_then = Request.result_opt getValues ~name:"v_then"
       ~descr:(Md.plain "Domain values for true condition")
-      (module Jstring) in
-  let set_else = Request.result_opt getValues ~name:"v_else"
+      (module Jstring)
+  and set_else = Request.result_opt getValues ~name:"v_else"
       ~descr:(Md.plain "Domain values for false condition")
-      (module Jstring) in
+      (module Jstring)
+  in
   Request.register_sig ~package getValues
     ~kind:`GET ~name:"getValues"
     ~descr:(Md.plain "Abstract values for the given marker")
     begin fun rq () ->
-      let marker = get_tgt rq in
-      let callstack = get_cs rq in
-      let domain =
-        let module A : EvaProxy = (val !proxy) in
-        A.domain (probe marker) callstack in
+      let module A : EvaProxy = (val proxy ()) in
+      let marker = get_tgt rq and callstack = get_cs rq in
+      let domain = A.domain (probe marker) callstack in
       set_alarms rq domain.alarms ;
-      List.iter
-        (fun (step, values) ->
-           let domain = Some values in
-           match step with
-           | `Here -> set_domain rq domain
-           | `After -> set_after rq domain
-           | `Then _ -> set_then rq domain
-           | `Else _ -> set_else rq domain
-        ) domain.values ;
+      let set_values = function
+        | `Here,   values -> set_domain rq (Some values)
+        | `After,  values -> set_after  rq (Some values)
+        | `Then _, values -> set_then   rq (Some values)
+        | `Else _, values -> set_else   rq (Some values)
+      in List.iter set_values domain.values
     end
 
 
@@ -508,25 +504,21 @@ let () =
 
 let () =
   let getPointedLvalues = Request.signature () in
-  (* Inputs of the request *)
   let get_tgt = Request.param getPointedLvalues ~name:"pointer"
-      ~descr:(Md.plain "")
+      ~descr:(Md.plain "Marker to the pointer we want to lookup")
       (module Jmarker)
   and get_cs = Request.param_opt getPointedLvalues ~name:"callstack"
       ~descr:(Md.plain "Callstack to collect (defaults to none)")
       (module Jcallstack)
-  in
-  (* Outputs of the request *)
-  let set_lvalues = Request.result_opt getPointedLvalues ~name:"lvalues"
-      ~descr:(Md.plain "")
+  and set_lvalues = Request.result_opt getPointedLvalues ~name:"lvalues"
+      ~descr:(Md.plain "List of pointed lvalues")
       (module Jlist(Jpair(Jstring)(Jmarker)))
   in
-  (* Register and request computation *)
   Request.register_sig ~package getPointedLvalues
     ~kind:`GET ~name:"getPointedLvalues"
-    ~descr:(Md.plain "")
+    ~descr:(Md.plain "Pointed lvalues for the given marker")
     begin fun rq () ->
-      let module A : EvaProxy = (val !proxy) in
+      let module A : EvaProxy = (val proxy ()) in
       let marker = get_tgt rq and callstack = get_cs rq in
       let kf = Printer_tag.kf_of_localizable marker in
       let ki = Printer_tag.ki_of_localizable marker in
