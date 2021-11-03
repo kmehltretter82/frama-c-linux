@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-eva-msg-key d-multidim -eva-domains multidim -eva-plevel 0"
+   STDOPT: +"-eva-msg-key d-multidim -eva-domains multidim -eva-plevel 1"
 */
 #include "__fc_builtin.h"
 #define N 4
@@ -42,14 +42,13 @@ void main(s x) {
   /* The multidim domain wont infer anything except the structure from the
      assign: it considers x can contain anything including pointers, and thus no
      reduction is done by are_finite */
-  //@ assert \are_finite(x.t1[..].f) && \are_finite(x.t2[..].f);
+  //@ admit \are_finite(x.t1[..].f) && \are_finite(x.t2[..].f);
   Frama_C_domain_show_each(x);
 
   f();
-  Frama_C_domain_show_each(z);
-  
+  Frama_C_domain_show_each(z);  
   /* The multidim domain doesn't implement forward logic yet */
-  //@ assert \are_finite(z[..].t1[..].f) && \are_finite(z[..].t2[..].f);
+  //@ check \are_finite(z[..].t1[..].f) && \are_finite(z[..].t2[..].f);
 
   for (int i = 0 ; i < M ; i ++) {
     for (int j = 0 ; j < N ; j ++) {
@@ -63,4 +62,16 @@ void main(s x) {
   t t1 = w[Frama_C_interval(0,M-1)].t1[Frama_C_interval(0,N-1)];
 
   Frama_C_domain_show_each(t1);
+}
+
+void main2(void) {
+  int t[10] = {0};
+  Frama_C_domain_show_each_begin(t);
+  for (int i = 0 ; i < 10 ; i++) {
+    Frama_C_domain_show_each_before(i, t);
+    t[i] = 1;
+    Frama_C_domain_show_each_after(i, t);
+  }
+  Frama_C_domain_show_each(t);
+  //@ check t[0..9] == 1;
 }

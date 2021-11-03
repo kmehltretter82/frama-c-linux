@@ -41,7 +41,7 @@ let pp_iter
     ?(pre=format_of_string "{@;<1 2>")
     ?(sep=format_of_string ",@;<1 2>")
     ?(suf=format_of_string "@ }")
-    ?(format=format_of_string"@[<hv>%a@]")
+    ?(format=format_of_string "@[<hv>%a@]")
     iter pp fmt v =
   let need_sep = ref false in
   Format.fprintf fmt pre;
@@ -49,10 +49,9 @@ let pp_iter
       if !need_sep then Format.fprintf fmt sep else need_sep := true;
       Format.fprintf fmt format pp v;
     ) v;
-  Format.fprintf fmt suf;
-;;
+  Format.fprintf fmt suf
 
-let pp_iter2 ?pre ?sep ?suf ?(format=format_of_string "%a%a")
+let pp_iter2 ?pre ?sep ?suf ?(format=format_of_string "@[<hv>%a%a@]")
     iter2 pp_key pp_val fmt v =
   let iter f = iter2 (fun k v -> f (k,v)) in
   let pp fmt (k,v) = Format.fprintf fmt format pp_key k pp_val v in
@@ -247,7 +246,7 @@ struct
   type submemory = M.t
 
   let pretty fmt m =
-    pp_iter2 ~format:".%a%a" FieldMap.iter Field.pretty M.pretty fmt m.fields
+    pp_iter2 ~format:"@[<hv>.%a%a@]" FieldMap.iter Field.pretty M.pretty fmt m.fields
 
   let hash m =
     Hashtbl.hash (m.padding, FieldMap.hash m.fields)
@@ -440,10 +439,14 @@ struct
       | Const _ -> Some b
       | Exp (e, j) ->
         let l = linearity vi e in
-        Some (Exp (e, Integer.(sub j (mul l i))))
-      | Ptroffset (e, b, j) ->
+        if Integer.is_zero l
+        then Some b
+        else Option.map (fun i -> Exp (e, Integer.(sub j (mul l i)))) i
+      | Ptroffset (e, base, j) ->
         let l = linearity vi e in
-        Some (Ptroffset (e, b, Integer.(sub j (mul l i))))
+        if Integer.is_zero l
+        then Some b
+        else Option.map (fun i -> Ptroffset (e, base, Integer.(sub j (mul l i)))) i
     with NonLinear -> None
 
   (* Stupid oracle built from an Ival oracle *)
@@ -506,7 +509,7 @@ sig
   val is_included : t -> t -> bool
   val unify : oracle:bioracle -> (submemory -> submemory -> submemory) ->
     t -> t -> t
-  val singleton : bit -> bound -> bound -> submemory -> t
+  val single : bit -> bound -> bound -> submemory -> t
   val read :
     oracle:(Cil_types.exp -> Ival.t) ->
     (submemory -> 'a) -> ('a -> 'a -> 'a) -> t -> bound -> 'a
@@ -722,7 +725,7 @@ struct
       padding = Bit.join p1 p2 ;
     }
 
-  let singleton padding lindex uindex value =
+  let single padding lindex uindex value =
     {
       padding ;
       start = lindex ;
@@ -757,7 +760,7 @@ struct
      1. reinforcement without loss
      2. weak update without singularization
      3. update reduces the number of segments to 3 *)
-  let write ~oracle f m lindex uindex =
+  let write ~oracle f m lindex uindex = (* lindex < uindex *)
     let (<=) b1 b2 = match Bound.cmp ~oracle b1 b2 with
       | Lower | Equal -> true
       | Greater | Uncomparable -> false
@@ -765,26 +768,39 @@ struct
       | Greater | Equal -> true
       | Lower | Uncomparable -> false
     in
+    (* (start,head) : segmentation kept identical below the write indexes,
+                      head is a list in reverse order
+       (l,v,u) : the segment (l,u) beeing overwriten with previous value v
+
+       head = (_,l) :: _
+    *)
     let rec aux_before l s =
+      (* Format.printf "aux before: %a@." pretty_segments (l,s); *)
       if lindex >= l
       then aux_below l [] l s
       else aux_over lindex [] lindex (M.of_raw m.padding) l s
-    and aux_below start head l = function (* l < index *)
+    and aux_below start head l = fun t ->
+      (* Format.printf "aux_below: %a [%a] %a@." pretty_segments (start,head) Bound.pretty l pretty_segments (l,t); *)
+      match t with (* l <= lindex *)
       | [] ->
         aux_end start head l (M.of_raw m.padding) uindex []
       | (v,u) :: t ->
         if lindex >= u
         then aux_below start ((v,u) :: head) u t
         else aux_over start head l v u t
-    and aux_over start head l v u = function (* l >= index *)
-      | [] ->
-        aux_end start head l (M.smash ~oracle v (M.of_raw m.padding)) uindex []
-      | ((v',u') :: t) as s ->
-        if uindex <= u'
-        then aux_end start head l v u s
-        (* TODO: do not smash if the slices are covered by the write *)
-        else aux_over start head l (M.smash ~oracle v v') u' t
-    and aux_end start head l v u tail =
+    and aux_over start head l v u s = (* l <= lindex *)
+      (* Format.printf "aux_over: %a [%a,%a,%a] %a@." pretty_segments (start,head) Bound.pretty l M.pretty v Bound.pretty u pretty_segments (u,s); *)
+      if uindex <= u then
+        aux_end start head l v u s
+      else
+        match s with
+        | [] ->
+          aux_end start head l (M.smash ~oracle v (M.of_raw m.padding)) uindex []
+        | (v',u') :: t ->
+          (* TODO: do not smash if the slices are covered by the write *)
+          aux_over start head l (M.smash ~oracle v v') u' t
+    and aux_end start head l v u tail = (* l <= lindex < uindex <= u*)
+      (* Format.printf "aux_end: %a [%a,%a,%a] %a@." pretty_segments (start,head) Bound.pretty l M.pretty v Bound.pretty u pretty_segments (u,tail); *)
       let tail' =
         (if is_empty_segment ~oracle l lindex then [] else [(v,lindex)]) @
         [(f v,uindex)] @
@@ -803,7 +819,7 @@ struct
     let rec aux acc = function
       | [] -> acc
       | (v,u) :: t ->
-        match Option.bind x (fun x -> Bound.incr vi x u) with
+        match Bound.incr vi x u with
         | Some u -> aux ((v,u) :: acc) t
         | None ->
           match t with
@@ -814,7 +830,7 @@ struct
           | (v',u') :: t -> aux ((M.smash ~oracle v v',u') :: acc) t
     in
     let start, segments =
-      match Option.bind x (fun x -> Bound.incr vi x m.start) with
+      match Bound.incr vi x m.start with
       | Some start -> start, m.segments
       | None ->
         match m.segments with
@@ -905,7 +921,8 @@ struct
         Format.fprintf fmt "%a" A.pretty a.array_value
 
     let pretty fmt m = pp ~root:false fmt m
-    let pretty_root fmt m = pp ~root:true fmt m
+    let pretty_root fmt m =
+      Format.fprintf fmt "@[<hv>%a@]" (pp ~root:true) m
 
     let rec hash m = match m with
       | Raw b -> Hashtbl.hash (
@@ -1114,21 +1131,20 @@ struct
               let l, u = Int_val.min_and_max index in
               let l = Option.get l and u = Option.get u in (* TODO: handle exceptions *)
               Bound.of_integer l, Bound.of_integer u,
-              weak || Integer.(equal (succ l) u)
+              weak || Integer.equal l u
             | Some e ->
               let b = Bound.of_exp e in
-              b, Bound.succ b, weak
+              b, b, weak
           in
           match m with
           | Array a when are_typ_compatible a.array_cell_type elem_type ->
-            let array_value =
-              A.write ~oracle (aux ~weak offset') a.array_value lindex uindex
-            in
+            let array_value = A.write ~oracle (aux ~weak offset') a.array_value
+                lindex (Bound.succ uindex) in
             Array { a with array_value }
           | _ ->
             let b = raw m in
             let new_value = aux ~weak offset' (Raw b) in
-            let array_value = A.singleton b lindex uindex new_value in
+            let array_value = A.single b lindex (Bound.succ uindex) new_value in
             Array { array_cell_type = elem_type ; array_value }
       in aux
 
@@ -1169,19 +1185,30 @@ struct
     read ~oracle to_value V.join loc m
 
   let extract ~oracle (m : t) (loc : location) : t =
-    read ~oracle (fun _typ x -> x) (smash ~oracle) loc m
+    let r = read ~oracle (fun _typ x -> x) (smash ~oracle) loc m in
+    (* Format.printf "extract %a in %a : %a@." TypedOffset.pretty loc pretty m pretty r; *)
+    r
 
   let set ~oracle ~weak m offset new_v =
     let f ~weak typ m =
       of_value typ (if weak then V.join (to_value typ m) new_v else new_v)
     in
-    write ~oracle ~weak f offset m
+    let r = write ~oracle ~weak f offset m in
+    (* Format.printf "%a <- %a : %a@." TypedOffset.pretty offset V.pretty new_v pretty r; *)
+    r
+
+  let join ~oracle m1 m2 =
+    let r = join ~oracle m1 m2 in
+    (* Format.printf "%a join %a : %a@." pretty m1 pretty m2 pretty r; *)
+    r
 
   let reinforce ~oracle f m offset =
     let f' ~weak typ m =
       if weak then m else of_value typ (f (to_value typ m))
     in
-    write ~oracle ~weak:false f' offset m
+    let r = write ~oracle ~weak:false f' offset m in
+    (* Format.printf "reinforce at %a : %a@." TypedOffset.pretty offset pretty r; *)
+    r
 
   let erase ~oracle ~weak m offset b =
     let f ~weak _typ m =
