@@ -194,7 +194,7 @@ export class LayoutEngine {
           stackIndex: -1,
           stackCount: stacks.length,
           fct,
-          hlines: 1,
+          hlines,
         });
         stacks.forEach((cs, k) => {
           rs.push({
