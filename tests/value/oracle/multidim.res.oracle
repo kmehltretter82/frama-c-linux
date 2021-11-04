@@ -96,22 +96,6 @@
 [eva] tests/value/multidim.c:63: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva:alarm] tests/value/multidim.c:63: Warning: 
-  accessing out of bounds index.
-  assert 0 ≤ tmp;
-  (tmp from Frama_C_interval(0, 4 - 1))
-[eva:alarm] tests/value/multidim.c:63: Warning: 
-  accessing out of bounds index.
-  assert tmp < 4;
-  (tmp from Frama_C_interval(0, 4 - 1))
-[eva:alarm] tests/value/multidim.c:63: Warning: 
-  accessing out of bounds index.
-  assert 0 ≤ tmp_0;
-  (tmp_0 from Frama_C_interval(0, 4 - 1))
-[eva:alarm] tests/value/multidim.c:63: Warning: 
-  accessing out of bounds index.
-  assert tmp_0 < 4;
-  (tmp_0 from Frama_C_interval(0, 4 - 1))
 [eva] tests/value/multidim.c:65: 
   Frama_C_domain_show_each:
   t1 : # cvalue: [--..--]
