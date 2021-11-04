@@ -93,7 +93,7 @@ why3 config detect
 ### Reference configuration
 
 See file [reference-configuration.md](reference-configuration.md)
-for a set of packages that is known to work with Frama-C 23 (Vanadium).
+for a set of packages that is known to work with Frama-C 24 (Chromium).
 
 ### Installing Custom Versions of Frama-C
 
@@ -106,8 +106,8 @@ own sources directly:
     opam remove --force frama-c
 
     # install Frama-C's dependencies
-    opam install depext
-    opam depext frama-c
+    opam install depext # only for opam < 2.1.0
+    opam depext frama-c # only for opam < 2.1.0
     opam install --deps-only frama-c
 
     # install custom version of frama-c
@@ -297,8 +297,8 @@ Arch Linux: `pikaur -S frama-c`
 1. Install [opam](http://opam.ocaml.org/) and use it to get all of Frama-C's
    dependencies (including some external ones):
 
-        opam install depext
-        opam depext frama-c
+        opam install depext # only for opam < 2.1.0
+        opam depext frama-c # only for opam < 2.1.0
         opam install --deps-only frama-c
 
    If not using [opam](http://opam.ocaml.org/), you will need to install
