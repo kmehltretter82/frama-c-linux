@@ -276,12 +276,90 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
       | (`Top | `Bottom) as res -> res
       | `Value cmap -> try `Value (CSmap.find cmap cs) with Not_found -> `Bottom
 
-  let eval_lval lval state =
-    let value, alarms = A.copy_lvalue state lval in
-    let default = Eval.Flagged_Value.bottom in
-    (Bottom.default ~default value).v, alarms
+  type to_offsetmap =
+    | Bottom
+    | Offsetmap of Cvalue.V_Offsetmap.t
+    | Empty
+    | Top
+    | InvalidLoc
 
-  let eval_expr expr state = A.eval_expr state expr
+  let extract_single_var vi state =
+    let b = Base.of_varinfo vi in
+    try
+      match Cvalue.Model.find_base b state with
+      | `Bottom -> InvalidLoc
+      | `Value m -> Offsetmap m
+      | `Top -> Top
+    with Not_found -> InvalidLoc
+
+  let reduce_loc_and_eval loc state =
+    if Cvalue.Model.is_top state then Top
+    else if not @@ Cvalue.Model.is_reachable state then Bottom
+    else if Int_Base.(equal loc.Locations.size zero) then Empty
+    else
+      let loc' = Locations.(valid_part Read loc) in
+      if Locations.is_bottom_loc loc' then InvalidLoc
+      else
+        try
+          let size = Int_Base.project loc'.Locations.size in
+          match Cvalue.Model.copy_offsetmap loc'.Locations.loc size state with
+          | `Bottom -> Bottom
+          | `Value offsm -> Offsetmap offsm
+        with Abstract_interp.Error_Top -> Top
+
+  let extract_or_reduce_lval lval state =
+    match lval with
+    | Var vi, NoOffset -> let r = extract_single_var vi state in fun _ -> r
+    | _ -> fun loc -> reduce_loc_and_eval loc state
+
+  let lval_to_offsetmap lval state =
+    let loc, alarms = A.eval_lval_to_loc state lval in
+    let state = A.Dom.get_cvalue_or_top state in
+    let extract = extract_or_reduce_lval lval state in
+    let precise_loc =
+      match A.Loc.get Main_locations.PLoc.key with
+      | None -> `Value (Precise_locs.loc_top)
+      | Some get -> loc >>-: get
+    and f loc acc =
+      match acc, extract loc with
+      | Offsetmap o1, Offsetmap o2 -> Offsetmap (Cvalue.V_Offsetmap.join o1 o2)
+      | Bottom, v | v, Bottom -> v
+      | Empty, v | v, Empty -> v
+      | Top, Top -> Top
+      | InvalidLoc, InvalidLoc -> InvalidLoc
+      | InvalidLoc, (Offsetmap _ as res) -> res
+      | Offsetmap _, InvalidLoc -> acc
+      | Top, r | r, Top -> r (* cannot happen, we should get Top everywhere *)
+    in precise_loc >>-: (fun loc -> Precise_locs.fold f loc Bottom), alarms
+
+  type evaluation =
+    | ToValue of A.Val.t
+    | ToOffsetmap of to_offsetmap
+
+  let pp_evaluation typ fmt = function
+    | ToValue v -> A.Val.pretty fmt v
+    | ToOffsetmap Bottom -> Format.fprintf fmt "<BOTTOM>"
+    | ToOffsetmap Empty -> Format.fprintf fmt "<EMPTY>"
+    | ToOffsetmap Top -> Format.fprintf fmt "<NO INFORMATION>"
+    | ToOffsetmap InvalidLoc -> Format.fprintf fmt "<INVALID LOCATION>"
+    | ToOffsetmap (Offsetmap o) ->
+      Cvalue.V_Offsetmap.pretty_generic ?typ:(Some typ) () fmt o ;
+      Eval_op.pretty_stitched_offsetmap fmt typ o
+
+  let eval_lval lval state =
+    match Cil.(unrollType @@ typeOfLval lval) with
+    | TInt _ | TEnum _ | TPtr _ | TFloat _ ->
+      let value, alarms = A.copy_lvalue state lval in
+      let _ = lval_to_offsetmap lval state in
+      let default = Eval.Flagged_Value.bottom in
+      (Bottom.default ~default value).v >>-: (fun v -> ToValue v), alarms
+    | _ ->
+      let offsetmap, alarms = lval_to_offsetmap lval state in
+      offsetmap >>-: (fun r -> ToOffsetmap r), alarms
+
+  let eval_expr expr state =
+    let value, alarms = A.eval_expr state expr in
+    value >>-: (fun v -> ToValue v), alarms
 
   let dalarms alarms =
     let descr = Format.asprintf "@[<hov 2>%a@]" Alarms.pretty in
@@ -297,15 +375,15 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
       | `Else cond -> (A.assume_cond stmt state cond false :> dstate)
     in List.fold_left (fun acc step -> f acc step @@ add_state step) acc steps
 
-  let domain_step eval ((values, alarms) as acc) step =
-    let to_string = Pretty_utils.to_string (Bottom.pretty A.Val.pretty) in
+  let domain_step typ eval ((values, alarms) as acc) step =
+    let to_str = Pretty_utils.to_string (Bottom.pretty (pp_evaluation typ)) in
     handle_top_or_bottom ~top:acc ~bottom:acc @@ fun state ->
     let step_value, step_alarms = eval state in
     let alarms = match step with `Here -> step_alarms | _ -> alarms in
-    (step, to_string step_value) :: values, alarms
+    (step, to_str step_value) :: values, alarms
 
-  let domain_eval eval stmt callstack =
-    let fold = fold_steps (domain_step eval) stmt callstack in
+  let domain_eval typ eval stmt callstack =
+    let fold = fold_steps (domain_step typ eval) stmt callstack in
     let build (vs, als) = { values = List.rev vs ; alarms = dalarms als } in
     let compute_domain state = fold state ([], Alarmset.none) |> build in
     handle_top_or_bottom ~top:dtop ~bottom:dbottom compute_domain @@
@@ -313,8 +391,10 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
 
   let domain p callstack =
     match p with
-    | Plval (lval, stmt) -> domain_eval (eval_lval lval) stmt callstack
-    | Pexpr (expr, stmt) -> domain_eval (eval_expr expr) stmt callstack
+    | Plval (lval, stmt) ->
+      domain_eval (Cil.typeOfLval lval) (eval_lval lval) stmt callstack
+    | Pexpr (expr, stmt) ->
+      domain_eval (Cil.typeOf expr) (eval_expr expr) stmt callstack
     | Pnone -> dnone
 
   let var_of_base base acc =
@@ -323,7 +403,8 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
 
   let compute_pointed_lvalues eval_lval stmt callstack =
     Option.(bind (A.Val.get Main_values.CVal.key)) @@ fun get ->
-    let loc state = eval_lval state |> fst >>-: get in
+    let get_eval = function ToValue v -> `Value (get v) | _ -> `Bottom in
+    let loc state = eval_lval state |> fst >>- get_eval in
     let bases value = Cvalue.V.fold_bases var_of_base value [] in
     let lvalues state = loc state >>-: bases >>-: List.map Cil.var in
     let compute state = lvalues state |> Bottom.to_option in
