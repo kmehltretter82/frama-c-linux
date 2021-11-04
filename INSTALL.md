@@ -48,11 +48,14 @@ http://opam.ocaml.org/doc/Install.html
 The Frama-C package in opam is called `frama-c`, which includes both the
 command-line `frama-c` executable and the graphical interface `frama-c-gui`.
 
-`frama-c` has some non-OCaml dependencies, such as Gtk and GMP. In most
-systems, opam can take care of these external dependencies through
-its `depext` plug-in: issuing the two commands
+`frama-c` has some non-OCaml dependencies, such as Gtk and GMP. On most
+systems, `opam`'s `depext` mechanism can take care of installing these
+external dependencies. As of version
+2.1.0, `depext` is [directly included](https://opam.ocaml.org/blog/opam-2-1-0/#Seamless-integration-of-System-dependencies-handling-a-k-a-quot-depexts-quot)
+in `opam`. For older `opam` versions, you have to install it
+separately and call it explicitely with the following commands:
 
-    # install Frama-C's dependencies
+    # install Frama-C's dependencies with pre-2.1.0 opam
     opam install depext
     opam depext frama-c
 
