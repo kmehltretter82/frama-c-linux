@@ -30,6 +30,7 @@ import * as Dome from 'dome';
 import { classes } from 'dome/misc/utils';
 import { VariableSizeList } from 'react-window';
 import { Hpack, Filler } from 'dome/layout/boxes';
+import { Inset } from 'dome/frame/toolbars';
 import { Icon } from 'dome/controls/icons';
 import { Cell } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
@@ -199,6 +200,7 @@ interface TableSectionProps {
   onClick: () => void;
   byCallstacks: boolean;
   onCallstackClick: () => void;
+  close: () => void;
 }
 
 function TableSection(props: TableSectionProps) {
@@ -223,6 +225,13 @@ function TableSection(props: TableSectionProps) {
         selected={props.byCallstacks}
         title="Details by callstack"
         onClick={props.onCallstackClick}
+      />
+      <Inset />
+      <IconButton
+        icon="CROSS"
+        className="eva-probeinfo-button"
+        title="Close"
+        onClick={props.close}
       />
     </>
   );
@@ -298,6 +307,7 @@ function TableRow(props: TableRowProps) {
           onClick={() => model.setFolded(fct, !folded)}
           byCallstacks={byCallstacks}
           onCallstackClick={() => model.setByCallstacks(fct, !byCallstacks)}
+          close={() => model.clearFunction(fct)}
         />
       </Hpack>
     );

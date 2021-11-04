@@ -124,6 +124,20 @@ export class Model implements ModelCallbacks {
     this.forceLayout();
   }
 
+  clearFunction(fct: string) {
+    let selected = false;
+    this.probes.forEach((p) => {
+      if (p.fct === fct) {
+        if (this.selected === p)
+          selected = true;
+        if (!p.transient)
+          p.setTransient();
+      }
+    });
+    if (selected)
+      this.clearSelection();
+  }
+
   // --- Caches
 
   readonly stacks = new StacksCache(this);
