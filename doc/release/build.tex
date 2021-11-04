@@ -9,9 +9,12 @@ The procedure for creating the source distribution.
 \item \texttt{bash} v4.0 or higher
 \item \texttt{git-lfs}
 \item GNU \texttt{parallel}
-\item a \TeX distribution
+\item a \TeX distribution (e.g. \TeX{}live),
+including notably the following utilities:
+\begin{itemize}
 \item \texttt{latexmk}
 \item (recommended) \texttt{texfot}
+\end{itemize}
 \end{itemize}
 
 \section{Final checks}
@@ -19,7 +22,7 @@ The procedure for creating the source distribution.
 \begin{itemize}
 
 \item Check plug-in dependencies in all \texttt{configure.*}, in case they have
-  changed: if you don't know them, ask to plug-in developers to verify them.
+  changed: if you don't know them, ask plug-in developers to verify them.
 
 \todo{should be done when the plugin is modified}
 
@@ -31,7 +34,8 @@ The procedure for creating the source distribution.
 
 \item Check the contents of \texttt{INSTALL.md} \todo{Should always be up to date}
   \begin{itemize}
-  \item In particular, check and update a full known good configuration for
+    \item Update the Frama-C version number in the `Reference configuration` section
+    \item In particular, check and update a full known good configuration for
     opam packages, including alt-ergo, why3, coq, etc.
     Use \verb+bin/check-reference-configuration.sh+ to help check if the
     configuration is ok. You can also try running
