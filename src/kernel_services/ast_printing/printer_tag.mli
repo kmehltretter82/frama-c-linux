@@ -66,7 +66,7 @@ val loc_to_localizable: ?precise_col:bool -> Filepath.position -> localizable op
 (** return the (hopefully) most precise localizable that contains the given
     Filepath.position. If [precise_col] is [true], takes the column number into
     account (possibly a more precise, but costly, result).
-    @since Frama-C+dev *)
+    @since 24.0-Chromium *)
 
 module type Tag =
 sig

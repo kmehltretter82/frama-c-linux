@@ -436,7 +436,7 @@ val isCompleteType: ?allowZeroSizeArrays:bool -> typ -> bool
 val has_flexible_array_member: typ -> bool
 (** [true] iff the given type has flexible array member.
 
-    @modify Frama-C+dev in GCC/MSVC mode recursively searches in the type of the
+    @modify 24.0-Chromium in GCC/MSVC mode recursively searches in the type of the
     last field.
 *)
 
@@ -1042,7 +1042,7 @@ val parseInt: string -> Integer.t
 
 (** Like [parseInt], but returns [Error message] in case of failure, instead of
     aborting Frama-C.
-    @since Frama-C+dev *)
+    @since 24.0-Chromium *)
 val parseIntRes: string -> (Integer.t, string) result
 
 (** Like [parseInt], but converts to an expression. *)
@@ -1050,7 +1050,7 @@ val parseIntExp: loc:location -> string -> exp
 
 (** Like [parseIntExp], but returns [Error message] in case of failure, instead
     of aborting Frama-C.
-    @since Frama-C+dev *)
+    @since 24.0-Chromium *)
 val parseIntExpRes: loc:location -> string -> (exp, string) result
 
 (** Like [parseInt], but converts to a logic term. *)
@@ -1443,12 +1443,12 @@ val bitfield_attribute_name: string
 val anonymous_attribute_name: string
 (** Name of the attribute that is inserted when generating a name for a varinfo
     representing an anonymous function parameter.
-    @since Frama-C+dev
+    @since 24.0-Chromium
 *)
 
 val anonymous_attribute: attribute
 (** attribute identifying anonymous function parameters
-    @since Frama-C+dev
+    @since 24.0-Chromium
 *)
 
 (** Convert an expression into an attrparam, if possible. Otherwise raise
@@ -2298,7 +2298,7 @@ val stmt_of_instr_list : ?loc:location -> instr list -> stmtkind
 val cvar_to_lvar : varinfo -> logic_var
 
 (** Convert a C variable into a logic term.
-    @since Frama-C+dev *)
+    @since 24.0-Chromium *)
 val cvar_to_term: loc:location -> varinfo -> term
 
 (** Make a temporary variable to use in annotations *)

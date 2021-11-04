@@ -298,7 +298,7 @@ module PrintCode : Parameter_sig.Bool
 
 module PrintAsIs : Parameter_sig.Bool
 (** Behavior of option "-print-as-is"
-    @since Frama-C+dev *)
+    @since 24.0-Chromium *)
 
 module PrintMachdep : Parameter_sig.Bool
 (** Behavior of option "-print-machdep"

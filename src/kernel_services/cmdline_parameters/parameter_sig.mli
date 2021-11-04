@@ -167,7 +167,7 @@ module type S_no_parameter = sig
 
   val get_default: unit -> t
   (** Get the default value for the option.
-      @since Frama-C+dev *)
+      @since 24.0-Chromium *)
 
   val option_name: string
   (** Name of the option on the command-line
