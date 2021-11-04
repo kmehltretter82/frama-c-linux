@@ -21,9 +21,9 @@
 #   configure   configure
 ###############################################################################
 
-############################
-Plugin E-ACSL <next-release>
-############################
+#############################
+Plugin E-ACSL 24.0 (Chromium)
+#############################
 
 -  E-ACSL       [2021-10-20] Add option -e-acsl-assert-print-data
                 (--assert-print-data in e-acsl-gcc.sh) to print data

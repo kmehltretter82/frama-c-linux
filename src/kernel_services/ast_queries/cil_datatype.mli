@@ -136,7 +136,7 @@ end
 (**
    Same as {!Constant}, but comparison is strict, in the sense that it will take
    into account textual representation if provided.
-   @since Frama-C+dev
+   @since 24.0-Chromium
 *)
 module ConstantStrict: S_with_collections with type t = constant
 
@@ -151,7 +151,7 @@ module ExpStructEq: S_with_collections with type t = exp
 
 (**
    structural equality, with strict constant comparison as in {!ConstantStrict}
-   @since Frama-C+dev
+   @since 24.0-Chromium
 *)
 module ExpStructEqStrict: S_with_collections with type t = exp
 
@@ -194,7 +194,7 @@ module LvalStructEq: S_with_collections with type t = lval
 
 (**
    structural equality, with strict constant comparison as in {!ConstantStrict}
-   @since Frama-C+dev
+   @since 24.0-Chromium
 *)
 module LvalStructEqStrict: S_with_collections with type t = lval
 
@@ -207,7 +207,7 @@ module OffsetStructEq: S_with_collections with type t = offset
 
 (**
    structural equality, with strict constant comparison as in {!ConstantStrict}
-   @since Frama-C+dev
+   @since 24.0-Chromium
 *)
 module OffsetStructEqStrict: S_with_collections with type t = offset
 
@@ -349,7 +349,7 @@ module Identified_predicate:
   S_with_collections_pretty with type t = identified_predicate
 (** @since Neon-20140301 *)
 module PredicateStructEq: S_with_collections_pretty with type t = predicate
-(** @since Frama-C+dev *)
+(** @since 24.0-Chromium *)
 
 (**************************************************************************)
 (** {3 Logic_ptree}
