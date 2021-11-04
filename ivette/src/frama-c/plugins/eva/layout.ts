@@ -187,7 +187,7 @@ export class LayoutEngine {
           fct,
           hlines: 1,
         });
-        if (summary) rs.push({
+        if (summary && callstacks > 1) rs.push({
           key: `V:${fct}:${csRowsCounter}`,
           kind: 'values',
           probes: ps,
