@@ -143,7 +143,7 @@ class visit_assembly =
           let source = fst (Cil_datatype.Instr.loc i) in
           let once = true in
           Kernel.warning
-            ~once ~source
+            ~once ~source ~wkey:Kernel.wkey_asm
             "Clobber list contains \"memory\" argument. Assuming no \
              side effects beyond those mentioned in operands."
         end;

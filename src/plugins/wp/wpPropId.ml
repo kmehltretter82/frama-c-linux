@@ -150,7 +150,7 @@ let mk_disj_bhv_id (kf,ki,active,disj)  =
   mk_prop PKProp (Property.ip_of_disjoint kf ki active disj)
 let mk_compl_bhv_id (kf,ki,active,comp) =
   mk_prop PKProp (Property.ip_of_complete kf ki active comp)
-let mk_decrease_id (kf, s, x)  =
+let mk_decrease_id kf s x  =
   mk_prop PKProp (Property.ip_of_decreases kf s x)
 
 let mk_lemma_id l = mk_prop PKProp (LogicUsage.ip_lemma l)
@@ -934,6 +934,7 @@ let pp_assigns_desc fmt a = Wp_error.pp_assigns fmt a.a_assigns
 (*----------------------------------------------------------------------------*)
 
 type pred_info = prop_id * Cil_types.predicate
+type variant_info = prop_id * Cil_types.variant
 
 let mk_pred_info id p = (id, p)
 let pred_info_id (id, _) = id

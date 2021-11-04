@@ -21,9 +21,9 @@
 #   configure   configure
 ###############################################################################
 
-############################
-Plugin E-ACSL <next-release>
-############################
+#############################
+Plugin E-ACSL 24.0 (Chromium)
+#############################
 
 -  E-ACSL       [2021-11-03] Improve runtime debug logs: the %a modifier now
                 outputs in hexadecimal, the debug logs now all end in new lines,

@@ -21,15 +21,15 @@
 ###############################################################################
 
 #########################
-Plugin WP <next-release>
+Plugin WP 24.0 (Chromium)
 #########################
 
 - WP          [2021-10-25] Removes -wp-overflows option (unsound)
 - WP          [2021-06-11] Adds an experimental support of "terminates" clauses.
                            Adds the options -wp-declaration-terminate and
-                          -wp-frama-c-stdlib to claims that external functions
+                           -wp-frama-c-stdlib to claim that external functions
                            terminates.
-                           Adds -wp-declarations-terminate option to claims that
+                           Adds -wp-definitions-terminate option to claim that
                            defined function terminates.
                            Adds -wp-variant-with-terminates to verify loop
                            variants under the termination hypothesis.

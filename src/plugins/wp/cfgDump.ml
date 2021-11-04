@@ -106,7 +106,8 @@ let add_goal env (pid,pred) k =
   Format.fprintf !out "  %a -> %a [ style=dotted ] ;@." pretty u pretty k ;
   merge env u k
 
-let add_subgoal env (pid, t_pred) prop stmt _source k =
+let add_subgoal env (pid, t_pred) ?deps prop stmt _source k =
+  ignore deps ;
   let u = node () in
   if Wp_parameters.debug_atleast 1 then
     Format.fprintf !out "  %a [ color=red , label=\"Prove %a @@ %a (%a)\" ] ;@."

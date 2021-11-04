@@ -48,20 +48,24 @@ http://opam.ocaml.org/doc/Install.html
 The Frama-C package in opam is called `frama-c`, which includes both the
 command-line `frama-c` executable and the graphical interface `frama-c-gui`.
 
-`frama-c` has some non-OCaml dependencies, such as Gtk and GMP. In most
-systems, opam can take care of these external dependencies through
-its `depext` plug-in: issuing the two commands
-
-    # install Frama-C's dependencies
-    opam install depext
-    opam depext frama-c
-
-will install the appropriate system packages (this of course requires
-administrator rights on the system).
-
-If your system is not supported by `depext`, you can simply try:
+`frama-c` has some non-OCaml dependencies, such as Gtk and GMP. On most
+systems, `opam`'s `depext` mechanism can take care of installing these
+external dependencies. As of version
+2.1.0, `depext` is [directly included](https://opam.ocaml.org/blog/opam-2-1-0/#Seamless-integration-of-System-dependencies-handling-a-k-a-quot-depexts-quot)
+in `opam`, so that the following command should install everything, at
+least if your OS is supported by `depext` (and you have administrative
+rights):
 
     opam install frama-c
+
+For older `opam` versions, you have to install it
+separately and call it explicitely with the following commands, before
+installing Frama-C as above. Again, installing the external dependencies
+requires administrative rights.
+
+    # install Frama-C's dependencies with pre-2.1.0 opam
+    opam install depext
+    opam depext frama-c
 
 If there are errors due to missing external dependencies, opam may emit a
 message indicating which packages to install. If this is not sufficient,
@@ -90,7 +94,7 @@ why3 config detect
 ### Reference configuration
 
 See file [reference-configuration.md](reference-configuration.md)
-for a set of packages that is known to work with Frama-C 23 (Vanadium).
+for a set of packages that is known to work with Frama-C 24 (Chromium).
 
 ### Installing Custom Versions of Frama-C
 
@@ -103,8 +107,8 @@ own sources directly:
     opam remove --force frama-c
 
     # install Frama-C's dependencies
-    opam install depext
-    opam depext frama-c
+    opam install depext # only for opam < 2.1.0
+    opam depext frama-c # only for opam < 2.1.0
     opam install --deps-only frama-c
 
     # install custom version of frama-c
@@ -294,8 +298,8 @@ Arch Linux: `pikaur -S frama-c`
 1. Install [opam](http://opam.ocaml.org/) and use it to get all of Frama-C's
    dependencies (including some external ones):
 
-        opam install depext
-        opam depext frama-c
+        opam install depext # only for opam < 2.1.0
+        opam depext frama-c # only for opam < 2.1.0
         opam install --deps-only frama-c
 
    If not using [opam](http://opam.ocaml.org/), you will need to install
@@ -325,7 +329,7 @@ See the `opam/opam` file, section `depends`, for compatible OCaml versions and
 required dependencies (except for those related to `lablgtk`, which are
 required for the GUI but otherwise optional).
 
-Section `deptops` lists optional dependencies.
+Section `depopts` lists optional dependencies.
 
 #### Configuration
 

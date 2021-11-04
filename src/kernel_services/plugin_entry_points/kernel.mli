@@ -194,6 +194,9 @@ val wkey_audit: warn_category
 val wkey_parser_unsupported: warn_category
 (** Warning related to unsupported parsing-related features. *)
 
+val wkey_asm: warn_category
+(** Warnings related to assembly code. *)
+
 (* ************************************************************************* *)
 (** {2 Functors for late option registration}                                *)
 (** Kernel_function-related options cannot be registered in this module:
@@ -295,7 +298,7 @@ module PrintCode : Parameter_sig.Bool
 
 module PrintAsIs : Parameter_sig.Bool
 (** Behavior of option "-print-as-is"
-    @since Frama-C+dev *)
+    @since 24.0-Chromium *)
 
 module PrintMachdep : Parameter_sig.Bool
 (** Behavior of option "-print-machdep"

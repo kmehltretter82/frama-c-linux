@@ -2828,15 +2828,15 @@ let included_qualifiers ?(context=Identical) a1 a2 =
   let a2 = Cil.filter_qualifier_attributes a2 in
   let a1 = Cil.dropAttribute "restrict" a1 in
   let a2 = Cil.dropAttribute "restrict" a2 in
-  let a1_no_const = Cil.dropAttribute "const" a1 in
-  let a2_no_const = Cil.dropAttribute "const" a2 in
+  let a1_no_cv = Cil.dropAttributes ["const"; "volatile"] a1 in
+  let a2_no_cv = Cil.dropAttributes ["const"; "volatile"] a2 in
   let is_equal = Cil_datatype.Attributes.equal a1 a2 in
   if is_equal then true
   else begin
     match context with
     | Identical -> false
-    | Covariant -> Cil_datatype.Attributes.equal a1_no_const a2
-    | Contravariant -> Cil_datatype.Attributes.equal a1 a2_no_const
+    | Covariant -> Cil_datatype.Attributes.equal a1_no_cv a2
+    | Contravariant -> Cil_datatype.Attributes.equal a1 a2_no_cv
     | CovariantToplevel | ContravariantToplevel | IdenticalToplevel -> true
   end
 

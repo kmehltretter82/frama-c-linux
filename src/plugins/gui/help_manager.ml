@@ -26,6 +26,7 @@ let show main_ui =
     "Thibaud Antignac";
     "Gergö Barany";
     "Patrick Baudin";
+    "Thibaut Benjamin";
     "Allan Blanchard";
     "Lionel Blatter";
     "François Bobot";
@@ -60,6 +61,7 @@ let show main_ui =
     "Dario Pinto";
     "Virgile Prevosto";
     "Armand Puccetti";
+    "Félix Ridoux";
     "Virgile Robles";
     "Muriel Roger";
     "Julien Signoles";

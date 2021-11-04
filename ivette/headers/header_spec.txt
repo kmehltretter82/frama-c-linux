@@ -154,9 +154,12 @@ src/frama-c/kernel/ASTview.tsx: CEA_LGPL
 src/frama-c/kernel/Globals.tsx: CEA_LGPL
 src/frama-c/kernel/History.tsx: CEA_LGPL
 src/frama-c/kernel/Locations.tsx: CEA_LGPL
+src/frama-c/kernel/Messages.tsx: CEA_LGPL
 src/frama-c/kernel/Properties.tsx: CEA_LGPL
 src/frama-c/kernel/SourceCode.tsx: CEA_LGPL
+src/frama-c/kernel/Status.tsx: CEA_LGPL
 src/frama-c/kernel/style.css: .ignore
+src/frama-c/menu.ts: CEA_LGPL
 src/frama-c/pkg.json: .ignore
 src/frama-c/plugins/dive/cytoscape_libs.js: CEA_LGPL
 src/frama-c/plugins/dive/index.tsx: CEA_LGPL
@@ -183,6 +186,7 @@ src/frama-c/states.ts: CEA_LGPL
 src/frama-c/utils.ts: CEA_LGPL
 src/ivette/index.tsx: CEA_LGPL
 src/ivette/prefs.tsx: CEA_LGPL
+src/ivette/sandbox.tsx: CEA_LGPL
 src/main/index.js: CEA_LGPL
 src/renderer/Application.tsx: CEA_LGPL
 src/renderer/Controller.tsx: CEA_LGPL

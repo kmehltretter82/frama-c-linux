@@ -180,7 +180,7 @@ val is_definition : t -> bool
 
 val is_in_libc : t -> bool
 (** @return true iff the given function attributes contain libc indicators.
-    @since Frama-C+dev *)
+    @since 24.0-Chromium *)
 
 val is_entry_point: t -> bool
 (** @return true iff the given function is the main of the program (as stated by

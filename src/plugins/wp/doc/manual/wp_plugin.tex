@@ -797,7 +797,8 @@ interface of the programmatic API.
     Recognized categories are: \texttt{@lemma}, \texttt{@requires}, \texttt{@assigns},
     \texttt{@ensures}, \texttt{@exits}, \texttt{@assert}, \texttt{@check},
     \texttt{@invariant}, \texttt{@variant}, \texttt{@breaks},
-    \texttt{@continues}, \texttt{@returns}, \\
+    \texttt{@continues}, \texttt{@returns}, \texttt{@terminates},\\
+    \texttt{@decreases},
     \texttt{\mbox{@complete\_behaviors}}, \texttt{\mbox{@disjoint\_behaviors}}.
     \\
     Properties can be prefixed with a minus sign to \emph{skip} the associated annotations.
@@ -986,7 +987,7 @@ weakest precondition calculus.
   \texttt{terminates \textbackslash{}false}, any loop variant proof is trivial)
   (default is: \texttt{no}).
 \item[\tt -wp-(no)-dynamic] handles calls \textit{via} function pointers
-  thanks to the dedicated \verb+@calls f1,...,fn+ code annotation (default is: \texttt{yes}).
+  thanks to the dedicated code annotation \verb+@calls f1,...,fn+ (default is: \texttt{yes}).
 \end{description}
 
 \subsubsection{ACSL extension \texttt{@calls}}
@@ -1017,6 +1018,99 @@ int caller(int (*fp)(int)){
 These annotations split post-conditions to the dynamic call into two sub-goals: one for call to \verb+f1+ and
 a second for the call to \verb+f2+. A last goal is generated at the call
 site: one must prove that \verb+fp+ is either \verb+f1+ or \verb+f2+.
+
+\subsubsection{Proof of \texttt{@terminates}}
+
+In ACSL, a function can be specified to terminate when some condition \verb+P+ holds
+in pre-condition.
+
+\begin{lstlisting}[language=c, alsolanguage=acsl]
+/*@ terminates P ; */
+void function(void){
+  ...
+}
+\end{lstlisting}
+
+If terminates verification is active (depending on \verb+-wp+ options) WP collects all function calls and loops
+and generate verification conditions (VCs) to prove them, as detailed below.
+
+\paragraph{Loop variants.} When a loop has a variant, no particular verification
+is generated for termination. However, if \verb+-wp-variant-with-terminates+ is
+active, the variant is verified only when \verb+P+ holds in pre-condition.
+Intuitively, this option means that variant has to decrease only if the function has to terminate. For example:
+
+\begin{lstlisting}[language=c, alsolanguage=acsl]
+//@ terminates i >= 0 ;
+void positive(int i){
+  /*@ loop invariant \at(i, Pre) >= 0 ==> 0 <= i <= \at(i, Pre) ;
+      loop assigns i ;
+      loop variant i ; // verified when i >= 0 at pre
+  */
+  while(i) --i;
+}
+\end{lstlisting}
+
+Note that when \verb+terminates \false+ is specified, any loop
+variant would trivially holds.
+
+When a loop does not have a variant, WP checks that the loop is unreachable
+when \verb+P+ holds in precondition, which means that a loop is allowed to not
+terminate when the function does not have to terminate. For example:
+
+\begin{lstlisting}[language=c, alsolanguage=acsl]
+//@ terminates i >= 0 ;
+void function(int i){
+  if(i < 0){
+    // note i >= 0 && i < 0 ==> \false
+    while(1);
+  }
+}
+\end{lstlisting}
+
+\paragraph{Function call.} When a function \verb+f+ is required to terminate on
+\verb+P+, and calling function \verb+g+ only terminates when \verb+Q+, WP tries to
+prove that \verb+P@pre ==> Q@call-point+. Indeed, for \verb+f+ to terminates while calling
+\verb+g+, then \verb+g+ shall terminate. Note that it
+means that if the function under verification shall terminate, any call to a
+non-terminating function shall be unreachable. For example:
+
+\begin{lstlisting}[language=c, alsolanguage=acsl]
+//@ terminates i <= 0 ;
+void f(int i) ;
+
+//@ terminates i >  0 ;
+void g(int i) ;
+
+/*@ requires i <= 0 ;
+    terminates \true ; */
+void caller(int i){
+  f(i); // succeeds
+  g(i); // fails, thus global termination is not proved
+}
+\end{lstlisting}
+
+When a called function does not have a terminates specification, WP assumes one
+as specified by the options:
+
+\begin{itemize}
+\item \verb+-wp-frama-c-stdlib-terminate+,
+\item \verb+-wp-declarations-terminate+,
+\item \verb+-wp-definitions-terminate+.
+\end{itemize}
+
+\paragraph{(Mutually) recursive function.} When a function is involved in a
+recursive cluster (as defined in the ACSL manual) and shall terminate, WP checks that a
+\verb+decreases+ clause is available for the function. Proving that existing
+recursive calls might be unreachable is delegated to the proof of the
+\verb+decreases+ clause. Note however that, currenlty, the proof of \verb+decreases+
+clauses is not supported yet.
+
+\paragraph{Function pointers. } On a call via a function pointer, WP checks that
+a \verb+@calls+ is specified for this function pointer. If so, WP just behaves
+as explained before for function calls. If such a specification is not available,
+WP considers that the pointed function might call the function under
+verification and thus that it is part of a recursive cluster and shall provide
+a \verb+decreases+ clause.
 
 \subsection{Smoke Tests}
 

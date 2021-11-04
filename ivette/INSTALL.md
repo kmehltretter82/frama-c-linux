@@ -3,6 +3,7 @@
 Required package to be installed:
 - `yarn` for node pakage management;
 - `pandoc` for generating the documentation;
+- `node` version 16.x (codename: gallium)
 
 # Installation
 

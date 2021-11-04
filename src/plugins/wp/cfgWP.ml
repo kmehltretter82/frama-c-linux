@@ -438,10 +438,11 @@ struct
         (F.varsp goal) hs
     in xs , hs , goal
 
-  let add_vc target ?(warn=Warning.Set.empty) pred vcs =
+  let add_vc
+      target ?(warn=Warning.Set.empty) ?(deps=Property.Set.empty) pred vcs =
     let xs , hs , goal = introduction pred in
     let hyps = Conditions.intros hs Conditions.nil in
-    let vc = { empty_vc with goal=goal ; vars=xs ; hyps=hyps ; warn=warn } in
+    let vc = { empty_vc with goal ; vars=xs ; hyps ; warn ; deps } in
     Gmap.add target (Splitter.singleton vc) vcs
 
   (* ------------------------------------------------------------------------ *)
@@ -507,7 +508,7 @@ struct
          let vcs = add_vc (Gprop gpid) ~warn goal wp.vcs in
          { wp with vcs = vcs })
 
-  let add_subgoal wenv (gpid, _) predicate stmt source wp = in_wenv wenv wp
+  let add_subgoal wenv (gpid,_) ?deps predicate stmt src wp = in_wenv wenv wp
       (fun env wp ->
          let outcome = Warning.catch
              ~severe:true ~effect:"Degenerated goal"
@@ -516,7 +517,7 @@ struct
            | Warning.Result(warn,goal) -> warn,goal
            | Warning.Failed warn -> warn,F.p_false
          in
-         let vcs = add_vc (Gsource(gpid, stmt, source)) ~warn goal wp.vcs in
+         let vcs = add_vc (Gsource(gpid, stmt, src)) ~warn ?deps goal wp.vcs in
          { wp with vcs = vcs })
 
   let add_assigns wenv (gpid,ainfo) wp = in_wenv wenv wp

@@ -57,6 +57,7 @@ val get_complete_behaviors : kernel_function -> pred_info list
 val get_disjoint_behaviors : kernel_function -> pred_info list
 
 val get_terminates_goal : kernel_function -> pred_info option
+val get_decreases_goal : kernel_function -> variant_info option
 
 (* -------------------------------------------------------------------------- *)
 (* --- Property Accessors : Assertions                                    --- *)
