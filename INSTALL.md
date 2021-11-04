@@ -328,7 +328,7 @@ See the `opam/opam` file, section `depends`, for compatible OCaml versions and
 required dependencies (except for those related to `lablgtk`, which are
 required for the GUI but otherwise optional).
 
-Section `deptops` lists optional dependencies.
+Section `depopts` lists optional dependencies.
 
 #### Configuration
 
