@@ -8,6 +8,7 @@ support libraries (notably gtksourceview). lablgtk3 should be preferred.
 - OCaml 4.08.1
 - alt-ergo.2.2.0 (for wp, optional)
 - apron.v0.9.12 (for eva, optional)
+- coq.8.13.0 (for wp, optional)
 - lablgtk3.3.1.1 + lablgtk3-sourceview3.3.1.1 | lablgtk.2.18.11
 - mlgmpidl.1.2.12 (for eva, optional)
 - ocamlfind.1.8.1
