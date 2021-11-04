@@ -69,6 +69,14 @@ There are many administrative steps, coordinated by the release manager.
   % and check its contents.
 \item Update the Frama-C's authors list in files
   \texttt{src/plugins/gui/help\_manager.ml} and \texttt{opam/opam}.
+  Traditionally, an author is added if they have contributed 100+ LoC in
+  the release, as counted by:
+  \begin{verbatim}
+  git ls-files | \
+  xargs -n1 git blame --line-porcelain | \
+  sed -n 's/^author //p' | sort -f | uniq -ic | sort -nr
+  \end{verbatim}
+  (source for the command: \url{https://gist.github.com/amitchhajer/4461043})
 \item Recompile and test to check that all is fine.
 \item Check the documentation as per Section~\ref{update_doc}
 \item update the \texttt{opam} directory: update the version name and
