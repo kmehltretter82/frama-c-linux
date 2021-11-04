@@ -81,7 +81,9 @@ There are many administrative steps, coordinated by the release manager.
 \item Check the documentation as per Section~\ref{update_doc}
 \item update the \texttt{opam} directory: update the version name and
   version number in the fields \texttt{version}, \texttt{doc} and
-  \texttt{depends} in \texttt{opam/opam}
+  \texttt{depends} in \texttt{opam/opam}. \textbf{NB:} for a beta version, be sure
+  to use a tilde \textasciitilde{} between the version number and \texttt{beta},
+  and not a dash \texttt{-}.
 \item Create the last commit
 \item Create the tag using \texttt{git tag \$(cat VERSION)} and push it (e.g. via \texttt{git push origin \$(cat VERSION)})
 \end{enumerate}
