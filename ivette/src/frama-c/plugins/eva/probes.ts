@@ -78,7 +78,7 @@ export class Probe {
   rank?: number;
   minCols: number = LabelSize;
   maxCols: number = LabelSize;
-  zoomed = false;
+  zoomed = true;
   zoomable = false;
   effects = false;
   condition = false;
