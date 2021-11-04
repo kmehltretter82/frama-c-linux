@@ -105,9 +105,17 @@ export default function SourceCode() {
   async function select(_: editor, pos?: position) {
     if (file === '' || !pos) return;
     const arg = [file, pos.line + 1, pos.ch + 1];
-    const [fct, marker] = await Server.send(getMarkerAt, arg);
-    if (fct || marker)
-      updateSelection({ location: { fct, marker } });
+    try {
+      const [fct, marker] = await Server.send(getMarkerAt, arg);
+      if (fct || marker)
+        updateSelection({ location: { fct, marker } });
+    } catch (err) {
+      D.error(`Failed to get marker from source file position: ${err}`);
+      Status.setMessage({
+        text: 'Failed request to Frama-C server',
+        kind: 'error',
+      });
+    }
   }
 
   const [command] = Settings.useGlobalSettings(Preferences.EditorCommand);
