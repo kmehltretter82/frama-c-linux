@@ -6,7 +6,7 @@
   
 [eva] context-width.c:3: 
   Frama_C_dump_each:
-  # Cvalue domain:
+  # cvalue:
   t ∈ {{ NULL ; &S_t[0] }}
   S_t[0] ∈ {{ NULL ; &S_0_S_t[0] }}
      [1] ∈ {{ NULL ; &S_1_S_t[0] }}
