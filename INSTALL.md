@@ -52,19 +52,20 @@ command-line `frama-c` executable and the graphical interface `frama-c-gui`.
 systems, `opam`'s `depext` mechanism can take care of installing these
 external dependencies. As of version
 2.1.0, `depext` is [directly included](https://opam.ocaml.org/blog/opam-2-1-0/#Seamless-integration-of-System-dependencies-handling-a-k-a-quot-depexts-quot)
-in `opam`. For older `opam` versions, you have to install it
-separately and call it explicitely with the following commands:
+in `opam`, so that the following command should install everything, at
+least if your OS is supported by `depext` (and you have administrative
+rights):
+
+    opam install frama-c
+
+For older `opam` versions, you have to install it
+separately and call it explicitely with the following commands, before
+installing Frama-C as above. Again, installing the external dependencies
+requires administrative rights.
 
     # install Frama-C's dependencies with pre-2.1.0 opam
     opam install depext
     opam depext frama-c
-
-will install the appropriate system packages (this of course requires
-administrator rights on the system).
-
-If your system is not supported by `depext`, you can simply try:
-
-    opam install frama-c
 
 If there are errors due to missing external dependencies, opam may emit a
 message indicating which packages to install. If this is not sufficient,
