@@ -104,5 +104,6 @@ val is_reachable : Cil_types.stmt -> bool (* reachable by the analysis, not by t
 (* Callers / callsites *)
 val callers : Cil_types.kernel_function -> Cil_types.kernel_function list
 val callsites : Cil_types.kernel_function -> Cil_types.stmt list
-
+val callsites_per_caller : Cil_types.kernel_function ->
+    (Cil_types.kernel_function * Cil_types.stmt list) list
 [@@@ api_end]

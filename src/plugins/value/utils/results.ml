@@ -685,10 +685,23 @@ let callers kf =
   at_start_of kf |> callstacks |>
   List.filter_map f |> List.sort_uniq Kernel_function.compare
 
+let uniq_sites = List.sort_uniq Cil_datatype.Stmt.compare
+
 let callsites kf =
   let f = function
     | [] | (_,Cil_types.Kglobal) :: _ -> None
     | (_,Kstmt stmt) :: _-> Some stmt
   in
   at_start_of kf |> callstacks |>
-  List.filter_map f |> List.sort_uniq Cil_datatype.Stmt.compare
+  List.filter_map f |> uniq_sites
+
+let callsites_per_caller kf =
+  let module Map = Kernel_function.Map in
+  let f acc = function
+    | [] | (_,Cil_types.Kglobal) :: _ -> acc
+    | (kf,Kstmt stmt) :: _-> 
+      Map.update kf (fun old -> Some (stmt :: Option.value ~default:[] old)) acc
+  in
+  at_start_of kf |> callstacks |>
+  List.fold_left f Map.empty |> Map.to_seq |> List.of_seq |>
+  List.map (fun (kf,sites) -> kf, uniq_sites sites)

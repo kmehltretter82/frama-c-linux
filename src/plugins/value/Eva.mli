@@ -84,7 +84,8 @@ module Results: sig
   (* Callers / callsites *)
   val callers : Cil_types.kernel_function -> Cil_types.kernel_function list
   val callsites : Cil_types.kernel_function -> Cil_types.stmt list
-  
+  val callsites_per_caller : Cil_types.kernel_function ->
+      (Cil_types.kernel_function * Cil_types.stmt list) list
 end
 
 module Value_results: sig
