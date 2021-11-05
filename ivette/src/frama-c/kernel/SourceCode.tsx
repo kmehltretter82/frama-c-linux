@@ -63,7 +63,7 @@ const D = new Dome.Debug('Source Code');
 export default function SourceCode() {
 
   // Hooks
-  const [buffer] = React.useState(new RichTextBuffer());
+  const [buffer] = React.useState(() => new RichTextBuffer());
   const [selection, updateSelection] = States.useSelection();
   const theFunction = selection?.current?.fct;
   const theMarker = selection?.current?.marker;
@@ -96,27 +96,49 @@ export default function SourceCode() {
   const text = React.useMemo(read, [file, onError]);
   const { result } = Dome.usePromise(text);
   React.useEffect(() => buffer.setValue(result), [buffer, result]);
-  React.useEffect(() => buffer.setCursorOnTop(line), [buffer, line, result]);
+
+  /* Last location selected by a click in the source code. */
+  const selected: React.MutableRefObject<undefined | States.Location> =
+    React.useRef();
+
+  React.useEffect(() => {
+    if (selected.current && selected?.current === selection?.current)
+      selected.current = undefined;
+    else
+      buffer.setCursorOnTop(line);
+  }, [buffer, selection, line, result]);
 
   /* CodeMirror types used to bind callbacks to extraKeys. */
   type position = CodeMirror.Position;
   type editor = CodeMirror.Editor;
 
-  async function select(_: editor, pos?: position) {
+  async function select(editor: editor, event: MouseEvent) {
+    const pos = editor.coordsChar({ left: event.x, top: event.y });
     if (file === '' || !pos) return;
     const arg = [file, pos.line + 1, pos.ch + 1];
-    try {
-      const [fct, marker] = await Server.send(getMarkerAt, arg);
-      if (fct || marker)
-        updateSelection({ location: { fct, marker } });
-    } catch (err) {
-      D.error(`Failed to get marker from source file position: ${err}`);
-      Status.setMessage({
-        text: 'Failed request to Frama-C server',
-        kind: 'error',
+    Server
+      .send(getMarkerAt, arg)
+      .then(([fct, marker]) => {
+        if (fct || marker) {
+          const location = { fct, marker } as States.Location;
+          selected.current = location;
+          updateSelection({ location });
+        }
+      })
+      .catch((err) => {
+        D.error(`Failed to get marker from source file position: ${err}`);
+        Status.setMessage({
+          text: 'Failed request to Frama-C server',
+          kind: 'error',
+        });
       });
-    }
   }
+
+  const selectCallback = React.useCallback(select, [file]);
+  React.useEffect(() => {
+    buffer.forEach((cm) => cm.on('mousedown', selectCallback));
+    return () => buffer.forEach((cm) => cm.off('mousedown', selectCallback));
+  }, [buffer, selectCallback]);
 
   const [command] = Settings.useGlobalSettings(Preferences.EditorCommand);
   async function launchEditor(_?: editor, pos?: position) {
@@ -179,7 +201,6 @@ export default function SourceCode() {
         lineNumbers={!!theFunction}
         styleActiveLine={!!theFunction}
         extraKeys={{
-          LeftClick: select as (_: CodeMirror.Editor) => void,
           'Alt-F': 'findPersistent',
           'Ctrl-LeftClick': launchEditor as (_: CodeMirror.Editor) => void,
           RightClick: contextMenu as (_: CodeMirror.Editor) => void,
