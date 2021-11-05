@@ -457,6 +457,17 @@ let get_code_assertions ?(smoking=false) kf stmt =
 (* --- Loop Invariants                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
+let mk_variant_properties kf s ca v =
+  let vpos_id = WpPropId.mk_var_pos_id kf s ca in
+  let vdecr_id = WpPropId.mk_var_decr_id kf s ca in
+  let loc = v.term_loc in
+  let lcurr = Clabels.to_logic (Clabels.loop_current s) in
+  let vcurr = Logic_const.tat ~loc (v, lcurr) in
+  let zero = Cil.lzero ~loc () in
+  let vpos = Logic_const.prel ~loc (Rle, zero, vcurr) in
+  let vdecr = Logic_const.prel ~loc (Rlt, v, vcurr) in
+  (vpos_id, vpos), (vdecr_id, vdecr)
+
 type loop_contract = {
   loop_terminates: predicate option;
   (* to be verified at loop entry *)
@@ -515,7 +526,7 @@ module LoopContract = WpContext.StaticGenerator(CodeKey)
                 }
             | AVariant(term, None) ->
                 let vpos , vdec =
-                  WpStrategy.mk_variant_properties kf stmt ca term in
+                  mk_variant_properties kf stmt ca term in
                 let intro_terminates (pid, v) =
                   pid,
                   let t = snd @@ get_terminates_hyp kf in

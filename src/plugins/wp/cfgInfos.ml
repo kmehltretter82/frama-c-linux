@@ -303,7 +303,7 @@ let collect_loops_no_variant kf stmt =
     | _ -> Extlib.id
   in
   let props_of_v ca v =
-    let (d, _), (p, _) = WpStrategy.mk_variant_properties kf stmt ca v in
+    let (d, _), (p, _) = CfgAnnot.mk_variant_properties kf stmt ca v in
     Pset.union
       (Pset.singleton @@ WpPropId.property_of_id d)
       (Pset.singleton @@ WpPropId.property_of_id p)
@@ -316,6 +316,26 @@ let collect_loops_no_variant kf stmt =
       end
   | _ ->
       Sset.empty, Pset.empty
+
+(* -------------------------------------------------------------------------- *)
+(* --- Trivially terminates                                               --- *)
+(* -------------------------------------------------------------------------- *)
+
+let trivial_terminates = ref 0
+
+let wp_trivially_terminates =
+  Emitter.create
+    "Trivial Termination"
+    [Emitter.Property_status]
+    ~correctness:[] (* TBC *)
+    ~tuning:[] (* TBC *)
+
+let set_trivially_terminates p hyps =
+  incr trivial_terminates ;
+  Wp_parameters.result "[CFG] Goal %a : Valid (Trivial)" WpPropId.pp_propid p ;
+  let pid = WpPropId.property_of_id p in
+  let hyps = Property.Set.elements hyps in
+  Property_status.emit wp_trivially_terminates ~hyps pid Property_status.True
 
 (* -------------------------------------------------------------------------- *)
 (* --- Memoization Key                                                    --- *)
@@ -404,7 +424,7 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
   } in
   let behaviors = Annotations.behaviors kf in
   (* Inits *)
-  if WpStrategy.is_main_init kf then
+  if Globals.is_entry_point ~when_lib_entry:false kf then
     infos.annots <- List.exists (selected_main_bhv ~bhv ~prop) behaviors ;
   (* Function Body *)
   Option.iter
@@ -466,7 +486,7 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
     end body ;
   (* Doomed *)
   Bag.iter
-    (fun p -> if WpPropId.filter_status p then WpAnnot.set_unreachable p)
+    (fun p -> if WpPropId.filter_status p then WpReached.set_unreachable p)
     infos.doomed ;
   (* Termination *)
   let infos =
@@ -498,7 +518,7 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
             end
           else if infos.calls = Fset.empty
                && infos.no_variant_loops = Sset.empty then begin
-            WpAnnot.set_trivially_terminates id infos.terminates_deps ;
+            set_trivially_terminates id infos.terminates_deps ;
             (* Drop dependencies for this terminates, we've used it. *)
             { infos with terminates_deps = Pset.empty }
           end

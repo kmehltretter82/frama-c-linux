@@ -56,13 +56,6 @@ module WP =
 let () = on_reset WP.clear
 
 let () = Parameter_customize.set_group wp_generation
-module Legacy =
-  False(struct
-    let option_name = "-wp-legacy"
-    let help = "Use legacy generator engine."
-  end)
-
-let () = Parameter_customize.set_group wp_generation
 module Dump =
   Action(struct
     let option_name = "-wp-dump"

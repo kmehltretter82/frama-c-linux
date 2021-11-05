@@ -666,7 +666,7 @@ struct
   let init ~is_pre_main env =
     let ninit = (env @: Clabels.init) in
     let sinit = Sigma.create () in
-    (** todo WpStrategy.is_main_init, need to test that seq.pre is the
+    (** todo Globals.is_entry_point kf, need to test that seq.pre is the
         start of the function *)
     (** todo warning *)
     let cfg_init = Globals.Vars.fold_in_file_order
@@ -690,10 +690,10 @@ struct
       let sconst = Sigma.havoc_any ~call:false sinit in
       let havoc = Cfg.E.create {pre=sinit; post=sconst} Lang.F.p_true in
       let consts =
-        if WpStrategy.isInitConst () then
+        if Wp_parameters.Init.get () then
           Globals.Vars.fold_in_file_order
             (fun var _ cfg ->
-               if WpStrategy.isGlobalInitConst var
+               if Cil.isGlobalInitConst var
                then
                  let h = (C.unchanged sconst sinit var) in
                  let h = Cfg.P.create
@@ -770,7 +770,8 @@ struct
     let posts = { pre = Cfg.node (); post = Cfg.node () } in
     let env = empty_env kf @* [Clabels.pre,pres.post;Clabels.post,posts.pre] in
     (* initialization *)
-    let init = init ~is_pre_main:(WpStrategy.is_main_init kf)
+    let init =
+      init ~is_pre_main:(Globals.is_entry_point ~when_lib_entry:false kf)
         (env @* [Clabels.here,pres.pre]) in
     (* pre-condition *)
     let pre =

@@ -1782,8 +1782,6 @@ src/plugins/wp/Why3Provers.mli: CEA_WP
 src/plugins/wp/Wp.mli: .ignore
 src/plugins/wp/WpTac.ml: CEA_WP
 src/plugins/wp/WpTac.mli: CEA_WP
-src/plugins/wp/calculus.ml: CEA_WP
-src/plugins/wp/calculus.mli: CEA_WP
 src/plugins/wp/cfgAnnot.ml: CEA_WP
 src/plugins/wp/cfgAnnot.mli: CEA_WP
 src/plugins/wp/cfgInfos.ml: CEA_WP
@@ -1798,8 +1796,6 @@ src/plugins/wp/cfgInit.ml: CEA_WP
 src/plugins/wp/cfgInit.mli: CEA_WP
 src/plugins/wp/cfgWP.ml: CEA_WP
 src/plugins/wp/cfgWP.mli: CEA_WP
-src/plugins/wp/cil2cfg.ml: CEA_WP
-src/plugins/wp/cil2cfg.mli: CEA_WP
 src/plugins/wp/clabels.ml: CEA_WP
 src/plugins/wp/clabels.mli: CEA_WP
 src/plugins/wp/configure.ac: CEA_WP
@@ -1938,12 +1934,8 @@ src/plugins/wp/share/why3/frama_c_wp/qed.mlw: CEA_WP
 src/plugins/wp/share/why3/frama_c_wp/vlist.mlw: CEA_WP
 src/plugins/wp/share/why3/frama_c_wp/vset.mlw: CEA_WP
 src/plugins/wp/share/wp.driver: CEA_WP
-src/plugins/wp/wpAnnot.ml: CEA_WP
-src/plugins/wp/wpAnnot.mli: CEA_WP
 src/plugins/wp/wpContext.ml: CEA_WP
 src/plugins/wp/wpContext.mli: CEA_WP
-src/plugins/wp/wpGenerator.ml: CEA_WP
-src/plugins/wp/wpGenerator.mli: CEA_WP
 src/plugins/wp/wpPropId.ml: CEA_WP
 src/plugins/wp/wpPropId.mli: CEA_WP
 src/plugins/wp/wpReached.ml: CEA_WP
@@ -1952,8 +1944,6 @@ src/plugins/wp/wpReport.ml: CEA_WP
 src/plugins/wp/wpReport.mli: CEA_WP
 src/plugins/wp/wpRTE.ml: CEA_WP
 src/plugins/wp/wpRTE.mli: CEA_WP
-src/plugins/wp/wpStrategy.ml: CEA_WP
-src/plugins/wp/wpStrategy.mli: CEA_WP
 src/plugins/wp/wpTarget.ml: CEA_WP
 src/plugins/wp/wpTarget.mli: CEA_WP
 src/plugins/wp/wp_error.ml: CEA_WP

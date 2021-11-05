@@ -68,7 +68,7 @@ PLUGIN_CMO:= \
 	LogicUsage RefUsage \
 	Layout Region \
 	RegionAnnot RegionAccess RegionDump RegionAnalysis \
-	cil2cfg normAtLabels wpPropId wpStrategy \
+	normAtLabels wpPropId \
 	Lang Repr Matrix Passive Splitter \
 	LogicBuiltins Definitions \
 	Cmath Cint Cfloat Vset Vlist Cstring Cvalues \
@@ -82,7 +82,7 @@ PLUGIN_CMO:= \
 	Sigma MemLoader MemDebug \
 	MemEmpty MemZeroAlias MemVar \
 	MemMemory MemTyped MemRegion MemVal \
-	wpReached wpRTE wpAnnot wpTarget \
+	wpReached wpRTE wpTarget \
 	CfgCompiler StmtSemantics \
 	VCS script proof wpo wpReport \
 	Footprint Tactical Strategy \
@@ -99,8 +99,8 @@ PLUGIN_CMO:= \
 	driver prover ProverSearch ProverScript \
 	Factory \
 	cfgInit cfgAnnot cfgInfos cfgCalculus \
-	calculus cfgDump cfgWP \
-	wpGenerator cfgGenerator \
+	cfgDump cfgWP \
+	cfgGenerator \
 	Generator register VC
 
 PLUGIN_CMI:= \
