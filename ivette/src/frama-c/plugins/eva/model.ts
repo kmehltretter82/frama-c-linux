@@ -127,10 +127,9 @@ export class Model implements ModelCallbacks {
     let selected = false;
     this.probes.forEach((p) => {
       if (p.fct === fct) {
+        p.setTransient();
         if (this.selected === p)
           selected = true;
-        if (!p.transient)
-          p.setTransient();
       }
     });
     if (selected)
