@@ -365,7 +365,10 @@ export function ValuesPanel(props: ValuesPanelProps) {
   const { zoom, width, height, model } = props;
   // --- reset line cache
   const listRef = React.useRef<VariableSizeList>(null);
+  const [rowCount, setRowCount] = React.useState(model.getRowCount());
   Dome.useEvent(model.laidout, () => {
+    // The layout has changed, so the number of rows may also have changed.
+    setRowCount(model.getRowCount());
     setImmediate(() => {
       const vlist = listRef.current;
       if (vlist) vlist.resetAfterIndex(0, true);
@@ -388,7 +391,7 @@ export function ValuesPanel(props: ValuesPanelProps) {
   return (
     <VariableSizeList
       ref={listRef}
-      itemCount={model.getRowCount()}
+      itemCount={rowCount}
       itemKey={model.getRowKey}
       itemSize={getRowHeight}
       estimatedItemSize={estimatedHeight}

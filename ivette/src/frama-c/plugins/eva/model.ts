@@ -120,7 +120,6 @@ export class Model implements ModelCallbacks {
 
   setByCallstacks(fct: string, b: boolean) {
     this.byCallstacks.set(fct, b);
-    this.values.clear();
     this.forceLayout();
   }
 
