@@ -1303,6 +1303,14 @@ val isGhostFormalVarinfo: varinfo -> bool
 *)
 val isGhostFormalVarDecl: (string * typ * attributes) -> bool
 
+
+(** [true] iff the given variable is a const global variable with non extern
+    storage.
+
+    @since Frama-C+dev
+*)
+val isGlobalInitConst: varinfo -> bool
+
 (** Remove attributes whose name appears in the first argument that are
     present anywhere in the fully expanded version of the type.
     @since Oxygen-20120901
