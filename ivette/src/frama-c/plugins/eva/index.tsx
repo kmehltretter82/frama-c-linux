@@ -28,9 +28,11 @@
 import React from 'react';
 import * as Dome from 'dome';
 import * as Ivette from 'ivette';
+import * as Server from 'frama-c/server';
 import { Vfill } from 'dome/layout/boxes';
 import { IconButton } from 'dome/controls/buttons';
 import { AutoSizer } from 'react-virtualized';
+import { Model } from './model';
 
 // Locals
 import { ProbeInfos } from './probeinfos';
@@ -45,6 +47,10 @@ import './style.css';
 // --------------------------------------------------------------------------
 
 function ValuesComponent() {
+  const [model] = React.useState(() => new Model());
+  model.mount();
+  Dome.useUpdate(model.changed, model.laidout);
+  Server.onShutdown(() => model.unmount());
   const [zoom, setZoom] = Dome.useNumberSettings('eva-zoom-factor', 0);
   return (
     <>
@@ -61,19 +67,20 @@ function ValuesComponent() {
         />
       </Ivette.TitleBar>
       <Vfill>
-        <ProbeInfos />
+        <ProbeInfos model={model} />
         <Vfill>
           <AutoSizer>
             {(dim: Dimension) => (
               <ValuesPanel
                 zoom={zoom}
+                model={model}
                 {...dim}
               />
             )}
           </AutoSizer>
         </Vfill>
-        <AlarmsInfos />
-        <StackInfos />
+        <AlarmsInfos model={model} />
+        <StackInfos model={model} />
       </Vfill>
     </>
   );

@@ -72,6 +72,7 @@ export class Model implements ModelCallbacks {
   private remanent?: Probe; // last transient
   private probes = new Map<string, Probe>();
   private folded = new Map<string, boolean>(); // folded functions
+  private byCallstacks = new Map<string, boolean>();
 
   getFocused() { return this.focused; }
   isFocused(p: Probe | undefined) { return this.focused === p; }
@@ -113,6 +114,28 @@ export class Model implements ModelCallbacks {
     this.forceLayout();
   }
 
+  isByCallstacks(fct: string): boolean {
+    return this.byCallstacks.get(fct) ?? false;
+  }
+
+  setByCallstacks(fct: string, b: boolean) {
+    this.byCallstacks.set(fct, b);
+    this.forceLayout();
+  }
+
+  clearFunction(fct: string) {
+    let selected = false;
+    this.probes.forEach((p) => {
+      if (p.fct === fct) {
+        p.setTransient();
+        if (this.selected === p)
+          selected = true;
+      }
+    });
+    if (selected)
+      this.clearSelection();
+  }
+
   // --- Caches
 
   readonly stacks = new StacksCache(this);
@@ -151,7 +174,7 @@ export class Model implements ModelCallbacks {
   }
 
   isSelectedRow(row: Row): boolean {
-    if (!this.focused?.byCallstacks) return false;
+    if (!this.byCallstacks) return false;
     const cs = this.callstack;
     return cs !== undefined && cs === row.callstack;
   }
@@ -182,14 +205,8 @@ export class Model implements ModelCallbacks {
 
   metaSelection(location: States.Location) {
     const p = this.getProbe(location);
-    if (p) {
-      if (p.transient) {
-        if (this.focused?.byCallstacks)
-          p.setByCallstacks(true);
-        else
-          p.setPersistent();
-      }
-    }
+    if (p && p.transient)
+      p.setPersistent();
   }
 
   clearSelection() {
@@ -228,7 +245,7 @@ export class Model implements ModelCallbacks {
       this.stacks,
       this.isFolded,
     );
-    this.rows = engine.layout(toLayout);
+    this.rows = engine.layout(toLayout, this.byCallstacks);
     this.laidout.emit();
     this.lock = false;
   }
@@ -272,26 +289,6 @@ export class Model implements ModelCallbacks {
 
 }
 
-// --------------------------------------------------------------------------
-// --- EVA Model Hook
-// --------------------------------------------------------------------------
-
-let MODEL: Model | undefined;
-
-Server.onShutdown(() => {
-  if (MODEL) {
-    MODEL.unmount();
-    MODEL = undefined;
-  }
-});
-
-export function useModel(): Model {
-  if (!MODEL) {
-    MODEL = new Model();
-    MODEL.mount();
-  }
-  Dome.useUpdate(MODEL.changed, MODEL.laidout);
-  return MODEL;
+export interface ModelProp {
+  model: Model;
 }
-
-// --------------------------------------------------------------------------

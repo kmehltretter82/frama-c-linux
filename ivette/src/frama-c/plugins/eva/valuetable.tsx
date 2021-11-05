@@ -30,9 +30,11 @@ import * as Dome from 'dome';
 import { classes } from 'dome/misc/utils';
 import { VariableSizeList } from 'react-window';
 import { Hpack, Filler } from 'dome/layout/boxes';
+import { Inset } from 'dome/frame/toolbars';
 import { Icon } from 'dome/controls/icons';
 import { Cell } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
+import { ModelProp } from 'frama-c/plugins/eva/model';
 
 // Frama-C
 import * as States from 'frama-c/states';
@@ -44,7 +46,6 @@ import { sizeof, EvaValues, EvaState } from './cells';
 import { Probe } from './probes';
 import { Row } from './layout';
 import { Callsite } from './stacks';
-import { useModel } from './model';
 import { Stmt } from './valueinfos';
 import './style.css';
 
@@ -91,7 +92,7 @@ function computeDiffs(
 // --- Table Cell
 // --------------------------------------------------------------------------
 
-interface TableCellProps {
+interface TableCellProps extends ModelProp {
   probe: Probe;
   row: Row;
 }
@@ -99,9 +100,8 @@ interface TableCellProps {
 const CELLPADDING = 12;
 
 function TableCell(props: TableCellProps) {
-  const model = useModel();
+  const { probe, row, model } = props;
   const [, setSelection] = States.useSelection();
-  const { probe, row } = props;
   const { kind, callstack } = row;
   const minWidth = CELLPADDING + WSIZER.dimension(probe.minCols);
   const maxWidth = CELLPADDING + WSIZER.dimension(probe.maxCols);
@@ -146,9 +146,10 @@ function TableCell(props: TableCellProps) {
           else status = 'Unknown';
         }
         const alarmClass = `eva-cell-alarms eva-alarm-${status}`;
+        const title = 'At least one alarm is raised in one callstack';
         contents = (
           <>
-            <Icon className={alarmClass} size={10} id="WARNING" />
+            <Icon className={alarmClass} size={10} title={title} id="WARNING" />
             <SizedArea cols={cols} rows={rows}>
               <span className={`eva-state-${vstate}`}>
                 <Diff {...vdiffs} />
@@ -197,6 +198,9 @@ interface TableSectionProps {
   folded: boolean;
   foldable: boolean;
   onClick: () => void;
+  byCallstacks: boolean;
+  onCallstackClick: () => void;
+  close: () => void;
 }
 
 function TableSection(props: TableSectionProps) {
@@ -214,6 +218,21 @@ function TableSection(props: TableSectionProps) {
         onClick={onClick}
       />
       <Cell className="eva-fct-name">{fct}</Cell>
+      <Filler />
+      <IconButton
+        icon="ITEMS.LIST"
+        className="eva-probeinfo-button"
+        selected={props.byCallstacks}
+        title="Details by callstack"
+        onClick={props.onCallstackClick}
+      />
+      <Inset />
+      <IconButton
+        icon="CROSS"
+        className="eva-probeinfo-button"
+        title="Close"
+        onClick={props.close}
+      />
     </>
   );
 }
@@ -265,10 +284,11 @@ function TableHead(props: TableHeadProps) {
 interface TableRowProps {
   style: React.CSSProperties;
   index: number;
+  data: ModelProp;
 }
 
 function TableRow(props: TableRowProps) {
-  const model = useModel();
+  const { model } = props.data;
   const row = model.getRow(props.index);
   if (!row) return null;
   const { kind, probes } = row;
@@ -277,6 +297,7 @@ function TableRow(props: TableRowProps) {
     if (!fct) return null;
     const folded = model.isFolded(fct);
     const foldable = model.isFoldable(fct);
+    const byCallstacks = model.isByCallstacks(fct);
     return (
       <Hpack className="eva-function" style={props.style}>
         <TableSection
@@ -284,6 +305,9 @@ function TableRow(props: TableRowProps) {
           folded={folded}
           foldable={foldable}
           onClick={() => model.setFolded(fct, !folded)}
+          byCallstacks={byCallstacks}
+          onCallstackClick={() => model.setByCallstacks(fct, !byCallstacks)}
+          close={() => model.clearFunction(fct)}
         />
       </Hpack>
     );
@@ -305,6 +329,7 @@ function TableRow(props: TableRowProps) {
       key={probe.marker}
       probe={probe}
       row={row}
+      model={model}
     />
   );
   return (
@@ -332,16 +357,18 @@ export interface Dimension {
   height: number;
 }
 
-export interface ValuesPanelProps extends Dimension {
+export interface ValuesPanelProps extends Dimension, ModelProp {
   zoom: number;
 }
 
 export function ValuesPanel(props: ValuesPanelProps) {
-  const model = useModel();
-  const { zoom, width, height } = props;
+  const { zoom, width, height, model } = props;
   // --- reset line cache
   const listRef = React.useRef<VariableSizeList>(null);
+  const [rowCount, setRowCount] = React.useState(model.getRowCount());
   Dome.useEvent(model.laidout, () => {
+    // The layout has changed, so the number of rows may also have changed.
+    setRowCount(model.getRowCount());
     setImmediate(() => {
       const vlist = listRef.current;
       if (vlist) vlist.resetAfterIndex(0, true);
@@ -364,13 +391,13 @@ export function ValuesPanel(props: ValuesPanelProps) {
   return (
     <VariableSizeList
       ref={listRef}
-      itemCount={model.getRowCount()}
+      itemCount={rowCount}
       itemKey={model.getRowKey}
       itemSize={getRowHeight}
       estimatedItemSize={estimatedHeight}
       width={width}
       height={height}
-      itemData={model}
+      itemData={{ model }}
     >
       {TableRow}
     </VariableSizeList>

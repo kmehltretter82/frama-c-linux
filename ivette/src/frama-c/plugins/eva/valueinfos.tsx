@@ -31,11 +31,11 @@ import { Hpack, Vpack } from 'dome/layout/boxes';
 import { Code, Cell } from 'dome/controls/labels';
 import * as States from 'frama-c/states';
 import * as Ast from 'frama-c/api/kernel/ast';
+import { ModelProp } from 'frama-c/plugins/eva/model';
 
 // Locals
 import { EvaAlarm } from './cells';
 import { Callsite } from './stacks';
-import { useModel } from './model';
 
 // --------------------------------------------------------------------------
 // --- Stmt Printer
@@ -66,8 +66,8 @@ export function Stmt(props: StmtProps) {
 // --- Alarms Panel
 // --------------------------------------------------------------------------
 
-export function AlarmsInfos() {
-  const model = useModel();
+export function AlarmsInfos(props: ModelProp) {
+  const { model } = props;
   const probe = model.getFocused();
   if (probe) {
     const callstack = model.getCallstack();
@@ -94,8 +94,8 @@ export function AlarmsInfos() {
 // --- Stack Panel
 // --------------------------------------------------------------------------
 
-export function StackInfos() {
-  const model = useModel();
+export function StackInfos(props: ModelProp) {
+  const { model } = props;
   const [, setSelection] = States.useSelection();
   const focused = model.getFocused();
   const callstack = model.getCalls();

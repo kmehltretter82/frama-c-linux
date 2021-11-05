@@ -78,8 +78,7 @@ export class Probe {
   rank?: number;
   minCols: number = LabelSize;
   maxCols: number = LabelSize;
-  byCallstacks = false;
-  zoomed = false;
+  zoomed = true;
   zoomable = false;
   effects = false;
   condition = false;
@@ -139,14 +138,6 @@ export class Probe {
     if (this.transient !== tr) {
       this.transient = tr;
       this.updateLabel();
-      this.model.forceLayout();
-    }
-  }
-
-  setByCallstacks(byCS: boolean) {
-    if (byCS !== this.byCallstacks) {
-      this.byCallstacks = byCS;
-      if (byCS) this.setPersistent();
       this.model.forceLayout();
     }
   }

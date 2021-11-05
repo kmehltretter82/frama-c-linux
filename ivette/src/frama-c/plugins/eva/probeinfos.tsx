@@ -37,23 +37,20 @@ import * as States from 'frama-c/states';
 // Locals
 import { SizedArea } from './sized';
 import { sizeof } from './cells';
-import { useModel } from './model';
+import { ModelProp } from './model';
 import { Stmt } from './valueinfos';
 
 // --------------------------------------------------------------------------
 // --- Probe Editor
 // --------------------------------------------------------------------------
 
-function ProbeEditor() {
-  const model = useModel();
+function ProbeEditor(props: ModelProp) {
+  const { model } = props;
   const probe = model.getFocused();
   if (!probe || !probe.code) return null;
   const { label } = probe;
   const { code } = probe;
   const { stmt, marker } = probe;
-  const byCS = probe.byCallstacks;
-  const stacks = model.getStacks(probe);
-  const stackable = byCS || stacks.length > 1;
   const { cols, rows } = sizeof(code);
   const { transient } = probe;
   const { zoomed } = probe;
@@ -65,14 +62,6 @@ function ProbeEditor() {
         <SizedArea cols={cols} rows={rows}>{code}</SizedArea>
       </div>
       <Code><Stmt stmt={stmt} marker={marker} /></Code>
-      <IconButton
-        icon="ITEMS.LIST"
-        className="eva-probeinfo-button"
-        display={stackable}
-        selected={byCS}
-        title={`Details by callstack (${stacks})`}
-        onClick={() => { if (probe) probe.setByCallstacks(!byCS); }}
-      />
       <IconButton
         icon="SEARCH"
         className="eva-probeinfo-button"
@@ -116,11 +105,11 @@ function ProbeEditor() {
 // --- Probe Panel
 // --------------------------------------------------------------------------
 
-export function ProbeInfos() {
-  const model = useModel();
+export function ProbeInfos(props: ModelProp) {
+  const { model } = props;
   const probe = model.getFocused();
   const fct = probe?.fct;
-  const byCS = probe?.byCallstacks;
+  const byCS = fct ? model.isByCallstacks(fct) : false;
   const effects = probe ? probe.effects : false;
   const condition = probe ? probe.condition : false;
   const summary = fct ? model.stacks.getSummary(fct) : false;
@@ -128,7 +117,7 @@ export function ProbeInfos() {
   const vstmt = model.getVstmt();
   return (
     <Hpack className="eva-probeinfo">
-      <ProbeEditor />
+      <ProbeEditor model={model} />
       <Filler />
       <ButtonGroup
         enabled={!!probe}
