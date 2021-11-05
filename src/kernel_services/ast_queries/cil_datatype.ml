@@ -2252,12 +2252,6 @@ module Global_annotation = struct
           | Dmodel_annot(l1,_), Dmodel_annot(l2,_) -> Model_info.compare l1 l2
           | Dmodel_annot _, _ -> -1
           | _, Dmodel_annot _ -> 1
-          | Dcustom_annot(_, n1, attr1, _),
-            Dcustom_annot(_, n2, attr2, _) ->
-            let res = Datatype.String.compare n1 n2 in
-            if res = 0 then Attributes.compare attr1 attr2 else res
-          | Dcustom_annot _, _ -> -1
-          | _, Dcustom_annot _ -> 1
           | Dextended (ext1, _, _), Dextended (ext2, _, _) ->
             Datatype.Int.compare ext1.ext_id ext2.ext_id
 
@@ -2277,7 +2271,6 @@ module Global_annotation = struct
           | Dinvariant(l,_) -> 13 * Logic_info.hash l
           | Dtype_annot(l,_) -> 17 * Logic_info.hash l
           | Dmodel_annot(l,_) -> 19 * Model_info.hash l
-          | Dcustom_annot(_,n,_,_) -> 23 * Datatype.String.hash n
           | Dextended ({ext_id},_,_) -> 29 * Datatype.Int.hash ext_id
 
         let copy = Datatype.undefined
@@ -2292,7 +2285,6 @@ module Global_annotation = struct
     | Dtype_annot(_, loc) -> loc
     | Dmodel_annot(_, loc) -> loc
     | Dvolatile(_, _, _, _,loc) -> loc
-    | Dcustom_annot(_,_,_,loc) -> loc
     | Dextended(_,_,loc) -> loc
 
   let attr = function
@@ -2304,7 +2296,6 @@ module Global_annotation = struct
     | Dtype_annot({ l_var_info = { lv_attr}}, _) -> lv_attr
     | Dmodel_annot({ mi_attr }, _) -> mi_attr
     | Dvolatile(_, _, _, attr, _) -> attr
-    | Dcustom_annot(_,_,attr,_) -> attr
     | Dextended (_,attr,_) -> attr
 end
 

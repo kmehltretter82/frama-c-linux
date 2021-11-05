@@ -3273,10 +3273,6 @@ class cil_printer () = object (self)
       current_label <- old_label
     | Dmodel_annot (mfi,_) ->
       self#model_info fmt mfi
-    | Dcustom_annot(_c, n ,_attr, _) ->
-      (* attributes are meant to be purely internal for now. *)
-      fprintf fmt "@[%a %s: <...>@]@\n"
-        self#pp_acsl_keyword "custom" n
     | Dinvariant (pred,_) ->
       let old_label = current_label in
       (match pred.l_labels with [l] -> current_label <- l | _ -> ());

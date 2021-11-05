@@ -9640,21 +9640,7 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
     end;
     empty
 
-  | Cabs.CUSTOM (custom, name, location) when isglobal ->
-    begin
-      let loc = convLoc location in
-      CurrentLoc.set loc;
-      try
-        let tcustom = Ltyping.custom custom in
-        let attr = fc_stdlib_attribute [] in
-        cabsPushGlobal (GAnnot(Dcustom_annot(tcustom, name, attr,loc),loc))
-      with LogicTypeError ((source,_),msg) ->
-        Kernel.warning
-          ~wkey:Kernel.wkey_annot_error ~source
-          "%s. Ignoring custom annotation" msg
-    end;
-    empty
-  | Cabs.CUSTOM _ | Cabs.GLOBANNOT _ | Cabs.PRAGMA _ | Cabs.GLOBASM _ | Cabs.FUNDEF _ ->
+  | Cabs.GLOBANNOT _ | Cabs.PRAGMA _ | Cabs.GLOBASM _ | Cabs.FUNDEF _ ->
     Kernel.fatal ~current:true "this form of declaration must be global"
 
 and doTypedef ghost ((specs, nl): Cabs.name_group) =

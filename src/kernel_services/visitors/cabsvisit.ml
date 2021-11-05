@@ -264,7 +264,6 @@ and childrenDefinition vis d =
     let dl' = mapNoCopyList (visitCabsDefinition vis) dl in
     if dl' != dl then LINKAGE (n, l, dl') else d
   | GLOBANNOT _ -> d
-  | CUSTOM _ -> d
 
 and visitCabsBlock vis (b: block) : block =
   doVisit vis vis#vblock childrenBlock b

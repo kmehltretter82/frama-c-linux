@@ -622,8 +622,6 @@ and print_def fmt def =
     fprintf fmt "@[/*@@@ @[%a@]@ */@]@\n"
       (pp_list ~sep:"@\n" Logic_print.print_decl) annot
 
-  | CUSTOM _ -> fprintf fmt "<custom annot>"
-
   | PRAGMA (a,_) ->
     fprintf fmt "@[#pragma %a@]@\n" print_expression a
 

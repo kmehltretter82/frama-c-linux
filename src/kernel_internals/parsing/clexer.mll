@@ -520,8 +520,7 @@ let make_annot ~one_line default lexbuf s =
      *)
      | Logic_ptree.Acode_annot (loc,a) -> CODE_ANNOT (a, loc)
      | Logic_ptree.Aloop_annot (loc,a) -> LOOP_ANNOT (a,loc)
-     | Logic_ptree.Aattribute_annot (loc,a) -> ATTRIBUTE_ANNOT (a, loc)
-     | Logic_ptree.Acustom(loc,id, a) -> CUSTOM_ANNOT(a, id, loc))
+     | Logic_ptree.Aattribute_annot (loc,a) -> ATTRIBUTE_ANNOT (a, loc))
   | None -> (* error occured and annotation is discarded. Find a normal token. *)
     default lexbuf
 

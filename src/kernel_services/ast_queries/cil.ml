@@ -2137,9 +2137,6 @@ and childrenAnnotation vis a =
       Queue.add (fun () -> Logic_env.add_model_field mfi')
         vis#get_filling_actions;
     if mfi' != mfi then Dmodel_annot (mfi',loc) else a
-  | Dcustom_annot(c,n,attr,loc) ->
-    let attr' = visitCilAttributes vis attr in
-    if attr != attr' then Dcustom_annot(c,n,attr',loc) else a
   | Dvolatile(tset,rvi,wvi,attr,loc) ->
     let tset' = mapNoCopy (visitCilIdTerm vis) tset in
     let rvi' = optMapNoCopy (visitCilVarUse vis) rvi in
@@ -5412,7 +5409,6 @@ let global_annotation_attributes = function
   | Dtype_annot ({l_var_info = { lv_attr }}, _) -> lv_attr
   | Dmodel_annot ({ mi_attr }, _) -> mi_attr
   | Dextended (_,attrs,_) -> attrs
-  | Dcustom_annot (_,_,attrs,_) -> attrs
 
 let global_attributes = function
   | GType ({ttype},_) -> typeAttrs ttype

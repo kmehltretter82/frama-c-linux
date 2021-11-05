@@ -132,8 +132,6 @@
         "continues", (fun _ -> CONTINUES), false;
         "contract", (fun _ -> CONTRACT), false;
         (* ACSL extension for external spec file *)
-        "custom", (fun _ -> CUSTOM), false;
-        (* ACSL extension for custom annotations *)
         "decreases", (fun _ -> DECREASES), false;
         "disjoint", (fun _ -> DISJOINT), false;
         "double", (fun _ -> DOUBLE), true;

@@ -158,7 +158,6 @@ val pp_funspec : Format.formatter -> Cil_types.funspec -> unit
 val pp_code_annotation : Cil_types.code_annotation Pretty_utils.formatter
 val pp_funbehavior : Format.formatter -> Cil_types.funbehavior -> unit
 val pp_global_annotation : Cil_types.global_annotation Pretty_utils.formatter
-val pp_custom_tree : Format.formatter -> Cil_types.custom_tree -> unit
 val pp_kinstr : Format.formatter -> Cil_types.kinstr -> unit
 val pp_cil_function : Format.formatter -> Cil_types.cil_function -> unit
 val pp_kernel_function : Format.formatter -> Cil_types.kernel_function -> unit

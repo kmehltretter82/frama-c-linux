@@ -326,7 +326,6 @@ class slocVisitor ~libc : sloc_visitor = object(self)
         | Dinvariant (toto, _) -> toto.l_var_info.lv_name
         | Dtype_annot (ta, _) -> ta.l_var_info.lv_name
         | Dmodel_annot (mi, _) -> mi.mi_name
-        | Dcustom_annot (_c, _n, _, _) -> " (Custom) "
         | Dextended ({ext_name}, _, _) -> " (Extension " ^ ext_name ^ ")"
       end
 

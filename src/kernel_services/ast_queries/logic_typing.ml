@@ -4315,8 +4315,6 @@ struct
 
   let annot = C.on_error annot rollback_transaction
 
-  let custom _c = CustomDummy
-
 end
 
 (*

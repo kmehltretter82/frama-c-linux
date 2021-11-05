@@ -321,7 +321,6 @@ module MYTREE = struct
     | Dinvariant (li, _) -> Some (global_name li.l_var_info.lv_name)
     | Dtype_annot (li, _) -> Some (global_name li.l_var_info.lv_name)
     | Dmodel_annot (mf, _) -> Some (global_name mf.mi_name)
-    | Dcustom_annot _ -> Some "custom clause"
     | Dextended (e,_,_) -> Some ("ACSL extension " ^ (extension_name e))
 
   let make_list_globals hide sort_order globs =

@@ -1372,7 +1372,7 @@ let dependencies_of_global annot =
 let rec remove_declared_global_annot logic_vars = function
   | Dfun_or_pred(li,_) | Dinvariant(li,_) | Dtype_annot(li,_) ->
     Cil_datatype.Logic_info.Set.remove li logic_vars
-  | Dvolatile _ | Dtype _ | Dlemma _ | Dmodel_annot _ | Dcustom_annot _
+  | Dvolatile _ | Dtype _ | Dlemma _ | Dmodel_annot _
   | Dextended _ ->
     logic_vars
   | Daxiomatic (_,l,_, _) ->
@@ -1698,7 +1698,7 @@ let logic_info_of_global s =
     | Dfun_or_pred(li,_) | Dinvariant(li,_) | Dtype_annot(li,_) ->
       check_logic_info li acc
     | Daxiomatic (_,l, _, _) -> List.fold_left check_one acc l
-    | Dtype _ | Dvolatile _ | Dlemma _ | Dmodel_annot _ | Dcustom_annot _
+    | Dtype _ | Dvolatile _ | Dlemma _ | Dmodel_annot _
     | Dextended _
       -> acc
   in

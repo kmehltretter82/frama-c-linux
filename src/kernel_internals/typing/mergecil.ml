@@ -650,7 +650,6 @@ let lcEq = PlainMerging.create_eq_table 111 (* Logic constructors *)
 
 let laEq = PlainMerging.create_eq_table 111 (* Axiomatics *)
 let llEq = PlainMerging.create_eq_table 111 (* Lemmas *)
-let lcusEq = PlainMerging.create_eq_table 111 (* Custom *)
 
 let lvEq = VolatileMerging.create_eq_table 111
 let mfEq = ModelMerging.create_eq_table 111
@@ -668,7 +667,6 @@ let ltSyn = PlainMerging.create_syn_table 111
 let lcSyn = PlainMerging.create_syn_table 111
 let laSyn = PlainMerging.create_syn_table 111
 let llSyn = PlainMerging.create_syn_table 111
-let lcusSyn = PlainMerging.create_syn_table 111
 let lvSyn = VolatileMerging.create_syn_table 111
 let mfSyn = ModelMerging.create_syn_table 111
 let extSyn = ExtMerging.create_syn_table 111
@@ -862,8 +860,6 @@ let rec global_annot_without_irrelevant_attributes ga =
   match ga with
   | Dvolatile(vi,rd,wr,attr,loc) ->
     Dvolatile(vi,rd,wr,drop_attributes_for_merge attr,loc)
-  | Dcustom_annot (c,n,attr,loc) ->
-    Dcustom_annot (c,n,drop_attributes_for_merge attr,loc)
   | Daxiomatic(n,l,attr,loc) ->
     Daxiomatic(n,List.map global_annot_without_irrelevant_attributes l,
                drop_attributes_for_merge attr,loc)
@@ -924,12 +920,6 @@ let rec global_annot_pass1 g = match g with
     CurrentLoc.set l;
     ignore (ModelMerging.getNode
               mfEq mfSyn !currentFidx (mfi.mi_name,mfi.mi_base_type) mfi
-              (Some (l, !currentDeclIdx)))
-  | Dcustom_annot (c, n, _, l) ->
-    Format.eprintf "Mergecil : custom@.";
-    CurrentLoc.set l;
-    ignore (PlainMerging.getNode
-              lcusEq lcusSyn !currentFidx n (n,(c,l))
               (Some (l, !currentDeclIdx)))
   | Dinvariant (pi,l)  ->
     CurrentLoc.set l;
@@ -2360,19 +2350,6 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
         Logic_env.add_model_field
           (ModelMerging.find_eq_table
              mfEq (!currentFidx,(mf'.mi_name,mf'.mi_base_type))).ndata;
-      | Some _ -> ()
-    end
-  | Dcustom_annot (_c, n, _, l) ->
-    begin
-      CurrentLoc.set l;
-      match
-        PlainMerging.findReplacement
-          true lcusEq !currentFidx n
-      with
-      | None ->
-        let g = visitCilGlobal renameVisitor g in
-        if not in_axiomatic then
-          mergePushGlobals g
       | Some _ -> ()
     end
   | Dlemma (n,_,_,_,_,l) ->

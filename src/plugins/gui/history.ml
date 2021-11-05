@@ -239,7 +239,6 @@ let translate_history_elt old_helt =
       | GAnnot(Dinvariant _,_),    GAnnot(Dinvariant _,_)
       | GAnnot(Dtype_annot _,_),   GAnnot(Dtype_annot _,_)
       | GAnnot(Dmodel_annot _,_),  GAnnot(Dmodel_annot _,_)
-      | GAnnot(Dcustom_annot _,_), GAnnot(Dcustom_annot _,_)
         -> (** they have no names *) ()
       | _ -> (** different constructors *) ()
     in

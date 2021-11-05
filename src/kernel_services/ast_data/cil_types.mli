@@ -1830,15 +1830,6 @@ and global_annotation =
       argument of type t *)
   | Dextended of acsl_extension * attributes * location
   (** Extended global clause. *)
-  | Dcustom_annot of custom_tree * string * attributes * location
-  (*Custom declaration*)
-
-and custom_tree = CustomDummy
-(*
-  | CustomType of logic_type
-  | CustomLexpr of lexpr
-  | CustomOther of string * (custom_tree list)
-*)
 
 type kinstr =
   | Kstmt of stmt

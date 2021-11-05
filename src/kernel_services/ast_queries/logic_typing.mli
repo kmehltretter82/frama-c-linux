@@ -233,8 +233,6 @@ sig
 
   val annot : Logic_ptree.decl -> global_annotation
 
-  val custom : Logic_ptree.custom_tree -> Cil_types.custom_tree
-
   (** [funspec behaviors f prms typ spec] type-checks a function contract.
       @param behaviors list of existing behaviors (outside of the current
       spec, e.g. in the spec of the corresponding declaration when type-checking

@@ -1026,14 +1026,9 @@ and pp_global_annotation fmt = function
     Format.fprintf fmt "Dtype_annot(%a,%a)"  pp_logic_info logic_info  pp_location location
   | Dmodel_annot(model_info,location) ->
     Format.fprintf fmt "Dmodel_annot(%a,%a)"  pp_model_info model_info  pp_location location
-  | Dcustom_annot(custom_tree,string,attributes,location) ->
-    Format.fprintf fmt "Dcustom_annot(%a,%a,%a,%a)"  pp_custom_tree custom_tree  pp_string string
-      pp_attributes attributes  pp_location location
   | Dextended (e,attr,loc) ->
     Format.fprintf fmt "Dextended(%a,%a,%a)"
       pp_acsl_extension e pp_attributes attr pp_location loc
-
-and pp_custom_tree fmt _custom_tree = Format.fprintf fmt "CustomDummy"
 
 and pp_variant fmt = pp_pair pp_term (pp_option pp_logic_info) fmt
 

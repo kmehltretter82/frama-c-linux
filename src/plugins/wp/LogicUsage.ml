@@ -418,7 +418,6 @@ class visitor =
 
       | Dvolatile _
       | Dmodel_annot _
-      | Dcustom_annot _
       | Dextended _
         -> SkipChildren
 
