@@ -10,7 +10,7 @@
 78a85,86
 > [kernel] tests/value/multidim.c:57: 
 >   more than 0(28) elements to enumerate. Approximating.
-120,123d127
+104,107d111
 < [kernel] tests/value/multidim.c:56: 
 <   more than 0(28) elements to enumerate. Approximating.
 < [kernel] tests/value/multidim.c:57: 
