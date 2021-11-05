@@ -5591,7 +5591,6 @@ and makeCompType ghost (isstruct: bool)
         faddrof = false;
         fsize_in_bits = None;
         foffset_in_bits = None;
-        fpadding_in_bits = None;
       } :: flds
     in
     fold addFieldInfo flds nl

@@ -239,7 +239,6 @@ and pp_fieldinfo fmt fieldinfo =
        faddrof=%a;\
        fsize_in_bits=%a;\
        foffset_in_bits=%a;\
-       fpadding_in_bits=%a;\
        }"
       pp_compinfo fieldinfo.fcomp
       pp_string fieldinfo.forig_name
@@ -251,7 +250,6 @@ and pp_fieldinfo fmt fieldinfo =
       pp_bool fieldinfo.faddrof
       (pp_option pp_int) fieldinfo.fsize_in_bits
       (pp_option pp_int) fieldinfo.foffset_in_bits
-      (pp_option pp_int) fieldinfo.fpadding_in_bits
   else
     Format.fprintf fmt
       "{\

@@ -843,8 +843,8 @@ module Fieldinfo = struct
                            floc = loc;
                            faddrof = false;
                            fsize_in_bits = None;
-                           foffset_in_bits = None;
-                           fpadding_in_bits = None }
+                           foffset_in_bits = None
+                         }
                          :: acc)
                       acc
                       Location.reprs)

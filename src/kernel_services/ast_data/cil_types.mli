@@ -444,10 +444,6 @@ and fieldinfo = {
   (** Offset at which the field starts in the structure.
       Do not read this field directly. Use {!Cil.fieldBitsOffset} or
       {!Cil.bitsOffset} instead. *)
-
-  mutable fpadding_in_bits: int option;
-  (** (Deprecated.) Store the size of the padding that follows the field, if any.
-      @deprecated only Jessie uses this *)
 }
 
 (* ************************************************************************* *)
